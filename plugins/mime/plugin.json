@@ -1,0 +1,8 @@
+{
+  "plugin": {
+    "name": "mime",
+    "version": "0.1.2-1",
+    "author": "Tim Caswell",
+	"type": "library",
+  }
+}

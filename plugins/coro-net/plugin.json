@@ -1,0 +1,8 @@
+{
+  "plugin": {
+    "name": "coro-net",
+    "version": "1.1.1-1",
+    "author": "Tim Caswell",
+	"type": "library",
+  }
+}

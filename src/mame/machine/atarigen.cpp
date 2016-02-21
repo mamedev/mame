@@ -10,11 +10,6 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/2151intf.h"
-#include "sound/2413intf.h"
-#include "sound/tms5220.h"
-#include "sound/okim6295.h"
-#include "sound/pokey.h"
 #include "video/atarimo.h"
 #include "atarigen.h"
 
@@ -965,9 +960,6 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_slapstic_mirror(0),
 		m_scanlines_per_callback(0),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_oki(*this, "oki"),
-		m_soundcomm(*this, "soundcomm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -1012,7 +1004,7 @@ void atarigen_state::machine_reset()
 	// reset the slapstic
 	if (m_slapstic_num != 0)
 	{
-		if (!m_slapstic_device)
+		if (!m_slapstic_device.found())
 			fatalerror("Slapstic device is missing?\n");
 
 		m_slapstic_device->slapstic_reset();
@@ -1187,8 +1179,8 @@ void atarigen_state::device_post_load()
 {
 	if (m_slapstic_num != 0)
 	{
-		if (!m_slapstic_device)
-		fatalerror("Slapstic device is missing?\n");
+		if (!m_slapstic_device.found())
+			fatalerror("Slapstic device is missing?\n");
 
 		slapstic_update_bank(m_slapstic_device->slapstic_bank());
 	}
@@ -1222,37 +1214,30 @@ DIRECT_UPDATE_MEMBER(atarigen_state::slapstic_setdirect)
 //  slapstic and sets the chip number.
 //-------------------------------------------------
 
-void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, int chipnum)
+void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t mirror)
 {
-	// reset in case we have no state
-	m_slapstic_num = chipnum;
-	m_slapstic = nullptr;
+	if (!m_slapstic_device.found())
+		fatalerror("Slapstic device is missing\n");
 
-	// if we have a chip, install it
-	if (chipnum != 0)
-	{
-		if (!m_slapstic_device)
-			fatalerror("Slapstic device is missing\n");
+	// initialize the slapstic
+	m_slapstic_num = m_slapstic_device->m_chipnum;
+	m_slapstic_device->slapstic_init();
 
-		// initialize the slapstic
-		m_slapstic_device->slapstic_init(machine(), chipnum);
+	// install the memory handlers
+	address_space &program = device.space(AS_PROGRAM);
+	m_slapstic = program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, read16_delegate(FUNC(atarigen_state::slapstic_r), this), write16_delegate(FUNC(atarigen_state::slapstic_w), this));
+	program.set_direct_update_handler(direct_update_delegate(FUNC(atarigen_state::slapstic_setdirect), this));
 
-		// install the memory handlers
-		address_space &program = device.space(AS_PROGRAM);
-		m_slapstic = program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, read16_delegate(FUNC(atarigen_state::slapstic_r), this), write16_delegate(FUNC(atarigen_state::slapstic_w), this));
-		program.set_direct_update_handler(direct_update_delegate(FUNC(atarigen_state::slapstic_setdirect), this));
+	// allocate memory for a copy of bank 0
+	m_slapstic_bank0.resize(0x2000);
+	memcpy(&m_slapstic_bank0[0], m_slapstic, 0x2000);
 
-		// allocate memory for a copy of bank 0
-		m_slapstic_bank0.resize(0x2000);
-		memcpy(&m_slapstic_bank0[0], m_slapstic, 0x2000);
+	// ensure we recopy memory for the bank
+	m_slapstic_bank = 0xff;
 
-		// ensure we recopy memory for the bank
-		m_slapstic_bank = 0xff;
-
-		// install an opcode base handler if we are a 68000 or variant
-		m_slapstic_base = base;
-		m_slapstic_mirror = mirror;
-	}
+	// install an opcode base handler if we are a 68000 or variant
+	m_slapstic_base = base;
+	m_slapstic_mirror = mirror;
 }
 
 
@@ -1264,7 +1249,7 @@ void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t 
 
 WRITE16_MEMBER(atarigen_state::slapstic_w)
 {
-	if (!m_slapstic_device)
+	if (!m_slapstic_device.found())
 		fatalerror("Slapstic device is missing?\n");
 
 	slapstic_update_bank(m_slapstic_device->slapstic_tweak(space, offset));
@@ -1278,7 +1263,7 @@ WRITE16_MEMBER(atarigen_state::slapstic_w)
 
 READ16_MEMBER(atarigen_state::slapstic_r)
 {
-	if (!m_slapstic_device)
+	if (!m_slapstic_device.found())
 		fatalerror("Slapstic device is missing?\n");
 
 	// fetch the result from the current bank first
@@ -1287,57 +1272,6 @@ READ16_MEMBER(atarigen_state::slapstic_r)
 	// then determine the new one
 	slapstic_update_bank(m_slapstic_device->slapstic_tweak(space, offset));
 	return result;
-}
-
-
-
-/***************************************************************************
-    SOUND HELPERS
-***************************************************************************/
-
-//-------------------------------------------------
-//  set_volume_by_type: Scans for a particular
-//  sound chip and changes the volume on all
-//  channels associated with it.
-//-------------------------------------------------
-
-void atarigen_state::set_volume_by_type(int volume, device_type type)
-{
-	sound_interface_iterator iter(*this);
-	for (device_sound_interface *sound = iter.first(); sound != nullptr; sound = iter.next())
-		if (sound->device().type() == type)
-			sound->set_output_gain(ALL_OUTPUTS, volume / 100.0);
-}
-
-
-//-------------------------------------------------
-//  set_XXXXX_volume: Sets the volume for a given
-//  type of chip.
-//-------------------------------------------------
-
-void atarigen_state::set_ym2151_volume(int volume)
-{
-	set_volume_by_type(volume, YM2151);
-}
-
-void atarigen_state::set_ym2413_volume(int volume)
-{
-	set_volume_by_type(volume, YM2413);
-}
-
-void atarigen_state::set_pokey_volume(int volume)
-{
-	set_volume_by_type(volume, POKEY);
-}
-
-void atarigen_state::set_tms5220_volume(int volume)
-{
-	set_volume_by_type(volume, TMS5220);
-}
-
-void atarigen_state::set_oki6295_volume(int volume)
-{
-	set_volume_by_type(volume, OKIM6295);
 }
 
 

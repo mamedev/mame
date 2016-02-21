@@ -54,7 +54,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
-	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
+	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;
@@ -176,7 +176,7 @@ void hh_melps4_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void hh_melps4_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+void hh_melps4_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
@@ -185,7 +185,8 @@ void hh_melps4_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 set
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
-	display_update();
+	if (update)
+		display_update();
 }
 
 

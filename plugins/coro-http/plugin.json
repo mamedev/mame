@@ -1,0 +1,8 @@
+{
+  "plugin": {
+    "name": "coro-http",
+    "version": "1.2.1-1",
+    "author": "Tim Caswell",
+	"type": "library",
+  }
+}

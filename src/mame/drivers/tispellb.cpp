@@ -26,6 +26,7 @@
   - TMC0355 4KB VSM ROM CD2602*
   - 8-digit cyan VFD display
   - 1-bit sound (indicated by a music note symbol on the top-right of the casing)
+  - note: much rarer than the 1978 version, not much luck finding one on eBay
 
   Spelling ABC (UK), 1979: exact same hardware as US version
 
@@ -104,7 +105,6 @@ protected:
 void tispellb_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
-	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
 
 	// zerofill
 	m_rev1_ctl = 0;
@@ -138,9 +138,10 @@ void tispellb_state::power_off()
 
 void tispellb_state::prepare_display()
 {
-	// same as snspell
-	UINT16 gridmask = (m_display_decay[15][16] != 0) ? 0xffff : 0x8000;
-	display_matrix_seg(16+1, 16, m_plate | 0x10000, m_grid & gridmask, 0x3fff);
+	// almost same as snspell
+	UINT16 gridmask = (m_display_decay[15][16] != 0) ? 0xffff : 0x8000; // vfd filament on/off
+	set_display_segmask(0xff, 0x3fff);
+	display_matrix(16+1, 16, m_plate | 1<<16, m_grid & gridmask);
 }
 
 WRITE16_MEMBER(tispellb_state::main_write_o)

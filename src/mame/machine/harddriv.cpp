@@ -54,11 +54,11 @@ void  harddriv_state::device_reset()
 {
 	/* generic reset */
 	//atarigen_state::machine_reset();
-	m_slapstic_device->slapstic_reset();
+	if (m_slapstic_device.found()) m_slapstic_device->slapstic_reset();
 
 	/* halt several of the DSPs to start */
-	if (m_adsp != nullptr) m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	if (m_dsp32 != nullptr) m_dsp32->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	if (m_adsp.found()) m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	if (m_dsp32.found()) m_dsp32->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	m_last_gsp_shiftreg = 0;
 
@@ -72,14 +72,14 @@ void  harddriv_state::device_reset()
 	m_adsp_br = 0;
 	m_adsp_xflag = 0;
 
-	if (m_ds3sdsp != nullptr)
+	if (m_ds3sdsp.found())
 	{
 		m_ds3sdsp->load_boot_data(m_ds3sdsp->region()->base(), m_ds3sdsp_pgm_memory);
 		m_ds3sdsp_timer_en = 0;
 		m_ds3sdsp_internal_timer->adjust(attotime::never);
 	}
 
-	if (m_ds3xdsp != nullptr)
+	if (m_ds3xdsp.found())
 	{
 		m_ds3xdsp->load_boot_data(m_ds3xdsp->region()->base(), m_ds3xdsp_pgm_memory);
 		m_ds3xdsp_timer_en = 0;
@@ -173,7 +173,7 @@ READ16_MEMBER( harddriv_state::hd68k_msp_io_r )
 	UINT16 result;
 	offset = (offset / 2) ^ 1;
 	m_hd34010_host_access = TRUE;
-	result = (m_msp != nullptr) ? m_msp->host_r(space, offset, 0xffff) : 0xffff;
+	result = m_msp.found() ? m_msp->host_r(space, offset, 0xffff) : 0xffff;
 	m_hd34010_host_access = FALSE;
 	return result;
 }
@@ -182,7 +182,7 @@ READ16_MEMBER( harddriv_state::hd68k_msp_io_r )
 WRITE16_MEMBER( harddriv_state::hd68k_msp_io_w )
 {
 	offset = (offset / 2) ^ 1;
-	if (m_msp != nullptr)
+	if (m_msp.found())
 	{
 		m_hd34010_host_access = TRUE;
 		m_msp->host_w(space, offset, data, 0xffff);
@@ -302,7 +302,7 @@ READ16_MEMBER( harddriv_state::hd68k_adc12_r )
 
 READ16_MEMBER( harddriv_state::hd68k_sound_reset_r )
 {
-	if (m_jsa != nullptr)
+	if (m_jsa.found())
 		m_jsa->reset();
 	return ~0;
 }
@@ -404,12 +404,12 @@ WRITE16_MEMBER( harddriv_state::hd68k_nwr_w )
 			break;
 		case 6: /* /GSPRES */
 			logerror("Write to /GSPRES(%d)\n", data);
-			if (m_gsp != nullptr)
+			if (m_gsp.found())
 				m_gsp->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 		case 7: /* /MSPRES */
 			logerror("Write to /MSPRES(%d)\n", data);
-			if (m_msp != nullptr)
+			if (m_msp.found())
 				m_msp->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 	}
@@ -859,7 +859,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_ds3_control_w )
 	{
 		case 0:
 			/* SRES - reset sound CPU */
-			if (m_ds3sdsp)
+			if (m_ds3sdsp.found())
 			{
 				m_ds3sdsp->set_input_line(INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
 				m_ds3sdsp->load_boot_data(m_ds3sdsp->region()->base(), m_ds3sdsp_pgm_memory);
@@ -879,7 +879,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_ds3_control_w )
 
 		case 1:
 			/* XRES - reset sound helper CPU */
-			if (m_ds3xdsp)
+			if (m_ds3xdsp.found())
 			{
 				m_ds3xdsp->set_input_line(INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
 				m_ds3xdsp->load_boot_data(m_ds3xdsp->region()->base(), m_ds3xdsp_pgm_memory);
@@ -1510,11 +1510,11 @@ WRITE16_MEMBER( harddriv_state::hd68k_dsk_control_w )
 	switch (offset & 7)
 	{
 		case 0: /* DSPRESTN */
-			if (m_dsp32) m_dsp32->set_input_line(INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
+			if (m_dsp32.found()) m_dsp32->set_input_line(INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 1: /* DSPZN */
-			if (m_dsp32) m_dsp32->set_input_line(INPUT_LINE_HALT, val ? CLEAR_LINE : ASSERT_LINE);
+			if (m_dsp32.found()) m_dsp32->set_input_line(INPUT_LINE_HALT, val ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 2: /* ZW1 */
@@ -1578,7 +1578,7 @@ READ16_MEMBER( harddriv_state::hd68k_dsk_rom_r )
 WRITE16_MEMBER( harddriv_state::hd68k_dsk_dsp32_w )
 {
 	m_dsk_pio_access = TRUE;
-	if (m_dsp32) m_dsp32->pio_w(offset, data);
+	if (m_dsp32.found()) m_dsp32->pio_w(offset, data);
 	m_dsk_pio_access = FALSE;
 }
 
@@ -1587,7 +1587,7 @@ READ16_MEMBER( harddriv_state::hd68k_dsk_dsp32_r )
 {
 	UINT16 result;
 	m_dsk_pio_access = TRUE;
-	if (m_dsp32) result = m_dsp32->pio_r(offset);
+	if (m_dsp32.found()) result = m_dsp32->pio_r(offset);
 	else result = 0x00;
 
 	m_dsk_pio_access = FALSE;

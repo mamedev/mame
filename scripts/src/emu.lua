@@ -38,6 +38,18 @@ if _OPTIONS["with-bundled-lua"] then
 	}
 end
 
+if (_OPTIONS["targetos"] == "windows") then
+	defines {
+		"UI_WINDOWS",
+	}
+end
+
+if (_OPTIONS["osd"] == "sdl") then
+	defines {
+		"UI_SDL",
+	}
+end
+
 files {
 	MAME_DIR .. "src/emu/emu.h",
 	MAME_DIR .. "src/emu/gamedrv.h",
@@ -105,6 +117,8 @@ files {
 	MAME_DIR .. "src/emu/distate.h",
 	MAME_DIR .. "src/emu/divideo.cpp",
 	MAME_DIR .. "src/emu/divideo.h",
+	MAME_DIR .. "src/emu/divtlb.cpp",
+	MAME_DIR .. "src/emu/divtlb.h",
 	MAME_DIR .. "src/emu/drawgfx.cpp",
 	MAME_DIR .. "src/emu/drawgfx.h",
 	MAME_DIR .. "src/emu/drawgfxm.h",
@@ -208,8 +222,6 @@ files {
 	MAME_DIR .. "src/emu/ui/info_pty.h",
 	MAME_DIR .. "src/emu/ui/inputmap.cpp",
 	MAME_DIR .. "src/emu/ui/inputmap.h",
-	MAME_DIR .. "src/emu/ui/selgame.cpp",
-	MAME_DIR .. "src/emu/ui/selgame.h",
 	MAME_DIR .. "src/emu/ui/sliders.cpp",
 	MAME_DIR .. "src/emu/ui/sliders.h",
 	MAME_DIR .. "src/emu/ui/slotopt.cpp",
@@ -222,6 +234,48 @@ files {
 	MAME_DIR .. "src/emu/ui/videoopt.h",
 	MAME_DIR .. "src/emu/ui/viewgfx.cpp",
 	MAME_DIR .. "src/emu/ui/viewgfx.h",
+	MAME_DIR .. "src/emu/ui/auditmenu.cpp",
+	MAME_DIR .. "src/emu/ui/auditmenu.h",
+	MAME_DIR .. "src/emu/ui/cmddata.h",
+	MAME_DIR .. "src/emu/ui/cmdrender.h",
+	MAME_DIR .. "src/emu/ui/ctrlmenu.cpp",
+	MAME_DIR .. "src/emu/ui/ctrlmenu.h",
+	MAME_DIR .. "src/emu/ui/custmenu.cpp",
+	MAME_DIR .. "src/emu/ui/custmenu.h",
+	MAME_DIR .. "src/emu/ui/custui.cpp",
+	MAME_DIR .. "src/emu/ui/custui.h",
+	MAME_DIR .. "src/emu/ui/datfile.cpp",
+	MAME_DIR .. "src/emu/ui/datfile.h",
+	MAME_DIR .. "src/emu/ui/datmenu.cpp",
+	MAME_DIR .. "src/emu/ui/datmenu.h",
+	MAME_DIR .. "src/emu/ui/defimg.h",
+	MAME_DIR .. "src/emu/ui/dirmenu.cpp",
+	MAME_DIR .. "src/emu/ui/dirmenu.h",
+	MAME_DIR .. "src/emu/ui/dsplmenu.cpp",
+	MAME_DIR .. "src/emu/ui/dsplmenu.h",
+	MAME_DIR .. "src/emu/ui/icorender.h",
+	MAME_DIR .. "src/emu/ui/inifile.cpp",
+	MAME_DIR .. "src/emu/ui/inifile.h",
+	MAME_DIR .. "src/emu/ui/miscmenu.cpp",
+	MAME_DIR .. "src/emu/ui/miscmenu.h",
+	MAME_DIR .. "src/emu/ui/moptions.cpp",
+	MAME_DIR .. "src/emu/ui/moptions.h",
+	MAME_DIR .. "src/emu/ui/optsmenu.cpp",
+	MAME_DIR .. "src/emu/ui/optsmenu.h",
+	MAME_DIR .. "src/emu/ui/selector.cpp",
+	MAME_DIR .. "src/emu/ui/selector.h",
+	MAME_DIR .. "src/emu/ui/selgame.cpp",
+	MAME_DIR .. "src/emu/ui/selgame.h",
+	MAME_DIR .. "src/emu/ui/simpleselgame.cpp",
+	MAME_DIR .. "src/emu/ui/simpleselgame.h",
+	MAME_DIR .. "src/emu/ui/selsoft.cpp",
+	MAME_DIR .. "src/emu/ui/selsoft.h",
+	MAME_DIR .. "src/emu/ui/sndmenu.cpp",
+	MAME_DIR .. "src/emu/ui/sndmenu.h",
+	MAME_DIR .. "src/emu/ui/starimg.h",
+	MAME_DIR .. "src/emu/ui/toolbar.h",
+	MAME_DIR .. "src/emu/ui/utils.cpp",
+	MAME_DIR .. "src/emu/ui/utils.h",	
 	MAME_DIR .. "src/emu/validity.cpp",
 	MAME_DIR .. "src/emu/validity.h",
 	MAME_DIR .. "src/emu/video.cpp",
@@ -333,6 +387,7 @@ dependency {
 	-- additional dependencies
 	--------------------------------------------------
 	{ MAME_DIR .. "src/emu/rendfont.cpp", GEN_DIR .. "emu/uismall.fh" },
+	{ MAME_DIR .. "src/emu/rendfont.cpp", GEN_DIR .. "emu/ui/uicmd14.fh" },
 	-------------------------------------------------
 	-- core layouts
 	--------------------------------------------------
@@ -352,7 +407,8 @@ dependency {
 }
 
 custombuildtask {
-	{ MAME_DIR .. "src/emu/uismall.png"         , GEN_DIR .. "emu/uismall.fh",  {  MAME_DIR.. "scripts/build/png2bdc.py",  MAME_DIR .. "scripts/build/file2str.py" }, {"@echo Converting uismall.png...", PYTHON .. " $(1) $(<) temp.bdc", PYTHON .. " $(2) temp.bdc $(@) font_uismall UINT8" }},
+	{ MAME_DIR .. "src/emu/uismall.png"         , GEN_DIR .. "emu/uismall.fh",  {  MAME_DIR.. "scripts/build/png2bdc.py",  MAME_DIR .. "scripts/build/file2str.py" }, {"@echo Converting uismall.png...", PYTHON .. " $(1) $(<) temp.bdc",     PYTHON .. " $(2) temp.bdc $(@) font_uismall UINT8" }},
+	{ MAME_DIR .. "src/emu/ui/uicmd14.png"      , GEN_DIR .. "emu/ui/uicmd14.fh",  {  MAME_DIR.. "scripts/build/png2bdc.py",  MAME_DIR .. "scripts/build/file2str.py" }, {"@echo Converting uicmd14.png...", PYTHON .. " $(1) $(<) temp_cmd.bdc", PYTHON .. " $(2) temp_cmd.bdc $(@) font_uicmd14 UINT8" }},
 
 	layoutbuildtask("emu/layout", "dualhovu"),
 	layoutbuildtask("emu/layout", "dualhsxs"),

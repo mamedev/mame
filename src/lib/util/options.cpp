@@ -58,7 +58,8 @@ core_options::entry::entry(const char *name, const char *description, UINT32 fla
 		m_seqid(0),
 		m_error_reported(false),
 		m_priority(OPTION_PRIORITY_DEFAULT),
-		m_description(description)
+		m_description(description),
+		m_changed(false)
 {
 	// copy in the name(s) as appropriate
 	if (name != nullptr)
@@ -615,6 +616,16 @@ bool core_options::exists(const char *name) const
 }
 
 //-------------------------------------------------
+//  is_changed - return if option have been marked
+//  changed
+//-------------------------------------------------
+
+bool core_options::is_changed(const char *name) const
+{
+	auto curentry = m_entrymap.find(name);
+	return (curentry != m_entrymap.end()) ? curentry->second->is_changed() : false;
+}
+//-------------------------------------------------
 //  set_value - set the raw option value
 //-------------------------------------------------
 
@@ -656,6 +667,16 @@ void core_options::set_flag(const char *name, UINT32 mask, UINT32 flag)
 	curentry->second->set_flag(mask, flag);
 }
 
+void core_options::mark_changed(const char* name)
+{
+	// find the entry first
+	auto curentry = m_entrymap.find(name);
+	if (curentry == m_entrymap.end())
+	{
+		return;
+	}
+	curentry->second->mark_changed();
+}
 
 //-------------------------------------------------
 //  reset - reset the options state, removing

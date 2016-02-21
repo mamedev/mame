@@ -1,0 +1,60 @@
+Compiling MAME to JavaScript via Emscripten
+===========================================
+
+First, download and install Emscripten by following the instructions at the
+official site:
+
+https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html
+
+Once Emscripten has been installed, it should be possible to compile MAME
+out-of-the-box using Emscripten's 'emmake' tool. Because a full MAME compile is
+too large to load into a web browser at once, you will want to use the SOURCES
+parameter to compile only a subset of the project, e.g. (in the mame directory):
+
+emmake make SUBTARGET=pacmantest SOURCES=src/mame/drivers/pacman.cpp
+
+The SOURCES parameter should have the path to at least one driver .cpp file.
+The make process will attempt to locate and include all dependencies necessary
+to produce a complete build including the specified driver(s). However, 
+sometimes it is necessary to manually specify additional files (using commas) if
+this process misses something. E.g.:
+
+emmake make SUBTARGET=apple2e SOURCES=src/mame/drivers/apple2e.cpp,src/mame/machine/applefdc.cpp
+
+The value of the SUBTARGET parameter serves only to differentiate multiple
+builds and need not be set to any specific value.
+
+Other make parameters can also be used, e.g. -j for multithreaded compilation.
+
+When the compilation reaches the emcc phase, you may see a number of "unresolved
+symbol" warnings. At the moment, this is expected for OpenGL-related functions
+such as glPointSize. Any others may indicate that an additional dependency file
+needs to be specified in the SOURCES list. Unfortunately this process is not
+automated and you will need to search the source tree to locate the files
+supplying the missing symbols. You may also be able to get away with ignoring
+the warnings if the code path referencing them is not used at run-time.
+
+If all goes well, a .js file will be output to the current directory. This file
+cannot be run by itself, but requires an HTML loader to provide it with a canvas
+to output to and pass in command-line parameters. The Emularity project provides
+such a loader:
+
+https://github.com/db48x/emularity
+
+There are example .html files in that repository which can be edited to point
+to your newly compiled MAME js filename and pass in whatever parameters you
+desire. You will then need to place all of the following on a web server:
+
+* The compiled MAME .js file
+* The .js files from the Emularity package (loader.js, browserfs.js, etc.)
+* A .zip file with the ROMs for the MAME driver you would like to run (if any)
+* Any software files you would like to run with the MAME driver
+* An Emularity loader .html modified to point to all of the above
+
+You need to use a web server instead of opening the local files directly due to
+security restrictions in modern web browsers.
+
+If the result fails to run, you can open the Web Console in your browser to see
+any error output which may have been produced (e.g. missing or incorrect ROM
+files). A "ReferenceError: foo is not defined" error most likely indicates that
+a needed source file was omitted from the SOURCES list.

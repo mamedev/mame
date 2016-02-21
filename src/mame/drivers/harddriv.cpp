@@ -1425,7 +1425,7 @@ static MACHINE_CONFIG_FRAGMENT( driver_nomsp )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", harddriv_state, video_int_gen)
 	MCFG_CPU_PERIODIC_INT_DRIVER(harddriv_state, hd68k_irq_gen,  (double)HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
 
-	MCFG_SLAPSTIC_ADD("slapstic")
+	MCFG_SLAPSTIC_ADD("slapstic", 117)
 	MCFG_SLAPSTIC_68K_ACCESS(1)
 
 	MCFG_CPU_ADD("gsp", TMS34010, HARDDRIV_GSP_CLOCK)
@@ -1472,6 +1472,7 @@ static MACHINE_CONFIG_FRAGMENT( driver_msp )
 	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(harddriv_state, hdmsp_irq_gen))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
+	MCFG_DEVICE_REMOVE("slapstic")
 MACHINE_CONFIG_END
 
 
@@ -1510,6 +1511,7 @@ static MACHINE_CONFIG_FRAGMENT( multisync_msp )
 	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(harddriv_state, hdmsp_irq_gen))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
+	MCFG_DEVICE_REMOVE("slapstic")
 MACHINE_CONFIG_END
 
 
@@ -1524,6 +1526,8 @@ static MACHINE_CONFIG_FRAGMENT( multisync2 )
 
 	MCFG_CPU_MODIFY("gsp")
 	MCFG_CPU_PROGRAM_MAP(multisync2_gsp_map)
+
+	MCFG_DEVICE_REMOVE("slapstic")
 MACHINE_CONFIG_END
 
 
@@ -1682,6 +1686,7 @@ static MACHINE_CONFIG_FRAGMENT( stunrun )
 	MCFG_CPU_MODIFY("gsp")
 	MCFG_TMS340X0_PIXEL_CLOCK(5000000)  /* pixel clock */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
+	MCFG_DEVICE_REMOVE("slapstic")
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2017,6 +2022,10 @@ static MACHINE_CONFIG_START( racedriv_panorama_machine, harddriv_new_state )
 //  MCFG_QUANTUM_TIME(attotime::from_hz(100000))
 	MCFG_DEVICE_MODIFY("mainpcb:duartn68681")
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, harddriv_new_state,tx_a))
+
+	// boots with 'PROGRAM OK' when using standard Hard Drivin' board type (needs 137412-115 slapstic)
+	MCFG_DEVICE_MODIFY("mainpcb:slapstic")
+	MCFG_SLAPSTIC_NUM(115)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hack_timer", harddriv_new_state, hack_timer, attotime::from_hz(60))
 //  MCFG_QUANTUM_TIME(attotime::from_hz(60000))
@@ -4070,7 +4079,6 @@ Filename    Location    Label           Board
 ROM_START( racedrivpan )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 )        /* 2MB for 68000 code */
 	// Multisync PBB A045988 - Central Monitor
-	// boots with 'PROGRAM OK' when using standard Hard Drivin' board type (needs 137412-115 slapstic)
 	ROM_LOAD16_BYTE( "088-1002.bin", 0x000000, 0x010000, CRC(49a97391) SHA1(dbe4086cd87669a02d2a2133d0d9e2895946b383) )
 	ROM_LOAD16_BYTE( "088-1001.bin", 0x000001, 0x010000, CRC(4473accc) SHA1(099bda6cfe31d4e53cbe74046679ddf8b874982d) )
 	ROM_LOAD16_BYTE( "088-1004.bin", 0x020000, 0x010000, CRC(33b84ca6) SHA1(9e3cafadfb23bfc4a44e503043cc05db27d939a9) )
@@ -4652,7 +4660,7 @@ void harddriv_state::init_multisync(int compact_inputs)
 	m_gsp_multisync = TRUE;
 
 	// if we have a JSA board, install the read/write handlers
-	if (m_jsa != nullptr)
+	if (m_jsa.found())
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x600000, 0x603fff, read8_delegate(FUNC(atari_jsa_base_device::main_response_r),m_jsa.target()), write8_delegate(FUNC(atari_jsa_base_device::main_command_w),m_jsa.target()), 0xff00);
 
 	/* install handlers for the compact driving games' inputs */
@@ -4936,7 +4944,7 @@ void harddriv_state::init_racedriv(void)
 	init_driver_sound();
 
 	/* set up the slapstic */
-	m_slapstic_device->slapstic_init(machine(), 117);
+	m_slapstic_device->slapstic_init();
 	m_m68k_slapstic_base = m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
 
 	/* synchronization */
@@ -4957,7 +4965,7 @@ void harddriv_state::racedrivc_init_common(offs_t gsp_protection)
 	init_driver_sound();
 
 	/* set up the slapstic */
-	m_slapstic_device->slapstic_init(machine(), 117);
+	m_slapstic_device->slapstic_init();
 	m_m68k_slapstic_base = m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
 
 	/* synchronization */
@@ -4987,7 +4995,7 @@ void harddriv_state::init_racedrivc_panorama_side()
 	init_adsp();
 
 	/* set up the slapstic */
-	m_slapstic_device->slapstic_init(machine(), 117);
+	m_slapstic_device->slapstic_init();
 	m_m68k_slapstic_base = m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
 
 	/* set up protection hacks */
@@ -5079,7 +5087,7 @@ void harddriv_state::init_strtdriv(void)
 	init_dsk();
 
 	/* set up the slapstic */
-	m_slapstic_device->slapstic_init(machine(), 117);
+	m_slapstic_device->slapstic_init();
 	m_m68k_slapstic_base = m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa80000, 0xafffff, read16_delegate(FUNC(harddriv_state::hda68k_port1_r), this));

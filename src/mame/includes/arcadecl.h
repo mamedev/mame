@@ -8,15 +8,18 @@
 
 #include "machine/atarigen.h"
 #include "video/atarimo.h"
+#include "sound/okim6295.h"
 
 class arcadecl_state : public atarigen_state
 {
 public:
 	arcadecl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_oki(*this, "oki"),
 			m_mob(*this, "mob"),
 			m_bitmap(*this, "bitmap") { }
 
+	required_device<okim6295_device> m_oki;
 	optional_device<atari_motion_objects_device> m_mob;
 	required_shared_ptr<UINT16> m_bitmap;
 

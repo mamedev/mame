@@ -2558,3 +2558,17 @@ if (BUSES["CGENIE_PARALLEL"]~=null) then
 		MAME_DIR .. "src/devices/bus/cgenie/parallel/printer.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/m5/slot.h,BUSES["M5"] = true
+---------------------------------------------------
+if (BUSES["M5"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/m5/slot.cpp",
+		MAME_DIR .. "src/devices/bus/m5/slot.h",
+		MAME_DIR .. "src/devices/bus/m5/rom.cpp",
+		MAME_DIR .. "src/devices/bus/m5/rom.h",
+	}
+end
+

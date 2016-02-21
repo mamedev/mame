@@ -425,6 +425,7 @@ Keyboard TX commands:
 #include "machine/pc9801_118.h"
 #include "machine/pc9801_cbus.h"
 #include "machine/pc9801_kbd.h"
+#include "machine/pc9801_cd.h"
 
 #include "machine/idectrl.h"
 #include "machine/idehd.h"
@@ -512,6 +513,7 @@ public:
 	UINT8 *m_kanji_rom;
 
 	UINT8 m_dma_offset[4];
+	UINT8 m_dma_autoinc[4];
 	int m_dack;
 
 	UINT8 m_video_ff[8],m_gfx_ff;
@@ -569,7 +571,9 @@ public:
 	UINT8 m_sys_type;
 
 	DECLARE_WRITE_LINE_MEMBER( write_uart_clock );
-	DECLARE_WRITE8_MEMBER(rtc_dmapg_w);
+	DECLARE_WRITE8_MEMBER(rtc_w);
+	DECLARE_WRITE8_MEMBER(dmapg4_w);
+	DECLARE_WRITE8_MEMBER(dmapg8_w);
 	DECLARE_WRITE8_MEMBER(nmi_ctrl_w);
 	DECLARE_WRITE8_MEMBER(vrtc_clear_w);
 	DECLARE_WRITE8_MEMBER(pc9801_video_ff_w);
@@ -733,6 +737,7 @@ public:
 		UINT8 freq_index;
 	}m_mouse;
 	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
+	DECLARE_READ8_MEMBER(unk_r);
 
 	DECLARE_DRIVER_INIT(pc9801_kanji);
 	inline void set_dma_channel(int channel, int state);
@@ -973,29 +978,29 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 }
 
 
-WRITE8_MEMBER(pc9801_state::rtc_dmapg_w)
+WRITE8_MEMBER(pc9801_state::rtc_w)
 {
-	if((offset & 1) == 0)
-	{
-		if(offset == 0)
-		{
-			m_rtc->c0_w((data & 0x01) >> 0);
-			m_rtc->c1_w((data & 0x02) >> 1);
-			m_rtc->c2_w((data & 0x04) >> 2);
-			m_rtc->stb_w((data & 0x08) >> 3);
-			m_rtc->clk_w((data & 0x10) >> 4);
-			m_rtc->data_in_w(((data & 0x20) >> 5));
-			if(data & 0xc0)
-				logerror("RTC write to undefined bits %02x\n",data & 0xc0);
-		}
-		else
-			logerror("Write to undefined port [%02x] <- %02x\n",offset+0x20,data);
-	}
-	else // odd
-	{
-//      logerror("Write to DMA bank register %d %02x\n",((offset >> 1)+1) & 3,data);
-		m_dma_offset[((offset >> 1)+1) & 3] = data & 0x0f;
-	}
+	m_rtc->c0_w((data & 0x01) >> 0);
+	m_rtc->c1_w((data & 0x02) >> 1);
+	m_rtc->c2_w((data & 0x04) >> 2);
+	m_rtc->stb_w((data & 0x08) >> 3);
+	m_rtc->clk_w((data & 0x10) >> 4);
+	m_rtc->data_in_w(((data & 0x20) >> 5));
+	if(data & 0xc0)
+		logerror("RTC write to undefined bits %02x\n",data & 0xc0);
+}
+
+WRITE8_MEMBER(pc9801_state::dmapg4_w)
+{
+	m_dma_offset[(offset+1) & 3] = data & 0x0f;
+}
+
+WRITE8_MEMBER(pc9801_state::dmapg8_w)
+{
+	if(offset == 4)
+		m_dma_autoinc[data & 3] = (data >> 2) & 3;
+	else if(offset < 4)
+		m_dma_offset[(offset+1) & 3] = data;
 }
 
 WRITE8_MEMBER(pc9801_state::nmi_ctrl_w)
@@ -1425,7 +1430,20 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 	}
 
 	// mask off the bits past the end of the blit
-	if(m_egc.count < 16)
+	if((m_egc.count < 8) && (mem_mask != 0xffff))
+	{
+		UINT16 end_mask = dir ? ((1 << m_egc.count) - 1) : ~((1 << (8 - m_egc.count)) - 1);
+		// if the blit is less than 8 bits, adjust the masks
+		if(m_egc.first)
+		{
+			if(dir)
+				end_mask <<= dst_off & 7;
+			else
+				end_mask >>= dst_off & 7;
+		}
+		mask &= end_mask;
+	}
+	else if((m_egc.count < 16) && (mem_mask == 0xffff))
 	{
 		UINT16 end_mask = dir ? ((1 << m_egc.count) - 1) : ~((1 << (16 - m_egc.count)) - 1);
 		// if the blit is less than 16 bits, adjust the masks
@@ -1456,11 +1474,6 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 					out = data;
 					break;
 				case 1:
-					if(mem_mask == 0x00ff)
-						src = src | src << 8;
-					else if(mem_mask == 0xff00)
-						src = src | src >> 8;
-
 					out = egc_do_partial_op(i, src, pat, m_video_ram_2[offset + (((i + 1) & 3) * 0x4000)]);
 					break;
 				case 2:
@@ -1773,7 +1786,8 @@ static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xff00)
 	AM_RANGE(0x0000, 0x000f) AM_READWRITE8(pic_r, pic_w, 0x00ff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-	AM_RANGE(0x0020, 0x0027) AM_WRITE8(rtc_dmapg_w,0xffff) // RTC / DMA registers (LS244)
+	AM_RANGE(0x0020, 0x0021) AM_WRITE8(rtc_w,0x00ff)
+	AM_RANGE(0x0020, 0x0027) AM_WRITE8(dmapg4_w,0xff00)
 	AM_RANGE(0x0030, 0x0037) AM_DEVREADWRITE8("ppi8255_sys", i8255_device, read, write, 0xff00) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("ppi8255_prn", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("keyb", pc9801_kbd_device, rx_r, tx_w, 0xff00) //i8255 printer port / i8251 keyboard
@@ -2231,6 +2245,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0020, 0x002f) AM_WRITE8(dmapg8_w,0xff00)
 	AM_RANGE(0x0050, 0x0057) AM_NOP // 2dd ppi?
 	AM_RANGE(0x005c, 0x005f) AM_READ(pc9821_timestamp_r) AM_WRITENOP // artic
 	AM_RANGE(0x0068, 0x006b) AM_WRITE8(pc9801rs_video_ff_w,0x00ff) //mode FF / <undefined>
@@ -2262,7 +2277,7 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x0430, 0x0433) AM_READWRITE8(ide_ctrl_r, ide_ctrl_w, 0x00ff)
 	AM_RANGE(0x0640, 0x064f) AM_READWRITE(ide_cs0_r, ide_cs0_w)
 	AM_RANGE(0x0740, 0x074f) AM_READWRITE(ide_cs1_r, ide_cs1_w)
-	AM_RANGE(0x1e80, 0x1e8f) AM_NOP // temp
+	AM_RANGE(0x1e8c, 0x1e8f) AM_NOP // temp
 	AM_RANGE(0xbfd8, 0xbfdf) AM_WRITE8(pc9801rs_mouse_freq_w, 0xffff)
 	AM_RANGE(0xe0d0, 0xe0d3) AM_READ8(pc9801rs_midi_r, 0xffff)
 	AM_IMPORT_FROM(pc9801ux_io)
@@ -2278,6 +2293,8 @@ WRITE8_MEMBER(pc9801_state::pc9821_video_ff_w)
 {
 	if(offset == 1)
 	{
+		if(((data & 0xfe) == 4) && !m_ex_video_ff[3]) // TODO: many other settings are protected
+			return;
 		m_ex_video_ff[(data & 0xfe) >> 1] = data & 1;
 
 		//if((data & 0xfe) == 0x20)
@@ -2469,13 +2486,15 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 //  ADDRESS_MAP_UNMAP_HIGH // TODO: a read to somewhere makes this to fail at POST
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xff00ff00)
 	AM_RANGE(0x0000, 0x000f) AM_READWRITE8(pic_r, pic_w, 0x00ff00ff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-	AM_RANGE(0x0020, 0x0027) AM_WRITE8(rtc_dmapg_w,        0xffffffff) // RTC / DMA registers (LS244)
+	AM_RANGE(0x0020, 0x0023) AM_WRITE8(rtc_w,0x000000ff)
+	AM_RANGE(0x0020, 0x002f) AM_WRITE8(dmapg8_w,0xff00ff00)
 	AM_RANGE(0x0030, 0x0037) AM_DEVREADWRITE8("ppi8255_sys", i8255_device, read, write, 0xff00ff00) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("ppi8255_prn", i8255_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("keyb", pc9801_kbd_device, rx_r, tx_w, 0xff00ff00) //i8255 printer port / i8251 keyboard
 	AM_RANGE(0x0050, 0x0053) AM_WRITE8(pc9801rs_nmi_w, 0xffffffff)
 	AM_RANGE(0x005c, 0x005f) AM_READ16(pc9821_timestamp_r,0xffffffff) AM_WRITENOP // artic
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("upd7220_chr", upd7220_device, read, write, 0x00ff00ff) //upd7220 character ports / <undefined>
+	AM_RANGE(0x0060, 0x0063) AM_READ8(unk_r, 0xff00ff00) // mouse related (unmapped checking for AT keyb controller\PS/2 mouse?)
 	AM_RANGE(0x0064, 0x0067) AM_WRITE8(vrtc_clear_w, 0x000000ff)
 	AM_RANGE(0x0068, 0x006b) AM_WRITE8(pc9821_video_ff_w,  0x00ff00ff) //mode FF / <undefined>
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xff00ff00)
@@ -2511,6 +2530,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 //  AM_RANGE(0x0c2d, 0x0c2d) cs4231 PCM board hi byte control
 //  AM_RANGE(0x0cc0, 0x0cc7) SCSI interface / <undefined>
 //  AM_RANGE(0x0cfc, 0x0cff) PCI bus
+	AM_RANGE(0x1e8c, 0x1e8f) AM_NOP // IDE RAM switch
 	AM_RANGE(0x3fd8, 0x3fdf) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xff00ff00) // <undefined> / pit mirror ports
 	AM_RANGE(0x7fd8, 0x7fdf) AM_DEVREADWRITE8("ppi8255_mouse", i8255_device, read, write, 0xff00ff00)
 	AM_RANGE(0x841c, 0x841f) AM_READWRITE8(sdip_0_r,sdip_0_w,0xffffffff)
@@ -2871,6 +2891,21 @@ READ8_MEMBER(pc9801_state::dma_read_byte)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
+	if(offset == 0xffff)
+	{
+		switch(m_dma_autoinc[m_dack])
+		{
+			case 1:
+			{
+				UINT8 page = m_dma_offset[m_dack];
+				m_dma_offset[m_dack] = ((page + 1) & 0xf) | (page & 0xf0);
+				break;
+			}
+			case 3:
+				m_dma_offset[m_dack]++;
+				break;
+		}
+	}
 
 //  logerror("%08x\n",addr);
 
@@ -2882,7 +2917,21 @@ WRITE8_MEMBER(pc9801_state::dma_write_byte)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
-
+	if(offset == 0xffff)
+	{
+		switch(m_dma_autoinc[m_dack])
+		{
+			case 1:
+			{
+				UINT8 page = m_dma_offset[m_dack];
+				m_dma_offset[m_dack] = ((page + 1) & 0xf) | (page & 0xf0);
+				break;
+			}
+			case 3:
+				m_dma_offset[m_dack]++;
+				break;
+		}
+	}
 //  logerror("%08x %02x\n",addr,data);
 
 	program.write_byte(addr, data);
@@ -2957,6 +3006,11 @@ WRITE8_MEMBER(pc9801_state::ppi_mouse_portc_w)
 	}
 
 	m_mouse.control = data;
+}
+
+READ8_MEMBER(pc9801_state::unk_r)
+{
+	return 0xff;
 }
 
 /****************************************
@@ -3122,6 +3176,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 	m_mouse.control = 0xff;
 	m_mouse.freq_reg = 0;
 	m_mouse.freq_index = 0;
+	m_dma_autoinc[0] = m_dma_autoinc[1] = m_dma_autoinc[2] = m_dma_autoinc[3] = 0;
 	memset(&m_egc, 0, sizeof(m_egc));
 }
 
@@ -3218,6 +3273,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( pc9801_state::mouse_irq_cb )
 	}
 }
 
+SLOT_INTERFACE_START(pc9801_atapi_devices)
+	SLOT_INTERFACE("pc9801_cd", PC9801_CD)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_FRAGMENT( pc9801_keyboard )
 	MCFG_DEVICE_ADD("keyb", PC9801_KBD, 53)
 	MCFG_PC9801_KBD_IRQ_CALLBACK(DEVWRITELINE("pic8259_master", pic8259_device, ir1_w))
@@ -3266,7 +3325,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( pc9801_ide )
 	MCFG_ATA_INTERFACE_ADD("ide1", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(pc9801_state, ide1_irq_w))
-	MCFG_ATA_INTERFACE_ADD("ide2", ata_devices, "cdrom", nullptr, false)
+	MCFG_ATA_INTERFACE_ADD("ide2", pc9801_atapi_devices, "pc9801_cd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(pc9801_state, ide2_irq_w))
 MACHINE_CONFIG_END
 
@@ -3409,7 +3468,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("640K,3712K,7808K")
+	MCFG_RAM_EXTRA_OPTIONS("640K,3712K,7808K,14M")
 
 	MCFG_DEVICE_MODIFY("upd7220_btm")
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_grcg_2_map)
@@ -3668,6 +3727,10 @@ ROM_START( pc9821 )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "itf.rom",  0x18000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
 	ROM_LOAD( "bios.rom", 0x28000, 0x18000, BAD_DUMP CRC(34a19a59) SHA1(2e92346727b0355bc1ec9a7ded1b444a4917f2b9) )
+	ROM_FILL(0x34c40, 4, 0) // hide the _32_ marker until we have a 32-bit clean IDE bios otherwise windows tries to
+							// make a 32-bit call into 16-bit code
+	ROM_FILL(0x37ffe, 1, 0x92)
+	ROM_FILL(0x37fff, 1, 0xd7)
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )

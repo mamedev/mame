@@ -1457,9 +1457,9 @@ int shaders::downsample_pass(render_target *rt, int source_index, poly_info *pol
 	curr_effect->update_uniforms();
 
 	int bloom_index = 0;
-	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
-	float bloom_width = d3d->get_width();
-	float bloom_height = d3d->get_height();
+	float bloom_width = rt->target_width;
+	float bloom_height = rt->target_height;
+	float bloom_size = bloom_width < bloom_height ? bloom_width : bloom_height;
 	for (; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 	{
 		bloom_dims[bloom_index][0] = (float)(int)bloom_width;

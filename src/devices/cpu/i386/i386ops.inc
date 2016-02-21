@@ -701,7 +701,7 @@ void i386_device::i386_mov_cr_r32()        // Opcode 0x0f 22
 		case 2: CYCLES(CYCLES_MOV_REG_CR2); break;
 		case 3:
 			CYCLES(CYCLES_MOV_REG_CR3);
-			vtlb_flush_dynamic(m_vtlb);
+			vtlb_flush_dynamic();
 			break;
 		case 4: CYCLES(1); break; // TODO
 		default:
@@ -2504,7 +2504,66 @@ void i386_device::i386_mov_tr_r32()        // Opcode 0x0f 26
 
 void i386_device::i386_loadall()       // Opcode 0x0f 0x07 (0x0f 0x05 on 80286), undocumented
 {
-	fatalerror("i386: LOADALL unimplemented at %08X\n", m_pc - 1);
+	if(PROTECTED_MODE && (m_CPL != 0))
+		FAULT(FAULT_GP,0)
+	UINT32 ea = i386_translate(ES, REG32(EDI), 0);
+	m_cr[0] = READ32(ea) & 0xfffeffff; // wp not supported on 386
+	set_flags(READ32(ea + 0x04));
+	m_eip = READ32(ea + 0x08);
+	REG32(EDI) = READ32(ea + 0x0c);
+	REG32(ESI) = READ32(ea + 0x10);
+	REG32(EBP) = READ32(ea + 0x14);
+	REG32(ESP) = READ32(ea + 0x18);
+	REG32(EBX) = READ32(ea + 0x1c);
+	REG32(EDX) = READ32(ea + 0x20);
+	REG32(ECX) = READ32(ea + 0x24);
+	REG32(EAX) = READ32(ea + 0x28);
+	m_dr[6] = READ32(ea + 0x2c);
+	m_dr[7] = READ32(ea + 0x30);
+	m_task.segment = READ16(ea + 0x34);
+	m_ldtr.segment = READ16(ea + 0x38);
+	m_sreg[GS].selector = READ16(ea + 0x3c);
+	m_sreg[FS].selector = READ16(ea + 0x40);
+	m_sreg[DS].selector = READ16(ea + 0x44);
+	m_sreg[SS].selector = READ16(ea + 0x48);
+	m_sreg[CS].selector = READ16(ea + 0x4c);
+	m_sreg[ES].selector = READ16(ea + 0x50);
+	m_task.flags = READ32(ea + 0x54) >> 8;
+	m_task.base = READ32(ea + 0x58);
+	m_task.limit = READ32(ea + 0x5c);
+	m_idtr.base = READ32(ea + 0x64);
+	m_idtr.limit = READ32(ea + 0x68);
+	m_gdtr.base = READ32(ea + 0x70);
+	m_gdtr.limit = READ32(ea + 0x74);
+	m_ldtr.flags = READ32(ea + 0x78) >> 8;
+	m_ldtr.base = READ32(ea + 0x7c);
+	m_ldtr.limit = READ32(ea + 0x80);
+	m_sreg[GS].flags = READ32(ea + 0x84) >> 8;
+	m_sreg[GS].base = READ32(ea + 0x88);
+	m_sreg[GS].limit = READ32(ea + 0x8c);
+	m_sreg[FS].flags = READ32(ea + 0x90) >> 8;
+	m_sreg[FS].base = READ32(ea + 0x94);
+	m_sreg[FS].limit = READ32(ea + 0x98);
+	m_sreg[DS].flags = READ32(ea + 0x9c) >> 8;
+	m_sreg[DS].base = READ32(ea + 0xa0);
+	m_sreg[DS].limit = READ32(ea + 0xa4);
+	m_sreg[SS].flags = READ32(ea + 0xa8) >> 8;
+	m_sreg[SS].base = READ32(ea + 0xac);
+	m_sreg[SS].limit = READ32(ea + 0xb0);
+	m_sreg[CS].flags = READ32(ea + 0xb4) >> 8;
+	m_sreg[CS].base = READ32(ea + 0xb8);
+	m_sreg[CS].limit = READ32(ea + 0xbc);
+	m_sreg[ES].flags = READ32(ea + 0xc0) >> 8;
+	m_sreg[ES].base = READ32(ea + 0xc4);
+	m_sreg[ES].limit = READ32(ea + 0xc8);
+	m_CPL = (m_sreg[SS].flags >> 5) & 3; // cpl == dpl of ss
+
+	for(int i = 0; i < GS; i++)
+	{
+		m_sreg[i].valid = (m_sreg[i].flags & 0x80) ? true : false;
+		m_sreg[i].d = (m_sreg[i].flags & 0x4000) ? 1 : 0;
+	}
+	CHANGE_PC(m_eip);
 }
 
 void i386_device::i386_invalid()

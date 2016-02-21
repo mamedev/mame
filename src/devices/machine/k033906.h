@@ -12,7 +12,7 @@
 #define __K033906_H__
 
 #include "emu.h"
-
+#include "video/voodoo.h"
 
 
 /***************************************************************************
@@ -58,7 +58,7 @@ private:
 	int          m_reg_set; // 1 = access reg / 0 = access ram
 
 	const char   *m_voodoo_tag;
-	device_t     *m_voodoo;
+	voodoo_device     *m_voodoo;
 
 	UINT32       m_reg[256];
 	UINT32       m_ram[32768];

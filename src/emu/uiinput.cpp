@@ -324,3 +324,30 @@ void ui_input_manager::push_char_event(render_target* target, unicode_char ch)
 	event.ch = ch;
 	push_event(event);
 }
+
+/*-------------------------------------------------
+	push_mouse_wheel_event - pushes a mouse 
+	wheel event to the specified render_target
+-------------------------------------------------*/
+
+void ui_input_manager::push_mouse_wheel_event(render_target *target, INT32 x, INT32 y, short delta, int ucNumLines)
+{
+	ui_event event = { UI_EVENT_NONE };
+	event.event_type = UI_EVENT_MOUSE_WHEEL;
+	event.target = target;
+	event.mouse_x = x;
+	event.mouse_y = y;
+	event.zdelta = delta;
+	event.num_lines = ucNumLines;
+	push_event(event);
+}
+
+/*-------------------------------------------------
+    mark_all_as_pressed - marks all buttons
+    as if they were already pressed once
+-------------------------------------------------*/
+void ui_input_manager::mark_all_as_pressed()
+{
+	for (int code = IPT_UI_FIRST + 1; code < IPT_UI_LAST; code++)
+		m_next_repeat[code] = osd_ticks();
+}

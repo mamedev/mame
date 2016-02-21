@@ -128,7 +128,7 @@ UINT16 i82730_device::read_word(offs_t address)
 {
 	UINT16 data;
 
-	if (sysbus_16bit() && !(address & 1))
+	if (sysbus_16bit() && WORD_ALIGNED(address))
 	{
 		data = m_program->read_word(address);
 	}
@@ -148,7 +148,7 @@ void i82730_device::write_byte(offs_t address, UINT8 data)
 
 void i82730_device::write_word(offs_t address, UINT16 data)
 {
-	if (sysbus_16bit() && !(address & 1))
+	if (sysbus_16bit() && WORD_ALIGNED(address))
 	{
 		m_program->write_word(address, data);
 	}

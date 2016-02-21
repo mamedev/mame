@@ -204,7 +204,9 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_ether_a49(nullptr),
 	m_eth()
 {
-	m_is_octal = true;
+	m_ucode_config.m_is_octal = true;
+	m_const_config.m_is_octal = true;
+	m_iomem_config.m_is_octal = true;
 	memset(m_task_mpc, 0x00, sizeof(m_task_mpc));
 	memset(m_task_next2, 0x00, sizeof(m_task_next2));
 	memset(m_r, 0x00, sizeof(m_r));

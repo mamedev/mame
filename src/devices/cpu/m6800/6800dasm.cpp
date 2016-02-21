@@ -52,7 +52,8 @@ enum op_names {
 	rts,    sba,    sbca,   sbcb,   sec,    sev,    sta,    stb,
 	_std,   sei,    sts,    stx,    suba,   subb,   subd,   swi,
 	wai,    tab,    tap,    tba,    tim,    tpa,    tst,    tsta,
-	tstb,   tsx,    txs,    asx1,   asx2,   xgdx,   addx,   adcx
+	tstb,   tsx,    txs,    asx1,   asx2,   xgdx,   addx,   adcx,
+	bitx
 };
 
 static const char *const op_name_str[] = {
@@ -71,7 +72,8 @@ static const char *const op_name_str[] = {
 	"rts",   "sba",   "sbca",  "sbcb",  "sec",   "sev",   "sta",   "stb",
 	"std",   "sei",   "sts",   "stx",   "suba",  "subb",  "subd",  "swi",
 	"wai",   "tab",   "tap",   "tba",   "tim",   "tpa",   "tst",   "tsta",
-	"tstb",  "tsx",   "txs",   "asx1",  "asx2",  "xgdx",  "addx",  "adcx"
+	"tstb",  "tsx",   "txs",   "asx1",  "asx2",  "xgdx",  "addx",  "adcx",
+	"bitx"
 };
 
 /*
@@ -82,7 +84,7 @@ static const char *const op_name_str[] = {
  * 2    invalid opcode for 1:6800/6802/6808, 2:6801/6803, 4:HD63701
  */
 
-static const UINT8 table[0x102][3] = {
+static const UINT8 table[0x104][3] = {
 	{ill, inh,7},{nop, inh,0},{ill, inh,7},{ill, inh,7},/* 00 */
 	{lsrd,inh,1},{asld,inh,1},{tap, inh,0},{tpa, inh,0},
 	{inx, inh,0},{dex, inh,0},{clv, inh,0},{sev, inh,0},
@@ -151,7 +153,11 @@ static const UINT8 table[0x102][3] = {
 	/* extra instruction $fc for NSC-8105 */
 	{addx,ext,0},
 	/* extra instruction $ec for NSC-8105 */
-	{adcx,imb,0}
+	{adcx,imb,0},
+	/* extra instruction $bb for NSC-8105 */
+	{bitx,imx,0},
+	/* extra instruction $b2 for NSC-8105 */
+	{stx,imx,0}
 };
 
 /* some macros to keep things short */
@@ -188,6 +194,8 @@ static unsigned Dasm680x (int subtype, char *buf, unsigned pc, const UINT8 *opro
 		/* and check for extra instruction */
 		if (code == 0xfc)  code = 0x0100;
 		if (code == 0xec)  code = 0x0101;
+		if (code == 0x7b) code = 0x0102;
+		if (code == 0x71) code = 0x0103;
 	}
 
 	opcode = table[code][0];

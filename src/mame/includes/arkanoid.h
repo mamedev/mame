@@ -62,7 +62,7 @@ public:
 	UINT8    m_ddr_c;
 	UINT8    m_tdr;
 	UINT8    m_tcr;
-
+	emu_timer *m_68705_timer;
 
 	/* hexaa */
 	UINT8 m_hexaa_from_main;

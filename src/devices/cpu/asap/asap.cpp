@@ -364,7 +364,7 @@ inline UINT8 asap_device::readbyte(offs_t address)
 inline UINT16 asap_device::readword(offs_t address)
 {
 	// aligned reads are easy
-	if (!(address & 1))
+	if (WORD_ALIGNED(address))
 		return m_program->read_word(address);
 
 	// misaligned reads are tricky
@@ -379,7 +379,7 @@ inline UINT16 asap_device::readword(offs_t address)
 inline UINT32 asap_device::readlong(offs_t address)
 {
 	// aligned reads are easy
-	if (!(address & 3))
+	if (DWORD_ALIGNED(address))
 		return m_program->read_dword(address);
 
 	// misaligned reads are tricky
@@ -405,7 +405,7 @@ inline void asap_device::writebyte(offs_t address, UINT8 data)
 inline void asap_device::writeword(offs_t address, UINT16 data)
 {
 	// aligned writes are easy
-	if (!(address & 1))
+	if (WORD_ALIGNED(address))
 	{
 		m_program->write_word(address, data);
 		return;
@@ -429,7 +429,7 @@ inline void asap_device::writeword(offs_t address, UINT16 data)
 inline void asap_device::writelong(offs_t address, UINT32 data)
 {
 	// aligned writes are easy
-	if (!(address & 3))
+	if (DWORD_ALIGNED(address))
 	{
 		m_program->write_dword(address, data);
 		return;

@@ -16,6 +16,7 @@
 #include "osdepend.h"
 #include "uismall.fh"
 
+#include "ui/cmdrender.h"
 
 //**************************************************************************
 //  INLINE FUNCTIONS
@@ -55,12 +56,51 @@ inline render_font::glyph &render_font::get_char(unicode_char chnum)
 	if (!m_glyphs[chnum / 256] && m_format == FF_OSD)
 		m_glyphs[chnum / 256] = new glyph[256];
 	if (!m_glyphs[chnum / 256])
-		return dummy_glyph;
+	{
+		//mamep: make table for command glyph
+		if (chnum >= COMMAND_UNICODE && chnum < COMMAND_UNICODE + MAX_GLYPH_FONT)
+			m_glyphs[chnum / 256] = new glyph[256];
+		else
+			return dummy_glyph;
+	}
 
 	// if the character isn't generated yet, do it now
 	glyph &gl = m_glyphs[chnum / 256][chnum % 256];
 	if (!gl.bitmap.valid())
-		char_expand(chnum, gl);
+	{
+		//mamep: command glyph support
+		if (m_height_cmd && chnum >= COMMAND_UNICODE && chnum < COMMAND_UNICODE + MAX_GLYPH_FONT)
+		{
+			glyph &glyph_ch = m_glyphs_cmd[chnum / 256][chnum % 256];
+			float scale = (float)m_height / (float)m_height_cmd;
+			if (m_format == FF_OSD) scale *= 0.90f;
+
+			if (!glyph_ch.bitmap.valid())
+				char_expand(chnum, glyph_ch);
+
+			//mamep: for color glyph
+			gl.color = glyph_ch.color;
+
+			gl.width = (int)(glyph_ch.width * scale + 0.5f);
+			gl.xoffs = (int)(glyph_ch.xoffs * scale + 0.5f);
+			gl.yoffs = (int)(glyph_ch.yoffs * scale + 0.5f);
+			gl.bmwidth = (int)(glyph_ch.bmwidth * scale + 0.5f);
+			gl.bmheight = (int)(glyph_ch.bmheight * scale + 0.5f);
+
+			gl.bitmap.allocate(gl.bmwidth, gl.bmheight);
+			rectangle clip;
+			clip.min_x = clip.min_y = 0;
+			clip.max_x = glyph_ch.bitmap.width() - 1;
+			clip.max_y = glyph_ch.bitmap.height() - 1;
+			render_texture::hq_scale(gl.bitmap, glyph_ch.bitmap, clip, nullptr);
+
+			/* wrap a texture around the bitmap */
+			gl.texture = m_manager.texture_alloc(render_texture::hq_scale);
+			gl.texture->set_bitmap(gl.bitmap, gl.bitmap.cliprect(), TEXFORMAT_ARGB32);
+		}
+		else
+			char_expand(chnum, gl);
+	}
 
 	// return the resulting character
 	return gl;
@@ -83,9 +123,12 @@ render_font::render_font(render_manager &manager, const char *filename)
 		m_yoffs(0),
 		m_scale(1.0f),
 		m_rawsize(0),
-		m_osdfont(nullptr)
+		m_osdfont(nullptr),
+		m_height_cmd(0),
+		m_yoffs_cmd(0)
 {
 	memset(m_glyphs, 0, sizeof(m_glyphs));
+	memset(m_glyphs_cmd, 0, sizeof(m_glyphs_cmd));
 
 	// if this is an OSD font, we're done
 	if (filename != nullptr)
@@ -95,10 +138,13 @@ render_font::render_font(render_manager &manager, const char *filename)
 		{
 			if (m_osdfont->open(manager.machine().options().font_path(), filename, m_height))
 			{
-				m_scale = 1.0f / (float)m_height;
-				m_format = FF_OSD;
-				return;
-			}
+			m_scale = 1.0f / (float)m_height;
+			m_format = FF_OSD;
+
+			//mamep: allocate command glyph font
+			render_font_command_glyph();
+			return;
+						}
 			global_free(m_osdfont);
 			m_osdfont = nullptr;
 		}
@@ -110,13 +156,18 @@ render_font::render_font(render_manager &manager, const char *filename)
 
 	// attempt to load the cached version of the font first
 	if (filename != nullptr && load_cached_bdf(filename))
-		return;
+	{
+			//mamep: allocate command glyph font
+			render_font_command_glyph();
+			return;
+	}
 
 	// load the raw data instead
 	emu_file ramfile(OPEN_FLAG_READ);
 	file_error filerr = ramfile.open_ram(font_uismall, sizeof(font_uismall));
 	if (filerr == FILERR_NONE)
 		load_cached(ramfile, 0);
+	render_font_command_glyph();
 }
 
 
@@ -128,6 +179,17 @@ render_font::~render_font()
 {
 	// free all the subtables
 	for (auto & elem : m_glyphs)
+		if (elem)
+		{
+			for (unsigned int charnum = 0; charnum < 256; charnum++)
+			{
+				glyph &gl = elem[charnum];
+				m_manager.texture_free(gl.texture);
+			}
+			delete[] elem;
+		}
+
+	for (auto & elem : m_glyphs_cmd)
 		if (elem)
 		{
 			for (unsigned int charnum = 0; charnum < 256; charnum++)
@@ -154,8 +216,43 @@ render_font::~render_font()
 
 void render_font::char_expand(unicode_char chnum, glyph &gl)
 {
+	rgb_t color = rgb_t(0xff,0xff,0xff,0xff);
+	bool is_cmd = (chnum >= COMMAND_UNICODE && chnum < COMMAND_UNICODE + MAX_GLYPH_FONT);
+
+	if (gl.color)
+		color = gl.color;
+
+	if (is_cmd)
+	{
+		// punt if nothing there
+		if (gl.bmwidth == 0 || gl.bmheight == 0 || gl.rawdata == nullptr)
+			return;
+
+		// allocate a new bitmap of the size we need
+		gl.bitmap.allocate(gl.bmwidth, m_height_cmd);
+		gl.bitmap.fill(0);
+
+		// extract the data
+		const char *ptr = gl.rawdata;
+		UINT8 accum = 0, accumbit = 7;
+		for (int y = 0; y < gl.bmheight; y++)
+		{
+			int desty = y + m_height_cmd + m_yoffs_cmd - gl.yoffs - gl.bmheight;
+			UINT32 *dest = (desty >= 0 && desty < m_height_cmd) ? &gl.bitmap.pix32(desty, 0) : nullptr;
+			{
+				for (int x = 0; x < gl.bmwidth; x++)
+				{
+					if (accumbit == 7)
+						accum = *ptr++;
+					if (dest != nullptr)
+						*dest++ = (accum & (1 << accumbit)) ? color : rgb_t(0x00,0xff,0xff,0xff);
+					accumbit = (accumbit - 1) & 7;
+				}
+			}
+		}
+	}
 	// if we're an OSD font, query the info
-	if (m_format == FF_OSD)
+	else if (m_format == FF_OSD)
 	{
 		// we set bmwidth to -1 if we've previously queried and failed
 		if (gl.bmwidth == -1)
@@ -173,7 +270,6 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 		gl.bmwidth = gl.bitmap.width();
 		gl.bmheight = gl.bitmap.height();
 	}
-
 	// other formats need to parse their data
 	else
 	{
@@ -216,10 +312,10 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 					// expand the four bits
 					if (dest != nullptr)
 					{
-						*dest++ = (bits & 8) ? rgb_t(0xff,0xff,0xff,0xff) : rgb_t(0x00,0xff,0xff,0xff);
-						*dest++ = (bits & 4) ? rgb_t(0xff,0xff,0xff,0xff) : rgb_t(0x00,0xff,0xff,0xff);
-						*dest++ = (bits & 2) ? rgb_t(0xff,0xff,0xff,0xff) : rgb_t(0x00,0xff,0xff,0xff);
-						*dest++ = (bits & 1) ? rgb_t(0xff,0xff,0xff,0xff) : rgb_t(0x00,0xff,0xff,0xff);
+						*dest++ = (bits & 8) ? color : rgb_t(0x00,0xff,0xff,0xff);
+						*dest++ = (bits & 4) ? color : rgb_t(0x00,0xff,0xff,0xff);
+						*dest++ = (bits & 2) ? color : rgb_t(0x00,0xff,0xff,0xff);
+						*dest++ = (bits & 1) ? color : rgb_t(0x00,0xff,0xff,0xff);
 					}
 				}
 
@@ -235,7 +331,7 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 					if (accumbit == 7)
 						accum = *ptr++;
 					if (dest != nullptr)
-						*dest++ = (accum & (1 << accumbit)) ? rgb_t(0xff,0xff,0xff,0xff) : rgb_t(0x00,0xff,0xff,0xff);
+						*dest++ = (accum & (1 << accumbit)) ? color : rgb_t(0x00,0xff,0xff,0xff);
 					accumbit = (accumbit - 1) & 7;
 				}
 			}

@@ -239,10 +239,12 @@ public:
 	INT8                m_addrbus_shift;
 	UINT8               m_logaddr_width;
 	UINT8               m_page_shift;
+	bool                m_is_octal;                 // to determine if messages/debugger will show octal or hex
+
 	address_map_constructor m_internal_map;
 	address_map_constructor m_default_map;
-	address_map_delegate m_internal_map_delegate;
-	address_map_delegate m_default_map_delegate;
+	address_map_delegate    m_internal_map_delegate;
+	address_map_delegate    m_default_map_delegate;
 };
 
 
@@ -283,6 +285,7 @@ public:
 	int addr_width() const { return m_config.addr_width(); }
 	endianness_t endianness() const { return m_config.endianness(); }
 	UINT64 unmap() const { return m_unmap; }
+	bool is_octal() const { return m_config.m_is_octal; }
 
 	offs_t addrmask() const { return m_addrmask; }
 	offs_t bytemask() const { return m_bytemask; }
@@ -864,6 +867,12 @@ private:
 // read/write a dword to a 64-bit space
 #define DWORD_XOR_BE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(4,0))
 #define DWORD_XOR_LE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,4))
+
+
+// helpers for checking address alignment
+#define WORD_ALIGNED(a)                 (((a) & 1) == 0)
+#define DWORD_ALIGNED(a)                (((a) & 3) == 0)
+#define QWORD_ALIGNED(a)                (((a) & 7) == 0)
 
 
 

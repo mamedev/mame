@@ -49,7 +49,7 @@ t11_device::t11_device(const machine_config &mconfig, device_type type, const ch
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, 0)
 	, c_initial_mode(0)
 {
-	m_is_octal = true;
+	m_program_config.m_is_octal = true;
 	memset(m_reg, 0x00, sizeof(m_reg));
 	memset(&m_psw, 0x00, sizeof(m_psw));
 }
@@ -59,7 +59,7 @@ t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t 
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, 0)
 	, c_initial_mode(0)
 {
-	m_is_octal = true;
+	m_program_config.m_is_octal = true;
 	memset(m_reg, 0x00, sizeof(m_reg));
 	memset(&m_psw, 0x00, sizeof(m_psw));
 }

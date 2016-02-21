@@ -156,6 +156,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/ef9364.h,VIDEOS["EF9364"] = true
+--------------------------------------------------
+
+if (VIDEOS["EF9364"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ef9364.cpp",
+		MAME_DIR .. "src/devices/video/ef9364.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/ef9365.h,VIDEOS["EF9365"] = true
 --------------------------------------------------
 
@@ -828,5 +840,17 @@ if (VIDEOS["CRTC_EGA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/crtc_ega.cpp",
 		MAME_DIR .. "src/devices/video/crtc_ega.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/jangou_blitter.h,VIDEOS["JANGOU_BLITTER"] = true
+--------------------------------------------------
+
+if (VIDEOS["JANGOU_BLITTER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/jangou_blitter.cpp",
+		MAME_DIR .. "src/devices/video/jangou_blitter.h",
 	}
 end

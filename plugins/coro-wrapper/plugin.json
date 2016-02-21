@@ -1,0 +1,8 @@
+{
+  "plugin": {
+    "name": "coro-wrapper",
+    "version": "1.0.0-1",
+    "author": "Tim Caswell",
+	"type": "library",
+  }
+}

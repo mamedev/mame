@@ -35,17 +35,7 @@ public:
 	ticalc1x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
-
-protected:
-	virtual void machine_start() override;
 };
-
-
-void ticalc1x_state::machine_start()
-{
-	hh_tms1k_state::machine_start();
-	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
-}
 
 
 
@@ -85,21 +75,18 @@ public:
 void tisr16_state::prepare_display()
 {
 	// update leds state
-	for (int y = 0; y < 11; y++)
-		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
+	set_display_segmask(0xfff, 0xff);
+	display_matrix(8, 12, m_o, m_r, false);
 
 	// exponent sign is from R10 O1, and R10 itself only uses segment G
 	m_display_state[11] = m_display_state[10] << 5 & 0x40;
 	m_display_state[10] &= 0x40;
-
-	set_display_size(8, 12);
 	display_update();
 }
 
 WRITE16_MEMBER(tisr16_state::write_r)
 {
-	// R0-R10: input mux
-	// R0-R10: select digit (right-to-left)
+	// R0-R10: input mux, select digit
 	m_r = m_inp_mux = data;
 	prepare_display();
 }
@@ -259,7 +246,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( tisr16, tisr16_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 300000) // RC osc. R=43K, C=68pf -> ~300kHz (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf -> also ~300kHz)
+	MCFG_CPU_ADD("maincpu", TMS1000, 300000) // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
 	MCFG_TMS1XXX_READ_K_CB(READ8(tisr16_state, read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tisr16_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tisr16_state, write_r))
@@ -315,11 +302,10 @@ public:
 
 WRITE16_MEMBER(ti1250_state::write_r)
 {
-	// R8 only has segment G connected
-	m_display_segmask[8] = 0x40;
-
-	// R0-R7(,R8): select digit (right-to-left)
-	display_matrix_seg(8, 9, m_o, data, 0xff);
+	// R0-R8: select digit
+	set_display_segmask(0xff, 0xff);
+	set_display_segmask(0x100, 0x40); // R8 only has segment G connected
+	display_matrix(8, 9, m_o, data);
 }
 
 WRITE16_MEMBER(ti1250_state::write_o)
@@ -398,7 +384,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( ti1250, ti1250_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0950, 200000) // RC osc. R=68K, C=68pf -> ~200kHz
+	MCFG_CPU_ADD("maincpu", TMS0950, 200000) // approximation - RC osc. R=68K, C=68pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(ti1250_state, read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ti1250_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ti1250_state, write_r))
@@ -451,9 +437,9 @@ public:
 
 WRITE16_MEMBER(ti1000_state::write_r)
 {
-	// R0-R7: select digit (right-to-left)
-	UINT8 o = BITSWAP8(m_o,7,4,3,2,1,0,6,5);
-	display_matrix_seg(8, 8, o, data, 0xff);
+	// R0-R7: select digit
+	set_display_segmask(0xff, 0xff);
+	display_matrix(8, 8, m_o, data);
 }
 
 WRITE16_MEMBER(ti1000_state::write_o)
@@ -461,7 +447,7 @@ WRITE16_MEMBER(ti1000_state::write_o)
 	// O0-O3,O5(?): input mux
 	// O0-O7: digit segments
 	m_inp_mux = (data & 0xf) | (data >> 1 & 0x10);
-	m_o = data;
+	m_o = BITSWAP8(data,7,4,3,2,1,0,6,5);
 }
 
 READ8_MEMBER(ti1000_state::read_k)
@@ -555,10 +541,11 @@ WRITE16_MEMBER(wizatron_state::write_r)
 
 	// 3rd digit only has A and G for =, though some newer hardware revisions
 	// (goes for both wizatron and lilprof) use a custom equals-sign digit here
-	m_display_segmask[3] = 0x41;
+	set_display_segmask(8, 0x41);
 
-	// R0-R8: select digit (right-to-left)
-	display_matrix_seg(7, 9, m_o, data, 0x7f);
+	// R0-R8: select digit
+	set_display_segmask(0x1ff^8, 0x7f);
+	display_matrix(7, 9, m_o, data);
 }
 
 WRITE16_MEMBER(wizatron_state::write_o)
@@ -725,19 +712,16 @@ public:
 WRITE16_MEMBER(lilprof78_state::write_r)
 {
 	// update leds state
-	UINT8 o = BITSWAP8(m_o,7,4,3,2,1,0,6,5) & 0x7f;
+	UINT8 seg = BITSWAP8(m_o,7,4,3,2,1,0,6,5) & 0x7f;
 	UINT16 r = (data & 7) | (data << 1 & 0x1f0);
-
-	for (int y = 0; y < 9; y++)
-		m_display_state[y] = (r >> y & 1) ? o : 0;
-
+	set_display_segmask(0x1ff, 0x7f);
+	display_matrix(7, 9, seg, r, false);
+	
 	// 3rd digit A/G(equals sign) is from O7
-	m_display_state[3] = (r && m_o & 0x80) ? 0x41 : 0;
+	m_display_state[3] = (r != 0 && m_o & 0x80) ? 0x41 : 0;
 
 	// 6th digit is a custom 7seg for math symbols (see wizatron_state write_r)
 	m_display_state[6] = BITSWAP8(m_display_state[6],7,6,1,4,2,3,5,0);
-
-	set_display_size(7, 9);
 	display_update();
 }
 
@@ -836,7 +820,8 @@ public:
 void dataman_state::prepare_display()
 {
 	// note the extra segment on R9
-	display_matrix_seg(8, 9, m_o | (m_r >> 2 & 0x80), m_r & 0x1ff, 0x7f);
+	set_display_segmask(0x1ff, 0x7f);
+	display_matrix(8, 9, m_o | (m_r >> 2 & 0x80), m_r & 0x1ff);
 }
 
 WRITE16_MEMBER(dataman_state::write_r)
@@ -959,12 +944,10 @@ public:
 
 WRITE16_MEMBER(ti30_state::write_r)
 {
-	// 1st digit only has segments B,F,G,DP
-	m_display_segmask[0] = 0xe2;
-
 	// R0-R8: select digit
-	UINT8 o = BITSWAP8(m_o,7,5,2,1,4,0,6,3);
-	display_matrix_seg(8, 9, o, data, 0xff);
+	set_display_segmask(0x1fe, 0xff);
+	set_display_segmask(0x001, 0xe2); // 1st digit only has segments B,F,G,DP
+	display_matrix(8, 9, m_o, data);
 }
 
 WRITE16_MEMBER(ti30_state::write_o)
@@ -972,7 +955,7 @@ WRITE16_MEMBER(ti30_state::write_o)
 	// O0-O2,O4-O7: input mux
 	// O0-O7: digit segments
 	m_inp_mux = (data & 7) | (data >> 1 & 0x78);
-	m_o = data;
+	m_o = BITSWAP8(data,7,5,2,1,4,0,6,3);
 }
 
 READ8_MEMBER(ti30_state::read_k)
@@ -1384,6 +1367,6 @@ COMP( 1978, lilprof78, lilprof,  0, lilprof78, lilprof78, driver_device, 0, "Tex
 
 COMP( 1977, dataman,   0,        0, dataman,   dataman,   driver_device, 0, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-COMP( 1976, ti30,      0,        0, ti30,     ti30,      driver_device, 0, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1976, tibusan,   0,        0, ti30,     tibusan,   driver_device, 0, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, tiprog,    0,        0, ti30,     tiprog,    driver_device, 0, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, ti30,      0,        0, ti30,     ti30,       driver_device, 0, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, tibusan,   0,        0, ti30,     tibusan,    driver_device, 0, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, tiprog,    0,        0, ti30,     tiprog,     driver_device, 0, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

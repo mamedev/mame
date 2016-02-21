@@ -23,11 +23,8 @@ class tb303_state : public hh_ucom4_state
 {
 public:
 	tb303_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag),
-		m_tp3_off_timer(*this, "tp3_off")
+		: hh_ucom4_state(mconfig, type, tag)
 	{ }
-
-	required_device<timer_device> m_tp3_off_timer;
 
 	UINT8 m_ram[0xc00];
 	UINT16 m_ram_address;
@@ -43,37 +40,18 @@ public:
 	DECLARE_READ8_MEMBER(input_r);
 	void update_leds();
 
-	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clock);
-	TIMER_DEVICE_CALLBACK_MEMBER(tp3_off);
+	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clock) { m_maincpu->set_input_line(0, ASSERT_LINE); }
+	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clear) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 
 	virtual void machine_start() override;
 };
 
-
-/***************************************************************************
-
-  Timer/Interrupt
-
-***************************************************************************/
-
 // TP2 to MCU CLK: LC circuit(TI S74230), stable sine wave, 2.2us interval
-#define TP2_CLOCK_HZ    454545 /* in hz */
+#define TP2_HZ      454545
 
 // TP3 to MCU _INT: square wave, 1.8ms interval, short duty cycle
-#define TP3_CLOCK       attotime::from_usec(1800)
-#define TP3_OFF         (TP3_CLOCK / 8)
-
-TIMER_DEVICE_CALLBACK_MEMBER(tb303_state::tp3_off)
-{
-	m_maincpu->set_input_line(0, CLEAR_LINE);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(tb303_state::tp3_clock)
-{
-	m_maincpu->set_input_line(0, ASSERT_LINE);
-	m_tp3_off_timer->adjust(TP3_OFF);
-}
-
+#define TP3_PERIOD  attotime::from_usec(1800)
+#define TP3_LOW     (TP3_PERIOD / 8)
 
 
 /***************************************************************************
@@ -270,7 +248,7 @@ void tb303_state::machine_start()
 static MACHINE_CONFIG_START( tb303, tb303_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D650, TP2_CLOCK_HZ)
+	MCFG_CPU_ADD("maincpu", NEC_D650, TP2_HZ)
 	MCFG_UCOM4_READ_A_CB(READ8(tb303_state, input_r))
 	MCFG_UCOM4_READ_B_CB(READ8(tb303_state, input_r))
 	MCFG_UCOM4_READ_C_CB(READ8(tb303_state, ram_r))
@@ -282,9 +260,9 @@ static MACHINE_CONFIG_START( tb303, tb303_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(tb303_state, switch_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(tb303_state, strobe_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp3_clock", tb303_state, tp3_clock, TP3_CLOCK)
-	MCFG_TIMER_START_DELAY(TP3_CLOCK)
-	MCFG_TIMER_DRIVER_ADD("tp3_off", tb303_state, tp3_off)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp3_clock", tb303_state, tp3_clock, TP3_PERIOD)
+	MCFG_TIMER_START_DELAY(TP3_PERIOD - TP3_LOW)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp3_clear", tb303_state, tp3_clear, TP3_PERIOD)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tb303)

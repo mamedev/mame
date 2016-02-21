@@ -14,6 +14,7 @@
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <mutex>
 
 #pragma warning( push )
 #pragma warning( disable: 4068 )
@@ -124,21 +125,12 @@ public:
 			obj->DestroyVoice();
 		}
 	}
-
-	void operator()(osd_lock* obj) const
-	{
-		if (obj != nullptr)
-		{
-			osd_lock_free(obj);
-		}
-	}
 };
 
 // Typedefs for smart pointers used with customer deleters
 typedef std::unique_ptr<IXAudio2, xaudio2_custom_deleter> xaudio2_ptr;
 typedef std::unique_ptr<IXAudio2MasteringVoice, xaudio2_custom_deleter> mastering_voice_ptr;
 typedef std::unique_ptr<IXAudio2SourceVoice, xaudio2_custom_deleter> src_voice_ptr;
-typedef std::unique_ptr<osd_lock, xaudio2_custom_deleter> osd_lock_ptr;
 
 // Typedef for pointer to XAudio2Create
 typedef HRESULT(__stdcall* PFN_XAUDIO2CREATE)(IXAudio2**, UINT32, XAUDIO2_PROCESSOR);
@@ -146,27 +138,6 @@ typedef HRESULT(__stdcall* PFN_XAUDIO2CREATE)(IXAudio2**, UINT32, XAUDIO2_PROCES
 //============================================================
 //  Helper classes
 //============================================================
-
-// Helper for locking within a particular scope without having to manually release
-class osd_scoped_lock
-{
-private:
-	osd_lock *  m_lock;
-public:
-	osd_scoped_lock(osd_lock* lock)
-	{
-		m_lock = lock;
-		osd_lock_acquire(m_lock);
-	}
-
-	~osd_scoped_lock()
-	{
-		if (m_lock != nullptr)
-		{
-			osd_lock_release(m_lock);
-		}
-	}
-};
 
 // Provides a pool of buffers
 class bufferpool
@@ -233,7 +204,7 @@ private:
 	DWORD                                       m_buffer_size;
 	DWORD                                       m_buffer_count;
 	DWORD                                       m_writepos;
-	osd_lock_ptr                                m_buffer_lock;
+	std::mutex                                  m_buffer_lock;
 	HANDLE                                      m_hEventBufferCompleted;
 	HANDLE                                      m_hEventDataAvailable;
 	HANDLE                                      m_hEventExiting;
@@ -258,7 +229,6 @@ public:
 		m_buffer_size(0),
 		m_buffer_count(0),
 		m_writepos(0),
-		m_buffer_lock(osd_lock_alloc()),
 		m_hEventBufferCompleted(NULL),
 		m_hEventDataAvailable(NULL),
 		m_hEventExiting(NULL),
@@ -389,7 +359,7 @@ void sound_xaudio2::update_audio_stream(
 
 	UINT32 const bytes_this_frame = samples_this_frame * m_sample_bytes;
 
-	osd_scoped_lock scope_lock(m_buffer_lock.get());
+	std::lock_guard<std::mutex> lock(m_buffer_lock);
 
 	UINT32 bytes_left = bytes_this_frame;
 
@@ -446,7 +416,7 @@ void sound_xaudio2::OnBufferEnd(void *pBufferContext)
 	BYTE* completed_buffer = (BYTE*)pBufferContext;
 	if (completed_buffer != nullptr)
 	{
-		auto scoped_lock = osd_scoped_lock(m_buffer_lock.get());
+		std::lock_guard<std::mutex> lock(m_buffer_lock);
 		m_buffer_pool->return_to_pool(completed_buffer);
 	}
 
@@ -625,7 +595,7 @@ void sound_xaudio2::submit_needed()
 	if (state.BuffersQueued >= 1)
 		return;
 
-	osd_scoped_lock lock_scope(m_buffer_lock.get());
+	std::lock_guard<std::mutex> lock(m_buffer_lock);
 
 	// Roll the buffer
 	roll_buffer();

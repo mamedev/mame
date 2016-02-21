@@ -304,6 +304,7 @@ public:
 	int m_fpga_uploaded;
 	int m_lanc2_ram_r;
 	int m_lanc2_ram_w;
+	UINT8 m_lanc2_reg[3];
 	std::unique_ptr<UINT8[]> m_lanc2_ram;
 	std::unique_ptr<UINT32[]> m_sharc_dataram;
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
@@ -346,11 +347,11 @@ WRITE_LINE_MEMBER(nwktr_state::voodoo_vblank_0)
 
 UINT32 nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	device_t *voodoo = machine().device("voodoo0");
+	voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo0");
 
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	voodoo_update(voodoo, bitmap, cliprect);
+	voodoo->voodoo_update(bitmap, cliprect);
 
 	const rectangle &visarea = screen.visible_area();
 	const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y+16, visarea.max_y);
@@ -521,6 +522,7 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 					((value << 7) & 0x80);
 
 			m_fpga_uploaded = 1;
+			m_lanc2_reg[0] = (UINT8)(data >> 24);
 
 			//printf("lanc2_fpga_w: %02X at %08X\n", value, space.device().safe_pc());
 		}
@@ -528,11 +530,16 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 		{
 			m_lanc2_ram_r = 0;
 			m_lanc2_ram_w = 0;
+			m_lanc2_reg[1] = (UINT8)(data >> 8);
 		}
 		else if (ACCESSING_BITS_16_23)
 		{
-			m_lanc2_ram[2] = (data >> 20) & 0xf;
-			m_lanc2_ram[3] = 0;
+			if (m_lanc2_reg[0] != 0)
+			{
+				m_lanc2_ram[2] = (data >> 20) & 0xf;
+				m_lanc2_ram[3] = 0;
+			}
+			m_lanc2_reg[2] = (UINT8)(data >> 16);
 		}
 		else if (ACCESSING_BITS_0_7)
 		{

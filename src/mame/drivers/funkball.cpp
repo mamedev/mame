@@ -142,7 +142,7 @@ void funkball_state::video_start()
 
 UINT32 funkball_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	return voodoo_update(m_voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 static UINT32 voodoo_0_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -186,7 +186,7 @@ static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, 
 			break;
 		case 0x40:
 			state->m_voodoo_pci_regs.init_enable = data;
-			voodoo_set_init_enable(state->m_voodoo, data);
+			state->m_voodoo->voodoo_set_init_enable(data);
 			break;
 	}
 }

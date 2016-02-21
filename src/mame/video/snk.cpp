@@ -930,6 +930,19 @@ UINT32 snk_state::screen_update_tnk3(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
+UINT32 snk_state::screen_update_fitegolf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
+	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	tnk3_draw_sprites(bitmap, cliprect, m_sp16_scrollx+1, m_sp16_scrolly); // needs an extra offset?? neither this or fitegolf actually write to sprite offset registers tho?
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+
 
 UINT32 snk_state::screen_update_ikari(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

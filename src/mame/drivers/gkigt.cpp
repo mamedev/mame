@@ -172,7 +172,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( igt_gameking, igt_gameking_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I960, 20000000) // ?? Mhz
+	MCFG_CPU_ADD("maincpu", I960, XTAL_24MHz)
 	MCFG_CPU_PROGRAM_MAP(igt_gameking_mem)
 
 
@@ -185,6 +185,7 @@ static MACHINE_CONFIG_START( igt_gameking, igt_gameking_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igt_gameking_state, screen_update_igt_gameking)
 	MCFG_SCREEN_PALETTE("palette")
+	// Xilinx used as video chip XTAL_26_66666MHz on board
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
@@ -197,6 +198,26 @@ static MACHINE_CONFIG_START( igt_gameking, igt_gameking_state )
 
 MACHINE_CONFIG_END
 
+
+ROM_START( ms72c )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "3B5019FA MULTISTAR 7 2c CONFIG.u8", 0x00000, 0x80000, CRC(6c326a31) SHA1(cd8ecc814ef4f379946ab3654dddd508c24ae56c) )
+
+	ROM_REGION32_LE( 0x200000, "game", 0 )
+	ROM_LOAD16_BYTE( "DA5001FA Gamebase GME1.u21", 0x000000, 0x100000, CRC(4cd63b5f) SHA1(440302a6ac844b453573e358b29c64f2e8ece80e) )
+	ROM_LOAD16_BYTE( "DA5001FA Gamebase GME2.u5",  0x000001, 0x100000, CRC(663df2fe) SHA1(d2ac3129a346450168a9f76431b0fa8b78db3b37) )
+
+	ROM_REGION( 0x100000, "cg", 0 )
+	ROM_LOAD16_BYTE( "1G5019FA Multistar 7 PUB.u48", 0x000000, 0x80000, CRC(ac50a155) SHA1(50d07ba5ca176c97adde169fda6e6385c8ec8299) )
+	ROM_LOAD16_BYTE( "1G5019FA Multistar 7 PUB.u47", 0x000001, 0x80000, CRC(5fee078b) SHA1(a41591d14fbc12c68d773fbd1ac340d9427d68e9) )
+
+	ROM_REGION( 0x200000, "plx", 0 )
+	ROM_LOAD16_BYTE( "1G5019FA Multistar 7 PUB.u20", 0x000000, 0x100000, CRC(806ec7d4) SHA1(b9263f942b3d7101797bf87ad18cfddac9582791) )
+	ROM_LOAD16_BYTE( "1G5019FA Multistar 7 PUB.u4",  0x000001, 0x100000, CRC(2e1e9c8a) SHA1(b6992f013f43debf43f4704396fc71e88449e365) )
+
+	ROM_REGION( 0x200000, "snd", 0 )
+	ROM_LOAD( "1H5008FA Multistar 7.u6", 0x000000, 0x100000, CRC(69656637) SHA1(28c2cf48856ee4f820146fdbd0f3c7e307892dc6) )
+ROM_END
 
 
 ROM_START( gkigt4 )
@@ -369,6 +390,7 @@ ROM_START( gkkey )
 ROM_END
 
 
+GAME( 1994, ms72c,    0,            igt_gameking, igt_gameking, driver_device,  0, ROT0, "IGT", "Multistar 7 2c", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt4,   0,            igt_gameking, igt_gameking, driver_device,  0, ROT0, "IGT", "Game King (v4.x)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt4ms, gkigt4,       igt_gameking, igt_gameking, driver_device,  0, ROT0, "IGT", "Game King (v4.x, MS)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt43,  gkigt4,       igt_gameking, igt_gameking, driver_device,  0, ROT0, "IGT", "Game King (v4.3)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

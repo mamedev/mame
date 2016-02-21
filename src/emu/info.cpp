@@ -19,6 +19,9 @@
 
 #include <ctype.h>
 
+#define XML_ROOT                "mame"
+#define XML_TOP                 "machine"
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -188,15 +191,15 @@ info_xml_creator::info_xml_creator(driver_enumerator &drivlist)
 //  for all known games
 //-------------------------------------------------
 
-void info_xml_creator::output(FILE *out)
+void info_xml_creator::output(FILE *out, bool nodevices)
 {
 	m_output = out;
 
 	// output the DTD
 	fprintf(m_output, "<?xml version=\"1.0\"?>\n");
 	std::string dtd(s_dtd_string);
-	strreplace(dtd, "__XML_ROOT__", emulator_info::get_xml_root());
-	strreplace(dtd, "__XML_TOP__", emulator_info::get_xml_top());
+	strreplace(dtd, "__XML_ROOT__", XML_ROOT);
+	strreplace(dtd, "__XML_TOP__", XML_TOP);
 
 	fprintf(m_output, "%s\n\n", dtd.c_str());
 
@@ -208,7 +211,7 @@ void info_xml_creator::output(FILE *out)
 		"no"
 #endif
 		"\" mameconfig=\"%d\">\n",
-		emulator_info::get_xml_root(),
+		XML_ROOT,
 		xml_normalize_string(build_version),
 		CONFIG_VERSION
 	);
@@ -218,10 +221,11 @@ void info_xml_creator::output(FILE *out)
 		output_one();
 
 	// output devices (both devices with roms and slot devices)
-	output_devices();
+	if (!nodevices)
+		output_devices();
 
 	// close the top level tag
-	fprintf(m_output, "</%s>\n",emulator_info::get_xml_root());
+	fprintf(m_output, "</%s>\n",XML_ROOT);
 }
 
 
@@ -246,7 +250,7 @@ void info_xml_creator::output_one()
 		portlist.append(*device, errors);
 
 	// print the header and the game name
-	fprintf(m_output, "\t<%s",emulator_info::get_xml_top());
+	fprintf(m_output, "\t<%s",XML_TOP);
 	fprintf(m_output, " name=\"%s\"", xml_normalize_string(driver.name));
 
 	// strip away any path information from the source_file and output it
@@ -308,7 +312,7 @@ void info_xml_creator::output_one()
 	output_ramoptions();
 
 	// close the topmost tag
-	fprintf(m_output, "\t</%s>\n",emulator_info::get_xml_top());
+	fprintf(m_output, "\t</%s>\n",XML_TOP);
 }
 
 
@@ -340,7 +344,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 			}
 
 	// start to output info
-	fprintf(m_output, "\t<%s", emulator_info::get_xml_top());
+	fprintf(m_output, "\t<%s", XML_TOP);
 	fprintf(m_output, " name=\"%s\"", xml_normalize_string(device.shortname()));
 	std::string src(device.source());
 	strreplace(src,"../", "");
@@ -367,7 +371,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	output_adjusters(portlist);
 	output_images(device, devtag);
 	output_slots(device, devtag);
-	fprintf(m_output, "\t</%s>\n", emulator_info::get_xml_top());
+	fprintf(m_output, "\t</%s>\n", XML_TOP);
 }
 
 

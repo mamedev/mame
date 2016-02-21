@@ -553,7 +553,8 @@ void mc6845_device::recompute_parameters(bool postload)
 		m_hsync_off_pos = hsync_off_pos;
 		m_vsync_on_pos = vsync_on_pos;
 		m_vsync_off_pos = vsync_off_pos;
-		m_line_counter = 0;
+		if (!postload) // set m_line_counter to 0 on normal operation, but not on postload
+			m_line_counter = 0;
 	}
 }
 

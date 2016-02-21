@@ -21,7 +21,7 @@
 
 /* ----- render utilities ----- */
 
-void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, const render_color &color);
+void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, const render_color &color, bool force = false);
 int render_clip_line(render_bounds *bounds, const render_bounds *clip);
 int render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_quad_texuv *texcoords);
 void render_line_to_quad(const render_bounds *bounds, float width, render_bounds *bounds0, render_bounds *bounds1);

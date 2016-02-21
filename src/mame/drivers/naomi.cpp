@@ -377,7 +377,7 @@ Airline Pilots (Rev A)                          840-0005C    21739A  11 (64Mb)  
 Cosmic Smash                                    840-0044C    23428    8 (64Mb)   ?           315-6213  317-0289-COM   joystick + 2 buttons
 Cosmic Smash (Rev A)                            840-0044C    23428A   8 (64Mb)   ?           315-6213  317-0289-COM   joystick + 2 buttons
 Crazy Taxi                                      840-0002C    21684   13 (64Mb)*  present     315-6213  317-0248-COM   * ic8 and ic9 are not present
-Dead Or Alive 2                                 841-0003C    22121   21 (64Mb)   present     315-6213  317-5048-COM   joystick + 3 buttons
+Dead Or Alive 2 (Rev A)                         841-0003C    22121A  21 (64Mb)   present     315-6213  317-5048-COM   joystick + 3 buttons
 Dead Or Alive 2 Millennium                      841-0003C    DOA2 M  21 (64Mb)   present     315-6213  317-5048-COM   joystick + 3 buttons
 Death Crimson OX                                841-0016C    23524   10 (64Mb)   present     315-6213  317-5066-COM
 Dengen Tenshi Taisen Janshi Shangri-La          841-0004C    22060   12 (64Mb)   ?           315-6213  317-5050-JPN
@@ -1862,7 +1862,9 @@ READ64_MEMBER(naomi_state::aw_modem_r )
 	{
 	/*
 	         0x00600280 r  0000dcba
-	             a/b/c/d - coin inputs 1-4, active low
+	             a/b - 1P/2P coin inputs (JAMMA), active low
+	             c/d - 3P/4P coin inputs (EX. IO board), active low
+
 	             (ab == 0) -> BIOS skip RAM test
 	    */
 		return U64(0xffffffff00000000) | (ioport("COINS")->read() & 0x0F);
@@ -1896,8 +1898,8 @@ WRITE64_MEMBER(naomi_state::aw_modem_w )
 	        TODO: hook this then MAME have such devices emulated
 
 	        0x00600288 rw 0000dcba
-	            a - 1P coin couner
-	            b - 2P coin couner
+	            a - 1P coin counter
+	            b - 2P coin counter
 	            c - 1P coin lockout
 	            d - 2P coin lockout
 
@@ -2965,8 +2967,19 @@ Probably at some stage of development NAOMI was planned as non-JVS system as wel
 	ROM_SYSTEM_BIOS( 20, "bios20", "Naomi Dev BIOS" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 20, "dcnaodev.bios",   0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) \
 	ROM_SYSTEM_BIOS( 21, "bios21", "Naomi Dev BIOS v1.10" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 21, "develop110.ic27", 0x000000, 0x200000, CRC(de7cfdb0) SHA1(da16800edc4d49f70481c124d487f544c2fa8ce7) )
+	ROM_LOAD16_WORD_SWAP_BIOS( 21, "develop110.ic27", 0x000000, 0x200000, CRC(de7cfdb0) SHA1(da16800edc4d49f70481c124d487f544c2fa8ce7) ) \
+	ROM_SYSTEM_BIOS( 22, "bios22", "Naomi Unknown Dev board" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 22, "zukinver0930.ipl", 0x000000, 0x200000, CRC(58e17c23) SHA1(19330f906accf1b859f56bbcedc2edff73747599) )
 /* dcnaodev.bios comes from a dev / beta board. The eprom was a 27C4096 */
+
+/*
+ zukinver0930.ipl comes from 837-13502-01 / 837-13663 PCB which contains:
+  22 empty sockets ROM0 - ROM21
+  315-6187 Altera EPM7064LC68-10
+  PC16550DV UART
+  Fujitsu MB???? SCSI controller
+  IPL BOOT ROM with printed label "Zukin Ver.0930 / 99/5/24 / SUM:DB9C"
+*/
 
 // bios for House of the Dead 2
 #define HOTD2_BIOS \
@@ -3411,7 +3424,7 @@ ROM_START( doa2 )
 	NAOMI_DEFAULT_EEPROM_NO_BD
 
 	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD("epr-22121.ic22", 0x0000000, 0x0400000,  CRC(30f93b5e) SHA1(0e33383e7ab9a721dab4708b063598f2e9c9f2e7) ) // partially encrypted
+	ROM_LOAD("epr-22121a.ic22", 0x0000000, 0x0400000,  CRC(30f93b5e) SHA1(0e33383e7ab9a721dab4708b063598f2e9c9f2e7) ) // partially encrypted
 
 	ROM_LOAD("mpr-22100.ic1",  0x0800000, 0x0800000, CRC(92a53e5e) SHA1(87fcdeee9c4e65a3eb6eb345eed85d4f2df26c3c) )
 	ROM_LOAD("mpr-22101.ic2",  0x1000000, 0x0800000, CRC(14cd7dce) SHA1(5df14a5dad14bc922b4f88881dc2e9c8e74d6170) )
@@ -7963,6 +7976,26 @@ ROM_START( puyofev )
 	ROM_LOAD("317-0375-com.pic", 0x00, 0x4000, CRC(52b56b52) SHA1(221590efbb09824621714cb163bda51a921d7d54) )
 ROM_END
 
+/*
+   note:
+   both Dragon Treasure game binaries have only first 16MB encrypted using DES key from security PIC provided with GD-ROMs.
+   the rest of data encrypted using some other key, same in both game versions.
+   presumably this data uploaded via network to satellite units and decrypted using DES key from their own security PICs.
+*/
+
+// requires 837-14381 "G2 EXPANSION BD" I/O board
+ROM_START( dragntr2 )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0037a", 0, SHA1(ce65fe84cabaa1ac3f40bff9535a42c2055b5f1c) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC is missing
+	ROM_LOAD("317-xxxx-xxx.pic", 0x00, 0x4000, NO_DUMP )
+ROM_END
+
 // requires 837-14381 "G2 EXPANSION BD" I/O board
 ROM_START( dragntr3 )
 	NAOMIGD_BIOS
@@ -9008,6 +9041,9 @@ ROM_START( ngbc )
 	ROM_LOAD( "ax3301f01.bin", 0, 4, CRC(9afe949b) SHA1(4f7b039f3287da61a53a2d012993bfb57e1459bd) )
 ROM_END
 
+// note: it looks there no regional differences in KOF NW EN and JP cartridge dumps, possible JP is just newer revision
+
+// Build: Jul 2004
 ROM_START( kofnw )
 	AW_BIOS
 
@@ -9024,6 +9060,7 @@ ROM_START( kofnw )
 	ROM_LOAD( "ax2201f01.bin", 0, 4, CRC(b1fff0c8) SHA1(d83177e3672378a2bbc08653b4b73704333ca30a) )
 ROM_END
 
+// Build: Sep 2004
 ROM_START( kofnwj )
 	AW_BIOS
 
@@ -9142,6 +9179,7 @@ ROM_START( ftspeed )
 	ROM_LOAD( "ax1701f01.bin", 0, 4, CRC(f3f03c35) SHA1(2a8329a29cdcc0219e9360cc573c0f3ad44d0175) )
 ROM_END
 
+// contents of cartridges labeled as JP and EN is the same
 ROM_START( kofxi )
 	AW_BIOS
 
@@ -9456,8 +9494,8 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* 841-xxxxx ("Licensed by Sega" Naomi cart games)*/
 /* 0001 */ GAME( 1999, pstone,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Power Stone (JPN, USA, EUR, ASI, AUS)", GAME_FLAGS )
 /* 0002 */ GAME( 1999, suchie3,  naomi, naomim2, suchie3, naomi_state,naomi_mp,ROT0,  "Jaleco",          "Idol Janshi Suchie-Pai 3 (JPN)", GAME_FLAGS )
-/* 0003 */ GAME( 1999, doa2,     naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
-/* 0003 */ GAME( 2000, doa2m,    doa2,  naomim2, naomi,   naomi_state, naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 Millennium (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
+/* 0003 */ GAME( 1999, doa2,     naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 (Rev A)", GAME_FLAGS )
+/* 0003 */ GAME( 2000, doa2m,    doa2,  naomim2, naomi,   naomi_state, naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 Millennium", GAME_FLAGS )
 /* 0004 */ GAME( 1999, shangril, naomi, naomim2, naomi_mp,naomi_state,naomi_mp,ROT0,  "Marvelous Ent.",  "Dengen Tenshi Taisen Janshi Shangri-la (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
 /* 0005 */ GAME( 1999, spawn,    naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Todd Mc Farlane / Capcom","Spawn In the Demon's Hand (JPN, USA, EUR, ASI, AUS) (Rev B)", GAME_FLAGS )
 /* 0006 */ GAME( 1999, puyoda,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Compile",         "Puyo Puyo Da!", GAME_FLAGS )
@@ -9566,7 +9604,7 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 // 0036E Virtua Fighter 4 Final Tuned (GDS-0036E)
 /* 0036F */ GAME( 2004, vf4tuned, naomi2,  naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Virtua Fighter 4 Final Tuned (Rev F) (GDS-0036F)", GAME_FLAGS )
 // 0037  Dragon Treasure 2 (GDS-0037)
-// 0037A Dragon Treasure 2 (Rev A) (GDS-0037A)
+/* 0037A */ GAME( 2004, dragntr2, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Dragon Treasure 2 (Rev A) (GDS-0037A)", GAME_FLAGS )
 // 0038
 // 0039  Initial D Arcade Stage Ver. 3 Cycraft Edition (GDS-0039)
 /* 0039A */ GAME( 2006, inidv3ca, inidv3cy,naomigd,  naomi,   naomi_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev A) (GDS-0039A)", GAME_FLAGS )

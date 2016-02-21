@@ -28,11 +28,7 @@
 
 #ifdef SDLMAME_WIN32
 #include "../../sdl/osdsdl.h"
-#if (SDLMAME_SDL2)
 #include <SDL2/SDL_syswm.h>
-#else
-#include <SDL/SDL_syswm.h>
-#endif
 #include "../../sdl/window.h"
 #else
 #include "winmain.h"
@@ -408,13 +404,8 @@ HRESULT sound_direct_sound::dsound_init()
 #ifdef SDLMAME_WIN32
 		SDL_SysWMinfo wminfo;
 		SDL_VERSION(&wminfo.version);
-#if SDLMAME_SDL2
 		SDL_GetWindowWMInfo(sdl_window_list->sdl_window(), &wminfo);
 		HWND const window = wminfo.info.win.window;
-#else // SDLMAME_SDL2
-		SDL_GetWMInfo(&wminfo);
-		HWND const window = wminfo.window;
-#endif // SDLMAME_SDL2
 #else // SDLMAME_WIN32
 		HWND const window = win_window_list->m_hwnd;
 #endif // SDLMAME_WIN32

@@ -74,7 +74,12 @@ Stephh's additional notes :
 #include "includes/galpanic.h"
 #include "includes/galpnipt.h"
 
-void galpanic_state::screen_eof_galpanic(screen_device &screen, bool state)
+void galpanic_state::machine_start()
+{
+	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+}
+
+void galpanic_state::screen_eof(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)
@@ -83,7 +88,7 @@ void galpanic_state::screen_eof_galpanic(screen_device &screen, bool state)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(galpanic_state::galpanic_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(galpanic_state::scanline)
 {
 	int scanline = param;
 
@@ -98,13 +103,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpanic_state::galpanic_scanline)
 
 
 
-WRITE16_MEMBER(galpanic_state::galpanic_6295_bankswitch_w)
+WRITE16_MEMBER(galpanic_state::m6295_bankswitch_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = memregion("oki")->base();
-
-		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
+		membank("okibank")->set_entry((data >> 8) & 0x0f);
 
 		// used before title screen
 		m_pandora->set_clear_bitmap((data & 0x8000)>>15);
@@ -113,7 +116,7 @@ WRITE16_MEMBER(galpanic_state::galpanic_6295_bankswitch_w)
 
 
 
-WRITE16_MEMBER(galpanic_state::galpanic_coin_w)
+WRITE16_MEMBER(galpanic_state::coin_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -131,15 +134,15 @@ static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
-	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_SHARE("bgvideoram")  /* + work RAM */
+	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")  /* + work RAM */
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")  /* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
 	AM_RANGE(0x702000, 0x704fff) AM_RAM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanic_6295_bankswitch_w)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(galpanic_coin_w)  /* coin counters */
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(m6295_bankswitch_w)
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(coin_w)  /* coin counters */
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITENOP    /* ??? */
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP    /* ??? */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP    /* ??? */
@@ -147,6 +150,10 @@ static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16, galpanic_state )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( galpanic_oki_map, AS_0, 8, galpanic_state )
+	AM_RANGE(0x00000, 0x2ffff) AM_ROM
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
+ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( galpanic )
@@ -221,7 +228,7 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(galpanic_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpanic_state, galpanic_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpanic_state, scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -229,8 +236,8 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update_galpanic)
-	MCFG_SCREEN_VBLANK_DRIVER(galpanic_state, screen_eof_galpanic)
+	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(galpanic_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galpanic)
@@ -246,12 +253,11 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
 	kaneko_hit_device::set_type(*device, 0);
 
-	MCFG_VIDEO_START_OVERRIDE(galpanic_state,galpanic)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/6, OKIM6295_PIN7_LOW) /* verified on pcb */
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, galpanic_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -287,11 +293,10 @@ ROM_START( galpanic ) /* PAMERA-04 PCB with the PAMERA-SUB daughter card and unp
 	ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
 	ROM_LOAD( "pm006e.67",    0x000000, 0x100000, CRC(57aec037) SHA1(e6ba095b6892d4dcd76ba3343a97dd98ae29dc24) )
 
-	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
+	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
 	ROM_LOAD( "pm008e.l",     0x00000, 0x80000, CRC(d9379ba8) SHA1(5ae7c743319b1a12f2b101a9f0f8fe0728ed1476) )
-	ROM_RELOAD(               0x40000, 0x80000 )
-	ROM_LOAD( "pm007e.u",     0xc0000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
+	ROM_LOAD( "pm007e.u",     0x80000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
 ROM_END
 
 ROM_START( galpanica ) /* PAMERA-04 PCB with the CALC1 MCU used */
@@ -308,12 +313,11 @@ ROM_START( galpanica ) /* PAMERA-04 PCB with the CALC1 MCU used */
 	ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
 	ROM_LOAD( "pm006e.67",    0x000000, 0x100000, CRC(57aec037) SHA1(e6ba095b6892d4dcd76ba3343a97dd98ae29dc24) )
 
-	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
+	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
 	ROM_LOAD( "pm008e.l",     0x00000, 0x80000, CRC(d9379ba8) SHA1(5ae7c743319b1a12f2b101a9f0f8fe0728ed1476) )
-	ROM_RELOAD(               0x40000, 0x80000 )
-	ROM_LOAD( "pm007e.u",     0xc0000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
+	ROM_LOAD( "pm007e.u",     0x80000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
 ROM_END
 
-GAME( 1990, galpanic, 0,        galpanic, galpanic,  driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (Unprotected)", MACHINE_NO_COCKTAIL )
-GAME( 1990, galpanica,galpanic, galpanica,galpanica, driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (MCU Protected)", MACHINE_NO_COCKTAIL )
+GAME( 1990, galpanic, 0,        galpanic, galpanic,  driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (Unprotected)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanica,galpanic, galpanica,galpanica, driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (MCU Protected)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

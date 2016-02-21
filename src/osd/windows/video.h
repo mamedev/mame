@@ -21,10 +21,7 @@
 enum {
 	VIDEO_MODE_NONE,
 	VIDEO_MODE_GDI,
-	VIDEO_MODE_DDRAW,
-#if defined (USE_BGFX)
 	VIDEO_MODE_BGFX,
-#endif
 #if (USE_OPENGL)
 	VIDEO_MODE_OPENGL,
 #endif
@@ -179,9 +176,6 @@ struct osd_video_config
 	int                 switchres;                  // switch resolutions
 
 	int                 fullstretch;    // FXIME: implement in windows!
-
-	// ddraw options
-	int                 hwstretch;                  // stretch using the hardware
 
 	// d3d, accel, opengl
 	int                 filter;                     // enable filtering

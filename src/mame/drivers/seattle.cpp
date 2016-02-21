@@ -540,7 +540,7 @@ public:
 
 UINT32 seattle_state::screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return voodoo_update(m_voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 
@@ -876,7 +876,7 @@ void seattle_state::pci_3dfx_w(address_space &space, UINT8 reg, UINT8 type, UINT
 			break;
 
 		case 0x10:      /* initEnable register */
-			voodoo_set_init_enable(m_voodoo, data);
+			m_voodoo->voodoo_set_init_enable(data);
 			break;
 	}
 	if (LOG_PCI)

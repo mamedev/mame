@@ -2089,7 +2089,7 @@ void n64_periphs::si_dma_tick()
 
 void n64_periphs::pif_dma(int direction)
 {
-	if (si_dram_addr & 0x3)
+	if (!DWORD_ALIGNED(si_dram_addr))
 	{
 		fatalerror("pif_dma: si_dram_addr unaligned: %08X\n", si_dram_addr);
 	}

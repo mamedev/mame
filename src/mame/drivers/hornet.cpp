@@ -478,9 +478,9 @@ WRITE_LINE_MEMBER(hornet_state::voodoo_vblank_1)
 
 UINT32 hornet_state::screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	device_t *voodoo = machine().device("voodoo0");
+	voodoo_device* voodoo = (voodoo_device*)machine().device("voodoo0");
 
-	voodoo_update(voodoo, bitmap, cliprect);
+	voodoo->voodoo_update(bitmap, cliprect);
 
 	m_k037122_1->tile_draw(screen, bitmap, cliprect);
 
@@ -493,16 +493,16 @@ UINT32 hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_r
 {
 	if (strcmp(screen.tag(), ":lscreen") == 0)
 	{
-		device_t *voodoo = machine().device("voodoo0");
-		voodoo_update(voodoo, bitmap, cliprect);
+		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo0");
+		voodoo->voodoo_update(bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
 		m_k037122_1->tile_draw(screen, bitmap, cliprect);
 	}
 	else if (strcmp(screen.tag(), ":rscreen") == 0)
 	{
-		device_t *voodoo = machine().device("voodoo1");
-		voodoo_update(voodoo, bitmap, cliprect);
+		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo1");
+		voodoo->voodoo_update(bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
 		m_k037122_2->tile_draw(screen, bitmap, cliprect);

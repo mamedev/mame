@@ -12,7 +12,7 @@ It is not Y2K compliant.
 
 Rough cpanel sketch:
 
-    [LED-array dispay]          1  2  3  M
+    [LED-array display]         1  2  3  M
                                 4  5  6  F
                                 7  8  9  0
                                 CLEAR ENTER

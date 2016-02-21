@@ -179,7 +179,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gtfore01, iteagle )
 	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x01000401, 0x0b0b0b)
+	MCFG_ITEAGLE_FPGA_INIT(0x00000401, 0x0b0b0b)
 	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
 	MCFG_ITEAGLE_EEPROM_INIT(0x0401, 0x7)
 MACHINE_CONFIG_END
@@ -187,7 +187,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gtfore02, iteagle )
 	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
 	MCFG_ITEAGLE_FPGA_INIT(0x01000402, 0x020201)
-	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
 	MCFG_ITEAGLE_EEPROM_INIT(0x0402, 0x7)
 MACHINE_CONFIG_END
 
@@ -215,28 +215,28 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gtfore06, iteagle )
 	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
 	MCFG_ITEAGLE_FPGA_INIT(0x01000406, 0x0c0b0d)
-	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
 	MCFG_ITEAGLE_EEPROM_INIT(0x0406, 0x9);
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( carnking, iteagle )
 	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x01000603, 0x0c0b0d)
+	MCFG_ITEAGLE_FPGA_INIT(0x01000a01, 0x0e0a0a)
 	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
-	MCFG_ITEAGLE_EEPROM_INIT(0x0603, 0x9)
+	MCFG_ITEAGLE_EEPROM_INIT(0x0a01, 0x9)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bbhsc, iteagle )
 	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x01000600, 0x0c0a0a)
+	MCFG_ITEAGLE_FPGA_INIT(0x02000600, 0x0c0a0a)
 	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
-	MCFG_ITEAGLE_EEPROM_INIT(0x0600, 0x9)
+	MCFG_ITEAGLE_EEPROM_INIT(0x0000, 0x7)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bbhcotw, iteagle )
 	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
 	MCFG_ITEAGLE_FPGA_INIT(0x02000603, 0x080704)
-	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
 	MCFG_ITEAGLE_EEPROM_INIT(0x0603, 0x9)
 MACHINE_CONFIG_END
 
@@ -331,7 +331,7 @@ static INPUT_PORTS_START( virtpool )
 
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( bbhcotw )
+static INPUT_PORTS_START( bbh )
 	PORT_INCLUDE( iteagle )
 
 	PORT_MODIFY("IN1")
@@ -557,7 +557,7 @@ ROM_END
 
 GAME( 2000, iteagle,          0,  iteagle,  iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Eagle BIOS", MACHINE_IS_BIOS_ROOT )
 GAME( 1998, virtpool,   iteagle,  virtpool, virtpool, driver_device, 0, ROT0, "Incredible Technologies", "Virtual Pool", MACHINE_NOT_WORKING ) // random lockups on loading screens
-GAME( 2002, carnking,   iteagle,  carnking, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", MACHINE_NOT_WORKING )
+GAME( 2002, carnking,   iteagle,  carnking, bbh,  driver_device, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", 0 )
 GAME( 2000, gtfore01,   iteagle,  gtfore01, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! (v1.00.25)", 0 )
 GAME( 2001, gtfore02,   iteagle,  gtfore02, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.06)", 0 )
 GAME( 2002, gtfore03,   iteagle,  gtfore03, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.10)", 0 )
@@ -569,5 +569,5 @@ GAME( 2004, gtfore05a,  gtfore05, gtfore05, iteagle,  driver_device, 0, ROT0, "I
 GAME( 2004, gtfore05b,  gtfore05, gtfore05, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.00)", 0 )
 GAME( 2004, gtfore05c,  gtfore05, gtfore05, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.00.00)", 0 )
 GAME( 2005, gtfore06,   iteagle,  gtfore06, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete (v6.00.01)", 0 )
-GAME( 2002, bbhsc,      iteagle,  bbhsc,    iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", MACHINE_NOT_WORKING ) // doesn't boot
-GAME( 2006, bbhcotw,    iteagle,  bbhcotw,  bbhcotw,  driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", MACHINE_NOT_WORKING ) // random lockups
+GAME( 2002, bbhsc,      iteagle,  bbhsc,    bbh,  driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", MACHINE_NOT_WORKING ) // doesn't boot
+GAME( 2006, bbhcotw,    iteagle,  bbhcotw,  bbh,  driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", MACHINE_NOT_WORKING ) // random lockups

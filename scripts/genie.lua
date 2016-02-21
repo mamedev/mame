@@ -83,6 +83,11 @@ newoption {
 }
 
 newoption {
+	trigger = "with-benchmarks",
+	description = "Enable building benchmarks.",
+}
+
+newoption {
 	trigger = "osd",
 	description = "Choose OSD layer implementation",
 }
@@ -193,6 +198,11 @@ newoption {
 }
 
 newoption {
+	trigger = "TOOLCHAIN",
+	description = "Toolchain prefix"
+}
+
+newoption {
 	trigger = "PROFILE",
 	description = "Enable profiling.",
 }
@@ -263,15 +273,6 @@ newoption {
 newoption {
 	trigger = "NOWERROR",
 	description = "NOWERROR",
-}
-
-newoption {
-	trigger = "USE_BGFX",
-	description = "Use of BGFX.",
-	allowed = {
-		{ "0",   "Disabled" 	},
-		{ "1",   "Enabled"      },
-	}
 }
 
 newoption {
@@ -417,9 +418,8 @@ if _OPTIONS["NOASM"]=="1" and not _OPTIONS["FORCE_DRC_C_BACKEND"] then
 	_OPTIONS["FORCE_DRC_C_BACKEND"] = "1"
 end
 
-USE_BGFX = 1
-if(_OPTIONS["USE_BGFX"]~=nil) then
-	USE_BGFX = tonumber(_OPTIONS["USE_BGFX"])
+if(_OPTIONS["TOOLCHAIN"] == nil) then
+	_OPTIONS['TOOLCHAIN'] = ""
 end
 
 GEN_DIR = MAME_BUILD_DIR .. "generated/"
@@ -666,9 +666,10 @@ end
 --DEFS += -DUSE_SYSTEM_JPEGLIB
 --endif
 
-	--To support casting in Lua 5.3
 	defines {
-		"LUA_COMPAT_APIINTCASTS",
+		"LUA_COMPAT_ALL",
+		"LUA_COMPAT_5_1",
+		"LUA_COMPAT_5_2",
 	}
 
 	if _ACTION == "gmake" then
@@ -1044,6 +1045,7 @@ configuration { "nacl*" }
 configuration { "linux-*" }
 		links {
 			"dl",
+			"rt",
 		}
 		if _OPTIONS["distro"]=="debian-stable" then
 			defines
@@ -1057,7 +1059,10 @@ configuration { "linux-*" }
 configuration { "steamlink" }
 	links {
 		"dl",
-	}
+		"EGL",		
+		"GLESv2",
+ 		"SDL2",
+	}	
 	defines {
 		"EGL_API_FB",
 	}
@@ -1079,6 +1084,11 @@ configuration { "mingw*" }
 			"advapi32",
 			"shlwapi",
 			"wsock32",
+			"ws2_32",
+			"psapi",
+			"iphlpapi",
+			"shell32",
+			"userenv",
 		}
 configuration { "mingw-clang" }
 		linkoptions {
@@ -1100,6 +1110,11 @@ configuration { "vs*" }
 			"advapi32",
 			"shlwapi",
 			"wsock32",
+			"ws2_32",
+			"psapi",
+			"iphlpapi",
+			"shell32",
+			"userenv",
 		}
 
 		buildoptions {
@@ -1219,6 +1234,7 @@ configuration { "vs2015" }
 			"/wd4463", -- warning C4463: overflow; assigning 1 to bit-field that can only hold values from -1 to 0
 			"/wd4297", -- warning C4297: 'xxx::~xxx': function assumed not to throw an exception but does
 			"/wd4319", -- warning C4319: 'operator' : zero extending 'type' to 'type' of greater size
+			"/wd4592", -- warning C4592: symbol will be dynamically initialized (implementation limitation)
 		}
 configuration { "winphone8* or winstore8*" }
 	removelinks {
@@ -1282,10 +1298,7 @@ else
 	startproject (_OPTIONS["subtarget"])
 end 
 mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
-
-if (_OPTIONS["STRIP_SYMBOLS"]=="1") then
-	strip()
-end
+strip()
 
 if _OPTIONS["with-tools"] then
 	group "tools"
@@ -1295,4 +1308,9 @@ end
 if _OPTIONS["with-tests"] then
 	group "tests"
 	dofile(path.join("src", "tests.lua"))
+end
+
+if _OPTIONS["with-benchmarks"] then
+	group "benchmarks"
+	dofile(path.join("src", "benchmarks.lua"))
 end

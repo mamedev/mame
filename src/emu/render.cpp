@@ -227,7 +227,6 @@ void render_primitive::reset()
 //-------------------------------------------------
 
 render_primitive_list::render_primitive_list()
-	: m_lock(osd_lock_alloc())
 {
 }
 
@@ -239,7 +238,6 @@ render_primitive_list::render_primitive_list()
 render_primitive_list::~render_primitive_list()
 {
 	release_all();
-	osd_lock_free(m_lock);
 }
 
 
@@ -296,10 +294,8 @@ inline render_primitive *render_primitive_list::alloc(render_primitive::primitiv
 void render_primitive_list::release_all()
 {
 	// release all the live items while under the lock
-	acquire_lock();
 	m_primitive_allocator.reclaim_all(m_primlist);
 	m_reference_allocator.reclaim_all(m_reflist);
-	release_lock();
 }
 
 
@@ -446,7 +442,7 @@ void render_texture::hq_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const 
 //  get_scaled - get a scaled bitmap (if we can)
 //-------------------------------------------------
 
-void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist)
+void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, UINT32 flags)
 {
 	// source width/height come from the source bounds
 	int swidth = m_sbounds.width();
@@ -681,7 +677,7 @@ void render_container::add_char(float x0, float y0, float height, float aspect, 
 	// add it like a quad
 	item &newitem = add_generic(CONTAINER_ITEM_QUAD, bounds.x0, bounds.y0, bounds.x1, bounds.y1, argb);
 	newitem.m_texture = texture;
-	newitem.m_flags = PRIMFLAG_TEXORIENT(ROT0) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
+	newitem.m_flags = PRIMFLAG_TEXORIENT(ROT0) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE;
 	newitem.m_internal = INTERNAL_FLAG_CHAR;
 }
 
@@ -1055,8 +1051,9 @@ int render_target::configured_view(const char *viewname, int targetindex, int nu
 	if (strcmp(viewname, "auto") != 0)
 	{
 		// scan for a matching view name
+		size_t viewlen = strlen(viewname);
 		for (view = view_by_index(viewindex = 0); view != nullptr; view = view_by_index(++viewindex))
-			if (core_strnicmp(view->name(), viewname, strlen(viewname)) == 0)
+			if (core_strnicmp(view->name(), viewname, viewlen) == 0)
 				break;
 	}
 
@@ -1754,7 +1751,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					width = MIN(width, m_maxtexwidth);
 					height = MIN(height, m_maxtexheight);
 
-					curitem->texture()->get_scaled(width, height, prim->texture, list);
+					curitem->texture()->get_scaled(width, height, prim->texture, list, curitem->flags());
 
 					// set the palette
 					prim->texture.palette = curitem->texture()->get_adjusted_palette(container);
@@ -1857,7 +1854,7 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 
 		// get the scaled texture and append it
 
-		texture->get_scaled(width, height, prim->texture, list);
+		texture->get_scaled(width, height, prim->texture, list, prim->flags);
 
 		// compute the clip rect
 		render_bounds cliprect;

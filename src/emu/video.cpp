@@ -108,7 +108,13 @@ video_manager::video_manager(running_machine &machine)
 		m_avi_frame_period(attotime::zero),
 		m_avi_next_frame_time(attotime::zero),
 		m_avi_frame(0),
-		m_dummy_recording(false)
+		m_dummy_recording(false),
+		m_timecode_enabled(false),
+		m_timecode_write(false),
+		m_timecode_text(""),
+		m_timecode_start(attotime::zero),
+		m_timecode_total(attotime::zero)
+
 {
 	// request a callback upon exiting
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(video_manager::exit), this));
@@ -362,6 +368,63 @@ void video_manager::save_active_screen_snapshots()
 
 
 //-------------------------------------------------
+//  save_input_timecode - add a line of current
+//  timestamp to inp.timecode file
+//-------------------------------------------------
+
+void video_manager::save_input_timecode()
+{
+	// if record timecode input is not active, do nothing
+	if (!m_timecode_enabled) {
+		return;
+	}
+	m_timecode_write = true;
+}
+
+std::string &video_manager::timecode_text(std::string &str) {
+	str.clear();
+	str += " ";
+
+	if (!m_timecode_text.empty()) {
+		str += m_timecode_text + " ";
+	}
+
+	attotime elapsed_time = machine().time() - m_timecode_start;
+	std::string elapsed_time_str;
+	strcatprintf(elapsed_time_str, "%02d:%02d",
+		(elapsed_time.m_seconds / 60) % 60,
+		elapsed_time.m_seconds % 60);
+	str += elapsed_time_str;
+
+	bool paused = machine().paused();
+	if (paused) {
+		str.append(" [paused]");
+	}
+
+	str += " ";
+
+	return str;
+}
+
+std::string &video_manager::timecode_total_text(std::string &str) {
+	str.clear();
+	str += " TOTAL ";
+
+	attotime elapsed_time = m_timecode_total;
+	if (machine().ui().show_timecode_counter()) {
+		elapsed_time += machine().time() - m_timecode_start;
+	}
+	std::string elapsed_time_str;
+	strcatprintf(elapsed_time_str, "%02d:%02d",
+		(elapsed_time.m_seconds / 60) % 60,
+		elapsed_time.m_seconds % 60);
+	str += elapsed_time_str + " ";
+	return str;
+}
+
+
+
+//-------------------------------------------------
 //  begin_recording - begin recording of a movie
 //-------------------------------------------------
 
@@ -584,7 +647,7 @@ void video_manager::postload()
 //  forward
 //-------------------------------------------------
 
-inline int video_manager::effective_autoframeskip() const
+inline bool video_manager::effective_autoframeskip() const
 {
 	// if we're fast forwarding or paused, autoframeskip is disabled
 	if (m_fastforward || machine().paused())
@@ -621,7 +684,7 @@ inline int video_manager::effective_frameskip() const
 inline bool video_manager::effective_throttle() const
 {
 	// if we're paused, or if the UI is active, we always throttle
-	if (machine().paused() || machine().ui().is_menu_active())
+	if (machine().paused()) //|| machine().ui().is_menu_active())
 		return true;
 
 	// if we're fast forwarding, we don't throttle

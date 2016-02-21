@@ -275,6 +275,7 @@ VIDEOS["BUFSPRITE"] = true
 VIDEOS["DM9368"] = true
 --VIDEOS["EF9340_1"] = true
 --VIDEOS["EF9345"] = true
+--VIDEOS["EF9364"] = true
 --VIDEOS["EF9365"] = true
 --VIDEOS["GF4500"] = true
 VIDEOS["GF7600GS"] = true
@@ -294,6 +295,7 @@ VIDEOS["HUC6270"] = true
 --VIDEOS["HUC6272"] = true
 --VIDEOS["I8244"] = true
 VIDEOS["I8275"] = true
+VIDEOS["JANGOU_BLITTER"] = true
 VIDEOS["M50458"] = true
 VIDEOS["MB90082"] = true
 VIDEOS["MB_VCU"] = true
@@ -4019,6 +4021,8 @@ files {
 
 createMAMEProjects(_target, _subtarget, "zaccaria")
 files {
+	MAME_DIR .. "src/mame/audio/zaccaria.cpp",
+	MAME_DIR .. "src/mame/audio/zaccaria.h",
 	MAME_DIR .. "src/mame/drivers/laserbat.cpp",
 	MAME_DIR .. "src/mame/includes/laserbat.h",
 	MAME_DIR .. "src/mame/video/laserbat.cpp",
@@ -4245,6 +4249,7 @@ files {
 	MAME_DIR .. "src/mame/machine/inder_vid.cpp",
 	MAME_DIR .. "src/mame/machine/inder_vid.h",
 	MAME_DIR .. "src/mame/drivers/corona.cpp",
+	MAME_DIR .. "src/mame/drivers/amazonlf.cpp",
 	MAME_DIR .. "src/mame/drivers/crystal.cpp",
 	MAME_DIR .. "src/mame/video/vrender0.cpp",
 	MAME_DIR .. "src/mame/video/vrender0.h",
@@ -4411,6 +4416,7 @@ files {
 	MAME_DIR .. "src/mame/includes/news.h",
 	MAME_DIR .. "src/mame/video/news.cpp",
 	MAME_DIR .. "src/mame/drivers/nexus3d.cpp",
+	MAME_DIR .. "src/mame/drivers/nibble.cpp",
 	MAME_DIR .. "src/mame/drivers/norautp.cpp",
 	MAME_DIR .. "src/mame/includes/norautp.h",
 	MAME_DIR .. "src/mame/audio/norautp.cpp",

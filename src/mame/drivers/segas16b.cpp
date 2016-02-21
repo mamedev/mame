@@ -7143,6 +7143,7 @@ ROM_END
 //  Sonic Boom, Sega System 16B
 //  CPU: FD1094 (317-0053)
 //  ROM Board type: 171-5358
+//  Sega ID# for ROM board: 834-6532-01
 //
 //  Pos.   Silk        Type        Part                Pos.   Silk        Type        Part
 //

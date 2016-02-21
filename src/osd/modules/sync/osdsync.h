@@ -24,7 +24,7 @@ struct osd_event;
 
 
 /*-----------------------------------------------------------------------------
-    osd_lock_event_alloc: allocate a new event
+    osd_event_alloc: allocate a new event
 
     Parameters:
 
@@ -173,19 +173,5 @@ int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask);
         None.
 -----------------------------------------------------------------------------*/
 void osd_thread_wait_free(osd_thread *thread);
-
-//============================================================
-//  Scalable Locks
-//============================================================
-
-struct osd_scalable_lock;
-
-osd_scalable_lock *osd_scalable_lock_alloc(void);
-
-INT32 osd_scalable_lock_acquire(osd_scalable_lock *lock);
-
-void osd_scalable_lock_release(osd_scalable_lock *lock, INT32 myslot);
-
-void osd_scalable_lock_free(osd_scalable_lock *lock);
 
 #endif  /* __OSDSYNC__ */

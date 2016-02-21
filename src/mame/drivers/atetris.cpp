@@ -330,7 +330,7 @@ static MACHINE_CONFIG_START( atetris, atetris_state )
 	MCFG_CPU_ADD("maincpu", M6502,MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_SLAPSTIC_ADD("slapstic")
+	MCFG_SLAPSTIC_ADD("slapstic", 101)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -367,7 +367,7 @@ static MACHINE_CONFIG_START( atetrisb2, atetris_state )
 	MCFG_CPU_ADD("maincpu", M6502,BOOTLEG_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(atetrisb2_map)
 
-	MCFG_SLAPSTIC_ADD("slapstic")
+	MCFG_SLAPSTIC_ADD("slapstic", 101)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -544,7 +544,7 @@ DRIVER_INIT_MEMBER(atetris_state,atetris)
 {
 	UINT8 *rgn = memregion("maincpu")->base();
 
-	m_slapstic_device->slapstic_init(machine(), 101);
+	m_slapstic_device->slapstic_init();
 	m_slapstic_source = &rgn[0x10000];
 	m_slapstic_base = &rgn[0x04000];
 }

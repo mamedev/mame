@@ -37,7 +37,9 @@ public:
 #else
 		m_hwnd(0), m_dc(0), m_focus_hwnd(0), m_resize_state(0),
 #endif
-		m_primlist(NULL),
+		m_primlist(nullptr),
+		m_index(0),
+		m_main(nullptr),
 		m_prescale(1)
 		{}
 	virtual ~osd_window() { }
@@ -55,11 +57,7 @@ public:
 #ifdef OSD_SDL
 	virtual osd_dim blit_surface_size() = 0;
 	virtual osd_monitor_info *monitor() const = 0;
-#if (SDLMAME_SDL2)
 	virtual SDL_Window *sdl_window() = 0;
-#else
-	virtual SDL_Surface *sdl_surface() = 0;
-#endif
 #else
 	virtual osd_monitor_info *monitor() const = 0;
 	virtual bool win_has_menu() = 0;
@@ -78,6 +76,8 @@ public:
 
 	render_primitive_list   *m_primlist;
 	osd_window_config       m_win_config;
+	int						m_index;
+	osd_window				*m_main;
 protected:
 	int                     m_prescale;
 };

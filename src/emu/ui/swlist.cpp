@@ -355,7 +355,10 @@ void ui_menu_software_list::handle()
 				}
 
 				if (selected_entry != nullptr && selected_entry != cur_selected)
-					set_selection((void *) selected_entry);
+				{
+					set_selection((void *)selected_entry);
+					top_line = selected - (visible_lines / 2);
+				}
 			}
 		}
 		else if (event->iptkey == IPT_UI_CANCEL)
@@ -448,7 +451,7 @@ void ui_menu_software::handle()
 	const ui_menu_event *event = process(0);
 
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT) {
-		//      ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_software_list>(machine(), container, (software_list_config *)event->itemref, image)));
+		//      ui_menu::stack_push(global_alloc_clear<ui_menu_software_list>(machine(), container, (software_list_config *)event->itemref, image));
 		*m_result = (software_list_device *)event->itemref;
 		ui_menu::stack_pop(machine());
 	}
