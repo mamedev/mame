@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  uniformreader.cpp - BGFX shader uniform JSON reader
+//
+//============================================================
+
 #include "uniformreader.h"
 #include "uniform.h"
 

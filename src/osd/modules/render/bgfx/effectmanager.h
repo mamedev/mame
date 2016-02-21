@@ -1,3 +1,14 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  effectmanager.h - BGFX shader effect manager
+//
+//  Maintains a string-to-entry lookup of BGFX shader
+//  effects, defined by effect.h and read by effectreader.h
+//
+//============================================================
+
 #pragma once
 
 #ifndef __DRAWBGFX_EFFECT_MANAGER__

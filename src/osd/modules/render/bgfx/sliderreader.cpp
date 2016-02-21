@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//==============================================================
+//
+//  sliderreader.cpp - BGFX shader parameter slider JSON reader
+//
+//==============================================================
+
 #include "emu.h"
 
 #include "sliderreader.h"

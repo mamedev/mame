@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  texture.cpp - Texture abstraction for BGFX layer
+//
+//============================================================
+
 #include "emu.h"
 
 #include "texture.h"

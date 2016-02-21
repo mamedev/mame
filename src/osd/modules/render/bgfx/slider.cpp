@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  slider.cpp - BGFX shader parameter slider
+//
+//============================================================
+
 #include "emu.h"
 
 #include "slider.h"

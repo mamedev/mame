@@ -1,3 +1,14 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  chainentry.cpp - BGFX shader post-processing node
+//
+//  Represents a single entry in a list of post-processing
+//  passes to be applied to a screen quad or buffer.
+//
+//============================================================
+
 #include "emu.h"
 
 #include <bgfx/bgfx.h>

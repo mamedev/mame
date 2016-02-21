@@ -1,3 +1,14 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  chainentry.h - BGFX shader post-processing node
+//
+//  Represents a single entry in a list of post-processing
+//  passes to be applied to a screen quad or buffer.
+//
+//============================================================
+
 #pragma once
 
 #ifndef __DRAWBGFX_CHAIN_ENTRY__

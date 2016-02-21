@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  effectreader.cpp - BGFX effect JSON reader
+//
+//============================================================
+
 #include <string>
 
 #include <bgfx/bgfx.h>

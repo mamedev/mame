@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  chainentryreader.cpp - BGFX chain entry JSON reader
+//
+//============================================================
+
 #include <string>
 
 #include "emu.h"

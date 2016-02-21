@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  chainentryreader.h - BGFX chain entry JSON reader
+//
+//============================================================
+
 #pragma once
 
 #ifndef __DRAWBGFX_CHAIN_ENTRY_READER__

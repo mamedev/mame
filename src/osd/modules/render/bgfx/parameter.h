@@ -1,3 +1,15 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  parameter.h - BGFX shader parameter
+//
+//  A value that represents some form of parametric
+//  operation, which can be fed to the input of a BGFX
+//  shader uniform.
+//
+//============================================================
+
 #pragma once
 
 #ifndef __DRAWBGFX_PARAMETER__

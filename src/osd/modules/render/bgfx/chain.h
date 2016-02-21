@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  chain.h - BGFX screen-space post-effect chain
+//
+//============================================================
+
 #pragma once
 
 #ifndef __DRAWBGFX_CHAIN__

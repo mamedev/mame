@@ -62,7 +62,7 @@ static inline bool is_transparent(const float &a)
 
 renderer_sdl1::renderer_sdl1(osd_window *window, int extra_flags)
 	: osd_renderer(window, extra_flags)
-	, m_sdl_renderer(NULL)
+	, m_sdl_renderer(nullptr)
 	, m_blittimer(0)
 	, m_last_hofs(0)
 	, m_last_vofs(0)
@@ -180,7 +180,7 @@ const copy_info_t renderer_sdl1::s_blit_info_default[] =
 { -1 },
 };
 
-copy_info_t* renderer_sdl1::s_blit_info[SDL_TEXFORMAT_LAST+1] = { NULL };
+copy_info_t* renderer_sdl1::s_blit_info[SDL_TEXFORMAT_LAST+1] = { nullptr };
 bool renderer_sdl1::s_blit_info_initialized = false;
 
 //============================================================
@@ -261,9 +261,9 @@ void texture_info::render_quad(const render_primitive *prim, const int x, const 
 	set_coloralphamode(m_texture_id, &prim->color);
 	//printf("%d %d %d %d\n", target_rect.x, target_rect.y, target_rect.w, target_rect.h);
 	// Arghhh .. Just another bug. SDL_RenderCopy has severe issues with scaling ...
-	SDL_RenderCopy(m_renderer->m_sdl_renderer,  m_texture_id, NULL, &target_rect);
-	//SDL_RenderCopyEx(m_renderer->m_sdl_renderer,  m_texture_id, NULL, &target_rect, 0, NULL, SDL_FLIP_NONE);
-	//SDL_RenderCopyEx(m_renderer->m_sdl_renderer,  m_texture_id, NULL, NULL, 0, NULL, SDL_FLIP_NONE);
+	SDL_RenderCopy(m_renderer->m_sdl_renderer,  m_texture_id, nullptr, &target_rect);
+	//SDL_RenderCopyEx(m_renderer->m_sdl_renderer,  m_texture_id, nullptr, &target_rect, 0, nullptr, SDL_FLIP_NONE);
+	//SDL_RenderCopyEx(m_renderer->m_sdl_renderer,  m_texture_id, nullptr, nullptr, 0, nullptr, SDL_FLIP_NONE);
 }
 
 void renderer_sdl1::render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y)
@@ -370,13 +370,13 @@ bool renderer_sdl1::init(running_machine &machine)
 	// Load the GL library now - else MT will fail
 	const char *stemp = downcast<sdl_options &>(machine.options()).gl_lib();
 #else
-	const char *stemp = NULL;
+	const char *stemp = nullptr;
 #endif
-	if (stemp != NULL && strcmp(stemp, OSDOPTVAL_AUTO) == 0)
-		stemp = NULL;
+	if (stemp != nullptr && strcmp(stemp, OSDOPTVAL_AUTO) == 0)
+		stemp = nullptr;
 
 	// No fatalerror here since not all video drivers support GL !
-	if (SDL_GL_LoadLibrary(stemp) != 0) // Load library (default for e==NULL
+	if (SDL_GL_LoadLibrary(stemp) != 0) // Load library (default for e==nullptr
 		osd_printf_warning("Warning: Unable to load opengl library: %s\n", stemp ? stemp : "<default>");
 	else
 		osd_printf_verbose("Loaded opengl shared library: %s\n", stemp ? stemp : "<default>");
@@ -408,12 +408,12 @@ static void drawsdl_show_info(struct SDL_RendererInfo *render_info)
 			RF_ENTRY(SDL_RENDERER_PRESENTVSYNC),
 			RF_ENTRY(SDL_RENDERER_ACCELERATED),
 			RF_ENTRY(SDL_RENDERER_TARGETTEXTURE),
-			{-1, NULL}
+			{-1, nullptr}
 		};
 	int i;
 
 	osd_printf_verbose("window: using renderer %s\n", render_info->name ? render_info->name : "<unknown>");
-	for (i = 0; rflist[i].name != NULL; i++)
+	for (i = 0; rflist[i].name != nullptr; i++)
 		if (render_info->flags & rflist[i].flag)
 			osd_printf_verbose("renderer: flag %s\n", rflist[i].name);
 }
@@ -500,7 +500,7 @@ void renderer_sdl1::destroy_all_textures()
 int renderer_sdl1::draw(int update)
 {
 	render_primitive *prim;
-	texture_info *texture=NULL;
+	texture_info *texture=nullptr;
 	float vofs, hofs;
 	int blit_pixels = 0;
 
@@ -516,7 +516,7 @@ int renderer_sdl1::draw(int update)
 		destroy_all_textures();
 		m_width = wdim.width();
 		m_height = wdim.height();
-		SDL_RenderSetViewport(m_sdl_renderer, NULL);
+		SDL_RenderSetViewport(m_sdl_renderer, nullptr);
 		m_blittimer = 3;
 		clear_flags(FI_CHANGED);
 	}
@@ -529,7 +529,7 @@ int renderer_sdl1::draw(int update)
 		SDL_SetRenderDrawBlendMode(m_sdl_renderer, SDL_BLENDMODE_NONE);
 		//SDL_SetRenderDrawColor(0,0,0,255);
 		SDL_SetRenderDrawColor(m_sdl_renderer, 0,0,0,0);
-		SDL_RenderFillRect(m_sdl_renderer, NULL);
+		SDL_RenderFillRect(m_sdl_renderer, nullptr);
 		m_blittimer--;
 	}
 
@@ -559,7 +559,7 @@ int renderer_sdl1::draw(int update)
 	window().m_primlist->acquire_lock();
 
 	// now draw
-	for (prim = window().m_primlist->first(); prim != NULL; prim = prim->next())
+	for (prim = window().m_primlist->first(); prim != nullptr; prim = prim->next())
 	{
 		Uint8 sr, sg, sb, sa;
 
@@ -610,10 +610,10 @@ int renderer_sdl1::draw(int update)
 
 copy_info_t *texture_info::compute_size_type()
 {
-	copy_info_t *result = NULL;
+	copy_info_t *result = nullptr;
 	int maxperf = 0;
 
-	for (copy_info_t *bi = renderer_sdl1::s_blit_info[m_format]; bi != NULL; bi = bi->next)
+	for (copy_info_t *bi = renderer_sdl1::s_blit_info[m_format]; bi != nullptr; bi = bi->next)
 	{
 		if ((m_is_rotated == bi->blitter->m_is_rot)
 				&& (m_sdl_blendmode == bi->bm_mask))
@@ -636,7 +636,7 @@ copy_info_t *texture_info::compute_size_type()
 		return result;
 
 	/* try last resort handlers */
-	for (copy_info_t *bi = renderer_sdl1::s_blit_info[m_format]; bi != NULL; bi = bi->next)
+	for (copy_info_t *bi = renderer_sdl1::s_blit_info[m_format]; bi != nullptr; bi = bi->next)
 	{
 		if ((m_is_rotated == bi->blitter->m_is_rot)
 			&& (m_sdl_blendmode == bi->bm_mask))
@@ -644,7 +644,7 @@ copy_info_t *texture_info::compute_size_type()
 				return bi;
 	}
 	//FIXME: crash implement a -do nothing handler */
-	return NULL;
+	return nullptr;
 }
 
 // FIXME:
@@ -739,7 +739,7 @@ texture_info::texture_info(renderer_sdl1 *renderer, const render_texinfo &texsou
 	if (m_sdl_access == SDL_TEXTUREACCESS_STATIC)
 	{
 		if (m_copyinfo->blitter->m_is_passthrough)
-			m_pixels = NULL;
+			m_pixels = nullptr;
 		else
 			m_pixels = malloc(m_setup.rotwidth * m_setup.rotheight * m_copyinfo->blitter->m_dest_bpp);
 	}
@@ -749,7 +749,7 @@ texture_info::texture_info(renderer_sdl1 *renderer, const render_texinfo &texsou
 
 texture_info::~texture_info()
 {
-	if ( is_pixels_owned() && (m_pixels != NULL) )
+	if ( is_pixels_owned() && (m_pixels != nullptr) )
 		free(m_pixels);
 	SDL_DestroyTexture(m_texture_id);
 }
@@ -773,11 +773,11 @@ void texture_info::set_data(const render_texinfo &texsource, const UINT32 flags)
 			m_pitch = m_setup.rotwidth * m_copyinfo->blitter->m_dest_bpp;
 			m_copyinfo->blitter->texop(this, &texsource);
 		}
-		SDL_UpdateTexture(m_texture_id, NULL, m_pixels, m_pitch);
+		SDL_UpdateTexture(m_texture_id, nullptr, m_pixels, m_pitch);
 	}
 	else
 	{
-		SDL_LockTexture(m_texture_id, NULL, (void **) &m_pixels, &m_pitch);
+		SDL_LockTexture(m_texture_id, nullptr, (void **) &m_pixels, &m_pitch);
 		if ( m_copyinfo->blitter->m_is_passthrough )
 		{
 			UINT8 *src = (UINT8 *) texsource.base;
@@ -872,7 +872,7 @@ texture_info *renderer_sdl1::texture_find(const render_primitive &prim, const qu
 	osd_ticks_t now = osd_ticks();
 
 	// find a match
-	for (texture = m_texlist.first(); texture != NULL; )
+	for (texture = m_texlist.first(); texture != nullptr; )
 		if (texture->hash() == texhash &&
 			texture->matches(prim, setup))
 		{
@@ -880,7 +880,7 @@ texture_info *renderer_sdl1::texture_find(const render_primitive &prim, const qu
 			if ((texture->m_copyinfo->samples & 0x7f) == 0x7f)
 			{
 				if (texture->m_copyinfo != texture->compute_size_type())
-					return NULL;
+					return nullptr;
 			}
 			texture->m_last_access = now;
 			return texture;
@@ -895,7 +895,7 @@ texture_info *renderer_sdl1::texture_find(const render_primitive &prim, const qu
 		}
 
 	// nothing found
-	return NULL;
+	return nullptr;
 }
 
 //============================================================
@@ -912,16 +912,16 @@ texture_info * renderer_sdl1::texture_update(const render_primitive &prim)
 	texture = texture_find(prim, setup);
 
 	// if we didn't find one, create a new texture
-	if (texture == NULL && prim.texture.base != NULL)
+	if (texture == nullptr && prim.texture.base != nullptr)
 	{
 		texture = global_alloc(texture_info(this, prim.texture, setup, prim.flags));
 		/* add us to the texture list */
 		m_texlist.prepend(*texture);
 	}
 
-	if (texture != NULL)
+	if (texture != nullptr)
 	{
-		if (prim.texture.base != NULL && texture->texinfo().seqid != prim.texture.seqid)
+		if (prim.texture.base != nullptr && texture->texinfo().seqid != prim.texture.seqid)
 		{
 			texture->texinfo().seqid = prim.texture.seqid;
 			// if we found it, but with a different seqid, copy the data

@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  chainreader.cpp - BGFX chain JSON reader
+//
+//============================================================
+
 #include <string>
 #include <vector>
 

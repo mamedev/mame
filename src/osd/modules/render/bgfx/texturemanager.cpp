@@ -1,3 +1,14 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  texturemanager.cpp - BGFX texture manager
+//
+//  Maintains a string-to-entry mapping for any registered
+//  textures.
+//
+//============================================================
+
 #include <bgfx/bgfx.h>
 
 #include "texturemanager.h"

@@ -1,3 +1,14 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  shadermanager.h - BGFX shader manager
+//
+//  Maintains a mapping between strings and BGFX shaders,
+//  either vertex or pixel/fragment.
+//
+//============================================================
+
 #pragma once
 
 #ifndef __DRAWBGFX_SHADER_MANAGER__

@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  paramreader.cpp - BGFX shader parameter JSON reader
+//
+//============================================================
+
 #include <string>
 
 #include "paramreader.h"

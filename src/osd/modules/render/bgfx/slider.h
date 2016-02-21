@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  slider.h - BGFX shader parameter slider
+//
+//============================================================
+
 #pragma once
 
 #ifndef __DRAWBGFX_SLIDER__

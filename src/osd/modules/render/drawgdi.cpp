@@ -16,7 +16,7 @@
 renderer_gdi::~renderer_gdi()
 {
 	// free the bitmap memory
-	if (m_bmdata != NULL)
+	if (m_bmdata != nullptr)
 		global_free_array(m_bmdata);
 }
 

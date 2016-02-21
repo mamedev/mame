@@ -31,7 +31,7 @@ class renderer_gdi : public osd_renderer
 public:
 	renderer_gdi(osd_window *window)
 		: osd_renderer(window, FLAG_NONE)
-		, m_bmdata(NULL)
+		, m_bmdata(nullptr)
 		, m_bmsize(0)
 	{
 	}

@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  uniform.h - Shader uniform abstraction for BGFX layer
+//
+//============================================================
+
 #pragma once
 
 #ifndef __DRAWBGFX_UNIFORM__

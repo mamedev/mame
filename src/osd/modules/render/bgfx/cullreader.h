@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  cullreader.h - BGFX cull state JSON reader
+//
+//============================================================
+
 #pragma once
 
 #ifndef __DRAWBGFX_CULL_READER__

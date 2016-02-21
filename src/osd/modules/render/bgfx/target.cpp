@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  target.cpp - Render target abstraction for BGFX layer
+//
+//============================================================
+
 #include "target.h"
 
 bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, bool filter)

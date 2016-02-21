@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  effect.h - BGFX shader material to be applied to a mesh
+//
+//============================================================
+
 #pragma once
 
 #ifndef __DRAWBGFX_EFFECT__

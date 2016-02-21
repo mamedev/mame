@@ -1,3 +1,14 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  effectmanager.cpp - BGFX shader effect manager
+//
+//  Maintains a string-to-entry lookup of BGFX shader
+//  effects, defined by effect.h and read by effectreader.h
+//
+//============================================================
+
 #include "emu.h"
 
 #include <rapidjson/document.h>

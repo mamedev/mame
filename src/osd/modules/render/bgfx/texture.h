@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  texture.h - Texture abstraction for BGFX layer
+//
+//============================================================
+
 #pragma once
 
 #ifndef __DRAWBGFX_TEXTURE__

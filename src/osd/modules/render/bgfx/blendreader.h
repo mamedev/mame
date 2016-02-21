@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  blendreader.h - BGFX blend state JSON reader
+//
+//============================================================
+
 #pragma once
 
 #ifndef __DRAWBGFX_BLEND_READER__

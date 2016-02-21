@@ -1,3 +1,14 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  inputpair.h - BGFX sampler-and-texture pair
+//
+//  Keeps track of the texture which is bound to the sampler
+//  which is bound to the specified stage index.
+//
+//============================================================
+
 #include "inputpair.h"
 #include "texture.h"
 #include "effect.h"

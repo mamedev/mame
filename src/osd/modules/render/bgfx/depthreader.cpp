@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  depthreader.cpp - BGFX depth state JSON reader
+//
+//============================================================
+
 #include <bgfx/bgfx.h>
 
 #include "depthreader.h"

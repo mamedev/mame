@@ -1,3 +1,14 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  targetmanager.cpp - BGFX render target manager
+//
+//  Maintains a string-to-entry mapping for any registered
+//  render targets.
+//
+//============================================================
+
 #include <bgfx/bgfx.h>
 
 #include "targetmanager.h"

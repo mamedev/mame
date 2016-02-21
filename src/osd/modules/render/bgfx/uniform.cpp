@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  uniform.cpp - Shader uniform abstraction for BGFX layer
+//
+//============================================================
+
 #include "uniform.h"
 
 bgfx_uniform::bgfx_uniform(std::string name, bgfx::UniformType::Enum type)

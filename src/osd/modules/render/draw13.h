@@ -161,7 +161,7 @@ public:
 		{
 			for (int i = 0; i <= SDL_TEXFORMAT_LAST; i++)
 			{
-				for (copy_info_t *bi = s_blit_info[i]; bi != NULL; )
+				for (copy_info_t *bi = s_blit_info[i]; bi != nullptr; )
 				{
 					if (bi->pixel_count)
 						osd_printf_verbose("%s -> %s %s blendmode 0x%02x, %d samples: %d KPixel/sec\n", bi->srcname, bi->dstname,
@@ -171,7 +171,7 @@ public:
 					bi = bi->next;
 					global_free(freeme);
 				}
-				s_blit_info[i] = NULL;
+				s_blit_info[i] = nullptr;
 			}
 			s_blit_info_initialized = false;
 		}
