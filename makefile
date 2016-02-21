@@ -1279,8 +1279,10 @@ else
 endif
 
 %.mo: %.po
+ifneq ($(TARGETOS),macosx)
 	@echo Converting translation $<...
 	$(SILENT) msgfmt --check --output-file $@ $<
+endif
 
 #-------------------------------------------------
 # Regression tests
