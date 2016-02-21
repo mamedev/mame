@@ -1379,7 +1379,7 @@ shaders:
 
 translation:
 	$(SILENT) echo Generating mame.pot
-	$(SILENT) find src -iname "*.cpp" | xargs xgettext --from-code=UTF-8 -k_ -o mame.pot
+	$(SILENT) find src -iname "*.cpp" | xargs xgettext --from-code=UTF-8 -k_ -k__ -o mame.pot
 	$(SILENT) msgmerge -U "language/Afrikaans/strings.po"                     mame.pot
 	$(SILENT) msgmerge -U "language/Albanian/strings.po"                      mame.pot
 	$(SILENT) msgmerge -U "language/Arabic/strings.po"                        mame.pot
