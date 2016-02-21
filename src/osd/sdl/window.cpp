@@ -36,6 +36,12 @@
 #include "window.h"
 #include "input.h"
 #include "osdsdl.h"
+#include "modules/render/drawbgfx.h"
+#include "modules/render/drawsdl.h"
+#include "modules/render/draw13.h"
+#if (USE_OPENGL)
+#include "modules/render/drawogl.h"
+#endif
 
 //============================================================
 //  PARAMETERS
@@ -221,13 +227,37 @@ bool sdl_osd_interface::window_init()
 	}
 
 	// initialize the drawers
-	if (m_renderer->init(machine()))
-		video_config.mode = VIDEO_MODE_SOFT;
-
+	if (video_config.mode == VIDEO_MODE_BGFX)
+	{
+		if (renderer_bgfx::init(machine()))
+		{
+#if (USE_OPENGL)
+			video_config.mode = VIDEO_MODE_OPENGL;
+		}
+	}
+	if (video_config.mode == VIDEO_MODE_OPENGL)
+	{
+		if (renderer_ogl::init(machine()))
+		{
+			video_config.mode = VIDEO_MODE_SOFT;
+#else
+			video_config.mode = VIDEO_MODE_SOFT;
+#endif
+		}
+	}
+	if (video_config.mode == VIDEO_MODE_SDL2ACCEL)
+	{
+		if (renderer_sdl2::init(machine()))
+		{
+			video_config.mode = VIDEO_MODE_SOFT;
+		}
+	}
 	if (video_config.mode == VIDEO_MODE_SOFT)
 	{
-		if (m_renderer->init(machine()))
+		if (renderer_sdl1::init(machine()))
+		{
 			return false;
+		}
 	}
 
 	/* We may want to set a number of the hints SDL2 provides.
@@ -326,9 +356,6 @@ void sdl_osd_interface::window_exit()
 	{
 		sdlwindow_sync();
 	}
-
-	// kill the drawers
-	delete render_module;
 
 	execute_async_wait(&sdlwindow_exit_wt, wp_dummy);
 
@@ -514,7 +541,7 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 		window->m_windowed_dim = window->get_size();
 	}
 
-	global_free(window->m_renderer);
+	delete window->m_renderer;
 	window->m_renderer = nullptr;
 
 	bool is_osx = false;
@@ -531,9 +558,7 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 	SDL_DestroyWindow(window->sdl_window());
 	sdlinput_release_keys();
 
-	osd_renderer *renderer = osd_renderer::make_for_type(video_config.mode, reinterpret_cast<osd_window *>(this));
-	renderer->init(window->machine());
-	window->set_renderer(renderer);
+	window->set_renderer(osd_renderer::make_for_type(video_config.mode, reinterpret_cast<osd_window *>(window)));
 
 	// toggle the window mode
 	window->set_fullscreen(!window->fullscreen());
@@ -659,8 +684,7 @@ int sdl_window_info::window_init()
 	*last_window_ptr = this;
 	last_window_ptr = &this->m_next;
 
-	osd_renderer* renderer =
-	set_renderer(draw.create(this));
+	set_renderer(osd_renderer::make_for_type(video_config.mode, reinterpret_cast<osd_window *>(this)));
 
 	// create an event that we can use to skip blitting
 	m_rendered_event = osd_event_alloc(FALSE, TRUE);

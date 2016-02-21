@@ -219,7 +219,7 @@ render_primitive_list *renderer_d3d9::get_primitives()
 //  drawnone_create
 //============================================================
 
-int renderer_d3d9::init(running_machine &machine)
+bool renderer_d3d9::init(running_machine &machine)
 {
 	// Use Direct3D9
 	d3dintf = drawd3d9_init();
@@ -228,10 +228,10 @@ int renderer_d3d9::init(running_machine &machine)
 	if (d3dintf == nullptr)
 	{
 		osd_printf_error("Unable to initialize Direct3D.\n");
-		return 1;
+		return true;
 	}
 
-	return 0;
+	return false;
 }
 
 
@@ -576,11 +576,15 @@ int renderer_d3d9::initialize()
 {
 	// configure the adapter for the mode we want
 	if (config_adapter_mode())
+	{
 		return false;
+	}
 
 	// create the device immediately for the full screen case (defer for window mode)
 	if (window().fullscreen() && device_create(window().m_focus_hwnd))
+	{
 		return false;
+	}
 
 	return true;
 }
@@ -870,6 +874,7 @@ try_again:
 
 	m_shaders = (shaders*)global_alloc_clear<shaders>();
 	m_shaders->init(d3dintf, &window().machine(), this);
+	m_sliders_dirty = true;
 
 	int failed = m_shaders->create_resources(false);
 	if (failed)

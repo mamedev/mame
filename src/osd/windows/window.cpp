@@ -28,6 +28,14 @@
 
 #include "winutil.h"
 
+#include "modules/render/drawbgfx.h"
+#include "modules/render/drawnone.h"
+#include "modules/render/drawd3d.h"
+#include "modules/render/drawgdi.h"
+#if (USE_OPENGL)
+#include "modules/render/drawogl.h"
+#endif
+
 //============================================================
 //  PARAMETERS
 //============================================================
@@ -196,13 +204,108 @@ bool windows_osd_interface::window_init()
 		window_threadid = main_threadid;
 	}
 
+	const int fallbacks[VIDEO_MODE_COUNT] = {
+		-1,					// NONE -> no fallback
+		VIDEO_MODE_NONE,	// GDI -> NONE
+		VIDEO_MODE_D3D,		// BGFX -> D3D
+#if (USE_OPENGL)
+		VIDEO_MODE_GDI,		// OPENGL -> GDI
+#endif
+		-1,					// No SDL2ACCEL on Windows OSD
+#if (USE_OPENGL)
+		VIDEO_MODE_OPENGL,	// D3D -> OPENGL
+#else
+		VIDEO_MODE_GDI,		// D3D -> GDI
+#endif
+		-1					// No SOFT on Windows OSD
+	};
+
+	int current_mode = video_config.mode;
+	while (current_mode != VIDEO_MODE_NONE)
+	{
+		bool error = false;
+		switch(current_mode)
+		{
+			case VIDEO_MODE_NONE:
+				error = renderer_none::init(machine());
+				break;
+			case VIDEO_MODE_GDI:
+				error = renderer_gdi::init(machine());
+				break;
+			case VIDEO_MODE_BGFX:
+				error = renderer_bgfx::init(machine());
+				break;
+#if (USE_OPENGL)
+			case VIDEO_MODE_OPENGL:
+				error = renderer_ogl::init(machine());
+				break;
+#endif
+			case VIDEO_MODE_SDL2ACCEL:
+				fatalerror("SDL2-Accel renderer unavailable on Windows OSD.");
+				break;
+			case VIDEO_MODE_D3D:
+				error = renderer_d3d9::init(machine());
+				break;
+			case VIDEO_MODE_SOFT:
+				fatalerror("SDL1 renderer unavailable on Windows OSD.");
+				break;
+			default:
+				fatalerror("Unknown video mode.");
+				break;
+		}
+		if (error)
+		{
+			current_mode = fallbacks[current_mode];
+		}
+		else
+		{
+			break;
+		}
+	}
+	video_config.mode = current_mode;
+
 	// set up the window list
 	last_window_ptr = &win_window_list;
 
 	return true;
 }
 
+void windows_osd_interface::update_slider_list()
+{
+	for (win_window_info *window = win_window_list; window != nullptr; window = window->m_next)
+	{
+		if (window->m_renderer->sliders_dirty())
+		{
+			build_slider_list();
+			return;
+		}
+	}
+}
 
+void windows_osd_interface::build_slider_list()
+{
+	m_sliders = nullptr;
+	slider_state *curr = m_sliders;
+	for (win_window_info *info = win_window_list; info != nullptr; info = info->m_next)
+	{
+		slider_state *window_sliders = info->m_renderer->get_slider_list();
+		if (window_sliders != nullptr)
+		{
+			if (m_sliders == nullptr)
+			{
+				m_sliders = curr = window_sliders;
+			}
+			else
+			{
+				while (curr->next != nullptr)
+				{
+					curr = curr->next;
+				}
+				curr->next = window_sliders;
+			}
+		}
+	}
+}
 
 //============================================================
 //  winwindow_exit
@@ -300,9 +403,7 @@ void winwindow_process_events_periodic(running_machine &machine)
 
 static BOOL is_mame_window(HWND hwnd)
 {
-	win_window_info *window;
-
-	for (window = win_window_list; window != nullptr; window = window->m_next)
+	for (win_window_info *window = win_window_list; window != nullptr; window = window->m_next)
 		if (window->m_hwnd == hwnd)
 			return TRUE;
 
@@ -609,13 +710,10 @@ void win_window_info::create(running_machine &machine, int index, osd_monitor_in
 
 	// allocate a new window object
 	win_window_info *window = global_alloc(win_window_info(machine));
-	//printf("%d, %d\n", config->width, config->height);
 	window->m_win_config = *config;
 	window->m_monitor = monitor;
 	window->m_fullscreen = !video_config.windowed;
 	window->m_index = index;
-	window->m_renderer = reinterpret_cast<osd_renderer *>(osd_renderer::make_for_type(video_config.mode, reinterpret_cast<osd_window *>(window)));
-	window->m_renderer->init(machine);
 
 	// set main window
 	if (index > 0)
@@ -1019,8 +1117,6 @@ int win_window_info::wnd_extra_height()
 	return rect_height(&temprect) - 100;
 }
 
-
-
 //============================================================
 //  thread_entry
 //  (window thread)
@@ -1185,8 +1281,14 @@ int win_window_info::complete_create()
 	if (!m_fullscreen || m_fullscreen_safe)
 	{
 		// finish off by trying to initialize DirectX; if we fail, ignore it
+		if (m_renderer != nullptr)
+		{
+			global_free(m_renderer);
+		}
+		m_renderer = osd_renderer::make_for_type(video_config.mode, reinterpret_cast<osd_window *>(this));
 		if (m_renderer->create())
 			return 1;
+
 		ShowWindow(m_hwnd, SW_SHOW);
 	}
 
@@ -1892,9 +1994,12 @@ void win_window_info::set_fullscreen(int fullscreen)
 	{
 		if (video_config.mode != VIDEO_MODE_NONE)
 			ShowWindow(m_hwnd, SW_SHOW);
-		osd_renderer *renderer = reinterpret_cast<osd_renderer *>(osd_renderer::make_for_type(video_config.mode, reinterpret_cast<osd_window *>(this)));
-		renderer->init(machine());
-		m_renderer = renderer;
+
+		if (m_renderer != nullptr)
+		{
+			delete m_renderer;
+		}
+		m_renderer = reinterpret_cast<osd_renderer *>(osd_renderer::make_for_type(video_config.mode, reinterpret_cast<osd_window *>(this)));
 		if (m_renderer->create())
 			exit(1);
 	}

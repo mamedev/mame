@@ -83,28 +83,6 @@ bool windows_osd_interface::video_init()
 		win_window_info::create(machine(), index, osd_monitor_info::pick_monitor(options, index), &windows[index]);
 	}
 
-	m_sliders = nullptr;
-	slider_state *curr = m_sliders;
-	for (win_window_info *info = win_window_list; info != nullptr; info = info->m_next)
-	{
-		slider_state *window_sliders = info->m_renderer->get_slider_list();
-		if (window_sliders != nullptr)
-		{
-			if (m_sliders == nullptr)
-			{
-				m_sliders = curr = window_sliders;
-			}
-			else
-			{
-				while (curr->next != nullptr)
-				{
-					curr = curr->next;
-				}
-				curr->next = window_sliders;
-			}
-		}
-	}
-
 	if (video_config.mode != VIDEO_MODE_NONE)
 		SetForegroundWindow(win_window_list->m_hwnd);
 
@@ -214,6 +192,8 @@ void windows_osd_interface::update(bool skip_redraw)
 {
 	// ping the watchdog on each update
 	winmain_watchdog_ping();
+
+	update_slider_list();
 
 	// if we're not skipping this redraw, update all windows
 	if (!skip_redraw)

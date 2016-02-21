@@ -104,6 +104,7 @@ struct slider_state
 	INT32           maxval;             /* maximum value */
 	INT32           incval;             /* increment value */
 	bool			hidden;				/* hidden or not */
+	INT32			id;					/* unique identifier */
 	char 			description[1];     /* textual description */
 };
 

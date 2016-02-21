@@ -31,7 +31,7 @@ public:
 
 	virtual int create() override;
 	virtual slider_state* get_slider_list() override;
-	virtual int init(running_machine &machine) override { return 0; }
+	static bool init(running_machine &machine) { return false; }
 	virtual int draw(const int update) override;
 #ifdef OSD_SDL
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;

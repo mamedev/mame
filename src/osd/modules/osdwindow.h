@@ -12,6 +12,11 @@
 #include "emu.h"
 #include "ui/ui.h"
 
+#ifdef OSD_SDL
+// standard SDL headers
+#include "sdlinc.h"
+#endif
+
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
@@ -21,7 +26,7 @@ class render_primitive_list;
 
 enum
 {
-	VIDEO_MODE_NONE,
+	VIDEO_MODE_NONE = 0,
 	VIDEO_MODE_GDI,
 	VIDEO_MODE_BGFX,
 #if (USE_OPENGL)
@@ -29,7 +34,9 @@ enum
 #endif
 	VIDEO_MODE_SDL2ACCEL,
 	VIDEO_MODE_D3D,
-	VIDEO_MODE_SOFT
+	VIDEO_MODE_SOFT,
+
+	VIDEO_MODE_COUNT
 };
 
 class osd_dim
@@ -205,7 +212,7 @@ public:
 	static const int FLAG_NEEDS_ASYNCBLIT       = 0x0200;
 
 	osd_renderer(osd_window *window, const int flags)
-	: m_window(window), m_flags(flags) { }
+	: m_sliders_dirty(false), m_window(window), m_flags(flags) { }
 
 	virtual ~osd_renderer() { }
 
@@ -219,7 +226,6 @@ public:
 	/* Interface to be implemented by render code */
 
 	virtual int create() = 0;
-	virtual int init(running_machine &machine) = 0;
 	virtual render_primitive_list *get_primitives() = 0;
 
 	virtual slider_state* get_slider_list() { return nullptr; }
@@ -228,12 +234,14 @@ public:
 	virtual void save() { };
 	virtual void record() { };
 	virtual void toggle_fsfx() { };
+	virtual bool sliders_dirty() { return m_sliders_dirty; }
 
 	static osd_renderer* make_for_type(int mode, osd_window *window, int extra_flags = FLAG_NONE);
 
 protected:
 	/* Internal flags */
 	static const int FI_CHANGED                 = 0x010000;
+	bool		m_sliders_dirty;
 
 private:
 	osd_window	*m_window;

@@ -12,6 +12,7 @@
 #define __SDLVIDEO__
 
 #include "osdsdl.h"
+#include "modules/osdwindow.h"
 
 //============================================================
 //  CONSTANTS

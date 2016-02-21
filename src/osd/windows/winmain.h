@@ -275,8 +275,11 @@ public:
 
 private:
 	virtual void osd_exit() override;
-	windows_options &m_options;
-	slider_state *m_sliders;
+	void build_slider_list();
+	void update_slider_list();
+
+	windows_options &	m_options;
+	slider_state *		m_sliders;
 
 	static const int DEFAULT_FONT_HEIGHT = 200;
 };

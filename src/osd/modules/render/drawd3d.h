@@ -43,7 +43,7 @@ public:
 
 	virtual int create() override;
 	virtual slider_state* get_slider_list() override;
-	virtual int init(running_machine &machine) override;
+	static bool init(running_machine &machine);
 	virtual render_primitive_list *get_primitives() override;
 	virtual int draw(const int update) override;
 	virtual void save() override;

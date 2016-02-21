@@ -88,6 +88,8 @@ public:
 	bool is_pixels_owned() const;
 
 private:
+	void set_coloralphamode(SDL_Texture *texture_id, const render_color *color);
+
 	Uint32              m_sdl_access;
 	renderer_sdl1 *     m_renderer;
 	render_texinfo      m_texinfo;            // copy of the texture info
@@ -176,7 +178,7 @@ public:
 	}
 
 	virtual int create() override;
-	virtual int init(running_machine &machine) override;
+	static bool init(running_machine &machine);
 	virtual int draw(const int update) override;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
 	virtual render_primitive_list *get_primitives() override;
@@ -184,9 +186,13 @@ public:
 
 	SDL_Renderer *  m_sdl_renderer;
 
+	static copy_info_t* s_blit_info[SDL_TEXFORMAT_LAST+1];
+
 private:
+	void expand_copy_info(const copy_info_t *list);
+	void add_list(copy_info_t **head, const copy_info_t *element, Uint32 bm);
+
 	void render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y);
-	void set_coloralphamode(SDL_Texture *texture_id, const render_color *color);
 
 	texture_info *texture_find(const render_primitive &prim, const quad_setup_data &setup);
 	texture_info *texture_update(const render_primitive &prim);
@@ -216,7 +222,6 @@ private:
 	INT64           m_last_blit_time;
 	INT64           m_last_blit_pixels;
 
-	static copy_info_t* s_blit_info[SDL_TEXFORMAT_LAST+1];
 	static bool s_blit_info_initialized;
 	static const copy_info_t s_blit_info_default[];
 };

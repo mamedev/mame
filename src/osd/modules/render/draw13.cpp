@@ -84,7 +84,7 @@ renderer_sdl1::renderer_sdl1(osd_window *window, int extra_flags)
 		 * prohibit fullscreen toggling. It is than not possible
 		 * to toggle from fullscreen to window mode.
 		 */
-		expand_copy_info(blit_info_default);
+		expand_copy_info(s_blit_info_default);
 		s_blit_info_initialized = true;
 	}
 }
@@ -180,7 +180,7 @@ const copy_info_t renderer_sdl1::s_blit_info_default[] =
 { -1 },
 };
 
-copy_info_t* renderer_sdl::s_blit_info[SDL_TEXFORMAT_LAST+1] = { NULL };
+copy_info_t* renderer_sdl1::s_blit_info[SDL_TEXFORMAT_LAST+1] = { NULL };
 bool renderer_sdl1::s_blit_info_initialized = false;
 
 //============================================================
@@ -216,7 +216,7 @@ static inline SDL_BlendMode map_blendmode(const int blendmode)
 	return SDL_BLENDMODE_NONE;
 }
 
-void renderer_sdl1::set_coloralphamode(SDL_Texture *texture_id, const render_color *color)
+void texture_info::set_coloralphamode(SDL_Texture *texture_id, const render_color *color)
 {
 	UINT32 sr = (UINT32)(255.0f * color->r);
 	UINT32 sg = (UINT32)(255.0f * color->g);
@@ -333,7 +333,7 @@ int renderer_sdl1::RendererSupportsFormat(Uint32 format, Uint32 access, const ch
 //  drawsdl_init
 //============================================================
 
-static void add_list(copy_info_t **head, copy_info_t *element, Uint32 bm)
+void renderer_sdl1::add_list(copy_info_t **head, const copy_info_t *element, Uint32 bm)
 {
 	copy_info_t *newci = global_alloc(copy_info_t);
 	*newci = *element;
@@ -343,11 +343,9 @@ static void add_list(copy_info_t **head, copy_info_t *element, Uint32 bm)
 	*head = newci;
 }
 
-static void expand_copy_info(copy_info_t *list)
+void renderer_sdl1::expand_copy_info(const copy_info_t *list)
 {
-	copy_info_t   *bi;
-
-	for (bi = list; bi->src_fmt != -1; bi++)
+	for (const copy_info_t *bi = list; bi->src_fmt != -1; bi++)
 	{
 		if (bi->bm_mask == BM_ALL)
 		{
@@ -357,17 +355,14 @@ static void expand_copy_info(copy_info_t *list)
 			add_list(&s_blit_info[bi->src_fmt], bi, SDL_BLENDMODE_BLEND);
 		}
 		else
+		{
 			add_list(&s_blit_info[bi->src_fmt], bi, bi->bm_mask);
+		}
 	}
 }
 
-static osd_renderer *drawsdl2_create(osd_window *window)
-{
-	return global_alloc(renderer_sdl1(window, osd_renderer::FLAG_NONE));
-}
-
 // FIXME: machine only used to access options.
-int renderer_sdl1::init(running_machine &machine)
+bool renderer_sdl1::init(running_machine &machine)
 {
 	osd_printf_verbose("Using SDL native texturing driver (SDL 2.0+)\n");
 
@@ -386,7 +381,7 @@ int renderer_sdl1::init(running_machine &machine)
 	else
 		osd_printf_verbose("Loaded opengl shared library: %s\n", stemp ? stemp : "<default>");
 
-	return 0;
+	return false;
 }
 
 
@@ -615,11 +610,10 @@ int renderer_sdl1::draw(int update)
 
 copy_info_t *texture_info::compute_size_type()
 {
-	copy_info_t *bi;
 	copy_info_t *result = NULL;
 	int maxperf = 0;
 
-	for (bi = blit_info[m_format]; bi != NULL; bi = bi->next)
+	for (copy_info_t *bi = renderer_sdl1::s_blit_info[m_format]; bi != NULL; bi = bi->next)
 	{
 		if ((m_is_rotated == bi->blitter->m_is_rot)
 				&& (m_sdl_blendmode == bi->bm_mask))
@@ -637,10 +631,12 @@ copy_info_t *texture_info::compute_size_type()
 			}
 		}
 	}
+
 	if (result)
 		return result;
+
 	/* try last resort handlers */
-	for (bi = blit_info[m_format]; bi != NULL; bi = bi->next)
+	for (copy_info_t *bi = renderer_sdl1::s_blit_info[m_format]; bi != NULL; bi = bi->next)
 	{
 		if ((m_is_rotated == bi->blitter->m_is_rot)
 			&& (m_sdl_blendmode == bi->bm_mask))
@@ -906,7 +902,7 @@ texture_info *renderer_sdl1::texture_find(const render_primitive &prim, const qu
 //  texture_update
 //============================================================
 
-texture_info * renderer_sdl3::texture_update(const render_primitive &prim)
+texture_info * renderer_sdl1::texture_update(const render_primitive &prim)
 {
 	quad_setup_data setup;
 	texture_info *texture;
@@ -936,7 +932,7 @@ texture_info * renderer_sdl3::texture_update(const render_primitive &prim)
 	return texture;
 }
 
-render_primitive_list *renderer_sdl13::get_primitives()
+render_primitive_list *renderer_sdl1::get_primitives()
 {
 	osd_dim nd = window().blit_surface_size();
 	if (nd != m_blit_dim)

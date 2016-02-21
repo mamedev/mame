@@ -131,7 +131,7 @@ public:
 	virtual ~renderer_ogl();
 
 	virtual int create() override;
-	virtual int init(running_machine &machine) override;
+	static bool init(running_machine &machine);
 	virtual int draw(const int update) override;
 
 #ifndef OSD_WINDOWS
@@ -165,7 +165,7 @@ private:
 
 	void destroy_all_textures();
 
-	void load_gl_lib(running_machine &machine);
+	static void load_gl_lib(running_machine &machine);
 	void loadGLExtensions();
 	void initialize_gl();
 	void set_blendmode(int blendmode);

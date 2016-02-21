@@ -320,7 +320,9 @@ public:
 		SLIDER_SCREEN_TYPE_NONE = 0,
 		SLIDER_SCREEN_TYPE_RASTER = 1,
 		SLIDER_SCREEN_TYPE_VECTOR = 2,
-		SLIDER_SCREEN_TYPE_LCD = 4
+		SLIDER_SCREEN_TYPE_LCD = 4,
+		SLIDER_SCREEN_TYPE_LCD_OR_RASTER = SLIDER_SCREEN_TYPE_RASTER | SLIDER_SCREEN_TYPE_LCD,
+		SLIDER_SCREEN_TYPE_ANY = SLIDER_SCREEN_TYPE_RASTER | SLIDER_SCREEN_TYPE_VECTOR | SLIDER_SCREEN_TYPE_LCD
 	};
 
 	struct slider_desc
@@ -332,6 +334,7 @@ public:
 		int                 step;
 		int                 screen_type;
 		INT32(*adjustor)(running_machine &, void *, std::string *, INT32);
+		int					id;
 	};
 
 private:

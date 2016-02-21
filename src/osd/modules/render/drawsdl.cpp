@@ -44,9 +44,6 @@
 //  PROTOTYPES
 //============================================================
 
-// core functions
-static void drawsdl_exit(void);
-
 // YUV overlays
 
 static void yuv_RGB_to_YV12(const UINT16 *bitmap, UINT8 *ptr, const int pitch, \
@@ -93,10 +90,10 @@ int drawsdl_scale_mode(const char *s)
 //  drawsdl_init
 //============================================================
 
-int renderer_sdl2::init(running_machine &machine)
+bool renderer_sdl2::init(running_machine &machine)
 {
 	osd_printf_verbose("Using SDL multi-window soft driver (SDL 2.0+)\n");
-	return 0;
+	return false;
 }
 
 //============================================================
@@ -154,7 +151,7 @@ void renderer_sdl2::setup_texture(const osd_dim &size)
 //  drawsdl_show_info
 //============================================================
 
-void renderer_sdl::show_info(struct SDL_RendererInfo *render_info)
+void renderer_sdl2::show_info(struct SDL_RendererInfo *render_info)
 {
 #define RF_ENTRY(x) {x, #x }
 	static struct
