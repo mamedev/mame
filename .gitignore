@@ -4,6 +4,7 @@
 !/3rdparty/
 !/benchmarks/
 !/artwork/
+!/bgfx/
 !/docs/
 !/hash/
 !/hlsl/

@@ -9,6 +9,15 @@
 #ifndef __WIN_D3DINTF__
 #define __WIN_D3DINTF__
 
+// standard windows headers
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <tchar.h>
+#include <mmsystem.h>
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <math.h>
+#undef interface
 
 //============================================================
 //  CONSTANTS
@@ -33,13 +42,11 @@
 #define D3DTSS_MAXMIPLEVEL    20
 #define D3DTSS_MAXANISOTROPY  21
 
-namespace d3d
-{
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
-struct base;
+struct d3d_base;
 struct device;
 struct surface;
 struct texture;
@@ -118,17 +125,17 @@ enum caps_index
 
 struct interface
 {
-	HRESULT  (*check_device_format)(base *d3dptr, UINT adapter, D3DDEVTYPE devtype, D3DFORMAT adapterformat, DWORD usage, D3DRESOURCETYPE restype, D3DFORMAT format);
-	HRESULT  (*check_device_type)(base *d3dptr, UINT adapter, D3DDEVTYPE devtype, D3DFORMAT format, D3DFORMAT backformat, BOOL windowed);
-	HRESULT  (*create_device)(base *d3dptr, UINT adapter, D3DDEVTYPE devtype, HWND focus, DWORD behavior, present_parameters *params, device **dev);
-	HRESULT  (*enum_adapter_modes)(base *d3dptr, UINT adapter, D3DFORMAT format, UINT index, D3DDISPLAYMODE *mode);
-	UINT     (*get_adapter_count)(base *d3dptr);
-	HRESULT  (*get_adapter_display_mode)(base *d3dptr, UINT adapter, D3DDISPLAYMODE *mode);
-	HRESULT  (*get_adapter_identifier)(base *d3dptr, UINT adapter, DWORD flags, adapter_identifier *identifier);
-	UINT     (*get_adapter_mode_count)(base *d3dptr, UINT adapter, D3DFORMAT format);
-	HMONITOR (*get_adapter_monitor)(base *d3dptr, UINT adapter);
-	HRESULT  (*get_caps_dword)(base *d3dptr, UINT adapter, D3DDEVTYPE devtype, caps_index which, DWORD *value);
-	ULONG    (*release)(base *d3dptr);
+	HRESULT  (*check_device_format)(d3d_base *d3dptr, UINT adapter, D3DDEVTYPE devtype, D3DFORMAT adapterformat, DWORD usage, D3DRESOURCETYPE restype, D3DFORMAT format);
+	HRESULT  (*check_device_type)(d3d_base *d3dptr, UINT adapter, D3DDEVTYPE devtype, D3DFORMAT format, D3DFORMAT backformat, BOOL windowed);
+	HRESULT  (*create_device)(d3d_base *d3dptr, UINT adapter, D3DDEVTYPE devtype, HWND focus, DWORD behavior, present_parameters *params, device **dev);
+	HRESULT  (*enum_adapter_modes)(d3d_base *d3dptr, UINT adapter, D3DFORMAT format, UINT index, D3DDISPLAYMODE *mode);
+	UINT     (*get_adapter_count)(d3d_base *d3dptr);
+	HRESULT  (*get_adapter_display_mode)(d3d_base *d3dptr, UINT adapter, D3DDISPLAYMODE *mode);
+	HRESULT  (*get_adapter_identifier)(d3d_base *d3dptr, UINT adapter, DWORD flags, adapter_identifier *identifier);
+	UINT     (*get_adapter_mode_count)(d3d_base *d3dptr, UINT adapter, D3DFORMAT format);
+	HMONITOR (*get_adapter_monitor)(d3d_base *d3dptr, UINT adapter);
+	HRESULT  (*get_caps_dword)(d3d_base *d3dptr, UINT adapter, D3DDEVTYPE devtype, caps_index which, DWORD *value);
+	ULONG    (*release)(d3d_base *d3dptr);
 };
 
 
@@ -136,7 +143,7 @@ struct interface
 //  Direct3DDevice interfaces
 //============================================================
 
-struct device_interface
+struct d3d_device_interface
 {
 	HRESULT (*begin_scene)(device *dev);
 	HRESULT (*clear)(device *dev, DWORD count, const D3DRECT *rects, DWORD flags, D3DCOLOR color, float z, DWORD stencil);
@@ -205,7 +212,7 @@ struct vertex_buffer_interface
 //  Core D3D object
 //============================================================
 
-struct base
+struct d3d_base
 {
 	// internal objects
 	int                         version;
@@ -216,7 +223,7 @@ struct base
 
 	// interface pointers
 	interface               d3d;
-	device_interface        device;
+	d3d_device_interface    device;
 	surface_interface       surface;
 	texture_interface       texture;
 	vertex_buffer_interface vertexbuf;
@@ -227,8 +234,6 @@ struct base
 //  PROTOTYPES
 //============================================================
 
-base *drawd3d9_init(void);
-
-}
+d3d_base *drawd3d9_init(void);
 
 #endif

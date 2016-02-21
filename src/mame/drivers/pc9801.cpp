@@ -536,7 +536,6 @@ public:
 
 	/* PC9801RS specific */
 	UINT8 m_gate_a20; //A20 line
-	UINT8 m_nmi_enable;
 	UINT8 m_access_ctrl; // DMA related
 	UINT8 m_rom_bank;
 	UINT8 m_fdc_ctrl;
@@ -584,10 +583,10 @@ public:
 	DECLARE_WRITE16_MEMBER(egc_w);
 	DECLARE_READ8_MEMBER(pc9801_a0_r);
 	DECLARE_WRITE8_MEMBER(pc9801_a0_w);
-	DECLARE_READ8_MEMBER(pc9801_fdc_2hd_r);
-	DECLARE_WRITE8_MEMBER(pc9801_fdc_2hd_w);
-	DECLARE_READ8_MEMBER(pc9801_fdc_2dd_r);
-	DECLARE_WRITE8_MEMBER(pc9801_fdc_2dd_w);
+	DECLARE_READ8_MEMBER(fdc_2hd_ctrl_r);
+	DECLARE_WRITE8_MEMBER(fdc_2hd_ctrl_w);
+	DECLARE_READ8_MEMBER(fdc_2dd_ctrl_r);
+	DECLARE_WRITE8_MEMBER(fdc_2dd_ctrl_w);
 	DECLARE_READ16_MEMBER(tvram_r);
 	DECLARE_WRITE16_MEMBER(tvram_w);
 	DECLARE_READ8_MEMBER(gvram_r);
@@ -602,7 +601,7 @@ public:
 	DECLARE_WRITE16_MEMBER(upd7220_grcg_w);
 	void egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask);
 	UINT16 egc_blit_r(UINT32 offset, UINT16 mem_mask);
-	UINT32 pc9801_286_a20(bool state);
+	UINT32 a20_286(bool state);
 
 	DECLARE_READ8_MEMBER(ide_ctrl_r);
 	DECLARE_WRITE8_MEMBER(ide_ctrl_w);
@@ -633,10 +632,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9801rs_bank_w);
 	DECLARE_READ8_MEMBER(a20_ctrl_r);
 	DECLARE_WRITE8_MEMBER(a20_ctrl_w);
-	DECLARE_READ8_MEMBER(pc9810rs_fdc_ctrl_r);
-	DECLARE_WRITE8_MEMBER(pc9810rs_fdc_ctrl_w);
-	DECLARE_READ8_MEMBER(pc9801rs_2hd_r);
-	DECLARE_WRITE8_MEMBER(pc9801rs_2hd_w);
+	DECLARE_READ8_MEMBER(fdc_mode_ctrl_r);
+	DECLARE_WRITE8_MEMBER(fdc_mode_ctrl_w);
 //  DECLARE_READ8_MEMBER(pc9801rs_2dd_r);
 //  DECLARE_WRITE8_MEMBER(pc9801rs_2dd_w);
 	DECLARE_WRITE8_MEMBER(pc9801rs_video_ff_w);
@@ -644,10 +641,9 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9821_video_ff_w);
 	DECLARE_READ8_MEMBER(pc9821_a0_r);
 	DECLARE_WRITE8_MEMBER(pc9821_a0_w);
-	DECLARE_READ8_MEMBER(pc9801rs_access_ctrl_r);
-	DECLARE_WRITE8_MEMBER(pc9801rs_access_ctrl_w);
-	DECLARE_WRITE8_MEMBER(pc9801rs_nmi_w);
-	DECLARE_READ8_MEMBER(pc9801rs_midi_r);
+	DECLARE_READ8_MEMBER(access_ctrl_r);
+	DECLARE_WRITE8_MEMBER(access_ctrl_w);
+	DECLARE_READ8_MEMBER(midi_r);
 //  DECLARE_READ8_MEMBER(winram_r);
 //  DECLARE_WRITE8_MEMBER(winram_w);
 //  DECLARE_READ8_MEMBER(pc9801_ext_opna_r);
@@ -681,11 +677,11 @@ public:
 	DECLARE_WRITE8_MEMBER(sdip_a_w);
 	DECLARE_WRITE8_MEMBER(sdip_b_w);
 
-	DECLARE_READ8_MEMBER(pc9821_window_bank_r);
-	DECLARE_WRITE8_MEMBER(pc9821_window_bank_w);
-	DECLARE_READ16_MEMBER(pc9821_timestamp_r);
-	DECLARE_READ8_MEMBER(pc9821_ext2_video_ff_r);
-	DECLARE_WRITE8_MEMBER(pc9821_ext2_video_ff_w);
+	DECLARE_READ8_MEMBER(window_bank_r);
+	DECLARE_WRITE8_MEMBER(window_bank_w);
+	DECLARE_READ16_MEMBER(timestamp_r);
+	DECLARE_READ8_MEMBER(ext2_video_ff_r);
+	DECLARE_WRITE8_MEMBER(ext2_video_ff_w);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
@@ -709,7 +705,7 @@ public:
 	DECLARE_MACHINE_RESET(pc9821);
 
 	DECLARE_PALETTE_INIT(pc9801);
-	INTERRUPT_GEN_MEMBER(pc9801_vrtc_irq);
+	INTERRUPT_GEN_MEMBER(vrtc_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
@@ -1200,120 +1196,56 @@ DECLARE_WRITE_LINE_MEMBER(pc9801_state::write_uart_clock)
 	m_sio->write_rxc(state);
 }
 
-READ8_MEMBER(pc9801_state::pc9801_fdc_2hd_r)
+READ8_MEMBER(pc9801_state::fdc_2hd_ctrl_r)
 {
-	if((offset & 1) == 0)
-	{
-		switch(offset & 6)
-		{
-			case 0: return m_fdc_2hd->msr_r(space, 0, 0xff);
-			case 2: return m_fdc_2hd->fifo_r(space, 0, 0xff);
-			case 4: return 0x5f; //unknown port meaning
-		}
-	}
-	else
-	{
-		switch((offset & 6) + 1)
-		{
-			case 1: return m_sio->data_r(space, 0);
-			case 3: return m_sio->status_r(space, 0);
-		}
-		logerror("Read to undefined port [%02x]\n",offset+0x90);
-		return 0xff;
-	}
-
-	return 0xff;
+	return 0x44; //unknown port meaning 2hd flag?
 }
 
-WRITE8_MEMBER(pc9801_state::pc9801_fdc_2hd_w)
+WRITE8_MEMBER(pc9801_state::fdc_2hd_ctrl_w)
 {
-	if((offset & 1) == 0)
+	//logerror("%02x ctrl\n",data);
+	if(((m_fdc_2hd_ctrl & 0x80) == 0) && (data & 0x80))
+		m_fdc_2hd->soft_reset();
+
+	m_fdc_2hd_ctrl = data;
+
+	if(data & 0x40)
 	{
-		switch(offset & 6)
-		{
-			case 0: logerror("Write to undefined port [%02x] <- %02x\n",offset+0x90,data); return;
-			case 2: m_fdc_2hd->fifo_w(space, 0, data, 0xff); return;
-			case 4:
-				//logerror("%02x ctrl\n",data);
-				if(((m_fdc_2hd_ctrl & 0x80) == 0) && (data & 0x80))
-					m_fdc_2hd->soft_reset();
-
-				m_fdc_2hd_ctrl = data;
-
-				if(data & 0x40)
-				{
-					m_fdc_2hd->set_ready_line_connected(0);
-					m_fdc_2hd->ready_w(0);
-				}
-				else
-					m_fdc_2hd->set_ready_line_connected(1);
-
-				// TODO: is the motor control bit really inverted relative to the other fdcs?
-				m_fdc_2hd->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? ASSERT_LINE : CLEAR_LINE);
-				m_fdc_2hd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? ASSERT_LINE : CLEAR_LINE);
-				break;
-		}
+		m_fdc_2hd->set_ready_line_connected(0);
+		m_fdc_2hd->ready_w(0);
 	}
 	else
+		m_fdc_2hd->set_ready_line_connected(1);
+
+	if(!m_sys_type) // required for 9801f 2hd adapter bios
 	{
-		switch((offset & 6) + 1)
-		{
-			case 1: m_sio->data_w(space, 0, data); return;
-			case 3: m_sio->control_w(space, 0, data); return;
-		}
-		logerror("Write to undefined port [%02x] <- %02x\n",offset+0x90,data);
+		m_fdc_2hd->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? ASSERT_LINE : CLEAR_LINE);
+		m_fdc_2hd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? ASSERT_LINE : CLEAR_LINE);
+	}
+	else if(!(m_fdc_ctrl & 4)) // required for 9821
+	{
+		m_fdc_2hd->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
+		m_fdc_2hd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
 
-READ8_MEMBER(pc9801_state::pc9801_fdc_2dd_r)
+READ8_MEMBER(pc9801_state::fdc_2dd_ctrl_r)
 {
-	if((offset & 1) == 0)
-	{
-		switch(offset & 6)
-		{
-			case 0: return m_fdc_2dd->msr_r(space, 0, 0xff);
-			case 2: return m_fdc_2dd->fifo_r(space, 0, 0xff);
-			case 4:
-			{
-				int ret = (!m_fdc_2dd->subdevice<floppy_connector>("0")->get_device()->ready_r()) ? 0x10 : 0;
-				ret |= (m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->ready_r()) ? 0x10 : 0;
-				return ret | 0x40; //unknown port meaning, might be 0x70
-			}
-		}
-	}
-	else
-	{
-		logerror("Read to undefined port [%02x]\n",offset+0xc8);
-		return 0xff;
-	}
-
-	return 0xff;
+		int ret = (!m_fdc_2dd->subdevice<floppy_connector>("0")->get_device()->ready_r()) ? 0x10 : 0;
+		ret |= (m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->ready_r()) ? 0x10 : 0;
+		return ret | 0x40; //unknown port meaning, might be 0x70
 }
 
-WRITE8_MEMBER(pc9801_state::pc9801_fdc_2dd_w)
+WRITE8_MEMBER(pc9801_state::fdc_2dd_ctrl_w)
 {
-	if((offset & 1) == 0)
-	{
-		switch(offset & 6)
-		{
-			case 0: logerror("Write to undefined port [%02x] <- %02x\n",offset+0xc8,data); return;
-			case 2: m_fdc_2dd->fifo_w(space, 0, data, 0xff); return;
-			case 4:
-				logerror("%02x ctrl\n",data);
-				if(((m_fdc_2dd_ctrl & 0x80) == 0) && (data & 0x80))
-					m_fdc_2dd->soft_reset();
+		logerror("%02x ctrl\n",data);
+		if(((m_fdc_2dd_ctrl & 0x80) == 0) && (data & 0x80))
+			m_fdc_2dd->soft_reset();
 
-				m_fdc_2dd_ctrl = data;
-				m_fdc_2dd->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
-				m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
-				break;
-		}
-	}
-	else
-	{
-		logerror("Write to undefined port [%02x] <- %02x\n",offset+0xc8,data);
-	}
+		m_fdc_2dd_ctrl = data;
+		m_fdc_2dd->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
+		m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -1430,23 +1362,10 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 	}
 
 	// mask off the bits past the end of the blit
-	if((m_egc.count < 8) && (mem_mask != 0xffff))
-	{
-		UINT16 end_mask = dir ? ((1 << m_egc.count) - 1) : ~((1 << (8 - m_egc.count)) - 1);
-		// if the blit is less than 8 bits, adjust the masks
-		if(m_egc.first)
-		{
-			if(dir)
-				end_mask <<= dst_off & 7;
-			else
-				end_mask >>= dst_off & 7;
-		}
-		mask &= end_mask;
-	}
-	else if((m_egc.count < 16) && (mem_mask == 0xffff))
+	if(((m_egc.count < 8) && (mem_mask != 0xffff)) || ((m_egc.count < 16) && (mem_mask == 0xffff)))
 	{
 		UINT16 end_mask = dir ? ((1 << m_egc.count) - 1) : ~((1 << (16 - m_egc.count)) - 1);
-		// if the blit is less than 16 bits, adjust the masks
+		// if the blit is less than the write size, adjust the masks
 		if(m_egc.first)
 		{
 			if(dir)
@@ -1461,7 +1380,7 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 	{
 		if(!BIT(m_egc.regs[0], i))
 		{
-			UINT16 src = m_egc.src[i] & mem_mask, pat = m_egc.pat[i];
+			UINT16 src = m_egc.src[i], pat = m_egc.pat[i];
 			if(BIT(m_egc.regs[2], 10))
 				src = egc_shift(i, data);
 
@@ -1782,12 +1701,11 @@ static ADDRESS_MAP_START( pc9801_map, AS_PROGRAM, 16, pc9801_state )
 ADDRESS_MAP_END
 
 /* first device is even offsets, second one is odd offsets */
-static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
+static ADDRESS_MAP_START( pc9801_common_io, AS_IO, 16, pc9801_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xff00)
 	AM_RANGE(0x0000, 0x000f) AM_READWRITE8(pic_r, pic_w, 0x00ff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 	AM_RANGE(0x0020, 0x0021) AM_WRITE8(rtc_w,0x00ff)
-	AM_RANGE(0x0020, 0x0027) AM_WRITE8(dmapg4_w,0xff00)
 	AM_RANGE(0x0030, 0x0037) AM_DEVREADWRITE8("ppi8255_sys", i8255_device, read, write, 0xff00) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("ppi8255_prn", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("keyb", pc9801_kbd_device, rx_r, tx_w, 0xff00) //i8255 printer port / i8251 keyboard
@@ -1795,18 +1713,28 @@ static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x0050, 0x0053) AM_WRITE8(nmi_ctrl_w,0x00ff) // NMI FF / i8255 floppy port (2d?)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("upd7220_chr", upd7220_device, read, write, 0x00ff) //upd7220 character ports / <undefined>
 	AM_RANGE(0x0064, 0x0065) AM_WRITE8(vrtc_clear_w,0x00ff)
-	AM_RANGE(0x0068, 0x0069) AM_WRITE8(pc9801_video_ff_w,0x00ff) //mode FF / <undefined>
 //  AM_RANGE(0x006c, 0x006f) border color / <undefined>
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xff00)
 	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(txt_scrl_r,txt_scrl_w,0x00ff) //display registers / i8253 pit
 	AM_RANGE(0x0080, 0x0081) AM_READWRITE8(sasi_data_r, sasi_data_w, 0x00ff)
 	AM_RANGE(0x0082, 0x0083) AM_READWRITE8(sasi_status_r, sasi_ctrl_w,0x00ff)
-	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801_fdc_2hd_r,pc9801_fdc_2hd_w,0xffff) //upd765a 2hd / cmt
-	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,pc9801_a0_w,0xffff) //upd7220 bitmap ports / display registers
-	AM_RANGE(0x00c8, 0x00cd) AM_READWRITE8(pc9801_fdc_2dd_r,pc9801_fdc_2dd_w,0xffff) //upd765a 2dd / <undefined>
-//  AM_RANGE(0x0188, 0x018b) AM_READWRITE8(pc9801_opn_r,pc9801_opn_w,0xffff) //ym2203 opn / <undefined>
+	AM_RANGE(0x0090, 0x0091) AM_DEVREAD8("upd765_2hd", upd765a_device, msr_r, 0x00ff)
+	AM_RANGE(0x0092, 0x0093) AM_DEVREADWRITE8("upd765_2hd", upd765a_device, fifo_r, fifo_w, 0x00ff)
+	AM_RANGE(0x0094, 0x0095) AM_READWRITE8(fdc_2hd_ctrl_r, fdc_2hd_ctrl_w, 0x00ff)
+	AM_RANGE(0x0090, 0x0091) AM_DEVREADWRITE8(UPD8251_TAG, i8251_device, data_r, data_w, 0xff00)
+	AM_RANGE(0x0092, 0x0093) AM_DEVREADWRITE8(UPD8251_TAG, i8251_device, status_r, control_w, 0xff00)
 	AM_RANGE(0x7fd8, 0x7fdf) AM_DEVREADWRITE8("ppi8255_mouse", i8255_device, read, write, 0xff00)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
+	AM_RANGE(0x0020, 0x0027) AM_WRITE8(dmapg4_w,0xff00)
+	AM_RANGE(0x0068, 0x0069) AM_WRITE8(pc9801_video_ff_w,0x00ff) //mode FF / <undefined>
+	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,pc9801_a0_w,0xffff) //upd7220 bitmap ports / display registers
+	AM_RANGE(0x00c8, 0x00cb) AM_DEVICE8("upd765_2dd", upd765a_device, map, 0x00ff)
+	AM_RANGE(0x00cc, 0x00cd) AM_READWRITE8(fdc_2dd_ctrl_r, fdc_2dd_ctrl_w, 0x00ff) //upd765a 2dd / <undefined>
+	AM_IMPORT_FROM(pc9801_common_io)
+ADDRESS_MAP_END
+
 
 /*************************************
  *
@@ -1890,7 +1818,7 @@ READ8_MEMBER(pc9801_state::a20_ctrl_r)
 	if(offset == 0x01)
 		return (m_gate_a20 ^ 1) | 0xfe;
 	else if(offset == 0x03)
-		return (m_gate_a20 ^ 1) | (m_nmi_enable << 1);
+		return (m_gate_a20 ^ 1) | (m_nmi_ff << 1);
 
 	return 0x00;
 }
@@ -1999,12 +1927,12 @@ WRITE16_MEMBER(pc9801_state::egc_w)
 	}
 }
 
-READ8_MEMBER(pc9801_state::pc9810rs_fdc_ctrl_r)
+READ8_MEMBER(pc9801_state::fdc_mode_ctrl_r)
 {
 	return (m_fdc_ctrl & 3) | 0xf0 | 8 | 4;
 }
 
-WRITE8_MEMBER(pc9801_state::pc9810rs_fdc_ctrl_w)
+WRITE8_MEMBER(pc9801_state::fdc_mode_ctrl_w)
 {
 	/*
 	---- x--- ready line?
@@ -2020,55 +1948,6 @@ WRITE8_MEMBER(pc9801_state::pc9810rs_fdc_ctrl_w)
 	m_fdc_ctrl = data;
 	//if(data & 0xfc)
 	//  logerror("FDC ctrl called with %02x\n",data);
-}
-
-READ8_MEMBER(pc9801_state::pc9801rs_2hd_r)
-{
-	if((offset & 1) == 0)
-	{
-		switch(offset & 6)
-		{
-			case 0: return m_fdc_2hd->msr_r(space, 0, 0xff);
-			case 2: return m_fdc_2hd->fifo_r(space, 0, 0xff);
-			case 4: return 0x44; //2hd flag
-		}
-	}
-
-	logerror("Read to undefined port [%02x]\n",offset+0x90);
-
-	return 0xff;
-}
-
-WRITE8_MEMBER(pc9801_state::pc9801rs_2hd_w)
-{
-	if((offset & 1) == 0)
-	{
-		switch(offset & 6)
-		{
-			case 2: m_fdc_2hd->fifo_w(space, 0, data, 0xff); return;
-			case 4:
-				if(data & 0x80)
-					m_fdc_2hd->soft_reset();
-
-				if(data & 0x40)
-				{
-					m_fdc_2hd->set_ready_line_connected(0);
-					m_fdc_2hd->ready_w(0);
-				}
-				else
-					m_fdc_2hd->set_ready_line_connected(1);
-
-				//TODO: verify
-				if(!(m_fdc_ctrl & 4))
-				{
-					m_fdc_2hd->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
-					m_fdc_2hd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
-				}
-				return;
-		}
-	}
-
-	logerror("Write to undefined port [%02x] %02x\n",offset+0x90,data);
 }
 
 #if 0
@@ -2160,7 +2039,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_a0_w)
 	pc9801_a0_w(space,offset,data);
 }
 
-READ8_MEMBER( pc9801_state::pc9801rs_access_ctrl_r )
+READ8_MEMBER( pc9801_state::access_ctrl_r )
 {
 	if(offset == 1)
 		return m_access_ctrl;
@@ -2168,7 +2047,7 @@ READ8_MEMBER( pc9801_state::pc9801rs_access_ctrl_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( pc9801_state::pc9801rs_access_ctrl_w )
+WRITE8_MEMBER( pc9801_state::access_ctrl_w )
 {
 	if(offset == 1)
 		m_access_ctrl = data;
@@ -2184,17 +2063,7 @@ WRITE8_MEMBER( pc9801_state::pc9801rs_mouse_freq_w )
 	}
 }
 
-
-WRITE8_MEMBER( pc9801_state::pc9801rs_nmi_w )
-{
-	if(offset == 0)
-		m_nmi_enable = 0;
-
-	if(offset == 2)
-		m_nmi_enable = 1;
-}
-
-READ8_MEMBER( pc9801_state::pc9801rs_midi_r )
+READ8_MEMBER( pc9801_state::midi_r )
 {
 	/* unconnect, needed by Amaranth KH to boot */
 	return 0xff;
@@ -2247,20 +2116,19 @@ static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0020, 0x002f) AM_WRITE8(dmapg8_w,0xff00)
 	AM_RANGE(0x0050, 0x0057) AM_NOP // 2dd ppi?
-	AM_RANGE(0x005c, 0x005f) AM_READ(pc9821_timestamp_r) AM_WRITENOP // artic
+	AM_RANGE(0x005c, 0x005f) AM_READ(timestamp_r) AM_WRITENOP // artic
 	AM_RANGE(0x0068, 0x006b) AM_WRITE8(pc9801rs_video_ff_w,0x00ff) //mode FF / <undefined>
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(grcg_r,      grcg_w,      0x00ff) //display registers "GRCG" / i8253 pit
-	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffff)
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,        pc9801rs_a0_w,      0xffff) //upd7220 bitmap ports / display registers
-	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffff)
-	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffff)
+	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(fdc_mode_ctrl_r,fdc_mode_ctrl_w,0xffff)
+	AM_RANGE(0x00c8, 0x00cb) AM_DEVICE8("upd765_2hd", upd765a_device, map, 0x00ff)
+	AM_RANGE(0x00cc, 0x00cd) AM_READWRITE8(fdc_2hd_ctrl_r, fdc_2hd_ctrl_w, 0x00ff)
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(a20_ctrl_r,      a20_ctrl_w,      0x00ff)
-	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffff)
-	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffff) //ROM/RAM bank
+	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(access_ctrl_r,access_ctrl_w,0xffff)
+	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w, 0xffff) //ROM/RAM bank
 	AM_RANGE(0x04a0, 0x04af) AM_WRITE(egc_w)
 	AM_RANGE(0x3fd8, 0x3fdf) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xff00)
-//  AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffff)
-	AM_IMPORT_FROM(pc9801_io)
+	AM_IMPORT_FROM(pc9801_common_io)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 16, pc9801_state )
@@ -2273,13 +2141,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 16, pc9801_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0050, 0x0053) AM_WRITE8(pc9801rs_nmi_w, 0xffff)
 	AM_RANGE(0x0430, 0x0433) AM_READWRITE8(ide_ctrl_r, ide_ctrl_w, 0x00ff)
 	AM_RANGE(0x0640, 0x064f) AM_READWRITE(ide_cs0_r, ide_cs0_w)
 	AM_RANGE(0x0740, 0x074f) AM_READWRITE(ide_cs1_r, ide_cs1_w)
 	AM_RANGE(0x1e8c, 0x1e8f) AM_NOP // temp
 	AM_RANGE(0xbfd8, 0xbfdf) AM_WRITE8(pc9801rs_mouse_freq_w, 0xffff)
-	AM_RANGE(0xe0d0, 0xe0d3) AM_READ8(pc9801rs_midi_r, 0xffff)
+	AM_RANGE(0xe0d0, 0xe0d3) AM_READ8(midi_r, 0xffff)
 	AM_IMPORT_FROM(pc9801ux_io)
 ADDRESS_MAP_END
 
@@ -2355,7 +2222,7 @@ WRITE8_MEMBER(pc9801_state::pc9821_a0_w)
 	pc9801rs_a0_w(space,offset,data);
 }
 
-READ8_MEMBER(pc9801_state::pc9821_window_bank_r)
+READ8_MEMBER(pc9801_state::window_bank_r)
 {
 	if(offset == 1)
 		return m_pc9821_window_bank & 0xfe;
@@ -2363,7 +2230,7 @@ READ8_MEMBER(pc9801_state::pc9821_window_bank_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc9801_state::pc9821_window_bank_w)
+WRITE8_MEMBER(pc9801_state::window_bank_w)
 {
 	if(offset == 1)
 		m_pc9821_window_bank = data & 0xfe;
@@ -2427,13 +2294,13 @@ WRITE8_MEMBER(pc9801_state::sdip_b_w)
 		logerror("SDIP area B write %02x %02x\n",offset,data);
 }
 
-READ16_MEMBER(pc9801_state::pc9821_timestamp_r)
+READ16_MEMBER(pc9801_state::timestamp_r)
 {
 	return (m_maincpu->total_cycles() >> (16 * offset));
 }
 
 /* basically a read-back of various registers */
-READ8_MEMBER(pc9801_state::pc9821_ext2_video_ff_r)
+READ8_MEMBER(pc9801_state::ext2_video_ff_r)
 {
 	UINT8 res;
 
@@ -2449,7 +2316,7 @@ READ8_MEMBER(pc9801_state::pc9821_ext2_video_ff_r)
 	return res;
 }
 
-WRITE8_MEMBER(pc9801_state::pc9821_ext2_video_ff_w)
+WRITE8_MEMBER(pc9801_state::ext2_video_ff_w)
 {
 	m_ext2_ff = data;
 }
@@ -2491,36 +2358,38 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0030, 0x0037) AM_DEVREADWRITE8("ppi8255_sys", i8255_device, read, write, 0xff00ff00) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("ppi8255_prn", i8255_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("keyb", pc9801_kbd_device, rx_r, tx_w, 0xff00ff00) //i8255 printer port / i8251 keyboard
-	AM_RANGE(0x0050, 0x0053) AM_WRITE8(pc9801rs_nmi_w, 0xffffffff)
-	AM_RANGE(0x005c, 0x005f) AM_READ16(pc9821_timestamp_r,0xffffffff) AM_WRITENOP // artic
+	AM_RANGE(0x0050, 0x0053) AM_WRITE8(nmi_ctrl_w, 0x00ff00ff)
+	AM_RANGE(0x005c, 0x005f) AM_READ16(timestamp_r,0xffffffff) AM_WRITENOP // artic
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("upd7220_chr", upd7220_device, read, write, 0x00ff00ff) //upd7220 character ports / <undefined>
 	AM_RANGE(0x0060, 0x0063) AM_READ8(unk_r, 0xff00ff00) // mouse related (unmapped checking for AT keyb controller\PS/2 mouse?)
 	AM_RANGE(0x0064, 0x0067) AM_WRITE8(vrtc_clear_w, 0x000000ff)
 	AM_RANGE(0x0068, 0x006b) AM_WRITE8(pc9821_video_ff_w,  0x00ff00ff) //mode FF / <undefined>
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xff00ff00)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(grcg_r,      grcg_w,      0x00ff00ff) //display registers "GRCG" / i8253 pit
-	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
+	AM_RANGE(0x0090, 0x0093) AM_DEVICE8("upd765_2hd", upd765a_device, map, 0x00ff00ff)
+	AM_RANGE(0x0094, 0x0097) AM_READWRITE8(fdc_2hd_ctrl_r, fdc_2hd_ctrl_w, 0x000000ff)
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9821_a0_r,        pc9821_a0_w,        0xffffffff) //upd7220 bitmap ports / display registers
 //  AM_RANGE(0x00b0, 0x00b3) PC9861k (serial port?)
 //  AM_RANGE(0x00b9, 0x00b9) PC9861k
 //  AM_RANGE(0x00bb, 0x00bb) PC9861k
-	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffffffff)
-	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
-//  AM_RANGE(0x00d8, 0x00df) AMD98 (sound?) board
+	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(fdc_mode_ctrl_r,fdc_mode_ctrl_w,0xffffffff)
+	AM_RANGE(0x00c8, 0x00cb) AM_DEVICE8("upd765_2hd", upd765a_device, map, 0x00ff00ff)
+	AM_RANGE(0x00cc, 0x00cf) AM_READWRITE8(fdc_2hd_ctrl_r, fdc_2hd_ctrl_w, 0x000000ff)
+	//  AM_RANGE(0x00d8, 0x00df) AMD98 (sound?) board
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(a20_ctrl_r,      a20_ctrl_w,      0x00ff00ff)
 //  AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
 //  AM_RANGE(0x018c, 0x018f) YM2203 OPN extended ports / <undefined>
 	AM_RANGE(0x0430, 0x0433) AM_READWRITE8(ide_ctrl_r, ide_ctrl_w, 0x00ff00ff)
-	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
+	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(access_ctrl_r,access_ctrl_w,0xffffffff)
 //  AM_RANGE(0x043d, 0x043d) ROM/RAM bank (NEC)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank (EPSON)
-	AM_RANGE(0x0460, 0x0463) AM_READWRITE8(pc9821_window_bank_r,pc9821_window_bank_w, 0xffffffff)
+	AM_RANGE(0x0460, 0x0463) AM_READWRITE8(window_bank_r,window_bank_w, 0xffffffff)
 	AM_RANGE(0x04a0, 0x04af) AM_WRITE16(egc_w, 0xffffffff)
 //  AM_RANGE(0x04be, 0x04be) FDC "RPM" register
 	AM_RANGE(0x0640, 0x064f) AM_READWRITE16(ide_cs0_r, ide_cs0_w, 0xffffffff)
 	AM_RANGE(0x0740, 0x074f) AM_READWRITE16(ide_cs1_r, ide_cs1_w, 0xffffffff)
 //  AM_RANGE(0x08e0, 0x08ea) <undefined> / EMM SIO registers
-	AM_RANGE(0x09a0, 0x09a3) AM_READWRITE8(pc9821_ext2_video_ff_r, pc9821_ext2_video_ff_w, 0x000000ff) // GDC extended register r/w
+	AM_RANGE(0x09a0, 0x09a3) AM_READWRITE8(ext2_video_ff_r, ext2_video_ff_w, 0x000000ff) // GDC extended register r/w
 //  AM_RANGE(0x09a8, 0x09a8) GDC 31KHz register r/w
 //  AM_RANGE(0x0c07, 0x0c07) EPSON register w
 //  AM_RANGE(0x0c03, 0x0c03) EPSON register 0 r
@@ -2545,7 +2414,6 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x8d1c, 0x8d1f) AM_READWRITE8(sdip_9_r,sdip_9_w,0xffffffff)
 	AM_RANGE(0x8e1c, 0x8e1f) AM_READWRITE8(sdip_a_r,sdip_a_w,0xffffffff)
 	AM_RANGE(0x8f1c, 0x8f1f) AM_READWRITE8(sdip_b_r,sdip_b_w,0xffffffff)
-//  AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffffffff)
 //  AM_RANGE(0xa460, 0xa46f) cs4231 PCM extended port / <undefined>
 //  AM_RANGE(0xbfdb, 0xbfdb) mouse timing port
 //  AM_RANGE(0xc0d0, 0xc0d3) MIDI port, option 0 / <undefined>
@@ -2556,7 +2424,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 //  AM_RANGE(0xd4d0, 0xd4d3) MIDI port, option 5 / <undefined>
 //  AM_RANGE(0xd8d0, 0xd8d3) MIDI port, option 6 / <undefined>
 //  AM_RANGE(0xdcd0, 0xdcd3) MIDI port, option 7 / <undefined>
-	AM_RANGE(0xe0d0, 0xe0d3) AM_READ8(pc9801rs_midi_r, 0xffffffff) // MIDI port, option 8 / <undefined>
+	AM_RANGE(0xe0d0, 0xe0d3) AM_READ8(midi_r, 0xffffffff) // MIDI port, option 8 / <undefined>
 //  AM_RANGE(0xe4d0, 0xe4d3) MIDI port, option 9 / <undefined>
 //  AM_RANGE(0xe8d0, 0xe8d3) MIDI port, option A / <undefined>
 //  AM_RANGE(0xecd0, 0xecd3) MIDI port, option B / <undefined>
@@ -3070,7 +2938,7 @@ WRITE_LINE_MEMBER( pc9801_state::pc9801rs_fdc_drq )
 		m_dmac->dreq3_w(state ^ 1);
 }
 
-UINT32 pc9801_state::pc9801_286_a20(bool state)
+UINT32 pc9801_state::a20_286(bool state)
 {
 	return (state ? 0xffffff : 0x0fffff);
 }
@@ -3240,7 +3108,7 @@ void pc9801_state::device_reset_after_children()
 		ide0->identify_device_buffer()[47] = 0;
 }
 
-INTERRUPT_GEN_MEMBER(pc9801_state::pc9801_vrtc_irq)
+INTERRUPT_GEN_MEMBER(pc9801_state::vrtc_irq)
 {
 	m_pic1->ir2_w(1);
 	m_vbirq->adjust(m_screen->time_until_vblank_end());
@@ -3408,7 +3276,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_CPU_ADD("maincpu", I8086, 5000000) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9801_map)
 	MCFG_CPU_IO_MAP(pc9801_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_FRAGMENT_ADD(pc9801_common)
@@ -3442,7 +3310,7 @@ static MACHINE_CONFIG_DERIVED( pc9801vm, pc9801 )
 	MCFG_CPU_REPLACE("maincpu",V30,10000000)
 	MCFG_CPU_PROGRAM_MAP(pc9801ux_map)
 	MCFG_CPU_IO_MAP(pc9801ux_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801_common)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801_common)
@@ -3452,7 +3320,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_CPU_ADD("maincpu", I386SX, MAIN_CLOCK_X1*8) // unknown clock.
 	MCFG_CPU_PROGRAM_MAP(pc9801rs_map)
 	MCFG_CPU_IO_MAP(pc9801rs_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_FRAGMENT_ADD(pc9801_common)
@@ -3481,8 +3349,8 @@ static MACHINE_CONFIG_DERIVED( pc9801ux, pc9801rs )
 	MCFG_CPU_REPLACE("maincpu",I80286,10000000)
 	MCFG_CPU_PROGRAM_MAP(pc9801ux_map)
 	MCFG_CPU_IO_MAP(pc9801ux_io)
-	MCFG_80286_A20(pc9801_state, pc9801_286_a20)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
+	MCFG_80286_A20(pc9801_state, a20_286)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 //  MCFG_DEVICE_MODIFY("i8237", AM9157A, 10000000) // unknown clock
 MACHINE_CONFIG_END
@@ -3491,7 +3359,7 @@ static MACHINE_CONFIG_DERIVED( pc9801bx2, pc9801rs )
 	MCFG_CPU_REPLACE("maincpu",I486,25000000)
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801bx2)
@@ -3501,7 +3369,7 @@ static MACHINE_CONFIG_DERIVED( pc9821, pc9801rs )
 	MCFG_CPU_REPLACE("maincpu", I486, 16000000) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_MODIFY("pit8253")
@@ -3524,7 +3392,7 @@ static MACHINE_CONFIG_DERIVED( pc9821ap2, pc9821)
 	MCFG_CPU_REPLACE("maincpu", I486, 66666667) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821ap2)
@@ -3534,7 +3402,7 @@ static MACHINE_CONFIG_DERIVED( pc9821v20, pc9821 )
 	MCFG_CPU_REPLACE("maincpu",PENTIUM,32000000) /* TODO: clock */
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 MACHINE_CONFIG_END
 

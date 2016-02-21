@@ -187,7 +187,7 @@ public:
 	virtual bool font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
 
 	// video overridables
-	virtual void *get_slider_list() override;
+	virtual slider_state *get_slider_list() override;
 
 	// command option overrides
 	virtual bool execute_command(const char *command) override;

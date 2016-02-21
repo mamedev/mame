@@ -115,7 +115,7 @@ void ui_menu_barcode_reader::handle()
 					std::string tmp_file(m_barcode_buffer);
 					//printf("code %s\n", m_barcode_buffer);
 					if (!current_device()->is_valid(tmp_file.length()))
-						machine().ui().popup_time(5, _("Barcode length invalid!"));
+						machine().ui().popup_time(5, "%s", _("Barcode length invalid!"));
 					else
 					{
 						current_device()->write_code(tmp_file.c_str(), tmp_file.length());

@@ -1954,6 +1954,8 @@ static slider_state *slider_alloc(running_machine &machine, const char *title, I
 	state->incval = incval;
 	state->update = update;
 	state->arg = arg;
+	state->hidden = false;
+	state->id = -1;
 	strcpy(state->description, title);
 
 	return state;
@@ -2771,7 +2773,7 @@ rgb_t decode_ui_color(int id, running_machine *machine)
 
 	if (machine != nullptr) {
 		ui_options option;
-		for (int x = 0; x < ARRAY_LENGTH(s_color_list); x++) {
+		for (int x = 0; x < ARRAY_LENGTH(s_color_list); ++x) {
 			const char *o_default = option.value(s_color_list[x]);
 			const char *s_option = machine->ui().options().value(s_color_list[x]);
 			int len = strlen(s_option);

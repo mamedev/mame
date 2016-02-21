@@ -57,6 +57,7 @@ enum
 #define OPTION_CHEATPATH            "cheatpath"
 #define OPTION_CROSSHAIRPATH        "crosshairpath"
 #define OPTION_PLUGINSPATH          "pluginspath"
+#define OPTION_LANGUAGEPATH         "languagepath"
 
 // core directory options
 #define OPTION_CFG_DIRECTORY        "cfg_directory"
@@ -190,6 +191,8 @@ enum
 
 #define OPTION_CONSOLE              "console"
 
+#define OPTION_LANGUAGE             "language"
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -233,6 +236,7 @@ public:
 	const char *cheat_path() const { return value(OPTION_CHEATPATH); }
 	const char *crosshair_path() const { return value(OPTION_CROSSHAIRPATH); }
 	const char *plugins_path() const { return value(OPTION_PLUGINSPATH); }
+	const char *language_path() const { return value(OPTION_LANGUAGEPATH); }
 
 	// core directory options
 	const char *cfg_directory() const { return value(OPTION_CFG_DIRECTORY); }
@@ -363,6 +367,8 @@ public:
 	const char *autoboot_script() const { return value(OPTION_AUTOBOOT_SCRIPT); }
 
 	bool console() const { return bool_value(OPTION_CONSOLE); }
+	
+	const char *language() const { return value(OPTION_LANGUAGE); }
 
 	// FIXME: Couriersud: This should be in image_device_exit
 	void remove_device_options();

@@ -1,5 +1,5 @@
 # Russian translations for PACKAGE package
-# ���������� �������� ��� ������ PACKAGE.
+# Русский перевод для пакета PACKAGE.
 # Copyright (C) 2016 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Automatically generated, 2016.
@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-20 21:38+0100\n"
+"POT-Creation-Date: 2016-02-21 10:03+0100\n"
 "PO-Revision-Date: 2016-02-20 18:03+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -21,19 +21,19 @@ msgstr ""
 
 #: src/emu/ui/auditmenu.cpp:111
 msgid "Audit in progress..."
-msgstr ""
+msgstr "Идет проверка..."
 
 #: src/emu/ui/barcode.cpp:72
 msgid "New Barcode:"
-msgstr ""
+msgstr "Новый штрих-код:"
 
 #: src/emu/ui/barcode.cpp:76
 msgid "Enter Code"
-msgstr ""
+msgstr "Введите код"
 
 #: src/emu/ui/barcode.cpp:118
 msgid "Barcode length invalid!"
-msgstr ""
+msgstr "Не верная длина штрих-кода!"
 
 #: src/emu/ui/cheatopt.cpp:78
 #, c-format
@@ -41,139 +41,173 @@ msgid ""
 "Cheat Comment:\n"
 "%s"
 msgstr ""
+"Коментарий чита:\n"
+"%s"
 
 #: src/emu/ui/cheatopt.cpp:91
 msgid "All cheats reloaded"
-msgstr ""
+msgstr "Все читы перезагружены"
 
 #: src/emu/ui/cheatopt.cpp:122
 msgid "Autofire Settings"
-msgstr ""
+msgstr "Настройка авто-огня"
 
 #: src/emu/ui/cheatopt.cpp:140
 msgid "Reset All"
-msgstr ""
+msgstr "Сбросить все"
 
 #: src/emu/ui/cheatopt.cpp:143
 msgid "Reload All"
-msgstr ""
+msgstr "Перезагрузить все"
 
 #: src/emu/ui/cheatopt.cpp:259
 msgid "Autofire Status"
-msgstr ""
+msgstr "Состояние"
 
 #: src/emu/ui/cheatopt.cpp:259
 msgid "Disabled"
-msgstr ""
+msgstr "Выключен"
 
 #: src/emu/ui/cheatopt.cpp:259
 msgid "Enabled"
-msgstr ""
+msgstr "Включен"
 
 #: src/emu/ui/cheatopt.cpp:285 src/emu/ui/cheatopt.cpp:291
 msgid "On"
-msgstr ""
+msgstr "Вкл"
 
 #: src/emu/ui/cheatopt.cpp:285 src/emu/ui/cheatopt.cpp:291
 msgid "Off"
-msgstr ""
+msgstr "Выкл"
 
 #: src/emu/ui/cheatopt.cpp:302
 msgid "No buttons found on this machine!"
-msgstr ""
+msgstr "У этой системы нет кнопок огонь!"
 
 #: src/emu/ui/cheatopt.cpp:313 src/emu/ui/cheatopt.cpp:317
 msgid "Autofire Delay"
+msgstr "Задержка"
+
+#: src/emu/ui/ctrlmenu.cpp:20
+msgid "Lightgun Device Assignment"
+msgstr ""
+
+#: src/emu/ui/ctrlmenu.cpp:21
+msgid "Trackball Device Assignment"
+msgstr ""
+
+#: src/emu/ui/ctrlmenu.cpp:22
+msgid "Pedal Device Assignment"
+msgstr ""
+
+#: src/emu/ui/ctrlmenu.cpp:23
+msgid "Adstick Device Assignment"
+msgstr ""
+
+#: src/emu/ui/ctrlmenu.cpp:24
+msgid "Paddle Device Assignment"
+msgstr ""
+
+#: src/emu/ui/ctrlmenu.cpp:25
+msgid "Dial Device Assignment"
+msgstr ""
+
+#: src/emu/ui/ctrlmenu.cpp:26
+msgid "Positional Device Assignment"
+msgstr ""
+
+#: src/emu/ui/ctrlmenu.cpp:27
+msgid "Mouse Device Assignment"
 msgstr ""
 
 #: src/emu/ui/ctrlmenu.cpp:106 src/emu/ui/ctrlmenu.cpp:126
 msgid "Device Mapping"
-msgstr ""
+msgstr "Устройства управленя"
 
 #: src/emu/ui/custmenu.cpp:156 src/emu/ui/custmenu.cpp:441
 msgid "Main filter"
-msgstr ""
+msgstr "Главный фильтр"
 
 #: src/emu/ui/custmenu.cpp:165 src/emu/ui/custmenu.cpp:450
 msgid "Other filter"
-msgstr ""
+msgstr "Дополнительные фильтры"
 
 #: src/emu/ui/custmenu.cpp:192 src/emu/ui/custmenu.cpp:504
 msgid "Remove last filter"
-msgstr ""
+msgstr "Удалить последний фильтр"
 
 #: src/emu/ui/custmenu.cpp:195 src/emu/ui/custmenu.cpp:507
 msgid "Add filter"
-msgstr ""
+msgstr "Добавить фильтр"
 
 #: src/emu/ui/custmenu.cpp:210 src/emu/ui/custmenu.cpp:230
 #: src/emu/ui/custmenu.cpp:523 src/emu/ui/custmenu.cpp:543
 msgid "Select custom filters:"
-msgstr ""
+msgstr "Выберите фильтры:"
 
 #: src/emu/ui/mainmenu.cpp:53
 msgid "Input (general)"
-msgstr ""
+msgstr "Управление (общее)"
 
 #: src/emu/ui/mainmenu.cpp:55
 msgid "Input (this Machine)"
-msgstr ""
+msgstr "Управление (эта система)"
 
 #: src/emu/ui/mainmenu.cpp:59
 msgid "Analog Controls"
-msgstr ""
+msgstr "Аналоговое управление"
 
 #: src/emu/ui/mainmenu.cpp:61
 msgid "Dip Switches"
-msgstr ""
+msgstr "DIP переключатели"
 
 #: src/emu/ui/mainmenu.cpp:64
 msgid "Machine Configuration"
-msgstr ""
+msgstr "Настройки системы"
 
 #: src/emu/ui/mainmenu.cpp:68
 msgid "Bookkeeping Info"
-msgstr ""
+msgstr "Статистика игры"
 
 #: src/emu/ui/mainmenu.cpp:71
 msgid "Machine Information"
-msgstr ""
+msgstr "Информация о системе"
 
 #: src/emu/ui/mainmenu.cpp:77
 msgid "Image Information"
-msgstr ""
+msgstr "Информация о образах"
 
 #: src/emu/ui/mainmenu.cpp:80
 msgid "File Manager"
-msgstr ""
+msgstr "Файловый менеджер"
 
 #: src/emu/ui/mainmenu.cpp:85
 msgid "Tape Control"
-msgstr ""
+msgstr "Управление лентой"
 
 #: src/emu/ui/mainmenu.cpp:90
 msgid "Pseudo terminals"
-msgstr ""
+msgstr "Псевдо терминалы"
 
 #: src/emu/ui/mainmenu.cpp:93
 msgid "Bios Selection"
-msgstr ""
+msgstr "Выбор BIOS"
 
 #: src/emu/ui/mainmenu.cpp:99
 msgid "Slot Devices"
-msgstr ""
+msgstr "Подключаемые устройства"
 
 #: src/emu/ui/mainmenu.cpp:106
 msgid "Barcode Reader"
-msgstr ""
+msgstr "Сканер штрих-кодов"
 
 #: src/emu/ui/mainmenu.cpp:113
 msgid "Network Devices"
-msgstr ""
+msgstr "Сетевые устройства"
 
 #: src/emu/ui/mainmenu.cpp:118
 msgid "Keyboard Mode"
-msgstr ""
+msgstr "Режим клавиатуры"
 
 #: src/emu/ui/mainmenu.cpp:121
 msgid "Slider Controls"
@@ -181,28 +215,28 @@ msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:124
 msgid "Video Options"
-msgstr ""
+msgstr "Настройки видео"
 
 #: src/emu/ui/mainmenu.cpp:128
 msgid "Crosshair Options"
-msgstr ""
+msgstr "Настройки прицела"
 
 #: src/emu/ui/mainmenu.cpp:132
 msgid "Cheat"
-msgstr ""
+msgstr "Читы"
 
 #: src/emu/ui/mainmenu.cpp:136
 msgid "External DAT View"
-msgstr ""
+msgstr "Просмотр DAT-файлов"
 
 #: src/emu/ui/mainmenu.cpp:142
 msgid "Add To Favorites"
-msgstr ""
+msgstr "Добавить в Избранное"
 
 #: src/emu/ui/mainmenu.cpp:144
 msgid "Remove From Favorites"
-msgstr ""
+msgstr "Удалить из Избранного"
 
 #: src/emu/ui/mainmenu.cpp:151
 msgid "Select New Machine"
-msgstr ""
+msgstr "Выбрать новую систему"
