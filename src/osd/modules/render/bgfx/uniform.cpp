@@ -7,7 +7,7 @@
 //============================================================
 
 #include "uniform.h"
-#include <string.h>
+#include <cstring>
 
 bgfx_uniform::bgfx_uniform(std::string name, bgfx::UniformType::Enum type)
     : m_name(name)
