@@ -77,43 +77,6 @@
 #define LOG(x) do { if (AVIGO_LOG) logerror x; } while (0)
 
 
-/* memory 0x0000-0x03fff */
-READ8_MEMBER(avigo_state::flash_0x0000_read_handler)
-{
-	return m_flashes[0]->read(offset);
-}
-
-/* memory 0x0000-0x03fff */
-WRITE8_MEMBER(avigo_state::flash_0x0000_write_handler)
-{
-	m_flashes[0]->write(offset, data);
-}
-
-/* memory 0x04000-0x07fff */
-READ8_MEMBER(avigo_state::flash_0x4000_read_handler)
-{
-	return m_flashes[m_flash_at_0x4000]->read((m_bank1_l<<14) | offset);
-}
-
-/* memory 0x04000-0x07fff */
-WRITE8_MEMBER(avigo_state::flash_0x4000_write_handler)
-{
-	m_flashes[m_flash_at_0x4000]->write((m_bank1_l<<14) | offset, data);
-}
-
-/* memory 0x08000-0x0bfff */
-READ8_MEMBER(avigo_state::flash_0x8000_read_handler)
-{
-	return m_flashes[m_flash_at_0x8000]->read((m_bank2_l<<14) | offset);
-}
-
-/* memory 0x08000-0x0bfff */
-WRITE8_MEMBER(avigo_state::flash_0x8000_write_handler)
-{
-	m_flashes[m_flash_at_0x8000]->write((m_bank2_l<<14) | offset, data);
-}
-
-
 /*
     IRQ bits (port 3) ordered by priority:
 
@@ -150,58 +113,6 @@ WRITE_LINE_MEMBER( avigo_state::tc8521_alarm_int )
 //#endif
 }
 
-void avigo_state::refresh_memory(UINT8 bank, UINT8 chip_select)
-{
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-	int &active_flash = (bank == 1 ? m_flash_at_0x4000 : m_flash_at_0x8000);
-	char bank_tag[6];
-
-	LOG(("Chip %02x mapped at %04x - %04x\n", chip_select, bank * 0x4000, bank * 0x4000 + 0x3fff));
-
-	switch (chip_select)
-	{
-		case 0x06:  // videoram
-			space.install_readwrite_handler(bank * 0x4000, bank * 0x4000 + 0x3fff, read8_delegate(FUNC(avigo_state::vid_memory_r), this), write8_delegate(FUNC(avigo_state::vid_memory_w), this));
-			active_flash = -1;
-			break;
-
-		case 0x01: // banked RAM
-			sprintf(bank_tag,"bank%d", bank);
-			membank(bank_tag)->set_base(m_ram_base + (((bank == 1 ? m_bank1_l : m_bank2_l) & 0x07)<<14));
-			space.install_readwrite_bank (bank * 0x4000, bank * 0x4000 + 0x3fff, bank_tag);
-			active_flash = -1;
-			break;
-
-		case 0x00:  // flash 0
-		case 0x03:  // flash 1
-		case 0x05:  // flash 2
-		case 0x07:  // flash 0
-			if (active_flash < 0)   // to avoid useless calls to install_readwrite_handler that cause slowdowns
-			{
-				if (bank == 1)
-					space.install_readwrite_handler(0x4000, 0x7fff, read8_delegate(FUNC(avigo_state::flash_0x4000_read_handler), this), write8_delegate(FUNC(avigo_state::flash_0x4000_write_handler), this));
-				else
-					space.install_readwrite_handler(0x8000, 0xbfff, read8_delegate(FUNC(avigo_state::flash_0x8000_read_handler), this), write8_delegate(FUNC(avigo_state::flash_0x8000_write_handler), this));
-			}
-
-			switch (chip_select)
-			{
-				case 0x00:
-				case 0x07: active_flash = 0; break;
-				case 0x03: active_flash = 1; break;
-				case 0x05: active_flash = 2; break;
-			}
-			break;
-
-		default:
-			logerror("Unknown chip %02x mapped at %04x - %04x\n", chip_select, bank * 0x4000, bank * 0x4000 + 0x3fff);
-			space.unmap_readwrite(bank * 0x4000, bank * 0x4000 + 0x3fff);
-			active_flash = -1;
-			break;
-	}
-}
-
-
 WRITE_LINE_MEMBER( avigo_state::com_interrupt )
 {
 	LOG(("com int\r\n"));
@@ -218,38 +129,21 @@ WRITE_LINE_MEMBER( avigo_state::com_interrupt )
 
 void avigo_state::machine_reset()
 {
-	/* if is a cold start initialize flash contents */
-	if (!m_warm_start)
-	{
-		memcpy(m_flashes[0]->space().get_read_ptr(0), memregion("bios")->base() + 0x000000, 0x100000);
-		memcpy(m_flashes[1]->space().get_read_ptr(0), memregion("bios")->base() + 0x100000, 0x100000);
-	}
-
 	m_irq = 0;
 	m_bank1_l = 0;
 	m_bank1_h = 0;
 	m_bank2_l = 0;
 	m_bank2_h = 0;
-	m_flash_at_0x4000 = -1;
-	m_flash_at_0x8000 = -1;
 
-	refresh_memory(1, m_bank1_h & 0x07);
-	refresh_memory(2, m_bank2_h & 0x07);
+	m_bankdev1->set_bank(0);
+	m_bankdev2->set_bank(0);
 }
 
 void avigo_state::machine_start()
 {
-	m_ram_base = (UINT8*)m_ram->pointer();
-
 	// bank3 always first ram bank
-	membank("bank3")->set_base(m_ram_base);
+	membank("bank2")->set_base(m_nvram);
 
-	/* keep machine pointers to flash devices */
-	m_flashes[0] = machine().device<intelfsh8_device>("flash0");
-	m_flashes[1] = machine().device<intelfsh8_device>("flash1");
-	m_flashes[2] = machine().device<intelfsh8_device>("flash2");
-
-	machine().device<nvram_device>("nvram")->set_base(m_ram_base, m_ram->size());
 	m_warm_start = 1;
 
 	// register for state saving
@@ -261,33 +155,27 @@ void avigo_state::machine_start()
 	save_item(NAME(m_bank1_l));
 	save_item(NAME(m_bank1_h));
 	save_item(NAME(m_ad_control_status));
-	save_item(NAME(m_flash_at_0x4000));
-	save_item(NAME(m_flash_at_0x8000));
 	save_item(NAME(m_ad_value));
 	save_item(NAME(m_screen_column));
 	save_item(NAME(m_warm_start));
-
-	// save all flash contents
-	save_pointer(NAME((UINT8*)m_flashes[0]->space().get_read_ptr(0)), 0x100000);
-	save_pointer(NAME((UINT8*)m_flashes[1]->space().get_read_ptr(0)), 0x100000);
-	save_pointer(NAME((UINT8*)m_flashes[2]->space().get_read_ptr(0)), 0x100000);
-
-	// register postload callback
-	machine().save().register_postload(save_prepost_delegate(FUNC(avigo_state::postload), this));
 }
 
-void avigo_state::postload()
-{
-	// refresh the bankswitch
-	refresh_memory(1, m_bank1_h & 0x07);
-	refresh_memory(2, m_bank2_h & 0x07);
-}
+static ADDRESS_MAP_START(avigo_banked_map, AS_PROGRAM, 8, avigo_state)
+	AM_RANGE(0x0000000, 0x00fffff) AM_MIRROR(0x0300000) AM_DEVREADWRITE("flash0", intelfsh8_device, read, write)
+	AM_RANGE(0x0400000, 0x041ffff) AM_MIRROR(0x03e0000) AM_RAM AM_SHARE("nvram")
+
+	AM_RANGE(0x0c00000, 0x0cfffff) AM_MIRROR(0x0300000) AM_DEVREADWRITE("flash1", intelfsh8_device, read, write)
+	AM_RANGE(0x1400000, 0x14fffff) AM_MIRROR(0x0300000) AM_DEVREADWRITE("flash2", intelfsh8_device, read, write)
+	AM_RANGE(0x1c00000, 0x1cfffff) AM_MIRROR(0x0300000) AM_DEVREADWRITE("flash0", intelfsh8_device, read, write)
+
+	AM_RANGE(0x1800000, 0x1803fff) AM_MIRROR(0x03fc000) AM_READWRITE(vid_memory_r, vid_memory_w)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( avigo_mem , AS_PROGRAM, 8, avigo_state)
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(flash_0x0000_read_handler, flash_0x0000_write_handler)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_BANK("bank1")
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE_BANK("bank2")
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE_BANK("bank3")
+	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("flash0", intelfsh8_device, read, write)
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bank0", address_map_bank_device, read8, write8)
+	AM_RANGE(0x8000, 0xbfff) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
 
@@ -378,7 +266,7 @@ WRITE8_MEMBER(avigo_state::bank1_w)
 		m_bank1_l = data & 0x3f;
 	}
 
-	refresh_memory(1, m_bank1_h & 0x07);
+	m_bankdev1->set_bank(((m_bank1_h & 0x07) << 8) | m_bank1_l);
 }
 
 WRITE8_MEMBER(avigo_state::bank2_w)
@@ -394,7 +282,7 @@ WRITE8_MEMBER(avigo_state::bank2_w)
 		m_bank2_l = data & 0x3f;
 	}
 
-	refresh_memory(2, m_bank2_h & 0x07);
+	m_bankdev2->set_bank(((m_bank2_h & 0x07) << 8) | m_bank2_l);
 }
 
 READ8_MEMBER(avigo_state::ad_control_status_r)
@@ -775,12 +663,12 @@ static const gfx_layout avigo_6_by_8 =
 };
 
 static GFXDECODE_START( avigo )
-	GFXDECODE_ENTRY( "bios", 0x08992, avigo_charlayout, 0, 1 )
-	GFXDECODE_ENTRY( "bios", 0x0c020, avigo_8_by_14, 0, 1 )
-	GFXDECODE_ENTRY( "bios", 0x0c020, avigo_16_by_15, 0, 1 )
-	GFXDECODE_ENTRY( "bios", 0x14020, avigo_15_by_16, 0, 1 )
-	GFXDECODE_ENTRY( "bios", 0x1c020, avigo_8_by_8, 0, 1 )
-	GFXDECODE_ENTRY( "bios", 0x1e020, avigo_6_by_8, 0, 1 )
+	GFXDECODE_ENTRY( "flash0", 0x08992, avigo_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "flash0", 0x0c020, avigo_8_by_14, 0, 1 )
+	GFXDECODE_ENTRY( "flash0", 0x0c020, avigo_16_by_15, 0, 1 )
+	GFXDECODE_ENTRY( "flash0", 0x14020, avigo_15_by_16, 0, 1 )
+	GFXDECODE_ENTRY( "flash0", 0x1c020, avigo_8_by_8, 0, 1 )
+	GFXDECODE_ENTRY( "flash0", 0x1e020, avigo_6_by_8, 0, 1 )
 GFXDECODE_END
 
 
@@ -800,7 +688,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(avigo_state::avigo_1hz_timer)
 
 QUICKLOAD_LOAD_MEMBER( avigo_state,avigo)
 {
-	address_space& flash1 = m_flashes[1]->space(0);
+	address_space& flash1 = m_flash1->space(0);
 	const char *systemname = machine().system().name;
 	UINT32 first_app_page = (0x50000>>14);
 	int app_page;
@@ -833,7 +721,7 @@ QUICKLOAD_LOAD_MEMBER( avigo_state,avigo)
 		logerror("Application loaded at 0x%05x-0x%05x\n", app_page<<14, (app_page<<14) + (UINT32)image.length());
 
 		// copy app file into flash memory
-		image.fread((UINT8*)m_flashes[1]->space().get_read_ptr(app_page<<14), image.length());
+		image.fread((UINT8*)flash1.get_read_ptr(app_page<<14), image.length());
 
 		// update the application ID
 		flash1.write_byte((app_page<<14) + 0x1a5, 0x80 + (app_page - (first_app_page>>14)));
@@ -907,6 +795,18 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 
+	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(avigo_banked_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(avigo_banked_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", avigo_state, nvram_init)
 
 	// IRQ 1 is used for scan the pen and for cursor blinking
@@ -926,87 +826,78 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 ROM_START(avigo)
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASEFF)
-
+	ROM_REGION(0x100000, "flash0", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS( 0, "v1004", "v1.004" )
 	ROMX_LOAD("os_1004.rom", 0x000000, 0x0100000, CRC(62acd55c) SHA1(b2be12f5cc1053b6026bff2a265146ba831a7ffa), ROM_BIOS(1))
-	ROMX_LOAD("english_1004.rom", 0x100000, 0x050000, CRC(c9c3a225) SHA1(7939993a5615ca59ff2047e69b6d85122d437dca), ROM_BIOS(1))
-
 	ROM_SYSTEM_BIOS( 1, "v1002", "v1.002" )
 	ROMX_LOAD("os_1002.rom", 0x000000, 0x0100000, CRC(484bb95c) SHA1(ddc28f22f8cbc99f60f91c58ee0e2d15170024fb), ROM_BIOS(2))
-	ROMX_LOAD("english_1002.rom", 0x100000, 0x050000, CRC(31cab0ac) SHA1(87d337830506a12514a4beb9a8502a0de94816f2), ROM_BIOS(2))
-
 	ROM_SYSTEM_BIOS( 2, "v100", "v1.00" )
 	ROMX_LOAD("os_100.rom", 0x000000, 0x0100000, CRC(13ea7b38) SHA1(85566ff142d86d504ac72613f169d8758e2daa09), ROM_BIOS(3))
-	ROMX_LOAD("english_100.rom", 0x100000, 0x050000, CRC(e2824b44) SHA1(3252454b05c3d3a4d7df1cb48dc3441ae82f2b1c), ROM_BIOS(3))
 
+	ROM_REGION(0x100000, "flash1", ROMREGION_ERASEFF)
+	ROMX_LOAD("english_1004.rom", 0x000000, 0x050000, CRC(c9c3a225) SHA1(7939993a5615ca59ff2047e69b6d85122d437dca), ROM_BIOS(1))
+	ROMX_LOAD("english_1002.rom", 0x000000, 0x050000, CRC(31cab0ac) SHA1(87d337830506a12514a4beb9a8502a0de94816f2), ROM_BIOS(2))
+	ROMX_LOAD("english_100.rom",  0x000000, 0x050000, CRC(e2824b44) SHA1(3252454b05c3d3a4d7df1cb48dc3441ae82f2b1c), ROM_BIOS(3))
 ROM_END
 
 ROM_START(avigo_de)
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASEFF)
-
+	ROM_REGION(0x100000, "flash0", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS( 0, "v1004", "v1.004" )
 	ROMX_LOAD("os_1004.rom", 0x000000, 0x0100000, CRC(62acd55c) SHA1(b2be12f5cc1053b6026bff2a265146ba831a7ffa), ROM_BIOS(1))
-	ROMX_LOAD("german_1004.rom", 0x100000, 0x060000, CRC(0fa437b3) SHA1(e9352aa8fee6d93b898412bd129452b82baa9a21), ROM_BIOS(1))
-
 	ROM_SYSTEM_BIOS( 1, "v1002", "v1.002" )
 	ROMX_LOAD("os_1002.rom", 0x000000, 0x0100000, CRC(484bb95c) SHA1(ddc28f22f8cbc99f60f91c58ee0e2d15170024fb), ROM_BIOS(2))
-	ROMX_LOAD("german_1002.rom", 0x100000, 0x060000, CRC(c6bf07ba) SHA1(d3185687aa510f6c3b3ab3baaabe7e8ce1a79e3b), ROM_BIOS(2))
-
 	ROM_SYSTEM_BIOS( 2, "v100", "v1.00" )
 	ROMX_LOAD("os_100.rom", 0x000000, 0x0100000, CRC(13ea7b38) SHA1(85566ff142d86d504ac72613f169d8758e2daa09), ROM_BIOS(3))
-	ROMX_LOAD("german_100.rom", 0x100000, 0x060000, CRC(117d9189) SHA1(7e959ab1381ba831821fcf87973b25d87f12d34e), ROM_BIOS(3))
 
+	ROM_REGION(0x100000, "flash1", ROMREGION_ERASEFF)
+	ROMX_LOAD("german_1004.rom", 0x000000, 0x060000, CRC(0fa437b3) SHA1(e9352aa8fee6d93b898412bd129452b82baa9a21), ROM_BIOS(1))
+	ROMX_LOAD("german_1002.rom", 0x000000, 0x060000, CRC(c6bf07ba) SHA1(d3185687aa510f6c3b3ab3baaabe7e8ce1a79e3b), ROM_BIOS(2))
+	ROMX_LOAD("german_100.rom",  0x000000, 0x060000, CRC(117d9189) SHA1(7e959ab1381ba831821fcf87973b25d87f12d34e), ROM_BIOS(3))
 ROM_END
 
 ROM_START(avigo_fr)
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASEFF)
-
+	ROM_REGION(0x100000, "flash0", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS( 0, "v1004", "v1.004" )
 	ROMX_LOAD("os_1004.rom", 0x000000, 0x0100000, CRC(62acd55c) SHA1(b2be12f5cc1053b6026bff2a265146ba831a7ffa), ROM_BIOS(1))
-	ROMX_LOAD("french_1004.rom", 0x100000, 0x050000, CRC(5e4d90f7) SHA1(07df3af8a431ba65e079d6c987fb5d544f6541d8), ROM_BIOS(1))
-
 	ROM_SYSTEM_BIOS( 1, "v1002", "v1.002" )
 	ROMX_LOAD("os_1002.rom", 0x000000, 0x0100000, CRC(484bb95c) SHA1(ddc28f22f8cbc99f60f91c58ee0e2d15170024fb), ROM_BIOS(2))
-	ROMX_LOAD("french_1002.rom", 0x100000, 0x050000,CRC(caa3eb91) SHA1(ab199986de301d933f069a5e1f5150967e1d7f59), ROM_BIOS(2))
-
 	ROM_SYSTEM_BIOS( 2, "v100", "v1.00" )
 	ROMX_LOAD("os_100.rom", 0x000000, 0x0100000, CRC(13ea7b38) SHA1(85566ff142d86d504ac72613f169d8758e2daa09), ROM_BIOS(3))
-	ROMX_LOAD("french_100.rom", 0x100000, 0x050000, CRC(fffa2345) SHA1(399447cede3cdd0be768952cb24f7e4431147e3d), ROM_BIOS(3))
 
+	ROM_REGION(0x100000, "flash1", ROMREGION_ERASEFF)
+	ROMX_LOAD("french_1004.rom", 0x000000, 0x050000, CRC(5e4d90f7) SHA1(07df3af8a431ba65e079d6c987fb5d544f6541d8), ROM_BIOS(1))
+	ROMX_LOAD("french_1002.rom", 0x000000, 0x050000,CRC(caa3eb91) SHA1(ab199986de301d933f069a5e1f5150967e1d7f59), ROM_BIOS(2))
+	ROMX_LOAD("french_100.rom",  0x000000, 0x050000, CRC(fffa2345) SHA1(399447cede3cdd0be768952cb24f7e4431147e3d), ROM_BIOS(3))
 ROM_END
 
 ROM_START(avigo_es)
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASEFF)
-
+	ROM_REGION(0x100000, "flash0", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS( 0, "v1004", "v1.004" )
 	ROMX_LOAD("os_1004.rom", 0x000000, 0x0100000, CRC(62acd55c) SHA1(b2be12f5cc1053b6026bff2a265146ba831a7ffa), ROM_BIOS(1))
-	ROMX_LOAD("spanish_1004.rom", 0x100000, 0x060000, CRC(235a7f8d) SHA1(94da4ecafb54dcd5d80bc5063cb4024e66e6a21f), ROM_BIOS(1))
-
 	ROM_SYSTEM_BIOS( 1, "v1002", "v1.002" )
 	ROMX_LOAD("os_1002.rom", 0x000000, 0x0100000, CRC(484bb95c) SHA1(ddc28f22f8cbc99f60f91c58ee0e2d15170024fb), ROM_BIOS(2))
-	ROMX_LOAD("spanish_1002.rom", 0x100000, 0x060000, CRC(a6e80cc4) SHA1(e741657558c11f7bce646ba3d7b5f845bfa275b7), ROM_BIOS(2))
-
 	ROM_SYSTEM_BIOS( 2, "v100", "v1.00" )
 	ROMX_LOAD("os_100.rom", 0x000000, 0x0100000, CRC(13ea7b38) SHA1(85566ff142d86d504ac72613f169d8758e2daa09), ROM_BIOS(3))
-	ROMX_LOAD("spanish_100.rom", 0x100000, 0x060000, CRC(953a5276) SHA1(b9ba1dbdc2127b1ef419c911ef66313024a7351a), ROM_BIOS(3))
 
+	ROM_REGION(0x100000, "flash1", ROMREGION_ERASEFF)
+	ROMX_LOAD("spanish_1004.rom", 0x000000, 0x060000, CRC(235a7f8d) SHA1(94da4ecafb54dcd5d80bc5063cb4024e66e6a21f), ROM_BIOS(1))
+	ROMX_LOAD("spanish_1002.rom", 0x000000, 0x060000, CRC(a6e80cc4) SHA1(e741657558c11f7bce646ba3d7b5f845bfa275b7), ROM_BIOS(2))
+	ROMX_LOAD("spanish_100.rom",  0x000000, 0x060000, CRC(953a5276) SHA1(b9ba1dbdc2127b1ef419c911ef66313024a7351a), ROM_BIOS(3))
 ROM_END
 
 ROM_START(avigo_it)
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASEFF)
-
+	ROM_REGION(0x100000, "flash0", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS( 0, "v1004", "v1.004" )
 	ROMX_LOAD("os_1004.rom", 0x000000, 0x0100000, CRC(62acd55c) SHA1(b2be12f5cc1053b6026bff2a265146ba831a7ffa), ROM_BIOS(1))
-	ROMX_LOAD("italian_1004.rom", 0x100000, 0x050000, CRC(fb7941ec) SHA1(230e8346a3b0da1ee24568ec090ce6860ebfe995), ROM_BIOS(1))
-
 	ROM_SYSTEM_BIOS( 1, "v1002", "v1.002" )
 	ROMX_LOAD("os_1002.rom", 0x000000, 0x0100000, CRC(484bb95c) SHA1(ddc28f22f8cbc99f60f91c58ee0e2d15170024fb), ROM_BIOS(2))
-	ROMX_LOAD("italian_1002.rom", 0x100000, 0x050000, CRC(093bc032) SHA1(2c75d950d356a7fd1d058808e5f0be8e15b8ea2a), ROM_BIOS(2))
-
 	ROM_SYSTEM_BIOS( 2, "v100", "v1.00" )
 	ROMX_LOAD("os_100.rom", 0x000000, 0x0100000, CRC(13ea7b38) SHA1(85566ff142d86d504ac72613f169d8758e2daa09), ROM_BIOS(3))
-	ROMX_LOAD("italian_100.rom", 0x100000, 0x050000, CRC(de359218) SHA1(6185727aba8ffc98723f2df74dda388fd0d70cc9), ROM_BIOS(3))
+
+	ROM_REGION(0x100000, "flash1", ROMREGION_ERASEFF)
+	ROMX_LOAD("italian_1004.rom", 0x000000, 0x050000, CRC(fb7941ec) SHA1(230e8346a3b0da1ee24568ec090ce6860ebfe995), ROM_BIOS(1))
+	ROMX_LOAD("italian_1002.rom", 0x000000, 0x050000, CRC(093bc032) SHA1(2c75d950d356a7fd1d058808e5f0be8e15b8ea2a), ROM_BIOS(2))
+	ROMX_LOAD("italian_100.rom",  0x000000, 0x050000, CRC(de359218) SHA1(6185727aba8ffc98723f2df74dda388fd0d70cc9), ROM_BIOS(3))
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY   FULLNAME */
