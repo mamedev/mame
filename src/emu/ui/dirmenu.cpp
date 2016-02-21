@@ -17,7 +17,7 @@
 #include "ui/optsmenu.h"
 
 static int ADDING = 1;
-static int CHANGE = 1;
+static int CHANGE = 2;
 
 struct folders_entry
 {
