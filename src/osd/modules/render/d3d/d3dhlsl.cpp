@@ -14,16 +14,6 @@
 //  Windows NT shipped with DirectX 3.0a
 //  Windows 95 shipped with DirectX 2
 
-// standard windows headers
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <tchar.h>
-#include <mmsystem.h>
-#include <d3d9.h>
-#include <d3dx9.h>
-#include <math.h>
-#undef interface
-
 // MAME headers
 #include "emu.h"
 #include "render.h"
@@ -35,12 +25,12 @@
 #include "screen.h"
 
 // MAMEOS headers
-#include "d3dintf.h"
 #include "winmain.h"
 #include "window.h"
-#include "d3dcomm.h"
 #include "modules/render/drawd3d.h"
+#include "d3dcomm.h"
 #include "strconv.h"
+#include "d3dhlsl.h"
 
 
 //============================================================
@@ -48,10 +38,8 @@
 //============================================================
 
 static slider_state *g_slider_list;
-static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *templ, const char *extension, int idx);
+static file_error open_next(renderer_d3d9 *d3d, emu_file &file, const char *templ, const char *extension, int idx);
 
-namespace d3d
-{
 //============================================================
 //  PROTOTYPES
 //============================================================
@@ -108,7 +96,7 @@ shaders::~shaders()
 		currcache = cachehead;
 	}
 
-	render_target *currtarget = targethead;
+	d3d_render_target *currtarget = targethead;
 	while(targethead != NULL)
 	{
 		targethead = currtarget->next;
@@ -565,14 +553,14 @@ void shaders::remove_render_target(texture_info *texture)
 
 void shaders::remove_render_target(int width, int height, UINT32 screen_index, UINT32 page_index)
 {
-	render_target *target = find_render_target(width, height, screen_index, page_index);
+	d3d_render_target *target = find_render_target(width, height, screen_index, page_index);
 	if (target != NULL)
 	{
 		remove_render_target(target);
 	}
 }
 
-void shaders::remove_render_target(render_target *rt)
+void shaders::remove_render_target(d3d_render_target *rt)
 {
 	if (rt != NULL)
 	{
@@ -645,7 +633,7 @@ void shaders::set_texture(texture_info *texture)
 //  shaders::init
 //============================================================
 
-void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *renderer)
+void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *renderer)
 {
 	if (!d3dintf->post_fx_available)
 	{
@@ -1165,13 +1153,13 @@ void shaders::init_effect_info(poly_info *poly)
 //  shaders::find_render_target
 //============================================================
 
-render_target* shaders::find_render_target(texture_info *info)
+d3d_render_target* shaders::find_render_target(texture_info *info)
 {
 	UINT32 screen_index_data = (UINT32)info->get_texinfo().osddata;
 	UINT32 screen_index = screen_index_data >> 1;
 	UINT32 page_index = screen_index_data & 1;
 
-	render_target *curr = targethead;
+	d3d_render_target *curr = targethead;
 	while (curr != NULL && (
 		curr->screen_index != screen_index ||
 		curr->page_index != page_index ||
@@ -1189,9 +1177,9 @@ render_target* shaders::find_render_target(texture_info *info)
 //  shaders::find_render_target
 //============================================================
 
-render_target* shaders::find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index)
+d3d_render_target* shaders::find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index)
 {
-	render_target *curr = targethead;
+	d3d_render_target *curr = targethead;
 	while (curr != NULL && (
 		curr->width != width ||
 		curr->height != height ||
@@ -1223,7 +1211,7 @@ cache_target* shaders::find_cache_target(UINT32 screen_index, int width, int hei
 	return curr;
 }
 
-int shaders::ntsc_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::ntsc_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1290,7 +1278,7 @@ rgb_t shaders::apply_color_convolution(rgb_t color)
 		MAX(0, MIN(255, static_cast<int>(b * 255.0f))));
 }
 
-int shaders::color_convolution_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::color_convolution_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1305,7 +1293,7 @@ int shaders::color_convolution_pass(render_target *rt, int source_index, poly_in
 	return next_index;
 }
 
-int shaders::prescale_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::prescale_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1319,7 +1307,7 @@ int shaders::prescale_pass(render_target *rt, int source_index, poly_info *poly,
 	return next_index;
 }
 
-int shaders::deconverge_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::deconverge_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1342,7 +1330,7 @@ int shaders::deconverge_pass(render_target *rt, int source_index, poly_info *pol
 	return next_index;
 }
 
-int shaders::defocus_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::defocus_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1362,7 +1350,7 @@ int shaders::defocus_pass(render_target *rt, int source_index, poly_info *poly, 
 	return next_index;
 }
 
-int shaders::phosphor_pass(render_target *rt, cache_target *ct, int source_index, poly_info *poly, int vertnum)
+int shaders::phosphor_pass(d3d_render_target *rt, cache_target *ct, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1393,7 +1381,7 @@ int shaders::phosphor_pass(render_target *rt, cache_target *ct, int source_index
 	return next_index;
 }
 
-int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int vertnum, bool prepare_bloom)
+int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum, bool prepare_bloom)
 {
 	int next_index = source_index;
 
@@ -1440,7 +1428,7 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	return next_index;
 }
 
-int shaders::downsample_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::downsample_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1485,7 +1473,7 @@ int shaders::downsample_pass(render_target *rt, int source_index, poly_info *pol
 	return next_index;
 }
 
-int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::bloom_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1557,7 +1545,7 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 	return next_index;
 }
 
-int shaders::distortion_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::distortion_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1601,7 +1589,7 @@ int shaders::distortion_pass(render_target *rt, int source_index, poly_info *pol
 	return next_index;
 }
 
-int shaders::vector_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::vector_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1618,7 +1606,7 @@ int shaders::vector_pass(render_target *rt, int source_index, poly_info *poly, i
 	return next_index;
 }
 
-int shaders::vector_buffer_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::vector_buffer_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1635,7 +1623,7 @@ int shaders::vector_buffer_pass(render_target *rt, int source_index, poly_info *
 	return next_index;
 }
 
-int shaders::screen_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
 
@@ -1698,7 +1686,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		curr_render_target = find_render_target(curr_texture);
 
-		render_target *rt = curr_render_target;
+		d3d_render_target *rt = curr_render_target;
 		if (rt == NULL)
 		{
 			return;
@@ -1744,7 +1732,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		curr_render_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
 
-		render_target *rt = curr_render_target;
+		d3d_render_target *rt = curr_render_target;
 		if (rt == NULL)
 		{
 			return;
@@ -1766,7 +1754,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		curr_render_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
 
-		render_target *rt = curr_render_target;
+		d3d_render_target *rt = curr_render_target;
 		if (rt == NULL)
 		{
 			return;
@@ -1844,7 +1832,7 @@ bool shaders::register_prescaled_texture(texture_info *texture)
 //============================================================
 //  shaders::add_cache_target - register a cache target
 //============================================================
-bool shaders::add_cache_target(renderer* d3d, texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index)
+bool shaders::add_cache_target(renderer_d3d9* d3d, texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index)
 {
 	cache_target* target = (cache_target*)global_alloc_clear<cache_target>();
 
@@ -1879,7 +1867,7 @@ bool shaders::add_cache_target(renderer* d3d, texture_info* info, int width, int
 	return true;
 }
 
-render_target* shaders::get_vector_target()
+d3d_render_target* shaders::get_vector_target()
 {
 	if (!vector_enable)
 	{
@@ -1902,13 +1890,13 @@ void shaders::create_vector_target(render_primitive *prim)
 //  shaders::add_render_target - register a render target
 //============================================================
 
-bool shaders::add_render_target(renderer* d3d, texture_info* info, int width, int height, int xprescale, int yprescale)
+bool shaders::add_render_target(renderer_d3d9* d3d, texture_info* info, int width, int height, int xprescale, int yprescale)
 {
 	UINT32 screen_index = 0;
 	UINT32 page_index = 0;
 	if (info != NULL)
 	{
-		render_target *existing_target = find_render_target(info);
+		d3d_render_target *existing_target = find_render_target(info);
 		if (existing_target != NULL)
 		{
 			remove_render_target(existing_target);
@@ -1920,14 +1908,14 @@ bool shaders::add_render_target(renderer* d3d, texture_info* info, int width, in
 	}
 	else
 	{
-		render_target *existing_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
+		d3d_render_target *existing_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
 		if (existing_target != NULL)
 		{
 			remove_render_target(existing_target);
 		}
 	}
 
-	render_target* target = (render_target*)global_alloc_clear<render_target>();
+	d3d_render_target* target = (d3d_render_target*)global_alloc_clear<d3d_render_target>();
 
 	if (!target->init(d3d, d3dintf, width, height, xprescale, yprescale))
 	{
@@ -2069,7 +2057,7 @@ void shaders::delete_resources(bool reset)
 		currcache = cachehead;
 	}
 
-	render_target *currtarget = targethead;
+	d3d_render_target *currtarget = targethead;
 	while(targethead != NULL)
 	{
 		targethead = currtarget->next;
@@ -2218,7 +2206,7 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 //  be done in a more ideal way.
 //============================================================
 
-static slider_state *slider_alloc(running_machine &machine, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg)
+static slider_state *slider_alloc(running_machine &machine, int id, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg)
 {
 	int size = sizeof(slider_state) + strlen(title);
 	slider_state *state = (slider_state *)auto_alloc_array_clear(machine, UINT8, size);
@@ -2229,6 +2217,8 @@ static slider_state *slider_alloc(running_machine &machine, const char *title, I
 	state->incval = incval;
 	state->update = update;
 	state->arg = arg;
+	state->hidden = false;
+	state->id = id;
 	strcpy(state->description, title);
 
 	return state;
@@ -2856,99 +2846,191 @@ static INT32 slider_ntsc_scan_time(running_machine &machine, void *arg, std::str
 
 hlsl_options shaders::last_options = { false };
 
+enum slider_option
+{
+	SLIDER_VECTOR_ATTENUATION = 0,
+	SLIDER_VECTOR_LENGTH_MAX,
+	SLIDER_SHADOW_MASK_TILE_MODE,
+	SLIDER_SHADOW_MASK_ALPHA,
+	SLIDER_SHADOW_MASK_X_COUNT,
+	SLIDER_SHADOW_MASK_Y_COUNT,
+	SLIDER_SHADOW_MASK_U_SIZE,
+	SLIDER_SHADOW_MASK_V_SIZE,
+	SLIDER_SHADOW_MASK_U_OFFSET,
+	SLIDER_SHADOW_MASK_V_OFFSET,
+	SLIDER_CURVATURE,
+	SLIDER_ROUND_CORNER,
+	SLIDER_SMOOTH_BORDER,
+	SLIDER_REFLECTION,
+	SLIDER_VIGNETTING,
+	SLIDER_SCANLINE_ALPHA,
+	SLIDER_SCANLINE_SCALE,
+	SLIDER_SCANLINE_HEIGHT,
+	SLIDER_SCANLINE_BRIGHT_SCALE,
+	SLIDER_SCANLINE_BRIGHT_OFFSET,
+	SLIDER_SCANLINE_JITTER,
+	SLIDER_HUM_BAR_ALPHA,
+	SLIDER_DEFOCUS_X,
+	SLIDER_DEFOCUS_Y,
+	SLIDER_RED_CONVERGE_X,
+	SLIDER_RED_CONVERGE_Y,
+	SLIDER_GREEN_CONVERGE_X,
+	SLIDER_GREEN_CONVERGE_Y,
+	SLIDER_BLUE_CONVERGE_X,
+	SLIDER_BLUE_CONVERGE_Y,
+	SLIDER_RED_RADIAL_CONVERGE_X,
+	SLIDER_RED_RADIAL_CONVERGE_Y,
+	SLIDER_GREEN_RADIAL_CONVERGE_X,
+	SLIDER_GREEN_RADIAL_CONVERGE_Y,
+	SLIDER_BLUE_RADIAL_CONVERGE_X,
+	SLIDER_BLUE_RADIAL_CONVERGE_Y,
+	SLIDER_RED_FROM_R,
+	SLIDER_RED_FROM_G,
+	SLIDER_RED_FROM_B,
+	SLIDER_GREEN_FROM_R,
+	SLIDER_GREEN_FROM_G,
+	SLIDER_GREEN_FROM_B,
+	SLIDER_BLUE_FROM_R,
+	SLIDER_BLUE_FROM_G,
+	SLIDER_BLUE_FROM_B,
+	SLIDER_SATURATION,
+	SLIDER_RED_OFFSET,
+	SLIDER_GREEN_OFFSET,
+	SLIDER_BLUE_OFFSET,
+	SLIDER_RED_SCALE,
+	SLIDER_GREEN_SCALE,
+	SLIDER_BLUE_SCALE,
+	SLIDER_RED_POWER,
+	SLIDER_GREEN_POWER,
+	SLIDER_BLUE_POWER,
+	SLIDER_RED_FLOOR,
+	SLIDER_GREEN_FLOOR,
+	SLIDER_BLUE_FLOOR,
+	SLIDER_RED_PHOSPHOR,
+	SLIDER_GREEN_PHOSPHOR,
+	SLIDER_BLUE_PHOSPHOR,
+	SLIDER_BLOOM_BLEND_MODE,
+	SLIDER_BLOOM_SCALE,
+	SLIDER_BLOOM_RED_OVERDRIVE,
+	SLIDER_BLOOM_GREEN_OVERDRIVE,
+	SLIDER_BLOOM_BLUE_OVERDRIVE,
+	SLIDER_BLOOM_LVL0_SCALE,
+	SLIDER_BLOOM_LVL1_SCALE,
+	SLIDER_BLOOM_LVL2_SCALE,
+	SLIDER_BLOOM_LVL3_SCALE,
+	SLIDER_BLOOM_LVL4_SCALE,
+	SLIDER_BLOOM_LVL5_SCALE,
+	SLIDER_BLOOM_LVL6_SCALE,
+	SLIDER_BLOOM_LVL7_SCALE,
+	SLIDER_BLOOM_LVL8_SCALE,
+	SLIDER_BLOOM_LVL9_SCALE,
+	SLIDER_BLOOM_LVL10_SCALE,
+	SLIDER_NTSC_ENABLE,
+	SLIDER_NTSC_JITTER,
+	SLIDER_NTSC_A_VALUE,
+	SLIDER_NTSC_B_VALUE,
+	SLIDER_NTSC_P_VALUE,
+	SLIDER_NTSC_O_VALUE,
+	SLIDER_NTSC_CC_VALUE,
+	SLIDER_NTSC_N_VALUE,
+	SLIDER_NTSC_Y_VALUE,
+	SLIDER_NTSC_I_VALUE,
+	SLIDER_NTSC_Q_VALUE,
+	SLIDER_NTSC_SCAN_TIME
+};
+
 shaders::slider_desc shaders::s_sliders[] =
 {
-	{ "Vector Length Attenuation",           0,    50,   100, 1, 2, slider_vector_attenuation },
-	{ "Vector Attenuation Length Limit",     1,   500,  1000, 1, 2, slider_vector_length_max },
-	{ "Shadow Mask Tile Mode",               0,     0,     1, 1, 7, slider_shadow_mask_tile_mode },
-	{ "Shadow Mask Darkness",                0,     0,   100, 1, 7, slider_shadow_mask_alpha },
-	{ "Shadow Mask X Count",                 1,     1,  1024, 1, 7, slider_shadow_mask_x_count },
-	{ "Shadow Mask Y Count",                 1,     1,  1024, 1, 7, slider_shadow_mask_y_count },
-	{ "Shadow Mask Pixel Count X",           1,     1,    64, 1, 7, slider_shadow_mask_usize },
-	{ "Shadow Mask Pixel Count Y",           1,     1,    64, 1, 7, slider_shadow_mask_vsize },
-	{ "Shadow Mask Offset X",             -100,     0,   100, 1, 7, slider_shadow_mask_uoffset },
-	{ "Shadow Mask Offset Y",             -100,     0,   100, 1, 7, slider_shadow_mask_voffset },
-	{ "Screen Curvature",                    0,     0,   100, 1, 7, slider_curvature },
-	{ "Screen Round Corner",                 0,     0,   100, 1, 7, slider_round_corner },
-	{ "Screen Smooth Border",                0,     0,   100, 1, 7, slider_smooth_border },
-	{ "Screen Reflection",                   0,     0,   100, 1, 7, slider_reflection },
-	{ "Image Vignetting",                    0,     0,   100, 1, 7, slider_vignetting },
-	{ "Scanline Darkness",                   0,     0,   100, 1, 5, slider_scanline_alpha },
-	{ "Scanline Screen Height",              1,    20,    80, 1, 5, slider_scanline_scale },
-	{ "Scanline Indiv. Height",              1,    20,    80, 1, 5, slider_scanline_height },
-	{ "Scanline Brightness",                 0,    20,    40, 1, 5, slider_scanline_bright_scale },
-	{ "Scanline Brightness Overdrive",       0,     0,    20, 1, 5, slider_scanline_bright_offset },
-	{ "Scanline Jitter",                     0,     0,   100, 1, 5, slider_scanline_jitter },
-	{ "Hum Bar Darkness",                    0,     0,   100, 1, 5, slider_hum_bar_alpha },
-	{ "Defocus X",                           0,     0,   100, 1, 7, slider_defocus_x },
-	{ "Defocus Y",                           0,     0,   100, 1, 7, slider_defocus_y },
-	{ "Red Position Offset X",            -100,     0,   100, 1, 7, slider_red_converge_x },
-	{ "Red Position Offset Y",            -100,     0,   100, 1, 7, slider_red_converge_y },
-	{ "Green Position Offset X",          -100,     0,   100, 1, 7, slider_green_converge_x },
-	{ "Green Position Offset Y",          -100,     0,   100, 1, 7, slider_green_converge_y },
-	{ "Blue Position Offset X",           -100,     0,   100, 1, 7, slider_blue_converge_x },
-	{ "Blue Position Offset Y",           -100,     0,   100, 1, 7, slider_blue_converge_y },
-	{ "Red Convergence X",                -100,     0,   100, 1, 7, slider_red_radial_converge_x },
-	{ "Red Convergence Y",                -100,     0,   100, 1, 7, slider_red_radial_converge_y },
-	{ "Green Convergence X",              -100,     0,   100, 1, 7, slider_green_radial_converge_x },
-	{ "Green Convergence Y",              -100,     0,   100, 1, 7, slider_green_radial_converge_y },
-	{ "Blue Convergence X",               -100,     0,   100, 1, 7, slider_blue_radial_converge_x },
-	{ "Blue Convergence Y",               -100,     0,   100, 1, 7, slider_blue_radial_converge_y },
-	{ "Red Output from Red Input",        -400,     0,   400, 5, 7, slider_red_from_r },
-	{ "Red Output from Green Input",      -400,     0,   400, 5, 7, slider_red_from_g },
-	{ "Red Output from Blue Input",       -400,     0,   400, 5, 7, slider_red_from_b },
-	{ "Green Output from Red Input",      -400,     0,   400, 5, 7, slider_green_from_r },
-	{ "Green Output from Green Input",    -400,     0,   400, 5, 7, slider_green_from_g },
-	{ "Green Output from Blue Input",     -400,     0,   400, 5, 7, slider_green_from_b },
-	{ "Blue Output from Red Input",       -400,     0,   400, 5, 7, slider_blue_from_r },
-	{ "Blue Output from Green Input",     -400,     0,   400, 5, 7, slider_blue_from_g },
-	{ "Blue Output from Blue Input",      -400,     0,   400, 5, 7, slider_blue_from_b },
-	{ "Saturation",                          0,   100,   400, 1, 7, slider_saturation },
-	{ "Red DC Offset",                    -100,     0,   100, 1, 7, slider_red_offset },
-	{ "Green DC Offset",                  -100,     0,   100, 1, 7, slider_green_offset },
-	{ "Blue DC Offset",                   -100,     0,   100, 1, 7, slider_blue_offset },
-	{ "Red Scale",                        -200,   100,   200, 1, 7, slider_red_scale },
-	{ "Green Scale",                      -200,   100,   200, 1, 7, slider_green_scale },
-	{ "Blue Scale",                       -200,   100,   200, 1, 7, slider_blue_scale },
-	{ "Red Gamma",                         -80,     0,    80, 1, 7, slider_red_power },
-	{ "Green Gamma",                       -80,     0,    80, 1, 7, slider_green_power },
-	{ "Blue Gamma",                        -80,     0,    80, 1, 7, slider_blue_power },
-	{ "Red Floor",                           0,     0,   100, 1, 7, slider_red_floor },
-	{ "Green Floor",                         0,     0,   100, 1, 7, slider_green_floor },
-	{ "Blue Floor",                          0,     0,   100, 1, 7, slider_blue_floor },
-	{ "Red Phosphor Life",                   0,     0,   100, 1, 7, slider_red_phosphor_life },
-	{ "Green Phosphor Life",                 0,     0,   100, 1, 7, slider_green_phosphor_life },
-	{ "Blue Phosphor Life",                  0,     0,   100, 1, 7, slider_blue_phosphor_life },
-	{ "Bloom Blend Mode",                    0,     0,     1, 1, 7, slider_bloom_blend_mode },
-	{ "Bloom Scale",                         0,     0,  2000, 5, 7, slider_bloom_scale },
-	{ "Bloom Red Overdrive",                 0,     0,  2000, 5, 7, slider_bloom_red_overdrive },
-	{ "Bloom Green Overdrive",               0,     0,  2000, 5, 7, slider_bloom_green_overdrive },
-	{ "Bloom Blue Overdrive",                0,     0,  2000, 5, 7, slider_bloom_blue_overdrive },
-	{ "Bloom Level 0 Scale",                 0,   100,   100, 1, 7, slider_bloom_lvl0_scale },
-	{ "Bloom Level 1 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl1_scale },
-	{ "Bloom Level 2 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl2_scale },
-	{ "Bloom Level 3 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl3_scale },
-	{ "Bloom Level 4 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl4_scale },
-	{ "Bloom Level 5 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl5_scale },
-	{ "Bloom Level 6 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl6_scale },
-	{ "Bloom Level 7 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl7_scale },
-	{ "Bloom Level 8 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl8_scale },
-	{ "Bloom Level 9 Scale",                 0,     0,   100, 1, 7, slider_bloom_lvl9_scale },
-	{ "Bloom Level 10 Scale",                0,     0,   100, 1, 7, slider_bloom_lvl10_scale },
-	{ "NTSC processing",                     0,     0,     1, 1, 5, slider_ntsc_enable },
-	{ "Signal Jitter",                       0,     0,   100, 1, 5, slider_ntsc_jitter },
-	{ "A Value",                          -100,    50,   100, 1, 5, slider_ntsc_a_value },
-	{ "B Value",                          -100,    50,   100, 1, 5, slider_ntsc_b_value },
-	{ "Incoming Pixel Clock Scaling",     -300,   100,   300, 1, 5, slider_ntsc_p_value },
-	{ "Outgoing Color Carrier Phase",     -300,     0,   300, 1, 5, slider_ntsc_o_value },
-	{ "Color Carrier Frequency",             0, 35795, 60000, 5, 5, slider_ntsc_cc_value },
-	{ "Y Notch",                             0,   100,   600, 5, 5, slider_ntsc_n_value },
-	{ "Y Frequency",                         0,   600,   600, 5, 5, slider_ntsc_y_value },
-	{ "I Frequency",                         0,   120,   600, 5, 5, slider_ntsc_i_value },
-	{ "Q Frequency",                         0,    60,   600, 5, 5, slider_ntsc_q_value },
-	{ "Scanline Duration",                   0,  5260, 10000, 1, 5, slider_ntsc_scan_time },
-	// { "Phase Count",                         1,     2,     3, 1, 5, slider_ntsc_phase_count },
-	{ NULL, 0, 0, 0, 0, 0, NULL },
+	{ "Vector Length Attenuation",           0,    50,   100, 1, SLIDER_SCREEN_TYPE_VECTOR, slider_vector_attenuation, SLIDER_VECTOR_ATTENUATION },
+	{ "Vector Attenuation Length Limit",     1,   500,  1000, 1, SLIDER_SCREEN_TYPE_VECTOR, slider_vector_length_max, SLIDER_VECTOR_LENGTH_MAX },
+	{ "Shadow Mask Tile Mode",               0,     0,     1, 1, SLIDER_SCREEN_TYPE_ANY, slider_shadow_mask_tile_mode, SLIDER_SHADOW_MASK_TILE_MODE },
+	{ "Shadow Mask Darkness",                0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_shadow_mask_alpha, SLIDER_SHADOW_MASK_ALPHA },
+	{ "Shadow Mask X Count",                 1,     1,  1024, 1, SLIDER_SCREEN_TYPE_ANY, slider_shadow_mask_x_count, SLIDER_SHADOW_MASK_X_COUNT },
+	{ "Shadow Mask Y Count",                 1,     1,  1024, 1, SLIDER_SCREEN_TYPE_ANY, slider_shadow_mask_y_count, SLIDER_SHADOW_MASK_Y_COUNT },
+	{ "Shadow Mask Pixel Count X",           1,     1,    64, 1, SLIDER_SCREEN_TYPE_ANY, slider_shadow_mask_usize, SLIDER_SHADOW_MASK_U_SIZE },
+	{ "Shadow Mask Pixel Count Y",           1,     1,    64, 1, SLIDER_SCREEN_TYPE_ANY, slider_shadow_mask_vsize, SLIDER_SHADOW_MASK_V_SIZE },
+	{ "Shadow Mask Offset X",             -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_shadow_mask_uoffset, SLIDER_SHADOW_MASK_U_OFFSET },
+	{ "Shadow Mask Offset Y",             -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_shadow_mask_voffset, SLIDER_SHADOW_MASK_V_OFFSET },
+	{ "Screen Curvature",                    0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_curvature, SLIDER_CURVATURE },
+	{ "Screen Round Corner",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_round_corner, SLIDER_ROUND_CORNER },
+	{ "Screen Smooth Border",                0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_smooth_border, SLIDER_SMOOTH_BORDER },
+	{ "Screen Reflection",                   0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_reflection, SLIDER_REFLECTION },
+	{ "Image Vignetting",                    0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_vignetting, SLIDER_VIGNETTING },
+	{ "Scanline Darkness",                   0,     0,   100, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_scanline_alpha, SLIDER_SCANLINE_ALPHA },
+	{ "Scanline Screen Height",              1,    20,    80, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_scanline_scale, SLIDER_SCANLINE_SCALE },
+	{ "Scanline Indiv. Height",              1,    20,    80, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_scanline_height, SLIDER_SCANLINE_HEIGHT },
+	{ "Scanline Brightness",                 0,    20,    40, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_scanline_bright_scale, SLIDER_SCANLINE_BRIGHT_SCALE },
+	{ "Scanline Brightness Overdrive",       0,     0,    20, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_scanline_bright_offset, SLIDER_SCANLINE_BRIGHT_OFFSET },
+	{ "Scanline Jitter",                     0,     0,   100, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_scanline_jitter, SLIDER_SCANLINE_JITTER },
+	{ "Hum Bar Darkness",                    0,     0,   100, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_hum_bar_alpha, SLIDER_HUM_BAR_ALPHA },
+	{ "Defocus X",                           0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_defocus_x, SLIDER_DEFOCUS_X },
+	{ "Defocus Y",                           0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_defocus_y, SLIDER_DEFOCUS_Y },
+	{ "Red Position Offset X",            -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_converge_x, SLIDER_RED_CONVERGE_X },
+	{ "Red Position Offset Y",            -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_converge_y, SLIDER_RED_CONVERGE_Y },
+	{ "Green Position Offset X",          -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_converge_x, SLIDER_GREEN_CONVERGE_X },
+	{ "Green Position Offset Y",          -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_converge_y, SLIDER_GREEN_CONVERGE_Y },
+	{ "Blue Position Offset X",           -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_converge_x, SLIDER_BLUE_CONVERGE_X },
+	{ "Blue Position Offset Y",           -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_converge_y, SLIDER_BLUE_CONVERGE_Y },
+	{ "Red Convergence X",                -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_radial_converge_x, SLIDER_RED_RADIAL_CONVERGE_X },
+	{ "Red Convergence Y",                -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_radial_converge_y, SLIDER_RED_RADIAL_CONVERGE_Y },
+	{ "Green Convergence X",              -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_radial_converge_x, SLIDER_GREEN_RADIAL_CONVERGE_X },
+	{ "Green Convergence Y",              -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_radial_converge_y, SLIDER_GREEN_RADIAL_CONVERGE_Y },
+	{ "Blue Convergence X",               -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_radial_converge_x, SLIDER_BLUE_RADIAL_CONVERGE_X },
+	{ "Blue Convergence Y",               -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_radial_converge_y, SLIDER_BLUE_RADIAL_CONVERGE_Y },
+	{ "Red Output from Red Input",        -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_red_from_r, SLIDER_RED_FROM_R },
+	{ "Red Output from Green Input",      -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_red_from_g, SLIDER_RED_FROM_G },
+	{ "Red Output from Blue Input",       -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_red_from_b, SLIDER_RED_FROM_B },
+	{ "Green Output from Red Input",      -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_green_from_r, SLIDER_GREEN_FROM_R },
+	{ "Green Output from Green Input",    -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_green_from_g, SLIDER_GREEN_FROM_G },
+	{ "Green Output from Blue Input",     -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_green_from_b, SLIDER_GREEN_FROM_B },
+	{ "Blue Output from Red Input",       -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_blue_from_r, SLIDER_BLUE_FROM_R },
+	{ "Blue Output from Green Input",     -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_blue_from_g, SLIDER_BLUE_FROM_G },
+	{ "Blue Output from Blue Input",      -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_blue_from_b, SLIDER_BLUE_FROM_B },
+	{ "Saturation",                          0,   100,   400, 1, SLIDER_SCREEN_TYPE_ANY, slider_saturation, SLIDER_SATURATION },
+	{ "Red DC Offset",                    -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_offset, SLIDER_RED_OFFSET },
+	{ "Green DC Offset",                  -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_offset, SLIDER_GREEN_OFFSET },
+	{ "Blue DC Offset",                   -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_offset, SLIDER_BLUE_OFFSET },
+	{ "Red Scale",                        -200,   100,   200, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_scale, SLIDER_RED_SCALE },
+	{ "Green Scale",                      -200,   100,   200, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_scale, SLIDER_GREEN_SCALE },
+	{ "Blue Scale",                       -200,   100,   200, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_scale, SLIDER_BLUE_SCALE },
+	{ "Red Gamma",                         -80,     0,    80, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_power, SLIDER_RED_POWER },
+	{ "Green Gamma",                       -80,     0,    80, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_power, SLIDER_GREEN_POWER },
+	{ "Blue Gamma",                        -80,     0,    80, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_power, SLIDER_BLUE_POWER },
+	{ "Red Floor",                           0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_floor, SLIDER_RED_FLOOR },
+	{ "Green Floor",                         0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_floor, SLIDER_GREEN_FLOOR },
+	{ "Blue Floor",                          0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_floor, SLIDER_BLUE_FLOOR },
+	{ "Red Phosphor Life",                   0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_phosphor_life, SLIDER_RED_PHOSPHOR },
+	{ "Green Phosphor Life",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_phosphor_life, SLIDER_GREEN_PHOSPHOR },
+	{ "Blue Phosphor Life",                  0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_phosphor_life, SLIDER_BLUE_PHOSPHOR },
+	{ "Bloom Blend Mode",                    0,     0,     1, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_blend_mode, SLIDER_BLOOM_BLEND_MODE },
+	{ "Bloom Scale",                         0,     0,  2000, 5, SLIDER_SCREEN_TYPE_ANY, slider_bloom_scale, SLIDER_BLOOM_SCALE },
+	{ "Bloom Red Overdrive",                 0,     0,  2000, 5, SLIDER_SCREEN_TYPE_ANY, slider_bloom_red_overdrive, SLIDER_BLOOM_RED_OVERDRIVE },
+	{ "Bloom Green Overdrive",               0,     0,  2000, 5, SLIDER_SCREEN_TYPE_ANY, slider_bloom_green_overdrive, SLIDER_BLOOM_GREEN_OVERDRIVE },
+	{ "Bloom Blue Overdrive",                0,     0,  2000, 5, SLIDER_SCREEN_TYPE_ANY, slider_bloom_blue_overdrive, SLIDER_BLOOM_BLUE_OVERDRIVE },
+	{ "Bloom Level 0 Scale",                 0,   100,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl0_scale, SLIDER_BLOOM_LVL0_SCALE },
+	{ "Bloom Level 1 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl1_scale, SLIDER_BLOOM_LVL1_SCALE },
+	{ "Bloom Level 2 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl2_scale, SLIDER_BLOOM_LVL2_SCALE },
+	{ "Bloom Level 3 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl3_scale, SLIDER_BLOOM_LVL3_SCALE },
+	{ "Bloom Level 4 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl4_scale, SLIDER_BLOOM_LVL4_SCALE },
+	{ "Bloom Level 5 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl5_scale, SLIDER_BLOOM_LVL5_SCALE },
+	{ "Bloom Level 6 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl6_scale, SLIDER_BLOOM_LVL6_SCALE },
+	{ "Bloom Level 7 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl7_scale, SLIDER_BLOOM_LVL7_SCALE },
+	{ "Bloom Level 8 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl8_scale, SLIDER_BLOOM_LVL8_SCALE },
+	{ "Bloom Level 9 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl9_scale, SLIDER_BLOOM_LVL9_SCALE },
+	{ "Bloom Level 10 Scale",                0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl10_scale, SLIDER_BLOOM_LVL10_SCALE },
+	{ "NTSC processing",                     0,     0,     1, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_enable, SLIDER_NTSC_ENABLE },
+	{ "Signal Jitter",                       0,     0,   100, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_jitter, SLIDER_NTSC_JITTER },
+	{ "A Value",                          -100,    50,   100, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_a_value, SLIDER_NTSC_A_VALUE },
+	{ "B Value",                          -100,    50,   100, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_b_value, SLIDER_NTSC_B_VALUE },
+	{ "Incoming Pixel Clock Scaling",     -300,   100,   300, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_p_value, SLIDER_NTSC_P_VALUE },
+	{ "Outgoing Color Carrier Phase",     -300,     0,   300, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_o_value, SLIDER_NTSC_O_VALUE },
+	{ "Color Carrier Frequency",             0, 35795, 60000, 5, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_cc_value, SLIDER_NTSC_CC_VALUE },
+	{ "Y Notch",                             0,   100,   600, 5, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_n_value, SLIDER_NTSC_N_VALUE },
+	{ "Y Frequency",                         0,   600,   600, 5, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_y_value, SLIDER_NTSC_Y_VALUE },
+	{ "I Frequency",                         0,   120,   600, 5, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_i_value, SLIDER_NTSC_I_VALUE },
+	{ "Q Frequency",                         0,    60,   600, 5, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_q_value, SLIDER_NTSC_Q_VALUE },
+	{ "Scanline Duration",                   0,  5260, 10000, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_scan_time, SLIDER_NTSC_SCAN_TIME },
+	{ NULL, 0, 0, 0, 0, 0, NULL, -1 },
 };
 
 
@@ -2976,7 +3058,7 @@ slider_state *shaders::init_slider_list()
 			(screen_type == SCREEN_TYPE_RASTER && (slider->screen_type & SLIDER_SCREEN_TYPE_RASTER) == SLIDER_SCREEN_TYPE_RASTER) ||
 			(screen_type == SCREEN_TYPE_LCD    && (slider->screen_type & SLIDER_SCREEN_TYPE_LCD)    == SLIDER_SCREEN_TYPE_LCD))
 		{
-			*tailptr = slider_alloc(*machine, slider->name, slider->minval, slider->defval, slider->maxval, slider->step, slider->adjustor, (void*)options);
+			*tailptr = slider_alloc(*machine, slider->id, slider->name, slider->minval, slider->defval, slider->maxval, slider->step, slider->adjustor, (void*)options);
 			tailptr = &(*tailptr)->next;
 		}
 	}
@@ -3040,7 +3122,7 @@ void uniform::update()
 
 	shaders *shadersys = m_shader->m_shaders;
 	hlsl_options *options = shadersys->options;
-	renderer *d3d = shadersys->d3d;
+	renderer_d3d9 *d3d = shadersys->d3d;
 
 	switch (m_id)
 	{
@@ -3531,16 +3613,14 @@ ULONG effect::release()
 	return m_effect->Release();
 }
 
-}
-
 
 //============================================================
 //  get_slider_list
 //============================================================
 
-void *windows_osd_interface::get_slider_list()
+slider_state *renderer_d3d9::get_slider_list()
 {
-	return (void*)g_slider_list;
+	return g_slider_list;
 }
 
 
@@ -3551,7 +3631,7 @@ void *windows_osd_interface::get_slider_list()
 //  scheme
 //-------------------------------------------------
 
-static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *templ, const char *extension, int idx)
+static file_error open_next(renderer_d3d9 *d3d, emu_file &file, const char *templ, const char *extension, int idx)
 {
 	UINT32 origflags = file.openflags();
 

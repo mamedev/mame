@@ -15,6 +15,7 @@
 #include "ui/custui.h"
 #include "ui/utils.h"
 #include <algorithm>
+#include "language.h"
 
 const char *ui_menu_custom_ui::hide_status[] = { "Show All", "Hide Filters", "Hide Info/Image", "Hide Both" };
 
@@ -24,6 +25,17 @@ const char *ui_menu_custom_ui::hide_status[] = { "Show All", "Hide Filters", "Hi
 
 ui_menu_custom_ui::ui_menu_custom_ui(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
+	// load languages
+	file_enumerator path(machine.options().language_path());
+	const char *lang = machine.options().language();
+	const osd_directory_entry *dirent;
+	for (int x = 0; (dirent = path.next()) != nullptr; ++x)
+		if (dirent->type == ENTTYPE_DIR && strcmp(dirent->name, ".") != 0 && strcmp(dirent->name, "..") != 0)
+		{
+			m_lang.push_back(dirent->name);
+			if (strcmp(dirent->name, lang) == 0)
+				m_currlang = x;
+		}
 }
 
 //-------------------------------------------------
@@ -34,6 +46,11 @@ ui_menu_custom_ui::~ui_menu_custom_ui()
 {
 	std::string error_string;
 	machine().ui().options().set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE, error_string);
+	if (!m_lang.empty())
+	{
+		machine().options().set_value(OPTION_LANGUAGE, m_lang[m_currlang].c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+		load_translation(machine().options());
+	}
 	ui_globals::reset = true;
 }
 
@@ -50,25 +67,24 @@ void ui_menu_custom_ui::handle()
 
 	if (m_event != nullptr && m_event->itemref != nullptr)
 	{
-		if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
+		switch ((FPTR)m_event->itemref)
 		{
-			changed = true;
-			(m_event->iptkey == IPT_UI_RIGHT) ? ui_globals::panels_status++ : ui_globals::panels_status--;
-		}
-
-
-		else if (m_event->iptkey == IPT_UI_SELECT)
-		{
-			switch ((FPTR)m_event->itemref)
-			{
-				case FONT_MENU:
+			case FONT_MENU:
+				if (m_event->iptkey == IPT_UI_SELECT)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_font_ui>(machine(), container));
-					break;
-
-				case COLORS_MENU:
+				break;
+			case COLORS_MENU:
+				if (m_event->iptkey == IPT_UI_SELECT)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_colors_ui>(machine(), container));
-					break;
-				case HIDE_MENU:
+				break;
+			case HIDE_MENU:
+			{
+				if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
+				{
+					changed = true;
+					(m_event->iptkey == IPT_UI_RIGHT) ? ui_globals::panels_status++ : ui_globals::panels_status--;
+				}
+				else if (m_event->iptkey == IPT_UI_SELECT)
 				{
 					int total = ARRAY_LENGTH(hide_status);
 					std::vector<std::string> s_sel(total);
@@ -76,6 +92,23 @@ void ui_menu_custom_ui::handle()
 						s_sel[index] = hide_status[index];
 
 					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, ui_globals::panels_status));
+				}
+			}
+			case LANGUAGE_MENU:
+			{
+				if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
+				{
+					changed = true;
+					(m_event->iptkey == IPT_UI_RIGHT) ? m_currlang++ : m_currlang--;
+				}
+				else if (m_event->iptkey == IPT_UI_SELECT)
+				{
+					int total = m_lang.size();
+					std::vector<std::string> s_sel(total);
+					for (int index = 0; index < total; ++index)
+						s_sel[index] = m_lang[index];
+
+					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, m_currlang));
 				}
 			}
 		}
@@ -91,11 +124,18 @@ void ui_menu_custom_ui::handle()
 
 void ui_menu_custom_ui::populate()
 {
+	UINT32 arrow_flags;
 	item_append("Fonts", nullptr, 0, (void *)(FPTR)FONT_MENU);
 	item_append("Colors", nullptr, 0, (void *)(FPTR)COLORS_MENU);
 
-	UINT32 arrow_flags = get_arrow_flags(0, (int)HIDE_BOTH, ui_globals::panels_status);
-	item_append("Filters and Info/Image", hide_status[ui_globals::panels_status], arrow_flags, (void *)(FPTR)HIDE_MENU);
+	if (!m_lang.empty())
+	{
+		arrow_flags = get_arrow_flags(0, m_lang.size() - 1, m_currlang);
+		item_append("Language", m_lang[m_currlang].c_str(), arrow_flags, (void *)(FPTR)LANGUAGE_MENU);
+	}
+
+	arrow_flags = get_arrow_flags(0, (int)HIDE_BOTH, ui_globals::panels_status);
+	item_append("Show side panels", hide_status[ui_globals::panels_status], arrow_flags, (void *)(FPTR)HIDE_MENU);
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;

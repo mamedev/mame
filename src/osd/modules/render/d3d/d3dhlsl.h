@@ -22,8 +22,6 @@
 
 struct slider_state;
 
-namespace d3d
-{
 class effect;
 class shaders;
 
@@ -181,9 +179,9 @@ private:
 	bool        m_valid;
 };
 
-class render_target;
+class d3d_render_target;
 class cache_target;
-class renderer;
+class renderer_d3d9;
 
 /* hlsl_options is the information about runtime-mutable Direct3D HLSL options */
 /* in the future this will be moved into an OSD/emu shared buffer */
@@ -273,13 +271,13 @@ public:
 	shaders();
 	~shaders();
 
-	void init(base *d3dintf, running_machine *machine, d3d::renderer *renderer);
+	void init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *renderer);
 
 	bool enabled() { return master_enable; }
 	void toggle();
 
 	bool vector_enabled() { return master_enable && vector_enable; }
-	render_target* get_vector_target();
+	d3d_render_target* get_vector_target();
 	void create_vector_target(render_primitive *prim);
 
 	void begin_frame();
@@ -293,8 +291,8 @@ public:
 
 	bool register_texture(texture_info *texture);
 	bool register_prescaled_texture(texture_info *texture);
-	bool add_render_target(renderer* d3d, texture_info* info, int width, int height, int xprescale, int yprescale);
-	bool add_cache_target(renderer* d3d, texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index);
+	bool add_render_target(renderer_d3d9* d3d, texture_info* info, int width, int height, int xprescale, int yprescale);
+	bool add_cache_target(renderer_d3d9* d3d, texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index);
 
 	void window_save();
 	void window_record();
@@ -306,10 +304,10 @@ public:
 	void init_fsfx_quad(void *vertbuf);
 
 	void                    set_texture(texture_info *texture);
-	render_target *         find_render_target(texture_info *info);
+	d3d_render_target *     find_render_target(texture_info *info);
 	void                    remove_render_target(texture_info *texture);
 	void                    remove_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
-	void                    remove_render_target(render_target *rt);
+	void                    remove_render_target(d3d_render_target *rt);
 
 	int create_resources(bool reset);
 	void delete_resources(bool reset);
@@ -322,7 +320,9 @@ public:
 		SLIDER_SCREEN_TYPE_NONE = 0,
 		SLIDER_SCREEN_TYPE_RASTER = 1,
 		SLIDER_SCREEN_TYPE_VECTOR = 2,
-		SLIDER_SCREEN_TYPE_LCD = 4
+		SLIDER_SCREEN_TYPE_LCD = 4,
+		SLIDER_SCREEN_TYPE_LCD_OR_RASTER = SLIDER_SCREEN_TYPE_RASTER | SLIDER_SCREEN_TYPE_LCD,
+		SLIDER_SCREEN_TYPE_ANY = SLIDER_SCREEN_TYPE_RASTER | SLIDER_SCREEN_TYPE_VECTOR | SLIDER_SCREEN_TYPE_LCD
 	};
 
 	struct slider_desc
@@ -334,6 +334,7 @@ public:
 		int                 step;
 		int                 screen_type;
 		INT32(*adjustor)(running_machine &, void *, std::string *, INT32);
+		int					id;
 	};
 
 private:
@@ -345,32 +346,32 @@ private:
 
 	bool                    register_texture(texture_info *texture, int width, int height, int xscale, int yscale);
 
-	render_target*          find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
+	d3d_render_target*      find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
 	cache_target *          find_cache_target(UINT32 screen_index, int width, int height);
 	void                    remove_cache_target(cache_target *cache);
 
 	rgb_t                   apply_color_convolution(rgb_t color);
 
 	// Shader passes
-	int                     ntsc_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
-	int                     color_convolution_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
-	int                     prescale_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
-	int                     deconverge_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
-	int                     defocus_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
-	int                     phosphor_pass(render_target *rt, cache_target *ct, int source_index, poly_info *poly, int vertnum);
-	int                     post_pass(render_target *rt, int source_index, poly_info *poly, int vertnum, bool prepare_bloom);
-	int                     downsample_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
-	int                     bloom_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
-	int                     distortion_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
-	int                     vector_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
-	int                     vector_buffer_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
-	int                     screen_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     ntsc_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     color_convolution_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     prescale_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     deconverge_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     defocus_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     phosphor_pass(d3d_render_target *rt, cache_target *ct, int source_index, poly_info *poly, int vertnum);
+	int                     post_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum, bool prepare_bloom);
+	int                     downsample_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     bloom_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     distortion_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     vector_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     vector_buffer_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     screen_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	void                    menu_pass(poly_info *poly, int vertnum);
 
-	base *                  d3dintf;                    // D3D interface
+	d3d_base *              d3dintf;                    // D3D interface
 
 	running_machine *       machine;
-	d3d::renderer *         d3d;                        // D3D renderer
+	renderer_d3d9 *    		d3d;                        // D3D renderer
 
 	bool                    master_enable;              // overall enable flag
 	bool                    vector_enable;              // vector post-processing enable flag
@@ -436,15 +437,13 @@ private:
 	vertex *                fsfx_vertices;              // pointer to our full-screen-quad object
 
 	texture_info *          curr_texture;
-	render_target *         curr_render_target;
+	d3d_render_target *     curr_render_target;
 	poly_info *             curr_poly;
-	render_target *         targethead;
+	d3d_render_target *     targethead;
 	cache_target *          cachehead;
 
 	static slider_desc      s_sliders[];
 	static hlsl_options     last_options;               // last used options
 };
-
-}
 
 #endif

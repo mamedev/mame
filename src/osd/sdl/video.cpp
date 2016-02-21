@@ -83,7 +83,7 @@ bool sdl_osd_interface::video_init()
 		get_resolution(options().resolution(), options().resolution(index), &conf, TRUE);
 
 		// create window ...
-		sdl_window_info *win = global_alloc(sdl_window_info(machine(), index, sdl_monitor_info::pick_monitor(options(), index), &conf));
+		sdl_window_info *win = global_alloc(sdl_window_info(machine(), index, osd_monitor_info::pick_monitor(reinterpret_cast<osd_options &>(options()), index), &conf));
 
 		if (win->window_init())
 			return false;
@@ -229,8 +229,9 @@ void sdl_monitor_info::exit()
 //  pick_monitor
 //============================================================
 
-osd_monitor_info *osd_monitor_info::pick_monitor(sdl_options &options, int index)
+osd_monitor_info *osd_monitor_info::pick_monitor(osd_options &generic_options, int index)
 {
+	sdl_options &options = reinterpret_cast<sdl_options &>(generic_options);
 	osd_monitor_info *monitor;
 	const char *scrname, *scrname2;
 	int moncount = 0;

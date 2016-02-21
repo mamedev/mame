@@ -537,6 +537,8 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 		machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// determine the first visible line based on the current selection
+	if (selected > top_line + visible_lines)
+		top_line = selected - (visible_lines / 2);
 	if (top_line < 0 || selected == 0)
 		top_line = 0;
 	if (top_line + visible_lines >= item.size())

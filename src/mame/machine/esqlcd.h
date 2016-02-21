@@ -20,7 +20,7 @@ public:
 	esq2x16_sq1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void write_char(int data) override;
-	virtual void update_display();
+	virtual void update_display() override;
 	virtual void device_reset() override;
 
 

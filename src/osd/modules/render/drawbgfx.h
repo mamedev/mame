@@ -3,10 +3,20 @@
 #ifndef __RENDER_BGFX__
 #define __RENDER_BGFX__
 
+#include <bgfx/bgfx.h>
+
 #include <map>
 #include <vector>
 
 #include "binpacker.h"
+
+class texture_manager;
+class target_manager;
+class shader_manager;
+class effect_manager;
+class bgfx_texture;
+class bgfx_effect;
+class bgfx_target;
 
 /* sdl_info is the information about SDL for the current screen */
 class renderer_bgfx : public osd_renderer
@@ -17,8 +27,11 @@ public:
 		, m_dimensions(0, 0)
 	{
 	}
+	virtual ~renderer_bgfx();
 
 	virtual int create() override;
+	virtual slider_state* get_slider_list() override;
+	static bool init(running_machine &machine) { return false; }
 	virtual int draw(const int update) override;
 #ifdef OSD_SDL
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
@@ -27,7 +40,6 @@ public:
 	virtual void record() override { }
 	virtual void toggle_fsfx() override { }
 #endif
-	virtual void destroy() override;
 	virtual render_primitive_list *get_primitives() override
 	{
 		osd_dim wdim = window().get_size();
@@ -83,22 +95,25 @@ private:
 	const bgfx::Memory* mame_texture_data_to_bgfx_texture_data(UINT32 format, int width, int height, int rowpixels, const rgb_t *palette, void *base);
 	UINT32 get_texture_hash(render_primitive *prim);
 
-	bgfx::ProgramHandle loadProgram(bx::FileReaderI* _reader, const char* _vsName, const char* _fsName);
-	bgfx::ProgramHandle loadProgram(const char* _vsName, const char* _fsName);
-
-	bgfx::ProgramHandle m_progQuad;
-	bgfx::ProgramHandle m_progQuadTexture;
-	bgfx::UniformHandle m_s_texColor;
-	bgfx::FrameBufferHandle fbh;
-	bgfx::TextureHandle m_texture_cache;
+	bgfx_target* m_framebuffer;
+	bgfx_texture* m_texture_cache;
 
 	// Original display_mode
 	osd_dim m_dimensions;
+
+	texture_manager* m_textures;
+	target_manager* m_targets;
+	shader_manager* m_shaders;
+	effect_manager* m_effects;
+	bgfx_effect* m_gui_effect[4];
+	bgfx_effect* m_screen_effect[4];
 
 	std::map<UINT32, rectangle_packer::packed_rectangle> m_hash_to_entry;
 	std::vector<rectangle_packer::packable_rectangle> m_texinfo;
 	rectangle_packer m_packer;
 
+	uint32_t m_width[16];
+	uint32_t m_height[16];
 	uint32_t m_white[16*16];
 	enum : uint16_t { CACHE_SIZE = 1024 };
 	enum : uint32_t { PACKABLE_SIZE = 128 };

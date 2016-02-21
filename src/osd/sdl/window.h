@@ -161,7 +161,6 @@ private:
 struct osd_draw_callbacks
 {
 	osd_renderer *(*create)(osd_window *window);
-	void (*exit)(void);
 };
 
 //============================================================
@@ -179,8 +178,6 @@ extern sdl_window_info *sdl_window_list;
 // PROTOTYPES - drawsdl.c
 //============================================================
 
-int drawsdl_init(osd_draw_callbacks *callbacks);
-const char *drawsdl_scale_mode_str(int index);
 int drawsdl_scale_mode(const char *s);
 
 //============================================================

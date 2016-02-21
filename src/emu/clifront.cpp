@@ -28,6 +28,7 @@
 #include "softlist.h"
 
 #include "ui/moptions.h"
+#include "language.h"
 
 #include <new>
 #include <ctype.h>
@@ -88,7 +89,7 @@ cli_frontend::~cli_frontend()
 	// nuke any device options since they will leak memory
 	m_options.remove_device_options();
 }
-
+/*
 const UINT32 MO_MAGIC		   = 0x950412de;
 const UINT32 MO_MAGIC_REVERSED = 0xde120495;
 
@@ -151,7 +152,7 @@ void cli_frontend::load_translation()
 		global_free_array(buffer);
 	}
 }
-
+*/
 //-------------------------------------------------
 //  execute - execute a game via the standard
 //  command line interface
@@ -171,7 +172,8 @@ int cli_frontend::execute(int argc, char **argv)
 
 		m_options.parse_standard_inis(option_errors);
 		
-		load_translation();
+		//load_translation();
+		load_translation(m_options);
 		
 		manager->start_luaengine();
 
