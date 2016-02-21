@@ -226,5 +226,5 @@ private:
     FUNCTION PROTOTYPES
 ***************************************************************************/
 rgb_t decode_ui_color(int id, running_machine *machine = nullptr);
-int get_font_rows(running_machine *machine = NULL);
+int get_font_rows(running_machine *machine = nullptr);
 #endif  /* __USRINTRF_H__ */

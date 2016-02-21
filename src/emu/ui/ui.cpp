@@ -2773,7 +2773,7 @@ rgb_t decode_ui_color(int id, running_machine *machine)
 
 	if (machine != nullptr) {
 		ui_options option;
-		for (int x = 0; x < ARRAY_LENGTH(s_color_list); x++) {
+		for (int x = 0; x < ARRAY_LENGTH(s_color_list); ++x) {
 			const char *o_default = option.value(s_color_list[x]);
 			const char *s_option = machine->ui().options().value(s_color_list[x]);
 			int len = strlen(s_option);
