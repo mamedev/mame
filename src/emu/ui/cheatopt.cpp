@@ -34,16 +34,15 @@ void ui_menu_cheat::handle()
 		machine().popmessage(nullptr);
 
 		/* handle reset all + reset all cheats for reload all option */
-		if (menu_event->itemref < ITEMREF_CHEATS_FIRST_ITEM && menu_event->iptkey == IPT_UI_SELECT)
+		if ((menu_event->itemref == ITEMREF_CHEATS_RESET_ALL || menu_event->itemref == ITEMREF_CHEATS_RELOAD_ALL) && menu_event->iptkey == IPT_UI_SELECT)
 		{
 			for (cheat_entry *curcheat = machine().cheat().first(); curcheat != nullptr; curcheat = curcheat->next())
 				if (curcheat->select_default_state())
 					changed = true;
 		}
 
-
 		/* handle individual cheats */
-		else if (menu_event->itemref > ITEMREF_CHEATS_FIRST_ITEM)
+		else if (menu_event->itemref >= ITEMREF_CHEATS_FIRST_ITEM)
 		{
 			cheat_entry *curcheat = reinterpret_cast<cheat_entry *>(menu_event->itemref);
 			const char *string;
