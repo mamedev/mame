@@ -87,8 +87,21 @@ end
 	configuration { "asmjs" }
 		targetextension ".bc"  
 		if os.getenv("EMSCRIPTEN") then
+			local emccopts = ""
+			emccopts = emccopts .. " -O3"
+			emccopts = emccopts .. " -s USE_SDL=2"
+			emccopts = emccopts .. " --memory-init-file 0"
+			emccopts = emccopts .. " -s ALLOW_MEMORY_GROWTH=0"
+			emccopts = emccopts .. " -s TOTAL_MEMORY=268435456"
+			emccopts = emccopts .. " -s DISABLE_EXCEPTION_CATCHING=2"
+			emccopts = emccopts .. " -s EXCEPTION_CATCHING_WHITELIST='[\"__ZN15running_machine17start_all_devicesEv\"]'"
+			emccopts = emccopts .. " -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '__Z14js_get_machinev', '__Z9js_get_uiv', '__Z12js_get_soundv', '__ZN10ui_manager12set_show_fpsEb', '__ZNK10ui_manager8show_fpsEv', '__ZN13sound_manager4muteEbh', '_SDL_PauseAudio']\""
+			emccopts = emccopts .. " --pre-js " .. _MAKE.esc(MAME_DIR) .. "src/osd/modules/sound/js_sound.js"
+			emccopts = emccopts .. " --post-js " .. _MAKE.esc(MAME_DIR) .. "src/osd/sdl/emscripten_post.js"
+			emccopts = emccopts .. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx@bgfx"
+			emccopts = emccopts .. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "shaders/gles@shaders/gles"
 			postbuildcommands {
-				os.getenv("EMSCRIPTEN") .. "/emcc -O3 -s DISABLE_EXCEPTION_CATCHING=2 -s USE_SDL=2 --memory-init-file 0 -s ALLOW_MEMORY_GROWTH=0 -s TOTAL_MEMORY=268435456 -s EXCEPTION_CATCHING_WHITELIST='[\"__ZN15running_machine17start_all_devicesEv\"]' -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '__Z14js_get_machinev', '__Z9js_get_uiv', '__Z12js_get_soundv', '__ZN10ui_manager12set_show_fpsEb', '__ZNK10ui_manager8show_fpsEv', '__ZN13sound_manager4muteEbh', '_SDL_PauseAudio']\" $(TARGET) -o " .. _MAKE.esc(MAME_DIR) .. _OPTIONS["target"] .. _OPTIONS["subtarget"] .. ".js --pre-js " .. _MAKE.esc(MAME_DIR) .. "src/osd/modules/sound/js_sound.js --post-js " .. _MAKE.esc(MAME_DIR) .. "src/osd/sdl/emscripten_post.js --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx@bgfx --embed-file " .. _MAKE.esc(MAME_DIR) .. "shaders/gles@shaders/gles",
+				os.getenv("EMSCRIPTEN") .. "/emcc " .. emccopts .. " $(TARGET) -o " .. _MAKE.esc(MAME_DIR) .. _OPTIONS["target"] .. _OPTIONS["subtarget"] .. ".js",
 			}
 		end
 
