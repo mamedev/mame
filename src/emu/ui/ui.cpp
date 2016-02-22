@@ -363,7 +363,7 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 {
 	const int maxstate = 4;
 	int str = machine().options().seconds_to_run();
-	bool show_gameinfo = !machine().ui().options().skip_gameinfo();
+	bool show_gameinfo = !machine().options().skip_gameinfo();
 	bool show_warnings = true, show_mandatory_fileman = true;
 	int state;
 
@@ -412,7 +412,7 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 				if (show_mandatory_fileman && machine().image().mandatory_scan(messagebox_text).length() > 0)
 				{
 					std::string warning;
-					warning.assign("This driver requires images to be loaded in the following device(s): ").append(messagebox_text.substr(0, messagebox_text.length() - 2));
+					warning.assign(_("This driver requires images to be loaded in the following device(s): ")).append(messagebox_text.substr(0, messagebox_text.length() - 2));
 					ui_menu_file_manager::force_file_manager(machine(), &machine().render().ui_container(), warning.c_str());
 				}
 				break;
@@ -499,7 +499,7 @@ void ui_manager::update_and_render(render_container *container)
 		m_popup_text_end = 0;
 
 	// display the internal mouse cursor
-	if (m_mouse_show || (is_menu_active() && machine().ui().options().ui_mouse()))
+	if (m_mouse_show || (is_menu_active() && machine().options().ui_mouse()))
 	{
 		INT32 mouse_target_x, mouse_target_y;
 		bool mouse_button;
@@ -530,7 +530,7 @@ render_font *ui_manager::get_font()
 {
 	// allocate the font and messagebox string
 	if (m_font == nullptr)
-		m_font = machine().render().font_alloc(machine().ui().options().ui_font());
+		m_font = machine().render().font_alloc(machine().options().ui_font());
 	return m_font;
 }
 
@@ -1059,9 +1059,9 @@ bool ui_manager::show_timecode_total()
 
 std::string &ui_manager::disclaimer_string(std::string &str)
 {
-	str.assign("Usage of emulators in conjunction with ROMs you don't own is forbidden by copyright law.\n\n");
-	strcatprintf(str, "IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS ESC.\n\n", machine().system().description);
-	str.append("Otherwise, type OK or move the joystick left then right to continue");
+	str.assign(_("Usage of emulators in conjunction with ROMs you don't own is forbidden by copyright law.\n\n"));
+	strcatprintf(str, _("IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS ESC.\n\n"), machine().system().description);
+	str.append(_("Otherwise, type OK or move the joystick left then right to continue"));
 	return str;
 }
 
@@ -1096,7 +1096,7 @@ std::string &ui_manager::warnings_string(std::string &str)
 	// add a warning if any ROMs were loaded with warnings
 	if (machine().rom_load().warnings() > 0)
 	{
-		str.append("One or more ROMs/CHDs for this machine are incorrect. The machine may not run correctly.\n");
+		str.append(_("One or more ROMs/CHDs for this machine are incorrect. The machine may not run correctly.\n"));
 		if (machine().system().flags & WARNING_FLAGS)
 			str.append("\n");
 	}
@@ -1109,42 +1109,42 @@ std::string &ui_manager::warnings_string(std::string &str)
 	// if we have at least one warning flag, print the general header
 	if ((machine().system().flags & WARNING_FLAGS) || machine().rom_load().knownbad() > 0)
 	{
-		str.append("There are known problems with this machine\n\n");
+		str.append(_("There are known problems with this machine\n\n"));
 
 		// add a warning if any ROMs are flagged BAD_DUMP/NO_DUMP
 		if (machine().rom_load().knownbad() > 0) {
-			str.append("One or more ROMs/CHDs for this machine have not been correctly dumped.\n");
+			str.append(_("One or more ROMs/CHDs for this machine have not been correctly dumped.\n"));
 		}
 		// add one line per warning flag
 		if (machine().system().flags & MACHINE_IMPERFECT_KEYBOARD)
-			str.append("The keyboard emulation may not be 100% accurate.\n");
+			str.append(_("The keyboard emulation may not be 100% accurate.\n"));
 		if (machine().system().flags & MACHINE_IMPERFECT_COLORS)
-			str.append("The colors aren't 100% accurate.\n");
+			str.append(_("The colors aren't 100% accurate.\n"));
 		if (machine().system().flags & MACHINE_WRONG_COLORS)
-			str.append("The colors are completely wrong.\n");
+			str.append(_("The colors are completely wrong.\n"));
 		if (machine().system().flags & MACHINE_IMPERFECT_GRAPHICS)
-			str.append("The video emulation isn't 100% accurate.\n");
+			str.append(_("The video emulation isn't 100% accurate.\n"));
 		if (machine().system().flags & MACHINE_IMPERFECT_SOUND)
-			str.append("The sound emulation isn't 100% accurate.\n");
+			str.append(_("The sound emulation isn't 100% accurate.\n"));
 		if (machine().system().flags & MACHINE_NO_SOUND) {
-			str.append("The machine lacks sound.\n");
+			str.append(_("The machine lacks sound.\n"));
 		}
 		if (machine().system().flags & MACHINE_NO_COCKTAIL)
-			str.append("Screen flipping in cocktail mode is not supported.\n");
+			str.append(_("Screen flipping in cocktail mode is not supported.\n"));
 
 		// check if external artwork is present before displaying this warning?
 		if (machine().system().flags & MACHINE_REQUIRES_ARTWORK) {
-			str.append("The machine requires external artwork files\n");
+			str.append(_("The machine requires external artwork files\n"));
 		}
 
 		if (machine().system().flags & MACHINE_IS_INCOMPLETE )
 		{
-			str.append("This machine was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n");
+			str.append(_("This machine was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n"));
 		}
 
 		if (machine().system().flags & MACHINE_NO_SOUND_HW )
 		{
-			str.append("This machine has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n");
+			str.append(_("This machine has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n"));
 		}
 
 		// if there's a NOT WORKING, UNEMULATED PROTECTION or GAME MECHANICAL warning, make it stronger
@@ -1152,15 +1152,15 @@ std::string &ui_manager::warnings_string(std::string &str)
 		{
 			// add the strings for these warnings
 			if (machine().system().flags & MACHINE_UNEMULATED_PROTECTION) {
-				str.append("The machine has protection which isn't fully emulated.\n");
+				str.append(_("The machine has protection which isn't fully emulated.\n"));
 			}
 			if (machine().system().flags & MACHINE_NOT_WORKING) {
-				str.append("\nTHIS MACHINE DOESN'T WORK. The emulation for this machine is not yet complete. "
-						"There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
+				str.append(_("\nTHIS MACHINE DOESN'T WORK. The emulation for this machine is not yet complete. "
+						"There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n"));
 			}
 			if (machine().system().flags & MACHINE_MECHANICAL) {
-				str.append("\nCertain elements of this machine cannot be emulated as it requires actual physical interaction or consists of mechanical devices. "
-						"It is not possible to fully play this machine.\n");
+				str.append(_("\nCertain elements of this machine cannot be emulated as it requires actual physical interaction or consists of mechanical devices. "
+						"It is not possible to fully play this machine.\n"));
 			}
 
 			// find the parent of this driver
@@ -1178,7 +1178,7 @@ std::string &ui_manager::warnings_string(std::string &str)
 					{
 						// this one works, add a header and display the name of the clone
 						if (!foundworking) {
-							str.append("\n\nThere are working clones of this machine: ");
+							str.append(_("\n\nThere are working clones of this machine: "));
 						}
 						else
 							str.append(", ");
@@ -1192,7 +1192,7 @@ std::string &ui_manager::warnings_string(std::string &str)
 	}
 
 	// add the 'press OK' string
-	str.append("\n\nType OK or move the joystick left then right to continue");
+	str.append(_("\n\nType OK or move the joystick left then right to continue"));
 	return str;
 }
 
@@ -1251,7 +1251,7 @@ std::string &ui_manager::game_info_astring(std::string &str)
 
 		// append the Sound: string
 		if (!found_sound)
-			str.append("\nSound:\n");
+			str.append(_("\nSound:\n"));
 		found_sound = true;
 
 		// count how many identical sound chips we have
@@ -1279,11 +1279,11 @@ std::string &ui_manager::game_info_astring(std::string &str)
 	}
 
 	// display screen information
-	str.append("\nVideo:\n");
+	str.append(_("\nVideo:\n"));
 	screen_device_iterator scriter(machine().root_device());
 	int scrcount = scriter.count();
 	if (scrcount == 0)
-		str.append("None\n");
+		str.append(_("None\n"));
 	else
 	{
 		for (screen_device *screen = scriter.first(); screen != nullptr; screen = scriter.next())
@@ -1295,7 +1295,7 @@ std::string &ui_manager::game_info_astring(std::string &str)
 			}
 
 			if (screen->screen_type() == SCREEN_TYPE_VECTOR)
-				str.append("Vector\n");
+				str.append(_("Vector\n"));
 			else
 			{
 				const rectangle &visarea = screen->visible_area();
@@ -1587,22 +1587,22 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 			if (machine.ui_active())
 			{
 				machine.ui().popup_time(2, "%s\n%s\n%s\n%s\n%s\n%s\n",
-					"Keyboard Emulation Status",
+					_("Keyboard Emulation Status"),
 					"-------------------------",
-					"Mode: PARTIAL Emulation",
-					"UI:   Enabled",
+					_("Mode: PARTIAL Emulation"),
+					_("UI:   Enabled"),
 					"-------------------------",
-					"**Use ScrLock to toggle**");
+					_("**Use ScrLock to toggle**"));
 			}
 			else
 			{
 				machine.ui().popup_time(2, "%s\n%s\n%s\n%s\n%s\n%s\n",
-					"Keyboard Emulation Status",
+					_("Keyboard Emulation Status"),
 					"-------------------------",
-					"Mode: FULL Emulation",
-					"UI:   Disabled",
+					_("Mode: FULL Emulation"),
+					_("UI:   Disabled"),
 					"-------------------------",
-					"**Use ScrLock to toggle**");
+					_("**Use ScrLock to toggle**"));
 			}
 		}
 	}
@@ -1746,13 +1746,13 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	{
 		if (!machine.options().cheat())
 		{
-			machine.popmessage("Autofire can't be enabled");
+			machine.popmessage(_("Autofire can't be enabled"));
 		}
 		else
 		{
 			bool autofire_toggle = machine.ioport().get_autofire_toggle();
 			machine.ioport().set_autofire_toggle(!autofire_toggle);
-			machine.popmessage("Autofire %s", autofire_toggle ? "Enabled" : "Disabled");
+			machine.popmessage("Autofire %s", autofire_toggle ? _("Enabled") : _("Disabled"));
 		}
 	}
 
@@ -1785,9 +1785,9 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 
 	// okay, we're waiting for a key to select a slot; display a message
 	if (state == LOADSAVE_SAVE)
-		machine.ui().draw_message_window(container, "Select position to save to");
+		machine.ui().draw_message_window(container, _("Select position to save to"));
 	else
-		machine.ui().draw_message_window(container, "Select position to load from");
+		machine.ui().draw_message_window(container, _("Select position to load from"));
 
 	// if load/save state sequence is still being pressed, do not read the filename yet
 	if (machine.ui().m_load_save_hold) {
@@ -1811,9 +1811,9 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 	{
 		// display a popup indicating things were cancelled
 		if (state == LOADSAVE_SAVE)
-			machine.popmessage("Save cancelled");
+			machine.popmessage(_("Save cancelled"));
 		else
-			machine.popmessage("Load cancelled");
+			machine.popmessage(_("Load cancelled"));
 
 		// reset the state
 		machine.resume();
@@ -1856,12 +1856,12 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 	// display a popup indicating that the save will proceed
 	if (state == LOADSAVE_SAVE)
 	{
-		machine.popmessage("Save to position %s", filename);
+		machine.popmessage(_("Save to position %s"), filename);
 		machine.schedule_save(filename);
 	}
 	else
 	{
-		machine.popmessage("Load from position %s", filename);
+		machine.popmessage(_("Load from position %s"), filename);
 		machine.schedule_load(filename);
 	}
 
@@ -1880,7 +1880,7 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 
 void ui_manager::request_quit()
 {
-	if (!machine().ui().options().confirm_quit())
+	if (!machine().options().confirm_quit())
 		machine().schedule_exit();
 	else
 		set_handler(handler_confirm_quit, 0);
@@ -1901,9 +1901,9 @@ UINT32 ui_manager::handler_confirm_quit(running_machine &machine, render_contain
 	std::string ui_cancel_text = machine.input().seq_name(machine.ioport().type_seq(IPT_UI_CANCEL, 0, SEQ_TYPE_STANDARD));
 
 	// assemble the quit message
-	std::string quit_message = strformat("Are you sure you want to quit?\n\n"
+	std::string quit_message = strformat(_("Are you sure you want to quit?\n\n"
 		"Press ''%s'' to quit,\n"
-		"Press ''%s'' to return to emulation.",
+		"Press ''%s'' to return to emulation."),
 		ui_select_text.c_str(),
 		ui_cancel_text.c_str());
 
@@ -1977,7 +1977,7 @@ static slider_state *slider_init(running_machine &machine)
 	int item;
 
 	// add overall volume
-	*tailptr = slider_alloc(machine, "Master Volume", -32, 0, 0, 1, slider_volume, nullptr);
+	*tailptr = slider_alloc(machine, _("Master Volume"), -32, 0, 0, 1, slider_volume, nullptr);
 	tailptr = &(*tailptr)->next;
 
 	// add per-channel volume
@@ -1988,7 +1988,7 @@ static slider_state *slider_init(running_machine &machine)
 		INT32 defval = 1000;
 
 		str.assign(info.stream->input_name(info.inputnum));
-		str.append(" Volume");
+		str.append(_(" Volume"));
 		*tailptr = slider_alloc(machine, str.c_str(), 0, defval, maxval, 20, slider_mixervol, (void *)(FPTR)item);
 		tailptr = &(*tailptr)->next;
 	}
@@ -2091,13 +2091,13 @@ static slider_state *slider_init(running_machine &machine)
 		if (screen->screen_type() == SCREEN_TYPE_VECTOR)
 		{
 			// add vector control
-			*tailptr = slider_alloc(machine, "Vector Flicker", 0, 0, 1000, 10, slider_flicker, nullptr);
+			*tailptr = slider_alloc(machine, _("Vector Flicker"), 0, 0, 1000, 10, slider_flicker, nullptr);
 			tailptr = &(*tailptr)->next;
-			*tailptr = slider_alloc(machine, "Beam Width Minimum", 1, 100, 1000, 1, slider_beam_width_min, nullptr);
+			*tailptr = slider_alloc(machine, _("Beam Width Minimum"), 1, 100, 1000, 1, slider_beam_width_min, nullptr);
 			tailptr = &(*tailptr)->next;
-			*tailptr = slider_alloc(machine, "Beam Width Maximum", 1, 100, 1000, 1, slider_beam_width_max, nullptr);
+			*tailptr = slider_alloc(machine, _("Beam Width Maximum"), 1, 100, 1000, 1, slider_beam_width_max, nullptr);
 			tailptr = &(*tailptr)->next;
-			*tailptr = slider_alloc(machine, "Beam Intensity Weight", -1000, 0, 1000, 10, slider_beam_intensity_weight, nullptr);
+			*tailptr = slider_alloc(machine, _("Beam Intensity Weight"), -1000, 0, 1000, 10, slider_beam_intensity_weight, nullptr);
 			tailptr = &(*tailptr)->next;
 			break;
 		}
@@ -2537,9 +2537,9 @@ static char *slider_get_screen_desc(screen_device &screen)
 	static char descbuf[256];
 
 	if (scrcount > 1)
-		sprintf(descbuf, "Screen '%s'", screen.tag());
+		sprintf(descbuf, _("Screen '%s'"), screen.tag());
 	else
-		strcpy(descbuf, "Screen");
+		strcpy(descbuf, _("Screen"));
 
 	return descbuf;
 }
@@ -2557,7 +2557,7 @@ static INT32 slider_crossscale(running_machine &machine, void *arg, std::string 
 	if (newval != SLIDER_NOCHANGE)
 		field->set_crosshair_scale(float(newval) * 0.001);
 	if (str != nullptr)
-		strprintf(*str,"%s %s %1.3f", "Crosshair Scale", (field->crosshair_axis() == CROSSHAIR_AXIS_X) ? "X" : "Y", float(newval) * 0.001f);
+		strprintf(*str,"%s %s %1.3f", _("Crosshair Scale"), (field->crosshair_axis() == CROSSHAIR_AXIS_X) ? "X" : "Y", float(newval) * 0.001f);
 	return floor(field->crosshair_scale() * 1000.0f + 0.5f);
 }
 #endif
@@ -2576,7 +2576,7 @@ static INT32 slider_crossoffset(running_machine &machine, void *arg, std::string
 	if (newval != SLIDER_NOCHANGE)
 		field->set_crosshair_offset(float(newval) * 0.001f);
 	if (str != nullptr)
-		strprintf(*str,"%s %s %1.3f", "Crosshair Offset", (field->crosshair_axis() == CROSSHAIR_AXIS_X) ? "X" : "Y", float(newval) * 0.001f);
+		strprintf(*str,"%s %s %1.3f", _("Crosshair Offset"), (field->crosshair_axis() == CROSSHAIR_AXIS_X) ? "X" : "Y", float(newval) * 0.001f);
 	return field->crosshair_offset();
 }
 #endif

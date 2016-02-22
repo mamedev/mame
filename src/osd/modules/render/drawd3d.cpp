@@ -1018,9 +1018,6 @@ renderer_d3d9::~renderer_d3d9()
 	if (get_shaders() != nullptr && get_shaders()->recording())
 		get_shaders()->window_record();
 
-	if (d3dintf != nullptr)
-		(*d3dintf->d3d.release)(d3dintf);
-
 	device_delete();
 
 	if (m_shaders_options != nullptr)
@@ -1028,6 +1025,12 @@ renderer_d3d9::~renderer_d3d9()
 		global_free(m_shaders_options);
 		m_shaders_options = nullptr;
 	}
+}
+
+void renderer_d3d9::exit()
+{
+	if (d3dintf != nullptr)
+		(*d3dintf->d3d.release)(d3dintf);
 }
 
 void renderer_d3d9::device_delete()

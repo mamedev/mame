@@ -620,9 +620,9 @@ void ui_menu_select_game::populate()
 	// add special items
 	if (ui_menu::stack_has_special_main_menu())
 	{
-		item_append("Configure Options", nullptr, MENU_FLAG_UI, (void *)(FPTR)1);
-		item_append("Configure Directories", nullptr, MENU_FLAG_UI, (void *)(FPTR)2);
-		item_append("Save Configuration", nullptr, MENU_FLAG_UI, (void *)(FPTR)3);
+		item_append(_("Configure Options"), nullptr, MENU_FLAG_UI, (void *)(FPTR)1);
+		item_append(_("Configure Directories"), nullptr, MENU_FLAG_UI, (void *)(FPTR)2);
+		item_append(_("Save Configuration"), nullptr, MENU_FLAG_UI, (void *)(FPTR)3);
 		skip_main_items = 3;
 	}
 	else
@@ -743,7 +743,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	if (isfavorite())
 		tempbuf[1].clear();
 	else
-		tempbuf[1].assign(filtered).append(" Search: ").append(m_search).append("_");
+		tempbuf[1].assign(filtered).append(_(" Search: ")).append(m_search).append("_");
 
 	// get the size of the text
 	for (int line = 0; line < 2; ++line)
@@ -1758,12 +1758,12 @@ float ui_menu_select_game::draw_left_panel(float x1, float y1, float x2, float y
 				hover = phover + filter;
 			}
 
-			if (afilter == filter)
+/*			if (afilter == filter)
 			{
 				bgcolor = UI_SELECTED_BG_COLOR;
 				fgcolor = UI_SELECTED_COLOR;
 			}
-
+*/
 			if (bgcolor != UI_TEXT_BG_COLOR)
 				container->add_rect(x1, y1, x2, y1 + line_height_max, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
@@ -1788,6 +1788,12 @@ float ui_menu_select_game::draw_left_panel(float x1, float y1, float x2, float y
 						}
 					}
 				}
+				convert_command_glyph(str);
+			}
+			else if (filter == main_filters::actual)
+			{
+				str.assign("@custom1 ").append(text[filter]);
+				x1t -= text_sign;
 				convert_command_glyph(str);
 			}
 
@@ -1942,7 +1948,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 
 		if (buffer.empty())
 		{
-			mui.draw_text_full(container, "No Infos Available", origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, JUSTIFY_CENTER, 
+			mui.draw_text_full(container, _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, JUSTIFY_CENTER, 
 				WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 			return;
 		}
@@ -2045,7 +2051,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 		// apply title to right panel
 		if (soft->usage.empty())
 		{
-			mui.draw_text_full(container, "History", origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE, 
+			mui.draw_text_full(container, _("History"), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 				DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 			ui_globals::cur_sw_dats_view = 0;
 		}
@@ -2054,8 +2060,8 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 			float title_size = 0.0f;
 			float txt_lenght = 0.0f;
 			std::string t_text[2];
-			t_text[0] = "History";
-			t_text[1] = "Usage";
+			t_text[0] = _("History");
+			t_text[1] = _("Usage");
 
 			for (auto & elem: t_text)
 			{
@@ -2089,7 +2095,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 
 		if (buffer.empty())
 		{
-			mui.draw_text_full(container, "No Infos Available", origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, JUSTIFY_CENTER, 
+			mui.draw_text_full(container, _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, JUSTIFY_CENTER,
 				WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 			return;
 		}

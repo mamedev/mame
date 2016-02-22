@@ -6,6 +6,8 @@
 //
 //============================================================
 
+#pragma once
+
 #ifndef __WIN_DRAWD3D__
 #define __WIN_DRAWD3D__
 
@@ -41,9 +43,11 @@ public:
 	renderer_d3d9(osd_window *window);
 	virtual ~renderer_d3d9();
 
+	static bool init(running_machine &machine);
+	static void exit();
+
 	virtual int create() override;
 	virtual slider_state* get_slider_list() override;
-	static bool init(running_machine &machine);
 	virtual render_primitive_list *get_primitives() override;
 	virtual int draw(const int update) override;
 	virtual void save() override;

@@ -899,7 +899,8 @@
 				table.insert(flags, flag)
 			end
 		end
-		xcode.printlist(table.join(flags, cfg.buildoptions), 'OTHER_CFLAGS')
+        xcode.printlist(table.join(flags, cfg.buildoptions, cfg.buildoptions_c), 'OTHER_CFLAGS')
+        xcode.printlist(table.join(flags, cfg.buildoptions, cfg.buildoptions_cpp), 'OTHER_CPLUSPLUSFLAGS')
 
 		-- build list of "other" linked flags. All libraries that aren't frameworks
 		-- are listed here, so I don't have to try and figure out if they are ".a"

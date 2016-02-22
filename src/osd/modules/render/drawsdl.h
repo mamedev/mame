@@ -36,12 +36,13 @@ public:
 	}
 	virtual ~renderer_sdl2();
 
+	static bool init(running_machine &machine);
+	static void exit() { }
+
 	virtual int create() override;
 	virtual int draw(const int update) override;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
 	virtual render_primitive_list *get_primitives() override;
-
-	static bool init(running_machine &machine);
 
 private:
 	void show_info(struct SDL_RendererInfo *render_info);

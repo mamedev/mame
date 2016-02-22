@@ -62,6 +62,7 @@
 //  TYPES
 //============================================================
 
+bool renderer_bgfx::s_window_set = false;
 
 //============================================================
 //  renderer_bgfx::create
@@ -100,6 +101,18 @@ int renderer_bgfx::create()
 	m_height[window().m_index] = wdim.height();
 	if (window().m_index == 0)
 	{
+		if (!s_window_set)
+		{
+			s_window_set = true;
+			ScreenVertex::init();
+		}
+		else
+		{
+			bgfx::shutdown();
+			bgfx::PlatformData blank_pd;
+			memset(&blank_pd, 0, sizeof(bgfx::PlatformData));
+			bgfx::setPlatformData(blank_pd);
+		}
 #ifdef OSD_WINDOWS
 		bgfx::winSetHwnd(window().m_hwnd);
 #else
@@ -110,8 +123,6 @@ int renderer_bgfx::create()
 		// Enable debug text.
 		bgfx::setDebug(BGFX_DEBUG_TEXT); //BGFX_DEBUG_STATS
 		m_dimensions = osd_dim(m_width[0], m_height[0]);
-
-		ScreenVertex::init();
 	}
 
 	m_textures = new texture_manager();
@@ -160,10 +171,13 @@ renderer_bgfx::~renderer_bgfx()
 	delete m_textures;
 	delete m_effects;
 	delete m_shaders;
-
-	bgfx::shutdown();
 }
 
+void renderer_bgfx::exit()
+{
+	bgfx::shutdown();
+	s_window_set = false;
+}
 
 //============================================================
 //  drawsdl_xy_to_render_target

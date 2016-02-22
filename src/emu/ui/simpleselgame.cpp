@@ -261,8 +261,8 @@ void ui_simple_menu_select_game::populate()
 	if (ui_menu::stack_has_special_main_menu())
 	{
 		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-		item_append("Configure Options", nullptr, 0, (void *)1);
-		item_append("Save Configuration", nullptr, 0, (void *)2);
+		item_append(_("Configure Options"), nullptr, 0, (void *)1);
+		item_append(_("Save Configuration"), nullptr, 0, (void *)2);
 		skip_main_items = 2;
 	}
 

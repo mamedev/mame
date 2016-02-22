@@ -2449,7 +2449,7 @@ ROM_START(p911ea)
 	ROM_LOAD("a00eaa_nvram.u39", 0x000000, 0x2000,  CRC(4f3497b6) SHA1(3045c54f98dff92cdf3a1fc0cd4c76ba82d632d7) )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "a00eaa02", 0, SHA1(fa057bf17f4c0fb9b9a09b820ff7a101e44fab7d) )
+	DISK_IMAGE( "a00eaa02_ea", 0, SHA1(fa057bf17f4c0fb9b9a09b820ff7a101e44fab7d) )
 ROM_END
 
 ROM_START(p911j) //*
@@ -2684,9 +2684,10 @@ ROM_START(wcombatu) //*
 	DISK_REGION( "ata:0:hdd:image" )
 	// CHD image provided had evidence of being altered by Windows, probably was put in a Windows machine without write protection hardware (bad idea)
 	// label was the same as this, so this should be a clean and correct version.
-	DISK_IMAGE( "c22d02", 0, SHA1(69a24c9e36b073021d55bec27d89fcc0254a60cc) ) // chs 978,8,3
+	DISK_IMAGE( "c22d02", 0, SHA1(69a24c9e36b073021d55bec27d89fcc0254a60cc) ) // chs 978,8,32
 ROM_END
 
+/* This CF card has sticker C22A02 */
 ROM_START(wcombatj) //*
 	VIPER_BIOS
 
@@ -2697,7 +2698,7 @@ ROM_START(wcombatj) //*
 	ROM_LOAD("wcombatj_nvram.u39", 0x00000, 0x2000, CRC(bd8a6640) SHA1(2d409197ef3fb07d984d27fa943f29c7a711d715))
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "c22a02", 0, BAD_DUMP SHA1(b607fb2ddfd0bd552b7a736cea4ac1aa3ea021bd) )
+	DISK_IMAGE( "c22a02", 0, SHA1(7200c7c436491fd8027d6d7139a80ee3b984697b) ) // chs 978,8,32
 ROM_END
 
 ROM_START(xtrial) //*
@@ -2718,7 +2719,7 @@ ROM_END
 /*
 Mahjong Fight Club (Konami Viper h/w)
 Konami, 2002
-
+78,8,3)
 PCB number - GM941-PWB(A)C Copyright 1999 Konami Made In Japan
 
 Mahjong Fight Club is a multi player Mahjong battle game for up to 8 players. A

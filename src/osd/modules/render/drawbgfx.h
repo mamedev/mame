@@ -29,9 +29,11 @@ public:
 	}
 	virtual ~renderer_bgfx();
 
+	static bool init(running_machine &machine) { return false; }
+	static void exit();
+
 	virtual int create() override;
 	virtual slider_state* get_slider_list() override;
-	static bool init(running_machine &machine) { return false; }
 	virtual int draw(const int update) override;
 #ifdef OSD_SDL
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
@@ -118,6 +120,8 @@ private:
 	enum : uint16_t { CACHE_SIZE = 1024 };
 	enum : uint32_t { PACKABLE_SIZE = 128 };
 	enum : UINT32 { WHITE_HASH = 0x87654321 };
+
+	static bool s_window_set;
 };
 
 #endif

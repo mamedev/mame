@@ -52,10 +52,6 @@ const options_entry ui_options::s_option_entries[] =
 	{ OPTION_LAST_USED_FILTER,              "",			OPTION_STRING,		"latest used filter" },
 	{ OPTION_LAST_USED_MACHINE,             "",			OPTION_STRING,		"latest used machine" },
 	{ OPTION_INFO_AUTO_AUDIT,               "0",		OPTION_BOOLEAN,		"enable auto audit in the general info panel" },
-	{ OPTION_UI_SKIP_GAMEINFO,              "0",        OPTION_BOOLEAN,     "skip displaying the information screen at startup" },
-	{ OPTION_UI_FONT,                       "default",  OPTION_STRING,      "specify a font to use" },
-	{ OPTION_UI_CONFIRM_QUIT,               "0",        OPTION_BOOLEAN,     "display confirm quit screen on exit" },
-	{ OPTION_UI_MOUSE,                      "1",        OPTION_BOOLEAN,     "display ui mouse cursor" },
 
 	// UI options
 	{ nullptr,                              nullptr,		OPTION_HEADER,		"UI OPTIONS" },

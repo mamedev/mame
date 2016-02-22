@@ -325,6 +325,29 @@ void windows_osd_interface::window_exit()
 		global_free(temp);
 	}
 
+	switch(video_config.mode)
+	{
+		case VIDEO_MODE_NONE:
+			renderer_none::exit();
+			break;
+		case VIDEO_MODE_GDI:
+			renderer_gdi::exit();
+			break;
+		case VIDEO_MODE_BGFX:
+			renderer_bgfx::exit();
+			break;
+#if (USE_OPENGL)
+		case VIDEO_MODE_OPENGL:
+			renderer_ogl::exit();
+			break;
+#endif
+		case VIDEO_MODE_D3D:
+			renderer_d3d9::exit();
+			break;
+		default:
+			break;
+	}
+
 	// if we're multithreaded, clean up the window thread
 	if (multithreading_enabled)
 	{
@@ -375,6 +398,10 @@ win_window_info::win_window_info(running_machine &machine)
 
 win_window_info::~win_window_info()
 {
+	if (m_renderer != nullptr)
+	{
+		delete m_renderer;
+	}
 }
 
 
@@ -1283,7 +1310,7 @@ int win_window_info::complete_create()
 		// finish off by trying to initialize DirectX; if we fail, ignore it
 		if (m_renderer != nullptr)
 		{
-			global_free(m_renderer);
+			delete m_renderer;
 		}
 		m_renderer = osd_renderer::make_for_type(video_config.mode, reinterpret_cast<osd_window *>(this));
 		if (m_renderer->create())
@@ -1938,7 +1965,7 @@ void win_window_info::set_fullscreen(int fullscreen)
 	m_fullscreen = fullscreen;
 
 	// kill off the drawers
-	global_free(m_renderer);
+	delete m_renderer;
 	m_renderer = nullptr;
 
 	// hide ourself
@@ -1996,10 +2023,6 @@ void win_window_info::set_fullscreen(int fullscreen)
 		if (video_config.mode != VIDEO_MODE_NONE)
 			ShowWindow(m_hwnd, SW_SHOW);
 
-		if (m_renderer != nullptr)
-		{
-			delete m_renderer;
-		}
 		m_renderer = reinterpret_cast<osd_renderer *>(osd_renderer::make_for_type(video_config.mode, reinterpret_cast<osd_window *>(this)));
 		if (m_renderer->create())
 			exit(1);
