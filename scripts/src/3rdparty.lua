@@ -60,7 +60,7 @@ project "zlib"
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
-		configuration { "gmake or xcode4" }
+		configuration { "gmake" }
 		if (version >= 30700) then
 			buildoptions {
 				"-Wno-shift-negative-value",
@@ -85,7 +85,7 @@ end
 			"verbose=-1",
 		}
 
-	configuration { "gmake or xcode4" }
+	configuration { "gmake" }
 		buildoptions_c {
 			"-Wno-strict-prototypes",
 		}
@@ -271,7 +271,7 @@ end
 			"HAVE_CONFIG_H=1",
 		}
 
-	configuration { "gmake or xcode4"}
+	configuration { "gmake"}
 		buildoptions_c {
 			"-Wno-unused-function",
 			"-O0",
@@ -384,7 +384,7 @@ project "lua"
 	--	"ForceCPP",
 	--}
 
-	configuration { "gmake or xcode4" }
+	configuration { "gmake" }
 		buildoptions_c {
 			"-Wno-bad-function-cast"
 		}
@@ -523,7 +523,7 @@ project "luv"
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 		}
 
-	configuration { "gmake or xcode4" }
+	configuration { "gmake" }
 		buildoptions_c {
 			"-Wno-unused-function",
 			"-Wno-strict-prototypes",
@@ -588,7 +588,7 @@ end
 		}
 
 
-	configuration { "gmake or xcode4" }
+	configuration { "gmake" }
 		buildoptions_c {
 			"-Wno-bad-function-cast",
 			"-Wno-undef",
@@ -761,7 +761,7 @@ end
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
 		}
 
-	configuration { "gmake or xcode4" }
+	configuration { "gmake" }
 		buildoptions {
 			"-Wno-uninitialized",
 			"-Wno-unused-function",
@@ -864,7 +864,7 @@ end
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
 
-	configuration { "gmake or xcode4" }
+	configuration { "gmake" }
 		buildoptions_c {
 			"-Wno-strict-prototypes",
 			"-Wno-bad-function-cast",
@@ -999,7 +999,7 @@ project "uv"
 		MAME_DIR .. "3rdparty/libuv/src/win",
 	}
 
-	configuration { "gmake or xcode4" }
+	configuration { "gmake" }
 		buildoptions_c {
 			"-Wno-strict-prototypes",
 			"-Wno-bad-function-cast",

@@ -899,6 +899,11 @@
 				table.insert(flags, flag)
 			end
 		end
+        
+        
+        _p(4,'CLANG_CXX_LANGUAGE_STANDARD = "c++14";')
+		_p(4,'CLANG_CXX_LIBRARY = "libc++";')
+        
         xcode.printlist(table.join(flags, cfg.buildoptions, cfg.buildoptions_c), 'OTHER_CFLAGS')
         xcode.printlist(table.join(flags, cfg.buildoptions, cfg.buildoptions_cpp), 'OTHER_CPLUSPLUSFLAGS')
 
