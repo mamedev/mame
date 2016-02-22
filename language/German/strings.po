@@ -1,4 +1,4 @@
-^# German translations for PACKAGE package
+# German translations for PACKAGE package
 # German translation for PACKAGE.
 # Copyright (C) 2016 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
@@ -810,7 +810,7 @@ msgid ""
 "\n"
 msgstr ""
 "Die Verwendung von Emulatoren in Verbindung mit ROMs die Sie nicht besitzen "
-"verstößt gegen das Copyright Gesetz.\n""
+"verstößt gegen das Copyright Gesetz.\n"
 "\n"
 
 #: src/emu/ui/ui.cpp:1063
@@ -1017,7 +1017,7 @@ msgstr "Laden abgebrochen"
 #: src/emu/ui/ui.cpp:1859
 #, c-format
 msgid "Save to position %s"
-msgstr "Speichere an Position "%s"
+msgstr "Speichere an Position %s"
 
 #: src/emu/ui/ui.cpp:1864
 #, c-format
