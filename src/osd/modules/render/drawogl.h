@@ -130,8 +130,10 @@ public:
 	}
 	virtual ~renderer_ogl();
 
-	virtual int create() override;
 	static bool init(running_machine &machine);
+	static void exit();
+
+	virtual int create() override;
 	virtual int draw(const int update) override;
 
 #ifndef OSD_WINDOWS

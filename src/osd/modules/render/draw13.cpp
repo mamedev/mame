@@ -899,6 +899,32 @@ texture_info *renderer_sdl1::texture_find(const render_primitive &prim, const qu
 }
 
 //============================================================
+//  exit
+//============================================================
+
+void renderer_sdl1::exit()
+{
+	if (s_blit_info_initialized)
+	{
+		for (int i = 0; i <= SDL_TEXFORMAT_LAST; i++)
+		{
+			for (copy_info_t *bi = s_blit_info[i]; bi != nullptr; )
+			{
+				if (bi->pixel_count)
+					osd_printf_verbose("%s -> %s %s blendmode 0x%02x, %d samples: %d KPixel/sec\n", bi->srcname, bi->dstname,
+							bi->blitter->m_is_rot ? "rot" : "norot", bi->bm_mask, bi->samples,
+							(int) bi->perf);
+				copy_info_t *freeme = bi;
+				bi = bi->next;
+				global_free(freeme);
+			}
+			s_blit_info[i] = nullptr;
+		}
+		s_blit_info_initialized = false;
+	}
+}
+
+//============================================================
 //  texture_update
 //============================================================
 
