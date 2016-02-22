@@ -660,7 +660,7 @@ msgstr "Mostra puntatore mouse"
 
 #: src/emu/ui/miscmenu.cpp:567
 msgid "Confirm quit from machines"
-msgstr "Conferma uscita dalle macchine"
+msgstr "Confermi l'uscita"
 
 #: src/emu/ui/miscmenu.cpp:568
 msgid "Skip displaying information's screen at startup"
@@ -710,7 +710,7 @@ msgstr "Settaggi"
 
 #: src/emu/ui/optsmenu.cpp:307
 msgid "**Error to save ui.ini**"
-msgstr "**Errore salvando ui.ini**"
+msgstr "**Errore nel salvataggio del file ui.ini**"
 
 #: src/emu/ui/selector.cpp:152
 msgid "Selection List - Search: "
@@ -734,7 +734,7 @@ msgstr "Salva Configurazione"
 
 #: src/emu/ui/selgame.cpp:746
 msgid " Search: "
-msgstr " Cerca:"
+msgstr " Cerca: "
 
 #: src/emu/ui/selgame.cpp:1951 src/emu/ui/selgame.cpp:2098
 #: src/emu/ui/selsoft.cpp:1486
@@ -830,7 +830,7 @@ msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
 msgstr ""
-"Una o più ROMs/CHDs per questa macchina non sono corrette/i. La macchina potrebbe non "
+"Una o più ROMs/CHDs per questa macchina non sono corrette(i). La macchina potrebbe non "
 "funzionare correttamente.\n"
 
 #: src/emu/ui/ui.cpp:1112
@@ -977,11 +977,11 @@ msgstr ""
 
 #: src/emu/ui/ui.cpp:1592
 msgid "Mode: PARTIAL Emulation"
-msgstr ""
+msgstr "Modalità: Emulazione PARZIALE"
 
 #: src/emu/ui/ui.cpp:1593
 msgid "UI:   Enabled"
-msgstr ""
+msgstr "UI:  Abilitato"
 
 #: src/emu/ui/ui.cpp:1595 src/emu/ui/ui.cpp:1605
 msgid "**Use ScrLock to toggle**"
@@ -989,11 +989,11 @@ msgstr "**Usa ScrLock per switchare**"
 
 #: src/emu/ui/ui.cpp:1602
 msgid "Mode: FULL Emulation"
-msgstr ""
+msgstr "Modalità: Emulazione COMPLETA"
 
 #: src/emu/ui/ui.cpp:1603
 msgid "UI:   Disabled"
-msgstr ""
+msgstr "UI:   Disabilitato"
 
 #: src/emu/ui/ui.cpp:1749
 msgid "Autofire can't be enabled"
@@ -1009,21 +1009,21 @@ msgstr ""
 
 #: src/emu/ui/ui.cpp:1814
 msgid "Save cancelled"
-msgstr ""
+msgstr "Salvataggio interrotto"
 
 #: src/emu/ui/ui.cpp:1816
 msgid "Load cancelled"
-msgstr ""
+msgstr "Caricamento interrotto"
 
 #: src/emu/ui/ui.cpp:1859
 #, c-format
 msgid "Save to position %s"
-msgstr ""
+msgstr "Salva da %s"
 
 #: src/emu/ui/ui.cpp:1864
 #, c-format
 msgid "Load from position %s"
-msgstr ""
+msgstr "Carica da %s"
 
 #: src/emu/ui/ui.cpp:1904
 #, c-format
