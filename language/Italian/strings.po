@@ -32,7 +32,7 @@ msgstr "Inserisci Codice"
 
 #: src/emu/ui/barcode.cpp:118
 msgid "Barcode length invalid!"
-msgstr "Lunghezza Codice a barre invalido!"
+msgstr "Lunghezza Codice a barre errata!"
 
 #: src/emu/ui/cheatopt.cpp:78
 #, c-format
@@ -399,11 +399,11 @@ msgstr "Cheat"
 
 #: src/emu/ui/dirmenu.cpp:40
 msgid "Snapshots"
-msgstr "Immagini"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:41
 msgid "Cabinets"
-msgstr "Cabinati"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:42
 msgid "Flyers"
@@ -411,7 +411,7 @@ msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:43
 msgid "Titles"
-msgstr "Titoli"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:44
 msgid "Ends"
@@ -443,7 +443,7 @@ msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:51
 msgid "Artworks Preview"
-msgstr "Anteprima Artwork"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:52
 msgid "Select"
@@ -660,7 +660,7 @@ msgstr "Mostra puntatore mouse"
 
 #: src/emu/ui/miscmenu.cpp:567
 msgid "Confirm quit from machines"
-msgstr "Conferma chiusura dalle macchine"
+msgstr "Conferma uscita dalle macchine"
 
 #: src/emu/ui/miscmenu.cpp:568
 msgid "Skip displaying information's screen at startup"
@@ -685,7 +685,7 @@ msgstr "Non mostrare il menu di selezione parti software"
 #: src/emu/ui/miscmenu.cpp:653 src/emu/ui/miscmenu.cpp:673
 #: src/emu/ui/optsmenu.cpp:250
 msgid "Miscellaneous Options"
-msgstr "Opzioni Miscellanee"
+msgstr "Opzioni Varie"
 
 #: src/emu/ui/optsmenu.cpp:201
 msgid "Filter"
@@ -710,7 +710,7 @@ msgstr "Settaggi"
 
 #: src/emu/ui/optsmenu.cpp:307
 msgid "**Error to save ui.ini**"
-msgstr "**Errore nel salvare ui.ini**"
+msgstr "**Errore salvando ui.ini**"
 
 #: src/emu/ui/selector.cpp:152
 msgid "Selection List - Search: "
@@ -791,7 +791,7 @@ msgstr "Sonoro"
 
 #: src/emu/ui/sndmenu.cpp:137
 msgid "Sample Rate"
-msgstr ""
+msgstr "Frequenza di Campionamento"
 
 #: src/emu/ui/sndmenu.cpp:138
 msgid "Use External Samples"
@@ -808,7 +808,7 @@ msgid ""
 "\n"
 msgstr ""
 "L'utilizzo di emulatori combinati alle ROMs che non possiedi è vietato dalla "
-"legge sul copyright.\n"
+"legge sul diritto d'autore.\n"
 "\n"
 
 #: src/emu/ui/ui.cpp:1063
@@ -817,7 +817,7 @@ msgid ""
 "IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS ESC.\n"
 "\n"
 msgstr ""
-"SE NON HAI I DIRITTI LEGALI NEL GIOCARE \"%s\" SU QUESTO EMULATORE, PREMI ESC.\n"
+"SE NON HAI I DIRITTI LEGALI PER GIOCARE \"%s\" SU QUESTO EMULATORE, PREMI ESC.\n"
 "\n"
 
 
@@ -830,7 +830,7 @@ msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
 msgstr ""
-"Una o più ROMs/CHDs per questa macchina sono incorretti. La macchina potrebbe non "
+"Una o più ROMs/CHDs per questa macchina non sono corrette/i. La macchina potrebbe non "
 "funzionare correttamente.\n"
 
 #: src/emu/ui/ui.cpp:1112
@@ -838,7 +838,7 @@ msgid ""
 "There are known problems with this machine\n"
 "\n"
 msgstr ""
-"Ci sono problemi noti con questa macchina\n"
+"Ci sono problemi noti per questa macchina\n"
 "\n"
 
 #: src/emu/ui/ui.cpp:1116
@@ -864,12 +864,12 @@ msgstr "I colori sono completamente sbagliati.\n"
 #: src/emu/ui/ui.cpp:1126
 #, c-format
 msgid "The video emulation isn't 100% accurate.\n"
-msgstr "L'emulazione video non è al 100% corretta.\n"
+msgstr "L'emulazione video non è corretta al 100%.\n"
 
 #: src/emu/ui/ui.cpp:1128
 #, c-format
 msgid "The sound emulation isn't 100% accurate.\n"
-msgstr "L'emulazione audio non è al 100% corretta.\n"
+msgstr "L'emulazione audio non è corretta al 100%.\n"
 
 #: src/emu/ui/ui.cpp:1130
 msgid "The machine lacks sound.\n"
@@ -896,8 +896,8 @@ msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
 msgstr ""
-"Questa macchina non ha alcun componente sonoro, MAME non produrrà alcuno sonoro, questo è "
-"il comportamento previsto.\n"
+"Questa macchina non ha alcun componente audio, MAME non produrrà alcun suono e questo è "
+"un comportamento conosciuto e non un bug.\n"
 
 #: src/emu/ui/ui.cpp:1155
 msgid "The machine has protection which isn't fully emulated.\n"
