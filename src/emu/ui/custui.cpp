@@ -192,7 +192,7 @@ ui_menu_font_ui::ui_menu_font_ui(running_machine &machine, render_container *con
 	ui_options &moptions = machine.ui().options();
 #ifdef UI_WINDOWS
 
-	std::string name(machine.ui().options().ui_font());
+	std::string name(machine.options().ui_font());
 	list();
 
 	m_bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
@@ -285,7 +285,8 @@ ui_menu_font_ui::~ui_menu_font_ui()
 		if (m_bold)
 			name.insert(0, "[B]");
 	}
-	moptions.set_value(OPTION_UI_FONT, name.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+	machine().options().set_value(OPTION_UI_FONT, name.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+	machine().options().mark_changed(OPTION_UI_FONT);
 #endif
 
 	moptions.set_value(OPTION_INFOS_SIZE, m_info_size, OPTION_PRIORITY_CMDLINE, error_string);

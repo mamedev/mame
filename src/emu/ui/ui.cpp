@@ -363,7 +363,7 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 {
 	const int maxstate = 4;
 	int str = machine().options().seconds_to_run();
-	bool show_gameinfo = !machine().ui().options().skip_gameinfo();
+	bool show_gameinfo = !machine().options().skip_gameinfo();
 	bool show_warnings = true, show_mandatory_fileman = true;
 	int state;
 
@@ -499,7 +499,7 @@ void ui_manager::update_and_render(render_container *container)
 		m_popup_text_end = 0;
 
 	// display the internal mouse cursor
-	if (m_mouse_show || (is_menu_active() && machine().ui().options().ui_mouse()))
+	if (m_mouse_show || (is_menu_active() && machine().options().ui_mouse()))
 	{
 		INT32 mouse_target_x, mouse_target_y;
 		bool mouse_button;
@@ -530,7 +530,7 @@ render_font *ui_manager::get_font()
 {
 	// allocate the font and messagebox string
 	if (m_font == nullptr)
-		m_font = machine().render().font_alloc(machine().ui().options().ui_font());
+		m_font = machine().render().font_alloc(machine().options().ui_font());
 	return m_font;
 }
 
@@ -1880,7 +1880,7 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 
 void ui_manager::request_quit()
 {
-	if (!machine().ui().options().confirm_quit())
+	if (!machine().options().confirm_quit())
 		machine().schedule_exit();
 	else
 		set_handler(handler_confirm_quit, 0);
