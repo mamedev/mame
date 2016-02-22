@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-21 20:49+0100\n"
+"POT-Creation-Date: 2016-02-22 15:05+0100\n"
 "PO-Revision-Date: 2016-02-20 18:03+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -19,78 +19,76 @@ msgstr ""
 
 #: src/emu/ui/auditmenu.cpp:111
 msgid "Audit in progress..."
-msgstr "Audit in progress..."
+msgstr ""
 
 #: src/emu/ui/barcode.cpp:72
 msgid "New Barcode:"
-msgstr "New Barcode:"
+msgstr ""
 
 #: src/emu/ui/barcode.cpp:76
 msgid "Enter Code"
-msgstr "Enter Code"
+msgstr ""
 
 #: src/emu/ui/barcode.cpp:118
 msgid "Barcode length invalid!"
-msgstr "Barcode length invalid!"
+msgstr ""
 
-#: src/emu/ui/cheatopt.cpp:78
+#: src/emu/ui/cheatopt.cpp:77
 #, c-format
 msgid ""
 "Cheat Comment:\n"
 "%s"
 msgstr ""
-"Cheat Comment:\n"
-"%s"
 
-#: src/emu/ui/cheatopt.cpp:91
+#: src/emu/ui/cheatopt.cpp:90
 msgid "All cheats reloaded"
-msgstr "All cheats reloaded"
+msgstr ""
 
-#: src/emu/ui/cheatopt.cpp:122
+#: src/emu/ui/cheatopt.cpp:121
 msgid "Autofire Settings"
-msgstr "Autofire Settings"
+msgstr ""
 
-#: src/emu/ui/cheatopt.cpp:140
+#: src/emu/ui/cheatopt.cpp:139
 msgid "Reset All"
-msgstr "Reset All"
+msgstr ""
 
-#: src/emu/ui/cheatopt.cpp:143
+#: src/emu/ui/cheatopt.cpp:142
 msgid "Reload All"
-msgstr "Reload All"
+msgstr ""
 
-#: src/emu/ui/cheatopt.cpp:259
+#: src/emu/ui/cheatopt.cpp:258
 msgid "Autofire Status"
-msgstr "Autofire Status"
+msgstr ""
 
-#: src/emu/ui/cheatopt.cpp:259 src/emu/ui/ui.cpp:1755
+#: src/emu/ui/cheatopt.cpp:258 src/emu/ui/ui.cpp:1755
 #: src/emu/ui/videoopt.cpp:207 src/emu/ui/videoopt.cpp:211
 #: src/emu/ui/videoopt.cpp:215 src/emu/ui/videoopt.cpp:219
 #: src/emu/ui/videoopt.cpp:223
 msgid "Disabled"
-msgstr "Disabled"
+msgstr ""
 
-#: src/emu/ui/cheatopt.cpp:259 src/emu/ui/ui.cpp:1755
+#: src/emu/ui/cheatopt.cpp:258 src/emu/ui/ui.cpp:1755
 #: src/emu/ui/videoopt.cpp:207 src/emu/ui/videoopt.cpp:211
 #: src/emu/ui/videoopt.cpp:215 src/emu/ui/videoopt.cpp:219
 #: src/emu/ui/videoopt.cpp:223
 msgid "Enabled"
-msgstr "Enabled"
+msgstr ""
 
-#: src/emu/ui/cheatopt.cpp:285 src/emu/ui/cheatopt.cpp:291
+#: src/emu/ui/cheatopt.cpp:284 src/emu/ui/cheatopt.cpp:290
 msgid "On"
-msgstr "On"
+msgstr ""
 
-#: src/emu/ui/cheatopt.cpp:285 src/emu/ui/cheatopt.cpp:291
+#: src/emu/ui/cheatopt.cpp:284 src/emu/ui/cheatopt.cpp:290
 msgid "Off"
-msgstr "Off"
+msgstr ""
 
-#: src/emu/ui/cheatopt.cpp:302
+#: src/emu/ui/cheatopt.cpp:301
 msgid "No buttons found on this machine!"
-msgstr "No buttons found on this machine!"
+msgstr ""
 
-#: src/emu/ui/cheatopt.cpp:313 src/emu/ui/cheatopt.cpp:317
+#: src/emu/ui/cheatopt.cpp:312 src/emu/ui/cheatopt.cpp:316
 msgid "Autofire Delay"
-msgstr "Autofire Delay"
+msgstr ""
 
 #: src/emu/ui/ctrlmenu.cpp:20
 msgid "Lightgun Device Assignment"
@@ -127,37 +125,36 @@ msgstr ""
 #: src/emu/ui/ctrlmenu.cpp:106 src/emu/ui/ctrlmenu.cpp:126
 #: src/emu/ui/optsmenu.cpp:251
 msgid "Device Mapping"
-msgstr "Device Mapping"
+msgstr ""
 
 #: src/emu/ui/custmenu.cpp:156 src/emu/ui/custmenu.cpp:441
 msgid "Main filter"
-msgstr "Main filter"
+msgstr ""
 
 #: src/emu/ui/custmenu.cpp:165 src/emu/ui/custmenu.cpp:450
 msgid "Other filter"
-msgstr "Other filter"
+msgstr ""
 
 #: src/emu/ui/custmenu.cpp:192 src/emu/ui/custmenu.cpp:504
 msgid "Remove last filter"
-msgstr "Remove last filter"
+msgstr ""
 
 #: src/emu/ui/custmenu.cpp:195 src/emu/ui/custmenu.cpp:507
 msgid "Add filter"
-msgstr "Add filter"
+msgstr ""
 
 #: src/emu/ui/custmenu.cpp:210 src/emu/ui/custmenu.cpp:230
 #: src/emu/ui/custmenu.cpp:523 src/emu/ui/custmenu.cpp:543
 msgid "Select custom filters:"
-msgstr "Select custom filters:"
+msgstr ""
 
 #: src/emu/ui/custui.cpp:20
 msgid "Show All"
 msgstr ""
 
 #: src/emu/ui/custui.cpp:21
-#, fuzzy
 msgid "Hide Filters"
-msgstr "Add filter"
+msgstr ""
 
 #: src/emu/ui/custui.cpp:22
 msgid "Hide Info/Image"
@@ -184,152 +181,146 @@ msgid "Show side panels"
 msgstr ""
 
 #: src/emu/ui/custui.cpp:162 src/emu/ui/custui.cpp:182
-#, fuzzy
 msgid "Custom UI Settings"
-msgstr "Autofire Settings"
+msgstr ""
 
-#: src/emu/ui/custui.cpp:369
+#: src/emu/ui/custui.cpp:370
 msgid "UI Font"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:373
+#: src/emu/ui/custui.cpp:374
 msgid "Bold"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:374
+#: src/emu/ui/custui.cpp:375
 msgid "Italic"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:380
+#: src/emu/ui/custui.cpp:381
 msgid "Lines"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:388
+#: src/emu/ui/custui.cpp:389
 msgid "Infos text size"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:405
+#: src/emu/ui/custui.cpp:406
 msgid "UI Fonts Settings"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:432
+#: src/emu/ui/custui.cpp:433
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 msgstr ""
 
-#: src/emu/ui/custui.cpp:530
+#: src/emu/ui/custui.cpp:531
 msgid "Normal text"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:531
-#, fuzzy
-msgid "Selected color"
-msgstr "Select custom filters:"
-
 #: src/emu/ui/custui.cpp:532
-msgid "Normal text background"
+msgid "Selected color"
 msgstr ""
 
 #: src/emu/ui/custui.cpp:533
-msgid "Selected background color"
+msgid "Normal text background"
 msgstr ""
 
 #: src/emu/ui/custui.cpp:534
+msgid "Selected background color"
+msgstr ""
+
+#: src/emu/ui/custui.cpp:535
 msgid "Subitem color"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:535 src/emu/ui/custui.cpp:630
+#: src/emu/ui/custui.cpp:536 src/emu/ui/custui.cpp:631
 msgid "Clone"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:536
+#: src/emu/ui/custui.cpp:537
 msgid "Border"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:537
+#: src/emu/ui/custui.cpp:538
 msgid "Background"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:538
-#, fuzzy
-msgid "Dipswitch"
-msgstr "Dip Switches"
-
 #: src/emu/ui/custui.cpp:539
-msgid "Unavailable color"
+msgid "Dipswitch"
 msgstr ""
 
 #: src/emu/ui/custui.cpp:540
-#, fuzzy
-msgid "Slider color"
-msgstr "Slider Controls"
+msgid "Unavailable color"
+msgstr ""
 
 #: src/emu/ui/custui.cpp:541
-msgid "Gfx viewer background"
+msgid "Slider color"
 msgstr ""
 
 #: src/emu/ui/custui.cpp:542
-msgid "Mouse over color"
+msgid "Gfx viewer background"
 msgstr ""
 
 #: src/emu/ui/custui.cpp:543
-msgid "Mouse over background color"
+msgid "Mouse over color"
 msgstr ""
 
 #: src/emu/ui/custui.cpp:544
-msgid "Mouse down color"
+msgid "Mouse over background color"
 msgstr ""
 
 #: src/emu/ui/custui.cpp:545
+msgid "Mouse down color"
+msgstr ""
+
+#: src/emu/ui/custui.cpp:546
 msgid "Mouse down background color"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:548
+#: src/emu/ui/custui.cpp:549
 msgid "Restore originals colors"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:564
-#, fuzzy
+#: src/emu/ui/custui.cpp:565
 msgid "UI Colors Settings"
-msgstr "Autofire Settings"
+msgstr ""
 
-#: src/emu/ui/custui.cpp:592 src/emu/ui/selector.cpp:181
+#: src/emu/ui/custui.cpp:593 src/emu/ui/selector.cpp:181
 msgid "Double click or press "
 msgstr ""
 
-#: src/emu/ui/custui.cpp:592
+#: src/emu/ui/custui.cpp:593
 msgid " to change the color value"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:618
+#: src/emu/ui/custui.cpp:619
 msgid "Menu Preview"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:626
+#: src/emu/ui/custui.cpp:627
 msgid "Normal"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:627
+#: src/emu/ui/custui.cpp:628
 msgid "Subitem"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:628
+#: src/emu/ui/custui.cpp:629
 msgid "Selected"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:629
+#: src/emu/ui/custui.cpp:630
 msgid "Mouse Over"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:896
+#: src/emu/ui/custui.cpp:897
 msgid "Choose from palette"
 msgstr ""
 
-#: src/emu/ui/custui.cpp:912
-#, fuzzy
+#: src/emu/ui/custui.cpp:913
 msgid " - ARGB Settings"
-msgstr "Autofire Settings"
+msgstr ""
 
-#: src/emu/ui/custui.cpp:936
+#: src/emu/ui/custui.cpp:937
 msgid "Color preview ="
 msgstr ""
 
@@ -400,9 +391,8 @@ msgid "Icons"
 msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:39 src/emu/ui/miscmenu.cpp:565
-#, fuzzy
 msgid "Cheats"
-msgstr "Cheat"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:40
 msgid "Snapshots"
@@ -437,9 +427,8 @@ msgid "Controls Panels"
 msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:48
-#, fuzzy
 msgid "Crosshairs"
-msgstr "Crosshair Options"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:49
 msgid "Artworks"
@@ -450,14 +439,12 @@ msgid "Bosses"
 msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:51
-#, fuzzy
 msgid "Artworks Preview"
-msgstr "Network Devices"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:52
-#, fuzzy
 msgid "Select"
-msgstr "Bios Selection"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:53
 msgid "GameOver"
@@ -496,14 +483,12 @@ msgid "Change Folder"
 msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:195
-#, fuzzy
 msgid "Add Folder"
-msgstr "Add filter"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:198
-#, fuzzy
 msgid "Remove Folder"
-msgstr "Remove last filter"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:512
 msgid "Change)"
@@ -531,110 +516,108 @@ msgstr ""
 
 #: src/emu/ui/dsplmenu.cpp:205 src/emu/ui/dsplmenu.cpp:225
 #: src/emu/ui/optsmenu.cpp:248
-#, fuzzy
 msgid "Display Options"
-msgstr "Video Options"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:53
 msgid "Input (general)"
-msgstr "Input (general)"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:55
 msgid "Input (this Machine)"
-msgstr "Input (this Machine)"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:59
 msgid "Analog Controls"
-msgstr "Analog Controls"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:61
 msgid "Dip Switches"
-msgstr "Dip Switches"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:64
 msgid "Machine Configuration"
-msgstr "Machine Configuration"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:68
 msgid "Bookkeeping Info"
-msgstr "Bookkeeping Info"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:71
 msgid "Machine Information"
-msgstr "Machine Information"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:77
 msgid "Image Information"
-msgstr "Image Information"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:80
 msgid "File Manager"
-msgstr "File Manager"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:85
 msgid "Tape Control"
-msgstr "Tape Control"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:90
 msgid "Pseudo terminals"
-msgstr "Pseudo terminals"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:93
 msgid "Bios Selection"
-msgstr "Bios Selection"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:99
 msgid "Slot Devices"
-msgstr "Slot Devices"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:106
 msgid "Barcode Reader"
-msgstr "Barcode Reader"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:113
 msgid "Network Devices"
-msgstr "Network Devices"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:118
 msgid "Keyboard Mode"
-msgstr "Keyboard Mode"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:121
 msgid "Slider Controls"
-msgstr "Slider Controls"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:124
 msgid "Video Options"
-msgstr "Video Options"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:128
 msgid "Crosshair Options"
-msgstr "Crosshair Options"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:132
 msgid "Cheat"
-msgstr "Cheat"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:136
 msgid "External DAT View"
-msgstr "External DAT View"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:142
 msgid "Add To Favorites"
-msgstr "Add To Favorites"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:144
 msgid "Remove From Favorites"
-msgstr "Remove From Favorites"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:151
 msgid "Select New Machine"
-msgstr "Select New Machine"
+msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:35
-#, fuzzy
 msgid "Keyboard Mode:"
-msgstr "Keyboard Mode"
+msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:35
 msgid "Natural"
@@ -645,9 +628,8 @@ msgid "Emulated"
 msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:89 src/emu/ui/slotopt.cpp:172
-#, fuzzy
 msgid "Reset"
-msgstr "Reset All"
+msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:263
 msgid " (locked)"
@@ -690,9 +672,8 @@ msgid "Use image as background"
 msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:571
-#, fuzzy
 msgid "Skip bios selection menu"
-msgstr "Bios Selection"
+msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:572
 msgid "Skip software parts selection menu"
@@ -700,14 +681,12 @@ msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:653 src/emu/ui/miscmenu.cpp:673
 #: src/emu/ui/optsmenu.cpp:250
-#, fuzzy
 msgid "Miscellaneous Options"
-msgstr "Video Options"
+msgstr ""
 
 #: src/emu/ui/optsmenu.cpp:201
-#, fuzzy
 msgid "Filter"
-msgstr "Add filter"
+msgstr ""
 
 #: src/emu/ui/optsmenu.cpp:246
 msgid "Customize UI"
@@ -715,18 +694,16 @@ msgstr ""
 
 #: src/emu/ui/optsmenu.cpp:249 src/emu/ui/sndmenu.cpp:152
 #: src/emu/ui/sndmenu.cpp:172
-#, fuzzy
 msgid "Sound Options"
-msgstr "Video Options"
+msgstr ""
 
 #: src/emu/ui/optsmenu.cpp:252
 msgid "General Inputs"
 msgstr ""
 
 #: src/emu/ui/optsmenu.cpp:267 src/emu/ui/optsmenu.cpp:287
-#, fuzzy
 msgid "Settings"
-msgstr "Autofire Settings"
+msgstr ""
 
 #: src/emu/ui/optsmenu.cpp:307
 msgid "**Error to save ui.ini**"
@@ -741,18 +718,16 @@ msgid " to select"
 msgstr ""
 
 #: src/emu/ui/selgame.cpp:623 src/emu/ui/simpleselgame.cpp:264
-#, fuzzy
 msgid "Configure Options"
-msgstr "Crosshair Options"
+msgstr ""
 
 #: src/emu/ui/selgame.cpp:624
 msgid "Configure Directories"
 msgstr ""
 
 #: src/emu/ui/selgame.cpp:625 src/emu/ui/simpleselgame.cpp:265
-#, fuzzy
 msgid "Save Configuration"
-msgstr "Machine Configuration"
+msgstr ""
 
 #: src/emu/ui/selgame.cpp:746
 msgid " Search: "
@@ -800,9 +775,8 @@ msgid "Software part selection:"
 msgstr ""
 
 #: src/emu/ui/selsoft.cpp:1960 src/emu/ui/selsoft.cpp:1980
-#, fuzzy
 msgid "Bios selection:"
-msgstr "Bios Selection"
+msgstr ""
 
 #: src/emu/ui/slotopt.cpp:166
 msgid " [internal]"
@@ -970,9 +944,8 @@ msgid "Mode: PARTIAL Emulation"
 msgstr ""
 
 #: src/emu/ui/ui.cpp:1593
-#, fuzzy
 msgid "UI:   Enabled"
-msgstr "Enabled"
+msgstr ""
 
 #: src/emu/ui/ui.cpp:1595 src/emu/ui/ui.cpp:1605
 msgid "**Use ScrLock to toggle**"
@@ -983,9 +956,8 @@ msgid "Mode: FULL Emulation"
 msgstr ""
 
 #: src/emu/ui/ui.cpp:1603
-#, fuzzy
 msgid "UI:   Disabled"
-msgstr "Disabled"
+msgstr ""
 
 #: src/emu/ui/ui.cpp:1749
 msgid "Autofire can't be enabled"
@@ -1060,14 +1032,12 @@ msgid "Screen"
 msgstr ""
 
 #: src/emu/ui/ui.cpp:2560
-#, fuzzy
 msgid "Crosshair Scale"
-msgstr "Crosshair Options"
+msgstr ""
 
 #: src/emu/ui/ui.cpp:2579
-#, fuzzy
 msgid "Crosshair Offset"
-msgstr "Crosshair Options"
+msgstr ""
 
 #: src/emu/ui/videoopt.cpp:55
 #, c-format
