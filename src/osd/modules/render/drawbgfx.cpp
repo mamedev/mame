@@ -176,6 +176,7 @@ renderer_bgfx::~renderer_bgfx()
 void renderer_bgfx::exit()
 {
 	bgfx::shutdown();
+	s_window_set = false;
 }
 
 //============================================================
