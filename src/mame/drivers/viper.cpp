@@ -2449,7 +2449,7 @@ ROM_START(p911ea)
 	ROM_LOAD("a00eaa_nvram.u39", 0x000000, 0x2000,  CRC(4f3497b6) SHA1(3045c54f98dff92cdf3a1fc0cd4c76ba82d632d7) )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "a00eaa02", 0, SHA1(fa057bf17f4c0fb9b9a09b820ff7a101e44fab7d) )
+	DISK_IMAGE( "a00eaa02_ea", 0, SHA1(fa057bf17f4c0fb9b9a09b820ff7a101e44fab7d) )
 ROM_END
 
 ROM_START(p911j) //*
