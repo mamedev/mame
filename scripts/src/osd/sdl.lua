@@ -49,9 +49,24 @@ function maintargetosdoptions(_target,_subtarget)
 
 	if _OPTIONS["targetos"]=="windows" then
 		if _OPTIONS["USE_LIBSDL"]~="1" then
-			links {
-				"SDL2.dll",
-			}
+			configuration { "mingw*"}
+				links {
+					"SDL2.dll",
+				}
+			configuration { "x64","vs*" }
+				libdirs {
+					MAME_DIR .. "3rdparty/sdl2/lib/x64",
+				}
+			configuration { "x32","vs*" }
+				libdirs {
+					MAME_DIR .. "3rdparty/sdl2/lib/x86",
+				}
+				
+			configuration { "vs*"}
+				links {
+					"SDL2",
+				}
+			configuration { }
 		else
 			local str = backtick(sdlconfigcmd() .. " --libs | sed 's/ -lSDLmain//'")
 			addlibfromstring(str)
@@ -488,9 +503,23 @@ if _OPTIONS["with-tools"] then
 
 		if _OPTIONS["targetos"] == "windows" then
 			if _OPTIONS["USE_LIBSDL"]~="1" then
-				links {
-					"SDL2.dll",
-				}
+				configuration { "mingw*"}
+					links {
+						"SDL2.dll",
+					}
+				configuration { "x64","vs*" }
+					libdirs {
+						MAME_DIR .. "3rdparty/sdl2/lib/x64",
+					}
+				configuration { "x32","vs*" }
+					libdirs {
+						MAME_DIR .. "3rdparty/sdl2/lib/x86",
+					}					
+				configuration { "vs*"}
+					links {
+						"SDL2",
+					}
+				configuration { }
 			else
 				local str = backtick(sdlconfigcmd() .. " --libs | sed 's/ -lSDLmain//'")
 				addlibfromstring(str)

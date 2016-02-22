@@ -14,7 +14,7 @@
 
 /* Only problems ... */
 #if defined(_WIN32)
-#define SDLMAME_WIN32
+#define SDLMAME_WIN32 1
 #define _SDL_main_h
 #endif
 
