@@ -23,8 +23,8 @@ enum ay31015_input_pin_t
 	AY31015_CS = 34,          /*  CS   - Pin 34 - Control strobe */
 	AY31015_NP = 35,          /*  NP   - Pin 35 - No parity */
 	AY31015_TSB = 36,         /*  TSB  - Pin 36 - Number of stop bits */
-	AY31015_NB1 = 37,         /*  NB1  - Pin 37 - Number of bits #1 */
-	AY31015_NB2 = 38,         /*  NB2  - Pin 38 - Number of bits #2 */
+	AY31015_NB2 = 37,         /*  NB2  - Pin 37 - Number of bits #2 */
+	AY31015_NB1 = 38,         /*  NB1  - Pin 38 - Number of bits #1 */
 	AY31015_EPS = 39          /*  EPS  - Pin 39 - Odd/Even parity select */
 };
 
