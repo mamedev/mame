@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-21 20:49+0100\n"
 "PO-Revision-Date: 2016-02-20 18:03+0100\n"
-"Last-Translator: Angelo Salese\n"
+"Last-Translator: Angelo Salese,Antonio Paradossi,Fabio Priuli\n"
 "Language-Team: MAME Language Team\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -28,11 +28,11 @@ msgstr "Nuovo codice a barre:"
 
 #: src/emu/ui/barcode.cpp:76
 msgid "Enter Code"
-msgstr "Inserisci Codice"
+msgstr "Inserisci codice a barre"
 
 #: src/emu/ui/barcode.cpp:118
 msgid "Barcode length invalid!"
-msgstr "Lunghezza Codice a barre errata!"
+msgstr "Lunghezza codice a barre errata!"
 
 #: src/emu/ui/cheatopt.cpp:78
 #, c-format
@@ -45,11 +45,11 @@ msgstr ""
 
 #: src/emu/ui/cheatopt.cpp:91
 msgid "All cheats reloaded"
-msgstr "Tutti i cheat ricaricati"
+msgstr "Ricaricati tutti i cheat"
 
 #: src/emu/ui/cheatopt.cpp:122
 msgid "Autofire Settings"
-msgstr "Settaggio Autofire"
+msgstr "Settaggi Autofire"
 
 #: src/emu/ui/cheatopt.cpp:140
 msgid "Reset All"
@@ -79,15 +79,15 @@ msgstr "Abilitato"
 
 #: src/emu/ui/cheatopt.cpp:285 src/emu/ui/cheatopt.cpp:291
 msgid "On"
-msgstr ""
+msgstr "Attivo"
 
 #: src/emu/ui/cheatopt.cpp:285 src/emu/ui/cheatopt.cpp:291
 msgid "Off"
-msgstr ""
+msgstr "Inattivo"
 
 #: src/emu/ui/cheatopt.cpp:302
 msgid "No buttons found on this machine!"
-msgstr "Nessun tasto trovato per questa macchina!"
+msgstr "Nessun tasto/pulsante trovato per questa macchina!"
 
 #: src/emu/ui/cheatopt.cpp:313 src/emu/ui/cheatopt.cpp:317
 msgid "Autofire Delay"
@@ -149,7 +149,7 @@ msgstr "Aggiungi filtro"
 #: src/emu/ui/custmenu.cpp:210 src/emu/ui/custmenu.cpp:230
 #: src/emu/ui/custmenu.cpp:523 src/emu/ui/custmenu.cpp:543
 msgid "Select custom filters:"
-msgstr "Seleziona filtro custom:"
+msgstr "Seleziona filtro personalizzato:"
 
 #: src/emu/ui/custui.cpp:20
 msgid "Show All"
@@ -189,7 +189,7 @@ msgstr "Settaggi UI Custom"
 
 #: src/emu/ui/custui.cpp:369
 msgid "UI Font"
-msgstr ""
+msgstr "Font UI"
 
 #: src/emu/ui/custui.cpp:373
 msgid "Bold"
@@ -209,7 +209,7 @@ msgstr "Grandezza testo info"
 
 #: src/emu/ui/custui.cpp:405
 msgid "UI Fonts Settings"
-msgstr "Settaggi UI Font"
+msgstr "Settaggi Font UI"
 
 #: src/emu/ui/custui.cpp:432
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -229,7 +229,7 @@ msgstr "Sfondo testo normale"
 
 #: src/emu/ui/custui.cpp:533
 msgid "Selected background color"
-msgstr "Sfondo colore selezionato"
+msgstr "Colore sfondo selezionato"
 
 #: src/emu/ui/custui.cpp:534
 msgid "Subitem color"
@@ -261,7 +261,7 @@ msgstr "Colore slider"
 
 #: src/emu/ui/custui.cpp:541
 msgid "Gfx viewer background"
-msgstr "Sfondo vista Gfx"
+msgstr "Sfondo visualizzatore Gfx"
 
 #: src/emu/ui/custui.cpp:542
 msgid "Mouse over color"
@@ -269,7 +269,7 @@ msgstr "Colore mouse over"
 
 #: src/emu/ui/custui.cpp:543
 msgid "Mouse over background color"
-msgstr "Colore di sfondo mouse over"
+msgstr "Colore sfondo mouse over"
 
 #: src/emu/ui/custui.cpp:544
 msgid "Mouse down color"
@@ -277,7 +277,7 @@ msgstr "Colore mouse down"
 
 #: src/emu/ui/custui.cpp:545
 msgid "Mouse down background color"
-msgstr "Colore di sfondo mouse down"
+msgstr "Colore sfondo mouse down"
 
 #: src/emu/ui/custui.cpp:548
 msgid "Restore originals colors"
@@ -285,11 +285,11 @@ msgstr "Ripristina colori originali"
 
 #: src/emu/ui/custui.cpp:564
 msgid "UI Colors Settings"
-msgstr "Settaggi Colori di UI"
+msgstr "Settaggi Colori UI"
 
 #: src/emu/ui/custui.cpp:592 src/emu/ui/selector.cpp:181
 msgid "Double click or press "
-msgstr "Doppio click o digita "
+msgstr "Doppio click o premi "
 
 #: src/emu/ui/custui.cpp:592
 msgid " to change the color value"
@@ -329,7 +329,7 @@ msgstr "Anteprima colore ="
 
 #: src/emu/ui/datmenu.cpp:59
 msgid "Software History"
-msgstr "Storico Software"
+msgstr "History Software"
 
 #: src/emu/ui/datmenu.cpp:61
 msgid "Software Usage"
@@ -471,7 +471,7 @@ msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:115 src/emu/ui/dirmenu.cpp:135
 msgid "Folders Setup"
-msgstr "Settaggio Cartelle"
+msgstr "Configura Cartelle"
 
 #: src/emu/ui/dirmenu.cpp:182
 msgid "Current "
@@ -544,7 +544,7 @@ msgstr "Configurazione Macchina"
 
 #: src/emu/ui/mainmenu.cpp:68
 msgid "Bookkeeping Info"
-msgstr "Info Contabilit√†"
+msgstr "Info Contabilit‡"
 
 #: src/emu/ui/mainmenu.cpp:71
 msgid "Machine Information"
@@ -584,7 +584,7 @@ msgstr "Dispositivi Network"
 
 #: src/emu/ui/mainmenu.cpp:118
 msgid "Keyboard Mode"
-msgstr "Modalit√† Tastiera"
+msgstr "Modalit‡ Tastiera"
 
 #: src/emu/ui/mainmenu.cpp:121
 msgid "Slider Controls"
@@ -604,7 +604,7 @@ msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:136
 msgid "External DAT View"
-msgstr "Vista DAT Esterna"
+msgstr "Vista DAT Esterni"
 
 #: src/emu/ui/mainmenu.cpp:142
 msgid "Add To Favorites"
@@ -620,7 +620,7 @@ msgstr "Seleziona Nuova Macchina"
 
 #: src/emu/ui/miscmenu.cpp:35
 msgid "Keyboard Mode:"
-msgstr "Modalit√† Tastiera:"
+msgstr "Modalit‡ Tastiera:"
 
 #: src/emu/ui/miscmenu.cpp:35
 msgid "Natural"
@@ -644,7 +644,7 @@ msgstr "Delay Visibile"
 
 #: src/emu/ui/miscmenu.cpp:562
 msgid "Re-select last machine played"
-msgstr "Riseleziona l'ultima macchina giocata"
+msgstr "Riseleziona l'ultima macchina emulata"
 
 #: src/emu/ui/miscmenu.cpp:563
 msgid "Enlarge images in the right panel"
@@ -664,11 +664,11 @@ msgstr "Confermi l'uscita"
 
 #: src/emu/ui/miscmenu.cpp:568
 msgid "Skip displaying information's screen at startup"
-msgstr "Non mostrare le schermate informative all'inizio"
+msgstr "Non mostrare le schermate informative all'avvio"
 
 #: src/emu/ui/miscmenu.cpp:569
 msgid "Force 4:3 appearance for software snapshot"
-msgstr "Forza i 4:3 per gli snapshot dei software"
+msgstr "Forza ratio 4:3 per gli snapshot del software"
 
 #: src/emu/ui/miscmenu.cpp:570
 msgid "Use image as background"
@@ -680,7 +680,7 @@ msgstr "Non mostrare il menu di selezione BIOS"
 
 #: src/emu/ui/miscmenu.cpp:572
 msgid "Skip software parts selection menu"
-msgstr "Non mostrare il menu di selezione parti software"
+msgstr "Non mostrare il menu di selezione del software"
 
 #: src/emu/ui/miscmenu.cpp:653 src/emu/ui/miscmenu.cpp:673
 #: src/emu/ui/optsmenu.cpp:250
@@ -693,7 +693,7 @@ msgstr "Filtri"
 
 #: src/emu/ui/optsmenu.cpp:246
 msgid "Customize UI"
-msgstr "Customizza UI"
+msgstr "Personalizza UI"
 
 #: src/emu/ui/optsmenu.cpp:249 src/emu/ui/sndmenu.cpp:152
 #: src/emu/ui/sndmenu.cpp:172
@@ -775,7 +775,7 @@ msgstr "Cerca: "
 
 #: src/emu/ui/selsoft.cpp:1822 src/emu/ui/selsoft.cpp:1842
 msgid "Software part selection:"
-msgstr "Selezione parte Software:"
+msgstr "Selezione parte software:"
 
 #: src/emu/ui/selsoft.cpp:1960 src/emu/ui/selsoft.cpp:1980
 msgid "Bios selection:"
@@ -799,7 +799,7 @@ msgstr "Usa Sample Esterni"
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
-msgstr "Questo driver richiede immagini caricate nel dispositivo(i) seguente: "
+msgstr "Questo driver richiede software caricato nel(i) dispositivo(i) seguente(i): "
 
 #: src/emu/ui/ui.cpp:1062
 msgid ""
@@ -807,7 +807,7 @@ msgid ""
 "copyright law.\n"
 "\n"
 msgstr ""
-"L'utilizzo di emulatori combinati alle ROMs che non possiedi √® vietato dalla "
+"L'utilizzo di emulatori combinati con ROMs che non possiedi Ë vietato dalla "
 "legge sul diritto d'autore.\n"
 "\n"
 
@@ -830,7 +830,7 @@ msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
 msgstr ""
-"Una o pi√π ROMs/CHDs per questa macchina non sono corrette(i). La macchina potrebbe non "
+"Uno o pi˘ ROM/CHD per questa macchina non sono corretti. La macchina potrebbe non "
 "funzionare correttamente.\n"
 
 #: src/emu/ui/ui.cpp:1112
@@ -845,12 +845,12 @@ msgstr ""
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
 msgstr ""
-"Una o pi√π ROMs/CHDs per questa macchina non √® dumpata correttamente.\n"
+"Uno o pi˘ ROM/CHD per questa macchina non Ë dumpato correttamente.\n"
 
 #: src/emu/ui/ui.cpp:1120
 #, c-format
 msgid "The keyboard emulation may not be 100% accurate.\n"
-msgstr "L'emulazione tastiera potrebbe non essere al 100% corretta.\n"
+msgstr "L'emulazione della tastiera potrebbe non essere al 100% corretta.\n"
 
 #: src/emu/ui/ui.cpp:1122
 #, c-format
@@ -864,12 +864,12 @@ msgstr "I colori sono completamente sbagliati.\n"
 #: src/emu/ui/ui.cpp:1126
 #, c-format
 msgid "The video emulation isn't 100% accurate.\n"
-msgstr "L'emulazione video non √® corretta al 100%.\n"
+msgstr "L'emulazione video non Ë corretta al 100%.\n"
 
 #: src/emu/ui/ui.cpp:1128
 #, c-format
 msgid "The sound emulation isn't 100% accurate.\n"
-msgstr "L'emulazione audio non √® corretta al 100%.\n"
+msgstr "L'emulazione audio non Ë corretta al 100%.\n"
 
 #: src/emu/ui/ui.cpp:1130
 msgid "The machine lacks sound.\n"
@@ -877,7 +877,7 @@ msgstr "La macchina non ha sonoro.\n"
 
 #: src/emu/ui/ui.cpp:1133
 msgid "Screen flipping in cocktail mode is not supported.\n"
-msgstr ""
+msgstr "L'inversione dello schermo in modalit‡ cocktail non Ë supportata"
 
 #: src/emu/ui/ui.cpp:1137
 msgid "The machine requires external artwork files\n"
@@ -888,7 +888,7 @@ msgid ""
 "This machine was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
 msgstr ""
-"Questa macchina non √® mai stata completata. Potrebbe mostrare fenomeni strani o elementi "
+"Questa macchina non Ë mai stata completata. Potrebbe mostrare fenomeni strani o elementi "
 "mancanti che non sono bug nell'emulazione.\n"
 
 #: src/emu/ui/ui.cpp:1147
@@ -896,8 +896,8 @@ msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
 msgstr ""
-"Questa macchina non ha alcun componente audio, MAME non produrr√† alcun suono e questo √® "
-"un comportamento conosciuto e non un bug.\n"
+"Questa macchina non ha alcun componente audio, MAME non produrr‡ alcun suono e questo Ë "
+"il comportamento atteso e non un bug.\n"
 
 #: src/emu/ui/ui.cpp:1155
 msgid "The machine has protection which isn't fully emulated.\n"
@@ -911,8 +911,8 @@ msgid ""
 "the developers to improve the emulation.\n"
 msgstr ""
 "\n"
-"QUESTA MACCHINA NON FUNZIONA. L'emulazione di questa macchina non ancora "
-"completa. Non c'√® nulla che tu possa fare per fissare questo problema eccetto aspettare che "
+"QUESTA MACCHINA NON FUNZIONA. L'emulazione di questa macchina non Ë ancora "
+"completa. Non c'Ë nulla che tu possa fare per risolvere questo problema eccetto aspettare che "
 "gli sviluppatori migliorino l'emulazione.\n"
 
 #: src/emu/ui/ui.cpp:1162
@@ -923,8 +923,8 @@ msgid ""
 "to fully play this machine.\n"
 msgstr ""
 "\n"
-"Alcuni elementi di questa macchina non possono essere emulati poich√© richiedono "
-"interazioni fisiche oppure dispositivi meccanici. Non √® possibile "
+"Alcuni elementi di questa macchina non possono essere emulati poichÈ richiedono "
+"interazioni fisiche oppure dispositivi meccanici. Non Ë possibile "
 "giocare completamente con questa macchina.\n"
 
 #: src/emu/ui/ui.cpp:1181
@@ -973,11 +973,11 @@ msgstr ""
 
 #: src/emu/ui/ui.cpp:1590 src/emu/ui/ui.cpp:1600
 msgid "Keyboard Emulation Status"
-msgstr ""
+msgstr "Stato emulazione tastiera"
 
 #: src/emu/ui/ui.cpp:1592
 msgid "Mode: PARTIAL Emulation"
-msgstr "Modalit√†: Emulazione PARZIALE"
+msgstr "Modalit‡: Emulazione PARZIALE"
 
 #: src/emu/ui/ui.cpp:1593
 msgid "UI:   Enabled"
@@ -989,7 +989,7 @@ msgstr "**Usa ScrLock per switchare**"
 
 #: src/emu/ui/ui.cpp:1602
 msgid "Mode: FULL Emulation"
-msgstr "Modalit√†: Emulazione COMPLETA"
+msgstr "Modalit‡: Emulazione COMPLETA"
 
 #: src/emu/ui/ui.cpp:1603
 msgid "UI:   Disabled"
@@ -997,15 +997,15 @@ msgstr "UI:   Disabilitato"
 
 #: src/emu/ui/ui.cpp:1749
 msgid "Autofire can't be enabled"
-msgstr "Autofire non pu√≤ essere abilitato"
+msgstr "Autofire non puÚ essere abilitato"
 
 #: src/emu/ui/ui.cpp:1788
 msgid "Select position to save to"
-msgstr ""
+msgstr "Seleziona la posizione in cui salvare"
 
 #: src/emu/ui/ui.cpp:1790
 msgid "Select position to load from"
-msgstr ""
+msgstr "Seleziona la posizione da cui caricare"
 
 #: src/emu/ui/ui.cpp:1814
 msgid "Save cancelled"
@@ -1033,7 +1033,7 @@ msgid ""
 "Press ''%s'' to quit,\n"
 "Press ''%s'' to return to emulation."
 msgstr ""
-"Sei sicuro che vuoi abbandonare?\n"
+"Sei sicuro di voler abbandonare?\n"
 "\n"
 "Premi ''%s'' per abbandonare,\n"
 "Premi ''%s'' per ritornare all'emulazione."
