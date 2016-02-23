@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-21 20:49+0100\n"
-"PO-Revision-Date: 2016-02-20 18:03+0100\n"
-"Last-Translator: Raf Tacker\n"
+"PO-Revision-Date: 2016-02-23 17:00+0100\n"
+"Last-Translator: Raf Tacker, Lothar Serra Mari\n"
 "Language-Team: MAME Language Team\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -40,7 +40,7 @@ msgid ""
 "Cheat Comment:\n"
 "%s"
 msgstr ""
-"Cheat Kommentar:\n"
+"Cheat-Kommentar:\n"
 "%s"
 
 #: src/emu/ui/cheatopt.cpp:91
@@ -213,11 +213,11 @@ msgstr "Einstellungen Schriftart für Benutzeroberfläche"
 
 #: src/emu/ui/custui.cpp:432
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr "Besipieltext - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+msgstr "Beispieltext - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 #: src/emu/ui/custui.cpp:530
 msgid "Normal text"
-msgstr "Normaler text"
+msgstr "Normaler Text"
 
 #: src/emu/ui/custui.cpp:531
 msgid "Selected color"
@@ -249,7 +249,7 @@ msgstr "Hintergrund"
 
 #: src/emu/ui/custui.cpp:538
 msgid "Dipswitch"
-msgstr "Dipschalter"
+msgstr "DIP-Schalter"
 
 #: src/emu/ui/custui.cpp:539
 msgid "Unavailable color"
@@ -261,7 +261,7 @@ msgstr "Schieberegler"
 
 #: src/emu/ui/custui.cpp:541
 msgid "Gfx viewer background"
-msgstr "Hintergrund Gfx Anzeige"
+msgstr "Hintergrund Gfx-Anzeige"
 
 #: src/emu/ui/custui.cpp:542
 msgid "Mouse over color"
@@ -524,7 +524,7 @@ msgstr "Anzeigeeinstellungen"
 
 #: src/emu/ui/mainmenu.cpp:53
 msgid "Input (general)"
-msgstr "Eingabe (Basis)"
+msgstr "Eingabe (allgemein)"
 
 #: src/emu/ui/mainmenu.cpp:55
 msgid "Input (this Machine)"
@@ -536,7 +536,7 @@ msgstr "Analoge Bedienelemente"
 
 #: src/emu/ui/mainmenu.cpp:61
 msgid "Dip Switches"
-msgstr "Dipschalter"
+msgstr "DIP-Schalter"
 
 #: src/emu/ui/mainmenu.cpp:64
 msgid "Machine Configuration"
@@ -548,11 +548,11 @@ msgstr "Buchhaltungsinformationen"
 
 #: src/emu/ui/mainmenu.cpp:71
 msgid "Machine Information"
-msgstr "Informationen über die Maschine"
+msgstr "Informationen über diese Maschine"
 
 #: src/emu/ui/mainmenu.cpp:77
 msgid "Image Information"
-msgstr "Informationen über die Software"
+msgstr "Informationen über diese Software"
 
 #: src/emu/ui/mainmenu.cpp:80
 msgid "File Manager"
@@ -568,7 +568,7 @@ msgstr "Pseudoterminals"
 
 #: src/emu/ui/mainmenu.cpp:93
 msgid "Bios Selection"
-msgstr "Biosauswahl"
+msgstr "BIOS-Auswahl"
 
 #: src/emu/ui/mainmenu.cpp:99
 msgid "Slot Devices"
@@ -604,7 +604,7 @@ msgstr "Cheat"
 
 #: src/emu/ui/mainmenu.cpp:136
 msgid "External DAT View"
-msgstr "Externe DAT Anzeige"
+msgstr "Externe DAT-Anzeige"
 
 #: src/emu/ui/mainmenu.cpp:142
 msgid "Add To Favorites"
@@ -621,7 +621,7 @@ msgstr "Neue Maschine auswählen"
 #: src/emu/ui/miscmenu.cpp:35
 #, fuzzy
 msgid "Keyboard Mode:"
-msgstr "Keyboardmodus"
+msgstr "Tastaturmodus"
 
 #: src/emu/ui/miscmenu.cpp:35
 msgid "Natural"
@@ -653,7 +653,7 @@ msgstr "Bilder in der rechten Kachel vergrößern"
 
 #: src/emu/ui/miscmenu.cpp:564
 msgid "DATs info"
-msgstr "DAT Informationen"
+msgstr "DAT-Informationen"
 
 #: src/emu/ui/miscmenu.cpp:566
 msgid "Show mouse pointer"
@@ -669,7 +669,7 @@ msgstr "Informationsbildschirm beim Start überspringen"
 
 #: src/emu/ui/miscmenu.cpp:569
 msgid "Force 4:3 appearance for software snapshot"
-msgstr "4:3 Ansicht für Softwareansicht erzwingen"
+msgstr "Seitenverhältnis 4:3 für Softwareansicht erzwingen"
 
 #: src/emu/ui/miscmenu.cpp:570
 msgid "Use image as background"
@@ -677,7 +677,7 @@ msgstr "Bild als Hintergrund verwenden"
 
 #: src/emu/ui/miscmenu.cpp:571
 msgid "Skip bios selection menu"
-msgstr "Menü zur Biosauswahl überspringen"
+msgstr "Menü zur BIOS-Auswahl überspringen"
 
 #: src/emu/ui/miscmenu.cpp:572
 msgid "Skip software parts selection menu"
@@ -712,7 +712,7 @@ msgstr "Einstellungen"
 
 #: src/emu/ui/optsmenu.cpp:307
 msgid "**Error to save ui.ini**"
-msgstr "**Fehler beim speichern von ui.ini**"
+msgstr "**Fehler beim Speichern von ui.ini**"
 
 #: src/emu/ui/selector.cpp:152
 msgid "Selection List - Search: "
@@ -749,7 +749,7 @@ msgstr "Verwendung"
 
 #: src/emu/ui/selsoft.cpp:109
 msgid " (default)"
-msgstr " (standard)"
+msgstr " (Standard)"
 
 #: src/emu/ui/selsoft.cpp:621
 msgid "Region: "
@@ -781,7 +781,7 @@ msgstr "Softwareauswahl:"
 
 #: src/emu/ui/selsoft.cpp:1960 src/emu/ui/selsoft.cpp:1980
 msgid "Bios selection:"
-msgstr "Biosauswahl"
+msgstr "BIOS-auswahl"
 
 #: src/emu/ui/slotopt.cpp:166
 msgid " [internal]"
@@ -823,7 +823,7 @@ msgstr "WENN SIE NICHT BERECHTIGT SIND \"%s\" IN DIESEM EMULATOR ZU VERWENDEN, D
 
 #: src/emu/ui/ui.cpp:1064
 msgid "Otherwise, type OK or move the joystick left then right to continue"
-msgstr "Andernfalls drücken sie OK or bewegen Sie den Joystick nach links und dann nach rechts um fortzufahren"
+msgstr "Andernfalls drücken Sie OK oder bewegen Sie den Joystick nach links und dann nach rechts um fortzufahren"
 
 #: src/emu/ui/ui.cpp:1099
 msgid ""
@@ -831,7 +831,7 @@ msgid ""
 "run correctly.\n"
 msgstr ""
 "Ein oder mehrere ROMs/CHDs für diese Maschine sind inkorrekt. Die Maschine "
-"könnte nicht korrekt arbeiten.\n"
+"wird eventuell nicht korrekt arbeiten.\n"
 
 #: src/emu/ui/ui.cpp:1112
 msgid ""
@@ -850,26 +850,26 @@ msgstr ""
 #: src/emu/ui/ui.cpp:1120
 #, c-format
 msgid "The keyboard emulation may not be 100% accurate.\n"
-msgstr "Die Tastaturemulation könnte nicht 100% korrekt arbeiten.\n"
+msgstr "Die Tastaturemulation könnte nicht zu 100% korrekt arbeiten.\n"
 
 #: src/emu/ui/ui.cpp:1122
 #, c-format
 msgid "The colors aren't 100% accurate.\n"
-msgstr "Die Farben sind nicht 100% korrekt.\n"
+msgstr "Die Farben sind nicht zu 100% korrekt.\n"
 
 #: src/emu/ui/ui.cpp:1124
 msgid "The colors are completely wrong.\n"
-msgstr "Die Farben sind komplette falsch.\n"
+msgstr "Die Farben sind komplett falsch.\n"
 
 #: src/emu/ui/ui.cpp:1126
 #, c-format
 msgid "The video emulation isn't 100% accurate.\n"
-msgstr "Die Videoemulation ist nicht 100% korrekt.\n"
+msgstr "Die Videoemulation ist nicht zu 100% korrekt.\n"
 
 #: src/emu/ui/ui.cpp:1128
 #, c-format
 msgid "The sound emulation isn't 100% accurate.\n"
-msgstr "Die Soundemulation ist nicht 100% korrekt.\n"
+msgstr "Die Soundemulation ist nicht zu 100% korrekt.\n"
 
 #: src/emu/ui/ui.cpp:1130
 msgid "The machine lacks sound.\n"
@@ -1032,7 +1032,7 @@ msgid ""
 "Press ''%s'' to quit,\n"
 "Press ''%s'' to return to emulation."
 msgstr ""
-"Sind Sie sicher, dass Sie Beenden wollen?\n"
+"Sind Sie sicher, dass Sie beenden wollen?\n"
 "\n"
 "Zum Beenden drücken Sie ''%s''.\n"
 "Um zur Emulation zurückzukehren drücken Sie ''%s''."
@@ -1051,11 +1051,11 @@ msgstr "Vektorflicker"
 
 #: src/emu/ui/ui.cpp:2096
 msgid "Beam Width Minimum"
-msgstr "Minimum Strahlbreite"
+msgstr "Minimale Strahlbreite"
 
 #: src/emu/ui/ui.cpp:2098
 msgid "Beam Width Maximum"
-msgstr "Maximum Strahlbreite"
+msgstr "Maximale Strahlbreite"
 
 #: src/emu/ui/ui.cpp:2100
 msgid "Beam Intensity Weight"
@@ -1077,7 +1077,7 @@ msgstr "Fadenkreuzskalierung"
 #: src/emu/ui/ui.cpp:2579
 #, fuzzy
 msgid "Crosshair Offset"
-msgstr "Fadenkreuzoffset"
+msgstr "Fadenkreuzversatz"
 
 #: src/emu/ui/videoopt.cpp:55
 #, c-format
