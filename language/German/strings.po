@@ -809,8 +809,8 @@ msgid ""
 "copyright law.\n"
 "\n"
 msgstr ""
-"Die Verwendung von Emulatoren in Verbindung mit ROMs die Sie nicht besitzen "
-"verstößt gegen das Copyright Gesetz.\n"
+"Die unlizenzierte Beschaffung und Verwendung von Computerprogrammen (einschließlich "
+"ROM-Inhalten), beispielsweise zur Nutzung in einem Emulator, stellt einen Verstoß gegen das Urheberrecht dar.\n"
 "\n"
 
 #: src/emu/ui/ui.cpp:1063
@@ -818,12 +818,12 @@ msgstr ""
 msgid ""
 "IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS ESC.\n"
 "\n"
-msgstr "WENN SIE NICHT BERECHTIGT SIND \"%s\" IN DIESEM EMULATOR ZU VERWENDEN, DRÜCKEN SIE ESC.\n"
+msgstr "WENN SIE NICHT BERECHTIGT SIND, \"%s\" IN DIESEM EMULATOR ZU VERWENDEN, DRÜCKEN SIE ESC.\n"
 "\n"
 
 #: src/emu/ui/ui.cpp:1064
 msgid "Otherwise, type OK or move the joystick left then right to continue"
-msgstr "Andernfalls drücken Sie OK oder bewegen Sie den Joystick nach links und dann nach rechts um fortzufahren"
+msgstr "Andernfalls geben Sie OK ein oder bewegen Sie den Joystick nach links und dann nach rechts um fortzufahren"
 
 #: src/emu/ui/ui.cpp:1099
 msgid ""
