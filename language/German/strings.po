@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-21 20:49+0100\n"
-"PO-Revision-Date: 2016-02-23 17:00+0100\n"
-"Last-Translator: Raf Tacker, Lothar Serra Mari\n"
+"PO-Revision-Date: 2016-02-20 18:03+0100\n"
+"Last-Translator: Michael Zapf\n"
 "Language-Team: MAME Language Team\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -111,7 +111,7 @@ msgstr "Zuordnung ADStick"
 
 #: src/emu/ui/ctrlmenu.cpp:24
 msgid "Paddle Device Assignment"
-msgstr "Zuordnung Paddel"
+msgstr "Zuordnung Paddle"
 
 #: src/emu/ui/ctrlmenu.cpp:25
 msgid "Dial Device Assignment"
@@ -181,7 +181,7 @@ msgstr "Sprache"
 
 #: src/emu/ui/custui.cpp:147
 msgid "Show side panels"
-msgstr "Seitenkacheln anzeigen"
+msgstr "Seitenbereiche anzeigen"
 
 #: src/emu/ui/custui.cpp:162 src/emu/ui/custui.cpp:182
 msgid "Custom UI Settings"
@@ -229,7 +229,7 @@ msgstr "Normaler Texthintergrund"
 
 #: src/emu/ui/custui.cpp:533
 msgid "Selected background color"
-msgstr "Hintergrundfarbe auswählen"
+msgstr "Hintergrundfarbe für Auswahl"
 
 #: src/emu/ui/custui.cpp:534
 msgid "Subitem color"
@@ -257,7 +257,7 @@ msgstr "Nicht verfügbare Farbe"
 
 #: src/emu/ui/custui.cpp:540
 msgid "Slider color"
-msgstr "Schieberegler"
+msgstr "Schieberegler-Farbe"
 
 #: src/emu/ui/custui.cpp:541
 msgid "Gfx viewer background"
@@ -289,7 +289,7 @@ msgstr "Farbeinstellungen für Benutzeroberfläche"
 
 #: src/emu/ui/custui.cpp:592 src/emu/ui/selector.cpp:181
 msgid "Double click or press "
-msgstr "Doppelklicken Sie oder Drücken Sie"
+msgstr "Doppelklicken Sie oder drücken Sie"
 
 #: src/emu/ui/custui.cpp:592
 msgid " to change the color value"
@@ -317,11 +317,11 @@ msgstr "Mouseover"
 
 #: src/emu/ui/custui.cpp:896
 msgid "Choose from palette"
-msgstr "Von Palette wählen"
+msgstr "Aus Palette wählen"
 
 #: src/emu/ui/custui.cpp:912
 msgid " - ARGB Settings"
-msgstr " - ARGB Einstellungen"
+msgstr " - ARGB-Einstellungen"
 
 #: src/emu/ui/custui.cpp:936
 msgid "Color preview ="
@@ -419,7 +419,7 @@ msgstr "Enden"
 
 #: src/emu/ui/dirmenu.cpp:45
 msgid "PCBs"
-msgstr "Leiterplatten"
+msgstr "Platinen"
 
 #: src/emu/ui/dirmenu.cpp:46 src/emu/ui/videoopt.cpp:223
 msgid "Marquees"
@@ -507,7 +507,7 @@ msgstr " Ordner - Suche: "
 
 #: src/emu/ui/dirmenu.cpp:548
 msgid "Press TAB to set"
-msgstr "Zum setzen drücken Sie TAB"
+msgstr "Zum Setzen drücken Sie TAB"
 
 #: src/emu/ui/dirmenu.cpp:660
 msgid "Remove "
@@ -649,7 +649,7 @@ msgstr "Zuletzt verwendete Maschine erneut auswählen"
 
 #: src/emu/ui/miscmenu.cpp:563
 msgid "Enlarge images in the right panel"
-msgstr "Bilder in der rechten Kachel vergrößern"
+msgstr "Bilder im rechten Bereich vergrößern"
 
 #: src/emu/ui/miscmenu.cpp:564
 msgid "DATs info"
@@ -661,7 +661,7 @@ msgstr "Mauszeiger anzeigen"
 
 #: src/emu/ui/miscmenu.cpp:567
 msgid "Confirm quit from machines"
-msgstr "Beenden der Maschinen bestätigen"
+msgstr "Beim Verlassen Bestätigung fordern"
 
 #: src/emu/ui/miscmenu.cpp:568
 msgid "Skip displaying information's screen at startup"
@@ -669,7 +669,7 @@ msgstr "Informationsbildschirm beim Start überspringen"
 
 #: src/emu/ui/miscmenu.cpp:569
 msgid "Force 4:3 appearance for software snapshot"
-msgstr "Seitenverhältnis 4:3 für Softwareansicht erzwingen"
+msgstr "4:3-Ansicht für Bildschirmfoto erzwingen"
 
 #: src/emu/ui/miscmenu.cpp:570
 msgid "Use image as background"
@@ -801,7 +801,7 @@ msgstr "Verwende externe Samples"
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
-msgstr "Für diese Maschine müssen Abbilder in den folgenden Geräten geladen werden: "
+msgstr "Für diese Maschine müssen Abbilder in die folgenden Geräten geladen werden: "
 
 #: src/emu/ui/ui.cpp:1062
 msgid ""
@@ -830,8 +830,8 @@ msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
 msgstr ""
-"Ein oder mehrere ROMs/CHDs für diese Maschine sind inkorrekt. Die Maschine "
-"wird eventuell nicht korrekt arbeiten.\n"
+"Ein oder mehrere ROMs/CHDs für diese Maschine sind nicht korrekt. Wahrscheinlich "
+"wird die Maschine nicht richtig laufen.\n"
 
 #: src/emu/ui/ui.cpp:1112
 msgid ""
@@ -850,26 +850,26 @@ msgstr ""
 #: src/emu/ui/ui.cpp:1120
 #, c-format
 msgid "The keyboard emulation may not be 100% accurate.\n"
-msgstr "Die Tastaturemulation könnte nicht zu 100% korrekt arbeiten.\n"
+msgstr "Die Tastaturemulation könnte nicht 100% korrekt sein.\n"
 
 #: src/emu/ui/ui.cpp:1122
 #, c-format
 msgid "The colors aren't 100% accurate.\n"
-msgstr "Die Farben sind nicht zu 100% korrekt.\n"
+msgstr "Die Farben sind nicht 100% korrekt.\n"
 
 #: src/emu/ui/ui.cpp:1124
 msgid "The colors are completely wrong.\n"
-msgstr "Die Farben sind komplett falsch.\n"
+msgstr "Die Farben sind völlig falsch.\n"
 
 #: src/emu/ui/ui.cpp:1126
 #, c-format
 msgid "The video emulation isn't 100% accurate.\n"
-msgstr "Die Videoemulation ist nicht zu 100% korrekt.\n"
+msgstr "Die Videoemulation ist nicht 100% korrekt.\n"
 
 #: src/emu/ui/ui.cpp:1128
 #, c-format
 msgid "The sound emulation isn't 100% accurate.\n"
-msgstr "Die Soundemulation ist nicht zu 100% korrekt.\n"
+msgstr "Die Soundemulation ist nicht 100% korrekt.\n"
 
 #: src/emu/ui/ui.cpp:1130
 msgid "The machine lacks sound.\n"
@@ -881,26 +881,25 @@ msgstr "Die Bildschirmdrehung im Cocktailmodus wird nicht unterstützt.\n"
 
 #: src/emu/ui/ui.cpp:1137
 msgid "The machine requires external artwork files\n"
-msgstr "Die Maschine benötigt externe Illustrationsdateien"
+msgstr "Die Maschine benötigt externe Illustrationsdateien\n"
 
 #: src/emu/ui/ui.cpp:1142
 msgid ""
 "This machine was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
 msgstr ""
-"Diese Maschine wurde niemals fertiggestellt. Sie kann seltsames Verhalten oder fehlende Elemente zeigen, "
+"Diese Maschine wurde niemals fertiggestellt. Sie kann seltsames Verhalten oder fehlende Elemente aufweisen, "
 "die nicht auf Fehler der Emulation zurückzuführen sind.\n"
 
 #: src/emu/ui/ui.cpp:1147
 msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
-msgstr "Diese Maschine besitzt keine Soundhardware, MAME wird keine Töne ausgeben. "
-"Dies ist das erwartete Verhalten.\n"
+msgstr "Diese Maschine besitzt keine Sound-Hardware; MAME wird erwartungsgemäß keine Töne ausgeben.\n"
 
 #: src/emu/ui/ui.cpp:1155
 msgid "The machine has protection which isn't fully emulated.\n"
-msgstr "Die Maschine besitzt Schutzmaßnahmen, die nicht vollständig emuliert sind.\n"
+msgstr "Die Maschine besitzt Schutzvorrichtungen, die nicht vollständig emuliert sind.\n"
 
 #: src/emu/ui/ui.cpp:1158
 msgid ""
@@ -911,8 +910,8 @@ msgid ""
 msgstr ""
 "\n"
 "DIESE MASCHINE FUNKTIONIERT NICHT. Die Emulation dieser Maschine ist noch nicht vollständig. "
-"Sie können nichts tun um dieses Problem zu beheben, als darauf zu warten, das die Entwickler "
-"Emulation verbessern.\n"
+"Sie können nichts tun, um dieses Problem zu beheben, als darauf zu warten, das die Entwickler "
+"die Emulation verbessern.\n"
 
 #: src/emu/ui/ui.cpp:1162
 msgid ""
@@ -923,7 +922,7 @@ msgid ""
 msgstr ""
 "\n"
 "Verschiedene Elemente dieser Maschine können nicht emuliert werden, da sie echte "
-"physische Interaktion voraussetzen oder mechanische Komponenten beinhalten. Es ist nicht möglich "
+"physische Interaktion voraussetzen oder mechanische Komponenten beinhalten. Es ist nicht möglich, "
 "diese Maschine vollständig zu verwenden.\n"
 
 #: src/emu/ui/ui.cpp:1181
@@ -944,7 +943,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Drücken Sie OK oder bewegen Sie den Joystick nach links und dann nach rechts um fortzufahren"
+"Drücken Sie OK oder bewegen Sie den Joystick nach links und dann nach rechts, um fortzufahren"
 
 #: src/emu/ui/ui.cpp:1254
 msgid ""
@@ -988,7 +987,7 @@ msgstr "** Verwenden Sie ScrLock zum Umschalten**"
 
 #: src/emu/ui/ui.cpp:1602
 msgid "Mode: FULL Emulation"
-msgstr "Modus: KOMPLETTE Emulation"
+msgstr "Modus: VOLLSTÄNDIGE Emulation"
 
 #: src/emu/ui/ui.cpp:1603
 msgid "UI:   Disabled"
@@ -1032,7 +1031,7 @@ msgid ""
 "Press ''%s'' to quit,\n"
 "Press ''%s'' to return to emulation."
 msgstr ""
-"Sind Sie sicher, dass Sie beenden wollen?\n"
+"Sind Sie sicher, dass Sie die Emulation verlassen wollen?\n"
 "\n"
 "Zum Beenden drücken Sie ''%s''.\n"
 "Um zur Emulation zurückzukehren drücken Sie ''%s''."
@@ -1051,7 +1050,7 @@ msgstr "Vektorflicker"
 
 #: src/emu/ui/ui.cpp:2096
 msgid "Beam Width Minimum"
-msgstr "Minimale Strahlbreite"
+msgstr "Minimum Strahlbreite"
 
 #: src/emu/ui/ui.cpp:2098
 msgid "Beam Width Maximum"
