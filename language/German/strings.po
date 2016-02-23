@@ -801,7 +801,7 @@ msgstr "Verwende externe Samples"
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
-msgstr "Für diese Maschine müssen Abbilder in die folgenden Geräten geladen werden: "
+msgstr "Für diese Maschine müssen Abbilder in die folgenden Geräte geladen werden: "
 
 #: src/emu/ui/ui.cpp:1062
 msgid ""
