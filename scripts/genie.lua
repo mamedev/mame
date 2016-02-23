@@ -446,7 +446,7 @@ configurations {
 
 if _ACTION == "xcode4" then
     platforms {
-        "Universal",
+        "x64",
     }
 else
     platforms {
