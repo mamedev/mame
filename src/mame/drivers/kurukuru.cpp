@@ -128,7 +128,7 @@
   a DIP switch.
 
   If you get a 'medal jam' error, and the game is not responding anymore, press
-  RESET (key 0), and the game will reset to default values (even all counters
+  RESET (key 9), and the game will reset to default values (even all counters
   will be cleared).
 
 
@@ -158,7 +158,7 @@
 
   Bookkeeping...
 
-  Pressing Bookkeeping key (key 9), you enter the Bookkeeping Mode. There are
+  Pressing Bookkeeping key (key 0), you enter the Bookkeeping Mode. There are
   2 screens with all the game information like DIP switches and statistics...
 
   1st screen...
@@ -196,7 +196,7 @@
 
   Bookkeeping...
 
-  Pressing Bookkeeping key (key 9), you enter the Bookkeeping Mode. There are
+  Pressing Bookkeeping key (key 0), you enter the Bookkeeping Mode. There are
   2 screens with all the game information like DIP switches and statistics...
 
   1st screen...
@@ -543,11 +543,11 @@ static INPUT_PORTS_START( kurukuru )
 /*  bits d0-d3 are JAMMA top side pins 20,21,22,23, bits d4-d7 are JAMMA bottom side pins 20,21,22,23
     so that's player 1 left/right/button1/button2 then player 2 left/right/button1/button2
 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("1st (Bote/Botechin)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("2nd (Oume)")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("3rd (Pyoko/Pyokorin)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("4th (Kunio)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("5th (Pyon-Pyon)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("1st (Bote/Botechin)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("2nd (Oume)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("3rd (Pyoko/Pyokorin)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("4th (Kunio)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("5th (Pyon-Pyon)")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_N) PORT_NAME("Unknown A0h - bit5")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_M) PORT_NAME("Unknown A0h - bit6")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
@@ -556,9 +556,9 @@ static INPUT_PORTS_START( kurukuru )
 /*  routed to JAMMA top side 15, bottom 15, top 16, bottom 16, top 17, bottom 17, top 24, bottom 24
     so that's test, tilt/slam, coin 1, coin 2, p1 start, p2 start, p1 button 3, p2 button 3
 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Bookkeeping")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Medal In")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Reset Button")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Reset Button")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_A) PORT_NAME("Unknown B0h - bit4")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE (2)
@@ -620,11 +620,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ppj )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1st (Boketa)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("2nd (Kunio)")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("3rd (Pyon-Pyon)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("4th (Pyokorin)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("5th (Botechin)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("1st (Boketa)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("2nd (Kunio)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("3rd (Pyon-Pyon)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("4th (Pyokorin)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("5th (Botechin)")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_S) PORT_NAME("Unknown 70h - bit5")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_D) PORT_NAME("Unknown 70h - bit6")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
@@ -632,7 +632,7 @@ static INPUT_PORTS_START( ppj )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Medal In")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Reset Button")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Reset Button")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_A) PORT_NAME("Unknown 60h - bit4")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE (2)
