@@ -680,7 +680,7 @@ end
 		"LUA_COMPAT_5_2",
 	}
 
-	if _ACTION == "gmake" or _ACTION == "xcode4" then
+	if _ACTION == "gmake" then
 
 	--we compile C-only to C99 standard with GNU extensions
 
