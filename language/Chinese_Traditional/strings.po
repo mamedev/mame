@@ -19,7 +19,7 @@ msgstr ""
 
 #: src/emu/ui/auditmenu.cpp:111
 msgid "Audit in progress..."
-msgstr "正在驗證中..."
+msgstr "驗證中..."
 
 #: src/emu/ui/barcode.cpp:72
 msgid "New Barcode:"
@@ -212,7 +212,7 @@ msgstr "UI 字體設定"
 
 #: src/emu/ui/custui.cpp:432
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr "樣本文字 - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+msgstr "文字樣本 - 永東國酬愛鬱靈鷹袋、南去經三國，東來過五湖。"
 
 #: src/emu/ui/custui.cpp:530
 msgid "Normal text"
@@ -228,7 +228,7 @@ msgstr "一般文字背景"
 
 #: src/emu/ui/custui.cpp:533
 msgid "Selected background color"
-msgstr "選擇背景顏色"
+msgstr "已選擇背景顏色"
 
 #: src/emu/ui/custui.cpp:534
 msgid "Subitem color"
@@ -300,7 +300,7 @@ msgstr "選單預覽"
 
 #: src/emu/ui/custui.cpp:626
 msgid "Normal"
-msgstr "一般"
+msgstr "一般項目"
 
 #: src/emu/ui/custui.cpp:627
 msgid "Subitem"
@@ -362,7 +362,7 @@ msgstr "Mamescore"
 
 #: src/emu/ui/datmenu.cpp:301
 msgid "Command"
-msgstr "指令"
+msgstr "指令集"
 
 #: src/emu/ui/dirmenu.cpp:31
 msgid "ROMs"
@@ -378,7 +378,7 @@ msgstr "樣本檔"
 
 #: src/emu/ui/dirmenu.cpp:35
 msgid "DATs"
-msgstr "DAT"
+msgstr "文件"
 
 #: src/emu/ui/dirmenu.cpp:36
 msgid "INIs"
@@ -603,7 +603,7 @@ msgstr "作弊引擎"
 
 #: src/emu/ui/mainmenu.cpp:136
 msgid "External DAT View"
-msgstr "外部 DAT 檢視"
+msgstr "查閱外部文件"
 
 #: src/emu/ui/mainmenu.cpp:142
 msgid "Add To Favorites"
@@ -651,7 +651,7 @@ msgstr "右側面版放大圖片"
 
 #: src/emu/ui/miscmenu.cpp:564
 msgid "DATs info"
-msgstr "DAT 資訊"
+msgstr "文件資訊"
 
 #: src/emu/ui/miscmenu.cpp:566
 msgid "Show mouse pointer"

@@ -19,7 +19,7 @@ msgstr ""
 
 #: src/emu/ui/auditmenu.cpp:111
 msgid "Audit in progress..."
-msgstr "正在校验中..."
+msgstr "校验中..."
 
 #: src/emu/ui/barcode.cpp:72
 msgid "New Barcode:"
@@ -122,7 +122,7 @@ msgstr "配置定位设备"
 
 #: src/emu/ui/ctrlmenu.cpp:27
 msgid "Mouse Device Assignment"
-msgstr "设备"
+msgstr "配置鼠标设备"
 
 #: src/emu/ui/ctrlmenu.cpp:106 src/emu/ui/ctrlmenu.cpp:126
 #: src/emu/ui/optsmenu.cpp:251
@@ -320,7 +320,7 @@ msgstr "从色盘选择"
 
 #: src/emu/ui/custui.cpp:912
 msgid " - ARGB Settings"
-msgstr ""
+msgstr " - ARGB 设定"
 
 #: src/emu/ui/custui.cpp:936
 msgid "Color preview ="
@@ -346,23 +346,23 @@ msgstr "历史"
 
 #: src/emu/ui/datmenu.cpp:293
 msgid "Mameinfo"
-msgstr ""
+msgstr "Mameinfo"
 
 #: src/emu/ui/datmenu.cpp:295
 msgid "Messinfo"
-msgstr ""
+msgstr "Messinfo"
 
 #: src/emu/ui/datmenu.cpp:297
 msgid "Sysinfo"
-msgstr ""
+msgstr "Sysinfo"
 
 #: src/emu/ui/datmenu.cpp:299
 msgid "Mamescore"
-msgstr ""
+msgstr "Mamescore"
 
 #: src/emu/ui/datmenu.cpp:301
 msgid "Command"
-msgstr "指令"
+msgstr "出招表"
 
 #: src/emu/ui/dirmenu.cpp:31
 msgid "ROMs"
@@ -378,15 +378,15 @@ msgstr "采样文件"
 
 #: src/emu/ui/dirmenu.cpp:35
 msgid "DATs"
-msgstr ""
+msgstr "文件"
 
 #: src/emu/ui/dirmenu.cpp:36
 msgid "INIs"
-msgstr ""
+msgstr "INI"
 
 #: src/emu/ui/dirmenu.cpp:37
 msgid "Extra INIs"
-msgstr ""
+msgstr "额外的 INI"
 
 #: src/emu/ui/dirmenu.cpp:38
 msgid "Icons"
@@ -418,7 +418,7 @@ msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:45
 msgid "PCBs"
-msgstr ""
+msgstr "PCB"
 
 #: src/emu/ui/dirmenu.cpp:46 src/emu/ui/videoopt.cpp:223
 msgid "Marquees"
@@ -434,15 +434,15 @@ msgstr "十字准星"
 
 #: src/emu/ui/dirmenu.cpp:49
 msgid "Artworks"
-msgstr ""
+msgstr "装饰图"
 
 #: src/emu/ui/dirmenu.cpp:50
 msgid "Bosses"
-msgstr ""
+msgstr "首领"
 
 #: src/emu/ui/dirmenu.cpp:51
 msgid "Artworks Preview"
-msgstr ""
+msgstr "装饰图预览"
 
 #: src/emu/ui/dirmenu.cpp:52
 msgid "Select"
@@ -454,7 +454,7 @@ msgstr "游戏结束"
 
 #: src/emu/ui/dirmenu.cpp:54
 msgid "HowTo"
-msgstr ""
+msgstr "说明"
 
 #: src/emu/ui/dirmenu.cpp:55
 msgid "Logos"
@@ -470,19 +470,19 @@ msgstr "对战"
 
 #: src/emu/ui/dirmenu.cpp:115 src/emu/ui/dirmenu.cpp:135
 msgid "Folders Setup"
-msgstr ""
+msgstr "文件夹设定"
 
 #: src/emu/ui/dirmenu.cpp:182
 msgid "Current "
-msgstr ""
+msgstr "现有 "
 
 #: src/emu/ui/dirmenu.cpp:182
 msgid " Folders"
-msgstr ""
+msgstr " 文件夹"
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
-msgstr ""
+msgstr "变更文件夹"
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Add Folder"
@@ -603,7 +603,7 @@ msgstr "游戏作弊"
 
 #: src/emu/ui/mainmenu.cpp:136
 msgid "External DAT View"
-msgstr "外部 DAT 检视"
+msgstr "檢視外部文件"
 
 #: src/emu/ui/mainmenu.cpp:142
 msgid "Add To Favorites"
@@ -627,7 +627,7 @@ msgstr "自然"
 
 #: src/emu/ui/miscmenu.cpp:35
 msgid "Emulated"
-msgstr ""
+msgstr "模拟"
 
 #: src/emu/ui/miscmenu.cpp:89 src/emu/ui/slotopt.cpp:172
 msgid "Reset"
@@ -651,7 +651,7 @@ msgstr "右侧面版放大图片"
 
 #: src/emu/ui/miscmenu.cpp:564
 msgid "DATs info"
-msgstr ""
+msgstr "文件资讯"
 
 #: src/emu/ui/miscmenu.cpp:566
 msgid "Show mouse pointer"
