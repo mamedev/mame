@@ -544,7 +544,7 @@ msgstr "Configurazione Macchina"
 
 #: src/emu/ui/mainmenu.cpp:68
 msgid "Bookkeeping Info"
-msgstr "Info Contabilit‡"
+msgstr "Info Contabilit√†"
 
 #: src/emu/ui/mainmenu.cpp:71
 msgid "Machine Information"
@@ -584,7 +584,7 @@ msgstr "Dispositivi Network"
 
 #: src/emu/ui/mainmenu.cpp:118
 msgid "Keyboard Mode"
-msgstr "Modalit‡ Tastiera"
+msgstr "Modalit√† Tastiera"
 
 #: src/emu/ui/mainmenu.cpp:121
 msgid "Slider Controls"
@@ -620,7 +620,7 @@ msgstr "Seleziona Nuova Macchina"
 
 #: src/emu/ui/miscmenu.cpp:35
 msgid "Keyboard Mode:"
-msgstr "Modalit‡ Tastiera:"
+msgstr "Modalit√† Tastiera:"
 
 #: src/emu/ui/miscmenu.cpp:35
 msgid "Natural"
@@ -807,7 +807,7 @@ msgid ""
 "copyright law.\n"
 "\n"
 msgstr ""
-"L'utilizzo di emulatori combinati con ROMs che non possiedi Ë vietato dalla "
+"L'utilizzo di emulatori combinati con ROMs che non possiedi √® vietato dalla "
 "legge sul diritto d'autore.\n"
 "\n"
 
@@ -830,7 +830,7 @@ msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
 msgstr ""
-"Uno o pi˘ ROM/CHD per questa macchina non sono corretti. La macchina potrebbe non "
+"Uno o pi√π ROM/CHD per questa macchina non sono corretti. La macchina potrebbe non "
 "funzionare correttamente.\n"
 
 #: src/emu/ui/ui.cpp:1112
@@ -845,7 +845,7 @@ msgstr ""
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
 msgstr ""
-"Uno o pi˘ ROM/CHD per questa macchina non Ë dumpato correttamente.\n"
+"Uno o pi√π ROM/CHD per questa macchina non √® dumpato correttamente.\n"
 
 #: src/emu/ui/ui.cpp:1120
 #, c-format
@@ -864,12 +864,12 @@ msgstr "I colori sono completamente sbagliati.\n"
 #: src/emu/ui/ui.cpp:1126
 #, c-format
 msgid "The video emulation isn't 100% accurate.\n"
-msgstr "L'emulazione video non Ë corretta al 100%.\n"
+msgstr "L'emulazione video non √® corretta al 100%.\n"
 
 #: src/emu/ui/ui.cpp:1128
 #, c-format
 msgid "The sound emulation isn't 100% accurate.\n"
-msgstr "L'emulazione audio non Ë corretta al 100%.\n"
+msgstr "L'emulazione audio non √® corretta al 100%.\n"
 
 #: src/emu/ui/ui.cpp:1130
 msgid "The machine lacks sound.\n"
@@ -877,7 +877,7 @@ msgstr "La macchina non ha sonoro.\n"
 
 #: src/emu/ui/ui.cpp:1133
 msgid "Screen flipping in cocktail mode is not supported.\n"
-msgstr "L'inversione dello schermo in modalit‡ cocktail non Ë supportata"
+msgstr "L'inversione dello schermo in modalit√† cocktail non √® supportata"
 
 #: src/emu/ui/ui.cpp:1137
 msgid "The machine requires external artwork files\n"
@@ -888,7 +888,7 @@ msgid ""
 "This machine was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
 msgstr ""
-"Questa macchina non Ë mai stata completata. Potrebbe mostrare fenomeni strani o elementi "
+"Questa macchina non √® mai stata completata. Potrebbe mostrare fenomeni strani o elementi "
 "mancanti che non sono bug nell'emulazione.\n"
 
 #: src/emu/ui/ui.cpp:1147
@@ -896,7 +896,7 @@ msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
 msgstr ""
-"Questa macchina non ha alcun componente audio, MAME non produrr‡ alcun suono e questo Ë "
+"Questa macchina non ha alcun componente audio, MAME non produrr√† alcun suono e questo √® "
 "il comportamento atteso e non un bug.\n"
 
 #: src/emu/ui/ui.cpp:1155
@@ -911,8 +911,8 @@ msgid ""
 "the developers to improve the emulation.\n"
 msgstr ""
 "\n"
-"QUESTA MACCHINA NON FUNZIONA. L'emulazione di questa macchina non Ë ancora "
-"completa. Non c'Ë nulla che tu possa fare per risolvere questo problema eccetto aspettare che "
+"QUESTA MACCHINA NON FUNZIONA. L'emulazione di questa macchina non √® ancora "
+"completa. Non c'√® nulla che tu possa fare per risolvere questo problema eccetto aspettare che "
 "gli sviluppatori migliorino l'emulazione.\n"
 
 #: src/emu/ui/ui.cpp:1162
@@ -923,8 +923,8 @@ msgid ""
 "to fully play this machine.\n"
 msgstr ""
 "\n"
-"Alcuni elementi di questa macchina non possono essere emulati poichÈ richiedono "
-"interazioni fisiche oppure dispositivi meccanici. Non Ë possibile "
+"Alcuni elementi di questa macchina non possono essere emulati poich√© richiedono "
+"interazioni fisiche oppure dispositivi meccanici. Non √® possibile "
 "giocare completamente con questa macchina.\n"
 
 #: src/emu/ui/ui.cpp:1181
@@ -977,7 +977,7 @@ msgstr "Stato emulazione tastiera"
 
 #: src/emu/ui/ui.cpp:1592
 msgid "Mode: PARTIAL Emulation"
-msgstr "Modalit‡: Emulazione PARZIALE"
+msgstr "Modalit√†: Emulazione PARZIALE"
 
 #: src/emu/ui/ui.cpp:1593
 msgid "UI:   Enabled"
@@ -989,7 +989,7 @@ msgstr "**Usa ScrLock per switchare**"
 
 #: src/emu/ui/ui.cpp:1602
 msgid "Mode: FULL Emulation"
-msgstr "Modalit‡: Emulazione COMPLETA"
+msgstr "Modalit√†: Emulazione COMPLETA"
 
 #: src/emu/ui/ui.cpp:1603
 msgid "UI:   Disabled"
@@ -997,7 +997,7 @@ msgstr "UI:   Disabilitato"
 
 #: src/emu/ui/ui.cpp:1749
 msgid "Autofire can't be enabled"
-msgstr "Autofire non puÚ essere abilitato"
+msgstr "Autofire non pu√≤ essere abilitato"
 
 #: src/emu/ui/ui.cpp:1788
 msgid "Select position to save to"
