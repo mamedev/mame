@@ -95,35 +95,35 @@ msgstr "Verzögerung für Autofeuer"
 
 #: src/emu/ui/ctrlmenu.cpp:20
 msgid "Lightgun Device Assignment"
-msgstr "Zuordnung Lichtpistolen"
+msgstr "Lichtpistolen-Zuordnung"
 
 #: src/emu/ui/ctrlmenu.cpp:21
 msgid "Trackball Device Assignment"
-msgstr "Zuordnung Trackballs"
+msgstr "Trackball-Zuordnung"
 
 #: src/emu/ui/ctrlmenu.cpp:22
 msgid "Pedal Device Assignment"
-msgstr "Zuordnung Pedale"
+msgstr "Pedal-Zuordnung"
 
 #: src/emu/ui/ctrlmenu.cpp:23
 msgid "Adstick Device Assignment"
-msgstr "Zuordnung ADStick"
+msgstr "ADStick-Zuordnung"
 
 #: src/emu/ui/ctrlmenu.cpp:24
 msgid "Paddle Device Assignment"
-msgstr "Zuordnung Paddle"
+msgstr "Paddle-Zuordnung"
 
 #: src/emu/ui/ctrlmenu.cpp:25
 msgid "Dial Device Assignment"
-msgstr "Zuordnung Wählscheiben"
+msgstr "Wählscheiben-Zuordnung"
 
 #: src/emu/ui/ctrlmenu.cpp:26
 msgid "Positional Device Assignment"
-msgstr "Zuordnung Positionsgeräte"
+msgstr "Positionsgeräte-Zuordnung"
 
 #: src/emu/ui/ctrlmenu.cpp:27
 msgid "Mouse Device Assignment"
-msgstr "Zuordnung Mäuse"
+msgstr "Maus-Zuordnung"
 
 #: src/emu/ui/ctrlmenu.cpp:106 src/emu/ui/ctrlmenu.cpp:126
 #: src/emu/ui/optsmenu.cpp:251
