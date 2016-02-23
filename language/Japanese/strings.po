@@ -201,7 +201,7 @@ msgstr "イタリック"
 
 #: src/emu/ui/custui.cpp:380
 msgid "Lines"
-msgstr "線"
+msgstr "行数"
 
 #: src/emu/ui/custui.cpp:388
 msgid "Infos text size"
@@ -213,7 +213,7 @@ msgstr "UIフォント設定"
 
 #: src/emu/ui/custui.cpp:432
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr "サンプルテキスト - 禅智内供の鼻と云えば、池の尾で知らない者はない。"
+msgstr "サンプルテキスト - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 #: src/emu/ui/custui.cpp:530
 msgid "Normal text"
@@ -229,7 +229,7 @@ msgstr "通常テキストの背景"
 
 #: src/emu/ui/custui.cpp:533
 msgid "Selected background color"
-msgstr "選択したテキストの背景"
+msgstr "選択済テキストの背景"
 
 #: src/emu/ui/custui.cpp:534
 msgid "Subitem color"
@@ -289,11 +289,11 @@ msgstr "UIの色設定"
 
 #: src/emu/ui/custui.cpp:592 src/emu/ui/selector.cpp:181
 msgid "Double click or press "
-msgstr "ダブルクリックまたはプレス"
+msgstr "色の値を変更するには"
 
 #: src/emu/ui/custui.cpp:592
 msgid " to change the color value"
-msgstr "色変更用"
+msgstr "ダブルクリックまたはプレスして下さい"
 
 #: src/emu/ui/custui.cpp:618
 msgid "Menu Preview"
@@ -301,7 +301,7 @@ msgstr "メニューのプレビュー"
 
 #: src/emu/ui/custui.cpp:626
 msgid "Normal"
-msgstr "通常"
+msgstr "通常項目"
 
 #: src/emu/ui/custui.cpp:627
 msgid "Subitem"
@@ -309,7 +309,7 @@ msgstr "サブ項目"
 
 #: src/emu/ui/custui.cpp:628
 msgid "Selected"
-msgstr "選択済"
+msgstr "選択済の項目"
 
 #: src/emu/ui/custui.cpp:629
 msgid "Mouse Over"
@@ -321,15 +321,15 @@ msgstr "パレットから選ぶ"
 
 #: src/emu/ui/custui.cpp:912
 msgid " - ARGB Settings"
-msgstr "- ARGB設定"
+msgstr " - ARGB設定"
 
 #: src/emu/ui/custui.cpp:936
 msgid "Color preview ="
-msgstr "色プレビュー ="
+msgstr "色のプレビュー ="
 
 #: src/emu/ui/datmenu.cpp:59
 msgid "Software History"
-msgstr "ソフトウェアの歴史"
+msgstr "ソフトウェアのヒストリ"
 
 #: src/emu/ui/datmenu.cpp:61
 msgid "Software Usage"
@@ -337,13 +337,13 @@ msgstr "ソフトウェアの使い方"
 
 #: src/emu/ui/datmenu.cpp:199
 msgid "Revision: "
-msgstr "リビジョン:"
+msgstr "リビジョン: "
 
 #: src/emu/ui/datmenu.cpp:291 src/emu/ui/selgame.cpp:2054
 #: src/emu/ui/selgame.cpp:2063 src/emu/ui/selsoft.cpp:1441
 #: src/emu/ui/selsoft.cpp:1450
 msgid "History"
-msgstr "ヒストリ"
+msgstr "ヒストリファイル"
 
 #: src/emu/ui/datmenu.cpp:293
 msgid "Mameinfo"
@@ -447,7 +447,7 @@ msgstr "アートワークのプレビュー"
 
 #: src/emu/ui/dirmenu.cpp:52
 msgid "Select"
-msgstr "セレクト"
+msgstr "選択"
 
 #: src/emu/ui/dirmenu.cpp:53
 msgid "GameOver"
@@ -515,7 +515,7 @@ msgstr "フォルダを"
 
 #: src/emu/ui/dirmenu.cpp:660
 msgid " Folder"
-msgstr " 削除"
+msgstr " 削除する"
 
 #: src/emu/ui/dsplmenu.cpp:205 src/emu/ui/dsplmenu.cpp:225
 #: src/emu/ui/optsmenu.cpp:248
