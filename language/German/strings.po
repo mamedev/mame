@@ -984,7 +984,7 @@ msgstr "Benutzeroberfläche:   Aktiviert"
 
 #: src/emu/ui/ui.cpp:1595 src/emu/ui/ui.cpp:1605
 msgid "**Use ScrLock to toggle**"
-msgstr "** Verwenden Sie ScrLock zum umschalten**"
+msgstr "** Verwenden Sie ScrLock zum Umschalten**"
 
 #: src/emu/ui/ui.cpp:1602
 msgid "Mode: FULL Emulation"
