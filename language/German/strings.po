@@ -781,7 +781,7 @@ msgstr "Softwareauswahl:"
 
 #: src/emu/ui/selsoft.cpp:1960 src/emu/ui/selsoft.cpp:1980
 msgid "Bios selection:"
-msgstr "BIOS-auswahl"
+msgstr "BIOS-Auswahl"
 
 #: src/emu/ui/slotopt.cpp:166
 msgid " [internal]"
