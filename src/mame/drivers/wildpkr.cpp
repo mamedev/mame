@@ -26,7 +26,7 @@
   - 1x D8751H            ; 8751 MCU (3.6864 MHz?)
 
   Sound device:
-  - 1x AY8930            ; Sound IC, from Yamaha.
+  - 1x AY8930            ; Sound IC, from Microchip Technology.
 
   Video:
   - 1x HD63484CP8 @ 8MHz ; Advanced CRT Controller (ACRTC), from Hitachi Semiconductor.
