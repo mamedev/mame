@@ -1815,10 +1815,13 @@ osd_dim win_window_info::get_max_bounds(int constrain)
 
 	// constrain to fit
 	if (constrain)
+	{
 		maximum = constrain_to_aspect_ratio(maximum, WMSZ_BOTTOMRIGHT);
+	}
 	else
 	{
-		maximum = maximum.resize(maximum.width() - wnd_extra_width(), maximum.height() - wnd_extra_height());
+		// No - the maxima returned by usable_position_size are in window units, not usable units
+		//maximum = maximum.resize(maximum.width() - wnd_extra_width(), maximum.height() - wnd_extra_height());
 	}
 	return maximum.dim();
 }
