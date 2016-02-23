@@ -121,7 +121,7 @@
 
   1) Pyon Pyon (a marathon game with froggy characters).
   2) Kuru Kuru Pyon Pyon (a kind of slots game with the same froggy characters).
-  3) Pyon Pyon Jyanpu (a contents where the same characters try to cross the river jumping on pads).
+  3) Pyon Pyon Jump (a contents where the same characters try to cross the river jumping on pads).
   4) Sui Sui Pyon Pyon (a swimming competition where the same characters swim with different styles, even walking).
 
   Coin 1 (key 5) could be set either as Coin 1 or as Payout button, through
@@ -179,10 +179,10 @@
 
   ----------------------------------------------------------------------------------
 
-  * Pyon Pyon Jyanpu:
+  * Pyon Pyon Jump:
 
   The game name could be translated as "Hop Hop Jump"
-  Pyon is the sound of jumps. Jyanpu means jump.
+  Pyon is the sound of jumps. Jump means jump.
 
   How to play...
 
@@ -808,7 +808,7 @@ ROM_START( kurukuru )
 	ROM_LOAD( "7908b-4.ic32", 0x0600, 0x0034, CRC(bddf925e) SHA1(861cf5966444d0c0392241e5cfa08db475fb439a) )
 ROM_END
 
-/*  Pyon Pyon Jyanpu.
+/*  Pyon Pyon Jump.
     Ver 1.40.
 	199?, Success / Taiyo Jidoki.
 */
@@ -839,7 +839,7 @@ ROM_END
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                   FULLNAME                          FLAGS  */
 GAME( 1990, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",     0 )
-GAME( 199?, ppj,      0,      ppj,      ppj,      driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jyanpu (V1.40, Japan)", 0 )
+GAME( 199?, ppj,      0,      ppj,      ppj,      driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", 0 )
 
 // unemulated....
 
