@@ -552,7 +552,7 @@ msgstr "マシン情報"
 
 #: src/emu/ui/mainmenu.cpp:77
 msgid "Image Information"
-msgstr "画像情報"
+msgstr "イメージ情報"
 
 #: src/emu/ui/mainmenu.cpp:80
 msgid "File Manager"
@@ -779,7 +779,7 @@ msgstr "選択中のソフトウェアパーツ:"
 
 #: src/emu/ui/selsoft.cpp:1960 src/emu/ui/selsoft.cpp:1980
 msgid "Bios selection:"
-msgstr "選択中のBIOS: "
+msgstr "BIOS選択: "
 
 #: src/emu/ui/slotopt.cpp:166
 msgid " [internal]"
