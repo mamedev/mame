@@ -1681,6 +1681,8 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	}
 
 	// non-integer scaling - often gives more pleasing results in full screen
+	newwidth = target_width;
+	newheight = target_height;
 	if (!video_config.fullstretch)
 	{
 		// compute maximum integral scaling to fit the window
@@ -1720,11 +1722,6 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 		// apply the final scale
 		newwidth *= xscale;
 		newheight *= yscale;
-	}
-	else
-	{
-		newwidth = target_width;
-		newheight = target_height;
 	}
 
 	// clamp against the absolute minimum
