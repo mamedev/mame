@@ -1354,36 +1354,67 @@ READ16_MEMBER(segas1x_bootleg_state::ddcrew_c41006_r)
 	return 0xffff;//rand();
 }
 
+WRITE16_MEMBER(segas1x_bootleg_state::ddcrewbl_spritebank_w)
+{
+//	printf("banking write %08x: %04x (%04x %04x)\n", space.device().safe_pc(), offset*2, data&mem_mask, mem_mask);
+
+	data &= mem_mask;
+//	offset &= 0x7;
+	offset += 4;
+
+	int maxbanks = memregion("sprites")->bytes() / 0x40000;
+	if (data >= maxbanks)
+		data = 255;
+	m_sprites->set_bank((offset) * 2 + 0, data * 2 + 0);
+	m_sprites->set_bank((offset) * 2 + 1, data * 2 + 1);
+}
+
+
 // todo: this
-static ADDRESS_MAP_START( ddcrewbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM
+static ADDRESS_MAP_START(ddcrewbl_map, AS_PROGRAM, 16, segas1x_bootleg_state)
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM // ok
+	AM_RANGE(0x200000, 0x27ffff) AM_ROM // ok
 
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
-//	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("COINAGE")
-//	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW1")
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites") // ok
 
-//	AM_RANGE(0xa0000e, 0xa0000f) AM_WRITE(sys18_tilebank_w)
-//	AM_RANGE(0xa01000, 0xa01001) AM_READ_PORT("SERVICE")
-//	AM_RANGE(0xa01002, 0xa01003) AM_READ_PORT("P1")
-//	AM_RANGE(0xa01004, 0xa01005) AM_READ_PORT("P2")
-//	AM_RANGE(0xa01006, 0xa01007) AM_READ_PORT("P3")
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram") // ok
 
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-
-	AM_RANGE(0xC00000, 0xC00001) AM_WRITENOP
+	AM_RANGE(0xC00000, 0xC00001) AM_WRITENOP // vdp leftovers maybe?
+	AM_RANGE(0xC00004, 0xC00005) AM_WRITENOP
+	AM_RANGE(0xC00006, 0xC00007) AM_WRITENOP
+	
 
 	AM_RANGE(0xC40000, 0xC40001) AM_READ(ddcrew_c41006_r)
 	AM_RANGE(0xC40002, 0xC40003) AM_READ(ddcrew_c41006_r)
-
-
 	AM_RANGE(0xC41000, 0xC41001) AM_READ(ddcrew_c41006_r)
+	AM_RANGE(0xC41002, 0xC41003) AM_READ(ddcrew_c41006_r)
+	AM_RANGE(0xC41004, 0xC41005) AM_READ(ddcrew_c41006_r)
 	AM_RANGE(0xC41006, 0xC41007) AM_READ(ddcrew_c41006_r)
 
+
+	
+	AM_RANGE(0xC44000, 0xC44001) AM_WRITENOP
+
 	AM_RANGE(0xc46600, 0xc46601) AM_WRITE(sys18_refreshenable_w)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM
+
+	AM_RANGE(0xC46038, 0xC4603f) AM_WRITE(ddcrewbl_spritebank_w) // ok
+
+	AM_RANGE(0xC46000, 0xC46001) AM_WRITENOP
+	AM_RANGE(0xC46010, 0xC46011) AM_WRITENOP
+	AM_RANGE(0xC46020, 0xC46021) AM_WRITENOP
+
+	AM_RANGE(0xC46040, 0xC46041) AM_WRITENOP
+	AM_RANGE(0xC46050, 0xC46051) AM_WRITENOP
+
+	AM_RANGE(0xC46060, 0xC46061) AM_WRITENOP
+	AM_RANGE(0xC46062, 0xC46063) AM_WRITENOP
+	AM_RANGE(0xC46064, 0xC46065) AM_WRITENOP
+
+	AM_RANGE(0xC46070, 0xC46071) AM_WRITENOP
+	
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM // ok
 ADDRESS_MAP_END
 
 /*************************************
@@ -2472,6 +2503,18 @@ static MACHINE_CONFIG_DERIVED( shdancbla, system18 )
 MACHINE_CONFIG_END
 
 
+MACHINE_RESET_MEMBER(segas1x_bootleg_state,ddcrewbl)
+{
+	// set up the initial banks for this game
+	// because it doesn't appear to actually program banks 0-3.
+	for (int i = 0; i < 4; i++)
+	{
+		m_sprites->set_bank((i)* 2 + 0, i * 2 + 0);
+		m_sprites->set_bank((i)* 2 + 1, i * 2 + 1);
+	}
+}
+
+
 static MACHINE_CONFIG_START( ddcrewbl, segas1x_bootleg_state )
 
 	/* basic machine hardware */
@@ -2494,7 +2537,9 @@ static MACHINE_CONFIG_START( ddcrewbl, segas1x_bootleg_state )
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
+	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-124)
+
+	MCFG_MACHINE_RESET_OVERRIDE(segas1x_bootleg_state,ddcrewbl)
 
 MACHINE_CONFIG_END
 
@@ -3740,7 +3785,6 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,fpointbl)
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,ddcrewbl)
 {
 	DRIVER_INIT_CALL(common);
-	m_spritebank_type = 0;
 }
 
 
