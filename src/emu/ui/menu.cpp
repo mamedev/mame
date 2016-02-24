@@ -2,9 +2,9 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-	ui/menu.c
+    ui/menu.c
 
-	Internal MAME menus for the user interface.
+    Internal MAME menus for the user interface.
 
 *********************************************************************/
 
@@ -27,7 +27,7 @@
 
 
 /***************************************************************************
-	CONSTANTS
+    CONSTANTS
 ***************************************************************************/
 
 #define UI_MENU_POOL_SIZE  65536
@@ -68,7 +68,7 @@ static const char *hover_msg[] = {
 };
 
 /***************************************************************************
-	GLOBAL VARIABLES
+    GLOBAL VARIABLES
 ***************************************************************************/
 
 ui_menu *ui_menu::menu_stack;
@@ -93,7 +93,7 @@ bitmap_argb32 *ui_menu::toolbar_bitmap[UI_TOOLBAR_BUTTONS];
 bitmap_argb32 *ui_menu::sw_toolbar_bitmap[UI_TOOLBAR_BUTTONS];
 
 /***************************************************************************
-	INLINE FUNCTIONS
+    INLINE FUNCTIONS
 ***************************************************************************/
 
 //-------------------------------------------------
@@ -126,7 +126,7 @@ inline bool ui_menu::exclusive_input_pressed(int key, int repeat)
 
 
 /***************************************************************************
-	CORE SYSTEM MANAGEMENT
+    CORE SYSTEM MANAGEMENT
 ***************************************************************************/
 
 //-------------------------------------------------
@@ -193,7 +193,7 @@ void ui_menu::exit(running_machine &machine)
 
 
 /***************************************************************************
-	CORE MENU MANAGEMENT
+    CORE MENU MANAGEMENT
 ***************************************************************************/
 
 //-------------------------------------------------
@@ -334,7 +334,7 @@ const ui_menu_event *ui_menu::process(UINT32 flags)
 	menu_event.iptkey = IPT_INVALID;
 
 	// first make sure our selection is valid
-//	if (!(flags & UI_MENU_PROCESS_NOINPUT))
+//  if (!(flags & UI_MENU_PROCESS_NOINPUT))
 		validate_selection(1);
 
 	// draw the menu
@@ -451,7 +451,7 @@ void ui_menu::set_selection(void *selected_itemref)
 
 
 /***************************************************************************
-	INTERNAL MENU PROCESSING
+    INTERNAL MENU PROCESSING
 ***************************************************************************/
 
 //-------------------------------------------------
@@ -713,7 +713,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 
 		// compute the multi-line target width/height
 		machine().ui().draw_text_full(container, pitem.subtext, 0, 0, visible_width * 0.75f,
-		                              JUSTIFY_RIGHT, WRAP_WORD, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &target_width, &target_height);
+										JUSTIFY_RIGHT, WRAP_WORD, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &target_width, &target_height);
 
 		// determine the target location
 		target_x = visible_left + visible_width - target_width - UI_BOX_LR_BORDER;
@@ -725,8 +725,8 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 		machine().ui().draw_outlined_box(container, target_x - UI_BOX_LR_BORDER,
 							target_y - UI_BOX_TB_BORDER,
 							target_x + target_width + UI_BOX_LR_BORDER,
-										 target_y + target_height + UI_BOX_TB_BORDER,
-										 subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
+											target_y + target_height + UI_BOX_TB_BORDER,
+											subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
 		machine().ui().draw_text_full(container, pitem.subtext, target_x, target_y, target_width,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
 	}
@@ -736,8 +736,8 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
 	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != item.size());
-//	if (history_flag && (top_line + visible_lines >= item.size()))
-//		selected = item.size() - 1;
+//  if (history_flag && (top_line + visible_lines >= item.size()))
+//      selected = item.size() - 1;
 }
 
 void ui_menu::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
@@ -762,7 +762,7 @@ void ui_menu::draw_text_box()
 
 	// compute the multi-line target width/height
 	machine().ui().draw_text_full(container, text, 0, 0, 1.0f - 2.0f * UI_BOX_LR_BORDER - 2.0f * gutter_width,
-	                              JUSTIFY_LEFT, WRAP_WORD, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &target_width, &target_height);
+									JUSTIFY_LEFT, WRAP_WORD, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &target_width, &target_height);
 	target_height += 2.0f * line_height;
 	if (target_height > 1.0f - 2.0f * UI_BOX_TB_BORDER)
 		target_height = floorf((1.0f - 2.0f * UI_BOX_TB_BORDER) / line_height) * line_height;
@@ -787,20 +787,20 @@ void ui_menu::draw_text_box()
 
 	// add a box around that
 	machine().ui().draw_outlined_box(container, target_x - UI_BOX_LR_BORDER - gutter_width,
-                                     target_y - UI_BOX_TB_BORDER,
-                                     target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
-                                     target_y + target_height + UI_BOX_TB_BORDER,
-                                     (item[0].flags & MENU_FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
+										target_y - UI_BOX_TB_BORDER,
+										target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
+										target_y + target_height + UI_BOX_TB_BORDER,
+										(item[0].flags & MENU_FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
 	machine().ui().draw_text_full(container, text, target_x, target_y, target_width,
 				JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	// draw the "return to prior menu" text with a hilight behind it
 	highlight(container,
-              target_x + 0.5f * UI_LINE_WIDTH,
-              target_y + target_height - line_height,
-              target_x + target_width - 0.5f * UI_LINE_WIDTH,
-              target_y + target_height,
-              UI_SELECTED_BG_COLOR);
+				target_x + 0.5f * UI_LINE_WIDTH,
+				target_y + target_height - line_height,
+				target_x + target_width - 0.5f * UI_LINE_WIDTH,
+				target_y + target_height,
+				UI_SELECTED_BG_COLOR);
 	machine().ui().draw_text_full(container, backtext, target_x, target_y + target_height - line_height, target_width,
 				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
 
@@ -1097,7 +1097,7 @@ void ui_menu::clear_free_list(running_machine &machine)
 
 
 /***************************************************************************
-	MENU STACK MANAGEMENT
+    MENU STACK MANAGEMENT
 ***************************************************************************/
 
 //-------------------------------------------------
@@ -1167,7 +1167,7 @@ void ui_menu::do_handle()
 
 
 /***************************************************************************
-	UI SYSTEM INTERACTION
+    UI SYSTEM INTERACTION
 ***************************************************************************/
 
 //-------------------------------------------------
@@ -1196,7 +1196,7 @@ UINT32 ui_menu::ui_handler(running_machine &machine, render_container *container
 }
 
 /***************************************************************************
-	MENU HELPERS
+    MENU HELPERS
 ***************************************************************************/
 
 //-------------------------------------------------
@@ -1848,7 +1848,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	if (menu_event.iptkey == IPT_INVALID)
 		for (int code = IPT_UI_FIRST + 1; code < IPT_UI_LAST; code++)
 		{
-			if (ui_error || code == IPT_UI_CONFIGURE || (code == IPT_UI_LEFT && ignoreleft)	|| (code == IPT_UI_RIGHT && ignoreright) || (code == IPT_UI_PAUSE && ignorepause))
+			if (ui_error || code == IPT_UI_CONFIGURE || (code == IPT_UI_LEFT && ignoreleft) || (code == IPT_UI_RIGHT && ignoreright) || (code == IPT_UI_PAUSE && ignorepause))
 				continue;
 
 			if (exclusive_input_pressed(code, 0))

@@ -25,7 +25,7 @@ static std::string TAG_COMMAND("$cmd");
 static std::string TAG_END("$end");
 static std::string TAG_DRIVER("$drv");
 static std::string TAG_STORY("$story");
-static std::string TAG_HISTORY_R("## REVISION:"); 
+static std::string TAG_HISTORY_R("## REVISION:");
 static std::string TAG_MAMEINFO_R("# MAMEINFO.DAT");
 static std::string TAG_MESSINFO_R("#     MESSINFO.DAT");
 static std::string TAG_SYSINFO_R("# This file was generated on");
@@ -540,7 +540,7 @@ int datfile_manager::index_datafile(dataindex &index, int &swcount)
 }
 
 //---------------------------------------------------------
-//	parseopen - Open up file for reading
+//  parseopen - Open up file for reading
 //---------------------------------------------------------
 bool datfile_manager::parseopen(const char *filename)
 {

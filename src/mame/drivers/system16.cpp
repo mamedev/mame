@@ -1356,10 +1356,10 @@ READ16_MEMBER(segas1x_bootleg_state::ddcrew_c41006_r)
 
 WRITE16_MEMBER(segas1x_bootleg_state::ddcrewbl_spritebank_w)
 {
-//	printf("banking write %08x: %04x (%04x %04x)\n", space.device().safe_pc(), offset*2, data&mem_mask, mem_mask);
+//  printf("banking write %08x: %04x (%04x %04x)\n", space.device().safe_pc(), offset*2, data&mem_mask, mem_mask);
 
 	data &= mem_mask;
-//	offset &= 0x7;
+//  offset &= 0x7;
 	offset += 4;
 
 	int maxbanks = memregion("sprites")->bytes() / 0x40000;
@@ -1384,7 +1384,7 @@ static ADDRESS_MAP_START(ddcrewbl_map, AS_PROGRAM, 16, segas1x_bootleg_state)
 	AM_RANGE(0xC00000, 0xC00001) AM_WRITENOP // vdp leftovers maybe?
 	AM_RANGE(0xC00004, 0xC00005) AM_WRITENOP
 	AM_RANGE(0xC00006, 0xC00007) AM_WRITENOP
-	
+
 
 	AM_RANGE(0xC40000, 0xC40001) AM_READ(ddcrew_c41006_r)
 	AM_RANGE(0xC40002, 0xC40003) AM_READ(ddcrew_c41006_r)
@@ -1394,7 +1394,7 @@ static ADDRESS_MAP_START(ddcrewbl_map, AS_PROGRAM, 16, segas1x_bootleg_state)
 	AM_RANGE(0xC41006, 0xC41007) AM_READ(ddcrew_c41006_r)
 
 
-	
+
 	AM_RANGE(0xC44000, 0xC44001) AM_WRITENOP
 
 	AM_RANGE(0xc46600, 0xc46601) AM_WRITE(sys18_refreshenable_w)
@@ -1413,7 +1413,7 @@ static ADDRESS_MAP_START(ddcrewbl_map, AS_PROGRAM, 16, segas1x_bootleg_state)
 	AM_RANGE(0xC46064, 0xC46065) AM_WRITENOP
 
 	AM_RANGE(0xC46070, 0xC46071) AM_WRITENOP
-	
+
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // ok
 ADDRESS_MAP_END
 

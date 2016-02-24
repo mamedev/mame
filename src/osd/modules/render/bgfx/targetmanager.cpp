@@ -16,11 +16,11 @@
 
 target_manager::~target_manager()
 {
-    for (std::pair<std::string, bgfx_target*> target : m_targets)
-    {
+	for (std::pair<std::string, bgfx_target*> target : m_targets)
+	{
 		delete target.second;
-    }
-    m_targets.clear();
+	}
+	m_targets.clear();
 }
 
 bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, bool filter)
@@ -45,11 +45,11 @@ bgfx_target* target_manager::create_target(std::string name, void *handle, uint3
 
 bgfx_target* target_manager::target(std::string name)
 {
-    std::map<std::string, bgfx_target*>::iterator iter = m_targets.find(name);
-    if (iter != m_targets.end())
-    {
-        return iter->second;
-    }
+	std::map<std::string, bgfx_target*>::iterator iter = m_targets.find(name);
+	if (iter != m_targets.end())
+	{
+		return iter->second;
+	}
 
-    return nullptr;
+	return nullptr;
 }

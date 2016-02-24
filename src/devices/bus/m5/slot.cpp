@@ -175,7 +175,6 @@ bool m5_cart_slot_device::call_load()
 
 		if (m_type == M5_STD || m_type>2) //carts with roms
 		{
-
 			UINT32 size = (software_entry() == NULL) ? length() : get_software_region_length("rom");
 
 			if (size > 0x5000 && m_type == M5_STD)
@@ -190,12 +189,12 @@ bool m5_cart_slot_device::call_load()
 				fread(m_cart->get_rom_base(), size);
 			else
 				memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);
-		
+
 		}
 		if (!M5_STD)
 			if (get_software_region("ram"))
 				m_cart->ram_alloc(get_software_region_length("ram"));
-		
+
 
 		//printf("Type: %s\n", m5_get_slot(m_type));
 	}

@@ -214,7 +214,7 @@
   - Bet distribution (1, 2, 3, 4, 5~10)
 
   - Omake (bonus) distribution (games total, win games, loss games)
-  
+
   Pressing the Bookkeeping key once more, you exit the mode and go back to the game.
 
 
@@ -437,7 +437,7 @@ ADDRESS_MAP_END
 /*
 
  00h  W --> bankswitching reg...
- 
+
  10h  W --> 00's           \
  11h  W --> 02 8f 20 91...  > V9938 OK
  13h  W -->                /
@@ -810,7 +810,7 @@ ROM_END
 
 /*  Pyon Pyon Jump.
     Ver 1.40.
-	199?, Success / Taiyo Jidoki.
+    199?, Success / Taiyo Jidoki.
 */
 ROM_START( ppj )
 	ROM_REGION( 0x08000, "maincpu", 0 )

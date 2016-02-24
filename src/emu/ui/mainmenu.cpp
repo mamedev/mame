@@ -138,14 +138,14 @@ void ui_menu_main::populate()
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 
 	/* add favorite menu */
-    if (!machine().favorite().isgame_favorite())
+	if (!machine().favorite().isgame_favorite())
 		item_append(_("Add To Favorites"), nullptr, 0, (void *)ADD_FAVORITE);
 	else
 		item_append(_("Remove From Favorites"), nullptr, 0, (void *)REMOVE_FAVORITE);
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 
-//	item_append(_("Quit from Machine"), nullptr, 0, (void *)QUIT_GAME);
+//  item_append(_("Quit from Machine"), nullptr, 0, (void *)QUIT_GAME);
 
 	/* add reset and exit menus */
 	item_append(_("Select New Machine"), nullptr, 0, (void *)SELECT_GAME);
@@ -246,7 +246,7 @@ void ui_menu_main::handle()
 				ui_menu::stack_push(global_alloc_clear<ui_simple_menu_select_game>(machine(), container, nullptr));
 			} else {
 				ui_menu::stack_push(global_alloc_clear<ui_menu_select_game>(machine(), container, nullptr));
-			}		
+			}
 			break;
 
 		case BIOS_SELECTION:
@@ -262,12 +262,12 @@ void ui_menu_main::handle()
 			break;
 
 		case ADD_FAVORITE:
-            machine().favorite().add_favorite_game();
+			machine().favorite().add_favorite_game();
 			reset(UI_MENU_RESET_REMEMBER_POSITION);
 			break;
 
 		case REMOVE_FAVORITE:
-            machine().favorite().remove_favorite_game();
+			machine().favorite().remove_favorite_game();
 			reset(UI_MENU_RESET_REMEMBER_POSITION);
 			break;
 

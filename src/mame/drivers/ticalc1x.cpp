@@ -716,7 +716,7 @@ WRITE16_MEMBER(lilprof78_state::write_r)
 	UINT16 r = (data & 7) | (data << 1 & 0x1f0);
 	set_display_segmask(0x1ff, 0x7f);
 	display_matrix(7, 9, seg, r, false);
-	
+
 	// 3rd digit A/G(equals sign) is from O7
 	m_display_state[3] = (r != 0 && m_o & 0x80) ? 0x41 : 0;
 

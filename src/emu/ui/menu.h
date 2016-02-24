@@ -2,9 +2,9 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
-	ui/menu.h
+    ui/menu.h
 
-	Internal MAME menus for the user interface.
+    Internal MAME menus for the user interface.
 
 ***************************************************************************/
 
@@ -17,7 +17,7 @@
 
 
 /***************************************************************************
-	CONSTANTS
+    CONSTANTS
 ***************************************************************************/
 
 // flags for menu items
@@ -55,7 +55,7 @@ enum ui_menu_reset_options
 
 
 /***************************************************************************
-	TYPE DEFINITIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 // menu-related events
@@ -255,7 +255,7 @@ protected:
 	static render_texture *hilight_main_texture;
 private:
 	static std::unique_ptr<bitmap_argb32> no_avail_bitmap, bgrnd_bitmap, star_bitmap;
-//	static std::unique_ptr<bitmap_rgb32> hilight_main_bitmap;
+//  static std::unique_ptr<bitmap_rgb32> hilight_main_bitmap;
 	static render_texture *bgrnd_texture, *star_texture;
 	static bitmap_argb32 *icons_bitmap[];
 	static render_texture *icons_texture[];

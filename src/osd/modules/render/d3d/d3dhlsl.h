@@ -334,7 +334,7 @@ public:
 		int                 step;
 		int                 screen_type;
 		INT32(*adjustor)(running_machine &, void *, std::string *, INT32);
-		int					id;
+		int                 id;
 	};
 
 private:
@@ -371,7 +371,7 @@ private:
 	d3d_base *              d3dintf;                    // D3D interface
 
 	running_machine *       machine;
-	renderer_d3d9 *    		d3d;                        // D3D renderer
+	renderer_d3d9 *         d3d;                        // D3D renderer
 
 	bool                    master_enable;              // overall enable flag
 	bool                    vector_enable;              // vector post-processing enable flag

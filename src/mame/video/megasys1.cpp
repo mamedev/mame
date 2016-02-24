@@ -893,7 +893,7 @@ void megasys1_state::megasys1_priority_create()
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int pri_code, offset, i, order;
-	
+
 	/* convert PROM to something we can use */
 
 	for (pri_code = 0; pri_code < 0x10 ; pri_code++)    // 16 priority codes

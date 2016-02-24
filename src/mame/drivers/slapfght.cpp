@@ -1832,7 +1832,7 @@ ROM_START( slapfighb3 )
 	ROM_LOAD( "sf_col19.bin", 0x0200,  0x0100, CRC(5cbf9fbf) SHA1(abfa58fa4e44ebc56f2e0fac9bcc36164c845fa3) )
 ROM_END
 
-/* 
+/*
 
 Guardian
 1986 Taito Corporation
@@ -1924,7 +1924,7 @@ A68_02 & 06 to 09 - 27256 EPROM
     A68_14 - Motorola MC68705P5 Micro-Controller (protected). Clock 3.000MHz [36/12]
          X - Unpopulated socket
 
-*/         
+*/
 
 ROM_START( grdian )
 	ROM_REGION( 0x18000, "maincpu", 0 )     /* Region 0 - main cpu code */

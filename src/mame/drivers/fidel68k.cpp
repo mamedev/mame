@@ -3,7 +3,7 @@
 /******************************************************************************
 
     Fidelity Electronics 68000 based board driver
-    
+
     TODO:
     - how does dual-CPU work?
     - IRQ level/timing is unknown

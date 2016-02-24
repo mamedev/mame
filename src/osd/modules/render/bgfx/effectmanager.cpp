@@ -25,22 +25,22 @@ using namespace rapidjson;
 
 effect_manager::~effect_manager()
 {
-    for (std::pair<std::string, bgfx_effect*> effect : m_effects)
-    {
+	for (std::pair<std::string, bgfx_effect*> effect : m_effects)
+	{
 		delete effect.second;
-    }
-    m_effects.clear();
+	}
+	m_effects.clear();
 }
 
 bgfx_effect* effect_manager::effect(std::string name)
 {
-    std::map<std::string, bgfx_effect*>::iterator iter = m_effects.find(name);
-    if (iter != m_effects.end())
-    {
-        return iter->second;
-    }
+	std::map<std::string, bgfx_effect*>::iterator iter = m_effects.find(name);
+	if (iter != m_effects.end())
+	{
+		return iter->second;
+	}
 
-    return load_effect(name);
+	return load_effect(name);
 }
 
 bgfx_effect* effect_manager::load_effect(std::string name) {
@@ -60,7 +60,7 @@ bgfx_effect* effect_manager::load_effect(std::string name) {
 	document.Parse<0>(data);
 	bgfx_effect* effect = effect_reader::read_from_value(m_shaders, document);
 
-    m_effects[name] = effect;
+	m_effects[name] = effect;
 
-    return effect;
+	return effect;
 }

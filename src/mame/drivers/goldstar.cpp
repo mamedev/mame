@@ -6763,7 +6763,7 @@ static const gfx_layout super9_charlayout =
 	32*8   /* every char takes 32 consecutive bytes */
 };
 
-static const gfx_layout super9_tilelayout =  // Green is OK. Red needs normal goldstar order... 
+static const gfx_layout super9_tilelayout =  // Green is OK. Red needs normal goldstar order...
 {
 	8,32,    /* 8*32 characters */
 	256,    /* 256 tiles */
@@ -8629,11 +8629,11 @@ ROM_END
 /* Cherry Gold I (bootleg)
    It runs in CB3e similar hardware...
 
-1x TMPZ84C00AP-6  u15 	            8-bit Microprocessor
-3x D71055C        u30, u39, u40 	Programmable Peripheral Interface
-1x WF19054        u27 	            Programmable Sound Generator
-1x SN76489AN      u28 	            Digital Complex Sound Generator
-1x oscillator 	unmarked  Y1 	
+1x TMPZ84C00AP-6  u15               8-bit Microprocessor
+3x D71055C        u30, u39, u40     Programmable Peripheral Interface
+1x WF19054        u27               Programmable Sound Generator
+1x SN76489AN      u28               Digital Complex Sound Generator
+1x oscillator   unmarked  Y1
 
 ROMs
 1x D27256      1.u3
@@ -8660,7 +8660,7 @@ Others
 1x battery 5,5V
 
 Notes
-PCB is marked "REV.3" 
+PCB is marked "REV.3"
 */
 ROM_START( chryglda )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -9268,7 +9268,7 @@ ROM_END
 
 
 /* Cherry Master I (CM1-1.01)
-   Sticker with "Cherry Master V4 -B-" on the PCB.   
+   Sticker with "Cherry Master V4 -B-" on the PCB.
    Similar to cmasterb. Different program.
 
 1x TMPZ84C00AP-6   u80    8-bit Microprocessor
@@ -9296,7 +9296,7 @@ Others
 1x pushbutton (SW6)
 1x trimmer (volume)(VR1)
 5x 8x2 switches DIP(SW1-SW5)
-1x battery 5.5V(BT1) 
+1x battery 5.5V(BT1)
 */
 ROM_START( cmasterg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -12059,7 +12059,7 @@ ROM_END
    Lacks of Dyna copyright. Maybe bootleg.
 
    Not reels stop options.
-   Tried any input on the real hardware without luck.   
+   Tried any input on the real hardware without luck.
 */
 ROM_START( scmaster )  // all roms unique
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -13483,7 +13483,7 @@ DRIVER_INIT_MEMBER(cmaster_state, rp36c3)
 	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, read8_delegate(FUNC(cmaster_state::fixedval48_r),this));
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, rp96sub)	// 95 33 95 33 70 6C 70 6C... XORs seem ok. need bitswap and handler.
+DRIVER_INIT_MEMBER(cmaster_state, rp96sub)  // 95 33 95 33 70 6C 70 6C... XORs seem ok. need bitswap and handler.
 {
 	int i;
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -13502,7 +13502,7 @@ DRIVER_INIT_MEMBER(cmaster_state, rp96sub)	// 95 33 95 33 70 6C 70 6C... XORs se
 		ROM[i] = x;
 	}
 
-//	m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(FUNC(cmaster_state::fixedvalb2_r),this));
+//  m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(FUNC(cmaster_state::fixedvalb2_r),this));
 }
 
 

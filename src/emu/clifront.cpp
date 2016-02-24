@@ -107,10 +107,10 @@ int cli_frontend::execute(int argc, char **argv)
 		m_options.parse_command_line(argc, argv, option_errors);
 
 		m_options.parse_standard_inis(option_errors);
-		
+
 		//load_translation();
 		load_translation(m_options);
-		
+
 		manager->start_luaengine();
 
 		if (*(m_options.software_name()) != 0)

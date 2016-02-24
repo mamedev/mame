@@ -79,7 +79,7 @@ public:
 		m_io_key1(*this , "KEY1"),
 		m_io_key2(*this , "KEY2"),
 		m_io_key3(*this , "KEY3"),
-                m_t15(*this , "t15")
+				m_t15(*this , "t15")
 	{ }
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -101,9 +101,9 @@ public:
 
 		DECLARE_WRITE8_MEMBER(pa_w);
 
-        DECLARE_WRITE_LINE_MEMBER(t15_irq_w);
-        DECLARE_WRITE_LINE_MEMBER(t15_flg_w);
-        DECLARE_WRITE_LINE_MEMBER(t15_sts_w);
+		DECLARE_WRITE_LINE_MEMBER(t15_irq_w);
+		DECLARE_WRITE_LINE_MEMBER(t15_flg_w);
+		DECLARE_WRITE_LINE_MEMBER(t15_sts_w);
 
 private:
 		required_device<hp_5061_3001_cpu_device> m_lpu;
@@ -113,7 +113,7 @@ private:
 	required_ioport m_io_key1;
 	required_ioport m_io_key2;
 	required_ioport m_io_key3;
-        required_device<hp_taco_device> m_t15;
+		required_device<hp_taco_device> m_t15;
 
 		void set_video_mar(UINT16 mar);
 		void video_fill_buff(bool buff_idx);
@@ -150,8 +150,8 @@ private:
 		UINT8 m_kb_scancode;
 		UINT16 m_kb_status;
 
-        // State of PPU I/O
-        UINT8 m_ppu_pa;
+		// State of PPU I/O
+		UINT8 m_ppu_pa;
 };
 
 static INPUT_PORTS_START(hp9845b)
@@ -332,13 +332,13 @@ void hp9845b_state::machine_reset()
 		m_video_frame = 0;
 
 		m_irl_pending = 0;
-                m_irh_pending = 0;
+				m_irh_pending = 0;
 
 		memset(&m_kb_state[ 0 ] , 0 , sizeof(m_kb_state));
 		m_kb_scancode = 0x7f;
 		m_kb_status = 0;
 
-                m_ppu_pa = 0;
+				m_ppu_pa = 0;
 }
 
 void hp9845b_state::set_video_mar(UINT16 mar)
@@ -593,13 +593,13 @@ WRITE16_MEMBER(hp9845b_state::kb_irq_clear_w)
 
 WRITE8_MEMBER(hp9845b_state::pa_w)
 {
-        m_ppu_pa = data;
+		m_ppu_pa = data;
 
 		// TODO: handle sts & flg
 		if (data == 15) {
-                        // RHS tape drive (T15)
-                        m_ppu->status_w(m_t15->sts_r());
-                        m_ppu->flag_w(m_t15->flg_r());
+						// RHS tape drive (T15)
+						m_ppu->status_w(m_t15->sts_r());
+						m_ppu->flag_w(m_t15->flg_r());
 		} else {
 				m_ppu->status_w(0);
 				m_ppu->flag_w(0);
@@ -608,26 +608,26 @@ WRITE8_MEMBER(hp9845b_state::pa_w)
 
 WRITE_LINE_MEMBER(hp9845b_state::t15_irq_w)
 {
-        if (state) {
-                BIT_SET(m_irh_pending , 7);
-        } else {
-                BIT_CLR(m_irh_pending , 7);
-        }
-        update_irq();
+		if (state) {
+				BIT_SET(m_irh_pending , 7);
+		} else {
+				BIT_CLR(m_irh_pending , 7);
+		}
+		update_irq();
 }
 
 WRITE_LINE_MEMBER(hp9845b_state::t15_flg_w)
 {
-        if (m_ppu_pa == 15) {
-                m_ppu->flag_w(state);
-        }
+		if (m_ppu_pa == 15) {
+				m_ppu->flag_w(state);
+		}
 }
 
 WRITE_LINE_MEMBER(hp9845b_state::t15_sts_w)
 {
-        if (m_ppu_pa == 15) {
-                m_ppu->status_w(state);
-        }
+		if (m_ppu_pa == 15) {
+				m_ppu->status_w(state);
+		}
 }
 
 static MACHINE_CONFIG_START( hp9845a, hp9845_state )
@@ -678,9 +678,9 @@ static ADDRESS_MAP_START(ppu_io_map , AS_IO , 16 , hp9845b_state)
 		// PA = 0, IC = 3
 		// Keyboard status input & keyboard interrupt clear
 		AM_RANGE(HP_MAKE_IOADDR(0 , 3) , HP_MAKE_IOADDR(0 , 3)) AM_READWRITE(kb_status_r , kb_irq_clear_w)
-        // PA = 15, IC = 0..3
-        // Right-hand side tape drive (T15)
-        AM_RANGE(HP_MAKE_IOADDR(15 , 0) , HP_MAKE_IOADDR(15 , 3))        AM_DEVREADWRITE("t15" , hp_taco_device , reg_r , reg_w)
+		// PA = 15, IC = 0..3
+		// Right-hand side tape drive (T15)
+		AM_RANGE(HP_MAKE_IOADDR(15 , 0) , HP_MAKE_IOADDR(15 , 3))        AM_DEVREADWRITE("t15" , hp_taco_device , reg_r , reg_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
@@ -706,11 +706,11 @@ static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
 	// Actual keyboard refresh rate should be KEY_SCAN_OSCILLATOR / 128 (2560 Hz)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer" , hp9845b_state , kb_scan , attotime::from_hz(100))
 
-        // Tape controller
-        MCFG_DEVICE_ADD("t15" , HP_TACO , 4000000)
-        MCFG_TACO_IRQ_HANDLER(WRITELINE(hp9845b_state , t15_irq_w))
-        MCFG_TACO_FLG_HANDLER(WRITELINE(hp9845b_state , t15_flg_w))
-        MCFG_TACO_STS_HANDLER(WRITELINE(hp9845b_state , t15_sts_w))
+		// Tape controller
+		MCFG_DEVICE_ADD("t15" , HP_TACO , 4000000)
+		MCFG_TACO_IRQ_HANDLER(WRITELINE(hp9845b_state , t15_irq_w))
+		MCFG_TACO_FLG_HANDLER(WRITELINE(hp9845b_state , t15_flg_w))
+		MCFG_TACO_STS_HANDLER(WRITELINE(hp9845b_state , t15_sts_w))
 
 		MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
 MACHINE_CONFIG_END

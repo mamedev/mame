@@ -16,7 +16,7 @@
     Chess pieces are required, but theoretically blindfold chess is possible.
     Chessboard artwork is provided for boards with pressure/magnet sensors.
     Read the official manual(s) on how to play.
-    
+
     Keypad legend:
     - RE: Reset
     - CL: Clear
@@ -29,17 +29,17 @@
     - RV: Reverse
     - ST: Set/Stop
     - TM: Time
-    
+
     Peripherals, compatible with various boards:
     - Fidelity Challenger Printer - thermal printer, MCU=?
-    
+
     Program/data cartridges, for various boards, some cross-compatible:
     - CG6: Greatest Chess Games 1
     - CAC: Challenger Advanced Chess - 8KB 101-1038A01
     - CB9: Challenger Book Openings 1 - 8KB?
     - CB16: Challenger Book Openings 2 - 8+8KB 101-1042A01,02
     - others are alt. titles of these?
-    
+
     Board hardware descriptions below.
     Detailed RE work done by Kevin 'kevtris' Horton, except where noted
 
@@ -534,7 +534,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vcc_ppi_portc_w);
 	DECLARE_WRITE8_MEMBER(cc10_ppi_porta_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off_callback);
-	
+
 	// BCC
 	DECLARE_READ8_MEMBER(bcc_input_r);
 	DECLARE_WRITE8_MEMBER(bcc_control_w);
@@ -938,7 +938,7 @@ READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
 
 	// d4: TSI BUSY line
 	data |= (m_speech->busy_r()) ? 0 : 0x10;
-	
+
 	return data;
 }
 
@@ -947,14 +947,14 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 	// d0,d1: input mux highest bits
 	// d5: enable language switch
 	m_inp_mux = (m_inp_mux & 0xff) | (data << 8 & 0x300) | (data << 5 & 0x400);
-	
+
 	// d7: TSI ROM A12
 	m_speech->force_update(); // update stream to now
 	m_speech_bank = data >> 7 & 1;
-	
+
 	// d6: TSI START line
 	m_speech->start_w(data >> 6 & 1);
-	
+
 	// d2: lower TSI volume
 	m_speech->set_output_gain(0, (data & 4) ? 0.5 : 1.0);
 }

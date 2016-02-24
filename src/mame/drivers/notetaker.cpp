@@ -23,7 +23,7 @@
  * The NoteTaker used the BitBlt graphical operation (from SmallTalk-76) to do most graphical functions, in order to fit the SmallTalk code and programs within 256K of RAM[2]. The actual BitBlt code lives in ROM[3].
 
  * As far as I am aware, no media (world disks/boot disks) for the NoteTaker have survived (except maybe the two disks at Xerox Museum at PARC), but an incomplete dump of the Smalltalk-76 'world' which was used to bootstrap Smalltalk-78 originally did survive on the Alto disks at CHM
- 
+
  * see http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker for additional information
  * see http://xeroxalto.computerhistory.org/Filene/Smalltalk-76/ for the smalltalk-76 dump
  * see http://xeroxalto.computerhistory.org/Indigo/BasicDisks/Smalltalk14.bfs!1_/ for more notetaker/smalltalk related files, including SmallTalk-80 files based on the notetaker smalltalk-78
@@ -35,7 +35,7 @@
  * [4] http://xeroxalto.computerhistory.org/Filene/Smalltalk-76/
  * [5] http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790118_NoteTaker_System_Manual.pdf
  * MISSING DUMP for 8741? Keyboard MCU which does row-column scanning and mouse-related stuff
- 
+
 TODO: everything below.
 * figure out the correct memory maps for the 256kB of shared ram, and what part of ram constitutes the framebuffer
 * figure out how the emulation-cpu boots and where its 4k of local ram maps to
@@ -53,7 +53,7 @@ WIP:
   According to [3] and [5] the format is double density/MFM, 128 bytes per sector, 16 sectors per track, 1 or 2 sided, for 170K or 340K per disk. Drive spins at 300RPM.
   According to the schematics, we're missing an 82s147 DISKSEP.PROM used as a data separator
 * we're missing a dump of the 82s126 SETMEMRQ PROM used to handle memory arbitration between the crtc and the rest of the system, but the equations are on the schematic and I'm planning to regenerate the prom contents from that, see ROM_LOAD section
-  
+
 DONE:
 * i/o cpu i/o area needs the memory map worked out per the schematics - done
 */
@@ -87,7 +87,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	// basic io
 	DECLARE_WRITE16_MEMBER(IPConReg_w);
-	
+
 	// uarts
 	DECLARE_READ16_MEMBER(ReadKeyData_r);
 	DECLARE_READ16_MEMBER(ReadOPStatus_r);
@@ -108,7 +108,7 @@ public:
 //variables
 	UINT8 m_BootSeqDone;
 	UINT8 m_DisableROM;
-	
+
 // overrides
 	virtual void machine_reset() override;
 };
@@ -346,14 +346,14 @@ static ADDRESS_MAP_START(notetaker_iocpu_io, AS_IO, 16, notetaker_state)
 ADDRESS_MAP_END
 
 /* iopic8259 interrupts:
-irq0	parity error (parity error syndrome data will be in fffdx/fffex) - currently ignored
-irq1	IPSysInt (interrupt triggered by the emulator cpu)
-irq2	DiskInt	(interrupt triggered by the IRQ or DRQ pins from the WD1791)
-irq3	EIAInt	(interrupt triggered by the datareceived pin from the eiauart)
-irq4	OddInt	(interrupt triggered by the O/E Odd/Even pin from the crt5027)
-irq5	ADCInt	(interrupt triggered at the ADCSpd rate interrupt from 74c161 counter on the disk/display module to indicate adc conversion finished)
-irq6	KbdInt	(interrupt triggered by the datareceived pin from the kbduart)
-irq7	VSync	(interrupt from the VSYN VSync pin from the crt5027)
+irq0    parity error (parity error syndrome data will be in fffdx/fffex) - currently ignored
+irq1    IPSysInt (interrupt triggered by the emulator cpu)
+irq2    DiskInt (interrupt triggered by the IRQ or DRQ pins from the WD1791)
+irq3    EIAInt  (interrupt triggered by the datareceived pin from the eiauart)
+irq4    OddInt  (interrupt triggered by the O/E Odd/Even pin from the crt5027)
+irq5    ADCInt  (interrupt triggered at the ADCSpd rate interrupt from 74c161 counter on the disk/display module to indicate adc conversion finished)
+irq6    KbdInt  (interrupt triggered by the datareceived pin from the kbduart)
+irq7    VSync   (interrupt from the VSYN VSync pin from the crt5027)
 */
 
 /* writes during boot of io roms v2.0:
@@ -490,12 +490,12 @@ ROM_START( notetakr )
 	||\------ WCtr.2
 	|\------- WCtr.1
 	\-------- WCtr.0 (MSB)
-	
+
 	Data:
 	0123
 	|\\\- N/C (zero?)
 	\---- SetMemRq
-	
+
 	Equation: SETMEMRQ == (
 	  ((Rctr == 0) && ((Wctr == 0)||(Wctr == 4)||(Wctr == 8)))
 	||((Rctr == 4) && ((Wctr == 4)||(Wctr == 8)||(Wctr == 12)))

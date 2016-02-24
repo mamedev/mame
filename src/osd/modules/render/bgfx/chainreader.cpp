@@ -20,7 +20,7 @@
 
 bgfx_chain* chain_reader::read_from_value(const Value& value, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t screen_width, uint32_t screen_height)
 {
-    validate_parameters(value);
+	validate_parameters(value);
 
 	std::string name = value["name"].GetString();
 	std::string author = value["author"].GetString();

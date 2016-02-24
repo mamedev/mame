@@ -2023,11 +2023,11 @@ WRITE64_MEMBER(viper_state::unk_serial_w)
 
 			if (m_unk_serial_bit_w == 8)
 			{
-				if ((m_unk_serial_cmd & 0x80) == 0)		// register read
+				if ((m_unk_serial_cmd & 0x80) == 0)     // register read
 				{
 					int reg = m_unk_serial_cmd & 0x7f;
 					UINT8 data = m_unk_serial_regs[reg];
-					
+
 					m_unk_serial_data_r = ((data & 0x1) << 7) | ((data & 0x2) << 5) | ((data & 0x4) << 3) | ((data & 0x8) << 1) | ((data & 0x10) >> 1) | ((data & 0x20) >> 3) | ((data & 0x40) >> 5) | ((data & 0x80) >> 7);
 
 					printf("unk_serial read reg %02X: %04X\n", reg, data);
@@ -2035,7 +2035,7 @@ WRITE64_MEMBER(viper_state::unk_serial_w)
 			}
 			if (m_unk_serial_bit_w == 16)
 			{
-				if (m_unk_serial_cmd & 0x80)				// register write
+				if (m_unk_serial_cmd & 0x80)                // register write
 				{
 					int reg = m_unk_serial_cmd & 0x7f;
 					m_unk_serial_regs[reg] = m_unk_serial_data;
@@ -2538,7 +2538,7 @@ ROM_START(sscopefh)
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
-	
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "ata:0:hdd:image" )
@@ -2572,7 +2572,7 @@ ROM_START(thrild2a) //*
 	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) )
 ROM_END
 
-ROM_START(thrild2ab) 
+ROM_START(thrild2ab)
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
@@ -2585,7 +2585,7 @@ ROM_START(thrild2ab)
 	DISK_IMAGE( "a41a02_alt", 0, SHA1(7a9cfdab7000765ffdd9198b209f7a74741248f2) )
 ROM_END
 
-ROM_START(thrild2ac) 
+ROM_START(thrild2ac)
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */

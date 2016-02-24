@@ -651,7 +651,7 @@ void ui_menu_misc_options::custom_render(void *selectedref, float top, float bot
 	ui_manager &mui = machine().ui();
 
 	mui.draw_text_full(container, _("Miscellaneous Options"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -671,5 +671,5 @@ void ui_menu_misc_options::custom_render(void *selectedref, float top, float bot
 
 	// draw the text within it
 	mui.draw_text_full(container, _("Miscellaneous Options"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }

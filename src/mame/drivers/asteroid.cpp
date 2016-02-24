@@ -774,7 +774,7 @@ ROM_END
 
 /*  Space Rocks (J.Estevez, Barcelona).
     Seems to be a legit spanish set, since there are documented cabs
-	registered in Spain.
+    registered in Spain.
 */
 ROM_START( spcrocks )
 	ROM_REGION( 0x8000, "maincpu", 0 )

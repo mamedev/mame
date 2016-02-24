@@ -2,9 +2,9 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-	language.h
+    language.h
 
-	Multi-language support.
+    Multi-language support.
 
 ***************************************************************************/
 #pragma once
@@ -20,13 +20,12 @@
 //  LOCALIZATION SUPPORT
 //**************************************************************************
 
-#define _(param)	lang_translate(param)
+#define _(param)    lang_translate(param)
 // Fake one to make possible using it in static text definitions, on those
 // lang_translate must be called afterwards
-#define __(param)	param
+#define __(param)   param
 
 void load_translation(emu_options &option);
 const char *lang_translate(const char *word);
 
 #endif /*__LANGUAGE_H__*/
-

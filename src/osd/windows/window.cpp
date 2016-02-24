@@ -205,19 +205,19 @@ bool windows_osd_interface::window_init()
 	}
 
 	const int fallbacks[VIDEO_MODE_COUNT] = {
-		-1,					// NONE -> no fallback
-		VIDEO_MODE_NONE,	// GDI -> NONE
-		VIDEO_MODE_D3D,		// BGFX -> D3D
+		-1,                 // NONE -> no fallback
+		VIDEO_MODE_NONE,    // GDI -> NONE
+		VIDEO_MODE_D3D,     // BGFX -> D3D
 #if (USE_OPENGL)
-		VIDEO_MODE_GDI,		// OPENGL -> GDI
+		VIDEO_MODE_GDI,     // OPENGL -> GDI
 #endif
-		-1,					// No SDL2ACCEL on Windows OSD
+		-1,                 // No SDL2ACCEL on Windows OSD
 #if (USE_OPENGL)
-		VIDEO_MODE_OPENGL,	// D3D -> OPENGL
+		VIDEO_MODE_OPENGL,  // D3D -> OPENGL
 #else
-		VIDEO_MODE_GDI,		// D3D -> GDI
+		VIDEO_MODE_GDI,     // D3D -> GDI
 #endif
-		-1					// No SOFT on Windows OSD
+		-1                  // No SOFT on Windows OSD
 	};
 
 	int current_mode = video_config.mode;

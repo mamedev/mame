@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:Dankan1890
 /***************************************************************************
 
@@ -29,9 +29,9 @@ std::string reselect_last::software;
 std::string reselect_last::swlist;
 bool reselect_last::m_reselect = false;
 static const char *region_lists[] = { "arab", "arg", "asia", "aus", "aut", "bel", "blr", "bra", "can", "chi", "chn", "cze", "den",
-                                      "ecu", "esp", "euro", "fin", "fra", "gbr", "ger", "gre", "hkg", "hun", "irl", "isr",
-                                      "isv", "ita", "jpn", "kaz", "kor", "lat", "lux", "mex", "ned", "nld", "nor", "nzl",
-                                      "pol", "rus", "slo", "spa", "sui", "swe", "tha", "tpe", "tw", "uk", "ukr", "usa" };
+										"ecu", "esp", "euro", "fin", "fra", "gbr", "ger", "gre", "hkg", "hun", "irl", "isr",
+										"isv", "ita", "jpn", "kaz", "kor", "lat", "lux", "mex", "ned", "nld", "nor", "nzl",
+										"pol", "rus", "slo", "spa", "sui", "swe", "tha", "tpe", "tw", "uk", "ukr", "usa" };
 
 //-------------------------------------------------
 //  compares two items in the software list and
@@ -424,7 +424,7 @@ void ui_menu_select_software::populate()
 				old_software = m_has_empty_start ? curitem + 1 : curitem;
 
 			item_append(m_displaylist[curitem]->longname.c_str(), m_displaylist[curitem]->devicetype.c_str(),
-			            m_displaylist[curitem]->parentname.empty() ? flags_ui : (MENU_FLAG_INVERT | flags_ui), (void *)m_displaylist[curitem]);
+						m_displaylist[curitem]->parentname.empty() ? flags_ui : (MENU_FLAG_INVERT | flags_ui), (void *)m_displaylist[curitem]);
 		}
 	}
 
@@ -434,8 +434,8 @@ void ui_menu_select_software::populate()
 
 		for (int curitem = 0; m_searchlist[curitem] != nullptr; ++curitem)
 			item_append(m_searchlist[curitem]->longname.c_str(), m_searchlist[curitem]->devicetype.c_str(),
-			            m_searchlist[curitem]->parentname.empty() ? flags_ui : (MENU_FLAG_INVERT | flags_ui),
-			            (void *)m_searchlist[curitem]);
+						m_searchlist[curitem]->parentname.empty() ? flags_ui : (MENU_FLAG_INVERT | flags_ui),
+						(void *)m_searchlist[curitem]);
 	}
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, flags_ui, nullptr);
@@ -636,7 +636,7 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 	for (int line = 0; line < 3; ++line)
 	{
 		mui.draw_text_full(container, tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-		                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+										DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(width, maxwidth);
 	}
@@ -659,7 +659,7 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 	for (int line = 0; line < 3; ++line)
 	{
 		mui.draw_text_full(container, tempbuf[line].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-		                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+										DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		y1 += mui.get_line_height();
 	}
 
@@ -781,7 +781,7 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 	for (auto & elem : tempbuf)
 	{
 		mui.draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-		                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+										DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
 	}
@@ -808,7 +808,7 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 	for (auto & elem : tempbuf)
 	{
 		mui.draw_text_full(container, elem.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-		                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+										DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		y1 += machine().ui().get_line_height();
 	}
 }
@@ -1088,7 +1088,6 @@ std::string c_sw_publisher::getname(std::string &str)
 //-------------------------------------------------
 void ui_menu_select_software::build_list(std::vector<ui_software_info *> &s_drivers, const char *filter_text, int filter)
 {
-
 	if (s_drivers.empty() && filter == -1)
 	{
 		filter = sw_filters::actual;
@@ -1319,11 +1318,11 @@ float ui_menu_select_software::draw_left_panel(float x1, float y1, float x2, flo
 				hover = phover + filter;
 			}
 
-/*			if (afilter == filter)
-			{
-				bgcolor = UI_SELECTED_BG_COLOR;
-				fgcolor = UI_SELECTED_COLOR;
-			}
+/*          if (afilter == filter)
+            {
+                bgcolor = UI_SELECTED_BG_COLOR;
+                fgcolor = UI_SELECTED_COLOR;
+            }
 */
 			if (bgcolor != UI_TEXT_BG_COLOR)
 				container->add_rect(x1, y1, x2, y1 + line_height, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
@@ -1359,7 +1358,7 @@ float ui_menu_select_software::draw_left_panel(float x1, float y1, float x2, flo
 			}
 
 			mui.draw_text_full(container, str.c_str(), x1t, y1, x2 - x1, JUSTIFY_LEFT, WRAP_NEVER,
-			                   DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
+								DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
 			y1 += line_height;
 		}
 
@@ -1439,7 +1438,7 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 	if (soft && soft->usage.empty())
 	{
 		mui.draw_text_full(container, _("History"), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+										DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		ui_globals::cur_sw_dats_view = 0;
 	}
 	else
@@ -1453,14 +1452,14 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 		for (auto & elem : t_text)
 		{
 			mui.draw_text_full(container, elem.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-			                              DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
+											DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
 			txt_lenght += 0.01f;
 			title_size = MAX(txt_lenght, title_size);
 		}
 
 		mui.draw_text_full(container, t_text[ui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1,
-		                              JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-		                              nullptr, nullptr);
+										JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+										nullptr, nullptr);
 
 		draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::cur_sw_dats_view, 0, 1, title_size);
 	}
@@ -1484,7 +1483,7 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 	if (buffer.empty())
 	{
 		mui.draw_text_full(container, _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, JUSTIFY_CENTER,
-		                              WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+										WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		return;
 	}
 	else
@@ -1512,8 +1511,8 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 			info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
 		else
 			mui.draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1,
-			                              JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-			                              nullptr, nullptr, text_size);
+											JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+											nullptr, nullptr, text_size);
 		oy1 += (line_height * text_size);
 	}
 
@@ -1820,7 +1819,7 @@ void ui_software_parts::custom_render(void *selectedref, float top, float bottom
 	float width;
 	ui_manager &mui = machine().ui();
 	mui.draw_text_full(container, _("Software part selection:"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -1840,7 +1839,7 @@ void ui_software_parts::custom_render(void *selectedref, float top, float bottom
 
 	// draw the text within it
 	mui.draw_text_full(container, _("Software part selection:"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 //-------------------------------------------------
@@ -1958,7 +1957,7 @@ void ui_bios_selection::custom_render(void *selectedref, float top, float bottom
 	float width;
 	ui_manager &mui = machine().ui();
 	mui.draw_text_full(container, _("Bios selection:"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -1978,5 +1977,5 @@ void ui_bios_selection::custom_render(void *selectedref, float top, float bottom
 
 	// draw the text within it
 	mui.draw_text_full(container, _("Bios selection:"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }

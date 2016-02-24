@@ -377,7 +377,7 @@ K28 modules:
     - Expansion Module 4: VSM: 16KB CM62217
     - Expansion Module 5: VSM: 16KB CM62218*
     - Expansion Module 6: VSM: 16KB CM62219
-    
+
     note: these won't work on the 1981 version(s)
 
 ----------------------------------------------------------------------------
@@ -682,7 +682,7 @@ WRITE16_MEMBER(tispeak_state::k28_write_r)
 
 	// R0: TMS5100 PDC pin
 	m_tms5100->pdc_w(data & 1);
-	
+
 	// R5: input mux high bit
 	m_inp_mux = (m_inp_mux & 0xff) | (data << 3 & 0x100);
 
