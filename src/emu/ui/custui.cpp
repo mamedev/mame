@@ -102,6 +102,7 @@ void ui_menu_custom_ui::handle()
 
 					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, ui_globals::panels_status));
 				}
+				break;
 			}
 			case LANGUAGE_MENU:
 			{
