@@ -289,11 +289,11 @@ msgstr "UIの色設定"
 
 #: src/emu/ui/custui.cpp:592 src/emu/ui/selector.cpp:181
 msgid "Double click or press "
-msgstr "色の値を変更するには"
+msgstr "値を変更するには"
 
 #: src/emu/ui/custui.cpp:592
 msgid " to change the color value"
-msgstr "ダブルクリックまたはプレスして下さい"
+msgstr "を押すかダブルクリックしてください"
 
 #: src/emu/ui/custui.cpp:618
 msgid "Menu Preview"
@@ -718,7 +718,7 @@ msgstr "選択リスト - 検索:"
 
 #: src/emu/ui/selector.cpp:181
 msgid " to select"
-msgstr " 選択"
+msgstr "を押すかダブルクリックで選択してください"
 
 #: src/emu/ui/selgame.cpp:623 src/emu/ui/simpleselgame.cpp:264
 msgid "Configure Options"
@@ -799,7 +799,7 @@ msgstr "外部サンプル使用"
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
-msgstr "このドライバは以下のデバイスで画像の読み込みが必要です:"
+msgstr "このドライバは以下のデバイスでイメージの読み込みが必要です:"
 
 #: src/emu/ui/ui.cpp:1062
 msgid ""
@@ -819,7 +819,7 @@ msgid ""
 msgstr ""
 "もしあなたが合法的に「%s」をプレイする資格がない場合は、ESCキーを押して下さ"
 "い。\n"
-"\v\n"
+"\n"
 
 #: src/emu/ui/ui.cpp:1064
 msgid "Otherwise, type OK or move the joystick left then right to continue"
@@ -935,7 +935,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"\vこのマシンの動作可能なクローンセット:"
+"このマシンの動作可能なクローンセット:"
 
 #: src/emu/ui/ui.cpp:1195
 msgid ""
@@ -945,7 +945,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"\vOKとタイプするか、ジョイスティックを左右に動かして進む"
+"OKとタイプするか、ジョイスティックを左右に動かして進む"
 
 #: src/emu/ui/ui.cpp:1254
 msgid ""
@@ -953,7 +953,7 @@ msgid ""
 "Sound:\n"
 msgstr ""
 "\n"
-"\vサウンド:\n"
+"サウンド:\n"
 
 #: src/emu/ui/ui.cpp:1282
 msgid ""
@@ -1034,9 +1034,9 @@ msgid ""
 "Press ''%s'' to return to emulation."
 msgstr ""
 "終了しますか?\n"
-"\v\n"
-"\v「%s」で終了\n"
-"\v「%s」でエミュレーションに戻る"
+"\n"
+"「%s」で終了\n"
+"「%s」でエミュレーションに戻る"
 
 #: src/emu/ui/ui.cpp:1980
 msgid "Master Volume"
