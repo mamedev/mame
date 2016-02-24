@@ -884,7 +884,7 @@ msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
 msgstr "Cette machine ne possède pas de matériel son, MAME ne fournira aucun son, ceci est "
-"un commportement prévu.\n
+"un commportement prévu.\n"
 
 #: src/emu/ui/ui.cpp:1155
 msgid "The machine has protection which isn't fully emulated.\n"
