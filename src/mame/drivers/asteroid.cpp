@@ -786,7 +786,7 @@ ROM_START( spcrocks )
 
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
-	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
+	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, BAD_DUMP CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) ) // still undumped.
 ROM_END
 
 ROM_START( aerolitos )
@@ -1011,7 +1011,6 @@ ROM_START( llandert )
 ROM_END
 
 
-
 /*************************************
  *
  *  Driver initialization
@@ -1029,6 +1028,7 @@ DRIVER_INIT_MEMBER(asteroid_state,asterock)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2007, read8_delegate(FUNC(asteroid_state::asterock_IN0_r),this));
 }
+
 
 /*************************************
  *
