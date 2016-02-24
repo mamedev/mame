@@ -13,7 +13,6 @@
 #ifndef __UI_MISCMENU_H__
 #define __UI_MISCMENU_H__
 
-#include "drivenum.h"
 #include "crsshair.h"
 
 class ui_menu_keyboard_mode : public ui_menu {

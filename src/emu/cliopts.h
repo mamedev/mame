@@ -34,6 +34,7 @@
 #define CLICOMMAND_LISTSOURCE           "listsource"
 #define CLICOMMAND_LISTCLONES           "listclones"
 #define CLICOMMAND_LISTBROTHERS         "listbrothers"
+#define CLICOMMAND_LISTTREE             "listtree"
 #define CLICOMMAND_LISTCRC              "listcrc"
 #define CLICOMMAND_LISTROMS             "listroms"
 #define CLICOMMAND_LISTSAMPLES          "listsamples"

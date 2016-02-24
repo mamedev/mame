@@ -91,21 +91,30 @@ games are listed; however, you can limit this list by specifying a
 driver name or wildcard after the \-listfull command.
 .TP
 .B \-listsource, \-ls \fR[\fIgamename\fR|\fIwildcard\fR]
-Displays a list of drivers and the names of the source files their game
-drivers live in. Useful for finding which driver a game runs on in
-order to fix bugs. By default all games are listed; however, you can
+Displays a list of drivers, the names of the source files their game
+drivers live in, and their parent sets and BIOS roots, if any. These
+are listed in the form of wildcards that will match all drivers with
+similar properties. By default all games are listed; however, you can
 limit this list by specifying a driver name or wildcard after the
 \-listsource command.
 .TP
 .B \-listclones, \-lc \fR[\fIgamename\fR|\fIwildcard\fR]
-Displays a list of clones. By default all clones are listed; however,
-you can limit this list by specifying a driver name or wildcard after
-the \-listclones command.
+Displays a list of clones, sorted under their parent sets. By default
+all drivers are listed; however, you can limit this list to clones of
+certain drivers by specifying a name or wildcard after the \-listclones
+command.
 .TP
 .B \-listbrothers, \-lb \fR[\fIgamename\fR|\fIwildcard\fR]
 Displays a list of "brothers" or other drivers from same sourcefile.
 By default all games are listed; however, you can limit this list by
 specifying a driver name or wildcard after the \-listbrothers command.
+.TP
+.B \-listtree, \-lt \fR[\fIgamename\fR|\fIwildcard\fR]
+Displays a list of driver names and descriptions in tree format.
+Clones are listed under their parent sets, and drivers are grouped
+together with their "brothers" from the same sourcefile. By default
+all games are listed; however, you can limit this list by specifying a
+driver name or wildcard.
 .TP
 .B \-listcrc
 Displays a full list of CRCs of all ROM images referenced by all
