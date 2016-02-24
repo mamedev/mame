@@ -43,7 +43,7 @@ msgstr ""
 
 #: src/emu/ui/cheatopt.cpp:91
 msgid "All cheats reloaded"
-msgstr "Recharger Tous les Cheats"
+msgstr "Rechargé Tous les Cheats"
 
 #: src/emu/ui/cheatopt.cpp:122
 msgid "Autofire Settings"
@@ -291,7 +291,7 @@ msgstr "Double cliquer ou presser "
 
 #: src/emu/ui/custui.cpp:592
 msgid " to change the color value"
-msgstr "pour changer la valeur de la couleur"
+msgstr " pour changer la valeur de la couleur"
 
 #: src/emu/ui/custui.cpp:618
 msgid "Menu Preview"
@@ -311,7 +311,7 @@ msgstr "Sélectionné"
 
 #: src/emu/ui/custui.cpp:629
 msgid "Mouse Over"
-msgstr "Souris Sur"
+msgstr "Survol de la Souris"
 
 #: src/emu/ui/custui.cpp:896
 msgid "Choose from palette"
@@ -319,7 +319,7 @@ msgstr "Choisir depuis la Palette"
 
 #: src/emu/ui/custui.cpp:912
 msgid " - ARGB Settings"
-msgstr "Paramètres ARGB"
+msgstr " - Paramètres ARGB"
 
 #: src/emu/ui/custui.cpp:936
 msgid "Color preview ="
@@ -421,7 +421,7 @@ msgstr "PCB"
 
 #: src/emu/ui/dirmenu.cpp:46 src/emu/ui/videoopt.cpp:223
 msgid "Marquees"
-msgstr "MArquees"
+msgstr "Marquees"
 
 #: src/emu/ui/dirmenu.cpp:47
 msgid "Controls Panels"
@@ -501,7 +501,7 @@ msgstr "Ajouter"
 
 #: src/emu/ui/dirmenu.cpp:513
 msgid " Folder - Search: "
-msgstr "Dossier - Rechercher :"
+msgstr " Dossier - Rechercher :"
 
 #: src/emu/ui/dirmenu.cpp:548
 msgid "Press TAB to set"
@@ -513,7 +513,7 @@ msgstr "Enlever "
 
 #: src/emu/ui/dirmenu.cpp:660
 msgid " Folder"
-msgstr "Dossier"
+msgstr " Dossier"
 
 #: src/emu/ui/dsplmenu.cpp:205 src/emu/ui/dsplmenu.cpp:225
 #: src/emu/ui/optsmenu.cpp:248
