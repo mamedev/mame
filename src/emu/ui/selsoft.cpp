@@ -318,7 +318,6 @@ void ui_menu_select_software::handle()
 	if (check_filter)
 	{
 		m_search[0] = '\0';
-
 		switch (l_sw_hover)
 		{
 			case UI_SW_REGION:
@@ -1184,7 +1183,7 @@ void ui_menu_select_software::find_matches(const char *str, int count)
 	std::vector<int> penalty(count, 9999);
 	int index = 0;
 
-	for (; m_displaylist[index]; ++index)
+	for (; index < m_displaylist.size(); ++index)
 	{
 		// pick the best match between driver name and description
 		int curpenalty = fuzzy_substring(str, m_displaylist[index]->longname);
