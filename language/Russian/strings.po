@@ -823,7 +823,7 @@ msgstr ""
 
 #: src/emu/ui/ui.cpp:1064
 msgid "Otherwise, type OK or move the joystick left then right to continue"
-msgid "Иначе напечатайте OK либо нажмите влево затем вправо на джойстике"
+msgstr "Иначе напечатайте OK либо нажмите влево затем вправо на джойстике"
 
 #: src/emu/ui/ui.cpp:1099
 msgid ""
