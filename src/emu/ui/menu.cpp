@@ -603,7 +603,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 			}
 
 			// else if the mouse is over this item, draw with a different background
-			else if (itemnum == hover) /* && ((linenum == 0 && top_line != 0) || (linenum == visible_lines - 1 && itemnum != item.size() - 1))) */
+			else if (itemnum == hover)
 			{
 				fgcolor = UI_MOUSEOVER_COLOR;
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
@@ -734,10 +734,10 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 
 		// add a box around that
 		machine().ui().draw_outlined_box(container, target_x - UI_BOX_LR_BORDER,
-							target_y - UI_BOX_TB_BORDER,
-							target_x + target_width + UI_BOX_LR_BORDER,
-											target_y + target_height + UI_BOX_TB_BORDER,
-											subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
+			target_y - UI_BOX_TB_BORDER,
+			target_x + target_width + UI_BOX_LR_BORDER,
+			target_y + target_height + UI_BOX_TB_BORDER,
+			subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
 		machine().ui().draw_text_full(container, pitem.subtext, target_x, target_y, target_width,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
 	}
@@ -747,8 +747,6 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
 	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != item.size());
-//  if (history_flag && (top_line + visible_lines >= item.size()))
-//      selected = item.size() - 1;
 }
 
 void ui_menu::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
