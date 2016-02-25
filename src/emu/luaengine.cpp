@@ -136,23 +136,19 @@ lua_engine::hook::hook()
 	cb = -1;
 }
 
-#if (defined(__sun__) && defined(__svr4__)) || defined(__ANDROID__) || defined(__OpenBSD__)
-#undef _L
-#endif
-
-void lua_engine::hook::set(lua_State *_L, int idx)
+void lua_engine::hook::set(lua_State *lua, int idx)
 {
 	if (L)
 		luaL_unref(L, LUA_REGISTRYINDEX, cb);
 
-	if (lua_isnil(_L, idx)) {
+	if (lua_isnil(lua, idx)) {
 		L = nullptr;
 		cb = -1;
 
 	} else {
-		L = _L;
-		lua_pushvalue(_L, idx);
-		cb = luaL_ref(_L, LUA_REGISTRYINDEX);
+		L = lua;
+		lua_pushvalue(lua, idx);
+		cb = luaL_ref(lua, LUA_REGISTRYINDEX);
 	}
 }
 
@@ -197,9 +193,9 @@ void lua_engine::resume(lua_State *L, int nparam, lua_State *root)
 	}
 }
 
-void lua_engine::resume(void *_L, INT32 param)
+void lua_engine::resume(void *lua, INT32 param)
 {
-	resume(static_cast<lua_State *>(_L));
+	resume(static_cast<lua_State *>(lua));
 }
 
 int lua_engine::l_ioport_write(lua_State *L)
