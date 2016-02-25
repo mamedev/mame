@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-25 16:33+0100\n"
-"PO-Revision-Date: 2016-02-22 01:30+0800\n"
+"PO-Revision-Date: 2016-02-26 02:20+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -689,24 +689,24 @@ msgstr "雜項選項"
 #: src/emu/ui/miscmenu.cpp:740
 #, c-format
 msgid "%s.xml saved under ui folder."
-msgstr ""
+msgstr "%s.xml 已儲存於 ui 資料夾下。"
 
 #: src/emu/ui/miscmenu.cpp:769
 msgid "Name:             Description:\n"
-msgstr ""
+msgstr "名稱:             描述:\n"
 
 #: src/emu/ui/miscmenu.cpp:781
 #, c-format
 msgid "%s.txt saved under ui folder."
-msgstr ""
+msgstr "%s.txt 已儲存於 ui 資料夾下。"
 
 #: src/emu/ui/miscmenu.cpp:801
 msgid "Export XML format"
-msgstr ""
+msgstr "匯出為 XML 格式"
 
 #: src/emu/ui/miscmenu.cpp:802
 msgid "Export TXT format"
-msgstr ""
+msgstr "匯出為 TXT 格式"
 
 #: src/emu/ui/optsmenu.cpp:203
 msgid "Filter"
@@ -742,19 +742,16 @@ msgid " to select"
 msgstr " 以選擇"
 
 #: src/emu/ui/selgame.cpp:39
-#, fuzzy
 msgid "General Info"
-msgstr "一般輸入"
+msgstr "一般資訊"
 
 #: src/emu/ui/selgame.cpp:133
-#, fuzzy, c-format
 msgid "**Error to load %s.ini**"
-msgstr "**儲存至 ui.ini 時錯誤**"
+msgstr "**載入 %s.ini 時錯誤**"
 
 #: src/emu/ui/selgame.cpp:158
-#, fuzzy, c-format
 msgid "**Error to save %s.ini**"
-msgstr "**儲存至 ui.ini 時錯誤**"
+msgstr "**儲存 %s.ini 時錯誤**"
 
 #: src/emu/ui/selgame.cpp:162
 msgid ""
@@ -762,6 +759,9 @@ msgid ""
 "    Configuration saved    \n"
 "\n"
 msgstr ""
+"\n"
+"        設定已儲存        \n"
+"\n"
 
 #: src/emu/ui/selgame.cpp:440
 #, c-format
@@ -769,13 +769,15 @@ msgid ""
 "%s\n"
 " added to favorites list."
 msgstr ""
+"%s\n"
+" 已新增至最愛清單。"
 
 #: src/emu/ui/selgame.cpp:446 src/emu/ui/selgame.cpp:455
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "%s\n"
 " removed from favorites list."
-msgstr "從最愛移除"
+msgstr " 從最愛清單移除。"
 
 #: src/emu/ui/selgame.cpp:514
 msgid ""
@@ -784,6 +786,9 @@ msgid ""
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
+"選定的機台缺少一個至多個必要的 ROM 或 CHD 映像檔，請選擇其他機台。\n"
+"\n"
+"按任意鍵 (除 ESC 鍵) 繼續。"
 
 #: src/emu/ui/selgame.cpp:651 src/emu/ui/simpleselgame.cpp:264
 msgid "Configure Options"
@@ -800,7 +805,7 @@ msgstr "儲存設定"
 #: src/emu/ui/selgame.cpp:762
 #, c-format
 msgid "MAME %s ( %d / %d machines (%d BIOS) )"
-msgstr ""
+msgstr "MAME %s ( %d / %d 機台 (%d BIOS) )"
 
 #: src/emu/ui/selgame.cpp:782
 msgid " Search: "
@@ -809,7 +814,7 @@ msgstr " 搜尋: "
 #: src/emu/ui/selgame.cpp:1474
 #, c-format
 msgid "Romset: %-.100s\n"
-msgstr ""
+msgstr "Rom組: %-.100s\n"
 
 #: src/emu/ui/selgame.cpp:1475
 msgid "Year: "
@@ -818,152 +823,151 @@ msgstr "年份: "
 #: src/emu/ui/selgame.cpp:1476
 #, c-format
 msgid "Manufacturer: %-.100s\n"
-msgstr ""
+msgstr "製造商: %-.100s\n"
 
 #: src/emu/ui/selgame.cpp:1480
 #, c-format
 msgid "Driver is Clone of: %-.100s\n"
-msgstr ""
+msgstr "驅動程式相容於: %-.100s\n"
 
 #: src/emu/ui/selgame.cpp:1482
 msgid "Driver is Parent\n"
-msgstr ""
+msgstr "驅動程式為主檔\n"
 
 #: src/emu/ui/selgame.cpp:1485
 msgid "Overall: NOT WORKING\n"
-msgstr ""
+msgstr "整體: 不可執行\n"
 
 #: src/emu/ui/selgame.cpp:1487
 msgid "Overall: Unemulated Protection\n"
-msgstr ""
+msgstr "整體: 未模擬保護\n"
 
 #: src/emu/ui/selgame.cpp:1489
-msgid "Overall: Working\n"
+msgid "整體: 可以執行\n"
 msgstr ""
 
 #: src/emu/ui/selgame.cpp:1492
 msgid "Graphics: Imperfect Colors\n"
-msgstr ""
+msgstr "圖形: 色彩不完美"
 
 #: src/emu/ui/selgame.cpp:1494
 msgid "Graphics: Wrong Colors\n"
-msgstr ""
+msgstr "圖形: 色彩錯誤"
 
 #: src/emu/ui/selgame.cpp:1496
 msgid "Graphics: Imperfect\n"
-msgstr ""
+msgstr "圖形: 不完美"
 
 #: src/emu/ui/selgame.cpp:1498
 msgid "Graphics: OK\n"
-msgstr ""
+msgstr "圖形: OK"
 
 #: src/emu/ui/selgame.cpp:1501
 msgid "Sound: Unimplemented\n"
-msgstr ""
+msgstr "聲音: 無法執行"
 
 #: src/emu/ui/selgame.cpp:1503
 msgid "Sound: Imperfect\n"
-msgstr ""
+msgstr "聲音: 不完美"
 
 #: src/emu/ui/selgame.cpp:1505
-#, fuzzy
 msgid "Sound: OK\n"
-msgstr ""
-"\n"
-"聲音:\n"
+msgstr "聲音: OK\n"
 
 #: src/emu/ui/selgame.cpp:1507
 #, c-format
 msgid "Driver is Skeleton: %s\n"
-msgstr ""
+msgstr "驅動程式尚未完整: %s\n"
 
 #: src/emu/ui/selgame.cpp:1507 src/emu/ui/selgame.cpp:1508
 #: src/emu/ui/selgame.cpp:1509 src/emu/ui/selgame.cpp:1510
 #: src/emu/ui/selgame.cpp:1511 src/emu/ui/selgame.cpp:1512
 #: src/emu/ui/selgame.cpp:1513
 msgid "Yes"
-msgstr ""
+msgstr "是"
 
 #: src/emu/ui/selgame.cpp:1507 src/emu/ui/selgame.cpp:1508
 #: src/emu/ui/selgame.cpp:1509 src/emu/ui/selgame.cpp:1510
 #: src/emu/ui/selgame.cpp:1511 src/emu/ui/selgame.cpp:1512
 #: src/emu/ui/selgame.cpp:1513
 msgid "No"
-msgstr ""
+msgstr "否"
 
 #: src/emu/ui/selgame.cpp:1508
 #, c-format
 msgid "Game is Mechanical: %s\n"
-msgstr ""
+msgstr "遊戲為機械式: %s\n"
 
 #: src/emu/ui/selgame.cpp:1509
 #, c-format
 msgid "Requires Artwork: %s\n"
-msgstr ""
+msgstr "需要裝飾圖: %s\n"
 
 #: src/emu/ui/selgame.cpp:1510
 #, c-format
 msgid "Requires Clickable Artwork: %s\n"
-msgstr ""
+msgstr "需要可點擊的裝飾圖: %s\n"
 
 #: src/emu/ui/selgame.cpp:1511
 #, c-format
 msgid "Support Cocktail: %s\n"
-msgstr ""
+msgstr "支援檯面型筐體: %s\n"
 
 #: src/emu/ui/selgame.cpp:1512
 #, c-format
 msgid "Driver is Bios: %s\n"
-msgstr ""
+msgstr "驅動程式為 BIOS: %s\n"
 
 #: src/emu/ui/selgame.cpp:1513
 #, c-format
 msgid "Support Save: %s\n"
-msgstr ""
+msgstr "支援即時存檔: %s\n"
 
 #: src/emu/ui/selgame.cpp:1514
 #, c-format
 msgid "Screen Orentation: %s\n"
-msgstr ""
+msgstr "畫面方向: %s\n"
 
 #: src/emu/ui/selgame.cpp:1514
 msgid "Vertical"
-msgstr ""
+msgstr "垂直"
 
 #: src/emu/ui/selgame.cpp:1514
 msgid "Horizontal"
-msgstr ""
+msgstr "水平"
 
 #: src/emu/ui/selgame.cpp:1522
 #, c-format
 msgid "Requires CHD: %s\n"
-msgstr ""
+msgstr "需要 CHD: %s\n"
 
 #: src/emu/ui/selgame.cpp:1535
 msgid "Roms Audit Pass: OK\n"
-msgstr ""
+msgstr "ROM 驗證通過: OK\n"
 
 #: src/emu/ui/selgame.cpp:1537
 msgid "Roms Audit Pass: BAD\n"
-msgstr ""
+msgstr "ROM 驗證通過: 錯誤\n"
 
 #: src/emu/ui/selgame.cpp:1540
 msgid "Samples Audit Pass: None Needed\n"
-msgstr ""
+msgstr "樣本檔驗證通過: 不需要\n"
 
 #: src/emu/ui/selgame.cpp:1542
 msgid "Samples Audit Pass: OK\n"
-msgstr ""
+msgstr "樣本檔驗證通過: OK\n"
 
 #: src/emu/ui/selgame.cpp:1544
 msgid "Samples Audit Pass: BAD\n"
-msgstr ""
+msgstr "樣本檔驗證通過: 錯誤\n"
 
 #: src/emu/ui/selgame.cpp:1547
 msgid ""
 "Roms Audit Pass: Disabled\n"
 "Samples Audit Pass: Disabled\n"
 msgstr ""
+"ROM 驗證通過: 已停用\n"
+"樣本檔驗證通過: 已停用\n"
 
 #: src/emu/ui/selgame.cpp:1964 src/emu/ui/selgame.cpp:2111
 #: src/emu/ui/selsoft.cpp:1535
@@ -979,34 +983,29 @@ msgid " (default)"
 msgstr " (預設)"
 
 #: src/emu/ui/selsoft.cpp:642
-#, fuzzy, c-format
 msgid "Region: %s -"
-msgstr "區域: "
+msgstr "區域: %s -"
 
 #: src/emu/ui/selsoft.cpp:644
-#, fuzzy, c-format
 msgid "Publisher: %s -"
-msgstr "出版商: "
+msgstr "出版商: %s -"
 
 #: src/emu/ui/selsoft.cpp:646
-#, fuzzy, c-format
 msgid "Year: %s -"
-msgstr "年份: "
+msgstr "年份: %s -"
 
 #: src/emu/ui/selsoft.cpp:648
-#, fuzzy, c-format
 msgid "Software List: %s -"
-msgstr "軟體清單: "
+msgstr "軟體清單: %s -"
 
 #: src/emu/ui/selsoft.cpp:650
-#, fuzzy, c-format
 msgid "Device type: %s -"
-msgstr "裝置類別: "
+msgstr "裝置類別: %s -"
 
 #: src/emu/ui/selsoft.cpp:652
 #, fuzzy, c-format
 msgid "%s Search: %s_"
-msgstr " 搜尋: "
+msgstr "%s 搜尋: %s_"
 
 #: src/emu/ui/selsoft.cpp:1872 src/emu/ui/selsoft.cpp:1892
 msgid "Software part selection:"
@@ -1030,7 +1029,7 @@ msgstr "取樣頻率"
 
 #: src/emu/ui/sndmenu.cpp:138
 msgid "Use External Samples"
-msgstr "使用外部取樣"
+msgstr "使用外部樣本檔"
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
