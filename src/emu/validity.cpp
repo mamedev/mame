@@ -211,7 +211,7 @@ bool validity_checker::check_all_matching(const char *string)
 	// then iterate over all drivers and check them
 	m_drivlist.reset();
 	while (m_drivlist.next())
-		if (m_drivlist.matches(string, m_drivlist.driver()))
+		if (m_drivlist.matches(string, m_drivlist.driver().name))
 			validate_one(m_drivlist.driver());
 
 	// cleanup

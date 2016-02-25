@@ -9,7 +9,6 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "drivenum.h"
 #include "rendutil.h"
 #include "cheat.h"
 #include "uiinput.h"

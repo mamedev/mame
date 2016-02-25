@@ -13,6 +13,7 @@
 #ifndef __UI_MAIN_H__
 #define __UI_MAIN_H__
 
+#include "drivenum.h"
 #include "ui/menu.h"
 
 class ui_menu_select_game : public ui_menu

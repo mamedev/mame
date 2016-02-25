@@ -54,42 +54,14 @@ int driver_list::find(const char *name)
 //  account wildcards in the wildstring
 //-------------------------------------------------
 
-bool driver_list::matches(const char *wildstring, const game_driver &driver)
+bool driver_list::matches(const char *wildstring, const char *string)
 {
 	// can only match internal drivers if the wildstring starts with an underscore
-	if (driver.name[0] == '_' && (wildstring == nullptr || wildstring[0] != '_'))
+	if (string[0] == '_' && (wildstring == nullptr || wildstring[0] != '_'))
 		return false;
 
-	// null matches any normal driver
-	if (wildstring == nullptr)
-		return true;
-
-	// special case: match on parent name
-	if (wildstring[0] == '^')
-	{
-		int clone_index = non_bios_clone(driver);
-		if (clone_index == -1)
-			return (wildstring[1] == '\0') || (core_stricmp(wildstring+1, driver.name) == 0);
-		else
-			return (core_stricmp(wildstring+1, s_drivers_sorted[clone_index]->name) == 0);
-	}
-
-	// special case: match on BIOS name
-	if (wildstring[0] == ':')
-	{
-		int bios_index = bios_root(driver);
-		if (bios_index == -1)
-			return (driver.flags & MACHINE_IS_BIOS_ROOT) && ((wildstring[1] == '\0') || (core_stricmp(wildstring+1, driver.name) == 0));
-		else
-			return (core_stricmp(wildstring+1, s_drivers_sorted[bios_index]->name) == 0);
-	}
-
-	// special case: match on source filename
-	if (wildstring[0] == '@')
-		return (core_stricmp(wildstring+1, core_filename_extract_base(driver.source_file).c_str()) == 0);
-
 	// match everything else normally
-	return (core_strwildcmp(wildstring, driver.name) == 0);
+	return (wildstring == nullptr || core_strwildcmp(wildstring, string) == 0);
 }
 
 
@@ -243,7 +215,7 @@ int driver_enumerator::filter(const char *filterstring)
 
 	// match name against each driver in the list
 	for (int index = 0; index < s_driver_count; index++)
-		if (matches(filterstring, *s_drivers_sorted[index]))
+		if (matches(filterstring, s_drivers_sorted[index]->name))
 			include(index);
 
 	return m_filtered_count;
@@ -281,7 +253,7 @@ void driver_enumerator::include_all()
 	// always exclude the empty driver
 	int empty = find("___empty");
 	assert(empty != -1);
-	exclude(empty);
+	m_included[empty] = 0;
 }
 
 
@@ -341,15 +313,9 @@ bool driver_enumerator::next_excluded()
 void driver_enumerator::find_approximate_matches(const char *string, int count, int *results)
 {
 #undef rand
-	// skip leading nonalphanumeric characters
-	if (string != nullptr)
-	{
-		while (string[0] != '\0' && !isalnum(string[0]))
-			string++;
-	}
 
 	// if no name, pick random entries
-	if (string == nullptr || string[0] == '\0')
+	if (string == nullptr || string[0] == 0)
 	{
 		// seed the RNG first
 		srand(osd_ticks());
