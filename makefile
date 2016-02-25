@@ -903,9 +903,6 @@ ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR)/vs2013-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
-vs2013_clang: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2013-clang vs2013
-
 vs2013_winrt: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore81 vs2013
 
@@ -926,9 +923,6 @@ vs2015_xp: generate
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR)/vs2015-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
-
-vs2015_clang: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2015-clang vs2015
 
 vs2015_winrt: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore81 vs2015
@@ -977,36 +971,6 @@ ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=asmjs --gcc_version=4.9 gmake
 endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-asmjs config=$(CONFIG)
-
-
-nacl: nacl_x86
-
-nacl_x64: generate
-ifndef NACL_SDK_ROOT
-	$(error NACL_SDK_ROOT is not set)
-endif
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=nacl --gcc_version=4.8 gmake
-endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-nacl config=$(CONFIG)64
-
-nacl_x86: generate
-ifndef NACL_SDK_ROOT
-	$(error NACL_SDK_ROOT is not set)
-endif
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=nacl --gcc_version=4.8 gmake
-endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-nacl config=$(CONFIG)32
-
-nacl-arm: generate
-ifndef NACL_SDK_ROOT
-	$(error NACL_SDK_ROOT is not set)
-endif
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=nacl-arm --gcc_version=4.8 gmake
-endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-nacl-arm config=$(CONFIG)
 
 pnacl: generate
 ifndef NACL_SDK_ROOT
