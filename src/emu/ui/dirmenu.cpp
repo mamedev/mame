@@ -32,7 +32,7 @@ static const folders_entry s_folders[] =
 	{ __("UI"),                  OPTION_UI_PATH,			CHANGE },
 	{ __("Language"),            OPTION_LANGUAGEPATH,		CHANGE },
 	{ __("Samples"),             OPTION_SAMPLEPATH,			ADDING },
-	{ __("DATs"),                OPTION_HISTORY_PATH,		CHANGE },
+	{ __("DATs"),                OPTION_HISTORY_PATH,		ADDING },
 	{ __("INIs"),                OPTION_INIPATH,			ADDING },
 	{ __("Extra INIs"),          OPTION_EXTRAINI_PATH,		CHANGE },
 	{ __("Icons"),               OPTION_ICONS_PATH,			ADDING },
@@ -73,6 +73,7 @@ ui_menu_directory::~ui_menu_directory()
 {
 	save_ui_options(machine());
 	ui_globals::reset = true;
+	machine().datfile().reset_run();
 }
 
 //-------------------------------------------------
