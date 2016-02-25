@@ -13,6 +13,8 @@
 #ifndef __UI_MAINMENU_H__
 #define __UI_MAINMENU_H__
 
+#include "drivenum.h"
+
 class ui_menu_main : public ui_menu {
 public:
 	ui_menu_main(running_machine &machine, render_container *container);

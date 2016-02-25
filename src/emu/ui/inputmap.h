@@ -13,6 +13,8 @@
 #ifndef __UI_INPUTMAP_H__
 #define __UI_INPUTMAP_H__
 
+//#include "drivenum.h"
+
 class ui_menu_input_groups : public ui_menu {
 public:
 	ui_menu_input_groups(running_machine &machine, render_container *container);

@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "drivenum.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "uiinput.h"
