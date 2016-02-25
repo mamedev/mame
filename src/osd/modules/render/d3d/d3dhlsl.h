@@ -380,8 +380,6 @@ private:
 	int                     curr_screen;                // current screen for render target operations
 	int                     curr_frame;                 // current frame (0/1) of a screen for render target operations
 	int                     lastidx;                    // index of the last-encountered target
-	float                   bloom_dims[11][2];          // bloom texture dimensions
-	int                     bloom_count;                // count of used bloom textures
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
 	hlsl_options *          options;                    // current options

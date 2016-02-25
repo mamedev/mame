@@ -202,14 +202,17 @@ float random(float2 seed)
 
 uniform float2 ScreenDims;
 uniform float2 TargetDims;
-uniform float2 SourceRect;
+uniform float2 SourceDims;
 
+// level dimensions not necessary anymore?
 uniform float2 Level0Size;
 uniform float4 Level12Size;
 uniform float4 Level34Size;
 uniform float4 Level56Size;
 uniform float4 Level78Size;
 uniform float4 Level9ASize;
+
+uniform bool VectorScreen = false;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -226,12 +229,17 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	float2 TexCoord = Input.Position.xy / ScreenDims;
 	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
-	Output.TexCoord0 = TexCoord;
-	Output.TexCoord12 = TexCoord.xyxy + (0.5f / Level12Size);
-	Output.TexCoord34 = TexCoord.xyxy + (0.5f / Level34Size);
-	Output.TexCoord56 = TexCoord.xyxy + (0.5f / Level56Size);
-	Output.TexCoord78 = TexCoord.xyxy + (0.5f / Level78Size);
-	Output.TexCoord9A = TexCoord.xyxy + (0.5f / Level9ASize);
+	Output.TexCoord0 = TexCoord.xy; // + (0.5f / Level0Size);
+
+	TexCoord += VectorScreen
+		? 0.5f / TargetDims.xy
+		: 0.5f / SourceDims.xy;
+
+	Output.TexCoord12 = TexCoord.xyxy; // + (0.5f / Level12Size);
+	Output.TexCoord34 = TexCoord.xyxy; // + (0.5f / Level34Size);
+	Output.TexCoord56 = TexCoord.xyxy; // + (0.5f / Level56Size);
+	Output.TexCoord78 = TexCoord.xyxy; // + (0.5f / Level78Size);
+	Output.TexCoord9A = TexCoord.xyxy; // + (0.5f / Level9ASize);
 
 	return Output;
 }

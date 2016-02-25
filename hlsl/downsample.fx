@@ -57,6 +57,8 @@ uniform float2 SourceDims;
 uniform float2 SourceRect;
 uniform float2 QuadDims;
 
+uniform int BloomLevel;
+
 uniform bool VectorScreen;
 
 static const float2 Coord0Offset = float2(-0.5f, -0.5f);
@@ -68,9 +70,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
-	float2 TargetTexelDims = 1.0f / TargetDims;
-	float2 ScreenTexelDims = 1.0f / ScreenDims;
-	float2 SourceTexelDims = 1.0f / SourceDims;
+	float2 HalfTargetTexelDims = 0.5f / TargetDims;
 
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
@@ -83,17 +83,10 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	float2 TexCoord = Input.Position.xy / ScreenDims;
 	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
-	float2 VectorTexelOffset = ScreenTexelDims * -0.5;
-	float2 RasterTexelOffset = SourceTexelDims * (0.5f * SourceRect) * (1.0f - (QuadDims / ScreenDims));
-
-	TexCoord += VectorScreen 
-		? VectorTexelOffset
-		: RasterTexelOffset;
-
-	Output.TexCoord01.xy = TexCoord + Coord0Offset * TargetTexelDims;
-	Output.TexCoord01.zw = TexCoord + Coord1Offset * TargetTexelDims;
-	Output.TexCoord23.xy = TexCoord + Coord2Offset * TargetTexelDims;
-	Output.TexCoord23.zw = TexCoord + Coord3Offset * TargetTexelDims;
+	Output.TexCoord01.xy = TexCoord + Coord0Offset * HalfTargetTexelDims;
+	Output.TexCoord01.zw = TexCoord + Coord1Offset * HalfTargetTexelDims;
+	Output.TexCoord23.xy = TexCoord + Coord2Offset * HalfTargetTexelDims;
+	Output.TexCoord23.zw = TexCoord + Coord3Offset * HalfTargetTexelDims;
 
 	return Output;
 }

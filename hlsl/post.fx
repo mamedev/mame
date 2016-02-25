@@ -97,17 +97,14 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.xy *= 2.0f; // zoom
 
 	Output.TexCoord = Input.Position.xy / ScreenDims;
-	Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
+
+	Output.TexCoord += PrepareBloom
+		? 0.0f / TargetDims  // use half texel offset (DX9) to do the blur for first bloom layer
+		: 0.5f / TargetDims; // fix half texel offset correction (DX9)
 
 	Output.SourceCoord = Input.TexCoord;
 
-	float2 ScreenCoordOffset = ShadowUVOffset;
-	ScreenCoordOffset = SwapXY
-		? ShadowUVOffset.yx
-		: ShadowUVOffset.xy;
-
 	Output.ScreenCoord = Input.Position.xy / ScreenDims;
-	Output.ScreenCoord += ScreenCoordOffset / ScreenDims;
 
 	Output.Color = Input.Color;
 
@@ -173,22 +170,31 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 BaseColor = tex2D(DiffuseSampler, TexCoord);
 	BaseColor.a = 1.0f;
 
-	clip(TexCoord < 0.0f || TexCoord > 1.0f ? -1 : 1);
+	// keep border	
+	if (!PrepareBloom)
+	{
+		// clip border
+		clip(TexCoord < 0.0f || TexCoord > 1.0f ? -1 : 1);
+	}
 
 	// Mask Simulation (may not affect bloom)
 	if (!PrepareBloom && ShadowAlpha > 0.0f)
 	{
+		float2 shadowUVOffset = ShadowUVOffset;
+		shadowUVOffset = SwapXY
+			? ShadowUVOffset.yx
+			: ShadowUVOffset.xy;
+
 		float2 shadowDims = ShadowDims;
 		shadowDims = SwapXY
 			? shadowDims.yx
 			: shadowDims.xy;
 
 		float2 shadowUV = ShadowUV;
-		// shadowUV = SwapXY
-			// ? shadowUV.yx
-			// : shadowUV.xy;
 
-		float2 screenCoord = ShadowTileMode == 0 ? ScreenCoord : SourceCoord;
+		float2 screenCoord = ShadowTileMode == 0
+			? ScreenCoord + shadowUVOffset / ScreenDims
+			: SourceCoord + shadowUVOffset / SourceDims;
 		screenCoord = SwapXY
 			? screenCoord.yx
 			: screenCoord.xy;
@@ -198,17 +204,17 @@ float4 ps_main(PS_INPUT Input) : COLOR
 			? shadowCount.yx
 			: shadowCount.xy;
 
-		float2 shadowTile = (ShadowTileMode == 0 ? ScreenTexelDims : SourceTexelDims) * shadowCount;
+		float2 shadowTile = ShadowTileMode == 0 
+			? ScreenTexelDims * shadowCount
+			: SourceTexelDims * shadowCount;
 		shadowTile = SwapXY
 			? shadowTile.yx
 			: shadowTile.xy;
 
 		float2 ShadowFrac = frac(screenCoord / shadowTile);
+
 		float2 ShadowCoord = (ShadowFrac * shadowUV);
 		ShadowCoord += 0.5f / shadowDims; // half texel offset
-		// ShadowCoord = SwapXY
-			// ? ShadowCoord.yx
-			// : ShadowCoord.xy;
 
 		float4 ShadowColor = tex2D(ShadowSampler, ShadowCoord);
 		float3 ShadowMaskColor = lerp(1.0f, ShadowColor.rgb, ShadowAlpha);

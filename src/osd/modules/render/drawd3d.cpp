@@ -2770,10 +2770,10 @@ d3d_render_target::~d3d_render_target()
 			(*d3dintf->texture.release)(bloom_texture[index]);
 			bloom_texture[index] = nullptr;
 		}
-		if (bloom_target[index] != nullptr)
+		if (bloom_surface[index] != nullptr)
 		{
-			(*d3dintf->surface.release)(bloom_target[index]);
-			bloom_target[index] = nullptr;
+			(*d3dintf->surface.release)(bloom_surface[index]);
+			bloom_surface[index] = nullptr;
 		}
 	}
 
@@ -2836,23 +2836,33 @@ bool d3d_render_target::init(renderer_d3d9 *d3d, d3d_base *d3dintf, int width, i
 		(*d3dintf->texture.get_surface_level)(target_texture[index], 0, &target_surface[index]);
 	}
 
-	int bloom_index = 0;
-	float bloom_width = target_width;
-	float bloom_height = target_height;
+	bool vector_screen =
+		d3d->window().machine().first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
+
+	// larger blur width for vector screens than raster screens
+	float scale_factor = vector_screen ? 0.5f : 0.75f;
+
+	float bloom_width = (float)width;	
+	float bloom_height = (float)height;
 	float bloom_size = bloom_width < bloom_height ? bloom_width : bloom_height;
-	for (; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
+	for (int bloom_index = 0; bloom_index < 11 && bloom_size >= 2.0f; bloom_size *= scale_factor)
 	{
-		bloom_width *= 0.5f;
-		bloom_height *= 0.5f;
+		this->bloom_dims[bloom_index][0] = (int)bloom_width;
+		this->bloom_dims[bloom_index][1] = (int)bloom_height;
 
 		result = (*d3dintf->device.create_texture)(d3d->get_device(), (int)bloom_width, (int)bloom_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &bloom_texture[bloom_index]);
 		if (result != D3D_OK)
 		{
 			return false;
 		}
-		(*d3dintf->texture.get_surface_level)(bloom_texture[bloom_index], 0, &bloom_target[bloom_index]);
+		(*d3dintf->texture.get_surface_level)(bloom_texture[bloom_index], 0, &bloom_surface[bloom_index]);
+
+		bloom_width *= scale_factor;
+		bloom_height *= scale_factor;
 
 		bloom_index++;
+
+		this->bloom_count = bloom_index;
 	}
 
 	return true;

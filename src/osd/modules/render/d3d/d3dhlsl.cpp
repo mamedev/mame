@@ -60,7 +60,7 @@ static direct3dx9_loadeffect_ptr g_load_effect = NULL;
 //============================================================
 
 shaders::shaders() :
-	d3dintf(NULL), machine(NULL), d3d(NULL), num_screens(0), curr_screen(0), curr_frame(0), bloom_count(0),
+	d3dintf(NULL), machine(NULL), d3d(NULL), num_screens(0), curr_screen(0), curr_frame(0),
 	vecbuf_type(), vecbuf_index(0), vecbuf_count(0), avi_output_file(NULL), avi_frame(0), avi_copy_surface(NULL), avi_copy_texture(NULL), avi_final_target(NULL), avi_final_texture(NULL),
 	black_surface(NULL), black_texture(NULL), render_snap(false), snap_rendered(false), snap_copy_target(NULL), snap_copy_texture(NULL), snap_target(NULL), snap_texture(NULL),
 	snap_width(0), snap_height(0), lines_pending(false), backbuffer(NULL), curr_effect(NULL), default_effect(NULL), prescale_effect(NULL), post_effect(NULL), distortion_effect(NULL),
@@ -1444,31 +1444,18 @@ int shaders::downsample_pass(d3d_render_target *rt, int source_index, poly_info 
 	curr_effect = downsample_effect;
 	curr_effect->update_uniforms();
 
-	int bloom_index = 0;
-	float bloom_width = rt->target_width;
-	float bloom_height = rt->target_height;
-	float bloom_size = bloom_width < bloom_height ? bloom_width : bloom_height;
-	for (; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
+	for (int bloom_index = 0; bloom_index < rt->bloom_count; bloom_index++)
 	{
-		bloom_dims[bloom_index][0] = (float)(int)bloom_width;
-		bloom_dims[bloom_index][1] = (float)(int)bloom_height;
-
-		curr_effect->set_vector("TargetDims", 2, bloom_dims[bloom_index]);
+		curr_effect->set_vector("TargetDims", 2, rt->bloom_dims[bloom_index]);
+		curr_effect->set_int("BloomLevel", bloom_index + 1);
 		curr_effect->set_texture("DiffuseTexture",
 			bloom_index == 0
 				? rt->source_texture[next_index]
 				: rt->bloom_texture[bloom_index - 1]);
 
-		// blit(rt->bloom_target[bloom_index], true, D3DPT_TRIANGLELIST, 0, 2);
-		blit(rt->bloom_target[bloom_index], true, poly->get_type(), vertnum, poly->get_count());
-
-		bloom_width *= 0.5f;
-		bloom_height *= 0.5f;
-
-		bloom_index++;
+		// blit(rt->bloom_surface[bloom_index], true, D3DPT_TRIANGLELIST, 0, 2);
+		blit(rt->bloom_surface[bloom_index], true, poly->get_type(), vertnum, poly->get_count());
 	}
-
-	bloom_count = bloom_index;
 
 	return next_index;
 }
@@ -1514,12 +1501,12 @@ int shaders::bloom_pass(d3d_render_target *rt, int source_index, poly_info *poly
 	curr_effect->set_vector("Level78Weight", 2, weight78);
 	curr_effect->set_vector("Level9AWeight", 2, weight9A);
 
-	curr_effect->set_vector("Level0Size", 2, bloom_dims[0]);
-	curr_effect->set_vector("Level12Size", 4, bloom_dims[1]);
-	curr_effect->set_vector("Level34Size", 4, bloom_dims[3]);
-	curr_effect->set_vector("Level56Size", 4, bloom_dims[5]);
-	curr_effect->set_vector("Level78Size", 4, bloom_dims[7]);
-	curr_effect->set_vector("Level9ASize", 4, bloom_dims[9]);
+	curr_effect->set_vector("Level0Size", 2, rt->bloom_dims[0]);
+	curr_effect->set_vector("Level12Size", 4, rt->bloom_dims[1]);
+	curr_effect->set_vector("Level34Size", 4, rt->bloom_dims[3]);
+	curr_effect->set_vector("Level56Size", 4, rt->bloom_dims[5]);
+	curr_effect->set_vector("Level78Size", 4, rt->bloom_dims[7]);
+	curr_effect->set_vector("Level9ASize", 4, rt->bloom_dims[9]);
 
 	curr_effect->set_int("BloomBlendMode", options->bloom_blend_mode);
 	curr_effect->set_float("BloomScale", options->bloom_scale);
@@ -1528,12 +1515,12 @@ int shaders::bloom_pass(d3d_render_target *rt, int source_index, poly_info *poly
 	curr_effect->set_texture("DiffuseA", rt->target_texture[next_index]);
 
 	char name[9] = "Diffuse*";
-	for (int index = 1; index < bloom_count; index++)
+	for (int index = 1; index < rt->bloom_count; index++)
 	{
 		name[7] = 'A' + index;
 		curr_effect->set_texture(name, rt->bloom_texture[index - 1]);
 	}
-	for (int index = bloom_count; index < 11; index++)
+	for (int index = rt->bloom_count; index < 11; index++)
 	{
 		name[7] = 'A' + index;
 		curr_effect->set_texture(name, black_texture);

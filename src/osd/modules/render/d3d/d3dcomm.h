@@ -292,8 +292,12 @@ public:
 	d3d_render_target *next;
 	d3d_render_target *prev;
 
-	surface *bloom_target[11];
+	surface *bloom_surface[11];
 	texture *bloom_texture[11];
+
+	float bloom_dims[11][2];
+
+	int bloom_count;
 };
 
 #endif
