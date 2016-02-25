@@ -406,7 +406,7 @@ end
 			"LUA_COMPAT_5_1",
 			"LUA_COMPAT_5_2",
 		}
-	if not (_OPTIONS["targetos"]=="windows") and not (_OPTIONS["targetos"]=="asmjs") then
+	if not (_OPTIONS["targetos"]=="windows") and not (_OPTIONS["targetos"]=="asmjs") and not (_OPTIONS["targetos"]=="pnacl") then
 		defines {
 			"LUA_USE_POSIX",
 		}
@@ -480,6 +480,11 @@ project "lualibs"
 			"/wd4130", -- warning C4130: '==': logical operation on address of string constant
 		}
 
+	configuration { "pnacl"}
+		buildoptions {
+			"-Wno-char-subscripts",
+		}
+
 	configuration { }
 		defines {
 			"LUA_COMPAT_ALL",
@@ -518,6 +523,10 @@ project "luv"
 			"_WIN32_WINNT=0x0600",
 		}
 	end
+	configuration { "pnacl"}
+		defines {
+			"_POSIX_BARRIERS=1",
+		}
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
@@ -581,7 +590,10 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
 		}
 end
-
+	configuration { "pnacl" }
+		defines {
+			"SQLITE_OMIT_LOAD_EXTENSION",
+		}
 	configuration { "vs2015" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
