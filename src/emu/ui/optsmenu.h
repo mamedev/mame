@@ -23,6 +23,8 @@ public:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
+	UINT16 m_main;
+
 	enum
 	{
 		FILTER_MENU = 1,

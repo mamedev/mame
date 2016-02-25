@@ -30,6 +30,7 @@
 
 ui_menu_game_options::ui_menu_game_options(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
+	m_main = main_filters::actual;
 }
 
 //-------------------------------------------------
@@ -38,6 +39,7 @@ ui_menu_game_options::ui_menu_game_options(running_machine &machine, render_cont
 
 ui_menu_game_options::~ui_menu_game_options()
 {
+	main_filters::actual = m_main;
 	ui_menu::menu_stack->reset(UI_MENU_RESET_SELECT_FIRST);
 	save_ui_options(machine());
 	ui_globals::switch_image = true;
@@ -52,9 +54,9 @@ void ui_menu_game_options::handle()
 	bool changed = false;
 
 	// process the menu
-//  ui_menu::menu_stack->parent->process(UI_MENU_PROCESS_NOINPUT);
-//  const ui_menu_event *m_event = process(UI_MENU_PROCESS_LR_REPEAT | UI_MENU_PROCESS_NOIMAGE);
-	const ui_menu_event *m_event = process(UI_MENU_PROCESS_LR_REPEAT);
+	ui_menu::menu_stack->parent->process(UI_MENU_PROCESS_NOINPUT);
+	const ui_menu_event *m_event = process(UI_MENU_PROCESS_LR_REPEAT | UI_MENU_PROCESS_NOIMAGE);
+//	const ui_menu_event *m_event = process(UI_MENU_PROCESS_LR_REPEAT);
 
 	if (m_event != nullptr && m_event->itemref != nullptr)
 		switch ((FPTR)m_event->itemref)
@@ -63,7 +65,7 @@ void ui_menu_game_options::handle()
 			{
 				if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
 				{
-					(m_event->iptkey == IPT_UI_RIGHT) ? ++main_filters::actual : --main_filters::actual;
+					(m_event->iptkey == IPT_UI_RIGHT) ? ++m_main : --m_main;
 					changed = true;
 				}
 				else if (m_event->iptkey == IPT_UI_SELECT)
@@ -73,7 +75,7 @@ void ui_menu_game_options::handle()
 					for (int index = 0; index < total; ++index)
 						s_sel[index] = main_filters::text[index];
 
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, main_filters::actual));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, m_main));
 				}
 				break;
 			}
@@ -197,8 +199,8 @@ void ui_menu_game_options::populate()
 		std::string fbuff;
 
 		// add filter item
-		UINT32 arrow_flags = get_arrow_flags((int)FILTER_FIRST, (int)FILTER_LAST, main_filters::actual);
-		item_append(_("Filter"), main_filters::text[main_filters::actual], arrow_flags, (void *)(FPTR)FILTER_MENU);
+		UINT32 arrow_flags = get_arrow_flags((int)FILTER_FIRST, (int)FILTER_LAST, m_main);
+		item_append(_("Filter"), main_filters::text[m_main], arrow_flags, (void *)(FPTR)FILTER_MENU);
 
 		// add category subitem
 		if (main_filters::actual == FILTER_CATEGORY && !machine().inifile().ini_index.empty())

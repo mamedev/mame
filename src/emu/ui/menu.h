@@ -192,6 +192,18 @@ private:
 	static void render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 
 public:
+	// tab navigation
+	enum focused_menu
+	{
+		main,
+		left,
+		righttop,
+		rightbottom
+	};
+
+	focused_menu m_focus;
+	void *m_prev_selected;
+
 	int  visible_items;
 	bool ui_error;
 

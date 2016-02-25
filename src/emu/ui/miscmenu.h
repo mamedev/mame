@@ -108,4 +108,15 @@ private:
 	static misc_option m_options[];
 };
 
+class ui_menu_export : public ui_menu
+{
+public:
+	ui_menu_export(running_machine &machine, render_container *container, std::vector<const game_driver*> list);
+	virtual ~ui_menu_export();
+	virtual void populate() override;
+	virtual void handle() override;
+
+private:
+	std::vector<const game_driver*> m_list;
+};
 #endif  /* __UI_MISCMENU_H__ */

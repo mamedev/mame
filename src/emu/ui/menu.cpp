@@ -255,9 +255,20 @@ void ui_menu::reset(ui_menu_reset_options options)
 	if (parent == nullptr)
 		item_append(backtext.c_str(), nullptr, 0, nullptr);
 	else if (parent->is_special_main_menu())
-		item_append("Exit", nullptr, 0, nullptr);
+	{
+		if (strcmp(machine().options().ui(), "simple") == 0) 
+			item_append("Exit", nullptr, 0, nullptr);
+		else
+			item_append("Exit", nullptr, MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, nullptr);
+	}
 	else
-		item_append("Return to Previous Menu", nullptr, 0, nullptr);
+	{
+		if (strcmp(machine().options().ui(), "simple") == 0)
+			item_append("Return to Previous Menu", nullptr, 0, nullptr);
+		else if (ui_menu::stack_has_special_main_menu())
+			item_append("Return to Previous Menu", nullptr, MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, nullptr);
+	}
+
 }
 
 
@@ -1441,7 +1452,6 @@ void ui_menu::draw_select_game(bool noinput)
 
 	//machine().ui().draw_outlined_box(container, x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
-
 	if (visible_items < visible_lines)
 		visible_lines = visible_items;
 	if (top_line < 0 || selected == 0)
@@ -1454,6 +1464,8 @@ void ui_menu::draw_select_game(bool noinput)
 	float effective_left = visible_left + gutter_width;
 
 	int n_loop = (visible_items >= visible_lines) ? visible_lines : visible_items;
+	if (m_prev_selected != nullptr && m_focus == focused_menu::main && selected < visible_items)
+		m_prev_selected = nullptr;
 
 	for (int linenum = 0; linenum < n_loop; linenum++)
 	{
@@ -1474,23 +1486,28 @@ void ui_menu::draw_select_game(bool noinput)
 			hover = itemnum;
 
 		// if we're selected, draw with a different background
-		if (itemnum == selected)
+		if (itemnum == selected && m_focus == focused_menu::main)
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
 			fgcolor3 = rgb_t(0xff, 0xcc, 0xcc, 0x00);
+			mui.draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(255, 43, 43, 43),
+				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		}
 		// else if the mouse is over this item, draw with a different background
 		else if (itemnum == hover)
 		{
 			fgcolor = fgcolor3 = UI_MOUSEOVER_COLOR;
 			bgcolor = UI_MOUSEOVER_BG_COLOR;
+			highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
 		}
-
-		// if we have some background hilighting to do, add a quad behind everything else
-		if (bgcolor != UI_TEXT_BG_COLOR)
+		else if (pitem.ref == m_prev_selected)
+		{
+			fgcolor = fgcolor3 = UI_MOUSEOVER_COLOR;
+			bgcolor = UI_MOUSEOVER_BG_COLOR;
 			mui.draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(255, 43, 43, 43),
 				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+		}
 
 		// if we're on the top line, display the up arrow
 		if (linenum == 0 && top_line != 0)
@@ -1572,7 +1589,7 @@ void ui_menu::draw_select_game(bool noinput)
 			hover = count;
 
 		// if we're selected, draw with a different background
-		if (count == selected)
+		if (count == selected && m_focus == focused_menu::main)
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -1615,6 +1632,16 @@ void ui_menu::draw_select_game(bool noinput)
 	// reset redraw icon stage
 	if (!is_swlist)
 		ui_globals::redraw_icon = false;
+
+	// noinput
+	if (noinput)
+	{
+		int alpha = (1.0f - machine().options().pause_brightness()) * 255.0f;
+		if (alpha > 255)
+			alpha = 255;
+		if (alpha >= 0)
+			container->add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(alpha, 0x00, 0x00, 0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	}
 }
 
 //-------------------------------------------------
@@ -1660,7 +1687,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	// if we hit select, return TRUE or pop the stack, depending on the item
 	if (exclusive_input_pressed(IPT_UI_SELECT, 0))
 	{
-		if (selected == item.size() - 1)
+		if (selected == item.size() - 1 && m_focus == focused_menu::main)
 		{
 			menu_event.iptkey = IPT_UI_CANCEL;
 			ui_menu::stack_pop(machine());
@@ -1684,8 +1711,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	// swallow left/right keys if they are not appropriate
 	bool ignoreleft = ((item[selected].flags & MENU_FLAG_LEFT_ARROW) == 0 || ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL);
 	bool ignoreright = ((item[selected].flags & MENU_FLAG_RIGHT_ARROW) == 0 || ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL);
-	bool ignoreup = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_LEFT_PANEL);
-	bool ignoredown = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_LEFT_PANEL);
+	bool leftclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_LEFT_PANEL);
 
 	input_manager &minput = machine().input();
 	// accept left/right keys as-is with repeat
@@ -1704,7 +1730,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	if (exclusive_input_pressed(IPT_UI_UP, 6))
 	{
 		// Filter
-		if (!ignoreup && (minput.code_pressed(KEYCODE_LALT) || minput.code_pressed(JOYCODE_BUTTON2)))
+		if (!leftclose && m_focus == focused_menu::left)
 		{
 			menu_event.iptkey = IPT_UI_UP_FILTER;
 			return;
@@ -1731,7 +1757,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	if (exclusive_input_pressed(IPT_UI_DOWN, 6))
 	{
 		// Filter
-		if (!ignoredown && (minput.code_pressed(KEYCODE_LALT) || minput.code_pressed(JOYCODE_BUTTON2)))
+		if (!leftclose && m_focus == focused_menu::left)
 		{
 			menu_event.iptkey = IPT_UI_DOWN_FILTER;
 			return;
@@ -1881,7 +1907,10 @@ void ui_menu::handle_main_events(UINT32 flags)
 			else
 			{
 				if (hover >= 0 && hover < item.size())
+				{
 					selected = hover;
+					m_focus = focused_menu::main;
+				}
 				else if (hover == HOVER_ARROW_UP)
 				{
 					selected -= visitems;
@@ -2014,9 +2043,17 @@ void ui_menu::handle_main_events(UINT32 flags)
 
 			// translate CHAR events into specials
 		case UI_EVENT_CHAR:
-			menu_event.iptkey = IPT_SPECIAL;
-			menu_event.unichar = local_menu_event.ch;
-			stop = true;
+			if (exclusive_input_pressed(IPT_UI_CONFIGURE, 0))
+			{
+				menu_event.iptkey = IPT_UI_CONFIGURE;
+				stop = true;
+			}
+			else
+			{
+				menu_event.iptkey = IPT_SPECIAL;
+				menu_event.unichar = local_menu_event.ch;
+				stop = true;
+			}
 			break;
 
 			// ignore everything else
@@ -2097,13 +2134,21 @@ std::string ui_menu::arts_render_common(float origx1, float origy1, float origx2
 	for (int x = FIRST_VIEW; x < LAST_VIEW; x++)
 	{
 		machine().ui().draw_text_full(container, arts_info[x].title, origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
-			WRAP_TRUNCATE, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
+			WRAP_TRUNCATE, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &txt_lenght, nullptr);
 		txt_lenght += 0.01f;
 		title_size = MAX(txt_lenght, title_size);
 	}
 
+	rgb_t fgcolor = UI_TEXT_COLOR;
+	rgb_t bgcolor = UI_TEXT_BG_COLOR;
+	if (m_focus == focused_menu::rightbottom)
+	{
+		fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
+		bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+	}
+
 	machine().ui().draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+		DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 
 	draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
 

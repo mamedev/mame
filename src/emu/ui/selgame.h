@@ -39,8 +39,8 @@ public:
 private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
 	char m_search[40];
-	int  m_prev_selected;
-	static int  m_isabios;
+	static int m_isabios;
+	int highlight;
 
 	static std::vector<const game_driver *> m_sortedlist;
 	std::vector<const game_driver *> m_availsortedlist;
@@ -73,6 +73,7 @@ private:
 	void inkey_select_favorite(const ui_menu_event *menu_event);
 	void inkey_special(const ui_menu_event *menu_event);
 	void inkey_export();
+	void inkey_configure(const ui_menu_event *menu_event);
 };
 
 

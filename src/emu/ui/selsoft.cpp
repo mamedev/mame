@@ -126,6 +126,7 @@ ui_menu_select_software::ui_menu_select_software(running_machine &machine, rende
 		reselect_last::set(false);
 
 	sw_filters::actual = 0;
+	highlight = 0;
 
 	m_driver = driver;
 	build_software_list();
@@ -155,6 +156,9 @@ ui_menu_select_software::~ui_menu_select_software()
 
 void ui_menu_select_software::handle()
 {
+	if (m_prev_selected == nullptr)
+		m_prev_selected = item[0].ref;
+
 	bool check_filter = false;
 
 	// ignore pause keys by swallowing them before we process the menu
@@ -171,7 +175,18 @@ void ui_menu_select_software::handle()
 
 		// handle selections
 		else if (m_event->iptkey == IPT_UI_SELECT)
-			inkey_select(m_event);
+		{
+			if (m_focus == focused_menu::main)
+			{
+				inkey_select(m_event);
+			}
+			else if (m_focus == focused_menu::left)
+			{
+				l_sw_hover = highlight;
+				check_filter = true;
+				m_prev_selected = nullptr;
+			}
+		}
 
 		// handle UI_LEFT
 		else if (m_event->iptkey == IPT_UI_LEFT)
@@ -225,20 +240,18 @@ void ui_menu_select_software::handle()
 			}
 		}
 
-		// handle UI_UP_FILTER
-		else if (m_event->iptkey == IPT_UI_UP_FILTER && sw_filters::actual > UI_SW_FIRST)
+/*		// handle UI_UP_FILTER
+		else if (m_event->iptkey == IPT_UI_UP_FILTER && highlight > UI_SW_FIRST)
 		{
-			l_sw_hover = sw_filters::actual - 1;
-			check_filter = true;
+			highlight--;
 		}
 
 		// handle UI_DOWN_FILTER
-		else if (m_event->iptkey == IPT_UI_DOWN_FILTER && sw_filters::actual < UI_SW_LAST)
+		else if (m_event->iptkey == IPT_UI_DOWN_FILTER && highlight < UI_SW_LAST)
 		{
-			l_sw_hover = sw_filters::actual + 1;
-			check_filter = true;
+			highlight++;
 		}
-
+*/
 		// handle UI_LEFT_PANEL
 		else if (m_event->iptkey == IPT_UI_LEFT_PANEL)
 			ui_globals::rpanel = RP_IMAGES;
@@ -280,31 +293,40 @@ void ui_menu_select_software::handle()
 			inkey_special(m_event);
 
 		else if (m_event->iptkey == IPT_OTHER)
+		{
+			highlight = l_sw_hover;
 			check_filter = true;
+			m_prev_selected = nullptr;
+		}
+
+		else if (m_event->iptkey == IPT_UI_CONFIGURE)
+			inkey_configure(m_event);
 	}
 
 	if (m_event != nullptr && m_event->itemref == nullptr)
 	{
-		// reset the error on any future m_event
-		if (ui_error)
-			ui_error = false;
 
-		else if (m_event->iptkey == IPT_OTHER)
-			check_filter = true;
+		if (m_event->iptkey == IPT_UI_CONFIGURE)
+			inkey_configure(m_event);
 
 		// handle UI_UP_FILTER
-		else if (m_event->iptkey == IPT_UI_UP_FILTER && sw_filters::actual > UI_SW_FIRST)
+		else if (m_event->iptkey == IPT_UI_UP_FILTER && highlight > UI_SW_FIRST)
 		{
-			l_sw_hover = sw_filters::actual - 1;
-			check_filter = true;
+			highlight--;
 		}
 
 		// handle UI_DOWN_FILTER
-		else if (m_event->iptkey == IPT_UI_DOWN_FILTER && sw_filters::actual < UI_SW_LAST)
+		else if (m_event->iptkey == IPT_UI_DOWN_FILTER && highlight < UI_SW_LAST)
 		{
-			l_sw_hover = sw_filters::actual + 1;
-			check_filter = true;
+			highlight++;
 		}
+		else if (m_event->iptkey == IPT_UI_SELECT && m_focus == focused_menu::left)
+		{
+			l_sw_hover = highlight;
+			check_filter = true;
+			m_prev_selected = nullptr;
+		}
+
 	}
 
 	// if we're in an error state, overlay an error message
@@ -602,7 +624,7 @@ void ui_menu_select_software::build_software_list()
 
 void ui_menu_select_software::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	ui_software_info *swinfo = (ui_software_info *)selectedref;
+	ui_software_info *swinfo = (selectedref != nullptr) ? (ui_software_info *)selectedref : ((m_prev_selected != nullptr) ? (ui_software_info *)m_prev_selected : nullptr);
 	const game_driver *driver = nullptr;
 	ui_manager &mui = machine().ui();
 	float width;
@@ -663,10 +685,10 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 	}
 
 	// determine the text to render below
-	if (swinfo && swinfo->startempty == 1)
+	if (swinfo != nullptr && swinfo->startempty == 1)
 		driver = swinfo->driver;
 
-	if ((FPTR)driver > 1)
+	if (driver != nullptr)
 	{
 		isstar = machine().favorite().isgame_favorite(driver);
 
@@ -716,7 +738,7 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 
 	}
 
-	else if ((FPTR)swinfo > 1)
+	else if (swinfo != nullptr)
 	{
 		isstar = machine().favorite().isgame_favorite(*swinfo);
 
@@ -918,6 +940,32 @@ void ui_menu_select_software::inkey_special(const ui_menu_event *m_event)
 		m_search[buflen] = 0;
 		reset(UI_MENU_RESET_SELECT_FIRST);
 	}
+}
+
+void ui_menu_select_software::inkey_configure(const ui_menu_event *m_event)
+{
+	if (selected <= visible_items && m_focus == focused_menu::main)
+	{
+		m_prev_selected = item[selected].ref;
+		selected = visible_items + 1;
+	}
+	else if (selected > visible_items && m_focus == focused_menu::main)
+		m_focus = focused_menu::left;
+	else if (m_focus == focused_menu::left)
+	{
+		m_focus = focused_menu::main;
+		if (m_prev_selected == nullptr)
+		{
+			selected = 0;
+			return;
+		}
+
+		for (int x = 0; x < item.size(); ++x)
+			if (item[x].ref == m_prev_selected)
+				selected = x;
+	}
+	else if (m_focus == focused_menu::rightbottom)
+		m_focus = focused_menu::main;
 }
 
 //-------------------------------------------------
@@ -1317,14 +1365,15 @@ float ui_menu_select_software::draw_left_panel(float x1, float y1, float x2, flo
 				hover = phover + filter;
 			}
 
-/*          if (afilter == filter)
-            {
-                bgcolor = UI_SELECTED_BG_COLOR;
-                fgcolor = UI_SELECTED_COLOR;
-            }
-*/
+			if (highlight == filter && m_focus == focused_menu::left)
+			{
+				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
+				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+			}
+
 			if (bgcolor != UI_TEXT_BG_COLOR)
-				container->add_rect(x1, y1, x2, y1 + line_height, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+				mui.draw_textured_box(container, x1, y1, x2, y1 + line_height, bgcolor, rgb_t(255, 43, 43, 43),
+					hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 			float x1t = x1 + text_sign;
 			if (afilter == UI_SW_CUSTOM)
@@ -1351,7 +1400,7 @@ float ui_menu_select_software::draw_left_panel(float x1, float y1, float x2, flo
 			}
 			else if (filter == sw_filters::actual)
 			{
-				str.assign("@custom1 ").append(text[filter]);
+				str.assign("_> ").append(text[filter]);
 				x1t -= text_sign;
 				convert_command_glyph(str);
 			}
@@ -1425,7 +1474,8 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 	std::vector<int> xstart;
 	std::vector<int> xend;
 	float text_size = machine().ui().options().infos_size();
-	ui_software_info *soft = (ui_software_info *)selectedref;
+//	ui_software_info *soft = (ui_software_info *)selectedref;
+	ui_software_info *soft = (selectedref != nullptr) ? (ui_software_info *)selectedref : ((m_prev_selected != nullptr) ? (ui_software_info *)m_prev_selected : nullptr);
 	static ui_software_info *oldsoft = nullptr;
 	static int old_sw_view = -1;
 
@@ -1434,7 +1484,7 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 	float oy1 = origy1 + line_height;
 
 	// apply title to right panel
-	if (soft && soft->usage.empty())
+	if (soft != nullptr && soft->usage.empty())
 	{
 		mui.draw_text_full(container, _("History"), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 										DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
@@ -1530,9 +1580,10 @@ void ui_menu_select_software::arts_render(void *selectedref, float origx1, float
 	static ui_software_info *oldsoft = nullptr;
 	static const game_driver *olddriver = nullptr;
 	const game_driver *driver = nullptr;
-	ui_software_info *soft = (ui_software_info *)selectedref;
+	ui_software_info *soft = (selectedref != nullptr) ? (ui_software_info *)selectedref : ((m_prev_selected != nullptr) ? (ui_software_info *)m_prev_selected : nullptr);
+//	ui_software_info *soft = (ui_software_info *)selectedref;
 
-	if (soft && soft->startempty == 1)
+	if (soft != nullptr && soft->startempty == 1)
 	{
 		driver = soft->driver;
 		oldsoft = nullptr;
@@ -1540,7 +1591,7 @@ void ui_menu_select_software::arts_render(void *selectedref, float origx1, float
 	else
 		olddriver = nullptr;
 
-	if (driver)
+	if (driver != nullptr)
 	{
 		if (ui_globals::default_image)
 			((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? ui_globals::curimage_view = CABINETS_VIEW : ui_globals::curimage_view = SNAPSHOT_VIEW;
@@ -1618,7 +1669,7 @@ void ui_menu_select_software::arts_render(void *selectedref, float origx1, float
 			container->add_quad( x1, y1, x2, y2, ARGB_WHITE, snapx_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
 	}
-	else if (soft)
+	else if (soft != nullptr)
 	{
 		std::string fullname, pathname;
 		if (ui_globals::default_image)
