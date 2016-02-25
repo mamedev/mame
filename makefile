@@ -885,48 +885,57 @@ windows_x86_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
 
+.PHONY: vs2013
 vs2013: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2013
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR)/vs2013/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
+.PHONY: vs2013_intel
 vs2013_intel: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2013
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR)/vs2013-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
+.PHONY: vs2013_xp
 vs2013_xp: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2013-xp vs2013
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR)/vs2013-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
+.PHONY: vs2013_winrt
 vs2013_winrt: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore81 vs2013
 
+.PHONY: vs2015
 vs2015: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2015
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR)/vs2015/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
+.PHONY: vs2015_intel
 vs2015_intel: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2015
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR)/vs2015-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
+.PHONY: vs2015_xp
 vs2015_xp: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2015-xp vs2015
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR)/vs2015-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
+.PHONY: vs2015_winrt
 vs2015_winrt: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore81 vs2015
 
+.PHONY: android-arm
 android-arm: generate
 ifndef ANDROID_NDK_ARM
 	$(error ANDROID_NDK_ARM is not set)
@@ -939,6 +948,7 @@ ifndef COMPILE
 endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-arm config=$(CONFIG)
 
+.PHONY: android-mips
 android-mips: generate
 ifndef ANDROID_NDK_MIPS
 	$(error ANDROID_NDK_MIPS is not set)
@@ -951,6 +961,7 @@ ifndef COMPILE
 endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-mips config=$(CONFIG)
 
+.PHONY: android-x86
 android-x86: generate
 ifndef ANDROID_NDK_X86
 	$(error ANDROID_NDK_X86 is not set)
@@ -963,6 +974,7 @@ ifndef COMPILE
 endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-x86 config=$(CONFIG)
 
+.PHONY: asmjs
 asmjs: generate
 ifndef EMSCRIPTEN
 	$(error EMSCRIPTEN is not set)
@@ -972,6 +984,7 @@ ifndef COMPILE
 endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-asmjs config=$(CONFIG)
 
+.PHONY: pnacl
 pnacl: generate
 ifndef NACL_SDK_ROOT
 	$(error NACL_SDK_ROOT is not set)
@@ -1057,9 +1070,11 @@ macosx_x86_clang: generate $(PROJECTDIR)/gmake-osx-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)32 precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)32
 
+.PHONY: xcode4
 xcode4: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --targetos=macosx --xcode=osx xcode4
 
+.PHONY: xcode4-ios
 xcode4-ios: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --targetos=macosx --xcode=ios xcode4
 
@@ -1175,6 +1190,7 @@ steamlink: generate $(PROJECTDIR)/gmake-steamlink/Makefile
 #-------------------------------------------------
 # cmake
 #-------------------------------------------------
+.PHONY: cmake
 cmake: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) cmake
 ifeq ($(OS),windows)
