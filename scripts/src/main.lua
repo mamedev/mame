@@ -25,6 +25,17 @@ else
 end	
 	uuid (os.uuid(_target .."_" .. _subtarget))
 	kind "ConsoleApp"
+	
+	configuration { "android*" }
+		targetextension ".so"
+		linkoptions {
+			"-shared",
+		}
+		links {
+			"EGL",
+			"GLESv2",
+		} 	
+	configuration {  }
 
 	addprojectflags()
 	flags {
