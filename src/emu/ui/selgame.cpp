@@ -488,8 +488,10 @@ void ui_menu_select_game::handle()
 
 	if (m_event != nullptr && m_event->itemref == nullptr)
 	{
-		if (m_event->iptkey == IPT_SPECIAL && m_event->unichar == 0x09)
+		if (m_event->iptkey == IPT_SPECIAL)
 			inkey_special(m_event);
+		else if (m_event->iptkey == IPT_UI_CONFIGURE)
+			inkey_configure(m_event);
 		else if (m_event->iptkey == IPT_UI_SELECT && m_focus == focused_menu::left)
 		{
 			m_prev_selected = nullptr;

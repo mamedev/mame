@@ -263,10 +263,10 @@ void ui_menu::reset(ui_menu_reset_options options)
 	}
 	else
 	{
-		if (strcmp(machine().options().ui(), "simple") == 0)
-			item_append("Return to Previous Menu", nullptr, 0, nullptr);
-		else if (ui_menu::stack_has_special_main_menu())
+		if (strcmp(machine().options().ui(), "simple") != 0 && ui_menu::stack_has_special_main_menu())
 			item_append("Return to Previous Menu", nullptr, MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, nullptr);
+		else
+			item_append("Return to Previous Menu", nullptr, 0, nullptr);
 	}
 
 }

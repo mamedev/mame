@@ -240,18 +240,6 @@ void ui_menu_select_software::handle()
 			}
 		}
 
-/*		// handle UI_UP_FILTER
-		else if (m_event->iptkey == IPT_UI_UP_FILTER && highlight > UI_SW_FIRST)
-		{
-			highlight--;
-		}
-
-		// handle UI_DOWN_FILTER
-		else if (m_event->iptkey == IPT_UI_DOWN_FILTER && highlight < UI_SW_LAST)
-		{
-			highlight++;
-		}
-*/
 		// handle UI_LEFT_PANEL
 		else if (m_event->iptkey == IPT_UI_LEFT_PANEL)
 			ui_globals::rpanel = RP_IMAGES;
