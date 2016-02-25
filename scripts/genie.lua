@@ -1025,10 +1025,15 @@ configuration { "asmjs" }
 configuration { "android*" }
 	buildoptions {
 		"-Wno-undef",
+		"-Wno-typedef-redefinition",
+		"-Wno-unknown-warning-option",
 	}
 	buildoptions_cpp {
 		"-x c++",
 		"-std=c++14",
+		"-Wno-extern-c-compat",
+		"-Wno-tautological-constant-out-of-range-compare",
+		"-Wno-tautological-pointer-compare",
 	}
 	archivesplit_size "20"
 

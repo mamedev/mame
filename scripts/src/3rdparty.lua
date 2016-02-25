@@ -537,10 +537,14 @@ project "luv"
 			"-Wno-unused-function",
 			"-Wno-strict-prototypes",
 			"-Wno-unused-variable",
-			"-Wno-maybe-uninitialized",
 			"-Wno-undef",
 		}
 
+	configuration { "not android-*" }
+		buildoptions_c {
+			"-Wno-maybe-uninitialized",
+		}
+		
 	configuration { "vs2015" }
 		buildoptions {
 			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
@@ -749,6 +753,11 @@ end
 			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 		}
 
+	configuration { "android-*"}
+		buildoptions {
+			"-Wno-macro-redefined",
+		}
+
 	configuration { "vs*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/msvc",
@@ -890,7 +899,7 @@ end
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if (_OPTIONS["gcc"]~=nil) then
-		if string.find(_OPTIONS["gcc"], "clang") then
+		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "android") then
 			buildoptions_c {
 				"-Wno-unknown-warning-option",
 				"-Wno-absolute-value",
@@ -1024,7 +1033,7 @@ project "uv"
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if (_OPTIONS["gcc"]~=nil) then
-		if string.find(_OPTIONS["gcc"], "clang") then
+		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "android") then
 			buildoptions_c {
 				"-Wno-unknown-warning-option",
 				"-Wno-unknown-attributes",

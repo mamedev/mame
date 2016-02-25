@@ -106,9 +106,10 @@ function toolchain(_buildDir, _subDir)
 				print("Set ANDROID_NDK_ARM and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-gcc"
-			premake.gcc.cxx = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-g++"
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang++.exe"
 			premake.gcc.ar  = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-ar"
+			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-arm")
 		end
 
@@ -118,9 +119,10 @@ function toolchain(_buildDir, _subDir)
 				print("Set ANDROID_NDK_MIPS and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-gcc"
-			premake.gcc.cxx = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-g++"
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang++.exe"
 			premake.gcc.ar  = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-ar"
+			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-mips")
 		end
 
@@ -130,9 +132,10 @@ function toolchain(_buildDir, _subDir)
 				print("Set ANDROID_NDK_X86 and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_X86)/bin/i686-linux-android-gcc"
-			premake.gcc.cxx = "$(ANDROID_NDK_X86)/bin/i686-linux-android-g++"
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang++.exe"
 			premake.gcc.ar  = "$(ANDROID_NDK_X86)/bin/i686-linux-android-ar"
+			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-x86")
 		end
 
@@ -629,11 +632,12 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "android-*" }
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/include",
+			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include",
+			"$(ANDROID_NDK_ROOT)/sources/android/support/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 		}
 		linkoptions {
-			"-nostdlib",
 			"-static-libgcc",
 		}
 		flags {
@@ -645,19 +649,18 @@ function toolchain(_buildDir, _subDir)
 			"m",
 			"android",
 			"log",
-			"gnustl_static",
 			"gcc",
 		}
 		buildoptions {
-			"-fPIC",
-			"-no-canonical-prefixes",
-			"-Wa,--noexecstack",
-			"-fstack-protector",
+			"-fpic",
 			"-ffunction-sections",
-			"-Wno-cast-align",
-			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
+			"-funwind-tables",
+			"-fstack-protector-strong",
+			"-no-canonical-prefixes",
+			"-fno-integrated-as",
 			"-Wunused-value",
 			"-Wundef",
+			"-Wno-cast-align",
 		}
 		linkoptions {
 			"-no-canonical-prefixes",
@@ -672,44 +675,46 @@ function toolchain(_buildDir, _subDir)
 		targetdir (_buildDir .. "android-arm" .. "/bin")
 		objdir (_buildDir .. "android-arm" .. "/obj")
 			libdirs {
-				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/libs/armeabi-v7a",
+				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib",
 			}
 			includedirs {
-				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/libs/armeabi-v7a/include",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/include",
 			}
 			buildoptions {
-				"-mthumb",
+				"-gcc-toolchain $(ANDROID_NDK_ARM)",
+				"-target armv7-none-linux-androideabi",
 				"-march=armv7-a",
 				"-mfloat-abi=softfp",
-				"-mfpu=neon",
-				"-Wunused-value",
-				"-Wundef",
+				"-mfpu=vfpv3-d16",
+				"-mthumb",
 			}
 			linkoptions {
+				"-gcc-toolchain $(ANDROID_NDK_ARM)",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtbegin_so.o",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtend_so.o",
+				"-target armv7-none-linux-androideabi",
 				"-march=armv7-a",
-				"-Wl,--fix-cortex-a8",
+				"-mthumb",
 			}
 
 	configuration { "android-mips" }
 		targetdir (_buildDir .. "android-mips" .. "/bin")
 		objdir (_buildDir .. "android-mips" .. "/obj")
 		libdirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/libs/mips",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/mips",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/libs/mips/include",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/include",
 		}
 		buildoptions {
-			"-Wunused-value",
-			"-Wundef",
+			"-gcc-toolchain $(ANDROID_NDK_MIPS)",
+			"-target mipsel-none-linux-android",
 		}
 		linkoptions {
+			"-gcc-toolchain $(ANDROID_NDK_MIPS)",
+			"-target mipsel-none-linux-android",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/crtbegin_so.o",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/crtend_so.o",
 		}
@@ -718,23 +723,21 @@ function toolchain(_buildDir, _subDir)
 		targetdir (_buildDir .. "android-x86" .. "/bin")
 		objdir (_buildDir .. "android-x86" .. "/obj")
 		libdirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/libs/x86",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/x86",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/libs/x86/include",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/include",
 		}
 		buildoptions {
-			"-march=i686",
-			"-mtune=atom",
-			"-mstackrealign",
-			"-msse3",
-			"-mfpmath=sse",
-			"-Wunused-value",
-			"-Wundef",
+			"-gcc-toolchain $(ANDROID_NDK_X86)",
+			"-target i686-none-linux-android",
+			"-mssse3"
 		}
 		linkoptions {
+			"-gcc-toolchain $(ANDROID_NDK_X86)",
+			"-target i686-none-linux-android",
+			"-mssse3",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib/crtbegin_so.o",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib/crtend_so.o",
 		}

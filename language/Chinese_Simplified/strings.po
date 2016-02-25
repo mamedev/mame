@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-25 16:33+0100\n"
-"PO-Revision-Date: 2016-02-22 01:50+0800\n"
+"PO-Revision-Date: 2016-02-26 02:35+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh\n"
@@ -33,7 +33,7 @@ msgstr "输入条码"
 msgid "Barcode length invalid!"
 msgstr "条码长度无效!"
 
-#: src/emu/ui/cheatopt.cpp:77
+#: src/emu/ui/cheatopt.cpp:78
 #, c-format
 msgid ""
 "Cheat Comment:\n"
@@ -160,7 +160,7 @@ msgstr "隐藏过滤器"
 
 #: src/emu/ui/custui.cpp:22
 msgid "Hide Info/Image"
-msgstr "隐藏资讯/图片"
+msgstr "隐藏信息/图片"
 
 #: src/emu/ui/custui.cpp:23
 msgid "Hide Both"
@@ -204,11 +204,11 @@ msgstr "行"
 
 #: src/emu/ui/custui.cpp:391
 msgid "Infos text size"
-msgstr ""
+msgstr "信息字体大小"
 
 #: src/emu/ui/custui.cpp:408
 msgid "UI Fonts Settings"
-msgstr ""
+msgstr "UI 字体设定"
 
 #: src/emu/ui/custui.cpp:435
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -230,7 +230,7 @@ msgstr "一般文本背景"
 msgid "Selected background color"
 msgstr "选择背景颜色"
 
-#: src/emu/ui/custui.cpp:537
+#: src/emu/ui/custui.cpp:534
 msgid "Subitem color"
 msgstr "子项目颜色"
 
@@ -651,7 +651,7 @@ msgstr "右侧面版放大图片"
 
 #: src/emu/ui/miscmenu.cpp:565
 msgid "DATs info"
-msgstr "文件资讯"
+msgstr "文件信息"
 
 #: src/emu/ui/miscmenu.cpp:567
 msgid "Show mouse pointer"
@@ -675,38 +675,38 @@ msgstr "使用图片作为背景"
 
 #: src/emu/ui/miscmenu.cpp:572
 msgid "Skip bios selection menu"
-msgstr "略过 BIOS 选择选单"
+msgstr "略过 BIOS 选择菜单"
 
 #: src/emu/ui/miscmenu.cpp:573
 msgid "Skip software parts selection menu"
-msgstr "略过软件部分选择选单"
+msgstr "略过软件部分选择菜单"
 
-#: src/emu/ui/miscmenu.cpp:654 src/emu/ui/miscmenu.cpp:674
-#: src/emu/ui/optsmenu.cpp:252
+#: src/emu/ui/miscmenu.cpp:653 src/emu/ui/miscmenu.cpp:673
+#: src/emu/ui/optsmenu.cpp:250
 msgid "Miscellaneous Options"
 msgstr "杂项选项"
 
 #: src/emu/ui/miscmenu.cpp:740
 #, c-format
 msgid "%s.xml saved under ui folder."
-msgstr ""
+msgstr "%s.xml 已储存于 ui 文件夹。"
 
 #: src/emu/ui/miscmenu.cpp:769
 msgid "Name:             Description:\n"
-msgstr ""
+msgstr "名称:             描述:\n"
 
 #: src/emu/ui/miscmenu.cpp:781
 #, c-format
 msgid "%s.txt saved under ui folder."
-msgstr ""
+msgstr "%s.txt 已储存于 ui 文件夹。"
 
 #: src/emu/ui/miscmenu.cpp:801
 msgid "Export XML format"
-msgstr ""
+msgstr "汇出为 XML 格式"
 
 #: src/emu/ui/miscmenu.cpp:802
 msgid "Export TXT format"
-msgstr ""
+msgstr "汇出为 TXT 格式"
 
 #: src/emu/ui/optsmenu.cpp:203
 msgid "Filter"
@@ -742,19 +742,16 @@ msgid " to select"
 msgstr " 选择"
 
 #: src/emu/ui/selgame.cpp:39
-#, fuzzy
 msgid "General Info"
-msgstr "一般输入"
+msgstr "一般信息"
 
 #: src/emu/ui/selgame.cpp:133
-#, fuzzy, c-format
 msgid "**Error to load %s.ini**"
-msgstr "**保存至 ui.ini 时错误**"
+msgstr "**载入 %s.ini 时错误**"
 
 #: src/emu/ui/selgame.cpp:158
-#, fuzzy, c-format
 msgid "**Error to save %s.ini**"
-msgstr "**保存至 ui.ini 时错误**"
+msgstr "**保存 %s.ini 时错误**"
 
 #: src/emu/ui/selgame.cpp:162
 msgid ""
@@ -762,6 +759,9 @@ msgid ""
 "    Configuration saved    \n"
 "\n"
 msgstr ""
+"\n"
+"        设定已保存        \n"
+"\n"
 
 #: src/emu/ui/selgame.cpp:440
 #, c-format
@@ -769,13 +769,15 @@ msgid ""
 "%s\n"
 " added to favorites list."
 msgstr ""
+"%s\n"
+" 已新增至最爱清单。"
 
 #: src/emu/ui/selgame.cpp:446 src/emu/ui/selgame.cpp:455
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "%s\n"
 " removed from favorites list."
-msgstr "从最爱移除"
+msgstr " 从最爱清单移除。"
 
 #: src/emu/ui/selgame.cpp:514
 msgid ""
@@ -784,6 +786,9 @@ msgid ""
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
+"选定的机台缺少一个至多个必要的 ROM 或 CHD 映像档，请选择其他机台。\n"
+"\n"
+"按任意键 (除 ESC 键) 继续。"
 
 #: src/emu/ui/selgame.cpp:651 src/emu/ui/simpleselgame.cpp:264
 msgid "Configure Options"
@@ -800,7 +805,7 @@ msgstr "保存设定"
 #: src/emu/ui/selgame.cpp:762
 #, c-format
 msgid "MAME %s ( %d / %d machines (%d BIOS) )"
-msgstr ""
+msgstr "MAME %s ( %d / %d 机台 (%d BIOS) )"
 
 #: src/emu/ui/selgame.cpp:782
 msgid " Search: "
@@ -809,7 +814,7 @@ msgstr " 搜寻: "
 #: src/emu/ui/selgame.cpp:1474
 #, c-format
 msgid "Romset: %-.100s\n"
-msgstr ""
+msgstr "Rom组: %-.100s\n"
 
 #: src/emu/ui/selgame.cpp:1475
 msgid "Year: "
@@ -818,157 +823,156 @@ msgstr "年份: "
 #: src/emu/ui/selgame.cpp:1476
 #, c-format
 msgid "Manufacturer: %-.100s\n"
-msgstr ""
+msgstr "制造商: %-.100s\n"
 
 #: src/emu/ui/selgame.cpp:1480
 #, c-format
 msgid "Driver is Clone of: %-.100s\n"
-msgstr ""
+msgstr "驱动程式相容于: %-.100s\n"
 
 #: src/emu/ui/selgame.cpp:1482
 msgid "Driver is Parent\n"
-msgstr ""
+msgstr "驱动程式为主档\n"
 
 #: src/emu/ui/selgame.cpp:1485
 msgid "Overall: NOT WORKING\n"
-msgstr ""
+msgstr "整体: 不可执行\n"
 
 #: src/emu/ui/selgame.cpp:1487
 msgid "Overall: Unemulated Protection\n"
-msgstr ""
+msgstr "整体: 未模拟保护\n"
 
 #: src/emu/ui/selgame.cpp:1489
-msgid "Overall: Working\n"
+msgid "整体: 可以执行\n"
 msgstr ""
 
 #: src/emu/ui/selgame.cpp:1492
 msgid "Graphics: Imperfect Colors\n"
-msgstr ""
+msgstr "图形: 色彩不完美"
 
 #: src/emu/ui/selgame.cpp:1494
 msgid "Graphics: Wrong Colors\n"
-msgstr ""
+msgstr "图形: 色彩错误"
 
 #: src/emu/ui/selgame.cpp:1496
 msgid "Graphics: Imperfect\n"
-msgstr ""
+msgstr "图形: 不完美"
 
 #: src/emu/ui/selgame.cpp:1498
 msgid "Graphics: OK\n"
-msgstr ""
+msgstr "图形: OK"
 
 #: src/emu/ui/selgame.cpp:1501
 msgid "Sound: Unimplemented\n"
-msgstr ""
+msgstr "声音: 无法执行"
 
 #: src/emu/ui/selgame.cpp:1503
 msgid "Sound: Imperfect\n"
-msgstr ""
+msgstr "声音: 不完美"
 
 #: src/emu/ui/selgame.cpp:1505
-#, fuzzy
 msgid "Sound: OK\n"
-msgstr ""
-"\n"
-"声音:\n"
+msgstr "声音: OK\n"
 
 #: src/emu/ui/selgame.cpp:1507
 #, c-format
 msgid "Driver is Skeleton: %s\n"
-msgstr ""
+msgstr "驱动程式尚未完整: %s\n"
 
 #: src/emu/ui/selgame.cpp:1507 src/emu/ui/selgame.cpp:1508
 #: src/emu/ui/selgame.cpp:1509 src/emu/ui/selgame.cpp:1510
 #: src/emu/ui/selgame.cpp:1511 src/emu/ui/selgame.cpp:1512
 #: src/emu/ui/selgame.cpp:1513
 msgid "Yes"
-msgstr ""
+msgstr "是"
 
 #: src/emu/ui/selgame.cpp:1507 src/emu/ui/selgame.cpp:1508
 #: src/emu/ui/selgame.cpp:1509 src/emu/ui/selgame.cpp:1510
 #: src/emu/ui/selgame.cpp:1511 src/emu/ui/selgame.cpp:1512
 #: src/emu/ui/selgame.cpp:1513
 msgid "No"
-msgstr ""
+msgstr "否"
 
 #: src/emu/ui/selgame.cpp:1508
 #, c-format
 msgid "Game is Mechanical: %s\n"
-msgstr ""
+msgstr "游戏为机械式: %s\n"
 
 #: src/emu/ui/selgame.cpp:1509
 #, c-format
 msgid "Requires Artwork: %s\n"
-msgstr ""
+msgstr "需要装饰图: %s\n"
 
 #: src/emu/ui/selgame.cpp:1510
 #, c-format
 msgid "Requires Clickable Artwork: %s\n"
-msgstr ""
+msgstr "需要可点击的装饰图: %s\n"
 
 #: src/emu/ui/selgame.cpp:1511
 #, c-format
 msgid "Support Cocktail: %s\n"
-msgstr ""
+msgstr "支援台面型筐体: %s\n"
 
 #: src/emu/ui/selgame.cpp:1512
 #, c-format
 msgid "Driver is Bios: %s\n"
-msgstr ""
+msgstr "驱动程式为 BIOS: %s\n"
 
 #: src/emu/ui/selgame.cpp:1513
 #, c-format
 msgid "Support Save: %s\n"
-msgstr ""
+msgstr "支援即时存档: %s\n"
 
 #: src/emu/ui/selgame.cpp:1514
 #, c-format
 msgid "Screen Orentation: %s\n"
-msgstr ""
+msgstr "画面方向: %s\n"
 
 #: src/emu/ui/selgame.cpp:1514
 msgid "Vertical"
-msgstr ""
+msgstr "垂直"
 
 #: src/emu/ui/selgame.cpp:1514
 msgid "Horizontal"
-msgstr ""
+msgstr "水平"
 
 #: src/emu/ui/selgame.cpp:1522
 #, c-format
 msgid "Requires CHD: %s\n"
-msgstr ""
+msgstr "需要 CHD: %s\n"
 
 #: src/emu/ui/selgame.cpp:1535
 msgid "Roms Audit Pass: OK\n"
-msgstr ""
+msgstr "ROM 验证通过: OK\n"
 
 #: src/emu/ui/selgame.cpp:1537
 msgid "Roms Audit Pass: BAD\n"
-msgstr ""
+msgstr "ROM 验证通过: 错误\n"
 
 #: src/emu/ui/selgame.cpp:1540
 msgid "Samples Audit Pass: None Needed\n"
-msgstr ""
+msgstr "样本档验证通过: 不需要\n"
 
 #: src/emu/ui/selgame.cpp:1542
 msgid "Samples Audit Pass: OK\n"
-msgstr ""
+msgstr "样本档验证通过: OK\n"
 
 #: src/emu/ui/selgame.cpp:1544
 msgid "Samples Audit Pass: BAD\n"
-msgstr ""
+msgstr "样本档验证通过: 错误\n"
 
 #: src/emu/ui/selgame.cpp:1547
 msgid ""
 "Roms Audit Pass: Disabled\n"
 "Samples Audit Pass: Disabled\n"
 msgstr ""
+"ROM 验证通过: 已停用\n"
+"样本档验证通过: 已停用\n"
 
 #: src/emu/ui/selgame.cpp:1964 src/emu/ui/selgame.cpp:2111
 #: src/emu/ui/selsoft.cpp:1535
 msgid "No Infos Available"
-msgstr "无可用资讯"
+msgstr "无可用信息"
 
 #: src/emu/ui/selgame.cpp:2077 src/emu/ui/selsoft.cpp:1500
 msgid "Usage"
@@ -979,40 +983,35 @@ msgid " (default)"
 msgstr " (缺省)"
 
 #: src/emu/ui/selsoft.cpp:642
-#, fuzzy, c-format
 msgid "Region: %s -"
-msgstr "区域: "
+msgstr "区域: %s -"
 
 #: src/emu/ui/selsoft.cpp:644
-#, fuzzy, c-format
 msgid "Publisher: %s -"
-msgstr "出版商: "
+msgstr "出版商: %s -"
 
 #: src/emu/ui/selsoft.cpp:646
-#, fuzzy, c-format
 msgid "Year: %s -"
-msgstr "年份: "
+msgstr "年份: %s -"
 
 #: src/emu/ui/selsoft.cpp:648
-#, fuzzy, c-format
 msgid "Software List: %s -"
-msgstr "软件清单: "
+msgstr "软件清单: %s -"
 
 #: src/emu/ui/selsoft.cpp:650
-#, fuzzy, c-format
 msgid "Device type: %s -"
-msgstr "装置类别: "
+msgstr "装置类别: %s -"
 
 #: src/emu/ui/selsoft.cpp:652
 #, fuzzy, c-format
 msgid "%s Search: %s_"
-msgstr " 搜寻: "
+msgstr "%s 搜寻: %s_"
 
-#: src/emu/ui/selsoft.cpp:1872 src/emu/ui/selsoft.cpp:1892
+#: src/emu/ui/selsoft.cpp:1822 src/emu/ui/selsoft.cpp:1842
 msgid "Software part selection:"
 msgstr "软件部分选项: "
 
-#: src/emu/ui/selsoft.cpp:2010 src/emu/ui/selsoft.cpp:2030
+#: src/emu/ui/selsoft.cpp:1960 src/emu/ui/selsoft.cpp:1980
 msgid "Bios selection:"
 msgstr "选择 BIOS"
 
@@ -1343,6 +1342,5 @@ msgstr " 色彩"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " PENS"
-
 #~ msgid "Search: "
 #~ msgstr "搜寻: "
