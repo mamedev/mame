@@ -25,7 +25,6 @@ target_manager::~target_manager()
 
 bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, bool filter)
 {
-	printf("Creating %s\n", name.c_str());
 	bgfx_target* target = new bgfx_target(name, format, width, height, filter);
 	m_targets[name] = target;
 
@@ -35,7 +34,6 @@ bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat
 
 bgfx_target* target_manager::create_target(std::string name, void *handle, uint32_t width, uint32_t height)
 {
-	printf("Creating %s\n", name.c_str());
 	bgfx_target* target = new bgfx_target(name, handle, width, height);
 	m_targets[name] = target;
 
