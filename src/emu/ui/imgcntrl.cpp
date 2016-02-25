@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "drivenum.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "ui/imgcntrl.h"

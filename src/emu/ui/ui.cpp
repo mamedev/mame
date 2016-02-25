@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "drivenum.h"
 #include "video/vector.h"
 #include "machine/laserdsc.h"
 #include "render.h"
