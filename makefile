@@ -819,11 +819,13 @@ endif
 GENIE := 3rdparty/genie/bin/$(GENIEOS)/genie$(EXE)
 
 ifeq ($(TARGET),$(SUBTARGET))
-SUBDIR := $(OSD)/$(TARGET)
+FULLTARGET := $(TARGET)
 else
-SUBDIR := $(OSD)/$(TARGET)$(SUBTARGET)
+FULLTARGET := $(TARGET)$(SUBTARGET)
 endif
-PROJECTDIR := $(BUILDDIR)/projects/$(SUBDIR)
+PROJECTDIR := $(BUILDDIR)/projects/$(OSD)/$(FULLTARGET)
+PROJECTDIR_MINI := $(BUILDDIR)/projects/osdmini/$(FULLTARGET)
+PROJECTDIR_WIN := $(BUILDDIR)/projects/windows/$(FULLTARGET)
 
 .PHONY: all clean regenie generate
 all: $(GENIE) $(TARGETOS)$(ARCHITECTURE)
@@ -887,53 +889,45 @@ windows_x86_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
 
 .PHONY: vs2013
 vs2013: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2013
+	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows vs2013
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR)/vs2013/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2013/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2013_intel
 vs2013_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2013
+	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows --vs=intel-15 vs2013
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR)/vs2013-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2013-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2013_xp
 vs2013_xp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2013-xp vs2013
+	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows --vs=vs2013-xp vs2013
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR)/vs2013-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2013-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
-
-.PHONY: vs2013_winrt
-vs2013_winrt: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore81 vs2013
 
 .PHONY: vs2015
 vs2015: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2015
+	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows vs2015
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR)/vs2015/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2015_intel
 vs2015_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2015
+	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows --vs=intel-15 vs2015
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR)/vs2015-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2015_xp
 vs2015_xp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2015-xp vs2015
+	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows --vs=vs2015-xp vs2015
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR)/vs2015-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
-
-.PHONY: vs2015_winrt
-vs2015_winrt: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore81 vs2015
 
 .PHONY: android-arm
 android-arm: generate
@@ -944,9 +938,10 @@ ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=android-arm --gcc_version=4.8 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=4.9 --osd=osdmini --targetos=android-arm --PLATFORM=arm --NOASM=1 gmake
 endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-arm config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-arm config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-arm config=$(CONFIG)
 
 .PHONY: android-mips
 android-mips: generate
@@ -957,9 +952,10 @@ ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=android-mips --gcc_version=4.8 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=4.9 --osd=osdmini --targetos=android-mips --PLATFORM=mips --NOASM=1 gmake
 endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-mips config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-mips config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-mips config=$(CONFIG)
 
 .PHONY: android-x86
 android-x86: generate
@@ -970,9 +966,10 @@ ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=android-x86 --gcc_version=4.8 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=4.9 --osd=osdmini --targetos=android-x86 --PLATFORM=x86 gmake
 endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-x86 config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-x86 config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-x86 config=$(CONFIG)
 
 .PHONY: asmjs
 asmjs: generate
@@ -980,8 +977,9 @@ ifndef EMSCRIPTEN
 	$(error EMSCRIPTEN is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=asmjs --gcc_version=4.9 gmake
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=asmjs --gcc_version=3.7.0 gmake
 endif
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-asmjs config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-asmjs config=$(CONFIG)
 
 .PHONY: pnacl
@@ -990,9 +988,10 @@ ifndef NACL_SDK_ROOT
 	$(error NACL_SDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=pnacl --gcc_version=4.8 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=pnacl --gcc_version=3.7.0 --osd=osdmini --targetos=pnacl --NOASM=1 gmake
 endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-pnacl config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-pnacl config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-pnacl config=$(CONFIG)
 
 #-------------------------------------------------
 # gmake-linux
