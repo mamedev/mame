@@ -649,6 +649,7 @@ function toolchain(_buildDir, _subDir)
 			"m",
 			"android",
 			"log",
+			"c++_static",
 			"gcc",
 		}
 		buildoptions {

@@ -523,10 +523,7 @@ project "luv"
 			"_WIN32_WINNT=0x0600",
 		}
 	end
-	configuration { "pnacl"}
-		defines {
-			"_POSIX_BARRIERS=1",
-		}
+
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
@@ -1159,6 +1156,25 @@ project "uv"
 			MAME_DIR .. "3rdparty/libuv/src/unix/proctitle.c",
 		}
 	end
+			
+	if _OPTIONS["targetos"]=="android" then
+		defines {
+			"_GNU_SOURCE",
+		}
+		buildoptions {
+			"-Wno-header-guard",
+		}
+		files {
+			MAME_DIR .. "3rdparty/libuv/src/unix/proctitle.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/linux-core.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/linux-inotify.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/linux-syscalls.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/linux-syscalls.h",
+			MAME_DIR .. "3rdparty/libuv/src/unix/pthread-fixes.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/android-ifaddrs.c",
+		}
+	end
+			
 	if _OPTIONS["targetos"]=="solaris" then
 		defines {
 			"__EXTENSIONS__",
