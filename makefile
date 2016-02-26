@@ -94,7 +94,8 @@
 
 # FORCE_VERSION_COMPILE = 1
 
-# MS BUILD = 1
+# MSBUILD = 1
+# USE_LIBUV = 1
 
 ifdef PREFIX_MAKEFILE
 include $(PREFIX_MAKEFILE)
@@ -676,6 +677,10 @@ ifdef PLATFORM
 TARGET_PARAMS += --PLATFORM='$(PLATFORM)'
 endif
 
+ifdef USE_LIBUV
+PARAMS += --USE_LIBUV='$(USE_LIBUV)'
+endif
+
 #-------------------------------------------------
 # All scripts
 #-------------------------------------------------
@@ -1024,7 +1029,7 @@ $(PROJECTDIR_MINI)/gmake-pnacl/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef NACL_SDK_ROOT
 	$(error NACL_SDK_ROOT is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=pnacl --gcc_version=3.7.0 --osd=osdmini --targetos=pnacl --NOASM=1 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=pnacl --gcc_version=3.7.0 --osd=osdmini --targetos=pnacl --NOASM=1 --USE_LIBUV=0 gmake
 
 .PHONY: pnacl
 pnacl: generate $(PROJECTDIR_MINI)/gmake-pnacl/Makefile

@@ -387,6 +387,15 @@ newoption {
 	description = "Target machine platform (x86,arm,...)",
 }
 
+newoption {
+	trigger = "USE_LIBUV",
+	description = "Use libuv.",
+	allowed = {
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
+	}
+}
+
 if _OPTIONS["SHLIB"]=="1" then
 	LIBTYPE = "SharedLib"
 else
@@ -409,6 +418,10 @@ if not _OPTIONS["NOASM"] then
 	else
 		_OPTIONS["NOASM"] = "0"
 	end
+end
+
+if not _OPTIONS["USE_LIBUV"] then
+	_OPTIONS["USE_LIBUV"] = "1"
 end
 
 if _OPTIONS["NOASM"]=="1" and not _OPTIONS["FORCE_DRC_C_BACKEND"] then
@@ -511,6 +524,11 @@ configuration { "gmake" }
 
 dofile ("toolchain.lua")
 
+if _OPTIONS["USE_LIBUV"]=="0" then
+	defines {
+		"NO_LIBUV",
+	}
+end
 
 if _OPTIONS["targetos"]=="windows" then
 	configuration { "x64" }
@@ -1023,9 +1041,6 @@ configuration { "android*" }
 		"-Wno-tautological-constant-out-of-range-compare",
 		"-Wno-tautological-pointer-compare",
 	}
-	defines {
-		"_POSIX_BARRIERS=1",
-	}	
 	archivesplit_size "20"
 
 configuration { "pnacl" }

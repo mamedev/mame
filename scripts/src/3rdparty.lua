@@ -513,7 +513,7 @@ project "lualibs"
 --------------------------------------------------
 -- luv lua library objects
 --------------------------------------------------
-
+if _OPTIONS["USE_LIBUV"]=="1" then
 project "luv"
 	uuid "d98ec5ca-da2a-4a50-88a2-52061ca53871"
 	kind "StaticLib"
@@ -567,7 +567,7 @@ project "luv"
 		MAME_DIR .. "3rdparty/luv/src/luv.c",
 		MAME_DIR .. "3rdparty/luv/src/luv.h",
 	}
-
+end
 --------------------------------------------------
 -- SQLite3 library objects
 --------------------------------------------------
@@ -1007,6 +1007,7 @@ end
 --------------------------------------------------
 -- libuv library objects
 --------------------------------------------------
+if _OPTIONS["USE_LIBUV"]=="1" then
 project "uv"
 	uuid "cd2afe7f-139d-49c3-9000-fc9119f3cea0"
 	kind "StaticLib"
@@ -1196,7 +1197,7 @@ project "uv"
 			"-Wshadow"
 		}
 	end
-
+end
 --------------------------------------------------
 -- HTTP parser library objects
 --------------------------------------------------
