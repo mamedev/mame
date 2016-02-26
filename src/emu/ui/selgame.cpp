@@ -761,7 +761,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	ui_manager &mui = machine().ui();
 	float tbarspace = mui.get_line_height();
 
-	strprintf(tempbuf[0], _("MAME %s ( %d / %d machines (%d BIOS) )"), bare_build_version, visible_items, (driver_list::total() - 1), m_isabios);	
+	strprintf(tempbuf[0], _("%s %s ( %d / %d machines (%d BIOS) )"), emulator_info::get_appname(), bare_build_version, visible_items, (driver_list::total() - 1), m_isabios);	
 	std::string filtered;
 
 	if (main_filters::actual == FILTER_CATEGORY && !machine().inifile().ini_index.empty())
