@@ -171,10 +171,6 @@ endif
 ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
 OS := haiku
 endif
-ifeq ($(firstword $(filter OS/2,$(UNAME))),OS/2)
-OS := os2
-GENIEOS := os2
-endif
 ifndef OS
 $(error Unable to detect OS from uname -a: $(UNAME))
 endif
@@ -214,7 +210,7 @@ endif
 #-------------------------------------------------
 # specify OS target, which further differentiates
 # the underlying OS; supported values are:
-# win32, unix, macosx, os2
+# win32, unix, macosx
 #-------------------------------------------------
 
 ifndef TARGETOS
@@ -342,10 +338,6 @@ OSD := sdl
 endif
 
 ifeq ($(TARGETOS),macosx)
-OSD := sdl
-endif
-
-ifeq ($(TARGETOS),os2)
 OSD := sdl
 endif
 
@@ -731,9 +723,6 @@ endif
 EXE :=
 
 ifeq ($(OS),windows)
-EXE := .exe
-endif
-ifeq ($(OS),os2)
 EXE := .exe
 endif
 
@@ -1141,23 +1130,6 @@ netbsd: netbsd_x86
 netbsd_x86: generate $(PROJECTDIR)/gmake-netbsd/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-netbsd config=$(CONFIG)32 precompile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-netbsd config=$(CONFIG)32
-
-
-#-------------------------------------------------
-# gmake-os2
-#-------------------------------------------------
-
-
-$(PROJECTDIR)/gmake-os2/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=os2 --gcc_version=$(GCC_VERSION) gmake
-
-.PHONY: os2
-os2: os2_x86
-
-.PHONY: os2_x86
-os2_x86: generate $(PROJECTDIR)/gmake-os2/Makefile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-os2 config=$(CONFIG)32 precompile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-os2 config=$(CONFIG)32
 
 
 #-------------------------------------------------

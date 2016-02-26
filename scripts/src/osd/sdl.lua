@@ -141,7 +141,7 @@ newoption {
 }
 
 if not _OPTIONS["NO_X11"] then
-	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"]=="asmjs" or _OPTIONS["targetos"]=="os2" then
+	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"]=="asmjs" then
 		_OPTIONS["NO_X11"] = "1"
 	else
 		_OPTIONS["NO_X11"] = "0"
@@ -226,10 +226,6 @@ elseif _OPTIONS["targetos"]=="macosx" then
 	SDLOS_TARGETOS      = "macosx"
 	SYNC_IMPLEMENTATION = "ntc"
 	SDL_NETWORK         = "pcap"
-elseif _OPTIONS["targetos"]=="os2" then
-	BASE_TARGETOS       = "os2"
-	SDLOS_TARGETOS      = "os2"
-	SYNC_IMPLEMENTATION = "os2"
 end
 
 if BASE_TARGETOS=="unix" then
@@ -290,13 +286,6 @@ if BASE_TARGETOS=="unix" then
 			end
 		end
 	end
-elseif BASE_TARGETOS=="os2" then
-	local str = backtick(sdlconfigcmd() .. " --libs")
-	addlibfromstring(str)
-	addoptionsfromstring(str)
-	links {
-		"pthread"
-	}
 end
 
 project ("qtdbg_" .. _OPTIONS["osd"])

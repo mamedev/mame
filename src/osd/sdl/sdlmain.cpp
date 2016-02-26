@@ -21,7 +21,7 @@
 #endif
 
 // standard includes
-#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_OS2)
+#if !defined(SDLMAME_WIN32)
 #include <unistd.h>
 #endif
 
@@ -29,12 +29,6 @@
 #if defined(SDLMAME_WIN32)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#endif
-
-
-#ifdef SDLMAME_OS2
-#define INCL_DOS
-#include <os2.h>
 #endif
 
 #include "sdlinc.h"
@@ -67,7 +61,7 @@
 //============================================================
 
 #ifndef INI_PATH
-#if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
+#if defined(SDLMAME_WIN32)
 	#define INI_PATH ".;ini"
 #elif defined(SDLMAME_MACOSX)
 	#define INI_PATH "$HOME/Library/Application Support/APP_NAME;$HOME/.APP_NAME;.;ini"
@@ -173,23 +167,6 @@ const options_entry sdl_options::s_option_entries[] =
 };
 
 //============================================================
-//  OS2 specific
-//============================================================
-
-#ifdef SDLMAME_OS2
-void MorphToPM()
-{
-	PPIB pib;
-	PTIB tib;
-
-	DosGetInfoBlocks(&tib, &pib);
-
-	// Change flag from VIO to PM:
-	if (pib->pib_ultype==2) pib->pib_ultype = 3;
-}
-#endif
-
-//============================================================
 //  sdl_options
 //============================================================
 
@@ -229,10 +206,6 @@ int main(int argc, char *argv[])
 #if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
 	FcInit();
 #endif
-#endif
-
-#ifdef SDLMAME_OS2
-	MorphToPM();
 #endif
 
 	{
@@ -326,7 +299,6 @@ static void defines_verbose(void)
 	MACRO_VERBOSE(SDLMAME_UNIX);
 	MACRO_VERBOSE(SDLMAME_X11);
 	MACRO_VERBOSE(SDLMAME_WIN32);
-	MACRO_VERBOSE(SDLMAME_OS2);
 	MACRO_VERBOSE(SDLMAME_MACOSX);
 	MACRO_VERBOSE(SDLMAME_DARWIN);
 	MACRO_VERBOSE(SDLMAME_LINUX);

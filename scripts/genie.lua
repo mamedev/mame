@@ -108,7 +108,6 @@ newoption {
 		{ "ios",           "iOS"                    },
 		{ "macosx",        "OSX"                    },
 		{ "windows",       "Windows"                },
-		{ "os2",           "OS/2 eComStation"       },
 		{ "haiku",         "Haiku"                  },
 		{ "solaris",       "Solaris SunOS"          },
 		{ "steamlink",     "Steam Link"             },
@@ -555,8 +554,8 @@ configuration { "Release" }
 
 configuration { }
 
--- CR/LF setup: use both on win32/os2, CR only on everything else
-if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="os2" then
+-- CR/LF setup: use on win32, CR only on everything else
+if _OPTIONS["targetos"]=="windows" then
 	defines {
 		"CRLF=3",
 	}
@@ -696,17 +695,10 @@ if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["ta
 		"-std=c++1y",
 	}
 else
-	if _OPTIONS["targetos"]=="os2" then
-		buildoptions_cpp {
-			"-x c++",
-			"-std=gnu++14",
-		}
-	else
-		buildoptions_cpp {
-			"-x c++",
-			"-std=c++14",
-		}
-	end
+	buildoptions_cpp {
+		"-x c++",
+		"-std=c++14",
+	}
 
 	buildoptions_objc {
 		"-x objective-c++",
