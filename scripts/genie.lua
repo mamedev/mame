@@ -542,7 +542,7 @@ end
 if (_ACTION == nil) then return false end
 
 -- define PTR64 if we are a 64-bit target
-configuration { "x64" }
+configuration { "x64 or android-*64"}
 	defines { "PTR64=1" }
 
 -- define MAME_DEBUG if we are a debugging build
@@ -1043,6 +1043,11 @@ configuration { "android*" }
 	}
 	archivesplit_size "20"
 
+configuration { "android-arm64" }
+	buildoptions {
+		"-Wno-asm-operand-widths",
+	}
+	
 configuration { "pnacl" }
 	buildoptions {
 		"-std=gnu89",

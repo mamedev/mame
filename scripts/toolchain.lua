@@ -16,8 +16,11 @@ newoption {
 	description = "Choose GCC flavor",
 	allowed = {
 		{ "android-arm",   "Android - ARM"          },
+		{ "android-arm64", "Android - ARM64"          },
 		{ "android-mips",  "Android - MIPS"         },
+		{ "android-mips64","Android - MIPS64"       },
 		{ "android-x86",   "Android - x86"          },
+		{ "android-x64",   "Android - x64"          },
 		{ "asmjs",         "Emscripten/asm.js"      },
 		{ "freebsd",       "FreeBSD"                },
 		{ "linux-gcc",     "Linux (GCC compiler)"   },
@@ -111,6 +114,19 @@ function toolchain(_buildDir, _subDir)
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-arm")
 		end
 
+		if "android-arm64" == _OPTIONS["gcc"] then
+
+			if not os.getenv("ANDROID_NDK_ARM64") or not os.getenv("ANDROID_NDK_ROOT") then
+				print("Set ANDROID_NDK_ARM64 and ANDROID_NDK_ROOT envrionment variables.")
+			end
+
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang++.exe"
+			premake.gcc.ar  = "$(ANDROID_NDK_ARM64)/bin/aarch64-linux-android-ar.exe"
+			premake.gcc.llvm = true
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-arm64")
+		end
+		
 		if "android-mips" == _OPTIONS["gcc"] then
 
 			if not os.getenv("ANDROID_NDK_MIPS") or not os.getenv("ANDROID_NDK_ROOT") then
@@ -123,7 +139,20 @@ function toolchain(_buildDir, _subDir)
 			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-mips")
 		end
+		
+		if "android-mips64" == _OPTIONS["gcc"] then
 
+			if not os.getenv("ANDROID_NDK_MIPS64") or not os.getenv("ANDROID_NDK_ROOT") then
+				print("Set ANDROID_NDK_MIPS64 and ANDROID_NDK_ROOT envrionment variables.")
+			end
+
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang++.exe"
+			premake.gcc.ar  = "$(ANDROID_NDK_MIPS64)/bin/mips64el-linux-android-ar.exe"
+			premake.gcc.llvm = true
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-mips64")
+		end
+		
 		if "android-x86" == _OPTIONS["gcc"] then
 
 			if not os.getenv("ANDROID_NDK_X86") or not os.getenv("ANDROID_NDK_ROOT") then
@@ -136,7 +165,19 @@ function toolchain(_buildDir, _subDir)
 			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-x86")
 		end
+		
+		if "android-x64" == _OPTIONS["gcc"] then
 
+			if not os.getenv("ANDROID_NDK_X64") or not os.getenv("ANDROID_NDK_ROOT") then
+				print("Set ANDROID_NDK_X64 and ANDROID_NDK_ROOT envrionment variables.")
+			end
+
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang++.exe"
+			premake.gcc.ar  = "$(ANDROID_NDK_X64)/bin/x86_64-linux-android-ar.exe"
+			premake.gcc.llvm = true
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-x64")
+		end
 		if "asmjs" == _OPTIONS["gcc"] then
 
 			if not os.getenv("EMSCRIPTEN") then
@@ -683,6 +724,29 @@ function toolchain(_buildDir, _subDir)
 				"-mthumb",
 			}
 
+	configuration { "android-arm64" }
+		androidPlatform = "android-21" -- supported from API 21
+		targetdir (_buildDir .. "android-arm64" .. "/bin")
+		objdir (_buildDir .. "android-arm64" .. "/obj")
+			libdirs {
+				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/arm64-v8a",
+				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib64",
+			}
+			includedirs {
+				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/include",
+			}
+			buildoptions {
+				"-gcc-toolchain $(ANDROID_NDK_ARM64)",
+				"-target aarch64-none-linux-android",
+			}
+			linkoptions {
+				"-gcc-toolchain $(ANDROID_NDK_ARM64)",
+				"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64",
+				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib/crtbegin_so.o",
+				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib/crtend_so.o",
+				"-target aarch64-none-linux-android",
+			}
+			
 	configuration { "android-mips" }
 		targetdir (_buildDir .. "android-mips" .. "/bin")
 		objdir (_buildDir .. "android-mips" .. "/obj")
@@ -703,6 +767,29 @@ function toolchain(_buildDir, _subDir)
 			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/crtbegin_so.o",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/crtend_so.o",
+		}
+		
+	configuration { "android-mips64" }
+		androidPlatform = "android-21" -- supported from API 21
+		targetdir (_buildDir .. "android-mips64" .. "/bin")
+		objdir (_buildDir .. "android-mips64" .. "/obj")
+		libdirs {
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/mips64",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips64/usr/lib64/",
+		}
+		includedirs {
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips64/usr/include",
+		}
+		buildoptions {
+			"-gcc-toolchain $(ANDROID_NDK_MIPS64)",
+			"-target mips64el-none-linux-android",
+		}
+		linkoptions {
+			"-gcc-toolchain $(ANDROID_NDK_MIPS64)",
+			"-target mips64el-none-linux-android",
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips64",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips64/usr/lib64/crtbegin_so.o",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips64/usr/lib64/crtend_so.o",
 		}
 
 	configuration { "android-x86" }
@@ -729,7 +816,29 @@ function toolchain(_buildDir, _subDir)
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib/crtend_so.o",
 		}
 
-
+	configuration { "android-x64" }
+		androidPlatform = "android-21" -- supported from API 21
+		targetdir (_buildDir .. "android-x64" .. "/bin")
+		objdir (_buildDir .. "android-x64" .. "/obj")
+		libdirs {
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/x86_64",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/lib64",
+		}
+		includedirs {
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/include",
+		}
+		buildoptions {
+			"-gcc-toolchain $(ANDROID_NDK_X64)",
+			"-target x86_64-none-linux-android",
+		}
+		linkoptions {
+			"-gcc-toolchain $(ANDROID_NDK_X64)",
+			"-target x86_64-none-linux-android",
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/lib64/crtbegin_so.o",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/lib64/crtend_so.o",
+		}
+	
 	configuration { "asmjs" }
 		targetdir (_buildDir .. "asmjs" .. "/bin")
 		objdir (_buildDir .. "asmjs" .. "/obj")
