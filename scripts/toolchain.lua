@@ -638,7 +638,7 @@ function toolchain(_buildDir, _subDir)
 			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 		}
 		linkoptions {
-			"-static-libgcc",
+			"-nostdlib",
 		}
 		flags {
 			"NoImportLib",
@@ -692,6 +692,7 @@ function toolchain(_buildDir, _subDir)
 			}
 			linkoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM)",
+				"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtbegin_so.o",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtend_so.o",
 				"-target armv7-none-linux-androideabi",
@@ -716,6 +717,7 @@ function toolchain(_buildDir, _subDir)
 		linkoptions {
 			"-gcc-toolchain $(ANDROID_NDK_MIPS)",
 			"-target mipsel-none-linux-android",
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/crtbegin_so.o",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/crtend_so.o",
 		}
@@ -739,6 +741,7 @@ function toolchain(_buildDir, _subDir)
 			"-gcc-toolchain $(ANDROID_NDK_X86)",
 			"-target i686-none-linux-android",
 			"-mssse3",
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib/crtbegin_so.o",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib/crtend_so.o",
 		}
