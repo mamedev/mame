@@ -329,7 +329,7 @@ MACHINE_START_MEMBER(blmbycar_state,blmbycar)
 {
 	save_item(NAME(m_pot_wheel));
 	save_item(NAME(m_old_val));
-	
+
 	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
@@ -377,7 +377,7 @@ MACHINE_CONFIG_END
 MACHINE_START_MEMBER(blmbycar_state,watrball)
 {
 	save_item(NAME(m_retvalue));
-	
+
 	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 

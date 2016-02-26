@@ -156,7 +156,7 @@
         0x000ac:        Viewport center Y
 
         0x00114:        xxxxxxxx xxxxxxxx -------- --------             Framebuffer pixel read line count
-		                -------- -------- xxxxxxxx xxxxxxxx             Framebuffer pixel read pixel count
+                        -------- -------- xxxxxxxx xxxxxxxx             Framebuffer pixel read pixel count
 
         0x00118:        xxxxxxxx xxxxxxxx -------- --------             Framebuffer pixel read X pos
                         -------- -------- xxxxxxxx xxxxxxxx             Framebuffer pixel read Y pos
@@ -2668,7 +2668,7 @@ void cobra_renderer::gfx_fifo_exec()
 						case 0x0e0000:      buffer = &m_overlay->pix32(y+i); break;
 						case 0x000800:      buffer = &m_zbuffer->pix32(y+i); break;
 						case 0x000200:      buffer = &m_stencil->pix32(y+i); break;
-	
+
 						default:
 						{
 							fatalerror("gfxfifo_exec: fb read from buffer %08X!\n", m_gfx_gram[0x80100/4]);

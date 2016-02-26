@@ -6,6 +6,8 @@
 //
 //============================================================
 
+#pragma once
+
 #ifndef __WIN_DRAWD3D__
 #define __WIN_DRAWD3D__
 
@@ -41,9 +43,11 @@ public:
 	renderer_d3d9(osd_window *window);
 	virtual ~renderer_d3d9();
 
+	static bool init(running_machine &machine);
+	static void exit();
+
 	virtual int create() override;
 	virtual slider_state* get_slider_list() override;
-	static bool init(running_machine &machine);
 	virtual render_primitive_list *get_primitives() override;
 	virtual int draw(const int update) override;
 	virtual void save() override;
@@ -108,9 +112,9 @@ public:
 	bool                    is_mod2x_supported() { return (bool)m_mod2x_supported; }
 	bool                    is_mod4x_supported() { return (bool)m_mod4x_supported; }
 
-	D3DFORMAT				get_screen_format() { return m_screen_format; }
-	D3DFORMAT				get_pixel_format() { return m_pixformat; }
-	D3DDISPLAYMODE			get_origmode() { return m_origmode; }
+	D3DFORMAT               get_screen_format() { return m_screen_format; }
+	D3DFORMAT               get_pixel_format() { return m_pixformat; }
+	D3DDISPLAYMODE          get_origmode() { return m_origmode; }
 
 	UINT32                  get_last_texture_flags() { return m_last_texture_flags; }
 
@@ -130,9 +134,9 @@ private:
 
 	device *                m_device;                   // pointer to the Direct3DDevice object
 	int                     m_gamma_supported;          // is full screen gamma supported?
-	present_parameters 		m_presentation;             // set of presentation parameters
-	D3DDISPLAYMODE			m_origmode;                 // original display mode for the adapter
-	D3DFORMAT				m_pixformat;                // pixel format we are using
+	present_parameters      m_presentation;             // set of presentation parameters
+	D3DDISPLAYMODE          m_origmode;                 // original display mode for the adapter
+	D3DFORMAT               m_pixformat;                // pixel format we are using
 
 	vertex_buffer *         m_vertexbuf;                // pointer to the vertex buffer object
 	vertex *                m_lockedbuf;                // pointer to the locked vertex buffer
@@ -141,14 +145,14 @@ private:
 	vertex *                m_vectorbatch;              // pointer to the vector batch buffer
 	int                     m_batchindex;               // current index into the vector batch
 
-	poly_info 				m_poly[VERTEX_BUFFER_SIZE/3];// array to hold polygons as they are created
+	poly_info               m_poly[VERTEX_BUFFER_SIZE/3];// array to hold polygons as they are created
 	int                     m_numpolys;                 // number of accumulated polygons
 
 	bool                    m_restarting;               // if we're restarting
 
 	int                     m_mod2x_supported;          // is D3DTOP_MODULATE2X supported?
 	int                     m_mod4x_supported;          // is D3DTOP_MODULATE4X supported?
-	D3DFORMAT				m_screen_format;            // format to use for screen textures
+	D3DFORMAT               m_screen_format;            // format to use for screen textures
 
 	texture_info *          m_last_texture;             // previous texture
 	UINT32                  m_last_texture_flags;       // previous texture flags
@@ -157,8 +161,8 @@ private:
 	int                     m_last_blendsrc;            // previous blendmode
 	int                     m_last_blenddst;            // previous blendmode
 	int                     m_last_filter;              // previous texture filter
-	UINT32					m_last_wrap;                // previous wrap state
-	int						m_last_modmode;             // previous texture modulation
+	UINT32                  m_last_wrap;                // previous wrap state
+	int                     m_last_modmode;             // previous texture modulation
 
 	void *                  m_hlsl_buf;                 // HLSL vertex data
 	shaders *               m_shaders;                  // HLSL interface

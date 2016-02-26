@@ -1,0 +1,1091 @@
+# Portuguese translations for PACKAGE package
+# Traduções em português brasileiro para o pacote PACKAGE.
+# Copyright (C) 2016 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Automatically generated, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: MAME\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-02-21 20:49+0100\n"
+"PO-Revision-Date: 2016-02-22 18:03+0100\n"
+"Last-Translator: Ashura-X\n"
+"Language-Team: MAME Language Team\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: src/emu/ui/auditmenu.cpp:111
+msgid "Audit in progress..."
+msgstr "Auditoria em progresso"
+
+#: src/emu/ui/barcode.cpp:72
+msgid "New Barcode:"
+msgstr "Novo código de barras"
+
+#: src/emu/ui/barcode.cpp:76
+msgid "Enter Code"
+msgstr "Entrar com o código"
+
+#: src/emu/ui/barcode.cpp:118
+msgid "Barcode length invalid!"
+msgstr "Tamanho do código de barras inválido"
+
+#: src/emu/ui/cheatopt.cpp:78
+#, c-format
+msgid ""
+"Cheat Comment:\n"
+"%s"
+msgstr "Comentário do Truque:\n"
+
+#: src/emu/ui/cheatopt.cpp:91
+msgid "All cheats reloaded"
+msgstr "Todos os truques recarregados"
+
+#: src/emu/ui/cheatopt.cpp:122
+msgid "Autofire Settings"
+msgstr "Configurações do Autofire"
+
+#: src/emu/ui/cheatopt.cpp:140
+msgid "Reset All"
+msgstr "Reiniciar Tudo"
+
+#: src/emu/ui/cheatopt.cpp:143
+msgid "Reload All"
+msgstr "Recarregar Tudo"
+
+#: src/emu/ui/cheatopt.cpp:259
+msgid "Autofire Status"
+msgstr "Status do Autofire"
+
+#: src/emu/ui/cheatopt.cpp:259 src/emu/ui/ui.cpp:1755
+#: src/emu/ui/videoopt.cpp:207 src/emu/ui/videoopt.cpp:211
+#: src/emu/ui/videoopt.cpp:215 src/emu/ui/videoopt.cpp:219
+#: src/emu/ui/videoopt.cpp:223
+msgid "Disabled"
+msgstr "Desativado"
+
+#: src/emu/ui/cheatopt.cpp:259 src/emu/ui/ui.cpp:1755
+#: src/emu/ui/videoopt.cpp:207 src/emu/ui/videoopt.cpp:211
+#: src/emu/ui/videoopt.cpp:215 src/emu/ui/videoopt.cpp:219
+#: src/emu/ui/videoopt.cpp:223
+msgid "Enabled"
+msgstr "Ativado"
+
+#: src/emu/ui/cheatopt.cpp:285 src/emu/ui/cheatopt.cpp:291
+msgid "On"
+msgstr "Ligado"
+
+#: src/emu/ui/cheatopt.cpp:285 src/emu/ui/cheatopt.cpp:291
+msgid "Off"
+msgstr "Desligado"
+
+#: src/emu/ui/cheatopt.cpp:302
+msgid "No buttons found on this machine!"
+msgstr "Nenhum botão encontrado nesta máquina!"
+
+#: src/emu/ui/cheatopt.cpp:313 src/emu/ui/cheatopt.cpp:317
+msgid "Autofire Delay"
+msgstr "Atraso do Autofire"
+
+#: src/emu/ui/ctrlmenu.cpp:20
+msgid "Lightgun Device Assignment"
+msgstr "Atribuição do Dispositivo Lightgun"
+
+#: src/emu/ui/ctrlmenu.cpp:21
+msgid "Trackball Device Assignment"
+msgstr "Atribuição do Dispositivo Trackball"
+
+#: src/emu/ui/ctrlmenu.cpp:22
+msgid "Pedal Device Assignment"
+msgstr "Atribuição do Dispositivo Pedal"
+
+#: src/emu/ui/ctrlmenu.cpp:23
+msgid "Adstick Device Assignment"
+msgstr "Atribuição do Dispositivo Adstick"
+
+#: src/emu/ui/ctrlmenu.cpp:24
+msgid "Paddle Device Assignment"
+msgstr "Atribuição do Dispositivo Paddle"
+
+#: src/emu/ui/ctrlmenu.cpp:25
+msgid "Dial Device Assignment"
+msgstr "Atribuição do Dispositivo Dial"
+
+#: src/emu/ui/ctrlmenu.cpp:26
+msgid "Positional Device Assignment"
+msgstr "Atribuição do Dispositivo Posicional"
+
+#: src/emu/ui/ctrlmenu.cpp:27
+msgid "Mouse Device Assignment"
+msgstr "Atribuição do Dispositivo Mouse"
+
+#: src/emu/ui/ctrlmenu.cpp:106 src/emu/ui/ctrlmenu.cpp:126
+#: src/emu/ui/optsmenu.cpp:251
+msgid "Device Mapping"
+msgstr "Mapeamento de Dispositivo"
+
+#: src/emu/ui/custmenu.cpp:156 src/emu/ui/custmenu.cpp:441
+msgid "Main filter"
+msgstr "Filtro Principal"
+
+#: src/emu/ui/custmenu.cpp:165 src/emu/ui/custmenu.cpp:450
+msgid "Other filter"
+msgstr "Outro filtro"
+
+#: src/emu/ui/custmenu.cpp:192 src/emu/ui/custmenu.cpp:504
+msgid "Remove last filter"
+msgstr "Remover o último filtro"
+
+#: src/emu/ui/custmenu.cpp:195 src/emu/ui/custmenu.cpp:507
+msgid "Add filter"
+msgstr "Adicionar filtro"
+
+#: src/emu/ui/custmenu.cpp:210 src/emu/ui/custmenu.cpp:230
+#: src/emu/ui/custmenu.cpp:523 src/emu/ui/custmenu.cpp:543
+msgid "Select custom filters:"
+msgstr "Selecionar filtros customizáveis:"
+
+#: src/emu/ui/custui.cpp:20
+msgid "Show All"
+msgstr "Mostrar Tudo"
+
+#: src/emu/ui/custui.cpp:21
+msgid "Hide Filters"
+msgstr "Esconder Filtros"
+
+#: src/emu/ui/custui.cpp:22
+msgid "Hide Info/Image"
+msgstr "Esconder Info/Imagem"
+
+#: src/emu/ui/custui.cpp:23
+msgid "Hide Both"
+msgstr "Esconder Ambos"
+
+#: src/emu/ui/custui.cpp:137
+msgid "Fonts"
+msgstr "Fontes"
+
+#: src/emu/ui/custui.cpp:138
+msgid "Colors"
+msgstr "Cores"
+
+#: src/emu/ui/custui.cpp:143 src/emu/ui/dirmenu.cpp:33
+msgid "Language"
+msgstr "Linguagem"
+
+#: src/emu/ui/custui.cpp:147
+msgid "Show side panels"
+msgstr "Mostrar painéis laterais"
+
+#: src/emu/ui/custui.cpp:162 src/emu/ui/custui.cpp:182
+msgid "Custom UI Settings"
+msgstr "Configurações Customizadas do UI"
+
+#: src/emu/ui/custui.cpp:369
+msgid "UI Font"
+msgstr "Fonte do UI"
+
+#: src/emu/ui/custui.cpp:373
+msgid "Bold"
+msgstr "Negrito"
+
+#: src/emu/ui/custui.cpp:374
+msgid "Italic"
+msgstr "Itálico"
+
+#: src/emu/ui/custui.cpp:380
+msgid "Lines"
+msgstr "Linhas"
+
+#: src/emu/ui/custui.cpp:388
+msgid "Infos text size"
+msgstr "Informações do tamanho do texto"
+
+#: src/emu/ui/custui.cpp:405
+msgid "UI Fonts Settings"
+msgstr "Configurações das fontes do UI"
+
+#: src/emu/ui/custui.cpp:432
+msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+msgstr "Texto de amostra - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+
+#: src/emu/ui/custui.cpp:530
+msgid "Normal text"
+msgstr "Texto Normal"
+
+#: src/emu/ui/custui.cpp:531
+msgid "Selected color"
+msgstr "Cor Selecionada"
+
+#: src/emu/ui/custui.cpp:532
+msgid "Normal text background"
+msgstr "Texto de fundo normal"
+
+#: src/emu/ui/custui.cpp:533
+msgid "Selected background color"
+msgstr "Cor de fundo selecionada"
+
+#: src/emu/ui/custui.cpp:534
+msgid "Subitem color"
+msgstr "Cor do Sub-item"
+
+#: src/emu/ui/custui.cpp:535 src/emu/ui/custui.cpp:630
+msgid "Clone"
+msgstr "Clone"
+
+#: src/emu/ui/custui.cpp:536
+msgid "Border"
+msgstr "Borda"
+
+#: src/emu/ui/custui.cpp:537
+msgid "Background"
+msgstr "Fundo"
+
+#: src/emu/ui/custui.cpp:538
+msgid "Dipswitch"
+msgstr "Dipswitch"
+
+#: src/emu/ui/custui.cpp:539
+msgid "Unavailable color"
+msgstr "Cor Indisponível"
+
+#: src/emu/ui/custui.cpp:540
+msgid "Slider color"
+msgstr "Slider de cores"
+
+#: src/emu/ui/custui.cpp:541
+msgid "Gfx viewer background"
+msgstr "Visualizador GFX de fundo"
+
+#: src/emu/ui/custui.cpp:542
+msgid "Mouse over color"
+msgstr "Cor do Mouse over"
+
+#: src/emu/ui/custui.cpp:543
+msgid "Mouse over background color"
+msgstr "Cor de fundo do Mouse over"
+
+#: src/emu/ui/custui.cpp:544
+msgid "Mouse down color"
+msgstr "Cor do Mouse down"
+
+#: src/emu/ui/custui.cpp:545
+msgid "Mouse down background color"
+msgstr "Cor de fundo do Mouse down"
+
+#: src/emu/ui/custui.cpp:548
+msgid "Restore originals colors"
+msgstr "Restaurar as cores originais"
+
+#: src/emu/ui/custui.cpp:564
+msgid "UI Colors Settings"
+msgstr "Configurações de cores do UI"
+
+#: src/emu/ui/custui.cpp:592 src/emu/ui/selector.cpp:181
+msgid "Double click or press "
+msgstr "Duplo-clique ou pressione"
+
+#: src/emu/ui/custui.cpp:592
+msgid " to change the color value"
+msgstr "para mudar o valor da cor"
+
+#: src/emu/ui/custui.cpp:618
+msgid "Menu Preview"
+msgstr "Menu de Visualização"
+
+#: src/emu/ui/custui.cpp:626
+msgid "Normal"
+msgstr "Normal"
+
+#: src/emu/ui/custui.cpp:627
+msgid "Subitem"
+msgstr "Sub-item"
+
+#: src/emu/ui/custui.cpp:628
+msgid "Selected"
+msgstr "Selecionado"
+
+#: src/emu/ui/custui.cpp:629
+msgid "Mouse Over"
+msgstr "Mouse Over"
+
+#: src/emu/ui/custui.cpp:896
+msgid "Choose from palette"
+msgstr "Escolha da paleta"
+
+#: src/emu/ui/custui.cpp:912
+msgid " - ARGB Settings"
+msgstr "Configurações ARGB"
+
+#: src/emu/ui/custui.cpp:936
+msgid "Color preview ="
+msgstr "Visualização da cor"
+
+#: src/emu/ui/datmenu.cpp:59
+msgid "Software History"
+msgstr "História do Software"
+
+#: src/emu/ui/datmenu.cpp:61
+msgid "Software Usage"
+msgstr "Uso do Software"
+
+#: src/emu/ui/datmenu.cpp:199
+msgid "Revision: "
+msgstr "Revisão: "
+
+#: src/emu/ui/datmenu.cpp:291 src/emu/ui/selgame.cpp:2054
+#: src/emu/ui/selgame.cpp:2063 src/emu/ui/selsoft.cpp:1441
+#: src/emu/ui/selsoft.cpp:1450
+msgid "History"
+msgstr "História"
+
+#: src/emu/ui/datmenu.cpp:293
+msgid "Mameinfo"
+msgstr "Mameinfo"
+
+#: src/emu/ui/datmenu.cpp:295
+msgid "Messinfo"
+msgstr "Messinfo"
+
+#: src/emu/ui/datmenu.cpp:297
+msgid "Sysinfo"
+msgstr "Sysinfo"
+
+#: src/emu/ui/datmenu.cpp:299
+msgid "Mamescore"
+msgstr "Mamescore"
+
+#: src/emu/ui/datmenu.cpp:301
+msgid "Command"
+msgstr "Command"
+
+#: src/emu/ui/dirmenu.cpp:31
+msgid "ROMs"
+msgstr "ROMs"
+
+#: src/emu/ui/dirmenu.cpp:32
+msgid "UI"
+msgstr "UI"
+
+#: src/emu/ui/dirmenu.cpp:34
+msgid "Samples"
+msgstr "Samples"
+
+#: src/emu/ui/dirmenu.cpp:35
+msgid "DATs"
+msgstr "DATs"
+
+#: src/emu/ui/dirmenu.cpp:36
+msgid "INIs"
+msgstr "INIs"
+
+#: src/emu/ui/dirmenu.cpp:37
+msgid "Extra INIs"
+msgstr "Extra INIs"
+
+#: src/emu/ui/dirmenu.cpp:38
+msgid "Icons"
+msgstr "Ícones"
+
+#: src/emu/ui/dirmenu.cpp:39 src/emu/ui/miscmenu.cpp:565
+msgid "Cheats"
+msgstr "Truques"
+
+#: src/emu/ui/dirmenu.cpp:40
+msgid "Snapshots"
+msgstr "Snapshots"
+
+#: src/emu/ui/dirmenu.cpp:41
+msgid "Cabinets"
+msgstr "Gabinetes"
+
+#: src/emu/ui/dirmenu.cpp:42
+msgid "Flyers"
+msgstr "Flyers"
+
+#: src/emu/ui/dirmenu.cpp:43
+msgid "Titles"
+msgstr "Títulos"
+
+#: src/emu/ui/dirmenu.cpp:44
+msgid "Ends"
+msgstr "Ends"
+
+#: src/emu/ui/dirmenu.cpp:45
+msgid "PCBs"
+msgstr "PCBs"
+
+#: src/emu/ui/dirmenu.cpp:46 src/emu/ui/videoopt.cpp:223
+msgid "Marquees"
+msgstr "Marquees"
+
+#: src/emu/ui/dirmenu.cpp:47
+msgid "Controls Panels"
+msgstr "Painéis de Controles"
+
+#: src/emu/ui/dirmenu.cpp:48
+msgid "Crosshairs"
+msgstr "Mira"
+
+#: src/emu/ui/dirmenu.cpp:49
+msgid "Artworks"
+msgstr "Artworks"
+
+#: src/emu/ui/dirmenu.cpp:50
+msgid "Bosses"
+msgstr "Chefes"
+
+#: src/emu/ui/dirmenu.cpp:51
+msgid "Artworks Preview"
+msgstr "Amostra de Artworks"
+
+#: src/emu/ui/dirmenu.cpp:52
+msgid "Select"
+msgstr "Selecionado"
+
+#: src/emu/ui/dirmenu.cpp:53
+msgid "GameOver"
+msgstr "Fim do Jogo"
+
+#: src/emu/ui/dirmenu.cpp:54
+msgid "HowTo"
+msgstr "Como"
+
+#: src/emu/ui/dirmenu.cpp:55
+msgid "Logos"
+msgstr "Logos"
+
+#: src/emu/ui/dirmenu.cpp:56
+msgid "Scores"
+msgstr "Scores"
+
+#: src/emu/ui/dirmenu.cpp:57
+msgid "Versus"
+msgstr "Versus"
+
+#: src/emu/ui/dirmenu.cpp:115 src/emu/ui/dirmenu.cpp:135
+msgid "Folders Setup"
+msgstr "Configurar Pastas"
+
+#: src/emu/ui/dirmenu.cpp:182
+msgid "Current "
+msgstr "Atual"
+
+#: src/emu/ui/dirmenu.cpp:182
+msgid " Folders"
+msgstr "Pastas"
+
+#: src/emu/ui/dirmenu.cpp:195
+msgid "Change Folder"
+msgstr "Mudar Pasta"
+
+#: src/emu/ui/dirmenu.cpp:195
+msgid "Add Folder"
+msgstr "Adicionar Pasta"
+
+#: src/emu/ui/dirmenu.cpp:198
+msgid "Remove Folder"
+msgstr "Remover Pasta"
+
+#: src/emu/ui/dirmenu.cpp:512
+msgid "Change)"
+msgstr "Mudar)"
+
+#: src/emu/ui/dirmenu.cpp:512
+msgid "Add"
+msgstr "Adicionar"
+
+#: src/emu/ui/dirmenu.cpp:513
+msgid " Folder - Search: "
+msgstr "Busca - Pasta: "
+
+#: src/emu/ui/dirmenu.cpp:548
+msgid "Press TAB to set"
+msgstr "Pressione TAB para acertar"
+
+#: src/emu/ui/dirmenu.cpp:660
+msgid "Remove "
+msgstr "Remover "
+
+#: src/emu/ui/dirmenu.cpp:660
+msgid " Folder"
+msgstr "Pasta"
+
+#: src/emu/ui/dsplmenu.cpp:205 src/emu/ui/dsplmenu.cpp:225
+#: src/emu/ui/optsmenu.cpp:248
+msgid "Display Options"
+msgstr "Opções de Tela"
+
+#: src/emu/ui/mainmenu.cpp:53
+msgid "Input (general)"
+msgstr "Entrada (geral)"
+
+#: src/emu/ui/mainmenu.cpp:55
+msgid "Input (this Machine)"
+msgstr "Entrada (esta máquina)"
+
+#: src/emu/ui/mainmenu.cpp:59
+msgid "Analog Controls"
+msgstr "Controles Analógicos"
+
+#: src/emu/ui/mainmenu.cpp:61
+msgid "Dip Switches"
+msgstr "Dip Switches"
+
+#: src/emu/ui/mainmenu.cpp:64
+msgid "Machine Configuration"
+msgstr "Configuração da Máquina"
+
+#: src/emu/ui/mainmenu.cpp:68
+msgid "Bookkeeping Info"
+msgstr "Info de Bookkeeping"
+
+#: src/emu/ui/mainmenu.cpp:71
+msgid "Machine Information"
+msgstr "Informação da Máquina"
+
+#: src/emu/ui/mainmenu.cpp:77
+msgid "Image Information"
+msgstr "Informação da Imagem"
+
+#: src/emu/ui/mainmenu.cpp:80
+msgid "File Manager"
+msgstr "Gerenciador de Arquivos"
+
+#: src/emu/ui/mainmenu.cpp:85
+msgid "Tape Control"
+msgstr "Controle do Tape"
+
+#: src/emu/ui/mainmenu.cpp:90
+msgid "Pseudo terminals"
+msgstr "Pseudo terminais"
+
+#: src/emu/ui/mainmenu.cpp:93
+msgid "Bios Selection"
+msgstr "Seleção da Bios"
+
+#: src/emu/ui/mainmenu.cpp:99
+msgid "Slot Devices"
+msgstr "Dispositivos de Slot"
+
+#: src/emu/ui/mainmenu.cpp:106
+msgid "Barcode Reader"
+msgstr "Leitor de código de barras"
+
+#: src/emu/ui/mainmenu.cpp:113
+msgid "Network Devices"
+msgstr "Dispositivos de rede"
+
+#: src/emu/ui/mainmenu.cpp:118
+msgid "Keyboard Mode"
+msgstr "Modo Teclado"
+
+#: src/emu/ui/mainmenu.cpp:121
+msgid "Slider Controls"
+msgstr "Controles do Slider"
+
+#: src/emu/ui/mainmenu.cpp:124
+msgid "Video Options"
+msgstr "Opções de Vídeo"
+
+#: src/emu/ui/mainmenu.cpp:128
+msgid "Crosshair Options"
+msgstr "Opções de Mira"
+
+#: src/emu/ui/mainmenu.cpp:132
+msgid "Cheat"
+msgstr "Truques"
+
+#: src/emu/ui/mainmenu.cpp:136
+msgid "External DAT View"
+msgstr "Visualização Externa DAT"
+
+#: src/emu/ui/mainmenu.cpp:142
+msgid "Add To Favorites"
+msgstr "Adicionar aos Favoritos"
+
+#: src/emu/ui/mainmenu.cpp:144
+msgid "Remove From Favorites"
+msgstr "Remover dos Favoritos"
+
+#: src/emu/ui/mainmenu.cpp:151
+msgid "Select New Machine"
+msgstr "Selecinar Nova Máquina"
+
+#: src/emu/ui/miscmenu.cpp:35
+msgid "Keyboard Mode:"
+msgstr "Modo Teclado"
+
+#: src/emu/ui/miscmenu.cpp:35
+msgid "Natural"
+msgstr "Natural"
+
+#: src/emu/ui/miscmenu.cpp:35
+msgid "Emulated"
+msgstr "Emulado"
+
+#: src/emu/ui/miscmenu.cpp:89 src/emu/ui/slotopt.cpp:172
+msgid "Reset"
+msgstr "Reinício"
+
+#: src/emu/ui/miscmenu.cpp:263
+msgid " (locked)"
+msgstr "(travado)"
+
+#: src/emu/ui/miscmenu.cpp:523
+msgid "Visible Delay"
+msgstr "Atraso Visível"
+
+#: src/emu/ui/miscmenu.cpp:562
+msgid "Re-select last machine played"
+msgstr "Re-selecione a última máquina jogada"
+
+#: src/emu/ui/miscmenu.cpp:563
+msgid "Enlarge images in the right panel"
+msgstr "Aumentar as imagens no painél direito"
+
+#: src/emu/ui/miscmenu.cpp:564
+msgid "DATs info"
+msgstr "Info dos DATs"
+
+#: src/emu/ui/miscmenu.cpp:566
+msgid "Show mouse pointer"
+msgstr "Mostrar ponteiro do mouse"
+
+#: src/emu/ui/miscmenu.cpp:567
+msgid "Confirm quit from machines"
+msgstr "Confirmar saída das máquinas"
+
+#: src/emu/ui/miscmenu.cpp:568
+msgid "Skip displaying information's screen at startup"
+msgstr "Pular as informações na tela no início"
+
+#: src/emu/ui/miscmenu.cpp:569
+msgid "Force 4:3 appearance for software snapshot"
+msgstr "Forçar a aparência de 4:3 para o software do snapshot"
+
+#: src/emu/ui/miscmenu.cpp:570
+msgid "Use image as background"
+msgstr "Usar imagem como plano de fundo"
+
+#: src/emu/ui/miscmenu.cpp:571
+msgid "Skip bios selection menu"
+msgstr "Pular menu de seleção da bios"
+
+#: src/emu/ui/miscmenu.cpp:572
+msgid "Skip software parts selection menu"
+msgstr "Pular menu de seleção para o software em partes"
+
+#: src/emu/ui/miscmenu.cpp:653 src/emu/ui/miscmenu.cpp:673
+#: src/emu/ui/optsmenu.cpp:250
+msgid "Miscellaneous Options"
+msgstr "Opção de Miscelâneas"
+
+#: src/emu/ui/optsmenu.cpp:201
+msgid "Filter"
+msgstr "Filtro"
+
+#: src/emu/ui/optsmenu.cpp:246
+msgid "Customize UI"
+msgstr "Customizar UI"
+
+#: src/emu/ui/optsmenu.cpp:249 src/emu/ui/sndmenu.cpp:152
+#: src/emu/ui/sndmenu.cpp:172
+msgid "Sound Options"
+msgstr "Opções de Som"
+
+#: src/emu/ui/optsmenu.cpp:252
+msgid "General Inputs"
+msgstr "Entradas Gerais"
+
+#: src/emu/ui/optsmenu.cpp:267 src/emu/ui/optsmenu.cpp:287
+msgid "Settings"
+msgstr "Configurações"
+
+#: src/emu/ui/optsmenu.cpp:307
+msgid "**Error to save ui.ini**"
+msgstr "**Erro salvando ui.ini**"
+
+#: src/emu/ui/selector.cpp:152
+msgid "Selection List - Search: "
+msgstr "Lista de Seleção - Busca: "
+
+#: src/emu/ui/selector.cpp:181
+msgid " to select"
+msgstr " para selecionar"
+
+#: src/emu/ui/selgame.cpp:623 src/emu/ui/simpleselgame.cpp:264
+msgid "Configure Options"
+msgstr "Opções de configuração"
+
+#: src/emu/ui/selgame.cpp:624
+msgid "Configure Directories"
+msgstr "Configurar Diretórios"
+
+#: src/emu/ui/selgame.cpp:625 src/emu/ui/simpleselgame.cpp:265
+msgid "Save Configuration"
+msgstr "Salvar Configurações"
+
+#: src/emu/ui/selgame.cpp:746
+msgid " Search: "
+msgstr " Busca: "
+
+#: src/emu/ui/selgame.cpp:1951 src/emu/ui/selgame.cpp:2098
+#: src/emu/ui/selsoft.cpp:1486
+msgid "No Infos Available"
+msgstr "Sem Informação Disponível"
+
+#: src/emu/ui/selgame.cpp:2064 src/emu/ui/selsoft.cpp:1451
+msgid "Usage"
+msgstr "Uso"
+
+#: src/emu/ui/selsoft.cpp:109
+msgid " (default)"
+msgstr " (padrão)"
+
+#: src/emu/ui/selsoft.cpp:621
+msgid "Region: "
+msgstr "Região"
+
+#: src/emu/ui/selsoft.cpp:623
+msgid "Publisher: "
+msgstr "Fabricante"
+
+#: src/emu/ui/selsoft.cpp:625
+msgid "Year: "
+msgstr "Ano"
+
+#: src/emu/ui/selsoft.cpp:627
+msgid "Software List: "
+msgstr "Lista de Software: "
+
+#: src/emu/ui/selsoft.cpp:629
+msgid "Device type: "
+msgstr "Tipo de Dispositivo"
+
+#: src/emu/ui/selsoft.cpp:631
+msgid "Search: "
+msgstr "Busca: "
+
+#: src/emu/ui/selsoft.cpp:1822 src/emu/ui/selsoft.cpp:1842
+msgid "Software part selection:"
+msgstr "Seleção por parte de Software"
+
+#: src/emu/ui/selsoft.cpp:1960 src/emu/ui/selsoft.cpp:1980
+msgid "Bios selection:"
+msgstr "Seleção da Bios"
+
+#: src/emu/ui/slotopt.cpp:166
+msgid " [internal]"
+msgstr " [interno]"
+
+#: src/emu/ui/sndmenu.cpp:136
+msgid "Sound"
+msgstr "Som"
+
+#: src/emu/ui/sndmenu.cpp:137
+msgid "Sample Rate"
+msgstr "Taxa de Amostragem"
+
+#: src/emu/ui/sndmenu.cpp:138
+msgid "Use External Samples"
+msgstr "Usar Amostras Externas"
+
+#: src/emu/ui/ui.cpp:415
+msgid "This driver requires images to be loaded in the following device(s): "
+msgstr "Este driver necessita de imagens para ser carregado no seguintes dispositivo(s): "
+
+#: src/emu/ui/ui.cpp:1062
+msgid ""
+"Usage of emulators in conjunction with ROMs you don't own is forbidden by "
+"copyright law.\n"
+"\n"
+msgstr "O uso de emuladores em conjunto com ROMs que você não possue é proibido por leis de direitos autorais"
+
+#: src/emu/ui/ui.cpp:1063
+#, c-format
+msgid ""
+"IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS ESC.\n"
+"\n"
+msgstr "SE VOCÊ NÃO ESTÁ LEGALMENTE ENTITULADO PARA JOGAR \"%s\" NESTE EMULADOR, PRESSIONE ESC."
+
+#: src/emu/ui/ui.cpp:1064
+msgid "Otherwise, type OK or move the joystick left then right to continue"
+msgstr "Caso contrário, pressione OK ou mova o joystick para a esquerda e direita para continuar"
+
+#: src/emu/ui/ui.cpp:1099
+msgid ""
+"One or more ROMs/CHDs for this machine are incorrect. The machine may not "
+"run correctly.\n"
+msgstr "Uma ou mais ROMs/CHDs para esta máquina estão incorretas. A máquina não irá funcionar corretamente"
+
+#: src/emu/ui/ui.cpp:1112
+msgid ""
+"There are known problems with this machine\n"
+"\n"
+msgstr "Existem problemas conhecidos com esta máquina"
+
+#: src/emu/ui/ui.cpp:1116
+msgid ""
+"One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
+msgstr "Uma ou mais ROMs/CHDs para esta máquina não foram corretamente dumpadas. \n "
+
+#: src/emu/ui/ui.cpp:1120
+#, c-format
+msgid "The keyboard emulation may not be 100% accurate.\n"
+msgstr "A emulação do teclado talvez não seja 100% perfeita.\n"
+
+#: src/emu/ui/ui.cpp:1122
+#, c-format
+msgid "The colors aren't 100% accurate.\n"
+msgstr "As cores não são 100% perfeitas.\n"
+
+#: src/emu/ui/ui.cpp:1124
+msgid "The colors are completely wrong.\n"
+msgstr "As cores são completamente erradas.\n"
+
+#: src/emu/ui/ui.cpp:1126
+#, c-format
+msgid "The video emulation isn't 100% accurate.\n"
+msgstr "A emulação do vídeo não é 100% perfeita.\n"
+
+#: src/emu/ui/ui.cpp:1128
+#, c-format
+msgid "The sound emulation isn't 100% accurate.\n"
+msgstr "A emulação do som não é 100% perfeita.\n"
+
+#: src/emu/ui/ui.cpp:1130
+msgid "The machine lacks sound.\n"
+msgstr "A máquina tem problemas no som.\n"
+
+#: src/emu/ui/ui.cpp:1133
+msgid "Screen flipping in cocktail mode is not supported.\n"
+msgstr "Modo Screen flipping na tela invertida não é suportado"
+
+#: src/emu/ui/ui.cpp:1137
+msgid "The machine requires external artwork files\n"
+msgstr "Esta máquina requer arquivos externos de artwork\n"
+
+#: src/emu/ui/ui.cpp:1142
+msgid ""
+"This machine was never completed. It may exhibit strange behavior or missing "
+"elements that are not bugs in the emulation.\n"
+msgstr "Esta máquina nunca foi completada. Ela poderá ter um comportamento estranho or faltar elementos que não são bugs na emulação"
+
+#: src/emu/ui/ui.cpp:1147
+msgid ""
+"This machine has no sound hardware, MAME will produce no sounds, this is "
+"expected behaviour.\n"
+msgstr "Esta máquina não tem hardware de som, MAME não irá produzir som algum, isto já é esperado."
+
+#: src/emu/ui/ui.cpp:1155
+msgid "The machine has protection which isn't fully emulated.\n"
+msgstr "A máquina possui proteção a qual não é completamente emulada.\n"
+
+#: src/emu/ui/ui.cpp:1158
+msgid ""
+"\n"
+"THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet "
+"complete. There is nothing you can do to fix this problem except wait for "
+"the developers to improve the emulation.\n"
+msgstr "ESTA MÁQUINA NÃO FUNCIONA. A emulação para esta máquina não está completa. Não há nada que você possa fazer para fixar isto exceto aguardar os desenvolvedores improvisarem a emulação.\n"
+
+#: src/emu/ui/ui.cpp:1162
+msgid ""
+"\n"
+"Certain elements of this machine cannot be emulated as it requires actual "
+"physical interaction or consists of mechanical devices. It is not possible "
+"to fully play this machine.\n"
+msgstr "Certos elementos desta máquina não podem ser emulados e isto necessita de interação física ou de dispositivos mecânicos. Não é possível jogar esta máquina plenamente.\n"
+
+#: src/emu/ui/ui.cpp:1181
+msgid ""
+"\n"
+"\n"
+"There are working clones of this machine: "
+msgstr "Existem clones funcionando para esta máquina: "
+
+#: src/emu/ui/ui.cpp:1195
+msgid ""
+"\n"
+"\n"
+"Type OK or move the joystick left then right to continue"
+msgstr "Pressione OK ou mova o joysticks para esquerda e direita para continuar"
+
+#: src/emu/ui/ui.cpp:1254
+msgid ""
+"\n"
+"Sound:\n"
+msgstr "Som:"
+
+#: src/emu/ui/ui.cpp:1282
+msgid ""
+"\n"
+"Video:\n"
+msgstr "Vídeo:"
+
+#: src/emu/ui/ui.cpp:1286
+msgid "None\n"
+msgstr "Nada"
+
+#: src/emu/ui/ui.cpp:1298
+msgid "Vector\n"
+msgstr "Vetorial"
+
+#: src/emu/ui/ui.cpp:1590 src/emu/ui/ui.cpp:1600
+msgid "Keyboard Emulation Status"
+msgstr "Status da Emulação do Teclado"
+
+#: src/emu/ui/ui.cpp:1592
+msgid "Mode: PARTIAL Emulation"
+msgstr "Modo: Emulação PARCIAL"
+
+#: src/emu/ui/ui.cpp:1593
+msgid "UI:   Enabled"
+msgstr "UI:   Ativo"
+
+#: src/emu/ui/ui.cpp:1595 src/emu/ui/ui.cpp:1605
+msgid "**Use ScrLock to toggle**"
+msgstr "**Usar ScrLock para alternar"
+
+#: src/emu/ui/ui.cpp:1602
+msgid "Mode: FULL Emulation"
+msgstr "Modo: Emulação COMPLETA"
+
+#: src/emu/ui/ui.cpp:1603
+msgid "UI:   Disabled"
+msgstr "UI:   Desativado"
+
+#: src/emu/ui/ui.cpp:1749
+msgid "Autofire can't be enabled"
+msgstr "Autofire não pode ser ativado"
+
+#: src/emu/ui/ui.cpp:1788
+msgid "Select position to save to"
+msgstr "Selecione a posição para salvar em"
+
+#: src/emu/ui/ui.cpp:1790
+msgid "Select position to load from"
+msgstr "Selecione a posição para carregar de"
+
+#: src/emu/ui/ui.cpp:1814
+msgid "Save cancelled"
+msgstr "Salvar cancelado"
+
+#: src/emu/ui/ui.cpp:1816
+msgid "Load cancelled"
+msgstr "Carregar cancelado"
+
+#: src/emu/ui/ui.cpp:1859
+#, c-format
+msgid "Save to position %s"
+msgstr "Salvar para a posição %s"
+
+#: src/emu/ui/ui.cpp:1864
+#, c-format
+msgid "Load from position %s"
+msgstr "Carregar da posição %s"
+
+#: src/emu/ui/ui.cpp:1904
+#, c-format
+msgid ""
+"Are you sure you want to quit?\n"
+"\n"
+"Press ''%s'' to quit,\n"
+"Press ''%s'' to return to emulation."
+msgstr ""
+"Tem certeza que deseja sair?\n"
+"\n"
+"Pressione ''%s'' para sair,\n"
+"Pressione ''%s'' para retornar a emulação."
+
+
+#: src/emu/ui/ui.cpp:1980
+msgid "Master Volume"
+msgstr "Volume Mestre"
+
+#: src/emu/ui/ui.cpp:1991
+msgid " Volume"
+msgstr " Volume"
+
+#: src/emu/ui/ui.cpp:2094
+msgid "Vector Flicker"
+msgstr "Flicker Vetorial"
+
+#: src/emu/ui/ui.cpp:2096
+msgid "Beam Width Minimum"
+msgstr "Largura Mínima do Feixe de Luz"
+
+#: src/emu/ui/ui.cpp:2098
+msgid "Beam Width Maximum"
+msgstr "Largura Máxima do Feixe de Luz"
+
+#: src/emu/ui/ui.cpp:2100
+msgid "Beam Intensity Weight"
+msgstr "Intensidade do tamanho do Feixe de Luz"
+
+#: src/emu/ui/ui.cpp:2540
+#, c-format
+msgid "Screen '%s'"
+msgstr "Tela  '%s'"
+
+#: src/emu/ui/ui.cpp:2542
+msgid "Screen"
+msgstr "Tela"
+
+#: src/emu/ui/ui.cpp:2560
+msgid "Crosshair Scale"
+msgstr "Escala da Mira"
+
+#: src/emu/ui/ui.cpp:2579
+msgid "Crosshair Offset"
+msgstr "Alinhamento da Mira"
+
+#: src/emu/ui/videoopt.cpp:55
+#, c-format
+msgid "Screen #%d"
+msgstr "Tela #%d"
+
+#: src/emu/ui/videoopt.cpp:203
+msgid "Rotate"
+msgstr "Rotação"
+
+#: src/emu/ui/videoopt.cpp:207
+msgid "Backdrops"
+msgstr "Backdrops"
+
+#: src/emu/ui/videoopt.cpp:211
+msgid "Overlays"
+msgstr "Overlays"
+
+#: src/emu/ui/videoopt.cpp:215
+msgid "Bezels"
+msgstr "Bezels"
+
+#: src/emu/ui/videoopt.cpp:219
+msgid "CPanels"
+msgstr "CPanels"
+
+#: src/emu/ui/videoopt.cpp:227
+msgid "View"
+msgstr "Vista"
+
+#: src/emu/ui/videoopt.cpp:227
+msgid "Cropped"
+msgstr "Cortado"
+
+#: src/emu/ui/videoopt.cpp:227
+msgid "Full"
+msgstr "Cheio"
+
+#: src/emu/ui/viewgfx.cpp:391
+msgid " COLORS"
+msgstr " CORES"
+
+#: src/emu/ui/viewgfx.cpp:391
+msgid " PENS"
+msgstr " CANETAS"

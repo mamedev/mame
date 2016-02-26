@@ -406,7 +406,7 @@ end
 			"LUA_COMPAT_5_1",
 			"LUA_COMPAT_5_2",
 		}
-	if not (_OPTIONS["targetos"]=="windows") and not (_OPTIONS["targetos"]=="asmjs") then
+	if not (_OPTIONS["targetos"]=="windows") and not (_OPTIONS["targetos"]=="asmjs") and not (_OPTIONS["targetos"]=="pnacl") then
 		defines {
 			"LUA_USE_POSIX",
 		}
@@ -480,6 +480,11 @@ project "lualibs"
 			"/wd4130", -- warning C4130: '==': logical operation on address of string constant
 		}
 
+	configuration { "pnacl"}
+		buildoptions {
+			"-Wno-char-subscripts",
+		}
+
 	configuration { }
 		defines {
 			"LUA_COMPAT_ALL",
@@ -518,6 +523,10 @@ project "luv"
 			"_WIN32_WINNT=0x0600",
 		}
 	end
+	configuration { "pnacl"}
+		defines {
+			"_POSIX_BARRIERS=1",
+		}
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
@@ -528,10 +537,14 @@ project "luv"
 			"-Wno-unused-function",
 			"-Wno-strict-prototypes",
 			"-Wno-unused-variable",
-			"-Wno-maybe-uninitialized",
 			"-Wno-undef",
 		}
 
+	configuration { "not android-*" }
+		buildoptions_c {
+			"-Wno-maybe-uninitialized",
+		}
+		
 	configuration { "vs2015" }
 		buildoptions {
 			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
@@ -581,7 +594,10 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
 		}
 end
-
+	configuration { "pnacl" }
+		defines {
+			"SQLITE_OMIT_LOAD_EXTENSION",
+		}
 	configuration { "vs2015" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
@@ -737,6 +753,11 @@ end
 			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 		}
 
+	configuration { "android-*"}
+		buildoptions {
+			"-Wno-macro-redefined",
+		}
+
 	configuration { "vs*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/msvc",
@@ -746,7 +767,7 @@ end
 			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
 		}
 
-	configuration { "osx*" }
+	configuration { "osx* or xcode4" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/osx",
 		}
@@ -878,7 +899,7 @@ end
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if (_OPTIONS["gcc"]~=nil) then
-		if string.find(_OPTIONS["gcc"], "clang") then
+		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "android") then
 			buildoptions_c {
 				"-Wno-unknown-warning-option",
 				"-Wno-absolute-value",
@@ -1012,7 +1033,7 @@ project "uv"
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if (_OPTIONS["gcc"]~=nil) then
-		if string.find(_OPTIONS["gcc"], "clang") then
+		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "android") then
 			buildoptions_c {
 				"-Wno-unknown-warning-option",
 				"-Wno-unknown-attributes",

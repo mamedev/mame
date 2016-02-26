@@ -2,15 +2,15 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Jangou Custom Blitter Chip, codename "???" (name scratched afaik)
+    Jangou Custom Blitter Chip, codename "???" (name scratched afaik)
 
-	device emulation by Angelo Salese, from original jangou.cpp implementation
-	 by Angelo Salese, David Haywood and Phil Bennett.
+    device emulation by Angelo Salese, from original jangou.cpp implementation
+     by Angelo Salese, David Haywood and Phil Bennett.
 
-	TODO:
-	- BLTFLIP mechanism;
-	- clean-ups;
-	 
+    TODO:
+    - BLTFLIP mechanism;
+    - clean-ups;
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -51,7 +51,7 @@ void jangou_blitter_device::device_start()
 	if (m_gfxrom == nullptr)
 		fatalerror("JANGOU_BLITTER: \"gfx\" memory base not found");
 	m_gfxrommask = devregion->bytes()-1;
-	
+
 	save_item(NAME(m_pen_data));
 	save_item(NAME(m_blit_data));
 	save_item(NAME(m_blit_buffer));
@@ -84,12 +84,12 @@ UINT8 jangou_blitter_device::gfx_nibble( UINT32 niboffset )
 }
 
 void jangou_blitter_device::plot_gfx_pixel( UINT8 pix, int x, int y )
-{	
+{
 	if (y < 0 || y >= 256)
 		return;
 	if (x < 0 || x >= 256)
 		return;
-	
+
 	if (x & 1)
 		m_blit_buffer[(y * 256) + (x >> 1)] = (m_blit_buffer[(y * 256) + (x >> 1)] & 0x0f) | ((pix << 4) & 0xf0);
 	else
@@ -112,11 +112,11 @@ WRITE8_MEMBER( jangou_blitter_device::process_w )
 		src |= (m_blit_data[6] & 3) << 16;
 		x = (m_blit_data[2] & 0xff);
 		y = (m_blit_data[3] & 0xff);
-		
+
 		#if 0
 		if(m_bltflip == true)
 		{
-			printf("%02x %02x %02x %02x %02x %02x %02x\n", m_blit_data[0], m_blit_data[1], m_blit_data[2],m_blit_data[3], m_blit_data[4], m_blit_data[5],m_blit_data[6]); 
+			printf("%02x %02x %02x %02x %02x %02x %02x\n", m_blit_data[0], m_blit_data[1], m_blit_data[2],m_blit_data[3], m_blit_data[4], m_blit_data[5],m_blit_data[6]);
 			printf("=>");
 			for(int i=0;i<0x10;i++)
 				printf("%02x ",m_pen_data[i]);
@@ -131,7 +131,7 @@ WRITE8_MEMBER( jangou_blitter_device::process_w )
 		else
 			src -= (w * h) - 1;
 
-		
+
 		for (ycount = 0; ycount < h; ycount++)
 		{
 			for(xcount = 0; xcount < w; xcount++)
@@ -152,9 +152,9 @@ WRITE8_MEMBER( jangou_blitter_device::process_w )
 					count++;
 			}
 		}
-		
+
 		//UINT32 new_src = src + count;
-		
+
 		// update source and height after blitter operation
 		// TODO: Jangou doesn't agree with this, later HW?
 		#if 0

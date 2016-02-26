@@ -112,7 +112,7 @@ public:
 		std::string             m_defdata;          // default data for this item
 		std::string             m_minimum;          // minimum value
 		std::string             m_maximum;          // maximum value
-		bool					m_changed;			// changed flag
+		bool                    m_changed;          // changed flag
 	};
 
 	// construction/destruction

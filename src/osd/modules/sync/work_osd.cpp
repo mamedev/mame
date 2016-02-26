@@ -110,7 +110,7 @@ struct work_thread_info
 
 struct osd_work_queue
 {
-	std::mutex			*lock;           // lock for protecting the queue
+	std::mutex          *lock;           // lock for protecting the queue
 	osd_work_item * volatile list;      // list of items in the queue
 	osd_work_item ** volatile tailptr;  // pointer to the tail pointer of work items in the queue
 	osd_work_item * volatile free;      // free list of work items

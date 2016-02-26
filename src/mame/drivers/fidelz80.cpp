@@ -16,7 +16,7 @@
     Chess pieces are required, but theoretically blindfold chess is possible.
     Chessboard artwork is provided for boards with pressure/magnet sensors.
     Read the official manual(s) on how to play.
-    
+
     Keypad legend:
     - RE: Reset
     - CL: Clear
@@ -29,17 +29,17 @@
     - RV: Reverse
     - ST: Set/Stop
     - TM: Time
-    
+
     Peripherals, compatible with various boards:
     - Fidelity Challenger Printer - thermal printer, MCU=?
-    
+
     Program/data cartridges, for various boards, some cross-compatible:
     - CG6: Greatest Chess Games 1
     - CAC: Challenger Advanced Chess - 8KB 101-1038A01
     - CB9: Challenger Book Openings 1 - 8KB?
     - CB16: Challenger Book Openings 2 - 8+8KB 101-1042A01,02
     - others are alt. titles of these?
-    
+
     Board hardware descriptions below.
     Detailed RE work done by Kevin 'kevtris' Horton, except where noted
 
@@ -534,7 +534,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vcc_ppi_portc_w);
 	DECLARE_WRITE8_MEMBER(cc10_ppi_porta_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off_callback);
-	
+
 	// BCC
 	DECLARE_READ8_MEMBER(bcc_input_r);
 	DECLARE_WRITE8_MEMBER(bcc_control_w);
@@ -938,7 +938,7 @@ READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
 
 	// d4: TSI BUSY line
 	data |= (m_speech->busy_r()) ? 0 : 0x10;
-	
+
 	return data;
 }
 
@@ -947,14 +947,14 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 	// d0,d1: input mux highest bits
 	// d5: enable language switch
 	m_inp_mux = (m_inp_mux & 0xff) | (data << 8 & 0x300) | (data << 5 & 0x400);
-	
+
 	// d7: TSI ROM A12
 	m_speech->force_update(); // update stream to now
 	m_speech_bank = data >> 7 & 1;
-	
+
 	// d6: TSI START line
 	m_speech->start_w(data >> 6 & 1);
-	
+
 	// d2: lower TSI volume
 	m_speech->set_output_gain(0, (data & 4) ? 0.5 : 1.0);
 }
@@ -1025,7 +1025,8 @@ static ADDRESS_MAP_START( cc10_map, AS_PROGRAM, 8, fidelz80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x3000, 0x31ff) AM_MIRROR(0x0e00) AM_RAM
+	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x0f00) AM_RAM
+	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0f00) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vcc_map, AS_PROGRAM, 8, fidelz80_state )
@@ -1146,7 +1147,7 @@ static INPUT_PORTS_START( vcc_base )
 
 	PORT_START("IN.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_V)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("D4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_D)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H)
 
@@ -1215,7 +1216,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( bcc )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_V)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("d4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_D)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H)
 

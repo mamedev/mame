@@ -21,17 +21,17 @@
 
 class shader_manager {
 public:
-    shader_manager() {}
-    ~shader_manager();
+	shader_manager() {}
+	~shader_manager();
 
-    // Getters
-    bgfx::ShaderHandle shader(std::string name);
+	// Getters
+	bgfx::ShaderHandle shader(std::string name);
 
 private:
-    bgfx::ShaderHandle load_shader(std::string name);
-    static const bgfx::Memory* load_mem(std::string name);
+	bgfx::ShaderHandle load_shader(std::string name);
+	static const bgfx::Memory* load_mem(std::string name);
 
-    std::map<std::string, bgfx::ShaderHandle> m_shaders;
+	std::map<std::string, bgfx::ShaderHandle> m_shaders;
 };
 
 #endif // __DRAWBGFX_SHADER_MANAGER__

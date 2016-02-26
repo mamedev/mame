@@ -113,7 +113,7 @@ if _OPTIONS["targetos"]=="windows" then
 		}
 	configuration { "vs*" }
 		includedirs {
-			path.join(_OPTIONS["SDL_INSTALL_ROOT"],"include")
+			MAME_DIR .. "3rdparty/sdl2/include",
 		}
 	configuration { }
 

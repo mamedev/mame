@@ -374,6 +374,13 @@ consistent, you should only record and playback with all configuration
 (.cfg), NVRAM (.nv), and memory card files deleted. The default is NULL
 (no recording).
 .TP
+.B \-[no]record_timecode
+Specify whether to create a timecode file. It contains a line with elapsed
+times on each press of timecode shortcut key (default is F12).
+This option works only when recording mode is enabled (\-record option).
+The file is saved on inp folder.
+Default is OFF (\-norecord_timecode).
+.TP
 .B \-mngwrite \fIfilename
 Writes each video frame to the given file in MNG format, producing
 an animation of the system session.
@@ -1101,8 +1108,9 @@ systems that make use of a BIOS. The \-listxml output will list all of
 the possible BIOS names for a system. The default is 'default'.
 .TP
 .B \-[no]cheat, \-[no]c
-Enables the reading of the cheat database, if present, and the Cheat
-menu in the user interface. The	default is OFF (\-nocheat).
+Activates the cheat menu with autofire options and other tricks from
+the cheat database, if present.
+The default is OFF (\-nocheat).
 .TP
 .B \-[no]skip_gameinfo
 Forces MESS to skip displaying the system info screen. The default is OFF

@@ -27,8 +27,8 @@ public:
 		PARAM_FRAME_MASK
 	};
 
-    bgfx_parameter(std::string name, parameter_type type, int period);
-    ~bgfx_parameter();
+	bgfx_parameter(std::string name, parameter_type type, int period);
+	~bgfx_parameter();
 
 	void frame();
 	bool active();

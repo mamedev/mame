@@ -2479,7 +2479,7 @@ ioport_manager::ioport_manager(running_machine &machine)
 		m_has_dips(false),
 		m_has_bioses(false),
 		m_autofire_toggle(false),
-		m_autofire_delay(3)					// 1 seems too fast for a bunch of games
+		m_autofire_delay(3)                 // 1 seems too fast for a bunch of games
 {
 	memset(m_type_to_entry, 0, sizeof(m_type_to_entry));
 }
@@ -3555,8 +3555,8 @@ void ioport_manager::timecode_write(_Type value)
 /*template<>
 void ioport_manager::timecode_write<bool>(bool value)
 {
-	UINT8 byte = UINT8(value);
-	timecode_write(byte);
+    UINT8 byte = UINT8(value);
+    timecode_write(byte);
 }*/
 template<>
 void ioport_manager::timecode_write<std::string>(std::string value) {

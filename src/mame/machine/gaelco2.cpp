@@ -291,7 +291,7 @@ static UINT32 rol(UINT32 x, unsigned int c)
 {
 	return (x << c) | (x >> (32 - c));
 }
- 
+
 static UINT16 get_lo(UINT32 x)
 {
 	return ((x & 0x00000010) <<  1) |
@@ -308,7 +308,7 @@ static UINT16 get_lo(UINT32 x)
 			((x & 0x00044000) >>  5) |
 			((x & 0x00000020) >>  1);
 }
- 
+
 static UINT16 get_hi(UINT32 x)
 {
 	return ((x & 0x00001400) >>  0) |
@@ -327,7 +327,7 @@ static UINT16 get_hi(UINT32 x)
 			((x & 0x00000080) >>  4) |
 			((x & 0x00000100) >>  1);
 }
- 
+
 static UINT16 get_out(UINT16 x)
 {
 	return ((x & 0xc840) <<  0) |
@@ -343,7 +343,7 @@ static UINT16 get_out(UINT16 x)
 			((x & 0x2000) >>  6) |
 			((x & 0x0020) >>  2);
 }
- 
+
 UINT16 mangle(UINT32 x)
 {
 	UINT16 a = get_lo(x);

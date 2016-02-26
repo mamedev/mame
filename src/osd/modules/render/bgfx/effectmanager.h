@@ -25,17 +25,17 @@ class bgfx_effect;
 
 class effect_manager {
 public:
-    effect_manager(shader_manager& shaders) : m_shaders(shaders) { }
-    ~effect_manager();
+	effect_manager(shader_manager& shaders) : m_shaders(shaders) { }
+	~effect_manager();
 
-    // Getters
-    bgfx_effect* effect(std::string name);
+	// Getters
+	bgfx_effect* effect(std::string name);
 
 private:
-    bgfx_effect* load_effect(std::string name);
+	bgfx_effect* load_effect(std::string name);
 
-	shader_manager&						m_shaders;
-    std::map<std::string, bgfx_effect*> m_effects;
+	shader_manager&                     m_shaders;
+	std::map<std::string, bgfx_effect*> m_effects;
 };
 
 #endif // __DRAWBGFX_EFFECT_MANAGER__

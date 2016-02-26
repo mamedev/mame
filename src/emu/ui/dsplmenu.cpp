@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:Dankan1890
 /*********************************************************************
 
@@ -23,10 +23,10 @@
 
 
 ui_menu_display_options::video_modes ui_menu_display_options::m_video = {
-	{ "auto",	"Auto" },
-	{ "opengl",	"OpenGL" },
-	{ "bgfx",	"BGFX" },
-	{ "d3d",	"Direct3D" },
+	{ "auto",   "Auto" },
+	{ "opengl", "OpenGL" },
+	{ "bgfx",   "BGFX" },
+	{ "d3d",    "Direct3D" },
 	{ "gdi",    "GDI" },
 	{ "ddraw",  "DirectDraw" },
 	{ "soft",   "Software" },
@@ -107,20 +107,20 @@ ui_menu_display_options::ui_menu_display_options(running_machine &machine, rende
 ui_menu_display_options::~ui_menu_display_options()
 {
 	std::string error_string;
-	for (int d = 2; d < ARRAY_LENGTH(m_options); ++d) 
+	for (int d = 2; d < ARRAY_LENGTH(m_options); ++d)
 	{
 		if (machine().options().int_value(m_options[d].option) != m_options[d].status)
 		{
 			machine().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
 			machine().options().mark_changed(m_options[d].option);
-		}	
+		}
 	}
 	if (machine().options().value(m_options[1].option) !=  m_list[m_options[1].status])
 	{
 		machine().options().set_value(m_options[1].option, m_list[m_options[1].status].c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 		machine().options().mark_changed(m_options[1].option);
 
-	}	
+	}
 	ui_globals::reset = true;
 }
 
@@ -202,7 +202,7 @@ void ui_menu_display_options::custom_render(void *selectedref, float top, float 
 {
 	float width;
 	ui_manager &mui = machine().ui();
-	mui.draw_text_full(container, "Display Options", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, 
+	mui.draw_text_full(container, _("Display Options"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE,
 		ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
@@ -222,6 +222,6 @@ void ui_menu_display_options::custom_render(void *selectedref, float top, float 
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, "Display Options", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, 
+	mui.draw_text_full(container, _("Display Options"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL,
 		UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }

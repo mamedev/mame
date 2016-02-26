@@ -142,7 +142,7 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
 }
 
 //---------------------------------------------------------
-//	parseopen - Open up file for reading
+//  parseopen - Open up file for reading
 //---------------------------------------------------------
 
 bool inifile_manager::parseopen(const char *filename)
@@ -303,7 +303,7 @@ bool favorite_manager::isgame_favorite()
 			image_loaded = true;
 			for (size_t current = 0; current < m_list.size(); current++)
 				if (m_list[current].shortname == swinfo->shortname() &&
-				    m_list[current].listname == image->software_list_name())
+					m_list[current].listname == image->software_list_name())
 				{
 					m_current = current;
 					return true;

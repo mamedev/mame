@@ -16,6 +16,7 @@
 #include "ui/menu.h"
 #include "ui/miscmenu.h"
 #include "ui/utils.h"
+#include "../info.h"
 
 /***************************************************************************
     MENU HANDLERS
@@ -32,7 +33,7 @@ ui_menu_keyboard_mode::ui_menu_keyboard_mode(running_machine &machine, render_co
 void ui_menu_keyboard_mode::populate()
 {
 	bool natural = machine().ui().use_natural_keyboard();
-	item_append("Keyboard Mode:", natural ? "Natural" : "Emulated", natural ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, nullptr);
+	item_append(_("Keyboard Mode:"), natural ? _("Natural") : _("Emulated"), natural ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, nullptr);
 }
 
 ui_menu_keyboard_mode::~ui_menu_keyboard_mode()
@@ -86,7 +87,7 @@ void ui_menu_bios_selection::populate()
 	}
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-	item_append("Reset",  nullptr, 0, (void *)1);
+	item_append(_("Reset"),  nullptr, 0, (void *)1);
 }
 
 ui_menu_bios_selection::~ui_menu_bios_selection()
@@ -260,7 +261,7 @@ void ui_menu_bookkeeping::populate()
 
 		/* display whether or not we are locked out */
 		if (machine().bookkeeping().coin_lockout_get_state(ctrnum))
-			tempstring.append(" (locked)");
+			tempstring.append(_(" (locked)"));
 		tempstring.append("\n");
 	}
 
@@ -520,7 +521,7 @@ void ui_menu_crosshair::populate()
 
 		/* add CROSSHAIR_ITEM_AUTO_TIME menu */
 		sprintf(temp_text, "%d", settings.auto_time);
-		item_append("Visible Delay", temp_text, flags, data);
+		item_append(_("Visible Delay"), temp_text, flags, data);
 	}
 //  else
 //      /* leave a blank filler line when not in auto time so size does not rescale */
@@ -559,17 +560,17 @@ void ui_menu_quit_game::handle()
 
 ui_menu_misc_options::misc_option ui_menu_misc_options::m_options[] = {
 	{ 0, nullptr, nullptr },
-	{ 0, "Re-select last machine played",                   OPTION_REMEMBER_LAST },
-	{ 0, "Enlarge images in the right panel",               OPTION_ENLARGE_SNAPS },
-	{ 0, "DATs info",                                       OPTION_DATS_ENABLED },
-	{ 0, "Cheats",                                          OPTION_CHEAT },
-	{ 0, "Show mouse pointer",                              OPTION_UI_MOUSE },
-	{ 0, "Confirm quit from machines",                      OPTION_UI_CONFIRM_QUIT },
-	{ 0, "Skip displaying information's screen at startup", OPTION_UI_SKIP_GAMEINFO },
-	{ 0, "Force 4:3 appearance for software snapshot",      OPTION_FORCED4X3 },
-	{ 0, "Use image as background",                         OPTION_USE_BACKGROUND },
-	{ 0, "Skip bios selection menu",                        OPTION_SKIP_BIOS_MENU },
-	{ 0, "Skip software parts selection menu",              OPTION_SKIP_PARTS_MENU }
+	{ 0, __("Re-select last machine played"),                   OPTION_REMEMBER_LAST },
+	{ 0, __("Enlarge images in the right panel"),               OPTION_ENLARGE_SNAPS },
+	{ 0, __("DATs info"),                                       OPTION_DATS_ENABLED },
+	{ 0, __("Cheats"),                                          OPTION_CHEAT },
+	{ 0, __("Show mouse pointer"),                              OPTION_UI_MOUSE },
+	{ 0, __("Confirm quit from machines"),                      OPTION_CONFIRM_QUIT },
+	{ 0, __("Skip displaying information's screen at startup"), OPTION_SKIP_GAMEINFO },
+	{ 0, __("Force 4:3 appearance for software snapshot"),      OPTION_FORCED4X3 },
+	{ 0, __("Use image as background"),                         OPTION_USE_BACKGROUND },
+	{ 0, __("Skip bios selection menu"),                        OPTION_SKIP_BIOS_MENU },
+	{ 0, __("Skip software parts selection menu"),              OPTION_SKIP_PARTS_MENU }
 };
 
 //-------------------------------------------------
@@ -635,7 +636,7 @@ void ui_menu_misc_options::populate()
 {
 	// add options items
 	for (int opt = 1; opt < ARRAY_LENGTH(m_options); ++opt)
-		item_append(m_options[opt].description, m_options[opt].status ? "On" : "Off", m_options[opt].status ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)opt);
+		item_append(_(m_options[opt].description), m_options[opt].status ? "On" : "Off", m_options[opt].status ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)opt);
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 	customtop = machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
@@ -650,8 +651,8 @@ void ui_menu_misc_options::custom_render(void *selectedref, float top, float bot
 	float width;
 	ui_manager &mui = machine().ui();
 
-	mui.draw_text_full(container, "Miscellaneous Options", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	mui.draw_text_full(container, _("Miscellaneous Options"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -670,6 +671,134 @@ void ui_menu_misc_options::custom_render(void *selectedref, float top, float bot
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, "Miscellaneous Options", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	mui.draw_text_full(container, _("Miscellaneous Options"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+}
+
+//-------------------------------------------------
+//  ctor / dtor
+//-------------------------------------------------
+
+ui_menu_export::ui_menu_export(running_machine &machine, render_container *container, std::vector<const game_driver *> drvlist) 
+	: ui_menu(machine, container), m_list(drvlist)
+{
+}
+
+ui_menu_export::~ui_menu_export()
+{
+}
+
+//-------------------------------------------------
+//  handlethe options menu
+//-------------------------------------------------
+
+void ui_menu_export::handle()
+{
+	// process the menu
+	ui_menu::menu_stack->parent->process(UI_MENU_PROCESS_NOINPUT);
+	const ui_menu_event *m_event = process(UI_MENU_PROCESS_NOIMAGE);
+	if (m_event != nullptr && m_event->itemref != nullptr)
+	{
+		switch ((FPTR)m_event->itemref)
+		{
+		case 1:
+		{
+			if (m_event->iptkey == IPT_UI_SELECT)
+			{
+				std::string filename("exported");
+				emu_file infile(machine().ui().options().ui_path(), OPEN_FLAG_READ);
+				if (infile.open(filename.c_str(), ".xml") == FILERR_NONE)
+					for (int seq = 0; ; ++seq)
+					{
+						std::string seqtext;
+						strprintf(seqtext, "%s_%04d", filename.c_str(), seq);
+						if (infile.open(seqtext.c_str(), ".xml") != FILERR_NONE)
+						{
+							filename = seqtext;
+							break;
+						}
+					}
+
+				// attempt to open the output file
+				emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+				if (file.open(filename.c_str(), ".xml") == FILERR_NONE)
+				{
+					FILE *pfile;
+					std::string fullpath(file.fullpath());
+					file.close();
+					pfile = fopen(fullpath.c_str(), "w");
+
+					// create the XML and save to file
+					driver_enumerator drvlist(machine().options());
+					drvlist.exclude_all();
+					for (auto & elem : m_list)
+						drvlist.include(driver_list::find(*elem));
+
+					info_xml_creator creator(drvlist);
+					creator.output(pfile, false);
+					fclose(pfile);
+					machine().popmessage(_("%s.xml saved under ui folder."), filename.c_str());
+				}
+			}
+			break;
+		}
+		case 2:
+		{
+			if (m_event->iptkey == IPT_UI_SELECT)
+			{
+				std::string filename("exported");
+				std::string buffer;
+				emu_file infile(machine().ui().options().ui_path(), OPEN_FLAG_READ);
+				if (infile.open(filename.c_str(), ".txt") == FILERR_NONE)
+					for (int seq = 0; ; ++seq)
+					{
+						std::string seqtext;
+						strprintf(seqtext, "%s_%04d", filename.c_str(), seq);
+						if (infile.open(seqtext.c_str(), ".txt") != FILERR_NONE)
+						{
+							filename = seqtext;
+							break;
+						}
+					}
+
+				// attempt to open the output file
+				emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+				if (file.open(filename.c_str(), ".txt") == FILERR_NONE)
+				{
+					// print the header
+					buffer.assign(_("Name:             Description:\n"));
+					driver_enumerator drvlist(machine().options());
+					drvlist.exclude_all();
+					for (auto & elem : m_list)
+						drvlist.include(driver_list::find(*elem));
+
+					// iterate through drivers and output the info
+					while (drvlist.next())
+						if ((drvlist.driver().flags & MACHINE_NO_STANDALONE) == 0)
+							strcatprintf(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().description);
+					file.puts(buffer.c_str());
+					file.close();
+					machine().popmessage(_("%s.txt saved under ui folder."), filename.c_str());
+				}
+			}
+			break;
+		}
+
+		default:
+			break;
+		}
+	}
+}
+
+//-------------------------------------------------
+//  populate
+//-------------------------------------------------
+
+void ui_menu_export::populate()
+{
+	
+	// add options items
+	item_append(_("Export XML format"), nullptr, 0, (void *)(FPTR)1);
+	item_append(_("Export TXT format"), nullptr, 0, (void *)(FPTR)2);
+	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 }

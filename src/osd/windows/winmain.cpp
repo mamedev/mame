@@ -280,12 +280,12 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_HWSTRETCH ";hws",                     "1",        OPTION_BOOLEAN,    "enables hardware stretching" },
 
 	// post-processing options
-	{ nullptr,                                        			nullptr,             OPTION_HEADER,     "DIRECT3D POST-PROCESSING OPTIONS" },
-	{ WINOPTION_HLSL_ENABLE";hlsl",                   			"0",                 OPTION_BOOLEAN,    "enables HLSL post-processing (PS3.0 required)" },
-	{ WINOPTION_HLSLPATH,                             			"hlsl",              OPTION_STRING,     "path to hlsl files" },
-	{ WINOPTION_HLSL_PRESCALE_X,                      			"0",                 OPTION_INTEGER,    "HLSL pre-scale override factor for X (0 for auto)" },
-	{ WINOPTION_HLSL_PRESCALE_Y,                      			"0",                 OPTION_INTEGER,    "HLSL pre-scale override factor for Y (0 for auto)" },
-	{ WINOPTION_HLSL_WRITE,                           			nullptr,             OPTION_STRING,     "enables HLSL AVI writing (huge disk bandwidth suggested)" },
+	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "DIRECT3D POST-PROCESSING OPTIONS" },
+	{ WINOPTION_HLSL_ENABLE";hlsl",                             "0",                 OPTION_BOOLEAN,    "enables HLSL post-processing (PS3.0 required)" },
+	{ WINOPTION_HLSLPATH,                                       "hlsl",              OPTION_STRING,     "path to hlsl files" },
+	{ WINOPTION_HLSL_PRESCALE_X,                                "0",                 OPTION_INTEGER,    "HLSL pre-scale override factor for X (0 for auto)" },
+	{ WINOPTION_HLSL_PRESCALE_Y,                                "0",                 OPTION_INTEGER,    "HLSL pre-scale override factor for Y (0 for auto)" },
+	{ WINOPTION_HLSL_WRITE,                                     nullptr,             OPTION_STRING,     "enables HLSL AVI writing (huge disk bandwidth suggested)" },
 	{ WINOPTION_HLSL_SNAP_WIDTH,                                "2048",              OPTION_STRING,     "HLSL upscaled-snapshot width" },
 	{ WINOPTION_HLSL_SNAP_HEIGHT,                               "1536",              OPTION_STRING,     "HLSL upscaled-snapshot height" },
 	{ WINOPTION_SHADOW_MASK_TILE_MODE,                          "0",                 OPTION_INTEGER,    "shadow mask tile mode (0 for screen based, 1 for source based)" },

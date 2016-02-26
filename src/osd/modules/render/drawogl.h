@@ -130,8 +130,10 @@ public:
 	}
 	virtual ~renderer_ogl();
 
-	virtual int create() override;
 	static bool init(running_machine &machine);
+	static void exit();
+
+	virtual int create() override;
 	virtual int draw(const int update) override;
 
 #ifndef OSD_WINDOWS
@@ -226,8 +228,8 @@ private:
 	INT32           m_surf_h;
 	GLfloat         m_texVerticex[8];
 
-	static bool		s_shown_video_info;
-	static bool		s_dll_loaded;
+	static bool     s_shown_video_info;
+	static bool     s_dll_loaded;
 };
 
 #endif // __DRAWOGL__

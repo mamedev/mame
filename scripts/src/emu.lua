@@ -16,7 +16,9 @@ kind (LIBTYPE)
 
 addprojectflags()
 precompiledheaders()
-
+options {
+	"ArchiveSplit",
+}
 includedirs {
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/emu",

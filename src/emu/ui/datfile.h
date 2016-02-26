@@ -38,7 +38,7 @@ public:
 	std::string rev_messinfo() const { return m_mess_rev; }
 	std::string rev_sysinfo() const { return m_sysinfo_rev; }
 	std::string rev_storyinfo() const { return m_story_rev; }
-	
+
 	bool has_history(const game_driver *driver) { return (m_histidx.find(driver) != m_histidx.end()); }
 	bool has_mameinfo(const game_driver *driver) { return (m_mameidx.find(driver) != m_mameidx.end()); }
 	bool has_messinfo(const game_driver *driver) { return (m_messidx.find(driver) != m_messidx.end()); }
@@ -46,8 +46,8 @@ public:
 	bool has_sysinfo(const game_driver *driver) { return (m_sysidx.find(driver) != m_sysidx.end()); }
 	bool has_story(const game_driver *driver) { return (m_storyidx.find(driver) != m_storyidx.end()); }
 
-	bool has_data(const game_driver *d) 
-	{ 
+	bool has_data(const game_driver *d)
+	{
 		return (has_history(d) || has_mameinfo(d) || has_messinfo(d) || has_command(d) || has_sysinfo(d) || has_story(d));
 	}
 private:
@@ -84,8 +84,8 @@ private:
 	running_machine     &m_machine;             // reference to our machine
 	std::string         m_fullpath;
 	static std::string  m_history_rev, m_mame_rev, m_mess_rev, m_sysinfo_rev, m_story_rev;
-	FILE				*fp = nullptr;
-	static bool			first_run;
+	FILE                *fp = nullptr;
+	static bool         first_run;
 };
 
 

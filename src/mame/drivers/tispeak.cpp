@@ -377,7 +377,7 @@ K28 modules:
     - Expansion Module 4: VSM: 16KB CM62217
     - Expansion Module 5: VSM: 16KB CM62218*
     - Expansion Module 6: VSM: 16KB CM62219
-    
+
     note: these won't work on the 1981 version(s)
 
 ----------------------------------------------------------------------------
@@ -431,6 +431,7 @@ public:
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
 	void power_off();
 	void prepare_display();
+	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
 
 	DECLARE_READ8_MEMBER(snspell_read_k);
 	DECLARE_WRITE16_MEMBER(snmath_write_o);
@@ -540,7 +541,7 @@ DRIVER_INIT_MEMBER(tispeak_state, lantutor)
 
 void tispeak_state::prepare_display()
 {
-	UINT16 gridmask = (m_display_decay[15][16] != 0) ? 0xffff : 0x8000; // vfd filament on/off
+	UINT16 gridmask = vfd_filament_on() ? 0xffff : 0x8000;
 	set_display_segmask(0x21ff, 0x3fff);
 	display_matrix(16+1, 16, m_plate | 1<<16, m_grid & gridmask);
 }
@@ -548,7 +549,7 @@ void tispeak_state::prepare_display()
 WRITE16_MEMBER(tispeak_state::snspell_write_r)
 {
 	// R13: power-off request, on falling edge
-	if ((m_r >> 13 & 1) && !(data >> 13 & 1))
+	if (~data & m_r & 0x2000)
 		power_off();
 
 	// R0-R7: input mux and select digit (+R8 if the device has 9 digits)
@@ -614,7 +615,7 @@ WRITE16_MEMBER(tispeak_state::snspellc_write_r)
 	m_tms5100->pdc_w(data >> 10);
 
 	// R9: power-off request, on falling edge
-	if ((m_r >> 9 & 1) && !(data >> 9 & 1))
+	if (~data & m_r & 0x200)
 		power_off();
 
 	// R0-R8: input mux
@@ -681,12 +682,12 @@ WRITE16_MEMBER(tispeak_state::k28_write_r)
 
 	// R0: TMS5100 PDC pin
 	m_tms5100->pdc_w(data & 1);
-	
+
 	// R5: input mux high bit
 	m_inp_mux = (m_inp_mux & 0xff) | (data << 3 & 0x100);
 
 	// R6: power-off request, on falling edge
-	if ((m_r >> 6 & 1) && !(data >> 6 & 1))
+	if (~data & m_r & 0x40)
 		power_off();
 
 	// R7-R10: LCD data

@@ -521,7 +521,7 @@ PARAMS += --USE_BGFX='$(USE_BGFX)'
 endif
 
 ifdef NOASM
-PARAMS += --NOASM='$(NOASM)'
+TARGET_PARAMS += --NOASM='$(NOASM)'
 endif
 
 ifdef BIGENDIAN
@@ -545,7 +545,7 @@ PARAMS += --subtarget='$(SUBTARGET)'
 endif
 
 ifdef OSD
-PARAMS += --osd='$(OSD)'
+TARGET_PARAMS += --osd='$(OSD)'
 endif
 
 ifdef BUILDDIR
@@ -553,7 +553,7 @@ PARAMS += --build-dir='$(BUILDDIR)'
 endif
 
 ifdef TARGETOS
-PARAMS += --targetos='$(TARGETOS)'
+TARGET_PARAMS += --targetos='$(TARGETOS)'
 endif
 
 ifdef DONT_USE_NETWORK
@@ -681,7 +681,7 @@ PARAMS += --FORCE_VERSION_COMPILE='$(FORCE_VERSION_COMPILE)'
 endif
 
 ifdef PLATFORM
-PARAMS += --PLATFORM='$(PLATFORM)'
+TARGET_PARAMS += --PLATFORM='$(PLATFORM)'
 endif
 
 #-------------------------------------------------
@@ -819,11 +819,13 @@ endif
 GENIE := 3rdparty/genie/bin/$(GENIEOS)/genie$(EXE)
 
 ifeq ($(TARGET),$(SUBTARGET))
-SUBDIR := $(OSD)/$(TARGET)
+FULLTARGET := $(TARGET)
 else
-SUBDIR := $(OSD)/$(TARGET)$(SUBTARGET)
+FULLTARGET := $(TARGET)$(SUBTARGET)
 endif
-PROJECTDIR := $(BUILDDIR)/projects/$(SUBDIR)
+PROJECTDIR := $(BUILDDIR)/projects/$(OSD)/$(FULLTARGET)
+PROJECTDIR_MINI := $(BUILDDIR)/projects/osdmini/$(FULLTARGET)
+PROJECTDIR_WIN := $(BUILDDIR)/projects/windows/$(FULLTARGET)
 
 .PHONY: all clean regenie generate
 all: $(GENIE) $(TARGETOS)$(ARCHITECTURE)
@@ -837,7 +839,7 @@ $(PROJECTDIR)/gmake-mingw64-gcc/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef MINGW64
 	$(error MINGW64 is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw64-gcc --gcc_version=$(GCC_VERSION) gmake
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=mingw64-gcc --gcc_version=$(GCC_VERSION) gmake
 
 .PHONY: windows_x64
 windows_x64: generate $(PROJECTDIR)/gmake-mingw64-gcc/Makefile
@@ -858,7 +860,7 @@ $(PROJECTDIR)/gmake-mingw32-gcc/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef MINGW32
 	$(error MINGW32 is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw32-gcc --gcc_version=$(GCC_VERSION) gmake
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=mingw32-gcc --gcc_version=$(GCC_VERSION) gmake
 
 .PHONY: windows_x86
 windows_x86: generate $(PROJECTDIR)/gmake-mingw32-gcc/Makefile
@@ -873,7 +875,7 @@ endif
 #-------------------------------------------------
 
 $(PROJECTDIR)/gmake-mingw-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw-clang --gcc_version=$(CLANG_VERSION) gmake
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=mingw-clang --gcc_version=$(CLANG_VERSION) gmake
 
 .PHONY: windows_x64_clang
 windows_x64_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
@@ -885,54 +887,49 @@ windows_x86_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
 
+.PHONY: vs2013
 vs2013: generate
-	$(SILENT) $(GENIE) $(PARAMS) vs2013
+	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows vs2013
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR)/vs2013/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2013/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
+.PHONY: vs2013_intel
 vs2013_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) --vs=intel-15 vs2013
+	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows --vs=intel-15 vs2013
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR)/vs2013-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2013-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
+.PHONY: vs2013_xp
 vs2013_xp: generate
-	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2013-xp vs2013
+	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows --vs=vs2013-xp vs2013
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR)/vs2013-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2013-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
-vs2013_clang: generate
-	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2013-clang vs2013
-
-vs2013_winrt: generate
-	$(SILENT) $(GENIE) $(PARAMS) --vs=winstore81 vs2013
-
+.PHONY: vs2015
 vs2015: generate
-	$(SILENT) $(GENIE) $(PARAMS) vs2015
+	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows vs2015
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR)/vs2015/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
+.PHONY: vs2015_intel
 vs2015_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) --vs=intel-15 vs2015
+	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows --vs=intel-15 vs2015
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR)/vs2015-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
+.PHONY: vs2015_xp
 vs2015_xp: generate
-	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2015-xp vs2015
+	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows --vs=vs2015-xp vs2015
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR)/vs2015-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
-vs2015_clang: generate
-	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2015-clang vs2015
-
-vs2015_winrt: generate
-	$(SILENT) $(GENIE) $(PARAMS) --vs=winstore81 vs2015
-
+.PHONY: android-arm
 android-arm: generate
 ifndef ANDROID_NDK_ARM
 	$(error ANDROID_NDK_ARM is not set)
@@ -941,10 +938,12 @@ ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=4.8 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=4.9 --osd=osdmini --targetos=android-arm --PLATFORM=arm --NOASM=1 gmake
 endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-arm config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-arm config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-arm config=$(CONFIG)
 
+.PHONY: android-mips
 android-mips: generate
 ifndef ANDROID_NDK_MIPS
 	$(error ANDROID_NDK_MIPS is not set)
@@ -953,10 +952,12 @@ ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=4.8 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=4.9 --osd=osdmini --targetos=android-mips --PLATFORM=mips --NOASM=1 gmake
 endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-mips config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-mips config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-mips config=$(CONFIG)
 
+.PHONY: android-x86
 android-x86: generate
 ifndef ANDROID_NDK_X86
 	$(error ANDROID_NDK_X86 is not set)
@@ -965,64 +966,39 @@ ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=4.8 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=4.9 --osd=osdmini --targetos=android-x86 --PLATFORM=x86 gmake
 endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-x86 config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-x86 config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-x86 config=$(CONFIG)
 
+.PHONY: asmjs
 asmjs: generate
 ifndef EMSCRIPTEN
 	$(error EMSCRIPTEN is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=asmjs --gcc_version=4.9 gmake
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=asmjs --gcc_version=3.7.0 gmake
 endif
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-asmjs config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-asmjs config=$(CONFIG)
 
-
-nacl: nacl_x86
-
-nacl_x64: generate
-ifndef NACL_SDK_ROOT
-	$(error NACL_SDK_ROOT is not set)
-endif
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl --gcc_version=4.8 gmake
-endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-nacl config=$(CONFIG)64
-
-nacl_x86: generate
-ifndef NACL_SDK_ROOT
-	$(error NACL_SDK_ROOT is not set)
-endif
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl --gcc_version=4.8 gmake
-endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-nacl config=$(CONFIG)32
-
-nacl-arm: generate
-ifndef NACL_SDK_ROOT
-	$(error NACL_SDK_ROOT is not set)
-endif
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl-arm --gcc_version=4.8 gmake
-endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-nacl-arm config=$(CONFIG)
-
+.PHONY: pnacl
 pnacl: generate
 ifndef NACL_SDK_ROOT
 	$(error NACL_SDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=pnacl --gcc_version=4.8 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=pnacl --gcc_version=3.7.0 --osd=osdmini --targetos=pnacl --NOASM=1 gmake
 endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-pnacl config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-pnacl config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-pnacl config=$(CONFIG)
 
 #-------------------------------------------------
 # gmake-linux
 #-------------------------------------------------
 
 $(PROJECTDIR)/gmake-linux/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-gcc --gcc_version=$(GCC_VERSION) gmake
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=linux-gcc --gcc_version=$(GCC_VERSION) gmake
 
 .PHONY: linux_x64
 linux_x64: generate $(PROJECTDIR)/gmake-linux/Makefile
@@ -1044,7 +1020,7 @@ linux: generate $(PROJECTDIR)/gmake-linux/Makefile
 #-------------------------------------------------
 
 $(PROJECTDIR)/gmake-linux-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-clang --gcc_version=$(CLANG_VERSION) gmake
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=linux-clang --gcc_version=$(CLANG_VERSION) gmake
 
 .PHONY: linux_x64_clang
 linux_x64_clang: generate $(PROJECTDIR)/gmake-linux-clang/Makefile
@@ -1061,7 +1037,7 @@ linux_x86_clang: generate $(PROJECTDIR)/gmake-linux-clang/Makefile
 #-------------------------------------------------
 
 $(PROJECTDIR)/gmake-osx/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --gcc_version=$(GCC_VERSION) gmake
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=osx --gcc_version=$(GCC_VERSION) gmake
 
 .PHONY: macosx_x64
 macosx_x64: generate $(PROJECTDIR)/gmake-osx/Makefile
@@ -1081,7 +1057,7 @@ macosx_x86: generate $(PROJECTDIR)/gmake-osx/Makefile
 #-------------------------------------------------
 
 $(PROJECTDIR)/gmake-osx-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --gcc_version=$(CLANG_VERSION) gmake
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=osx-clang --gcc_version=$(CLANG_VERSION) gmake
 
 .PHONY: macosx_x64_clang
 macosx_x64_clang: generate $(PROJECTDIR)/gmake-osx-clang/Makefile
@@ -1093,11 +1069,13 @@ macosx_x86_clang: generate $(PROJECTDIR)/gmake-osx-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)32 precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)32
 
+.PHONY: xcode4
 xcode4: generate
-	$(SILENT) $(GENIE) $(PARAMS) --targetos=macosx --xcode=osx xcode4
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --targetos=macosx --xcode=osx xcode4
 
+.PHONY: xcode4-ios
 xcode4-ios: generate
-	$(SILENT) $(GENIE) $(PARAMS) --targetos=macosx --xcode=ios xcode4
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --targetos=macosx --xcode=ios xcode4
 
 #-------------------------------------------------
 # gmake-solaris
@@ -1105,7 +1083,7 @@ xcode4-ios: generate
 
 
 $(PROJECTDIR)/gmake-solaris/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=solaris --gcc_version=$(GCC_VERSION) gmake
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=solaris --gcc_version=$(GCC_VERSION) gmake
 
 .PHONY: solaris_x64
 solaris_x64: generate $(PROJECTDIR)/gmake-solaris/Makefile
@@ -1127,7 +1105,7 @@ solaris_x86: generate $(PROJECTDIR)/gmake-solaris/Makefile
 
 
 $(PROJECTDIR)/gmake-freebsd/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=freebsd --gcc_version=$(GCC_VERSION) gmake
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=freebsd --gcc_version=$(GCC_VERSION) gmake
 
 .PHONY: freebsd_x64
 freebsd_x64: generate $(PROJECTDIR)/gmake-freebsd/Makefile
@@ -1149,7 +1127,7 @@ freebsd_x86: generate $(PROJECTDIR)/gmake-freebsd/Makefile
 
 
 $(PROJECTDIR)/gmake-netbsd/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=netbsd --gcc_version=$(GCC_VERSION) gmake
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=netbsd --gcc_version=$(GCC_VERSION) gmake
 
 .PHONY: netbsd_x64
 netbsd_x64: generate $(PROJECTDIR)/gmake-netbsd/Makefile
@@ -1171,7 +1149,7 @@ netbsd_x86: generate $(PROJECTDIR)/gmake-netbsd/Makefile
 
 
 $(PROJECTDIR)/gmake-os2/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=os2 --gcc_version=$(GCC_VERSION) gmake
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=os2 --gcc_version=$(GCC_VERSION) gmake
 
 .PHONY: os2
 os2: os2_x86
@@ -1193,7 +1171,7 @@ endif
 ifndef MARVELL_ROOTFS
 	$(error MARVELL_ROOTFS is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --NO_OPENGL=1 --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  gmake  
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --NO_OPENGL=1 --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  gmake  
 
 .PHONY: steamlink
 ifndef MARVELL_SDK_PATH
@@ -1211,8 +1189,9 @@ steamlink: generate $(PROJECTDIR)/gmake-steamlink/Makefile
 #-------------------------------------------------
 # cmake
 #-------------------------------------------------
+.PHONY: cmake
 cmake: generate
-	$(SILENT) $(GENIE) $(PARAMS) cmake
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) cmake
 ifeq ($(OS),windows)
 	$(SILENT)echo cmake_minimum_required(VERSION 2.8.4) > CMakeLists.txt
 	$(SILENT)echo add_subdirectory($(PROJECTDIR)/cmake) >> CMakeLists.txt
@@ -1244,6 +1223,7 @@ clean: genieclean
 
 GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET)/
 
+rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 LAYOUTS=$(wildcard $(SRC)/$(TARGET)/layout/*.lay)
 
 ifneq (,$(wildcard src/osd/$(OSD)/$(OSD).mak))
@@ -1262,6 +1242,7 @@ genie: $(GENIE)
 generate: \
 		genie \
 		$(GEN_FOLDERS) \
+		$(patsubst %.po,%.mo,$(call rwildcard, language/, *.po)) \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
 		$(SRC)/devices/cpu/m68000/m68kops.cpp
 
@@ -1275,6 +1256,10 @@ ifeq ($(TARGETOS),asmjs)
 else
 	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000 CC="$(CC)" CXX="$(CXX)"
 endif
+
+%.mo: %.po
+	@echo Converting translation $<...
+	$(SILENT)$(PYTHON) scripts/build/msgfmt.py --output-file $@ $<
 
 #-------------------------------------------------
 # Regression tests
@@ -1379,107 +1364,6 @@ shaders:
 
 translation:
 	$(SILENT) echo Generating mame.pot
-	$(SILENT) find src -iname "*.cpp" | xargs xgettext --from-code=UTF-8 -k_ -o mame.pot
-	$(SILENT) msgmerge -U "language/Afrikaans/strings.po"                     mame.pot
-	$(SILENT) msgmerge -U "language/Albanian/strings.po"                      mame.pot
-	$(SILENT) msgmerge -U "language/Arabic/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/Basque/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/Belarusian/strings.po"                    mame.pot
-	$(SILENT) msgmerge -U "language/Bosnian/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Bulgarian/strings.po"                     mame.pot
-	$(SILENT) msgmerge -U "language/Burmese/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Catalan/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Chinese (Simple)/strings.po"              mame.pot
-	$(SILENT) msgmerge -U "language/Chinese (Traditional)/strings.po"         mame.pot
-	$(SILENT) msgmerge -U "language/Croatian/strings.po"                      mame.pot
-	$(SILENT) msgmerge -U "language/Czech/strings.po"                         mame.pot
-	$(SILENT) msgmerge -U "language/Danish/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/Dutch/strings.po"                         mame.pot
-	$(SILENT) msgmerge -U "language/English/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Estonian/strings.po"                      mame.pot
-	$(SILENT) msgmerge -U "language/Finnish/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/French/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/French (Canada)/strings.po"               mame.pot
-	$(SILENT) msgmerge -U "language/Georgian/strings.po"                      mame.pot
-	$(SILENT) msgmerge -U "language/German/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/Greek/strings.po"                         mame.pot
-	$(SILENT) msgmerge -U "language/Hebrew/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/Hindi/strings.po"                         mame.pot
-	$(SILENT) msgmerge -U "language/Hungarian/strings.po"                     mame.pot
-	$(SILENT) msgmerge -U "language/Indonesian/strings.po"                    mame.pot
-	$(SILENT) msgmerge -U "language/Italian/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Japanese/strings.po"                      mame.pot
-	$(SILENT) msgmerge -U "language/Korean/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/Latvian/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Lithuanian/strings.po"                    mame.pot
-	$(SILENT) msgmerge -U "language/Macedonian/strings.po"                    mame.pot
-	$(SILENT) msgmerge -U "language/Norwegian/strings.po"                     mame.pot
-	$(SILENT) msgmerge -U "language/Persian/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Polish/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/Portuguese/strings.po"                    mame.pot
-	$(SILENT) msgmerge -U "language/Portuguese (Brazil)/strings.po"           mame.pot
-	$(SILENT) msgmerge -U "language/Romanian/strings.po"                      mame.pot
-	$(SILENT) msgmerge -U "language/Russian/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Serbian/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Serbian (Cyrillic)/strings.po"            mame.pot
-	$(SILENT) msgmerge -U "language/Slovak/strings.po"                        mame.pot
-	$(SILENT) msgmerge -U "language/Slovenian/strings.po"                     mame.pot
-	$(SILENT) msgmerge -U "language/Spanish/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Spanish (Mexico)/strings.po"              mame.pot
-	$(SILENT) msgmerge -U "language/Swedish/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Thai/strings.po"                          mame.pot
-	$(SILENT) msgmerge -U "language/Turkish/strings.po"                       mame.pot
-	$(SILENT) msgmerge -U "language/Ukrainian/strings.po"                     mame.pot
-	$(SILENT) msgmerge -U "language/Vietnamese/strings.po"                    mame.pot
-	$(SILENT) msgfmt --check --output-file "language/Afrikaans/strings.mo"             "language/Afrikaans/strings.po"             
-	$(SILENT) msgfmt --check --output-file "language/Albanian/strings.mo"              "language/Albanian/strings.po"              
-	$(SILENT) msgfmt --check --output-file "language/Arabic/strings.mo"                "language/Arabic/strings.po"                
-	$(SILENT) msgfmt --check --output-file "language/Basque/strings.mo"                "language/Basque/strings.po"                
-	$(SILENT) msgfmt --check --output-file "language/Belarusian/strings.mo"            "language/Belarusian/strings.po"            
-	$(SILENT) msgfmt --check --output-file "language/Bosnian/strings.mo"               "language/Bosnian/strings.po"               
-	$(SILENT) msgfmt --check --output-file "language/Bulgarian/strings.mo"             "language/Bulgarian/strings.po"             
-	$(SILENT) msgfmt --check --output-file "language/Burmese/strings.mo"               "language/Burmese/strings.po"               
-	$(SILENT) msgfmt --check --output-file "language/Catalan/strings.mo"               "language/Catalan/strings.po"               
-	$(SILENT) msgfmt --check --output-file "language/Chinese (Simple)/strings.mo"      "language/Chinese (Simple)/strings.po"      
-	$(SILENT) msgfmt --check --output-file "language/Chinese (Traditional)/strings.mo" "language/Chinese (Traditional)/strings.po" 
-	$(SILENT) msgfmt --check --output-file "language/Croatian/strings.mo"              "language/Croatian/strings.po"              
-	$(SILENT) msgfmt --check --output-file "language/Czech/strings.mo"                 "language/Czech/strings.po"                 
-	$(SILENT) msgfmt --check --output-file "language/Danish/strings.mo"                "language/Danish/strings.po"                
-	$(SILENT) msgfmt --check --output-file "language/Dutch/strings.mo"                 "language/Dutch/strings.po"                 
-	$(SILENT) msgfmt --check --output-file "language/English/strings.mo"               "language/English/strings.po"               
-	$(SILENT) msgfmt --check --output-file "language/Estonian/strings.mo"              "language/Estonian/strings.po"              
-	$(SILENT) msgfmt --check --output-file "language/Finnish/strings.mo"               "language/Finnish/strings.po"               
-	$(SILENT) msgfmt --check --output-file "language/French/strings.mo"                "language/French/strings.po"                
-	$(SILENT) msgfmt --check --output-file "language/French (Canada)/strings.mo"       "language/French (Canada)/strings.po"       
-	$(SILENT) msgfmt --check --output-file "language/Georgian/strings.mo"              "language/Georgian/strings.po"              
-	$(SILENT) msgfmt --check --output-file "language/German/strings.mo"                "language/German/strings.po"                
-	$(SILENT) msgfmt --check --output-file "language/Greek/strings.mo"                 "language/Greek/strings.po"                 
-	$(SILENT) msgfmt --check --output-file "language/Hebrew/strings.mo"                "language/Hebrew/strings.po"                
-	$(SILENT) msgfmt --check --output-file "language/Hindi/strings.mo"                 "language/Hindi/strings.po"                 
-	$(SILENT) msgfmt --check --output-file "language/Hungarian/strings.mo"             "language/Hungarian/strings.po"             
-	$(SILENT) msgfmt --check --output-file "language/Indonesian/strings.mo"            "language/Indonesian/strings.po"            
-	$(SILENT) msgfmt --check --output-file "language/Italian/strings.mo"               "language/Italian/strings.po"               
-	$(SILENT) msgfmt --check --output-file "language/Japanese/strings.mo"              "language/Japanese/strings.po"              
-	$(SILENT) msgfmt --check --output-file "language/Korean/strings.mo"                "language/Korean/strings.po"                
-	$(SILENT) msgfmt --check --output-file "language/Latvian/strings.mo"               "language/Latvian/strings.po"               
-	$(SILENT) msgfmt --check --output-file "language/Lithuanian/strings.mo"            "language/Lithuanian/strings.po"            
-	$(SILENT) msgfmt --check --output-file "language/Macedonian/strings.mo"            "language/Macedonian/strings.po"            
-	$(SILENT) msgfmt --check --output-file "language/Norwegian/strings.mo"             "language/Norwegian/strings.po"             
-	$(SILENT) msgfmt --check --output-file "language/Persian/strings.mo"               "language/Persian/strings.po"               
-	$(SILENT) msgfmt --check --output-file "language/Polish/strings.mo"                "language/Polish/strings.po"                
-	$(SILENT) msgfmt --check --output-file "language/Portuguese/strings.mo"            "language/Portuguese/strings.po"            
-	$(SILENT) msgfmt --check --output-file "language/Portuguese (Brazil)/strings.mo"   "language/Portuguese (Brazil)/strings.po"   
-	$(SILENT) msgfmt --check --output-file "language/Romanian/strings.mo"              "language/Romanian/strings.po"              
-	$(SILENT) msgfmt --check --output-file "language/Russian/strings.mo"               "language/Russian/strings.po"               
-	$(SILENT) msgfmt --check --output-file "language/Serbian/strings.mo"               "language/Serbian/strings.po"               
-	$(SILENT) msgfmt --check --output-file "language/Serbian (Cyrillic)/strings.mo"    "language/Serbian (Cyrillic)/strings.po"    
-	$(SILENT) msgfmt --check --output-file "language/Slovak/strings.mo"                "language/Slovak/strings.po"                
-	$(SILENT) msgfmt --check --output-file "language/Slovenian/strings.mo"             "language/Slovenian/strings.po"             
-	$(SILENT) msgfmt --check --output-file "language/Spanish/strings.mo"               "language/Spanish/strings.po"               
-	$(SILENT) msgfmt --check --output-file "language/Spanish (Mexico)/strings.mo"      "language/Spanish (Mexico)/strings.po"      
-	$(SILENT) msgfmt --check --output-file "language/Swedish/strings.mo"               "language/Swedish/strings.po"               
-	$(SILENT) msgfmt --check --output-file "language/Thai/strings.mo"                  "language/Thai/strings.po"                  
-	$(SILENT) msgfmt --check --output-file "language/Turkish/strings.mo"               "language/Turkish/strings.po"               
-	$(SILENT) msgfmt --check --output-file "language/Ukrainian/strings.mo"             "language/Ukrainian/strings.po"             
-	$(SILENT) msgfmt --check --output-file "language/Vietnamese/strings.mo"            "language/Vietnamese/strings.po"            
-	
+	$(SILENT) find src -iname "*.cpp" | xargs xgettext --from-code=UTF-8 -k_ -k__ -o mame.pot
+	$(SILENT) find language -iname "*.po" | xargs -n 1 -I %% msgmerge -U %% mame.pot 
+

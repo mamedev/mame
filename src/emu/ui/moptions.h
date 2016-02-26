@@ -70,12 +70,6 @@
 #define OPTION_UI_DIPSW_COLOR         "ui_dipsw_color"
 #define OPTION_UI_SLIDER_COLOR        "ui_slider_color"
 
-#define OPTION_UI_FONT                "uifont"
-#define OPTION_UI_CONFIRM_QUIT        "confirm_quit"
-#define OPTION_UI_MOUSE               "ui_mouse"
-#define OPTION_UI_SKIP_GAMEINFO       "skip_gameinfo"
-
-
 class ui_options : public core_options
 {
 public:
@@ -136,11 +130,6 @@ public:
 	const char *ui_mousedown_bg_color() const { return value(OPTION_UI_MOUSEDOWN_BG_COLOR); }
 	const char *ui_dipsw_color() const { return value(OPTION_UI_DIPSW_COLOR); }
 	const char *ui_slider_color() const { return value(OPTION_UI_SLIDER_COLOR); }
-
-	bool skip_gameinfo() const { return bool_value(OPTION_UI_SKIP_GAMEINFO); }
-	const char *ui_font() const { return value(OPTION_UI_FONT); }
-	bool confirm_quit() const { return bool_value(OPTION_UI_CONFIRM_QUIT); }
-	bool ui_mouse() const { return bool_value(OPTION_UI_MOUSE); }
 private:
 	static const options_entry s_option_entries[];
 };

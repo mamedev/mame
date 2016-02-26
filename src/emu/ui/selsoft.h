@@ -45,6 +45,7 @@ private:
 	const game_driver   *m_driver;
 	bool                m_has_empty_start;
 	s_filter            m_filter;
+	int                 highlight;
 
 	ui_software_info                  *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
 	std::vector<ui_software_info *>   m_displaylist, m_tmp, m_sortedlist;
@@ -62,6 +63,7 @@ private:
 	// handlers
 	void inkey_select(const ui_menu_event *menu_event);
 	void inkey_special(const ui_menu_event *menu_event);
+	void inkey_configure(const ui_menu_event *menu_event);
 };
 
 class ui_software_parts : public ui_menu

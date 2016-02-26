@@ -22,8 +22,10 @@ public:
 
 	virtual ~renderer_none() { }
 
-	virtual int create() override { return 0; }
 	static bool init(running_machine &machine) { return false; }
+	static void exit() { }
+
+	virtual int create() override { return 0; }
 	virtual render_primitive_list *get_primitives() override;
 	virtual int draw(const int update) override { return 0; }
 	virtual void save() override { }

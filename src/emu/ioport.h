@@ -1096,7 +1096,7 @@ public:
 	struct user_settings
 	{
 		ioport_value    value;                  // for DIP switches
-		bool			autofire;				// for autofire settings
+		bool            autofire;               // for autofire settings
 		input_seq       seq[SEQ_TYPE_TOTAL];    // sequences of all types
 		INT32           sensitivity;            // for analog controls
 		INT32           delta;                  // for analog controls
@@ -1486,8 +1486,8 @@ private:
 	UINT64                  m_playback_accumulated_speed; // accumulated speed during playback
 	UINT32                  m_playback_accumulated_frames; // accumulated frames during playback
 	emu_file                m_timecode_file;        // timecode/frames playback file (NULL if not recording)
-	int						m_timecode_count;
-	attotime				m_timecode_last_time;
+	int                     m_timecode_count;
+	attotime                m_timecode_last_time;
 
 	// has...
 	bool                    m_has_configs;

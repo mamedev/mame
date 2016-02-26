@@ -54,7 +54,9 @@ function layoutbuildtask(_folder, _name)
 end
 
 function precompiledheaders()
-	pchheader("emu.h")
+    configuration { "not xcode4" }
+	   pchheader("emu.h")
+    configuration { }
 end
 
 function addprojectflags()
@@ -442,11 +444,17 @@ configurations {
 	"Release",
 }
 
-platforms {
-	"x32",
-	"x64",
-	"Native", -- for targets where bitness is not specified
-}
+if _ACTION == "xcode4" then
+    platforms {
+        "x64",
+    }
+else
+    platforms {
+        "x32",
+        "x64",
+        "Native", -- for targets where bitness is not specified
+    }
+end
 
 language "C++"
 
@@ -947,7 +955,7 @@ end
 
 
 		local version = str_to_version(_OPTIONS["gcc_version"])
-		if string.find(_OPTIONS["gcc"], "clang") then
+		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "pnacl") or string.find(_OPTIONS["gcc"], "asmjs") then
 			if (version < 30400) then
 				print("Clang version 3.4 or later needed")
 				os.exit(-1)
@@ -1017,10 +1025,15 @@ configuration { "asmjs" }
 configuration { "android*" }
 	buildoptions {
 		"-Wno-undef",
+		"-Wno-typedef-redefinition",
+		"-Wno-unknown-warning-option",
 	}
 	buildoptions_cpp {
 		"-x c++",
 		"-std=c++14",
+		"-Wno-extern-c-compat",
+		"-Wno-tautological-constant-out-of-range-compare",
+		"-Wno-tautological-pointer-compare",
 	}
 	archivesplit_size "20"
 
@@ -1029,13 +1042,6 @@ configuration { "pnacl" }
 		"-std=gnu89",
 		"-Wno-inline-new-delete",
 	}
-	buildoptions_cpp {
-		"-x c++",
-		"-std=c++14",
-	}
-	archivesplit_size "20"
-
-configuration { "nacl*" }
 	buildoptions_cpp {
 		"-x c++",
 		"-std=c++14",
@@ -1067,7 +1073,7 @@ configuration { "steamlink" }
 		"EGL_API_FB",
 	}
 
-configuration { "osx*" }
+configuration { "osx* or xcode4" }
 		links {
 			"pthread",
 		}

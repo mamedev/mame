@@ -51,7 +51,7 @@ extern "C" {
 	int luaopen_zlib(lua_State *L);
 	int luaopen_luv(lua_State *L);
 	int luaopen_lfs(lua_State *L);
-	uv_loop_t* luv_loop(lua_State* L);	
+	uv_loop_t* luv_loop(lua_State* L);
 }
 
 static void lstop(lua_State *L, lua_Debug *ar)
@@ -136,23 +136,19 @@ lua_engine::hook::hook()
 	cb = -1;
 }
 
-#if (defined(__sun__) && defined(__svr4__)) || defined(__ANDROID__) || defined(__OpenBSD__)
-#undef _L
-#endif
-
-void lua_engine::hook::set(lua_State *_L, int idx)
+void lua_engine::hook::set(lua_State *lua, int idx)
 {
 	if (L)
 		luaL_unref(L, LUA_REGISTRYINDEX, cb);
 
-	if (lua_isnil(_L, idx)) {
+	if (lua_isnil(lua, idx)) {
 		L = nullptr;
 		cb = -1;
 
 	} else {
-		L = _L;
-		lua_pushvalue(_L, idx);
-		cb = luaL_ref(_L, LUA_REGISTRYINDEX);
+		L = lua;
+		lua_pushvalue(lua, idx);
+		cb = luaL_ref(lua, LUA_REGISTRYINDEX);
 	}
 }
 
@@ -197,9 +193,9 @@ void lua_engine::resume(lua_State *L, int nparam, lua_State *root)
 	}
 }
 
-void lua_engine::resume(void *_L, INT32 param)
+void lua_engine::resume(void *lua, INT32 param)
 {
-	resume(static_cast<lua_State *>(_L));
+	resume(static_cast<lua_State *>(lua));
 }
 
 int lua_engine::l_ioport_write(lua_State *L)
@@ -744,7 +740,7 @@ int lua_engine::lua_options_entry::l_entry_value(lua_State *L)
 			luaL_error(L, "%s", error.c_str());
 		}
 	}
-	
+
 	switch (e->type())
 	{
 		case OPTION_BOOLEAN:
@@ -1194,7 +1190,7 @@ lua_engine::lua_engine()
 	lua_gc(m_lua_state, LUA_GCSTOP, 0);  /* stop collector during initialization */
 	luaL_openlibs(m_lua_state);  /* open libraries */
 
-	 // Get package.preload so we can store builtins in it.
+		// Get package.preload so we can store builtins in it.
 	lua_getglobal(m_lua_state, "package");
 	lua_getfield(m_lua_state, -1, "preload");
 	lua_remove(m_lua_state, -2); // Remove package
@@ -1205,13 +1201,13 @@ lua_engine::lua_engine()
 
 	lua_pushcfunction(m_lua_state, luaopen_zlib);
 	lua_setfield(m_lua_state, -2, "zlib");
-	
+
 	lua_pushcfunction(m_lua_state, luaopen_lsqlite3);
 	lua_setfield(m_lua_state, -2, "lsqlite3");
 
 	lua_pushcfunction(m_lua_state, luaopen_lfs);
 	lua_setfield(m_lua_state, -2, "lfs");
-	
+
 	luaopen_ioport(m_lua_state);
 
 	lua_gc(m_lua_state, LUA_GCRESTART, 0);
@@ -1668,7 +1664,7 @@ void lua_engine::periodic_check()
 	auto loop = luv_loop(m_lua_state);
 	if (loop!=nullptr)
 		uv_run(loop, UV_RUN_NOWAIT);
-	
+
 }
 
 //-------------------------------------------------

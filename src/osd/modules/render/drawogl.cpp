@@ -302,7 +302,10 @@ renderer_ogl::~renderer_ogl()
 
 	global_free(m_gl_context);
 	m_gl_context = nullptr;
+}
 
+void renderer_ogl::exit()
+{
 	for (int i = 0; i < video_config.glsl_shader_mamebm_num; i++)
 	{
 		if (nullptr != video_config.glsl_shader_mamebm[i])
