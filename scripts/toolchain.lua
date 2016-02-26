@@ -32,7 +32,6 @@ newoption {
 		{ "osx",           "OSX (GCC compiler)"     },
 		{ "osx-clang",     "OSX (Clang compiler)"   },
 		{ "pnacl",         "Native Client - PNaCl"  },
-		{ "qnx-arm",       "QNX/Blackberry - ARM"   },
 		{ "rpi",           "RaspberryPi"            },
 		{ "solaris", 	   "Solaris"                },
 		{ "steamlink", 	   "Steam Link"             },
@@ -287,18 +286,6 @@ function toolchain(_buildDir, _subDir)
 			premake.gcc.cxx = naclToolchain .. "clang++"
 			premake.gcc.ar  = naclToolchain .. "ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-pnacl")
-		end
-
-		if "qnx-arm" == _OPTIONS["gcc"] then
-
-			if not os.getenv("QNX_HOST") then
-				print("Set QNX_HOST enviroment variables.")
-			end
-
-			premake.gcc.cc  = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-gcc"
-			premake.gcc.cxx = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-g++"
-			premake.gcc.ar  = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-ar"
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-qnx-arm")
 		end
 
 		if "rpi" == _OPTIONS["gcc"] then
@@ -828,10 +815,6 @@ function toolchain(_buildDir, _subDir)
 	configuration { "ios-simulator" }
 		targetdir (_buildDir .. "ios-simulator" .. "/bin")
 		objdir (_buildDir .. "ios-simulator" .. "/obj")
-
-	configuration { "qnx-arm" }
-		targetdir (_buildDir .. "qnx-arm" .. "/bin")
-		objdir (_buildDir .. "qnx-arm" .. "/obj")
 
 	configuration { "rpi" }
 		targetdir (_buildDir .. "rpi" .. "/bin")
