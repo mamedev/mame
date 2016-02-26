@@ -491,9 +491,9 @@ ROM_START(apple2gsr3lp)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89) ) /* need label/part number */
 
 	ROM_REGION(0x40000,"maincpu",0)
-	// The 341-0749 is known to also be matched with the 341-0728 MASK rom which holds the same data.
-	ROM_LOAD("341-0737", 0x00000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27) ) /* 341-0737: IIgs ROM03 FC-FD */
-	ROM_LOAD("341-0749", 0x20000, 0x20000, CRC(c6e9b4b4) SHA1(d754a3c3a26763c50bc9adfd0fcb9b71aef7999d) ) /* 341-0749: unknown ?post? ROM03 IIgs prototype? FE-FF - 32 pin EPPROM */
+	// The 341-0749 is known to also be matched with the 341-0728 MASK rom which holds the same data as the EPROM 341-0737 version.
+	ROM_LOAD("341-0737", 0x00000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27) ) /* 341-0737: IIgs ROM03 FC-FD - 32 pin EPROM */
+	ROM_LOAD("341-0749", 0x20000, 0x20000, CRC(c6e9b4b4) SHA1(d754a3c3a26763c50bc9adfd0fcb9b71aef7999d) ) /* 341-0749: unknown ?post? ROM03 IIgs prototype? FE-FF - 32 pin EPROM */
 
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE00)
 
