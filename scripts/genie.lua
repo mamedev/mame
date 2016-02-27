@@ -158,6 +158,11 @@ newoption {
 }
 
 newoption {
+    trigger = 'with-bundled-sdl2',
+    description = 'Build bundled SDL2 library',
+}
+
+newoption {
 	trigger = "distro",
 	description = "Choose distribution",
 	allowed = {
@@ -450,6 +455,7 @@ else
 	end
 end
 
+
 configurations {
 	"Debug",
 	"Release",
@@ -497,6 +503,13 @@ configuration { "Release", "vs*" }
 		"Optimize",
 	}
 
+-- Force VS2013/15 targets to use bundled SDL2
+if string.sub(_ACTION,1,4) == "vs20" and _OPTIONS["osd"]=="sdl" then
+	if _OPTIONS["with-bundled-sdl2"]==nil then
+		_OPTIONS["with-bundled-sdl2"] = "1"
+	end
+end
+	
 configuration {}
 
 msgcompile ("Compiling $(subst ../,,$<)...")

@@ -113,7 +113,7 @@ if _OPTIONS["targetos"]=="windows" then
 		}
 	configuration { "vs*" }
 		includedirs {
-			MAME_DIR .. "3rdparty/sdl2/include",
+			GEN_DIR .. "includes",
 		}
 	configuration { }
 

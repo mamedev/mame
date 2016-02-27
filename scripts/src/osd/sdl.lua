@@ -53,18 +53,11 @@ function maintargetosdoptions(_target,_subtarget)
 				links {
 					"SDL2.dll",
 				}
-			configuration { "x64","vs*" }
-				libdirs {
-					MAME_DIR .. "3rdparty/sdl2/lib/x64",
-				}
-			configuration { "x32","vs*" }
-				libdirs {
-					MAME_DIR .. "3rdparty/sdl2/lib/x86",
-				}
-				
-			configuration { "vs*"}
+			configuration { "vs*" }
 				links {
 					"SDL2",
+					"Imm32",
+					"Version",
 				}
 			configuration { }
 		else
@@ -496,17 +489,11 @@ if _OPTIONS["with-tools"] then
 					links {
 						"SDL2.dll",
 					}
-				configuration { "x64","vs*" }
-					libdirs {
-						MAME_DIR .. "3rdparty/sdl2/lib/x64",
-					}
-				configuration { "x32","vs*" }
-					libdirs {
-						MAME_DIR .. "3rdparty/sdl2/lib/x86",
-					}					
-				configuration { "vs*"}
+				configuration { "vs*" }
 					links {
 						"SDL2",
+						"Imm32",
+						"Version",
 					}
 				configuration { }
 			else

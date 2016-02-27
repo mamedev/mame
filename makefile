@@ -62,6 +62,7 @@
 # USE_SYSTEM_LIB_SQLITE3 = 1
 # USE_SYSTEM_LIB_PORTMIDI = 1
 # USE_SYSTEM_LIB_PORTAUDIO = 1
+# USE_BOUNDLED_LIB_SDL2 = 1
 
 # MESA_INSTALL_ROOT = /opt/mesa
 # SDL_INSTALL_ROOT = /opt/sdl2
@@ -381,6 +382,12 @@ endif
 
 ifndef USE_SYSTEM_LIB_PORTAUDIO
 PARAMS += --with-bundled-portaudio
+endif
+
+# reverse logic for this one
+
+ifdef USE_BOUNDLED_LIB_SDL2
+PARAMS += --with-bundled-sdl2
 endif
 
 #-------------------------------------------------
@@ -1338,7 +1345,12 @@ generate: \
 		$(GEN_FOLDERS) \
 		$(patsubst %.po,%.mo,$(call rwildcard, language/, *.po)) \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
-		$(SRC)/devices/cpu/m68000/m68kops.cpp
+		$(SRC)/devices/cpu/m68000/m68kops.cpp \
+		$(GENDIR)/includes/SDL2
+
+$(GENDIR)/includes/SDL2:
+	-$(call MKDIR,$@)
+	$(SILENT)cp -fR 3rdparty/SDL2/include/* $(GENDIR)/includes/SDL2/.
 
 $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/file2str.py | $(GEN_FOLDERS)
 	@echo Converting $<...

@@ -308,13 +308,6 @@ end
 			PYTHON .. " " .. path.translate(MAME_DIR .. "scripts/build/verinfo.py","\\") .. " -r -b " .. rctarget .. " " .. path.translate(MAME_DIR .. "src/version.cpp","\\") .. " > " .. path.translate(GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", "\\") ,
 		}	
 				
-	if (_OPTIONS["osd"] == "sdl") then
-		configuration { "x64","vs*" }
-			prelinkcommands { "copy " .. path.translate(MAME_DIR .."3rdparty/sdl2/lib/x64/SDL2.dll", "\\") .. " " .. path.translate(MAME_DIR .."SDL2.dll","\\") .. " /Y" }
-		configuration { "x32","vs*" }
-			prelinkcommands { "copy " .. path.translate(MAME_DIR .."3rdparty/sdl2/lib/x86/SDL2.dll", "\\") .. " " .. path.translate(MAME_DIR .."SDL2.dll","\\") .. " /Y" }
-	end
-	
 	configuration { }
 
 	debugdir (MAME_DIR)
