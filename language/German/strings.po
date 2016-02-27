@@ -9,14 +9,15 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-21 20:49+0100\n"
-"PO-Revision-Date: 2016-02-20 18:03+0100\n"
-"Last-Translator: Michael Zapf\n"
+"PO-Revision-Date: 2016-02-27 10:05+0100\n"
+"Last-Translator: Lothar Serra Mari <scummvm@rootfather.de>\n"
 "Language-Team: MAME Language Team\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.8.7\n"
 
 #: src/emu/ui/auditmenu.cpp:111
 msgid "Audit in progress..."
@@ -619,7 +620,6 @@ msgid "Select New Machine"
 msgstr "Neue Maschine auswählen"
 
 #: src/emu/ui/miscmenu.cpp:35
-#, fuzzy
 msgid "Keyboard Mode:"
 msgstr "Tastaturmodus"
 
@@ -706,7 +706,6 @@ msgid "General Inputs"
 msgstr "Haupteingaben"
 
 #: src/emu/ui/optsmenu.cpp:267 src/emu/ui/optsmenu.cpp:287
-
 msgid "Settings"
 msgstr "Einstellungen"
 
@@ -805,12 +804,10 @@ msgstr "Für diese Maschine müssen Abbilder in die folgenden Geräte geladen we
 
 #: src/emu/ui/ui.cpp:1062
 msgid ""
-"Usage of emulators in conjunction with ROMs you don't own is forbidden by "
-"copyright law.\n"
+"Usage of emulators in conjunction with ROMs you don't own is forbidden by copyright law.\n"
 "\n"
 msgstr ""
-"Die unlizenzierte Beschaffung und Verwendung von Computerprogrammen (einschließlich "
-"ROM-Inhalten), beispielsweise zur Nutzung in einem Emulator, stellt einen Verstoß gegen das Urheberrecht dar.\n"
+"Die unlizenzierte Beschaffung und Verwendung von Computerprogrammen (einschließlich ROM-Inhalten), beispielsweise zur Nutzung in einem Emulator, stellt einen Verstoß gegen das Urheberrecht dar.\n"
 "\n"
 
 #: src/emu/ui/ui.cpp:1063
@@ -818,7 +815,8 @@ msgstr ""
 msgid ""
 "IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS ESC.\n"
 "\n"
-msgstr "WENN SIE NICHT BERECHTIGT SIND, \"%s\" IN DIESEM EMULATOR ZU VERWENDEN, DRÜCKEN SIE ESC.\n"
+msgstr ""
+"WENN SIE NICHT BERECHTIGT SIND, \"%s\" IN DIESEM EMULATOR ZU VERWENDEN, DRÜCKEN SIE ESC.\n"
 "\n"
 
 #: src/emu/ui/ui.cpp:1064
@@ -826,12 +824,8 @@ msgid "Otherwise, type OK or move the joystick left then right to continue"
 msgstr "Andernfalls geben Sie OK ein oder bewegen Sie den Joystick nach links und dann nach rechts um fortzufahren"
 
 #: src/emu/ui/ui.cpp:1099
-msgid ""
-"One or more ROMs/CHDs for this machine are incorrect. The machine may not "
-"run correctly.\n"
-msgstr ""
-"Ein oder mehrere ROMs/CHDs für diese Maschine sind nicht korrekt. Wahrscheinlich "
-"wird die Maschine nicht richtig laufen.\n"
+msgid "One or more ROMs/CHDs for this machine are incorrect. The machine may not run correctly.\n"
+msgstr "Ein oder mehrere ROMs/CHDs für diese Maschine sind nicht korrekt. Wahrscheinlich wird die Maschine nicht richtig laufen.\n"
 
 #: src/emu/ui/ui.cpp:1112
 msgid ""
@@ -842,10 +836,8 @@ msgstr ""
 "\n"
 
 #: src/emu/ui/ui.cpp:1116
-msgid ""
-"One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
-msgstr ""
-"Ein oder mehrere ROMs/CHDs dieser Maschine wurden nicht korrekt ausgelesen.\n"
+msgid "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
+msgstr "Ein oder mehrere ROMs/CHDs dieser Maschine wurden nicht korrekt ausgelesen.\n"
 
 #: src/emu/ui/ui.cpp:1120
 #, c-format
@@ -884,17 +876,11 @@ msgid "The machine requires external artwork files\n"
 msgstr "Die Maschine benötigt externe Illustrationsdateien\n"
 
 #: src/emu/ui/ui.cpp:1142
-msgid ""
-"This machine was never completed. It may exhibit strange behavior or missing "
-"elements that are not bugs in the emulation.\n"
-msgstr ""
-"Diese Maschine wurde niemals fertiggestellt. Sie kann seltsames Verhalten oder fehlende Elemente aufweisen, "
-"die nicht auf Fehler der Emulation zurückzuführen sind.\n"
+msgid "This machine was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n"
+msgstr "Diese Maschine wurde niemals fertiggestellt. Sie kann seltsames Verhalten oder fehlende Elemente aufweisen, die nicht auf Fehler der Emulation zurückzuführen sind.\n"
 
 #: src/emu/ui/ui.cpp:1147
-msgid ""
-"This machine has no sound hardware, MAME will produce no sounds, this is "
-"expected behaviour.\n"
+msgid "This machine has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n"
 msgstr "Diese Maschine besitzt keine Sound-Hardware; MAME wird erwartungsgemäß keine Töne ausgeben.\n"
 
 #: src/emu/ui/ui.cpp:1155
@@ -904,26 +890,18 @@ msgstr "Die Maschine besitzt Schutzvorrichtungen, die nicht vollständig emulier
 #: src/emu/ui/ui.cpp:1158
 msgid ""
 "\n"
-"THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet "
-"complete. There is nothing you can do to fix this problem except wait for "
-"the developers to improve the emulation.\n"
+"THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet complete. There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n"
 msgstr ""
 "\n"
-"DIESE MASCHINE FUNKTIONIERT NICHT. Die Emulation dieser Maschine ist noch nicht vollständig. "
-"Sie können nichts tun, um dieses Problem zu beheben, als darauf zu warten, das die Entwickler "
-"die Emulation verbessern.\n"
+"DIESE MASCHINE FUNKTIONIERT NICHT. Die Emulation dieser Maschine ist noch nicht vollständig. Sie können nichts tun, um dieses Problem zu beheben, als darauf zu warten, das die Entwickler die Emulation verbessern.\n"
 
 #: src/emu/ui/ui.cpp:1162
 msgid ""
 "\n"
-"Certain elements of this machine cannot be emulated as it requires actual "
-"physical interaction or consists of mechanical devices. It is not possible "
-"to fully play this machine.\n"
+"Certain elements of this machine cannot be emulated as it requires actual physical interaction or consists of mechanical devices. It is not possible to fully play this machine.\n"
 msgstr ""
 "\n"
-"Verschiedene Elemente dieser Maschine können nicht emuliert werden, da sie echte "
-"physische Interaktion voraussetzen oder mechanische Komponenten beinhalten. Es ist nicht möglich, "
-"diese Maschine vollständig zu verwenden.\n"
+"Verschiedene Elemente dieser Maschine können nicht emuliert werden, da sie echte physische Interaktion voraussetzen oder mechanische Komponenten beinhalten. Es ist nicht möglich, diese Maschine vollständig zu verwenden.\n"
 
 #: src/emu/ui/ui.cpp:1181
 msgid ""
@@ -1074,7 +1052,6 @@ msgid "Crosshair Scale"
 msgstr "Fadenkreuzskalierung"
 
 #: src/emu/ui/ui.cpp:2579
-#, fuzzy
 msgid "Crosshair Offset"
 msgstr "Fadenkreuzversatz"
 
