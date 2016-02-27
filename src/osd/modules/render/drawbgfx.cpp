@@ -49,6 +49,10 @@
 //  CONSTANTS
 //============================================================
 
+const uint16_t renderer_bgfx::CACHE_SIZE = 1024;
+const uint32_t renderer_bgfx::PACKABLE_SIZE = 128;
+const uint32_t renderer_bgfx::WHITE_HASH = 0x87654321;
+
 //============================================================
 //  MACROS
 //============================================================

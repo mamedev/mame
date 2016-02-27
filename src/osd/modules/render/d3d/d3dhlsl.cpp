@@ -52,7 +52,7 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 //============================================================
 
 typedef HRESULT (WINAPI *direct3dx9_loadeffect_ptr)(LPDIRECT3DDEVICE9 pDevice, LPCTSTR pSrcFile, const D3DXMACRO *pDefines, LPD3DXINCLUDE pInclude, DWORD Flags, LPD3DXEFFECTPOOL pPool, LPD3DXEFFECT *ppEffect, LPD3DXBUFFER *ppCompilationErrors);
-static direct3dx9_loadeffect_ptr g_load_effect = NULL;
+static direct3dx9_loadeffect_ptr g_load_effect = nullptr;
 
 
 //============================================================
@@ -60,24 +60,24 @@ static direct3dx9_loadeffect_ptr g_load_effect = NULL;
 //============================================================
 
 shaders::shaders() :
-	d3dintf(NULL), machine(NULL), d3d(NULL), num_screens(0), curr_screen(0), curr_frame(0), write_ini(false), read_ini(false), hlsl_prescale_x(0), hlsl_prescale_y(0), bloom_count(0),
-	vecbuf_type(), vecbuf_index(0), vecbuf_count(0), avi_output_file(NULL), avi_frame(0), avi_copy_surface(NULL), avi_copy_texture(NULL), avi_final_target(NULL), avi_final_texture(NULL),
-	black_surface(NULL), black_texture(NULL), render_snap(false), snap_rendered(false), snap_copy_target(NULL), snap_copy_texture(NULL), snap_target(NULL), snap_texture(NULL),
-	snap_width(0), snap_height(0), lines_pending(false), backbuffer(NULL), curr_effect(NULL), default_effect(NULL), prescale_effect(NULL), post_effect(NULL), distortion_effect(NULL),
-	focus_effect(NULL), phosphor_effect(NULL), deconverge_effect(NULL), color_effect(NULL), ntsc_effect(NULL), bloom_effect(NULL),
-	downsample_effect(NULL), vector_effect(NULL), fsfx_vertices(NULL), curr_texture(NULL), curr_render_target(NULL), curr_poly(NULL)
+	d3dintf(nullptr), machine(nullptr), d3d(nullptr), num_screens(0), curr_screen(0), curr_frame(0), write_ini(false), read_ini(false), hlsl_prescale_x(0), hlsl_prescale_y(0), bloom_count(0),
+	vecbuf_type(), vecbuf_index(0), vecbuf_count(0), avi_output_file(nullptr), avi_frame(0), avi_copy_surface(nullptr), avi_copy_texture(nullptr), avi_final_target(nullptr), avi_final_texture(nullptr),
+	black_surface(nullptr), black_texture(nullptr), render_snap(false), snap_rendered(false), snap_copy_target(nullptr), snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr),
+	snap_width(0), snap_height(0), lines_pending(false), backbuffer(nullptr), curr_effect(nullptr), default_effect(nullptr), prescale_effect(nullptr), post_effect(nullptr), distortion_effect(nullptr),
+	focus_effect(nullptr), phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr), ntsc_effect(nullptr), bloom_effect(nullptr),
+	downsample_effect(nullptr), vector_effect(nullptr), fsfx_vertices(nullptr), curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr)
 {
 	master_enable = false;
 	vector_enable = true;
 	hlsl_prescale_x = 1;
 	hlsl_prescale_x = 1;
 	preset = -1;
-	shadow_texture = NULL;
-	options = NULL;
+	shadow_texture = nullptr;
+	options = nullptr;
 	paused = true;
 	lastidx = -1;
-	targethead = NULL;
-	cachehead = NULL;
+	targethead = nullptr;
+	cachehead = nullptr;
 	initialized = false;
 }
 
@@ -88,8 +88,13 @@ shaders::shaders() :
 
 shaders::~shaders()
 {
+	for (slider* slider : sliders)
+	{
+		delete slider;
+	}
+
 	cache_target *currcache = cachehead;
-	while(cachehead != NULL)
+	while(cachehead != nullptr)
 	{
 		cachehead = currcache->next;
 		global_free(currcache);
@@ -97,7 +102,7 @@ shaders::~shaders()
 	}
 
 	d3d_render_target *currtarget = targethead;
-	while(targethead != NULL)
+	while(targethead != nullptr)
 	{
 		targethead = currtarget->next;
 		global_free(currtarget);
@@ -152,7 +157,7 @@ void shaders::window_record()
 	windows_options &options = downcast<windows_options &>(machine->options());
 	const char *filename = options.d3d_hlsl_write();
 
-	if (avi_output_file != NULL)
+	if (avi_output_file != nullptr)
 	{
 		end_avi_recording();
 	}
@@ -190,7 +195,7 @@ void shaders::avi_update_snap(surface *surface)
 	}
 
 	// lock the texture
-	result = (*d3dintf->surface.lock_rect)(avi_copy_surface, &rect, NULL, D3DLOCK_DISCARD);
+	result = (*d3dintf->surface.lock_rect)(avi_copy_surface, &rect, nullptr, D3DLOCK_DISCARD);
 	if (result != D3D_OK)
 	{
 		return;
@@ -247,7 +252,7 @@ void shaders::render_snapshot(surface *surface)
 	}
 
 	// lock the texture
-	result = (*d3dintf->surface.lock_rect)(snap_copy_target, &rect, NULL, D3DLOCK_DISCARD);
+	result = (*d3dintf->surface.lock_rect)(snap_copy_target, &rect, nullptr, D3DLOCK_DISCARD);
 	if (result != D3D_OK)
 	{
 		return;
@@ -274,7 +279,7 @@ void shaders::render_snapshot(surface *surface)
 			int idx = cy * 2 + cx;
 
 			emu_file file(machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			file_error filerr = open_next(d3d, file, NULL, "png", idx);
+			file_error filerr = open_next(d3d, file, nullptr, "png", idx);
 			if (filerr != FILERR_NONE)
 			{
 				return;
@@ -288,7 +293,7 @@ void shaders::render_snapshot(surface *surface)
 			png_add_text(&pnginfo, "System", text2.c_str());
 
 			// now do the actual work
-			png_error error = png_write_bitmap(file, &pnginfo, avi_snap, 1 << 24, NULL);
+			png_error error = png_write_bitmap(file, &pnginfo, avi_snap, 1 << 24, nullptr);
 			if (error != PNGERR_NONE)
 			{
 				osd_printf_error("Error generating PNG for HLSL snapshot: png_error = %d\n", error);
@@ -303,28 +308,28 @@ void shaders::render_snapshot(surface *surface)
 	result = (*d3dintf->surface.unlock_rect)(snap_copy_target);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during texture unlock_rect call\n", (int)result);
 
-	if (snap_texture != NULL)
+	if (snap_texture != nullptr)
 	{
 		(*d3dintf->texture.release)(snap_texture);
-		snap_texture = NULL;
+		snap_texture = nullptr;
 	}
 
-	if (snap_target != NULL)
+	if (snap_target != nullptr)
 	{
 		(*d3dintf->surface.release)(snap_target);
-		snap_target = NULL;
+		snap_target = nullptr;
 	}
 
-	if (snap_copy_texture != NULL)
+	if (snap_copy_texture != nullptr)
 	{
 		(*d3dintf->texture.release)(snap_copy_texture);
-		snap_copy_texture = NULL;
+		snap_copy_texture = nullptr;
 	}
 
-	if (snap_copy_target != NULL)
+	if (snap_copy_target != nullptr)
 	{
 		(*d3dintf->surface.release)(snap_copy_target);
-		snap_copy_target = NULL;
+		snap_copy_target = nullptr;
 	}
 }
 
@@ -343,7 +348,7 @@ void shaders::record_texture()
 	surface *surface = avi_final_target;
 
 	// ignore if nothing to do
-	if (avi_output_file == NULL || surface == NULL)
+	if (avi_output_file == nullptr || surface == nullptr)
 	{
 		return;
 	}
@@ -383,12 +388,12 @@ void shaders::end_avi_recording()
 		return;
 	}
 
-	if (avi_output_file != NULL)
+	if (avi_output_file != nullptr)
 	{
 		avi_close(avi_output_file);
 	}
 
-	avi_output_file = NULL;
+	avi_output_file = nullptr;
 	avi_frame = 0;
 }
 
@@ -406,7 +411,7 @@ void shaders::toggle()
 			// free shader resources before renderer resources
 			delete_resources(false);
 
-			g_slider_list = NULL;
+			g_slider_list = nullptr;
 		}
 
 		master_enable = !master_enable;
@@ -460,7 +465,7 @@ void shaders::begin_avi_recording(const char *name)
 	// build up information about this new movie
 	avi_movie_info info;
 	info.video_format = 0;
-	info.video_timescale = 1000 * ((machine->first_screen() != NULL) ? ATTOSECONDS_TO_HZ(machine->first_screen()->frame_period().m_attoseconds) : screen_device::DEFAULT_FRAME_RATE);
+	info.video_timescale = 1000 * ((machine->first_screen() != nullptr) ? ATTOSECONDS_TO_HZ(machine->first_screen()->frame_period().m_attoseconds) : screen_device::DEFAULT_FRAME_RATE);
 	info.video_sampletime = 1000;
 	info.video_numsamples = 0;
 	info.video_width = snap_width;
@@ -480,13 +485,13 @@ void shaders::begin_avi_recording(const char *name)
 	std::string fullpath;
 	{
 		emu_file tempfile(machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (name != NULL)
+		if (name != nullptr)
 		{
 			filerr = tempfile.open(name);
 		}
 		else
 		{
-			filerr = open_next(d3d, tempfile, NULL, "avi", 0);
+			filerr = open_next(d3d, tempfile, nullptr, "avi", 0);
 		}
 
 		// compute the frame time
@@ -520,19 +525,19 @@ void shaders::begin_avi_recording(const char *name)
 
 void shaders::remove_cache_target(cache_target *cache)
 {
-	if (cache != NULL)
+	if (cache != nullptr)
 	{
 		if (cache == cachehead)
 		{
 			cachehead = cachehead->next;
 		}
 
-		if (cache->prev != NULL)
+		if (cache->prev != nullptr)
 		{
 			cache->prev->next = cache->next;
 		}
 
-		if (cache->next != NULL)
+		if (cache->next != nullptr)
 		{
 			cache->next->prev = cache->prev;
 		}
@@ -554,7 +559,7 @@ void shaders::remove_render_target(texture_info *texture)
 void shaders::remove_render_target(int width, int height, UINT32 screen_index, UINT32 page_index)
 {
 	d3d_render_target *target = find_render_target(width, height, screen_index, page_index);
-	if (target != NULL)
+	if (target != nullptr)
 	{
 		remove_render_target(target);
 	}
@@ -562,25 +567,25 @@ void shaders::remove_render_target(int width, int height, UINT32 screen_index, U
 
 void shaders::remove_render_target(d3d_render_target *rt)
 {
-	if (rt != NULL)
+	if (rt != nullptr)
 	{
 		if (rt == targethead)
 		{
 			targethead = targethead->next;
 		}
 
-		if (rt->prev != NULL)
+		if (rt->prev != nullptr)
 		{
 			rt->prev->next = rt->next;
 		}
 
-		if (rt->next != NULL)
+		if (rt->next != nullptr)
 		{
 			rt->next->prev = rt->prev;
 		}
 
 		cache_target *cache = find_cache_target(rt->screen_index, rt->width, rt->height);
-		if (cache != NULL)
+		if (cache != nullptr)
 		{
 			remove_cache_target(cache);
 		}
@@ -609,7 +614,7 @@ void shaders::set_texture(texture_info *texture)
 		return;
 	}
 
-	if (texture != NULL)
+	if (texture != nullptr)
 	{
 		paused = texture->paused();
 		texture->advance_frame();
@@ -617,14 +622,14 @@ void shaders::set_texture(texture_info *texture)
 
 	// set initial texture to use
 	texture_info *default_texture = d3d->get_default_texture();
-	default_effect->set_texture("Diffuse", (texture == NULL) ? default_texture->get_finaltex() : texture->get_finaltex());
+	default_effect->set_texture("Diffuse", (texture == nullptr) ? default_texture->get_finaltex() : texture->get_finaltex());
 	if (options->yiq_enable)
 	{
-		ntsc_effect->set_texture("Diffuse", (texture == NULL) ? default_texture->get_finaltex() : texture->get_finaltex());
+		ntsc_effect->set_texture("Diffuse", (texture == nullptr) ? default_texture->get_finaltex() : texture->get_finaltex());
 	}
 	else
 	{
-		color_effect->set_texture("Diffuse", (texture == NULL) ? default_texture->get_finaltex() : texture->get_finaltex());
+		color_effect->set_texture("Diffuse", (texture == nullptr) ? default_texture->get_finaltex() : texture->get_finaltex());
 	}
 }
 
@@ -641,7 +646,7 @@ void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 	}
 
 	g_load_effect = (direct3dx9_loadeffect_ptr)GetProcAddress(d3dintf->libhandle, "D3DXCreateEffectFromFileW");
-	if (g_load_effect == NULL)
+	if (g_load_effect == nullptr)
 	{
 		printf("Direct3D: Unable to find D3DXCreateEffectFromFileW\n");
 		d3dintf->post_fx_available = false;
@@ -765,7 +770,7 @@ void shaders::init_fsfx_quad(void *vertbuf)
 
 	// get a pointer to the vertex buffer
 	fsfx_vertices = (vertex *)vertbuf;
-	if (fsfx_vertices == NULL)
+	if (fsfx_vertices == nullptr)
 	{
 		return;
 	}
@@ -856,7 +861,7 @@ int shaders::create_resources(bool reset)
 	(*d3dintf->texture.get_surface_level)(black_texture, 0, &black_surface);
 	result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, black_surface);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
+	result = (*d3dintf->device.clear)(d3d->get_device(), 0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
 	result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
@@ -878,7 +883,7 @@ int shaders::create_resources(bool reset)
 	(*d3dintf->texture.get_surface_level)(avi_final_texture, 0, &avi_final_target);
 
 	emu_file file(machine->options().art_path(), OPEN_FLAG_READ);
-	render_load_png(shadow_bitmap, file, NULL, options->shadow_mask_texture);
+	render_load_png(shadow_bitmap, file, nullptr, options->shadow_mask_texture);
 
 	// experimental: if we have a shadow bitmap, create a texture for it
 	if (shadow_bitmap.valid())
@@ -890,7 +895,7 @@ int shaders::create_resources(bool reset)
 		texture.rowpixels = shadow_bitmap.rowpixels();
 		texture.width = shadow_bitmap.width();
 		texture.height = shadow_bitmap.height();
-		texture.palette = NULL;
+		texture.palette = nullptr;
 		texture.seqid = 0;
 
 		// now create it (no prescale, but wrap)
@@ -1075,7 +1080,7 @@ void shaders::blit(
 {
 	HRESULT result;
 
-	if (dst != NULL)
+	if (dst != nullptr)
 	{
 		result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, dst);
 		if (result != D3D_OK)
@@ -1085,7 +1090,7 @@ void shaders::blit(
 
 		if (clear_dst)
 		{
-			result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1,0,0,0), 0, 0);
+			result = (*d3dintf->device.clear)(d3d->get_device(), 0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1,0,0,0), 0, 0);
 			if (result != D3D_OK)
 			{
 				osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
@@ -1160,7 +1165,7 @@ d3d_render_target* shaders::find_render_target(texture_info *info)
 	UINT32 page_index = screen_index_data & 1;
 
 	d3d_render_target *curr = targethead;
-	while (curr != NULL && (
+	while (curr != nullptr && (
 		curr->screen_index != screen_index ||
 		curr->page_index != page_index ||
 		curr->width != info->get_texinfo().width ||
@@ -1180,7 +1185,7 @@ d3d_render_target* shaders::find_render_target(texture_info *info)
 d3d_render_target* shaders::find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index)
 {
 	d3d_render_target *curr = targethead;
-	while (curr != NULL && (
+	while (curr != nullptr && (
 		curr->width != width ||
 		curr->height != height ||
 		curr->screen_index != screen_index ||
@@ -1200,7 +1205,7 @@ d3d_render_target* shaders::find_render_target(int width, int height, UINT32 scr
 cache_target* shaders::find_cache_target(UINT32 screen_index, int width, int height)
 {
 	cache_target *curr = cachehead;
-	while (curr != NULL && (
+	while (curr != nullptr && (
 		curr->screen_index != screen_index ||
 		curr->width != width ||
 		curr->height != height))
@@ -1410,7 +1415,7 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
+	curr_effect->set_texture("ShadowTexture", shadow_texture == nullptr ? nullptr : shadow_texture->get_finaltex());
 	curr_effect->set_int("ShadowTileMode", options->shadow_mask_tile_mode);
 	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[next_index]);
 	curr_effect->set_vector("BackColor", 3, back_color);
@@ -1640,7 +1645,7 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 	// we do not clear the backbuffe here because multiple screens might rendered into
 	blit(backbuffer, false, poly->get_type(), vertnum, poly->get_count());
 
-	if (avi_output_file != NULL)
+	if (avi_output_file != nullptr)
 	{
 		blit(avi_final_target, false, poly->get_type(), vertnum, poly->get_count());
 	}
@@ -1662,7 +1667,7 @@ void shaders::menu_pass(poly_info *poly, int vertnum)
 	curr_effect->set_bool("PostPass", false);
 	curr_effect->set_float("Brighten", 0.0f);
 
-	blit(NULL, false, poly->get_type(), vertnum, poly->get_count());
+	blit(nullptr, false, poly->get_type(), vertnum, poly->get_count());
 }
 
 
@@ -1680,14 +1685,14 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	curr_texture = poly->get_texture();
 	curr_poly = poly;
 
-	if (PRIMFLAG_GET_SCREENTEX(d3d->get_last_texture_flags()) && curr_texture != NULL)
+	if (PRIMFLAG_GET_SCREENTEX(d3d->get_last_texture_flags()) && curr_texture != nullptr)
 	{
 		curr_screen = curr_screen < num_screens ? curr_screen : 0;
 
 		curr_render_target = find_render_target(curr_texture);
 
 		d3d_render_target *rt = curr_render_target;
-		if (rt == NULL)
+		if (rt == nullptr)
 		{
 			return;
 		}
@@ -1733,7 +1738,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		curr_render_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
 
 		d3d_render_target *rt = curr_render_target;
-		if (rt == NULL)
+		if (rt == nullptr)
 		{
 			return;
 		}
@@ -1755,7 +1760,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		curr_render_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
 
 		d3d_render_target *rt = curr_render_target;
-		if (rt == NULL)
+		if (rt == nullptr)
 		{
 			return;
 		}
@@ -1798,9 +1803,9 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		menu_pass(poly, vertnum);
 	}
 
-	curr_render_target = NULL;
-	curr_texture = NULL;
-	curr_poly = NULL;
+	curr_render_target = nullptr;
+	curr_texture = nullptr;
+	curr_poly = nullptr;
 }
 
 
@@ -1842,7 +1847,7 @@ bool shaders::add_cache_target(renderer_d3d9* d3d, texture_info* info, int width
 		return false;
 	}
 
-	if (info != NULL)
+	if (info != nullptr)
 	{
 		target->width = info->get_texinfo().width;
 		target->height = info->get_texinfo().height;
@@ -1854,11 +1859,11 @@ bool shaders::add_cache_target(renderer_d3d9* d3d, texture_info* info, int width
 	}
 
 	target->next = cachehead;
-	target->prev = NULL;
+	target->prev = nullptr;
 
 	target->screen_index = screen_index;
 
-	if (cachehead != NULL)
+	if (cachehead != nullptr)
 	{
 		cachehead->prev = target;
 	}
@@ -1871,7 +1876,7 @@ d3d_render_target* shaders::get_vector_target()
 {
 	if (!vector_enable)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	return find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
@@ -1879,7 +1884,7 @@ d3d_render_target* shaders::get_vector_target()
 
 void shaders::create_vector_target(render_primitive *prim)
 {
-	if (!add_render_target(d3d, NULL, d3d->get_width(), d3d->get_height(), 1, 1))
+	if (!add_render_target(d3d, nullptr, d3d->get_width(), d3d->get_height(), 1, 1))
 	{
 		vector_enable = false;
 	}
@@ -1894,10 +1899,10 @@ bool shaders::add_render_target(renderer_d3d9* d3d, texture_info* info, int widt
 {
 	UINT32 screen_index = 0;
 	UINT32 page_index = 0;
-	if (info != NULL)
+	if (info != nullptr)
 	{
 		d3d_render_target *existing_target = find_render_target(info);
-		if (existing_target != NULL)
+		if (existing_target != nullptr)
 		{
 			remove_render_target(existing_target);
 		}
@@ -1909,7 +1914,7 @@ bool shaders::add_render_target(renderer_d3d9* d3d, texture_info* info, int widt
 	else
 	{
 		d3d_render_target *existing_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
-		if (existing_target != NULL)
+		if (existing_target != nullptr)
 		{
 			remove_render_target(existing_target);
 		}
@@ -1923,7 +1928,7 @@ bool shaders::add_render_target(renderer_d3d9* d3d, texture_info* info, int widt
 		return false;
 	}
 
-	if (info != NULL)
+	if (info != nullptr)
 	{
 		target->width = info->get_texinfo().width;
 		target->height = info->get_texinfo().height;
@@ -1936,7 +1941,7 @@ bool shaders::add_render_target(renderer_d3d9* d3d, texture_info* info, int widt
 
 	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, target->prescale_target[0]);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
+	result = (*d3dintf->device.clear)(d3d->get_device(), 0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
 	result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
@@ -1945,7 +1950,7 @@ bool shaders::add_render_target(renderer_d3d9* d3d, texture_info* info, int widt
 	target->page_index = page_index;
 
 	cache_target* cache = find_cache_target(target->screen_index, target->width, target->height);
-	if (cache == NULL)
+	if (cache == nullptr)
 	{
 		if (!add_cache_target(d3d, info, width, height, xprescale, yprescale, target->screen_index))
 		{
@@ -1955,9 +1960,9 @@ bool shaders::add_render_target(renderer_d3d9* d3d, texture_info* info, int widt
 	}
 
 	target->next = targethead;
-	target->prev = NULL;
+	target->prev = nullptr;
 
-	if (targethead != NULL)
+	if (targethead != nullptr)
 	{
 		targethead->prev = target;
 	}
@@ -2041,16 +2046,16 @@ void shaders::delete_resources(bool reset)
 		return;
 	}
 
-	if (options != NULL)
+	if (options != nullptr)
 	{
 		last_options = *options;
-		options = NULL;
+		options = nullptr;
 	}
 
 	initialized = false;
 
 	cache_target *currcache = cachehead;
-	while(cachehead != NULL)
+	while(cachehead != nullptr)
 	{
 		cachehead = currcache->next;
 		global_free(currcache);
@@ -2058,113 +2063,113 @@ void shaders::delete_resources(bool reset)
 	}
 
 	d3d_render_target *currtarget = targethead;
-	while(targethead != NULL)
+	while(targethead != nullptr)
 	{
 		targethead = currtarget->next;
 		global_free(currtarget);
 		currtarget = targethead;
 	}
 
-	if (downsample_effect != NULL)
+	if (downsample_effect != nullptr)
 	{
 		delete downsample_effect;
-		downsample_effect = NULL;
+		downsample_effect = nullptr;
 	}
-	if (bloom_effect != NULL)
+	if (bloom_effect != nullptr)
 	{
 		delete bloom_effect;
-		bloom_effect = NULL;
+		bloom_effect = nullptr;
 	}
-	if (vector_effect != NULL)
+	if (vector_effect != nullptr)
 	{
 		delete vector_effect;
-		vector_effect = NULL;
+		vector_effect = nullptr;
 	}
-	if (default_effect != NULL)
+	if (default_effect != nullptr)
 	{
 		delete default_effect;
-		default_effect = NULL;
+		default_effect = nullptr;
 	}
-	if (post_effect != NULL)
+	if (post_effect != nullptr)
 	{
 		delete post_effect;
-		post_effect = NULL;
+		post_effect = nullptr;
 	}
-	if (distortion_effect != NULL)
+	if (distortion_effect != nullptr)
 	{
 		delete distortion_effect;
-		distortion_effect = NULL;
+		distortion_effect = nullptr;
 	}
-	if (prescale_effect != NULL)
+	if (prescale_effect != nullptr)
 	{
 		delete prescale_effect;
-		prescale_effect = NULL;
+		prescale_effect = nullptr;
 	}
-	if (phosphor_effect != NULL)
+	if (phosphor_effect != nullptr)
 	{
 		delete phosphor_effect;
-		phosphor_effect = NULL;
+		phosphor_effect = nullptr;
 	}
-	if (focus_effect != NULL)
+	if (focus_effect != nullptr)
 	{
 		delete focus_effect;
-		focus_effect = NULL;
+		focus_effect = nullptr;
 	}
-	if (deconverge_effect != NULL)
+	if (deconverge_effect != nullptr)
 	{
 		delete deconverge_effect;
-		deconverge_effect = NULL;
+		deconverge_effect = nullptr;
 	}
-	if (color_effect != NULL)
+	if (color_effect != nullptr)
 	{
 		delete color_effect;
-		color_effect = NULL;
+		color_effect = nullptr;
 	}
-	if (ntsc_effect != NULL)
+	if (ntsc_effect != nullptr)
 	{
 		delete ntsc_effect;
-		ntsc_effect = NULL;
+		ntsc_effect = nullptr;
 	}
 
-	if (backbuffer != NULL)
+	if (backbuffer != nullptr)
 	{
 		(*d3dintf->surface.release)(backbuffer);
-		backbuffer = NULL;
+		backbuffer = nullptr;
 	}
 
-	if (black_surface != NULL)
+	if (black_surface != nullptr)
 	{
 		(*d3dintf->surface.release)(black_surface);
-		black_surface = NULL;
+		black_surface = nullptr;
 	}
-	if (black_texture != NULL)
+	if (black_texture != nullptr)
 	{
 		(*d3dintf->texture.release)(black_texture);
-		black_texture = NULL;
+		black_texture = nullptr;
 	}
 
-	if (avi_copy_texture != NULL)
+	if (avi_copy_texture != nullptr)
 	{
 		(*d3dintf->texture.release)(avi_copy_texture);
-		avi_copy_texture = NULL;
+		avi_copy_texture = nullptr;
 	}
 
-	if (avi_copy_surface != NULL)
+	if (avi_copy_surface != nullptr)
 	{
 		(*d3dintf->surface.release)(avi_copy_surface);
-		avi_copy_surface = NULL;
+		avi_copy_surface = nullptr;
 	}
 
-	if (avi_final_texture != NULL)
+	if (avi_final_texture != nullptr)
 	{
 		(*d3dintf->texture.release)(avi_final_texture);
-		avi_final_texture = NULL;
+		avi_final_texture = nullptr;
 	}
 
-	if (avi_final_target != NULL)
+	if (avi_final_target != nullptr)
 	{
 		(*d3dintf->surface.release)(avi_final_target);
-		avi_final_target = NULL;
+		avi_final_target = nullptr;
 	}
 
 	shadow_bitmap.reset();
@@ -2229,619 +2234,74 @@ static slider_state *slider_alloc(running_machine &machine, int id, const char *
 //  assorted global slider accessors
 //============================================================
 
-static INT32 slider_set(float *option, float scale, const char *fmt, std::string *str, INT32 newval)
+enum slider_type
 {
-	if (option != NULL && newval != SLIDER_NOCHANGE)
+	SLIDER_FLOAT,
+	SLIDER_INT_ENUM,
+	SLIDER_INT,
+	SLIDER_COLOR,
+	SLIDER_VEC2
+};
+
+INT32 slider::update(std::string *str, INT32 newval)
+{
+	switch (m_desc->slider_type)
 	{
-		*option = (float)newval * scale;
+		case SLIDER_INT_ENUM:
+		{
+			INT32 *val_ptr = reinterpret_cast<INT32 *>(m_value);
+			*m_dirty = true;
+			if (newval != SLIDER_NOCHANGE)
+			{
+				*val_ptr = newval;
+			}
+			if (str != nullptr)
+			{
+				strprintf(*str, m_desc->format, m_desc->strings[*val_ptr]);
+			}
+			return *val_ptr;
+		}
+
+		case SLIDER_INT:
+		{
+			int *val_ptr = reinterpret_cast<int *>(m_value);
+			*m_dirty = true;
+			if (newval != SLIDER_NOCHANGE)
+			{
+				*val_ptr = newval;
+			}
+			if (str != nullptr)
+			{
+				strprintf(*str, m_desc->format, *val_ptr);
+			}
+			return *val_ptr;
+		}
+
+		default:
+		{
+			float *val_ptr = reinterpret_cast<float *>(m_value);
+			*m_dirty = true;
+			if (newval != SLIDER_NOCHANGE)
+			{
+				*val_ptr = (float)newval * m_desc->scale;
+			}
+			if (str != nullptr)
+			{
+				strprintf(*str, m_desc->format, *val_ptr);
+			}
+			return (INT32)floor(*val_ptr / m_desc->scale + 0.5f);
+		}
 	}
-	if (str != NULL)
+	return 0;
+}
+
+static INT32 slider_update_trampoline(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	if (arg != nullptr)
 	{
-		strprintf(*str, fmt, *option);
+		return reinterpret_cast<slider *>(arg)->update(str, newval);
 	}
-
-	return floor(*option / scale + 0.5f);
-}
-
-static INT32 slider_shadow_mask_tile_mode(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	hlsl_options *options = (hlsl_options*)arg;
-	if (newval != SLIDER_NOCHANGE)
-	{
-		options->shadow_mask_tile_mode = newval;
-	}
-	if (str != NULL)
-	{
-		strprintf(*str, "%s", options->shadow_mask_tile_mode == 0 ? "Screen" : "Source");
-	}
-	options->params_dirty = true;
-
-	return options->shadow_mask_tile_mode;
-}
-
-static INT32 slider_shadow_mask_alpha(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->shadow_mask_alpha), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_shadow_mask_x_count(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	hlsl_options *options = (hlsl_options*)arg;
-	if (newval != SLIDER_NOCHANGE)
-	{
-		options->shadow_mask_count_x = newval;
-	}
-	if (str != NULL)
-	{
-		strprintf(*str, "%d", options->shadow_mask_count_x);
-	}
-	options->params_dirty = true;
-
-	return options->shadow_mask_count_x;
-}
-
-static INT32 slider_shadow_mask_y_count(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	hlsl_options *options = (hlsl_options*)arg;
-	if (newval != SLIDER_NOCHANGE)
-	{
-		options->shadow_mask_count_y = newval;
-	}
-	if (str != NULL)
-	{
-		strprintf(*str, "%d", options->shadow_mask_count_y);
-	}
-	options->params_dirty = true;
-
-	return options->shadow_mask_count_y;
-}
-
-static INT32 slider_shadow_mask_usize(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->shadow_mask_u_size), 1.0f / 32.0f, "%2.5f", str, newval);
-}
-
-static INT32 slider_shadow_mask_vsize(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->shadow_mask_v_size), 1.0f / 32.0f, "%2.5f", str, newval);
-}
-
-static INT32 slider_shadow_mask_uoffset(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->shadow_mask_u_offset), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_shadow_mask_voffset(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->shadow_mask_v_offset), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_curvature(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->curvature), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_round_corner(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->round_corner), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_smooth_border(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->smooth_border), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_reflection(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->reflection), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_vignetting(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->vignetting), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_scanline_alpha(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->scanline_alpha), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_scanline_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->scanline_scale), 0.05f, "%2.2f", str, newval);
-}
-
-static INT32 slider_scanline_height(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->scanline_height), 0.05f, "%2.2f", str, newval);
-}
-
-static INT32 slider_scanline_bright_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->scanline_bright_scale), 0.05f, "%2.2f", str, newval);
-}
-
-static INT32 slider_scanline_bright_offset(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->scanline_bright_offset), 0.05f, "%2.2f", str, newval);
-}
-
-static INT32 slider_scanline_jitter(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->scanline_jitter), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_hum_bar_alpha(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->hum_bar_alpha), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_defocus_x(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->defocus[0]), 0.1f, "%2.1f", str, newval);
-}
-
-static INT32 slider_defocus_y(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->defocus[1]), 0.1f, "%2.1f", str, newval);
-}
-
-static INT32 slider_red_converge_x(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->converge_x[0]), 0.1f, "%3.1f", str, newval);
-}
-
-static INT32 slider_red_converge_y(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->converge_y[0]), 0.1f, "%3.1f", str, newval);
-}
-
-static INT32 slider_green_converge_x(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->converge_x[1]), 0.1f, "%3.1f", str, newval);
-}
-
-static INT32 slider_green_converge_y(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->converge_y[1]), 0.1f, "%3.1f", str, newval);
-}
-
-static INT32 slider_blue_converge_x(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->converge_x[2]), 0.1f, "%3.1f", str, newval);
-}
-
-static INT32 slider_blue_converge_y(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->converge_y[2]), 0.1f, "%3.1f", str, newval);
-}
-
-static INT32 slider_red_radial_converge_x(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->radial_converge_x[0]), 0.1f, "%3.1f", str, newval);
-}
-
-static INT32 slider_red_radial_converge_y(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->radial_converge_y[0]), 0.1f, "%3.1f", str, newval);
-}
-
-static INT32 slider_green_radial_converge_x(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->radial_converge_x[1]), 0.1f, "%3.1f", str, newval);
-}
-
-static INT32 slider_green_radial_converge_y(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->radial_converge_y[1]), 0.1f, "%3.1f", str, newval);
-}
-
-static INT32 slider_blue_radial_converge_x(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->radial_converge_x[2]), 0.1f, "%3.1f", str, newval);
-}
-
-static INT32 slider_blue_radial_converge_y(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->radial_converge_y[2]), 0.1f, "%3.1f", str, newval);
-}
-
-static INT32 slider_red_from_r(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->red_ratio[0]), 0.005f, "%2.3f", str, newval);
-}
-
-static INT32 slider_red_from_g(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->red_ratio[1]), 0.005f, "%2.3f", str, newval);
-}
-
-static INT32 slider_red_from_b(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->red_ratio[2]), 0.005f, "%2.3f", str, newval);
-}
-
-static INT32 slider_green_from_r(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->grn_ratio[0]), 0.005f, "%2.3f", str, newval);
-}
-
-static INT32 slider_green_from_g(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->grn_ratio[1]), 0.005f, "%2.3f", str, newval);
-}
-
-static INT32 slider_green_from_b(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->grn_ratio[2]), 0.005f, "%2.3f", str, newval);
-}
-
-static INT32 slider_blue_from_r(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->blu_ratio[0]), 0.005f, "%2.3f", str, newval);
-}
-
-static INT32 slider_blue_from_g(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->blu_ratio[1]), 0.005f, "%2.3f", str, newval);
-}
-
-static INT32 slider_blue_from_b(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->blu_ratio[2]), 0.005f, "%2.3f", str, newval);
-}
-
-static INT32 slider_red_offset(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->offset[0]), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_green_offset(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->offset[1]), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_blue_offset(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->offset[2]), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_red_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->scale[0]), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_green_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->scale[1]), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_blue_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->scale[2]), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_red_power(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->power[0]), 0.05f, "%2.2f", str, newval);
-}
-
-static INT32 slider_green_power(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->power[1]), 0.05f, "%2.2f", str, newval);
-}
-
-static INT32 slider_blue_power(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->power[2]), 0.05f, "%2.2f", str, newval);
-}
-
-static INT32 slider_red_floor(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->floor[0]), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_green_floor(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->floor[1]), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_blue_floor(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->floor[2]), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_red_phosphor_life(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->phosphor[0]), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_green_phosphor_life(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->phosphor[1]), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_blue_phosphor_life(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->phosphor[2]), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_saturation(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->saturation), 0.01f, "%2.2f", str, newval);
-}
-
-static INT32 slider_vector_attenuation(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->vector_length_scale), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_vector_length_max(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->vector_length_ratio), 1.0f, "%4f", str, newval);
-}
-
-static INT32 slider_bloom_blend_mode(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	hlsl_options *options = (hlsl_options*)arg;
-	if (newval != SLIDER_NOCHANGE)
-	{
-		options->bloom_blend_mode = newval;
-	}
-	if (str != NULL)
-	{
-		strprintf(*str, "%s", options->bloom_blend_mode == 0 ? "Addition" : "Darken");
-	}
-	options->params_dirty = true;
-
-	return options->bloom_blend_mode;
-}
-
-static INT32 slider_bloom_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->bloom_scale), 0.001f, "%1.3f", str, newval);
-}
-
-static INT32 slider_bloom_red_overdrive(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->bloom_overdrive[0]), 0.001f, "%1.3f", str, newval);
-}
-
-static INT32 slider_bloom_green_overdrive(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->bloom_overdrive[1]), 0.001f, "%1.3f", str, newval);
-}
-
-static INT32 slider_bloom_blue_overdrive(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->bloom_overdrive[2]), 0.001f, "%1.3f", str, newval);
-}
-
-static INT32 slider_bloom_lvl0_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->bloom_level0_weight), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_bloom_lvl1_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->bloom_level1_weight), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_bloom_lvl2_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->bloom_level2_weight), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_bloom_lvl3_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->bloom_level3_weight), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_bloom_lvl4_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->bloom_level4_weight), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_bloom_lvl5_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->bloom_level5_weight), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_bloom_lvl6_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->bloom_level6_weight), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_bloom_lvl7_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->bloom_level7_weight), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_bloom_lvl8_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->bloom_level8_weight), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_bloom_lvl9_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->bloom_level9_weight), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_bloom_lvl10_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->bloom_level10_weight), 0.01f, "%1.2f", str, newval);
-}
-
-
-static INT32 slider_ntsc_enable(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	hlsl_options *options = (hlsl_options*)arg;
-	if (newval != SLIDER_NOCHANGE)
-	{
-		options->yiq_enable = newval;
-	}
-	if (str != NULL)
-	{
-		strprintf(*str, "%s", options->yiq_enable == 0 ? "Off" : "On");
-	}
-	options->params_dirty = true;
-
-	return options->yiq_enable;
-}
-
-// static INT32 slider_ntsc_phase_count(running_machine &machine, void *arg, std::string *str, INT32 newval)
-// {
-//  hlsl_options *options = (hlsl_options*)arg;
-//  if (newval != SLIDER_NOCHANGE)
-//  {
-//      options->yiq_phase_count = newval;
-//  }
-//  if (str != NULL)
-//  {
-//      strprintf(*str, "%d", options->yiq_phase_count);
-//  }
-//  options->params_dirty = true;
-
-//  return options->yiq_phase_count;
-// }
-
-static INT32 slider_ntsc_jitter(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->yiq_jitter), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_ntsc_a_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->yiq_a), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_ntsc_b_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->yiq_b), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_ntsc_p_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->yiq_p), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_ntsc_o_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->yiq_o), 0.01f, "%1.2f", str, newval);
-}
-
-static INT32 slider_ntsc_cc_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->yiq_cc), 0.0001f, "%1.4f", str, newval);
-}
-
-static INT32 slider_ntsc_n_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->yiq_n), 0.01f, "%1.4f", str, newval);
-}
-
-static INT32 slider_ntsc_y_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->yiq_y), 0.01f, "%1.4f", str, newval);
-}
-
-static INT32 slider_ntsc_i_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->yiq_i), 0.01f, "%1.4f", str, newval);
-}
-
-static INT32 slider_ntsc_q_value(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->yiq_q), 0.01f, "%1.4f", str, newval);
-}
-
-static INT32 slider_ntsc_scan_time(running_machine &machine, void *arg, std::string *str, INT32 newval)
-{
-	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->yiq_scan_time), 0.01f, "%1.2f", str, newval);
+	return 0;
 }
 
 hlsl_options shaders::last_options = { false };
@@ -2870,50 +2330,23 @@ enum slider_option
 	SLIDER_SCANLINE_BRIGHT_OFFSET,
 	SLIDER_SCANLINE_JITTER,
 	SLIDER_HUM_BAR_ALPHA,
-	SLIDER_DEFOCUS_X,
-	SLIDER_DEFOCUS_Y,
-	SLIDER_RED_CONVERGE_X,
-	SLIDER_RED_CONVERGE_Y,
-	SLIDER_GREEN_CONVERGE_X,
-	SLIDER_GREEN_CONVERGE_Y,
-	SLIDER_BLUE_CONVERGE_X,
-	SLIDER_BLUE_CONVERGE_Y,
-	SLIDER_RED_RADIAL_CONVERGE_X,
-	SLIDER_RED_RADIAL_CONVERGE_Y,
-	SLIDER_GREEN_RADIAL_CONVERGE_X,
-	SLIDER_GREEN_RADIAL_CONVERGE_Y,
-	SLIDER_BLUE_RADIAL_CONVERGE_X,
-	SLIDER_BLUE_RADIAL_CONVERGE_Y,
-	SLIDER_RED_FROM_R,
-	SLIDER_RED_FROM_G,
-	SLIDER_RED_FROM_B,
-	SLIDER_GREEN_FROM_R,
-	SLIDER_GREEN_FROM_G,
-	SLIDER_GREEN_FROM_B,
-	SLIDER_BLUE_FROM_R,
-	SLIDER_BLUE_FROM_G,
-	SLIDER_BLUE_FROM_B,
+	SLIDER_DEFOCUS,
+	SLIDER_CONVERGE_X,
+	SLIDER_CONVERGE_Y,
+	SLIDER_RADIAL_CONVERGE_X,
+	SLIDER_RADIAL_CONVERGE_Y,
+	SLIDER_RED_RATIO,
+	SLIDER_GREEN_RATIO,
+	SLIDER_BLUE_RATIO,
 	SLIDER_SATURATION,
-	SLIDER_RED_OFFSET,
-	SLIDER_GREEN_OFFSET,
-	SLIDER_BLUE_OFFSET,
-	SLIDER_RED_SCALE,
-	SLIDER_GREEN_SCALE,
-	SLIDER_BLUE_SCALE,
-	SLIDER_RED_POWER,
-	SLIDER_GREEN_POWER,
-	SLIDER_BLUE_POWER,
-	SLIDER_RED_FLOOR,
-	SLIDER_GREEN_FLOOR,
-	SLIDER_BLUE_FLOOR,
-	SLIDER_RED_PHOSPHOR,
-	SLIDER_GREEN_PHOSPHOR,
-	SLIDER_BLUE_PHOSPHOR,
+	SLIDER_OFFSET,
+	SLIDER_SCALE,
+	SLIDER_POWER,
+	SLIDER_FLOOR,
+	SLIDER_PHOSPHOR,
 	SLIDER_BLOOM_BLEND_MODE,
 	SLIDER_BLOOM_SCALE,
-	SLIDER_BLOOM_RED_OVERDRIVE,
-	SLIDER_BLOOM_GREEN_OVERDRIVE,
-	SLIDER_BLOOM_BLUE_OVERDRIVE,
+	SLIDER_BLOOM_OVERDRIVE,
 	SLIDER_BLOOM_LVL0_SCALE,
 	SLIDER_BLOOM_LVL1_SCALE,
 	SLIDER_BLOOM_LVL2_SCALE,
@@ -2939,98 +2372,81 @@ enum slider_option
 	SLIDER_NTSC_SCAN_TIME
 };
 
-shaders::slider_desc shaders::s_sliders[] =
+enum slider_screen_type
 {
-	{ "Vector Length Attenuation",           0,    50,   100, 1, SLIDER_SCREEN_TYPE_VECTOR, slider_vector_attenuation, SLIDER_VECTOR_ATTENUATION },
-	{ "Vector Attenuation Length Limit",     1,   500,  1000, 1, SLIDER_SCREEN_TYPE_VECTOR, slider_vector_length_max, SLIDER_VECTOR_LENGTH_MAX },
-	{ "Shadow Mask Tile Mode",               0,     0,     1, 1, SLIDER_SCREEN_TYPE_ANY, slider_shadow_mask_tile_mode, SLIDER_SHADOW_MASK_TILE_MODE },
-	{ "Shadow Mask Darkness",                0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_shadow_mask_alpha, SLIDER_SHADOW_MASK_ALPHA },
-	{ "Shadow Mask X Count",                 1,     1,  1024, 1, SLIDER_SCREEN_TYPE_ANY, slider_shadow_mask_x_count, SLIDER_SHADOW_MASK_X_COUNT },
-	{ "Shadow Mask Y Count",                 1,     1,  1024, 1, SLIDER_SCREEN_TYPE_ANY, slider_shadow_mask_y_count, SLIDER_SHADOW_MASK_Y_COUNT },
-	{ "Shadow Mask Pixel Count X",           1,     1,    64, 1, SLIDER_SCREEN_TYPE_ANY, slider_shadow_mask_usize, SLIDER_SHADOW_MASK_U_SIZE },
-	{ "Shadow Mask Pixel Count Y",           1,     1,    64, 1, SLIDER_SCREEN_TYPE_ANY, slider_shadow_mask_vsize, SLIDER_SHADOW_MASK_V_SIZE },
-	{ "Shadow Mask Offset X",             -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_shadow_mask_uoffset, SLIDER_SHADOW_MASK_U_OFFSET },
-	{ "Shadow Mask Offset Y",             -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_shadow_mask_voffset, SLIDER_SHADOW_MASK_V_OFFSET },
-	{ "Screen Curvature",                    0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_curvature, SLIDER_CURVATURE },
-	{ "Screen Round Corner",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_round_corner, SLIDER_ROUND_CORNER },
-	{ "Screen Smooth Border",                0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_smooth_border, SLIDER_SMOOTH_BORDER },
-	{ "Screen Reflection",                   0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_reflection, SLIDER_REFLECTION },
-	{ "Image Vignetting",                    0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_vignetting, SLIDER_VIGNETTING },
-	{ "Scanline Darkness",                   0,     0,   100, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_scanline_alpha, SLIDER_SCANLINE_ALPHA },
-	{ "Scanline Screen Height",              1,    20,    80, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_scanline_scale, SLIDER_SCANLINE_SCALE },
-	{ "Scanline Indiv. Height",              1,    20,    80, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_scanline_height, SLIDER_SCANLINE_HEIGHT },
-	{ "Scanline Brightness",                 0,    20,    40, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_scanline_bright_scale, SLIDER_SCANLINE_BRIGHT_SCALE },
-	{ "Scanline Brightness Overdrive",       0,     0,    20, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_scanline_bright_offset, SLIDER_SCANLINE_BRIGHT_OFFSET },
-	{ "Scanline Jitter",                     0,     0,   100, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_scanline_jitter, SLIDER_SCANLINE_JITTER },
-	{ "Hum Bar Darkness",                    0,     0,   100, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_hum_bar_alpha, SLIDER_HUM_BAR_ALPHA },
-	{ "Defocus X",                           0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_defocus_x, SLIDER_DEFOCUS_X },
-	{ "Defocus Y",                           0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_defocus_y, SLIDER_DEFOCUS_Y },
-	{ "Red Position Offset X",            -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_converge_x, SLIDER_RED_CONVERGE_X },
-	{ "Red Position Offset Y",            -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_converge_y, SLIDER_RED_CONVERGE_Y },
-	{ "Green Position Offset X",          -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_converge_x, SLIDER_GREEN_CONVERGE_X },
-	{ "Green Position Offset Y",          -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_converge_y, SLIDER_GREEN_CONVERGE_Y },
-	{ "Blue Position Offset X",           -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_converge_x, SLIDER_BLUE_CONVERGE_X },
-	{ "Blue Position Offset Y",           -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_converge_y, SLIDER_BLUE_CONVERGE_Y },
-	{ "Red Convergence X",                -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_radial_converge_x, SLIDER_RED_RADIAL_CONVERGE_X },
-	{ "Red Convergence Y",                -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_radial_converge_y, SLIDER_RED_RADIAL_CONVERGE_Y },
-	{ "Green Convergence X",              -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_radial_converge_x, SLIDER_GREEN_RADIAL_CONVERGE_X },
-	{ "Green Convergence Y",              -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_radial_converge_y, SLIDER_GREEN_RADIAL_CONVERGE_Y },
-	{ "Blue Convergence X",               -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_radial_converge_x, SLIDER_BLUE_RADIAL_CONVERGE_X },
-	{ "Blue Convergence Y",               -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_radial_converge_y, SLIDER_BLUE_RADIAL_CONVERGE_Y },
-	{ "Red Output from Red Input",        -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_red_from_r, SLIDER_RED_FROM_R },
-	{ "Red Output from Green Input",      -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_red_from_g, SLIDER_RED_FROM_G },
-	{ "Red Output from Blue Input",       -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_red_from_b, SLIDER_RED_FROM_B },
-	{ "Green Output from Red Input",      -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_green_from_r, SLIDER_GREEN_FROM_R },
-	{ "Green Output from Green Input",    -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_green_from_g, SLIDER_GREEN_FROM_G },
-	{ "Green Output from Blue Input",     -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_green_from_b, SLIDER_GREEN_FROM_B },
-	{ "Blue Output from Red Input",       -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_blue_from_r, SLIDER_BLUE_FROM_R },
-	{ "Blue Output from Green Input",     -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_blue_from_g, SLIDER_BLUE_FROM_G },
-	{ "Blue Output from Blue Input",      -400,     0,   400, 5, SLIDER_SCREEN_TYPE_ANY, slider_blue_from_b, SLIDER_BLUE_FROM_B },
-	{ "Saturation",                          0,   100,   400, 1, SLIDER_SCREEN_TYPE_ANY, slider_saturation, SLIDER_SATURATION },
-	{ "Red DC Offset",                    -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_offset, SLIDER_RED_OFFSET },
-	{ "Green DC Offset",                  -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_offset, SLIDER_GREEN_OFFSET },
-	{ "Blue DC Offset",                   -100,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_offset, SLIDER_BLUE_OFFSET },
-	{ "Red Scale",                        -200,   100,   200, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_scale, SLIDER_RED_SCALE },
-	{ "Green Scale",                      -200,   100,   200, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_scale, SLIDER_GREEN_SCALE },
-	{ "Blue Scale",                       -200,   100,   200, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_scale, SLIDER_BLUE_SCALE },
-	{ "Red Gamma",                         -80,     0,    80, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_power, SLIDER_RED_POWER },
-	{ "Green Gamma",                       -80,     0,    80, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_power, SLIDER_GREEN_POWER },
-	{ "Blue Gamma",                        -80,     0,    80, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_power, SLIDER_BLUE_POWER },
-	{ "Red Floor",                           0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_floor, SLIDER_RED_FLOOR },
-	{ "Green Floor",                         0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_floor, SLIDER_GREEN_FLOOR },
-	{ "Blue Floor",                          0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_floor, SLIDER_BLUE_FLOOR },
-	{ "Red Phosphor Life",                   0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_red_phosphor_life, SLIDER_RED_PHOSPHOR },
-	{ "Green Phosphor Life",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_green_phosphor_life, SLIDER_GREEN_PHOSPHOR },
-	{ "Blue Phosphor Life",                  0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_blue_phosphor_life, SLIDER_BLUE_PHOSPHOR },
-	{ "Bloom Blend Mode",                    0,     0,     1, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_blend_mode, SLIDER_BLOOM_BLEND_MODE },
-	{ "Bloom Scale",                         0,     0,  2000, 5, SLIDER_SCREEN_TYPE_ANY, slider_bloom_scale, SLIDER_BLOOM_SCALE },
-	{ "Bloom Red Overdrive",                 0,     0,  2000, 5, SLIDER_SCREEN_TYPE_ANY, slider_bloom_red_overdrive, SLIDER_BLOOM_RED_OVERDRIVE },
-	{ "Bloom Green Overdrive",               0,     0,  2000, 5, SLIDER_SCREEN_TYPE_ANY, slider_bloom_green_overdrive, SLIDER_BLOOM_GREEN_OVERDRIVE },
-	{ "Bloom Blue Overdrive",                0,     0,  2000, 5, SLIDER_SCREEN_TYPE_ANY, slider_bloom_blue_overdrive, SLIDER_BLOOM_BLUE_OVERDRIVE },
-	{ "Bloom Level 0 Scale",                 0,   100,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl0_scale, SLIDER_BLOOM_LVL0_SCALE },
-	{ "Bloom Level 1 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl1_scale, SLIDER_BLOOM_LVL1_SCALE },
-	{ "Bloom Level 2 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl2_scale, SLIDER_BLOOM_LVL2_SCALE },
-	{ "Bloom Level 3 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl3_scale, SLIDER_BLOOM_LVL3_SCALE },
-	{ "Bloom Level 4 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl4_scale, SLIDER_BLOOM_LVL4_SCALE },
-	{ "Bloom Level 5 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl5_scale, SLIDER_BLOOM_LVL5_SCALE },
-	{ "Bloom Level 6 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl6_scale, SLIDER_BLOOM_LVL6_SCALE },
-	{ "Bloom Level 7 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl7_scale, SLIDER_BLOOM_LVL7_SCALE },
-	{ "Bloom Level 8 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl8_scale, SLIDER_BLOOM_LVL8_SCALE },
-	{ "Bloom Level 9 Scale",                 0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl9_scale, SLIDER_BLOOM_LVL9_SCALE },
-	{ "Bloom Level 10 Scale",                0,     0,   100, 1, SLIDER_SCREEN_TYPE_ANY, slider_bloom_lvl10_scale, SLIDER_BLOOM_LVL10_SCALE },
-	{ "NTSC processing",                     0,     0,     1, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_enable, SLIDER_NTSC_ENABLE },
-	{ "Signal Jitter",                       0,     0,   100, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_jitter, SLIDER_NTSC_JITTER },
-	{ "A Value",                          -100,    50,   100, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_a_value, SLIDER_NTSC_A_VALUE },
-	{ "B Value",                          -100,    50,   100, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_b_value, SLIDER_NTSC_B_VALUE },
-	{ "Incoming Pixel Clock Scaling",     -300,   100,   300, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_p_value, SLIDER_NTSC_P_VALUE },
-	{ "Outgoing Color Carrier Phase",     -300,     0,   300, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_o_value, SLIDER_NTSC_O_VALUE },
-	{ "Color Carrier Frequency",             0, 35795, 60000, 5, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_cc_value, SLIDER_NTSC_CC_VALUE },
-	{ "Y Notch",                             0,   100,   600, 5, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_n_value, SLIDER_NTSC_N_VALUE },
-	{ "Y Frequency",                         0,   600,   600, 5, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_y_value, SLIDER_NTSC_Y_VALUE },
-	{ "I Frequency",                         0,   120,   600, 5, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_i_value, SLIDER_NTSC_I_VALUE },
-	{ "Q Frequency",                         0,    60,   600, 5, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_q_value, SLIDER_NTSC_Q_VALUE },
-	{ "Scanline Duration",                   0,  5260, 10000, 1, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, slider_ntsc_scan_time, SLIDER_NTSC_SCAN_TIME },
-	{ NULL, 0, 0, 0, 0, 0, NULL, -1 },
+	SLIDER_SCREEN_TYPE_NONE = 0,
+	SLIDER_SCREEN_TYPE_RASTER = 1,
+	SLIDER_SCREEN_TYPE_VECTOR = 2,
+	SLIDER_SCREEN_TYPE_LCD = 4,
+	SLIDER_SCREEN_TYPE_LCD_OR_RASTER = SLIDER_SCREEN_TYPE_RASTER | SLIDER_SCREEN_TYPE_LCD,
+	SLIDER_SCREEN_TYPE_ANY = SLIDER_SCREEN_TYPE_RASTER | SLIDER_SCREEN_TYPE_VECTOR | SLIDER_SCREEN_TYPE_LCD
+};
+
+slider_desc shaders::s_sliders[] =
+{
+	{ "Vector Length Attenuation",          0,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_ATTENUATION,      0.01f,    "%1.2f", {} },
+	{ "Vector Attenuation Length Limit",    1,   500,  1000, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_LENGTH_MAX,       1.0f,     "%4f",   {} },
+	{ "Shadow Mask Tile Mode",              0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_TILE_MODE,   0,        "%s",    { "Screen", "Source" } },
+	{ "Shadow Mask Darkness",               0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_ALPHA,       0.01f,    "%1.2f", {} },
+	{ "Shadow Mask X Count",                1,     1,  1024, 1, SLIDER_INT,      SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_X_COUNT,     0,        "%d",    {} },
+	{ "Shadow Mask Y Count",                1,     1,  1024, 1, SLIDER_INT,      SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_Y_COUNT,     0,        "%d",    {} },
+	{ "Shadow Mask Pixel Count X",          1,     1,    64, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_U_SIZE,      0.03125f, "%2.5f", {} },
+	{ "Shadow Mask Pixel Count Y",          1,     1,    64, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_V_SIZE,      0.03125f, "%2.5f", {} },
+	{ "Shadow Mask Offset X",            -100,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_U_OFFSET,    0.01f,    "%1.2f", {} },
+	{ "Shadow Mask Offset Y",            -100,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_V_OFFSET,    0.01f,    "%1.2f", {} },
+	{ "Screen Curvature",                   0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_CURVATURE,               0.01f,    "%2.2f", {} },
+	{ "Screen Round Corner",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_ROUND_CORNER,            0.01f,    "%1.2f", {} },
+	{ "Screen Smooth Border",               0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SMOOTH_BORDER,           0.01f,    "%1.2f", {} },
+	{ "Screen Reflection",                  0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_REFLECTION,              0.01f,    "%1.2f", {} },
+	{ "Image Vignetting",                   0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_VIGNETTING,              0.01f,    "%1.2f", {} },
+	{ "Scanline Darkness",                  0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_ALPHA,          0.01f,    "%1.2f", {} },
+	{ "Scanline Screen Height",             1,    20,    80, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_SCALE,          0.05f,    "%1.2f", {} },
+	{ "Scanline Indiv. Height",             1,    20,    80, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_HEIGHT,         0.05f,    "%1.2f", {} },
+	{ "Scanline Brightness",                0,    20,    40, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_BRIGHT_SCALE,   0.05f,    "%1.2f", {} },
+	{ "Scanline Brightness Overdrive",      0,     0,    20, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_BRIGHT_OFFSET,  0.05f,    "%1.2f", {} },
+	{ "Scanline Jitter",                    0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_JITTER,         0.01f,    "%1.2f", {} },
+	{ "Hum Bar Darkness",                   0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_HUM_BAR_ALPHA,           0.01f,    "%2.2f", {} },
+	{ "Defocus",                            0,     0,   100, 1, SLIDER_VEC2,     SLIDER_SCREEN_TYPE_ANY,           SLIDER_DEFOCUS,                 0.1f,     "%2.1f", {} },
+	{ "Position Offset X,",              -100,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_CONVERGE_X,              0.1f,     "%3.1f", {} },
+	{ "Position Offset Y,",              -100,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_CONVERGE_Y,              0.1f,     "%3.1f", {} },
+	{ "Convergence X,",                  -100,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_RADIAL_CONVERGE_X,       0.1f,     "%3.1f", {} },
+	{ "Convergence Y,",                  -100,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_RADIAL_CONVERGE_Y,       0.1f,     "%3.1f", {} },
+	{ "Red Input Percent in",            -400,     0,   400, 5, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_RED_RATIO,               0.005f,   "%2.3f", {} },
+	{ "Green Input Percent in",          -400,     0,   400, 5, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_GREEN_RATIO,             0.005f,   "%2.3f", {} },
+	{ "Blue Input Percent in",           -400,     0,   400, 5, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLUE_RATIO,              0.005f,   "%2.3f", {} },
+	{ "Saturation",                         0,   100,   400, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SATURATION,              0.1f,     "%2.2f", {} },
+	{ "DC Offset,",                      -100,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_OFFSET,                  0.01f,    "%2.2f", {} },
+	{ "Scale,",                          -200,   100,   200, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SCALE,                   0.01f,    "%2.2f", {} },
+	{ "Gamma,",                           -80,     0,    80, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_POWER,                   0.1f,     "%2.2f", {} },
+	{ "Floor,",                             0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_FLOOR,                   0.01f,    "%2.2f", {} },
+	{ "Phosphor Life,",                     0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_PHOSPHOR,                0.01f,    "%2.2f", {} },
+	{ "Bloom Blend Mode",                   0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY, 	       SLIDER_BLOOM_BLEND_MODE,        0,        "%s",    { "Brighten", "Darken" } },
+	{ "Bloom Scale",                        0,     0,  2000, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_SCALE,             0.001f,   "%1.3f", {} },
+	{ "Bloom Overdrive,",                   0,     0,  2000, 5, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_OVERDRIVE,         0.001f,   "%1.3f", {} },
+	{ "Bloom Level 0 Scale",                0,   100,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL0_SCALE,        0.01f,    "%1.2f", {} },
+	{ "Bloom Level 1 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL1_SCALE,        0.01f,    "%1.2f", {} },
+	{ "Bloom Level 2 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL2_SCALE,        0.01f,    "%1.2f", {} },
+	{ "Bloom Level 3 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL3_SCALE,        0.01f,    "%1.2f", {} },
+	{ "Bloom Level 4 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL4_SCALE,        0.01f,    "%1.2f", {} },
+	{ "Bloom Level 5 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL5_SCALE,        0.01f,    "%1.2f", {} },
+	{ "Bloom Level 6 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL6_SCALE,        0.01f,    "%1.2f", {} },
+	{ "Bloom Level 7 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL7_SCALE,        0.01f,    "%1.2f", {} },
+	{ "Bloom Level 8 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL8_SCALE,        0.01f,    "%1.2f", {} },
+	{ "Bloom Level 9 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL9_SCALE,        0.01f,    "%1.2f", {} },
+	{ "Bloom Level 10 Scale",               0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL10_SCALE,       0.01f,    "%1.2f", {} },
+	{ "NTSC processing",                    0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_ENABLE,             0,        "%s",    { "Off", "On" } },
+	{ "Signal Jitter",                      0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_JITTER,             0.01f,    "%1.2f", {} },
+	{ "A Value",                         -100,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_A_VALUE,            0.01f,    "%1.2f", {} },
+	{ "B Value",                         -100,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_B_VALUE,            0.01f,    "%1.2f", {} },
+	{ "Incoming Pixel Clock Scaling",    -300,   100,   300, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_P_VALUE,            0.01f,    "%1.2f", {} },
+	{ "Outgoing Color Carrier Phase",    -300,     0,   300, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_O_VALUE,            0.01f,    "%1.2f", {} },
+	{ "Color Carrier Frequency",            0, 35795, 60000, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_CC_VALUE,           0.001f,   "%1.4f", {} },
+	{ "Y Notch",                            0,   100,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_N_VALUE,            0.01f,    "%1.4f", {} },
+	{ "Y Frequency",                        0,   600,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_Y_VALUE,            0.01f,    "%1.4f", {} },
+	{ "I Frequency",                        0,   120,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_I_VALUE,            0.01f,    "%1.4f", {} },
+	{ "Q Frequency",                        0,    60,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_Q_VALUE,            0.01f,    "%1.4f", {} },
+	{ "Scanline Duration",                  0,  5260, 10000, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_SCAN_TIME,          0.01f,    "%1.2f", {} },
+	{ nullptr, 0, 0, 0, 0, 0, 0, -1, 0, nullptr, {} }
 };
 
 
@@ -3038,28 +2454,134 @@ shaders::slider_desc shaders::s_sliders[] =
 //  init_slider_list
 //============================================================
 
+void *shaders::get_slider_option(int id, int index)
+{
+	switch (id)
+	{
+		case SLIDER_VECTOR_ATTENUATION: return &(options->vector_length_scale);
+		case SLIDER_VECTOR_LENGTH_MAX: return &(options->vector_length_ratio);
+		case SLIDER_SHADOW_MASK_TILE_MODE: return &(options->shadow_mask_tile_mode);
+		case SLIDER_SHADOW_MASK_ALPHA: return &(options->shadow_mask_alpha);
+		case SLIDER_SHADOW_MASK_X_COUNT: return &(options->shadow_mask_count_x);
+		case SLIDER_SHADOW_MASK_Y_COUNT: return &(options->shadow_mask_count_y);
+		case SLIDER_SHADOW_MASK_U_SIZE: return &(options->shadow_mask_u_size);
+		case SLIDER_SHADOW_MASK_V_SIZE: return &(options->shadow_mask_v_size);
+		case SLIDER_SHADOW_MASK_U_OFFSET: return &(options->shadow_mask_u_offset);
+		case SLIDER_SHADOW_MASK_V_OFFSET: return &(options->shadow_mask_v_offset);
+		case SLIDER_CURVATURE: return &(options->curvature);
+		case SLIDER_ROUND_CORNER: return &(options->round_corner);
+		case SLIDER_SMOOTH_BORDER: return &(options->smooth_border);
+		case SLIDER_REFLECTION: return &(options->reflection);
+		case SLIDER_VIGNETTING: return &(options->vignetting);
+		case SLIDER_SCANLINE_ALPHA: return &(options->scanline_alpha);
+		case SLIDER_SCANLINE_SCALE: return &(options->scanline_scale);
+		case SLIDER_SCANLINE_HEIGHT: return &(options->scanline_height);
+		case SLIDER_SCANLINE_BRIGHT_SCALE: return &(options->scanline_bright_scale);
+		case SLIDER_SCANLINE_BRIGHT_OFFSET: return &(options->scanline_bright_offset);
+		case SLIDER_SCANLINE_JITTER: return &(options->scanline_jitter);
+		case SLIDER_HUM_BAR_ALPHA: return &(options->hum_bar_alpha);
+		case SLIDER_DEFOCUS: return &(options->defocus[index]);
+		case SLIDER_CONVERGE_X: return &(options->converge_x[index]);
+		case SLIDER_CONVERGE_Y: return &(options->converge_y[index]);
+		case SLIDER_RADIAL_CONVERGE_X: return &(options->radial_converge_x[index]);
+		case SLIDER_RADIAL_CONVERGE_Y: return &(options->radial_converge_y[index]);
+		case SLIDER_RED_RATIO: return &(options->red_ratio[index]);
+		case SLIDER_GREEN_RATIO: return &(options->grn_ratio[index]);
+		case SLIDER_BLUE_RATIO: return &(options->blu_ratio[index]);
+		case SLIDER_SATURATION: return &(options->saturation);
+		case SLIDER_OFFSET: return &(options->offset[index]);
+		case SLIDER_SCALE: return &(options->scale[index]);
+		case SLIDER_POWER: return &(options->power[index]);
+		case SLIDER_FLOOR: return &(options->floor[index]);
+		case SLIDER_PHOSPHOR: return &(options->phosphor[index]);
+		case SLIDER_BLOOM_BLEND_MODE: return &(options->bloom_blend_mode);
+		case SLIDER_BLOOM_SCALE: return &(options->bloom_scale);
+		case SLIDER_BLOOM_OVERDRIVE: return &(options->bloom_overdrive[index]);
+		case SLIDER_BLOOM_LVL0_SCALE: return &(options->bloom_level0_weight);
+		case SLIDER_BLOOM_LVL1_SCALE: return &(options->bloom_level1_weight);
+		case SLIDER_BLOOM_LVL2_SCALE: return &(options->bloom_level2_weight);
+		case SLIDER_BLOOM_LVL3_SCALE: return &(options->bloom_level3_weight);
+		case SLIDER_BLOOM_LVL4_SCALE: return &(options->bloom_level4_weight);
+		case SLIDER_BLOOM_LVL5_SCALE: return &(options->bloom_level5_weight);
+		case SLIDER_BLOOM_LVL6_SCALE: return &(options->bloom_level6_weight);
+		case SLIDER_BLOOM_LVL7_SCALE: return &(options->bloom_level7_weight);
+		case SLIDER_BLOOM_LVL8_SCALE: return &(options->bloom_level8_weight);
+		case SLIDER_BLOOM_LVL9_SCALE: return &(options->bloom_level9_weight);
+		case SLIDER_BLOOM_LVL10_SCALE: return &(options->bloom_level10_weight);
+		case SLIDER_NTSC_ENABLE: return &(options->yiq_enable);
+		case SLIDER_NTSC_JITTER: return &(options->yiq_jitter);
+		case SLIDER_NTSC_A_VALUE: return &(options->yiq_a);
+		case SLIDER_NTSC_B_VALUE: return &(options->yiq_b);
+		case SLIDER_NTSC_P_VALUE: return &(options->yiq_p);
+		case SLIDER_NTSC_O_VALUE: return &(options->yiq_o);
+		case SLIDER_NTSC_CC_VALUE: return &(options->yiq_cc);
+		case SLIDER_NTSC_N_VALUE: return &(options->yiq_n);
+		case SLIDER_NTSC_Y_VALUE: return &(options->yiq_y);
+		case SLIDER_NTSC_I_VALUE: return &(options->yiq_i);
+		case SLIDER_NTSC_Q_VALUE: return &(options->yiq_q);
+		case SLIDER_NTSC_SCAN_TIME: return &(options->yiq_scan_time);
+	}
+	return nullptr;
+}
+
 slider_state *shaders::init_slider_list()
 {
 	if (!master_enable || !d3dintf->post_fx_available)
 	{
-		g_slider_list = NULL;
-		return NULL;
+		g_slider_list = nullptr;
+		return nullptr;
 	}
 
-	slider_state *listhead = NULL;
+	slider_state *listhead = nullptr;
 	slider_state **tailptr = &listhead;
 
-	for (int index = 0; s_sliders[index].name != NULL; index++)
+	for (int index = 0; s_sliders[index].name != nullptr; index++)
 	{
-		slider_desc *slider = &s_sliders[index];
+		slider_desc *desc = &s_sliders[index];
 
 		int screen_type = machine->first_screen()->screen_type();
-		if ((screen_type == SCREEN_TYPE_VECTOR && (slider->screen_type & SLIDER_SCREEN_TYPE_VECTOR) == SLIDER_SCREEN_TYPE_VECTOR) ||
-			(screen_type == SCREEN_TYPE_RASTER && (slider->screen_type & SLIDER_SCREEN_TYPE_RASTER) == SLIDER_SCREEN_TYPE_RASTER) ||
-			(screen_type == SCREEN_TYPE_LCD    && (slider->screen_type & SLIDER_SCREEN_TYPE_LCD)    == SLIDER_SCREEN_TYPE_LCD))
+		if ((screen_type == SCREEN_TYPE_VECTOR && (desc->screen_type & SLIDER_SCREEN_TYPE_VECTOR) == SLIDER_SCREEN_TYPE_VECTOR) ||
+			(screen_type == SCREEN_TYPE_RASTER && (desc->screen_type & SLIDER_SCREEN_TYPE_RASTER) == SLIDER_SCREEN_TYPE_RASTER) ||
+			(screen_type == SCREEN_TYPE_LCD    && (desc->screen_type & SLIDER_SCREEN_TYPE_LCD)    == SLIDER_SCREEN_TYPE_LCD))
 		{
-			*tailptr = slider_alloc(*machine, slider->id, slider->name, slider->minval, slider->defval, slider->maxval, slider->step, slider->adjustor, (void*)options);
-			tailptr = &(*tailptr)->next;
+			int count;
+			switch (desc->slider_type)
+			{
+				case SLIDER_VEC2:
+					count = 2;
+					break;
+				case SLIDER_COLOR:
+					count = 3;
+					break;
+				default:
+					count = 1;
+					break;
+			}
+			for (int index = 0; index < count; index++)
+			{
+				slider* slider_arg = new slider(desc, get_slider_option(desc->id, index), &options->params_dirty);
+				sliders.push_back(slider_arg);
+				std::string name = desc->name;
+				switch (desc->slider_type)
+				{
+					case SLIDER_VEC2:
+					{
+						std::string names[2] = { " X", " Y" };
+						name = name + names[index];
+						break;
+					}
+					case SLIDER_COLOR:
+					{
+						std::string names[3] = { " Red", " Green", " Blue" };
+						name = name + names[index];
+						break;
+					}
+					default:
+						break;
+				}
+				*tailptr = slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_update_trampoline, slider_arg);
+				tailptr = &(*tailptr)->next;
+			}
 		}
 	}
 
@@ -3075,13 +2597,13 @@ uniform::uniform(effect *shader, const char *name, uniform_type type, int id)
 {
 	m_shader = shader;
 	m_type = type;
-	m_next = NULL;
-	m_handle = m_shader->get_parameter(NULL, name);
+	m_next = nullptr;
+	m_handle = m_shader->get_parameter(nullptr, name);
 	m_ival = 0;
 	m_bval = false;
 	memset(m_vec, 0, sizeof(float) * 4);
-	m_mval = NULL;
-	m_texture = NULL;
+	m_mval = nullptr;
+	m_texture = nullptr;
 	m_id = id;
 
 	switch (type)
@@ -3134,7 +2656,7 @@ void uniform::update()
 		}
 		case CU_SOURCE_DIMS:
 		{
-			if (shadersys->curr_texture != NULL)
+			if (shadersys->curr_texture != nullptr)
 			{
 				vec2f sourcedims = shadersys->curr_texture->get_rawdims();
 				m_shader->set_vector("SourceDims", 2, &sourcedims.c.x);
@@ -3154,7 +2676,7 @@ void uniform::update()
 				break;
 			}
 
-			if (shadersys->curr_texture != NULL)
+			if (shadersys->curr_texture != nullptr)
 			{
 				vec2f delta = shadersys->curr_texture->get_uvstop() - shadersys->curr_texture->get_uvstart();
 				m_shader->set_vector("SourceRect", 2, &delta.c.x);
@@ -3165,7 +2687,7 @@ void uniform::update()
 		}
 		case CU_TARGET_DIMS:
 		{
-			if (shadersys->curr_render_target != NULL)
+			if (shadersys->curr_render_target != nullptr)
 			{
 				float targetdims[2] = {
 					static_cast<float>(shadersys->curr_render_target->target_width),
@@ -3176,7 +2698,7 @@ void uniform::update()
 		}
 		case CU_QUAD_DIMS:
 		{
-			if (shadersys->curr_poly != NULL)
+			if (shadersys->curr_poly != nullptr)
 			{
 				float quaddims[2] = {
 					shadersys->curr_poly->get_prim_width(),
@@ -3312,7 +2834,7 @@ void uniform::update()
 			m_shader->set_float("SmoothBorderAmount", options->smooth_border);
 			break;
 		case CU_POST_SHADOW_ALPHA:
-			m_shader->set_float("ShadowAlpha", shadersys->shadow_texture == NULL ? 0.0f : options->shadow_mask_alpha);
+			m_shader->set_float("ShadowAlpha", shadersys->shadow_texture == nullptr ? 0.0f : options->shadow_mask_alpha);
 			break;
 		case CU_POST_SHADOW_COUNT:
 		{
@@ -3454,22 +2976,22 @@ void uniform::upload()
 effect::effect(shaders *shadersys, device *dev, const char *name, const char *path)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
-	LPD3DXBUFFER buffer_errors = NULL;
+	LPD3DXBUFFER buffer_errors = nullptr;
 
 	m_shaders = shadersys;
-	m_uniform_head = NULL;
-	m_uniform_tail = NULL;
-	m_effect = NULL;
+	m_uniform_head = nullptr;
+	m_uniform_tail = nullptr;
+	m_effect = nullptr;
 	m_valid = false;
 
 	char name_cstr[1024];
 	sprintf(name_cstr, "%s\\%s", path, name);
 	TCHAR *effect_name = tstring_from_utf8(name_cstr);
 
-	HRESULT hr = (*g_load_effect)(device, effect_name, NULL, NULL, 0, NULL, &m_effect, &buffer_errors);
+	HRESULT hr = (*g_load_effect)(device, effect_name, nullptr, nullptr, 0, nullptr, &m_effect, &buffer_errors);
 	if (FAILED(hr))
 	{
-		if (buffer_errors != NULL)
+		if (buffer_errors != nullptr)
 		{
 			LPVOID compile_errors = buffer_errors->GetBufferPointer();
 			printf("Unable to compile shader: %s\n", (const char*)compile_errors); fflush(stdout);
@@ -3490,31 +3012,31 @@ effect::effect(shaders *shadersys, device *dev, const char *name, const char *pa
 effect::~effect()
 {
 	m_effect->Release();
-	m_effect = NULL;
+	m_effect = nullptr;
 	uniform *curr = m_uniform_head;
-	while (curr != NULL)
+	while (curr != nullptr)
 	{
 		uniform *next = curr->get_next();
 		delete curr;
 		curr = next;
 	}
-	m_uniform_head = NULL;
-	m_uniform_tail = NULL;
+	m_uniform_head = nullptr;
+	m_uniform_tail = nullptr;
 }
 
 void effect::add_uniform(const char *name, uniform::uniform_type type, int id)
 {
 	uniform *newuniform = new uniform(this, name, type, id);
-	if (newuniform == NULL)
+	if (newuniform == nullptr)
 	{
 		return;
 	}
 
-	if (m_uniform_head == NULL)
+	if (m_uniform_head == nullptr)
 	{
 		m_uniform_head = newuniform;
 	}
-	if (m_uniform_tail != NULL)
+	if (m_uniform_tail != nullptr)
 	{
 		m_uniform_tail->set_next(newuniform);
 	}
@@ -3524,7 +3046,7 @@ void effect::add_uniform(const char *name, uniform::uniform_type type, int id)
 void effect::update_uniforms()
 {
 	uniform *curr = m_uniform_head;
-	while(curr != NULL)
+	while(curr != nullptr)
 	{
 		curr->update();
 		curr = curr->get_next();
@@ -3638,7 +3160,7 @@ static file_error open_next(renderer_d3d9 *d3d, emu_file &file, const char *temp
 	// handle defaults
 	const char *snapname = templ ? templ : d3d->window().machine().options().snap_name();
 
-	if (snapname == NULL || snapname[0] == 0)
+	if (snapname == nullptr || snapname[0] == 0)
 	{
 		snapname = "%g/%i";
 	}
@@ -3700,7 +3222,7 @@ static file_error open_next(renderer_d3d9 *d3d, emu_file &file, const char *temp
 
 			// verify that there is such a device for this system
 			image_interface_iterator iter(d3d->window().machine().root_device());
-			for (device_image_interface *image = iter.first(); image != NULL; iter.next())
+			for (device_image_interface *image = iter.first(); image != nullptr; iter.next())
 			{
 				// get the device name
 				std::string tempdevname(image->brief_instance_name());
@@ -3708,7 +3230,7 @@ static file_error open_next(renderer_d3d9 *d3d, emu_file &file, const char *temp
 				if (snapdevname.compare(tempdevname) == 0)
 				{
 					// verify that such a device has an image mounted
-					if (image->basename() != NULL)
+					if (image->basename() != nullptr)
 					{
 						std::string filename(image->basename());
 

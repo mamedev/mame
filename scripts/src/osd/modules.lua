@@ -110,6 +110,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/render/bgfx/effectmanager.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/effectreader.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/chain.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/chainmanager.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/chainreader.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/chainentry.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/chainentryreader.cpp",
