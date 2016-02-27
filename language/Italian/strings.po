@@ -298,7 +298,7 @@ msgstr " per cambiare il valore del colore"
 
 #: src/emu/ui/custui.cpp:621
 msgid "Menu Preview"
-msgstr "Anteprima menu"
+msgstr "Anteprima Menu"
 
 #: src/emu/ui/custui.cpp:629
 msgid "Normal"
@@ -696,20 +696,20 @@ msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:769
 msgid "Name:             Description:\n"
-msgstr ""
+msgstr "Nome:             Descrizione:\n"
 
 #: src/emu/ui/miscmenu.cpp:781
 #, c-format
 msgid "%s.txt saved under ui folder."
-msgstr ""
+msgstr "%s.txt salvato nella cartella UI."
 
 #: src/emu/ui/miscmenu.cpp:799
 msgid "Export XML format (like -listxml)"
-msgstr ""
+msgstr "Esporta in formato XML (come -listxml)"
 
 #: src/emu/ui/miscmenu.cpp:800
 msgid "Export TXT format (like -listfull)"
-msgstr ""
+msgstr "Esporta in formato TXT (come -listfull)"
 
 #: src/emu/ui/miscmenu.cpp:858
 msgid "Dummy"
@@ -718,7 +718,7 @@ msgstr ""
 #: src/emu/ui/miscmenu.cpp:860
 #, fuzzy
 msgid "Save machine configuration"
-msgstr "Configurazione Macchina"
+msgstr "Salva configurazione macchina"
 
 #: src/emu/ui/optsmenu.cpp:217
 msgid "Filter"
@@ -795,7 +795,7 @@ msgstr ""
 msgid ""
 "%s\n"
 " removed from favorites list."
-msgstr "Rimuovi dai Preferiti"
+msgstr "rimosso dalla lista dei preferiti"
 
 #: src/emu/ui/selgame.cpp:464
 msgid ""
@@ -860,32 +860,32 @@ msgstr ""
 
 #: src/emu/ui/selgame.cpp:1476
 msgid "Graphics: Imperfect Colors\n"
-msgstr ""
+msgstr "Grafica: Colori Non Perfetti\n"
 
 #: src/emu/ui/selgame.cpp:1478
 msgid "Graphics: Wrong Colors\n"
-msgstr ""
+msgstr "Grafica: Colori Sbagliati\n"
 
 #: src/emu/ui/selgame.cpp:1480
 msgid "Graphics: Imperfect\n"
-msgstr ""
+msgstr "Grafica: Non Perfetta\n"
 
 #: src/emu/ui/selgame.cpp:1482
 msgid "Graphics: OK\n"
-msgstr ""
+msgstr "Grafica: OK\n"
 
 #: src/emu/ui/selgame.cpp:1485
 msgid "Sound: Unimplemented\n"
-msgstr ""
+msgstr "Sonoro: Non Implementato\n"
 
 #: src/emu/ui/selgame.cpp:1487
 msgid "Sound: Imperfect\n"
-msgstr ""
+msgstr "Sonoro: Non Perfetto\n"
 
 #: src/emu/ui/selgame.cpp:1489
 #, fuzzy
 msgid "Sound: OK\n"
-msgstr ""
+msgstr "Sonoro: OK\n"
 "\n"
 "Sonoro:\n"
 
@@ -899,7 +899,7 @@ msgstr ""
 #: src/emu/ui/selgame.cpp:1495 src/emu/ui/selgame.cpp:1496
 #: src/emu/ui/selgame.cpp:1497
 msgid "Yes"
-msgstr ""
+msgstr "Si"
 
 #: src/emu/ui/selgame.cpp:1491 src/emu/ui/selgame.cpp:1492
 #: src/emu/ui/selgame.cpp:1493 src/emu/ui/selgame.cpp:1494
@@ -911,22 +911,22 @@ msgstr ""
 #: src/emu/ui/selgame.cpp:1492
 #, c-format
 msgid "Game is Mechanical: %s\n"
-msgstr ""
+msgstr "Gioco Meccanico: "
 
 #: src/emu/ui/selgame.cpp:1493
 #, c-format
 msgid "Requires Artwork: %s\n"
-msgstr ""
+msgstr "Rechiede un Artwork: "
 
 #: src/emu/ui/selgame.cpp:1494
 #, c-format
 msgid "Requires Clickable Artwork: %s\n"
-msgstr ""
+msgstr "Richiede un Artwork Cliccabile: "
 
 #: src/emu/ui/selgame.cpp:1495
 #, c-format
 msgid "Support Cocktail: %s\n"
-msgstr ""
+msgstr "Supporta Cocktail: "
 
 #: src/emu/ui/selgame.cpp:1496
 #, c-format
@@ -936,25 +936,25 @@ msgstr ""
 #: src/emu/ui/selgame.cpp:1497
 #, c-format
 msgid "Support Save: %s\n"
-msgstr ""
+msgstr "Supporta il Salvataggio: "
 
 #: src/emu/ui/selgame.cpp:1498
 #, c-format
 msgid "Screen Orentation: %s\n"
-msgstr ""
+msgstr "Orientamento Schermo: "
 
 #: src/emu/ui/selgame.cpp:1498
 msgid "Vertical"
-msgstr ""
+msgstr "Verticale"
 
 #: src/emu/ui/selgame.cpp:1498
 msgid "Horizontal"
-msgstr ""
+msgstr "Orizzontale"
 
 #: src/emu/ui/selgame.cpp:1506
 #, c-format
 msgid "Requires CHD: %s\n"
-msgstr ""
+msgstr "Richiede CHD: "
 
 #: src/emu/ui/selgame.cpp:1519
 msgid "Roms Audit Pass: OK\n"
