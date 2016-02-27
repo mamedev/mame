@@ -1342,15 +1342,18 @@ void lua_engine::update_machine()
 			}
 			port = port->next();
 		}
-		machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(lua_engine::on_machine_start), this));
-		machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(lua_engine::on_machine_stop), this));
-		machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(lua_engine::on_machine_pause), this));
-		machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(lua_engine::on_machine_resume), this));
-		machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(lua_engine::on_machine_frame), this));
 	}
 	lua_setglobal(m_lua_state, "ioport");
 }
 
+void lua_engine::attach_notifiers()
+{
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(lua_engine::on_machine_start), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(lua_engine::on_machine_stop), this));
+	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(lua_engine::on_machine_pause), this));
+	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(lua_engine::on_machine_resume), this));
+	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(lua_engine::on_machine_frame), this));
+}
 
 //-------------------------------------------------
 //  initialize - initialize lua hookup to emu engine
