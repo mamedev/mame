@@ -189,7 +189,7 @@ DRIVER_INIT_MEMBER(megapc_state, megapcpl)
 
 DRIVER_INIT_MEMBER(at_state, megapcpla)
 {
-	UINT8* ROM = memregion("maincpu")->base();
+	UINT8* ROM = memregion("bios")->base();
 
 	init_at_common(0xa0000);
 
