@@ -111,10 +111,6 @@ if _OPTIONS["targetos"]=="windows" then
 		defines {
 			"MALLOC_DEBUG",
 		}
-	configuration { "vs*" }
-		includedirs {
-			GEN_DIR .. "includes",
-		}
 	configuration { }
 
 elseif _OPTIONS["targetos"]=="linux" then

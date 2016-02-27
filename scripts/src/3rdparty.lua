@@ -1226,10 +1226,6 @@ project "SDL2"
 	kind "StaticLib"
 
 	configuration {  }
-
-	includedirs {
-		MAME_DIR .. "3rdparty/SDL2/include",
-	}
 	
 	files {
 		MAME_DIR .. "3rdparty/SDL2/include/begin_code.h",
@@ -1325,7 +1321,6 @@ project "SDL2"
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_wave.h",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/winmm/SDL_winmm.c",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/winmm/SDL_winmm.h",
-		MAME_DIR .. "3rdparty/SDL2/src/audio/xaudio2/SDL_xaudio2.c",
 		MAME_DIR .. "3rdparty/SDL2/src/core/windows/SDL_directx.h",
 		MAME_DIR .. "3rdparty/SDL2/src/core/windows/SDL_windows.c",
 		MAME_DIR .. "3rdparty/SDL2/src/core/windows/SDL_windows.h",
@@ -1519,6 +1514,10 @@ project "SDL2"
 		MAME_DIR .. "3rdparty/SDL2/src/main/windows/version.rc",
 	}
 	configuration { "vs*" }
+		files {
+			MAME_DIR .. "3rdparty/SDL2/src/audio/xaudio2/SDL_xaudio2.c",
+		}
+	
 		buildoptions {
 			"/wd4200", -- warning C4200: nonstandard extension used: zero-sized array in struct/union
 			"/wd4055", -- warning C4055: 'type cast': from data pointer 'void *' to function pointer 'xxx'
@@ -1531,6 +1530,22 @@ project "SDL2"
 		defines {
 			"HAVE_LIBC",
 		}
+	configuration { "mingw*"}
+		includedirs {
+			MAME_DIR .. "3rdparty/SDL2-override/mingw",
+			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
+		}
+		buildoptions_c {
+			"-Wno-undef",
+			"-Wno-strict-prototypes",
+			"-Wno-bad-function-cast",
+			"-Wno-discarded-qualifiers",
+			"-Wno-unused-but-set-variable",
+		}		
 		
 	configuration { }
+		includedirs {
+			MAME_DIR .. "3rdparty/SDL2/include",
+		}
+
 end
