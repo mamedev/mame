@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-25 16:33+0100\n"
-"PO-Revision-Date: 2016-02-27 10:58+0100\n"
+"PO-Revision-Date: 2016-02-27 14:59+0100\n"
 "Last-Translator: Lothar Serra Mari <scummvm@rootfather.de>\n"
 "Language-Team: MAME Language Team\n"
 "Language: de\n"
@@ -50,7 +50,7 @@ msgstr "Alle Cheats neu geladen"
 
 #: src/emu/ui/cheatopt.cpp:121
 msgid "Autofire Settings"
-msgstr "Einstellungen Autofeuer"
+msgstr "Einstellungen Dauerfeuer"
 
 #: src/emu/ui/cheatopt.cpp:139
 msgid "Reset All"
@@ -62,7 +62,7 @@ msgstr "Alle neu laden"
 
 #: src/emu/ui/cheatopt.cpp:258
 msgid "Autofire Status"
-msgstr "Status Autofeuer"
+msgstr "Status Dauerfeuer"
 
 #: src/emu/ui/cheatopt.cpp:258 src/emu/ui/ui.cpp:1755
 #: src/emu/ui/videoopt.cpp:207 src/emu/ui/videoopt.cpp:211
@@ -92,7 +92,7 @@ msgstr "Keine Knöpfe für diese Maschine gefunden!"
 
 #: src/emu/ui/cheatopt.cpp:312 src/emu/ui/cheatopt.cpp:316
 msgid "Autofire Delay"
-msgstr "Verzögerung für Autofeuer"
+msgstr "Verzögerung für Dauerfeuer"
 
 #: src/emu/ui/ctrlmenu.cpp:20
 msgid "Lightgun Device Assignment"
@@ -290,7 +290,7 @@ msgstr "Farbeinstellungen für Benutzeroberfläche"
 
 #: src/emu/ui/custui.cpp:595 src/emu/ui/selector.cpp:181
 msgid "Double click or press "
-msgstr "Doppelklicken Sie oder drücken Sie"
+msgstr "Doppelklicken Sie oder drücken Sie "
 
 #: src/emu/ui/custui.cpp:595
 msgid " to change the color value"
@@ -793,7 +793,7 @@ msgid ""
 msgstr ""
 "Der gewählten Maschine fehlen ein oder mehrere benötigte ROM- oder CHD-Abbilder. Bitte wählen Sie eine andere Maschine aus.\n"
 "\n"
-"Drücken Sie jede Taste (außer ESC) zum Fortfahren."
+"Drücken Sie eine beliebige Taste (außer ESC) zum Fortfahren."
 
 #: src/emu/ui/selgame.cpp:651 src/emu/ui/simpleselgame.cpp:264
 msgid "Configure Options"
@@ -808,9 +808,9 @@ msgid "Save Configuration"
 msgstr "Konfiguration speichern"
 
 #: src/emu/ui/selgame.cpp:762
-#, fuzzy, c-format
+#, c-format
 msgid "MAME %s ( %d / %d machines (%d BIOS) )"
-msgstr "MAME %s ( %d / %d machines (%d BIOS) )"
+msgstr "MAME %s ( %d / %d Maschinen (%d BIOS) )"
 
 #: src/emu/ui/selgame.cpp:782
 msgid " Search: "
@@ -1064,7 +1064,7 @@ msgstr ""
 
 #: src/emu/ui/ui.cpp:1064
 msgid "Otherwise, type OK or move the joystick left then right to continue"
-msgstr "Andernfalls geben Sie OK ein oder bewegen Sie den Joystick nach links und dann nach rechts um fortzufahren"
+msgstr "Andernfalls geben Sie \"OK\" ein oder bewegen Sie den Joystick nach links und dann nach rechts um fortzufahren"
 
 #: src/emu/ui/ui.cpp:1099
 msgid "One or more ROMs/CHDs for this machine are incorrect. The machine may not run correctly.\n"
@@ -1164,7 +1164,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Drücken Sie OK oder bewegen Sie den Joystick nach links und dann nach rechts, um fortzufahren"
+"Geben Sie \"OK\" ein oder bewegen Sie den Joystick nach links und dann nach rechts, um fortzufahren"
 
 #: src/emu/ui/ui.cpp:1254
 msgid ""
@@ -1216,7 +1216,7 @@ msgstr "Benutzeroberfläche:   Deaktiviert"
 
 #: src/emu/ui/ui.cpp:1749
 msgid "Autofire can't be enabled"
-msgstr "Autofeuer kann nicht aktiviert werden"
+msgstr "Dauerfeuer kann nicht aktiviert werden"
 
 #: src/emu/ui/ui.cpp:1788
 msgid "Select position to save to"
@@ -1267,7 +1267,7 @@ msgstr " Lautstärke"
 
 #: src/emu/ui/ui.cpp:2094
 msgid "Vector Flicker"
-msgstr "Vektorflicker"
+msgstr "Vektorflimmern"
 
 #: src/emu/ui/ui.cpp:2096
 msgid "Beam Width Minimum"
@@ -1279,7 +1279,7 @@ msgstr "Maximale Strahlbreite"
 
 #: src/emu/ui/ui.cpp:2100
 msgid "Beam Intensity Weight"
-msgstr "Strahlintensität"
+msgstr "Gewichtung der Strahlintensität"
 
 #: src/emu/ui/ui.cpp:2540
 #, c-format
