@@ -70,7 +70,7 @@ private:
 	// internal state
 	running_machine &m_machine;  // reference to our machine
 	std::string     m_fullpath;
-	FILE			*fp = nullptr;
+	FILE            *fp = nullptr;
 };
 
 //-------------------------------------------------
@@ -108,7 +108,7 @@ public:
 
 private:
 	const char *favorite_filename = "favorites.ini";
-	
+
 	// current
 	int m_current;
 

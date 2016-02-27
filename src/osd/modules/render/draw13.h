@@ -41,7 +41,7 @@ struct quad_setup_data
 
 	void compute(const render_primitive &prim, const int prescale);
 
-	INT32	dudx, dvdx, dudy, dvdy;
+	INT32   dudx, dvdx, dudy, dvdy;
 	INT32   startu, startv;
 	INT32   rotwidth, rotheight;
 };

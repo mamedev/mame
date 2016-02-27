@@ -228,8 +228,8 @@ private:
 	INT32           m_surf_h;
 	GLfloat         m_texVerticex[8];
 
-	static bool		s_shown_video_info;
-	static bool		s_dll_loaded;
+	static bool     s_shown_video_info;
+	static bool     s_dll_loaded;
 };
 
 #endif // __DRAWOGL__

@@ -3591,7 +3591,7 @@ void z80_device::execute_set_input(int inputnum, int state)
 	case Z80_INPUT_LINE_WAIT:
 		m_wait_state = state;
 		break;
-	
+
 	default:
 		break;
 	}

@@ -16,11 +16,11 @@
 
 texture_manager::~texture_manager()
 {
-    for (std::pair<std::string, bgfx_texture*> texture : m_textures)
-    {
+	for (std::pair<std::string, bgfx_texture*> texture : m_textures)
+	{
 		delete texture.second;
-    }
-    m_textures.clear();
+	}
+	m_textures.clear();
 }
 
 void texture_manager::add_texture(std::string name, bgfx_texture* texture)
@@ -37,11 +37,11 @@ bgfx_texture* texture_manager::create_texture(std::string name, bgfx::TextureFor
 
 bgfx_texture* texture_manager::texture(std::string name)
 {
-    std::map<std::string, bgfx_texture*>::iterator iter = m_textures.find(name);
-    if (iter != m_textures.end())
-    {
-        return iter->second;
-    }
+	std::map<std::string, bgfx_texture*>::iterator iter = m_textures.find(name);
+	if (iter != m_textures.end())
+	{
+		return iter->second;
+	}
 
-    return nullptr;
+	return nullptr;
 }

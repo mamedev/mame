@@ -673,7 +673,7 @@ UINT16 hp_hybrid_cpu_device::RM(UINT32 addr)
 						return RIO(CURRENT_PA , addr_wo_bsc - HP_REG_R4_ADDR);
 
 				case HP_REG_IV_ADDR:
-                                        return m_reg_IV;
+										return m_reg_IV;
 
 				case HP_REG_PA_ADDR:
 						return CURRENT_PA;

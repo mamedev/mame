@@ -46,7 +46,6 @@
 #include "machine/sgi.h"
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
-#include "includes/at.h"
 #include "machine/8042kbdc.h"
 #include "machine/pit8253.h"
 #include "video/newport.h"

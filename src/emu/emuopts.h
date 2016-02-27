@@ -74,7 +74,7 @@ enum
 #define OPTION_PLAYBACK             "playback"
 #define OPTION_RECORD               "record"
 #define OPTION_RECORD_TIMECODE      "record_timecode"
-#define OPTION_EXIT_AFTER_PLAYBACK	"exit_after_playback"
+#define OPTION_EXIT_AFTER_PLAYBACK  "exit_after_playback"
 #define OPTION_MNGWRITE             "mngwrite"
 #define OPTION_AVIWRITE             "aviwrite"
 #ifdef MAME_DEBUG
@@ -178,7 +178,7 @@ enum
 #define OPTION_CHEAT                "cheat"
 #define OPTION_SKIP_GAMEINFO        "skip_gameinfo"
 #define OPTION_UI_FONT              "uifont"
-#define OPTION_UI 		            "ui"
+#define OPTION_UI                   "ui"
 #define OPTION_RAMSIZE              "ramsize"
 
 // core comm options
@@ -359,7 +359,7 @@ public:
 	const char *bios() const { return value(OPTION_BIOS); }
 	bool cheat() const { return bool_value(OPTION_CHEAT); }
 	bool skip_gameinfo() const { return bool_value(OPTION_SKIP_GAMEINFO); }
-	const char *ui_font() const { return value(OPTION_UI_FONT); }	
+	const char *ui_font() const { return value(OPTION_UI_FONT); }
 	const char *ui() const { return value(OPTION_UI); }
 	const char *ram_size() const { return value(OPTION_RAMSIZE); }
 
@@ -368,7 +368,7 @@ public:
 	const char *comm_localport() const { return value(OPTION_COMM_LOCAL_PORT); }
 	const char *comm_remotehost() const { return value(OPTION_COMM_REMOTE_HOST); }
 	const char *comm_remoteport() const { return value(OPTION_COMM_REMOTE_PORT); }
-	
+
 
 	bool confirm_quit() const { return bool_value(OPTION_CONFIRM_QUIT); }
 	bool ui_mouse() const { return bool_value(OPTION_UI_MOUSE); }
@@ -378,7 +378,7 @@ public:
 	const char *autoboot_script() const { return value(OPTION_AUTOBOOT_SCRIPT); }
 
 	bool console() const { return bool_value(OPTION_CONSOLE); }
-	
+
 	const char *language() const { return value(OPTION_LANGUAGE); }
 
 	// FIXME: Couriersud: This should be in image_device_exit

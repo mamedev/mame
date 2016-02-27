@@ -242,7 +242,6 @@ void mbdtower_state::machine_start()
 	save_item(NAME(m_sensor_blind));
 }
 
-
 static MACHINE_CONFIG_START( mbdtower, mbdtower_state )
 
 	/* basic machine hardware */

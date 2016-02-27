@@ -192,8 +192,8 @@ public:
 
 	render_primitive_list   *m_primlist;
 	osd_window_config       m_win_config;
-	int						m_index;
-	osd_window				*m_main;
+	int                     m_index;
+	osd_window              *m_main;
 protected:
 	int                     m_prescale;
 };
@@ -241,11 +241,11 @@ public:
 protected:
 	/* Internal flags */
 	static const int FI_CHANGED                 = 0x010000;
-	bool		m_sliders_dirty;
+	bool        m_sliders_dirty;
 
 private:
-	osd_window	*m_window;
-	int			m_flags;
+	osd_window  *m_window;
+	int         m_flags;
 };
 
 

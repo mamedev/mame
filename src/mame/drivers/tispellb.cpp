@@ -83,6 +83,7 @@ public:
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
 	void power_off();
 	void prepare_display();
+	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
 
 	DECLARE_READ8_MEMBER(main_read_k);
 	DECLARE_WRITE16_MEMBER(main_write_o);
@@ -139,7 +140,7 @@ void tispellb_state::power_off()
 void tispellb_state::prepare_display()
 {
 	// almost same as snspell
-	UINT16 gridmask = (m_display_decay[15][16] != 0) ? 0xffff : 0x8000; // vfd filament on/off
+	UINT16 gridmask = vfd_filament_on() ? 0xffff : 0x8000;
 	set_display_segmask(0xff, 0x3fff);
 	display_matrix(16+1, 16, m_plate | 1<<16, m_grid & gridmask);
 }
@@ -154,7 +155,7 @@ WRITE16_MEMBER(tispellb_state::main_write_o)
 WRITE16_MEMBER(tispellb_state::main_write_r)
 {
 	// R13: power-off request, on falling edge
-	if ((m_r >> 13 & 1) && !(data >> 13 & 1))
+	if (~data & m_r & 0x2000)
 		power_off();
 
 	// R0-R6: input mux

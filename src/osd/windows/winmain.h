@@ -278,8 +278,8 @@ private:
 	void build_slider_list();
 	void update_slider_list();
 
-	windows_options &	m_options;
-	slider_state *		m_sliders;
+	windows_options &   m_options;
+	slider_state *      m_sliders;
 
 	static const int DEFAULT_FONT_HEIGHT = 200;
 };

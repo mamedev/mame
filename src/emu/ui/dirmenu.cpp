@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:Dankan1890
 /*********************************************************************
 
@@ -32,7 +32,7 @@ static const folders_entry s_folders[] =
 	{ __("UI"),                  OPTION_UI_PATH,			CHANGE },
 	{ __("Language"),            OPTION_LANGUAGEPATH,		CHANGE },
 	{ __("Samples"),             OPTION_SAMPLEPATH,			ADDING },
-	{ __("DATs"),                OPTION_HISTORY_PATH,		CHANGE },
+	{ __("DATs"),                OPTION_HISTORY_PATH,		ADDING },
 	{ __("INIs"),                OPTION_INIPATH,			ADDING },
 	{ __("Extra INIs"),          OPTION_EXTRAINI_PATH,		CHANGE },
 	{ __("Icons"),               OPTION_ICONS_PATH,			ADDING },
@@ -73,6 +73,7 @@ ui_menu_directory::~ui_menu_directory()
 {
 	save_ui_options(machine());
 	ui_globals::reset = true;
+	machine().datfile().reset_run();
 }
 
 //-------------------------------------------------
@@ -180,12 +181,11 @@ void ui_menu_display_actual::handle()
 void ui_menu_display_actual::populate()
 {
 	m_tempbuf.assign(_("Current ")).append(_(s_folders[m_ref].name)).append(_(" Folders"));
-	if (machine().ui().options().exists(s_folders[m_ref].option)) {
+	if (machine().ui().options().exists(s_folders[m_ref].option)) 
 		m_searchpath.assign(machine().ui().options().value(s_folders[m_ref].option));
-	}
-	else {
+	else 
 		m_searchpath.assign(machine().options().value(s_folders[m_ref].option));
-	}
+
 	path_iterator path(m_searchpath.c_str());
 	std::string curpath;
 	m_folders.clear();
@@ -286,19 +286,14 @@ ui_menu_add_change_folder::ui_menu_add_change_folder(running_machine &machine, r
 
 	std::string searchpath;
 	if (machine.ui().options().exists(s_folders[m_ref].option))
-	{
 		searchpath = machine.ui().options().value(s_folders[m_ref].option);
-	}
 	else
-	{
 		searchpath = machine.options().value(s_folders[m_ref].option);
-	}
 
 	path_iterator path(searchpath.c_str());
 	std::string curpath;
 	while (path.next(curpath, nullptr))
 		m_folders.push_back(curpath);
-
 }
 
 ui_menu_add_change_folder::~ui_menu_add_change_folder()
@@ -373,16 +368,11 @@ void ui_menu_add_change_folder::handle()
 				if (m_change)
 				{
 					if (machine().ui().options().exists(s_folders[m_ref].option))
-					{
 						machine().ui().options().set_value(s_folders[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-					}
-					else 
+					else if (strcmp(machine().options().value(s_folders[m_ref].option), m_current_path.c_str()) != 0)
 					{
-						if (strcmp(machine().options().value(s_folders[m_ref].option), m_current_path.c_str()) != 0)
-						{
-							machine().options().set_value(s_folders[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-							machine().options().mark_changed(s_folders[m_ref].option);
-						}
+						machine().options().set_value(s_folders[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+						machine().options().mark_changed(s_folders[m_ref].option);
 					}
 					machine().datfile().reset_run();
 				}
@@ -398,16 +388,11 @@ void ui_menu_add_change_folder::handle()
 					}
 
 					if (machine().ui().options().exists(s_folders[m_ref].option))
-					{
 						machine().ui().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-					}
-					else 
+					else if (strcmp(machine().options().value(s_folders[m_ref].option), tmppath.c_str()) != 0)
 					{
-						if (strcmp(machine().options().value(s_folders[m_ref].option), tmppath.c_str()) != 0)
-						{
-							machine().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-							machine().options().mark_changed(s_folders[m_ref].option);
-						}
+						machine().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+						machine().options().mark_changed(s_folders[m_ref].option);
 					}
 				}
 
@@ -477,13 +462,13 @@ void ui_menu_add_change_folder::handle()
 void ui_menu_add_change_folder::populate()
 {
 	// open a path
-	const char *volume_name;
+	const char *volume_name = nullptr;
 	file_enumerator path(m_current_path.c_str());
 	const osd_directory_entry *dirent;
 	int folders_count = 0;
 
 	// add the drives
-	for (int i = 0; (volume_name = osd_get_volume_name(i)) != nullptr; i++)
+	for (int i = 0; (volume_name = osd_get_volume_name(i)) != nullptr; ++i)
 		item_append(volume_name, "[DRIVE]", 0, (void *)(FPTR)++folders_count);
 
 	// add the directories
@@ -617,16 +602,11 @@ void ui_menu_remove_folder::handle()
 		}
 
 		if (machine().ui().options().exists(s_folders[m_ref].option))
-		{
 			machine().ui().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-		}
-		else 
+		else if (strcmp(machine().options().value(s_folders[m_ref].option),tmppath.c_str())!=0)
 		{
-			if (strcmp(machine().options().value(s_folders[m_ref].option),tmppath.c_str())!=0)
-			{
-				machine().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);				
-				machine().options().mark_changed(s_folders[m_ref].option);
-			}
+			machine().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);				
+			machine().options().mark_changed(s_folders[m_ref].option);
 		}
 
 		ui_menu::menu_stack->parent->reset(UI_MENU_RESET_REMEMBER_REF);
@@ -645,7 +625,6 @@ void ui_menu_remove_folder::populate()
 		item_append(elem.c_str(), nullptr, 0, (void *)(FPTR)++folders_count);
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 

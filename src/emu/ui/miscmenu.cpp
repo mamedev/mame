@@ -16,6 +16,7 @@
 #include "ui/menu.h"
 #include "ui/miscmenu.h"
 #include "ui/utils.h"
+#include "../info.h"
 
 /***************************************************************************
     MENU HANDLERS
@@ -651,7 +652,7 @@ void ui_menu_misc_options::custom_render(void *selectedref, float top, float bot
 	ui_manager &mui = machine().ui();
 
 	mui.draw_text_full(container, _("Miscellaneous Options"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -671,5 +672,225 @@ void ui_menu_misc_options::custom_render(void *selectedref, float top, float bot
 
 	// draw the text within it
 	mui.draw_text_full(container, _("Miscellaneous Options"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+}
+
+//-------------------------------------------------
+//  ctor / dtor
+//-------------------------------------------------
+
+ui_menu_export::ui_menu_export(running_machine &machine, render_container *container, std::vector<const game_driver *> drvlist) 
+	: ui_menu(machine, container), m_list(drvlist)
+{
+}
+
+ui_menu_export::~ui_menu_export()
+{
+}
+
+//-------------------------------------------------
+//  handlethe options menu
+//-------------------------------------------------
+
+void ui_menu_export::handle()
+{
+	// process the menu
+	ui_menu::menu_stack->parent->process(UI_MENU_PROCESS_NOINPUT);
+	const ui_menu_event *m_event = process(UI_MENU_PROCESS_NOIMAGE);
+	if (m_event != nullptr && m_event->itemref != nullptr)
+	{
+		switch ((FPTR)m_event->itemref)
+		{
+			case 1:
+			{
+				if (m_event->iptkey == IPT_UI_SELECT)
+				{
+					std::string filename("exported");
+					emu_file infile(machine().ui().options().ui_path(), OPEN_FLAG_READ);
+					if (infile.open(filename.c_str(), ".xml") == FILERR_NONE)
+						for (int seq = 0; ; ++seq)
+						{
+							std::string seqtext;
+							strprintf(seqtext, "%s_%04d", filename.c_str(), seq);
+							if (infile.open(seqtext.c_str(), ".xml") != FILERR_NONE)
+							{
+								filename = seqtext;
+								break;
+							}
+						}
+
+					// attempt to open the output file
+					emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+					if (file.open(filename.c_str(), ".xml") == FILERR_NONE)
+					{
+						FILE *pfile;
+						std::string fullpath(file.fullpath());
+						file.close();
+						pfile = fopen(fullpath.c_str(), "w");
+
+						// create the XML and save to file
+						driver_enumerator drvlist(machine().options());
+						drvlist.exclude_all();
+						for (auto & elem : m_list)
+							drvlist.include(driver_list::find(*elem));
+
+						info_xml_creator creator(drvlist);
+						creator.output(pfile, false);
+						fclose(pfile);
+						machine().popmessage(_("%s.xml saved under ui folder."), filename.c_str());
+					}
+				}
+				break;
+			}
+			case 2:
+			{
+				if (m_event->iptkey == IPT_UI_SELECT)
+				{
+					std::string filename("exported");
+					std::string buffer;
+					emu_file infile(machine().ui().options().ui_path(), OPEN_FLAG_READ);
+					if (infile.open(filename.c_str(), ".txt") == FILERR_NONE)
+						for (int seq = 0; ; ++seq)
+						{
+							std::string seqtext;
+							strprintf(seqtext, "%s_%04d", filename.c_str(), seq);
+							if (infile.open(seqtext.c_str(), ".txt") != FILERR_NONE)
+							{
+								filename = seqtext;
+								break;
+							}
+						}
+
+					// attempt to open the output file
+					emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+					if (file.open(filename.c_str(), ".txt") == FILERR_NONE)
+					{
+						// print the header
+						buffer.assign(_("Name:             Description:\n"));
+						driver_enumerator drvlist(machine().options());
+						drvlist.exclude_all();
+						for (auto & elem : m_list)
+							drvlist.include(driver_list::find(*elem));
+
+						// iterate through drivers and output the info
+						while (drvlist.next())
+							if ((drvlist.driver().flags & MACHINE_NO_STANDALONE) == 0)
+								strcatprintf(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().description);
+						file.puts(buffer.c_str());
+						file.close();
+						machine().popmessage(_("%s.txt saved under ui folder."), filename.c_str());
+					}
+				}
+				break;
+			}
+			default:
+				break;
+		}
+	}
+}
+
+//-------------------------------------------------
+//  populate
+//-------------------------------------------------
+
+void ui_menu_export::populate()
+{
+	// add options items
+	item_append(_("Export XML format (like -listxml)"), nullptr, 0, (void *)(FPTR)1);
+	item_append(_("Export TXT format (like -listfull)"), nullptr, 0, (void *)(FPTR)2);
+	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+}
+
+//-------------------------------------------------
+//  ctor / dtor
+//-------------------------------------------------
+
+ui_menu_machine_configure::ui_menu_machine_configure(running_machine &machine, render_container *container, const game_driver *prev)
+	: ui_menu(machine, container), m_drv(prev)
+{
+}
+
+ui_menu_machine_configure::~ui_menu_machine_configure()
+{
+}
+
+//-------------------------------------------------
+//  handlethe options menu
+//-------------------------------------------------
+
+void ui_menu_machine_configure::handle()
+{
+	// process the menu
+	ui_menu::menu_stack->parent->process(UI_MENU_PROCESS_NOINPUT);
+	const ui_menu_event *m_event = process(UI_MENU_PROCESS_NOIMAGE);
+	if (m_event != nullptr && m_event->itemref != nullptr)
+	{
+		switch ((FPTR)m_event->itemref)
+		{
+			case 1:
+			{
+				if (m_event->iptkey == IPT_UI_SELECT)
+				{
+					std::string filename(m_drv->name);
+					emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+					file_error filerr = file.open(filename.c_str(), ".ini");
+					if (filerr == FILERR_NONE)
+					{
+						std::string inistring = machine().options().output_ini();
+						file.puts(inistring.c_str());
+					}
+				}
+			break;
+			}
+		default:
+			break;
+		}
+	}
+}
+
+//-------------------------------------------------
+//  populate
+//-------------------------------------------------
+
+void ui_menu_machine_configure::populate()
+{
+	// add options items
+	item_append(_("Dummy"), nullptr, 0, (void *)(FPTR)10);
+	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(_("Save machine configuration"), nullptr, 0, (void *)(FPTR)1);
+	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	customtop = machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
+}
+
+//-------------------------------------------------
+//  perform our special rendering
+//-------------------------------------------------
+
+void ui_menu_machine_configure::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+{
+	float width;
+	ui_manager &mui = machine().ui();
+
+	mui.draw_text_full(container, m_drv->description, 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	width += 2 * UI_BOX_LR_BORDER;
+	float maxwidth = MAX(origx2 - origx1, width);
+
+	// compute our bounds
+	float x1 = 0.5f - 0.5f * maxwidth;
+	float x2 = x1 + maxwidth;
+	float y1 = origy1 - top;
+	float y2 = origy1 - UI_BOX_TB_BORDER;
+
+	// draw a box
+	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+
+	// take off the borders
+	x1 += UI_BOX_LR_BORDER;
+	x2 -= UI_BOX_LR_BORDER;
+	y1 += UI_BOX_TB_BORDER;
+
+	// draw the text within it
+	mui.draw_text_full(container, m_drv->description, x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }

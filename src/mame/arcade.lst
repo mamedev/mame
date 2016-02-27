@@ -382,7 +382,7 @@ hustlerb4       // bootleg
 frogger         // GX392 (c) 1981 Konami
 froggers1       // (c) 1981 Sega
 froggers2       // 834-0068 (c) 1981 Sega
-froggers3		// 
+froggers3       //
 froggermc       // 800-3110 (c) 1981 Sega
 amidar          // GX337 (c) 1982 Konami
 amidar1         // GX337 (c) 1981 Konami
@@ -2108,7 +2108,7 @@ sboblbobl       // bootleg
 sboblbobla      // bootleg
 sboblboblb      // bootleg
 sboblboblc      // bootleg
-sboblbobld		// bootleg
+sboblbobld      // bootleg
 bublboblb       // bootleg
 bub68705        // bootleg
 dland           // bootleg
@@ -4769,6 +4769,7 @@ fantzn2xp       // (c) 2008 Sega / M2
 // Philko Boards
 atomicp         // (c) 1990 Philko - korean clone board
 snapper         // (c) 1990 Philko - korean clone board
+lockonph
 
 // S16 decrypted bootlegs
 cottonjd
@@ -4897,7 +4898,7 @@ astormb2        // BOOTLEG
 shdancbl        // BOOTLEG
 shdancbla       // BOOTLEG
 mwalkbl         // BOOTLEG
-
+ddcrewbl
 
 // Outrun Hardware
 				// 1986.11 Outrun (US)
@@ -5155,27 +5156,27 @@ shienryu        // 1997.02 Shienryu (Warashi)
 vmahjong        // 1997.02 Virtual Mahjong (Micronet)
 pclub2kc        // 1997.02 Print Club Kome Kome Club
 pclub2fc        // 1997.04 Print Club 2 Felix The Cat
-pclub2pe		//
-pclub2wb		//
-pclub2pf		//
-pclub26w		//
-pclub27s		//
-pclubyo2		//
+pclub2pe        //
+pclub2wb        //
+pclub2pf        //
+pclub26w        //
+pclub27s        //
+pclubyo2        //
 groovef         // 1997.05 Groove on Fight (Atlus)
 nclubv3         // 1997.07 Name Club Ver. 3
-nclubv2			//
-nameclub		//
+nclubv2         //
+nameclub        //
 pclb2elk        // 1997.07 Print Club Custom
 pclub2          // 1997.09 Print Club 2
 thunt           // 1997.09 Puzzle & Action Treasure Hunt (Sega (Deniam License))
 thuntk
 winterht        // 1997.10 Winter Heat (Data East)
 prc297wi        // 1997.10 Print Club 2 '97 Winter Ver
-prc297wia		//
+prc297wia       //
 prc298sp        // 1997.10 Print Club 2 '98 Spring Ver
-prc298su		//
-pclove			//
-pclove2			//
+prc298su        //
+pclove          //
+pclove2         //
 cotton2         // 1997.11 Cotton 2 (Success)
 hanagumi        // 1997.11 Sakura Taisen Hanagumi Taisen Columns
 findlove        // 1997.12 Find Love (Daiki / FCF)
@@ -5824,6 +5825,7 @@ dolphin         // 2003.08 Dolphin Blue
 kov7sprt        // 2003.11 Knights of Valour - The Seven Sprits
 ggisuka         // 2003.12 Guilty Gear Isuka
 				// 2003.12 Sangoku Senki Shichisei Tensei (IGS)
+rumblefp        // 2004.02 The Rumble Fish (prototype)
 rumblef         // 2004.03 The Rumble Fish
 rangrmsn        // 2004.03 Ranger Mission
 salmankt        // 2004.06 Salary Man Kintarou Net Select
@@ -5837,6 +5839,7 @@ anmlbskt        // 2005.01 Animal Basket (date is inside of ROM, probably earlie
 vfurlong        // 2005.03 Net Select Keiba Victory Furlong
 rumblef2        // 2005.03 The Rumble Fish 2
 ngbc            // 2005.07 NeoGeo Battle Colloseum
+ngbcj           // 2005.07 NeoGeo Battle Colloseum (Japan)
 samsptk         // 2005.09 Samurai Spirits Tenkaichi Kenkakuden
 kofxi           // 2005.10 The King of Fighters XI
 fotns           // 2005.12 Hokuto no Ken
@@ -6379,7 +6382,7 @@ charlien        // MBR (c) 1994 Mitchell
 				// MBV ??
 				// MBW ??
 wcvol95         // MBX (c) 1993 Data East
-wcvol95x		// ?
+wcvol95x        // ?
 				// MBY ??
 backfire        // MBZ (c) 1995
 backfirea       // MBZ (c) 1995
@@ -7707,7 +7710,7 @@ tnk3j           // A5001      (c) 1985
 athena          //       'UP' (c) 1986
 fitegolf        //       'GU' (c) 1988
 fitegolfu       //       'GU' (c) 1988
-fitegolf2		//
+fitegolf2       //
 countryc        // A7004 'CC' (c) 1988
 ikari           // A5004 'IW' (c) 1986
 ikaria          // A5004 'IW' (c) 1986
@@ -8823,7 +8826,7 @@ rdft2a          // (c) 1997 Seibu Kaihatsu (Metrotainment license)
 rdft2aa         // (c) 1997 Seibu Kaihatsu (Dream Island license)
 rdft2j          // (c) 1997 Seibu Kaihatsu
 rdft2ja         // (c) 1997 Seibu Kaihatsu
-rdft2it			// (c) 1997 Seibu Kaihatsu
+rdft2it         // (c) 1997 Seibu Kaihatsu
 rdft2t          // (c) 1997 Seibu Kaihatsu
 rdft2u          // (c) 1997 Seibu Kaihatsu (Fabtek license)
 rdft2us         // (c) 1997 Seibu Kaihatsu (Fabtek license)
@@ -8972,7 +8975,7 @@ edfu            // (c) 1991 (North America)
 edfbl           // (c) 1991
 64street        // (c) 1991
 64streetj       // (c) 1991 (Japan)
-64streetja		// (c) 1991 (Japan)
+64streetja      // (c) 1991 (Japan)
 soldam          // (c) 1992
 soldamj         // (c) 1992 (Japan)
 bigstrik        // (c) 1992
@@ -9191,7 +9194,7 @@ thoop           // (c) 1992 - Ref 922804/1
 squash          // (c) 1992 - Ref 922804/2
 wrally          // (c) 1993 - Ref 930705
 wrallya         // (c) 1993 - Ref 930705
-wrallyb			// (c) 1993 - Ref 930217
+wrallyb         // (c) 1993 - Ref 930217
 wrallyat        // (c) 1993 - Ref 930217
 glass           // (c) 1993 - Ref 931021
 glass10         // (c) 1993 - Ref 931021
@@ -9301,8 +9304,8 @@ oedfight        // (c) 1994 Kaneko
 bonkadv         // (c) 1994 Kaneko
 gtmr            // (c) 1994 Kaneko
 gtmra           // (c) 1994 Kaneko
-gtmrb			// (c) 1994 Kaneko
-gtmro			// (c) 1994 Kaneko
+gtmrb           // (c) 1994 Kaneko
+gtmro           // (c) 1994 Kaneko
 gtmre           // (c) 1994 Kaneko
 gtmrusa         // (c) 1994 Kaneko (US)
 gtmr2           // (c) 1995 Kaneko
@@ -9886,7 +9889,7 @@ spec2kh         // (c) 2000 Yonatech
 // http://www.esdgame.co.kr/english/
 multchmp        // (c) 1999 (World)
 multchmpk       // (c) 1998 (Korea)
-multchmpa		// (c) 1998 (World)
+multchmpa       // (c) 1998 (World)
 mchampdx        // (c) 1999 ESD
 mchampdxa       // (c) 1999 ESD
 mchampdxb       // (c) 1999 ESD
@@ -10565,7 +10568,7 @@ fastdraw_130    // (c) 1995
 aplatoon        // (c) 199? Nova?
 zortonbr        // (c) 1993 Web Picmatic
 
-crospuzl		//
+crospuzl        //
 // Crystal System
 crysbios
 crysking        // 2001 Brezzasoft. Crystal of the kings
@@ -10768,7 +10771,7 @@ coolpool        // (c) 1992 Catalina Games
 9ballsht3       // (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games"
 9ballshtc       // (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games"
 megaphx         // (c) 1991 Dinamic / Inder
-flagrall		// ?
+flagrall        // ?
 gumbo           // (c) 1994 Min Corp.
 mspuzzleg       // (c) 1994 Min Corp.
 mspuzzle        // (c) 1994 Min Corp.
@@ -32730,4 +32733,4 @@ fi6845
 fi8275
 
 l9nibble   // unknown Nibble game.
- 
+	

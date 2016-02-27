@@ -20,7 +20,7 @@
 
 bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, texture_manager& textures, target_manager& targets, effect_manager& effects)
 {
-    validate_parameters(value);
+	validate_parameters(value);
 
 	bgfx_effect* effect = effects.effect(value["effect"].GetString());
 

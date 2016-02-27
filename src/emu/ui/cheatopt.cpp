@@ -192,7 +192,7 @@ void ui_menu_autofire::handle()
 			if (menu_event->itemref == ITEMREF_AUTOFIRE_STATUS)
 			{
 				// toggle autofire status
-				bool autofire_toggle = machine().ioport().get_autofire_toggle(); 	// (menu_event->iptkey == IPT_UI_LEFT);
+				bool autofire_toggle = machine().ioport().get_autofire_toggle();    // (menu_event->iptkey == IPT_UI_LEFT);
 				machine().ioport().set_autofire_toggle(!autofire_toggle);
 				changed = true;
 			}
@@ -321,5 +321,3 @@ void ui_menu_autofire::populate()
 
 	last_toggle = autofire_toggle;
 }
-
-

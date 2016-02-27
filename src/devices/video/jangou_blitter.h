@@ -43,9 +43,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override; 
+	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 private:
 	void plot_gfx_pixel( UINT8 pix, int x, int y );
 	UINT8 gfx_nibble( UINT32 niboffset );

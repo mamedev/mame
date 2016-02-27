@@ -19,13 +19,13 @@ using namespace rapidjson;
 
 class blend_reader : public state_reader {
 public:
-    static uint64_t read_from_value(const Value& value);
+	static uint64_t read_from_value(const Value& value);
 
 private:
-    static const int EQUATION_COUNT = 7;
-    static const string_to_enum EQUATION_NAMES[EQUATION_COUNT];
-    static const int FUNCTION_COUNT = 16;
-    static const string_to_enum FUNCTION_NAMES[FUNCTION_COUNT];
+	static const int EQUATION_COUNT = 7;
+	static const string_to_enum EQUATION_NAMES[EQUATION_COUNT];
+	static const int FUNCTION_COUNT = 16;
+	static const string_to_enum FUNCTION_NAMES[FUNCTION_COUNT];
 };
 
 #endif // __DRAWBGFX_BLEND_READER__

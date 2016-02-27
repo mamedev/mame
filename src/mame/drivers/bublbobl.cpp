@@ -1897,7 +1897,7 @@ GAME( 1986, boblbobl,   bublbobl, boblbobl, boblbobl,   bublbobl_state, bublbobl
 GAME( 1986, sboblbobl,  bublbobl, boblbobl, sboblbobl,  bublbobl_state, bublbobl, ROT0,  "bootleg (Datsu)", "Super Bobble Bobble (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sboblbobla, bublbobl, boblbobl, boblbobl,   bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sboblboblb, bublbobl, boblbobl, sboblboblb, bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (bootleg, set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblbobld, bublbobl, boblbobl, sboblboblb, bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (bootleg, set 4)", MACHINE_SUPPORTS_SAVE ) 
+GAME( 1986, sboblbobld, bublbobl, boblbobl, sboblboblb, bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sboblboblc, bublbobl, boblbobl, sboblboblb, bublbobl_state, bublbobl, ROT0,  "bootleg", "Super Bubble Bobble (bootleg)", MACHINE_SUPPORTS_SAVE ) // the title screen on this one isn't hacked
 GAME( 1986, bub68705,   bublbobl, bub68705, bublbobl,   bublbobl_state, bublbobl, ROT0,  "bootleg", "Bubble Bobble (bootleg with 68705)", MACHINE_SUPPORTS_SAVE )
 

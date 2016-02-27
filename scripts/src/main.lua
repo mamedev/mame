@@ -25,6 +25,25 @@ else
 end	
 	uuid (os.uuid(_target .."_" .. _subtarget))
 	kind "ConsoleApp"
+	
+	configuration { "android*" }
+		targetextension ".so"
+		linkoptions {
+			"-shared",
+		}
+		links {
+			"EGL",
+			"GLESv2",
+		} 	
+	configuration { "pnacl" }
+		kind "ConsoleApp"
+		targetextension ".pexe"
+		links {
+			"ppapi",
+			"ppapi_gles2",
+			"pthread",
+		}
+	configuration {  }
 
 	addprojectflags()
 	flags {
@@ -142,11 +161,15 @@ end
 		"7z",
 		"lua",
 		"lualibs",
-		"luv",
-		"uv",
-		"http-parser",
 	}
 
+	if _OPTIONS["USE_LIBUV"]=="1" then
+		links {		
+			"luv",
+			"uv",
+			"http-parser",
+		}
+	end
 	if _OPTIONS["with-bundled-zlib"] then
 		links {
 			"zlib",

@@ -406,7 +406,7 @@ end
 			"LUA_COMPAT_5_1",
 			"LUA_COMPAT_5_2",
 		}
-	if not (_OPTIONS["targetos"]=="windows") and not (_OPTIONS["targetos"]=="asmjs") then
+	if not (_OPTIONS["targetos"]=="windows") and not (_OPTIONS["targetos"]=="asmjs") and not (_OPTIONS["targetos"]=="pnacl") then
 		defines {
 			"LUA_USE_POSIX",
 		}
@@ -480,6 +480,11 @@ project "lualibs"
 			"/wd4130", -- warning C4130: '==': logical operation on address of string constant
 		}
 
+	configuration { "pnacl"}
+		buildoptions {
+			"-Wno-char-subscripts",
+		}
+
 	configuration { }
 		defines {
 			"LUA_COMPAT_ALL",
@@ -508,7 +513,7 @@ project "lualibs"
 --------------------------------------------------
 -- luv lua library objects
 --------------------------------------------------
-
+if _OPTIONS["USE_LIBUV"]=="1" then
 project "luv"
 	uuid "d98ec5ca-da2a-4a50-88a2-52061ca53871"
 	kind "StaticLib"
@@ -518,6 +523,7 @@ project "luv"
 			"_WIN32_WINNT=0x0600",
 		}
 	end
+
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
@@ -528,10 +534,14 @@ project "luv"
 			"-Wno-unused-function",
 			"-Wno-strict-prototypes",
 			"-Wno-unused-variable",
-			"-Wno-maybe-uninitialized",
 			"-Wno-undef",
 		}
 
+	configuration { "not android-*" }
+		buildoptions_c {
+			"-Wno-maybe-uninitialized",
+		}
+		
 	configuration { "vs2015" }
 		buildoptions {
 			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
@@ -557,7 +567,7 @@ project "luv"
 		MAME_DIR .. "3rdparty/luv/src/luv.c",
 		MAME_DIR .. "3rdparty/luv/src/luv.h",
 	}
-
+end
 --------------------------------------------------
 -- SQLite3 library objects
 --------------------------------------------------
@@ -581,7 +591,10 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
 		}
 end
-
+	configuration { "pnacl" }
+		defines {
+			"SQLITE_OMIT_LOAD_EXTENSION",
+		}
 	configuration { "vs2015" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
@@ -737,6 +750,11 @@ end
 			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 		}
 
+	configuration { "android-*"}
+		buildoptions {
+			"-Wno-macro-redefined",
+		}
+
 	configuration { "vs*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/msvc",
@@ -878,7 +896,7 @@ end
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if (_OPTIONS["gcc"]~=nil) then
-		if string.find(_OPTIONS["gcc"], "clang") then
+		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "android") then
 			buildoptions_c {
 				"-Wno-unknown-warning-option",
 				"-Wno-absolute-value",
@@ -989,6 +1007,7 @@ end
 --------------------------------------------------
 -- libuv library objects
 --------------------------------------------------
+if _OPTIONS["USE_LIBUV"]=="1" then
 project "uv"
 	uuid "cd2afe7f-139d-49c3-9000-fc9119f3cea0"
 	kind "StaticLib"
@@ -1012,7 +1031,7 @@ project "uv"
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if (_OPTIONS["gcc"]~=nil) then
-		if string.find(_OPTIONS["gcc"], "clang") then
+		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "android") then
 			buildoptions_c {
 				"-Wno-unknown-warning-option",
 				"-Wno-unknown-attributes",
@@ -1138,6 +1157,25 @@ project "uv"
 			MAME_DIR .. "3rdparty/libuv/src/unix/proctitle.c",
 		}
 	end
+			
+	if _OPTIONS["targetos"]=="android" then
+		defines {
+			"_GNU_SOURCE",
+		}
+		buildoptions {
+			"-Wno-header-guard",
+		}
+		files {
+			MAME_DIR .. "3rdparty/libuv/src/unix/proctitle.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/linux-core.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/linux-inotify.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/linux-syscalls.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/linux-syscalls.h",
+			MAME_DIR .. "3rdparty/libuv/src/unix/pthread-fixes.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/android-ifaddrs.c",
+		}
+	end
+			
 	if _OPTIONS["targetos"]=="solaris" then
 		defines {
 			"__EXTENSIONS__",
@@ -1159,7 +1197,7 @@ project "uv"
 			"-Wshadow"
 		}
 	end
-
+end
 --------------------------------------------------
 -- HTTP parser library objects
 --------------------------------------------------

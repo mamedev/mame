@@ -939,9 +939,9 @@ Notes:
 ROM_START( bombsa )
 	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )                 /* Main CPU */
 	ROM_LOAD( "4.7a",         0x00000, 0x08000, CRC(0191f6a7) SHA1(10a0434abbf4be068751e65c81b1a211729e3742) )
-	/* these fail their self-test... should be checked on real hw (hold start1+start2 on boot) */
-	ROM_LOAD( "5.7c",         0x10000, 0x08000, BAD_DUMP CRC(095c451a) SHA1(892ca84376f89640ad4d28f1e548c26bc8f72c0e) ) // contains palettes etc. but fails rom check??
-	ROM_LOAD( "6.7d",         0x20000, 0x10000, BAD_DUMP CRC(89f9dc0f) SHA1(5cf6a7aade3d56bc229d3771bc4141ad0c0e8da2) )
+	/* these two fail their self-test, happens on real HW as well. */
+	ROM_LOAD( "5.7c",         0x10000, 0x08000, CRC(095c451a) SHA1(892ca84376f89640ad4d28f1e548c26bc8f72c0e) )
+	ROM_LOAD( "6.7d",         0x20000, 0x10000, CRC(89f9dc0f) SHA1(5cf6a7aade3d56bc229d3771bc4141ad0c0e8da2) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )                    /* Sound CPU */
 	ROM_LOAD( "1.3a",         0x00000, 0x08000, CRC(92801404) SHA1(c4ff47989d355b18a909eaa88f138e2f68178ecc) )
@@ -951,9 +951,9 @@ ROM_START( bombsa )
 	ROM_LOAD( "3.4s",         0x10000, 0x10000, CRC(9a8a8a97) SHA1(13328631202c196c9d8791cc6063048eb6be0472) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )    /* background tiles */
-	/* some corrupt 'blank' characters, should also be checked with a redump */
-	ROM_LOAD( "8.2l",         0x00000, 0x10000, BAD_DUMP CRC(3391c769) SHA1(7ae7575ac81d6e0d915c279c1f57a9bc6d096bd6) )
-	ROM_LOAD( "9.2m",         0x10000, 0x10000, BAD_DUMP CRC(5b315976) SHA1(d17cc1926f926bdd88b66ea6af88dac30880e7d4) )
+	/* some corrupt 'blank' characters in these */
+	ROM_LOAD( "8.2l",         0x00000, 0x10000, CRC(3391c769) SHA1(7ae7575ac81d6e0d915c279c1f57a9bc6d096bd6) )
+	ROM_LOAD( "9.2m",         0x10000, 0x10000, CRC(5b315976) SHA1(d17cc1926f926bdd88b66ea6af88dac30880e7d4) )
 
 	ROM_REGION( 0x08000, "gfx3", 0 )    /* foreground tiles */
 	ROM_LOAD( "7.4f",         0x00000, 0x08000, CRC(400114b9) SHA1(db2f3ba05a2005ae0e0e7d19c8739353032cbeab) )

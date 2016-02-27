@@ -33,7 +33,7 @@ public:
 		if (strcmp(machine().options().ui(),"simple")==0) {
 			ui_simple_menu_select_game::force_game_select(machine(), &machine().render().ui_container());
 		} else {
-			ui_menu_select_game::force_game_select(machine(), &machine().render().ui_container());			
+			ui_menu_select_game::force_game_select(machine(), &machine().render().ui_container());
 		}
 	}
 

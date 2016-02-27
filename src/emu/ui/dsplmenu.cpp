@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:Dankan1890
 /*********************************************************************
 
@@ -23,10 +23,10 @@
 
 
 ui_menu_display_options::video_modes ui_menu_display_options::m_video = {
-	{ "auto",	"Auto" },
-	{ "opengl",	"OpenGL" },
-	{ "bgfx",	"BGFX" },
-	{ "d3d",	"Direct3D" },
+	{ "auto",   "Auto" },
+	{ "opengl", "OpenGL" },
+	{ "bgfx",   "BGFX" },
+	{ "d3d",    "Direct3D" },
 	{ "gdi",    "GDI" },
 	{ "ddraw",  "DirectDraw" },
 	{ "soft",   "Software" },
@@ -107,20 +107,20 @@ ui_menu_display_options::ui_menu_display_options(running_machine &machine, rende
 ui_menu_display_options::~ui_menu_display_options()
 {
 	std::string error_string;
-	for (int d = 2; d < ARRAY_LENGTH(m_options); ++d) 
+	for (int d = 2; d < ARRAY_LENGTH(m_options); ++d)
 	{
 		if (machine().options().int_value(m_options[d].option) != m_options[d].status)
 		{
 			machine().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
 			machine().options().mark_changed(m_options[d].option);
-		}	
+		}
 	}
 	if (machine().options().value(m_options[1].option) !=  m_list[m_options[1].status])
 	{
 		machine().options().set_value(m_options[1].option, m_list[m_options[1].status].c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 		machine().options().mark_changed(m_options[1].option);
 
-	}	
+	}
 	ui_globals::reset = true;
 }
 

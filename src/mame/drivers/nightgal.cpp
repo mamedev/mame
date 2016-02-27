@@ -14,7 +14,7 @@ TODO:
  - Fix Sweet Gal/Sexy Gal layer clearances;
  - NMI origin for Sexy Gal / Night Gal Summer
  - unemulated WAIT pin for Z80, MCU asserts it when accessing communication RAM
- 
+
 *******************************************************************************************/
 
 #include "emu.h"
@@ -218,7 +218,7 @@ READ8_MEMBER(nightgal_state::royalqn_nsc_blit_r)
 {
 	if(offset == 2)
 		m_subcpu->set_input_line(0, CLEAR_LINE );
-	
+
 	return m_blit_raw_data[offset];
 }
 
@@ -230,10 +230,10 @@ TIMER_CALLBACK_MEMBER(nightgal_state::z80_wait_ack_cb)
 void nightgal_state::z80_wait_assert_cb()
 {
 	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
-	
+
 	// Note: cycles_to_attotime requires z80 context to work, calling for example m_subcpu as context gives a x4 cycle boost in z80 terms (reads execute_cycles_to_clocks() from NCS?) even if they runs at same speed basically.
 	// TODO: needs a getter that tells a given CPU how many cycles requires an executing opcode for the r/w operation, which stacks with wait state penalty for accessing this specific area.
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(4), timer_expired_delegate(FUNC(nightgal_state::z80_wait_ack_cb),this));	
+	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(4), timer_expired_delegate(FUNC(nightgal_state::z80_wait_ack_cb),this));
 }
 
 READ8_MEMBER(nightgal_state::royalqn_comm_r)
@@ -344,7 +344,7 @@ static ADDRESS_MAP_START( sexygal_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
 	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, alt_process_w)
 	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, vregs_w)
-	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, bltflip_w) 
+	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, bltflip_w)
 
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_SHARE("comms_ram")
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION("subrom", 0)
@@ -382,7 +382,7 @@ static ADDRESS_MAP_START( royalqn_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
 	AM_RANGE(0x0080, 0x0086) AM_DEVWRITE("blitter", jangou_blitter_device, process_w)
 	AM_RANGE(0x00a0, 0x00af) AM_DEVWRITE("blitter", jangou_blitter_device, vregs_w)
-	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, bltflip_w) 
+	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("blitter", jangou_blitter_device, bltflip_w)
 
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r,royalqn_comm_w)
 	AM_RANGE(0x4000, 0x4000) AM_NOP
@@ -626,7 +626,7 @@ static INPUT_PORTS_START( sexygal )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("BLIT_PORT")
 	PORT_DIPNAME( 0x01, 0x01, "BLIT_PORT" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

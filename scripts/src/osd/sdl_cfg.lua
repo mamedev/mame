@@ -137,13 +137,6 @@ elseif _OPTIONS["targetos"]=="freebsd" then
 		-- /usr/local/include is not considered a system include director on FreeBSD.  GL.h resides there and throws warnings
 		"-isystem /usr/local/include",
 	}
-elseif _OPTIONS["targetos"]=="os2" then
-	defines {
-		"SDLMAME_OS2",
-	}
-	buildoptions {
-		backtick(sdlconfigcmd() .. " --cflags"),
-	}
 end
 
 configuration { "osx*" }

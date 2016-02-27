@@ -38,7 +38,7 @@
 #include "osdcore.h"
 #include "modules/lib/osdlib.h"
 
-#if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
+#if defined(SDLMAME_WIN32)
 #define PATHSEPCH '\\'
 #define INVPATHSEPCH '/'
 #else
@@ -46,7 +46,7 @@
 #define INVPATHSEPCH '\\'
 #endif
 
-#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU) || defined(SDLMAME_EMSCRIPTEN)
+#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_HAIKU) || defined(SDLMAME_EMSCRIPTEN)
 typedef struct dirent sdl_dirent;
 typedef struct stat sdl_stat;
 #define sdl_readdir readdir

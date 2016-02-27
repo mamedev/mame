@@ -364,6 +364,8 @@ void sdl_osd_interface::extract_video_config()
 	{
 #if (defined SDLMAME_MACOSX || defined SDLMAME_WIN32)
 		stemp = "opengl";
+#elif (defined __STEAMLINK__)
+		stemp = "bgfx";
 #else
 		stemp = "soft";
 #endif
@@ -378,8 +380,10 @@ void sdl_osd_interface::extract_video_config()
 		if (options().seconds_to_run() == 0)
 			osd_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
-	else if (USE_OPENGL && (strcmp(stemp, SDLOPTVAL_OPENGL) == 0))
+#if (USE_OPENGL)	
+	else if (strcmp(stemp, SDLOPTVAL_OPENGL) == 0)
 		video_config.mode = VIDEO_MODE_OPENGL;
+#endif		
 	else if ((strcmp(stemp, SDLOPTVAL_SDL2ACCEL) == 0))
 	{
 		video_config.mode = VIDEO_MODE_SDL2ACCEL;
