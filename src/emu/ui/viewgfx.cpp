@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-    ui/viewgfx.c
+    ui/viewgfx.cpp
 
     Internal graphics viewer.
 

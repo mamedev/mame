@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
-    ui/simpleselgame.c
+    ui/simpleselgame.cpp
 
     Game selector
 
@@ -135,7 +135,7 @@ void ui_simple_menu_select_game::handle()
 //-------------------------------------------------
 //  inkey_select
 //-------------------------------------------------
-extern void save_main_option(running_machine &machine);
+
 void ui_simple_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 {
 	const game_driver *driver = (const game_driver *)menu_event->itemref;
@@ -143,8 +143,6 @@ void ui_simple_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 	// special case for configure inputs
 	if ((FPTR)driver == 1)
 		ui_menu::stack_push(global_alloc_clear<ui_menu_game_options>(machine(), container));
-	else if ((FPTR)driver == 2)
-		save_main_option(machine());
 	// anything else is a driver
 	else
 	{
@@ -262,8 +260,7 @@ void ui_simple_menu_select_game::populate()
 	{
 		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 		item_append(_("Configure Options"), nullptr, 0, (void *)1);
-		item_append(_("Save Configuration"), nullptr, 0, (void *)2);
-		skip_main_items = 2;
+		skip_main_items = 1;
 	}
 
 	// configure the custom rendering

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods, Maurizio Petrarota
 /*********************************************************************
 
-    ui/menu.c
+    ui/menu.cpp
 
     Internal MAME menus for the user interface.
 
@@ -63,8 +63,6 @@ static const char *hover_msg[] = {
 	"Add or remove favorites",
 	"Export displayed list to file",
 	"Show DATs view",
-	"Setup directories",
-	"Configure options"
 };
 
 /***************************************************************************
@@ -1976,18 +1974,6 @@ void ui_menu::handle_main_events(UINT32 flags)
 				else if (hover == HOVER_B_DATS)
 				{
 					menu_event.iptkey = IPT_UI_DATS;
-					stop = true;
-				}
-				else if (hover == HOVER_B_SETTINGS)
-				{
-					menu_event.iptkey = IPT_UI_SELECT;
-					selected = visible_items + 1;
-					stop = true;
-				}
-				else if (hover == HOVER_B_FOLDERS)
-				{
-					menu_event.iptkey = IPT_UI_SELECT;
-					selected = visible_items + 2;
 					stop = true;
 				}
 				else if (hover >= HOVER_RP_FIRST && hover <= HOVER_RP_LAST)

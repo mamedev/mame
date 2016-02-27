@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-25 16:33+0100\n"
+"POT-Creation-Date: 2016-02-27 20:54+0100\n"
 "PO-Revision-Date: 2016-02-20 18:03+0100\n"
 "Last-Translator: A.Viloria\n"
 "Language-Team: MAME Language Team\n"
@@ -126,7 +126,7 @@ msgid "Mouse Device Assignment"
 msgstr "Asignación del Dispositivo Mouse"
 
 #: src/emu/ui/ctrlmenu.cpp:106 src/emu/ui/ctrlmenu.cpp:126
-#: src/emu/ui/optsmenu.cpp:253
+#: src/emu/ui/optsmenu.cpp:268
 msgid "Device Mapping"
 msgstr "Mapeado de Dispositivos"
 
@@ -213,7 +213,8 @@ msgstr "Configuración de las fuentes para el UI"
 
 #: src/emu/ui/custui.cpp:435
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr "Texto de ejemplo - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+msgstr ""
+"Texto de ejemplo - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 #: src/emu/ui/custui.cpp:533
 msgid "Normal text"
@@ -335,33 +336,34 @@ msgstr "Historia del software"
 msgid "Software Usage"
 msgstr "Uso del Software"
 
-#: src/emu/ui/datmenu.cpp:199
+#: src/emu/ui/datmenu.cpp:195
 msgid "Revision: "
 msgstr "Revisión: "
 
-#: src/emu/ui/datmenu.cpp:291 src/emu/ui/selgame.cpp:40
-#: src/emu/ui/selgame.cpp:2067 src/emu/ui/selgame.cpp:2076
-#: src/emu/ui/selsoft.cpp:1490 src/emu/ui/selsoft.cpp:1499
+#: src/emu/ui/datmenu.cpp:287 src/emu/ui/selgame.cpp:39
+#: src/emu/ui/selgame.cpp:2065 src/emu/ui/selgame.cpp:2074
+#: src/emu/ui/selsoft.cpp:1567 src/emu/ui/selsoft.cpp:1585
+#: src/emu/ui/selsoft.cpp:1594
 msgid "History"
 msgstr ""
 
-#: src/emu/ui/datmenu.cpp:293 src/emu/ui/selgame.cpp:41
+#: src/emu/ui/datmenu.cpp:289 src/emu/ui/selgame.cpp:40
 msgid "Mameinfo"
 msgstr ""
 
-#: src/emu/ui/datmenu.cpp:295 src/emu/ui/selgame.cpp:43
+#: src/emu/ui/datmenu.cpp:291 src/emu/ui/selgame.cpp:42
 msgid "Messinfo"
 msgstr ""
 
-#: src/emu/ui/datmenu.cpp:297 src/emu/ui/selgame.cpp:42
+#: src/emu/ui/datmenu.cpp:293 src/emu/ui/selgame.cpp:41
 msgid "Sysinfo"
 msgstr ""
 
-#: src/emu/ui/datmenu.cpp:299 src/emu/ui/selgame.cpp:45
+#: src/emu/ui/datmenu.cpp:295 src/emu/ui/selgame.cpp:44
 msgid "Mamescore"
 msgstr ""
 
-#: src/emu/ui/datmenu.cpp:301 src/emu/ui/selgame.cpp:44
+#: src/emu/ui/datmenu.cpp:297 src/emu/ui/selgame.cpp:43
 msgid "Command"
 msgstr ""
 
@@ -518,7 +520,7 @@ msgid " Folder"
 msgstr " Carpeta"
 
 #: src/emu/ui/dsplmenu.cpp:205 src/emu/ui/dsplmenu.cpp:225
-#: src/emu/ui/optsmenu.cpp:250
+#: src/emu/ui/optsmenu.cpp:265
 msgid "Display Options"
 msgstr "Mostrar Opciones"
 
@@ -683,7 +685,7 @@ msgid "Skip software parts selection menu"
 msgstr "No mostrar el menú de selección del software"
 
 #: src/emu/ui/miscmenu.cpp:654 src/emu/ui/miscmenu.cpp:674
-#: src/emu/ui/optsmenu.cpp:252
+#: src/emu/ui/optsmenu.cpp:267
 msgid "Miscellaneous Options"
 msgstr "Opciones varias"
 
@@ -701,62 +703,69 @@ msgstr "Nombre:             Descripción:\n"
 msgid "%s.txt saved under ui folder."
 msgstr "%s.txt guardado en la carpeta ui"
 
-#: src/emu/ui/miscmenu.cpp:801
-msgid "Export XML format"
+#: src/emu/ui/miscmenu.cpp:799
+#, fuzzy
+msgid "Export XML format (like -listxml)"
 msgstr "Exportar en formato XML"
 
-#: src/emu/ui/miscmenu.cpp:802
-msgid "Export TXT format"
+#: src/emu/ui/miscmenu.cpp:800
+#, fuzzy
+msgid "Export TXT format (like -listfull)"
 msgstr "Exportar en formato TXT"
 
-#: src/emu/ui/optsmenu.cpp:203
+#: src/emu/ui/miscmenu.cpp:858
+msgid "Dummy"
+msgstr ""
+
+#: src/emu/ui/miscmenu.cpp:860
+#, fuzzy
+msgid "Save machine configuration"
+msgstr "Configuración de la Máquina"
+
+#: src/emu/ui/optsmenu.cpp:217
 msgid "Filter"
 msgstr "Filtro"
 
-#: src/emu/ui/optsmenu.cpp:248
+#: src/emu/ui/optsmenu.cpp:262
 msgid "Customize UI"
 msgstr "Personalizar UI"
 
-#: src/emu/ui/optsmenu.cpp:251 src/emu/ui/sndmenu.cpp:152
+#: src/emu/ui/optsmenu.cpp:263
+msgid "Configure Directories"
+msgstr "Configurar Directorios"
+
+#: src/emu/ui/optsmenu.cpp:266 src/emu/ui/sndmenu.cpp:152
 #: src/emu/ui/sndmenu.cpp:172
 msgid "Sound Options"
 msgstr "Opciones de Sonido"
 
-#: src/emu/ui/optsmenu.cpp:254
+#: src/emu/ui/optsmenu.cpp:269
 msgid "General Inputs"
 msgstr ""
 
-#: src/emu/ui/optsmenu.cpp:269 src/emu/ui/optsmenu.cpp:289
+#: src/emu/ui/optsmenu.cpp:271
+msgid "Save Configuration"
+msgstr "Guardar Configuración"
+
+#: src/emu/ui/optsmenu.cpp:285 src/emu/ui/optsmenu.cpp:305
 msgid "Settings"
 msgstr "Configuración"
 
-#: src/emu/ui/optsmenu.cpp:309
+#: src/emu/ui/optsmenu.cpp:325
 msgid "**Error to save ui.ini**"
 msgstr "**Error al guardar ui.ini**"
 
-#: src/emu/ui/selector.cpp:152
-msgid "Selection List - Search: "
-msgstr "Lista de Selección - Buscar: "
-
-#: src/emu/ui/selector.cpp:181
-msgid " to select"
-msgstr " a seleccionar"
-
-#: src/emu/ui/selgame.cpp:39
-msgid "General Info"
-msgstr "Info General"
-
-#: src/emu/ui/selgame.cpp:133
+#: src/emu/ui/optsmenu.cpp:347
 #, c-format
 msgid "**Error to load %s.ini**"
 msgstr "**Error al leer %s.ini**"
 
-#: src/emu/ui/selgame.cpp:158
+#: src/emu/ui/optsmenu.cpp:372
 #, c-format
 msgid "**Error to save %s.ini**"
 msgstr "Error al guardar %s.ini**"
 
-#: src/emu/ui/selgame.cpp:162
+#: src/emu/ui/optsmenu.cpp:376
 msgid ""
 "\n"
 "    Configuration saved    \n"
@@ -766,7 +775,19 @@ msgstr ""
 "    Configuración guardada    \n"
 "\n"
 
-#: src/emu/ui/selgame.cpp:440
+#: src/emu/ui/selector.cpp:152
+msgid "Selection List - Search: "
+msgstr "Lista de Selección - Buscar: "
+
+#: src/emu/ui/selector.cpp:181
+msgid " to select"
+msgstr " a seleccionar"
+
+#: src/emu/ui/selgame.cpp:38
+msgid "General Info"
+msgstr "Info General"
+
+#: src/emu/ui/selgame.cpp:388
 #, c-format
 msgid ""
 "%s\n"
@@ -775,7 +796,7 @@ msgstr ""
 "%s\n"
 " añadido a la lista de favoritos."
 
-#: src/emu/ui/selgame.cpp:446 src/emu/ui/selgame.cpp:455
+#: src/emu/ui/selgame.cpp:394 src/emu/ui/selgame.cpp:403
 #, c-format
 msgid ""
 "%s\n"
@@ -784,190 +805,187 @@ msgstr ""
 "%s\n"
 " eliminado de la lista de favoritos."
 
-#: src/emu/ui/selgame.cpp:514
+#: src/emu/ui/selgame.cpp:464
 msgid ""
 "The selected machine is missing one or more required ROM or CHD images. "
 "Please select a different machine.\n"
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
-"Falta la máquina seleccionada o una o más de sus ROM o imágenes CHD. "
-"Por favor elija otra máquina.\n"
+"Falta la máquina seleccionada o una o más de sus ROM o imágenes CHD. Por "
+"favor elija otra máquina.\n"
 "\n"
 "Pulse cualquier tecla (excepto ESC) para continuar."
 
-#: src/emu/ui/selgame.cpp:651 src/emu/ui/simpleselgame.cpp:264
+#: src/emu/ui/selgame.cpp:601 src/emu/ui/simpleselgame.cpp:262
 msgid "Configure Options"
 msgstr "Configurar Opciones"
 
-#: src/emu/ui/selgame.cpp:652
-msgid "Configure Directories"
-msgstr "Configurar Directorios"
+#: src/emu/ui/selgame.cpp:602
+#, fuzzy
+msgid "Configure Machine"
+msgstr "Configurar Opciones"
 
-#: src/emu/ui/selgame.cpp:653 src/emu/ui/simpleselgame.cpp:265
-msgid "Save Configuration"
-msgstr "Guardar Configuración"
-
-#: src/emu/ui/selgame.cpp:762
-#, c-format
-msgid "MAME %s ( %d / %d machines (%d BIOS) )"
+#: src/emu/ui/selgame.cpp:711
+#, fuzzy, c-format
+msgid "%s %s ( %d / %d machines (%d BIOS) )"
 msgstr "MAME %s ( máquinas %d / %d (BIOS %d) )"
 
-#: src/emu/ui/selgame.cpp:782
+#: src/emu/ui/selgame.cpp:731
 msgid " Search: "
 msgstr " Buscar: "
 
-#: src/emu/ui/selgame.cpp:1474
+#: src/emu/ui/selgame.cpp:1458
 #, c-format
 msgid "Romset: %-.100s\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1475
+#: src/emu/ui/selgame.cpp:1459
 msgid "Year: "
 msgstr "Año: "
 
-#: src/emu/ui/selgame.cpp:1476
+#: src/emu/ui/selgame.cpp:1460
 #, c-format
 msgid "Manufacturer: %-.100s\n"
 msgstr "Fabricante: %-.100s\n"
 
-#: src/emu/ui/selgame.cpp:1480
+#: src/emu/ui/selgame.cpp:1464
 #, c-format
 msgid "Driver is Clone of: %-.100s\n"
 msgstr "El Driver es un Clon de %-.100s\n"
 
-#: src/emu/ui/selgame.cpp:1482
+#: src/emu/ui/selgame.cpp:1466
 msgid "Driver is Parent\n"
 msgstr "El Driver es Padre\n"
 
-#: src/emu/ui/selgame.cpp:1485
+#: src/emu/ui/selgame.cpp:1469
 msgid "Overall: NOT WORKING\n"
 msgstr "General: NO FUNCIONA\n"
 
-#: src/emu/ui/selgame.cpp:1487
+#: src/emu/ui/selgame.cpp:1471
 msgid "Overall: Unemulated Protection\n"
 msgstr "General: Protección no Emulada\n"
 
-#: src/emu/ui/selgame.cpp:1489
+#: src/emu/ui/selgame.cpp:1473
 msgid "Overall: Working\n"
 msgstr "General: Funciona\n"
 
-#: src/emu/ui/selgame.cpp:1492
+#: src/emu/ui/selgame.cpp:1476
 msgid "Graphics: Imperfect Colors\n"
 msgstr "Gráficos: Colores Imperfectos\n"
 
-#: src/emu/ui/selgame.cpp:1494
+#: src/emu/ui/selgame.cpp:1478
 msgid "Graphics: Wrong Colors\n"
 msgstr "Gráficos: Colores Erróneos\n"
 
-#: src/emu/ui/selgame.cpp:1496
+#: src/emu/ui/selgame.cpp:1480
 msgid "Graphics: Imperfect\n"
 msgstr "Gráficos: Imperfectos\n"
 
-#: src/emu/ui/selgame.cpp:1498
+#: src/emu/ui/selgame.cpp:1482
 msgid "Graphics: OK\n"
 msgstr "Gráficos: OK\n"
 
-#: src/emu/ui/selgame.cpp:1501
+#: src/emu/ui/selgame.cpp:1485
 msgid "Sound: Unimplemented\n"
 msgstr "Sonido: No Implementado\n"
 
-#: src/emu/ui/selgame.cpp:1503
+#: src/emu/ui/selgame.cpp:1487
 msgid "Sound: Imperfect\n"
 msgstr "Sonido: Imperfecto\n"
 
-#: src/emu/ui/selgame.cpp:1505
+#: src/emu/ui/selgame.cpp:1489
 msgid "Sound: OK\n"
 msgstr "Sonido: OK\n"
 
-#: src/emu/ui/selgame.cpp:1507
+#: src/emu/ui/selgame.cpp:1491
 #, c-format
 msgid "Driver is Skeleton: %s\n"
 msgstr "El Driver es un Skeleton: %s\n"
 
-#: src/emu/ui/selgame.cpp:1507 src/emu/ui/selgame.cpp:1508
-#: src/emu/ui/selgame.cpp:1509 src/emu/ui/selgame.cpp:1510
-#: src/emu/ui/selgame.cpp:1511 src/emu/ui/selgame.cpp:1512
-#: src/emu/ui/selgame.cpp:1513
+#: src/emu/ui/selgame.cpp:1491 src/emu/ui/selgame.cpp:1492
+#: src/emu/ui/selgame.cpp:1493 src/emu/ui/selgame.cpp:1494
+#: src/emu/ui/selgame.cpp:1495 src/emu/ui/selgame.cpp:1496
+#: src/emu/ui/selgame.cpp:1497
 msgid "Yes"
 msgstr "Si"
 
-#: src/emu/ui/selgame.cpp:1507 src/emu/ui/selgame.cpp:1508
-#: src/emu/ui/selgame.cpp:1509 src/emu/ui/selgame.cpp:1510
-#: src/emu/ui/selgame.cpp:1511 src/emu/ui/selgame.cpp:1512
-#: src/emu/ui/selgame.cpp:1513
+#: src/emu/ui/selgame.cpp:1491 src/emu/ui/selgame.cpp:1492
+#: src/emu/ui/selgame.cpp:1493 src/emu/ui/selgame.cpp:1494
+#: src/emu/ui/selgame.cpp:1495 src/emu/ui/selgame.cpp:1496
+#: src/emu/ui/selgame.cpp:1497
 msgid "No"
 msgstr "No"
 
-#: src/emu/ui/selgame.cpp:1508
+#: src/emu/ui/selgame.cpp:1492
 #, c-format
 msgid "Game is Mechanical: %s\n"
 msgstr "El Juego es Mecánico: %s\n"
 
-#: src/emu/ui/selgame.cpp:1509
+#: src/emu/ui/selgame.cpp:1493
 #, c-format
 msgid "Requires Artwork: %s\n"
 msgstr "Requiere Artwork: %s\n"
 
-#: src/emu/ui/selgame.cpp:1510
+#: src/emu/ui/selgame.cpp:1494
 #, c-format
 msgid "Requires Clickable Artwork: %s\n"
 msgstr "Requiere Artwork Clicable: %s\n"
 
-#: src/emu/ui/selgame.cpp:1511
+#: src/emu/ui/selgame.cpp:1495
 #, c-format
 msgid "Support Cocktail: %s\n"
 msgstr "Soporta Cocktail: %s\n"
 
-#: src/emu/ui/selgame.cpp:1512
+#: src/emu/ui/selgame.cpp:1496
 #, c-format
 msgid "Driver is Bios: %s\n"
 msgstr "El Driver es una Bios: %s\n"
 
-#: src/emu/ui/selgame.cpp:1513
+#: src/emu/ui/selgame.cpp:1497
 #, c-format
 msgid "Support Save: %s\n"
 msgstr "Soporta Guardado: %s\n"
 
-#: src/emu/ui/selgame.cpp:1514
+#: src/emu/ui/selgame.cpp:1498
 #, c-format
 msgid "Screen Orentation: %s\n"
 msgstr "Orientación de la Pantalla: %s\n"
 
-#: src/emu/ui/selgame.cpp:1514
+#: src/emu/ui/selgame.cpp:1498
 msgid "Vertical"
 msgstr "Vertical"
 
-#: src/emu/ui/selgame.cpp:1514
+#: src/emu/ui/selgame.cpp:1498
 msgid "Horizontal"
 msgstr "Horizontal"
 
-#: src/emu/ui/selgame.cpp:1522
+#: src/emu/ui/selgame.cpp:1506
 #, c-format
 msgid "Requires CHD: %s\n"
 msgstr "Requiere CHD: %s\n"
 
-#: src/emu/ui/selgame.cpp:1535
+#: src/emu/ui/selgame.cpp:1519
 msgid "Roms Audit Pass: OK\n"
 msgstr "Auditoría de las Roms: OK\n"
 
-#: src/emu/ui/selgame.cpp:1537
+#: src/emu/ui/selgame.cpp:1521
 msgid "Roms Audit Pass: BAD\n"
 msgstr "Auditoría de las Roms: MAL"
 
-#: src/emu/ui/selgame.cpp:1540
+#: src/emu/ui/selgame.cpp:1524
 msgid "Samples Audit Pass: None Needed\n"
 msgstr "Auditoría de los Samples: No es Necesario\n"
 
-#: src/emu/ui/selgame.cpp:1542
+#: src/emu/ui/selgame.cpp:1526
 msgid "Samples Audit Pass: OK\n"
 msgstr "Auditoría de los Samples: OK"
 
-#: src/emu/ui/selgame.cpp:1544
+#: src/emu/ui/selgame.cpp:1528
 msgid "Samples Audit Pass: BAD\n"
 msgstr "Auditoría de los Samples: MAL"
 
-#: src/emu/ui/selgame.cpp:1547
+#: src/emu/ui/selgame.cpp:1531
 msgid ""
 "Roms Audit Pass: Disabled\n"
 "Samples Audit Pass: Disabled\n"
@@ -975,12 +993,12 @@ msgstr ""
 "Auditoría de las Roms: Deshabilitado\n"
 "Auditoría de los Samples: Deshabilitado\n"
 
-#: src/emu/ui/selgame.cpp:1964 src/emu/ui/selgame.cpp:2111
-#: src/emu/ui/selsoft.cpp:1535
+#: src/emu/ui/selgame.cpp:1962 src/emu/ui/selgame.cpp:2123
+#: src/emu/ui/selsoft.cpp:1643
 msgid "No Infos Available"
 msgstr "No hay Infos disponibles"
 
-#: src/emu/ui/selgame.cpp:2077 src/emu/ui/selsoft.cpp:1500
+#: src/emu/ui/selgame.cpp:2075 src/emu/ui/selsoft.cpp:1595
 msgid "Usage"
 msgstr "Uso"
 
@@ -988,41 +1006,41 @@ msgstr "Uso"
 msgid " (default)"
 msgstr " (por defecto)"
 
-#: src/emu/ui/selsoft.cpp:642
+#: src/emu/ui/selsoft.cpp:688
 #, c-format
 msgid "Region: %s -"
 msgstr "Región: %s -"
 
-#: src/emu/ui/selsoft.cpp:644
+#: src/emu/ui/selsoft.cpp:690
 #, c-format
 msgid "Publisher: %s -"
 msgstr "Editor: %s -"
 
-#: src/emu/ui/selsoft.cpp:646
+#: src/emu/ui/selsoft.cpp:692
 #, c-format
 msgid "Year: %s -"
 msgstr "Año: %s -"
 
-#: src/emu/ui/selsoft.cpp:648
+#: src/emu/ui/selsoft.cpp:694
 #, c-format
 msgid "Software List: %s -"
 msgstr "Lista de Software: %s -"
 
-#: src/emu/ui/selsoft.cpp:650
+#: src/emu/ui/selsoft.cpp:696
 #, c-format
 msgid "Device type: %s -"
 msgstr "Tipo de Dispositivo: %s -"
 
-#: src/emu/ui/selsoft.cpp:652
+#: src/emu/ui/selsoft.cpp:698
 #, c-format
 msgid "%s Search: %s_"
 msgstr "%s Buscar: %s_"
 
-#: src/emu/ui/selsoft.cpp:1872 src/emu/ui/selsoft.cpp:1892
+#: src/emu/ui/selsoft.cpp:1979 src/emu/ui/selsoft.cpp:1999
 msgid "Software part selection:"
 msgstr "Selección de la parte software:"
 
-#: src/emu/ui/selsoft.cpp:2010 src/emu/ui/selsoft.cpp:2030
+#: src/emu/ui/selsoft.cpp:2117 src/emu/ui/selsoft.cpp:2137
 msgid "Bios selection:"
 msgstr "Selección de Bios:"
 
@@ -1044,7 +1062,9 @@ msgstr "Utilizar Samples Externos"
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
-msgstr "Este driver requiere que el software se cargue en los siguientes dispositivos: "
+msgstr ""
+"Este driver requiere que el software se cargue en los siguientes "
+"dispositivos: "
 
 #: src/emu/ui/ui.cpp:1062
 msgid ""
@@ -1052,8 +1072,8 @@ msgid ""
 "copyright law.\n"
 "\n"
 msgstr ""
-"El uso de emuladores junto con ROMs que no sean de su propiedad está prohibido por "
-"las leyes del copyright.\n"
+"El uso de emuladores junto con ROMs que no sean de su propiedad está "
+"prohibido por las leyes del copyright.\n"
 "\n"
 
 #: src/emu/ui/ui.cpp:1063
@@ -1062,20 +1082,23 @@ msgid ""
 "IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS ESC.\n"
 "\n"
 msgstr ""
-"SI NO ESTÁ LEGALMENTE LEGITIMADO PARA REPRODUCIR \"%s\" EN ESTE EMULADOR, PULSE ESC.\n"
+"SI NO ESTÁ LEGALMENTE LEGITIMADO PARA REPRODUCIR \"%s\" EN ESTE EMULADOR, "
+"PULSE ESC.\n"
 "\n"
 
 #: src/emu/ui/ui.cpp:1064
 msgid "Otherwise, type OK or move the joystick left then right to continue"
-msgstr "En otro caso, teclee OK o mueva el joystick de izquierda a derecha para continuar"
+msgstr ""
+"En otro caso, teclee OK o mueva el joystick de izquierda a derecha para "
+"continuar"
 
 #: src/emu/ui/ui.cpp:1099
 msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
 msgstr ""
-"Uno o más ROMs/CHDs de esta máquina son incorrectos. Esta máquina podría "
-"no funcionar correctamente.\n"
+"Uno o más ROMs/CHDs de esta máquina son incorrectos. Esta máquina podría no "
+"funcionar correctamente.\n"
 
 #: src/emu/ui/ui.cpp:1112
 msgid ""
@@ -1132,20 +1155,22 @@ msgid ""
 "This machine was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
 msgstr ""
-"Esta máquina nunca fue terminada. Podría mostrar un comportamiento extraño o falta "
-"de elementos que no son bugs de la emulación.\n"
+"Esta máquina nunca fue terminada. Podría mostrar un comportamiento extraño o "
+"falta de elementos que no son bugs de la emulación.\n"
 
 #: src/emu/ui/ui.cpp:1147
 msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
 msgstr ""
-"Esta máquina no tiene hardware de sonido, MAME no reproducirá sonidos, este es "
-"el comportamiento experado.\n"
+"Esta máquina no tiene hardware de sonido, MAME no reproducirá sonidos, este "
+"es el comportamiento experado.\n"
 
 #: src/emu/ui/ui.cpp:1155
 msgid "The machine has protection which isn't fully emulated.\n"
-msgstr "La máquina tiene un sistema de protección que no está completamente emulado.\n"
+msgstr ""
+"La máquina tiene un sistema de protección que no está completamente "
+"emulado.\n"
 
 #: src/emu/ui/ui.cpp:1158
 msgid ""
@@ -1155,8 +1180,8 @@ msgid ""
 "the developers to improve the emulation.\n"
 msgstr ""
 "ESTA MÁQUINA NO FUNCIONA. La emulación para esta máquina no está todavía "
-"completada. No hay nada que pueda hacer para arreglar el problema salvo esperar a "
-"que los desarrolladores mejoren la emulación.\n"
+"completada. No hay nada que pueda hacer para arreglar el problema salvo "
+"esperar a que los desarrolladores mejoren la emulación.\n"
 
 #: src/emu/ui/ui.cpp:1162
 msgid ""
@@ -1165,9 +1190,10 @@ msgid ""
 "physical interaction or consists of mechanical devices. It is not possible "
 "to fully play this machine.\n"
 msgstr ""
-"Algunos elementos de esta máquina no pueden ser emulados dado que actualmente requieren una "
-"interacción física o está compuesta de dispositivos mecánicos. No es posible "
-"reproducir completamente esta máquina.\n"
+"Algunos elementos de esta máquina no pueden ser emulados dado que "
+"actualmente requieren una interacción física o está compuesta de "
+"dispositivos mecánicos. No es posible reproducir completamente esta "
+"máquina.\n"
 
 #: src/emu/ui/ui.cpp:1181
 msgid ""

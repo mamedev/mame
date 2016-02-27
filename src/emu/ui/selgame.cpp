@@ -20,7 +20,6 @@
 #include "ui/inifile.h"
 #include "rendfont.h"
 #include "ui/datmenu.h"
-#include "ui/dirmenu.h"
 #include "ui/optsmenu.h"
 #include "ui/selector.h"
 #include "ui/selsoft.h"
@@ -109,57 +108,6 @@ bool sort_game_list(const game_driver *x, const game_driver *y)
 		else
 			return (c_stricmp(driver_list::driver(cx).description, y->description) < 0);
 	}
-}
-
-//-------------------------------------------------
-//  save main option
-//-------------------------------------------------
-
-void save_main_option(running_machine &machine)
-{
-	// parse the file
-	std::string error;
-	emu_options options(machine.options()); // This way we make sure that all OSD parts are in
-	std::string error_string;
-
-	// attempt to open the main ini file
-	{
-		emu_file file(machine.options().ini_path(), OPEN_FLAG_READ);
-		if (file.open(emulator_info::get_configname(), ".ini") == FILERR_NONE)
-		{
-			bool result = options.parse_ini_file((core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
-			if (!result)
-			{
-				osd_printf_error(_("**Error to load %s.ini**"), emulator_info::get_configname());
-				return;
-			}
-		}
-	}
-
-	for (emu_options::entry *f_entry = machine.options().first(); f_entry != nullptr; f_entry = f_entry->next())
-	{
-		if (f_entry->is_changed()) 
-		{
-			options.set_value(f_entry->name(), f_entry->value(), OPTION_PRIORITY_CMDLINE, error_string);
-		}
-	}
-
-	// attempt to open the output file
-	{
-		emu_file file(machine.options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(emulator_info::get_configname(), ".ini") == FILERR_NONE)
-		{
-			// generate the updated INI
-			std::string initext = options.output_ini();
-			file.puts(initext.c_str());
-			file.close();
-		}
-		else {
-			machine.popmessage(_("**Error to save %s.ini**"), emulator_info::get_configname());
-			return;
-		}			
-	}
-	machine.ui().popup_time(3, "%s", _("\n    Configuration saved    \n\n"));
 }
 
 //-------------------------------------------------
@@ -460,7 +408,7 @@ void ui_menu_select_game::handle()
 		}
 
 		// handle UI_EXPORT
-		else if (m_event->iptkey == IPT_UI_EXPORT)
+		else if (m_event->iptkey == IPT_UI_EXPORT && !isfavorite())
 			inkey_export();
 
 		// handle UI_AUDIT_FAST
@@ -651,10 +599,8 @@ void ui_menu_select_game::populate()
 	{
 		UINT32 flags_ui = MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
 		item_append(_("Configure Options"), nullptr, flags_ui, (void *)(FPTR)CONF_OPTS);
-		item_append(_("Configure Directories"), nullptr, flags_ui, (void *)(FPTR)CONF_DIR);
 		item_append(_("Configure Machine"), nullptr, flags_ui, (void *)(FPTR)CONF_MACHINE);
-		item_append(_("Save Configuration"), nullptr, flags_ui, (void *)(FPTR)SAVE_CONFIG);
-		skip_main_items = 4;
+		skip_main_items = 2;
 	}
 	else
 		skip_main_items = 0;
@@ -1002,13 +948,7 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *m_event)
 	// special case for configure options
 	if ((FPTR)driver == CONF_OPTS)
 		ui_menu::stack_push(global_alloc_clear<ui_menu_game_options>(machine(), container));
-	// special case for configure directory
-	else if ((FPTR)driver == CONF_DIR)
-		ui_menu::stack_push(global_alloc_clear<ui_menu_directory>(machine(), container));
-	// special case for save configuration 
-	else if ((FPTR)driver == SAVE_CONFIG)
-		save_main_option(machine());		
-	// special case for save configuration 
+	// special case for configure machine
 	else if ((FPTR)driver == CONF_MACHINE)
 	{
 		if (m_prev_selected != nullptr)
@@ -1073,11 +1013,7 @@ void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 	// special case for configure options
 	if ((FPTR)ui_swinfo == CONF_OPTS)
 		ui_menu::stack_push(global_alloc_clear<ui_menu_game_options>(machine(), container));
-	// special case for configure directory
-	else if ((FPTR)ui_swinfo == CONF_DIR)
-		ui_menu::stack_push(global_alloc_clear<ui_menu_directory>(machine(), container));
-	else if ((FPTR)ui_swinfo == SAVE_CONFIG)
-		save_main_option(machine());
+	// special case for configure machine
 	else if ((FPTR)ui_swinfo == CONF_MACHINE)
 	{
 		if (m_prev_selected != nullptr)

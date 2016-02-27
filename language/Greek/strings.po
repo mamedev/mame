@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-25 16:33+0100\n"
+"POT-Creation-Date: 2016-02-27 20:54+0100\n"
 "PO-Revision-Date: 2016-02-26 02:24+0200\n"
 "Last-Translator: Mame.gr\n"
 "Language-Team: MAME Language Team\n"
@@ -126,7 +126,7 @@ msgid "Mouse Device Assignment"
 msgstr "Ανάθεση συσκευής Ποντικιού"
 
 #: src/emu/ui/ctrlmenu.cpp:106 src/emu/ui/ctrlmenu.cpp:126
-#: src/emu/ui/optsmenu.cpp:253
+#: src/emu/ui/optsmenu.cpp:268
 msgid "Device Mapping"
 msgstr "Αντιστοίχιση συσκευής"
 
@@ -336,33 +336,34 @@ msgstr "Ιστορικό Λογισμικού"
 msgid "Software Usage"
 msgstr "Χρήση λογισμικού"
 
-#: src/emu/ui/datmenu.cpp:199
+#: src/emu/ui/datmenu.cpp:195
 msgid "Revision: "
 msgstr "Αναθεώρηση: "
 
-#: src/emu/ui/datmenu.cpp:291 src/emu/ui/selgame.cpp:40
-#: src/emu/ui/selgame.cpp:2067 src/emu/ui/selgame.cpp:2076
-#: src/emu/ui/selsoft.cpp:1490 src/emu/ui/selsoft.cpp:1499
+#: src/emu/ui/datmenu.cpp:287 src/emu/ui/selgame.cpp:39
+#: src/emu/ui/selgame.cpp:2065 src/emu/ui/selgame.cpp:2074
+#: src/emu/ui/selsoft.cpp:1567 src/emu/ui/selsoft.cpp:1585
+#: src/emu/ui/selsoft.cpp:1594
 msgid "History"
 msgstr "Ιστορικό"
 
-#: src/emu/ui/datmenu.cpp:293 src/emu/ui/selgame.cpp:41
+#: src/emu/ui/datmenu.cpp:289 src/emu/ui/selgame.cpp:40
 msgid "Mameinfo"
 msgstr "Mameinfo"
 
-#: src/emu/ui/datmenu.cpp:295 src/emu/ui/selgame.cpp:43
+#: src/emu/ui/datmenu.cpp:291 src/emu/ui/selgame.cpp:42
 msgid "Messinfo"
 msgstr "Messinfo"
 
-#: src/emu/ui/datmenu.cpp:297 src/emu/ui/selgame.cpp:42
+#: src/emu/ui/datmenu.cpp:293 src/emu/ui/selgame.cpp:41
 msgid "Sysinfo"
 msgstr "Sysinfo"
 
-#: src/emu/ui/datmenu.cpp:299 src/emu/ui/selgame.cpp:45
+#: src/emu/ui/datmenu.cpp:295 src/emu/ui/selgame.cpp:44
 msgid "Mamescore"
 msgstr "Mamescore"
 
-#: src/emu/ui/datmenu.cpp:301 src/emu/ui/selgame.cpp:44
+#: src/emu/ui/datmenu.cpp:297 src/emu/ui/selgame.cpp:43
 msgid "Command"
 msgstr "Εντολή"
 
@@ -519,7 +520,7 @@ msgid " Folder"
 msgstr " Φάκελος"
 
 #: src/emu/ui/dsplmenu.cpp:205 src/emu/ui/dsplmenu.cpp:225
-#: src/emu/ui/optsmenu.cpp:250
+#: src/emu/ui/optsmenu.cpp:265
 msgid "Display Options"
 msgstr "Επιλογές γραφικών"
 
@@ -684,7 +685,7 @@ msgid "Skip software parts selection menu"
 msgstr "Παράλειψη μενού επιλογής τμημάτων λογισμικού"
 
 #: src/emu/ui/miscmenu.cpp:654 src/emu/ui/miscmenu.cpp:674
-#: src/emu/ui/optsmenu.cpp:252
+#: src/emu/ui/optsmenu.cpp:267
 msgid "Miscellaneous Options"
 msgstr "Διάφορες επιλογές"
 
@@ -702,62 +703,69 @@ msgstr "Όνομα:             Περιγραφή:\n"
 msgid "%s.txt saved under ui folder."
 msgstr "%s.txt αποθηκεύτηκε στο φάκελο ui."
 
-#: src/emu/ui/miscmenu.cpp:801
-msgid "Export XML format"
+#: src/emu/ui/miscmenu.cpp:799
+#, fuzzy
+msgid "Export XML format (like -listxml)"
 msgstr "Εξαγωγή σε μορφή XML"
 
-#: src/emu/ui/miscmenu.cpp:802
-msgid "Export TXT format"
+#: src/emu/ui/miscmenu.cpp:800
+#, fuzzy
+msgid "Export TXT format (like -listfull)"
 msgstr "Εξαγωγή σε μορφή XML TXT"
 
-#: src/emu/ui/optsmenu.cpp:203
+#: src/emu/ui/miscmenu.cpp:858
+msgid "Dummy"
+msgstr ""
+
+#: src/emu/ui/miscmenu.cpp:860
+#, fuzzy
+msgid "Save machine configuration"
+msgstr "Παραμετροποίηση Μηχανήματος"
+
+#: src/emu/ui/optsmenu.cpp:217
 msgid "Filter"
 msgstr "Φίλτρο"
 
-#: src/emu/ui/optsmenu.cpp:248
+#: src/emu/ui/optsmenu.cpp:262
 msgid "Customize UI"
 msgstr "Προσαρμογή UI"
 
-#: src/emu/ui/optsmenu.cpp:251 src/emu/ui/sndmenu.cpp:152
+#: src/emu/ui/optsmenu.cpp:263
+msgid "Configure Directories"
+msgstr "Ρύθμιση φακέλων"
+
+#: src/emu/ui/optsmenu.cpp:266 src/emu/ui/sndmenu.cpp:152
 #: src/emu/ui/sndmenu.cpp:172
 msgid "Sound Options"
 msgstr "Επιλογές ήχου"
 
-#: src/emu/ui/optsmenu.cpp:254
+#: src/emu/ui/optsmenu.cpp:269
 msgid "General Inputs"
 msgstr "Γενικός Χειρισμός"
 
-#: src/emu/ui/optsmenu.cpp:269 src/emu/ui/optsmenu.cpp:289
+#: src/emu/ui/optsmenu.cpp:271
+msgid "Save Configuration"
+msgstr "Αποθήκευση Ρυθμίσεων"
+
+#: src/emu/ui/optsmenu.cpp:285 src/emu/ui/optsmenu.cpp:305
 msgid "Settings"
 msgstr "Ρυθμίσεις"
 
-#: src/emu/ui/optsmenu.cpp:309
+#: src/emu/ui/optsmenu.cpp:325
 msgid "**Error to save ui.ini**"
 msgstr "** Σφάλμα αποθήκευσης ui.ini**"
 
-#: src/emu/ui/selector.cpp:152
-msgid "Selection List - Search: "
-msgstr "Λίστα επιλογής - Αναζήτηση: "
-
-#: src/emu/ui/selector.cpp:181
-msgid " to select"
-msgstr " για επιλογή﻿"
-
-#: src/emu/ui/selgame.cpp:39
-msgid "General Info"
-msgstr "Γενικές Πληροφορίες"
-
-#: src/emu/ui/selgame.cpp:133
+#: src/emu/ui/optsmenu.cpp:347
 #, c-format
 msgid "**Error to load %s.ini**"
 msgstr "**Σφάλμα φόρτωσης %s.ini**"
 
-#: src/emu/ui/selgame.cpp:158
+#: src/emu/ui/optsmenu.cpp:372
 #, c-format
 msgid "**Error to save %s.ini**"
 msgstr "**Σφάλμα αποθήκευσης %s.ini**"
 
-#: src/emu/ui/selgame.cpp:162
+#: src/emu/ui/optsmenu.cpp:376
 msgid ""
 "\n"
 "    Configuration saved    \n"
@@ -767,7 +775,19 @@ msgstr ""
 "    Οι ρυθμίσεις αποθηκεύτηκαν    \n"
 "\n"
 
-#: src/emu/ui/selgame.cpp:440
+#: src/emu/ui/selector.cpp:152
+msgid "Selection List - Search: "
+msgstr "Λίστα επιλογής - Αναζήτηση: "
+
+#: src/emu/ui/selector.cpp:181
+msgid " to select"
+msgstr " για επιλογή﻿"
+
+#: src/emu/ui/selgame.cpp:38
+msgid "General Info"
+msgstr "Γενικές Πληροφορίες"
+
+#: src/emu/ui/selgame.cpp:388
 #, c-format
 msgid ""
 "%s\n"
@@ -776,7 +796,7 @@ msgstr ""
 "%s\n"
 " προστέθηκε στη λίστα αγαπημένων."
 
-#: src/emu/ui/selgame.cpp:446 src/emu/ui/selgame.cpp:455
+#: src/emu/ui/selgame.cpp:394 src/emu/ui/selgame.cpp:403
 #, c-format
 msgid ""
 "%s\n"
@@ -785,7 +805,7 @@ msgstr ""
 "%s\n"
 " αφαιρέθηκε από τη λίστα αγαπημένων."
 
-#: src/emu/ui/selgame.cpp:514
+#: src/emu/ui/selgame.cpp:464
 msgid ""
 "The selected machine is missing one or more required ROM or CHD images. "
 "Please select a different machine.\n"
@@ -797,180 +817,177 @@ msgstr ""
 "\n"
 "Πιέστε οποιοδήποτε πλήκτρο (εκτός από το ESC) για να συνεχίσετε."
 
-#: src/emu/ui/selgame.cpp:651 src/emu/ui/simpleselgame.cpp:264
+#: src/emu/ui/selgame.cpp:601 src/emu/ui/simpleselgame.cpp:262
 msgid "Configure Options"
 msgstr "Ρύθμιση επιλογών"
 
-#: src/emu/ui/selgame.cpp:652
-msgid "Configure Directories"
-msgstr "Ρύθμιση φακέλων"
+#: src/emu/ui/selgame.cpp:602
+#, fuzzy
+msgid "Configure Machine"
+msgstr "Ρύθμιση επιλογών"
 
-#: src/emu/ui/selgame.cpp:653 src/emu/ui/simpleselgame.cpp:265
-msgid "Save Configuration"
-msgstr "Αποθήκευση Ρυθμίσεων"
-
-#: src/emu/ui/selgame.cpp:762
-#, c-format
-msgid "MAME %s ( %d / %d machines (%d BIOS) )"
+#: src/emu/ui/selgame.cpp:711
+#, fuzzy, c-format
+msgid "%s %s ( %d / %d machines (%d BIOS) )"
 msgstr "MAME %s (%d / %d μηχανές (%d BIOS))"
 
-#: src/emu/ui/selgame.cpp:782
+#: src/emu/ui/selgame.cpp:731
 msgid " Search: "
 msgstr " Αναζήτηση: "
 
-#: src/emu/ui/selgame.cpp:1474
+#: src/emu/ui/selgame.cpp:1458
 #, c-format
 msgid "Romset: %-.100s\n"
 msgstr "Romset: %-.100s\n"
 
-#: src/emu/ui/selgame.cpp:1475
+#: src/emu/ui/selgame.cpp:1459
 msgid "Year: "
 msgstr "Έτος: "
 
-#: src/emu/ui/selgame.cpp:1476
+#: src/emu/ui/selgame.cpp:1460
 #, c-format
 msgid "Manufacturer: %-.100s\n"
 msgstr "Κατασκευαστής: %-.100s\n"
 
-#: src/emu/ui/selgame.cpp:1480
+#: src/emu/ui/selgame.cpp:1464
 #, c-format
 msgid "Driver is Clone of: %-.100s\n"
 msgstr "Το πρόγραμμα οδήγησης είναι κλώνος του: %-.100s\n"
 
-#: src/emu/ui/selgame.cpp:1482
+#: src/emu/ui/selgame.cpp:1466
 msgid "Driver is Parent\n"
 msgstr "To Πρόγραμμα οδήγησης είναι βασικό\n"
 
-#: src/emu/ui/selgame.cpp:1485
+#: src/emu/ui/selgame.cpp:1469
 msgid "Overall: NOT WORKING\n"
 msgstr "Συνολικά: ΔΕΝ ΛΕΙΤΟΥΡΓΕΙ\n"
 
-#: src/emu/ui/selgame.cpp:1487
+#: src/emu/ui/selgame.cpp:1471
 msgid "Overall: Unemulated Protection\n"
 msgstr "Συνολικά: Προστασία μη εξομοιωμένη\n"
 
-#: src/emu/ui/selgame.cpp:1489
+#: src/emu/ui/selgame.cpp:1473
 msgid "Overall: Working\n"
 msgstr "Συνολικά: Λειτουργεί\n"
 
-#: src/emu/ui/selgame.cpp:1492
+#: src/emu/ui/selgame.cpp:1476
 msgid "Graphics: Imperfect Colors\n"
 msgstr "Γραφικά: Ατελή χρώματα\n"
 
-#: src/emu/ui/selgame.cpp:1494
+#: src/emu/ui/selgame.cpp:1478
 msgid "Graphics: Wrong Colors\n"
 msgstr "Γραφικά: Λάθος χρώματα\n"
 
-#: src/emu/ui/selgame.cpp:1496
+#: src/emu/ui/selgame.cpp:1480
 msgid "Graphics: Imperfect\n"
 msgstr "Γραφικά: ατελή\n"
 
-#: src/emu/ui/selgame.cpp:1498
+#: src/emu/ui/selgame.cpp:1482
 msgid "Graphics: OK\n"
 msgstr "Γραφικά: OK\n"
 
-#: src/emu/ui/selgame.cpp:1501
+#: src/emu/ui/selgame.cpp:1485
 msgid "Sound: Unimplemented\n"
 msgstr "Ήχος: δεν έχει υλοποιηθεί\n"
 
-#: src/emu/ui/selgame.cpp:1503
+#: src/emu/ui/selgame.cpp:1487
 msgid "Sound: Imperfect\n"
 msgstr "Ήχος: ατελής\n"
 
-#: src/emu/ui/selgame.cpp:1505
+#: src/emu/ui/selgame.cpp:1489
 msgid "Sound: OK\n"
 msgstr "Ήχος: OK\n"
 
-#: src/emu/ui/selgame.cpp:1507
+#: src/emu/ui/selgame.cpp:1491
 #, c-format
 msgid "Driver is Skeleton: %s\n"
 msgstr "Πρόγραμμα οδήγησης είναι σκελετός: %s\n"
 
-#: src/emu/ui/selgame.cpp:1507 src/emu/ui/selgame.cpp:1508
-#: src/emu/ui/selgame.cpp:1509 src/emu/ui/selgame.cpp:1510
-#: src/emu/ui/selgame.cpp:1511 src/emu/ui/selgame.cpp:1512
-#: src/emu/ui/selgame.cpp:1513
+#: src/emu/ui/selgame.cpp:1491 src/emu/ui/selgame.cpp:1492
+#: src/emu/ui/selgame.cpp:1493 src/emu/ui/selgame.cpp:1494
+#: src/emu/ui/selgame.cpp:1495 src/emu/ui/selgame.cpp:1496
+#: src/emu/ui/selgame.cpp:1497
 msgid "Yes"
 msgstr "Ναι"
 
-#: src/emu/ui/selgame.cpp:1507 src/emu/ui/selgame.cpp:1508
-#: src/emu/ui/selgame.cpp:1509 src/emu/ui/selgame.cpp:1510
-#: src/emu/ui/selgame.cpp:1511 src/emu/ui/selgame.cpp:1512
-#: src/emu/ui/selgame.cpp:1513
+#: src/emu/ui/selgame.cpp:1491 src/emu/ui/selgame.cpp:1492
+#: src/emu/ui/selgame.cpp:1493 src/emu/ui/selgame.cpp:1494
+#: src/emu/ui/selgame.cpp:1495 src/emu/ui/selgame.cpp:1496
+#: src/emu/ui/selgame.cpp:1497
 msgid "No"
 msgstr "Όχι"
 
-#: src/emu/ui/selgame.cpp:1508
+#: src/emu/ui/selgame.cpp:1492
 #, c-format
 msgid "Game is Mechanical: %s\n"
 msgstr "Το παιχνίδι είναι Μηχανικό: %s\n"
 
-#: src/emu/ui/selgame.cpp:1509
+#: src/emu/ui/selgame.cpp:1493
 #, c-format
 msgid "Requires Artwork: %s\n"
 msgstr "Απαιτεί Artwork: %s\n"
 
-#: src/emu/ui/selgame.cpp:1510
+#: src/emu/ui/selgame.cpp:1494
 #, c-format
 msgid "Requires Clickable Artwork: %s\n"
 msgstr "Απαιτεί Artwork για κλικ: %s\n"
 
-#: src/emu/ui/selgame.cpp:1511
+#: src/emu/ui/selgame.cpp:1495
 #, c-format
 msgid "Support Cocktail: %s\n"
 msgstr "Υποστήριξη κοκτέιλ: %s\n"
 
-#: src/emu/ui/selgame.cpp:1512
+#: src/emu/ui/selgame.cpp:1496
 #, c-format
 msgid "Driver is Bios: %s\n"
 msgstr "Το πρόγραμμα οδήγησης είναι Bios: %s\n"
 
-#: src/emu/ui/selgame.cpp:1513
+#: src/emu/ui/selgame.cpp:1497
 #, c-format
 msgid "Support Save: %s\n"
 msgstr "Υποστηρίζει Αποθήκευση: %s\n"
 
-#: src/emu/ui/selgame.cpp:1514
+#: src/emu/ui/selgame.cpp:1498
 #, c-format
 msgid "Screen Orentation: %s\n"
 msgstr "Προσανατολισμός Οθόνης '%s'\n"
 
-#: src/emu/ui/selgame.cpp:1514
+#: src/emu/ui/selgame.cpp:1498
 msgid "Vertical"
 msgstr "Κάθετος"
 
-#: src/emu/ui/selgame.cpp:1514
+#: src/emu/ui/selgame.cpp:1498
 msgid "Horizontal"
 msgstr "Οριζόντιος"
 
-#: src/emu/ui/selgame.cpp:1522
+#: src/emu/ui/selgame.cpp:1506
 #, c-format
 msgid "Requires CHD: %s\n"
 msgstr "Απαιτεί CHD: %s\n"
 
-#: src/emu/ui/selgame.cpp:1535
+#: src/emu/ui/selgame.cpp:1519
 msgid "Roms Audit Pass: OK\n"
 msgstr "Έλεγχος ROMs: OK\n"
 
-#: src/emu/ui/selgame.cpp:1537
+#: src/emu/ui/selgame.cpp:1521
 msgid "Roms Audit Pass: BAD\n"
 msgstr ""
 "Έλεγχος ROMs: Κακός\n"
 "\n"
 
-#: src/emu/ui/selgame.cpp:1540
+#: src/emu/ui/selgame.cpp:1524
 msgid "Samples Audit Pass: None Needed\n"
 msgstr "Έλεγχος Δειγμάτων Ήχου: Δεν απαιτείται\n"
 
-#: src/emu/ui/selgame.cpp:1542
+#: src/emu/ui/selgame.cpp:1526
 msgid "Samples Audit Pass: OK\n"
 msgstr "Έλεγχος Δειγμάτων Ήχου: OK\n"
 
-#: src/emu/ui/selgame.cpp:1544
+#: src/emu/ui/selgame.cpp:1528
 msgid "Samples Audit Pass: BAD\n"
 msgstr "Έλεγχος Δειγμάτων Ήχου: Λάθος\n"
 
-#: src/emu/ui/selgame.cpp:1547
+#: src/emu/ui/selgame.cpp:1531
 msgid ""
 "Roms Audit Pass: Disabled\n"
 "Samples Audit Pass: Disabled\n"
@@ -978,12 +995,12 @@ msgstr ""
 "Έλεγχος ROMs: Απενεργοποιημένο\n"
 "Έλεγχος Δειγμάτων Ήχου: Απενεργοποιημένο\n"
 
-#: src/emu/ui/selgame.cpp:1964 src/emu/ui/selgame.cpp:2111
-#: src/emu/ui/selsoft.cpp:1535
+#: src/emu/ui/selgame.cpp:1962 src/emu/ui/selgame.cpp:2123
+#: src/emu/ui/selsoft.cpp:1643
 msgid "No Infos Available"
 msgstr "Καμία διαθέσιμη πληροφορία"
 
-#: src/emu/ui/selgame.cpp:2077 src/emu/ui/selsoft.cpp:1500
+#: src/emu/ui/selgame.cpp:2075 src/emu/ui/selsoft.cpp:1595
 msgid "Usage"
 msgstr "Χρήση"
 
@@ -991,41 +1008,41 @@ msgstr "Χρήση"
 msgid " (default)"
 msgstr " (προεπιλογή)"
 
-#: src/emu/ui/selsoft.cpp:642
+#: src/emu/ui/selsoft.cpp:688
 #, c-format
 msgid "Region: %s -"
 msgstr "Περιοχή: %s -"
 
-#: src/emu/ui/selsoft.cpp:644
+#: src/emu/ui/selsoft.cpp:690
 #, c-format
 msgid "Publisher: %s -"
 msgstr "Εκδότης: %s-"
 
-#: src/emu/ui/selsoft.cpp:646
+#: src/emu/ui/selsoft.cpp:692
 #, c-format
 msgid "Year: %s -"
 msgstr "Έτος: %s -"
 
-#: src/emu/ui/selsoft.cpp:648
+#: src/emu/ui/selsoft.cpp:694
 #, c-format
 msgid "Software List: %s -"
 msgstr "Λίστα λογισμικού: %s-"
 
-#: src/emu/ui/selsoft.cpp:650
+#: src/emu/ui/selsoft.cpp:696
 #, c-format
 msgid "Device type: %s -"
 msgstr "Τύπος συσκευής: %s -"
 
-#: src/emu/ui/selsoft.cpp:652
+#: src/emu/ui/selsoft.cpp:698
 #, c-format
 msgid "%s Search: %s_"
 msgstr "%s αναζήτησης: %s_"
 
-#: src/emu/ui/selsoft.cpp:1872 src/emu/ui/selsoft.cpp:1892
+#: src/emu/ui/selsoft.cpp:1979 src/emu/ui/selsoft.cpp:1999
 msgid "Software part selection:"
 msgstr "Επιλογή τμημάτων λογισμικού:"
 
-#: src/emu/ui/selsoft.cpp:2010 src/emu/ui/selsoft.cpp:2030
+#: src/emu/ui/selsoft.cpp:2117 src/emu/ui/selsoft.cpp:2137
 msgid "Bios selection:"
 msgstr "Επιλογή BIOS:"
 

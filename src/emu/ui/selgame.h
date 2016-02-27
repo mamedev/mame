@@ -40,9 +40,7 @@ private:
 	enum
 	{
 		CONF_OPTS = 1,
-		CONF_DIR,
 		CONF_MACHINE,
-		SAVE_CONFIG
 	};
 
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };

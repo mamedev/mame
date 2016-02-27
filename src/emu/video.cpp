@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    video.c
+    video.cpp
 
     Core MAME video routines.
 
