@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /*********************************************************************
 
     ui/selgame.cpp
@@ -263,10 +263,10 @@ ui_menu_select_game::~ui_menu_select_game()
 	else
 		driver = (selected >= 0 && selected < item.size()) ? (const game_driver *)item[selected].ref : nullptr;
 
-	if ((FPTR)driver > 3)
+	if ((FPTR)driver > skip_main_items)
 		last_driver = driver->name;
 
-	if ((FPTR)swinfo > 3)
+	if ((FPTR)swinfo > skip_main_items)
 		last_driver = swinfo->shortname;
 
 	std::string filter(main_filters::text[main_filters::actual]);
@@ -650,10 +650,11 @@ void ui_menu_select_game::populate()
 	if (ui_menu::stack_has_special_main_menu())
 	{
 		UINT32 flags_ui = MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
-		item_append(_("Configure Options"), nullptr, flags_ui, (void *)(FPTR)1);
-		item_append(_("Configure Directories"), nullptr, flags_ui, (void *)(FPTR)2);
-		item_append(_("Save Configuration"), nullptr, flags_ui, (void *)(FPTR)3);
-		skip_main_items = 3;
+		item_append(_("Configure Options"), nullptr, flags_ui, (void *)(FPTR)CONF_OPTS);
+		item_append(_("Configure Directories"), nullptr, flags_ui, (void *)(FPTR)CONF_DIR);
+		item_append(_("Configure Machine"), nullptr, flags_ui, (void *)(FPTR)CONF_MACHINE);
+		item_append(_("Save Configuration"), nullptr, flags_ui, (void *)(FPTR)SAVE_CONFIG);
+		skip_main_items = 4;
 	}
 	else
 		skip_main_items = 0;
@@ -999,14 +1000,21 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *m_event)
 	const game_driver *driver = (const game_driver *)m_event->itemref;
 
 	// special case for configure options
-	if ((FPTR)driver == 1)
+	if ((FPTR)driver == CONF_OPTS)
 		ui_menu::stack_push(global_alloc_clear<ui_menu_game_options>(machine(), container));
 	// special case for configure directory
-	else if ((FPTR)driver == 2)
+	else if ((FPTR)driver == CONF_DIR)
 		ui_menu::stack_push(global_alloc_clear<ui_menu_directory>(machine(), container));
-	// anything else is a driver
-	else if ((FPTR)driver == 3) {
+	// special case for save configuration 
+	else if ((FPTR)driver == SAVE_CONFIG)
 		save_main_option(machine());		
+	// special case for save configuration 
+	else if ((FPTR)driver == CONF_MACHINE)
+	{
+		if (m_prev_selected != nullptr)
+			ui_menu::stack_push(global_alloc_clear<ui_menu_machine_configure>(machine(), container, (const game_driver *)m_prev_selected));
+		else
+			return;
 	}
 	// anything else is a driver
 	else
@@ -1063,15 +1071,23 @@ void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 	ui_options &mopt = machine().ui().options();
 
 	// special case for configure options
-	if ((FPTR)ui_swinfo == 1)
+	if ((FPTR)ui_swinfo == CONF_OPTS)
 		ui_menu::stack_push(global_alloc_clear<ui_menu_game_options>(machine(), container));
-
 	// special case for configure directory
-	else if ((FPTR)ui_swinfo == 2)
+	else if ((FPTR)ui_swinfo == CONF_DIR)
 		ui_menu::stack_push(global_alloc_clear<ui_menu_directory>(machine(), container));
-	else if ((FPTR)ui_swinfo == 3)
-	{
+	else if ((FPTR)ui_swinfo == SAVE_CONFIG)
 		save_main_option(machine());
+	else if ((FPTR)ui_swinfo == CONF_MACHINE)
+	{
+		if (m_prev_selected != nullptr)
+		{
+			ui_software_info *swinfo = (ui_software_info *)m_prev_selected;
+			if (swinfo->startempty == 1)
+				ui_menu::stack_push(global_alloc_clear<ui_menu_machine_configure>(machine(), container, swinfo->driver));
+		}
+		else
+			return;
 	}
 	else if (ui_swinfo->startempty == 1)
 	{
@@ -1202,8 +1218,40 @@ void ui_menu_select_game::inkey_configure(const ui_menu_event *m_event)
 		selected = visible_items + 1;
 	}
 	else if (selected > visible_items && m_focus == focused_menu::main)
-		m_focus = focused_menu::left;
+	{
+		if (ui_globals::panels_status != HIDE_LEFT_PANEL)
+			m_focus = focused_menu::left;
+
+		else if (ui_globals::panels_status == HIDE_BOTH)
+		{
+			for (int x = 0; x < item.size(); ++x)
+				if (item[x].ref == m_prev_selected)
+					selected = x;
+		}
+		else
+			m_focus = focused_menu::righttop;
+	}
 	else if (m_focus == focused_menu::left)
+	{
+		if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
+			m_focus = focused_menu::righttop;
+		else
+		{
+			m_focus = focused_menu::main;
+			if (m_prev_selected == nullptr)
+			{
+				selected = 0;
+				return;
+			}
+
+			for (int x = 0; x < item.size(); ++x)
+				if (item[x].ref == m_prev_selected)
+					selected = x;
+		}
+	}
+	else if (m_focus == focused_menu::righttop)
+		m_focus = focused_menu::rightbottom;
+	else if (m_focus == focused_menu::rightbottom)
 	{
 		m_focus = focused_menu::main;
 		if (m_prev_selected == nullptr)
@@ -1216,8 +1264,6 @@ void ui_menu_select_game::inkey_configure(const ui_menu_event *m_event)
 			if (item[x].ref == m_prev_selected)
 				selected = x;
 	}
-	else if (m_focus == focused_menu::rightbottom)
-		m_focus = focused_menu::main;
 }
 
 //-------------------------------------------------
@@ -1926,8 +1972,22 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 			title_size = MAX(txt_lenght, title_size);
 		}
 
-		mui.draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, 
-			WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+		rgb_t fgcolor = UI_TEXT_COLOR;
+		rgb_t bgcolor = UI_TEXT_BG_COLOR;
+		if (m_focus == focused_menu::rightbottom)
+		{
+			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
+			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+		}
+
+		float middle = origx2 - origx1;
+
+		if (bgcolor != UI_TEXT_BG_COLOR)
+			mui.draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
+				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+
+		mui.draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
+			WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 
 		draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::curdats_view, UI_FIRST_LOAD, UI_LAST_LOAD, title_size);
 
@@ -2086,8 +2146,22 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 				title_size = MAX(txt_lenght, title_size);
 			}
 
-			mui.draw_text_full(container, t_text[ui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1, 
-				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+			rgb_t fgcolor = UI_TEXT_COLOR;
+			rgb_t bgcolor = UI_TEXT_BG_COLOR;
+			if (m_focus == focused_menu::rightbottom)
+			{
+				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
+				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+			}
+
+			float middle = origx2 - origx1;
+
+			if (bgcolor != UI_TEXT_BG_COLOR)
+				mui.draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
+					origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+
+			mui.draw_text_full(container, t_text[ui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1,
+				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 
 			draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::cur_sw_dats_view, 0, 1, title_size);
 		}

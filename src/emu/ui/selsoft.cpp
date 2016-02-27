@@ -226,6 +226,18 @@ void ui_menu_select_software::handle()
 			}
 		}
 
+		// handle UI_UP_FILTER
+		else if (m_event->iptkey == IPT_UI_UP_FILTER && highlight > UI_SW_FIRST)
+		{
+			highlight--;
+		}
+
+		// handle UI_DOWN_FILTER
+		else if (m_event->iptkey == IPT_UI_DOWN_FILTER && highlight < UI_SW_LAST)
+		{
+			highlight++;
+		}
+
 		// handle UI_DATS
 		else if (m_event->iptkey == IPT_UI_DATS && machine().ui().options().enabled_dats())
 		{
@@ -296,6 +308,52 @@ void ui_menu_select_software::handle()
 
 		if (m_event->iptkey == IPT_UI_CONFIGURE)
 			inkey_configure(m_event);
+
+		// handle UI_LEFT
+		else if (m_event->iptkey == IPT_UI_LEFT)
+		{
+			// Images
+			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view > FIRST_VIEW)
+			{
+				ui_globals::curimage_view--;
+				ui_globals::switch_image = true;
+				ui_globals::default_image = false;
+			}
+
+			// Infos
+			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view > 0)
+			{
+				ui_globals::cur_sw_dats_view--;
+				topline_datsview = 0;
+			}
+		}
+
+		// handle UI_RIGHT
+		else if (m_event->iptkey == IPT_UI_RIGHT)
+		{
+			// Images
+			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view < LAST_VIEW)
+			{
+				ui_globals::curimage_view++;
+				ui_globals::switch_image = true;
+				ui_globals::default_image = false;
+			}
+
+			// Infos
+			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view < 1)
+			{
+				ui_globals::cur_sw_dats_view++;
+				topline_datsview = 0;
+			}
+		}
+
+		// handle UI_LEFT_PANEL
+		else if (m_event->iptkey == IPT_UI_LEFT_PANEL)
+			ui_globals::rpanel = RP_IMAGES;
+
+		// handle UI_RIGHT_PANEL
+		else if (m_event->iptkey == IPT_UI_RIGHT_PANEL)
+			ui_globals::rpanel = RP_INFOS;
 
 		// handle UI_UP_FILTER
 		else if (m_event->iptkey == IPT_UI_UP_FILTER && highlight > UI_SW_FIRST)
@@ -939,8 +997,40 @@ void ui_menu_select_software::inkey_configure(const ui_menu_event *m_event)
 		selected = visible_items + 1;
 	}
 	else if (selected > visible_items && m_focus == focused_menu::main)
-		m_focus = focused_menu::left;
+	{
+		if (ui_globals::panels_status != HIDE_LEFT_PANEL)
+			m_focus = focused_menu::left;
+
+		else if (ui_globals::panels_status == HIDE_BOTH)
+		{
+			for (int x = 0; x < item.size(); ++x)
+				if (item[x].ref == m_prev_selected)
+					selected = x;
+		}
+		else
+			m_focus = focused_menu::righttop;
+	}
 	else if (m_focus == focused_menu::left)
+	{
+		if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
+			m_focus = focused_menu::righttop;
+		else
+		{
+			m_focus = focused_menu::main;
+			if (m_prev_selected == nullptr)
+			{
+				selected = 0;
+				return;
+			}
+
+			for (int x = 0; x < item.size(); ++x)
+				if (item[x].ref == m_prev_selected)
+					selected = x;
+		}
+	}
+	else if (m_focus == focused_menu::righttop)
+		m_focus = focused_menu::rightbottom;
+	else if (m_focus == focused_menu::rightbottom)
 	{
 		m_focus = focused_menu::main;
 		if (m_prev_selected == nullptr)
@@ -953,8 +1043,6 @@ void ui_menu_select_software::inkey_configure(const ui_menu_event *m_event)
 			if (item[x].ref == m_prev_selected)
 				selected = x;
 	}
-	else if (m_focus == focused_menu::rightbottom)
-		m_focus = focused_menu::main;
 }
 
 //-------------------------------------------------
@@ -1463,7 +1551,6 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 	std::vector<int> xstart;
 	std::vector<int> xend;
 	float text_size = machine().ui().options().infos_size();
-//	ui_software_info *soft = (ui_software_info *)selectedref;
 	ui_software_info *soft = (selectedref != nullptr) ? (ui_software_info *)selectedref : ((m_prev_selected != nullptr) ? (ui_software_info *)m_prev_selected : nullptr);
 	static ui_software_info *oldsoft = nullptr;
 	static int old_sw_view = -1;
@@ -1475,8 +1562,28 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 	// apply title to right panel
 	if (soft != nullptr && soft->usage.empty())
 	{
+		float title_size = 0.0f;
+
 		mui.draw_text_full(container, _("History"), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+			DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &title_size, nullptr);
+		title_size += 0.01f;
+
+		rgb_t fgcolor = UI_TEXT_COLOR;
+		rgb_t bgcolor = UI_TEXT_BG_COLOR;
+		if (m_focus == focused_menu::rightbottom)
+		{
+			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
+			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+		}
+
+		float middle = origx2 - origx1;
+
+		if (bgcolor != UI_TEXT_BG_COLOR)
+			mui.draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
+				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+
+		mui.draw_text_full(container, _("History"), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+			DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 		ui_globals::cur_sw_dats_view = 0;
 	}
 	else
@@ -1490,14 +1597,27 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 		for (auto & elem : t_text)
 		{
 			mui.draw_text_full(container, elem.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-			                              DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
+				DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
 			txt_lenght += 0.01f;
 			title_size = MAX(txt_lenght, title_size);
 		}
 
+		rgb_t fgcolor = UI_TEXT_COLOR;
+		rgb_t bgcolor = UI_TEXT_BG_COLOR;
+		if (m_focus == focused_menu::rightbottom)
+		{
+			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
+			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+		}
+
+		float middle = origx2 - origx1;
+
+		if (bgcolor != UI_TEXT_BG_COLOR)
+			mui.draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
+				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+
 		mui.draw_text_full(container, t_text[ui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1,
-		                              JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-		                              nullptr, nullptr);
+			JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 
 		draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::cur_sw_dats_view, 0, 1, title_size);
 	}
@@ -1521,7 +1641,7 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 	if (buffer.empty())
 	{
 		mui.draw_text_full(container, _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, JUSTIFY_CENTER,
-		                              WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+			WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		return;
 	}
 	else
@@ -1549,8 +1669,8 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 			info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
 		else
 			mui.draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1,
-			                              JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-			                              nullptr, nullptr, text_size);
+				JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+				nullptr, nullptr, text_size);
 		oy1 += (line_height * text_size);
 	}
 
@@ -1570,7 +1690,6 @@ void ui_menu_select_software::arts_render(void *selectedref, float origx1, float
 	static const game_driver *olddriver = nullptr;
 	const game_driver *driver = nullptr;
 	ui_software_info *soft = (selectedref != nullptr) ? (ui_software_info *)selectedref : ((m_prev_selected != nullptr) ? (ui_software_info *)m_prev_selected : nullptr);
-//	ui_software_info *soft = (ui_software_info *)selectedref;
 
 	if (soft != nullptr && soft->startempty == 1)
 	{
