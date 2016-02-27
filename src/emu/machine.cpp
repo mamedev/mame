@@ -321,7 +321,6 @@ void running_machine::start()
 	m_favorite = std::make_unique<favorite_manager>(*this);
 
 	manager().update_machine();
-	manager().lua()->attach_notifiers();
 }
 
 
