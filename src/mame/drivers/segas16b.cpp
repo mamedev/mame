@@ -3414,9 +3414,9 @@ static INPUT_PORTS_START( lockonph )
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Region ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Korea ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Europe ) )
@@ -8639,7 +8639,7 @@ GAME( 2008, fantzoneta, fantzone, system16b,           fantzoneta,segas16b_state
 GAME( 1990, atomicp,    0,        atomicp,             atomicp,  segas16b_state,generic_korean,     ROT0,   "Philko", "Atomic Point (Korea)", 0) // korean clone board..
 GAME( 1990, snapper,    0,        atomicp,             snapper,  segas16b_state,snapper,            ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
 // board marked 'System 4' and has Philko custom chip - various hw changes (4bpp tiles for example)
-GAME( 199?, lockonph,   0,        lockonph,            lockonph, segas16b_state,lockonph,           ROT0,   "Philko", "Lock On (Philko)", MACHINE_IMPERFECT_SOUND ) // copyright not shown, but has 'PHILKO' in the tiles. Clipping issues on left edge in attract look like original game bugs.
+GAME( 1991, lockonph,   0,        lockonph,            lockonph, segas16b_state,lockonph,           ROT0,   "Philko", "Lock On (Philko)", MACHINE_IMPERFECT_SOUND ) // Copyright not shown in game, but has 'PHILKO' in the startup warning and tiles / PCB.  1991 is the name entry for the lowest high score.  Clipping issues on left edge in attract look like original game bugs.
 
 // decrypted bootleg / 'suicide repair' sets
 
