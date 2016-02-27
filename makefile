@@ -887,21 +887,21 @@ windows_x86_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
 
 .PHONY: vs2013
 vs2013: generate
-	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows vs2013
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2013
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2013/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2013_intel
 vs2013_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows --vs=intel-15 vs2013
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2013
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2013-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2013_xp
 vs2013_xp: generate
-	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows --vs=vs2013-xp vs2013
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2013-xp vs2013
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2013-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
@@ -912,21 +912,21 @@ endif
 
 .PHONY: vs2015
 vs2015: generate
-	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows vs2015
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2015
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2015_intel
 vs2015_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows --vs=intel-15 vs2015
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2015
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2015_xp
 vs2015_xp: generate
-	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows --vs=vs2015-xp vs2015
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2015-xp vs2015
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
