@@ -3405,15 +3405,18 @@ static INPUT_PORTS_START( lockonph )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")    // DSW2
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	// these 3 dips seem to control a combination of the number of bullets / bullet speed.  Not sure how they translate to actual difficulty
+	// the comments relate to the bullets fire by the first 'large' ship.
+	PORT_DIPNAME( 0x0007, 0x0004, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(      0x0000, "0" ) // very slow bullets
+	PORT_DIPSETTING(      0x0001, "1" ) // ^
+	PORT_DIPSETTING(      0x0002, "2" ) // very slow bullets but less?
+	PORT_DIPSETTING(      0x0003, "3" ) // ^
+	PORT_DIPSETTING(      0x0004, "4" ) // faster bullets
+	PORT_DIPSETTING(      0x0005, "5" ) // ^
+	PORT_DIPSETTING(      0x0006, "6" ) // very fast, but less of them?
+	PORT_DIPSETTING(      0x0007, "7" ) // almost no bullets?
+
 	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
