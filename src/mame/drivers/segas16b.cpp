@@ -873,7 +873,7 @@ S11 S13 S15 S17  |EPR12194 -        -        -        EPR12195 -        -       
 #include "machine/segaic16.h"
 #include "machine/mc8123.h"
 #include "includes/segaipt.h"
-
+#include "sound/okim6295.h"
 
 //**************************************************************************
 //  CONSTANTS
@@ -1758,12 +1758,15 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( lockonph_map, AS_PROGRAM, 16, segas16b_state )
-	// this still appears to have a mapper device, does the hardware use it?
+	// this still appears to have a mapper device, does the hardware use it? should we move this to all be configured by it?
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
+	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(rom_5704_bank_w)
 	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
 	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x841fff) AM_RAM_WRITE(philko_paletteram_w) AM_SHARE("paletteram")
+
+	AM_RANGE(0xC40000, 0xC40001) AM_WRITENOP // coin counters etc.?
 
 	AM_RANGE(0xC41000, 0xC41001) AM_READ_PORT("P1")
 	AM_RANGE(0xC41002, 0xC41003) AM_READ_PORT("P2")
@@ -1772,6 +1775,7 @@ static ADDRESS_MAP_START( lockonph_map, AS_PROGRAM, 16, segas16b_state )
 	AM_RANGE(0xC42000, 0xC42001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xC42002, 0xC42003) AM_READ_PORT("DSW2")
 
+	AM_RANGE(0x777706, 0x777707) AM_WRITE(sound_w16) // AM_WRITE8(soundlatch_byte_w, 0xff00)
 
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
@@ -1814,6 +1818,20 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas16b_state )
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
+// similar to whizz / other philko games in sidearms.cpp, but with the m6295
+static ADDRESS_MAP_START( lockonph_sound_map, AS_PROGRAM, 8, segas16b_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xf7ff) AM_ROM
+	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( lockonph_sound_iomap, AS_IO, 8, segas16b_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+	AM_RANGE(0x40, 0x40) AM_WRITENOP // ??
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_byte_r)
+ADDRESS_MAP_END
 
 
 //**************************************************************************
@@ -3361,54 +3379,54 @@ static INPUT_PORTS_START( lockonph )
 
 
 	PORT_START("DSW1")    // DSW1
-	PORT_DIPNAME( 0x0001, 0x0001, "DSW1" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW0:1,2,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW0:4,5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW0:7")
+	PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW0:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")    // DSW2
-	PORT_DIPNAME( 0x0001, 0x0001, "DSW2" )
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Region ) ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Korea ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Europe ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3538,9 +3556,10 @@ static MACHINE_CONFIG_START( lockonph, segas16b_state )
 	MCFG_CPU_PROGRAM_MAP(lockonph_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 
-//	MCFG_CPU_ADD("soundcpu", Z80, XTAL_16MHz/4) // ?
-//	MCFG_CPU_PROGRAM_MAP(sound_map)
-//	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_16MHz/4) // ?
+	MCFG_CPU_PROGRAM_MAP(lockonph_sound_map)
+	MCFG_CPU_IO_MAP(lockonph_sound_iomap)
+
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3562,8 +3581,16 @@ static MACHINE_CONFIG_START( lockonph, segas16b_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ym2151", MASTER_CLOCK_8MHz/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
+	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4) // ??
+//	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0)) // does set up the timer, but end up with no sound?
+	MCFG_SOUND_ROUTE(0, "mono", 0.5)
+	MCFG_SOUND_ROUTE(1, "mono", 0.5)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_LOW) // clock / pin not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
+
+
 MACHINE_CONFIG_END
 
 
@@ -8612,7 +8639,7 @@ GAME( 2008, fantzoneta, fantzone, system16b,           fantzoneta,segas16b_state
 GAME( 1990, atomicp,    0,        atomicp,             atomicp,  segas16b_state,generic_korean,     ROT0,   "Philko", "Atomic Point (Korea)", 0) // korean clone board..
 GAME( 1990, snapper,    0,        atomicp,             snapper,  segas16b_state,snapper,            ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
 // board marked 'System 4' and has Philko custom chip - various hw changes (4bpp tiles for example)
-GAME( 199?, lockonph,   0,        lockonph,            lockonph, segas16b_state,lockonph,           ROT0,   "Philko", "Lock On (Philko)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND) // copyright not shown, but has 'PHILKO' in the tiles
+GAME( 199?, lockonph,   0,        lockonph,            lockonph, segas16b_state,lockonph,           ROT0,   "Philko", "Lock On (Philko)", MACHINE_IMPERFECT_SOUND ) // copyright not shown, but has 'PHILKO' in the tiles. Clipping issues on left edge in attract look like original game bugs.
 
 // decrypted bootleg / 'suicide repair' sets
 
