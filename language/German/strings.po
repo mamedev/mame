@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-21 20:49+0100\n"
-"PO-Revision-Date: 2016-02-27 10:05+0100\n"
+"PO-Revision-Date: 2016-02-27 10:18+0100\n"
 "Last-Translator: Lothar Serra Mari <scummvm@rootfather.de>\n"
 "Language-Team: MAME Language Team\n"
 "Language: de\n"
@@ -800,7 +800,7 @@ msgstr "Verwende externe Samples"
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
-msgstr "Für diese Maschine müssen Abbilder in die folgenden Geräte geladen werden: "
+msgstr "Für diese Maschine müssen Abbilder in die folgenden Geräte eingehängt werden:"
 
 #: src/emu/ui/ui.cpp:1062
 msgid ""
@@ -825,7 +825,7 @@ msgstr "Andernfalls geben Sie OK ein oder bewegen Sie den Joystick nach links un
 
 #: src/emu/ui/ui.cpp:1099
 msgid "One or more ROMs/CHDs for this machine are incorrect. The machine may not run correctly.\n"
-msgstr "Ein oder mehrere ROMs/CHDs für diese Maschine sind nicht korrekt. Wahrscheinlich wird die Maschine nicht richtig laufen.\n"
+msgstr "Ein oder mehrere ROMs/CHDs für diese Maschine sind nicht korrekt. Eventuell wird die Maschine nicht richtig laufen.\n"
 
 #: src/emu/ui/ui.cpp:1112
 msgid ""
@@ -885,7 +885,7 @@ msgstr "Diese Maschine besitzt keine Sound-Hardware; MAME wird erwartungsgemäß
 
 #: src/emu/ui/ui.cpp:1155
 msgid "The machine has protection which isn't fully emulated.\n"
-msgstr "Die Maschine besitzt Schutzvorrichtungen, die nicht vollständig emuliert sind.\n"
+msgstr "Die Maschine besitzt einen Kopierschutz, der nicht vollständig emuliert ist.\n"
 
 #: src/emu/ui/ui.cpp:1158
 msgid ""
@@ -893,7 +893,7 @@ msgid ""
 "THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet complete. There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n"
 msgstr ""
 "\n"
-"DIESE MASCHINE FUNKTIONIERT NICHT. Die Emulation dieser Maschine ist noch nicht vollständig. Sie können nichts tun, um dieses Problem zu beheben, als darauf zu warten, das die Entwickler die Emulation verbessern.\n"
+"DIESE MASCHINE FUNKTIONIERT NICHT. Die Emulation dieser Maschine ist noch nicht vollständig. Sie können nur darauf warten, dass die Entwickler die Emulation verbessern.\n"
 
 #: src/emu/ui/ui.cpp:1162
 msgid ""
@@ -1028,7 +1028,7 @@ msgstr "Vektorflicker"
 
 #: src/emu/ui/ui.cpp:2096
 msgid "Beam Width Minimum"
-msgstr "Minimum Strahlbreite"
+msgstr "Minimale Strahlbreite"
 
 #: src/emu/ui/ui.cpp:2098
 msgid "Beam Width Maximum"
