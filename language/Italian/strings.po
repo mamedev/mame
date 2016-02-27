@@ -916,17 +916,17 @@ msgstr "Gioco Meccanico: "
 #: src/emu/ui/selgame.cpp:1493
 #, c-format
 msgid "Requires Artwork: %s\n"
-msgstr "Rechiede un Artwork: "
+msgstr "Richiede un Artwork: %s\n"
 
 #: src/emu/ui/selgame.cpp:1494
 #, c-format
 msgid "Requires Clickable Artwork: %s\n"
-msgstr "Richiede un Artwork Cliccabile: "
+msgstr "Richiede un Artwork Cliccabile: %s\n"
 
 #: src/emu/ui/selgame.cpp:1495
 #, c-format
 msgid "Support Cocktail: %s\n"
-msgstr "Supporta Cocktail: "
+msgstr "Supporta Cocktail: %s\n"
 
 #: src/emu/ui/selgame.cpp:1496
 #, c-format
@@ -936,12 +936,12 @@ msgstr ""
 #: src/emu/ui/selgame.cpp:1497
 #, c-format
 msgid "Support Save: %s\n"
-msgstr "Supporta il Salvataggio: "
+msgstr "Supporta il Salvataggio: %s\n"
 
 #: src/emu/ui/selgame.cpp:1498
 #, c-format
 msgid "Screen Orentation: %s\n"
-msgstr "Orientamento Schermo: "
+msgstr "Orientamento Schermo: %s\n"
 
 #: src/emu/ui/selgame.cpp:1498
 msgid "Vertical"
@@ -954,7 +954,7 @@ msgstr "Orizzontale"
 #: src/emu/ui/selgame.cpp:1506
 #, c-format
 msgid "Requires CHD: %s\n"
-msgstr "Richiede CHD: "
+msgstr "Richiede CHD: %s\n"
 
 #: src/emu/ui/selgame.cpp:1519
 msgid "Roms Audit Pass: OK\n"
@@ -998,32 +998,32 @@ msgstr ""
 #: src/emu/ui/selsoft.cpp:688
 #, fuzzy, c-format
 msgid "Region: %s -"
-msgstr "Regione: "
+msgstr "Regione: %s -"
 
 #: src/emu/ui/selsoft.cpp:690
 #, fuzzy, c-format
 msgid "Publisher: %s -"
-msgstr "Editore: "
+msgstr "Editore: %s -"
 
 #: src/emu/ui/selsoft.cpp:692
 #, fuzzy, c-format
 msgid "Year: %s -"
-msgstr "Anno: "
+msgstr "Anno: %s -"
 
 #: src/emu/ui/selsoft.cpp:694
 #, fuzzy, c-format
 msgid "Software List: %s -"
-msgstr "Lista Software: "
+msgstr "Lista Software: %s -"
 
 #: src/emu/ui/selsoft.cpp:696
 #, fuzzy, c-format
 msgid "Device type: %s -"
-msgstr "Tipo Dispositivo: "
+msgstr "Tipo Dispositivo: %s -"
 
 #: src/emu/ui/selsoft.cpp:698
 #, fuzzy, c-format
 msgid "%s Search: %s_"
-msgstr " Cerca: "
+msgstr " Cerca: %s_"
 
 #: src/emu/ui/selsoft.cpp:1979 src/emu/ui/selsoft.cpp:1999
 msgid "Software part selection:"
