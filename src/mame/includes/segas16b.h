@@ -49,6 +49,7 @@ public:
 			m_hwc_input_value(0),
 			m_mj_input_num(0),
 			m_mj_last_val(0),
+			m_spritepalbase(0x400),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes"),
 			m_decrypted_opcodes(*this, "decrypted_opcodes")
@@ -88,7 +89,7 @@ public:
 	DECLARE_DRIVER_INIT(generic_5358_small);
 	DECLARE_DRIVER_INIT(generic_5797);
 	DECLARE_DRIVER_INIT(generic_korean);
-
+	DECLARE_DRIVER_INIT(lockonph);
 	// game-specific driver init
 	DECLARE_DRIVER_INIT(isgsm);
 	DECLARE_DRIVER_INIT(tturf_5704);
@@ -208,6 +209,7 @@ protected:
 	UINT8               m_hwc_input_value;
 	UINT8               m_mj_input_num;
 	UINT8               m_mj_last_val;
+	int					m_spritepalbase;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_shared_ptr<UINT8> m_sound_decrypted_opcodes;

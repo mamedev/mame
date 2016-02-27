@@ -164,6 +164,30 @@ WRITE16_MEMBER( sega_16bit_common_base::paletteram_w )
 	m_palette->set_pen_color(offset + 2 * m_palette_entries, m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]);
 }
 
+WRITE16_MEMBER( sega_16bit_common_base::philko_paletteram_w )
+{
+	// compute the number of entries
+	if (m_palette_entries == 0)
+		m_palette_entries = memshare("paletteram")->bytes() / 2;
+
+	// get the new value
+	UINT16 newval = m_paletteram[offset];
+	COMBINE_DATA(&newval);
+	m_paletteram[offset] = newval;
+
+	//     byte 0    byte 1
+	//  sRRR RRGG GGGB BBBB
+	//  x432 1043 2104 3210
+	int b = (newval >> 0) & 0x1f;
+	int g = (newval >> 5) & 0x1f;
+	int r = (newval >> 10) & 0x1f;
+
+	// normal colors
+	m_palette->set_pen_color(offset + 0 * m_palette_entries, m_palette_normal[r],  m_palette_normal[g],  m_palette_normal[b]);
+	m_palette->set_pen_color(offset + 1 * m_palette_entries, m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
+	m_palette->set_pen_color(offset + 2 * m_palette_entries, m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]);
+}
+
 
 
 //**************************************************************************

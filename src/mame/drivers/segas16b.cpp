@@ -1758,11 +1758,12 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( lockonph_map, AS_PROGRAM, 16, segas16b_state )
+	// this still appears to have a mapper device, does the hardware use it?
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
 	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x840000, 0x841fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x840000, 0x841fff) AM_RAM_WRITE(philko_paletteram_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0xC41000, 0xC41001) AM_READ_PORT("P1")
 	AM_RANGE(0xC41002, 0xC41003) AM_READ_PORT("P2")
@@ -4260,28 +4261,29 @@ ROM_END
 //
 ROM_START( lockonph )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "B2.bin", 0x000001, 0x40000, CRC(fc1c9f81) SHA1(09c51fbf4cc440ad3166407d1b96b4a4dcc9e412) )
-	ROM_LOAD16_BYTE( "B4.bin", 0x000000, 0x40000, CRC(fbb896f4) SHA1(36fe1199d27c6b106164ed359ddd735a75bcb85b) )
-	ROM_LOAD16_BYTE( "B1.bin", 0x080001, 0x20000, CRC(f11a72ac) SHA1(e3010114abc79e4787f9e68fac40fdc231a22a5f) )
-	ROM_LOAD16_BYTE( "B3.bin", 0x080000, 0x20000, CRC(3f8c0215) SHA1(3d8081c2e2a8dea398b390d5bcde5b1684c136ad) )
+	ROM_LOAD16_BYTE( "B2", 0x000001, 0x40000, CRC(fc1c9f81) SHA1(09c51fbf4cc440ad3166407d1b96b4a4dcc9e412) )
+	ROM_LOAD16_BYTE( "B4", 0x000000, 0x40000, CRC(fbb896f4) SHA1(36fe1199d27c6b106164ed359ddd735a75bcb85b) )
+	ROM_LOAD16_BYTE( "B1", 0x080001, 0x20000, CRC(f11a72ac) SHA1(e3010114abc79e4787f9e68fac40fdc231a22a5f) )
+	ROM_LOAD16_BYTE( "B3", 0x080000, 0x20000, CRC(3f8c0215) SHA1(3d8081c2e2a8dea398b390d5bcde5b1684c136ad) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // z80
-	ROM_LOAD( "B6.BIN",  0x00000, 0x10000, CRC(aa7b1880) SHA1(866c057e076178da2395ce0351f7060cccd7bd81) )
+	ROM_LOAD( "B6",  0x00000, 0x10000, CRC(aa7b1880) SHA1(866c057e076178da2395ce0351f7060cccd7bd81) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) // m6295
-	ROM_LOAD( "B5.BIN",  0x00000, 0x20000, CRC(d6369a39) SHA1(354075ec6eb7861567917f61d2dda23652dbec60) )
+	ROM_LOAD( "B5",  0x00000, 0x20000, CRC(d6369a39) SHA1(354075ec6eb7861567917f61d2dda23652dbec60) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "B7.BIN",  0x00000, 0x20000, CRC(787c382e) SHA1(4e1912c891d69a9fbeecfa16ff0fc1377ae5ad8e) )
-	ROM_LOAD( "B8.BIN",  0x20000, 0x20000, CRC(cd30abe0) SHA1(9fb19b9d2bee033fc81a47fb00ab4a59ea77ecb1) )
-	ROM_LOAD( "B9.BIN",  0x40000, 0x20000, CRC(aae2cef1) SHA1(3f83cf8b605822561bd0f745f7568cae86d3a3b8) )
-	ROM_LOAD( "B10.BIN", 0x60000, 0x20000, CRC(d3a8bd15) SHA1(06fc030d4325aaf181578ae8b7da671190ca9548) )
+	ROM_LOAD( "B10", 0x00000, 0x20000, CRC(d3a8bd15) SHA1(06fc030d4325aaf181578ae8b7da671190ca9548) )
+	ROM_LOAD( "B7",  0x20000, 0x20000, CRC(787c382e) SHA1(4e1912c891d69a9fbeecfa16ff0fc1377ae5ad8e) )
+	ROM_LOAD( "B9",  0x40000, 0x20000, CRC(aae2cef1) SHA1(3f83cf8b605822561bd0f745f7568cae86d3a3b8) )
+	ROM_LOAD( "B8",  0x60000, 0x20000, CRC(cd30abe0) SHA1(9fb19b9d2bee033fc81a47fb00ab4a59ea77ecb1) )
+
 
 	ROM_REGION16_BE( 0x100000, "sprites", ROMREGION_ERASEFF ) // sprites
-	ROM_LOAD16_BYTE( "B12.bin", 0x000000, 0x40000, CRC(9088d980) SHA1(bc6c24d4b56472a4bd2f2b0999b850fc99b6c556) )
-	ROM_LOAD16_BYTE( "B14.bin", 0x000001, 0x40000, CRC(af943525) SHA1(fe1accca30602c8b5db799c7cb038230b0113810) )
-	ROM_LOAD16_BYTE( "B11.bin", 0x080000, 0x20000, CRC(5da3dfcd) SHA1(02d409c2fff4fdc405f7d5b4e0ca0c43dc6f6899) )
-	ROM_LOAD16_BYTE( "B13.bin", 0x080001, 0x20000, CRC(62f4b64f) SHA1(719f9d4faf2bd04bb47131fe4082def3d809c56b) )
+	ROM_LOAD16_BYTE( "B12", 0x000000, 0x40000, CRC(9088d980) SHA1(bc6c24d4b56472a4bd2f2b0999b850fc99b6c556) )
+	ROM_LOAD16_BYTE( "B14", 0x000001, 0x40000, CRC(af943525) SHA1(fe1accca30602c8b5db799c7cb038230b0113810) )
+	ROM_LOAD16_BYTE( "B11", 0x080000, 0x20000, CRC(5da3dfcd) SHA1(02d409c2fff4fdc405f7d5b4e0ca0c43dc6f6899) )
+	ROM_LOAD16_BYTE( "B13", 0x080001, 0x20000, CRC(62f4b64f) SHA1(719f9d4faf2bd04bb47131fe4082def3d809c56b) )
 ROM_END
 
 
@@ -8312,7 +8314,17 @@ DRIVER_INIT_MEMBER(segas16b_state,generic_korean)
 	emu_timer *timer = timer_alloc(TID_ATOMICP_SOUND_IRQ);
 	timer->adjust(attotime::from_hz(10000), 0, attotime::from_hz(10000));
 }
+DRIVER_INIT_MEMBER(segas16b_state, lockonph)
+{
+	init_generic(ROM_BOARD_KOREAN);
 
+	// configure special behaviors for the Korean boards
+	m_disable_screen_blanking = true;
+	m_atomicp_sound_divisor = 1;
+	m_segaic16vid->m_display_enable = 1;
+
+	m_spritepalbase = 0x800; // tiles are 4bpp so sprite base is 0x800 instead of 0x400
+}
 
 //-------------------------------------------------
 //  init_* - game-specific initialization
@@ -8600,7 +8612,7 @@ GAME( 2008, fantzoneta, fantzone, system16b,           fantzoneta,segas16b_state
 GAME( 1990, atomicp,    0,        atomicp,             atomicp,  segas16b_state,generic_korean,     ROT0,   "Philko", "Atomic Point (Korea)", 0) // korean clone board..
 GAME( 1990, snapper,    0,        atomicp,             snapper,  segas16b_state,snapper,            ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
 // board marked 'System 4' and has Philko custom chip - various hw changes (4bpp tiles for example)
-GAME( 199?, lockonph,   0,        lockonph,            lockonph, segas16b_state,generic_korean,     ROT0,   "Philko", "Lock On (Philko)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND) // korean clone board..
+GAME( 199?, lockonph,   0,        lockonph,            lockonph, segas16b_state,lockonph,           ROT0,   "Philko", "Lock On (Philko)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND) // copyright not shown, but has 'PHILKO' in the tiles
 
 // decrypted bootleg / 'suicide repair' sets
 
