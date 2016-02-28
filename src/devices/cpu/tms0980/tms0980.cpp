@@ -164,13 +164,17 @@ const device_type TMS1670 = &device_creator<tms1670_cpu_device>; // high voltage
 // TMS0980
 // - 64x9bit RAM array at the bottom-left (set up as 144x4)
 // - 2048x9bit ROM array at the bottom-left
-// - main instructions PLA at the top half, to the right of the midline
+// - main instructions PLAs at the top half, to the right of the midline
+//   * top section is assumed to be the CKI bus select
+//   * middle section is for microinstruction redirection, this part may differ per die
+//   * rest is fixed instructions select, from top-to-bottom: SEAC, LDX, COMX, COMX8,
+//     TDO, SBIT, RETN, SETR, REAC, XDA, SAL, RBIT, ..., OFF, SBL, LDP, redir(------00- + R0^BL)
 // - 64-term microinstructions PLA between the RAM and ROM, supporting 20 microinstructions
 // - 16-term inverted output PLA and segment PLA above the RAM (rotate opla 90 degrees)
 const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 9 R pins
 
 // TMS1980 is a TMS0980 with a TMS1x00 style opla
-// - RAM, ROM, and main instructions PLA is the same as TMS0980
+// - RAM, ROM, and main instructions PLAs is the same as TMS0980
 // - one of the microinstructions redirects to a RSTR instruction, like on TMS0270
 // - 32-term inverted output PLA above the RAM, 7 bits! (rotate opla 270 degrees)
 const device_type TMS1980 = &device_creator<tms1980_cpu_device>; // 28-pin DIP, 7 O pins, 10 R pins, high voltage
@@ -182,19 +186,25 @@ const device_type TMS0950 = &device_creator<tms0950_cpu_device>; // 28-pin DIP, 
 
 // TMS0970 is a stripped-down version of the TMS0980, itself acting more like a TMS1000
 // - RAM and ROM is the same as TMS1000
-// - main instructions PLA at the top half, to the right of the midline
+// - main instructions PLAs at the top half, to the right of the midline
+//   * see TMS0980 notes, except that the fixed instruction list differs:
+//     RETN, SETR, RBIT, SBIT, LDX, COMX, TDO, ..., redir(----0-00), LDP
 // - 32-term microinstructions PLA between the RAM and ROM, supporting 15 microinstructions
 // - 16-term inverted output PLA and segment PLA above the RAM (rotate opla 90 degrees)
 const device_type TMS0970 = &device_creator<tms0970_cpu_device>; // 28-pin DIP, 11 R pins (note: pinout may slightly differ from chip to chip)
 const device_type TMS1990 = &device_creator<tms1990_cpu_device>; // 28-pin DIP, ? R pins..
 
 // TMS0270 on the other hand, is a TMS0980 with earrings and a new hat. The new changes look like a quick afterthought, almost hacky
-// - RAM, ROM, and main instructions PLA is the same as TMS0980
+// - RAM, ROM, and main instructions PLAs is the same as TMS0980
 // - 64-term microinstructions PLA between the RAM and ROM, supporting 20 microinstructions plus optional separate lines for custom opcode handling
 // - 48-term output PLA above the RAM (rotate opla 90 degrees)
 const device_type TMS0270 = &device_creator<tms0270_cpu_device>; // 40-pin DIP, 16 O pins, 8+ R pins (some R pins are internally hooked up to support more I/O)
 // newer TMS0270 chips (eg. Speak & Math) have 42 pins
 // TMS0260 is same or similar?
+
+// TP0320 is TI's first CMOS MCU with integrated LCD controller, the die is still very similar to TMS0980
+// - x
+const device_type TP0320 = &device_creator<tp0320_cpu_device>; // 28-pin SDIP, ..
 
 
 // internal memory maps
@@ -333,6 +343,11 @@ tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char
 	, m_read_ctl(*this)
 	, m_write_ctl(*this)
 	, m_write_pdc(*this)
+{ }
+
+
+tp0320_cpu_device::tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms0980_cpu_device(mconfig, TP0320, "TP0320", tag, owner, clock, 7, 10, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_64x9_as4), "tp0320", __FILE__)
 { }
 
 
