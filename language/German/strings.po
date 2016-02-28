@@ -633,7 +633,7 @@ msgstr "Verlassen"
 
 #: src/emu/ui/menu.cpp:263 src/emu/ui/menu.cpp:265
 msgid "Return to Previous Menu"
-msgstr "Zurück zum vorigen Menü"
+msgstr "Zurück zum vorherigen Menü"
 
 #: src/emu/ui/miscmenu.cpp:36
 msgid "Keyboard Mode:"
@@ -1150,7 +1150,7 @@ msgstr " (Standard)"
 #: src/emu/ui/selsoft.cpp:684
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d softwares )"
-msgstr "%1$s %2$s ( %3$d / %4$d Softwares )"
+msgstr "%1$s %2$s ( %3$d / %4$d Programme )"
 
 #: src/emu/ui/selsoft.cpp:685
 #, c-format
@@ -1208,7 +1208,7 @@ msgid ""
 "\n"
 "If this is your first time using %2$s, please see the config.txt file in the "
 "docs directory for information on configuring %2$s."
-msgstr "Keine Maschinen gefunden. Bitte überprüfen Sie den Pfad für die ROMs in Ini-Datei %1$s.ini.\n\nWenn dies Ihre erste Verwendung von  %2$s ist, konsultieren Sie bitte config.txt im docs Verzeichnis zur Konfiguration von %2$s."
+msgstr "Keine Maschinen gefunden. Bitte überprüfen Sie den in der ini-Datei %1$s.ini angegebenen Pfad zu den ROM-Dateien. \n\n Wenn Sie %2$s zum ersten Mal verwenden, konsultieren Sie bitte die Datei config.txt im Verzeichnis "docs" zur Konfiguration von %2$s."
 
 #: src/emu/ui/simpleselgame.cpp:287
 #, c-format
