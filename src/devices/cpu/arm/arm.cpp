@@ -559,14 +559,14 @@ void arm_cpu_device::state_string_export(const device_state_entry &entry, std::s
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c %s",
+			str = string_format("%c%c%c%c%c%c %s",
 				(m_sArmRegister[15] & N_MASK) ? 'N' : '-',
 				(m_sArmRegister[15] & Z_MASK) ? 'Z' : '-',
 				(m_sArmRegister[15] & C_MASK) ? 'C' : '-',
 				(m_sArmRegister[15] & V_MASK) ? 'V' : '-',
 				(m_sArmRegister[15] & I_MASK) ? 'I' : '-',
 				(m_sArmRegister[15] & F_MASK) ? 'F' : '-',
-				s[m_sArmRegister[15] & 3] );
+				s[m_sArmRegister[15] & 3]);
 			break;
 	}
 }

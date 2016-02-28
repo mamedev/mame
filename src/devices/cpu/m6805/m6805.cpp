@@ -498,7 +498,7 @@ void m6805_base_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				(m_cc & 0x80) ? '?' : '.',
 				(m_cc & 0x40) ? '?' : '.',
 				(m_cc & 0x20) ? '?' : '.',

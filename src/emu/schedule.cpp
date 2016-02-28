@@ -252,7 +252,7 @@ void emu_timer::register_save()
 	// for device timers, it is an index based on the device and timer ID
 	else
 	{
-		strprintf(name,"%s/%d", m_device->tag(), m_id);
+		name = string_format("%s/%d", m_device->tag(), m_id);
 		for (emu_timer *curtimer = machine().scheduler().first_timer(); curtimer != nullptr; curtimer = curtimer->next())
 			if (!curtimer->m_temporary && curtimer->m_device != nullptr && curtimer->m_device == m_device && curtimer->m_id == m_id)
 				index++;

@@ -405,7 +405,7 @@ void jaguar_cpu_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c%c%c%c",
 				FLAGS & 0x8000 ? 'D':'.',
 				FLAGS & 0x4000 ? 'A':'.',
 				FLAGS & 0x0100 ? '4':'.',

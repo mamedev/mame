@@ -49,19 +49,15 @@ static imgtoolerr_t map_chd_error(chd_error chderr)
 imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylinders, UINT32 heads, UINT32 sectors, UINT32 seclen)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	dynamic_buffer cache;
 	chd_file chd;
 	chd_error rc;
-	UINT64 logicalbytes;
-	int hunknum, totalhunks;
-	std::string metadata;
 	chd_codec_type compression[4] = { CHD_CODEC_NONE };
 
 	/* sanity check args */
 	if (hunksize >= 2048)
 	{
 		err = IMGTOOLERR_PARAMCORRUPT;
-		goto done;
+		return err;
 	}
 	if (hunksize <= 0)
 		hunksize = 1024;    /* default value */
@@ -70,18 +66,18 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	if (stream_isreadonly(stream))
 	{
 		err = IMGTOOLERR_READONLY;
-		goto done;
+		return err;
 	}
 
 	/* calculations */
-	logicalbytes = (UINT64)cylinders * heads * sectors * seclen;
+	const UINT64 logicalbytes = (UINT64)cylinders * heads * sectors * seclen;
 
 	/* create the new hard drive */
 	rc = chd.create(*stream_core_file(stream), logicalbytes, hunksize, seclen, compression);
 	if (rc != CHDERR_NONE)
 	{
 		err = map_chd_error(rc);
-		goto done;
+		return err;
 	}
 
 	/* open the new hard drive */
@@ -90,35 +86,35 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	if (rc != CHDERR_NONE)
 	{
 		err = map_chd_error(rc);
-		goto done;
+		return err;
 	}
 
 	/* write the metadata */
-	strprintf(metadata,HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, seclen);
+	const std::string metadata = string_format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, seclen);
 	err = (imgtoolerr_t)chd.write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
 	if (rc != CHDERR_NONE)
 	{
 		err = map_chd_error(rc);
-		goto done;
+		return err;
 	}
 
 	/* alloc and zero buffer */
+	dynamic_buffer cache;
 	cache.resize(hunksize);
 	memset(&cache[0], 0, hunksize);
 
 	/* zero out every hunk */
-	totalhunks = (logicalbytes + hunksize - 1) / hunksize;
-	for (hunknum = 0; hunknum < totalhunks; hunknum++)
+	const int totalhunks = (logicalbytes + hunksize - 1) / hunksize;
+	for (int hunknum = 0; hunknum < totalhunks; hunknum++)
 	{
 		rc = chd.write_units(hunknum, &cache[0]);
 		if (rc)
 		{
 			err = IMGTOOLERR_WRITEERROR;
-			goto done;
+			return err;
 		}
 	}
 
-done:
 	return err;
 }
 

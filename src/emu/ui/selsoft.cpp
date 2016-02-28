@@ -681,22 +681,21 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 
 	// determine the text for the header
 	int vis_item = (m_search[0] != 0) ? visible_items : (m_has_empty_start ? visible_items - 1 : visible_items);
-	strprintf(tempbuf[0], "MAME %s ( %d / %d softwares )", bare_build_version, vis_item, (int)m_swinfo.size() - 1);
-	tempbuf[1].assign("Driver: \"").append(m_driver->description).append("\" software list ");
+	tempbuf[0] = string_format(_("%1$s %2$s ( %3$d / %4$d softwares )"), emulator_info::get_appname(), bare_build_version, vis_item, m_swinfo.size() - 1);
+	tempbuf[1] = string_format(_("Driver: \"%1$s\" software list "), m_driver->description);
 
 	if (sw_filters::actual == UI_SW_REGION && m_filter.region.ui.size() != 0)
-		strprintf(filtered, _("Region: %s -"), m_filter.region.ui[m_filter.region.actual].c_str());
+		filtered = string_format(_("Region: %1$s -"), m_filter.region.ui[m_filter.region.actual]);
 	else if (sw_filters::actual == UI_SW_PUBLISHERS)
-		strprintf(filtered, _("Publisher: %s -"), m_filter.publisher.ui[m_filter.publisher.actual].c_str());
+		filtered = string_format(_("Publisher: %1$s -"), m_filter.publisher.ui[m_filter.publisher.actual]);
 	else if (sw_filters::actual == UI_SW_YEARS)
-		strprintf(filtered, _("Year: %s -"), m_filter.year.ui[m_filter.year.actual].c_str());
+		filtered = string_format(_("Year: %1$s -"), m_filter.year.ui[m_filter.year.actual]);
 	else if (sw_filters::actual == UI_SW_LIST)
-		strprintf(filtered, _("Software List: %s -"), m_filter.swlist.description[m_filter.swlist.actual].c_str());
+		filtered = string_format(_("Software List: %1$s -"), m_filter.swlist.description[m_filter.swlist.actual]);
 	else if (sw_filters::actual == UI_SW_TYPE)
-		strprintf(filtered, _("Device type: %s -"), m_filter.type.ui[m_filter.type.actual].c_str());
+		filtered = string_format(_("Device type: %1$s -"), m_filter.type.ui[m_filter.type.actual]);
 
-	strprintf(tempbuf[2], _("%s Search: %s_"), filtered.c_str(), m_search);
-//	tempbuf[2].assign(filtered).append(_("Search: ")).append(m_search).append("_");
+	tempbuf[2] = string_format(_("%s Search: %s_"), filtered, m_search);
 
 	// get the size of the text
 	float maxwidth = origx2 - origx1;
@@ -740,39 +739,39 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 		isstar = machine().favorite().isgame_favorite(driver);
 
 		// first line is game description
-		strprintf(tempbuf[0], "%-.100s", driver->description);
+		tempbuf[0] = string_format(_("%1$-.100s"), driver->description);
 
 		// next line is year, manufacturer
-		strprintf(tempbuf[1], "%s, %-.100s", driver->year, driver->manufacturer);
+		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
 
 		// next line is clone/parent status
 		int cloneof = driver_list::non_bios_clone(*driver);
 
 		if (cloneof != -1)
-			strprintf(tempbuf[2], "Driver is clone of: %-.100s", driver_list::driver(cloneof).description);
+			tempbuf[2] = string_format(_("Driver is clone of: %1$-.100s"), driver_list::driver(cloneof).description);
 		else
-			tempbuf[2] = "Driver is parent";
+			tempbuf[2] = _("Driver is parent");
 
 		// next line is overall driver status
 		if (driver->flags & MACHINE_NOT_WORKING)
-			tempbuf[3] = "Overall: NOT WORKING";
+			tempbuf[3] = _("Overall: NOT WORKING");
 		else if (driver->flags & MACHINE_UNEMULATED_PROTECTION)
-			tempbuf[3] = "Overall: Unemulated Protection";
+			tempbuf[3] = _("Overall: Unemulated Protection");
 		else
-			tempbuf[3] = "Overall: Working";
+			tempbuf[3] = _("Overall: Working");
 
 		// next line is graphics, sound status
 		if (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS))
-			tempbuf[4] = "Graphics: Imperfect, ";
+			tempbuf[4] = _("Graphics: Imperfect, ");
 		else
-			tempbuf[4] = "Graphics: OK, ";
+			tempbuf[4] = _("Graphics: OK, ");
 
 		if (driver->flags & MACHINE_NO_SOUND)
-			tempbuf[4].append("Sound: Unimplemented");
+			tempbuf[4].append(_("Sound: Unimplemented"));
 		else if (driver->flags & MACHINE_IMPERFECT_SOUND)
-			tempbuf[4].append("Sound: Imperfect");
+			tempbuf[4].append(_("Sound: Imperfect"));
 		else
-			tempbuf[4].append("Sound: OK");
+			tempbuf[4].append(_("Sound: OK"));
 
 		color = UI_GREEN_COLOR;
 
@@ -790,36 +789,36 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 		isstar = machine().favorite().isgame_favorite(*swinfo);
 
 		// first line is long name
-		strprintf(tempbuf[0], "%-.100s", swinfo->longname.c_str());
+		tempbuf[0] = string_format(_("%1$-.100s"), swinfo->longname.c_str());
 
 		// next line is year, publisher
-		strprintf(tempbuf[1], "%s, %-.100s", swinfo->year.c_str(), swinfo->publisher.c_str());
+		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), swinfo->year.c_str(), swinfo->publisher.c_str());
 
 		// next line is parent/clone
 		if (!swinfo->parentname.empty())
-			strprintf(tempbuf[2], "Software is clone of: %-.100s", !swinfo->parentlongname.empty() ? swinfo->parentlongname.c_str() : swinfo->parentname.c_str());
+			tempbuf[2] = string_format(_("Software is clone of: %1$-.100s"), !swinfo->parentlongname.empty() ? swinfo->parentlongname.c_str() : swinfo->parentname.c_str());
 		else
-			tempbuf[2] = "Software is parent";
+			tempbuf[2] = _("Software is parent");
 
 		// next line is supported status
 		if (swinfo->supported == SOFTWARE_SUPPORTED_NO)
 		{
-			tempbuf[3] = "Supported: No";
+			tempbuf[3] = _("Supported: No");
 			color = UI_RED_COLOR;
 		}
 		else if (swinfo->supported == SOFTWARE_SUPPORTED_PARTIAL)
 		{
-			tempbuf[3] = "Supported: Partial";
+			tempbuf[3] = _("Supported: Partial");
 			color = UI_YELLOW_COLOR;
 		}
 		else
 		{
-			tempbuf[3] = "Supported: Yes";
+			tempbuf[3] = _("Supported: Yes");
 			color = UI_GREEN_COLOR;
 		}
 
 		// last line is romset name
-		strprintf(tempbuf[4], "romset: %-.100s", swinfo->shortname.c_str());
+		tempbuf[4] = string_format(_("romset: %1$-.100s"), swinfo->shortname.c_str());
 	}
 
 	else
@@ -1467,7 +1466,7 @@ float ui_menu_select_software::draw_left_panel(float x1, float y1, float x2, flo
 						int cfilter = sw_custfltr::other[count];
 						if (cfilter == filter)
 						{
-							strprintf(str, "@custom%d %s", count + 1, text[filter]);
+							str = string_format("@custom%d %s", count + 1, text[filter]);
 							x1t -= text_sign;
 							break;
 						}

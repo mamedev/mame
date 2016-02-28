@@ -840,8 +840,7 @@ const char *big_int_string(std::string &str, UINT64 intvalue)
 		int chunk = intvalue % 1000;
 		intvalue /= 1000;
 
-		std::string insert;
-		strprintf(insert, (intvalue != 0) ? "%03d" : "%d", chunk);
+		std::string insert = string_format((intvalue != 0) ? "%03d" : "%d", chunk);
 
 		if (!first)
 			str.insert(0, ",").c_str();
@@ -859,7 +858,7 @@ const char *big_int_string(std::string &str, UINT64 intvalue)
 
 const char *msf_string_from_frames(std::string &str, UINT32 frames)
 {
-	strprintf(str, "%02d:%02d:%02d", frames / (75 * 60), (frames / 75) % 60, frames % 75);
+	str = string_format("%02d:%02d:%02d", frames / (75 * 60), (frames / 75) % 60, frames % 75);
 	return str.c_str();
 }
 
@@ -1249,7 +1248,7 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 		{
 			case CD_TRACK_MODE1:
 			case CD_TRACK_MODE1_RAW:
-				strprintf(tempstr,"MODE1/%04d", info.datasize);
+				tempstr = string_format("MODE1/%04d", info.datasize);
 				break;
 
 			case CD_TRACK_MODE2:
@@ -1257,7 +1256,7 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 			case CD_TRACK_MODE2_FORM2:
 			case CD_TRACK_MODE2_FORM_MIX:
 			case CD_TRACK_MODE2_RAW:
-				strprintf(tempstr,"MODE2/%04d", info.datasize);
+				tempstr = string_format("MODE2/%04d", info.datasize);
 				break;
 
 			case CD_TRACK_AUDIO:
@@ -1301,9 +1300,9 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 		// write out the track type
 		std::string modesubmode;
 		if (info.subtype != CD_SUB_NONE)
-			strprintf(modesubmode,"%s %s", cdrom_get_type_string(info.trktype), cdrom_get_subtype_string(info.subtype));
+			modesubmode = string_format("%s %s", cdrom_get_type_string(info.trktype), cdrom_get_subtype_string(info.subtype));
 		else
-			strprintf(modesubmode,"%s", cdrom_get_type_string(info.trktype));
+			modesubmode = string_format("%s", cdrom_get_type_string(info.trktype));
 		core_fprintf(file, "TRACK %s\n", modesubmode.c_str());
 
 		// write out the attributes
@@ -1819,8 +1818,7 @@ static void do_create_hd(parameters_t &params)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
 
 		// add the standard hard disk metadata
-		std::string metadata;
-		strprintf(metadata, HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sector_size);
+		std::string  metadata = string_format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sector_size);
 		err = chd->write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error adding hard disk metadata: %s", chd_file::error_string(err));
@@ -2040,8 +2038,7 @@ static void do_create_ld(parameters_t &params)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
 
 		// write the core A/V metadata
-		std::string metadata;
-		strprintf(metadata, AV_METADATA_FORMAT, info.fps_times_1million / 1000000, info.fps_times_1million % 1000000, info.width, info.height, info.interlaced, info.channels, info.rate);
+		std::string metadata = string_format(AV_METADATA_FORMAT, info.fps_times_1million / 1000000, info.fps_times_1million % 1000000, info.width, info.height, info.interlaced, info.channels, info.rate);
 		err = chd->write_metadata(AV_METADATA_TAG, 0, metadata);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error adding AV metadata: %s\n", chd_file::error_string(err));

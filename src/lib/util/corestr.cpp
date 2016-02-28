@@ -208,25 +208,6 @@ int strvprintf(std::string &str, const char *format, va_list args)
 	return result;
 }
 
-int strprintf(std::string &str, const char *format, ...)
-{
-	va_list ap;
-	va_start(ap, format);
-	int retVal = strvprintf(str, format, ap);
-	va_end(ap);
-	return retVal;
-}
-
-std::string strformat(const char *format, ...)
-{
-	std::string retVal;
-	va_list ap;
-	va_start(ap, format);
-	strvprintf(retVal, format, ap);
-	va_end(ap);
-	return retVal;
-}
-
 int strcatvprintf(std::string &str, const char *format, va_list args)
 {
 	char tempbuf[4096];
@@ -235,15 +216,6 @@ int strcatvprintf(std::string &str, const char *format, va_list args)
 	// set the result
 	str.append(tempbuf);
 	return result;
-}
-
-int strcatprintf(std::string &str, const char *format, ...)
-{
-	va_list ap;
-	va_start(ap, format);
-	int retVal = strcatvprintf(str, format, ap);
-	va_end(ap);
-	return retVal;
 }
 
 void strdelchr(std::string& str, char chr)

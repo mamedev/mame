@@ -5,29 +5,27 @@
 
 std::string disasmF1Field(const UINT8& F1, const UINT8& D, const UINT8& S)
 {
-	std::string ret = "";
 	switch (F1)
 	{
-		case 0x00: strprintf(ret, "a%d = p, p = x*y", D); break;
-		case 0x01: strprintf(ret, "a%d = a%d + p, p = x*y", D, S); break;
-		case 0x02: strprintf(ret, "p = x*y"); break;
-		case 0x03: strprintf(ret, "a%d = a%d - p, p = x*y", D, S); break;
-		case 0x04: strprintf(ret, "a%d = p", D); break;
-		case 0x05: strprintf(ret, "a%d = a%d + p", D, S); break;
-		case 0x06: strprintf(ret, "NOP"); break;
-		case 0x07: strprintf(ret, "a%d = a%d - p", D, S); break;
-		case 0x08: strprintf(ret, "a%d = a%d | y", D, S); break;
-		case 0x09: strprintf(ret, "a%d = a%d ^ y", D, S); break;
-		case 0x0a: strprintf(ret, "a%d & y", S); break;
-		case 0x0b: strprintf(ret, "a%d - y", S); break;
-		case 0x0c: strprintf(ret, "a%d = y", D); break;
-		case 0x0d: strprintf(ret, "a%d = a%d + y", D, S); break;
-		case 0x0e: strprintf(ret, "a%d = a%d & y", D, S); break;
-		case 0x0f: strprintf(ret, "a%d = a%d - y", D, S); break;
+		case 0x00: return string_format("a%u = p, p = x*y", D); break;
+		case 0x01: return string_format("a%u = a%u + p, p = x*y", D, S); break;
+		case 0x02: return string_format("p = x*y"); break;
+		case 0x03: return string_format("a%u = a%u - p, p = x*y", D, S); break;
+		case 0x04: return string_format("a%u = p", D); break;
+		case 0x05: return string_format("a%u = a%u + p", D, S); break;
+		case 0x06: return string_format("NOP"); break;
+		case 0x07: return string_format("a%u = a%u - p", D, S); break;
+		case 0x08: return string_format("a%u = a%u | y", D, S); break;
+		case 0x09: return string_format("a%u = a%u ^ y", D, S); break;
+		case 0x0a: return string_format("a%u & y", S); break;
+		case 0x0b: return string_format("a%u - y", S); break;
+		case 0x0c: return string_format("a%u = y", D); break;
+		case 0x0d: return string_format("a%u = a%u + y", D, S); break;
+		case 0x0e: return string_format("a%u = a%u & y", D, S); break;
+		case 0x0f: return string_format("a%u = a%u - y", D, S); break;
 
 		default: return "UNKNOWN";
 	}
-	return ret;
 }
 
 std::string disasmYField(const UINT8& Y)
@@ -95,23 +93,23 @@ std::string disasmF2Field(const UINT8& F2, const UINT8& D, const UINT8& S)
 	std::string ret = "";
 	switch (F2)
 	{
-		case 0x00: strprintf(ret, "a%d = a%d >> 1", D, S); break;
-		case 0x01: strprintf(ret, "a%d = a%d << 1", D, S); break;
-		case 0x02: strprintf(ret, "a%d = a%d >> 4", D, S); break;
-		case 0x03: strprintf(ret, "a%d = a%d << 4", D, S); break;
-		case 0x04: strprintf(ret, "a%d = a%d >> 8", D, S); break;
-		case 0x05: strprintf(ret, "a%d = a%d << 8", D, S); break;
-		case 0x06: strprintf(ret, "a%d = a%d >> 16", D, S); break;
-		case 0x07: strprintf(ret, "a%d = a%d << 16", D, S); break;
+		case 0x00: return string_format("a%u = a%u >> 1", D, S); break;
+		case 0x01: return string_format("a%u = a%u << 1", D, S); break;
+		case 0x02: return string_format("a%u = a%u >> 4", D, S); break;
+		case 0x03: return string_format("a%u = a%u << 4", D, S); break;
+		case 0x04: return string_format("a%u = a%u >> 8", D, S); break;
+		case 0x05: return string_format("a%u = a%u << 8", D, S); break;
+		case 0x06: return string_format("a%u = a%u >> 16", D, S); break;
+		case 0x07: return string_format("a%u = a%u << 16", D, S); break;
 
-		case 0x08: strprintf(ret, "a%d = p", D); break;
-		case 0x09: strprintf(ret, "a%dh = a%dh + 1", D, S); break;
-		case 0x0a: strprintf(ret, "RESERVED"); break;
-		case 0x0b: strprintf(ret, "a%d = rnd(a%d)", D, S); break;
-		case 0x0c: strprintf(ret, "a%d = y", D); break;
-		case 0x0d: strprintf(ret, "a%d = a%d + 1", D, S); break;
-		case 0x0e: strprintf(ret, "a%d = a%d", D, S); break;
-		case 0x0f: strprintf(ret, "a%d = -a%d", D, S); break;
+		case 0x08: return string_format("a%u = p", D); break;
+		case 0x09: return string_format("a%uh = a%uh + 1", D, S); break;
+		case 0x0a: return string_format("RESERVED"); break;
+		case 0x0b: return string_format("a%u = rnd(a%u)", D, S); break;
+		case 0x0c: return string_format("a%u = y", D); break;
+		case 0x0d: return string_format("a%u = a%u + 1", D, S); break;
+		case 0x0e: return string_format("a%u = a%u", D, S); break;
+		case 0x0f: return string_format("a%u = -a%u", D, S); break;
 
 		default: return "UNKNOWN";
 	}

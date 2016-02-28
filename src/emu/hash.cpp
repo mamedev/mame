@@ -19,9 +19,15 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
+const char hash_collection::HASH_CRC;
+const char hash_collection::HASH_SHA1;
+
 const char *hash_collection::HASH_TYPES_CRC = "R";
 const char *hash_collection::HASH_TYPES_CRC_SHA1 = "RS";
 const char *hash_collection::HASH_TYPES_ALL = "RS";
+
+const char hash_collection::FLAG_NO_DUMP;
+const char hash_collection::FLAG_BAD_DUMP;
 
 
 

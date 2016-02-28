@@ -1036,14 +1036,14 @@ static void execute_ignore(running_machine &machine, int ref, int params, const 
 			if (!exec->device().debug()->observing())
 			{
 				if (buffer.empty())
-					strprintf(buffer, "Currently ignoring device '%s'", exec->device().tag());
+					buffer = string_format("Currently ignoring device '%s'", exec->device().tag());
 				else
-					strcatprintf(buffer, ", '%s'", exec->device().tag());
+					buffer.append(string_format(", '%s'", exec->device().tag()));
 			}
 
 		/* special message for none */
 		if (buffer.empty())
-			strprintf(buffer, "Not currently ignoring any devices");
+			buffer = string_format("Not currently ignoring any devices");
 		debug_console_printf(machine, "%s\n", buffer.c_str());
 	}
 
@@ -1101,14 +1101,14 @@ static void execute_observe(running_machine &machine, int ref, int params, const
 			if (exec->device().debug()->observing())
 			{
 				if (buffer.empty())
-					strprintf(buffer, "Currently observing CPU '%s'", exec->device().tag());
+					buffer = string_format("Currently observing CPU '%s'", exec->device().tag());
 				else
-					strcatprintf(buffer, ", '%s'", exec->device().tag());
+					buffer.append(string_format(", '%s'", exec->device().tag()));
 			}
 
 		/* special message for none */
 		if (buffer.empty())
-			strprintf(buffer, "Not currently observing any devices");
+			buffer = string_format("Not currently observing any devices");
 		debug_console_printf(machine, "%s\n", buffer.c_str());
 	}
 
@@ -1329,11 +1329,11 @@ static void execute_bplist(running_machine &machine, int ref, int params, const 
 			/* loop over the breakpoints */
 			for (device_debug::breakpoint *bp = device->debug()->breakpoint_first(); bp != nullptr; bp = bp->next())
 			{
-				strprintf(buffer, "%c%4X @ %s", bp->enabled() ? ' ' : 'D', bp->index(), core_i64_hex_format(bp->address(), device->debug()->logaddrchars()));
+				buffer = string_format("%c%4X @ %s", bp->enabled() ? ' ' : 'D', bp->index(), core_i64_hex_format(bp->address(), device->debug()->logaddrchars()));
 				if (std::string(bp->condition()).compare("1") != 0)
-					strcatprintf(buffer, " if %s", bp->condition());
+					buffer.append(string_format(" if %s", bp->condition()));
 				if (std::string(bp->action()).compare("") != 0)
-					strcatprintf(buffer, " do %s", bp->action());
+					buffer.append(string_format(" do %s", bp->action()));
 				debug_console_printf(machine, "%s\n", buffer.c_str());
 				printed++;
 			}
@@ -1496,14 +1496,14 @@ static void execute_wplist(running_machine &machine, int ref, int params, const 
 				/* loop over the watchpoints */
 				for (device_debug::watchpoint *wp = device->debug()->watchpoint_first(spacenum); wp != nullptr; wp = wp->next())
 				{
-					strprintf(buffer, "%c%4X @ %s-%s %s", wp->enabled() ? ' ' : 'D', wp->index(),
+					buffer = string_format("%c%4X @ %s-%s %s", wp->enabled() ? ' ' : 'D', wp->index(),
 							core_i64_hex_format(wp->space().byte_to_address(wp->address()), wp->space().addrchars()),
 							core_i64_hex_format(wp->space().byte_to_address_end(wp->address() + wp->length()) - 1, wp->space().addrchars()),
 							types[wp->type() & 3]);
 					if (std::string(wp->condition()).compare("1") != 0)
-						strcatprintf(buffer, " if %s", wp->condition());
+						buffer.append(string_format(" if %s", wp->condition()));
 					if (std::string(wp->action()).compare("") != 0)
-						strcatprintf(buffer, " do %s", wp->action());
+						buffer.append(string_format(" do %s", wp->action()));
 					debug_console_printf(machine, "%s\n", buffer.c_str());
 					printed++;
 				}
@@ -1639,10 +1639,9 @@ static void execute_rplist(running_machine &machine, int ref, int params, const 
 			/* loop over the breakpoints */
 			for (device_debug::registerpoint *rp = device->debug()->registerpoint_first(); rp != nullptr; rp = rp->next())
 			{
-				strprintf(buffer, "%c%4X ", rp->enabled() ? ' ' : 'D', rp->index());
-				strcatprintf(buffer, "if %s", rp->condition());
+				buffer = string_format("%c%4X if %s", rp->enabled() ? ' ' : 'D', rp->index(), rp->condition());
 				if (rp->action() != nullptr)
-					strcatprintf(buffer, " do %s", rp->action());
+					buffer.append(string_format(" do %s", rp->action()));
 				debug_console_printf(machine, "%s\n", buffer.c_str());
 				printed++;
 			}

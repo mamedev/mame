@@ -134,7 +134,7 @@ void device_state_entry::format_from_mask()
 	int width = 0;
 	for (UINT64 tempmask = m_datamask; tempmask != 0; tempmask >>= 4)
 		width++;
-	strprintf(m_format,"%%0%dX", width);
+	m_format = string_format("%%0%dX", width);
 }
 
 

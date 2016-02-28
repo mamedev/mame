@@ -185,11 +185,11 @@ void lr35902_cpu_device::state_string_export(const device_state_entry &entry, st
 	switch (entry.index())
 	{
 		case LR35902_SPEED:
-			strprintf(str, "%02X", 0x7E | ((m_gb_speed - 1) << 7) | m_gb_speed_change_pending);
+			str = string_format("%02X", 0x7E | ((m_gb_speed - 1) << 7) | m_gb_speed_change_pending);
 			break;
 
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c",
+			str = string_format("%c%c%c%c",
 				m_F & FLAG_Z   ? 'Z' : '.',
 				m_F & FLAG_N   ? 'N' : '.',
 				m_F & FLAG_H   ? 'H' : '.',

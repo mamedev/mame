@@ -68,7 +68,7 @@ void ui_menu_file_manager::custom_render(void *selectedref, float top, float bot
 void ui_menu_file_manager::fill_image_line(device_image_interface *img, std::string &instance, std::string &filename)
 {
 	// get the image type/id
-	strprintf(instance,"%s (%s)", img->instance_name(), img->brief_instance_name());
+	instance = string_format("%s (%s)", img->instance_name(), img->brief_instance_name());
 
 	// get the base name
 	if (img->basename() != nullptr)
@@ -103,7 +103,7 @@ void ui_menu_file_manager::fill_image_line(device_image_interface *img, std::str
 
 void ui_menu_file_manager::populate()
 {
-	std::string buffer, tmp_inst, tmp_name;
+	std::string tmp_inst, tmp_name;
 	bool first_entry = true;
 
 	if (!m_warnings.empty())
@@ -140,8 +140,7 @@ void ui_menu_file_manager::populate()
 								first_entry = false;
 							else
 								item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-							strprintf(buffer, "[root%s]", dev->tag());
-							item_append(buffer.c_str(), nullptr, 0, nullptr);
+							item_append(string_format("[root%s]", dev->tag()).c_str(), nullptr, 0, nullptr);
 							tag_appended = true;
 						}
 						// finally, append the image interface to the menu

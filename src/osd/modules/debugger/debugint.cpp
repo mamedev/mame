@@ -1763,8 +1763,6 @@ static void handle_menus(running_machine &machine)
 
 static void followers_set_cpu(device_t *device)
 {
-	std::string title;
-
 	for (DView *dv = list; dv != nullptr; dv = dv->next)
 	{
 		if (dview_is_state(dv, VIEW_STATE_FOLLOW_CPU))
@@ -1775,8 +1773,7 @@ static void followers_set_cpu(device_t *device)
 			case DVT_DISASSEMBLY:
 			case DVT_STATE:
 				dv->view->set_source(*source);
-				strprintf(title, "%s", source->name());
-				dview_set_title(dv, title);
+				dview_set_title(dv, string_format("%s", source->name()));
 				break;
 			}
 		}

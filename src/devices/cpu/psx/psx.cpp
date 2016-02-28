@@ -2033,11 +2033,11 @@ void psxcpu_device::state_string_export( const device_state_entry &entry, std::s
 	case PSXCPU_DELAYR:
 		if( m_delayr <= PSXCPU_DELAYR_NOTPC )
 		{
-			strprintf(str, "%02x %-3s", m_delayr, delayn[m_delayr]);
+			str = string_format("%02x %-3s", m_delayr, delayn[m_delayr]);
 		}
 		else
 		{
-			strprintf(str, "%02x ---", m_delayr);
+			str = string_format("%02x ---", m_delayr);
 		}
 		break;
 	}

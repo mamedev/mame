@@ -78,7 +78,7 @@ void debug_view_state::enumerate_sources()
 	std::string name;
 	for (device_state_interface *state = iter.first(); state != nullptr; state = iter.next())
 	{
-		strprintf(name,"%s '%s'", state->device().name(), state->device().tag());
+		name = string_format("%s '%s'", state->device().name(), state->device().tag());
 		m_source_list.append(*global_alloc(debug_view_state_source(name.c_str(), state->device())));
 	}
 
@@ -242,7 +242,7 @@ void debug_view_state::view_update()
 						if (source.m_execintf != nullptr)
 						{
 							curitem->m_currval = source.m_execintf->cycles_remaining();
-							strprintf(valstr, "%-8d", (UINT32)curitem->m_currval);
+							valstr = string_format("%-8d", (UINT32)curitem->m_currval);
 						}
 						break;
 
@@ -250,7 +250,7 @@ void debug_view_state::view_update()
 						if (screen != nullptr)
 						{
 							curitem->m_currval = screen->hpos();
-							strprintf(valstr, "%4d", (UINT32)curitem->m_currval);
+							valstr = string_format("%4d", (UINT32)curitem->m_currval);
 						}
 						break;
 
@@ -258,7 +258,7 @@ void debug_view_state::view_update()
 						if (screen != nullptr)
 						{
 							curitem->m_currval = screen->vpos();
-							strprintf(valstr, "%4d", (UINT32)curitem->m_currval);
+							valstr = string_format("%4d", (UINT32)curitem->m_currval);
 						}
 						break;
 
@@ -266,7 +266,7 @@ void debug_view_state::view_update()
 						if (screen != nullptr)
 						{
 							curitem->m_currval = screen->frame_number();
-							strprintf(valstr, "%6d", (UINT32)curitem->m_currval);
+							valstr = string_format("%6d", (UINT32)curitem->m_currval);
 						}
 						break;
 				}

@@ -185,9 +185,8 @@ void ui_menu_display_options::populate()
 				m_options[opt].status ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)opt);
 		else
 		{
-			strprintf(v_text, "%d", m_options[opt].status);
 			arrow_flags = get_arrow_flags(1, 3, m_options[opt].status);
-			item_append(m_options[opt].description, v_text.c_str(), arrow_flags, (void *)(FPTR)opt);
+			item_append(m_options[opt].description, string_format("%d", m_options[opt].status).c_str(), arrow_flags, (void *)(FPTR)opt);
 		}
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);

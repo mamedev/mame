@@ -569,7 +569,7 @@ void arm7_cpu_device::state_string_export(const device_state_entry &entry, std::
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c %s",
+			str = string_format("%c%c%c%c%c%c%c%c %s",
 				(ARM7REG(eCPSR) & N_MASK) ? 'N' : '-',
 				(ARM7REG(eCPSR) & Z_MASK) ? 'Z' : '-',
 				(ARM7REG(eCPSR) & C_MASK) ? 'C' : '-',
@@ -578,7 +578,7 @@ void arm7_cpu_device::state_string_export(const device_state_entry &entry, std::
 				(ARM7REG(eCPSR) & I_MASK) ? 'I' : '-',
 				(ARM7REG(eCPSR) & F_MASK) ? 'F' : '-',
 				(ARM7REG(eCPSR) & T_MASK) ? 'T' : '-',
-				GetModeText(ARM7REG(eCPSR)) );
+				GetModeText(ARM7REG(eCPSR)));
 		break;
 	}
 }

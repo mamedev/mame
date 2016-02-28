@@ -190,7 +190,7 @@ const char *running_machine::describe_context()
 		if (cpu != nullptr)
 		{
 			address_space &prg = cpu->space(AS_PROGRAM);
-			strprintf(m_context, "'%s' (%s)", cpu->tag(), core_i64_format(cpu->pc(), prg.logaddrchars(), prg.is_octal()));
+			m_context = string_format("'%s' (%s)", cpu->tag(), core_i64_format(cpu->pc(), prg.logaddrchars(), prg.is_octal()));
 		}
 	}
 	else
@@ -1199,9 +1199,10 @@ void running_machine::postload_all_devices()
 std::string running_machine::nvram_filename(device_t &device) const
 {
 	// start with either basename or basename_biosnum
-	std::string result(basename());
+	std::ostringstream result;
+	result << basename();
 	if (root_device().system_bios() != 0 && root_device().default_bios() != root_device().system_bios())
-		strcatprintf(result, "_%d", root_device().system_bios() - 1);
+		stream_format(result, "_%d", root_device().system_bios() - 1);
 
 	// device-based NVRAM gets its own name in a subdirectory
 	if (device.owner() != nullptr)
@@ -1218,14 +1219,14 @@ std::string running_machine::nvram_filename(device_t &device) const
 			}
 		}
 		if (software != nullptr && *software != '\0')
-			result.append(PATH_SEPARATOR).append(software);
+			result << PATH_SEPARATOR << software;
 
 		std::string tag(device.tag());
 		tag.erase(0, 1);
 		strreplacechr(tag,':', '_');
-		result.append(PATH_SEPARATOR).append(tag);
+		result << PATH_SEPARATOR << tag;
 	}
-	return result;
+	return result.str();
 }
 
 /*-------------------------------------------------

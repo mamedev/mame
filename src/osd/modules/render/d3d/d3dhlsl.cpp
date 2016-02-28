@@ -2257,7 +2257,7 @@ INT32 slider::update(std::string *str, INT32 newval)
 			}
 			if (str != nullptr)
 			{
-				strprintf(*str, m_desc->format, m_desc->strings[*val_ptr]);
+				*str = string_format(m_desc->format, m_desc->strings[*val_ptr]);
 			}
 			return *val_ptr;
 		}
@@ -2272,7 +2272,7 @@ INT32 slider::update(std::string *str, INT32 newval)
 			}
 			if (str != nullptr)
 			{
-				strprintf(*str, m_desc->format, *val_ptr);
+				*str = string_format(m_desc->format, *val_ptr);
 			}
 			return *val_ptr;
 		}
@@ -2287,7 +2287,7 @@ INT32 slider::update(std::string *str, INT32 newval)
 			}
 			if (str != nullptr)
 			{
-				strprintf(*str, m_desc->format, *val_ptr);
+				*str = string_format(m_desc->format, *val_ptr);
 			}
 			return (INT32)floor(*val_ptr / m_desc->scale + 0.5f);
 		}
@@ -3273,13 +3273,11 @@ static file_error open_next(renderer_d3d9 *d3d, emu_file &file, const char *temp
 	else
 	{
 		// try until we succeed
-		std::string seqtext;
 		file.set_openflags(OPEN_FLAG_READ);
 		for (int seq = 0; ; seq++)
 		{
 			// build up the filename
-			strprintf(seqtext, "%04d_%d", seq, idx);
-			strreplace(fname.assign(snapstr), "%i", seqtext.c_str());
+			strreplace(fname.assign(snapstr), "%i", string_format("%04d_%d", seq, idx).c_str());
 
 			// try to open the file; stop when we fail
 			file_error filerr = file.open(fname.c_str());

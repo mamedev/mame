@@ -129,13 +129,11 @@ void ui_menu_sound_options::populate()
 {
 	UINT32 arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(m_sound_rate) - 1, m_cur_rates);
 	m_sample_rate = m_sound_rate[m_cur_rates];
-	std::string s_text;
-	strprintf(s_text, "%d", m_sample_rate);
 
 	// add options items
-	item_append(_("Sound"), m_sound ? "On" : "Off", m_sound ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)ENABLE_SOUND);
-	item_append(_("Sample Rate"), s_text.c_str(), arrow_flags, (void *)(FPTR)SAMPLE_RATE);
-	item_append(_("Use External Samples"), m_samples ? "On" : "Off", m_samples ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)ENABLE_SAMPLES);
+	item_append(_("Sound"), m_sound ? _("On") : _("Off"), m_sound ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)ENABLE_SOUND);
+	item_append(_("Sample Rate"), string_format("%d", m_sample_rate).c_str(), arrow_flags, (void *)(FPTR)SAMPLE_RATE);
+	item_append(_("Use External Samples"), m_samples ? _("On") : _("Off"), m_samples ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)ENABLE_SAMPLES);
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 
 	customtop = machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);

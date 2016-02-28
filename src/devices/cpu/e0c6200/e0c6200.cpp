@@ -30,7 +30,7 @@ void e0c6200_cpu_device::state_string_export(const device_state_entry &entry, st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c",
+			str = string_format("%c%c%c%c",
 				(m_f & I_FLAG) ? 'I':'i',
 				(m_f & D_FLAG) ? 'D':'d',
 				(m_f & Z_FLAG) ? 'Z':'z',

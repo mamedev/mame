@@ -525,7 +525,7 @@ const char *drcuml_block::get_comment_text(const instruction &inst, std::string 
 
 	// mapvars comment about their values
 	else if (inst.opcode() == OP_MAPVAR) {
-		strprintf(comment,"m%d = $%X", (int)inst.param(0).mapvar() - MAPVAR_M0, (UINT32)inst.param(1).immediate());
+		comment = string_format("m%d = $%X", (int)inst.param(0).mapvar() - MAPVAR_M0, (UINT32)inst.param(1).immediate());
 		return comment.c_str();
 	}
 

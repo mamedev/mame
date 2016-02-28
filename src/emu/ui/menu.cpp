@@ -246,25 +246,23 @@ void ui_menu::reset(ui_menu_reset_options options)
 	item.clear();
 	visitems = 0;
 	selected = 0;
-	std::string backtext;
-	strprintf(backtext, "Return to Machine");
 
 	// add an item to return
 	if (parent == nullptr)
-		item_append(backtext.c_str(), nullptr, 0, nullptr);
+		item_append(_("Return to Machine"), nullptr, 0, nullptr);
 	else if (parent->is_special_main_menu())
 	{
 		if (strcmp(machine().options().ui(), "simple") == 0) 
-			item_append("Exit", nullptr, 0, nullptr);
+			item_append(_("Exit"), nullptr, 0, nullptr);
 		else
-			item_append("Exit", nullptr, MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, nullptr);
+			item_append(_("Exit"), nullptr, MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, nullptr);
 	}
 	else
 	{
 		if (strcmp(machine().options().ui(), "simple") != 0 && ui_menu::stack_has_special_main_menu())
-			item_append("Return to Previous Menu", nullptr, MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, nullptr);
+			item_append(_("Return to Previous Menu"), nullptr, MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, nullptr);
 		else
-			item_append("Return to Previous Menu", nullptr, 0, nullptr);
+			item_append(_("Return to Previous Menu"), nullptr, 0, nullptr);
 	}
 
 }

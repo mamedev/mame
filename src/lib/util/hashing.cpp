@@ -10,6 +10,8 @@
 
 #include "hashing.h"
 #include <zlib.h>
+#include <iomanip>
+#include <sstream>
 
 
 //**************************************************************************
@@ -81,10 +83,12 @@ bool sha1_t::from_string(const char *string, int length)
 
 std::string sha1_t::as_string() const
 {
-	std::string buffer;
+	std::ostringstream buffer;
+	buffer.fill('0');
+	buffer << std::hex;
 	for (auto & elem : m_raw)
-		strcatprintf(buffer, "%02x", elem);
-	return buffer;
+		buffer << std::setw(2) << unsigned(elem);
+	return buffer.str();
 }
 
 
@@ -124,10 +128,12 @@ bool md5_t::from_string(const char *string, int length)
 
 std::string md5_t::as_string() const
 {
-	std::string buffer;
+	std::ostringstream buffer;
+	buffer.fill('0');
+	buffer << std::hex;
 	for (auto & elem : m_raw)
-		strcatprintf(buffer, "%02x", elem);
-	return buffer;
+		buffer << std::setw(2) << unsigned(elem);
+	return buffer.str();
 }
 
 
@@ -168,7 +174,7 @@ bool crc32_t::from_string(const char *string, int length)
 
 std::string crc32_t::as_string() const
 {
-	return strformat("%08x", m_raw);
+	return string_format("%08x", m_raw);
 }
 
 
@@ -225,7 +231,7 @@ bool crc16_t::from_string(const char *string, int length)
 
 std::string crc16_t::as_string() const
 {
-	return strformat("%04x", m_raw);
+	return string_format("%04x", m_raw);
 }
 
 /**

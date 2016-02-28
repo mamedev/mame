@@ -152,7 +152,7 @@ static int split_file(const char *filename, const char *basename, UINT32 splitsi
 		core_fprintf(splitfile, "hash=%s file=%s.%03d\n", computedhash.c_str(), basefilename.c_str(), partnum);
 
 		// compute the full filename for this guy
-		strprintf(outfilename,"%s.%03d", basename, partnum);
+		outfilename = string_format("%s.%03d", basename, partnum);
 
 		// create it
 		filerr = core_fopen(outfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &outfile);

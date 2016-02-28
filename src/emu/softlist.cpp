@@ -486,7 +486,7 @@ void software_list_device::parse()
 		m_file.close();
 	}
 	else
-		strprintf(m_errors, "Error opening file: %s\n", filename());
+		m_errors = string_format("Error opening file: %s\n", filename());
 
 	// indicate that we've been parsed
 	m_parsed = true;
@@ -726,7 +726,7 @@ void softlist_parser::expat_free(void *ptr)
 void ATTR_PRINTF(2,3) softlist_parser::parse_error(const char *fmt, ...)
 {
 	// always start with filename(line.column):
-	strcatprintf(m_errors, "%s(%d.%d): ", filename(), line(), column());
+	m_errors.append(string_format("%s(%d.%d): ", filename(), line(), column()));
 
 	// append the remainder of the string
 	va_list va;
@@ -1151,14 +1151,14 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 				std::string hashdata;
 				if (nodump)
 				{
-					strprintf(hashdata, "%s", NO_DUMP);
+					hashdata = string_format("%s", NO_DUMP);
 					if (crc != nullptr && sha1 != nullptr)
 						parse_error("No need for hash definition");
 				}
 				else
 				{
 					if (crc != nullptr && sha1 != nullptr)
-						strprintf(hashdata, "%c%s%c%s%s", hash_collection::HASH_CRC, crc, hash_collection::HASH_SHA1, sha1, (baddump ? BAD_DUMP : ""));
+						hashdata = string_format("%c%s%c%s%s", hash_collection::HASH_CRC, crc, hash_collection::HASH_SHA1, sha1, (baddump ? BAD_DUMP : ""));
 					else
 						parse_error("Incomplete rom hash definition");
 				}
@@ -1201,8 +1201,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 			bool baddump = (status != nullptr && strcmp(status, "baddump") == 0);
 			bool nodump = (status != nullptr && strcmp(status, "nodump" ) == 0);
 			bool writeable = (writeablestr != nullptr && strcmp(writeablestr, "yes") == 0);
-			std::string hashdata;
-			strprintf(hashdata, "%c%s%s", hash_collection::HASH_SHA1, sha1, (nodump ? NO_DUMP : (baddump ? BAD_DUMP : "")));
+			std::string hashdata = string_format("%c%s%s", hash_collection::HASH_SHA1, sha1, (nodump ? NO_DUMP : (baddump ? BAD_DUMP : "")));
 
 			add_rom_entry(name, hashdata.c_str(), 0, 0, ROMENTRYTYPE_ROM | (writeable ? DISK_READWRITE : DISK_READONLY));
 		}

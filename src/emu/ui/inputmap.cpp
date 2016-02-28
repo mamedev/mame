@@ -379,7 +379,6 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 	const char *nameformat[INPUT_TYPE_TOTAL] = { nullptr };
 	input_item_data **itemarray, *item;
 	int numitems = 0, curitem;
-	std::string text;
 	std::string subtext;
 	std::string prev_owner;
 	bool first_entry = true;
@@ -417,12 +416,11 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 				first_entry = false;
 			else
 				item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-			strprintf(text, "[root%s]", item->owner_name);
-			item_append(text.c_str(), nullptr, 0, nullptr);
+			item_append(string_format("[root%s]", item->owner_name).c_str(), nullptr, 0, nullptr);
 			prev_owner.assign(item->owner_name);
 		}
 
-		strprintf(text, nameformat[item->type], item->name);
+		std::string text = string_format(nameformat[item->type], item->name);
 
 		/* if we're polling this item, use some spaces with left/right arrows */
 		if (pollingref == item->ref)
@@ -556,7 +554,6 @@ void ui_menu_settings::populate()
 			if (field->type() == type && field->enabled())
 			{
 				UINT32 flags = 0;
-				std::string name;
 
 				/* set the left/right flags appropriately */
 				if (field->has_previous_setting())
@@ -571,14 +568,12 @@ void ui_menu_settings::populate()
 						first_entry = false;
 					else
 						item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-					strprintf(name, "[root%s]", field->device().tag());
-					item_append(name.c_str(), nullptr, 0, nullptr);
+					string_format("[root%s]", field->device().tag());
+					item_append(string_format("[root%s]", field->device().tag()).c_str(), nullptr, 0, nullptr);
 					prev_owner.assign(field->device().tag());
 				}
 
-				name.assign(field->name());
-
-				item_append(name.c_str(), field->setting_name(), flags, (void *)field);
+				item_append(field->name(), field->setting_name(), flags, (void *)field);
 
 				/* for DIP switches, build up the model */
 				if (type == IPT_DIPSWITCH && field->first_diplocation() != nullptr)
@@ -868,19 +863,15 @@ void ui_menu_analog::populate()
 					{
 						analog_item_data *data;
 						UINT32 flags = 0;
-						std::string name;
 						if (strcmp(field->device().tag(), prev_owner.c_str()) != 0)
 						{
 							if (first_entry)
 								first_entry = false;
 							else
 								item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-							strprintf(name,"[root%s]", field->device().tag());
-							item_append(name.c_str(), nullptr, 0, nullptr);
+							item_append(string_format("[root%s]", field->device().tag()).c_str(), nullptr, 0, nullptr);
 							prev_owner.assign(field->device().tag());
 						}
-
-						name.assign(field->name());
 
 						/* allocate a data item for tracking what this menu item refers to */
 						data = (analog_item_data *)m_pool_alloc(sizeof(*data));
@@ -892,8 +883,8 @@ void ui_menu_analog::populate()
 						{
 							default:
 							case ANALOG_ITEM_KEYSPEED:
-								strprintf(text, "%s Digital Speed", name.c_str());
-								strprintf(subtext, "%d", settings.delta);
+								text = string_format("%s Digital Speed", field->name());
+								subtext = string_format("%d", settings.delta);
 								data->min = 0;
 								data->max = 255;
 								data->cur = settings.delta;
@@ -901,8 +892,8 @@ void ui_menu_analog::populate()
 								break;
 
 							case ANALOG_ITEM_CENTERSPEED:
-								strprintf(text, "%s Autocenter Speed", name.c_str());
-								strprintf(subtext, "%d", settings.centerdelta);
+								text = string_format("%s Autocenter Speed", field->name());
+								subtext = string_format("%d", settings.centerdelta);
 								data->min = 0;
 								data->max = 255;
 								data->cur = settings.centerdelta;
@@ -910,7 +901,7 @@ void ui_menu_analog::populate()
 								break;
 
 							case ANALOG_ITEM_REVERSE:
-								strprintf(text, "%s Reverse", name.c_str());
+								text = string_format("%s Reverse", field->name());
 								subtext.assign(settings.reverse ? "On" : "Off");
 								data->min = 0;
 								data->max = 1;
@@ -919,8 +910,8 @@ void ui_menu_analog::populate()
 								break;
 
 							case ANALOG_ITEM_SENSITIVITY:
-								strprintf(text, "%s Sensitivity", name.c_str());
-								strprintf(subtext, "%d", settings.sensitivity);
+								text = string_format("%s Sensitivity", field->name());
+								subtext = string_format("%d", settings.sensitivity);
 								data->min = 1;
 								data->max = 255;
 								data->cur = settings.sensitivity;

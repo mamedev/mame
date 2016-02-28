@@ -708,27 +708,39 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	ui_manager &mui = machine().ui();
 	float tbarspace = mui.get_line_height();
 
-	strprintf(tempbuf[0], _("%s %s ( %d / %d machines (%d BIOS) )"), emulator_info::get_appname(), bare_build_version, visible_items, (driver_list::total() - 1), m_isabios);	
-	std::string filtered;
+	tempbuf[0] = string_format(_("%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"),
+			emulator_info::get_appname(),
+			bare_build_version,
+			visible_items,
+			(driver_list::total() - 1),
+			m_isabios);
 
+	std::string filtered;
 	if (main_filters::actual == FILTER_CATEGORY && !machine().inifile().ini_index.empty())
 	{
-		std::string s_file(machine().inifile().actual_file());
-		std::string s_category(machine().inifile().actual_category());
-		filtered.assign(main_filters::text[main_filters::actual]).append(" (").append(s_file).append(" - ").append(s_category).append(") -");
+		filtered = string_format(_("%1$s (%2$s - %3$s) - "),
+				main_filters::text[main_filters::actual],
+				machine().inifile().actual_file(),
+				machine().inifile().actual_category());
 	}
-
 	else if (main_filters::actual == FILTER_MANUFACTURER)
-		filtered.assign(main_filters::text[main_filters::actual]).append(" (").append(c_mnfct::ui[c_mnfct::actual]).append(") -");
-
+	{
+		filtered = string_format(_("%1$s (%2$s) - "),
+				main_filters::text[main_filters::actual],
+				c_mnfct::ui[c_mnfct::actual]);
+	}
 	else if (main_filters::actual == FILTER_YEAR)
-		filtered.assign(main_filters::text[main_filters::actual]).append(" (").append(c_year::ui[c_year::actual]).append(") -");
+	{
+		filtered = string_format(_("%1$s (%2$s) - "),
+				main_filters::text[main_filters::actual],
+				c_year::ui[c_year::actual]);
+	}
 
 	// display the current typeahead
 	if (isfavorite())
 		tempbuf[1].clear();
 	else
-		tempbuf[1].assign(filtered).append(_(" Search: ")).append(m_search).append("_");
+		tempbuf[1] = string_format(_("%1$s Search: %2$s_"), filtered, m_search);
 
 	// get the size of the text
 	for (int line = 0; line < 2; ++line)
@@ -776,39 +788,39 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		isstar = machine().favorite().isgame_favorite(driver);
 
 		// first line is game name
-		strprintf(tempbuf[0], "Romset: %-.100s", driver->name);
+		tempbuf[0] = string_format(_("Romset: %1$-.100s"), driver->name);
 
 		// next line is year, manufacturer
-		strprintf(tempbuf[1], "%s, %-.100s", driver->year, driver->manufacturer);
+		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
 
 		// next line is clone/parent status
 		int cloneof = driver_list::non_bios_clone(*driver);
 
 		if (cloneof != -1)
-			strprintf(tempbuf[2], "Driver is clone of: %-.100s", driver_list::driver(cloneof).description);
+			tempbuf[2] = string_format(_("Driver is clone of: %1$-.100s"), driver_list::driver(cloneof).description);
 		else
-			tempbuf[2] = "Driver is parent";
+			tempbuf[2] = _("Driver is parent");
 
 		// next line is overall driver status
 		if (driver->flags & MACHINE_NOT_WORKING)
-			tempbuf[3] = "Overall: NOT WORKING";
+			tempbuf[3] = _("Overall: NOT WORKING");
 		else if (driver->flags & MACHINE_UNEMULATED_PROTECTION)
-			tempbuf[3] = "Overall: Unemulated Protection";
+			tempbuf[3] = _("Overall: Unemulated Protection");
 		else
-			tempbuf[3] = "Overall: Working";
+			tempbuf[3] = _("Overall: Working");
 
 		// next line is graphics, sound status
 		if (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS))
-			tempbuf[4] = "Graphics: Imperfect, ";
+			tempbuf[4] = _("Graphics: Imperfect, ");
 		else
-			tempbuf[4] = "Graphics: OK, ";
+			tempbuf[4] = _("Graphics: OK, ");
 
 		if (driver->flags & MACHINE_NO_SOUND)
-			tempbuf[4].append("Sound: Unimplemented");
+			tempbuf[4].append(_("Sound: Unimplemented"));
 		else if (driver->flags & MACHINE_IMPERFECT_SOUND)
-			tempbuf[4].append("Sound: Imperfect");
+			tempbuf[4].append(_("Sound: Imperfect"));
 		else
-			tempbuf[4].append("Sound: OK");
+			tempbuf[4].append(_("Sound: OK"));
 
 		color = UI_GREEN_COLOR;
 
@@ -825,43 +837,43 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		isstar = machine().favorite().isgame_favorite(*swinfo);
 
 		// first line is system
-		strprintf(tempbuf[0], "System: %-.100s", swinfo->driver->description);
+		tempbuf[0] = string_format(_("System: %1$-.100s"), swinfo->driver->description);
 
 		// next line is year, publisher
-		strprintf(tempbuf[1], "%s, %-.100s", swinfo->year.c_str(), swinfo->publisher.c_str());
+		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), swinfo->year.c_str(), swinfo->publisher.c_str());
 
 		// next line is parent/clone
 		if (!swinfo->parentname.empty())
-			strprintf(tempbuf[2], "Software is clone of: %-.100s", !swinfo->parentlongname.empty() ? swinfo->parentlongname.c_str() : swinfo->parentname.c_str());
+			tempbuf[2] = string_format(_("Software is clone of: %1$-.100s"), !swinfo->parentlongname.empty() ? swinfo->parentlongname.c_str() : swinfo->parentname.c_str());
 		else
-			tempbuf[2] = "Software is parent";
+			tempbuf[2] = _("Software is parent");
 
 		// next line is supported status
 		if (swinfo->supported == SOFTWARE_SUPPORTED_NO)
 		{
-			tempbuf[3] = "Supported: No";
+			tempbuf[3] = _("Supported: No");
 			color = UI_RED_COLOR;
 		}
 		else if (swinfo->supported == SOFTWARE_SUPPORTED_PARTIAL)
 		{
-			tempbuf[3] = "Supported: Partial";
+			tempbuf[3] = _("Supported: Partial");
 			color = UI_YELLOW_COLOR;
 		}
 		else
 		{
-			tempbuf[3] = "Supported: Yes";
+			tempbuf[3] = _("Supported: Yes");
 			color = UI_GREEN_COLOR;
 		}
 
 		// last line is romset name
-		strprintf(tempbuf[4], "romset: %-.100s", swinfo->shortname.c_str());
+		tempbuf[4] = string_format(_("romset: %1$-.100s"), swinfo->shortname.c_str());
 	}
 	else
 	{
 		std::string copyright(emulator_info::get_copyright());
 		size_t found = copyright.find("\n");
 		tempbuf[0].clear();
-		tempbuf[1].assign(emulator_info::get_appname()).append(" ").append(build_version);
+		tempbuf[1] = string_format(_("%1$s %2$s"), emulator_info::get_appname(), build_version);
 		tempbuf[2] = copyright.substr(0, found);
 		tempbuf[3] = copyright.substr(found + 1);
 		tempbuf[4].clear();
@@ -1455,47 +1467,49 @@ void ui_menu_select_game::populate_search()
 
 void ui_menu_select_game::general_info(const game_driver *driver, std::string &buffer)
 {
-	strprintf(buffer, _("Romset: %-.100s\n"), driver->name);
-	buffer.append(_("Year: ")).append(driver->year).append("\n");
-	strcatprintf(buffer, _("Manufacturer: %-.100s\n"), driver->manufacturer);
+	std::ostringstream str;
+
+	stream_format(str, _("Romset: %1$-.100s\n"), driver->name);
+	stream_format(str, _("Year: %1$s\n"), driver->year);
+	stream_format(str, _("Manufacturer: %1$-.100s\n"), driver->manufacturer);
 
 	int cloneof = driver_list::non_bios_clone(*driver);
 	if (cloneof != -1)
-		strcatprintf(buffer, _("Driver is Clone of: %-.100s\n"), driver_list::driver(cloneof).description);
+		stream_format(str, _("Driver is Clone of: %1$-.100s\n"), driver_list::driver(cloneof).description);
 	else
-		buffer.append(_("Driver is Parent\n"));
+		str << _("Driver is Parent\n");
 
 	if (driver->flags & MACHINE_NOT_WORKING)
-		buffer.append(_("Overall: NOT WORKING\n"));
+		str << _("Overall: NOT WORKING\n");
 	else if (driver->flags & MACHINE_UNEMULATED_PROTECTION)
-		buffer.append(_("Overall: Unemulated Protection\n"));
+		str << _("Overall: Unemulated Protection\n");
 	else
-		buffer.append(_("Overall: Working\n"));
+		str << _("Overall: Working\n");
 
 	if (driver->flags & MACHINE_IMPERFECT_COLORS)
-		buffer.append(_("Graphics: Imperfect Colors\n"));
+		str << _("Graphics: Imperfect Colors\n");
 	else if (driver->flags & MACHINE_WRONG_COLORS)
-		buffer.append(_("Graphics: Wrong Colors\n"));
+		str << ("Graphics: Wrong Colors\n");
 	else if (driver->flags & MACHINE_IMPERFECT_GRAPHICS)
-		buffer.append(_("Graphics: Imperfect\n"));
+		str << _("Graphics: Imperfect\n");
 	else
-		buffer.append(_("Graphics: OK\n"));
+		str << _("Graphics: OK\n");
 
 	if (driver->flags & MACHINE_NO_SOUND)
-		buffer.append(_("Sound: Unimplemented\n"));
+		str << _("Sound: Unimplemented\n");
 	else if (driver->flags & MACHINE_IMPERFECT_SOUND)
-		buffer.append(_("Sound: Imperfect\n"));
+		str << _("Sound: Imperfect\n");
 	else
-		buffer.append(_("Sound: OK\n"));
+		str << _("Sound: OK\n");
 
-	strcatprintf(buffer, _("Driver is Skeleton: %s\n"), ((driver->flags & MACHINE_IS_SKELETON) ? _("Yes") : _("No")));
-	strcatprintf(buffer, _("Game is Mechanical: %s\n"), ((driver->flags & MACHINE_MECHANICAL) ? _("Yes") : _("No")));
-	strcatprintf(buffer, _("Requires Artwork: %s\n"), ((driver->flags & MACHINE_REQUIRES_ARTWORK) ? _("Yes") : _("No")));
-	strcatprintf(buffer, _("Requires Clickable Artwork: %s\n"), ((driver->flags & MACHINE_CLICKABLE_ARTWORK) ? _("Yes") : _("No")));
-	strcatprintf(buffer, _("Support Cocktail: %s\n"), ((driver->flags & MACHINE_NO_COCKTAIL) ? _("Yes") : _("No")));
-	strcatprintf(buffer, _("Driver is Bios: %s\n"), ((driver->flags & MACHINE_IS_BIOS_ROOT) ? _("Yes") : _("No")));
-	strcatprintf(buffer, _("Support Save: %s\n"), ((driver->flags & MACHINE_SUPPORTS_SAVE) ? _("Yes") : _("No")));
-	strcatprintf(buffer, _("Screen Orentation: %s\n"), ((driver->flags & ORIENTATION_SWAP_XY) ? _("Vertical") : _("Horizontal")));
+	stream_format(str, _("Driver is Skeleton: %1$s\n"), ((driver->flags & MACHINE_IS_SKELETON) ? _("Yes") : _("No")));
+	stream_format(str, _("Game is Mechanical: %1$s\n"), ((driver->flags & MACHINE_MECHANICAL) ? _("Yes") : _("No")));
+	stream_format(str, _("Requires Artwork: %1$s\n"), ((driver->flags & MACHINE_REQUIRES_ARTWORK) ? _("Yes") : _("No")));
+	stream_format(str, _("Requires Clickable Artwork: %1$s\n"), ((driver->flags & MACHINE_CLICKABLE_ARTWORK) ? _("Yes") : _("No")));
+	stream_format(str, _("Support Cocktail: %1$s\n"), ((driver->flags & MACHINE_NO_COCKTAIL) ? _("Yes") : _("No")));
+	stream_format(str, _("Driver is Bios: %1$s\n"), ((driver->flags & MACHINE_IS_BIOS_ROOT) ? _("Yes") : _("No")));
+	stream_format(str, _("Support Save: %1$s\n"), ((driver->flags & MACHINE_SUPPORTS_SAVE) ? _("Yes") : _("No")));
+	stream_format(str, _("Screen Orentation: %1$s\n"), ((driver->flags & ORIENTATION_SWAP_XY) ? _("Vertical") : _("Horizontal")));
 	bool found = false;
 	for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
 		if (ROMENTRY_ISREGION(rom) && ROMREGION_ISDISKDATA(rom))
@@ -1503,7 +1517,7 @@ void ui_menu_select_game::general_info(const game_driver *driver, std::string &b
 			found = true;
 			break;
 		}
-	strcatprintf(buffer, _("Requires CHD: %s\n"), (found ? "Yes" : "No"));
+	stream_format(str, _("Requires CHD: %1$s\n"), found ? _("Yes") : _("No"));
 
 	// audit the game first to see if we're going to work
 	if (machine().ui().options().info_audit())
@@ -1516,19 +1530,21 @@ void ui_menu_select_game::general_info(const game_driver *driver, std::string &b
 
 		// if everything looks good, schedule the new driver
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
-			buffer.append(_("Roms Audit Pass: OK\n"));
+			str << _("Roms Audit Pass: OK\n");
 		else
-			buffer.append(_("Roms Audit Pass: BAD\n"));
+			str << _("Roms Audit Pass: BAD\n");
 
 		if (summary_samples == media_auditor::NONE_NEEDED)
-			buffer.append(_("Samples Audit Pass: None Needed\n"));
+			str << _("Samples Audit Pass: None Needed\n");
 		else if (summary_samples == media_auditor::CORRECT || summary_samples == media_auditor::BEST_AVAILABLE)
-			buffer.append(_("Samples Audit Pass: OK\n"));
+			str << _("Samples Audit Pass: OK\n");
 		else
-			buffer.append(_("Samples Audit Pass: BAD\n"));
+			str << _("Samples Audit Pass: BAD\n");
 	}
 	else
-		buffer.append(_("Roms Audit Pass: Disabled\nSamples Audit Pass: Disabled\n"));
+		str << _("Roms Audit Pass: Disabled\nSamples Audit Pass: Disabled\n");
+
+	buffer = str.str();
 }
 
 void ui_menu_select_game::inkey_export()
@@ -1779,7 +1795,7 @@ float ui_menu_select_game::draw_left_panel(float x1, float y1, float x2, float y
 						int cfilter = custfltr::other[count];
 						if (cfilter == filter)
 						{
-							strprintf(str, "@custom%d %s", count + 1, text[filter]);
+							str = string_format("@custom%d %s", count + 1, text[filter]);
 							x1t -= text_sign;
 							break;
 						}

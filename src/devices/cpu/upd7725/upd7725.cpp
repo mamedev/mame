@@ -207,7 +207,7 @@ void necdsp_device::state_string_export(const device_state_entry &entry, std::st
 	switch (entry.index())
 	{
 		case UPD7725_FLAGA:
-			strprintf(str, "%s %s %c%c %s %s %s %s",
+			str = string_format("%s %s %c%c %s %s %s %s",
 							regs.flaga.s1 ? "S1" : "s1",
 							regs.flaga.s0 ? "S0" : "s0",
 							regs.flaga.c ? 'C' : 'c',
@@ -219,7 +219,7 @@ void necdsp_device::state_string_export(const device_state_entry &entry, std::st
 			break;
 
 		case UPD7725_FLAGB:
-			strprintf(str, "%s %s %c%c %s %s %s %s",
+			str = string_format("%s %s %c%c %s %s %s %s",
 							regs.flagb.s1 ? "S1" : "s1",
 							regs.flagb.s0 ? "S0" : "s0",
 							regs.flagb.c ? 'C' : 'c',

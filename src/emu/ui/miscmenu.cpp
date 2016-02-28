@@ -125,8 +125,7 @@ void ui_menu_bios_selection::handle()
 				assert(error.empty());
 			} else {
 				std::string error;
-				std::string value = machine().options().main_value(dev->owner()->tag()+1);
-				strcatprintf(value,",bios=%d",val-1);
+				std::string value = string_format("%s,bios=%d", machine().options().main_value(dev->owner()->tag()+1), val-1);
 				machine().options().set_value(dev->owner()->tag()+1, value.c_str(), OPTION_PRIORITY_CMDLINE, error);
 				assert(error.empty());
 			}
@@ -232,18 +231,18 @@ ui_menu_bookkeeping::~ui_menu_bookkeeping()
 void ui_menu_bookkeeping::populate()
 {
 	int tickets = machine().bookkeeping().get_dispensed_tickets();
-	std::string tempstring;
+	std::ostringstream tempstring;
 	int ctrnum;
 
 	/* show total time first */
-	if (prevtime.seconds() >= 60 * 60)
-		strcatprintf(tempstring, "Uptime: %d:%02d:%02d\n\n", prevtime.seconds() / (60 * 60), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60);
+	if (prevtime.seconds() >= (60 * 60))
+		stream_format(tempstring, _("Uptime: %1$d:%2$02d:%3$02d\n\n"), prevtime.seconds() / (60 * 60), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60);
 	else
-		strcatprintf(tempstring,"Uptime: %d:%02d\n\n", (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60);
+		stream_format(tempstring, _("Uptime: %1$d:%2$02d\n\n"), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60);
 
 	/* show tickets at the top */
 	if (tickets > 0)
-		strcatprintf(tempstring,"Tickets dispensed: %d\n\n", tickets);
+		stream_format(tempstring, _("Tickets dispensed: %1$d\n\n"), tickets);
 
 	/* loop over coin counters */
 	for (ctrnum = 0; ctrnum < COIN_COUNTERS; ctrnum++)
@@ -251,22 +250,17 @@ void ui_menu_bookkeeping::populate()
 		int count = machine().bookkeeping().coin_counter_get_count(ctrnum);
 
 		/* display the coin counter number */
-		strcatprintf(tempstring,"Coin %c: ", ctrnum + 'A');
-
 		/* display how many coins */
-		if (count == 0)
-			tempstring.append("NA");
-		else
-			strcatprintf(tempstring, "%d", count);
-
 		/* display whether or not we are locked out */
-		if (machine().bookkeeping().coin_lockout_get_state(ctrnum))
-			tempstring.append(_(" (locked)"));
-		tempstring.append("\n");
+		stream_format(tempstring,
+				(count == 0) ? _("Coin %1$c: NA%3$s\n") : _("Coin %1$c: %2$d%3$s\n"),
+				ctrnum + 'A',
+				count,
+				machine().bookkeeping().coin_lockout_get_state(ctrnum) ? _(" (locked)") : "");
 	}
 
 	/* append the single item */
-	item_append(tempstring.c_str(), nullptr, MENU_FLAG_MULTILINE, nullptr);
+	item_append(tempstring.str().c_str(), nullptr, MENU_FLAG_MULTILINE, nullptr);
 }
 
 /*-------------------------------------------------
@@ -710,8 +704,7 @@ void ui_menu_export::handle()
 					if (infile.open(filename.c_str(), ".xml") == FILERR_NONE)
 						for (int seq = 0; ; ++seq)
 						{
-							std::string seqtext;
-							strprintf(seqtext, "%s_%04d", filename.c_str(), seq);
+							std::string seqtext = string_format("%s_%04d", filename, seq);
 							if (infile.open(seqtext.c_str(), ".xml") != FILERR_NONE)
 							{
 								filename = seqtext;
@@ -747,13 +740,11 @@ void ui_menu_export::handle()
 				if (m_event->iptkey == IPT_UI_SELECT)
 				{
 					std::string filename("exported");
-					std::string buffer;
 					emu_file infile(machine().ui().options().ui_path(), OPEN_FLAG_READ);
 					if (infile.open(filename.c_str(), ".txt") == FILERR_NONE)
 						for (int seq = 0; ; ++seq)
 						{
-							std::string seqtext;
-							strprintf(seqtext, "%s_%04d", filename.c_str(), seq);
+							std::string seqtext = string_format("%s_%04d", filename, seq);
 							if (infile.open(seqtext.c_str(), ".txt") != FILERR_NONE)
 							{
 								filename = seqtext;
@@ -766,7 +757,8 @@ void ui_menu_export::handle()
 					if (file.open(filename.c_str(), ".txt") == FILERR_NONE)
 					{
 						// print the header
-						buffer.assign(_("Name:             Description:\n"));
+						std::ostringstream buffer;
+						buffer << _("Name:             Description:\n");
 						driver_enumerator drvlist(machine().options());
 						drvlist.exclude_all();
 						for (auto & elem : m_list)
@@ -775,8 +767,8 @@ void ui_menu_export::handle()
 						// iterate through drivers and output the info
 						while (drvlist.next())
 							if ((drvlist.driver().flags & MACHINE_NO_STANDALONE) == 0)
-								strcatprintf(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().description);
-						file.puts(buffer.c_str());
+								stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().description);
+						file.puts(buffer.str().c_str());
 						file.close();
 						machine().popmessage(_("%s.txt saved under ui folder."), filename.c_str());
 					}

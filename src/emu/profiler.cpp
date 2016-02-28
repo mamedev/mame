@@ -202,15 +202,15 @@ void real_profiler_state::update_text(running_machine &machine)
 		if (computed != 0)
 		{
 			// start with the un-normalized percentage
-			strcatprintf(m_text, "%02d%% ", (int)((computed * 100 + total / 2) / total));
+			m_text.append(string_format("%02d%% ", (int)((computed * 100 + total / 2) / total)));
 
 			// followed by the normalized percentage for everything but profiler and idle
 			if (curtype < PROFILER_PROFILER)
-				strcatprintf(m_text, "%02d%% ", (int)((computed * 100 + normalize / 2) / normalize));
+				m_text.append(string_format("%02d%% ", (int)((computed * 100 + normalize / 2) / normalize)));
 
 			// and then the text
 			if (curtype >= PROFILER_DEVICE_FIRST && curtype <= PROFILER_DEVICE_MAX)
-				strcatprintf(m_text, "'%s'", iter.byindex(curtype - PROFILER_DEVICE_FIRST)->tag());
+				m_text.append(string_format("'%s'", iter.byindex(curtype - PROFILER_DEVICE_FIRST)->tag()));
 			else
 				for (auto & name : names)
 					if (name.type == curtype)

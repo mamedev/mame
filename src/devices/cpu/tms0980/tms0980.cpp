@@ -480,7 +480,7 @@ void tms1xxx_cpu_device::state_string_export(const device_state_entry &entry, st
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-			strprintf(str, "%03X", m_rom_address << ((m_byte_bits > 8) ? 1 : 0));
+			str = string_format("%03X", m_rom_address << ((m_byte_bits > 8) ? 1 : 0));
 			break;
 	}
 }

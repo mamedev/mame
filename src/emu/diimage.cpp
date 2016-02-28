@@ -1181,8 +1181,8 @@ void device_image_interface::update_names(const device_type device_type, const c
 	const char *brief_name = (device_type!=nullptr) ? brief : device_brieftypename(image_type());
 	if (count > 1)
 	{
-		strprintf(m_instance_name,"%s%d", inst_name, index + 1);
-		strprintf(m_brief_instance_name, "%s%d", brief_name, index + 1);
+		m_instance_name = string_format("%s%d", inst_name, index + 1);
+		m_brief_instance_name = string_format("%s%d", brief_name, index + 1);
 	}
 	else
 	{
@@ -1312,8 +1312,7 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 	bool result = call_softlist_load(swpart->info().list(), swpart->info().shortname(), swpart->romdata());
 
 	// Tell the world which part we actually loaded
-	std::string full_sw_name;
-	strprintf(full_sw_name,"%s:%s:%s", swpart->info().list().list_name(), swpart->info().shortname(), swpart->name());
+	std::string full_sw_name = string_format("%s:%s:%s", swpart->info().list().list_name(), swpart->info().shortname(), swpart->name());
 
 	// check compatibility
 	if (!swpart->is_compatible(swpart->info().list()))
