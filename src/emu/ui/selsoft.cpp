@@ -277,12 +277,12 @@ void ui_menu_select_software::handle()
 				if (!machine().favorite().isgame_favorite(*swinfo))
 				{
 					machine().favorite().add_favorite_game(*swinfo);
-					machine().popmessage("%s\n added to favorites list.", swinfo->longname.c_str());
+					machine().popmessage(_("%s\n added to favorites list."), swinfo->longname.c_str());
 				}
 
 				else
 				{
-					machine().popmessage("%s\n removed from favorites list.", swinfo->longname.c_str());
+					machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname.c_str());
 					machine().favorite().remove_favorite_game();
 				}
 			}
