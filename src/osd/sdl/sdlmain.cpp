@@ -42,7 +42,6 @@
 
 // OSD headers
 #include "video.h"
-#include "input.h"
 #include "osdsdl.h"
 #include "modules/lib/osdlib.h"
 
@@ -524,3 +523,4 @@ void sdl_osd_interface::init(running_machine &machine)
 	SDL_EventState(SDL_TEXTINPUT, SDL_TRUE);
 #endif
 }
+

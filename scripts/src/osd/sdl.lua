@@ -425,8 +425,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/sdl/sdlprefix.h",
 		MAME_DIR .. "src/osd/sdl/sdlmain.cpp",
 		MAME_DIR .. "src/osd/osdepend.h",
-		MAME_DIR .. "src/osd/sdl/input.cpp",
-		MAME_DIR .. "src/osd/sdl/input.h",
 		MAME_DIR .. "src/osd/sdl/video.cpp",
 		MAME_DIR .. "src/osd/sdl/video.h",
 		MAME_DIR .. "src/osd/sdl/window.cpp",

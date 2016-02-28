@@ -149,17 +149,27 @@ public:
 
 	virtual bool video_init() override;
 	virtual bool window_init() override;
+#ifdef USE_OLD_SDL_INPUT
 	virtual bool input_init() override;
 	virtual void input_pause() override;
 	virtual void input_resume() override;
+#endif
 	virtual bool output_init() override;
 	//virtual bool midi_init();
 
 	virtual void video_exit() override;
 	virtual void window_exit() override;
+#ifdef USE_OLD_SDL_INPUT
 	virtual void input_exit() override;
+#endif
 	virtual void output_exit() override;
 	//virtual void midi_exit();
+
+	// sdl specific
+	void poll_inputs(running_machine &machine);
+	void release_keys();
+	bool should_hide_mouse();
+	void process_events_buf();
 
 	sdl_options &options() { return m_options; }
 
