@@ -11,6 +11,7 @@
 #include "sdlinc.h"
 
 // standard C headers
+#include <cstdint>
 #include <unistd.h>
 #include <sys/types.h>
 #include <signal.h>
@@ -175,11 +176,7 @@ static int worker_thread_entry(void *param)
 	void *res;
 
 	res = thread->callback(thread->param);
-#ifdef PTR64
-	return (int) (INT64) res;
-#else
-	return (int) res;
-#endif
+	return int(intptr_t(res));
 }
 
 osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
