@@ -75,18 +75,20 @@ if BASE_TARGETOS=="unix" then
 		"SDLMAME_UNIX",
 	}
 	if _OPTIONS["targetos"]=="macosx" then
-		if _OPTIONS["USE_LIBSDL"]~="1" then
-			buildoptions {
-				"-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
-			}
-		else
-			defines {
-				"MACOSX_USE_LIBSDL",
-			}
-			buildoptions {
-				backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL::'"),
-			}
-		end
+    	if _OPTIONS["with-bundled-sdl2"]==nil then
+            if _OPTIONS["USE_LIBSDL"]~="1" then
+                buildoptions {
+                    "-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
+                }
+            else
+                defines {
+                    "MACOSX_USE_LIBSDL",
+                }
+                buildoptions {
+                    backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL::'"),
+                }
+            end
+         end
 	else
 		buildoptions {
 			backtick(sdlconfigcmd() .. " --cflags"),

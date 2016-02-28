@@ -1350,7 +1350,7 @@ generate: \
 
 $(GENDIR)/includes/SDL2:
 	-$(call MKDIR,$@)
-	-$(call COPY,3rdparty/SDL2/include,$(GENDIR)/includes/SDL2)
+	-$(call COPY,3rdparty/SDL2/include/,$(GENDIR)/includes/SDL2)
 
 $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/file2str.py | $(GEN_FOLDERS)
 	@echo Converting $<...

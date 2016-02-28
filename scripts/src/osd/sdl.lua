@@ -115,8 +115,16 @@ function maintargetosdoptions(_target,_subtarget)
 		links {
 			"psapi"
 		}
-
 	configuration { }
+	    
+    if _OPTIONS["targetos"]=="macosx" then
+		if _OPTIONS["with-bundled-sdl2"]~=nil then
+			links {
+				"SDL2",
+			}
+        end
+    end
+    
 end
 
 
@@ -243,7 +251,6 @@ if _OPTIONS["with-bundled-sdl2"]~=nil then
 		GEN_DIR .. "includes",
 	}
 end
-
 if BASE_TARGETOS=="unix" then
 	if _OPTIONS["targetos"]=="macosx" then
 		local os_version = str_to_version(backtick("sw_vers -productVersion"))
@@ -255,15 +262,22 @@ if BASE_TARGETOS=="unix" then
 			"-framework QuartzCore",
 			"-framework OpenGL",
 		}
+      
+        
 		if os_version>=101100 then
 			linkoptions {
 				"-weak_framework Metal",
 			}
 		end
 		if _OPTIONS["with-bundled-sdl2"]~=nil then
-			links {
-				"SDL2",
-			}
+            linkoptions {
+                "-framework AudioUnit",
+                "-framework CoreAudio",
+                "-framework Carbon",
+                "-framework ForceFeedback",
+                "-framework IOKit",
+                "-framework CoreVideo",                                
+            }                  
 		else
 			if _OPTIONS["USE_LIBSDL"]~="1" then
 				linkoptions {

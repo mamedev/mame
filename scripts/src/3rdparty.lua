@@ -1588,6 +1588,7 @@ project "SDL2"
 		defines {
 			"HAVE_LIBC",
 		}
+        
 	configuration { "mingw*"}
 		includedirs {
 			MAME_DIR .. "3rdparty/SDL2-override/mingw",
@@ -1600,6 +1601,20 @@ project "SDL2"
 			"-Wno-discarded-qualifiers",
 			"-Wno-unused-but-set-variable",
 		}		
+
+	configuration { "osx*"}
+		buildoptions {
+			"-Wno-undef",
+        }
+    	buildoptions_objc {
+    		"-x objective-c",
+	       	"-std=c99",
+    	}
+        
+		buildoptions_c {
+			"-Wno-bad-function-cast",
+		}		
+		
 		
 	configuration { }
 		includedirs {
