@@ -754,7 +754,7 @@ ifeq (posix,$(SHELLTYPE))
   COPY  = $(SILENT) cp -fR "$(1)" "$(2)"
 else
   MKDIR = $(SILENT) mkdir "$(subst /,\\,$(1))" 2> nul || exit 0
-  COPY  = $(SILENT) copy /Y "$(subst /,\\,$(1))" "$(subst /,\\,$(2))" > 2> nul || exit 0
+  COPY  = $(SILENT) copy /Y "$(subst /,\\,$(1))" "$(subst /,\\,$(2))" > nul || exit 0
 endif
 
 GENDIR = $(BUILDDIR)/generated
