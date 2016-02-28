@@ -4,10 +4,17 @@
 
   This driver is a collection of simple dedicated handheld and tabletop
   toys based around the TMS1000 MCU series. Anything more complex or clearly
-  part of a series is (or will be) in its own driver.
+  part of a series is (or will be) in its own driver, see:
+  - hh_tms1k: here
+  - microvsn: Milton Bradley MicroVision
+  - mbdtower: Milton Bradley Dark Tower
+  - elecbowl: Marx Electronic Bowling
+  - ticalc1x: TI TMS1K-based calculators
+  - tispellb: TI Spelling B series gen. 1
+  - tispeak: TI Speak & Spell series gen. 1
 
   Let's use this driver for a list of known devices and their serials,
-  excluding TI's own products (see ticalc1x.cpp, tispeak.cpp, tispellb.cpp)
+  excluding TI's own products.
 
   serial   device    etc.
 --------------------------------------------------------------------
@@ -99,7 +106,6 @@
     but not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
   - some of the games rely on the fact that faster/longer strobed leds appear
     brighter: tc4/h2hfootb(offense), bankshot(cue ball), ...
-  - add softwarelist for tc4 cartridges?
   - stopthiep: unable to start a game (may be intentional?)
   - tbreakup: some of the leds flicker (rom and PLAs doublechecked)
 
