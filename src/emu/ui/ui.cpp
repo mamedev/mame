@@ -112,13 +112,13 @@ static const char *s_color_list[] = {
 ***************************************************************************/
 
 // messagebox buffer
-static std::string messagebox_text;
-static std::string messagebox_poptext;
-static rgb_t messagebox_backcolor;
+std::string ui_manager::messagebox_text;
+std::string ui_manager::messagebox_poptext;
+rgb_t ui_manager::messagebox_backcolor;
 
 // slider info
-static slider_state *slider_list;
-static slider_state *slider_current;
+slider_state *ui_manager::slider_list;
+slider_state *ui_manager::slider_current;
 
 
 /***************************************************************************
@@ -910,26 +910,6 @@ void ui_manager::draw_text_box(render_container *container, const char *text, in
 void ui_manager::draw_message_window(render_container *container, const char *text)
 {
 	draw_text_box(container, text, JUSTIFY_LEFT, 0.5f, 0.5f, UI_BACKGROUND_COLOR);
-}
-
-
-//-------------------------------------------------
-//  popup_time - popup a message for a specific
-//  amount of time
-//-------------------------------------------------
-
-void CLIB_DECL ui_manager::popup_time(int seconds, const char *text, ...)
-{
-	va_list arg;
-
-	// extract the text
-	va_start(arg,text);
-	strvprintf(messagebox_poptext, text, arg);
-	messagebox_backcolor = UI_BACKGROUND_COLOR;
-	va_end(arg);
-
-	// set a timer
-	m_popup_text_end = osd_ticks() + osd_ticks_per_second() * seconds;
 }
 
 

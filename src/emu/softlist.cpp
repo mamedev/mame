@@ -31,7 +31,7 @@ class softlist_parser
 {
 public:
 	// construction (== execution)
-	softlist_parser(software_list_device &list, std::string &errors);
+	softlist_parser(software_list_device &list, std::ostringstream &errors);
 
 private:
 	enum parse_position
@@ -51,7 +51,7 @@ private:
 	const char *parser_error() const { return XML_ErrorString(XML_GetErrorCode(m_parser)); }
 
 	// internal error helpers
-	void ATTR_PRINTF(2,3) parse_error(const char *fmt, ...);
+	template <typename Format, typename... Params> void parse_error(Format &&fmt, Params &&... args);
 	void unknown_tag(const char *tagname) { parse_error("Unknown tag: %s", tagname); }
 	void unknown_attribute(const char *attrname) { parse_error("Unknown attribute: %s", attrname); }
 
@@ -77,7 +77,7 @@ private:
 
 	// internal parsing state
 	software_list_device &  m_list;
-	std::string &           m_errors;
+	std::ostringstream &    m_errors;
 	XML_Parser              m_parser;
 	bool                    m_done;
 	bool                    m_data_accum_expected;
@@ -482,8 +482,10 @@ void software_list_device::parse()
 	if (filerr == FILERR_NONE)
 	{
 		// parse if no error
-		softlist_parser parser(*this, m_errors);
+		std::ostringstream errs;
+		softlist_parser parser(*this, errs);
 		m_file.close();
+		m_errors = errs.str();
 	}
 	else
 		m_errors = string_format("Error opening file: %s\n", filename());
@@ -647,7 +649,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 //  softlist_parser - constructor
 //-------------------------------------------------
 
-softlist_parser::softlist_parser(software_list_device &list, std::string &errors)
+softlist_parser::softlist_parser(software_list_device &list, std::ostringstream &errors)
 	: m_list(list),
 		m_errors(errors),
 		m_done(false),
@@ -723,19 +725,17 @@ void softlist_parser::expat_free(void *ptr)
 //  filename, line and column information
 //-------------------------------------------------
 
-void ATTR_PRINTF(2,3) softlist_parser::parse_error(const char *fmt, ...)
+template <typename Format, typename... Params>
+inline void softlist_parser::parse_error(Format &&fmt, Params &&... args)
 {
 	// always start with filename(line.column):
-	m_errors.append(string_format("%s(%d.%d): ", filename(), line(), column()));
+	stream_format(m_errors, "%s(%d.%d): ", filename(), line(), column());
 
 	// append the remainder of the string
-	va_list va;
-	va_start(va, fmt);
-	strcatvprintf(m_errors, fmt, va);
-	va_end(va);
+	stream_format(m_errors, std::forward<Format>(fmt), std::forward<Params>(args)...);
 
 	// append a newline at the end
-	m_errors.append("\n");
+	m_errors.put('\n');
 }
 
 

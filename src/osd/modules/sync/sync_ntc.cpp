@@ -43,11 +43,8 @@ struct osd_event {
 	pthread_cond_t      cond;
 	volatile INT32      autoreset;
 	volatile INT32      signalled;
-#ifdef PTR64
-	INT8                padding[40];    // Fill a 64-byte cache line
-#else
-	INT8                padding[48];    // A bit more padding
-#endif
+	// Fill a 64-byte cache line (a bit more padding with smaller pointers)
+	INT8                padding[(sizeof(void *) >= 8) ? 40 : 48];
 };
 
 
