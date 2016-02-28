@@ -684,7 +684,7 @@ No specific PCB model or numer....
 
  Astro V02 0022 160pin PQFP ("ASTRO02" silkscreened under chip)
  JX-1689F1028N GRC586.V5 (68K core, has direct connection to program roms)
- Lattice IspLSI 1016 60LJ socketted FPGA
+ Lattice IspLSI 1016 60LJ socketed FPGA
  OKI 6295 clone chip (AD-65 or U6295)
 
 EEPROM Atmel 93C46
@@ -755,7 +755,7 @@ No specific PCB model or numer, same as used for Skill Drop but with newer video
 
  Astro V05 0206 160pin PQFP ("ASTRO02" silkscreened under chip)
  JX-1689HP TA5265188 (68K core, has direct connection to program roms)
- Lattice IspLSI 1016 60LJ socketted FPGA
+ Lattice IspLSI 1016 60LJ socketed FPGA
  OKI 6295 clone chip (AD-65 or U6295)
 
 EEPROM  Atmel 93C46
@@ -869,7 +869,7 @@ ASTRO M1.2 PCB:
  Astro V06 0430 160pin PQFP ("ASTRO02" silkscreened under chip)
    Boards are known to have either Astro V06 0430 or Astro V07 0610
  Astro V102PX-006 at U10 (68K core, has direct connection to program roms)
- Astro F02 2005-09-17 socketted FPGA type chip (used for encryption?)
+ Astro F02 2005-09-17 socketed FPGA type chip (used for encryption?)
  OKI 6295 clone chip (AD-65 or U6295)
 
 RAM:
@@ -984,7 +984,7 @@ Zoo by Astro
 ASTRO M1.1 PCB:
  Astro V06 0430 160pin PQFP ("ASTRO02" silkscreened under chip)
  Astro V102PX-005 T042652846 at U10 (68K core, has direct connection to program roms)
- Astro F02 2005-02-18 socketted FPGA type chip (used for encryption?)
+ Astro F02 2005-02-18 socketed FPGA type chip (used for encryption?)
  OKI 6295 clone chip (AD-65 or U6295)
 
 RAM:

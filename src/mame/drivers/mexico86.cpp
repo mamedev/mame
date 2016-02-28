@@ -39,7 +39,7 @@ Notes:
   switch settings. Therefore, it's hardwired to be 1 coin / 1 credit.
 
 - Kick and Run is a rom swap for Kiki KaiKai as the pal chips are all A85-0x
-  A85 is the Taito rom code for Kiki KaiKai.  Even the MCU is socketted!
+  A85 is the Taito rom code for Kiki KaiKai.  Even the MCU is socketed!
 
 Note MCU labeling:
 
