@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-27 20:54+0100\n"
-"PO-Revision-Date: 2016-02-26 02:20+0800\n"
+"PO-Revision-Date: 2016-02-28 05:43+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -702,23 +702,20 @@ msgid "%s.txt saved under ui folder."
 msgstr "%s.txt 已儲存於 ui 資料夾下。"
 
 #: src/emu/ui/miscmenu.cpp:799
-#, fuzzy
 msgid "Export XML format (like -listxml)"
-msgstr "匯出為 XML 格式"
+msgstr "匯出為 XML 格式 (同 -listxml)"
 
 #: src/emu/ui/miscmenu.cpp:800
-#, fuzzy
 msgid "Export TXT format (like -listfull)"
-msgstr "匯出為 TXT 格式"
+msgstr "匯出為 TXT 格式 (同 -listfull)"
 
 #: src/emu/ui/miscmenu.cpp:858
 msgid "Dummy"
 msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:860
-#, fuzzy
 msgid "Save machine configuration"
-msgstr "機台設定"
+msgstr "儲存機台設定"
 
 #: src/emu/ui/optsmenu.cpp:217
 msgid "Filter"
@@ -817,14 +814,13 @@ msgid "Configure Options"
 msgstr "設定選項"
 
 #: src/emu/ui/selgame.cpp:602
-#, fuzzy
 msgid "Configure Machine"
-msgstr "設定選項"
+msgstr "設定機台"
 
 #: src/emu/ui/selgame.cpp:711
-#, fuzzy, c-format
+#, c-format
 msgid "%s %s ( %d / %d machines (%d BIOS) )"
-msgstr "MAME %s ( %d / %d 機台 (%d BIOS) )"
+msgstr "%s %s ( %d / %d 機台 (%d BIOS) )"
 
 #: src/emu/ui/selgame.cpp:731
 msgid " Search: "
@@ -863,7 +859,7 @@ msgstr "整體: 未模擬保護\n"
 
 #: src/emu/ui/selgame.cpp:1473
 msgid "Overall: Working\n"
-msgstr ""
+msgstr "整體: 可以執行\n"
 
 #: src/emu/ui/selgame.cpp:1476
 msgid "Graphics: Imperfect Colors\n"
@@ -1027,7 +1023,7 @@ msgid "Device type: %s -"
 msgstr "裝置類別: %s -"
 
 #: src/emu/ui/selsoft.cpp:698
-#, fuzzy, c-format
+#, c-format
 msgid "%s Search: %s_"
 msgstr "%s 搜尋: %s_"
 
