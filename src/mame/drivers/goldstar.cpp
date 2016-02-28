@@ -10165,6 +10165,45 @@ ROM_START( ns8linew )
 ROM_END
 
 
+/*  Lucky Bar
+    Unknown reels game based on Wing's Lucky 8 Lines.
+	W4 hardware
+
+	Daughterboard with Z80 + program ROM + MC68705P3S MCU at location ic4 (14b)
+
+    Game seems to be meant for progressive modes...
+*/
+ROM_START( luckybar )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "27c256_subboard.ic4",   0x0000, 0x8000, CRC(b987115b) SHA1(1c2f6369170c9667996e5dde8ac93100a7234e19) )
+//	ROM_LOAD( "luckybar_dump.bin",   0x0000, 0x8000, CRC(0000573e) SHA1(000027502025dbc83a0049fc98505655cec7b181) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "5.bin",  0x00000, 0x8000, CRC(994a9894) SHA1(4063c2c5e111f24a85df1665fd3f9fbb20fda4da) )
+	ROM_LOAD( "6.bin",  0x08000, 0x8000, CRC(80888d64) SHA1(91ec96709df77c534d381e391839984a88aeb1e0) )
+	ROM_LOAD( "7.bin",  0x10000, 0x8000, CRC(255d5860) SHA1(f171fde3d542594132b38b44300f750d45fb67a2) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.bin",   0x0000, 0x2000, CRC(e3b96119) SHA1(292d2066e5deb442b9ba3403a73dbfac992c69c2) )
+	ROM_LOAD( "2.bin",   0x2000, 0x2000, CRC(e355d816) SHA1(bf709fd0597dd28d5e8a020a54064749e3d29988) )
+	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(cf196c4a) SHA1(b36d9ab37590cbcf48352e6186bc137139ded0aa) )
+	ROM_LOAD( "4.bin",   0x6000, 0x2000, CRC(1432a1c2) SHA1(c7cdf3501b9545b5463a7051d22765a9601ccad0) )
+
+	ROM_REGION( 0x200, "proms", 0 ) /* proper dumps */
+	ROM_LOAD( "82s129.g13", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "82s129.g14", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "82s123.d13", 0x0000, 0x0020, CRC(c387bd86) SHA1(abf37c60e859dcedb3de2c85e7ed8e5545c9f73c) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "82s129.f3",  0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "82s123.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+
 /******************************************************************************
 
   Lucky Lady (1985, Wing)
@@ -13779,6 +13818,7 @@ GAMEL( 1989, lucky8e,   lucky8,   lucky8,   lucky8d,  driver_device,  0,        
 GAMEL( 198?, ns8lines,  0,        lucky8,   lucky8b,  driver_device,  0,         ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8 )
 GAMEL( 198?, ns8linew,  0,        lucky8,   ns8linew, driver_device,  0,         ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )
 
+GAME(  198?, luckybar,  0,        lucky8,   ns8linew, driver_device,  0,         ROT0, "<unknown>",         "Lucky Bar (W-4 with mc68705 MCU)",                         MACHINE_NOT_WORKING )  // MC68705 MCU
 GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, driver_device,  0,         ROT0, "hack",              "Kkot No Li (Kill the Bees)",                               MACHINE_IMPERFECT_COLORS, layout_lucky8 )
 GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, driver_device,  0,         ROT0, "TAB Austria",       "Lady Liner",                                               0 )
 GAME(  198?, wcat3,     0,        wcat3,    lucky8,   driver_device,  0,         ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING )
