@@ -10207,6 +10207,11 @@ ROM_END
     (W-4 / CB3 hardware)
 
 	Daughterboard with Z80 + program ROM + TTL at location ic4 (14b)
+
+	Encryption pattern:
+	For each 0x100 block:
+	00-7f : 22 2a 82 2a...
+    80-ff : a8 88 28 88...
 */
 ROM_START( chryangla )
 	ROM_REGION( 0x8000, "maincpu", 0 )
