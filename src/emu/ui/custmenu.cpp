@@ -171,7 +171,7 @@ void ui_menu_custom_filter::populate()
 		if (custfltr::other[x] == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(0, c_mnfct::ui.size() - 1, custfltr::mnfct[x]);
-			std::string fbuff("^!Manufacturer");
+			std::string fbuff(_("^!Manufacturer"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), c_mnfct::ui[custfltr::mnfct[x]].c_str(), arrow_flags, (void *)(FPTR)(MNFCT_FILTER + x));
 		}
@@ -180,7 +180,7 @@ void ui_menu_custom_filter::populate()
 		else if (custfltr::other[x] == FILTER_YEAR && c_year::ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(0, c_year::ui.size() - 1, custfltr::year[x]);
-			std::string fbuff("^!Year");
+			std::string fbuff(_("^!Year"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), c_year::ui[custfltr::year[x]].c_str(), arrow_flags, (void *)(FPTR)(YEAR_FILTER + x));
 		}
@@ -456,7 +456,7 @@ void ui_menu_swcustom_filter::populate()
 		if (sw_custfltr::other[x] == UI_SW_PUBLISHERS && m_filter.publisher.ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(0, m_filter.publisher.ui.size() - 1, sw_custfltr::mnfct[x]);
-			std::string fbuff("^!Publisher");
+			std::string fbuff(_("^!Publisher"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), m_filter.publisher.ui[sw_custfltr::mnfct[x]].c_str(), arrow_flags, (void *)(FPTR)(MNFCT_FILTER + x));
 		}
@@ -465,7 +465,7 @@ void ui_menu_swcustom_filter::populate()
 		else if (sw_custfltr::other[x] == UI_SW_YEARS && m_filter.year.ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(0, m_filter.year.ui.size() - 1, sw_custfltr::year[x]);
-			std::string fbuff("^!Year");
+			std::string fbuff(_("^!Year"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), m_filter.year.ui[sw_custfltr::year[x]].c_str(), arrow_flags, (void *)(FPTR)(YEAR_FILTER + x));
 		}
@@ -474,7 +474,7 @@ void ui_menu_swcustom_filter::populate()
 		else if (sw_custfltr::other[x] == UI_SW_LIST && m_filter.swlist.name.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(0, m_filter.swlist.name.size() - 1, sw_custfltr::list[x]);
-			std::string fbuff("^!Software List");
+			std::string fbuff(_("^!Software List"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), m_filter.swlist.description[sw_custfltr::list[x]].c_str(), arrow_flags, (void *)(FPTR)(LIST_FILTER + x));
 		}
@@ -483,7 +483,7 @@ void ui_menu_swcustom_filter::populate()
 		else if (sw_custfltr::other[x] == UI_SW_TYPE && m_filter.type.ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(0, m_filter.type.ui.size() - 1, sw_custfltr::type[x]);
-			std::string fbuff("^!Device type");
+			std::string fbuff(_("^!Device type"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), m_filter.type.ui[sw_custfltr::type[x]].c_str(), arrow_flags, (void *)(FPTR)(TYPE_FILTER + x));
 		}
@@ -492,7 +492,7 @@ void ui_menu_swcustom_filter::populate()
 		else if (sw_custfltr::other[x] == UI_SW_REGION && m_filter.region.ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(0, m_filter.region.ui.size() - 1, sw_custfltr::region[x]);
-			std::string fbuff("^!Region");
+			std::string fbuff(_("^!Region"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), m_filter.region.ui[sw_custfltr::region[x]].c_str(), arrow_flags, (void *)(FPTR)(REGION_FILTER + x));
 		}

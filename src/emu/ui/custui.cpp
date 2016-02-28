@@ -265,7 +265,7 @@ void ui_menu_font_ui::list()
 	std::stable_sort(m_fonts.begin(), m_fonts.end());
 
 	// add default string to the top of array
-	m_fonts.insert(m_fonts.begin(), std::string("default"));
+	m_fonts.insert(m_fonts.begin(), std::string(_("default")));
 }
 #endif
 
@@ -857,34 +857,34 @@ void ui_menu_rgb_ui::populate()
 	if (m_lock_ref != RGB_ALPHA)
 	{
 		arrow_flags = get_arrow_flags(0, 255, m_color->a());
-		item_append("Alpha", string_format("%3d", m_color->a()).c_str(), arrow_flags, (void *)(FPTR)RGB_ALPHA);
+		item_append(_("Alpha"), string_format("%3d", m_color->a()).c_str(), arrow_flags, (void *)(FPTR)RGB_ALPHA);
 	}
 	else
-		item_append("Alpha", s_text.c_str(), 0, (void *)(FPTR)RGB_ALPHA);
+		item_append(_("Alpha"), s_text.c_str(), 0, (void *)(FPTR)RGB_ALPHA);
 
 	if (m_lock_ref != RGB_RED)
 	{
 		arrow_flags = get_arrow_flags(0, 255, m_color->r());
-		item_append("Red", string_format("%3d", m_color->r()).c_str(), arrow_flags, (void *)(FPTR)RGB_RED);
+		item_append(_("Red"), string_format("%3d", m_color->r()).c_str(), arrow_flags, (void *)(FPTR)RGB_RED);
 	}
 	else
-		item_append("Red", s_text.c_str(), 0, (void *)(FPTR)RGB_RED);
+		item_append(_("Red"), s_text.c_str(), 0, (void *)(FPTR)RGB_RED);
 
 	if (m_lock_ref != RGB_GREEN)
 	{
 		arrow_flags = get_arrow_flags(0, 255, m_color->g());
-		item_append("Green", string_format("%3d", m_color->g()).c_str(), arrow_flags, (void *)(FPTR)RGB_GREEN);
+		item_append(_("Green"), string_format("%3d", m_color->g()).c_str(), arrow_flags, (void *)(FPTR)RGB_GREEN);
 	}
 	else
-		item_append("Green", s_text.c_str(), 0, (void *)(FPTR)RGB_GREEN);
+		item_append(_("Green"), s_text.c_str(), 0, (void *)(FPTR)RGB_GREEN);
 
 	if (m_lock_ref != RGB_BLUE)
 	{
 		arrow_flags = get_arrow_flags(0, 255, m_color->b());
-		item_append("Blue", string_format("%3d", m_color->b()).c_str(), arrow_flags, (void *)(FPTR)RGB_BLUE);
+		item_append(_("Blue"), string_format("%3d", m_color->b()).c_str(), arrow_flags, (void *)(FPTR)RGB_BLUE);
 	}
 	else
-		item_append("Blue", s_text.c_str(), 0, (void *)(FPTR)RGB_BLUE);
+		item_append(_("Blue"), s_text.c_str(), 0, (void *)(FPTR)RGB_BLUE);
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 	item_append(_("Choose from palette"), nullptr, 0, (void *)(FPTR)PALETTE_CHOOSE);
@@ -1023,16 +1023,16 @@ void ui_menu_rgb_ui::inkey_special(const ui_menu_event *m_event)
 }
 
 ui_menu_palette_sel::palcolor ui_menu_palette_sel::m_palette[] = {
-	{ "White",  "FFFFFFFF" },
-	{ "Silver", "FFC0C0C0" },
-	{ "Gray",   "FF808080" },
-	{ "Black",  "FF000000" },
-	{ "Red",    "FFFF0000" },
-	{ "Orange", "FFFFA500" },
-	{ "Yellow", "FFFFFF00" },
-	{ "Green",  "FF00FF00" },
-	{ "Blue",   "FF0000FF" },
-	{ "Violet", "FF8F00FF" }
+	{ __("White"),  "FFFFFFFF" },
+	{ __("Silver"), "FFC0C0C0" },
+	{ __("Gray"),   "FF808080" },
+	{ __("Black"),  "FF000000" },
+	{ __("Red"),    "FFFF0000" },
+	{ __("Orange"), "FFFFA500" },
+	{ __("Yellow"), "FFFFFF00" },
+	{ __("Green"),  "FF00FF00" },
+	{ __("Blue"),   "FF0000FF" },
+	{ __("Violet"), "FF8F00FF" }
 };
 
 //-------------------------------------------------
@@ -1078,7 +1078,7 @@ void ui_menu_palette_sel::handle()
 void ui_menu_palette_sel::populate()
 {
 	for (int x = 0; x < ARRAY_LENGTH(m_palette); ++x)
-		item_append(m_palette[x].name, m_palette[x].argb, MENU_FLAG_UI_PALETTE, (void *)(FPTR)(x + 1));
+		item_append(_(m_palette[x].name), m_palette[x].argb, MENU_FLAG_UI_PALETTE, (void *)(FPTR)(x + 1));
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 }

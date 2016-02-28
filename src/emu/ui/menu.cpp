@@ -40,29 +40,29 @@ struct ui_arts_info
 
 static const ui_arts_info arts_info[] =
 {
-	{ "Snapshots", OPTION_SNAPSHOT_DIRECTORY, "snap" },
-	{ "Cabinets", OPTION_CABINETS_PATH, "cabinets;cabdevs" },
-	{ "Control Panels", OPTION_CPANELS_PATH, "cpanel" },
-	{ "PCBs", OPTION_PCBS_PATH, "pcb" },
-	{ "Flyers", OPTION_FLYERS_PATH, "flyers" },
-	{ "Titles", OPTION_TITLES_PATH, "titles" },
-	{ "Ends", OPTION_ENDS_PATH, "ends" },
-	{ "Artwork Preview", OPTION_ARTPREV_PATH, "artwork preview" },
-	{ "Bosses", OPTION_BOSSES_PATH, "bosses" },
-	{ "Logos", OPTION_LOGOS_PATH, "logo" },
-	{ "Versus", OPTION_VERSUS_PATH, "versus" },
-	{ "Game Over", OPTION_GAMEOVER_PATH, "gameover" },
-	{ "HowTo", OPTION_HOWTO_PATH, "howto" },
-	{ "Scores", OPTION_SCORES_PATH, "scores" },
-	{ "Select", OPTION_SELECT_PATH, "select" },
-	{ "Marquees", OPTION_MARQUEES_PATH, "marquees" },
+	{ __("Snapshots"), OPTION_SNAPSHOT_DIRECTORY, "snap" },
+	{ __("Cabinets"), OPTION_CABINETS_PATH, "cabinets;cabdevs" },
+	{ __("Control Panels"), OPTION_CPANELS_PATH, "cpanel" },
+	{ __("PCBs"), OPTION_PCBS_PATH, "pcb" },
+	{ __("Flyers"), OPTION_FLYERS_PATH, "flyers" },
+	{ __("Titles"), OPTION_TITLES_PATH, "titles" },
+	{ __("Ends"), OPTION_ENDS_PATH, "ends" },
+	{ __("Artwork Preview"), OPTION_ARTPREV_PATH, "artwork preview" },
+	{ __("Bosses"), OPTION_BOSSES_PATH, "bosses" },
+	{ __("Logos"), OPTION_LOGOS_PATH, "logo" },
+	{ __("Versus"), OPTION_VERSUS_PATH, "versus" },
+	{ __("Game Over"), OPTION_GAMEOVER_PATH, "gameover" },
+	{ __("HowTo"), OPTION_HOWTO_PATH, "howto" },
+	{ __("Scores"), OPTION_SCORES_PATH, "scores" },
+	{ __("Select"), OPTION_SELECT_PATH, "select" },
+	{ __("Marquees"), OPTION_MARQUEES_PATH, "marquees" },
 	{ nullptr }
 };
 
 static const char *hover_msg[] = {
-	"Add or remove favorites",
-	"Export displayed list to file",
-	"Show DATs view",
+	__("Add or remove favorites"),
+	__("Export displayed list to file"),
+	__("Show DATs view"),
 };
 
 /***************************************************************************
@@ -671,13 +671,13 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 				}
 
 				// customize subitem text color
-				if (!core_stricmp(subitem_text, "On"))
+				if (!core_stricmp(subitem_text, _("On")))
 					fgcolor2 = rgb_t(0xff,0x00,0xff,0x00);
 
-				if (!core_stricmp(subitem_text, "Off"))
+				if (!core_stricmp(subitem_text, _("Off")))
 					fgcolor2 = rgb_t(0xff,0xff,0x00,0x00);
 
-				if (!core_stricmp(subitem_text, "Auto"))
+				if (!core_stricmp(subitem_text, _("Auto")))
 					fgcolor2 = rgb_t(0xff,0xff,0xff,0x00);
 
 				// draw the subitem right-justified
@@ -1645,7 +1645,7 @@ void ui_menu::draw_select_game(bool noinput)
 void ui_menu::get_title_search(std::string &snaptext, std::string &searchstr)
 {
 	// get arts title text
-	snaptext.assign(arts_info[ui_globals::curimage_view].title);
+	snaptext.assign(_(arts_info[ui_globals::curimage_view].title));
 
 	// get search path
 	if (ui_globals::curimage_view == SNAPSHOT_VIEW)
@@ -2072,8 +2072,8 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 	container->add_line(x1 + midl, y1, x1 + midl, y1 + line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	std::string buffer[RP_LAST + 1];
-	buffer[RP_IMAGES].assign("Images");
-	buffer[RP_INFOS].assign("Infos");
+	buffer[RP_IMAGES] = _("Images");
+	buffer[RP_INFOS] = _("Infos");
 
 	for (int cells = RP_IMAGES; cells <= RP_INFOS; cells++)
 	{
@@ -2135,7 +2135,7 @@ std::string ui_menu::arts_render_common(float origx1, float origy1, float origx2
 
 	for (int x = FIRST_VIEW; x < LAST_VIEW; x++)
 	{
-		mui.draw_text_full(container, arts_info[x].title, origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
+		mui.draw_text_full(container, _(arts_info[x].title), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
 			WRAP_TRUNCATE, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &txt_lenght, nullptr);
 		txt_lenght += 0.01f;
 		title_size = MAX(txt_lenght, title_size);
@@ -2214,7 +2214,7 @@ void ui_menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software
 				hover = HOVER_B_FAV + z;
 				color = ARGB_WHITE;
 				float ypos = y2 + machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
-				mui.draw_text_box(container, hover_msg[z], JUSTIFY_CENTER, 0.5f, ypos, UI_BACKGROUND_COLOR);
+				mui.draw_text_box(container, _(hover_msg[z]), JUSTIFY_CENTER, 0.5f, ypos, UI_BACKGROUND_COLOR);
 			}
 
 			container->add_quad(x1, y1, x2, y2, color, t_texture[z], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));

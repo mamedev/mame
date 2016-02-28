@@ -49,14 +49,14 @@ void ui_menu_input_groups::populate()
 	int player;
 
 	/* build up the menu */
-	item_append("User Interface", nullptr, 0, (void *)(IPG_UI + 1));
+	item_append(_("User Interface"), nullptr, 0, (void *)(IPG_UI + 1));
 	for (player = 0; player < MAX_PLAYERS; player++)
 	{
 		char buffer[40];
 		sprintf(buffer, "Player %d Controls", player + 1);
 		item_append(buffer, nullptr, 0, (void *)(FPTR)(IPG_PLAYER1 + player + 1));
 	}
-	item_append("Other Controls", nullptr, 0, (void *)(FPTR)(IPG_OTHER + 1));
+	item_append(_("Other Controls"), nullptr, 0, (void *)(FPTR)(IPG_OTHER + 1));
 }
 
 ui_menu_input_groups::~ui_menu_input_groups()
@@ -622,7 +622,7 @@ void ui_menu_settings::populate()
 		custombottom = dipcount ? dipcount * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) + DIP_SWITCH_SPACING : 0;
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-	item_append("Reset",  nullptr, 0, (void *)1);
+	item_append(_("Reset"),  nullptr, 0, (void *)1);
 }
 
 ui_menu_settings::~ui_menu_settings()

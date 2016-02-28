@@ -377,9 +377,8 @@ void ui_menu_select_software::handle()
 
 	// if we're in an error state, overlay an error message
 	if (ui_error)
-		machine().ui().draw_text_box(container,
-									"The selected software is missing one or more required files. "
-									"Please select a different software.\n\nPress any key (except ESC) to continue.",
+		machine().ui().draw_text_box(container, _("The selected software is missing one or more required files. "
+									"Please select a different software.\n\nPress any key (except ESC) to continue."),
 									JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 
 	// handle filters selection from key shortcuts
@@ -565,16 +564,16 @@ void ui_menu_select_software::build_software_list()
 				if (instance_name == nullptr || type_name == nullptr)
 					continue;
 
-				if (swinfo->shortname()) tmpmatches.shortname = swinfo->shortname();
-				if (swinfo->longname()) tmpmatches.longname = swinfo->longname();
-				if (swinfo->parentname()) tmpmatches.parentname = swinfo->parentname();
-				if (swinfo->year()) tmpmatches.year = swinfo->year();
-				if (swinfo->publisher()) tmpmatches.publisher = swinfo->publisher();
+				tmpmatches.shortname = strensure(swinfo->shortname());
+				tmpmatches.longname = strensure(swinfo->longname());
+				tmpmatches.parentname = strensure(swinfo->parentname());
+				tmpmatches.year = strensure(swinfo->year());
+				tmpmatches.publisher = strensure(swinfo->publisher());
 				tmpmatches.supported = swinfo->supported();
-				if (part->name()) tmpmatches.part = part->name();
+				tmpmatches.part = strensure(part->name());
 				tmpmatches.driver = m_driver;
-				if (swlist->list_name()) tmpmatches.listname = swlist->list_name();
-				if (part->interface()) tmpmatches.interface = part->interface();
+				tmpmatches.listname = strensure(swlist->list_name());
+				tmpmatches.interface = strensure(part->interface());
 				tmpmatches.startempty = 0;
 				tmpmatches.parentlongname.clear();
 				tmpmatches.usage.clear();

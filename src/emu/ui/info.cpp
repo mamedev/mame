@@ -95,10 +95,10 @@ void ui_menu_image_info::image_info(device_image_interface *image)
 			switch (image->supported())
 			{
 				case SOFTWARE_SUPPORTED_NO:
-					item_append("Not supported", "", MENU_FLAG_DISABLE, nullptr);
+					item_append(_("Not supported"), "", MENU_FLAG_DISABLE, nullptr);
 					break;
 				case SOFTWARE_SUPPORTED_PARTIAL:
-					item_append("Partially supported", "", MENU_FLAG_DISABLE, nullptr);
+					item_append(_("Partially supported"), "", MENU_FLAG_DISABLE, nullptr);
 					break;
 				default:
 					break;
@@ -106,6 +106,6 @@ void ui_menu_image_info::image_info(device_image_interface *image)
 		}
 	}
 	else
-		item_append(image->brief_instance_name(), "[empty]", 0, nullptr);
+		item_append(image->brief_instance_name(), _("[empty]"), 0, nullptr);
 	item_append("", nullptr, MENU_FLAG_DISABLE, nullptr);
 }
