@@ -1219,7 +1219,7 @@ public:
 	static void apply(Stream &str, format_flags const &flags, U const *value)
 	{
 		static_assert(
-				!format_output::template string_semantics<U>::value || (N <= size_t(unsigned(std::numeric_limits<int>::max()))),
+				!format_output::template string_semantics<U>::value || (N <= size_t(unsigned((std::numeric_limits<int>::max)()))),
 				"C string array length must not exceed maximum integer value");
 		format_flags f(flags);
 		if (format_output::template string_semantics<U>::value && ((0 > f.get_precision()) || (N < unsigned(f.get_precision()))))
