@@ -977,18 +977,11 @@ int shaders::create_resources(bool reset)
 
 	phosphor_effect->add_uniform("Phosphor", uniform::UT_VEC3, uniform::CU_PHOSPHOR_LIFE);
 
-	post_effect->add_uniform("VignettingAmount", uniform::UT_FLOAT, uniform::CU_POST_VIGNETTING); // backward compatibility
-	post_effect->add_uniform("CurvatureAmount", uniform::UT_FLOAT, uniform::CU_POST_CURVATURE); // backward compatibility
-	post_effect->add_uniform("RoundCornerAmount", uniform::UT_FLOAT, uniform::CU_POST_ROUND_CORNER); // backward compatibility
-	post_effect->add_uniform("SmoothBorderAmount", uniform::UT_FLOAT, uniform::CU_POST_SMOOTH_BORDER); // backward compatibility
-	post_effect->add_uniform("ReflectionAmount", uniform::UT_FLOAT, uniform::CU_POST_REFLECTION); // backward compatibility
-
 	post_effect->add_uniform("ShadowAlpha", uniform::UT_FLOAT, uniform::CU_POST_SHADOW_ALPHA);
 	post_effect->add_uniform("ShadowCount", uniform::UT_VEC2, uniform::CU_POST_SHADOW_COUNT);
 	post_effect->add_uniform("ShadowUV", uniform::UT_VEC2, uniform::CU_POST_SHADOW_UV);
 	post_effect->add_uniform("ShadowUVOffset", uniform::UT_VEC2, uniform::CU_POST_SHADOW_UV_OFFSET);
 	post_effect->add_uniform("ShadowDims", uniform::UT_VEC2, uniform::CU_POST_SHADOW_DIMS);
-
 	post_effect->add_uniform("ScanlineAlpha", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_ALPHA);
 	post_effect->add_uniform("ScanlineScale", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_SCALE);
 	post_effect->add_uniform("ScanlineHeight", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_HEIGHT);
@@ -996,7 +989,6 @@ int shaders::create_resources(bool reset)
 	post_effect->add_uniform("ScanlineBrightOffset", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_BRIGHT_OFFSET);
 	post_effect->add_uniform("Power", uniform::UT_VEC3, uniform::CU_POST_POWER);
 	post_effect->add_uniform("Floor", uniform::UT_VEC3, uniform::CU_POST_FLOOR);
-
 	post_effect->add_uniform("RotationType", uniform::UT_INT, uniform::CU_ROTATION_TYPE);
 
 	distortion_effect->add_uniform("VignettingAmount", uniform::UT_FLOAT, uniform::CU_POST_VIGNETTING);
@@ -1004,7 +996,6 @@ int shaders::create_resources(bool reset)
 	distortion_effect->add_uniform("RoundCornerAmount", uniform::UT_FLOAT, uniform::CU_POST_ROUND_CORNER);
 	distortion_effect->add_uniform("SmoothBorderAmount", uniform::UT_FLOAT, uniform::CU_POST_SMOOTH_BORDER);
 	distortion_effect->add_uniform("ReflectionAmount", uniform::UT_FLOAT, uniform::CU_POST_REFLECTION);
-
 	distortion_effect->add_uniform("RotationType", uniform::UT_INT, uniform::CU_ROTATION_TYPE);
 
 	initialized = true;
@@ -1026,7 +1017,7 @@ void shaders::begin_draw()
 
 	curr_effect = default_effect;
 
-	default_effect->set_technique("DefaultTechnique");
+	default_effect->set_technique("ScreenTechnique");
 	post_effect->set_technique("DefaultTechnique");
 	distortion_effect->set_technique("DefaultTechnique");
 	prescale_effect->set_technique("DefaultTechnique");
@@ -1605,9 +1596,9 @@ int shaders::vector_buffer_pass(d3d_render_target *rt, int source_index, poly_in
 
 	curr_effect = default_effect;
 	curr_effect->update_uniforms();
+	curr_effect->set_technique("VectorBufferTechnique");
 
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
-	curr_effect->set_bool("PostPass", true);
 
 	next_index = rt->next_index(next_index);
 	// blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
@@ -1622,11 +1613,11 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 
 	curr_effect = default_effect;
 	curr_effect->update_uniforms();
+	curr_effect->set_technique("ScreenTechnique");
 
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
-	curr_effect->set_bool("PostPass", true);
 
-	// we do not clear the backbuffe here because multiple screens might rendered into
+	// we do not clear the backbuffe here because multiple screens might be rendered into
 	blit(backbuffer, false, poly->get_type(), vertnum, poly->get_count());
 
 	if (avi_output_file != NULL)
@@ -1644,11 +1635,11 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 	return next_index;
 }
 
-void shaders::menu_pass(poly_info *poly, int vertnum)
+void shaders::ui_pass(poly_info *poly, int vertnum)
 {
 	curr_effect = default_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_bool("PostPass", false);
+	curr_effect->set_technique("UiTechnique");
 
 	blit(NULL, false, poly->get_type(), vertnum, poly->get_count());
 }
@@ -1786,7 +1777,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	}
 	else
 	{
-		menu_pass(poly, vertnum);
+		ui_pass(poly, vertnum);
 	}
 
 	curr_render_target = NULL;
@@ -1965,7 +1956,7 @@ void shaders::enumerate_screens()
 //  shaders::register_texture(texture::info)
 //============================================================
 
-bool shaders::register_texture(texture_info *texture)
+bool shaders::register_texture(render_primitive *prim, texture_info *texture)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
 	{

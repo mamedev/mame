@@ -694,8 +694,20 @@ void d3d_texture_manager::update_textures()
 			texture_info *texture = find_texinfo(&prim->texture, prim->flags);
 			if (texture == nullptr)
 			{
-				// if there isn't one, create a new texture
-				global_alloc(texture_info(this, &prim->texture, m_renderer->window().prescale(), prim->flags));
+				if (m_renderer->get_shaders()->enabled())
+				{
+					// create a new texture without prescale, shaders will handle the prescale
+					texture = global_alloc(texture_info(this, &prim->texture, 1, prim->flags));
+					if (texture != nullptr)
+					{
+						m_renderer->get_shaders()->register_texture(prim, texture);
+					}
+				}
+				else
+				{
+					// create a new texture
+					texture = global_alloc(texture_info(this, &prim->texture, m_renderer->window().prescale(), prim->flags));
+				}
 			}
 			else
 			{
@@ -1689,11 +1701,12 @@ void renderer_d3d9::draw_quad(const render_primitive *prim)
 	float height = prim->bounds.y1 - prim->bounds.y0;
 
 	// set the texture coordinates
-	if(texture != nullptr)
+	if (texture != nullptr)
 	{
 		vec2f& start = texture->get_uvstart();
 		vec2f& stop = texture->get_uvstop();
 		vec2f delta = stop - start;
+
 		vertex[0].u0 = start.c.x + delta.c.x * prim->texcoords.tl.u;
 		vertex[0].v0 = start.c.y + delta.c.y * prim->texcoords.tl.v;
 		vertex[1].u0 = start.c.x + delta.c.x * prim->texcoords.tr.u;
@@ -2018,11 +2031,11 @@ texture_info::texture_info(d3d_texture_manager *manager, const render_texinfo* t
 			}
 
 			// screen textures with no prescaling are pretty easy and shaders handle prescale itself
-			if ((m_xprescale == 1 && m_yprescale == 1) || m_renderer->get_shaders()->enabled())
+			if (m_xprescale == 1 && m_yprescale == 1)
 			{
 				// required to compute the size
 				m_type = m_texture_manager->is_dynamic_supported() ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
-				
+
 				// compute the size
 				compute_size(texsource->width, texsource->height);
 
@@ -2030,11 +2043,6 @@ texture_info::texture_info(d3d_texture_manager *manager, const render_texinfo* t
 				if (result == D3D_OK)
 				{
 					m_d3dfinaltex = m_d3dtex;
-					if (m_renderer->get_shaders()->enabled() && !m_renderer->get_shaders()->register_texture(this))
-					{
-						goto error;
-					}
-
 					break;
 				}
 			}

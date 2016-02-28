@@ -290,7 +290,7 @@ public:
 	void init_effect_info(poly_info *poly);
 	void render_quad(poly_info *poly, int vertnum);
 
-	bool register_texture(texture_info *texture);
+	bool register_texture(render_primitive *prim, texture_info *texture);
 	bool add_render_target(renderer_d3d9* d3d, texture_info* info, int width, int height, int target_width, int target_height);
 	bool add_cache_target(renderer_d3d9* d3d, texture_info* info, int width, int height, int screen_index);
 
@@ -344,8 +344,6 @@ private:
 	void                    end_avi_recording();
 	void                    begin_avi_recording(const char *name);
 
-	bool                    register_texture(texture_info *texture, int width, int height, int xscale, int yscale);
-
 	d3d_render_target*      find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
 	cache_target *          find_cache_target(UINT32 screen_index, int width, int height);
 	void                    remove_cache_target(cache_target *cache);
@@ -366,7 +364,7 @@ private:
 	int                     vector_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     vector_buffer_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     screen_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
-	void                    menu_pass(poly_info *poly, int vertnum);
+	void                    ui_pass(poly_info *poly, int vertnum);
 
 	d3d_base *              d3dintf;                    // D3D interface
 

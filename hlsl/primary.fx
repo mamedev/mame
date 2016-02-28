@@ -46,18 +46,18 @@ struct PS_INPUT
 };
 
 //-----------------------------------------------------------------------------
-// Primary Vertex Shader
+// Primary Vertex Shaders
 //-----------------------------------------------------------------------------
 
 static const float Epsilon = 1.0e-7f;
 
 uniform float2 ScreenDims;
 uniform float2 TargetDims;
+uniform float2 QuadDims;
 
-uniform bool PostPass;
 uniform bool VectorScreen;
 
-VS_OUTPUT vs_main(VS_INPUT Input)
+VS_OUTPUT vs_screen_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
@@ -67,18 +67,43 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.xy -= 0.5f; // center
 	Output.Position.xy *= 2.0f; // zoom
 
-	float2 targetDims = TargetDims + Epsilon; // bug: with exact target dimensions the font disappears
+	Output.TexCoord = Input.Position.xy / ScreenDims;
+	Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
-	if (PostPass)
-	{
-		Output.TexCoord = Input.Position.xy / ScreenDims;
-		Output.TexCoord += 0.5f / targetDims; // half texel offset correction (DX9)
-	}
-	else
-	{
-		Output.TexCoord = Input.TexCoord;
-		// Output.TexCoord += 0.5f / targetDims; // half texel offset correction (DX9)
-	}
+	Output.Color = Input.Color;
+
+	return Output;
+}
+
+VS_OUTPUT vs_vector_buffer_main(VS_INPUT Input)
+{
+	VS_OUTPUT Output = (VS_OUTPUT)0;
+
+	Output.Position = float4(Input.Position.xyz, 1.0f);
+	Output.Position.xy /= ScreenDims;
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // zoom
+
+	Output.TexCoord = Input.Position.xy / ScreenDims;
+	Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
+
+	Output.Color = Input.Color;
+
+	return Output;
+}
+
+VS_OUTPUT vs_ui_main(VS_INPUT Input)
+{
+	VS_OUTPUT Output = (VS_OUTPUT)0;
+
+	Output.Position = float4(Input.Position.xyz, 1.0f);
+	Output.Position.xy /= ScreenDims;
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // zoom
+
+	Output.TexCoord = Input.TexCoord;
 
 	Output.Color = Input.Color;
 
@@ -86,30 +111,65 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 }
 
 //-----------------------------------------------------------------------------
-// Primary Pixel Shader
+// Primary Pixel Shaders
 //-----------------------------------------------------------------------------
 
-float4 ps_main(PS_INPUT Input) : COLOR
+float4 ps_screen_main(PS_INPUT Input) : COLOR
 {
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
-	BaseTexel *= PostPass && VectorScreen
-		? Input.Color + float4(1.0f, 1.0f, 1.0f, 0.0f)
-		: Input.Color;
+
+	return BaseTexel;
+}
+
+float4 ps_vector_buffer_main(PS_INPUT Input) : COLOR
+{
+	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
+	BaseTexel *= Input.Color + float4(1.0f, 1.0f, 1.0f, 0.0f);
+
+	return BaseTexel;
+}
+
+float4 ps_ui_main(PS_INPUT Input) : COLOR
+{
+	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
+	BaseTexel *= Input.Color;
 
 	return BaseTexel;
 }
 
 //-----------------------------------------------------------------------------
-// Primary Technique
+// Primary Techniques
 //-----------------------------------------------------------------------------
 
-technique DefaultTechnique
+technique ScreenTechnique
 {
 	pass Pass0
 	{
 		Lighting = FALSE;
 
-		VertexShader = compile vs_2_0 vs_main();
-		PixelShader  = compile ps_2_0 ps_main();
+		VertexShader = compile vs_2_0 vs_screen_main();
+		PixelShader  = compile ps_2_0 ps_screen_main();
+	}
+}
+
+technique VectorBufferTechnique
+{
+	pass Pass0
+	{
+		Lighting = FALSE;
+
+		VertexShader = compile vs_2_0 vs_vector_buffer_main();
+		PixelShader  = compile ps_2_0 ps_vector_buffer_main();
+	}
+}
+
+technique UiTechnique
+{
+	pass Pass0
+	{
+		Lighting = FALSE;
+
+		VertexShader = compile vs_2_0 vs_ui_main();
+		PixelShader  = compile ps_2_0 ps_ui_main();
 	}
 }
