@@ -1351,25 +1351,6 @@ project "SDL2"
 		MAME_DIR .. "3rdparty/SDL2/src/joystick/SDL_joystick.c",
 		MAME_DIR .. "3rdparty/SDL2/src/joystick/SDL_joystick_c.h",
 		MAME_DIR .. "3rdparty/SDL2/src/joystick/SDL_sysjoystick.h",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/e_atan2.c",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/e_log.c",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/e_pow.c",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/e_rem_pio2.c",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/e_sqrt.c",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/k_cos.c",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/k_rem_pio2.c",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/k_sin.c",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/k_tan.c",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/math.h",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/math_private.h",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/s_atan.c",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/s_copysign.c",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/s_cos.c",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/s_fabs.c",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/s_floor.c",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/s_scalbn.c",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/s_sin.c",
-		MAME_DIR .. "3rdparty/SDL2/src/libm/s_tan.c",
 		MAME_DIR .. "3rdparty/SDL2/src/loadso/windows/SDL_sysloadso.c",
 		MAME_DIR .. "3rdparty/SDL2/src/power/SDL_power.c",
 		MAME_DIR .. "3rdparty/SDL2/src/power/windows/SDL_syspower.c",
@@ -1461,7 +1442,63 @@ project "SDL2"
 		MAME_DIR .. "3rdparty/SDL2/src/video/SDL_video.c",
 
 	}
-
+	if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="windows" then
+		files {
+			MAME_DIR .. "3rdparty/SDL2/src/libm/e_atan2.c",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/e_log.c",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/e_pow.c",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/e_rem_pio2.c",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/e_sqrt.c",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/k_cos.c",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/k_rem_pio2.c",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/k_sin.c",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/k_tan.c",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/math.h",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/math_private.h",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/s_atan.c",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/s_copysign.c",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/s_cos.c",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/s_fabs.c",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/s_floor.c",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/s_scalbn.c",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/s_sin.c",
+			MAME_DIR .. "3rdparty/SDL2/src/libm/s_tan.c",
+		}
+	end
+	if _OPTIONS["targetos"]~="windows" then
+		files {
+			MAME_DIR .. "3rdparty/SDL2/src/render/opengles/SDL_render_gles.c",
+			MAME_DIR .. "3rdparty/SDL2/src/render/opengles/SDL_glesfuncs.h",
+		}
+	end
+	
+	if _OPTIONS["targetos"]=="android" then
+		files {
+			MAME_DIR .. "3rdparty/SDL2/src/audio/android/SDL_androidaudio.c",
+			MAME_DIR .. "3rdparty/SDL2/src/core/android/SDL_android.c",	
+			MAME_DIR .. "3rdparty/SDL2/src/filesystem/android/SDL_sysfilesystem.c",
+			MAME_DIR .. "3rdparty/SDL2/src/haptic/dummy/SDL_syshaptic.c",
+			MAME_DIR .. "3rdparty/SDL2/src/joystick/android/SDL_sysjoystick.c",
+			MAME_DIR .. "3rdparty/SDL2/src/loadso/dlopen/SDL_sysloadso.c",
+			MAME_DIR .. "3rdparty/SDL2/src/power/android/SDL_syspower.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_syscond.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_sysmutex.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_syssem.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_systhread.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_systls.c",
+			MAME_DIR .. "3rdparty/SDL2/src/timer/unix/SDL_systimer.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidclipboard.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidevents.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidgl.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidkeyboard.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidmessagebox.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidmouse.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidtouch.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidvideo.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidwindow.c",
+		}
+	end
+	
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
 			MAME_DIR .. "3rdparty/SDL2/src/audio/coreaudio/SDL_coreaudio.c",
@@ -1475,8 +1512,6 @@ project "SDL2"
 			MAME_DIR .. "3rdparty/SDL2/src/joystick/darwin/SDL_sysjoystick_c.h",
 			MAME_DIR .. "3rdparty/SDL2/src/loadso/dlopen/SDL_sysloadso.c",
 			MAME_DIR .. "3rdparty/SDL2/src/power/macosx/SDL_syspower.c",			
-			MAME_DIR .. "3rdparty/SDL2/src/render/opengles/SDL_render_gles.c",
-			MAME_DIR .. "3rdparty/SDL2/src/render/opengles/SDL_glesfuncs.h",
 			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_syscond.c",
 			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_sysmutex.c",
 			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_sysmutex_c.h",
@@ -1615,6 +1650,16 @@ project "SDL2"
 			"-Wno-bad-function-cast",
 		}		
 		
+	configuration { "android-*"}
+		defines {
+			"GL_GLEXT_PROTOTYPES",
+		}
+		buildoptions_c {
+			"-Wno-bad-function-cast",
+			"-Wno-incompatible-pointer-types-discards-qualifiers",
+			"-Wno-unneeded-internal-declaration",
+			"-Wno-unused-const-variable",
+		}		
 		
 	configuration { }
 		includedirs {
