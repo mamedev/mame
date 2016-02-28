@@ -754,7 +754,7 @@ ifeq (posix,$(SHELLTYPE))
   COPY  = $(SILENT) cp -fR "$(1)" "$(2)"
 else
   MKDIR = $(SILENT) mkdir "$(subst /,\\,$(1))" 2> nul || exit 0
-  COPY  = $(SILENT) copy /Y "$(subst /,\\,$(1))" "$(subst /,\\,$(2))"
+  COPY  = $(SILENT) copy /Y "$(subst /,\\,$(1))" "$(subst /,\\,$(2))" > 2> nul || exit 0
 endif
 
 GENDIR = $(BUILDDIR)/generated
@@ -1350,7 +1350,7 @@ generate: \
 
 $(GENDIR)/includes/SDL2:
 	-$(call MKDIR,$@)
-	$(SILENT)cp -fR 3rdparty/SDL2/include/* $(GENDIR)/includes/SDL2/.
+	-$(call COPY,3rdparty/SDL2/include,$(GENDIR)/includes/SDL2)
 
 $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/file2str.py | $(GEN_FOLDERS)
 	@echo Converting $<...
