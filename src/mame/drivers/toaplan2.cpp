@@ -5168,10 +5168,34 @@ ROM_START( batriderk )
 	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
-/* older version, might have only been released in Japan and Taiwan? */
+/* older version, might have only been released in Japan, Hong Kong and Taiwan? */
 ROM_START( batriderja )
 	ROM_REGION( 0x200000, "maincpu", 0 )            /* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0.bin", 0x000000, 0x080000, CRC(f93ea27c) SHA1(41023c2ee1efd70b5aa9c70e1ddd9e5c3d51d68a) )
+	ROM_LOAD16_BYTE( "prg1.u23", 0x000001, 0x080000, CRC(8ae7f592) SHA1(8a20ebf85eca621f578d2302c3a3988647b077a7) )
+	ROM_LOAD16_BYTE( "prg2.u21", 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
+	ROM_LOAD16_BYTE( "prg3.u24", 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )            /* Sound Z80 code + bank */
+	ROM_LOAD( "snd.u77", 0x00000, 0x40000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
+
+	ROM_REGION( 0x1000000, "gp9001", 0 )
+	ROM_LOAD( "rom-1.bin", 0x000000, 0x400000, CRC(0df69ca2) SHA1(49670347ebd7e1067ff988cf842b275b7ee7b5f7) )
+	ROM_LOAD( "rom-3.bin", 0x400000, 0x400000, CRC(60167d38) SHA1(fd2429808c59ef51fd5f5db84ea89a8dc504186e) )
+	ROM_LOAD( "rom-2.bin", 0x800000, 0x400000, CRC(1bfea593) SHA1(ce06dc3097ae56b0df56d104bbf7efc9b5d968d4) )
+	ROM_LOAD( "rom-4.bin", 0xc00000, 0x400000, CRC(bee03c94) SHA1(5bc1e6769c42857c03456426b502fcb86a114f19) )
+
+	ROM_REGION( 0x140000, "oki1", 0 )       /* ADPCM Samples 1 */
+	ROM_LOAD( "rom-5.bin", 0x040000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
+
+	ROM_REGION( 0x140000, "oki2", 0 )       /* ADPCM Samples 2 */
+	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
+ROM_END
+
+
+ROM_START( batriderhk )
+	ROM_REGION( 0x200000, "maincpu", 0 )            /* Main 68k code */
+	ROM_LOAD16_BYTE( "prg0.u22", 0x000000, 0x080000, CRC(00afbb7c) SHA1(a4b6331e0fcab7d0c43fc43adb701f1248247b41) )
 	ROM_LOAD16_BYTE( "prg1.u23", 0x000001, 0x080000, CRC(8ae7f592) SHA1(8a20ebf85eca621f578d2302c3a3988647b077a7) )
 	ROM_LOAD16_BYTE( "prg2.u21", 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24", 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
@@ -5456,6 +5480,7 @@ GAME( 1998, batriderj,  batrider, batrider, batriderj, toaplan2_state, batrider,
 GAME( 1998, batriderk,  batrider, batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea) (Fri Feb 13 1998)", MACHINE_SUPPORTS_SAVE )
 // older revision of the code
 GAME( 1998, batriderja, batrider, batrider, batriderj, toaplan2_state, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, older version) (Mon Dec 22 1997)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batriderhk, batrider, batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Hong Kong) (Mon Dec 22 1997)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, batridert,  batrider, batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Taiwan) (Mon Dec 22 1997)", MACHINE_SUPPORTS_SAVE )
 
 // Battle Bakraid
