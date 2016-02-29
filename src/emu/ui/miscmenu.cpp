@@ -236,13 +236,13 @@ void ui_menu_bookkeeping::populate()
 
 	/* show total time first */
 	if (prevtime.seconds() >= (60 * 60))
-		stream_format(tempstring, _("Uptime: %1$d:%2$02d:%3$02d\n\n"), prevtime.seconds() / (60 * 60), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60);
+		util::stream_format(tempstring, _("Uptime: %1$d:%2$02d:%3$02d\n\n"), prevtime.seconds() / (60 * 60), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60);
 	else
-		stream_format(tempstring, _("Uptime: %1$d:%2$02d\n\n"), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60);
+		util::stream_format(tempstring, _("Uptime: %1$d:%2$02d\n\n"), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60);
 
 	/* show tickets at the top */
 	if (tickets > 0)
-		stream_format(tempstring, _("Tickets dispensed: %1$d\n\n"), tickets);
+		util::stream_format(tempstring, _("Tickets dispensed: %1$d\n\n"), tickets);
 
 	/* loop over coin counters */
 	for (ctrnum = 0; ctrnum < COIN_COUNTERS; ctrnum++)
@@ -252,7 +252,7 @@ void ui_menu_bookkeeping::populate()
 		/* display the coin counter number */
 		/* display how many coins */
 		/* display whether or not we are locked out */
-		stream_format(tempstring,
+		util::stream_format(tempstring,
 				(count == 0) ? _("Coin %1$c: NA%3$s\n") : _("Coin %1$c: %2$d%3$s\n"),
 				ctrnum + 'A',
 				count,
@@ -767,7 +767,7 @@ void ui_menu_export::handle()
 						// iterate through drivers and output the info
 						while (drvlist.next())
 							if ((drvlist.driver().flags & MACHINE_NO_STANDALONE) == 0)
-								stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().description);
+								util::stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().description);
 						file.puts(buffer.str().c_str());
 						file.close();
 						machine().popmessage(_("%s.txt saved under ui folder."), filename.c_str());

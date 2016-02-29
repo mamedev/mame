@@ -95,15 +95,6 @@ void js_set_main_loop(running_machine * machine);
 
 
 //**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// a giant string buffer for temporary strings
-static char giant_string_buffer[65536] = { 0 };
-
-
-
-//**************************************************************************
 //  RUNNING MACHINE
 //**************************************************************************
 
@@ -773,69 +764,6 @@ void running_machine::add_logerror_callback(logerror_callback callback)
 	m_logerror_list.push_back(std::make_unique<logerror_callback_item>(callback));
 }
 
-/*-------------------------------------------------
-    popmessage - pop up a user-visible message
--------------------------------------------------*/
-
-void running_machine::popmessage(const char *format, ...) const
-{
-	// if the format is NULL, it is a signal to clear the popmessage
-	if (format == nullptr)
-		ui().popup_time(0, " ");
-
-	// otherwise, generate the buffer and call the UI to display the message
-	else
-	{
-		std::string temp;
-		va_list arg;
-
-		// dump to the buffer
-		va_start(arg, format);
-		strvprintf(temp,format, arg);
-		va_end(arg);
-
-		// pop it in the UI
-		ui().popup_time(temp.length() / 40 + 2, "%s", temp.c_str());
-	}
-}
-
-
-/*-------------------------------------------------
-    logerror - log to the debugger and any other
-    OSD-defined output streams
--------------------------------------------------*/
-
-void running_machine::logerror(const char *format, ...) const
-{
-	va_list arg;
-	va_start(arg, format);
-	vlogerror(format, arg);
-	va_end(arg);
-}
-
-
-//-------------------------------------------------
-//  vlogerror - vprintf-style error logging
-//-------------------------------------------------
-
-void running_machine::vlogerror(const char *format, va_list args) const
-{
-	// process only if there is a target
-	if (!m_logerror_list.empty())
-	{
-		g_profiler.start(PROFILER_LOGERROR);
-
-		// dump to the buffer
-		vsnprintf(giant_string_buffer, ARRAY_LENGTH(giant_string_buffer), format, args);
-
-		// log to all callbacks
-		for (auto& cb : m_logerror_list)
-			(cb->m_func)(*this, giant_string_buffer);
-
-		g_profiler.stop();
-	}
-}
-
 
 //-------------------------------------------------
 //  base_datetime - retrieve the time of the host
@@ -1202,7 +1130,7 @@ std::string running_machine::nvram_filename(device_t &device) const
 	std::ostringstream result;
 	result << basename();
 	if (root_device().system_bios() != 0 && root_device().default_bios() != root_device().system_bios())
-		stream_format(result, "_%d", root_device().system_bios() - 1);
+		util::stream_format(result, "_%d", root_device().system_bios() - 1);
 
 	// device-based NVRAM gets its own name in a subdirectory
 	if (device.owner() != nullptr)

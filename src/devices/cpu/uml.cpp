@@ -870,11 +870,11 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 	std::ostringstream buffer;
 	for (const char *opsrc = opinfo.mnemonic; *opsrc != 0; opsrc++)
 		if (*opsrc == '!')
-			stream_format(buffer, "%-8s", bang_size[m_size]);
+			util::stream_format(buffer, "%-8s", bang_size[m_size]);
 		else if (*opsrc == '#')
-			stream_format(buffer, "%-8s", pound_size[m_size]);
+			util::stream_format(buffer, "%-8s", pound_size[m_size]);
 		else
-			stream_format(buffer, "%-8c", *opsrc);
+			util::stream_format(buffer, "%-8c", *opsrc);
 
 	// iterate through parameters
 	for (int pnum = 0; pnum < m_numparams; pnum++)
@@ -911,20 +911,20 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 					if (size == 2) value = (UINT16)value;
 					if (size == 4) value = (UINT32)value;
 					if ((UINT32)value == value)
-						stream_format(buffer, "$%X", (UINT32)value);
+						util::stream_format(buffer, "$%X", (UINT32)value);
 					else
-						stream_format(buffer, "$%X%08X", (UINT32)(value >> 32), (UINT32)value);
+						util::stream_format(buffer, "$%X%08X", (UINT32)(value >> 32), (UINT32)value);
 				}
 				break;
 
 			// immediates have several special cases
 			case parameter::PTYPE_SIZE:
-				stream_format(buffer, "%s", sizes[param.size()]);
+				util::stream_format(buffer, "%s", sizes[param.size()]);
 				break;
 
 			// size + address space immediate
 			case parameter::PTYPE_SIZE_SPACE:
-				stream_format(buffer, "%s_%s", spaces[param.space()], sizes[param.size()]);
+				util::stream_format(buffer, "%s_%s", spaces[param.space()], sizes[param.size()]);
 				break;
 
 			// size + scale immediate
@@ -933,30 +933,30 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 					int scale = param.scale();
 					int size  = param.size();
 					if (scale == size)
-						stream_format(buffer, "%s", sizes[size]);
+						util::stream_format(buffer, "%s", sizes[size]);
 					else
-						stream_format(buffer, "%s_x%d", sizes[size], 1 << scale);
+						util::stream_format(buffer, "%s_x%d", sizes[size], 1 << scale);
 				}
 				break;
 
 			// fmod immediate
 			case parameter::PTYPE_ROUNDING:
-				stream_format(buffer, "%s", fmods[param.rounding()]);
+				util::stream_format(buffer, "%s", fmods[param.rounding()]);
 				break;
 
 			// integer registers
 			case parameter::PTYPE_INT_REGISTER:
-				stream_format(buffer, "i%d", param.ireg() - REG_I0);
+				util::stream_format(buffer, "i%d", param.ireg() - REG_I0);
 				break;
 
 			// floating point registers
 			case parameter::PTYPE_FLOAT_REGISTER:
-				stream_format(buffer, "f%d", param.freg() - REG_F0);
+				util::stream_format(buffer, "f%d", param.freg() - REG_F0);
 				break;
 
 			// map variables
 			case parameter::PTYPE_MAPVAR:
-				stream_format(buffer, "m%d", param.mapvar() - MAPVAR_M0);
+				util::stream_format(buffer, "m%d", param.mapvar() - MAPVAR_M0);
 				break;
 
 			// memory
@@ -969,40 +969,40 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 				if (drcuml != nullptr && (symbol = drcuml->symbol_find(param.memory(), &symoffset)) != nullptr)
 				{
 					if (symoffset == 0)
-						stream_format(buffer, "[%s]", symbol);
+						util::stream_format(buffer, "[%s]", symbol);
 					else
-						stream_format(buffer, "[%s+$%X]", symbol, symoffset);
+						util::stream_format(buffer, "[%s+$%X]", symbol, symoffset);
 				}
 
 				// cache memory
 				else if (drcuml != nullptr && drcuml->cache().contains_pointer(param.memory()))
-					stream_format(buffer, "[+$%X]", (UINT32)(FPTR)((drccodeptr)param.memory() - drcuml->cache().near()));
+					util::stream_format(buffer, "[+$%X]", (UINT32)(FPTR)((drccodeptr)param.memory() - drcuml->cache().near()));
 
 				// general memory
 				else
-					stream_format(buffer, "[[$%p]]", param.memory());
+					util::stream_format(buffer, "[[$%p]]", param.memory());
 				break;
 			}
 
 			// string pointer
 			case parameter::PTYPE_STRING:
-				stream_format(buffer, "%s", (const char *)(FPTR)param.string());
+				util::stream_format(buffer, "%s", (const char *)(FPTR)param.string());
 				break;
 
 			// handle pointer
 			case parameter::PTYPE_CODE_HANDLE:
-				stream_format(buffer, "%s", param.handle().string());
+				util::stream_format(buffer, "%s", param.handle().string());
 				break;
 
 			default:
-				stream_format(buffer, "???");
+				util::stream_format(buffer, "???");
 				break;
 		}
 	}
 
 	// if there's a condition, append it
 	if (m_condition != COND_ALWAYS)
-		stream_format(buffer, ",%s", conditions[m_condition & 0x0f]);
+		util::stream_format(buffer, ",%s", conditions[m_condition & 0x0f]);
 
 	// if there are flags, append them
 	if (m_flags != 0)

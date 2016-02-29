@@ -243,16 +243,16 @@ void ui_menu_custom_filter::save_custom_filters()
 	{
 		// generate custom filters info
 		std::ostringstream cinfo;
-		stream_format(cinfo, "Total filters = %d\n", (custfltr::numother + 1));
-		stream_format(cinfo, "Main filter = %s\n", main_filters::text[custfltr::main]);
+		util::stream_format(cinfo, "Total filters = %d\n", (custfltr::numother + 1));
+		util::stream_format(cinfo, "Main filter = %s\n", main_filters::text[custfltr::main]);
 
 		for (int x = 1; x <= custfltr::numother; x++)
 		{
-			stream_format(cinfo, "Other filter = %s\n", main_filters::text[custfltr::other[x]]);
+			util::stream_format(cinfo, "Other filter = %s\n", main_filters::text[custfltr::other[x]]);
 			if (custfltr::other[x] == FILTER_MANUFACTURER)
-				stream_format(cinfo, "  Manufacturer filter = %s\n", c_mnfct::ui[custfltr::mnfct[x]]);
+				util::stream_format(cinfo, "  Manufacturer filter = %s\n", c_mnfct::ui[custfltr::mnfct[x]]);
 			else if (custfltr::other[x] == FILTER_YEAR)
-				stream_format(cinfo, "  Year filter = %s\n", c_year::ui[custfltr::year[x]]);
+				util::stream_format(cinfo, "  Year filter = %s\n", c_year::ui[custfltr::year[x]]);
 		}
 		file.puts(cinfo.str().c_str());
 		file.close();
@@ -556,22 +556,22 @@ void ui_menu_swcustom_filter::save_sw_custom_filters()
 	{
 		// generate custom filters info
 		std::ostringstream cinfo;
-		stream_format(cinfo, "Total filters = %d\n", (sw_custfltr::numother + 1));
-		stream_format(cinfo, "Main filter = %s\n", sw_filters::text[sw_custfltr::main]);
+		util::stream_format(cinfo, "Total filters = %d\n", (sw_custfltr::numother + 1));
+		util::stream_format(cinfo, "Main filter = %s\n", sw_filters::text[sw_custfltr::main]);
 
 		for (int x = 1; x <= sw_custfltr::numother; x++)
 		{
-			stream_format(cinfo, "Other filter = %s\n", sw_filters::text[sw_custfltr::other[x]]);
+			util::stream_format(cinfo, "Other filter = %s\n", sw_filters::text[sw_custfltr::other[x]]);
 			if (sw_custfltr::other[x] == UI_SW_PUBLISHERS)
-				stream_format(cinfo, "  Manufacturer filter = %s\n", m_filter.publisher.ui[sw_custfltr::mnfct[x]]);
+				util::stream_format(cinfo, "  Manufacturer filter = %s\n", m_filter.publisher.ui[sw_custfltr::mnfct[x]]);
 			else if (sw_custfltr::other[x] == UI_SW_LIST)
-				stream_format(cinfo, "  Software List filter = %s\n", m_filter.swlist.name[sw_custfltr::list[x]]);
+				util::stream_format(cinfo, "  Software List filter = %s\n", m_filter.swlist.name[sw_custfltr::list[x]]);
 			else if (sw_custfltr::other[x] == UI_SW_YEARS)
-				stream_format(cinfo, "  Year filter = %s\n", m_filter.year.ui[sw_custfltr::year[x]]);
+				util::stream_format(cinfo, "  Year filter = %s\n", m_filter.year.ui[sw_custfltr::year[x]]);
 			else if (sw_custfltr::other[x] == UI_SW_TYPE)
-				stream_format(cinfo, "  Type filter = %s\n", m_filter.type.ui[sw_custfltr::type[x]]);
+				util::stream_format(cinfo, "  Type filter = %s\n", m_filter.type.ui[sw_custfltr::type[x]]);
 			else if (sw_custfltr::other[x] == UI_SW_REGION)
-				stream_format(cinfo, "  Region filter = %s\n", m_filter.region.ui[sw_custfltr::region[x]]);
+				util::stream_format(cinfo, "  Region filter = %s\n", m_filter.region.ui[sw_custfltr::region[x]]);
 		}
 		file.puts(cinfo.str().c_str());
 		file.close();

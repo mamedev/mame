@@ -549,7 +549,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 	{
 		// start with the line number
 		dstline.str("");
-		stream_format(dstline, "<span class=\"linenum\">%5d</span>&nbsp;&nbsp;", linenum++);
+		util::stream_format(dstline, "<span class=\"linenum\">%5d</span>&nbsp;&nbsp;", linenum++);
 
 		// iterate over characters in the source line
 		bool escape = false;
@@ -569,7 +569,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 			{
 				if (!in_comment && ch == comment_start[0] && strncmp(srcptr - 1, comment_start, strlen(comment_start)) == 0)
 				{
-					stream_format(dstline, "<span class=\"comment\">%s", comment_start_esc);
+					util::stream_format(dstline, "<span class=\"comment\">%s", comment_start_esc);
 					curcol += strlen(comment_start);
 					srcptr += strlen(comment_start) - 1;
 					ch = 0;
@@ -577,7 +577,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 				}
 				else if (in_comment && ch == comment_end[0] && strncmp(srcptr - 1, comment_end, strlen(comment_end)) == 0)
 				{
-					stream_format(dstline, "%s</span>", comment_end_esc);
+					util::stream_format(dstline, "%s</span>", comment_end_esc);
 					curcol += strlen(comment_end);
 					srcptr += strlen(comment_end) - 1;
 					ch = 0;
@@ -588,7 +588,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 			// track whether or not we are within an inline (C++-style) comment
 			if (!in_quotes && !in_comment && !in_inline_comment && ch == comment_inline[0] && strncmp(srcptr - 1, comment_inline, strlen(comment_inline)) == 0)
 			{
-				stream_format(dstline, "<span class=\"comment\">%s", comment_inline_esc);
+				util::stream_format(dstline, "<span class=\"comment\">%s", comment_inline_esc);
 				curcol += strlen(comment_inline);
 				srcptr += strlen(comment_inline) - 1;
 				ch = 0;
@@ -612,7 +612,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 				for (curtoken = token_table; curtoken->token != nullptr; curtoken++)
 					if (strncmp(srcptr - 1, curtoken->token, toklength) == 0 && strlen(curtoken->token) == toklength)
 					{
-						stream_format(dstline, "<span class=\"%s\">%s</span>", curtoken->color, curtoken->token);
+						util::stream_format(dstline, "<span class=\"%s\">%s</span>", curtoken->color, curtoken->token);
 						curcol += strlen(curtoken->token);
 						srcptr += strlen(curtoken->token) - 1;
 						ch = 0;
@@ -644,7 +644,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 				if (!in_comment && !in_inline_comment && !in_quotes && (ch == '"' || ch == '\''))
 				{
 					if (color_quotes)
-						stream_format(dstline, "<span class=\"string\">%c", ch);
+						util::stream_format(dstline, "<span class=\"string\">%c", ch);
 					else
 						dstline.put(ch);
 					in_quotes = true;
@@ -660,7 +660,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 							std::string target;
 							if (find_include_file(target, srcrootlen, dstrootlen, srcfile, dstfile, filename))
 							{
-								stream_format(dstline, "<a href=\"%s\">", target.c_str());
+								util::stream_format(dstline, "<a href=\"%s\">", target.c_str());
 								quotes_are_linked = true;
 							}
 						}
@@ -673,7 +673,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 					if (quotes_are_linked)
 						dstline << "</a>";
 					if (color_quotes)
-						stream_format(dstline, "%c</span>", ch);
+						util::stream_format(dstline, "%c</span>", ch);
 					else
 						dstline.put(ch);
 					in_quotes = false;

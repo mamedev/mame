@@ -729,10 +729,10 @@ template <typename Format, typename... Params>
 inline void softlist_parser::parse_error(Format &&fmt, Params &&... args)
 {
 	// always start with filename(line.column):
-	stream_format(m_errors, "%s(%d.%d): ", filename(), line(), column());
+	util::stream_format(m_errors, "%s(%d.%d): ", filename(), line(), column());
 
 	// append the remainder of the string
-	stream_format(m_errors, std::forward<Format>(fmt), std::forward<Params>(args)...);
+	util::stream_format(m_errors, std::forward<Format>(fmt), std::forward<Params>(args)...);
 
 	// append a newline at the end
 	m_errors.put('\n');

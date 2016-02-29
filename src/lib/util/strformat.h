@@ -91,6 +91,8 @@
            widening or narrowing
     - s/S: default stream output behaviour for argument
     - p/P: cast any integer/char/bool/pointer/array to void const *
+    - n:   store characters printed so far, produces no output, argument
+           must be pointer to type that std::streamoff is convertible to
     - m:   output of std::strerror(errno), no automatic widening or
            narrowing, does not consume an argument
     - %:   literal %, field width applied, does not consume an argument
@@ -128,13 +130,13 @@
     - Out-of-range argument/width/precision position
     - Inappropriate type for parameterised width/precision
     - Positional width/precision specifier not terminated with $
+    - Inappropriate type for n conversion
 
     Some limitations have been described in passing.  Major limitations
     and bugs include:
     - No automatic widening/narrowing support, so no simple way to
       output wide characters/strings to narrow streams/strings and vice
       versa.
-    - No support for n conversion (store characters printed so far)
     - Precision ignored for d/i/u/o/x/X conversions (should set minimum
       digits to print).
     - Precisoin for s/S conversion is only honoured for string-like
@@ -183,7 +185,7 @@
 #include <type_traits>
 #include <utility>
 
-
+namespace util {
 namespace detail {
 template <typename Character>
 class format_chars
@@ -221,6 +223,7 @@ public:
 			l           = Character('l'),
 			L           = Character('L'),
 			m           = Character('m'),
+			n           = Character('n'),
 			o           = Character('o'),
 			p           = Character('p'),
 			s           = Character('s'),
@@ -270,6 +273,7 @@ public:
 			l           = L'l',
 			L           = L'L',
 			m           = L'm',
+			n           = L'n',
 			o           = L'o',
 			p           = L'p',
 			s           = L's',
@@ -320,6 +324,7 @@ public:
 			character,                  // c, C
 			string,                     // s, S
 			pointer,                    // p
+			tell,                       // n
 			strerror,                   // m
 			percent                     // %
 		};
@@ -389,6 +394,7 @@ public:
 		case conversion::character:
 		case conversion::string:
 		case conversion::pointer:
+		case conversion::tell:
 		case conversion::strerror:
 		case conversion::percent:
 			break;
@@ -839,6 +845,9 @@ public:
 		case format_helper::p:
 			flags.set_conversion(format_flags::conversion::pointer);
 			break;
+		case format_helper::n:
+			flags.set_conversion(format_flags::conversion::tell);
+			break;
 		case format_helper::m:
 			flags.set_conversion(format_flags::conversion::strerror);
 			break;
@@ -1256,6 +1265,39 @@ public:
 	}
 };
 
+template <typename T>
+class format_store_integer
+{
+private:
+	template <typename U> struct is_non_const_ptr
+	{ static constexpr bool value = std::is_pointer<U>::value && !std::is_const<std::remove_pointer_t<U> >::value; };
+	template <typename U> struct is_unsigned_ptr
+	{ static constexpr bool value = std::is_pointer<U>::value && std::is_unsigned<std::remove_pointer_t<U> >::value; };
+	template <typename U> struct use_unsigned_cast
+	{ static constexpr bool value = is_non_const_ptr<U>::value && is_unsigned_ptr<U>::value && std::is_convertible<std::make_unsigned_t<std::streamoff>, std::remove_pointer_t<U> >::value; };
+	template <typename U> struct use_signed_cast
+	{ static constexpr bool value = is_non_const_ptr<U>::value && !use_unsigned_cast<U>::value && std::is_convertible<std::streamoff, std::remove_pointer_t<U> >::value; };
+	template <typename U> struct disable
+	{ static constexpr bool value = !use_unsigned_cast<U>::value && !use_signed_cast<U>::value; };
+
+public:
+	template <typename U> static std::enable_if_t<use_unsigned_cast<U>::value, bool> apply(U const &value, std::streamoff data)
+	{
+		*value = std::remove_pointer_t<U>(std::make_unsigned_t<std::streamoff>(data));
+		return true;
+	}
+	template <typename U> static std::enable_if_t<use_signed_cast<U>::value, bool> apply(U const &value, std::streamoff data)
+	{
+		*value = std::remove_pointer_t<U>(std::make_signed_t<std::streamoff>(data));
+		return true;
+	}
+	template <typename U> static std::enable_if_t<disable<U>::value, bool> apply(U const &value, std::streamoff data)
+	{
+		assert(false); // inappropriate type for storing characters written so far
+		return false;
+	}
+};
+
 template <typename Stream>
 class format_argument
 {
@@ -1264,6 +1306,7 @@ public:
 		: m_value(nullptr)
 		, m_output_function(nullptr)
 		, m_make_integer_function(nullptr)
+		, m_store_integer_function(nullptr)
 	{
 	}
 
@@ -1272,15 +1315,18 @@ public:
 		: m_value(reinterpret_cast<void const *>(&value))
 		, m_output_function(&static_output<T>)
 		, m_make_integer_function(&static_make_integer<T>)
+		, m_store_integer_function(&static_store_integer<T>)
 	{
 	}
 
 	void output(Stream &str, format_flags const &flags) const { m_output_function(str, flags, m_value); }
 	bool make_integer(int &result) const { return m_make_integer_function(m_value, result); }
+	void store_integer(std::streamoff data) const { m_store_integer_function(m_value, data); }
 
 private:
 	typedef void (*output_function)(Stream &str, format_flags const &flags, void const *value);
 	typedef bool (*make_integer_function)(void const *value, int &result);
+	typedef void (*store_integer_function)(void const *value, std::streamoff data);
 
 	template <typename T> static void static_output(Stream &str, format_flags const &flags, void const *value)
 	{
@@ -1292,9 +1338,15 @@ private:
 		return format_make_integer<T>::apply(*reinterpret_cast<T const *>(value), result);
 	}
 
+	template <typename T> static void static_store_integer(void const *value, std::streamoff data)
+	{
+		format_store_integer<T>::apply(*reinterpret_cast<T const *>(value), data);
+	}
+
 	void const              *m_value;
 	output_function         m_output_function;
 	make_integer_function   m_make_integer_function;
+	store_integer_function  m_store_integer_function;
 };
 
 template <typename Stream, typename... Params>
@@ -1304,7 +1356,7 @@ inline std::array<format_argument<Stream>, sizeof...(Params)> make_format_argume
 }
 
 template <typename Stream, typename Format, std::size_t Count>
-void stream_format(Stream &str, Format const &fmt, std::array<format_argument<Stream>, Count> const &args)
+typename Stream::off_type stream_format(Stream &str, Format const &fmt, std::array<format_argument<Stream>, Count> const &args)
 {
 	typedef format_helper<std::remove_reference_t<Format> > format_helper;
 	typedef typename format_helper::iterator iterator;
@@ -1334,7 +1386,8 @@ void stream_format(Stream &str, Format const &fmt, std::array<format_argument<St
 		std::streamsize             m_width;
 	};
 
-	stream_preserver preserver(str);
+	typename Stream::pos_type const begin(str.tellp());
+	stream_preserver const preserver(str);
 	int next_pos(1);
 	iterator start = format_helper::begin(fmt);
 	for (iterator it = start; !format_helper::at_end(fmt, start); )
@@ -1415,20 +1468,35 @@ void stream_format(Stream &str, Format const &fmt, std::array<format_argument<St
 				assert(args.size() >= unsigned(arg_pos));
 				if ((0 >= arg_pos) || (args.size() < unsigned(arg_pos)))
 					continue;
-				args[arg_pos - 1].output(str, flags);
+				if (format_flags::conversion::tell == flags.get_conversion())
+				{
+					typename Stream::pos_type const current(str.tellp());
+					args[arg_pos - 1].store_integer(
+							((typename Stream::pos_type(-1) == begin) || (typename Stream::pos_type(-1) == current))
+								? typename Stream::off_type(-1)
+								: (current - begin));
+				}
+				else
+				{
+					args[arg_pos - 1].output(str, flags);
+				}
 				start = it;
 			}
 		}
 	}
+	typename Stream::pos_type const end(str.tellp());
+	return ((typename Stream::pos_type(-1) == begin) || (typename Stream::pos_type(-1) == end))
+			? typename Stream::off_type(-1)
+			: (end - begin);
 }
 
 } // namespace detail
 
 template <typename Stream, typename Format, typename... Params>
-inline void stream_format(Stream &str, Format const &fmt, Params &&... args)
+inline typename Stream::off_type stream_format(Stream &str, Format const &fmt, Params &&... args)
 {
 	auto const arg_pack(detail::make_format_arguments<Stream>(std::forward<Params>(args)...));
-	detail::stream_format(str, fmt, arg_pack);
+	return detail::stream_format(str, fmt, arg_pack);
 }
 
 template <typename String = std::string, typename Format, typename... Params>
@@ -1449,5 +1517,9 @@ inline String string_format(std::locale const &locale, Format const &fmt, Params
 	stream_format(str, fmt, std::forward<Params>(args)...);
 	return str.str();
 };
+
+} // namespace util
+
+using util::string_format;
 
 #endif // __MAME_UTIL_STRFORMAT_H__

@@ -564,13 +564,13 @@ void info_xml_creator::output_rom(device_t &device)
 
 				// add name, merge, bios, and size tags */
 				if (name != nullptr && name[0] != 0)
-					stream_format(output, " name=\"%s\"", xml_normalize_string(name));
+					util::stream_format(output, " name=\"%s\"", xml_normalize_string(name));
 				if (merge_name != nullptr)
-					stream_format(output, " merge=\"%s\"", xml_normalize_string(merge_name));
+					util::stream_format(output, " merge=\"%s\"", xml_normalize_string(merge_name));
 				if (bios_name[0] != 0)
-					stream_format(output, " bios=\"%s\"", xml_normalize_string(bios_name));
+					util::stream_format(output, " bios=\"%s\"", xml_normalize_string(bios_name));
 				if (!is_disk)
-					stream_format(output, " size=\"%d\"", rom_file_size(rom));
+					util::stream_format(output, " size=\"%d\"", rom_file_size(rom));
 
 				// dump checksum information only if there is a known dump
 				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
@@ -582,17 +582,17 @@ void info_xml_creator::output_rom(device_t &device)
 					output << " status=\"nodump\"";
 
 				// append a region name
-				stream_format(output, " region=\"%s\"", ROMREGION_GETTAG(region));
+				util::stream_format(output, " region=\"%s\"", ROMREGION_GETTAG(region));
 
 				// for non-disk entries, print offset
 				if (!is_disk)
-					stream_format(output, " offset=\"%x\"", offset);
+					util::stream_format(output, " offset=\"%x\"", offset);
 
 				// for disk entries, add the disk index
 				else
 				{
-					stream_format(output, " index=\"%x\"", DISK_GETINDEX(rom));
-					stream_format(output, " writable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
+					util::stream_format(output, " index=\"%x\"", DISK_GETINDEX(rom));
+					util::stream_format(output, " writable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
 				}
 
 				// add optional flag
@@ -1104,16 +1104,16 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 				// output the switch name information
 				std::string normalized_field_name(xml_normalize_string(field->name()));
 				std::string normalized_newtag(xml_normalize_string(newtag.c_str()));
-				stream_format(output,"\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.c_str(), normalized_newtag.c_str(), field->mask());
+				util::stream_format(output,"\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.c_str(), normalized_newtag.c_str(), field->mask());
 
 				// loop over settings
 				for (ioport_setting *setting = field->first_setting(); setting != nullptr; setting = setting->next())
 				{
-					stream_format(output,"\t\t\t<%s name=\"%s\" value=\"%u\"%s/>\n", innertag, xml_normalize_string(setting->name()), setting->value(), setting->value() == field->defvalue() ? " default=\"yes\"" : "");
+					util::stream_format(output,"\t\t\t<%s name=\"%s\" value=\"%u\"%s/>\n", innertag, xml_normalize_string(setting->name()), setting->value(), setting->value() == field->defvalue() ? " default=\"yes\"" : "");
 				}
 
 				// terminate the switch entry
-				stream_format(output,"\t\t</%s>\n", outertag);
+				util::stream_format(output,"\t\t</%s>\n", outertag);
 
 				fprintf(m_output, "%s", output.str().c_str());
 			}

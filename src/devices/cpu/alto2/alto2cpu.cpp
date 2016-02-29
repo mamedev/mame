@@ -20,55 +20,38 @@ const device_type ALTO2 = &device_creator<alto2_cpu_device>;
 //  LOGGING AND DEBUGGING
 //**************************************************************************
 #if ALTO2_DEBUG
-int g_log_types = LOG_DISK | LOG_ETH;
-int g_log_level = 8;
-bool g_log_newline = true;
-
-void logprintf(device_t *device, int type, int level, const char* format, ...)
-{
-	static const char* type_name[] = {
-		"[CPU]",
-		"[EMU]",
-		"[T01]",
-		"[T02]",
-		"[T03]",
-		"[KSEC]",
-		"[T05]",
-		"[T06]",
-		"[ETH]",
-		"[MRT]",
-		"[DWT]",
-		"[CURT]",
-		"[DHT]",
-		"[DVT]",
-		"[PART]",
-		"[KWD]",
-		"[T17]",
-		"[MEM]",
-		"[RAM]",
-		"[DRIVE]",
-		"[DISK]",
-		"[DISPL]",
-		"[MOUSE]",
-		"[HW]",
-		"[KBD]"
-	};
-	if (!(g_log_types & type))
-		return;
-	if (level > g_log_level)
-		return;
-	if (g_log_newline) {
-		// last line had a \n - print type name
-		for (int i = 0; i < sizeof(type_name)/sizeof(type_name[0]); i++)
-			if (type & (1 << i))
-				device->logerror("%-7s ", type_name[i]);
-	}
-	va_list ap;
-	va_start(ap, format);
-	device->vlogerror(format, ap);
-	va_end(ap);
-	g_log_newline = format[strlen(format) - 1] == '\n';
-}
+int alto2_log_t::log_types = LOG_DISK | LOG_ETH;
+int alto2_log_t::log_level = 8;
+bool alto2_log_t::log_newline = true;
+const char *const alto2_log_t::type_name[] = {
+	"[CPU]",
+	"[EMU]",
+	"[T01]",
+	"[T02]",
+	"[T03]",
+	"[KSEC]",
+	"[T05]",
+	"[T06]",
+	"[ETH]",
+	"[MRT]",
+	"[DWT]",
+	"[CURT]",
+	"[DHT]",
+	"[DVT]",
+	"[PART]",
+	"[KWD]",
+	"[T17]",
+	"[MEM]",
+	"[RAM]",
+	"[DRIVE]",
+	"[DISK]",
+	"[DISPL]",
+	"[MOUSE]",
+	"[HW]",
+	"[KBD]"
+};
+const size_t alto2_log_t::type_name_count = sizeof(alto2_log_t::type_name) / sizeof(alto2_log_t::type_name[0]);
+alto2_log_t logprintf;
 #endif
 
 //**************************************************************************

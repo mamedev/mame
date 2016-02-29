@@ -340,7 +340,7 @@ void pci_device::add_map(UINT64 size, int flags, address_map_delegate &map)
 		bank_reg_infos[breg].hi = 0;
 	}
 
-	logerror("Device %s (%s) has 0x%" I64FMT "x bytes of %s named %s\n", tag(), name(), size, flags & M_IO ? "io" : "memory", bank_infos[bid].map.name());
+	logerror("Device %s (%s) has 0x%x bytes of %s named %s\n", tag(), name(), size, flags & M_IO ? "io" : "memory", bank_infos[bid].map.name());
 }
 
 void pci_device::add_rom(const UINT8 *rom, UINT32 size)

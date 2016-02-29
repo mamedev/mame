@@ -1347,11 +1347,11 @@ std::string natural_keyboard::dump()
 		std::string description = string_format("%08X (%s) ", code.ch, unicode_to_string(code.ch).c_str());
 
 		// pad with spaces
-		stream_format(buffer, "%-*s", left_column_width, description);
+		util::stream_format(buffer, "%-*s", left_column_width, description);
 
 		// identify the keys used
 		for (int field = 0; field < ARRAY_LENGTH(code.field) && code.field[field] != nullptr; field++)
-			stream_format(buffer, "%s'%s'", (field > 0) ? ", " : "", code.field[field]->name());
+			util::stream_format(buffer, "%s'%s'", (field > 0) ? ", " : "", code.field[field]->name());
 
 		// carriage return
 		buffer << '\n';

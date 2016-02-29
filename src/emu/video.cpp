@@ -280,15 +280,15 @@ std::string video_manager::speed_text()
 
 	// if we're auto frameskipping, display that plus the level
 	else if (effective_autoframeskip())
-		stream_format(str, "auto%2d/%d", effective_frameskip(), MAX_FRAMESKIP);
+		util::stream_format(str, "auto%2d/%d", effective_frameskip(), MAX_FRAMESKIP);
 
 	// otherwise, just display the frameskip plus the level
 	else
-		stream_format(str, "skip %d/%d", effective_frameskip(), MAX_FRAMESKIP);
+		util::stream_format(str, "skip %d/%d", effective_frameskip(), MAX_FRAMESKIP);
 
 	// append the speed for all cases except paused
 	if (!paused)
-		stream_format(str, "%4d%%", (int)(100 * m_speed_percent + 0.5));
+		util::stream_format(str, "%4d%%", (int)(100 * m_speed_percent + 0.5));
 
 	// display the number of partial updates as well
 	int partials = 0;
@@ -296,7 +296,7 @@ std::string video_manager::speed_text()
 	for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
 		partials += screen->partial_updates();
 	if (partials > 1)
-		stream_format(str, "\n%d partial updates", partials);
+		util::stream_format(str, "\n%d partial updates", partials);
 
 	return str.str();
 }

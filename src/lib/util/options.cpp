@@ -519,7 +519,7 @@ std::string core_options::output_ini(const core_options *diff) const
 					{
 						if (num_valid_headers++)
 							buffer << '\n';
-						stream_format(buffer, "#\n# %s\n#\n", last_header);
+						util::stream_format(buffer, "#\n# %s\n#\n", last_header);
 						last_header = nullptr;
 					}
 
@@ -527,9 +527,9 @@ std::string core_options::output_ini(const core_options *diff) const
 					if (!is_unadorned)
 					{
 						if (strchr(value, ' ') != nullptr)
-							stream_format(buffer, "%-25s \"%s\"\n", name, value);
+							util::stream_format(buffer, "%-25s \"%s\"\n", name, value);
 						else
-							stream_format(buffer, "%-25s %s\n", name, value);
+							util::stream_format(buffer, "%-25s %s\n", name, value);
 					}
 				}
 			}
@@ -553,11 +553,11 @@ std::string core_options::output_help() const
 	{
 		// header: just print
 		if (curentry->is_header())
-			stream_format(buffer, "\n#\n# %s\n#\n", curentry->description());
+			util::stream_format(buffer, "\n#\n# %s\n#\n", curentry->description());
 
 		// otherwise, output entries for all non-deprecated items
 		else if (curentry->description() != nullptr)
-			stream_format(buffer, "-%-20s%s\n", curentry->name(), curentry->description());
+			util::stream_format(buffer, "-%-20s%s\n", curentry->name(), curentry->description());
 	}
 	return buffer.str();
 }

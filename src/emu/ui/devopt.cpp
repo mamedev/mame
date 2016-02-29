@@ -42,12 +42,12 @@ void ui_menu_device_config::populate()
 	std::ostringstream str;
 	device_t *dev;
 
-	stream_format(str, "[This option is%s currently mounted in the running system]\n\n", m_mounted ? "" : " NOT");
-	stream_format(str, "Option: %s\n", m_option->name());
+	util::stream_format(str, "[This option is%s currently mounted in the running system]\n\n", m_mounted ? "" : " NOT");
+	util::stream_format(str, "Option: %s\n", m_option->name());
 
 	dev = const_cast<machine_config &>(machine().config()).device_add(&machine().config().root_device(), m_option->name(), m_option->devtype(), 0);
 
-	stream_format(str, "Device: %s\n", dev->name());
+	util::stream_format(str, "Device: %s\n", dev->name());
 	if (!m_mounted)
 		str << "\nIf you select this option, the following items will be enabled:\n";
 	else
@@ -80,16 +80,16 @@ void ui_menu_device_config::populate()
 
 			// if more than one, prepend a #x in front of the CPU name
 			if (count > 1)
-				stream_format(str, "  %d" UTF8_MULTIPLY, count);
+				util::stream_format(str, "  %d" UTF8_MULTIPLY, count);
 			else
 				str << "  ";
 			str << name;
 
 			// display clock in kHz or MHz
 			if (clock >= 1000000)
-				stream_format(str, " %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
+				util::stream_format(str, " %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
 			else
-				stream_format(str, " %d.%03d" UTF8_NBSP "kHz\n", clock / 1000, clock % 1000);
+				util::stream_format(str, " %d.%03d" UTF8_NBSP "kHz\n", clock / 1000, clock % 1000);
 		}
 	}
 
@@ -100,7 +100,7 @@ void ui_menu_device_config::populate()
 		str << "* Video:\n";
 		for (screen_device *screen = scriter.first(); screen != nullptr; screen = scriter.next())
 		{
-			stream_format(str, "  Screen '%s': ", screen->tag());
+			util::stream_format(str, "  Screen '%s': ", screen->tag());
 
 			if (screen->screen_type() == SCREEN_TYPE_VECTOR)
 				str << "Vector\n";
@@ -108,7 +108,7 @@ void ui_menu_device_config::populate()
 			{
 				const rectangle &visarea = screen->visible_area();
 
-				stream_format(str, "%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
+				util::stream_format(str, "%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
 									visarea.width(), visarea.height(),
 									(machine().system().flags & ORIENTATION_SWAP_XY) ? "V" : "H",
 									ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds()));
@@ -138,7 +138,7 @@ void ui_menu_device_config::populate()
 			}
 			// if more than one, prepend a #x in front of the CPU name
 			if (count > 1)
-				stream_format(str,"  %d" UTF8_MULTIPLY, count);
+				util::stream_format(str,"  %d" UTF8_MULTIPLY, count);
 			else
 				str << "  ";
 			str << sound->device().name();
@@ -146,9 +146,9 @@ void ui_menu_device_config::populate()
 			// display clock in kHz or MHz
 			int clock = sound->device().clock();
 			if (clock >= 1000000)
-				stream_format(str," %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
+				util::stream_format(str," %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
 			else if (clock != 0)
-				stream_format(str," %d.%03d" UTF8_NBSP "kHz\n", clock / 1000, clock % 1000);
+				util::stream_format(str," %d.%03d" UTF8_NBSP "kHz\n", clock / 1000, clock % 1000);
 			else
 				str << '\n';
 		}
@@ -176,7 +176,7 @@ void ui_menu_device_config::populate()
 		}
 
 		if (bios)
-			stream_format(str, "* BIOS settings:\n  %d options    [default: %s]\n", bios, bios_str.c_str());
+			util::stream_format(str, "* BIOS settings:\n  %d options    [default: %s]\n", bios, bios_str.c_str());
 	}
 
 	int input = 0, input_mj = 0, input_hana = 0, input_gamble = 0, input_analog = 0, input_adjust = 0;
@@ -216,7 +216,7 @@ void ui_menu_device_config::populate()
 				{
 					if (setting->value() == field->defvalue())
 					{
-						stream_format(dips_opt, "    [default: %s]\n", setting->name());
+						util::stream_format(dips_opt, "    [default: %s]\n", setting->name());
 						break;
 					}
 				}
@@ -229,7 +229,7 @@ void ui_menu_device_config::populate()
 				{
 					if (setting->value() == field->defvalue())
 					{
-						stream_format(confs_opt, "    [default: %s]\n", setting->name());
+						util::stream_format(confs_opt, "    [default: %s]\n", setting->name());
 						break;
 					}
 				}
@@ -243,28 +243,28 @@ void ui_menu_device_config::populate()
 	if (input + input_mj + input_hana + input_gamble + input_analog + input_adjust + input_keypad + input_keyboard)
 		str << "* Input device(s):\n";
 	if (input)
-		stream_format(str, "  User inputs    [%d inputs]\n", input);
+		util::stream_format(str, "  User inputs    [%d inputs]\n", input);
 	if (input_mj)
-		stream_format(str, "  Mahjong inputs    [%d inputs]\n", input_mj);
+		util::stream_format(str, "  Mahjong inputs    [%d inputs]\n", input_mj);
 	if (input_hana)
-		stream_format(str, "  Hanafuda inputs    [%d inputs]\n", input_hana);
+		util::stream_format(str, "  Hanafuda inputs    [%d inputs]\n", input_hana);
 	if (input_gamble)
-		stream_format(str, "  Gambling inputs    [%d inputs]\n", input_gamble);
+		util::stream_format(str, "  Gambling inputs    [%d inputs]\n", input_gamble);
 	if (input_analog)
-		stream_format(str, "  Analog inputs    [%d inputs]\n", input_analog);
+		util::stream_format(str, "  Analog inputs    [%d inputs]\n", input_analog);
 	if (input_adjust)
-		stream_format(str, "  Adjuster inputs    [%d inputs]\n", input_adjust);
+		util::stream_format(str, "  Adjuster inputs    [%d inputs]\n", input_adjust);
 	if (input_keypad)
-		stream_format(str, "  Keypad inputs    [%d inputs]\n", input_keypad);
+		util::stream_format(str, "  Keypad inputs    [%d inputs]\n", input_keypad);
 	if (input_keyboard)
-		stream_format(str, "  Keyboard inputs    [%d inputs]\n", input_keyboard);
+		util::stream_format(str, "  Keyboard inputs    [%d inputs]\n", input_keyboard);
 
 	image_interface_iterator imgiter(*dev);
 	if (imgiter.count() > 0)
 	{
 		str << "* Media Options:\n";
 		for (const device_image_interface *imagedev = imgiter.first(); imagedev != nullptr; imagedev = imgiter.next())
-			stream_format(str, "  %s    [tag: %s]\n", imagedev->image_type_name(), imagedev->device().tag());
+			util::stream_format(str, "  %s    [tag: %s]\n", imagedev->image_type_name(), imagedev->device().tag());
 	}
 
 	slot_interface_iterator slotiter(*dev);
@@ -272,7 +272,7 @@ void ui_menu_device_config::populate()
 	{
 		str << "* Slot Options:\n";
 		for (const device_slot_interface *slot = slotiter.first(); slot != nullptr; slot = slotiter.next())
-			stream_format(str, "  %s    [default: %s]\n", slot->device().tag(), slot->default_option() ? slot->default_option() : "----");
+			util::stream_format(str, "  %s    [default: %s]\n", slot->device().tag(), slot->default_option() ? slot->default_option() : "----");
 	}
 
 	if ((execiter.count() + scriter.count() + snditer.count() + imgiter.count() + slotiter.count() + bios + dips + confs

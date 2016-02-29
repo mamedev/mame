@@ -206,9 +206,8 @@ public:
 	bool findit(bool isvalidation = false) const;
 
 	// misc
-	void popmessage(const char *format, ...) const;
-	void logerror(const char *format, ...) const;
-	void vlogerror(const char *format, va_list args) const;
+	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
+	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 
 protected:
 	// miscellaneous helpers

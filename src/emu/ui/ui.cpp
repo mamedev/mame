@@ -1189,7 +1189,7 @@ std::string &ui_manager::game_info_astring(std::string &str)
 	std::ostringstream buf;
 
 	// print description, manufacturer, and CPU:
-	stream_format(buf, _("%1$s\n%2$s %3$s\nDriver: %4$s\n\nCPU:\n"),
+	util::stream_format(buf, _("%1$s\n%2$s %3$s\nDriver: %4$s\n\nCPU:\n"),
 			machine().system().description,
 			machine().system().year,
 			machine().system().manufacturer,
@@ -1218,7 +1218,7 @@ std::string &ui_manager::game_info_astring(std::string &str)
 
 		// if more than one, prepend a #x in front of the CPU name
 		// display clock in kHz or MHz
-		stream_format(buf,
+		util::stream_format(buf,
 				(count > 1) ? "%1$d" UTF8_MULTIPLY "%2$s %3$d.%4$0*5$d%6$s\n" : "%2$s %3$d.%4$0*5$d%6$s\n",
 				count,
 				name,
@@ -1255,7 +1255,7 @@ std::string &ui_manager::game_info_astring(std::string &str)
 		// if more than one, prepend a #x in front of the CPU name
 		// display clock in kHz or MHz
 		int clock = sound->device().clock();
-		stream_format(buf,
+		util::stream_format(buf,
 				(count > 1)
 					? ((clock != 0) ? "%1$d" UTF8_MULTIPLY "%2$s %3$d.%4$0*5$d%6$s\n" : "%1$d" UTF8_MULTIPLY "%2$s\n")
 					: ((clock != 0) ? "%2$s %3$d.%4$0*5$d%6$s\n" : "%2$s\n"),
@@ -1289,7 +1289,7 @@ std::string &ui_manager::game_info_astring(std::string &str)
 						ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds()));
 			}
 
-			stream_format(buf,
+			util::stream_format(buf,
 					(scrcount > 1) ? _("%1$s: %2$s\n") : _("%2$s\n"),
 					slider_get_screen_desc(*screen), detail);
 		}

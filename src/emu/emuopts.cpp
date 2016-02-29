@@ -335,9 +335,9 @@ void emu_options::add_device_options()
 
 		// retrieve info about the device instance
 		std::ostringstream option_name;
-		stream_format(option_name, "%s;%s", image->instance_name(), image->brief_instance_name());
+		util::stream_format(option_name, "%s;%s", image->instance_name(), image->brief_instance_name());
 		if (strcmp(image->device_typename(image->image_type()), image->instance_name()) == 0)
-			stream_format(option_name, ";%s1;%s1", image->instance_name(), image->brief_instance_name());
+			util::stream_format(option_name, ";%s1;%s1", image->instance_name(), image->brief_instance_name());
 
 		// add the option
 		if (!exists(image->instance_name()))

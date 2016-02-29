@@ -179,21 +179,21 @@ void ui_menu_audit::save_available_machines()
 		// generate header
 		std::ostringstream buffer;
 		buffer << "#\n" << UI_VERSION_TAG << bare_build_version << "\n#\n\n";
-		stream_format(buffer, "%d\n", m_availablesorted.size());
-		stream_format(buffer, "%d\n", m_unavailablesorted.size());
+		util::stream_format(buffer, "%d\n", m_availablesorted.size());
+		util::stream_format(buffer, "%d\n", m_unavailablesorted.size());
 
 		// generate available list
 		for (size_t x = 0; x < m_availablesorted.size(); ++x)
 		{
 			int find = driver_list::find(m_availablesorted[x]->name);
-			stream_format(buffer, "%d\n", find);
+			util::stream_format(buffer, "%d\n", find);
 		}
 
 		// generate unavailable list
 		for (size_t x = 0; x < m_unavailablesorted.size(); ++x)
 		{
 			int find = driver_list::find(m_unavailablesorted[x]->name);
-			stream_format(buffer, "%d\n", find);
+			util::stream_format(buffer, "%d\n", find);
 		}
 		file.puts(buffer.str().c_str());
 		file.close();

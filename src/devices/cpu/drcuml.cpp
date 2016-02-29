@@ -377,31 +377,6 @@ uml::instruction &drcuml_block::append()
 
 
 //-------------------------------------------------
-//  comment - attach a comment to the current
-//  output location in the specified block
-//-------------------------------------------------
-
-void drcuml_block::append_comment(const char *format, ...)
-{
-	// do the printf
-	std::string temp;
-	va_list va;
-	va_start(va, format);
-	strvprintf(temp,format, va);
-	va_end(va);
-
-	// allocate space in the cache to hold the comment
-	char *comment = (char *)m_drcuml.cache().alloc_temporary(temp.length() + 1);
-	if (comment == nullptr)
-		return;
-	strcpy(comment, temp.c_str());
-
-	// add an instruction with a pointer
-	append().comment(comment);
-}
-
-
-//-------------------------------------------------
 //  optimize - apply various optimizations to a
 //  block of code
 //-------------------------------------------------

@@ -149,13 +149,13 @@ void ram_device::device_validity_check(validity_checker &valid) const
 	if (!is_valid)
 	{
 		std::ostringstream output;
-		stream_format(output, "Cannot recognize the RAM option %s", ramsize_string);
-		stream_format(output, " (valid options are %s", m_default_size);
+		util::stream_format(output, "Cannot recognize the RAM option %s", ramsize_string);
+		util::stream_format(output, " (valid options are %s", m_default_size);
 
 		if (m_extra_options != nullptr)
-			stream_format(output, ",%s).\n", m_extra_options);
+			util::stream_format(output, ",%s).\n", m_extra_options);
 		else
-			stream_format(output, ").\n");
+			util::stream_format(output, ").\n");
 
 		osd_printf_error("%s", output.str().c_str());
 

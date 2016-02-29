@@ -168,13 +168,13 @@ std::string sound_stream::input_name(int inputnum) const
 
 	// start with our device name and tag
 	assert(inputnum >= 0 && inputnum < m_input.size());
-	stream_format(str, "%s '%s': ", m_device.name(), m_device.tag());
+	util::stream_format(str, "%s '%s': ", m_device.name(), m_device.tag());
 
 	// if we have a source, indicate where the sound comes from by device name and tag
 	if (m_input[inputnum].m_source != nullptr && m_input[inputnum].m_source->m_stream != nullptr)
 	{
 		device_t &source = m_input[inputnum].m_source->m_stream->device();
-		stream_format(str, "%s '%s'", source.name(), source.tag());
+		util::stream_format(str, "%s '%s'", source.name(), source.tag());
 
 		// get the sound interface; if there is more than 1 output we need to figure out which one
 		device_sound_interface *sound;
@@ -187,7 +187,7 @@ std::string sound_stream::input_name(int inputnum) const
 			for (int outputnum = 0; (outstream = sound->output_to_stream_output(outputnum, streamoutputnum)) != nullptr; outputnum++)
 				if (outstream == m_input[inputnum].m_source->m_stream && m_input[inputnum].m_source == &outstream->m_output[streamoutputnum])
 				{
-					stream_format(str, " Ch.%d", outputnum);
+					util::stream_format(str, " Ch.%d", outputnum);
 					break;
 				}
 		}

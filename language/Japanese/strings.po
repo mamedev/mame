@@ -149,7 +149,7 @@ msgstr ""
 #: src/emu/ui/custmenu.cpp:183 src/emu/ui/custmenu.cpp:468
 #: src/emu/ui/optsmenu.cpp:247
 msgid "^!Year"
-msgstr ""
+msgstr "^!年度"
 
 #: src/emu/ui/custmenu.cpp:192 src/emu/ui/custmenu.cpp:504
 msgid "Remove last filter"
@@ -165,23 +165,20 @@ msgid "Select custom filters:"
 msgstr "カスタムフィルタ選択:"
 
 #: src/emu/ui/custmenu.cpp:459
-#, fuzzy
 msgid "^!Publisher"
-msgstr "発売元：%1$s〜"
+msgstr "^!発売元"
 
 #: src/emu/ui/custmenu.cpp:477
-#, fuzzy
 msgid "^!Software List"
-msgstr "ソフトウェアのヒストリ"
+msgstr "^!ソフトウェアリスト"
 
 #: src/emu/ui/custmenu.cpp:486
-#, fuzzy
 msgid "^!Device type"
-msgstr "デバイスタイプ：%1$s〜"
+msgstr "^!デバイスタイプ"
 
 #: src/emu/ui/custmenu.cpp:495
 msgid "^!Region"
-msgstr ""
+msgstr "^!リージョン"
 
 #: src/emu/ui/custui.cpp:20
 msgid "Show All"
@@ -220,9 +217,8 @@ msgid "Custom UI Settings"
 msgstr "カスタムUI設定"
 
 #: src/emu/ui/custui.cpp:268
-#, fuzzy
 msgid "default"
-msgstr "（デフォルト）"
+msgstr "デフォルト"
 
 #: src/emu/ui/custui.cpp:371
 msgid "UI Font"
@@ -355,23 +351,22 @@ msgstr "マウスオーバー"
 
 #: src/emu/ui/custui.cpp:860 src/emu/ui/custui.cpp:863
 msgid "Alpha"
-msgstr ""
+msgstr "アルファ"
 
 #: src/emu/ui/custui.cpp:868 src/emu/ui/custui.cpp:871
 #: src/emu/ui/custui.cpp:1030
 msgid "Red"
-msgstr ""
+msgstr "赤"
 
 #: src/emu/ui/custui.cpp:876 src/emu/ui/custui.cpp:879
 #: src/emu/ui/custui.cpp:1033
-#, fuzzy
 msgid "Green"
-msgstr "画面"
+msgstr "緑"
 
 #: src/emu/ui/custui.cpp:884 src/emu/ui/custui.cpp:887
 #: src/emu/ui/custui.cpp:1034
 msgid "Blue"
-msgstr ""
+msgstr "青"
 
 #: src/emu/ui/custui.cpp:890
 msgid "Choose from palette"
@@ -387,32 +382,31 @@ msgstr "色のプレビュー ="
 
 #: src/emu/ui/custui.cpp:1026
 msgid "White"
-msgstr ""
+msgstr "白"
 
 #: src/emu/ui/custui.cpp:1027
 msgid "Silver"
-msgstr ""
+msgstr "銀色"
 
 #: src/emu/ui/custui.cpp:1028
 msgid "Gray"
-msgstr ""
+msgstr "灰色"
 
 #: src/emu/ui/custui.cpp:1029
 msgid "Black"
-msgstr ""
+msgstr "黒"
 
 #: src/emu/ui/custui.cpp:1031
-#, fuzzy
 msgid "Orange"
-msgstr "変更)"
+msgstr "オレンジ"
 
 #: src/emu/ui/custui.cpp:1032
 msgid "Yellow"
-msgstr ""
+msgstr "黄"
 
 #: src/emu/ui/custui.cpp:1035
 msgid "Violet"
-msgstr ""
+msgstr "紫"
 
 #: src/emu/ui/datmenu.cpp:59
 msgid "Software History"
@@ -606,9 +600,8 @@ msgid " Folder"
 msgstr " 削除する"
 
 #: src/emu/ui/dsplmenu.cpp:38
-#, fuzzy
 msgid "Video Mode"
-msgstr "表示設定"
+msgstr ""
 
 #: src/emu/ui/dsplmenu.cpp:40
 msgid "Hardware Stretch"
@@ -620,16 +613,15 @@ msgstr ""
 
 #: src/emu/ui/dsplmenu.cpp:42
 msgid "HLSL"
-msgstr ""
+msgstr "HLSL"
 
 #: src/emu/ui/dsplmenu.cpp:44
 msgid "GLSL"
-msgstr ""
+msgstr "GLSL"
 
 #: src/emu/ui/dsplmenu.cpp:45
-#, fuzzy
 msgid "Bilinear Filtering"
-msgstr "フィルタを非表示にする"
+msgstr "バイリニアフィルタリング"
 
 #: src/emu/ui/dsplmenu.cpp:46
 msgid "Bitmap Prescaling"
@@ -689,9 +681,8 @@ msgid "New Image Name:"
 msgstr ""
 
 #: src/emu/ui/filesel.cpp:277
-#, fuzzy
 msgid "Image Format:"
-msgstr "イメージ情報"
+msgstr ""
 
 #: src/emu/ui/filesel.cpp:283
 msgid "Create"
@@ -710,23 +701,20 @@ msgid "[create]"
 msgstr ""
 
 #: src/emu/ui/filesel.cpp:510 src/emu/ui/swlist.cpp:76
-#, fuzzy
 msgid "[software list]"
-msgstr "ソフトウェアのヒストリ"
+msgstr "【ソフトウェアリスト】"
 
 #: src/emu/ui/filesel.cpp:802
-#, fuzzy
 msgid "Select image format"
-msgstr "イメージ情報"
+msgstr ""
 
 #: src/emu/ui/filesel.cpp:862
-#, fuzzy
 msgid "Select access mode"
-msgstr "選択済の項目"
+msgstr ""
 
 #: src/emu/ui/filesel.cpp:863
 msgid "Read-only"
-msgstr ""
+msgstr "読み取り専用"
 
 #: src/emu/ui/filesel.cpp:865
 msgid "Read-write"
@@ -772,12 +760,11 @@ msgstr ""
 
 #: src/emu/ui/inputmap.cpp:52
 msgid "User Interface"
-msgstr ""
+msgstr "ユーザーインターフェイス"
 
 #: src/emu/ui/inputmap.cpp:59
-#, fuzzy
 msgid "Other Controls"
-msgstr "スライダ設定"
+msgstr ""
 
 #: src/emu/ui/inputmap.cpp:625 src/emu/ui/miscmenu.cpp:90
 #: src/emu/ui/slotopt.cpp:172
@@ -877,24 +864,20 @@ msgid "Select New Machine"
 msgstr "新しいマシンを選択"
 
 #: src/emu/ui/menu.cpp:45
-#, fuzzy
 msgid "Control Panels"
 msgstr "操作パネル画像"
 
 #: src/emu/ui/menu.cpp:50
-#, fuzzy
 msgid "Artwork Preview"
 msgstr "アートワークのプレビュー"
 
 #: src/emu/ui/menu.cpp:54
-#, fuzzy
 msgid "Game Over"
 msgstr "ゲームオーバー"
 
 #: src/emu/ui/menu.cpp:63
-#, fuzzy
 msgid "Add or remove favorites"
-msgstr "お気に入りに追加"
+msgstr ""
 
 #: src/emu/ui/menu.cpp:64
 msgid "Export displayed list to file"
@@ -914,7 +897,7 @@ msgstr "終了"
 
 #: src/emu/ui/menu.cpp:263 src/emu/ui/menu.cpp:265
 msgid "Return to Previous Menu"
-msgstr ""
+msgstr "前のメニューに戻る"
 
 #: src/emu/ui/menu.cpp:680
 msgid "Auto"
@@ -1063,16 +1046,15 @@ msgstr "フィルタ"
 
 #: src/emu/ui/optsmenu.cpp:226
 msgid " ^!File"
-msgstr ""
+msgstr "^!ファイル"
 
 #: src/emu/ui/optsmenu.cpp:231
 msgid " ^!Category"
 msgstr ""
 
 #: src/emu/ui/optsmenu.cpp:254
-#, fuzzy
 msgid "^!Setup custom filter"
-msgstr "カスタムフィルタ選択:"
+msgstr ""
 
 #: src/emu/ui/optsmenu.cpp:262
 msgid "Customize UI"
@@ -1447,7 +1429,7 @@ msgstr ""
 #: src/emu/ui/selsoft.cpp:684
 #, c-format
 msgid "Driver: \"%1$s\" software list "
-msgstr "ドライバ：「%1$s」ソフトウェアリスト"
+msgstr "ドライバ：「%1$s」　ソフトウェアリスト"
 
 #: src/emu/ui/selsoft.cpp:687
 #, c-format
@@ -1483,7 +1465,7 @@ msgstr "%1$s検索：%2$s_"
 #: src/emu/ui/simpleselgame.cpp:322
 #, c-format
 msgid "%1$-.100s"
-msgstr ""
+msgstr "%1$-.100s"
 
 #: src/emu/ui/selsoft.cpp:1977 src/emu/ui/selsoft.cpp:1997
 msgid "Software part selection:"
@@ -1550,9 +1532,8 @@ msgid "Use External Samples"
 msgstr "外部サンプル使用"
 
 #: src/emu/ui/swlist.cpp:70
-#, fuzzy
 msgid "[file manager]"
-msgstr "ファイルマネージャ"
+msgstr "【ファイルマネージャ】"
 
 #: src/emu/ui/swlist.cpp:235
 msgid "Switch Item Ordering"
@@ -1576,33 +1557,32 @@ msgid "[compatible lists]"
 msgstr ""
 
 #: src/emu/ui/tapectrl.cpp:84
-#, fuzzy
 msgid "stopped"
-msgstr "切り落とし"
+msgstr "停止"
 
 #: src/emu/ui/tapectrl.cpp:86
 msgid "playing"
-msgstr ""
+msgstr "再生中"
 
 #: src/emu/ui/tapectrl.cpp:86
 msgid "(playing)"
-msgstr ""
+msgstr "（再生中）"
 
 #: src/emu/ui/tapectrl.cpp:87
 msgid "recording"
-msgstr ""
+msgstr "録音中"
 
 #: src/emu/ui/tapectrl.cpp:87
 msgid "(recording)"
-msgstr ""
+msgstr "（録音中）"
 
 #: src/emu/ui/tapectrl.cpp:94
 msgid "Pause/Stop"
-msgstr ""
+msgstr "一時停止／停止"
 
 #: src/emu/ui/tapectrl.cpp:97
 msgid "Play"
-msgstr ""
+msgstr "再生"
 
 #: src/emu/ui/tapectrl.cpp:100
 msgid "Record"
@@ -1610,11 +1590,11 @@ msgstr ""
 
 #: src/emu/ui/tapectrl.cpp:103
 msgid "Rewind"
-msgstr ""
+msgstr "巻き戻す"
 
 #: src/emu/ui/tapectrl.cpp:106
 msgid "Fast Forward"
-msgstr ""
+msgstr "早送り"
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
@@ -1769,6 +1749,11 @@ msgid ""
 "\n"
 "CPU:\n"
 msgstr ""
+"%1$s\n"
+"%2$s　%3$s\n"
+"ドライバ:%4$s\n"
+"\n"
+"CPU:\n"
 
 #: src/emu/ui/ui.cpp:1228 src/emu/ui/ui.cpp:1267
 msgid "MHz"
@@ -1900,17 +1885,17 @@ msgstr ""
 #: src/emu/ui/ui.cpp:2025
 #, c-format
 msgid "%1$s Brightness"
-msgstr ""
+msgstr "%1$sの輝度"
 
 #: src/emu/ui/ui.cpp:2028
 #, c-format
 msgid "%1$s Contrast"
-msgstr ""
+msgstr "%1$sのコントラスト"
 
 #: src/emu/ui/ui.cpp:2031
 #, c-format
 msgid "%1$s Gamma"
-msgstr ""
+msgstr "%1$sのガンマ"
 
 #: src/emu/ui/ui.cpp:2036
 #, c-format
@@ -2012,13 +1997,13 @@ msgstr ""
 #: src/emu/ui/ui.cpp:2424 src/emu/ui/ui.cpp:2446
 #, c-format
 msgid "%1$.3f"
-msgstr ""
+msgstr "%1$.3f"
 
 #: src/emu/ui/ui.cpp:2462 src/emu/ui/ui.cpp:2478 src/emu/ui/ui.cpp:2494
 #: src/emu/ui/ui.cpp:2510
 #, c-format
 msgid "%1$1.2f"
-msgstr ""
+msgstr "%1$1.2f"
 
 #: src/emu/ui/ui.cpp:2526
 #, fuzzy, c-format

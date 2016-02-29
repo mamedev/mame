@@ -437,17 +437,17 @@ void favorite_manager::save_favorite_games()
 			text << elem.parentname << '\n';
 			text << elem.year << '\n';
 			text << elem.publisher << '\n';
-			stream_format(text, "%d\n", elem.supported);
+			util::stream_format(text, "%d\n", elem.supported);
 			text << elem.part << '\n';
-			stream_format(text, "%s\n", elem.driver->name);
+			util::stream_format(text, "%s\n", elem.driver->name);
 			text << elem.listname << '\n';
 			text << elem.interface << '\n';
 			text << elem.instance << '\n';
-			stream_format(text, "%d\n", elem.startempty);
+			util::stream_format(text, "%d\n", elem.startempty);
 			text << elem.parentlongname << '\n';
 			text << elem.usage << '\n';
 			text << elem.devicetype << '\n';
-			stream_format(text, "%d\n", elem.available);
+			util::stream_format(text, "%d\n", elem.available);
 		}
 		file.puts(text.str().c_str());
 		file.close();

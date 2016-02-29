@@ -247,7 +247,7 @@ int get_font_rows(running_machine *machine = nullptr);
 //-------------------------------------------------
 
 template <typename Format, typename... Params>
-void ui_manager::popup_time(int seconds, Format &&fmt, Params &&... args)
+inline void ui_manager::popup_time(int seconds, Format &&fmt, Params &&... args)
 {
 	// extract the text
 	messagebox_poptext = string_format(std::forward<Format>(fmt), std::forward<Params>(args)...);
