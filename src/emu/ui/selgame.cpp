@@ -1768,17 +1768,16 @@ float ui_menu_select_game::draw_left_panel(float x1, float y1, float x2, float y
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
 				fgcolor = UI_MOUSEOVER_COLOR;
 				hover = phover + filter;
+				ui_menu::highlight(container, x1, y1, x2, y1+ line_height_max, bgcolor);
 			}
 
 			if (highlight == filter && m_focus == focused_menu::left)
 			{
 				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
-			}
-
-			if (bgcolor != UI_TEXT_BG_COLOR)
 				mui.draw_textured_box(container, x1, y1, x2, y1 + line_height_max, bgcolor, rgb_t(255, 43, 43, 43),
 					hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+			}
 
 			float x1t = x1 + text_sign;
 			if (afilter == FILTER_CUSTOM)

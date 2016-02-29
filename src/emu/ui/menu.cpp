@@ -1587,18 +1587,16 @@ void ui_menu::draw_select_game(bool noinput)
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+			mui.draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(255, 43, 43, 43),
+				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		}
 		// else if the mouse is over this item, draw with a different background
 		else if (count == hover)
 		{
 			fgcolor = UI_MOUSEOVER_COLOR;
 			bgcolor = UI_MOUSEOVER_BG_COLOR;
+			highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
 		}
-
-		// if we have some background hilighting to do, add a quad behind everything else
-		if (bgcolor != UI_TEXT_BG_COLOR)
-			mui.draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(255, 43, 43, 43),
-				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
 			container->add_line(visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
