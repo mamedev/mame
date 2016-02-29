@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-28 22:51+0100\n"
-"PO-Revision-Date: 2016-02-28 23:20+0800\n"
+"PO-Revision-Date: 2016-02-29 09:45+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -142,14 +142,13 @@ msgid "Other filter"
 msgstr "其他篩選"
 
 #: src/emu/ui/custmenu.cpp:174 src/emu/ui/optsmenu.cpp:239
-#, fuzzy
 msgid "^!Manufacturer"
-msgstr "製造商： %1$-.100s\n"
+msgstr "^!製造商"
 
 #: src/emu/ui/custmenu.cpp:183 src/emu/ui/custmenu.cpp:468
 #: src/emu/ui/optsmenu.cpp:247
 msgid "^!Year"
-msgstr ""
+msgstr "^!年代"
 
 #: src/emu/ui/custmenu.cpp:192 src/emu/ui/custmenu.cpp:504
 msgid "Remove last filter"
@@ -165,23 +164,20 @@ msgid "Select custom filters:"
 msgstr "選擇自訂篩選："
 
 #: src/emu/ui/custmenu.cpp:459
-#, fuzzy
 msgid "^!Publisher"
-msgstr "出版商： %1$s -"
+msgstr "^!出版商"
 
 #: src/emu/ui/custmenu.cpp:477
-#, fuzzy
 msgid "^!Software List"
-msgstr "軟體歷史"
+msgstr "^!軟體清單"
 
 #: src/emu/ui/custmenu.cpp:486
-#, fuzzy
 msgid "^!Device type"
-msgstr "裝置類別： %1$s -"
+msgstr "^!裝置類別"
 
 #: src/emu/ui/custmenu.cpp:495
 msgid "^!Region"
-msgstr ""
+msgstr "^!區域"
 
 #: src/emu/ui/custui.cpp:20
 msgid "Show All"
@@ -220,9 +216,8 @@ msgid "Custom UI Settings"
 msgstr "連射設定"
 
 #: src/emu/ui/custui.cpp:268
-#, fuzzy
 msgid "default"
-msgstr " （預設）"
+msgstr "預設"
 
 #: src/emu/ui/custui.cpp:371
 msgid "UI Font"
@@ -354,23 +349,22 @@ msgstr "滑鼠經過"
 
 #: src/emu/ui/custui.cpp:860 src/emu/ui/custui.cpp:863
 msgid "Alpha"
-msgstr ""
+msgstr "透明度"
 
 #: src/emu/ui/custui.cpp:868 src/emu/ui/custui.cpp:871
 #: src/emu/ui/custui.cpp:1030
 msgid "Red"
-msgstr ""
+msgstr "紅"
 
 #: src/emu/ui/custui.cpp:876 src/emu/ui/custui.cpp:879
 #: src/emu/ui/custui.cpp:1033
-#, fuzzy
 msgid "Green"
-msgstr "畫面"
+msgstr "綠"
 
 #: src/emu/ui/custui.cpp:884 src/emu/ui/custui.cpp:887
 #: src/emu/ui/custui.cpp:1034
 msgid "Blue"
-msgstr ""
+msgstr "藍"
 
 #: src/emu/ui/custui.cpp:890
 msgid "Choose from palette"
@@ -386,32 +380,31 @@ msgstr "顏色預覽＝"
 
 #: src/emu/ui/custui.cpp:1026
 msgid "White"
-msgstr ""
+msgstr "白"
 
 #: src/emu/ui/custui.cpp:1027
 msgid "Silver"
-msgstr ""
+msgstr "銀"
 
 #: src/emu/ui/custui.cpp:1028
 msgid "Gray"
-msgstr ""
+msgstr "灰"
 
 #: src/emu/ui/custui.cpp:1029
 msgid "Black"
-msgstr ""
+msgstr "黑"
 
 #: src/emu/ui/custui.cpp:1031
-#, fuzzy
 msgid "Orange"
-msgstr "變更）"
+msgstr "橘"
 
 #: src/emu/ui/custui.cpp:1032
 msgid "Yellow"
-msgstr ""
+msgstr "黃"
 
 #: src/emu/ui/custui.cpp:1035
 msgid "Violet"
-msgstr ""
+msgstr "紫"
 
 #: src/emu/ui/datmenu.cpp:59
 msgid "Software History"
@@ -605,59 +598,56 @@ msgid " Folder"
 msgstr " 資料夾"
 
 #: src/emu/ui/dsplmenu.cpp:38
-#, fuzzy
 msgid "Video Mode"
-msgstr "視訊選項"
+msgstr "視訊模式"
 
 #: src/emu/ui/dsplmenu.cpp:40
 msgid "Hardware Stretch"
-msgstr ""
+msgstr "硬體延展"
 
 #: src/emu/ui/dsplmenu.cpp:41
 msgid "Triple Buffering"
-msgstr ""
+msgstr "三重緩衝"
 
 #: src/emu/ui/dsplmenu.cpp:42
 msgid "HLSL"
-msgstr ""
+msgstr "HLSL"
 
 #: src/emu/ui/dsplmenu.cpp:44
 msgid "GLSL"
-msgstr ""
+msgstr "GLSL"
 
 #: src/emu/ui/dsplmenu.cpp:45
-#, fuzzy
 msgid "Bilinear Filtering"
-msgstr "隱藏篩選"
+msgstr "雙線過濾"
 
 #: src/emu/ui/dsplmenu.cpp:46
 msgid "Bitmap Prescaling"
-msgstr ""
+msgstr "點陣預縮放"
 
 #: src/emu/ui/dsplmenu.cpp:47
 msgid "Multi-Threaded Rendering"
-msgstr ""
+msgstr "多線程描繪"
 
 #: src/emu/ui/dsplmenu.cpp:48
 msgid "Window Mode"
-msgstr ""
+msgstr "視窗模式"
 
 #: src/emu/ui/dsplmenu.cpp:49
 msgid "Enforce Aspect Ratio"
-msgstr ""
+msgstr "強制長寬比例"
 
 #: src/emu/ui/dsplmenu.cpp:50
 msgid "Start Out Maximized"
-msgstr ""
+msgstr "啟動時最大化"
 
 #: src/emu/ui/dsplmenu.cpp:51
 msgid "Synchronized Refresh"
-msgstr ""
+msgstr "同步更新"
 
 #: src/emu/ui/dsplmenu.cpp:52
-#, fuzzy
 msgid "Wait Vertical Sync"
-msgstr "垂直"
+msgstr "等待垂直同步"
 
 #: src/emu/ui/dsplmenu.cpp:204 src/emu/ui/dsplmenu.cpp:224
 #: src/emu/ui/optsmenu.cpp:265
@@ -666,7 +656,7 @@ msgstr "視訊選項"
 
 #: src/emu/ui/filesel.cpp:159
 msgid "File Already Exists - Override?"
-msgstr ""
+msgstr "檔案已存在 — 是否覆蓋？"
 
 #: src/emu/ui/filesel.cpp:161 src/emu/ui/selgame.cpp:1505
 #: src/emu/ui/selgame.cpp:1506 src/emu/ui/selgame.cpp:1507
@@ -686,86 +676,78 @@ msgstr "是"
 
 #: src/emu/ui/filesel.cpp:271
 msgid "New Image Name:"
-msgstr ""
+msgstr "新映象檔名稱："
 
 #: src/emu/ui/filesel.cpp:277
-#, fuzzy
 msgid "Image Format:"
-msgstr "映像檔資訊"
+msgstr "映像檔格式"
 
 #: src/emu/ui/filesel.cpp:283
 msgid "Create"
-msgstr ""
+msgstr "建立"
 
 #: src/emu/ui/filesel.cpp:314
 msgid "Please enter a file extension too"
-msgstr ""
+msgstr "請一併輸入副檔名"
 
 #: src/emu/ui/filesel.cpp:502 src/emu/ui/swlist.cpp:65
 msgid "[empty slot]"
-msgstr ""
+msgstr "[ 空插槽 ]"
 
 #: src/emu/ui/filesel.cpp:506
 msgid "[create]"
-msgstr ""
+msgstr "[ 建立 ]"
 
 #: src/emu/ui/filesel.cpp:510 src/emu/ui/swlist.cpp:76
-#, fuzzy
 msgid "[software list]"
-msgstr "軟體歷史"
+msgstr "[ 軟體清單 ]"
 
 #: src/emu/ui/filesel.cpp:802
-#, fuzzy
 msgid "Select image format"
-msgstr "映像檔資訊"
+msgstr "選擇映像檔格式"
 
 #: src/emu/ui/filesel.cpp:862
-#, fuzzy
 msgid "Select access mode"
-msgstr "已選擇"
+msgstr "選擇存取模式"
 
 #: src/emu/ui/filesel.cpp:863
 msgid "Read-only"
-msgstr ""
+msgstr "唯讀"
 
 #: src/emu/ui/filesel.cpp:865
 msgid "Read-write"
-msgstr ""
+msgstr "讀寫"
 
 #: src/emu/ui/filesel.cpp:866
 msgid "Read this image, write to another image"
-msgstr ""
+msgstr "讀取此映像檔，寫入至其他映像檔"
 
 #: src/emu/ui/filesel.cpp:867
 msgid "Read this image, write to diff"
-msgstr ""
+msgstr "讀取此映像檔，寫入差異檔"
 
 #: src/emu/ui/imgcntrl.cpp:115
 msgid "Cannot save over directory"
-msgstr ""
+msgstr "無法跨目錄儲存"
 
 #: src/emu/ui/imgcntrl.cpp:149
-#, fuzzy
 msgid ""
 "The software selected is missing one or more required ROM or CHD images. "
 "Please select a different one."
 msgstr ""
-"選定的機台缺少一個至多個必要的 ROM 或 CHD 映像檔，請選擇其他機台。\n"
-"\n"
-"按任意鍵 （除 ESC 鍵） 繼續。"
+"選定的軟體缺少一個至多個必要的 ROM 或 CHD 映像檔，請選擇其他軟體。"
 
 #: src/emu/ui/info.cpp:98
-#, fuzzy
 msgid "Not supported"
-msgstr "已支援： 否"
+msgstr "不支援"
 
 #: src/emu/ui/info.cpp:101
 msgid "Partially supported"
-msgstr ""
+msgstr "部分支援"
 
 #: src/emu/ui/info.cpp:109
 msgid "[empty]"
-msgstr ""
+msgstr "[ 空 ]"
 
 #: src/emu/ui/info_pty.cpp:26 src/emu/ui/mainmenu.cpp:90
 msgid "Pseudo terminals"
@@ -773,16 +755,15 @@ msgstr "偽終端"
 
 #: src/emu/ui/info_pty.cpp:35
 msgid "[failed]"
-msgstr ""
+msgstr "[ 錯誤 ]"
 
 #: src/emu/ui/inputmap.cpp:52
 msgid "User Interface"
-msgstr ""
+msgstr "使用者介面"
 
 #: src/emu/ui/inputmap.cpp:59
-#, fuzzy
 msgid "Other Controls"
-msgstr "參數調整"
+msgstr "其他控制"
 
 #: src/emu/ui/inputmap.cpp:625 src/emu/ui/miscmenu.cpp:90
 #: src/emu/ui/slotopt.cpp:172
@@ -882,32 +863,28 @@ msgid "Select New Machine"
 msgstr "選擇新機台"
 
 #: src/emu/ui/menu.cpp:45
-#, fuzzy
 msgid "Control Panels"
 msgstr "操作檯"
 
 #: src/emu/ui/menu.cpp:50
-#, fuzzy
 msgid "Artwork Preview"
 msgstr "裝飾圖預覽"
 
 #: src/emu/ui/menu.cpp:54
-#, fuzzy
 msgid "Game Over"
 msgstr "遊戲結束"
 
 #: src/emu/ui/menu.cpp:63
-#, fuzzy
 msgid "Add or remove favorites"
-msgstr "新增至最愛"
+msgstr "新增或移除最愛"
 
 #: src/emu/ui/menu.cpp:64
 msgid "Export displayed list to file"
-msgstr ""
+msgstr "匯出顯示的清單至檔案"
 
 #: src/emu/ui/menu.cpp:65
 msgid "Show DATs view"
-msgstr ""
+msgstr "顯示文件檢視"
 
 #: src/emu/ui/menu.cpp:252
 msgid "Return to Machine"
@@ -923,15 +900,15 @@ msgstr "回上一層選單"
 
 #: src/emu/ui/menu.cpp:680
 msgid "Auto"
-msgstr ""
+msgstr "自動"
 
 #: src/emu/ui/menu.cpp:2075
 msgid "Images"
-msgstr ""
+msgstr "映像檔"
 
 #: src/emu/ui/menu.cpp:2076
 msgid "Infos"
-msgstr ""
+msgstr "資訊"
 
 #: src/emu/ui/miscmenu.cpp:36
 msgid "Keyboard Mode:"
@@ -1070,16 +1047,15 @@ msgstr "篩選"
 
 #: src/emu/ui/optsmenu.cpp:226
 msgid " ^!File"
-msgstr ""
+msgstr " ^!檔案"
 
 #: src/emu/ui/optsmenu.cpp:231
 msgid " ^!Category"
-msgstr ""
+msgstr " ^!類別"
 
 #: src/emu/ui/optsmenu.cpp:254
-#, fuzzy
 msgid "^!Setup custom filter"
-msgstr "選擇自訂篩選："
+msgstr "^!設定自訂篩選"
 
 #: src/emu/ui/optsmenu.cpp:262
 msgid "Customize UI"
@@ -1445,14 +1421,13 @@ msgid " (default)"
 msgstr " （預設）"
 
 #: src/emu/ui/selsoft.cpp:380
-#, fuzzy
 msgid ""
 "The selected software is missing one or more required files. Please select a "
 "different software.\n"
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
-"選定的機台缺少一個至多個必要的 ROM 或 CHD 映像檔，請選擇其他機台。\n"
+"選定的軟體缺少一個至多個必要的 ROM 或 CHD 映像檔，請選擇其他軟體。\n"
 "\n"
 "按任意鍵 （除 ESC 鍵） 繼續。"
 
@@ -1479,7 +1454,7 @@ msgstr "出版商： %1$s -"
 #: src/emu/ui/selsoft.cpp:691
 #, c-format
 msgid "Year: %1$s -"
-msgstr "年份： %1$s -"
+msgstr "年代： %1$s -"
 
 #: src/emu/ui/selsoft.cpp:693
 #, c-format
@@ -1520,8 +1495,8 @@ msgid ""
 msgstr ""
 "找不到機台，請檢查 %1$s.ini 的 ROM 目錄設定\n"
 "\n"
-"如果這是您首次使用 %2$s，請參閱 docs 目錄中的 config.txt 以取得設定 %2$s 的相"
-"關資訊。"
+"如果這是您首次使用 %2$s，請參閱 docs 目錄中的 config.txt 以取得設定 %2$s 的"
+"相關資訊。"
 
 #: src/emu/ui/simpleselgame.cpp:287
 #, c-format
@@ -1571,71 +1546,69 @@ msgid "Use External Samples"
 msgstr "使用外部樣本檔"
 
 #: src/emu/ui/swlist.cpp:70
-#, fuzzy
 msgid "[file manager]"
-msgstr "檔案管理員"
+msgstr "[ 檔案管理員 ]"
 
 #: src/emu/ui/swlist.cpp:235
 msgid "Switch Item Ordering"
-msgstr ""
+msgstr "切換項目順序"
 
 #: src/emu/ui/swlist.cpp:268
 #, c-format
 msgid "Switched Order: entries now ordered by %s"
-msgstr ""
+msgstr "切換順序：目前項目依照 %s 排序"
 
 #: src/emu/ui/swlist.cpp:268
 msgid "shortname"
-msgstr ""
+msgstr "短檔名"
 
 #: src/emu/ui/swlist.cpp:268
 msgid "description"
-msgstr ""
+msgstr "描述"
 
 #: src/emu/ui/swlist.cpp:436
 msgid "[compatible lists]"
-msgstr ""
+msgstr "[ 完整清單 ]"
 
 #: src/emu/ui/tapectrl.cpp:84
-#, fuzzy
 msgid "stopped"
-msgstr "裁切"
+msgstr "已停止"
 
 #: src/emu/ui/tapectrl.cpp:86
 msgid "playing"
-msgstr ""
+msgstr "正在執行"
 
 #: src/emu/ui/tapectrl.cpp:86
 msgid "(playing)"
-msgstr ""
+msgstr "（正在執行）"
 
 #: src/emu/ui/tapectrl.cpp:87
 msgid "recording"
-msgstr ""
+msgstr "正在記錄"
 
 #: src/emu/ui/tapectrl.cpp:87
 msgid "(recording)"
-msgstr ""
+msgstr "（正在記錄）"
 
 #: src/emu/ui/tapectrl.cpp:94
 msgid "Pause/Stop"
-msgstr ""
+msgstr "暫停／停止"
 
 #: src/emu/ui/tapectrl.cpp:97
 msgid "Play"
-msgstr ""
+msgstr "執行"
 
 #: src/emu/ui/tapectrl.cpp:100
 msgid "Record"
-msgstr ""
+msgstr "記錄"
 
 #: src/emu/ui/tapectrl.cpp:103
 msgid "Rewind"
-msgstr ""
+msgstr "倒帶"
 
 #: src/emu/ui/tapectrl.cpp:106
 msgid "Fast Forward"
-msgstr ""
+msgstr "快進"
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
@@ -1887,8 +1860,8 @@ msgid ""
 msgstr ""
 "確定要退出嗎？\n"
 "\n"
-"按『%1%s』退出，\n"
-"按『%2%s』繼續模擬。"
+"按『%1$s』退出，\n"
+"按『%2$s』繼續模擬。"
 
 #: src/emu/ui/ui.cpp:1967
 msgid "Master Volume"
