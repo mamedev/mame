@@ -1208,7 +1208,7 @@ msgid ""
 "\n"
 "If this is your first time using %2$s, please see the config.txt file in the "
 "docs directory for information on configuring %2$s."
-msgstr "Keine Maschinen gefunden. Bitte überprüfen Sie den in der ini-Datei %1$s.ini angegebenen Pfad zu den ROM-Dateien. \n\n Wenn Sie %2$s zum ersten Mal verwenden, konsultieren Sie bitte die Datei config.txt im Verzeichnis "docs" zur Konfiguration von %2$s."
+msgstr "Keine Maschinen gefunden. Bitte überprüfen Sie den in der ini-Datei %1$s.ini angegebenen Pfad zu den ROM-Dateien. \n\n Wenn Sie %2$s zum ersten Mal verwenden, lesen Sie bitte die Datei config.txt im Verzeichnis "docs" zur Konfiguration von %2$s."
 
 #: src/emu/ui/simpleselgame.cpp:287
 #, c-format
