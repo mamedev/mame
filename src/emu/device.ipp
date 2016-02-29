@@ -34,7 +34,7 @@ template <typename Format, typename... Params>
 inline void device_t::logerror(Format &&fmt, Params &&... args) const
 {
 	if (m_machine)
-		m_machine->logerror(string_format("[%s] %s", std::forward<Format>(fmt)), std::forward<Params>(args)...);
+		m_machine->logerror(string_format("[%s] %s", tag(), std::forward<Format>(fmt)), std::forward<Params>(args)...);
 }
 
 #endif // __DEVICE_IPP__
