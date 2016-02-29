@@ -107,10 +107,10 @@ int cli_frontend::execute(int argc, char **argv)
 		m_options.parse_command_line(argc, argv, option_errors);
 
 		m_options.parse_standard_inis(option_errors);
-		
+
 		//load_translation();
 		load_translation(m_options);
-		
+
 		manager->start_luaengine();
 
 		if (*(m_options.software_name()) != 0)
@@ -152,8 +152,7 @@ int cli_frontend::execute(int argc, char **argv)
 											// mount only if not already mounted
 											if (*option == 0)
 											{
-												std::string val;
-												strprintf(val, "%s:%s:%s", swlistdev->list_name(), m_options.software_name(), swpart->name());
+												std::string val = string_format("%s:%s:%s", swlistdev->list_name(), m_options.software_name(), swpart->name());
 
 												// call this in order to set slot devices according to mounting
 												m_options.parse_slot_devices(argc, argv, option_errors, image->instance_name(), val.c_str(), swpart);
@@ -718,8 +717,7 @@ void cli_frontend::listmedia(const char *gamename)
 		for (const device_image_interface *imagedev = iter.first(); imagedev != nullptr; imagedev = iter.next())
 		{
 			// extract the shortname with parentheses
-			std::string paren_shortname;
-			strprintf(paren_shortname,"(%s)", imagedev->brief_instance_name());
+			std::string paren_shortname = string_format("(%s)", imagedev->brief_instance_name());
 
 			// output the line, up to the list of extensions
 			printf("%-13s%-12s%-8s   ", first ? drivlist.driver().name : "", imagedev->instance_name(), paren_shortname.c_str());

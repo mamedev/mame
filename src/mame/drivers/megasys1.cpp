@@ -134,8 +134,7 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 
 MACHINE_RESET_MEMBER(megasys1_state,megasys1)
 {
-
-	m_ignore_oki_status = 1;    /* ignore oki status due 'protection' */ 
+	m_ignore_oki_status = 1;    /* ignore oki status due 'protection' */
 	m_ip_latched = 0x0006; /* reset protection - some games expect this initial read without sending anything */
 	m_mcu_hs = 0;
 }
@@ -274,8 +273,8 @@ WRITE16_MEMBER(megasys1_state::ip_select_w) // TO MCU
 			case 2 :    m_ip_latched = m_io_p2->read(); break;
 			case 3 :    m_ip_latched = m_io_dsw1->read(); break;
 			case 4 :    m_ip_latched = m_io_dsw2->read(); break;
-			case 5 :	m_ip_latched = 0x0d; break; // startup check?
-			case 6 :	m_ip_latched = 0x06; break; // sent before each other command
+			case 5 :    m_ip_latched = 0x0d; break; // startup check?
+			case 6 :    m_ip_latched = 0x06; break; // sent before each other command
 			default:  return; // get out if it wasn't a valid request
 	}
 

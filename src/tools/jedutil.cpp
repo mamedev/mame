@@ -535,14 +535,14 @@ static pin_fuse_rows peel18cv8pinfuserows[] = {
 	{19, 2304, 0, 252}};
 
 static pin_fuse_rows ampal18p8pinfuserows[] = {
-    {12, 2268, 2304, 2556},
-    {13, 1944, 1980, 2232},
-    {14, 1620, 1656, 1908},
-    {15, 1296, 1332, 1584},
-    {16, 972,  1008, 1260},
-    {17, 648,  684,  936},
-    {18, 324,  360,  612},
-    {19, 0,    36,   288}};
+	{12, 2268, 2304, 2556},
+	{13, 1944, 1980, 2232},
+	{14, 1620, 1656, 1908},
+	{15, 1296, 1332, 1584},
+	{16, 972,  1008, 1260},
+	{17, 648,  684,  936},
+	{18, 324,  360,  612},
+	{19, 0,    36,   288}};
 
 static pin_fuse_rows gal18v10pinfuserows[] = {
 	{9,  3096, 3132, 3384},
@@ -2019,13 +2019,13 @@ static pal_data paldata[] = {
 		config_peel18cv8_pins,
 		nullptr,
 		get_peel18cv8_pin_fuse_state},
-    {"AMPAL18P8", 2600,
-        ampal18p8pinfuserows, ARRAY_LENGTH(ampal18p8pinfuserows),
-        ampal18p8pinfusecolumns, ARRAY_LENGTH(ampal18p8pinfusecolumns),
-        print_ampal18p8_product_terms,
-        config_ampal18p8_pins,
-        nullptr,
-        nullptr},
+	{"AMPAL18P8", 2600,
+		ampal18p8pinfuserows, ARRAY_LENGTH(ampal18p8pinfuserows),
+		ampal18p8pinfusecolumns, ARRAY_LENGTH(ampal18p8pinfusecolumns),
+		print_ampal18p8_product_terms,
+		config_ampal18p8_pins,
+		nullptr,
+		nullptr},
 	{"GAL18V10", 3540,
 		gal18v10pinfuserows, ARRAY_LENGTH(gal18v10pinfuserows),
 		gal18v10pinfusecolumns, ARRAY_LENGTH(gal18v10pinfusecolumns),
@@ -5312,7 +5312,7 @@ static void config_ampal18p8_pins(const pal_data* pal, const jed_data* jed)
 			output_pins[output_pin_count].pin = pal->pinfuserows[index].pin;
 			output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
 
-            if (jed_get_fuse(jed, 2591 + (8 - index)))
+			if (jed_get_fuse(jed, 2591 + (8 - index)))
 			{
 				output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
 			}

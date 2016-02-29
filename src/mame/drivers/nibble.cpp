@@ -11,9 +11,9 @@
 
 
 **************************************************************************
-  
+
   Specs:
-  
+
   1x UM6845 (U67).
   1x AY38910A/p (U75).
 
@@ -148,11 +148,11 @@ void nibble_state::machine_reset()
 *************************/
 
 static ADDRESS_MAP_START( nibble_map, AS_PROGRAM, 8, nibble_state )
-//	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+//  ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(nibble_videoram_w) AM_SHARE("videoram")	// placeholder
-//	AM_RANGE(0xff00, 0xff01) AM_DEVWRITE("crtc", mc6845_device, address_w)
-//	AM_RANGE(0xff02, 0xff03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(nibble_videoram_w) AM_SHARE("videoram")   // placeholder
+//  AM_RANGE(0xff00, 0xff01) AM_DEVWRITE("crtc", mc6845_device, address_w)
+//  AM_RANGE(0xff02, 0xff03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
 
 

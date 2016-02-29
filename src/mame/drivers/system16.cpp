@@ -1349,6 +1349,74 @@ static ADDRESS_MAP_START( astormbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
+READ16_MEMBER(segas1x_bootleg_state::ddcrew_c41006_r)
+{
+	return 0xffff;//rand();
+}
+
+WRITE16_MEMBER(segas1x_bootleg_state::ddcrewbl_spritebank_w)
+{
+//  printf("banking write %08x: %04x (%04x %04x)\n", space.device().safe_pc(), offset*2, data&mem_mask, mem_mask);
+
+	data &= mem_mask;
+//  offset &= 0x7;
+	offset += 4;
+
+	int maxbanks = memregion("sprites")->bytes() / 0x40000;
+	if (data >= maxbanks)
+		data = 255;
+	m_sprites->set_bank((offset) * 2 + 0, data * 2 + 0);
+	m_sprites->set_bank((offset) * 2 + 1, data * 2 + 1);
+}
+
+
+// todo: this
+static ADDRESS_MAP_START(ddcrewbl_map, AS_PROGRAM, 16, segas1x_bootleg_state)
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM // ok
+	AM_RANGE(0x200000, 0x27ffff) AM_ROM // ok
+
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites") // ok
+
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram") // ok
+
+	AM_RANGE(0xC00000, 0xC00001) AM_WRITENOP // vdp leftovers maybe?
+	AM_RANGE(0xC00004, 0xC00005) AM_WRITENOP
+	AM_RANGE(0xC00006, 0xC00007) AM_WRITENOP
+
+
+	AM_RANGE(0xC40000, 0xC40001) AM_READ(ddcrew_c41006_r)
+	AM_RANGE(0xC40002, 0xC40003) AM_READ(ddcrew_c41006_r)
+	AM_RANGE(0xC41000, 0xC41001) AM_READ(ddcrew_c41006_r)
+	AM_RANGE(0xC41002, 0xC41003) AM_READ(ddcrew_c41006_r)
+	AM_RANGE(0xC41004, 0xC41005) AM_READ(ddcrew_c41006_r)
+	AM_RANGE(0xC41006, 0xC41007) AM_READ(ddcrew_c41006_r)
+
+
+
+	AM_RANGE(0xC44000, 0xC44001) AM_WRITENOP
+
+	AM_RANGE(0xc46600, 0xc46601) AM_WRITE(sys18_refreshenable_w)
+
+	AM_RANGE(0xC46038, 0xC4603f) AM_WRITE(ddcrewbl_spritebank_w) // ok
+
+	AM_RANGE(0xC46000, 0xC46001) AM_WRITENOP
+	AM_RANGE(0xC46010, 0xC46011) AM_WRITENOP
+	AM_RANGE(0xC46020, 0xC46021) AM_WRITENOP
+
+	AM_RANGE(0xC46040, 0xC46041) AM_WRITENOP
+	AM_RANGE(0xC46050, 0xC46051) AM_WRITENOP
+
+	AM_RANGE(0xC46060, 0xC46061) AM_WRITENOP
+	AM_RANGE(0xC46062, 0xC46063) AM_WRITENOP
+	AM_RANGE(0xC46064, 0xC46065) AM_WRITENOP
+
+	AM_RANGE(0xC46070, 0xC46071) AM_WRITENOP
+
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM // ok
+ADDRESS_MAP_END
+
 /*************************************
  *
  *  Input ports
@@ -2434,6 +2502,48 @@ static MACHINE_CONFIG_DERIVED( shdancbla, system18 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
+
+MACHINE_RESET_MEMBER(segas1x_bootleg_state,ddcrewbl)
+{
+	// set up the initial banks for this game
+	// because it doesn't appear to actually program banks 0-3.
+	for (int i = 0; i < 4; i++)
+	{
+		m_sprites->set_bank((i)* 2 + 0, i * 2 + 0);
+		m_sprites->set_bank((i)* 2 + 1, i * 2 + 1);
+	}
+}
+
+
+static MACHINE_CONFIG_START( ddcrewbl, segas1x_bootleg_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, 10000000)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  irq4_line_hold)
+	MCFG_CPU_PROGRAM_MAP(ddcrewbl_map)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(40*8, 28*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sys16)
+	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER)
+
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
+
+	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
+	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-124)
+
+	MCFG_MACHINE_RESET_OVERRIDE(segas1x_bootleg_state,ddcrewbl)
+
+MACHINE_CONFIG_END
+
+
 /*************************************
  *
  *  ROM definition(s)
@@ -3477,6 +3587,48 @@ ROM_START( shdancbla )
 	ROM_LOAD( "10.bin", 0x10000, 0x10000, CRC(d47a1610) SHA1(96d22068321de3c285a41d28342ab97d1dfa09da) )
 	ROM_LOAD( "9.bin",  0x20000, 0x10000, CRC(430faf5e) SHA1(dfe34a757937d7a971911fcefd14dfd7f5942b02) )
 ROM_END
+
+// seems derived from the D. D. Crew (World, 4 Players) / FD1094 317-0187 version, old bootleg from the period the game was released
+ROM_START( ddcrewbl )
+	ROM_REGION( 0x400000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "11.bin", 0x000000, 0x20000, CRC(c670c8a6) SHA1(eeda32aa9f75b8917e39484f579441a6020c29f4) )
+	ROM_LOAD16_BYTE( "15.bin", 0x000001, 0x20000, CRC(7f3baab1) SHA1(390310765137cffc2a1119f1839195134439e929) )
+	ROM_LOAD16_BYTE( "12.bin", 0x040000, 0x20000, CRC(f8d3fedc) SHA1(3a3151c9a05db3f8c736f57d90f2dd3e5ea708dd) )
+	ROM_LOAD16_BYTE( "16.bin", 0x040001, 0x20000, CRC(9662afd7) SHA1(688a0b1b5a83b1cfb2ea2f08f4ca15d8a8be08d4) )
+	ROM_LOAD16_BYTE( "13.bin", 0x200000, 0x20000, CRC(0033fe50) SHA1(3f29db7ddcfb5b6d6dfdd500d6541ac6018974ca) )
+	ROM_LOAD16_BYTE( "17.bin", 0x200001, 0x20000, CRC(bbb43241) SHA1(7a2955c59c39e9e214f15a842d3bc94d7a1095f3) )
+	ROM_LOAD16_BYTE( "14.bin", 0x240000, 0x20000, CRC(8780712e) SHA1(05ab2f7b108e0ae139237665da14f33132fb555e) )
+	ROM_LOAD16_BYTE( "18.bin", 0x240001, 0x20000, CRC(94b69d68) SHA1(e49ac664f4a5576737db9b9a7eee34b8c5fcd333))
+
+	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles (same as original)
+	ROM_LOAD( "fac-03.bin", 0x00000, 0x40000, CRC(2228cd88) SHA1(5774bb6a401c3da05c5f3c9d3996b20bb3713cb2) )
+	ROM_LOAD( "fac-02.bin", 0x40000, 0x40000, CRC(edba8e10) SHA1(25a2833ead4ca363802ddc2eb97c40976502921a) )
+	ROM_LOAD( "fac-01.bin", 0x80000, 0x40000, CRC(e8ecc305) SHA1(a26d0c5c7826cd315f8b2c27e5a503a2a7b535c4) )
+
+	ROM_REGION16_BE( 0x800000, "sprites", 0 ) // sprites (same as original)
+	ROM_LOAD16_BYTE( "fac-10.bin", 0x000001, 0x80000, CRC(4fda6a4b) SHA1(a9e582e494ab967e8f3ccf4d5844bb8ef889928c) )
+	ROM_LOAD16_BYTE( "fac-11.bin", 0x000000, 0x80000, CRC(3cbf1f2a) SHA1(80b6b006936740087786acd538e28aca85fa6894) )
+	ROM_LOAD16_BYTE( "fac-08.bin", 0x200001, 0x80000, CRC(e9c74876) SHA1(aff9d071e77f01c6937188bf67be38fa898343e6) )
+	ROM_LOAD16_BYTE( "fac-09.bin", 0x200000, 0x80000, CRC(59022c31) SHA1(5e1409fe0f29284dc6a3ffacf69b761aae09f132) )
+	ROM_LOAD16_BYTE( "fac-06.bin", 0x400001, 0x80000, CRC(720d9858) SHA1(8ebcb8b3e9555ca48b28908d47dcbbd654398b6f) )
+	ROM_LOAD16_BYTE( "fac-07.bin", 0x400000, 0x80000, CRC(7775fdd4) SHA1(a03cac039b400b651a4bf2167a8f2338f488ce26) )
+	ROM_LOAD16_BYTE( "fac-04.bin", 0x600001, 0x80000, CRC(846c4265) SHA1(58d0c213d085fb4dee18b7aefb05087d9d522950) )
+	ROM_LOAD16_BYTE( "fac-05.bin", 0x600000, 0x80000, CRC(0e76c797) SHA1(9a44dc948e84e5acac36e80105c2349ee78e6cfa) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "fac-12.bin", 0x00000, 0x80000, CRC(2e7dade2) SHA1(4133138990ed10f56e299399f034f86ffd9cbd47) )
+
+	ROM_REGION( 0x100000, "proms", 0 )
+	ROM_LOAD( "82s123.bin", 0x000, 0x020, CRC(58bcf8bd) SHA1(e4d3d179b08c0f3424a6bec0f15058fb1b56f8d8) )
+	ROM_LOAD( "82s129.bin", 0x000, 0x100, CRC(00b5c4c4) SHA1(acab51ad861b25edf310b9b903a7fc486daaee4b) )
+
+	ROM_REGION( 0x100000, "gals", 0 )
+	ROM_LOAD( "gal16v8-1.bin", 0x000, 0x117, CRC(64892ee8) SHA1(c7ea077aead5934d95d61f82bdf705dc0cb0e8e4) )
+	ROM_LOAD( "gal16v8-2.bin", 0x000, 0x117, CRC(22133a8f) SHA1(0b5bc074cfe88c0631df63e0c0a733c660d73af0) )
+ROM_END
+
+
+
 /*************************************
  *
  *  Driver initialization
@@ -3629,6 +3781,12 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,fpointbl)
 	m_back_yscroll = 2;
 	m_fore_yscroll = 2;
 }
+
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,ddcrewbl)
+{
+	DRIVER_INIT_CALL(common);
+}
+
 
 WRITE16_MEMBER(segas1x_bootleg_state::altbeastbl_gfx_w)
 {
@@ -3801,3 +3959,5 @@ GAME( 1990, astormb2,    astorm,    astormbl,    astormbl, segas1x_bootleg_state
 GAME( 1990, mwalkbl,     mwalk,     mwalkbl,     mwalkbl, segas1x_bootleg_state,   mwalkbl,    ROT0,   "bootleg", "Michael Jackson's Moonwalker (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, shdancbl,    shdancer,  shdancbl,    shdancbl, segas1x_bootleg_state,  shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, shdancbla,   shdancer,  shdancbla,   shdancbl, segas1x_bootleg_state,  shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 1990, ddcrewbl,    ddcrew,    ddcrewbl,    astormbl, segas1x_bootleg_state,  ddcrewbl,   ROT0,   "bootleg", "D. D. Crew (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

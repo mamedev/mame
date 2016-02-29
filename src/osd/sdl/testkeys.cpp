@@ -111,10 +111,6 @@ int main(int argc, char *argv[])
 			break;
 		}
 		event.type = 0;
-
-		#ifdef SDLMAME_OS2
-		SDL_Delay( 10 );
-		#endif
 	}
 	SDL_Quit();
 	return(0);

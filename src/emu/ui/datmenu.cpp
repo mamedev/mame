@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:Dankan1890
 /*********************************************************************
 
@@ -56,9 +56,9 @@ ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container 
 	issoft = true;
 
 	if (machine.datfile().has_software(m_list, m_short, m_parent))
-		m_items_list.emplace_back("Software History", UI_HISTORY_LOAD, machine.datfile().rev_history());
-	if (swinfo && !swinfo->usage.empty())
-		m_items_list.emplace_back("Software Usage", 0, "");		
+		m_items_list.emplace_back(_("Software History"), UI_HISTORY_LOAD, machine.datfile().rev_history());
+	if (swinfo != nullptr && !swinfo->usage.empty())
+		m_items_list.emplace_back(_("Software Usage"), 0, "");
 }
 
 //-------------------------------------------------
@@ -148,12 +148,6 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 	mui.draw_text_full(container, driver.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
-
-	// take off the borders
-	x1 -= UI_BOX_LR_BORDER;
-	x2 += UI_BOX_LR_BORDER;
-	y1 -= UI_BOX_TB_BORDER;
-
 	maxwidth = 0;
 	for (auto & elem : m_items_list)
 	{
@@ -165,6 +159,8 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 	float space = (1.0f - maxwidth) / (m_items_list.size() * 2);
 
 	// compute our bounds
+	x1 -= UI_BOX_LR_BORDER;
+	x2 += UI_BOX_LR_BORDER;
 	y1 = y2 + UI_BOX_TB_BORDER;
 	y2 += mui.get_line_height() + 2.0f * UI_BOX_TB_BORDER;
 
@@ -196,9 +192,9 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 
 	// bottom
 	std::string revision;
-	revision.assign("Revision: ").append(m_items_list[actual].revision);
+	revision.assign(_("Revision: ")).append(m_items_list[actual].revision);
 	mui.draw_text_full(container, revision.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(origx2 - origx1, width);
 
@@ -218,7 +214,7 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 
 	// draw the text within it
 	mui.draw_text_full(container, revision.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 //-------------------------------------------------
@@ -288,16 +284,15 @@ void ui_menu_dats_view::init_items()
 {
 	datfile_manager &datfile = machine().datfile();
 	if (datfile.has_history(m_driver))
-		m_items_list.emplace_back("History", UI_HISTORY_LOAD, datfile.rev_history());
+		m_items_list.emplace_back(_("History"), UI_HISTORY_LOAD, datfile.rev_history());
 	if (datfile.has_mameinfo(m_driver))
-		m_items_list.emplace_back("Mameinfo", UI_MAMEINFO_LOAD, datfile.rev_mameinfo());
+		m_items_list.emplace_back(_("Mameinfo"), UI_MAMEINFO_LOAD, datfile.rev_mameinfo());
 	if (datfile.has_messinfo(m_driver))
-		m_items_list.emplace_back("Messinfo", UI_MESSINFO_LOAD, datfile.rev_messinfo());
+		m_items_list.emplace_back(_("Messinfo"), UI_MESSINFO_LOAD, datfile.rev_messinfo());
 	if (datfile.has_sysinfo(m_driver))
-		m_items_list.emplace_back("Sysinfo", UI_SYSINFO_LOAD, datfile.rev_sysinfo());
+		m_items_list.emplace_back(_("Sysinfo"), UI_SYSINFO_LOAD, datfile.rev_sysinfo());
 	if (datfile.has_story(m_driver))
-		m_items_list.emplace_back("Mamescore", UI_STORY_LOAD, datfile.rev_storyinfo());
+		m_items_list.emplace_back(_("Mamescore"), UI_STORY_LOAD, datfile.rev_storyinfo());
 	if (datfile.has_command(m_driver))
-		m_items_list.emplace_back("Command", UI_COMMAND_LOAD, "");
+		m_items_list.emplace_back(_("Command"), UI_COMMAND_LOAD, "");
 }
-

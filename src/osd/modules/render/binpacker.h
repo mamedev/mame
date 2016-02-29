@@ -10,18 +10,18 @@
 class rectangle_packer
 {
 public:
-    // The input and output are in terms of vectors of ints to avoid
-    // dependencies (although I suppose a public member struct could have been
-    // used). The parameters are:
+	// The input and output are in terms of vectors of ints to avoid
+	// dependencies (although I suppose a public member struct could have been
+	// used). The parameters are:
 
-    // packs : After packing, the outer array contains the packs (therefore
-    // the number of packs is packs.size()). Each inner array contains a
-    // sequence of sets of 3 ints. Each set represents a rectangle in the
-    // pack. The elements in the set are 1) the rect ID, 2) the x position
-    // of the rect with respect to the pack, and 3) the y position of the rect
-    // with respect to the pack. The widths and heights of the rects are not
-    // included, as it's assumed they are stored on the caller's side (they
-    // were after all the input to the function).
+	// packs : After packing, the outer array contains the packs (therefore
+	// the number of packs is packs.size()). Each inner array contains a
+	// sequence of sets of 3 ints. Each set represents a rectangle in the
+	// pack. The elements in the set are 1) the rect ID, 2) the x position
+	// of the rect with respect to the pack, and 3) the y position of the rect
+	// with respect to the pack. The widths and heights of the rects are not
+	// included, as it's assumed they are stored on the caller's side (they
+	// were after all the input to the function).
 
 	class packable_rectangle
 	{
@@ -107,77 +107,77 @@ public:
 		void* m_base;
 	};
 
-    bool pack(const std::vector<packable_rectangle>& rects, std::vector<std::vector<packed_rectangle>>& packs, int pack_size);
+	bool pack(const std::vector<packable_rectangle>& rects, std::vector<std::vector<packed_rectangle>>& packs, int pack_size);
 
 private:
-    struct rectangle
-    {
-        rectangle(int size)
-            : x(0)
-            , y(0)
-            , w(size)
-            , h(size)
-            , hash(-1)
-            , format(0)
+	struct rectangle
+	{
+		rectangle(int size)
+			: x(0)
+			, y(0)
+			, w(size)
+			, h(size)
+			, hash(-1)
+			, format(0)
 			, rowpixels(0)
 			, palette(nullptr)
 			, base(nullptr)
-            , packed(false)
-        {
-            children[0] = -1;
-            children[1] = -1;
-        }
+			, packed(false)
+		{
+			children[0] = -1;
+			children[1] = -1;
+		}
 
-        rectangle(int x, int y, int w, int h, int hash, UINT32 format, int rowpixels, const rgb_t *palette, void *base)
-            : x(x)
-            , y(y)
-            , w(w)
-            , h(h)
-            , hash(hash)
-            , format(format)
+		rectangle(int x, int y, int w, int h, int hash, UINT32 format, int rowpixels, const rgb_t *palette, void *base)
+			: x(x)
+			, y(y)
+			, w(w)
+			, h(h)
+			, hash(hash)
+			, format(format)
 			, rowpixels(rowpixels)
 			, palette(palette)
 			, base(base)
-            , packed(false)
-        {
-            children[0] = -1;
-            children[1] = -1;
-        }
+			, packed(false)
+		{
+			children[0] = -1;
+			children[1] = -1;
+		}
 
-        int get_area() const
-        {
-            return w * h;
-        }
+		int get_area() const
+		{
+			return w * h;
+		}
 
-        bool operator<(const rectangle& rect) const
-        {
-            return get_area() < rect.get_area();
-        }
+		bool operator<(const rectangle& rect) const
+		{
+			return get_area() < rect.get_area();
+		}
 
-        int  			x;
-        int  			y;
-        int  			w;
-        int  			h;
-        int  			hash;
-        UINT32			format;
-        int  			rowpixels;
-        const rgb_t*	palette;
-        void*			base;
-        int  			children[2];
-        bool 			packed;
-    };
+		int             x;
+		int             y;
+		int             w;
+		int             h;
+		int             hash;
+		UINT32          format;
+		int             rowpixels;
+		const rgb_t*    palette;
+		void*           base;
+		int             children[2];
+		bool            packed;
+	};
 
-    void clear();
-    bool fill(int pack);
-    void split(int pack, int rect);
-    bool fits(rectangle& rect1, const rectangle& rect2);
-    void add_pack_to_array(int pack, std::vector<packed_rectangle>& array) const;
+	void clear();
+	bool fill(int pack);
+	void split(int pack, int rect);
+	bool fits(rectangle& rect1, const rectangle& rect2);
+	void add_pack_to_array(int pack, std::vector<packed_rectangle>& array) const;
 
-    int               		m_pack_size;
-    int               		m_num_packed;
-    std::vector<rectangle>	m_rects;
-    std::vector<rectangle> 	m_packs;
-    std::vector<int>  		m_roots;
+	int                     m_pack_size;
+	int                     m_num_packed;
+	std::vector<rectangle>  m_rects;
+	std::vector<rectangle>  m_packs;
+	std::vector<int>        m_roots;
 };
 
 #endif // __RECTPACKER_H__

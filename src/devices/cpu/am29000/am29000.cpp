@@ -409,16 +409,17 @@ void am29000_cpu_device::state_string_export(const device_state_entry &entry, st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c%c|%3d", m_alu & ALU_V ? 'V' : '.',
-													m_alu & ALU_Z ? 'Z' : '.',
-													m_alu & ALU_N ? 'N' : '.',
-													m_alu & ALU_C ? 'C' : '.',
-													m_cps & CPS_IP ? 'I' : '.',
-													m_cps & CPS_FZ ? 'F' : '.',
-													m_cps & CPS_SM ? 'S' : 'U',
-													m_cps & CPS_DI ? 'I' : '.',
-													m_cps & CPS_DA ? 'D' : '.',
-													(m_r[1] >> 2) & 0x7f);
+			str = string_format("%c%c%c%c%c%c%c%c%c|%3d",
+					m_alu & ALU_V ? 'V' : '.',
+					m_alu & ALU_Z ? 'Z' : '.',
+					m_alu & ALU_N ? 'N' : '.',
+					m_alu & ALU_C ? 'C' : '.',
+					m_cps & CPS_IP ? 'I' : '.',
+					m_cps & CPS_FZ ? 'F' : '.',
+					m_cps & CPS_SM ? 'S' : 'U',
+					m_cps & CPS_DI ? 'I' : '.',
+					m_cps & CPS_DA ? 'D' : '.',
+					(m_r[1] >> 2) & 0x7f);
 			break;
 	}
 }

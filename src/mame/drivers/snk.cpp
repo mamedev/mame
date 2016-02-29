@@ -4648,7 +4648,7 @@ ROM_START( fitegolfu )  /*  Later US version containing enhancements to make the
 	ROM_LOAD( "pal20l8a.6r", 0x0400, 0x0144, CRC(0f011673) SHA1(383e6f6e78daec9c874d5b48378111ca60f5ed64) )
 ROM_END
 
-  
+
 
 
 ROM_START( fitegolf2 )

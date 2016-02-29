@@ -75,7 +75,7 @@ void amis2000_base_device::state_string_export(const device_state_entry &entry, 
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c",
 				m_f & 0x20 ? '6':'.',
 				m_f & 0x10 ? '5':'.',
 				m_f & 0x08 ? '4':'.',

@@ -137,7 +137,6 @@ bool harddisk_image_device::call_create(int create_format, option_resolution *cr
 	int err;
 	UINT32 sectorsize, hunksize;
 	UINT32 cylinders, heads, sectors, totalsectors;
-	std::string metadata;
 
 	cylinders   = option_resolution_lookup_int(create_args, 'C');
 	heads       = option_resolution_lookup_int(create_args, 'H');
@@ -154,8 +153,7 @@ bool harddisk_image_device::call_create(int create_format, option_resolution *cr
 		goto error;
 
 	/* if we created the image and hence, have metadata to set, set the metadata */
-	strprintf(metadata, HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize);
-	err = m_origchd.write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
+	err = m_origchd.write_metadata(HARD_DISK_METADATA_TAG, 0, string_format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize));
 	m_origchd.close();
 
 	if (err != CHDERR_NONE)

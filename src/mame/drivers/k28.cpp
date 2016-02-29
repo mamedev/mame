@@ -8,12 +8,12 @@
   * MM5445N VFD driver, 9-digit alphanumeric display same as snmath
   * 2*TMS6100 (32KB VSM)
   * SC-01-A speech chip
-  
+
   3 models exist:
   - 7-230: darkblue case, toy-ish looks
   - 7-231: gray case, hardware is the same
   - 7-232: this one is completely different hw --> driver tispeak.cpp
-  
+
   TODO:
   - external module support (no dumps yet)
   - SC-01 frog speech is why this driver is marked NOT_WORKING
@@ -83,7 +83,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_p2_w);
 	DECLARE_WRITE8_MEMBER(mcu_prog_w);
 	DECLARE_READ8_MEMBER(mcu_t1_r);
-	
+
 	DECLARE_INPUT_CHANGED_MEMBER(power_on);
 	void power_off();
 
@@ -140,7 +140,7 @@ void k28_state::machine_reset()
 {
 	m_power_on = true;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	
+
 	// the game relies on reading the on-button as pressed when it's turned on
 	m_onbutton_timer->adjust(attotime::from_msec(250));
 }
@@ -274,13 +274,13 @@ WRITE8_MEMBER(k28_state::mcu_p0_w)
 	// d0-d2: input mux high bits
 	m_inp_mux = (m_inp_mux & 0xf) | (~data << 4 & 0x70);
 	m_phoneme = (m_phoneme & 0xf) | (data << 4 & 0x30);
-	
+
 	// d3: SC-01 strobe, latch phoneme on rising edge
 	int strobe = data >> 3 & 1;
 	if (!strobe && m_speech_strobe)
 		m_speech->write(space, 0, m_phoneme);
 	m_speech_strobe = strobe;
-	
+
 	// d5: VFD driver data enable
 	m_vfd_data_enable = ~data >> 5 & 1;
 	if (m_vfd_data_enable)
@@ -299,18 +299,18 @@ WRITE8_MEMBER(k28_state::mcu_p0_w)
 READ8_MEMBER(k28_state::mcu_p1_r)
 {
 	UINT8 data = 0;
-	
+
 	// multiplexed inputs (active low)
 	for (int i = 0; i < 7; i++)
 		if (m_inp_mux >> i & 1)
 		{
 			data |= m_inp_matrix[i]->read();
-			
+
 			// force press on-button at boot
 			if (i == 5 && m_onbutton_timer->enabled())
 				data |= 1;
 		}
-	
+
 	return data ^ 0xff;
 }
 
@@ -326,7 +326,7 @@ WRITE8_MEMBER(k28_state::mcu_p2_w)
 	m_vfd_data_in = data & 1;
 	if (m_vfd_data_enable)
 		m_vfd_shiftreg = (m_vfd_shiftreg & U64(~1)) | m_vfd_data_in;
-	
+
 	// d0-d3: VSM data, input mux and SC-01 phoneme lower nibble
 	m_tms6100->add_w(space, 0, data);
 	m_inp_mux = (m_inp_mux & ~0xf) | (~data & 0xf);
@@ -339,19 +339,19 @@ WRITE8_MEMBER(k28_state::mcu_prog_w)
 	int state = (data) ? 1 : 0;
 	bool rise = state == 1 && !m_vfd_clock;
 	m_vfd_clock = state;
-	
+
 	// on rising edge
 	if (rise)
 	{
 		// leading 1 triggers shift start
 		if (m_vfd_shiftcount == 0 && ~m_vfd_shiftreg & 1)
 			return;
-		
+
 		// output shiftreg on 35th clock
 		if (m_vfd_shiftcount == 35)
 		{
 			m_vfd_shiftcount = 0;
-			
+
 			// output 0-15: digit segment data
 			UINT16 seg_data = (UINT16)(m_vfd_shiftreg >> 19);
 			seg_data = BITSWAP16(seg_data,0,1,13,9,10,12,14,8,3,4,5,2,15,11,6,7);
@@ -360,7 +360,7 @@ WRITE8_MEMBER(k28_state::mcu_prog_w)
 			UINT16 digit_sel = (UINT16)(m_vfd_shiftreg >> 10) & 0x1ff;
 			set_display_segmask(0x1ff, 0x3fff);
 			display_matrix(16, 9, seg_data, digit_sel);
-			
+
 			// output 25: power-off request on falling edge
 			if (~m_vfd_shiftreg & m_vfd_shiftreg_out & 0x200)
 				power_off();

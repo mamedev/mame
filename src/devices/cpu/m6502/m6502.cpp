@@ -444,7 +444,7 @@ void m6502_device::state_string_export(const device_state_entry &entry, std::str
 	switch(entry.index()) {
 	case STATE_GENFLAGS:
 	case M6502_P:
-		strprintf(str, "%c%c%c%c%c%c",
+		str = string_format("%c%c%c%c%c%c",
 						P & F_N ? 'N' : '.',
 						P & F_V ? 'V' : '.',
 						P & F_D ? 'D' : '.',

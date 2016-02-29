@@ -2653,7 +2653,7 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 		membank = global_alloc(memory_bank(*this, banknum, bytestart, byteend, tag));
 		std::string temptag;
 		if (tag == nullptr) {
-			strprintf(temptag, "anon_%p", (void *) membank);
+			temptag = string_format("anon_%p", membank);
 			tag = temptag.c_str();
 		}
 		manager().m_banklist.append(tag, *membank);
@@ -3842,8 +3842,7 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 	if (region == nullptr)
 	{
 		int bytes_per_element = space.data_width() / 8;
-		std::string name;
-		strprintf(name,"%08x-%08x", bytestart, byteend);
+		std::string name = string_format("%08x-%08x", bytestart, byteend);
 		space.machine().save().save_memory(nullptr, "memory", space.device().tag(), space.spacenum(), name.c_str(), m_data, bytes_per_element, (UINT32)(byteend + 1 - bytestart) / bytes_per_element);
 	}
 }
@@ -3880,13 +3879,13 @@ memory_bank::memory_bank(address_space &space, int index, offs_t bytestart, offs
 	// generate an internal tag if we don't have one
 	if (tag == nullptr)
 	{
-		strprintf(m_tag,"~%d~", index);
-		strprintf(m_name,"Internal bank #%d", index);
+		m_tag = string_format("~%d~", index);
+		m_name = string_format("Internal bank #%d", index);
 	}
 	else
 	{
 		m_tag.assign(tag);
-		strprintf(m_name,"Bank '%s'", tag);
+		m_name = string_format("Bank '%s'", tag);
 	}
 
 	if (!m_anonymous && space.machine().save().registration_allowed())

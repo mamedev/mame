@@ -17,6 +17,9 @@
 #include "eminline.h"
 #include "osdsync.h"
 
+// C++ headers
+#include <cstdint>
+
 
 //============================================================
 //  DEBUGGING
@@ -144,11 +147,7 @@ static unsigned __stdcall worker_thread_entry(void *param)
 	osd_thread *thread = (osd_thread *) param;
 	void *res;
 	res = thread->callback(thread->param);
-#ifdef PTR64
-	return (unsigned) (long long) res;
-#else
-	return (unsigned) res;
-#endif
+	return unsigned(uintptr_t(res));
 }
 
 osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)

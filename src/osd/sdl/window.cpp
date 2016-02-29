@@ -351,6 +351,26 @@ void sdl_osd_interface::window_exit()
 		global_free(temp);
 	}
 
+	switch(video_config.mode)
+	{
+		case VIDEO_MODE_SDL2ACCEL:
+			renderer_sdl2::exit();
+			break;
+		case VIDEO_MODE_SOFT:
+			renderer_sdl1::exit();
+			break;
+		case VIDEO_MODE_BGFX:
+			renderer_bgfx::exit();
+			break;
+#if (USE_OPENGL)
+		case VIDEO_MODE_OPENGL:
+			renderer_ogl::exit();
+			break;
+#endif
+		default:
+			break;
+	}
+
 	// if we're multithreaded, clean up the window thread
 	if (multithreading_enabled)
 	{
@@ -541,8 +561,11 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 		window->m_windowed_dim = window->get_size();
 	}
 
-	delete window->m_renderer;
-	window->m_renderer = nullptr;
+	if (window->m_renderer != nullptr)
+	{
+		delete window->m_renderer;
+		window->m_renderer = nullptr;
+	}
 
 	bool is_osx = false;
 #ifdef SDLMAME_MACOSX

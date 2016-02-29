@@ -41,7 +41,7 @@ struct quad_setup_data
 
 	void compute(const render_primitive &prim, const int prescale);
 
-	INT32	dudx, dvdx, dudy, dvdy;
+	INT32   dudx, dvdx, dudy, dvdy;
 	INT32   startu, startv;
 	INT32   rotwidth, rotheight;
 };
@@ -156,32 +156,16 @@ public:
 		destroy_all_textures();
 		SDL_DestroyRenderer(m_sdl_renderer);
 		m_sdl_renderer = nullptr;
-
-		if (s_blit_info_initialized)
-		{
-			for (int i = 0; i <= SDL_TEXFORMAT_LAST; i++)
-			{
-				for (copy_info_t *bi = s_blit_info[i]; bi != nullptr; )
-				{
-					if (bi->pixel_count)
-						osd_printf_verbose("%s -> %s %s blendmode 0x%02x, %d samples: %d KPixel/sec\n", bi->srcname, bi->dstname,
-								bi->blitter->m_is_rot ? "rot" : "norot", bi->bm_mask, bi->samples,
-								(int) bi->perf);
-					copy_info_t *freeme = bi;
-					bi = bi->next;
-					global_free(freeme);
-				}
-				s_blit_info[i] = nullptr;
-			}
-			s_blit_info_initialized = false;
-		}
 	}
 
-	virtual int create() override;
 	static bool init(running_machine &machine);
+	static void exit();
+
+	virtual int create() override;
 	virtual int draw(const int update) override;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
 	virtual render_primitive_list *get_primitives() override;
+
 	int RendererSupportsFormat(Uint32 format, Uint32 access, const char *sformat);
 
 	SDL_Renderer *  m_sdl_renderer;

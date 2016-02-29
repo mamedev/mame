@@ -619,7 +619,7 @@ come from... they might be eventually removed -->
 		</part>
 	</software>
 
-<!-- Homebrew memory modules -->  
+<!-- Homebrew memory modules -->
 
 	<software name="64kbi" supported="no">
 		<description>EM-64 Expansion memory 64Kb</description>
@@ -645,7 +645,7 @@ come from... they might be eventually removed -->
 			</dataarea>
 		</part>
 	</software>
-  
+
 	<software name="64krx" supported="no">
 		<description>64Krx Expansion board 64Kb</description>
 		<year>199?</year>
@@ -665,9 +665,9 @@ come from... they might be eventually removed -->
 		</part>
 	</software>
 
-  <!-- Brno mod ROMs -->
+	<!-- Brno mod ROMs -->
 
-	<software name="brno_boot" supported="no">
+	<software name="brno_con" supported="no">
 		<description>Boot for Brno ramdisk [console version]</description>
 		<year>1989</year>
 		<publisher>&lt;Pavel Brychta a spol.&gt;</publisher>
@@ -688,5 +688,5 @@ come from... they might be eventually removed -->
 			</dataarea>
 		</part>
 	</software>
-  
+
 </softwarelist>

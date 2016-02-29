@@ -786,9 +786,9 @@ ROM_START( 1943bj )
 	/* front background */
 	ROM_LOAD( "bm14.5f",   0x0000, 0x8000, CRC(4d3c6401) SHA1(ce4f6dbf8fa030ad45cbb5afd58df27fed2d4618) )
 	/* back background probably same gfx different layout */
-	ROM_LOAD( "mkb07.8k",  0xc000, 0x4000, CRC(ae1b317f) SHA1(d311c198d77ec932d776427e2ebfffe90e5330c3) )  
+	ROM_LOAD( "mkb07.8k",  0xc000, 0x4000, CRC(ae1b317f) SHA1(d311c198d77ec932d776427e2ebfffe90e5330c3) )
 	ROM_CONTINUE( 0x8000, 0x4000 )
-  
+
 	ROM_REGION( 0x0c00, "proms", 0 )
 	ROM_LOAD( "bm1.12a",   0x0000, 0x0100, CRC(74421f18) SHA1(5b8b59f6f4e5ad358611de50608f47f41a5b0e51) )    /* red component */
 	ROM_LOAD( "bm2.13a",   0x0100, 0x0100, CRC(ac27541f) SHA1(1796c4c9041dfe28e6319576f21df1dbcb8d12bf) )    /* green component */

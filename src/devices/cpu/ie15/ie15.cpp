@@ -65,7 +65,7 @@ void ie15_device::device_start()
 	state_add(IE15_A,        "A",        m_A);
 
 	for (int ireg = 0; ireg < 32; ireg++)
-		state_add(IE15_R0 + ireg, strformat("R%d", ireg).c_str(), m_REGS[ireg]);
+		state_add(IE15_R0 + ireg, string_format("R%d", ireg).c_str(), m_REGS[ireg]);
 }
 
 //-------------------------------------------------
@@ -137,7 +137,7 @@ void ie15_device::state_string_export(const device_state_entry &entry, std::stri
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c",
+			str = string_format("%c%c%c",
 				m_CF ? 'C':'.',
 				m_ZF ? 'Z':'.',
 				m_RF ? 'R':'.');

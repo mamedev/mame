@@ -8,7 +8,7 @@
 //
 //============================================================
 
-#if (!defined(SDLMAME_SOLARIS) && !(defined(SDLMAME_OS2)))
+#if (!defined(SDLMAME_SOLARIS))
 
 #include <sys/types.h>
 #include <sys/uio.h>

@@ -4545,7 +4545,6 @@ ROM_START( batsugun )
 //  ROM_LOAD( "tp030_u19_gal16v8b-15.jed", 0x0000, 0x991, CRC(31be54a2) SHA1(06278942a9a2ea858c0352b2ef5a65bf329b7b82) )
 ROM_END
 
-
 ROM_START( batsuguna )
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "tp030_01.bin", 0x000000, 0x080000, CRC(3873d7dd) SHA1(baf6187d7d554cfcf4a86b63f07fc30df7ef84c9) )
@@ -4569,6 +4568,38 @@ ROM_START( batsuguna )
 	ROM_REGION( 0x1000, "plds", 0 )         /* Logic for mixing output of both GP9001 GFX controllers */
 	ROM_LOAD( "tp030_u19_gal16v8b-15.bin", 0x0000, 0x117, CRC(f71669e8) SHA1(ec1fbe04605fee864af4b01f001af227938c9f21) )
 ROM_END
+
+ROM_START( batsugunb )
+	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
+	ROM_LOAD16_WORD_SWAP( "large_rom1.bin", 0x000000, 0x080000,  CRC(c9de8ed8) SHA1(8de9acd26e83c8ea3388137da528704116aa7bdb) )
+
+	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
+	/* It's a NEC V25 (PLCC94) (program uploaded by main CPU) */
+
+	ROM_REGION( 0x400000, "gp9001", 0 )
+	ROM_LOAD16_BYTE( "rom12.bin", 0x000000, 0x080000, CRC(d25affc6) SHA1(00803ae5a2bc06edbfb9ea6e3df51f195bbee8cb) )
+	ROM_LOAD16_BYTE( "rom6.bin",  0x000001, 0x080000, CRC(ddd6df60) SHA1(3b46945c51e7b10b473d98916f075e8def336ce7) )
+	ROM_LOAD16_BYTE( "rom11.bin", 0x100000, 0x080000, CRC(ed72fe3e) SHA1(5c0f4d5cc84b45e1924dacfa4c0b602cc1600b2f) )
+	ROM_LOAD16_BYTE( "rom5.bin",  0x100001, 0x080000, CRC(fd44b33b) SHA1(791cf6056a2dbafa5f41f1dcf686947ee990647d) )
+	ROM_LOAD16_BYTE( "rom10.bin", 0x200000, 0x080000, CRC(86b2c6a9) SHA1(b3f39246012c6cd9df69a6797d56479523b33bcb) )
+	ROM_LOAD16_BYTE( "rom4.bin",  0x200001, 0x080000, CRC(e7c1c623) SHA1(0d8922ce901b5f74f1bd397d5d9c6ab4e918b1d1) )
+	ROM_LOAD16_BYTE( "rom9.bin",  0x300000, 0x080000, CRC(fda8ee00) SHA1(d5ea617a72b2721386eb2dfc15b76de2e30f069c) )
+	ROM_LOAD16_BYTE( "rom3.bin",  0x300001, 0x080000, CRC(a7c4dee8) SHA1(94e2dda067612fac810157f8cf392b685b38798b) )
+
+	ROM_REGION( 0x200000, "gp9001_1", 0 )
+	ROM_LOAD16_BYTE( "rom8.bin",  0x000000, 0x080000, CRC(a2c6a170) SHA1(154048ddc8ca2b4e9617e142d904ad2698b0ad02) )
+	ROM_LOAD16_BYTE( "rom2.bin",  0x000001, 0x080000, CRC(a457e202) SHA1(4a9f2f95c866fc9d40af1c57ce1940f0a6dc1b82) )
+	ROM_LOAD16_BYTE( "rom7.bin",  0x100000, 0x080000, CRC(8644518f) SHA1(570141deeb796cfae57600d5a518d34bb6dc14d0) )
+	ROM_LOAD16_BYTE( "rom1.bin",  0x100001, 0x080000, CRC(8e339897) SHA1(80e84c291f287c0783bddfcb1b7ebf78c154cadc) )
+
+	ROM_REGION( 0x40000, "oki", 0 )         /* ADPCM Samples */
+	ROM_LOAD( "rom13.bin", 0x00000, 0x40000, CRC(276146f5) SHA1(bf11d1f6782cefcad77d52af4f7e6054a8f93440) )
+
+	ROM_REGION( 0x1000, "plds", 0 )         /* Logic for mixing output of both GP9001 GFX controllers */
+	ROM_LOAD( "tp030_u19_gal16v8b-15.bin", 0x0000, 0x117, CRC(f71669e8) SHA1(ec1fbe04605fee864af4b01f001af227938c9f21) )
+//  ROM_LOAD( "tp030_u19_gal16v8b-15.jed", 0x0000, 0x991, CRC(31be54a2) SHA1(06278942a9a2ea858c0352b2ef5a65bf329b7b82) )
+ROM_END
+
 
 
 ROM_START( batsugunsp )
@@ -5137,10 +5168,34 @@ ROM_START( batriderk )
 	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
-/* older version, might have only been released in Japan and Taiwan? */
+/* older version, might have only been released in Japan, Hong Kong and Taiwan? */
 ROM_START( batriderja )
 	ROM_REGION( 0x200000, "maincpu", 0 )            /* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0.bin", 0x000000, 0x080000, CRC(f93ea27c) SHA1(41023c2ee1efd70b5aa9c70e1ddd9e5c3d51d68a) )
+	ROM_LOAD16_BYTE( "prg1.u23", 0x000001, 0x080000, CRC(8ae7f592) SHA1(8a20ebf85eca621f578d2302c3a3988647b077a7) )
+	ROM_LOAD16_BYTE( "prg2.u21", 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
+	ROM_LOAD16_BYTE( "prg3.u24", 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )            /* Sound Z80 code + bank */
+	ROM_LOAD( "snd.u77", 0x00000, 0x40000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
+
+	ROM_REGION( 0x1000000, "gp9001", 0 )
+	ROM_LOAD( "rom-1.bin", 0x000000, 0x400000, CRC(0df69ca2) SHA1(49670347ebd7e1067ff988cf842b275b7ee7b5f7) )
+	ROM_LOAD( "rom-3.bin", 0x400000, 0x400000, CRC(60167d38) SHA1(fd2429808c59ef51fd5f5db84ea89a8dc504186e) )
+	ROM_LOAD( "rom-2.bin", 0x800000, 0x400000, CRC(1bfea593) SHA1(ce06dc3097ae56b0df56d104bbf7efc9b5d968d4) )
+	ROM_LOAD( "rom-4.bin", 0xc00000, 0x400000, CRC(bee03c94) SHA1(5bc1e6769c42857c03456426b502fcb86a114f19) )
+
+	ROM_REGION( 0x140000, "oki1", 0 )       /* ADPCM Samples 1 */
+	ROM_LOAD( "rom-5.bin", 0x040000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
+
+	ROM_REGION( 0x140000, "oki2", 0 )       /* ADPCM Samples 2 */
+	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
+ROM_END
+
+
+ROM_START( batriderhk )
+	ROM_REGION( 0x200000, "maincpu", 0 )            /* Main 68k code */
+	ROM_LOAD16_BYTE( "prg0.u22", 0x000000, 0x080000, CRC(00afbb7c) SHA1(a4b6331e0fcab7d0c43fc43adb701f1248247b41) )
 	ROM_LOAD16_BYTE( "prg1.u23", 0x000001, 0x080000, CRC(8ae7f592) SHA1(8a20ebf85eca621f578d2302c3a3988647b077a7) )
 	ROM_LOAD16_BYTE( "prg2.u21", 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24", 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
@@ -5392,6 +5447,7 @@ GAME( 1993, vfive,      grindstm, vfive,    vfive, toaplan2_state,      vfive,  
 
 GAME( 1993, batsugun,   0,        batsugun, batsugun, toaplan2_state,   dogyuun, ROT270, "Toaplan", "Batsugun", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, batsuguna,  batsugun, batsugun, batsugun, toaplan2_state,   dogyuun, ROT270, "Toaplan", "Batsugun (older set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, batsugunb,  batsugun, batsugun, batsugun, toaplan2_state,   dogyuun, ROT270, "Toaplan", "Batsugun (Korean PCB)", MACHINE_SUPPORTS_SAVE ) // cheap looking PCB (same 'TP-030' numbering as original) but without Mask ROMs.  Still has original customs etc.  Jumpers were set to the Korea Unite Trading license, so likely made in Korea, not a bootleg tho.
 GAME( 1993, batsugunsp, batsugun, batsugun, batsugun, toaplan2_state,   dogyuun, ROT270, "Toaplan", "Batsugun - Special Version", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, pwrkick,    0,        pwrkick,  pwrkick, driver_device,    0,       ROT0,   "Sunwise",  "Power Kick (Japan)", 0 )
@@ -5424,6 +5480,7 @@ GAME( 1998, batriderj,  batrider, batrider, batriderj, toaplan2_state, batrider,
 GAME( 1998, batriderk,  batrider, batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea) (Fri Feb 13 1998)", MACHINE_SUPPORTS_SAVE )
 // older revision of the code
 GAME( 1998, batriderja, batrider, batrider, batriderj, toaplan2_state, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, older version) (Mon Dec 22 1997)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batriderhk, batrider, batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Hong Kong) (Mon Dec 22 1997)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, batridert,  batrider, batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Taiwan) (Mon Dec 22 1997)", MACHINE_SUPPORTS_SAVE )
 
 // Battle Bakraid

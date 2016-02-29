@@ -532,7 +532,7 @@ void alpha8201_cpu_device::state_string_export(const device_state_entry &entry, 
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c", m_cf ? 'C' : '.', m_zf ? 'Z' : '.');
+			str = string_format("%c%c", m_cf ? 'C' : '.', m_zf ? 'Z' : '.');
 			break;
 	}
 }

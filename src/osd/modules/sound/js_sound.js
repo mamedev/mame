@@ -185,18 +185,18 @@ function get_context() {
 };
 
 function sample_count() {
-		//TODO get someone to call this from the emulator,
-		//so the emulator can do proper audio buffering by
-		//knowing how many samples are left:
-		if (!context) {
-			//Use impossible value as an error code:
-			return -1;
-		}
-		var count = rear - start;
-		if (start > rear) {
-			count += bufferSize;
-		}
-		return count;
+	//TODO get someone to call this from the emulator,
+	//so the emulator can do proper audio buffering by
+	//knowing how many samples are left:
+	if (!context) {
+		//Use impossible value as an error code:
+		return -1;
+	}
+	var count = rear - start;
+	if (start > rear) {
+		count += bufferSize;
+	}
+	return count;
 }
 
 return {

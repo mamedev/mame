@@ -85,14 +85,11 @@ void ui_menu_image_info::image_info(device_image_interface *image)
 		// if image has been loaded through softlist, let's add some more info
 		if (image->software_entry())
 		{
-			std::string str;
-
 			// display long filename
 			item_append(image->longname(), "", MENU_FLAG_DISABLE, nullptr);
 
 			// display manufacturer and year
-			strcatprintf(str, "%s, %s", image->manufacturer(), image->year());
-			item_append(str.c_str(), "", MENU_FLAG_DISABLE, nullptr);
+			item_append(string_format("%s, %s", image->manufacturer(), image->year()).c_str(), "", MENU_FLAG_DISABLE, nullptr);
 
 			// display supported information, if available
 			switch (image->supported())

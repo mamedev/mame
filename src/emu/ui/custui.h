@@ -68,9 +68,9 @@ private:
 	};
 
 #ifdef UI_WINDOWS
-	UINT16						m_actual;
-	std::vector<std::string>	m_fonts;
-	bool						m_bold, m_italic;
+	UINT16                      m_actual;
+	std::vector<std::string>    m_fonts;
+	bool                        m_bold, m_italic;
 
 	void list();
 	static int CALLBACK EnumFontFamiliesExProc(const LOGFONT *lpelfe, const TEXTMETRIC *lpntme, DWORD FontType, LPARAM lParam);

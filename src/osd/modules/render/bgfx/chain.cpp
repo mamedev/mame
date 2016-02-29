@@ -23,6 +23,18 @@ bgfx_chain::bgfx_chain(std::string name, std::string author, std::vector<bgfx_sl
 
 bgfx_chain::~bgfx_chain()
 {
+	for (bgfx_slider* slider : m_sliders)
+	{
+		delete slider;
+	}
+	for (bgfx_parameter* param : m_params)
+	{
+		delete param;
+	}
+	for (bgfx_chain_entry* entry : m_entries)
+	{
+		delete entry;
+	}
 }
 
 void bgfx_chain::submit(render_primitive* prim, int view)

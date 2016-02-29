@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles,Paul Priest
+// copyright-holders:Aaron Giles, Paul Priest
 /***************************************************************************
 
-    validity.c
+    validity.cpp
 
     Validity checks on internal data structures.
 

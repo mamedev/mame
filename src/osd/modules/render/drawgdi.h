@@ -37,8 +37,10 @@ public:
 	}
 	virtual ~renderer_gdi();
 
-	virtual int create() override;
 	static bool init(running_machine &machine) { return false; }
+	static void exit() { }
+
+	virtual int create() override;
 	virtual render_primitive_list *get_primitives() override;
 	virtual int draw(const int update) override;
 	virtual void save() override {};

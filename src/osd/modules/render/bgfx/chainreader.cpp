@@ -20,11 +20,12 @@
 
 bgfx_chain* chain_reader::read_from_value(const Value& value, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t screen_width, uint32_t screen_height)
 {
-    validate_parameters(value);
+	validate_parameters(value);
 
 	std::string name = value["name"].GetString();
 	std::string author = value["author"].GetString();
 
+	// Parse sliders
 	std::vector<bgfx_slider*> sliders;
 	if (value.HasMember("sliders"))
 	{
@@ -35,6 +36,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, texture_manager& t
 		}
 	}
 
+	// Parse parameters
 	std::vector<bgfx_parameter*> parameters;
 	if (value.HasMember("parameters"))
 	{
@@ -45,6 +47,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, texture_manager& t
 		}
 	}
 
+	// Parse chain entries
 	std::vector<bgfx_chain_entry*> entries;
 	if (value.HasMember("passes"))
 	{
@@ -55,6 +58,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, texture_manager& t
 		}
 	}
 
+	// Create targets
 	if (value.HasMember("targets"))
 	{
 		const Value& target_array = value["targets"];

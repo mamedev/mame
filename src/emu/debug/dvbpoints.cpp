@@ -134,7 +134,7 @@ void debug_view_breakpoints::enumerate_sources()
 	for (device_disasm_interface *dasm = iter.first(); dasm != nullptr; dasm = iter.next())
 	{
 		std::string name;
-		strprintf(name, "%s '%s'", dasm->device().name(), dasm->device().tag());
+		name = string_format("%s '%s'", dasm->device().name(), dasm->device().tag());
 		m_source_list.append(*global_alloc(debug_view_source(name.c_str(), &dasm->device())));
 	}
 
@@ -190,14 +190,7 @@ void debug_view_breakpoints::view_click(const int button, const debug_view_xy& p
 
 void debug_view_breakpoints::pad_astring_to_length(std::string& str, int len)
 {
-	int diff = len - str.length();
-	if (diff > 0)
-	{
-		std::string buffer;
-		for (int i = 0; i < diff; i++)
-			strcatprintf(buffer, " ");
-		strcatprintf(str, "%s", buffer.c_str());
-	}
+	str = string_format("%-*s", std::max(len, 0), str);
 }
 
 
@@ -236,7 +229,7 @@ void debug_view_breakpoints::view_update()
 
 	// Draw
 	debug_view_char *dest = &m_viewdata[0];
-	std::string         linebuf;
+	std::string     linebuf;
 
 	// Header
 	if (m_visible.y > 0)
@@ -282,8 +275,7 @@ void debug_view_breakpoints::view_update()
 		{
 			device_debug::breakpoint *const bp = m_buffer[bpi];
 
-			linebuf.clear();
-			strcatprintf(linebuf, "%2X", bp->index());
+			linebuf = string_format("%2X", bp->index());
 			pad_astring_to_length(linebuf, tableBreaks[0]);
 			linebuf.push_back(bp->enabled() ? 'X' : 'O');
 			pad_astring_to_length(linebuf, tableBreaks[1]);

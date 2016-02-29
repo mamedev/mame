@@ -13,16 +13,16 @@
 #include "slider.h"
 
 const slider_reader::string_to_enum slider_reader::TYPE_NAMES[slider_reader::TYPE_COUNT] = {
-    { "bool",   uint64_t(bgfx_slider::slider_type::SLIDER_BOOL) },
-    { "float",  uint64_t(bgfx_slider::slider_type::SLIDER_FLOAT) },
-    { "int",    uint64_t(bgfx_slider::slider_type::SLIDER_INT) },
-    { "color",  uint64_t(bgfx_slider::slider_type::SLIDER_COLOR) },
-    { "vec2",	uint64_t(bgfx_slider::slider_type::SLIDER_VEC2) }
+	{ "bool",   uint64_t(bgfx_slider::slider_type::SLIDER_BOOL) },
+	{ "float",  uint64_t(bgfx_slider::slider_type::SLIDER_FLOAT) },
+	{ "int",    uint64_t(bgfx_slider::slider_type::SLIDER_INT) },
+	{ "color",  uint64_t(bgfx_slider::slider_type::SLIDER_COLOR) },
+	{ "vec2",   uint64_t(bgfx_slider::slider_type::SLIDER_VEC2) }
 };
 
 bgfx_slider* slider_reader::read_from_value(const Value& value)
 {
-    validate_parameters(value);
+	validate_parameters(value);
 
 	bgfx_slider::slider_type type = bgfx_slider::slider_type(get_enum_from_value(value, "type", uint64_t(bgfx_slider::slider_type::SLIDER_FLOAT), TYPE_NAMES, TYPE_COUNT));
 	std::string name = value["name"].GetString();

@@ -113,11 +113,11 @@ public:
 	const char *keymap_file() const { return value(SDLOPTION_KEYMAP_FILE); }
 
 	// joystick mapping
-	const char *joy_index(int index) const { return value(strformat("%s%d", SDLOPTION_JOYINDEX, index).c_str()); }
+	const char *joy_index(int index) const { return value(string_format("%s%d", SDLOPTION_JOYINDEX, index).c_str()); }
 	bool sixaxis() const { return bool_value(SDLOPTION_SIXAXIS); }
 
-	const char *mouse_index(int index) const { return value(strformat("%s%d", SDLOPTION_MOUSEINDEX, index).c_str()); }
-	const char *keyboard_index(int index) const { return value(strformat("%s%d", SDLOPTION_KEYBINDEX, index).c_str()); }
+	const char *mouse_index(int index) const { return value(string_format("%s%d", SDLOPTION_MOUSEINDEX, index).c_str()); }
+	const char *keyboard_index(int index) const { return value(string_format("%s%d", SDLOPTION_KEYBINDEX, index).c_str()); }
 
 	const char *video_driver() const { return value(SDLOPTION_VIDEODRIVER); }
 	const char *render_driver() const { return value(SDLOPTION_RENDERDRIVER); }

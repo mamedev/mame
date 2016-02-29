@@ -205,19 +205,19 @@ bool windows_osd_interface::window_init()
 	}
 
 	const int fallbacks[VIDEO_MODE_COUNT] = {
-		-1,					// NONE -> no fallback
-		VIDEO_MODE_NONE,	// GDI -> NONE
-		VIDEO_MODE_D3D,		// BGFX -> D3D
+		-1,                 // NONE -> no fallback
+		VIDEO_MODE_NONE,    // GDI -> NONE
+		VIDEO_MODE_D3D,     // BGFX -> D3D
 #if (USE_OPENGL)
-		VIDEO_MODE_GDI,		// OPENGL -> GDI
+		VIDEO_MODE_GDI,     // OPENGL -> GDI
 #endif
-		-1,					// No SDL2ACCEL on Windows OSD
+		-1,                 // No SDL2ACCEL on Windows OSD
 #if (USE_OPENGL)
-		VIDEO_MODE_OPENGL,	// D3D -> OPENGL
+		VIDEO_MODE_OPENGL,  // D3D -> OPENGL
 #else
-		VIDEO_MODE_GDI,		// D3D -> GDI
+		VIDEO_MODE_GDI,     // D3D -> GDI
 #endif
-		-1					// No SOFT on Windows OSD
+		-1                  // No SOFT on Windows OSD
 	};
 
 	int current_mode = video_config.mode;
@@ -274,7 +274,7 @@ void windows_osd_interface::update_slider_list()
 {
 	for (win_window_info *window = win_window_list; window != nullptr; window = window->m_next)
 	{
-		if (window->m_renderer->sliders_dirty())
+		if (window->m_renderer && window->m_renderer->sliders_dirty())
 		{
 			build_slider_list();
 			return;
@@ -323,6 +323,29 @@ void windows_osd_interface::window_exit()
 		win_window_list = temp->m_next;
 		temp->destroy();
 		global_free(temp);
+	}
+
+	switch(video_config.mode)
+	{
+		case VIDEO_MODE_NONE:
+			renderer_none::exit();
+			break;
+		case VIDEO_MODE_GDI:
+			renderer_gdi::exit();
+			break;
+		case VIDEO_MODE_BGFX:
+			renderer_bgfx::exit();
+			break;
+#if (USE_OPENGL)
+		case VIDEO_MODE_OPENGL:
+			renderer_ogl::exit();
+			break;
+#endif
+		case VIDEO_MODE_D3D:
+			renderer_d3d9::exit();
+			break;
+		default:
+			break;
 	}
 
 	// if we're multithreaded, clean up the window thread
@@ -375,6 +398,10 @@ win_window_info::win_window_info(running_machine &machine)
 
 win_window_info::~win_window_info()
 {
+	if (m_renderer != nullptr)
+	{
+		delete m_renderer;
+	}
 }
 
 
@@ -1283,7 +1310,7 @@ int win_window_info::complete_create()
 		// finish off by trying to initialize DirectX; if we fail, ignore it
 		if (m_renderer != nullptr)
 		{
-			global_free(m_renderer);
+			delete m_renderer;
 		}
 		m_renderer = osd_renderer::make_for_type(video_config.mode, reinterpret_cast<osd_window *>(this));
 		if (m_renderer->create())
@@ -1586,6 +1613,12 @@ void win_window_info::draw_video_contents(HDC dc, int update)
 }
 
 
+static inline int better_mode(int width0, int height0, int width1, int height1, float desired_aspect)
+{
+	float aspect0 = (float)width0 / (float)height0;
+	float aspect1 = (float)width1 / (float)height1;
+	return (fabs(desired_aspect - aspect0) < fabs(desired_aspect - aspect1)) ? 0 : 1;
+}
 
 //============================================================
 //  constrain_to_aspect_ratio
@@ -1599,15 +1632,19 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	INT32 propwidth, propheight;
 	INT32 minwidth, minheight;
 	INT32 maxwidth, maxheight;
-	INT32 viswidth, visheight;
 	INT32 adjwidth, adjheight;
-	float pixel_aspect;
+	float desired_aspect = 1.0f;
+	osd_dim window_dim = get_size();
+	INT32 target_width = window_dim.width();
+	INT32 target_height = window_dim.height();
+	INT32 xscale = 1, yscale = 1;
+	int newwidth, newheight;
 	osd_monitor_info *monitor = winwindow_video_window_monitor(&rect);
 
 	assert(GetCurrentThreadId() == window_threadid);
 
 	// get the pixel aspect ratio for the target monitor
-	pixel_aspect = monitor->aspect();
+	float pixel_aspect = monitor->aspect();
 
 	// determine the proposed width/height
 	propwidth = rect.width() - extrawidth;
@@ -1634,6 +1671,58 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 
 	// get the minimum width/height for the current layout
 	m_target->compute_minimum_size(minwidth, minheight);
+
+	// compute the appropriate visible area if we're trying to keepaspect
+	if (video_config.keepaspect)
+	{
+		// make sure the monitor is up-to-date
+		m_target->compute_visible_area(target_width, target_height, m_monitor->aspect(), m_target->orientation(), target_width, target_height);
+		desired_aspect = (float)target_width / (float)target_height;
+	}
+
+	// non-integer scaling - often gives more pleasing results in full screen
+	newwidth = target_width;
+	newheight = target_height;
+	if (!video_config.fullstretch)
+	{
+		// compute maximum integral scaling to fit the window
+		xscale = (target_width + 2) / newwidth;
+		yscale = (target_height + 2) / newheight;
+
+		// try a little harder to keep the aspect ratio if desired
+		if (video_config.keepaspect)
+		{
+			// if we could stretch more in the X direction, and that makes a better fit, bump the xscale
+			while (newwidth * (xscale + 1) <= window_dim.width() &&
+				better_mode(newwidth * xscale, newheight * yscale, newwidth * (xscale + 1), newheight * yscale, desired_aspect))
+				xscale++;
+
+			// if we could stretch more in the Y direction, and that makes a better fit, bump the yscale
+			while (newheight * (yscale + 1) <= window_dim.height() &&
+				better_mode(newwidth * xscale, newheight * yscale, newwidth * xscale, newheight * (yscale + 1), desired_aspect))
+				yscale++;
+
+			// now that we've maxed out, see if backing off the maximally stretched one makes a better fit
+			if (window_dim.width() - newwidth * xscale < window_dim.height() - newheight * yscale)
+			{
+				while (better_mode(newwidth * xscale, newheight * yscale, newwidth * (xscale - 1), newheight * yscale, desired_aspect) && (xscale >= 0))
+					xscale--;
+			}
+			else
+			{
+				while (better_mode(newwidth * xscale, newheight * yscale, newwidth * xscale, newheight * (yscale - 1), desired_aspect) && (yscale >= 0))
+					yscale--;
+			}
+		}
+
+		// ensure at least a scale factor of 1
+		if (xscale <= 0) xscale = 1;
+		if (yscale <= 0) yscale = 1;
+
+		// apply the final scale
+		newwidth *= xscale;
+		newheight *= yscale;
+	}
 
 	// clamp against the absolute minimum
 	propwidth = MAX(propwidth, MIN_WINDOW_DIM);
@@ -1665,12 +1754,9 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	propwidth = MIN(propwidth, maxwidth);
 	propheight = MIN(propheight, maxheight);
 
-	// compute the visible area based on the proposed rectangle
-	m_target->compute_visible_area(propwidth, propheight, pixel_aspect, m_target->orientation(), viswidth, visheight);
-
 	// compute the adjustments we need to make
-	adjwidth = (viswidth + extrawidth) - rect.width();
-	adjheight = (visheight + extraheight) - rect.height();
+	adjwidth = (propwidth + extrawidth) - rect.width();
+	adjheight = (propheight + extraheight) - rect.height();
 
 	// based on which corner we're adjusting, constrain in different ways
 	osd_rect ret(rect);
@@ -1697,6 +1783,7 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 			ret = rect.move_by(0, -adjheight).resize(rect.width() + adjwidth, rect.height() + adjheight);
 			break;
 	}
+
 	return ret;
 }
 
@@ -1788,10 +1875,13 @@ osd_dim win_window_info::get_max_bounds(int constrain)
 
 	// constrain to fit
 	if (constrain)
+	{
 		maximum = constrain_to_aspect_ratio(maximum, WMSZ_BOTTOMRIGHT);
+	}
 	else
 	{
-		maximum = maximum.resize(maximum.width() - wnd_extra_width(), maximum.height() - wnd_extra_height());
+		// No - the maxima returned by usable_position_size are in window units, not usable units
+		//maximum = maximum.resize(maximum.width() - wnd_extra_width(), maximum.height() - wnd_extra_height());
 	}
 	return maximum.dim();
 }
@@ -1938,7 +2028,7 @@ void win_window_info::set_fullscreen(int fullscreen)
 	m_fullscreen = fullscreen;
 
 	// kill off the drawers
-	global_free(m_renderer);
+	delete m_renderer;
 	m_renderer = nullptr;
 
 	// hide ourself
@@ -1996,10 +2086,6 @@ void win_window_info::set_fullscreen(int fullscreen)
 		if (video_config.mode != VIDEO_MODE_NONE)
 			ShowWindow(m_hwnd, SW_SHOW);
 
-		if (m_renderer != nullptr)
-		{
-			delete m_renderer;
-		}
 		m_renderer = reinterpret_cast<osd_renderer *>(osd_renderer::make_for_type(video_config.mode, reinterpret_cast<osd_window *>(this)));
 		if (m_renderer->create())
 			exit(1);

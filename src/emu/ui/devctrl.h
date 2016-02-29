@@ -126,11 +126,7 @@ std::string ui_menu_device_control<_DeviceType>::current_display_name()
 	std::string display_name;
 	display_name.assign(current_device()->name());
 	if (count() > 1)
-	{
-		std::string temp;
-		strprintf(temp, " %d", current_index() + 1);
-		display_name.append(temp);
-	}
+		display_name.append(string_format("%d", current_index() + 1));
 	return display_name;
 }
 

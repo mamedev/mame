@@ -183,8 +183,12 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_DRC_LOG_NATIVE,                             "0",         OPTION_BOOLEAN,    "write DRC native disassembly log" },
 	{ OPTION_BIOS,                                       nullptr,        OPTION_STRING,     "select the system BIOS to use" },
 	{ OPTION_CHEAT ";c",                                 "0",         OPTION_BOOLEAN,    "enable cheat subsystem" },
-	{ OPTION_UI,          	                             "cabinet",   OPTION_STRING,     "type of UI (simple|cabinet)" },
+	{ OPTION_SKIP_GAMEINFO,                              "0",         OPTION_BOOLEAN,    "skip displaying the information screen at startup" },
+	{ OPTION_UI_FONT,                                    "default",   OPTION_STRING,     "specify a font to use" },
+	{ OPTION_UI,                                         "cabinet",   OPTION_STRING,     "type of UI (simple|cabinet)" },
 	{ OPTION_RAMSIZE ";ram",                             nullptr,        OPTION_STRING,     "size of RAM (if supported by driver)" },
+	{ OPTION_CONFIRM_QUIT,                               "0",         OPTION_BOOLEAN,    "display confirm quit screen on exit" },
+	{ OPTION_UI_MOUSE,                                   "1",         OPTION_BOOLEAN,    "display ui mouse cursor" },
 	{ OPTION_AUTOBOOT_COMMAND ";ab",                     nullptr,        OPTION_STRING,     "command to execute after machine boot" },
 	{ OPTION_AUTOBOOT_DELAY,                             "2",         OPTION_INTEGER,    "timer delay in sec to trigger command execution on autoboot" },
 	{ OPTION_AUTOBOOT_SCRIPT ";script",                  nullptr,        OPTION_STRING,     "lua script to execute after machine boot" },
@@ -330,14 +334,14 @@ void emu_options::add_device_options()
 			add_entry(nullptr, "IMAGE DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
 
 		// retrieve info about the device instance
-		std::string option_name;
-		strprintf(option_name, "%s;%s", image->instance_name(), image->brief_instance_name());
+		std::ostringstream option_name;
+		stream_format(option_name, "%s;%s", image->instance_name(), image->brief_instance_name());
 		if (strcmp(image->device_typename(image->image_type()), image->instance_name()) == 0)
-			strcatprintf(option_name, ";%s1;%s1", image->instance_name(), image->brief_instance_name());
+			stream_format(option_name, ";%s1;%s1", image->instance_name(), image->brief_instance_name());
 
 		// add the option
 		if (!exists(image->instance_name()))
-			add_entry(option_name.c_str(), nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, nullptr, true);
+			add_entry(option_name.str().c_str(), nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, nullptr, true);
 	}
 }
 
@@ -570,8 +574,8 @@ bool emu_options::parse_one_ini(const char *basename, int priority, std::string 
 	bool result = parse_ini_file((core_file&)file, priority, OPTION_PRIORITY_DRIVER_INI, error);
 
 	// append errors if requested
-	if (!error.empty() && error_string != nullptr)
-		strcatprintf(*error_string, "While parsing %s:\n%s\n", file.fullpath(), error.c_str());
+	if (!error.empty() && error_string)
+		error_string->append(string_format("While parsing %s:\n%s\n", file.fullpath(), error));
 
 	return result;
 }

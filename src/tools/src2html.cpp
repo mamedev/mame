@@ -332,7 +332,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 
 	// create an index file
 	std::string indexname;
-	strprintf(indexname,"%s%c%s", dstdir.c_str(), PATH_SEPARATOR[0], "index.html");
+	indexname = string_format("%s%c%s", dstdir.c_str(), PATH_SEPARATOR[0], "index.html");
 	core_file *indexfile = create_file_and_output_header(indexname, tempheader, srcdir_subpath);
 
 	// output the directory navigation
@@ -402,7 +402,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 
 			// build the source filename
 			std::string srcfile;
-			strprintf(srcfile, "%s%c%s", srcdir.c_str(), PATH_SEPARATOR[0], curlist->name.c_str());
+			srcfile = string_format("%s%c%s", srcdir.c_str(), PATH_SEPARATOR[0], curlist->name.c_str());
 
 			// if we have a file, output it
 			std::string dstfile;
@@ -420,7 +420,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 				// if we got a valid file, process it
 				if (type != FILE_TYPE_INVALID)
 				{
-					strprintf(dstfile, "%s%c%s.html", dstdir.c_str(), PATH_SEPARATOR[0], curlist->name.c_str());
+					dstfile = string_format("%s%c%s.html", dstdir.c_str(), PATH_SEPARATOR[0], curlist->name.c_str());
 					if (indexfile != nullptr)
 						core_fprintf(indexfile, "\t<li><a href=\"%s.html\">%s</a></li>\n", curlist->name.c_str(), curlist->name.c_str());
 					result = output_file(type, srcrootlen, dstrootlen, srcfile, dstfile, srcdir.compare(dstdir) == 0, tempheader, tempfooter);
@@ -430,7 +430,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 			// if we have a directory, recurse
 			else
 			{
-				strprintf(dstfile, "%s%c%s", dstdir.c_str(), PATH_SEPARATOR[0], curlist->name.c_str());
+				dstfile = string_format("%s%c%s", dstdir.c_str(), PATH_SEPARATOR[0], curlist->name.c_str());
 				if (indexfile != nullptr)
 					core_fprintf(indexfile, "\t<li><a href=\"%s/index.html\">%s/</a></li>\n", curlist->name.c_str(), curlist->name.c_str());
 				result = recurse_dir(srcrootlen, dstrootlen, srcfile, dstfile, tempheader, tempfooter);
@@ -544,11 +544,12 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 	int linenum = 1;
 	bool in_comment = false;
 	char srcline[4096];
+	std::ostringstream dstline;
 	while (core_fgets(srcline, ARRAY_LENGTH(srcline), src) != nullptr)
 	{
 		// start with the line number
-		std::string dstline;
-		strcatprintf(dstline, "<span class=\"linenum\">%5d</span>&nbsp;&nbsp;", linenum++);
+		dstline.str("");
+		stream_format(dstline, "<span class=\"linenum\">%5d</span>&nbsp;&nbsp;", linenum++);
 
 		// iterate over characters in the source line
 		bool escape = false;
@@ -568,7 +569,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 			{
 				if (!in_comment && ch == comment_start[0] && strncmp(srcptr - 1, comment_start, strlen(comment_start)) == 0)
 				{
-					strcatprintf(dstline, "<span class=\"comment\">%s", comment_start_esc);
+					stream_format(dstline, "<span class=\"comment\">%s", comment_start_esc);
 					curcol += strlen(comment_start);
 					srcptr += strlen(comment_start) - 1;
 					ch = 0;
@@ -576,7 +577,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 				}
 				else if (in_comment && ch == comment_end[0] && strncmp(srcptr - 1, comment_end, strlen(comment_end)) == 0)
 				{
-					strcatprintf(dstline, "%s</span>", comment_end_esc);
+					stream_format(dstline, "%s</span>", comment_end_esc);
 					curcol += strlen(comment_end);
 					srcptr += strlen(comment_end) - 1;
 					ch = 0;
@@ -587,7 +588,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 			// track whether or not we are within an inline (C++-style) comment
 			if (!in_quotes && !in_comment && !in_inline_comment && ch == comment_inline[0] && strncmp(srcptr - 1, comment_inline, strlen(comment_inline)) == 0)
 			{
-				strcatprintf(dstline, "<span class=\"comment\">%s", comment_inline_esc);
+				stream_format(dstline, "<span class=\"comment\">%s", comment_inline_esc);
 				curcol += strlen(comment_inline);
 				srcptr += strlen(comment_inline) - 1;
 				ch = 0;
@@ -611,7 +612,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 				for (curtoken = token_table; curtoken->token != nullptr; curtoken++)
 					if (strncmp(srcptr - 1, curtoken->token, toklength) == 0 && strlen(curtoken->token) == toklength)
 					{
-						strcatprintf(dstline, "<span class=\"%s\">%s</span>", curtoken->color, curtoken->token);
+						stream_format(dstline, "<span class=\"%s\">%s</span>", curtoken->color, curtoken->token);
 						curcol += strlen(curtoken->token);
 						srcptr += strlen(curtoken->token) - 1;
 						ch = 0;
@@ -631,7 +632,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 				int spaces = 4 - curcol % 4;
 				while (spaces--)
 				{
-					dstline.push_back(' ');
+					dstline.put(' ');
 					curcol++;
 				}
 			}
@@ -643,9 +644,9 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 				if (!in_comment && !in_inline_comment && !in_quotes && (ch == '"' || ch == '\''))
 				{
 					if (color_quotes)
-						strcatprintf(dstline, "<span class=\"string\">%c", ch);
+						stream_format(dstline, "<span class=\"string\">%c", ch);
 					else
-						dstline.push_back(ch);
+						dstline.put(ch);
 					in_quotes = true;
 					curquote = ch;
 
@@ -659,7 +660,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 							std::string target;
 							if (find_include_file(target, srcrootlen, dstrootlen, srcfile, dstfile, filename))
 							{
-								strcatprintf(dstline, "<a href=\"%s\">", target.c_str());
+								stream_format(dstline, "<a href=\"%s\">", target.c_str());
 								quotes_are_linked = true;
 							}
 						}
@@ -670,11 +671,11 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 				else if (!in_comment && !in_inline_comment && in_quotes && (ch == curquote) && !escape)
 				{
 					if (quotes_are_linked)
-						dstline.append("</a>");
+						dstline << "</a>";
 					if (color_quotes)
-						strcatprintf(dstline, "%c</span>", ch);
+						stream_format(dstline, "%c</span>", ch);
 					else
-						dstline.push_back(ch);
+						dstline.put(ch);
 					in_quotes = false;
 					curquote = 0;
 					quotes_are_linked = false;
@@ -682,13 +683,13 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 
 				// else just output the current character
 				else if (ch == '&')
-					dstline.append("&amp;");
+					dstline << "&amp;";
 				else if (ch == '<')
-					dstline.append("&lt;");
+					dstline << "&lt;";
 				else if (ch == '>')
-					dstline.append("&gt;");
+					dstline << "&gt;";
 				else
-					dstline.push_back(ch);
+					dstline.put(ch);
 				curcol++;
 			}
 
@@ -700,13 +701,13 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 		// finish inline comments
 		if (in_inline_comment)
 		{
-			dstline.append("</span>");
+			dstline << "</span>";
 			in_inline_comment = false;
 		}
 
 		// append a break and move on
-		dstline.append("\n");
-		core_fputs(dst, dstline.c_str());
+		dstline.put('\n');
+		core_fputs(dst, dstline.str().c_str());
 	}
 
 	// close tags

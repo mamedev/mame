@@ -31,7 +31,7 @@ public:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	int	actual;
+	int actual;
 	const game_driver  *m_driver;
 	ui_software_info *m_swinfo;
 	std::string m_list, m_short, m_long, m_parent;
@@ -43,7 +43,7 @@ private:
 	{
 		list_items(std::string l, int i, std::string rev) { label = l; option = i; revision = rev; }
 		std::string label;
-		int	option;
+		int option;
 		std::string revision;
 	};
 	std::vector<list_items> m_items_list;

@@ -2,18 +2,18 @@
 // copyright-holders:Curt Coder, Ales Dlabac
 /***************************************************************************
 
-	Sord m.5
+    Sord m.5
 
-	http://www.retropc.net/mm/m5/
-	http://www.museo8bits.es/wiki/index.php/Sord_M5 not working
-	http://k5.web.klfree.net/content/view/10/11/ not working
-	http://k5.web.klfree.net/images/stories/sord/m5heap.htm  not working
-	http://k5.klfree.net/index.php?option=com_content&task=view&id=5&Itemid=3
-	http://k5.klfree.net/index.php?option=com_content&task=view&id=10&Itemid=11
-	http://k5.klfree.net/index.php?option=com_content&task=view&id=14&Itemid=3
-	http://www.dlabi.cz/?s=sord
-	https://www.facebook.com/groups/59667560188/
-	http://www.oldcomp.cz/viewtopic.php?f=103&t=1164
+    http://www.retropc.net/mm/m5/
+    http://www.museo8bits.es/wiki/index.php/Sord_M5 not working
+    http://k5.web.klfree.net/content/view/10/11/ not working
+    http://k5.web.klfree.net/images/stories/sord/m5heap.htm  not working
+    http://k5.klfree.net/index.php?option=com_content&task=view&id=5&Itemid=3
+    http://k5.klfree.net/index.php?option=com_content&task=view&id=10&Itemid=11
+    http://k5.klfree.net/index.php?option=com_content&task=view&id=14&Itemid=3
+    http://www.dlabi.cz/?s=sord
+    https://www.facebook.com/groups/59667560188/
+    http://www.oldcomp.cz/viewtopic.php?f=103&t=1164
 
 ****************************************************************************/
 
@@ -21,34 +21,34 @@
 
 TODO:
 
-	- fd5 floppy
-	- SI-5 serial interface (8251, ROM)
-	- ramdisk for KRX Memory expansion
-	- rewrite fd5 floppy as unpluggable device
-	- move dipswitch declaration to softwarelist file?
-	- 64krx: get windows ROM version with cpm & ramdisk support (Stuchlik S.E.I. version)
+    - fd5 floppy
+    - SI-5 serial interface (8251, ROM)
+    - ramdisk for KRX Memory expansion
+    - rewrite fd5 floppy as unpluggable device
+    - move dipswitch declaration to softwarelist file?
+    - 64krx: get windows ROM version with cpm & ramdisk support (Stuchlik S.E.I. version)
 
-	- brno mod: make the dsk image writeable
-	- brno mod: in console version lost data on RAMDISK after soft reset
-	- brno mod: add support for lzr floppy disc format
-	- brno mod: include basic-i
+    - brno mod: make the dsk image writeable
+    - brno mod: in console version lost data on RAMDISK after soft reset
+    - brno mod: add support for lzr floppy disc format
+    - brno mod: include basic-i
 
 
 
 CHANGELOG:
 
 10.02.2016
-	- fixed bug: crash if rom card was only cart
-	- fixed bug: when em-5 selected monitor rom wasn't paged in
-	- brno mod: spin motor on upon restart
-	- brno mod: windowed boot as default rom
-	- brno mod: fixed bug: tape command in menu now works
+    - fixed bug: crash if rom card was only cart
+    - fixed bug: when em-5 selected monitor rom wasn't paged in
+    - brno mod: spin motor on upon restart
+    - brno mod: windowed boot as default rom
+    - brno mod: fixed bug: tape command in menu now works
 
 05.02.2016
-	- added BRNO modification - 1024kB Ramdisk + CP/M support
-	- 32/64KB RAM expansions EM-5, 64KBI, 64KBF, 64KRX
-	- since now own version of rom and slot handlers
-	- 2 slots for carts
+    - added BRNO modification - 1024kB Ramdisk + CP/M support
+    - 32/64KB RAM expansions EM-5, 64KBI, 64KBF, 64KRX
+    - since now own version of rom and slot handlers
+    - 2 slots for carts
 
 
 ******************************************************************************
@@ -58,12 +58,12 @@ Controlling (paging) of homebrew 64KB RAM carts
 ================================================
 
 Used ports:
-EM-64, 64KBI:	OUT 6CH,00H	- enables ROM
-				OUT 6CH,01H	- enables RAM
-64KBF:			OUT 30H,00000xxxB	- enables RAM or ROM, see bellow
-64KRD, 64KRX:	OUT 7FH,00000000B	- enables RAM
-				OUT 7FH,11111111B	- enables ROM
-				OUT 7FH,xxxxxxxxB	- enables RAM and ROM, see bellow
+EM-64, 64KBI:   OUT 6CH,00H - enables ROM
+                OUT 6CH,01H - enables RAM
+64KBF:          OUT 30H,00000xxxB   - enables RAM or ROM, see bellow
+64KRD, 64KRX:   OUT 7FH,00000000B   - enables RAM
+                OUT 7FH,11111111B   - enables ROM
+                OUT 7FH,xxxxxxxxB   - enables RAM and ROM, see bellow
 
 ===========================================================================================================================
 
@@ -78,93 +78,93 @@ RAM/ROM modes of 64KBF version 2C cart
 ------------------------------------------
 Memory paging is done by using "OUT &30,mod".
 
-MODE	READ							WRITE
+MODE    READ                            WRITE
 ----------------------------------------------------------------------
- 00	8 KB MON + 20 KB BF + 36 KB RAM		28 KB DIS + 36 KB RAM
- 01	64 KB RAM							64 KB RAM
- 02	8 KB MON + 56 KB RAM				64 KB RAM
- 03	64 KB RAM							28 KB DIS + 36 KB RAM
- 04	64 KB RAM							16 KB DIS + 48 KB RAM
- 05	8 KB MON + 20 KB BF + 36 KB RAM		64 KB RAM
- 06	8 KB MON + 20 KB DIS + 36 KB RAM	64 KB RAM
- 07	64 KB DIS							64 KB DIS
-				
+ 00 8 KB MON + 20 KB BF + 36 KB RAM     28 KB DIS + 36 KB RAM
+ 01 64 KB RAM                           64 KB RAM
+ 02 8 KB MON + 56 KB RAM                64 KB RAM
+ 03 64 KB RAM                           28 KB DIS + 36 KB RAM
+ 04 64 KB RAM                           16 KB DIS + 48 KB RAM
+ 05 8 KB MON + 20 KB BF + 36 KB RAM     64 KB RAM
+ 06 8 KB MON + 20 KB DIS + 36 KB RAM    64 KB RAM
+ 07 64 KB DIS                           64 KB DIS
+
 Version LZR ( 2C )
 ================
 
 +------------+
-|////////////|	READ ONLY AREA
+|////////////|  READ ONLY AREA
 +------------+
-|\\\\\\\\\\\\|	WRITE ONLY AREA
+|\\\\\\\\\\\\|  WRITE ONLY AREA
 +------------+
-|XXXXXXXXXXXX|	R&W AREA
+|XXXXXXXXXXXX|  R&W AREA
 +------------+
-|            |	DISABLED R&W
+|            |  DISABLED R&W
 +------------+
 
-	  0   0   0   1   1   2   2   2   3   3   4   4   4   5   5   6   6
-kB	  0   4   8   2   6   0   4   8   2   6   0   4   8   2   6   0   4
-	  +-------+-------------------+
-ROM	  |MONITOR|      BASIC-F      |
-	  +-------+-------+-------+---+---+-------+-------+-------+-------+
-RAM	  |       |       |       |       |       |       |       |       |
-	  +-------+-------+-------+-------+-------+-------+-------+-------+
+      0   0   0   1   1   2   2   2   3   3   4   4   4   5   5   6   6
+kB    0   4   8   2   6   0   4   8   2   6   0   4   8   2   6   0   4
+      +-------+-------------------+
+ROM   |MONITOR|      BASIC-F      |
+      +-------+-------+-------+---+---+-------+-------+-------+-------+
+RAM   |       |       |       |       |       |       |       |       |
+      +-------+-------+-------+-------+-------+-------+-------+-------+
 CART  |       |       |       |       |       |       |       |       |
-	  +-------+-------+-------+-------+-------+-------+-------+-------+
+      +-------+-------+-------+-------+-------+-------+-------+-------+
 
 
 Mode
-	+-------+-------------------+
-	|///////|///////////////////|
-	+-------+-------+-------+---+---+-------+-------+-------+-------+
-M0	|       |       |       |   |XXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|
-	+-------+-------+-------+-------+-------+-------+-------+-------+
+    +-------+-------------------+
+    |///////|///////////////////|
+    +-------+-------+-------+---+---+-------+-------+-------+-------+
+M0  |       |       |       |   |XXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|
+    +-------+-------+-------+-------+-------+-------+-------+-------+
 
-	+-------+-------------------+
-	|       |                   |
-	+-------+-------+-------+---+---+-------+-------+-------+-------+
-M1	|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|
-	+-------+-------+-------+-------+-------+-------+-------+-------+
+    +-------+-------------------+
+    |       |                   |
+    +-------+-------+-------+---+---+-------+-------+-------+-------+
+M1  |XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|
+    +-------+-------+-------+-------+-------+-------+-------+-------+
 
-	+-------+-------------------+
-	|///////|                   |
-	+-------+-------+-------+---+---+-------+-------+-------+-------+
-M2	|\\\\\\\|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|
-	+-------+-------+-------+-------+-------+-------+-------+-------+
+    +-------+-------------------+
+    |///////|                   |
+    +-------+-------+-------+---+---+-------+-------+-------+-------+
+M2  |\\\\\\\|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|
+    +-------+-------+-------+-------+-------+-------+-------+-------+
 
-	+-------+-------------------+
-	|       |                   |
-	+-------+-------+-------+---+---+-------+-------+-------+-------+
-M3	|///////|///////|///////|///|XXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|
-	+-------+-------+-------+-------+-------+-------+-------+-------+
+    +-------+-------------------+
+    |       |                   |
+    +-------+-------+-------+---+---+-------+-------+-------+-------+
+M3  |///////|///////|///////|///|XXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|
+    +-------+-------+-------+-------+-------+-------+-------+-------+
 
-	+-------+-------------------+
-	|       |                   |
-	+-------+-------+-------+---+---+-------+-------+-------+-------+
-M4	|///////|///////|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|
-	+-------+-------+-------+-------+-------+-------+-------+-------+
+    +-------+-------------------+
+    |       |                   |
+    +-------+-------+-------+---+---+-------+-------+-------+-------+
+M4  |///////|///////|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|
+    +-------+-------+-------+-------+-------+-------+-------+-------+
 
-	+-------+-------------------+
-	|///////|///////////////////|
-	+-------+-------+-------+---+---+-------+-------+-------+-------+
-M5	|\\\\\\\|\\\\\\\|\\\\\\\|\\\|XXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|
-	+-------+-------+-------+-------+-------+-------+-------+-------+
+    +-------+-------------------+
+    |///////|///////////////////|
+    +-------+-------+-------+---+---+-------+-------+-------+-------+
+M5  |\\\\\\\|\\\\\\\|\\\\\\\|\\\|XXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|
+    +-------+-------+-------+-------+-------+-------+-------+-------+
 
-	+-------+-------------------+
-	|///////|                   |
-	+-------+-------+-------+---+---+-------+-------+-------+-------+
-M6	|\\\\\\\|\\\\\\\|\\\\\\\|\\\|XXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|
-	+-------+-------+-------+---+---+-------+-------+-------+-------+
-			|///////|///////|///|
-		    +-------+-------+---+
+    +-------+-------------------+
+    |///////|                   |
+    +-------+-------+-------+---+---+-------+-------+-------+-------+
+M6  |\\\\\\\|\\\\\\\|\\\\\\\|\\\|XXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|
+    +-------+-------+-------+---+---+-------+-------+-------+-------+
+            |///////|///////|///|
+            +-------+-------+---+
 
-	+-------+-------------------+
-	|       |                   |
-	+-------+-------+-------+---+---+-------+-------+-------+-------+
-M7	|       |       |       |       |       |       |       |       |
-	+-------+-------+-------+-------+-------+-------+-------+-------+
-	|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|
-	+---------------------------------------------------------------+
+    +-------+-------------------+
+    |       |                   |
+    +-------+-------+-------+---+---+-------+-------+-------+-------+
+M7  |       |       |       |       |       |       |       |       |
+    +-------+-------+-------+-------+-------+-------+-------+-------+
+    |XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|XXXXXXX|
+    +---------------------------------------------------------------+
 
 ===========================================================================================================
 
@@ -181,9 +181,9 @@ C000 |   DRAM   |                           +----------+ +----------+
      |          |                           | EPROM 16K| | EPROM 16K|
      |          |                           |        4 | |        6 |
 7FFF +----------+ +----------+              +----------+ +----------+
-                  |   SRAM   |             
-7000 +----------+ +----------+             
-     |          |             
+                  |   SRAM   |
+7000 +----------+ +----------+
+     |          |
 6000 |          |                           +----------+
      |          |                           |          |
 5000 |          |                           | EPROM 8K |
@@ -213,12 +213,12 @@ Switching between 4,5 and 6,7 is provided by hw switch, selecting ROM/RAM mode h
 using OUT (7FH),A, where each bit of A means 8KB memory chunk ( state: 0=RAM,
 1=ROM, bit: 0=1, 1=2, 2=3, 3=always SRAM, 4=4, 5=5, 6=6, 7=7 ).
 
-				
+
 */
 
 /*
 *************************************************************
-*						BRNO MOD							*
+*                       BRNO MOD                            *
 *************************************************************
 HW and SW was originally created by Pavel Brychta with help of Jiri Kubin and L. Novak
 This driver mod was implemented by Ales Dlabac with great help of Pavel Brychta. Without him this would never happen
@@ -230,7 +230,7 @@ Whole Sord's address area (0000-FFFF) is divided to 16 4kB banks. To this 16 ban
 you can map any of possible 256 ramdisc blocks what allows user to have 1024kB large ramdisc.
 Of course to be able to realise this is necessary page out all roms
 
-As pagination port MMU(page select) is used. 
+As pagination port MMU(page select) is used.
 For RAM write protection port CASEN is used. 0=access to ramdisk enabled, 0xff=ramdisk access disabled(data protection), &80=ROM2+48k RAM, &81=ROM2+4k RAM(this is not implemented)
 For ROM page out port RAMEN is used. 0=rom enable; 0xff=rom+sord ram disabled (ramdisk visible)
 
@@ -243,20 +243,20 @@ a. SORD system variables and stack
 c. Area where the first sector of 1st track is loaded, simultaneously is reserved for Hook program
 d. Reserved for memory tests and ramdisk mapping(pagination). After boot is used as buffer for cursor position,
    type of floppy and so on. Area consists of:
-   
+
 7FFFH .... bootloader version
 7FFEH .... identification byte of floppy - is transferred from EPROM, it might be changed by SETUP
 7FFDH .... number of last Ramdisk segment of RAM
-7FFBH .... address of cursor in VRAM in 40 columns CRT. For 80 columns CRT both bytes are zero  
+7FFBH .... address of cursor in VRAM in 40 columns CRT. For 80 columns CRT both bytes are zero
 7FF9H .... X,Y cursor actual position for 40 columns CRTs. In case of 80 columns CRT both bytes are zero
 7203H .... Actual memory bank buffer
-           
+
 System floppy disk header on track 00 of 1st sector
-		 byte 0-1  ... system disk identification SY
-	     byte 2    ... # of physical sectors for BIOS or DOS plus # of segments for DIR
-	     byte 3-4  ... Start address for loading of BIOS or DOS
-	     byte 5    ... # of bytes for possible HOOK program
-	     byte 6-   ... HOOK	program, or either BIOS or DOS
+         byte 0-1  ... system disk identification SY
+         byte 2    ... # of physical sectors for BIOS or DOS plus # of segments for DIR
+         byte 3-4  ... Start address for loading of BIOS or DOS
+         byte 5    ... # of bytes for possible HOOK program
+         byte 6-   ... HOOK program, or either BIOS or DOS
 
 In case of HOOK, bytes 8 and 9 contains characters 'H' and 'O' for HOOK testing
 
@@ -266,9 +266,9 @@ Few other notes:
 
  Floppy formats as follows:
 
- A: Ramdisk 1024kB, 8 sectors, 
- B: Floppy format "Heat Magnolia" SingleSide SingleDensity , 40 tracks, 9 sectors, 512  sec. length, 128 dirs, offset 3, 166kB 
- C: Floppy format "Robotron aka PC1715", DS DD,				 80 tracks, 5 sectors, 1024 sec. length, 128 dirs, offset 2, 780kB
+ A: Ramdisk 1024kB, 8 sectors,
+ B: Floppy format "Heat Magnolia" SingleSide SingleDensity , 40 tracks, 9 sectors, 512  sec. length, 128 dirs, offset 3, 166kB
+ C: Floppy format "Robotron aka PC1715", DS DD,              80 tracks, 5 sectors, 1024 sec. length, 128 dirs, offset 2, 780kB
 
 **********************************************************************************************************************************/
 
@@ -498,19 +498,18 @@ READ8_MEMBER( m5_state::mem64KBI_r ) //in 0x6c
 
 WRITE8_MEMBER( m5_state::mem64KBI_w ) //out 0x6c
 {
-
 	if (m_ram_type != MEM64KBI) return;
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart_ram->tag()).append(M5SLOT_ROM_REGION_TAG).c_str());
 	memory_region *ram_region=memregion(region_tag.assign(m_cart_ram->tag()).append(":ram").c_str());
-	
+
 	if (m_ram_mode == BIT(data, 0))
 		return;
-	
+
 	m_ram_mode = BIT(data, 0);
-	
+
 	//if 32kb only mode don't map top ram
 	if (m_ram_mode && (m_DIPS->read() & 4) != 4)
 	{
@@ -520,7 +519,7 @@ WRITE8_MEMBER( m5_state::mem64KBI_w ) //out 0x6c
 	{
 		program.install_rom(0x0000, 0x1fff, memregion(Z80_TAG)->base());
 		program.unmap_write(0x0000, 0x1fff);
-		
+
 		//if AUTOSTART is on don't load any ROM cart
 		if (m_cart && (m_DIPS->read() & 2) != 2)
 		{
@@ -530,7 +529,7 @@ WRITE8_MEMBER( m5_state::mem64KBI_w ) //out 0x6c
 		else
 			program.unmap_readwrite(0x2000, 0x3fff);
 	}
-	
+
 	logerror("64KBI: ROM %s", m_ram_mode == 0 ? "enabled\n" : "disabled\n");
 }
 
@@ -544,49 +543,49 @@ WRITE8_MEMBER( m5_state::mem64KBF_w ) //out 0x30
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	std::string region_tag;
-	m_cart_rom = memregion(region_tag.assign(m_cart_ram->tag()).append(M5SLOT_ROM_REGION_TAG).c_str());	//ROM region of the cart
-	memory_region *ram_region=memregion(region_tag.assign(m_cart_ram->tag()).append(":ram").c_str());	//RAM region of the cart
+	m_cart_rom = memregion(region_tag.assign(m_cart_ram->tag()).append(M5SLOT_ROM_REGION_TAG).c_str()); //ROM region of the cart
+	memory_region *ram_region=memregion(region_tag.assign(m_cart_ram->tag()).append(":ram").c_str());   //RAM region of the cart
 	memory_region *rom_region=memregion(region_tag.assign(m_cart->tag()).append(M5SLOT_ROM_REGION_TAG).c_str()); //region where clasic ROM cartridge resides
-	
+
 	if (m_ram_mode == data)
 		return;
 
 	m_ram_mode = data;
-	
+
 	switch(m_ram_mode)
 	{
-		case 0:	
+		case 0:
 			program.unmap_write(0x0000, 0x6fff);
 			membank("bank1r")->set_base(memregion(Z80_TAG)->base());
 			membank("bank2r")->set_base(m_cart_rom->base());
 			membank("bank3r")->set_base(m_cart_rom->base()+0x2000);
 			membank("bank4r")->set_base(m_cart_rom->base()+0x4000);
-			membank("bank5r")->set_base(ram_region->base()+0x8000);		membank("bank5w")->set_base(ram_region->base()+0x8000);
-			membank("bank6r")->set_base(ram_region->base()+0xc000);		membank("bank6w")->set_base(ram_region->base()+0xc000);
+			membank("bank5r")->set_base(ram_region->base()+0x8000);     membank("bank5w")->set_base(ram_region->base()+0x8000);
+			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
 			break;
 		case 1:
 			program.install_write_bank(0x0000,0x1fff,"bank1w");
 			program.install_write_bank(0x2000,0x3fff,"bank2w");
 			program.install_write_bank(0x4000,0x5fff,"bank3w");
 			program.install_write_bank(0x6000,0x6fff,"bank4w");
-			membank("bank1r")->set_base(ram_region->base()+0x0000);		membank("bank1w")->set_base(ram_region->base()+0x0000);
-			membank("bank2r")->set_base(ram_region->base()+0x2000);		membank("bank2w")->set_base(ram_region->base()+0x2000);
-			membank("bank3r")->set_base(ram_region->base()+0x4000);		membank("bank3w")->set_base(ram_region->base()+0x4000);
-			membank("bank4r")->set_base(ram_region->base()+0x6000);		membank("bank4w")->set_base(ram_region->base()+0x6000);
-			membank("bank5r")->set_base(ram_region->base()+0x8000);		membank("bank5w")->set_base(ram_region->base()+0x8000);
-			membank("bank6r")->set_base(ram_region->base()+0xc000);		membank("bank6w")->set_base(ram_region->base()+0xc000);
+			membank("bank1r")->set_base(ram_region->base()+0x0000);     membank("bank1w")->set_base(ram_region->base()+0x0000);
+			membank("bank2r")->set_base(ram_region->base()+0x2000);     membank("bank2w")->set_base(ram_region->base()+0x2000);
+			membank("bank3r")->set_base(ram_region->base()+0x4000);     membank("bank3w")->set_base(ram_region->base()+0x4000);
+			membank("bank4r")->set_base(ram_region->base()+0x6000);     membank("bank4w")->set_base(ram_region->base()+0x6000);
+			membank("bank5r")->set_base(ram_region->base()+0x8000);     membank("bank5w")->set_base(ram_region->base()+0x8000);
+			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
 			break;
 		case 2:
 			program.install_write_bank(0x0000,0x1fff,"bank1w");
 			program.install_write_bank(0x2000,0x3fff,"bank2w");
 			program.install_write_bank(0x4000,0x5fff,"bank3w");
 			program.install_write_bank(0x6000,0x6fff,"bank4w");
-			membank("bank1r")->set_base(memregion(Z80_TAG)->base());	membank("bank1w")->set_base(ram_region->base()+0x0000);
-			membank("bank2r")->set_base(ram_region->base()+0x2000);		membank("bank2w")->set_base(ram_region->base()+0x2000);
-			membank("bank3r")->set_base(ram_region->base()+0x4000);		membank("bank3w")->set_base(ram_region->base()+0x4000);
-			membank("bank4r")->set_base(ram_region->base()+0x6000);		membank("bank4w")->set_base(ram_region->base()+0x6000);
-			membank("bank5r")->set_base(ram_region->base()+0x8000);		membank("bank5w")->set_base(ram_region->base()+0x8000);
-			membank("bank6r")->set_base(ram_region->base()+0xc000);		membank("bank6w")->set_base(ram_region->base()+0xc000);
+			membank("bank1r")->set_base(memregion(Z80_TAG)->base());    membank("bank1w")->set_base(ram_region->base()+0x0000);
+			membank("bank2r")->set_base(ram_region->base()+0x2000);     membank("bank2w")->set_base(ram_region->base()+0x2000);
+			membank("bank3r")->set_base(ram_region->base()+0x4000);     membank("bank3w")->set_base(ram_region->base()+0x4000);
+			membank("bank4r")->set_base(ram_region->base()+0x6000);     membank("bank4w")->set_base(ram_region->base()+0x6000);
+			membank("bank5r")->set_base(ram_region->base()+0x8000);     membank("bank5w")->set_base(ram_region->base()+0x8000);
+			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
 			break;
 		case 3:
 			program.unmap_write(0x0000, 0x6fff);
@@ -594,8 +593,8 @@ WRITE8_MEMBER( m5_state::mem64KBF_w ) //out 0x30
 			membank("bank2r")->set_base(ram_region->base()+0x2000);
 			membank("bank3r")->set_base(ram_region->base()+0x4000);
 			membank("bank4r")->set_base(ram_region->base()+0x6000);
-			membank("bank5r")->set_base(ram_region->base()+0x8000);		membank("bank5w")->set_base(ram_region->base()+0x8000);
-			membank("bank6r")->set_base(ram_region->base()+0xc000);		membank("bank6w")->set_base(ram_region->base()+0xc000);
+			membank("bank5r")->set_base(ram_region->base()+0x8000);     membank("bank5w")->set_base(ram_region->base()+0x8000);
+			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
 			break;
 		case 4:
 			program.unmap_write(0x0000, 0x3fff);
@@ -603,34 +602,34 @@ WRITE8_MEMBER( m5_state::mem64KBF_w ) //out 0x30
 			program.install_write_bank(0x6000,0x6fff,"bank4w");
 			membank("bank1r")->set_base(ram_region->base()+0x0000);
 			membank("bank2r")->set_base(ram_region->base()+0x2000);
-			membank("bank3r")->set_base(ram_region->base()+0x4000);		membank("bank3w")->set_base(ram_region->base()+0x4000);
-			membank("bank4r")->set_base(ram_region->base()+0x6000);		membank("bank4w")->set_base(ram_region->base()+0x6000);
-			membank("bank5r")->set_base(ram_region->base()+0x8000);		membank("bank5w")->set_base(ram_region->base()+0x8000);
-			membank("bank6r")->set_base(ram_region->base()+0xc000);		membank("bank6w")->set_base(ram_region->base()+0xc000);
+			membank("bank3r")->set_base(ram_region->base()+0x4000);     membank("bank3w")->set_base(ram_region->base()+0x4000);
+			membank("bank4r")->set_base(ram_region->base()+0x6000);     membank("bank4w")->set_base(ram_region->base()+0x6000);
+			membank("bank5r")->set_base(ram_region->base()+0x8000);     membank("bank5w")->set_base(ram_region->base()+0x8000);
+			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
 			break;
 		case 5:
 			program.install_write_bank(0x0000,0x1fff,"bank1w");
 			program.install_write_bank(0x2000,0x3fff,"bank2w");
 			program.install_write_bank(0x4000,0x5fff,"bank3w");
 			program.install_write_bank(0x6000,0x6fff,"bank4w");
-			membank("bank1r")->set_base(memregion(Z80_TAG)->base());	membank("bank1w")->set_base(ram_region->base()+0x0000);
-			membank("bank2r")->set_base(m_cart_rom->base());			membank("bank2w")->set_base(ram_region->base()+0x2000);
-			membank("bank3r")->set_base(m_cart_rom->base()+0x2000);		membank("bank3w")->set_base(ram_region->base()+0x4000);
-			membank("bank4r")->set_base(m_cart_rom->base()+0x4000);		membank("bank4w")->set_base(ram_region->base()+0x6000);
-			membank("bank5r")->set_base(ram_region->base()+0x8000);		membank("bank5w")->set_base(ram_region->base()+0x8000);
-			membank("bank6r")->set_base(ram_region->base()+0xc000);		membank("bank6w")->set_base(ram_region->base()+0xc000);
+			membank("bank1r")->set_base(memregion(Z80_TAG)->base());    membank("bank1w")->set_base(ram_region->base()+0x0000);
+			membank("bank2r")->set_base(m_cart_rom->base());            membank("bank2w")->set_base(ram_region->base()+0x2000);
+			membank("bank3r")->set_base(m_cart_rom->base()+0x2000);     membank("bank3w")->set_base(ram_region->base()+0x4000);
+			membank("bank4r")->set_base(m_cart_rom->base()+0x4000);     membank("bank4w")->set_base(ram_region->base()+0x6000);
+			membank("bank5r")->set_base(ram_region->base()+0x8000);     membank("bank5w")->set_base(ram_region->base()+0x8000);
+			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
 			break;
 		case 6:
 			program.install_write_bank(0x0000,0x1fff,"bank1w");
 			program.install_write_bank(0x2000,0x3fff,"bank2w");
 			program.install_write_bank(0x4000,0x5fff,"bank3w");
 			program.install_write_bank(0x6000,0x6fff,"bank4w");
-			membank("bank1r")->set_base(memregion(Z80_TAG)->base());	membank("bank1w")->set_base(ram_region->base()+0x0000);
-			membank("bank2r")->set_base(rom_region->base()+0x0000);		membank("bank2w")->set_base(ram_region->base()+0x2000);
-			membank("bank3r")->set_base(rom_region->base()+0x2000);		membank("bank3w")->set_base(ram_region->base()+0x4000);
-			membank("bank4r")->set_base(rom_region->base()+0x4000);		membank("bank4w")->set_base(ram_region->base()+0x6000);
-			membank("bank5r")->set_base(ram_region->base()+0x8000);		membank("bank5w")->set_base(ram_region->base()+0x8000);
-			membank("bank6r")->set_base(ram_region->base()+0xc000);		membank("bank6w")->set_base(ram_region->base()+0xc000);
+			membank("bank1r")->set_base(memregion(Z80_TAG)->base());    membank("bank1w")->set_base(ram_region->base()+0x0000);
+			membank("bank2r")->set_base(rom_region->base()+0x0000);     membank("bank2w")->set_base(ram_region->base()+0x2000);
+			membank("bank3r")->set_base(rom_region->base()+0x2000);     membank("bank3w")->set_base(ram_region->base()+0x4000);
+			membank("bank4r")->set_base(rom_region->base()+0x4000);     membank("bank4w")->set_base(ram_region->base()+0x6000);
+			membank("bank5r")->set_base(ram_region->base()+0x8000);     membank("bank5w")->set_base(ram_region->base()+0x8000);
+			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
 			break;
 		case 7: //probably this won't work - it should redirect rw to another ram module
 			program.install_write_bank(0x0000,0x1fff,"bank1w");
@@ -638,16 +637,16 @@ WRITE8_MEMBER( m5_state::mem64KBF_w ) //out 0x30
 			program.install_write_bank(0x4000,0x5fff,"bank3w");
 			program.install_write_bank(0x6000,0x6fff,"bank4w");
 			program.install_readwrite_bank(0x7000,0x7fff,"sram");
-			membank("bank1r")->set_base(rom_region->base()+0x0000);		membank("bank1w")->set_base(rom_region->base()+0x0000);
-			membank("bank2r")->set_base(rom_region->base()+0x2000);		membank("bank2w")->set_base(rom_region->base()+0x2000);
-			membank("bank3r")->set_base(rom_region->base()+0x4000);		membank("bank3w")->set_base(rom_region->base()+0x4000);
-			membank("bank4r")->set_base(rom_region->base()+0x6000);		membank("bank4w")->set_base(rom_region->base()+0x6000);
+			membank("bank1r")->set_base(rom_region->base()+0x0000);     membank("bank1w")->set_base(rom_region->base()+0x0000);
+			membank("bank2r")->set_base(rom_region->base()+0x2000);     membank("bank2w")->set_base(rom_region->base()+0x2000);
+			membank("bank3r")->set_base(rom_region->base()+0x4000);     membank("bank3w")->set_base(rom_region->base()+0x4000);
+			membank("bank4r")->set_base(rom_region->base()+0x6000);     membank("bank4w")->set_base(rom_region->base()+0x6000);
 			membank("sram")->set_base(rom_region->base()+0x7000);
-			membank("bank5r")->set_base(rom_region->base()+0x8000);		membank("bank5w")->set_base(rom_region->base()+0x8000);
-			membank("bank6r")->set_base(rom_region->base()+0xc000);		membank("bank6w")->set_base(rom_region->base()+0xc000);
+			membank("bank5r")->set_base(rom_region->base()+0x8000);     membank("bank5w")->set_base(rom_region->base()+0x8000);
+			membank("bank6r")->set_base(rom_region->base()+0xc000);     membank("bank6w")->set_base(rom_region->base()+0xc000);
 			break;
 	}
-	
+
 	logerror("64KBF RAM mode set to %d\n", m_ram_mode);
 }
 
@@ -657,7 +656,6 @@ WRITE8_MEMBER( m5_state::mem64KBF_w ) //out 0x30
 
 WRITE8_MEMBER( m5_state::mem64KRX_w ) //out 0x7f
 {
-		
 	if (m_ram_type != MEM64KRX) return;
 	if (m_ram_mode == data) return;
 
@@ -665,22 +663,22 @@ WRITE8_MEMBER( m5_state::mem64KRX_w ) //out 0x7f
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart_ram->tag()).append(M5SLOT_ROM_REGION_TAG).c_str());
 	memory_region *ram_region=memregion(region_tag.assign(m_cart_ram->tag()).append(":ram").c_str());
-	
+
 	m_ram_mode = data;
 
-	BIT(m_ram_mode, 0) ? membank("bank1r")->set_base(memregion(Z80_TAG)->base())	:	membank("bank1r")->set_base(ram_region->base());
-	BIT(m_ram_mode, 1) ? membank("bank2r")->set_base(m_cart_rom->base())			:	membank("bank2r")->set_base(ram_region->base()+0x2000);
-	BIT(m_ram_mode, 2) ? membank("bank3r")->set_base(m_cart_rom->base()+0x2000)		:	membank("bank3r")->set_base(ram_region->base()+0x4000);
+	BIT(m_ram_mode, 0) ? membank("bank1r")->set_base(memregion(Z80_TAG)->base())    :   membank("bank1r")->set_base(ram_region->base());
+	BIT(m_ram_mode, 1) ? membank("bank2r")->set_base(m_cart_rom->base())            :   membank("bank2r")->set_base(ram_region->base()+0x2000);
+	BIT(m_ram_mode, 2) ? membank("bank3r")->set_base(m_cart_rom->base()+0x2000)     :   membank("bank3r")->set_base(ram_region->base()+0x4000);
 
 	if ((m_DIPS->read() & 0x01))
 	{
-		BIT(m_ram_mode, 4) ? membank("bank5r")->set_base(m_cart_rom->base()+0x6000)	:   membank("bank5r")->set_base(ram_region->base()+0x8000);
-		BIT(m_ram_mode, 5) ? membank("bank6r")->set_base(m_cart_rom->base()+0xa000)	:	membank("bank6r")->set_base(ram_region->base()+0xc000);
+		BIT(m_ram_mode, 4) ? membank("bank5r")->set_base(m_cart_rom->base()+0x6000) :   membank("bank5r")->set_base(ram_region->base()+0x8000);
+		BIT(m_ram_mode, 5) ? membank("bank6r")->set_base(m_cart_rom->base()+0xa000) :   membank("bank6r")->set_base(ram_region->base()+0xc000);
 	}
 	else
 	{
-		BIT(m_ram_mode, 6) ? membank("bank5r")->set_base(m_cart_rom->base()+0xe000)	:   membank("bank5r")->set_base(ram_region->base()+0x8000);
-		BIT(m_ram_mode, 7) ? membank("bank6r")->set_base(m_cart_rom->base()+0x12000):	membank("bank6r")->set_base(ram_region->base()+0xc000);
+		BIT(m_ram_mode, 6) ? membank("bank5r")->set_base(m_cart_rom->base()+0xe000) :   membank("bank5r")->set_base(ram_region->base()+0x8000);
+		BIT(m_ram_mode, 7) ? membank("bank6r")->set_base(m_cart_rom->base()+0x12000):   membank("bank6r")->set_base(ram_region->base()+0xc000);
 	}
 
 	//if KRX ROM is paged out page in cart ROM if any
@@ -705,10 +703,10 @@ WRITE8_MEMBER( m5_state::mem64KRX_w ) //out 0x7f
 static ADDRESS_MAP_START( m5_mem, AS_PROGRAM, 8, m5_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_READ_BANK("bank1r") AM_WRITE_BANK("bank1w") //monitor rom(bios)
-	AM_RANGE(0x2000, 0x3fff) AM_READ_BANK("bank2r") AM_WRITE_BANK("bank2w") 
-	AM_RANGE(0x4000, 0x5fff) AM_READ_BANK("bank3r") AM_WRITE_BANK("bank3w")	
-	AM_RANGE(0x6000, 0x6fff) AM_READ_BANK("bank4r") AM_WRITE_BANK("bank4w") 
-	AM_RANGE(0x7000, 0x7fff) AM_RAM											//4kb internal RAM
+	AM_RANGE(0x2000, 0x3fff) AM_READ_BANK("bank2r") AM_WRITE_BANK("bank2w")
+	AM_RANGE(0x4000, 0x5fff) AM_READ_BANK("bank3r") AM_WRITE_BANK("bank3w")
+	AM_RANGE(0x6000, 0x6fff) AM_READ_BANK("bank4r") AM_WRITE_BANK("bank4w")
+	AM_RANGE(0x7000, 0x7fff) AM_RAM                                         //4kb internal RAM
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank5r") AM_WRITE_BANK("bank5w")
 	AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank6r") AM_WRITE_BANK("bank6w")
 ADDRESS_MAP_END
@@ -864,7 +862,7 @@ static INPUT_PORTS_START( m5 )
 	PORT_DIPNAME(0x01, 0x01, "KRX: BASIC[on]/MSX[off]") //switching between BASIC and MSX ROMs which share same address area
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x01, DEF_STR( On ))
-	PORT_DIPNAME(0x02, 0x00, "KBI: AUTOSTART")	//pages out cart and starts loading from tape
+	PORT_DIPNAME(0x02, 0x00, "KBI: AUTOSTART")  //pages out cart and starts loading from tape
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x02, DEF_STR( On ))
 	PORT_DIPNAME(0x04, 0x00, "KBI: 32kb only") //compatible with em-5
@@ -1051,25 +1049,24 @@ static ADDRESS_MAP_START( brno_io, AS_IO, 8, brno_state )
 	AM_RANGE(0x37, 0x37) AM_READ_PORT("JOY")
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_READWRITE(sts_r, com_w)
-//  AM_RANGE(0x60, 0x63)																			//	SIO
-	AM_RANGE(0x64, 0x67) AM_READWRITE(mmu_r, mmu_w)													//	MMU - page select (ramdisk memory paging)
-	AM_RANGE(0x68, 0x6b) AM_READWRITE(ramsel_r, ramsel_w)											//	CASEN 0=access to ramdisk enabled, 0xff=ramdisk access disabled(data protection), &80=ROM2+48k RAM, &81=ROM2+4k RAM
-	AM_RANGE(0x6c, 0x6f) AM_READWRITE(romsel_r, romsel_w)											//	RAMEN 0=rom enable; 0xff=rom+sord ram disabled (ramdisk visible)
-//	AM_RANGE(0x70, 0x73) AM_MIRROR(0x04) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)		//	PIO
-	AM_RANGE(0x78, 0x7b) AM_DEVREADWRITE(WD2797_TAG, wd_fdc_t, read, write)							//  WD2797 registers -> 78 - status/cmd, 79 - track #, 7a - sector #, 7b - data
-	AM_RANGE(0x7c, 0x7c) AM_READWRITE(fd_r, fd_w)													//	drive select
+//  AM_RANGE(0x60, 0x63)                                                                            //  SIO
+	AM_RANGE(0x64, 0x67) AM_READWRITE(mmu_r, mmu_w)                                                 //  MMU - page select (ramdisk memory paging)
+	AM_RANGE(0x68, 0x6b) AM_READWRITE(ramsel_r, ramsel_w)                                           //  CASEN 0=access to ramdisk enabled, 0xff=ramdisk access disabled(data protection), &80=ROM2+48k RAM, &81=ROM2+4k RAM
+	AM_RANGE(0x6c, 0x6f) AM_READWRITE(romsel_r, romsel_w)                                           //  RAMEN 0=rom enable; 0xff=rom+sord ram disabled (ramdisk visible)
+//  AM_RANGE(0x70, 0x73) AM_MIRROR(0x04) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)     //  PIO
+	AM_RANGE(0x78, 0x7b) AM_DEVREADWRITE(WD2797_TAG, wd_fdc_t, read, write)                         //  WD2797 registers -> 78 - status/cmd, 79 - track #, 7a - sector #, 7b - data
+	AM_RANGE(0x7c, 0x7c) AM_READWRITE(fd_r, fd_w)                                                   //  drive select
 ADDRESS_MAP_END
 
 
 READ8_MEMBER( brno_state::mmu_r )
 {
-	return 0;	
+	return 0;
 }
 
 
 WRITE8_MEMBER( brno_state::mmu_w )
 {
-
 	m_ramcpu = m_maincpu->state_int(Z80_B);
 	m_rambank = ~data; //m_maincpu->state_int(Z80_A);
 	m_rammap[m_ramcpu >> 4]=m_rambank;
@@ -1096,13 +1093,13 @@ WRITE8_MEMBER( brno_state::mmu_w )
 	}
 
 	//logerror("RAMdisk page change(CPURAM<=BANK): &%02X00<=%02X at address &%04X\n",m_ramcpu,m_rambank,m_maincpu->state_int(Z80_PC)-2);
-		
+
 
 }
 
 READ8_MEMBER( brno_state::ramsel_r )
 {
-	return m_ramen;	
+	return m_ramen;
 }
 
 
@@ -1120,7 +1117,7 @@ WRITE8_MEMBER( brno_state::ramsel_w ) //out 6b
 
 READ8_MEMBER( brno_state::romsel_r )
 {
-	return m_romen;	
+	return m_romen;
 }
 
 WRITE8_MEMBER( brno_state::romsel_w ) //out 6c
@@ -1129,13 +1126,13 @@ WRITE8_MEMBER( brno_state::romsel_w ) //out 6c
 
 	if (!data)
 	{
-		program.install_rom(0x0000, 0x3fff, memregion(Z80_TAG)->base()); 
+		program.install_rom(0x0000, 0x3fff, memregion(Z80_TAG)->base());
 		program.unmap_write(0x0000, 0x3fff);
 		m_romen=true;
 	}
 
 	else
-	{ 
+	{
 		program.install_readwrite_bank(0x0000, 0x0fff, "bank1");
 		program.install_readwrite_bank(0x1000, 0x1fff, "bank2");
 		program.install_readwrite_bank(0x2000, 0x2fff, "bank3");
@@ -1146,7 +1143,7 @@ WRITE8_MEMBER( brno_state::romsel_w ) //out 6c
 
 		m_romen=false;
 	}
-	
+
 	logerror("RAMEN change: out (&6c),%x\n",data);
 }
 
@@ -1166,9 +1163,9 @@ WRITE8_MEMBER( brno_state::fd_w )
 	floppy_image_device *floppy;
 	m_floppy = NULL;
 	int disk = 0;
-                       
- 
-	floppy = m_floppy0->get_device();      
+
+
+	floppy = m_floppy0->get_device();
 	if (floppy)
 	{
 		if(BIT(data,0))
@@ -1181,7 +1178,7 @@ WRITE8_MEMBER( brno_state::fd_w )
 			floppy->mon_w(1);
 		}
 	}
-	floppy = m_floppy1->get_device();      
+	floppy = m_floppy1->get_device();
 	if (floppy)
 	{
 		if(BIT(data,1))
@@ -1193,15 +1190,15 @@ WRITE8_MEMBER( brno_state::fd_w )
 		{
 			floppy->mon_w(1);
 		}
-	}              
+	}
 
 	m_fdc->set_floppy(m_floppy);
 	if (m_floppy)
 	{
 		m_floppy->set_rpm(300);
 		m_floppy->mon_w(0);
-		logerror("Select floppy %d\n", disk);          
-	} 
+		logerror("Select floppy %d\n", disk);
+	}
 
 }
 
@@ -1231,7 +1228,7 @@ void m5_state::machine_start()
 	save_item(NAME(m_intra));
 	save_item(NAME(m_ibfa));
 	save_item(NAME(m_obfa));
-	
+
 }
 
 void m5_state::machine_reset()
@@ -1240,16 +1237,16 @@ void m5_state::machine_reset()
 	std::string region_tag;
 
 	//is ram/rom cart plugged in?
-	if (m_cart1->exists()) 
+	if (m_cart1->exists())
 	{
-		if (m_cart1->get_type() > 0) 
+		if (m_cart1->get_type() > 0)
 			m_cart_ram=m_cart1;
 		else
 			m_cart=m_cart1;
 	}
-	if (m_cart2->exists()) 
+	if (m_cart2->exists())
 	{
-		if (m_cart2->get_type() > 0) 
+		if (m_cart2->get_type() > 0)
 			m_cart_ram=m_cart2;
 		else
 			m_cart=m_cart2;
@@ -1259,7 +1256,7 @@ void m5_state::machine_reset()
 		{
 			membank("bank1r")->set_base(memregion(Z80_TAG)->base());
 			program.unmap_write(0x0000, 0x1fff);
-		//	program.unmap_readwrite(0x2000, 0x6fff); //if you uncomment this line Sord starts cassette loading but it is not correct on real hw
+		//  program.unmap_readwrite(0x2000, 0x6fff); //if you uncomment this line Sord starts cassette loading but it is not correct on real hw
 			program.unmap_readwrite(0x8000, 0xffff);
 			return;
 		}
@@ -1271,12 +1268,12 @@ void m5_state::machine_reset()
 
 		m_cart_rom = memregion(region_tag.assign(m_cart_ram->tag()).append(M5SLOT_ROM_REGION_TAG).c_str());
 		memory_region *ram_region=memregion(region_tag.assign(m_cart_ram->tag()).append(":ram").c_str());
-		
+
 		switch (m_ram_type)
 		{
 			case EM_5:
 				program.install_rom(0x0000, 0x1fff, memregion(Z80_TAG)->base());
-				program.unmap_write(0x0000, 0x1fff);	
+				program.unmap_write(0x0000, 0x1fff);
 				program.install_readwrite_handler(0x8000, 0xffff, read8_delegate(FUNC(m5_cart_slot_device::read_ram),(m5_cart_slot_device*)m_cart_ram), write8_delegate(FUNC(m5_cart_slot_device::write_ram),(m5_cart_slot_device*)m_cart_ram));
 				if (m_cart)
 				{
@@ -1286,7 +1283,7 @@ void m5_state::machine_reset()
 				break;
 			case MEM64KBI:
 				program.install_rom(0x0000, 0x1fff, memregion(Z80_TAG)->base());
-				program.unmap_write(0x0000, 0x1fff);	
+				program.unmap_write(0x0000, 0x1fff);
 				program.install_ram(0x8000, 0xffff, ram_region->base()+0x8000);
 
 				//if AUTOSTART is on then page out cart and start tape loading
@@ -1297,7 +1294,7 @@ void m5_state::machine_reset()
 				}
 				else
 					program.unmap_readwrite(0x2000, 0x6fff); //monitor rom is testing this area for 0xFFs otherwise thinks there is some ROM cart plugged in
-				
+
 				break;
 			case MEM64KBF:
 				program.unmap_write(0x0000, 0x6fff);
@@ -1309,11 +1306,11 @@ void m5_state::machine_reset()
 				membank("bank6r")->set_base(ram_region->base()+0xc000); membank("bank6w")->set_base(ram_region->base()+0xc000);
 				break;
 			case MEM64KRX:
-				membank("bank1r")->set_base(memregion(Z80_TAG)->base());	membank("bank1w")->set_base(ram_region->base());
-				membank("bank2r")->set_base(m_cart_rom->base());			membank("bank2w")->set_base(ram_region->base()+0x2000);
-				membank("bank3r")->set_base(m_cart_rom->base()+0x2000);		membank("bank3w")->set_base(ram_region->base()+0x4000);
-				membank("bank4r")->set_base(ram_region->base()+0x6000);		membank("bank4w")->set_base(ram_region->base()+0x6000);
-				
+				membank("bank1r")->set_base(memregion(Z80_TAG)->base());    membank("bank1w")->set_base(ram_region->base());
+				membank("bank2r")->set_base(m_cart_rom->base());            membank("bank2w")->set_base(ram_region->base()+0x2000);
+				membank("bank3r")->set_base(m_cart_rom->base()+0x2000);     membank("bank3w")->set_base(ram_region->base()+0x4000);
+				membank("bank4r")->set_base(ram_region->base()+0x6000);     membank("bank4w")->set_base(ram_region->base()+0x6000);
+
 				//page in BASIC or MSX
 				if ((m_DIPS->read() & 0x01))
 				{
@@ -1322,7 +1319,7 @@ void m5_state::machine_reset()
 				}
 				else
 				{
-					membank("bank5r")->set_base(m_cart_rom->base()+0xe000);	 membank("bank5w")->set_base(ram_region->base()+0x8000);
+					membank("bank5r")->set_base(m_cart_rom->base()+0xe000);  membank("bank5w")->set_base(ram_region->base()+0x8000);
 					membank("bank6r")->set_base(m_cart_rom->base()+0x12000); membank("bank6w")->set_base(ram_region->base()+0xc000);
 				}
 				break;
@@ -1330,7 +1327,7 @@ void m5_state::machine_reset()
 				program.unmap_readwrite(0x8000, 0xffff);
 		}
 		//I don't have idea what to do with savestates, please someone take care of it
-		//m_cart_ram->save_ram();	
+		//m_cart_ram->save_ram();
 	}
 	else
 		//ram cart wasn't found so if rom cart present install it
@@ -1340,8 +1337,8 @@ void m5_state::machine_reset()
 			program.unmap_write(0x0000, 0x1fff);
 			program.install_read_handler(0x2000, 0x6fff, read8_delegate(FUNC(m5_cart_slot_device::read_rom),(m5_cart_slot_device*)m_cart));
 			program.unmap_write(0x2000, 0x6fff);
-		} 
-	m_ram_mode=0;	
+		}
+	m_ram_mode=0;
 }
 
 
@@ -1352,25 +1349,24 @@ void brno_state::machine_start()
 
 void brno_state::machine_reset()
 {
-
 	/* enable ROM1+ROM2 */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	
+
 	program.install_rom(0x0000, 0x3fff, memregion(Z80_TAG)->base());
 	program.unmap_write(0x0000, 0x3fff);
 
 
 	//is ram/rom cart plugged in?
-	if (m_cart1->exists()) 
+	if (m_cart1->exists())
 	{
-		if (m_cart1->get_type() > 0) 
+		if (m_cart1->get_type() > 0)
 			m_cart_ram=m_cart1;
 		else
 			m_cart=m_cart1;
 	}
 	if (m_cart2->exists())
 	{
-		if (m_cart2->get_type() > 0) 
+		if (m_cart2->get_type() > 0)
 			m_cart_ram=m_cart2;
 		else
 			m_cart=m_cart2;
@@ -1380,11 +1376,11 @@ void brno_state::machine_reset()
 		{
 			program.install_read_handler(0x2000, 0x6fff, read8_delegate(FUNC(m5_cart_slot_device::read_rom),(m5_cart_slot_device*)m_cart));
 			program.unmap_write(0x2000, 0x6fff);
-		}		
+		}
 
 	m_romen=true;
 	m_ramen=false;
-	
+
 	floppy_image_device *floppy = NULL;
 	floppy = m_floppy0->get_device();
 	m_fdc->set_floppy(floppy);
@@ -1491,14 +1487,14 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED_CLASS( brno, m5, brno_state )
-	
+
 	// basic machine hardware
 	MCFG_CPU_MODIFY(Z80_TAG)
 	MCFG_CPU_PROGRAM_MAP(m5_mem_brno)
 	MCFG_CPU_IO_MAP(brno_io)
-//	MCFG_CPU_CONFIG(m5_daisy_chain)
-	
-	
+//  MCFG_CPU_CONFIG(m5_daisy_chain)
+
+
 	//remove devices used for fd5 floppy
 	MCFG_DEVICE_REMOVE(Z80_FD5_TAG)
 	MCFG_DEVICE_REMOVE(I8255A_TAG)
@@ -1520,7 +1516,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( brno, m5, brno_state )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	// only one floppy drive
 	//MCFG_DEVICE_REMOVE(WD2797_TAG":1")
-	
+
 	//MCFG_SNAPSHOT_ADD("snapshot", brno_state, brno, "rmd", 0)
 
 	// software list
@@ -1601,7 +1597,7 @@ DRIVER_INIT_MEMBER(m5_state,pal)
 
 DRIVER_INIT_MEMBER(brno_state,brno)
 {
-//	logerror("Driver init entered\n" ); 	
+//  logerror("Driver init entered\n" );
 }
 
 

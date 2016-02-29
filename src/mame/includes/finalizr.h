@@ -57,7 +57,6 @@ public:
 	DECLARE_READ8_MEMBER(i8039_T1_r);
 	DECLARE_WRITE8_MEMBER(i8039_T0_w);
 	DECLARE_WRITE8_MEMBER(finalizr_videoctrl_w);
-	DECLARE_DRIVER_INIT(finalizr);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;

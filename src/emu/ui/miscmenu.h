@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods,Dankan1890
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods, Maurizio Petrarota
 /***************************************************************************
 
     ui/miscmenu.h
@@ -107,5 +107,39 @@ private:
 
 	static misc_option m_options[];
 };
+
+//-------------------------------------------------
+//  export menu
+//-------------------------------------------------
+
+class ui_menu_export : public ui_menu
+{
+public:
+	ui_menu_export(running_machine &machine, render_container *container, std::vector<const game_driver*> list);
+	virtual ~ui_menu_export();
+	virtual void populate() override;
+	virtual void handle() override;
+
+private:
+	std::vector<const game_driver*> m_list;
+};
+
+//-------------------------------------------------
+//  machine configure menu
+//-------------------------------------------------
+
+class ui_menu_machine_configure : public ui_menu
+{
+public:
+	ui_menu_machine_configure(running_machine &machine, render_container *container, const game_driver *prev);
+	virtual ~ui_menu_machine_configure();
+	virtual void populate() override;
+	virtual void handle() override;
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+
+private:
+	const game_driver *m_drv;
+};
+
 
 #endif  /* __UI_MISCMENU_H__ */

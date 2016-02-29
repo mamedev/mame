@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Bryan McPhail
 /***************************************************************************
 
-    Midway MCR system
+    Midway MCR-68k system
 
 ***************************************************************************/
 
@@ -49,9 +49,7 @@ READ8_MEMBER(mcr68_state::zwackery_port_3_r)
 
 MACHINE_START_MEMBER(mcr68_state,mcr68)
 {
-	int i;
-
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		struct counter_state *m6840 = &m_m6840_state[i];
 
@@ -75,17 +73,15 @@ MACHINE_START_MEMBER(mcr68_state,mcr68)
 
 void mcr68_state::mcr68_common_init()
 {
-	int i;
-
 	/* reset the 6840's */
-	m_m6840_counter_periods[0] = attotime::from_hz(30);          /* clocked by /VBLANK */
-	m_m6840_counter_periods[1] = attotime::never;                    /* grounded */
-	m_m6840_counter_periods[2] = attotime::from_hz(512 * 30);    /* clocked by /HSYNC */
+	m_m6840_counter_periods[0] = attotime::from_hz(30);         /* clocked by /VBLANK */
+	m_m6840_counter_periods[1] = attotime::never;               /* grounded */
+	m_m6840_counter_periods[2] = attotime::from_hz(512 * 30);   /* clocked by /HSYNC */
 
 	m_m6840_status = 0x00;
 	m_m6840_status_read_since_int = 0x00;
 	m_m6840_msb_buffer = m_m6840_lsb_buffer = 0;
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		struct counter_state *m6840 = &m_m6840_state[i];
 

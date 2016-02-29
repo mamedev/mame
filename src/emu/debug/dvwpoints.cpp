@@ -155,7 +155,7 @@ void debug_view_watchpoints::enumerate_sources()
 	for (device_disasm_interface *dasm = iter.first(); dasm != nullptr; dasm = iter.next())
 	{
 		std::string name;
-		strprintf(name, "%s '%s'", dasm->device().name(), dasm->device().tag());
+		name = string_format("%s '%s'", dasm->device().name(), dasm->device().tag());
 		m_source_list.append(*global_alloc(debug_view_source(name.c_str(), &dasm->device())));
 	}
 
@@ -213,14 +213,7 @@ void debug_view_watchpoints::view_click(const int button, const debug_view_xy& p
 
 void debug_view_watchpoints::pad_astring_to_length(std::string& str, int len)
 {
-	int diff = len - str.length();
-	if (diff > 0)
-	{
-		std::string buffer;
-		for (int i = 0; i < diff; i++)
-			buffer.append(" ");
-		strcatprintf(str, "%s", buffer.c_str());
-	}
+	str = string_format("%-*s", std::max(len, 0), str);
 }
 
 
@@ -317,8 +310,7 @@ void debug_view_watchpoints::view_update()
 			static char const *const types[] = { "unkn ", "read ", "write", "r/w  " };
 			device_debug::watchpoint *const wp = m_buffer[wpi];
 
-			linebuf.clear();
-			strcatprintf(linebuf, "%2X", wp->index());
+			linebuf = string_format("%2X", wp->index());
 			pad_astring_to_length(linebuf, tableBreaks[0]);
 			linebuf.push_back(wp->enabled() ? 'X' : 'O');
 			pad_astring_to_length(linebuf, tableBreaks[1]);

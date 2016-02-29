@@ -350,10 +350,6 @@ ROM_START( finalizrb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(finalizr_state,finalizr)
-{
-}
 
-
-GAME( 1985, finalizr,  0,        finalizr, finalizr, finalizr_state,  finalizr, ROT90, "Konami",  "Finalizer - Super Transformation", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, finalizrb, finalizr, finalizr, finalizrb, finalizr_state, finalizr, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, finalizr,  0,        finalizr, finalizr,  driver_device, 0, ROT90, "Konami", "Finalizer - Super Transformation", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, finalizrb, finalizr, finalizr, finalizrb, driver_device, 0, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

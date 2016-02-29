@@ -42,8 +42,8 @@ class hash_collection
 {
 public:
 	// hash types are identified by non-hex alpha values (G-Z)
-	static const char HASH_CRC = 'R';
-	static const char HASH_SHA1 = 'S';
+	static constexpr char HASH_CRC = 'R';
+	static constexpr char HASH_SHA1 = 'S';
 
 	// common combinations for requests
 	static const char *HASH_TYPES_CRC;
@@ -51,8 +51,8 @@ public:
 	static const char *HASH_TYPES_ALL;
 
 	// flags are identified by punctuation marks
-	static const char FLAG_NO_DUMP = '!';
-	static const char FLAG_BAD_DUMP = '^';
+	static constexpr char FLAG_NO_DUMP = '!';
+	static constexpr char FLAG_BAD_DUMP = '^';
 
 	// construction/destruction
 	hash_collection();

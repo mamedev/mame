@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*************************************************************************
 
-    Driver for Midway MCR games
+    Midway MCR system
 
 **************************************************************************/
 
@@ -38,9 +38,8 @@ public:
 		m_dpoker_hopper_timer(*this, "dp_hopper"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_sio_txda(0),
-		m_sio_txdb(0) { }
+		m_palette(*this, "palette")
+	{ }
 
 	// these should be required but can't because mcr68 shares with us
 	// once the sound boards are properly device-ified, fix this
@@ -61,6 +60,9 @@ public:
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	int m_sio_txda;
+	int m_sio_txdb;
 
 	DECLARE_WRITE8_MEMBER(mcr_control_port_w);
 	DECLARE_WRITE8_MEMBER(mcr_ipu_laserdisk_w);
@@ -129,9 +131,6 @@ public:
 	void render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask);
 	void mcr_init(int cpuboard, int vidboard, int ssioboard);
-
-	int m_sio_txda;
-	int m_sio_txdb;
 };
 
 /*----------- defined in machine/mcr.c -----------*/

@@ -94,7 +94,7 @@ enum
 #define UPD7220_COMMAND_CCHAR           0x4b
 #define UPD7220_COMMAND_START           0x6b
 #define UPD7220_COMMAND_BCTRL           0x0c // & 0xfe
-#define UPD7220_COMMAND_05				0x05
+#define UPD7220_COMMAND_05              0x05
 #define UPD7220_COMMAND_ZOOM            0x46
 #define UPD7220_COMMAND_CURS            0x49
 #define UPD7220_COMMAND_PRAM            0x70 // & 0xf0

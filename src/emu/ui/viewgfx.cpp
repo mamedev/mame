@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-    ui/viewgfx.c
+    ui/viewgfx.cpp
 
     Internal graphics viewer.
 
@@ -388,7 +388,7 @@ static void palette_handler(running_machine &machine, render_container *containe
 	cellboxbounds.y0 += 3.0f * chheight;
 
 	// figure out the title and expand the outer box to fit
-	const char *suffix = palette->indirect_entries() == 0 ? "" : state.palette.which ? " COLORS" : " PENS";
+	const char *suffix = palette->indirect_entries() == 0 ? "" : state.palette.which ? _(" COLORS") : _(" PENS");
 	sprintf(title, "'%s'%s", palette->tag(), suffix);
 	titlewidth = ui_font->string_width(chheight, machine.render().ui_aspect(), title);
 	x0 = 0.0f;

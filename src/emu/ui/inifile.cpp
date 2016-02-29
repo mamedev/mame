@@ -142,7 +142,7 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
 }
 
 //---------------------------------------------------------
-//	parseopen - Open up file for reading
+//  parseopen - Open up file for reading
 //---------------------------------------------------------
 
 bool inifile_manager::parseopen(const char *filename)
@@ -303,7 +303,7 @@ bool favorite_manager::isgame_favorite()
 			image_loaded = true;
 			for (size_t current = 0; current < m_list.size(); current++)
 				if (m_list[current].shortname == swinfo->shortname() &&
-				    m_list[current].listname == image->software_list_name())
+					m_list[current].listname == image->software_list_name())
 				{
 					m_current = current;
 					return true;
@@ -428,27 +428,28 @@ void favorite_manager::save_favorite_games()
 		}
 
 		// generate the favorite INI
-		std::string text("[ROOT_FOLDER]\n[Favorite]\n\n");
+		std::ostringstream text;
+		text << "[ROOT_FOLDER]\n[Favorite]\n\n";
 		for (auto & elem : m_list)
 		{
-			text += elem.shortname + "\n";
-			text += elem.longname + "\n";
-			text += elem.parentname + "\n";
-			text += elem.year + "\n";
-			text += elem.publisher + "\n";
-			strcatprintf(text, "%d\n", elem.supported);
-			text += elem.part + "\n";
-			strcatprintf(text, "%s\n", elem.driver->name);
-			text += elem.listname + "\n";
-			text += elem.interface + "\n";
-			text += elem.instance + "\n";
-			strcatprintf(text, "%d\n", elem.startempty);
-			text += elem.parentlongname + "\n";
-			text += elem.usage + "\n";
-			text += elem.devicetype + "\n";
-			strcatprintf(text, "%d\n", elem.available);
+			text << elem.shortname << '\n';
+			text << elem.longname << '\n';
+			text << elem.parentname << '\n';
+			text << elem.year << '\n';
+			text << elem.publisher << '\n';
+			stream_format(text, "%d\n", elem.supported);
+			text << elem.part << '\n';
+			stream_format(text, "%s\n", elem.driver->name);
+			text << elem.listname << '\n';
+			text << elem.interface << '\n';
+			text << elem.instance << '\n';
+			stream_format(text, "%d\n", elem.startempty);
+			text << elem.parentlongname << '\n';
+			text << elem.usage << '\n';
+			text << elem.devicetype << '\n';
+			stream_format(text, "%d\n", elem.available);
 		}
-		file.puts(text.c_str());
+		file.puts(text.str().c_str());
 		file.close();
 	}
 }

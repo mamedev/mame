@@ -171,9 +171,9 @@ void ui_menu_tape_control::get_time_string(std::string &dest, cassette_image_dev
 	t1 = cassette->get_length();
 
 	if (t1)
-		strprintf(dest, "%04d/%04d", (int)t0, (int)t1);
+		dest = string_format("%04d/%04d", (int)t0, (int)t1);
 	else
-		strprintf(dest, "%04d/%04d", 0, (int)t1);
+		dest = string_format("%04d/%04d", 0, (int)t1);
 
 	if (curpos != nullptr)
 		*curpos = t0;

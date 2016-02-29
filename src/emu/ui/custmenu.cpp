@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:Dankan1890
 /*********************************************************************
 
@@ -208,7 +208,7 @@ void ui_menu_custom_filter::custom_render(void *selectedref, float top, float bo
 
 	// get the size of the text
 	mui.draw_text_full(container, _("Select custom filters:"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	float maxwidth = MAX(width, origx2 - origx1);
 
@@ -228,7 +228,7 @@ void ui_menu_custom_filter::custom_render(void *selectedref, float top, float bo
 
 	// draw the text within it
 	mui.draw_text_full(container, _("Select custom filters:"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 //-------------------------------------------------
@@ -242,19 +242,19 @@ void ui_menu_custom_filter::save_custom_filters()
 	if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == FILERR_NONE)
 	{
 		// generate custom filters info
-		std::string cinfo;
-		strprintf(cinfo, "Total filters = %d\n", (custfltr::numother + 1));
-		cinfo.append("Main filter = ").append(main_filters::text[custfltr::main]).append("\n");
+		std::ostringstream cinfo;
+		stream_format(cinfo, "Total filters = %d\n", (custfltr::numother + 1));
+		stream_format(cinfo, "Main filter = %s\n", main_filters::text[custfltr::main]);
 
 		for (int x = 1; x <= custfltr::numother; x++)
 		{
-			cinfo.append("Other filter = ").append(main_filters::text[custfltr::other[x]]).append("\n");
+			stream_format(cinfo, "Other filter = %s\n", main_filters::text[custfltr::other[x]]);
 			if (custfltr::other[x] == FILTER_MANUFACTURER)
-				cinfo.append("  Manufacturer filter = ").append(c_mnfct::ui[custfltr::mnfct[x]]).append("\n");
+				stream_format(cinfo, "  Manufacturer filter = %s\n", c_mnfct::ui[custfltr::mnfct[x]]);
 			else if (custfltr::other[x] == FILTER_YEAR)
-				cinfo.append("  Year filter = ").append(c_year::ui[custfltr::year[x]]).append("\n");
+				stream_format(cinfo, "  Year filter = %s\n", c_year::ui[custfltr::year[x]]);
 		}
-		file.puts(cinfo.c_str());
+		file.puts(cinfo.str().c_str());
 		file.close();
 	}
 }
@@ -521,7 +521,7 @@ void ui_menu_swcustom_filter::custom_render(void *selectedref, float top, float 
 
 	// get the size of the text
 	mui.draw_text_full(container, _("Select custom filters:"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	float maxwidth = MAX(width, origx2 - origx1);
 
@@ -541,7 +541,7 @@ void ui_menu_swcustom_filter::custom_render(void *selectedref, float top, float 
 
 	// draw the text within it
 	mui.draw_text_full(container, _("Select custom filters:"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 //-------------------------------------------------
@@ -555,26 +555,25 @@ void ui_menu_swcustom_filter::save_sw_custom_filters()
 	if (file.open("custom_", m_driver->name, "_filter.ini") == FILERR_NONE)
 	{
 		// generate custom filters info
-		std::string cinfo;
-		strprintf(cinfo, "Total filters = %d\n", (sw_custfltr::numother + 1));
-		cinfo.append("Main filter = ").append(sw_filters::text[sw_custfltr::main]).append("\n");
+		std::ostringstream cinfo;
+		stream_format(cinfo, "Total filters = %d\n", (sw_custfltr::numother + 1));
+		stream_format(cinfo, "Main filter = %s\n", sw_filters::text[sw_custfltr::main]);
 
 		for (int x = 1; x <= sw_custfltr::numother; x++)
 		{
-			cinfo.append("Other filter = ").append(sw_filters::text[sw_custfltr::other[x]]).append("\n");
+			stream_format(cinfo, "Other filter = %s\n", sw_filters::text[sw_custfltr::other[x]]);
 			if (sw_custfltr::other[x] == UI_SW_PUBLISHERS)
-				cinfo.append("  Manufacturer filter = ").append(m_filter.publisher.ui[sw_custfltr::mnfct[x]]).append("\n");
+				stream_format(cinfo, "  Manufacturer filter = %s\n", m_filter.publisher.ui[sw_custfltr::mnfct[x]]);
 			else if (sw_custfltr::other[x] == UI_SW_LIST)
-				cinfo.append("  Software List filter = ").append(m_filter.swlist.name[sw_custfltr::list[x]]).append("\n");
+				stream_format(cinfo, "  Software List filter = %s\n", m_filter.swlist.name[sw_custfltr::list[x]]);
 			else if (sw_custfltr::other[x] == UI_SW_YEARS)
-				cinfo.append("  Year filter = ").append(m_filter.year.ui[sw_custfltr::year[x]]).append("\n");
+				stream_format(cinfo, "  Year filter = %s\n", m_filter.year.ui[sw_custfltr::year[x]]);
 			else if (sw_custfltr::other[x] == UI_SW_TYPE)
-				cinfo.append("  Type filter = ").append(m_filter.type.ui[sw_custfltr::type[x]]).append("\n");
+				stream_format(cinfo, "  Type filter = %s\n", m_filter.type.ui[sw_custfltr::type[x]]);
 			else if (sw_custfltr::other[x] == UI_SW_REGION)
-				cinfo.append("  Region filter = ").append(m_filter.region.ui[sw_custfltr::region[x]]).append("\n");
+				stream_format(cinfo, "  Region filter = %s\n", m_filter.region.ui[sw_custfltr::region[x]]);
 		}
-		file.puts(cinfo.c_str());
+		file.puts(cinfo.str().c_str());
 		file.close();
 	}
 }
-

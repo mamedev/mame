@@ -960,7 +960,7 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_callback )
 	/* set a timer for the next off state */
 	machine().scheduler().timer_set(screen->time_until_pos(0), timer_expired_delegate(FUNC(voodoo_device::vblank_off_callback),this), 0, this);
 
-	
+
 
 	/* set internal state and call the client */
 	fbi.vblank = TRUE;
@@ -2877,7 +2877,7 @@ default_case:
  *
  *************************************/
 INT32 voodoo_device::lfb_direct_w(voodoo_device *vd, offs_t offset, UINT32 data, UINT32 mem_mask)
-{	
+{
 	UINT16 *dest;
 	UINT32 destmax;
 	int x, y;
@@ -2923,7 +2923,6 @@ INT32 voodoo_device::lfb_direct_w(voodoo_device *vd, offs_t offset, UINT32 data,
 
 INT32 voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
-
 	UINT16 *dest, *depth;
 	UINT32 destmax, depthmax;
 	int sr[2], sg[2], sb[2], sa[2], sw[2];
@@ -3783,7 +3782,6 @@ WRITE32_MEMBER( voodoo_device::voodoo_w )
 
 static UINT32 register_r(voodoo_device *vd, offs_t offset)
 {
-
 	int regnum = offset & 0xff;
 	UINT32 result;
 
@@ -4053,7 +4051,6 @@ static UINT32 lfb_r(voodoo_device *vd, offs_t offset, bool lfb_3d)
 
 READ32_MEMBER( voodoo_device::voodoo_r )
 {
-
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (pci.op_pending)
 		flush_fifos(this, machine().time());
@@ -4699,7 +4696,6 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_agp_w )
 
 WRITE32_MEMBER( voodoo_banshee_device::banshee_w )
 {
-
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (pci.op_pending)
 		flush_fifos(this, machine().time());
@@ -5045,7 +5041,7 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 	pci.fifo.in = pci.fifo.out = 0;
 	pci.stall_state = NOT_STALLED;
 	pci.continue_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device::stall_cpu_callback),this), nullptr);
-	
+
 	/* allocate memory */
 	tmumem0 = m_tmumem0;
 	tmumem1 = m_tmumem1;

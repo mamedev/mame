@@ -58,8 +58,6 @@ project ("osd_" .. _OPTIONS["osd"])
 	}
 
 	files {
-		MAME_DIR .. "src/osd/osdnet.cpp",
-		MAME_DIR .. "src/osd/osdnet.h",
 		MAME_DIR .. "src/osd/osdmini/minimain.cpp",
 		MAME_DIR .. "src/osd/osdmini/osdmini.h",
 		MAME_DIR .. "src/osd/osdepend.h",
@@ -118,6 +116,8 @@ project ("ocore_" .. _OPTIONS["osd"])
 	end
 
 	files {
+		MAME_DIR .. "src/osd/osdnet.cpp",
+		MAME_DIR .. "src/osd/osdnet.h",
 		MAME_DIR .. "src/osd/osdcore.cpp",
 		MAME_DIR .. "src/osd/osdcore.h",
 		MAME_DIR .. "src/osd/modules/osdmodule.cpp",

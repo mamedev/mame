@@ -420,7 +420,9 @@ WRITE8_MEMBER( trs80_state::trs80m4_e9_w )
     CCh    4800
     DDh    7200
     EEh    9600
-    FFh    19200 */
+    FFh    19200
+Note: this may be a COM5016 dual baud rate generator, or may be an equivalent circuit embedded in the gate array ASIC on the trs80 model 4
+    */
 
 	static const int baud_clock[]={ 800, 1200, 1760, 2152, 2400, 4800, 9600, 19200, 28800, 32000, 38400, 57600, 76800, 115200, 153600, 307200 };
 	m_ay31015->set_receiver_clock(baud_clock[data & 0x0f]);

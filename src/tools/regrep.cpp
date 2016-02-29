@@ -686,7 +686,7 @@ static void output_report(std::string &dirname, std::string &tempheader, std::st
 		*buckettailptr[bucknum] = nullptr;
 
 	/* output header */
-	strprintf(tempname,"%s" PATH_SEPARATOR "%s", dirname.c_str(), "index.html");
+	tempname = string_format("%s" PATH_SEPARATOR "%s", dirname.c_str(), "index.html");
 	indexfile = create_file_and_output_header(tempname, tempheader, title);
 	if (indexfile == nullptr)
 	{
@@ -732,7 +732,7 @@ static int compare_screenshots(summary_file *curfile)
 			core_file *file;
 
 			/* get the filename for the image */
-			strprintf(fullname,"%s" PATH_SEPARATOR "snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", lists[listnum].dir, curfile->name);
+			fullname = string_format("%s" PATH_SEPARATOR "snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", lists[listnum].dir, curfile->name);
 
 			/* open the file */
 			filerr = core_fopen(fullname.c_str(), OPEN_FLAG_READ, &file);
@@ -741,7 +741,7 @@ static int compare_screenshots(summary_file *curfile)
 			if (filerr != FILERR_NONE)
 			{
 				/* get the filename for the image */
-				strprintf(fullname, "%s" PATH_SEPARATOR "snap" PATH_SEPARATOR "_%s.png", lists[listnum].dir, curfile->name);
+				fullname = string_format("%s" PATH_SEPARATOR "snap" PATH_SEPARATOR "_%s.png", lists[listnum].dir, curfile->name);
 
 				/* open the file */
 				filerr = core_fopen(fullname.c_str(), OPEN_FLAG_READ, &file);
@@ -843,14 +843,14 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 	int starty;
 
 	/* generate the common source filename */
-	strprintf(dstfilename,"%s" PATH_SEPARATOR "%s", destdir.c_str(), destname);
-	strprintf(srcimgname,"snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", curfile->name);
+	dstfilename = string_format("%s" PATH_SEPARATOR "%s", destdir.c_str(), destname);
+	srcimgname = string_format("snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", curfile->name);
 
 	/* open and load all unique bitmaps */
 	for (listnum = 0; listnum < list_count; listnum++)
 		if (curfile->matchbitmap[listnum] == listnum)
 		{
-			strprintf(tempname, "%s" PATH_SEPARATOR "%s", lists[listnum].dir, srcimgname.c_str());
+			tempname = string_format("%s" PATH_SEPARATOR "%s", lists[listnum].dir, srcimgname.c_str());
 
 			/* open the source image */
 			filerr = core_fopen(tempname.c_str(), OPEN_FLAG_READ, &file);
@@ -957,11 +957,11 @@ static void create_linked_file(std::string &dirname, const summary_file *curfile
 	int listnum;
 
 	/* create the filename */
-	strprintf(filename,"%s.html", curfile->name);
+	filename = string_format("%s.html", curfile->name);
 
 	/* output header */
-	strprintf(title, "%s Regressions (%s)", curfile->name, curfile->source);
-	strprintf(linkname,"%s" PATH_SEPARATOR "%s", dirname.c_str(), filename.c_str());
+	title = string_format("%s Regressions (%s)", curfile->name, curfile->source);
+	linkname = string_format("%s" PATH_SEPARATOR "%s", dirname.c_str(), filename.c_str());
 	linkfile = create_file_and_output_header(linkname, tempheader, title);
 	if (linkfile == nullptr)
 	{

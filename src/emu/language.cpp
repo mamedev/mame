@@ -2,9 +2,9 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-	language.cpp
+    language.cpp
 
-	Multi-language support.
+    Multi-language support.
 
 ***************************************************************************/
 
@@ -37,7 +37,11 @@ void load_translation(emu_options &m_options)
 {
 	g_translation.clear();
 	emu_file file(m_options.language_path(), OPEN_FLAG_READ);
-	if (file.open(m_options.language(), PATH_SEPARATOR "strings.mo") == FILERR_NONE)
+	auto name = std::string(m_options.language());
+	strreplace(name, " ", "_");
+	strreplace(name, "(", "");
+	strreplace(name, ")", "");
+	if (file.open(name.c_str(), PATH_SEPARATOR "strings.mo") == FILERR_NONE)
 	{
 		UINT64 size = file.size();
 		UINT32 *buffer = global_alloc_array(UINT32, size / 4 + 1);
