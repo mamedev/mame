@@ -426,7 +426,7 @@ void rom_load_manager::verify_length_and_hash(const char *name, UINT32 explength
 	UINT32 actlength = m_file->size();
 	if (explength != actlength)
 	{
-		m_errorstring.append(string_format(m_errorstring, "%s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength));
+		m_errorstring.append(string_format("%s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength));
 		m_warnings++;
 	}
 
@@ -434,21 +434,21 @@ void rom_load_manager::verify_length_and_hash(const char *name, UINT32 explength
 	hash_collection &acthashes = m_file->hashes(hashes.hash_types().c_str());
 	if (hashes.flag(hash_collection::FLAG_NO_DUMP))
 	{
-		m_errorstring.append(string_format(m_errorstring, "%s NO GOOD DUMP KNOWN\n", name));
+		m_errorstring.append(string_format("%s NO GOOD DUMP KNOWN\n", name));
 		m_knownbad++;
 	}
 	/* verify checksums */
 	else if (hashes != acthashes)
 	{
 		/* otherwise, it's just bad */
-		m_errorstring.append(string_format(m_errorstring, "%s WRONG CHECKSUMS:\n", name));
+		m_errorstring.append(string_format("%s WRONG CHECKSUMS:\n", name));
 		dump_wrong_and_correct_checksums(hashes, acthashes);
 		m_warnings++;
 	}
 	/* If it matches, but it is actually a bad dump, write it */
 	else if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
 	{
-		m_errorstring.append(string_format(m_errorstring, "%s ROM NEEDS REDUMP\n", name));
+		m_errorstring.append(string_format("%s ROM NEEDS REDUMP\n", name));
 		m_knownbad++;
 	}
 }
