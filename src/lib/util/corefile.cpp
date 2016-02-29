@@ -898,6 +898,16 @@ file_error core_truncate(core_file *f, UINT64 offset)
 }
 
 
+/*-------------------------------------------------
+    core_truncate - flush write buffer
+-------------------------------------------------*/
+
+file_error core_fflush(core_file *f)
+{
+	return osd_fflush(f->file);
+}
+
+
 
 /***************************************************************************
     FILENAME UTILITIES

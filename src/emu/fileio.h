@@ -120,6 +120,8 @@ public:
 
 	// control
 	file_error compress(int compress);
+
+	// position
 	int seek(INT64 offset, int whence);
 	UINT64 tell();
 	bool eof();
@@ -136,6 +138,9 @@ public:
 	int puts(const char *s);
 	int vprintf(const char *fmt, va_list va);
 	int printf(const char *fmt, ...) ATTR_PRINTF(2,3);
+
+	// buffers
+	void flush();
 
 private:
 	bool compressed_file_ready(void);
