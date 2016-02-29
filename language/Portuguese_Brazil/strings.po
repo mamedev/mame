@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-28 22:51+0100\n"
+"POT-Creation-Date: 2016-02-29 08:17+0100\n"
 "PO-Revision-Date: 2016-02-27 08:52+0100\n"
 "Last-Translator: Ashura-X\n"
 "Language-Team: MAME Language Team\n"
@@ -872,7 +872,7 @@ msgstr "Remover dos Favoritos"
 
 #: src/emu/ui/mainmenu.cpp:151
 msgid "Select New Machine"
-msgstr "Selecinar Nova Máquina"
+msgstr "Selecionar Nova Máquina"
 
 #: src/emu/ui/menu.cpp:45
 #, fuzzy
@@ -905,7 +905,7 @@ msgstr ""
 #: src/emu/ui/menu.cpp:252
 #, fuzzy
 msgid "Return to Machine"
-msgstr "Selecinar Nova Máquina"
+msgstr "Selecionar Nova Máquina"
 
 #: src/emu/ui/menu.cpp:256 src/emu/ui/menu.cpp:258
 msgid "Exit"
@@ -999,7 +999,7 @@ msgstr "Confirmar saída das máquinas"
 
 #: src/emu/ui/miscmenu.cpp:563
 msgid "Skip displaying information's screen at startup"
-msgstr "Pular a tela de informaçoes ao iniciar"
+msgstr "Pular a tela de informações ao iniciar"
 
 #: src/emu/ui/miscmenu.cpp:564
 msgid "Force 4:3 appearance for software snapshot"
@@ -1795,7 +1795,7 @@ msgstr ""
 
 #: src/emu/ui/ui.cpp:1577 src/emu/ui/ui.cpp:1587
 msgid "Keyboard Emulation Status"
-msgstr "Situação da Emulaçao do Teclado"
+msgstr "Situação da Emulação do Teclado"
 
 #: src/emu/ui/ui.cpp:1579
 msgid "Mode: PARTIAL Emulation"
@@ -1819,7 +1819,7 @@ msgstr "UI:   Desativado"
 
 #: src/emu/ui/ui.cpp:1736
 msgid "Autofire can't be enabled"
-msgstr "Autofire não pode ser ativado"
+msgstr "Autodisparo não pode ser ativado"
 
 #: src/emu/ui/ui.cpp:1775
 msgid "Select position to save to"
