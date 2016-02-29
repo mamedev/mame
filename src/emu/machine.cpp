@@ -1009,7 +1009,10 @@ void running_machine::watchdog_vblank(screen_device &screen, bool vblank_state)
 void running_machine::logfile_callback(const running_machine &machine, const char *buffer)
 {
 	if (machine.m_logfile != nullptr)
+	{
 		machine.m_logfile->puts(buffer);
+		machine.m_logfile->flush();
+	}
 }
 
 
