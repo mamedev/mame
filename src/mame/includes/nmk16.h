@@ -90,7 +90,6 @@ public:
 	DECLARE_WRITE16_MEMBER(afega_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(hachamf_mainram_w);
 	DECLARE_WRITE16_MEMBER(tdragon_mainram_w);
-	DECLARE_WRITE8_MEMBER(raphero_sound_rombank_w);
 	DECLARE_READ16_MEMBER(vandykeb_r);
 	DECLARE_READ16_MEMBER(tdragonb_prot_r);
 	DECLARE_READ16_MEMBER(afega_unknown_r);
@@ -119,6 +118,7 @@ public:
 	DECLARE_WRITE16_MEMBER(nmk16_x0016_w);
 	DECLARE_WRITE16_MEMBER(nmk16_bioship_x0016_w);
 	DECLARE_DRIVER_INIT(nmk);
+	DECLARE_DRIVER_INIT(tharrier);
 	DECLARE_DRIVER_INIT(vandykeb);
 	DECLARE_DRIVER_INIT(tdragonb);
 	DECLARE_DRIVER_INIT(ssmissin);
@@ -126,6 +126,7 @@ public:
 	DECLARE_DRIVER_INIT(redhawk);
 	DECLARE_DRIVER_INIT(tdragon_prot);
 	DECLARE_DRIVER_INIT(bubl2000);
+	DECLARE_DRIVER_INIT(banked_audiocpu);
 	DECLARE_DRIVER_INIT(grdnstrm);
 	DECLARE_DRIVER_INIT(spec2k);
 	DECLARE_DRIVER_INIT(redfoxwp2a);
