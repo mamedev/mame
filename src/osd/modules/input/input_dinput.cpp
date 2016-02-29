@@ -206,19 +206,20 @@ public:
 	}
 
 	virtual BOOL device_enum_callback(LPCDIDEVICEINSTANCE instance, LPVOID ref) = 0;
+	
+	struct dinput_callback_context
+	{
+		dinput_module *    self;
+		running_machine *   machine;
+	};
 
+	static BOOL CALLBACK enum_callback(LPCDIDEVICEINSTANCE instance, LPVOID ref)
+	{
+		return ((dinput_callback_context*)ref)->self->device_enum_callback(instance, ((dinput_callback_context*)ref)->machine);
+	}
 	void input_init(running_machine &machine) override
 	{
-		struct dinput_callback_context
-		{
-			dinput_module *    self;
-			running_machine *           machine;
-		} context = { this, &machine };
-
-		// enumerate the ones we have
-		auto enum_callback = [](LPCDIDEVICEINSTANCE instance, LPVOID ref) {
-			return ((dinput_callback_context*)ref)->self->device_enum_callback(instance, ((dinput_callback_context*)ref)->machine);
-		};
+		dinput_callback_context context = { this, &machine };
 
 		HRESULT result = IDirectInput_EnumDevices(m_dinput, dinput_devclass(), enum_callback, &context, DIEDFL_ATTACHEDONLY);
 		if (result != DI_OK)
