@@ -14,6 +14,15 @@
      <there are probably others I've missed>
 
  * History of the machine can be found at http://freudenbergs.de/bert/publications/Ingalls-2014-Smalltalk78.pdf
+ 
+ * The notetaker has an 8-slot backplane, with the following cards in it:
+   * I/O Processor card (8086@8Mhz, 8259pic, 4k ROM, Keyboard UART, DAC1200 (multiplexed to 2 channels))
+   * Emulation Processor card (8086@5Mhz, 8259pic, 4k RAM with Parity/ECC/Syndrome logic)
+   * Disk/Display card (WD1791 FDC, CRT5027 CRTC, EIA UART)
+   * Memory Control Module \_ (buffering, refresh, and Parity/ECC/Syndrome logic lives on these boards)
+   * Memory Data Module    /
+   * Memory Storage Module x2 (the 4116 DRAMs live on these boards)
+   * Battery Module *OR* debugger module type A or B (debugger module has an i8255 on it for alto<->notetaker comms, and allows alto to halt the cpus [type A and B can debug either the emulator cpu or the iocpu respectively] and dump registers to alto screen, etc)
 
  * Prototypes only, 10 units[2] manufactured 1978-1980
    Known surviving units:
@@ -24,6 +33,8 @@
 
  * As far as I am aware, no media (world disks/boot disks) for the NoteTaker have survived (except maybe the two disks at Xerox Museum at PARC), but an incomplete dump of the Smalltalk-76 'world' which was used to bootstrap Smalltalk-78 originally did survive on the Alto disks at CHM
 
+ * We are missing the dump for the i8748 Keyboard MCU which does row-column scanning and mouse quadrature reading, and talks to the main system via serial
+ 
  * see http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker for additional information
  * see http://xeroxalto.computerhistory.org/Filene/Smalltalk-76/ for the smalltalk-76 dump
  * see http://xeroxalto.computerhistory.org/Indigo/BasicDisks/Smalltalk14.bfs!1_/ for more notetaker/smalltalk related files, including SmallTalk-80 files based on the notetaker smalltalk-78
@@ -34,24 +45,24 @@
  * [3] http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf
  * [4] http://xeroxalto.computerhistory.org/Filene/Smalltalk-76/
  * [5] http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790118_NoteTaker_System_Manual.pdf
- * MISSING DUMP for 8741? Keyboard MCU which does row-column scanning and mouse-related stuff
 
 TODO: everything below.
 * figure out the correct memory maps for the 256kB of shared ram, and what part of ram constitutes the framebuffer
 * figure out how the emulation-cpu boots and where its 4k of local ram maps to
 * Get smalltalk-78 loaded as a rom and forced into ram on startup, since no boot disks have survived (or if any survived, they are not dumped)
-* crt5027 video controller
+
 * Harris 6402 keyboard UART (within keyboard, next to MCU)
 * The harris 6402 UART is pin compatible with WD TR1865 and TR1602 UARTs, as well as the AY-3-1015A/D
 * HLE for the missing i8748[5] MCU in the keyboard which reads the mouse quadratures and buttons and talks serially to the Keyboard UART
-
-WIP:
-* pic8259 interrupt controller - this is attached as a device, but the interrupts are not hooked to it yet.
-* Harris 6402 serial/EIA UART
-* Harris 6402 keyboard UART (within notetaker)
 * floppy controller wd1791
   According to [3] and [5] the format is double density/MFM, 128 bytes per sector, 16 sectors per track, 1 or 2 sided, for 170K or 340K per disk. Drive spins at 300RPM.
-  According to the schematics, we're missing an 82s147 DISKSEP.PROM used as a data separator
+* According to the schematics, we're missing an 82s147 DISKSEP.PROM used as a data separator
+
+WIP:
+* crt5027 video controller - the iocpu side is hooked up, but crashes due to a bug in the crt5027/tms9927 code. the actual drawing to screen part is not connected anywhere yet.
+* pic8259 interrupt controller - this is attached as a device, but the interrupts are not hooked to it yet.
+* Harris 6402 serial/EIA UART - connected to iocpu, other end isn't connected anywhere
+* Harris 6402 keyboard UART (within notetaker) - connected to iocpu, other end isn't connected anywhere
 * we're missing a dump of the 82s126 SETMEMRQ PROM used to handle memory arbitration between the crtc and the rest of the system, but the equations are on the schematic and I'm planning to regenerate the prom contents from that, see ROM_LOAD section
 
 DONE:
@@ -335,6 +346,7 @@ static ADDRESS_MAP_START(notetaker_iocpu_io, AS_IO, 16, notetaker_state)
 	//AM_RANGE(0x100, 0x101) AM_MIRROR(0x7E1E) AM_WRITE(SelDiskReg_w) I/O register (adc speed, crtc pixel clock enable, +5 and +12v relays for floppy, etc)
 	//AM_RANGE(0x120, 0x121) AM_MIRROR(0x7E18) AM_DEVREADWRITE("wd1791", fd1971_device) // floppy controller
 	AM_RANGE(0x140, 0x15f) AM_MIRROR(0x7E00) AM_DEVREADWRITE8("crt5027", crt5027_device, read, write, 0x00FF) // crt controller
+	//AM_RANGE(0x160, 0x161) AM_MIRROR(0x7E1E) AM_WRITE(LoadDispAddr_w) // loads the start address for the display framebuffer
 	AM_RANGE(0x1a0, 0x1a1) AM_MIRROR(0x7E10) AM_READ(ReadEIAStatus_r) // read keyboard fifo state
 	AM_RANGE(0x1a2, 0x1a3) AM_MIRROR(0x7E10) AM_READ(ReadEIAData_r) // read keyboard data
 	AM_RANGE(0x1a8, 0x1a9) AM_MIRROR(0x7E10) AM_WRITE(LoadEIACtlReg_w) // kbd uart control register
@@ -417,7 +429,7 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(60.975)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
 	MCFG_SCREEN_UPDATE_DRIVER(notetaker_state, screen_update)
 	MCFG_SCREEN_SIZE(64*6, 32*8)
@@ -426,7 +438,11 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-	MCFG_DEVICE_ADD( "crt5027", CRT5027, XTAL_36MHz/14) // the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*,2,4,6,8,10,12, or 14 (* because this setting may actually oscillate unstably, or not clock at all)
+	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL_36MHz/4)/8) // the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*,2,4,6,8,10,12, or 14 (* because this is a 74s163 this setting probably means divide by 1) and secondarily divided by 8 (again by two to load the 16 bit output shifters after this)
+	// on reset, bitclk is 000 so divider is (36mhz/14)/8; during boot it is written with 101, changing the divider to (36mhz/4)/8
+	// for now, we just hack it to the latter setting from start
+	// TODO: actually do this correctly.
+	MCFG_TMS9927_CHAR_WIDTH(8) //(8 pixels per column/halfword, 16 pixels per fullword)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD( "kbduart", AY31015, 0 )
@@ -473,7 +489,7 @@ ROM_START( notetakr )
 	ROMX_LOAD( "z-iop_1.50_hi.h1", 0x0000, 0x0800, CRC(2994656e) SHA1(ca2bb38eb9075c5c2f3cc5439b209e7e216084da), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD( "z-iop_1.50_lo.g1", 0x0001, 0x0800, CRC(2cb79a67) SHA1(692aafd2aeea27533f6288dbb1cb8678ea08fade), ROM_SKIP(1) | ROM_BIOS(2))
 	ROM_REGION( 0x100000, "iocpu", ROMREGION_ERASEFF ) // area for descrambled roms
-	ROM_REGION( 0x100000, "mainram", ROMREGION_ERASEFF ) // ram cards
+	ROM_REGION( 0x100000, "mainram", ROMREGION_ERASEFF ) // main ram, on 2 cards with parity/ecc/syndrome/timing/bus arbitration on another 2 cards
 	ROM_REGION( 0x1000, "proms", ROMREGION_ERASEFF )
 	ROM_LOAD( "disksep.prom.82s147.a4", 0x000, 0x200, NO_DUMP ) // disk data separator prom from the disk/display module board
 	ROM_LOAD( "memcasraswrite.prom.82s147.b1", 0x200, 0x200, NO_DUMP ) // memory cas/ras/write prom from the memory address logic board
