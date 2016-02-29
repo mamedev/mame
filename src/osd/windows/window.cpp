@@ -23,7 +23,6 @@
 #include "winmain.h"
 #include "window.h"
 #include "video.h"
-#include "input.h"
 #include "winutf8.h"
 
 #include "winutil.h"

@@ -35,7 +35,6 @@
 #include "winmain.h"
 #include "window.h"
 #include "winutil.h"
-#include "../../windows/input.h"
 
 #include "input_common.h"
 #include "input_windows.h"

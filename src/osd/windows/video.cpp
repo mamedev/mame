@@ -21,7 +21,6 @@
 #include "winmain.h"
 #include "video.h"
 #include "window.h"
-#include "input.h"
 #include "strconv.h"
 
 #include "modules/osdwindow.h"

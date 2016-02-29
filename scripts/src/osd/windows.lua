@@ -163,7 +163,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/render/drawgdi.h",
 		MAME_DIR .. "src/osd/modules/render/drawnone.cpp",
 		MAME_DIR .. "src/osd/modules/render/drawnone.h",
-		MAME_DIR .. "src/osd/windows/input.h",
 		MAME_DIR .. "src/osd/windows/output.cpp",
 		MAME_DIR .. "src/osd/windows/output.h",
 		MAME_DIR .. "src/osd/windows/video.cpp",

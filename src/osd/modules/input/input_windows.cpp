@@ -26,7 +26,6 @@
 // MAMEOS headers
 #include "winmain.h"
 #include "window.h"
-#include "../../windows/input.h"
 
 #include "input_common.h"
 #include "input_windows.h"
