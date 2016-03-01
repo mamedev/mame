@@ -322,7 +322,7 @@ public:
 	void vec(const vector_type &content) { rdbuf()->vec(content); }
 	void vec(vector_type &&content) { rdbuf()->vec(std::move(content)); }
 	void clear() { rdbuf()->clear(); }
-	void reserve(typename vector_type::size_type size) { rdbuf->reserve(size); }
+	void reserve(typename vector_type::size_type size) { rdbuf()->reserve(size); }
 
 private:
 	basic_vectorbuf<CharT, Traits, Allocator> m_rdbuf;
@@ -344,7 +344,7 @@ public:
 	void vec(const vector_type &content) { rdbuf()->vec(content); }
 	void vec(vector_type &&content) { rdbuf()->vec(std::move(content)); }
 	void clear() { rdbuf()->clear(); }
-	void reserve(typename vector_type::size_type size) { rdbuf->reserve(size); }
+	void reserve(typename vector_type::size_type size) { rdbuf()->reserve(size); }
 
 private:
 	basic_vectorbuf<CharT, Traits, Allocator> m_rdbuf;

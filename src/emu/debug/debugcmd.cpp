@@ -699,7 +699,7 @@ static void execute_print(running_machine &machine, int ref, int params, const c
 
 	/* then print each one */
 	for (i = 0; i < params; i++)
-		debug_console_printf(machine, "%s", core_i64_hex_format(values[i], 0));
+		debug_console_printf(machine, "%X", values[i]);
 	debug_console_printf(machine, "\n");
 }
 
@@ -1329,7 +1329,7 @@ static void execute_bplist(running_machine &machine, int ref, int params, const 
 			/* loop over the breakpoints */
 			for (device_debug::breakpoint *bp = device->debug()->breakpoint_first(); bp != nullptr; bp = bp->next())
 			{
-				buffer = string_format("%c%4X @ %s", bp->enabled() ? ' ' : 'D', bp->index(), core_i64_hex_format(bp->address(), device->debug()->logaddrchars()));
+				buffer = string_format("%c%4X @ %*X", bp->enabled() ? ' ' : 'D', bp->index(), device->debug()->logaddrchars(), bp->address());
 				if (std::string(bp->condition()).compare("1") != 0)
 					buffer.append(string_format(" if %s", bp->condition()));
 				if (std::string(bp->action()).compare("") != 0)
@@ -1496,9 +1496,9 @@ static void execute_wplist(running_machine &machine, int ref, int params, const 
 				/* loop over the watchpoints */
 				for (device_debug::watchpoint *wp = device->debug()->watchpoint_first(spacenum); wp != nullptr; wp = wp->next())
 				{
-					buffer = string_format("%c%4X @ %s-%s %s", wp->enabled() ? ' ' : 'D', wp->index(),
-							core_i64_hex_format(wp->space().byte_to_address(wp->address()), wp->space().addrchars()),
-							core_i64_hex_format(wp->space().byte_to_address_end(wp->address() + wp->length()) - 1, wp->space().addrchars()),
+					buffer = string_format("%c%4X @ %*X-%*X %s", wp->enabled() ? ' ' : 'D', wp->index(),
+							wp->space().addrchars(), wp->space().byte_to_address(wp->address()),
+							wp->space().addrchars(), wp->space().byte_to_address_end(wp->address() + wp->length()) - 1,
 							types[wp->type() & 3]);
 					if (std::string(wp->condition()).compare("1") != 0)
 						buffer.append(string_format(" if %s", wp->condition()));
@@ -1818,7 +1818,7 @@ static void execute_load(running_machine &machine, int ref, int params, const ch
 	if ( i == offset)
 		debug_console_printf(machine, "Length specified too large, load failed\n");
 	else
-		debug_console_printf(machine, "Data loaded successfully to memory : 0x%s to 0x%s\n", core_i64_hex_format(offset,0), core_i64_hex_format(i-1,0));
+		debug_console_printf(machine, "Data loaded successfully to memory : 0x%X to 0x%X\n", offset, i-1);
 }
 
 
@@ -1867,13 +1867,14 @@ static void execute_dump(running_machine &machine, int ref, int params, const ch
 	}
 
 	/* now write the data out */
+	util::ovectorstream output;
+	output.reserve(200);
 	for (i = offset; i <= endoffset; i += 16)
 	{
-		char output[200];
-		int outdex = 0;
+		output.clear();
 
 		/* print the address */
-		outdex += sprintf(&output[outdex], "%s: ", core_i64_hex_format((UINT32)space->byte_to_address(i), space->logaddrchars()));
+		util::stream_format(output, "%*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(i));
 
 		/* print the bytes */
 		for (j = 0; j < 16; j += width)
@@ -1884,34 +1885,35 @@ static void execute_dump(running_machine &machine, int ref, int params, const ch
 				if (debug_cpu_translate(*space, TRANSLATE_READ_DEBUG, &curaddr))
 				{
 					UINT64 value = debug_read_memory(*space, i + j, width, TRUE);
-					outdex += sprintf(&output[outdex], " %s", core_i64_hex_format(value, width * 2));
+					util::stream_format(output, " %*X", width * 2, value);
 				}
 				else
-					outdex += sprintf(&output[outdex], " %.*s", (int)width * 2, "****************");
+					util::stream_format(output, " %.*s", width * 2, "****************");
 			}
 			else
-				outdex += sprintf(&output[outdex], " %*s", (int)width * 2, "");
+				util::stream_format(output, " %*s", width * 2, "");
 		}
 
 		/* print the ASCII */
 		if (ascii)
 		{
-			outdex += sprintf(&output[outdex], "  ");
+			util::stream_format(output, "  ");
 			for (j = 0; j < 16 && (i + j) <= endoffset; j++)
 			{
 				offs_t curaddr = i + j;
 				if (debug_cpu_translate(*space, TRANSLATE_READ_DEBUG, &curaddr))
 				{
 					UINT8 byte = debug_read_byte(*space, i + j, TRUE);
-					outdex += sprintf(&output[outdex], "%c", (byte >= 32 && byte < 127) ? byte : '.');
+					util::stream_format(output, "%c", (byte >= 32 && byte < 127) ? byte : '.');
 				}
 				else
-					outdex += sprintf(&output[outdex], " ");
+					util::stream_format(output, " ");
 			}
 		}
 
 		/* output the result */
-		fprintf(f, "%s\n", output);
+		auto const &text = output.vec();
+		fprintf(f, "%.*s\n", int(unsigned(text.size())), &text[0]);
 	}
 
 	/* close the file */
@@ -2292,6 +2294,7 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 	}
 
 	/* write the cheat list */
+	util::ovectorstream output;
 	for (cheatindex = 0; cheatindex < cheat.cheatmap.size(); cheatindex += 1)
 	{
 		if (cheat.cheatmap[cheatindex].state == 1)
@@ -2302,14 +2305,27 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 			if (params > 0)
 			{
 				active_cheat++;
-				fprintf(f, "  <cheat desc=\"Possibility %d : %s (%s)\">\n", active_cheat, core_i64_hex_format(address, space->logaddrchars()), core_i64_hex_format(value, cheat.width * 2));
-				fprintf(f, "    <script state=\"run\">\n");
-				fprintf(f, "      <action>%s.p%c%c@%s=%s</action>\n", cpu->tag(), spaceletter, sizeletter, core_i64_hex_format(address, space->logaddrchars()), core_i64_hex_format(cheat_byte_swap(&cheat, cheat.cheatmap[cheatindex].first_value) & sizemask, cheat.width * 2));
-				fprintf(f, "    </script>\n");
-				fprintf(f, "  </cheat>\n\n");
+				output.clear();
+				stream_format(
+						output,
+						"  <cheat desc=\"Possibility %d : %*X (%*X)\">\n"
+						"    <script state=\"run\">\n"
+						"      <action>%s.p%c%c@%*X=%*X</action>\n"
+						"    </script>\n"
+						"  </cheat>\n\n",
+						active_cheat, space->logaddrchars(), address, cheat.width * 2, value,
+						cpu->tag(), spaceletter, sizeletter, space->logaddrchars(), address, cheat.width * 2, cheat_byte_swap(&cheat, cheat.cheatmap[cheatindex].first_value) & sizemask);
+				auto const &text(output.vec());
+				fprintf(f, "%.*s", int(unsigned(text.size())), &text[0]);
 			}
 			else
-				debug_console_printf(machine, "Address=%s Start=%s Current=%s\n", core_i64_hex_format(address, space->logaddrchars()), core_i64_hex_format(cheat_byte_swap(&cheat, cheat.cheatmap[cheatindex].first_value) & sizemask, cheat.width * 2), core_i64_hex_format(value, cheat.width * 2));
+			{
+				debug_console_printf(
+						machine, "Address=%*X Start=%*X Current=%*X\n",
+						space->logaddrchars(), address,
+						cheat.width * 2, cheat_byte_swap(&cheat, cheat.cheatmap[cheatindex].first_value) & sizemask,
+						cheat.width * 2, value);
+			}
 		}
 	}
 	if (params > 0)
@@ -2436,7 +2452,7 @@ static void execute_find(running_machine &machine, int ref, int params, const ch
 		if (match)
 		{
 			found++;
-			debug_console_printf(machine, "Found at %s\n", core_i64_hex_format((UINT32)space->byte_to_address(i), space->addrchars()));
+			debug_console_printf(machine, "Found at %*X\n", space->addrchars(), (UINT32)space->byte_to_address(i));
 		}
 	}
 
@@ -2490,17 +2506,19 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 	}
 
 	/* now write the data out */
+	util::ovectorstream output;
+	output.reserve(512);
 	for (UINT64 i = 0; i < length; )
 	{
 		int pcbyte = space->address_to_byte(offset + i) & space->bytemask();
-		char output[512], disasm[200];
+		char disasm[200];
 		const char *comment;
 		offs_t tempaddr;
-		int outdex = 0;
 		int numbytes = 0;
+		output.clear();
 
 		/* print the address */
-		outdex += sprintf(&output[outdex], "%s: ", core_i64_hex_format((UINT32)space->byte_to_address(pcbyte), space->logaddrchars()));
+		stream_format(output, "%*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(pcbyte));
 
 		/* make sure we can translate the address */
 		tempaddr = pcbyte;
@@ -2522,38 +2540,37 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 		/* print the bytes */
 		if (bytes)
 		{
-			int startdex = outdex;
+			auto const startdex = output.tellp();
 			numbytes = space->address_to_byte(numbytes);
 			for (j = 0; j < numbytes; j += minbytes)
-				outdex += sprintf(&output[outdex], "%s ", core_i64_hex_format(debug_read_opcode(*decrypted_space, pcbyte + j, minbytes), minbytes * 2));
-			if (outdex - startdex < byteswidth)
-				outdex += sprintf(&output[outdex], "%*s", byteswidth - (outdex - startdex), "");
-			outdex += sprintf(&output[outdex], "  ");
+				stream_format(output, "%*X ", minbytes * 2, debug_read_opcode(*decrypted_space, pcbyte + j, minbytes));
+			if ((output.tellp() - startdex) < byteswidth)
+				stream_format(output, "%*s", byteswidth - (output.tellp() - startdex), "");
+			stream_format(output, "  ");
 		}
 
 		/* add the disassembly */
-		sprintf(&output[outdex], "%s", disasm);
+		stream_format(output, "%s", disasm);
 
 		/* attempt to add the comment */
 		comment = space->device().debug()->comment_text(tempaddr);
 		if (comment != nullptr)
 		{
 			/* somewhat arbitrary guess as to how long most disassembly lines will be [column 60] */
-			if (strlen(output) < 60)
+			if (output.tellp() < 60)
 			{
 				/* pad the comment space out to 60 characters and null-terminate */
-				for (outdex = (int)strlen(output); outdex < 60; outdex++)
-					output[outdex] = ' ' ;
-				output[outdex] = 0 ;
+				while (output.tellp() < 60) output.put(' ');
 
-				sprintf(&output[strlen(output)], "// %s", comment) ;
+				stream_format(output, "// %s", comment);
 			}
 			else
-				sprintf(&output[strlen(output)], "\t// %s", comment) ;
+				stream_format(output, "\t// %s", comment);
 		}
 
 		/* output the result */
-		fprintf(f, "%s\n", output);
+		auto const &text(output.vec());
+		fprintf(f, "%.*s\n", int(unsigned(text.size())), &text[0]);
 	}
 
 	/* close the file */
@@ -2684,7 +2701,7 @@ static void execute_history(running_machine &machine, int ref, int params, const
 		char buffer[200];
 		debug->disassemble(buffer, pc, opbuf, argbuf);
 
-		debug_console_printf(machine, "%s: %s\n", core_i64_hex_format(pc, space->logaddrchars()), buffer);
+		debug_console_printf(machine, "%*X: %s\n", space->logaddrchars(), pc, buffer);
 	}
 }
 
@@ -2890,10 +2907,15 @@ static void execute_map(running_machine &machine, int ref, int params, const cha
 		if (debug_cpu_translate(*space, intention, &taddress))
 		{
 			const char *mapname = space->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? ROW_WRITE : ROW_READ, taddress);
-			debug_console_printf(machine, "%7s: %s logical == %s physical -> %s\n", intnames[intention & 3], core_i64_hex_format(address, space->logaddrchars()), core_i64_hex_format(space->byte_to_address(taddress), space->addrchars()), mapname);
+			debug_console_printf(
+					machine, "%7s: %*X logical == %*X physical -> %s\n",
+					intnames[intention & 3],
+					space->logaddrchars(), address,
+					space->addrchars(), space->byte_to_address(taddress),
+					mapname);
 		}
 		else
-			debug_console_printf(machine, "%7s: %s logical is unmapped\n", intnames[intention & 3], core_i64_hex_format(address, space->logaddrchars()));
+			debug_console_printf(machine, "%7s: %*X logical is unmapped\n", intnames[intention & 3], space->logaddrchars(), address);
 	}
 }
 
@@ -2977,7 +2999,7 @@ static void execute_symlist(running_machine &machine, int ref, int params, const
 		UINT64 value = entry->value();
 
 		/* only display "register" type symbols */
-		debug_console_printf(machine, "%s = %s", namelist[symnum], core_i64_hex_format(value, 0));
+		debug_console_printf(machine, "%s = %X", namelist[symnum], value);
 		if (!entry->is_lval())
 			debug_console_printf(machine, "  (read-only)");
 		debug_console_printf(machine, "\n");
