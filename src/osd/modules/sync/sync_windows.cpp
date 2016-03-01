@@ -45,46 +45,6 @@ struct osd_thread {
 	void *param;
 };
 
-//============================================================
-//  win_compare_exchange32
-//============================================================
-
-INT32 win_compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
-{
-	return InterlockedCompareExchange((LPLONG)ptr, (LONG)exchange, (LONG)compare);
-}
-
-
-//============================================================
-//  win_compare_exchange64
-//============================================================
-
-#ifdef PTR64
-INT64 win_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
-{
-	return InterlockedCompareExchange64((LONGLONG*)ptr, (LONGLONG)exchange, (LONGLONG)compare);
-}
-#endif
-
-
-//============================================================
-//  win_atomic_exchange32
-//============================================================
-
-INT32 win_atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
-{
-	return InterlockedExchange((LONG *) ptr, exchange);
-}
-
-
-//============================================================
-//  win_atomic_add32
-//============================================================
-
-INT32 win_atomic_add32(INT32 volatile *ptr, INT32 delta)
-{
-	return InterlockedExchangeAdd((LONG *) ptr, delta) + delta;
-}
 
 //============================================================
 //  osd_event_alloc
