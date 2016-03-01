@@ -19,6 +19,7 @@
 #endif
 #endif
 #include <mutex>
+#include <atomic>
 
 // MAME headers
 #include "osdcore.h"
@@ -56,7 +57,7 @@ typedef void *PVOID;
 //============================================================
 
 #if KEEP_STATISTICS
-#define add_to_stat(v,x)        do { atomic_add32((v), (x)); } while (0)
+#define add_to_stat(v,x)        do { (v) += (x); } while (0)
 #define begin_timing(v)         do { (v) -= get_profile_ticks(); } while (0)
 #define end_timing(v)           do { (v) += get_profile_ticks(); } while (0)
 #else
@@ -65,8 +66,8 @@ typedef void *PVOID;
 #define end_timing(v)           do { } while (0)
 #endif
 
-template<typename _PtrType>
-static void spin_while(const volatile _PtrType * volatile ptr, const _PtrType val, const osd_ticks_t timeout, const int invert = 0)
+template<typename _AtomType, typename _MainType>
+static void spin_while(const volatile _AtomType * volatile atom, const _MainType val, const osd_ticks_t timeout, const int invert = 0)
 {
 	osd_ticks_t stopspin = osd_ticks() + timeout;
 
@@ -74,16 +75,16 @@ static void spin_while(const volatile _PtrType * volatile ptr, const _PtrType va
 		int spin = 10000;
 		while (--spin)
 		{
-			if ((*ptr != val) ^ invert)
+			if ((*atom != val) ^ invert)
 				return;
 		}
-	} while (((*ptr == val) ^ invert) && osd_ticks() < stopspin);
+	} while (((*atom == val) ^ invert) && osd_ticks() < stopspin);
 }
 
-template<typename _PtrType>
-static void spin_while_not(const volatile _PtrType * volatile ptr, const _PtrType val, const osd_ticks_t timeout)
+template<typename _AtomType, typename _MainType>
+static void spin_while_not(const volatile _AtomType * volatile atom, const _MainType val, const osd_ticks_t timeout)
 {
-	spin_while(ptr, val, timeout, 1);
+	spin_while<_AtomType, _MainType>(atom, val, timeout, 1);
 }
 
 
@@ -96,7 +97,7 @@ struct work_thread_info
 	osd_work_queue *    queue;          // pointer back to the queue
 	osd_thread *        handle;         // handle to the thread
 	osd_event *         wakeevent;      // wake event for the thread
-	volatile INT32      active;         // are we actively processing work?
+	std::atomic<INT32>  active;         // are we actively processing work?
 
 #if KEEP_STATISTICS
 	INT32               itemsdone;
@@ -110,24 +111,24 @@ struct work_thread_info
 
 struct osd_work_queue
 {
-	std::mutex          *lock;           // lock for protecting the queue
-	osd_work_item * volatile list;      // list of items in the queue
+	std::mutex          *lock;          // lock for protecting the queue
+	std::atomic<osd_work_item *> list;  // list of items in the queue
 	osd_work_item ** volatile tailptr;  // pointer to the tail pointer of work items in the queue
-	osd_work_item * volatile free;      // free list of work items
-	volatile INT32      items;          // items in the queue
-	volatile INT32      livethreads;    // number of live threads
-	volatile INT32      waiting;        // is someone waiting on the queue to complete?
-	volatile INT32      exiting;        // should the threads exit on their next opportunity?
+	std::atomic<osd_work_item *> free;  // free list of work items
+	std::atomic<INT32>  items;          // items in the queue
+	std::atomic<INT32>  livethreads;    // number of live threads
+	std::atomic<INT32>  waiting;        // is someone waiting on the queue to complete?
+	std::atomic<INT32>  exiting;        // should the threads exit on their next opportunity?
 	UINT32              threads;        // number of threads in this queue
 	UINT32              flags;          // creation flags
 	work_thread_info *  thread;         // array of thread information
 	osd_event   *       doneevent;      // event signalled when work is complete
 
 #if KEEP_STATISTICS
-	volatile INT32      itemsqueued;    // total items queued
-	volatile INT32      setevents;      // number of times we called SetEvent
-	volatile INT32      extraitems;     // how many extra items we got after the first in the queue loop
-	volatile INT32      spinloops;      // how many times spinning bought us more items
+	std::atomic<INT32>  itemsqueued;    // total items queued
+	std::atomic<INT32>  setevents;      // number of times we called SetEvent
+	std::atomic<INT32>  extraitems;     // how many extra items we got after the first in the queue loop
+	std::atomic<INT32>  spinloops;      // how many times spinning bought us more items
 #endif
 };
 
@@ -141,7 +142,7 @@ struct osd_work_item
 	void *              result;         // callback result
 	osd_event *         event;          // event signalled when complete
 	UINT32              flags;          // creation flags
-	volatile INT32      done;           // is the item done?
+	std::atomic<INT32>  done;           // is the item done?
 };
 
 //============================================================
@@ -301,7 +302,7 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 		{
 			// spin until we're done
 			begin_timing(thread->spintime);
-			spin_while_not(&queue->items, 0, timeout);
+			spin_while_not<std::atomic<int>,int>(&queue->items, 0, timeout);
 			end_timing(thread->spintime);
 
 			begin_timing(thread->waittime);
@@ -312,10 +313,10 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 
 	// reset our done event and double-check the items before waiting
 	osd_event_reset(queue->doneevent);
-	atomic_exchange32(&queue->waiting, TRUE);
+	queue->waiting = TRUE;
 	if (queue->items != 0)
 		osd_event_wait(queue->doneevent, timeout);
-	atomic_exchange32(&queue->waiting, FALSE);
+	queue->waiting = FALSE;
 
 	// return TRUE if we actually hit 0
 	return (queue->items == 0);
@@ -340,7 +341,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		}
 
 		// signal all the threads to exit
-		atomic_exchange32(&queue->exiting, TRUE);
+		queue->exiting = TRUE;
 		for (threadnum = 0; threadnum < queue->threads; threadnum++)
 		{
 			work_thread_info *thread = &queue->thread[threadnum];
@@ -396,7 +397,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		osd_event_free(queue->doneevent);
 
 	// free all items in the free list
-	while (queue->free != NULL)
+	while (queue->free.load() != nullptr)
 	{
 		osd_work_item *item = (osd_work_item *)queue->free;
 		queue->free = item->next;
@@ -406,7 +407,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 	}
 
 	// free all items in the active list
-	while (queue->list != NULL)
+	while (queue->list.load() != nullptr)
 	{
 		osd_work_item *item = (osd_work_item *)queue->list;
 		queue->list = item->next;
@@ -449,7 +450,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 			do
 			{
 				item = (osd_work_item *)queue->free;
-			} while (item != NULL && compare_exchange_ptr((PVOID volatile *)&queue->free, item, item->next) != item);
+			} while (item != NULL && !queue->free.compare_exchange_weak(item, item->next, std::memory_order_release, std::memory_order_relaxed));
 			queue->lock->unlock();
 		}
 
@@ -466,7 +467,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		}
 		else
 		{
-			atomic_exchange32(&item->done, FALSE); // needs to be set this way to prevent data race/usage of uninitialized memory on Linux
+			item->done = FALSE; // needs to be set this way to prevent data race/usage of uninitialized memory on Linux
 		}
 
 		// fill in the basics
@@ -492,8 +493,8 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 	}
 
 	// increment the number of items in the queue
-	atomic_add32(&queue->items, numitems);
-	add_to_stat(&queue->itemsqueued, numitems);
+	queue->items += numitems;
+	add_to_stat(queue->itemsqueued, numitems);
 
 	// look for free threads to do the work
 	if (queue->livethreads < queue->threads)
@@ -509,7 +510,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 			if (!thread->active)
 			{
 				osd_event_set(thread->wakeevent);
-				add_to_stat(&queue->setevents, 1);
+				add_to_stat(queue->setevents, 1);
 
 				// for non-shared, the first one we find is good enough
 				if (--numitems == 0)
@@ -554,7 +555,7 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 	if (item->event == NULL)
 	{
 		// TODO: do we need to measure the spin time here as well? and how can we do it?
-		spin_while(&item->done, 0, timeout);
+		spin_while<std::atomic<int>,int>(&item->done, 0, timeout);
 	}
 
 	// otherwise, block on the event until done
@@ -593,7 +594,7 @@ void osd_work_item_release(osd_work_item *item)
 	{
 		next = (osd_work_item *)item->queue->free;
 		item->next = next;
-	} while (compare_exchange_ptr((PVOID volatile *)&item->queue->free, next, item) != next);
+	} while (!item->queue->free.compare_exchange_weak(next, item, std::memory_order_release, std::memory_order_relaxed));
 	item->queue->lock->unlock();
 }
 
@@ -659,8 +660,8 @@ static void *worker_thread_entry(void *param)
 			break;
 
 		// indicate that we are live
-		atomic_exchange32(&thread->active, TRUE);
-		atomic_increment32(&queue->livethreads);
+		thread->active = TRUE;
+		++queue->livethreads;
 
 		// process work items
 		for ( ;; )
@@ -669,23 +670,23 @@ static void *worker_thread_entry(void *param)
 			worker_thread_process(queue, thread);
 
 			// if we're a high frequency queue, spin for a while before giving up
-			if (queue->flags & WORK_QUEUE_FLAG_HIGH_FREQ && queue->list == NULL)
+			if (queue->flags & WORK_QUEUE_FLAG_HIGH_FREQ && queue->list.load() == nullptr)
 			{
 				// spin for a while looking for more work
 				begin_timing(thread->spintime);
-				spin_while(&queue->list, (osd_work_item *)NULL, SPIN_LOOP_TIME);
+				spin_while<std::atomic<osd_work_item *>, osd_work_item *>(&queue->list, (osd_work_item *)nullptr, SPIN_LOOP_TIME);
 				end_timing(thread->spintime);
 			}
 
 			// if nothing more, release the processor
 			if (!queue_has_list_items(queue))
 				break;
-			add_to_stat(&queue->spinloops, 1);
+			add_to_stat(queue->spinloops, 1);
 		}
 
 		// decrement the live thread count
-		atomic_exchange32(&thread->active, FALSE);
-		atomic_decrement32(&queue->livethreads);
+		thread->active = FALSE;
+		--queue->livethreads;
 	}
 
 #if defined(SDLMAME_MACOSX)
@@ -716,7 +717,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 		// use a critical section to synchronize the removal of items
 		{
 			queue->lock->lock();
-			if (queue->list == NULL)
+			if (queue->list.load() == nullptr)
 			{
 				end_loop = true;
 			}
@@ -727,7 +728,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 				if (item != NULL)
 				{
 					queue->list = item->next;
-					if (queue->list == NULL)
+					if (queue->list.load() == nullptr)
 						queue->tailptr = (osd_work_item **)&queue->list;
 				}
 			}
@@ -746,9 +747,9 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 			end_timing(thread->actruntime);
 
 			// decrement the item count after we are done
-			atomic_decrement32(&queue->items);
-			atomic_exchange32(&item->done, TRUE);
-			add_to_stat(&thread->itemsdone, 1);
+			--queue->items;
+			item->done = TRUE;
+			add_to_stat(thread->itemsdone, 1);
 
 			// if it's an auto-release item, release it
 			if (item->flags & WORK_ITEM_FLAG_AUTO_RELEASE)
@@ -761,14 +762,14 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 				if (item->event != NULL)
 				{
 					osd_event_set(item->event);
-					add_to_stat(&item->queue->setevents, 1);
+					add_to_stat(item->queue->setevents, 1);
 				}
 				queue->lock->unlock();
 			}
 
 			// if we removed an item and there's still work to do, bump the stats
 			if (queue_has_list_items(queue))
-				add_to_stat(&queue->extraitems, 1);
+				add_to_stat(queue->extraitems, 1);
 		}
 	}
 
@@ -776,7 +777,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 	if (queue->waiting)
 	{
 		osd_event_set(queue->doneevent);
-		add_to_stat(&queue->setevents, 1);
+		add_to_stat(queue->setevents, 1);
 	}
 
 	end_timing(thread->runtime);
@@ -785,7 +786,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 bool queue_has_list_items(osd_work_queue *queue)
 {
 	queue->lock->lock();
-	bool has_list_items = (queue->list != NULL);
+	bool has_list_items = (queue->list.load() != nullptr);
 	queue->lock->unlock();
 	return has_list_items;
 }
