@@ -383,7 +383,7 @@ file_error osd_fflush(osd_file *file)
 	switch (file->type)
 	{
 		case SDLFILE_FILE:
-			result = fflush(file->handle);
+			result = syncfs(file->handle);
 			if (result == EOF)
 				return error_to_file_error(errno);
 			return FILERR_NONE;
