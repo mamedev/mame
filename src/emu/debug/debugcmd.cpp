@@ -2518,7 +2518,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 		output.clear();
 
 		/* print the address */
-		stream_format(output, "%*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(pcbyte));
+		stream_format(output, "%0*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(pcbyte));
 
 		/* make sure we can translate the address */
 		tempaddr = pcbyte;
@@ -2543,7 +2543,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 			auto const startdex = output.tellp();
 			numbytes = space->address_to_byte(numbytes);
 			for (j = 0; j < numbytes; j += minbytes)
-				stream_format(output, "%*X ", minbytes * 2, debug_read_opcode(*decrypted_space, pcbyte + j, minbytes));
+				stream_format(output, "%0*X ", minbytes * 2, debug_read_opcode(*decrypted_space, pcbyte + j, minbytes));
 			if ((output.tellp() - startdex) < byteswidth)
 				stream_format(output, "%*s", byteswidth - (output.tellp() - startdex), "");
 			stream_format(output, "  ");
