@@ -375,8 +375,6 @@ file_error osd_truncate(osd_file *file, UINT64 offset)
 
 file_error osd_fflush(osd_file *file)
 {
-	UINT32 result;
-
 	if (!file || !file->handle)
 		return FILERR_FAILURE;
 
