@@ -6,7 +6,7 @@
 //
 //============================================================
 
-#if defined(OSD_WINDOWS) || (SDLMAME_WIN32)
+#if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
