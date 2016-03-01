@@ -46,7 +46,6 @@ function maintargetosdoptions(_target,_subtarget)
 		"comctl32",
 		"comdlg32",
 		"psapi",
-		"xinput",
 	}
 end
 
