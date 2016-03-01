@@ -13,7 +13,8 @@ snk68_spr_device::snk68_spr_device(const machine_config &mconfig, const char *ta
 		m_palette(*this),
 		m_spriteram(*this, "^spriteram"),
 		m_screen(*this, "^screen"),
-		m_flipscreen(0)
+		m_flipscreen(0),
+		m_partialupdates(1)
 {
 	m_newtilecb =  snk68_tile_indirection_delegate(FUNC(snk68_spr_device::tile_callback_noindirect), this);
 }	
@@ -51,7 +52,11 @@ void snk68_spr_device::set_tile_indirect_cb(device_t &device,snk68_tile_indirect
 	dev.m_newtilecb = newtilecb;
 }
 
-
+void snk68_spr_device::static_set_no_partial(device_t &device)
+{
+	snk68_spr_device &dev = downcast<snk68_spr_device &>(device);
+	dev.m_partialupdates = 0;
+}
 
 void snk68_spr_device::device_start()
 {
@@ -87,7 +92,7 @@ WRITE16_MEMBER(snk68_spr_device::spriteram_w)
 		int vpos = m_screen->vpos();
 
 		if (vpos > 0)
-			m_screen->update_partial(vpos - 1);
+			if (m_partialupdates) m_screen->update_partial(vpos - 1);
 
 		m_spriteram[offset] = newword;
 	}
