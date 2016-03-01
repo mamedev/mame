@@ -12,8 +12,11 @@
 // Needed for RAW Input
 #define WM_INPUT 0x00FF
 
+#include <stdio.h> // must be here otherwise issues with I64FMT in MINGW
 // standard C headers
 #include <process.h>
+
+#include <atomic>
 
 // MAME headers
 #include "emu.h"
@@ -127,11 +130,11 @@ struct mtlog
 };
 
 static mtlog mtlog[100000];
-static volatile INT32 mtlogindex;
+static std::atomic<INT32> mtlogindex;
 
 void mtlog_add(const char *event)
 {
-	int index = atomic_increment32((INT32 *) &mtlogindex) - 1;
+	int index = mtlogindex++;
 	if (index < ARRAY_LENGTH(mtlog))
 	{
 		mtlog[index].timestamp = osd_ticks();
@@ -149,7 +152,7 @@ static void mtlog_dump(void)
 	for (i = 0; i < mtlogindex; i++)
 	{
 		osd_ticks_t curr = mtlog[i].timestamp * 1000000 / cps;
-		fprintf(f, "%20I64d %10I64d %s\n", curr, curr - last, mtlog[i].event);
+		fprintf(f, "%20" I64FMT "d %10" I64FMT "d %s\n", (UINT64)curr, (UINT64)(curr - last), mtlog[i].event);
 		last = curr;
 	}
 	fclose(f);

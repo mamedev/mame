@@ -18,14 +18,6 @@
 
 #if defined(__i386__) || defined(__x86_64__)
 
-
-static inline void ATTR_FORCE_INLINE
-osd_yield_processor(void)
-{
-	__asm__ __volatile__ ( " rep ; nop ;" );
-}
-
-
 #if defined(__x86_64__)
 
 //============================================================
@@ -50,14 +42,6 @@ _osd_exchange64(INT64 volatile *ptr, INT64 exchange)
 
 
 #elif defined(__ppc__) || defined (__PPC__) || defined(__ppc64__) || defined(__PPC64__)
-
-
-static inline void ATTR_FORCE_INLINE
-osd_yield_processor(void)
-{
-	__asm__ __volatile__ ( " nop \n nop \n" );
-}
-
 
 
 #if defined(__ppc64__) || defined(__PPC64__)

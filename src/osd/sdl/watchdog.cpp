@@ -51,7 +51,7 @@ watchdog::watchdog(void)
 
 watchdog::~watchdog(void)
 {
-	atomic_exchange32(&m_do_exit, 1);
+	m_do_exit = 1;
 	osd_event_set(m_event);
 	osd_thread_wait_free(m_thread);
 	osd_event_free(m_event);

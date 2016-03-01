@@ -11,6 +11,7 @@
 //============================================================
 
 #include "modules/sync/osdsync.h"
+#include <atomic>
 
 class watchdog
 {
@@ -27,7 +28,7 @@ public:
 private:
 	osd_event *     m_event;
 	osd_thread *    m_thread;
-	volatile INT32  m_do_exit;
+	std::atomic<INT32>  m_do_exit;
 
 	osd_ticks_t     m_timeout;
 };
