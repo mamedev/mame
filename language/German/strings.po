@@ -746,7 +746,7 @@ msgstr ""
 
 #: src/emu/ui/info.cpp:98
 msgid "Not supported"
-msgstr "Nicht Unterstützt"
+msgstr "Nicht unterstützt"
 
 #: src/emu/ui/info.cpp:101
 msgid "Partially supported"
