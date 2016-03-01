@@ -683,8 +683,6 @@ void ui_menu_select_game::build_available_list()
 				if (cx != -1 && m_included[cx])
 				{
 					const game_driver *drv = &driver_list::driver(cx);
-					if (strcmp(drv->name, "natodef") == 0)
-						noroms = false;
 					const rom_entry *parentrom = drv->rom;
 					if ((rom = driver->rom) == parentrom)
 						noroms = true;
