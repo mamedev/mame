@@ -497,23 +497,6 @@ void validity_checker::validate_inlines()
 	testi32a = (testi32a | 0xffff0000) & ~0x400000;
 	if (count_leading_ones(testi32a) != 9)
 		osd_printf_error("Error testing count_leading_ones\n");
-
-	testi32b = testi32a;
-	if (compare_exchange32(&testi32a, testi32b, 1000) != testi32b || testi32a != 1000)
-		osd_printf_error("Error testing compare_exchange32\n");
-#ifdef PTR64
-	testi64b = testi64a;
-	if (compare_exchange64(&testi64a, testi64b, 1000) != testi64b || testi64a != 1000)
-		osd_printf_error("Error testing compare_exchange64\n");
-#endif
-	if (atomic_exchange32(&testi32a, testi32b) != 1000)
-		osd_printf_error("Error testing atomic_exchange32\n");
-	if (atomic_add32(&testi32a, 45) != testi32b + 45)
-		osd_printf_error("Error testing atomic_add32\n");
-	if (atomic_increment32(&testi32a) != testi32b + 46)
-		osd_printf_error("Error testing atomic_increment32\n");
-	if (atomic_decrement32(&testi32a) != testi32b + 45)
-		osd_printf_error("Error testing atomic_decrement32\n");
 }
 
 
