@@ -65,16 +65,18 @@ write:
 
 /*
 
-Planet Probe -  unknown manufacture  -  Copyright 1985
-Game probably programmed by same people behind some Kyugo/Orca/Komax games (see hiscore table, Gyrodine pinout, clocks etc.)
+Planet Probe - TRY Corporation? - Copyright 1985
+Game probably programmed by same people behind some Kyugo/Orca/Komax/Crux games (see hiscore table, Gyrodine pinout, clocks etc.)
 
 Upper board marked DVL/A-V
 Bottom Bord DVL/B-V
 
-The pcb seems a bootleg/prototype:
+The PCB seems to be a bootleg/prototype:
 On the upper board there are some pads for jumpers , some empty spaces left unpopulated for additional TTLs and an XTAL.
 All 5 sockets for 2732 eproms were modified to accept 2764 eproms.
 The AY8910 pin 26 (TEST 2) is grounded with a flying wire
+Lack of manufacturer on title/copyright screen (there is room in the ROM - 15 characters - after the year string for a copyright message,
+  however it is filled with the 'string termination' character rather than a string.)
 
 Upper board chips:
 5x 2764 eproms
