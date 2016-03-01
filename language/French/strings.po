@@ -721,7 +721,7 @@ msgstr "Sélection du Format de l'Image"
 #: src/emu/ui/filesel.cpp:862
 #, fuzzy
 msgid "Select access mode"
-msgstr "Mode d"Accès Sélectionné"
+msgstr "Mode d'Accès Sélectionné"
 
 #: src/emu/ui/filesel.cpp:863
 msgid "Read-only"
@@ -748,7 +748,7 @@ msgid ""
 "The software selected is missing one or more required ROM or CHD images. "
 "Please select a different one."
 msgstr "Le logiciel sélectionné est manquant ou une ou plusieurs images ROM ou CHD sont nécessaires. "
-'Veuillez en sélectionner une différente."
+"Veuillez en sélectionner une différente."
 
 #: src/emu/ui/info.cpp:98
 msgid "Not supported"
@@ -1178,7 +1178,7 @@ msgstr "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
 #: src/emu/ui/selgame.cpp:721
 #, c-format
 msgid "%1$s (%2$s - %3$s) - "
-msgstr ""%1$s (%2$s - %3$s) - "
+msgstr "%1$s (%2$s - %3$s) - "
 
 #: src/emu/ui/selgame.cpp:728 src/emu/ui/selgame.cpp:734
 #, c-format
@@ -1422,7 +1422,7 @@ msgstr "Contrôles des Samples : MAUVAIS\n"
 msgid ""
 "Roms Audit Pass: Disabled\n"
 "Samples Audit Pass: Disabled\n"
-msgstr ""Contrôles des Roms : Désactivé\n"
+msgstr "Contrôles des Roms : Désactivé\n"
 "Contrôles des Samples : Désactivé\n"
 
 #: src/emu/ui/selgame.cpp:1978 src/emu/ui/selgame.cpp:2139
