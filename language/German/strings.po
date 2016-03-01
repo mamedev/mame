@@ -1269,7 +1269,7 @@ msgstr "ROM-Satz: %1$-.100s\n"
 #: src/emu/ui/selgame.cpp:876
 #, c-format
 msgid "%1$s %2$s"
-msgstr ""%1$s %2$s"
+msgstr "%1$s %2$s"
 
 #: src/emu/ui/selgame.cpp:1472
 #, c-format
