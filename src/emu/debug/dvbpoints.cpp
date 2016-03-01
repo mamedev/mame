@@ -194,7 +194,7 @@ void debug_view_breakpoints::pad_ostream_to_length(std::ostream& str, int len)
 {
 	auto const current = str.tellp();
 	if (current < decltype(current)(len))
-		str << std::setw(current - decltype(current)(len)) << "";
+		str << std::setw(decltype(current)(len) - current) << "";
 }
 
 
