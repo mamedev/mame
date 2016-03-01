@@ -9,6 +9,8 @@
 #include "osdcore.h"
 #include "osdsync.h"
 
+#include <stdlib.h>
+
 // C++ headers
 #include <mutex>
 #include <atomic>

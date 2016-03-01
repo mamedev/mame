@@ -5,7 +5,6 @@
 //  sdlwork.c - SDL OSD core work item functions
 //
 //============================================================
-
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
