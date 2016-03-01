@@ -235,6 +235,7 @@ void osd_common_t::register_options()
 
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDL);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_DINPUT);
+	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_XINPUT);
 	REGISTER_MODULE(m_mod_man, JOYSTICK_NONE);
 
 	// after initialization we know which modules are supported
