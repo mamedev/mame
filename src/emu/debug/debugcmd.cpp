@@ -1874,7 +1874,7 @@ static void execute_dump(running_machine &machine, int ref, int params, const ch
 		output.clear();
 
 		/* print the address */
-		util::stream_format(output, "%*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(i));
+		util::stream_format(output, "%0*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(i));
 
 		/* print the bytes */
 		for (j = 0; j < 16; j += width)
@@ -1885,7 +1885,7 @@ static void execute_dump(running_machine &machine, int ref, int params, const ch
 				if (debug_cpu_translate(*space, TRANSLATE_READ_DEBUG, &curaddr))
 				{
 					UINT64 value = debug_read_memory(*space, i + j, width, TRUE);
-					util::stream_format(output, " %*X", width * 2, value);
+					util::stream_format(output, " %0*X", width * 2, value);
 				}
 				else
 					util::stream_format(output, " %.*s", width * 2, "****************");
