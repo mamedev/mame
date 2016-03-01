@@ -1134,7 +1134,7 @@ public:
 	template <typename Format, typename... Params>
 	format_argument_pack_impl(Format &&fmt, Params &&... args)
 		: std::array<format_argument<Stream>, Count>({ { format_argument<Stream>(std::forward<Params>(args))... } })
-		, format_argument_pack<Stream>(std::forward<Format>(fmt), this->cbegin(), Count)
+		, format_argument_pack<Stream>(std::forward<Format>(fmt), Count ? &*this->cbegin() : nullptr, Count)
 	{
 		static_assert(sizeof...(Params) == Count, "Wrong number of constructor arguments");
 	}
