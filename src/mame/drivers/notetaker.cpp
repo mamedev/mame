@@ -17,9 +17,9 @@
  
  * The notetaker has an 8-slot backplane, with the following cards in it:
    * I/O Processor card (8086@8Mhz, 8259pic, 4k ROM, Keyboard UART, DAC1200 (multiplexed to 2 channels))
-   * Emulation Processor card (8086@5Mhz, 8259pic, 4k RAM with Parity/ECC/Syndrome logic)
-   * Disk/Display card (WD1791 FDC, CRT5027 CRTC, EIA UART)
-   * Memory Control Module \_ (buffering, refresh, and Parity/ECC/Syndrome logic lives on these boards)
+   * Emulation Processor card (8086@5Mhz, 8259pic, 4k of local RAM with Parity check logic)
+   * Disk/Display card (WD1791 FDC, CRT5027 CRTC, EIA UART, AD571 ADC, 8->1 Analog Multiplexer)
+   * Memory Control Module \_ (bus control, buffering, refresh, Parity/ECC/Syndrome logic lives on these boards)
    * Memory Data Module    /
    * Memory Storage Module x2 (the 4116 DRAMs live on these boards)
    * Battery Module *OR* debugger module type A or B (debugger module has an i8255 on it for alto<->notetaker comms, and allows alto to halt the cpus [type A and B can debug either the emulator cpu or the iocpu respectively] and dump registers to alto screen, etc)
@@ -133,10 +133,10 @@ UINT32 notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 WRITE16_MEMBER(notetaker_state::IPConReg_w)
 {
 	m_BootSeqDone = (data&0x80)?1:0;
-	//m_ProcLock = (data&0x40)?1:0; // processor lock
+	//m_ProcLock = (data&0x40)?1:0; // bus lock for this processor (hold other processor in wait state)
 	//m_CharCtr = (data&0x20)?1:0; // battery charge control
 	m_DisableROM = (data&0x10)?1:0; // disable rom at 0000-0fff
-	//m_CorrOn = (data&0x08)?1:0; // also LedInd5
+	//m_CorrOn = (data&0x08)?1:0; // corron (?) also LedInd5
 	//m_LedInd6 = (data&0x04)?1:0;
 	//m_LedInd7 = (data&0x02)?1:0;
 	//m_LedInd8 = (data&0x01)?1:0;
