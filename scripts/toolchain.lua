@@ -464,7 +464,6 @@ function toolchain(_buildDir, _subDir)
 		removeflags {
 			"StaticRuntime",
 			"NoExceptions",
-			"EnableMinimalRebuild",
 		}
 
 	configuration { "mingw*" }

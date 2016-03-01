@@ -484,7 +484,6 @@ configuration { "vs*" }
 		"NoPCH",
 		"ExtraWarnings",
 		"NoEditAndContinue",
-		"EnableMinimalRebuild",
 	}
 	if not _OPTIONS["NOWERROR"] then
 		flags{
