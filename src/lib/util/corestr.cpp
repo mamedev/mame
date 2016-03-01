@@ -198,16 +198,6 @@ char *core_i64_format(UINT64 value, UINT8 mindigits, bool is_octal)
 
 #include <algorithm>
 
-int strvprintf(std::string &str, const char *format, va_list args)
-{
-	char tempbuf[4096];
-	int result = vsprintf(tempbuf, format, args);
-
-	// set the result
-	str.assign(tempbuf);
-	return result;
-}
-
 int strcatvprintf(std::string &str, const char *format, va_list args)
 {
 	char tempbuf[4096];

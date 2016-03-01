@@ -66,7 +66,6 @@ char *core_i64_format(UINT64 value, UINT8 mindigits, bool is_octal);
 char *core_i64_hex_format(UINT64 value, UINT8 mindigits);
 char *core_i64_oct_format(UINT64 value, UINT8 mindigits);
 
-int strvprintf(std::string &str, const char *format, va_list args);
 int strcatvprintf(std::string &str, const char *format, va_list args);
 
 void strdelchr(std::string& str, char chr);

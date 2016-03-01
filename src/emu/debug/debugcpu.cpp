@@ -2231,10 +2231,9 @@ void device_debug::go_next_device()
 //  debugger on the next instruction
 //-------------------------------------------------
 
-void device_debug::halt_on_next_instruction(const char *fmt, ...)
+void device_debug::halt_on_next_instruction_impl(util::format_argument_pack<std::ostream> &&args)
 {
 	debugcpu_private *global = m_device.machine().debugcpu_data;
-	va_list arg;
 
 	assert(m_exec != nullptr);
 
@@ -2243,9 +2242,7 @@ void device_debug::halt_on_next_instruction(const char *fmt, ...)
 		return;
 
 	// output the message to the console
-	va_start(arg, fmt);
-	debug_console_vprintf(m_device.machine(), fmt, arg);
-	va_end(arg);
+	debug_console_vprintf(m_device.machine(), std::move(args));
 
 	// if we are live, stop now, otherwise note that we want to break there
 	if (&m_device == global->livecpu)
