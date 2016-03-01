@@ -6,7 +6,7 @@
 //
 //============================================================
 
-#if defined(OSD_WINDOWS)
+#if defined(OSD_WINDOWS) || (SDLMAME_WIN32)
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -20,6 +20,7 @@
 #endif
 #include <mutex>
 #include <atomic>
+#include <thread>
 
 // MAME headers
 #include "osdcore.h"
@@ -32,7 +33,9 @@
 #if defined(SDLMAME_MACOSX)
 #include "osxutils.h"
 #endif
-
+#if defined(SDLMAME_LINUX) || defined(SDLMAME_BSD) || defined(SDLMAME_HAIKU) || defined(SDLMAME_EMSCRIPTEN) || defined(SDLMAME_MACOSX)
+#include <pthread.h>
+#endif
 #if defined(OSD_SDL)
 typedef void *PVOID;
 #endif
@@ -95,7 +98,7 @@ static void spin_while_not(const volatile _AtomType * volatile atom, const _Main
 struct work_thread_info
 {
 	osd_work_queue *    queue;          // pointer back to the queue
-	osd_thread *        handle;         // handle to the thread
+	std::thread *       handle;         // handle to the thread
 	osd_event *         wakeevent;      // wake event for the thread
 	std::atomic<INT32>  active;         // are we actively processing work?
 
@@ -160,6 +163,33 @@ static void * worker_thread_entry(void *param);
 static void worker_thread_process(osd_work_queue *queue, work_thread_info *thread);
 static bool queue_has_list_items(osd_work_queue *queue);
 
+//============================================================
+//  osd_thread_adjust_priority
+//============================================================
+
+int thread_adjust_priority(std::thread *thread, int adjust)
+{
+#if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
+	if (adjust)
+		SetThreadPriority((HANDLE)thread->native_handle(), THREAD_PRIORITY_ABOVE_NORMAL);
+	else
+		SetThreadPriority((HANDLE)thread->native_handle(), GetThreadPriority(GetCurrentThread()));
+#endif
+#if defined(SDLMAME_LINUX) || defined(SDLMAME_BSD) || defined(SDLMAME_HAIKU) || defined(SDLMAME_EMSCRIPTEN) || defined(SDLMAME_DARWIN)
+	struct sched_param  sched;
+	int                 policy;
+
+	if (pthread_getschedparam(thread->native_handle(), &policy, &sched) == 0)
+	{
+		sched.sched_priority += adjust;
+		if (pthread_setschedparam(thread->native_handle(), policy, &sched) == 0)
+			return TRUE;
+		else
+			return FALSE;
+	}
+#endif
+	return TRUE;
+}
 
 //============================================================
 //  osd_work_queue_alloc
@@ -237,16 +267,16 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 			goto error;
 
 		// create the thread
-		thread->handle = osd_thread_create(worker_thread_entry, thread);
-		if (thread->handle == NULL)
+		thread->handle = new std::thread(worker_thread_entry, thread);
+		if (thread->handle == nullptr)
 			goto error;
 
 		// set its priority: I/O threads get high priority because they are assumed to be
 		// blocked most of the time; other threads just match the creator's priority
 		if (flags & WORK_QUEUE_FLAG_IO)
-			osd_thread_adjust_priority(thread->handle, 1);
+			thread_adjust_priority(thread->handle, 1);
 		else
-			osd_thread_adjust_priority(thread->handle, 0);
+			thread_adjust_priority(thread->handle, 0);
 	}
 
 	// start a timer going for "waittime" on the main thread
@@ -357,7 +387,8 @@ void osd_work_queue_free(osd_work_queue *queue)
 			// block on the thread going away, then close the handle
 			if (thread->handle != NULL)
 			{
-				osd_thread_wait_free(thread->handle);
+				thread->handle->join();
+				delete thread->handle;
 			}
 
 			// clean up the wake event
@@ -446,12 +477,11 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 
 		// first allocate a new work item; try the free list first
 		{
-			queue->lock->lock();
+			std::lock_guard<std::mutex> lock(*queue->lock);
 			do
 			{
 				item = (osd_work_item *)queue->free;
-			} while (item != NULL && !queue->free.compare_exchange_weak(item, item->next, std::memory_order_release, std::memory_order_relaxed));
-			queue->lock->unlock();
+			} while (item != NULL && !queue->free.compare_exchange_weak(item, item->next, std::memory_order_release, std::memory_order_relaxed));			
 		}
 
 		// if nothing, allocate something new
@@ -486,10 +516,9 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 
 	// enqueue the whole thing within the critical section
 	{
-		queue->lock->lock();
+		std::lock_guard<std::mutex> lock(*queue->lock);
 		*queue->tailptr = itemlist;
-		queue->tailptr = item_tailptr;
-		queue->lock->unlock();
+		queue->tailptr = item_tailptr;		
 	}
 
 	// increment the number of items in the queue
@@ -544,9 +573,8 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 	// if we don't have an event, create one
 	if (item->event == NULL)
 	{
-		item->queue->lock->lock();
-		item->event = osd_event_alloc(TRUE, FALSE);     // manual reset, not signalled
-		item->queue->lock->unlock();
+		std::lock_guard<std::mutex> lock(*item->queue->lock);
+		item->event = osd_event_alloc(TRUE, FALSE);     // manual reset, not signalled		
 	}
 	else
 		osd_event_reset(item->event);
@@ -589,13 +617,12 @@ void osd_work_item_release(osd_work_item *item)
 	osd_work_item_wait(item, 100 * osd_ticks_per_second());
 
 	// add us to the free list on our queue
-	item->queue->lock->lock();
+	std::lock_guard<std::mutex> lock(*item->queue->lock);
 	do
 	{
 		next = (osd_work_item *)item->queue->free;
 		item->next = next;
 	} while (!item->queue->free.compare_exchange_weak(next, item, std::memory_order_release, std::memory_order_relaxed));
-	item->queue->lock->unlock();
 }
 
 
@@ -716,7 +743,8 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 
 		// use a critical section to synchronize the removal of items
 		{
-			queue->lock->lock();
+			std::lock_guard<std::mutex> lock(*queue->lock);
+
 			if (queue->list.load() == nullptr)
 			{
 				end_loop = true;
@@ -732,7 +760,6 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 						queue->tailptr = (osd_work_item **)&queue->list;
 				}
 			}
-			queue->lock->unlock();
 		}
 
 		if (end_loop)
@@ -758,13 +785,13 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 			// set the result and signal the event
 			else
 			{
-				queue->lock->lock();
+				std::lock_guard<std::mutex> lock(*queue->lock);
+
 				if (item->event != NULL)
 				{
 					osd_event_set(item->event);
 					add_to_stat(item->queue->setevents, 1);
 				}
-				queue->lock->unlock();
 			}
 
 			// if we removed an item and there's still work to do, bump the stats
@@ -785,8 +812,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 
 bool queue_has_list_items(osd_work_queue *queue)
 {
-	queue->lock->lock();
+	std::lock_guard<std::mutex> lock(*queue->lock);
 	bool has_list_items = (queue->list.load() != nullptr);
-	queue->lock->unlock();
 	return has_list_items;
 }

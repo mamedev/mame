@@ -67,7 +67,6 @@ end
 
 defines {
 	"OSD_SDL",
-	"SYNC_IMPLEMENTATION=" .. SYNC_IMPLEMENTATION,
 }
 
 if BASE_TARGETOS=="unix" then

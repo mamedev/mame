@@ -12,6 +12,7 @@
 
 #include "modules/sync/osdsync.h"
 #include <atomic>
+#include <thread>
 
 class watchdog
 {
@@ -27,7 +28,7 @@ public:
 	void            setTimeout(int timeout);
 private:
 	osd_event *     m_event;
-	osd_thread *    m_thread;
+	std::thread*      m_thread;
 	std::atomic<INT32>  m_do_exit;
 
 	osd_ticks_t     m_timeout;

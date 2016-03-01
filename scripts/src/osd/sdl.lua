@@ -222,27 +222,20 @@ end
 
 BASE_TARGETOS       = "unix"
 SDLOS_TARGETOS      = "unix"
-SYNC_IMPLEMENTATION = "tc"
 SDL_NETWORK         = ""
 if _OPTIONS["targetos"]=="linux" then
 	SDL_NETWORK         = "taptun"
 elseif _OPTIONS["targetos"]=="openbsd" then
-	SYNC_IMPLEMENTATION = "ntc"
 elseif _OPTIONS["targetos"]=="netbsd" then
-	SYNC_IMPLEMENTATION = "ntc"
 	SDL_NETWORK         = "pcap"
 elseif _OPTIONS["targetos"]=="haiku" then
-	SYNC_IMPLEMENTATION = "ntc"
 elseif _OPTIONS["targetos"]=="asmjs" then
-	SYNC_IMPLEMENTATION = "mini"
 elseif _OPTIONS["targetos"]=="windows" then
 	BASE_TARGETOS       = "win32"
 	SDLOS_TARGETOS      = "win32"
-	SYNC_IMPLEMENTATION = "windows"
 	SDL_NETWORK         = "pcap"
 elseif _OPTIONS["targetos"]=="macosx" then
 	SDLOS_TARGETOS      = "macosx"
-	SYNC_IMPLEMENTATION = "ntc"
 	SDL_NETWORK         = "pcap"
 end
 
@@ -476,19 +469,10 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/osdmodule.h",
 		MAME_DIR .. "src/osd/modules/lib/osdlib_" .. SDLOS_TARGETOS .. ".cpp",
 		MAME_DIR .. "src/osd/modules/lib/osdlib.h",
-		MAME_DIR .. "src/osd/modules/sync/sync_" .. SYNC_IMPLEMENTATION .. ".cpp",
+		MAME_DIR .. "src/osd/modules/sync/osdsync.cpp",
 		MAME_DIR .. "src/osd/modules/sync/osdsync.h",
+		MAME_DIR .. "src/osd/modules/sync/work_osd.cpp",
 	}
-
-	if _OPTIONS["NOASM"]=="1" then
-		files {
-			MAME_DIR .. "src/osd/modules/sync/work_mini.cpp",
-		}
-	else
-		files {
-			MAME_DIR .. "src/osd/modules/sync/work_osd.cpp",
-		}
-	end
 
 	if _OPTIONS["targetos"]=="macosx" then
 		files {

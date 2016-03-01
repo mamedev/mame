@@ -96,25 +96,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 	}
-
-	if _OPTIONS["targetos"]=="linux" then
-		BASE_TARGETOS = "unix"
-		SDLOS_TARGETOS = "unix"
-		SYNC_IMPLEMENTATION = "tc"
-	end
-
-	if _OPTIONS["targetos"]=="windows" then
-		BASE_TARGETOS = "win32"
-		SDLOS_TARGETOS = "win32"
-		SYNC_IMPLEMENTATION = "windows"
-	end
-
-	if _OPTIONS["targetos"]=="macosx" then
-		BASE_TARGETOS = "unix"
-		SDLOS_TARGETOS = "macosx"
-		SYNC_IMPLEMENTATION = "ntc"
-	end
-
+	
 	files {
 		MAME_DIR .. "src/osd/osdnet.cpp",
 		MAME_DIR .. "src/osd/osdnet.h",
@@ -126,5 +108,5 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/osdmini/minifile.cpp",
 		MAME_DIR .. "src/osd/osdmini/minimisc.cpp",
 		MAME_DIR .. "src/osd/osdmini/minitime.cpp",
-		MAME_DIR .. "src/osd/modules/sync/work_mini.cpp",
+		MAME_DIR .. "src/osd/modules/sync/work_osd.cpp",
 	}
