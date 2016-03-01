@@ -11,6 +11,8 @@
 
 #include <bgfx/bgfx.h>
 
+#include <vector>
+
 #include "targetmanager.h"
 #include "target.h"
 
@@ -34,7 +36,7 @@ bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat
 
 bgfx_target* target_manager::create_target(std::string name, void *handle, uint32_t width, uint32_t height)
 {
-	bgfx_target* target = new bgfx_target(name, handle, width, height);
+	bgfx_target* target = new bgfx_target(name, width, height, TARGET_STYLE_CUSTOM, handle);
 	m_targets[name] = target;
 
 	m_textures.add_texture(name, target);
@@ -50,4 +52,27 @@ bgfx_target* target_manager::target(std::string name)
 	}
 
 	return nullptr;
+}
+
+void target_manager::update_guest_targets(uint16_t width, uint16_t height)
+{
+	if (width != m_guest_width || height != m_guest_height)
+	{
+		m_guest_width = width;
+		m_guest_height = height;
+		std::vector<bgfx_target*> to_resize;
+		for (std::pair<std::string, bgfx_target*> target : m_targets)
+		{
+			if ((target.second)->style() == TARGET_STYLE_GUEST)
+			{
+				to_resize.push_back(target.second);
+			}
+		}
+
+		for (bgfx_target* target : to_resize)
+		{
+			m_targets[target->name()] = new bgfx_target(target->name(), target->format(), width, height, TARGET_STYLE_GUEST, target->filter());
+			delete target;
+		}
+	}
 }

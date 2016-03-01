@@ -17,11 +17,11 @@
 #include <map>
 #include <string>
 
-#include <bgfx/bgfx.h>
-
 #include "texturemanager.h"
 #include "targetmanager.h"
 #include "effectmanager.h"
+
+class running_machine;
 
 class bgfx_chain;
 
@@ -38,10 +38,10 @@ public:
 	~chain_manager();
 
 	// Getters
-	bgfx_chain* chain(std::string name);
+	bgfx_chain* chain(std::string name, running_machine& machine);
 
 private:
-	bgfx_chain* load_chain(std::string name);
+	bgfx_chain* load_chain(std::string name, running_machine& machine);
 
 	texture_manager&					m_textures;
 	target_manager&						m_targets;

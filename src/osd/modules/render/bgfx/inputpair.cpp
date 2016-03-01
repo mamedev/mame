@@ -12,15 +12,21 @@
 #include "inputpair.h"
 #include "texture.h"
 #include "effect.h"
+#include "uniform.h"
+#include "texturemanager.h"
 
-bgfx_input_pair::bgfx_input_pair(int index, std::string sampler, bgfx_texture* texture)
+bgfx_input_pair::bgfx_input_pair(int index, std::string sampler, std::string texture)
 	: m_index(index)
 	, m_sampler(sampler)
 	, m_texture(texture)
 {
 }
 
-void bgfx_input_pair::bind(bgfx_effect *effect)
+void bgfx_input_pair::bind(bgfx_effect *effect, texture_manager& textures)
 {
-	bgfx::setTexture(m_index, effect->uniform(m_sampler)->handle(), m_texture->handle());
+	printf("Binding texture %s to uniform %s\n", m_texture.c_str(), m_sampler.c_str());
+	bgfx_uniform *uniform = effect->uniform(m_sampler);
+	bgfx::UniformHandle u_handle = uniform->handle();
+	bgfx::TextureHandle t_handle = textures.texture(m_texture)->handle();
+	bgfx::setTexture(m_index, u_handle, t_handle);
 }

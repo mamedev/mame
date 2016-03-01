@@ -2214,7 +2214,7 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 static slider_state *slider_alloc(running_machine &machine, int id, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg)
 {
 	int size = sizeof(slider_state) + strlen(title);
-	slider_state *state = (slider_state *)auto_alloc_array_clear(machine, UINT8, size);
+	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(machine, UINT8, size));
 
 	state->minval = minval;
 	state->defval = defval;

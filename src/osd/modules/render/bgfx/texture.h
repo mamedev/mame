@@ -18,7 +18,8 @@
 class bgfx_texture
 {
 public:
-	bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, void* data = nullptr, uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
+	bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, uint32_t flags, void* data);
+	bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, const bgfx::Memory* data, uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
 	virtual ~bgfx_texture();
 
 	// Getters

@@ -34,5 +34,5 @@ void parameter_reader::validate_parameters(const Value& value)
 	assert(value.HasMember("type"));
 	assert(value["type"].IsString());
 	assert(value.HasMember("period"));
-	assert(value["period"].IsDouble());
+	assert(value["period"].IsNumber());
 }

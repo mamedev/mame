@@ -38,12 +38,18 @@ void state_reader::validate_array_parameter(const Value& value, std::string type
 	}
 }
 
-void state_reader::validate_double_parameter(const Value& value, std::string typeName, std::string name)
+void state_reader::validate_float_parameter(const Value& value, std::string typeName, std::string name)
 {
 	if (value.HasMember(name.c_str()))
 	{
-		assert(value[name.c_str()].IsDouble());
+		assert(value[name.c_str()].IsFloat());
 	}
+}
+
+void state_reader::validate_int_parameter(const Value& value, std::string typeName, std::string name) {
+    if (value.HasMember(name.c_str())) {
+        assert(value[name.c_str()].IsInt());
+    }
 }
 
 void state_reader::validate_string_parameter(const Value& value, std::string typeName, std::string name)
@@ -69,6 +75,13 @@ bool state_reader::get_bool(const Value& value, const std::string name, const bo
 		return value[name.c_str()].GetBool();
 	}
 	return default_value;
+}
+
+int state_reader::get_int(const Value& value, const std::string name, const int default_value) {
+    if (value.HasMember(name.c_str())) {
+        return int(floor(value[name.c_str()].GetDouble() + 0.5));
+    }
+    return default_value;
 }
 
 void state_reader::get_float(const Value& value, const std::string name, float* out, float* default_value, int count)

@@ -271,7 +271,7 @@ struct slider_desc
 	int                 		step;
 	int							slider_type;
 	int                 		screen_type;
-	int                 		id;
+	int							id;
 	float						scale;
 	const char *				format;
 	std::vector<const char *>	strings;

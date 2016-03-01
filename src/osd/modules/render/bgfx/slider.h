@@ -15,35 +15,62 @@
 
 #include <string>
 #include <vector>
-#include <map>
 
-#include "uniform.h"
+#include "emu.h"
+#include "ui/ui.h"
 
 class bgfx_slider
 {
 public:
 	enum slider_type
 	{
-		SLIDER_BOOL,
+		SLIDER_INT_ENUM,
 		SLIDER_FLOAT,
 		SLIDER_INT,
 		SLIDER_COLOR,
 		SLIDER_VEC2
 	};
 
-	bgfx_slider(slider_type type, std::string name, std::string description, void *defaults, void *min, void *max);
+	enum screen_type
+	{
+		SLIDER_SCREEN_TYPE_NONE = 0,
+		SLIDER_SCREEN_TYPE_RASTER = 1,
+		SLIDER_SCREEN_TYPE_VECTOR = 2,
+		SLIDER_SCREEN_TYPE_VECTOR_OR_RASTER = SLIDER_SCREEN_TYPE_VECTOR | SLIDER_SCREEN_TYPE_RASTER,
+		SLIDER_SCREEN_TYPE_LCD = 4,
+		SLIDER_SCREEN_TYPE_LCD_OR_RASTER = SLIDER_SCREEN_TYPE_LCD | SLIDER_SCREEN_TYPE_RASTER,
+		SLIDER_SCREEN_TYPE_LCD_OR_VECTOR = SLIDER_SCREEN_TYPE_LCD | SLIDER_SCREEN_TYPE_VECTOR,
+		SLIDER_SCREEN_TYPE_ANY = SLIDER_SCREEN_TYPE_RASTER | SLIDER_SCREEN_TYPE_VECTOR | SLIDER_SCREEN_TYPE_LCD
+	};
+
+	bgfx_slider(running_machine& machine, std::string name, int32_t min, int32_t def, int32_t max, int32_t step, slider_type type, screen_type screen, float scale, std::string format, std::string description, std::vector<std::string>& strings);
 	~bgfx_slider();
 
-	static size_t size(slider_type type);
-	static size_t storage_size(slider_type type);
-protected:
+    int32_t update(std::string *str, int32_t newval);
 
-	slider_type m_type;
-	std::string m_name;
-	std::string m_description;
-	char*   m_data;
-	char*   m_min;
-	char*   m_max;
+    // Getters
+    std::string name() const { return m_name; }
+    slider_type type() const { return m_type; }
+    int32_t value() const { return m_value; }
+    float   uniform_value() const { return *(reinterpret_cast<const float*>(&m_value)); }
+    slider_state* core_slider() const { return m_slider_state; }
+
+protected:
+    slider_state* create_core_slider(running_machine &machine);
+
+    std::string     m_name;
+    int32_t         m_min;
+    int32_t         m_default;
+    int32_t         m_max;
+    int32_t         m_step;
+    slider_type     m_type;
+    screen_type	    m_screen_type;
+    float		    m_scale;
+    std::string	    m_format;
+	std::string     m_description;
+    std::vector<std::string> m_strings;
+    int32_t         m_value;
+    slider_state*   m_slider_state;
 };
 
 #endif // __DRAWBGFX_SLIDER__

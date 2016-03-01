@@ -40,6 +40,9 @@
 #include "bgfx/texture.h"
 #include "bgfx/target.h"
 #include "bgfx/chain.h"
+#include "bgfx/vertex.h"
+#include "bgfx/uniform.h"
+#include "bgfx/slider.h"
 
 //============================================================
 //  DEBUGGING
@@ -57,7 +60,8 @@ const uint32_t renderer_bgfx::WHITE_HASH = 0x87654321;
 //  MACROS
 //============================================================
 
-#define GIBBERISH   (0)
+#define GIBBERISH   	(0)
+#define USE_NEW_SHADERS (0)
 
 //============================================================
 //  INLINES
@@ -135,7 +139,7 @@ int renderer_bgfx::create()
 	m_targets = new target_manager(*m_textures);
 	m_shaders = new shader_manager();
 	m_effects = new effect_manager(*m_shaders);
-	m_chains = new chain_manager(*m_textures, *m_targets, *m_effects, m_width[window().m_index], m_height[window().m_index]);
+	//m_chains = new chain_manager(*m_textures, *m_targets, *m_effects, m_width[window().m_index], m_height[window().m_index]);
 
 	if (window().m_index != 0)
 	{
@@ -158,7 +162,8 @@ int renderer_bgfx::create()
 	m_screen_effect[2] = m_effects->effect("screen_multiply");
 	m_screen_effect[3] = m_effects->effect("screen_add");
 
-	//m_screen_chain[0] = m_chains->chain("test");
+	//m_screen_chain = m_chains->chain("test", window().machine());
+    m_sliders_dirty = true;
 
 	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
 	m_texture_cache = m_textures->create_texture("#cache", bgfx::TextureFormat::RGBA8, CACHE_SIZE, CACHE_SIZE, nullptr, flags);
@@ -176,7 +181,7 @@ int renderer_bgfx::create()
 renderer_bgfx::~renderer_bgfx()
 {
 	// Cleanup.
-	delete m_chains;
+	//delete m_chains;
 	delete m_effects;
 	delete m_shaders;
 	delete m_textures;
@@ -210,7 +215,7 @@ int renderer_bgfx::xy_to_render_target(int x, int y, int *xt, int *yt)
 //  drawbgfx_window_draw
 //============================================================
 
-bgfx::VertexDecl renderer_bgfx::ScreenVertex::ms_decl;
+bgfx::VertexDecl ScreenVertex::ms_decl;
 
 void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, ScreenVertex* vertex)
 {
@@ -295,9 +300,32 @@ void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, ScreenV
 	vertex[5].m_v = v[0];
 }
 
+void renderer_bgfx::render_screen_quad(int view, render_primitive* prim)
+{
+    uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
+    if (video_config.filter == 0) {
+        texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
+    }
+
+    const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(prim->flags & PRIMFLAG_TEXFORMAT_MASK,
+        prim->texture.width, prim->texture.height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
+
+    uint16_t tex_width(prim->texture.width);
+    uint16_t tex_height(prim->texture.height);
+
+    bgfx_texture *texture = new bgfx_texture("screen", bgfx::TextureFormat::RGBA8, uint16_t(prim->texture.width), uint16_t(prim->texture.height), mem);
+    m_textures->add_texture("screen", texture);
+
+    m_targets->update_guest_targets(tex_width, tex_height);
+    m_screen_chain->process(prim, view, *m_textures, window().get_size().width(), window().get_size().height(), get_blend_state(PRIMFLAG_GET_BLENDMODE(prim->flags)));
+
+    m_textures->add_texture("screen", nullptr);
+    delete texture;
+}
+
 void renderer_bgfx::render_textured_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer)
 {
-	ScreenVertex* vertex = (ScreenVertex*)buffer->data;
+	ScreenVertex* vertex = reinterpret_cast<ScreenVertex*>(buffer->data);
 
 	UINT32 rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
 
@@ -342,7 +370,6 @@ void renderer_bgfx::render_textured_quad(int view, render_primitive* prim, bgfx:
 	vertex[5].m_rgba = rgba;
 	vertex[5].m_u = prim->texcoords.tl.u;
 	vertex[5].m_v = prim->texcoords.tl.v;
-	bgfx::setVertexBuffer(buffer);
 
 	uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
 	if (video_config.filter == 0)
@@ -353,10 +380,12 @@ void renderer_bgfx::render_textured_quad(int view, render_primitive* prim, bgfx:
 	const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(prim->flags & PRIMFLAG_TEXFORMAT_MASK,
 		prim->texture.width, prim->texture.height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
 
-	bgfx::TextureHandle texture = bgfx::createTexture2D((uint16_t)prim->texture.width, (uint16_t)prim->texture.height, 1, bgfx::TextureFormat::RGBA8, texture_flags, mem);
+	bgfx::TextureHandle texture = bgfx::createTexture2D(uint16_t(prim->texture.width), uint16_t(prim->texture.height), 1, bgfx::TextureFormat::RGBA8, texture_flags, mem);
 
 	bgfx_effect** effects = PRIMFLAG_GET_SCREENTEX(prim->flags) ? m_screen_effect : m_gui_effect;
+
 	UINT32 blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
+    bgfx::setVertexBuffer(buffer);
 	bgfx::setTexture(0, effects[blend]->uniform("s_tex")->handle(), texture);
 	effects[blend]->submit(view);
 
@@ -889,11 +918,18 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
 					}
 					else
 					{
-						if (vertices > 0)
-						{
-							return BUFFER_PRE_FLUSH;
-						}
+#if USE_NEW_SHADERS
+                        if (PRIMFLAG_GET_SCREENTEX((*prim)->flags))
+                        {
+                            render_screen_quad(view, *prim);
+                        }
+                        else
+                        {
+                            render_textured_quad(view, *prim, buffer);
+                        }
+#else
 						render_textured_quad(view, *prim, buffer);
+#endif
 						return BUFFER_EMPTY;
 					}
 				}
@@ -923,25 +959,26 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
 	return BUFFER_FLUSH;
 }
 
+uint64_t renderer_bgfx::get_blend_state(UINT32 blend)
+{
+	switch (blend)
+	{
+		case BLENDMODE_ALPHA:
+			return BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
+		case BLENDMODE_RGB_MULTIPLY:
+			return BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_DST_COLOR, BGFX_STATE_BLEND_ZERO);
+		case BLENDMODE_ADD:
+			return BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_ONE);
+		default:
+			return 0L;
+	}
+	return 0L;
+}
+
 void renderer_bgfx::set_bgfx_state(UINT32 blend)
 {
 	uint64_t flags = BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_DEPTH_TEST_ALWAYS;
-
-	switch (blend)
-	{
-		case BLENDMODE_NONE:
-			bgfx::setState(flags);
-			break;
-		case BLENDMODE_ALPHA:
-			bgfx::setState(flags | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA));
-			break;
-		case BLENDMODE_RGB_MULTIPLY:
-			bgfx::setState(flags | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_DST_COLOR, BGFX_STATE_BLEND_ZERO));
-			break;
-		case BLENDMODE_ADD:
-			bgfx::setState(flags | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_ONE));
-			break;
-	}
+	bgfx::setState(flags | get_blend_state(blend));
 }
 
 bool renderer_bgfx::update_atlas()
@@ -1105,5 +1142,24 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::
 
 slider_state* renderer_bgfx::get_slider_list()
 {
-	return nullptr;
+    slider_state *listhead = nullptr;
+#if USE_NEW_SHADERS
+    slider_state **tailptr = &listhead;
+    std::vector<bgfx_slider*> sliders = m_screen_chain->sliders();
+    for (bgfx_slider* slider : sliders)
+    {
+        if (*tailptr == nullptr)
+        {
+            *tailptr = slider->core_slider();
+        }
+        else
+        {
+            (*tailptr)->next = slider->core_slider();
+            tailptr = &(*tailptr)->next;
+        }
+    }
+    (*tailptr)->next = nullptr;
+    m_sliders_dirty = false;
+#endif
+    return listhead;
 }

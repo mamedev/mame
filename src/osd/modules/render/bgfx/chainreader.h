@@ -21,10 +21,13 @@ class effect_manager;
 class chain_reader : public state_reader
 {
 public:
-	static bgfx_chain* read_from_value(const Value& value, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t screen_width, uint32_t screen_height);
+	static bgfx_chain* read_from_value(const Value& value, running_machine& machine, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t screen_width, uint32_t screen_height);
 
 private:
 	static void validate_parameters(const Value& value);
+
+	static const int STYLE_COUNT = 3;
+	static const string_to_enum STYLE_NAMES[STYLE_COUNT];
 };
 
 #endif // __DRAWBGFX_CHAIN_READER__

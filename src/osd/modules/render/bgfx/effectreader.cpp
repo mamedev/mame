@@ -26,7 +26,11 @@ bgfx_effect* effect_reader::read_from_value(shader_manager& shaders, const Value
 {
 	validate_parameters(value);
 
-	uint64_t blend = blend_reader::read_from_value(value["blend"]);
+	uint64_t blend = 0;
+	if (value.HasMember("blend"))
+	{
+		blend = blend_reader::read_from_value(value["blend"]);
+	}
 	uint64_t depth = depth_reader::read_from_value(value["depth"]);
 	uint64_t cull = cull_reader::read_from_value(value["cull"]);
 	uint64_t write = write_reader::read_from_value(value["write"]);
@@ -57,7 +61,6 @@ bgfx_effect* effect_reader::read_from_value(shader_manager& shaders, const Value
 
 void effect_reader::validate_parameters(const Value& value)
 {
-	assert(value.HasMember("blend"));
 	assert(value.HasMember("depth"));
 	assert(value.HasMember("cull"));
 	assert(value.HasMember("write"));

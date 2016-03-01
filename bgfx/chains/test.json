@@ -1,26 +1,26 @@
 {	"name": "Test Shader Chain",
 	"author": "Ryan Holtz",
 	"sliders": [
-		{ "type": "bool",  "name": "adjustments", "text": "Enable Adjustments", "default": false },
-		{ "type": "float", "name": "ratio_amount", "text": "Ratio Amount", "default": 0, "max": 1, "min": 0 },
-
-		{ "type": "color", "name": "red_ratios", "text": "Red Amount",   "default": [ 1, 0, 0 ], "max": [ 1, 1, 1 ], "min": [ 0, 0, 0 ] },
-		{ "type": "color", "name": "grn_ratios", "text": "Green Amount", "default": [ 0, 1, 0 ], "max": [ 1, 1, 1 ], "min": [ 0, 0, 0 ] },
-		{ "type": "color", "name": "blu_ratios", "text": "Blue Amount",  "default": [ 0, 0, 1 ], "max": [ 1, 1, 1 ], "min": [ 0, 0, 0 ] },
-		{ "type": "color", "name": "tint", "text": "Tint", "default": [ 1, 1, 1 ], "max": [ 1, 1, 1 ], "min": [ 0, 0, 0 ] },
-		{ "type": "color", "name": "phosphor", "text": "Phosphor Amount",  "default": [ 0, 0, 0 ], "max": [ 1, 1, 1 ], "min": [ 0, 0, 0 ] },
-		{ "type": "vec2",  "name": "shift", "text": "Frame Shift", "default": [ 0, 0 ], "max": [ 25, 25 ], "min": [ -25, -25 ] }
+		{ "type": "int_enum", "name": "adjustments",  "text": "Enable Adjustments",        "default": 0,                 "max": 1,                 "min": 0,                    "step": 1, "scale": 1.0,   "format": "%s",    "screen": "any", "strings": [ "On", "Off" ] },
+		{ "type": "float",    "name": "ratio_amount", "text": "Ratio Amount",              "default": 0,                 "max": 100,               "min": 0,                    "step": 1, "scale": 0.01,  "format": "%1.2f", "screen": "any" },
+		{ "type": "color",    "name": "red_ratios",   "text": "Color Matrix, Red from ",   "default": [ 200,   0,   0 ], "max": [ 400, 400, 400 ], "min": [ -400, -400, -400 ], "step": 1, "scale": 0.005, "format": "%2.3f", "screen": "any" },
+		{ "type": "color",    "name": "grn_ratios",   "text": "Color Matrix, Green from ", "default": [   0, 200,   0 ], "max": [ 400, 400, 400 ], "min": [ -400, -400, -400 ], "step": 1, "scale": 0.005, "format": "%2.3f", "screen": "any" },
+		{ "type": "color",    "name": "blu_ratios",   "text": "Color Matrix, Blue from ",  "default": [   0,   0, 200 ], "max": [ 400, 400, 400 ], "min": [ -400, -400, -400 ], "step": 1, "scale": 0.005, "format": "%2.3f", "screen": "any" },
+		{ "type": "color",    "name": "tint",         "text": "Tint ",                     "default": [ 100, 100, 100 ], "max": [ 100, 100, 100 ], "min": [    0,    0,    0 ], "step": 1, "scale": 0.01,  "format": "%1.2f", "screen": "any" },
+		{ "type": "color",    "name": "phosphor",     "text": "Phosphor Life, ",           "default": [   0,   0,   0 ], "max": [ 100, 100, 100 ], "min": [    0,    0,    0 ], "step": 1, "scale": 0.01,  "format": "%1.2f", "screen": "any" },
+		{ "type": "vec2",     "name": "shift",        "text": "Frame Shift ",              "default": [   0,   0 ],      "max": [ 25, 25 ],        "min": [ -25, -25 ],         "step": 1, "scale": 1.0,   "format": "%2.f",  "screen": "raster" }
 	],
 	"parameters": [
 		{ "name": "alternating", "type": "frame_mask", "period": 2 }
 	],
 	"targets": [
 		{	"name": "native",
-			"screen": true
+			"mode": "native",
+			"prescale": 1
 		},
 		{	"name": "previous",
-			"screen": true,
-			"prescale": true
+			"mode": "native",
+			"prescale": 1
 		}
 	],
 	"passes": [
@@ -31,10 +31,10 @@
 				{ "type": "slider", "name": "ratio_amount", "value": 0 }
 			],
 			"uniforms": [
-				{ "name": "u_ratio_amount", "slider": "ratio_amount" },
-				{ "name": "u_red_ratios", "slider": "red_ratios" },
-				{ "name": "u_grn_ratios", "slider": "grn_ratios" },
-				{ "name": "u_blu_ratios", "slider": "blu_ratios" }
+				{ "uniform": "u_ratio_amount", "slider": "ratio_amount" },
+				{ "uniform": "u_red_ratios", "slider": "red_ratios" },
+				{ "uniform": "u_grn_ratios", "slider": "grn_ratios" },
+				{ "uniform": "u_blu_ratios", "slider": "blu_ratios" }
 			],
 			"input": [
 				{ "sampler": "s_tex", "texture": "screen" }
@@ -47,8 +47,8 @@
 				{ "type": "slider", "name": "adjustments", "value": false }
 			],
 			"uniforms": [
-				{ "name": "u_tint", "slider": "tint" },
-				{ "name": "u_shift", "slider": "shift" }
+				{ "uniform": "u_tint", "slider": "tint" },
+				{ "uniform": "u_shift", "slider": "shift" }
 			],
 			"input": [
 				{ "sampler": "s_tex", "texture": "native" }
@@ -62,8 +62,8 @@
 				{ "type": "slider", "name": "phosphor", "value": [ 0, 0, 0 ] }
 			],
 			"uniforms": [
-				{ "name": "u_passthrough", "value": [ 0 ] },
-				{ "name": "u_phosphor", "slider": "phosphor" }
+				{ "uniform": "u_passthrough", "value": [ 0 ] },
+				{ "uniform": "u_phosphor", "slider": "phosphor" }
 			],
 			"input": [
 				{ "sampler": "s_tex", "texture": "native" },
@@ -78,8 +78,8 @@
 				{ "type": "slider", "name": "phosphor", "value": [ 0, 0, 0 ] }
 			],
 			"uniforms": [
-				{ "name": "u_passthrough", "value": [ 1 ] },
-				{ "name": "u_phosphor", "slider": "phosphor" }
+				{ "uniform": "u_passthrough", "value": [ 1 ] },
+				{ "uniform": "u_phosphor", "slider": "phosphor" }
 			],
 			"input": [
 				{ "sampler": "s_tex", "texture": "native" },

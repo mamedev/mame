@@ -9,57 +9,104 @@
 #include "emu.h"
 
 #include "slider.h"
+#include "ui/ui.h"
 
-bgfx_slider::bgfx_slider(slider_type type, std::string name, std::string description, void *defaults, void *min, void *max)
-	: m_type(type)
-	, m_name(name)
+bgfx_slider::bgfx_slider(running_machine &machine, std::string name, int32_t min, int32_t def, int32_t max, int32_t step, slider_type type, screen_type screen, float scale, std::string format, std::string description, std::vector<std::string>& strings)
+	: m_name(name)
+	, m_step(step)
+	, m_type(type)
+	, m_screen_type(screen)
+	, m_scale(scale)
+	, m_format(format)
 	, m_description(description)
 {
-	m_data = global_alloc_array_clear<char>(storage_size(type));
-	m_min = global_alloc_array_clear<char>(storage_size(type));
-	m_max = global_alloc_array_clear<char>(storage_size(type));
-	memcpy(m_data, defaults, size(type));
-	memcpy(m_min, min, size(type));
-	memcpy(m_max, max, size(type));
+	m_min = min;
+	m_default = def;
+    m_max = max;
+
+    m_value = def;
+    if (m_type != slider_type::SLIDER_INT && m_type != slider_type::SLIDER_INT_ENUM)
+    {
+        float temp = float(def) * scale;
+        m_value = *reinterpret_cast<int32_t*>(&temp);
+    }
+
+    for (std::string string : strings)
+    {
+        m_strings.push_back(string);
+    }
+
+    m_slider_state = create_core_slider(machine);
 }
 
 bgfx_slider::~bgfx_slider()
 {
-	global_free(m_data);
-	global_free(m_min);
-	global_free(m_max);
 }
 
-size_t bgfx_slider::storage_size(slider_type type)
-{
-	switch(type)
-	{
-		case SLIDER_INT:
-			return 1 * sizeof(int);
-		case SLIDER_BOOL:
-		case SLIDER_FLOAT:
-		case SLIDER_COLOR:
-		case SLIDER_VEC2:
-			return 4 * sizeof(float);
-		default:
-			return 0;
-	}
+static INT32 update_trampoline(running_machine &machine, void *arg, std::string *str, INT32 newval) {
+    if (arg != nullptr) {
+        return reinterpret_cast<bgfx_slider*>(arg)->update(str, newval);
+    }
+    return 0;
 }
 
-size_t bgfx_slider::size(slider_type type)
+slider_state* bgfx_slider::create_core_slider(running_machine& machine)
 {
-	switch(type)
-	{
-		case SLIDER_INT:
-			return sizeof(int);
-		case SLIDER_BOOL:
-		case SLIDER_FLOAT:
-			return sizeof(float);
-		case SLIDER_COLOR:
-			return sizeof(float) * 3;
-		case SLIDER_VEC2:
-			return sizeof(float) * 2;
-		default:
-			return 0;
-	}
+    int size = sizeof(slider_state) + m_description.length();
+    slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(machine, UINT8, size));
+
+    state->minval = m_min;
+    state->defval = m_default;
+    state->maxval = m_max;
+    state->incval = m_step;
+    state->update = update_trampoline;
+    state->arg = this;
+    state->hidden = false;
+    state->id = 0; // fixme
+    strcpy(state->description, m_description.c_str());
+    
+    return state;
+}
+
+int32_t bgfx_slider::update(std::string *str, int32_t newval)
+{
+    switch (m_type) {
+        case SLIDER_INT_ENUM:
+        {
+            INT32 *val_ptr = reinterpret_cast<INT32 *>(&m_value);
+            if (newval != SLIDER_NOCHANGE) {
+                *val_ptr = newval;
+            }
+            if (str != nullptr) {
+                *str = string_format(m_format, m_strings[*val_ptr]);
+            }
+            return *val_ptr;
+        }
+
+        case SLIDER_INT:
+        {
+            int *val_ptr = reinterpret_cast<int *>(&m_value);
+            if (newval != SLIDER_NOCHANGE) {
+                *val_ptr = newval;
+            }
+            if (str != nullptr) {
+                *str = string_format(m_format, *val_ptr);
+            }
+            return *val_ptr;
+        }
+
+        default:
+        {
+            float *val_ptr = reinterpret_cast<float *>(&m_value);
+            if (newval != SLIDER_NOCHANGE)
+            {
+                *val_ptr = float(newval) * m_scale;
+            }
+            if (str != nullptr) {
+                *str = string_format(m_format, *val_ptr);
+            }
+            return int32_t(floor(*val_ptr / m_scale + 0.5f));
+        }
+    }
+    return 0;
 }
