@@ -1709,6 +1709,7 @@ void ui_menu_select_software::arts_render(void *selectedref, float origx1, float
 		if (driver != olddriver || !snapx_bitmap->valid() || ui_globals::switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
+			snapfile.set_restrict_to_mediapath(true);
 			bitmap_argb32 *tmp_bitmap;
 			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
 

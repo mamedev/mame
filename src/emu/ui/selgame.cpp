@@ -660,26 +660,75 @@ void ui_menu_select_game::build_available_list()
 
 	// now check and include NONE_NEEDED
 	for (int x = 0; x < m_total; ++x)
-		if (!m_included[x])
+	{
+		const game_driver *driver = &driver_list::driver(x);
+		if (!m_included[x] && driver != &GAME_NAME(___empty))
 		{
-			if (&driver_list::driver(x) == &GAME_NAME(___empty))
-				continue;
-
-			const rom_entry *rom = driver_list::driver(x).rom;
+			const rom_entry *rom = driver->rom;
 			bool noroms = true;
-			for (; !ROMENTRY_ISEND(rom); ++rom)
-				if (!ROMENTRY_ISREGION(rom))
+
+			// check NO-DUMP
+			for (; !ROMENTRY_ISEND(rom) && noroms == true; ++rom)
+				if (ROMENTRY_ISFILE(rom))
 				{
-					noroms = false;
-					break;
+					hash_collection hashes(ROM_GETHASHDATA(rom));
+					if (!hashes.flag(hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
+						noroms = false;
 				}
-			
+
+			if (!noroms)
+			{
+				// check if clone == parent
+				int cx = driver_list::clone(*driver);
+				if (cx != -1 && m_included[cx])
+				{
+					const game_driver *drv = &driver_list::driver(cx);
+					if (strcmp(drv->name, "natodef") == 0)
+						noroms = false;
+					const rom_entry *parentrom = drv->rom;
+					if ((rom = driver->rom) == parentrom)
+						noroms = true;
+
+					// check if clone < parent
+					if (!noroms)
+					{
+						noroms = true;
+						for (; !ROMENTRY_ISEND(rom) && noroms == true; ++rom)
+						{
+							if (ROMENTRY_ISFILE(rom))
+							{
+								hash_collection hashes(ROM_GETHASHDATA(rom));
+								if (hashes.flag(hash_collection::FLAG_NO_DUMP) || ROM_ISOPTIONAL(rom))
+									continue;
+
+								UINT64 lenght = ROM_GETLENGTH(rom);
+								bool found = false;
+								for (parentrom = drv->rom; !ROMENTRY_ISEND(parentrom) && found == false; ++parentrom)
+								{
+									if (ROMENTRY_ISFILE(parentrom) && ROM_GETLENGTH(parentrom) == lenght)
+									{
+										hash_collection parenthashes(ROM_GETHASHDATA(parentrom));
+										if (parenthashes.flag(hash_collection::FLAG_NO_DUMP) || ROM_ISOPTIONAL(parentrom))
+											continue;
+
+										if (hashes == parenthashes)
+											found = true;
+									}
+								}
+								noroms = found;
+							}
+						}
+					}
+				}
+			}
+
 			if (noroms)
 			{
 				m_availsortedlist.push_back(&driver_list::driver(x));
 				m_included[x] = true;
 			}
 		}
+	}
 
 	// sort
 	std::stable_sort(m_availsortedlist.begin(), m_availsortedlist.end(), sort_game_list);
@@ -2259,6 +2308,7 @@ void ui_menu_select_game::arts_render(void *selectedref, float origx1, float ori
 		if (driver != olddriver || !snapx_bitmap->valid() || ui_globals::switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
+			snapfile.set_restrict_to_mediapath(true);
 			bitmap_argb32 *tmp_bitmap;
 			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
 
