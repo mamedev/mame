@@ -2875,7 +2875,7 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 
 		// queue the next read
 		for (curitem = startitem; curitem < enditem; curitem++)
-			atomic_exchange32(&m_work_item[curitem % WORK_BUFFER_HUNKS].m_status, WS_READING);
+			m_work_item[curitem % WORK_BUFFER_HUNKS].m_status = WS_READING;
 		osd_work_item_queue(m_read_queue, async_read_static, this, WORK_ITEM_FLAG_AUTO_RELEASE);
 		m_read_queue_offset += WORK_BUFFER_HUNKS * hunk_bytes() / 2;
 	}
@@ -2946,7 +2946,7 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 		} while (0);
 
 		// reset the item and advance
-		atomic_exchange32(&item.m_status, WS_READY);
+		item.m_status = WS_READY;
 		m_write_hunk++;
 
 		// if we hit the end, finalize
@@ -2959,7 +2959,7 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 				m_read_queue_offset = m_read_done_offset = 0;
 				m_write_hunk = 0;
 				for (auto & elem : m_work_item)
-					atomic_exchange32(&elem.m_status, WS_READY);
+					elem.m_status = WS_READY;
 			}
 
 			// wait for all reads to finish and if we're compressed, write the final SHA1 and map
@@ -3027,7 +3027,7 @@ void chd_file_compressor::async_walk_parent(work_item &item)
 		item.m_hash[unit].m_crc16 = crc16_creator::simple(item.m_data + unit * unit_bytes(), hunk_bytes());
 		item.m_hash[unit].m_sha1 = sha1_creator::simple(item.m_data + unit * unit_bytes(), hunk_bytes());
 	}
-	atomic_exchange32(&item.m_status, WS_COMPLETE);
+	item.m_status = WS_COMPLETE;
 }
 
 /**
@@ -3077,7 +3077,7 @@ void chd_file_compressor::async_compress_hunk(work_item &item, int threadid)
 		item.m_compression = item.m_codecs->find_best_compressor(item.m_data, item.m_compressed, item.m_complen);
 
 	// mark us complete
-	atomic_exchange32(&item.m_status, WS_COMPLETE);
+	item.m_status = WS_COMPLETE;
 }
 
 /**
@@ -3146,7 +3146,7 @@ void chd_file_compressor::async_read()
 			UINT32 hunknum = curoffs / hunk_bytes();
 			work_item &item = m_work_item[hunknum % WORK_BUFFER_HUNKS];
 			assert(item.m_status == WS_READING);
-			atomic_exchange32(&item.m_status, WS_QUEUED);
+			item.m_status = WS_QUEUED;
 			item.m_hunknum = hunknum;
 			item.m_osd = osd_work_item_queue(m_work_queue, m_walking_parent ? async_walk_parent_static : async_compress_hunk_static, &item, 0);
 		}
