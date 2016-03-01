@@ -996,7 +996,7 @@ void n64_periphs::vi_recalculate_resolution()
 	// DACRATE is the quarter pixel clock and period will be for a field, not a frame
 	attoseconds_t period = (vi_hsync & 0xfff) * (vi_vsync & 0xfff) * HZ_TO_ATTOSECONDS(DACRATE_NTSC) / 2;
 
-	if (width == 0 || height == 0)
+	if (width == 0 || height == 0 || (vi_control & 3) == 0)
 	{
 		vi_blank = 1;
 		/*
@@ -2060,7 +2060,7 @@ void n64_periphs::handle_pif()
 			}
 		}
 
-		ram[0x3f ^ BYTE4_XOR_BE(0)] = 0;
+		ram[0x3f ^ BYTE4_XOR_BE(0)] &= ~0x80;
 	}
 
 	/*printf("After:\n"); fflush(stdout);
@@ -2278,7 +2278,7 @@ void n64_periphs::dd_update_bm()
 	}
 	else // dd read, BM Mode 1
 	{
-		if(((dd_track_reg & 0xFFF) == 6) && (dd_start_block == 0) && ((machine().root_device().ioport("input")->read() & 0x0100) == 0x0000))
+		if(((dd_track_reg & 0x1FFF) == 6) && (dd_start_block == 0) && ((machine().root_device().ioport("input")->read() & 0x0100) == 0x0000))
 		{
 			//only fail read LBA 12 if retail disk drive
 			dd_status_reg &= ~DD_ASIC_STATUS_DREQ;
