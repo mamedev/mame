@@ -593,10 +593,10 @@ void ui_menu_remove_folder::handle()
 	if (m_event != nullptr && m_event->itemref != nullptr && m_event->iptkey == IPT_UI_SELECT)
 	{
 		std::string tmppath, error_string;
+		m_folders.erase(m_folders.begin() + selected);
 		for (int x = 0; x < m_folders.size(); ++x)
 		{
-			if (x != selected)
-				tmppath.append(m_folders[x]);
+			tmppath.append(m_folders[x]);
 			if (x < m_folders.size() - 1)
 				tmppath.append(";");
 		}
