@@ -2006,7 +2006,7 @@ msgid "%1$1.2f"
 msgstr "%1$1.2f"
 
 #: src/emu/ui/ui.cpp:2526
-#, fuzzy, c-format
+#, c-format
 msgid "Screen '%1$s'"
 msgstr "画面「%1$s」"
 
