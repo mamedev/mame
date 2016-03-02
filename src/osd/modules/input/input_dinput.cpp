@@ -422,7 +422,7 @@ public:
 #if DIRECTINPUT_VERSION >= 0x800
 		return DI8DEVCLASS_POINTER;
 #else
-		return DI8DEVTYPE_MOUSE;
+		return DIDEVTYPE_MOUSE;
 #endif
 	}
 
@@ -531,7 +531,7 @@ public:
 #if DIRECTINPUT_VERSION >= 0x800
 		return DI8DEVCLASS_GAMECTRL;
 #else
-		return DI8DEVTYPE_JOYSTICK;
+		return DIDEVTYPE_JOYSTICK;
 #endif
 	}
 
