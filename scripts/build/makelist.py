@@ -118,7 +118,7 @@ if len(sys.argv) < 2 or len(sys.argv) > 3:
 if len(sys.argv) == 3:
     if parse_filter_file(sys.argv[2]) :
         sys.exit(1)
-    sys.stderr.write("%d sources found\n" % len(sourcelist))
+    sys.stderr.write("%d source file(s) found\n" % len(sourcelist))
 
 if parse_file(sys.argv[1]) :
     sys.exit(1)
@@ -128,7 +128,7 @@ if len(drivlist)==0 :
     sys.stderr.write("No drivers found\n")
     sys.exit(1)
 
-sys.stderr.write("%d drivers found\n" % len(drivlist))
+sys.stderr.write("%d driver(s) found\n" % len(drivlist))
 
 # add a reference to the ___empty driver
 drivlist.append("___empty")
