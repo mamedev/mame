@@ -306,6 +306,16 @@ if (_OPTIONS["SOURCES"] == nil) then
 	end
 end	
 
+if (_OPTIONS["SOURCES"] ~= nil) then
+		dependency {
+		{  
+			GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
+		}
+		custombuildtask {
+			{ GEN_DIR .. _target .."/" .. _subtarget ..".flt" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makelist.py", MAME_DIR .. "src/".._target .."/" .. _target ..".lst"  }, {"@echo Building driver list...",    PYTHON .. " $(1) $(2) $(<) > $(@)" }},
+		}
+end
+
 if _OPTIONS["FORCE_VERSION_COMPILE"]=="1" then
 	configuration { "gmake" }
 		dependency {

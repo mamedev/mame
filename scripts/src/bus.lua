@@ -2572,3 +2572,18 @@ if (BUSES["M5"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/newbrain/exp.h,BUSES["NEWBRAIN"] = true
+---------------------------------------------------
+
+if (BUSES["NEWBRAIN"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/newbrain/exp.cpp",
+		MAME_DIR .. "src/devices/bus/newbrain/exp.h",
+		MAME_DIR .. "src/devices/bus/newbrain/eim.cpp",
+		MAME_DIR .. "src/devices/bus/newbrain/eim.h",
+		MAME_DIR .. "src/devices/bus/newbrain/fdc.cpp",
+		MAME_DIR .. "src/devices/bus/newbrain/fdc.h",
+	}
+end

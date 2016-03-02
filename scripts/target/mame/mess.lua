@@ -629,6 +629,7 @@ BUSES["NASBUS"] = true
 BUSES["NEOGEO"] = true
 BUSES["NES"] = true
 BUSES["NES_CTRL"] = true
+BUSES["NEWBRAIN"] = true
 BUSES["NUBUS"] = true
 BUSES["O2"] = true
 BUSES["ORICEXT"] = true
@@ -954,7 +955,7 @@ files {
 	MAME_DIR .. "src/mame/video/jaguar.cpp",
 	MAME_DIR .. "src/mame/video/jagblit.h",
 	MAME_DIR .. "src/mame/video/jagblit.inc",
-	MAME_DIR .. "src/mame/video/jagobj.inc",	
+	MAME_DIR .. "src/mame/video/jagobj.inc",
 	MAME_DIR .. "src/mame/audio/gorf.cpp",
 	MAME_DIR .. "src/mame/audio/wow.cpp",
 	MAME_DIR .. "src/mame/drivers/astrocde.cpp",
@@ -971,7 +972,7 @@ files {
 	MAME_DIR .. "src/mame/machine/n64.cpp",
 	MAME_DIR .. "src/mame/video/n64.cpp",
 	MAME_DIR .. "src/mame/video/n64types.h",
-	MAME_DIR .. "src/mame/video/rdpfiltr.inc",	
+	MAME_DIR .. "src/mame/video/rdpfiltr.inc",
 	MAME_DIR .. "src/mame/video/n64.h",
 	MAME_DIR .. "src/mame/video/rdpblend.cpp",
 	MAME_DIR .. "src/mame/video/rdpblend.h",

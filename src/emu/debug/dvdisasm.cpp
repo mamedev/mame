@@ -38,6 +38,9 @@ debug_view_disasm_source::debug_view_disasm_source(const char *name, device_t &d
 //  DEBUG VIEW DISASM
 //**************************************************************************
 
+const int debug_view_disasm::DEFAULT_DASM_LINES, debug_view_disasm::DEFAULT_DASM_WIDTH, debug_view_disasm::DASM_MAX_BYTES;
+
+
 //-------------------------------------------------
 //  debug_view_disasm - constructor
 //-------------------------------------------------
@@ -305,24 +308,25 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 //  values
 //-------------------------------------------------
 
-void debug_view_disasm::generate_bytes(offs_t pcbyte, int numbytes, int minbytes, char *string, int maxchars, bool encrypted)
+void debug_view_disasm::generate_bytes(offs_t pcbyte, int numbytes, int minbytes, int maxchars, bool encrypted)
 {
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-	int char_num = source.m_space.is_octal() ? 3 : 2;
+	const int char_num = source.m_space.is_octal() ? 3 : 2;
+	const int base = m_dasm.tellp();
+
 	// output the first value
 	int offset = 0;
 	if (maxchars >= char_num * minbytes)
-		offset = sprintf(string, "%s", core_i64_format(debug_read_opcode(source.m_decrypted_space, pcbyte, minbytes), minbytes * char_num, source.m_space.is_octal()));
+		offset += util::stream_format(m_dasm, source.m_space.is_octal() ? "%0*o" : "%0*X", minbytes * char_num, debug_read_opcode(source.m_decrypted_space, pcbyte, minbytes));
 
 	// output subsequent values
 	int byte;
 	for (byte = minbytes; byte < numbytes && offset + 1 + char_num * minbytes < maxchars; byte += minbytes)
-		offset += sprintf(&string[offset], " %s", core_i64_format(debug_read_opcode(encrypted ? source.m_space : source.m_decrypted_space, pcbyte + byte, minbytes), minbytes * char_num, source.m_space.is_octal()));
+		offset += util::stream_format(m_dasm, source.m_space.is_octal() ? " %0*o" : " %0*X", minbytes * char_num, debug_read_opcode(encrypted ? source.m_space : source.m_decrypted_space, pcbyte + byte, minbytes));
 
 	// if we ran out of room, indicate more
-	string[maxchars - 1] = 0;
-	if (byte < numbytes && byte != minbytes && maxchars > (char_num*2 -1))
-		string[maxchars - char_num] = string[maxchars - char_num - 1] = string[maxchars - char_num -2] = '.';
+	if ((byte < numbytes) && (byte != minbytes) && (maxchars > 3))
+		m_dasm.seekp(base + maxchars - 4) << "...";
 }
 
 
@@ -335,7 +339,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 {
 	bool changed = false;
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-	int char_num =  source.m_space.is_octal() ? 3 : 2;
+	const int char_num = source.m_space.is_octal() ? 3 : 2;
 
 	// determine how many characters we need for an address and set the divider
 	m_divider1 = 1 + (source.m_space.logaddrchars()/2*char_num) + 1;
@@ -344,8 +348,8 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 	m_divider2 = m_divider1 + 1 + m_dasm_width + 1;
 
 	// determine how many bytes we might need to display
-	int minbytes = source.m_disasmintf->min_opcode_bytes();
-	int maxbytes = source.m_disasmintf->max_opcode_bytes();
+	const int minbytes = source.m_disasmintf->min_opcode_bytes();
+	const int maxbytes = source.m_disasmintf->max_opcode_bytes();
 
 	// ensure that the PC is aligned to the minimum opcode size
 	pc &= ~source.m_space.byte_to_address_end(minbytes - 1);
@@ -353,7 +357,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 	// set the width of the third column according to display mode
 	if (m_right_column == DASM_RIGHTCOL_RAW || m_right_column == DASM_RIGHTCOL_ENCRYPTED)
 	{
-		int maxbytes_clamped = MIN(maxbytes, DASM_MAX_BYTES);
+		int const maxbytes_clamped = (std::min)(maxbytes, DASM_MAX_BYTES);
 		m_total.x = m_divider2 + 1 + char_num * maxbytes_clamped + (maxbytes_clamped / minbytes - 1) + 1;
 	}
 	else if (m_right_column == DASM_RIGHTCOL_COMMENTS)
@@ -365,25 +369,27 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 	m_byteaddress.resize(m_total.y);
 
 	// allocate disassembly buffer
-	m_dasm.resize(m_total.x * m_total.y);
+	const auto total_bytes = m_total.x * m_total.y;
+	m_dasm.reserve(total_bytes).seekp(total_bytes);
 
 	// iterate over lines
-	int row_width = m_total.x;
 	for (int line = 0; line < lines; line++)
 	{
 		// convert PC to a byte offset
-		offs_t pcbyte = source.m_space.address_to_byte(pc) & source.m_space.logbytemask();
+		const offs_t pcbyte = source.m_space.address_to_byte(pc) & source.m_space.logbytemask();
 
 		// save a copy of the previous line as a backup if we're only doing one line
-		int instr = startline + line;
-		char *destbuf = &m_dasm[instr * row_width];
+		const auto instr = startline + line;
+		const auto base = instr * m_total.x;
 		char oldbuf[100];
 		if (lines == 1)
-			strncpy(oldbuf, destbuf, MIN(sizeof(oldbuf), row_width));
+			std::memcpy(oldbuf, &m_dasm.vec()[base], (std::min<std::size_t>)(sizeof(oldbuf), m_total.x));
 
 		// convert back and set the address of this instruction
 		m_byteaddress[instr] = pcbyte;
-		sprintf(&destbuf[0], " %s  ", core_i64_format(source.m_space.byte_to_address(pcbyte), source.m_space.logaddrchars()/2*char_num, source.m_space.is_octal()));
+		util::stream_format(m_dasm.seekp(base),
+			source.m_space.is_octal() ? " %0*o  " : " %0*X  ",
+			source.m_space.logaddrchars()/2*char_num, source.m_space.byte_to_address(pcbyte));
 
 		// make sure we can translate the address, and then disassemble the result
 		char buffer[100];
@@ -407,26 +413,28 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 			strcpy(buffer, "<unmapped>");
 
 		// append the disassembly to the buffer
-		sprintf(&destbuf[m_divider1 + 1], "%-*s  ", m_dasm_width, buffer);
+		util::stream_format(m_dasm.seekp(base + m_divider1 + 1), "%2$-*1$.*1$s  ", m_dasm_width, buffer);
 
 		// output the right column
 		if (m_right_column == DASM_RIGHTCOL_RAW || m_right_column == DASM_RIGHTCOL_ENCRYPTED)
 		{
 			// get the bytes
 			numbytes = source.m_space.address_to_byte(numbytes) & source.m_space.logbytemask();
-			generate_bytes(pcbyte, numbytes, minbytes, &destbuf[m_divider2], row_width - m_divider2, m_right_column == DASM_RIGHTCOL_ENCRYPTED);
+			m_dasm.seekp(base + m_divider2);
+			generate_bytes(pcbyte, numbytes, minbytes, m_total.x - m_divider2, m_right_column == DASM_RIGHTCOL_ENCRYPTED);
 		}
 		else if (m_right_column == DASM_RIGHTCOL_COMMENTS)
 		{
 			// get and add the comment, if present
-			offs_t comment_address = source.m_space.byte_to_address(m_byteaddress[instr]);
-			const char *text = source.m_device.debug()->comment_text(comment_address);
+			const offs_t comment_address = source.m_space.byte_to_address(m_byteaddress[instr]);
+			const char *const text = source.m_device.debug()->comment_text(comment_address);
 			if (text != nullptr)
-				sprintf(&destbuf[m_divider2], "// %.*s", row_width - m_divider2 - 4, text);
+				util::stream_format(m_dasm.seekp(base + m_divider2), "// %.*s", m_total.x - m_divider2 - 4, text);
 		}
+		m_dasm.put('\0');
 
 		// see if the line changed at all
-		if (lines == 1 && strncmp(oldbuf, destbuf, MIN(sizeof(oldbuf), row_width)) != 0)
+		if (lines == 1 && strncmp(oldbuf, &m_dasm.vec()[base], (std::min<std::size_t>)(sizeof(oldbuf), m_total.x)) != 0)
 			changed = true;
 	}
 
@@ -544,7 +552,6 @@ recompute:
 
 	// loop over visible rows
 	debug_view_char *dest = &m_viewdata[0];
-	int row_width = m_dasm.size() / m_byteaddress.size();
 	for (UINT32 row = 0; row < m_visible.y; row++)
 	{
 		UINT32 effrow = m_topleft.y + row;
@@ -575,7 +582,7 @@ recompute:
 				attrib |= DCA_VISITED;
 
 			// get the effective string
-			const char *data = &m_dasm[effrow * row_width];
+			const char *data = &m_dasm.vec()[effrow * m_total.x];
 			UINT32 len = (UINT32)strlen(data);
 
 			// copy data

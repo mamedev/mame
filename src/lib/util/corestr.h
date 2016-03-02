@@ -61,10 +61,6 @@ char *core_strdup(const char *str);
 int core_strwildcmp(const char *sp1, const char *sp2);
 
 
-/* I64 printf helper */
-char *core_i64_format(UINT64 value, UINT8 mindigits, bool is_octal);
-char *core_i64_hex_format(UINT64 value, UINT8 mindigits);
-
 int strcatvprintf(std::string &str, const char *format, va_list args);
 
 void strdelchr(std::string& str, char chr);

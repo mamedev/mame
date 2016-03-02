@@ -187,6 +187,35 @@
 
 #define VPRINTF(x)  do { if (VERBOSE) printf x; } while (0)
 
+/*-------------------------------------------------
+    core_i64_hex_format - i64 format printf helper
+-------------------------------------------------*/
+
+static char *core_i64_hex_format(UINT64 value, UINT8 mindigits)
+{
+	static char buffer[16][64];
+	// TODO: this can overflow - e.g. when a lot of unmapped writes are logged
+	static int index;
+	char *bufbase = &buffer[index++ % 16][0];
+	char *bufptr = bufbase;
+	INT8 curdigit;
+
+	for (curdigit = 15; curdigit >= 0; curdigit--)
+	{
+		int nibble = (value >> (curdigit * 4)) & 0xf;
+		if (nibble != 0 || curdigit < mindigits)
+		{
+			mindigits = curdigit;
+			*bufptr++ = "0123456789ABCDEF"[nibble];
+		}
+	}
+	if (bufptr == bufbase)
+		*bufptr++ = '0';
+	*bufptr = 0;
+
+	return bufbase;
+}
+
 
 
 //**************************************************************************
@@ -675,8 +704,8 @@ private:
 		{
 			m_space.device().logerror(
 					m_space.is_octal()
-						? "%s: unmapped %s memory read from %*o & %*o\n"
-						: "%s: unmapped %s memory read from %*X & %*X\n",
+						? "%s: unmapped %s memory read from %0*o & %0*o\n"
+						: "%s: unmapped %s memory read from %0*X & %0*X\n",
 					m_space.machine().describe_context(), m_space.name(),
 					m_space.addrchars(), m_space.byte_to_address(offset * sizeof(_UintType)),
 					2 * sizeof(_UintType), mask);
@@ -746,8 +775,8 @@ private:
 		{
 			m_space.device().logerror(
 					m_space.is_octal()
-						? "%s: unmapped %s memory write to %*o = %*o & %*o\n"
-						: "%s: unmapped %s memory write to %*X = %*X & %*X\n",
+						? "%s: unmapped %s memory write to %0*o = %0*o & %0*o\n"
+						: "%s: unmapped %s memory write to %0*X = %0*X & %0*X\n",
 					m_space.machine().describe_context(), m_space.name(),
 					m_space.addrchars(), m_space.byte_to_address(offset * sizeof(_UintType)),
 					2 * sizeof(_UintType), data,

@@ -167,45 +167,10 @@ def parse_file(root, srcfile, folder):
     return 0
 
 def parse_file_for_drivers(root, srcfile):
-    try:
-        fp = open(root + srcfile, 'r')
-    except IOError:
-        sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
-        return 1
-    in_comment = 0
-    linenum = 0
-    for line in fp.readlines():
-        content = ''
-        linenum+=1
-        srcptr = 0
-        while srcptr < len(line):
-            c = line[srcptr]
-            srcptr+=1
-            if ord(c)==13 or ord(c)==10:
-                if ord(c)==13 and ord(line[srcptr])==10:
-                    srcptr+=1
-                continue
-            if c==' ' or ord(c)==9:
-                continue
-            if in_comment==1 and c=='*' and line[srcptr]=='/' :
-                srcptr+=1
-                in_comment = 0
-                continue
-            if in_comment:
-                continue
-            if c=='/' and line[srcptr]=='*' :
-                srcptr+=1
-                in_comment = 1
-                continue
-            if c=='/' and line[srcptr]=='/' :
-                break
-            content += c
-        content = content.strip()
-        if len(content)>0:
-            if content.startswith('COMP') or content.startswith('CONS') or content.startswith('GAME') or content.startswith('SYST')  or content.startswith('GAMEL'):
-               splitname = content.split(',', 3)
-               if len(splitname)>1:
-                  drivers.append(splitname[1])
+    srcfile = srcfile.replace('\\','/')
+    if srcfile.startswith('src/mame/drivers'):
+       splitname = srcfile.split('/', 4)
+       drivers.append(splitname[3])
     return 0
 
 def parse_lua_file(srcfile):
@@ -245,31 +210,12 @@ for filename in deps_files_included:
 for filename in sys.argv[2].rsplit(',') :
     parse_file_for_drivers(root,filename)
 
-
 # display output
 if sys.argv[3]=='drivers':
-    # add a reference to the ___empty driver
-    drivers.append("___empty")
-
-    # start with a header
-    print('#include "emu.h"\n')
-    print('#include "drivenum.h"\n')
-
     #output the list of externs first
     for drv in sorted(drivers):
-        print("GAME_EXTERN(%s);" % drv)
+        print(drv)
     print("")
-
-    # then output the array
-    print("const game_driver * const driver_list::s_drivers_sorted[%d] =" % len(drivers))
-    print("{")
-    for drv in sorted(drivers):
-        print("\t&GAME_NAME(%s)," % drv)
-    print("};")
-    print("")
-
-    # also output a global count
-    print("int driver_list::s_driver_count = %d;\n" % len(drivers))
 
 if sys.argv[3]=='target':
     for line in components:
