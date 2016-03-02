@@ -26,6 +26,7 @@
 #include "ui/ui.h"
 
 // MAMEOS headers
+#include "winutil.h"
 #include "winmain.h"
 #include "window.h"
 
@@ -117,93 +118,46 @@ struct xinput_api_state
 };
 
 // Typedef for pointers to XInput Functions
-typedef DWORD(__stdcall* PFN_XINPUTGETSTATE)(DWORD, XINPUT_STATE*);
-typedef DWORD(__stdcall* PFN_XINPUTGETCAPS)(DWORD, DWORD, XINPUT_CAPABILITIES*);
+typedef lazy_loaded_function_p2<DWORD, DWORD, XINPUT_STATE*> xinput_get_state_fn;
+typedef lazy_loaded_function_p3<DWORD, DWORD, DWORD, XINPUT_CAPABILITIES*> xinput_get_caps_fn;
 
 class xinput_interface
 {
 private:
-	HMODULE               m_xinput_module;
-	PFN_XINPUTGETSTATE    m_pfnXInputGetState;
-	PFN_XINPUTGETCAPS     m_pfnXInputGetCapabilities;
-	bool				  m_initialized;
+	const wchar_t* xinput_dll_names[2] = { L"xinput1_4.dll", L"xinput9_1_0.dll" };
 
+public:
+	xinput_get_state_fn   XInputGetState;
+	xinput_get_caps_fn    XInputGetCapabilities;
+
+private:
 	xinput_interface()
-		: m_xinput_module(NULL),
-			m_pfnXInputGetState(nullptr),
-			m_pfnXInputGetCapabilities(nullptr),
-			m_initialized(false)
+		: XInputGetState("XInputGetState", xinput_dll_names, ARRAY_LENGTH(xinput_dll_names)),
+		XInputGetCapabilities("XInputGetCapabilities", xinput_dll_names, ARRAY_LENGTH(xinput_dll_names))
 	{
 	}
 
 	int initialize()
 	{
-		if (m_initialized)
-			return 0;
-
-		m_xinput_module = load_xinput_library();
-		if (m_xinput_module == NULL)
+		int status;
+		status = XInputGetState.initialize();
+		if (status != 0)
 		{
-			osd_printf_error("Failed to load xinput library. Error: %u\n", (unsigned int)GetLastError());
+			osd_printf_error("Failed to initialize function pointer for %s. Error: %d\n", XInputGetState.name(), status);
 			return -1;
 		}
 
-		if (load_xinput_exports() != 0)
+		status = XInputGetCapabilities.initialize();
+		if (status != 0)
 		{
-			osd_printf_error("Failed to load exported XInput functions from library\n");
+			osd_printf_error("Failed to initialize function pointer for %s. Error: %d\n", XInputGetCapabilities.name(), status);
 			return -1;
 		}
 
-		m_initialized = true;
 		return 0;
-	}
-
-	DWORD load_xinput_exports()
-	{
-		m_pfnXInputGetState = (PFN_XINPUTGETSTATE)GetProcAddress(m_xinput_module, "XInputGetState");
-		m_pfnXInputGetCapabilities = (PFN_XINPUTGETCAPS)GetProcAddress(m_xinput_module, "XInputGetCapabilities");
-
-		if (m_pfnXInputGetState == nullptr
-			|| m_pfnXInputGetCapabilities == nullptr)
-		{
-			return ERROR_NOT_FOUND;
-		}
-
-		return 0;
-	}
-
-	static HMODULE load_xinput_library()
-	{
-		// Attempt to load the Windows 8/10 version of Xinput first
-		HMODULE module = LoadLibrary(L"xinput1_4.dll");
-
-		// Fall back to the one from DX SDK
-		if (module == NULL)
-		{
-			module = LoadLibrary(L"xinput9_1_0.dll");
-		}
-
-		// If we still didn't load it, fail
-		if (module == NULL)
-		{
-			osd_printf_warning("Could not load any verions of the XInput Library.\n");
-			SetLastError(ERROR_DLL_NOT_FOUND);
-		}
-
-		return module;
 	}
 
 public:
-	inline DWORD XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
-	{
-		return m_pfnXInputGetState(dwUserIndex, pState);
-	}
-
-	inline DWORD XInputGetCapabilities(DWORD dwUserIndex, DWORD dwFlags, XINPUT_CAPABILITIES* pCapabilities)
-	{
-		return m_pfnXInputGetCapabilities(dwUserIndex, dwFlags, pCapabilities);
-	}
-
 	static DWORD get_interface(xinput_interface **ppinterface)
 	{
 		static xinput_interface s_instance;
@@ -234,10 +188,10 @@ public:
 	xinput_joystick_device(running_machine &machine, const char *name, input_module &module)
 		: device_info(machine, name, DEVICE_CLASS_JOYSTICK, module),
 			gamepad({0}),
-			xinput_state({0})
+			xinput_state({0}),
+			xinput_api(nullptr)
 	{
 		// Attempt to get the xinput interface
-		xinput_api = nullptr;
 		xinput_interface::get_interface(&xinput_api);
 	}
 
