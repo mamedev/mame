@@ -23,7 +23,7 @@ Japanese Releases - Pyuuta
 013E Mickey Athletic Land ~ ミッキー アスレチックランド [dumped]
 014E Pooyan ~ プーヤン [dumped]
 015E Jungler ~ ジャングラー [dumped]
-016E Guttang Gottong ~ ガッタンゴットン [dumped]]
+016E Guttang Gottong ~ ガッタンゴットン [dumped]
 017E Maze Patrol ~ メイズ パトロール    [dumped]
 018E Tron ~ トロン [dumped]
 019E Mr. Do! ~ Mr.DO!    [dumped]
@@ -107,7 +107,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software> 
     
 	<software name="baseball">
-		<description>Baseball (Jpn)</description>
+		<description>Baseball [3D] (Jpn)</description>
 		<year>1984</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="ベースボール"/>
@@ -120,7 +120,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
   	<software name="batlfght">
-		<description>Battle Fighter (Jpn)</description>
+		<description>Battle Fighter [3D] (Jpn)</description>
 		<year>1985</year>
     <publisher>Tomy</publisher>
 		<info name="alt_title" value="バトルファイター"/>
