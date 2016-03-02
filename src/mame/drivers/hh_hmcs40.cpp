@@ -2788,7 +2788,7 @@ static MACHINE_CONFIG_START( eturtles, eturtles_state )
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(eturtles_state, grid_w))
 
 	MCFG_CPU_ADD("audiocpu", COP411, 215000) // approximation
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED) // guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_SK_CB(WRITELINE(eturtles_state, speaker_w))
 	MCFG_COP400_WRITE_D_CB(WRITE8(eturtles_state, cop_irq_w))
 	MCFG_COP400_READ_L_CB(READ8(eturtles_state, cop_latch_r))
@@ -2895,7 +2895,7 @@ static MACHINE_CONFIG_START( estargte, estargte_state )
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(eturtles_state, grid_w))
 
 	MCFG_CPU_ADD("audiocpu", COP411, 190000) // approximation
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED) // guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_SK_CB(WRITELINE(eturtles_state, speaker_w))
 	MCFG_COP400_WRITE_D_CB(WRITE8(eturtles_state, cop_irq_w))
 	MCFG_COP400_READ_L_CB(READ8(estargte_state, cop_data_r))
