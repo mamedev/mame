@@ -97,6 +97,7 @@
 
 # MSBUILD = 1
 # USE_LIBUV = 1
+# IGNORE_BAD_LOCALISATION=1
 
 ifdef PREFIX_MAKEFILE
 include $(PREFIX_MAKEFILE)
@@ -1365,8 +1366,11 @@ endif
 
 %.mo: %.po
 	@echo Converting translation $<...
+ifdef IGNORE_BAD_LOCALISATION
 	$(SILENT)$(PYTHON) scripts/build/msgfmt.py --output-file $@ $< || exit 0
-
+else
+	$(SILENT)$(PYTHON) scripts/build/msgfmt.py --output-file $@ $<
+endif
 #-------------------------------------------------
 # Regression tests
 #-------------------------------------------------
