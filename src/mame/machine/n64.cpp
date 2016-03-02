@@ -651,7 +651,7 @@ READ32_MEMBER(n64_periphs::sp_reg_r)
 			return 0;
 
 		case 0x1c/4:        // SP_SEMAPHORE_REG
-			m_vr4300->yield();
+			//m_vr4300->yield();
 			if( sp_semaphore )
 			{
 				return 1;
@@ -1373,7 +1373,7 @@ WRITE32_MEMBER( n64_periphs::ai_reg_w )
 TIMER_CALLBACK_MEMBER(n64_periphs::pi_dma_callback)
 {
 	pi_dma_tick();
-	m_rsp->yield();
+	//m_rsp->yield();
 }
 
 void n64_periphs::pi_dma_tick()
