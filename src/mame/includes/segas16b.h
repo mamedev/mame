@@ -52,7 +52,9 @@ public:
 			m_spritepalbase(0x400),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes"),
-			m_decrypted_opcodes(*this, "decrypted_opcodes")
+			m_decrypted_opcodes(*this, "decrypted_opcodes"),
+			m_bootleg_scroll(*this, "bootleg_scroll"),
+			m_bootleg_page(*this, "bootleg_page")
 	{ }
 
 	// memory mapping
@@ -89,6 +91,7 @@ public:
 	DECLARE_DRIVER_INIT(generic_5358_small);
 	DECLARE_DRIVER_INIT(generic_5797);
 	DECLARE_DRIVER_INIT(generic_korean);
+	DECLARE_DRIVER_INIT(generic_bootleg);
 	DECLARE_DRIVER_INIT(lockonph);
 	// game-specific driver init
 	DECLARE_DRIVER_INIT(isgsm);
@@ -123,6 +126,9 @@ public:
 
 	DECLARE_WRITE16_MEMBER( tileram_w ) { m_segaic16vid->tileram_w(space,offset,data,mem_mask); };
 	DECLARE_WRITE16_MEMBER( textram_w ) { m_segaic16vid->textram_w(space,offset,data,mem_mask); };
+
+	// bootleg stuff
+	void tilemap_16b_fpointbl_fill_latch(int i, UINT16* latched_pageselect, UINT16* latched_yscroll, UINT16* latched_xscroll, UINT16* textram);
 
 protected:
 	// internal types
@@ -214,6 +220,10 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_shared_ptr<UINT8> m_sound_decrypted_opcodes;
 	optional_shared_ptr<UINT16> m_decrypted_opcodes;
+	optional_shared_ptr<UINT16> m_bootleg_scroll;
+	optional_shared_ptr<UINT16> m_bootleg_page;
+
+
 };
 
 

@@ -12,7 +12,7 @@
 
 typedef device_delegate<void (int, UINT16*, UINT16*, UINT16*, UINT16*)> segaic16_video_pagelatch_delegate;
 
-#define MCFG_segaic16_video_SET_TILE_INDIRECT( _class, _method) \
+#define MCFG_SEGAIC16_VIDEO_SET_PAGELATCH_CB( _class, _method) \
 	segaic16_video_device::set_pagelatch_cb(*device, segaic16_video_pagelatch_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
 
 
