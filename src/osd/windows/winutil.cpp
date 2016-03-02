@@ -187,14 +187,20 @@ int lazy_loaded_function::initialize()
 		}
 
 		if (m_module == NULL)
+		{
+			osd_printf_verbose("Could not find DLL to dynamically link function %s.\n", m_name.c_str());
 			return ERROR_DLL_NOT_FOUND;
+		}
 	}
 
 	if (m_pfn == nullptr)
 	{
 		m_pfn = GetProcAddress(m_module, m_name.c_str());
 		if (m_pfn == nullptr)
+		{
+			osd_printf_verbose("Could not find function address to dynamically link function %s.\n", m_name.c_str());
 			return ERROR_NOT_FOUND;
+		}
 	}
 
 	m_initialized = true;
