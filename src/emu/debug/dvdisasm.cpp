@@ -370,10 +370,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 
 	// allocate disassembly buffer
 	const auto total_bytes = m_total.x * m_total.y;
-	m_dasm.reserve(total_bytes);
-	const auto current_bytes = m_dasm.seekp(0, util::ovectorstream::end).tellp();
-	if (current_bytes < util::ovectorstream::pos_type(total_bytes))
-		util::stream_format(m_dasm, "%*s", total_bytes - int(current_bytes), "");
+	m_dasm.reserve(total_bytes).seekp(total_bytes);
 
 	// iterate over lines
 	for (int line = 0; line < lines; line++)

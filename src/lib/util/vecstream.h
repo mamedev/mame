@@ -17,6 +17,7 @@
 #ifndef __MAME_UTIL_VECSTREAM_H__
 #define __MAME_UTIL_VECSTREAM_H__
 
+#include <algorithm>
 #include <cassert>
 #include <ostream>
 #include <streambuf>
@@ -26,6 +27,7 @@
 #include <vector>
 
 namespace util {
+
 template <typename CharT, typename Traits = std::char_traits<CharT>, typename Allocator = std::allocator<CharT> >
 class basic_vectorbuf : public std::basic_streambuf<CharT, Traits>
 {
@@ -99,6 +101,14 @@ public:
 		setup();
 	}
 
+	void swap(basic_vectorbuf &that)
+	{
+		std::basic_streambuf<CharT, Traits>::swap(that);
+		std::swap(m_mode, that.m_mode);
+		m_storage.swap(that.m_storage);
+		std::swap(m_threshold, that.m_threshold);
+	}
+
 	void reserve(typename vector_type::size_type size)
 	{
 		if ((m_mode & std::ios_base::out) && (m_storage.size() < size))
@@ -155,13 +165,22 @@ protected:
 		default:
 			return pos_type(off_type(-1));
 		}
-		if ((off_type(0) > off) || (end < off) || ((m_mode & std::ios_base::app) && out && (end != off)))
-			return pos_type(off_type(-1));
-		if (in) this->setg(this->eback(), this->eback() + off, this->egptr());
+		if ((off_type(0) > off) || ((m_mode & std::ios_base::app) && out && (end != off))) return pos_type(off_type(-1));
+		if ((out ? off_type(this->epptr() - this->pbase()) : end) < off) return pos_type(off_type(-1));
 		if (out)
 		{
 			this->setp(this->pbase(), this->epptr());
 			this->pbump(off);
+			if (m_threshold < this->pptr()) m_threshold = this->pptr();
+			if (m_mode & std::ios_base::in)
+			{
+				if (in) this->setg(this->eback(), this->eback() + off, m_threshold);
+				else if (this->egptr() < m_threshold) this->setg(this->eback(), this->gptr(), m_threshold);
+			}
+		}
+		else if (in)
+		{
+			this->setg(this->eback(), this->eback() + off, this->egptr());
 		}
 		return pos_type(off);
 	}
@@ -300,7 +319,9 @@ public:
 	vector_type const &vec() const { return rdbuf()->vec(); }
 	void vec(const vector_type &content) { rdbuf()->vec(content); }
 	void vec(vector_type &&content) { rdbuf()->vec(std::move(content)); }
-	void clear() { rdbuf()->clear(); }
+	basic_ivectorstream &clear() { rdbuf()->clear(); return *this; }
+
+	void swap(basic_ivectorstream &that) { std::basic_istream<CharT, Traits>::swap(that); rdbuf()->swap(*that.rdbuf()); }
 
 private:
 	basic_vectorbuf<CharT, Traits, Allocator> m_rdbuf;
@@ -321,8 +342,10 @@ public:
 	vector_type const &vec() const { return rdbuf()->vec(); }
 	void vec(const vector_type &content) { rdbuf()->vec(content); }
 	void vec(vector_type &&content) { rdbuf()->vec(std::move(content)); }
-	void clear() { rdbuf()->clear(); }
-	void reserve(typename vector_type::size_type size) { rdbuf()->reserve(size); }
+	basic_ovectorstream &clear() { rdbuf()->clear(); return *this; }
+	basic_ovectorstream &reserve(typename vector_type::size_type size) { rdbuf()->reserve(size); return *this; }
+
+	void swap(basic_ovectorstream &that) { std::basic_ostream<CharT, Traits>::swap(that); rdbuf()->swap(*that.rdbuf()); }
 
 private:
 	basic_vectorbuf<CharT, Traits, Allocator> m_rdbuf;
@@ -343,8 +366,10 @@ public:
 	vector_type const &vec() const { return rdbuf()->vec(); }
 	void vec(const vector_type &content) { rdbuf()->vec(content); }
 	void vec(vector_type &&content) { rdbuf()->vec(std::move(content)); }
-	void clear() { rdbuf()->clear(); }
-	void reserve(typename vector_type::size_type size) { rdbuf()->reserve(size); }
+	basic_vectorstream &clear() { rdbuf()->clear(); return *this; }
+	basic_vectorstream &reserve(typename vector_type::size_type size) { rdbuf()->reserve(size); return *this; }
+
+	void swap(basic_vectorstream &that) { std::basic_iostream<CharT, Traits>::swap(that); rdbuf()->swap(*that.rdbuf()); }
 
 private:
 	basic_vectorbuf<CharT, Traits, Allocator> m_rdbuf;
