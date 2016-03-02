@@ -188,6 +188,7 @@ void osd_common_t::register_options()
 {
 	REGISTER_MODULE(m_mod_man, FONT_OSX);
 	REGISTER_MODULE(m_mod_man, FONT_WINDOWS);
+	REGISTER_MODULE(m_mod_man, FONT_DWRITE);
 	REGISTER_MODULE(m_mod_man, FONT_SDL);
 	REGISTER_MODULE(m_mod_man, FONT_NONE);
 
