@@ -675,8 +675,8 @@ private:
 		{
 			m_space.device().logerror(
 					m_space.is_octal()
-						? "%s: unmapped %s memory read from %*o & %*o\n"
-						: "%s: unmapped %s memory read from %*X & %*X\n",
+						? "%s: unmapped %s memory read from %0*o & %0*o\n"
+						: "%s: unmapped %s memory read from %0*X & %0*X\n",
 					m_space.machine().describe_context(), m_space.name(),
 					m_space.addrchars(), m_space.byte_to_address(offset * sizeof(_UintType)),
 					2 * sizeof(_UintType), mask);
@@ -746,8 +746,8 @@ private:
 		{
 			m_space.device().logerror(
 					m_space.is_octal()
-						? "%s: unmapped %s memory write to %*o = %*o & %*o\n"
-						: "%s: unmapped %s memory write to %*X = %*X & %*X\n",
+						? "%s: unmapped %s memory write to %0*o = %0*o & %0*o\n"
+						: "%s: unmapped %s memory write to %0*X = %0*X & %0*X\n",
 					m_space.machine().describe_context(), m_space.name(),
 					m_space.addrchars(), m_space.byte_to_address(offset * sizeof(_UintType)),
 					2 * sizeof(_UintType), data,

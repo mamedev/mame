@@ -181,7 +181,7 @@ const char *running_machine::describe_context()
 		if (cpu != nullptr)
 		{
 			address_space &prg = cpu->space(AS_PROGRAM);
-			m_context = string_format(prg.is_octal() ? "'%s' (%*o)" :  "'%s' (%*X)", cpu->tag(), prg.logaddrchars(), cpu->pc());
+			m_context = string_format(prg.is_octal() ? "'%s' (%0*o)" :  "'%s' (%0*X)", cpu->tag(), prg.logaddrchars(), cpu->pc());
 		}
 	}
 	else
