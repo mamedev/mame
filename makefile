@@ -1365,7 +1365,7 @@ endif
 
 %.mo: %.po
 	@echo Converting translation $<...
-	$(SILENT)$(PYTHON) scripts/build/msgfmt.py --output-file $@ $<
+	$(SILENT)$(PYTHON) scripts/build/msgfmt.py --output-file $@ $< || exit 0
 
 #-------------------------------------------------
 # Regression tests
