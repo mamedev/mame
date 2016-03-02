@@ -9,7 +9,7 @@ Info from Atariage and Atarimania
 	<software name="adventp">
 		<description>Adventure +</description>
 		<year>2003</year>
-		<publisher>Homebrew</publisher>		
+		<publisher>Homebrew</publisher>
 		<info name="programmer" value="Steve Engelhardt" />
 		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="a2600_cart">
@@ -22,7 +22,7 @@ Info from Atariage and Atarimania
 	<software name="elfadven">
 		<description>Elf Adventure (Prototype)</description>
 		<year>1983</year>
-		<publisher>Atari</publisher>		
+		<publisher>Atari</publisher>
 		<info name="programmer" value="Warren Robinett" />
 		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="a2600_cart">
@@ -31,11 +31,11 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ret2hh">
 		<description>Return to Haunted House (Flashback 2)</description>
 		<year>2005</year>
-		<publisher>Syzygy Company</publisher>		
+		<publisher>Syzygy Company</publisher>
 		<info name="programmer" value="Curt Vensel" />
 		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="a2600_cart">
@@ -44,11 +44,11 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="advent2" supported="no">
 		<description>Adventure II (Flashback 2)</description>
 		<year>2005</year>
-		<publisher>Syzygy Company</publisher>		
+		<publisher>Syzygy Company</publisher>
 		<info name="programmer" value="Curt Vensel" />
 		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="a2600_cart">
@@ -56,7 +56,7 @@ Info from Atariage and Atarimania
 				<rom name="Adventure 2.a26" size="8192" crc="bfd846c5" sha1="48d3b94e41371dd7f41d96e1195c324913c228bd" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="2pakblac">
 		<description>2 Pak Special: Challenge + Surfing (PAL)</description>

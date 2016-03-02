@@ -1185,38 +1185,38 @@ namespace netlist
 
 		ATTR_COLD net_t *find_net(const pstring &name);
 
-		template<class _C>
-		ATTR_COLD plist_t<_C *> get_device_list()
+		template<class _device_class>
+		ATTR_COLD plist_t<_device_class *> get_device_list()
 		{
-			plist_t<_C *> tmp;
+			plist_t<_device_class *> tmp;
 			for (std::size_t i = 0; i < m_devices.size(); i++)
 			{
-				_C *dev = dynamic_cast<_C *>(m_devices[i]);
+				_device_class *dev = dynamic_cast<_device_class *>(m_devices[i]);
 				if (dev != NULL)
 					tmp.add(dev);
 			}
 			return tmp;
 		}
 
-		template<class _C>
-		ATTR_COLD _C *get_first_device()
+		template<class _device_class>
+		ATTR_COLD _device_class *get_first_device()
 		{
 			for (std::size_t i = 0; i < m_devices.size(); i++)
 			{
-				_C *dev = dynamic_cast<_C *>(m_devices[i]);
+				_device_class *dev = dynamic_cast<_device_class *>(m_devices[i]);
 				if (dev != NULL)
 					return dev;
 			}
 			return NULL;
 		}
 
-		template<class _C>
-		ATTR_COLD _C *get_single_device(const char *classname)
+		template<class _device_class>
+		ATTR_COLD _device_class *get_single_device(const char *classname)
 		{
-			_C *ret = NULL;
+			_device_class *ret = NULL;
 			for (std::size_t i = 0; i < m_devices.size(); i++)
 			{
-				_C *dev = dynamic_cast<_C *>(m_devices[i]);
+				_device_class *dev = dynamic_cast<_device_class *>(m_devices[i]);
 				if (dev != NULL)
 				{
 					if (ret != NULL)

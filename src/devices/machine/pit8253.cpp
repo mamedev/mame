@@ -723,7 +723,7 @@ void pit8253_device::update(pit8253_timer *timer)
 	attotime elapsed_time = now - timer->last_updated;
 	INT64 elapsed_cycles = elapsed_time.as_double() * timer->clockin;
 
-	LOG1(("pit8253: update(): timer %d, %" I64FMT "d elapsed_cycles\n", timer->index, elapsed_cycles));
+	LOG1(("pit8253: update(): timer %d, %d elapsed_cycles\n", timer->index, elapsed_cycles));
 
 	if (timer->clockin)
 		timer->last_updated += elapsed_cycles * attotime::from_hz(timer->clockin);

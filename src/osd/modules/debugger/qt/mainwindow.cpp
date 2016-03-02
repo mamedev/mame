@@ -144,9 +144,8 @@ void MainWindow::setProcessor(device_t* processor)
 	m_dasmFrame->view()->verticalScrollBar()->setValue(m_dasmFrame->view()->view()->visible_position().y);
 
 	// Window title
-	std::string title;
-	strprintf(title,"Debug: %s - %s '%s'", m_machine->system().name, processor->name(), processor->tag());
-	setWindowTitle(title.c_str());
+	string_format("Debug: %s - %s '%s'", m_machine->system().name, processor->name(), processor->tag());
+	setWindowTitle(string_format("Debug: %s - %s '%s'", m_machine->system().name, processor->name(), processor->tag()).c_str());
 }
 
 
@@ -236,11 +235,11 @@ void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 		std::string command;
 		if (bpindex == -1)
 		{
-			strprintf(command,"bpset 0x%X", address);
+			command = string_format("bpset 0x%X", address);
 		}
 		else
 		{
-			strprintf(command,"bpclear 0x%X", bpindex);
+			command = string_format("bpclear 0x%X", bpindex);
 		}
 		debug_console_execute_command(*m_machine, command.c_str(), 1);
 	}
@@ -265,8 +264,7 @@ void MainWindow::enableBreakpointAtCursor(bool changedTo)
 		if (bp != NULL)
 		{
 			INT32 const bpindex = bp->index();
-			std::string command;
-			strprintf(command,bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", bpindex);
+			std::string command = string_format(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", bpindex);
 			debug_console_execute_command(*m_machine, command.c_str(), 1);
 		}
 	}
@@ -281,8 +279,7 @@ void MainWindow::runToCursor(bool changedTo)
 	if (dasmView->cursor_visible() && (debug_cpu_get_visible_cpu(*m_machine) == dasmView->source()->device()))
 	{
 		offs_t address = downcast<debug_view_disasm*>(dasmView)->selected_address();
-		std::string command;
-		strprintf(command,"go 0x%X", address);
+		std::string command = string_format("go 0x%X", address);
 		debug_console_execute_command(*m_machine, command.c_str(), 1);
 	}
 }
@@ -475,8 +472,7 @@ void MainWindow::createImagesMenu()
 	image_interface_iterator iter(m_machine->root_device());
 	for (device_image_interface *img = iter.first(); img != NULL; img = iter.next())
 	{
-		std::string menuName;
-		strprintf(menuName,"%s : %s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
+		std::string menuName = string_format("%s : %s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
 
 		QMenu* interfaceMenu = imagesMenu->addMenu(menuName.c_str());
 		interfaceMenu->setObjectName(img->device().name());

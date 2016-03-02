@@ -35,9 +35,11 @@
 #include "bgfx/targetmanager.h"
 #include "bgfx/shadermanager.h"
 #include "bgfx/effectmanager.h"
+#include "bgfx/chainmanager.h"
 #include "bgfx/effect.h"
 #include "bgfx/texture.h"
 #include "bgfx/target.h"
+#include "bgfx/chain.h"
 
 //============================================================
 //  DEBUGGING
@@ -47,11 +49,15 @@
 //  CONSTANTS
 //============================================================
 
+const uint16_t renderer_bgfx::CACHE_SIZE = 1024;
+const uint32_t renderer_bgfx::PACKABLE_SIZE = 128;
+const uint32_t renderer_bgfx::WHITE_HASH = 0x87654321;
+
 //============================================================
 //  MACROS
 //============================================================
 
-#define GIBBERISH	(0)
+#define GIBBERISH   (0)
 
 //============================================================
 //  INLINES
@@ -78,17 +84,17 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 		return nullptr;
 	}
 
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
+#   if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
 	return (void*)wmi.info.x11.window;
-#	elif BX_PLATFORM_OSX
+#   elif BX_PLATFORM_OSX
 	return wmi.info.cocoa.window;
-#	elif BX_PLATFORM_WINDOWS
+#   elif BX_PLATFORM_WINDOWS
 	return wmi.info.win.window;
-#	elif BX_PLATFORM_STEAMLINK
+#   elif BX_PLATFORM_STEAMLINK
 	return wmi.info.vivante.window;
 #   elif BX_PLATFORM_EMSCRIPTEN
 	return nullptr;
-#	endif // BX_PLATFORM_
+#   endif // BX_PLATFORM_
 }
 #endif
 
@@ -121,7 +127,7 @@ int renderer_bgfx::create()
 		bgfx::init();
 		bgfx::reset(m_width[window().m_index], m_height[window().m_index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 		// Enable debug text.
-		bgfx::setDebug(BGFX_DEBUG_TEXT); //BGFX_DEBUG_STATS
+		bgfx::setDebug(window().machine().options().verbose() ? BGFX_DEBUG_STATS : BGFX_DEBUG_TEXT);
 		m_dimensions = osd_dim(m_width[0], m_height[0]);
 	}
 
@@ -129,16 +135,17 @@ int renderer_bgfx::create()
 	m_targets = new target_manager(*m_textures);
 	m_shaders = new shader_manager();
 	m_effects = new effect_manager(*m_shaders);
+	m_chains = new chain_manager(*m_textures, *m_targets, *m_effects, m_width[window().m_index], m_height[window().m_index]);
 
-    if (window().m_index != 0)
-    {
+	if (window().m_index != 0)
+	{
 #ifdef OSD_WINDOWS
-	    m_framebuffer = m_targets->create_target("backbuffer", window().m_hwnd, m_width[window().m_index], m_height[window().m_index]);
+		m_framebuffer = m_targets->create_target("backbuffer", window().m_hwnd, m_width[window().m_index], m_height[window().m_index]);
 #else
-	    m_framebuffer = m_targets->create_target("backbuffer", sdlNativeWindowHandle(window().sdl_window()), m_width[window().m_index], m_height[window().m_index]);
+		m_framebuffer = m_targets->create_target("backbuffer", sdlNativeWindowHandle(window().sdl_window()), m_width[window().m_index], m_height[window().m_index]);
 #endif
-	    bgfx::touch(window().m_index);
-    }
+		bgfx::touch(window().m_index);
+	}
 
 	// Create program from shaders.
 	m_gui_effect[0] = m_effects->effect("gui_opaque");
@@ -150,6 +157,8 @@ int renderer_bgfx::create()
 	m_screen_effect[1] = m_effects->effect("screen_blend");
 	m_screen_effect[2] = m_effects->effect("screen_multiply");
 	m_screen_effect[3] = m_effects->effect("screen_add");
+
+	//m_screen_chain[0] = m_chains->chain("test");
 
 	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
 	m_texture_cache = m_textures->create_texture("#cache", bgfx::TextureFormat::RGBA8, CACHE_SIZE, CACHE_SIZE, nullptr, flags);
@@ -167,10 +176,11 @@ int renderer_bgfx::create()
 renderer_bgfx::~renderer_bgfx()
 {
 	// Cleanup.
-	delete m_targets;
-	delete m_textures;
+	delete m_chains;
 	delete m_effects;
 	delete m_shaders;
+	delete m_textures;
+	delete m_targets;
 }
 
 void renderer_bgfx::exit()
@@ -209,11 +219,11 @@ void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, ScreenV
 	float v0 = float(rect.y()) / float(CACHE_SIZE);
 	float u1 = u0 + float(rect.width()) / float(CACHE_SIZE);
 	float v1 = v0 + float(rect.height()) / float(CACHE_SIZE);
-    u1 -= 0.5f / float(CACHE_SIZE);
-    v1 -= 0.5f / float(CACHE_SIZE);
-    u0 += 0.5f / float(CACHE_SIZE);
-    v0 += 0.5f / float(CACHE_SIZE);
-    UINT32 rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
+	u1 -= 0.5f / float(CACHE_SIZE);
+	v1 -= 0.5f / float(CACHE_SIZE);
+	u0 += 0.5f / float(CACHE_SIZE);
+	v0 += 0.5f / float(CACHE_SIZE);
+	UINT32 rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
 
 	float x[4] = { prim->bounds.x0, prim->bounds.x1, prim->bounds.x0, prim->bounds.x1 };
 	float y[4] = { prim->bounds.y0, prim->bounds.y0, prim->bounds.y1, prim->bounds.y1 };
@@ -781,11 +791,11 @@ int renderer_bgfx::draw(int update)
 		}
 	}
 
-    if (index != 0)
-    {
-        bgfx::setViewFrameBuffer(index, m_framebuffer->target());
-    }
-    	bgfx::setViewSeq(index, true);
+	if (index != 0)
+	{
+		bgfx::setViewFrameBuffer(index, m_framebuffer->target());
+	}
+		bgfx::setViewSeq(index, true);
 	bgfx::setViewRect(index, 0, 0, m_width[index], m_height[index]);
 
 	// Setup view transform.
@@ -1020,8 +1030,8 @@ bool renderer_bgfx::check_for_dirty_atlas()
 			const UINT32 hash = get_texture_hash(prim);
 			// If this texture is packable and not currently in the atlas, prepare the texture for putting in the atlas
 			if ((hash != 0 && m_hash_to_entry[hash].hash() == 0 && acquired_infos[hash].hash() == 0)
-             || (hash != 0 && m_hash_to_entry[hash].hash() != hash && acquired_infos[hash].hash() == 0))
-			{	// Create create the texture and mark the atlas dirty
+				|| (hash != 0 && m_hash_to_entry[hash].hash() != hash && acquired_infos[hash].hash() == 0))
+			{   // Create create the texture and mark the atlas dirty
 				atlas_dirty = true;
 
 				m_texinfo.push_back(rectangle_packer::packable_rectangle(hash, prim->flags & PRIMFLAG_TEXFORMAT_MASK,

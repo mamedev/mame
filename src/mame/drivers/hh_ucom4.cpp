@@ -4,6 +4,9 @@
 
   NEC uCOM4 MCU tabletops/handhelds or other simple devices,
   most of them (emulated ones) are VFD electronic games/toys.
+  List of child drivers:
+  - tb303: Roland TB-303
+  - tr606: Roland TR-606
 
   Commonly used VFD(vacuum fluorescent display) are by NEC or Futaba.
 

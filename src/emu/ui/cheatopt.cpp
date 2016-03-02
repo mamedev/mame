@@ -31,7 +31,7 @@ void ui_menu_cheat::handle()
 		bool changed = false;
 
 		/* clear cheat comment on any movement or keypress */
-		machine().popmessage(nullptr);
+		machine().popmessage();
 
 		/* handle reset all + reset all cheats for reload all option */
 		if ((menu_event->itemref == ITEMREF_CHEATS_RESET_ALL || menu_event->itemref == ITEMREF_CHEATS_RELOAD_ALL) && menu_event->iptkey == IPT_UI_SELECT)
@@ -192,7 +192,7 @@ void ui_menu_autofire::handle()
 			if (menu_event->itemref == ITEMREF_AUTOFIRE_STATUS)
 			{
 				// toggle autofire status
-				bool autofire_toggle = machine().ioport().get_autofire_toggle(); 	// (menu_event->iptkey == IPT_UI_LEFT);
+				bool autofire_toggle = machine().ioport().get_autofire_toggle();    // (menu_event->iptkey == IPT_UI_LEFT);
 				machine().ioport().set_autofire_toggle(!autofire_toggle);
 				changed = true;
 			}
@@ -321,5 +321,3 @@ void ui_menu_autofire::populate()
 
 	last_toggle = autofire_toggle;
 }
-
-

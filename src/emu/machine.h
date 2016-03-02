@@ -17,6 +17,8 @@
 #ifndef __MACHINE_H__
 #define __MACHINE_H__
 
+#include "vecstream.h"
+
 #include <time.h>
 
 // forward declaration instead of osdepend.h
@@ -72,6 +74,7 @@ const int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is e
 #define auto_alloc_array(m, t, c)       pool_alloc_array(static_cast<running_machine &>(m).respool(), t, c)
 #define auto_alloc_array_clear(m, t, c) pool_alloc_array_clear(static_cast<running_machine &>(m).respool(), t, c)
 #define auto_free(m, v)                 pool_free(static_cast<running_machine &>(m).respool(), v)
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -237,9 +240,9 @@ public:
 	INT32 get_vblank_watchdog_counter() const { return m_watchdog_counter; }
 
 	// misc
-	void popmessage(const char *format, ...) const;
-	void logerror(const char *format, ...) const;
-	void vlogerror(const char *format, va_list args) const;
+	void popmessage() const { popmessage(static_cast<char const *>(nullptr)); }
+	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
+	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 	UINT32 rand();
 	const char *describe_context();
 
@@ -259,6 +262,8 @@ public:
 
 private:
 	// internal helpers
+	template <typename T> struct is_null { template <typename U> static bool value(U &&x) { return false; } };
+	template <typename T> struct is_null<T *> { template <typename U> static bool value(U &&x) { return !x; } };
 	void start();
 	void set_saveload_filename(const char *filename);
 	std::string get_statename(const char *statename_opt) const;
@@ -372,6 +377,9 @@ private:
 	std::unique_ptr<datfile_manager>   m_datfile;      // internal data from datfile.c
 	std::unique_ptr<inifile_manager>   m_inifile;      // internal data from inifile.c for INIs
 	std::unique_ptr<favorite_manager>  m_favorite;     // internal data from inifile.c for favorites
+
+	// string formatting buffer
+	mutable util::ovectorstream	m_string_buffer;
 };
 
 #endif  /* __MACHINE_H__ */

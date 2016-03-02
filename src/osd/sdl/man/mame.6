@@ -359,6 +359,11 @@ make things consistent, you should only record and playback with all
 configuration (.cfg), NVRAM (.nv), and memory card files deleted. The
 default is NULL (no playback).
 .TP
+.B \-[no]exit_after_playback
+If play back is enabled (see \-playback option) the program exits when
+end of file is reached. Otherwise the machine will continue to run.
+Default is OFF (\-noexit_after_playback).
+.TP
 .B \-record, \-rec \fIfilename
 Specifies a file to record all input from a game session. This can be
 used to record a game session for later playback. This feature does not

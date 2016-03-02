@@ -82,7 +82,7 @@ void ucom4_cpu_device::state_string_export(const device_state_entry &entry, std:
 	{
 		// obviously not from a single flags register
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c",
 				m_inte_f    ? 'E':'e',
 				m_int_f     ? 'I':'i',
 				m_timer_f   ? 'T':'t',

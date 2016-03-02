@@ -1,5 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Bryan McPhail
+/***************************************************************************
+
+    Midway MCR-68k system
+
+***************************************************************************/
+
 #include "machine/6821pia.h"
 #include "audio/midway.h"
 #include "audio/williams.h"
@@ -23,12 +29,13 @@ public:
 		m_sounds_good(*this, "sg"),
 		m_turbo_chip_squeak(*this, "tcs"),
 		m_cvsd_sound(*this, "cvsd"),
-			m_videoram(*this, "videoram"),
-			m_spriteram(*this, "spriteram") ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram") ,
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	optional_device<midway_chip_squeak_deluxe_device> m_chip_squeak_deluxe;
 	optional_device<midway_sounds_good_device> m_sounds_good;

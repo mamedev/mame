@@ -21,10 +21,10 @@ class effect_manager;
 class chain_entry_reader : public state_reader
 {
 public:
-    static bgfx_chain_entry* read_from_value(const Value& value, texture_manager& textures, target_manager& targets, effect_manager& effects);
+	static bgfx_chain_entry* read_from_value(const Value& value, texture_manager& textures, target_manager& targets, effect_manager& effects);
 
 private:
-    static void validate_parameters(const Value& value);
+	static void validate_parameters(const Value& value);
 };
 
 #endif // __DRAWBGFX_CHAIN_ENTRY_READER__

@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:Dankan1890
 /*********************************************************************
 
@@ -57,7 +57,7 @@ ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container 
 
 	if (machine.datfile().has_software(m_list, m_short, m_parent))
 		m_items_list.emplace_back(_("Software History"), UI_HISTORY_LOAD, machine.datfile().rev_history());
-	if (swinfo && !swinfo->usage.empty())
+	if (swinfo != nullptr && !swinfo->usage.empty())
 		m_items_list.emplace_back(_("Software Usage"), 0, "");
 }
 
@@ -148,12 +148,6 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 	mui.draw_text_full(container, driver.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
-
-	// take off the borders
-	x1 -= UI_BOX_LR_BORDER;
-	x2 += UI_BOX_LR_BORDER;
-	y1 -= UI_BOX_TB_BORDER;
-
 	maxwidth = 0;
 	for (auto & elem : m_items_list)
 	{
@@ -165,6 +159,8 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 	float space = (1.0f - maxwidth) / (m_items_list.size() * 2);
 
 	// compute our bounds
+	x1 -= UI_BOX_LR_BORDER;
+	x2 += UI_BOX_LR_BORDER;
 	y1 = y2 + UI_BOX_TB_BORDER;
 	y2 += mui.get_line_height() + 2.0f * UI_BOX_TB_BORDER;
 
@@ -198,7 +194,7 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 	std::string revision;
 	revision.assign(_("Revision: ")).append(m_items_list[actual].revision);
 	mui.draw_text_full(container, revision.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(origx2 - origx1, width);
 
@@ -218,7 +214,7 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 
 	// draw the text within it
 	mui.draw_text_full(container, revision.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 //-------------------------------------------------
@@ -300,4 +296,3 @@ void ui_menu_dats_view::init_items()
 	if (datfile.has_command(m_driver))
 		m_items_list.emplace_back(_("Command"), UI_COMMAND_LOAD, "");
 }
-

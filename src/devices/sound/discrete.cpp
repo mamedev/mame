@@ -38,6 +38,7 @@
 #include "emu.h"
 #include "sound/wavwrite.h"
 #include "discrete.h"
+#include <atomic>
 
 /* for_each collides with c++ standard libraries - include it here */
 #define for_each(_T, _e, _l) for (_T _e = (_l)->begin_ptr() ;  _e <= (_l)->end_ptr(); _e++)
@@ -110,9 +111,8 @@ public:
 	inline void step_nodes(void);
 	inline bool lock_threadid(INT32 threadid)
 	{
-		INT32 prev_id;
-		prev_id = compare_exchange32(&m_threadid, -1, threadid);
-		return (prev_id == -1 && m_threadid == threadid);
+		int expected = -1;
+		return m_threadid.compare_exchange_weak(expected, threadid, std::memory_order_release,std::memory_order_relaxed);
 	}
 	inline void unlock(void) { m_threadid = -1; }
 
@@ -144,7 +144,7 @@ protected:
 	discrete_device &                   m_device;
 
 private:
-	volatile INT32          m_threadid;
+	std::atomic<INT32>      m_threadid;
 	volatile int            m_samples;
 
 };

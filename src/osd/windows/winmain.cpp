@@ -588,11 +588,9 @@ void windows_osd_interface::init(running_machine &machine)
 	osd_common_t::init_subsystems();
 
 	// notify listeners of screen configuration
-	std::string tempstring;
 	for (win_window_info *info = win_window_list; info != nullptr; info = info->m_next)
 	{
-		strprintf(tempstring, "Orientation(%s)", info->m_monitor->devicename());
-		machine.output().set_value(tempstring.c_str(), info->m_targetorient);
+		machine.output().set_value(string_format("Orientation(%s)", info->m_monitor->devicename()).c_str(), info->m_targetorient);
 	}
 
 	// hook up the debugger log
@@ -1027,7 +1025,7 @@ symbol_manager::symbol_manager(const char *argv0)
 #endif
 
 	// expand the buffer to be decently large up front
-	strprintf(m_buffer,"%500s", "");
+	m_buffer = string_format("%500s", "");
 }
 
 
@@ -1294,13 +1292,13 @@ bool symbol_manager::parse_map_line(const char *line, FPTR &address, std::string
 void symbol_manager::format_symbol(const char *name, UINT32 displacement, const char *filename, int linenumber)
 {
 	// start with the address and offset
-	strprintf(m_buffer, " (%s", name);
+	m_buffer = string_format(" (%s", name);
 	if (displacement != 0)
-		strcatprintf(m_buffer, "+0x%04x", (UINT32)displacement);
+		m_buffer.append(string_format("+0x%04x", (UINT32)displacement));
 
 	// append file/line if present
 	if (filename != nullptr)
-		strcatprintf(m_buffer, ", %s:%d", filename, linenumber);
+		m_buffer.append(string_format(", %s:%d", filename, linenumber));
 
 	// close up the string
 	m_buffer.append(")");

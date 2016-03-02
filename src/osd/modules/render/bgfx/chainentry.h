@@ -27,19 +27,19 @@ class bgfx_target;
 class bgfx_chain_entry
 {
 public:
-    bgfx_chain_entry(std::string name, bgfx_effect* effect, std::vector<bgfx_input_pair>& inputs, bgfx_target* output);
-    ~bgfx_chain_entry();
+	bgfx_chain_entry(std::string name, bgfx_effect* effect, std::vector<bgfx_input_pair>& inputs, bgfx_target* output);
+	~bgfx_chain_entry();
 
-    void submit(render_primitive* prim, int view);
+	void submit(render_primitive* prim, int view);
 
-    // Getters
-    std::string name() const { return m_name; }
+	// Getters
+	std::string name() const { return m_name; }
 
 private:
-	std::string						m_name;
-    bgfx_effect*					m_effect;
-    std::vector<bgfx_input_pair>	m_inputs;
-    bgfx_target*					m_output;
+	std::string                     m_name;
+	bgfx_effect*                    m_effect;
+	std::vector<bgfx_input_pair>    m_inputs;
+	bgfx_target*                    m_output;
 };
 
 #endif // __DRAWBGFX_CHAIN_ENTRY__

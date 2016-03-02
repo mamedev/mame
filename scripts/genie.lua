@@ -8,6 +8,9 @@ newoption {
 
 premake.check_paths = true
 premake.make.override = { "TARGET" }
+
+premake.xcode.parameters = { 'CLANG_CXX_LANGUAGE_STANDARD = "c++14"', 'CLANG_CXX_LIBRARY = "libc++"' }
+
 MAME_DIR = (path.getabsolute("..") .. "/")
 --MAME_DIR = string.gsub(MAME_DIR, "(%s)", "\\%1")
 local MAME_BUILD_DIR = (MAME_DIR .. _OPTIONS["build-dir"] .. "/")
@@ -98,21 +101,16 @@ newoption {
 	trigger = "targetos",
 	description = "Choose target OS",
 	allowed = {
-		{ "android-arm",   "Android - ARM"          },
-		{ "android-mips",  "Android - MIPS"         },
-		{ "android-x86",   "Android - x86"          },
+		{ "android",  	   "Android" 	            },
 		{ "asmjs",         "Emscripten/asm.js"      },
 		{ "freebsd",       "FreeBSD"                },
 		{ "netbsd",        "NetBSD"                 },
 		{ "openbsd",       "OpenBSD"                },
-		{ "nacl",          "Native Client"          },
-		{ "nacl-arm",      "Native Client - ARM"    },
 		{ "pnacl",         "Native Client - PNaCl"  },
 		{ "linux",     	   "Linux"                  },
 		{ "ios",           "iOS"                    },
 		{ "macosx",        "OSX"                    },
 		{ "windows",       "Windows"                },
-		{ "os2",           "OS/2 eComStation"       },
 		{ "haiku",         "Haiku"                  },
 		{ "solaris",       "Solaris SunOS"          },
 		{ "steamlink",     "Steam Link"             },
@@ -157,6 +155,11 @@ newoption {
 newoption {
     trigger = 'with-bundled-portaudio',
     description = 'Build bundled PortAudio library',
+}
+
+newoption {
+    trigger = 'with-bundled-sdl2',
+    description = 'Build bundled SDL2 library',
 }
 
 newoption {
@@ -392,6 +395,15 @@ newoption {
 	description = "Target machine platform (x86,arm,...)",
 }
 
+newoption {
+	trigger = "USE_LIBUV",
+	description = "Use libuv.",
+	allowed = {
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
+	}
+}
+
 if _OPTIONS["SHLIB"]=="1" then
 	LIBTYPE = "SharedLib"
 else
@@ -414,6 +426,10 @@ if not _OPTIONS["NOASM"] then
 	else
 		_OPTIONS["NOASM"] = "0"
 	end
+end
+
+if not _OPTIONS["USE_LIBUV"] then
+	_OPTIONS["USE_LIBUV"] = "1"
 end
 
 if _OPTIONS["NOASM"]=="1" and not _OPTIONS["FORCE_DRC_C_BACKEND"] then
@@ -439,6 +455,7 @@ else
 	end
 end
 
+
 configurations {
 	"Debug",
 	"Release",
@@ -446,7 +463,7 @@ configurations {
 
 if _ACTION == "xcode4" then
     platforms {
-        "Universal",
+        "x64",
     }
 else
     platforms {
@@ -467,7 +484,6 @@ configuration { "vs*" }
 		"NoPCH",
 		"ExtraWarnings",
 		"NoEditAndContinue",
-		"EnableMinimalRebuild",
 	}
 	if not _OPTIONS["NOWERROR"] then
 		flags{
@@ -486,6 +502,17 @@ configuration { "Release", "vs*" }
 		"Optimize",
 	}
 
+-- Force VS2013/15 targets to use bundled SDL2
+if string.sub(_ACTION,1,4) == "vs20" and _OPTIONS["osd"]=="sdl" then
+	if _OPTIONS["with-bundled-sdl2"]==nil then
+		_OPTIONS["with-bundled-sdl2"] = "1"
+	end
+end
+-- Build SDL2 for Android
+if _OPTIONS["targetos"] == "android" then
+	_OPTIONS["with-bundled-sdl2"] = "1"
+end
+	
 configuration {}
 
 msgcompile ("Compiling $(subst ../,,$<)...")
@@ -516,6 +543,11 @@ configuration { "gmake" }
 
 dofile ("toolchain.lua")
 
+if _OPTIONS["USE_LIBUV"]=="0" then
+	defines {
+		"NO_LIBUV",
+	}
+end
 
 if _OPTIONS["targetos"]=="windows" then
 	configuration { "x64" }
@@ -529,7 +561,7 @@ end
 if (_ACTION == nil) then return false end
 
 -- define PTR64 if we are a 64-bit target
-configuration { "x64" }
+configuration { "x64 or android-*64"}
 	defines { "PTR64=1" }
 
 -- define MAME_DEBUG if we are a debugging build
@@ -559,8 +591,8 @@ configuration { "Release" }
 
 configuration { }
 
--- CR/LF setup: use both on win32/os2, CR only on everything else
-if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="os2" then
+-- CR/LF setup: use on win32, CR only on everything else
+if _OPTIONS["targetos"]=="windows" then
 	defines {
 		"CRLF=3",
 	}
@@ -680,7 +712,7 @@ end
 		"LUA_COMPAT_5_2",
 	}
 
-	if _ACTION == "gmake" or _ACTION == "xcode4" then
+	if _ACTION == "gmake" then
 
 	--we compile C-only to C99 standard with GNU extensions
 
@@ -700,17 +732,10 @@ if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["ta
 		"-std=c++1y",
 	}
 else
-	if _OPTIONS["targetos"]=="os2" then
-		buildoptions_cpp {
-			"-x c++",
-			"-std=gnu++14",
-		}
-	else
-		buildoptions_cpp {
-			"-x c++",
-			"-std=c++14",
-		}
-	end
+	buildoptions_cpp {
+		"-x c++",
+		"-std=c++14",
+	}
 
 	buildoptions_objc {
 		"-x objective-c++",
@@ -955,7 +980,7 @@ end
 
 
 		local version = str_to_version(_OPTIONS["gcc_version"])
-		if string.find(_OPTIONS["gcc"], "clang") then
+		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "pnacl") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
 			if (version < 30400) then
 				print("Clang version 3.4 or later needed")
 				os.exit(-1)
@@ -1025,25 +1050,28 @@ configuration { "asmjs" }
 configuration { "android*" }
 	buildoptions {
 		"-Wno-undef",
+		"-Wno-typedef-redefinition",
+		"-Wno-unknown-warning-option",
 	}
 	buildoptions_cpp {
 		"-x c++",
 		"-std=c++14",
+		"-Wno-extern-c-compat",
+		"-Wno-tautological-constant-out-of-range-compare",
+		"-Wno-tautological-pointer-compare",
 	}
 	archivesplit_size "20"
 
+configuration { "android-arm64" }
+	buildoptions {
+		"-Wno-asm-operand-widths",
+	}
+	
 configuration { "pnacl" }
 	buildoptions {
 		"-std=gnu89",
 		"-Wno-inline-new-delete",
 	}
-	buildoptions_cpp {
-		"-x c++",
-		"-std=c++14",
-	}
-	archivesplit_size "20"
-
-configuration { "nacl*" }
 	buildoptions_cpp {
 		"-x c++",
 		"-std=c++14",
@@ -1264,7 +1292,7 @@ configuration { }
 if (_OPTIONS["SOURCES"] ~= nil) then
 	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " target " .. _OPTIONS["subtarget"])
 	load(OUT_STR)()
-	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.cpp")
+	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"]..".flt")
 end
 
 group "libs"

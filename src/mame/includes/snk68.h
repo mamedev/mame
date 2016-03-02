@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, Acho A. Tang, Nicola Salmoria
 #include "sound/upd7759.h"
-
+#include "video/snk68_spr.h"
 class snk68_state : public driver_device
 {
 public:
@@ -13,7 +13,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_pow_fg_videoram(*this, "pow_fg_videoram"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram"),
+		m_sprites(*this, "sprites")
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -24,6 +26,8 @@ public:
 	required_shared_ptr<UINT16> m_pow_fg_videoram;
 	required_shared_ptr<UINT16> m_spriteram;
 
+	required_device<snk68_spr_device> m_sprites;
+
 	UINT8 m_invert_controls;
 	bool m_sprite_flip_axis;
 	tilemap_t *m_fg_tilemap;
@@ -31,8 +35,6 @@ public:
 
 	// common
 	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_READ16_MEMBER(spriteram_r);
-	DECLARE_WRITE16_MEMBER(spriteram_w);
 	DECLARE_WRITE8_MEMBER(D7759_write_port_0_w);
 	DECLARE_WRITE8_MEMBER(D7759_upd_reset_w);
 
@@ -60,5 +62,8 @@ public:
 	void common_video_start();
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int group);
+
+	void tile_callback_pow(int &tile, int& fx, int& fy, int& region);
+	void tile_callback_notpow(int &tile, int& fx, int& fy, int& region);
+
 };

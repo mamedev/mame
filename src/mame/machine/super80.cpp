@@ -94,7 +94,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_h )
 {
 	UINT8 go_fast = 0;
 	if ( (!BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 1)) )    /* bit 2 of port F0 is low, OR user turned on config switch */
-		go_fast++;
+		go_fast++; // must be 1 at boot so banking works correctly
 
 	/* code to slow down computer to 1 MHz by halting cpu on every second frame */
 	if (!go_fast)
@@ -203,7 +203,7 @@ WRITE8_MEMBER( super80_state::super80r_f0_w )
 
 void super80_state::machine_reset()
 {
-	m_portf0 = 0xff;
+	m_portf0 = 0; // must be 0 like real machine, or banking breaks on 32-col systems
 	m_keylatch = 0xff;
 	m_key_pressed = 0;
 	m_palette_index = 0;

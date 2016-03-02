@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "dvwpoints.h"
 
+#include <iomanip>
+
 
 
 static int cIndexAscending(const void* a, const void* b)
@@ -155,7 +157,7 @@ void debug_view_watchpoints::enumerate_sources()
 	for (device_disasm_interface *dasm = iter.first(); dasm != nullptr; dasm = iter.next())
 	{
 		std::string name;
-		strprintf(name, "%s '%s'", dasm->device().name(), dasm->device().tag());
+		name = string_format("%s '%s'", dasm->device().name(), dasm->device().tag());
 		m_source_list.append(*global_alloc(debug_view_source(name.c_str(), &dasm->device())));
 	}
 
@@ -211,16 +213,11 @@ void debug_view_watchpoints::view_click(const int button, const debug_view_xy& p
 }
 
 
-void debug_view_watchpoints::pad_astring_to_length(std::string& str, int len)
+void debug_view_watchpoints::pad_ostream_to_length(std::ostream& str, int len)
 {
-	int diff = len - str.length();
-	if (diff > 0)
-	{
-		std::string buffer;
-		for (int i = 0; i < diff; i++)
-			buffer.append(" ");
-		strcatprintf(str, "%s", buffer.c_str());
-	}
+	auto const current = str.tellp();
+	if (current < decltype(current)(len))
+		str << std::setw(decltype(current)(len) - current) << "";
 }
 
 
@@ -261,49 +258,51 @@ void debug_view_watchpoints::view_update()
 		m_total.y = 10;
 
 	// Draw
-	debug_view_char *dest = &m_viewdata[0];
-	std::string         linebuf;
+	debug_view_char		*dest = &m_viewdata[0];
+	util::ovectorstream	linebuf;
+	linebuf.reserve(ARRAY_LENGTH(tableBreaks) - 1);
 
 	// Header
 	if (m_visible.y > 0)
 	{
 		linebuf.clear();
-		linebuf.append("ID");
-		if (m_sortType == &cIndexAscending) linebuf.push_back('\\');
-		else if (m_sortType == &cIndexDescending) linebuf.push_back('/');
-		pad_astring_to_length(linebuf, tableBreaks[0]);
-		linebuf.append("En");
-		if (m_sortType == &cEnabledAscending) linebuf.push_back('\\');
-		else if (m_sortType == &cEnabledDescending) linebuf.push_back('/');
-		pad_astring_to_length(linebuf, tableBreaks[1]);
-		linebuf.append("CPU");
-		if (m_sortType == &cCpuAscending) linebuf.push_back('\\');
-		else if (m_sortType == &cCpuDescending) linebuf.push_back('/');
-		pad_astring_to_length(linebuf, tableBreaks[2]);
-		linebuf.append("Space");
-		if (m_sortType == &cSpaceAscending) linebuf.push_back('\\');
-		else if (m_sortType == &cSpaceDescending) linebuf.push_back('/');
-		pad_astring_to_length(linebuf, tableBreaks[3]);
-		linebuf.append("Addresses");
-		if (m_sortType == &cAddressAscending) linebuf.push_back('\\');
-		else if (m_sortType == &cAddressDescending) linebuf.push_back('/');
-		pad_astring_to_length(linebuf, tableBreaks[4]);
-		linebuf.append("Type");
-		if (m_sortType == &cTypeAscending) linebuf.push_back('\\');
-		else if (m_sortType == &cTypeDescending) linebuf.push_back('/');
-		pad_astring_to_length(linebuf, tableBreaks[5]);
-		linebuf.append("Condition");
-		if (m_sortType == &cConditionAscending) linebuf.push_back('\\');
-		else if (m_sortType == &cConditionDescending) linebuf.push_back('/');
-		pad_astring_to_length(linebuf, tableBreaks[6]);
-		linebuf.append("Action");
-		if (m_sortType == &cActionAscending) linebuf.push_back('\\');
-		else if (m_sortType == &cActionDescending) linebuf.push_back('/');
-		pad_astring_to_length(linebuf, tableBreaks[7]);
+		linebuf << "ID";
+		if (m_sortType == &cIndexAscending) linebuf.put('\\');
+		else if (m_sortType == &cIndexDescending) linebuf.put('/');
+		pad_ostream_to_length(linebuf, tableBreaks[0]);
+		linebuf << "En";
+		if (m_sortType == &cEnabledAscending) linebuf.put('\\');
+		else if (m_sortType == &cEnabledDescending) linebuf.put('/');
+		pad_ostream_to_length(linebuf, tableBreaks[1]);
+		linebuf << "CPU";
+		if (m_sortType == &cCpuAscending) linebuf.put('\\');
+		else if (m_sortType == &cCpuDescending) linebuf.put('/');
+		pad_ostream_to_length(linebuf, tableBreaks[2]);
+		linebuf << "Space";
+		if (m_sortType == &cSpaceAscending) linebuf.put('\\');
+		else if (m_sortType == &cSpaceDescending) linebuf.put('/');
+		pad_ostream_to_length(linebuf, tableBreaks[3]);
+		linebuf << "Addresses";
+		if (m_sortType == &cAddressAscending) linebuf.put('\\');
+		else if (m_sortType == &cAddressDescending) linebuf.put('/');
+		pad_ostream_to_length(linebuf, tableBreaks[4]);
+		linebuf << "Type";
+		if (m_sortType == &cTypeAscending) linebuf.put('\\');
+		else if (m_sortType == &cTypeDescending) linebuf.put('/');
+		pad_ostream_to_length(linebuf, tableBreaks[5]);
+		linebuf << "Condition";
+		if (m_sortType == &cConditionAscending) linebuf.put('\\');
+		else if (m_sortType == &cConditionDescending) linebuf.put('/');
+		pad_ostream_to_length(linebuf, tableBreaks[6]);
+		linebuf << "Action";
+		if (m_sortType == &cActionAscending) linebuf.put('\\');
+		else if (m_sortType == &cActionDescending) linebuf.put('/');
+		pad_ostream_to_length(linebuf, tableBreaks[7]);
 
+		auto const &text(linebuf.vec());
 		for (UINT32 i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
 		{
-			dest->byte = (i < linebuf.length()) ? linebuf[i] : ' ';
+			dest->byte = (i < text.size()) ? text[i] : ' ';
 			dest->attrib = DCA_ANCILLARY;
 		}
 	}
@@ -318,29 +317,30 @@ void debug_view_watchpoints::view_update()
 			device_debug::watchpoint *const wp = m_buffer[wpi];
 
 			linebuf.clear();
-			strcatprintf(linebuf, "%2X", wp->index());
-			pad_astring_to_length(linebuf, tableBreaks[0]);
-			linebuf.push_back(wp->enabled() ? 'X' : 'O');
-			pad_astring_to_length(linebuf, tableBreaks[1]);
-			linebuf.append(wp->debugInterface()->device().tag());
-			pad_astring_to_length(linebuf, tableBreaks[2]);
-			linebuf.append(wp->space().name());
-			pad_astring_to_length(linebuf, tableBreaks[3]);
-			linebuf.append(core_i64_hex_format(wp->space().byte_to_address(wp->address()), wp->space().addrchars()));
-			linebuf.push_back('-');
-			linebuf.append(core_i64_hex_format(wp->space().byte_to_address_end(wp->address() + wp->length()) - 1, wp->space().addrchars()));
-			pad_astring_to_length(linebuf, tableBreaks[4]);
-			linebuf.append(types[wp->type() & 3]);
-			pad_astring_to_length(linebuf, tableBreaks[5]);
+			util::stream_format(linebuf, "%2X", wp->index());
+			pad_ostream_to_length(linebuf, tableBreaks[0]);
+			linebuf.put(wp->enabled() ? 'X' : 'O');
+			pad_ostream_to_length(linebuf, tableBreaks[1]);
+			linebuf << wp->debugInterface()->device().tag();
+			pad_ostream_to_length(linebuf, tableBreaks[2]);
+			linebuf << wp->space().name();
+			pad_ostream_to_length(linebuf, tableBreaks[3]);
+			util::stream_format(linebuf, "%0*X", wp->space().addrchars(), wp->space().byte_to_address(wp->address()));
+			linebuf.put('-');
+			util::stream_format(linebuf, "%0*X", wp->space().addrchars(), wp->space().byte_to_address_end(wp->address() + wp->length()) - 1);
+			pad_ostream_to_length(linebuf, tableBreaks[4]);
+			linebuf << types[wp->type() & 3];
+			pad_ostream_to_length(linebuf, tableBreaks[5]);
 			if (strcmp(wp->condition(), "1"))
-				linebuf.append(wp->condition());
-			pad_astring_to_length(linebuf, tableBreaks[6]);
-			linebuf.append(wp->action());
-			pad_astring_to_length(linebuf, tableBreaks[7]);
+				linebuf << wp->condition();
+			pad_ostream_to_length(linebuf, tableBreaks[6]);
+			linebuf << wp->action();
+			pad_ostream_to_length(linebuf, tableBreaks[7]);
 
+			auto const &text(linebuf.vec());
 			for (UINT32 i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
 			{
-				dest->byte = (i < linebuf.length()) ? linebuf[i] : ' ';
+				dest->byte = (i < text.size()) ? text[i] : ' ';
 				dest->attrib = DCA_NORMAL;
 
 				// Color disabled watchpoints red

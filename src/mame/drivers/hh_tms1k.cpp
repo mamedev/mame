@@ -4,10 +4,17 @@
 
   This driver is a collection of simple dedicated handheld and tabletop
   toys based around the TMS1000 MCU series. Anything more complex or clearly
-  part of a series is (or will be) in its own driver.
+  part of a series is (or will be) in its own driver, see:
+  - hh_tms1k: here
+  - microvsn: Milton Bradley MicroVision
+  - mbdtower: Milton Bradley Dark Tower
+  - elecbowl: Marx Electronic Bowling
+  - ticalc1x: TI TMS1K-based calculators
+  - tispellb: TI Spelling B series gen. 1
+  - tispeak: TI Speak & Spell series gen. 1
 
   Let's use this driver for a list of known devices and their serials,
-  excluding TI's own products (see ticalc1x.cpp, tispeak.cpp, tispellb.cpp)
+  excluding TI's own products.
 
   serial   device    etc.
 --------------------------------------------------------------------
@@ -99,7 +106,6 @@
     but not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
   - some of the games rely on the fact that faster/longer strobed leds appear
     brighter: tc4/h2hfootb(offense), bankshot(cue ball), ...
-  - add softwarelist for tc4 cartridges?
   - stopthiep: unable to start a game (may be intentional?)
   - tbreakup: some of the leds flicker (rom and PLAs doublechecked)
 
@@ -669,7 +675,7 @@ MACHINE_CONFIG_END
   Coleco Zodiac - The Astrology Computer
   * TMS1100 MP3435 (no decap)
   * 8-digit 7seg display, 12 other LEDs, 1-bit sound
-  
+
   As the name suggests, this is an astrologic calculator. Refer to the
   (very extensive) manual on how to use it.
 
@@ -858,7 +864,7 @@ void cqback_state::prepare_display()
 	UINT16 seg = m_o;
 	if (m_r & 0x200)
 		seg = (m_o << 7 & 0x300) | (m_o & 0xf9);
-	
+
 	set_display_segmask(0x1ff, 0xff);
 	display_matrix(11, 9, seg, m_r & 0x1ff);
 }
@@ -1351,7 +1357,7 @@ MACHINE_CONFIG_END
   Conic Electronic Football II
   * TMS1100 MP1181 (no decap)
   * 9-digit LED grid, 1-bit sound
-  
+
   This is a clone of Coleco's Quarterback, similar at hardware-level too.
   It was also sold by Tandy under the same title.
 
@@ -1378,7 +1384,7 @@ void cnfball2_state::prepare_display()
 	UINT16 seg = m_o;
 	if (~m_r & 2)
 		seg = (m_o << 7 & 0x300) | (m_o & 0xf9);
-	
+
 	set_display_segmask(0x1ff, 0xff);
 	display_matrix(11, 9, seg, m_r >> 1 & 0x1ff);
 }
@@ -1390,7 +1396,7 @@ WRITE16_MEMBER(cnfball2_state::write_r)
 
 	// R8-R10: input mux
 	m_inp_mux = data >> 8 & 7;
-	
+
 	// R1-R10: select digit/segment
 	m_r = data;
 	prepare_display();
@@ -4397,7 +4403,7 @@ MACHINE_CONFIG_END
   Featuring The Electronic Dive-Control Center
   * TMS1100 M34038-NLL (die labeled 1100E, M34038)
   * 11 LEDs, 4-bit sound
-  
+
   This is a board game. The electronic accessory is the emulated part here.
 
 ***************************************************************************/

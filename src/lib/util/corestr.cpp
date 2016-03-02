@@ -126,106 +126,10 @@ char *core_strdup(const char *str)
 
 
 /*-------------------------------------------------
-    core_i64_hex_format - i64 format printf helper
--------------------------------------------------*/
-
-char *core_i64_hex_format(UINT64 value, UINT8 mindigits)
-{
-	static char buffer[16][64];
-	// TODO: this can overflow - e.g. when a lot of unmapped writes are logged
-	static int index;
-	char *bufbase = &buffer[index++ % 16][0];
-	char *bufptr = bufbase;
-	INT8 curdigit;
-
-	for (curdigit = 15; curdigit >= 0; curdigit--)
-	{
-		int nibble = (value >> (curdigit * 4)) & 0xf;
-		if (nibble != 0 || curdigit < mindigits)
-		{
-			mindigits = curdigit;
-			*bufptr++ = "0123456789ABCDEF"[nibble];
-		}
-	}
-	if (bufptr == bufbase)
-		*bufptr++ = '0';
-	*bufptr = 0;
-
-	return bufbase;
-}
-
-/*-------------------------------------------------
-    core_i64_oct_format - i64 format printf helper
--------------------------------------------------*/
-
-char *core_i64_oct_format(UINT64 value, UINT8 mindigits)
-{
-	static char buffer[22][64];
-	// TODO: this can overflow
-	static int index;
-	char *bufbase = &buffer[index++ % 22][0];
-	char *bufptr = bufbase;
-	INT8 curdigit;
-
-	for (curdigit = 21; curdigit >= 0; curdigit--)
-	{
-		int octdigit = (value >> (curdigit * 3)) & 0x7;
-		if (octdigit != 0 || curdigit < mindigits)
-		{
-			mindigits = curdigit;
-			*bufptr++ = "01234567"[octdigit];
-		}
-	}
-	if (bufptr == bufbase)
-		*bufptr++ = '0';
-	*bufptr = 0;
-
-	return bufbase;
-}
-
-/*-------------------------------------------------
-    core_i64_format - i64 format printf helper
--------------------------------------------------*/
-
-char *core_i64_format(UINT64 value, UINT8 mindigits, bool is_octal)
-{
-	return is_octal ? core_i64_oct_format(value,mindigits) : core_i64_hex_format(value,mindigits);
-}
-
-/*-------------------------------------------------
     std::string helpers
 -------------------------------------------------*/
 
 #include <algorithm>
-
-int strvprintf(std::string &str, const char *format, va_list args)
-{
-	char tempbuf[4096];
-	int result = vsprintf(tempbuf, format, args);
-
-	// set the result
-	str.assign(tempbuf);
-	return result;
-}
-
-int strprintf(std::string &str, const char *format, ...)
-{
-	va_list ap;
-	va_start(ap, format);
-	int retVal = strvprintf(str, format, ap);
-	va_end(ap);
-	return retVal;
-}
-
-std::string strformat(const char *format, ...)
-{
-	std::string retVal;
-	va_list ap;
-	va_start(ap, format);
-	strvprintf(retVal, format, ap);
-	va_end(ap);
-	return retVal;
-}
 
 int strcatvprintf(std::string &str, const char *format, va_list args)
 {
@@ -235,15 +139,6 @@ int strcatvprintf(std::string &str, const char *format, va_list args)
 	// set the result
 	str.append(tempbuf);
 	return result;
-}
-
-int strcatprintf(std::string &str, const char *format, ...)
-{
-	va_list ap;
-	va_start(ap, format);
-	int retVal = strcatvprintf(str, format, ap);
-	va_end(ap);
-	return retVal;
 }
 
 void strdelchr(std::string& str, char chr)

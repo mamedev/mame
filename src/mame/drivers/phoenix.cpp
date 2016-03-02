@@ -1266,6 +1266,30 @@ ROM_START( pleiadsi )
 	ROM_LOAD( "7611-5.33",    0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   /* palette high bits */
 ROM_END
 
+ROM_START( pleiadsn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",     0x0000, 0x0800, CRC(c013515f) SHA1(c44db1c615c11ace997c0065762020827bf9ef7e) )
+	ROM_LOAD( "2.bin",     0x0800, 0x0800, CRC(b254217c) SHA1(312a33cca09d5d2d18992f28eb051230a90db6e3) )
+	ROM_LOAD( "3.bin",     0x1000, 0x0800, CRC(3b29aec5) SHA1(b90b55fdc799db672558e2f7c6b05a958bf33a2c) )
+	ROM_LOAD( "4.bin",     0x1800, 0x0800, CRC(1fbde4d7) SHA1(b358649288108159a426dba3940c627c2d2aeb01) )
+	ROM_LOAD( "5.bin",     0x2000, 0x0800, BAD_DUMP CRC(9dc73e63) SHA1(8a2de6666fecead7071285125b16641b50249adc) )  // the best of 50 different dumps. the device is clearly damaged. 
+	ROM_LOAD( "6.bin",     0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) )
+	ROM_LOAD( "7.bin",     0x3000, 0x0800, CRC(b5f07fbc) SHA1(2ae687c84732942e69ad4dfb7a4ac1b97b77487a) )
+	ROM_LOAD( "8.bin",     0x3800, 0x0800, CRC(b3db08c2) SHA1(d5b1b77dcf2d76498f30d5f880635f5acfac7dfd) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 ) // these are straight (colors match the real machine)
+	ROM_LOAD( "11.bin",    0x0000, 0x0800, CRC(4e30f9e7) SHA1(da023a94725dc40107cd97e4decfd4dc0f9f00ee) )
+	ROM_LOAD( "12.bin",    0x0800, 0x0800, CRC(72d511fc) SHA1(a12485698ad35ba3a8c72bb9401c0cf522ffc73c) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "9.bin",     0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
+	ROM_LOAD( "10.bin",    0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // proms borrowed from phoenix, reverse order.
+	ROM_LOAD( "hm3-7611.bin", 0x0000, 0x0100, BAD_DUMP CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   /* palette low bits */
+	ROM_LOAD( "mb7052.ic41",  0x0100, 0x0100, BAD_DUMP CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   /* palette high bits */
+ROM_END
+
 ROM_START( pleiadss )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pl45.bin",     0x0000, 0x0800, CRC(e2528599) SHA1(4647c62a2c6047238ad2855cf71b9e079ac4b4c7) )
@@ -1396,6 +1420,7 @@ GAME( 1981, pleiadsb2,pleiads,  pleiads,  pleiads, driver_device,  0,        ROT
 GAME( 1981, pleiadbl, pleiads,  pleiads,  pleiadbl, driver_device, 0,        ROT90, "bootleg",                           "Pleiads (bootleg set 1)", MACHINE_IMPERFECT_COLORS )
 GAME( 1981, pleiadce, pleiads,  pleiads,  pleiadce, driver_device, 0,        ROT90, "Tehkan (Centuri license)",          "Pleiads (Centuri)", MACHINE_IMPERFECT_COLORS )
 GAME( 1981, pleiadsi, pleiads,  pleiads,  pleiadce, driver_device, 0,        ROT90, "bootleg? (Irecsa)",                 "Pleiads (Irecsa)", MACHINE_IMPERFECT_COLORS ) // possibly licensed, but some of the roms match the bootlegs
+GAME( 1981, pleiadsn, pleiads,  phoenix,  pleiadce, driver_device, 0,        ROT90, "Niemer S.A.",                       "Pleiads (Niemer S.A.)", MACHINE_IMPERFECT_COLORS ) // possibly licensed, but some of the roms match the bootlegs
 GAME( 1981, pleiadss, pleiads,  phoenix,  pleiadce, driver_device, 0,        ROT90, "bootleg",                           "Pleiads (Spanish bootleg)", MACHINE_SUPPORTS_SAVE ) // colours match PCB (but are ugly)
 GAME( 1981, capitol,  pleiads,  phoenix,  capitol, driver_device,  0,        ROT90, "bootleg? (Universal Video Spiel)",  "Capitol", MACHINE_IMPERFECT_COLORS )
 

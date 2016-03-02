@@ -995,11 +995,11 @@ void pic16c62x_device::state_string_export(const device_state_entry &entry, std:
 	switch (entry.index())
 	{
 		case PIC16C62x_PSCL:
-			strprintf(str, "%c%02X", ((m_OPTION & 0x08) ? 'W' : 'T'), m_prescaler);
+			str = string_format("%c%02X", ((m_OPTION & 0x08) ? 'W' : 'T'), m_prescaler);
 			break;
 
 		case STATE_GENFLAGS:
-			strprintf(str, "%01x%c%c%c%c%c %c%c%c%03x",
+			str = string_format("%01x%c%c%c%c%c %c%c%c%03x",
 				(STATUS & 0xe0) >> 5,
 				STATUS & 0x10 ? '.':'O',      /* WDT Overflow */
 				STATUS & 0x08 ? 'P':'D',      /* Power/Down */

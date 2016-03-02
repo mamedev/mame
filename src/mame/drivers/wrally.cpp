@@ -123,8 +123,8 @@ static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16, wrally_state )
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(okim6295_bankswitch_w)                                /* OKI6295 bankswitch */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  /* OKI6295 status/data register */
-	AM_RANGE(0x70000a, 0x70001b) AM_WRITE(wrally_coin_lockout_w)                                /* Coin lockouts */
-	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(wrally_coin_counter_w)                                /* Coin counters */
+	AM_RANGE(0x70000a, 0x70001b) AM_WRITE(coin_lockout_w)                                /* Coin lockouts */
+	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(coin_counter_w)                                /* Coin counters */
 	AM_RANGE(0x70004a, 0x70004b) AM_WRITENOP                                                /* Sound muting */
 	AM_RANGE(0x70005a, 0x70005b) AM_WRITE(flipscreen_w)                                  /* Flip screen */
 	AM_RANGE(0x70006a, 0x70007b) AM_WRITENOP                                                /* ??? */
@@ -151,6 +151,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dallas_ram, AS_IO, 8, wrally_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dallas_share_r, dallas_share_w)   AM_MASK(0x3fff)     /* Shared RAM with the main CPU */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( oki_map, AS_0, 8, wrally_state )
+	AM_RANGE(0x00000, 0x2ffff) AM_ROM
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wrally )
@@ -276,6 +281,7 @@ static MACHINE_CONFIG_START( wrally, wrally_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH)                 /* verified on pcb */
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -294,11 +300,10 @@ ROM_START( wrally )
 	ROM_LOAD16_BYTE( "worldr19.i09", 0x100000, 0x080000, CRC(018b35bb) SHA1(ca789e23d18cc7d7e48b6858e6b61e03bf88b475) )
 	ROM_LOAD16_BYTE( "worldr18.i07", 0x100001, 0x080000, CRC(b37c807e) SHA1(9e6155a2b5206c0d4dca669d24d9fe9830027651) )
 
-	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "worldr14.c01",   0x000000, 0x080000, CRC(e931c2ee) SHA1(ea1cf8ad52713e5136a370e289567eea9e6403d6) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
-	ROM_RELOAD(     0x040000, 0x080000 )
-	ROM_LOAD( "worldr15.c03",   0x0c0000, 0x080000, CRC(11f0fe2c) SHA1(96c2a04874fa036576b7cfc5559bb0e33582ffd2) )
+	ROM_LOAD( "worldr15.c03",   0x080000, 0x080000, CRC(11f0fe2c) SHA1(96c2a04874fa036576b7cfc5559bb0e33582ffd2) )
 
 	ROM_REGION( 0x0514, "plds", 0 ) /* PAL's and GAL's */
 	ROM_LOAD( "tibpal20l8-25cnt.b23", 0x0000, 0x0104, NO_DUMP )
@@ -322,11 +327,10 @@ ROM_START( wrallya )
 	ROM_LOAD16_BYTE( "worldr19.i09", 0x100000, 0x080000, CRC(018b35bb) SHA1(ca789e23d18cc7d7e48b6858e6b61e03bf88b475) )
 	ROM_LOAD16_BYTE( "worldr18.i07", 0x100001, 0x080000, CRC(b37c807e) SHA1(9e6155a2b5206c0d4dca669d24d9fe9830027651) )
 
-	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "worldr14.c01",   0x000000, 0x080000, CRC(e931c2ee) SHA1(ea1cf8ad52713e5136a370e289567eea9e6403d6) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
-	ROM_RELOAD(     0x040000, 0x080000 )
-	ROM_LOAD( "worldr15.c03",   0x0c0000, 0x080000, CRC(11f0fe2c) SHA1(96c2a04874fa036576b7cfc5559bb0e33582ffd2) )
+	ROM_LOAD( "worldr15.c03",   0x080000, 0x080000, CRC(11f0fe2c) SHA1(96c2a04874fa036576b7cfc5559bb0e33582ffd2) )
 
 	ROM_REGION( 0x0514, "plds", 0 ) /* PAL's and GAL's */
 	ROM_LOAD( "tibpal20l8-25cnt.b23", 0x0000, 0x0104, NO_DUMP )
@@ -348,9 +352,8 @@ ROM_START( wrallyb )
 	ROM_LOAD( "rally h-12.h12", 0x000000, 0x100000, CRC(3353dc00) SHA1(db3b1686751dcaa231d66c08b5be81fcfe299ad9) ) /* Same data, different layout */
 	ROM_LOAD( "rally h-8.h8",   0x100000, 0x100000, CRC(58dcd024) SHA1(384ff296d3c7c8e0c4469231d1940de3cea89fc2) )
 
-	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "sound c-1.c1", 0x000000, 0x100000, CRC(2d69c9b8) SHA1(328cb3c928dc6921c0c3f0277f59bca6c747c504) ) /* Same data in a single rom */
-	ROM_RELOAD(       0x040000, 0x100000 )
 
 	ROM_REGION( 0x0514, "plds", 0 ) /* PAL's and GAL's */
 	ROM_LOAD( "tibpal20l8-25cnt.b23", 0x0000, 0x0104, NO_DUMP )
@@ -372,9 +375,8 @@ ROM_START( wrallyat ) /* Board Marked 930217, Atari License */
 	ROM_LOAD( "rally h-12.h12", 0x000000, 0x100000, CRC(3353dc00) SHA1(db3b1686751dcaa231d66c08b5be81fcfe299ad9) ) /* Same data, different layout */
 	ROM_LOAD( "rally h-8.h8",   0x100000, 0x100000, CRC(58dcd024) SHA1(384ff296d3c7c8e0c4469231d1940de3cea89fc2) )
 
-	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "sound c-1.c1", 0x000000, 0x100000, CRC(2d69c9b8) SHA1(328cb3c928dc6921c0c3f0277f59bca6c747c504) ) /* Same data in a single rom */
-	ROM_RELOAD(       0x040000, 0x100000 )
 
 	ROM_REGION( 0x0514, "plds", 0 ) /* PAL's and GAL's */
 	ROM_LOAD( "tibpal20l8-25cnt.b23", 0x0000, 0x0104, NO_DUMP )

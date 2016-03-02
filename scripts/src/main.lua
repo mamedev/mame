@@ -25,6 +25,25 @@ else
 end	
 	uuid (os.uuid(_target .."_" .. _subtarget))
 	kind "ConsoleApp"
+	
+	configuration { "android*" }
+		targetextension ".so"
+		linkoptions {
+			"-shared",
+		}
+		links {
+			"EGL",
+			"GLESv2",
+		} 	
+	configuration { "pnacl" }
+		kind "ConsoleApp"
+		targetextension ".pexe"
+		links {
+			"ppapi",
+			"ppapi_gles2",
+			"pthread",
+		}
+	configuration {  }
 
 	addprojectflags()
 	flags {
@@ -142,11 +161,15 @@ end
 		"7z",
 		"lua",
 		"lualibs",
-		"luv",
-		"uv",
-		"http-parser",
 	}
 
+	if _OPTIONS["USE_LIBUV"]=="1" then
+		links {		
+			"luv",
+			"uv",
+			"http-parser",
+		}
+	end
 	if _OPTIONS["with-bundled-zlib"] then
 		links {
 			"zlib",
@@ -257,14 +280,41 @@ end
 	}
 	
 if (_OPTIONS["SOURCES"] == nil) then 	
-	dependency {
-		{ "../../../../generated/mame/mame/drivlist.cpp",  MAME_DIR .. "src/mame/mess.lst", true },
-		{ "../../../../generated/mame/mame/drivlist.cpp" , MAME_DIR .. "src/mame/arcade.lst", true},
-	}
-	custombuildtask {
-		{ MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makelist.py" }, {"@echo Building driver list...",    PYTHON .. " $(1) $(<) > $(@)" }},
-	}
+
+	if os.isfile(MAME_DIR .. "src/".._target .."/" .. _subtarget ..".flt") then
+		dependency {
+		{  
+			GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
+		}
+		custombuildtask {
+			{ MAME_DIR .. "src/".._target .."/" .. _subtarget ..".flt" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makelist.py", MAME_DIR .. "src/".._target .."/" .. _target ..".lst"  }, {"@echo Building driver list...",    PYTHON .. " $(1) $(2) $(<) > $(@)" }},
+		}
+	else
+		if os.isfile(MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst") then
+			custombuildtask {
+				{ MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makelist.py" }, {"@echo Building driver list...",    PYTHON .. " $(1) $(<) > $(@)" }},
+			}
+		else
+			dependency {
+			{  
+				GEN_DIR  .. _target .. "/" .. _target .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
+			}
+			custombuildtask {
+				{ MAME_DIR .. "src/".._target .."/" .. _target ..".lst" ,  GEN_DIR  .. _target .. "/" .. _target .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makelist.py" }, {"@echo Building driver list...",    PYTHON .. " $(1) $(<) > $(@)" }},
+			}
+		end
+	end
 end	
+
+if (_OPTIONS["SOURCES"] ~= nil) then
+		dependency {
+		{  
+			GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
+		}
+		custombuildtask {
+			{ GEN_DIR .. _target .."/" .. _subtarget ..".flt" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makelist.py", MAME_DIR .. "src/".._target .."/" .. _target ..".lst"  }, {"@echo Building driver list...",    PYTHON .. " $(1) $(2) $(<) > $(@)" }},
+		}
+end
 
 if _OPTIONS["FORCE_VERSION_COMPILE"]=="1" then
 	configuration { "gmake" }
@@ -285,13 +335,6 @@ end
 			PYTHON .. " " .. path.translate(MAME_DIR .. "scripts/build/verinfo.py","\\") .. " -r -b " .. rctarget .. " " .. path.translate(MAME_DIR .. "src/version.cpp","\\") .. " > " .. path.translate(GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", "\\") ,
 		}	
 				
-	if (_OPTIONS["osd"] == "sdl") then
-		configuration { "x64","vs*" }
-			prelinkcommands { "copy " .. path.translate(MAME_DIR .."3rdparty/sdl2/lib/x64/SDL2.dll", "\\") .. " " .. path.translate(MAME_DIR .."SDL2.dll","\\") .. " /Y" }
-		configuration { "x32","vs*" }
-			prelinkcommands { "copy " .. path.translate(MAME_DIR .."3rdparty/sdl2/lib/x86/SDL2.dll", "\\") .. " " .. path.translate(MAME_DIR .."SDL2.dll","\\") .. " /Y" }
-	end
-	
 	configuration { }
 
 	debugdir (MAME_DIR)

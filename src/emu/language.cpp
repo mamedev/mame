@@ -2,9 +2,9 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-	language.cpp
+    language.cpp
 
-	Multi-language support.
+    Multi-language support.
 
 ***************************************************************************/
 

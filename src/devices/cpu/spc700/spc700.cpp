@@ -1249,7 +1249,7 @@ void spc700_device::state_string_export(const device_state_entry &entry, std::st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				(m_flag_n & 0x80)        ? 'N':'.',
 				((m_flag_v & 0x80) >> 1) ? 'V':'.',
 				(m_flag_p>>3)            ? 'P':'.',

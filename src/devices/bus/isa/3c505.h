@@ -143,7 +143,7 @@ protected:
 	virtual int setfilter(device_t *, int);
 
 	const char *cpu_context();
-	void logerror(const char *format, ...) const;
+	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 
 	// device-level overrides
 	virtual void device_start() override;

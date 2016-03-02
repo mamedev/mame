@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia, David Haywood
+// copyright-holders:Luca Elia, David Haywood, Roberto Fresca
 /***************************************************************************
 
                           -= IGS009 Based Games =-
@@ -15,12 +15,16 @@ NVRAM   :   Battery for main RAM
   The interesting part is the background tilemap, that is designed specifically
   for simulating the nine reels of a slot machine.
 
-----------------------------------------------------------------------
-Year  Game                Manufacturer    Notes
-----------------------------------------------------------------------
-1995? Jingle Bell         IGS
-1998  Grand Prix '98      Romtec          1 reel gfx rom is bad
-----------------------------------------------------------------------
+---------------------------------------------------------------------------
+Year  Game                         Manufacturer    Notes
+---------------------------------------------------------------------------
+1997  Jingle Bell (US, V157)       IGS             NMI issues...
+1997  Jingle Bell (EU, V155)       IGS             NMI issues...
+1997  Jingle Bell (EU, V153)       IGS             NMI issues...
+1995  Jingle Bell (EU, V141)       IGS             Working
+1995? Jingle Bell (Italy, V133I)   IGS             Working
+1998  Grand Prix '98               Romtec          1 reel gfx rom is bad
+---------------------------------------------------------------------------
 
 ***************************************************************************/
 
@@ -227,10 +231,6 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel4_tile_info)
 			0,
 			0);
 }
-
-
-
-
 
 
 
@@ -469,8 +469,6 @@ READ8_MEMBER(igs009_state::magic_r)
 }
 
 
-
-
 static ADDRESS_MAP_START( jingbell_map, AS_PROGRAM, 8, igs009_state )
 	AM_RANGE( 0x00000, 0x0f3ff ) AM_ROM
 	AM_RANGE( 0x0f400, 0x0ffff ) AM_RAM AM_SHARE("nvram")
@@ -493,8 +491,42 @@ static ADDRESS_MAP_START( jingbell_portmap, AS_IO, 8, igs009_state )
 
 	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 
-	AM_RANGE( 0x6480, 0x6480 ) AM_WRITE(nmi_and_coins_w )
+	AM_RANGE(0x6480, 0x6483) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* NMI and coins (w), service (r), coins (r) */
+	AM_RANGE(0x6490, 0x6493) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* buttons 1 (r), video and leds (w), leds (w) */
 
+	AM_RANGE( 0x64a0, 0x64a0 ) AM_READ_PORT( "BUTTONS2" )
+
+	AM_RANGE( 0x64b0, 0x64b1 ) AM_DEVWRITE("ymsnd", ym2413_device, write)
+
+	AM_RANGE( 0x64c0, 0x64c0 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+
+	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE(magic_r, magic_w )    // DSW1-5
+
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
+
+	AM_RANGE( 0x8000, 0xffff ) AM_ROM AM_REGION("data", 0)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( gp98_portmap, AS_IO, 8, igs009_state )
+	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
+
+	AM_RANGE( 0x1000, 0x11ff ) AM_RAM_WRITE(bg_scroll_w ) AM_SHARE("bg_scroll")
+
+	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+
+	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE(reel1_ram_w )  AM_SHARE("reel1_ram")
+	AM_RANGE( 0x3400, 0x37ff ) AM_RAM_WRITE(reel2_ram_w )  AM_SHARE("reel2_ram")
+	AM_RANGE( 0x3800, 0x3bff ) AM_RAM_WRITE(reel3_ram_w )  AM_SHARE("reel3_ram")
+	AM_RANGE( 0x3c00, 0x3fff ) AM_RAM_WRITE(reel4_ram_w )  AM_SHARE("reel4_ram")
+
+	AM_RANGE( 0x4000, 0x407f ) AM_RAM AM_SHARE("bg_scroll2")
+
+	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
+
+    // seems to lacks of PPI devices...
+	AM_RANGE( 0x6480, 0x6480 ) AM_WRITE(nmi_and_coins_w )
 	AM_RANGE( 0x6481, 0x6481 ) AM_READ_PORT( "SERVICE" )
 	AM_RANGE( 0x6482, 0x6482 ) AM_READ_PORT( "COINS" )
 	AM_RANGE( 0x6490, 0x6490 ) AM_READ_PORT( "BUTTONS1" )
@@ -685,6 +717,7 @@ static INPUT_PORTS_START( jingbell )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+
 /***************************************************************************
                                 Graphics Layout
 ***************************************************************************/
@@ -781,8 +814,17 @@ static MACHINE_CONFIG_START( jingbell, igs009_state )
 	MCFG_CPU_IO_MAP(jingbell_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs009_state, interrupt)
 
-
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(igs009_state, nmi_and_coins_w))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(igs009_state, video_and_leds_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(igs009_state, leds_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -797,7 +839,6 @@ static MACHINE_CONFIG_START( jingbell, igs009_state )
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
@@ -807,7 +848,12 @@ static MACHINE_CONFIG_START( jingbell, igs009_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+
 static MACHINE_CONFIG_DERIVED( gp98, jingbell )
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(gp98_portmap)
+
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gp98)
 
 	MCFG_VIDEO_START_OVERRIDE(igs009_state,gp98)
@@ -816,7 +862,140 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Jingle Bell
+  IGS, 1997.  
+
+  English versions.
+
+  1x HD64180RP8 (u18)
+  2x NEC D8255AC-2 (u19, u20)
+  1x custom IGS 009 F56D 246 (u22)
+  1x YM2413 (u45)
+  1x AR17961-AP0640 (u46)(sound equivalent to OKI M6295)
+
+  4x 27C512 (1, 2, 3, V)
+  3x 27C2001 (4, 5, 6)
+  1x 27C256 (7)
+  1x 27C1001 (sp)
+
+  1x UMC UM6264B-10L (u42)
+  2x UMC UM6164DK-12 (u1, u2)
+
+  1x crystal 12.000 MHz.
+  1x crystal 3.579545 MHz.
+
+  1x 38x2 edge connector.
+  2x 10x2 edge connectors.
+  1x switch.
+  1x 3.6 V. lithium battery.
+  5x 8 DIP switches banks.
+
+***************************************************************************/
+
+/* Jingle Bells (V157 US)
+   Original IGS.
+   For amusement.
+*/
+ROM_START( jingbell )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512_v157_us.u44", 0x00000, 0x10000, CRC(37f95b60) SHA1(db2022802ce553ce7a0e8403408f3194b2f10007) )
+
+	ROM_REGION( 0x8000, "data", 0 )
+	ROM_LOAD( "27c256_v157_us.u43", 0x0000, 0x8000, CRC(a7affa15) SHA1(f9d33e32b57ad267d383e075663994e0af0b3016) )
+
+	ROM_REGION( 0x30000, "reels", 0 )
+	ROM_LOAD( "27c512_v157_us.u17", 0x00000, 0x10000, CRC(cadd7910) SHA1(aa514ddb29c8c9a77478d56bea4ae71995fdd518) )
+	ROM_LOAD( "27c512_v157_us.u16", 0x10000, 0x10000, CRC(a9e1f5aa) SHA1(68d7f4e9e9a5bbce0904e406ee6fe82e9e52a9ba) )
+	ROM_LOAD( "27c512_v157_us.u15", 0x20000, 0x10000, CRC(865b7d3a) SHA1(c1dff3a27d747ee499aaee0c4468534f0249a3e5) )
+
+	ROM_REGION( 0xc0000, "tiles", 0 )
+	ROM_LOAD( "27c2001_v157_us.u25", 0x00000, 0x40000, CRC(daa56ce5) SHA1(4f14a8efac16b03bd14dd26d586bcb8d5bef65c1) )
+	ROM_LOAD( "27c2001_v157_us.u24", 0x40000, 0x40000, CRC(b10b38e1) SHA1(397b2d899e47c6249fbbb6e6262d0390d9b796e6) )
+	ROM_LOAD( "27c2001_v157_us.u23", 0x80000, 0x40000, CRC(a3304b5a) SHA1(bf51cb1f728758d50ce27275aa19ef649f6b34b9) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "mx29f001t_v157_us_sp.u38", 0x00000, 0x20000, CRC(a42d73b1) SHA1(93157e9630d5c8bb34c71186415d0aa8c5d51951) )
+ROM_END
+
+/* Jingle Bells (V155 EU)
+   Original IGS.
+   For amusement.
+*/
+ROM_START( jingbella )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512_v155.u44", 0x00000, 0x10000, CRC(0813d12b) SHA1(4c35b656d1e54619bbfd26cbc017eba336e6abda) )
+
+	ROM_REGION( 0x8000, "data", 0 )
+	ROM_LOAD( "27c256_v155.u43", 0x0000, 0x8000, CRC(a7affa15) SHA1(f9d33e32b57ad267d383e075663994e0af0b3016) )
+
+	ROM_REGION( 0x30000, "reels", 0 )
+	ROM_LOAD( "27c512_v155.u17", 0x00000, 0x10000, CRC(cadd7910) SHA1(aa514ddb29c8c9a77478d56bea4ae71995fdd518) )
+	ROM_LOAD( "27c512_v155.u16", 0x10000, 0x10000, CRC(a9e1f5aa) SHA1(68d7f4e9e9a5bbce0904e406ee6fe82e9e52a9ba) )
+	ROM_LOAD( "27c512_v155.u15", 0x20000, 0x10000, CRC(865b7d3a) SHA1(c1dff3a27d747ee499aaee0c4468534f0249a3e5) )
+
+	ROM_REGION( 0xc0000, "tiles", 0 )
+	ROM_LOAD( "27c2001_v155.u25", 0x00000, 0x40000, CRC(daa56ce5) SHA1(4f14a8efac16b03bd14dd26d586bcb8d5bef65c1) )
+	ROM_LOAD( "27c2001_v155.u24", 0x40000, 0x40000, CRC(b10b38e1) SHA1(397b2d899e47c6249fbbb6e6262d0390d9b796e6) )
+	ROM_LOAD( "27c2001_v155.u23", 0x80000, 0x40000, CRC(a3304b5a) SHA1(bf51cb1f728758d50ce27275aa19ef649f6b34b9) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "27c1001_v155_sp.u38", 0x00000, 0x20000, CRC(a42d73b1) SHA1(93157e9630d5c8bb34c71186415d0aa8c5d51951) )
+ROM_END
+
+/* Jingle Bells (V153 EU)
+   Original IGS.
+   For amusement.
+*/
+ROM_START( jingbellb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512_v153.u44", 0x00000, 0x10000, CRC(fd3bc092) SHA1(a92dc9bc15d7a4816887d66d46cea925d230c5b8) )
+
+	ROM_REGION( 0x8000, "data", 0 )
+	ROM_LOAD( "27c256_v153.u43", 0x0000, 0x8000, CRC(a7affa15) SHA1(f9d33e32b57ad267d383e075663994e0af0b3016) )
+
+	ROM_REGION( 0x30000, "reels", 0 )
+	ROM_LOAD( "27c512_v153.u17", 0x00000, 0x10000, CRC(cadd7910) SHA1(aa514ddb29c8c9a77478d56bea4ae71995fdd518) )
+	ROM_LOAD( "27c512_v153.u16", 0x10000, 0x10000, CRC(a9e1f5aa) SHA1(68d7f4e9e9a5bbce0904e406ee6fe82e9e52a9ba) )
+	ROM_LOAD( "27c512_v153.u15", 0x20000, 0x10000, CRC(865b7d3a) SHA1(c1dff3a27d747ee499aaee0c4468534f0249a3e5) )
+
+	ROM_REGION( 0xc0000, "tiles", 0 )
+	ROM_LOAD( "27c2001_v153.u25", 0x00000, 0x40000, CRC(daa56ce5) SHA1(4f14a8efac16b03bd14dd26d586bcb8d5bef65c1) )
+	ROM_LOAD( "27c2001_v153.u24", 0x40000, 0x40000, CRC(b10b38e1) SHA1(397b2d899e47c6249fbbb6e6262d0390d9b796e6) )
+	ROM_LOAD( "27c2001_v153.u23", 0x80000, 0x40000, CRC(a3304b5a) SHA1(bf51cb1f728758d50ce27275aa19ef649f6b34b9) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "27c1001_v153_sp.u38", 0x00000, 0x20000, CRC(a42d73b1) SHA1(93157e9630d5c8bb34c71186415d0aa8c5d51951) )
+ROM_END
+
+/* Jingle Bells (V141 EU)
+   Original IGS.
+   For amusement.
+*/
+ROM_START( jingbellc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512_v141.u44", 0x00000, 0x10000, CRC(6997a903) SHA1(991508d85e55a3c6f811070352e06ae6bf65cc2e) )
+
+	ROM_REGION( 0x8000, "data", 0 )
+	ROM_LOAD( "27c256_v141.u43", 0x0000, 0x8000, CRC(a7affa15) SHA1(f9d33e32b57ad267d383e075663994e0af0b3016) )
+
+	ROM_REGION( 0x30000, "reels", 0 )
+	ROM_LOAD( "27c512_v141.u17", 0x00000, 0x10000, CRC(cadd7910) SHA1(aa514ddb29c8c9a77478d56bea4ae71995fdd518) )
+	ROM_LOAD( "27c512_v141.u16", 0x10000, 0x10000, CRC(a9e1f5aa) SHA1(68d7f4e9e9a5bbce0904e406ee6fe82e9e52a9ba) )
+	ROM_LOAD( "27c512_v141.u15", 0x20000, 0x10000, CRC(865b7d3a) SHA1(c1dff3a27d747ee499aaee0c4468534f0249a3e5) )
+
+	ROM_REGION( 0xc0000, "tiles", 0 )
+	ROM_LOAD( "27c2001_v141.u25", 0x00000, 0x40000, CRC(f53bac7e) SHA1(f4375da0780fba59fcb65e24a33099af35e4d286) )
+	ROM_LOAD( "27c2001_v141.u24", 0x40000, 0x40000, CRC(bddd6001) SHA1(2a6395e9593352d3ea2d477a7f41805f389c9c50) )
+	ROM_LOAD( "27c2001_v141.u23", 0x80000, 0x40000, CRC(e8322c75) SHA1(c3385538fb673a4ab14c315ce8bce792eb264ec7) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "27c1001_v141_sp.u38", 0x00000, 0x20000, CRC(a42d73b1) SHA1(93157e9630d5c8bb34c71186415d0aa8c5d51951) )
+ROM_END
+
+/***************************************************************************
+
 Jingle Bell
+Italy, V133I
 (C) IGS ("COPYRIGHT 1995" in ROM, "FEB. 23 1998" on sticker)
 
 CPU:
@@ -849,8 +1028,7 @@ Notes:
 12/02/2008 f205v
 
 ***************************************************************************/
-
-ROM_START( jingbell )
+ROM_START( jingbelli )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jinglev133i.u44", 0x00000, 0x10000, CRC(df60dc39) SHA1(ff57afd50c045b621395353fdc50ffd1e1b65e9e) )
 
@@ -876,6 +1054,7 @@ ROM_START( jingbell )
 	ROM_LOAD( "palce22v10h-ajbu24.u24",     0x000, 0x2dd, CRC(6310f441) SHA1(b610e170ccca1fcb06a57f718ece1408b696ba9c) )
 	ROM_LOAD( "palce22v10h-ch-jin-u27.u27", 0x000, 0x2dd, BAD_DUMP CRC(5c4e9024) SHA1(e9d1e4df3d79c21f4ce053a84bb7b7a43d650f91) )
 ROM_END
+
 
 DRIVER_INIT_MEMBER(igs009_state,jingbell)
 {
@@ -965,5 +1144,11 @@ ROM_START( gp98 )
 	// no OKI on this
 ROM_END
 
-GAME( 1995?, jingbell, 0, jingbell, jingbell, igs009_state, jingbell, ROT0, "IGS",            "Jingle Bell (Italy, V133I)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998,  gp98,     0, gp98,     jingbell, driver_device, 0,        ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+
+/*    YEAR   NAME       PARENT    MACHINE   INPUT     STATE          INIT      ROT    COMPANY           FULLNAME                     FLAGS  */
+GAME( 1997,  jingbell,  0,        jingbell, jingbell, igs009_state,  jingbell, ROT0, "IGS",            "Jingle Bell (US, V157)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  jingbell, ROT0, "IGS",            "Jingle Bell (EU, V155)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  jingbellb, jingbell, jingbell, jingbell, igs009_state,  jingbell, ROT0, "IGS",            "Jingle Bell (EU, V153)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  jingbellc, jingbell, jingbell, jingbell, igs009_state,  jingbell, ROT0, "IGS",            "Jingle Bell (EU, V141)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995?, jingbelli, jingbell, jingbell, jingbell, igs009_state,  jingbell, ROT0, "IGS",            "Jingle Bell (Italy, V133I)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  gp98,      0,        gp98,     jingbell, driver_device, 0,        ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

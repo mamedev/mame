@@ -873,7 +873,7 @@ S11 S13 S15 S17  |EPR12194 -        -        -        EPR12195 -        -       
 #include "machine/segaic16.h"
 #include "machine/mc8123.h"
 #include "includes/segaipt.h"
-
+#include "sound/okim6295.h"
 
 //**************************************************************************
 //  CONSTANTS
@@ -1756,6 +1756,65 @@ static ADDRESS_MAP_START( decrypted_opcodes_map_x, AS_DECRYPTED_OPCODES, 16, seg
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( lockonph_map, AS_PROGRAM, 16, segas16b_state )
+	// this still appears to have a mapper device, does the hardware use it? should we move this to all be configured by it?
+	AM_RANGE(0x000000, 0x0bffff) AM_ROM
+	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(rom_5704_bank_w)
+	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
+	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
+	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x840000, 0x841fff) AM_RAM_WRITE(philko_paletteram_w) AM_SHARE("paletteram")
+
+	AM_RANGE(0xC40000, 0xC40001) AM_WRITENOP // coin counters etc.?
+
+	AM_RANGE(0xC41000, 0xC41001) AM_READ_PORT("P1")
+	AM_RANGE(0xC41002, 0xC41003) AM_READ_PORT("P2")
+	AM_RANGE(0xC41004, 0xC41005) AM_READ_PORT("SERVICE")
+
+	AM_RANGE(0xC42000, 0xC42001) AM_READ_PORT("DSW1")
+	AM_RANGE(0xC42002, 0xC42003) AM_READ_PORT("DSW2")
+
+	AM_RANGE(0x777706, 0x777707) AM_WRITE(sound_w16) // AM_WRITE8(soundlatch_byte_w, 0xff00)
+
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("workram")
+ADDRESS_MAP_END
+
+
+
+static ADDRESS_MAP_START( fpointbl_map, AS_PROGRAM, 16, segas16b_state )
+	AM_RANGE(0x000000, 0x0bffff) AM_ROM
+
+	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
+	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
+
+	AM_RANGE(0x600006, 0x600007) AM_WRITE(sound_w16)
+	AM_RANGE(0x601000, 0x601001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0x601002, 0x601003) AM_READ_PORT("P1")
+	AM_RANGE(0x601004, 0x601005) AM_READ_PORT("P2")
+	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW2")
+	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW1")
+
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x843000, 0x843001) AM_WRITENOP
+
+	AM_RANGE(0xC46000, 0xC4601f) AM_RAM AM_SHARE("bootleg_scroll")
+	AM_RANGE(0xC46020, 0xC46027) AM_RAM AM_SHARE("bootleg_page")
+
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
+ADDRESS_MAP_END
+/*
+    Flash Point (Datsu bootlegs = fpointbl, fpointbj)
+    Has sound latch at $E000 instead of I/O ports $C0-FF
+*/
+static ADDRESS_MAP_START( fpointbl_sound_map, AS_PROGRAM, 8, segas16b_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+
 READ16_MEMBER(segas16b_state::bootleg_custom_io_r)
 {
 	return m_custom_io_r(space, offset, mem_mask);
@@ -1794,6 +1853,20 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas16b_state )
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
+// similar to whizz / other philko games in sidearms.cpp, but with the m6295
+static ADDRESS_MAP_START( lockonph_sound_map, AS_PROGRAM, 8, segas16b_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xf7ff) AM_ROM
+	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( lockonph_sound_iomap, AS_IO, 8, segas16b_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+	AM_RANGE(0x40, 0x40) AM_WRITENOP // ??
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_byte_r)
+ADDRESS_MAP_END
 
 
 //**************************************************************************
@@ -2393,6 +2466,96 @@ static INPUT_PORTS_START( fpoint )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 	// Switches 1, 3, 4 & 7 are listed as "Always off"
+INPUT_PORTS_END
+
+
+
+static INPUT_PORTS_START( fpointbl )
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+
+	PORT_START("DSW2")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" ) /* Listed as "Unused" */
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" ) /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" ) /* Listed as "Unused" */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x40, 0x40, "Clear Round Allowed" ) PORT_DIPLOCATION("SW2:7") /* Use button 3 */
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	/* SW2:8 The mode in which a block falls at twice [ usual ] speed as this when playing 25 minutes or more on one coin. */
+	PORT_DIPNAME( 0x80, 0x80, "2 Cell Move" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x05, "2 Coins/1 Credit 5/3 6/4" )
+	PORT_DIPSETTING(    0x04, "2 Coins/1 Credit 4/3" )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, "1 Coin/1 Credit 2/3" )
+	PORT_DIPSETTING(    0x02, "1 Coin/1 Credit 4/5" )
+	PORT_DIPSETTING(    0x03, "1 Coin/1 Credit 5/6" )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin B too) or 1/1" )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x50, "2 Coins/1 Credit 5/3 6/4" )
+	PORT_DIPSETTING(    0x40, "2 Coins/1 Credit 4/3" )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, "1 Coin/1 Credit 2/3" )
+	PORT_DIPSETTING(    0x20, "1 Coin/1 Credit 4/5" )
+	PORT_DIPSETTING(    0x30, "1 Coin/1 Credit 5/6" )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
 INPUT_PORTS_END
 
 
@@ -3308,7 +3471,93 @@ static INPUT_PORTS_START( snapper )
 	PORT_START("DSW1")  // DUMMY
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( lockonph )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+
+	PORT_START("SERVICE")   
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+
+	PORT_START("DSW1")    // DSW1
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW0:1,2,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW0:4,5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW0:7")
+	PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW0:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")    // DSW2
+	// these 3 dips seem to control a combination of the number of bullets / bullet speed.  Not sure how they translate to actual difficulty
+	// the comments relate to the bullets fire by the first 'large' ship.
+	PORT_DIPNAME( 0x0007, 0x0004, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(      0x0000, "0" ) // very slow bullets
+	PORT_DIPSETTING(      0x0001, "1" ) // ^
+	PORT_DIPSETTING(      0x0002, "2" ) // very slow bullets but less?
+	PORT_DIPSETTING(      0x0003, "3" ) // ^
+	PORT_DIPSETTING(      0x0004, "4" ) // faster bullets
+	PORT_DIPSETTING(      0x0005, "5" ) // ^
+	PORT_DIPSETTING(      0x0006, "6" ) // very fast, but less of them?
+	PORT_DIPSETTING(      0x0007, "7" ) // almost no bullets?
+
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Region ) ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Korea ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Europe ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
 
 //**************************************************************************
 //  GRAPHICS DECODING
@@ -3318,7 +3567,9 @@ static GFXDECODE_START( segas16b )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,   0, 1024 )
 GFXDECODE_END
 
-
+static GFXDECODE_START( lockonph )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar,   0, 1024 )
+GFXDECODE_END
 
 //**************************************************************************
 //  GENERIC MACHINE DRIVERS
@@ -3423,6 +3674,97 @@ static MACHINE_CONFIG_DERIVED( system16b_split, system16b )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map_x)
 
 	MCFG_DEVICE_REMOVE("mapper")
+MACHINE_CONFIG_END
+
+void segas16b_state::tilemap_16b_fpointbl_fill_latch(int i, UINT16* latched_pageselect, UINT16* latched_yscroll, UINT16* latched_xscroll, UINT16* textram)
+{
+	// grab the page regsisters from where the bootleg stores them instead, then convert them to the format the original video emulation code expects
+	if (i == 0)
+	{
+		latched_pageselect[i] = m_bootleg_page[1];
+		latched_yscroll[i] = m_bootleg_scroll[0x00/2];
+		latched_xscroll[i] = -m_bootleg_scroll[0x08/2]-1;
+
+	}
+	else if (i == 1)
+	{
+		// 6661 vs 1666
+		latched_pageselect[i] = BITSWAP16(m_bootleg_page[3] ,3, 2, 1, 0 , 7, 6, 5, 4,  11, 10, 9, 8,   15, 14, 13, 12 ) ;
+		latched_yscroll[i] = m_bootleg_scroll[0x10/2]+2;
+		latched_xscroll[i] = -m_bootleg_scroll[0x18/2]-1;
+	}
+	else
+	{
+		latched_pageselect[i] = 0x0000;
+		latched_yscroll[i] = 0;
+		latched_xscroll[i] = 0;
+	}
+//	printf("%02x returning latched page select %04x scrollx %04x scrolly %04x\n", i, latched_pageselect[i], latched_xscroll[i], latched_yscroll[i]);
+}
+
+static MACHINE_CONFIG_DERIVED( fpointbl, system16b )
+
+	MCFG_DEVICE_REMOVE("mapper")
+	MCFG_DEVICE_REMOVE("sprites")
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(fpointbl_map)
+
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(fpointbl_sound_map)
+
+	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
+	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(75) // these align the pieces with the playfield
+	MCFG_BOOTLEG_SYS16B_SPRITES_YORIGIN(-2) // some other gfx don't have identical alignment to original tho (flickey character over 'good luck')
+
+	MCFG_DEVICE_MODIFY("segaic16vid")
+	MCFG_SEGAIC16_VIDEO_SET_PAGELATCH_CB(segas16b_state, tilemap_16b_fpointbl_fill_latch)
+
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( lockonph, segas16b_state )
+
+	// basic machine hardware
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) // ?
+	MCFG_CPU_PROGRAM_MAP(lockonph_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_16MHz/4) // ?
+	MCFG_CPU_PROGRAM_MAP(lockonph_sound_map)
+	MCFG_CPU_IO_MAP(lockonph_sound_iomap)
+
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+//	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas16b_state, memory_mapper, mapper_sound_r, mapper_sound_w)
+
+	// video hardware
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lockonph)
+	MCFG_PALETTE_ADD("palette", 0x2000*4)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224) // wrong, other XTAL seems to be 17Mhz?
+	MCFG_SCREEN_UPDATE_DRIVER(segas16b_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
+	MCFG_SEGAIC16VID_ADD("segaic16vid")
+	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4) // ??
+//	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0)) // does set up the timer, but end up with no sound?
+	MCFG_SOUND_ROUTE(0, "mono", 0.5)
+	MCFG_SOUND_ROUTE(1, "mono", 0.5)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_LOW) // clock / pin not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
+
+
 MACHINE_CONFIG_END
 
 
@@ -4110,6 +4452,41 @@ ROM_START( snapper )
 	ROM_LOAD( "snap3.r04",  0x08000, 0x8000, CRC(c7f8cf0e) SHA1(08376f7941bc740ce85c6f32be7b54ced192599c) )
 	ROM_LOAD( "snap5.r05",  0x10000, 0x8000, CRC(378e08eb) SHA1(f2c10bd9e885c185ac2d0d51d907ceca1f21dd7a) )
 ROM_END
+
+//*************************************************************************************************************************
+//*************************************************************************************************************************
+//*************************************************************************************************************************
+//  Lock On
+//  CPU: 68000
+//  Custom Korean Board (Phiko System 4) - NOT Sega
+//
+ROM_START( lockonph )
+	ROM_REGION( 0xc0000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "B2", 0x000001, 0x40000, CRC(fc1c9f81) SHA1(09c51fbf4cc440ad3166407d1b96b4a4dcc9e412) )
+	ROM_LOAD16_BYTE( "B4", 0x000000, 0x40000, CRC(fbb896f4) SHA1(36fe1199d27c6b106164ed359ddd735a75bcb85b) )
+	ROM_LOAD16_BYTE( "B1", 0x080001, 0x20000, CRC(f11a72ac) SHA1(e3010114abc79e4787f9e68fac40fdc231a22a5f) )
+	ROM_LOAD16_BYTE( "B3", 0x080000, 0x20000, CRC(3f8c0215) SHA1(3d8081c2e2a8dea398b390d5bcde5b1684c136ad) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // z80
+	ROM_LOAD( "B6",  0x00000, 0x10000, CRC(aa7b1880) SHA1(866c057e076178da2395ce0351f7060cccd7bd81) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // m6295
+	ROM_LOAD( "B5",  0x00000, 0x20000, CRC(d6369a39) SHA1(354075ec6eb7861567917f61d2dda23652dbec60) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "B10", 0x00000, 0x20000, CRC(d3a8bd15) SHA1(06fc030d4325aaf181578ae8b7da671190ca9548) )
+	ROM_LOAD( "B7",  0x20000, 0x20000, CRC(787c382e) SHA1(4e1912c891d69a9fbeecfa16ff0fc1377ae5ad8e) )
+	ROM_LOAD( "B9",  0x40000, 0x20000, CRC(aae2cef1) SHA1(3f83cf8b605822561bd0f745f7568cae86d3a3b8) )
+	ROM_LOAD( "B8",  0x60000, 0x20000, CRC(cd30abe0) SHA1(9fb19b9d2bee033fc81a47fb00ab4a59ea77ecb1) )
+
+
+	ROM_REGION16_BE( 0x100000, "sprites", ROMREGION_ERASEFF ) // sprites
+	ROM_LOAD16_BYTE( "B12", 0x000000, 0x40000, CRC(9088d980) SHA1(bc6c24d4b56472a4bd2f2b0999b850fc99b6c556) )
+	ROM_LOAD16_BYTE( "B14", 0x000001, 0x40000, CRC(af943525) SHA1(fe1accca30602c8b5db799c7cb038230b0113810) )
+	ROM_LOAD16_BYTE( "B11", 0x080000, 0x20000, CRC(5da3dfcd) SHA1(02d409c2fff4fdc405f7d5b4e0ca0c43dc6f6899) )
+	ROM_LOAD16_BYTE( "B13", 0x080001, 0x20000, CRC(62f4b64f) SHA1(719f9d4faf2bd04bb47131fe4082def3d809c56b) )
+ROM_END
+
 
 
 //*************************************************************************************************************************
@@ -5646,6 +6023,53 @@ ROM_START( fpointd )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12592.a10", 0x0000, 0x8000, CRC(9a8c11bb) SHA1(399f8e9bdd7aaa4d25817fa9cd4bbf413e5baebe) )
+ROM_END
+
+// Datsu bootlegs
+ROM_START( fpointbl )
+	ROM_REGION( 0x0c0000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "flpoint.003", 0x000000, 0x10000, CRC(4d6df514) SHA1(168aa1629ab7152ba1984605155406b236954a2c) )
+	ROM_LOAD16_BYTE( "flpoint.002", 0x000001, 0x10000, CRC(4dff2ee8) SHA1(bd157d8c168d45e7490a05d5e1e901d9bdda9599) )
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_INVERT ) /* tiles */
+	ROM_LOAD( "flpoint.006", 0x00000, 0x10000, CRC(c539727d) SHA1(56674effe1d273128dddd2ff9e02974ec10f3fff) )
+	ROM_LOAD( "flpoint.005", 0x10000, 0x10000, CRC(82c0b8b0) SHA1(e1e2e721cb8ad53df33065582dc90edeba9c3cab) )
+	ROM_LOAD( "flpoint.004", 0x20000, 0x10000, CRC(522426ae) SHA1(90fd0a19b30a8a61dc4cfa66a64115596333dcc6) )
+
+	ROM_REGION16_BE( 0x20000, "sprites", 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "12596.bin", 0x00001, 0x010000, CRC(4a4041f3) SHA1(4c52b30223d8aa80ccdbb196098cb17e64ad6583) )
+	ROM_LOAD16_BYTE( "12597.bin", 0x00000, 0x010000, CRC(6961e676) SHA1(7639d2da086b57a9a8d6100fdacf40d97d7c4772) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD( "flpoint.001", 0x0000, 0x8000, CRC(c5b8e0fe) SHA1(6cf8c67151d8604326fc6dbf976c0635b452a844) )
+ROM_END
+
+ROM_START( fpointbj )
+	ROM_REGION( 0x0c0000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "boot2.003", 0x000000, 0x10000, CRC(6c00d1b0) SHA1(fd0c47b8ca010a64d3ef91980f93854ebc98fbda) )
+	ROM_LOAD16_BYTE( "boot2.002", 0x000001, 0x10000, CRC(c1fcd704) SHA1(697bef464e53fb9891ed15ee2d6210107b693b20) )
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_INVERT ) /* tiles */
+	ROM_LOAD( "flpoint.006", 0x00000, 0x10000, CRC(c539727d) SHA1(56674effe1d273128dddd2ff9e02974ec10f3fff) )
+	ROM_LOAD( "flpoint.005", 0x10000, 0x10000, CRC(82c0b8b0) SHA1(e1e2e721cb8ad53df33065582dc90edeba9c3cab) )
+	ROM_LOAD( "flpoint.004", 0x20000, 0x10000, CRC(522426ae) SHA1(90fd0a19b30a8a61dc4cfa66a64115596333dcc6) )
+
+	ROM_REGION16_BE( 0x20000, "sprites", 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "12596.bin", 0x00001, 0x010000, CRC(4a4041f3) SHA1(4c52b30223d8aa80ccdbb196098cb17e64ad6583) )
+	ROM_LOAD16_BYTE( "12597.bin", 0x00000, 0x010000, CRC(6961e676) SHA1(7639d2da086b57a9a8d6100fdacf40d97d7c4772) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD( "flpoint.001", 0x0000, 0x8000, CRC(c5b8e0fe) SHA1(6cf8c67151d8604326fc6dbf976c0635b452a844) )
+
+	/* stuff below isn't used but loaded because it was on the board .. */
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s129.1",  0x0000, 0x0100, CRC(a7c22d96) SHA1(160deae8053b09c09328325246598b3518c7e20b) )
+	ROM_LOAD( "82s123.2",  0x0100, 0x0020, CRC(58bcf8bd) SHA1(e4d3d179b08c0f3424a6bec0f15058fb1b56f8d8) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "fpointbj_gal16v8_1.bin", 0x0000, 0x0117, CRC(ba7f292c) SHA1(c383700d05663c9c5f29d5d04d16b05cd6adceb8) )
+	ROM_LOAD( "fpointbj_gal16v8_3.bin", 0x0200, 0x0117, CRC(ce1ab1e1) SHA1(dcfc0015d8595ee6cb6bb02c95655161a7f3b017) )
+	ROM_LOAD( "fpointbj_gal20v8.bin", 0x0400, 0x019d, NO_DUMP ) /* Protected */
 ROM_END
 
 //*************************************************************************************************************************
@@ -8138,6 +8562,23 @@ DRIVER_INIT_MEMBER(segas16b_state,generic_korean)
 	emu_timer *timer = timer_alloc(TID_ATOMICP_SOUND_IRQ);
 	timer->adjust(attotime::from_hz(10000), 0, attotime::from_hz(10000));
 }
+DRIVER_INIT_MEMBER(segas16b_state, lockonph)
+{
+	init_generic(ROM_BOARD_KOREAN);
+
+	// configure special behaviors for the Korean boards
+	m_disable_screen_blanking = true;
+	m_atomicp_sound_divisor = 1;
+	m_segaic16vid->m_display_enable = 1;
+
+	m_spritepalbase = 0x800; // tiles are 4bpp so sprite base is 0x800 instead of 0x400
+}
+DRIVER_INIT_MEMBER(segas16b_state, generic_bootleg)
+{
+	init_generic(ROM_BOARD_KOREAN);
+	m_disable_screen_blanking = true;
+	m_segaic16vid->m_display_enable = 1;
+}
 
 
 //-------------------------------------------------
@@ -8425,6 +8866,8 @@ GAME( 2008, fantzoneta, fantzone, system16b,           fantzoneta,segas16b_state
 // Custom Korean Board - these probably belong with the bootlegs...
 GAME( 1990, atomicp,    0,        atomicp,             atomicp,  segas16b_state,generic_korean,     ROT0,   "Philko", "Atomic Point (Korea)", 0) // korean clone board..
 GAME( 1990, snapper,    0,        atomicp,             snapper,  segas16b_state,snapper,            ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
+// board marked 'System 4' and has Philko custom chip - various hw changes (4bpp tiles for example)
+GAME( 1991, lockonph,   0,        lockonph,            lockonph, segas16b_state,lockonph,           ROT0,   "Philko", "Lock On (Philko)", MACHINE_IMPERFECT_SOUND ) // Copyright not shown in game, but has 'PHILKO' in the startup warning and tiles / PCB.  1991 is the name entry for the lowest high score.  Clipping issues on left edge in attract look like original game bugs.
 
 // decrypted bootleg / 'suicide repair' sets
 
@@ -8496,6 +8939,11 @@ GAME( 1987, sdibl3,      sdi,      system16b_split,           sdi,      segas16b
 GAME( 1987, sdibl4,      sdi,      system16b_split,           sdi,      segas16b_state,sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 3)", 0 ) // ^
 GAME( 1987, sdibl5,      sdi,      system16b_split,           sdi,      segas16b_state,sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 4)", 0 )
 GAME( 1987, sdibl6,      sdi,      system16b_split,           sdi,      segas16b_state,sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 5)", 0 )
+
+// bootlegs with modified hardware
+GAME( 1989, fpointbl,    fpoint,    fpointbl,    fpointbl, segas16b_state,  generic_bootleg,   ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", 0 )
+GAME( 1989, fpointbj,    fpoint,    fpointbl,    fpointbl, segas16b_state,  generic_bootleg,   ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg)", 0 )
+
 
 
 // ISG 'Selection Master' Type 2006 hardware
@@ -9014,3 +9462,9 @@ GAME(          2006, isgsm,  0,      isgsm,  isgsm,  isgsm_state,isgsm,  ROT0,  
 /* 01 */ // ?? unknown
 /* 02 */ GAME( 2006, tetrbx, isgsm,  isgsm,  tetrbx, isgsm_state,tetrbx, ROT0,   "bootleg (ISG)", "Tetris / Bloxeed (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 )
 /* 03 */ GAME( 2008, shinfz, isgsm,  isgsm,  shinfz, isgsm_state,shinfz, ROT0,   "bootleg (ISG)", "Shinobi / FZ-2006 (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 ) // claims it's released in 2006, but set includes the PS2/S16 remake of Fantasy Zone II which is clearly from 2008
+
+
+
+
+
+

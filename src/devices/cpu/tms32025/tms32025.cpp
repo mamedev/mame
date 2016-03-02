@@ -1806,7 +1806,7 @@ void tms32025_device::state_string_export(const device_state_entry &entry, std::
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "arp%d%c%c%c%cdp%03x  arb%d%c%c%c%c%c%c%c%c%c%c%cpm%d",
+			str = string_format("arp%d%c%c%c%cdp%03x  arb%d%c%c%c%c%c%c%c%c%c%c%cpm%d",
 				(m_STR0 & 0xe000) >> 13,
 				m_STR0 & 0x1000 ? 'O':'.',
 				m_STR0 & 0x0800 ? 'M':'.',

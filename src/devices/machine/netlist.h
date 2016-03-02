@@ -225,9 +225,9 @@ protected:
 		if (entry.index() >= 0)
 		{
 			if (entry.index() & 1)
-				strprintf(str,"%10.6f", *((double *)entry.dataptr()));
+				str = string_format("%10.6f", *((double *)entry.dataptr()));
 			else
-				strprintf(str, "%d", *((netlist_sig_t *)entry.dataptr()));
+				str = string_format("%d", *((netlist_sig_t *)entry.dataptr()));
 		}
 	}
 

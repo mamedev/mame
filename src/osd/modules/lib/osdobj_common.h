@@ -16,6 +16,7 @@
 #include "osdepend.h"
 #include "modules/osdmodule.h"
 #include "modules/font/font_module.h"
+#include "modules/input/input_module.h"
 #include "modules/sound/sound_module.h"
 #include "modules/debugger/debug_module.h"
 #include "modules/netdev/netdev_module.h"
@@ -118,10 +119,10 @@ public:
 	const char *aspect() const { return value(OSDOPTION_ASPECT); }
 	const char *resolution() const { return value(OSDOPTION_RESOLUTION); }
 	const char *view() const { return value(OSDOPTION_VIEW); }
-	const char *screen(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_SCREEN, index);  return value(temp.c_str()); }
-	const char *aspect(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_ASPECT, index); return value(temp.c_str()); }
-	const char *resolution(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_RESOLUTION, index); return value(temp.c_str()); }
-	const char *view(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_VIEW, index); return value(temp.c_str()); }
+	const char *screen(int index) const { return value(string_format("%s%d", OSDOPTION_SCREEN, index).c_str()); }
+	const char *aspect(int index) const { return value(string_format("%s%d", OSDOPTION_ASPECT, index).c_str()); }
+	const char *resolution(int index) const { return value(string_format("%s%d", OSDOPTION_RESOLUTION, index).c_str()); }
+	const char *view(int index) const { return value(string_format("%s%d", OSDOPTION_VIEW, index).c_str()); }
 
 	// full screen options
 	bool switch_res() const { return bool_value(OSDOPTION_SWITCHRES); }
@@ -137,8 +138,8 @@ public:
 	bool gl_pbo() const { return bool_value(OSDOPTION_GL_PBO); }
 	bool gl_glsl() const { return bool_value(OSDOPTION_GL_GLSL); }
 	bool glsl_filter() const { return bool_value(OSDOPTION_GLSL_FILTER); }
-	const char *shader_mame(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_SHADER_MAME, index);  return value(temp.c_str()); }
-	const char *shader_screen(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_SHADER_SCREEN, index);  return value(temp.c_str()); }
+	const char *shader_mame(int index) const { return value(string_format("%s%d", OSDOPTION_SHADER_MAME, index).c_str()); }
+	const char *shader_screen(int index) const { return value(string_format("%s%d", OSDOPTION_SHADER_SCREEN, index).c_str()); }
 
 	// sound options
 	const char *sound() const { return value(OSDOPTION_SOUND); }
@@ -146,7 +147,7 @@ public:
 
 	// CoreAudio specific options
 	const char *audio_output() const { return value(OSDOPTION_AUDIO_OUTPUT); }
-	const char *audio_effect(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_AUDIO_EFFECT, index); return value(temp.c_str()); }
+	const char *audio_effect(int index) const { return value(string_format("%s%d", OSDOPTION_AUDIO_EFFECT, index).c_str()); }
 
 private:
 	static const options_entry s_option_entries[];
@@ -269,6 +270,10 @@ protected:
 	sound_module* m_sound;
 	debug_module* m_debugger;
 	midi_module* m_midi;
+    input_module* m_keyboard_input;
+    input_module* m_mouse_input;
+    input_module* m_lightgun_input;
+    input_module* m_joystick_input;
 private:
 	std::vector<const char *> m_video_names;
 };

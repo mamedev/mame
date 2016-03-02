@@ -31,8 +31,8 @@ public:
 		SLIDER_VEC2
 	};
 
-    bgfx_slider(slider_type type, std::string name, std::string description, void *defaults, void *min, void *max);
-    ~bgfx_slider();
+	bgfx_slider(slider_type type, std::string name, std::string description, void *defaults, void *min, void *max);
+	~bgfx_slider();
 
 	static size_t size(slider_type type);
 	static size_t storage_size(slider_type type);
@@ -41,9 +41,9 @@ protected:
 	slider_type m_type;
 	std::string m_name;
 	std::string m_description;
-	char*	m_data;
-	char*	m_min;
-	char*	m_max;
+	char*   m_data;
+	char*   m_min;
+	char*   m_max;
 };
 
 #endif // __DRAWBGFX_SLIDER__

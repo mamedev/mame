@@ -149,6 +149,7 @@ void machine_manager::schedule_new_driver(const game_driver &driver)
 void machine_manager::update_machine()
 {
 	m_lua->set_machine(m_machine);
+	m_lua->attach_notifiers();
 }
 
 

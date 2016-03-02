@@ -3327,6 +3327,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/snk68.cpp",
 	MAME_DIR .. "src/mame/includes/snk68.h",
 	MAME_DIR .. "src/mame/video/snk68.cpp",
+	MAME_DIR .. "src/mame/video/snk68_spr.cpp",
+
 }
 
 createMAMEProjects(_target, _subtarget, "sony")

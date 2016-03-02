@@ -1014,131 +1014,131 @@ void ppc_device::state_string_export(const device_state_entry &entry, std::strin
 	switch (entry.index())
 	{
 		case PPC_F0:
-			strprintf(str, "%12f", m_core->f[0]);
+			str = string_format("%12f", m_core->f[0]);
 			break;
 
 		case PPC_F1:
-			strprintf(str, "%12f", m_core->f[1]);
+			str = string_format("%12f", m_core->f[1]);
 			break;
 
 		case PPC_F2:
-			strprintf(str, "%12f", m_core->f[2]);
+			str = string_format("%12f", m_core->f[2]);
 			break;
 
 		case PPC_F3:
-			strprintf(str, "%12f", m_core->f[3]);
+			str = string_format("%12f", m_core->f[3]);
 			break;
 
 		case PPC_F4:
-			strprintf(str, "%12f", m_core->f[4]);
+			str = string_format("%12f", m_core->f[4]);
 			break;
 
 		case PPC_F5:
-			strprintf(str, "%12f", m_core->f[5]);
+			str = string_format("%12f", m_core->f[5]);
 			break;
 
 		case PPC_F6:
-			strprintf(str, "%12f", m_core->f[6]);
+			str = string_format("%12f", m_core->f[6]);
 			break;
 
 		case PPC_F7:
-			strprintf(str, "%12f", m_core->f[7]);
+			str = string_format("%12f", m_core->f[7]);
 			break;
 
 		case PPC_F8:
-			strprintf(str, "%12f", m_core->f[8]);
+			str = string_format("%12f", m_core->f[8]);
 			break;
 
 		case PPC_F9:
-			strprintf(str, "%12f", m_core->f[9]);
+			str = string_format("%12f", m_core->f[9]);
 			break;
 
 		case PPC_F10:
-			strprintf(str, "%12f", m_core->f[10]);
+			str = string_format("%12f", m_core->f[10]);
 			break;
 
 		case PPC_F11:
-			strprintf(str, "%12f", m_core->f[11]);
+			str = string_format("%12f", m_core->f[11]);
 			break;
 
 		case PPC_F12:
-			strprintf(str, "%12f", m_core->f[12]);
+			str = string_format("%12f", m_core->f[12]);
 			break;
 
 		case PPC_F13:
-			strprintf(str, "%12f", m_core->f[13]);
+			str = string_format("%12f", m_core->f[13]);
 			break;
 
 		case PPC_F14:
-			strprintf(str, "%12f", m_core->f[14]);
+			str = string_format("%12f", m_core->f[14]);
 			break;
 
 		case PPC_F15:
-			strprintf(str, "%12f", m_core->f[15]);
+			str = string_format("%12f", m_core->f[15]);
 			break;
 
 		case PPC_F16:
-			strprintf(str, "%12f", m_core->f[16]);
+			str = string_format("%12f", m_core->f[16]);
 			break;
 
 		case PPC_F17:
-			strprintf(str, "%12f", m_core->f[17]);
+			str = string_format("%12f", m_core->f[17]);
 			break;
 
 		case PPC_F18:
-			strprintf(str, "%12f", m_core->f[18]);
+			str = string_format("%12f", m_core->f[18]);
 			break;
 
 		case PPC_F19:
-			strprintf(str, "%12f", m_core->f[19]);
+			str = string_format("%12f", m_core->f[19]);
 			break;
 
 		case PPC_F20:
-			strprintf(str, "%12f", m_core->f[20]);
+			str = string_format("%12f", m_core->f[20]);
 			break;
 
 		case PPC_F21:
-			strprintf(str, "%12f", m_core->f[21]);
+			str = string_format("%12f", m_core->f[21]);
 			break;
 
 		case PPC_F22:
-			strprintf(str, "%12f", m_core->f[22]);
+			str = string_format("%12f", m_core->f[22]);
 			break;
 
 		case PPC_F23:
-			strprintf(str, "%12f", m_core->f[23]);
+			str = string_format("%12f", m_core->f[23]);
 			break;
 
 		case PPC_F24:
-			strprintf(str, "%12f", m_core->f[24]);
+			str = string_format("%12f", m_core->f[24]);
 			break;
 
 		case PPC_F25:
-			strprintf(str, "%12f", m_core->f[25]);
+			str = string_format("%12f", m_core->f[25]);
 			break;
 
 		case PPC_F26:
-			strprintf(str, "%12f", m_core->f[26]);
+			str = string_format("%12f", m_core->f[26]);
 			break;
 
 		case PPC_F27:
-			strprintf(str, "%12f", m_core->f[27]);
+			str = string_format("%12f", m_core->f[27]);
 			break;
 
 		case PPC_F28:
-			strprintf(str, "%12f", m_core->f[28]);
+			str = string_format("%12f", m_core->f[28]);
 			break;
 
 		case PPC_F29:
-			strprintf(str, "%12f", m_core->f[29]);
+			str = string_format("%12f", m_core->f[29]);
 			break;
 
 		case PPC_F30:
-			strprintf(str, "%12f", m_core->f[30]);
+			str = string_format("%12f", m_core->f[30]);
 			break;
 
 		case PPC_F31:
-			strprintf(str, "%12f", m_core->f[31]);
+			str = string_format("%12f", m_core->f[31]);
 			break;
 	}
 }

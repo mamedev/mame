@@ -224,7 +224,7 @@ struct vertex
 {
 	float       x, y, z;                    // X,Y,Z coordinates
 	float       rhw;                        // RHW when no HLSL, padding when HLSL
-	D3DCOLOR	color;                      // diffuse color
+	D3DCOLOR    color;                      // diffuse color
 	float       u0, v0;                     // texture stage 0 coordinates
 	float       u1, v1;                     // additional info for vector data
 };

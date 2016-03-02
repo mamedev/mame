@@ -17,7 +17,7 @@
     1x MC1458P (u10)(sound)
     1x TDA2003 (u8)(sound)
     1x oscillator 10.000MHz (QZ1)
-    1x oscillator 16.000000 (QZ2) 
+    1x oscillator 16.000000 (QZ2)
   ROMs:
     1x AT27C020 (1)
     2x M27C4001 (2,3)

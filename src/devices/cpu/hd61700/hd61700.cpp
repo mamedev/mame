@@ -183,7 +183,7 @@ void hd61700_cpu_device::device_start()
 
 	for (int ireg=0; ireg<32; ireg++)
 	{
-		state_add(HD61700_MAINREG + ireg, strformat("R%d", ireg).c_str(), m_regmain[ireg]).callimport().callexport().formatstr("%02X");
+		state_add(HD61700_MAINREG + ireg, string_format("R%d", ireg).c_str(), m_regmain[ireg]).callimport().callexport().formatstr("%02X");
 	}
 
 	state_add(STATE_GENPC, "curpc", m_curpc).callimport().callexport().formatstr("%8s").noshow();
@@ -275,7 +275,7 @@ void hd61700_cpu_device::state_string_export(const device_state_entry &entry, st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c",
 				m_flags & FLAG_Z   ? '.' : 'Z',
 				m_flags & FLAG_C   ? 'C' : '.',
 				m_flags & FLAG_LZ  ? '.' : 'L',

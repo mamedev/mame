@@ -55,7 +55,7 @@ protected:
 	UINT8               m_rx_buf[0x80];
 	UINT8               m_keyb_tx;
 	UINT8               m_keyb_rx;
-	bool				m_key_avail;
+	bool                m_key_avail;
 };
 
 

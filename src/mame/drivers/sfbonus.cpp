@@ -143,7 +143,7 @@ Model No. S2000-B
 Graphics: HM86171
      OSC: 25.000MHz, 12.000MHz & 4.9152MHz
    Sound: OKI M6295
-   Other: XILINX XC9536XL (socketted)
+   Other: XILINX XC9536XL (socketed)
 
 HM86171-120 - HMC 28 pin DIP Color Palette RAMDAC
    ULN2003A - 16 pin DIP Seven Darlington Arrays
@@ -195,7 +195,7 @@ Model No. S2000C SALTIRE
   +----------+-------+-------------------------------+
 
 Basically the same as the VCG-1 SALTIRE below, but the
-XILINX chip is socketted and no H1 or H2 connector.
+XILINX chip is socketed and no H1 or H2 connector.
 
 ------------------------------------------------------------
 

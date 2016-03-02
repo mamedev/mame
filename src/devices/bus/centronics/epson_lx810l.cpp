@@ -132,7 +132,7 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx810l )
 	MCFG_UPD7810_CO0(WRITELINE(epson_lx810l_t, co0_w))
 	MCFG_UPD7810_CO1(WRITELINE(epson_lx810l_t, co1_w))
 
-//	MCFG_DEFAULT_LAYOUT(layout_lx800)
+//  MCFG_DEFAULT_LAYOUT(layout_lx800)
 
 	/* video hardware (simulates paper) */
 	MCFG_SCREEN_ADD("screen", RASTER)

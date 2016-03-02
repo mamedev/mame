@@ -1015,7 +1015,7 @@ void scudsp_cpu_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%s%s%s%c%c%c%c%c%s%s%s",
+			str = string_format("%s%s%s%c%c%c%c%c%s%s%s",
 				m_flags & 0x4000000 ? "PR":"..",
 				m_flags & 0x2000000 ? "EP":"..",
 				m_flags & 0x800000 ? "T0":"..",

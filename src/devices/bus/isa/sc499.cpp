@@ -431,12 +431,10 @@ const char *sc499_device::cpu_context()
  logerror - log an error message (w/o device tags)
  -------------------------------------------------*/
 
-void sc499_device::logerror(const char *format, ...) const
+template <typename Format, typename... Params>
+void sc499_device::logerror(Format &&fmt, Params &&... args) const
 {
-	va_list arg;
-	va_start(arg, format);
-	machine().vlogerror(format, arg);
-	va_end(arg);
+	machine().logerror(std::forward<Format>(fmt), std::forward<Params>(args)...);
 }
 
 /*-------------------------------------------------

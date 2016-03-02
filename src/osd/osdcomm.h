@@ -88,11 +88,7 @@ using INT64 = signed long long;
 #endif
 
 /* pointer-sized values */
-#ifdef PTR64
-using FPTR = UINT64;
-#else
-using FPTR = UINT32;
-#endif
+using FPTR = uintptr_t;
 
 
 

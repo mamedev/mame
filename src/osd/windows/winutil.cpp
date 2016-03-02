@@ -11,6 +11,9 @@
 #include <windows.h>
 #include <direct.h>
 
+// MAME headers
+#include "emu.h"
+
 // MAMEOS headers
 #include "winutil.h"
 #include "strconv.h"
@@ -145,4 +148,62 @@ HMODULE WINAPI GetModuleHandleUni()
 	MEMORY_BASIC_INFORMATION mbi;
 	VirtualQuery((LPCVOID)GetModuleHandleUni, &mbi, sizeof(mbi));
 	return (HMODULE)mbi.AllocationBase;
+}
+
+//-----------------------------------------------------------
+//  Lazy loaded function using LoadLibrary / GetProcAddress
+//-----------------------------------------------------------
+
+lazy_loaded_function::lazy_loaded_function(const char * name, const wchar_t* dll_name)
+	: lazy_loaded_function(name, &dll_name, 1)
+{
+}
+
+lazy_loaded_function::lazy_loaded_function(const char * name, const wchar_t** dll_names, int dll_count)
+	: m_name(name), m_initialized(false), m_pfn(nullptr)
+{
+	for (int i = 0; i < dll_count; i++)
+		m_dll_names.push_back(std::wstring(dll_names[i]));
+}
+
+lazy_loaded_function::~lazy_loaded_function()
+{
+	if (m_module != nullptr)
+	{
+		FreeLibrary(m_module);
+		m_module = nullptr;
+	}
+}
+
+int lazy_loaded_function::initialize()
+{
+	if (m_module == nullptr)
+	{
+		for (int i = 0; i < m_dll_names.size(); i++)
+		{
+			m_module = LoadLibraryW(m_dll_names[i].c_str());
+			if (m_module != NULL)
+				break;
+		}
+
+		if (m_module == NULL)
+			return ERROR_DLL_NOT_FOUND;
+	}
+
+	if (m_pfn == nullptr)
+	{
+		m_pfn = GetProcAddress(m_module, m_name.c_str());
+		if (m_pfn == nullptr)
+			return ERROR_NOT_FOUND;
+	}
+
+	m_initialized = true;
+
+	return 0;
+}
+
+void lazy_loaded_function::check_init()
+{
+	if (!m_initialized)
+		fatalerror("Attempt to use function pointer for function %s prior to init!", name());
 }

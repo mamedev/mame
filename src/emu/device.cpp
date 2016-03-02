@@ -783,42 +783,6 @@ finder_base *device_t::register_auto_finder(finder_base &autodev)
 	return old;
 }
 
-void device_t::popmessage(const char *format, ...) const
-{
-	// if the format is NULL, it is a signal to clear the popmessage
-	if (format == nullptr)
-		machine().ui().popup_time(0, " ");
-
-	// otherwise, generate the buffer and call the UI to display the message
-	else
-	{
-		std::string temp;
-		va_list arg;
-
-		// dump to the buffer
-		va_start(arg, format);
-		strvprintf(temp, format, arg);
-		va_end(arg);
-
-		// pop it in the UI
-		if (m_machine!=nullptr) machine().ui().popup_time(temp.length() / 40 + 2, "%s", temp.c_str());
-	}
-}
-
-void device_t::logerror(const char *format, ...) const
-{
-	va_list arg;
-	va_start(arg, format);
-	vlogerror(format, arg);
-	va_end(arg);
-}
-void device_t::vlogerror(const char *format, va_list args) const
-{
-	std::string fmt("[");
-	fmt += tag() + std::string("] ") + format;
-	if (m_machine!=nullptr) machine().vlogerror(fmt.c_str(), args);
-}
-
 //**************************************************************************
 //  LIVE DEVICE INTERFACES
 //**************************************************************************

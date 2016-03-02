@@ -3,7 +3,7 @@
 /******************************************************************************
 
     Fidelity Electronics 6502 based board driver
-    
+
 ******************************************************************************
 
 Champion Sensory Chess Challenger (CSC)
@@ -286,7 +286,7 @@ public:
 	// devices/pointers
 	optional_device<pia6821_device> m_6821pia;
 	optional_device<generic_slot_device> m_cart;
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
 
@@ -309,7 +309,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
 	DECLARE_READ8_MEMBER(sc12_input_r);
 	DECLARE_READ8_MEMBER(sc12_cart_r);
-	
+
 	// 6080/6092/6093 (Excellence)
 	DECLARE_INPUT_CHANGED_MEMBER(fexcelv_bankswitch);
 	DECLARE_READ8_MEMBER(fexcelv_speech_r);
@@ -331,7 +331,7 @@ void fidel6502_state::csc_prepare_display()
 {
 	// 7442 0-8: led select, input mux
 	m_inp_mux = 1 << m_led_select & 0x3ff;
-	
+
 	// 7442 9: speaker out
 	m_speaker->level_w(m_inp_mux >> 9 & 1);
 
@@ -374,7 +374,7 @@ WRITE8_MEMBER(fidel6502_state::csc_pia0_pb_w)
 
 	// d1: TSI START line
 	m_speech->start_w(data >> 1 & 1);
-	
+
 	// d4: lower TSI volume
 	m_speech->set_output_gain(0, (data & 0x10) ? 0.5 : 1.0);
 }
@@ -391,7 +391,7 @@ READ8_MEMBER(fidel6502_state::csc_pia0_pb_r)
 	// d5: button row 8 (active low)
 	// d6,d7: language switches
 	data |= (~read_inputs(9) >> 3 & 0x20) | (~m_inp_matrix[9]->read() << 6 & 0xc0);
-	
+
 	return data;
 }
 
@@ -520,7 +520,7 @@ WRITE8_MEMBER(fidel6502_state::fexcel_ttl_w)
 	// a0-a2,d0: 74259(1)
 	UINT8 mask = 1 << offset;
 	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
-	
+
 	// 74259 Q0-Q3: 7442 a0-a3
 	// 7442 0-8: led data, input mux
 	UINT16 sel = 1 << (m_led_select & 0xf) & 0x3ff;
@@ -536,7 +536,7 @@ WRITE8_MEMBER(fidel6502_state::fexcel_ttl_w)
 	// a0-a2,d1: digit segment data (model 6093)
 	m_7seg_data = (m_7seg_data & ~mask) | ((data & 2) ? mask : 0);
 	UINT8 seg_data = BITSWAP8(m_7seg_data,0,1,3,2,7,5,6,4);
-	
+
 	// update display: 4 7seg leds, 2*8 chessboard leds
 	for (int i = 0; i < 6; i++)
 		m_display_state[i] = (led_sel >> i & 1) ? ((i < 2) ? led_data : seg_data) : 0;
@@ -550,7 +550,7 @@ WRITE8_MEMBER(fidel6502_state::fexcel_ttl_w)
 	{
 		// a0-a2,d2: 74259(2) to speech board
 		m_speech_data = (m_speech_data & ~mask) | ((data & 4) ? mask : 0);
-	
+
 		// 74259 Q6: TSI ROM A11
 		m_speech->force_update(); // update stream to now
 		m_speech_bank = (m_speech_bank & ~1) | (m_speech_data >> 6 & 1);
@@ -566,7 +566,7 @@ READ8_MEMBER(fidel6502_state::fexcel_ttl_r)
 {
 	// a0-a2,d6: from speech board: language switches and TSI BUSY line, otherwise tied to VCC
 	UINT8 d6 = (read_safe(m_inp_matrix[9], 0xff) >> offset & 1) ? 0x40 : 0;
-	
+
 	// a0-a2,d7: multiplexed inputs (active low)
 	return d6 | ((read_inputs(9) >> offset & 1) ? 0 : 0x80);
 }

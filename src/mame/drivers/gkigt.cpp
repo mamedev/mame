@@ -51,7 +51,7 @@ MULTIMEDIA LITE boards:
     32 Macrocells
     32 I/O Pins
      5 Dedicated Inputs
-  labeled MML1 REV A (socketted) for EPROM type (4 32pin eprom sockets)
+  labeled MML1 REV A (socketed) for EPROM type (4 32pin eprom sockets)
   labeled MML2 REV A (surface mounted) for SIMM type (1 72pin SIMM socket)
  16.9344MHz OSC
  Yamaha YMZ280-B sound chip

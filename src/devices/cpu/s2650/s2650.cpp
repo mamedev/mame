@@ -881,7 +881,7 @@ void s2650_device::state_string_export(const device_state_entry &entry, std::str
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				m_psu & 0x80 ? 'S':'.',
 				m_psu & 0x40 ? 'O':'.',
 				m_psu & 0x20 ? 'I':'.',

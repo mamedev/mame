@@ -11,13 +11,13 @@
 
 WRITE8_MEMBER( nmk004_device::write )
 {
-	space.machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 	to_nmk004 = data;
 }
 
 READ8_MEMBER( nmk004_device::read )
 {
-	space.machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 	return to_main;
 }
 
@@ -31,31 +31,25 @@ WRITE8_MEMBER(nmk004_device::nmk004_port4_w)
 
 WRITE8_MEMBER(nmk004_device::nmk004_oki0_bankswitch_w)
 {
-	UINT8 *rom = memregion(":oki1")->base();
-
-	data++; // so that 3 wraps around
 	data &= 3;
-	memcpy(rom + 0x20000,rom + 0x20000 + data * 0x20000,0x20000);
+	membank(":okibank1")->set_entry(data);
 }
 
 WRITE8_MEMBER(nmk004_device::nmk004_oki1_bankswitch_w)
 {
-	UINT8 *rom = memregion(":oki2")->base();
-
-	data++; // so that 3 wraps around
 	data &= 3;
-	memcpy(rom + 0x20000,rom + 0x20000 + data * 0x20000,0x20000);
+	membank(":okibank2")->set_entry(data);
 }
 
 READ8_MEMBER(nmk004_device::nmk004_tonmk004_r)
 {
-	space.machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 	return to_nmk004;
 }
 
 WRITE8_MEMBER(nmk004_device::nmk004_tomain_w)
 {
-	space.machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 	to_main = data;
 }
 
@@ -113,6 +107,8 @@ nmk004_device::nmk004_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 void nmk004_device::device_start()
 {
+	membank(":okibank1")->configure_entries(0, 4, memregion(":oki1")->base() + 0x20000, 0x20000);
+	membank(":okibank2")->configure_entries(0, 4, memregion(":oki2")->base() + 0x20000, 0x20000);
 }
 
 //-------------------------------------------------

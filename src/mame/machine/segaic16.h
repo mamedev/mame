@@ -58,6 +58,7 @@ public:
 
 	// palette helpers
 	DECLARE_WRITE16_MEMBER( paletteram_w );
+	DECLARE_WRITE16_MEMBER( philko_paletteram_w );
 
 protected:
 	// internal helpers

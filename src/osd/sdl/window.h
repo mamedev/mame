@@ -17,17 +17,14 @@
 
 #include "modules/osdwindow.h"
 
-// I don't like this, but we're going to get spurious "cast to integer of different size" warnings on
-// at least one architecture without doing it this way.
-#ifdef PTR64
-typedef UINT64 HashT;
-#else
-typedef UINT32 HashT;
-#endif
+#include <cstdint>
+
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
+
+typedef uintptr_t HashT;
 
 #define OSDWORK_CALLBACK(name)  void *name(void *param, ATTR_UNUSED int threadid)
 

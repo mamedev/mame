@@ -619,7 +619,7 @@ UINT16 hp_hybrid_cpu_device::execute_one_sub(UINT16 opcode)
 void hp_hybrid_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	if (entry.index() == STATE_GENFLAGS) {
-		strprintf(str, "%s %s %c %c",
+		str = string_format("%s %s %c %c",
 					BIT(m_flags , HPHYBRID_DB_BIT) ? "Db":"..",
 					BIT(m_flags , HPHYBRID_CB_BIT) ? "Cb":"..",
 					BIT(m_flags , HPHYBRID_O_BIT) ? 'O':'.',
@@ -673,7 +673,7 @@ UINT16 hp_hybrid_cpu_device::RM(UINT32 addr)
 						return RIO(CURRENT_PA , addr_wo_bsc - HP_REG_R4_ADDR);
 
 				case HP_REG_IV_ADDR:
-                                        return m_reg_IV;
+										return m_reg_IV;
 
 				case HP_REG_PA_ADDR:
 						return CURRENT_PA;

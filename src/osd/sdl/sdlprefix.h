@@ -59,10 +59,6 @@
 #define SDLMAME_BSD 1
 #endif
 
-#if defined(__OS2__)
-#define SDLMAME_OS2 1
-#endif
-
 #if defined(__HAIKU__)
 #define SDLMAME_HAIKU 1
 #define SDLMAME_NO64BITIO 1

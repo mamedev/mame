@@ -3591,7 +3591,7 @@ void z80_device::execute_set_input(int inputnum, int state)
 	case Z80_INPUT_LINE_WAIT:
 		m_wait_state = state;
 		break;
-	
+
 	default:
 		break;
 	}
@@ -3658,7 +3658,7 @@ void z80_device::state_string_export(const device_state_entry &entry, std::strin
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				F & 0x80 ? 'S':'.',
 				F & 0x40 ? 'Z':'.',
 				F & 0x20 ? 'Y':'.',

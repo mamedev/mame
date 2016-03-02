@@ -1173,40 +1173,40 @@ void m68000_base_device::state_string_export(const device_state_entry &entry, st
 	switch (entry.index())
 	{
 		case M68K_FP0:
-			strprintf(str,"%f", fx80_to_double(REG_FP(this)[0]));
+			str = string_format("%f", fx80_to_double(REG_FP(this)[0]));
 			break;
 
 		case M68K_FP1:
-			strprintf(str,"%f", fx80_to_double(REG_FP(this)[1]));
+			str = string_format("%f", fx80_to_double(REG_FP(this)[1]));
 			break;
 
 		case M68K_FP2:
-			strprintf(str,"%f", fx80_to_double(REG_FP(this)[2]));
+			str = string_format("%f", fx80_to_double(REG_FP(this)[2]));
 			break;
 
 		case M68K_FP3:
-			strprintf(str,"%f", fx80_to_double(REG_FP(this)[3]));
+			str = string_format("%f", fx80_to_double(REG_FP(this)[3]));
 			break;
 
 		case M68K_FP4:
-			strprintf(str,"%f", fx80_to_double(REG_FP(this)[4]));
+			str = string_format("%f", fx80_to_double(REG_FP(this)[4]));
 			break;
 
 		case M68K_FP5:
-			strprintf(str,"%f", fx80_to_double(REG_FP(this)[5]));
+			str = string_format("%f", fx80_to_double(REG_FP(this)[5]));
 			break;
 
 		case M68K_FP6:
-			strprintf(str,"%f", fx80_to_double(REG_FP(this)[6]));
+			str = string_format("%f", fx80_to_double(REG_FP(this)[6]));
 			break;
 
 		case M68K_FP7:
-			strprintf(str,"%f", fx80_to_double(REG_FP(this)[7]));
+			str = string_format("%f", fx80_to_double(REG_FP(this)[7]));
 			break;
 
 		case STATE_GENFLAGS:
 			sr = m68ki_get_sr(this);
-			strprintf(str,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				sr & 0x8000 ? 'T':'.',
 				sr & 0x4000 ? 't':'.',
 				sr & 0x2000 ? 'S':'.',
@@ -1735,10 +1735,10 @@ void m68000_base_device::define_state(void)
 		state_add(M68K_MSP,    "MSP",       iotemp).callimport().callexport();
 
 	for (int regnum = 0; regnum < 8; regnum++) {
-		state_add(M68K_D0 + regnum, strformat("D%d", regnum).c_str(), dar[regnum]);
+		state_add(M68K_D0 + regnum, string_format("D%d", regnum).c_str(), dar[regnum]);
 	}
 	for (int regnum = 0; regnum < 8; regnum++) {
-		state_add(M68K_A0 + regnum, strformat("A%d", regnum).c_str(), dar[8 + regnum]);
+		state_add(M68K_A0 + regnum, string_format("A%d", regnum).c_str(), dar[8 + regnum]);
 	}
 
 	state_add(M68K_PREF_ADDR,  "PREF_ADDR", pref_addr).mask(addrmask);
@@ -1760,7 +1760,7 @@ void m68000_base_device::define_state(void)
 	if (cpu_type & MASK_030_OR_LATER)
 	{
 		for (int regnum = 0; regnum < 8; regnum++) {
-			state_add(M68K_FP0 + regnum, strformat("FP%d", regnum).c_str(), iotemp).callimport().callexport().formatstr("%10s");
+			state_add(M68K_FP0 + regnum, string_format("FP%d", regnum).c_str(), iotemp).callimport().callexport().formatstr("%10s");
 		}
 		state_add(M68K_FPSR, "FPSR", fpsr);
 		state_add(M68K_FPCR, "FPCR", fpcr);

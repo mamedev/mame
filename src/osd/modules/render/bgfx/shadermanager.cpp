@@ -20,22 +20,22 @@
 
 shader_manager::~shader_manager()
 {
-    for (std::pair<std::string, bgfx::ShaderHandle> shader : m_shaders)
-    {
-        bgfx::destroyShader(shader.second);
-    }
-    m_shaders.clear();
+	for (std::pair<std::string, bgfx::ShaderHandle> shader : m_shaders)
+	{
+		bgfx::destroyShader(shader.second);
+	}
+	m_shaders.clear();
 }
 
 bgfx::ShaderHandle shader_manager::shader(std::string name)
 {
-    std::map<std::string, bgfx::ShaderHandle>::iterator iter = m_shaders.find(name);
-    if (iter != m_shaders.end())
-    {
-        return iter->second;
-    }
+	std::map<std::string, bgfx::ShaderHandle>::iterator iter = m_shaders.find(name);
+	if (iter != m_shaders.end())
+	{
+		return iter->second;
+	}
 
-    return load_shader(name);
+	return load_shader(name);
 }
 
 bgfx::ShaderHandle shader_manager::load_shader(std::string name) {
@@ -65,9 +65,9 @@ bgfx::ShaderHandle shader_manager::load_shader(std::string name) {
 
 	bgfx::ShaderHandle handle = bgfx::createShader(load_mem(shader_path + name + ".bin"));
 
-    m_shaders[name] = handle;
+	m_shaders[name] = handle;
 
-    return handle;
+	return handle;
 }
 
 const bgfx::Memory* shader_manager::load_mem(std::string name) {

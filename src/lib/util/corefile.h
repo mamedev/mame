@@ -120,6 +120,9 @@ int CLIB_DECL core_fprintf(core_file *f, const char *fmt, ...) ATTR_PRINTF(2,3);
 /* file truncation */
 file_error core_truncate(core_file *f, UINT64 offset);
 
+/* flush file buffers */
+file_error core_fflush(core_file *f);
+
 
 
 /* ----- filename utilities ----- */

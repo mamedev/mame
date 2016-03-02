@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-    uiinput.c
+    uiinput.cpp
 
     Internal MAME user interface input state.
 ***************************************************************************/
@@ -326,8 +326,8 @@ void ui_input_manager::push_char_event(render_target* target, unicode_char ch)
 }
 
 /*-------------------------------------------------
-	push_mouse_wheel_event - pushes a mouse 
-	wheel event to the specified render_target
+    push_mouse_wheel_event - pushes a mouse
+    wheel event to the specified render_target
 -------------------------------------------------*/
 
 void ui_input_manager::push_mouse_wheel_event(render_target *target, INT32 x, INT32 y, short delta, int ucNumLines)

@@ -164,9 +164,9 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 	// create the full name
 	std::string totalname;
 	if (tag != nullptr)
-		strprintf(totalname, "%s/%s/%X/%s", module, tag, index, name);
+		totalname = string_format("%s/%s/%X/%s", module, tag, index, name);
 	else
-		strprintf(totalname, "%s/%X/%s", module, index, name);
+		totalname = string_format("%s/%X/%s", module, index, name);
 
 	// look for duplicates and an entry to insert in front of
 	state_entry *insert_after = nullptr;

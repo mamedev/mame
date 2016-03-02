@@ -670,6 +670,30 @@ static INPUT_PORTS_START( kdeadeye )
 
 INPUT_PORTS_END
 
+/* Wedding Rhapsody */
+
+static INPUT_PORTS_START( weddingr )
+	PORT_INCLUDE( konamigv )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Answer 3/Zoom In")
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Answer 4/Zoom Out")
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Answer 1/Pan Left")
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Answer 2/Pan Right")
+	PORT_BIT( 0x00000070, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Answer 3/Zoom In")
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("Answer 4/Zoom Out")
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Answer 1/Pan Left")
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Answer 2/Pan Right")
+	PORT_BIT( 0x00000070, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("P3_P4")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+INPUT_PORTS_END
+
 #define GV_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "999a01.7e",   0x0000000, 0x080000, CRC(ad498d2d) SHA1(02a82a2fe1fba0404517c3602324bfa64e23e478) )
@@ -829,7 +853,7 @@ GAME( 1996, lacrazyc, konamigv, konamigv, konamigv, driver_device,  0,        RO
 GAME( 1996, susume,   lacrazyc, konamigv, konamigv, driver_device,  0,        ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 Japan 1.20)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, btchamp,  konamigv, btchamp,  btchamp,  driver_device,  0,        ROT0, "Konami", "Beat the Champ (GV053 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, driver_device,  0,        ROT0, "Konami", "Dead Eye (GV054 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, weddingr, konamigv, konamigv, konamigv, driver_device,  0,        ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, weddingr, konamigv, konamigv, weddingr, driver_device,  0,        ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, tmosh,    konamigv, tmosh,    konamigv, driver_device,  0,        ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GQ673 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1997, tmoshs,   konamigv, tmosh,    konamigv, driver_device,  0,        ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version (GE755 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1997, tmoshsp,  konamigv, tmosh,    konamigv, driver_device,  0,        ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

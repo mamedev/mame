@@ -64,7 +64,7 @@ public:
 	DECLARE_MACHINE_RESET(blmbycar);
 	DECLARE_MACHINE_START(watrball);
 	DECLARE_MACHINE_RESET(watrball);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

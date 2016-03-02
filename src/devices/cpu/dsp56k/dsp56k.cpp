@@ -347,7 +347,7 @@ void dsp56k_device::state_string_export(const device_state_entry &entry, std::st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%s%s %s%s%s%s%s%s%s%s %s%s",
+			str = string_format("%s%s %s%s%s%s%s%s%s%s %s%s",
 				/* Status Register */
 				LF_bit(cpustate) ? "L" : ".",
 				FV_bit(cpustate) ? "F" : ".",
@@ -367,19 +367,19 @@ void dsp56k_device::state_string_export(const device_state_entry &entry, std::st
 			break;
 
 		case DSP56K_X:
-			strprintf(str, "%04x %04x", X1, X0);
+			str = string_format("%04x %04x", X1, X0);
 			break;
 
 		case DSP56K_Y:
-			strprintf(str, "%04x %04x", Y1, Y0);
+			str = string_format("%04x %04x", Y1, Y0);
 			break;
 
 		case DSP56K_A:
-			strprintf(str, "%02x %04x %04x", A2, A1, A0);
+			str = string_format("%02x %04x %04x", A2, A1, A0);
 			break;
 
 		case DSP56K_B:
-			strprintf(str, "%02x %04x %04x", B2, B1, B0);
+			str = string_format("%02x %04x %04x", B2, B1, B0);
 			break;
 	}
 }

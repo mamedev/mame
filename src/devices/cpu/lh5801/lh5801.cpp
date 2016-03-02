@@ -147,7 +147,7 @@ void lh5801_cpu_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				m_t&0x80?'1':'0',
 				m_t&0x40?'1':'0',
 				m_t&0x20?'1':'0',

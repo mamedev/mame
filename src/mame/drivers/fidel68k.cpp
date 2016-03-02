@@ -3,7 +3,7 @@
 /******************************************************************************
 
     Fidelity Electronics 68000 based board driver
-    
+
     TODO:
     - how does dual-CPU work?
     - IRQ level/timing is unknown
@@ -78,7 +78,7 @@ V11: 68060, 2MB h.RAM, high speed
 
 V7 Hardware info:
 -----------------
-- MC68020RC25E CPU, 25MHz XTAL
+- MC68020RC25E CPU, 25MHz XTAL - this PCB was overclocked, original was 20MHz so let's use that
 - 4*AS7C164-20PC 8KB SRAM, 2*KM684000ALG-7L 512KB CMOS SRAM
 - 2*27C512? 64KB EPROM, 2*HM6264LP-15 8KB SRAM, 2*AT28C64B 8KB EEPROM, 2*GAL16V8C
 - same as 6114: M82C51A, NE555, SN74HC4060, module slot, chessboard, ..
@@ -409,7 +409,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( eagv7, eag )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M68020, XTAL_25MHz)
+	MCFG_CPU_REPLACE("maincpu", M68020, XTAL_20MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
 MACHINE_CONFIG_END
