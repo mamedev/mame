@@ -1874,7 +1874,7 @@ static void execute_dump(running_machine &machine, int ref, int params, const ch
 		output.clear();
 
 		/* print the address */
-		util::stream_format(output, "%*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(i));
+		util::stream_format(output, "%0*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(i));
 
 		/* print the bytes */
 		for (j = 0; j < 16; j += width)
@@ -1885,7 +1885,7 @@ static void execute_dump(running_machine &machine, int ref, int params, const ch
 				if (debug_cpu_translate(*space, TRANSLATE_READ_DEBUG, &curaddr))
 				{
 					UINT64 value = debug_read_memory(*space, i + j, width, TRUE);
-					util::stream_format(output, " %*X", width * 2, value);
+					util::stream_format(output, " %0*X", width * 2, value);
 				}
 				else
 					util::stream_format(output, " %.*s", width * 2, "****************");
@@ -2518,7 +2518,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 		output.clear();
 
 		/* print the address */
-		stream_format(output, "%*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(pcbyte));
+		stream_format(output, "%0*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(pcbyte));
 
 		/* make sure we can translate the address */
 		tempaddr = pcbyte;
@@ -2543,7 +2543,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 			auto const startdex = output.tellp();
 			numbytes = space->address_to_byte(numbytes);
 			for (j = 0; j < numbytes; j += minbytes)
-				stream_format(output, "%*X ", minbytes * 2, debug_read_opcode(*decrypted_space, pcbyte + j, minbytes));
+				stream_format(output, "%0*X ", minbytes * 2, debug_read_opcode(*decrypted_space, pcbyte + j, minbytes));
 			if ((output.tellp() - startdex) < byteswidth)
 				stream_format(output, "%*s", byteswidth - (output.tellp() - startdex), "");
 			stream_format(output, "  ");
