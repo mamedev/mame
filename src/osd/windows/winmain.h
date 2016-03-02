@@ -271,7 +271,6 @@ public:
 
 private:
 	virtual void osd_exit() override;
-	void build_slider_list();
 	void update_slider_list();
 
 	windows_options &	m_options;
