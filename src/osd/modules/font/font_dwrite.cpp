@@ -661,6 +661,18 @@ public:
 	{
 	}
 
+	virtual bool probe() override
+	{
+		// This module is available if it can load the expected API Functions
+		if (m_pfnD2D1CreateFactory.initialize() != 0
+			|| m_pfnDWriteCreateFactory.initialize() != 0)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	virtual int init(const osd_options &options) override
 	{
 		HRESULT result;
