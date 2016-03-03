@@ -2823,11 +2823,7 @@ files {
 	MAME_DIR .. "src/mame/includes/battlex.h",
 	MAME_DIR .. "src/mame/video/battlex.cpp",
 	MAME_DIR .. "src/mame/drivers/carjmbre.cpp",
-	MAME_DIR .. "src/mame/includes/carjmbre.h",
-	MAME_DIR .. "src/mame/video/carjmbre.cpp",
 	MAME_DIR .. "src/mame/drivers/popper.cpp",
-	MAME_DIR .. "src/mame/includes/popper.h",
-	MAME_DIR .. "src/mame/video/popper.cpp",
 	MAME_DIR .. "src/mame/drivers/spaceg.cpp",
 }
 
@@ -4293,9 +4289,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/fireball.cpp",
 	MAME_DIR .. "src/mame/drivers/flipjack.cpp",
 	MAME_DIR .. "src/mame/drivers/flower.cpp",
-	MAME_DIR .. "src/mame/includes/flower.h",
-	MAME_DIR .. "src/mame/audio/flower.cpp",
-	MAME_DIR .. "src/mame/video/flower.cpp",
 	MAME_DIR .. "src/mame/drivers/fortecar.cpp",
 	MAME_DIR .. "src/mame/drivers/fresh.cpp",
 	MAME_DIR .. "src/mame/drivers/freekick.cpp",
