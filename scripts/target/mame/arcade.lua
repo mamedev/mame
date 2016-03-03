@@ -2590,8 +2590,6 @@ files {
 	MAME_DIR .. "src/mame/includes/tceptor.h",
 	MAME_DIR .. "src/mame/video/tceptor.cpp",
 	MAME_DIR .. "src/mame/drivers/toypop.cpp",
-	MAME_DIR .. "src/mame/includes/toypop.h",
-	MAME_DIR .. "src/mame/video/toypop.cpp",
 	MAME_DIR .. "src/mame/drivers/turrett.cpp",
 	MAME_DIR .. "src/mame/includes/turrett.h",
 	MAME_DIR .. "src/mame/audio/turrett.cpp",
