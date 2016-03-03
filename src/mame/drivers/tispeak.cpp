@@ -79,7 +79,7 @@ above expectations. TI continued to manufacture many products for this line.
     - VFD: some seen with the one from Speak & Math(!)
     - notes: this one has a dedicated voice actor
 
-    Speak & Spell (Spain), 1981
+    Speak & Spell (Spanish), 1981
     - MCU: CD2701N2L*
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB? CD2319*

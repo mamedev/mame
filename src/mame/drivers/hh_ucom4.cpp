@@ -231,7 +231,7 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
 
   Bambino UFO Master-Blaster Station (manufactured in Japan)
   * PCB label Emix Corp. ET-02
-  * NEC uCOM-44 MCU, labeled EMIX D552C 017
+  * NEC uCOM-44 MCU, label EMIX D552C 017
   * cyan VFD display Emix-101, with blue color overlay
 
   This is Bambino's first game, it is not known if ET-01 exists. Emix Corp.
@@ -345,7 +345,7 @@ MACHINE_CONFIG_END
 
   Bambino Superstar Football (manufactured in Japan)
   * PCB label Emix Corp. ET-03
-  * NEC uCOM-43 MCU, labeled D553C 031
+  * NEC uCOM-43 MCU, label D553C 031
   * cyan VFD display Emix-102, with bezel
 
   The game was rereleased in 1982 as Classic Football, with an improved VFD.
@@ -485,7 +485,7 @@ MACHINE_CONFIG_END
 
   Bambino Kick The Goal Soccer
   * PCB label Emix Corp. ET-10/08 (PCB is for 2 possible games)
-  * NEC uCOM-44 MCU, labeled D552C 043
+  * NEC uCOM-44 MCU, label D552C 043
   * cyan VFD display Emix-105, with bezel overlay
 
   Press the Display button twice to start the game. Action won't start until
@@ -609,7 +609,7 @@ MACHINE_CONFIG_END
 
   Bambino Safari (manufactured in Japan)
   * PCB label Emix Corp. ET-11
-  * NEC uCOM-44 MCU, labeled EMIX D552C 049
+  * NEC uCOM-44 MCU, label EMIX D552C 049
   * cyan VFD display Emix-108
 
   NOTE!: MAME external artwork is required
@@ -713,7 +713,7 @@ MACHINE_CONFIG_END
 
   Bambino Space Laser Fight (manufactured in Japan)
   * PCB label Emix Corp. ET-12
-  * NEC uCOM-43 MCU, labeled D553C 055
+  * NEC uCOM-43 MCU, label D553C 055
   * cyan VFD display Emix-104, with blue or green color overlay
 
   This is basically a revamp of their earlier Boxing game (ET-06), case and
@@ -863,7 +863,7 @@ MACHINE_CONFIG_END
 
   Bandai Crazy Climber (manufactured in Japan)
   * PCB labels SM-020/SM-021
-  * NEC uCOM-43 MCU, labeled D553C 170
+  * NEC uCOM-43 MCU, label D553C 170
   * cyan/red/green VFD display NEC FIP6AM2-T no. 1-8 2, with partial color overlay and bezel
 
   known releases:
@@ -962,7 +962,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Castle Toy Tactix
-  * NEC uCOM-43 MCU, labeled D557LC 512
+  * NEC uCOM-43 MCU, label D557LC 512
   * 16 LEDs behind buttons
 
   Tactix is similar to Merlin, for 1 or 2 players. In 2-player mode, simply
@@ -1080,7 +1080,7 @@ MACHINE_CONFIG_END
 
   Epoch Invader From Space (manufactured in Japan)
   * PCB labels 36010(A/B)
-  * NEC uCOM-44 MCU, labeled D552C 054
+  * NEC uCOM-44 MCU, label D552C 054
   * cyan VFD display NEC FIP9AM18T tube no. 0D, with color overlay
 
   known releases:
@@ -1179,7 +1179,7 @@ MACHINE_CONFIG_END
 
   Epoch Electronic Football (manufactured in Japan)
   * PCB labels 36020(A/B/C)
-  * NEC uCOM-43 MCU, labeled D553C 080
+  * NEC uCOM-43 MCU, label D553C 080
   * cyan VFD display NEC FIP10AM15T tube no. 0F, with bezel overlay
 
   known releases:
@@ -1288,7 +1288,7 @@ MACHINE_CONFIG_END
 
   Epoch Galaxy II (manufactured in Japan)
   * PCB labels 19096/96062
-  * NEC uCOM-43 MCU, labeled D553C 153
+  * NEC uCOM-43 MCU, label D553C 153
   * cyan/red VFD display NEC FIP10xM20T, with color overlay. x = multiple VFD
     revisions exist, with different graphics: rev B no. 1-8, rev. D no. 2-21.
 
@@ -1389,7 +1389,7 @@ MACHINE_CONFIG_END
 
   Epoch Astro Command (manufactured in Japan)
   * PCB labels 96111/96112
-  * NEC uCOM-43 MCU, labeled D553C 202
+  * NEC uCOM-43 MCU, label D553C 202
   * cyan/red VFD display NEC FIP9AM20T no. 42-42, with color overlay + bezel
 
   known releases:
@@ -1496,7 +1496,7 @@ MACHINE_CONFIG_END
 
   Epoch Dracula (manufactured in Japan)
   * PCB label 96121
-  * NEC uCOM-43 MCU, labeled D553C 206
+  * NEC uCOM-43 MCU, label D553C 206
   * cyan/red/green VFD display NEC FIP8BM20T no. 2-42
 
   known releases:
@@ -1588,7 +1588,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Mattel Computer Gin
-  * NEC uCOM-43 MCU, labeled D650C 060
+  * NEC uCOM-43 MCU, label D650C 060
 
 ***************************************************************************/
 
@@ -1662,7 +1662,7 @@ MACHINE_CONFIG_END
 
   Mego Mini-Vid Break Free (manufactured in Japan)
   * PCB label Mego 79 rev F
-  * NEC uCOM-43 MCU, labeled D553C 049
+  * NEC uCOM-43 MCU, label D553C 049
   * cyan VFD display Futaba DM-4.5 91
 
   note: MAME external artwork is not needed for this game
@@ -1766,8 +1766,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Cosmic Combat (manufactured in Japan)
-  * PCBs are labeled 2E1019-E01
-  * NEC uCOM-44 MCU, labeled D552C 042
+  * PCB label 2E1019-E01
+  * NEC uCOM-44 MCU, label D552C 042
   * cyan VFD display NEC FIP32AM18Y tube no. 0E, with color overlay
 
   known releases:
@@ -1861,8 +1861,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Tennis (manufactured in Japan)
-  * PCB labeled TOMY TN-04 TENNIS
-  * NEC uCOM-44 MCU, labeled D552C 048
+  * PCB label TOMY TN-04 TENNIS
+  * NEC uCOM-44 MCU, label D552C 048
   * VFD display NEC FIP11AM15T tube no. 0F, with overlay
 
   The initial release of this game was in 1979, known as Pro-Tennis,
@@ -2017,8 +2017,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Pac-Man (manufactured in Japan)
-  * PCBs are labeled TN-08 2E108E01
-  * NEC uCOM-43 MCU, labeled D553C 160
+  * PCB label TN-08 2E108E01
+  * NEC uCOM-43 MCU, label D553C 160
   * cyan/red/green VFD display NEC FIP8AM18T no. 2-21
   * bright yellow round casing
 
@@ -2123,8 +2123,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Scramble (manufactured in Japan)
-  * PCBs are labeled TN-10 2E114E01
-  * NEC uCOM-43 MCU, labeled D553C 192
+  * PCB label TN-10 2E114E01
+  * NEC uCOM-43 MCU, label D553C 192
   * cyan/red/green VFD display NEC FIP10CM20T no. 2-41
 
   known releases:
@@ -2223,8 +2223,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Caveman (manufactured in Japan)
-  * PCBs are labeled TN-12 2E114E03
-  * NEC uCOM-43 MCU, labeled D553C 209
+  * PCB label TN-12 2E114E03
+  * NEC uCOM-43 MCU, label D553C 209
   * cyan/red/green VFD display NEC FIP8AM20T no. 2-42
 
   known releases:
@@ -2319,8 +2319,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy Alien Chase (manufactured in Japan)
-  * PCBs are labeled TN-16 2E121B01
-  * NEC uCOM-43 MCU, labeled D553C 258
+  * PCB label TN-16 2E121B01
+  * NEC uCOM-43 MCU, label D553C 258
   * red/green VFD display NEC FIP9AM24T, with color overlay, 2-sided*
 
   *Player one views the VFD from the front (grid+filament side) while the

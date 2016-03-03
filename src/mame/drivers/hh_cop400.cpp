@@ -234,7 +234,7 @@ UINT8 hh_cop400_state::read_inputs(int columns)
 /***************************************************************************
 
   Castle Toy Einstein
-  * COP421 MCU labeled ~/927 COP421-NEZ/N
+  * COP421 MCU label ~/927 COP421-NEZ/N
   * 4 lamps, 1-bit sound
 
 ***************************************************************************/
@@ -279,7 +279,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Coleco Head to Head Basketball
-  * COP420 MCU labeled COP420L-NEZ/N
+  * COP420 MCU label COP420L-NEZ/N
   * 2-digit 7seg display, 41 other leds, 1-bit sound
 
 ***************************************************************************/
@@ -324,7 +324,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Space Invader
-  * COP444L MCU labeled /B138 COPL444-HRZ/N INV II (die labeled HRZ COP 444L/A)
+  * COP444L MCU label /B138 COPL444-HRZ/N INV II (die label HRZ COP 444L/A)
   * 3 7seg LEDs, LED matrix and overlay mask, 1-bit sound
 
   The first version was on TMS1100 (see hh_tms1k.c), this is the reprogrammed
@@ -440,7 +440,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Mattel Funtronics Jacks
-  * COP410L MCU bonded directly to PCB (die labeled COP410L/B NGS)
+  * COP410L MCU bonded directly to PCB (die label COP410L/B NGS)
   * 8 LEDs, 1-bit sound
 
 ***************************************************************************/
@@ -547,7 +547,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Mattel Funtronics Red Light Green Light
-  * COP410L MCU bonded directly to PCB (die labeled COP410L/B NHZ)
+  * COP410L MCU bonded directly to PCB (die label COP410L/B NHZ)
   * 14 LEDs, 1-bit sound
 
   known releases:
@@ -642,7 +642,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Milton Bradley Plus One
-  * COP410L MCU in 8-pin DIP, labeled ~/029 MM 57405 (die labeled COP410L/B NNE)
+  * COP410L MCU in 8-pin DIP, label ~/029 MM 57405 (die label COP410L/B NNE)
   * 4 sensors(1 on each die side), 1-bit sound
 
 ***************************************************************************/
@@ -686,7 +686,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Milton Bradley (Electronic) Lightfight
-  * COP421L MCU labeled /B119 COP421L-HLA/N
+  * COP421L MCU label /B119 COP421L-HLA/N
   * LED matrix, 1-bit sound
 
   Xbox-shaped electronic game for 2 or more players, with long diagonal buttons
