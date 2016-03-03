@@ -521,40 +521,4 @@ _count_leading_ones(UINT32 value)
 	return result;
 }
 
-/***************************************************************************
-    INLINE TIMING FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    get_profile_ticks - return a tick counter
-    from the processor that can be used for
-    profiling. It does not need to run at any
-    particular rate.
--------------------------------------------------*/
-
-#define get_profile_ticks _get_profile_ticks
-
-#ifndef __x86_64__
-static inline UINT64 ATTR_UNUSED ATTR_FORCE_INLINE _get_profile_ticks(void)
-{
-	UINT64 result;
-	__asm__ __volatile__ (
-			"rdtsc"
-			: "=A" (result)
-	);
-	return result;
-}
-#else
-static inline UINT64 ATTR_UNUSED ATTR_FORCE_INLINE _get_profile_ticks(void)
-{
-	_x86_union r;
-	__asm__ __volatile__ (
-			"rdtsc"
-			: "=a" (r.u32.l), "=d" (r.u32.h)
-	);
-
-	return (UINT64) r.u64;
-}
-#endif
-
 #endif /* __EIGCCX86__ */

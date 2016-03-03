@@ -310,7 +310,7 @@ static void sdlwindow_sync(void)
 		while (!osd_work_queue_wait(work_queue, osd_ticks_per_second()*10))
 		{
 			osd_printf_warning("sdlwindow_sync: Sleeping...\n");
-			osd_sleep(100000);
+			osd_sleep(osd_ticks_per_second() / 1000 * 100);
 		}
 	}
 }
