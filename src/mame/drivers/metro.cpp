@@ -96,7 +96,7 @@ Notes:
 -   vmetal: has Sega and Taito logos in the roms ?!
 
 
-driver modified by Eisuke Watanabe
+driver modified by Hau
 ***************************************************************************/
 
 #include "emu.h"
