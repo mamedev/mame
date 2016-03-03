@@ -160,7 +160,7 @@ lazy_loaded_function::lazy_loaded_function(const char * name, const wchar_t* dll
 }
 
 lazy_loaded_function::lazy_loaded_function(const char * name, const wchar_t** dll_names, int dll_count)
-	: m_name(name), m_initialized(false), m_pfn(nullptr)
+	: m_name(name), m_module(NULL), m_initialized(false), m_pfn(nullptr)
 {
 	for (int i = 0; i < dll_count; i++)
 		m_dll_names.push_back(std::wstring(dll_names[i]));

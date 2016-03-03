@@ -27,6 +27,7 @@
 #include "strconv.h"
 
 // MAMEOS headers
+#include "winutil.h"
 #include "winmain.h"
 #include "window.h"
 
@@ -44,10 +45,10 @@
 #endif
 
 // RawInput APIs
-typedef /*WINUSERAPI*/ INT(WINAPI *get_rawinput_device_list_ptr)(OUT PRAWINPUTDEVICELIST pRawInputDeviceList, IN OUT PINT puiNumDevices, IN UINT cbSize);
-typedef /*WINUSERAPI*/ INT(WINAPI *get_rawinput_data_ptr)(IN HRAWINPUT hRawInput, IN UINT uiCommand, OUT LPVOID pData, IN OUT PINT pcbSize, IN UINT cbSizeHeader);
-typedef /*WINUSERAPI*/ INT(WINAPI *get_rawinput_device_info_ptr)(IN HANDLE hDevice, IN UINT uiCommand, OUT LPVOID pData, IN OUT PINT pcbSize);
-typedef /*WINUSERAPI*/ BOOL(WINAPI *register_rawinput_devices_ptr)(IN PCRAWINPUTDEVICE pRawInputDevices, IN UINT uiNumDevices, IN UINT cbSize);
+typedef lazy_loaded_function_p3<INT, PRAWINPUTDEVICELIST, PINT, UINT> get_rawinput_device_list_ptr;
+typedef lazy_loaded_function_p5<INT, HRAWINPUT, UINT, LPVOID, PINT, UINT> get_rawinput_data_ptr;
+typedef lazy_loaded_function_p4<INT, HANDLE, UINT, LPVOID, PINT> get_rawinput_device_info_ptr;
+typedef lazy_loaded_function_p3<BOOL, PCRAWINPUTDEVICE, UINT, UINT> register_rawinput_devices_ptr;
 
 //============================================================
 //  reg_query_string
@@ -289,19 +290,11 @@ public:
 //  rawinput_mouse_device
 //============================================================
 
-struct rawinput_mouse_state
-{
-	int raw_x;
-	int raw_y;
-	int raw_z;
-};
-
 class rawinput_mouse_device : public rawinput_device
 {
 private:
 	std::mutex  m_device_lock;
 public:
-	//rawinput_mouse_state raw_mouse;
 	mouse_state			 mouse;
 
 	rawinput_mouse_device(running_machine& machine, const char* name, input_module& module)
@@ -317,18 +310,6 @@ public:
 		mouse.lZ = 0;
 
 		rawinput_device::poll();
-
-		//std::lock_guard<std::mutex> scope_lock(m_device_lock);
-
-		//// copy the accumulated raw state to the actual state
-		//mouse.lX = raw_mouse.raw_x;
-		//mouse.lY = raw_mouse.raw_y;
-		//mouse.lZ = raw_mouse.raw_z;
-		//raw_mouse.raw_x = 0;
-		//raw_mouse.raw_y = 0;
-		//raw_mouse.raw_z = 0;
-
-		//osd_printf_verbose("At poll: lX=%d, lY=%d, lZ=%d\n", (int)mouse.lX, (int)mouse.lY, (int)mouse.lZ);
 	}
 
 	void reset() override
@@ -344,13 +325,6 @@ public:
 		
 		mouse.lX += rawinput.data.mouse.lLastX * INPUT_RELATIVE_PER_PIXEL;
 		mouse.lY += rawinput.data.mouse.lLastY * INPUT_RELATIVE_PER_PIXEL;
-
-		/*osd_printf_verbose(
-			"Mouse Abs : lastX = %d, lastY = %d, rawx = %d, rawy = %d\n",
-			(int)rawinput.data.mouse.lLastX,
-			(int)rawinput.data.mouse.lLastY,
-			(int)raw_mouse.raw_x,
-			(int)raw_mouse.raw_y);*/
 
 		// update zaxis
 		if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
@@ -370,6 +344,13 @@ public:
 	}
 };
 
+/*
+register_rawinput_devices = (register_rawinput_devices_ptr)GetProcAddress(user32, "RegisterRawInputDevices");
+get_rawinput_device_list = (get_rawinput_device_list_ptr)GetProcAddress(user32, "GetRawInputDeviceList");
+get_rawinput_device_info = (get_rawinput_device_info_ptr)GetProcAddress(user32, "GetRawInputDeviceInfo" UNICODE_SUFFIX);
+get_rawinput_data = (get_rawinput_data_ptr)GetProcAddress(user32, "GetRawInputData");
+*/
+
 //============================================================
 //  rawinput_module - base class for rawinput modules
 //============================================================
@@ -387,25 +368,38 @@ private:
 public:
 	rawinput_module(const char *type, const char* name)
 		: wininput_module(type, name),
-			get_rawinput_device_list(nullptr),
-			get_rawinput_data(nullptr),
-			get_rawinput_device_info(nullptr),
-			register_rawinput_devices(nullptr)
+			get_rawinput_device_list("GetRawInputDeviceList", L"user32.dll"),
+			get_rawinput_data("GetRawInputData", L"user32.dll"),
+			get_rawinput_device_info("GetRawInputDeviceInfoW", L"user32.dll"),
+			register_rawinput_devices("RegisterRawInputDevices", L"user32.dll")
 	{
+	}
+
+	bool probe() override
+	{
+		int status = get_rawinput_device_list.initialize();
+		status |= get_rawinput_data.initialize();
+		status |= get_rawinput_device_info.initialize();
+		status |= register_rawinput_devices.initialize();
+
+		if (status != 0)
+			return false;
+
+		return true;
 	}
 
 	void input_init(running_machine &machine) override
 	{
 		// get the number of devices, allocate a device list, and fetch it
 		int device_count = 0;
-		if ((*get_rawinput_device_list)(NULL, &device_count, sizeof(RAWINPUTDEVICELIST)) != 0)
+		if (get_rawinput_device_list(NULL, &device_count, sizeof(RAWINPUTDEVICELIST)) != 0)
 			return;
 
 		if (device_count == 0)
 			return;
 
 		auto rawinput_devices = std::make_unique<RAWINPUTDEVICELIST[]>(device_count);
-		if ((*get_rawinput_device_list)(rawinput_devices.get(), &device_count, sizeof(RAWINPUTDEVICELIST)) == -1)
+		if (get_rawinput_device_list(rawinput_devices.get(), &device_count, sizeof(RAWINPUTDEVICELIST)) == -1)
 			return;
 
 		// iterate backwards through devices; new devices are added at the head
@@ -433,7 +427,7 @@ public:
 		registration.hwndTarget = win_window_list->m_hwnd;
 
 		// register the device
-		(*register_rawinput_devices)(&registration, 1, sizeof(registration));
+		register_rawinput_devices(&registration, 1, sizeof(registration));
 	}
 
 protected:
@@ -443,23 +437,15 @@ protected:
 
 	int init_internal() override
 	{
-		HMODULE user32;
-
-		// look in user32 for the raw input APIs
-		user32 = LoadLibrary(TEXT("user32.dll"));
-		if (user32 == NULL)
-			return 1;
-
 		// look up the entry points
-		register_rawinput_devices = (register_rawinput_devices_ptr)GetProcAddress(user32, "RegisterRawInputDevices");
-		get_rawinput_device_list = (get_rawinput_device_list_ptr)GetProcAddress(user32, "GetRawInputDeviceList");
-		get_rawinput_device_info = (get_rawinput_device_info_ptr)GetProcAddress(user32, "GetRawInputDeviceInfo" UNICODE_SUFFIX);
-		get_rawinput_data = (get_rawinput_data_ptr)GetProcAddress(user32, "GetRawInputData");
-		if (register_rawinput_devices == NULL || get_rawinput_device_list == NULL || get_rawinput_device_info == NULL || get_rawinput_data == NULL)
+		int status = get_rawinput_device_list.initialize();
+		status |= get_rawinput_data.initialize();
+		status |= get_rawinput_device_info.initialize();
+		status |= register_rawinput_devices.initialize();
+		if (status != 0)
 			return 1;
 
 		osd_printf_verbose("RawInput: APIs detected\n");
-
 		return 0;
 	}
 
@@ -469,11 +455,11 @@ protected:
 		TDevice* devinfo = nullptr;
 		INT name_length = 0;
 		// determine the length of the device name, allocate it, and fetch it if not nameless
-		if ((*get_rawinput_device_info)(rawinputdevice->hDevice, RIDI_DEVICENAME, NULL, &name_length) != 0)
+		if (get_rawinput_device_info(rawinputdevice->hDevice, RIDI_DEVICENAME, NULL, &name_length) != 0)
 			return nullptr;
 
 		std::unique_ptr<TCHAR[]> tname = std::make_unique<TCHAR[]>(name_length + 1);
-		if (name_length > 1 && (*get_rawinput_device_info)(rawinputdevice->hDevice, RIDI_DEVICENAME, tname.get(), &name_length) == -1)
+		if (name_length > 1 && get_rawinput_device_info(rawinputdevice->hDevice, RIDI_DEVICENAME, tname.get(), &name_length) == -1)
 			return nullptr;
 
 		// if this is an RDP name, skip it
@@ -514,7 +500,7 @@ protected:
 			return FALSE;
 
 		// determine the size of databuffer we need
-		if ((*get_rawinput_data)(rawinputdevice, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER)) != 0)
+		if (get_rawinput_data(rawinputdevice, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER)) != 0)
 			return FALSE;
 
 		// if necessary, allocate a temporary buffer and fetch the data
@@ -527,7 +513,7 @@ protected:
 		}
 
 		// fetch the data and process the appropriate message types
-		result = (*get_rawinput_data)((HRAWINPUT)rawinputdevice, RID_INPUT, data, &size, sizeof(RAWINPUTHEADER));
+		result = get_rawinput_data((HRAWINPUT)rawinputdevice, RID_INPUT, data, &size, sizeof(RAWINPUTHEADER));
 		if (result)
 		{
 			std::lock_guard<std::mutex> scope_lock(m_module_lock);

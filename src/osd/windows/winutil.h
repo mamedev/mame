@@ -153,4 +153,26 @@ public:
 	}
 };
 
+// Five parameters
+template <class TRet, class P1, class P2, class P3, class P4, class P5>
+class lazy_loaded_function_p5 : public lazy_loaded_function
+{
+public:
+	lazy_loaded_function_p5(const char * name, const wchar_t* dll_name)
+		: lazy_loaded_function(name, &dll_name, 1)
+	{
+	}
+
+	lazy_loaded_function_p5(const char * name, const wchar_t** dll_names, int dll_count)
+		: lazy_loaded_function(name, dll_names, dll_count)
+	{
+	}
+
+	TRet operator ()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5)
+	{
+		check_init();
+		return ((TRet(__stdcall *) (P1, P2, P3, P4, P5))m_pfn)(p1, p2, p3, p4, p5);
+	}
+};
+
 #endif // __WINUTIL__
