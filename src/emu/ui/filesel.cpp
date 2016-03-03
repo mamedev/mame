@@ -712,7 +712,7 @@ void ui_menu_file_selector::handle()
 				// from current entry to the end
 				for (entry = cur_selected; entry != nullptr; entry = entry->next)
 				{
-					if (entry->basename != nullptr && m_filename_buffer != nullptr)
+					if (entry->basename != nullptr && m_filename_buffer[0] != '\0')
 					{
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
@@ -731,7 +731,7 @@ void ui_menu_file_selector::handle()
 				// and from the first entry to current one
 				for (entry = m_entrylist; entry != cur_selected; entry = entry->next)
 				{
-					if (entry->basename != nullptr && m_filename_buffer != nullptr)
+					if (entry->basename != nullptr && m_filename_buffer[0] != '\0')
 					{
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
