@@ -19,6 +19,10 @@
 
 #include <algorithm>
 #include <cassert>
+#include <ios>
+#include <istream>
+#include <ostream>
+#include <memory>
 #include <ostream>
 #include <streambuf>
 #include <string>
@@ -103,10 +107,11 @@ public:
 
 	void swap(basic_vectorbuf &that)
 	{
+		using std::swap;
 		std::basic_streambuf<CharT, Traits>::swap(that);
-		std::swap(m_mode, that.m_mode);
-		m_storage.swap(that.m_storage);
-		std::swap(m_threshold, that.m_threshold);
+		swap(m_mode, that.m_mode);
+		swap(m_storage, that.m_storage);
+		swap(m_threshold, that.m_threshold);
 	}
 
 	void reserve(typename vector_type::size_type size)
@@ -381,6 +386,16 @@ typedef basic_ovectorstream<char>       ovectorstream;
 typedef basic_ovectorstream<wchar_t>    wovectorstream;
 typedef basic_vectorstream<char>        vectorstream;
 typedef basic_vectorstream<wchar_t>     wvectorstream;
+
+template <typename CharT, typename Traits, typename Allocator>
+void swap(basic_vectorbuf<CharT, Traits, Allocator> &a, basic_vectorbuf<CharT, Traits, Allocator> &b) { a.swap(b); }
+
+template <typename CharT, typename Traits, typename Allocator>
+void swap(basic_ivectorstream<CharT, Traits, Allocator> &a, basic_ivectorstream<CharT, Traits, Allocator> &b) { a.swap(b); }
+template <typename CharT, typename Traits, typename Allocator>
+void swap(basic_ovectorstream<CharT, Traits, Allocator> &a, basic_ovectorstream<CharT, Traits, Allocator> &b) { a.swap(b); }
+template <typename CharT, typename Traits, typename Allocator>
+void swap(basic_vectorstream<CharT, Traits, Allocator> &a, basic_vectorstream<CharT, Traits, Allocator> &b) { a.swap(b); }
 
 } // namespace util
 
