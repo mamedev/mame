@@ -34,7 +34,7 @@ Wiz-A-Tron or Little Professor. But the popularity of this product was much
 above expectations. TI continued to manufacture many products for this line.
 
     Speak & Spell (US), 1978
-    - MCU: TMC0271*, labeled TMC0271NL (die label unknown)
+    - MCU: TMC0271*, label TMC0271NL (die label unknown)
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB TMC0351NL
     - VSM(2/2): 16KB TMC0352NL
@@ -42,7 +42,7 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: keyboard has buttons instead of cheap membrane
 
     Speak & Spell (US), 1979
-    - MCU: TMC0271, labeled TMC0271H-N2L (die labeled 0271H T0270D)
+    - MCU: TMC0271, label TMC0271H-N2L (die label 0271H T0270D)
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB TMC0351N2L
     - VSM(2/2): 16KB TMC0352N2L
@@ -79,8 +79,15 @@ above expectations. TI continued to manufacture many products for this line.
     - VFD: some seen with the one from Speak & Math(!)
     - notes: this one has a dedicated voice actor
 
+    Speak & Spell (Spain), 1981
+    - MCU: CD2701N2L*
+    - TMS51xx: TMC0281
+    - VSM(1/2): 16KB? CD2319*
+    - VSM(2/2): 16KB? CD2320*
+    - VFD: 8 digits with 14 segments, DP and accent mark
+
     Speak & Spell (France) "La Dictee Magique", 1980
-    - MCU: CD2702, labeled CD2702AN2L (die labeled TMC0270F 2702A)
+    - MCU: CD2702, label CD2702AN2L (die label TMC0270F 2702A)
     - TMS51xx: CD2801
     - VSM: 16KB CD2352
 
@@ -96,7 +103,7 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: it appears that TI ran out of original snspell VFDs in the early 80s?
 
     Speak & Spell Compact (US), 1981
-    - MCU: CD8011, labeled CD8011A-NL (die labeled 1100B)
+    - MCU: CD8011, label CD8011A-NL (die label 1100B)
     - TMS51xx: TMC0281D
     - VSM: 16KB CD2354, CD2354(rev.A)
     - notes: no display, MCU is TMS1100 instead of TMS0270, overall similar to Touch & Tell
@@ -143,7 +150,7 @@ Note that they are interchangeable, eg. you can use a French module on a US Spea
 Speak & Math:
 
     Speak & Math (US), 1980 (renamed to "Speak & Maths" in UK, but is the same product)
-    - MCU: CD2704, labeled CD2704B-N2L (die labeled TMC0270F 2704B) - 2nd revision?(mid-1982)
+    - MCU: CD2704, label CD2704B-N2L (die label TMC0270F 2704B) - 2nd revision?(mid-1982)
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2392
     - VSM(2/2): 16KB CD2393
@@ -154,7 +161,7 @@ Speak & Math:
       Apparently QA never found out and it ended up in the final product.
 
     Speak & Math (US), 1986
-    - MCU: CD2708, labeled CD2708N2L (die labeled TMC0270F 2708A)
+    - MCU: CD2708, label CD2708N2L (die label TMC0270F 2708A)
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2381
     - VSM(2/2): 4KB CD2614
@@ -170,7 +177,7 @@ Speak & Math:
 Speak & Read:
 
     Speak & Read (US), 1980
-    - MCU: CD2705, labeled CD2705B-N2L (die labeled TMC0270E 2705B) - 2nd revision?(late-1981)
+    - MCU: CD2705, label CD2705B-N2L (die label TMC0270E 2705B) - 2nd revision?(late-1981)
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2394(rev.A)
     - VSM(2/2): 16KB CD2395(rev.A)
@@ -192,7 +199,7 @@ Speak & Read modules:
 Touch & Tell:
 
     Touch & Tell (US), 1981
-    - MCU: CD8012, labeled CD8012NL (die labeled 1100G CD8012)
+    - MCU: CD8012, label CD8012NL (die label 1100G CD8012)
     - TMS51xx: CD2802
     - VSM: 4KB CD2610
     - notes: MCU is TMS1100 instead of TMS0270. CD8010 is seen in some devices
