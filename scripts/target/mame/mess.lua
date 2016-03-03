@@ -1777,8 +1777,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/mephisto.cpp",
 	MAME_DIR .. "src/mame/drivers/mmodular.cpp",
 	MAME_DIR .. "src/mame/drivers/stratos.cpp",
-	MAME_DIR .. "src/mame/machine/mboard.cpp",
-	MAME_DIR .. "src/mame/includes/mboard.h",
 }
 
 createMESSProjects(_target, _subtarget, "hitachi")
