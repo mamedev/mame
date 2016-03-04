@@ -50,7 +50,7 @@ public:
 		m_fd1793(*this, "wd179x"),
 		m_floppy0(*this, "wd179x:0"),
 		m_floppy1(*this, "wd179x:1"),
-		m_crtc(*this, "crtc"),
+//		m_crtc(*this, "crtc"),
 		m_line(*this, "LINE"),
 		m_joysticks(*this, "JOYSTICKS"),
 		m_buttons(*this, "BUTTONS"),
@@ -85,7 +85,7 @@ protected:
 	required_device<fd1793_t> m_fd1793;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-	optional_device<mc6845_device> m_crtc;
+	//optional_device<mc6845_device> m_crtc;
 	required_ioport_array<11> m_line;
 	required_ioport m_joysticks;
 	required_ioport m_buttons;
@@ -115,10 +115,10 @@ static ADDRESS_MAP_START( svi318_io, AS_IO, 8, svi318_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x00, 0x38) AM_READWRITE(io_ext_r, io_ext_w )
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("tms9928a", tms9928a_device, vram_write)
-	AM_RANGE(0x81, 0x81) AM_DEVWRITE("tms9928a", tms9928a_device, register_write)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("tms9928a", tms9928a_device, vram_read)
-	AM_RANGE(0x85, 0x85) AM_DEVREAD("tms9928a", tms9928a_device, register_read)
+	//AM_RANGE(0x80, 0x80) AM_DEVWRITE("tms9928a", tms9928a_device, vram_write)
+	//AM_RANGE(0x81, 0x81) AM_DEVWRITE("tms9928a", tms9928a_device, register_write)
+	//AM_RANGE(0x84, 0x84) AM_DEVREAD("tms9928a", tms9928a_device, vram_read)
+	//AM_RANGE(0x85, 0x85) AM_DEVREAD("tms9928a", tms9928a_device, register_read)
 	AM_RANGE(0x88, 0x88) AM_DEVWRITE("ay8910", ay8910_device, address_w)
 	AM_RANGE(0x8c, 0x8c) AM_DEVWRITE("ay8910", ay8910_device, data_w)
 	AM_RANGE(0x90, 0x90) AM_DEVREAD("ay8910", ay8910_device, data_r)
@@ -130,10 +130,10 @@ static ADDRESS_MAP_START( svi328_806_io, AS_IO, 8, svi318_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x00, 0x58) AM_READWRITE(io_ext_r, io_ext_w )
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("tms9928a", tms9928a_device, vram_write)
-	AM_RANGE(0x81, 0x81) AM_DEVWRITE("tms9928a", tms9928a_device, register_write)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("tms9928a", tms9928a_device, vram_read)
-	AM_RANGE(0x85, 0x85) AM_DEVREAD("tms9928a", tms9928a_device, register_read)
+	//AM_RANGE(0x80, 0x80) AM_DEVWRITE("tms9928a", tms9928a_device, vram_write)
+	//AM_RANGE(0x81, 0x81) AM_DEVWRITE("tms9928a", tms9928a_device, register_write)
+	//AM_RANGE(0x84, 0x84) AM_DEVREAD("tms9928a", tms9928a_device, vram_read)
+	//AM_RANGE(0x85, 0x85) AM_DEVREAD("tms9928a", tms9928a_device, register_read)
 	AM_RANGE(0x88, 0x88) AM_DEVWRITE("ay8910", ay8910_device, address_w)
 	AM_RANGE(0x8c, 0x8c) AM_DEVWRITE("ay8910", ay8910_device, data_w)
 	AM_RANGE(0x90, 0x90) AM_DEVREAD("ay8910", ay8910_device, data_r)
@@ -360,10 +360,10 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	//MCFG_INS8250_OUT_INT_CB(WRITELINE(svi318_state, ins8250_interrupt))
 
 	/* Video hardware */
-	MCFG_DEVICE_ADD("tms9928a", TMS9929A, XTAL_10_738635MHz / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	//MCFG_DEVICE_ADD("tms9928a", TMS9929A, XTAL_10_738635MHz / 2)
+	//MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	//MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi318_state, vdp_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")
+	//MCFG_TMS9928A_SCREEN_ADD_PAL("screen")
 	//MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9929a_device, screen_update)
 
 	/* Sound hardware */
@@ -409,12 +409,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svi318n, svi318 )
 
-	MCFG_DEVICE_REMOVE("tms9928a")
-	MCFG_DEVICE_REMOVE("screen")
-	MCFG_DEVICE_ADD("tms9928a", TMS9928A, XTAL_10_738635MHz / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	//MCFG_DEVICE_REMOVE("tms9928a")
+	//MCFG_DEVICE_REMOVE("screen")
+	//MCFG_DEVICE_ADD("tms9928a", TMS9928A, XTAL_10_738635MHz / 2)
+	//MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	//MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi318_state, vdp_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC("screen")
+	//MCFG_TMS9928A_SCREEN_ADD_NTSC("screen")
 	//MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
 
@@ -473,26 +473,26 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	/* Video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MCFG_DEVICE_ADD("tms9928a", TMS9929A, XTAL_10_738635MHz / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	//MCFG_DEVICE_ADD("tms9928a", TMS9929A, XTAL_10_738635MHz / 2)
+	//MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	//MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi318_state, vdp_interrupt))
-	MCFG_TMS9928A_SET_SCREEN("screen")
-	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")
+	//MCFG_TMS9928A_SET_SCREEN("screen")
+	//MCFG_TMS9928A_SCREEN_ADD_PAL("screen")
 	//MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9929a_device, screen_update)
 	MCFG_PALETTE_ADD("palette", TMS9928A_PALETTE_SIZE + 2)  /* 2 additional entries for monochrome svi806 output */
 
-	MCFG_SCREEN_ADD("svi806", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
+	//MCFG_SCREEN_ADD("svi806", RASTER)
+	//MCFG_SCREEN_REFRESH_RATE(50)
+	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	//MCFG_SCREEN_SIZE(640, 400)
+	//MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	//MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", svi328)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "svi806", XTAL_12MHz / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)   /* ? */
+	//MCFG_MC6845_ADD("crtc", MC6845, "svi806", XTAL_12MHz / 8)
+	//MCFG_MC6845_SHOW_BORDER_AREA(false)
+	//MCFG_MC6845_CHAR_WIDTH(8)   /* ? */
 	//MCFG_MC6845_UPDATE_ROW_CB(svi318_state, crtc_update_row)
 
 	/* Sound hardware */
@@ -538,8 +538,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svi328n_806, svi328_806 )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
+	//MCFG_SCREEN_MODIFY("screen")
+	//MCFG_SCREEN_REFRESH_RATE(60)
 MACHINE_CONFIG_END
 
 /***************************************************************************

@@ -126,7 +126,7 @@ public:
 			m_beeper(*this, "beeper")
 		{ }
 
-	required_device<m68000_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	optional_device<hd44780_device> m_lcdc;
 	optional_device<beep_device> m_beeper;
 
