@@ -1,17 +1,17 @@
-MAME(tm)
-Copyright (c) 1997-2013 by Nicola Salmoria and the MAME team
-MAME is a trademark owned by Nicola Salmoria
+MAME(r)
+Copyright (c) 1997-2016 by MAMEdev and contributors
+MAME is a registered trademark of Nicola Salmoria
 
 
 ----------
 I. Purpose
 ----------
-MAME main purpose is to be a refefence to the inner workings of the
+MAME main purpose is to be a reference to the inner workings of the
 emulated machines. This is done both for educational purposes and for
 preservation purposes, in order to prevent historical software from
 disappearing forever once the hardware it runs on stops working. Of
-course, in order to preserve the software and demonstrate that the 
-emulated behavior matches the original, you must also be able to
+course, in order to preserve the software and demonstrate that the
+emulated behavior matches the original, one must also be able to
 actually use the software. This is considered a nice side effect, and is
 not MAME's primary focus.
 
@@ -27,9 +27,9 @@ in the executable.
 II. Cost
 --------
 MAME is free. Its source code is free. The project as whole is under
-distributed under the GNU General Public License, version 2 (GPL-2.0),
-but most of code (including core functionality) is available under the
-BSD-3-clause license.
+distributed under the GNU General Public License, version 2 or later
+(GPL-2.0+), but most of code (including core functionality) is also
+available under the 3-clause BSD license (BSD-3-clause).
 
 
 -------------------------
