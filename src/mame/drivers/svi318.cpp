@@ -1,9 +1,7 @@
-// license:???
-// copyright-holders:Sean Young,Tomas Karlsson
+// license:BSD-3-Clause
+// copyright-holders:Sean Young
 /*
 ** svi318.c : driver for Spectravideo SVI-318 and SVI-328
-**
-** Sean Young, Tomas Karlsson
 **
 ** Information taken from: http://www.samdal.com/sv318.htm
 **
@@ -12,30 +10,114 @@
 */
 
 #include "emu.h"
-#include "includes/svi318.h"
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "machine/ins8250.h"
+#include "machine/wd_fdc.h"
+#include "machine/ram.h"
+#include "machine/buffer.h"
+#include "imagedev/cassette.h"
+#include "sound/dac.h"
+#include "sound/ay8910.h"
+#include "sound/wave.h"
+#include "video/mc6845.h"
+#include "video/tms9928a.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "imagedev/flopdrv.h"
 #include "formats/svi_dsk.h"
 #include "formats/svi_cas.h"
 #include "softlist.h"
 #include "rendlay.h"
 
+
+class svi318_state : public driver_device
+{
+public:
+	svi318_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_cassette(*this, "cassette"),
+		m_dac(*this, "dac"),
+		m_ppi(*this, "ppi8255"),
+		m_ram(*this, RAM_TAG),
+		m_centronics(*this, "centronics"),
+		m_cent_data_out(*this, "cent_data_out"),
+		m_ins8250_0(*this, "ins8250_0"),
+		m_ins8250_1(*this, "ins8250_1"),
+		m_cart(*this, "cartslot"),
+		m_fd1793(*this, "wd179x"),
+		m_floppy0(*this, "wd179x:0"),
+		m_floppy1(*this, "wd179x:1"),
+		m_crtc(*this, "crtc"),
+		m_line(*this, "LINE"),
+		m_joysticks(*this, "JOYSTICKS"),
+		m_buttons(*this, "BUTTONS"),
+		m_palette(*this, "palette"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_bank4(*this, "bank4")
+	{ }
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
+	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
+	// FDC
+	int m_drq;
+	int m_irq;
+	
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	memory_region *m_cart_rom;
+	memory_region *m_bios_rom;
+
+protected:
+	required_device<z80_device> m_maincpu;
+	required_device<cassette_image_device> m_cassette;
+	required_device<dac_device> m_dac;
+	required_device<i8255_device> m_ppi;
+	required_device<ram_device> m_ram;
+	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
+	required_device<ins8250_device> m_ins8250_0;
+	required_device<ins8250_device> m_ins8250_1;
+	required_device<generic_slot_device> m_cart;
+	required_device<fd1793_t> m_fd1793;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	optional_device<mc6845_device> m_crtc;
+	required_ioport_array<11> m_line;
+	required_ioport m_joysticks;
+	required_ioport m_buttons;
+	optional_device<palette_device> m_palette;
+
+private:
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_memory_bank m_bank3;
+	optional_memory_bank m_bank4;
+};
+
 static ADDRESS_MAP_START( svi318_mem, AS_PROGRAM, 8, svi318_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE(writemem1)
-	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank2") AM_WRITE(writemem2)
-	AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank3") AM_WRITE(writemem3)
+	//AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE(writemem1)
+	//AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank2") AM_WRITE(writemem2)
+	//AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank3") AM_WRITE(writemem3)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svi328_806_mem, AS_PROGRAM, 8, svi318_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE(writemem1)
-	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank2") AM_WRITE(writemem2)
-	AM_RANGE(0xc000, 0xefff) AM_READ_BANK("bank3") AM_WRITE(writemem3)
-	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bank4") AM_WRITE(writemem4)
+	//AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE(writemem1)
+	//AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank2") AM_WRITE(writemem2)
+	//AM_RANGE(0xc000, 0xefff) AM_READ_BANK("bank3") AM_WRITE(writemem3)
+	//AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bank4") AM_WRITE(writemem4)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svi318_io, AS_IO, 8, svi318_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x38) AM_READWRITE(io_ext_r, io_ext_w )
+	//AM_RANGE(0x00, 0x38) AM_READWRITE(io_ext_r, io_ext_w )
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("tms9928a", tms9928a_device, vram_write)
 	AM_RANGE(0x81, 0x81) AM_DEVWRITE("tms9928a", tms9928a_device, register_write)
 	AM_RANGE(0x84, 0x84) AM_DEVREAD("tms9928a", tms9928a_device, vram_read)
@@ -43,14 +125,14 @@ static ADDRESS_MAP_START( svi318_io, AS_IO, 8, svi318_state )
 	AM_RANGE(0x88, 0x88) AM_DEVWRITE("ay8910", ay8910_device, address_w)
 	AM_RANGE(0x8c, 0x8c) AM_DEVWRITE("ay8910", ay8910_device, data_w)
 	AM_RANGE(0x90, 0x90) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x96, 0x97) AM_WRITE(ppi_w)
+	//AM_RANGE(0x96, 0x97) AM_WRITE(ppi_w)
 	AM_RANGE(0x98, 0x9a) AM_DEVREAD("ppi8255", i8255_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svi328_806_io, AS_IO, 8, svi318_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x58) AM_READWRITE(io_ext_r, io_ext_w )
+	//AM_RANGE(0x00, 0x58) AM_READWRITE(io_ext_r, io_ext_w )
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("tms9928a", tms9928a_device, vram_write)
 	AM_RANGE(0x81, 0x81) AM_DEVWRITE("tms9928a", tms9928a_device, register_write)
 	AM_RANGE(0x84, 0x84) AM_DEVREAD("tms9928a", tms9928a_device, vram_read)
@@ -58,7 +140,7 @@ static ADDRESS_MAP_START( svi328_806_io, AS_IO, 8, svi318_state )
 	AM_RANGE(0x88, 0x88) AM_DEVWRITE("ay8910", ay8910_device, address_w)
 	AM_RANGE(0x8c, 0x8c) AM_DEVWRITE("ay8910", ay8910_device, data_w)
 	AM_RANGE(0x90, 0x90) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x96, 0x97) AM_WRITE(ppi_w)
+	//AM_RANGE(0x96, 0x97) AM_WRITE(ppi_w)
 	AM_RANGE(0x98, 0x9a) AM_DEVREAD("ppi8255", i8255_device, read)
 ADDRESS_MAP_END
 
@@ -257,7 +339,7 @@ SLOT_INTERFACE_END
 static MACHINE_CONFIG_FRAGMENT( svi318_cartslot )
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "svi318_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(svi318_state, svi318_cart)
+	//MCFG_GENERIC_LOAD(svi318_state, svi318_cart)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","svi318_cart")
@@ -271,21 +353,21 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(svi318_state, ppi_port_a_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(svi318_state, ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(svi318_state, ppi_port_c_w))
+	//MCFG_I8255_IN_PORTA_CB(READ8(svi318_state, ppi_port_a_r))
+	//MCFG_I8255_IN_PORTB_CB(READ8(svi318_state, ppi_port_b_r))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(svi318_state, ppi_port_c_w))
 
 	MCFG_DEVICE_ADD("ins8250_0", INS8250, 1000000)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(svi318_state, ins8250_interrupt))
+	//MCFG_INS8250_OUT_INT_CB(WRITELINE(svi318_state, ins8250_interrupt))
 	MCFG_DEVICE_ADD("ins8250_1", INS8250, 3072000)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(svi318_state, ins8250_interrupt))
+	//MCFG_INS8250_OUT_INT_CB(WRITELINE(svi318_state, ins8250_interrupt))
 
 	/* Video hardware */
 	MCFG_DEVICE_ADD("tms9928a", TMS9929A, XTAL_10_738635MHz / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi318_state, vdp_interrupt))
+	//MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi318_state, vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9929a_device, screen_update)
+	//MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9929a_device, screen_update)
 
 	/* Sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -294,13 +376,13 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8910", AY8910, 1789773)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(svi318_state, psg_port_a_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(svi318_state, psg_port_b_w))
+	//MCFG_AY8910_PORT_A_READ_CB(READ8(svi318_state, psg_port_a_r))
+	//MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(svi318_state, psg_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(svi318_state, write_centronics_busy))
+	//MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(svi318_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -312,8 +394,8 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "svi318_cass")
 
 	MCFG_FD1793_ADD("wd179x", XTAL_1MHz)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(svi318_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(svi318_state, fdc_drq_w))
+	//MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(svi318_state, fdc_intrq_w))
+	//MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(svi318_state, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", svi_floppies, "dd", svi318_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:1", svi_floppies, "dd", svi318_state::floppy_formats)
@@ -334,9 +416,9 @@ static MACHINE_CONFIG_DERIVED( svi318n, svi318 )
 	MCFG_DEVICE_REMOVE("screen")
 	MCFG_DEVICE_ADD("tms9928a", TMS9928A, XTAL_10_738635MHz / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi318_state, vdp_interrupt))
+	//MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi318_state, vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+	//MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svi328, svi318 )
@@ -382,24 +464,24 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(svi318_state, ppi_port_a_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(svi318_state, ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(svi318_state, ppi_port_c_w))
+	//MCFG_I8255_IN_PORTA_CB(READ8(svi318_state, ppi_port_a_r))
+	//MCFG_I8255_IN_PORTB_CB(READ8(svi318_state, ppi_port_b_r))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(svi318_state, ppi_port_c_w))
 
 	MCFG_DEVICE_ADD("ins8250_0", INS8250, 1000000)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(svi318_state, ins8250_interrupt))
+	//MCFG_INS8250_OUT_INT_CB(WRITELINE(svi318_state, ins8250_interrupt))
 	MCFG_DEVICE_ADD("ins8250_1", INS8250, 3072000)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(svi318_state, ins8250_interrupt))
+	//MCFG_INS8250_OUT_INT_CB(WRITELINE(svi318_state, ins8250_interrupt))
 
 	/* Video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_DEVICE_ADD("tms9928a", TMS9929A, XTAL_10_738635MHz / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi318_state, vdp_interrupt))
+	//MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi318_state, vdp_interrupt))
 	MCFG_TMS9928A_SET_SCREEN("screen")
 	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9929a_device, screen_update)
+	//MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9929a_device, screen_update)
 	MCFG_PALETTE_ADD("palette", TMS9928A_PALETTE_SIZE + 2)  /* 2 additional entries for monochrome svi806 output */
 
 	MCFG_SCREEN_ADD("svi806", RASTER)
@@ -407,14 +489,14 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	//MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", svi328)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "svi806", XTAL_12MHz / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)   /* ? */
-	MCFG_MC6845_UPDATE_ROW_CB(svi318_state, crtc_update_row)
+	//MCFG_MC6845_UPDATE_ROW_CB(svi318_state, crtc_update_row)
 
 	/* Sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -423,13 +505,13 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8910", AY8910, 1789773)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(svi318_state, psg_port_a_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(svi318_state, psg_port_b_w))
+	//MCFG_AY8910_PORT_A_READ_CB(READ8(svi318_state, psg_port_a_r))
+	//MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(svi318_state, psg_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(svi318_state, write_centronics_busy))
+	//MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(svi318_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -441,8 +523,8 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "svi318_cass")
 
 	MCFG_FD1793_ADD("wd179x", XTAL_1MHz)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(svi318_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(svi318_state, fdc_drq_w))
+	//MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(svi318_state, fdc_intrq_w))
+	//MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(svi318_state, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", svi_floppies, "dd", svi318_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:1", svi_floppies, "dd", svi318_state::floppy_formats)
@@ -533,9 +615,9 @@ ROM_END
 
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE        INPUT   INIT                       COMPANY         FULLNAME                    FLAGS */
-COMP( 1983, svi318,     0,      0,      svi318,        svi318, svi318_state, svi318,      "Spectravideo", "SVI-318 (PAL)",   MACHINE_SUPPORTS_SAVE )
-COMP( 1983, svi318n,    svi318, 0,      svi318n,       svi318, svi318_state, svi318,      "Spectravideo", "SVI-318 (NTSC)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, svi328,     svi318, 0,      svi328,        svi328, svi318_state, svi318,      "Spectravideo", "SVI-328 (PAL)",   MACHINE_SUPPORTS_SAVE )
-COMP( 1983, svi328n,    svi318, 0,      svi328n,       svi328, svi318_state, svi318,      "Spectravideo", "SVI-328 (NTSC)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, sv328p80,   svi318, 0,      svi328_806,    svi328, svi318_state, svi328_806,  "Spectravideo", "SVI-328 (PAL) + SVI-806 80 column card",  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, sv328n80,   svi318, 0,      svi328n_806,   svi328, svi318_state, svi328_806,  "Spectravideo", "SVI-328 (NTSC) + SVI-806 80 column card", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, svi318,     0,      0,      svi318,        svi318, driver_device, 0,      "Spectravideo", "SVI-318 (PAL)",   MACHINE_NOT_WORKING )
+COMP( 1983, svi318n,    svi318, 0,      svi318n,       svi318, driver_device, 0,      "Spectravideo", "SVI-318 (NTSC)",  MACHINE_NOT_WORKING )
+COMP( 1983, svi328,     svi318, 0,      svi328,        svi328, driver_device, 0,      "Spectravideo", "SVI-328 (PAL)",   MACHINE_NOT_WORKING )
+COMP( 1983, svi328n,    svi318, 0,      svi328n,       svi328, driver_device, 0,      "Spectravideo", "SVI-328 (NTSC)",  MACHINE_NOT_WORKING )
+COMP( 1983, sv328p80,   svi318, 0,      svi328_806,    svi328, driver_device, 0,  	  "Spectravideo", "SVI-328 (PAL) + SVI-806 80 column card",  MACHINE_NOT_WORKING )
+COMP( 1983, sv328n80,   svi318, 0,      svi328n_806,   svi328, driver_device, 0,      "Spectravideo", "SVI-328 (NTSC) + SVI-806 80 column card", MACHINE_NOT_WORKING )

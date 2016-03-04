@@ -2603,8 +2603,6 @@ files {
 createMESSProjects(_target, _subtarget, "svi")
 files {
 	MAME_DIR .. "src/mame/drivers/svi318.cpp",
-	MAME_DIR .. "src/mame/includes/svi318.h",
-	MAME_DIR .. "src/mame/machine/svi318.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "svision")
