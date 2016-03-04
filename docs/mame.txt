@@ -29,7 +29,7 @@ II. Cost
 MAME is free. Its source code is free. The project as whole is under
 distributed under the GNU General Public License, version 2 (GPL-2.0),
 but most of code (including core functionality) is available under the
-BSD-3-~lause license.
+BSD-3-clause license.
 
 
 -------------------------
