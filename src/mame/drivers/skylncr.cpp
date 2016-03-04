@@ -543,6 +543,22 @@ static const gfx_layout layout8x8x8_alt =   /* for sstar97 */
 	8*8*4
 };
 
+static const gfx_layout layout8x8x8_bdream97 =   /* for bdream97 */
+{
+	8,8,
+	RGN_FRAC(1,2),
+	8,
+	{ STEP8(0,1) },
+	{
+		8*0,RGN_FRAC(1,2)+8*0,
+		RGN_FRAC(1,2)+8*1,8*1,
+		8*2,RGN_FRAC(1,2)+8*2,
+		RGN_FRAC(1,2)+8*3,8*3
+	},
+	{ STEP8(0,8*4) },
+	8*8*4
+};
+
 static const gfx_layout layout8x32x8 =
 {
 	8,32,
@@ -640,6 +656,12 @@ GFXDECODE_END
 
 static GFXDECODE_START( sstar97 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_alt,    0, 2 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0, 2 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START( bdream97 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_bdream97,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 1 )
 GFXDECODE_END
@@ -1431,6 +1453,14 @@ static MACHINE_CONFIG_DERIVED( sstar97, skylncr )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( bdream97, skylncr )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_GFXDECODE_MODIFY("gfxdecode", bdream97)
+MACHINE_CONFIG_END
+
+
 /**********************************
 *            ROM Load             *
 **********************************/
@@ -1695,4 +1725,4 @@ GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  skylncr, ROT0
 GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  skylncr, ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
 GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr, ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
 GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr, ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
-GAME( 199?, bdream97, 0,       sstar97,  sstar97,  skylncr_state,  skylncr, ROT0, "bootleg",              "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_NOT_WORKING )
+GAME( 199?, bdream97, 0,       bdream97, skylncr,  skylncr_state,  skylncr, ROT0, "bootleg",              "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_NOT_WORKING )
