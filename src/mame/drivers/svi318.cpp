@@ -68,9 +68,6 @@ public:
 	int m_drq;
 	int m_irq;
 	
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	memory_region *m_cart_rom;
 	memory_region *m_bios_rom;
 
