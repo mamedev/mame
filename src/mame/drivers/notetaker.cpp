@@ -136,7 +136,7 @@ WRITE16_MEMBER(notetaker_state::IPConReg_w)
 	//m_ProcLock = (data&0x40)?1:0; // bus lock for this processor (hold other processor in wait state)
 	//m_CharCtr = (data&0x20)?1:0; // battery charge control
 	m_DisableROM = (data&0x10)?1:0; // disable rom at 0000-0fff
-	//m_CorrOn = (data&0x08)?1:0; // corron (?) also LedInd5
+	//m_CorrOn = (data&0x08)?1:0; // CorrectionOn (ECC correction enabled); also LedInd5
 	//m_LedInd6 = (data&0x04)?1:0;
 	//m_LedInd7 = (data&0x02)?1:0;
 	//m_LedInd8 = (data&0x01)?1:0;
@@ -250,7 +250,9 @@ READ16_MEMBER(notetaker_state::iocpu_r)
 	}
 	else
 	{
-		ram += (offset);
+		// are we in the FFFE8-FFFEF area where the parity/int/reset/etc stuff lives?
+		if (offset >= 0x7fff4) { logerror("attempt to read processor control regs at %d\n", offset<<1); return 0xFFFF; }
+		ram += offset;
 		return *ram;
 	}
 }
@@ -260,9 +262,11 @@ WRITE16_MEMBER(notetaker_state::iocpu_w)
 	UINT16 *ram = (UINT16 *)(memregion("mainram")->base());
 	if ( (m_BootSeqDone == 0) || ((m_DisableROM == 0) && ((offset&0x7F800) == 0)) )
 	{
-		logerror("attempt to write %04X to ROM-mapped area at %06X ignored\n", data, offset);
+		logerror("attempt to write %04X to ROM-mapped area at %06X ignored\n", data, offset<<1);
 		return;
 	}
+	// are we in the FFFE8-FFFEF area where the parity/int/reset/etc stuff lives?
+	if (offset >= 0x7fff4) { logerror("attempt to write processor control regs at %d with %02X ignored\n", offset<<1, data); }
 	ram += offset;
 	*ram = data;
 }
@@ -277,21 +281,40 @@ mode 1: (during most of boot)
 0   0   0   0    0   0   1   *    *   *   *   *    *   *   *   *    *   *   *   *    1            0          RW  RAM
 <anything not all zeroes>x   x    x   x   x   x    x   x   x   x    x   x   x   x    1            0          .   Open Bus
 mode 2: (during load of the emulatorcpu's firmware to the first 4k of shared ram which is on the emulatorcpu board)
-0   0   0   0    0   0   *   *    *   *   *   *    *   *   *   *    *   *   *   *    1            1          RW  RAM
+0   0   *   *    *   *   *   *    *   *   *   *    *   *   *   *    *   *   *   *    1            1          RW  RAM
 <anything not all zeroes>x   x    x   x   x   x    x   x   x   x    x   x   x   x    1            1          .   Open Bus
+   EXCEPT for the following, decoded by the memory address logic board:
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   0   x    1            x          .   Open Bus
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   1   x    1            x          W   FFFEA (Multiprocessor Control (reset/int/boot for each proc; data bits 3,2,1,0 = 0010 means IP, bits 3210 = 0111 means EP; all others ignored.))
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   0   x    1            x          R   FFFEC (Syndrome bits (gnd bit 15, parity bit 14, exp (ECC) bits 13-8, bits 7-0 are 'other' (?maybe highest address bits?)
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   1   x    1            x          R   FFFEE (Parity Error Address: row bits 15-8, column bits 7-0; reading this acknowledges a parity interrupt)
 
 More or less:
 BootSeqDone is 0, DisableROM is ignored, mem map is 0x00000-0xfffff reading is the 0x1000-long ROM, repeated every 0x1000 bytes. writing goes nowhere.
 BootSeqDone is 1, DisableROM is 0,       mem map is 0x00000-0x00fff reading is the 0x1000-long ROM, remainder of memory map goes to RAM or open bus. writing the ROM area goes nowhere, writing RAM goes to RAM.
 BootSeqDone is 1, DisableROM is 1,       mem map is entirely RAM or open bus for both reading and writing.
+
+
+Emulator cpu mem map:
+a19 a18 a17 a16  a15 a14 a13 a12  a11 a10 a9  a8   a7  a6  a5  a4   a3  a2  a1  a0   4KPage0'
+x   x   0   0    0   0   0   0    *   *   *   *    *   *   *   *    *   *   *   *    0                       RW  Local (fast) RAM
+x   x   0   0    0   0   0   0    *   *   *   *    *   *   *   *    *   *   *   *    1                       RW  System/Shared RAM
+x   x   *   *    *   *   *   *    *   *   *   *    *   *   *   *    *   *   *   *    x                       RW  System/Shared RAM
+   EXCEPT for the following, decoded by the EP board and superseding above:
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   0   x    x   x   x   x    x                       RW  FFFC0-FFFDF (trigger ILLINST interrupt on EP, data ignored?)
+   And the following, decoded by the memory address logic board:
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   0   x    x                       .   Open Bus
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   1   x    x                       W   FFFEA (Multiprocessor Control (reset/int/boot for each proc; data bits 3,2,1,0 = 0010 means IP, bits 3210 = 0111 means EP; all others ignored.))
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   0   x    x                       R   FFFEC (Syndrome bits (gnd bit 15, parity bit 14, exp bits 13-8, bits 7-0 are 'other', maybe highest address bits)
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   1   x    x                       R   FFFEE (Parity Error Address: row bits 15-8, column bits 7-0; reading this acknowledges a parity interrupt)
 */
+
 static ADDRESS_MAP_START(notetaker_iocpu_mem, AS_PROGRAM, 16, notetaker_state)
 	/*
-	AM_RANGE(0x00000, 0x00fff) AM_ROM AM_REGION("iocpu", 0xFF000) // rom is here if either BootSeqDone OR DisableROM are zero. the 1.5 source code implies writes here are ignored
-	AM_RANGE(0x01000, 0x01fff) AM_RAM // 4k of ram, local to the io processor
-	AM_RANGE(0x02000, 0x3ffff) AM_RAM AM_BASE("mainram") // 256k of ram (less 8k), shared between both processors
+	AM_RANGE(0x00000, 0x00fff) AM_ROM AM_REGION("iocpu", 0xFF000) // rom is here if either BootSeqDone OR DisableROM are zero. the 1.5 source code and the schematics implies writes here are ignored while rom is enabled; if disablerom is 1 this goes to mainram
+	AM_RANGE(0x01000, 0x3ffff) AM_RAM AM_BASE("mainram") // 256k of ram (less 4k), shared between both processors. rom goes here if bootseqdone is 0
 	// note 4000-8fff? is the framebuffer for the screen?
-	AM_RANGE(0xff000, 0xfffff) AM_ROM // rom is only banked in here if bootseqdone is 0, so the reset vector is in the proper place
+	AM_RANGE(0xff000, 0xfffff) AM_ROM // rom is only banked in here if bootseqdone is 0, so the reset vector is in the proper place. otherwise the memory control regs live at fffe8-fffef
 	*/
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(iocpu_r, iocpu_w) // bypass MAME's memory map system as we need finer grained control
 ADDRESS_MAP_END
@@ -396,6 +419,16 @@ read from 0x0002 (byte wide) (check interrupts) <looking for vblank int or odd/e
 0xaf to port 0x002 PIC (mask out kb int and 30hz display int)
 0x0400 to 0x060 (select DAC fifo frequency 2)
 read from 0x44 (byte wide) in a loop forever (read keyboard fifo status)
+*/
+
+/* Emulator CPU */
+/*
+static ADDRESS_MAP_START(notetaker_emulatorcpu_mem, AS_PROGRAM, 16, notetaker_state)
+	AM_RANGE(0x00000, 0x00fff) AM_RAM // actually a banked block of ram
+	AM_RANGE(0x02000, 0x3ffff) AM_RAM AM_BASE("mainram") // 256k of ram (less 8k), shared between both processors
+	// note 4000-8fff? is the framebuffer for the screen?
+	AM_RANGE(0xFFFE0, 0xFFFEF) AM_READWRITE(proc_control_r, proc_control_w)
+ADDRESS_MAP_END
 */
 
 /* Machine Reset */
