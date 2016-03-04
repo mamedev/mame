@@ -71,7 +71,9 @@ All contributors need to either add a standard header for license info (on new f
 
 License
 =======
-MAME project as a whole is licnesed under the [GPL-2.0](http://opensource.org/licenses/GPL-2.0) license, since it contains code that is under multiple licenses. A great majority of files (over 90% including core files) are under the [BSD-3-Clause](http://opensource.org/licenses/BSD-3-Clause) and we would encourage new developers to distribute files under this license. 
+The MAME project as a whole is distributed under the terms of the [GPL-2.0](http://opensource.org/licenses/GPL-2.0) license, since it contains code distributed under multiple GPL-compatible licenses. A great majority of files (over 90% including core files) are under the [BSD-3-Clause](http://opensource.org/licenses/BSD-3-Clause) and we would encourage new developers to distribute files under this license.
+
+Please note that MAME is a registerd trademake of Nicola Salmoria, and permission is required to use the "MAME" name, logo or wordmark.
 
 [License (GPL-2.0)](LICENSE)
 ============================
