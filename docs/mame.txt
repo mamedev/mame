@@ -1,4 +1,4 @@
-MAME(tm), the Multiple Arcade Machine Emulator
+MAME(tm)
 Copyright (c) 1997-2013 by Nicola Salmoria and the MAME team
 MAME is a trademark owned by Nicola Salmoria
 
@@ -27,8 +27,9 @@ in the executable.
 II. Cost
 --------
 MAME is free. Its source code is free. The project as whole is under
-distributed under the GPL-2.0 license, but most of code (including core
-functionality) is available under the 3-clause BSD license.
+distributed under the GNU General Public License, version 2 (GPL-2.0),
+but most of code (including core functionality) is available under the
+BSD-3-~lause license.
 
 
 -------------------------
