@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #include "atom_dsk.h"
 
 atom_format::atom_format() : wd177x_format(formats)

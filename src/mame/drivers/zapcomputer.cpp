@@ -1,4 +1,4 @@
-// license:GPL2+
+// license:GPL-2.0+
 // copyright-holders:FelipeSanches
 /*
     ZAP - Z80 Applications Processor

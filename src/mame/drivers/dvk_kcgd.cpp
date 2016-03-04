@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 /***************************************************************************
 
     KCGD (Kontroller Cvetnogo Graficheskogo Displeya = Colour Graphics

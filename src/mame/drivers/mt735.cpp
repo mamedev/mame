@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Cowering, Olivier Galibert
 /*
   Brother MT735 thermal printer
 */
