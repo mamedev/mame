@@ -905,11 +905,11 @@ msgstr ""
 
 #: src/emu/ui/menu.cpp:2073
 msgid "Images"
-msgstr ""
+msgstr "画像"
 
 #: src/emu/ui/menu.cpp:2074
 msgid "Infos"
-msgstr ""
+msgstr "情報"
 
 #: src/emu/ui/miscmenu.cpp:36
 msgid "Keyboard Mode:"
@@ -1586,7 +1586,7 @@ msgstr "再生"
 
 #: src/emu/ui/tapectrl.cpp:100
 msgid "Record"
-msgstr ""
+msgstr "録音"
 
 #: src/emu/ui/tapectrl.cpp:103
 msgid "Rewind"
