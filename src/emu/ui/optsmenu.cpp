@@ -217,7 +217,7 @@ void ui_menu_game_options::populate()
 		item_append(_("Filter"), main_filters::text[m_main], arrow_flags, (void *)(FPTR)FILTER_MENU);
 
 		// add category subitem
-		if (main_filters::actual == FILTER_CATEGORY && !machine().inifile().ini_index.empty())
+		if (m_main == FILTER_CATEGORY && !machine().inifile().ini_index.empty())
 		{
 			inifile_manager &inif = machine().inifile();
 			int afile = inif.current_file;
@@ -233,7 +233,7 @@ void ui_menu_game_options::populate()
 			item_append(fbuff.c_str(), inif.actual_category().c_str(), arrow_flags, (void *)(FPTR)CATEGORY_FILTER);
 		}
 		// add manufacturer subitem
-		else if (main_filters::actual == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
+		else if (m_main == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(0, c_mnfct::ui.size() - 1, c_mnfct::actual);
 			fbuff = _("^!Manufacturer");
@@ -241,7 +241,7 @@ void ui_menu_game_options::populate()
 			item_append(fbuff.c_str(), c_mnfct::ui[c_mnfct::actual].c_str(), arrow_flags, (void *)(FPTR)MANUFACT_CAT_FILTER);
 		}
 		// add year subitem
-		else if (main_filters::actual == FILTER_YEAR && c_year::ui.size() > 0)
+		else if (m_main == FILTER_YEAR && c_year::ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(0, c_year::ui.size() - 1, c_year::actual);
 			fbuff.assign(_("^!Year"));
@@ -249,7 +249,7 @@ void ui_menu_game_options::populate()
 			item_append(fbuff.c_str(), c_year::ui[c_year::actual].c_str(), arrow_flags, (void *)(FPTR)YEAR_CAT_FILTER);
 		}
 		// add custom subitem
-		else if (main_filters::actual == FILTER_CUSTOM)
+		else if (m_main == FILTER_CUSTOM)
 		{
 			fbuff = _("^!Setup custom filter");
 			convert_command_glyph(fbuff);
