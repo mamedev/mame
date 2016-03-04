@@ -425,8 +425,7 @@ read from 0x44 (byte wide) in a loop forever (read keyboard fifo status)
 /*
 static ADDRESS_MAP_START(notetaker_emulatorcpu_mem, AS_PROGRAM, 16, notetaker_state)
 	AM_RANGE(0x00000, 0x00fff) AM_RAM // actually a banked block of ram
-	AM_RANGE(0x02000, 0x3ffff) AM_RAM AM_BASE("mainram") // 256k of ram (less 8k), shared between both processors
-	// note 4000-8fff? is the framebuffer for the screen?
+	AM_RANGE(0x01000, 0x3ffff) AM_MIRROR(0xC0000) AM_RAM AM_BASE("mainram") // 256k of ram (less 4k), shared between both processors, mirrored 4 times
 	AM_RANGE(0xFFFE0, 0xFFFEF) AM_READWRITE(proc_control_r, proc_control_w)
 ADDRESS_MAP_END
 */
