@@ -637,6 +637,25 @@ static const gfx_layout layout8x32x8_alt2 =  /* for neraidov */
 	8*32*8/2
 };
 
+static const gfx_layout layout8x32x8_bdream97 =  /* for bdream97 */
+{
+	8,32,
+	RGN_FRAC(1,2),
+	8,
+	{ STEP8(0,1) },
+	{
+		8*1, RGN_FRAC(1,2)+8*1,
+		8*0, RGN_FRAC(1,2)+8*0,
+		8*3, RGN_FRAC(1,2)+8*3,
+		8*2, RGN_FRAC(1,2)+8*2
+	},
+	{
+		STEP16(0,8*4),
+		STEP16(16*8*4,8*4)
+	},
+	8*32*8/2
+};
+
 
 /**************************************
 *           Graphics Decode           *
@@ -662,8 +681,8 @@ GFXDECODE_END
 
 static GFXDECODE_START( bdream97 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_bdream97,    0, 2 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0, 2 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_bdream97,   0, 2 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_bdream97,   0x100, 1 )
 GFXDECODE_END
 
 
