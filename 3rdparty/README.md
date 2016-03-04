@@ -1,5 +1,5 @@
 # **3rdparty** #
-=========
+
 benchmark - [Apache License, Version 2.0](http://opensource.org/licenses/Apache-2.0)
 
 bgfx - [The BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)
