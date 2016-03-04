@@ -4472,8 +4472,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/splus.cpp",
 	MAME_DIR .. "src/mame/drivers/spool99.cpp",
 	MAME_DIR .. "src/mame/drivers/sprcros2.cpp",
-	MAME_DIR .. "src/mame/includes/sprcros2.h",
-	MAME_DIR .. "src/mame/video/sprcros2.cpp",
 	MAME_DIR .. "src/mame/drivers/sshot.cpp",
 	MAME_DIR .. "src/mame/drivers/ssingles.cpp",
 	MAME_DIR .. "src/mame/drivers/sstrangr.cpp",
