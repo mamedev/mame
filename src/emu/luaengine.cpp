@@ -19,9 +19,6 @@
 #include "ui/ui.h"
 #include "luaengine.h"
 #include <mutex>
-#if !defined(NO_LIBUV)
-#include "libuv/include/uv.h"
-#endif
 
 //**************************************************************************
 //  LUA ENGINE
@@ -52,10 +49,6 @@ extern "C" {
 	int luaopen_lsqlite3(lua_State *L);
 	int luaopen_zlib(lua_State *L);
 	int luaopen_lfs(lua_State *L);
-#if !defined(NO_LIBUV)
-	int luaopen_luv(lua_State *L);
-	uv_loop_t* luv_loop(lua_State* L);
-#endif
 }
 
 static void lstop(lua_State *L, lua_Debug *ar)
@@ -1199,12 +1192,6 @@ lua_engine::lua_engine()
 	lua_getfield(m_lua_state, -1, "preload");
 	lua_remove(m_lua_state, -2); // Remove package
 
-#if !defined(NO_LIBUV)
-	// Store uv module definition at preload.uv
-	lua_pushcfunction(m_lua_state, luaopen_luv);
-	lua_setfield(m_lua_state, -2, "luv");
-#endif
-
 	lua_pushcfunction(m_lua_state, luaopen_zlib);
 	lua_setfield(m_lua_state, -2, "zlib");
 
@@ -1670,11 +1657,6 @@ void lua_engine::periodic_check()
 		msg.ready = 0;
 		msg.done = 1;
 	}
-#if !defined(NO_LIBUV)	
-	auto loop = luv_loop(m_lua_state);
-	if (loop!=nullptr)
-		uv_run(loop, UV_RUN_NOWAIT);
-#endif
 }
 
 //-------------------------------------------------

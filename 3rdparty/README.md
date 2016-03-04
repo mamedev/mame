@@ -1,6 +1,6 @@
 # **3rdparty** #
 
-benchmark - [Apache License, Version 2.0](http://opensource.org/licenses/Apache-2.0)
+benchmark - [Apache License, Version 2.0](http://opensource.org/licenses/Apache-2.0) (used only for testing, not part of distribution)
 
 bgfx - [The BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)
 
@@ -31,8 +31,6 @@ lua-zlib - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 luabridge - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 luafilesystem - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
-
-luv - [Apache License, Version 2.0](http://opensource.org/licenses/Apache-2.0)
 
 lzma - [The GNU Lesser General Public License](http://opensource.org/licenses/LGPL-2.1)
 
