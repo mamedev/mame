@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-02 07:55+0100\n"
+"POT-Creation-Date: 2016-03-05 22:55+1100\n"
 "PO-Revision-Date: 2016-03-02 18:52+0100\n"
 "Last-Translator: Mevi <mevi.mame@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
@@ -245,7 +245,8 @@ msgstr "Paramètres des polices de l'interface"
 
 #: src/emu/ui/custui.cpp:431
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr "Exemple de texte - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+msgstr ""
+"Exemple de texte - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 #: src/emu/ui/custui.cpp:529
 msgid "Normal text"
@@ -554,12 +555,9 @@ msgid "Folders Setup"
 msgstr "Configuration des dossiers"
 
 #: src/emu/ui/dirmenu.cpp:183
-msgid "Current "
-msgstr "Actuel "
-
-#: src/emu/ui/dirmenu.cpp:183
-msgid " Folders"
-msgstr " dossiers"
+#, c-format
+msgid "Current %1$s Folders"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
@@ -573,29 +571,24 @@ msgstr "Ajouter un dossier"
 msgid "Remove Folder"
 msgstr "Supprimer un dossier"
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Change)"
-msgstr "Changer)"
+#: src/emu/ui/dirmenu.cpp:499
+#, c-format
+msgid "Change %1$s Folder - Search: %2$s_"
+msgstr ""
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Add"
-msgstr "Ajouter"
+#: src/emu/ui/dirmenu.cpp:500
+#, c-format
+msgid "Add %1$s Folder - Search: %2$s_"
+msgstr ""
 
-#: src/emu/ui/dirmenu.cpp:498
-msgid " Folder - Search: "
-msgstr " Dossier - Recherche : "
-
-#: src/emu/ui/dirmenu.cpp:533
+#: src/emu/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
 msgstr "Appuyer sur TAB pour définir"
 
-#: src/emu/ui/dirmenu.cpp:639
-msgid "Remove "
-msgstr "Supprimer "
-
-#: src/emu/ui/dirmenu.cpp:639
-msgid " Folder"
-msgstr " Dossier"
+#: src/emu/ui/dirmenu.cpp:643
+#, c-format
+msgid "Remove %1$s Folder"
+msgstr ""
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
@@ -1563,7 +1556,8 @@ msgstr "Permuter l'ordre des éléments"
 #: src/emu/ui/swlist.cpp:268
 #, c-format
 msgid "Switched Order: entries now ordered by %s"
-msgstr "Commande de tri effectuée : les entrées sont maintenant classées par %s"
+msgstr ""
+"Commande de tri effectuée : les entrées sont maintenant classées par %s"
 
 #: src/emu/ui/swlist.cpp:268
 msgid "shortname"
@@ -1619,7 +1613,8 @@ msgstr ""
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
-msgstr "Ce driver nécessite le chargement d'images dans le(s) périphérique(s) "
+msgstr ""
+"Ce driver nécessite le chargement d'images dans le(s) périphérique(s) "
 "suivant(s) : "
 
 #: src/emu/ui/ui.cpp:1043
@@ -2104,3 +2099,24 @@ msgstr " COULEURS"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " MARQUEURS"
+
+#~ msgid "Current "
+#~ msgstr "Actuel "
+
+#~ msgid " Folders"
+#~ msgstr " dossiers"
+
+#~ msgid "Change)"
+#~ msgstr "Changer)"
+
+#~ msgid "Add"
+#~ msgstr "Ajouter"
+
+#~ msgid " Folder - Search: "
+#~ msgstr " Dossier - Recherche : "
+
+#~ msgid "Remove "
+#~ msgstr "Supprimer "
+
+#~ msgid " Folder"
+#~ msgstr " Dossier"

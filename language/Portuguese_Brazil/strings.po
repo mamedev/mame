@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-02 07:55+0100\n"
+"POT-Creation-Date: 2016-03-05 22:55+1100\n"
 "PO-Revision-Date: 2016-03-02 14:00+0100\n"
 "Last-Translator: Ashura-X\n"
 "Language-Team: MAME Language Team\n"
@@ -554,12 +554,9 @@ msgid "Folders Setup"
 msgstr "Configurar Pastas"
 
 #: src/emu/ui/dirmenu.cpp:183
-msgid "Current "
-msgstr "Atual"
-
-#: src/emu/ui/dirmenu.cpp:183
-msgid " Folders"
-msgstr "Pastas"
+#, c-format
+msgid "Current %1$s Folders"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
@@ -573,29 +570,24 @@ msgstr "Adicionar Pasta"
 msgid "Remove Folder"
 msgstr "Remover Pasta"
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Change)"
-msgstr "Mudar)"
+#: src/emu/ui/dirmenu.cpp:499
+#, c-format
+msgid "Change %1$s Folder - Search: %2$s_"
+msgstr ""
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Add"
-msgstr "Adicionar"
+#: src/emu/ui/dirmenu.cpp:500
+#, c-format
+msgid "Add %1$s Folder - Search: %2$s_"
+msgstr ""
 
-#: src/emu/ui/dirmenu.cpp:498
-msgid " Folder - Search: "
-msgstr " Busca - Pasta: "
-
-#: src/emu/ui/dirmenu.cpp:533
+#: src/emu/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
 msgstr "Pressione TAB para definir"
 
-#: src/emu/ui/dirmenu.cpp:639
-msgid "Remove "
-msgstr "Remover "
-
-#: src/emu/ui/dirmenu.cpp:639
-msgid " Folder"
-msgstr " Pasta"
+#: src/emu/ui/dirmenu.cpp:643
+#, c-format
+msgid "Remove %1$s Folder"
+msgstr ""
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
@@ -862,7 +854,7 @@ msgid "Select New Machine"
 msgstr "Selecionar Nova Máquina"
 
 #: src/emu/ui/menu.cpp:45
-msgid "Painéis de Controle"
+msgid "Control Panels"
 msgstr ""
 
 #: src/emu/ui/menu.cpp:50
@@ -1130,8 +1122,8 @@ msgid ""
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
-"Faltam arquivos ROM ou CHD correspondentes à máquina selecionada. "
-"Por favor, selecione uma outra máquina.\n"
+"Faltam arquivos ROM ou CHD correspondentes à máquina selecionada. Por favor, "
+"selecione uma outra máquina.\n"
 "\n"
 "Pressione qualquer tecla (exceto ESC) para continuar."
 
@@ -1370,7 +1362,9 @@ msgstr "Requer CHD: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1580
 msgid "Roms Audit Pass: OK\n"
-msgstr "Checagem de Roms: OK\n "
+msgstr ""
+"Checagem de Roms: OK\n"
+" "
 
 #: src/emu/ui/selgame.cpp:1582
 msgid "Roms Audit Pass: BAD\n"
@@ -2051,6 +2045,27 @@ msgstr " CORES"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " CANETAS"
+
+#~ msgid "Current "
+#~ msgstr "Atual"
+
+#~ msgid " Folders"
+#~ msgstr "Pastas"
+
+#~ msgid "Change)"
+#~ msgstr "Mudar)"
+
+#~ msgid "Add"
+#~ msgstr "Adicionar"
+
+#~ msgid " Folder - Search: "
+#~ msgstr " Busca - Pasta: "
+
+#~ msgid "Remove "
+#~ msgstr "Remover "
+
+#~ msgid " Folder"
+#~ msgstr " Pasta"
 
 #~ msgid "Search: "
 #~ msgstr "Busca: "

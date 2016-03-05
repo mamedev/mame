@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-02 07:55+0100\n"
+"POT-Creation-Date: 2016-03-05 22:55+1100\n"
 "PO-Revision-Date: 2016-02-20 18:03+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: Benjamin Siskoo\n"
@@ -557,12 +557,9 @@ msgid "Folders Setup"
 msgstr "Configurer les Dossiers"
 
 #: src/emu/ui/dirmenu.cpp:183
-msgid "Current "
-msgstr "En cours "
-
-#: src/emu/ui/dirmenu.cpp:183
-msgid " Folders"
-msgstr " Dossiers"
+#, c-format
+msgid "Current %1$s Folders"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
@@ -576,29 +573,24 @@ msgstr "Ajouter un Dossier"
 msgid "Remove Folder"
 msgstr "Enlever le Dossier"
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Change)"
-msgstr "Changer)"
+#: src/emu/ui/dirmenu.cpp:499
+#, c-format
+msgid "Change %1$s Folder - Search: %2$s_"
+msgstr ""
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Add"
-msgstr "Ajouter"
+#: src/emu/ui/dirmenu.cpp:500
+#, c-format
+msgid "Add %1$s Folder - Search: %2$s_"
+msgstr ""
 
-#: src/emu/ui/dirmenu.cpp:498
-msgid " Folder - Search: "
-msgstr " Dossier - Rechercher : "
-
-#: src/emu/ui/dirmenu.cpp:533
+#: src/emu/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
 msgstr "Presser TAB pour choisir"
 
-#: src/emu/ui/dirmenu.cpp:639
-msgid "Remove "
-msgstr "Enlever "
-
-#: src/emu/ui/dirmenu.cpp:639
-msgid " Folder"
-msgstr " Dossier"
+#: src/emu/ui/dirmenu.cpp:643
+#, c-format
+msgid "Remove %1$s Folder"
+msgstr ""
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
@@ -2092,6 +2084,27 @@ msgstr " COULEURS"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " PENS"
+
+#~ msgid "Current "
+#~ msgstr "En cours "
+
+#~ msgid " Folders"
+#~ msgstr " Dossiers"
+
+#~ msgid "Change)"
+#~ msgstr "Changer)"
+
+#~ msgid "Add"
+#~ msgstr "Ajouter"
+
+#~ msgid " Folder - Search: "
+#~ msgstr " Dossier - Rechercher : "
+
+#~ msgid "Remove "
+#~ msgstr "Enlever "
+
+#~ msgid " Folder"
+#~ msgstr " Dossier"
 
 #~ msgid " Search: "
 #~ msgstr " Rechercher :"

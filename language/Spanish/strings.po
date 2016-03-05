@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-02 07:55+0100\n"
+"POT-Creation-Date: 2016-03-05 22:55+1100\n"
 "PO-Revision-Date: 2016-02-20 18:03+0100\n"
 "Last-Translator: A.Viloria\n"
 "Language-Team: MAME Language Team\n"
@@ -246,7 +246,8 @@ msgstr "Configuración de las fuentes para el UI"
 
 #: src/emu/ui/custui.cpp:431
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr "Texto de ejemplo - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+msgstr ""
+"Texto de ejemplo - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 #: src/emu/ui/custui.cpp:529
 msgid "Normal text"
@@ -555,12 +556,9 @@ msgid "Folders Setup"
 msgstr "Configuración de las Carpetas"
 
 #: src/emu/ui/dirmenu.cpp:183
-msgid "Current "
-msgstr "Actual "
-
-#: src/emu/ui/dirmenu.cpp:183
-msgid " Folders"
-msgstr " Carpetas"
+#, c-format
+msgid "Current %1$s Folders"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
@@ -574,29 +572,24 @@ msgstr "Añadir Carpeta"
 msgid "Remove Folder"
 msgstr "Eliminar Carpeta"
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Change)"
-msgstr "Cambio)"
+#: src/emu/ui/dirmenu.cpp:499
+#, c-format
+msgid "Change %1$s Folder - Search: %2$s_"
+msgstr ""
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Add"
-msgstr "Añadir"
+#: src/emu/ui/dirmenu.cpp:500
+#, c-format
+msgid "Add %1$s Folder - Search: %2$s_"
+msgstr ""
 
-#: src/emu/ui/dirmenu.cpp:498
-msgid " Folder - Search: "
-msgstr " Carpeta - Buscar: "
-
-#: src/emu/ui/dirmenu.cpp:533
+#: src/emu/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
 msgstr "Pulsa TAB para fijar"
 
-#: src/emu/ui/dirmenu.cpp:639
-msgid "Remove "
-msgstr "Eliminar "
-
-#: src/emu/ui/dirmenu.cpp:639
-msgid " Folder"
-msgstr " Carpeta"
+#: src/emu/ui/dirmenu.cpp:643
+#, c-format
+msgid "Remove %1$s Folder"
+msgstr ""
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
@@ -943,8 +936,7 @@ msgstr ""
 msgid ""
 "Tickets dispensed: %1$d\n"
 "\n"
-msgstr ""
-"Tickets dispensados: %1$d\n"
+msgstr "Tickets dispensados: %1$d\n"
 
 #: src/emu/ui/miscmenu.cpp:256
 msgid "Coin %1$c: NA%3$s\n"
@@ -1605,7 +1597,9 @@ msgstr "Avance Rápido"
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
-msgstr "Este driver requiere que el software se cargue en los siguientes dispositivos: "
+msgstr ""
+"Este driver requiere que el software se cargue en los siguientes "
+"dispositivos: "
 
 #: src/emu/ui/ui.cpp:1043
 #, c-format
@@ -1624,7 +1618,8 @@ msgstr ""
 "SI NO ESTÁ LEGALMENTE LEGITIMADO PARA REPRODUCIR \"%1$s\" EN ESTE EMULADOR, "
 "PULSE ESC.\n"
 "\n"
-"En otro caso, teclee OK o mueva el joystick de izquierda a derecha para continuar"
+"En otro caso, teclee OK o mueva el joystick de izquierda a derecha para "
+"continuar"
 
 #: src/emu/ui/ui.cpp:1081
 msgid ""
@@ -2082,6 +2077,27 @@ msgstr ""
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr ""
+
+#~ msgid "Current "
+#~ msgstr "Actual "
+
+#~ msgid " Folders"
+#~ msgstr " Carpetas"
+
+#~ msgid "Change)"
+#~ msgstr "Cambio)"
+
+#~ msgid "Add"
+#~ msgstr "Añadir"
+
+#~ msgid " Folder - Search: "
+#~ msgstr " Carpeta - Buscar: "
+
+#~ msgid "Remove "
+#~ msgstr "Eliminar "
+
+#~ msgid " Folder"
+#~ msgstr " Carpeta"
 
 #~ msgid " Search: "
 #~ msgstr " Buscar: "

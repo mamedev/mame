@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-02 07:55+0100\n"
+"POT-Creation-Date: 2016-03-05 22:55+1100\n"
 "PO-Revision-Date: 2016-03-01 16:29+0200\n"
 "Last-Translator: Mame.gr\n"
 "Language-Team: MAME Language Team\n"
@@ -556,12 +556,9 @@ msgid "Folders Setup"
 msgstr "Ρύθμιση φακέλων"
 
 #: src/emu/ui/dirmenu.cpp:183
-msgid "Current "
-msgstr "Τρέχοντες "
-
-#: src/emu/ui/dirmenu.cpp:183
-msgid " Folders"
-msgstr " Φάκελοι"
+#, c-format
+msgid "Current %1$s Folders"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
@@ -575,29 +572,24 @@ msgstr "Προσθήκη φακέλου"
 msgid "Remove Folder"
 msgstr "Αφαίρεση φακέλου"
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Change)"
-msgstr "Αλλαγή)"
+#: src/emu/ui/dirmenu.cpp:499
+#, c-format
+msgid "Change %1$s Folder - Search: %2$s_"
+msgstr ""
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Add"
-msgstr "Προσθήκη"
+#: src/emu/ui/dirmenu.cpp:500
+#, c-format
+msgid "Add %1$s Folder - Search: %2$s_"
+msgstr ""
 
-#: src/emu/ui/dirmenu.cpp:498
-msgid " Folder - Search: "
-msgstr " Φάκελος - Αναζήτηση: "
-
-#: src/emu/ui/dirmenu.cpp:533
+#: src/emu/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
 msgstr "Πιέστε το πλήκτρο TAB για να ορίσετε"
 
-#: src/emu/ui/dirmenu.cpp:639
-msgid "Remove "
-msgstr "Αφαίρεση"
-
-#: src/emu/ui/dirmenu.cpp:639
-msgid " Folder"
-msgstr " Φάκελος"
+#: src/emu/ui/dirmenu.cpp:643
+#, c-format
+msgid "Remove %1$s Folder"
+msgstr ""
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
@@ -2112,3 +2104,24 @@ msgstr " ΧΡΩΜΑΤΑ"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " ΓΡΑΦΙΔΕΣ"
+
+#~ msgid "Current "
+#~ msgstr "Τρέχοντες "
+
+#~ msgid " Folders"
+#~ msgstr " Φάκελοι"
+
+#~ msgid "Change)"
+#~ msgstr "Αλλαγή)"
+
+#~ msgid "Add"
+#~ msgstr "Προσθήκη"
+
+#~ msgid " Folder - Search: "
+#~ msgstr " Φάκελος - Αναζήτηση: "
+
+#~ msgid "Remove "
+#~ msgstr "Αφαίρεση"
+
+#~ msgid " Folder"
+#~ msgstr " Φάκελος"
