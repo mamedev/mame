@@ -47,8 +47,8 @@ NETLIB_TRUTHTABLE(7404, 1, 1, 0);
 #else
 NETLIB_DEVICE(7404,
 public:
-	netlist_logic_input_t m_I[1];
-	netlist_logic_output_t m_Q[1];
+	logic_input_t m_I[1];
+	logic_output_t m_Q[1];
 );
 #endif
 

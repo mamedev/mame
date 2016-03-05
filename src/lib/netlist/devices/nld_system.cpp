@@ -329,7 +329,7 @@ NETLIB_START(function)
 			if (err)
 				netlist().log().fatal("nld_function: unknown/misformatted token <{1}> in <{2}>", cmd, m_func.Value());
 		}
-		m_precompiled.add(rc);
+		m_precompiled.push_back(rc);
 	}
 
 }

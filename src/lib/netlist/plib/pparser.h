@@ -96,7 +96,7 @@ public:
 
 	token_id_t register_token(pstring token)
 	{
-		m_tokens.add(token);
+		m_tokens.push_back(token);
 		return token_id_t(m_tokens.size() - 1);
 	}
 

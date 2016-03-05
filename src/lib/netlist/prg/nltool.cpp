@@ -272,7 +272,7 @@ plist_t<input_t> *read_input(netlist::netlist_t *netlist, pstring fname)
 			if (l != "")
 			{
 				input_t inp(netlist, l);
-				ret->add(inp);
+				ret->push_back(inp);
 			}
 		}
 	}

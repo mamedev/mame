@@ -100,7 +100,7 @@ UINT32 truthtable_desc_t::get_ignored_extended(UINT32 i)
 // ----------------------------------------------------------------------------------------
 
 void truthtable_desc_t::help(unsigned cur, pstring_list_t list,
-		UINT64 state,UINT16 val, UINT8 *timing_index)
+		UINT64 state,UINT16 val, parray_t<UINT8> &timing_index)
 {
 	pstring elem = list[cur].trim();
 	int start = 0;
@@ -192,8 +192,11 @@ void truthtable_desc_t::setup(const pstring_list_t &truthtable, UINT32 disabled_
 			tindex[j] = k;
 		}
 
-		help(0, inout, 0 , val, tindex.data());
-		ttline = truthtable[line];
+		help(0, inout, 0 , val, tindex);
+		if (line < truthtable.size())
+			ttline = truthtable[line];
+		else
+			ttline = "";
 		line++;
 	}
 

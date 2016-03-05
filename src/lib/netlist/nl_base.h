@@ -155,6 +155,8 @@
 #ifndef NLBASE_H_
 #define NLBASE_H_
 
+#include <vector>
+
 #include "nl_lists.h"
 #include "nl_time.h"
 #include "nl_util.h"
@@ -165,7 +167,14 @@
 // Type definitions
 // ----------------------------------------------------------------------------------------
 
-typedef UINT8 netlist_sig_t;
+//typedef UINT8 netlist_sig_t;
+
+/*
+ *  unsigned int would be a 20% speed increase over UINT8 for pong.
+ *  For breakout it causes a slight decrease.
+ *
+ */
+typedef unsigned int netlist_sig_t;
 
 //============================================================
 //  MACROS / netlist devices
@@ -1193,7 +1202,7 @@ namespace netlist
 			{
 				_device_class *dev = dynamic_cast<_device_class *>(m_devices[i]);
 				if (dev != NULL)
-					tmp.add(dev);
+					tmp.push_back(dev);
 			}
 			return tmp;
 		}
@@ -1228,7 +1237,7 @@ namespace netlist
 			return ret;
 		}
 
-		pnamedlist_t<device_t *> m_devices;
+		plist_t<device_t *> m_devices;
 		net_t::list_t m_nets;
 	#if (NL_KEEP_STATISTICS)
 		pnamedlist_t<core_device_t *> m_started_devices;

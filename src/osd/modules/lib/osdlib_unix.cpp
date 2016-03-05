@@ -127,7 +127,8 @@ void osd_free_executable(void *ptr, size_t size)
 
 void osd_break_into_debugger(const char *message)
 {
-	#ifdef MAME_DEBUG
+	//#ifdef MAME_DEBUG
+	#if 1
 	printf("MAME exception: %s\n", message);
 	printf("Attempting to fall into debugger\n");
 	kill(getpid(), SIGTRAP);

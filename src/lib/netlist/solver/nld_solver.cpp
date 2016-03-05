@@ -9,8 +9,11 @@
  * the vectorizations fast-math enables pretty expensive
  */
 
+#pragma GCC optimize "-ffast-math"
+#pragma GCC optimize "-fstrict-aliasing"
 #if 0
 #pragma GCC optimize "-ffast-math"
+#pragma GCC optimize "-fstrict-aliasing"
 //#pragma GCC optimize "-ftree-parallelize-loops=4"
 #pragma GCC optimize "-funroll-loops"
 #pragma GCC optimize "-funswitch-loops"
@@ -54,21 +57,21 @@ ATTR_COLD void terms_t::add(terminal_t *term, int net_other, bool sorted)
 		{
 			if (m_net_other[i] > net_other)
 			{
-				m_term.insert_at(term, i);
-				m_net_other.insert_at(net_other, i);
-				m_gt.insert_at(0.0, i);
-				m_go.insert_at(0.0, i);
-				m_Idr.insert_at(0.0, i);
-				m_other_curanalog.insert_at(NULL, i);
+				m_term.insert_at(i, term);
+				m_net_other.insert_at(i, net_other);
+				m_gt.insert_at(i, 0.0);
+				m_go.insert_at(i, 0.0);
+				m_Idr.insert_at(i, 0.0);
+				m_other_curanalog.insert_at(i, NULL);
 				return;
 			}
 		}
-	m_term.add(term);
-	m_net_other.add(net_other);
-	m_gt.add(0.0);
-	m_go.add(0.0);
-	m_Idr.add(0.0);
-	m_other_curanalog.add(NULL);
+	m_term.push_back(term);
+	m_net_other.push_back(net_other);
+	m_gt.push_back(0.0);
+	m_go.push_back(0.0);
+	m_Idr.push_back(0.0);
+	m_other_curanalog.push_back(NULL);
 }
 
 ATTR_COLD void terms_t::set_pointers()
@@ -109,10 +112,8 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 
 	m_nets.clear();
 
-	for (std::size_t k = 0; k < nets.size(); k++)
-	{
-		m_nets.add(nets[k]);
-	}
+	for (auto & net : nets)
+		m_nets.push_back(net);
 
 	for (std::size_t k = 0; k < nets.size(); k++)
 	{
@@ -122,9 +123,8 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 
 		net->m_solver = this;
 
-		for (std::size_t i = 0; i < net->m_core_terms.size(); i++)
+		for (core_terminal_t *p : net->m_core_terms)
 		{
-			core_terminal_t *p = net->m_core_terms[i];
 			log().debug("{1} {2} {3}\n", p->name(), net->name(), (int) net->isRailNet());
 			switch (p->type())
 			{
@@ -133,7 +133,7 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 					{
 						case device_t::CAPACITOR:
 							if (!m_step_devices.contains(&p->device()))
-								m_step_devices.add(&p->device());
+								m_step_devices.push_back(&p->device());
 							break;
 						case device_t::BJT_EB:
 						case device_t::DIODE:
@@ -141,7 +141,7 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 						case device_t::BJT_SWITCH:
 							log().debug("found BJT/Diode/LVCCS\n");
 							if (!m_dynamic_devices.contains(&p->device()))
-								m_dynamic_devices.add(&p->device());
+								m_dynamic_devices.push_back(&p->device());
 							break;
 						default:
 							break;
@@ -155,10 +155,10 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 				case terminal_t::INPUT:
 					{
 						analog_output_t *net_proxy_output = NULL;
-						for (std::size_t j = 0; j < m_inps.size(); j++)
-							if (m_inps[j]->m_proxied_net == &p->net().as_analog())
+						for (auto & input : m_inps)
+							if (input->m_proxied_net == &p->net().as_analog())
 							{
-								net_proxy_output = m_inps[j];
+								net_proxy_output = input;
 								break;
 							}
 
@@ -166,7 +166,7 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 						{
 							net_proxy_output = palloc(analog_output_t);
 							net_proxy_output->init_object(*this, this->name() + "." + pfmt("m{1}")(m_inps.size()));
-							m_inps.add(net_proxy_output);
+							m_inps.push_back(net_proxy_output);
 							net_proxy_output->m_proxied_net = &p->net().as_analog();
 						}
 						net_proxy_output->net().register_con(*p);
@@ -399,9 +399,9 @@ NETLIB_UPDATE(solver)
 	if (m_params.m_dynamic)
 		return;
 
-	const std::size_t t_cnt = m_mat_solvers.size();
 
 #if HAS_OPENMP && USE_OPENMP
+	const std::size_t t_cnt = m_mat_solvers.size();
 	if (m_parallel.Value())
 	{
 		omp_set_num_threads(3);
@@ -425,14 +425,10 @@ NETLIB_UPDATE(solver)
 				ATTR_UNUSED const nl_double ts = m_mat_solvers[i]->solve();
 			}
 #else
-	for (std::size_t i = 0; i < t_cnt; i++)
-	{
-		if (m_mat_solvers[i]->is_timestep())
-		{
+	for (auto & solver : m_mat_solvers)
+		if (solver->is_timestep())
 			// Ignore return value
-			ATTR_UNUSED const nl_double ts = m_mat_solvers[i]->solve();
-		}
-	}
+			ATTR_UNUSED const nl_double ts = solver->solve();
 #endif
 
 	/* step circuit */
@@ -518,13 +514,13 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
 	netlist().log().verbose("Scanning net groups ...");
 	// determine net groups
-	for (std::size_t i=0; i<netlist().m_nets.size(); i++)
+	for (auto & net : netlist().m_nets)
 	{
-		netlist().log().debug("processing {1}\n", netlist().m_nets[i]->name());
-		if (!netlist().m_nets[i]->isRailNet())
+		netlist().log().debug("processing {1}\n", net->name());
+		if (!net->isRailNet())
 		{
 			netlist().log().debug("   ==> not a rail net\n");
-			analog_net_t *n = &netlist().m_nets[i]->as_analog();
+			analog_net_t *n = &net->as_analog();
 			if (!n->already_processed(groups, cur_group))
 			{
 				cur_group++;
@@ -621,7 +617,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
 		ms->vsetup(groups[i]);
 
-		m_mat_solvers.add(ms);
+		m_mat_solvers.push_back(ms);
 
 		netlist().log().verbose("Solver {1}", ms->name());
 		netlist().log().verbose("       # {1} ==> {2} nets", i, groups[i].size());

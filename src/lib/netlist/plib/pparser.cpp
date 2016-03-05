@@ -255,16 +255,16 @@ ATTR_COLD void ptokenizer::error(const pstring &errs)
 ppreprocessor::ppreprocessor()
 : m_ifflag(0), m_level(0), m_lineno(0)
 {
-	m_expr_sep.add("!");
-	m_expr_sep.add("(");
-	m_expr_sep.add(")");
-	m_expr_sep.add("+");
-	m_expr_sep.add("-");
-	m_expr_sep.add("*");
-	m_expr_sep.add("/");
-	m_expr_sep.add("==");
-	m_expr_sep.add(" ");
-	m_expr_sep.add("\t");
+	m_expr_sep.push_back("!");
+	m_expr_sep.push_back("(");
+	m_expr_sep.push_back(")");
+	m_expr_sep.push_back("+");
+	m_expr_sep.push_back("-");
+	m_expr_sep.push_back("*");
+	m_expr_sep.push_back("/");
+	m_expr_sep.push_back("==");
+	m_expr_sep.push_back(" ");
+	m_expr_sep.push_back("\t");
 
 	m_defines.add("__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1"));
 }

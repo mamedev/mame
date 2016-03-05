@@ -25,9 +25,13 @@ public:
 	nl_convert_base_t() : out(m_buf) {};
 	virtual ~nl_convert_base_t()
 	{
-		m_nets.clear_and_free();
+		for (std::size_t i = 0; i < m_nets.size(); i++)
+			pfree(m_nets.value_at(i));
+		m_nets.clear();
 		m_devs.clear_and_free();
-		m_pins.clear_and_free();
+		for (std::size_t i = 0; i < m_pins.size(); i++)
+			pfree(m_pins.value_at(i));
+		m_pins.clear();
 	}
 
 	const pstringbuffer &result() { return m_buf.str(); }
@@ -55,6 +59,7 @@ protected:
 
 	pstream_fmt_writer_t out;
 private:
+
 	struct net_t
 	{
 	public:
@@ -124,12 +129,14 @@ private:
 
 private:
 
+	void add_device(dev_t *dev);
+
 	postringstream m_buf;
 
-	pnamedlist_t<dev_t *> m_devs;
-	pnamedlist_t<net_t *> m_nets;
+	plist_t<dev_t *> m_devs;
+	phashmap_t<pstring, net_t *> m_nets;
 	plist_t<pstring> m_ext_alias;
-	pnamedlist_t<pin_alias_t *> m_pins;
+	phashmap_t<pstring, pin_alias_t *> m_pins;
 
 	static unit_t m_units[];
 

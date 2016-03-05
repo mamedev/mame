@@ -127,7 +127,7 @@ public:
 		int i=0;
 		while (o[i] != NULL)
 		{
-			m_opts.add(o[i]);
+			m_opts.push_back(o[i]);
 			i++;
 		}
 	}
@@ -139,7 +139,7 @@ public:
 
 	void register_option(poption *opt)
 	{
-		m_opts.add(opt);
+		m_opts.push_back(opt);
 	}
 
 	int parse(int argc, char *argv[])

@@ -114,7 +114,7 @@ void matrix_solver_GMRES_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 			for (unsigned i = mat.ia[k]; i<nz; i++)
 				if (this->m_terms[k]->net_other()[j] == (int) mat.ja[i])
 				{
-					m_term_cr[k].add(i);
+					m_term_cr[k].push_back(i);
 					break;
 				}
 			nl_assert(m_term_cr[k].size() == this->m_terms[k]->m_railstart);

@@ -30,10 +30,10 @@
 			# _name, # _name, "+" _def_params);
 
 #define TT_HEAD(_x) \
-	ttd->m_desc.add(_x);
+	ttd->m_desc.push_back(_x);
 
 #define TT_LINE(_x) \
-	ttd->m_desc.add(_x);
+	ttd->m_desc.push_back(_x);
 
 #define TT_FAMILY(_x) \
 	ttd->m_family = setup.family_from_model(_x);
@@ -69,7 +69,7 @@ struct truthtable_desc_t
 
 private:
 	void help(unsigned cur, pstring_list_t list,
-			UINT64 state,UINT16 val, UINT8 *timing_index);
+			UINT64 state,UINT16 val, parray_t<UINT8> &timing_index);
 	static unsigned count_bits(UINT32 v);
 	static UINT32 set_bits(UINT32 v, UINT32 b);
 	UINT32 get_ignored_simple(UINT32 i);
@@ -114,7 +114,7 @@ public:
 	{
 		while (*desc != NULL && **desc != 0 )
 			{
-				m_desc.add(*desc);
+				m_desc.push_back(*desc);
 				desc++;
 			}
 
