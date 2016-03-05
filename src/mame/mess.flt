@@ -123,7 +123,6 @@ concept.cpp
 cortex.cpp
 cosmicos.cpp
 cp1.cpp
-cps1.cpp
 craft.cpp
 crvision.cpp
 ct486.cpp
@@ -672,3 +671,9 @@ zorba.cpp
 zrt80.cpp
 zsbc3.cpp
 zx.cpp
+//exceptions + to add - to remove form imported list
+-orbatak
++wofch
++sfzch
++sfach
++sfzbch
