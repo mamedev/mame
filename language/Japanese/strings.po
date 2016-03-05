@@ -144,7 +144,7 @@ msgstr "他のフィルタ"
 
 #: src/emu/ui/custmenu.cpp:174 src/emu/ui/optsmenu.cpp:239
 msgid "^!Manufacturer"
-msgstr ""
+msgstr "^!製造元"
 
 #: src/emu/ui/custmenu.cpp:183 src/emu/ui/custmenu.cpp:468
 #: src/emu/ui/optsmenu.cpp:247
@@ -374,7 +374,7 @@ msgstr "パレットから選ぶ"
 
 #: src/emu/ui/custui.cpp:906
 msgid " - ARGB Settings"
-msgstr " - ARGB設定"
+msgstr "のARGB設定"
 
 #: src/emu/ui/custui.cpp:930
 msgid "Color preview ="
@@ -773,7 +773,7 @@ msgstr "リセット"
 
 #: src/emu/ui/mainmenu.cpp:53
 msgid "Input (general)"
-msgstr "入力（一般）"
+msgstr "入力（共通）"
 
 #: src/emu/ui/mainmenu.cpp:55
 msgid "Input (this Machine)"
@@ -1088,7 +1088,7 @@ msgstr "*** ui.iniの保存エラー ***"
 #: src/emu/ui/optsmenu.cpp:347
 #, c-format
 msgid "**Error to load %s.ini**"
-msgstr "*** %s.iniの保存エラー ***"
+msgstr ""
 
 #: src/emu/ui/optsmenu.cpp:372
 #, c-format
@@ -1112,7 +1112,7 @@ msgstr "を押すかダブルクリックで選択してください"
 
 #: src/emu/ui/selgame.cpp:38
 msgid "General Info"
-msgstr ""
+msgstr "一般情報"
 
 #: src/emu/ui/selgame.cpp:388 src/emu/ui/selsoft.cpp:280
 #, c-format
@@ -1215,7 +1215,7 @@ msgstr ""
 
 #: src/emu/ui/selgame.cpp:866 src/emu/ui/selsoft.cpp:769
 msgid "Sound: Unimplemented"
-msgstr ""
+msgstr "サウンド：未実装"
 
 #: src/emu/ui/selgame.cpp:868 src/emu/ui/selsoft.cpp:771
 msgid "Sound: Imperfect"
@@ -1274,7 +1274,7 @@ msgstr "年度: %1$s\n"
 #: src/emu/ui/selgame.cpp:1521
 #, c-format
 msgid "Manufacturer: %1$-.100s\n"
-msgstr ""
+msgstr "製造元: %1$-.100s\n"
 
 #: src/emu/ui/selgame.cpp:1525
 #, c-format
@@ -1311,7 +1311,7 @@ msgstr ""
 
 #: src/emu/ui/selgame.cpp:1546
 msgid "Sound: Unimplemented\n"
-msgstr ""
+msgstr "サウンド: 未実装\n"
 
 #: src/emu/ui/selgame.cpp:1548
 msgid "Sound: Imperfect\n"
@@ -1359,15 +1359,15 @@ msgstr ""
 #: src/emu/ui/selgame.cpp:1559
 #, c-format
 msgid "Screen Orentation: %1$s\n"
-msgstr ""
+msgstr "画面の向き: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1559
 msgid "Vertical"
-msgstr ""
+msgstr "縦"
 
 #: src/emu/ui/selgame.cpp:1559
 msgid "Horizontal"
-msgstr ""
+msgstr "横"
 
 #: src/emu/ui/selgame.cpp:1567
 #, c-format
@@ -1508,12 +1508,12 @@ msgstr ""
 
 #: src/emu/ui/simpleselgame.cpp:345
 msgid "Unimplemented"
-msgstr ""
+msgstr "未実装"
 
 #: src/emu/ui/simpleselgame.cpp:351
 #, c-format
 msgid "Gfx: %s, Sound: %s"
-msgstr ""
+msgstr "グラフィックス：%s　サウンド：%s"
 
 #: src/emu/ui/slotopt.cpp:166
 msgid " [internal]"
@@ -1870,7 +1870,7 @@ msgstr "マスター音量"
 #: src/emu/ui/ui.cpp:1977
 #, c-format
 msgid "%1$s Volume"
-msgstr "%1$s音量"
+msgstr "%1$sの音量"
 
 #: src/emu/ui/ui.cpp:1999
 #, c-format
@@ -1880,7 +1880,7 @@ msgstr ""
 #: src/emu/ui/ui.cpp:2019
 #, c-format
 msgid "%1$s Refresh Rate"
-msgstr ""
+msgstr "%1$sのリフレッシュレート"
 
 #: src/emu/ui/ui.cpp:2025
 #, c-format
