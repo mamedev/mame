@@ -281,7 +281,7 @@ READ8_MEMBER( amstrad_pc_state::pc1640_port60_r )
 
 	case 2:
 		data = m_port62;
-		if (m_mb->m_pit_out2)
+		if (m_mb->pit_out2())
 			data |= 0x20;
 		break;
 	}

@@ -74,8 +74,6 @@ public:
 	int m_lastvalue;
 	UINT8 m_disk_data[2];
 	UINT8 m_port_b_data;
-	UINT8 m_wss1_data;
-	UINT8 m_wss2_data;
 	UINT8 m_status;
 	UINT8 m_clr_status;
 
@@ -89,9 +87,6 @@ public:
 	DECLARE_READ8_MEMBER(port_b_r);
 	DECLARE_READ8_MEMBER(port_c_r);
 	DECLARE_WRITE8_MEMBER(port_b_w);
-	DECLARE_WRITE8_MEMBER(wss_1_w);
-	DECLARE_WRITE8_MEMBER(wss_2_w);
-	DECLARE_WRITE8_MEMBER(sys_reset_w);
 
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -298,24 +293,7 @@ WRITE8_MEMBER(pcxt_state::disk_iobank_w)
 
 READ8_MEMBER(pcxt_state::port_a_r)
 {
-	if(!(m_port_b_data & 0x80))//???
-	{
-		/*
-		x--- ---- Undefined (Always 0)
-		-x-- ---- B: Floppy disk drive installed.
-		--xx ---- Default Display Mode
-		---- xx-- Undefined (Always 1)
-		---- --x- 8087 NDP installed
-		---- ---x Undefined (Always 1)
-		*/
-		return m_wss1_data;
-	}
-	else//keyboard emulation
-	{
-		//m_maincpu->set_input_line(1, PULSE_LINE);
-		return 0x00;//Keyboard is disconnected
-		//return 0xaa;//Keyboard code
-	}
+	return 0xaa;//harmless keyboard error occurs without this
 }
 
 READ8_MEMBER(pcxt_state::port_b_r)
@@ -325,13 +303,7 @@ READ8_MEMBER(pcxt_state::port_b_r)
 
 READ8_MEMBER(pcxt_state::port_c_r)
 {
-	if ( m_port_b_data & 0x01 )
-	{
-		m_wss2_data = ( m_wss2_data & ~0x10 ) | ( m_mb->m_pit_out2 ? 0x10 : 0x00 );
-	}
-	m_wss2_data = ( m_wss2_data & ~0x20 ) | ( m_mb->m_pit_out2 ? 0x20 : 0x00 );
-
-	return m_wss2_data;//TODO
+	return 0x00;// DIPS?
 }
 
 /*'buzzer' sound routes here*/
@@ -346,22 +318,6 @@ WRITE8_MEMBER(pcxt_state::port_b_w)
 //  hc55516_digit_w(cvsd, data);
 }
 
-WRITE8_MEMBER(pcxt_state::wss_1_w)
-{
-	m_wss1_data = data;
-}
-
-WRITE8_MEMBER(pcxt_state::wss_2_w)
-{
-	m_wss2_data = data;
-}
-
-WRITE8_MEMBER(pcxt_state::sys_reset_w)
-{
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-}
-
-
 /*Floppy Disk Controller 765 device*/
 /*Currently we only emulate it at a point that the BIOS will pass the checks*/
 
@@ -372,7 +328,6 @@ WRITE8_MEMBER(pcxt_state::sys_reset_w)
 READ8_MEMBER(pcxt_state::fdc765_status_r)
 {
 	UINT8 tmp;
-//  popmessage("Read FDC status @ PC=%05x",space.device().safe_pc());
 	tmp = m_status | 0x80;
 	m_clr_status++;
 	if(m_clr_status == 0x10)
@@ -408,10 +363,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( filetto_io, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)  //PPI 8255
-	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)  //PPI 8255
+	AM_RANGE(0x0060, 0x0060) AM_READ(port_a_r)  //not a real 8255
+	AM_RANGE(0x0061, 0x0061) AM_READWRITE(port_b_r, port_b_w)
+	AM_RANGE(0x0062, 0x0062) AM_READ(port_c_r)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
-//  AM_RANGE(0x0200, 0x020f) AM_RAM //game port
 	AM_RANGE(0x0201, 0x0201) AM_READ_PORT("COIN") //game port
 	AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card
 	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
@@ -427,7 +382,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tetriskr_io, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
-	AM_RANGE(0x0200, 0x020f) AM_RAM //game port
 	AM_RANGE(0x03c8, 0x03c8) AM_READ_PORT("IN0")
 	AM_RANGE(0x03c9, 0x03c9) AM_READ_PORT("IN1")
 //  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1") //read then discarded?
@@ -517,7 +471,6 @@ INPUT_PORTS_END
 void pcxt_state::machine_reset()
 {
 	m_lastvalue = -1;
-	m_wss2_data = 0;
 }
 
 static SLOT_INTERFACE_START( filetto_isa8_cards )
@@ -533,18 +486,6 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", filetto_isa8_cards, "filetto", true)
-
-
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pcxt_state, port_a_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(pcxt_state, port_b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pcxt_state, port_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pcxt_state, port_c_r))
-
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pcxt_state, wss_1_w))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pcxt_state, wss_2_w))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pcxt_state, sys_reset_w))
 
 	MCFG_SOUND_ADD("voice", HC55516, 8000000/4)//8923S-UM5100 is a HC55536 with ROM hook-up
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mb:mono", 0.60)

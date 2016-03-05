@@ -381,7 +381,7 @@ READ8_MEMBER( europc_pc_state::europc_pio_r )
 		data = m_port61;
 		break;
 	case 2:
-		if (m_mb->m_pit_out2)
+		if (m_mb->pit_out2())
 			data |= 0x20;
 		break;
 	}

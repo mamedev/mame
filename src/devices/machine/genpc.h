@@ -182,12 +182,12 @@ class pc_noppi_mb_device : public ibm5160_mb_device
 public:
 	// construction/destruction
 	pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	UINT8 pit_out2() { return m_pit_out2; } // helper for near-clones with multifunction ics instead of 8255s
 
 	DECLARE_ADDRESS_MAP(map, 8);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
-protected:
 };
 
 extern const device_type PCNOPPI_MOTHERBOARD;
