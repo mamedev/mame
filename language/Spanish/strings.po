@@ -1870,13 +1870,10 @@ msgid ""
 "Press ''%1$s'' to quit,\n"
 "Press ''%2$s'' to return to emulation."
 msgstr ""
-<<<<<<< HEAD
 "¿Seguro que quieres salir?\n"
 "\n"
 "Presiona «%1$s» para salir,\n"
 "Presiona «%2$s» para volver al emulador."
-=======
->>>>>>> 057a6f64c9b40c53941a3e603efad046b724a3c1
 
 #: src/emu/ui/ui.cpp:1967
 msgid "Master Volume"
