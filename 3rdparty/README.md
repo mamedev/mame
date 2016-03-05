@@ -46,7 +46,7 @@ rapidjson - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clau
 
 sdl2 - [zlib license](http://opensource.org/licenses/Zlib)
 
-softfloat - [U.C. Berkeley open-source license] MIT compatible (https://github.com/mamedev/mame/blob/master/3rdparty/softfloat/README.txt)
+softfloat - [U.C. Berkeley open-source license](https://github.com/mamedev/mame/blob/master/3rdparty/softfloat/README.txt) MIT compatible
 
 sqlite3 - Public Domain
 
