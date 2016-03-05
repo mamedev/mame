@@ -653,16 +653,33 @@ public:
 	plus1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_cop400_state(mconfig, type, tag)
 	{ }
+
+	DECLARE_WRITE8_MEMBER(write_d);
 };
 
 // handlers
 
-//..
+WRITE8_MEMBER(plus1_state::write_d)
+{
+	// D?: speaker out
+	m_speaker->level_w(data & 1);
+}
 
 
 // config
 
 static INPUT_PORTS_START( plus1 )
+	PORT_START("IN.0") // port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN.1") // port L
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( plus1, plus1_state )
@@ -670,6 +687,9 @@ static MACHINE_CONFIG_START( plus1, plus1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K to +5V, C=100pf to GND
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true) // guessed
+	MCFG_COP400_WRITE_D_CB(WRITE8(plus1_state, write_d))
+	MCFG_COP400_READ_G_CB(IOPORT("IN.0"))
+	MCFG_COP400_READ_L_CB(IOPORT("IN.1"))
 
 	/* no visual feedback! */
 
