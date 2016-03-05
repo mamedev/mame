@@ -89,6 +89,7 @@ function osdmodulesbuild()
 	if _OPTIONS["targetos"]=="windows" then
 		includedirs {
 			MAME_DIR .. "3rdparty/winpcap/Include",
+			MAME_DIR .. "3rdparty/wine/Include",
 		}
 	end
 
@@ -430,29 +431,6 @@ newoption {
 		{ "1",  "Use Modern Windows APIs - support for Windows 8.1 and later"  },
 	},
 }
-
-newoption {
-	trigger = "USE_XAUDIO2",
-	description = "Use XAudio2 API for audio",
-	allowed = {
-		{ "0",  "Disable XAudio2"  },
-		{ "1",  "Enable XAudio2" },
-	},
-}
-
-if _OPTIONS["USE_XAUDIO2"]=="1" then
-	_OPTIONS["MODERN_WIN_API"] = "1",
-	defines {
-		"USE_XAUDIO2=1",
-	},
-	includedirs {
-		MAME_DIR .. "3rdparty/win81sdk/Include/um",
-	}
-else
-	defines {
-		"USE_XAUDIO2=0",
-	}
-end
 
 newoption {
 	trigger = "USE_QTDEBUG",
