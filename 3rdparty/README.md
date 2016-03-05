@@ -8,7 +8,7 @@ bx - [The BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)
 
 compat - Wine headers missing in MinGW [The GNU Lesser General Public License, version 2.1 (LGPL-2.1)](http://opensource.org/licenses/LGPL-2.1)
 
-**note that this one contain headers only and that real library/dll is dinamicaly loaded so use in commercial project is allowed, will be removed when becomes part of MinGW distribution**
+**note that this one contain headers only and that real library/dll is dynamically loaded so use in commercial project is allowed, will be removed when becomes part of MinGW distribution**
 
 dxsdk - [DirectX SDK EULA](https://github.com/mamedev/mame/blob/master/3rdparty/dxsdk/Documentation/License%20Agreements/DirectX%20SDK%20EULA.txt)
 
