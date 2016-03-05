@@ -38,6 +38,13 @@
 #include "emu.h"
 #include "osdepend.h"
 #include "emuopts.h"
+#if !defined(XAUDIO2_DLL)
+#if defined(UNICODE)
+#define XAUDIO2_DLL  L"xaudio2_8.dll"
+#else
+#define XAUDIO2_DLL  "xaudio2_8.dll"
+#endif
+#endif
 
 //============================================================
 //  Constants
