@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-02 07:55+0100\n"
-"PO-Revision-Date: 2016-03-01 19:37+0100\n"
+"PO-Revision-Date: 2016-03-02 18:52+0100\n"
 "Last-Translator: Mevi <mevi.mame@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: fr_BE\n"
@@ -31,7 +31,7 @@ msgstr "Entrer un code"
 
 #: src/emu/ui/barcode.cpp:118
 msgid "Barcode length invalid!"
-msgstr "Longueur du code-barres non valide!"
+msgstr "Longueur du code-barres non valide !"
 
 #: src/emu/ui/cheatopt.cpp:77
 #, c-format
@@ -52,11 +52,11 @@ msgstr "Paramètres du tir automatique"
 
 #: src/emu/ui/cheatopt.cpp:139
 msgid "Reset All"
-msgstr "Réinitialiser tout"
+msgstr "Tout réinitialiser"
 
 #: src/emu/ui/cheatopt.cpp:142
 msgid "Reload All"
-msgstr "Recharger tout"
+msgstr "Tout recharger"
 
 #: src/emu/ui/cheatopt.cpp:258
 msgid "Autofire Status"
@@ -90,11 +90,11 @@ msgstr "Inactif"
 
 #: src/emu/ui/cheatopt.cpp:301
 msgid "No buttons found on this machine!"
-msgstr "Aucun bouton trouvé sur cette machine!"
+msgstr "Aucun bouton trouvé sur cette machine !"
 
 #: src/emu/ui/cheatopt.cpp:312 src/emu/ui/cheatopt.cpp:316
 msgid "Autofire Delay"
-msgstr "Retard du tir automatique"
+msgstr "Attente du tir automatique"
 
 #: src/emu/ui/ctrlmenu.cpp:20
 msgid "Lightgun Device Assignment"
@@ -131,7 +131,7 @@ msgstr "Affecter au périphérique Souris"
 #: src/emu/ui/ctrlmenu.cpp:106 src/emu/ui/ctrlmenu.cpp:126
 #: src/emu/ui/optsmenu.cpp:268
 msgid "Device Mapping"
-msgstr "Définir le périphérique"
+msgstr "Mappage des périphériques"
 
 #: src/emu/ui/custmenu.cpp:156 src/emu/ui/custmenu.cpp:441
 msgid "Main filter"
@@ -143,7 +143,7 @@ msgstr "Autre filtre"
 
 #: src/emu/ui/custmenu.cpp:174 src/emu/ui/optsmenu.cpp:239
 msgid "^!Manufacturer"
-msgstr "^!Fabricant"
+msgstr "^!Constructeur"
 
 #: src/emu/ui/custmenu.cpp:183 src/emu/ui/custmenu.cpp:468
 #: src/emu/ui/optsmenu.cpp:247
@@ -181,7 +181,7 @@ msgstr "^!Région"
 
 #: src/emu/ui/custui.cpp:20
 msgid "Show All"
-msgstr "Afficher tout"
+msgstr "Tout afficher"
 
 #: src/emu/ui/custui.cpp:21
 msgid "Hide Filters"
@@ -189,7 +189,7 @@ msgstr "Cacher les filtres"
 
 #: src/emu/ui/custui.cpp:22
 msgid "Hide Info/Image"
-msgstr "Cacher Info/Image"
+msgstr "Cacher Images/Infos"
 
 #: src/emu/ui/custui.cpp:23
 msgid "Hide Both"
@@ -209,7 +209,7 @@ msgstr "Langue"
 
 #: src/emu/ui/custui.cpp:149
 msgid "Show side panels"
-msgstr "Afficher les side panels"
+msgstr "Afficher les panneaux latéraux"
 
 #: src/emu/ui/custui.cpp:164 src/emu/ui/custui.cpp:184
 msgid "Custom UI Settings"
@@ -237,7 +237,7 @@ msgstr "Lignes"
 
 #: src/emu/ui/custui.cpp:387
 msgid "Infos text size"
-msgstr "Taille du texte Infos"
+msgstr "Taille du texte des infos"
 
 #: src/emu/ui/custui.cpp:404
 msgid "UI Fonts Settings"
@@ -245,8 +245,7 @@ msgstr "Paramètres des polices de l'interface"
 
 #: src/emu/ui/custui.cpp:431
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr ""
-"Exemple de texte - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+msgstr "Exemple de texte - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 #: src/emu/ui/custui.cpp:529
 msgid "Normal text"
@@ -330,7 +329,7 @@ msgstr " pour changer la valeur de la couleur"
 
 #: src/emu/ui/custui.cpp:617
 msgid "Menu Preview"
-msgstr "Prévisualiser le menu"
+msgstr "Aperçu du menu"
 
 #: src/emu/ui/custui.cpp:625
 msgid "Normal"
@@ -377,7 +376,7 @@ msgstr " - Paramètres ARVB"
 
 #: src/emu/ui/custui.cpp:930
 msgid "Color preview ="
-msgstr "Couleur prévisualisée ="
+msgstr "Aperçu de la couleur ="
 
 #: src/emu/ui/custui.cpp:1026
 msgid "White"
@@ -417,34 +416,34 @@ msgstr "Utilisation du logiciel"
 
 #: src/emu/ui/datmenu.cpp:195
 msgid "Revision: "
-msgstr "Révision :"
+msgstr "Révision : "
 
 #: src/emu/ui/datmenu.cpp:287 src/emu/ui/selgame.cpp:39
 #: src/emu/ui/selgame.cpp:2127 src/emu/ui/selgame.cpp:2136
 #: src/emu/ui/selsoft.cpp:1565 src/emu/ui/selsoft.cpp:1583
 #: src/emu/ui/selsoft.cpp:1592
 msgid "History"
-msgstr ""
+msgstr "Aperçu history.dat"
 
 #: src/emu/ui/datmenu.cpp:289 src/emu/ui/selgame.cpp:40
 msgid "Mameinfo"
-msgstr ""
+msgstr "Aperçu mameinfo.dat"
 
 #: src/emu/ui/datmenu.cpp:291 src/emu/ui/selgame.cpp:42
 msgid "Messinfo"
-msgstr ""
+msgstr "Aperçu messinfo.dat"
 
 #: src/emu/ui/datmenu.cpp:293 src/emu/ui/selgame.cpp:41
 msgid "Sysinfo"
-msgstr ""
+msgstr "Aperçu sysinfo.dat"
 
 #: src/emu/ui/datmenu.cpp:295 src/emu/ui/selgame.cpp:44
 msgid "Mamescore"
-msgstr ""
+msgstr "Aperçu story.dat (MAMESCORE)"
 
 #: src/emu/ui/datmenu.cpp:297 src/emu/ui/selgame.cpp:43
 msgid "Command"
-msgstr ""
+msgstr "Aperçu command.dat"
 
 #: src/emu/ui/dirmenu.cpp:31
 msgid "ROMs"
@@ -452,7 +451,7 @@ msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:32
 msgid "UI"
-msgstr ""
+msgstr "UI (Interface utilisateur)"
 
 #: src/emu/ui/dirmenu.cpp:34
 msgid "Samples"
@@ -460,47 +459,47 @@ msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:35
 msgid "DATs"
-msgstr ""
+msgstr "Fichiers DAT"
 
 #: src/emu/ui/dirmenu.cpp:36
 msgid "INIs"
-msgstr ""
+msgstr "Fichiers INI"
 
 #: src/emu/ui/dirmenu.cpp:37
 msgid "Extra INIs"
-msgstr ""
+msgstr "Fichiers INI supplémentaires"
 
 #: src/emu/ui/dirmenu.cpp:38
 msgid "Icons"
-msgstr ""
+msgstr "Icônes"
 
 #: src/emu/ui/dirmenu.cpp:39 src/emu/ui/miscmenu.cpp:560
 msgid "Cheats"
-msgstr ""
+msgstr "Cheats (Codes de triche)"
 
 #: src/emu/ui/dirmenu.cpp:40 src/emu/ui/menu.cpp:43
 msgid "Snapshots"
-msgstr ""
+msgstr "Snapshots (Captures d'écran)"
 
 #: src/emu/ui/dirmenu.cpp:41 src/emu/ui/menu.cpp:44
 msgid "Cabinets"
-msgstr ""
+msgstr "Cabinets (Bornes)"
 
 #: src/emu/ui/dirmenu.cpp:42 src/emu/ui/menu.cpp:47
 msgid "Flyers"
-msgstr ""
+msgstr "Flyers (Prospectus)"
 
 #: src/emu/ui/dirmenu.cpp:43 src/emu/ui/menu.cpp:48
 msgid "Titles"
-msgstr ""
+msgstr "Titles (Écrans-titre)"
 
 #: src/emu/ui/dirmenu.cpp:44 src/emu/ui/menu.cpp:49
 msgid "Ends"
-msgstr ""
+msgstr "Ends (Fins de jeu)"
 
 #: src/emu/ui/dirmenu.cpp:45 src/emu/ui/menu.cpp:46
 msgid "PCBs"
-msgstr ""
+msgstr "PCBs (Circuits imprimés)"
 
 #: src/emu/ui/dirmenu.cpp:46 src/emu/ui/menu.cpp:58 src/emu/ui/videoopt.cpp:223
 msgid "Marquees"
@@ -508,27 +507,27 @@ msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:47
 msgid "Controls Panels"
-msgstr "Control Panels"
+msgstr "Control Panels (Panneaux de contrôle)"
 
 #: src/emu/ui/dirmenu.cpp:48
 msgid "Crosshairs"
-msgstr ""
+msgstr "Crosshairs (Viseurs)"
 
 #: src/emu/ui/dirmenu.cpp:49
 msgid "Artworks"
-msgstr ""
+msgstr "Artworks (Illustrations)"
 
 #: src/emu/ui/dirmenu.cpp:50 src/emu/ui/menu.cpp:51
 msgid "Bosses"
-msgstr ""
+msgstr "Bosses (Ennemis et adversaires)"
 
 #: src/emu/ui/dirmenu.cpp:51
 msgid "Artworks Preview"
-msgstr ""
+msgstr "Artworks Preview (Aperçu)"
 
 #: src/emu/ui/dirmenu.cpp:52 src/emu/ui/menu.cpp:57
 msgid "Select"
-msgstr ""
+msgstr "Select (Écran de sélection)"
 
 #: src/emu/ui/dirmenu.cpp:53
 msgid "GameOver"
@@ -536,7 +535,7 @@ msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:54 src/emu/ui/menu.cpp:55
 msgid "HowTo"
-msgstr ""
+msgstr "HowTo (Comment faire)"
 
 #: src/emu/ui/dirmenu.cpp:55 src/emu/ui/menu.cpp:52
 msgid "Logos"
@@ -584,7 +583,7 @@ msgstr "Ajouter"
 
 #: src/emu/ui/dirmenu.cpp:498
 msgid " Folder - Search: "
-msgstr " Dossier - Recherche :"
+msgstr " Dossier - Recherche : "
 
 #: src/emu/ui/dirmenu.cpp:533
 msgid "Press TAB to set"
@@ -636,7 +635,7 @@ msgstr "Mode fenêtré"
 
 #: src/emu/ui/dsplmenu.cpp:49
 msgid "Enforce Aspect Ratio"
-msgstr "Forcer le format d'affichage"
+msgstr "Respecter le ratio d'affichage"
 
 #: src/emu/ui/dsplmenu.cpp:50
 msgid "Start Out Maximized"
@@ -657,7 +656,7 @@ msgstr "Options d'affichage"
 
 #: src/emu/ui/filesel.cpp:159
 msgid "File Already Exists - Override?"
-msgstr "Ce fichier existe déjà - Écraser?"
+msgstr "Ce fichier existe déjà - Écraser ?"
 
 #: src/emu/ui/filesel.cpp:161 src/emu/ui/selgame.cpp:1552
 #: src/emu/ui/selgame.cpp:1553 src/emu/ui/selgame.cpp:1554
@@ -761,7 +760,7 @@ msgstr "[échoué]"
 
 #: src/emu/ui/inputmap.cpp:52
 msgid "User Interface"
-msgstr "Interface utilisateur"
+msgstr "Interface"
 
 #: src/emu/ui/inputmap.cpp:59
 msgid "Other Controls"
@@ -866,11 +865,11 @@ msgstr "Sélectionner une nouvelle machine"
 
 #: src/emu/ui/menu.cpp:45
 msgid "Control Panels"
-msgstr ""
+msgstr "Control Panels (Commandes)"
 
 #: src/emu/ui/menu.cpp:50
 msgid "Artwork Preview"
-msgstr ""
+msgstr "Aperçu de l'artwork"
 
 #: src/emu/ui/menu.cpp:54
 msgid "Game Over"
@@ -890,11 +889,11 @@ msgstr "Afficher vue des fichiers DATs"
 
 #: src/emu/ui/menu.cpp:252
 msgid "Return to Machine"
-msgstr ""
+msgstr "Retour à la machine actuelle"
 
 #: src/emu/ui/menu.cpp:256 src/emu/ui/menu.cpp:258
 msgid "Exit"
-msgstr "Quitter MAME"
+msgstr "Quitter"
 
 #: src/emu/ui/menu.cpp:263 src/emu/ui/menu.cpp:265
 msgid "Return to Previous Menu"
@@ -953,12 +952,12 @@ msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:256
 msgid "Coin %1$c: NA%3$s\n"
-msgstr "Monnaie %1$c : ND%3$s\n"
+msgstr "Monnayeur %1$c : ND%3$s\n"
 
 #: src/emu/ui/miscmenu.cpp:256
 #, c-format
 msgid "Coin %1$c: %2$d%3$s\n"
-msgstr "Monnaie %1$c : %2$d%3$s\n"
+msgstr "Monnayeur %1$c : %2$d%3$s\n"
 
 #: src/emu/ui/miscmenu.cpp:259
 msgid " (locked)"
@@ -966,7 +965,7 @@ msgstr " (verrouillé)"
 
 #: src/emu/ui/miscmenu.cpp:518
 msgid "Visible Delay"
-msgstr "Retard visible"
+msgstr "Attente visible"
 
 #: src/emu/ui/miscmenu.cpp:557
 msgid "Re-select last machine played"
@@ -998,7 +997,7 @@ msgstr "Forcer l'aspect 4:3 pour la capture d'écran"
 
 #: src/emu/ui/miscmenu.cpp:565
 msgid "Use image as background"
-msgstr "Utiliser une image de fond"
+msgstr "Utiliser l'image comme fond d'écran"
 
 #: src/emu/ui/miscmenu.cpp:566
 msgid "Skip bios selection menu"
@@ -1147,7 +1146,7 @@ msgid ""
 "Press any key (except ESC) to continue."
 msgstr ""
 "Il manque un ou plusieurs fichiers de ROMs ou d'images CHD pour utiliser "
-"cette machine. Veuillez sélectionner une machine différente.\n"
+"cette machine. Veuillez en sélectionner une autre.\n"
 "\n"
 "Appuyez sur une touche (excepté ESC) pour continuer."
 
@@ -1284,7 +1283,7 @@ msgstr "Année : %1$s\n"
 #: src/emu/ui/selgame.cpp:1521
 #, c-format
 msgid "Manufacturer: %1$-.100s\n"
-msgstr "Fabricant : %1$-.100s\n"
+msgstr "Constructeur : %1$-.100s\n"
 
 #: src/emu/ui/selgame.cpp:1525
 #, c-format
@@ -1369,7 +1368,7 @@ msgstr "Supporte les sauvegardes : %1$s\n"
 #: src/emu/ui/selgame.cpp:1559
 #, c-format
 msgid "Screen Orentation: %1$s\n"
-msgstr ""
+msgstr "Orientation de l'écran: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1559
 msgid "Vertical"
@@ -1433,7 +1432,7 @@ msgid ""
 "Press any key (except ESC) to continue."
 msgstr ""
 "Il manque un ou plusieurs fichiers nécessaires à l'utilisation de ce "
-"logiciel. Veuillez sélectionner un logiciel différent.\n"
+"logiciel. Veuillez en sélectionner un autre.\n"
 "\n"
 "Appuyez sur une touche (excepté ESC) pour continuer."
 
@@ -1445,7 +1444,7 @@ msgstr "%1$s %2$s ( %3$d / %4$d logiciels )"
 #: src/emu/ui/selsoft.cpp:684
 #, c-format
 msgid "Driver: \"%1$s\" software list "
-msgstr "Driver : \"%1$s\" liste de logiciels "
+msgstr "Liste de logiciels pour le driver : \"%1$s\" "
 
 #: src/emu/ui/selsoft.cpp:687
 #, c-format
@@ -1547,7 +1546,7 @@ msgstr "Son"
 
 #: src/emu/ui/sndmenu.cpp:135
 msgid "Sample Rate"
-msgstr "Niveau d'échantillonnage"
+msgstr "Fréquence d'échantillonnage"
 
 #: src/emu/ui/sndmenu.cpp:136
 msgid "Use External Samples"
@@ -1564,7 +1563,7 @@ msgstr "Permuter l'ordre des éléments"
 #: src/emu/ui/swlist.cpp:268
 #, c-format
 msgid "Switched Order: entries now ordered by %s"
-msgstr "Commande de tri effectuée : les entrées sont maintenant classés par %s"
+msgstr "Commande de tri effectuée : les entrées sont maintenant classées par %s"
 
 #: src/emu/ui/swlist.cpp:268
 msgid "shortname"
@@ -1584,7 +1583,7 @@ msgstr "arrêté"
 
 #: src/emu/ui/tapectrl.cpp:86
 msgid "playing"
-msgstr "En cours de lecture"
+msgstr "en cours de lecture"
 
 #: src/emu/ui/tapectrl.cpp:86
 msgid "(playing)"
@@ -1592,7 +1591,7 @@ msgstr "(en cours de lecture)"
 
 #: src/emu/ui/tapectrl.cpp:87
 msgid "recording"
-msgstr "En cours d'enregistrement"
+msgstr "en cours d'enregistrement"
 
 #: src/emu/ui/tapectrl.cpp:87
 msgid "(recording)"
@@ -1620,8 +1619,7 @@ msgstr ""
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
-msgstr ""
-"Ce driver nécessite le chargement d'images dans le(s) périphérique "
+msgstr "Ce driver nécessite le chargement d'images dans le(s) périphérique(s) "
 "suivant(s) : "
 
 #: src/emu/ui/ui.cpp:1043
@@ -1657,7 +1655,7 @@ msgid ""
 "There are known problems with this machine\n"
 "\n"
 msgstr ""
-"On rencontre les problèmes suivants avec cette machine\n"
+"On rencontre les problèmes suivants avec cette machine :\n"
 "\n"
 
 #: src/emu/ui/ui.cpp:1098
@@ -1781,7 +1779,7 @@ msgstr ""
 "%2$s %3$s\n"
 "Driver : %4$s\n"
 "\n"
-"CPU :\n"
+"Processeur :\n"
 
 #: src/emu/ui/ui.cpp:1228 src/emu/ui/ui.cpp:1267
 msgid "MHz"
@@ -1813,7 +1811,7 @@ msgstr "Aucun\n"
 
 #: src/emu/ui/ui.cpp:1282
 msgid "Vector"
-msgstr ""
+msgstr "Vecteur"
 
 #: src/emu/ui/ui.cpp:1293
 #, c-format
@@ -1854,11 +1852,11 @@ msgstr "Le tir automatique ne peut pas être activé"
 
 #: src/emu/ui/ui.cpp:1775
 msgid "Select position to save to"
-msgstr "Sélectionner la position de la sauvegarde"
+msgstr "Sauvegarder à la position"
 
 #: src/emu/ui/ui.cpp:1777
 msgid "Select position to load from"
-msgstr "Sélectionner la position du chargement"
+msgstr "Charger depuis la position"
 
 #: src/emu/ui/ui.cpp:1801
 msgid "Save cancelled"
@@ -1871,12 +1869,12 @@ msgstr "Chargement annulé"
 #: src/emu/ui/ui.cpp:1846
 #, c-format
 msgid "Save to position %s"
-msgstr "Sauvegarder à la position %s"
+msgstr "Sauvegarde à la position %s"
 
 #: src/emu/ui/ui.cpp:1851
 #, c-format
 msgid "Load from position %s"
-msgstr "Charger depuis la position %s"
+msgstr "Chargement depuis la position %s"
 
 #: src/emu/ui/ui.cpp:1891
 #, c-format
@@ -1886,24 +1884,24 @@ msgid ""
 "Press ''%1$s'' to quit,\n"
 "Press ''%2$s'' to return to emulation."
 msgstr ""
-"Êtes-vous certain de vouloir quitter?\n"
+"Êtes-vous certain de vouloir quitter ?\n"
 "\n"
 "Appuyez sur ''%1$s'' pour quitter,\n"
 "Appuyez sur ''%2$s'' pour retourner à l'émulation."
 
 #: src/emu/ui/ui.cpp:1967
 msgid "Master Volume"
-msgstr ""
+msgstr "Volume principal"
 
 #: src/emu/ui/ui.cpp:1977
 #, c-format
 msgid "%1$s Volume"
-msgstr ""
+msgstr "Volume %1$s"
 
 #: src/emu/ui/ui.cpp:1999
 #, c-format
 msgid "Overclock CPU %1$s"
-msgstr ""
+msgstr "Overclock du processeur %1$s"
 
 #: src/emu/ui/ui.cpp:2019
 #, c-format
@@ -1948,43 +1946,43 @@ msgstr "%1$s - Position Verticale"
 #: src/emu/ui/ui.cpp:2063
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr "Laserdisc '%1$s' Stretch Horizontal"
+msgstr "'%1$s' Laserdisc - Stretch Horizontal"
 
 #: src/emu/ui/ui.cpp:2066
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
-msgstr "Laserdisc '%1$s' Position Horizontal"
+msgstr "'%1$s' Laserdisc - Position Horizontale"
 
 #: src/emu/ui/ui.cpp:2069
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr "Laserdisc '%1$s' Stretch Vertical"
+msgstr "'%1$s' Laserdisc - Stretch Vertical"
 
 #: src/emu/ui/ui.cpp:2072
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
-msgstr "Laserdisc '%1$s' Position Verticale"
+msgstr "'%1$s' Laserdisc - Position Verticale"
 
 #: src/emu/ui/ui.cpp:2081
 msgid "Vector Flicker"
-msgstr ""
+msgstr "Vector Flicker (Scintillement)"
 
 #: src/emu/ui/ui.cpp:2083
 msgid "Beam Width Minimum"
-msgstr ""
+msgstr "Largeur de rayon minimum"
 
 #: src/emu/ui/ui.cpp:2085
 msgid "Beam Width Maximum"
-msgstr ""
+msgstr "Largeur de rayon maximum"
 
 #: src/emu/ui/ui.cpp:2087
 msgid "Beam Intensity Weight"
-msgstr ""
+msgstr "Intensité du rayon"
 
 #: src/emu/ui/ui.cpp:2099
 #, c-format
 msgid "Crosshair Scale %1$s"
-msgstr ""
+msgstr "Viseur - Échelle %1$s"
 
 #: src/emu/ui/ui.cpp:2099 src/emu/ui/ui.cpp:2102
 msgid "X"
@@ -1997,7 +1995,7 @@ msgstr ""
 #: src/emu/ui/ui.cpp:2102
 #, c-format
 msgid "Crosshair Offset %1$s"
-msgstr ""
+msgstr "Viseur - Offset %1$s"
 
 #: src/emu/ui/ui.cpp:2121
 #, c-format
@@ -2045,22 +2043,22 @@ msgstr "Écran"
 #: src/emu/ui/ui.cpp:2544
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
-msgstr ""
+msgstr "Viseur - Échelle X %1$1.3f"
 
 #: src/emu/ui/ui.cpp:2544
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
-msgstr ""
+msgstr "Viseur - Échelle Y %1$1.3f"
 
 #: src/emu/ui/ui.cpp:2563
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
-msgstr ""
+msgstr "Viseur - Offset X %1$1.3f"
 
 #: src/emu/ui/ui.cpp:2563
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
-msgstr ""
+msgstr "Viseur - Offset Y %1$1.3f"
 
 #: src/emu/ui/videoopt.cpp:55
 #, c-format
@@ -2073,19 +2071,19 @@ msgstr "Rotation"
 
 #: src/emu/ui/videoopt.cpp:207
 msgid "Backdrops"
-msgstr ""
+msgstr "Backdrops (Fonds)"
 
 #: src/emu/ui/videoopt.cpp:211
 msgid "Overlays"
-msgstr ""
+msgstr "Overlays (Calques)"
 
 #: src/emu/ui/videoopt.cpp:215
 msgid "Bezels"
-msgstr ""
+msgstr "Bezels (Cadres)"
 
 #: src/emu/ui/videoopt.cpp:219
 msgid "CPanels"
-msgstr ""
+msgstr "CPanels (Commandes)"
 
 #: src/emu/ui/videoopt.cpp:227
 msgid "View"
@@ -2093,7 +2091,7 @@ msgstr "Vue"
 
 #: src/emu/ui/videoopt.cpp:227
 msgid "Cropped"
-msgstr "Rétrécie"
+msgstr "Tronquée"
 
 #: src/emu/ui/videoopt.cpp:227
 msgid "Full"
@@ -2106,6 +2104,3 @@ msgstr " COULEURS"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " MARQUEURS"
-
-#~ msgid "Screen Orientation: %1$s\n"
-#~ msgstr "Orientation de l'écran : %1$s\n"
