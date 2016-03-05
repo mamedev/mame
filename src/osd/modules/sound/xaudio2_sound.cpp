@@ -304,13 +304,6 @@ int sound_xaudio2::init(osd_options const &options)
 
 	m_sample_bytes = format.nBlockAlign;
 
-#if defined(_DEBUG)
-	XAUDIO2_DEBUG_CONFIGURATION debugConfig = { 0 };
-	debugConfig.TraceMask = XAUDIO2_LOG_WARNINGS | XAUDIO2_LOG_TIMING | XAUDIO2_LOG_STREAMING;
-	debugConfig.LogFunctionName = TRUE;
-	m_xAudio2->SetDebugConfiguration(&debugConfig);
-#endif
-
 	// Create the buffers
 	create_buffers(format);
 

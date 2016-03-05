@@ -86,14 +86,10 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_xinput.cpp",
 	}
 
-	configuration { "mingw*"}
-	includedirs {
-		MAME_DIR .. "3rdparty/compat/mingw",
-	}
-
 	if _OPTIONS["targetos"]=="windows" then
 		includedirs {
 			MAME_DIR .. "3rdparty/winpcap/Include",
+			MAME_DIR .. "3rdparty/compat/mingw",
 		}
 	end
 
