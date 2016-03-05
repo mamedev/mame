@@ -575,12 +575,12 @@ msgstr "フォルダを削除"
 #: src/emu/ui/dirmenu.cpp:499
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
-msgstr "%1$sフォルダ変更　〜　検索：%2$s_"
+msgstr "%1$sフォルダを変更　〜　検索：%2$s_"
 
 #: src/emu/ui/dirmenu.cpp:500
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
-msgstr "%1$sフォルダ追加　〜　検索：%2$s_"
+msgstr "%1$sフォルダを追加　〜　検索：%2$s_"
 
 #: src/emu/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
@@ -589,7 +589,7 @@ msgstr "TABを押して設定"
 #: src/emu/ui/dirmenu.cpp:643
 #, c-format
 msgid "Remove %1$s Folder"
-msgstr "%1$sフォルダ削除"
+msgstr "%1$sフォルダを削除"
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
