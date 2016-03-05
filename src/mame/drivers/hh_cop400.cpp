@@ -237,6 +237,8 @@ UINT8 hh_cop400_state::read_inputs(int columns)
   Castle Toy Einstein
   * COP421 MCU label ~/927 COP421-NEZ/N
   * 4 lamps, 1-bit sound
+  
+  This is a Simon clone, the tones are not harmonic.
 
 ***************************************************************************/
 
@@ -263,8 +265,9 @@ WRITE8_MEMBER(ctstein_state::write_g)
 
 WRITE8_MEMBER(ctstein_state::write_l)
 {
-	// L0-L3: button lamps
-	display_matrix(4, 1, data & 0xf, 1);
+	// L0-L3: button lamps (strobed)
+	display_matrix(4, 1, data, 1);
+	display_matrix(4, 1, data, 0);
 }
 
 READ8_MEMBER(ctstein_state::read_l)
@@ -283,30 +286,30 @@ WRITE_LINE_MEMBER(ctstein_state::write_sk)
 // config
 
 static INPUT_PORTS_START( ctstein )
-	PORT_START("IN.0") // D0 port L
-	PORT_CONFNAME( 0x0f, 0x01, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(    0x01, "1" )
-	PORT_CONFSETTING(    0x02, "2" )
-	PORT_CONFSETTING(    0x04, "3" )
-	PORT_CONFSETTING(    0x08, "4" )
+	PORT_START("IN.0") // G0 port L
+	PORT_CONFNAME( 0x0f, 0x01^0x0f, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x01^0x0f, "1" )
+	PORT_CONFSETTING(    0x02^0x0f, "2" )
+	PORT_CONFSETTING(    0x04^0x0f, "3" )
+	PORT_CONFSETTING(    0x08^0x0f, "4" )
 
-	PORT_START("IN.1") // D1 port L
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_START("IN.1") // G1 port L
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SELECT ) PORT_NAME("Best Score")
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN.2") // D2 port L
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_START("IN.2") // G2 port L
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Red Button")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Yellow Button")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Green Button")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Blue Button")
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( ctstein, ctstein_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP421, 2000000) // approximation - RC osc. R=12K to +6V, C=100pf to GND
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
+	MCFG_CPU_ADD("maincpu", COP421, 850000) // approximation - RC osc. R=12K to +6V, C=100pf to GND
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_G_CB(WRITE8(ctstein_state, write_g))
 	MCFG_COP400_WRITE_L_CB(WRITE8(ctstein_state, write_l))
 	MCFG_COP400_WRITE_SK_CB(WRITELINE(ctstein_state, write_sk))
@@ -729,6 +732,7 @@ static INPUT_PORTS_START( plus1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( plus1, plus1_state )
@@ -939,7 +943,7 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, ctstein,   0,        0, ctstein,   ctstein,   driver_device, 0, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, ctstein,   0,        0, ctstein,   ctstein,   driver_device, 0, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, h2hbaskb,  0,        0, h2hbaskb,  h2hbaskb,  driver_device, 0, "Coleco", "Head to Head Basketball (COP420L)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
