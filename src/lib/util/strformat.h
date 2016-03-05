@@ -185,6 +185,21 @@
 #include <type_traits>
 #include <utility>
 
+#if defined(__GNUC__) && ((__GNUC__ == 5 && __GNUC_MINOR__ < 2) || (__GNUC__ == 4 && __GNUC_MINOR__ > 8))
+namespace std
+{
+template<class _Container>
+  inline constexpr auto
+  cbegin(const _Container& __cont) noexcept(noexcept(std::begin(__cont)))-> decltype(std::begin(__cont))
+  { return std::begin(__cont); }
+
+template<class _Container>
+  inline constexpr auto
+  cend(const _Container& __cont) noexcept(noexcept(std::end(__cont)))-> decltype(std::end(__cont))
+  { return std::end(__cont); }
+}
+#endif
+
 namespace util {
 namespace detail {
 //**************************************************************************
