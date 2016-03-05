@@ -1853,42 +1853,42 @@ msgstr "Overclock CPU %1$s"
 #: src/emu/ui/ui.cpp:2019
 #, c-format
 msgid "%1$s Refresh Rate"
-msgstr "%1$s Taxa de Atualização"
+msgstr "Taxa de Atualização da %1$s"
 
 #: src/emu/ui/ui.cpp:2025
 #, c-format
 msgid "%1$s Brightness"
-msgstr "%1$s Brilho"
+msgstr "Brilho da %1$s"
 
 #: src/emu/ui/ui.cpp:2028
 #, c-format
 msgid "%1$s Contrast"
-msgstr "%1$s Contraste"
+msgstr "Contraste da %1$s"
 
 #: src/emu/ui/ui.cpp:2031
 #, c-format
 msgid "%1$s Gamma"
-msgstr "%1$s Gama"
+msgstr "Gama da %1$s"
 
 #: src/emu/ui/ui.cpp:2036
 #, c-format
 msgid "%1$s Horiz Stretch"
-msgstr "%1$s Extensão Horizontal"
+msgstr "Extensão Horizontal da %1$s"
 
 #: src/emu/ui/ui.cpp:2039
 #, c-format
 msgid "%1$s Horiz Position"
-msgstr "%1$s Posição Horizontal"
+msgstr "Posição Horizontal %1$s"
 
 #: src/emu/ui/ui.cpp:2042
 #, c-format
 msgid "%1$s Vert Stretch"
-msgstr "%1$s Extensão Vertical"
+msgstr "Extensão Vertical da %1$s"
 
 #: src/emu/ui/ui.cpp:2045
 #, c-format
 msgid "%1$s Vert Position"
-msgstr "%1$s Posição Vertical"
+msgstr "Posição Vertical da %1$s"
 
 #: src/emu/ui/ui.cpp:2063
 #, c-format
