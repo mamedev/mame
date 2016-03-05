@@ -25,6 +25,7 @@
 
 # USE_DISPATCH_GL = 0
 # MODERN_WIN_API = 0
+# USE_XAUDIO2 = 0
 # DIRECTINPUT = 7
 # USE_SDL = 1
 # SDL_INI_PATH = .;$HOME/.mame/;ini;
@@ -574,6 +575,10 @@ endif
 
 ifdef MODERN_WIN_API
 PARAMS += --MODERN_WIN_API='$(MODERN_WIN_API)'
+endif
+
+ifdef USE_XAUDIO2
+PARAMS += --USE_XAUDIO2='$(USE_XAUDIO2)'
 endif
 
 ifdef DIRECTINPUT
