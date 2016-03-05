@@ -180,7 +180,7 @@ void ui_menu_display_actual::handle()
 
 void ui_menu_display_actual::populate()
 {
-	m_tempbuf.assign(_("Current ")).append(_(s_folders[m_ref].name)).append(_(" Folders"));
+	m_tempbuf = string_format(_("Current %1$s Folders"), _(s_folders[m_ref].name));
 	if (machine().ui().options().exists(s_folders[m_ref].option)) 
 		m_searchpath.assign(machine().ui().options().value(s_folders[m_ref].option));
 	else 
@@ -494,8 +494,12 @@ void ui_menu_add_change_folder::custom_render(void *selectedref, float top, floa
 	float width, maxwidth = origx2 - origx1;
 	ui_manager &mui = machine().ui();
 	std::string tempbuf[2];
-	tempbuf[0] = (m_change) ? _("Change)") : _("Add");
-	tempbuf[0].append(" ").append(_(s_folders[m_ref].name)).append(_(" Folder - Search: ")).append(m_search).append("_");
+	tempbuf[0] = string_format(
+			(m_change)
+				? _("Change %1$s Folder - Search: %2$s_")
+				: _("Add %1$s Folder - Search: %2$s_"),
+			_(s_folders[m_ref].name),
+			m_search);
 	tempbuf[1] = m_current_path;
 
 	// get the size of the text
@@ -636,7 +640,7 @@ void ui_menu_remove_folder::custom_render(void *selectedref, float top, float bo
 {
 	float width;
 	ui_manager &mui = machine().ui();
-	std::string tempbuf = std::string(_("Remove ")).append(_(s_folders[m_ref].name)).append(_(" Folder"));
+	std::string tempbuf = string_format(_("Remove %1$s Folder"), _(s_folders[m_ref].name));
 
 	// get the size of the text
 	mui.draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
