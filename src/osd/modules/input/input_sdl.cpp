@@ -688,11 +688,20 @@ public:
 		int physical_stick;
 		for (physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
 		{
-			SDL_Joystick *joy = SDL_JoystickOpen(physical_stick);
-			std::string joy_name = remove_spaces(SDL_JoystickName(joy));
-			SDL_JoystickClose(joy);
-
-			devmap_register(&m_joy_map, physical_stick, joy_name.c_str());
+		    if (SDL_IsGameController(physical_stick)) {
+				osd_printf_verbose("Joystick %i is supported by the game controller interface!\n", physical_stick);
+				osd_printf_verbose("Compatible controller, named \'%s\'\n", SDL_GameControllerNameForIndex(physical_stick));
+				SDL_GameController  *joy = SDL_GameControllerOpen(physical_stick);
+				osd_printf_verbose("Controller is mapped as \"%s\".\n", SDL_GameControllerMapping(joy));
+				std::string joy_name = remove_spaces(SDL_GameControllerName(joy));
+				SDL_GameControllerClose(joy);
+				devmap_register(&m_joy_map, physical_stick, joy_name.c_str());
+			} else {
+				SDL_Joystick *joy = SDL_JoystickOpen(physical_stick);
+				std::string joy_name = remove_spaces(SDL_JoystickName(joy));
+				SDL_JoystickClose(joy);
+				devmap_register(&m_joy_map, physical_stick, joy_name.c_str());
+			}
 		}
 
 		for (int stick = 0; stick < MAX_DEVMAP_ENTRIES; stick++)
