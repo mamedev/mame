@@ -651,6 +651,8 @@ ROM_END
    IGS002  (u20)
    U3567   (u42)
 
+   1x 12.288 MHz Xtal. (next to HD64180RP8)
+
    Programs are encrypted.
    See the last 0x1000 of each one
    to see the patterns...
