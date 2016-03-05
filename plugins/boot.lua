@@ -1,3 +1,5 @@
+-- license:BSD-3-Clause
+-- copyright-holders:Miodrag Milanovic
 require('lfs')
 local cwd = lfs.currentdir()
 package.path = cwd .. "/plugins/?.lua;" .. cwd .. "/plugins/?/init.lua"

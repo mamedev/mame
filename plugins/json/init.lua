@@ -1,3 +1,6 @@
+-- license:MIT
+-- copyright-holders:David Kolf
+
 local exports = {}
 exports.name = "luvit/json"
 exports.version = "2.5.0"
