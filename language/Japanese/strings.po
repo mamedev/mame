@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-02 07:55+0100\n"
+"POT-Creation-Date: 2016-03-05 22:55+1100\n"
 "PO-Revision-Date: 2016-02-23 01:39+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -556,12 +556,9 @@ msgid "Folders Setup"
 msgstr "フォルダ設定"
 
 #: src/emu/ui/dirmenu.cpp:183
-msgid "Current "
-msgstr "現在の"
-
-#: src/emu/ui/dirmenu.cpp:183
-msgid " Folders"
-msgstr " フォルダ"
+#, c-format
+msgid "Current %1$s Folders"
+msgstr "現在の%1$sフォルダ"
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
@@ -575,29 +572,24 @@ msgstr "フォルダを追加"
 msgid "Remove Folder"
 msgstr "フォルダを削除"
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Change)"
-msgstr "変更)"
+#: src/emu/ui/dirmenu.cpp:499
+#, c-format
+msgid "Change %1$s Folder - Search: %2$s_"
+msgstr "%1$sフォルダ変更　〜　検索：%2$s_"
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Add"
-msgstr "フォルダを"
+#: src/emu/ui/dirmenu.cpp:500
+#, c-format
+msgid "Add %1$s Folder - Search: %2$s_"
+msgstr "%1$sフォルダ追加　〜　検索：%2$s_"
 
-#: src/emu/ui/dirmenu.cpp:498
-msgid " Folder - Search: "
-msgstr " 追加 - 検索："
-
-#: src/emu/ui/dirmenu.cpp:533
+#: src/emu/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
 msgstr "TABを押して設定"
 
-#: src/emu/ui/dirmenu.cpp:639
-msgid "Remove "
-msgstr "フォルダを"
-
-#: src/emu/ui/dirmenu.cpp:639
-msgid " Folder"
-msgstr " 削除する"
+#: src/emu/ui/dirmenu.cpp:643
+#, c-format
+msgid "Remove %1$s Folder"
+msgstr "%1$sフォルダ削除"
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
@@ -678,15 +670,15 @@ msgstr ""
 
 #: src/emu/ui/filesel.cpp:271
 msgid "New Image Name:"
-msgstr ""
+msgstr "新しいイメージ名:"
 
 #: src/emu/ui/filesel.cpp:277
 msgid "Image Format:"
-msgstr ""
+msgstr "イメージ形式:"
 
 #: src/emu/ui/filesel.cpp:283
 msgid "Create"
-msgstr ""
+msgstr "作成"
 
 #: src/emu/ui/filesel.cpp:314
 msgid "Please enter a file extension too"
@@ -694,11 +686,11 @@ msgstr ""
 
 #: src/emu/ui/filesel.cpp:502 src/emu/ui/swlist.cpp:65
 msgid "[empty slot]"
-msgstr ""
+msgstr "【空のスロット】"
 
 #: src/emu/ui/filesel.cpp:506
 msgid "[create]"
-msgstr ""
+msgstr "【作成】"
 
 #: src/emu/ui/filesel.cpp:510 src/emu/ui/swlist.cpp:76
 msgid "[software list]"
@@ -706,11 +698,11 @@ msgstr "【ソフトウェアリスト】"
 
 #: src/emu/ui/filesel.cpp:802
 msgid "Select image format"
-msgstr ""
+msgstr "イメージ形式の選択"
 
 #: src/emu/ui/filesel.cpp:862
 msgid "Select access mode"
-msgstr ""
+msgstr "アクセスモードの選択"
 
 #: src/emu/ui/filesel.cpp:863
 msgid "Read-only"
@@ -718,7 +710,7 @@ msgstr "読み取り専用"
 
 #: src/emu/ui/filesel.cpp:865
 msgid "Read-write"
-msgstr ""
+msgstr "読み取り／書き込み"
 
 #: src/emu/ui/filesel.cpp:866
 msgid "Read this image, write to another image"
@@ -756,7 +748,7 @@ msgstr "擬似ターミナル"
 
 #: src/emu/ui/info_pty.cpp:35
 msgid "[failed]"
-msgstr ""
+msgstr "【失敗】"
 
 #: src/emu/ui/inputmap.cpp:52
 msgid "User Interface"
@@ -901,7 +893,7 @@ msgstr "前のメニューに戻る"
 
 #: src/emu/ui/menu.cpp:680
 msgid "Auto"
-msgstr ""
+msgstr "自動"
 
 #: src/emu/ui/menu.cpp:2073
 msgid "Images"
