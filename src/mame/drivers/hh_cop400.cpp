@@ -21,6 +21,7 @@
 #include "einvaderc.lh" // test-layout(but still playable)
 #include "funjacks.lh"
 #include "funrlgl.lh"
+#include "h2hbaskb.lh"
 #include "lightfgt.lh" // clickable
 
 //#include "hh_cop400_test.lh" // common test-layout - use external artwork
@@ -67,6 +68,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
+	void set_display_segmask(UINT32 digits, UINT32 mask);
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update = true);
 
 protected:
@@ -195,6 +197,17 @@ void hh_cop400_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
+void hh_cop400_state::set_display_segmask(UINT32 digits, UINT32 mask)
+{
+	// set a segment mask per selected digit, but leave unselected ones alone
+	for (int i = 0; i < 0x20; i++)
+	{
+		if (digits & 1)
+			m_display_segmask[i] = mask;
+		digits >>= 1;
+	}
+}
+
 void hh_cop400_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
@@ -266,8 +279,8 @@ WRITE8_MEMBER(ctstein_state::write_g)
 WRITE8_MEMBER(ctstein_state::write_l)
 {
 	// L0-L3: button lamps (strobed)
-	display_matrix(4, 1, data, 1);
-	display_matrix(4, 1, data, 0);
+	display_matrix(4, 1, data & 0xf, 1);
+	display_matrix(4, 1, data & 0xf, 0);
 }
 
 READ8_MEMBER(ctstein_state::read_l)
@@ -300,9 +313,9 @@ static INPUT_PORTS_START( ctstein )
 
 	PORT_START("IN.2") // G2 port L
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Red Button")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Yellow Button")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Yellow Button")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Green Button")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Blue Button")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Blue Button")
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( ctstein, ctstein_state )
@@ -333,7 +346,7 @@ MACHINE_CONFIG_END
   Coleco Head to Head Basketball
   * COP420 MCU label COP420L-NEZ/N
   * 2-digit 7seg display, 41 other leds, 1-bit sound
-
+  
 ***************************************************************************/
 
 class h2hbaskb_state : public hh_cop400_state
@@ -342,16 +355,90 @@ public:
 	h2hbaskb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_cop400_state(mconfig, type, tag)
 	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(write_d);
+	DECLARE_WRITE8_MEMBER(write_g);
+	DECLARE_WRITE8_MEMBER(write_l);
+	DECLARE_READ8_MEMBER(read_in);
+	DECLARE_WRITE_LINE_MEMBER(write_so);
 };
 
 // handlers
 
-//..
+void h2hbaskb_state::prepare_display()
+{
+	// D2,D3 double as multiplexer
+	UINT16 mask = ((m_d >> 2 & 1) * 0xf) | ((m_d << 1 & 0x10) * 0xf);
+	UINT16 sel = (m_g | m_d << 4 | m_g << 8 | m_d << 12) & mask;
+	
+	// D2+G0,G1 are 7segs
+	set_display_segmask(3, 0x7f);
+	display_matrix(7, 16, m_l, sel);
+}
+
+WRITE8_MEMBER(h2hbaskb_state::write_d)
+{
+	// D: led select
+	m_d = data & 0xf;
+	prepare_display();
+}
+
+WRITE8_MEMBER(h2hbaskb_state::write_g)
+{
+	// G: led select, input mux
+	m_inp_mux = data;
+	m_g = data & 0xf;
+	prepare_display();
+}
+
+WRITE8_MEMBER(h2hbaskb_state::write_l)
+{
+	// L0-L6: digit segments A-G
+	// L0-L4: led data
+	m_l = data;
+	prepare_display();
+}
+
+READ8_MEMBER(h2hbaskb_state::read_in)
+{
+	// IN: multiplexed inputs
+	return read_inputs(4);
+}
+
+WRITE_LINE_MEMBER(h2hbaskb_state::write_so)
+{
+	// SO: speaker out
+	m_speaker->level_w(state);
+}
 
 
 // config
 
 static INPUT_PORTS_START( h2hbaskb )
+	PORT_START("IN.0") // G0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_4)
+
+	PORT_START("IN.1") // G1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_5)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_CODE(KEYCODE_8)
+
+	PORT_START("IN.2") // G2 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_CODE(KEYCODE_R)
+
+	PORT_START("IN.3") // G3 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_CODE(KEYCODE_I)
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( h2hbaskb, h2hbaskb_state )
@@ -359,9 +446,14 @@ static MACHINE_CONFIG_START( h2hbaskb, h2hbaskb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP420, 1000000) // approximation - RC osc. R=43K to +9V, C=101pf to GND
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
+	MCFG_COP400_WRITE_D_CB(WRITE8(h2hbaskb_state, write_d))
+	MCFG_COP400_WRITE_G_CB(WRITE8(h2hbaskb_state, write_g))
+	MCFG_COP400_WRITE_L_CB(WRITE8(h2hbaskb_state, write_l))
+	MCFG_COP400_READ_IN_CB(READ8(h2hbaskb_state, read_in))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE(h2hbaskb_state, write_so))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-//  MCFG_DEFAULT_LAYOUT(layout_h2hbaskb)
+	MCFG_DEFAULT_LAYOUT(layout_h2hbaskb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
