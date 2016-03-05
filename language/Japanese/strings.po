@@ -584,7 +584,7 @@ msgstr "%1$sフォルダを追加　〜　検索：%2$s_"
 
 #: src/emu/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
-msgstr "TABを押して設定"
+msgstr "TABキーを押して設定"
 
 #: src/emu/ui/dirmenu.cpp:643
 #, c-format
@@ -593,7 +593,7 @@ msgstr "%1$sフォルダを削除"
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
-msgstr ""
+msgstr "ビデオモード"
 
 #: src/emu/ui/dsplmenu.cpp:40
 msgid "Hardware Stretch"
@@ -625,7 +625,7 @@ msgstr ""
 
 #: src/emu/ui/dsplmenu.cpp:48
 msgid "Window Mode"
-msgstr ""
+msgstr "ウィンドウモード"
 
 #: src/emu/ui/dsplmenu.cpp:49
 msgid "Enforce Aspect Ratio"
@@ -686,15 +686,15 @@ msgstr ""
 
 #: src/emu/ui/filesel.cpp:502 src/emu/ui/swlist.cpp:65
 msgid "[empty slot]"
-msgstr "【空のスロット】"
+msgstr "〔空のスロット〕"
 
 #: src/emu/ui/filesel.cpp:506
 msgid "[create]"
-msgstr "【作成】"
+msgstr "〔作成〕"
 
 #: src/emu/ui/filesel.cpp:510 src/emu/ui/swlist.cpp:76
 msgid "[software list]"
-msgstr "【ソフトウェアリスト】"
+msgstr "〔ソフトウェアリスト〕"
 
 #: src/emu/ui/filesel.cpp:802
 msgid "Select image format"
@@ -877,7 +877,7 @@ msgstr ""
 
 #: src/emu/ui/menu.cpp:65
 msgid "Show DATs view"
-msgstr ""
+msgstr "DATビューを表示"
 
 #: src/emu/ui/menu.cpp:252
 msgid "Return to Machine"
@@ -1465,7 +1465,7 @@ msgstr "選択中のソフトウェアパーツ:"
 
 #: src/emu/ui/selsoft.cpp:2116 src/emu/ui/selsoft.cpp:2136
 msgid "Bios selection:"
-msgstr "BIOS選択: "
+msgstr "BIOS選択："
 
 #: src/emu/ui/simpleselgame.cpp:232
 #, c-format
@@ -1542,7 +1542,7 @@ msgstr ""
 
 #: src/emu/ui/swlist.cpp:268
 msgid "description"
-msgstr ""
+msgstr "説明"
 
 #: src/emu/ui/swlist.cpp:436
 msgid "[compatible lists]"
