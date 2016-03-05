@@ -102,24 +102,24 @@ protected:
 
 	virtual void video_start() override;
 	
-	
+private:
+	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 };
 
 void sprcros2_state::video_start()
 {
 }
 
-UINT32 sprcros2_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void sprcros2_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	gfx_element *gfx_0 = m_gfxdecode->gfx(0);
-	gfx_element *gfx_1 = m_gfxdecode->gfx(1);
-	gfx_element *gfx_2 = m_gfxdecode->gfx(2);
-	int y,x;
 	int count = 0;
 
-	for (y=0;y<32;y++)
+	for (int y=0;y<32;y++)
 	{
-		for (x=0;x<32;x++)
+		for (int x=0;x<32;x++)
 		{
 			UINT16 tile = m_bgvram[count];
 			tile |= (m_bgattr[count] & 7) << 8;
@@ -135,27 +135,34 @@ UINT32 sprcros2_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 		}
 	}
 	
-	for(count=0x40-4;count>-1;count-=4)
+}
+
+void sprcros2_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
+{
+	gfx_element *gfx_1 = m_gfxdecode->gfx(1);
+
+	for(int count=0x40-4;count>-1;count-=4)
 	{
 		UINT8 x,y,tile,color;
 		bool flipx;
 		
-		y = m_sprram[count+2];
+		y = 224-m_sprram[count+2];
 		x = m_sprram[count+3];
 		tile = m_sprram[count+0];
 		flipx = bool(m_sprram[count+1] & 2);
 		color = (m_sprram[count+1] & 0x38) >> 3;
-		gfx_1->transpen(bitmap,cliprect,tile,color,flipx,0,x,y,0);
+		gfx_1->transpen(bitmap,cliprect,tile,color,flipx,0,x,y & 0xff,0);
 	}
-	
-	
-	count = 0;
-	
-	//gfx = m_gfxdecode->gfx(2);
+}
 
-	for (y=0;y<32;y++)
+void sprcros2_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
+{
+	gfx_element *gfx_2 = m_gfxdecode->gfx(2);
+	int count = 0;
+	
+	for (int y=0;y<32;y++)
 	{
-		for (x=0;x<32;x++)
+		for (int x=0;x<32;x++)
 		{
 			UINT16 tile = m_fgvram[count];
 			tile |= (m_fgattr[count] & 3) << 8;
@@ -166,7 +173,16 @@ UINT32 sprcros2_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 			count++;
 		}
 	}
-	
+}
+
+
+
+
+UINT32 sprcros2_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	legacy_bg_draw(bitmap,cliprect);
+	legacy_obj_draw(bitmap,cliprect);
+	legacy_fg_draw(bitmap,cliprect);
 	
 	return 0;
 }
