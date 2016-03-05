@@ -1,3 +1,5 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
 macro bxx_any %cond
 	prefetch_start();
 	TMP2 = read16i(TMP1);

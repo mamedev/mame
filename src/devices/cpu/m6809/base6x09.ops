@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 NMI:
 	m_nmi_asserted = false;
 	m_cc |= CC_E;

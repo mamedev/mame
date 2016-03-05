@@ -17,6 +17,7 @@
 #include "sound/speaker.h"
 
 // internal artwork
+#include "ctstein.lh" // clickable
 #include "einvaderc.lh" // test-layout(but still playable)
 #include "funjacks.lh"
 #include "funrlgl.lh"
@@ -234,8 +235,10 @@ UINT8 hh_cop400_state::read_inputs(int columns)
 /***************************************************************************
 
   Castle Toy Einstein
-  * COP421 MCU labeled ~/927 COP421-NEZ/N
+  * COP421 MCU label ~/927 COP421-NEZ/N
   * 4 lamps, 1-bit sound
+  
+  This is a Simon clone, the tones are not harmonic.
 
 ***************************************************************************/
 
@@ -245,26 +248,75 @@ public:
 	ctstein_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_cop400_state(mconfig, type, tag)
 	{ }
+
+	DECLARE_WRITE8_MEMBER(write_g);
+	DECLARE_WRITE8_MEMBER(write_l);
+	DECLARE_WRITE_LINE_MEMBER(write_sk);
+	DECLARE_READ8_MEMBER(read_l);
 };
 
 // handlers
 
-//..
+WRITE8_MEMBER(ctstein_state::write_g)
+{
+	// G0-G2: input mux
+	m_inp_mux = ~data & 7;
+}
+
+WRITE8_MEMBER(ctstein_state::write_l)
+{
+	// L0-L3: button lamps (strobed)
+	display_matrix(4, 1, data, 1);
+	display_matrix(4, 1, data, 0);
+}
+
+READ8_MEMBER(ctstein_state::read_l)
+{
+	// L4-L7: multiplexed inputs
+	return read_inputs(3) << 4 | 0xf;
+}
+
+WRITE_LINE_MEMBER(ctstein_state::write_sk)
+{
+	// SK: speaker out
+	m_speaker->level_w(state);
+}
 
 
 // config
 
 static INPUT_PORTS_START( ctstein )
+	PORT_START("IN.0") // G0 port L
+	PORT_CONFNAME( 0x0f, 0x01^0x0f, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x01^0x0f, "1" )
+	PORT_CONFSETTING(    0x02^0x0f, "2" )
+	PORT_CONFSETTING(    0x04^0x0f, "3" )
+	PORT_CONFSETTING(    0x08^0x0f, "4" )
+
+	PORT_START("IN.1") // G1 port L
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SELECT ) PORT_NAME("Best Score")
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN.2") // G2 port L
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Red Button")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Yellow Button")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Green Button")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Blue Button")
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( ctstein, ctstein_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP421, 1000000) // approximation - RC osc. R=12K to +6V, C=100pf to GND
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
+	MCFG_CPU_ADD("maincpu", COP421, 850000) // approximation - RC osc. R=12K to +6V, C=100pf to GND
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
+	MCFG_COP400_WRITE_G_CB(WRITE8(ctstein_state, write_g))
+	MCFG_COP400_WRITE_L_CB(WRITE8(ctstein_state, write_l))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE(ctstein_state, write_sk))
+	MCFG_COP400_READ_L_CB(READ8(ctstein_state, read_l))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-//  MCFG_DEFAULT_LAYOUT(layout_ctstein)
+	MCFG_DEFAULT_LAYOUT(layout_ctstein)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -279,7 +331,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Coleco Head to Head Basketball
-  * COP420 MCU labeled COP420L-NEZ/N
+  * COP420 MCU label COP420L-NEZ/N
   * 2-digit 7seg display, 41 other leds, 1-bit sound
 
 ***************************************************************************/
@@ -324,7 +376,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Space Invader
-  * COP444L MCU labeled /B138 COPL444-HRZ/N INV II (die labeled HRZ COP 444L/A)
+  * COP444L MCU label /B138 COPL444-HRZ/N INV II (die label HRZ COP 444L/A)
   * 3 7seg LEDs, LED matrix and overlay mask, 1-bit sound
 
   The first version was on TMS1100 (see hh_tms1k.c), this is the reprogrammed
@@ -440,7 +492,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Mattel Funtronics Jacks
-  * COP410L MCU bonded directly to PCB (die labeled COP410L/B NGS)
+  * COP410L MCU bonded directly to PCB (die label COP410L/B NGS)
   * 8 LEDs, 1-bit sound
 
 ***************************************************************************/
@@ -547,7 +599,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Mattel Funtronics Red Light Green Light
-  * COP410L MCU bonded directly to PCB (die labeled COP410L/B NHZ)
+  * COP410L MCU bonded directly to PCB (die label COP410L/B NHZ)
   * 14 LEDs, 1-bit sound
 
   known releases:
@@ -642,7 +694,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Milton Bradley Plus One
-  * COP410L MCU in 8-pin DIP, labeled ~/029 MM 57405 (die labeled COP410L/B NNE)
+  * COP410L MCU in 8-pin DIP, label ~/029 MM 57405 (die label COP410L/B NNE)
   * 4 sensors(1 on each die side), 1-bit sound
 
 ***************************************************************************/
@@ -653,16 +705,34 @@ public:
 	plus1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_cop400_state(mconfig, type, tag)
 	{ }
+
+	DECLARE_WRITE8_MEMBER(write_d);
 };
 
 // handlers
 
-//..
+WRITE8_MEMBER(plus1_state::write_d)
+{
+	// D?: speaker out
+	m_speaker->level_w(data & 1);
+}
 
 
 // config
 
 static INPUT_PORTS_START( plus1 )
+	PORT_START("IN.0") // port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN.1") // port L
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( plus1, plus1_state )
@@ -670,6 +740,9 @@ static MACHINE_CONFIG_START( plus1, plus1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K to +5V, C=100pf to GND
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true) // guessed
+	MCFG_COP400_WRITE_D_CB(WRITE8(plus1_state, write_d))
+	MCFG_COP400_READ_G_CB(IOPORT("IN.0"))
+	MCFG_COP400_READ_L_CB(IOPORT("IN.1"))
 
 	/* no visual feedback! */
 
@@ -686,7 +759,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Milton Bradley (Electronic) Lightfight
-  * COP421L MCU labeled /B119 COP421L-HLA/N
+  * COP421L MCU label /B119 COP421L-HLA/N
   * LED matrix, 1-bit sound
 
   Xbox-shaped electronic game for 2 or more players, with long diagonal buttons
@@ -870,7 +943,7 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, ctstein,   0,        0, ctstein,   ctstein,   driver_device, 0, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, ctstein,   0,        0, ctstein,   ctstein,   driver_device, 0, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, h2hbaskb,  0,        0, h2hbaskb,  h2hbaskb,  driver_device, 0, "Coleco", "Head to Head Basketball (COP420L)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 

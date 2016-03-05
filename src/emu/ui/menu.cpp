@@ -1891,6 +1891,21 @@ void ui_menu::handle_main_events(UINT32 flags)
 	bool stop = false;
 	ui_event local_menu_event;
 
+	if (m_pressed)
+	{
+		bool pressed = mouse_pressed();
+		INT32 m_target_x, m_target_y;
+		bool m_button;
+		render_target *mouse_target = machine().ui_input().find_mouse(&m_target_x, &m_target_y, &m_button);
+		if (mouse_target != nullptr && m_button && (hover == HOVER_ARROW_DOWN || hover == HOVER_ARROW_UP))
+		{
+			if (pressed)
+				machine().ui_input().push_mouse_down_event(mouse_target, m_target_x, m_target_y);
+		}
+		else
+			reset_pressed();
+	}
+
 	// loop while we have interesting events
 	while (!stop && machine().ui_input().pop_event(&local_menu_event))
 	{
@@ -1919,6 +1934,7 @@ void ui_menu::handle_main_events(UINT32 flags)
 					if (selected < 0)
 						selected = 0;
 					top_line -= visitems - (top_line + visible_lines == visible_items);
+					set_pressed();
 				}
 				else if (hover == HOVER_ARROW_DOWN)
 				{
@@ -1926,6 +1942,7 @@ void ui_menu::handle_main_events(UINT32 flags)
 					if (selected >= visible_items)
 						selected = visible_items - 1;
 					top_line += visible_lines - 2;
+					set_pressed();
 				}
 				else if (hover == HOVER_UI_RIGHT)
 					menu_event.iptkey = IPT_UI_RIGHT;
@@ -2819,4 +2836,10 @@ void ui_menu::draw_dats_menu()
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
 	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != visible_items);
+}
+
+void ui_menu::set_pressed()
+{
+	(m_repeat == 0) ? m_repeat = osd_ticks() + osd_ticks_per_second() / 2 : m_repeat = osd_ticks() + osd_ticks_per_second() / 4;
+	m_pressed = true;
 }

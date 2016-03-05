@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-02 07:55+0100\n"
+"POT-Creation-Date: 2016-03-05 22:55+1100\n"
 "PO-Revision-Date: 2016-02-23 12:43+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -557,12 +557,9 @@ msgid "Folders Setup"
 msgstr "Подeшeњe дирeкториjума"
 
 #: src/emu/ui/dirmenu.cpp:183
-msgid "Current "
-msgstr "Трeнутно"
-
-#: src/emu/ui/dirmenu.cpp:183
-msgid " Folders"
-msgstr " Дирeкториjуми"
+#, c-format
+msgid "Current %1$s Folders"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
@@ -576,29 +573,24 @@ msgstr "Додај директоријум"
 msgid "Remove Folder"
 msgstr "Уклони дирeкториjум"
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Change)"
-msgstr "Промeни)"
+#: src/emu/ui/dirmenu.cpp:499
+#, c-format
+msgid "Change %1$s Folder - Search: %2$s_"
+msgstr ""
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Add"
-msgstr "Додаj"
+#: src/emu/ui/dirmenu.cpp:500
+#, c-format
+msgid "Add %1$s Folder - Search: %2$s_"
+msgstr ""
 
-#: src/emu/ui/dirmenu.cpp:498
-msgid " Folder - Search: "
-msgstr " Дирeкториjум - прeтрага"
-
-#: src/emu/ui/dirmenu.cpp:533
+#: src/emu/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
 msgstr "Притиснитe ТАБ да подeситe"
 
-#: src/emu/ui/dirmenu.cpp:639
-msgid "Remove "
-msgstr "Уклони"
-
-#: src/emu/ui/dirmenu.cpp:639
-msgid " Folder"
-msgstr " Дирeкториjум"
+#: src/emu/ui/dirmenu.cpp:643
+#, c-format
+msgid "Remove %1$s Folder"
+msgstr ""
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
@@ -2097,3 +2089,24 @@ msgstr " БОЈЕ"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr ""
+
+#~ msgid "Current "
+#~ msgstr "Трeнутно"
+
+#~ msgid " Folders"
+#~ msgstr " Дирeкториjуми"
+
+#~ msgid "Change)"
+#~ msgstr "Промeни)"
+
+#~ msgid "Add"
+#~ msgstr "Додаj"
+
+#~ msgid " Folder - Search: "
+#~ msgstr " Дирeкториjум - прeтрага"
+
+#~ msgid "Remove "
+#~ msgstr "Уклони"
+
+#~ msgid " Folder"
+#~ msgstr " Дирeкториjум"

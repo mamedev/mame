@@ -118,7 +118,7 @@ DRIVER_INIT_MEMBER(pcjr_state, pcjr)
 	m_pc_int_delay_timer = timer_alloc(TIMER_IRQ_DELAY);
 	m_pcjr_watchdog = timer_alloc(TIMER_WATCHDOG);
 	m_keyb_signal_timer = timer_alloc(TIMER_KB_SIGNAL);
-	membank( "bank10" )->set_base( m_ram->pointer() );
+	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
 }
 
 void pcjr_state::machine_reset()
@@ -533,20 +533,16 @@ GFXDECODE_END
 
 
 static ADDRESS_MAP_START(ibmpcjr_map, AS_PROGRAM, 8, pcjr_state)
-	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0xa0000, 0xaffff) AM_RAM
-	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
-	AM_RANGE(0xb8000, 0xbffff) AM_RAMBANK("bank14")
-	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
-	AM_RANGE(0xc8000, 0xc9fff) AM_ROM
-	AM_RANGE(0xca000, 0xcffff) AM_NOP
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0xb8000, 0xbffff) AM_DEVICE("pcvideo_pcjr:vram", address_map_bank_device, amap8)
 	AM_RANGE(0xd0000, 0xdffff) AM_DEVREAD("cartslot2", generic_slot_device, read_rom)
 	AM_RANGE(0xe0000, 0xeffff) AM_DEVREAD("cartslot1", generic_slot_device, read_rom)
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, pcjr_state)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
@@ -561,11 +557,16 @@ static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, pcjr_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ibmpcjx_map, AS_PROGRAM, 8, pcjr_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x80000, 0xb7fff) AM_ROM AM_REGION("kanji",0)
-	AM_IMPORT_FROM( ibmpcjr_map )
+	AM_RANGE(0x80000, 0x9ffff) AM_RAM AM_SHARE("vram") // TODO: remove this part of vram hack
+	AM_RANGE(0xb8000, 0xbffff) AM_DEVICE("pcvideo_pcjr:vram", address_map_bank_device, amap8)
+	AM_RANGE(0xd0000, 0xdffff) AM_DEVREAD("cartslot1", generic_slot_device, read_rom)
+	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ibmpcjx_io, AS_IO, 8, pcjr_state)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01ff, 0x01ff) AM_READWRITE(pcjx_port_1ff_r, pcjx_port_1ff_w)
 	AM_IMPORT_FROM( ibmpcjr_io )
 ADDRESS_MAP_END
@@ -650,6 +651,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
+	MCFG_RAM_EXTRA_OPTIONS("128K, 256K, 512K")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","ibmpcjr_cart")
@@ -673,26 +675,30 @@ static MACHINE_CONFIG_DERIVED( ibmpcjx, ibmpcjr )
 	MCFG_SLOT_FIXED(true)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", ibmpcjx)
-MACHINE_CONFIG_END
+	/* internal ram */
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_EXTRA_OPTIONS("") // only boots with 512k currently
+ MACHINE_CONFIG_END
 
 
 
 ROM_START( ibmpcjr )
-	ROM_REGION(0x100000,"maincpu", 0)
-	ROM_LOAD("bios.rom", 0xf0000, 0x10000,CRC(31e3a7aa) SHA1(1f5f7013f18c08ff50d7942e76c4fbd782412414))
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_LOAD("bios.rom", 0x0000, 0x10000,CRC(31e3a7aa) SHA1(1f5f7013f18c08ff50d7942e76c4fbd782412414))
 
 	ROM_REGION(0x08100,"gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card
 ROM_END
 
 ROM_START( ibmpcjx )
-	ROM_REGION(0x100000,"maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x20000,"bios", ROMREGION_ERASEFF)
 	ROM_DEFAULT_BIOS("unk")
 	ROM_SYSTEM_BIOS( 0, "5601jda", "5601jda" )
-	ROMX_LOAD("5601jda.bin", 0xf0000, 0x10000, CRC(b1e12366) SHA1(751feb16b985aa4f1ec1437493ff77e2ebd5e6a6), ROM_BIOS(1))
-	ROMX_LOAD("basicjx.rom",   0xe8000, 0x08000, NO_DUMP, ROM_BIOS(1)) // boot fails due of this.
+	ROMX_LOAD("5601jda.bin", 0x10000, 0x10000, CRC(b1e12366) SHA1(751feb16b985aa4f1ec1437493ff77e2ebd5e6a6), ROM_BIOS(1))
+	ROMX_LOAD("basicjx.rom",   0x08000, 0x08000, NO_DUMP, ROM_BIOS(1)) // boot fails due of this.
 	ROM_SYSTEM_BIOS( 1, "unk", "unk" )
-	ROMX_LOAD("ipljx.rom", 0xe0000, 0x20000, CRC(36a7b2de) SHA1(777db50c617725e149bca9b18cf51ce78f6dc548), ROM_BIOS(2))
+	ROMX_LOAD("ipljx.rom", 0x00000, 0x20000, CRC(36a7b2de) SHA1(777db50c617725e149bca9b18cf51ce78f6dc548), ROM_BIOS(2))
 
 	ROM_REGION(0x08100,"gfx1", 0) //TODO: needs a different charset
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card

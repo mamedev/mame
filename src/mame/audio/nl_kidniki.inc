@@ -1,4 +1,5 @@
-
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner, Couriersud
 #include "netlist/devices/net_lib.h"
 
 #ifndef USE_FRONTIERS

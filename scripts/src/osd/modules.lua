@@ -445,9 +445,11 @@ if _OPTIONS["USE_XAUDIO2"]=="1" then
 	defines {
 		"USE_XAUDIO2=1",
 	},
-	includedirs {
-		MAME_DIR .. "3rdparty/win81sdk/Include/um",
-	}
+	configuration { "mingw*"}
+		includedirs {
+			MAME_DIR .. "3rdparty/compat/mingw",
+		}
+	configuration { }
 else
 	defines {
 		"USE_XAUDIO2=0",

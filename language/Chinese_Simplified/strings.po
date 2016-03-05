@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-02 07:55+0100\n"
+"POT-Creation-Date: 2016-03-05 22:55+1100\n"
 "PO-Revision-Date: 2016-02-29 10:10+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
@@ -554,12 +554,9 @@ msgid "Folders Setup"
 msgstr "文件夹设定"
 
 #: src/emu/ui/dirmenu.cpp:183
-msgid "Current "
-msgstr "现有 "
-
-#: src/emu/ui/dirmenu.cpp:183
-msgid " Folders"
-msgstr " 文件夹"
+#, c-format
+msgid "Current %1$s Folders"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
@@ -573,29 +570,24 @@ msgstr "新增文件夹"
 msgid "Remove Folder"
 msgstr "移除文件夹"
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Change)"
-msgstr " 变更)"
+#: src/emu/ui/dirmenu.cpp:499
+#, c-format
+msgid "Change %1$s Folder - Search: %2$s_"
+msgstr ""
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Add"
-msgstr "新增"
+#: src/emu/ui/dirmenu.cpp:500
+#, c-format
+msgid "Add %1$s Folder - Search: %2$s_"
+msgstr ""
 
-#: src/emu/ui/dirmenu.cpp:498
-msgid " Folder - Search: "
-msgstr " 文件夹 - 搜寻: "
-
-#: src/emu/ui/dirmenu.cpp:533
+#: src/emu/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
 msgstr "按下 TAB 键设定"
 
-#: src/emu/ui/dirmenu.cpp:639
-msgid "Remove "
-msgstr "移除 "
-
-#: src/emu/ui/dirmenu.cpp:639
-msgid " Folder"
-msgstr " 文件夹"
+#: src/emu/ui/dirmenu.cpp:643
+#, c-format
+msgid "Remove %1$s Folder"
+msgstr ""
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
@@ -2077,6 +2069,27 @@ msgstr " 色彩"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " PENS"
+
+#~ msgid "Current "
+#~ msgstr "现有 "
+
+#~ msgid " Folders"
+#~ msgstr " 文件夹"
+
+#~ msgid "Change)"
+#~ msgstr " 变更)"
+
+#~ msgid "Add"
+#~ msgstr "新增"
+
+#~ msgid " Folder - Search: "
+#~ msgstr " 文件夹 - 搜寻: "
+
+#~ msgid "Remove "
+#~ msgstr "移除 "
+
+#~ msgid " Folder"
+#~ msgstr " 文件夹"
 
 #~ msgid "Search: "
 #~ msgstr "搜寻: "

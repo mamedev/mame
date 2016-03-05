@@ -165,7 +165,6 @@ end
 
 	if _OPTIONS["USE_LIBUV"]=="1" then
 		links {		
-			"luv",
 			"uv",
 			"http-parser",
 		}

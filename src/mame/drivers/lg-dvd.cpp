@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /*
   Rather skeleton driver for a LG GP40NW10 usb dvd writer.
 

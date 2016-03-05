@@ -364,7 +364,7 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 /***************************************************************************
 
   APF Mathemagician
-  * TMS1100 MCU, labeled MP1030 (no decap)
+  * TMS1100 MCU, label MP1030 (no decap)
   * 2 x DS8870N - Hex LED Digit Driver
   * 2 x DS8861N - MOS-to-LED 5-Segment Driver
   * 10-digit 7seg LED display(2 custom ones) + 4 LEDs, no sound
@@ -542,7 +542,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Coleco Amaze-A-Tron, by Ralph Baer
-  * TMS1100 MCU, labeled MP3405(die label too)
+  * TMS1100 MCU, label MP3405(die label too)
   * 2-digit 7seg LED display + 2 LEDs(one red, one green), 1-bit sound
   * 5*5 pressure-sensitive playing board(buttons), 4 game pieces
 
@@ -834,7 +834,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Coleco Electronic Quarterback
-  * TMS1100NLL MP3415 (die labeled MP3415)
+  * TMS1100NLL MP3415 (die label MP3415)
   * 9-digit LED grid, 1-bit sound
 
   known releases:
@@ -945,7 +945,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Coleco Head to Head Football
-  * TMS1100NLLE (rev. E!) MP3460 (die labeled MP3460)
+  * TMS1100NLLE (rev. E!) MP3460 (die label MP3460)
   * 2*SN75492N LED display drivers, 9-digit LED grid, 1-bit sound
 
   known releases:
@@ -1060,7 +1060,7 @@ MACHINE_CONFIG_END
 
   Coleco Head to Head Baseball
   * PCB labels Coleco rev C 73891/2
-  * TMS1170NLN MP1525-N2 (die labeled MP1525)
+  * TMS1170NLN MP1525-N2 (die label MP1525)
   * 9-digit cyan VFD display, and other LEDs behind bezel, 1-bit sound
 
   known releases:
@@ -1199,7 +1199,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Coleco Total Control 4
-  * TMS1400NLL MP7334-N2 (die labeled MP7334)
+  * TMS1400NLL MP7334-N2 (die label MP7334)
   * 2x2-digit 7seg LED display + 4 LEDs, LED grid display, 1-bit sound
 
   This is a head to head electronic tabletop LED-display sports console.
@@ -1479,7 +1479,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex (Electronic) Baseball (1)
-  * TMS1000NLP MP0914 (die labeled MP0914A)
+  * TMS1000NLP MP0914 (die label MP0914A)
   * 1 7seg LED, and other LEDs behind bezel, 1-bit sound
 
   This is a handheld LED baseball game. One player controls the batter, the CPU
@@ -1614,8 +1614,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex (Electronic) Baseball 2
-  * PCBs are labeled: ZENY
-  * TMS1000 MCU, MP0923 (die labeled MP0923)
+  * PCB label: ZENY
+  * TMS1000 MCU, MP0923 (die label MP0923)
   * 3 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
   The Japanese version was published by Gakken, black casing instead of white.
@@ -1739,8 +1739,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex (Electronic) Baseball 3
-  * PCBs are labeled: ZENY
-  * TMS1100NLL 6007 MP1204 (rev. E!) (die labeled MP1204)
+  * PCB label: ZENY
+  * TMS1100NLL 6007 MP1204 (rev. E!) (die label MP1204)
   * 2*SN75492N LED display driver
   * 4 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
@@ -1920,7 +1920,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Space Invader
-  * TMS1100 MP1211 (die labeled MP1211)
+  * TMS1100 MP1211 (die label MP1211)
   * 3 7seg LEDs, LED matrix and overlay mask, 1-bit sound
 
   There are two versions of this game: the first release(this one) is on
@@ -2034,7 +2034,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Color Football 4
-  * TMS1670 6009 MP7551 (die also labeled MP7551)
+  * TMS1670 6009 MP7551 (die also label MP7551)
   * 9-digit cyan VFD display, 60 red and green LEDs behind bezel, 1-bit sound
 
 ***************************************************************************/
@@ -2151,7 +2151,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex (Electronic) Basketball 2
-  * TMS1100 6010 MP1218 (die also labeled MP1218)
+  * TMS1100 6010 MP1218 (die also label MP1218)
   * 4 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
   lamp translation table: led zz from game PCB = MAME lampyx:
@@ -2274,7 +2274,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Raise The Devil
-  * TMS1100 MP1221 (die labeled MP1221)
+  * TMS1100 MP1221 (die label MP1221)
   * 4 7seg LEDs(rightmost one unused), and other LEDs behind bezel, 1-bit sound
 
   lamp translation table: led zz from game PCB = MAME lampyx:
@@ -2417,7 +2417,7 @@ MACHINE_CONFIG_END
 
   Gakken Poker
   * PCB label POKER. gakken
-  * TMS1370 MP2105 (die labeled MP2105)
+  * TMS1370 MP2105 (die label MP2105)
   * 11-digit cyan VFD display Itron FG1114B, oscillator sound
 
   known releases:
@@ -2562,7 +2562,7 @@ MACHINE_CONFIG_END
 
   Gakken Jackpot: Gin Rummy & Black Jack
   * PCB label gakken
-  * TMS1670 MPF553 (die labeled MPF553)
+  * TMS1670 MPF553 (die label MPF553)
   * 11-digit cyan VFD display Itron FG1114B, oscillator sound
 
   known releases:
@@ -2674,7 +2674,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Ideal Electronic Detective
-  * TMS0980NLL MP6100A (die labeled 0980B-00)
+  * TMS0980NLL MP6100A (die label 0980B-00)
   * 10-digit 7seg LED display, 2-level sound
 
   hardware (and concept) is very similar to Parker Brothers Stop Thief
@@ -2805,7 +2805,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Kenner Star Wars - Electronic Battle Command
-  * TMS1100 MCU, labeled MP3438A
+  * TMS1100 MCU, label MP3438A
   * 4x4 LED grid display + 2 separate LEDs and 2-digit 7segs, 1-bit sound
 
   This is a small tabletop space-dogfighting game. To start the game,
@@ -2931,7 +2931,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Kosmos Astro
-  * TMS1470NLHL MP1133 (die labeled TMS1400 MP1133)
+  * TMS1470NLHL MP1133 (die label TMS1400 MP1133)
   * 9digit 7seg VFD display + 8 LEDs(4 green, 4 yellow), no sound
 
   This is an astrological calculator, and also supports 4-function
@@ -3055,7 +3055,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Mattel Dungeons & Dragons - Computer Labyrinth Game
-  * TMS1100 M34012-N2LL (die labeled M34012)
+  * TMS1100 M34012-N2LL (die label M34012)
   * 72 buttons, no LEDs, 1-bit sound
 
   This is an electronic board game. It requires markers and wall pieces to play.
@@ -3236,7 +3236,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Milton Bradley Comp IV
-  * TMC0904NL CP0904A (die labeled 4A0970D-04A)
+  * TMC0904NL CP0904A (die label 4A0970D-04A)
   * 10 LEDs behind bezel, no sound
 
   known releases:
@@ -3340,7 +3340,7 @@ MACHINE_CONFIG_END
   Milton Bradley Simon, created by Ralph Baer
 
   Revision A hardware:
-  * TMS1000 (die labeled MP3226)
+  * TMS1000 (die label MP3226)
   * DS75494 Hex digit LED driver, 4 big lamps, 1-bit sound
 
   Newer revisions (also Pocket Simon) have a smaller 16-pin MB4850 chip
@@ -3441,7 +3441,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Milton Bradley Super Simon
-  * TMS1100 MP3476NLL (die labeled MP3476)
+  * TMS1100 MP3476NLL (die label MP3476)
   * 8 big lamps(2 turn on at same time), 1-bit sound
 
   The semi-squel to Simon, not as popular. It includes more game variations
@@ -3583,7 +3583,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Milton Bradley Big Trak
-  * TMS1000NLL MP3301A or MP3301ANLL E (rev. E!) (die labeled 1000E MP3301)
+  * TMS1000NLL MP3301A or MP3301ANLL E (rev. E!) (die label 1000E MP3301)
   * SN75494N Hex digit LED driver, 1 lamp, 3-level sound
   * gearbox with magnetic clutch, 1 IR led+sensor, 2 motors(middle wheels)
   * 24-button keypad, ext in/out ports
@@ -3767,7 +3767,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Parker Brothers Code Name: Sector, by Bob Doyle
-  * TMS0970 MCU, MP0905BNL ZA0379 (die labeled 0970F-05B)
+  * TMS0970 MCU, MP0905BNL ZA0379 (die label 0970F-05B)
   * 6-digit 7seg LED display + 4 LEDs for compass, no sound
 
   This is a tabletop submarine pursuit game. A grid board and small toy
@@ -4001,7 +4001,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Parker Brothers Master Merlin
-  * TMS1400 MP7351-N2LL (die labeled 1400CR MP7351)
+  * TMS1400 MP7351-N2LL (die label 1400CR MP7351)
   * 11 LEDs behind buttons, 3-level sound
 
   The TMS1400CR MCU has the same pinout as a standard TMS1100. The hardware
@@ -4065,7 +4065,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Parker Brothers Stop Thief, by Bob Doyle
-  * TMS0980NLL MP6101B (die labeled 0980B-01A)
+  * TMS0980NLL MP6101B (die label 0980B-01A)
   * 3-digit 7seg LED display, 6-level sound
 
   Stop Thief is actually a board game, the electronic device emulated here
@@ -4182,7 +4182,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Parker Brothers Bank Shot (known as Cue Ball in the UK), by Garry Kitchen
-  * TMS1400NLL MP7313-N2 (die labeled MP7313)
+  * TMS1400NLL MP7313-N2 (die label MP7313)
   * LED grid display, 1-bit sound
 
   Bank Shot is an electronic pool game. To select a game, repeatedly press
@@ -4289,7 +4289,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Parker Brothers Split Second
-  * TMS1400NLL MP7314-N2 (die labeled MP7314)
+  * TMS1400NLL MP7314-N2 (die label MP7314)
   * LED grid display(default round LEDs, and rectangular shape ones), 1-bit sound
 
   This is an electronic handheld reflex gaming device, it's straightforward
@@ -4401,7 +4401,7 @@ MACHINE_CONFIG_END
 
   Parker Brothers Lost Treasure - The Electronic Deep-Sea Diving Game,
   Featuring The Electronic Dive-Control Center
-  * TMS1100 M34038-NLL (die labeled 1100E, M34038)
+  * TMS1100 M34038-NLL (die label 1100E, M34038)
   * 11 LEDs, 4-bit sound
 
   This is a board game. The electronic accessory is the emulated part here.
@@ -4516,7 +4516,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tandy Radio Shack Computerized Arcade (1981, 1982, 1995)
-  * TMS1100 MCU, labeled CD7282SL
+  * TMS1100 MCU, label CD7282SL
   * 12 lamps behind buttons, 1-bit sound
 
   This handheld contains 12 minigames. It looks and plays like "Fabulous Fred"
@@ -4677,7 +4677,7 @@ MACHINE_CONFIG_END
 
   Tomy(tronics) Break Up (manufactured in Japan)
   * PCB label TOMY B.O.
-  * TMS1040 MP2726 TOMY WIPE (die labeled MP2726A)
+  * TMS1040 MP2726 TOMY WIPE (die label MP2726A)
   * TMS1025N2LL I/O expander
   * 2-digit 7seg display, 46 other leds, 1-bit sound
 
@@ -4879,7 +4879,7 @@ MACHINE_CONFIG_END
 
   Tomy Power House Pinball
   * PCB label TOMY P-B
-  * TMS1100 MP1180 TOMY PINB (die labeled MP1180)
+  * TMS1100 MP1180 TOMY PINB (die label MP1180)
   * 3 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
   known releases:

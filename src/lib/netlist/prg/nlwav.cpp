@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 #include <cstdio>
 #include <cstring>
 #include "plib/poptions.h"

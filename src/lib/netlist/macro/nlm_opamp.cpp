@@ -1,4 +1,5 @@
-
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 #include "nlm_opamp.h"
 
 #include "analog/nld_opamps.h"

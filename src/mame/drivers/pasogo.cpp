@@ -442,7 +442,6 @@ static ADDRESS_MAP_START(emsbank_map, AS_PROGRAM, 16, pasogo_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pasogo_mem, AS_PROGRAM, 16, pasogo_state)
-	AM_RANGE(0x00000, 0x7ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xb8000, 0xbffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x80000, 0xeffff) AM_READWRITE(emsram_r, emsram_w)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK("bank27")
@@ -452,6 +451,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pasogo_io, AS_IO, 16, pasogo_state)
 	AM_RANGE(0x0026, 0x0027) AM_READWRITE8(vg230_io_r, vg230_io_w, 0xffff)
 	AM_RANGE(0x006c, 0x006f) AM_READWRITE(ems_r, ems_w)
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -521,8 +521,8 @@ void pasogo_state::machine_reset()
 	std::string region_tag;
 	ioport_port *color = ioport("COLOR");
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	if (!m_cart_rom)    // this should never happen, since we make carts mandatory!
-		m_cart_rom = memregion("maincpu");
+	if (!m_cart_rom) // even with mandatory carts, debug will crash without anything at the boot vector
+		m_cart_rom = memregion("empty");
 
 	membank("bank27")->set_base(m_cart_rom->base());
 	m_ems_index = 0;
@@ -569,7 +569,7 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 MACHINE_CONFIG_END
 
 ROM_START( pasogo )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "empty", ROMREGION_ERASEFF )
 ROM_END
 
 //    YEAR   NAME    PARENT  COMPAT    MACHINE   INPUT     INIT      COMPANY  FULLNAME          FLAGS

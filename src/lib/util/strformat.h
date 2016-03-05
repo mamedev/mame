@@ -185,6 +185,21 @@
 #include <type_traits>
 #include <utility>
 
+#if defined(__GNUC__) && ((__GNUC__ == 5 && __GNUC_MINOR__ < 2) || (__GNUC__ == 4 && __GNUC_MINOR__ > 8))
+namespace std
+{
+template<class _Container>
+  inline constexpr auto
+  cbegin(const _Container& __cont) noexcept(noexcept(std::begin(__cont)))-> decltype(std::begin(__cont))
+  { return std::begin(__cont); }
+
+template<class _Container>
+  inline constexpr auto
+  cend(const _Container& __cont) noexcept(noexcept(std::end(__cont)))-> decltype(std::end(__cont))
+  { return std::end(__cont); }
+}
+#endif
+
 namespace util {
 namespace detail {
 //**************************************************************************
@@ -1497,11 +1512,11 @@ private:
 //  CORE FORMATTING FUNCTION
 //**************************************************************************
 
-template <typename Stream, typename Format>
-typename Stream::off_type stream_format(Stream &str, Format const &args)
+template <typename Stream, typename Base>
+typename Stream::off_type stream_format(Stream &str, format_argument_pack<Base> const &args)
 {
-	typedef format_helper<std::remove_cv_t<Format> > format_helper;
-	typedef typename Format::iterator iterator;
+	typedef format_helper<format_argument_pack<Base> > format_helper;
+	typedef typename format_argument_pack<Base>::iterator iterator;
 	class stream_preserver
 	{
 	public:
@@ -1681,41 +1696,41 @@ inline String string_format(std::locale const &locale, Format &&fmt, Params &&..
 	return str.str();
 };
 
-template <typename String = std::string, typename Format, typename Stream>
-inline String string_format(Format &&fmt, detail::format_argument_pack<Stream> const &args)
+template <typename String = std::string, typename Stream>
+inline String string_format(detail::format_argument_pack<Stream> const &args)
 {
 	typedef std::basic_ostringstream<typename String::value_type, typename String::traits_type, typename String::allocator_type> ostream;
 	ostream str;
-	stream_format(str, std::forward<Format>(fmt), args);
+	detail::stream_format(str, args);
 	return str.str();
 };
 
-template <typename String = std::string, typename Format, typename Stream>
-inline String string_format(Format &&fmt, detail::format_argument_pack<Stream> &&args)
+template <typename String = std::string, typename Stream>
+inline String string_format(detail::format_argument_pack<Stream> &&args)
 {
 	typedef std::basic_ostringstream<typename String::value_type, typename String::traits_type, typename String::allocator_type> ostream;
 	ostream str;
-	stream_format(str, std::forward<Format>(fmt), std::move(args));
+	detail::stream_format(str, std::move(args));
 	return str.str();
 };
 
-template <typename String = std::string, typename Format, typename Stream>
-inline String string_format(std::locale const &locale, Format &&fmt, detail::format_argument_pack<Stream> const &args)
+template <typename String = std::string, typename Stream>
+inline String string_format(std::locale const &locale, detail::format_argument_pack<Stream> const &args)
 {
 	typedef std::basic_ostringstream<typename String::value_type, typename String::traits_type, typename String::allocator_type> ostream;
 	ostream str;
 	str.imbue(locale);
-	stream_format(str, std::forward<Format>(fmt), args);
+	detail::stream_format(str, args);
 	return str.str();
 };
 
-template <typename String = std::string, typename Format, typename Stream>
-inline String string_format(std::locale const &locale, Format &&fmt, detail::format_argument_pack<Stream> &&args)
+template <typename String = std::string, typename Stream>
+inline String string_format(std::locale const &locale, detail::format_argument_pack<Stream> &&args)
 {
 	typedef std::basic_ostringstream<typename String::value_type, typename String::traits_type, typename String::allocator_type> ostream;
 	ostream str;
 	str.imbue(locale);
-	stream_format(str, std::forward<Format>(fmt), std::move(args));
+	detail::stream_format(str, std::move(args));
 	return str.str();
 };
 

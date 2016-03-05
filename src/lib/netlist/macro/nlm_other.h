@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 #ifndef NLM_OTHER_H_
 #define NLM_OTHER_H_
 

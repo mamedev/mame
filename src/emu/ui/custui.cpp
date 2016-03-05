@@ -857,7 +857,7 @@ void ui_menu_rgb_ui::populate()
 	if (m_lock_ref != RGB_ALPHA)
 	{
 		arrow_flags = get_arrow_flags(0, 255, m_color->a());
-		item_append(_("Alpha"), string_format("%3d", m_color->a()).c_str(), arrow_flags, (void *)(FPTR)RGB_ALPHA);
+		item_append(_("Alpha"), string_format("%3u", m_color->a()).c_str(), arrow_flags, (void *)(FPTR)RGB_ALPHA);
 	}
 	else
 		item_append(_("Alpha"), s_text.c_str(), 0, (void *)(FPTR)RGB_ALPHA);
@@ -865,7 +865,7 @@ void ui_menu_rgb_ui::populate()
 	if (m_lock_ref != RGB_RED)
 	{
 		arrow_flags = get_arrow_flags(0, 255, m_color->r());
-		item_append(_("Red"), string_format("%3d", m_color->r()).c_str(), arrow_flags, (void *)(FPTR)RGB_RED);
+		item_append(_("Red"), string_format("%3u", m_color->r()).c_str(), arrow_flags, (void *)(FPTR)RGB_RED);
 	}
 	else
 		item_append(_("Red"), s_text.c_str(), 0, (void *)(FPTR)RGB_RED);
@@ -873,7 +873,7 @@ void ui_menu_rgb_ui::populate()
 	if (m_lock_ref != RGB_GREEN)
 	{
 		arrow_flags = get_arrow_flags(0, 255, m_color->g());
-		item_append(_("Green"), string_format("%3d", m_color->g()).c_str(), arrow_flags, (void *)(FPTR)RGB_GREEN);
+		item_append(_("Green"), string_format("%3u", m_color->g()).c_str(), arrow_flags, (void *)(FPTR)RGB_GREEN);
 	}
 	else
 		item_append(_("Green"), s_text.c_str(), 0, (void *)(FPTR)RGB_GREEN);
@@ -881,7 +881,7 @@ void ui_menu_rgb_ui::populate()
 	if (m_lock_ref != RGB_BLUE)
 	{
 		arrow_flags = get_arrow_flags(0, 255, m_color->b());
-		item_append(_("Blue"), string_format("%3d", m_color->b()).c_str(), arrow_flags, (void *)(FPTR)RGB_BLUE);
+		item_append(_("Blue"), string_format("%3u", m_color->b()).c_str(), arrow_flags, (void *)(FPTR)RGB_BLUE);
 	}
 	else
 		item_append(_("Blue"), s_text.c_str(), 0, (void *)(FPTR)RGB_BLUE);

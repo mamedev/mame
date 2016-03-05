@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 #pragma once
 
 #ifndef __DRAWBGFX_STATE_READER__

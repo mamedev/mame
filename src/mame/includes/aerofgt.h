@@ -107,6 +107,7 @@ public:
 	DECLARE_VIDEO_START(spinlbrk);
 	DECLARE_VIDEO_START(turbofrc);
 	DECLARE_VIDEO_START(wbbc97);
+	DECLARE_DRIVER_INIT(banked_oki);
 	UINT32 screen_update_pspikes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_spikes91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_pspikesb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

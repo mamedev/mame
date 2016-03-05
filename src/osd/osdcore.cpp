@@ -160,7 +160,7 @@ osd_ticks_t osd_ticks(void)
 
 osd_ticks_t osd_ticks_per_second(void)
 {
-	return std::chrono::high_resolution_clock::period::den;
+	return std::chrono::high_resolution_clock::period::den / std::chrono::high_resolution_clock::period::num;
 }
 
 //============================================================

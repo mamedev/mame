@@ -14,12 +14,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/i386/i386.h"
 #include "machine/pcshare.h"
-#include "machine/pckeybrd.h"
-#include "machine/mc146818.h"
-#include "machine/idectrl.h"
-
+#include "cpu/i86/i286.h"
 
 /******************
 DMA8237 Controller

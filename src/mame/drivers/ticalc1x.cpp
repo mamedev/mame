@@ -48,11 +48,11 @@ public:
 /***************************************************************************
 
   TI SR-16 (1974, first consumer product with TMS1000 series MCU)
-  * TMS1000 MCU labeled TMS1001NL (die labeled 1000, 1001A)
+  * TMS1000 MCU label TMS1001NL (die label 1000, 1001A)
   * 12-digit 7seg LED display
 
   TI SR-16 II (1975 version)
-  * TMS1000 MCU labeled TMS1016NL (die labeled 1000B, 1016A)
+  * TMS1000 MCU label TMS1016NL (die label 1000B, 1016A)
   * notes: cost-reduced 'sequel', [10^x] was removed, and [pi] was added.
 
 ***************************************************************************/
@@ -264,11 +264,11 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI-1250/TI-1200 (1975 version), Spirit of '76
-  * TMS0950 MCU labeled TMC0952NL, K0952 (die labeled 0950A 0952)
+  * TMS0950 MCU label TMC0952NL, K0952 (die label 0950A 0952)
   * 9-digit 7seg LED display
 
   TI-1250/TI-1200 (1976 version), TI-1400, TI-1450, TI-1205, TI-1255, LADY 1200, ABLE
-  * TMS0970 MCU labeled TMS0972NL ZA0348, JP0972A (die labeled 0970D-72A)
+  * TMS0970 MCU label TMS0972NL ZA0348, JP0972A (die label 0970D-72A)
   * 8-digit 7seg LED display, or 9 digits with leftmost unused
 
   As seen listed above, the basic 4-function TMS0972 calculator MCU was used
@@ -280,7 +280,7 @@ MACHINE_CONFIG_END
   available buttons.
 
   TI-1270
-  * TMS0970 MCU labeled TMC0974NL ZA0355, DP0974A (die labeled 0970D-74A)
+  * TMS0970 MCU label TMC0974NL ZA0355, DP0974A (die label 0970D-74A)
   * 8-digit 7seg LED display
   * notes: almost same hardware as TMS0972 TI-1250, minor scientific functions
 
@@ -413,11 +413,11 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI-1000 (1977 version)
-  * TMS1990 MCU labeled TMC1991NL (die labeled 1991-91A)
+  * TMS1990 MCU label TMC1991NL (die label 1991-91A)
   * 8-digit 7seg LED display
 
   TI-1000 (1978 version)
-  * TMS1990 MCU labeled TMC1992-4NL **not dumped yet
+  * TMS1990 MCU label TMC1992-4NL **not dumped yet
 
 ***************************************************************************/
 
@@ -513,7 +513,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI WIZ-A-TRON
-  * TMS0970 MCU labeled TMC0907NL ZA0379, DP0907BS (die labeled 0970F-07B)
+  * TMS0970 MCU label TMC0907NL ZA0379, DP0907BS (die label 0970F-07B)
   * 9-digit 7seg LED display(one custom digit)
 
 ***************************************************************************/
@@ -613,7 +613,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI Little Professor (1976 version)
-  * TMS0970 MCU labeled TMS0975NL ZA0356, GP0975CS (die labeled 0970D-75C)
+  * TMS0970 MCU label TMS0975NL ZA0356, GP0975CS (die label 0970D-75C)
   * 9-digit 7seg LED display(one custom digit)
 
   The hardware is nearly identical to Wiz-A-Tron (or vice versa, since this
@@ -687,7 +687,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI Little Professor (1978 version)
-  * TMS1990 MCU labeled TMC1993NL (die labeled 1990C-c3C)
+  * TMS1990 MCU label TMC1993NL (die label 1990C-c3C)
   * 9-digit 7seg LED display(one custom digit)
 
   1978 re-release, with on/off and level select on buttons instead of
@@ -797,7 +797,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI DataMan
-  * TMS1980 MCU labeled TMC1982NL (die labeled 1980A 82B)
+  * TMS1980 MCU label TMC1982NL (die label 1980A 82B)
   * 10-digit cyan VFD display(3 digits are custom)
 
 ***************************************************************************/
@@ -912,7 +912,7 @@ MACHINE_CONFIG_END
   TMC098x series Majestic-line calculators
 
   TI-30, SR-40, TI-15(less buttons) and several by Koh-I-Noor
-  * TMS0980 MCU labeled TMC0981NL (die labeled 0980B-81F)
+  * TMS0980 MCU label TMC0981NL (die label 0980B-81F)
   * 9-digit 7seg LED display
 
   Of note is a peripheral by Schoenherr, called the Braillotron. It acts as
@@ -921,10 +921,10 @@ MACHINE_CONFIG_END
   the original LED display to a 25-pin D-Sub connector.
 
   TI Business Analyst, TI Business Analyst-I, TI Money Manager, TI-31, TI-41
-  * TMS0980 MCU labeled TMC0982NL (die labeled 0980B-82F)
+  * TMS0980 MCU label TMC0982NL (die label 0980B-82F)
 
   TI Programmer
-  * TMS0980 MCU labeled ZA0675NL, JP0983AT (die labeled 0980B-83)
+  * TMS0980 MCU label ZA0675NL, JP0983AT (die label 0980B-83)
 
 ***************************************************************************/
 

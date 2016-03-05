@@ -1777,8 +1777,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/mephisto.cpp",
 	MAME_DIR .. "src/mame/drivers/mmodular.cpp",
 	MAME_DIR .. "src/mame/drivers/stratos.cpp",
-	MAME_DIR .. "src/mame/machine/mboard.cpp",
-	MAME_DIR .. "src/mame/includes/mboard.h",
 }
 
 createMESSProjects(_target, _subtarget, "hitachi")
@@ -2605,8 +2603,6 @@ files {
 createMESSProjects(_target, _subtarget, "svi")
 files {
 	MAME_DIR .. "src/mame/drivers/svi318.cpp",
-	MAME_DIR .. "src/mame/includes/svi318.h",
-	MAME_DIR .. "src/mame/machine/svi318.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "svision")
@@ -2996,9 +2992,6 @@ files {
 	MAME_DIR .. "src/mame/includes/mc1502.h",
 	MAME_DIR .. "src/mame/drivers/poisk1.cpp",
 	MAME_DIR .. "src/mame/machine/kb_poisk1.h",
-	MAME_DIR .. "src/mame/includes/poisk1.h",
-	MAME_DIR .. "src/mame/video/poisk1.cpp",
-	MAME_DIR .. "src/mame/video/poisk1.h",
 }
 
 createMESSProjects(_target, _subtarget, "yamaha")

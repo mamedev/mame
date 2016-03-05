@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, Acho A. Tang, Nicola Salmoria
 typedef device_delegate<void (int&, int&, int&, int&)> snk68_tile_indirection_delegate;
 
 #define MCFG_SNK68_SPR_GFXDECODE(_gfxtag) \

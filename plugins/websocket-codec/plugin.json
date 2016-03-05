@@ -1,8 +1,0 @@
-{
-  "plugin": {
-    "name": "websocket-codec",
-    "version": "1.0.7",
-    "author": "Tim Caswell",
-	"type": "library",
-  }
-}

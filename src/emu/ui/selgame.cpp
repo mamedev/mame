@@ -358,13 +358,13 @@ void ui_menu_select_game::handle()
 			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
-				if ((FPTR)driver > 3 && machine().datfile().has_data(driver))
+				if ((FPTR)driver > skip_main_items && machine().datfile().has_data(driver))
 					ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, driver));
 			}
 			else
 			{
 				ui_software_info *swinfo  = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > 3 && machine().datfile().has_data(swinfo->driver))
+				if ((FPTR)swinfo > skip_main_items && machine().datfile().has_data(swinfo->driver))
 				{
 					if (swinfo->startempty == 1)
 						ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, swinfo->driver));
@@ -380,7 +380,7 @@ void ui_menu_select_game::handle()
 			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
-				if ((FPTR)driver > 3)
+				if ((FPTR)driver > skip_main_items)
 				{
 					if (!machine().favorite().isgame_favorite(driver))
 					{
@@ -398,7 +398,7 @@ void ui_menu_select_game::handle()
 			else
 			{
 				ui_software_info *swinfo = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > 3)
+				if ((FPTR)swinfo > skip_main_items)
 				{
 					machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname.c_str());
 					machine().favorite().remove_favorite_game(*swinfo);
@@ -534,24 +534,26 @@ void ui_menu_select_game::populate()
 			}
 
 			// iterate over entries
-			for (size_t curitem = 0; curitem < m_displaylist.size(); ++curitem)
+			int curitem = 0;
+			for (auto & elem : m_displaylist)
 			{
 				UINT32 flags_ui = MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
 
-				if (old_item_selected == -1 && m_displaylist[curitem]->name == reselect_last::driver)
+				if (old_item_selected == -1 && elem->name == reselect_last::driver)
 					old_item_selected = curitem;
 
-				bool cloneof = strcmp(m_displaylist[curitem]->parent, "0");
+				bool cloneof = strcmp(elem->parent, "0");
 				if (cloneof)
 				{
-					int cx = driver_list::find(m_displaylist[curitem]->parent);
+					int cx = driver_list::find(elem->parent);
 					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 						cloneof = false;
 				}
 				if (cloneof)
 					flags_ui |= MENU_FLAG_INVERT;
 
-				item_append(m_displaylist[curitem]->description, nullptr, flags_ui, (void *)m_displaylist[curitem]);
+				item_append(elem->description, nullptr, flags_ui, (void *)elem);
+				curitem++;
 			}
 		}
 	}

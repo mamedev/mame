@@ -1,5 +1,6 @@
 #!/usr/bin/python
-
+# license:BSD-3-Clause
+# copyright-holders:David Haywood
 from __future__ import print_function
 import sys
 
