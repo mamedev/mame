@@ -40,6 +40,7 @@
 #include "includes/bfm_sc45.h"
 #include "bfm_sc45_helper.h"
 
+#include "sc4fd7tha.lh"
 #include "sc4dnd.lh"
 #include "sc4dndtp.lh"
 #include "sc4dnddw.lh"
@@ -48053,17 +48054,17 @@ DRIVER_INIT_MEMBER(sc4_state,sc4fd7th)
 
 
 // PR6804 FRANKIE DETTORI         PR6804 FRANKIE SOUNDS
-GAMEL( 200?, sc4fd7th    ,0,         sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fd7tha   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fd7thb   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fd7the   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fd7thf   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fd7thg   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4fd7th    ,0,         sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4fd7tha )
+GAMEL( 200?, sc4fd7tha   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4fd7tha )
+GAMEL( 200?, sc4fd7thb   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4fd7tha )
+GAMEL( 200?, sc4fd7the   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4fd7tha )
+GAMEL( 200?, sc4fd7thf   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4fd7tha )
+GAMEL( 200?, sc4fd7thg   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4fd7tha )
 // PR6804 FRANKIE DETTORI SP98         PR6804 FRANKIE SOUNDS
-GAMEL( 200?, sc4fd7thc   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven SP98 (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fd7thd   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven SP98 (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fd7thh   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven SP98 (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fd7thi   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven SP98 (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4fd7thc   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven SP98 (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4fd7tha )
+GAMEL( 200?, sc4fd7thd   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven SP98 (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4fd7tha )
+GAMEL( 200?, sc4fd7thh   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven SP98 (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4fd7tha )
+GAMEL( 200?, sc4fd7thi   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven SP98 (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4fd7tha )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4frsu)
