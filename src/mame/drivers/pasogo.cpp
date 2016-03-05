@@ -101,12 +101,13 @@ TODO:
 
 ******************************************************************************/
 
+
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "machine/bankdev.h"
-#include "includes/genpc.h"
+#include "machine/genpc.h"
 #include "softlist.h"
 
 /*

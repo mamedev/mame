@@ -563,6 +563,7 @@ MACHINES["STEPPERS"] = true
 --MACHINES["DIABLO_HD"] = true
 MACHINES["PCI9050"] = true
 --MACHINES["TMS1024"] = true
+MACHINES["GENPC"] = true
 
 --------------------------------------------------
 -- specify available bus cores

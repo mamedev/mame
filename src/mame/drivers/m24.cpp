@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+
 #include "emu.h"
 
 #include "cpu/i86/i86.h"
@@ -7,7 +8,7 @@
 #include "machine/m24_kbd.h"
 #include "machine/m24_z8000.h"
 #include "machine/mm58274c.h"
-#include "includes/genpc.h"
+#include "machine/genpc.h"
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 #include "formats/m20_dsk.h"

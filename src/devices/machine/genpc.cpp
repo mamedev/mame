@@ -8,8 +8,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/genpc.h"
-
+#include "machine/genpc.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"

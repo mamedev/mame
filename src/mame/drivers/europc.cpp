@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol
 #include "emu.h"
 #include "coreutil.h"
-#include "includes/genpc.h"
+#include "machine/genpc.h"
 #include "machine/nvram.h"
 #include "machine/pckeybrd.h"
 

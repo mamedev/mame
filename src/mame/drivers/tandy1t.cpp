@@ -32,7 +32,7 @@ Tandy 1000 (80386) variations:
 1000RSX/1000RSX-HD  1M-9M RAM           25.0/8.0 MHz    v01.10.00 */
 
 #include "emu.h"
-#include "includes/genpc.h"
+#include "machine/genpc.h"
 #include "machine/pckeybrd.h"
 #include "machine/nvram.h"
 #include "machine/pc_fdc.h"

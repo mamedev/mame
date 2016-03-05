@@ -27,13 +27,13 @@ video HW too.
 
 ***************************************************************************/
 
-#include "emu.h"
 
+#include "emu.h"
+#include "machine/genpc.h"
 #include "cpu/i86/i86.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
-#include "includes/genpc.h"
 #include "softlist.h"
 
 class pc_state : public driver_device

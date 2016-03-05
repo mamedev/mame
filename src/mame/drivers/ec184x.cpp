@@ -11,8 +11,7 @@
 
 #include "emu.h"
 
-#include "includes/genpc.h"
-
+#include "machine/genpc.h"
 #include "bus/isa/xsu_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "cpu/i86/i86.h"

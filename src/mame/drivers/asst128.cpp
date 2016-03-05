@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
 #include "emu.h"
-#include "includes/genpc.h"
+#include "machine/genpc.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "machine/pc_fdc.h"
 #include "formats/asst128_dsk.h"
