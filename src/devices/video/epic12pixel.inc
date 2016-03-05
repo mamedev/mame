@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* This is the inner-most loop code (per-pixel) and thus the most performance sensitive part */
 
 #if FLIPX == 1

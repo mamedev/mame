@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    timer.c
+    timer.cpp
 
     Timer devices.
 

@@ -29,10 +29,10 @@ Sound: AY8930 (or compatible)
   OSC: 21.47727MHz
 Other: Z80APIO x 2  (I/O and interrupt controllers)
        P8255A (I/O)
-       8-switch DSW (socketted)
+       8-switch DSW (socketed)
        Volume pot
 
-Memory: Fujitsu MB81464-12 (or compatible) all socketted. The 3rd row of memory
+Memory: Fujitsu MB81464-12 (or compatible) all socketed. The 3rd row of memory
         may or may not be populated.
 
 JP6 - 3 pin jumper: ROM size (1-2 = 27256, 2-3 = 27512)

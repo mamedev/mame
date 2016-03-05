@@ -155,7 +155,7 @@ int find_input_strings(running_machine &machine)
 	{
 		for (int j = 0; j < 16; j++)
 		{
-			sc4inputs[i][j].name = strformat("IN%d-%d", i, j);
+			sc4inputs[i][j].name = string_format("IN%d-%d", i, j);
 			sc4inputs[i][j].used = false;
 		}
 	}

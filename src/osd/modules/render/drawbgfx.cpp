@@ -35,9 +35,11 @@
 #include "bgfx/targetmanager.h"
 #include "bgfx/shadermanager.h"
 #include "bgfx/effectmanager.h"
+#include "bgfx/chainmanager.h"
 #include "bgfx/effect.h"
 #include "bgfx/texture.h"
 #include "bgfx/target.h"
+#include "bgfx/chain.h"
 
 //============================================================
 //  DEBUGGING
@@ -46,6 +48,10 @@
 //============================================================
 //  CONSTANTS
 //============================================================
+
+const uint16_t renderer_bgfx::CACHE_SIZE = 1024;
+const uint32_t renderer_bgfx::PACKABLE_SIZE = 128;
+const uint32_t renderer_bgfx::WHITE_HASH = 0x87654321;
 
 //============================================================
 //  MACROS
@@ -121,7 +127,7 @@ int renderer_bgfx::create()
 		bgfx::init();
 		bgfx::reset(m_width[window().m_index], m_height[window().m_index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 		// Enable debug text.
-		bgfx::setDebug(BGFX_DEBUG_TEXT); //BGFX_DEBUG_STATS
+		bgfx::setDebug(window().machine().options().verbose() ? BGFX_DEBUG_STATS : BGFX_DEBUG_TEXT);
 		m_dimensions = osd_dim(m_width[0], m_height[0]);
 	}
 
@@ -129,6 +135,7 @@ int renderer_bgfx::create()
 	m_targets = new target_manager(*m_textures);
 	m_shaders = new shader_manager();
 	m_effects = new effect_manager(*m_shaders);
+	m_chains = new chain_manager(*m_textures, *m_targets, *m_effects, m_width[window().m_index], m_height[window().m_index]);
 
 	if (window().m_index != 0)
 	{
@@ -151,6 +158,8 @@ int renderer_bgfx::create()
 	m_screen_effect[2] = m_effects->effect("screen_multiply");
 	m_screen_effect[3] = m_effects->effect("screen_add");
 
+	//m_screen_chain[0] = m_chains->chain("test");
+
 	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
 	m_texture_cache = m_textures->create_texture("#cache", bgfx::TextureFormat::RGBA8, CACHE_SIZE, CACHE_SIZE, nullptr, flags);
 
@@ -167,10 +176,11 @@ int renderer_bgfx::create()
 renderer_bgfx::~renderer_bgfx()
 {
 	// Cleanup.
-	delete m_targets;
-	delete m_textures;
+	delete m_chains;
 	delete m_effects;
 	delete m_shaders;
+	delete m_textures;
+	delete m_targets;
 }
 
 void renderer_bgfx::exit()

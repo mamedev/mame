@@ -159,13 +159,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( at32_io, AS_IO, 32, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE16("mb", at_mb_device, map, 0xfffffffff)
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE16("mb", at_mb_device, map, 0xffffffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ficpio_io, AS_IO, 32, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00a8, 0x00af) AM_DEVREADWRITE8("chipset", vt82c496_device, read, write, 0xffffffff)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE16("mb", at_mb_device, map, 0xfffffffff)
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE16("mb", at_mb_device, map, 0xffffffff)
 	AM_RANGE(0x0170, 0x0177) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs0, write_cs0)
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs0, write_cs0)
 	AM_RANGE(0x0370, 0x0377) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs1, write_cs1)
@@ -189,7 +189,7 @@ DRIVER_INIT_MEMBER(megapc_state, megapcpl)
 
 DRIVER_INIT_MEMBER(at_state, megapcpla)
 {
-	UINT8* ROM = memregion("maincpu")->base();
+	UINT8* ROM = memregion("bios")->base();
 
 	init_at_common(0xa0000);
 

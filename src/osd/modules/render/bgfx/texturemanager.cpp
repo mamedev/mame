@@ -18,7 +18,10 @@ texture_manager::~texture_manager()
 {
 	for (std::pair<std::string, bgfx_texture*> texture : m_textures)
 	{
-		delete texture.second;
+		if (!(texture.second)->is_target())
+		{
+			delete texture.second;
+		}
 	}
 	m_textures.clear();
 }

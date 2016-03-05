@@ -14,6 +14,15 @@
      <there are probably others I've missed>
 
  * History of the machine can be found at http://freudenbergs.de/bert/publications/Ingalls-2014-Smalltalk78.pdf
+ 
+ * The notetaker has an 8-slot backplane, with the following cards in it:
+   * I/O Processor card (8086@8Mhz, 8259pic, 4k ROM, Keyboard UART, DAC1200 (multiplexed to 2 channels))
+   * Emulation Processor card (8086@5Mhz, 8259pic, 4k of local RAM with Parity check logic)
+   * Disk/Display card (WD1791 FDC, CRT5027 CRTC, EIA UART, AD571 ADC, 8->1 Analog Multiplexer)
+   * Memory Control Module \_ (bus control, buffering, refresh, Parity/ECC/Syndrome logic lives on these boards)
+   * Memory Data Module    /
+   * Memory Storage Module x2 (the 4116 DRAMs live on these boards)
+   * Battery Module *OR* debugger module type A or B (debugger module has an i8255 on it for alto<->notetaker comms, and allows alto to halt the cpus [type A and B can debug either the emulator cpu or the iocpu respectively] and dump registers to alto screen, etc)
 
  * Prototypes only, 10 units[2] manufactured 1978-1980
    Known surviving units:
@@ -24,6 +33,8 @@
 
  * As far as I am aware, no media (world disks/boot disks) for the NoteTaker have survived (except maybe the two disks at Xerox Museum at PARC), but an incomplete dump of the Smalltalk-76 'world' which was used to bootstrap Smalltalk-78 originally did survive on the Alto disks at CHM
 
+ * We are missing the dump for the i8748 Keyboard MCU which does row-column scanning and mouse quadrature reading, and talks to the main system via serial
+ 
  * see http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker for additional information
  * see http://xeroxalto.computerhistory.org/Filene/Smalltalk-76/ for the smalltalk-76 dump
  * see http://xeroxalto.computerhistory.org/Indigo/BasicDisks/Smalltalk14.bfs!1_/ for more notetaker/smalltalk related files, including SmallTalk-80 files based on the notetaker smalltalk-78
@@ -34,24 +45,24 @@
  * [3] http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf
  * [4] http://xeroxalto.computerhistory.org/Filene/Smalltalk-76/
  * [5] http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790118_NoteTaker_System_Manual.pdf
- * MISSING DUMP for 8741? Keyboard MCU which does row-column scanning and mouse-related stuff
 
 TODO: everything below.
 * figure out the correct memory maps for the 256kB of shared ram, and what part of ram constitutes the framebuffer
 * figure out how the emulation-cpu boots and where its 4k of local ram maps to
 * Get smalltalk-78 loaded as a rom and forced into ram on startup, since no boot disks have survived (or if any survived, they are not dumped)
-* crt5027 video controller
+
 * Harris 6402 keyboard UART (within keyboard, next to MCU)
 * The harris 6402 UART is pin compatible with WD TR1865 and TR1602 UARTs, as well as the AY-3-1015A/D
 * HLE for the missing i8748[5] MCU in the keyboard which reads the mouse quadratures and buttons and talks serially to the Keyboard UART
-
-WIP:
-* pic8259 interrupt controller - this is attached as a device, but the interrupts are not hooked to it yet.
-* Harris 6402 serial/EIA UART
-* Harris 6402 keyboard UART (within notetaker)
 * floppy controller wd1791
   According to [3] and [5] the format is double density/MFM, 128 bytes per sector, 16 sectors per track, 1 or 2 sided, for 170K or 340K per disk. Drive spins at 300RPM.
-  According to the schematics, we're missing an 82s147 DISKSEP.PROM used as a data separator
+* According to the schematics, we're missing an 82s147 DISKSEP.PROM used as a data separator
+
+WIP:
+* crt5027 video controller - the iocpu side is hooked up, but crashes due to a bug in the crt5027/tms9927 code. the actual drawing to screen part is not connected anywhere yet.
+* pic8259 interrupt controller - this is attached as a device, but the interrupts are not hooked to it yet.
+* Harris 6402 serial/EIA UART - connected to iocpu, other end isn't connected anywhere
+* Harris 6402 keyboard UART (within notetaker) - connected to iocpu, other end isn't connected anywhere
 * we're missing a dump of the 82s126 SETMEMRQ PROM used to handle memory arbitration between the crtc and the rest of the system, but the equations are on the schematic and I'm planning to regenerate the prom contents from that, see ROM_LOAD section
 
 DONE:
@@ -122,10 +133,10 @@ UINT32 notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 WRITE16_MEMBER(notetaker_state::IPConReg_w)
 {
 	m_BootSeqDone = (data&0x80)?1:0;
-	//m_ProcLock = (data&0x40)?1:0; // processor lock
+	//m_ProcLock = (data&0x40)?1:0; // bus lock for this processor (hold other processor in wait state)
 	//m_CharCtr = (data&0x20)?1:0; // battery charge control
 	m_DisableROM = (data&0x10)?1:0; // disable rom at 0000-0fff
-	//m_CorrOn = (data&0x08)?1:0; // also LedInd5
+	//m_CorrOn = (data&0x08)?1:0; // CorrectionOn (ECC correction enabled); also LedInd5
 	//m_LedInd6 = (data&0x04)?1:0;
 	//m_LedInd7 = (data&0x02)?1:0;
 	//m_LedInd8 = (data&0x01)?1:0;
@@ -239,7 +250,9 @@ READ16_MEMBER(notetaker_state::iocpu_r)
 	}
 	else
 	{
-		ram += (offset);
+		// are we in the FFFE8-FFFEF area where the parity/int/reset/etc stuff lives?
+		if (offset >= 0x7fff4) { logerror("attempt to read processor control regs at %d\n", offset<<1); return 0xFFFF; }
+		ram += offset;
 		return *ram;
 	}
 }
@@ -249,9 +262,11 @@ WRITE16_MEMBER(notetaker_state::iocpu_w)
 	UINT16 *ram = (UINT16 *)(memregion("mainram")->base());
 	if ( (m_BootSeqDone == 0) || ((m_DisableROM == 0) && ((offset&0x7F800) == 0)) )
 	{
-		logerror("attempt to write %04X to ROM-mapped area at %06X ignored\n", data, offset);
+		logerror("attempt to write %04X to ROM-mapped area at %06X ignored\n", data, offset<<1);
 		return;
 	}
+	// are we in the FFFE8-FFFEF area where the parity/int/reset/etc stuff lives?
+	if (offset >= 0x7fff4) { logerror("attempt to write processor control regs at %d with %02X ignored\n", offset<<1, data); }
 	ram += offset;
 	*ram = data;
 }
@@ -266,21 +281,40 @@ mode 1: (during most of boot)
 0   0   0   0    0   0   1   *    *   *   *   *    *   *   *   *    *   *   *   *    1            0          RW  RAM
 <anything not all zeroes>x   x    x   x   x   x    x   x   x   x    x   x   x   x    1            0          .   Open Bus
 mode 2: (during load of the emulatorcpu's firmware to the first 4k of shared ram which is on the emulatorcpu board)
-0   0   0   0    0   0   *   *    *   *   *   *    *   *   *   *    *   *   *   *    1            1          RW  RAM
+0   0   *   *    *   *   *   *    *   *   *   *    *   *   *   *    *   *   *   *    1            1          RW  RAM
 <anything not all zeroes>x   x    x   x   x   x    x   x   x   x    x   x   x   x    1            1          .   Open Bus
+   EXCEPT for the following, decoded by the memory address logic board:
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   0   x    1            x          .   Open Bus
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   1   x    1            x          W   FFFEA (Multiprocessor Control (reset/int/boot for each proc; data bits 3,2,1,0 = 0010 means IP, bits 3210 = 0111 means EP; all others ignored.))
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   0   x    1            x          R   FFFEC (Syndrome bits (gnd bit 15, parity bit 14, exp (ECC) bits 13-8, bits 7-0 are 'other' (?maybe highest address bits?)
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   1   x    1            x          R   FFFEE (Parity Error Address: row bits 15-8, column bits 7-0; reading this acknowledges a parity interrupt)
 
 More or less:
 BootSeqDone is 0, DisableROM is ignored, mem map is 0x00000-0xfffff reading is the 0x1000-long ROM, repeated every 0x1000 bytes. writing goes nowhere.
 BootSeqDone is 1, DisableROM is 0,       mem map is 0x00000-0x00fff reading is the 0x1000-long ROM, remainder of memory map goes to RAM or open bus. writing the ROM area goes nowhere, writing RAM goes to RAM.
 BootSeqDone is 1, DisableROM is 1,       mem map is entirely RAM or open bus for both reading and writing.
+
+
+Emulator cpu mem map:
+a19 a18 a17 a16  a15 a14 a13 a12  a11 a10 a9  a8   a7  a6  a5  a4   a3  a2  a1  a0   4KPage0'
+x   x   0   0    0   0   0   0    *   *   *   *    *   *   *   *    *   *   *   *    0                       RW  Local (fast) RAM
+x   x   0   0    0   0   0   0    *   *   *   *    *   *   *   *    *   *   *   *    1                       RW  System/Shared RAM
+x   x   *   *    *   *   *   *    *   *   *   *    *   *   *   *    *   *   *   *    x                       RW  System/Shared RAM
+   EXCEPT for the following, decoded by the EP board and superseding above:
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   0   x    x   x   x   x    x                       RW  FFFC0-FFFDF (trigger ILLINST interrupt on EP, data ignored?)
+   And the following, decoded by the memory address logic board:
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   0   x    x                       .   Open Bus
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   1   x    x                       W   FFFEA (Multiprocessor Control (reset/int/boot for each proc; data bits 3,2,1,0 = 0010 means IP, bits 3210 = 0111 means EP; all others ignored.))
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   0   x    x                       R   FFFEC (Syndrome bits (gnd bit 15, parity bit 14, exp bits 13-8, bits 7-0 are 'other', maybe highest address bits)
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   1   x    x                       R   FFFEE (Parity Error Address: row bits 15-8, column bits 7-0; reading this acknowledges a parity interrupt)
 */
+
 static ADDRESS_MAP_START(notetaker_iocpu_mem, AS_PROGRAM, 16, notetaker_state)
 	/*
-	AM_RANGE(0x00000, 0x00fff) AM_ROM AM_REGION("iocpu", 0xFF000) // rom is here if either BootSeqDone OR DisableROM are zero. the 1.5 source code implies writes here are ignored
-	AM_RANGE(0x01000, 0x01fff) AM_RAM // 4k of ram, local to the io processor
-	AM_RANGE(0x02000, 0x3ffff) AM_RAM AM_BASE("mainram") // 256k of ram (less 8k), shared between both processors
+	AM_RANGE(0x00000, 0x00fff) AM_ROM AM_REGION("iocpu", 0xFF000) // rom is here if either BootSeqDone OR DisableROM are zero. the 1.5 source code and the schematics implies writes here are ignored while rom is enabled; if disablerom is 1 this goes to mainram
+	AM_RANGE(0x01000, 0x3ffff) AM_RAM AM_BASE("mainram") // 256k of ram (less 4k), shared between both processors. rom goes here if bootseqdone is 0
 	// note 4000-8fff? is the framebuffer for the screen?
-	AM_RANGE(0xff000, 0xfffff) AM_ROM // rom is only banked in here if bootseqdone is 0, so the reset vector is in the proper place
+	AM_RANGE(0xff000, 0xfffff) AM_ROM // rom is only banked in here if bootseqdone is 0, so the reset vector is in the proper place. otherwise the memory control regs live at fffe8-fffef
 	*/
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(iocpu_r, iocpu_w) // bypass MAME's memory map system as we need finer grained control
 ADDRESS_MAP_END
@@ -335,6 +369,7 @@ static ADDRESS_MAP_START(notetaker_iocpu_io, AS_IO, 16, notetaker_state)
 	//AM_RANGE(0x100, 0x101) AM_MIRROR(0x7E1E) AM_WRITE(SelDiskReg_w) I/O register (adc speed, crtc pixel clock enable, +5 and +12v relays for floppy, etc)
 	//AM_RANGE(0x120, 0x121) AM_MIRROR(0x7E18) AM_DEVREADWRITE("wd1791", fd1971_device) // floppy controller
 	AM_RANGE(0x140, 0x15f) AM_MIRROR(0x7E00) AM_DEVREADWRITE8("crt5027", crt5027_device, read, write, 0x00FF) // crt controller
+	//AM_RANGE(0x160, 0x161) AM_MIRROR(0x7E1E) AM_WRITE(LoadDispAddr_w) // loads the start address for the display framebuffer
 	AM_RANGE(0x1a0, 0x1a1) AM_MIRROR(0x7E10) AM_READ(ReadEIAStatus_r) // read keyboard fifo state
 	AM_RANGE(0x1a2, 0x1a3) AM_MIRROR(0x7E10) AM_READ(ReadEIAData_r) // read keyboard data
 	AM_RANGE(0x1a8, 0x1a9) AM_MIRROR(0x7E10) AM_WRITE(LoadEIACtlReg_w) // kbd uart control register
@@ -386,6 +421,15 @@ read from 0x0002 (byte wide) (check interrupts) <looking for vblank int or odd/e
 read from 0x44 (byte wide) in a loop forever (read keyboard fifo status)
 */
 
+/* Emulator CPU */
+/*
+static ADDRESS_MAP_START(notetaker_emulatorcpu_mem, AS_PROGRAM, 16, notetaker_state)
+	AM_RANGE(0x00000, 0x00fff) AM_RAM // actually a banked block of ram
+	AM_RANGE(0x01000, 0x3ffff) AM_MIRROR(0xC0000) AM_RAM AM_BASE("mainram") // 256k of ram (less 4k), shared between both processors, mirrored 4 times
+	AM_RANGE(0xFFFE0, 0xFFFEF) AM_READWRITE(proc_control_r, proc_control_w)
+ADDRESS_MAP_END
+*/
+
 /* Machine Reset */
 void notetaker_state::machine_reset()
 {
@@ -417,7 +461,7 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(60.975)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
 	MCFG_SCREEN_UPDATE_DRIVER(notetaker_state, screen_update)
 	MCFG_SCREEN_SIZE(64*6, 32*8)
@@ -426,7 +470,11 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-	MCFG_DEVICE_ADD( "crt5027", CRT5027, XTAL_36MHz/14) // the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*,2,4,6,8,10,12, or 14 (* because this setting may actually oscillate unstably, or not clock at all)
+	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL_36MHz/4)/8) // the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*,2,4,6,8,10,12, or 14 (* because this is a 74s163 this setting probably means divide by 1) and secondarily divided by 8 (again by two to load the 16 bit output shifters after this)
+	// on reset, bitclk is 000 so divider is (36mhz/14)/8; during boot it is written with 101, changing the divider to (36mhz/4)/8
+	// for now, we just hack it to the latter setting from start
+	// TODO: actually do this correctly.
+	MCFG_TMS9927_CHAR_WIDTH(8) //(8 pixels per column/halfword, 16 pixels per fullword)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD( "kbduart", AY31015, 0 )
@@ -473,7 +521,7 @@ ROM_START( notetakr )
 	ROMX_LOAD( "z-iop_1.50_hi.h1", 0x0000, 0x0800, CRC(2994656e) SHA1(ca2bb38eb9075c5c2f3cc5439b209e7e216084da), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD( "z-iop_1.50_lo.g1", 0x0001, 0x0800, CRC(2cb79a67) SHA1(692aafd2aeea27533f6288dbb1cb8678ea08fade), ROM_SKIP(1) | ROM_BIOS(2))
 	ROM_REGION( 0x100000, "iocpu", ROMREGION_ERASEFF ) // area for descrambled roms
-	ROM_REGION( 0x100000, "mainram", ROMREGION_ERASEFF ) // ram cards
+	ROM_REGION( 0x100000, "mainram", ROMREGION_ERASEFF ) // main ram, on 2 cards with parity/ecc/syndrome/timing/bus arbitration on another 2 cards
 	ROM_REGION( 0x1000, "proms", ROMREGION_ERASEFF )
 	ROM_LOAD( "disksep.prom.82s147.a4", 0x000, 0x200, NO_DUMP ) // disk data separator prom from the disk/display module board
 	ROM_LOAD( "memcasraswrite.prom.82s147.b1", 0x200, 0x200, NO_DUMP ) // memory cas/ras/write prom from the memory address logic board

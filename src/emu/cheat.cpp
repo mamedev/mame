@@ -108,16 +108,16 @@ inline std::string number_and_format::format() const
 	{
 		default:
 		case XML_INT_FORMAT_DECIMAL:
-			return strformat("%d", (UINT32)m_value);
+			return string_format("%d", (UINT32)m_value);
 
 		case XML_INT_FORMAT_DECIMAL_POUND:
-			return strformat("#%d", (UINT32)m_value);
+			return string_format("#%d", (UINT32)m_value);
 
 		case XML_INT_FORMAT_HEX_DOLLAR:
-			return strformat("$%X", (UINT32)m_value);
+			return string_format("$%X", (UINT32)m_value);
 
 		case XML_INT_FORMAT_HEX_C:
-			return strformat("0x%X", (UINT32)m_value);
+			return string_format("0x%X", (UINT32)m_value);
 	}
 }
 
@@ -174,12 +174,13 @@ const char *cheat_parameter::text()
 {
 	// are we a value cheat?
 	if (!has_itemlist())
-		strprintf(m_curtext,"%d (0x%X)", UINT32(m_value), UINT32(m_value));
-
-	// if not, we're an item cheat
+	{
+		m_curtext = string_format("%d (0x%X)", UINT32(m_value), UINT32(m_value));
+	}
 	else
 	{
-		strprintf(m_curtext, "??? (%d)", UINT32(m_value));
+		// if not, we're an item cheat
+		m_curtext = string_format("??? (%d)", UINT32(m_value));
 		for (item *curitem = m_itemlist.first(); curitem != nullptr; curitem = curitem->next())
 			if (curitem->value() == m_value)
 			{
@@ -502,7 +503,7 @@ void cheat_script::script_entry::execute(cheat_manager &manager, UINT64 &arginde
 			curarg += arg->values(argindex, &params[curarg]);
 
 		// generate the astring
-		strprintf(manager.get_output_astring(m_line, m_justify), m_format.c_str(),
+		manager.get_output_astring(m_line, m_justify) = string_format(m_format,
 			(UINT32)params[0],  (UINT32)params[1],  (UINT32)params[2],  (UINT32)params[3],
 			(UINT32)params[4],  (UINT32)params[5],  (UINT32)params[6],  (UINT32)params[7],
 			(UINT32)params[8],  (UINT32)params[9],  (UINT32)params[10], (UINT32)params[11],
@@ -697,7 +698,7 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 		// create the symbol table
 		m_symbols.add("argindex", symbol_table::READ_ONLY, &m_argindex);
 		for (int curtemp = 0; curtemp < tempcount; curtemp++) {
-			m_symbols.add(strformat("temp%d", curtemp).c_str(), symbol_table::READ_WRITE);
+			m_symbols.add(string_format("temp%d", curtemp).c_str(), symbol_table::READ_WRITE);
 		}
 
 		// read the first comment node
@@ -1133,9 +1134,7 @@ void cheat_manager::reload()
 			// have the same shortname
 			if (image->software_entry() != nullptr)
 			{
-				std::string filename;
-				strprintf(filename, "%s%s%s", image->software_list_name(), PATH_SEPARATOR, image->basename());
-				load_cheats(filename.c_str());
+				load_cheats(string_format("%s%s%s", image->software_list_name(), PATH_SEPARATOR, image->basename()).c_str());
 				break;
 			}
 			// else we are loading outside the software list, try to load machine_basename/crc32.xml
@@ -1144,9 +1143,7 @@ void cheat_manager::reload()
 				UINT32 crc = image->crc();
 				if (crc != 0)
 				{
-					std::string filename;
-					strprintf(filename, "%s%s%08X", machine().basename(), PATH_SEPARATOR, crc);
-					load_cheats(filename.c_str());
+					load_cheats(string_format("%s%s%08X", machine().basename(), PATH_SEPARATOR, crc).c_str());
 					break;
 				}
 			}

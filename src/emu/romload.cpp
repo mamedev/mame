@@ -302,7 +302,7 @@ void rom_load_manager::determine_bios_rom(device_t *device, const char *specbios
 		/* if we got neither an empty string nor 'default' then warn the user */
 		if (specbios[0] != 0 && strcmp(specbios, "default") != 0)
 		{
-			strcatprintf(m_errorstring, "%s: invalid bios, reverting to default\n", specbios);
+			m_errorstring.append(string_format("%s: invalid bios, reverting to default\n", specbios));
 			m_warnings++;
 		}
 
@@ -370,13 +370,13 @@ void rom_load_manager::handle_missing_file(const rom_entry *romp, std::string tr
 
 	bool is_chd_error = (is_chd && chderr != CHDERR_FILE_NOT_FOUND);
 	if (is_chd_error)
-		strcatprintf(m_errorstring, "%s CHD ERROR: %s\n", name.c_str(), chd_file::error_string(chderr));
+		m_errorstring.append(string_format("%s CHD ERROR: %s\n", name.c_str(), chd_file::error_string(chderr)));
 
 	/* optional files are okay */
 	if (ROM_ISOPTIONAL(romp))
 	{
 		if (!is_chd_error)
-			strcatprintf(m_errorstring, "OPTIONAL %s NOT FOUND%s\n", name.c_str(), tried_file_names.c_str());
+			m_errorstring.append(string_format("OPTIONAL %s NOT FOUND%s\n", name.c_str(), tried_file_names.c_str()));
 		m_warnings++;
 	}
 
@@ -384,7 +384,7 @@ void rom_load_manager::handle_missing_file(const rom_entry *romp, std::string tr
 	else if (hash_collection(ROM_GETHASHDATA(romp)).flag(hash_collection::FLAG_NO_DUMP))
 	{
 		if (!is_chd_error)
-			strcatprintf(m_errorstring, "%s NOT FOUND (NO GOOD DUMP KNOWN)%s\n", name.c_str(), tried_file_names.c_str());
+			m_errorstring.append(string_format("%s NOT FOUND (NO GOOD DUMP KNOWN)%s\n", name, tried_file_names));
 		m_knownbad++;
 	}
 
@@ -392,7 +392,7 @@ void rom_load_manager::handle_missing_file(const rom_entry *romp, std::string tr
 	else
 	{
 		if (!is_chd_error)
-			strcatprintf(m_errorstring, "%s NOT FOUND%s\n", name.c_str(), tried_file_names.c_str());
+			m_errorstring.append(string_format("%s NOT FOUND%s\n", name.c_str(), tried_file_names));
 		m_errors++;
 	}
 }
@@ -406,8 +406,8 @@ void rom_load_manager::handle_missing_file(const rom_entry *romp, std::string tr
 
 void rom_load_manager::dump_wrong_and_correct_checksums(const hash_collection &hashes, const hash_collection &acthashes)
 {
-	strcatprintf(m_errorstring, "    EXPECTED: %s\n", hashes.macro_string().c_str());
-	strcatprintf(m_errorstring, "       FOUND: %s\n", acthashes.macro_string().c_str());
+	m_errorstring.append(string_format("    EXPECTED: %s\n", hashes.macro_string().c_str()));
+	m_errorstring.append(string_format("       FOUND: %s\n", acthashes.macro_string().c_str()));
 }
 
 
@@ -426,7 +426,7 @@ void rom_load_manager::verify_length_and_hash(const char *name, UINT32 explength
 	UINT32 actlength = m_file->size();
 	if (explength != actlength)
 	{
-		strcatprintf(m_errorstring, "%s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength);
+		m_errorstring.append(string_format("%s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength));
 		m_warnings++;
 	}
 
@@ -434,21 +434,21 @@ void rom_load_manager::verify_length_and_hash(const char *name, UINT32 explength
 	hash_collection &acthashes = m_file->hashes(hashes.hash_types().c_str());
 	if (hashes.flag(hash_collection::FLAG_NO_DUMP))
 	{
-		strcatprintf(m_errorstring, "%s NO GOOD DUMP KNOWN\n", name);
+		m_errorstring.append(string_format("%s NO GOOD DUMP KNOWN\n", name));
 		m_knownbad++;
 	}
 	/* verify checksums */
 	else if (hashes != acthashes)
 	{
 		/* otherwise, it's just bad */
-		strcatprintf(m_errorstring, "%s WRONG CHECKSUMS:\n", name);
+		m_errorstring.append(string_format("%s WRONG CHECKSUMS:\n", name));
 		dump_wrong_and_correct_checksums(hashes, acthashes);
 		m_warnings++;
 	}
 	/* If it matches, but it is actually a bad dump, write it */
 	else if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
 	{
-		strcatprintf(m_errorstring, "%s ROM NEEDS REDUMP\n",name);
+		m_errorstring.append(string_format("%s ROM NEEDS REDUMP\n", name));
 		m_knownbad++;
 	}
 }
@@ -1179,13 +1179,13 @@ void rom_load_manager::process_disk_entries(const char *regiontag, const rom_ent
 			/* verify the hash */
 			if (hashes != acthashes)
 			{
-				strcatprintf(m_errorstring, "%s WRONG CHECKSUMS:\n", filename.c_str());
+				m_errorstring.append(string_format("%s WRONG CHECKSUMS:\n", filename));
 				dump_wrong_and_correct_checksums(hashes, acthashes);
 				m_warnings++;
 			}
 			else if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
 			{
-				strcatprintf(m_errorstring, "%s CHD NEEDS REDUMP\n", filename.c_str());
+				m_errorstring.append(string_format("%s CHD NEEDS REDUMP\n", filename));
 				m_knownbad++;
 			}
 
@@ -1196,7 +1196,7 @@ void rom_load_manager::process_disk_entries(const char *regiontag, const rom_ent
 				err = open_disk_diff(machine().options(), romp, chd->orig_chd(), chd->diff_chd());
 				if (err != CHDERR_NONE)
 				{
-					strcatprintf(m_errorstring, "%s DIFF CHD ERROR: %s\n", filename.c_str(), chd_file::error_string(err));
+					m_errorstring.append(string_format("%s DIFF CHD ERROR: %s\n", filename, chd_file::error_string(err)));
 					m_errors++;
 					chd = nullptr;
 					continue;
@@ -1276,13 +1276,13 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		UINT32 supported = swinfo->supported();
 		if (supported == SOFTWARE_SUPPORTED_PARTIAL)
 		{
-			strcatprintf(m_errorstring, "WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
-			strcatprintf(m_softwarningstring, "Support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
+			m_errorstring.append(string_format("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name()));
+			m_softwarningstring.append(string_format("Support for software %s (in list %s) is only partial\n", swname, swlist.list_name()));
 		}
 		if (supported == SOFTWARE_SUPPORTED_NO)
 		{
-			strcatprintf(m_errorstring, "WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
-			strcatprintf(m_softwarningstring, "Support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
+			m_errorstring.append(string_format("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name()));
+			m_softwarningstring.append(string_format("Support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name()));
 		}
 
 		// attempt reading up the chain through the parents and create a locationtag std::string in the format

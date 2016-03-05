@@ -626,6 +626,17 @@ int emu_file::puts(const char *s)
 
 
 //-------------------------------------------------
+//  vfprintf - vfprintf to a text file
+//-------------------------------------------------
+
+int emu_file::vprintf(const char *fmt, va_list va)
+{
+	// write the data if we can
+	return (m_file != nullptr) ? core_vfprintf(m_file, fmt, va) : 0;
+}
+
+
+//-------------------------------------------------
 //  printf - vfprintf to a text file
 //-------------------------------------------------
 
@@ -641,13 +652,14 @@ int CLIB_DECL emu_file::printf(const char *fmt, ...)
 
 
 //-------------------------------------------------
-//  mame_vfprintf - vfprintf to a text file
+//  flush - flush file buffers
 //-------------------------------------------------
 
-int emu_file::vprintf(const char *fmt, va_list va)
+void emu_file::flush()
 {
-	// write the data if we can
-	return (m_file != nullptr) ? core_vfprintf(m_file, fmt, va) : 0;
+	// flush the buffers if we can
+	if (m_file != nullptr)
+		core_fflush(m_file);
 }
 
 

@@ -193,7 +193,7 @@ private:
 
 public:
 	// tab navigation
-	enum focused_menu
+	enum class focused_menu
 	{
 		main,
 		left,

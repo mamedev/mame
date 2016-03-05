@@ -209,7 +209,11 @@ public:
 	void go_exception(int exception);
 	void go_milliseconds(UINT64 milliseconds);
 	void go_next_device();
-	void halt_on_next_instruction(const char *fmt, ...) ATTR_PRINTF(2,3);
+	template <typename Format, typename... Params>
+	void halt_on_next_instruction(Format &&fmt, Params &&... args)
+	{
+		halt_on_next_instruction_impl(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
 
 	// breakpoints
 	breakpoint *breakpoint_first() const { return m_bplist; }
@@ -275,6 +279,8 @@ public:
 	static const int HISTORY_SIZE = 256;
 
 private:
+	void halt_on_next_instruction_impl(util::format_argument_pack<std::ostream> &&args);
+
 	// internal helpers
 	void compute_debug_flags();
 	void prepare_for_step_overout(offs_t pc);

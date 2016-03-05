@@ -37,6 +37,12 @@ public:
 	virtual void draw_right_panel(void *selectedref, float origx1, float origy1, float origx2, float origy2) override;
 
 private:
+	enum
+	{
+		CONF_OPTS = 1,
+		CONF_MACHINE,
+	};
+
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
 	char m_search[40];
 	static int m_isabios;

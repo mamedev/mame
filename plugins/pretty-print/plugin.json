@@ -1,8 +1,0 @@
-{
-  "plugin": {
-    "name": "pretty-print",
-    "version": "1.0.3",
-    "author": "Tim Caswell",
-	"type": "library",
-  }
-}

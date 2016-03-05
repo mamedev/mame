@@ -9,6 +9,7 @@
 #ifndef __WIN_D3DHLSL__
 #define __WIN_D3DHLSL__
 
+#include <vector>
 #include "aviio.h"
 
 //============================================================
@@ -226,7 +227,7 @@ struct hlsl_options
 	float                   saturation;
 
 	// NTSC
-	bool                    yiq_enable;
+	int						yiq_enable;
 	float                   yiq_jitter;
 	float                   yiq_cc;
 	float                   yiq_a;
@@ -259,6 +260,34 @@ struct hlsl_options
 	float                   bloom_level8_weight;
 	float                   bloom_level9_weight;
 	float                   bloom_level10_weight;
+};
+
+struct slider_desc
+{
+	const char *        		name;
+	int                 		minval;
+	int                 		defval;
+	int                 		maxval;
+	int                 		step;
+	int							slider_type;
+	int                 		screen_type;
+	int                 		id;
+	float						scale;
+	const char *				format;
+	std::vector<const char *>	strings;
+};
+
+class slider
+{
+public:
+	slider(slider_desc *desc, void *value, bool *dirty) : m_desc(desc), m_value(value), m_dirty(dirty) { }
+
+	INT32 update(std::string *str, INT32 newval);
+
+private:
+	slider_desc *	m_desc;
+	void *			m_value;
+	bool *			m_dirty;
 };
 
 class shaders
@@ -296,7 +325,7 @@ public:
 
 	void window_save();
 	void window_record();
-	bool recording() { return avi_output_file != NULL; }
+	bool recording() { return avi_output_file != nullptr; }
 
 	void avi_update_snap(surface *surface);
 	void render_snapshot(surface *surface);
@@ -314,28 +343,7 @@ public:
 
 	// slider-related functions
 	slider_state *init_slider_list();
-
-	enum slider_screen_type
-	{
-		SLIDER_SCREEN_TYPE_NONE = 0,
-		SLIDER_SCREEN_TYPE_RASTER = 1,
-		SLIDER_SCREEN_TYPE_VECTOR = 2,
-		SLIDER_SCREEN_TYPE_LCD = 4,
-		SLIDER_SCREEN_TYPE_LCD_OR_RASTER = SLIDER_SCREEN_TYPE_RASTER | SLIDER_SCREEN_TYPE_LCD,
-		SLIDER_SCREEN_TYPE_ANY = SLIDER_SCREEN_TYPE_RASTER | SLIDER_SCREEN_TYPE_VECTOR | SLIDER_SCREEN_TYPE_LCD
-	};
-
-	struct slider_desc
-	{
-		const char *        name;
-		int                 minval;
-		int                 defval;
-		int                 maxval;
-		int                 step;
-		int                 screen_type;
-		INT32(*adjustor)(running_machine &, void *, std::string *, INT32);
-		int                 id;
-	};
+	void *get_slider_option(int id, int index = 0);
 
 private:
 	void                    blit(surface *dst, bool clear_dst, D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count);
@@ -441,6 +449,8 @@ private:
 	poly_info *             curr_poly;
 	d3d_render_target *     targethead;
 	cache_target *          cachehead;
+
+	std::vector<slider*>	sliders;
 
 	static slider_desc      s_sliders[];
 	static hlsl_options     last_options;               // last used options

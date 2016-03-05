@@ -352,9 +352,10 @@ void cquestrot_cpu_device::state_string_export(const device_state_entry &entry, 
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c", m_cflag ? 'C' : '.',
-										m_vflag ? 'V' : '.',
-										m_f ? '.' : 'Z');
+			str = string_format("%c%c%c",
+					m_cflag ? 'C' : '.',
+					m_vflag ? 'V' : '.',
+					m_f ? '.' : 'Z');
 			break;
 	}
 }
@@ -476,10 +477,11 @@ void cquestlin_cpu_device::state_string_export(const device_state_entry &entry, 
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c|%cG", m_cflag ? 'C' : '.',
-											m_vflag ? 'V' : '.',
-											m_f ? '.' : 'Z',
-											( m_clkcnt & 3 ) ? 'B' : 'F');
+			str = string_format("%c%c%c|%cG",
+					m_cflag ? 'C' : '.',
+					m_vflag ? 'V' : '.',
+					m_f ? '.' : 'Z',
+					( m_clkcnt & 3 ) ? 'B' : 'F');
 			break;
 	}
 }

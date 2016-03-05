@@ -50,6 +50,8 @@
 	MCFG_DEVICE_ADD(_tag, SEGA_SYS16B_SPRITES, 0)
 #define MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(_xorigin) \
 	sega_sys16b_sprite_device::set_local_originx(*device, _xorigin);
+#define MCFG_BOOTLEG_SYS16B_SPRITES_YORIGIN(_yorigin) \
+	sega_sys16b_sprite_device::set_local_originy(*device, _yorigin);
 
 
 

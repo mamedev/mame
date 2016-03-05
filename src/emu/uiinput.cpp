@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-    uiinput.c
+    uiinput.cpp
 
     Internal MAME user interface input state.
 ***************************************************************************/

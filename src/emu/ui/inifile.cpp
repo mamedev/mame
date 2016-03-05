@@ -428,27 +428,28 @@ void favorite_manager::save_favorite_games()
 		}
 
 		// generate the favorite INI
-		std::string text("[ROOT_FOLDER]\n[Favorite]\n\n");
+		std::ostringstream text;
+		text << "[ROOT_FOLDER]\n[Favorite]\n\n";
 		for (auto & elem : m_list)
 		{
-			text += elem.shortname + "\n";
-			text += elem.longname + "\n";
-			text += elem.parentname + "\n";
-			text += elem.year + "\n";
-			text += elem.publisher + "\n";
-			strcatprintf(text, "%d\n", elem.supported);
-			text += elem.part + "\n";
-			strcatprintf(text, "%s\n", elem.driver->name);
-			text += elem.listname + "\n";
-			text += elem.interface + "\n";
-			text += elem.instance + "\n";
-			strcatprintf(text, "%d\n", elem.startempty);
-			text += elem.parentlongname + "\n";
-			text += elem.usage + "\n";
-			text += elem.devicetype + "\n";
-			strcatprintf(text, "%d\n", elem.available);
+			text << elem.shortname << '\n';
+			text << elem.longname << '\n';
+			text << elem.parentname << '\n';
+			text << elem.year << '\n';
+			text << elem.publisher << '\n';
+			util::stream_format(text, "%d\n", elem.supported);
+			text << elem.part << '\n';
+			util::stream_format(text, "%s\n", elem.driver->name);
+			text << elem.listname << '\n';
+			text << elem.interface << '\n';
+			text << elem.instance << '\n';
+			util::stream_format(text, "%d\n", elem.startempty);
+			text << elem.parentlongname << '\n';
+			text << elem.usage << '\n';
+			text << elem.devicetype << '\n';
+			util::stream_format(text, "%d\n", elem.available);
 		}
-		file.puts(text.c_str());
+		file.puts(text.str().c_str());
 		file.close();
 	}
 }

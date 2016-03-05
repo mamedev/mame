@@ -19,7 +19,6 @@
 #include "ui/ui.h"
 #include "luaengine.h"
 #include <mutex>
-#include "libuv/include/uv.h"
 
 //**************************************************************************
 //  LUA ENGINE
@@ -49,9 +48,7 @@ lua_engine* lua_engine::luaThis = nullptr;
 extern "C" {
 	int luaopen_lsqlite3(lua_State *L);
 	int luaopen_zlib(lua_State *L);
-	int luaopen_luv(lua_State *L);
 	int luaopen_lfs(lua_State *L);
-	uv_loop_t* luv_loop(lua_State* L);
 }
 
 static void lstop(lua_State *L, lua_Debug *ar)
@@ -1195,10 +1192,6 @@ lua_engine::lua_engine()
 	lua_getfield(m_lua_state, -1, "preload");
 	lua_remove(m_lua_state, -2); // Remove package
 
-	// Store uv module definition at preload.uv
-	lua_pushcfunction(m_lua_state, luaopen_luv);
-	lua_setfield(m_lua_state, -2, "luv");
-
 	lua_pushcfunction(m_lua_state, luaopen_zlib);
 	lua_setfield(m_lua_state, -2, "zlib");
 
@@ -1336,15 +1329,18 @@ void lua_engine::update_machine()
 			}
 			port = port->next();
 		}
-		machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(lua_engine::on_machine_start), this));
-		machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(lua_engine::on_machine_stop), this));
-		machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(lua_engine::on_machine_pause), this));
-		machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(lua_engine::on_machine_resume), this));
-		machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(lua_engine::on_machine_frame), this));
 	}
 	lua_setglobal(m_lua_state, "ioport");
 }
 
+void lua_engine::attach_notifiers()
+{
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(lua_engine::on_machine_start), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(lua_engine::on_machine_stop), this));
+	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(lua_engine::on_machine_pause), this));
+	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(lua_engine::on_machine_resume), this));
+	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(lua_engine::on_machine_frame), this));
+}
 
 //-------------------------------------------------
 //  initialize - initialize lua hookup to emu engine
@@ -1661,10 +1657,6 @@ void lua_engine::periodic_check()
 		msg.ready = 0;
 		msg.done = 1;
 	}
-	auto loop = luv_loop(m_lua_state);
-	if (loop!=nullptr)
-		uv_run(loop, UV_RUN_NOWAIT);
-
 }
 
 //-------------------------------------------------

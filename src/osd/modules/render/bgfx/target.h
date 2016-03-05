@@ -22,6 +22,7 @@ public:
 
 	// Getters
 	bgfx::FrameBufferHandle target() const { return m_target; }
+	virtual bool is_target() const override { return true; }
 
 private:
 	bgfx::FrameBufferHandle m_target;

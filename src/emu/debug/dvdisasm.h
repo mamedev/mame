@@ -13,6 +13,8 @@
 
 #include "debugvw.h"
 
+#include "vecstream.h"
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -91,7 +93,7 @@ private:
 	// internal helpers
 	void enumerate_sources();
 	offs_t find_pc_backwards(offs_t targetpc, int numinstrs);
-	void generate_bytes(offs_t pcbyte, int numbytes, int minbytes, char *string, int maxchars, bool encrypted);
+	void generate_bytes(offs_t pcbyte, int numbytes, int minbytes, int maxchars, bool encrypted);
 	bool recompute(offs_t pc, int startline, int lines);
 
 	// internal state
@@ -106,12 +108,12 @@ private:
 	int                 m_divider3;             // comment divider column
 	debug_view_expression m_expression;         // expression-related information
 	std::vector<offs_t> m_byteaddress;               // addresses of the instructions
-	std::vector<char> m_dasm;                        // disassembled instructions
+	util::ovectorstream m_dasm;                 // disassembled instructions
 
 	// constants
-	static const int DEFAULT_DASM_LINES = 1000;
-	static const int DEFAULT_DASM_WIDTH = 50;
-	static const int DASM_MAX_BYTES = 16;
+	static constexpr int DEFAULT_DASM_LINES = 1000;
+	static constexpr int DEFAULT_DASM_WIDTH = 50;
+	static constexpr int DASM_MAX_BYTES = 16;
 };
 
 

@@ -27,6 +27,7 @@ public:
 	uint32_t width() const { return m_width; }
 	uint32_t height() const { return m_height; }
 	bgfx::TextureHandle handle() const { return m_handle; }
+	virtual bool is_target() const { return false; }
 
 protected:
 	std::string                 m_name;

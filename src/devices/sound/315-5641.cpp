@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese
 /* Sega 315-5641 / D77591 / 9442CA010 */
 
 #include "emu.h"

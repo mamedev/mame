@@ -1,0 +1,26 @@
+{
+    "blend": {
+    	"equation": "add",
+    	"srcColor": "srcAlpha",
+    	"dstColor": "1-srcAlpha",
+    	"srcAlpha": "srcAlpha",
+    	"dstAlpha": "1-srcAlpha"
+    },
+    "depth": {
+    	"function": "always"
+    },
+    "cull": { "mode": "none" },
+    "write": {
+    	"rgb": "true",
+    	"alpha": "true"
+    },
+    "vertex": "vs_ratios",
+    "fragment": "fs_ratios",
+    "uniforms": [
+    	{ "name": "s_tex",          "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "u_red_ratios",   "type": "vec4", "values": [ 1.0, 0.0, 0.0, 1.0 ] },
+    	{ "name": "u_grn_ratios",   "type": "vec4", "values": [ 0.0, 1.0, 0.0, 1.0 ] },
+    	{ "name": "u_blu_ratios",   "type": "vec4", "values": [ 0.0, 0.0, 1.0, 1.0 ] },
+    	{ "name": "u_ratio_amount", "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] }
+    ]
+}

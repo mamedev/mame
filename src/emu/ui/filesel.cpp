@@ -156,10 +156,10 @@ ui_menu_confirm_save_as::~ui_menu_confirm_save_as()
 
 void ui_menu_confirm_save_as::populate()
 {
-	item_append("File Already Exists - Override?", nullptr, MENU_FLAG_DISABLE, nullptr);
+	item_append(_("File Already Exists - Override?"), nullptr, MENU_FLAG_DISABLE, nullptr);
 	item_append(MENU_SEPARATOR_ITEM, nullptr, MENU_FLAG_DISABLE, nullptr);
-	item_append("No", nullptr, 0, ITEMREF_NO);
-	item_append("Yes", nullptr, 0, ITEMREF_YES);
+	item_append(_("No"), nullptr, 0, ITEMREF_NO);
+	item_append(_("Yes"), nullptr, 0, ITEMREF_YES);
 }
 
 //-------------------------------------------------
@@ -268,19 +268,19 @@ void ui_menu_file_create::populate()
 	{
 		new_image_name = m_filename_buffer;
 	}
-	item_append("New Image Name:", new_image_name, 0, ITEMREF_NEW_IMAGE_NAME);
+	item_append(_("New Image Name:"), new_image_name, 0, ITEMREF_NEW_IMAGE_NAME);
 
 	// do we support multiple formats?
 	if (ENABLE_FORMATS) format = m_image->formatlist();
 	if (ENABLE_FORMATS && (format != nullptr))
 	{
-		item_append("Image Format:", m_current_format->description(), 0, ITEMREF_FORMAT);
+		item_append(_("Image Format:"), m_current_format->description(), 0, ITEMREF_FORMAT);
 		m_current_format = format;
 	}
 
 	// finish up the menu
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-	item_append("Create", nullptr, 0, ITEMREF_CREATE);
+	item_append(_("Create"), nullptr, 0, ITEMREF_CREATE);
 
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
@@ -311,7 +311,7 @@ void ui_menu_file_create::handle()
 						ui_menu::stack_pop(machine());
 					}
 					else
-						machine().ui().popup_time(1, "Please enter a file extension too");
+						machine().ui().popup_time(1, "%s", _("Please enter a file extension too"));
 				}
 				break;
 
@@ -499,15 +499,15 @@ void ui_menu_file_selector::append_entry_menu_item(const file_selector_entry *en
 	switch(entry->type)
 	{
 		case SELECTOR_ENTRY_TYPE_EMPTY:
-			text = "[empty slot]";
+			text = _("[empty slot]");
 			break;
 
 		case SELECTOR_ENTRY_TYPE_CREATE:
-			text = "[create]";
+			text = _("[create]");
 			break;
 
 		case SELECTOR_ENTRY_TYPE_SOFTWARE_LIST:
-			text = "[software list]";
+			text = _("[software list]");
 			break;
 
 		case SELECTOR_ENTRY_TYPE_DRIVE:
@@ -712,7 +712,7 @@ void ui_menu_file_selector::handle()
 				// from current entry to the end
 				for (entry = cur_selected; entry != nullptr; entry = entry->next)
 				{
-					if (entry->basename != nullptr && m_filename_buffer != nullptr)
+					if (entry->basename != nullptr && m_filename_buffer[0] != '\0')
 					{
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
@@ -731,7 +731,7 @@ void ui_menu_file_selector::handle()
 				// and from the first entry to current one
 				for (entry = m_entrylist; entry != cur_selected; entry = entry->next)
 				{
-					if (entry->basename != nullptr && m_filename_buffer != nullptr)
+					if (entry->basename != nullptr && m_filename_buffer[0] != '\0')
 					{
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
@@ -799,7 +799,7 @@ ui_menu_select_format::~ui_menu_select_format()
 
 void ui_menu_select_format::populate()
 {
-	item_append("Select image format", nullptr, MENU_FLAG_DISABLE, nullptr);
+	item_append(_("Select image format"), nullptr, MENU_FLAG_DISABLE, nullptr);
 	for (int i = 0; i < m_total_usable; i++)
 	{
 		const floppy_image_format_t *fmt = m_formats[i];
@@ -859,12 +859,12 @@ ui_menu_select_rw::~ui_menu_select_rw()
 
 void ui_menu_select_rw::populate()
 {
-	item_append("Select access mode", nullptr, MENU_FLAG_DISABLE, nullptr);
-	item_append("Read-only", nullptr, 0, (void *)READONLY);
+	item_append(_("Select access mode"), nullptr, MENU_FLAG_DISABLE, nullptr);
+	item_append(_("Read-only"), nullptr, 0, (void *)READONLY);
 	if (m_can_in_place)
-		item_append("Read-write", nullptr, 0, (void *)READWRITE);
-	item_append("Read this image, write to another image", nullptr, 0, (void *)WRITE_OTHER);
-	item_append("Read this image, write to diff", nullptr, 0, (void *)WRITE_DIFF);
+		item_append(_("Read-write"), nullptr, 0, (void *)READWRITE);
+	item_append(_("Read this image, write to another image"), nullptr, 0, (void *)WRITE_OTHER);
+	item_append(_("Read this image, write to diff"), nullptr, 0, (void *)WRITE_DIFF);
 }
 
 

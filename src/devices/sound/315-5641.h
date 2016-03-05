@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese
 /* Sega 315-5641 / D77591 / 9442CA010 */
 
 // this is the PICO sound chip, we are not sure if it's the same as a 7759 or not, it requires FIFO logic

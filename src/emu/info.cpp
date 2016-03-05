@@ -554,54 +554,54 @@ void info_xml_creator::output_rom(device_t &device)
 						}
 				}
 
-				std::string output;
+				std::ostringstream output;
 
 				// opening tag
 				if (!is_disk)
-					output.append("\t\t<rom");
+					output << "\t\t<rom";
 				else
-					output.append("\t\t<disk");
+					output << "\t\t<disk";
 
 				// add name, merge, bios, and size tags */
 				if (name != nullptr && name[0] != 0)
-					strcatprintf(output," name=\"%s\"", xml_normalize_string(name));
+					util::stream_format(output, " name=\"%s\"", xml_normalize_string(name));
 				if (merge_name != nullptr)
-					strcatprintf(output," merge=\"%s\"", xml_normalize_string(merge_name));
+					util::stream_format(output, " merge=\"%s\"", xml_normalize_string(merge_name));
 				if (bios_name[0] != 0)
-					strcatprintf(output," bios=\"%s\"", xml_normalize_string(bios_name));
+					util::stream_format(output, " bios=\"%s\"", xml_normalize_string(bios_name));
 				if (!is_disk)
-					strcatprintf(output," size=\"%d\"", rom_file_size(rom));
+					util::stream_format(output, " size=\"%d\"", rom_file_size(rom));
 
 				// dump checksum information only if there is a known dump
 				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
 				{
 					// iterate over hash function types and print m_output their values
-					output.append(" ").append(hashes.attribute_string());
+					output << " " << hashes.attribute_string();
 				}
 				else
-					output.append(" status=\"nodump\"");
+					output << " status=\"nodump\"";
 
 				// append a region name
-				strcatprintf(output," region=\"%s\"", ROMREGION_GETTAG(region));
+				util::stream_format(output, " region=\"%s\"", ROMREGION_GETTAG(region));
 
 				// for non-disk entries, print offset
 				if (!is_disk)
-					strcatprintf(output," offset=\"%x\"", offset);
+					util::stream_format(output, " offset=\"%x\"", offset);
 
 				// for disk entries, add the disk index
 				else
 				{
-					strcatprintf(output," index=\"%x\"", DISK_GETINDEX(rom));
-					strcatprintf(output," writable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
+					util::stream_format(output, " index=\"%x\"", DISK_GETINDEX(rom));
+					util::stream_format(output, " writable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
 				}
 
 				// add optional flag
 				if (ROM_ISOPTIONAL(rom))
-					output.append(" optional=\"yes\"");
+					output << " optional=\"yes\"";
 
-				output.append("/>\n");
+				output << "/>\n";
 
-				fprintf(m_output, "%s", output.c_str());
+				fprintf(m_output, "%s", output.str().c_str());
 			}
 		}
 }
@@ -1096,7 +1096,7 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 			if (field->type() == type)
 			{
-				std::string output;
+				std::ostringstream output;
 
 				std::string newtag(port->tag()), oldtag(":");
 				newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
@@ -1104,18 +1104,18 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 				// output the switch name information
 				std::string normalized_field_name(xml_normalize_string(field->name()));
 				std::string normalized_newtag(xml_normalize_string(newtag.c_str()));
-				strcatprintf(output,"\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.c_str(), normalized_newtag.c_str(), field->mask());
+				util::stream_format(output,"\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.c_str(), normalized_newtag.c_str(), field->mask());
 
 				// loop over settings
 				for (ioport_setting *setting = field->first_setting(); setting != nullptr; setting = setting->next())
 				{
-					strcatprintf(output,"\t\t\t<%s name=\"%s\" value=\"%u\"%s/>\n", innertag, xml_normalize_string(setting->name()), setting->value(), setting->value() == field->defvalue() ? " default=\"yes\"" : "");
+					util::stream_format(output,"\t\t\t<%s name=\"%s\" value=\"%u\"%s/>\n", innertag, xml_normalize_string(setting->name()), setting->value(), setting->value() == field->defvalue() ? " default=\"yes\"" : "");
 				}
 
 				// terminate the switch entry
-				strcatprintf(output,"\t\t</%s>\n", outertag);
+				util::stream_format(output,"\t\t</%s>\n", outertag);
 
-				fprintf(m_output, "%s", output.c_str());
+				fprintf(m_output, "%s", output.str().c_str());
 			}
 }
 

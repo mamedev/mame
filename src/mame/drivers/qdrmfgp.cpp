@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Eisuke Watanabe
+// license:BSD-3-Clause
+// copyright-holders:Hau
 /***************************************************************************
 
 Quiz Do Re Mi Fa Grand Prix (Japan)     (GQ460) (c)1994 Konami
@@ -16,7 +16,7 @@ TODO:
   command
 
 --
-driver by Eisuke Watanabe
+driver by Hau
 
 Note:
 GP1 HDD data contents:

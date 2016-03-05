@@ -46,7 +46,7 @@ ui_menu_controller_mapping::~ui_menu_controller_mapping()
 	std::string error_string;
 	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d)
 	{
-		if (strcmp(machine().options().value(m_options[d].option),m_device_status[m_options[d].status])!=0)
+		if (strcmp(machine().options().value(m_options[d].option), m_device_status[m_options[d].status])!=0)
 		{
 			machine().options().set_value(m_options[d].option, m_device_status[m_options[d].status], OPTION_PRIORITY_CMDLINE, error_string);
 			machine().options().mark_changed(m_options[d].option);

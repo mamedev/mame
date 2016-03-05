@@ -47,7 +47,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ps2_32_io, AS_IO, 32, ps2_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE16("mb", at_mb_device, map, 0xfffffffff)
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE16("mb", at_mb_device, map, 0xffffffff)
 ADDRESS_MAP_END
 
 void ps2_state::machine_start()

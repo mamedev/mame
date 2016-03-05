@@ -112,7 +112,7 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 
 		case ENTTYPE_DIR:
 			/* a directory exists here - we can't save over it */
-			machine().ui().popup_time(5, "Cannot save over directory");
+			machine().ui().popup_time(5, "%s", _("Cannot save over directory"));
 			can_create = false;
 			need_confirm = false;
 			break;
@@ -146,7 +146,7 @@ void ui_menu_control_device_image::load_software_part()
 		hook_load(temp_name, true);
 	else
 	{
-		machine().popmessage("The software selected is missing one or more required ROM or CHD images. Please select a different one.");
+		machine().popmessage(_("The software selected is missing one or more required ROM or CHD images. Please select a different one."));
 		state = SELECT_SOFTLIST;
 	}
 }

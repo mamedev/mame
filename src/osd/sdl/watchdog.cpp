@@ -45,15 +45,16 @@ watchdog::watchdog(void)
 {
 	m_do_exit = 0;
 	m_event = osd_event_alloc(1, 0);
-	m_thread = osd_thread_create(watchdog_thread, this);
+	m_thread = new std::thread(watchdog_thread, this);
 	m_timeout = 60 * osd_ticks_per_second();
 }
 
 watchdog::~watchdog(void)
 {
-	atomic_exchange32(&m_do_exit, 1);
+	m_do_exit = 1;
 	osd_event_set(m_event);
-	osd_thread_wait_free(m_thread);
+	m_thread->join();
+	delete m_thread;
 	osd_event_free(m_event);
 }
 

@@ -12,10 +12,7 @@
 #include "debugger.h"
 #include "drcbec.h"
 
-#ifdef _MSC_VER
-#include <float.h>
-#define isnan _isnan
-#endif
+#include <cmath>
 
 using namespace uml;
 
@@ -1898,7 +1895,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FCMP, 4, 1):      // FSCMP   src1,src2
-				if (isnan(FSPARAM0) || isnan(FSPARAM1))
+				if (std::isnan(FSPARAM0) || std::isnan(FSPARAM1))
 					flags = FLAG_U;
 				else
 					flags = (FSPARAM0 < FSPARAM1) | ((FSPARAM0 == FSPARAM1) << 2);
@@ -2037,7 +2034,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FCMP, 8, 1):      // FDCMP   src1,src2
-				if (isnan(FDPARAM0) || isnan(FDPARAM1))
+				if (std::isnan(FDPARAM0) || std::isnan(FDPARAM1))
 					flags = FLAG_U;
 				else
 					flags = (FDPARAM0 < FDPARAM1) | ((FDPARAM0 == FDPARAM1) << 2);

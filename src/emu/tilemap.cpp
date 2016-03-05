@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    tilemap.c
+    tilemap.cpp
 
     Generic tilemap management system.
 

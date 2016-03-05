@@ -146,11 +146,7 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 		/* otherwise, do a disassembly of the current instruction */
 		else
 		{
-#ifdef PTR64
-			bytes = i386_dasm_one_ex(buffer, (FPTR)cur, cur, 64) & DASMFLAG_LENGTHMASK;
-#else
-			bytes = i386_dasm_one_ex(buffer, (FPTR)cur, cur, 32) & DASMFLAG_LENGTHMASK;
-#endif
+			bytes = i386_dasm_one_ex(buffer, (FPTR)cur, cur, sizeof(void *) * 8) & DASMFLAG_LENGTHMASK;
 		}
 
 		/* if we have a matching comment, output it */

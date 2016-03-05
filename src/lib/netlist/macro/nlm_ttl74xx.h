@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 #ifndef NLD_TTL74XX_H_
 #define NLD_TTL74XX_H_
 

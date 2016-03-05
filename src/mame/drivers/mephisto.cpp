@@ -67,14 +67,11 @@ Mephisto 4 Turbo Kit 18mhz - (mm4tk)
 #include "sound/beep.h"
 //#include "mephisto.lh"
 
-#include "includes/mboard.h"
-
-
-class mephisto_state : public mboard_state
+class mephisto_state : public driver_device
 {
 public:
 	mephisto_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mboard_state(mconfig, type, tag)
+		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_beep(*this, "beeper")
 		, m_key1_0(*this, "KEY1_0")
@@ -218,10 +215,10 @@ static ADDRESS_MAP_START( rebel5_mem, AS_PROGRAM, 8, mephisto_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM                        // AM_BASE(m_p_ram)
 	AM_RANGE( 0x2000, 0x2007) AM_WRITE(write_led)           // Status LEDs+ buzzer
 	AM_RANGE( 0x3000, 0x3007) AM_READ(read_keys)            // Rebel 5.0
-	AM_RANGE( 0x3000, 0x4000) AM_READ(mboard_read_board_8)      // Chessboard
+	//AM_RANGE( 0x3000, 0x4000) AM_READ(mboard_read_board_8)      // Chessboard
 	AM_RANGE( 0x5000, 0x5000) AM_WRITE(write_lcd)
-	AM_RANGE( 0x6000, 0x6000) AM_WRITE(mboard_write_LED_8)      // Chessboard
-	AM_RANGE( 0x7000, 0x7000) AM_WRITE(mboard_write_board_8)    // Chessboard
+	//AM_RANGE( 0x6000, 0x6000) AM_WRITE(mboard_write_LED_8)      // Chessboard
+	//AM_RANGE( 0x7000, 0x7000) AM_WRITE(mboard_write_board_8)    // Chessboard
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -229,10 +226,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mephisto_mem, AS_PROGRAM, 8, mephisto_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM //AM_BASE(m_p_ram)
 	AM_RANGE( 0x2000, 0x2000) AM_WRITE(write_lcd)
-	AM_RANGE( 0x2400, 0x2407) AM_WRITE(mboard_write_LED_8)      // Chessboard
-	AM_RANGE( 0x2800, 0x2800) AM_WRITE(mboard_write_board_8)        // Chessboard
+	//AM_RANGE( 0x2400, 0x2407) AM_WRITE(mboard_write_LED_8)      // Chessboard
+	//AM_RANGE( 0x2800, 0x2800) AM_WRITE(mboard_write_board_8)        // Chessboard
 	AM_RANGE( 0x2c00, 0x2c07) AM_READ(read_keys)
-	AM_RANGE( 0x3000, 0x3000) AM_READ(mboard_read_board_8)      // Chessboard
+	//AM_RANGE( 0x3000, 0x3000) AM_READ(mboard_read_board_8)      // Chessboard
 	AM_RANGE( 0x3400, 0x3407) AM_WRITE(write_led)           // Status LEDs+ buzzer
 	AM_RANGE( 0x3800, 0x3800) AM_WRITE(mephisto_NMI)            // NMI enable
 	AM_RANGE( 0x4000, 0x7fff) AM_ROM                        // Opening Library
@@ -243,10 +240,10 @@ static ADDRESS_MAP_START( mm2_mem, AS_PROGRAM, 8, mephisto_state )
 	AM_RANGE( 0x0000, 0x0fff) AM_RAM //AM_BASE(m_p_ram)
 	AM_RANGE( 0x1000, 0x1007) AM_WRITE(write_led_mm2)       //Status LEDs
 	AM_RANGE( 0x1800, 0x1807) AM_READ(read_keys)
-	AM_RANGE( 0x2000, 0x2000) AM_READ(mboard_read_board_8)      //Chessboard
+	//AM_RANGE( 0x2000, 0x2000) AM_READ(mboard_read_board_8)      //Chessboard
 	AM_RANGE( 0x2800, 0x2800) AM_WRITE(write_lcd)
-	AM_RANGE( 0x3000, 0x3000) AM_WRITE(mboard_write_LED_8)      //Chessboard
-	AM_RANGE( 0x3800, 0x3800) AM_WRITE(mboard_write_board_8)        //Chessboard
+	//AM_RANGE( 0x3000, 0x3000) AM_WRITE(mboard_write_LED_8)      //Chessboard
+	//AM_RANGE( 0x3800, 0x3800) AM_WRITE(mboard_write_board_8)        //Chessboard
 	AM_RANGE( 0x4000, 0x7fff) AM_ROM                        // Opening Library ?
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -288,7 +285,6 @@ static INPUT_PORTS_START( mephisto )
 	PORT_START("KEY2_7") //Port $2c0f
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D 4") PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4)
 
-	PORT_INCLUDE( chessboard )
 INPUT_PORTS_END
 
 
@@ -319,7 +315,7 @@ void mephisto_state::machine_start()
 {
 	m_lcd_shift_counter = 3;
 	m_allowNMI = 1;
-	mboard_savestate_register();
+	//mboard_savestate_register();
 }
 
 MACHINE_START_MEMBER(mephisto_state,mm2)
@@ -327,7 +323,7 @@ MACHINE_START_MEMBER(mephisto_state,mm2)
 	m_lcd_shift_counter = 3;
 	m_led7=0xff;
 
-	mboard_savestate_register();
+	//mboard_savestate_register();
 }
 
 
@@ -335,8 +331,8 @@ void mephisto_state::machine_reset()
 {
 	m_lcd_shift_counter = 3;
 	m_allowNMI = 1;
-	mboard_set_border_pieces();
-	mboard_set_board();
+	//mboard_set_border_pieces();
+	//mboard_set_board();
 
 /* adjust artwork depending on current emulation*/
 
@@ -369,7 +365,7 @@ static MACHINE_CONFIG_START( mephisto, mephisto_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", mephisto_state, update_nmi, attotime::from_hz(600))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", mephisto_state, mboard_update_artwork, attotime::from_hz(100))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", mephisto_state, mboard_update_artwork, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rebel5, mephisto )
@@ -461,10 +457,10 @@ DRIVER_INIT_MEMBER(mephisto_state,mephisto)
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME                            FLAGS */
 
-CONS( 1984, mm2,        mm4,    0,      mm2,        mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto MM2 Schachcomputer",     MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, rebel5,     mm4,    0,      rebel5,     mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto Rebell 5,0 Schachcomputer", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mm4,        0,      0,      mephisto,   mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schachcomputer",       MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mm4tk,      mm4,    0,      mm4tk,      mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schachcomputer Turbo Kit + HG440",       MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, mm5,        mm4,    0,      mephisto,   mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schachcomputer",     MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, mm50,       mm4,    0,      mephisto,   mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto 5.0 Schachcomputer",     MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, mm5tk,      mm4,    0,      mm4tk,      mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schachcomputer Turbo Kit + HG550",       MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, mm2,        mm4,    0,      mm2,        mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto MM2 Schachcomputer",     MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, rebel5,     mm4,    0,      rebel5,     mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto Rebell 5,0 Schachcomputer", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, mm4,        0,      0,      mephisto,   mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schachcomputer",       MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, mm4tk,      mm4,    0,      mm4tk,      mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schachcomputer Turbo Kit + HG440",       MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, mm5,        mm4,    0,      mephisto,   mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schachcomputer",     MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, mm50,       mm4,    0,      mephisto,   mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto 5.0 Schachcomputer",     MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, mm5tk,      mm4,    0,      mm4tk,      mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schachcomputer Turbo Kit + HG550",       MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )

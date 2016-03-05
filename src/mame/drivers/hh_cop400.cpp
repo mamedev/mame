@@ -234,7 +234,7 @@ UINT8 hh_cop400_state::read_inputs(int columns)
 /***************************************************************************
 
   Castle Toy Einstein
-  * COP421 MCU labeled ~/927 COP421-NEZ/N
+  * COP421 MCU label ~/927 COP421-NEZ/N
   * 4 lamps, 1-bit sound
 
 ***************************************************************************/
@@ -261,7 +261,7 @@ static MACHINE_CONFIG_START( ctstein, ctstein_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP421, 1000000) // approximation - RC osc. R=12K to +6V, C=100pf to GND
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED) // guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 //  MCFG_DEFAULT_LAYOUT(layout_ctstein)
@@ -279,7 +279,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Coleco Head to Head Basketball
-  * COP420 MCU labeled COP420L-NEZ/N
+  * COP420 MCU label COP420L-NEZ/N
   * 2-digit 7seg display, 41 other leds, 1-bit sound
 
 ***************************************************************************/
@@ -306,7 +306,7 @@ static MACHINE_CONFIG_START( h2hbaskb, h2hbaskb_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP420, 1000000) // approximation - RC osc. R=43K to +9V, C=101pf to GND
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED) // guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 //  MCFG_DEFAULT_LAYOUT(layout_h2hbaskb)
@@ -324,7 +324,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Space Invader
-  * COP444L MCU labeled /B138 COPL444-HRZ/N INV II (die labeled HRZ COP 444L/A)
+  * COP444L MCU label /B138 COPL444-HRZ/N INV II (die label HRZ COP 444L/A)
   * 3 7seg LEDs, LED matrix and overlay mask, 1-bit sound
 
   The first version was on TMS1100 (see hh_tms1k.c), this is the reprogrammed
@@ -416,7 +416,7 @@ static MACHINE_CONFIG_START( einvaderc, einvaderc_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP444, 1000000) // approximation - RC osc. R=47K to +9V, C=100pf to GND(-9V)
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED) // guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_READ_IN_CB(IOPORT("IN.0"))
 	MCFG_COP400_WRITE_D_CB(WRITE8(einvaderc_state, write_d))
 	MCFG_COP400_WRITE_G_CB(WRITE8(einvaderc_state, write_g))
@@ -440,7 +440,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Mattel Funtronics Jacks
-  * COP410L MCU bonded directly to PCB (die labeled COP410L/B NGS)
+  * COP410L MCU bonded directly to PCB (die label COP410L/B NGS)
   * 8 LEDs, 1-bit sound
 
 ***************************************************************************/
@@ -524,7 +524,7 @@ static MACHINE_CONFIG_START( funjacks, funjacks_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP410, 2000000) // approximation - RC osc. R=47K, C=56pf
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_ENABLED) // guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(funjacks_state, write_d))
 	MCFG_COP400_WRITE_L_CB(WRITE8(funjacks_state, write_l))
 	MCFG_COP400_WRITE_G_CB(WRITE8(funjacks_state, write_g))
@@ -547,7 +547,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Mattel Funtronics Red Light Green Light
-  * COP410L MCU bonded directly to PCB (die labeled COP410L/B NHZ)
+  * COP410L MCU bonded directly to PCB (die label COP410L/B NHZ)
   * 14 LEDs, 1-bit sound
 
   known releases:
@@ -620,7 +620,7 @@ static MACHINE_CONFIG_START( funrlgl, funrlgl_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP410, 2000000) // approximation - RC osc. R=51K, C=91pf
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_ENABLED) // guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(funrlgl_state, write_d))
 	MCFG_COP400_WRITE_L_CB(WRITE8(funrlgl_state, write_l))
 	MCFG_COP400_WRITE_G_CB(WRITE8(funrlgl_state, write_g))
@@ -642,7 +642,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Milton Bradley Plus One
-  * COP410L MCU in 8-pin DIP, labeled ~/029 MM 57405 (die labeled COP410L/B NNE)
+  * COP410L MCU in 8-pin DIP, label ~/029 MM 57405 (die label COP410L/B NNE)
   * 4 sensors(1 on each die side), 1-bit sound
 
 ***************************************************************************/
@@ -669,7 +669,7 @@ static MACHINE_CONFIG_START( plus1, plus1_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K to +5V, C=100pf to GND
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_ENABLED) // guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true) // guessed
 
 	/* no visual feedback! */
 
@@ -686,7 +686,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Milton Bradley (Electronic) Lightfight
-  * COP421L MCU labeled /B119 COP421L-HLA/N
+  * COP421L MCU label /B119 COP421L-HLA/N
   * LED matrix, 1-bit sound
 
   Xbox-shaped electronic game for 2 or more players, with long diagonal buttons
@@ -800,7 +800,7 @@ static MACHINE_CONFIG_START( lightfgt, lightfgt_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP421, 950000) // approximation - RC osc. R=82K to +6V, C=56pf to GND(-6V)
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED) // guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_SO_CB(WRITELINE(lightfgt_state, write_so))
 	MCFG_COP400_WRITE_D_CB(WRITE8(lightfgt_state, write_d))
 	MCFG_COP400_WRITE_L_CB(WRITE8(lightfgt_state, write_l))

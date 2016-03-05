@@ -480,6 +480,19 @@ private:
 };
 
 
+class tp0320_cpu_device : public tms0980_cpu_device
+{
+public:
+	tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// overrides
+	//virtual void device_start() override;
+	//virtual void device_reset() override;
+
+	//virtual machine_config_constructor device_mconfig_additions() const override;
+};
+
 
 extern const device_type TMS1000;
 extern const device_type TMS1070;
@@ -499,6 +512,7 @@ extern const device_type TMS1990;
 extern const device_type TMS0980;
 extern const device_type TMS1980;
 extern const device_type TMS0270;
+extern const device_type TP0320;
 
 
 #endif /* _TMS0980_H_ */

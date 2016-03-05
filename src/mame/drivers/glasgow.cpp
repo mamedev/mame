@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Dirk Verwiebe, Robbbert, Cowering, Ralf Schaefer
+// license:BSD-3-Clause
+// copyright-holders:Dirk Verwiebe, Robbbert, Cowering
 /***************************************************************************
 Mephisto Glasgow 3 S chess computer
 Dirk V.
@@ -39,27 +39,19 @@ How to play (quick guide)
 Note about clickable artwork: You need to be running in windowed mode;
     and you need to use newui.
 
-R.Schaefer Oct 2010
-
-1. everything concerning chessboard moved to machine mboard
-2. Border pieces added. This allow setting up and repair chess positons
-3. chessboard added for Amsterdam, Dallas 16 Bit, Dallas 32 Bit, Roma 32 Bit
-4. Save states added.
-
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "glasgow.lh"
 #include "sound/beep.h"
-#include "includes/mboard.h"
 
 
-class glasgow_state : public mboard_state
+class glasgow_state : public driver_device
 {
 public:
 	glasgow_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mboard_state(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_beep(*this, "beeper"),
 		m_line0(*this, "LINE0"),
@@ -121,7 +113,6 @@ WRITE16_MEMBER( glasgow_state::glasgow_lcd_flag_w )
 	else
 	{
 		m_led7 = 0;
-		mboard_key_selector = 1;
 	}
 }
 
@@ -129,28 +120,17 @@ READ16_MEMBER( glasgow_state::glasgow_keys_r )
 {
 	UINT8 data = 0xff;
 
-	/* See if any keys pressed */
-	data = 3;
-
-	if (mboard_key_select == m_line0->read())
-		data &= 1;
-
-	if (mboard_key_select == m_line1->read())
-		data &= 2;
-
 	return data << 8;
 }
 
 WRITE16_MEMBER( glasgow_state::glasgow_keys_w )
 {
-	mboard_key_select = data >> 8;
 }
 
 WRITE16_MEMBER( glasgow_state::write_lcd )
 {
 	UINT8 lcd_data = data >> 8;
 
-	output().set_digit_value(m_lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
 	m_lcd_shift_counter--;
 	m_lcd_shift_counter &= 3;
 	logerror("LCD Offset = %d Data low = %x \n", offset, lcd_data);
@@ -159,12 +139,10 @@ WRITE16_MEMBER( glasgow_state::write_lcd )
 WRITE16_MEMBER( glasgow_state::write_lcd_flag )
 {
 //  UINT8 lcd_flag;
-	mboard_lcd_invert = 0;
 //  lcd_flag=data >> 8;
 	//m_beep->set_state((data >> 8) & 1 ? 1 : 0);
 	if ((data >> 8) == 0)
 	{
-		mboard_key_selector = 1;
 		m_led7 = 0;
 	}
 	else
@@ -191,16 +169,7 @@ WRITE16_MEMBER( glasgow_state::write_irq_flag )
 
 READ16_MEMBER( glasgow_state::read_newkeys16 )  //Amsterdam, Roma
 {
-	UINT16 data;
-
-	if (mboard_key_selector == 0)
-		data = m_line0->read();
-	else
-		data = m_line1->read();
-
-	logerror("read Keyboard Offset = %x Data = %x Select = %x \n", offset, data, mboard_key_selector);
-	data <<= 8;
-	return data ;
+	return 0;
 }
 
 
@@ -220,9 +189,6 @@ READ16_MEMBER(glasgow_state::read_test)
 
 WRITE32_MEMBER( glasgow_state::write_lcd32 )
 {
-	UINT8 lcd_data = data >> 8;
-
-	output().set_digit_value(m_lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
 	m_lcd_shift_counter--;
 	m_lcd_shift_counter &= 3;
 	//logerror("LCD Offset = %d Data   = %x \n  ", offset, lcd_data);
@@ -232,11 +198,8 @@ WRITE32_MEMBER( glasgow_state::write_lcd_flag32 )
 {
 //  UINT8 lcd_flag = data >> 24;
 
-	mboard_lcd_invert = 0;
-
 	if ((data >> 24) == 0)
 	{
-		mboard_key_selector = 1;
 		m_led7 = 0;
 	}
 	else
@@ -254,17 +217,7 @@ WRITE32_MEMBER( glasgow_state::write_lcd_flag32 )
 
 READ32_MEMBER( glasgow_state::read_newkeys32 ) // Dallas 32, Roma 32
 {
-	UINT32 data;
-
-	if (mboard_key_selector == 0)
-		data = m_line0->read();
-	else
-		data = m_line1->read();
-	//if (mboard_key_selector == 1) data = m_line0->read(); else data = 0;
-	if(data)
-		logerror("read Keyboard Offset = %x Data = %x\n", offset, data);
-	data <<= 24;
-	return data ;
+	return 0;
 }
 
 #ifdef UNUSED_FUNCTION
@@ -295,28 +248,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(glasgow_state::update_nmi32)
 
 void glasgow_state::machine_start()
 {
-	mboard_key_selector = 0;
 	m_irq_flag = 0;
 	m_lcd_shift_counter = 3;
-
-	mboard_savestate_register();
 }
 
 
 MACHINE_START_MEMBER(glasgow_state,dallas32)
 {
 	m_lcd_shift_counter = 3;
-
-	mboard_savestate_register();
 }
 
 
 void glasgow_state::machine_reset()
 {
 	m_lcd_shift_counter = 3;
-
-	mboard_set_border_pieces();
-	mboard_set_board();
 }
 
 static ADDRESS_MAP_START(glasgow_mem, AS_PROGRAM, 16, glasgow_state)
@@ -325,8 +270,6 @@ static ADDRESS_MAP_START(glasgow_mem, AS_PROGRAM, 16, glasgow_state)
 	AM_RANGE(0x00010000, 0x00010001) AM_WRITE(glasgow_lcd_w)
 	AM_RANGE(0x00010002, 0x00010003) AM_READWRITE(glasgow_keys_r,glasgow_keys_w)
 	AM_RANGE(0x00010004, 0x00010005) AM_WRITE(glasgow_lcd_flag_w)
-	AM_RANGE(0x00010006, 0x00010007) AM_READWRITE(mboard_read_board_16,mboard_write_LED_16)
-	AM_RANGE(0x00010008, 0x00010009) AM_WRITE(mboard_write_board_16)
 	AM_RANGE(0x0001c000, 0x0001ffff) AM_RAM     // 16KB
 ADDRESS_MAP_END
 
@@ -337,10 +280,7 @@ static ADDRESS_MAP_START(amsterd_mem, AS_PROGRAM, 16, glasgow_state)
 	AM_RANGE(0x00800002, 0x00800003) AM_WRITE(write_lcd)
 	AM_RANGE(0x00800008, 0x00800009) AM_WRITE(write_lcd_flag)
 	AM_RANGE(0x00800004, 0x00800005) AM_WRITE(write_irq_flag)
-	AM_RANGE(0x00800010, 0x00800011) AM_WRITE(mboard_write_board_16)
-	AM_RANGE(0x00800020, 0x00800021) AM_READ(mboard_read_board_16)
 	AM_RANGE(0x00800040, 0x00800041) AM_READ(read_newkeys16)
-	AM_RANGE(0x00800088, 0x00800089) AM_WRITE(mboard_write_LED_16)
 	AM_RANGE(0x00ffc000, 0x00ffffff) AM_RAM     // 16KB
 ADDRESS_MAP_END
 
@@ -352,10 +292,7 @@ static ADDRESS_MAP_START(dallas32_mem, AS_PROGRAM, 32, glasgow_state)
 	AM_RANGE(0x00800000, 0x00800003) AM_WRITE(write_lcd32)
 	AM_RANGE(0x00800004, 0x00800007) AM_WRITE(write_beeper32)
 	AM_RANGE(0x00800008, 0x0080000B) AM_WRITE(write_lcd_flag32)
-	AM_RANGE(0x00800010, 0x00800013) AM_WRITE(mboard_write_board_32)
-	AM_RANGE(0x00800020, 0x00800023) AM_READ(mboard_read_board_32)
 	AM_RANGE(0x00800040, 0x00800043) AM_READ(read_newkeys32)
-	AM_RANGE(0x00800088, 0x0080008b) AM_WRITE(mboard_write_LED_32)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( new_keyboard ) //Amsterdam, Dallas 32, Roma, Roma 32
@@ -407,12 +344,10 @@ INPUT_PORTS_EXTERN( chessboard);
 
 static INPUT_PORTS_START( oldkeys )
 	PORT_INCLUDE( old_keyboard )
-	PORT_INCLUDE( chessboard )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( newkeys )
 	PORT_INCLUDE( new_keyboard )
-	PORT_INCLUDE( chessboard )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( glasgow, glasgow_state )
@@ -424,7 +359,6 @@ static MACHINE_CONFIG_START( glasgow, glasgow_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", glasgow_state, update_nmi, attotime::from_hz(50))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", glasgow_state, mboard_update_artwork, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( amsterd, glasgow )
@@ -500,10 +434,10 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR, NAME,     PARENT,   COMPAT, MACHINE,     INPUT,          INIT, COMPANY,                      FULLNAME,                 FLAGS */
-CONS(  1984, glasgow,  0,        0,      glasgow,     oldkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto III S Glasgow", MACHINE_SUPPORTS_SAVE)
-CONS(  1984, amsterd,  0,        0,      amsterd,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Amsterdam",     MACHINE_SUPPORTS_SAVE)
-CONS(  1984, dallas,   glasgow,  0,      glasgow,     oldkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas",        MACHINE_SUPPORTS_SAVE)
+CONS(  1984, glasgow,  0,        0,      glasgow,     oldkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto III S Glasgow", MACHINE_NOT_WORKING)
+CONS(  1984, amsterd,  0,        0,      amsterd,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Amsterdam",     MACHINE_NOT_WORKING)
+CONS(  1984, dallas,   glasgow,  0,      glasgow,     oldkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas",        MACHINE_NOT_WORKING)
 CONS(  1984, roma,     amsterd,  0,      glasgow,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Roma",          MACHINE_NOT_WORKING)
-CONS(  1984, dallas32, amsterd,  0,      dallas32,    newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas 32 Bit", MACHINE_SUPPORTS_SAVE)
-CONS(  1984, roma32,   amsterd,  0,      dallas32,    newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Roma 32 Bit",   MACHINE_SUPPORTS_SAVE)
-CONS(  1984, dallas16, amsterd,  0,      amsterd,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas 16 Bit", MACHINE_SUPPORTS_SAVE)
+CONS(  1984, dallas32, amsterd,  0,      dallas32,    newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas 32 Bit", MACHINE_NOT_WORKING)
+CONS(  1984, roma32,   amsterd,  0,      dallas32,    newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Roma 32 Bit",   MACHINE_NOT_WORKING)
+CONS(  1984, dallas16, amsterd,  0,      amsterd,     newkeys, driver_device,        0, "Hegener & Glaser Muenchen", "Mephisto Dallas 16 Bit", MACHINE_NOT_WORKING)

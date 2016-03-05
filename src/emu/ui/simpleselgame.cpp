@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
-    ui/simpleselgame.c
+    ui/simpleselgame.cpp
 
     Game selector
 
@@ -135,7 +135,7 @@ void ui_simple_menu_select_game::handle()
 //-------------------------------------------------
 //  inkey_select
 //-------------------------------------------------
-extern void save_main_option(running_machine &machine);
+
 void ui_simple_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 {
 	const game_driver *driver = (const game_driver *)menu_event->itemref;
@@ -143,8 +143,6 @@ void ui_simple_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 	// special case for configure inputs
 	if ((FPTR)driver == 1)
 		ui_menu::stack_push(global_alloc_clear<ui_menu_game_options>(machine(), container));
-	else if ((FPTR)driver == 2)
-		save_main_option(machine());
 	// anything else is a driver
 	else
 	{
@@ -230,12 +228,12 @@ void ui_simple_menu_select_game::populate()
 	// if nothing there, add a single multiline item and return
 	if (matchcount == 0)
 	{
-		std::string txt;
-		strprintf(txt, "No machines found. Please check the rompath specified in the %s.ini file.\n\n"
-					"If this is your first time using %s, please see the config.txt file in "
-					"the docs directory for information on configuring %s.",
-					emulator_info::get_configname(),
-					emulator_info::get_appname(),emulator_info::get_appname() );
+		std::string txt = string_format(
+				_("No machines found. Please check the rompath specified in the %1$s.ini file.\n\n"
+				"If this is your first time using %2$s, please see the config.txt file in "
+				"the docs directory for information on configuring %2$s."),
+				emulator_info::get_configname(),
+				emulator_info::get_appname());
 		item_append(txt.c_str(), nullptr, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, nullptr);
 		return;
 	}
@@ -262,8 +260,7 @@ void ui_simple_menu_select_game::populate()
 	{
 		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 		item_append(_("Configure Options"), nullptr, 0, (void *)1);
-		item_append(_("Save Configuration"), nullptr, 0, (void *)2);
-		skip_main_items = 2;
+		skip_main_items = 1;
 	}
 
 	// configure the custom rendering
@@ -287,9 +284,9 @@ void ui_simple_menu_select_game::custom_render(void *selectedref, float top, flo
 
 	// display the current typeahead
 	if (m_search[0] != 0)
-		strprintf(tempbuf[0], "Type name or select: %s_", m_search);
+		tempbuf[0] = string_format(_("Type name or select: %1$s_"), m_search);
 	else
-		strprintf(tempbuf[0],"Type name or select: (random)");
+		tempbuf[0] = _("Type name or select: (random)");
 
 	// get the size of the text
 	machine().ui().draw_text_full(container, tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
@@ -322,36 +319,36 @@ void ui_simple_menu_select_game::custom_render(void *selectedref, float top, flo
 		const char *gfxstat, *soundstat;
 
 		// first line is game name
-		strprintf(tempbuf[0],"%-.100s", driver->description);
+		tempbuf[0] = string_format(_("%1$-.100s"), driver->description);
 
 		// next line is year, manufacturer
-		strprintf(tempbuf[1], "%s, %-.100s", driver->year, driver->manufacturer);
+		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
 
 		// next line source path
-		strprintf(tempbuf[2],"Driver: %-.100s", core_filename_extract_base(driver->source_file).c_str());
+		tempbuf[2] = string_format(_("Driver: %1$-.100s"), core_filename_extract_base(driver->source_file).c_str());
 
 		// next line is overall driver status
 		if (driver->flags & MACHINE_NOT_WORKING)
-			tempbuf[3].assign("Overall: NOT WORKING");
+			tempbuf[3].assign(_("Overall: NOT WORKING"));
 		else if (driver->flags & MACHINE_UNEMULATED_PROTECTION)
-			tempbuf[3].assign("Overall: Unemulated Protection");
+			tempbuf[3].assign(_("Overall: Unemulated Protection"));
 		else
-			tempbuf[3].assign("Overall: Working");
+			tempbuf[3].assign(_("Overall: Working"));
 
 		// next line is graphics, sound status
 		if (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS))
-			gfxstat = "Imperfect";
+			gfxstat = _("Imperfect");
 		else
-			gfxstat = "OK";
+			gfxstat = _("OK");
 
 		if (driver->flags & MACHINE_NO_SOUND)
-			soundstat = "Unimplemented";
+			soundstat = _("Unimplemented");
 		else if (driver->flags & MACHINE_IMPERFECT_SOUND)
-			soundstat = "Imperfect";
+			soundstat = _("Imperfect");
 		else
-			soundstat = "OK";
+			soundstat = _("OK");
 
-		strprintf(tempbuf[4], "Gfx: %s, Sound: %s", gfxstat, soundstat);
+		tempbuf[4] = string_format(_("Gfx: %s, Sound: %s"), gfxstat, soundstat);
 	}
 	else
 	{
@@ -359,7 +356,7 @@ void ui_simple_menu_select_game::custom_render(void *selectedref, float top, flo
 		line = 0;
 
 		// first line is version string
-		strprintf(tempbuf[line++], "%s %s", emulator_info::get_appname(), build_version);
+		tempbuf[line++] = string_format("%s %s", emulator_info::get_appname(), build_version);
 
 		// output message
 		while (line < ARRAY_LENGTH(tempbuf))

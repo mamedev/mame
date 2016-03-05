@@ -444,7 +444,7 @@ void nec_common_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				flags & 0x8000 ? 'N':'E',
 				flags & 0x4000 ? '?':'.',
 				flags & 0x2000 ? '?':'.',

@@ -416,19 +416,19 @@ void i4004_cpu_device::device_start()
 {
 	/* set up the state table */
 	{
-		state_add(I4004_PC,    "PC",    m_PC.w.l).mask(0x0fff);
-		state_add(STATE_GENPC, "GENPC", m_PC.w.l).mask(0x0fff).noshow();
+		state_add(I4004_PC,       "PC",       m_PC.w.l).mask(0x0fff);
+		state_add(STATE_GENPC,    "GENPC",    m_PC.w.l).mask(0x0fff).noshow();
 		state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).mask(0x0f).callimport().callexport().noshow().formatstr("%4s");
-		state_add(I4004_A,     "A",     m_A).mask(0x0f);
+		state_add(I4004_A,        "A",        m_A).mask(0x0f);
 
 		for (int regnum = 0; regnum < 8; regnum++)
 		{
-			state_add(I4004_R01 + regnum, strformat("R%X%X", regnum * 2, regnum * 2 + 1).c_str(), m_R[regnum]);
+			state_add(I4004_R01 + regnum, string_format("R%X%X", regnum * 2, regnum * 2 + 1).c_str(), m_R[regnum]);
 		}
 
 		for (int addrnum = 0; addrnum < 4; addrnum++)
 		{
-			state_add(I4004_ADDR1 + addrnum, strformat("ADDR%d", addrnum + 1).c_str(), m_ADDR[addrnum].w.l).mask(0xfff);
+			state_add(I4004_ADDR1 + addrnum, string_format("ADDR%d", addrnum + 1).c_str(), m_ADDR[addrnum].w.l).mask(0xfff);
 		}
 
 		state_add(I4004_RAM,   "RAM",   m_RAM.w.l).mask(0x0fff);
@@ -513,7 +513,7 @@ void i4004_cpu_device::state_string_export(const device_state_entry &entry, std:
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, ".%c%c%c",
+			str = string_format(".%c%c%c",
 				(m_A==0) ? 'Z':'.',
 				m_C      ? 'C':'.',
 				m_TEST   ? 'T':'.');

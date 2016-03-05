@@ -62,6 +62,7 @@
 # USE_SYSTEM_LIB_SQLITE3 = 1
 # USE_SYSTEM_LIB_PORTMIDI = 1
 # USE_SYSTEM_LIB_PORTAUDIO = 1
+# USE_BUNDLED_LIB_SDL2 = 1
 
 # MESA_INSTALL_ROOT = /opt/mesa
 # SDL_INSTALL_ROOT = /opt/sdl2
@@ -94,7 +95,9 @@
 
 # FORCE_VERSION_COMPILE = 1
 
-# MS BUILD = 1
+# MSBUILD = 1
+# USE_LIBUV = 1
+# IGNORE_BAD_LOCALISATION=1
 
 ifdef PREFIX_MAKEFILE
 include $(PREFIX_MAKEFILE)
@@ -171,10 +174,6 @@ endif
 ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
 OS := haiku
 endif
-ifeq ($(firstword $(filter OS/2,$(UNAME))),OS/2)
-OS := os2
-GENIEOS := os2
-endif
 ifndef OS
 $(error Unable to detect OS from uname -a: $(UNAME))
 endif
@@ -214,7 +213,7 @@ endif
 #-------------------------------------------------
 # specify OS target, which further differentiates
 # the underlying OS; supported values are:
-# win32, unix, macosx, os2
+# win32, unix, macosx
 #-------------------------------------------------
 
 ifndef TARGETOS
@@ -345,10 +344,6 @@ ifeq ($(TARGETOS),macosx)
 OSD := sdl
 endif
 
-ifeq ($(TARGETOS),os2)
-OSD := sdl
-endif
-
 ifeq ($(TARGETOS),asmjs)
 OSD := sdl
 endif
@@ -388,6 +383,12 @@ endif
 
 ifndef USE_SYSTEM_LIB_PORTAUDIO
 PARAMS += --with-bundled-portaudio
+endif
+
+# reverse logic for this one
+
+ifdef USE_BUNDLED_LIB_SDL2
+PARAMS += --with-bundled-sdl2
 endif
 
 #-------------------------------------------------
@@ -684,6 +685,10 @@ ifdef PLATFORM
 TARGET_PARAMS += --PLATFORM='$(PLATFORM)'
 endif
 
+ifdef USE_LIBUV
+PARAMS += --USE_LIBUV='$(USE_LIBUV)'
+endif
+
 #-------------------------------------------------
 # All scripts
 #-------------------------------------------------
@@ -733,9 +738,6 @@ EXE :=
 ifeq ($(OS),windows)
 EXE := .exe
 endif
-ifeq ($(OS),os2)
-EXE := .exe
-endif
 
 SHELLTYPE := msdos
 ifeq (,$(ComSpec)$(COMSPEC))
@@ -753,7 +755,7 @@ ifeq (posix,$(SHELLTYPE))
   COPY  = $(SILENT) cp -fR "$(1)" "$(2)"
 else
   MKDIR = $(SILENT) mkdir "$(subst /,\\,$(1))" 2> nul || exit 0
-  COPY  = $(SILENT) copy /Y "$(subst /,\\,$(1))" "$(subst /,\\,$(2))"
+  COPY  = $(SILENT) copy /Y "$(subst /,\\,$(1))" "$(subst /,\\,$(2))" > nul || exit 0
 endif
 
 GENDIR = $(BUILDDIR)/generated
@@ -887,108 +889,232 @@ windows_x86_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
 
+#-------------------------------------------------
+# Visual Studio 2013
+#-------------------------------------------------
+
 .PHONY: vs2013
 vs2013: generate
-	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows vs2013
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2013
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2013/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2013_intel
 vs2013_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows --vs=intel-15 vs2013
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2013
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2013-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2013_xp
 vs2013_xp: generate
-	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows --vs=vs2013-xp vs2013
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2013-xp vs2013
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2013-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
+#-------------------------------------------------
+# Visual Studio 2015
+#-------------------------------------------------
+
 .PHONY: vs2015
 vs2015: generate
-	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows vs2015
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2015
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2015_intel
 vs2015_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows --vs=intel-15 vs2015
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2015
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2015_xp
 vs2015_xp: generate
-	$(SILENT) $(GENIE) $(PARAMS) --osd=windows --targetos=windows --vs=vs2015-xp vs2015
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2015-xp vs2015
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
-.PHONY: android-arm
-android-arm: generate
+#-------------------------------------------------
+# android-arm
+#-------------------------------------------------
+
+$(PROJECTDIR_MINI)/gmake-android-arm/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_ARM
 	$(error ANDROID_NDK_ARM is not set)
 endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=4.9 --osd=osdmini --targetos=android-arm --PLATFORM=arm --NOASM=1 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=3.6.0 --osd=osdmini --targetos=android-arm --targetos=android --PLATFORM=arm --NOASM=1 gmake
+
+.PHONY: android-arm
+android-arm: generate $(PROJECTDIR_MINI)/gmake-android-arm/Makefile
+ifndef ANDROID_NDK_ARM
+	$(error ANDROID_NDK_ARM is not set)
 endif
+ifndef ANDROID_NDK_ROOT
+	$(error ANDROID_NDK_ROOT is not set)
+endif	
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-arm config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-arm config=$(CONFIG)
 
-.PHONY: android-mips
-android-mips: generate
+#-------------------------------------------------
+# android-arm64
+#-------------------------------------------------
+
+$(PROJECTDIR_MINI)/gmake-android-arm64/Makefile: makefile $(SCRIPTS) $(GENIE)
+ifndef ANDROID_NDK_ARM64
+	$(error ANDROID_NDK_ARM64 is not set)
+endif
+ifndef ANDROID_NDK_ROOT
+	$(error ANDROID_NDK_ROOT is not set)
+endif
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm64 --gcc_version=3.6.0 --osd=osdmini --targetos=android-arm64 --targetos=android --PLATFORM=arm64 --NOASM=1 gmake
+
+.PHONY: android-arm64
+android-arm64: generate $(PROJECTDIR_MINI)/gmake-android-arm64/Makefile
+ifndef ANDROID_NDK_ARM64
+	$(error ANDROID_NDK_ARM64 is not set)
+endif
+ifndef ANDROID_NDK_ROOT
+	$(error ANDROID_NDK_ROOT is not set)
+endif	
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-arm64 config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-arm64 config=$(CONFIG)
+
+#-------------------------------------------------
+# android-mips
+#-------------------------------------------------
+
+$(PROJECTDIR_MINI)/gmake-android-mips/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_MIPS
 	$(error ANDROID_NDK_MIPS is not set)
 endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=4.9 --osd=osdmini --targetos=android-mips --PLATFORM=mips --NOASM=1 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=3.6.0 --osd=osdmini --targetos=android-mips --targetos=android --PLATFORM=mips --NOASM=1 gmake
+
+.PHONY: android-mips
+android-mips: generate $(PROJECTDIR_MINI)/gmake-android-mips/Makefile
+ifndef ANDROID_NDK_MIPS
+	$(error ANDROID_NDK_MIPS is not set)
+endif
+ifndef ANDROID_NDK_ROOT
+	$(error ANDROID_NDK_ROOT is not set)
 endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-mips config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-mips config=$(CONFIG)
 
-.PHONY: android-x86
-android-x86: generate
+#-------------------------------------------------
+# android-mips64
+#-------------------------------------------------
+
+$(PROJECTDIR_MINI)/gmake-android-mips64/Makefile: makefile $(SCRIPTS) $(GENIE)
+ifndef ANDROID_NDK_MIPS64
+	$(error ANDROID_NDK_MIPS64 is not set)
+endif
+ifndef ANDROID_NDK_ROOT
+	$(error ANDROID_NDK_ROOT is not set)
+endif
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips64 --gcc_version=3.6.0 --osd=osdmini --targetos=android-mips64 --targetos=android --PLATFORM=mips64 --NOASM=1 gmake
+
+.PHONY: android-mips64
+android-mips64: generate $(PROJECTDIR_MINI)/gmake-android-mips64/Makefile
+ifndef ANDROID_NDK_MIPS64
+	$(error ANDROID_NDK_MIPS64 is not set)
+endif
+ifndef ANDROID_NDK_ROOT
+	$(error ANDROID_NDK_ROOT is not set)
+endif
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-mips64 config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-mips64 config=$(CONFIG)
+
+#-------------------------------------------------
+# android-x86
+#-------------------------------------------------
+
+$(PROJECTDIR_MINI)/gmake-android-x86/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_X86
 	$(error ANDROID_NDK_X86 is not set)
 endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=4.9 --osd=osdmini --targetos=android-x86 --PLATFORM=x86 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=3.6.0 --osd=osdmini --targetos=android-x86 --targetos=android --PLATFORM=x86 gmake
+
+.PHONY: android-x86
+android-x86: generate $(PROJECTDIR_MINI)/gmake-android-x86/Makefile
+ifndef ANDROID_NDK_X86
+	$(error ANDROID_NDK_X86 is not set)
+endif
+ifndef ANDROID_NDK_ROOT
+	$(error ANDROID_NDK_ROOT is not set)
 endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-x86 config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-x86 config=$(CONFIG)
 
-.PHONY: asmjs
-asmjs: generate
+#-------------------------------------------------
+# android-x64
+#-------------------------------------------------
+
+$(PROJECTDIR_MINI)/gmake-android-x64/Makefile: makefile $(SCRIPTS) $(GENIE)
+ifndef ANDROID_NDK_X64
+	$(error ANDROID_NDK_X64 is not set)
+endif
+ifndef ANDROID_NDK_ROOT
+	$(error ANDROID_NDK_ROOT is not set)
+endif
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x64 --gcc_version=3.6.0 --osd=osdmini --targetos=android-x64 --targetos=android --PLATFORM=x64 gmake
+
+.PHONY: android-x64
+android-x64: generate $(PROJECTDIR_MINI)/gmake-android-x64/Makefile
+ifndef ANDROID_NDK_X64
+	$(error ANDROID_NDK_X64 is not set)
+endif
+ifndef ANDROID_NDK_ROOT
+	$(error ANDROID_NDK_ROOT is not set)
+endif
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-x64 config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-x64 config=$(CONFIG)
+
+#-------------------------------------------------
+# asmjs / Emscripten
+#-------------------------------------------------
+
+$(PROJECTDIR)/gmake-asmjs/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef EMSCRIPTEN
 	$(error EMSCRIPTEN is not set)
 endif
-ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=asmjs --gcc_version=3.7.0 gmake
+
+.PHONY: asmjs
+asmjs: generate $(PROJECTDIR)/gmake-asmjs/Makefile
+ifndef EMSCRIPTEN
+	$(error EMSCRIPTEN is not set)
 endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-asmjs config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-asmjs config=$(CONFIG)
 
-.PHONY: pnacl
-pnacl: generate
+#-------------------------------------------------
+# PNaCl
+#-------------------------------------------------
+
+$(PROJECTDIR_MINI)/gmake-pnacl/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef NACL_SDK_ROOT
 	$(error NACL_SDK_ROOT is not set)
 endif
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=pnacl --gcc_version=3.7.0 --osd=osdmini --targetos=pnacl --NOASM=1 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=pnacl --gcc_version=3.7.0 --osd=osdmini --targetos=pnacl --NOASM=1 --USE_LIBUV=0 gmake
+
+.PHONY: pnacl
+pnacl: generate $(PROJECTDIR_MINI)/gmake-pnacl/Makefile
+ifndef NACL_SDK_ROOT
+	$(error NACL_SDK_ROOT is not set)
 endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-pnacl config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-pnacl config=$(CONFIG)
@@ -1103,7 +1229,6 @@ solaris_x86: generate $(PROJECTDIR)/gmake-solaris/Makefile
 # gmake-freebsd
 #-------------------------------------------------
 
-
 $(PROJECTDIR)/gmake-freebsd/Makefile: makefile $(SCRIPTS) $(GENIE)
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=freebsd --gcc_version=$(GCC_VERSION) gmake
 
@@ -1120,11 +1245,9 @@ freebsd_x86: generate $(PROJECTDIR)/gmake-freebsd/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-freebsd config=$(CONFIG)32 precompile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-freebsd config=$(CONFIG)32
 
-
 #-------------------------------------------------
 # gmake-netbsd
 #-------------------------------------------------
-
 
 $(PROJECTDIR)/gmake-netbsd/Makefile: makefile $(SCRIPTS) $(GENIE)
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=netbsd --gcc_version=$(GCC_VERSION) gmake
@@ -1141,24 +1264,6 @@ netbsd: netbsd_x86
 netbsd_x86: generate $(PROJECTDIR)/gmake-netbsd/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-netbsd config=$(CONFIG)32 precompile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-netbsd config=$(CONFIG)32
-
-
-#-------------------------------------------------
-# gmake-os2
-#-------------------------------------------------
-
-
-$(PROJECTDIR)/gmake-os2/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=os2 --gcc_version=$(GCC_VERSION) gmake
-
-.PHONY: os2
-os2: os2_x86
-
-.PHONY: os2_x86
-os2_x86: generate $(PROJECTDIR)/gmake-os2/Makefile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-os2 config=$(CONFIG)32 precompile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-os2 config=$(CONFIG)32
-
 
 #-------------------------------------------------
 # gmake-steamlink
@@ -1184,8 +1289,6 @@ steamlink: generate $(PROJECTDIR)/gmake-steamlink/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-steamlink config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-steamlink config=$(CONFIG)
 
-
-
 #-------------------------------------------------
 # cmake
 #-------------------------------------------------
@@ -1199,7 +1302,6 @@ else
 	$(SILENT)echo "cmake_minimum_required(VERSION 2.8.4)" > CMakeLists.txt
 	$(SILENT)echo "add_subdirectory($(PROJECTDIR)/cmake)" >> CMakeLists.txt
 endif
-
 
 #-------------------------------------------------
 # Clean/bootstrap
@@ -1244,7 +1346,12 @@ generate: \
 		$(GEN_FOLDERS) \
 		$(patsubst %.po,%.mo,$(call rwildcard, language/, *.po)) \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
-		$(SRC)/devices/cpu/m68000/m68kops.cpp
+		$(SRC)/devices/cpu/m68000/m68kops.cpp \
+		$(GENDIR)/includes/SDL2
+
+$(GENDIR)/includes/SDL2:
+	-$(call MKDIR,$@)
+	-$(call COPY,3rdparty/SDL2/include/,$(GENDIR)/includes/SDL2)
 
 $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/file2str.py | $(GEN_FOLDERS)
 	@echo Converting $<...
@@ -1259,8 +1366,11 @@ endif
 
 %.mo: %.po
 	@echo Converting translation $<...
+ifdef IGNORE_BAD_LOCALISATION
+	$(SILENT)$(PYTHON) scripts/build/msgfmt.py --output-file $@ $< || exit 0
+else
 	$(SILENT)$(PYTHON) scripts/build/msgfmt.py --output-file $@ $<
-
+endif
 #-------------------------------------------------
 # Regression tests
 #-------------------------------------------------
@@ -1355,15 +1465,24 @@ cppcheck:
 	@echo Generate CppCheck analysis report
 	cppcheck --enable=all src/ $(CPPCHECK_PARAMS) -j9
 
+#-------------------------------------------------
+# BGFX shaders
+#-------------------------------------------------
+
 .PHONY: shaders
 
 shaders:
 	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx rebuild
 	
+#-------------------------------------------------
+# Translation
+#-------------------------------------------------
+
 .PHONY: translation
 
 translation:
 	$(SILENT) echo Generating mame.pot
 	$(SILENT) find src -iname "*.cpp" | xargs xgettext --from-code=UTF-8 -k_ -k__ -o mame.pot
-	$(SILENT) find language -iname "*.po" | xargs -n 1 -I %% msgmerge -U %% mame.pot 
+	$(SILENT) find language -iname "*.po" | xargs -n 1 -I %% msgmerge -U -N %% mame.pot 
+	$(SILENT) find language -iname "*.po" | xargs -n 1 -I %% msgattrib --clear-fuzzy --empty %% -o %%
 

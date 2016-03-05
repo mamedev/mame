@@ -75,7 +75,7 @@ protected:
 	void omti_disk_config(UINT16 disk_type);
 
 private:
-	void logerror(const char *format, ...) const;
+	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 
 public:
 	UINT16 m_type;
@@ -693,12 +693,10 @@ void omti8621_device::set_esdi_defect_list(UINT8 lun, UINT8 head)
  logerror - log an error message (w/o device tags)
  -------------------------------------------------*/
 
-void omti8621_device::logerror(const char *format, ...) const
+template <typename Format, typename... Params>
+void omti8621_device::logerror(Format &&fmt, Params &&... args) const
 {
-	va_list arg;
-	va_start(arg, format);
-	machine().vlogerror(format, arg);
-	va_end(arg);
+	machine().logerror(std::forward<Format>(fmt), std::forward<Params>(args)...);
 }
 
 /***************************************************************************
@@ -1358,12 +1356,10 @@ void omti_disk_image_device::omti_disk_config(UINT16 disk_type)
  logerror - log an error message (w/o device tags)
  -------------------------------------------------*/
 
-void omti_disk_image_device::logerror(const char *format, ...) const
+template <typename Format, typename... Params>
+void omti_disk_image_device::logerror(Format &&fmt, Params &&... args) const
 {
-	va_list arg;
-	va_start(arg, format);
-	machine().vlogerror(format, arg);
-	va_end(arg);
+	machine().logerror(std::forward<Format>(fmt), std::forward<Params>(args)...);
 }
 
 /*-------------------------------------------------

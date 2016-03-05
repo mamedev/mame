@@ -334,14 +334,14 @@ void emu_options::add_device_options()
 			add_entry(nullptr, "IMAGE DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
 
 		// retrieve info about the device instance
-		std::string option_name;
-		strprintf(option_name, "%s;%s", image->instance_name(), image->brief_instance_name());
+		std::ostringstream option_name;
+		util::stream_format(option_name, "%s;%s", image->instance_name(), image->brief_instance_name());
 		if (strcmp(image->device_typename(image->image_type()), image->instance_name()) == 0)
-			strcatprintf(option_name, ";%s1;%s1", image->instance_name(), image->brief_instance_name());
+			util::stream_format(option_name, ";%s1;%s1", image->instance_name(), image->brief_instance_name());
 
 		// add the option
 		if (!exists(image->instance_name()))
-			add_entry(option_name.c_str(), nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, nullptr, true);
+			add_entry(option_name.str().c_str(), nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, nullptr, true);
 	}
 }
 
@@ -574,8 +574,8 @@ bool emu_options::parse_one_ini(const char *basename, int priority, std::string 
 	bool result = parse_ini_file((core_file&)file, priority, OPTION_PRIORITY_DRIVER_INI, error);
 
 	// append errors if requested
-	if (!error.empty() && error_string != nullptr)
-		strcatprintf(*error_string, "While parsing %s:\n%s\n", file.fullpath(), error.c_str());
+	if (!error.empty() && error_string)
+		error_string->append(string_format("While parsing %s:\n%s\n", file.fullpath(), error));
 
 	return result;
 }

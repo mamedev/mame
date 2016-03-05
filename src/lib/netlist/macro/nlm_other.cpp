@@ -1,4 +1,5 @@
-
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 #include "nlm_other.h"
 
 #include "devices/nld_truthtable.h"

@@ -38,6 +38,7 @@
 #define __POLY_H__
 
 #include <limits.h>
+#include <atomic>
 
 //**************************************************************************
 //  DEBUGGING
@@ -165,7 +166,7 @@ private:
 	// internal unit of work
 	struct work_unit
 	{
-		volatile UINT32     count_next;             // number of scanlines and index of next item to process
+		std::atomic<UINT32> count_next;             // number of scanlines and index of next item to process
 		polygon_info *      polygon;                // pointer to polygon
 		INT16               scanline;               // starting scanline
 		UINT16              previtem;               // index of previous item in the same bucket
@@ -405,7 +406,7 @@ void *poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::work_item_cal
 				{
 					orig_count_next = prevunit.count_next;
 					new_count_next = orig_count_next | (unitnum << 16);
-				} while (compare_exchange32((volatile INT32 *)&prevunit.count_next, orig_count_next, new_count_next) != orig_count_next);
+				} while (!prevunit.count_next.compare_exchange_weak(orig_count_next, new_count_next, std::memory_order_release, std::memory_order_relaxed));
 
 #if KEEP_POLY_STATISTICS
 				// track resolved conflicts
@@ -427,7 +428,7 @@ void *poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::work_item_cal
 		do
 		{
 			orig_count_next = unit.count_next;
-		} while (compare_exchange32((volatile INT32 *)&unit.count_next, orig_count_next, 0) != orig_count_next);
+		} while (!unit.count_next.compare_exchange_weak(orig_count_next, 0, std::memory_order_release, std::memory_order_relaxed));
 
 		// if we have no more work to do, do nothing
 		orig_count_next >>= 16;

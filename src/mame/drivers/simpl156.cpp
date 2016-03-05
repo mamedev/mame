@@ -485,7 +485,7 @@ This is a higher quality bootleg made with genuine DECO chips/parts.
 |      93C45  05.u29            |
 +-------------------------------+
 
-All roms are socketted eproms, no labels, just a number in pencel.
+All roms are socketed eproms, no labels, just a number in pencel.
 
 05.u29  27c4096
 01.u8l  27c4096

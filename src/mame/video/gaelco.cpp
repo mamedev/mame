@@ -114,7 +114,7 @@ VIDEO_START_MEMBER(gaelco_state,maniacsq)
       1  | xxxxxxxx xxxxxxxx | not used
       2  | -------x xxxxxxxx | x position
       2  | -xxxxxx- -------- | sprite color
-      3  | -------- ------xx | sprite code (8x8 cuadrant)
+      3  | -------- ------xx | sprite code (8x8 quadrant)
       3  | xxxxxxxx xxxxxx-- | sprite code
 */
 

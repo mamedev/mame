@@ -31,7 +31,7 @@ void ui_menu_cheat::handle()
 		bool changed = false;
 
 		/* clear cheat comment on any movement or keypress */
-		machine().popmessage(nullptr);
+		machine().popmessage();
 
 		/* handle reset all + reset all cheats for reload all option */
 		if ((menu_event->itemref == ITEMREF_CHEATS_RESET_ALL || menu_event->itemref == ITEMREF_CHEATS_RELOAD_ALL) && menu_event->iptkey == IPT_UI_SELECT)

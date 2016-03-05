@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods, Maurizio Petrarota
 /*********************************************************************
 
-    ui/menu.c
+    ui/menu.cpp
 
     Internal MAME menus for the user interface.
 
@@ -40,31 +40,29 @@ struct ui_arts_info
 
 static const ui_arts_info arts_info[] =
 {
-	{ "Snapshots", OPTION_SNAPSHOT_DIRECTORY, "snap" },
-	{ "Cabinets", OPTION_CABINETS_PATH, "cabinets;cabdevs" },
-	{ "Control Panels", OPTION_CPANELS_PATH, "cpanel" },
-	{ "PCBs", OPTION_PCBS_PATH, "pcb" },
-	{ "Flyers", OPTION_FLYERS_PATH, "flyers" },
-	{ "Titles", OPTION_TITLES_PATH, "titles" },
-	{ "Ends", OPTION_ENDS_PATH, "ends" },
-	{ "Artwork Preview", OPTION_ARTPREV_PATH, "artwork preview" },
-	{ "Bosses", OPTION_BOSSES_PATH, "bosses" },
-	{ "Logos", OPTION_LOGOS_PATH, "logo" },
-	{ "Versus", OPTION_VERSUS_PATH, "versus" },
-	{ "Game Over", OPTION_GAMEOVER_PATH, "gameover" },
-	{ "HowTo", OPTION_HOWTO_PATH, "howto" },
-	{ "Scores", OPTION_SCORES_PATH, "scores" },
-	{ "Select", OPTION_SELECT_PATH, "select" },
-	{ "Marquees", OPTION_MARQUEES_PATH, "marquees" },
+	{ __("Snapshots"), OPTION_SNAPSHOT_DIRECTORY, "snap" },
+	{ __("Cabinets"), OPTION_CABINETS_PATH, "cabinets;cabdevs" },
+	{ __("Control Panels"), OPTION_CPANELS_PATH, "cpanel" },
+	{ __("PCBs"), OPTION_PCBS_PATH, "pcb" },
+	{ __("Flyers"), OPTION_FLYERS_PATH, "flyers" },
+	{ __("Titles"), OPTION_TITLES_PATH, "titles" },
+	{ __("Ends"), OPTION_ENDS_PATH, "ends" },
+	{ __("Artwork Preview"), OPTION_ARTPREV_PATH, "artwork preview" },
+	{ __("Bosses"), OPTION_BOSSES_PATH, "bosses" },
+	{ __("Logos"), OPTION_LOGOS_PATH, "logo" },
+	{ __("Versus"), OPTION_VERSUS_PATH, "versus" },
+	{ __("Game Over"), OPTION_GAMEOVER_PATH, "gameover" },
+	{ __("HowTo"), OPTION_HOWTO_PATH, "howto" },
+	{ __("Scores"), OPTION_SCORES_PATH, "scores" },
+	{ __("Select"), OPTION_SELECT_PATH, "select" },
+	{ __("Marquees"), OPTION_MARQUEES_PATH, "marquees" },
 	{ nullptr }
 };
 
 static const char *hover_msg[] = {
-	"Add or remove favorites",
-	"Export displayed list to file",
-	"Show DATs view",
-	"Setup directories",
-	"Configure options"
+	__("Add or remove favorites"),
+	__("Export displayed list to file"),
+	__("Show DATs view"),
 };
 
 /***************************************************************************
@@ -248,25 +246,23 @@ void ui_menu::reset(ui_menu_reset_options options)
 	item.clear();
 	visitems = 0;
 	selected = 0;
-	std::string backtext;
-	strprintf(backtext, "Return to Machine");
 
 	// add an item to return
 	if (parent == nullptr)
-		item_append(backtext.c_str(), nullptr, 0, nullptr);
+		item_append(_("Return to Machine"), nullptr, 0, nullptr);
 	else if (parent->is_special_main_menu())
 	{
 		if (strcmp(machine().options().ui(), "simple") == 0) 
-			item_append("Exit", nullptr, 0, nullptr);
+			item_append(_("Exit"), nullptr, 0, nullptr);
 		else
-			item_append("Exit", nullptr, MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, nullptr);
+			item_append(_("Exit"), nullptr, MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, nullptr);
 	}
 	else
 	{
 		if (strcmp(machine().options().ui(), "simple") != 0 && ui_menu::stack_has_special_main_menu())
-			item_append("Return to Previous Menu", nullptr, MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, nullptr);
+			item_append(_("Return to Previous Menu"), nullptr, MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, nullptr);
 		else
-			item_append("Return to Previous Menu", nullptr, 0, nullptr);
+			item_append(_("Return to Previous Menu"), nullptr, 0, nullptr);
 	}
 
 }
@@ -548,7 +544,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 		machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// determine the first visible line based on the current selection
-	if (selected > top_line + visible_lines)
+	if (selected > top_line + visible_lines || selected < top_line - visible_lines)
 		top_line = selected - (visible_lines / 2);
 	if (top_line < 0 || selected == 0)
 		top_line = 0;
@@ -675,13 +671,13 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 				}
 
 				// customize subitem text color
-				if (!core_stricmp(subitem_text, "On"))
+				if (!core_stricmp(subitem_text, _("On")))
 					fgcolor2 = rgb_t(0xff,0x00,0xff,0x00);
 
-				if (!core_stricmp(subitem_text, "Off"))
+				if (!core_stricmp(subitem_text, _("Off")))
 					fgcolor2 = rgb_t(0xff,0xff,0x00,0x00);
 
-				if (!core_stricmp(subitem_text, "Auto"))
+				if (!core_stricmp(subitem_text, _("Auto")))
 					fgcolor2 = rgb_t(0xff,0xff,0xff,0x00);
 
 				// draw the subitem right-justified
@@ -1591,18 +1587,16 @@ void ui_menu::draw_select_game(bool noinput)
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+			mui.draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(255, 43, 43, 43),
+				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		}
 		// else if the mouse is over this item, draw with a different background
 		else if (count == hover)
 		{
 			fgcolor = UI_MOUSEOVER_COLOR;
 			bgcolor = UI_MOUSEOVER_BG_COLOR;
+			highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
 		}
-
-		// if we have some background hilighting to do, add a quad behind everything else
-		if (bgcolor != UI_TEXT_BG_COLOR)
-			mui.draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(255, 43, 43, 43),
-				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
 			container->add_line(visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
@@ -1649,7 +1643,7 @@ void ui_menu::draw_select_game(bool noinput)
 void ui_menu::get_title_search(std::string &snaptext, std::string &searchstr)
 {
 	// get arts title text
-	snaptext.assign(arts_info[ui_globals::curimage_view].title);
+	snaptext.assign(_(arts_info[ui_globals::curimage_view].title));
 
 	// get search path
 	if (ui_globals::curimage_view == SNAPSHOT_VIEW)
@@ -1657,14 +1651,17 @@ void ui_menu::get_title_search(std::string &snaptext, std::string &searchstr)
 	else
 		searchstr = machine().ui().options().value(arts_info[ui_globals::curimage_view].path);
 
-	path_iterator path(searchstr.c_str());
+	std::string tmp(searchstr);
+	path_iterator path(tmp.c_str());
 	std::string curpath;
+
+	path_iterator path_iter(arts_info[ui_globals::curimage_view].addpath);
+	std::string c_path;
 
 	// iterate over path and add path for zipped formats
 	while (path.next(curpath))
 	{
-		path_iterator path_iter(arts_info[ui_globals::curimage_view].addpath);
-		std::string c_path;
+		path_iter.reset();
 		while (path_iter.next(c_path))
 			searchstr.append(";").append(curpath).append(PATH_SEPARATOR).append(c_path);
 	}
@@ -1707,22 +1704,27 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	validate_selection(1);
 
 	// swallow left/right keys if they are not appropriate
-	bool ignoreleft = ((item[selected].flags & MENU_FLAG_LEFT_ARROW) == 0 || ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL);
-	bool ignoreright = ((item[selected].flags & MENU_FLAG_RIGHT_ARROW) == 0 || ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL);
+	bool ignoreleft = ((item[selected].flags & MENU_FLAG_LEFT_ARROW) == 0);
+	bool ignoreright = ((item[selected].flags & MENU_FLAG_RIGHT_ARROW) == 0);
 	bool leftclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_LEFT_PANEL);
+	bool rightclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL);
 
-	input_manager &minput = machine().input();
 	// accept left/right keys as-is with repeat
 	if (!ignoreleft && exclusive_input_pressed(IPT_UI_LEFT, (flags & UI_MENU_PROCESS_LR_REPEAT) ? 6 : 0))
 	{
 		// Swap the right panel
-		if (minput.code_pressed(KEYCODE_LCONTROL) || minput.code_pressed(JOYCODE_BUTTON1))
+		if (m_focus == focused_menu::righttop)
 			menu_event.iptkey = IPT_UI_LEFT_PANEL;
 		return;
 	}
 
 	if (!ignoreright && exclusive_input_pressed(IPT_UI_RIGHT, (flags & UI_MENU_PROCESS_LR_REPEAT) ? 6 : 0))
+	{
+		// Swap the right panel
+		if (m_focus == focused_menu::righttop)
+			menu_event.iptkey = IPT_UI_RIGHT_PANEL;
 		return;
+	}
 
 	// up backs up by one item
 	if (exclusive_input_pressed(IPT_UI_UP, 6))
@@ -1735,7 +1737,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 		}
 
 		// Infos
-		if (!ignoreleft && (minput.code_pressed(KEYCODE_LCONTROL) || minput.code_pressed(JOYCODE_BUTTON1)))
+		if (!rightclose && m_focus == focused_menu::rightbottom)
 		{
 			menu_event.iptkey = IPT_UI_UP_PANEL;
 			topline_datsview--;
@@ -1762,7 +1764,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 		}
 
 		// Infos
-		if (!ignoreright && (minput.code_pressed(KEYCODE_LCONTROL) || minput.code_pressed(JOYCODE_BUTTON1)))
+		if (!rightclose && m_focus == focused_menu::rightbottom)
 		{
 			menu_event.iptkey = IPT_UI_DOWN_PANEL;
 			topline_datsview++;
@@ -1782,7 +1784,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	if (exclusive_input_pressed(IPT_UI_PAGE_UP, 6))
 	{
 		// Infos
-		if (!ignoreleft && (minput.code_pressed(KEYCODE_LCONTROL) || minput.code_pressed(JOYCODE_BUTTON1)))
+		if (!rightclose && m_focus == focused_menu::rightbottom)
 		{
 			menu_event.iptkey = IPT_UI_DOWN_PANEL;
 			topline_datsview -= right_visible_lines - 1;
@@ -1804,7 +1806,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	if (exclusive_input_pressed(IPT_UI_PAGE_DOWN, 6))
 	{
 		// Infos
-		if (!ignoreleft && (minput.code_pressed(KEYCODE_LCONTROL) || minput.code_pressed(JOYCODE_BUTTON1)))
+		if (!rightclose && m_focus == focused_menu::rightbottom)
 		{
 			menu_event.iptkey = IPT_UI_DOWN_PANEL;
 			topline_datsview += right_visible_lines - 1;
@@ -1826,7 +1828,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	if (exclusive_input_pressed(IPT_UI_HOME, 0))
 	{
 		// Infos
-		if (!ignoreleft && (minput.code_pressed(KEYCODE_LCONTROL) || minput.code_pressed(JOYCODE_BUTTON1)))
+		if (!rightclose && m_focus == focused_menu::rightbottom)
 		{
 			menu_event.iptkey = IPT_UI_DOWN_PANEL;
 			topline_datsview = 0;
@@ -1844,7 +1846,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	if (exclusive_input_pressed(IPT_UI_END, 0))
 	{
 		// Infos
-		if (!ignoreleft && (minput.code_pressed(KEYCODE_LCONTROL) || minput.code_pressed(JOYCODE_BUTTON1)))
+		if (!rightclose && m_focus == focused_menu::rightbottom)
 		{
 			menu_event.iptkey = IPT_UI_DOWN_PANEL;
 			topline_datsview = totallines;
@@ -1906,6 +1908,8 @@ void ui_menu::handle_main_events(UINT32 flags)
 			{
 				if (hover >= 0 && hover < item.size())
 				{
+					if (hover >= visible_items - 1 && selected < visible_items)
+						m_prev_selected = item[selected].ref;
 					selected = hover;
 					m_focus = focused_menu::main;
 				}
@@ -1966,18 +1970,6 @@ void ui_menu::handle_main_events(UINT32 flags)
 				else if (hover == HOVER_B_DATS)
 				{
 					menu_event.iptkey = IPT_UI_DATS;
-					stop = true;
-				}
-				else if (hover == HOVER_B_SETTINGS)
-				{
-					menu_event.iptkey = IPT_UI_SELECT;
-					selected = visible_items + 1;
-					stop = true;
-				}
-				else if (hover == HOVER_B_FOLDERS)
-				{
-					menu_event.iptkey = IPT_UI_SELECT;
-					selected = visible_items + 2;
 					stop = true;
 				}
 				else if (hover >= HOVER_RP_FIRST && hover <= HOVER_RP_LAST)
@@ -2078,8 +2070,8 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 	container->add_line(x1 + midl, y1, x1 + midl, y1 + line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	std::string buffer[RP_LAST + 1];
-	buffer[RP_IMAGES].assign("Images");
-	buffer[RP_INFOS].assign("Infos");
+	buffer[RP_IMAGES] = _("Images");
+	buffer[RP_INFOS] = _("Infos");
 
 	for (int cells = RP_IMAGES; cells <= RP_INFOS; cells++)
 	{
@@ -2104,9 +2096,17 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 				fgcolor = UI_CLONE_COLOR;
 		}
 
-		if (bgcolor != UI_TEXT_BG_COLOR)
+		if (m_focus == focused_menu::righttop && ui_globals::rpanel == cells)
+		{
+			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
+			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+			mui.draw_textured_box(container, x1 + UI_LINE_WIDTH, y1 + UI_LINE_WIDTH, x1 + midl - UI_LINE_WIDTH, y1 + line_height,
+				bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+		}
+
+		if (bgcolor == UI_MOUSEOVER_BG_COLOR)
 			container->add_rect(x1 + UI_LINE_WIDTH, y1 + UI_LINE_WIDTH, x1 + midl - UI_LINE_WIDTH, y1 + line_height,
-			bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+				bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		mui.draw_text_full(container, buffer[cells].c_str(), x1 + UI_LINE_WIDTH, y1, midl - UI_LINE_WIDTH,
 			JUSTIFY_CENTER, WRAP_NEVER, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
@@ -2122,6 +2122,8 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 
 std::string ui_menu::arts_render_common(float origx1, float origy1, float origx2, float origy2)
 {
+	ui_manager &mui = machine().ui();
+	float line_height = mui.get_line_height();
 	std::string snaptext, searchstr;
 	get_title_search(snaptext, searchstr);
 
@@ -2131,7 +2133,7 @@ std::string ui_menu::arts_render_common(float origx1, float origy1, float origx2
 
 	for (int x = FIRST_VIEW; x < LAST_VIEW; x++)
 	{
-		machine().ui().draw_text_full(container, arts_info[x].title, origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
+		mui.draw_text_full(container, _(arts_info[x].title), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
 			WRAP_TRUNCATE, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &txt_lenght, nullptr);
 		txt_lenght += 0.01f;
 		title_size = MAX(txt_lenght, title_size);
@@ -2145,7 +2147,13 @@ std::string ui_menu::arts_render_common(float origx1, float origy1, float origx2
 		bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
 	}
 
-	machine().ui().draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	float middle = origx2 - origx1;
+
+	if (bgcolor != UI_TEXT_BG_COLOR)
+		mui.draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
+			origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+
+	mui.draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 		DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 
 	draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
@@ -2204,7 +2212,7 @@ void ui_menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software
 				hover = HOVER_B_FAV + z;
 				color = ARGB_WHITE;
 				float ypos = y2 + machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
-				mui.draw_text_box(container, hover_msg[z], JUSTIFY_CENTER, 0.5f, ypos, UI_BACKGROUND_COLOR);
+				mui.draw_text_box(container, _(hover_msg[z]), JUSTIFY_CENTER, 0.5f, ypos, UI_BACKGROUND_COLOR);
 			}
 
 			container->add_quad(x1, y1, x2, y2, color, t_texture[z], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));

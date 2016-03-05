@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /*********************************************************************
 
     ui/optsmenu.cpp
@@ -22,6 +22,7 @@
 #include "ui/optsmenu.h"
 #include "ui/custmenu.h"
 #include "ui/inputmap.h"
+#include "ui/dirmenu.h"
 #include "rendfont.h"
 
 //-------------------------------------------------
@@ -54,9 +55,16 @@ void ui_menu_game_options::handle()
 	bool changed = false;
 
 	// process the menu
-	ui_menu::menu_stack->parent->process(UI_MENU_PROCESS_NOINPUT);
-	const ui_menu_event *m_event = process(UI_MENU_PROCESS_LR_REPEAT | UI_MENU_PROCESS_NOIMAGE);
-//	const ui_menu_event *m_event = process(UI_MENU_PROCESS_LR_REPEAT);
+	const ui_menu_event *m_event;
+	if (strcmp(machine().options().ui(), "simple") == 0)
+	{
+		m_event = process(UI_MENU_PROCESS_LR_REPEAT);
+	}
+	else
+	{
+		ui_menu::menu_stack->parent->process(UI_MENU_PROCESS_NOINPUT);
+		m_event = process(UI_MENU_PROCESS_LR_REPEAT | UI_MENU_PROCESS_NOIMAGE);
+	}
 
 	if (m_event != nullptr && m_event->itemref != nullptr)
 		switch ((FPTR)m_event->itemref)
@@ -151,6 +159,10 @@ void ui_menu_game_options::handle()
 					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, c_year::ui, c_year::actual));
 
 				break;
+			case CONF_DIR:
+				if (m_event->iptkey == IPT_UI_SELECT)
+					ui_menu::stack_push(global_alloc_clear<ui_menu_directory>(machine(), container));
+				break;
 			case MISC_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_misc_options>(machine(), container));
@@ -171,15 +183,17 @@ void ui_menu_game_options::handle()
 				if (m_event->iptkey == IPT_UI_SELECT)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_controller_mapping>(machine(), container));
 				break;
-
 			case CGI_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_input_groups>(machine(), container));
 				break;
-
 			case CUSTOM_FILTER:
 				if (m_event->iptkey == IPT_UI_SELECT)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_custom_filter>(machine(), container));
+				break;
+			case SAVE_CONFIG:
+				if (m_event->iptkey == IPT_UI_SELECT)
+					save_main_option(machine());
 				break;
 		}
 
@@ -203,41 +217,41 @@ void ui_menu_game_options::populate()
 		item_append(_("Filter"), main_filters::text[m_main], arrow_flags, (void *)(FPTR)FILTER_MENU);
 
 		// add category subitem
-		if (main_filters::actual == FILTER_CATEGORY && !machine().inifile().ini_index.empty())
+		if (m_main == FILTER_CATEGORY && !machine().inifile().ini_index.empty())
 		{
 			inifile_manager &inif = machine().inifile();
 			int afile = inif.current_file;
 
 			arrow_flags = get_arrow_flags(0, inif.ini_index.size() - 1, afile);
-			fbuff = " ^!File";
+			fbuff = _(" ^!File");
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), inif.actual_file().c_str(), arrow_flags, (void *)(FPTR)FILE_CATEGORY_FILTER);
 
 			arrow_flags = get_arrow_flags(0, inif.ini_index[afile].category.size() - 1, inif.current_category);
-			fbuff = " ^!Category";
+			fbuff = _(" ^!Category");
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), inif.actual_category().c_str(), arrow_flags, (void *)(FPTR)CATEGORY_FILTER);
 		}
 		// add manufacturer subitem
-		else if (main_filters::actual == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
+		else if (m_main == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(0, c_mnfct::ui.size() - 1, c_mnfct::actual);
-			fbuff = "^!Manufacturer";
+			fbuff = _("^!Manufacturer");
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), c_mnfct::ui[c_mnfct::actual].c_str(), arrow_flags, (void *)(FPTR)MANUFACT_CAT_FILTER);
 		}
 		// add year subitem
-		else if (main_filters::actual == FILTER_YEAR && c_year::ui.size() > 0)
+		else if (m_main == FILTER_YEAR && c_year::ui.size() > 0)
 		{
 			arrow_flags = get_arrow_flags(0, c_year::ui.size() - 1, c_year::actual);
-			fbuff.assign("^!Year");
+			fbuff.assign(_("^!Year"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), c_year::ui[c_year::actual].c_str(), arrow_flags, (void *)(FPTR)YEAR_CAT_FILTER);
 		}
 		// add custom subitem
-		else if (main_filters::actual == FILTER_CUSTOM)
+		else if (m_main == FILTER_CUSTOM)
 		{
-			fbuff = "^!Setup custom filter";
+			fbuff = _("^!Setup custom filter");
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), nullptr, 0, (void *)(FPTR)CUSTOM_FILTER);
 		}
@@ -246,6 +260,7 @@ void ui_menu_game_options::populate()
 
 		// add options items
 		item_append(_("Customize UI"), nullptr, 0, (void *)(FPTR)CUSTOM_MENU);
+		item_append(_("Configure Directories"), nullptr, 0, (void *)(FPTR)CONF_DIR);
 	}
 	item_append(_("Display Options"), nullptr, 0, (void *)(FPTR)DISPLAY_MENU);
 	item_append(_("Sound Options"), nullptr, 0, (void *)(FPTR)SOUND_MENU);
@@ -253,6 +268,7 @@ void ui_menu_game_options::populate()
 	item_append(_("Device Mapping"), nullptr, 0, (void *)(FPTR)CONTROLLER_MENU);
 	item_append(_("General Inputs"), nullptr, 0, (void *)(FPTR)CGI_MENU);
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(_("Save Configuration"), nullptr, 0, (void *)(FPTR)SAVE_CONFIG);
 
 	custombottom = 2.0f * machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
@@ -308,3 +324,55 @@ void save_ui_options(running_machine &machine)
 	else
 		machine.popmessage(_("**Error to save ui.ini**"));
 }
+
+//-------------------------------------------------
+//  save main option
+//-------------------------------------------------
+
+void save_main_option(running_machine &machine)
+{
+	// parse the file
+	std::string error;
+	emu_options options(machine.options()); // This way we make sure that all OSD parts are in
+	std::string error_string;
+
+	// attempt to open the main ini file
+	{
+		emu_file file(machine.options().ini_path(), OPEN_FLAG_READ);
+		if (file.open(emulator_info::get_configname(), ".ini") == FILERR_NONE)
+		{
+			bool result = options.parse_ini_file((core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+			if (!result)
+			{
+				osd_printf_error(_("**Error to load %s.ini**"), emulator_info::get_configname());
+				return;
+			}
+		}
+	}
+
+	for (emu_options::entry *f_entry = machine.options().first(); f_entry != nullptr; f_entry = f_entry->next())
+	{
+		if (f_entry->is_changed())
+		{
+			options.set_value(f_entry->name(), f_entry->value(), OPTION_PRIORITY_CMDLINE, error_string);
+		}
+	}
+
+	// attempt to open the output file
+	{
+		emu_file file(machine.options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		if (file.open(emulator_info::get_configname(), ".ini") == FILERR_NONE)
+		{
+			// generate the updated INI
+			std::string initext = options.output_ini();
+			file.puts(initext.c_str());
+			file.close();
+		}
+		else {
+			machine.popmessage(_("**Error to save %s.ini**"), emulator_info::get_configname());
+			return;
+		}
+	}
+	machine.ui().popup_time(3, "%s", _("\n    Configuration saved    \n\n"));
+}
+

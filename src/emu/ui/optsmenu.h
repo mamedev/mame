@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /***************************************************************************
 
     ui/optsmenu.h
@@ -32,6 +32,7 @@ private:
 		MANUFACT_CAT_FILTER,
 		YEAR_CAT_FILTER,
 		CATEGORY_FILTER,
+		CONF_DIR,
 		MISC_MENU,
 		DISPLAY_MENU,
 		CUSTOM_MENU,
@@ -39,11 +40,13 @@ private:
 		CONTROLLER_MENU,
 		SAVE_OPTIONS,
 		CGI_MENU,
-		CUSTOM_FILTER
+		CUSTOM_FILTER,
+		SAVE_CONFIG
 	};
 };
 
 // save options to file
 void save_ui_options(running_machine &machine);
+void save_main_option(running_machine &machine);
 
 #endif /* __UI_OPTSMENU_H__ */

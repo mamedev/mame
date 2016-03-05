@@ -1,9 +1,0 @@
-{
-  "plugin": {
-    "name": "webserver",
-    "version": "1.0.0",
-    "author": "Miodrag Milanovic",
-	"type": "plugin",
-	"start": "false",
-  }
-}

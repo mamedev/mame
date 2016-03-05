@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 #pragma once
 
 #ifndef __RENDER_BGFX__
@@ -14,9 +16,11 @@ class texture_manager;
 class target_manager;
 class shader_manager;
 class effect_manager;
+class chain_manager;
 class bgfx_texture;
 class bgfx_effect;
 class bgfx_target;
+class bgfx_chain;
 
 /* sdl_info is the information about SDL for the current screen */
 class renderer_bgfx : public osd_renderer
@@ -107,8 +111,11 @@ private:
 	target_manager* m_targets;
 	shader_manager* m_shaders;
 	effect_manager* m_effects;
+	chain_manager* m_chains;
+
 	bgfx_effect* m_gui_effect[4];
 	bgfx_effect* m_screen_effect[4];
+	//bgfx_chain* m_screen_chain[4];
 
 	std::map<UINT32, rectangle_packer::packed_rectangle> m_hash_to_entry;
 	std::vector<rectangle_packer::packable_rectangle> m_texinfo;
@@ -117,9 +124,9 @@ private:
 	uint32_t m_width[16];
 	uint32_t m_height[16];
 	uint32_t m_white[16*16];
-	enum : uint16_t { CACHE_SIZE = 1024 };
-	enum : uint32_t { PACKABLE_SIZE = 128 };
-	enum : UINT32 { WHITE_HASH = 0x87654321 };
+	static const uint16_t CACHE_SIZE;
+	static const uint32_t PACKABLE_SIZE;
+	static const uint32_t WHITE_HASH;
 
 	static bool s_window_set;
 };

@@ -12,8 +12,11 @@
 // Needed for RAW Input
 #define WM_INPUT 0x00FF
 
+#include <stdio.h> // must be here otherwise issues with I64FMT in MINGW
 // standard C headers
 #include <process.h>
+
+#include <atomic>
 
 // MAME headers
 #include "emu.h"
@@ -23,7 +26,6 @@
 #include "winmain.h"
 #include "window.h"
 #include "video.h"
-#include "input.h"
 #include "winutf8.h"
 
 #include "winutil.h"
@@ -35,6 +37,12 @@
 #if (USE_OPENGL)
 #include "modules/render/drawogl.h"
 #endif
+
+#define NOT_ALREADY_DOWN(x) (x & 0x40000000) == 0
+#define SCAN_CODE(x) ((x >> 16) & 0xff)
+#define IS_EXTENDED(x) (0x01000000 & x)
+#define MAKE_DI_SCAN(scan, isextended) (scan & 0x7f) | (isextended ? 0x80 : 0x00)
+#define WINOSD(machine) downcast<windows_osd_interface*>(&machine.osd())
 
 //============================================================
 //  PARAMETERS
@@ -122,11 +130,11 @@ struct mtlog
 };
 
 static mtlog mtlog[100000];
-static volatile INT32 mtlogindex;
+static std::atomic<INT32> mtlogindex;
 
 void mtlog_add(const char *event)
 {
-	int index = atomic_increment32((INT32 *) &mtlogindex) - 1;
+	int index = mtlogindex++;
 	if (index < ARRAY_LENGTH(mtlog))
 	{
 		mtlog[index].timestamp = osd_ticks();
@@ -144,7 +152,7 @@ static void mtlog_dump(void)
 	for (i = 0; i < mtlogindex; i++)
 	{
 		osd_ticks_t curr = mtlog[i].timestamp * 1000000 / cps;
-		fprintf(f, "%20I64d %10I64d %s\n", curr, curr - last, mtlog[i].event);
+		fprintf(f, "%20" I64FMT "d %10" I64FMT "d %s\n", (UINT64)curr, (UINT64)(curr - last), mtlog[i].event);
 		last = curr;
 	}
 	fclose(f);
@@ -188,7 +196,7 @@ bool windows_osd_interface::window_init()
 			fatalerror("Failed to create window thread ready event\n");
 
 		// create a thread to run the windows from
-		temp = _beginthreadex(nullptr, 0, win_window_info::thread_entry, nullptr, 0, (unsigned *)&window_threadid);
+		temp = _beginthreadex(nullptr, 0, win_window_info::thread_entry, this, 0, (unsigned *)&window_threadid);
 		window_thread = (HANDLE)temp;
 		if (window_thread == nullptr)
 			fatalerror("Failed to create window thread\n");
@@ -225,7 +233,7 @@ bool windows_osd_interface::window_init()
 	{
 		bool error = false;
 		switch(current_mode)
-		{
+	{
 			case VIDEO_MODE_NONE:
 				error = renderer_none::init(machine());
 				break;
@@ -401,7 +409,7 @@ win_window_info::~win_window_info()
 	if (m_renderer != nullptr)
 	{
 		delete m_renderer;
-	}
+}
 }
 
 
@@ -437,7 +445,31 @@ static BOOL is_mame_window(HWND hwnd)
 	return FALSE;
 }
 
+inline static BOOL handle_mouse_button(windows_osd_interface *osd, int button, int down, int x, int y)
+{
+	MouseButtonEventArgs args;
+	args.button = button;
+	args.keydown = down;
+	args.xpos = x;
+	args.ypos = y;
 
+	bool handled = osd->handle_input_event(INPUT_EVENT_MOUSE_BUTTON, &args);
+
+	// When in lightgun mode or mouse mode, the mouse click may be routed to the input system
+	// because the mouse interactions in the UI are routed from the video_window_proc below
+	// we need to make sure they aren't suppressed in these cases.
+	return handled && !osd->options().lightgun() && !osd->options().mouse();
+}
+
+inline static BOOL handle_keypress(windows_osd_interface *osd, int vkey, int down, int scancode, BOOL extended_key)
+{
+	KeyPressEventArgs args;
+	args.event_id = down ? INPUT_EVENT_KEYDOWN : INPUT_EVENT_KEYUP;
+	args.scancode = MAKE_DI_SCAN(scancode, extended_key);
+	args.vkey = vkey;
+
+	return osd->handle_input_event(args.event_id, &args);
+}
 
 //============================================================
 //  winwindow_process_events
@@ -478,36 +510,45 @@ void winwindow_process_events(running_machine &machine, int ingame, bool nodispa
 
 					// forward mouse button downs to the input system
 					case WM_LBUTTONDOWN:
-						dispatch = !wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(WINOSD(machine), 0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_RBUTTONDOWN:
-						dispatch = !wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(WINOSD(machine), 1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_MBUTTONDOWN:
-						dispatch = !wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(WINOSD(machine), 2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_XBUTTONDOWN:
-						dispatch = !wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(WINOSD(machine), 3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					// forward mouse button ups to the input system
 					case WM_LBUTTONUP:
-						dispatch = !wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(WINOSD(machine), 0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_RBUTTONUP:
-						dispatch = !wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(WINOSD(machine), 1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_MBUTTONUP:
-						dispatch = !wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(WINOSD(machine), 2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_XBUTTONUP:
-						dispatch = !wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(WINOSD(machine), 3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						break;
+
+					case WM_KEYDOWN:
+						if (NOT_ALREADY_DOWN(message.lParam))
+							dispatch = !handle_keypress(WINOSD(machine), message.wParam, TRUE, SCAN_CODE(message.lParam), IS_EXTENDED(message.lParam));
+						break;
+
+					case WM_KEYUP:
+						dispatch = !handle_keypress(WINOSD(machine), message.wParam, FALSE, SCAN_CODE(message.lParam), IS_EXTENDED(message.lParam));
 						break;
 				}
 			}
@@ -688,7 +729,7 @@ void winwindow_update_cursor_state(running_machine &machine)
 	//   2. we also hide the cursor in full screen mode and when the window doesn't have a menu
 	//   3. we also hide the cursor in windowed mode if we're not paused and
 	//      the input system requests it
-	if (winwindow_has_focus() && ((!video_config.windowed && !win_window_list->win_has_menu()) || (!machine.paused() && wininput_should_hide_mouse())))
+	if (winwindow_has_focus() && ((!video_config.windowed && !win_window_list->win_has_menu()) || (!machine.paused() && downcast<windows_osd_interface&>(machine.osd()).should_hide_mouse())))
 	{
 		win_window_info *window = win_window_list;
 		RECT bounds;
@@ -1152,6 +1193,7 @@ int win_window_info::wnd_extra_height()
 unsigned __stdcall win_window_info::thread_entry(void *param)
 {
 	MSG message;
+	windows_osd_interface *osd = static_cast<windows_osd_interface*>(param);
 
 	// make a bogus user call to make us a message thread
 	PeekMessage(&message, nullptr, 0, 0, PM_NOREMOVE);
@@ -1179,36 +1221,36 @@ unsigned __stdcall win_window_info::thread_entry(void *param)
 
 				// forward mouse button downs to the input system
 				case WM_LBUTTONDOWN:
-					dispatch = !wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = !handle_mouse_button(osd, 0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_RBUTTONDOWN:
-					dispatch = !wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = !handle_mouse_button(osd, 1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_MBUTTONDOWN:
-					dispatch = !wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = !handle_mouse_button(osd, 2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_XBUTTONDOWN:
-					dispatch = !wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = !handle_mouse_button(osd, 3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				// forward mouse button ups to the input system
 				case WM_LBUTTONUP:
-					dispatch = !wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = !handle_mouse_button(osd, 0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_RBUTTONUP:
-					dispatch = !wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = !handle_mouse_button(osd, 1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_MBUTTONUP:
-					dispatch = !wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = !handle_mouse_button(osd, 2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_XBUTTONUP:
-					dispatch = !wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = !handle_mouse_button(osd, 3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				// a terminate message to the thread posts a quit
@@ -1369,7 +1411,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 
 		// input: handle the raw input
 		case WM_INPUT:
-			wininput_handle_raw((HRAWINPUT)lparam);
+			downcast<windows_osd_interface&>(window->machine().osd()).handle_input_event(INPUT_EVENT_RAWINPUT, &lparam);
 			break;
 
 		// syskeys - ignore

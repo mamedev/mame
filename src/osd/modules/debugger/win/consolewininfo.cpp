@@ -43,9 +43,7 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 			m_devices_menu = CreatePopupMenu();
 			for ( ; img != NULL; img = iter.next())
 			{
-				std::string temp;
-				strprintf(temp,"%s : %s", img->device().name(), img->exists() ? img->filename() : "[no image]");
-				TCHAR *tc_buf = tstring_from_utf8(temp.c_str());
+				TCHAR *tc_buf = tstring_from_utf8(string_format("%s : %s", img->device().name(), img->exists() ? img->filename() : "[no image]").c_str());
 				if (tc_buf != NULL)
 				{
 					AppendMenu(m_devices_menu, MF_ENABLED, 0, tc_buf);
@@ -106,9 +104,8 @@ void consolewin_info::set_cpu(device_t &device)
 
 	// then update the caption
 	char curtitle[256];
-	std::string title;
 
-	strprintf(title, "Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
+	std::string title = string_format("Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
 	win_get_window_text_utf8(window(), curtitle, ARRAY_LENGTH(curtitle));
 	if (title.compare(curtitle) != 0)
 		win_set_window_text_utf8(window(), title.c_str());
@@ -200,9 +197,7 @@ void consolewin_info::update_menu()
 				AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_FASTFORWARD, TEXT("Fast Forward"));
 			}
 
-			std::string temp;
-			strprintf(temp,"%s :%s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
-			TCHAR *tc_buf = tstring_from_utf8(temp.c_str());
+			TCHAR *tc_buf = tstring_from_utf8(string_format("%s :%s", img->device().name(), img->exists() ? img->filename() : "[empty slot]").c_str());
 			if (tc_buf != NULL)
 			{
 				ModifyMenu(m_devices_menu, cnt, MF_BYPOSITION | MF_POPUP, (UINT_PTR)devicesubmenu, tc_buf);
