@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "machine/pcshare.h"
+#include "cpu/i86/i286.h"
 
 /******************
 DMA8237 Controller
