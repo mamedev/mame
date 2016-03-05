@@ -59,9 +59,9 @@ def parse_file(srcfile):
             if not all(((c >='a' and c<='z') or (c>='0' and c<='9') or c=='_') for c in drivname):
                sys.stderr.write("%s:%d - Invalid character in driver \"%s\"\n" % (srcfile,  linenum,  drivname))
                return 1
-            else:			   
+            else:
                if (curr_source == '') or (len(sourcelist)==0) or (curr_source in sourcelist):
-			       drivlist.append(drivname)
+                   drivlist.append(drivname)
     return 0
 
 def parse_filter_file(srcfile):
@@ -113,7 +113,7 @@ def parse_filter_file(srcfile):
             if not all(((c >='a' and c<='z') or (c>='0' and c<='9') or c=='_' or c=='.' or c=='-') for c in sourcename):
                sys.stderr.write("%s:%d - Invalid character in driver \"%s\"\n" % (srcfile,  linenum,  sourcename))
                return 1
-            else:			   
+            else:               
                sourcelist.append(sourcename)
     return 0
 

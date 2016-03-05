@@ -16,7 +16,7 @@
 #include <windows.h>
 
 // XInput header
-#include <Xinput.h>
+#include <xinput.h>
 
 #undef interface
 
