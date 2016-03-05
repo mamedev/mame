@@ -25,6 +25,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "compat_cpp14.h"
+
 // core emulator headers -- must be first
 #include "emucore.h"
 #include "eminline.h"
