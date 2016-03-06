@@ -322,7 +322,7 @@ void save_ui_options(running_machine &machine)
 		file.close();
 	}
 	else
-		machine.popmessage(_("**Error to save ui.ini**"));
+		machine.popmessage(_("**Error saving ui.ini**"));
 }
 
 //-------------------------------------------------
@@ -344,7 +344,7 @@ void save_main_option(running_machine &machine)
 			bool result = options.parse_ini_file((core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
 			if (!result)
 			{
-				osd_printf_error(_("**Error to load %s.ini**"), emulator_info::get_configname());
+				osd_printf_error(_("**Error loading %s.ini**"), emulator_info::get_configname());
 				return;
 			}
 		}
@@ -369,7 +369,7 @@ void save_main_option(running_machine &machine)
 			file.close();
 		}
 		else {
-			machine.popmessage(_("**Error to save %s.ini**"), emulator_info::get_configname());
+			machine.popmessage(_("**Error saving %s.ini**"), emulator_info::get_configname());
 			return;
 		}
 	}
