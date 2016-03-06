@@ -1092,7 +1092,7 @@ msgstr "Lista de Seleção - Busca: "
 #: src/emu/ui/selector.cpp:181
 #, c-format
 msgid "Double click or press %1$s to select"
-msgstr ""
+msgstr "Pressione %1$s ou clique duas vezes para selecionar"
 
 #: src/emu/ui/selgame.cpp:38
 msgid "General Info"
@@ -1362,7 +1362,6 @@ msgstr "Requer CHD: %1$s\n"
 msgid "Roms Audit Pass: OK\n"
 msgstr ""
 "Checagem de Roms: OK\n"
-" "
 
 #: src/emu/ui/selgame.cpp:1584
 msgid "Roms Audit Pass: BAD\n"
@@ -2047,15 +2046,6 @@ msgstr " CORES"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " CANETAS"
-
-#~ msgid "Double click or press "
-#~ msgstr "Duplo-clique ou pressione"
-
-#~ msgid " to change the color value"
-#~ msgstr "para mudar o valor da cor"
-
-#~ msgid " to select"
-#~ msgstr " para selecionar"
 
 #~ msgid "Current "
 #~ msgstr "Atual"
