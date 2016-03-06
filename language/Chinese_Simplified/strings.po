@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-06 03:03+0100\n"
-"PO-Revision-Date: 2016-03-06 01:10+0800\n"
+"PO-Revision-Date: 2016-03-06 22:30+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh\n"
@@ -169,7 +169,7 @@ msgstr "^!出版商"
 
 #: src/emu/ui/custmenu.cpp:477
 msgid "^!Software List"
-msgstr "^!软体清单"
+msgstr "^!软件清单"
 
 #: src/emu/ui/custmenu.cpp:486
 msgid "^!Device type"
@@ -322,7 +322,7 @@ msgstr "UI 色彩设定"
 #: src/emu/ui/custui.cpp:591
 #, c-format
 msgid "Double click or press %1$s to change the color value"
-msgstr ""
+msgstr "双击或按下 %1$s 以改变颜色值"
 
 #: src/emu/ui/custui.cpp:617
 msgid "Menu Preview"
@@ -723,7 +723,7 @@ msgstr "无法跨目录储存"
 msgid ""
 "The software selected is missing one or more required ROM or CHD images. "
 "Please select a different one."
-msgstr "选定的软体缺少一个至多个必要的 ROM 或 CHD 映像档，请选择其他软体。"
+msgstr "选定的软件缺少一个至多个必要的 ROM 或 CHD 映像档，请选择其他软件。"
 
 #: src/emu/ui/info.cpp:98
 msgid "Not supported"
@@ -980,7 +980,7 @@ msgstr "略过启动时的显示资讯画面"
 
 #: src/emu/ui/miscmenu.cpp:564
 msgid "Force 4:3 appearance for software snapshot"
-msgstr "强制 4:3 外观供软体撷图"
+msgstr "强制 4:3 外观供软件撷图"
 
 #: src/emu/ui/miscmenu.cpp:565
 msgid "Use image as background"
@@ -1072,7 +1072,7 @@ msgstr "设定"
 
 #: src/emu/ui/optsmenu.cpp:325
 msgid "**Error saving ui.ini**"
-msgstr "**保存至 ui.ini 时错误**"
+msgstr "**保存 ui.ini 时错误**"
 
 #: src/emu/ui/optsmenu.cpp:347
 #, c-format
@@ -1101,7 +1101,7 @@ msgstr "选项清单 - 搜寻： "
 #: src/emu/ui/selector.cpp:181
 #, c-format
 msgid "Double click or press %1$s to select"
-msgstr ""
+msgstr "双击或按下 %1$s 以选择"
 
 #: src/emu/ui/selgame.cpp:38
 msgid "General Info"
@@ -1227,11 +1227,11 @@ msgstr "系统： %1$-.100s"
 #: src/emu/ui/selgame.cpp:896 src/emu/ui/selsoft.cpp:798
 #, c-format
 msgid "Software is clone of: %1$-.100s"
-msgstr "软体相容于： %1$-.100s"
+msgstr "软件相容于： %1$-.100s"
 
 #: src/emu/ui/selgame.cpp:898 src/emu/ui/selsoft.cpp:800
 msgid "Software is parent"
-msgstr "软体为主档"
+msgstr "软件为主档"
 
 #: src/emu/ui/selgame.cpp:903 src/emu/ui/selsoft.cpp:805
 msgid "Supported: No"
@@ -1601,7 +1601,7 @@ msgstr "快进"
 
 #: src/emu/ui/ui.cpp:176
 msgid "**Error loading ui.ini**"
-msgstr "载入 ui.ini 时错误"
+msgstr "载入 ui.ini 时错误**"
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
@@ -2071,15 +2071,3 @@ msgstr " 色彩"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " PENS"
-
-#~ msgid "Double click or press "
-#~ msgstr "双击或按下 "
-
-#~ msgid " to change the color value"
-#~ msgstr " 以改变颜色值"
-
-#~ msgid " to select"
-#~ msgstr " 以选择"
-
-#~ msgid "Search: "
-#~ msgstr "搜寻: "

@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-06 03:03+0100\n"
-"PO-Revision-Date: 2016-03-06 01:00+0800\n"
+"PO-Revision-Date: 2016-03-06 22:30+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -322,7 +322,7 @@ msgstr "UI 色彩設定"
 #: src/emu/ui/custui.cpp:591
 #, c-format
 msgid "Double click or press %1$s to change the color value"
-msgstr ""
+msgstr "雙擊或按下 %1$s 以改變顏色值"
 
 #: src/emu/ui/custui.cpp:617
 msgid "Menu Preview"
@@ -1072,17 +1072,17 @@ msgstr "設定"
 
 #: src/emu/ui/optsmenu.cpp:325
 msgid "**Error saving ui.ini**"
-msgstr "**儲存至 ui.ini 時錯誤**"
+msgstr "**儲存 ui.ini 時發生錯誤**"
 
 #: src/emu/ui/optsmenu.cpp:347
 #, c-format
 msgid "**Error loading %s.ini**"
-msgstr "**載入 %s.ini 時錯誤**"
+msgstr "**載入 %s.ini 時發生錯誤**"
 
 #: src/emu/ui/optsmenu.cpp:372
 #, c-format
 msgid "**Error saving %s.ini**"
-msgstr "**儲存 %s.ini 時錯誤**"
+msgstr "**儲存 %s.ini 時發生錯誤**"
 
 #: src/emu/ui/optsmenu.cpp:376
 msgid ""
@@ -1101,7 +1101,7 @@ msgstr "選項清單 - 搜尋： "
 #: src/emu/ui/selector.cpp:181
 #, c-format
 msgid "Double click or press %1$s to select"
-msgstr ""
+msgstr "雙擊或按下 %1$s 以選擇"
 
 #: src/emu/ui/selgame.cpp:38
 msgid "General Info"
@@ -1258,7 +1258,7 @@ msgstr "%1$s %2$s"
 #: src/emu/ui/selgame.cpp:1521
 #, c-format
 msgid "Romset: %1$-.100s\n"
-msgstr "Rom組：: %1$-.100s\n"
+msgstr "Rom組： %1$-.100s\n"
 
 #: src/emu/ui/selgame.cpp:1522
 #, c-format
@@ -2071,12 +2071,3 @@ msgstr " 色彩"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " PENS"
-
-#~ msgid "Double click or press "
-#~ msgstr "雙擊或按下 "
-
-#~ msgid " to change the color value"
-#~ msgstr " 以改變顏色值"
-
-#~ msgid " to select"
-#~ msgstr " 以選擇"
