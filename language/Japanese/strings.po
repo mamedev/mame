@@ -324,7 +324,7 @@ msgstr "UIの色設定"
 #: src/emu/ui/custui.cpp:591
 #, c-format
 msgid "Double click or press %1$s to change the color value"
-msgstr "色彩値を変更するには%1$sを押すかダブルクリックしてください"
+msgstr "色の値を変更するには%1$sを押すかダブルクリックしてください"
 
 #: src/emu/ui/custui.cpp:617
 msgid "Menu Preview"
@@ -1002,7 +1002,7 @@ msgstr "その他の設定"
 #: src/emu/ui/miscmenu.cpp:733
 #, c-format
 msgid "%s.xml saved under ui folder."
-msgstr ""
+msgstr "%s.xmlがuiフォルダーに保存した。"
 
 #: src/emu/ui/miscmenu.cpp:761
 msgid "Name:             Description:\n"
@@ -1011,7 +1011,7 @@ msgstr ""
 #: src/emu/ui/miscmenu.cpp:773
 #, c-format
 msgid "%s.txt saved under ui folder."
-msgstr ""
+msgstr "%s.txtがuiフォルダーに保した。"
 
 #: src/emu/ui/miscmenu.cpp:791
 msgid "Export XML format (like -listxml)"
@@ -1085,11 +1085,14 @@ msgid "**Error saving %s.ini**"
 msgstr "*** %s.iniの保存エラー ***"
 
 #: src/emu/ui/optsmenu.cpp:376
-msgid ""
-"\n"
+msgid "\n"
 "    Configuration saved    \n"
 "\n"
-msgstr ""
+""
+msgstr "\n"
+"    設定が保存した    \n"
+"\n"
+""
 
 #: src/emu/ui/selector.cpp:152
 msgid "Selection List - Search: "
@@ -1110,7 +1113,7 @@ msgid ""
 "%s\n"
 " added to favorites list."
 msgstr ""
-"「%s」は\n"
+"「%s」が\n"
 "お気に入りに追加した。"
 
 #: src/emu/ui/selgame.cpp:394 src/emu/ui/selgame.cpp:403
@@ -1120,7 +1123,7 @@ msgid ""
 "%s\n"
 " removed from favorites list."
 msgstr ""
-"「%s」は\n"
+"「%s」が\n"
 "お気に入りから削除した。"
 
 #: src/emu/ui/selgame.cpp:464
