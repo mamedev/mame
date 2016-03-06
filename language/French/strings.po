@@ -214,7 +214,7 @@ msgstr "Afficher les Onglets à Côté"
 
 #: src/emu/ui/custui.cpp:164 src/emu/ui/custui.cpp:184
 msgid "Custom UI Settings"
-msgstr "Configurer l'Interface Personnalisé"
+msgstr "Configurer l'Interface Personnalisée"
 
 #: src/emu/ui/custui.cpp:268
 msgid "default"
@@ -582,7 +582,7 @@ msgstr "Ajouter %1$s Dossier - Recherche : %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
-msgstr "Presser TAB pour Choisir"
+msgstr "Presser TAB pour Faire les Réglages"
 
 #: src/emu/ui/dirmenu.cpp:643
 #, c-format
@@ -611,7 +611,7 @@ msgstr "GLSL"
 
 #: src/emu/ui/dsplmenu.cpp:45
 msgid "Bilinear Filtering"
-msgstr ""
+msgstr "Flitrage Bi-linèaire"
 
 #: src/emu/ui/dsplmenu.cpp:46
 msgid "Bitmap Prescaling"
@@ -631,7 +631,7 @@ msgstr "Garder les Proportions"
 
 #: src/emu/ui/dsplmenu.cpp:50
 msgid "Start Out Maximized"
-msgstr "Commencer en Maximisée"
+msgstr "Affichage Agrandit au Démarrage"
 
 #: src/emu/ui/dsplmenu.cpp:51
 msgid "Synchronized Refresh"
@@ -639,7 +639,7 @@ msgstr "Rafraîchissement Syncrhonisé"
 
 #: src/emu/ui/dsplmenu.cpp:52
 msgid "Wait Vertical Sync"
-msgstr "Attente de la Synchro Vertical"
+msgstr "Attente de la Synchro Verticale"
 
 #: src/emu/ui/dsplmenu.cpp:204 src/emu/ui/dsplmenu.cpp:224
 #: src/emu/ui/optsmenu.cpp:265
@@ -680,7 +680,7 @@ msgstr "Créer"
 
 #: src/emu/ui/filesel.cpp:314
 msgid "Please enter a file extension too"
-msgstr "Veuillez entrer l'extenstion du fichier aussi"
+msgstr "Veuillez entrer l'extension du fichier aussi"
 
 #: src/emu/ui/filesel.cpp:502 src/emu/ui/swlist.cpp:65
 msgid "[empty slot]"
@@ -700,7 +700,7 @@ msgstr "Sélection du Format de l'Image"
 
 #: src/emu/ui/filesel.cpp:862
 msgid "Select access mode"
-msgstr "Sélection du Mode d4accès"
+msgstr "Sélection du Mode d'Accès"
 
 #: src/emu/ui/filesel.cpp:863
 msgid "Read-only"
@@ -765,11 +765,11 @@ msgstr "Redémarrer"
 
 #: src/emu/ui/mainmenu.cpp:53
 msgid "Input (general)"
-msgstr "Périphérique d'Entrée (Général)"
+msgstr "Configuration des Contrôles pour Tous les Jeux"
 
 #: src/emu/ui/mainmenu.cpp:55
 msgid "Input (this Machine)"
-msgstr "Périphérique d'Entrée (Cette Machine)"
+msgstr "Configuration des Contrôles pour ce Jeu Uniquement"
 
 #: src/emu/ui/mainmenu.cpp:59
 msgid "Analog Controls"
@@ -789,11 +789,11 @@ msgstr "Info : Crédits et Temps de Jeu"
 
 #: src/emu/ui/mainmenu.cpp:71
 msgid "Machine Information"
-msgstr "Information sur la Machine"
+msgstr "Informations sur la Machine"
 
 #: src/emu/ui/mainmenu.cpp:77
 msgid "Image Information"
-msgstr "Information de l'Image"
+msgstr "Informations sur l'Image"
 
 #: src/emu/ui/mainmenu.cpp:80
 msgid "File Manager"
@@ -869,7 +869,7 @@ msgstr ""
 
 #: src/emu/ui/menu.cpp:63
 msgid "Add or remove favorites"
-msgstr "Ajouter ou Suppromer des Favoris"
+msgstr "Ajouter ou Supprimer des Favoris"
 
 #: src/emu/ui/menu.cpp:64
 msgid "Export displayed list to file"
@@ -981,7 +981,7 @@ msgstr "Confirmer l'Arrêt depuis les Machines"
 
 #: src/emu/ui/miscmenu.cpp:563
 msgid "Skip displaying information's screen at startup"
-msgstr "Passer les infos d'affichage au démarrage"
+msgstr "Ne pas Afficher les Informations au Démarrage"
 
 #: src/emu/ui/miscmenu.cpp:564
 msgid "Force 4:3 appearance for software snapshot"
@@ -989,7 +989,7 @@ msgstr "Forcer l'Affichage en 4:3 pour les copies d'écrans"
 
 #: src/emu/ui/miscmenu.cpp:565
 msgid "Use image as background"
-msgstr "Utiliser une Image de Fond"
+msgstr "Utiliser l'Image comme Fond d'Ecran"
 
 #: src/emu/ui/miscmenu.cpp:566
 msgid "Skip bios selection menu"
@@ -1020,7 +1020,7 @@ msgstr "%s.txt a été sauvegardé sous le dossier UI."
 
 #: src/emu/ui/miscmenu.cpp:791
 msgid "Export XML format (like -listxml)"
-msgstr "Exporer au Format XML (comme -listxml)"
+msgstr "Exporter au Format XML (comme -listxml)"
 
 #: src/emu/ui/miscmenu.cpp:792
 msgid "Export TXT format (like -listfull)"
@@ -1032,7 +1032,7 @@ msgstr "Factice"
 
 #: src/emu/ui/miscmenu.cpp:852
 msgid "Save machine configuration"
-msgstr ""
+msgstr "Sauvegarder la Configuration de la Machine"
 
 #: src/emu/ui/optsmenu.cpp:217
 msgid "Filter"
@@ -1052,7 +1052,7 @@ msgstr "^!Paramètrer le Filtre Personnalisé"
 
 #: src/emu/ui/optsmenu.cpp:262
 msgid "Customize UI"
-msgstr "Personnaliser l'UI"
+msgstr "Personnaliser l'Interface Utilisateur"
 
 #: src/emu/ui/optsmenu.cpp:263
 msgid "Configure Directories"
@@ -1061,7 +1061,7 @@ msgstr "Configurer les Répertoires"
 #: src/emu/ui/optsmenu.cpp:266 src/emu/ui/sndmenu.cpp:150
 #: src/emu/ui/sndmenu.cpp:170
 msgid "Sound Options"
-msgstr "Options Sons"
+msgstr "Options Son"
 
 #: src/emu/ui/optsmenu.cpp:269
 msgid "General Inputs"
@@ -1094,7 +1094,7 @@ msgid ""
 "\n"
 "    Configuration saved    \n"
 "\n"
-msgstr "    Configuration Sauvegardé    \n"
+msgstr "    Configuration Sauvegardée    \n"
 
 #: src/emu/ui/selector.cpp:152
 msgid "Selection List - Search: "
@@ -1107,7 +1107,7 @@ msgstr ""
 
 #: src/emu/ui/selgame.cpp:38
 msgid "General Info"
-msgstr "Info Général"
+msgstr "Info Générale"
 
 #: src/emu/ui/selgame.cpp:388 src/emu/ui/selsoft.cpp:280
 #, c-format
@@ -1135,8 +1135,8 @@ msgid ""
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
-"La Machine Sélectionnée est manquand ou une ou plusieurs images ROM ou CHD "
-"sont nécessaires. Veuillez Sélectionner une Machine différente.\n"
+"Une ou plusieurs Images ROM ou CHD sont manquantes pour le Jeu Sélectionné"
+"Veuillez Choisir un Jeu Différent.\n"
 "\n"
 
 #: src/emu/ui/selgame.cpp:603 src/emu/ui/simpleselgame.cpp:262
@@ -1205,7 +1205,7 @@ msgstr "Global : Fonctionne"
 
 #: src/emu/ui/selgame.cpp:863 src/emu/ui/selsoft.cpp:764
 msgid "Graphics: Imperfect, "
-msgstr "Graphismes : Imparfait, "
+msgstr "Graphiques : Imparfait, "
 
 #: src/emu/ui/selgame.cpp:865 src/emu/ui/selsoft.cpp:766
 msgid "Graphics: OK, "
@@ -1337,7 +1337,7 @@ msgstr "Nécessite l'Artwork: %1$s\n"
 #: src/emu/ui/selgame.cpp:1557
 #, c-format
 msgid "Requires Clickable Artwork: %1$s\n"
-msgstr "Ncessite un Artwork Cliquable : %1$s\n"
+msgstr "Nécessite un Artwork Cliquable : %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1558
 #, c-format
@@ -1405,7 +1405,7 @@ msgstr ""
 #: src/emu/ui/selgame.cpp:2026 src/emu/ui/selgame.cpp:2187
 #: src/emu/ui/selsoft.cpp:1641
 msgid "No Infos Available"
-msgstr "Aucunes Infos Disponible"
+msgstr "Aucune Info Disponible"
 
 #: src/emu/ui/selgame.cpp:2139 src/emu/ui/selsoft.cpp:1593
 msgid "Usage"
@@ -1425,7 +1425,7 @@ msgstr ""
 "Le Logiciel Sélectionné est manquant, un ou plusieurs fichiers sont "
 "nécessaires. Veuillez sélectionner un logiciel différent.\n"
 "\n"
-"Presser n'importe quel touche (sauf ECHAP) pour continuer."
+"Appuyer sur n'importe quel touche (sauf ECHAP) pour continuer."
 
 #: src/emu/ui/selsoft.cpp:683
 #, c-format
@@ -1455,7 +1455,7 @@ msgstr "Année : %1$s -"
 #: src/emu/ui/selsoft.cpp:693
 #, c-format
 msgid "Software List: %1$s -"
-msgstr "Listes de Logiciel : %1$s -"
+msgstr "Listes de Logiciels : %1$s -"
 
 #: src/emu/ui/selsoft.cpp:695
 #, c-format
@@ -1489,7 +1489,7 @@ msgid ""
 "If this is your first time using %2$s, please see the config.txt file in the "
 "docs directory for information on configuring %2$s."
 msgstr ""
-"Aucune Machine trouvé. Veuillez vérifier le chemin de la rom spécifiée dans  "
+"Aucun jeu trouvé. Veuillez vérifier le chemin de la rom spécifiée dans  "
 "le fichier %1$s.ini.\n"
 "\n"
 "Si c'est la première fois que vous utilisez  %2$s, veuillez lire le fichier "
@@ -1499,11 +1499,11 @@ msgstr ""
 #: src/emu/ui/simpleselgame.cpp:287
 #, c-format
 msgid "Type name or select: %1$s_"
-msgstr "Taper le nom ou sélectionner : %1$s_"
+msgstr "Taper le nom ou choisir : %1$s_"
 
 #: src/emu/ui/simpleselgame.cpp:289
 msgid "Type name or select: (random)"
-msgstr "Taper le nom ou sélectionner : (au hasard)"
+msgstr "Taper le nom ou choisir : (au hasard)"
 
 #: src/emu/ui/simpleselgame.cpp:328
 #, c-format
@@ -1537,7 +1537,7 @@ msgstr "Son"
 
 #: src/emu/ui/sndmenu.cpp:135
 msgid "Sample Rate"
-msgstr "Echantillonage"
+msgstr "Vitesse d'Echantillonnage"
 
 #: src/emu/ui/sndmenu.cpp:136
 msgid "Use External Samples"
@@ -1615,7 +1615,7 @@ msgstr "**Erreur de Chargement ui.ini**"
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
 msgstr ""
-"Ce driver nécessite les images pour être chargé dans les périphériques : "
+"Ce driver nécessite les images pour être chargé dans les périphérique(s) suivant(s) : "
 
 #: src/emu/ui/ui.cpp:1043
 #, c-format
@@ -1632,7 +1632,7 @@ msgstr ""
 "interdite par la loi sur les droits d'auteurs.\n"
 "\n"
 "SI VOUS N'ETES PAS LEGALEMENT HABILITE A LANCER \"%1$s\" SUR CETTE "
-"EMULATEUR, PRESSEZ ECHAP.\n"
+"EMULATEUR, PRESSEZ LA TOUCHE ECHAP.\n"
 "\n"
 "Autrement, taper OK ou bouger le joystick de gauche à droite pour continuer"
 
@@ -1641,23 +1641,22 @@ msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
 msgstr ""
-"Une ou plusieurs ROMS/CHD pour cette machine ne sont pas bonne. Cette "
-"machine peut ne pas se lancer correctement.\n"
+"Une ou plusieurs ROMS/CHD de ce jeu est (sont)incorrecte(s). Ce "
+"jeu pourrait ne pas se lancer correctement.\n"
 
 #: src/emu/ui/ui.cpp:1094
 msgid ""
 "There are known problems with this machine\n"
 "\n"
 msgstr ""
-"Il y a des problèmes connus avec cette machine\n"
+"Il y a des problèmes connus avec ce jeu\n"
 "\n"
 
 #: src/emu/ui/ui.cpp:1098
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
 msgstr ""
-"Une ou plusieurs ROMs/CHDs pour cette machine n'a pas été correctement "
-"copié(s).\n"
+"Une ou plusieurs ROMs/CHDs de ce jeu n'a (n'ont) pas été(s) correctement copiée(s).\n"
 
 #: src/emu/ui/ui.cpp:1102
 #, c-format
@@ -1667,7 +1666,7 @@ msgstr "L'émulation du clavier peut ne pas être précise à 100%.\n"
 #: src/emu/ui/ui.cpp:1104
 #, c-format
 msgid "The colors aren't 100% accurate.\n"
-msgstr "Les couleurs ne sont pas précises à 100%.\n"
+msgstr "Les couleurs ne sont pas parfaites à 100%.\n"
 
 #: src/emu/ui/ui.cpp:1106
 msgid "The colors are completely wrong.\n"
@@ -1685,7 +1684,7 @@ msgstr "L'émulation du son n'est pas précise à 100%.\n"
 
 #: src/emu/ui/ui.cpp:1112
 msgid "The machine lacks sound.\n"
-msgstr "La machine manque de son.\n"
+msgstr "Il n'y a aucun son pour ce jeu.\n"
 
 #: src/emu/ui/ui.cpp:1115
 msgid "Screen flipping in cocktail mode is not supported.\n"
@@ -1700,16 +1699,16 @@ msgid ""
 "This machine was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
 msgstr ""
-"Cette machine n'a jamais été terminé. Il peut y avoir des comportements "
-"étranges ou des élèmentsmanquants qui ne sont pas des bugs d'émulation.\n"
+"Ce jeu n'a jamais été terminé. Il peut y avoir des comportements "
+"étranges ou des éléments manquants qui ne sont pas des bugs d'émulation.\n"
 
 #: src/emu/ui/ui.cpp:1129
 msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
 msgstr ""
-"Cette machine ne possède pas de matériel son, MAME ne fournira aucun son, "
-"ceci est un commportement prévu.\n"
+"Ce jeu ne possède pas de son à l'origine, MAME ne produira aucun son, "
+"c'est un fonctionnement normal pour ce jeu.\n"
 
 #: src/emu/ui/ui.cpp:1137
 msgid "The machine has protection which isn't fully emulated.\n"
@@ -1722,9 +1721,9 @@ msgid ""
 "complete. There is nothing you can do to fix this problem except wait for "
 "the developers to improve the emulation.\n"
 msgstr ""
-"CETTE MACHINE NE FONCTIONNE PAS. L'émulation pour cette machine n'est pas "
-"encore complète. Il n'y a rien que vous puissiez faire pour corriger ce "
-"problème sauf d'attendre que les développeurs améliorent l'émulationon.\n"
+"CE JEU NE FONCTIONNE PAS. L'émulation pour ce jeu n'est pas "
+"encore terminée. Il n'y a rien que vous puissiez faire pour corriger ce  "
+"problème sauf d'attendre que les développeurs améliorent l'émulation.\n"
 
 #: src/emu/ui/ui.cpp:1144
 msgid ""
@@ -1733,16 +1732,16 @@ msgid ""
 "physical interaction or consists of mechanical devices. It is not possible "
 "to fully play this machine.\n"
 msgstr ""
-"Certains éléments de cette machine ne peuvent pas être émulés car cela "
+"Certains éléments de ce jeu ne peuvent pas être émulés car cela "
 "nécessite une interaction physique ou comporte des périphériques mécaniques. "
-"Il n'est pas possible de jouer complètement sur cette machine"
+"Il n'est pas possible de jouer à 100% avec ce jeu.\n"
 
 #: src/emu/ui/ui.cpp:1163
 msgid ""
 "\n"
 "\n"
 "There are working clones of this machine: "
-msgstr "Il y a des clones qui fonctionnent sur cette machine :"
+msgstr "Il y a des clones de ce jeu qui fonctionnent :"
 
 #: src/emu/ui/ui.cpp:1177
 msgid ""
@@ -2096,7 +2095,7 @@ msgstr " PENS"
 #~ msgstr " pour changer la valeur de la couleur"
 
 #~ msgid " to select"
-#~ msgstr " à sélectionner"
+#~ msgstr " à choisir"
 
 #~ msgid "Current "
 #~ msgstr "En cours "
