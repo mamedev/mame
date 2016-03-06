@@ -185,7 +185,7 @@
 #include <type_traits>
 #include <utility>
 
-#if defined(__GNUC__) && ((__GNUC__ == 5 && __GNUC_MINOR__ < 2) || (__GNUC__ == 4 && __GNUC_MINOR__ > 8))
+#if defined(__GLIBCXX__) && (__GLIBCXX__ < 20150413)
 namespace std
 {
 template<class _Container>
