@@ -137,11 +137,6 @@ end
 	links {
 		"qtdbg_" .. _OPTIONS["osd"],
 	}
-	if (_OPTIONS["SOURCES"] == nil) then 
-		links {
-			"bus",
-		}
-	end
 	links {
 		"netlist",
 		"optional",
