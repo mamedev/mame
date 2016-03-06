@@ -173,7 +173,7 @@ static void load_ui_options(running_machine &machine)
 	{
 		bool result = machine.ui().options().parse_ini_file((core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
 		if (!result)
-			osd_printf_error(_("**Error loading ui.ini**"));
+			osd_printf_error("**Error loading ui.ini**");
 	}
 }
 
