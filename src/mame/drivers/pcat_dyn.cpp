@@ -33,33 +33,42 @@ keyboard trick;
 #include "cpu/i386/i386.h"
 #include "machine/pcshare.h"
 #include "video/pc_vga.h"
-
+#include "machine/bankdev.h"
 
 class pcat_dyn_state : public pcat_base_state
 {
 public:
 	pcat_dyn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag) { }
+		: pcat_base_state(mconfig, type, tag)
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2"){ }
 
-	DECLARE_DRIVER_INIT(pcat_dyn);
-	virtual void machine_start() override;
+	required_device<address_map_bank_device> m_bank1;
+	required_device<address_map_bank_device> m_bank2;
+	DECLARE_WRITE8_MEMBER(bank1_w);
+	DECLARE_WRITE8_MEMBER(bank2_w);
 };
 
+WRITE8_MEMBER(pcat_dyn_state::bank1_w)
+{
+	m_bank1->set_bank(data);
+}
 
-//ce9b8
-/* TODO: understand the proper ROM loading.*/
+WRITE8_MEMBER(pcat_dyn_state::bank2_w)
+{
+	m_bank2->set_bank(data);
+}
+
 static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, pcat_dyn_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
-	AM_RANGE(0x000c8000, 0x000cffff) AM_RAM
-//  AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM AM_REGION("disk_bios", 0)
-//  AM_RANGE(0x000d8000, 0x000dffff) AM_RAM AM_REGION("disk_bios", 0)
-//  AM_RANGE(0x000e0000, 0x000effff) AM_ROM AM_REGION("game_prg", 0)
+    AM_RANGE(0x000d0000, 0x000d0fff) AM_ROM AM_REGION("game_prg", 0x0000) AM_WRITE8(bank1_w, 0xffffffff)
+    AM_RANGE(0x000d1000, 0x000d1fff) AM_ROM AM_REGION("game_prg", 0x1000) AM_WRITE8(bank2_w, 0xffffffff)
+	AM_RANGE(0x000d2000, 0x000d3fff) AM_DEVICE("bank1", address_map_bank_device, amap32)
+	AM_RANGE(0x000d2000, 0x000d4fff) AM_DEVICE("bank2", address_map_bank_device, amap32)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("bios", 0 )
-	AM_RANGE(0x00100000, 0x001fffff) AM_RAM //AM_REGION("game_prg", 0)
-//  AM_RANGE(0x00200000, 0x00ffffff) AM_RAM
-	//AM_RANGE(0x01000000, 0x01ffffff) AM_RAM
+	AM_RANGE(0x00100000, 0x001fffff) AM_RAM
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
 ADDRESS_MAP_END
 
@@ -68,6 +77,10 @@ static ADDRESS_MAP_START( pcat_io, AS_IO, 32, pcat_dyn_state )
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bank_map, AS_0, 32, pcat_dyn_state )
+	AM_RANGE(0x00000, 0xfffff) AM_ROM AM_REGION("game_prg", 0)
 ADDRESS_MAP_END
 
 #define AT_KEYB_HELPER(bit, text, key1) \
@@ -104,9 +117,6 @@ static INPUT_PORTS_START( pcat_dyn )
 	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
 
-void pcat_dyn_state::machine_start()
-{
-}
 
 static MACHINE_CONFIG_START( pcat_dyn, pcat_dyn_state )
 	/* basic machine hardware */
@@ -119,9 +129,21 @@ static MACHINE_CONFIG_START( pcat_dyn, pcat_dyn_state )
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	MCFG_FRAGMENT_ADD( pcat_common )
+
+	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(20)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	MCFG_DEVICE_ADD("bank2", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(20)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 MACHINE_CONFIG_END
 
 /***************************************
@@ -163,9 +185,6 @@ ROM_START(toursol1)
 	ROM_LOAD("prom.7", 0xe0000, 0x02000, CRC(154c8092) SHA1(4439ee82f36d5d5c334494ba7bb4848e839213a7))
 ROM_END
 
-DRIVER_INIT_MEMBER(pcat_dyn_state,pcat_dyn)
-{
-}
 
-GAME( 1995, toursol,  0,       pcat_dyn, pcat_dyn, pcat_dyn_state, pcat_dyn, ROT0, "Dynamo", "Tournament Solitaire (V1.06, 08/03/95)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 1995, toursol1, toursol, pcat_dyn, pcat_dyn, pcat_dyn_state, pcat_dyn, ROT0, "Dynamo", "Tournament Solitaire (V1.04, 06/22/95)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1995, toursol,  0,       pcat_dyn, pcat_dyn, driver_device, 0, ROT0, "Dynamo", "Tournament Solitaire (V1.06, 08/03/95)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1995, toursol1, toursol, pcat_dyn, pcat_dyn, driver_device, 0, ROT0, "Dynamo", "Tournament Solitaire (V1.04, 06/22/95)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

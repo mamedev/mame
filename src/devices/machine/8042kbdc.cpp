@@ -287,7 +287,8 @@ void kbdc8042_device::at_8042_receive(UINT8 data)
 		m_input_buffer_full_cb(1);
 		/* Lets 8952's timers do their job before clear the interrupt line, */
 		/* else Keyboard interrupt never happens. */
-		machine().scheduler().timer_set(attotime::from_usec(2), timer_expired_delegate(FUNC(kbdc8042_device::kbdc8042_clr_int),this));
+		/* Why was this done?  It dies when an extended scan code is received */
+		//machine().scheduler().timer_set(attotime::from_usec(2), timer_expired_delegate(FUNC(kbdc8042_device::kbdc8042_clr_int),this));
 	}
 }
 
@@ -347,6 +348,7 @@ READ8_MEMBER(kbdc8042_device::data_r)
 	switch (offset) {
 	case 0:
 		data = m_data;
+		m_input_buffer_full_cb(0);
 		if ((m_status_read_mode != 3) || (data != 0xfa))
 		{
 			if (m_keybtype != KBDC8042_AT386 || (data != 0x55))
