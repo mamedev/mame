@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-06 03:03+0100\n"
+"POT-Creation-Date: 2016-03-06 23:52+1100\n"
 "PO-Revision-Date: 2016-02-23 01:39+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -737,7 +737,7 @@ msgstr ""
 
 #: src/emu/ui/info.cpp:109
 msgid "[empty]"
-msgstr ""
+msgstr "〔空〕"
 
 #: src/emu/ui/info_pty.cpp:26 src/emu/ui/mainmenu.cpp:90
 msgid "Pseudo terminals"
@@ -866,7 +866,7 @@ msgstr "ゲームオーバー"
 
 #: src/emu/ui/menu.cpp:63
 msgid "Add or remove favorites"
-msgstr ""
+msgstr "お気に入りに追加または削除"
 
 #: src/emu/ui/menu.cpp:64
 msgid "Export displayed list to file"
@@ -994,38 +994,38 @@ msgstr "BIOS選択メニューをスキップする"
 msgid "Skip software parts selection menu"
 msgstr "ソフトウェアパーツ選択メニューをスキップする"
 
-#: src/emu/ui/miscmenu.cpp:648 src/emu/ui/miscmenu.cpp:668
+#: src/emu/ui/miscmenu.cpp:652 src/emu/ui/miscmenu.cpp:672
 #: src/emu/ui/optsmenu.cpp:267
 msgid "Miscellaneous Options"
 msgstr "その他の設定"
 
-#: src/emu/ui/miscmenu.cpp:733
+#: src/emu/ui/miscmenu.cpp:737
 #, c-format
 msgid "%s.xml saved under ui folder."
-msgstr "%s.xmlがuiフォルダーに保存された。"
+msgstr "%s.xmlをuiフォルダーに保存しました。"
 
-#: src/emu/ui/miscmenu.cpp:761
+#: src/emu/ui/miscmenu.cpp:765
 msgid "Name:             Description:\n"
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:773
+#: src/emu/ui/miscmenu.cpp:777
 #, c-format
 msgid "%s.txt saved under ui folder."
-msgstr "%s.txtがuiフォルダーに保存された。"
+msgstr "%s.txtをuiフォルダーに保存しました。"
 
-#: src/emu/ui/miscmenu.cpp:791
+#: src/emu/ui/miscmenu.cpp:795
 msgid "Export XML format (like -listxml)"
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:792
+#: src/emu/ui/miscmenu.cpp:796
 msgid "Export TXT format (like -listfull)"
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:850
+#: src/emu/ui/miscmenu.cpp:854
 msgid "Dummy"
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:852
+#: src/emu/ui/miscmenu.cpp:856
 msgid "Save machine configuration"
 msgstr "マシン設定を保存する"
 
@@ -1039,7 +1039,7 @@ msgstr "^!ファイル"
 
 #: src/emu/ui/optsmenu.cpp:231
 msgid " ^!Category"
-msgstr ""
+msgstr " ^!カテゴリ"
 
 #: src/emu/ui/optsmenu.cpp:254
 msgid "^!Setup custom filter"
@@ -1051,7 +1051,7 @@ msgstr "UIをカスタマイズする"
 
 #: src/emu/ui/optsmenu.cpp:263
 msgid "Configure Directories"
-msgstr "ディレクトリの設定"
+msgstr "フォルダ設定"
 
 #: src/emu/ui/optsmenu.cpp:266 src/emu/ui/sndmenu.cpp:150
 #: src/emu/ui/sndmenu.cpp:170
@@ -1085,14 +1085,14 @@ msgid "**Error saving %s.ini**"
 msgstr "*** %s.iniの保存エラー ***"
 
 #: src/emu/ui/optsmenu.cpp:376
-msgid "\n"
+msgid ""
+"\n"
 "    Configuration saved    \n"
 "\n"
-""
-msgstr "\n"
-"    設定が保存された    \n"
+msgstr ""
 "\n"
-""
+"    設定を保存しました    \n"
+"\n"
 
 #: src/emu/ui/selector.cpp:152
 msgid "Selection List - Search: "
@@ -1113,8 +1113,8 @@ msgid ""
 "%s\n"
 " added to favorites list."
 msgstr ""
-"「%s」が\n"
-"お気に入りに追加した。"
+"「%s」を\n"
+"お気に入りに追加しました。"
 
 #: src/emu/ui/selgame.cpp:394 src/emu/ui/selgame.cpp:403
 #: src/emu/ui/selsoft.cpp:285
@@ -1123,8 +1123,8 @@ msgid ""
 "%s\n"
 " removed from favorites list."
 msgstr ""
-"「%s」が\n"
-"お気に入りから削除した。"
+"「%s」を\n"
+"お気に入りから削除しました。"
 
 #: src/emu/ui/selgame.cpp:464
 msgid ""
@@ -1539,15 +1539,15 @@ msgstr ""
 
 #: src/emu/ui/swlist.cpp:268
 msgid "shortname"
-msgstr ""
+msgstr "ソフト"
 
 #: src/emu/ui/swlist.cpp:268
 msgid "description"
-msgstr "説明"
+msgstr "名前"
 
 #: src/emu/ui/swlist.cpp:436
 msgid "[compatible lists]"
-msgstr ""
+msgstr "【互換リスト】"
 
 #: src/emu/ui/tapectrl.cpp:84
 msgid "stopped"
@@ -1588,10 +1588,6 @@ msgstr "巻き戻す"
 #: src/emu/ui/tapectrl.cpp:106
 msgid "Fast Forward"
 msgstr "早送り"
-
-#: src/emu/ui/ui.cpp:176
-msgid "**Error loading ui.ini**"
-msgstr "*** ui.iniの読み込みエラー ***"
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
