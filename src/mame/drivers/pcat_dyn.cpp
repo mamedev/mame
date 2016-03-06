@@ -34,6 +34,7 @@ keyboard trick;
 #include "machine/pcshare.h"
 #include "video/pc_vga.h"
 #include "machine/bankdev.h"
+#include "machine/ds128x.h"
 
 class pcat_dyn_state : public pcat_base_state
 {
@@ -66,7 +67,8 @@ static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, pcat_dyn_state )
     AM_RANGE(0x000d0000, 0x000d0fff) AM_ROM AM_REGION("game_prg", 0x0000) AM_WRITE8(bank1_w, 0xffffffff)
     AM_RANGE(0x000d1000, 0x000d1fff) AM_ROM AM_REGION("game_prg", 0x1000) AM_WRITE8(bank2_w, 0xffffffff)
 	AM_RANGE(0x000d2000, 0x000d3fff) AM_DEVICE("bank1", address_map_bank_device, amap32)
-	AM_RANGE(0x000d2000, 0x000d4fff) AM_DEVICE("bank2", address_map_bank_device, amap32)
+	AM_RANGE(0x000d3000, 0x000d4fff) AM_DEVICE("bank2", address_map_bank_device, amap32)
+	AM_RANGE(0x000df800, 0x000df8ff) AM_RAM //I/O board?
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("bios", 0 )
 	AM_RANGE(0x00100000, 0x001fffff) AM_RAM
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
@@ -132,6 +134,11 @@ static MACHINE_CONFIG_START( pcat_dyn, pcat_dyn_state )
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 
+	MCFG_DEVICE_REMOVE("rtc")
+	MCFG_DS12885_ADD("rtc")
+	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir0_w))
+	MCFG_MC146818_CENTURY_INDEX(0x32)
+
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
@@ -166,6 +173,9 @@ ROM_START(toursol)
 	ROM_LOAD("sol.u23", 0x80000, 0x40000, CRC(d1e39bd4) SHA1(39c7ee43cddb53fba0f7c0572ddc40289c4edd07))
 	ROM_LOAD("sol.u24", 0xa0000, 0x40000, CRC(555341e0) SHA1(81fee576728855e234ff7aae06f54ae9705c3ab5))
 	ROM_LOAD("sol.u28", 0xe0000, 0x02000, CRC(c9374d50) SHA1(49173bc69f70bb2a7e8af9d03e2538b34aa881d8))
+
+	ROM_REGION(128, "rtc", 0)
+	ROM_LOAD("rtc", 0, 128, BAD_DUMP CRC(732f64c8) SHA1(5386eac3afef9b16af8dd7766e577f7ac700d9cc))
 ROM_END
 
 
@@ -183,6 +193,9 @@ ROM_START(toursol1)
 	ROM_LOAD("prom.2", 0x80000, 0x40000, CRC(8b0ac5cf) SHA1(1c2b6a53c9ff4d18a5227d899facbbc719f40205))
 	ROM_LOAD("prom.3", 0xa0000, 0x40000, CRC(9352e965) SHA1(2bfb647ec27c60a8c821fdf7483199e1a444cea8))
 	ROM_LOAD("prom.7", 0xe0000, 0x02000, CRC(154c8092) SHA1(4439ee82f36d5d5c334494ba7bb4848e839213a7))
+
+	ROM_REGION(128, "rtc", 0)
+	ROM_LOAD("rtc", 0, 128, BAD_DUMP CRC(732f64c8) SHA1(5386eac3afef9b16af8dd7766e577f7ac700d9cc))
 ROM_END
 
 
