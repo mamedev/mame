@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-06 03:03+0100\n"
-"PO-Revision-Date: 2016-03-02 18:52+0100\n"
+"PO-Revision-Date: 2016-03-06 10:44+0100\n"
 "Last-Translator: Mevi <mevi.mame@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: fr_BE\n"
@@ -245,8 +245,7 @@ msgstr "Paramètres des polices de l'interface"
 
 #: src/emu/ui/custui.cpp:431
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr ""
-"Exemple de texte - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+msgstr "Exemple de texte - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 #: src/emu/ui/custui.cpp:529
 msgid "Normal text"
@@ -323,7 +322,8 @@ msgstr "Paramètres des couleurs de l'interface"
 #: src/emu/ui/custui.cpp:591
 #, c-format
 msgid "Double click or press %1$s to change the color value"
-msgstr ""
+msgstr "Double-cliquer ou appuyer sur %1$s pour changer la valeur de "
+"la couleur"
 
 #: src/emu/ui/custui.cpp:617
 msgid "Menu Preview"
@@ -554,11 +554,11 @@ msgstr "Configuration des dossiers"
 #: src/emu/ui/dirmenu.cpp:183
 #, c-format
 msgid "Current %1$s Folders"
-msgstr ""
+msgstr "Dossier(s) actuel(s) pour %1$s"
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
-msgstr "Changer un dossier"
+msgstr "Changer le dossier"
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Add Folder"
@@ -566,17 +566,17 @@ msgstr "Ajouter un dossier"
 
 #: src/emu/ui/dirmenu.cpp:198
 msgid "Remove Folder"
-msgstr "Supprimer un dossier"
+msgstr "Supprimer le dossier"
 
 #: src/emu/ui/dirmenu.cpp:499
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
-msgstr ""
+msgstr "Modifier le dossier %1$s - Recherche: %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:500
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
-msgstr ""
+msgstr "Ajouter un dossier %1$s - Recherche: %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
@@ -585,7 +585,7 @@ msgstr "Appuyer sur TAB pour définir"
 #: src/emu/ui/dirmenu.cpp:643
 #, c-format
 msgid "Remove %1$s Folder"
-msgstr ""
+msgstr "Supprimer le dossier %1$s"
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
@@ -609,15 +609,15 @@ msgstr ""
 
 #: src/emu/ui/dsplmenu.cpp:45
 msgid "Bilinear Filtering"
-msgstr ""
+msgstr "Filtrage bilinéaire"
 
 #: src/emu/ui/dsplmenu.cpp:46
 msgid "Bitmap Prescaling"
-msgstr ""
+msgstr "Prescaling de l'image"
 
 #: src/emu/ui/dsplmenu.cpp:47
 msgid "Multi-Threaded Rendering"
-msgstr ""
+msgstr "Rendu multithread"
 
 #: src/emu/ui/dsplmenu.cpp:48
 msgid "Window Mode"
@@ -633,11 +633,11 @@ msgstr "Démarrer en mode plein écran"
 
 #: src/emu/ui/dsplmenu.cpp:51
 msgid "Synchronized Refresh"
-msgstr ""
+msgstr "Synchroniser le rafraîchissement de l'écran"
 
 #: src/emu/ui/dsplmenu.cpp:52
 msgid "Wait Vertical Sync"
-msgstr ""
+msgstr "Attendre V-Sync"
 
 #: src/emu/ui/dsplmenu.cpp:204 src/emu/ui/dsplmenu.cpp:224
 #: src/emu/ui/optsmenu.cpp:265
@@ -807,7 +807,7 @@ msgstr "Sélection du BIOS"
 
 #: src/emu/ui/mainmenu.cpp:99
 msgid "Slot Devices"
-msgstr ""
+msgstr "Slot Devices (Périphériques d'emplacement)"
 
 #: src/emu/ui/mainmenu.cpp:106
 msgid "Barcode Reader"
@@ -1026,7 +1026,7 @@ msgstr "Exporter au format TXT (comme -listfull)"
 
 #: src/emu/ui/miscmenu.cpp:850
 msgid "Dummy"
-msgstr "Fictif"
+msgstr "Fictif - Non chargé"
 
 #: src/emu/ui/miscmenu.cpp:852
 msgid "Save machine configuration"
@@ -1104,7 +1104,7 @@ msgstr "Liste de sélection - Recherche : "
 #: src/emu/ui/selector.cpp:181
 #, c-format
 msgid "Double click or press %1$s to select"
-msgstr ""
+msgstr "Double-cliquer ou appuyer sur %1$s pour sélectionner"
 
 #: src/emu/ui/selgame.cpp:38
 msgid "General Info"
@@ -1329,7 +1329,7 @@ msgstr "Ce driver est embryonnaire : %1$s\n"
 #: src/emu/ui/selgame.cpp:1555
 #, c-format
 msgid "Game is Mechanical: %1$s\n"
-msgstr "Éléments mécaniques dans ce jeu : %1$s\n"
+msgstr "Jeu comportant des éléments mécaniques : %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1556
 #, c-format
@@ -1344,7 +1344,7 @@ msgstr "Artwork cliquable nécessaire : %1$s\n"
 #: src/emu/ui/selgame.cpp:1558
 #, c-format
 msgid "Support Cocktail: %1$s\n"
-msgstr "Support du coktail mode : %1$s\n"
+msgstr "Support du mode coktail : %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1559
 #, c-format
@@ -1554,8 +1554,7 @@ msgstr "Permuter l'ordre des éléments"
 #: src/emu/ui/swlist.cpp:268
 #, c-format
 msgid "Switched Order: entries now ordered by %s"
-msgstr ""
-"Commande de tri effectuée : les entrées sont maintenant classées par %s"
+msgstr "Commande de tri effectuée : les entrées sont maintenant classées par %s"
 
 #: src/emu/ui/swlist.cpp:268
 msgid "shortname"
@@ -1615,8 +1614,7 @@ msgstr "**Erreur de chargement du fichier ui.ini**"
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
-msgstr ""
-"Ce driver nécessite le chargement d'images dans le(s) périphérique(s) "
+msgstr "Ce driver nécessite le chargement d'images dans le(s) périphérique(s) "
 "suivant(s) : "
 
 #: src/emu/ui/ui.cpp:1043
@@ -1643,7 +1641,7 @@ msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
 msgstr ""
-"Un ou plusieurs fichiers ROMs/CHDs nécessaires à l'utilisation de cette "
+"Un ou plusieurs fichiers ROMs ou d'images CHD nécessaires à l'utilisation de cette "
 "machine sont incorrects. Il est possible qu'elle ne fonctionne pas "
 "correctement.\n"
 
@@ -1740,7 +1738,7 @@ msgid ""
 msgstr ""
 "\n"
 "Certains composants de cette machine ne peuvent pas être émulés car ils "
-"nécessitent une interaction physique ou se composent d'éléments mécaniques. "
+"nécessitent une interaction physique ou comportent des éléments mécaniques. "
 "Il n'est donc pas possible d'y jouer complètement.\n"
 
 #: src/emu/ui/ui.cpp:1163
@@ -1776,7 +1774,7 @@ msgstr ""
 "%2$s %3$s\n"
 "Driver : %4$s\n"
 "\n"
-"Processeur :\n"
+"Processeur(s) :\n"
 
 #: src/emu/ui/ui.cpp:1228 src/emu/ui/ui.cpp:1267
 msgid "MHz"
@@ -1808,7 +1806,7 @@ msgstr "Aucun\n"
 
 #: src/emu/ui/ui.cpp:1282
 msgid "Vector"
-msgstr "Vecteur"
+msgstr "Graphismes vectoriels"
 
 #: src/emu/ui/ui.cpp:1293
 #, c-format
@@ -1962,7 +1960,7 @@ msgstr "'%1$s' Laserdisc - Position Verticale"
 
 #: src/emu/ui/ui.cpp:2081
 msgid "Vector Flicker"
-msgstr "Vector Flicker (Scintillement)"
+msgstr "Scintillement de l'affichage vectoriel"
 
 #: src/emu/ui/ui.cpp:2083
 msgid "Beam Width Minimum"
@@ -2101,33 +2099,3 @@ msgstr " COULEURS"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " MARQUEURS"
-
-#~ msgid "Double click or press "
-#~ msgstr "Double-cliquer ou appuyer sur "
-
-#~ msgid " to change the color value"
-#~ msgstr " pour changer la valeur de la couleur"
-
-#~ msgid " to select"
-#~ msgstr " pour sélectionner"
-
-#~ msgid "Current "
-#~ msgstr "Actuel "
-
-#~ msgid " Folders"
-#~ msgstr " dossiers"
-
-#~ msgid "Change)"
-#~ msgstr "Changer)"
-
-#~ msgid "Add"
-#~ msgstr "Ajouter"
-
-#~ msgid " Folder - Search: "
-#~ msgstr " Dossier - Recherche : "
-
-#~ msgid "Remove "
-#~ msgstr "Supprimer "
-
-#~ msgid " Folder"
-#~ msgstr " Dossier"
