@@ -322,7 +322,7 @@ msgstr "Configurações de cores do UI"
 #: src/emu/ui/custui.cpp:591
 #, c-format
 msgid "Double click or press %1$s to change the color value"
-msgstr ""
+msgstr "Duplo-clique ou pressione %1$s para mudar o valor da cor"
 
 #: src/emu/ui/custui.cpp:617
 msgid "Menu Preview"
@@ -1092,7 +1092,7 @@ msgstr "Lista de Seleção - Busca: "
 #: src/emu/ui/selector.cpp:181
 #, c-format
 msgid "Double click or press %1$s to select"
-msgstr ""
+msgstr "Pressione %1$s ou clique duas vezes para selecionar"
 
 #: src/emu/ui/selgame.cpp:38
 msgid "General Info"
@@ -1362,7 +1362,6 @@ msgstr "Requer CHD: %1$s\n"
 msgid "Roms Audit Pass: OK\n"
 msgstr ""
 "Checagem de Roms: OK\n"
-" "
 
 #: src/emu/ui/selgame.cpp:1584
 msgid "Roms Audit Pass: BAD\n"
@@ -1603,6 +1602,14 @@ msgid ""
 "\n"
 "Otherwise, type OK or move the joystick left then right to continue"
 msgstr ""
+"O uso de emuladores em conjunto com ROMs que você não possui é proibido "
+"por leis de direitos autorais\n"
+"\n"
+"SE VOCÊ NÃO ESTÁ LEGALMENTE ENTITULADO PARA JOGAR \"%1$s\" NESTE EMULADOR, "
+"PRESSIONE ESC.\n"
+"\n"
+"Caso contrário, digite OK ou mova o joystick para a esquerda e direita "
+"para continuar"
 
 #: src/emu/ui/ui.cpp:1081
 msgid ""
@@ -2048,15 +2055,6 @@ msgstr " CORES"
 msgid " PENS"
 msgstr " CANETAS"
 
-#~ msgid "Double click or press "
-#~ msgstr "Duplo-clique ou pressione"
-
-#~ msgid " to change the color value"
-#~ msgstr "para mudar o valor da cor"
-
-#~ msgid " to select"
-#~ msgstr " para selecionar"
-
 #~ msgid "Current "
 #~ msgstr "Atual"
 
@@ -2080,24 +2078,3 @@ msgstr " CANETAS"
 
 #~ msgid "Search: "
 #~ msgstr "Busca: "
-
-#~ msgid ""
-#~ "Usage of emulators in conjunction with ROMs you don't own is forbidden by "
-#~ "copyright law.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "O uso de emuladores em conjunto com ROMs que você não possui é proibido "
-#~ "por leis de direitos autorais"
-
-#~ msgid ""
-#~ "IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS "
-#~ "ESC.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "SE VOCÊ NÃO ESTÁ LEGALMENTE ENTITULADO PARA JOGAR \"%s\" NESTE EMULADOR, "
-#~ "PRESSIONE ESC."
-
-#~ msgid "Otherwise, type OK or move the joystick left then right to continue"
-#~ msgstr ""
-#~ "Caso contrário, digite OK ou mova o joystick para a esquerda e direita "
-#~ "para continuar"
