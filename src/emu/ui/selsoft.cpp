@@ -826,7 +826,7 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 		size_t found = copyright.find("\n");
 
 		tempbuf[0].clear();
-		tempbuf[1].assign(emulator_info::get_appname()).append(" ").append(build_version);
+		tempbuf[1] = string_format("%s %s", emulator_info::get_appname(), build_version);
 		tempbuf[2] = copyright.substr(0, found);
 		tempbuf[3] = copyright.substr(found + 1);
 		tempbuf[4].clear();

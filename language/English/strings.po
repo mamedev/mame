@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-06 12:23+1100\n"
+"POT-Creation-Date: 2016-03-06 03:03+0100\n"
 "PO-Revision-Date: 2016-02-20 18:03+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -318,11 +318,8 @@ msgid "UI Colors Settings"
 msgstr ""
 
 #: src/emu/ui/custui.cpp:591
-msgid "Double click or press "
-msgstr ""
-
-#: src/emu/ui/custui.cpp:591
-msgid " to change the color value"
+#, c-format
+msgid "Double click or press %1$s to change the color value"
 msgstr ""
 
 #: src/emu/ui/custui.cpp:617

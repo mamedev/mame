@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-06 12:34+1100\n"
+"POT-Creation-Date: 2016-03-06 03:03+0100\n"
 "PO-Revision-Date: 2016-03-05 13:02+0100\n"
 "Last-Translator: Ismael Ferreras Morezuelas <swyterzone+mame@gmail.com>\n"
 "Language-Team: Español; Castellano <>\n"
@@ -325,12 +325,9 @@ msgid "UI Colors Settings"
 msgstr "Ajustes de color de interfaz"
 
 #: src/emu/ui/custui.cpp:591
-msgid "Double click or press "
-msgstr "Haz doble clic o pulsa "
-
-#: src/emu/ui/custui.cpp:591
-msgid " to change the color value"
-msgstr " para cambiar el color"
+#, c-format
+msgid "Double click or press %1$s to change the color value"
+msgstr ""
 
 #: src/emu/ui/custui.cpp:617
 msgid "Menu Preview"
@@ -2099,6 +2096,12 @@ msgstr " COLORES"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " PLUMAS"
+
+#~ msgid "Double click or press "
+#~ msgstr "Haz doble clic o pulsa "
+
+#~ msgid " to change the color value"
+#~ msgstr " para cambiar el color"
 
 #~ msgid " to select"
 #~ msgstr " para seleccionar"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-06 12:34+1100\n"
+"POT-Creation-Date: 2016-03-06 03:03+0100\n"
 "PO-Revision-Date: 2016-02-23 12:43+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -323,12 +323,9 @@ msgid "UI Colors Settings"
 msgstr "Подeшeњe боjа корисничког интeрфejса"
 
 #: src/emu/ui/custui.cpp:591
-msgid "Double click or press "
-msgstr "Дупли клик или притисак тастeра"
-
-#: src/emu/ui/custui.cpp:591
-msgid " to change the color value"
-msgstr " да сe промeни врeдност боje"
+#, c-format
+msgid "Double click or press %1$s to change the color value"
+msgstr ""
 
 #: src/emu/ui/custui.cpp:617
 msgid "Menu Preview"
@@ -2094,6 +2091,12 @@ msgstr " БОЈЕ"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr ""
+
+#~ msgid "Double click or press "
+#~ msgstr "Дупли клик или притисак тастeра"
+
+#~ msgid " to change the color value"
+#~ msgstr " да сe промeни врeдност боje"
 
 #~ msgid " to select"
 #~ msgstr " за изабрати"

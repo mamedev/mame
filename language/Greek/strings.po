@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-06 12:34+1100\n"
+"POT-Creation-Date: 2016-03-06 03:03+0100\n"
 "PO-Revision-Date: 2016-03-01 16:29+0200\n"
 "Last-Translator: Mame.gr\n"
 "Language-Team: MAME Language Team\n"
@@ -322,12 +322,9 @@ msgid "UI Colors Settings"
 msgstr "Ρυθμίσεις χρωμάτων UI"
 
 #: src/emu/ui/custui.cpp:591
-msgid "Double click or press "
-msgstr "Κάντε διπλό κλικ ή πιέστε το πλήκτρο "
-
-#: src/emu/ui/custui.cpp:591
-msgid " to change the color value"
-msgstr " για να αλλάξετε την τιμή του χρώματος"
+#, c-format
+msgid "Double click or press %1$s to change the color value"
+msgstr ""
 
 #: src/emu/ui/custui.cpp:617
 msgid "Menu Preview"
@@ -2109,6 +2106,12 @@ msgstr " ΧΡΩΜΑΤΑ"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " ΓΡΑΦΙΔΕΣ"
+
+#~ msgid "Double click or press "
+#~ msgstr "Κάντε διπλό κλικ ή πιέστε το πλήκτρο "
+
+#~ msgid " to change the color value"
+#~ msgstr " για να αλλάξετε την τιμή του χρώματος"
 
 #~ msgid " to select"
 #~ msgstr " για επιλογή﻿"
