@@ -31,7 +31,6 @@ public:
 	void load_software_info(std::string &softlist, std::string &buffer, std::string &softname, std::string &parentname);
 	void command_sub_menu(const game_driver *drv, std::vector<std::string> &menuitems);
 	void reset_run() { first_run = true; }
-	bool has_software(std::string &softlist, std::string &softname, std::string &parentname);
 
 	std::string rev_history() const { return m_history_rev; }
 	std::string rev_mameinfo() const { return m_mame_rev; }
@@ -45,9 +44,11 @@ public:
 	bool has_command(const game_driver *driver) { return (m_cmdidx.find(driver) != m_cmdidx.end()); }
 	bool has_sysinfo(const game_driver *driver) { return (m_sysidx.find(driver) != m_sysidx.end()); }
 	bool has_story(const game_driver *driver) { return (m_storyidx.find(driver) != m_storyidx.end()); }
+	bool has_software(std::string &softlist, std::string &softname, std::string &parentname);
 
-	bool has_data(const game_driver *d)
+	bool has_data(const game_driver *a = nullptr)
 	{
+		const game_driver *d = (a != nullptr) ? a : &machine().system();
 		return (has_history(d) || has_mameinfo(d) || has_messinfo(d) || has_command(d) || has_sysinfo(d) || has_story(d));
 	}
 private:

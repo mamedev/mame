@@ -132,7 +132,7 @@ void ui_menu_main::populate()
 		item_append(_("Cheat"), nullptr, 0, (void *)CHEAT);
 
 	// add dats menu
-	if (machine().ui().options().enabled_dats() && machine().datfile().has_data(&machine().system()))
+	if (machine().ui().options().enabled_dats() && machine().datfile().has_data())
 		item_append(_("External DAT View"), nullptr, 0, (void *)EXTERNAL_DATS);
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
