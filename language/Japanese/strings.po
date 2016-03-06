@@ -1002,7 +1002,7 @@ msgstr "その他の設定"
 #: src/emu/ui/miscmenu.cpp:733
 #, c-format
 msgid "%s.xml saved under ui folder."
-msgstr "%s.xmlがuiフォルダーに保存した。"
+msgstr "%s.xmlがuiフォルダーに保存された。"
 
 #: src/emu/ui/miscmenu.cpp:761
 msgid "Name:             Description:\n"
@@ -1011,7 +1011,7 @@ msgstr ""
 #: src/emu/ui/miscmenu.cpp:773
 #, c-format
 msgid "%s.txt saved under ui folder."
-msgstr "%s.txtがuiフォルダーに保した。"
+msgstr "%s.txtがuiフォルダーに保存された。"
 
 #: src/emu/ui/miscmenu.cpp:791
 msgid "Export XML format (like -listxml)"
@@ -1090,7 +1090,7 @@ msgid "\n"
 "\n"
 ""
 msgstr "\n"
-"    設定が保存した    \n"
+"    設定が保存された    \n"
 "\n"
 ""
 
