@@ -512,7 +512,7 @@ int main(int argc, char *argv[])
 		return 1;
 
 	// load the file
-	filerr = core_fload(opts.filename, &data, &length);
+	filerr = util::core_file::load(opts.filename, &data, length);
 	if (filerr != FILERR_NONE)
 	{
 		fprintf(stderr, "Error opening file '%s'\n", opts.filename);

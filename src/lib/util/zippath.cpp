@@ -298,7 +298,7 @@ static file_error file_error_from_zip_error(zip_error ziperr)
 -------------------------------------------------*/
 
 /**
- * @fn  static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header *header, core_file *&file)
+ * @fn  static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header *header, util::core_file::ptr &file)
  *
  * @brief   Creates core file from zip.
  *
@@ -309,7 +309,7 @@ static file_error file_error_from_zip_error(zip_error ziperr)
  * @return  The new core file from zip.
  */
 
-static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header *header, core_file *&file)
+static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header *header, util::core_file::ptr &file)
 {
 	file_error filerr;
 	zip_error ziperr;
@@ -329,7 +329,7 @@ static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header
 		goto done;
 	}
 
-	filerr = core_fopen_ram_copy(ptr, header->uncompressed_length, OPEN_FLAG_READ, &file);
+	filerr = util::core_file::open_ram_copy(ptr, header->uncompressed_length, OPEN_FLAG_READ, file);
 	if (filerr != FILERR_NONE)
 		goto done;
 
@@ -345,7 +345,7 @@ done:
 -------------------------------------------------*/
 
 /**
- * @fn  file_error zippath_fopen(const char *filename, UINT32 openflags, core_file *&file, std::string &revised_path)
+ * @fn  file_error zippath_fopen(const char *filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path)
  *
  * @brief   Zippath fopen.
  *
@@ -357,7 +357,7 @@ done:
  * @return  A file_error.
  */
 
-file_error zippath_fopen(const char *filename, UINT32 openflags, core_file *&file, std::string &revised_path)
+file_error zippath_fopen(const char *filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path)
 {
 	file_error filerr = FILERR_NOT_FOUND;
 	zip_error ziperr;
@@ -421,7 +421,7 @@ file_error zippath_fopen(const char *filename, UINT32 openflags, core_file *&fil
 		}
 
 		if (subpath.length() == 0)
-			filerr = core_fopen(filename, openflags, &file);
+			filerr = util::core_file::open(filename, openflags, file);
 		else
 			filerr = FILERR_NOT_FOUND;
 

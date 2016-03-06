@@ -64,7 +64,7 @@ static void compute_hash_as_string(std::string &buffer, void *data, UINT32 lengt
 static int split_file(const char *filename, const char *basename, UINT32 splitsize)
 {
 	std::string outfilename, basefilename, splitfilename;
-	core_file *outfile = nullptr, *infile = nullptr, *splitfile = nullptr;
+	util::core_file::ptr outfile, infile, splitfile;
 	std::string computedhash;
 	void *splitbuffer = nullptr;
 	int index, partnum;
@@ -81,7 +81,7 @@ static int split_file(const char *filename, const char *basename, UINT32 splitsi
 	splitsize *= 1024 * 1024;
 
 	// open the file for read
-	filerr = core_fopen(filename, OPEN_FLAG_READ, &infile);
+	filerr = util::core_file::open(filename, OPEN_FLAG_READ, infile);
 	if (filerr != FILERR_NONE)
 	{
 		fprintf(stderr, "Fatal error: unable to open file '%s'\n", filename);
@@ -89,7 +89,7 @@ static int split_file(const char *filename, const char *basename, UINT32 splitsi
 	}
 
 	// get the total length
-	totallength = core_fsize(infile);
+	totallength = infile->size();
 	if (totallength < splitsize)
 	{
 		fprintf(stderr, "Fatal error: file is smaller than the split size\n");
@@ -119,7 +119,7 @@ static int split_file(const char *filename, const char *basename, UINT32 splitsi
 	splitfilename.assign(basename).append(".split");
 
 	// create the split file
-	filerr = core_fopen(splitfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, &splitfile);
+	filerr = util::core_file::open(splitfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, splitfile);
 	if (filerr != FILERR_NONE)
 	{
 		fprintf(stderr, "Fatal error: unable to create split file '%s'\n", splitfilename.c_str());
@@ -127,8 +127,8 @@ static int split_file(const char *filename, const char *basename, UINT32 splitsi
 	}
 
 	// write the basics out
-	core_fprintf(splitfile, "splitfile=%s\n", basefilename.c_str());
-	core_fprintf(splitfile, "splitsize=%d\n", splitsize);
+	splitfile->printf("splitfile=%s\n", basefilename.c_str());
+	splitfile->printf("splitsize=%d\n", splitsize);
 
 	printf("Split file is '%s'\n", splitfilename.c_str());
 	printf("Splitting file %s into chunks of %dMB...\n", basefilename.c_str(), splitsize / (1024 * 1024));
@@ -141,7 +141,7 @@ static int split_file(const char *filename, const char *basename, UINT32 splitsi
 		printf("Reading part %d...", partnum);
 
 		// read as much as we can from the file
-		length = core_fread(infile, splitbuffer, splitsize);
+		length = infile->read(splitbuffer, splitsize);
 		if (length == 0)
 			break;
 
@@ -149,13 +149,13 @@ static int split_file(const char *filename, const char *basename, UINT32 splitsi
 		compute_hash_as_string(computedhash, splitbuffer, length);
 
 		// write that info to the split file
-		core_fprintf(splitfile, "hash=%s file=%s.%03d\n", computedhash.c_str(), basefilename.c_str(), partnum);
+		splitfile->printf("hash=%s file=%s.%03d\n", computedhash.c_str(), basefilename.c_str(), partnum);
 
 		// compute the full filename for this guy
 		outfilename = string_format("%s.%03d", basename, partnum);
 
 		// create it
-		filerr = core_fopen(outfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &outfile);
+		filerr = util::core_file::open(outfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, outfile);
 		if (filerr != FILERR_NONE)
 		{
 			printf("\n");
@@ -166,15 +166,14 @@ static int split_file(const char *filename, const char *basename, UINT32 splitsi
 		printf(" writing %s.%03d...", basefilename.c_str(), partnum);
 
 		// write the data
-		actual = core_fwrite(outfile, splitbuffer, length);
+		actual = outfile->write(splitbuffer, length);
 		if (actual != length)
 		{
 			printf("\n");
 			fprintf(stderr, "Fatal error: Error writing output file (out of space?)\n");
 			goto cleanup;
 		}
-		core_fclose(outfile);
-		outfile = nullptr;
+		outfile.reset();
 
 		printf(" done\n");
 
@@ -188,17 +187,17 @@ static int split_file(const char *filename, const char *basename, UINT32 splitsi
 	error = 0;
 
 cleanup:
-	if (splitfile != nullptr)
+	if (splitfile)
 	{
-		core_fclose(splitfile);
+		splitfile.reset();
 		if (error != 0)
 			remove(splitfilename.c_str());
 	}
-	if (infile != nullptr)
-		core_fclose(infile);
-	if (outfile != nullptr)
+	if (infile)
+		infile.reset();
+	if (outfile)
 	{
-		core_fclose(outfile);
+		outfile.reset();
 		if (error != 0)
 			remove(outfilename.c_str());
 	}
@@ -218,7 +217,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 	std::string expectedhash, computedhash;
 	std::string outfilename, infilename;
 	std::string basepath;
-	core_file *outfile = nullptr, *infile = nullptr, *splitfile = nullptr;
+	util::core_file::ptr outfile, infile, splitfile;
 	void *splitbuffer = nullptr;
 	file_error filerr;
 	UINT32 splitsize;
@@ -227,7 +226,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 	int index;
 
 	// open the file for read
-	filerr = core_fopen(filename, OPEN_FLAG_READ, &splitfile);
+	filerr = util::core_file::open(filename, OPEN_FLAG_READ, splitfile);
 	if (filerr != FILERR_NONE)
 	{
 		fprintf(stderr, "Fatal error: unable to open file '%s'\n", filename);
@@ -235,7 +234,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 	}
 
 	// read the first line and verify this is a split file
-	if (!core_fgets(buffer, sizeof(buffer), splitfile) || strncmp(buffer, "splitfile=", 10) != 0)
+	if (!splitfile->gets(buffer, sizeof(buffer)) || strncmp(buffer, "splitfile=", 10) != 0)
 	{
 		fprintf(stderr, "Fatal error: corrupt or incomplete split file at line:\n%s\n", buffer);
 		goto cleanup;
@@ -258,7 +257,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 		outfilename.insert(0, basepath);
 
 	// read the split size
-	if (!core_fgets(buffer, sizeof(buffer), splitfile) || sscanf(buffer, "splitsize=%d", &splitsize) != 1)
+	if (!splitfile->gets(buffer, sizeof(buffer)) || sscanf(buffer, "splitsize=%d", &splitsize) != 1)
 	{
 		fprintf(stderr, "Fatal error: corrupt or incomplete split file at line:\n%s\n", buffer);
 		goto cleanup;
@@ -268,17 +267,16 @@ static int join_file(const char *filename, const char *outname, int write_output
 	if (write_output)
 	{
 		// don't overwrite the original!
-		filerr = core_fopen(outfilename.c_str(), OPEN_FLAG_READ, &outfile);
+		filerr = util::core_file::open(outfilename.c_str(), OPEN_FLAG_READ, outfile);
 		if (filerr == FILERR_NONE)
 		{
-			core_fclose(outfile);
-			outfile = nullptr;
+			outfile.reset();
 			fprintf(stderr, "Fatal error: output file '%s' already exists\n", outfilename.c_str());
 			goto cleanup;
 		}
 
 		// open the output for write
-		filerr = core_fopen(outfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &outfile);
+		filerr = util::core_file::open(outfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, outfile);
 		if (filerr != FILERR_NONE)
 		{
 			fprintf(stderr, "Fatal error: unable to create file '%s'\n", outfilename.c_str());
@@ -289,7 +287,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 	printf("%s file '%s'...\n", write_output ? "Joining" : "Verifying", outfilename.c_str());
 
 	// now iterate through each file
-	while (core_fgets(buffer, sizeof(buffer), splitfile))
+	while (splitfile->gets(buffer, sizeof(buffer)))
 	{
 		UINT32 length, actual;
 
@@ -307,7 +305,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 
 		// read the file's contents
 		infilename.insert(0, basepath);
-		filerr = core_fload(infilename.c_str(), &splitbuffer, &length);
+		filerr = util::core_file::load(infilename.c_str(), &splitbuffer, length);
 		if (filerr != FILERR_NONE)
 		{
 			printf("\n");
@@ -331,7 +329,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 		{
 			printf(" writing...");
 
-			actual = core_fwrite(outfile, splitbuffer, length);
+			actual = outfile->write(splitbuffer, length);
 			if (actual != length)
 			{
 				printf("\n");
@@ -357,13 +355,13 @@ static int join_file(const char *filename, const char *outname, int write_output
 	error = 0;
 
 cleanup:
-	if (splitfile != nullptr)
-		core_fclose(splitfile);
-	if (infile != nullptr)
-		core_fclose(infile);
-	if (outfile != nullptr)
+	if (splitfile)
+		splitfile.reset();
+	if (infile)
+		infile.reset();
+	if (outfile)
 	{
-		core_fclose(outfile);
+		outfile.reset();
 		if (error != 0)
 			remove(outfilename.c_str());
 	}

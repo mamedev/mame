@@ -1880,7 +1880,7 @@ void media_identifier::identify_file(const char *name)
 		// load the file and process if it opens and has a valid length
 		UINT32 length;
 		void *data;
-		file_error filerr = core_fload(name, &data, &length);
+		const file_error filerr = util::core_file::load(name, &data, length);
 		if (filerr == FILERR_NONE && length > 0)
 		{
 			identify_data(name, reinterpret_cast<UINT8 *>(data), length);
