@@ -325,7 +325,7 @@ msgstr "Paramètrage des Couleurs de l'Interface"
 #: src/emu/ui/custui.cpp:591
 #, c-format
 msgid "Double click or press %1$s to change the color value"
-msgstr "Double clicquer ou pressez %1$s pour changer la valeur de la couleur"
+msgstr "Double-cliquez ou pressez %1$s pour changer la valeur de la couleur"
 
 #: src/emu/ui/custui.cpp:617
 msgid "Menu Preview"

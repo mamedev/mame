@@ -242,14 +242,12 @@ void ui_menu_select_software::handle()
 		else if (m_event->iptkey == IPT_UI_DATS && machine().ui().options().enabled_dats())
 		{
 			ui_software_info *ui_swinfo = (ui_software_info *)m_event->itemref;
+			datfile_manager &mdat = machine().datfile();
 
-			if ((FPTR)ui_swinfo > 1 && machine().datfile().has_data(ui_swinfo->driver))
-			{
-				if (ui_swinfo->startempty == 1)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo->driver));
-				else
-					ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo));
-			}
+			if (ui_swinfo->startempty == 1 && mdat.has_history(ui_swinfo->driver))
+				ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo->driver));
+			else if (mdat.has_software(ui_swinfo->listname, ui_swinfo->shortname, ui_swinfo->parentname) || !ui_swinfo->usage.empty())
+				ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo));
 		}
 
 		// handle UI_LEFT_PANEL

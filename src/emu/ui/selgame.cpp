@@ -299,10 +299,31 @@ void ui_menu_select_game::handle()
 			}
 
 			// Infos
-			else if (ui_globals::rpanel == RP_INFOS && ui_globals::curdats_view > UI_FIRST_LOAD)
+			else if (ui_globals::rpanel == RP_INFOS)
 			{
-				ui_globals::curdats_view--;
-				topline_datsview = 0;
+				if (!isfavorite()) 
+				{
+					const game_driver *drv = (const game_driver *)m_event->itemref;
+					if ((FPTR)drv > skip_main_items && ui_globals::curdats_view > UI_FIRST_LOAD)
+					{
+						ui_globals::curdats_view--;
+						topline_datsview = 0;
+					}
+				}
+				else
+				{
+					ui_software_info *drv = (ui_software_info *)m_event->itemref;
+					if (drv->startempty == 1 && ui_globals::curdats_view > UI_FIRST_LOAD)
+					{
+						ui_globals::curdats_view--;
+						topline_datsview = 0;
+					}
+					else if ((FPTR)drv > skip_main_items && ui_globals::cur_sw_dats_view > 0)
+					{
+						ui_globals::cur_sw_dats_view--;
+						topline_datsview = 0;
+					}
+				}
 			}
 		}
 
@@ -318,10 +339,31 @@ void ui_menu_select_game::handle()
 			}
 
 			// Infos
-			else if (ui_globals::rpanel == RP_INFOS && ui_globals::curdats_view < UI_LAST_LOAD)
+			else if (ui_globals::rpanel == RP_INFOS)
 			{
-				ui_globals::curdats_view++;
-				topline_datsview = 0;
+				if (!isfavorite())
+				{
+					const game_driver *drv = (const game_driver *)m_event->itemref;
+					if ((FPTR)drv > skip_main_items && ui_globals::curdats_view < UI_LAST_LOAD)
+					{
+						ui_globals::curdats_view++;
+						topline_datsview = 0;
+					}
+				}
+				else
+				{
+					ui_software_info *drv = (ui_software_info *)m_event->itemref;
+					if (drv->startempty == 1 && ui_globals::curdats_view < UI_LAST_LOAD)
+					{
+						ui_globals::curdats_view++;
+						topline_datsview = 0;
+					}
+					else if ((FPTR)drv > skip_main_items && ui_globals::cur_sw_dats_view < 1)
+					{
+						ui_globals::cur_sw_dats_view++;
+						topline_datsview = 0;
+					}
+				}
 			}
 		}
 
@@ -363,13 +405,15 @@ void ui_menu_select_game::handle()
 			}
 			else
 			{
-				ui_software_info *swinfo  = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > skip_main_items && machine().datfile().has_data(swinfo->driver))
+				ui_software_info *ui_swinfo  = (ui_software_info *)m_event->itemref;
+				datfile_manager &mdat = machine().datfile();
+
+				if ((FPTR)ui_swinfo > skip_main_items)
 				{
-					if (swinfo->startempty == 1)
-						ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, swinfo->driver));
-					else
-						ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, swinfo));
+					if (ui_swinfo->startempty == 1 && mdat.has_history(ui_swinfo->driver))
+						ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo->driver));
+					else if (mdat.has_software(ui_swinfo->listname, ui_swinfo->shortname, ui_swinfo->parentname) || !ui_swinfo->usage.empty())
+						ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo));
 				}
 			}
 		}

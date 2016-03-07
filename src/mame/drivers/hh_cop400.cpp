@@ -251,7 +251,8 @@ UINT8 hh_cop400_state::read_inputs(int columns)
   * COP421 MCU label ~/927 COP421-NEZ/N
   * 4 lamps, 1-bit sound
   
-  This is a Simon clone, the tones are not harmonic.
+  This is a Simon clone, the tones are not harmonic. Two models exist, each
+  with a different batteries setup, assume for now they're same otherwise.
 
 ***************************************************************************/
 
@@ -321,7 +322,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( ctstein, ctstein_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP421, 850000) // approximation - RC osc. R=12K to +6V, C=100pf to GND
+	MCFG_CPU_ADD("maincpu", COP421, 860000) // approximation - RC osc. R=12K to +6V, C=100pf to GND
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_G_CB(WRITE8(ctstein_state, write_g))
 	MCFG_COP400_WRITE_L_CB(WRITE8(ctstein_state, write_l))
@@ -346,6 +347,8 @@ MACHINE_CONFIG_END
   Coleco Head to Head Basketball
   * COP420 MCU label COP420L-NEZ/N
   * 2-digit 7seg display, 41 other leds, 1-bit sound
+  
+  This is the COP400 version, there is one for TMS1000 too.
   
 ***************************************************************************/
 
