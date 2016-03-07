@@ -520,6 +520,8 @@ public:
 	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
 	TIMER_CALLBACK_MEMBER(dafb_vbl_tick);
 	TIMER_CALLBACK_MEMBER(dafb_cursor_tick);
+	TIMER_CALLBACK_MEMBER(mac_adb_tick);    // macadb.c
+	TIMER_CALLBACK_MEMBER(mac_pmu_tick);    // macadb.c
 	DECLARE_WRITE_LINE_MEMBER(mac_via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
 	DECLARE_READ8_MEMBER(mac_via_in_a);

@@ -103,7 +103,7 @@ private:
 
 		attotime period() const;
 		void trigger(UINT8 data);
-		void timer_callback();
+		TIMER_CALLBACK_MEMBER(timer_callback);
 
 		z80ctc_device * m_device;               // pointer back to our device
 		int             m_index;                // our channel index
@@ -113,9 +113,6 @@ private:
 		UINT8           m_extclk;               // current signal from the external clock
 		emu_timer *     m_timer;                // array of active timers
 		UINT8           m_int_state;            // interrupt status (for daisy chain)
-
-	private:
-		static TIMER_CALLBACK( static_timer_callback ) { reinterpret_cast<z80ctc_device::ctc_channel *>(ptr)->timer_callback(); }
 	};
 
 	// internal state

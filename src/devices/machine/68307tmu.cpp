@@ -99,7 +99,7 @@ WRITE16_MEMBER( m68307cpu_device::m68307_internal_timer_w )
 	}
 }
 
-static TIMER_CALLBACK( m68307_timer0_callback )
+TIMER_CALLBACK_MEMBER(m68307_timer::timer0_callback )
 {
 	m68307cpu_device* m68k = (m68307cpu_device *)ptr;
 	m68307_single_timer* tptr = &m68k->m68307TIMER->singletimer[0];
@@ -110,7 +110,7 @@ static TIMER_CALLBACK( m68307_timer0_callback )
 	tptr->mametimer->adjust(m68k->cycles_to_attotime(20000));
 }
 
-static TIMER_CALLBACK( m68307_timer1_callback )
+TIMER_CALLBACK_MEMBER(m68307_timer::timer1_callback )
 {
 	m68307cpu_device* m68k = (m68307cpu_device *)ptr;
 	m68307_single_timer* tptr = &m68k->m68307TIMER->singletimer[1];
@@ -122,7 +122,7 @@ static TIMER_CALLBACK( m68307_timer1_callback )
 
 }
 
-static TIMER_CALLBACK( m68307_wd_timer_callback )
+TIMER_CALLBACK_MEMBER(m68307_timer::wd_timer_callback )
 {
 	printf("wd timer\n");
 }
@@ -134,15 +134,12 @@ void m68307_timer::init(m68307cpu_device *device)
 	m68307_single_timer* tptr;
 
 	tptr = &singletimer[0];
-	tptr->mametimer = device->machine().scheduler().timer_alloc(FUNC(m68307_timer0_callback), parent);
+	tptr->mametimer = device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68307_timer::timer0_callback),this), parent);
 
 	tptr = &singletimer[1];
-	tptr->mametimer = device->machine().scheduler().timer_alloc(FUNC(m68307_timer1_callback), parent);
+	tptr->mametimer = device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68307_timer::timer1_callback),this), parent);
 
-
-	wd_mametimer = device->machine().scheduler().timer_alloc(FUNC(m68307_wd_timer_callback), parent);
-
-
+	wd_mametimer = device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68307_timer::wd_timer_callback),this), parent);
 }
 
 UINT16 m68307_timer::read_tcn(UINT16 mem_mask, int which)
