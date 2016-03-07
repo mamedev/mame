@@ -65,27 +65,20 @@
 
 
 /* 8-bit values */
-using UINT8 = uint8_t;
-using INT8 = int8_t;
+using UINT8 = std::uint8_t;
+using INT8 = std::int8_t;
 
 /* 16-bit values */
-using UINT16 = uint16_t;
-using INT16 = int16_t;
+using UINT16 = std::uint16_t;
+using INT16 = std::int16_t;
 
 /* 32-bit values */
-using UINT32 = uint32_t;
-using INT32 = int32_t;
+using UINT32 = std::uint32_t;
+using INT32 = std::int32_t;
 
 /* 64-bit values */
-#ifndef _WINDOWS_H
-#ifdef _MSC_VER
-using UINT64 = unsigned __int64;
-using INT64 = signed  __int64;
-#else
-using UINT64 = unsigned long long;
-using INT64 = signed long long;
-#endif
-#endif
+using UINT64 = std::uint64_t;
+using INT64 = std::int64_t;
 
 /* pointer-sized values */
 using FPTR = uintptr_t;

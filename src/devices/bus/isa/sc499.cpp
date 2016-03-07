@@ -344,7 +344,7 @@ void sc499_device::device_start()
 
 	m_installed = false;
 
-	if (m_image->image_core_file() == nullptr)
+	if (!m_image->is_open())
 	{
 		LOG2(("start sc499: no cartridge tape"));
 	}

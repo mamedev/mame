@@ -8,8 +8,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/genpc.h"
-
+#include "machine/genpc.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -35,12 +34,6 @@
  *      PC DMA stuff
  *
  *************************************************************************/
-
-READ8_MEMBER( ibm5160_mb_device::pc_page_r)
-{
-	return 0xff;
-}
-
 
 WRITE8_MEMBER( ibm5160_mb_device::pc_page_w)
 {
@@ -528,24 +521,14 @@ ibm5160_mb_device::ibm5160_mb_device(const machine_config &mconfig, const char *
 {
 }
 
-void ibm5160_mb_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler)
-{
-	int buswidth = m_maincpu->space_config(AS_IO)->m_databus_width;
-	switch(buswidth)
-	{
-		case 8:
-			if(!rhandler.isnull()) m_maincpu->space(AS_IO).install_read_handler(start, end, mask, mirror, rhandler, 0);
-			if(!whandler.isnull()) m_maincpu->space(AS_IO).install_write_handler(start, end, mask, mirror, whandler, 0);
-			break;
-		case 16:
-			if(!rhandler.isnull()) m_maincpu->space(AS_IO).install_read_handler(start, end, mask, mirror, rhandler, 0xffff);
-			if(!whandler.isnull()) m_maincpu->space(AS_IO).install_write_handler(start, end, mask, mirror, whandler, 0xffff);
-			break;
-		default:
-			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported\n", buswidth);
-	}
-}
-
+DEVICE_ADDRESS_MAP_START( map, 8, ibm5160_mb_device )
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", am9517a_device, read, write)
+	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
+	AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+	AM_RANGE(0x0080, 0x008f) AM_WRITE(pc_page_w)
+	AM_RANGE(0x00a0, 0x00a1) AM_WRITE(nmi_enable_w)
+ADDRESS_MAP_END
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -553,15 +536,9 @@ void ibm5160_mb_device::install_device(offs_t start, offs_t end, offs_t mask, of
 
 void ibm5160_mb_device::device_start()
 {
-	install_device(0x0000, 0x000f, 0, 0, read8_delegate(FUNC(am9517a_device::read), (am9517a_device*)m_dma8237), write8_delegate(FUNC(am9517a_device::write), (am9517a_device*)m_dma8237) );
-	install_device(0x0020, 0x0021, 0, 0, read8_delegate(FUNC(pic8259_device::read), (pic8259_device*)m_pic8259), write8_delegate(FUNC(pic8259_device::write), (pic8259_device*)m_pic8259) );
-	install_device(0x0040, 0x0043, 0, 0, read8_delegate(FUNC(pit8253_device::read), (pit8253_device*)m_pit8253), write8_delegate(FUNC(pit8253_device::write), (pit8253_device*)m_pit8253) );
-	install_device(0x0060, 0x0063, 0, 0, read8_delegate(FUNC(i8255_device::read),   (i8255_device*)m_ppi8255),   write8_delegate(FUNC(i8255_device::write),   (i8255_device*)m_ppi8255)   );
-	install_device(0x0080, 0x0087, 0, 0, read8_delegate(FUNC(ibm5160_mb_device::pc_page_r), this), write8_delegate(FUNC(ibm5160_mb_device::pc_page_w),this) );
-	install_device(0x00a0, 0x00a1, 0, 0, read8_delegate(), write8_delegate(FUNC(ibm5160_mb_device::nmi_enable_w),this));
-	/* MESS managed RAM */
-	if ( m_ram->pointer() )
-		membank( "bank10" )->set_base( m_ram->pointer() );
+	if(!m_ram->started())
+		throw device_missing_dependencies();
+	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
 }
 
 
@@ -607,6 +584,10 @@ static MACHINE_CONFIG_FRAGMENT( ibm5150_mb_config )
 	MCFG_DEVICE_MODIFY("pc_kbdc")
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(ibm5150_mb_device, keyboard_clock_w))
 
+	MCFG_DEVICE_MODIFY("ppi8255")
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ibm5150_mb_device, pc_ppi_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(ibm5150_mb_device, pc_ppi_portc_r))
+
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 MACHINE_CONFIG_END
@@ -634,15 +615,6 @@ ibm5150_mb_device::ibm5150_mb_device(const machine_config &mconfig, const char *
 	: ibm5160_mb_device(mconfig, tag, owner, clock),
 		m_cassette(*this, "cassette")
 {
-}
-
-void ibm5150_mb_device::device_start()
-{
-	ibm5160_mb_device::device_start();
-}
-void ibm5150_mb_device::device_reset()
-{
-	ibm5160_mb_device::device_reset();
 }
 
 READ8_MEMBER (ibm5150_mb_device::pc_ppi_porta_r)
@@ -788,6 +760,10 @@ const device_type EC1841_MOTHERBOARD = &device_creator<ec1841_mb_device>;
 static MACHINE_CONFIG_FRAGMENT( ec1841_mb_config )
 	MCFG_FRAGMENT_ADD(ibm5160_mb_config)
 
+	MCFG_DEVICE_MODIFY("ppi8255")
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ec1841_mb_device, pc_ppi_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(ec1841_mb_device, pc_ppi_portc_r))
+
 	MCFG_DEVICE_MODIFY("pc_kbdc")
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(ec1841_mb_device, keyboard_clock_w))
 MACHINE_CONFIG_END
@@ -857,11 +833,6 @@ ec1841_mb_device::ec1841_mb_device(const machine_config &mconfig, const char *ta
 
 void ec1841_mb_device::device_start()
 {
-	ibm5160_mb_device::device_start();
-}
-void ec1841_mb_device::device_reset()
-{
-	ibm5160_mb_device::device_reset();
 }
 
 // kbd interface is 5150-like but PB2 controls access to second bank of DIP switches (SA2).
@@ -939,16 +910,12 @@ ioport_constructor pc_noppi_mb_device::device_input_ports() const
 	return INPUT_PORTS_NAME( pc_noppi_mb );
 }
 
-void pc_noppi_mb_device::device_start()
-{
-	install_device(0x0000, 0x000f, 0, 0, read8_delegate(FUNC(am9517a_device::read), (am9517a_device*)m_dma8237), write8_delegate(FUNC(am9517a_device::write), (am9517a_device*)m_dma8237) );
-	install_device(0x0020, 0x0021, 0, 0, read8_delegate(FUNC(pic8259_device::read), (pic8259_device*)m_pic8259), write8_delegate(FUNC(pic8259_device::write), (pic8259_device*)m_pic8259) );
-	install_device(0x0040, 0x0043, 0, 0, read8_delegate(FUNC(pit8253_device::read), (pit8253_device*)m_pit8253), write8_delegate(FUNC(pit8253_device::write), (pit8253_device*)m_pit8253) );
-	install_device(0x0080, 0x0087, 0, 0, read8_delegate(FUNC(ibm5160_mb_device::pc_page_r), this), write8_delegate(FUNC(ibm5160_mb_device::pc_page_w),this) );
-	install_device(0x00a0, 0x00a1, 0, 0, read8_delegate(), write8_delegate(FUNC(ibm5160_mb_device::nmi_enable_w),this));
-	/* MESS managed RAM */
-	if ( m_ram->pointer() )
-		membank( "bank10" )->set_base( m_ram->pointer() );
-}
+DEVICE_ADDRESS_MAP_START( map, 8, pc_noppi_mb_device )
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", am9517a_device, read, write)
+	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
+	AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+	AM_RANGE(0x0080, 0x008f) AM_WRITE(pc_page_w)
+	AM_RANGE(0x00a0, 0x00a1) AM_WRITE(nmi_enable_w)
+ADDRESS_MAP_END
 
 const device_type PCNOPPI_MOTHERBOARD = &device_creator<pc_noppi_mb_device>;

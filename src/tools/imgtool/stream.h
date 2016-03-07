@@ -20,7 +20,7 @@ imgtool_stream *stream_open(const char *fname, int read_or_write);  /* similar p
 imgtool_stream *stream_open_write_stream(int filesize);
 imgtool_stream *stream_open_mem(void *buf, size_t sz);
 void stream_close(imgtool_stream *stream);
-core_file *stream_core_file(imgtool_stream *stream);
+util::core_file *stream_core_file(imgtool_stream *stream);
 UINT32 stream_read(imgtool_stream *stream, void *buf, UINT32 sz);
 UINT32 stream_write(imgtool_stream *stream, const void *buf, UINT32 sz);
 UINT64 stream_size(imgtool_stream *stream);

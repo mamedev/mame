@@ -58,10 +58,10 @@
  @88      HD38820A  1984, Bandai Pair Match (PT-460) (1/2)
  @89      HD38820A  1984, Bandai Pair Match (PT-460) (2/2)
 
- *75      HD44801A  1982, Alpha 8201 protection MCU (have dump)
+  75      HD44801A  1982, Alpha 8201 protection MCU -> machine/alpha8201.*
 
- *35      HD44801B  1983, Alpha 8302 protection MCU (have dump)
- *42      HD44801B  1984, Alpha 8303 protection MCU (have dump)
+  35      HD44801B  1983, Alpha 8302 protection MCU (see 8201)
+  42      HD44801B  1984, Alpha 8303 protection MCU (see 8201)
 
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 

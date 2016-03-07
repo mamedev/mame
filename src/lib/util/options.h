@@ -142,7 +142,7 @@ public:
 
 	// parsing/input
 	bool parse_command_line(int argc, char **argv, int priority, std::string &error_string);
-	bool parse_ini_file(core_file &inifile, int priority, int ignore_priority, std::string &error_string);
+	bool parse_ini_file(util::core_file &inifile, int priority, int ignore_priority, std::string &error_string);
 
 	// reverting
 	void revert(int priority = OPTION_PRIORITY_MAXIMUM);

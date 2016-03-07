@@ -344,11 +344,11 @@ std::string pce_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 len = core_fsize(m_file);
+		UINT32 len = m_file->size();
 		dynamic_buffer rom(len);
 		int type;
 
-		core_fread(m_file, &rom[0], len);
+		m_file->read(&rom[0], len);
 
 		type = get_cart_type(&rom[0], len);
 		slot_string = pce_get_slot(type);

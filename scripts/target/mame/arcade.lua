@@ -563,6 +563,7 @@ MACHINES["STEPPERS"] = true
 --MACHINES["DIABLO_HD"] = true
 MACHINES["PCI9050"] = true
 --MACHINES["TMS1024"] = true
+MACHINES["GENPC"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -619,7 +620,7 @@ BUSES["NEOGEO"] = true
 --BUSES["ORICEXT"] = true
 --BUSES["PCE"] = true
 BUSES["PC_JOY"] = true
---BUSES["PC_KBD"] = true
+BUSES["PC_KBD"] = true
 --BUSES["PET"] = true
 --BUSES["PLUS4"] = true
 --BUSES["PSX_CONTROLLER"] = true

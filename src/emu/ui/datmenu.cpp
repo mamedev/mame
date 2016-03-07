@@ -99,10 +99,7 @@ void ui_menu_dats_view::handle()
 void ui_menu_dats_view::populate()
 {
 	machine().pause();
-	if (!issoft)
-		get_data();
-	else
-		get_data_sw();
+	(issoft == true) ? get_data_sw() : get_data();
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, (MENU_FLAG_UI_DATS | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), nullptr);
 	customtop = 2.0f * machine().ui().get_line_height() + 4.0f * UI_BOX_TB_BORDER;
@@ -119,12 +116,7 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 	ui_manager &mui = machine().ui();
 	float maxwidth = origx2 - origx1;
 	float width;
-	std::string driver;
-
-	if (issoft)
-		driver = m_swinfo->longname;
-	else
-		driver = m_driver->description;
+	std::string driver = (issoft == true) ? m_swinfo->longname : m_driver->description;
 
 	mui.draw_text_full(container, driver.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
@@ -251,7 +243,6 @@ void ui_menu_dats_view::get_data()
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
 		item_append(tempbuf.c_str(), nullptr, (MENU_FLAG_UI_DATS | MENU_FLAG_DISABLE), (void *)(FPTR)(x + 1));
-
 	}
 }
 
@@ -276,7 +267,6 @@ void ui_menu_dats_view::get_data_sw()
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
 		item_append(tempbuf.c_str(), nullptr, (MENU_FLAG_UI_DATS | MENU_FLAG_DISABLE), (void *)(FPTR)(x + 1));
-
 	}
 }
 

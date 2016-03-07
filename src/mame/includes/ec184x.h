@@ -9,7 +9,7 @@
 #ifndef EC184X_H_
 #define EC184X_H_
 
-#include "includes/genpc.h"
+#include "machine/genpc.h"
 
 #define MCFG_EC1841_MOTHERBOARD_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, EC1841_MOTHERBOARD, 0) \

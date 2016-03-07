@@ -36,12 +36,12 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
+
+	DECLARE_ADDRESS_MAP(map, 8);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
 public:
 	required_device<cpu_device>  m_maincpu;
 	required_device<pic8259_device>  m_pic8259;
@@ -76,12 +76,12 @@ public:
 	UINT8                   m_ppi_shift_enable;
 
 	// interface to the keyboard
-	virtual DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 	DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );
 
-	virtual DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
-	virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
-	virtual DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
+	DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
+	DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
+	DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
 
 	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out1_changed );
 	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed );
@@ -104,7 +104,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
 
-	DECLARE_READ8_MEMBER(pc_page_r);
 	DECLARE_WRITE8_MEMBER(pc_page_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 
@@ -133,18 +132,16 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w ) override;
+	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	required_device<cassette_image_device>  m_cassette;
 public:
-	virtual DECLARE_READ8_MEMBER ( pc_ppi_porta_r ) override;
-	virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r ) override;
-	virtual DECLARE_WRITE8_MEMBER( pc_ppi_portb_w ) override;
+	DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
+	DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
+	DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
 };
 
 
@@ -165,17 +162,13 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
-
-protected:
-	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 public:
-	virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r ) override;
-	virtual DECLARE_WRITE8_MEMBER( pc_ppi_portb_w ) override;
+	DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
+	DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
 
-	virtual DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w ) override;
+	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 };
 
 extern const device_type EC1841_MOTHERBOARD;
@@ -189,12 +182,12 @@ class pc_noppi_mb_device : public ibm5160_mb_device
 public:
 	// construction/destruction
 	pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	UINT8 pit_out2() { return m_pit_out2; } // helper for near-clones with multifunction ics instead of 8255s
+
+	DECLARE_ADDRESS_MAP(map, 8);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
-protected:
-	// device-level overrides
-	void device_start() override;
 };
 
 extern const device_type PCNOPPI_MOTHERBOARD;

@@ -358,6 +358,8 @@ static MACHINE_CONFIG_DERIVED( xb42639, atvga )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( k286i, ibm5162 )
+	MCFG_DEVICE_MODIFY("kbd")
+	MCFG_DEVICE_SLOT_INTERFACE(pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL, false)
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa5", pc_isa16_cards, nullptr, false)
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa6", pc_isa16_cards, nullptr, false)
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa7", pc_isa16_cards, nullptr, false)

@@ -101,7 +101,6 @@ ccs2810.cpp
 ccs300.cpp
 cd2650.cpp
 cdc721.cpp
-cdi.cpp
 cfx9850.cpp
 cgc7900.cpp
 cgenie.cpp
@@ -123,7 +122,6 @@ concept.cpp
 cortex.cpp
 cosmicos.cpp
 cp1.cpp
-cps1.cpp
 craft.cpp
 crvision.cpp
 ct486.cpp
@@ -267,7 +265,6 @@ isbc.cpp
 iskr103x.cpp
 itt3030.cpp
 jade.cpp
-jaguar.cpp
 jonos.cpp
 jr100.cpp
 jr200.cpp
@@ -282,7 +279,6 @@ k8915.cpp
 kaypro.cpp
 kc.cpp
 kim1.cpp
-konamim2.cpp
 konin.cpp
 kramermc.cpp
 kyocera.cpp
@@ -672,3 +668,24 @@ zorba.cpp
 zrt80.cpp
 zsbc3.cpp
 zx.cpp
+//exceptions + to add - to remove from imported list
+//3do.cpp
+-3dobios
+-orbatak
+//cps1.cpp
++wofch
++sfzch
++sfach
++sfzbch
+//cdi.cpp
++cdimono1
++cdimono2
++cdi910
++cdi490a
+//jaguar.cpp
++jaguar
++jaguarcd
+//konamim2.cpp
++3do_m2
+//vectrex.cpp
+-raaspec
