@@ -100,6 +100,7 @@ public:
 	bool m_master_nmi_enable;
 	bool m_master_irq_enable;
 	bool m_slave_nmi_enable;
+	bool m_screen_enable;
 	UINT8 m_bg_scrollx, m_bg_scrolly;
 protected:
 	// driver_device overrides
@@ -191,6 +192,11 @@ void sprcros2_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 
 UINT32 sprcros2_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	if(m_screen_enable == false)
+	{
+		bitmap.fill(0,cliprect);
+		return 0;
+	}
 	legacy_bg_draw(bitmap,cliprect);
 	legacy_obj_draw(bitmap,cliprect);
 	legacy_fg_draw(bitmap,cliprect);
@@ -205,6 +211,7 @@ WRITE8_MEMBER(sprcros2_state::master_output_w)
 
 	membank("master_rombank")->set_entry((data&0x40)>>6);
 	m_master_nmi_enable = bool(data & 1);
+	m_screen_enable = bool(data & 4);
 	m_master_irq_enable = bool(data & 8);
 //	if(data & 0x80)
 //		m_master_cpu->set_input_line(0,HOLD_LINE);
