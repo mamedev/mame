@@ -1145,6 +1145,7 @@ file_error core_file::open_ram_copy(void const *data, std::size_t length, std::u
 		if (!result->buffer())
 			return FILERR_OUT_OF_MEMORY;
 
+		file = std::move(result);
 		return FILERR_NONE;
 	}
 	catch (...)
