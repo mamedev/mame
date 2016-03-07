@@ -609,6 +609,7 @@ protected:
 	UINT8 read_buffer[0x20];
 	UINT8 write_buffer[0x20];
 	chihiro_state *chihirosystem;
+	static const int size_factor = 2;
 };
 
 //**************************************************************************
@@ -665,10 +666,12 @@ int ide_baseboard_device::read_sector(UINT32 lba, void *buffer)
 
 	/*
 	It assumes there are 4 "partitions", the size of the first one depends on bits 3-0 of io port 40f4:
-	Value    Size lba
-	0   0x40000-0x8000
-	...
-	4   0x400000-0x8000
+	Value Size lba
+	0     0x40000-0x8000
+	1     0x80000-0x8000
+	2     0x100000-0x8000
+	3     0x200000-0x8000
+	4     0x400000-0x8000
 	The size of the second one is always 0x8000 sectors, and is used as a special communication area
 	This is a list of the partitions in the minimum size case:
 	Name          Start lba  Size lba Size
@@ -686,13 +689,13 @@ int ide_baseboard_device::read_sector(UINT32 lba, void *buffer)
 	logerror("baseboard: read sector lba %08x\n", lba);
 	if (lba >= 0x08000000) {
 		off = (lba & 0x7ff) * 512;
-		data = memregion(":others")->base();
+		data = memregion(":mediaboard")->base();
 		memcpy(buffer, data + off, 512);
 		return 1;
 	}
-	if (lba >= 0xf8000) {
+	if (lba >= ((0x40000 << size_factor) - 0x8000)) {
 		memset(buffer, 0, 512);
-		lba = lba - 0xf8000;
+		lba = lba - ((0x40000 << size_factor) - 0x8000);
 		if (lba == 0x4800)
 			memcpy(buffer, read_buffer, 0x20);
 		else if (lba == 0x4801)
@@ -709,8 +712,8 @@ int ide_baseboard_device::read_sector(UINT32 lba, void *buffer)
 int ide_baseboard_device::write_sector(UINT32 lba, const void *buffer)
 {
 	logerror("baseboard: write sector lba %08x\n", lba);
-	if (lba >= 0xf8000) {
-		lba = lba - 0xf8000;
+	if (lba >= ((0x40000 << size_factor) - 0x8000)) {
+		lba = lba - ((0x40000 << size_factor) - 0x8000);
 		if (lba == 0x4800)
 			memcpy(read_buffer, buffer, 0x20);
 		else if (lba == 0x4801) {
@@ -804,18 +807,18 @@ READ32_MEMBER(chihiro_state::mediaboard_r)
 
 	logerror("I/O port read %04x mask %08X\n", offset * 4 + 0x4000, mem_mask);
 	r = 0;
-	if ((offset == 7) && ACCESSING_BITS_16_31)
+	if ((offset == 0x1c/4) && ACCESSING_BITS_16_31)
 		r = 0x10000000;
-	if ((offset == 8) && ACCESSING_BITS_0_15)
+	if ((offset == 0x20/4) && ACCESSING_BITS_0_15)
 		r = 0x000000a0;
-	if ((offset == 8) && ACCESSING_BITS_16_31)
+	if ((offset == 0x20/4) && ACCESSING_BITS_16_31)
 		r = 0x42580000;
-	if ((offset == 9) && ACCESSING_BITS_0_15)
+	if ((offset == 0x24/4) && ACCESSING_BITS_0_15)
 		r = 0x00004d41;
-	if ((offset == 0x3c) && ACCESSING_BITS_0_15)
+	if ((offset == 0xf0/4) && ACCESSING_BITS_0_15)
 		r = 0x00000000; // bits 15-0 0 if media board present
-	if ((offset == 0x3d) && ACCESSING_BITS_0_15)
-		r = 0x00000002; // bits 3-0 size of dimm board memory. Must be 2
+	if ((offset == 0xf4/4) && ACCESSING_BITS_0_15)
+		r = 2; // bits 3-0 size of dimm board memory. 0=128 1=256 2=512 3=1024 Must be 2
 	return r;
 }
 
@@ -823,7 +826,7 @@ WRITE32_MEMBER(chihiro_state::mediaboard_w)
 {
 	logerror("I/O port write %04x mask %08X value %08X\n", offset * 4 + 0x4000, mem_mask, data);
 	// irq 10
-	if ((offset == 0x38) && ACCESSING_BITS_8_15)
+	if ((offset == 0xe0/4) && ACCESSING_BITS_8_15)
 		xbox_base_devs.pic8259_2->ir2_w(0);
 }
 
@@ -890,12 +893,13 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x100000, "bios", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro Bios" ) \
 	ROM_LOAD_BIOS( 0,  "chihiro_xbox_bios.bin", 0x000000, 0x80000, CRC(66232714) SHA1(b700b0041af8f84835e45d1d1250247bf7077188) ) \
-	ROM_REGION( 0x404080, "others", 0) \
+	ROM_REGION( 0x200000, "mediaboard", 0) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "fpr21042_m29w160et.bin", 0x000000, 0x200000, CRC(a4fcab0b) SHA1(a13cf9c5cdfe8605d82150b7573652f419b30197) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic10_g24lc64.bin", 0x200000, 0x2000, CRC(cfc5e06f) SHA1(3ababd4334d8d57abb22dd98bd2d347df39648d9) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic11_24lc024.bin", 0x202000, 0x80, CRC(8dc8374e) SHA1(cc03a0650bfac4bf6cb66e414bbef121cba53efe) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "pc20_g24lc64.bin", 0x202080, 0x2000, CRC(7742ab62) SHA1(82dad6e2a75bab4a4840dc6939462f1fb9b95101) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ver1305.bin", 0x204080, 0x200000, CRC(a738ea1c) SHA1(45d94d0c39be1cb3db9fab6610a88a550adda4e9) )
+	ROM_REGION( 0x204080, "others", 0) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic10_g24lc64.bin", 0x0000, 0x2000,   CRC(cfc5e06f) SHA1(3ababd4334d8d57abb22dd98bd2d347df39648d9) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic11_24lc024.bin", 0x2000, 0x80,     CRC(8dc8374e) SHA1(cc03a0650bfac4bf6cb66e414bbef121cba53efe) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "pc20_g24lc64.bin", 0x2080, 0x2000,   CRC(7742ab62) SHA1(82dad6e2a75bab4a4840dc6939462f1fb9b95101) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ver1305.bin",      0x4080, 0x200000, CRC(a738ea1c) SHA1(45d94d0c39be1cb3db9fab6610a88a550adda4e9) )
 
 ROM_START( chihiro )
 	CHIHIRO_BIOS
