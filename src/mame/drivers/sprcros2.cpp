@@ -2,11 +2,15 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-TODO:
-- complete rewrite;
-- scanline renderer;
-- understand irq 0 source;
-- output bit 0 might be watchdog armed bit/sprite start DMA instead of irq enable;
+	Super Cross II (c) 1987 GM Shoji
+
+	driver by Angelo Salese, based off "wiped off due of not anymore licenseable" driver by insideoutboy.   
+
+	TODO:
+	- complete rewrite;
+	- scanline renderer;
+	- understand irq 0 source;
+	- output bit 0 might be watchdog armed bit/sprite start DMA instead of irq enable;
 
 ===================================
 
@@ -159,7 +163,7 @@ void sprcros2_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 {
 	gfx_element *gfx_2 = m_gfxdecode->gfx(2);
 	int count = 0;
-	
+
 	for (int y=0;y<32;y++)
 	{
 		for (int x=0;x<32;x++)
@@ -167,8 +171,13 @@ void sprcros2_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 			UINT16 tile = m_fgvram[count];
 			tile |= (m_fgattr[count] & 3) << 8;
 			UINT8 color = (m_fgattr[count] & 0xfc) >> 2;
-			
-			gfx_2->transpen(bitmap,cliprect,tile,color,0,0,x*8,y*8,0);
+
+			// TODO: was using tileinfo.group, which I don't know what's for at all.
+			//       This guess seems as good as the original one for all I know.
+			if((color & 0x30) != 0x30)
+				gfx_2->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
+			else
+				gfx_2->transpen(bitmap,cliprect,tile,color,0,0,x*8,y*8,0);
 
 			count++;
 		}
@@ -183,15 +192,14 @@ UINT32 sprcros2_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	legacy_bg_draw(bitmap,cliprect);
 	legacy_obj_draw(bitmap,cliprect);
 	legacy_fg_draw(bitmap,cliprect);
-	
 	return 0;
 }
 
 WRITE8_MEMBER(sprcros2_state::master_output_w)
 {
-	popmessage("%02x",data);
-	if(data & 0xbe)
-		printf("master 07 -> %02x\n",data);
+	//popmessage("%02x",data);
+	//if(data & 0xbe)
+	//	printf("master 07 -> %02x\n",data);
 
 	membank("master_rombank")->set_entry((data&0x40)>>6);
 	m_master_nmi_enable = bool(data & 1);
@@ -202,8 +210,8 @@ WRITE8_MEMBER(sprcros2_state::master_output_w)
 
 WRITE8_MEMBER(sprcros2_state::slave_output_w)
 {
-	if(data & 0xf6)
-		printf("slave 03 -> %02x\n",data);
+	//if(data & 0xf6)
+	//	printf("slave 03 -> %02x\n",data);
 	
 	m_slave_nmi_enable = bool(data & 1);
 	membank("slave_rombank")->set_entry((data&8)>>3);
