@@ -47,6 +47,8 @@ public:
 	
 	DECLARE_READ8_MEMBER(irq_enable_r);
 	INTERRUPT_GEN_MEMBER(master_vblank_irq);
+	DECLARE_PALETTE_INIT(toypop); 
+	
 protected:
 	// driver_device overrides
 //	virtual void machine_start() override;
@@ -60,49 +62,83 @@ private:
 
 };
 
+PALETTE_INIT_MEMBER(toypop_state, toypop)
+{
+	const UINT8 *color_prom = memregion("proms")->base();
+
+	for (int i = 0;i < 256;i++)
+	{
+		int bit0,bit1,bit2,bit3,r,g,b;
+
+		// red component
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		bit3 = (color_prom[i] >> 3) & 0x01;
+		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// green component
+		bit0 = (color_prom[i+0x100] >> 0) & 0x01;
+		bit1 = (color_prom[i+0x100] >> 1) & 0x01;
+		bit2 = (color_prom[i+0x100] >> 2) & 0x01;
+		bit3 = (color_prom[i+0x100] >> 3) & 0x01;
+		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// blue component
+		bit0 = (color_prom[i+0x200] >> 0) & 0x01;
+		bit1 = (color_prom[i+0x200] >> 1) & 0x01;
+		bit2 = (color_prom[i+0x200] >> 2) & 0x01;
+		bit3 = (color_prom[i+0x200] >> 3) & 0x01;
+		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		palette.set_indirect_color(i, rgb_t(r,g,b));
+	}
+
+	for (int i = 0;i < 256;i++)
+	{
+		UINT8 entry;
+
+		// characters
+		palette.set_pen_indirect(i + 0*256, (color_prom[i + 0x300] & 0x0f) | 0x70);
+		palette.set_pen_indirect(i + 1*256, (color_prom[i + 0x300] & 0x0f) | 0xf0);
+		// sprites
+		entry = color_prom[i + 0x500];
+		palette.set_pen_indirect(i + 2*256, entry);
+	}
+	for (int i = 0;i < 16;i++)
+	{
+		// background
+		palette.set_pen_indirect(i + 3*256 + 0*16, 0x60 + i);
+		palette.set_pen_indirect(i + 3*256 + 1*16, 0xe0 + i);
+	}
+}
+
 void toypop_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	gfx_element *gfx_0 = m_gfxdecode->gfx(0);
-	static int test = 1;
 	int count;
 	
-	if(machine().input().code_pressed_once(KEYCODE_Z))
-		test++;
-
-	if(machine().input().code_pressed_once(KEYCODE_X))
-		test--;
-	
-	popmessage("%d",test);
-	
-	for(count=0;count<32;count++)
+	for (count=0;count<32*32;count++)
 	{
-		int x = count % 2;
-		int y = count / 2;
+		int x;// = (count % 32);
+		int y; //= count / 32;
+		
+		if(count < 64)
+		{
+			x = 34 + (count / 32);
+			y = (count % 32) - 2;
+		}
+		else if(count >= 32*30)
+		{
+			x = (count / 32) - 30;
+			y = (count % 32) - 2;
+		}
+		else
+		{
+			x = 2 + (count % 32);
+			y = (count / 32) - 2;
+		}
 		
 		UINT16 tile = m_fgvram[count];
-		UINT8 color = 0;//(m_fgattr[count] & 0xfc) >> 2;
-
-		gfx_0->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
-	}
-
-	for(;count<64;count++)
-	{
-		int x = 34 + (count % 2);
-		int y = count / 2;
-		
-		UINT16 tile = m_fgvram[count];
-		UINT8 color = 0;//(m_fgattr[count] & 0xfc) >> 2;
-
-		gfx_0->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
-	}
-	
-	for (;count<32*28;count++)
-	{
-		int x = 2 + (count % 32);
-		int y = count / 32;
-		
-		UINT16 tile = m_fgvram[count];
-		UINT8 color = 0;//(m_fgattr[count] & 0xfc) >> 2;
+		UINT8 color = m_fgattr[count] & 0x3f;
 
 			//if((color & 0x30) != 0x30)
 		gfx_0->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
@@ -202,15 +238,15 @@ static MACHINE_CONFIG_START( liblrabl, toypop_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.606060)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_SIZE(36*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(toypop_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toypop)
 	MCFG_PALETTE_ADD("palette", 128*4+64*4+16*2)
-	//MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	//MCFG_PALETTE_INIT_OWNER(toypop_state, toypop)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
+	MCFG_PALETTE_INIT_OWNER(toypop_state, toypop)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
