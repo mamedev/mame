@@ -1,9 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:Angelo Salese
 /****************************************
 
 Libble Rabble (c) 1983 Namco
 Toypop        (c) 1986 Namco
+
+Namco "Universal System 16" Hardware
 
 Notes:
 ------
@@ -18,17 +20,121 @@ Notes:
 ****************************************/
 
 #include "emu.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/m68000/m68000.h"
 
-
+#define MASTER_CLOCK XTAL_6_144MHz
 
 class toypop_state : public driver_device
 {
 public:
 	toypop_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: driver_device(mconfig, type, tag),
+		m_master_cpu(*this,"maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_fgvram(*this, "fgvram"),
+		m_fgattr(*this, "fgattr")
 	{ }
+	
+	required_device<cpu_device> m_master_cpu;
+
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	required_shared_ptr<UINT8> m_fgvram;
+	required_shared_ptr<UINT8> m_fgattr;
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
+	DECLARE_READ8_MEMBER(irq_enable_r);
+	INTERRUPT_GEN_MEMBER(master_vblank_irq);
+protected:
+	// driver_device overrides
+//	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+//	virtual void video_start() override;
+private:
+	bool m_master_irq_enable;
+	
+	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
+
 };
 
+void toypop_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
+{
+	gfx_element *gfx_0 = m_gfxdecode->gfx(0);
+	static int test = 1;
+	int count;
+	
+	if(machine().input().code_pressed_once(KEYCODE_Z))
+		test++;
+
+	if(machine().input().code_pressed_once(KEYCODE_X))
+		test--;
+	
+	popmessage("%d",test);
+	
+	for(count=0;count<32;count++)
+	{
+		int x = count % 2;
+		int y = count / 2;
+		
+		UINT16 tile = m_fgvram[count];
+		UINT8 color = 0;//(m_fgattr[count] & 0xfc) >> 2;
+
+		gfx_0->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
+	}
+
+	for(;count<64;count++)
+	{
+		int x = 34 + (count % 2);
+		int y = count / 2;
+		
+		UINT16 tile = m_fgvram[count];
+		UINT8 color = 0;//(m_fgattr[count] & 0xfc) >> 2;
+
+		gfx_0->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
+	}
+	
+	for (;count<32*28;count++)
+	{
+		int x = 2 + (count % 32);
+		int y = count / 32;
+		
+		UINT16 tile = m_fgvram[count];
+		UINT8 color = 0;//(m_fgattr[count] & 0xfc) >> 2;
+
+			//if((color & 0x30) != 0x30)
+		gfx_0->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
+
+	}
+}
+
+UINT32 toypop_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	legacy_fg_draw(bitmap,cliprect);
+	return 0;
+}
+
+READ8_MEMBER(toypop_state::irq_enable_r)
+{
+	m_master_irq_enable = true;
+	return 0;
+}
+
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, toypop_state )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("fgvram")
+	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("fgattr")
+	AM_RANGE(0x0800, 0x1fff) AM_RAM
+	AM_RANGE(0x2800, 0x2fff) AM_RAM
+	// 0x6000 - 0x603f namco i/o
+	AM_RANGE(0x6800, 0x6bff) AM_RAM // shared ram device
+	AM_RANGE(0x7000, 0x7000) AM_READ(irq_enable_r)
+	// 0x8000 m68k irq
+	// 0x9000 sound irq
+	// 0xa000 paletteram
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("master_rom",0)
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( liblrabl )
 INPUT_PORTS_END
@@ -37,7 +143,78 @@ static INPUT_PORTS_START( toypop )
 INPUT_PORTS_END
 
 
+static const gfx_layout charlayout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	2,
+	{ 0, 4 },
+	{ 8*8+0, 8*8+1, 8*8+2, 8*8+3, 0, 1, 2, 3 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	16*8
+};
+
+static const gfx_layout spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	2,
+	{ 0, 4 },
+	{ 0, 1, 2, 3, 8*8, 8*8+1, 8*8+2, 8*8+3, 16*8+0, 16*8+1, 16*8+2, 16*8+3,
+	24*8+0, 24*8+1, 24*8+2, 24*8+3 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+	32 * 8, 33 * 8, 34 * 8, 35 * 8, 36 * 8, 37 * 8, 38 * 8, 39 * 8 },
+	64*8
+};
+
+static GFXDECODE_START( toypop )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 128 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 128*4,  64 )
+GFXDECODE_END
+
+void toypop_state::machine_reset()
+{
+	m_master_irq_enable = false;
+}
+
+INTERRUPT_GEN_MEMBER(toypop_state::master_vblank_irq)
+{
+	if(m_master_irq_enable == true)
+		device.execute().set_input_line(M6809_IRQ_LINE,HOLD_LINE);
+}
+
 static MACHINE_CONFIG_START( liblrabl, toypop_state )
+ 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(master_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toypop_state,  master_vblank_irq)
+
+#if 0
+	MCFG_CPU_ADD("slave", M68000, MASTER_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(slave_map) 
+
+ 	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+
+	
+	
+#endif
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60.606060)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(36*8, 28*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(toypop_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toypop)
+	MCFG_PALETTE_ADD("palette", 128*4+64*4+16*2)
+	//MCFG_PALETTE_INDIRECT_ENTRIES(256)
+	//MCFG_PALETTE_INIT_OWNER(toypop_state, toypop)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( toypop, liblrabl )
@@ -45,14 +222,14 @@ MACHINE_CONFIG_END
 
 
 ROM_START( liblrabl )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "5b.rom",   0x8000, 0x4000, CRC(da7a93c2) SHA1(fe4a02cdab66722eb7b8cf58825f899b1949a6a2) )
-	ROM_LOAD( "5c.rom",   0xc000, 0x4000, CRC(6cae25dc) SHA1(de74317a7d5de1865d096c377923a764be5e6879) )
+	ROM_REGION( 0x8000, "master_rom", 0 )
+	ROM_LOAD( "5b.rom",   0x0000, 0x4000, CRC(da7a93c2) SHA1(fe4a02cdab66722eb7b8cf58825f899b1949a6a2) )
+	ROM_LOAD( "5c.rom",   0x4000, 0x4000, CRC(6cae25dc) SHA1(de74317a7d5de1865d096c377923a764be5e6879) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "2c.rom",   0xe000, 0x2000, CRC(7c09e50a) SHA1(5f004d60bbb7355e008a9cda137b28bc2192b8ef) )
+	ROM_REGION( 0x2000, "sound_rom", 0 )
+	ROM_LOAD( "2c.rom",   0x0000, 0x2000, CRC(7c09e50a) SHA1(5f004d60bbb7355e008a9cda137b28bc2192b8ef) )
 
-	ROM_REGION( 0x8000, "sub", 0 )
+	ROM_REGION( 0x8000, "slave_rom", 0 )
 	ROM_LOAD16_BYTE( "8c.rom",   0x0000, 0x4000, CRC(a00cd959) SHA1(cc5621103c31cfbc65941615cab391db0f74e6ce) )
 	ROM_LOAD16_BYTE("10c.rom",   0x0001, 0x4000, CRC(09ce209b) SHA1(2ed46d6592f8227bac8ab54963d9a300706ade47) )
 
@@ -74,14 +251,14 @@ ROM_START( liblrabl )
 ROM_END
 
 ROM_START( toypop )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tp1-2.5b", 0x8000, 0x4000, CRC(87469620) SHA1(2ee257486c9c044386ac7d0cd4a90583eaeb3e97) )
-	ROM_LOAD( "tp1-1.5c", 0xc000, 0x4000, CRC(dee2fd6e) SHA1(b2c12008d6d3e7544ba3c12a52a6abf9181842c8) )
+	ROM_REGION( 0x8000, "master_rom", 0 )
+	ROM_LOAD( "tp1-2.5b", 0x0000, 0x4000, CRC(87469620) SHA1(2ee257486c9c044386ac7d0cd4a90583eaeb3e97) )
+	ROM_LOAD( "tp1-1.5c", 0x4000, 0x4000, CRC(dee2fd6e) SHA1(b2c12008d6d3e7544ba3c12a52a6abf9181842c8) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "tp1-3.2c", 0xe000, 0x2000, CRC(5f3bf6e2) SHA1(d1b3335661b9b23cb10001416c515b77b5e783e9) )
+	ROM_REGION( 0x2000, "sound_rom", 0 )
+	ROM_LOAD( "tp1-3.2c", 0x0000, 0x2000, CRC(5f3bf6e2) SHA1(d1b3335661b9b23cb10001416c515b77b5e783e9) )
 
-	ROM_REGION( 0x8000, "sub", 0 )
+	ROM_REGION( 0x8000, "slave_rom", 0 )
 	ROM_LOAD16_BYTE( "tp1-4.8c", 0x0000, 0x4000, CRC(76997db3) SHA1(5023a2f20a5f2c9baff130f6832583493c71f883) )
 	ROM_LOAD16_BYTE("tp1-5.10c", 0x0001, 0x4000, CRC(37de8786) SHA1(710365e34c05d01815844c414518f93234b6160b) )
 
