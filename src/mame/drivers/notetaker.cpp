@@ -338,9 +338,9 @@ x   x   *   *    *   *   *   *    *   *   *   *    *   *   *   *    *   *   *   
 1   1   1   1    1   1   1   1    1   1   1   1    1   1   0   x    x   x   x   x    x                       RW  FFFC0-FFFDF (trigger ILLINST interrupt on EP, data ignored?)
    And the following, decoded by the memory address logic board:
 1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   0   x    x                       .   Open Bus
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   1   x    x                       W   FFFEA (Multiprocessor Control (reset/int/boot for each proc; data bits 3,2,1,0 = 0010 means IP, bits 3210 = 0111 means EP; all others ignored.))
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   0   x    x                       R   FFFEC (Syndrome bits (gnd bit 15, parity bit 14, exp bits 13-8, bits 7-0 are 'other', maybe highest address bits)
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   1   x    x                       R   FFFEE (Parity Error Address: row bits 15-8, column bits 7-0; reading this acknowledges a parity interrupt)
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   1   x    x                       W   FFFEA (Multiprocessor Control (reset(bit 6)/int(bit 5)/boot(bit 4) for each processor; data bits 3,2,1,0 are 'processor address'; 0010 means IP, 0111 means EP; all others ignored.))
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   0   x    x                       R   FFFEC (Syndrome bits (gnd bit 15, parity bit 14, exp(syndrome) bits 13-8, bits 7-0 are the highest address bits)
+1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   1   x    x                       R   FFFEE (Parity Error Address: row bits 15-8, column bits 7-0; reading this also acknowledges a parity interrupt)
 */
 
 static ADDRESS_MAP_START(notetaker_iocpu_mem, AS_PROGRAM, 16, notetaker_state)
@@ -400,7 +400,7 @@ static ADDRESS_MAP_START(notetaker_iocpu_io, AS_IO, 16, notetaker_state)
 	AM_RANGE(0x60, 0x61) AM_MIRROR(0x7E1E) AM_WRITE(FIFOReg_w) // DAC sample and hold and frequency setup
 	//AM_RANGE(0xa0, 0xa1) AM_MIRROR(0x7E18) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255
 	//AM_RANGE(0xc0, 0xc1) AM_MIRROR(0x7E1E) AM_WRITE(FIFOBus_w) // DAC data write to FIFO
-	//AM_RANGE(0x100, 0x101) AM_MIRROR(0x7E1E) AM_WRITE(SelDiskReg_w) I/O register (adc speed, crtc pixel clock enable, +5 and +12v relays for floppy, etc)
+	//AM_RANGE(0x100, 0x101) AM_MIRROR(0x7E1E) AM_WRITE(DiskReg_w) I/O register (adc speed, crtc pixel clock enable, +5 and +12v relays for floppy, etc)
 	//AM_RANGE(0x120, 0x121) AM_MIRROR(0x7E18) AM_DEVREADWRITE("wd1791", fd1971_device) // floppy controller
 	AM_RANGE(0x140, 0x15f) AM_MIRROR(0x7E00) AM_DEVREADWRITE8("crt5027", crt5027_device, read, write, 0x00FF) // crt controller
 	//AM_RANGE(0x160, 0x161) AM_MIRROR(0x7E1E) AM_WRITE(LoadDispAddr_w) // loads the start address for the display framebuffer
@@ -463,6 +463,15 @@ static ADDRESS_MAP_START(notetaker_emulatorcpu_mem, AS_PROGRAM, 16, notetaker_st
 	AM_RANGE(0xFFFC0, 0xFFFDF) AM_READWRITE(proc_illinst_r, proc_illinst_w)
 	AM_RANGE(0xFFFE0, 0xFFFEF) AM_READWRITE(proc_control_r, proc_control_w)
 ADDRESS_MAP_END
+
+// note everything in the emulatorcpu's io range is incompletely decoded; so if 0x1800 is accessed it will write to both the debug 8255 AND the pic8259! I'm not sure the code abuses this or not, but it might do so to both write registers and clear parity at once, or something similar.
+static ADDRESS_MAP_START(notetaker_emulatorcpu_io, AS_IO, 16, notetaker_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x800, 0x803) AM_MIRROR(0x07FC) AM_DEVREADWRITE8("emupic8259", pic8259_device, read, write, 0x00ff)
+	AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x07FE) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255, is this the same one as the iocpu accesses? or are these two 8255s on separate cards?
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07FE) AM_WRITE(EPConReg_w) // emu processor control reg & leds
+	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x07FE) AM_WRITE(EmuClearParity_w) // writes here clear the local 8k-ram parity error register
+ADDRESS_MAP_END
 */
 
 /* Machine Reset; this emulates the full system reset, triggered by ExtReset' (cardcage pin <50>) or the PowerOnReset' circuit */
@@ -500,11 +509,14 @@ void notetaker_state::ip_reset()
 	m_SetSH = 0;
 	// Clear the DAC FIFO
 	//  write me!
-	// stuff to reset on the display/eia board
+	// reset the EIA UART
+	m_eiauart->set_input_pin(AY31015_XR, 0); // MR - pin 21
+	m_eiauart->set_input_pin(AY31015_XR, 1); // ''
+	// reset the DiskReg latches at #c4 and #b4 on the disk/display/eia board
 	//  write me!
 }
 
-/* EP Reset; this emulats the EPReset' signal */
+/* EP Reset; this emulates the EPReset' signal */
 void notetaker_state::ep_reset()
 {
 }
@@ -542,10 +554,10 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL_36MHz/4)/8) // the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*,2,4,6,8,10,12, or 14 (* because this is a 74s163 this setting probably means divide by 1) and secondarily divided by 8 (again by two to load the 16 bit output shifters after this)
-	// on reset, bitclk is 000 so divider is (36mhz/14)/8; during boot it is written with 101, changing the divider to (36mhz/4)/8
-	// for now, we just hack it to the latter setting from start
-	// TODO: actually do this correctly.
+	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL_36MHz/4)/8) // the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*, 2, 3, 4, 5, 6, 7, or 8 (* because this is a 74s163 this setting probably means divide by 1; documentation at http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790605_Definition_of_8086_Ports.pdf claims it is 1.5, which makes no sense) and secondarily divided by 8 (again by two to load the 16 bit output shifters after this)
+	// on reset, bitclk is 000 so divider is (36mhz/8)/8; during boot it is written with 101, changing the divider to (36mhz/4)/8
+	// TODO: for now, we just hack it to the latter setting from start; this should be handled correctly in ip_reset();
+
 	MCFG_TMS9927_CHAR_WIDTH(8) //(8 pixels per column/halfword, 16 pixels per fullword)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
@@ -596,7 +608,7 @@ ROM_START( notetakr )
 	ROM_REGION( 0x100000, "mainram", ROMREGION_ERASEFF ) // main ram, on 2 cards with parity/ecc/syndrome/timing/bus arbitration on another 2 cards
 	ROM_REGION( 0x1000, "proms", ROMREGION_ERASEFF )
 	ROM_LOAD( "disksep.prom.82s147.a4", 0x000, 0x200, NO_DUMP ) // disk data separator prom from the disk/display module board
-	ROM_LOAD( "memcasraswrite.prom.82s147.b1", 0x200, 0x200, NO_DUMP ) // memory cas/ras/write prom from the memory address logic board
+	ROM_LOAD( "memcasraswrite.prom.82s147.b1", 0x200, 0x200, NO_DUMP ) // memory cas/ras/write state machine prom from the memory address logic board; the equations for this are listed in one of the documents on bitsavers
 	ROM_LOAD( "setmemrq.prom.82s126.d9", 0x400, 0x100, NO_DUMP ) // SETMEMRQ memory timing prom from the disk/display module board; The equations for this one are actually listed on the schematic and the prom dump can be generated from these:
 	/*
 	SetMemRq:
