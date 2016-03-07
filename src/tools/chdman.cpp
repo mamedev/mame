@@ -31,6 +31,12 @@
 //**************************************************************************
 //  CONSTANTS & DEFINES
 //**************************************************************************
+/* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 */
+#if defined(__MINGW32__) || defined(_MSC_VER)
+#define I64FMT   "I64"
+#else
+#define I64FMT   "ll"
+#endif
 
 // default hard disk sector size
 const UINT32 IDE_SECTOR_SIZE = 512;
@@ -1231,7 +1237,7 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 				break;
 		}
 		bool needquote = strchr(filename, ' ') != nullptr;
-		file.printf("%d %d %d %d %s%s%s %" I64FMT "d\n", tracknum+1, frameoffs, mode, size, needquote?"\"":"", filename, needquote?"\"":"", discoffs);
+		file.printf("%s",string_format("%d %d %d %d %s%s%s %I64d\n", tracknum+1, frameoffs, mode, size, needquote?"\"":"", filename, needquote?"\"":"", discoffs).c_str());
 	}
 	else if (mode == MODE_CUEBIN)
 	{
@@ -2592,7 +2598,7 @@ static void do_extract_ld(parameters_t &params)
 			if (err != CHDERR_NONE)
 			{
 				UINT64 filepos = static_cast<util::core_file &>(input_chd).tell();
-				report_error(1, "Error reading hunk %" I64FMT "d at offset %" I64FMT "d from CHD file (%s): %s\n", framenum, filepos, params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err));
+				report_error(1, "%s",string_format("Error reading hunk %I64d at offset %I64d from CHD file (%s): %s\n", framenum, filepos, params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err)).c_str());
 			}
 
 			// write audio
@@ -2600,7 +2606,7 @@ static void do_extract_ld(parameters_t &params)
 			{
 				avi_error avierr = avi_append_sound_samples(output_file, chnum, avconfig.audio[chnum], actsamples, 0);
 				if (avierr != AVIERR_NONE)
-					report_error(1, "Error writing samples for hunk %" I64FMT "d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_error_string(avierr));
+					report_error(1, "%s",string_format("Error writing samples for hunk %I64d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_error_string(avierr)).c_str());
 			}
 
 			// write video
@@ -2608,7 +2614,7 @@ static void do_extract_ld(parameters_t &params)
 			{
 				avi_error avierr = avi_append_video_frame(output_file, fullbitmap);
 				if (avierr != AVIERR_NONE)
-					report_error(1, "Error writing video for hunk %" I64FMT "d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_error_string(avierr));
+					report_error(1, "%s",string_format("Error writing video for hunk %I64d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_error_string(avierr)).c_str());
 			}
 		}
 

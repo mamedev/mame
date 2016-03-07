@@ -493,7 +493,7 @@ UINT32 ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitma
 					(m_store[(m_store_line << 2) | 1] << 16) |
 					(m_store[(m_store_line << 2) | 2] <<  8) |
 					(m_store[(m_store_line << 2) | 3] <<  0));
-	glyph_print(bitmap, 0, 272, "LINE:%02d  VALUE:%08x  HALT:%" I64FMT "d", m_store_line, word, m_maincpu->state_int(SSEM_HALT));
+	glyph_print(bitmap, 0, 272, "%s",string_format("LINE:%02d  VALUE:%08x  HALT:%I64d", m_store_line, word, m_maincpu->state_int(SSEM_HALT)).c_str());
 	return 0;
 }
 

@@ -185,7 +185,7 @@ static void dump_timer_command(running_machine &machine, int ref, int params, co
 	debug_console_printf(machine, "Header.Inserted %d byte\n", space.read_byte(address + 3));
 	debug_console_printf(machine, "Header.SignalState %08X dword\n", space.read_dword_unaligned(address + 4));
 	debug_console_printf(machine, "Header.WaitListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 8), space.read_dword_unaligned(address + 12));
-	debug_console_printf(machine, "DueTime %" I64FMT "x qword\n", (INT64)space.read_qword_unaligned(address + 16));
+	debug_console_printf(machine, "%s", string_format("DueTime %I64x qword\n", (INT64)space.read_qword_unaligned(address + 16)).c_str());
 	debug_console_printf(machine, "TimerListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 24), space.read_dword_unaligned(address + 28));
 	debug_console_printf(machine, "Dpc %08X dword\n", space.read_dword_unaligned(address + 32));
 	debug_console_printf(machine, "Period %d dword\n", space.read_dword_unaligned(address + 36));

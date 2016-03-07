@@ -148,7 +148,7 @@ void esq_5505_5510_pump::sound_stream_update(sound_stream &stream, stream_sample
 	{
 		osd_ticks_t elapsed = now - last_ticks;
 		osd_ticks_t tps = osd_ticks_per_second();
-		fprintf(stderr, "Pump: %d samples in %" I64FMT "d ticks for %f Hz\n", last_samples, elapsed, last_samples * (double)tps / (double)elapsed);
+		fprintf(stderr, "%s",string_format("Pump: %d samples in %I64d ticks for %f Hz\n", last_samples, elapsed, last_samples * (double)tps / (double)elapsed).c_str());
 		last_ticks = now;
 		while (next_report_ticks <= now) {
 			next_report_ticks += tps;
@@ -156,7 +156,7 @@ void esq_5505_5510_pump::sound_stream_update(sound_stream &stream, stream_sample
 		last_samples = 0;
 
 #if !PUMP_FAKE_ESP_PROCESSING
-		fprintf(stderr, "  ESP spent %" I64FMT "d ticks on %d samples, %f ticks per sample\n", ticks_spent_processing, samples_processed, (double)ticks_spent_processing / (double)samples_processed);
+		fprintf(stderr, "%s",string_format("  ESP spent %I64d ticks on %d samples, %f ticks per sample\n", ticks_spent_processing, samples_processed, (double)ticks_spent_processing / (double)samples_processed).c_str());
 		ticks_spent_processing = 0;
 		samples_processed = 0;
 #endif

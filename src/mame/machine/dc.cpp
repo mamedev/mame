@@ -374,7 +374,7 @@ READ64_MEMBER(dc_state::dc_sysctrl_r )
 	#if DEBUG_SYSCTRL
 	if ((reg != 0x40) && (reg != 0x41) && (reg != 0x42) && (reg != 0x23) && (reg > 2))  // filter out IRQ status reads
 	{
-		osd_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %" I64FMT "x (PC=%x)\n", 0x5f6800+reg*4, dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, space.device().safe_pc());
+		osd_printf_verbose("%s",string_format("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %I64x (PC=%x)\n", 0x5f6800+reg*4, dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, space.device().safe_pc()).c_str());
 	}
 	#endif
 
@@ -472,7 +472,7 @@ WRITE64_MEMBER(dc_state::dc_sysctrl_w )
 	#if DEBUG_SYSCTRL
 	if ((reg != 0x40) && (reg != 0x42) && (reg > 2))    // filter out IRQ acks and ch2 dma
 	{
-		osd_printf_verbose("SYSCTRL: write %" I64FMT "x to %x (reg %x), mask %" I64FMT "x\n", data>>shift, offset, reg, /*sysctrl_names[reg],*/ mem_mask);
+		osd_printf_verbose("%s",string_format("SYSCTRL: write %I64x to %x (reg %x), mask %I64x\n", data>>shift, offset, reg, /*sysctrl_names[reg],*/ mem_mask).c_str());
 	}
 	#endif
 }
@@ -513,7 +513,7 @@ WRITE64_MEMBER(dc_state::dc_gdrom_w )
 		off=offset << 1;
 	}
 
-	osd_printf_verbose("GDROM: [%08x=%x]write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x5f7000+off*4, dat, data, offset, mem_mask);
+	osd_printf_verbose("%s",string_format("GDROM: [%08x=%x]write %I64x to %x, mask %I64x\n", 0x5f7000+off*4, dat, data, offset, mem_mask).c_str());
 }
 
 READ64_MEMBER(dc_state::dc_g2_ctrl_r )
@@ -632,7 +632,7 @@ WRITE64_MEMBER(dc_state::dc_modem_w )
 
 	reg = decode_reg32_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
-	osd_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
+	osd_printf_verbose("%s",string_format("MODEM: [%08x=%x] write %I64x to %x, mask %I64x\n", 0x600000+reg*4, dat, data, offset, mem_mask).c_str());
 }
 
 #define SAVE_G2DMA(x) \
@@ -674,7 +674,7 @@ void dc_state::machine_reset()
 
 READ32_MEMBER(dc_state::dc_aica_reg_r)
 {
-//  osd_printf_verbose("AICA REG: [%08x] read %" I64FMT "x, mask %" I64FMT "x\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
+//  osd_printf_verbose("%s",string_format("AICA REG: [%08x] read %I64x, mask %I64x\n", 0x700000+reg*4, (UINT64)offset, mem_mask).c_str());
 
 	if(offset == 0x2c00/4)
 		return m_armrst;
@@ -705,7 +705,7 @@ WRITE32_MEMBER(dc_state::dc_aica_reg_w)
 
 	m_aica->write(space, offset*2, data, 0xffff);
 
-//  osd_printf_verbose("AICA REG: [%08x=%x] write %x to %x, mask %" I64FMT "x\n", 0x700000+reg*4, data, offset, mem_mask);
+//  osd_printf_verbose("%s",string_format("AICA REG: [%08x=%x] write %x to %x, mask %I64x\n", 0x700000+reg*4, data, offset, mem_mask).c_str());
 }
 
 READ32_MEMBER(dc_state::dc_arm_aica_r)

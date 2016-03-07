@@ -422,12 +422,12 @@ WRITE8_MEMBER(es5510_device::host_w)
 		break;
 
 		/* 0x03 to 0x08 INSTR Register */
-	case 0x03: instr_latch = ((instr_latch&U64(0x00ffffffffff)) | ((INT64)data&0xff)<<40); LOG(("ES5510: Host Write INSTR latch[5] = %02x -> %012" I64FMT "x\n", data, instr_latch)); break;
-	case 0x04: instr_latch = ((instr_latch&U64(0xff00ffffffff)) | ((INT64)data&0xff)<<32); LOG(("ES5510: Host Write INSTR latch[4] = %02x -> %012" I64FMT "x\n", data, instr_latch)); break;
-	case 0x05: instr_latch = ((instr_latch&U64(0xffff00ffffff)) | ((INT64)data&0xff)<<24); LOG(("ES5510: Host Write INSTR latch[3] = %02x -> %012" I64FMT "x\n", data, instr_latch)); break;
-	case 0x06: instr_latch = ((instr_latch&U64(0xffffff00ffff)) | ((INT64)data&0xff)<<16); LOG(("ES5510: Host Write INSTR latch[2] = %02x -> %012" I64FMT "x\n", data, instr_latch)); break;
-	case 0x07: instr_latch = ((instr_latch&U64(0xffffffff00ff)) | ((INT64)data&0xff)<< 8); LOG(("ES5510: Host Write INSTR latch[1] = %02x -> %012" I64FMT "x\n", data, instr_latch)); break;
-	case 0x08: instr_latch = ((instr_latch&U64(0xffffffffff00)) | ((INT64)data&0xff)<< 0); LOG(("ES5510: Host Write INSTR latch[0] = %02x -> %012" I64FMT "x\n", data, instr_latch)); break;
+	case 0x03: instr_latch = ((instr_latch&U64(0x00ffffffffff)) | ((INT64)data&0xff)<<40); LOG(("%s",string_format("ES5510: Host Write INSTR latch[5] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
+	case 0x04: instr_latch = ((instr_latch&U64(0xff00ffffffff)) | ((INT64)data&0xff)<<32); LOG(("%s",string_format("ES5510: Host Write INSTR latch[4] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
+	case 0x05: instr_latch = ((instr_latch&U64(0xffff00ffffff)) | ((INT64)data&0xff)<<24); LOG(("%s",string_format("ES5510: Host Write INSTR latch[3] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
+	case 0x06: instr_latch = ((instr_latch&U64(0xffffff00ffff)) | ((INT64)data&0xff)<<16); LOG(("%s",string_format("ES5510: Host Write INSTR latch[2] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
+	case 0x07: instr_latch = ((instr_latch&U64(0xffffffff00ff)) | ((INT64)data&0xff)<< 8); LOG(("%s",string_format("ES5510: Host Write INSTR latch[1] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
+	case 0x08: instr_latch = ((instr_latch&U64(0xffffffffff00)) | ((INT64)data&0xff)<< 0); LOG(("%s",string_format("ES5510: Host Write INSTR latch[0] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
 
 		/* 0x09 to 0x0b DIL Register (r/o) */
 
@@ -477,7 +477,7 @@ WRITE8_MEMBER(es5510_device::host_w)
 		break;
 
 	case 0x80: /* Read select - GPR + INSTR */
-		LOG(("ES5510: Host Read INSTR+GPR %02x (%s): %012" I64FMT "x %06x (%d)\n", data, REGNAME(data & 0xff), instr[data] & U64(0xffffffffffff), gpr[data] & 0xffffff, gpr[data]));
+		LOG(("%s",string_format("ES5510: Host Read INSTR+GPR %02x (%s): %012I64x %06x (%d)\n", data, REGNAME(data & 0xff), instr[data] & U64(0xffffffffffff), gpr[data] & 0xffffff, gpr[data]).c_str()));
 
 		/* Check if an INSTR address is selected */
 		if (data < 0xa0) {
@@ -498,7 +498,7 @@ WRITE8_MEMBER(es5510_device::host_w)
 	case 0xc0: /* Write select - INSTR */
 #if VERBOSE
 		DESCRIBE_INSTR(buf, instr_latch, gpr[data], NULL, NULL, NULL, NULL);
-		LOG(("ES5510: Host Write INSTR %02x %012" I64FMT "x: %s\n", data, instr_latch&U64(0xffffffffffff), buf));
+		LOG(("%s",string_format("ES5510: Host Write INSTR %02x %012I64x: %s\n", data, instr_latch&U64(0xffffffffffff), buf).c_str()));
 #endif
 		if (data < 0xa0) {
 			instr[data] = instr_latch&U64(0xffffffffffff);
@@ -508,7 +508,7 @@ WRITE8_MEMBER(es5510_device::host_w)
 	case 0xe0: /* Write select - GPR + INSTR */
 #if VERBOSE
 		DESCRIBE_INSTR(buf, instr_latch, gpr_latch, NULL, NULL, NULL, NULL);
-		LOG(("ES5510: Host Write INSTR+GPR %02x (%s): %012" I64FMT "x %06x (%d): %s\n", data, REGNAME(data&0xff), instr_latch, gpr_latch, SX(gpr_latch), buf));
+		LOG(("%s",string_format("ES5510: Host Write INSTR+GPR %02x (%s): %012I64x %06x (%d): %s\n", data, REGNAME(data&0xff), instr_latch, gpr_latch, SX(gpr_latch), buf).c_str()));
 #endif
 		if (data < 0xa0) {
 			instr[data] = instr_latch;
@@ -675,7 +675,7 @@ void es5510_device::list_program(void(p)(const char *, ...)) {
 		UINT8 cReg = (UINT8)((instr[addr] >> 32) & 0xff);
 		UINT8 dReg = (UINT8)((instr[addr] >> 40) & 0xff);
 		DESCRIBE_INSTR(buf, instr[addr], gpr[addr], name[aReg], name[bReg], name[cReg], name[dReg]);
-		p("%02x: %012" I64FMT "x %06x (%8d) %s\n", addr, instr[addr], gpr[addr]&0xffffff, SX(gpr[addr]&0xffffff), buf);
+		p("%s",string_format("%02x: %012I64x %06x (%8d) %s\n", addr, instr[addr], gpr[addr]&0xffffff, SX(gpr[addr]&0xffffff), buf).c_str());
 	}
 	for (; addr < 0xc0; addr++) {
 		p("%02x: %06x (%d)\n", addr, gpr[addr]&0xffffff, SX(gpr[addr]&0xffffff));
@@ -701,7 +701,7 @@ void es5510_device::execute_run() {
 #if VERBOSE_EXEC
 			char buf[1024];
 			DESCRIBE_INSTR(buf, instr[pc], gpr[pc], NULL, NULL, NULL, NULL);
-			LOG_EXEC(("EXECUTING %02x: %012" I64FMT "x %06x  %s\n", pc, instr[pc], gpr[pc]&0xffffff, buf));
+			LOG_EXEC(("%s",string_format("EXECUTING %02x: %012I64x %06x  %s\n", pc, instr[pc], gpr[pc]&0xffffff, buf).c_str()));
 #endif
 
 			ram_pp = ram_p;

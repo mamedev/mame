@@ -647,9 +647,9 @@ void discrete_device::display_profiling(void)
 	total = list_run_time(m_node_list);
 	count = m_node_list.count();
 	/* print statistics */
-	printf("Total Samples  : %16" I64FMT "d\n", m_total_samples);
+	printf("%s",string_format("Total Samples  : %16I64d\n", m_total_samples).c_str());
 	tresh = total / count;
-	printf("Threshold (mean): %16" I64FMT "d\n", tresh / m_total_samples );
+	printf("%s",string_format("Threshold (mean): %16I64d\n", tresh / m_total_samples).c_str());
 	for_each(discrete_base_node **, node, &m_node_list)
 	{
 		discrete_step_interface *step;
