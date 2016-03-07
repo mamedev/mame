@@ -98,6 +98,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	// basic io
 	DECLARE_WRITE16_MEMBER(IPConReg_w);
+	DECLARE_WRITE16_MEMBER(FIFOReg_w);
 
 	// uarts
 	DECLARE_READ16_MEMBER(ReadKeyData_r);
@@ -116,9 +117,29 @@ public:
 	DECLARE_READ16_MEMBER(iocpu_r);
 	DECLARE_WRITE16_MEMBER(iocpu_w);
 	DECLARE_DRIVER_INIT(notetakr);
-//variables
+	//variables
+	//  IPConReg
 	UINT8 m_BootSeqDone;
+	UINT8 m_ProcLock;
+	UINT8 m_CharCtr;
 	UINT8 m_DisableROM;
+	UINT8 m_CorrOn_q;
+	UINT8 m_LedInd6;
+	UINT8 m_LedInd7;
+	UINT8 m_LedInd8;
+	//  FIFOReg
+	UINT8 m_TabletYOn;
+	UINT8 m_TabletXOn;
+	UINT8 m_FrSel2;
+	UINT8 m_FrSel1;
+	UINT8 m_FrSel0;
+	UINT8 m_SHConB;
+	UINT8 m_SHConA;
+	UINT8 m_SetSH;
+
+// resets
+	void ip_reset();
+	void ep_reset();
 
 // overrides
 	virtual void machine_reset() override;
@@ -133,13 +154,13 @@ UINT32 notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 WRITE16_MEMBER(notetaker_state::IPConReg_w)
 {
 	m_BootSeqDone = (data&0x80)?1:0;
-	//m_ProcLock = (data&0x40)?1:0; // bus lock for this processor (hold other processor in wait state)
-	//m_CharCtr = (data&0x20)?1:0; // battery charge control
+	m_ProcLock = (data&0x40)?1:0; // bus lock for this processor (hold other processor in wait state)
+	m_CharCtr = (data&0x20)?1:0; // battery charge control
 	m_DisableROM = (data&0x10)?1:0; // disable rom at 0000-0fff
-	//m_CorrOn = (data&0x08)?1:0; // CorrectionOn (ECC correction enabled); also LedInd5
-	//m_LedInd6 = (data&0x04)?1:0;
-	//m_LedInd7 = (data&0x02)?1:0;
-	//m_LedInd8 = (data&0x01)?1:0;
+	m_CorrOn_q = (data&0x08)?1:0; // CorrectionOn (ECC correction enabled); also LedInd5
+	m_LedInd6 = (data&0x04)?1:0;
+	m_LedInd7 = (data&0x02)?1:0;
+	m_LedInd8 = (data&0x01)?1:0;
 	popmessage("LEDS: CR1: %d, CR2: %d, CR3: %d, CR4: %d", (data&0x04)>>2, (data&0x08)>>3, (data&0x02)>>1, (data&0x01)); // cr1 and 2 are in the reverse order as expected, according to the schematic
 }
 
@@ -191,6 +212,19 @@ WRITE16_MEMBER( notetaker_state::KeyChipReset_w )
 {
 	m_kbduart->set_input_pin(AY31015_XR, 0); // MR - pin 21
 	m_kbduart->set_input_pin(AY31015_XR, 1); // ''
+}
+
+/* FIFO (DAC) Stuff and ADC stuff */
+WRITE16_MEMBER(notetaker_state::FIFOReg_w)
+{
+	m_TabletYOn = (data&0x80)?1:0;
+	m_TabletXOn = (data&0x40)?1:0;
+	m_FrSel2 = (data&0x20)?1:0;
+	m_FrSel1 = (data&0x10)?1:0;
+	m_FrSel0 = (data&0x08)?1:0;
+	m_SHConB = (data&0x04)?1:0;
+	m_SHConA = (data&0x02)?1:0;
+	m_SetSH = (data&0x01)?1:0;
 }
 
 /* EIA hd6402 */
@@ -363,7 +397,7 @@ static ADDRESS_MAP_START(notetaker_iocpu_io, AS_IO, 16, notetaker_state)
 	AM_RANGE(0x4a, 0x4b) AM_MIRROR(0x7E10) AM_WRITE(LoadKeyData_w) // kbd uart data register
 	AM_RANGE(0x4c, 0x4d) AM_MIRROR(0x7E10) AM_WRITE(KeyDataReset_w) // kbd uart ddr switch (data reset)
 	AM_RANGE(0x4e, 0x4f) AM_MIRROR(0x7E10) AM_WRITE(KeyChipReset_w) // kbd uart reset
-	//AM_RANGE(0x60, 0x61) AM_MIRROR(0x7E1E) AM_WRITE(FIFOReg_w) // DAC sample and hold and frequency setup
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0x7E1E) AM_WRITE(FIFOReg_w) // DAC sample and hold and frequency setup
 	//AM_RANGE(0xa0, 0xa1) AM_MIRROR(0x7E18) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255
 	//AM_RANGE(0xc0, 0xc1) AM_MIRROR(0x7E1E) AM_WRITE(FIFOBus_w) // DAC data write to FIFO
 	//AM_RANGE(0x100, 0x101) AM_MIRROR(0x7E1E) AM_WRITE(SelDiskReg_w) I/O register (adc speed, crtc pixel clock enable, +5 and +12v relays for floppy, etc)
@@ -424,19 +458,57 @@ read from 0x44 (byte wide) in a loop forever (read keyboard fifo status)
 /* Emulator CPU */
 /*
 static ADDRESS_MAP_START(notetaker_emulatorcpu_mem, AS_PROGRAM, 16, notetaker_state)
-	AM_RANGE(0x00000, 0x00fff) AM_RAM // actually a banked block of ram
-	AM_RANGE(0x01000, 0x3ffff) AM_MIRROR(0xC0000) AM_RAM AM_BASE("mainram") // 256k of ram (less 4k), shared between both processors, mirrored 4 times
+	AM_RANGE(0x00000, 0x01fff) AM_MIRROR(0xC0000) AM_RAM // actually a banked block of ram, 8k (4k words)
+	AM_RANGE(0x02000, 0x3ffff) AM_MIRROR(0xC0000) AM_RAM AM_BASE("mainram") // 256k of ram (less 8k), shared between both processors, mirrored 4 times
+	AM_RANGE(0xFFFC0, 0xFFFDF) AM_READWRITE(proc_illinst_r, proc_illinst_w)
 	AM_RANGE(0xFFFE0, 0xFFFEF) AM_READWRITE(proc_control_r, proc_control_w)
 ADDRESS_MAP_END
 */
 
-/* Machine Reset */
+/* Machine Reset; this emulates the full system reset, triggered by ExtReset' (cardcage pin <50>) or the PowerOnReset' circuit */
 void notetaker_state::machine_reset()
 {
-	m_BootSeqDone = 0;
-	m_DisableROM = 0;
-	m_kbduart->set_input_pin(AY31015_SWE, 0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
+	ip_reset();
+	ep_reset();
 }
+
+/* IP Reset; this emulates the IPReset' signal */
+void notetaker_state::ip_reset()
+{
+	// not-really-reset related, set line on Keybaord UART
+	m_kbduart->set_input_pin(AY31015_SWE, 0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
+	// reset the Keyboard UART
+	m_kbduart->set_input_pin(AY31015_XR, 0); // MR - pin 21
+	m_kbduart->set_input_pin(AY31015_XR, 1); // ''
+	// reset the IPConReg latch at #f1
+	m_BootSeqDone = 0;
+	m_ProcLock = 0;
+	m_CharCtr = 0;
+	m_DisableROM = 0;
+	m_CorrOn_q = 0;
+	m_LedInd6 = 0;
+	m_LedInd7 = 0;
+	m_LedInd8 = 0;
+	// reset the FIFOReg latch at #h9
+	m_TabletYOn = 0;
+	m_TabletXOn = 0;
+	m_FrSel2 = 0;
+	m_FrSel1 = 0;
+	m_FrSel0 = 0;
+	m_SHConB = 0;
+	m_SHConA = 0;
+	m_SetSH = 0;
+	// Clear the DAC FIFO
+	//  write me!
+	// stuff to reset on the display/eia board
+	//  write me!
+}
+
+/* EP Reset; this emulats the EPReset' signal */
+void notetaker_state::ep_reset()
+{
+}
+
 
 /* Input ports */
 static INPUT_PORTS_START( notetakr )
