@@ -1580,7 +1580,6 @@ private:
 #define DECLARE_INPUT_CHANGED_MEMBER(name)  void name(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 
 // macro for port changed callback functions (PORT_CROSSHAIR_MAPPER)
-#define CROSSHAIR_MAPPER(name)  float name(device_t &device, ioport_field &field, float linear_value)
 #define CROSSHAIR_MAPPER_MEMBER(name)   float name(ioport_field &field, float linear_value)
 #define DECLARE_CROSSHAIR_MAPPER_MEMBER(name)   float name(ioport_field &field, float linear_value)
 
@@ -1727,9 +1726,6 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 	configurer.field_set_analog_invert();
 
 // read callbacks
-#define PORT_CUSTOM(_callback, _param) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate(_callback, #_callback, DEVICE_SELF, (device_t *)NULL), (void *)(_param));
-
 #define PORT_CUSTOM_MEMBER(_device, _class, _member, _param) \
 	configurer.field_set_dynamic_read(ioport_field_read_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)NULL), (void *)(_param));
 
@@ -1738,16 +1734,10 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 	configurer.field_set_dynamic_write(ioport_field_write_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)NULL), (void *)(_param));
 
 // input device handler
-#define PORT_READ_LINE_DEVICE(_device, _read_line_device) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate(&ioport_read_line_wrapper<_read_line_device>, #_read_line_device, _device, (device_t *)NULL));
-
 #define PORT_READ_LINE_DEVICE_MEMBER(_device, _class, _member) \
 	configurer.field_set_dynamic_read(ioport_field_read_delegate(&ioport_read_line_wrapper<_class, &_class::_member>, #_class "::" #_member, _device, (_class *)NULL));
 
 // output device handler
-#define PORT_WRITE_LINE_DEVICE(_device, _write_line_device) \
-	configurer.field_set_dynamic_write(ioport_field_write_delegate(&ioport_write_line_wrapper<_write_line_device>, #_write_line_device, _device, (device_t *)NULL));
-
 #define PORT_WRITE_LINE_DEVICE_MEMBER(_device, _class, _member) \
 	configurer.field_set_dynamic_write(ioport_field_write_delegate(&ioport_write_line_wrapper<_class, &_class::_member>, #_class "::" #_member, _device, (_class *)NULL));
 
