@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-06 03:03+0100\n"
-"PO-Revision-Date: 2016-03-01 16:29+0200\n"
+"PO-Revision-Date: 2016-03-07 03:10+0200\n"
 "Last-Translator: Mame.gr\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -24,15 +24,15 @@ msgstr "Ελέγχος σε εξέλιξη..."
 
 #: src/emu/ui/barcode.cpp:72
 msgid "New Barcode:"
-msgstr "Νέο Barcode:"
+msgstr "Νέος Γραμμωτός Κώδικας:"
 
 #: src/emu/ui/barcode.cpp:76
 msgid "Enter Code"
-msgstr "Εισάγετε τον κωδικό"
+msgstr "Εισάγετε τον Κωδικό"
 
 #: src/emu/ui/barcode.cpp:118
 msgid "Barcode length invalid!"
-msgstr "Μη έγκυρο μήκος γραμμικού κώδικα!"
+msgstr "Μη έγκυρο μήκος γραμμωτού κώδικα!"
 
 #: src/emu/ui/cheatopt.cpp:77
 #, c-format
@@ -91,7 +91,7 @@ msgstr "Off"
 
 #: src/emu/ui/cheatopt.cpp:301
 msgid "No buttons found on this machine!"
-msgstr "Δεν βρέθηκαν κουμπιά σε αυτόν το μηχάνημα!"
+msgstr "Δεν βρέθηκαν κουμπιά σε αυτό το μηχάνημα!"
 
 #: src/emu/ui/cheatopt.cpp:312 src/emu/ui/cheatopt.cpp:316
 msgid "Autofire Delay"
@@ -132,7 +132,7 @@ msgstr "Ανάθεση συσκευής Ποντικιού"
 #: src/emu/ui/ctrlmenu.cpp:106 src/emu/ui/ctrlmenu.cpp:126
 #: src/emu/ui/optsmenu.cpp:268
 msgid "Device Mapping"
-msgstr "Αντιστοίχιση συσκευής"
+msgstr "Αντιστοίχιση Συσκευής"
 
 #: src/emu/ui/custmenu.cpp:156 src/emu/ui/custmenu.cpp:441
 msgid "Main filter"
@@ -186,15 +186,15 @@ msgstr "Προβολή όλων"
 
 #: src/emu/ui/custui.cpp:21
 msgid "Hide Filters"
-msgstr "Απόκρυψη φίλτρων"
+msgstr "Απόκρυψη Φίλτρων"
 
 #: src/emu/ui/custui.cpp:22
 msgid "Hide Info/Image"
-msgstr "Απόκρυψη πληροφορίες/εικόνα"
+msgstr "Απόκρυψη Πληροφορίων/Εικόνας"
 
 #: src/emu/ui/custui.cpp:23
 msgid "Hide Both"
-msgstr "Απόκρυψη όλων"
+msgstr "Απόκρυψη Όλων"
 
 #: src/emu/ui/custui.cpp:139
 msgid "Fonts"
@@ -210,11 +210,11 @@ msgstr "Γλώσσα"
 
 #: src/emu/ui/custui.cpp:149
 msgid "Show side panels"
-msgstr "Εμφάνιση πλαϊνών πάνελ"
+msgstr "Εμφάνιση πλευρικών πάνελ"
 
 #: src/emu/ui/custui.cpp:164 src/emu/ui/custui.cpp:184
 msgid "Custom UI Settings"
-msgstr "Προσαρμοσμένες ρυθμίσεις UI"
+msgstr "Προσαρμοσμένες Ρυθμίσεις UI"
 
 #: src/emu/ui/custui.cpp:268
 msgid "default"
@@ -324,7 +324,7 @@ msgstr "Ρυθμίσεις χρωμάτων UI"
 #: src/emu/ui/custui.cpp:591
 #, c-format
 msgid "Double click or press %1$s to change the color value"
-msgstr ""
+msgstr "Κάντε διπλό κλικ ή πατήστε %1$s για να αλλάξετε την τιμή του χρώματος"
 
 #: src/emu/ui/custui.cpp:617
 msgid "Menu Preview"
@@ -383,7 +383,7 @@ msgstr "Λευκό"
 
 #: src/emu/ui/custui.cpp:1027
 msgid "Silver"
-msgstr "Ασιμί"
+msgstr "Ασημί"
 
 #: src/emu/ui/custui.cpp:1028
 msgid "Gray"
@@ -422,7 +422,7 @@ msgstr "Αναθεώρηση: "
 #: src/emu/ui/selsoft.cpp:1565 src/emu/ui/selsoft.cpp:1583
 #: src/emu/ui/selsoft.cpp:1592
 msgid "History"
-msgstr "Ιστορικό"
+msgstr "Ιστορία"
 
 #: src/emu/ui/datmenu.cpp:289 src/emu/ui/selgame.cpp:40
 msgid "Mameinfo"
@@ -550,34 +550,34 @@ msgstr "Versus"
 
 #: src/emu/ui/dirmenu.cpp:116 src/emu/ui/dirmenu.cpp:136
 msgid "Folders Setup"
-msgstr "Ρύθμιση φακέλων"
+msgstr "Ρύθμιση Φακέλων"
 
 #: src/emu/ui/dirmenu.cpp:183
 #, c-format
 msgid "Current %1$s Folders"
-msgstr ""
+msgstr "Τρέχοντες %1$s Φάκελοι"
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
-msgstr "Αλλαγή φακέλου"
+msgstr "Αλλαγή Φακέλου"
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Add Folder"
-msgstr "Προσθήκη φακέλου"
+msgstr "Προσθήκη Φακέλου"
 
 #: src/emu/ui/dirmenu.cpp:198
 msgid "Remove Folder"
-msgstr "Αφαίρεση φακέλου"
+msgstr "Αφαίρεση Φακέλου"
 
 #: src/emu/ui/dirmenu.cpp:499
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
-msgstr ""
+msgstr "Αλλαγή %1$s Φακέλου - Αναζήτηση: %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:500
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
-msgstr ""
+msgstr "Προσθήκη %1$s Φακέλου - Αναζήτηση: %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
@@ -586,11 +586,11 @@ msgstr "Πιέστε το πλήκτρο TAB για να ορίσετε"
 #: src/emu/ui/dirmenu.cpp:643
 #, c-format
 msgid "Remove %1$s Folder"
-msgstr ""
+msgstr "Αφαίρεση %1$s Φακέλου"
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
-msgstr "Λειτουργία βίντεο"
+msgstr "Λειτουργία Βίντεο"
 
 #: src/emu/ui/dsplmenu.cpp:40
 msgid "Hardware Stretch"
@@ -622,32 +622,32 @@ msgstr "Multi-Threaded Rendering"
 
 #: src/emu/ui/dsplmenu.cpp:48
 msgid "Window Mode"
-msgstr "Λειτουργία παραθύρου"
+msgstr "Λειτουργία Παραθύρου"
 
 #: src/emu/ui/dsplmenu.cpp:49
 msgid "Enforce Aspect Ratio"
-msgstr "Επιβολή αναλογίας εικόνας"
+msgstr "Επιβολή Αναλογίας Εικόνας"
 
 #: src/emu/ui/dsplmenu.cpp:50
 msgid "Start Out Maximized"
-msgstr "Εκκίνηση μεγιστοποιημένο"
+msgstr "Εκκίνηση Μεγιστοποιημένο"
 
 #: src/emu/ui/dsplmenu.cpp:51
 msgid "Synchronized Refresh"
-msgstr "Συγχρονισμένη ανανέωση"
+msgstr "Συγχρονισμένη Ανανέωση"
 
 #: src/emu/ui/dsplmenu.cpp:52
 msgid "Wait Vertical Sync"
-msgstr "Αναμονή για κάθετο συγχρονισμό"
+msgstr "Αναμονή για Κάθετο Συγχρονισμό"
 
 #: src/emu/ui/dsplmenu.cpp:204 src/emu/ui/dsplmenu.cpp:224
 #: src/emu/ui/optsmenu.cpp:265
 msgid "Display Options"
-msgstr "Επιλογές γραφικών"
+msgstr "Επιλογές Γραφικών"
 
 #: src/emu/ui/filesel.cpp:159
 msgid "File Already Exists - Override?"
-msgstr "Το αρχείο υπάρχει ήδη - να αντικατασταθεί;"
+msgstr "Το Αρχείο Υπάρχει Ήδη - Να Αντικατασταθεί;"
 
 #: src/emu/ui/filesel.cpp:161 src/emu/ui/selgame.cpp:1554
 #: src/emu/ui/selgame.cpp:1555 src/emu/ui/selgame.cpp:1556
@@ -667,11 +667,11 @@ msgstr "Ναι"
 
 #: src/emu/ui/filesel.cpp:271
 msgid "New Image Name:"
-msgstr "Νέο όνομα εικόνας:"
+msgstr "Νέο Όνομα Εικόνας:"
 
 #: src/emu/ui/filesel.cpp:277
 msgid "Image Format:"
-msgstr "Μορφή εικόνας:"
+msgstr "Μορφή Εικόνας:"
 
 #: src/emu/ui/filesel.cpp:283
 msgid "Create"
@@ -726,7 +726,7 @@ msgid ""
 "The software selected is missing one or more required ROM or CHD images. "
 "Please select a different one."
 msgstr ""
-"Στο επιλεγμένο λογισμικό λείπει μία ή περισσότερες  ROMs ή εικόνες CHD. "
+"Στο επιλεγμένο λογισμικό λείπει μία ή περισσότερες ROMs ή εικόνες CHD. "
 "Παρακαλούμε επιλέξτε ένα διαφορετικό."
 
 #: src/emu/ui/info.cpp:98
@@ -751,11 +751,11 @@ msgstr "[απέτυχε]"
 
 #: src/emu/ui/inputmap.cpp:52
 msgid "User Interface"
-msgstr "Περιβάλλον χρήστη"
+msgstr "Περιβάλλον Χρήστη"
 
 #: src/emu/ui/inputmap.cpp:59
 msgid "Other Controls"
-msgstr "Άλλα στοιχεία ελέγχου"
+msgstr "Άλλα Στοιχεία Ελέγχου"
 
 #: src/emu/ui/inputmap.cpp:625 src/emu/ui/miscmenu.cpp:90
 #: src/emu/ui/slotopt.cpp:172
@@ -768,7 +768,7 @@ msgstr "Χειρισμός (γενικά)"
 
 #: src/emu/ui/mainmenu.cpp:55
 msgid "Input (this Machine)"
-msgstr "Χειρισμός (τρέχων μηχάνημα)"
+msgstr "Χειρισμός (τρέχων Μηχάνημα)"
 
 #: src/emu/ui/mainmenu.cpp:59
 msgid "Analog Controls"
@@ -808,19 +808,19 @@ msgstr "Επιλογή BIOS"
 
 #: src/emu/ui/mainmenu.cpp:99
 msgid "Slot Devices"
-msgstr "Συσκευές υποδοχής"
+msgstr "Συσκευές Υποδοχής"
 
 #: src/emu/ui/mainmenu.cpp:106
 msgid "Barcode Reader"
-msgstr "Συσκευή ανάγνωσης γραμμοκώδικα"
+msgstr "Συσκευή Ανάγνωσης Γραμμωτού Κώδικα"
 
 #: src/emu/ui/mainmenu.cpp:113
 msgid "Network Devices"
-msgstr "Συσκευές δικτύου"
+msgstr "Συσκευές Δικτύου"
 
 #: src/emu/ui/mainmenu.cpp:118
 msgid "Keyboard Mode"
-msgstr "Λειτουργία πληκτρολογίου"
+msgstr "Λειτουργία Πληκτρολογίου"
 
 #: src/emu/ui/mainmenu.cpp:121
 msgid "Slider Controls"
@@ -828,7 +828,7 @@ msgstr "Έλεγχος Slider "
 
 #: src/emu/ui/mainmenu.cpp:124
 msgid "Video Options"
-msgstr "Επιλογές βίντεο"
+msgstr "Επιλογές Βίντεο"
 
 #: src/emu/ui/mainmenu.cpp:128
 msgid "Crosshair Options"
@@ -840,23 +840,23 @@ msgstr "Cheat"
 
 #: src/emu/ui/mainmenu.cpp:136
 msgid "External DAT View"
-msgstr "Προβολή εξωτερικού DAT"
+msgstr "Προβολή Εξωτερικού DAT"
 
 #: src/emu/ui/mainmenu.cpp:142
 msgid "Add To Favorites"
-msgstr "Προσθήκη στα αγαπημένα"
+msgstr "Προσθήκη Στα Αγαπημένα"
 
 #: src/emu/ui/mainmenu.cpp:144
 msgid "Remove From Favorites"
-msgstr "Αφαίρεση από τα αγαπημένα"
+msgstr "Αφαίρεση Από Τα Αγαπημένα"
 
 #: src/emu/ui/mainmenu.cpp:151
 msgid "Select New Machine"
-msgstr "Επιλέξτε νέο μηχάνημα"
+msgstr "Επιλέξτε Νέο Μηχάνημα"
 
 #: src/emu/ui/menu.cpp:45
 msgid "Control Panels"
-msgstr "Πίνακες ελέγχου"
+msgstr "Πίνακες Ελέγχου"
 
 #: src/emu/ui/menu.cpp:50
 msgid "Artwork Preview"
@@ -868,7 +868,7 @@ msgstr "Game Over"
 
 #: src/emu/ui/menu.cpp:63
 msgid "Add or remove favorites"
-msgstr "Προσθήκη ή αφαίρεση στα αγαπημένα"
+msgstr "Προσθήκη ή αφαίρεση από τα αγαπημένα"
 
 #: src/emu/ui/menu.cpp:64
 msgid "Export displayed list to file"
@@ -880,7 +880,7 @@ msgstr "Εμφάνιση προβολής DATs"
 
 #: src/emu/ui/menu.cpp:252
 msgid "Return to Machine"
-msgstr "Επιστροφή στο μηχάνημα"
+msgstr "Επιστροφή στο Μηχάνημα"
 
 #: src/emu/ui/menu.cpp:256 src/emu/ui/menu.cpp:258
 msgid "Exit"
@@ -888,7 +888,7 @@ msgstr "Έξοδος"
 
 #: src/emu/ui/menu.cpp:263 src/emu/ui/menu.cpp:265
 msgid "Return to Previous Menu"
-msgstr "Επιστροφή στο προηγούμενο μενού"
+msgstr "Επιστροφή στο Προηγούμενο Μενού"
 
 #: src/emu/ui/menu.cpp:680
 msgid "Auto"
@@ -904,7 +904,7 @@ msgstr "Πληροφορίες"
 
 #: src/emu/ui/miscmenu.cpp:36
 msgid "Keyboard Mode:"
-msgstr "Λειτουργία πληκτρολογίου"
+msgstr "Λειτουργία Πληκτρολογίου:"
 
 #: src/emu/ui/miscmenu.cpp:36
 msgid "Natural"
@@ -956,7 +956,7 @@ msgstr " (κλειδωμένο)"
 
 #: src/emu/ui/miscmenu.cpp:518
 msgid "Visible Delay"
-msgstr "Ορατή καθυστέρηση"
+msgstr "Ορατή Καθυστέρηση"
 
 #: src/emu/ui/miscmenu.cpp:557
 msgid "Re-select last machine played"
@@ -1001,7 +1001,7 @@ msgstr "Παράλειψη μενού επιλογής τμημάτων λογι
 #: src/emu/ui/miscmenu.cpp:648 src/emu/ui/miscmenu.cpp:668
 #: src/emu/ui/optsmenu.cpp:267
 msgid "Miscellaneous Options"
-msgstr "Διάφορες επιλογές"
+msgstr "Διάφορες Επιλογές"
 
 #: src/emu/ui/miscmenu.cpp:733
 #, c-format
@@ -1019,11 +1019,11 @@ msgstr "%s.txt αποθηκεύτηκε στο φάκελο ui."
 
 #: src/emu/ui/miscmenu.cpp:791
 msgid "Export XML format (like -listxml)"
-msgstr "Εξαγωγή σε μορφή XML (like -listxml)"
+msgstr "Εξαγωγή σε μορφή XML (όπως -listxml)"
 
 #: src/emu/ui/miscmenu.cpp:792
 msgid "Export TXT format (like -listfull)"
-msgstr "Εξαγωγή σε μορφή XML TXT(like -listfull)"
+msgstr "Εξαγωγή σε μορφή XML TXT(όπως -listfull)"
 
 #: src/emu/ui/miscmenu.cpp:850
 msgid "Dummy"
@@ -1055,12 +1055,12 @@ msgstr "Προσαρμογή UI"
 
 #: src/emu/ui/optsmenu.cpp:263
 msgid "Configure Directories"
-msgstr "Ρύθμιση φακέλων"
+msgstr "Ρύθμιση Φακέλων"
 
 #: src/emu/ui/optsmenu.cpp:266 src/emu/ui/sndmenu.cpp:150
 #: src/emu/ui/sndmenu.cpp:170
 msgid "Sound Options"
-msgstr "Επιλογές ήχου"
+msgstr "Επιλογές Ήχου"
 
 #: src/emu/ui/optsmenu.cpp:269
 msgid "General Inputs"
@@ -1100,12 +1100,12 @@ msgstr ""
 
 #: src/emu/ui/selector.cpp:152
 msgid "Selection List - Search: "
-msgstr "Λίστα επιλογής - Αναζήτηση: "
+msgstr "Λίστα Επιλογής - Αναζήτηση: "
 
 #: src/emu/ui/selector.cpp:181
 #, c-format
 msgid "Double click or press %1$s to select"
-msgstr ""
+msgstr "Κάντε διπλό κλικ ή πατήστε %1$s για να επιλέξετε"
 
 #: src/emu/ui/selgame.cpp:38
 msgid "General Info"
@@ -1137,7 +1137,7 @@ msgid ""
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
-"Στο επιλεγμένο μηχάνημα λείπει μία ή περισσότερες  ROMs ή εικόνες CHD. "
+"Στο επιλεγμένο μηχάνημα λείπει μία ή περισσότερες ROMs ή εικόνες CHD. "
 "Παρακαλούμε επιλέξτε ένα άλλο μηχάνημα.\n"
 "\n"
 "Πιέστε οποιοδήποτε πλήκτρο (εκτός από το ESC) για να συνεχίσετε."
@@ -1185,11 +1185,11 @@ msgstr "%1$s, %2$-.100s"
 #: src/emu/ui/selgame.cpp:849 src/emu/ui/selsoft.cpp:750
 #, c-format
 msgid "Driver is clone of: %1$-.100s"
-msgstr "Το πρόγραμμα οδήγησης είναι κλώνος του: %1$-.100s"
+msgstr "Ο Οδηγός είναι κλώνος του: %1$-.100s"
 
 #: src/emu/ui/selgame.cpp:851 src/emu/ui/selsoft.cpp:752
 msgid "Driver is parent"
-msgstr "To Πρόγραμμα οδήγησης είναι γονικό"
+msgstr "Ο Οδηγός είναι γονικός"
 
 #: src/emu/ui/selgame.cpp:855 src/emu/ui/selsoft.cpp:756
 #: src/emu/ui/simpleselgame.cpp:332
@@ -1199,7 +1199,7 @@ msgstr "Συνολικά: ΔΕΝ ΛΕΙΤΟΥΡΓΕΙ"
 #: src/emu/ui/selgame.cpp:857 src/emu/ui/selsoft.cpp:758
 #: src/emu/ui/simpleselgame.cpp:334
 msgid "Overall: Unemulated Protection"
-msgstr "Συνολικά: Προστασία μη εξομοιωμένη"
+msgstr "Συνολικά: Προστασία Μη Εξομοιωμένη"
 
 #: src/emu/ui/selgame.cpp:859 src/emu/ui/selsoft.cpp:760
 #: src/emu/ui/simpleselgame.cpp:336
@@ -1208,7 +1208,7 @@ msgstr "Συνολικά: Λειτουργεί"
 
 #: src/emu/ui/selgame.cpp:863 src/emu/ui/selsoft.cpp:764
 msgid "Graphics: Imperfect, "
-msgstr "Γραφικά: ατελή, "
+msgstr "Γραφικά: Ατελή, "
 
 #: src/emu/ui/selgame.cpp:865 src/emu/ui/selsoft.cpp:766
 msgid "Graphics: OK, "
@@ -1216,11 +1216,11 @@ msgstr "Γραφικά: OK, "
 
 #: src/emu/ui/selgame.cpp:868 src/emu/ui/selsoft.cpp:769
 msgid "Sound: Unimplemented"
-msgstr "Ήχος: δεν έχει υλοποιηθεί"
+msgstr "Ήχος: Δεν Έχει Υλοποιηθεί"
 
 #: src/emu/ui/selgame.cpp:870 src/emu/ui/selsoft.cpp:771
 msgid "Sound: Imperfect"
-msgstr "Ήχος: ατελής"
+msgstr "Ήχος: Ατελής"
 
 #: src/emu/ui/selgame.cpp:872 src/emu/ui/selsoft.cpp:773
 msgid "Sound: OK"
@@ -1234,11 +1234,11 @@ msgstr "Σύστημα: %1$-.100s"
 #: src/emu/ui/selgame.cpp:896 src/emu/ui/selsoft.cpp:798
 #, c-format
 msgid "Software is clone of: %1$-.100s"
-msgstr "Το πρόγραμμα οδήγησης είναι κλώνος του: %1$-.100s"
+msgstr "Το Λογισμικό είναι κλώνος του: %1$-.100s"
 
 #: src/emu/ui/selgame.cpp:898 src/emu/ui/selsoft.cpp:800
 msgid "Software is parent"
-msgstr "Το λογισμικό είναι βασικό"
+msgstr "Το λογισμικό είναι γονικό"
 
 #: src/emu/ui/selgame.cpp:903 src/emu/ui/selsoft.cpp:805
 msgid "Supported: No"
@@ -1280,11 +1280,11 @@ msgstr "Κατασκευαστής: %1$-.100s\n"
 #: src/emu/ui/selgame.cpp:1527
 #, c-format
 msgid "Driver is Clone of: %1$-.100s\n"
-msgstr "Το πρόγραμμα οδήγησης είναι κλώνος του: %1$-.100s\n"
+msgstr "Ο Οδηγός είναι Κλώνος του: %1$-.100s\n"
 
 #: src/emu/ui/selgame.cpp:1529
 msgid "Driver is Parent\n"
-msgstr "To Πρόγραμμα οδήγησης είναι βασικό\n"
+msgstr "Ο Οδηγός είναι Γονικός\n"
 
 #: src/emu/ui/selgame.cpp:1532
 msgid "Overall: NOT WORKING\n"
@@ -1292,7 +1292,7 @@ msgstr "Συνολικά: ΔΕΝ ΛΕΙΤΟΥΡΓΕΙ\n"
 
 #: src/emu/ui/selgame.cpp:1534
 msgid "Overall: Unemulated Protection\n"
-msgstr "Συνολικά: Προστασία μη εξομοιωμένη\n"
+msgstr "Συνολικά: Προστασία Μη Εξομοιωμένη\n"
 
 #: src/emu/ui/selgame.cpp:1536
 msgid "Overall: Working\n"
@@ -1300,11 +1300,11 @@ msgstr "Συνολικά: Λειτουργεί\n"
 
 #: src/emu/ui/selgame.cpp:1539
 msgid "Graphics: Imperfect Colors\n"
-msgstr "Γραφικά: Ατελή χρώματα\n"
+msgstr "Γραφικά: Ατελή Χρώματα\n"
 
 #: src/emu/ui/selgame.cpp:1543
 msgid "Graphics: Imperfect\n"
-msgstr "Γραφικά: ατελή\n"
+msgstr "Γραφικά: Ατελή\n"
 
 #: src/emu/ui/selgame.cpp:1545
 msgid "Graphics: OK\n"
@@ -1312,11 +1312,11 @@ msgstr "Γραφικά: OK\n"
 
 #: src/emu/ui/selgame.cpp:1548
 msgid "Sound: Unimplemented\n"
-msgstr "Ήχος: δεν έχει υλοποιηθεί\n"
+msgstr "Ήχος: Δεν Έχει Υλοποιηθεί\n"
 
 #: src/emu/ui/selgame.cpp:1550
 msgid "Sound: Imperfect\n"
-msgstr "Ήχος: ατελής\n"
+msgstr "Ήχος: Ατελής\n"
 
 #: src/emu/ui/selgame.cpp:1552
 msgid "Sound: OK\n"
@@ -1325,7 +1325,7 @@ msgstr "Ήχος: OK\n"
 #: src/emu/ui/selgame.cpp:1554
 #, c-format
 msgid "Driver is Skeleton: %1$s\n"
-msgstr "Το πρόγραμμα οδήγησης είναι σκελετός: %1$s\n"
+msgstr "Ο Οδηγός είναι Σκελετός: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1555
 #, c-format
@@ -1345,12 +1345,12 @@ msgstr "Απαιτεί Artwork για κλικ: %1$s\n"
 #: src/emu/ui/selgame.cpp:1558
 #, c-format
 msgid "Support Cocktail: %1$s\n"
-msgstr "Υποστήριξη κοκτέιλ: %1$s\n"
+msgstr "Υποστήριξη Κοκτέιλ: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1559
 #, c-format
 msgid "Driver is Bios: %1$s\n"
-msgstr "Το πρόγραμμα οδήγησης είναι Bios: %1$s\n"
+msgstr "Ο Οδηγός είναι Bios: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1560
 #, c-format
@@ -1373,9 +1373,7 @@ msgstr "Οριζόντιος"
 #: src/emu/ui/selgame.cpp:1569
 #, c-format
 msgid "Requires CHD: %1$s\n"
-msgstr ""
-"Απαιτεί CHD: %1$s\n"
-"\n"
+msgstr "Απαιτεί CHD: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1582
 msgid "Roms Audit Pass: OK\n"
@@ -1383,9 +1381,7 @@ msgstr "Έλεγχος ROMs: OK\n"
 
 #: src/emu/ui/selgame.cpp:1584
 msgid "Roms Audit Pass: BAD\n"
-msgstr ""
-"Έλεγχος ROMs: Κακός\n"
-"\n"
+msgstr "Έλεγχος ROMs: Λάθος\n"
 
 #: src/emu/ui/selgame.cpp:1587
 msgid "Samples Audit Pass: None Needed\n"
@@ -1404,8 +1400,8 @@ msgid ""
 "Roms Audit Pass: Disabled\n"
 "Samples Audit Pass: Disabled\n"
 msgstr ""
-"Έλεγχος ROMs: Απενεργοποιημένο\n"
-"Έλεγχος Δειγμάτων Ήχου: Απενεργοποιημένο\n"
+"Έλεγχος ROMs: Απενεργοποιημένος\n"
+"Έλεγχος Δειγμάτων Ήχου: Απενεργοποιημένος\n"
 
 #: src/emu/ui/selgame.cpp:2026 src/emu/ui/selgame.cpp:2187
 #: src/emu/ui/selsoft.cpp:1641
@@ -1427,7 +1423,7 @@ msgid ""
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
-"Στο επιλεγμένο λογισμικό λείπει μία ή περισσότερες  ROMs ή εικόνες CHD. "
+"Στο επιλεγμένο λογισμικό λείπει μία ή περισσότερες ROMs ή εικόνες CHD. "
 "Παρακαλούμε επιλέξτε ένα άλλο λογισμικό.\n"
 "\n"
 "Πιέστε οποιοδήποτε πλήκτρο (εκτός από το ESC) για να συνεχίσετε."
@@ -1460,7 +1456,7 @@ msgstr "Έτος: %1$s -"
 #: src/emu/ui/selsoft.cpp:693
 #, c-format
 msgid "Software List: %1$s -"
-msgstr "Λίστα λογισμικού: %1$s -"
+msgstr "Λίστα Λογισμικού: %1$s -"
 
 #: src/emu/ui/selsoft.cpp:695
 #, c-format
@@ -1497,7 +1493,7 @@ msgstr ""
 "Δεν βρέθηκαν μηχανήματα . Παρακαλώ ελέγξτε τη διαδρομή roms που καθορίζεται "
 "στο αρχείο %1$s.ini.\n"
 "\n"
-"Αν αυτή είναι η πρώτη φορά που χρησιμοποιείτε  %2$s., παρακαλούμε δείτε το "
+"Αν αυτή είναι η πρώτη φορά που χρησιμοποιείτε %2$s., παρακαλούμε δείτε το "
 "αρχείο config.txt στον κατάλογο docs για πληροφορίες σχετικά με τη "
 "διαμόρφωση %2$s.."
 
@@ -1542,11 +1538,11 @@ msgstr "Ήχος"
 
 #: src/emu/ui/sndmenu.cpp:135
 msgid "Sample Rate"
-msgstr "Ρυθμός δειγματοληψίας"
+msgstr "Ρυθμός Δειγματοληψίας"
 
 #: src/emu/ui/sndmenu.cpp:136
 msgid "Use External Samples"
-msgstr "Χρήση εξωτερικών δειγμάτων Ήχου"
+msgstr "Χρήση Εξωτερικών Δειγμάτων Ήχου"
 
 #: src/emu/ui/swlist.cpp:70
 msgid "[file manager]"
@@ -1554,7 +1550,7 @@ msgstr "[Διαχείριση αρχείων]"
 
 #: src/emu/ui/swlist.cpp:235
 msgid "Switch Item Ordering"
-msgstr "Εναλλαγή σειρά στοιχείων"
+msgstr "Εναλλαγή σειράς στοιχείων"
 
 #: src/emu/ui/swlist.cpp:268
 #, c-format
@@ -1620,8 +1616,7 @@ msgstr "**Σφάλμα φόρτωσης ui.ini**"
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
 msgstr ""
-"Αυτό το πρόγραμμα οδήγησης απαιτεί εικόνές να φορτωθούν στην ακόλουθη "
-"συσκευή (ες): "
+"Αυτός ο οδηγός απαιτεί εικόνες να φορτωθούν στην ακόλουθη συσκευή (ες): "
 
 #: src/emu/ui/ui.cpp:1043
 #, c-format
@@ -1655,7 +1650,9 @@ msgstr ""
 msgid ""
 "There are known problems with this machine\n"
 "\n"
-msgstr "Υπάρχουν γνωστά προβλήματα με αυτό το μηχάνημα\n"
+msgstr ""
+"Υπάρχουν γνωστά προβλήματα με αυτό το μηχάνημα\n"
+"\n"
 
 #: src/emu/ui/ui.cpp:1098
 msgid ""
@@ -1667,12 +1664,12 @@ msgstr ""
 #: src/emu/ui/ui.cpp:1102
 #, c-format
 msgid "The keyboard emulation may not be 100% accurate.\n"
-msgstr "Η εξομοίωση πληκτρολογίου δεν είναι σωστή 100% a.\n"
+msgstr "Η εξομοίωση πληκτρολογίου δεν είναι σωστή 100%.\n"
 
 #: src/emu/ui/ui.cpp:1104
 #, c-format
 msgid "The colors aren't 100% accurate.\n"
-msgstr "Τα χρώματα δεν είναι  σωστά 100% a.\n"
+msgstr "Τα χρώματα δεν είναι σωστά 100%.\n"
 
 #: src/emu/ui/ui.cpp:1106
 msgid "The colors are completely wrong.\n"
@@ -1681,12 +1678,12 @@ msgstr "Τα χρώματα είναι εντελώς λάθος.\n"
 #: src/emu/ui/ui.cpp:1108
 #, c-format
 msgid "The video emulation isn't 100% accurate.\n"
-msgstr "Η εξομοίωση βίντεο δεν είναι σωστή 100% a.\n"
+msgstr "Η εξομοίωση βίντεο δεν είναι σωστή 100%.\n"
 
 #: src/emu/ui/ui.cpp:1110
 #, c-format
 msgid "The sound emulation isn't 100% accurate.\n"
-msgstr "Η εξομοίωση ήχου δεν είναι σωστή 100% a.\n"
+msgstr "Η εξομοίωση ήχου δεν είναι σωστή 100%.\n"
 
 #: src/emu/ui/ui.cpp:1112
 msgid "The machine lacks sound.\n"
@@ -1733,7 +1730,7 @@ msgstr ""
 "ΑΥΤΟ ΤΟ ΜΗΧΑΝΗΜΑ ΔΕΝ ΛΕΙΤΟΥΡΓΕΙ. Η εξομοίωση για αυτό το μηχάνημα δεν είναι "
 "ακόμα πλήρης. Δεν υπάρχει τίποτα που μπορείτε να κάνετε για να διορθώσετε "
 "αυτό το πρόβλημα εκτός από την αναμονή για τους προγραμματιστές να "
-"βελτιώνουν την εξομοίωση.\n"
+"βελτιώσουν την εξομοίωση.\n"
 
 #: src/emu/ui/ui.cpp:1144
 msgid ""
@@ -1755,7 +1752,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Υπάρχουν κλώνοι αυτού του μηχάνηματος που λειτουργούν: "
+"Υπάρχουν κλώνοι αυτού του μηχανήματος που λειτουργούν: "
 
 #: src/emu/ui/ui.cpp:1177
 msgid ""
@@ -1765,7 +1762,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Πληκτρολογήστε OK ή μετακινήσετε το μοχλό αριστερά και στη συνέχεια, δεξιά "
+"Πληκτρολογήστε OK ή μετακινήσετε το μοχλό αριστερά και στη συνέχεια δεξιά "
 "για να συνεχίσετε"
 
 #: src/emu/ui/ui.cpp:1192
@@ -1826,19 +1823,19 @@ msgstr "%2$s\n"
 
 #: src/emu/ui/ui.cpp:1577 src/emu/ui/ui.cpp:1587
 msgid "Keyboard Emulation Status"
-msgstr "Κατάσταση εξομοίωσης πληκτρολογίου"
+msgstr "Κατάσταση Εξομοίωσης Πληκτρολογίου"
 
 #: src/emu/ui/ui.cpp:1579
 msgid "Mode: PARTIAL Emulation"
-msgstr "Λειτουργία: Μερική εξομοίωση"
+msgstr "Λειτουργία: Μερική Εξομοίωση"
 
 #: src/emu/ui/ui.cpp:1580
 msgid "UI:   Enabled"
-msgstr "UI: Ενεργοποιημένο"
+msgstr "UI:   Ενεργοποιημένο"
 
 #: src/emu/ui/ui.cpp:1582 src/emu/ui/ui.cpp:1592
 msgid "**Use ScrLock to toggle**"
-msgstr "** Χρήση ScrLock να εναλλαγή **"
+msgstr "**Χρήση ScrLock να εναλλαγή**"
 
 #: src/emu/ui/ui.cpp:1589
 msgid "Mode: FULL Emulation"
@@ -1967,19 +1964,19 @@ msgstr "Laserdisc '%1$s' Κάθετη Θέση"
 
 #: src/emu/ui/ui.cpp:2081
 msgid "Vector Flicker"
-msgstr "Τρεμόπαιγμα Διάνυσματος"
+msgstr "Τρεμόπαιγμα Διανύσματος"
 
 #: src/emu/ui/ui.cpp:2083
 msgid "Beam Width Minimum"
-msgstr "Ελάχιστο πλάτος ακτίνων"
+msgstr "Ελάχιστο Πλάτος Ακτινών"
 
 #: src/emu/ui/ui.cpp:2085
 msgid "Beam Width Maximum"
-msgstr "Μέγιστο πλάτος ακτίνων"
+msgstr "Μέγιστο Πλάτος Ακτινών"
 
 #: src/emu/ui/ui.cpp:2087
 msgid "Beam Intensity Weight"
-msgstr "Βάρος έντασης ακτίνας"
+msgstr "Βάρος Έντασης Ακτίνας"
 
 #: src/emu/ui/ui.cpp:2099
 #, c-format
@@ -1997,7 +1994,7 @@ msgstr "Y"
 #: src/emu/ui/ui.cpp:2102
 #, c-format
 msgid "Crosshair Offset %1$s"
-msgstr "Μετατόπιση στοχάστρου %1$s"
+msgstr "Μετατόπιση Στοχάστρου %1$s"
 
 #: src/emu/ui/ui.cpp:2121
 #, c-format
@@ -2055,12 +2052,12 @@ msgstr "Κλίμακα Στόχαστρου Y %1$1.3f"
 #: src/emu/ui/ui.cpp:2563
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
-msgstr "Μετατόπιση στοχάστρου X %1$1.3f"
+msgstr "Μετατόπιση Στοχάστρου X %1$1.3f"
 
 #: src/emu/ui/ui.cpp:2563
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
-msgstr "Μετατόπιση στοχάστρου Y %1$1.3f"
+msgstr "Μετατόπιση Στοχάστρου Y %1$1.3f"
 
 #: src/emu/ui/videoopt.cpp:55
 #, c-format
@@ -2106,33 +2103,3 @@ msgstr " ΧΡΩΜΑΤΑ"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " ΓΡΑΦΙΔΕΣ"
-
-#~ msgid "Double click or press "
-#~ msgstr "Κάντε διπλό κλικ ή πιέστε το πλήκτρο "
-
-#~ msgid " to change the color value"
-#~ msgstr " για να αλλάξετε την τιμή του χρώματος"
-
-#~ msgid " to select"
-#~ msgstr " για επιλογή﻿"
-
-#~ msgid "Current "
-#~ msgstr "Τρέχοντες "
-
-#~ msgid " Folders"
-#~ msgstr " Φάκελοι"
-
-#~ msgid "Change)"
-#~ msgstr "Αλλαγή)"
-
-#~ msgid "Add"
-#~ msgstr "Προσθήκη"
-
-#~ msgid " Folder - Search: "
-#~ msgstr " Φάκελος - Αναζήτηση: "
-
-#~ msgid "Remove "
-#~ msgstr "Αφαίρεση"
-
-#~ msgid " Folder"
-#~ msgstr " Φάκελος"
