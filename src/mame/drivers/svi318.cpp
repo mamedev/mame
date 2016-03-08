@@ -92,9 +92,9 @@ protected:
 	optional_device<palette_device> m_palette;
 
 private:
-	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
-	required_memory_bank m_bank3;
+	optional_memory_bank m_bank1;
+	optional_memory_bank m_bank2;
+	optional_memory_bank m_bank3;
 	optional_memory_bank m_bank4;
 };
 
