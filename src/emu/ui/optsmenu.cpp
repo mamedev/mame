@@ -344,7 +344,7 @@ void save_main_option(running_machine &machine)
 			bool result = options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
 			if (!result)
 			{
-				osd_printf_error(_("**Error loading %s.ini**"), emulator_info::get_configname());
+				osd_printf_error("**Error loading %s.ini**", emulator_info::get_configname());
 				return;
 			}
 		}
