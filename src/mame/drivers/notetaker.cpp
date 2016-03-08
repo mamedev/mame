@@ -52,18 +52,20 @@ TODO: everything below.
 * Get smalltalk-78 loaded as a rom and forced into ram on startup, since no boot disks have survived (or if any survived, they are not dumped)
 
 * Harris 6402 keyboard UART (within keyboard, next to MCU)
-* The harris 6402 UART is pin compatible with WD TR1865 and TR1602 UARTs, as well as the AY-3-1015A/D
+* The harris 6402 UART is pin compatible with WD TR1865 UART, as well as the AY-3-1015A/D
+   (These are 5v-only versions of the older WD TR1602 and AY-5-1013 parts which used 5v and 12v)
 * HLE for the missing i8748[5] MCU in the keyboard which reads the mouse quadratures and buttons and talks serially to the Keyboard UART
-* floppy controller wd1791
+* floppy controller wd1791 and its interrupt
   According to [3] and [5] the format is double density/MFM, 128 bytes per sector, 16 sectors per track, 1 or 2 sided, for 170K or 340K per disk. Drive spins at 300RPM.
 * According to the schematics, we're missing an 82s147 DISKSEP.PROM used as a data separator
 
 WIP:
 * crt5027 video controller - the iocpu side is hooked up, but crashes due to a bug in the crt5027/tms9927 code. the actual drawing to screen part is not connected anywhere yet.
-* pic8259 interrupt controller - this is attached as a device, but the interrupts are not hooked to it yet.
-* Harris 6402 serial/EIA UART - connected to iocpu, other end isn't connected anywhere
-* Harris 6402 keyboard UART (within notetaker) - connected to iocpu, other end isn't connected anywhere
+* pic8259 interrupt controller - this is attached as a device, but only the vblank interrupt is hooked to it yet.
+* Harris 6402 serial/EIA UART - connected to iocpu, other end isn't connected anywhere, interrupt is not connected
+* Harris 6402 keyboard UART (within notetaker) - connected to iocpu, other end isn't connected anywhere, interrupt is not connected
 * we're missing a dump of the 82s126 SETMEMRQ PROM used to handle memory arbitration between the crtc and the rest of the system, but the equations are on the schematic and I'm planning to regenerate the prom contents from that, see ROM_LOAD section
+* The DAC, its FIFO and its timer are hooked up and the v2.0 bios beeps, but the stereo latches are not hooked up at all, DAC is treated as mono for now
 
 DONE:
 * i/o cpu i/o area needs the memory map worked out per the schematics - done
@@ -73,17 +75,24 @@ DONE:
 #include "machine/pic8259.h"
 #include "machine/ay31015.h"
 #include "video/tms9927.h"
+#include "sound/dac.h"
 
 class notetaker_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_FIFOCLK,
+	};
+
 	notetaker_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag) ,
 		m_iocpu(*this, "iocpu"),
 		m_iopic(*this, "iopic8259"),
 		m_kbduart(*this, "kbduart"),
 		m_eiauart(*this, "eiauart"),
-		m_crtc(*this, "crt5027")
+		m_crtc(*this, "crt5027"),
+		m_dac(*this, "dac")
 	{
 	}
 // devices
@@ -92,6 +101,7 @@ public:
 	required_device<ay31015_device> m_kbduart;
 	required_device<ay31015_device> m_eiauart;
 	required_device<crt5027_device> m_crtc;
+	required_device<dac_device> m_dac;
 
 //declarations
 	// screen
@@ -99,6 +109,7 @@ public:
 	// basic io
 	DECLARE_WRITE16_MEMBER(IPConReg_w);
 	DECLARE_WRITE16_MEMBER(FIFOReg_w);
+	DECLARE_WRITE16_MEMBER(FIFOBus_w);
 
 	// uarts
 	DECLARE_READ16_MEMBER(ReadKeyData_r);
@@ -136,14 +147,57 @@ public:
 	UINT8 m_SHConB;
 	UINT8 m_SHConA;
 	UINT8 m_SetSH;
+	// output fifo, for DAC
+	UINT16 m_outfifo[16]; // technically three 74LS225 5bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo (one bit unused per chip)
+	UINT8 m_outfifo_count;
+	UINT8 m_outfifo_tail_ptr;
+	UINT8 m_outfifo_head_ptr;
+	// fifo timer
+	emu_timer *m_FIFO_timer;
+	TIMER_CALLBACK_MEMBER(timer_fifoclk);
 
-// resets
+// separate cpu resets
 	void ip_reset();
 	void ep_reset();
 
 // overrides
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+void notetaker_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_FIFOCLK:
+		timer_fifoclk(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in notetaker_state::device_timer");
+	}
+}
+
+TIMER_CALLBACK_MEMBER(notetaker_state::timer_fifoclk)
+{
+	UINT16 data;
+	//pop a value off the fifo and send it to the dac.
+#ifdef FIFO_VERBOSE
+	if (m_outfifo_count == 0) logerror("output fifo is EMPTY! repeating previous sample!\n");
+#endif
+	data = m_outfifo[m_outfifo_tail_ptr];
+	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
+	if (m_outfifo_count > 0)
+	{
+		m_outfifo_tail_ptr++;
+		m_outfifo_count--;
+	}
+	m_outfifo_tail_ptr&=0xF;
+	m_dac->write_unsigned16(data);
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter), divided by 4 (mc14568B with divider 1 pins set to 4), divided by 1,3,5,7,9,11,13,15 (or 0,2,4,6,8,10,12,14?)
+}
 
 UINT32 notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -171,18 +225,17 @@ READ16_MEMBER( notetaker_state::ReadKeyData_r )
 	return 0xFF00||m_kbduart->get_received_data();
 }
 
-READ16_MEMBER( notetaker_state::ReadOPStatus_r )
+READ16_MEMBER( notetaker_state::ReadOPStatus_r ) // 74ls368 hex inverter at #l7 provides 4 bits, inverted
 {
 	UINT16 data = 0xFFF0;
-	// TODO: FIX HACK: set FIFOInRDY and FIFOOutRdy both to 1
-	data |= 0x0C;
-	/*
-	data |= (m_FIFOOutRdy) ? 0x08 : 0;
-	data |= (m_FIFOInRdy) ? 0x04 : 0;
-	*/
+	data |= (m_outfifo_count >= 1) ? 0 : 0x08; // m_FIFOOutRdy is true if the fifo has at least 1 word in it, false otherwise
+	data |= (m_outfifo_count < 16) ? 0 : 0x04; // m_FIFOInRdy is true if the fifo has less than 16 words in it, false otherwise
 	// note /SWE is permanently enabled, so we don't enable it here for HD6402 reading
-	data |= m_kbduart->get_output_pin(AY31015_DAV ) ? 0x02 : 0; // DR - pin 19
-	data |= m_kbduart->get_output_pin(AY31015_TBMT) ? 0x01 : 0; // TBRE - pin 22
+	data |= m_kbduart->get_output_pin(AY31015_DAV ) ? 0 : 0x02; // DR - pin 19
+	data |= m_kbduart->get_output_pin(AY31015_TBMT) ? 0 : 0x01; // TBRE - pin 22
+#ifdef DEBUG_READOPSTATUS
+	logerror("ReadOPStatus read, returning %04x\n", data);
+#endif
 	return data;
 }
 
@@ -217,14 +270,31 @@ WRITE16_MEMBER( notetaker_state::KeyChipReset_w )
 /* FIFO (DAC) Stuff and ADC stuff */
 WRITE16_MEMBER(notetaker_state::FIFOReg_w)
 {
-	m_TabletYOn = (data&0x80)?1:0;
-	m_TabletXOn = (data&0x40)?1:0;
-	m_FrSel2 = (data&0x20)?1:0;
-	m_FrSel1 = (data&0x10)?1:0;
-	m_FrSel0 = (data&0x08)?1:0;
-	m_SHConB = (data&0x04)?1:0;
-	m_SHConA = (data&0x02)?1:0;
-	m_SetSH = (data&0x01)?1:0;
+	m_SetSH = (data&0x8000)?1:0;
+	m_SHConA = (data&0x4000)?1:0;
+	m_SHConB = (data&0x2000)?1:0;
+	m_FrSel0 = (data&0x1000)?1:0;
+	m_FrSel1 = (data&0x0800)?1:0;
+	m_FrSel2 = (data&0x0400)?1:0;
+	m_TabletXOn = (data&0x0200)?1:0;
+	m_TabletYOn = (data&0x0100)?1:0;
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter), divided by 4 (mc14568B with divider 1 pins set to 4), divided by 1,3,5,7,9,11,13,15 (or off,2,4,6,8,10,12,14?)
+	logerror("Write to 0x60 FIFOReg_w of %04x; fifo timer set to %d hz\n", data, (((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+}
+
+WRITE16_MEMBER(notetaker_state::FIFOBus_w)
+{
+	if (m_outfifo_count == 16)
+	{
+#ifdef SPC_LOG_DSP
+		logerror("outfifo was full, write ignored!\n");
+#endif
+		return;
+	}
+	m_outfifo[m_outfifo_head_ptr] = data;
+	m_outfifo_head_ptr++;
+	m_outfifo_count++;
+	m_outfifo_head_ptr&=0xF;
 }
 
 /* EIA hd6402 */
@@ -233,12 +303,12 @@ READ16_MEMBER( notetaker_state::ReadEIAData_r )
 	return 0xFF00||m_eiauart->get_received_data();
 }
 
-READ16_MEMBER( notetaker_state::ReadEIAStatus_r )
+READ16_MEMBER( notetaker_state::ReadEIAStatus_r ) // 74ls368 hex inverter at #f1 provides 2 bits, inverted
 {
 	UINT16 data = 0xFFFC;
 	// note /SWE is permanently enabled, so we don't enable it here for HD6402 reading
-	data |= m_eiauart->get_output_pin(AY31015_DAV ) ? 0x02 : 0; // DR - pin 19
-	data |= m_eiauart->get_output_pin(AY31015_TBMT) ? 0x01 : 0; // TBRE - pin 22
+	data |= m_eiauart->get_output_pin(AY31015_DAV ) ? 0 : 0x02; // DR - pin 19
+	data |= m_eiauart->get_output_pin(AY31015_TBMT) ? 0 : 0x01; // TBRE - pin 22
 	return data;
 }
 
@@ -399,7 +469,7 @@ static ADDRESS_MAP_START(notetaker_iocpu_io, AS_IO, 16, notetaker_state)
 	AM_RANGE(0x4e, 0x4f) AM_MIRROR(0x7E10) AM_WRITE(KeyChipReset_w) // kbd uart reset
 	AM_RANGE(0x60, 0x61) AM_MIRROR(0x7E1E) AM_WRITE(FIFOReg_w) // DAC sample and hold and frequency setup
 	//AM_RANGE(0xa0, 0xa1) AM_MIRROR(0x7E18) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255
-	//AM_RANGE(0xc0, 0xc1) AM_MIRROR(0x7E1E) AM_WRITE(FIFOBus_w) // DAC data write to FIFO
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0x7E1E) AM_WRITE(FIFOBus_w) // DAC data write to FIFO
 	//AM_RANGE(0x100, 0x101) AM_MIRROR(0x7E1E) AM_WRITE(DiskReg_w) I/O register (adc speed, crtc pixel clock enable, +5 and +12v relays for floppy, etc)
 	//AM_RANGE(0x120, 0x121) AM_MIRROR(0x7E18) AM_DEVREADWRITE("wd1791", fd1971_device) // floppy controller
 	AM_RANGE(0x140, 0x15f) AM_MIRROR(0x7E00) AM_DEVREADWRITE8("crt5027", crt5027_device, read, write, 0x00FF) // crt controller
@@ -430,10 +500,10 @@ irq7    VSync   (interrupt from the VSYN VSync pin from the crt5027)
 0x02 to port 0x100 (IOR write: enable 5v only relay control)
 0x03 to port 0x100 (IOR write: in addition to above, enable 12v relay control)
 <dram memory 0x00000-0x3ffff is zeroed here>
-0x13 to port 0x000 PIC (?????)
-0x08 to port 0x002 PIC (UART int enabled)
-0x0D to port 0x002 PIC (UART, wd1791, and parity error int enabled)
-0xff to port 0x002 PIC (all ints enabled)
+0x13 to port 0x000 PIC (ICW1, 8085 vector 0b000[ignored], edge trigger mode, interval of 8, single mode (no cascade/ICW3), ICW4 needed )
+0x08 to port 0x002 PIC (ICW2, T7-T3 = 0b00001)
+0x0D to port 0x002 PIC (ICW4, SFNM OFF, Buffered Mode MASTER, Normal EOI, 8086 mode)
+0xff to port 0x002 PIC (OCW1, All Ints Masked (disabled/suppressed))
 0x0000 to port 0x04e (reset keyboard fifo/controller)
 0x0000 to port 0x1ae (reset UART)
 0x0016 to port 0x048 (kbd control reg write)
@@ -449,8 +519,8 @@ irq7    VSync   (interrupt from the VSYN VSync pin from the crt5027)
 0x0a03 to port 0x100 (IOR write: set bit clock to 12Mhz)
 0x2a03 to port 0x100 (IOR write: enable crtc clock chain)
 0x00 to port 0x15c (fire off crtc timing chain)
-read from 0x0002 (byte wide) (check interrupts) <looking for vblank int or odd/even frame int here, most likely>
-0xaf to port 0x002 PIC (mask out kb int and 30hz display int)
+read from 0x0002 (byte wide) (IMR, read interrupt mask, will be 0xFF from above)
+0xaf to port 0x002 PIC (mask out with 0xEF and 0xBF to unnmask interrupts IR4(OddInt) and IR6(KbdInt), and write back to IMR)
 0x0400 to 0x060 (select DAC fifo frequency 2)
 read from 0x44 (byte wide) in a loop forever (read keyboard fifo status)
 */
@@ -473,6 +543,16 @@ static ADDRESS_MAP_START(notetaker_emulatorcpu_io, AS_IO, 16, notetaker_state)
 	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x07FE) AM_WRITE(EmuClearParity_w) // writes here clear the local 8k-ram parity error register
 ADDRESS_MAP_END
 */
+
+/* Machine Start; allocate timers and savestate stuff */
+void notetaker_state::machine_start()
+{
+	// allocate the DAC timer, and set it to fire NEVER. We'll set it up properly in IPReset.
+	m_FIFO_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(notetaker_state::timer_fifoclk),this));
+	m_FIFO_timer->adjust(attotime::never);
+	// savestate stuff
+	// TODO: add me!
+}
 
 /* Machine Reset; this emulates the full system reset, triggered by ExtReset' (cardcage pin <50>) or the PowerOnReset' circuit */
 void notetaker_state::machine_reset()
@@ -508,7 +588,10 @@ void notetaker_state::ip_reset()
 	m_SHConA = 0;
 	m_SetSH = 0;
 	// Clear the DAC FIFO
-	//  write me!
+	for (int i=0; i<16; i++) m_outfifo[i] = 0;
+	m_outfifo_count = m_outfifo_tail_ptr = m_outfifo_head_ptr = 0;
+	// Reset the DAC Timer
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter), divided by 4 (mc14568B with divider 1 pins set to 4), divided by 1,3,5,7,9,11,13,15 (or 0,2,4,6,8,10,12,14?)
 	// reset the EIA UART
 	m_eiauart->set_input_pin(AY31015_XR, 0); // MR - pin 21
 	m_eiauart->set_input_pin(AY31015_XR, 1); // ''
@@ -557,18 +640,23 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL_36MHz/4)/8) // the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*, 2, 3, 4, 5, 6, 7, or 8 (* because this is a 74s163 this setting probably means divide by 1; documentation at http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790605_Definition_of_8086_Ports.pdf claims it is 1.5, which makes no sense) and secondarily divided by 8 (again by two to load the 16 bit output shifters after this)
 	// on reset, bitclk is 000 so divider is (36mhz/8)/8; during boot it is written with 101, changing the divider to (36mhz/4)/8
 	// TODO: for now, we just hack it to the latter setting from start; this should be handled correctly in ip_reset();
-
 	MCFG_TMS9927_CHAR_WIDTH(8) //(8 pixels per column/halfword, 16 pixels per fullword)
+	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE("iopic8259", pic8259_device, ir7_w)) // note this triggers interrupts on both the iocpu (int7) and emulatorcpu (int4)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD( "kbduart", AY31015, 0 )
+	MCFG_DEVICE_ADD( "kbduart", AY31015, 0 ) // HD6402, == AY-3-1015D
 	MCFG_AY31015_RX_CLOCK(XTAL_960kHz) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
 	MCFG_AY31015_TX_CLOCK(XTAL_960kHz) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
 
-	MCFG_DEVICE_ADD( "eiauart", AY31015, 0 )
-	MCFG_AY31015_RX_CLOCK((96000/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
-	MCFG_AY31015_TX_CLOCK((96000/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	MCFG_DEVICE_ADD( "eiauart", AY31015, 0 ) // HD6402, == AY-3-1015D
+	MCFG_AY31015_RX_CLOCK(((XTAL_960kHz/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	MCFG_AY31015_TX_CLOCK(((XTAL_960kHz/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
 	/* Devices */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono") // TODO: should be stereo
+	MCFG_SOUND_ADD("dac", DAC, 0) /* DAC1200, set up with two sample and hold HA2425 chips outside it to do stereo */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -641,5 +729,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR      NAME  PARENT  COMPAT   MACHINE     INPUT            STATE      INIT  COMPANY     FULLNAME                FLAGS */
-COMP( 1978, notetakr,      0,      0, notetakr, notetakr, notetaker_state, notetakr, "Xerox", "Notetaker", MACHINE_IS_SKELETON)
-//COMP( 1978, notetakr,      0,      0, notetakr, notetakr, driver_device, notetakr, "Xerox", "Notetaker", MACHINE_IS_SKELETON)
+COMP( 1978, notetakr,      0,      0, notetakr, notetakr, notetaker_state, notetakr, "Xerox", "NoteTaker", MACHINE_IS_SKELETON)
+//COMP( 1978, notetakr,      0,      0, notetakr, notetakr, driver_device, notetakr, "Xerox", "NoteTaker", MACHINE_IS_SKELETON)
