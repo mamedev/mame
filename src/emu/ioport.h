@@ -1735,7 +1735,7 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 
 // input device handler
 #define PORT_READ_LINE_DEVICE_MEMBER(_device, _class, _member) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate([](_class &device, ioport_field &field, void *param)->ioport_value { return device._member() ? ~ioport_value(0) : 0; } , #_class "::" #_member, _device, (_class *)NULL));
+	configurer.field_set_dynamic_read(ioport_field_read_delegate([](_class &device, ioport_field &field, void *param)->ioport_value { return (device._member() & 1) ? ~ioport_value(0) : 0; } , #_class "::" #_member, _device, (_class *)NULL));
 
 // output device handler
 #define PORT_WRITE_LINE_DEVICE_MEMBER(_device, _class, _member) \
