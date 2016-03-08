@@ -16,6 +16,7 @@
 #include <bgfx/bgfxplatform.h>
 #include <bgfx/bgfx.h>
 #include <bx/readerwriter.h>
+#include <bx/crtimpl.h>
 
 #include "effectmanager.h"
 #include "effectreader.h"

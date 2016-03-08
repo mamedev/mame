@@ -1,0 +1,6 @@
+#ifndef MINGW32_ALLOCA_H_HEADER_GUARD
+#define MINGW32_ALLOCA_H_HEADER_GUARD
+
+#include <malloc.h>
+
+#endif // MINGW32_ALLOCA_H_HEADER_GUARD
