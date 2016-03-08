@@ -47,8 +47,6 @@
  * [5] http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790118_NoteTaker_System_Manual.pdf
 
 TODO: everything below.
-* figure out the correct memory maps for the 256kB of shared ram, and what part of ram constitutes the framebuffer
-* figure out how the emulation-cpu boots and where its 4k of local ram maps to
 * Get smalltalk-78 loaded as a rom and forced into ram on startup, since no boot disks have survived (or if any survived, they are not dumped)
 
 * Harris 6402 keyboard UART (within keyboard, next to MCU)
@@ -69,6 +67,11 @@ WIP:
 
 DONE:
 * i/o cpu i/o area needs the memory map worked out per the schematics - done
+* figure out the correct memory maps for the 256kB of shared ram, and what part of ram constitutes the framebuffer - done
+  - 256k of shared ram maps at 00000-3ffff for both cpus with special mem regs at fffec,fffee. the ram mirrors 4 times on the emulatorcpu only, iocpu the 40000-fffff area is open bus.
+  - frambuffer, at least for bios 1.5, lives from 0x4000-0xd5ff, exactly 640x480 pixels 1bpp, interlaced (even? plane is at 4000-8aff, odd? plane is at 8b00-d5ff); however the starting address of the framebuffer is configurable to any address within the 0x0000-0x1ffff range? (this exact range is unclear)
+* figure out how the emulation-cpu boots and where its 8k of local ram maps to - done
+  - both cpus boot, reset and system int controls are accessed at fffea from either cpu; emulatorcpu's 8k of ram lives at the beginning of its address space, but can be disabled in favor of mainram at the same addressses
 */
 
 #include "cpu/i86/i86.h"
