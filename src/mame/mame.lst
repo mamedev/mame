@@ -63,8 +63,6 @@ flagrall                        // ?
 60in1                           // MAME based bootleg
 
 @source:3do.cpp
-3do                             // 3DO consoles
-3do_pal                         // 
 3dobios                         // 
 orbatak                         // 
 
@@ -8927,11 +8925,7 @@ cd2650                          //
 cdc721                          // 
 
 @source:cdi.cpp
-cdi490a                         // 
-cdi910                          // 
 cdibios                         // Base unit
-cdimono1                        // Philips CD-i model 200 (Mono-I board, PAL)
-cdimono2                        // Philips CD-i model 220 (Mono-II board, NTSC)
 quizard                         // (c) TAB Austria 199?
 quizard_10                      // (c) TAB Austria 1996
 quizard_12                      // (c) TAB Austria 1996
@@ -14415,8 +14409,6 @@ freezeat4                       // (proto)          (c) 1996
 freezeat5                       // (proto)          (c) 1996
 freezeat6                       // (proto)          (c) 1996
 freezeatjp                      // (proto)          (c) 1996
-jaguar                          // Atari Jaguar
-jaguarcd                        // Atari Jaguar CD
 maxf_102                        // ??           (c) 1996
 maxf_ng                         // ??           (c) 1996
 maxforce                        // ??           (c) 1996
@@ -16155,7 +16147,6 @@ winspike                        // 1997.?? GX705 (Europe)
 winspikej                       // 1997.07 GX705 (Japan)
 
 @source:konamim2.cpp
-3do_m2                          // 
 btltryst                        // GX636 (c)1998
 evilngt                         // GX810 (c)1998
 evilngte                        // GX810 (c)1998
@@ -35516,7 +35507,6 @@ vector4                         //
 
 @source:vectrex.cpp
 raaspec                         // (c) Roy Abel & Associates 1984
-vectrex                         // General Consumer Electric Vectrex - 1982-1984
 
 @source:vega.cpp
 vega                            // (c) 19?? Olympia?
