@@ -11,6 +11,7 @@
 
 #include "inputpair.h"
 #include "texture.h"
+#include "target.h"
 #include "effect.h"
 #include "uniform.h"
 #include "texturemanager.h"
@@ -24,9 +25,13 @@ bgfx_input_pair::bgfx_input_pair(int index, std::string sampler, std::string tex
 
 void bgfx_input_pair::bind(bgfx_effect *effect, texture_manager& textures)
 {
-	printf("Binding texture %s to uniform %s\n", m_texture.c_str(), m_sampler.c_str());
-	bgfx_uniform *uniform = effect->uniform(m_sampler);
-	bgfx::UniformHandle u_handle = uniform->handle();
-	bgfx::TextureHandle t_handle = textures.texture(m_texture)->handle();
-	bgfx::setTexture(m_index, u_handle, t_handle);
+	bgfx::setTexture(m_index, effect->uniform(m_sampler)->handle(), textures.texture(m_texture)->handle());
+	bgfx_uniform *size_uniform = effect->uniform("u_texsize");
+	if (size_uniform != nullptr)
+	{
+		float width = float(textures.texture(m_texture)->width());
+		float height = float(textures.texture(m_texture)->height());
+		float size[4] = { 1.0f / width, 1.0f / height, 0.0f, 0.0f };
+		size_uniform->set(reinterpret_cast<void *>(size), sizeof(float) * 4);
+	}
 }

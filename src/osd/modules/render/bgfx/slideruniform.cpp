@@ -29,6 +29,5 @@ void bgfx_slider_uniform::bind()
 	{
 		values[i] = m_sliders[i]->uniform_value();
 	}
-	printf("Setting slider uniform %s to %f, %f, %f, %f (%s)\n", m_uniform->name().c_str(), values[0], values[1], values[2], values[3], m_sliders[0]->name().c_str());
 	m_uniform->set(values, sizeof(float) * m_sliders.size());
 }

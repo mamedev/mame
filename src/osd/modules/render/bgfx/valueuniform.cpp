@@ -20,6 +20,5 @@ bgfx_value_uniform::bgfx_value_uniform(bgfx_uniform* uniform, float* values, con
 
 void bgfx_value_uniform::bind()
 {
-	printf("Setting value uniform %s to %f, %f, %f, %f (%s)\n", m_uniform->name().c_str(), m_values[0], m_values[1], m_values[2], m_values[3]);
 	m_uniform->set(m_values, sizeof(float) * m_count);
 }

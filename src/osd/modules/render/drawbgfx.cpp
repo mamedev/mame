@@ -61,7 +61,7 @@ const uint32_t renderer_bgfx::WHITE_HASH = 0x87654321;
 //============================================================
 
 #define GIBBERISH   	(0)
-#define USE_NEW_SHADERS (0)
+#define USE_NEW_SHADERS (1)
 
 //============================================================
 //  INLINES
@@ -139,7 +139,6 @@ int renderer_bgfx::create()
 	m_targets = new target_manager(*m_textures);
 	m_shaders = new shader_manager();
 	m_effects = new effect_manager(*m_shaders);
-	//m_chains = new chain_manager(*m_textures, *m_targets, *m_effects, m_width[window().m_index], m_height[window().m_index]);
 
 	if (window().m_index != 0)
 	{
@@ -162,8 +161,11 @@ int renderer_bgfx::create()
 	m_screen_effect[2] = m_effects->effect("screen_multiply");
 	m_screen_effect[3] = m_effects->effect("screen_add");
 
-	//m_screen_chain = m_chains->chain("test", window().machine());
+#if USE_NEW_SHADERS
+	m_chains = new chain_manager(*m_textures, *m_targets, *m_effects, m_width[window().m_index], m_height[window().m_index]);
+	m_screen_chain = m_chains->chain("test", window().machine());
     m_sliders_dirty = true;
+#endif
 
 	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
 	m_texture_cache = m_textures->create_texture("#cache", bgfx::TextureFormat::RGBA8, CACHE_SIZE, CACHE_SIZE, nullptr, flags);
@@ -181,7 +183,9 @@ int renderer_bgfx::create()
 renderer_bgfx::~renderer_bgfx()
 {
 	// Cleanup.
-	//delete m_chains;
+#if USE_NEW_SHADERS
+	delete m_chains;
+#endif
 	delete m_effects;
 	delete m_shaders;
 	delete m_textures;
@@ -307,13 +311,13 @@ void renderer_bgfx::render_screen_quad(int view, render_primitive* prim)
         texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
     }
 
-    const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(prim->flags & PRIMFLAG_TEXFORMAT_MASK,
-        prim->texture.width, prim->texture.height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
-
     uint16_t tex_width(prim->texture.width);
     uint16_t tex_height(prim->texture.height);
 
-    bgfx_texture *texture = new bgfx_texture("screen", bgfx::TextureFormat::RGBA8, uint16_t(prim->texture.width), uint16_t(prim->texture.height), mem);
+    const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(prim->flags & PRIMFLAG_TEXFORMAT_MASK,
+        tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
+
+    bgfx_texture *texture = new bgfx_texture("screen", bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem);
     m_textures->add_texture("screen", texture);
 
     m_targets->update_guest_targets(tex_width, tex_height);
@@ -377,10 +381,13 @@ void renderer_bgfx::render_textured_quad(int view, render_primitive* prim, bgfx:
 		texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
 	}
 
-	const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(prim->flags & PRIMFLAG_TEXFORMAT_MASK,
-		prim->texture.width, prim->texture.height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
+    uint16_t tex_width(prim->texture.width);
+    uint16_t tex_height(prim->texture.height);
 
-	bgfx::TextureHandle texture = bgfx::createTexture2D(uint16_t(prim->texture.width), uint16_t(prim->texture.height), 1, bgfx::TextureFormat::RGBA8, texture_flags, mem);
+    const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(prim->flags & PRIMFLAG_TEXFORMAT_MASK,
+		tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
+
+	bgfx::TextureHandle texture = bgfx::createTexture2D(tex_width, tex_height, 1, bgfx::TextureFormat::RGBA8, texture_flags, mem);
 
 	bgfx_effect** effects = PRIMFLAG_GET_SCREENTEX(prim->flags) ? m_screen_effect : m_gui_effect;
 
@@ -928,7 +935,7 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
                             render_textured_quad(view, *prim, buffer);
                         }
 #else
-						render_textured_quad(view, *prim, buffer);
+						render_textured_quad(*view, *prim, buffer);
 #endif
 						return BUFFER_EMPTY;
 					}

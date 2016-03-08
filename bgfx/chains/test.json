@@ -3,9 +3,9 @@
 	"sliders": [
 		{ "type": "int_enum", "name": "adjustments",  "text": "Enable Adjustments",        "default": 0,                 "max": 1,                 "min": 0,                    "step": 1, "scale": 1.0,   "format": "%s",    "screen": "any", "strings": [ "On", "Off" ] },
 		{ "type": "float",    "name": "ratio_amount", "text": "Ratio Amount",              "default": 0,                 "max": 100,               "min": 0,                    "step": 1, "scale": 0.01,  "format": "%1.2f", "screen": "any" },
-		{ "type": "color",    "name": "red_ratios",   "text": "Color Matrix, Red from ",   "default": [ 200,   0,   0 ], "max": [ 400, 400, 400 ], "min": [ -400, -400, -400 ], "step": 1, "scale": 0.005, "format": "%2.3f", "screen": "any" },
-		{ "type": "color",    "name": "grn_ratios",   "text": "Color Matrix, Green from ", "default": [   0, 200,   0 ], "max": [ 400, 400, 400 ], "min": [ -400, -400, -400 ], "step": 1, "scale": 0.005, "format": "%2.3f", "screen": "any" },
-		{ "type": "color",    "name": "blu_ratios",   "text": "Color Matrix, Blue from ",  "default": [   0,   0, 200 ], "max": [ 400, 400, 400 ], "min": [ -400, -400, -400 ], "step": 1, "scale": 0.005, "format": "%2.3f", "screen": "any" },
+		{ "type": "color",    "name": "red_ratios",   "text": "Color Matrix, Red from ",   "default": [ 200,   0,   0 ], "max": [ 400, 400, 400 ], "min": [    0,    0,    0 ], "step": 1, "scale": 0.005, "format": "%2.3f", "screen": "any" },
+		{ "type": "color",    "name": "grn_ratios",   "text": "Color Matrix, Green from ", "default": [   0, 200,   0 ], "max": [ 400, 400, 400 ], "min": [    0,    0,    0 ], "step": 1, "scale": 0.005, "format": "%2.3f", "screen": "any" },
+		{ "type": "color",    "name": "blu_ratios",   "text": "Color Matrix, Blue from ",  "default": [   0,   0, 200 ], "max": [ 400, 400, 400 ], "min": [    0,    0,    0 ], "step": 1, "scale": 0.005, "format": "%2.3f", "screen": "any" },
 		{ "type": "color",    "name": "tint",         "text": "Tint ",                     "default": [ 100, 100, 100 ], "max": [ 100, 100, 100 ], "min": [    0,    0,    0 ], "step": 1, "scale": 0.01,  "format": "%1.2f", "screen": "any" },
 		{ "type": "color",    "name": "phosphor",     "text": "Phosphor Life, ",           "default": [   0,   0,   0 ], "max": [ 100, 100, 100 ], "min": [    0,    0,    0 ], "step": 1, "scale": 0.01,  "format": "%1.2f", "screen": "any" },
 		{ "type": "vec2",     "name": "shift",        "text": "Frame Shift ",              "default": [   0,   0 ],      "max": [ 25, 25 ],        "min": [ -25, -25 ],         "step": 1, "scale": 1.0,   "format": "%2.f",  "screen": "raster" }
@@ -15,6 +15,10 @@
 	],
 	"targets": [
 		{	"name": "native",
+			"mode": "native",
+			"prescale": 1
+		},
+		{	"name": "native2",
 			"mode": "native",
 			"prescale": 1
 		},
@@ -53,7 +57,7 @@
 			"input": [
 				{ "sampler": "s_tex", "texture": "native" }
 			],
-			"output": "native"
+			"output": "native2"
 		},
 		{	"effect": "phosphor",
 			"name": "Phosphor Decay",
@@ -66,7 +70,7 @@
 				{ "uniform": "u_phosphor", "slider": "phosphor" }
 			],
 			"input": [
-				{ "sampler": "s_tex", "texture": "native" },
+				{ "sampler": "s_tex", "texture": "native2" },
 				{ "sampler": "s_prev", "texture": "previous" }
 			],
 			"output": "native"

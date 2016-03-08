@@ -17,8 +17,9 @@
     "vertex": "vs_tint",
     "fragment": "fs_tint",
     "uniforms": [
-    	{ "name": "s_tex",   "type": "int",  "values": [ 1.0 ] },
-    	{ "name": "u_tint",  "type": "vec4", "values": [ 1.0, 1.0, 1.0, 1.0 ] },
-    	{ "name": "u_shift", "type": "vec4", "values": [ 0.1, 0.1, 0.0, 0.0 ] }
+    	{ "name": "s_tex",     "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "u_tint",    "type": "vec4", "values": [ 1.0, 1.0, 1.0, 1.0 ] },
+    	{ "name": "u_shift",   "type": "vec4", "values": [ 0.1, 0.1, 0.0, 0.0 ] },
+    	{ "name": "u_texsize", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
     ]
 }

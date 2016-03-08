@@ -9,8 +9,9 @@ uniform vec4 u_tint;
 uniform vec4 u_shift;
 
 SAMPLER2D(s_tex, 0);
+uniform vec4 u_texsize;
 
 void main()
 {
-	gl_FragColor = texture2D(s_tex, v_texcoord0 + u_shift.xy) * (u_tint + vec4(0.0, 0.5, 0.0, 0.0)) * v_color0;
+	gl_FragColor = texture2D(s_tex, v_texcoord0.xy + u_shift.xy * u_texsize.xy) * u_tint * v_color0 + vec4(0.0, 0.0, 0.0, 1.0);
 }
