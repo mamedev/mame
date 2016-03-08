@@ -221,7 +221,7 @@ inline BENCHMARK_ALWAYS_INLINE void DoNotOptimize(Tp const& value) {
 // benchmark to use.
 class State {
 public:
-  State(size_t max_iters, bool has_x, int x, bool has_y, int y, int thread_i);
+  State(size_t max_iters, bool has_x, int x, bool has_y, int y, int thread_i, int n_threads);
 
   // Returns true iff the benchmark should continue through another iteration.
   // NOTE: A benchmark may not return from the test until KeepRunning() has
@@ -358,7 +358,10 @@ private:
   size_t items_processed_;
 
 public:
+  // Index of the executing thread. Values from [0, threads).
   const int thread_index;
+  // Number of threads concurrently executing the benchmark.
+  const int threads;
   const size_t max_iterations;
 
 private:
@@ -486,13 +489,13 @@ public:
     Fixture() : internal::Benchmark("") {}
 
     virtual void Run(State& st) {
-      this->SetUp();
+      this->SetUp(st);
       this->BenchmarkCase(st);
-      this->TearDown();
+      this->TearDown(st);
     }
 
-    virtual void SetUp() {}
-    virtual void TearDown() {}
+    virtual void SetUp(const State&) {}
+    virtual void TearDown(const State&) {}
 
 protected:
     virtual void BenchmarkCase(State&) = 0;

@@ -174,12 +174,16 @@ void InitializeSystemInfo() {
         if (freqstr[1] != '\0' && *err == '\0' && bogo_clock > 0)
           saw_bogo = true;
       }
-    } else if (strncasecmp(line, "processor", sizeof("processor") - 1) == 0) {
+    } else if (strncmp(line, "processor", sizeof("processor") - 1) == 0) {
+      // The above comparison is case-sensitive because ARM kernels often
+      // include a "Processor" line that tells you about the CPU, distinct
+      // from the usual "processor" lines that give you CPU ids. No current
+      // Linux architecture is using "Processor" for CPU ids.
       num_cpus++;  // count up every time we see an "processor :" entry
-      const char* freqstr = strchr(line, ':');
-      if (freqstr) {
-        const long cpu_id = strtol(freqstr + 1, &err, 10);
-        if (freqstr[1] != '\0' && *err == '\0' && max_cpu_id < cpu_id)
+      const char* id_str = strchr(line, ':');
+      if (id_str) {
+        const long cpu_id = strtol(id_str + 1, &err, 10);
+        if (id_str[1] != '\0' && *err == '\0' && max_cpu_id < cpu_id)
           max_cpu_id = cpu_id;
       }
     }
@@ -201,7 +205,7 @@ void InitializeSystemInfo() {
   } else {
     if ((max_cpu_id + 1) != num_cpus) {
       fprintf(stderr,
-              "CPU ID assignments in /proc/cpuinfo seems messed up."
+              "CPU ID assignments in /proc/cpuinfo seem messed up."
               " This is usually caused by a bad BIOS.\n");
     }
     cpuinfo_num_cpus = num_cpus;
