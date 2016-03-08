@@ -1735,11 +1735,11 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 
 // input device handler
 #define PORT_READ_LINE_DEVICE_MEMBER(_device, _class, _member) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate(&ioport_read_line_wrapper<_class, &_class::_member>, #_class "::" #_member, _device, (_class *)NULL));
+	configurer.field_set_dynamic_read(ioport_field_read_delegate([](_class &device, ioport_field &field, void *param)->ioport_value { return device._member() ? ~ioport_value(0) : 0; } , #_class "::" #_member, _device, (_class *)NULL));
 
 // output device handler
 #define PORT_WRITE_LINE_DEVICE_MEMBER(_device, _class, _member) \
-	configurer.field_set_dynamic_write(ioport_field_write_delegate(&ioport_write_line_wrapper<_class, &_class::_member>, #_class "::" #_member, _device, (_class *)NULL));
+	configurer.field_set_dynamic_write(ioport_field_write_delegate([](_class &device, ioport_field &field, void *param, ioport_value oldval, ioport_value newval) { device._member(newval); }, #_class "::" #_member, _device, (_class *)NULL));
 
 // dip switch definition
 #define PORT_DIPNAME(_mask, _default, _name) \
@@ -1818,38 +1818,6 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 
 #define PORT_HBLANK(_screen) \
 	PORT_READ_LINE_DEVICE_MEMBER(_screen, screen_device, hblank)
-
-
-
-//**************************************************************************
-//  INLINE TEMPLATES
-//**************************************************************************
-
-template<int (*_FunctionPointer)(device_t *)>
-ioport_value ioport_read_line_wrapper(device_t &device, ioport_field &field, void *param)
-{
-	return ((*_FunctionPointer)(&device) & 1) ? ~ioport_value(0) : 0;
-}
-
-template<class _FunctionClass, int (_FunctionClass::*_FunctionPointer)()>
-ioport_value ioport_read_line_wrapper(_FunctionClass &device, ioport_field &field, void *param)
-{
-	return ((device.*_FunctionPointer)() & 1) ? ~ioport_value(0) : 0;
-}
-
-template<void (*_FunctionPointer)(device_t *, int)>
-void ioport_write_line_wrapper(device_t &device, ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
-{
-	return (*_FunctionPointer)(&device, newval);
-}
-
-template<class _FunctionClass, void (_FunctionClass::*_FunctionPointer)(int)>
-void ioport_write_line_wrapper(_FunctionClass &device, ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
-{
-	return (device.*_FunctionPointer)(newval);
-}
-
-
 
 //**************************************************************************
 //  INLINE FUNCTIONS
