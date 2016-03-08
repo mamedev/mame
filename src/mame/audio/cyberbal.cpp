@@ -15,8 +15,7 @@
 void cyberbal_state::cyberbal_sound_reset()
 {
 	/* reset the sound system */
-	m_bank_base = &memregion("audiocpu")->base()[0x10000];
-	membank("soundbank")->set_base(&m_bank_base[0x0000]);
+	membank("soundbank")->set_entry(0);
 	m_fast_68k_int = m_io_68k_int = 0;
 	m_sound_data_from_68k = m_sound_data_from_6502 = 0;
 	m_sound_data_from_68k_ready = m_sound_data_from_6502_ready = 0;
@@ -51,7 +50,7 @@ READ8_MEMBER(cyberbal_state::sound_6502_stat_r)
 
 WRITE8_MEMBER(cyberbal_state::sound_bank_select_w)
 {
-	membank("soundbank")->set_base(&m_bank_base[0x1000 * ((data >> 6) & 3)]);
+	membank("soundbank")->set_entry((data >> 6) & 3);
 	machine().bookkeeping().coin_counter_w(1, (data >> 5) & 1);
 	machine().bookkeeping().coin_counter_w(0, (data >> 4) & 1);
 	m_daccpu->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
