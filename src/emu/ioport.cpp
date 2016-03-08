@@ -103,6 +103,9 @@
 #include <ctype.h>
 #include <time.h>
 
+
+namespace {
+
 // temporary: set this to 1 to enable the originally defined behavior that
 // a field specified via PORT_MODIFY which intersects a previously-defined
 // field completely wipes out the previous definition
@@ -140,7 +143,6 @@ struct char_info
 
 	static const char_info *find(unicode_char target);
 };
-
 
 
 //**************************************************************************
@@ -186,10 +188,10 @@ inline INT32 apply_scale(INT32 value, INT64 scale)
 //**************************************************************************
 
 // XML attributes for the different types
-static const char *const seqtypestrings[] = { "standard", "increment", "decrement" };
+const char *const seqtypestrings[] = { "standard", "increment", "decrement" };
 
 // master character info table
-static const char_info charinfo[] =
+const char_info charinfo[] =
 {
 	{ 0x0008,                   "Backspace",    nullptr },     // Backspace
 	{ 0x0009,                   "Tab",          "    " },   // Tab
@@ -489,7 +491,7 @@ static const char_info charinfo[] =
 //  COMMON SHARED STRINGS
 //**************************************************************************
 
-static const struct
+const struct
 {
 	UINT32 id;
 	const char *string;
@@ -615,6 +617,11 @@ static const struct
 	{ INPUT_STRING_Alternate, "Alternate" },
 	{ INPUT_STRING_None, "None" },
 };
+
+} // anonymous namespace
+
+
+std::uint8_t const inp_header::MAGIC[inp_header::OFFS_BASETIME - inp_header::OFFS_MAGIC] = { 'M', 'A', 'M', 'E', 'I', 'N', 'P', 0 };
 
 
 
@@ -3404,25 +3411,25 @@ time_t ioport_manager::playback_init()
 	assert_always(filerr == FILERR_NONE, "Failed to open file for playback");
 
 	// read the header and verify that it is a modern version; if not, print an error
-	UINT8 header[INP_HEADER_SIZE];
-	if (m_playback_file.read(header, sizeof(header)) != sizeof(header))
+	inp_header header;
+	if (!header.read(m_playback_file))
 		fatalerror("Input file is corrupt or invalid (missing header)\n");
-	if (memcmp(header, "MAMEINP\0", 8) != 0)
+	if (!header.check_magic())
 		fatalerror("Input file invalid or in an older, unsupported format\n");
-	if (header[0x10] != INP_HEADER_MAJVERSION)
+	if (header.get_majversion() != inp_header::MAJVERSION)
 		fatalerror("Input file format version mismatch\n");
 
 	// output info to console
 	osd_printf_info("Input file: %s\n", filename);
-	osd_printf_info("INP version %d.%d\n", header[0x10], header[0x11]);
-	time_t basetime = header[0x08] | (header[0x09] << 8) | (header[0x0a] << 16) | (header[0x0b] << 24) |
-						((UINT64)header[0x0c] << 32) | ((UINT64)header[0x0d] << 40) | ((UINT64)header[0x0e] << 48) | ((UINT64)header[0x0f] << 56);
+	osd_printf_info("INP version %u.%u\n", header.get_majversion(), header.get_minversion());
+	time_t basetime = header.get_basetime();
 	osd_printf_info("Created %s\n", ctime(&basetime));
-	osd_printf_info("Recorded using %s\n", header + 0x20);
+	osd_printf_info("Recorded using %s\n", header.get_appdesc().c_str());
 
 	// verify the header against the current game
-	if (memcmp(machine().system().name, header + 0x14, strlen(machine().system().name) + 1) != 0)
-		osd_printf_info("Input file is for machine '%s', not for current machine '%s'\n", header + 0x14, machine().system().name);
+	std::string const sysname = header.get_sysname();
+	if (sysname != machine().system().name)
+		osd_printf_info("Input file is for machine '%s', not for current machine '%s'\n", sysname.c_str(), machine().system().name);
 
 	// enable compression
 	m_playback_file.compress(FCOMPRESS_MEDIUM);
@@ -3583,23 +3590,15 @@ void ioport_manager::record_init()
 	machine().base_datetime(systime);
 
 	// fill in the header
-	UINT8 header[INP_HEADER_SIZE] = { 0 };
-	memcpy(header, "MAMEINP\0", 8);
-	header[0x08] = systime.time >> 0;
-	header[0x09] = systime.time >> 8;
-	header[0x0a] = systime.time >> 16;
-	header[0x0b] = systime.time >> 24;
-	header[0x0c] = systime.time >> 32;
-	header[0x0d] = systime.time >> 40;
-	header[0x0e] = systime.time >> 48;
-	header[0x0f] = systime.time >> 56;
-	header[0x10] = INP_HEADER_MAJVERSION;
-	header[0x11] = INP_HEADER_MINVERSION;
-	strcpy((char *)header + 0x14, machine().system().name);
-	sprintf((char *)header + 0x20, "%s %s", emulator_info::get_appname(), build_version);
+	inp_header header;
+	header.set_magic();
+	header.set_basetime(systime.time);
+	header.set_version();
+	header.set_sysname(machine().system().name);
+	header.set_appdesc(util::string_format("%s %s", emulator_info::get_appname(), build_version));
 
 	// write it
-	m_record_file.write(header, sizeof(header));
+	header.write(m_record_file);
 
 	// enable compression
 	m_record_file.compress(FCOMPRESS_MEDIUM);
