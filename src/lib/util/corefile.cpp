@@ -126,6 +126,7 @@ private:
 		m_stream.zalloc = Z_NULL;
 		m_stream.zfree = Z_NULL;
 		m_stream.opaque = Z_NULL;
+		m_stream.avail_in = m_stream.avail_out = 0;
 	}
 
 	bool            m_compress, m_decompress;
@@ -341,7 +342,7 @@ private:
     works for most platforms
 -------------------------------------------------*/
 
-static inline int is_directory_separator(char c)
+inline int is_directory_separator(char c)
 {
 	return (c == '\\' || c == '/' || c == ':');
 }
@@ -755,11 +756,11 @@ file_error core_osd_file::compress(int level)
 		int zerr = Z_OK;
 
 		// flush any remaining data if we are writing
-		while (write_access() != 0 && (zerr != Z_STREAM_END))
+		while (write_access() && (zerr != Z_STREAM_END))
 		{
 			// deflate some more
 			zerr = m_zdata->finalise();
-			if (zerr != Z_STREAM_END && zerr != Z_OK)
+			if ((zerr != Z_STREAM_END) && (zerr != Z_OK))
 			{
 				result = FILERR_INVALID_DATA;
 				break;
@@ -972,41 +973,41 @@ file_error core_osd_file::osd_or_zlib_read(void *buffer, std::uint64_t offset, s
 		return osd_read(m_file, buffer, offset, length, &actual);
 
 	// if the offset doesn't match the next offset, fail
-	if (m_zdata->is_nextoffset(offset))
+	if (!m_zdata->is_nextoffset(offset))
 		return FILERR_INVALID_ACCESS;
 
 	// set up the destination
+	file_error filerr = FILERR_NONE;
 	m_zdata->set_output(buffer, length);
 	while (!m_zdata->output_full())
 	{
-		int zerr = Z_OK;
-
 		// if we didn't make progress, report an error or the end
 		if (m_zdata->has_input())
-			zerr = m_zdata->decompress();
-		if (zerr != Z_OK)
 		{
-			actual = length - m_zdata->output_space();
-			m_zdata->add_nextoffset(actual);
-			return (zerr == Z_STREAM_END) ? FILERR_NONE : FILERR_INVALID_DATA;
+			auto const zerr = m_zdata->decompress();
+			if (Z_OK != zerr)
+			{
+				if (Z_STREAM_END != zerr) filerr = FILERR_INVALID_DATA;
+				break;
+			}
 		}
 
 		// fetch more data if needed
 		if (!m_zdata->has_input())
 		{
-			std::uint32_t actualdata;
-			auto const filerr = osd_read(m_file, m_zdata->buffer_data(), m_zdata->realoffset(), m_zdata->buffer_size(), &actualdata);
-			if (filerr != FILERR_NONE)
-				return filerr;
-			m_zdata->add_realoffset(actual);
+			std::uint32_t actualdata = 0;
+			filerr = osd_read(m_file, m_zdata->buffer_data(), m_zdata->realoffset(), m_zdata->buffer_size(), &actualdata);
+			if (filerr != FILERR_NONE) break;
+			m_zdata->add_realoffset(actualdata);
 			m_zdata->reset_input(actualdata);
+			if (!m_zdata->has_input()) break;
 		}
 	}
 
-	// we read everything
-	actual = length;
+	// adjust everything
+	actual = length - m_zdata->output_space();
 	m_zdata->add_nextoffset(actual);
-	return FILERR_NONE;
+	return filerr;
 }
 
 
@@ -1054,7 +1055,7 @@ file_error core_osd_file::osd_or_zlib_write(void const *buffer, std::uint64_t of
 		// write more data if we are full up
 		if (m_zdata->output_full())
 		{
-			std::uint32_t actualdata;
+			std::uint32_t actualdata = 0;
 			auto const filerr = osd_write(m_file, m_zdata->buffer_data(), m_zdata->realoffset(), m_zdata->output_size(), &actualdata);
 			if (filerr != FILERR_NONE)
 				return filerr;

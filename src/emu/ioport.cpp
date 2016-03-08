@@ -3447,7 +3447,8 @@ void ioport_manager::playback_end(const char *message)
 			machine().popmessage("Playback Ended\nReason: %s", message);
 
 		// display speed stats
-		m_playback_accumulated_speed /= m_playback_accumulated_frames;
+		if (m_playback_accumulated_speed > 0)
+			m_playback_accumulated_speed /= m_playback_accumulated_frames;
 		osd_printf_info("Total playback frames: %d\n", UINT32(m_playback_accumulated_frames));
 		osd_printf_info("Average recorded speed: %d%%\n", UINT32((m_playback_accumulated_speed * 200 + 1) >> 21));
 
