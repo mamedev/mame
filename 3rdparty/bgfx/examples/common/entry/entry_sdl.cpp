@@ -29,6 +29,7 @@ BX_PRAGMA_DIAGNOSTIC_POP_CLANG()
 #include <bx/thread.h>
 #include <bx/handlealloc.h>
 #include <bx/readerwriter.h>
+#include <bx/crtimpl.h>
 #include <tinystl/allocator.h>
 #include <tinystl/string.h>
 
@@ -219,7 +220,7 @@ namespace entry
 #	elif BX_PLATFORM_WINDOWS
 		return wmi.info.win.window;
 #	elif BX_PLATFORM_STEAMLINK
-		return wmi.info.vivante.window;		
+		return wmi.info.vivante.window;
 #	endif // BX_PLATFORM_
 	}
 
@@ -307,6 +308,7 @@ namespace entry
 			initTranslateKey(SDL_SCANCODE_PRINTSCREEN,  Key::Print);
 			initTranslateKey(SDL_SCANCODE_KP_PLUS,      Key::Plus);
 			initTranslateKey(SDL_SCANCODE_KP_MINUS,     Key::Minus);
+			initTranslateKey(SDL_SCANCODE_GRAVE,        Key::Tilde);
 			initTranslateKey(SDL_SCANCODE_F1,           Key::F1);
 			initTranslateKey(SDL_SCANCODE_F2,           Key::F2);
 			initTranslateKey(SDL_SCANCODE_F3,           Key::F3);

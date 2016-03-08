@@ -28,6 +28,7 @@
 #include <bx/uint32_t.h>
 #include <bx/fpumath.h>
 #include <bx/handlealloc.h>
+#include <bx/crtimpl.h>
 
 #include "imgui.h"
 #include "ocornut_imgui.h"
@@ -454,11 +455,13 @@ struct Imgui
 	{
 		m_allocator = _allocator;
 
-		if (NULL == m_allocator)
+#if BX_CONFIG_ALLOCATOR_CRT
+		if (NULL == _allocator)
 		{
 			static bx::CrtAllocator allocator;
 			m_allocator = &allocator;
 		}
+#endif // BX_CONFIG_ALLOCATOR_CRT
 
 		if (NULL == _data)
 		{
