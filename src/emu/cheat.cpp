@@ -1031,6 +1031,9 @@ std::unique_ptr<cheat_script> &cheat_entry::script_for_state(script_state state)
 //  CHEAT MANAGER
 //**************************************************************************
 
+const int cheat_manager::CHEAT_VERSION;
+
+
 //-------------------------------------------------
 //  cheat_manager - constructor
 //-------------------------------------------------

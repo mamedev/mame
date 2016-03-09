@@ -329,7 +329,7 @@ private:
 	symbol_table        m_symtable;                         // global symbol table
 
 	// constants
-	static const int CHEAT_VERSION = 1;
+	static constexpr int CHEAT_VERSION = 1;
 };
 
 

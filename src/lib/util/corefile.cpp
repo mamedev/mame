@@ -8,14 +8,15 @@
 
 ***************************************************************************/
 
-#include <assert.h>
-
 #include "corefile.h"
+
 #include "unicode.h"
+#include "vecstream.h"
+
 #include <zlib.h>
 
 #include <algorithm>
-#include <cstdarg>
+#include <cassert>
 #include <cstring>
 #include <ctype.h>
 
@@ -157,7 +158,7 @@ public:
 
 	virtual std::uint32_t write(const void *buffer, std::uint32_t length) override { return m_file.write(buffer, length); }
 	virtual int puts(const char *s) override { return m_file.puts(s); }
-	virtual int vprintf(const char *fmt, va_list va) override { return m_file.vprintf(fmt, va); }
+	virtual int vprintf(util::format_argument_pack<std::ostream> const &args) override { return m_file.vprintf(args); }
 	virtual file_error truncate(std::uint64_t offset) override { return m_file.truncate(offset); }
 
 	virtual file_error flush() override { return m_file.flush(); }
@@ -184,7 +185,7 @@ public:
 	virtual int ungetc(int c) override;
 	virtual char *gets(char *s, int n) override;
 	virtual int puts(char const *s) override;
-	virtual int vprintf(char const *fmt, va_list va) override;
+	virtual int vprintf(util::format_argument_pack<std::ostream> const &args) override;
 
 protected:
 	core_text_file(std::uint32_t openflags)
@@ -192,6 +193,7 @@ protected:
 		, m_text_type(text_file_type::OSD)
 		, m_back_char_head(0)
 		, m_back_char_tail(0)
+		, m_printf_buffer()
 	{
 	}
 
@@ -208,6 +210,7 @@ private:
 	char                m_back_chars[UTF8_CHAR_MAX];    // buffer to hold characters for ungetc
 	int                 m_back_char_head;               // head of ungetc buffer
 	int                 m_back_char_tail;               // tail of ungetc buffer
+	ovectorstream       m_printf_buffer;                // persistent buffer for formatted output
 };
 
 
@@ -608,11 +611,12 @@ int core_text_file::puts(char const *s)
     vprintf - vfprintf to a text file
 -------------------------------------------------*/
 
-int core_text_file::vprintf(char const *fmt, va_list va)
+int core_text_file::vprintf(util::format_argument_pack<std::ostream> const &args)
 {
-	char buf[1024];
-	vsnprintf(buf, sizeof(buf), fmt, va);
-	return puts(buf);
+	m_printf_buffer.seekp(0, ovectorstream::beg);
+	util::stream_format<std::ostream, std::ostream>(m_printf_buffer, args);
+	m_printf_buffer.put('\0');
+	return puts(&m_printf_buffer.vec()[0]);
 }
 
 
@@ -1245,20 +1249,6 @@ file_error core_file::load(char const *filename, dynamic_buffer &data)
 
 	// close the file and return data
 	return FILERR_NONE;
-}
-
-
-/*-------------------------------------------------
-    printf - printf to a text file
--------------------------------------------------*/
-
-int CLIB_DECL core_file::printf(char const *fmt, ...)
-{
-	va_list va;
-	va_start(va, fmt);
-	auto const rc = vprintf(fmt, va);
-	va_end(va);
-	return rc;
 }
 
 
