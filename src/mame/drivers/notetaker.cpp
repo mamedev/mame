@@ -380,7 +380,6 @@ WRITE16_MEMBER( notetaker_state::EIAChipReset_w )
 
 
 /* These next two members are memory map related for the iocpu */
-/* TODO: not only are these extremely slow, they don't work properly as they do not respect byte writes vs word writes to addresses */
 READ16_MEMBER(notetaker_state::iocpu_r)
 {
 	UINT16 *rom = (UINT16 *)(memregion("iocpu")->base());
