@@ -69,7 +69,7 @@ DONE:
 * i/o cpu i/o area needs the memory map worked out per the schematics - done
 * figure out the correct memory maps for the 256kB of shared ram, and what part of ram constitutes the framebuffer - done
   - 256k of shared ram maps at 00000-3ffff for both cpus with special mem regs at fffec,fffee. the ram mirrors 4 times on the emulatorcpu only, iocpu the 40000-fffff area is open bus.
-  - frambuffer, at least for bios 1.5, lives from 0x4000-0xd5ff, exactly 640x480 pixels 1bpp, interlaced (even? plane is at 4000-8aff, odd? plane is at 8b00-d5ff); however the starting address of the framebuffer is configurable to any address within the 0x0000-0x1ffff range? (this exact range is unclear)
+  - framebuffer, at least for bios 1.5, lives from 0x4000-0xd5ff, exactly 640x480 pixels 1bpp, interlaced (even? plane is at 4000-8aff, odd? plane is at 8b00-d5ff); however the starting address of the framebuffer is configurable to any address within the 0x0000-0x1ffff range? (this exact range is unclear)
 * figure out how the emulation-cpu boots and where its 8k of local ram maps to - done
   - both cpus boot, reset and system int controls are accessed at fffea from either cpu; emulatorcpu's 8k of ram lives at the beginning of its address space, but can be disabled in favor of mainram at the same addressses
 */
@@ -113,6 +113,7 @@ public:
 	DECLARE_WRITE16_MEMBER(IPConReg_w);
 	DECLARE_WRITE16_MEMBER(FIFOReg_w);
 	DECLARE_WRITE16_MEMBER(FIFOBus_w);
+	DECLARE_WRITE16_MEMBER(LoadDispAddr_w);
 
 	// uarts
 	DECLARE_READ16_MEMBER(ReadKeyData_r);
@@ -158,6 +159,8 @@ public:
 	// fifo timer
 	emu_timer *m_FIFO_timer;
 	TIMER_CALLBACK_MEMBER(timer_fifoclk);
+	// framebuffer display starting address
+	UINT16 m_DispAddr;
 
 // separate cpu resets
 	void ip_reset();
@@ -205,6 +208,32 @@ TIMER_CALLBACK_MEMBER(notetaker_state::timer_fifoclk)
 UINT32 notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// have to figure out what resolution we're drawing to here and draw appropriately to screen
+	// code borrowed/stolen from video/mac.cpp
+	UINT32 video_base;
+	UINT16 word;
+	UINT16 *line;
+	int y, x, b;
+
+	video_base = (m_DispAddr << 3)&0x1FFFF;
+#ifdef DEBUG_VIDEO
+	logerror("Video Base = 0x%05x\n", video_base);
+#endif
+	const UINT16 *video_ram_field1 = (UINT16 *)(memregion("mainram")->base()+video_base);
+	const UINT16 *video_ram_field2 = (UINT16 *)(memregion("mainram")->base()+video_base+0x4B00);
+
+	for (y = 0; y < 480; y++)
+	{
+		line = &bitmap.pix16(y);
+
+		for (x = 0; x < 640; x += 16)
+		{
+			if ((y&1)==0) word = *(video_ram_field1++); else word = *(video_ram_field2++);
+			for (b = 0; b < 16; b++)
+			{
+				line[x + b] = (word >> (15 - b)) & 0x0001;
+			}
+		}
+	}
 	return 0;
 }
 
@@ -300,6 +329,12 @@ WRITE16_MEMBER(notetaker_state::FIFOBus_w)
 	m_outfifo_head_ptr&=0xF;
 }
 
+WRITE16_MEMBER( notetaker_state::LoadDispAddr_w )
+{
+	m_DispAddr = data;
+	// for future low level emulation: clear the current counter position here as well, as well as empty/reset the display fifo, and the setmemrq state.
+}
+
 /* EIA hd6402 */
 READ16_MEMBER( notetaker_state::ReadEIAData_r )
 {
@@ -345,6 +380,7 @@ WRITE16_MEMBER( notetaker_state::EIAChipReset_w )
 
 
 /* These next two members are memory map related for the iocpu */
+/* TODO: not only are these extremely slow, they don't work properly as they do not respect byte writes vs word writes to addresses */
 READ16_MEMBER(notetaker_state::iocpu_r)
 {
 	UINT16 *rom = (UINT16 *)(memregion("iocpu")->base());
@@ -366,6 +402,7 @@ READ16_MEMBER(notetaker_state::iocpu_r)
 
 WRITE16_MEMBER(notetaker_state::iocpu_w)
 {
+	//UINT16 tempword;
 	UINT16 *ram = (UINT16 *)(memregion("mainram")->base());
 	if ( (m_BootSeqDone == 0) || ((m_DisableROM == 0) && ((offset&0x7F800) == 0)) )
 	{
@@ -374,8 +411,7 @@ WRITE16_MEMBER(notetaker_state::iocpu_w)
 	}
 	// are we in the FFFE8-FFFEF area where the parity/int/reset/etc stuff lives?
 	if (offset >= 0x7fff4) { logerror("attempt to write processor control regs at %d with %02X ignored\n", offset<<1, data); }
-	ram += offset;
-	*ram = data;
+	COMBINE_DATA(&ram[offset]);
 }
 
 /* Address map comes from http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker/schematics/19790423_Notetaker_IO_Processor.pdf
@@ -418,10 +454,14 @@ x   x   *   *    *   *   *   *    *   *   *   *    *   *   *   *    *   *   *   
 
 static ADDRESS_MAP_START(notetaker_iocpu_mem, AS_PROGRAM, 16, notetaker_state)
 	/*
-	AM_RANGE(0x00000, 0x00fff) AM_ROM AM_REGION("iocpu", 0xFF000) // rom is here if either BootSeqDone OR DisableROM are zero. the 1.5 source code and the schematics implies writes here are ignored while rom is enabled; if disablerom is 1 this goes to mainram
-	AM_RANGE(0x01000, 0x3ffff) AM_RAM AM_BASE("mainram") // 256k of ram (less 4k), shared between both processors. rom goes here if bootseqdone is 0
-	// note 4000-8fff? is the framebuffer for the screen?
-	AM_RANGE(0xff000, 0xfffff) AM_ROM // rom is only banked in here if bootseqdone is 0, so the reset vector is in the proper place. otherwise the memory control regs live at fffe8-fffef
+	AM_RANGE(0x00000, 0x00fff) AM_ROM AM_REGION("iocpu", 0xff000) // rom is here if either BootSeqDone OR DisableROM are zero. the 1.5 source code and the schematics implies writes here are ignored while rom is enabled; if disablerom is 1 this goes to mainram
+	AM_RANGE(0x01000, 0x3ffff) AM_RAM AM_REGION("mainram", 0) // 256k of ram (less 4k), shared between both processors. rom goes here if bootseqdone is 0
+	// note 4000-d5ff is the framebuffer for the screen, in two sets of fields for odd/even interlace?
+	AM_RANGE(0xff000, 0xfffe7) AM_ROM AM_REGION("iocpu", 0xff000) // rom is only banked in here if bootseqdone is 0, so the reset vector is in the proper place. otherwise the memory control regs live at fffe8-fffef
+	//AM_RANGE(0xfffea, 0xfffeb) AM_WRITE(cpuCtl_w);
+	//AM_RANGE(0xfffec, 0xfffed) AM_READ(parityErrHi_r);
+	//AM_RANGE(0xfffee, 0xfffef) AM_READ(parityErrLo_r);
+	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("iocpu", 0xffff0)
 	*/
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(iocpu_r, iocpu_w) // bypass MAME's memory map system as we need finer grained control
 ADDRESS_MAP_END
@@ -474,9 +514,9 @@ static ADDRESS_MAP_START(notetaker_iocpu_io, AS_IO, 16, notetaker_state)
 	//AM_RANGE(0xa0, 0xa1) AM_MIRROR(0x7E18) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255
 	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0x7E1E) AM_WRITE(FIFOBus_w) // DAC data write to FIFO
 	//AM_RANGE(0x100, 0x101) AM_MIRROR(0x7E1E) AM_WRITE(DiskReg_w) I/O register (adc speed, crtc pixel clock enable, +5 and +12v relays for floppy, etc)
-	//AM_RANGE(0x120, 0x121) AM_MIRROR(0x7E18) AM_DEVREADWRITE("wd1791", fd1971_device) // floppy controller
+	//AM_RANGE(0x120, 0x127) AM_MIRROR(0x7E18) AM_DEVREADWRITE("wd1791", fd1971_device) // floppy controller
 	AM_RANGE(0x140, 0x15f) AM_MIRROR(0x7E00) AM_DEVREADWRITE8("crt5027", crt5027_device, read, write, 0x00FF) // crt controller
-	//AM_RANGE(0x160, 0x161) AM_MIRROR(0x7E1E) AM_WRITE(LoadDispAddr_w) // loads the start address for the display framebuffer
+	AM_RANGE(0x160, 0x161) AM_MIRROR(0x7E1E) AM_WRITE(LoadDispAddr_w) // loads the start address for the display framebuffer
 	AM_RANGE(0x1a0, 0x1a1) AM_MIRROR(0x7E10) AM_READ(ReadEIAStatus_r) // read keyboard fifo state
 	AM_RANGE(0x1a2, 0x1a3) AM_MIRROR(0x7E10) AM_READ(ReadEIAData_r) // read keyboard data
 	AM_RANGE(0x1a8, 0x1a9) AM_MIRROR(0x7E10) AM_WRITE(LoadEIACtlReg_w) // kbd uart control register
@@ -595,6 +635,9 @@ void notetaker_state::ip_reset()
 	m_outfifo_count = m_outfifo_tail_ptr = m_outfifo_head_ptr = 0;
 	// Reset the DAC Timer
 	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter), divided by 4 (mc14568B with divider 1 pins set to 4), divided by 1,3,5,7,9,11,13,15 (or 0,2,4,6,8,10,12,14?)
+	// stuff on display/eia board also reset by IPReset:
+	// reset the Framebuffer Display Address:
+	m_DispAddr = 0;
 	// reset the EIA UART
 	m_eiauart->set_input_pin(AY31015_XR, 0); // MR - pin 21
 	m_eiauart->set_input_pin(AY31015_XR, 1); // ''
@@ -634,8 +677,8 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 	MCFG_SCREEN_REFRESH_RATE(60.975)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
 	MCFG_SCREEN_UPDATE_DRIVER(notetaker_state, screen_update)
-	MCFG_SCREEN_SIZE(64*6, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
@@ -644,7 +687,8 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 	// on reset, bitclk is 000 so divider is (36mhz/8)/8; during boot it is written with 101, changing the divider to (36mhz/4)/8
 	// TODO: for now, we just hack it to the latter setting from start; this should be handled correctly in ip_reset();
 	MCFG_TMS9927_CHAR_WIDTH(8) //(8 pixels per column/halfword, 16 pixels per fullword)
-	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE("iopic8259", pic8259_device, ir7_w)) // note this triggers interrupts on both the iocpu (int7) and emulatorcpu (int4)
+	// TODO: below is HACKED to trigger the odd/even int ir4 instead of vblank int ir7 since ir4 is required for anything to be drawn to screen! hence with the hack this interrupt triggers twice as often as it should
+	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE("iopic8259", pic8259_device, ir4_w)) // note this triggers interrupts on both the iocpu (ir7) and emulatorcpu (ir4)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD( "kbduart", AY31015, 0 ) // HD6402, == AY-3-1015D
