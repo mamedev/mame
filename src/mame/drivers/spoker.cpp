@@ -605,77 +605,6 @@ MACHINE_CONFIG_END
                                 ROMs load
 ***************************************************************************/
 
-ROM_START( spk116it )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "v.bin",   0x0000, 0x10000, CRC(e44e943a)  SHA1(78e32d07e2be9a452be10735641cbcf269068c55) )
-
-	ROM_REGION( 0xc0000, "gfx1", 0 )
-	ROM_LOAD( "6.bin",  0x80000, 0x40000, CRC(55b54b11) SHA1(decf27d40ec842374af02c93d761375690be83a3) )
-	ROM_LOAD( "5.bin",  0x40000, 0x40000, CRC(163f5b64) SHA1(5d3a5c2a64691ee9e2bb3a7c283aa9efa53fb35e) )
-	ROM_LOAD( "4.bin",  0x00000, 0x40000, CRC(ec2c6ac3) SHA1(e0a38da26202d2b9a481060fe5b88a38e284201e) )
-
-	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_LOAD( "3.bin",  0x20000, 0x10000, CRC(5f18b012) SHA1(c9a96237eaf3138f136bbaffb29dde0ef568ce73) )
-	ROM_LOAD( "2.bin",  0x10000, 0x10000, CRC(50fc3505) SHA1(ca1e4ee7e0bb59c3bd67727f65054a48000ae7fe) )
-	ROM_LOAD( "1.bin",  0x00000, 0x10000, CRC(28ce630a) SHA1(9b597073d33841e7db2c68bbe9f30b734d7f7b41) )
-
-	ROM_REGION( 0x40000, "oki", 0 ) /* expansion rom - contains backgrounds and pictures charmaps */
-	ROM_LOAD( "7.bin",   0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
-ROM_END
-
-ROM_START( spk116ita )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "v_v116it_mx.bin",  0x0000, 0x10000, CRC(f84eefe3) SHA1(9b3acde4f8f5f635155ed132c10d11bf609da2dd) )
-
-	ROM_REGION( 0xc0000, "gfx1", 0 )
-	ROM_LOAD( "6.bin",  0x80000, 0x40000, CRC(55b54b11) SHA1(decf27d40ec842374af02c93d761375690be83a3) )
-	ROM_LOAD( "5.bin",  0x40000, 0x40000, CRC(163f5b64) SHA1(5d3a5c2a64691ee9e2bb3a7c283aa9efa53fb35e) )
-	ROM_LOAD( "4.bin",  0x00000, 0x40000, CRC(ec2c6ac3) SHA1(e0a38da26202d2b9a481060fe5b88a38e284201e) )
-
-	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_LOAD( "3.bin",  0x20000, 0x10000, CRC(5f18b012) SHA1(c9a96237eaf3138f136bbaffb29dde0ef568ce73) )
-	ROM_LOAD( "2.bin",  0x10000, 0x10000, CRC(50fc3505) SHA1(ca1e4ee7e0bb59c3bd67727f65054a48000ae7fe) )
-	ROM_LOAD( "1.bin",  0x00000, 0x10000, CRC(28ce630a) SHA1(9b597073d33841e7db2c68bbe9f30b734d7f7b41) )
-
-	ROM_REGION( 0x40000, "oki", 0 ) /* expansion rom - contains backgrounds and pictures charmaps */
-	ROM_LOAD( "7.bin",   0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
-ROM_END
-
-ROM_START( spk115it )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "v.bin",   0x0000, 0x10000, CRC(df52997b) SHA1(72a76e84aeedfdebd4c6cb47809117a28b5d3892) ) // sldh
-
-	ROM_REGION( 0xc0000, "gfx1", 0 )
-	ROM_LOAD( "6.bin",  0x80000, 0x40000, CRC(f9b027f8) SHA1(c4686a4024062482f9864e0445087e32899fc775) ) // sldh
-	ROM_LOAD( "5.bin",  0x40000, 0x40000, CRC(baca51b6) SHA1(c97322c814729332378b6304a79062fea385ca97) ) // sldh
-	ROM_LOAD( "4.bin",  0x00000, 0x40000, CRC(1172c790) SHA1(43f1d019ecae5c605722e3fe77ae2f022b01260b) ) // sldh
-
-	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_LOAD( "3.bin",  0x20000, 0x10000, CRC(5f18b012) SHA1(c9a96237eaf3138f136bbaffb29dde0ef568ce73) )
-	ROM_LOAD( "2.bin",  0x10000, 0x10000, CRC(50fc3505) SHA1(ca1e4ee7e0bb59c3bd67727f65054a48000ae7fe) )
-	ROM_LOAD( "1.bin",  0x00000, 0x10000, CRC(28ce630a) SHA1(9b597073d33841e7db2c68bbe9f30b734d7f7b41) )
-
-	ROM_REGION( 0x40000, "oki", 0 ) /* expansion rom - contains backgrounds and pictures charmaps */
-	ROM_LOAD( "7.bin",   0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
-ROM_END
-
-ROM_START( spk114it )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "v_v114it.bin",  0x0000, 0x10000, CRC(471f5d97) SHA1(94781fb7bd8e9633fafca72de41113c3f21fbf4e) )
-
-	ROM_REGION( 0xc0000, "gfx1", 0 )
-	ROM_LOAD( "6_v114it.bin",  0x80000, 0x40000, CRC(466cec74) SHA1(6e4fe56a55f1e230eb01266c67cc82a87f6aaec6) )
-	ROM_LOAD( "5_v114it.bin",  0x40000, 0x40000, CRC(ae32a620) SHA1(d5238628269050e21da31d628b1d80b0f9b2d251) )
-	ROM_LOAD( "4_v114it.bin",  0x00000, 0x40000, CRC(c2105b1c) SHA1(cd2a930e9c15d1fdcc02ce87c109b5b4107430fa) )
-
-	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_FILL(                  0x0000, 0x30000, 0xff ) /* filling the whole bank */
-
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
-	ROM_LOAD( "7_v114it.bin",  0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
-ROM_END
-
-
 /* Super Poker (IGS)
    US & UA versions.
    
@@ -772,6 +701,80 @@ ROM_START( spk102ua )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* 4-bit adpcm samples */
 	ROM_LOAD( "mx28f2000p_v102_uasp.u34",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
+ROM_END
+
+/*
+   Super Poker
+   Italian sets...
+*/
+ROM_START( spk116it )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "v.bin",   0x0000, 0x10000, CRC(e44e943a)  SHA1(78e32d07e2be9a452be10735641cbcf269068c55) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "6.bin",  0x80000, 0x40000, CRC(55b54b11) SHA1(decf27d40ec842374af02c93d761375690be83a3) )
+	ROM_LOAD( "5.bin",  0x40000, 0x40000, CRC(163f5b64) SHA1(5d3a5c2a64691ee9e2bb3a7c283aa9efa53fb35e) )
+	ROM_LOAD( "4.bin",  0x00000, 0x40000, CRC(ec2c6ac3) SHA1(e0a38da26202d2b9a481060fe5b88a38e284201e) )
+
+	ROM_REGION( 0x30000, "gfx2", 0 )
+	ROM_LOAD( "3.bin",  0x20000, 0x10000, CRC(5f18b012) SHA1(c9a96237eaf3138f136bbaffb29dde0ef568ce73) )
+	ROM_LOAD( "2.bin",  0x10000, 0x10000, CRC(50fc3505) SHA1(ca1e4ee7e0bb59c3bd67727f65054a48000ae7fe) )
+	ROM_LOAD( "1.bin",  0x00000, 0x10000, CRC(28ce630a) SHA1(9b597073d33841e7db2c68bbe9f30b734d7f7b41) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* expansion rom - contains backgrounds and pictures charmaps */
+	ROM_LOAD( "7.bin",   0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
+ROM_END
+
+ROM_START( spk116itmx )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "v_v116it_mx.bin",  0x0000, 0x10000, CRC(f84eefe3) SHA1(9b3acde4f8f5f635155ed132c10d11bf609da2dd) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "6.bin",  0x80000, 0x40000, CRC(55b54b11) SHA1(decf27d40ec842374af02c93d761375690be83a3) )
+	ROM_LOAD( "5.bin",  0x40000, 0x40000, CRC(163f5b64) SHA1(5d3a5c2a64691ee9e2bb3a7c283aa9efa53fb35e) )
+	ROM_LOAD( "4.bin",  0x00000, 0x40000, CRC(ec2c6ac3) SHA1(e0a38da26202d2b9a481060fe5b88a38e284201e) )
+
+	ROM_REGION( 0x30000, "gfx2", 0 )
+	ROM_LOAD( "3.bin",  0x20000, 0x10000, CRC(5f18b012) SHA1(c9a96237eaf3138f136bbaffb29dde0ef568ce73) )
+	ROM_LOAD( "2.bin",  0x10000, 0x10000, CRC(50fc3505) SHA1(ca1e4ee7e0bb59c3bd67727f65054a48000ae7fe) )
+	ROM_LOAD( "1.bin",  0x00000, 0x10000, CRC(28ce630a) SHA1(9b597073d33841e7db2c68bbe9f30b734d7f7b41) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* expansion rom - contains backgrounds and pictures charmaps */
+	ROM_LOAD( "7.bin",   0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
+ROM_END
+
+ROM_START( spk115it )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "v.bin",   0x0000, 0x10000, CRC(df52997b) SHA1(72a76e84aeedfdebd4c6cb47809117a28b5d3892) ) // sldh
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "6.bin",  0x80000, 0x40000, CRC(f9b027f8) SHA1(c4686a4024062482f9864e0445087e32899fc775) ) // sldh
+	ROM_LOAD( "5.bin",  0x40000, 0x40000, CRC(baca51b6) SHA1(c97322c814729332378b6304a79062fea385ca97) ) // sldh
+	ROM_LOAD( "4.bin",  0x00000, 0x40000, CRC(1172c790) SHA1(43f1d019ecae5c605722e3fe77ae2f022b01260b) ) // sldh
+
+	ROM_REGION( 0x30000, "gfx2", 0 )
+	ROM_LOAD( "3.bin",  0x20000, 0x10000, CRC(5f18b012) SHA1(c9a96237eaf3138f136bbaffb29dde0ef568ce73) )
+	ROM_LOAD( "2.bin",  0x10000, 0x10000, CRC(50fc3505) SHA1(ca1e4ee7e0bb59c3bd67727f65054a48000ae7fe) )
+	ROM_LOAD( "1.bin",  0x00000, 0x10000, CRC(28ce630a) SHA1(9b597073d33841e7db2c68bbe9f30b734d7f7b41) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* expansion rom - contains backgrounds and pictures charmaps */
+	ROM_LOAD( "7.bin",   0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
+ROM_END
+
+ROM_START( spk114it )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "v_v114it.bin",  0x0000, 0x10000, CRC(471f5d97) SHA1(94781fb7bd8e9633fafca72de41113c3f21fbf4e) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "6_v114it.bin",  0x80000, 0x40000, CRC(466cec74) SHA1(6e4fe56a55f1e230eb01266c67cc82a87f6aaec6) )
+	ROM_LOAD( "5_v114it.bin",  0x40000, 0x40000, CRC(ae32a620) SHA1(d5238628269050e21da31d628b1d80b0f9b2d251) )
+	ROM_LOAD( "4_v114it.bin",  0x00000, 0x40000, CRC(c2105b1c) SHA1(cd2a930e9c15d1fdcc02ce87c109b5b4107430fa) )
+
+	ROM_REGION( 0x30000, "gfx2", 0 )
+	ROM_FILL(                  0x0000, 0x30000, 0xff ) /* filling the whole bank */
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "7_v114it.bin",  0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
 ROM_END
 
 
@@ -893,14 +896,14 @@ DRIVER_INIT_MEMBER(spoker_state, 3super8)
                               Game Drivers
 ***************************************************************************/
 
-/*    YEAR   NAME       PARENT    MACHINE  INPUT    STATE          INIT      ROT    COMPANY      FULLNAME                   FLAGS  */
-GAME( 1993?, spk116it,  0,        spoker,  spoker,  spoker_state,  spk116it, ROT0, "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk116ita, spk116it, spoker,  spoker,  driver_device, 0,        ROT0, "IGS",       "Super Poker (v116IT-MX)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
-GAME( 1993?, spk115it,  spk116it, spoker,  spoker,  spoker_state,  spk116it, ROT0, "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk114it,  spk116it, spoker,  spoker,  driver_device, 0,        ROT0, "IGS",       "Super Poker (v114IT)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
-GAME( 1996,  spk306us,  spk116it, spoker,  spoker,  driver_device, 0,        ROT0, "IGS",       "Super Poker (v306US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
-GAME( 1996,  spk205us,  spk116it, spoker,  spoker,  driver_device, 0,        ROT0, "IGS",       "Super Poker (v205US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
-GAME( 1996,  spk203us,  spk116it, spoker,  spoker,  driver_device, 0,        ROT0, "IGS",       "Super Poker (v203US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
-GAME( 1996,  spk200ua,  spk116it, spoker,  spoker,  driver_device, 0,        ROT0, "IGS",       "Super Poker (v200UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
-GAME( 1996,  spk102ua,  spk116it, spoker,  spoker,  driver_device, 0,        ROT0, "IGS",       "Super Poker (v102UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
-GAME( 1993?, 3super8,   spk116it, 3super8, 3super8, spoker_state,  3super8,  ROT0, "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
+/*    YEAR   NAME        PARENT    MACHINE  INPUT    STATE          INIT      ROT     COMPANY      FULLNAME                   FLAGS  */
+GAME( 1996,  spk306us,   0,        spoker,  spoker,  driver_device, 0,        ROT0,  "IGS",       "Super Poker (v306US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
+GAME( 1996,  spk205us,   spk306us, spoker,  spoker,  driver_device, 0,        ROT0,  "IGS",       "Super Poker (v205US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
+GAME( 1996,  spk203us,   spk306us, spoker,  spoker,  driver_device, 0,        ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
+GAME( 1996,  spk200ua,   spk306us, spoker,  spoker,  driver_device, 0,        ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
+GAME( 1993?, spk116it,   spk306us, spoker,  spoker,  spoker_state,  spk116it, ROT0,  "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk116itmx, spk306us, spoker,  spoker,  driver_device, 0,        ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
+GAME( 1993?, spk115it,   spk306us, spoker,  spoker,  spoker_state,  spk116it, ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk114it,   spk306us, spoker,  spoker,  driver_device, 0,        ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
+GAME( 1996,  spk102ua,   spk306us, spoker,  spoker,  driver_device, 0,        ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
+GAME( 1993?, 3super8,    0,        3super8, 3super8, spoker_state,  3super8,  ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
