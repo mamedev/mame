@@ -16,7 +16,9 @@
 #	include <semaphore.h>
 #	include <time.h>
 #	include <pthread.h>
-#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
+#elif BX_PLATFORM_XBOXONE
+#	include <synchapi.h>
+#elif BX_PLATFORM_XBOX360 || BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	include <windows.h>
 #	include <limits.h>
 #endif // BX_PLATFORM_
@@ -211,7 +213,7 @@ namespace bx
 	};
 #	endif // BX_CONFIG_SEMAPHORE_PTHREAD
 
-#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
+#elif BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 
 	class Semaphore
 	{
@@ -223,10 +225,10 @@ namespace bx
 	public:
 		Semaphore()
 		{
-#if BX_PLATFORM_WINRT
-			m_handle = CreateSemaphoreEx(NULL, 0, LONG_MAX, NULL, 0, SEMAPHORE_ALL_ACCESS);
+#if BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
+			m_handle = CreateSemaphoreExW(NULL, 0, LONG_MAX, NULL, 0, SEMAPHORE_ALL_ACCESS);
 #else
-			m_handle = CreateSemaphore(NULL, 0, LONG_MAX, NULL);
+			m_handle = CreateSemaphoreA(NULL, 0, LONG_MAX, NULL);
 #endif
 			BX_CHECK(NULL != m_handle, "Failed to create Semaphore!");
 		}
@@ -244,7 +246,7 @@ namespace bx
 		bool wait(int32_t _msecs = -1) const
 		{
 			DWORD milliseconds = (0 > _msecs) ? INFINITE : _msecs;
-#if BX_PLATFORM_WINRT
+#if BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
 			return WAIT_OBJECT_0 == WaitForSingleObjectEx(m_handle, milliseconds, FALSE);
 #else
 			return WAIT_OBJECT_0 == WaitForSingleObject(m_handle, milliseconds);

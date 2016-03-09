@@ -80,7 +80,7 @@ enum
 	XTAL_5_911MHz       = 5911000,      /* Philips Videopac Plus G7400 */
 	XTAL_5_9904MHz      = 5990400,      /* Luxor ABC 800 keyboard (Keytronic custom part #48-300-008 is equivalent) */
 	XTAL_6MHz           = 6000000,      /* American Poker II */
-	XTAL_6_144MHz       = 6144000,      /* Used on Alpha Denshi early 80's games sound board and Casio FP-200 main CPU */
+	XTAL_6_144MHz       = 6144000,      /* Used on Alpha Denshi early 80's games sound board, Casio FP-200 and Namco System 16 */
 	XTAL_6_5MHz         = 6500000,      /* Jupiter Ace */
 	XTAL_6_9MHz         = 6900000,      /* BBN BitGraph CPU */
 	XTAL_7MHz           = 7000000,      /* Jaleco Mega System PCBs */

@@ -28448,6 +28448,9 @@ pkunwarj                        // UPL-????? (c) 1985 (Arcade Game TV List - P.9
 raiders5                        // UPL-85004 (c) 1985
 raiders5t                       // UPL-85004 (c) 1985 Taito license
 
+@source:novag6502.cpp
+supercon                        // 
+
 @source:nsm.cpp
 firebird                        // 
 
@@ -33606,9 +33609,6 @@ superchsj                       // D46 (c) 1992 Taito Corporation (Japan)
 superchsp                       // prototype
 superchsu                       // D46 (c) 1992 Taito America Corporation (US)
 
-@source:supercon.cpp
-supercon                        // 
-
 @source:supercrd.cpp
 fruitstr                        // (c) 1992 Fun World
 supercrd                        // (c) 1992 Fun World
@@ -33696,8 +33696,6 @@ suratkj                         // GX911 (c) 1990 (Japan)
 sv8000                          // Super Vision 8000
 
 @source:svi318.cpp
-sv328n80                        // SVI-328 (NTSC) + SVI-806 80 column card
-sv328p80                        // SVI-328 (PAL) + SVI-806 80 column card
 svi318                          // SVI-318 (PAL)
 svi318n                         // SVI-318 (NTSC)
 svi328                          // SVI-328 (PAL)

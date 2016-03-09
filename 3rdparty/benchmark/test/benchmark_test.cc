@@ -150,5 +150,29 @@ static void BM_LongTest(benchmark::State& state) {
 }
 BENCHMARK(BM_LongTest)->Range(1<<16,1<<28);
 
+static void BM_ParallelMemset(benchmark::State& state) {
+  int size = state.range_x() / sizeof(int);
+  int thread_size = size / state.threads;
+  int from = thread_size * state.thread_index;
+  int to = from + thread_size;
+
+  if (state.thread_index == 0) {
+    test_vector = new std::vector<int>(size);
+  }
+
+  while (state.KeepRunning()) {
+    for (int i = from; i < to; i++) {
+      // No need to lock test_vector_mu as ranges
+      // do not overlap between threads.
+      benchmark::DoNotOptimize(test_vector->at(i) = 1);
+    }
+  }
+
+  if (state.thread_index == 0) {
+    delete test_vector;
+  }
+}
+BENCHMARK(BM_ParallelMemset)->Arg(10 << 20)->ThreadRange(1, 4);
+
 BENCHMARK_MAIN()
 

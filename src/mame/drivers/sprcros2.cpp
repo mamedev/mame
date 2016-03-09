@@ -2,11 +2,17 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-TODO:
-- complete rewrite;
-- scanline renderer;
-- understand irq 0 source;
-- output bit 0 might be watchdog armed bit/sprite start DMA instead of irq enable;
+	Super Cross II (c) 1987 GM Shoji
+
+	driver by Angelo Salese, based off "wiped off due of not anymore licenseable" driver by insideoutboy.   
+
+	TODO:
+	- complete rewrite;
+	- scanline renderer;
+	- understand irq 0 source;
+	- output bit 0 might be watchdog armed bit/sprite start DMA instead of irq enable;
+	- weird visible area resolution, 224 or 240 x 224? Maybe it's really just 256 x 224 and then it's supposed 
+	  to show garbage/nothing on the edges?
 
 ===================================
 
@@ -94,6 +100,7 @@ public:
 	bool m_master_nmi_enable;
 	bool m_master_irq_enable;
 	bool m_slave_nmi_enable;
+	bool m_screen_enable;
 	UINT8 m_bg_scrollx, m_bg_scrolly;
 protected:
 	// driver_device overrides
@@ -159,7 +166,7 @@ void sprcros2_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 {
 	gfx_element *gfx_2 = m_gfxdecode->gfx(2);
 	int count = 0;
-	
+
 	for (int y=0;y<32;y++)
 	{
 		for (int x=0;x<32;x++)
@@ -167,8 +174,13 @@ void sprcros2_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 			UINT16 tile = m_fgvram[count];
 			tile |= (m_fgattr[count] & 3) << 8;
 			UINT8 color = (m_fgattr[count] & 0xfc) >> 2;
-			
-			gfx_2->transpen(bitmap,cliprect,tile,color,0,0,x*8,y*8,0);
+
+			// TODO: was using tileinfo.group, which I don't know what's for at all.
+			//       This guess seems as good as the original one for all I know.
+			if((color & 0x30) != 0x30)
+				gfx_2->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
+			else
+				gfx_2->transpen(bitmap,cliprect,tile,color,0,0,x*8,y*8,0);
 
 			count++;
 		}
@@ -180,21 +192,26 @@ void sprcros2_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 
 UINT32 sprcros2_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	if(m_screen_enable == false)
+	{
+		bitmap.fill(0,cliprect);
+		return 0;
+	}
 	legacy_bg_draw(bitmap,cliprect);
 	legacy_obj_draw(bitmap,cliprect);
 	legacy_fg_draw(bitmap,cliprect);
-	
 	return 0;
 }
 
 WRITE8_MEMBER(sprcros2_state::master_output_w)
 {
-	popmessage("%02x",data);
-	if(data & 0xbe)
-		printf("master 07 -> %02x\n",data);
+	//popmessage("%02x",data);
+	//if(data & 0xbe)
+	//	printf("master 07 -> %02x\n",data);
 
 	membank("master_rombank")->set_entry((data&0x40)>>6);
 	m_master_nmi_enable = bool(data & 1);
+	m_screen_enable = bool(data & 4);
 	m_master_irq_enable = bool(data & 8);
 //	if(data & 0x80)
 //		m_master_cpu->set_input_line(0,HOLD_LINE);
@@ -202,8 +219,8 @@ WRITE8_MEMBER(sprcros2_state::master_output_w)
 
 WRITE8_MEMBER(sprcros2_state::slave_output_w)
 {
-	if(data & 0xf6)
-		printf("slave 03 -> %02x\n",data);
+	//if(data & 0xf6)
+	//	printf("slave 03 -> %02x\n",data);
 	
 	m_slave_nmi_enable = bool(data & 1);
 	membank("slave_rombank")->set_entry((data&8)>>3);
@@ -442,11 +459,7 @@ static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(sprcros2_state, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-//	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 343, 0, 256, 262, 0, 256) // TODO: Wrong screen parameters
+	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 343, 8, 256-8, 262, 16, 240) // TODO: Wrong screen parameters
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprcros2)
@@ -499,7 +512,7 @@ ROM_START( sprcros2 )
 	ROM_LOAD( "scs-24.4e",   0x0000, 0x4000, CRC(87783c36) SHA1(7102be795afcddd76b4d41823e95c65fe1ffbca0) )
 
 	ROM_REGION( 0xc000, "gfx2", 0 )
-	ROM_LOAD( "scm-23.5b",   0x0000, 0x4000, CRC(ab42f8e3) SHA1(8c2213b7c47a48e223fc3f7d323d16c0e4cd0457) ) //sprites
+	ROM_LOAD( "scm-23.5b",   0x0000, 0x4000, CRC(ab42f8e3) SHA1(8c2213b7c47a48e223fc3f7d323d16c0e4cd0457) )
 	ROM_LOAD( "scm-22.5e",   0x4000, 0x4000, CRC(0cad254c) SHA1(36e30e30b652b3a388a3c4a82251196f79368f59) )
 	ROM_LOAD( "scm-21.5g",   0x8000, 0x4000, CRC(b6b68998) SHA1(cc3c6d996beeedcc7e5199f10d65c5b1d3c6e666) )
 
@@ -529,7 +542,7 @@ ROM_START( sprcros2a )
 	ROM_LOAD( "scs-28.5j",  0x08000, 0x4000, CRC(480d351f) SHA1(d1b86f441ae0e58b30e0f089ab25de219d5f30e3) )
 	
 	ROM_REGION( 0x4000, "slave_bank", 0)
-	ROM_LOAD( "scs-27.5k",  0x00000, 0x4000, CRC(2cf720cb) SHA1(a95c5b8c88371cf597bb7d80afeca6a48c7b74e6) ) //banked into c000-dfff
+	ROM_LOAD( "scs-27.5k",  0x00000, 0x4000, CRC(2cf720cb) SHA1(a95c5b8c88371cf597bb7d80afeca6a48c7b74e6) )
 
 	ROM_REGION( 0xc000, "gfx1", 0 ) //bg
 	ROM_LOAD( "scs-26.4b",   0x8000, 0x4000, CRC(f958b56d) SHA1(a1973179d336d2ba57294155550515f2b8a33a09) )
@@ -537,7 +550,7 @@ ROM_START( sprcros2a )
 	ROM_LOAD( "scs-24.4e",   0x0000, 0x4000, CRC(87783c36) SHA1(7102be795afcddd76b4d41823e95c65fe1ffbca0) )
 
 	ROM_REGION( 0xc000, "gfx2", 0 )
-	ROM_LOAD( "scm-23.5b",   0x0000, 0x4000, CRC(ab42f8e3) SHA1(8c2213b7c47a48e223fc3f7d323d16c0e4cd0457) ) //sprites
+	ROM_LOAD( "scm-23.5b",   0x0000, 0x4000, CRC(ab42f8e3) SHA1(8c2213b7c47a48e223fc3f7d323d16c0e4cd0457) )
 	ROM_LOAD( "scm-22.5e",   0x4000, 0x4000, CRC(0cad254c) SHA1(36e30e30b652b3a388a3c4a82251196f79368f59) )
 	ROM_LOAD( "scm-21.5g",   0x8000, 0x4000, CRC(b6b68998) SHA1(cc3c6d996beeedcc7e5199f10d65c5b1d3c6e666) )
 
@@ -552,5 +565,5 @@ ROM_START( sprcros2a )
 	ROM_LOAD( "sc-60.4k",    0x0320, 0x0100, CRC(d7a4e57d) SHA1(6db02ec6aa55b05422cb505e63c71e36b4b11b4a) ) //fg clut
 ROM_END
 
-GAME( 1986, sprcros2, 0,        sprcros2, sprcros2, driver_device, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1986, sprcros2a,sprcros2, sprcros2, sprcros2, driver_device, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1986, sprcros2, 0,        sprcros2, sprcros2, driver_device, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sprcros2a,sprcros2, sprcros2, sprcros2, driver_device, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )

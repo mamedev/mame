@@ -123,7 +123,7 @@
 #if defined(_XBOX_VER)
 #	undef  BX_PLATFORM_XBOX360
 #	define BX_PLATFORM_XBOX360 1
-#elif defined (_DURANGO)
+#elif defined(_DURANGO) || defined(_XBOX_ONE)
 #	undef  BX_PLATFORM_XBOXONE
 #	define BX_PLATFORM_XBOXONE 1
 #elif defined(_WIN32) || defined(_WIN64)

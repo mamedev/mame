@@ -772,6 +772,7 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dxbc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dx9bc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_spirv.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/topology.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/vertexdecl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/bgfx_utils.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/bounds.cpp",

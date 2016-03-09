@@ -135,8 +135,11 @@ public:
 	// writing
 	UINT32 write(const void *buffer, UINT32 length);
 	int puts(const char *s);
-	int vprintf(const char *fmt, va_list va);
-	int printf(const char *fmt, ...) ATTR_PRINTF(2,3);
+	int vprintf(util::format_argument_pack<std::ostream> const &args);
+	template <typename Format, typename... Params> int printf(Format &&fmt, Params &&...args)
+	{
+		return vprintf(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
 
 	// buffers
 	void flush();

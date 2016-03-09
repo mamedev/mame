@@ -400,9 +400,8 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( beathead )
-	ROM_REGION( 0x14000, "jsa:cpu", 0 )         /* 64k + 16k for 6502 code */
-	ROM_LOAD( "bhsnd.bin",  0x10000, 0x4000, CRC(dfd33f02) SHA1(479a4838c89691d5a4654a4cd84b6433a9e86109) )
-	ROM_CONTINUE(           0x04000, 0xc000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 )         /* 64k for 6502 code */
+	ROM_LOAD( "bhsnd.bin",  0x00000, 0x10000, CRC(dfd33f02) SHA1(479a4838c89691d5a4654a4cd84b6433a9e86109) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* 4MB for ASAP code */
 	ROM_LOAD32_BYTE( "bhprog0.bin", 0x000000, 0x80000, CRC(87975721) SHA1(862cb3a290c829aedea26ee7100c50a12e9517e7) )

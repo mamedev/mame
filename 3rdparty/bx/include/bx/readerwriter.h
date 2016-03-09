@@ -6,6 +6,7 @@
 #ifndef BX_READERWRITER_H_HEADER_GUARD
 #define BX_READERWRITER_H_HEADER_GUARD
 
+#include <alloca.h>
 #include <stdarg.h> // va_list
 #include <stdio.h>
 #include <string.h>
@@ -359,8 +360,8 @@ namespace bx
 				m_top += morecore;
 			}
 
-			int64_t reminder = m_top-m_pos;
-			int32_t size = uint32_min(_size, int32_t(reminder > INT32_MAX ? INT32_MAX : reminder) );
+			int64_t remainder = m_top-m_pos;
+			int32_t size = uint32_min(_size, int32_t(remainder > INT32_MAX ? INT32_MAX : remainder) );
 			m_pos += size;
 			if (size != _size)
 			{
@@ -412,8 +413,8 @@ namespace bx
 		{
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
-			int64_t reminder = m_top-m_pos;
-			int32_t size = uint32_min(_size, int32_t(reminder > INT32_MAX ? INT32_MAX : reminder) );
+			int64_t remainder = m_top-m_pos;
+			int32_t size = uint32_min(_size, int32_t(remainder > INT32_MAX ? INT32_MAX : remainder) );
 			memcpy(_data, &m_data[m_pos], size);
 			m_pos += size;
 			if (size != _size)
@@ -493,8 +494,8 @@ namespace bx
 				m_size = m_memBlock->getSize();
 			}
 
-			int64_t reminder = m_size-m_pos;
-			int32_t size = uint32_min(_size, int32_t(reminder > INT32_MAX ? INT32_MAX : reminder) );
+			int64_t remainder = m_size-m_pos;
+			int32_t size = uint32_min(_size, int32_t(remainder > INT32_MAX ? INT32_MAX : remainder) );
 			memcpy(&m_data[m_pos], _data, size);
 			m_pos += size;
 			m_top = int64_max(m_top, m_pos);
@@ -529,117 +530,6 @@ namespace bx
 	private:
 		StaticMemoryBlock m_smb;
 	};
-
-#if BX_CONFIG_CRT_FILE_READER_WRITER
-	class CrtFileReader : public FileReaderI
-	{
-	public:
-		CrtFileReader()
-			: m_file(NULL)
-		{
-		}
-
-		virtual ~CrtFileReader()
-		{
-		}
-
-		virtual bool open(const char* _filePath, Error* _err) BX_OVERRIDE
-		{
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
-
-			m_file = fopen(_filePath, "rb");
-			if (NULL == m_file)
-			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "CrtFileReader: Failed to open file.");
-				return false;
-			}
-
-			return true;
-		}
-
-		virtual void close() BX_OVERRIDE
-		{
-			fclose(m_file);
-		}
-
-		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) BX_OVERRIDE
-		{
-			fseeko64(m_file, _offset, _whence);
-			return ftello64(m_file);
-		}
-
-		virtual int32_t read(void* _data, int32_t _size, Error* _err) BX_OVERRIDE
-		{
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
-
-			int32_t size = (int32_t)fread(_data, 1, _size, m_file);
-			if (size != _size)
-			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_READ, "CrtFileReader: read failed.");
-				return size >= 0 ? size : 0;
-			}
-
-			return size;
-		}
-
-	private:
-		FILE* m_file;
-	};
-
-	class CrtFileWriter : public FileWriterI
-	{
-	public:
-		CrtFileWriter()
-			: m_file(NULL)
-		{
-		}
-
-		virtual ~CrtFileWriter()
-		{
-		}
-
-		virtual bool open(const char* _filePath, bool _append, Error* _err) BX_OVERRIDE
-		{
-			m_file = fopen(_filePath, _append ? "ab" : "wb");
-
-			if (NULL == m_file)
-			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "CrtFileWriter: Failed to open file.");
-				return false;
-			}
-
-			return true;
-		}
-
-		virtual void close() BX_OVERRIDE
-		{
-			fclose(m_file);
-		}
-
-		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) BX_OVERRIDE
-		{
-			fseeko64(m_file, _offset, _whence);
-			return ftello64(m_file);
-		}
-
-		virtual int32_t write(const void* _data, int32_t _size, Error* _err) BX_OVERRIDE
-		{
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
-
-			int32_t size = (int32_t)fwrite(_data, 1, _size, m_file);
-			if (size != _size)
-			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "CrtFileWriter: write failed.");
-				return size >= 0 ? size : 0;
-			}
-
-			return size;
-		}
-
-	private:
-		FILE* m_file;
-	};
-#endif // BX_CONFIG_CRT_FILE_READER_WRITER
 
 } // namespace bx
 

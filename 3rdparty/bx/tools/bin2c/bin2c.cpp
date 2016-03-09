@@ -7,7 +7,7 @@
 #include <vector>
 
 #include <bx/commandline.h>
-#include <bx/readerwriter.h>
+#include <bx/crtimpl.h>
 #include <bx/string.h>
 
 class Bin2cWriter : public bx::WriterI

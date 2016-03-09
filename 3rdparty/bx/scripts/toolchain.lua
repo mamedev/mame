@@ -18,14 +18,14 @@ function toolchain(_buildDir, _libDir)
 			{ "android-x86",     "Android - x86"              },
 			{ "asmjs",           "Emscripten/asm.js"          },
 			{ "freebsd",         "FreeBSD"                    },
+			{ "ios-arm",         "iOS - ARM"                  },
+			{ "ios-simulator",   "iOS - Simulator"            },
 			{ "linux-gcc",       "Linux (GCC compiler)"       },
 			{ "linux-gcc-5",     "Linux (GCC-5 compiler)"     },
 			{ "linux-clang",     "Linux (Clang compiler)"     },
 			{ "linux-mips-gcc",  "Linux (MIPS, GCC compiler)" },
 			{ "linux-arm-gcc",   "Linux (ARM, GCC compiler)"  },
 			{ "linux-steamlink", "Steam Link"                 },
-			{ "ios-arm",         "iOS - ARM"                  },
-			{ "ios-simulator",   "iOS - Simulator"            },
 			{ "tvos-arm64",      "tvOS - ARM64"               },
 			{ "tvos-simulator",  "tvOS - Simulator"           },
 			{ "mingw-gcc",       "MinGW"                      },
@@ -54,6 +54,7 @@ function toolchain(_buildDir, _libDir)
 			{ "winphone81",    "Windows Phone 8.1"               },
 			{ "winstore81",    "Windows Store 8.1"               },
 			{ "winstore82",    "Universal Windows App"           },
+			{ "durango",       "Durango"                         },
 		},
 	}
 
@@ -363,18 +364,28 @@ function toolchain(_buildDir, _libDir)
 			platforms { "ARM" }
 			location (path.join(_buildDir, "projects", _ACTION .. "-winstore82"))
 
+		elseif "durango" == _OPTIONS["vs"] then
+			if not os.getenv("DurangoXDK") then
+				print("DurangoXDK not found.")
+			end
+
+			premake.vstudio.toolset = "v140"
+			premake.vstudio.storeapp = "durango"
+			platforms { "Durango" }
+			location (path.join(_buildDir, "projects", _ACTION .. "-durango"))
+		end
+
 		elseif ("vs2012-xp") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("v110_xp")
 			location (path.join(_buildDir, "projects", _ACTION .. "-xp"))
 
-		elseif ("vs2013-xp") == _OPTIONS["vs"] then
+		elseif "vs2013-xp" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("v120_xp")
 			location (path.join(_buildDir, "projects", _ACTION .. "-xp"))
 
-		elseif ("vs2015-xp") == _OPTIONS["vs"] then
+		elseif "vs2015-xp" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("v140_xp")
 			location (path.join(_buildDir, "projects", _ACTION .. "-xp"))
-		end
 
 	elseif _ACTION == "xcode4" then
 
@@ -664,6 +675,7 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "android-*" }
+		targetprefix ("lib")
 		flags {
 			"NoImportLib",
 		}
@@ -800,7 +812,7 @@ function toolchain(_buildDir, _libDir)
 		linkoptions {
 			"--sysroot=" .. path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-x86"),
 			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-x86/usr/lib/crtbegin_so.o"),
-			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "/arch-x86/usr/lib/crtend_so.o"),
+			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-x86/usr/lib/crtend_so.o"),
 		}
 
 	configuration { "asmjs" }
@@ -899,14 +911,23 @@ function toolchain(_buildDir, _libDir)
 	configuration { "pnacl", "Release" }
 		libdirs { "$(NACL_SDK_ROOT)/lib/pnacl/Release" }
 
-	configuration { "Xbox360" }
+	configuration { "xbox360" }
 		targetdir (path.join(_buildDir, "xbox360/bin"))
 		objdir (path.join(_buildDir, "xbox360/obj"))
 		includedirs { path.join(bxDir, "include/compat/msvc") }
 		libdirs { path.join(_libDir, "lib/xbox360") }
 		defines {
 			"NOMINMAX",
-			"_XBOX",
+		}
+
+	configuration { "durango" }
+		targetdir (path.join(_buildDir, "durango/bin"))
+		objdir (path.join(_buildDir, "durango/obj"))
+		includedirs { path.join(bxDir, "include/compat/msvc") }
+		libdirs { path.join(_libDir, "lib/durango") }
+		removeflags { "StaticRuntime" }
+		defines {
+			"NOMINMAX",
 		}
 
 	configuration { "osx", "x32" }
