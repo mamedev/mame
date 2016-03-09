@@ -1130,7 +1130,7 @@ static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32, polgar_state )
 static ADDRESS_MAP_START(bpl32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x000000,  0x03ffff )  AM_ROM
-	AM_RANGE( 0x800000 , 0x800003 )  AM_READ(read_keys_BPL32 )
+//	AM_RANGE( 0x800000 , 0x800003 )  AM_READ(read_keys_BPL32 )
 	AM_RANGE( 0x900000 , 0x900003 )  AM_WRITE(write_board_BPL32 )
 	AM_RANGE( 0xa00000 , 0xa00003 )  AM_WRITE(write_LED_BPL32 )
 	AM_RANGE( 0xc00000 , 0xc00003 )  AM_WRITE(write_LCD_data_32 )
@@ -1230,7 +1230,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(milano_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1f9f ) AM_RAM
 	AM_RANGE( 0x1fd0, 0x1fd0 ) AM_WRITE(milano_write_board )        // Chessboard
-	AM_RANGE( 0x1fe0, 0x1fe0 ) AM_READ(milano_read_board )      // Chessboard
+//	AM_RANGE( 0x1fe0, 0x1fe0 ) AM_READ(milano_read_board )      // Chessboard
 	AM_RANGE( 0x1fe8, 0x1fed ) AM_WRITE(milano_write_LED )  // Function LEDs
 	AM_RANGE( 0x1fd8, 0x1fdf ) AM_READ(read_keys)
 	AM_RANGE( 0x1ff0, 0x1ff0 ) AM_WRITE(write_polgar_IO)    // IO control

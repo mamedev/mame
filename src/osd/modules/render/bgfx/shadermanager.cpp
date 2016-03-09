@@ -15,6 +15,7 @@
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 #include <bx/readerwriter.h>
+#include <bx/crtimpl.h>
 
 #include "shadermanager.h"
 

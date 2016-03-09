@@ -23,14 +23,22 @@
 #include <stdio.h>
 #include <time.h>
 #include <ctype.h>
-#include <unordered_map>
+
+#include <iostream>
 #include <new>
+#include <unordered_map>
 
 
 
 //**************************************************************************
 //  CONSTANTS & DEFINES
 //**************************************************************************
+/* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 */
+#if defined(__MINGW32__) || defined(_MSC_VER)
+#define I64FMT   "I64"
+#else
+#define I64FMT   "ll"
+#endif
 
 // default hard disk sector size
 const UINT32 IDE_SECTOR_SIZE = 512;
@@ -99,7 +107,7 @@ const int MODE_GDI = 2;
 
 typedef std::unordered_map<std::string,std::string *> parameters_t;
 
-static void report_error(int error, const char *format, ...) ATTR_PRINTF(2,3);
+template <typename Format, typename... Params> static void report_error(int error, Format &&fmt, Params &&...args);
 static void do_info(parameters_t &params);
 static void do_verify(parameters_t &params);
 static void do_create_raw(parameters_t &params);
@@ -721,15 +729,11 @@ static const command_description s_commands[] =
 //  report_error - report an error
 //-------------------------------------------------
 
-static void report_error(int error, const char *format, ...)
+template <typename Format, typename... Params> static void report_error(int error, Format &&fmt, Params &&...args)
 {
 	// output to stderr
-	va_list arg;
-	va_start(arg, format);
-	vfprintf(stderr, format, arg);
-	fflush(stderr);
-	va_end(arg);
-	fprintf(stderr, "\n");
+	util::stream_format(std::cerr, std::forward<Format>(fmt), std::forward<Params>(args)...);
+	std::cerr << std::endl;
 
 	// reset time for progress and return the error
 	lastprogress = 0;
@@ -741,7 +745,7 @@ static void report_error(int error, const char *format, ...)
 //  progress - generic progress callback
 //-------------------------------------------------
 
-static void ATTR_PRINTF(2,3) progress(bool forceit, const char *format, ...)
+template <typename Format, typename... Params> static void progress(bool forceit, Format &&fmt, Params &&...args)
 {
 	// skip if it hasn't been long enough
 	clock_t curtime = clock();
@@ -750,11 +754,8 @@ static void ATTR_PRINTF(2,3) progress(bool forceit, const char *format, ...)
 	lastprogress = curtime;
 
 	// standard vfprintf stuff here
-	va_list arg;
-	va_start(arg, format);
-	vfprintf(stderr, format, arg);
-	fflush(stderr);
-	va_end(arg);
+	util::stream_format(std::cerr, std::forward<Format>(fmt), std::forward<Params>(args)...);
+	std::cerr << std::flush;
 }
 
 
@@ -1231,7 +1232,7 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 				break;
 		}
 		bool needquote = strchr(filename, ' ') != nullptr;
-		file.printf("%d %d %d %d %s%s%s %" I64FMT "d\n", tracknum+1, frameoffs, mode, size, needquote?"\"":"", filename, needquote?"\"":"", discoffs);
+		file.printf("%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, mode, size, needquote?"\"":"", filename, needquote?"\"":"", discoffs);
 	}
 	else if (mode == MODE_CUEBIN)
 	{
@@ -2592,7 +2593,7 @@ static void do_extract_ld(parameters_t &params)
 			if (err != CHDERR_NONE)
 			{
 				UINT64 filepos = static_cast<util::core_file &>(input_chd).tell();
-				report_error(1, "Error reading hunk %" I64FMT "d at offset %" I64FMT "d from CHD file (%s): %s\n", framenum, filepos, params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err));
+				report_error(1, "Error reading hunk %d at offset %d from CHD file (%s): %s\n", framenum, filepos, params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err));
 			}
 
 			// write audio
@@ -2600,7 +2601,7 @@ static void do_extract_ld(parameters_t &params)
 			{
 				avi_error avierr = avi_append_sound_samples(output_file, chnum, avconfig.audio[chnum], actsamples, 0);
 				if (avierr != AVIERR_NONE)
-					report_error(1, "Error writing samples for hunk %" I64FMT "d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_error_string(avierr));
+					report_error(1, "Error writing samples for hunk %d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_error_string(avierr));
 			}
 
 			// write video
@@ -2608,7 +2609,7 @@ static void do_extract_ld(parameters_t &params)
 			{
 				avi_error avierr = avi_append_video_frame(output_file, fullbitmap);
 				if (avierr != AVIERR_NONE)
-					report_error(1, "Error writing video for hunk %" I64FMT "d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_error_string(avierr));
+					report_error(1, "Error writing video for hunk %d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_error_string(avierr));
 			}
 		}
 

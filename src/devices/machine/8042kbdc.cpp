@@ -224,10 +224,10 @@ void kbdc8042_device::device_start()
 {
 	// resolve callbacks
 	m_system_reset_cb.resolve_safe();
-	m_gate_a20_cb.resolve();
-	m_input_buffer_full_cb.resolve();
+	m_gate_a20_cb.resolve_safe();
+	m_input_buffer_full_cb.resolve_safe();
 	m_output_buffer_empty_cb.resolve_safe();
-	m_speaker_cb.resolve();
+	m_speaker_cb.resolve_safe();
 	m_operation_write_state = 0; /* first write to 0x60 might occur before anything can set this */
 	memset(&m_keyboard, 0x00, sizeof(m_keyboard));
 	memset(&m_mouse, 0x00, sizeof(m_mouse));

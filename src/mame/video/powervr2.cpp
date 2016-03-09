@@ -2010,7 +2010,7 @@ WRITE64_MEMBER( powervr2_device::ta_fifo_poly_w )
 		tafifo_buff[tafifo_pos]=(UINT32)data;
 		tafifo_buff[tafifo_pos+1]=(UINT32)(data >> 32);
 		#if DEBUG_FIFO_POLY
-		osd_printf_debug("ta_fifo_poly_w:  Unmapped write64 %08x = %" I64FMT "x -> %08x %08x\n", 0x10000000+offset*8, data, tafifo_buff[tafifo_pos], tafifo_buff[tafifo_pos+1]);
+		osd_printf_debug("%s",string_format("ta_fifo_poly_w:  Unmapped write64 %08x = %I64x -> %08x %08x\n", 0x10000000+offset*8, data, tafifo_buff[tafifo_pos], tafifo_buff[tafifo_pos+1]).c_str());
 		#endif
 		tafifo_pos += 2;
 	}

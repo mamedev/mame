@@ -93,7 +93,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
- 	<software name="4ninmja" cloneof="4ninmj">
+	<software name="4ninmja" cloneof="4ninmj">
 		<description>4-nin Mahjan (Jpn, set 2)</description>
 		<year>1984</year>
 		<publisher>Tomy</publisher>
@@ -101,7 +101,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<info name="serial" value="021E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="0x4000">
-		<rom name="MahJongg(JP).BIN" size="0x4000" crc="127241ec" sha1="8b9ea7fc592e673e93cfae1bfc458bfab4a52600" offset="0" />
+				<rom name="MahJongg(JP).BIN" size="0x4000" crc="127241ec" sha1="8b9ea7fc592e673e93cfae1bfc458bfab4a52600" offset="0" />
 			</dataarea>
 		</part>
 	</software> 
@@ -119,10 +119,10 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
-  	<software name="batlfght">
+	<software name="batlfght">
 		<description>Battle Fighter [3D] (Jpn)</description>
 		<year>1985</year>
-    <publisher>Tomy</publisher>
+		<publisher>Tomy</publisher>
 		<info name="alt_title" value="バトルファイター"/>
 		<info name="serial" value="026E"/>
 		<part name="cart" interface="tutor_cart">
@@ -412,10 +412,10 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
- 	<software name="superbik">
+	<software name="superbik">
 		<description>Super Bike (Jpn)</description>
 		<year>1984</year>
-    <publisher>Tomy</publisher>
+		<publisher>Tomy</publisher>
 		<info name="alt_title" value="スーパーバイク"/>
 		<info name="serial" value="023E"/>
 		<part name="cart" interface="tutor_cart">

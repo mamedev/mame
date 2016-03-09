@@ -181,8 +181,6 @@ INPUT_PORTS_START( kay_kbd )
 	PORT_BIT(0xf0, 0x00, IPT_UNUSED)
 INPUT_PORTS_END
 
-static void kay_kbd_in( running_machine &machine, UINT8 data );
-
 static const UINT8 keyboard[8][10][8] = {
 	{ /* normal */
 		{ 27,'1','2','3','4','5','6','7'},
@@ -376,11 +374,11 @@ INTERRUPT_GEN_MEMBER(kaypro_state::kay_kbd_interrupt)
 			if( kbd->key )  /* normal key */
 			{
 				kbd->repeater = 30;
-				kay_kbd_in(machine(), kbd->key);
+				kay_kbd_in(kbd->key);
 			}
 			else
 			if( (row == 0) && (chg == 0x04) ) /* Ctrl-@ (NUL) */
-				kay_kbd_in(machine(), 0);
+				kay_kbd_in(0);
 			keyrows[row] |= newval;
 		}
 		else
@@ -391,7 +389,7 @@ INTERRUPT_GEN_MEMBER(kaypro_state::kay_kbd_interrupt)
 	}
 	else if ( kbd->key && (keyrows[kbd->lastrow] & kbd->mask) && kbd->repeat == 0 )
 	{
-		kay_kbd_in(machine(), kbd->key);
+		kay_kbd_in(kbd->key);
 	}
 }
 
@@ -415,10 +413,9 @@ static WRITE8_HANDLER ( kaypro2_const_w )
  *  releases CPU if it was waiting for a key
  *  sounds bell if buffer would overflow
  ******************************************************/
-static void kay_kbd_in( running_machine &machine, UINT8 data )
+void kaypro_state::kay_kbd_in(UINT8 data )
 {
-	kaypro_state *state = machine.driver_data<kaypro_state>();
-	kay_kbd_t *kbd = state->m_kbd;
+	kay_kbd_t *kbd = m_kbd;
 	UINT8 kbd_head_old;
 
 	kbd_head_old = kbd->head;
@@ -428,21 +425,20 @@ static void kay_kbd_in( running_machine &machine, UINT8 data )
 	if (kbd->head == kbd->tail)
 	{
 		kbd->head = kbd_head_old;
-		kay_kbd_d_w(machine, 4);
+		kay_kbd_d_w(4);
 	}
 	else
-		kay_kbd_d_w(machine, 1);
+		kay_kbd_d_w(1);
 }
 
 
-UINT8 kay_kbd_c_r( running_machine &machine )
+UINT8 kaypro_state::kay_kbd_c_r()
 {
 /*  d4 transmit buffer empty - 1=ok to send
     d2 appears to be receive buffer empty - 1=ok to receive
     d0 keyboard buffer empty - 1=key waiting to be used */
 
-	kaypro_state *state = machine.driver_data<kaypro_state>();
-	kay_kbd_t *kbd = state->m_kbd;
+	kay_kbd_t *kbd = m_kbd;
 	UINT8 data = kbd->control_status;
 
 	if( kbd->head != kbd->tail )
@@ -451,12 +447,11 @@ UINT8 kay_kbd_c_r( running_machine &machine )
 	return data;
 }
 
-UINT8 kay_kbd_d_r( running_machine &machine )
+UINT8 kaypro_state::kay_kbd_d_r()
 {
 /* return next key in buffer */
 
-	kaypro_state *state = machine.driver_data<kaypro_state>();
-	kay_kbd_t *kbd = state->m_kbd;
+	kay_kbd_t *kbd = m_kbd;
 	UINT8 data = 0;
 
 	if (kbd->tail != kbd->head)
@@ -468,15 +463,14 @@ UINT8 kay_kbd_d_r( running_machine &machine )
 	return data;
 }
 
-static TIMER_CALLBACK( kay_kbd_beepoff )
+TIMER_CALLBACK_MEMBER( kaypro_state::kay_kbd_beepoff )
 {
-	kaypro_state *state = machine.driver_data<kaypro_state>();
-	kay_kbd_t *kbd = state->m_kbd;
+	kay_kbd_t *kbd = m_kbd;
 	kbd->beeper->set_state(0);
 	kbd->control_status |= 4;
 }
 
-void kay_kbd_d_w( running_machine &machine, UINT8 data )
+void kaypro_state::kay_kbd_d_w( UINT8 data )
 {
 /* Beeper control - lengths need verifying
     01 - keyclick
@@ -485,8 +479,7 @@ void kay_kbd_d_w( running_machine &machine, UINT8 data )
     08 - mute
     16 - unmute */
 
-	kaypro_state *state = machine.driver_data<kaypro_state>();
-	kay_kbd_t *kbd = state->m_kbd;
+	kay_kbd_t *kbd = m_kbd;
 	UINT16 length = 0;
 
 	if (data & 0x10)
@@ -509,7 +502,7 @@ void kay_kbd_d_w( running_machine &machine, UINT8 data )
 		if (length)
 		{
 			kbd->control_status &= 0xfb;
-			machine.scheduler().timer_set(attotime::from_msec(length), FUNC(kay_kbd_beepoff));
+			machine().scheduler().timer_set(attotime::from_msec(length), timer_expired_delegate(FUNC(kaypro_state::kay_kbd_beepoff),this));
 			kbd->beeper->set_state(1);
 		}
 	}

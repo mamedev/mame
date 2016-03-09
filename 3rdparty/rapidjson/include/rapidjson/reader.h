@@ -19,6 +19,7 @@
 
 #include "allocators.h"
 #include "stream.h"
+#include "encodedstream.h"
 #include "internal/meta.h"
 #include "internal/stack.h"
 #include "internal/strtod.h"
@@ -147,6 +148,7 @@ enum ParseFlag {
     kParseStopWhenDoneFlag = 8,     //!< After parsing a complete JSON root from stream, stop further processing the rest of stream. When this flag is used, parser will not generate kParseErrorDocumentRootNotSingular error.
     kParseFullPrecisionFlag = 16,   //!< Parse number in full precision (but slower).
     kParseCommentsFlag = 32,        //!< Allow one-line (//) and multi-line (/**/) comments.
+    kParseNumbersAsStringsFlag = 64,    //!< Parse all numbers (ints/doubles) as strings.
     kParseDefaultFlags = RAPIDJSON_PARSE_DEFAULT_FLAGS  //!< Default parse flags. Can be customized by defining RAPIDJSON_PARSE_DEFAULT_FLAGS
 };
 
@@ -168,6 +170,8 @@ concept Handler {
     bool Int64(int64_t i);
     bool Uint64(uint64_t i);
     bool Double(double d);
+    /// enabled via kParseNumbersAsStringsFlag, string is not null-terminated (use length)
+    bool RawNumber(const Ch* str, SizeType length, bool copy);
     bool String(const Ch* str, SizeType length, bool copy);
     bool StartObject();
     bool Key(const Ch* str, SizeType length, bool copy);
@@ -198,6 +202,8 @@ struct BaseReaderHandler {
     bool Int64(int64_t) { return static_cast<Override&>(*this).Default(); }
     bool Uint64(uint64_t) { return static_cast<Override&>(*this).Default(); }
     bool Double(double) { return static_cast<Override&>(*this).Default(); }
+    /// enabled via kParseNumbersAsStringsFlag, string is not null-terminated (use length)
+    bool RawNumber(const Ch* str, SizeType len, bool copy) { return static_cast<Override&>(*this).String(str, len, copy); }
     bool String(const Ch*, SizeType, bool) { return static_cast<Override&>(*this).Default(); }
     bool StartObject() { return static_cast<Override&>(*this).Default(); }
     bool Key(const Ch* str, SizeType len, bool copy) { return static_cast<Override&>(*this).String(str, len, copy); }
@@ -259,6 +265,12 @@ void SkipWhitespace(InputStream& is) {
         s.Take();
 }
 
+inline const char* SkipWhitespace(const char* p, const char* end) {
+    while (p != end && (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t'))
+        ++p;
+    return p;
+}
+
 #ifdef RAPIDJSON_SSE42
 //! Skip whitespace with SSE 4.2 pcmpistrm instruction, testing 16 8-byte characters at once.
 inline const char *SkipWhitespace_SIMD(const char* p) {
@@ -293,6 +305,34 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
 #endif
         }
     }
+}
+
+inline const char *SkipWhitespace_SIMD(const char* p, const char* end) {
+    // Fast return for single non-whitespace
+    if (p != end && (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t'))
+        ++p;
+    else
+        return p;
+
+    // The middle of string using SIMD
+    static const char whitespace[16] = " \n\r\t";
+    const __m128i w = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespace[0]));
+
+    for (; p <= end - 16; p += 16) {
+        const __m128i s = _mm_loadu_si128(reinterpret_cast<const __m128i *>(p));
+        const int r = _mm_cvtsi128_si32(_mm_cmpistrm(w, s, _SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_BIT_MASK | _SIDD_NEGATIVE_POLARITY));
+        if (r != 0) {   // some of characters is non-whitespace
+#ifdef _MSC_VER         // Find the index of first non-whitespace
+            unsigned long offset;
+            _BitScanForward(&offset, r);
+            return p + offset;
+#else
+            return p + __builtin_ffs(r) - 1;
+#endif
+        }
+    }
+
+    return SkipWhitespace(p, end);
 }
 
 #elif defined(RAPIDJSON_SSE2)
@@ -342,6 +382,44 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
     }
 }
 
+inline const char *SkipWhitespace_SIMD(const char* p, const char* end) {
+    // Fast return for single non-whitespace
+    if (p != end && (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t'))
+        ++p;
+    else
+        return p;
+
+    // The rest of string
+    #define C16(c) { c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c }
+    static const char whitespaces[4][16] = { C16(' '), C16('\n'), C16('\r'), C16('\t') };
+    #undef C16
+
+    const __m128i w0 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[0][0]));
+    const __m128i w1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[1][0]));
+    const __m128i w2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[2][0]));
+    const __m128i w3 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[3][0]));
+
+    for (; p <= end - 16; p += 16) {
+        const __m128i s = _mm_loadu_si128(reinterpret_cast<const __m128i *>(p));
+        __m128i x = _mm_cmpeq_epi8(s, w0);
+        x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w1));
+        x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w2));
+        x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w3));
+        unsigned short r = static_cast<unsigned short>(~_mm_movemask_epi8(x));
+        if (r != 0) {   // some of characters may be non-whitespace
+#ifdef _MSC_VER         // Find the index of first non-whitespace
+            unsigned long offset;
+            _BitScanForward(&offset, r);
+            return p + offset;
+#else
+            return p + __builtin_ffs(r) - 1;
+#endif
+        }
+    }
+
+    return SkipWhitespace(p, end);
+}
+
 #endif // RAPIDJSON_SSE2
 
 #ifdef RAPIDJSON_SIMD
@@ -353,6 +431,10 @@ template<> inline void SkipWhitespace(InsituStringStream& is) {
 //! Template function specialization for StringStream
 template<> inline void SkipWhitespace(StringStream& is) {
     is.src_ = SkipWhitespace_SIMD(is.src_);
+}
+
+template<> inline void SkipWhitespace(EncodedInputStream<UTF8<>, MemoryStream>& is) {
+    is.is_.src_ = SkipWhitespace_SIMD(is.is_.src_, is.is_.end_);
 }
 #endif // RAPIDJSON_SIMD
 
@@ -976,6 +1058,8 @@ private:
         RAPIDJSON_FORCEINLINE Ch Peek() const { return is.Peek(); }
         RAPIDJSON_FORCEINLINE Ch TakePush() { return is.Take(); }
         RAPIDJSON_FORCEINLINE Ch Take() { return is.Take(); }
+		  RAPIDJSON_FORCEINLINE void Push(char) {}
+
         size_t Tell() { return is.Tell(); }
         size_t Length() { return 0; }
         const char* Pop() { return 0; }
@@ -998,6 +1082,10 @@ private:
             return Base::is.Take();
         }
 
+		  RAPIDJSON_FORCEINLINE void Push(char c) {
+			  stackStream.Put(c);
+		  }
+
         size_t Length() { return stackStream.Length(); }
 
         const char* Pop() {
@@ -1012,7 +1100,11 @@ private:
     template<unsigned parseFlags, typename InputStream, typename Handler>
     void ParseNumber(InputStream& is, Handler& handler) {
         internal::StreamLocalCopy<InputStream> copy(is);
-        NumberStream<InputStream, (parseFlags & kParseFullPrecisionFlag) != 0> s(*this, copy.s);
+        NumberStream<InputStream,
+            ((parseFlags & kParseNumbersAsStringsFlag) != 0) ?
+                ((parseFlags & kParseInsituFlag) == 0) :
+                ((parseFlags & kParseFullPrecisionFlag) != 0)> s(*this, copy.s);
+
         size_t startOffset = s.Tell();
 
         // Parse minus
@@ -1099,6 +1191,9 @@ private:
         int expFrac = 0;
         size_t decimalPosition;
         if (Consume(s, '.')) {
+            if (((parseFlags & kParseNumbersAsStringsFlag) != 0) && ((parseFlags & kParseInsituFlag) == 0)) {
+					s.Push('.');
+				}
             decimalPosition = s.Length();
 
             if (RAPIDJSON_UNLIKELY(!(s.Peek() >= '0' && s.Peek() <= '9')))
@@ -1146,7 +1241,11 @@ private:
         // Parse exp = e [ minus / plus ] 1*DIGIT
         int exp = 0;
         if (Consume(s, 'e') || Consume(s, 'E')) {
-            if (!useDouble) {
+            if ( ((parseFlags & kParseNumbersAsStringsFlag) != 0) && ((parseFlags & kParseInsituFlag) == 0) ) {
+                s.Push( 'e' );
+            }
+
+			   if (!useDouble) {
                 d = static_cast<double>(use64bit ? i64 : i);
                 useDouble = true;
             }
@@ -1186,31 +1285,56 @@ private:
 
         // Finish parsing, call event according to the type of number.
         bool cont = true;
-        size_t length = s.Length();
-        const char* decimal = s.Pop();  // Pop stack no matter if it will be used or not.
 
-        if (useDouble) {
-            int p = exp + expFrac;
-            if (parseFlags & kParseFullPrecisionFlag)
-                d = internal::StrtodFullPrecision(d, p, decimal, length, decimalPosition, exp);
-            else
-                d = internal::StrtodNormalPrecision(d, p);
-
-            cont = handler.Double(minus ? -d : d);
-        }
-        else {
-            if (use64bit) {
-                if (minus)
-                    cont = handler.Int64(static_cast<int64_t>(~i64 + 1));
-                else
-                    cont = handler.Uint64(i64);
+        if (parseFlags & kParseNumbersAsStringsFlag) {
+            if (parseFlags & kParseInsituFlag) {
+                s.Pop();  // Pop stack no matter if it will be used or not.
+                typename InputStream::Ch* head = is.PutBegin();
+                const size_t length = s.Tell() - startOffset;
+                RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
+                // unable to insert the \0 character here, it will erase the comma after this number
+                const typename TargetEncoding::Ch* const str = reinterpret_cast<typename TargetEncoding::Ch*>(head);
+                cont = handler.RawNumber(str, SizeType(length), false);
             }
             else {
-                if (minus)
-                    cont = handler.Int(static_cast<int32_t>(~i + 1));
-                else
-                    cont = handler.Uint(i);
+                StackStream<typename TargetEncoding::Ch> stackStream(stack_);
+                SizeType numCharsToCopy = static_cast<SizeType>(s.Length());
+                while (numCharsToCopy--) {
+                    Transcoder<SourceEncoding, TargetEncoding>::Transcode(is, stackStream);
+                }
+                stackStream.Put('\0');
+                const typename TargetEncoding::Ch* str = stackStream.Pop();
+                const SizeType length = static_cast<SizeType>(stackStream.Length()) - 1;
+                cont = handler.RawNumber(str, SizeType(length), true);
             }
+        }
+        else {
+           size_t length = s.Length();
+           const char* decimal = s.Pop();  // Pop stack no matter if it will be used or not.
+
+           if (useDouble) {
+               int p = exp + expFrac;
+               if (parseFlags & kParseFullPrecisionFlag)
+                   d = internal::StrtodFullPrecision(d, p, decimal, length, decimalPosition, exp);
+               else
+                   d = internal::StrtodNormalPrecision(d, p);
+
+               cont = handler.Double(minus ? -d : d);
+           }
+           else {
+               if (use64bit) {
+                   if (minus)
+                       cont = handler.Int64(static_cast<int64_t>(~i64 + 1));
+                   else
+                       cont = handler.Uint64(i64);
+               }
+               else {
+                   if (minus)
+                       cont = handler.Int(static_cast<int32_t>(~i + 1));
+                   else
+                       cont = handler.Uint(i);
+               }
+           }
         }
         if (RAPIDJSON_UNLIKELY(!cont))
             RAPIDJSON_PARSE_ERROR(kParseErrorTermination, startOffset);

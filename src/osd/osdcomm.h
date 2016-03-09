@@ -128,25 +128,6 @@ using FPTR = uintptr_t;
 #define EXTRACT_64HI(val)   ((UINT32)((val) >> 32))
 #define EXTRACT_64LO(val)   ((UINT32)(val))
 
-
-/* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 */
-#if defined(__MINGW32__) || defined(_MSC_VER)
-#define I64FMT   "I64"
-#else
-#define I64FMT   "ll"
-#endif
-
-#if defined(_MSC_VER) || defined(__MINGW32__)
-#ifdef PTR64
-#define SIZETFMT   "I64u"
-#else
-#define SIZETFMT   "u"
-#endif
-#else
-#define SIZETFMT   "zu"
-#endif
-
-
 /* Highly useful macro for compile-time knowledge of an array size */
 #define ARRAY_LENGTH(x)     (sizeof(x) / sizeof(x[0]))
 

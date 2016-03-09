@@ -659,19 +659,19 @@ static void set_irq_line(m68000_base_device *m68k, int irqline, int state)
 		m68k->nmi_pending = TRUE;
 }
 
-static void m68k_presave(m68000_base_device *m68k)
+void m68000_base_device::presave()
 {
-	m68k->save_sr = m68ki_get_sr(m68k);
-	m68k->save_stopped = (m68k->stopped & STOP_LEVEL_STOP) != 0;
-	m68k->save_halted  = (m68k->stopped & STOP_LEVEL_HALT) != 0;
+	save_sr = m68ki_get_sr(this);
+	save_stopped = (stopped & STOP_LEVEL_STOP) != 0;
+	save_halted  = (stopped & STOP_LEVEL_HALT) != 0;
 }
 
-static void m68k_postload(m68000_base_device *m68k)
+void m68000_base_device::postload()
 {
-	m68ki_set_sr_noint_nosp(m68k, m68k->save_sr);
+	m68ki_set_sr_noint_nosp(this, save_sr);
 	//fprintf(stderr, "Reloaded, pc=%x\n", REG_PC(m68k));
-	m68k->stopped = (m68k->save_stopped ? STOP_LEVEL_STOP : 0) | (m68k->save_halted  ? STOP_LEVEL_HALT : 0);
-	m68ki_jump(m68k, REG_PC(m68k));
+	stopped = (save_stopped ? STOP_LEVEL_STOP : 0) | (save_halted  ? STOP_LEVEL_HALT : 0);
+	m68ki_jump(this, REG_PC(this));
 }
 
 static void m68k_cause_bus_error(m68000_base_device *m68k)
@@ -1025,8 +1025,8 @@ void m68000_base_device::init_cpu_common(void)
 		save_item(NAME(mmu_atc_data[i]), i);
 	}
 
-	machine().save().register_presave(save_prepost_delegate(FUNC(m68k_presave), this));
-	machine().save().register_postload(save_prepost_delegate(FUNC(m68k_postload), this));
+	machine().save().register_presave(save_prepost_delegate(FUNC(m68000_base_device::presave), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(m68000_base_device::postload), this));
 
 	m_icountptr = &remaining_cycles;
 	remaining_cycles = 0;

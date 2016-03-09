@@ -1709,13 +1709,13 @@ void lua_engine::start()
 
 namespace luabridge {
 	template <>
-	struct Stack <UINT64> {
-		static inline void push (lua_State* L, UINT64 value) {
+	struct Stack <unsigned long long> {
+		static inline void push (lua_State* L, unsigned long long value) {
 			lua_pushunsigned(L, static_cast <lua_Unsigned> (value));
 		}
 
-		static inline UINT64 get (lua_State* L, int index) {
-			return static_cast <UINT64> (luaL_checkunsigned (L, index));
+		static inline unsigned long long get (lua_State* L, int index) {
+			return static_cast <unsigned long long> (luaL_checkunsigned (L, index));
 		}
 	};
 }

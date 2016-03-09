@@ -308,7 +308,7 @@ atari_jsa_base_device::atari_jsa_base_device(const machine_config &mconfig, devi
 void atari_jsa_base_device::device_start()
 {
 	// configure CPU bank
-	m_cpu_bank->configure_entries(0, 4, m_jsacpu->region()->base() + 0x10000, 0x1000);
+	m_cpu_bank->configure_entries(0, 4, m_jsacpu->region()->base(), 0x1000);
 
 	// resolve devices
 	m_test_read_cb.resolve_safe(0);
@@ -580,7 +580,7 @@ void atari_jsa_oki_base_device::device_start()
 	{
 		m_oki2_banklo->configure_entries(0, 2, m_oki2->region()->base() + 0x00000, 0x00000);
 		m_oki2_banklo->configure_entries(2, 2, m_oki2->region()->base() + 0x20000, 0x20000);
-		m_oki2_bankhi->set_base(m_oki1->region()->base() + 0x60000);
+		m_oki2_bankhi->set_base(m_oki2->region()->base() + 0x60000);
 	}
 }
 

@@ -18,7 +18,6 @@
 #ifndef __EMU_H__
 #define __EMU_H__
 
-#include <stdio.h> // must be here otherwise issues with I64FMT in MINGW
 #include <list>
 #include <vector>
 #include <memory>

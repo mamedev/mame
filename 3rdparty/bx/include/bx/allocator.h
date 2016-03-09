@@ -12,10 +12,6 @@
 #include <string.h> //::memmove
 #include <new>
 
-#if BX_CONFIG_ALLOCATOR_CRT
-#	include <malloc.h>
-#endif // BX_CONFIG_ALLOCATOR_CRT
-
 #if BX_CONFIG_ALLOCATOR_DEBUG
 #	define BX_ALLOC(_allocator, _size)                         bx::alloc(_allocator, _size, 0, __FILE__, __LINE__)
 #	define BX_REALLOC(_allocator, _ptr, _size)                 bx::realloc(_allocator, _ptr, _size, 0, __FILE__, __LINE__)
@@ -144,70 +140,6 @@ namespace bx
 			free(_allocator, _object, _align, _file, _line);
 		}
 	}
-
-#if BX_CONFIG_ALLOCATOR_CRT
-	class CrtAllocator : public AllocatorI
-	{
-	public:
-		CrtAllocator()
-		{
-		}
-
-		virtual ~CrtAllocator()
-		{
-		}
-
-		virtual void* realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line) BX_OVERRIDE
-		{
-			if (0 == _size)
-			{
-				if (NULL != _ptr)
-				{
-					if (BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT >= _align)
-					{
-						::free(_ptr);
-						return NULL;
-					}
-
-#	if BX_COMPILER_MSVC
-					BX_UNUSED(_file, _line);
-					_aligned_free(_ptr);
-#	else
-					bx::alignedFree(this, _ptr, _align, _file, _line);
-#	endif // BX_
-				}
-
-				return NULL;
-			}
-			else if (NULL == _ptr)
-			{
-				if (BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT >= _align)
-				{
-					return ::malloc(_size);
-				}
-
-#	if BX_COMPILER_MSVC
-				BX_UNUSED(_file, _line);
-				return _aligned_malloc(_size, _align);
-#	else
-				return bx::alignedAlloc(this, _size, _align, _file, _line);
-#	endif // BX_
-			}
-
-			if (BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT >= _align)
-			{
-				return ::realloc(_ptr, _size);
-			}
-
-#	if BX_COMPILER_MSVC
-			BX_UNUSED(_file, _line);
-			return _aligned_realloc(_ptr, _size, _align);
-#	else
-			return bx::alignedRealloc(this, _ptr, _size, _align, _file, _line);
-#	endif // BX_
-		}
-	};
-#endif // BX_CONFIG_ALLOCATOR_CRT
 
 } // namespace bx
 

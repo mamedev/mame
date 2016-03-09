@@ -118,9 +118,6 @@
 #define LOG_MEMORY      0
 #endif
 
-extern TIMER_CALLBACK(mac_adb_tick);    // macadb.c
-extern TIMER_CALLBACK(mac_pmu_tick);    // macadb.c
-
 static offs_t mac_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
 // returns non-zero if this Mac has ADB
@@ -1837,13 +1834,13 @@ void mac_state::machine_start()
 {
 	if (has_adb())
 	{
-		this->m_adb_timer = machine().scheduler().timer_alloc(FUNC(mac_adb_tick));
+		this->m_adb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_adb_tick),this));
 		this->m_adb_timer->adjust(attotime::never);
 
 		// also allocate PMU timer
 		if (ADB_IS_PM_CLASS)
 		{
-			m_pmu_send_timer = machine().scheduler().timer_alloc(FUNC(mac_pmu_tick));
+			m_pmu_send_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_pmu_tick),this));
 			this->m_adb_timer->adjust(attotime::never);
 			m_pmu_int_status = 0;
 		}

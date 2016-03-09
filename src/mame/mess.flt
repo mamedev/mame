@@ -376,6 +376,7 @@ ngen.cpp
 ngp.cpp
 nokia_3310.cpp
 notetaker.cpp
+novag6502.cpp
 ob68k1a.cpp
 octopus.cpp
 odyssey2.cpp
@@ -542,7 +543,6 @@ sun3.cpp
 sun4.cpp
 super6.cpp
 super80.cpp
-supercon.cpp
 superslave.cpp
 supracan.cpp
 sv8000.cpp

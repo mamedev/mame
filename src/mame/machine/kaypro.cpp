@@ -165,10 +165,10 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 READ8_MEMBER(kaypro_state::kaypro_sio_r)
 {
 	if (offset == 1)
-		return kay_kbd_d_r(machine());
+		return kay_kbd_d_r();
 	else
 	if (offset == 3)
-		return kay_kbd_c_r(machine());
+		return kay_kbd_c_r();
 	else
 		return m_sio->cd_ba_r(space, offset);
 }
@@ -176,7 +176,7 @@ READ8_MEMBER(kaypro_state::kaypro_sio_r)
 WRITE8_MEMBER(kaypro_state::kaypro_sio_w)
 {
 	if (offset == 1)
-		kay_kbd_d_w(machine(), data);
+		kay_kbd_d_w(data);
 	else
 		m_sio->cd_ba_w(space, offset, data);
 }

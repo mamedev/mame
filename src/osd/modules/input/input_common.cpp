@@ -33,13 +33,16 @@
 #include <windows.h>
 #define KEY_TRANS_ENTRY0(mame, sdlsc, sdlkey, disc, virtual, ascii, UI) { ITEM_ID_##mame, KEY_ ## disc, virtual, ascii, "ITEM_ID_"#mame, (char *) UI }
 #define KEY_TRANS_ENTRY1(mame, sdlsc, sdlkey, disc, virtual, ascii)     { ITEM_ID_##mame, KEY_ ## disc, virtual, ascii, "ITEM_ID_"#mame, (char*) #mame }
-#else
+#elif defined(OSD_SDL)
 // SDL include
 #include <sdlinc.h>
 #define KEY_TRANS_ENTRY0(mame, sdlsc, sdlkey, disc, virtual, ascii, UI) { ITEM_ID_##mame, SDL_SCANCODE_ ## sdlsc, SDLK_ ## sdlkey, ascii, "ITEM_ID_"#mame, (char *) UI }
 #define KEY_TRANS_ENTRY1(mame, sdlsc, sdlkey, disc, virtual, ascii)     { ITEM_ID_##mame, SDL_SCANCODE_ ## sdlsc, SDLK_ ## sdlkey, ascii, "ITEM_ID_"#mame, (char*) #mame }
+#else
+// osd mini
 #endif
 
+#if defined(OSD_WINDOWS) || defined(OSD_SDL)
 key_trans_entry keyboard_trans_table::s_default_table[] =
 {
 	//              MAME key       sdl scancode  sdl key       di scancode     virtual key     ascii     ui
@@ -181,7 +184,14 @@ keyboard_trans_table::keyboard_trans_table()
 	m_table = s_default_table;
 	m_table_size = ARRAY_LENGTH(s_default_table);
 }
+#else
+keyboard_trans_table::keyboard_trans_table()
+{
+	m_table = nullptr;
+	m_table_size = 0;
+}
 
+#endif
 // public constructor to allow creation of non-default instances
 keyboard_trans_table::keyboard_trans_table(std::unique_ptr<key_trans_entry[]> entries, unsigned int size)
 {

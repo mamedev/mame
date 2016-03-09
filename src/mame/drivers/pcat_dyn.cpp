@@ -4,28 +4,19 @@
 
 Tournament Solitaire (c) 1995 Dynamo
 
-Unmodified 486 PC-AT HW. Input uses a trackball device that isn't PC standard afaik.
+Unmodified 486 PC-AT HW.
 
 Jet Way Information Co. OP495SLC motherboard
  - AMD Am486-DX40 CPU
  - Trident TVGA9000i video card
+ - Breve Technologies audio adapter
+ - CH Products RollerMouse serial trackball
 
 preliminary driver by Angelo Salese
 
-TODO:
-- Returns CMOS checksum error, can't enter into BIOS setup screens to set that up ... it's certainly a MESS-to-MAME
-  conversion bug or a keyboard device issue, since it works fine in MESS. (Update: it's the keyboard device)
-
-keyboard trick;
-- Set 0x41c to zero then set the scancode accordingly:
-- bp f1699 ah = 0x3b
-- bp f53b9 al = scancode
-- bp f08d9 ah = scancode
-
-0x48 is up 0x4d is down 0x50 is right 0x4b is left
-0x3c/0x3d is pageup/pagedown
-0x01 is esc
-0x0d is enter
+Notes:
+Data from the 99378275.SN file on the rom filesystem is scrambled and written to DF80:0000-0100 then read back.
+If the output isn't satisfactory, it prints "I/O BOARD FAILURE".
 
 ********************************************************************************************************************/
 
@@ -34,6 +25,10 @@ keyboard trick;
 #include "machine/pcshare.h"
 #include "video/pc_vga.h"
 #include "machine/bankdev.h"
+#include "machine/ds128x.h"
+#include "machine/ins8250.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/ser_mouse.h"
 
 class pcat_dyn_state : public pcat_base_state
 {
@@ -66,7 +61,8 @@ static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, pcat_dyn_state )
     AM_RANGE(0x000d0000, 0x000d0fff) AM_ROM AM_REGION("game_prg", 0x0000) AM_WRITE8(bank1_w, 0xffffffff)
     AM_RANGE(0x000d1000, 0x000d1fff) AM_ROM AM_REGION("game_prg", 0x1000) AM_WRITE8(bank2_w, 0xffffffff)
 	AM_RANGE(0x000d2000, 0x000d3fff) AM_DEVICE("bank1", address_map_bank_device, amap32)
-	AM_RANGE(0x000d2000, 0x000d4fff) AM_DEVICE("bank2", address_map_bank_device, amap32)
+	AM_RANGE(0x000d3000, 0x000d4fff) AM_DEVICE("bank2", address_map_bank_device, amap32)
+	AM_RANGE(0x000df400, 0x000df8ff) AM_RAM //I/O board?
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("bios", 0 )
 	AM_RANGE(0x00100000, 0x001fffff) AM_RAM
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
@@ -77,6 +73,7 @@ static ADDRESS_MAP_START( pcat_io, AS_IO, 32, pcat_dyn_state )
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16550", ns16550_device, ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bank_map, AS_0, 32, pcat_dyn_state )
@@ -117,6 +114,9 @@ static INPUT_PORTS_START( pcat_dyn )
 	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
 
+static SLOT_INTERFACE_START(pcat_dyn_com)
+	SLOT_INTERFACE("msmouse", MSFT_SERIAL_MOUSE)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( pcat_dyn, pcat_dyn_state )
 	/* basic machine hardware */
@@ -132,6 +132,11 @@ static MACHINE_CONFIG_START( pcat_dyn, pcat_dyn_state )
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 
+	MCFG_DEVICE_REMOVE("rtc")
+	MCFG_DS12885_ADD("rtc")
+	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir0_w))
+	MCFG_MC146818_CENTURY_INDEX(0x32)
+
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
@@ -144,6 +149,19 @@ static MACHINE_CONFIG_START( pcat_dyn, pcat_dyn_state )
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(20)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+
+	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL_1_8432MHz )
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
+	MCFG_RS232_PORT_ADD( "serport", pcat_dyn_com, "msmouse" )
+	MCFG_SLOT_FIXED(true)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, cts_w))
 MACHINE_CONFIG_END
 
 /***************************************
@@ -166,6 +184,10 @@ ROM_START(toursol)
 	ROM_LOAD("sol.u23", 0x80000, 0x40000, CRC(d1e39bd4) SHA1(39c7ee43cddb53fba0f7c0572ddc40289c4edd07))
 	ROM_LOAD("sol.u24", 0xa0000, 0x40000, CRC(555341e0) SHA1(81fee576728855e234ff7aae06f54ae9705c3ab5))
 	ROM_LOAD("sol.u28", 0xe0000, 0x02000, CRC(c9374d50) SHA1(49173bc69f70bb2a7e8af9d03e2538b34aa881d8))
+	ROM_FILL(0x2a3e6, 1, 0xeb) // skip prot(?) check
+
+	ROM_REGION(128, "rtc", 0)
+	ROM_LOAD("rtc", 0, 128, BAD_DUMP CRC(732f64c8) SHA1(5386eac3afef9b16af8dd7766e577f7ac700d9cc))
 ROM_END
 
 
@@ -183,6 +205,9 @@ ROM_START(toursol1)
 	ROM_LOAD("prom.2", 0x80000, 0x40000, CRC(8b0ac5cf) SHA1(1c2b6a53c9ff4d18a5227d899facbbc719f40205))
 	ROM_LOAD("prom.3", 0xa0000, 0x40000, CRC(9352e965) SHA1(2bfb647ec27c60a8c821fdf7483199e1a444cea8))
 	ROM_LOAD("prom.7", 0xe0000, 0x02000, CRC(154c8092) SHA1(4439ee82f36d5d5c334494ba7bb4848e839213a7))
+
+	ROM_REGION(128, "rtc", 0)
+	ROM_LOAD("rtc", 0, 128, BAD_DUMP CRC(732f64c8) SHA1(5386eac3afef9b16af8dd7766e577f7ac700d9cc))
 ROM_END
 
 

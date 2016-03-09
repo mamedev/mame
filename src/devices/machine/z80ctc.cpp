@@ -303,7 +303,7 @@ void z80ctc_device::ctc_channel::start(z80ctc_device *device, int index)
 	// initialize state
 	m_device = device;
 	m_index = index;
-	m_timer = m_device->machine().scheduler().timer_alloc(FUNC(static_timer_callback), this);
+	m_timer = m_device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ctc_device::ctc_channel::timer_callback), this));
 
 	// register for save states
 	m_device->save_item(NAME(m_mode), m_index);
@@ -478,7 +478,7 @@ void z80ctc_device::ctc_channel::trigger(UINT8 data)
 			{
 				// if we hit zero, do the same thing as for a timer interrupt
 				if (--m_down == 0)
-					timer_callback();
+					timer_callback(nullptr,0);
 			}
 		}
 	}
@@ -490,7 +490,7 @@ void z80ctc_device::ctc_channel::trigger(UINT8 data)
 //  side-effects
 //-------------------------------------------------
 
-void z80ctc_device::ctc_channel::timer_callback()
+TIMER_CALLBACK_MEMBER(z80ctc_device::ctc_channel::timer_callback)
 {
 	// down counter has reached zero - see if we should interrupt
 	if ((m_mode & INTERRUPT) == INTERRUPT_ON)

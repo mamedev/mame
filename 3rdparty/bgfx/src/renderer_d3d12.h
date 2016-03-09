@@ -6,10 +6,14 @@
 #ifndef BGFX_RENDERER_D3D12_H_HEADER_GUARD
 #define BGFX_RENDERER_D3D12_H_HEADER_GUARD
 
-#define USE_D3D12_DYNAMIC_LIB 1
+#define USE_D3D12_DYNAMIC_LIB BX_PLATFORM_WINDOWS
 
 #include <sal.h>
-#include <d3d12.h>
+#if BX_PLATFORM_XBOXONE
+#	include <d3d12_x.h>
+#else
+#	include <d3d12.h>
+#endif // BX_PLATFORM_XBOXONE
 
 #if defined(__MINGW32__) // BK - temp workaround for MinGW until I nuke d3dx12 usage.
 extern "C++" {
@@ -27,10 +31,20 @@ extern "C++" {
 
 BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wmissing-field-initializers");
-#include <d3dx12.h>
+#if BX_PLATFORM_XBOXONE
+#	include <d3dx12_x.h>
+#else
+#	include <d3dx12.h>
+#endif // BX_PLATFORM_XBOXONE
 BX_PRAGMA_DIAGNOSTIC_POP();
 
-#include <dxgi1_4.h>
+#if BX_PLATFORM_WINDOWS
+#	include <dxgi1_4.h>
+#endif // BX_PLATFORM_WINDOWS
+
+#ifndef D3D12_TEXTURE_DATA_PITCH_ALIGNMENT
+#	define D3D12_TEXTURE_DATA_PITCH_ALIGNMENT 1024
+#endif // D3D12_TEXTURE_DATA_PITCH_ALIGNMENT
 
 #include "renderer.h"
 #include "renderer_d3d.h"
@@ -173,7 +187,6 @@ namespace bgfx { namespace d3d12
 		}
 
 		void create(const Memory* _mem);
-		DWORD* getShaderCode(uint8_t _fragmentBit, const Memory* _mem);
 
 		void destroy()
 		{

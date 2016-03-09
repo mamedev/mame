@@ -464,30 +464,10 @@ void rtc65271_device::field_interrupts()
 
 
 /*
-    Timer handlers
-*/
-TIMER_CALLBACK( rtc65271_device::rtc_SQW_callback )
-{
-	rtc65271_device *rtc = reinterpret_cast<rtc65271_device *>(ptr);
-	rtc->rtc_SQW_cb();
-}
-
-TIMER_CALLBACK( rtc65271_device::rtc_begin_update_callback )
-{
-	rtc65271_device *rtc = reinterpret_cast<rtc65271_device *>(ptr);
-	rtc->rtc_begin_update_cb();
-}
-
-TIMER_CALLBACK( rtc65271_device::rtc_end_update_callback )
-{
-	rtc65271_device *rtc = reinterpret_cast<rtc65271_device *>(ptr);
-	rtc->rtc_end_update_cb();
-}
-/*
     Update SQW output state each half-period and assert periodic interrupt each
     period.
 */
-void rtc65271_device::rtc_SQW_cb()
+TIMER_CALLBACK_MEMBER(rtc65271_device::rtc_SQW_cb)
 {
 	attotime half_period;
 
@@ -506,14 +486,14 @@ void rtc65271_device::rtc_SQW_cb()
 /*
     Begin update cycle (called every second)
 */
-void rtc65271_device::rtc_begin_update_cb()
+TIMER_CALLBACK_MEMBER(rtc65271_device::rtc_begin_update_cb)
 {
 	if (((m_regs[reg_A] & reg_A_DV) == 0x20) && ! (m_regs[reg_B] & reg_B_SET))
 	{
 		m_regs[reg_A] |= reg_A_UIP;
 
 		/* schedule end of update cycle */
-		machine().scheduler().timer_set(UPDATE_CYCLE_TIME, FUNC(rtc_end_update_callback), 0, (void *)this);
+		machine().scheduler().timer_set(UPDATE_CYCLE_TIME, timer_expired_delegate(FUNC(rtc65271_device::rtc_end_update_cb), this));
 	}
 }
 
@@ -521,7 +501,7 @@ void rtc65271_device::rtc_begin_update_cb()
     End update cycle (called UPDATE_CYCLE_TIME = 1948us after start of update
     cycle)
 */
-void rtc65271_device::rtc_end_update_cb()
+TIMER_CALLBACK_MEMBER(rtc65271_device::rtc_end_update_cb)
 {
 	static const int days_in_month_table[12] =
 	{
@@ -684,9 +664,9 @@ rtc65271_device::rtc65271_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 void rtc65271_device::device_start()
 {
-	m_update_timer = machine().scheduler().timer_alloc(FUNC(rtc_begin_update_callback), (void *)this);
+	m_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rtc65271_device::rtc_begin_update_cb), this));
 	m_update_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
-	m_SQW_timer = machine().scheduler().timer_alloc(FUNC(rtc_SQW_callback), (void *)this);
+	m_SQW_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rtc65271_device::rtc_SQW_cb), this));
 	m_interrupt_cb.resolve();
 
 	save_item(NAME(m_regs));

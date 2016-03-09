@@ -99,6 +99,14 @@ inline BENCHMARK_ALWAYS_INLINE int64_t Now() {
   _asm rdtsc
 #elif defined(COMPILER_MSVC)
   return __rdtsc();
+#elif defined(__aarch64__)
+  // System timer of ARMv8 runs at a different frequency than the CPU's.
+  // The frequency is fixed, typically in the range 1-50MHz.  It can be
+  // read at CNTFRQ special register.  We assume the OS has set up
+  // the virtual timer properly.
+  int64_t virtual_timer_value;
+  asm volatile("mrs %0, cntvct_el0" : "=r"(virtual_timer_value));
+  return virtual_timer_value;
 #elif defined(__ARM_ARCH)
 #if (__ARM_ARCH >= 6)  // V6 is the earliest arch that has a standard cyclecount
   uint32_t pmccntr;

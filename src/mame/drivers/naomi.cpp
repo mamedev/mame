@@ -1894,7 +1894,7 @@ WRITE64_MEMBER(naomi_state::aw_modem_w )
 	            cc/dd - set type of Maple devices at ports 2/3 (EX. IO board)
 	        0 - regular Atomiswave controller
 	        1 - DC lightgun
-	        2 - DC mouse/trackball
+	        2,3 - DC mouse/trackball
 	        TODO: hook this then MAME have such devices emulated
 
 	        0x00600288 rw 0000dcba
@@ -1906,7 +1906,7 @@ WRITE64_MEMBER(naomi_state::aw_modem_w )
 	        0x0060028C rw POUT CN304 (EX. IO board)
 	*/
 
-	osd_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
+	osd_printf_verbose("%s",string_format("MODEM: [%08x=%x] write %I64x to %x, mask %I64x\n", 0x600000+reg*4, dat, data, offset, mem_mask).c_str());
 }
 
 static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, naomi_state )
@@ -8844,6 +8844,10 @@ ROM_END
  *
  *********************************************/
 
+// note: games with AW-NET features, i.e. NGBC or KOF NW, have "CUSTOMER ID" data (shown in NETWORK SETTINGS) in ROM @ 7FE000 (not encrypted, 8 bytes of data followed by 2 bytes of bytesumm)
+// EN cartridges have this area empty (FF-filled), i.e. AW-NET features not used.
+// JP cartridges have it filled with unique ID, which also means dumps of several JP cartridges will differ by this few bytes.
+
 DRIVER_INIT_MEMBER(naomi_state,atomiswave)
 {
 	UINT64 *ROM = (UINT64 *)memregion("awflash")->base();
@@ -9069,7 +9073,7 @@ ROM_START( ngbc )
 	ROM_LOAD( "ax3301f01.bin", 0, 4, CRC(9afe949b) SHA1(4f7b039f3287da61a53a2d012993bfb57e1459bd) )
 ROM_END
 
-// JP cartridge have only few bytes difference - "CUSTOMER ID" field filled, probably used in online features for machine identification.
+// same as above EN-dump, but CustomerID not FF-filled
 // Build:Jun 25 2005 17:00:38
 ROM_START( ngbcj )
 	AW_BIOS

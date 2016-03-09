@@ -111,13 +111,11 @@ private:
 	void do_transfer_write();
 	void do_search();
 
-	static TIMER_CALLBACK( static_timerproc ) { reinterpret_cast<z80dma_device *>(ptr)->timerproc(); }
-	void timerproc();
+	TIMER_CALLBACK_MEMBER(timerproc);
 
 	void update_status();
 
-	static TIMER_CALLBACK( static_rdy_write_callback ) { reinterpret_cast<z80dma_device *>(ptr)->rdy_write_callback(param); }
-	void rdy_write_callback(int state);
+	TIMER_CALLBACK_MEMBER(rdy_write_callback);
 
 	// internal state
 	devcb_write_line   m_out_busreq_cb;

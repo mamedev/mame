@@ -251,7 +251,8 @@ UINT8 hh_cop400_state::read_inputs(int columns)
   * COP421 MCU label ~/927 COP421-NEZ/N
   * 4 lamps, 1-bit sound
   
-  This is a Simon clone, the tones are not harmonic.
+  This is a Simon clone, the tones are not harmonic. Two models exist, each
+  with a different batteries setup, assume they're same otherwise.
 
 ***************************************************************************/
 
@@ -321,7 +322,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( ctstein, ctstein_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP421, 850000) // approximation - RC osc. R=12K to +6V, C=100pf to GND
+	MCFG_CPU_ADD("maincpu", COP421, 860000) // approximation - RC osc. R=12K to +6V, C=100pf to GND
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_G_CB(WRITE8(ctstein_state, write_g))
 	MCFG_COP400_WRITE_L_CB(WRITE8(ctstein_state, write_l))
@@ -343,9 +344,14 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Head to Head Basketball
+  Coleco Head to Head Basketball/Hockey/Soccer
   * COP420 MCU label COP420L-NEZ/N
   * 2-digit 7seg display, 41 other leds, 1-bit sound
+  
+  3 Head to Head games were released using this MCU/ROM. They play very much
+  the same, only differing on game time.
+  
+  An earlier revision of this game runs on TMS1000.
   
 ***************************************************************************/
 
@@ -356,7 +362,6 @@ public:
 		: hh_cop400_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_g);
 	DECLARE_WRITE8_MEMBER(write_l);
@@ -366,44 +371,38 @@ public:
 
 // handlers
 
-void h2hbaskb_state::prepare_display()
-{
-	// D2,D3 double as multiplexer
-	UINT16 mask = ((m_d >> 2 & 1) * 0xf) | ((m_d << 1 & 0x10) * 0xf);
-	UINT16 sel = (m_g | m_d << 4 | m_g << 8 | m_d << 12) & mask;
-	
-	// D2+G0,G1 are 7segs
-	set_display_segmask(3, 0x7f);
-	display_matrix(7, 16, m_l, sel);
-}
-
 WRITE8_MEMBER(h2hbaskb_state::write_d)
 {
 	// D: led select
 	m_d = data & 0xf;
-	prepare_display();
 }
 
 WRITE8_MEMBER(h2hbaskb_state::write_g)
 {
 	// G: led select, input mux
-	m_inp_mux = data;
+	m_inp_mux = ~data;
 	m_g = data & 0xf;
-	prepare_display();
 }
 
 WRITE8_MEMBER(h2hbaskb_state::write_l)
 {
-	// L0-L6: digit segments A-G
-	// L0-L4: led data
-	m_l = data;
-	prepare_display();
+	// D2,D3 double as multiplexer
+	UINT16 mask = ((m_d >> 2 & 1) * 0x00ff) | ((m_d >> 3 & 1) * 0xff00);
+	UINT16 sel = (m_g | m_d << 4 | m_g << 8 | m_d << 12) & mask;
+	
+	// D2+G0,G1 are 7segs
+	set_display_segmask(3, 0x7f);
+
+	// L0-L6: digit segments A-G, L0-L4: led data
+	// strobe display
+	display_matrix(7, 16, data, sel);
+	display_matrix(7, 16, 0, sel);
 }
 
 READ8_MEMBER(h2hbaskb_state::read_in)
 {
 	// IN: multiplexed inputs
-	return read_inputs(4);
+	return (read_inputs(4) & 7) | (m_inp_matrix[4]->read() & 8);
 }
 
 WRITE_LINE_MEMBER(h2hbaskb_state::write_so)
@@ -417,34 +416,42 @@ WRITE_LINE_MEMBER(h2hbaskb_state::write_so)
 
 static INPUT_PORTS_START( h2hbaskb )
 	PORT_START("IN.0") // G0 port IN
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Pass CW") // clockwise
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Pass CCW") // counter-clockwise
+	PORT_CONFNAME( 0x04, 0x04, "Players" )
+	PORT_CONFSETTING(    0x04, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
 
 	PORT_START("IN.1") // G1 port IN
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Shoot")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Start/Display")
+	PORT_BIT( 0x04, 0x04, IPT_SPECIAL ) PORT_CONDITION("IN.4", 0x04, EQUALS, 0x04)
 
 	PORT_START("IN.2") // G2 port IN
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Defense Right")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Defense Left")
+	PORT_CONFNAME( 0x04, 0x04, "Skill Level" )
+	PORT_CONFSETTING(    0x04, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
 
 	PORT_START("IN.3") // G3 port IN
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Right") // only for hockey/soccer
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Left") // "
+	PORT_CONFNAME( 0x04, 0x04, "Factory Test" )
+	PORT_CONFSETTING(    0x04, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN.4") // G1+IN2, IN3 (factory set)
+	PORT_CONFNAME( 0x0c, 0x00, "Game" )
+	PORT_CONFSETTING(    0x00, "Basketball" )
+	PORT_CONFSETTING(    0x08, "Hockey" )
+	PORT_CONFSETTING(    0x0c, "Soccer" )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( h2hbaskb, h2hbaskb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP420, 1000000) // approximation - RC osc. R=43K to +9V, C=101pf to GND
+	MCFG_CPU_ADD("maincpu", COP420, 1600000) // approximation - RC osc. R=43K to +9V, C=101pf to GND
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(h2hbaskb_state, write_d))
 	MCFG_COP400_WRITE_G_CB(WRITE8(h2hbaskb_state, write_g))
@@ -1037,7 +1044,7 @@ ROM_END
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1979, ctstein,   0,        0, ctstein,   ctstein,   driver_device, 0, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, h2hbaskb,  0,        0, h2hbaskb,  h2hbaskb,  driver_device, 0, "Coleco", "Head to Head Basketball (COP420L)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1980, h2hbaskb,  0,        0, h2hbaskb,  h2hbaskb,  driver_device, 0, "Coleco", "Head to Head Basketball/Hockey/Soccer (COP420L)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, driver_device, 0, "Entex", "Space Invader (Entex, COP444)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
 
