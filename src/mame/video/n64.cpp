@@ -174,7 +174,7 @@ void n64_periphs::video_update(bitmap_rgb32 &bitmap)
 	}
 	else
 	{
-		field = 1;
+		field = 0;
 	}
 
 	switch(vi_control & 0x3)
