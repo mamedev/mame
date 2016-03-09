@@ -33696,8 +33696,6 @@ suratkj                         // GX911 (c) 1990 (Japan)
 sv8000                          // Super Vision 8000
 
 @source:svi318.cpp
-sv328n80                        // SVI-328 (NTSC) + SVI-806 80 column card
-sv328p80                        // SVI-328 (PAL) + SVI-806 80 column card
 svi318                          // SVI-318 (PAL)
 svi318n                         // SVI-318 (NTSC)
 svi328                          // SVI-328 (PAL)
