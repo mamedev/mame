@@ -1310,6 +1310,35 @@ ROM_START( lresort )
 	ROM_LOAD16_BYTE( "024-c4.c4", 0x200001, 0x080000, CRC(7382fefb) SHA1(e916dec5bb5462eb9ae9711f08c7388937abb980) ) /* Plane 2,3 */ /* TC534200 */
 ROM_END
 
+ROM_START( lresortp ) /* prototype - all roms were hand labeled with CRCs */
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "024_p1_5937.bin", 0x000001, 0x080000, CRC(8e6008ee) SHA1(6779663118782207156dc9fa9e24e81e30c6391c) )
+	ROM_LOAD16_BYTE( "024_p2_8d37.bin", 0x000000, 0x080000, CRC(6d9ee90f) SHA1(ecd42182988092417bc96db8301ea408e47735f2) )
+
+	NEO_SFIX_128K( "024_s1_22fe.bin", CRC(5cef5cc6) SHA1(9ec305007bdb356e9f8f279beae5e2bcb3f2cf7b) )
+
+	NEO_BIOS_AUDIO_128K( "024_m1_fc7a.bin", CRC(22122875) SHA1(540c21559163381467679f836cb068adaf526659) )
+
+	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_LOAD( "024_v11_b085.bin", 0x000000, 0x080000, CRC(0722da38) SHA1(66a9b463d5277908b3a01c03de82b3de9118f2cb) ) // 024_v11_b085.bin            024-v1.v1    [1/2]      IDENTICAL
+	ROM_LOAD( "024_v12_d3b7.bin", 0x080000, 0x080000, CRC(670ce3ec) SHA1(9004aa85d4a9b0ecf9cf9357b073ed55a98fdb02) ) // 024_v12_d3b7.bin            024-v1.v1    [2/2]      IDENTICAL
+	ROM_LOAD( "024_v13_a31e.bin", 0x100000, 0x080000, CRC(2e39462b) SHA1(b0a9b1a3377bf0369f3020192505c46ca52927d6) ) // 024_v13_a31e.bin            024-v2.v2    [1/2]      IDENTICAL
+	ROM_LOAD( "024_v24_2f0f.bin", 0x180000, 0x080000, CRC(7944754f) SHA1(d42a46c5127c6c62041ebffb0007af8a24abd360) ) // 024_v24_2f0f.bin            024-v2.v2    [2/2]      IDENTICAL
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x400000, "sprites", 0 ) // note, ROM_LOAD32_BYTE
+	ROM_LOAD32_BYTE( "024_c1_b764.bin", 0x000000, 0x80000, CRC(677749ec) SHA1(6f94675e037956a380652ab1056e6f1dec605bec) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "024_c2_1951.bin", 0x000002, 0x80000, CRC(104d7b59) SHA1(404e8776ee8df4ca282eb7b747759af8628ddca1) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "024_c3_0f63.bin", 0x000001, 0x80000, CRC(b0965a74) SHA1(e8026dd4f722ccab9c913261d09ab8843ef56a0e) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "024_c4_c5b5.bin", 0x000003, 0x80000, CRC(dcfc3860) SHA1(8443b455ae8de656adab57f3b7e68919f22d3b9d) ) /* Plane 3 */
+	ROM_LOAD32_BYTE( "024_c5_dd03.bin", 0x200000, 0x80000, CRC(50322397) SHA1(3308fbe48ad165b9894a52fc3a8d9898bbbc0c0e) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "024_c6_c81a.bin", 0x200002, 0x80000, CRC(c3c93894) SHA1(f23b9d7e2b54d44c96370dde282bdf45cebd9cba) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "024_c7_5edc.bin", 0x200001, 0x80000, CRC(21faf72b) SHA1(00bf257b06180ae6ede57744cea6257b3488d9f0) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "024_c8_0850.bin", 0x200003, 0x80000, CRC(fb57217b) SHA1(607a98da754e8b1dd94a6432b21a36cc38e06a0f) ) /* Plane 3 */
+ROM_END
+
+
 /****************************************
  ID-0025
  . NGM-025
@@ -9638,6 +9667,7 @@ GAME( 1990, joyjoy,     neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neoge
 GAME( 1991, quizdais,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Quiz Daisousa Sen - The Last Count Down (NGM-023)(NGH-023)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, quizdaisk,  quizdais, neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Quiz Daisousa Sen - The Last Count Down (Korean release)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, lresort,    neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Last Resort", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, lresortp,   lresort,  neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Last Resort (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, eightman,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK / Pallas", "Eight Man (NGM-025)(NGH-025)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, legendos,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Legend of Success Joe / Ashita no Joe Densetsu", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, 2020bb,     neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK / Pallas", "2020 Super Baseball (set 1)", MACHINE_SUPPORTS_SAVE )
