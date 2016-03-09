@@ -28448,6 +28448,9 @@ pkunwarj                        // UPL-????? (c) 1985 (Arcade Game TV List - P.9
 raiders5                        // UPL-85004 (c) 1985
 raiders5t                       // UPL-85004 (c) 1985 Taito license
 
+@source:novag6502.cpp
+supercon                        // 
+
 @source:nsm.cpp
 firebird                        // 
 
@@ -33605,9 +33608,6 @@ superchs                        // D46 (c) 1992 Taito Corporation Japan (World)
 superchsj                       // D46 (c) 1992 Taito Corporation (Japan)
 superchsp                       // prototype
 superchsu                       // D46 (c) 1992 Taito America Corporation (US)
-
-@source:supercon.cpp
-supercon                        // 
 
 @source:supercrd.cpp
 fruitstr                        // (c) 1992 Fun World

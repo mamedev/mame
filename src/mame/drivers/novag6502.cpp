@@ -2,8 +2,14 @@
 // copyright-holders:hap
 /******************************************************************************
 
-    Novag Super Constellation Chess Computer (model 844)
+    Novag generic 6502 based chess computer driver
+    
+    TODO:
+    - move other Novag sets here when applicable
 
+-------------------------------------------------------------------------------
+
+Super Constellation Chess Computer (model 844):
 - UMC UM6502C @ 4 MHz (8MHz XTAL), 600Hz IRQ(source unknown?)
 - 2*2KB RAM TC5516APL-2 battery-backed, 2*32KB ROM custom label
 - TTL, buzzer, 24 LEDs, 8*8 chessboard buttons
@@ -20,10 +26,10 @@
 #include "supercon.lh"
 
 
-class supercon_state : public driver_device
+class novag6502_state : public driver_device
 {
 public:
-	supercon_state(const machine_config &mconfig, device_type type, const char *tag)
+	novag6502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_beeper(*this, "beeper"),
@@ -79,7 +85,7 @@ protected:
 
 // machine start/reset
 
-void supercon_state::machine_start()
+void novag6502_state::machine_start()
 {
 	// zerofill
 	memset(m_display_state, 0, sizeof(m_display_state));
@@ -106,7 +112,7 @@ void supercon_state::machine_start()
 	save_item(NAME(m_led_data));
 }
 
-void supercon_state::machine_reset()
+void novag6502_state::machine_reset()
 {
 }
 
@@ -121,7 +127,7 @@ void supercon_state::machine_reset()
 // The device may strobe the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
 
-void supercon_state::display_update()
+void novag6502_state::display_update()
 {
 	UINT32 active_state[0x20];
 
@@ -174,7 +180,7 @@ void supercon_state::display_update()
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(supercon_state::display_decay_tick)
+TIMER_DEVICE_CALLBACK_MEMBER(novag6502_state::display_decay_tick)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
@@ -185,13 +191,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(supercon_state::display_decay_tick)
 	display_update();
 }
 
-void supercon_state::set_display_size(int maxx, int maxy)
+void novag6502_state::set_display_size(int maxx, int maxy)
 {
 	m_display_maxx = maxx;
 	m_display_maxy = maxy;
 }
 
-void supercon_state::set_display_segmask(UINT32 digits, UINT32 mask)
+void novag6502_state::set_display_segmask(UINT32 digits, UINT32 mask)
 {
 	// set a segment mask per selected digit, but leave unselected ones alone
 	for (int i = 0; i < 0x20; i++)
@@ -202,7 +208,7 @@ void supercon_state::set_display_segmask(UINT32 digits, UINT32 mask)
 	}
 }
 
-void supercon_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update)
+void novag6502_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
@@ -217,7 +223,7 @@ void supercon_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 
 // generic input handlers
 
-UINT16 supercon_state::read_inputs(int columns)
+UINT16 novag6502_state::read_inputs(int columns)
 {
 	UINT16 ret = 0;
 
@@ -233,22 +239,22 @@ UINT16 supercon_state::read_inputs(int columns)
 /* Address maps */
 
 
-WRITE8_MEMBER(supercon_state::supercon_1c_w)
+WRITE8_MEMBER(novag6502_state::supercon_1c_w)
 {
 }
 
-WRITE8_MEMBER(supercon_state::supercon_1d_w)
+WRITE8_MEMBER(novag6502_state::supercon_1d_w)
 {
 }
 
-WRITE8_MEMBER(supercon_state::supercon_1e_w)
+WRITE8_MEMBER(novag6502_state::supercon_1e_w)
 {
 	// d0-d7: input mux, led data
 	m_inp_mux = m_led_data = data;
 	display_matrix(8, 3, m_led_data, m_led_select);
 }
 
-WRITE8_MEMBER(supercon_state::supercon_1f_w)
+WRITE8_MEMBER(novag6502_state::supercon_1f_w)
 {
 	// d4-d6: select led row
 	m_led_select = data >> 4 & 7;
@@ -259,23 +265,23 @@ WRITE8_MEMBER(supercon_state::supercon_1f_w)
 }
 
 
-READ8_MEMBER(supercon_state::supercon_1c_r)
+READ8_MEMBER(novag6502_state::supercon_1c_r)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(supercon_state::supercon_1d_r)
+READ8_MEMBER(novag6502_state::supercon_1d_r)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(supercon_state::supercon_1e_r)
+READ8_MEMBER(novag6502_state::supercon_1e_r)
 {
 	// d6,d7: multiplexed inputs (side panel)
 	return (read_inputs(8) >> 2 & 0xc0) ^ 0xff;
 }
 
-READ8_MEMBER(supercon_state::supercon_1f_r)
+READ8_MEMBER(novag6502_state::supercon_1f_r)
 {
 	// d0-d7: multiplexed inputs (chessboard squares)
 	return ~read_inputs(8) & 0xff;
@@ -284,7 +290,7 @@ READ8_MEMBER(supercon_state::supercon_1f_r)
 
 
 
-static ADDRESS_MAP_START( supercon_mem, AS_PROGRAM, 8, supercon_state )
+static ADDRESS_MAP_START( supercon_mem, AS_PROGRAM, 8, novag6502_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1c00, 0x1c00) AM_READWRITE(supercon_1c_r, supercon_1c_w)
 	AM_RANGE(0x1d00, 0x1d00) AM_READWRITE(supercon_1d_r, supercon_1d_w)
@@ -398,16 +404,16 @@ INPUT_PORTS_END
 
 /* Machine driver */
 
-static MACHINE_CONFIG_START( supercon, supercon_state )
+static MACHINE_CONFIG_START( supercon, novag6502_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_8MHz/2)
-	MCFG_CPU_PERIODIC_INT_DRIVER(supercon_state, irq0_line_hold, 600) // guessed
+	MCFG_CPU_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 600) // guessed
 	MCFG_CPU_PROGRAM_MAP(supercon_mem)
 	
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", supercon_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novag6502_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_supercon)
 
 	/* sound hardware */
