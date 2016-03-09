@@ -613,6 +613,7 @@ int core_text_file::puts(char const *s)
 
 int core_text_file::vprintf(util::format_argument_pack<std::ostream> const &args)
 {
+	m_printf_buffer.reserve(1024);
 	m_printf_buffer.seekp(0, ovectorstream::beg);
 	util::stream_format<std::ostream, std::ostream>(m_printf_buffer, args);
 	m_printf_buffer.put('\0');
