@@ -143,9 +143,9 @@ int renderer_bgfx::create()
 	if (window().m_index != 0)
 	{
 #ifdef OSD_WINDOWS
-		m_framebuffer = m_targets->create_target("backbuffer", window().m_hwnd, m_width[window().m_index], m_height[window().m_index]);
+		m_framebuffer = m_targets->create_backbuffer(window().m_hwnd, m_width[window().m_index], m_height[window().m_index]);
 #else
-		m_framebuffer = m_targets->create_target("backbuffer", sdlNativeWindowHandle(window().sdl_window()), m_width[window().m_index], m_height[window().m_index]);
+		m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(window().sdl_window()), m_width[window().m_index], m_height[window().m_index]);
 #endif
 		bgfx::touch(window().m_index);
 	}
@@ -318,12 +318,12 @@ void renderer_bgfx::render_screen_quad(int view, render_primitive* prim)
         tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
 
     bgfx_texture *texture = new bgfx_texture("screen", bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem);
-    m_textures->add_texture("screen", texture);
+    m_textures->add_provider("screen", texture);
 
     m_targets->update_guest_targets(tex_width, tex_height);
     m_screen_chain->process(prim, view, *m_textures, window().get_size().width(), window().get_size().height(), get_blend_state(PRIMFLAG_GET_BLENDMODE(prim->flags)));
 
-    m_textures->add_texture("screen", nullptr);
+    m_textures->add_provider("screen", nullptr);
     delete texture;
 }
 
@@ -809,9 +809,9 @@ int renderer_bgfx::draw(int update)
 			bgfx::reset(window().m_main->get_size().width(), window().m_main->get_size().height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 			delete m_framebuffer;
 #ifdef OSD_WINDOWS
-			m_framebuffer = m_targets->create_target("backbuffer", window().m_hwnd, m_width[index], m_height[index]);
+			m_framebuffer = m_targets->create_backbuffer(window().m_hwnd, m_width[index], m_height[index]);
 #else
-			m_framebuffer = m_targets->create_target("backbuffer", sdlNativeWindowHandle(window().sdl_window()), m_width[index], m_height[index]);
+			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(window().sdl_window()), m_width[index], m_height[index]);
 #endif
 			bgfx::setViewFrameBuffer(index, m_framebuffer->target());
 			m_dimensions = osd_dim(m_width[index], m_height[index]);
@@ -872,7 +872,7 @@ int renderer_bgfx::draw(int update)
 		if (status != BUFFER_EMPTY)
 		{
 			bgfx::setVertexBuffer(&buffer);
-			bgfx::setTexture(0, m_gui_effect[blend]->uniform("s_tex")->handle(), m_texture_cache->handle());
+			bgfx::setTexture(0, m_gui_effect[blend]->uniform("s_tex")->handle(), m_texture_cache->texture());
 			m_gui_effect[blend]->submit(index);
 		}
 
@@ -1029,7 +1029,7 @@ void renderer_bgfx::process_atlas_packs(std::vector<std::vector<rectangle_packer
 			}
 			m_hash_to_entry[rect.hash()] = rect;
 			const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(rect.format(), rect.width(), rect.height(), rect.rowpixels(), rect.palette(), rect.base());
-			bgfx::updateTexture2D(m_texture_cache->handle(), 0, rect.x(), rect.y(), rect.width(), rect.height(), mem);
+			bgfx::updateTexture2D(m_texture_cache->texture(), 0, rect.x(), rect.y(), rect.width(), rect.height(), mem);
 		}
 	}
 }

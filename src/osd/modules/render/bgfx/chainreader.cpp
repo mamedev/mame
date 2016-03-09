@@ -76,6 +76,8 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, running_machine& m
 			assert(target_array[i].HasMember("name"));
 			assert(target_array[i]["name"].IsString());
 			uint32_t mode = uint32_t(get_enum_from_value(value, "mode", TARGET_STYLE_NATIVE, STYLE_NAMES, STYLE_COUNT));
+			bool bilinear = get_bool(target_array[i], "bilinear", false);
+			bool double_buffer = get_bool(target_array[i], "doublebuffer", false);
 
 			float prescalef = 1.0f;
 			float default_prescale = 1.0f;
@@ -107,7 +109,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, running_machine& m
 			width *= prescale;
 			height *= prescale;
 
-			targets.create_target(target_array[i]["name"].GetString(), bgfx::TextureFormat::RGBA8, width, height, mode);
+			targets.create_target(target_array[i]["name"].GetString(), bgfx::TextureFormat::RGBA8, width, height, mode, double_buffer, bilinear);
 		}
 	}
 

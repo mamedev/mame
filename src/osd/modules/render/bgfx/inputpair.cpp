@@ -25,12 +25,12 @@ bgfx_input_pair::bgfx_input_pair(int index, std::string sampler, std::string tex
 
 void bgfx_input_pair::bind(bgfx_effect *effect, texture_manager& textures)
 {
-	bgfx::setTexture(m_index, effect->uniform(m_sampler)->handle(), textures.texture(m_texture)->handle());
+	bgfx::setTexture(m_index, effect->uniform(m_sampler)->handle(), textures.handle(m_texture));
 	bgfx_uniform *size_uniform = effect->uniform("u_texsize");
 	if (size_uniform != nullptr)
 	{
-		float width = float(textures.texture(m_texture)->width());
-		float height = float(textures.texture(m_texture)->height());
+		float width = float(textures.provider(m_texture)->width());
+		float height = float(textures.provider(m_texture)->height());
 		float size[4] = { 1.0f / width, 1.0f / height, 0.0f, 0.0f };
 		size_uniform->set(reinterpret_cast<void *>(size), sizeof(float) * 4);
 	}

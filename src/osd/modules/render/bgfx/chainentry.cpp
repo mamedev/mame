@@ -67,6 +67,11 @@ void bgfx_chain_entry::submit(render_primitive* prim, int view, texture_manager&
 	}
 
 	m_effect->submit(view, blend);
+
+    if (m_output != nullptr)
+    {
+        m_output->page_flip();
+    }
 }
 
 void bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t screen_height)

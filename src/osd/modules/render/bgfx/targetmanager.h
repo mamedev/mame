@@ -28,8 +28,8 @@ public:
 	target_manager(texture_manager& textures) : m_textures(textures), m_guest_width(16), m_guest_height(16) { }
 	~target_manager();
 
-	bgfx_target* create_target(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, bool filter = false);
-	bgfx_target* create_target(std::string name, void *handle, uint32_t width, uint32_t height);
+	bgfx_target* create_target(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, uint32_t style, bool double_buffer, bool filter);
+	bgfx_target* create_backbuffer(void *handle, uint32_t width, uint32_t height);
 
 	void update_guest_targets(uint16_t width, uint16_t height);
 
@@ -39,8 +39,6 @@ public:
 	uint16_t guest_height() const { return m_guest_height; }
 
 private:
-	bgfx_target* create_target(std::string name);
-
 	std::map<std::string, bgfx_target*> m_targets;
 	texture_manager& m_textures;
 

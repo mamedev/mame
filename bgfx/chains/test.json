@@ -16,11 +16,8 @@
 	"targets": [
 		{	"name": "native",
 			"mode": "native",
-			"prescale": 1
-		},
-		{	"name": "native2",
-			"mode": "native",
-			"prescale": 1
+			"prescale": 1,
+			"doublebuffer": true
 		},
 		{	"name": "previous",
 			"mode": "native",
@@ -31,8 +28,8 @@
 		{	"effect": "ratios",
 			"name": "Matrix Pass",
 			"disable_conditions": [
-				{ "type": "slider", "name": "adjustments", "value": false },
-				{ "type": "slider", "name": "ratio_amount", "value": 0 }
+				{ "type": "slider", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "name": "ratio_amount", "value": 0.0 }
 			],
 			"uniforms": [
 				{ "uniform": "u_ratio_amount", "slider": "ratio_amount" },
@@ -48,7 +45,7 @@
 		{	"effect": "tint",
 			"name": "Tint Pass",
 			"disable_conditions": [
-				{ "type": "slider", "name": "adjustments", "value": false }
+				{ "type": "slider", "name": "adjustments", "value": 0 }
 			],
 			"uniforms": [
 				{ "uniform": "u_tint", "slider": "tint" },
@@ -57,7 +54,7 @@
 			"input": [
 				{ "sampler": "s_tex", "texture": "native" }
 			],
-			"output": "native2"
+			"output": "native"
 		},
 		{	"effect": "phosphor",
 			"name": "Phosphor Decay",
@@ -70,7 +67,7 @@
 				{ "uniform": "u_phosphor", "slider": "phosphor" }
 			],
 			"input": [
-				{ "sampler": "s_tex", "texture": "native2" },
+				{ "sampler": "s_tex", "texture": "native" },
 				{ "sampler": "s_prev", "texture": "previous" }
 			],
 			"output": "native"

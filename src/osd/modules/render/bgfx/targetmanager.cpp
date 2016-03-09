@@ -25,21 +25,19 @@ target_manager::~target_manager()
 	m_targets.clear();
 }
 
-bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, bool filter)
+bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, uint32_t style, bool double_buffer, bool filter)
 {
-	bgfx_target* target = new bgfx_target(name, format, width, height, filter);
+	bgfx_target* target = new bgfx_target(name, format, width, height, style, double_buffer, filter);
 	m_targets[name] = target;
 
-	m_textures.add_texture(name, target);
+	m_textures.add_provider(name, target);
 	return target;
 }
 
-bgfx_target* target_manager::create_target(std::string name, void *handle, uint32_t width, uint32_t height)
+bgfx_target* target_manager::create_backbuffer(void *handle, uint32_t width, uint32_t height)
 {
-	bgfx_target* target = new bgfx_target(name, width, height, TARGET_STYLE_CUSTOM, handle);
-	m_targets[name] = target;
-
-	m_textures.add_texture(name, target);
+	bgfx_target* target = new bgfx_target(handle, width, height);
+	m_targets["backbuffer"] = target;
 	return target;
 }
 
@@ -71,7 +69,7 @@ void target_manager::update_guest_targets(uint16_t width, uint16_t height)
 
 		for (bgfx_target* target : to_resize)
 		{
-			m_targets[target->name()] = new bgfx_target(target->name(), target->format(), width, height, TARGET_STYLE_GUEST, target->filter());
+			m_targets[target->name()] = new bgfx_target(target->name(), target->format(), width, height, TARGET_STYLE_GUEST, target->double_buffered(), target->filter());
 			delete target;
 		}
 	}
