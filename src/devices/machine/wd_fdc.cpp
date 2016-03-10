@@ -1278,7 +1278,7 @@ void wd_fdc_t::index_callback(floppy_image_device *floppy, int state)
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
 	}
-	logerror("tick %d\n", state);
+
 	switch(sub_state) {
 	case IDLE:
 		if(motor_control || head_control) {
