@@ -27,10 +27,10 @@ Notes:
 
 #define MASTER_CLOCK XTAL_6_144MHz
 
-class toypop_state : public driver_device
+class namcos16_state : public driver_device
 {
 public:
-	toypop_state(const machine_config &mconfig, device_type type, const char *tag)
+	namcos16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_master_cpu(*this,"maincpu"),
 		m_slave_cpu(*this, "slave"),
@@ -98,7 +98,7 @@ private:
 
 };
 
-PALETTE_INIT_MEMBER(toypop_state, toypop)
+PALETTE_INIT_MEMBER(namcos16_state, toypop)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 
@@ -147,7 +147,7 @@ PALETTE_INIT_MEMBER(toypop_state, toypop)
 	}
 }
 
-void toypop_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void namcos16_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	int x, y;
 	const UINT16 pal_base = 0x300;
@@ -168,7 +168,7 @@ void toypop_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect
 	}
 }
 
-void toypop_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void namcos16_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	gfx_element *gfx_0 = m_gfxdecode->gfx(0);
 	int count;
@@ -198,64 +198,63 @@ void toypop_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect
 		UINT8 color = (m_fgattr[count] & 0x3f) + 0x40;
 
 		gfx_0->transpen(bitmap,cliprect,tile,color,0,0,x*8,y*8,0);
-
 	}
 }
 
-UINT32 toypop_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+UINT32 namcos16_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	legacy_bg_draw(bitmap,cliprect);
 	legacy_fg_draw(bitmap,cliprect);
 	return 0;
 }
 
-READ8_MEMBER(toypop_state::irq_enable_r)
+READ8_MEMBER(namcos16_state::irq_enable_r)
 {
 	m_master_irq_enable = true;
 	return 0;
 }
 
-WRITE8_MEMBER(toypop_state::irq_disable_w)
+WRITE8_MEMBER(namcos16_state::irq_disable_w)
 {
 	m_master_irq_enable = false;
 }
 
-WRITE8_MEMBER(toypop_state::slave_halt_ctrl_w)
+WRITE8_MEMBER(namcos16_state::slave_halt_ctrl_w)
 {
 	m_slave_cpu->set_input_line(INPUT_LINE_RESET,offset & 0x800 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(toypop_state::sound_halt_ctrl_w)
+WRITE8_MEMBER(namcos16_state::sound_halt_ctrl_w)
 {
 	m_sound_cpu->set_input_line(INPUT_LINE_RESET,offset & 0x800 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(toypop_state::slave_shared_r)
+READ8_MEMBER(namcos16_state::slave_shared_r)
 {
 	return m_slave_sharedram[offset];
 }
 
-WRITE8_MEMBER(toypop_state::slave_shared_w)
+WRITE8_MEMBER(namcos16_state::slave_shared_w)
 {
 	m_slave_sharedram[offset] = data;
 }
 
-WRITE16_MEMBER(toypop_state::slave_irq_enable_w)
+WRITE16_MEMBER(namcos16_state::slave_irq_enable_w)
 {
 	m_slave_irq_enable = (offset & 0x40000) ? false : true;
 }
 
-READ8_MEMBER(toypop_state::dipA_l){ return ioport("DSW1")->read(); }                // dips A
-READ8_MEMBER(toypop_state::dipA_h){ return ioport("DSW1")->read() >> 4; }           // dips A
-READ8_MEMBER(toypop_state::dipB_l){ return ioport("DSW2")->read(); }                // dips B
-READ8_MEMBER(toypop_state::dipB_h){ return ioport("DSW2")->read() >> 4; }           // dips B
+READ8_MEMBER(namcos16_state::dipA_l){ return ioport("DSW1")->read(); }                // dips A
+READ8_MEMBER(namcos16_state::dipA_h){ return ioport("DSW1")->read() >> 4; }           // dips A
+READ8_MEMBER(namcos16_state::dipB_l){ return ioport("DSW2")->read(); }                // dips B
+READ8_MEMBER(namcos16_state::dipB_h){ return ioport("DSW2")->read() >> 4; }           // dips B
 
-WRITE8_MEMBER(toypop_state::flip)
+WRITE8_MEMBER(namcos16_state::flip)
 {
 	flip_screen_set(data & 1);
 }
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, toypop_state )
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, namcos16_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("fgvram")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("fgattr")
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
@@ -273,7 +272,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, toypop_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("master_rom",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, toypop_state )
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, namcos16_state )
 	AM_RANGE(0x000000, 0x007fff) AM_ROM AM_REGION("slave_rom", 0)
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE8(slave_shared_r,slave_shared_w,0x00ff)
@@ -281,7 +280,7 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, toypop_state )
 	AM_RANGE(0x300000, 0x3fffff) AM_WRITE(slave_irq_enable_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, toypop_state )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, namcos16_state )
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("sound_rom", 0)
 ADDRESS_MAP_END
@@ -507,7 +506,7 @@ static GFXDECODE_START( toypop )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 128*4,  64 )
 GFXDECODE_END
 
-void toypop_state::machine_reset()
+void namcos16_state::machine_reset()
 {
 	m_master_irq_enable = false;
 	m_slave_irq_enable = false;
@@ -515,30 +514,30 @@ void toypop_state::machine_reset()
 	m_sound_cpu->set_input_line(INPUT_LINE_RESET,ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(toypop_state::master_vblank_irq)
+INTERRUPT_GEN_MEMBER(namcos16_state::master_vblank_irq)
 {
 	if(m_master_irq_enable == true)
 		device.execute().set_input_line(M6809_IRQ_LINE,HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(toypop_state::slave_vblank_irq)
+INTERRUPT_GEN_MEMBER(namcos16_state::slave_vblank_irq)
 {
 	if(m_slave_irq_enable == true)
 		device.execute().set_input_line(6,HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( liblrabl, toypop_state )
+static MACHINE_CONFIG_START( liblrabl, namcos16_state )
  	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", toypop_state,  master_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos16_state,  master_vblank_irq)
 
 	MCFG_CPU_ADD("slave", M68000, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(slave_map) 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", toypop_state,  slave_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos16_state,  slave_vblank_irq)
 
  	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
- 	MCFG_CPU_PERIODIC_INT_DRIVER(toypop_state,  irq0_line_hold, 60) 
+ 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos16_state,  irq0_line_hold, 60)
 	
 	
 
@@ -549,11 +548,11 @@ static MACHINE_CONFIG_START( liblrabl, toypop_state )
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
 	MCFG_DEVICE_ADD("56xx_1", NAMCO56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(READ8(toypop_state, dipA_h))
-	MCFG_NAMCO56XX_IN_1_CB(READ8(toypop_state, dipB_l))
-	MCFG_NAMCO56XX_IN_2_CB(READ8(toypop_state, dipB_h))
-	MCFG_NAMCO56XX_IN_3_CB(READ8(toypop_state, dipA_l))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(toypop_state, flip))
+	MCFG_NAMCO56XX_IN_0_CB(READ8(namcos16_state, dipA_h))
+	MCFG_NAMCO56XX_IN_1_CB(READ8(namcos16_state, dipB_l))
+	MCFG_NAMCO56XX_IN_2_CB(READ8(namcos16_state, dipB_h))
+	MCFG_NAMCO56XX_IN_3_CB(READ8(namcos16_state, dipA_l))
+	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(namcos16_state, flip))
 
 	MCFG_DEVICE_ADD("56xx_2", NAMCO56XX, 0)
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1_LEFT"))
@@ -565,13 +564,13 @@ static MACHINE_CONFIG_START( liblrabl, toypop_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(36*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(toypop_state, screen_update)
+	MCFG_SCREEN_UPDATE_DRIVER(namcos16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toypop)
 	MCFG_PALETTE_ADD("palette", 128*4+64*4+16*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(toypop_state, toypop)
+	MCFG_PALETTE_INIT_OWNER(namcos16_state, toypop)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
