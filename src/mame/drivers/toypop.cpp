@@ -39,8 +39,10 @@ public:
 		m_namco58xx(*this, "58xx"),
 		m_namco56xx_1(*this, "56xx_1"),
 		m_namco56xx_2(*this, "56xx_2"),
+		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_slave_sharedram(*this, "slave_sharedram"),
+		m_bgvram(*this, "bgvram"),
 		m_fgvram(*this, "fgvram"),
 		m_fgattr(*this, "fgattr")
 	{ }
@@ -53,15 +55,19 @@ public:
 	required_device<namco58xx_device> m_namco58xx;
 	required_device<namco56xx_device> m_namco56xx_1;
 	required_device<namco56xx_device> m_namco56xx_2;
+	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<UINT8> m_slave_sharedram;
+	required_shared_ptr<UINT16> m_bgvram;
 	required_shared_ptr<UINT8> m_fgvram;
 	required_shared_ptr<UINT8> m_fgattr;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	
 	INTERRUPT_GEN_MEMBER(master_vblank_irq);
+	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
+
 	DECLARE_READ8_MEMBER(irq_enable_r);
 	DECLARE_WRITE8_MEMBER(irq_disable_w);
 	DECLARE_PALETTE_INIT(toypop); 
@@ -75,6 +81,7 @@ public:
 	DECLARE_WRITE8_MEMBER(slave_halt_ctrl_w);
 	DECLARE_READ8_MEMBER(slave_shared_r);
 	DECLARE_WRITE8_MEMBER(slave_shared_w);
+	DECLARE_WRITE16_MEMBER(slave_irq_enable_w);
 	DECLARE_WRITE8_MEMBER(sound_halt_ctrl_w);
 protected:
 	// driver_device overrides
@@ -84,7 +91,9 @@ protected:
 //	virtual void video_start() override;
 private:
 	bool m_master_irq_enable;
+	bool m_slave_irq_enable;
 	
+	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 };
@@ -138,6 +147,27 @@ PALETTE_INIT_MEMBER(toypop_state, toypop)
 	}
 }
 
+void toypop_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
+{
+	int x, y;
+	const UINT16 pal_base = 0x300;
+	const UINT32 src_base = 0x200/2;
+	const UINT16 src_pitch = 288 / 2;
+	
+	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	{
+		UINT16 *src = &m_bgvram[y * src_pitch + cliprect.min_x + src_base];
+		UINT16 *dst = &bitmap.pix16(y, cliprect.min_x);
+
+		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
+		{
+			UINT32 srcpix = *src++;
+			*dst++ = m_palette->pen(((srcpix >> 8) & 0xf) + pal_base);
+			*dst++ = m_palette->pen((srcpix & 0xf) + pal_base);
+		}
+	}
+}
+
 void toypop_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	gfx_element *gfx_0 = m_gfxdecode->gfx(0);
@@ -167,14 +197,14 @@ void toypop_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect
 		UINT16 tile = m_fgvram[count];
 		UINT8 color = (m_fgattr[count] & 0x3f) + 0x40;
 
-			//if((color & 0x30) != 0x30)
-		gfx_0->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
+		gfx_0->transpen(bitmap,cliprect,tile,color,0,0,x*8,y*8,0);
 
 	}
 }
 
 UINT32 toypop_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	legacy_bg_draw(bitmap,cliprect);
 	legacy_fg_draw(bitmap,cliprect);
 	return 0;
 }
@@ -210,6 +240,11 @@ WRITE8_MEMBER(toypop_state::slave_shared_w)
 	m_slave_sharedram[offset] = data;
 }
 
+WRITE16_MEMBER(toypop_state::slave_irq_enable_w)
+{
+	m_slave_irq_enable = (offset & 0x40000) ? false : true;
+}
+
 READ8_MEMBER(toypop_state::dipA_l){ return ioport("DSW1")->read(); }                // dips A
 READ8_MEMBER(toypop_state::dipA_h){ return ioport("DSW1")->read() >> 4; }           // dips A
 READ8_MEMBER(toypop_state::dipB_l){ return ioport("DSW2")->read(); }                // dips B
@@ -242,6 +277,8 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, toypop_state )
 	AM_RANGE(0x000000, 0x007fff) AM_ROM AM_REGION("slave_rom", 0)
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE8(slave_shared_r,slave_shared_w,0x00ff)
+	AM_RANGE(0x190000, 0x1dffff) AM_RAM AM_SHARE("bgvram")
+	AM_RANGE(0x300000, 0x3fffff) AM_WRITE(slave_irq_enable_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, toypop_state )
@@ -473,6 +510,7 @@ GFXDECODE_END
 void toypop_state::machine_reset()
 {
 	m_master_irq_enable = false;
+	m_slave_irq_enable = false;
 	m_slave_cpu->set_input_line(INPUT_LINE_RESET,ASSERT_LINE);
 	m_sound_cpu->set_input_line(INPUT_LINE_RESET,ASSERT_LINE);
 }
@@ -483,6 +521,12 @@ INTERRUPT_GEN_MEMBER(toypop_state::master_vblank_irq)
 		device.execute().set_input_line(M6809_IRQ_LINE,HOLD_LINE);
 }
 
+INTERRUPT_GEN_MEMBER(toypop_state::slave_vblank_irq)
+{
+	if(m_slave_irq_enable == true)
+		device.execute().set_input_line(6,HOLD_LINE);
+}
+
 static MACHINE_CONFIG_START( liblrabl, toypop_state )
  	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(master_map)
@@ -490,6 +534,7 @@ static MACHINE_CONFIG_START( liblrabl, toypop_state )
 
 	MCFG_CPU_ADD("slave", M68000, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(slave_map) 
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toypop_state,  slave_vblank_irq)
 
  	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
