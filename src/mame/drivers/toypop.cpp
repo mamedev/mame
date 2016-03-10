@@ -40,6 +40,7 @@ public:
 		m_namco56xx_1(*this, "56xx_1"),
 		m_namco56xx_2(*this, "56xx_2"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_slave_sharedram(*this, "slave_sharedram"),
 		m_fgvram(*this, "fgvram"),
 		m_fgattr(*this, "fgattr")
 	{ }
@@ -54,13 +55,15 @@ public:
 	required_device<namco56xx_device> m_namco56xx_2;
 	required_device<gfxdecode_device> m_gfxdecode;
 
+	required_shared_ptr<UINT8> m_slave_sharedram;
 	required_shared_ptr<UINT8> m_fgvram;
 	required_shared_ptr<UINT8> m_fgattr;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	
-	DECLARE_READ8_MEMBER(irq_enable_r);
 	INTERRUPT_GEN_MEMBER(master_vblank_irq);
+	DECLARE_READ8_MEMBER(irq_enable_r);
+	DECLARE_WRITE8_MEMBER(irq_disable_w);
 	DECLARE_PALETTE_INIT(toypop); 
 	DECLARE_READ8_MEMBER(dipA_l);
 	DECLARE_READ8_MEMBER(dipA_h);
@@ -69,6 +72,10 @@ public:
 	//DECLARE_WRITE8_MEMBER(out_coin0);
 	//DECLARE_WRITE8_MEMBER(out_coin1);
 	DECLARE_WRITE8_MEMBER(flip);
+	DECLARE_WRITE8_MEMBER(slave_halt_ctrl_w);
+	DECLARE_READ8_MEMBER(slave_shared_r);
+	DECLARE_WRITE8_MEMBER(slave_shared_w);
+	DECLARE_WRITE8_MEMBER(sound_halt_ctrl_w);
 protected:
 	// driver_device overrides
 //	virtual void machine_start() override;
@@ -158,7 +165,7 @@ void toypop_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect
 		}
 		
 		UINT16 tile = m_fgvram[count];
-		UINT8 color = m_fgattr[count] & 0x3f;
+		UINT8 color = (m_fgattr[count] & 0x3f) + 0x40;
 
 			//if((color & 0x30) != 0x30)
 		gfx_0->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
@@ -178,6 +185,31 @@ READ8_MEMBER(toypop_state::irq_enable_r)
 	return 0;
 }
 
+WRITE8_MEMBER(toypop_state::irq_disable_w)
+{
+	m_master_irq_enable = false;
+}
+
+WRITE8_MEMBER(toypop_state::slave_halt_ctrl_w)
+{
+	m_slave_cpu->set_input_line(INPUT_LINE_RESET,offset & 0x800 ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE8_MEMBER(toypop_state::sound_halt_ctrl_w)
+{
+	m_sound_cpu->set_input_line(INPUT_LINE_RESET,offset & 0x800 ? ASSERT_LINE : CLEAR_LINE);
+}
+
+READ8_MEMBER(toypop_state::slave_shared_r)
+{
+	return m_slave_sharedram[offset];
+}
+
+WRITE8_MEMBER(toypop_state::slave_shared_w)
+{
+	m_slave_sharedram[offset] = data;
+}
+
 READ8_MEMBER(toypop_state::dipA_l){ return ioport("DSW1")->read(); }                // dips A
 READ8_MEMBER(toypop_state::dipA_h){ return ioport("DSW1")->read() >> 4; }           // dips A
 READ8_MEMBER(toypop_state::dipB_l){ return ioport("DSW2")->read(); }                // dips B
@@ -192,23 +224,24 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, toypop_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("fgvram")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("fgattr")
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
-	AM_RANGE(0x2800, 0x2fff) AM_RAM
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("slave_sharedram")
 	// TODO: 0x6xxx-0x7xxx seems to be programmable somehow (PAL?)
 	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("58xx", namco58xx_device, read, write)              
 	AM_RANGE(0x6010, 0x601f) AM_DEVREADWRITE("56xx_1", namco56xx_device, read, write)
 	AM_RANGE(0x6020, 0x602f) AM_DEVREADWRITE("56xx_2", namco56xx_device, read, write)
 	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)
-	AM_RANGE(0x7000, 0x7000) AM_READ(irq_enable_r)
+	AM_RANGE(0x7000, 0x7000) AM_READWRITE(irq_enable_r,irq_disable_w)
 
-	// 0x8000 m68k irq
-	// 0x9000 sound irq
-	// 0xa000 paletteram
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(slave_halt_ctrl_w)
+	AM_RANGE(0x9000, 0x9fff) AM_WRITE(sound_halt_ctrl_w)
+	// 0xa000 palette bank
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("master_rom",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, toypop_state )
 	AM_RANGE(0x000000, 0x007fff) AM_ROM AM_REGION("slave_rom", 0)
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE8(slave_shared_r,slave_shared_w,0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, toypop_state )
@@ -440,6 +473,8 @@ GFXDECODE_END
 void toypop_state::machine_reset()
 {
 	m_master_irq_enable = false;
+	m_slave_cpu->set_input_line(INPUT_LINE_RESET,ASSERT_LINE);
+	m_sound_cpu->set_input_line(INPUT_LINE_RESET,ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(toypop_state::master_vblank_irq)
@@ -513,8 +548,8 @@ ROM_START( liblrabl )
 	ROM_LOAD( "2c.rom",   0x0000, 0x2000, CRC(7c09e50a) SHA1(5f004d60bbb7355e008a9cda137b28bc2192b8ef) )
 
 	ROM_REGION( 0x8000, "slave_rom", 0 )
-	ROM_LOAD16_BYTE( "8c.rom",   0x0000, 0x4000, CRC(a00cd959) SHA1(cc5621103c31cfbc65941615cab391db0f74e6ce) )
-	ROM_LOAD16_BYTE("10c.rom",   0x0001, 0x4000, CRC(09ce209b) SHA1(2ed46d6592f8227bac8ab54963d9a300706ade47) )
+	ROM_LOAD16_BYTE("8c.rom",    0x0001, 0x4000, CRC(a00cd959) SHA1(cc5621103c31cfbc65941615cab391db0f74e6ce) )
+	ROM_LOAD16_BYTE("10c.rom",   0x0000, 0x4000, CRC(09ce209b) SHA1(2ed46d6592f8227bac8ab54963d9a300706ade47) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "5p.rom",   0x0000, 0x2000, CRC(3b4937f0) SHA1(06d9de576f1c2262c34aeb91054e68c9298af688) )
@@ -542,8 +577,8 @@ ROM_START( toypop )
 	ROM_LOAD( "tp1-3.2c", 0x0000, 0x2000, CRC(5f3bf6e2) SHA1(d1b3335661b9b23cb10001416c515b77b5e783e9) )
 
 	ROM_REGION( 0x8000, "slave_rom", 0 )
-	ROM_LOAD16_BYTE( "tp1-4.8c", 0x0000, 0x4000, CRC(76997db3) SHA1(5023a2f20a5f2c9baff130f6832583493c71f883) )
-	ROM_LOAD16_BYTE("tp1-5.10c", 0x0001, 0x4000, CRC(37de8786) SHA1(710365e34c05d01815844c414518f93234b6160b) )
+	ROM_LOAD16_BYTE("tp1-4.8c",  0x0001, 0x4000, CRC(76997db3) SHA1(5023a2f20a5f2c9baff130f6832583493c71f883) )
+	ROM_LOAD16_BYTE("tp1-5.10c", 0x0000, 0x4000, CRC(37de8786) SHA1(710365e34c05d01815844c414518f93234b6160b) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "tp1-7.5p", 0x0000, 0x2000, CRC(95076f9e) SHA1(1e3d32b21f6d46591ec3921aba51f672d64a9023) )
