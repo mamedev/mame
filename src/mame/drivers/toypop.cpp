@@ -538,7 +538,7 @@ static MACHINE_CONFIG_START( liblrabl, toypop_state )
 
  	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-
+ 	MCFG_CPU_PERIODIC_INT_DRIVER(toypop_state,  irq0_line_hold, 60) 
 	
 	
 
