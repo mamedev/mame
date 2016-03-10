@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-08 02:22+0100\n"
-"PO-Revision-Date: 2016-02-27 14:59+0100\n"
+"PO-Revision-Date: 2016-03-09 15:19+0100\n"
 "Last-Translator: Lothar Serra Mari <scummvm@rootfather.de>\n"
 "Language-Team: MAME Language Team\n"
 "Language: de\n"
@@ -50,7 +50,7 @@ msgstr "Alle Cheats neu geladen"
 
 #: src/emu/ui/cheatopt.cpp:121
 msgid "Autofire Settings"
-msgstr "Einstellungen Dauerfeuer"
+msgstr "Dauerfeuer-Einstellungen"
 
 #: src/emu/ui/cheatopt.cpp:139
 msgid "Reset All"
@@ -62,7 +62,7 @@ msgstr "Alle neu laden"
 
 #: src/emu/ui/cheatopt.cpp:258
 msgid "Autofire Status"
-msgstr "Status Dauerfeuer"
+msgstr "Dauerfeuer-Status"
 
 #: src/emu/ui/cheatopt.cpp:258 src/emu/ui/ui.cpp:1742
 #: src/emu/ui/videoopt.cpp:207 src/emu/ui/videoopt.cpp:211
@@ -100,7 +100,7 @@ msgstr "Verzögerung für Dauerfeuer"
 
 #: src/emu/ui/ctrlmenu.cpp:20
 msgid "Lightgun Device Assignment"
-msgstr "Lichtpistolen-Zuordnung"
+msgstr "Lightgun-Zuordnung"
 
 #: src/emu/ui/ctrlmenu.cpp:21
 msgid "Trackball Device Assignment"
@@ -239,16 +239,15 @@ msgstr "Linien"
 
 #: src/emu/ui/custui.cpp:387
 msgid "Infos text size"
-msgstr "Textgröße Informationen"
+msgstr "Textgröße für Informationen"
 
 #: src/emu/ui/custui.cpp:404
 msgid "UI Fonts Settings"
-msgstr "Einstellungen Schriftart für Benutzeroberfläche"
+msgstr "Schriftart-Einstellungen für Benutzeroberfläche"
 
 #: src/emu/ui/custui.cpp:431
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr ""
-"Beispieltext - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+msgstr "Beispieltext - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 #: src/emu/ui/custui.cpp:529
 msgid "Normal text"
@@ -325,7 +324,7 @@ msgstr "Farbeinstellungen für Benutzeroberfläche"
 #: src/emu/ui/custui.cpp:591
 #, c-format
 msgid "Double click or press %1$s to change the color value"
-msgstr ""
+msgstr "Doppelklicken oder drücken Sie %1$s, um den Farbwert zu ändern"
 
 #: src/emu/ui/custui.cpp:617
 msgid "Menu Preview"
@@ -556,7 +555,7 @@ msgstr "Ordnereinstellungen"
 #: src/emu/ui/dirmenu.cpp:183
 #, c-format
 msgid "Current %1$s Folders"
-msgstr ""
+msgstr "Aktuelle %1$s-Ordner"
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
@@ -573,12 +572,12 @@ msgstr "Ordner entfernen"
 #: src/emu/ui/dirmenu.cpp:499
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
-msgstr ""
+msgstr "%1$s-Ordner ändern - Suche: %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:500
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
-msgstr ""
+msgstr "%1$s-Ordner hinzufügen - Suche: %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
@@ -587,7 +586,7 @@ msgstr "Zum Setzen drücken Sie TAB"
 #: src/emu/ui/dirmenu.cpp:643
 #, c-format
 msgid "Remove %1$s Folder"
-msgstr ""
+msgstr "%1$s-Ordner entfernen"
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
@@ -595,7 +594,7 @@ msgstr "Videomodus"
 
 #: src/emu/ui/dsplmenu.cpp:40
 msgid "Hardware Stretch"
-msgstr "Hardware Streckung"
+msgstr "Hardware-Streckung"
 
 #: src/emu/ui/dsplmenu.cpp:41
 msgid "Triple Buffering"
@@ -615,11 +614,11 @@ msgstr "Bilineare Filterung"
 
 #: src/emu/ui/dsplmenu.cpp:46
 msgid "Bitmap Prescaling"
-msgstr "Bitmap Vorskalierung"
+msgstr "Bitmap-Vorskalierung"
 
 #: src/emu/ui/dsplmenu.cpp:47
 msgid "Multi-Threaded Rendering"
-msgstr "Multi-Thread Rendering"
+msgstr "Multi-Thread-Rendering"
 
 #: src/emu/ui/dsplmenu.cpp:48
 msgid "Window Mode"
@@ -668,11 +667,11 @@ msgstr "Ja"
 
 #: src/emu/ui/filesel.cpp:271
 msgid "New Image Name:"
-msgstr ""
+msgstr "Neuer Image-Name:"
 
 #: src/emu/ui/filesel.cpp:277
 msgid "Image Format:"
-msgstr "Image Format"
+msgstr "Image-Format"
 
 #: src/emu/ui/filesel.cpp:283
 msgid "Create"
@@ -696,7 +695,7 @@ msgstr "[Softwareliste]"
 
 #: src/emu/ui/filesel.cpp:802
 msgid "Select image format"
-msgstr "Image Format auswählen"
+msgstr "Image-Format auswählen"
 
 #: src/emu/ui/filesel.cpp:862
 msgid "Select access mode"
@@ -723,12 +722,8 @@ msgid "Cannot save over directory"
 msgstr "Kann Verzeichnis nicht überschreiben"
 
 #: src/emu/ui/imgcntrl.cpp:149
-msgid ""
-"The software selected is missing one or more required ROM or CHD images. "
-"Please select a different one."
-msgstr ""
-"Dem gewählten Programm fehlen ein oder mehrere benötigte ROM- oder CHD-"
-"Abbilder. Bitte wählen Sie ein anderes Programm aus."
+msgid "The software selected is missing one or more required ROM or CHD images. Please select a different one."
+msgstr "Dem gewählten Programm fehlen ein oder mehrere benötigte ROM- oder CHD-Abbilder. Bitte wählen Sie ein anderes Programm aus."
 
 #: src/emu/ui/info.cpp:98
 msgid "Not supported"
@@ -736,7 +731,7 @@ msgstr "Nicht unterstützt"
 
 #: src/emu/ui/info.cpp:101
 msgid "Partially supported"
-msgstr "Teilweise unterstütz"
+msgstr "Teilweise unterstützt"
 
 #: src/emu/ui/info.cpp:109
 msgid "[empty]"
@@ -944,12 +939,12 @@ msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:256
 msgid "Coin %1$c: NA%3$s\n"
-msgstr "Geld %1$c: NA%3$s\n"
+msgstr "Münzen %1$c: NA%3$s\n"
 
 #: src/emu/ui/miscmenu.cpp:256
 #, c-format
 msgid "Coin %1$c: %2$d%3$s\n"
-msgstr "Geld %1$c: %2$d%3$s\n"
+msgstr "Münzen %1$c: %2$d%3$s\n"
 
 #: src/emu/ui/miscmenu.cpp:259
 msgid " (locked)"
@@ -1101,7 +1096,7 @@ msgstr "Auswahlliste - Suche: "
 #: src/emu/ui/selector.cpp:181
 #, c-format
 msgid "Double click or press %1$s to select"
-msgstr ""
+msgstr "Zum Auswählen, doppelklicken oder drücken Sie %1$s"
 
 #: src/emu/ui/selgame.cpp:38
 msgid "General Info"
@@ -1128,13 +1123,11 @@ msgstr ""
 
 #: src/emu/ui/selgame.cpp:508
 msgid ""
-"The selected machine is missing one or more required ROM or CHD images. "
-"Please select a different machine.\n"
+"The selected machine is missing one or more required ROM or CHD images. Please select a different machine.\n"
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
-"Der gewählten Maschine fehlen ein oder mehrere benötigte ROM- oder CHD-"
-"Abbilder. Bitte wählen Sie eine andere Maschine aus.\n"
+"Der gewählten Maschine fehlen ein oder mehrere benötigte ROM- oder CHD-Abbilder. Bitte wählen Sie eine andere Maschine aus.\n"
 "\n"
 "Drücken Sie eine beliebige Taste (außer ESC) zum Fortfahren."
 
@@ -1185,7 +1178,7 @@ msgstr "Treiber ist ein Klon von: %1$-.100s\n"
 
 #: src/emu/ui/selgame.cpp:895 src/emu/ui/selsoft.cpp:750
 msgid "Driver is parent"
-msgstr "Treiber ist \"Eltern\"-Treiber\n"
+msgstr "Treiber ist Ursprungs-Treiber"
 
 #: src/emu/ui/selgame.cpp:899 src/emu/ui/selsoft.cpp:754
 #: src/emu/ui/simpleselgame.cpp:332
@@ -1234,7 +1227,7 @@ msgstr "Programm ist ein Klon von: %1$-.100s\n"
 
 #: src/emu/ui/selgame.cpp:942 src/emu/ui/selsoft.cpp:798
 msgid "Software is parent"
-msgstr "Programm ist \"Eltern\"-Programm"
+msgstr "Programm ist Ursprungs-Programm"
 
 #: src/emu/ui/selgame.cpp:947 src/emu/ui/selsoft.cpp:803
 msgid "Supported: No"
@@ -1280,7 +1273,7 @@ msgstr "Treiber ist ein Klon von: %1$-.100s\n"
 
 #: src/emu/ui/selgame.cpp:1573
 msgid "Driver is Parent\n"
-msgstr "Treiber ist \"Eltern\"-Treiber\n"
+msgstr "Treiber ist Ursprungs-Treiber\n"
 
 #: src/emu/ui/selgame.cpp:1576
 msgid "Overall: NOT WORKING\n"
@@ -1414,13 +1407,11 @@ msgstr " (Standard)"
 
 #: src/emu/ui/selsoft.cpp:378
 msgid ""
-"The selected software is missing one or more required files. Please select a "
-"different software.\n"
+"The selected software is missing one or more required files. Please select a different software.\n"
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
-"Dem gewählten Programm fehlen ein oder mehrere benötigte ROM- oder CHD-"
-"Abbilder. Bitte wählen Sie ein anderes Programm aus.\n"
+"Dem gewählten Programm fehlen ein oder mehrere benötigte ROM- oder CHD-Abbilder. Bitte wählen Sie ein anderes Programm aus.\n"
 "\n"
 "Drücken Sie eine beliebige Taste (außer ESC) zum Fortfahren."
 
@@ -1483,14 +1474,11 @@ msgstr "BIOS-Auswahl"
 msgid ""
 "No machines found. Please check the rompath specified in the %1$s.ini file.\n"
 "\n"
-"If this is your first time using %2$s, please see the config.txt file in the "
-"docs directory for information on configuring %2$s."
+"If this is your first time using %2$s, please see the config.txt file in the docs directory for information on configuring %2$s."
 msgstr ""
-"Keine Maschinen gefunden. Bitte überprüfen Sie den in der ini-Datei %1$s.ini "
-"angegebenen Pfad zu den ROM-Dateien. \n"
+"Keine Maschinen gefunden. Bitte überprüfen Sie den in der ini-Datei %1$s.ini angegebenen Pfad zu den ROM-Dateien. \n"
 "\n"
-" Wenn Sie %2$s zum ersten Mal verwenden, lesen Sie bitte die Datei config."
-"txt im Verzeichnis \"docs\" zur Konfiguration von %2$s."
+" Wenn Sie %2$s zum ersten Mal verwenden, lesen Sie bitte die Datei config.txt im Verzeichnis \"docs\" zur Konfiguration von %2$s."
 
 #: src/emu/ui/simpleselgame.cpp:287
 #, c-format
@@ -1606,37 +1594,26 @@ msgstr "Vorspulen"
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
-msgstr ""
-"Für diese Maschine müssen Abbilder in die folgenden Geräte eingehängt werden:"
+msgstr "Für diese Maschine müssen Abbilder in die folgenden Geräte eingehängt werden:"
 
 #: src/emu/ui/ui.cpp:1043
 #, c-format
 msgid ""
-"Usage of emulators in conjunction with ROMs you don't own is forbidden by "
-"copyright law.\n"
+"Usage of emulators in conjunction with ROMs you don't own is forbidden by copyright law.\n"
 "\n"
-"IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%1$s\" ON THIS EMULATOR, PRESS "
-"ESC.\n"
+"IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%1$s\" ON THIS EMULATOR, PRESS ESC.\n"
 "\n"
 "Otherwise, type OK or move the joystick left then right to continue"
 msgstr ""
-"Die unlizenzierte Beschaffung und Verwendung von Computerprogrammen "
-"(einschließlich ROM-Inhalten), beispielsweise zur Nutzung in einem Emulator, "
-"stellt einen Verstoß gegen das Urheberrecht dar.\n"
+"Die unlizenzierte Beschaffung und Verwendung von Computerprogrammen (einschließlich ROM-Inhalten), beispielsweise zur Nutzung in einem Emulator, stellt einen Verstoß gegen das Urheberrecht dar.\n"
 "\n"
-"WENN SIE NICHT BERECHTIGT SIND, \"%s\" IN DIESEM EMULATOR ZU VERWENDEN, "
-"DRÜCKEN SIE ESC.\n"
+"WENN SIE NICHT BERECHTIGT SIND, \"%s\" IN DIESEM EMULATOR ZU VERWENDEN, DRÜCKEN SIE ESC.\n"
 "\n"
-"Andernfalls geben Sie \"OK\" ein oder bewegen Sie den Joystick nach links "
-"und dann nach rechts um fortzufahren"
+"Andernfalls geben Sie \"OK\" ein oder bewegen Sie den Joystick nach links und dann nach rechts um fortzufahren"
 
 #: src/emu/ui/ui.cpp:1081
-msgid ""
-"One or more ROMs/CHDs for this machine are incorrect. The machine may not "
-"run correctly.\n"
-msgstr ""
-"Ein oder mehrere ROMs/CHDs für diese Maschine sind nicht korrekt. Eventuell "
-"wird die Maschine nicht richtig laufen.\n"
+msgid "One or more ROMs/CHDs for this machine are incorrect. The machine may not run correctly.\n"
+msgstr "Ein oder mehrere ROMs/CHDs für diese Maschine sind nicht korrekt. Eventuell wird die Maschine nicht richtig laufen.\n"
 
 #: src/emu/ui/ui.cpp:1094
 msgid ""
@@ -1647,10 +1624,8 @@ msgstr ""
 "\n"
 
 #: src/emu/ui/ui.cpp:1098
-msgid ""
-"One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
-msgstr ""
-"Ein oder mehrere ROMs/CHDs dieser Maschine wurden nicht korrekt ausgelesen.\n"
+msgid "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
+msgstr "Ein oder mehrere ROMs/CHDs dieser Maschine wurden nicht korrekt ausgelesen.\n"
 
 #: src/emu/ui/ui.cpp:1102
 #, c-format
@@ -1689,51 +1664,32 @@ msgid "The machine requires external artwork files\n"
 msgstr "Die Maschine benötigt externe Illustrationsdateien\n"
 
 #: src/emu/ui/ui.cpp:1124
-msgid ""
-"This machine was never completed. It may exhibit strange behavior or missing "
-"elements that are not bugs in the emulation.\n"
-msgstr ""
-"Diese Maschine wurde niemals fertiggestellt. Sie kann seltsames Verhalten "
-"oder fehlende Elemente aufweisen, die nicht auf Fehler der Emulation "
-"zurückzuführen sind.\n"
+msgid "This machine was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n"
+msgstr "Diese Maschine wurde niemals fertiggestellt. Sie kann seltsames Verhalten oder fehlende Elemente aufweisen, die nicht auf Fehler der Emulation zurückzuführen sind.\n"
 
 #: src/emu/ui/ui.cpp:1129
-msgid ""
-"This machine has no sound hardware, MAME will produce no sounds, this is "
-"expected behaviour.\n"
-msgstr ""
-"Diese Maschine besitzt keine Sound-Hardware; MAME wird erwartungsgemäß keine "
-"Töne ausgeben.\n"
+msgid "This machine has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n"
+msgstr "Diese Maschine besitzt keine Sound-Hardware; MAME wird erwartungsgemäß keine Töne ausgeben.\n"
 
 #: src/emu/ui/ui.cpp:1137
 msgid "The machine has protection which isn't fully emulated.\n"
-msgstr ""
-"Die Maschine besitzt einen Kopierschutz, der nicht vollständig emuliert "
-"ist.\n"
+msgstr "Die Maschine besitzt einen Kopierschutz, der nicht vollständig emuliert ist.\n"
 
 #: src/emu/ui/ui.cpp:1140
 msgid ""
 "\n"
-"THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet "
-"complete. There is nothing you can do to fix this problem except wait for "
-"the developers to improve the emulation.\n"
+"THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet complete. There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n"
 msgstr ""
 "\n"
-"DIESE MASCHINE FUNKTIONIERT NICHT. Die Emulation dieser Maschine ist noch "
-"nicht vollständig. Sie können nur darauf warten, dass die Entwickler die "
-"Emulation verbessern.\n"
+"DIESE MASCHINE FUNKTIONIERT NICHT. Die Emulation dieser Maschine ist noch nicht vollständig. Sie können nur darauf warten, dass die Entwickler die Emulation verbessern.\n"
 
 #: src/emu/ui/ui.cpp:1144
 msgid ""
 "\n"
-"Certain elements of this machine cannot be emulated as it requires actual "
-"physical interaction or consists of mechanical devices. It is not possible "
-"to fully play this machine.\n"
+"Certain elements of this machine cannot be emulated as it requires actual physical interaction or consists of mechanical devices. It is not possible to fully play this machine.\n"
 msgstr ""
 "\n"
-"Verschiedene Elemente dieser Maschine können nicht emuliert werden, da sie "
-"echte physische Interaktion voraussetzen oder mechanische Komponenten "
-"beinhalten. Es ist nicht möglich, diese Maschine vollständig zu verwenden.\n"
+"Verschiedene Elemente dieser Maschine können nicht emuliert werden, da sie echte physische Interaktion voraussetzen oder mechanische Komponenten beinhalten. Es ist nicht möglich, diese Maschine vollständig zu verwenden.\n"
 
 #: src/emu/ui/ui.cpp:1163
 msgid ""
@@ -1753,8 +1709,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Geben Sie \"OK\" ein oder bewegen Sie den Joystick nach links und dann nach "
-"rechts, um fortzufahren"
+"Geben Sie \"OK\" ein oder bewegen Sie den Joystick nach links und dann nach rechts, um fortzufahren"
 
 #: src/emu/ui/ui.cpp:1192
 #, c-format
