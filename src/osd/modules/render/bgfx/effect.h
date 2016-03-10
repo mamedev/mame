@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 //============================================================
 //
-//  vertex.h - BGFX screen vertex data
+//  effect.cpp - BGFX shader material to be applied to a mesh
 //
 //============================================================
 

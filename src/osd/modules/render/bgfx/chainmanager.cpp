@@ -42,7 +42,8 @@ bgfx_chain* chain_manager::chain(std::string name, running_machine& machine)
 	return load_chain(name, machine);
 }
 
-bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine) {
+bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine)
+{
 	std::string path = "bgfx/chains/" + name + ".json";
 
 	bx::CrtFileReader reader;

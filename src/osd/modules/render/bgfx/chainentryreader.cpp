@@ -16,10 +16,12 @@
 #include "targetmanager.h"
 #include "effectmanager.h"
 #include "chainentry.h"
-#include "entryuniform.h"
 #include "slider.h"
 #include "inputpair.h"
+#include "entryuniform.h"
 #include "entryuniformreader.h"
+#include "suppressor.h"
+#include "suppressorreader.h"
 
 bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, texture_manager& textures, target_manager& targets, effect_manager& effects, std::map<std::string, bgfx_slider*>& sliders)
 {
@@ -30,6 +32,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, textur
 	std::vector<bgfx_input_pair> inputs;
 	if (value.HasMember("input"))
 	{
+		assert(value["input"].IsArray());
 		const Value& input_array = value["input"];
 		for (UINT32 i = 0; i < input_array.Size(); i++)
 		{
@@ -42,6 +45,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, textur
 	std::vector<bgfx_entry_uniform*> uniforms;
 	if (value.HasMember("uniforms"))
 	{
+		assert(value["uniforms"].IsArray());
 		const Value& uniform_array = value["uniforms"];
 		for (UINT32 i = 0; i < uniform_array.Size(); i++)
 		{
@@ -49,14 +53,25 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, textur
 		}
 	}
 
+	std::vector<bgfx_suppressor*> suppressors;
+	if (value.HasMember("disablewhen"))
+	{
+		assert(value["disablewhen"].IsArray());
+		const Value& suppressor_array = value["disablewhen"];
+		for (UINT32 i = 0; i < suppressor_array.Size(); i++)
+		{
+			suppressors.push_back(suppressor_reader::read_from_value(suppressor_array[i], sliders));
+		}
+	}
+
     std::string output_name = value["output"].GetString();
     if (output_name != std::string("backbuffer"))
     {
-        return new bgfx_chain_entry(value["name"].GetString(), effect, inputs, uniforms, targets.target(output_name));
+        return new bgfx_chain_entry(value["name"].GetString(), effect, suppressors, inputs, uniforms, targets.target(output_name));
     }
     else
     {
-        return new bgfx_chain_entry(value["name"].GetString(), effect, inputs, uniforms, nullptr);
+        return new bgfx_chain_entry(value["name"].GetString(), effect, suppressors, inputs, uniforms, nullptr);
     }
 }
 

@@ -1,7 +1,7 @@
 {	"name": "Test Shader Chain",
 	"author": "Ryan Holtz",
 	"sliders": [
-		{ "type": "int_enum", "name": "adjustments",  "text": "Enable Adjustments",        "default": 0,                 "max": 1,                 "min": 0,                    "step": 1, "scale": 1.0,   "format": "%s",    "screen": "any", "strings": [ "On", "Off" ] },
+		{ "type": "int_enum", "name": "adjustments",  "text": "Enable Adjustments",        "default": 0,                 "max": 1,                 "min": 0,                    "step": 1, "scale": 1.0,   "format": "%s",    "screen": "any", "strings": [ "Off", "On" ] },
 		{ "type": "float",    "name": "ratio_amount", "text": "Ratio Amount",              "default": 0,                 "max": 100,               "min": 0,                    "step": 1, "scale": 0.01,  "format": "%1.2f", "screen": "any" },
 		{ "type": "color",    "name": "red_ratios",   "text": "Color Matrix, Red from ",   "default": [ 200,   0,   0 ], "max": [ 400, 400, 400 ], "min": [    0,    0,    0 ], "step": 1, "scale": 0.005, "format": "%2.3f", "screen": "any" },
 		{ "type": "color",    "name": "grn_ratios",   "text": "Color Matrix, Green from ", "default": [   0, 200,   0 ], "max": [ 400, 400, 400 ], "min": [    0,    0,    0 ], "step": 1, "scale": 0.005, "format": "%2.3f", "screen": "any" },
@@ -21,15 +21,16 @@
 		},
 		{	"name": "previous",
 			"mode": "native",
-			"prescale": 1
+			"prescale": 1,
+			"doublebuffer": true
 		}
 	],
 	"passes": [
 		{	"effect": "ratios",
 			"name": "Matrix Pass",
-			"disable_conditions": [
-				{ "type": "slider", "name": "adjustments", "value": 0 },
-				{ "type": "slider", "name": "ratio_amount", "value": 0.0 }
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "name": "ratio_amount", "value": 0 }
 			],
 			"uniforms": [
 				{ "uniform": "u_ratio_amount", "slider": "ratio_amount" },
@@ -42,10 +43,21 @@
 			],
 			"output": "native"
 		},
+		{	"effect": "blit",
+			"name": "Matrix Skip",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal",    "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "notequal", "name": "ratio_amount", "value": 0 }
+			],
+			"input": [
+				{ "sampler": "s_tex", "texture": "screen" }
+			],
+			"output": "native"
+		},
 		{	"effect": "tint",
 			"name": "Tint Pass",
-			"disable_conditions": [
-				{ "type": "slider", "name": "adjustments", "value": 0 }
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "name": "adjustments", "value": 0 }
 			],
 			"uniforms": [
 				{ "uniform": "u_tint", "slider": "tint" },
@@ -58,9 +70,9 @@
 		},
 		{	"effect": "phosphor",
 			"name": "Phosphor Decay",
-			"disable_conditions": [
-				{ "type": "slider", "name": "adjustments", "value": false },
-				{ "type": "slider", "name": "phosphor", "value": [ 0, 0, 0 ] }
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "name": "phosphor", "value": [ 0, 0, 0 ] }
 			],
 			"uniforms": [
 				{ "uniform": "u_passthrough", "value": [ 0 ] },
@@ -74,9 +86,9 @@
 		},
 		{	"effect": "phosphor",
 			"name": "Phosphor Store",
-			"disable_conditions": [
-				{ "type": "slider", "name": "adjustments", "value": false },
-				{ "type": "slider", "name": "phosphor", "value": [ 0, 0, 0 ] }
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "name": "phosphor", "value": [ 0, 0, 0 ] }
 			],
 			"uniforms": [
 				{ "uniform": "u_passthrough", "value": [ 1 ] },
@@ -89,11 +101,15 @@
 			"output": "previous"
 		},
 		{	"effect": "blit",
-			"name": "Final Blit",
-			"input": [
-				{ "sampler": "s_tex", "texture": "native" }
+			"name": "Total Skip",
+			"disablewhen": [
+				{ "type": "slider", "condition": "notequal", "name": "adjustments", "value": 0 }
 			],
-			"output": "backbuffer"
+			"input": [
+				{ "sampler": "s_tex", "texture": "screen" }
+			],
+			"output": "native"
 		}
-	]
+	],
+	"output": "native"
 }

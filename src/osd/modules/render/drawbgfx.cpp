@@ -304,10 +304,11 @@ void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, ScreenV
 	vertex[5].m_v = v[0];
 }
 
-void renderer_bgfx::render_screen_quad(int view, render_primitive* prim)
+void renderer_bgfx::process_screen_quad(int view, render_primitive* prim)
 {
     uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
-    if (video_config.filter == 0) {
+    if (video_config.filter == 0)
+    {
         texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
     }
 
@@ -325,6 +326,68 @@ void renderer_bgfx::render_screen_quad(int view, render_primitive* prim)
 
     m_textures->add_provider("screen", nullptr);
     delete texture;
+}
+
+void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim)
+{
+    bgfx::TransientVertexBuffer buffer;
+    if (bgfx::checkAvailTransientVertexBuffer(6, ScreenVertex::ms_decl))
+    {
+        bgfx::allocTransientVertexBuffer(&buffer, 6, ScreenVertex::ms_decl);
+    }
+    else
+    {
+        return;
+    }
+
+    ScreenVertex* vertex = reinterpret_cast<ScreenVertex*>(buffer.data);
+
+    vertex[0].m_x = prim->bounds.x0;
+    vertex[0].m_y = prim->bounds.y0;
+    vertex[0].m_z = 0;
+    vertex[0].m_rgba = 0xffffffff;
+    vertex[0].m_u = prim->texcoords.tl.u;
+    vertex[0].m_v = prim->texcoords.tl.v;
+
+    vertex[1].m_x = prim->bounds.x1;
+    vertex[1].m_y = prim->bounds.y0;
+    vertex[1].m_z = 0;
+    vertex[1].m_rgba = 0xffffffff;
+    vertex[1].m_u = prim->texcoords.tr.u;
+    vertex[1].m_v = prim->texcoords.tr.v;
+
+    vertex[2].m_x = prim->bounds.x1;
+    vertex[2].m_y = prim->bounds.y1;
+    vertex[2].m_z = 0;
+    vertex[2].m_rgba = 0xffffffff;
+    vertex[2].m_u = prim->texcoords.br.u;
+    vertex[2].m_v = prim->texcoords.br.v;
+
+    vertex[3].m_x = prim->bounds.x1;
+    vertex[3].m_y = prim->bounds.y1;
+    vertex[3].m_z = 0;
+    vertex[3].m_rgba = 0xffffffff;
+    vertex[3].m_u = prim->texcoords.br.u;
+    vertex[3].m_v = prim->texcoords.br.v;
+
+    vertex[4].m_x = prim->bounds.x0;
+    vertex[4].m_y = prim->bounds.y1;
+    vertex[4].m_z = 0;
+    vertex[4].m_rgba = 0xffffffff;
+    vertex[4].m_u = prim->texcoords.bl.u;
+    vertex[4].m_v = prim->texcoords.bl.v;
+
+    vertex[5].m_x = prim->bounds.x0;
+    vertex[5].m_y = prim->bounds.y0;
+    vertex[5].m_z = 0;
+    vertex[5].m_rgba = 0xffffffff;
+    vertex[5].m_u = prim->texcoords.tl.u;
+    vertex[5].m_v = prim->texcoords.tl.v;
+
+    UINT32 blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
+    bgfx::setVertexBuffer(&buffer);
+    bgfx::setTexture(0, m_screen_effect[blend]->uniform("s_tex")->handle(), m_targets->target(m_screen_chain->output())->texture());
+    m_screen_effect[blend]->submit(view);
 }
 
 void renderer_bgfx::render_textured_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer)
@@ -787,52 +850,89 @@ const bgfx::Memory* renderer_bgfx::mame_texture_data_to_bgfx_texture_data(UINT32
 	return mem;
 }
 
+int renderer_bgfx::handle_screen_chains()
+{
+    int index = window().m_index;
+
+    window().m_primlist->acquire_lock();
+    
+    int view = 0;
+    
+    // process
+    render_primitive *prim = window().m_primlist->first();
+    while (prim != nullptr)
+    {
+        if (PRIMFLAG_GET_SCREENTEX(prim->flags))
+        {
+            process_screen_quad(view, prim);
+            const int applicable_passes = m_screen_chain->applicable_passes();
+            bgfx::setViewFrameBuffer(applicable_passes, BGFX_INVALID_HANDLE);
+            window().m_primlist->release_lock();
+            return applicable_passes * (window().m_index + 1);
+        }
+        prim = prim->next();
+    }
+
+    window().m_primlist->release_lock();
+
+    return 0;
+}
+
 int renderer_bgfx::draw(int update)
 {
-	int index = window().m_index;
-	// Set view 0 default viewport.
+    int post_view_index = handle_screen_chains();
+    int window_index = window().m_index;
+    int view_index = window_index;
+    int first_view_index = 0;
+    if (post_view_index > 0)
+    {
+        view_index = post_view_index;
+        first_view_index = m_screen_chain->applicable_passes();
+    }
+
+    // Set view 0 default viewport.
 	osd_dim wdim = window().get_size();
-	m_width[index] = wdim.width();
-	m_height[index] = wdim.height();
-	if (index == 0)
+	m_width[window_index] = wdim.width();
+	m_height[window_index] = wdim.height();
+	if (view_index == first_view_index)
 	{
-		if ((m_dimensions != osd_dim(m_width[index], m_height[index])))
+		if ((m_dimensions != osd_dim(m_width[window_index], m_height[window_index])))
 		{
-			bgfx::reset(m_width[index], m_height[index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
-			m_dimensions = osd_dim(m_width[index], m_height[index]);
+			bgfx::reset(m_width[window_index], m_height[window_index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+			m_dimensions = osd_dim(m_width[window_index], m_height[window_index]);
 		}
 	}
 	else
 	{
-		if ((m_dimensions != osd_dim(m_width[index], m_height[index])))
+		if ((m_dimensions != osd_dim(m_width[window_index], m_height[window_index])))
 		{
 			bgfx::reset(window().m_main->get_size().width(), window().m_main->get_size().height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 			delete m_framebuffer;
 #ifdef OSD_WINDOWS
-			m_framebuffer = m_targets->create_backbuffer(window().m_hwnd, m_width[index], m_height[index]);
+			m_framebuffer = m_targets->create_backbuffer(window().m_hwnd, m_width[window_index], m_height[window_index]);
 #else
 			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(window().sdl_window()), m_width[index], m_height[index]);
 #endif
-			bgfx::setViewFrameBuffer(index, m_framebuffer->target());
-			m_dimensions = osd_dim(m_width[index], m_height[index]);
-			bgfx::setViewClear(index
+			bgfx::setViewFrameBuffer(view_index, m_framebuffer->target());
+			m_dimensions = osd_dim(m_width[window_index], m_height[window_index]);
+			bgfx::setViewClear(view_index
 				, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
 				, 0x000000ff
 				, 1.0f
 				, 0
 				);
-			bgfx::touch(index);
+			bgfx::touch(view_index);
 			bgfx::frame();
 			return 0;
 		}
 	}
 
-	if (index != 0)
+	if (view_index != first_view_index)
 	{
-		bgfx::setViewFrameBuffer(index, m_framebuffer->target());
+		bgfx::setViewFrameBuffer(view_index, m_framebuffer->target());
 	}
-		bgfx::setViewSeq(index, true);
-	bgfx::setViewRect(index, 0, 0, m_width[index], m_height[index]);
+	bgfx::setViewSeq(view_index, true);
+	bgfx::setViewRect(view_index, 0, 0, m_width[window_index], m_height[window_index]);
 
 	// Setup view transform.
 	{
@@ -841,13 +941,13 @@ int renderer_bgfx::draw(int update)
 
 		float left = 0.0f;
 		float top = 0.0f;
-		float right = m_width[index];
-		float bottom = m_height[index];
+		float right = m_width[window_index];
+		float bottom = m_height[window_index];
 		float proj[16];
 		bx::mtxOrtho(proj, left, right, bottom, top, 0.0f, 100.0f);
-		bgfx::setViewTransform(index, view, proj);
+		bgfx::setViewTransform(view_index, view, proj);
 	}
-	bgfx::setViewClear(index
+	bgfx::setViewClear(view_index
 		, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
 		, 0x000000ff
 		, 1.0f
@@ -867,13 +967,13 @@ int renderer_bgfx::draw(int update)
 		bgfx::TransientVertexBuffer buffer;
 		allocate_buffer(prim, blend, &buffer);
 
-		buffer_status status = buffer_primitives(index, atlas_valid, &prim, &buffer);
+		buffer_status status = buffer_primitives(view_index, atlas_valid, &prim, &buffer);
 
 		if (status != BUFFER_EMPTY)
 		{
 			bgfx::setVertexBuffer(&buffer);
 			bgfx::setTexture(0, m_gui_effect[blend]->uniform("s_tex")->handle(), m_texture_cache->texture());
-			m_gui_effect[blend]->submit(index);
+			m_gui_effect[blend]->submit(view_index);
 		}
 
 		if (status != BUFFER_DONE && status != BUFFER_PRE_FLUSH)
@@ -886,11 +986,14 @@ int renderer_bgfx::draw(int update)
 
 	// This dummy draw call is here to make sure that view 0 is cleared
 	// if no other draw calls are submitted to view 0.
-	bgfx::touch(index);
+	bgfx::touch(view_index);
 
 	// Advance to next frame. Rendering thread will be kicked to
 	// process submitted rendering primitives.
-	if (index==0) bgfx::frame();
+	if (view_index == first_view_index)
+    {
+        bgfx::frame();
+    }
 
 	return 0;
 }
@@ -928,7 +1031,8 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
 #if USE_NEW_SHADERS
                         if (PRIMFLAG_GET_SCREENTEX((*prim)->flags))
                         {
-                            render_screen_quad(view, *prim);
+                            //render_screen_quad(view, *prim);
+                            render_post_screen_quad(view, *prim);
                         }
                         else
                         {

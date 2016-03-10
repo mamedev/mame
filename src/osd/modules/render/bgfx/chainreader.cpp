@@ -71,6 +71,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, running_machine& m
 	if (value.HasMember("targets"))
 	{
 		const Value& target_array = value["targets"];
+        // TODO: Move into its own reader
 		for (UINT32 i = 0; i < target_array.Size(); i++)
 		{
 			assert(target_array[i].HasMember("name"));
@@ -115,14 +116,18 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, running_machine& m
 
     // Parse chain entries
     std::vector<bgfx_chain_entry*> entries;
-    if (value.HasMember("passes")) {
+    if (value.HasMember("passes"))
+    {
         const Value& entry_array = value["passes"];
-        for (UINT32 i = 0; i < entry_array.Size(); i++) {
+        for (UINT32 i = 0; i < entry_array.Size(); i++)
+        {
             entries.push_back(chain_entry_reader::read_from_value(entry_array[i], textures, targets, effects, slider_map));
         }
     }
 
-    return new bgfx_chain(name, author, sliders, parameters, entries);
+    std::string output = value["output"].GetString();
+
+    return new bgfx_chain(name, author, sliders, parameters, entries, output);
 }
 
 void chain_reader::validate_parameters(const Value& value)
@@ -132,4 +137,7 @@ void chain_reader::validate_parameters(const Value& value)
 	assert(value.HasMember("author"));
 	assert(value["author"].IsString());
 	assert(value.HasMember("passes"));
+    assert(value["passes"].IsArray());
+    assert(value.HasMember("output"));
+    assert(value["output"].IsString());
 }

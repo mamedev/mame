@@ -140,6 +140,8 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/render/bgfx/slideruniform.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/slideruniformreader.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/statereader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/suppressor.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/suppressorreader.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/target.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/targetmanager.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/texture.cpp",

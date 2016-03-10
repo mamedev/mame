@@ -13,7 +13,8 @@
 
 #include <bgfx/bgfx.h>
 
-struct ScreenVertex {
+struct ScreenVertex
+{
 	float m_x;
 	float m_y;
 	float m_z;
@@ -21,7 +22,8 @@ struct ScreenVertex {
 	float m_u;
 	float m_v;
 
-	static void init() {
+	static void init()
+	{
 		ms_decl.begin()
 			.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
 			.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)

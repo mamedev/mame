@@ -43,8 +43,10 @@ bgfx_slider::~bgfx_slider()
 {
 }
 
-static INT32 update_trampoline(running_machine &machine, void *arg, std::string *str, INT32 newval) {
-    if (arg != nullptr) {
+static INT32 update_trampoline(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+    if (arg != nullptr)
+    {
         return reinterpret_cast<bgfx_slider*>(arg)->update(str, newval);
     }
     return 0;
@@ -64,20 +66,23 @@ slider_state* bgfx_slider::create_core_slider(running_machine& machine)
     state->hidden = false;
     state->id = 0; // fixme
     strcpy(state->description, m_description.c_str());
-    
+
     return state;
 }
 
 int32_t bgfx_slider::update(std::string *str, int32_t newval)
 {
-    switch (m_type) {
+    switch (m_type)
+    {
         case SLIDER_INT_ENUM:
         {
             INT32 *val_ptr = reinterpret_cast<INT32 *>(&m_value);
-            if (newval != SLIDER_NOCHANGE) {
+            if (newval != SLIDER_NOCHANGE)
+            {
                 *val_ptr = newval;
             }
-            if (str != nullptr) {
+            if (str != nullptr)
+            {
                 *str = string_format(m_format, m_strings[*val_ptr]);
             }
             return *val_ptr;
@@ -86,10 +91,12 @@ int32_t bgfx_slider::update(std::string *str, int32_t newval)
         case SLIDER_INT:
         {
             int *val_ptr = reinterpret_cast<int *>(&m_value);
-            if (newval != SLIDER_NOCHANGE) {
+            if (newval != SLIDER_NOCHANGE)
+            {
                 *val_ptr = newval;
             }
-            if (str != nullptr) {
+            if (str != nullptr)
+            {
                 *str = string_format(m_format, *val_ptr);
             }
             return *val_ptr;
@@ -102,11 +109,29 @@ int32_t bgfx_slider::update(std::string *str, int32_t newval)
             {
                 *val_ptr = float(newval) * m_scale;
             }
-            if (str != nullptr) {
+            if (str != nullptr)
+            {
                 *str = string_format(m_format, *val_ptr);
             }
             return int32_t(floor(*val_ptr / m_scale + 0.5f));
         }
     }
     return 0;
+}
+
+size_t bgfx_slider::get_size_for_type(slider_type type)
+{
+	switch(type)
+	{
+		case SLIDER_INT_ENUM:
+		case SLIDER_FLOAT:
+		case SLIDER_INT:
+			return sizeof(float);
+		case SLIDER_COLOR:
+			return sizeof(float) * 3;
+		case SLIDER_VEC2:
+			return sizeof(float) * 2;
+		default:
+			return 0;
+	}
 }

@@ -17,7 +17,6 @@
     "vertex": "vs_screen",
     "fragment": "fs_screen",
     "uniforms": [
-    	{ "name": "s_tex",  "type": "int",  "values": [ 1.0 ] },
-    	{ "name": "u_tint", "type": "vec4", "values": [ 1.0, 1.0, 1.0, 1.0 ] }
+    	{ "name": "s_tex",  "type": "int",  "values": [ 1.0 ] }
     ]
 }

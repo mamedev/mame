@@ -10,19 +10,19 @@
 
 #include "slider.h"
 #include "parameter.h"
-#include "chainentry.h"
 #include "entryuniform.h"
 #include "texturemanager.h"
 #include "vertex.h"
 
 #include "chain.h"
 
-bgfx_chain::bgfx_chain(std::string name, std::string author, std::vector<bgfx_slider*> sliders, std::vector<bgfx_parameter*> params, std::vector<bgfx_chain_entry*> entries)
+bgfx_chain::bgfx_chain(std::string name, std::string author, std::vector<bgfx_slider*> sliders, std::vector<bgfx_parameter*> params, std::vector<bgfx_chain_entry*> entries, std::string output)
 	: m_name(name)
 	, m_author(author)
 	, m_sliders(sliders)
 	, m_params(params)
 	, m_entries(entries)
+    , m_output(output)
 {
     for (bgfx_slider* slider : m_sliders)
     {
@@ -48,17 +48,27 @@ bgfx_chain::~bgfx_chain()
 
 void bgfx_chain::process(render_primitive* prim, int view, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint64_t blend)
 {
+    int current_view = view;
     for (int index = 0; index < m_entries.size(); index++)
 	{
-        if (index == (m_entries.size() - 1))
+        if (!m_entries[index]->skip())
         {
-			view = 0;
+            m_entries[index]->submit(prim, current_view, textures, screen_width, screen_height, blend);
+            current_view++;
         }
-        else
-        {
-			view = 1 + index;
-        }
-
-        m_entries[index]->submit(prim, view, textures, screen_width, screen_height, blend);
 	}
+}
+
+uint32_t bgfx_chain::applicable_passes()
+{
+    int applicable_passes = 0;
+    for (int index = 0; index < m_entries.size(); index++)
+    {
+        if (!m_entries[index]->skip())
+        {
+            applicable_passes++;
+        }
+    }
+
+    return applicable_passes;
 }

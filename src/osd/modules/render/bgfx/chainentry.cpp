@@ -22,20 +22,16 @@
 #include "entryuniform.h"
 #include "texturemanager.h"
 #include "vertex.h"
+#include "suppressor.h"
 
-bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, std::vector<bgfx_input_pair>& inputs, std::vector<bgfx_entry_uniform*> uniforms, bgfx_target* output)
+bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair> inputs, std::vector<bgfx_entry_uniform*> uniforms, bgfx_target* output)
 	: m_name(name)
 	, m_effect(effect)
+    , m_inputs(inputs)
+    , m_suppressors(suppressors)
 	, m_output(output)
+    , m_uniforms(uniforms)
 {
-	for (bgfx_input_pair input : inputs)
-	{
-		m_inputs.push_back(input);
-	}
-	for (bgfx_entry_uniform* uniform : uniforms)
-	{
-		m_uniforms.push_back(uniform);
-	}
 }
 
 bgfx_chain_entry::~bgfx_chain_entry()
@@ -53,7 +49,8 @@ void bgfx_chain_entry::submit(render_primitive* prim, int view, texture_manager&
 
 	setup_view(view, screen_width, screen_height);
 
-    for (bgfx_input_pair input : m_inputs) {
+    for (bgfx_input_pair input : m_inputs)
+    {
         input.bind(m_effect, textures);
     }
 
@@ -89,23 +86,24 @@ void bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
     bgfx::setViewFrameBuffer(view, handle);
 	bgfx::setViewRect(view, 0, 0, width, height);
 
-    {
-        float viewMat[16];
-        bx::mtxIdentity(viewMat);
+	float viewMat[16];
+	bx::mtxIdentity(viewMat);
 
-        float projMat[16];
-        bx::mtxOrtho(projMat, 0.0f, width, height, 0.0f, 0.0f, 100.0f);
-        bgfx::setViewTransform(view, viewMat, projMat);
-    }
+	float projMat[16];
+	bx::mtxOrtho(projMat, 0.0f, width, height, 0.0f, 0.0f, 100.0f);
+	bgfx::setViewTransform(view, viewMat, projMat);
 
     bgfx::setViewClear(view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
 }
 
 void bgfx_chain_entry::put_screen_buffer(render_primitive* prim, bgfx::TransientVertexBuffer* buffer)
 {
-    if (bgfx::checkAvailTransientVertexBuffer(6, ScreenVertex::ms_decl)) {
+    if (bgfx::checkAvailTransientVertexBuffer(6, ScreenVertex::ms_decl))
+    {
         bgfx::allocTransientVertexBuffer(buffer, 6, ScreenVertex::ms_decl);
-    } else {
+    }
+    else
+    {
         return;
     }
 
@@ -152,4 +150,22 @@ void bgfx_chain_entry::put_screen_buffer(render_primitive* prim, bgfx::Transient
     vertex[5].m_rgba = 0xffffffff;
     vertex[5].m_u = prim->texcoords.tl.u;
     vertex[5].m_v = prim->texcoords.tl.v;
+}
+
+bool bgfx_chain_entry::skip()
+{
+    if (m_suppressors.size() == 0)
+    {
+        return false;
+    }
+
+    for (bgfx_suppressor* suppressor : m_suppressors)
+    {
+        if (suppressor->suppress())
+        {
+            return true;
+        }
+    }
+
+    return false;
 }

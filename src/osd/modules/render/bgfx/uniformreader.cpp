@@ -41,7 +41,8 @@ bgfx_uniform* uniform_reader::read_from_value(const Value& value)
 		data[index] = (float)value_array[index].GetDouble();
 	}
 
-	for (; index < type_size / 4; index++) {
+	for (; index < type_size / 4; index++)
+	{
 		data[index] = 0.0f;
 	}
 

@@ -55,6 +55,8 @@ public:
 	}
 
 private:
+    int handle_screen_chains();
+
 	void allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::TransientVertexBuffer *buffer);
 	enum buffer_status
 	{
@@ -65,8 +67,9 @@ private:
 	};
 	buffer_status buffer_primitives(int view, bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer);
 
-    void render_screen_quad(int view, render_primitive* prim);
+    void process_screen_quad(int view, render_primitive* prim);
 	void render_textured_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer);
+    void render_post_screen_quad(int view, render_primitive* prim);
 
 	void put_packed_quad(render_primitive *prim, UINT32 hash, ScreenVertex* vertex);
 	void put_polygon(const float* coords, UINT32 num_coords, float r, UINT32 rgba, ScreenVertex* vertex);
