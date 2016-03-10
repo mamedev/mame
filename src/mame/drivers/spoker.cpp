@@ -6,17 +6,24 @@
   Driver by Mirko Buffoni
   Additional work by Roberto Fresca.
 
+****************************************************************************
+
+  NOTES:
+
+  - Very similar to IGS009 driver, but without the reels stuff.
+    Maybe both drivers can be merged at some point.
+
+  - The Super Poker US/UA sets look like they lack of PPI 8255 devices...
+
+****************************************************************************
+
   TODO:
+
   - Understand how to reset NVRAM
   - Map DSW (Operator mode doesn't help)
   - Map Leds and Coin counters
   - 3super8 randomly crashes
   - 3super8 doesn't have the 8x32 tilemap, change the video emulation accordingly
-
-****************************************************************************
-
-  Very similar to IGS009 driver, but without the reels stuff.
-  Maybe both drivers can be merged at some point.
 
 ***************************************************************************/
 
@@ -77,6 +84,7 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
 
+	DECLARE_DRIVER_INIT(spkleftover);
 	DECLARE_DRIVER_INIT(spk116it);
 	DECLARE_DRIVER_INIT(3super8);
 	virtual void machine_start() override;
@@ -838,11 +846,25 @@ ROM_END
                               Driver Init
 ***************************************************************************/
 
+DRIVER_INIT_MEMBER(spoker_state, spkleftover)
+{
+/*  The last 4K have the scheme/table for the whole encryption.
+    Maybe a leftover...
+*/	
+	int A, B;
+	UINT8 *rom = memregion("maincpu")->base();
+
+	for (A = 0; A < 0x10000; A++)
+	{
+		B = ((A & 0x0fff) | 0xf000);
+		rom[A] = rom[A] ^ rom[B];
+	}
+}
+
 DRIVER_INIT_MEMBER(spoker_state, spk116it)
 {
 	int A;
 	UINT8 *rom = memregion("maincpu")->base();
-
 
 	for (A = 0; A < 0x10000; A++)
 	{
@@ -896,14 +918,14 @@ DRIVER_INIT_MEMBER(spoker_state, 3super8)
                               Game Drivers
 ***************************************************************************/
 
-/*    YEAR   NAME        PARENT    MACHINE  INPUT    STATE          INIT      ROT     COMPANY      FULLNAME                   FLAGS  */
-GAME( 1996,  spk306us,   0,        spoker,  spoker,  driver_device, 0,        ROT0,  "IGS",       "Super Poker (v306US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
-GAME( 1996,  spk205us,   spk306us, spoker,  spoker,  driver_device, 0,        ROT0,  "IGS",       "Super Poker (v205US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
-GAME( 1996,  spk203us,   spk306us, spoker,  spoker,  driver_device, 0,        ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
-GAME( 1996,  spk200ua,   spk306us, spoker,  spoker,  driver_device, 0,        ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
-GAME( 1993?, spk116it,   spk306us, spoker,  spoker,  spoker_state,  spk116it, ROT0,  "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk116itmx, spk306us, spoker,  spoker,  driver_device, 0,        ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
-GAME( 1993?, spk115it,   spk306us, spoker,  spoker,  spoker_state,  spk116it, ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk114it,   spk306us, spoker,  spoker,  driver_device, 0,        ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
-GAME( 1996,  spk102ua,   spk306us, spoker,  spoker,  driver_device, 0,        ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper decryption
-GAME( 1993?, 3super8,    0,        3super8, 3super8, spoker_state,  3super8,  ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
+/*    YEAR   NAME        PARENT    MACHINE  INPUT    STATE          INIT         ROT     COMPANY      FULLNAME                   FLAGS  */
+GAME( 1996,  spk306us,   0,        spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v306US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk205us,   spk306us, spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v205US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk203us,   spk306us, spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk200ua,   spk306us, spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1993?, spk116it,   spk306us, spoker,  spoker,  spoker_state,  spk116it,    ROT0,  "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk116itmx, spk306us, spoker,  spoker,  driver_device, 0,           ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1993?, spk115it,   spk306us, spoker,  spoker,  spoker_state,  spk116it,    ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk114it,   spk306us, spoker,  spoker,  driver_device, 0,           ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk102ua,   spk306us, spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1993?, 3super8,    0,        3super8, 3super8, spoker_state,  3super8,     ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
