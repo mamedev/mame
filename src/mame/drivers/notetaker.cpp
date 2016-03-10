@@ -79,6 +79,7 @@ DONE:
 #include "machine/ay31015.h"
 #include "video/tms9927.h"
 #include "sound/dac.h"
+#include "machine/wd_fdc.h"
 
 class notetaker_state : public driver_device
 {
@@ -95,7 +96,10 @@ public:
 		m_kbduart(*this, "kbduart"),
 		m_eiauart(*this, "eiauart"),
 		m_crtc(*this, "crt5027"),
-		m_dac(*this, "dac")
+		m_dac(*this, "dac"),
+		m_fdc(*this, "wd1791"),
+		m_floppy0(*this, "wd1791:0"),
+		m_floppy(NULL)
 	{
 	}
 // devices
@@ -105,6 +109,9 @@ public:
 	required_device<ay31015_device> m_eiauart;
 	required_device<crt5027_device> m_crtc;
 	required_device<dac_device> m_dac;
+	required_device<fd1791_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	floppy_image_device *m_floppy;
 
 //declarations
 	// screen
@@ -513,7 +520,7 @@ static ADDRESS_MAP_START(notetaker_iocpu_io, AS_IO, 16, notetaker_state)
 	//AM_RANGE(0xa0, 0xa1) AM_MIRROR(0x7E18) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255
 	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0x7E1E) AM_WRITE(FIFOBus_w) // DAC data write to FIFO
 	//AM_RANGE(0x100, 0x101) AM_MIRROR(0x7E1E) AM_WRITE(DiskReg_w) I/O register (adc speed, crtc pixel clock enable, +5 and +12v relays for floppy, etc)
-	//AM_RANGE(0x120, 0x127) AM_MIRROR(0x7E18) AM_DEVREADWRITE("wd1791", fd1971_device) // floppy controller
+	AM_RANGE(0x120, 0x127) AM_MIRROR(0x7E18) AM_DEVREADWRITE8("wd1791", fd1791_t, read, write, 0x00FF) // floppy controller
 	AM_RANGE(0x140, 0x15f) AM_MIRROR(0x7E00) AM_DEVREADWRITE8("crt5027", crt5027_device, read, write, 0x00FF) // crt controller
 	AM_RANGE(0x160, 0x161) AM_MIRROR(0x7E1E) AM_WRITE(LoadDispAddr_w) // loads the start address for the display framebuffer
 	AM_RANGE(0x1a0, 0x1a1) AM_MIRROR(0x7E10) AM_READ(ReadEIAStatus_r) // read keyboard fifo state
@@ -586,12 +593,21 @@ static ADDRESS_MAP_START(notetaker_emulatorcpu_io, AS_IO, 16, notetaker_state)
 ADDRESS_MAP_END
 */
 
+/* Input ports */
+
+/* Floppy Image Interface */
+static SLOT_INTERFACE_START( notetaker_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
+
 /* Machine Start; allocate timers and savestate stuff */
 void notetaker_state::machine_start()
 {
 	// allocate the DAC timer, and set it to fire NEVER. We'll set it up properly in IPReset.
 	m_FIFO_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(notetaker_state::timer_fifoclk),this));
 	m_FIFO_timer->adjust(attotime::never);
+	// floppy stuff
+	m_floppy = NULL;
 	// savestate stuff
 	// TODO: add me!
 }
@@ -649,7 +665,6 @@ void notetaker_state::ep_reset()
 {
 }
 
-
 /* Input ports */
 static INPUT_PORTS_START( notetakr )
 INPUT_PORTS_END
@@ -682,6 +697,7 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
+	/* Devices */
 	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL_36MHz/4)/8) // the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*, 2, 3, 4, 5, 6, 7, or 8 (* because this is a 74s163 this setting probably means divide by 1; documentation at http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790605_Definition_of_8086_Ports.pdf claims it is 1.5, which makes no sense) and secondarily divided by 8 (again by two to load the 16 bit output shifters after this)
 	// on reset, bitclk is 000 so divider is (36mhz/8)/8; during boot it is written with 101, changing the divider to (36mhz/4)/8
 	// TODO: for now, we just hack it to the latter setting from start; this should be handled correctly in ip_reset();
@@ -697,7 +713,10 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 	MCFG_DEVICE_ADD( "eiauart", AY31015, 0 ) // HD6402, == AY-3-1015D
 	MCFG_AY31015_RX_CLOCK(((XTAL_960kHz/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
 	MCFG_AY31015_TX_CLOCK(((XTAL_960kHz/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
-	/* Devices */
+
+	/* Floppy */
+	MCFG_FD1791_ADD("wd1791", (((XTAL_24MHz/3)/2)/2)) // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board
+	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", notetaker_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono") // TODO: should be stereo
