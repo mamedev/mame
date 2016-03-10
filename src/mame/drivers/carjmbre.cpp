@@ -43,6 +43,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
@@ -51,6 +52,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -65,6 +67,7 @@ public:
 
 	DECLARE_PALETTE_INIT(carjmbre);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 protected:
@@ -151,11 +154,30 @@ void carjmbre_state::video_start()
 
 UINT32 carjmbre_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_bgcolor, cliprect);
+	//bitmap.fill(m_bgcolor, cliprect);
+	bitmap.fill(0, cliprect);
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
+
+// sprites
+
+void carjmbre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	{
+		int sy = 240 - m_spriteram[offs];
+		int code = m_spriteram[offs + 1];
+		int color = m_spriteram[offs + 2] & 0xf;
+		int flipx = m_spriteram[offs + 2] >> 6 & 1;
+		int flipy = m_spriteram[offs + 2] >> 7 & 1;
+		int sx = m_spriteram[offs + 3];
+
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
+	}
+}
+
 
 /***************************************************************************
 
@@ -183,6 +205,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, carjmbre_state )
 	AM_RANGE(0x8805, 0x8805) AM_WRITE(bgcolor_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM // 6116
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram") // 2114*4
+	AM_RANGE(0x9800, 0x98ff) AM_RAM AM_SHARE("spriteram") // 5101*2
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN1")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN2")
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW") AM_WRITE(soundlatch_byte_w)
@@ -203,10 +226,10 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, carjmbre_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x22, 0x22) AM_WRITENOP // bdir/bc2/bc1 ~010 inactive write
+	AM_RANGE(0x22, 0x22) AM_WRITENOP // bdir/bc2/bc1 1/0/1 inactive write
 	AM_RANGE(0x24, 0x24) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0x30, 0x31) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x32, 0x32) AM_WRITENOP // bdir/bc2/bc1 ~010 inactive write
+	AM_RANGE(0x32, 0x32) AM_WRITENOP // bdir/bc2/bc1 1/0/1 inactive write
 	AM_RANGE(0x34, 0x34) AM_DEVREAD("ay2", ay8910_device, data_r)
 ADDRESS_MAP_END
 
@@ -265,9 +288,21 @@ INPUT_PORTS_END
 
 
 
+const gfx_layout carjmbre_spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,4),
+	2,
+	{ RGN_FRAC(1,2), RGN_FRAC(0,2) },
+	{ STEP8(0,1), STEP8(256*16*8,1) },
+	{ STEP16(0,8) },
+	16*8
+};
+
+
 static GFXDECODE_START( carjmbre )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar, 0, 16 )
-	//GFXDECODE_ENTRY( "gfx2", 0, x, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, carjmbre_spritelayout, 0, 16 )
 GFXDECODE_END
 
 
