@@ -38,6 +38,7 @@ extern NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification;
 
 - (void)activate;
 
+- (IBAction)debugBreak:(id)sender;
 - (IBAction)debugRun:(id)sender;
 - (IBAction)debugRunAndHide:(id)sender;
 - (IBAction)debugRunToNextCPU:(id)sender;

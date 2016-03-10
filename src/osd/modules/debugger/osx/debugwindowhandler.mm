@@ -29,6 +29,10 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 @implementation MAMEDebugWindowHandler
 
 + (void)addCommonActionItems:(NSMenu *)menu {
+	[menu addItemWithTitle:@"Break"
+					action:@selector(debugBreak:)
+			 keyEquivalent:@""];
+
 	NSMenuItem *runParentItem = [menu addItemWithTitle:@"Run"
 												action:@selector(debugRun:)
 										 keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF5FunctionKey]];
@@ -181,13 +185,22 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 }
 
 
+- (IBAction)debugBreak:(id)sender {
+	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
+		debug_cpu_get_visible_cpu(*machine)->debug()->halt_on_next_instruction("User-initiated break\n");
+}
+
+
 - (IBAction)debugRun:(id)sender {
 	debug_cpu_get_visible_cpu(*machine)->debug()->go();
 }
 
 
 - (IBAction)debugRunAndHide:(id)sender {
-	[[NSNotificationCenter defaultCenter] postNotificationName:MAMEHideDebuggerNotification object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:MAMEHideDebuggerNotification
+														object:self
+													  userInfo:[NSDictionary dictionaryWithObject:[NSValue valueWithPointer:machine]
+																						   forKey:@"MAMEDebugMachine"]];
 	debug_cpu_get_visible_cpu(*machine)->debug()->go();
 }
 
