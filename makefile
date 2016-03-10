@@ -799,16 +799,20 @@ CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC))  --version  2> /dev/nu
 endif
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
 endif
+
 ifeq ($(CLANG_VERSION),)
 $(info GCC $(GCC_VERSION) detected)
 else
 $(info Clang $(CLANG_VERSION) detected)
+ifneq ($(TARGETOS),asmjs)
 ifeq ($(ARCHITECTURE),_x64)
 ARCHITECTURE := _x64_clang
 else
 ARCHITECTURE := _x86_clang
 endif
 endif
+endif
+
 ifneq ($(PYTHON_AVAILABLE),python)
 $(error Python is not available in path)
 endif
