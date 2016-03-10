@@ -1,7 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
-
-// **** SKELETON DRIVER **** original removed due to unresolved licensing.
+// copyright-holders:hap
 
 /***************************************************************************
 
@@ -40,7 +38,7 @@ class carjmbre_state : public driver_device
 public:
 	carjmbre_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-	{}
+	{ }
 };
 
 
