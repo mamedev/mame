@@ -23,7 +23,8 @@
 enum
 {
 	// command-line options are HIGH priority
-	OPTION_PRIORITY_CMDLINE = OPTION_PRIORITY_HIGH,
+	OPTION_PRIORITY_SUBCMD = OPTION_PRIORITY_HIGH,
+	OPTION_PRIORITY_CMDLINE,
 
 	// INI-based options are NORMAL priority, in increasing order:
 	OPTION_PRIORITY_INI = OPTION_PRIORITY_NORMAL,
