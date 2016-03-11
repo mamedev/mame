@@ -1012,8 +1012,7 @@ void running_machine::logfile_callback(const running_machine &machine, const cha
 	{
 		machine.m_logfile->puts(buffer);
 		
-		// TODO: commented out for now - it causes -log slow down to a crawl on Windows
-		//machine.m_logfile->flush();
+		machine.m_logfile->flush();
 	}
 }
 
