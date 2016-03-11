@@ -742,7 +742,6 @@ WRITE_LINE_MEMBER( m68000_base_device::write_irq7 )
 bool m68000_base_device::memory_translate(address_spacenum space, int intention, offs_t &address)
 {
 	/* only applies to the program address space and only does something if the MMU's enabled */
-	if (this)
 	{
 		/* 68040 needs to call the MMU even when disabled so transparent translation works */
 		if ((space == AS_PROGRAM) && ((pmmu_enabled) || (CPU_TYPE_IS_040_PLUS(cpu_type))))
@@ -2646,7 +2645,6 @@ void m68020pmmu_device::device_start()
 bool m68020hmmu_device::memory_translate(address_spacenum space, int intention, offs_t &address)
 {
 	/* only applies to the program address space and only does something if the MMU's enabled */
-	if (this)
 	{
 		if ((space == AS_PROGRAM) && (hmmu_enabled))
 		{
