@@ -29,7 +29,7 @@ TILEMAP_MAPPER_MEMBER(armedf_state::armedf_scan_type2)
 
 TILEMAP_MAPPER_MEMBER(armedf_state::armedf_scan_type3)
 {   /* col: 0..63; row: 0..31 */
-	/* legion & legionjb */
+	/* legion & legiono */
 	return (col & 0x1f) * 32 + row + 0x800 * (col / 32);
 }
 
@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_bg_tile_info)
 
 VIDEO_START_MEMBER(armedf_state,terraf)
 {
-	m_sprite_offy = (m_scroll_type & 2 ) ? 0 : 128;  /* legion, legionjb, crazy climber 2 */
+	m_sprite_offy = (m_scroll_type & 2 ) ? 0 : 128;  /* legion, legiono, crazy climber 2 */
 
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(armedf_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(armedf_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
@@ -136,7 +136,7 @@ VIDEO_START_MEMBER(armedf_state,terraf)
 
 VIDEO_START_MEMBER(armedf_state,armedf)
 {
-	m_sprite_offy = (m_scroll_type & 2 ) ? 0 : 128;  /* legion, legionjb, crazy climber 2 */
+	m_sprite_offy = (m_scroll_type & 2 ) ? 0 : 128;  /* legion, legiono, crazy climber 2 */
 
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(armedf_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(armedf_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
@@ -170,7 +170,7 @@ READ8_MEMBER(armedf_state::nb1414m4_text_videoram_r)
 WRITE8_MEMBER(armedf_state::nb1414m4_text_videoram_w)
 {
 	m_text_videoram[offset] = data;
-	m_tx_tilemap->mark_all_dirty();
+	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 READ8_MEMBER(armedf_state::armedf_text_videoram_r)
@@ -181,7 +181,7 @@ READ8_MEMBER(armedf_state::armedf_text_videoram_r)
 WRITE8_MEMBER(armedf_state::armedf_text_videoram_w)
 {
 	m_text_videoram[offset] = data;
-	m_tx_tilemap->mark_all_dirty();
+	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 WRITE16_MEMBER(armedf_state::armedf_fg_videoram_w)
