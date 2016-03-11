@@ -59,7 +59,7 @@ project "zlib"
 	kind "StaticLib"
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
-	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
+	if _OPTIONS["gcc"]~=nil and ((string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android"))) then
 		configuration { "gmake" }
 		if (version >= 30700) then
 			buildoptions {
@@ -276,7 +276,7 @@ end
 			"-Wno-unused-function",
 			"-O0",
 		}
-	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "android")) then
 		buildoptions {
 			"-Wno-enum-conversion",
 		}

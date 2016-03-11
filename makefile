@@ -962,7 +962,7 @@ endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=3.6.0 --osd=osdmini --targetos=android-arm --targetos=android --PLATFORM=arm --NOASM=1 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=3.8.0 --osd=osdmini --targetos=android-arm --targetos=android --PLATFORM=arm --NOASM=1 gmake
 
 .PHONY: android-arm
 android-arm: generate $(PROJECTDIR_MINI)/gmake-android-arm/Makefile
@@ -986,7 +986,7 @@ endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm64 --gcc_version=3.6.0 --osd=osdmini --targetos=android-arm64 --targetos=android --PLATFORM=arm64 --NOASM=1 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm64 --gcc_version=3.8.0 --osd=osdmini --targetos=android-arm64 --targetos=android --PLATFORM=arm64 --NOASM=1 gmake
 
 .PHONY: android-arm64
 android-arm64: generate $(PROJECTDIR_MINI)/gmake-android-arm64/Makefile
@@ -1010,7 +1010,7 @@ endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=3.6.0 --osd=osdmini --targetos=android-mips --targetos=android --PLATFORM=mips --NOASM=1 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=3.8.0 --osd=osdmini --targetos=android-mips --targetos=android --PLATFORM=mips --NOASM=1 gmake
 
 .PHONY: android-mips
 android-mips: generate $(PROJECTDIR_MINI)/gmake-android-mips/Makefile
@@ -1034,7 +1034,7 @@ endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips64 --gcc_version=3.6.0 --osd=osdmini --targetos=android-mips64 --targetos=android --PLATFORM=mips64 --NOASM=1 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips64 --gcc_version=3.8.0 --osd=osdmini --targetos=android-mips64 --targetos=android --PLATFORM=mips64 --NOASM=1 gmake
 
 .PHONY: android-mips64
 android-mips64: generate $(PROJECTDIR_MINI)/gmake-android-mips64/Makefile
@@ -1058,7 +1058,7 @@ endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=3.6.0 --osd=osdmini --targetos=android-x86 --targetos=android --PLATFORM=x86 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=3.8.0 --osd=osdmini --targetos=android-x86 --targetos=android --PLATFORM=x86 gmake
 
 .PHONY: android-x86
 android-x86: generate $(PROJECTDIR_MINI)/gmake-android-x86/Makefile
@@ -1082,7 +1082,7 @@ endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x64 --gcc_version=3.6.0 --osd=osdmini --targetos=android-x64 --targetos=android --PLATFORM=x64 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x64 --gcc_version=3.8.0 --osd=osdmini --targetos=android-x64 --targetos=android --PLATFORM=x64 gmake
 
 .PHONY: android-x64
 android-x64: generate $(PROJECTDIR_MINI)/gmake-android-x64/Makefile
