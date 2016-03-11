@@ -1011,7 +1011,9 @@ void running_machine::logfile_callback(const running_machine &machine, const cha
 	if (machine.m_logfile != nullptr)
 	{
 		machine.m_logfile->puts(buffer);
-		machine.m_logfile->flush();
+		
+		// TODO: commented out for now - it causes -log slow down to a crawl on Windows
+		//machine.m_logfile->flush();
 	}
 }
 
