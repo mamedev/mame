@@ -3472,7 +3472,13 @@ int ppc_device::generate_instruction_3b(drcuml_block *block, compiler_state *com
 		case 0x12:  /* FDIVSx */
 			if (!(m_drcoptions & PPCDRC_ACCURATE_SINGLES))
 				return generate_instruction_3f(block, compiler, desc);
-			UML_FDDIV(block, F0, F64(G_RA(op)), F64(G_RB(op)));                     // fddiv   f0,ra,rb
+			UML_FDCMP(block, F64(G_RB(op)), mem(&m_core->fp0));                         // fdcmp   rb,0
+			UML_JMPc(block, COND_Z, compiler->labelnum);                                // bz 1:
+			UML_FDDIV(block, F0, F64(G_RA(op)), F64(G_RB(op)));                         // fddiv   f0,ra,rb
+			UML_JMP(block, compiler->labelnum+1);                                       // bz 2:
+			UML_LABEL(block, compiler->labelnum++);                                     // 1:
+			UML_FDMOV(block, F0, mem(&m_core->fp0));                                    // fdmov   f0,0
+			UML_LABEL(block, compiler->labelnum++);                                     // 2:
 			UML_FDRNDS(block, F64(G_RD(op)), F0);                                       // fdrnds  rd,f0
 			generate_fp_flags(block, desc, TRUE);
 			return TRUE;
@@ -3566,7 +3572,13 @@ int ppc_device::generate_instruction_3f(drcuml_block *block, compiler_state *com
 				return TRUE;
 
 			case 0x12:  /* FDIVx */
+				UML_FDCMP(block, F64(G_RB(op)), mem(&m_core->fp0));                         // fdcmp   rb,0
+				UML_JMPc(block, COND_Z, compiler->labelnum);                                // bz 1:
 				UML_FDDIV(block, F64(G_RD(op)), F64(G_RA(op)), F64(G_RB(op)));              // fddiv   rd,ra,rb
+				UML_JMP(block, compiler->labelnum+1);                                       // bz 2:
+				UML_LABEL(block, compiler->labelnum++);                                     // 1:
+				UML_FDMOV(block, F64(G_RD(op)), mem(&m_core->fp0));                         // fdmov   rd,0
+				UML_LABEL(block, compiler->labelnum++);                                     // 2:
 				generate_fp_flags(block, desc, TRUE);
 				return TRUE;
 
