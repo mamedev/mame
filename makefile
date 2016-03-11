@@ -136,6 +136,12 @@ endif
 ifneq ($(filter arm%,$(UNAME_P)),)
 PLATFORM := arm
 endif 
+ifneq ($(filter aarch64%,$(UNAME_M)),)
+PLATFORM := arm64
+endif 
+ifneq ($(filter aarch64%,$(UNAME_P)),)
+PLATFORM := arm64
+endif 
 ifneq ($(filter powerpc,$(UNAME_P)),)
 PLATFORM := powerpc
 endif 
@@ -273,6 +279,13 @@ endif
 endif
 
 ifeq ($(findstring arm,$(UNAME)),arm)
+ARCHITECTURE :=
+ifndef NOASM
+	NOASM := 1
+endif
+endif
+
+ifeq ($(findstring aarch64,$(UNAME)),aarch64)
 ARCHITECTURE :=
 ifndef NOASM
 	NOASM := 1

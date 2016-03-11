@@ -1025,6 +1025,15 @@ if (_OPTIONS["PLATFORM"]=="arm") then
 	}
 end
 
+if (_OPTIONS["PLATFORM"]=="arm64") then
+	buildoptions {
+		"-Wno-cast-align",
+	}
+	defines { 
+		"PTR64=1",
+	}
+end
+
 local subdir
 if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
 	subdir = _OPTIONS["osd"] .. "/" .. _OPTIONS["target"]
