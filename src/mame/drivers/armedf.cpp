@@ -711,7 +711,7 @@ READ8_MEMBER(armedf_state::blitter_txram_r)
 WRITE8_MEMBER(armedf_state::blitter_txram_w)
 {
 	m_text_videoram[offset] = data;
-	m_tx_tilemap->mark_tile_dirty(offset);
+	m_tx_tilemap->mark_all_dirty();
 }
 
 WRITE8_MEMBER(armedf_state::fg_scrollx_w)
