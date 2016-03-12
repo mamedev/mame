@@ -1111,7 +1111,7 @@ protected:
 			format_argument<Stream> const *arguments,
 			std::enable_if_t<handle_container<std::remove_reference_t<Format> >::value, std::size_t> argument_count)
 		: m_begin(fmt.empty() ? nullptr : &*std::cbegin(fmt))
-		, m_end(fmt.empty() ? nullptr : &*std::cend(fmt))
+		, m_end(fmt.empty() ? nullptr : (m_begin + std::distance(std::cbegin(fmt), std::cend(fmt))))
 		, m_check_nul(true)
 		, m_arguments(arguments)
 		, m_argument_count(argument_count)
