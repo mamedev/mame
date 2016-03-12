@@ -40,6 +40,12 @@
 			"prescale": 1,
 			"doublebuffer": true
 		},
+		{
+			"name": "deadend",
+			"mode": "guest",
+			"prescale": 1,
+			"doublebuffer": true
+		},
 		{	"name": "native",
 			"mode": "native",
 			"prescale": 1,
@@ -53,7 +59,7 @@
 	],
 	"passes": [
 		{	"effect": "ntsc_encode",
-			"name": "NTSC Decode",
+			"name": "NTSC Encode",
 			"disablewhen": [
 				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
 				{ "type": "slider", "condition": "equal", "combine": "or", "name": "ntsc",        "value": 0 }
@@ -108,7 +114,25 @@
 			],
 			"output": "guest"
 		},
-		{	"effect": "blit",
+		{	"effect": "color",
+			"name": "Color Convolution",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "name": "adjustments", "value": 0 }
+			],
+			"uniforms": [
+				{ "uniform": "u_red_ratios", "slider": "red_ratios" },
+				{ "uniform": "u_grn_ratios", "slider": "grn_ratios" },
+				{ "uniform": "u_blu_ratios", "slider": "blu_ratios" },
+				{ "uniform": "u_offset",     "slider": "offset"     },
+				{ "uniform": "u_scale",      "slider": "scale"      },
+				{ "uniform": "u_saturation", "slider": "saturation" }
+			],
+			"input": [
+				{ "sampler": "DiffuseSampler", "texture": "guest" }
+			],
+			"output": "guest"
+		},
+ 		{	"effect": "blit",
 			"name": "Prescale",
 			"input": [
 				{ "sampler": "s_tex", "texture": "guest" }

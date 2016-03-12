@@ -22,6 +22,7 @@ bgfx_entry_uniform* entry_uniform_reader::read_from_value(const Value& value, bg
     std::string name = value["uniform"].GetString();
 	bgfx_uniform* uniform = effect->uniform(name);
 
+
     assert(uniform != nullptr);
 
 	if (value.HasMember("slider"))
