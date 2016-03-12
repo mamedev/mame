@@ -163,6 +163,11 @@ newoption {
 }
 
 newoption {
+    trigger = 'with-bundled-libuv',
+    description = 'Build bundled libuv library',
+}
+
+newoption {
 	trigger = "distro",
 	description = "Choose distribution",
 	allowed = {

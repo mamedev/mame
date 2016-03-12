@@ -951,6 +951,7 @@ end
 -- libuv library objects
 --------------------------------------------------
 if _OPTIONS["USE_LIBUV"]=="1" then
+if _OPTIONS["with-bundled-libuv"] then
 project "uv"
 	uuid "cd2afe7f-139d-49c3-9000-fc9119f3cea0"
 	kind "StaticLib"
@@ -1160,6 +1161,11 @@ project "http-parser"
 		}
 	end
 
+else
+links {
+	"libuv",
+}
+end
 --------------------------------------------------
 -- SDL2 library
 --------------------------------------------------
