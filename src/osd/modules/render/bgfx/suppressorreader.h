@@ -31,6 +31,8 @@ private:
 
     static const int CONDITION_COUNT = 2;
     static const string_to_enum CONDITION_NAMES[CONDITION_COUNT];
+    static const int COMBINE_COUNT = 2;
+    static const string_to_enum COMBINE_NAMES[COMBINE_COUNT];
 };
 
 #endif // __DRAWBGFX_SUPPRESSOR_READER__

@@ -27,10 +27,10 @@
 bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair> inputs, std::vector<bgfx_entry_uniform*> uniforms, bgfx_target* output)
 	: m_name(name)
 	, m_effect(effect)
-    , m_inputs(inputs)
     , m_suppressors(suppressors)
-	, m_output(output)
+    , m_inputs(inputs)
     , m_uniforms(uniforms)
+	, m_output(output)
 {
 }
 
@@ -58,6 +58,39 @@ void bgfx_chain_entry::submit(render_primitive* prim, int view, texture_manager&
     put_screen_buffer(prim, &buffer);
     bgfx::setVertexBuffer(&buffer);
 
+    bgfx_uniform* screen_rect = m_effect->uniform("u_screenrect");
+    if (screen_rect != nullptr)
+    {
+        float values[2];
+        float width = screen_width;
+        float height = screen_height;
+        if (m_inputs.size() > 0)
+        {
+            width = float(textures.provider(m_inputs[0].texture())->width());
+            height = float(textures.provider(m_inputs[0].texture())->height());
+        }
+        values[0] = 1.0f / width;
+        values[1] = 1.0f / height;
+        screen_rect->set(values, sizeof(float) * 2);
+    }
+
+	bgfx_uniform* quad_dims = m_effect->uniform("u_quad_dims");
+	if (quad_dims != nullptr)
+	{
+		float values[2];
+		values[0] = prim->bounds.x1 - prim->bounds.x0;
+		values[1] = prim->bounds.y1 - prim->bounds.y0;
+		quad_dims->set(values, sizeof(float) * 2);
+	}
+
+    bgfx_uniform* guest_dims = m_effect->uniform("u_guest_dims");
+    if (guest_dims != nullptr)
+    {
+        float values[2];
+        values[0] = 1.0f / float(prim->texture.width);
+        values[1] = 1.0f / float(prim->texture.height);
+        guest_dims->set(values, sizeof(float) * 2);
+    }
     for (bgfx_entry_uniform* uniform : m_uniforms)
     {
 		uniform->bind();
@@ -159,13 +192,27 @@ bool bgfx_chain_entry::skip()
         return false;
     }
 
+    // Group all AND/OR'd results together and OR them together (hack for now)
+    // TODO: Make this a bit more logical
+
+    bool or_suppress = false;
+    int and_count = 0;
+    int and_suppressed = 0;
     for (bgfx_suppressor* suppressor : m_suppressors)
     {
-        if (suppressor->suppress())
+        if (suppressor->combine() == bgfx_suppressor::combine_mode::COMBINE_AND)
         {
-            return true;
+            and_count++;
+            if (suppressor->suppress())
+            {
+                and_suppressed++;
+            }
+        }
+        else if (suppressor->combine() == bgfx_suppressor::combine_mode::COMBINE_OR)
+        {
+            or_suppress |= suppressor->suppress();
         }
     }
 
-    return false;
+    return (and_count != 0 && and_suppressed == and_count) || or_suppress;
 }

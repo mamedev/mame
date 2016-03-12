@@ -18,12 +18,18 @@ const suppressor_reader::string_to_enum suppressor_reader::CONDITION_NAMES[suppr
 	{ "notequal",   bgfx_suppressor::condition_type::CONDITION_NOTEQUAL }
 };
 
+const suppressor_reader::string_to_enum suppressor_reader::COMBINE_NAMES[suppressor_reader::COMBINE_COUNT] = {
+    { "and", bgfx_suppressor::combine_mode::COMBINE_AND },
+    { "or",  bgfx_suppressor::combine_mode::COMBINE_OR }
+};
+
 bgfx_suppressor* suppressor_reader::read_from_value(const Value& value, std::map<std::string, bgfx_slider*>& sliders)
 {
 	validate_parameters(value);
 
 	std::string name = value["name"].GetString();
 	uint32_t condition = uint32_t(get_enum_from_value(value, "condition", bgfx_suppressor::condition_type::CONDITION_EQUAL, CONDITION_NAMES, CONDITION_COUNT));
+    bgfx_suppressor::combine_mode mode = bgfx_suppressor::combine_mode(get_enum_from_value(value, "combine", bgfx_suppressor::combine_mode::COMBINE_OR, COMBINE_NAMES, COMBINE_COUNT));
 
     std::vector<bgfx_slider*> check_sliders;
     check_sliders.push_back(sliders[name + "0"]);
@@ -51,7 +57,7 @@ bgfx_suppressor* suppressor_reader::read_from_value(const Value& value, std::map
     if (slider_count > 1)
     {
         get_values(value, "value", values, slider_count);
-        for (int index = 0; index < slider_count; index++)
+        for (int index = 1; index < slider_count; index++)
         {
             std::string desc;
             char full_name[1024]; // arbitrary
@@ -64,7 +70,7 @@ bgfx_suppressor* suppressor_reader::read_from_value(const Value& value, std::map
         values[0] = get_int(value, "value", 0);
     }
 
-	return new bgfx_suppressor(check_sliders, condition, values);
+	return new bgfx_suppressor(check_sliders, condition, mode, values);
 }
 
 void suppressor_reader::validate_parameters(const Value& value)

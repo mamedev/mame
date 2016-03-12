@@ -19,11 +19,12 @@
 class bgfx_entry_uniform;
 class bgfx_slider;
 class bgfx_effect;
+class bgfx_parameter;
 
 class entry_uniform_reader : public state_reader
 {
 public:
-	static bgfx_entry_uniform* read_from_value(const Value& value, bgfx_effect* effect, std::map<std::string, bgfx_slider*>& sliders);
+	static bgfx_entry_uniform* read_from_value(const Value& value, bgfx_effect* effect, std::map<std::string, bgfx_slider*>& sliders, std::map<std::string, bgfx_parameter*>& params);
 
 private:
 	static void validate_parameters(const Value& value);

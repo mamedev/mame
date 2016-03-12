@@ -18,13 +18,13 @@ class bgfx_parameter;
 class parameter_reader : public state_reader
 {
 public:
-	static bgfx_parameter* read_from_value(const Value& value);
+	static bgfx_parameter* read_from_value(const Value& value, uint32_t window_index);
 
 private:
 	static void validate_parameters(const Value& value);
 
-	static const int TYPE_COUNT = 1;
-	static const string_to_enum TYPE_NAMES[TYPE_COUNT];
+    static const int TYPE_COUNT = 2;
+    static const string_to_enum TYPE_NAMES[TYPE_COUNT];
 };
 
 #endif // __DRAWBGFX_PARAM_READER__

@@ -141,7 +141,11 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_AUDIO_EFFECT "9",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 9" },
 #endif
 
-	// End of list
+    { nullptr,                                nullptr,     OPTION_HEADER,     "BGFX POST-PROCESSING OPTIONS" },
+    { OSDOPTION_BGFX_PATH,                    "bgfx",      OPTION_STRING,     "path to BGFX-related files" },
+    { OSDOPTION_BGFX_SCREEN_CHAIN,            "hlsl",      OPTION_STRING,     "screen chain JSON file to use" },
+
+        // End of list
 	{ nullptr }
 };
 

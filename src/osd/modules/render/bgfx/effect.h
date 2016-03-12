@@ -26,7 +26,6 @@ public:
 
     void submit(int view, uint64_t blend = 0L);
     bgfx_uniform* uniform(std::string name);
-    bool has_uniform(std::string name);
 
 private:
     uint64_t                             m_state;

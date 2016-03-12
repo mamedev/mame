@@ -20,6 +20,7 @@
 #include "chainreader.h"
 #include "target.h"
 #include "slider.h"
+#include "parameter.h"
 
 const chain_reader::string_to_enum chain_reader::STYLE_NAMES[chain_reader::STYLE_COUNT] = {
 	{ "guest",  TARGET_STYLE_GUEST },
@@ -27,7 +28,7 @@ const chain_reader::string_to_enum chain_reader::STYLE_NAMES[chain_reader::STYLE
 	{ "custom",	TARGET_STYLE_CUSTOM }
 };
 
-bgfx_chain* chain_reader::read_from_value(const Value& value, running_machine& machine, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t screen_width, uint32_t screen_height)
+bgfx_chain* chain_reader::read_from_value(const Value& value, running_machine& machine, uint32_t window_index, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t screen_width, uint32_t screen_height)
 {
 	validate_parameters(value);
 
@@ -63,8 +64,15 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, running_machine& m
 		const Value& param_array = value["parameters"];
 		for (UINT32 i = 0; i < param_array.Size(); i++)
 		{
-			parameters.push_back(parameter_reader::read_from_value(param_array[i]));
+			parameters.push_back(parameter_reader::read_from_value(param_array[i], window_index));
 		}
+	}
+
+	// Map parameters
+	std::map<std::string, bgfx_parameter*> param_map;
+	for (bgfx_parameter* param : parameters)
+	{
+		param_map[param->name()] = param;
 	}
 
 	// Create targets
@@ -121,7 +129,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, running_machine& m
         const Value& entry_array = value["passes"];
         for (UINT32 i = 0; i < entry_array.Size(); i++)
         {
-            entries.push_back(chain_entry_reader::read_from_value(entry_array[i], textures, targets, effects, slider_map));
+            entries.push_back(chain_entry_reader::read_from_value(entry_array[i], textures, targets, effects, slider_map, param_map));
         }
     }
 

@@ -11,7 +11,7 @@
 		{ "type": "vec2",     "name": "shift",        "text": "Frame Shift ",              "default": [   0,   0 ],      "max": [ 25, 25 ],        "min": [ -25, -25 ],         "step": 1, "scale": 1.0,   "format": "%2.f",  "screen": "raster" }
 	],
 	"parameters": [
-		{ "name": "alternating", "type": "frame_mask", "period": 2 }
+		{ "name": "alternating", "type": "frame", "period": 2 }
 	],
 	"targets": [
 		{	"name": "native",

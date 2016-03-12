@@ -41,28 +41,32 @@ bgfx::ShaderHandle shader_manager::shader(std::string name)
 
 bgfx::ShaderHandle shader_manager::load_shader(std::string name)
 {
-	std::string shader_path = "shaders/dx9/";
+	std::string shader_path;
 	switch (bgfx::getRendererType())
 	{
+        case bgfx::RendererType::Direct3D9:
+            shader_path = m_options.bgfx_path() + std::string("/shaders/dx9/");
+            break;
+
 		case bgfx::RendererType::Direct3D11:
 		case bgfx::RendererType::Direct3D12:
-			shader_path = "shaders/dx11/";
+			shader_path = m_options.bgfx_path() + std::string("/shaders/dx11/");
 			break;
 
 		case bgfx::RendererType::OpenGL:
-			shader_path = "shaders/glsl/";
+			shader_path = m_options.bgfx_path() + std::string("/shaders/glsl/");
 			break;
 
 		case bgfx::RendererType::Metal:
-			shader_path = "shaders/metal/";
+			shader_path = m_options.bgfx_path() + std::string("/shaders/metal/");
 			break;
 
 		case bgfx::RendererType::OpenGLES:
-			shader_path = "shaders/gles/";
+			shader_path = m_options.bgfx_path() + std::string("/shaders/gles/");
 			break;
 
 		default:
-			break;
+            fatalerror("Unknown BGFX renderer type %d", bgfx::getRendererType());
 	}
 
 	bgfx::ShaderHandle handle = bgfx::createShader(load_mem(shader_path + name + ".bin"));

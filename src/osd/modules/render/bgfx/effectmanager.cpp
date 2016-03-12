@@ -46,7 +46,7 @@ bgfx_effect* effect_manager::effect(std::string name)
 
 bgfx_effect* effect_manager::load_effect(std::string name)
 {
-	std::string path = "bgfx/effects/" + name + ".json";
+	std::string path = std::string(m_options.bgfx_path()) + "/effects/" + name + ".json";
 
 	bx::CrtFileReader reader;
 	bx::open(&reader, path.c_str());

@@ -26,6 +26,10 @@ public:
 
 	void bind(bgfx_effect *effect, texture_manager& textures);
 
+    // Getters
+    std::string sampler() const { return m_sampler; }
+    std::string texture() const { return m_texture; }
+
 private:
 	int         m_index;
 	std::string m_sampler;

@@ -135,10 +135,12 @@ int renderer_bgfx::create()
 		m_dimensions = osd_dim(m_width[0], m_height[0]);
 	}
 
+    osd_options& options = downcast<osd_options &>(window().machine().options());
 	m_textures = new texture_manager();
 	m_targets = new target_manager(*m_textures);
-	m_shaders = new shader_manager();
-	m_effects = new effect_manager(*m_shaders);
+
+	m_shaders = new shader_manager(options);
+	m_effects = new effect_manager(options, *m_shaders);
 
 	if (window().m_index != 0)
 	{
@@ -162,8 +164,8 @@ int renderer_bgfx::create()
 	m_screen_effect[3] = m_effects->effect("screen_add");
 
 #if USE_NEW_SHADERS
-	m_chains = new chain_manager(*m_textures, *m_targets, *m_effects, m_width[window().m_index], m_height[window().m_index]);
-	m_screen_chain = m_chains->chain("test", window().machine());
+	m_chains = new chain_manager(options, *m_textures, *m_targets, *m_effects, m_width[window().m_index], m_height[window().m_index]);
+	m_screen_chain = m_chains->chain(options.bgfx_screen_chain(), window().machine(), window().m_index);
     m_sliders_dirty = true;
 #endif
 
@@ -852,12 +854,10 @@ const bgfx::Memory* renderer_bgfx::mame_texture_data_to_bgfx_texture_data(UINT32
 
 int renderer_bgfx::handle_screen_chains()
 {
-    int index = window().m_index;
-
     window().m_primlist->acquire_lock();
-    
+
     int view = 0;
-    
+
     // process
     render_primitive *prim = window().m_primlist->first();
     while (prim != nullptr)

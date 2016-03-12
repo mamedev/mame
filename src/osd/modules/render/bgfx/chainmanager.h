@@ -27,8 +27,9 @@ class bgfx_chain;
 
 class chain_manager {
 public:
-	chain_manager(texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t width, uint32_t height)
-		: m_textures(textures)
+	chain_manager(osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t width, uint32_t height)
+		: m_options(options)
+        , m_textures(textures)
 		, m_targets(targets)
 		, m_effects(effects)
 		, m_width(width)
@@ -38,11 +39,12 @@ public:
 	~chain_manager();
 
 	// Getters
-	bgfx_chain* chain(std::string name, running_machine& machine);
+	bgfx_chain* chain(std::string name, running_machine& machine, uint32_t window_index);
 
 private:
-	bgfx_chain* load_chain(std::string name, running_machine& machine);
+	bgfx_chain* load_chain(std::string name, running_machine& machine, uint32_t window_index);
 
+    osd_options&                        m_options;
 	texture_manager&					m_textures;
 	target_manager&						m_targets;
 	effect_manager&                     m_effects;

@@ -1,0 +1,135 @@
+{	"name": "Classic D3D HLSL CRT Simulation",
+	"author": "Ryan Holtz & ImJezze",
+	"sliders": [
+		{ "type": "int_enum", "name": "adjustments", "text": "Enable Adjustments", "default": 0, "max": 1, "min": 0, "step": 1, "scale": 1.0, "format": "%s", "screen": "any", "strings": [ "Off", "On" ] },
+
+		{ "type": "int_enum", "name": "ntsc",            "text": "Enable NTSC",                   "default": 0,        "max": 1,        "min": 0,        "step": 1,   "scale": 1.0,       "format": "%s",    "screen": "any", "strings": [ "Off", "On" ] },
+		{ "type": "float",    "name": "a_value",         "text": "NTSC A Value",                  "default": 50,       "max": 100,      "min": 0,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",    "name": "b_value",         "text": "NTSC B Value",                  "default": 50,       "max": 100,      "min": 0,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",    "name": "cc_value",        "text": "NTSC Color Carrier (Hz)",       "default": 35795454, "max": 36795454, "min": 34795454, "step": 100, "scale": 0.0000001, "format": "%1.7f", "screen": "raster" },
+		{ "type": "float",    "name": "o_value",         "text": "NTSC Time Offset",              "default": 0,        "max": 100,      "min": 0,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",    "name": "p_value",         "text": "NTSC Phase Offset",             "default": 100,      "max": 200,      "min": 0,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",    "name": "scan_time",       "text": "NTSC Scanline Duration (uSec)", "default": 526,      "max": 1500,     "min": 1,        "step": 1,   "scale": 0.1,       "format": "%3.1f", "screen": "raster" },
+		{ "type": "float",    "name": "notch_width",     "text": "NTSC Color Notch Filter Width", "default": 100,      "max": 400,      "min": 1,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",    "name": "y_freq_response", "text": "NTSC Y Signal Bandwidth (Hz)",  "default": 600,      "max": 2100,     "min": 1,        "step": 10,  "scale": 0.01,      "format": "%2.2f", "screen": "raster" },
+		{ "type": "float",    "name": "i_freq_response", "text": "NTSC I Signal Bandwidth (Hz)",  "default": 120,      "max": 2100,     "min": 1,        "step": 10,  "scale": 0.01,      "format": "%2.2f", "screen": "raster" },
+		{ "type": "float",    "name": "q_freq_response", "text": "NTSC Q Signal Bandwidth (Hz)",  "default": 60,       "max": 2100,     "min": 1,        "step": 10,  "scale": 0.01,      "format": "%2.2f", "screen": "raster" },
+		{ "type": "float",    "name": "jitter_offset",   "text": "NTSC Frame Jitter Offset",      "default": 0,        "max": 200,      "min": 1,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
+
+		{ "type": "color", "name": "red_ratios", "text": "Red Output from ",   "default": [ 100,   0,   0 ], "max": [ 200, 200, 200 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "color", "name": "grn_ratios", "text": "Green Output from ", "default": [   0, 100,   0 ], "max": [ 200, 200, 200 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "color", "name": "blu_ratios", "text": "Blue Output from ",  "default": [   0,   0, 100 ], "max": [ 200, 200, 200 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "color", "name": "offset",     "text": "Signal Offset, ",    "default": [   0,   0,   0 ], "max": [ 200, 200, 200 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "color", "name": "scale",      "text": "Signal Scale, ",     "default": [ 100, 100, 100 ], "max": [ 200, 200, 200 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "float", "name": "saturation", "text": "Color Saturation",   "default": 100,               "max": 400,               "min": 0,           "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
+
+		{ "type": "vec2", "name": "converge_red",          "text": "Red Convergence, ",   "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "converge_green",        "text": "Green Convergence, ", "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "converge_blue",         "text": "Blue Convergence, ",  "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "radial_converge_red",   "text": "Red Convergence, ",   "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "radial_converge_green", "text": "Green Convergence, ", "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "radial_converge_blue",  "text": "Blue Convergence, ",  "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" }
+	],
+	"parameters": [
+		{ "name": "jitter", "type": "frame", "period": 2 }
+	],
+	"targets": [
+		{
+			"name": "guest",
+			"mode": "guest",
+			"prescale": 1,
+			"doublebuffer": true
+		},
+		{	"name": "native",
+			"mode": "native",
+			"prescale": 1,
+			"doublebuffer": true
+		},
+		{	"name": "previous",
+			"mode": "native",
+			"prescale": 1,
+			"doublebuffer": true
+		}
+	],
+	"passes": [
+		{	"effect": "ntsc_encode",
+			"name": "NTSC Decode",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "ntsc",        "value": 0 }
+			],
+			"uniforms": [
+				{ "uniform": "u_a_value",         "slider": "a_value" },
+				{ "uniform": "u_b_value",         "slider": "b_value" },
+				{ "uniform": "u_cc_value",        "slider": "cc_value" },
+				{ "uniform": "u_p_value",         "slider": "p_value" },
+				{ "uniform": "u_scan_time",       "slider": "scan_time" },
+				{ "uniform": "u_jitter_offset",   "slider": "jitter_offset" },
+				{ "uniform": "u_jitter_amount",   "parameter": "jitter" }
+			],
+			"input": [
+				{ "sampler": "DiffuseSampler", "texture": "screen" }
+			],
+			"output": "guest"
+		},
+		{	"effect": "ntsc_decode",
+			"name": "NTSC Decode",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "ntsc",        "value": 0 }
+			],
+			"uniforms": [
+				{ "uniform": "u_a_value",         "slider": "a_value" },
+				{ "uniform": "u_b_value",         "slider": "b_value" },
+				{ "uniform": "u_cc_value",        "slider": "cc_value" },
+				{ "uniform": "u_o_value",         "slider": "o_value" },
+				{ "uniform": "u_scan_time",       "slider": "scan_time" },
+				{ "uniform": "u_notch_width",     "slider": "notch_width" },
+				{ "uniform": "u_y_freq_response", "slider": "y_freq_response" },
+				{ "uniform": "u_i_freq_response", "slider": "i_freq_response" },
+				{ "uniform": "u_q_freq_response", "slider": "q_freq_response" },
+				{ "uniform": "u_q_freq_response", "slider": "q_freq_response" },
+				{ "uniform": "u_jitter_offset",   "slider": "jitter_offset" },
+				{ "uniform": "u_jitter_amount",   "parameter": "jitter" }
+			],
+			"input": [
+				{ "sampler": "DiffuseSampler", "texture": "guest" }
+			],
+			"output": "guest"
+		},
+		{	"effect": "blit",
+			"name": "NTSC Skip",
+			"disablewhen": [
+				{ "type": "slider", "condition": "notequal", "combine": "and", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "notequal", "combine": "and", "name": "ntsc",        "value": 0 }
+			],
+			"input": [
+				{ "sampler": "s_tex", "texture": "screen" }
+			],
+			"output": "guest"
+		},
+		{	"effect": "blit",
+			"name": "Prescale",
+			"input": [
+				{ "sampler": "s_tex", "texture": "guest" }
+			],
+			"output": "native"
+		},
+		{	"effect": "deconverge",
+			"name": "Deconvergence",
+			"uniforms": [
+				{ "uniform": "u_converge_red",          "slider": "converge_red"   },
+				{ "uniform": "u_converge_green",        "slider": "converge_green" },
+				{ "uniform": "u_converge_blue",         "slider": "converge_blue"  },
+				{ "uniform": "u_radial_converge_red",   "slider": "radial_converge_red"   },
+				{ "uniform": "u_radial_converge_green", "slider": "radial_converge_green" },
+				{ "uniform": "u_radial_converge_blue",  "slider": "radial_converge_blue"  }
+			],
+			"input": [
+				{ "sampler": "DiffuseSampler", "texture": "native" }
+			],
+			"output": "native"
+		}
+	],
+	"output": "native"
+}

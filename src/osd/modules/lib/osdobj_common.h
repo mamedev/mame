@@ -78,7 +78,8 @@
 #define OSDOPTVAL_AUTO                  "auto"
 #define OSDOPTVAL_NONE                  "none"
 
-
+#define OSDOPTION_BGFX_PATH             "bgfx_path"
+#define OSDOPTION_BGFX_SCREEN_CHAIN     "screen_chain"
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -148,6 +149,10 @@ public:
 	// CoreAudio specific options
 	const char *audio_output() const { return value(OSDOPTION_AUDIO_OUTPUT); }
 	const char *audio_effect(int index) const { return value(string_format("%s%d", OSDOPTION_AUDIO_EFFECT, index).c_str()); }
+
+    // BGFX specific options
+    const char *bgfx_path() const { return value(OSDOPTION_BGFX_PATH); }
+    const char *bgfx_screen_chain() const { return value(OSDOPTION_BGFX_SCREEN_CHAIN); }
 
 private:
 	static const options_entry s_option_entries[];

@@ -23,7 +23,7 @@
 #include "suppressor.h"
 #include "suppressorreader.h"
 
-bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, texture_manager& textures, target_manager& targets, effect_manager& effects, std::map<std::string, bgfx_slider*>& sliders)
+bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, texture_manager& textures, target_manager& targets, effect_manager& effects, std::map<std::string, bgfx_slider*>& sliders, std::map<std::string, bgfx_parameter*>& params)
 {
 	validate_parameters(value);
 
@@ -49,7 +49,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, textur
 		const Value& uniform_array = value["uniforms"];
 		for (UINT32 i = 0; i < uniform_array.Size(); i++)
 		{
-			uniforms.push_back(entry_uniform_reader::read_from_value(uniform_array[i], effect, sliders));
+			uniforms.push_back(entry_uniform_reader::read_from_value(uniform_array[i], effect, sliders, params));
 		}
 	}
 

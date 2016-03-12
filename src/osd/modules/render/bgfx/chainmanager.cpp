@@ -31,20 +31,20 @@ chain_manager::~chain_manager()
 	m_chains.clear();
 }
 
-bgfx_chain* chain_manager::chain(std::string name, running_machine& machine)
+bgfx_chain* chain_manager::chain(std::string name, running_machine& machine, uint32_t window_index)
 {
-	std::map<std::string, bgfx_chain*>::iterator iter = m_chains.find(name);
+	std::map<std::string, bgfx_chain*>::iterator iter = m_chains.find(name + std::to_string(window_index));
 	if (iter != m_chains.end())
 	{
 		return iter->second;
 	}
 
-	return load_chain(name, machine);
+	return load_chain(name, machine, window_index);
 }
 
-bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine)
+bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine, uint32_t window_index)
 {
-	std::string path = "bgfx/chains/" + name + ".json";
+	std::string path = std::string(m_options.bgfx_path()) + "/chains/" + name + ".json";
 
 	bx::CrtFileReader reader;
 	bx::open(&reader, path.c_str());
@@ -58,9 +58,9 @@ bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine
 
 	Document document;
 	document.Parse<0>(data);
-	bgfx_chain* chain = chain_reader::read_from_value(document, machine, m_textures, m_targets, m_effects, m_width, m_height);
+	bgfx_chain* chain = chain_reader::read_from_value(document, machine, window_index, m_textures, m_targets, m_effects, m_width, m_height);
 
-	m_chains[name] = chain;
+	m_chains[name + std::to_string(window_index)] = chain;
 
 	return chain;
 }

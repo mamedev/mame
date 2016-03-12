@@ -279,7 +279,7 @@ const options_entry windows_options::s_option_entries[] =
 	{ nullptr,                                        nullptr,    OPTION_HEADER,     "DIRECTDRAW-SPECIFIC OPTIONS" },
 	{ WINOPTION_HWSTRETCH ";hws",                     "1",        OPTION_BOOLEAN,    "enables hardware stretching" },
 
-	// post-processing options
+	// D3D post-processing options
 	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "DIRECT3D POST-PROCESSING OPTIONS" },
 	{ WINOPTION_HLSL_ENABLE";hlsl",                             "0",                 OPTION_BOOLEAN,    "enables HLSL post-processing (PS3.0 required)" },
 	{ WINOPTION_HLSLPATH,                                       "hlsl",              OPTION_STRING,     "path to hlsl files" },
