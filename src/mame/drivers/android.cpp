@@ -15,7 +15,10 @@ public:
 	androidp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_bgram(*this, "bgram")
+	
+		{ }
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -23,27 +26,108 @@ public:
 	UINT32 screen_update_androidp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+
+	required_shared_ptr<UINT8> m_bgram;
+	tilemap_t *m_bg_tilemap;
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	DECLARE_WRITE8_MEMBER(androidp_bgram_w);
+	DECLARE_WRITE8_MEMBER(bg_scrollx_w);
+
 };
+
+TILE_GET_INFO_MEMBER(androidp_state::get_bg_tile_info)
+{
+	int code = (m_bgram[tile_index*2]);
+	int attr = (m_bgram[(tile_index*2)+1]);
+
+	code |= (attr & 0x7) << 8;
+
+	SET_TILE_INFO_MEMBER(1,
+			code,
+			0,
+			0);
+}
+
+WRITE8_MEMBER(androidp_state::androidp_bgram_w)
+{
+	m_bgram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset/2);
+}
 
 
 
 void androidp_state::video_start()
 {
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(androidp_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 UINT32 androidp_state::screen_update_androidp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-
+WRITE8_MEMBER(androidp_state::bg_scrollx_w)
+{
+	m_bg_tilemap->set_scrollx(0, data);
+}
 
 static ADDRESS_MAP_START( androidp_map, AS_PROGRAM, 8, androidp_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM 
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xa0ff) AM_RAM  // sprites?
+	AM_RANGE(0xa800, 0xa8ff) AM_RAM  // palette?
+	AM_RANGE(0xac00, 0xacff) AM_RAM  // palette?
+	AM_RANGE(0xb000, 0xbfff) AM_RAM_WRITE(androidp_bgram_w) AM_SHARE("bgram")
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( androidp_portmap, AS_IO, 8, androidp_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("02") // probably from sub-cpu (inputs read by that?)
+
+	AM_RANGE(0x03, 0x03) AM_WRITENOP
+
+	AM_RANGE(0x06, 0x06) AM_WRITENOP
+	AM_RANGE(0x07, 0x07) AM_WRITENOP
+	AM_RANGE(0x08, 0x08) AM_WRITENOP
+	AM_RANGE(0x09, 0x09) AM_WRITENOP
+
+	AM_RANGE(0x0a, 0x0a) AM_WRITE( bg_scrollx_w )
+	AM_RANGE(0x0b, 0x0b) AM_WRITENOP
+
 ADDRESS_MAP_END
 
 
+
 static INPUT_PORTS_START( androidp )
+
+	PORT_START("02")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 INPUT_PORTS_END
 
 
@@ -79,10 +163,12 @@ GFXDECODE_END
 
 void androidp_state::machine_start()
 {
+	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x4000);
 }
 
 void androidp_state::machine_reset()
 {
+	membank("bank1")->set_entry(0);
 }
 
 static MACHINE_CONFIG_START( androidp, androidp_state )
@@ -90,14 +176,15 @@ static MACHINE_CONFIG_START( androidp, androidp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(androidp_map)
+	MCFG_CPU_IO_MAP(androidp_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", androidp_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, (30*8)-1, 0, (24*8)-1)
 	MCFG_SCREEN_UPDATE_DRIVER(androidp_state, screen_update_androidp)
 	MCFG_SCREEN_PALETTE("palette")
 
