@@ -33,6 +33,16 @@ public:
 	DECLARE_WRITE8_MEMBER(androidp_bgram_w);
 	DECLARE_WRITE8_MEMBER(bg_scrollx_w);
 
+	DECLARE_WRITE8_MEMBER(port_3_w);
+
+	DECLARE_WRITE8_MEMBER(port_6_w);
+	DECLARE_WRITE8_MEMBER(port_7_w);
+	DECLARE_WRITE8_MEMBER(port_8_w);
+	DECLARE_WRITE8_MEMBER(port_9_w);
+
+	DECLARE_WRITE8_MEMBER(port_b_w);
+
+
 };
 
 TILE_GET_INFO_MEMBER(androidp_state::get_bg_tile_info)
@@ -72,6 +82,46 @@ WRITE8_MEMBER(androidp_state::bg_scrollx_w)
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
+
+WRITE8_MEMBER(androidp_state::port_3_w)
+{
+	// 9b on startup
+//	printf("port3_w %02x\n", data);
+}
+
+WRITE8_MEMBER(androidp_state::port_6_w)
+{
+	// seems most likely candidate for ROM BANK
+
+	// 04 during title, 08 during high score
+	//printf("port6_w %02x\n", data);
+}
+
+WRITE8_MEMBER(androidp_state::port_7_w)
+{
+	// 92 on startup
+	//printf("port7_w %02x\n", data);
+}
+
+WRITE8_MEMBER(androidp_state::port_8_w)
+{
+	// 00 between screens
+	//printf("port8_w %02x\n", data);
+}
+
+WRITE8_MEMBER(androidp_state::port_9_w)
+{
+	if (data!=0x00)
+		printf("port9_w %02x\n", data);
+}
+
+WRITE8_MEMBER(androidp_state::port_b_w)
+{
+	// 00 on startup
+	// 23 ff between scenes
+//	printf("portb_w %02x\n", data);
+}
+
 static ADDRESS_MAP_START( androidp_map, AS_PROGRAM, 8, androidp_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
@@ -86,15 +136,15 @@ static ADDRESS_MAP_START( androidp_portmap, AS_IO, 8, androidp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("02") // probably from sub-cpu (inputs read by that?)
 
-	AM_RANGE(0x03, 0x03) AM_WRITENOP
+	AM_RANGE(0x03, 0x03) AM_WRITE( port_3_w )
 
-	AM_RANGE(0x06, 0x06) AM_WRITENOP
-	AM_RANGE(0x07, 0x07) AM_WRITENOP
-	AM_RANGE(0x08, 0x08) AM_WRITENOP
-	AM_RANGE(0x09, 0x09) AM_WRITENOP
+	AM_RANGE(0x06, 0x06) AM_WRITE( port_6_w )
+	AM_RANGE(0x07, 0x07) AM_WRITE( port_7_w )
+	AM_RANGE(0x08, 0x08) AM_WRITE( port_8_w )
+	AM_RANGE(0x09, 0x09) AM_WRITE( port_9_w )
 
 	AM_RANGE(0x0a, 0x0a) AM_WRITE( bg_scrollx_w )
-	AM_RANGE(0x0b, 0x0b) AM_WRITENOP
+	AM_RANGE(0x0b, 0x0b) AM_WRITE( port_b_w )
 
 ADDRESS_MAP_END
 
