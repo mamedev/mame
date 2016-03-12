@@ -6,8 +6,8 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-
-
+#include "machine/i8255.h"
+#include "sound/2203intf.h"
 
 class androidp_state : public driver_device
 {
@@ -15,6 +15,7 @@ public:
 	androidp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_bgram(*this, "bgram")
 	
@@ -25,6 +26,7 @@ public:
 	virtual void video_start() override;
 	UINT32 screen_update_androidp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<UINT8> m_bgram;
@@ -42,6 +44,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(port_b_w);
 
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 };
 
@@ -99,7 +102,7 @@ WRITE8_MEMBER(androidp_state::port_6_w)
 	// seems most likely candidate for ROM BANK
 
 	// 04 during title, 08 during high score
-	//printf("port6_w %02x\n", data);
+	//printf("%04x: port6_w %02x\n", space.device().safe_pc(), data);
 }
 
 WRITE8_MEMBER(androidp_state::port_7_w)
@@ -149,6 +152,20 @@ static ADDRESS_MAP_START( androidp_portmap, AS_IO, 8, androidp_state )
 
 	AM_RANGE(0x0a, 0x0a) AM_WRITE( bg_scrollx_w )
 	AM_RANGE(0x0b, 0x0b) AM_WRITE( port_b_w )
+
+ADDRESS_MAP_END
+
+
+
+static ADDRESS_MAP_START( androidp_sub_map, AS_PROGRAM, 8, androidp_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xf800, 0xffff) AM_RAM
+
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( androidp_sub_portmap, AS_IO, 8, androidp_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym", ym2203_device, read, write)
 
 ADDRESS_MAP_END
 
@@ -225,6 +242,12 @@ void androidp_state::machine_reset()
 	membank("bank1")->set_entry(2);
 }
 
+WRITE_LINE_MEMBER(androidp_state::irqhandler)
+{
+	m_subcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
 static MACHINE_CONFIG_START( androidp, androidp_state )
 
 	/* basic machine hardware */
@@ -232,6 +255,28 @@ static MACHINE_CONFIG_START( androidp, androidp_state )
 	MCFG_CPU_PROGRAM_MAP(androidp_map)
 	MCFG_CPU_IO_MAP(androidp_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", androidp_state,  irq0_line_hold)
+
+	MCFG_CPU_ADD("subcpu", Z80,4000000)         /* ? MHz */
+	MCFG_CPU_PROGRAM_MAP(androidp_sub_map)
+	MCFG_CPU_IO_MAP(androidp_sub_portmap)
+//	MCFG_CPU_VBLANK_INT_DRIVER("screen", androidp_state,  irq0_line_hold)
+
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+//	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+//	MCFG_I8255_IN_PORTB_CB(IOPORT("IN3"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+//	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
+///	MCFG_I8255_IN_PORTB_CB(IOPORT("IN2"))
+//	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+
+	MCFG_SOUND_ADD("ym", YM2203, 4000000) // ? Mhz
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(androidp_state, irqhandler))
+	MCFG_SOUND_ROUTE(0, "mono", 0.65)
+	MCFG_SOUND_ROUTE(1, "mono", 0.65)
+	MCFG_SOUND_ROUTE(2, "mono", 0.65)
+	MCFG_SOUND_ROUTE(3, "mono", 0.45)
+
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -259,7 +304,7 @@ ROM_START( androidp )
 	ROM_LOAD( "MITSUBISHI_A02.toppcb.m5l27256k.J1.BIN", 0x08000, 0x08000, CRC(e41426be) SHA1(e7e06ef3ff5160bb7d870e148ba2799da52cf24c) )
 	ROM_LOAD( "MITSUBISHI_A03.toppcb.m5l27256k.G1.BIN", 0x10000, 0x08000, CRC(6cf5f48a) SHA1(b9b4e5e7bace0e8d98fbc9f4ad91bc56ef42099e) )
 
-	ROM_REGION( 0x18000, "soundcpu", 0 )
+	ROM_REGION( 0x18000, "subcpu", 0 )
 	ROM_LOAD( "MITSUBISHI_A04.toppcb.m5l27256k.N6.BIN", 0x00000, 0x08000, CRC(13c38fe4) SHA1(34a35fa057159a5c83892a88b8c908faa39d5cb3) )	
 
 	ROM_REGION( 0x20000, "sprites", 0 )
