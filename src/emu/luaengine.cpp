@@ -839,6 +839,43 @@ int lua_engine::lua_screen::l_width(lua_State *L)
 }
 
 //-------------------------------------------------
+//  screen_orientation - return screen orientation degrees (0, 90, 180, 270)
+//  -> manager:machine().screens[":screen"]:rotate()
+//-------------------------------------------------
+
+int lua_engine::lua_screen::l_rotate(lua_State *L)
+{
+	switch (luaThis->machine().system().flags & ORIENTATION_MASK)
+	{
+		case ORIENTATION_FLIP_X:
+			lua_pushunsigned(L, 0);
+			break;
+		case ORIENTATION_FLIP_Y:
+			lua_pushunsigned(L, 180);
+			break;
+		case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
+			lua_pushunsigned(L, 180);
+			break;
+		case ORIENTATION_SWAP_XY:
+			lua_pushunsigned(L, 90);
+			break;
+		case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X:
+			lua_pushunsigned(L, 90);
+			break;
+		case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_Y:
+			lua_pushunsigned(L, 270);
+			break;
+		case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
+			lua_pushunsigned(L, 270);
+			break;
+		default:
+			lua_pushunsigned(L, 0);
+			break;
+	}
+	return 1;
+}
+
+//-------------------------------------------------
 //  screen_refresh - return screen refresh rate
 //  -> manager:machine().screens[":screen"]:refresh()
 //-------------------------------------------------
@@ -1579,6 +1616,7 @@ void lua_engine::initialize()
 				.addCFunction ("draw_text", &lua_screen::l_draw_text)
 				.addCFunction ("height", &lua_screen::l_height)
 				.addCFunction ("width", &lua_screen::l_width)
+				.addCFunction ("rotate", &lua_screen::l_rotate)
 				.addCFunction ("refresh", &lua_screen::l_refresh)
 				.addCFunction ("snapshot", &lua_screen::l_snapshot)
 				.addCFunction ("type", &lua_screen::l_type)
