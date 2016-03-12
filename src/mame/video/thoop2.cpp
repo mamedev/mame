@@ -38,7 +38,7 @@
       1  | x------- -------- | flip y
 */
 
-TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info_thoop2_screen0)
+TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info_screen0)
 {
 	int data = m_videoram[tile_index << 1];
 	int data2 = m_videoram[(tile_index << 1) + 1];
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info_thoop2_screen0)
 }
 
 
-TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info_thoop2_screen1)
+TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info_screen1)
 {
 	int data = m_videoram[(0x1000/2) + (tile_index << 1)];
 	int data2 = m_videoram[(0x1000/2) + (tile_index << 1) + 1];
@@ -67,7 +67,7 @@ TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info_thoop2_screen1)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(thoop2_state::thoop2_vram_w)
+WRITE16_MEMBER(thoop2_state::vram_w)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_pant[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
@@ -81,17 +81,18 @@ WRITE16_MEMBER(thoop2_state::thoop2_vram_w)
 
 void thoop2_state::video_start()
 {
-	int i;
-
-	m_pant[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(thoop2_state::get_tile_info_thoop2_screen0),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_pant[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(thoop2_state::get_tile_info_thoop2_screen1),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_pant[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(thoop2_state::get_tile_info_screen0),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_pant[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(thoop2_state::get_tile_info_screen1),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 
 	m_pant[0]->set_transmask(0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
 	m_pant[1]->set_transmask(0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
 
-	for (i = 0; i < 5; i++){
+	for (int i = 0; i < 5; i++){
 		m_sprite_table[i] = std::make_unique<int[]>(512);
+		save_pointer(NAME(m_sprite_table[i].get()), 512, i);
 	}
+
+	save_item(NAME(m_sprite_count));
 }
 
 /***************************************************************************
@@ -100,17 +101,15 @@ void thoop2_state::video_start()
 
 ***************************************************************************/
 
-void thoop2_state::thoop2_sort_sprites()
+void thoop2_state::sort_sprites()
 {
-	int i;
-
 	m_sprite_count[0] = 0;
 	m_sprite_count[1] = 0;
 	m_sprite_count[2] = 0;
 	m_sprite_count[3] = 0;
 	m_sprite_count[4] = 0;
 
-	for (i = 3; i < (0x1000 - 6)/2; i += 4){
+	for (int i = 3; i < (0x1000 - 6)/2; i += 4){
 		int color = (m_spriteram[i+2] & 0x7e00) >> 9;
 		int priority = (m_spriteram[i] & 0x3000) >> 12;
 
@@ -194,7 +193,7 @@ void thoop2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 ***************************************************************************/
 
-UINT32 thoop2_state::screen_update_thoop2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 thoop2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* set scroll registers */
 	m_pant[0]->set_scrolly(0, m_vregs[0]);
@@ -202,7 +201,7 @@ UINT32 thoop2_state::screen_update_thoop2(screen_device &screen, bitmap_ind16 &b
 	m_pant[1]->set_scrolly(0, m_vregs[2]);
 	m_pant[1]->set_scrollx(0, m_vregs[3]);
 
-	thoop2_sort_sprites();
+	sort_sprites();
 
 	bitmap.fill(0, cliprect );
 

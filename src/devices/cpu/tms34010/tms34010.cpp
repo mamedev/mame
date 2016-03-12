@@ -594,11 +594,11 @@ void tms340x0_device::device_start()
 
 		for (int regnum = 0; regnum < 15; regnum++)
 		{
-			state_add(TMS34010_A0 + regnum, strformat("A%d", regnum).c_str(), m_regs[regnum].reg);
+			state_add(TMS34010_A0 + regnum, string_format("A%d", regnum).c_str(), m_regs[regnum].reg);
 		}
 		for (int regnum = 0; regnum < 15; regnum++)
 		{
-			state_add(TMS34010_B0 + regnum, strformat("B%d", regnum).c_str(), m_regs[30 - regnum].reg);
+			state_add(TMS34010_B0 + regnum, string_format("B%d", regnum).c_str(), m_regs[30 - regnum].reg);
 		}
 	}
 
@@ -1603,7 +1603,7 @@ void tms340x0_device::state_string_export(const device_state_entry &entry, std::
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				m_st & 0x80000000 ? 'N':'.',
 				m_st & 0x40000000 ? 'C':'.',
 				m_st & 0x20000000 ? 'Z':'.',

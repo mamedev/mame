@@ -1,3 +1,5 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
 fetch
 	if(irq_requested) {
 		int level;

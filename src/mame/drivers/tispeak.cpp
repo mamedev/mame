@@ -34,7 +34,7 @@ Wiz-A-Tron or Little Professor. But the popularity of this product was much
 above expectations. TI continued to manufacture many products for this line.
 
     Speak & Spell (US), 1978
-    - MCU: TMC0271*, labeled TMC0271NL (die label unknown)
+    - MCU: TMC0271*, label TMC0271NL (die label unknown)
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB TMC0351NL
     - VSM(2/2): 16KB TMC0352NL
@@ -42,7 +42,7 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: keyboard has buttons instead of cheap membrane
 
     Speak & Spell (US), 1979
-    - MCU: TMC0271, labeled TMC0271H-N2L (die labeled 0271H T0270D)
+    - MCU: TMC0271, label TMC0271H-N2L (die label 0271H T0270D)
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB TMC0351N2L
     - VSM(2/2): 16KB TMC0352N2L
@@ -79,8 +79,15 @@ above expectations. TI continued to manufacture many products for this line.
     - VFD: some seen with the one from Speak & Math(!)
     - notes: this one has a dedicated voice actor
 
+    Speak & Spell (Spanish), 1981
+    - MCU: CD2701N2L*
+    - TMS51xx: TMC0281
+    - VSM(1/2): 16KB? CD2319*
+    - VSM(2/2): 16KB? CD2320*
+    - VFD: 8 digits with 14 segments, DP and accent mark
+
     Speak & Spell (France) "La Dictee Magique", 1980
-    - MCU: CD2702, labeled CD2702AN2L (die labeled TMC0270F 2702A)
+    - MCU: CD2702, label CD2702AN2L (die label TMC0270F 2702A)
     - TMS51xx: CD2801
     - VSM: 16KB CD2352
 
@@ -96,7 +103,7 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: it appears that TI ran out of original snspell VFDs in the early 80s?
 
     Speak & Spell Compact (US), 1981
-    - MCU: CD8011, labeled CD8011A-NL (die labeled 1100B)
+    - MCU: CD8011, label CD8011A-NL (die label 1100B)
     - TMS51xx: TMC0281D
     - VSM: 16KB CD2354, CD2354(rev.A)
     - notes: no display, MCU is TMS1100 instead of TMS0270, overall similar to Touch & Tell
@@ -143,7 +150,7 @@ Note that they are interchangeable, eg. you can use a French module on a US Spea
 Speak & Math:
 
     Speak & Math (US), 1980 (renamed to "Speak & Maths" in UK, but is the same product)
-    - MCU: CD2704, labeled CD2704B-N2L (die labeled TMC0270F 2704B) - 2nd revision?(mid-1982)
+    - MCU: CD2704, label CD2704B-N2L (die label TMC0270F 2704B) - 2nd revision?(mid-1982)
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2392
     - VSM(2/2): 16KB CD2393
@@ -154,7 +161,7 @@ Speak & Math:
       Apparently QA never found out and it ended up in the final product.
 
     Speak & Math (US), 1986
-    - MCU: CD2708, labeled CD2708N2L (die labeled TMC0270F 2708A)
+    - MCU: CD2708, label CD2708N2L (die label TMC0270F 2708A)
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2381
     - VSM(2/2): 4KB CD2614
@@ -170,7 +177,7 @@ Speak & Math:
 Speak & Read:
 
     Speak & Read (US), 1980
-    - MCU: CD2705, labeled CD2705B-N2L (die labeled TMC0270E 2705B) - 2nd revision?(late-1981)
+    - MCU: CD2705, label CD2705B-N2L (die label TMC0270E 2705B) - 2nd revision?(late-1981)
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2394(rev.A)
     - VSM(2/2): 16KB CD2395(rev.A)
@@ -192,7 +199,7 @@ Speak & Read modules:
 Touch & Tell:
 
     Touch & Tell (US), 1981
-    - MCU: CD8012, labeled CD8012NL (die labeled 1100G CD8012)
+    - MCU: CD8012, label CD8012NL (die label 1100G CD8012)
     - TMS51xx: CD2802
     - VSM: 4KB CD2610
     - notes: MCU is TMS1100 instead of TMS0270. CD8010 is seen in some devices
@@ -377,7 +384,7 @@ K28 modules:
     - Expansion Module 4: VSM: 16KB CM62217
     - Expansion Module 5: VSM: 16KB CM62218*
     - Expansion Module 6: VSM: 16KB CM62219
-    
+
     note: these won't work on the 1981 version(s)
 
 ----------------------------------------------------------------------------
@@ -431,6 +438,7 @@ public:
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
 	void power_off();
 	void prepare_display();
+	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
 
 	DECLARE_READ8_MEMBER(snspell_read_k);
 	DECLARE_WRITE16_MEMBER(snmath_write_o);
@@ -468,7 +476,6 @@ protected:
 void tispeak_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
-	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
 
 	init_cartridge();
 }
@@ -541,14 +548,15 @@ DRIVER_INIT_MEMBER(tispeak_state, lantutor)
 
 void tispeak_state::prepare_display()
 {
-	UINT16 gridmask = (m_display_decay[15][16] != 0) ? 0xffff : 0x8000;
-	display_matrix_seg(16+1, 16, m_plate | 0x10000, m_grid & gridmask, 0x3fff);
+	UINT16 gridmask = vfd_filament_on() ? 0xffff : 0x8000;
+	set_display_segmask(0x21ff, 0x3fff);
+	display_matrix(16+1, 16, m_plate | 1<<16, m_grid & gridmask);
 }
 
 WRITE16_MEMBER(tispeak_state::snspell_write_r)
 {
 	// R13: power-off request, on falling edge
-	if ((m_r >> 13 & 1) && !(data >> 13 & 1))
+	if (~data & m_r & 0x2000)
 		power_off();
 
 	// R0-R7: input mux and select digit (+R8 if the device has 9 digits)
@@ -614,7 +622,7 @@ WRITE16_MEMBER(tispeak_state::snspellc_write_r)
 	m_tms5100->pdc_w(data >> 10);
 
 	// R9: power-off request, on falling edge
-	if ((m_r >> 9 & 1) && !(data >> 9 & 1))
+	if (~data & m_r & 0x200)
 		power_off();
 
 	// R0-R8: input mux
@@ -681,12 +689,12 @@ WRITE16_MEMBER(tispeak_state::k28_write_r)
 
 	// R0: TMS5100 PDC pin
 	m_tms5100->pdc_w(data & 1);
-	
+
 	// R5: input mux high bit
 	m_inp_mux = (m_inp_mux & 0xff) | (data << 3 & 0x100);
 
 	// R6: power-off request, on falling edge
-	if ((m_r >> 6 & 1) && !(data >> 6 & 1))
+	if (~data & m_r & 0x40)
 		power_off();
 
 	// R7-R10: LCD data

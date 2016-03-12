@@ -73,6 +73,10 @@ protected:
 	virtual void device_reset() override;
 
 	void omti_disk_config(UINT16 disk_type);
+
+private:
+	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
+
 public:
 	UINT16 m_type;
 	UINT16 m_cylinders;
@@ -685,6 +689,16 @@ void omti8621_device::set_esdi_defect_list(UINT8 lun, UINT8 head)
 	memset(disk->m_esdi_defect_list+6, 0xff, 5); // end of defect list
 }
 
+/*-------------------------------------------------
+ logerror - log an error message (w/o device tags)
+ -------------------------------------------------*/
+
+template <typename Format, typename... Params>
+void omti8621_device::logerror(Format &&fmt, Params &&... args) const
+{
+	machine().logerror(std::forward<Format>(fmt), std::forward<Params>(args)...);
+}
+
 /***************************************************************************
  log_command - log command from a command descriptor block
  ***************************************************************************/
@@ -693,83 +707,80 @@ void omti8621_device::log_command(const UINT8 cdb[], const UINT16 cdb_length)
 {
 	if (verbose > 0) {
 		int i;
-		char sb[100];
-		std::string text(cpu_context(this));
-		text += ": OMTI command ";
+		logerror("%s: OMTI command ", cpu_context(this));
 		switch (cdb[0]) {
 		case OMTI_CMD_TEST_DRIVE_READY: // 0x00
-			text += "Test Drive Ready";
+			logerror("Test Drive Ready");
 			break;
 		case OMTI_CMD_RECALIBRATE: // 0x01
-			text += "Recalibrate";
+			logerror("Recalibrate");
 			break;
 		case OMTI_CMD_REQUEST_SENSE: // 0x03
-			text += "Request Sense";
+			logerror("Request Sense");
 			break;
 		case OMTI_CMD_READ_VERIFY: // 0x05
-			text += "Read Verify";
+			logerror("Read Verify");
 			break;
 		case OMTI_CMD_FORMAT_TRACK: // 0x06
-			text += "Format Track";
+			logerror("Format Track");
 			break;
 		case OMTI_CMD_FORMAT_BAD_TRACK: // 0x07
-			text += "Format Bad Track";
+			logerror("Format Bad Track");
 			break;
 		case OMTI_CMD_READ: // 0x08
-			text += "Read";
+			logerror("Read");
 			break;
 		case OMTI_CMD_WRITE: // 0x0A
-			text += "Write";
+			logerror("Write");
 			break;
 		case OMTI_CMD_SEEK: // 0x0B
-			text += "Seek";
+			logerror("Seek");
 			break;
 		case OMTI_CMD_READ_SECTOR_BUFFER: // 0x0E
-			text += "Read Sector Buffer";
+			logerror("Read Sector Buffer");
 			break;
 		case OMTI_CMD_WRITE_SECTOR_BUFFER: // 0x0F
-			text += "Write Sector Buffer";
+			logerror("Write Sector Buffer");
 			break;
 		case OMTI_CMD_ASSIGN_ALTERNATE_TRACK: // 0x11
-			text += "Assign Alternate Track";
+			logerror("Assign Alternate Track");
 			break;
 		case OMTI_CMD_READ_DATA_TO_BUFFER: // 0x1E
-			text += "Read Data to Buffer";
+			logerror("Read Data to Buffer");
 			break;
 		case OMTI_CMD_WRITE_DATA_FROM_BUFFER: // 0x1F
-			text += "Write Data from Buffer";
+			logerror("Write Data from Buffer");
 			break;
 		case OMTI_CMD_COPY: // 0x20
-			text += "Copy";
+			logerror("Copy");
 			break;
 		case OMTI_CMD_READ_ESDI_DEFECT_LIST: // 0x37
-			text += "Read ESDI Defect List";
+			logerror("Read ESDI Defect List");
 			break;
 		case OMTI_CMD_RAM_DIAGNOSTICS: // 0xE0
-			text += "RAM. Diagnostic";
+			logerror("RAM. Diagnostic");
 			break;
 		case OMTI_CMD_CONTROLLER_INT_DIAGNOSTIC: // 0xE4
-			text += "Controller Int. Diagnostic";
+			logerror("Controller Int. Diagnostic");
 			break;
 		case OMTI_CMD_READ_LONG: // 0xE5
-			text += "Read Long";
+			logerror("Read Long");
 			break;
 		case OMTI_CMD_WRITE_LONG: // 0xE6
-			text += "Write Long";
+			logerror("Write Long");
 			break;
 		case OMTI_CMD_READ_CONFIGURATION: // 0xEC
-			text += "Read Configuration";
+			logerror("Read Configuration");
 			break;
 		case OMTI_CMD_INVALID_COMMAND: // 0xFF
-			text += "Invalid Command";
+			logerror("Invalid Command");
 			break;
 		default:
-			text += "!!! Unexpected Command !!!";
+			logerror("!!! Unexpected Command !!!");
 		}
 //      logerror(" (%02x, length=%02x)", cdb[0], cdb_length);
 		for (i = 0; i < cdb_length; i++) {
-			sprintf(sb, " %02x", cdb[i]);
-			text += sb;
+			logerror(" %02x", cdb[i]);
 		}
 
 		switch (cdb[0]) {
@@ -780,12 +791,10 @@ void omti8621_device::log_command(const UINT8 cdb[], const UINT16 cdb_length)
 		case OMTI_CMD_READ_DATA_TO_BUFFER: // 0x1E
 		case OMTI_CMD_WRITE_DATA_FROM_BUFFER: // 0x1F
 		case OMTI_CMD_COPY: // 0x20
-			sprintf(sb, " (diskaddr=%x count=%x)", get_disk_address(cdb), cdb[4]);
-			text += sb;
+			logerror(" (diskaddr=%x count=%x)", get_disk_address(cdb), cdb[4]);
 			break;
 		}
-		text += "\n";
-		logerror(text.c_str());
+		logerror("\n");
 	}
 }
 
@@ -795,25 +804,18 @@ void omti8621_device::log_command(const UINT8 cdb[], const UINT16 cdb_length)
 
 void omti8621_device::log_data()
 {
-	if (verbose > 0)
-	{
+	if (verbose > 0) {
 		int i;
-		char sb[100];
-		sprintf(sb, "%s: OMTI data (length=%02x)", cpu_context(this),
+		logerror("%s: OMTI data (length=%02x)", cpu_context(this),
 				data_length);
-		std::string text(sb);
-		for (i = 0; i < data_length && i < OMTI_DISK_SECTOR_SIZE; i++)
-		{
-			sprintf(sb, " %02x", data_buffer[i]);
-			text += sb;
+		for (i = 0; i < data_length && i < OMTI_DISK_SECTOR_SIZE; i++) {
+			logerror(" %02x", data_buffer[i]);
 		}
 
-		if (i < data_length)
-		{
-			text += " ...";
+		if (i < data_length) {
+			logerror(" ...");
 		}
-		text += "\n";
-		logerror(text.c_str());
+		logerror("\n");
 	}
 }
 
@@ -1351,6 +1353,16 @@ void omti_disk_image_device::omti_disk_config(UINT16 disk_type)
 }
 
 /*-------------------------------------------------
+ logerror - log an error message (w/o device tags)
+ -------------------------------------------------*/
+
+template <typename Format, typename... Params>
+void omti_disk_image_device::logerror(Format &&fmt, Params &&... args) const
+{
+	machine().logerror(std::forward<Format>(fmt), std::forward<Params>(args)...);
+}
+
+/*-------------------------------------------------
     device start callback
 -------------------------------------------------*/
 
@@ -1358,7 +1370,7 @@ void omti_disk_image_device::device_start()
 {
 	m_image = this;
 
-	if (m_image->image_core_file() == nullptr)
+	if (!m_image->is_open())
 	{
 		LOG1(("device_start_omti_disk: no disk"));
 	}

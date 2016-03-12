@@ -165,12 +165,12 @@ void wd7600_device::device_start()
 
 	// install video BIOS (we should use the VGA BIOS at the beginning of the system BIOS ROM, but that gives a
 	// blank display (but still runs))
-	//m_space->install_rom(0x000c0000, 0x000cffff, m_bios + 0xe0000);
+	//m_space->install_rom(0x000c0000, 0x000cffff, m_bios);
 	m_space->install_rom(0x000c0000, 0x000cffff, m_isa);
 
 	// install BIOS ROM at cpu inital pc
-	m_space->install_rom(0x000f0000, 0x000fffff, m_bios + 0xf0000);
-	m_space->install_rom(0xffff0000, 0xffffffff, m_bios + 0xf0000);
+	m_space->install_rom(0x000f0000, 0x000fffff, m_bios + 0x10000);
+	m_space->install_rom(0xffff0000, 0xffffffff, m_bios + 0x10000);
 
 	// install i/o accesses
 	m_space_io->install_readwrite_handler(0x0000, 0x000f, read8_delegate(FUNC(am9517a_device::read), &(*m_dma1)), write8_delegate(FUNC(am9517a_device::write), &(*m_dma1)), 0xffffffff);

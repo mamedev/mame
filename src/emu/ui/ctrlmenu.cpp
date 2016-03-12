@@ -17,14 +17,14 @@ const char *ui_menu_controller_mapping::m_device_status[] = { "none", "keyboard"
 
 ui_menu_controller_mapping::ctrl_option ui_menu_controller_mapping::m_options[] = {
 	{ 0, nullptr, nullptr },
-	{ 0, "Lightgun Device Assignment",   OPTION_LIGHTGUN_DEVICE },
-	{ 0, "Trackball Device Assignment",  OPTION_TRACKBALL_DEVICE },
-	{ 0, "Pedal Device Assignment",      OPTION_PEDAL_DEVICE },
-	{ 0, "Adstick Device Assignment",    OPTION_ADSTICK_DEVICE },
-	{ 0, "Paddle Device Assignment",     OPTION_PADDLE_DEVICE },
-	{ 0, "Dial Device Assignment",       OPTION_DIAL_DEVICE },
-	{ 0, "Positional Device Assignment", OPTION_POSITIONAL_DEVICE },
-	{ 0, "Mouse Device Assignment",      OPTION_MOUSE_DEVICE }
+	{ 0, __("Lightgun Device Assignment"),   OPTION_LIGHTGUN_DEVICE },
+	{ 0, __("Trackball Device Assignment"),  OPTION_TRACKBALL_DEVICE },
+	{ 0, __("Pedal Device Assignment"),      OPTION_PEDAL_DEVICE },
+	{ 0, __("Adstick Device Assignment"),    OPTION_ADSTICK_DEVICE },
+	{ 0, __("Paddle Device Assignment"),     OPTION_PADDLE_DEVICE },
+	{ 0, __("Dial Device Assignment"),       OPTION_DIAL_DEVICE },
+	{ 0, __("Positional Device Assignment"), OPTION_POSITIONAL_DEVICE },
+	{ 0, __("Mouse Device Assignment"),      OPTION_MOUSE_DEVICE }
 };
 
 //-------------------------------------------------
@@ -44,9 +44,9 @@ ui_menu_controller_mapping::ui_menu_controller_mapping(running_machine &machine,
 ui_menu_controller_mapping::~ui_menu_controller_mapping()
 {
 	std::string error_string;
-	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d) 
+	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d)
 	{
-		if (strcmp(machine().options().value(m_options[d].option),m_device_status[m_options[d].status])!=0)
+		if (strcmp(machine().options().value(m_options[d].option), m_device_status[m_options[d].status])!=0)
 		{
 			machine().options().set_value(m_options[d].option, m_device_status[m_options[d].status], OPTION_PRIORITY_CMDLINE, error_string);
 			machine().options().mark_changed(m_options[d].option);
@@ -88,7 +88,7 @@ void ui_menu_controller_mapping::populate()
 	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d)
 	{
 		UINT32 arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(m_device_status) - 1, m_options[d].status);
-		item_append(m_options[d].description, m_device_status[m_options[d].status], arrow_flags, (void *)(FPTR)d);
+		item_append(_(m_options[d].description), m_device_status[m_options[d].status], arrow_flags, (void *)(FPTR)d);
 	}
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 	customtop =  machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
@@ -103,8 +103,8 @@ void ui_menu_controller_mapping::custom_render(void *selectedref, float top, flo
 	float width, maxwidth = origx2 - origx1;
 	ui_manager &mui = machine().ui();
 
-	mui.draw_text_full(container, "Device Mapping", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	mui.draw_text_full(container, _("Device Mapping"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(maxwidth, width);
 
@@ -123,8 +123,8 @@ void ui_menu_controller_mapping::custom_render(void *selectedref, float top, flo
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, "Device Mapping", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	mui.draw_text_full(container, _("Device Mapping"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 }
 

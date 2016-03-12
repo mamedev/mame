@@ -226,7 +226,7 @@ std::string apf_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 size = core_fsize(m_file);
+		UINT32 size = m_file->size();
 		int type = APF_STD;
 
 		// attempt to identify Space Destroyer, which needs 1K of additional RAM

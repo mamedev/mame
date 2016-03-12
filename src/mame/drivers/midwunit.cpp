@@ -1263,6 +1263,7 @@ GAME( 1994, mk3p40,    mk3,      wunit, mk3,      midwunit_state, mk3r10,   ROT0
 GAME( 1994, umk3,      0,        wunit, mk3,      midwunit_state, umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, umk3r11,   umk3,     wunit, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, umk3r10,   umk3,     wunit, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
+// Ultimate Mortal Kombat 3 rev 2.0.35 (TE? Hack?) version known to exist
 
 GAME( 1995, wwfmania,  0,        wunit, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.30 08/10/95)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wwfmaniab, wwfmania, wunit, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.20 08/02/95)", MACHINE_SUPPORTS_SAVE )

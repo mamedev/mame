@@ -563,6 +563,7 @@ MACHINES["STEPPERS"] = true
 --MACHINES["DIABLO_HD"] = true
 MACHINES["PCI9050"] = true
 --MACHINES["TMS1024"] = true
+MACHINES["GENPC"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -619,7 +620,7 @@ BUSES["NEOGEO"] = true
 --BUSES["ORICEXT"] = true
 --BUSES["PCE"] = true
 BUSES["PC_JOY"] = true
---BUSES["PC_KBD"] = true
+BUSES["PC_KBD"] = true
 --BUSES["PET"] = true
 --BUSES["PLUS4"] = true
 --BUSES["PSX_CONTROLLER"] = true
@@ -2590,8 +2591,6 @@ files {
 	MAME_DIR .. "src/mame/includes/tceptor.h",
 	MAME_DIR .. "src/mame/video/tceptor.cpp",
 	MAME_DIR .. "src/mame/drivers/toypop.cpp",
-	MAME_DIR .. "src/mame/includes/toypop.h",
-	MAME_DIR .. "src/mame/video/toypop.cpp",
 	MAME_DIR .. "src/mame/drivers/turrett.cpp",
 	MAME_DIR .. "src/mame/includes/turrett.h",
 	MAME_DIR .. "src/mame/audio/turrett.cpp",
@@ -2823,11 +2822,7 @@ files {
 	MAME_DIR .. "src/mame/includes/battlex.h",
 	MAME_DIR .. "src/mame/video/battlex.cpp",
 	MAME_DIR .. "src/mame/drivers/carjmbre.cpp",
-	MAME_DIR .. "src/mame/includes/carjmbre.h",
-	MAME_DIR .. "src/mame/video/carjmbre.cpp",
 	MAME_DIR .. "src/mame/drivers/popper.cpp",
-	MAME_DIR .. "src/mame/includes/popper.h",
-	MAME_DIR .. "src/mame/video/popper.cpp",
 	MAME_DIR .. "src/mame/drivers/spaceg.cpp",
 }
 
@@ -3327,6 +3322,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/snk68.cpp",
 	MAME_DIR .. "src/mame/includes/snk68.h",
 	MAME_DIR .. "src/mame/video/snk68.cpp",
+	MAME_DIR .. "src/mame/video/snk68_spr.cpp",
+
 }
 
 createMAMEProjects(_target, _subtarget, "sony")
@@ -4291,9 +4288,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/fireball.cpp",
 	MAME_DIR .. "src/mame/drivers/flipjack.cpp",
 	MAME_DIR .. "src/mame/drivers/flower.cpp",
-	MAME_DIR .. "src/mame/includes/flower.h",
-	MAME_DIR .. "src/mame/audio/flower.cpp",
-	MAME_DIR .. "src/mame/video/flower.cpp",
 	MAME_DIR .. "src/mame/drivers/fortecar.cpp",
 	MAME_DIR .. "src/mame/drivers/fresh.cpp",
 	MAME_DIR .. "src/mame/drivers/freekick.cpp",
@@ -4479,8 +4473,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/splus.cpp",
 	MAME_DIR .. "src/mame/drivers/spool99.cpp",
 	MAME_DIR .. "src/mame/drivers/sprcros2.cpp",
-	MAME_DIR .. "src/mame/includes/sprcros2.h",
-	MAME_DIR .. "src/mame/video/sprcros2.cpp",
 	MAME_DIR .. "src/mame/drivers/sshot.cpp",
 	MAME_DIR .. "src/mame/drivers/ssingles.cpp",
 	MAME_DIR .. "src/mame/drivers/sstrangr.cpp",

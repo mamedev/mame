@@ -38,6 +38,8 @@
 #include "emu.h"
 #include "sound/wavwrite.h"
 #include "discrete.h"
+#include <atomic>
+#include <iostream>
 
 /* for_each collides with c++ standard libraries - include it here */
 #define for_each(_T, _e, _l) for (_T _e = (_l)->begin_ptr() ;  _e <= (_l)->end_ptr(); _e++)
@@ -110,9 +112,8 @@ public:
 	inline void step_nodes(void);
 	inline bool lock_threadid(INT32 threadid)
 	{
-		INT32 prev_id;
-		prev_id = compare_exchange32(&m_threadid, -1, threadid);
-		return (prev_id == -1 && m_threadid == threadid);
+		int expected = -1;
+		return m_threadid.compare_exchange_weak(expected, threadid, std::memory_order_release,std::memory_order_relaxed);
 	}
 	inline void unlock(void) { m_threadid = -1; }
 
@@ -144,7 +145,7 @@ protected:
 	discrete_device &                   m_device;
 
 private:
-	volatile INT32          m_threadid;
+	std::atomic<INT32>      m_threadid;
 	volatile int            m_samples;
 
 };
@@ -647,15 +648,15 @@ void discrete_device::display_profiling(void)
 	total = list_run_time(m_node_list);
 	count = m_node_list.count();
 	/* print statistics */
-	printf("Total Samples  : %16" I64FMT "d\n", m_total_samples);
+	util::stream_format(std::cout, "Total Samples  : %16d\n", m_total_samples);
 	tresh = total / count;
-	printf("Threshold (mean): %16" I64FMT "d\n", tresh / m_total_samples );
+	util::stream_format(std::cout, "Threshold (mean): %16d\n", tresh / m_total_samples );
 	for_each(discrete_base_node **, node, &m_node_list)
 	{
 		discrete_step_interface *step;
 		if ((*node)->interface(step))
 			if (step->run_time > tresh)
-				printf("%3d: %20s %8.2f %10.2f\n", (*node)->index(), (*node)->module_name(), (double) step->run_time / (double) total * 100.0, ((double) step->run_time) / (double) m_total_samples);
+				util::stream_format(std::cout, "%3d: %20s %8.2f %10.2f\n", (*node)->index(), (*node)->module_name(), double(step->run_time) / double(total) * 100.0, double(step->run_time) / double(m_total_samples));
 	}
 
 	/* Task information */
@@ -663,10 +664,10 @@ void discrete_device::display_profiling(void)
 	{
 		tt =  step_list_run_time((*task)->step_list);
 
-		printf("Task(%d): %8.2f %15.2f\n", (*task)->task_group, tt / (double) total * 100.0, tt / (double) m_total_samples);
+		util::stream_format(std::cout, "Task(%d): %8.2f %15.2f\n", (*task)->task_group, tt / double(total) * 100.0, tt / double(m_total_samples));
 	}
 
-	printf("Average samples/double->update: %8.2f\n", (double) m_total_samples / (double) m_total_stream_updates);
+	util::stream_format(std::cout, "Average samples/double->update: %8.2f\n", double(m_total_samples) / double(m_total_stream_updates));
 }
 
 
@@ -737,7 +738,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 						task->task_group = block->initial[0];
 						if (task->task_group < 0 || task->task_group >= DISCRETE_MAX_TASK_GROUPS)
 							fatalerror("discrete_dso_task: illegal task_group %d\n", task->task_group);
-						//printf("task group %d\n", task->task_group);
+						//util::stream_format(std::cout, "task group %d\n", task->task_group);
 						task_list.add(task);
 					}
 					break;
@@ -870,7 +871,6 @@ void discrete_device::device_start()
 	//m_stream = machine().sound().stream_alloc(*this, 0, 2, 22257);
 
 	const discrete_block *intf_start = m_intf;
-	char name[128];
 
 	/* If a clock is specified we will use it, otherwise run at the audio sample rate. */
 	if (this->clock())
@@ -884,9 +884,8 @@ void discrete_device::device_start()
 	m_total_stream_updates = 0;
 
 	/* create the logfile */
-	sprintf(name, "discrete%s.log", this->tag());
 	if (DISCRETE_DEBUGLOG)
-		m_disclogfile = fopen(name, "w");
+		m_disclogfile = fopen(util::string_format("discrete%s.log", this->tag()).c_str(), "w");
 
 	/* enable profiling */
 	m_profiling = 0;

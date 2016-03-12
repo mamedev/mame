@@ -17,17 +17,14 @@
 
 #include "modules/osdwindow.h"
 
-// I don't like this, but we're going to get spurious "cast to integer of different size" warnings on
-// at least one architecture without doing it this way.
-#ifdef PTR64
-typedef UINT64 HashT;
-#else
-typedef UINT32 HashT;
-#endif
+#include <cstdint>
+
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
+
+typedef uintptr_t HashT;
 
 #define OSDWORK_CALLBACK(name)  void *name(void *param, ATTR_UNUSED int threadid)
 
@@ -38,20 +35,13 @@ public:
 			const osd_window_config *config)
 	: osd_window(), m_next(NULL),
 		// Following three are used by input code to defer resizes
-#if (SDLMAME_SDL2)
 		m_resize_width(0),
 		m_resize_height(0),
 		m_last_resize(0),
-#endif
 		m_minimum_dim(0,0),
 		m_windowed_dim(0,0),
 		m_rendered_event(0), m_target(0),
-#if (SDLMAME_SDL2)
 		m_sdl_window(NULL),
-
-#else
-		m_sdlsurf(NULL),
-#endif
 		m_machine(a_machine), m_monitor(a_monitor), m_fullscreen(0)
 	{
 		m_win_config = *config;
@@ -81,13 +71,9 @@ public:
 
 	osd_dim get_size() override
 	{
-#if (SDLMAME_SDL2)
 		int w=0; int h=0;
 		SDL_GetWindowSize(m_sdl_window, &w, &h);
 		return osd_dim(w,h);
-#else
-		return osd_dim(m_sdlsurf->w, m_sdlsurf->h);
-#endif
 	}
 
 	int xy_to_render_target(int x, int y, int *xt, int *yt);
@@ -97,11 +83,7 @@ public:
 	int fullscreen() const override { return m_fullscreen; }
 
 	render_target *target() override { return m_target; }
-#if (SDLMAME_SDL2)
 	SDL_Window *sdl_window() override { return m_sdl_window; }
-#else
-	SDL_Surface *sdl_surface() { return m_sdlsurf; }
-#endif
 
 	osd_dim blit_surface_size() override;
 	int prescale() const { return m_prescale; }
@@ -109,12 +91,10 @@ public:
 	// Pointer to next window
 	sdl_window_info *   m_next;
 
-#if (SDLMAME_SDL2)
 	// These are used in combine resizing events ... #if SDL13_COMBINE_RESIZE
 	int                 m_resize_width;
 	int                 m_resize_height;
 	osd_ticks_t         m_last_resize;
-#endif
 
 private:
 	// window handle and info
@@ -129,15 +109,10 @@ private:
 	osd_event *         m_rendered_event;
 	render_target *     m_target;
 
-#if (SDLMAME_SDL2)
 	// Needs to be here as well so we can identify window
 	SDL_Window          *m_sdl_window;
 	// Original display_mode
 	SDL_DisplayMode m_original_mode;
-#else
-	// SDL surface
-	SDL_Surface         *m_sdlsurf;
-#endif
 
 	int                 m_extra_flags;
 
@@ -183,7 +158,6 @@ private:
 struct osd_draw_callbacks
 {
 	osd_renderer *(*create)(osd_window *window);
-	void (*exit)(void);
 };
 
 //============================================================
@@ -201,8 +175,6 @@ extern sdl_window_info *sdl_window_list;
 // PROTOTYPES - drawsdl.c
 //============================================================
 
-int drawsdl_init(osd_draw_callbacks *callbacks);
-const char *drawsdl_scale_mode_str(int index);
 int drawsdl_scale_mode(const char *s);
 
 //============================================================

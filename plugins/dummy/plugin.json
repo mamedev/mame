@@ -1,0 +1,9 @@
+{
+  "plugin": {
+    "name": "dummy",
+    "version": "0.0.1",
+    "author": "Miodrag Milanovic",
+	"type": "plugin",
+	"start": "false",
+  }
+}

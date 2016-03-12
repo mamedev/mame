@@ -243,7 +243,7 @@ The `context` attribute contains information about the run in general, including
 information about the CPU and the date.
 The `benchmarks` attribute contains a list of ever benchmark run. Example json
 output looks like:
-```
+``` json
 {
   "context": {
     "date": "2015/03/17-18:40:25",
@@ -288,6 +288,20 @@ name,iterations,real_time,cpu_time,bytes_per_second,items_per_second,label
 "BM_SetInsert/1024/1",65465,17890.7,8407.45,475768,118942,
 "BM_SetInsert/1024/8",116606,18810.1,9766.64,3.27646e+06,819115,
 "BM_SetInsert/1024/10",106365,17238.4,8421.53,4.74973e+06,1.18743e+06,
+```
+
+Debug vs Release
+----------------
+By default, benchmark builds as a debug library. You will see a warning in the output when this is the case. To build it as a release library instead, use:
+
+```
+cmake -DCMAKE_BUILD_TYPE=Release
+```
+
+To enable link-time optimisation, use
+
+```
+cmake -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_LTO=true
 ```
 
 Linking against the library

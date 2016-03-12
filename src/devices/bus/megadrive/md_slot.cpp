@@ -905,11 +905,11 @@ std::string base_md_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 len = core_fsize(m_file), offset = 0;
+		UINT32 len = m_file->size(), offset = 0;
 		dynamic_buffer rom(len);
 		int type;
 
-		core_fread(m_file, &rom[0], len);
+		m_file->read(&rom[0], len);
 
 		if (genesis_is_SMD(&rom[0x200], len - 0x200))
 				offset = 0x200;

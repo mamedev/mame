@@ -103,6 +103,9 @@
 #include <ctype.h>
 #include <time.h>
 
+
+namespace {
+
 // temporary: set this to 1 to enable the originally defined behavior that
 // a field specified via PORT_MODIFY which intersects a previously-defined
 // field completely wipes out the previous definition
@@ -140,7 +143,6 @@ struct char_info
 
 	static const char_info *find(unicode_char target);
 };
-
 
 
 //**************************************************************************
@@ -186,10 +188,10 @@ inline INT32 apply_scale(INT32 value, INT64 scale)
 //**************************************************************************
 
 // XML attributes for the different types
-static const char *const seqtypestrings[] = { "standard", "increment", "decrement" };
+const char *const seqtypestrings[] = { "standard", "increment", "decrement" };
 
 // master character info table
-static const char_info charinfo[] =
+const char_info charinfo[] =
 {
 	{ 0x0008,                   "Backspace",    nullptr },     // Backspace
 	{ 0x0009,                   "Tab",          "    " },   // Tab
@@ -489,7 +491,7 @@ static const char_info charinfo[] =
 //  COMMON SHARED STRINGS
 //**************************************************************************
 
-static const struct
+const struct
 {
 	UINT32 id;
 	const char *string;
@@ -615,6 +617,11 @@ static const struct
 	{ INPUT_STRING_Alternate, "Alternate" },
 	{ INPUT_STRING_None, "None" },
 };
+
+} // anonymous namespace
+
+
+std::uint8_t const inp_header::MAGIC[inp_header::OFFS_BASETIME - inp_header::OFFS_MAGIC] = { 'M', 'A', 'M', 'E', 'I', 'N', 'P', 0 };
 
 
 
@@ -1259,7 +1266,7 @@ std::string natural_keyboard::unicode_to_string(unicode_char ch)
 
 			// did we fail to resolve? if so, we have a last resort
 			if (buffer.empty())
-				strprintf(buffer,"U+%04X", unsigned(ch));
+				buffer = string_format("U+%04X", unsigned(ch));
 			break;
 	}
 	return buffer;
@@ -1337,29 +1344,27 @@ std::string natural_keyboard::key_name(unicode_char ch) const
 
 std::string natural_keyboard::dump()
 {
-	std::string buffer;
+	std::ostringstream buffer;
 	const size_t left_column_width = 24;
 
 	// loop through all codes
 	for (auto & code : m_keycode_map)
 	{
 		// describe the character code
-
-		strcatprintf(buffer,"%08X (%s) ", code.ch, unicode_to_string(code.ch).c_str());
+		std::string description = string_format("%08X (%s) ", code.ch, unicode_to_string(code.ch).c_str());
 
 		// pad with spaces
-		while (buffer.length() < left_column_width)
-			buffer.push_back(' ');
+		util::stream_format(buffer, "%-*s", left_column_width, description);
 
 		// identify the keys used
 		for (int field = 0; field < ARRAY_LENGTH(code.field) && code.field[field] != nullptr; field++)
-			strcatprintf(buffer, "%s'%s'", (field > 0) ? ", " : "", code.field[field]->name());
+			util::stream_format(buffer, "%s'%s'", (field > 0) ? ", " : "", code.field[field]->name());
 
 		// carriage return
-		buffer.push_back('\n');
+		buffer << '\n';
 	}
 
-	return buffer;
+	return buffer.str();
 }
 
 
@@ -2095,7 +2100,7 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 		{
 			if (lastname == nullptr)
 			{
-				strcatprintf(errorbuf, "Switch location '%s' missing switch name!\n", location);
+				errorbuf.append(string_format("Switch location '%s' missing switch name!\n", location));
 				lastname = (char *)"UNK";
 			}
 			name.assign(lastname);
@@ -2112,7 +2117,7 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 		// now scan the switch number
 		int swnum = -1;
 		if (sscanf(number, "%d", &swnum) != 1)
-			strcatprintf(errorbuf, "Switch location '%s' has invalid format!\n", location);
+			errorbuf.append(string_format("Switch location '%s' has invalid format!\n", location));
 
 		// allocate a new entry
 		m_diploclist.append(*global_alloc(ioport_diplocation(name.c_str(), swnum, invert)));
@@ -2130,7 +2135,7 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 	for (bits = 0, temp = m_mask; temp != 0 && bits < 32; bits++)
 		temp &= temp - 1;
 	if (bits != entries)
-		strcatprintf(errorbuf, "Switch location '%s' does not describe enough bits for mask %X\n", location, m_mask);
+		errorbuf.append(string_format("Switch location '%s' does not describe enough bits for mask %X\n", location, m_mask));
 }
 
 
@@ -2195,7 +2200,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 			unicode_char ch = field.keyboard_code(which);
 			if (ch == 0)
 				break;
-			strcatprintf(name, "%-*s ", MAX(SPACE_COUNT - 1, 0), field.manager().natkeyboard().key_name(ch).c_str());
+			name.append(string_format("%-*s ", MAX(SPACE_COUNT - 1, 0), field.manager().natkeyboard().key_name(ch)));
 		}
 
 		// trim extra spaces
@@ -2371,7 +2376,7 @@ void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedb
 	if (newfield.condition().none())
 	{
 		if ((newfield.mask() & disallowedbits) != 0)
-			strcatprintf(errorbuf, "INPUT_TOKEN_FIELD specifies duplicate port bits (port=%s mask=%X)\n", tag(), newfield.mask());
+			errorbuf.append(string_format("INPUT_TOKEN_FIELD specifies duplicate port bits (port=%s mask=%X)\n", tag(), newfield.mask()));
 		disallowedbits |= newfield.mask();
 	}
 
@@ -2479,7 +2484,7 @@ ioport_manager::ioport_manager(running_machine &machine)
 		m_has_dips(false),
 		m_has_bioses(false),
 		m_autofire_toggle(false),
-		m_autofire_delay(3)					// 1 seems too fast for a bunch of games
+		m_autofire_delay(3)                 // 1 seems too fast for a bunch of games
 {
 	memset(m_type_to_entry, 0, sizeof(m_type_to_entry));
 }
@@ -3406,25 +3411,25 @@ time_t ioport_manager::playback_init()
 	assert_always(filerr == FILERR_NONE, "Failed to open file for playback");
 
 	// read the header and verify that it is a modern version; if not, print an error
-	UINT8 header[INP_HEADER_SIZE];
-	if (m_playback_file.read(header, sizeof(header)) != sizeof(header))
+	inp_header header;
+	if (!header.read(m_playback_file))
 		fatalerror("Input file is corrupt or invalid (missing header)\n");
-	if (memcmp(header, "MAMEINP\0", 8) != 0)
+	if (!header.check_magic())
 		fatalerror("Input file invalid or in an older, unsupported format\n");
-	if (header[0x10] != INP_HEADER_MAJVERSION)
+	if (header.get_majversion() != inp_header::MAJVERSION)
 		fatalerror("Input file format version mismatch\n");
 
 	// output info to console
 	osd_printf_info("Input file: %s\n", filename);
-	osd_printf_info("INP version %d.%d\n", header[0x10], header[0x11]);
-	time_t basetime = header[0x08] | (header[0x09] << 8) | (header[0x0a] << 16) | (header[0x0b] << 24) |
-						((UINT64)header[0x0c] << 32) | ((UINT64)header[0x0d] << 40) | ((UINT64)header[0x0e] << 48) | ((UINT64)header[0x0f] << 56);
+	osd_printf_info("INP version %u.%u\n", header.get_majversion(), header.get_minversion());
+	time_t basetime = header.get_basetime();
 	osd_printf_info("Created %s\n", ctime(&basetime));
-	osd_printf_info("Recorded using %s\n", header + 0x20);
+	osd_printf_info("Recorded using %s\n", header.get_appdesc().c_str());
 
 	// verify the header against the current game
-	if (memcmp(machine().system().name, header + 0x14, strlen(machine().system().name) + 1) != 0)
-		osd_printf_info("Input file is for %s '%s', not for current %s '%s'\n", emulator_info::get_gamenoun(), header + 0x14, emulator_info::get_gamenoun(), machine().system().name);
+	std::string const sysname = header.get_sysname();
+	if (sysname != machine().system().name)
+		osd_printf_info("Input file is for machine '%s', not for current machine '%s'\n", sysname.c_str(), machine().system().name);
 
 	// enable compression
 	m_playback_file.compress(FCOMPRESS_MEDIUM);
@@ -3449,7 +3454,8 @@ void ioport_manager::playback_end(const char *message)
 			machine().popmessage("Playback Ended\nReason: %s", message);
 
 		// display speed stats
-		m_playback_accumulated_speed /= m_playback_accumulated_frames;
+		if (m_playback_accumulated_speed > 0)
+			m_playback_accumulated_speed /= m_playback_accumulated_frames;
 		osd_printf_info("Total playback frames: %d\n", UINT32(m_playback_accumulated_frames));
 		osd_printf_info("Average recorded speed: %d%%\n", UINT32((m_playback_accumulated_speed * 200 + 1) >> 21));
 
@@ -3555,8 +3561,8 @@ void ioport_manager::timecode_write(_Type value)
 /*template<>
 void ioport_manager::timecode_write<bool>(bool value)
 {
-	UINT8 byte = UINT8(value);
-	timecode_write(byte);
+    UINT8 byte = UINT8(value);
+    timecode_write(byte);
 }*/
 template<>
 void ioport_manager::timecode_write<std::string>(std::string value) {
@@ -3584,23 +3590,15 @@ void ioport_manager::record_init()
 	machine().base_datetime(systime);
 
 	// fill in the header
-	UINT8 header[INP_HEADER_SIZE] = { 0 };
-	memcpy(header, "MAMEINP\0", 8);
-	header[0x08] = systime.time >> 0;
-	header[0x09] = systime.time >> 8;
-	header[0x0a] = systime.time >> 16;
-	header[0x0b] = systime.time >> 24;
-	header[0x0c] = systime.time >> 32;
-	header[0x0d] = systime.time >> 40;
-	header[0x0e] = systime.time >> 48;
-	header[0x0f] = systime.time >> 56;
-	header[0x10] = INP_HEADER_MAJVERSION;
-	header[0x11] = INP_HEADER_MINVERSION;
-	strcpy((char *)header + 0x14, machine().system().name);
-	sprintf((char *)header + 0x20, "%s %s", emulator_info::get_appname(), build_version);
+	inp_header header;
+	header.set_magic();
+	header.set_basetime(systime.time);
+	header.set_version();
+	header.set_sysname(machine().system().name);
+	header.set_appdesc(util::string_format("%s %s", emulator_info::get_appname(), build_version));
 
 	// write it
-	m_record_file.write(header, sizeof(header));
+	header.write(m_record_file);
 
 	// enable compression
 	m_record_file.compress(FCOMPRESS_MEDIUM);
@@ -3695,107 +3693,90 @@ void ioport_manager::record_frame(const attotime &curtime)
 		record_write(UINT32(machine().video().speed_percent() * double(1 << 20)));
 	}
 
-	if (m_timecode_file.is_open() && machine().video().get_timecode_write()) {
+	if (m_timecode_file.is_open() && machine().video().get_timecode_write())
+	{
 		// Display the timecode
-		std::string current_time_str;
 		m_timecode_count++;
-		strcatprintf(current_time_str, "%02d:%02d:%02d.%03d",
-			(int)curtime.seconds() / (60 * 60),
-			(curtime.seconds() / 60) % 60,
-			curtime.seconds() % 60,
-			(int)(curtime.attoseconds()/ATTOSECONDS_PER_MILLISECOND));
+		std::string const current_time_str = string_format("%02d:%02d:%02d.%03d",
+				(int)curtime.seconds() / (60 * 60),
+				(curtime.seconds() / 60) % 60,
+				curtime.seconds() % 60,
+				(int)(curtime.attoseconds()/ATTOSECONDS_PER_MILLISECOND));
 
 		// Elapsed from previous timecode
-		attotime elapsed_time = curtime - m_timecode_last_time;
+		attotime const elapsed_time = curtime - m_timecode_last_time;
 		m_timecode_last_time = curtime;
-		std::string elapsed_time_str;
-		strcatprintf(elapsed_time_str, "%02d:%02d:%02d.%03d",
-			elapsed_time.seconds() / (60 * 60),
-			(elapsed_time.seconds() / 60) % 60,
-			elapsed_time.seconds() % 60,
-			int(elapsed_time.attoseconds()/ATTOSECONDS_PER_MILLISECOND));
+		std::string const elapsed_time_str = string_format("%02d:%02d:%02d.%03d",
+				elapsed_time.seconds() / (60 * 60),
+				(elapsed_time.seconds() / 60) % 60,
+				elapsed_time.seconds() % 60,
+				int(elapsed_time.attoseconds()/ATTOSECONDS_PER_MILLISECOND));
 
 		// Number of ms from beginning of playback
-		int mseconds_start = curtime.seconds()*1000 + curtime.attoseconds()/ATTOSECONDS_PER_MILLISECOND;
-		std::string mseconds_start_str;
-		strcatprintf(mseconds_start_str, "%015d", mseconds_start);
+		int const mseconds_start = curtime.seconds()*1000 + curtime.attoseconds()/ATTOSECONDS_PER_MILLISECOND;
+		std::string const mseconds_start_str = string_format("%015d", mseconds_start);
 
 		// Number of ms from previous timecode
 		int mseconds_elapsed = elapsed_time.seconds()*1000 + elapsed_time.attoseconds()/ATTOSECONDS_PER_MILLISECOND;
-		std::string mseconds_elapsed_str;
-		strcatprintf(mseconds_elapsed_str, "%015d", mseconds_elapsed);
+		std::string const mseconds_elapsed_str = string_format("%015d", mseconds_elapsed);
 
 		// Number of frames from beginning of playback
-		int frame_start = mseconds_start * 60 / 1000;
-		std::string frame_start_str;
-		strcatprintf(frame_start_str, "%015d", frame_start);
+		int const frame_start = mseconds_start * 60 / 1000;
+		std::string const frame_start_str = string_format("%015d", frame_start);
 
 		// Number of frames from previous timecode
 		int frame_elapsed = mseconds_elapsed * 60 / 1000;
-		std::string frame_elapsed_str;
-		strcatprintf(frame_elapsed_str, "%015d", frame_elapsed);
+		std::string const frame_elapsed_str = string_format("%015d", frame_elapsed);
 
 		std::string message;
 		std::string timecode_text;
 		std::string timecode_key;
 		bool show_timecode_counter = false;
 		if (m_timecode_count==1) {
-			message += "TIMECODE: Intro started at " + current_time_str;
+			message = string_format("TIMECODE: Intro started at %s", current_time_str);
 			timecode_key = "INTRO_START";
 			timecode_text = "INTRO";
 			show_timecode_counter = true;
 		}
 		else if (m_timecode_count==2) {
-			message += "TIMECODE: Intro duration " + elapsed_time_str;
-			timecode_key = "INTRO_STOP";
 			machine().video().add_to_total_time(elapsed_time);
-			//timecode_text += "INTRO";
+			message = string_format("TIMECODE: Intro duration %s", elapsed_time_str);
+			timecode_key = "INTRO_STOP";
+			//timecode_text = "INTRO";
 		}
 		else if (m_timecode_count==3) {
-			message += "TIMECODE: Gameplay started at " + current_time_str;
+			message = string_format("TIMECODE: Gameplay started at %s", current_time_str);
 			timecode_key = "GAMEPLAY_START";
-			timecode_text += "GAMEPLAY";
+			timecode_text = "GAMEPLAY";
 			show_timecode_counter = true;
 		}
 		else if (m_timecode_count==4) {
-			message += "TIMECODE: Gameplay duration " + elapsed_time_str;
-			timecode_key = "GAMEPLAY_STOP";
 			machine().video().add_to_total_time(elapsed_time);
-			//timecode_text += "GAMEPLAY";
+			message = string_format("TIMECODE: Gameplay duration %s", elapsed_time_str);
+			timecode_key = "GAMEPLAY_STOP";
+			//timecode_text = "GAMEPLAY";
 		}
 		else if (m_timecode_count % 2 == 1) {
-			std::string timecode_count_str;
-			strcatprintf(timecode_count_str, "%03d", (m_timecode_count-3)/2);
-			timecode_key = "EXTRA_START_" + timecode_count_str;
-			timecode_count_str.clear();
-			strcatprintf(timecode_count_str, "%d", (m_timecode_count-3)/2);
-			message += "TIMECODE: Extra " + timecode_count_str + " started at " + current_time_str;
-			timecode_text += "EXTRA " + timecode_count_str;
+			message = string_format("TIMECODE: Extra %d started at %s", (m_timecode_count-3)/2, current_time_str);
+			timecode_key = string_format("EXTRA_START_%03d", (m_timecode_count-3)/2);
+			timecode_text = string_format("EXTRA %d", (m_timecode_count-3)/2);
 			show_timecode_counter = true;
 		}
 		else {
 			machine().video().add_to_total_time(elapsed_time);
-
-			std::string timecode_count_str;
-			strcatprintf(timecode_count_str, "%d", (m_timecode_count-4)/2);
-			message += "TIMECODE: Extra " + timecode_count_str + " duration " + elapsed_time_str;
-
-			timecode_count_str.clear();
-			strcatprintf(timecode_count_str, "%03d", (m_timecode_count-4)/2);
-			timecode_key = "EXTRA_STOP_" + timecode_count_str;
+			message = string_format("TIMECODE: Extra %d duration %s", (m_timecode_count-4)/2, elapsed_time_str);
+			timecode_key = string_format("EXTRA_STOP_%03d", (m_timecode_count-4)/2);
 		}
 
 		osd_printf_info("%s \n", message.c_str());
 		machine().popmessage("%s \n", message.c_str());
 
-		std::string line_to_add;
-		line_to_add.append(timecode_key).append(19-timecode_key.length(), ' ');
-		line_to_add +=
-			" " + current_time_str   + " " + elapsed_time_str     +
-			" " + mseconds_start_str + " " + mseconds_elapsed_str +
-			" " + frame_start_str    + " " + frame_elapsed_str    +
-			"\n";
-		m_timecode_file.puts(line_to_add.c_str());
+		m_timecode_file.printf(
+				"%-19s %s %s %s %s %s %s\n",
+				timecode_key.c_str(),
+				current_time_str.c_str(), elapsed_time_str.c_str(),
+				mseconds_start_str.c_str(), mseconds_elapsed_str.c_str(),
+				frame_start_str.c_str(), frame_elapsed_str.c_str());
 
 		machine().video().set_timecode_write(false);
 		machine().video().set_timecode_text(timecode_text);
@@ -4616,7 +4597,7 @@ std::string ioport_manager::input_type_to_token(ioport_type type, int player)
 		return std::string(entry->token());
 
 	// if that fails, carry on
-	return strformat("TYPE_OTHER(%d,%d)", type, player);
+	return string_format("TYPE_OTHER(%d,%d)", type, player);
 }
 
 

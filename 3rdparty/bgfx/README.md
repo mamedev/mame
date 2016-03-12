@@ -37,6 +37,7 @@ Supported platforms:
  * Native Client (PPAPI 37+, ARM, x86, x64, PNaCl)
  * OSX (10.9+)
  * RaspberryPi
+ * SteamLink
  * Windows (XP, Vista, 7, 8, 10)
  * WinRT (WinPhone 8.0+)
 
@@ -54,13 +55,23 @@ Languages:
  * [Go language API bindings](https://github.com/james4k/go-bgfx)
  * [Java language API bindings](https://github.com/enleeten/twilight-bgfx)
  * [Haskell language API bindings](https://github.com/haskell-game/bgfx)
+ * [Python language API bindings](https://github.com/jnadro/pybgfx#pybgf)
  * [Rust language API bindings](https://github.com/rhoot/bgfx-rs)
 
-Build
------
+[Building](https://bkaradzic.github.io/bgfx/build.html)
+----------------------------------------------------
 
  - AppVeyor https://ci.appveyor.com/project/bkaradzic/bgfx
  - TravisCI https://travis-ci.org/bkaradzic/bgfx
+
+[Examples](https://bkaradzic.github.io/bgfx/examples.html)
+----------------------------------------------------------
+
+[API Reference](https://bkaradzic.github.io/bgfx/bgfx.html)
+-----------------------------------------------------------
+
+[Tools](https://bkaradzic.github.io/bgfx/tools.html)
+----------------------------------------------------
 
 Who is using it?
 ----------------
@@ -99,7 +110,7 @@ deployment model of web with the performance of native code and GPU acceleration
 
 https://github.com/nem0/LumixEngine LumixEngine is a MIT licensed 3D engine.
 The main goal is performance and Unity-like usability.  
-![LumixEngine screenshot](https://cloud.githubusercontent.com/assets/153526/10109455/450c51be-63c7-11e5-9c87-96d9d00efe02.png)
+![LumixEngine screenshot](https://cloud.githubusercontent.com/assets/153526/12904252/3fcf130e-cece-11e5-878b-c9fe24c1b11a.png)
 
 https://github.com/podgorskiy/KeplerOrbits KeplerOrbits - Tool that calculates
 positions of celestial bodies using their orbital elements. [Web Demo](http://podgorskiy.com/KeplerOrbits/KeplerOrbits.html)
@@ -116,18 +127,6 @@ http://makingartstudios.itch.io/dls - DLS the digital logic simulator game.
 ![dls-screenshot](https://img.itch.io/aW1hZ2UvMzk3MTgvMTc5MjQ4LnBuZw==/original/kA%2FQPb.png)
 
 https://github.com/mamedev/mame MAME - Multiple Arcade Machine Emulator
-
-[Building](https://bkaradzic.github.io/bgfx/build.html)
--------------------------------------------------------
-
-[Examples](https://bkaradzic.github.io/bgfx/examples.html)
-----------------------------------------------------------
-
-[API Reference](https://bkaradzic.github.io/bgfx/bgfx.html)
------------------------------------------------------------
-
-[Tools](https://bkaradzic.github.io/bgfx/tools.html)
-----------------------------------------------------
 
 [License (BSD 2-clause)](https://bkaradzic.github.io/bgfx/license.html)
 -----------------------------------------------------------------------

@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:Dankan1890
 /***************************************************************************
 
@@ -106,7 +106,7 @@ bool has_multiple_bios(const game_driver *driver, std::vector<s_bios> &biosname)
 
 			if (bname == default_name)
 			{
-				name.append(" (default)");
+				name.append(_(" (default)"));
 				biosname.emplace(biosname.begin(), name, bios_flags - 1);
 			}
 			else
@@ -126,6 +126,7 @@ ui_menu_select_software::ui_menu_select_software(running_machine &machine, rende
 		reselect_last::set(false);
 
 	sw_filters::actual = 0;
+	highlight = 0;
 
 	m_driver = driver;
 	build_software_list();
@@ -155,6 +156,9 @@ ui_menu_select_software::~ui_menu_select_software()
 
 void ui_menu_select_software::handle()
 {
+	if (m_prev_selected == nullptr)
+		m_prev_selected = item[0].ref;
+
 	bool check_filter = false;
 
 	// ignore pause keys by swallowing them before we process the menu
@@ -171,7 +175,18 @@ void ui_menu_select_software::handle()
 
 		// handle selections
 		else if (m_event->iptkey == IPT_UI_SELECT)
-			inkey_select(m_event);
+		{
+			if (m_focus == focused_menu::main)
+			{
+				inkey_select(m_event);
+			}
+			else if (m_focus == focused_menu::left)
+			{
+				l_sw_hover = highlight;
+				check_filter = true;
+				m_prev_selected = nullptr;
+			}
+		}
 
 		// handle UI_LEFT
 		else if (m_event->iptkey == IPT_UI_LEFT)
@@ -211,32 +226,28 @@ void ui_menu_select_software::handle()
 			}
 		}
 
+		// handle UI_UP_FILTER
+		else if (m_event->iptkey == IPT_UI_UP_FILTER && highlight > UI_SW_FIRST)
+		{
+			highlight--;
+		}
+
+		// handle UI_DOWN_FILTER
+		else if (m_event->iptkey == IPT_UI_DOWN_FILTER && highlight < UI_SW_LAST)
+		{
+			highlight++;
+		}
+
 		// handle UI_DATS
 		else if (m_event->iptkey == IPT_UI_DATS && machine().ui().options().enabled_dats())
 		{
 			ui_software_info *ui_swinfo = (ui_software_info *)m_event->itemref;
+			datfile_manager &mdat = machine().datfile();
 
-			if ((FPTR)ui_swinfo > 1 && machine().datfile().has_data(ui_swinfo->driver))
-			{
-				if (ui_swinfo->startempty == 1)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo->driver));
-				else
-					ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo));
-			}
-		}
-
-		// handle UI_UP_FILTER
-		else if (m_event->iptkey == IPT_UI_UP_FILTER && sw_filters::actual > UI_SW_FIRST)
-		{
-			l_sw_hover = sw_filters::actual - 1;
-			check_filter = true;
-		}
-
-		// handle UI_DOWN_FILTER
-		else if (m_event->iptkey == IPT_UI_DOWN_FILTER && sw_filters::actual < UI_SW_LAST)
-		{
-			l_sw_hover = sw_filters::actual + 1;
-			check_filter = true;
+			if (ui_swinfo->startempty == 1 && mdat.has_history(ui_swinfo->driver))
+				ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo->driver));
+			else if (mdat.has_software(ui_swinfo->listname, ui_swinfo->shortname, ui_swinfo->parentname) || !ui_swinfo->usage.empty())
+				ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo));
 		}
 
 		// handle UI_LEFT_PANEL
@@ -264,12 +275,12 @@ void ui_menu_select_software::handle()
 				if (!machine().favorite().isgame_favorite(*swinfo))
 				{
 					machine().favorite().add_favorite_game(*swinfo);
-					machine().popmessage("%s\n added to favorites list.", swinfo->longname.c_str());
+					machine().popmessage(_("%s\n added to favorites list."), swinfo->longname.c_str());
 				}
 
 				else
 				{
-					machine().popmessage("%s\n removed from favorites list.", swinfo->longname.c_str());
+					machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname.c_str());
 					machine().favorite().remove_favorite_game();
 				}
 			}
@@ -280,45 +291,98 @@ void ui_menu_select_software::handle()
 			inkey_special(m_event);
 
 		else if (m_event->iptkey == IPT_OTHER)
+		{
+			highlight = l_sw_hover;
 			check_filter = true;
+			m_prev_selected = nullptr;
+		}
+
+		else if (m_event->iptkey == IPT_UI_CONFIGURE)
+			inkey_configure(m_event);
 	}
 
 	if (m_event != nullptr && m_event->itemref == nullptr)
 	{
-		// reset the error on any future m_event
-		if (ui_error)
-			ui_error = false;
 
-		else if (m_event->iptkey == IPT_OTHER)
-			check_filter = true;
+		if (m_event->iptkey == IPT_UI_CONFIGURE)
+			inkey_configure(m_event);
+
+		// handle UI_LEFT
+		else if (m_event->iptkey == IPT_UI_LEFT)
+		{
+			// Images
+			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view > FIRST_VIEW)
+			{
+				ui_globals::curimage_view--;
+				ui_globals::switch_image = true;
+				ui_globals::default_image = false;
+			}
+
+			// Infos
+			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view > 0)
+			{
+				ui_globals::cur_sw_dats_view--;
+				topline_datsview = 0;
+			}
+		}
+
+		// handle UI_RIGHT
+		else if (m_event->iptkey == IPT_UI_RIGHT)
+		{
+			// Images
+			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view < LAST_VIEW)
+			{
+				ui_globals::curimage_view++;
+				ui_globals::switch_image = true;
+				ui_globals::default_image = false;
+			}
+
+			// Infos
+			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view < 1)
+			{
+				ui_globals::cur_sw_dats_view++;
+				topline_datsview = 0;
+			}
+		}
+
+		// handle UI_LEFT_PANEL
+		else if (m_event->iptkey == IPT_UI_LEFT_PANEL)
+			ui_globals::rpanel = RP_IMAGES;
+
+		// handle UI_RIGHT_PANEL
+		else if (m_event->iptkey == IPT_UI_RIGHT_PANEL)
+			ui_globals::rpanel = RP_INFOS;
 
 		// handle UI_UP_FILTER
-		else if (m_event->iptkey == IPT_UI_UP_FILTER && sw_filters::actual > UI_SW_FIRST)
+		else if (m_event->iptkey == IPT_UI_UP_FILTER && highlight > UI_SW_FIRST)
 		{
-			l_sw_hover = sw_filters::actual - 1;
-			check_filter = true;
+			highlight--;
 		}
 
 		// handle UI_DOWN_FILTER
-		else if (m_event->iptkey == IPT_UI_DOWN_FILTER && sw_filters::actual < UI_SW_LAST)
+		else if (m_event->iptkey == IPT_UI_DOWN_FILTER && highlight < UI_SW_LAST)
 		{
-			l_sw_hover = sw_filters::actual + 1;
-			check_filter = true;
+			highlight++;
 		}
+		else if (m_event->iptkey == IPT_UI_SELECT && m_focus == focused_menu::left)
+		{
+			l_sw_hover = highlight;
+			check_filter = true;
+			m_prev_selected = nullptr;
+		}
+
 	}
 
 	// if we're in an error state, overlay an error message
 	if (ui_error)
-		machine().ui().draw_text_box(container,
-									"The selected software is missing one or more required files. "
-									"Please select a different software.\n\nPress any key (except ESC) to continue.",
+		machine().ui().draw_text_box(container, _("The selected software is missing one or more required files. "
+									"Please select a different software.\n\nPress any key (except ESC) to continue."),
 									JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 
 	// handle filters selection from key shortcuts
 	if (check_filter)
 	{
 		m_search[0] = '\0';
-
 		switch (l_sw_hover)
 		{
 			case UI_SW_REGION:
@@ -498,16 +562,16 @@ void ui_menu_select_software::build_software_list()
 				if (instance_name == nullptr || type_name == nullptr)
 					continue;
 
-				if (swinfo->shortname()) tmpmatches.shortname = swinfo->shortname();
-				if (swinfo->longname()) tmpmatches.longname = swinfo->longname();
-				if (swinfo->parentname()) tmpmatches.parentname = swinfo->parentname();
-				if (swinfo->year()) tmpmatches.year = swinfo->year();
-				if (swinfo->publisher()) tmpmatches.publisher = swinfo->publisher();
+				tmpmatches.shortname = strensure(swinfo->shortname());
+				tmpmatches.longname = strensure(swinfo->longname());
+				tmpmatches.parentname = strensure(swinfo->parentname());
+				tmpmatches.year = strensure(swinfo->year());
+				tmpmatches.publisher = strensure(swinfo->publisher());
 				tmpmatches.supported = swinfo->supported();
-				if (part->name()) tmpmatches.part = part->name();
+				tmpmatches.part = strensure(part->name());
 				tmpmatches.driver = m_driver;
-				if (swlist->list_name()) tmpmatches.listname = swlist->list_name();
-				if (part->interface()) tmpmatches.interface = part->interface();
+				tmpmatches.listname = strensure(swlist->list_name());
+				tmpmatches.interface = strensure(part->interface());
 				tmpmatches.startempty = 0;
 				tmpmatches.parentlongname.clear();
 				tmpmatches.usage.clear();
@@ -603,7 +667,7 @@ void ui_menu_select_software::build_software_list()
 
 void ui_menu_select_software::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	ui_software_info *swinfo = (FPTR)selectedref > 1 ? (ui_software_info *)selectedref : nullptr;
+	ui_software_info *swinfo = (selectedref != nullptr) ? (ui_software_info *)selectedref : ((m_prev_selected != nullptr) ? (ui_software_info *)m_prev_selected : nullptr);
 	const game_driver *driver = nullptr;
 	ui_manager &mui = machine().ui();
 	float width;
@@ -614,21 +678,21 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 
 	// determine the text for the header
 	int vis_item = (m_search[0] != 0) ? visible_items : (m_has_empty_start ? visible_items - 1 : visible_items);
-	strprintf(tempbuf[0], "MAME %s ( %d / %d softwares )", bare_build_version, vis_item, (int)m_swinfo.size() - 1);
-	tempbuf[1].assign("Driver: \"").append(m_driver->description).append("\" software list ");
+	tempbuf[0] = string_format(_("%1$s %2$s ( %3$d / %4$d softwares )"), emulator_info::get_appname(), bare_build_version, vis_item, m_swinfo.size() - 1);
+	tempbuf[1] = string_format(_("Driver: \"%1$s\" software list "), m_driver->description);
 
 	if (sw_filters::actual == UI_SW_REGION && m_filter.region.ui.size() != 0)
-		filtered.assign("Region: ").append(m_filter.region.ui[m_filter.region.actual]).append(" - ");
+		filtered = string_format(_("Region: %1$s -"), m_filter.region.ui[m_filter.region.actual]);
 	else if (sw_filters::actual == UI_SW_PUBLISHERS)
-		filtered.assign("Publisher: ").append(m_filter.publisher.ui[m_filter.publisher.actual]).append(" - ");
+		filtered = string_format(_("Publisher: %1$s -"), m_filter.publisher.ui[m_filter.publisher.actual]);
 	else if (sw_filters::actual == UI_SW_YEARS)
-		filtered.assign("Year: ").append(m_filter.year.ui[m_filter.year.actual]).append(" - ");
+		filtered = string_format(_("Year: %1$s -"), m_filter.year.ui[m_filter.year.actual]);
 	else if (sw_filters::actual == UI_SW_LIST)
-		filtered.assign("Software List: ").append(m_filter.swlist.description[m_filter.swlist.actual]).append(" - ");
+		filtered = string_format(_("Software List: %1$s -"), m_filter.swlist.description[m_filter.swlist.actual]);
 	else if (sw_filters::actual == UI_SW_TYPE)
-		filtered.assign("Device type: ").append(m_filter.type.ui[m_filter.type.actual]).append(" - ");
+		filtered = string_format(_("Device type: %1$s -"), m_filter.type.ui[m_filter.type.actual]);
 
-	tempbuf[2].assign(filtered).append("Search: ").append(m_search).append("_");
+	tempbuf[2] = string_format(_("%s Search: %s_"), filtered, m_search);
 
 	// get the size of the text
 	float maxwidth = origx2 - origx1;
@@ -664,47 +728,47 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 	}
 
 	// determine the text to render below
-	if (swinfo && swinfo->startempty == 1)
+	if (swinfo != nullptr && swinfo->startempty == 1)
 		driver = swinfo->driver;
 
-	if ((FPTR)driver > 1)
+	if (driver != nullptr)
 	{
 		isstar = machine().favorite().isgame_favorite(driver);
 
 		// first line is game description
-		strprintf(tempbuf[0], "%-.100s", driver->description);
+		tempbuf[0] = string_format(_("%1$-.100s"), driver->description);
 
 		// next line is year, manufacturer
-		strprintf(tempbuf[1], "%s, %-.100s", driver->year, driver->manufacturer);
+		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
 
 		// next line is clone/parent status
 		int cloneof = driver_list::non_bios_clone(*driver);
 
 		if (cloneof != -1)
-			strprintf(tempbuf[2], "Driver is clone of: %-.100s", driver_list::driver(cloneof).description);
+			tempbuf[2] = string_format(_("Driver is clone of: %1$-.100s"), driver_list::driver(cloneof).description);
 		else
-			tempbuf[2] = "Driver is parent";
+			tempbuf[2] = _("Driver is parent");
 
 		// next line is overall driver status
 		if (driver->flags & MACHINE_NOT_WORKING)
-			tempbuf[3] = "Overall: NOT WORKING";
+			tempbuf[3] = _("Overall: NOT WORKING");
 		else if (driver->flags & MACHINE_UNEMULATED_PROTECTION)
-			tempbuf[3] = "Overall: Unemulated Protection";
+			tempbuf[3] = _("Overall: Unemulated Protection");
 		else
-			tempbuf[3] = "Overall: Working";
+			tempbuf[3] = _("Overall: Working");
 
 		// next line is graphics, sound status
 		if (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS))
-			tempbuf[4] = "Graphics: Imperfect, ";
+			tempbuf[4] = _("Graphics: Imperfect, ");
 		else
-			tempbuf[4] = "Graphics: OK, ";
+			tempbuf[4] = _("Graphics: OK, ");
 
 		if (driver->flags & MACHINE_NO_SOUND)
-			tempbuf[4].append("Sound: Unimplemented");
+			tempbuf[4].append(_("Sound: Unimplemented"));
 		else if (driver->flags & MACHINE_IMPERFECT_SOUND)
-			tempbuf[4].append("Sound: Imperfect");
+			tempbuf[4].append(_("Sound: Imperfect"));
 		else
-			tempbuf[4].append("Sound: OK");
+			tempbuf[4].append(_("Sound: OK"));
 
 		color = UI_GREEN_COLOR;
 
@@ -717,41 +781,41 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 
 	}
 
-	else if ((FPTR)swinfo > 1)
+	else if (swinfo != nullptr)
 	{
 		isstar = machine().favorite().isgame_favorite(*swinfo);
 
 		// first line is long name
-		strprintf(tempbuf[0], "%-.100s", swinfo->longname.c_str());
+		tempbuf[0] = string_format(_("%1$-.100s"), swinfo->longname.c_str());
 
 		// next line is year, publisher
-		strprintf(tempbuf[1], "%s, %-.100s", swinfo->year.c_str(), swinfo->publisher.c_str());
+		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), swinfo->year.c_str(), swinfo->publisher.c_str());
 
 		// next line is parent/clone
 		if (!swinfo->parentname.empty())
-			strprintf(tempbuf[2], "Software is clone of: %-.100s", !swinfo->parentlongname.empty() ? swinfo->parentlongname.c_str() : swinfo->parentname.c_str());
+			tempbuf[2] = string_format(_("Software is clone of: %1$-.100s"), !swinfo->parentlongname.empty() ? swinfo->parentlongname.c_str() : swinfo->parentname.c_str());
 		else
-			tempbuf[2] = "Software is parent";
+			tempbuf[2] = _("Software is parent");
 
 		// next line is supported status
 		if (swinfo->supported == SOFTWARE_SUPPORTED_NO)
 		{
-			tempbuf[3] = "Supported: No";
+			tempbuf[3] = _("Supported: No");
 			color = UI_RED_COLOR;
 		}
 		else if (swinfo->supported == SOFTWARE_SUPPORTED_PARTIAL)
 		{
-			tempbuf[3] = "Supported: Partial";
+			tempbuf[3] = _("Supported: Partial");
 			color = UI_YELLOW_COLOR;
 		}
 		else
 		{
-			tempbuf[3] = "Supported: Yes";
+			tempbuf[3] = _("Supported: Yes");
 			color = UI_GREEN_COLOR;
 		}
 
 		// last line is romset name
-		strprintf(tempbuf[4], "romset: %-.100s", swinfo->shortname.c_str());
+		tempbuf[4] = string_format(_("romset: %1$-.100s"), swinfo->shortname.c_str());
 	}
 
 	else
@@ -760,7 +824,7 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 		size_t found = copyright.find("\n");
 
 		tempbuf[0].clear();
-		tempbuf[1].assign(emulator_info::get_appname()).append(" ").append(build_version);
+		tempbuf[1] = string_format("%s %s", emulator_info::get_appname(), build_version);
 		tempbuf[2] = copyright.substr(0, found);
 		tempbuf[3] = copyright.substr(found + 1);
 		tempbuf[4].clear();
@@ -918,6 +982,62 @@ void ui_menu_select_software::inkey_special(const ui_menu_event *m_event)
 		buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, m_event->unichar);
 		m_search[buflen] = 0;
 		reset(UI_MENU_RESET_SELECT_FIRST);
+	}
+}
+
+void ui_menu_select_software::inkey_configure(const ui_menu_event *m_event)
+{
+	if (selected <= visible_items && m_focus == focused_menu::main)
+	{
+		m_prev_selected = item[selected].ref;
+		selected = visible_items + 1;
+	}
+	else if (selected > visible_items && m_focus == focused_menu::main)
+	{
+		if (ui_globals::panels_status != HIDE_LEFT_PANEL)
+			m_focus = focused_menu::left;
+
+		else if (ui_globals::panels_status == HIDE_BOTH)
+		{
+			for (int x = 0; x < item.size(); ++x)
+				if (item[x].ref == m_prev_selected)
+					selected = x;
+		}
+		else
+			m_focus = focused_menu::righttop;
+	}
+	else if (m_focus == focused_menu::left)
+	{
+		if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
+			m_focus = focused_menu::righttop;
+		else
+		{
+			m_focus = focused_menu::main;
+			if (m_prev_selected == nullptr)
+			{
+				selected = 0;
+				return;
+			}
+
+			for (int x = 0; x < item.size(); ++x)
+				if (item[x].ref == m_prev_selected)
+					selected = x;
+		}
+	}
+	else if (m_focus == focused_menu::righttop)
+		m_focus = focused_menu::rightbottom;
+	else if (m_focus == focused_menu::rightbottom)
+	{
+		m_focus = focused_menu::main;
+		if (m_prev_selected == nullptr)
+		{
+			selected = 0;
+			return;
+		}
+
+		for (int x = 0; x < item.size(); ++x)
+			if (item[x].ref == m_prev_selected)
+				selected = x;
 	}
 }
 
@@ -1088,7 +1208,6 @@ std::string c_sw_publisher::getname(std::string &str)
 //-------------------------------------------------
 void ui_menu_select_software::build_list(std::vector<ui_software_info *> &s_drivers, const char *filter_text, int filter)
 {
-
 	if (s_drivers.empty() && filter == -1)
 	{
 		filter = sw_filters::actual;
@@ -1185,7 +1304,7 @@ void ui_menu_select_software::find_matches(const char *str, int count)
 	std::vector<int> penalty(count, 9999);
 	int index = 0;
 
-	for (; m_displaylist[index]; ++index)
+	for (; index < m_displaylist.size(); ++index)
 	{
 		// pick the best match between driver name and description
 		int curpenalty = fuzzy_substring(str, m_displaylist[index]->longname);
@@ -1319,14 +1438,15 @@ float ui_menu_select_software::draw_left_panel(float x1, float y1, float x2, flo
 				hover = phover + filter;
 			}
 
-			if (afilter == filter)
+			if (highlight == filter && m_focus == focused_menu::left)
 			{
-				bgcolor = UI_SELECTED_BG_COLOR;
-				fgcolor = UI_SELECTED_COLOR;
+				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
+				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
 			}
 
 			if (bgcolor != UI_TEXT_BG_COLOR)
-				container->add_rect(x1, y1, x2, y1 + line_height, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+				mui.draw_textured_box(container, x1, y1, x2, y1 + line_height, bgcolor, rgb_t(255, 43, 43, 43),
+					hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 			float x1t = x1 + text_sign;
 			if (afilter == UI_SW_CUSTOM)
@@ -1343,12 +1463,18 @@ float ui_menu_select_software::draw_left_panel(float x1, float y1, float x2, flo
 						int cfilter = sw_custfltr::other[count];
 						if (cfilter == filter)
 						{
-							strprintf(str, "@custom%d %s", count + 1, text[filter]);
+							str = string_format("@custom%d %s", count + 1, text[filter]);
 							x1t -= text_sign;
 							break;
 						}
 					}
 				}
+				convert_command_glyph(str);
+			}
+			else if (filter == sw_filters::actual)
+			{
+				str.assign("_> ").append(text[filter]);
+				x1t -= text_sign;
 				convert_command_glyph(str);
 			}
 
@@ -1421,7 +1547,7 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 	std::vector<int> xstart;
 	std::vector<int> xend;
 	float text_size = machine().ui().options().infos_size();
-	ui_software_info *soft = ((FPTR)selectedref > 2) ? (ui_software_info *)selectedref : nullptr;
+	ui_software_info *soft = (selectedref != nullptr) ? (ui_software_info *)selectedref : ((m_prev_selected != nullptr) ? (ui_software_info *)m_prev_selected : nullptr);
 	static ui_software_info *oldsoft = nullptr;
 	static int old_sw_view = -1;
 
@@ -1430,10 +1556,30 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 	float oy1 = origy1 + line_height;
 
 	// apply title to right panel
-	if (soft && soft->usage.empty())
+	if (soft != nullptr && soft->usage.empty())
 	{
-		mui.draw_text_full(container, "History", origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+		float title_size = 0.0f;
+
+		mui.draw_text_full(container, _("History"), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+			DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &title_size, nullptr);
+		title_size += 0.01f;
+
+		rgb_t fgcolor = UI_TEXT_COLOR;
+		rgb_t bgcolor = UI_TEXT_BG_COLOR;
+		if (m_focus == focused_menu::rightbottom)
+		{
+			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
+			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+		}
+
+		float middle = origx2 - origx1;
+
+		if (bgcolor != UI_TEXT_BG_COLOR)
+			mui.draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
+				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+
+		mui.draw_text_full(container, _("History"), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+			DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 		ui_globals::cur_sw_dats_view = 0;
 	}
 	else
@@ -1441,20 +1587,33 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 		float title_size = 0.0f;
 		float txt_lenght = 0.0f;
 		std::string t_text[2];
-		t_text[0] = "History";
-		t_text[1] = "Usage";
+		t_text[0] = _("History");
+		t_text[1] = _("Usage");
 
 		for (auto & elem : t_text)
 		{
 			mui.draw_text_full(container, elem.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-			                              DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
+				DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
 			txt_lenght += 0.01f;
 			title_size = MAX(txt_lenght, title_size);
 		}
 
+		rgb_t fgcolor = UI_TEXT_COLOR;
+		rgb_t bgcolor = UI_TEXT_BG_COLOR;
+		if (m_focus == focused_menu::rightbottom)
+		{
+			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
+			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+		}
+
+		float middle = origx2 - origx1;
+
+		if (bgcolor != UI_TEXT_BG_COLOR)
+			mui.draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
+				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+
 		mui.draw_text_full(container, t_text[ui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1,
-		                              JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-		                              nullptr, nullptr);
+			JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 
 		draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::cur_sw_dats_view, 0, 1, title_size);
 	}
@@ -1477,8 +1636,8 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 
 	if (buffer.empty())
 	{
-		mui.draw_text_full(container, "No Infos Available", origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, JUSTIFY_CENTER,
-		                              WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+		mui.draw_text_full(container, _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, JUSTIFY_CENTER,
+			WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		return;
 	}
 	else
@@ -1506,8 +1665,8 @@ void ui_menu_select_software::infos_render(void *selectedref, float origx1, floa
 			info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
 		else
 			mui.draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1,
-			                              JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-			                              nullptr, nullptr, text_size);
+				JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+				nullptr, nullptr, text_size);
 		oy1 += (line_height * text_size);
 	}
 
@@ -1526,9 +1685,9 @@ void ui_menu_select_software::arts_render(void *selectedref, float origx1, float
 	static ui_software_info *oldsoft = nullptr;
 	static const game_driver *olddriver = nullptr;
 	const game_driver *driver = nullptr;
-	ui_software_info *soft = ((FPTR)selectedref > 2) ? (ui_software_info *)selectedref : nullptr;
+	ui_software_info *soft = (selectedref != nullptr) ? (ui_software_info *)selectedref : ((m_prev_selected != nullptr) ? (ui_software_info *)m_prev_selected : nullptr);
 
-	if (soft && soft->startempty == 1)
+	if (soft != nullptr && soft->startempty == 1)
 	{
 		driver = soft->driver;
 		oldsoft = nullptr;
@@ -1536,7 +1695,7 @@ void ui_menu_select_software::arts_render(void *selectedref, float origx1, float
 	else
 		olddriver = nullptr;
 
-	if (driver)
+	if (driver != nullptr)
 	{
 		if (ui_globals::default_image)
 			((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? ui_globals::curimage_view = CABINETS_VIEW : ui_globals::curimage_view = SNAPSHOT_VIEW;
@@ -1548,6 +1707,7 @@ void ui_menu_select_software::arts_render(void *selectedref, float origx1, float
 		if (driver != olddriver || !snapx_bitmap->valid() || ui_globals::switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
+			snapfile.set_restrict_to_mediapath(true);
 			bitmap_argb32 *tmp_bitmap;
 			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
 
@@ -1614,7 +1774,7 @@ void ui_menu_select_software::arts_render(void *selectedref, float origx1, float
 			container->add_quad( x1, y1, x2, y2, ARGB_WHITE, snapx_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
 	}
-	else if (soft)
+	else if (soft != nullptr)
 	{
 		std::string fullname, pathname;
 		if (ui_globals::default_image)
@@ -1813,7 +1973,7 @@ void ui_software_parts::custom_render(void *selectedref, float top, float bottom
 {
 	float width;
 	ui_manager &mui = machine().ui();
-	mui.draw_text_full(container, "Software part selection:", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	mui.draw_text_full(container, _("Software part selection:"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
@@ -1833,7 +1993,7 @@ void ui_software_parts::custom_render(void *selectedref, float top, float bottom
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, "Software part selection:", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	mui.draw_text_full(container, _("Software part selection:"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
@@ -1878,7 +2038,7 @@ void ui_bios_selection::handle()
 {
 	// process the menu
 	const ui_menu_event *event = process(0);
-	ui_options &moptions = machine().ui().options();
+	emu_options &moptions = machine().options();
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT && event->itemref != nullptr)
 		for (auto & elem : m_bios)
 			if ((void*)&elem.name == event->itemref)
@@ -1911,7 +2071,7 @@ void ui_bios_selection::handle()
 					drivlist.next();
 					software_list_device *swlist = software_list_device::find_by_name(drivlist.config(), ui_swinfo->listname.c_str());
 					software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
-					if (!moptions.skip_parts_menu() && swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
+					if (!machine().ui().options().skip_parts_menu() && swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
 					{
 						std::unordered_map<std::string, std::string> parts;
 						for (const software_part *swpart = swinfo->first_part(); swpart != nullptr; swpart = swpart->next())
@@ -1951,7 +2111,7 @@ void ui_bios_selection::custom_render(void *selectedref, float top, float bottom
 {
 	float width;
 	ui_manager &mui = machine().ui();
-	mui.draw_text_full(container, "Bios selection:", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	mui.draw_text_full(container, _("Bios selection:"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
@@ -1971,6 +2131,6 @@ void ui_bios_selection::custom_render(void *selectedref, float top, float bottom
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, "Bios selection:", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	mui.draw_text_full(container, _("Bios selection:"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }

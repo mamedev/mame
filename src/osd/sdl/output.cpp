@@ -34,10 +34,8 @@
 
 #ifdef PTR64
 #define PID_FMT "%ld"
-#define PID_CAST long
 #else
 #define PID_FMT "%d"
-#define PID_CAST int
 #endif
 
 //============================================================
@@ -60,9 +58,9 @@ static void notifier_callback(const char *outname, INT32 value, void *param);
 //  osd_get_pid
 //============================================================
 
-PID_CAST osd_getpid(void)
+intptr_t osd_getpid(void)
 {
-	return (PID_CAST) getpid();
+	return intptr_t(getpid());
 }
 
 //============================================================

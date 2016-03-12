@@ -339,12 +339,7 @@ void PrintTo(const wchar_t* s, ostream* os) {
     *os << "NULL";
   } else {
     *os << ImplicitCast_<const void*>(s) << " pointing to ";
-#ifndef __OS2__
     PrintCharsAsStringTo(s, std::wcslen(s), os);
-#else
-    // OS/2 gcc does not declare wcslen() in std namesapce.
-    PrintCharsAsStringTo(s, wcslen(s), os);
-#endif
   }
 }
 #endif  // wchar_t is native

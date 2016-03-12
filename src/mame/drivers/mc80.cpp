@@ -178,7 +178,7 @@ static MACHINE_CONFIG_START( mc8020, mc80_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mc80_state, screen_update_mc8020)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_2_4576MHz)
@@ -216,7 +216,7 @@ static MACHINE_CONFIG_START( mc8030, mc80_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mc80_state, screen_update_mc8030)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
 	MCFG_DEVICE_ADD("zve_pio", Z80PIO, XTAL_2_4576MHz)

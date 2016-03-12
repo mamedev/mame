@@ -221,27 +221,27 @@ void h8_device::state_string_export(const device_state_entry &entry, std::string
 	switch(entry.index()) {
 	case STATE_GENFLAGS:
 		if(has_exr)
-			strprintf(str, "%c%c %c%c%c%c%c%c%c%c",
-							(EXR & EXR_T) ? 'T' : '-',
-							'0' + (EXR & EXR_I),
-							(CCR & F_I)  ? 'I' : '-',
-							(CCR & F_UI) ? 'u' : '-',
-							(CCR & F_H)  ? 'H' : '-',
-							(CCR & F_U)  ? 'U' : '-',
-							(CCR & F_N)  ? 'N' : '-',
-							(CCR & F_Z)  ? 'Z' : '-',
-							(CCR & F_V)  ? 'V' : '-',
-							(CCR & F_C)  ? 'C' : '-');
+			str = string_format("%c%c %c%c%c%c%c%c%c%c",
+					(EXR & EXR_T) ? 'T' : '-',
+					'0' + (EXR & EXR_I),
+					(CCR & F_I)  ? 'I' : '-',
+					(CCR & F_UI) ? 'u' : '-',
+					(CCR & F_H)  ? 'H' : '-',
+					(CCR & F_U)  ? 'U' : '-',
+					(CCR & F_N)  ? 'N' : '-',
+					(CCR & F_Z)  ? 'Z' : '-',
+					(CCR & F_V)  ? 'V' : '-',
+					(CCR & F_C)  ? 'C' : '-');
 		else
-			strprintf(str, "%c%c%c%c%c%c%c%c",
-							(CCR & F_I)  ? 'I' : '-',
-							(CCR & F_UI) ? 'u' : '-',
-							(CCR & F_H)  ? 'H' : '-',
-							(CCR & F_U)  ? 'U' : '-',
-							(CCR & F_N)  ? 'N' : '-',
-							(CCR & F_Z)  ? 'Z' : '-',
-							(CCR & F_V)  ? 'V' : '-',
-							(CCR & F_C)  ? 'C' : '-');
+			str = string_format("%c%c%c%c%c%c%c%c",
+					(CCR & F_I)  ? 'I' : '-',
+					(CCR & F_UI) ? 'u' : '-',
+					(CCR & F_H)  ? 'H' : '-',
+					(CCR & F_U)  ? 'U' : '-',
+					(CCR & F_N)  ? 'N' : '-',
+					(CCR & F_Z)  ? 'Z' : '-',
+					(CCR & F_V)  ? 'V' : '-',
+					(CCR & F_C)  ? 'C' : '-');
 		break;
 	case H8_R0:
 	case H8_R1:
@@ -252,7 +252,7 @@ void h8_device::state_string_export(const device_state_entry &entry, std::string
 	case H8_R6:
 	case H8_R7: {
 		int r = entry.index() - H8_R0;
-		strprintf(str, "%04x %04x", R[r + 8], R[r]);
+		str = string_format("%04x %04x", R[r + 8], R[r]);
 		break;
 	}
 	}
@@ -281,7 +281,7 @@ void h8_device::disassemble_am(char *&buffer, int am, offs_t pc, const UINT8 *op
 		"e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7",
 	};
 
-	static const char *const r32_names[88] = {
+	static const char *const r32_names[8] = {
 		"er0", "er1", "er2", "er3", "er4", "er5", "er6", "sp",
 	};
 

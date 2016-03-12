@@ -1,6 +1,14 @@
 cmake_minimum_required (VERSION 2.8.11)
 project (benchmark)
 
+foreach(p
+    CMP0054 # CMake 3.1
+    )
+  if(POLICY ${p})
+    cmake_policy(SET ${p} NEW)
+  endif()
+endforeach()
+
 option(BENCHMARK_ENABLE_TESTING "Enable testing of the benchmark library." ON)
 option(BENCHMARK_ENABLE_LTO "Enable link time optimisation of the benchmark library." OFF)
 # Make sure we can import out CMake functions
@@ -23,73 +31,83 @@ include(CheckCXXCompilerFlag)
 include(AddCXXCompilerFlag)
 include(CXXFeatureCheck)
 
-# Try and enable C++11. Don't use C++14 because it doesn't work in some
-# configurations.
-add_cxx_compiler_flag(-std=c++11)
-if (NOT HAVE_CXX_FLAG_STD_CXX11)
-  add_cxx_compiler_flag(-std=c++0x)
-endif()
-
-# Turn compiler warnings up to 11
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  # Turn compiler warnings up to 11
   add_cxx_compiler_flag(-W4)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-else()
-  add_cxx_compiler_flag(-Wall)
-endif()
-add_cxx_compiler_flag(-Wextra)
-add_cxx_compiler_flag(-Wshadow)
-add_cxx_compiler_flag(-Werror RELEASE)
-add_cxx_compiler_flag(-pedantic)
-add_cxx_compiler_flag(-pedantic-errors)
-add_cxx_compiler_flag(-Wshorten-64-to-32)
-add_cxx_compiler_flag(-Wfloat-equal)
-add_cxx_compiler_flag(-Wzero-as-null-pointer-constant)
-add_cxx_compiler_flag(-fstrict-aliasing)
-if (HAVE_CXX_FLAG_FSTRICT_ALIASING)
-  add_cxx_compiler_flag(-Wstrict-aliasing)
-endif()
-add_cxx_compiler_flag(-Wthread-safety)
-if (HAVE_WTHREAD_SAFETY)
-  add_definitions(-DHAVE_WTHREAD_SAFETY)
-  cxx_feature_check(THREAD_SAFETY_ATTRIBUTES)
-endif()
 
-# Link time optimisation
-if (BENCHMARK_ENABLE_LTO)
-  add_cxx_compiler_flag(-flto)
-  if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
-    find_program(GCC_AR gcc-ar)
-    if (GCC_AR)
-      set(CMAKE_AR ${GCC_AR})
-    endif()
-    find_program(GCC_RANLIB gcc-ranlib)
-    if (GCC_RANLIB)
-      set(CMAKE_RANLIB ${GCC_RANLIB})
+  # Link time optimisation
+  if (BENCHMARK_ENABLE_LTO)
+    set(CMAKE_CXX_FLAGS_RELEASE "/GL")
+    set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "/LTCG")
+    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "/LTCG")
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "/LTCG")
+  endif()
+else()
+  # Try and enable C++11. Don't use C++14 because it doesn't work in some
+  # configurations.
+  add_cxx_compiler_flag(-std=c++11)
+  if (NOT HAVE_CXX_FLAG_STD_CXX11)
+    add_cxx_compiler_flag(-std=c++0x)
+  endif()
+
+  # Turn compiler warnings up to 11
+  add_cxx_compiler_flag(-Wall)
+
+  add_cxx_compiler_flag(-Wextra)
+  add_cxx_compiler_flag(-Wshadow)
+  add_cxx_compiler_flag(-Werror RELEASE)
+  add_cxx_compiler_flag(-pedantic)
+  add_cxx_compiler_flag(-pedantic-errors)
+  add_cxx_compiler_flag(-Wshorten-64-to-32)
+  add_cxx_compiler_flag(-Wfloat-equal)
+  add_cxx_compiler_flag(-Wzero-as-null-pointer-constant)
+  add_cxx_compiler_flag(-fstrict-aliasing)
+  if (HAVE_CXX_FLAG_FSTRICT_ALIASING)
+    add_cxx_compiler_flag(-Wstrict-aliasing)
+  endif()
+  add_cxx_compiler_flag(-Wthread-safety)
+  if (HAVE_WTHREAD_SAFETY)
+    add_definitions(-DHAVE_WTHREAD_SAFETY)
+    cxx_feature_check(THREAD_SAFETY_ATTRIBUTES)
+  endif()
+
+  # Link time optimisation
+  if (BENCHMARK_ENABLE_LTO)
+    add_cxx_compiler_flag(-flto)
+    if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
+      find_program(GCC_AR gcc-ar)
+      if (GCC_AR)
+        set(CMAKE_AR ${GCC_AR})
+      endif()
+      find_program(GCC_RANLIB gcc-ranlib)
+      if (GCC_RANLIB)
+        set(CMAKE_RANLIB ${GCC_RANLIB})
+      endif()
     endif()
   endif()
-endif()
 
-# Coverage build type
-set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_DEBUG}" CACHE STRING
-  "Flags used by the C++ compiler during coverage builds."
-  FORCE)
-set(CMAKE_EXE_LINKER_FLAGS_COVERAGE
-  "${CMAKE_EXE_LINKER_FLAGS_DEBUG}" CACHE STRING
-  "Flags used for linking binaries during coverage builds."
-  FORCE)
-set(CMAKE_SHARED_LINKER_FLAGS_COVERAGE
-  "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}" CACHE STRING
-  "Flags used by the shared libraries linker during coverage builds."
-  FORCE)
-mark_as_advanced(
-  CMAKE_CXX_FLAGS_COVERAGE
-  CMAKE_EXE_LINKER_FLAGS_COVERAGE
-  CMAKE_SHARED_LINKER_FLAGS_COVERAGE)
-set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
-  "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel Coverage."
-  FORCE)
-add_cxx_compiler_flag(--coverage COVERAGE)
+  # Coverage build type
+  set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_DEBUG}" CACHE STRING
+    "Flags used by the C++ compiler during coverage builds."
+    FORCE)
+  set(CMAKE_EXE_LINKER_FLAGS_COVERAGE
+    "${CMAKE_EXE_LINKER_FLAGS_DEBUG}" CACHE STRING
+    "Flags used for linking binaries during coverage builds."
+    FORCE)
+  set(CMAKE_SHARED_LINKER_FLAGS_COVERAGE
+    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}" CACHE STRING
+    "Flags used by the shared libraries linker during coverage builds."
+    FORCE)
+  mark_as_advanced(
+    CMAKE_CXX_FLAGS_COVERAGE
+    CMAKE_EXE_LINKER_FLAGS_COVERAGE
+    CMAKE_SHARED_LINKER_FLAGS_COVERAGE)
+  set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
+    "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel Coverage."
+    FORCE)
+  add_cxx_compiler_flag(--coverage COVERAGE)
+endif()
 
 # C++ feature checks
 cxx_feature_check(STD_REGEX)

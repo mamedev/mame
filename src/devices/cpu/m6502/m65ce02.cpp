@@ -80,7 +80,7 @@ void m65ce02_device::state_string_export(const device_state_entry &entry, std::s
 	switch(entry.index()) {
 	case STATE_GENFLAGS:
 	case M6502_P:
-		strprintf(str, "%c%c%c%c%c%c%c",
+		str = string_format("%c%c%c%c%c%c%c",
 						P & F_N ? 'N' : '.',
 						P & F_V ? 'V' : '.',
 						P & F_E ? 'E' : '.',
@@ -90,7 +90,7 @@ void m65ce02_device::state_string_export(const device_state_entry &entry, std::s
 						P & F_C ? 'C' : '.');
 		break;
 	case M65CE02_B:
-		strprintf(str, "%02x", B >> 8);
+		str = string_format("%02x", B >> 8);
 		break;
 	}
 }

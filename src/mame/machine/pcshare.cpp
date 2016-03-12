@@ -14,26 +14,12 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/i386/i386.h"
 #include "machine/pcshare.h"
-#include "machine/pckeybrd.h"
-#include "machine/mc146818.h"
-#include "machine/idectrl.h"
-
+#include "cpu/i86/i286.h"
 
 /******************
 DMA8237 Controller
 ******************/
-
-READ8_MEMBER(pcat_base_state::at_dma8237_2_r)
-{
-	return m_dma8237_2->read(space, offset / 2);
-}
-
-WRITE8_MEMBER(pcat_base_state::at_dma8237_2_w)
-{
-	m_dma8237_2->write(space, offset / 2, data);
-}
 
 WRITE_LINE_MEMBER( pcat_base_state::pc_dma_hrq_changed )
 {
@@ -138,7 +124,7 @@ WRITE_LINE_MEMBER( pcat_base_state::at_pit8254_out2_changed )
 }
 
 
-	ADDRESS_MAP_START( pcat32_io_common, AS_IO, 32, pcat_base_state )
+ADDRESS_MAP_START( pcat32_io_common, AS_IO, 32, pcat_base_state )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffff)
@@ -146,7 +132,7 @@ WRITE_LINE_MEMBER( pcat_base_state::at_pit8254_out2_changed )
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(dma_page_select_r,dma_page_select_w, 0xffffffff)//TODO
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", am9517a_device, read, write, 0x00ff00ff)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT(pcat_common)

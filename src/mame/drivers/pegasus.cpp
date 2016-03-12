@@ -433,8 +433,9 @@ int pegasus_state::load_cart(device_image_interface &image, generic_slot_device 
 
 		if (size == 0)
 		{
-			std::string errmsg;
-			strprintf(errmsg,"Attempted to load a file that does not work in this socket.\nPlease check \"Usage\" field in the software list for the correct socket(s) to use.");
+			std::string errmsg = string_format(
+					"Attempted to load a file that does not work in this socket.\n"
+					"Please check \"Usage\" field in the software list for the correct socket(s) to use.");
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.c_str());
 			return IMAGE_INIT_FAIL;
 		}
@@ -495,7 +496,7 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 16*16-1)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pegasus)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

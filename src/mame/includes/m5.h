@@ -20,7 +20,7 @@
 #define SCREEN_TAG      "screen"
 //brno mod
 #define WD2797_TAG      "5f"
-#define RAMDISK			"ramdisk"
+#define RAMDISK         "ramdisk"
 
 
 class m5_state : public driver_device
@@ -96,7 +96,7 @@ public:
 	UINT8 m_ram_mode;
 	UINT8 m_ram_type;
 	memory_region *m_cart_rom;
-	m5_cart_slot_device	*m_cart_ram, *m_cart;
+	m5_cart_slot_device *m_cart_ram, *m_cart;
 
 	// floppy state for fd5
 	UINT8 m_fd5_data;
@@ -110,17 +110,17 @@ public:
 
 class brno_state : public m5_state
 {
-public:		  
+public:
 	brno_state(const machine_config &mconfig, device_type type, const char *tag)
 		: m5_state(mconfig, type, tag),
-		
+
 		m_fdc(*this, WD2797_TAG),
 		m_floppy0(*this, WD2797_TAG":0"),
 		m_floppy1(*this, WD2797_TAG":1")
-		//	m_ramdisk(*this, RAMDISK)
+		//  m_ramdisk(*this, RAMDISK)
 	{ }
 
-	
+
 	required_device<wd2797_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
@@ -140,14 +140,14 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 
-//	DECLARE_WRITE_LINE_MEMBER( wd2797_intrq_w );
-//	DECLARE_WRITE_LINE_MEMBER( wd2797_drq_w );
-//	DECLARE_WRITE_LINE_MEMBER( wd2797_index_callback);
+//  DECLARE_WRITE_LINE_MEMBER( wd2797_intrq_w );
+//  DECLARE_WRITE_LINE_MEMBER( wd2797_drq_w );
+//  DECLARE_WRITE_LINE_MEMBER( wd2797_index_callback);
 
 	//required_device<ram_device> m_ramdisk;
 	DECLARE_DRIVER_INIT(brno);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( brno );
-//	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(m5_cart);
+//  DECLARE_DEVICE_IMAGE_LOAD_MEMBER(m5_cart);
 
 
 	virtual void machine_start() override;
@@ -157,9 +157,9 @@ public:
 	UINT8 m_ramcpu; //where Ramdisk bank is mapped
 	bool m_romen;
 	bool m_ramen;
-	
 
-	UINT8 m_rammap[16]; // memory map			
+
+	UINT8 m_rammap[16]; // memory map
 };
 
 #endif

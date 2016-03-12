@@ -160,7 +160,7 @@ static MACHINE_CONFIG_FRAGMENT( pcx_video )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2674_device, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcx)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_SCN2674_VIDEO_ADD("crtc", 0, INPUTLINE("graphics", MCS51_INT0_LINE));
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)

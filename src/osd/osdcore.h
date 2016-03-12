@@ -28,7 +28,7 @@
 
 /* Make sure we have a path separator (default to /) */
 #ifndef PATH_SEPARATOR
-#if defined(_WIN32) || defined (__OS2__)
+#if defined(_WIN32)
 #define PATH_SEPARATOR          "\\"
 #else
 #define PATH_SEPARATOR          "/"
@@ -200,6 +200,21 @@ file_error osd_openpty(osd_file **file, char *name, size_t name_len);
         the file, or FILERR_NONE if no error occurred
 -----------------------------------------------------------------------------*/
 file_error osd_truncate(osd_file *file, UINT64 offset);
+
+
+/*-----------------------------------------------------------------------------
+    osd_fflus: flush file buffers
+
+    Parameters:
+
+        file - handle to a file previously opened via osd_open
+
+    Return value:
+
+        a file_error describing any error that occurred while writing to
+        the file, or FILERR_NONE if no error occurred
+-----------------------------------------------------------------------------*/
+file_error osd_fflush(osd_file *file);
 
 
 /*-----------------------------------------------------------------------------

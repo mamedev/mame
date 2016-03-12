@@ -874,7 +874,7 @@ UINT8 corvus_hdc_t::corvus_read_firmware_block(UINT8 head, UINT8 sector) {
 //      Status of command
 //
 UINT8 corvus_hdc_t::corvus_write_firmware_block(UINT8 head, UINT8 sector, UINT8 *buffer) {
-	UINT16  relative_sector;    // Relative sector on drive for Physical Read
+	UINT16  relative_sector;    // Relative sector on drive for Physical Write
 	UINT8   status;
 
 	relative_sector = head * m_sectors_per_track + sector;

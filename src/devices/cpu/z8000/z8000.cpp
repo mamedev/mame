@@ -621,7 +621,7 @@ void z8002_device::state_string_export(const device_state_entry &entry, std::str
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				m_fcw & 0x8000 ? 'S':'s',
 				m_fcw & 0x4000 ? 'n':'N',
 				m_fcw & 0x2000 ? 'E':'e',

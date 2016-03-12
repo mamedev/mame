@@ -218,105 +218,105 @@ void dsp16_device::state_string_export(const device_state_entry &entry, std::str
 {
 	switch (entry.index())
 	{
-		case STATE_GENFLAGS:
-			strprintf(str, "(below)");
-			break;
+	case STATE_GENFLAGS:
+		str = "(below)";
+		break;
 
-		case DSP16_AUC:
+	case DSP16_AUC:
 		{
 			std::string alignString;
 			const UINT8 align = m_auc & 0x03;
 			switch (align)
 			{
-				case 0x00: strprintf(alignString,"xy"); break;
-				case 0x01: strprintf(alignString,"/4"); break;
-				case 0x02: strprintf(alignString,"x4"); break;
-				case 0x03: strprintf(alignString,",,"); break;
+			case 0x00: alignString = "xy"; break;
+			case 0x01: alignString = "/4"; break;
+			case 0x02: alignString = "x4"; break;
+			case 0x03: alignString = ",,"; break;
 			}
-			strprintf(str, "%c%c%c%c%c%s",
-							m_auc & 0x40 ? 'Y':'.',
-							m_auc & 0x20 ? '1':'.',
-							m_auc & 0x10 ? '0':'.',
-							m_auc & 0x08 ? '1':'.',
-							m_auc & 0x04 ? '0':'.',
-							alignString.c_str());
-			break;
+			str = string_format("%c%c%c%c%c%s",
+					m_auc & 0x40 ? 'Y':'.',
+					m_auc & 0x20 ? '1':'.',
+					m_auc & 0x10 ? '0':'.',
+					m_auc & 0x08 ? '1':'.',
+					m_auc & 0x04 ? '0':'.',
+					alignString);
 		}
+		break;
 
-		case DSP16_PSW:
-			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
-							m_psw & 0x8000 ? 'M':'.',
-							m_psw & 0x4000 ? 'E':'.',
-							m_psw & 0x2000 ? 'L':'.',
-							m_psw & 0x1000 ? 'V':'.',
-							m_psw & 0x0800 ? ',':',',
-							m_psw & 0x0400 ? ',':',',
-							m_psw & 0x0200 ? 'O':'.',
-							m_psw & 0x0100 ? '1':'.',
-							m_psw & 0x0080 ? '1':'.',
-							m_psw & 0x0040 ? '1':'.',
-							m_psw & 0x0020 ? '1':'.',
-							m_psw & 0x0010 ? 'O':'.',
-							m_psw & 0x0008 ? '1':'.',
-							m_psw & 0x0004 ? '1':'.',
-							m_psw & 0x0002 ? '1':'.',
-							m_psw & 0x0001 ? '1':'.');
-			break;
+	case DSP16_PSW:
+		str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+				m_psw & 0x8000 ? 'M':'.',
+				m_psw & 0x4000 ? 'E':'.',
+				m_psw & 0x2000 ? 'L':'.',
+				m_psw & 0x1000 ? 'V':'.',
+				m_psw & 0x0800 ? ',':',',
+				m_psw & 0x0400 ? ',':',',
+				m_psw & 0x0200 ? 'O':'.',
+				m_psw & 0x0100 ? '1':'.',
+				m_psw & 0x0080 ? '1':'.',
+				m_psw & 0x0040 ? '1':'.',
+				m_psw & 0x0020 ? '1':'.',
+				m_psw & 0x0010 ? 'O':'.',
+				m_psw & 0x0008 ? '1':'.',
+				m_psw & 0x0004 ? '1':'.',
+				m_psw & 0x0002 ? '1':'.',
+				m_psw & 0x0001 ? '1':'.');
+		break;
 
-		case DSP16_PIOC:
+	case DSP16_PIOC:
 		{
 			std::string strobeString;
 			const UINT8 strobe = (m_pioc & 0x6000) >> 13;
 			switch (strobe)
 			{
-				case 0x00: strprintf(strobeString, "1T"); break;
-				case 0x01: strprintf(strobeString, "2T"); break;
-				case 0x02: strprintf(strobeString, "3T"); break;
-				case 0x03: strprintf(strobeString, "4T"); break;
+			case 0x00: strobeString = "1T"; break;
+			case 0x01: strobeString = "2T"; break;
+			case 0x02: strobeString = "3T"; break;
+			case 0x03: strobeString = "4T"; break;
 			}
-			strprintf(str, "%c%s%c%c%c%c%c%c%c%c%c%c%c%c%c",
-							m_pioc & 0x8000 ? 'I':'.',
-							strobeString.c_str(),
-							m_pioc & 0x1000 ? 'O':'I',
-							m_pioc & 0x0800 ? 'O':'I',
-							m_pioc & 0x0400 ? 'S':'.',
-							m_pioc & 0x0200 ? 'I':'.',
-							m_pioc & 0x0100 ? 'O':'.',
-							m_pioc & 0x0080 ? 'P':'.',
-							m_pioc & 0x0040 ? 'P':'.',
-							m_pioc & 0x0020 ? 'I':'.',
-							m_pioc & 0x0010 ? 'I':'.',
-							m_pioc & 0x0008 ? 'O':'.',
-							m_pioc & 0x0004 ? 'P':'.',
-							m_pioc & 0x0002 ? 'P':'.',
-							m_pioc & 0x0001 ? 'I':'.');
-			break;
+			str = string_format("%c%s%c%c%c%c%c%c%c%c%c%c%c%c%c",
+					m_pioc & 0x8000 ? 'I':'.',
+					strobeString,
+					m_pioc & 0x1000 ? 'O':'I',
+					m_pioc & 0x0800 ? 'O':'I',
+					m_pioc & 0x0400 ? 'S':'.',
+					m_pioc & 0x0200 ? 'I':'.',
+					m_pioc & 0x0100 ? 'O':'.',
+					m_pioc & 0x0080 ? 'P':'.',
+					m_pioc & 0x0040 ? 'P':'.',
+					m_pioc & 0x0020 ? 'I':'.',
+					m_pioc & 0x0010 ? 'I':'.',
+					m_pioc & 0x0008 ? 'O':'.',
+					m_pioc & 0x0004 ? 'P':'.',
+					m_pioc & 0x0002 ? 'P':'.',
+					m_pioc & 0x0001 ? 'I':'.');
 		}
+		break;
 
-		// Placeholder for a better view later (TODO)
-		case DSP16_SIOC:
+	// Placeholder for a better view later (TODO)
+	case DSP16_SIOC:
 		{
 			std::string clkString;
 			const UINT8 clk = (m_sioc & 0x0180) >> 7;
 			switch (clk)
 			{
-				case 0x00: strprintf(clkString, "/4"); break;
-				case 0x01: strprintf(clkString, "12"); break;
-				case 0x02: strprintf(clkString, "16"); break;
-				case 0x03: strprintf(clkString, "20"); break;
+				case 0x00: clkString = "/4"; break;
+				case 0x01: clkString = "12"; break;
+				case 0x02: clkString = "16"; break;
+				case 0x03: clkString = "20"; break;
 			}
-			strprintf(str, "%c%s%c%c%c%c%c%c%c",
-							m_sioc & 0x0200 ? 'I':'O',
-							clkString.c_str(),
-							m_sioc & 0x0040 ? 'L':'M',
-							m_sioc & 0x0020 ? 'I':'O',
-							m_sioc & 0x0010 ? 'I':'O',
-							m_sioc & 0x0008 ? 'I':'O',
-							m_sioc & 0x0004 ? 'I':'O',
-							m_sioc & 0x0002 ? '2':'1',
-							m_sioc & 0x0001 ? '2':'1');
-			break;
+			str = string_format("%c%s%c%c%c%c%c%c%c",
+					m_sioc & 0x0200 ? 'I':'O',
+					clkString,
+					m_sioc & 0x0040 ? 'L':'M',
+					m_sioc & 0x0020 ? 'I':'O',
+					m_sioc & 0x0010 ? 'I':'O',
+					m_sioc & 0x0008 ? 'I':'O',
+					m_sioc & 0x0004 ? 'I':'O',
+					m_sioc & 0x0002 ? '2':'1',
+					m_sioc & 0x0001 ? '2':'1');
 		}
+		break;
 	}
 }
 

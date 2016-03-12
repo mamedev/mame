@@ -90,9 +90,8 @@ public:
 	virtual ~emu_file();
 
 	// getters
-	operator core_file *();
-	operator core_file &();
-	bool is_open() const { return (m_file != nullptr); }
+	operator util::core_file &();
+	bool is_open() const { return bool(m_file); }
 	const char *filename() const { return m_filename.c_str(); }
 	const char *fullpath() const { return m_fullpath.c_str(); }
 	UINT32 openflags() const { return m_openflags; }
@@ -102,7 +101,7 @@ public:
 
 	// setters
 	void remove_on_close() { m_remove_on_close = true; }
-	void set_openflags(UINT32 openflags) { assert(m_file == nullptr); m_openflags = openflags; }
+	void set_openflags(UINT32 openflags) { assert(!m_file); m_openflags = openflags; }
 	void set_restrict_to_mediapath(bool rtmp = true) { m_restrict_to_mediapath = rtmp; }
 
 	// open/close
@@ -120,6 +119,8 @@ public:
 
 	// control
 	file_error compress(int compress);
+
+	// position
 	int seek(INT64 offset, int whence);
 	UINT64 tell();
 	bool eof();
@@ -134,8 +135,14 @@ public:
 	// writing
 	UINT32 write(const void *buffer, UINT32 length);
 	int puts(const char *s);
-	int vprintf(const char *fmt, va_list va);
-	int printf(const char *fmt, ...) ATTR_PRINTF(2,3);
+	int vprintf(util::format_argument_pack<std::ostream> const &args);
+	template <typename Format, typename... Params> int printf(Format &&fmt, Params &&...args)
+	{
+		return vprintf(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
+
+	// buffers
+	void flush();
 
 private:
 	bool compressed_file_ready(void);
@@ -152,9 +159,9 @@ private:
 	// internal state
 	std::string     m_filename;                     // original filename provided
 	std::string     m_fullpath;                     // full filename
-	core_file *     m_file;                         // core file pointer
+	util::core_file::ptr m_file;                    // core file pointer
 	path_iterator   m_iterator;                     // iterator for paths
-	path_iterator   m_mediapaths;           // media-path iterator
+	path_iterator   m_mediapaths;                   // media-path iterator
 	UINT32          m_crc;                          // file's CRC
 	UINT32          m_openflags;                    // flags we used for the open
 	hash_collection m_hashes;                       // collection of hashes

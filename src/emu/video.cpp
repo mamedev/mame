@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    video.c
+    video.cpp
 
     Core MAME video routines.
 
@@ -267,28 +267,28 @@ void video_manager::frame_update(bool debug)
 
 std::string video_manager::speed_text()
 {
-	std::string str;
+	std::ostringstream str;
 
 	// if we're paused, just display Paused
 	bool paused = machine().paused();
 	if (paused)
-		str.append("paused");
+		str << "paused";
 
 	// if we're fast forwarding, just display Fast-forward
 	else if (m_fastforward)
-		str.append("fast ");
+		str << "fast ";
 
 	// if we're auto frameskipping, display that plus the level
 	else if (effective_autoframeskip())
-		strcatprintf(str, "auto%2d/%d", effective_frameskip(), MAX_FRAMESKIP);
+		util::stream_format(str, "auto%2d/%d", effective_frameskip(), MAX_FRAMESKIP);
 
 	// otherwise, just display the frameskip plus the level
 	else
-		strcatprintf(str, "skip %d/%d", effective_frameskip(), MAX_FRAMESKIP);
+		util::stream_format(str, "skip %d/%d", effective_frameskip(), MAX_FRAMESKIP);
 
 	// append the speed for all cases except paused
 	if (!paused)
-		strcatprintf(str, "%4d%%", (int)(100 * m_speed_percent + 0.5));
+		util::stream_format(str, "%4d%%", (int)(100 * m_speed_percent + 0.5));
 
 	// display the number of partial updates as well
 	int partials = 0;
@@ -296,9 +296,9 @@ std::string video_manager::speed_text()
 	for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
 		partials += screen->partial_updates();
 	if (partials > 1)
-		strcatprintf(str, "\n%d partial updates", partials);
+		util::stream_format(str, "\n%d partial updates", partials);
 
-	return str;
+	return str.str();
 }
 
 
@@ -381,44 +381,27 @@ void video_manager::save_input_timecode()
 	m_timecode_write = true;
 }
 
-std::string &video_manager::timecode_text(std::string &str) {
-	str.clear();
-	str += " ";
-
-	if (!m_timecode_text.empty()) {
-		str += m_timecode_text + " ";
-	}
-
+std::string &video_manager::timecode_text(std::string &str)
+{
 	attotime elapsed_time = machine().time() - m_timecode_start;
-	std::string elapsed_time_str;
-	strcatprintf(elapsed_time_str, "%02d:%02d",
-		(elapsed_time.m_seconds / 60) % 60,
-		elapsed_time.m_seconds % 60);
-	str += elapsed_time_str;
-
-	bool paused = machine().paused();
-	if (paused) {
-		str.append(" [paused]");
-	}
-
-	str += " ";
-
+	str = string_format(" %s%s%02d:%02d %s",
+			m_timecode_text,
+			m_timecode_text.empty() ? "" : " ",
+			(elapsed_time.m_seconds / 60) % 60,
+			elapsed_time.m_seconds % 60,
+			machine().paused() ? "[paused] " : "");
 	return str;
 }
 
-std::string &video_manager::timecode_total_text(std::string &str) {
-	str.clear();
-	str += " TOTAL ";
-
+std::string &video_manager::timecode_total_text(std::string &str)
+{
 	attotime elapsed_time = m_timecode_total;
 	if (machine().ui().show_timecode_counter()) {
 		elapsed_time += machine().time() - m_timecode_start;
 	}
-	std::string elapsed_time_str;
-	strcatprintf(elapsed_time_str, "%02d:%02d",
-		(elapsed_time.m_seconds / 60) % 60,
-		elapsed_time.m_seconds % 60);
-	str += elapsed_time_str + " ";
+	str = string_format("TOTAL %02d:%02d ",
+			(elapsed_time.m_seconds / 60) % 60,
+			elapsed_time.m_seconds % 60);
 	return str;
 }
 
@@ -684,7 +667,7 @@ inline int video_manager::effective_frameskip() const
 inline bool video_manager::effective_throttle() const
 {
 	// if we're paused, or if the UI is active, we always throttle
-	if (machine().paused() || machine().ui().is_menu_active())
+	if (machine().paused()) //|| machine().ui().is_menu_active())
 		return true;
 
 	// if we're fast forwarding, we don't throttle
@@ -1269,14 +1252,12 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 	else
 	{
 		// try until we succeed
-		std::string seqtext;
 		file.set_openflags(OPEN_FLAG_READ);
 		for (int seq = 0; ; seq++)
 		{
 			// build up the filename
 			fname.assign(snapstr);
-			strprintf(seqtext, "%04d", seq);
-			strreplace(fname, "%i", seqtext.c_str());
+			strreplace(fname, "%i", string_format("%04d", seq).c_str());
 
 			// try to open the file; stop when we fail
 			file_error filerr = file.open(fname.c_str());

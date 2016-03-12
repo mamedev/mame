@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    speaker.c
+    speaker.cpp
 
     Speaker output sound device.
 

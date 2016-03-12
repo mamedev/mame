@@ -76,6 +76,7 @@ public:
 	// misc
 	void toggle_throttle();
 	void toggle_record_movie();
+	file_error open_next(emu_file &file, const char *extension);
 
 	// render a frame
 	void frame_update(bool debug = false);
@@ -93,7 +94,7 @@ public:
 	void begin_recording(const char *name, movie_format format);
 	void end_recording(movie_format format);
 	void add_sound_to_recording(const INT16 *sound, int numsamples);
-	
+
 	void set_timecode_enabled(bool value) { m_timecode_enabled = value; }
 	bool get_timecode_enabled() { return m_timecode_enabled; }
 	bool get_timecode_write() { return m_timecode_write; }
@@ -103,7 +104,7 @@ public:
 	void add_to_total_time(attotime time) { m_timecode_total += time; }
 	std::string &timecode_text(std::string &str);
 	std::string &timecode_total_text(std::string &str);
-	
+
 
 private:
 	// internal helpers
@@ -127,7 +128,6 @@ private:
 
 	// snapshot/movie helpers
 	void create_snapshot_bitmap(screen_device *screen);
-	file_error open_next(emu_file &file, const char *extension);
 	void record_frame();
 
 	// internal state
@@ -196,13 +196,13 @@ private:
 
 	static const attoseconds_t ATTOSECONDS_PER_SPEED_UPDATE = ATTOSECONDS_PER_SECOND / 4;
 	static const int PAUSED_REFRESH_RATE = 30;
-	
-	bool					m_timecode_enabled;		// inp.timecode record enabled
-	bool					m_timecode_write;		// Show/hide timer at right (partial time)
-	std::string				m_timecode_text;		// Message for that video part (intro, gameplay, extra)
-	attotime				m_timecode_start;		// Starting timer for that video part (intro, gameplay, extra)
-	attotime				m_timecode_total;		// Show/hide timer at left (total elapsed on resulting video preview)
-	
+
+	bool                    m_timecode_enabled;     // inp.timecode record enabled
+	bool                    m_timecode_write;       // Show/hide timer at right (partial time)
+	std::string             m_timecode_text;        // Message for that video part (intro, gameplay, extra)
+	attotime                m_timecode_start;       // Starting timer for that video part (intro, gameplay, extra)
+	attotime                m_timecode_total;       // Show/hide timer at left (total elapsed on resulting video preview)
+
 };
 
 #endif  /* __VIDEO_H__ */

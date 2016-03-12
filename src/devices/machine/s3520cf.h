@@ -50,7 +50,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( set_cs_line );
 	DECLARE_WRITE_LINE_MEMBER( set_clock_line );
 	DECLARE_WRITE_LINE_MEMBER( write_bit );
-	void timer_callback();
+	TIMER_CALLBACK_MEMBER(timer_callback);
 
 protected:
 	// device-level overrides
@@ -59,8 +59,6 @@ protected:
 	virtual void device_reset() override;
 	inline UINT8 rtc_read(UINT8 offset);
 	inline void rtc_write(UINT8 offset,UINT8 data);
-
-	static TIMER_CALLBACK( rtc_inc_callback );
 
 	int m_dir;
 	int m_latch;

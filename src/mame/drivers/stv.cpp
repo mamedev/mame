@@ -3259,7 +3259,7 @@ ROM_START( nclubv2 )
 	ROM_LOAD16_WORD_SWAP( "nclubv2.ic24",    0x0600000, 0x0200000, CRC(1b7637de) SHA1(43c3094f60a6582298a45bad923fef57e98c5b2b) ) // OK
 	ROM_LOAD16_WORD_SWAP( "nclubv2.ic26",    0x0a00000, 0x0200000, CRC(630be99d) SHA1(ac7fbaae98b126fad5228b0ebffa91a0f0a94516) ) // OK
 	ROM_LOAD16_WORD_SWAP( "nclubv2.ic28",    0x0e00000, 0x0200000, CRC(1a3ca5e2) SHA1(4d3aed51d29c54e71175d828f648c9feb813ac04) ) // OK
-		
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "nclubv2.nv", 0x0000, 0x0080, CRC(96d55fa9) SHA1(b3c821d6cd4ed52d0e20565e12a06d8f81a08dbc) )
 ROM_END

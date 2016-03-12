@@ -1,5 +1,6 @@
 #!/bin/sh
-
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert, R. Belmont
 # ============================================================
 # 
 #   ledutil.sh - Example script for output notifiers

@@ -221,6 +221,7 @@
 		<text string="pion"><color red="0.65" green="0.15" blue="0.14" /></text>
 	</element>
 
+
 <!-- build screen -->
 
 	<view name="Internal Layout">
@@ -412,7 +413,7 @@
 		<bezel name="digit2" element="digit">
 			<bounds x="64.18" y="-12.5" width="5.66" height="8.5" />
 		</bezel>
-		<bezel name="digit3" element="digit">	
+		<bezel name="digit3" element="digit">
 			<bounds x="69.84" y="-12.5" width="5.66" height="8.5" />
 		</bezel>
 		<bezel name="digit4" element="digit">

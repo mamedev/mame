@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:Dankan1890
 /*********************************************************************
 
@@ -23,10 +23,10 @@
 
 
 ui_menu_display_options::video_modes ui_menu_display_options::m_video = {
-	{ "auto",	"Auto" },
-	{ "opengl",	"OpenGL" },
-	{ "bgfx",	"BGFX" },
-	{ "d3d",	"Direct3D" },
+	{ "auto",   "Auto" },
+	{ "opengl", "OpenGL" },
+	{ "bgfx",   "BGFX" },
+	{ "d3d",    "Direct3D" },
 	{ "gdi",    "GDI" },
 	{ "ddraw",  "DirectDraw" },
 	{ "soft",   "Software" },
@@ -35,21 +35,21 @@ ui_menu_display_options::video_modes ui_menu_display_options::m_video = {
 
 ui_menu_display_options::dspl_option ui_menu_display_options::m_options[] = {
 	{ 0, nullptr, nullptr },
-	{ 0, "Video Mode",               OSDOPTION_VIDEO },
+	{ 0, __("Video Mode"),               OSDOPTION_VIDEO },
 #if defined(UI_WINDOWS) && !defined(UI_SDL)
-	{ 0, "Hardware Stretch",         WINOPTION_HWSTRETCH },
-	{ 0, "Triple Buffering",         WINOPTION_TRIPLEBUFFER },
-	{ 0, "HLSL",                     WINOPTION_HLSL_ENABLE },
+	{ 0, __("Hardware Stretch"),         WINOPTION_HWSTRETCH },
+	{ 0, __("Triple Buffering"),         WINOPTION_TRIPLEBUFFER },
+	{ 0, __("HLSL"),                     WINOPTION_HLSL_ENABLE },
 #endif
-	{ 0, "GLSL",                     OSDOPTION_GL_GLSL },
-	{ 0, "Bilinear Filtering",       OSDOPTION_FILTER },
-	{ 0, "Bitmap Prescaling",        OSDOPTION_PRESCALE },
-	{ 0, "Multi-Threaded Rendering", OSDOPTION_MULTITHREADING },
-	{ 0, "Window Mode",              OSDOPTION_WINDOW },
-	{ 0, "Enforce Aspect Ratio",     OSDOPTION_KEEPASPECT },
-	{ 0, "Start Out Maximized",      OSDOPTION_MAXIMIZE },
-	{ 0, "Synchronized Refresh",     OSDOPTION_SYNCREFRESH },
-	{ 0, "Wait Vertical Sync",       OSDOPTION_WAITVSYNC }
+	{ 0, __("GLSL"),                     OSDOPTION_GL_GLSL },
+	{ 0, __("Bilinear Filtering"),       OSDOPTION_FILTER },
+	{ 0, __("Bitmap Prescaling"),        OSDOPTION_PRESCALE },
+	{ 0, __("Multi-Threaded Rendering"), OSDOPTION_MULTITHREADING },
+	{ 0, __("Window Mode"),              OSDOPTION_WINDOW },
+	{ 0, __("Enforce Aspect Ratio"),     OSDOPTION_KEEPASPECT },
+	{ 0, __("Start Out Maximized"),      OSDOPTION_MAXIMIZE },
+	{ 0, __("Synchronized Refresh"),     OSDOPTION_SYNCREFRESH },
+	{ 0, __("Wait Vertical Sync"),       OSDOPTION_WAITVSYNC }
 };
 
 
@@ -79,7 +79,11 @@ ui_menu_display_options::ui_menu_display_options(running_machine &machine, rende
 			break;
 		p2 = descr.find_first_of(delim, p1 + 1);
 		if (p2 != std::string::npos)
+		{
+			std::string txt(descr.substr(p1, p2 - p1));
+			if (txt != "or" && txt != "none")
 			m_list.push_back(descr.substr(p1, p2 - p1));
+		}
 		else
 		{
 			m_list.push_back(descr.substr(p1));
@@ -103,20 +107,20 @@ ui_menu_display_options::ui_menu_display_options(running_machine &machine, rende
 ui_menu_display_options::~ui_menu_display_options()
 {
 	std::string error_string;
-	for (int d = 2; d < ARRAY_LENGTH(m_options); ++d) 
+	for (int d = 2; d < ARRAY_LENGTH(m_options); ++d)
 	{
 		if (machine().options().int_value(m_options[d].option) != m_options[d].status)
 		{
 			machine().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
 			machine().options().mark_changed(m_options[d].option);
-		}	
+		}
 	}
 	if (machine().options().value(m_options[1].option) !=  m_list[m_options[1].status])
 	{
 		machine().options().set_value(m_options[1].option, m_list[m_options[1].status].c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 		machine().options().mark_changed(m_options[1].option);
 
-	}	
+	}
 	ui_globals::reset = true;
 }
 
@@ -172,18 +176,17 @@ void ui_menu_display_options::populate()
 	// add video mode option
 	std::string v_text(m_video[m_list[m_options[1].status]]);
 	UINT32 arrow_flags = get_arrow_flags(0, m_list.size() - 1, m_options[1].status);
-	item_append(m_options[1].description, v_text.c_str(), arrow_flags, (void *)(FPTR)1);
+	item_append(_(m_options[1].description), v_text.c_str(), arrow_flags, (void *)(FPTR)1);
 
 	// add options items
 	for (int opt = 2; opt < ARRAY_LENGTH(m_options); ++opt)
 		if (strcmp(m_options[opt].option, OSDOPTION_PRESCALE) != 0)
-			item_append(m_options[opt].description, m_options[opt].status ? "On" : "Off",
+			item_append(_(m_options[opt].description), m_options[opt].status ? _("On") : _("Off"),
 				m_options[opt].status ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)opt);
 		else
 		{
-			strprintf(v_text, "%d", m_options[opt].status);
 			arrow_flags = get_arrow_flags(1, 3, m_options[opt].status);
-			item_append(m_options[opt].description, v_text.c_str(), arrow_flags, (void *)(FPTR)opt);
+			item_append(_(m_options[opt].description), string_format("%d", m_options[opt].status).c_str(), arrow_flags, (void *)(FPTR)opt);
 		}
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
@@ -198,7 +201,7 @@ void ui_menu_display_options::custom_render(void *selectedref, float top, float 
 {
 	float width;
 	ui_manager &mui = machine().ui();
-	mui.draw_text_full(container, "Display Options", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, 
+	mui.draw_text_full(container, _("Display Options"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE,
 		ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
@@ -218,6 +221,6 @@ void ui_menu_display_options::custom_render(void *selectedref, float top, float 
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, "Display Options", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, 
+	mui.draw_text_full(container, _("Display Options"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL,
 		UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }

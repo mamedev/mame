@@ -79,6 +79,11 @@ public:
 	kay_kbd_t *m_kbd;
 	int m_centronics_busy;
 	required_device<palette_device> m_palette;
+	void kay_kbd_in(UINT8 data );
+	UINT8 kay_kbd_c_r();
+	UINT8 kay_kbd_d_r();
+	TIMER_CALLBACK_MEMBER( kay_kbd_beepoff );
+	void kay_kbd_d_w( UINT8 data );
 
 private:
 	bool m_is_motor_off;
@@ -101,12 +106,5 @@ private:
 	optional_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_beep;
 };
-
-
-/*----------- defined in machine/kay_kbd.c -----------*/
-
-UINT8 kay_kbd_c_r( running_machine &machine );
-UINT8 kay_kbd_d_r( running_machine &machine );
-void kay_kbd_d_w( running_machine &machine, UINT8 data );
 
 INPUT_PORTS_EXTERN( kay_kbd );

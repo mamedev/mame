@@ -21,7 +21,7 @@
 #include "corefile.h"
 #include "hashing.h"
 #include "chdcodec.h"
-
+#include <atomic>
 
 /***************************************************************************
 
@@ -304,7 +304,7 @@ public:
 	virtual ~chd_file();
 
 	// operators
-	operator core_file *() { return m_file; }
+	operator util::core_file &() { return *m_file; }
 
 	// getters
 	bool opened() const { return (m_file != nullptr); }
@@ -328,13 +328,13 @@ public:
 
 	// file create
 	chd_error create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 unitbytes, chd_codec_type compression[4]);
-	chd_error create(core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 unitbytes, chd_codec_type compression[4]);
+	chd_error create(util::core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 unitbytes, chd_codec_type compression[4]);
 	chd_error create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes, chd_codec_type compression[4], chd_file &parent);
-	chd_error create(core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, chd_codec_type compression[4], chd_file &parent);
+	chd_error create(util::core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, chd_codec_type compression[4], chd_file &parent);
 
 	// file open
 	chd_error open(const char *filename, bool writeable = false, chd_file *parent = nullptr);
-	chd_error open(core_file &file, bool writeable = false, chd_file *parent = nullptr);
+	chd_error open(util::core_file &file, bool writeable = false, chd_file *parent = nullptr);
 
 	// file close
 	void close();
@@ -401,7 +401,7 @@ private:
 	static int CLIB_DECL metadata_hash_compare(const void *elem1, const void *elem2);
 
 	// file characteristics
-	core_file *             m_file;             // handle to the open core file
+	util::core_file *       m_file;             // handle to the open core file
 	bool                    m_owns_file;        // flag indicating if this file should be closed on chd_close()
 	bool                    m_allow_reads;      // permit reads from this CHD?
 	bool                    m_allow_writes;     // permit writes to this CHD?
@@ -533,7 +533,7 @@ private:
 		chd_file_compressor *m_compressor;      // pointer back to the compressor
 		// TODO: had to change this to be able to use atomic_* functions on this
 		//volatile work_status m_status;          // current status of this item
-		volatile INT32      m_status;           // current status of this item
+		std::atomic<INT32>  m_status;           // current status of this item
 		UINT32              m_hunknum;          // number of the hunk we're working on
 		UINT8 *             m_data;             // pointer to the data we are working on
 		UINT8 *             m_compressed;       // pointer to the compressed data

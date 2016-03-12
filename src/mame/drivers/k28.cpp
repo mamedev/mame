@@ -8,12 +8,12 @@
   * MM5445N VFD driver, 9-digit alphanumeric display same as snmath
   * 2*TMS6100 (32KB VSM)
   * SC-01-A speech chip
-  
+
   3 models exist:
   - 7-230: darkblue case, toy-ish looks
   - 7-231: gray case, hardware is the same
   - 7-232: this one is completely different hw --> driver tispeak.cpp
-  
+
   TODO:
   - external module support (no dumps yet)
   - SC-01 frog speech is why this driver is marked NOT_WORKING
@@ -63,8 +63,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
+	void set_display_segmask(UINT32 digits, UINT32 mask);
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
-	void display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask);
 
 	bool m_power_on;
 	UINT8 m_inp_mux;
@@ -83,7 +83,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_p2_w);
 	DECLARE_WRITE8_MEMBER(mcu_prog_w);
 	DECLARE_READ8_MEMBER(mcu_t1_r);
-	
+
 	DECLARE_INPUT_CHANGED_MEMBER(power_on);
 	void power_off();
 
@@ -101,7 +101,7 @@ void k28_state::machine_start()
 	memset(m_display_state, 0, sizeof(m_display_state));
 	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
+	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 
 	m_power_on = false;
 	m_inp_mux = 0;
@@ -140,7 +140,7 @@ void k28_state::machine_reset()
 {
 	m_power_on = true;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	
+
 	// the game relies on reading the on-button as pressed when it's turned on
 	m_onbutton_timer->adjust(attotime::from_msec(250));
 }
@@ -237,6 +237,17 @@ void k28_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
+void k28_state::set_display_segmask(UINT32 digits, UINT32 mask)
+{
+	// set a segment mask per selected digit, but leave unselected ones alone
+	for (int i = 0; i < 0x20; i++)
+	{
+		if (digits & 1)
+			m_display_segmask[i] = mask;
+		digits >>= 1;
+	}
+}
+
 void k28_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
 {
 	set_display_size(maxx, maxy);
@@ -247,15 +258,6 @@ void k28_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
 	display_update();
-}
-
-void k28_state::display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask)
-{
-	// expects m_display_segmask to be not-0
-	for (int y = 0; y < maxy; y++)
-		m_display_segmask[y] &= segmask;
-
-	display_matrix(maxx, maxy, setx, sety);
 }
 
 
@@ -272,13 +274,13 @@ WRITE8_MEMBER(k28_state::mcu_p0_w)
 	// d0-d2: input mux high bits
 	m_inp_mux = (m_inp_mux & 0xf) | (~data << 4 & 0x70);
 	m_phoneme = (m_phoneme & 0xf) | (data << 4 & 0x30);
-	
+
 	// d3: SC-01 strobe, latch phoneme on rising edge
 	int strobe = data >> 3 & 1;
 	if (!strobe && m_speech_strobe)
 		m_speech->write(space, 0, m_phoneme);
 	m_speech_strobe = strobe;
-	
+
 	// d5: VFD driver data enable
 	m_vfd_data_enable = ~data >> 5 & 1;
 	if (m_vfd_data_enable)
@@ -297,18 +299,18 @@ WRITE8_MEMBER(k28_state::mcu_p0_w)
 READ8_MEMBER(k28_state::mcu_p1_r)
 {
 	UINT8 data = 0;
-	
+
 	// multiplexed inputs (active low)
 	for (int i = 0; i < 7; i++)
 		if (m_inp_mux >> i & 1)
 		{
 			data |= m_inp_matrix[i]->read();
-			
+
 			// force press on-button at boot
 			if (i == 5 && m_onbutton_timer->enabled())
 				data |= 1;
 		}
-	
+
 	return data ^ 0xff;
 }
 
@@ -324,7 +326,7 @@ WRITE8_MEMBER(k28_state::mcu_p2_w)
 	m_vfd_data_in = data & 1;
 	if (m_vfd_data_enable)
 		m_vfd_shiftreg = (m_vfd_shiftreg & U64(~1)) | m_vfd_data_in;
-	
+
 	// d0-d3: VSM data, input mux and SC-01 phoneme lower nibble
 	m_tms6100->add_w(space, 0, data);
 	m_inp_mux = (m_inp_mux & ~0xf) | (~data & 0xf);
@@ -337,27 +339,28 @@ WRITE8_MEMBER(k28_state::mcu_prog_w)
 	int state = (data) ? 1 : 0;
 	bool rise = state == 1 && !m_vfd_clock;
 	m_vfd_clock = state;
-	
+
 	// on rising edge
 	if (rise)
 	{
 		// leading 1 triggers shift start
 		if (m_vfd_shiftcount == 0 && ~m_vfd_shiftreg & 1)
 			return;
-		
+
 		// output shiftreg on 35th clock
 		if (m_vfd_shiftcount == 35)
 		{
 			m_vfd_shiftcount = 0;
-			
+
 			// output 0-15: digit segment data
 			UINT16 seg_data = (UINT16)(m_vfd_shiftreg >> 19);
 			seg_data = BITSWAP16(seg_data,0,1,13,9,10,12,14,8,3,4,5,2,15,11,6,7);
 
 			// output 16-24: digit select
 			UINT16 digit_sel = (UINT16)(m_vfd_shiftreg >> 10) & 0x1ff;
-			display_matrix_seg(16, 9, seg_data, digit_sel, 0x3fff);
-			
+			set_display_segmask(0x1ff, 0x3fff);
+			display_matrix(16, 9, seg_data, digit_sel);
+
 			// output 25: power-off request on falling edge
 			if (~m_vfd_shiftreg & m_vfd_shiftreg_out & 0x200)
 				power_off();

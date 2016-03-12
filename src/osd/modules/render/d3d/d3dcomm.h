@@ -13,10 +13,9 @@
 //  FORWARD DECLARATIONS
 //============================================================
 
-namespace d3d
-{
 class texture_info;
-class renderer;
+class renderer_d3d9;
+struct d3d_base;
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -51,12 +50,12 @@ public:
 	} c;
 };
 
-class texture_manager
+class d3d_texture_manager
 {
 public:
-	texture_manager() { }
-	texture_manager(renderer *d3d);
-	~texture_manager();
+	d3d_texture_manager() { }
+	d3d_texture_manager(renderer_d3d9 *d3d);
+	~d3d_texture_manager();
 
 	void                    update_textures();
 
@@ -81,10 +80,10 @@ public:
 	texture_info *          get_default_texture() { return m_default_texture; }
 	texture_info *          get_vector_texture() { return m_vector_texture; }
 
-	renderer *              get_d3d() { return m_renderer; }
+	renderer_d3d9 *         get_d3d() { return m_renderer; }
 
 private:
-	renderer *              m_renderer;
+	renderer_d3d9 *         m_renderer;
 
 	texture_info *          m_texlist;                  // list of active textures
 	int                     m_dynamic_supported;        // are dynamic textures supported?
@@ -108,7 +107,7 @@ private:
 class texture_info
 {
 public:
-	texture_info(texture_manager *manager, const render_texinfo *texsource, int prescale, UINT32 flags);
+	texture_info(d3d_texture_manager *manager, const render_texinfo *texsource, int prescale, UINT32 flags);
 	~texture_info();
 
 	render_texinfo &        get_texinfo() { return m_texinfo; }
@@ -151,9 +150,9 @@ private:
 	void compute_size(int texwidth, int texheight);
 	void compute_size_subroutine(int texwidth, int texheight, int* p_width, int* p_height);
 
-	texture_manager *       m_texture_manager;          // texture manager pointer
+	d3d_texture_manager *   m_texture_manager;          // texture manager pointer
 
-	renderer *              m_renderer;                 // renderer pointer
+	renderer_d3d9 *         m_renderer;                 // renderer pointer
 
 	texture_info *          m_next;                     // next texture in the list
 	texture_info *          m_prev;                     // prev texture in the list
@@ -174,17 +173,17 @@ private:
 	texture *               m_d3dfinaltex;              // Direct3D final (post-scaled) texture
 };
 
-/* d3d::poly_info holds information about a single polygon/d3d primitive */
+/* poly_info holds information about a single polygon/d3d primitive */
 class poly_info
 {
 public:
 	poly_info() { }
 
 	void init(D3DPRIMITIVETYPE type, UINT32 count, UINT32 numverts,
-			UINT32 flags, d3d::texture_info *texture, UINT32 modmode,
+			UINT32 flags, texture_info *texture, UINT32 modmode,
 			float prim_width, float prim_height);
 	void init(D3DPRIMITIVETYPE type, UINT32 count, UINT32 numverts,
-			UINT32 flags, d3d::texture_info *texture, UINT32 modmode,
+			UINT32 flags, texture_info *texture, UINT32 modmode,
 			float line_time, float line_length,
 			float prim_width, float prim_height);
 
@@ -193,7 +192,7 @@ public:
 	UINT32                  get_vertcount() { return m_numverts; }
 	UINT32                  get_flags() { return m_flags; }
 
-	d3d::texture_info *     get_texture() { return m_texture; }
+	texture_info *     get_texture() { return m_texture; }
 	DWORD                   get_modmode() { return m_modmode; }
 
 	float                   get_line_time() { return m_line_time; }
@@ -219,16 +218,14 @@ private:
 	float                   m_prim_height;                // used by quads
 };
 
-} // d3d
-
 /* vertex describes a single vertex */
 struct vertex
 {
-	float                   x, y, z;                    // X,Y,Z coordinates
-	float                   rhw;                        // RHW when no HLSL, padding when HLSL
-	D3DCOLOR                color;                      // diffuse color
-	float                   u0, v0;                     // texture stage 0 coordinates
-	float                   u1, v1;                     // additional info for vector data
+	float       x, y, z;                    // X,Y,Z coordinates
+	float       rhw;                        // RHW when no HLSL, padding when HLSL
+	D3DCOLOR    color;                      // diffuse color
+	float       u0, v0;                     // texture stage 0 coordinates
+	float       u1, v1;                     // additional info for vector data
 };
 
 
@@ -239,5 +236,64 @@ struct line_aa_step
 	float                   weight;                     // weight contribution
 };
 
+/* cache_target is a simple linked list containing only a rednerable target and texture, used for phosphor effects */
+class cache_target
+{
+public:
+	// construction/destruction
+	cache_target() { }
+	~cache_target();
+
+	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int width, int height, int prescale_x, int prescale_y);
+
+	surface *last_target;
+	texture *last_texture;
+
+	int target_width;
+	int target_height;
+
+	int width;
+	int height;
+
+	int screen_index;
+
+	cache_target *next;
+	cache_target *prev;
+};
+
+/* render_target is the information about a Direct3D render target chain */
+class d3d_render_target
+{
+public:
+	// construction/destruction
+	d3d_render_target() { }
+	~d3d_render_target();
+
+	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int width, int height, int prescale_x, int prescale_y);
+	int next_index(int index) { return ++index > 1 ? 0 : index; }
+
+	int target_width;
+	int target_height;
+
+	int prescale_x;
+	int prescale_y;
+
+	int width;
+	int height;
+
+	int screen_index;
+	int page_index;
+
+	surface *prescale_target[2];
+	texture *prescale_texture[2];
+	surface *native_target[2];
+	texture *native_texture[2];
+
+	d3d_render_target *next;
+	d3d_render_target *prev;
+
+	surface *bloom_target[11];
+	texture *bloom_texture[11];
+};
 
 #endif

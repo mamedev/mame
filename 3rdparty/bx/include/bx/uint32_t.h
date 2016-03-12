@@ -29,7 +29,7 @@
 #include "bx.h"
 
 #if BX_COMPILER_MSVC
-#	if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
+#	if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
 #		include <math.h> // math.h is included because VS bitches:
 						 // warning C4985: 'ceil': attributes not present on previous declaration.
 						 // must be included before intrin.h.

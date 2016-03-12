@@ -1,3 +1,5 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
 # m740 opcodes
 set_imp
 	read_pc_noinc();

@@ -1,15 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+
 #include "emu.h"
 
 #include "cpu/i86/i86.h"
 #include "cpu/tms7000/tms7000.h"
-#include "bus/isa/isa.h"
-#include "bus/isa/isa_cards.h"
 #include "machine/m24_kbd.h"
 #include "machine/m24_z8000.h"
 #include "machine/mm58274c.h"
-#include "includes/genpc.h"
+#include "machine/genpc.h"
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 #include "formats/m20_dsk.h"
@@ -165,9 +164,7 @@ WRITE_LINE_MEMBER(m24_state::halt_i86_w)
 
 static ADDRESS_MAP_START( m24_map, AS_PROGRAM, 16, m24_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0xa0000, 0xeffff) AM_NOP
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(m24_io, AS_IO, 16, m24_state )
@@ -175,6 +172,7 @@ static ADDRESS_MAP_START(m24_io, AS_IO, 16, m24_state )
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(keyboard_r, keyboard_w, 0xffff)
 	AM_RANGE(0x0066, 0x0067) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("mm58174an", mm58274c_device, read, write, 0xffff)
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", pc_noppi_mb_device, map, 0xffff)
 	AM_RANGE(0x80c0, 0x80c1) AM_DEVREADWRITE8("z8000_apb", m24_z8000_device, handshake_r, handshake_w, 0xff00)
 ADDRESS_MAP_END
 
@@ -267,6 +265,7 @@ static MACHINE_CONFIG_START( olivetti, m24_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
+	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
 
 	MCFG_CPU_ADD("kbc", TMS7000, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(kbc_map)
@@ -291,7 +290,7 @@ static MACHINE_CONFIG_START( olivetti, m24_state )
 MACHINE_CONFIG_END
 
 ROM_START( m24 )
-	ROM_REGION16_LE(0x8000,"maincpu", 0)
+	ROM_REGION16_LE(0x8000,"bios", 0)
 	ROMX_LOAD("olivetti_m24_version_1.43_high.bin",0x4001, 0x2000, CRC(04e697ba) SHA1(1066dcc849e6289b5ac6372c84a590e456d497a6), ROM_SKIP(1))
 	ROMX_LOAD("olivetti_m24_version_1.43_low.bin", 0x4000, 0x2000, CRC(ff7e0f10) SHA1(13423011a9bae3f3193e8c199f98a496cab48c0f), ROM_SKIP(1))
 
@@ -300,7 +299,7 @@ ROM_START( m24 )
 ROM_END
 
 ROM_START( m240 )
-	ROM_REGION16_LE(0x8000,"maincpu", 0)
+	ROM_REGION16_LE(0x8000,"bios", 0)
 	ROMX_LOAD("olivetti_m240_pch5_2.04_high.bin", 0x0001, 0x4000, CRC(ceb97b59) SHA1(84fabbeab355e0a4c9445910f2b7d1ec98886642), ROM_SKIP(1))
 	ROMX_LOAD("olivetti_m240_pch6_2.04_low.bin",  0x0000, 0x4000, CRC(c463aa94) SHA1(a30c763c1ace9f3ff79e7136b252d624108a50ae), ROM_SKIP(1))
 

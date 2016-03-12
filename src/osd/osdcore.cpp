@@ -2,6 +2,8 @@
 // copyright-holders:Aaron Giles
 
 #include "osdcore.h"
+#include <thread>
+#include <chrono>
 
 static const int MAXSTACK = 10;
 static osd_output *m_stack[MAXSTACK];
@@ -141,3 +143,41 @@ void CLIB_DECL osd_printf_log(const char *format, ...)
 	va_end(argptr);
 }
 #endif
+
+//============================================================
+//  osd_ticks
+//============================================================
+
+osd_ticks_t osd_ticks(void)
+{
+	return std::chrono::high_resolution_clock::now().time_since_epoch().count();
+}
+
+
+//============================================================
+//  osd_ticks_per_second
+//============================================================
+
+osd_ticks_t osd_ticks_per_second(void)
+{
+	return std::chrono::high_resolution_clock::period::den / std::chrono::high_resolution_clock::period::num;
+}
+
+//============================================================
+//  osd_sleep
+//============================================================
+
+void osd_sleep(osd_ticks_t duration)
+{
+	std::this_thread::sleep_for(std::chrono::high_resolution_clock::duration(duration));
+}
+
+//============================================================
+//  osd_num_processors
+//============================================================
+
+int osd_get_num_processors(void)
+{
+	// max out at 4 for now since scaling above that seems to do poorly
+	return MIN(std::thread::hardware_concurrency(), 4);
+}

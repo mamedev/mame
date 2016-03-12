@@ -25,37 +25,6 @@ public:
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-
-private:
-	enum
-	{
-		ROM_FOLDERS = 1,
-		UI_FOLDERS,
-		SAMPLE_FOLDERS,
-		HISTORY_FOLDERS,
-		INI_FOLDERS,
-		EXTRAINI_FOLDERS,
-		ICON_FOLDERS,
-		CHEAT_FOLDERS,
-		SNAPSHOT_FOLDERS,
-		CABINET_FOLDERS,
-		FLYER_FOLDERS,
-		TITLE_FOLDERS,
-		ENDS_FOLDERS,
-		PCB_FOLDERS,
-		MARQUEES_FOLDERS,
-		CPANEL_FOLDERS,
-		CROSSHAIR_FOLDERS,
-		ARTWORK_FOLDERS,
-		BOSSES_FOLDERS,
-		ARTPREV_FOLDERS,
-		SELECT_FOLDERS,
-		GAMEOVER_FOLDERS,
-		HOWTO_FOLDERS,
-		LOGO_FOLDERS,
-		SCORES_FOLDERS,
-		VERSUS_FOLDERS
-	};
 };
 
 //-------------------------------------------------
@@ -65,7 +34,7 @@ private:
 class ui_menu_display_actual : public ui_menu
 {
 public:
-	ui_menu_display_actual(running_machine &machine, render_container *container, int selectedref, bool _change);
+	ui_menu_display_actual(running_machine &machine, render_container *container, int selectedref);
 	virtual ~ui_menu_display_actual();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -75,13 +44,11 @@ private:
 	std::string              m_tempbuf, m_searchpath;
 	std::vector<std::string> m_folders;
 	int                      m_ref;
-	bool                     m_change;
 
 	enum
 	{
-		ADD_FOLDER = 1,
-		REMOVE_FOLDER,
-		CHANGE_FOLDER
+		ADD_CHANGE = 1,
+		REMOVE,
 	};
 };
 
@@ -101,6 +68,7 @@ public:
 private:
 	std::string  m_searchpath;
 	int          m_ref;
+	std::vector<std::string> m_folders;
 };
 
 //-------------------------------------------------
@@ -110,7 +78,7 @@ private:
 class ui_menu_add_change_folder : public ui_menu
 {
 public:
-	ui_menu_add_change_folder(running_machine &machine, render_container *container, int ref, bool change);
+	ui_menu_add_change_folder(running_machine &machine, render_container *container, int ref);
 	virtual ~ui_menu_add_change_folder();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -123,6 +91,7 @@ private:
 	std::string  m_current_path;
 	char         m_search[40];
 	bool         m_change;
+	std::vector<std::string> m_folders;
 };
 
 #endif /* __UI_DIRMENU_H__ */

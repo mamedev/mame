@@ -187,6 +187,35 @@
 
 #define VPRINTF(x)  do { if (VERBOSE) printf x; } while (0)
 
+/*-------------------------------------------------
+    core_i64_hex_format - i64 format printf helper
+-------------------------------------------------*/
+
+static char *core_i64_hex_format(UINT64 value, UINT8 mindigits)
+{
+	static char buffer[16][64];
+	// TODO: this can overflow - e.g. when a lot of unmapped writes are logged
+	static int index;
+	char *bufbase = &buffer[index++ % 16][0];
+	char *bufptr = bufbase;
+	INT8 curdigit;
+
+	for (curdigit = 15; curdigit >= 0; curdigit--)
+	{
+		int nibble = (value >> (curdigit * 4)) & 0xf;
+		if (nibble != 0 || curdigit < mindigits)
+		{
+			mindigits = curdigit;
+			*bufptr++ = "0123456789ABCDEF"[nibble];
+		}
+	}
+	if (bufptr == bufbase)
+		*bufptr++ = '0';
+	*bufptr = 0;
+
+	return bufbase;
+}
+
 
 
 //**************************************************************************
@@ -673,10 +702,13 @@ private:
 	{
 		if (m_space.log_unmap() && !m_space.debugger_access())
 		{
-			m_space.device().logerror("%s: unmapped %s memory read from %s & %s\n",
-						m_space.machine().describe_context(), m_space.name(),
-						core_i64_format(m_space.byte_to_address(offset * sizeof(_UintType)), m_space.addrchars(),m_space.is_octal()),
-						core_i64_format(mask, 2 * sizeof(_UintType),m_space.is_octal()));
+			m_space.device().logerror(
+					m_space.is_octal()
+						? "%s: unmapped %s memory read from %0*o & %0*o\n"
+						: "%s: unmapped %s memory read from %0*X & %0*X\n",
+					m_space.machine().describe_context(), m_space.name(),
+					m_space.addrchars(), m_space.byte_to_address(offset * sizeof(_UintType)),
+					2 * sizeof(_UintType), mask);
 		}
 		return m_space.unmap();
 	}
@@ -741,11 +773,14 @@ private:
 	{
 		if (m_space.log_unmap() && !m_space.debugger_access())
 		{
-			m_space.device().logerror("%s: unmapped %s memory write to %s = %s & %s\n",
+			m_space.device().logerror(
+					m_space.is_octal()
+						? "%s: unmapped %s memory write to %0*o = %0*o & %0*o\n"
+						: "%s: unmapped %s memory write to %0*X = %0*X & %0*X\n",
 					m_space.machine().describe_context(), m_space.name(),
-					core_i64_format(m_space.byte_to_address(offset * sizeof(_UintType)), m_space.addrchars(),m_space.is_octal()),
-					core_i64_format(data, 2 * sizeof(_UintType),m_space.is_octal()),
-					core_i64_format(mask, 2 * sizeof(_UintType),m_space.is_octal()));
+					m_space.addrchars(), m_space.byte_to_address(offset * sizeof(_UintType)),
+					2 * sizeof(_UintType), data,
+					2 * sizeof(_UintType), mask);
 		}
 	}
 
@@ -2653,7 +2688,7 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 		membank = global_alloc(memory_bank(*this, banknum, bytestart, byteend, tag));
 		std::string temptag;
 		if (tag == nullptr) {
-			strprintf(temptag, "anon_%p", (void *) membank);
+			temptag = string_format("anon_%p", membank);
 			tag = temptag.c_str();
 		}
 		manager().m_banklist.append(tag, *membank);
@@ -3842,8 +3877,7 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 	if (region == nullptr)
 	{
 		int bytes_per_element = space.data_width() / 8;
-		std::string name;
-		strprintf(name,"%08x-%08x", bytestart, byteend);
+		std::string name = string_format("%08x-%08x", bytestart, byteend);
 		space.machine().save().save_memory(nullptr, "memory", space.device().tag(), space.spacenum(), name.c_str(), m_data, bytes_per_element, (UINT32)(byteend + 1 - bytestart) / bytes_per_element);
 	}
 }
@@ -3880,13 +3914,13 @@ memory_bank::memory_bank(address_space &space, int index, offs_t bytestart, offs
 	// generate an internal tag if we don't have one
 	if (tag == nullptr)
 	{
-		strprintf(m_tag,"~%d~", index);
-		strprintf(m_name,"Internal bank #%d", index);
+		m_tag = string_format("~%d~", index);
+		m_name = string_format("Internal bank #%d", index);
 	}
 	else
 	{
 		m_tag.assign(tag);
-		strprintf(m_name,"Bank '%s'", tag);
+		m_name = string_format("Bank '%s'", tag);
 	}
 
 	if (!m_anonymous && space.machine().save().registration_allowed())

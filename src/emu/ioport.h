@@ -17,6 +17,8 @@
 #ifndef __INPTPORT_H__
 #define __INPTPORT_H__
 
+#include <cstdint>
+#include <cstring>
 #include <time.h>
 
 
@@ -33,11 +35,6 @@ const ioport_value IP_ACTIVE_LOW = 0xffffffff;
 
 // maximum number of players supported
 const int MAX_PLAYERS = 8;
-
-// INP file parameters
-const UINT32 INP_HEADER_SIZE = 64;
-const UINT32 INP_HEADER_MAJVERSION = 3;
-const UINT32 INP_HEADER_MINVERSION = 0;
 
 // unicode constants
 const unicode_char UCHAR_PRIVATE = 0x100000;
@@ -697,15 +694,110 @@ typedef delegate<bool ()> ioport_charqueue_empty_delegate;
 // ======================> inp_header
 
 // header at the front of INP files
-struct inp_header
+class inp_header
 {
-	char                        header[8];      // +00: 8 byte header - must be "MAMEINP\0"
-	UINT64                      basetime;       // +08: base time of recording
-	UINT8                       majversion;     // +10: major INP version
-	UINT8                       minversion;     // +11: minor INP version
-	UINT8                       reserved[2];    // +12: must be zero
-	char                        gamename[12];   // +14: game name string, NULL-terminated
-	char                        version[32];    // +20: system version string, NULL-terminated
+public:
+	// parameters
+	static constexpr unsigned MAJVERSION = 3;
+	static constexpr unsigned MINVERSION = 0;
+
+	bool read(emu_file &f)
+	{
+		return f.read(m_data, sizeof(m_data)) == sizeof(m_data);
+	}
+	bool write(emu_file &f) const
+	{
+		return f.write(m_data, sizeof(m_data)) == sizeof(m_data);
+	}
+
+	bool check_magic() const
+	{
+		return 0 == std::memcmp(MAGIC, m_data + OFFS_MAGIC, OFFS_BASETIME - OFFS_MAGIC);
+	}
+	std::uint64_t get_basetime() const
+	{
+		return
+				(std::uint64_t(m_data[OFFS_BASETIME + 0]) << (0 * 8)) |
+				(std::uint64_t(m_data[OFFS_BASETIME + 1]) << (1 * 8)) |
+				(std::uint64_t(m_data[OFFS_BASETIME + 2]) << (2 * 8)) |
+				(std::uint64_t(m_data[OFFS_BASETIME + 3]) << (3 * 8)) |
+				(std::uint64_t(m_data[OFFS_BASETIME + 4]) << (4 * 8)) |
+				(std::uint64_t(m_data[OFFS_BASETIME + 5]) << (5 * 8)) |
+				(std::uint64_t(m_data[OFFS_BASETIME + 6]) << (6 * 8)) |
+				(std::uint64_t(m_data[OFFS_BASETIME + 7]) << (7 * 8));
+	}
+	unsigned get_majversion() const
+	{
+		return m_data[OFFS_MAJVERSION];
+	}
+	unsigned get_minversion() const
+	{
+		return m_data[OFFS_MINVERSION];
+	}
+	std::string get_sysname() const
+	{
+		return get_string<OFFS_SYSNAME, OFFS_APPDESC>();
+	}
+	std::string get_appdesc() const
+	{
+		return get_string<OFFS_APPDESC, OFFS_END>();
+	}
+
+	void set_magic()
+	{
+		std::memcpy(m_data + OFFS_MAGIC, MAGIC, OFFS_BASETIME - OFFS_MAGIC);
+	}
+	void set_basetime(std::uint64_t time)
+	{
+		m_data[OFFS_BASETIME + 0] = std::uint8_t((time >> (0 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 1] = std::uint8_t((time >> (1 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 2] = std::uint8_t((time >> (2 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 3] = std::uint8_t((time >> (3 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 4] = std::uint8_t((time >> (4 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 5] = std::uint8_t((time >> (5 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 6] = std::uint8_t((time >> (6 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 7] = std::uint8_t((time >> (7 * 8)) & 0x00ff);
+	}
+	void set_version()
+	{
+		m_data[OFFS_MAJVERSION] = MAJVERSION;
+		m_data[OFFS_MINVERSION] = MINVERSION;
+	}
+	void set_sysname(std::string const &name)
+	{
+		set_string<OFFS_SYSNAME, OFFS_APPDESC>(name);
+	}
+	void set_appdesc(std::string const &desc)
+	{
+		set_string<OFFS_APPDESC, OFFS_END>(desc);
+	}
+
+private:
+	template <std::size_t BEGIN, std::size_t END> void set_string(std::string const &str)
+	{
+		std::size_t const used = (std::min<std::size_t>)(str.size() + 1, END - BEGIN);
+		std::memcpy(m_data + BEGIN, str.c_str(), used);
+		if ((END - BEGIN) > used)
+			std::memset(m_data + BEGIN + used, 0, (END - BEGIN) - used);
+	}
+	template <std::size_t BEGIN, std::size_t END> std::string get_string() const
+	{
+		char const *const begin = reinterpret_cast<char const *>(m_data + BEGIN);
+		return std::string(begin, std::find(begin, reinterpret_cast<char const *>(m_data + END), '\0'));
+	}
+
+	static constexpr std::size_t    OFFS_MAGIC       = 0x00;    // 0x08 bytes
+	static constexpr std::size_t    OFFS_BASETIME    = 0x08;    // 0x08 bytes (little-endian binary integer)
+	static constexpr std::size_t    OFFS_MAJVERSION  = 0x10;    // 0x01 bytes (binary integer)
+	static constexpr std::size_t    OFFS_MINVERSION  = 0x11;    // 0x01 bytes (binary integer)
+																// 0x02 bytes reserved
+	static constexpr std::size_t    OFFS_SYSNAME     = 0x14;    // 0x0c bytes (ASCII)
+	static constexpr std::size_t    OFFS_APPDESC     = 0x20;    // 0x20 bytes (ASCII)
+	static constexpr std::size_t    OFFS_END         = 0x40;
+
+	static std::uint8_t const       MAGIC[OFFS_BASETIME - OFFS_MAGIC];
+
+	std::uint8_t                    m_data[OFFS_END];
 };
 
 
@@ -1096,7 +1188,7 @@ public:
 	struct user_settings
 	{
 		ioport_value    value;                  // for DIP switches
-		bool			autofire;				// for autofire settings
+		bool            autofire;               // for autofire settings
 		input_seq       seq[SEQ_TYPE_TOTAL];    // sequences of all types
 		INT32           sensitivity;            // for analog controls
 		INT32           delta;                  // for analog controls
@@ -1486,8 +1578,8 @@ private:
 	UINT64                  m_playback_accumulated_speed; // accumulated speed during playback
 	UINT32                  m_playback_accumulated_frames; // accumulated frames during playback
 	emu_file                m_timecode_file;        // timecode/frames playback file (NULL if not recording)
-	int						m_timecode_count;
-	attotime				m_timecode_last_time;
+	int                     m_timecode_count;
+	attotime                m_timecode_last_time;
 
 	// has...
 	bool                    m_has_configs;
@@ -1580,7 +1672,6 @@ private:
 #define DECLARE_INPUT_CHANGED_MEMBER(name)  void name(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 
 // macro for port changed callback functions (PORT_CROSSHAIR_MAPPER)
-#define CROSSHAIR_MAPPER(name)  float name(device_t &device, ioport_field &field, float linear_value)
 #define CROSSHAIR_MAPPER_MEMBER(name)   float name(ioport_field &field, float linear_value)
 #define DECLARE_CROSSHAIR_MAPPER_MEMBER(name)   float name(ioport_field &field, float linear_value)
 
@@ -1727,9 +1818,6 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 	configurer.field_set_analog_invert();
 
 // read callbacks
-#define PORT_CUSTOM(_callback, _param) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate(_callback, #_callback, DEVICE_SELF, (device_t *)NULL), (void *)(_param));
-
 #define PORT_CUSTOM_MEMBER(_device, _class, _member, _param) \
 	configurer.field_set_dynamic_read(ioport_field_read_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)NULL), (void *)(_param));
 
@@ -1738,18 +1826,12 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 	configurer.field_set_dynamic_write(ioport_field_write_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)NULL), (void *)(_param));
 
 // input device handler
-#define PORT_READ_LINE_DEVICE(_device, _read_line_device) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate(&ioport_read_line_wrapper<_read_line_device>, #_read_line_device, _device, (device_t *)NULL));
-
 #define PORT_READ_LINE_DEVICE_MEMBER(_device, _class, _member) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate(&ioport_read_line_wrapper<_class, &_class::_member>, #_class "::" #_member, _device, (_class *)NULL));
+	configurer.field_set_dynamic_read(ioport_field_read_delegate([](_class &device, ioport_field &field, void *param)->ioport_value { return (device._member() & 1) ? ~ioport_value(0) : 0; } , #_class "::" #_member, _device, (_class *)NULL));
 
 // output device handler
-#define PORT_WRITE_LINE_DEVICE(_device, _write_line_device) \
-	configurer.field_set_dynamic_write(ioport_field_write_delegate(&ioport_write_line_wrapper<_write_line_device>, #_write_line_device, _device, (device_t *)NULL));
-
 #define PORT_WRITE_LINE_DEVICE_MEMBER(_device, _class, _member) \
-	configurer.field_set_dynamic_write(ioport_field_write_delegate(&ioport_write_line_wrapper<_class, &_class::_member>, #_class "::" #_member, _device, (_class *)NULL));
+	configurer.field_set_dynamic_write(ioport_field_write_delegate([](_class &device, ioport_field &field, void *param, ioport_value oldval, ioport_value newval) { device._member(newval); }, #_class "::" #_member, _device, (_class *)NULL));
 
 // dip switch definition
 #define PORT_DIPNAME(_mask, _default, _name) \
@@ -1828,38 +1910,6 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 
 #define PORT_HBLANK(_screen) \
 	PORT_READ_LINE_DEVICE_MEMBER(_screen, screen_device, hblank)
-
-
-
-//**************************************************************************
-//  INLINE TEMPLATES
-//**************************************************************************
-
-template<int (*_FunctionPointer)(device_t *)>
-ioport_value ioport_read_line_wrapper(device_t &device, ioport_field &field, void *param)
-{
-	return ((*_FunctionPointer)(&device) & 1) ? ~ioport_value(0) : 0;
-}
-
-template<class _FunctionClass, int (_FunctionClass::*_FunctionPointer)()>
-ioport_value ioport_read_line_wrapper(_FunctionClass &device, ioport_field &field, void *param)
-{
-	return ((device.*_FunctionPointer)() & 1) ? ~ioport_value(0) : 0;
-}
-
-template<void (*_FunctionPointer)(device_t *, int)>
-void ioport_write_line_wrapper(device_t &device, ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
-{
-	return (*_FunctionPointer)(&device, newval);
-}
-
-template<class _FunctionClass, void (_FunctionClass::*_FunctionPointer)(int)>
-void ioport_write_line_wrapper(_FunctionClass &device, ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
-{
-	return (device.*_FunctionPointer)(newval);
-}
-
-
 
 //**************************************************************************
 //  INLINE FUNCTIONS

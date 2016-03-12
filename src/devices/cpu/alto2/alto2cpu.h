@@ -125,10 +125,33 @@ enum {
 		LOG_KBD     = (1 << 24),
 		LOG_ALL     = ((1 << 25) - 1)
 	};
-	extern int m_log_types;
-	extern int m_log_level;
-	extern bool m_log_newline;
-	void logprintf(device_t *device, int type, int level, const char* format, ...);
+	class alto2_log_t
+	{
+	public:
+		template <typename... Params>
+		void operator()(device_t *device, int type, int level, const char* format, Params &&...args)
+		{
+			if (!(log_types & type))
+				return;
+			if (level > log_level)
+				return;
+			if (log_newline) {
+				// last line had a \n - print type name
+				for (int i = 0; i < type_name_count; i++)
+					if (type & (1 << i))
+						device->logerror("%-7s ", type_name[i]);
+			}
+			device->logerror(format, std::forward<Params>(args)...);
+			log_newline = format[strlen(format) - 1] == '\n';
+		}
+	private:
+		static int log_types;
+		static int log_level;
+		static bool log_newline;
+		static const char *const type_name[];
+		static const size_t type_name_count;
+	};
+	extern alto2_log_t logprintf;
 #   define  LOG(x) logprintf x
 #else
 #   define  LOG(x)

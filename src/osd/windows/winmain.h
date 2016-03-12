@@ -112,8 +112,6 @@
 #define WINOPTION_GLOBAL_INPUTS         "global_inputs"
 #define WINOPTION_DUAL_LIGHTGUN         "dual_lightgun"
 
-
-
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
@@ -240,6 +238,29 @@ private:
 //  TYPE DEFINITIONS
 //============================================================
 
+enum input_event
+{
+	INPUT_EVENT_KEYDOWN,
+	INPUT_EVENT_KEYUP,
+	INPUT_EVENT_RAWINPUT,
+	INPUT_EVENT_MOUSE_BUTTON
+};
+
+struct KeyPressEventArgs
+{
+	input_event event_id;
+	UINT8 vkey;
+	UINT8 scancode;
+};
+
+struct MouseButtonEventArgs
+{
+	int button;
+	int keydown;
+	int xpos;
+	int ypos;
+};
+
 class windows_osd_interface : public osd_common_t
 {
 public:
@@ -252,32 +273,36 @@ public:
 	virtual void update(bool skip_redraw) override;
 
 	// video overridables
-	virtual void *get_slider_list() override;
+	virtual slider_state *get_slider_list() override;
 
-	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 
 	virtual void video_register() override;
 
 	virtual bool video_init() override;
 	virtual bool window_init() override;
-	virtual bool input_init() override;
-	virtual void input_pause() override;
-	virtual void input_resume() override;
 	virtual bool output_init() override;
 
 	virtual void video_exit() override;
 	virtual void window_exit() override;
-	virtual void input_exit() override;
 	virtual void output_exit() override;
 
 	void extract_video_config();
+
+	// windows osd specific
+	bool handle_input_event(input_event eventid, void *eventdata);
+	bool should_hide_mouse();
+	void poll_input(running_machine &machine);
 
 	windows_options &options() { return m_options; }
 
 private:
 	virtual void osd_exit() override;
-	windows_options &m_options;
+	void build_slider_list();
+	void update_slider_list();
+
+	windows_options &   m_options;
+	slider_state *      m_sliders;
 
 	static const int DEFAULT_FONT_HEIGHT = 200;
 };

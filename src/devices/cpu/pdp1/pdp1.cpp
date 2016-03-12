@@ -742,7 +742,7 @@ void pdp1_device::state_string_export(const device_state_entry &entry, std::stri
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c-%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c-%c%c%c%c%c%c",
 					(FLAGS & 040) ? '1' : '.',
 					(FLAGS & 020) ? '2' : '.',
 					(FLAGS & 010) ? '3' : '.',

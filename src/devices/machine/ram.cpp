@@ -1,4 +1,4 @@
-// license: BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders: Dirk Best
 /*************************************************************************
 
@@ -148,16 +148,16 @@ void ram_device::device_validity_check(validity_checker &valid) const
 
 	if (!is_valid)
 	{
-		std::string output;
-		strcatprintf(output, "Cannot recognize the RAM option %s", ramsize_string);
-		strcatprintf(output, " (valid options are %s", m_default_size);
+		std::ostringstream output;
+		util::stream_format(output, "Cannot recognize the RAM option %s", ramsize_string);
+		util::stream_format(output, " (valid options are %s", m_default_size);
 
 		if (m_extra_options != nullptr)
-			strcatprintf(output, ",%s).\n", m_extra_options);
+			util::stream_format(output, ",%s).\n", m_extra_options);
 		else
-			strcatprintf(output, ").\n");
+			util::stream_format(output, ").\n");
 
-		osd_printf_error("%s", output.c_str());
+		osd_printf_error("%s", output.str().c_str());
 
 		osd_printf_warning("Setting value to default %s\n",m_default_size);
 		std::string error;

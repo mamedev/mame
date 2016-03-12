@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:R. Belmont
 #pragma once
 
 #ifndef __SEGAM1AUDIO_H__

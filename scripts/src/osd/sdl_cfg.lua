@@ -56,24 +56,17 @@ if _OPTIONS["NO_USE_MIDI"]~="1" and _OPTIONS["targetos"]=="linux" then
 	}
 end
 
-if _OPTIONS["SDL_LIBVER"]=="sdl2" then
+defines {
+	"SDLMAME_SDL2=1",
+}
+if _OPTIONS["SDL2_MULTIAPI"]=="1" then
 	defines {
-		"SDLMAME_SDL2=1",
-	}
-	if _OPTIONS["SDL2_MULTIAPI"]=="1" then
-		defines {
-			"SDL2_MULTIAPI",
-		}
-	end
-else
-	defines {
-		"SDLMAME_SDL2=0",
+		"SDL2_MULTIAPI",
 	}
 end
 
 defines {
 	"OSD_SDL",
-	"SYNC_IMPLEMENTATION=" .. SYNC_IMPLEMENTATION,
 }
 
 if BASE_TARGETOS=="unix" then
@@ -81,18 +74,20 @@ if BASE_TARGETOS=="unix" then
 		"SDLMAME_UNIX",
 	}
 	if _OPTIONS["targetos"]=="macosx" then
-		if _OPTIONS["MACOSX_USE_LIBSDL"]~="1" then
-			buildoptions {
-				"-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
-			}
-		else
-			defines {
-				"MACOSX_USE_LIBSDL",
-			}
-			buildoptions {
-				backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL::'"),
-			}
-		end
+    	if _OPTIONS["with-bundled-sdl2"]==nil then
+            if _OPTIONS["USE_LIBSDL"]~="1" then
+                buildoptions {
+                    "-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
+                }
+            else
+                defines {
+                    "MACOSX_USE_LIBSDL",
+                }
+                buildoptions {
+                    backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL::'"),
+                }
+            end
+         end
 	else
 		buildoptions {
 			backtick(sdlconfigcmd() .. " --cflags"),
@@ -117,10 +112,6 @@ if _OPTIONS["targetos"]=="windows" then
 		defines {
 			"MALLOC_DEBUG",
 		}
-	configuration { "vs*" }
-		includedirs {
-			path.join(_OPTIONS["SDL_INSTALL_ROOT"],"include")
-		}
 	configuration { }
 
 elseif _OPTIONS["targetos"]=="linux" then
@@ -142,13 +133,6 @@ elseif _OPTIONS["targetos"]=="freebsd" then
 	buildoptions {
 		-- /usr/local/include is not considered a system include director on FreeBSD.  GL.h resides there and throws warnings
 		"-isystem /usr/local/include",
-	}
-elseif _OPTIONS["targetos"]=="os2" then
-	defines {
-		"SDLMAME_OS2",
-	}
-	buildoptions {
-		backtick(sdlconfigcmd() .. " --cflags"),
 	}
 end
 

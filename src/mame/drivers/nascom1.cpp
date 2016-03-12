@@ -655,7 +655,7 @@ static MACHINE_CONFIG_START( nascom1, nascom1_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nascom1)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// uart
 	MCFG_DEVICE_ADD( "hd6402", AY31015, 0 )

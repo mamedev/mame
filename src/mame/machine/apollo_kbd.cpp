@@ -174,7 +174,7 @@ void apollo_kbd_device::beeper::start(apollo_kbd_device *device)
 	m_device = device;
 	LOG2(("start apollo_kbd::beeper"));
 	m_beeper = m_device->machine().device<beep_device>("beep");
-	m_timer = m_device->machine().scheduler().timer_alloc(FUNC(static_beeper_callback), this);
+	m_timer = m_device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apollo_kbd_device::beeper::beeper_callback), this));
 }
 
 void apollo_kbd_device::beeper::reset()
@@ -202,14 +202,9 @@ int apollo_kbd_device::beeper::keyboard_has_beeper()
 	return true;    // driver has no facility to return false here, so go with it
 }
 
-void apollo_kbd_device::beeper::beeper_callback()
+TIMER_CALLBACK_MEMBER(apollo_kbd_device::beeper::beeper_callback)
 {
 	off();
-}
-
-TIMER_CALLBACK( apollo_kbd_device::beeper::static_beeper_callback )
-{
-	reinterpret_cast<beeper*>(ptr)->beeper_callback();
 }
 
 //**************************************************************************

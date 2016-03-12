@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Eisuke Watanabe, Nicola Salmoria
+// license:BSD-3-Clause
+// copyright-holders:Hau, Nicola Salmoria
 /******************************************************************************
 
   Ganbare Ginkun  (Japan)  (c)1995 TECMO
@@ -8,7 +8,7 @@
 
 
 --
-driver by Eisuke Watanabe, Nicola Salmoria
+driver by Hau, Nicola Salmoria
 
 special thanks to Nekomata, NTD & code-name'Siberia'
 

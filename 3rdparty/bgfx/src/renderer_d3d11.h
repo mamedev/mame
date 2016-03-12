@@ -6,7 +6,7 @@
 #ifndef BGFX_RENDERER_D3D11_H_HEADER_GUARD
 #define BGFX_RENDERER_D3D11_H_HEADER_GUARD
 
-#define USE_D3D11_DYNAMIC_LIB !BX_PLATFORM_WINRT
+#define USE_D3D11_DYNAMIC_LIB BX_PLATFORM_WINDOWS
 
 #if !USE_D3D11_DYNAMIC_LIB
 #	undef  BGFX_CONFIG_DEBUG_PIX
@@ -19,11 +19,13 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC("-Wpragmas");
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4005) // warning C4005: '' : macro redefinition
 #include <sal.h>
 #define D3D11_NO_HELPERS
-#if BX_PLATFORM_WINRT
+#if BX_PLATFORM_WINDOWS
+#	include <d3d11.h>
+#elif BX_PLATFORM_WINRT
 #	include <d3d11_3.h>
 #else
-#	include <d3d11.h>
-#endif // BX_PLATFORM_WINRT
+#	include <d3d11_x.h>
+#endif // BX_PLATFORM_*
 BX_PRAGMA_DIAGNOSTIC_POP()
 
 #include "renderer.h"
@@ -118,7 +120,6 @@ namespace bgfx { namespace d3d11
 		}
 
 		void create(const Memory* _mem);
-		DWORD* getShaderCode(uint8_t _fragmentBit, const Memory* _mem);
 
 		void destroy()
 		{
@@ -261,7 +262,7 @@ namespace bgfx { namespace d3d11
 		{
 		}
 
-		void create(uint8_t _num, const TextureHandle* _handles);
+		void create(uint8_t _num, const Attachment* _attachment);
 		void create(uint16_t _denseIdx, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat);
 		uint16_t destroy();
 		void preReset(bool _force = false);
@@ -275,10 +276,11 @@ namespace bgfx { namespace d3d11
 		IDXGISwapChain* m_swapChain;
 		uint32_t m_width;
 		uint32_t m_height;
+
+		Attachment m_attachment[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
 		uint16_t m_denseIdx;
 		uint8_t m_num;
 		uint8_t m_numTh;
-		TextureHandle m_th[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
 	};
 
 	struct TimerQueryD3D11

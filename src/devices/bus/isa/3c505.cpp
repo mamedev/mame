@@ -26,8 +26,6 @@ static int verbose = VERBOSE;
 #define LOG1(d,x) { if (verbose > 0) LOG(d,x)}
 #define LOG2(d,x) { if (verbose > 1) LOG(d,x)}
 
-#define  MAINCPU "maincpu"
-
 #ifdef LSB_FIRST
 static UINT16 uint16_to_le(UINT16 value)
 {
@@ -424,7 +422,7 @@ const char *threecom3c505_device::cpu_context()
 {
 	static char statebuf[64]; /* string buffer containing state description */
 
-	device_t *cpu = machine().device(MAINCPU);
+	device_t *cpu = machine().firstcpu;
 	osd_ticks_t t = osd_ticks();
 	int s = t / osd_ticks_per_second();
 	int ms = (t % osd_ticks_per_second()) / 1000;
@@ -440,6 +438,16 @@ const char *threecom3c505_device::cpu_context()
 		sprintf(statebuf, "%d.%03d", s, ms);
 	}
 	return statebuf;
+}
+
+/*-------------------------------------------------
+ logerror - log an error message (w/o device tags)
+ -------------------------------------------------*/
+
+template <typename Format, typename... Params>
+void threecom3c505_device::logerror(Format &&fmt, Params &&... args) const
+{
+	machine().logerror(std::forward<Format>(fmt), std::forward<Params>(args)...);
 }
 
 //**************************************************************************
@@ -855,8 +863,8 @@ void threecom3c505_device::do_receive_command()
 
 void threecom3c505_device::set_command_pending(int state)
 {
-	LOG2(this,("set_command_pending %d -> %d m_wait_for_ack=%d m_wait_for_nak=%d m_rx_pending=%d%s",
-					m_command_pending, state, m_wait_for_ack, m_wait_for_nak, m_rx_pending, state ? "" :"\n"));
+	LOG2(this,("set_command_pending %d -> %d m_wait_for_ack=%d m_wait_for_nak=%d m_rx_pending=%d",
+					m_command_pending, state, m_wait_for_ack, m_wait_for_nak, m_rx_pending));
 
 //- verbose = onoff ? 1 : 2;
 
@@ -1657,7 +1665,7 @@ void threecom3c505_device::set_verbose(int on_off)
 
 int threecom3c505_device::tx_data(device_t *device, const UINT8 data[], int length)
 {
-	LOG1(device,("threecom3c505_device::tx_data length=%d", length));
+	LOG1(this,("threecom3c505_device::tx_data length=%d", length));
 	return 1;
 }
 

@@ -130,8 +130,6 @@ enum
 	HOVER_B_FAV,
 	HOVER_B_EXPORT,
 	HOVER_B_DATS,
-	HOVER_B_FOLDERS,
-	HOVER_B_SETTINGS,
 	HOVER_RPANEL_ARROW,
 	HOVER_LPANEL_ARROW,
 	HOVER_FILTER_FIRST,
@@ -208,6 +206,7 @@ struct ui_globals
 	static bool         switch_image, redraw_icon, default_image, reset;
 	static int          visible_main_lines, visible_sw_lines;
 	static UINT16       panels_status;
+	static bool         has_icons;
 };
 
 #define main_struct(name) \

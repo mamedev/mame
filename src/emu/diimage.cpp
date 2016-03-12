@@ -57,8 +57,8 @@ const image_device_type_info device_image_interface::m_device_info_array[] =
 device_image_interface::device_image_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "image"),
 		m_err(),
-		m_file(nullptr),
-		m_mame_file(nullptr),
+		m_file(),
+		m_mame_file(),
 		m_software_info_ptr(nullptr),
 		m_software_part_ptr(nullptr),
 		m_supported(0),
@@ -611,12 +611,11 @@ bool device_image_interface::is_loaded()
 
 image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, const char *path)
 {
-	file_error filerr;
 	image_error_t err;
 	std::string revised_path;
 
 	/* attempt to read the file */
-	filerr = zippath_fopen(path, open_flags, m_file, revised_path);
+	auto const filerr = zippath_fopen(path, open_flags, m_file, revised_path);
 
 	/* did the open succeed? */
 	switch(filerr)
@@ -662,15 +661,13 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
 
 int device_image_interface::reopen_for_write(const char *path)
 {
-	if(m_file)
-		core_fclose(m_file);
+	m_file.reset();
 
-	file_error filerr;
 	image_error_t err;
 	std::string revised_path;
 
 	/* attempt to open the file for writing*/
-	filerr = zippath_fopen(path, OPEN_FLAG_READ|OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, m_file, revised_path);
+	auto const filerr = zippath_fopen(path, OPEN_FLAG_READ|OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, m_file, revised_path);
 
 	/* did the open succeed? */
 	switch(filerr)
@@ -876,10 +873,9 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				warningcount += verify_length_and_hash(m_mame_file.get(),ROM_GETNAME(romp),ROM_GETLENGTH(romp),hash_collection(ROM_GETHASHDATA(romp)));
 
 				if (filerr == FILERR_NONE)
-				{
-					m_file = *m_mame_file;
+					filerr = util::core_file::open_proxy(*m_mame_file, m_file);
+				if (filerr == FILERR_NONE)
 					retVal = TRUE;
-				}
 
 				break; // load first item for start
 			}
@@ -1118,17 +1114,8 @@ bool device_image_interface::create(const char *path, const image_device_format 
 
 void device_image_interface::clear()
 {
-	if (m_mame_file)
-	{
-		m_mame_file = nullptr;
-		m_file = nullptr;
-	} else {
-		if (m_file)
-		{
-			core_fclose(m_file);
-			m_file = nullptr;
-		}
-	}
+	m_mame_file.reset();
+	m_file.reset();
 
 	m_image_name.clear();
 	m_readonly = false;
@@ -1181,8 +1168,8 @@ void device_image_interface::update_names(const device_type device_type, const c
 	const char *brief_name = (device_type!=nullptr) ? brief : device_brieftypename(image_type());
 	if (count > 1)
 	{
-		strprintf(m_instance_name,"%s%d", inst_name, index + 1);
-		strprintf(m_brief_instance_name, "%s%d", brief_name, index + 1);
+		m_instance_name = string_format("%s%d", inst_name, index + 1);
+		m_brief_instance_name = string_format("%s%d", brief_name, index + 1);
 	}
 	else
 	{
@@ -1312,8 +1299,7 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 	bool result = call_softlist_load(swpart->info().list(), swpart->info().shortname(), swpart->romdata());
 
 	// Tell the world which part we actually loaded
-	std::string full_sw_name;
-	strprintf(full_sw_name,"%s:%s:%s", swpart->info().list().list_name(), swpart->info().shortname(), swpart->name());
+	std::string full_sw_name = string_format("%s:%s:%s", swpart->info().list().list_name(), swpart->info().shortname(), swpart->name());
 
 	// check compatibility
 	if (!swpart->is_compatible(swpart->info().list()))

@@ -112,7 +112,7 @@ public:
 		std::string             m_defdata;          // default data for this item
 		std::string             m_minimum;          // minimum value
 		std::string             m_maximum;          // maximum value
-		bool					m_changed;			// changed flag
+		bool                    m_changed;          // changed flag
 	};
 
 	// construction/destruction
@@ -142,7 +142,7 @@ public:
 
 	// parsing/input
 	bool parse_command_line(int argc, char **argv, int priority, std::string &error_string);
-	bool parse_ini_file(core_file &inifile, int priority, int ignore_priority, std::string &error_string);
+	bool parse_ini_file(util::core_file &inifile, int priority, int ignore_priority, std::string &error_string);
 
 	// reverting
 	void revert(int priority = OPTION_PRIORITY_MAXIMUM);

@@ -225,7 +225,7 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", microtan)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

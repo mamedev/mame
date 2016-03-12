@@ -114,6 +114,9 @@ private:
 	void copy_sectors(INT32 dst_addr, INT32 src_addr, UINT8 count, UINT8 lun);
 	void format_track(const UINT8 * cdb);
 	void set_esdi_defect_list(UINT8 lun, UINT8 head);
+
+	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
+
 	void log_command(const UINT8 cdb[], const UINT16 cdb_length);
 	void log_data();
 	void do_command(const UINT8 cdb[], const UINT16 cdb_length);

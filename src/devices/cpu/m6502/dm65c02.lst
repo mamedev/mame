@@ -1,3 +1,5 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
 # m65c02
 brk_c_imp   ora_idx     nop_imm     nop_c_imp   tsb_zpg     ora_zpg     asl_zpg     nop_c_imp   php_imp     ora_imm     asl_acc     nop_c_imp   tsb_aba     ora_aba     asl_aba     nop_c_imp
 bpl_rel     ora_idy     ora_zpi     nop_c_imp   trb_zpg     ora_zpx     asl_zpx     nop_c_imp   clc_imp     ora_aby     inc_acc     nop_c_imp   trb_aba     ora_abx     asl_c_abx   nop_c_imp

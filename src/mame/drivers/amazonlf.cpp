@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-  
+
   uses ADC 'Amazon-LF' SoC, EISC CPU core - similar to crystal system?
 
 */

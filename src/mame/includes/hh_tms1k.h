@@ -41,6 +41,7 @@ public:
 	bool m_power_led;
 
 	UINT8 read_inputs(int columns);
+	UINT8 read_rotated_inputs(int columns, UINT8 rowmask = 0xf);
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
 	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 
@@ -49,8 +50,8 @@ public:
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
 
-	UINT32 m_grid;                      // VFD current row data
-	UINT32 m_plate;                     // VFD current column data
+	UINT32 m_grid;                      // VFD/LED current row data
+	UINT32 m_plate;                     // VFD/LED current column data
 
 	UINT32 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
 	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
@@ -61,8 +62,7 @@ public:
 	void display_update();
 	void set_display_size(int maxx, int maxy);
 	void set_display_segmask(UINT32 digits, UINT32 mask);
-	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
-	void display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask);
+	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;

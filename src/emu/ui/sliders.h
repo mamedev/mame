@@ -13,6 +13,8 @@
 #ifndef __UI_SLIDERS_H__
 #define __UI_SLIDERS_H__
 
+#include <map>
+
 class ui_menu_sliders : public ui_menu {
 public:
 	ui_menu_sliders(running_machine &machine, render_container *container, bool menuless_mode = false);
@@ -25,7 +27,8 @@ public:
 	static UINT32 ui_handler(running_machine &machine, render_container *container, UINT32 state);
 
 private:
-	bool menuless_mode, hidden;
+	bool m_menuless_mode;
+	bool m_hidden;
 };
 
 

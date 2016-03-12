@@ -77,7 +77,7 @@ void serflash_device::nvram_read(emu_file &file)
 	int size = m_length / FLASH_PAGE_SIZE;
 
 
-	if (file)
+	if (file.is_open())
 	{
 		UINT32 page;
 		file.read(&page, 4);

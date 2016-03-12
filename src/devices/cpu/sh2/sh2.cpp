@@ -2588,7 +2588,7 @@ void sh2_device::state_string_export(const device_state_entry &entry, std::strin
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%d%c%c",
+			str = string_format("%c%c%d%c%c",
 					m_sh2_state->sr & M ? 'M':'.',
 					m_sh2_state->sr & Q ? 'Q':'.',
 					(m_sh2_state->sr & I) >> 4,

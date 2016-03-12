@@ -58,43 +58,24 @@ the main program is 9th October 1990.
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "machine/pit8253.h"
-#include "machine/i8255.h"
-#include "machine/am9517a.h"
-#include "machine/pic8259.h"
 #include "sound/hc55516.h"
-#include "sound/speaker.h"
-#include "bus/isa/isa.h"
-#include "bus/isa/cga.h"
-
+#include "machine/bankdev.h"
+#include "machine/genpc.h"
 
 class pcxt_state : public driver_device
 {
 public:
 	pcxt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_pit8253(*this, "pit8253"),
-			m_pic8259_1(*this, "pic8259_1"),
-			m_dma8237_1(*this, "dma8237_1") ,
 		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker") { }
+		m_mb(*this, "mb"),
+		m_bank(*this, "bank"){ }
 
-	int m_bank;
 	int m_lastvalue;
 	UINT8 m_disk_data[2];
 	UINT8 m_port_b_data;
-	UINT8 m_wss1_data;
-	UINT8 m_wss2_data;
 	UINT8 m_status;
 	UINT8 m_clr_status;
-	int m_dma_channel;
-	UINT8 m_dma_offset[2][4];
-	UINT8 m_at_pages[0x10];
-	UINT8 m_pc_spkrdata, m_pit_out2;
-
-	required_device<pit8253_device> m_pit8253;
-	required_device<pic8259_device> m_pic8259_1;
-	required_device<am9517a_device> m_dma8237_1;
 
 	DECLARE_READ8_MEMBER(disk_iobank_r);
 	DECLARE_WRITE8_MEMBER(disk_iobank_w);
@@ -102,30 +83,15 @@ public:
 	DECLARE_READ8_MEMBER(fdc765_data_r);
 	DECLARE_WRITE8_MEMBER(fdc765_data_w);
 	DECLARE_WRITE8_MEMBER(fdc_dor_w);
-	DECLARE_READ8_MEMBER(pc_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
-	DECLARE_READ8_MEMBER(dma_page_select_r);
-	DECLARE_WRITE8_MEMBER(dma_page_select_w);
-	DECLARE_WRITE_LINE_MEMBER(ibm5150_pit8253_out2_changed);
 	DECLARE_READ8_MEMBER(port_a_r);
 	DECLARE_READ8_MEMBER(port_b_r);
 	DECLARE_READ8_MEMBER(port_c_r);
 	DECLARE_WRITE8_MEMBER(port_b_w);
-	DECLARE_WRITE8_MEMBER(wss_1_w);
-	DECLARE_WRITE8_MEMBER(wss_2_w);
-	DECLARE_WRITE8_MEMBER(sys_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
-	DECLARE_DRIVER_INIT(tetriskr);
-	DECLARE_DRIVER_INIT(filetto);
+
 	virtual void machine_reset() override;
-	UINT8 pcxt_speaker_get_spk();
-	void pcxt_speaker_set_spkrdata(UINT8 data);
 	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<pc_noppi_mb_device> m_mb;
+	optional_device<address_map_bank_device> m_bank;
 };
 
 
@@ -246,7 +212,6 @@ UINT32 isa8_cga_tetriskr_device::screen_update(screen_device &screen, bitmap_rgb
 	return 0;
 }
 
-
 ROM_START( tetriskr_cga )
 	ROM_REGION( 0x2000, "gfx1",ROMREGION_ERASE00 ) /* gfx - 1bpp font*/
 	ROM_LOAD( "b-3.u36", 0x1800, 0x0800, CRC(1a636f9a) SHA1(a356cc57914d0c9b9127670b55d1f340e64b1ac9) )
@@ -299,83 +264,36 @@ WRITE8_MEMBER(pcxt_state::disk_iobank_w)
     sets the selected rom that appears in $C0000-$CFFFF
 
 */
-	int newbank = 0;
+	int bank = 0;
 
 //  printf("bank %d set to %02X\n", offset,data);
 
 	if (data == 0xF0)
 	{
-		newbank = 0;
+		bank = 0;
 	}
 	else
 	{
 		if((m_lastvalue == 0xF0) && (data == 0xF2))
-			newbank = 0;
+			bank = 0;
 		else if ((m_lastvalue == 0xF1) && (data == 0xF2))
-			newbank = 1;
+			bank = 1;
 		else if ((m_lastvalue == 0xF0) && (data == 0xF3))
-			newbank = 2;
+			bank = 2;
 		else if ((m_lastvalue == 0xF1) && (data == 0xF3))
-			newbank = 3;
+			bank = 3;
 	}
 
-//  printf("newbank = %d\n", newbank);
-
-	if (newbank != m_bank)
-	{
-		m_bank = newbank;
-		membank("bank1")->set_base(memregion("game_prg")->base() + 0x10000 * m_bank );
-	}
+	m_bank->set_bank(bank);
 
 	m_lastvalue = data;
 
 	m_disk_data[offset] = data;
 }
 
-/*********************************
-Pit8253
-*********************************/
-
-// pc_speaker_get_spk, pc_speaker_set_spkrdata, and pc_speaker_set_input already exists in MESS, can the implementations be merged?
-UINT8 pcxt_state::pcxt_speaker_get_spk()
-{
-	return m_pc_spkrdata & m_pit_out2;
-}
-
-void pcxt_state::pcxt_speaker_set_spkrdata(UINT8 data)
-{
-	m_pc_spkrdata = data ? 1 : 0;
-	m_speaker->level_w(pcxt_speaker_get_spk());
-}
-
-
-WRITE_LINE_MEMBER(pcxt_state::ibm5150_pit8253_out2_changed)
-{
-	m_pit_out2 = state ? 1 : 0;
-	m_speaker->level_w(pcxt_speaker_get_spk());
-}
-
-
 READ8_MEMBER(pcxt_state::port_a_r)
 {
-	if(!(m_port_b_data & 0x80))//???
-	{
-		/*
-		x--- ---- Undefined (Always 0)
-		-x-- ---- B: Floppy disk drive installed.
-		--xx ---- Default Display Mode
-		---- xx-- Undefined (Always 1)
-		---- --x- 8087 NDP installed
-		---- ---x Undefined (Always 1)
-		*/
-		return m_wss1_data;
-	}
-	else//keyboard emulation
-	{
-		//m_maincpu->set_input_line(1, PULSE_LINE);
-		return 0x00;//Keyboard is disconnected
-		//return 0xaa;//Keyboard code
-	}
+	return 0xaa;//harmless keyboard error occurs without this
 }
 
 READ8_MEMBER(pcxt_state::port_b_r)
@@ -385,13 +303,7 @@ READ8_MEMBER(pcxt_state::port_b_r)
 
 READ8_MEMBER(pcxt_state::port_c_r)
 {
-	if ( m_port_b_data & 0x01 )
-	{
-		m_wss2_data = ( m_wss2_data & ~0x10 ) | ( m_pit_out2 ? 0x10 : 0x00 );
-	}
-	m_wss2_data = ( m_wss2_data & ~0x20 ) | ( m_pit_out2 ? 0x20 : 0x00 );
-
-	return m_wss2_data;//TODO
+	return 0x00;// DIPS?
 }
 
 /*'buzzer' sound routes here*/
@@ -399,34 +311,12 @@ READ8_MEMBER(pcxt_state::port_c_r)
 /* The Korean Tetris uses it as a regular buzzer,probably the sound is all in there...*/
 WRITE8_MEMBER(pcxt_state::port_b_w)
 {
-	/* PPI controller port B*/
-	m_pit8253->write_gate2(BIT(data, 0));
-	pcxt_speaker_set_spkrdata( data & 0x02 );
+	m_mb->m_pit8253->write_gate2(BIT(data, 0));
+	m_mb->pc_speaker_set_spkrdata(BIT(data, 1));
 	m_port_b_data = data;
-// device_t *beep = machine().device<beep_device>("beep");
 // device_t *cvsd = machine().device("cvsd");
 //  hc55516_digit_w(cvsd, data);
-//  popmessage("%02x\n",data);
-//  beep->beep_set_state(0);
-//  beep->beep_set_state(1);
-//  beep->beep_set_clock(m_port_b_data);
 }
-
-WRITE8_MEMBER(pcxt_state::wss_1_w)
-{
-	m_wss1_data = data;
-}
-
-WRITE8_MEMBER(pcxt_state::wss_2_w)
-{
-	m_wss2_data = data;
-}
-
-WRITE8_MEMBER(pcxt_state::sys_reset_w)
-{
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-}
-
 
 /*Floppy Disk Controller 765 device*/
 /*Currently we only emulate it at a point that the BIOS will pass the checks*/
@@ -438,7 +328,6 @@ WRITE8_MEMBER(pcxt_state::sys_reset_w)
 READ8_MEMBER(pcxt_state::fdc765_status_r)
 {
 	UINT8 tmp;
-//  popmessage("Read FDC status @ PC=%05x",space.device().safe_pc());
 	tmp = m_status | 0x80;
 	m_clr_status++;
 	if(m_clr_status == 0x10)
@@ -452,7 +341,7 @@ READ8_MEMBER(pcxt_state::fdc765_status_r)
 READ8_MEMBER(pcxt_state::fdc765_data_r)
 {
 	m_status = (FDC_READ);
-	m_pic8259_1->ir6_w(0);
+	m_mb->m_pic8259->ir6_w(0);
 	return 0xc0;
 }
 
@@ -464,140 +353,42 @@ WRITE8_MEMBER(pcxt_state::fdc765_data_w)
 
 WRITE8_MEMBER(pcxt_state::fdc_dor_w)
 {
-	/* TODO: properly hook-up upd765 FDC there */
-	m_pic8259_1->ir6_w(1);
+	m_mb->m_pic8259->ir6_w(1);
 }
-
-/******************
-DMA8237 Controller
-******************/
-
-
-WRITE_LINE_MEMBER(pcxt_state::pc_dma_hrq_changed)
-{
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
-
-	/* Assert HLDA */
-	m_dma8237_1->hack_w( state );
-}
-
-
-READ8_MEMBER(pcxt_state::pc_dma_read_byte)
-{
-	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
-		& 0xFF0000;
-
-	return space.read_byte(page_offset + offset);
-}
-
-
-WRITE8_MEMBER(pcxt_state::pc_dma_write_byte)
-{
-	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
-		& 0xFF0000;
-
-	space.write_byte(page_offset + offset, data);
-}
-
-READ8_MEMBER(pcxt_state::dma_page_select_r)
-{
-	UINT8 data = m_at_pages[offset % 0x10];
-
-	switch(offset % 8) {
-	case 1:
-		data = m_dma_offset[(offset / 8) & 1][2];
-		break;
-	case 2:
-		data = m_dma_offset[(offset / 8) & 1][3];
-		break;
-	case 3:
-		data = m_dma_offset[(offset / 8) & 1][1];
-		break;
-	case 7:
-		data = m_dma_offset[(offset / 8) & 1][0];
-		break;
-	}
-	return data;
-}
-
-
-WRITE8_MEMBER(pcxt_state::dma_page_select_w)
-{
-	m_at_pages[offset % 0x10] = data;
-
-	switch(offset % 8) {
-	case 1:
-		m_dma_offset[(offset / 8) & 1][2] = data;
-		break;
-	case 2:
-		m_dma_offset[(offset / 8) & 1][3] = data;
-		break;
-	case 3:
-		m_dma_offset[(offset / 8) & 1][1] = data;
-		break;
-	case 7:
-		m_dma_offset[(offset / 8) & 1][0] = data;
-		break;
-	}
-}
-
-static void set_dma_channel(device_t *device, int channel, int state)
-{
-	pcxt_state *drvstate = device->machine().driver_data<pcxt_state>();
-	if (!state) drvstate->m_dma_channel = channel;
-}
-
-WRITE_LINE_MEMBER(pcxt_state::pc_dack0_w){ set_dma_channel(m_dma8237_1, 0, state); }
-WRITE_LINE_MEMBER(pcxt_state::pc_dack1_w){ set_dma_channel(m_dma8237_1, 1, state); }
-WRITE_LINE_MEMBER(pcxt_state::pc_dack2_w){ set_dma_channel(m_dma8237_1, 2, state); }
-WRITE_LINE_MEMBER(pcxt_state::pc_dack3_w){ set_dma_channel(m_dma8237_1, 3, state); }
-
-/******************
-8259 IRQ controller
-******************/
 
 static ADDRESS_MAP_START( filetto_map, AS_PROGRAM, 8, pcxt_state )
-	AM_RANGE(0x00000, 0x9ffff) AM_RAM //work RAM 640KB
-	AM_RANGE(0xa0000, 0xbffff) AM_RAM //CGA VRAM
-	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd0000, 0xeffff) AM_NOP
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pcxt_io_common, AS_IO, 8, pcxt_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237_1", am9517a_device, read, write ) //8237 DMA Controller
-	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259_1", pic8259_device, read, write ) //8259 Interrupt control
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)    //8253 PIT
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)  //PPI 8255
-	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)  //PPI 8255
-	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)
-	AM_RANGE(0x0278, 0x027f) AM_RAM //printer (parallel) port latch
-	AM_RANGE(0x02f8, 0x02ff) AM_RAM //Modem port
-	AM_RANGE(0x0378, 0x037f) AM_RAM //printer (parallel) port
-	AM_RANGE(0x03bc, 0x03bf) AM_RAM //printer port
-	AM_RANGE(0x03f2, 0x03f2) AM_WRITE(fdc_dor_w)
-	AM_RANGE(0x03f4, 0x03f4) AM_READ(fdc765_status_r) //765 Floppy Disk Controller (FDC) Status
-	AM_RANGE(0x03f5, 0x03f5) AM_READWRITE(fdc765_data_r,fdc765_data_w)//FDC Data
-	AM_RANGE(0x03f8, 0x03ff) AM_RAM //rs232c (serial) port
+	AM_RANGE(0xc0000, 0xcffff) AM_DEVICE("bank", address_map_bank_device, amap8)
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( filetto_io, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_IMPORT_FROM( pcxt_io_common )
-//  AM_RANGE(0x0200, 0x020f) AM_RAM //game port
+	AM_RANGE(0x0060, 0x0060) AM_READ(port_a_r)  //not a real 8255
+	AM_RANGE(0x0061, 0x0061) AM_READWRITE(port_b_r, port_b_w)
+	AM_RANGE(0x0062, 0x0062) AM_READ(port_c_r)
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
 	AM_RANGE(0x0201, 0x0201) AM_READ_PORT("COIN") //game port
 	AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card
 	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
+	AM_RANGE(0x03f2, 0x03f2) AM_WRITE(fdc_dor_w)
+	AM_RANGE(0x03f4, 0x03f4) AM_READ(fdc765_status_r) //765 Floppy Disk Controller (FDC) Status
+	AM_RANGE(0x03f5, 0x03f5) AM_READWRITE(fdc765_data_r,fdc765_data_w)//FDC Data
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tetriskr_map, AS_PROGRAM, 8, pcxt_state )
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tetriskr_io, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_IMPORT_FROM( pcxt_io_common )
-	AM_RANGE(0x0200, 0x020f) AM_RAM //game port
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
 	AM_RANGE(0x03c8, 0x03c8) AM_READ_PORT("IN0")
 	AM_RANGE(0x03c9, 0x03c9) AM_READ_PORT("IN1")
 //  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1") //read then discarded?
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bank_map, AS_0, 8, pcxt_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_ROM AM_REGION("game_prg", 0)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( filetto )
@@ -679,105 +470,58 @@ INPUT_PORTS_END
 
 void pcxt_state::machine_reset()
 {
-	m_bank = -1;
 	m_lastvalue = -1;
-
-	m_pc_spkrdata = 0;
-	m_pit_out2 = 1;
-	m_wss2_data = 0;
-	m_speaker->level_w(0);
 }
 
-SLOT_INTERFACE_START( filetto_isa8_cards )
+static SLOT_INTERFACE_START( filetto_isa8_cards )
 	SLOT_INTERFACE_INTERNAL("filetto",  ISA8_CGA_FILETTO)
 	SLOT_INTERFACE_INTERNAL("tetriskr", ISA8_CGA_TETRISKR)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_FRAGMENT(pcxt)
+static MACHINE_CONFIG_START( filetto, pcxt_state )
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(filetto_map)
 	MCFG_CPU_IO_MAP(filetto_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
-
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_1", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12) /* dram refresh */
-	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pcxt_state, ibm5150_pit8253_out2_changed))
-
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pcxt_state, port_a_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(pcxt_state, port_b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pcxt_state, port_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pcxt_state, port_c_r))
-
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pcxt_state, wss_1_w))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pcxt_state, wss_2_w))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pcxt_state, sys_reset_w))
-
-	MCFG_DEVICE_ADD("dma8237_1", AM9517A, XTAL_14_31818MHz/3)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pcxt_state, pc_dma_hrq_changed))
-	MCFG_I8237_IN_MEMR_CB(READ8(pcxt_state, pc_dma_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(pcxt_state, pc_dma_write_byte))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(pcxt_state, pc_dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(pcxt_state, pc_dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(pcxt_state, pc_dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(pcxt_state, pc_dack3_w))
-
-	MCFG_PIC8259_ADD( "pic8259_1", INPUTLINE("maincpu", 0), VCC, NULL )
-
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU(":maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq3_w))
-
-	/*Sound Hardware*/
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb","maincpu")
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", filetto_isa8_cards, "filetto", true)
 
 	MCFG_SOUND_ADD("voice", HC55516, 8000000/4)//8923S-UM5100 is a HC55536 with ROM hook-up
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mb:mono", 0.60)
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("640K")
 
-//  PC "buzzer" sound
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( filetto, pcxt_state )
-	MCFG_FRAGMENT_ADD( pcxt )
-	MCFG_ISA8_SLOT_ADD("isa", "isa1", filetto_isa8_cards, "filetto", true)
+	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tetriskr, pcxt_state )
-	MCFG_FRAGMENT_ADD( pcxt )
-
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
+	MCFG_CPU_PROGRAM_MAP(tetriskr_map)
 	MCFG_CPU_IO_MAP(tetriskr_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb","maincpu")
 
-	MCFG_ISA8_SLOT_ADD("isa", "isa1", filetto_isa8_cards, "tetriskr", true)
-
-	MCFG_DEVICE_REMOVE("voice")
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", filetto_isa8_cards, "tetriskr", true)
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
 ROM_START( filetto )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD("u49.bin", 0xfc000, 0x2000, CRC(1be6948a) SHA1(9c433f63d347c211ee4663f133e8417221bc4bf0))
-	ROM_RELOAD(         0xf8000, 0x2000 )
-	ROM_RELOAD(         0xf4000, 0x2000 )
-	ROM_RELOAD(         0xf0000, 0x2000 )
-	ROM_LOAD("u55.bin", 0xfe000, 0x2000, CRC(1e455ed7) SHA1(786d18ce0ab1af45fc538a2300853e497488f0d4) )
-	ROM_RELOAD(         0xfa000, 0x2000 )
-	ROM_RELOAD(         0xf6000, 0x2000 )
-	ROM_RELOAD(         0xf2000, 0x2000 )
+	ROM_REGION( 0x10000, "bios", 0 )
+	ROM_LOAD("u49.bin", 0xc000, 0x2000, CRC(1be6948a) SHA1(9c433f63d347c211ee4663f133e8417221bc4bf0))
+	ROM_RELOAD(         0x8000, 0x2000 )
+	ROM_RELOAD(         0x4000, 0x2000 )
+	ROM_RELOAD(         0x0000, 0x2000 )
+	ROM_LOAD("u55.bin", 0xe000, 0x2000, CRC(1e455ed7) SHA1(786d18ce0ab1af45fc538a2300853e497488f0d4) )
+	ROM_RELOAD(         0xa000, 0x2000 )
+	ROM_RELOAD(         0x6000, 0x2000 )
+	ROM_RELOAD(         0x2000, 0x2000 )
 
 	ROM_REGION( 0x40000, "game_prg", 0 ) // program data
 	ROM_LOAD( "m0.u1", 0x00000, 0x10000, CRC(2408289d) SHA1(eafc144a557a79b58bcb48545cb9c9778e61fcd3) )
@@ -791,19 +535,9 @@ ROM_START( filetto )
 ROM_END
 
 ROM_START( tetriskr )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* code */
-	ROM_LOAD( "b-10.u10", 0xf0000, 0x10000, CRC(efc2a0f6) SHA1(5f0f1e90237bee9b78184035a32055b059a91eb3) )
+	ROM_REGION( 0x10000, "bios", 0 ) /* code */
+	ROM_LOAD( "b-10.u10", 0x0000, 0x10000, CRC(efc2a0f6) SHA1(5f0f1e90237bee9b78184035a32055b059a91eb3) )
 ROM_END
 
-DRIVER_INIT_MEMBER(pcxt_state,filetto)
-{
-	//...
-}
-
-DRIVER_INIT_MEMBER(pcxt_state,tetriskr)
-{
-	//...
-}
-
-GAME( 1990, filetto,  0, filetto,  filetto, pcxt_state,  filetto,  ROT0,  "Novarmatic", "Filetto (v1.05 901009)",MACHINE_IMPERFECT_SOUND )
-GAME( 1988?,tetriskr, 0, tetriskr, tetriskr, pcxt_state, tetriskr, ROT0,  "bootleg",    "Tetris (bootleg of Mirrorsoft PC-XT Tetris version)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1990, filetto,  0, filetto,  filetto, driver_device,  0,  ROT0,  "Novarmatic", "Filetto (v1.05 901009)",MACHINE_IMPERFECT_SOUND )
+GAME( 1988?,tetriskr, 0, tetriskr, tetriskr, driver_device,  0, ROT0,  "bootleg",    "Tetris (bootleg of Mirrorsoft PC-XT Tetris version)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

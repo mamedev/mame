@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    tilemap.c
+    tilemap.cpp
 
     Generic tilemap management system.
 
@@ -558,22 +558,22 @@ void tilemap_t::configure_groups(gfx_element &gfx, int transcolor)
 //  order with optional flipping
 //-------------------------------------------------
 
-tilemap_memory_index tilemap_t::scan_rows(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_rows(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return row * num_cols + col;
 }
 
-tilemap_memory_index tilemap_t::scan_rows_flip_x(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_rows_flip_x(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return row * num_cols + (num_cols - 1 - col);
 }
 
-tilemap_memory_index tilemap_t::scan_rows_flip_y(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_rows_flip_y(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return (num_rows - 1 - row) * num_cols + col;
 }
 
-tilemap_memory_index tilemap_t::scan_rows_flip_xy(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_rows_flip_xy(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return (num_rows - 1 - row) * num_cols + (num_cols - 1 - col);
 }
@@ -587,22 +587,22 @@ tilemap_memory_index tilemap_t::scan_rows_flip_xy(driver_device &device, UINT32 
 //  major order with optional flipping
 //-------------------------------------------------
 
-tilemap_memory_index tilemap_t::scan_cols(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_cols(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return col * num_rows + row;
 }
 
-tilemap_memory_index tilemap_t::scan_cols_flip_x(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_cols_flip_x(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return (num_cols - 1 - col) * num_rows + row;
 }
 
-tilemap_memory_index tilemap_t::scan_cols_flip_y(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_cols_flip_y(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return col * num_rows + (num_rows - 1 - row);
 }
 
-tilemap_memory_index tilemap_t::scan_cols_flip_xy(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_cols_flip_xy(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return (num_cols - 1 - col) * num_rows + (num_rows - 1 - row);
 }
@@ -1519,22 +1519,6 @@ tilemap_manager::~tilemap_manager()
 //  tilemaps
 //-------------------------------------------------
 
-static const struct
-{
-	tilemap_memory_index (*func)(driver_device &, UINT32, UINT32, UINT32, UINT32);
-	const char *name;
-} s_standard_mappers[TILEMAP_STANDARD_COUNT] =
-{
-	{ FUNC(tilemap_t::scan_rows) },
-	{ FUNC(tilemap_t::scan_rows_flip_x) },
-	{ FUNC(tilemap_t::scan_rows_flip_y) },
-	{ FUNC(tilemap_t::scan_rows_flip_xy) },
-	{ FUNC(tilemap_t::scan_cols) },
-	{ FUNC(tilemap_t::scan_cols_flip_x) },
-	{ FUNC(tilemap_t::scan_cols_flip_y) },
-	{ FUNC(tilemap_t::scan_cols_flip_xy) }
-};
-
 tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated)
 {
 	if (allocated == nullptr)
@@ -1546,7 +1530,19 @@ tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_in
 {
 	if (allocated == nullptr)
 		allocated = global_alloc(tilemap_t);
-	return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(s_standard_mappers[mapper].func, s_standard_mappers[mapper].name, machine().driver_data()), tilewidth, tileheight, cols, rows));
+
+	switch (mapper)
+	{
+		case TILEMAP_SCAN_ROWS :return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(FUNC(tilemap_t::scan_rows), allocated), tilewidth, tileheight, cols, rows));
+		case TILEMAP_SCAN_ROWS_FLIP_X:return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(FUNC(tilemap_t::scan_rows_flip_x), allocated), tilewidth, tileheight, cols, rows));
+		case TILEMAP_SCAN_ROWS_FLIP_Y:return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(FUNC(tilemap_t::scan_rows_flip_y), allocated), tilewidth, tileheight, cols, rows));
+		case TILEMAP_SCAN_ROWS_FLIP_XY:return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(FUNC(tilemap_t::scan_rows_flip_xy),allocated), tilewidth, tileheight, cols, rows));
+		case TILEMAP_SCAN_COLS:return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(FUNC(tilemap_t::scan_cols),allocated), tilewidth, tileheight, cols, rows));
+		case TILEMAP_SCAN_COLS_FLIP_X:return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(FUNC(tilemap_t::scan_cols_flip_x),allocated), tilewidth, tileheight, cols, rows));
+		case TILEMAP_SCAN_COLS_FLIP_Y:return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(FUNC(tilemap_t::scan_cols_flip_y),allocated), tilewidth, tileheight, cols, rows));
+		case TILEMAP_SCAN_COLS_FLIP_XY:return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(FUNC(tilemap_t::scan_cols_flip_xy),allocated), tilewidth, tileheight, cols, rows));
+		default: throw emu_fatalerror("Tilemap manager create unknown mapper %d", mapper);
+	}
 }
 
 

@@ -1461,6 +1461,18 @@ ROM_START( wanganmd )
 	DISK_IMAGE_READONLY( "wmn1-a", 0, SHA1(4254e987e71d0d4038a87f11dc1a304396b3dffc) )
 ROM_END
 
+ROM_START( wanganmr )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "wmr1vera.ic002", 0x000000, 0x800000, CRC(b431936b) SHA1(e2c543936cb5689a432662a69d0042c6179a3728) )
+	ROM_LOAD( "wmr1vera_spr.ic002", 0x800000, 0x040000, CRC(b8b7539c) SHA1(f415bdc8e3ebf3b0c3d0d7607b894440e89b0fe7) )
+
+	DISK_REGION("dvd")  // actually single-track CD-ROM
+	DISK_IMAGE_READONLY( "wmr1-a", 0, SHA1(02feab4380dcc2dd95c85b209192f858bafc721e) )
+ROM_END
+
 ROM_START( vnight )
 	ROM_REGION(0x200000, "bios", 0)
 	SYSTEM246_BIOS
@@ -1585,6 +1597,7 @@ GAME(2002, tekken4,    sys246, system246, system246, driver_device, 0, ROT0, "Na
 GAME(2002, tekken4a,  tekken4, system246, system246, driver_device, 0, ROT0, "Namco", "Tekken 4 (TEF2 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2002, tekken4b,  tekken4, system246, system246, driver_device, 0, ROT0, "Namco", "Tekken 4 (TEF1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2002, tekken4c,  tekken4, system246, system246, driver_device, 0, ROT0, "Namco", "Tekken 4 (TEF1 Ver. C)", MACHINE_IS_SKELETON)
+GAME(2002, wanganmr,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Wangan Midnight R (WMR1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2003, prdgp03,    sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Pride GP 2003 (PR21 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2003, timecrs3,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Time Crisis 3 (TST1)", MACHINE_IS_SKELETON)
 GAME(2003, timecrs3e,timecrs3, system246, system246, driver_device, 0, ROT0, "Namco", "Time Crisis 3 (TST2 Ver. A)", MACHINE_IS_SKELETON)

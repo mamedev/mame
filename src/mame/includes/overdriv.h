@@ -62,7 +62,7 @@ public:
 	//INTERRUPT_GEN_MEMBER(cpuB_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(overdriv_cpuA_scanline);
 	int m_fake_timer;
-	
+
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K053246_CB_MEMBER(sprite_callback);

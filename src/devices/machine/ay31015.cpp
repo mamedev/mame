@@ -40,8 +40,8 @@ Device Data:
 -- Pin 21 - XR - External Reset - resets all registers to initial state except for the control register
 -- Pin 35 - NP - No Parity - "1" will kill any parity processing
 -- Pin 36 - TSB - Number of Stop Bits - "0" = 1 stop bit; "1" = 2 stop bits. If "1", and 5 bits per character, then we have 1.5 stop bits
--- pin 37 - NB1
--- pin 38 - NB2 - Number of bits per character = NB1 + (NB2 * 2) + 5
+-- pin 37 - NB2
+-- pin 38 - NB1 - Number of bits per character = NB1 + (NB2 * 2) + 5
 -- pin 39 - EPS - Odd or Even Parity Select - "0" = Odd parity; "1" = Even parity. Has no effect if NP is high.
 -- Pin 34 - CS - Control Strobe - Read NP, TSB, EPS, NB1, NB2 into the control register.
 

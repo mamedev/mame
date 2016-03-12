@@ -56,37 +56,17 @@ machine_config_constructor sega315_5313_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( sega_genesis_vdp );
 }
 
-static TIMER_CALLBACK( render_timer_callback )
-{
-	sega315_5313_device* vdp = (sega315_5313_device*)ptr;
-	vdp->render_scanline();
-}
-
-void sega315_5313_device::vdp_handle_irq6_on_timer_callback(int param)
+TIMER_CALLBACK_MEMBER(sega315_5313_device::irq6_on_timer_callback)
 {
 // m_irq6_pending = 1;
 	if (MEGADRIVE_REG01_IRQ6_ENABLE)
 		m_lv6irqline_callback(true);
 }
 
-static TIMER_CALLBACK( irq6_on_timer_callback )
-{
-	sega315_5313_device* vdp = (sega315_5313_device*)ptr;
-	vdp->vdp_handle_irq6_on_timer_callback(param);
-}
-
-void sega315_5313_device::vdp_handle_irq4_on_timer_callback(int param)
+TIMER_CALLBACK_MEMBER(sega315_5313_device::irq4_on_timer_callback)
 {
 	m_lv4irqline_callback(true);
 }
-
-static TIMER_CALLBACK( irq4_on_timer_callback )
-{
-	sega315_5313_device* vdp = (sega315_5313_device*)ptr;
-	vdp->vdp_handle_irq4_on_timer_callback(param);
-}
-
-
 
 void sega315_5313_device::set_alt_timing(device_t &device, int use_alt_timing)
 {
@@ -189,9 +169,9 @@ void sega315_5313_device::device_start()
 	if (m_use_alt_timing)
 		save_pointer(NAME(m_render_line.get()), 320/2);
 
-	m_irq6_on_timer = machine().scheduler().timer_alloc(FUNC(irq6_on_timer_callback), (void*)this);
-	m_irq4_on_timer = machine().scheduler().timer_alloc(FUNC(irq4_on_timer_callback), (void*)this);
-	m_render_timer = machine().scheduler().timer_alloc(FUNC(render_timer_callback), (void*)this);
+	m_irq6_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::irq6_on_timer_callback), this));
+	m_irq4_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::irq4_on_timer_callback), this));
+	m_render_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::render_scanline), this));
 
 	m_space68k = &machine().device<m68000_base_device>(":maincpu")->space();
 	m_cpu68k = machine().device<m68000_base_device>(":maincpu");
@@ -2598,7 +2578,7 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 	}
 }
 
-void sega315_5313_device::render_scanline()
+TIMER_CALLBACK_MEMBER(sega315_5313_device::render_scanline)
 {
 	int scanline = get_scanline_counter();
 

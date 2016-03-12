@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:Dankan1890
 /*********************************************************************
 
@@ -108,7 +108,7 @@ void ui_menu_audit::handle()
 
 	if (m_first)
 	{
-		machine().ui().draw_text_box(container, "Audit in progress...", JUSTIFY_CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
+		machine().ui().draw_text_box(container, _("Audit in progress..."), JUSTIFY_CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
 		m_first = false;
 		return;
 	}
@@ -177,24 +177,25 @@ void ui_menu_audit::save_available_machines()
 	if (file.open(emulator_info::get_configname(), "_avail.ini") == FILERR_NONE)
 	{
 		// generate header
-		std::string buffer = std::string("#\n").append(UI_VERSION_TAG).append(bare_build_version).append("\n#\n\n");
-		strcatprintf(buffer, "%d\n", (int)m_availablesorted.size());
-		strcatprintf(buffer, "%d\n", (int)m_unavailablesorted.size());
+		std::ostringstream buffer;
+		buffer << "#\n" << UI_VERSION_TAG << bare_build_version << "\n#\n\n";
+		util::stream_format(buffer, "%d\n", m_availablesorted.size());
+		util::stream_format(buffer, "%d\n", m_unavailablesorted.size());
 
 		// generate available list
 		for (size_t x = 0; x < m_availablesorted.size(); ++x)
 		{
 			int find = driver_list::find(m_availablesorted[x]->name);
-			strcatprintf(buffer, "%d\n", find);
+			util::stream_format(buffer, "%d\n", find);
 		}
 
 		// generate unavailable list
 		for (size_t x = 0; x < m_unavailablesorted.size(); ++x)
 		{
 			int find = driver_list::find(m_unavailablesorted[x]->name);
-			strcatprintf(buffer, "%d\n", find);
+			util::stream_format(buffer, "%d\n", find);
 		}
-		file.puts(buffer.c_str());
+		file.puts(buffer.str().c_str());
 		file.close();
 	}
 }

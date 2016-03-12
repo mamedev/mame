@@ -219,7 +219,7 @@ void tms32082_mp_device::state_string_export(const device_state_entry &entry, st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "?");
+			str = "?";
 			break;
 	}
 }
@@ -516,7 +516,7 @@ void tms32082_pp_device::state_string_export(const device_state_entry &entry, st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "?");
+			str = "?";
 			break;
 	}
 }

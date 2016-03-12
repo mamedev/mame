@@ -22,11 +22,6 @@ project "gtest"
 			"-Wno-unused-variable",
 		}
 
-	configuration { "mingw-clang" }
-		buildoptions {
-			"-O0", -- crash of compiler when doing optimization
-		}
-
 	configuration { "vs*" }
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {

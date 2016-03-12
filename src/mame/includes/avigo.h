@@ -14,6 +14,7 @@
 #include "machine/rp5c01.h"
 #include "machine/ins8250.h"
 #include "machine/intelfsh.h"
+#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
@@ -36,7 +37,11 @@ public:
 			m_speaker(*this, "speaker"),
 			m_uart(*this, "ns16550"),
 			m_serport(*this, "serport"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_bankdev1(*this, "bank0"),
+			m_bankdev2(*this, "bank1"),
+			m_flash1(*this, "flash1"),
+			m_nvram(*this, "nvram")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -45,24 +50,19 @@ public:
 	required_device<ns16550_device> m_uart;
 	required_device<rs232_port_device> m_serport;
 	required_device<palette_device> m_palette;
+	required_device<address_map_bank_device> m_bankdev1;
+	required_device<address_map_bank_device> m_bankdev2;
+	required_device<intelfsh8_device> m_flash1;
+	required_shared_ptr<UINT8> m_nvram;
 
 	// defined in drivers/avigo.c
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void postload();
-	void refresh_memory(UINT8 bank, UINT8 chip_select);
 	void refresh_ints();
 	void nvram_init(nvram_device &nvram, void *base, size_t size);
 
 	DECLARE_WRITE_LINE_MEMBER( tc8521_alarm_int );
 	DECLARE_WRITE_LINE_MEMBER( com_interrupt );
-
-	DECLARE_READ8_MEMBER(flash_0x0000_read_handler);
-	DECLARE_WRITE8_MEMBER(flash_0x0000_write_handler);
-	DECLARE_READ8_MEMBER(flash_0x4000_read_handler);
-	DECLARE_WRITE8_MEMBER(flash_0x4000_write_handler);
-	DECLARE_READ8_MEMBER(flash_0x8000_read_handler);
-	DECLARE_WRITE8_MEMBER(flash_0x8000_write_handler);
 
 	DECLARE_READ8_MEMBER(key_data_read_r);
 	DECLARE_WRITE8_MEMBER(set_key_line_w);
@@ -99,14 +99,10 @@ public:
 	UINT8               m_bank1_l;
 	UINT8               m_bank1_h;
 	UINT8               m_ad_control_status;
-	intelfsh8_device *  m_flashes[3];
-	int                 m_flash_at_0x4000;
-	int                 m_flash_at_0x8000;
 	UINT16              m_ad_value;
 	UINT8 *             m_video_memory;
 	UINT8               m_screen_column;
 	UINT8               m_warm_start;
-	UINT8 *             m_ram_base;
 	DECLARE_PALETTE_INIT(avigo);
 	TIMER_DEVICE_CALLBACK_MEMBER(avigo_scan_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(avigo_1hz_timer);

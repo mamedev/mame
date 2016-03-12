@@ -27,8 +27,6 @@
 #define DMAOR_NMIF  0x0002
 #define DMAOR_DME   0x0001
 
-TIMER_CALLBACK( sh4_dmac_callback );
-
 void sh4_handle_sar0_addr_w(UINT32 data, UINT32 mem_mask);
 void sh4_handle_sar1_addr_w(UINT32 data, UINT32 mem_mask);
 void sh4_handle_sar2_addr_w(UINT32 data, UINT32 mem_mask);

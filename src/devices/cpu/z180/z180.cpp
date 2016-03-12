@@ -2565,7 +2565,7 @@ void z180_device::state_string_export(const device_state_entry &entry, std::stri
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				m_AF.b.l & 0x80 ? 'S':'.',
 				m_AF.b.l & 0x40 ? 'Z':'.',
 				m_AF.b.l & 0x20 ? '5':'.',

@@ -727,7 +727,7 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_DMV_KEYBOARD_ADD("keyboard")
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
@@ -735,7 +735,7 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dmv)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEFAULT_LAYOUT(layout_dmv)
 
 	// devices

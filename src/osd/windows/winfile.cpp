@@ -281,6 +281,18 @@ file_error osd_truncate(osd_file *file, UINT64 offset)
 	return FILERR_NONE;
 }
 
+//============================================================
+//  osd_fflush
+//============================================================
+
+file_error osd_fflush(osd_file *file)
+{
+	if (!file || !file->handle)
+		return FILERR_FAILURE;
+
+	return FILERR_NONE;
+}
+
 
 //============================================================
 //  osd_close

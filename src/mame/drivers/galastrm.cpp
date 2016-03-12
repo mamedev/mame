@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Hau
 /*
 
@@ -314,7 +314,7 @@ static MACHINE_CONFIG_START( galastrm, galastrm_state )
 	MCFG_TC0480SCP_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(taito_en_sound)
+	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
 MACHINE_CONFIG_END
 
 /***************************************************************************/
@@ -326,7 +326,7 @@ ROM_START( galastrm )
 	ROM_LOAD32_BYTE( "c99_13.ic103", 0x00002, 0x40000,  CRC(885fcb35) SHA1(be10e109c461c1f776e98efa1b2a4d588aa0c41c) )
 	ROM_LOAD32_BYTE( "c99_14.ic104", 0x00003, 0x40000,  CRC(457ef6b1) SHA1(06c2613d46addacd380a0f2413cd795b17ac9474) )
 
-	ROM_REGION( 0x180000, "audiocpu", 0 )
+	ROM_REGION( 0x180000, "taito_en:audiocpu", 0 )
 	ROM_LOAD16_BYTE( "c99_23.ic8",  0x100000, 0x20000,  CRC(5718ee92) SHA1(33cfa60c5bceb1525498f27b598067d2dc620431) )
 	ROM_LOAD16_BYTE( "c99_22.ic7",  0x100001, 0x20000,  CRC(b90f7c42) SHA1(e2fa9ee10ad61ae1a672c3357c0072b79ec7fbcb) )
 

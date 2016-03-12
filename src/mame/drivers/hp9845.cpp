@@ -16,12 +16,12 @@
 // - LPU & PPU ROMs
 // - LPU & PPU RAMs
 // - Text mode screen
-// - Keyboard (most of keys)
+// - Keyboard
+// - T15 tape drive
 // What's not yet in:
 // - Beeper
-// - Rest of keyboard
 // - Graphic screen
-// - Tape drive (this needs some heavy RE of the TACO chip)
+// - Better naming of tape drive image (it's now "magt", should be "t15")
 // - Better documentation of this file
 // - Software list to load optional ROMs
 // What's wrong:
@@ -33,6 +33,7 @@
 #include "cpu/z80/z80.h"
 #include "softlist.h"
 #include "cpu/hphybrid/hphybrid.h"
+#include "machine/hp_taco.h"
 
 #define BIT_MASK(n) (1U << (n))
 
@@ -77,7 +78,8 @@ public:
 		m_io_key0(*this , "KEY0"),
 		m_io_key1(*this , "KEY1"),
 		m_io_key2(*this , "KEY2"),
-		m_io_key3(*this , "KEY3")
+		m_io_key3(*this , "KEY3"),
+				m_t15(*this , "t15")
 	{ }
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -90,7 +92,7 @@ public:
 		void vblank_w(screen_device &screen, bool state);
 
 		IRQ_CALLBACK_MEMBER(irq_callback);
-	void update_irl(void);
+	void update_irq(void);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
 	DECLARE_READ16_MEMBER(kb_scancode_r);
@@ -98,6 +100,10 @@ public:
 	DECLARE_WRITE16_MEMBER(kb_irq_clear_w);
 
 		DECLARE_WRITE8_MEMBER(pa_w);
+
+		DECLARE_WRITE_LINE_MEMBER(t15_irq_w);
+		DECLARE_WRITE_LINE_MEMBER(t15_flg_w);
+		DECLARE_WRITE_LINE_MEMBER(t15_sts_w);
 
 private:
 		required_device<hp_5061_3001_cpu_device> m_lpu;
@@ -107,6 +113,7 @@ private:
 	required_ioport m_io_key1;
 	required_ioport m_io_key2;
 	required_ioport m_io_key3;
+		required_device<hp_taco_device> m_t15;
 
 		void set_video_mar(UINT16 mar);
 		void video_fill_buff(bool buff_idx);
@@ -136,12 +143,15 @@ private:
 
 		// Interrupt handling
 		UINT8 m_irl_pending;
+		UINT8 m_irh_pending;
 
 		// State of keyboard
 		ioport_value m_kb_state[ 4 ];
 		UINT8 m_kb_scancode;
 		UINT16 m_kb_status;
 
+		// State of PPU I/O
+		UINT8 m_ppu_pa;
 };
 
 static INPUT_PORTS_START(hp9845b)
@@ -322,10 +332,13 @@ void hp9845b_state::machine_reset()
 		m_video_frame = 0;
 
 		m_irl_pending = 0;
+				m_irh_pending = 0;
 
 		memset(&m_kb_state[ 0 ] , 0 , sizeof(m_kb_state));
 		m_kb_scancode = 0x7f;
 		m_kb_status = 0;
+
+				m_ppu_pa = 0;
 }
 
 void hp9845b_state::set_video_mar(UINT16 mar)
@@ -479,13 +492,14 @@ IRQ_CALLBACK_MEMBER(hp9845b_state::irq_callback)
 		if (irqline == HPHYBRID_IRL) {
 				return m_irl_pending;
 		} else {
-				return 0;
+				return m_irh_pending;
 		}
 }
 
-void hp9845b_state::update_irl(void)
+void hp9845b_state::update_irq(void)
 {
 		m_ppu->set_input_line(HPHYBRID_IRL , m_irl_pending != 0);
+		m_ppu->set_input_line(HPHYBRID_IRH , m_irh_pending != 0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::kb_scan)
@@ -546,7 +560,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::kb_scan)
 						m_kb_scancode = i;
 						BIT_SET(m_irl_pending , 0);
 						BIT_SET(m_kb_status, 0);
-						update_irl();
+						update_irq();
 
 						// Special case: pressing stop key sets LPU "status" flag
 						if (i == 0x47) {
@@ -572,21 +586,47 @@ WRITE16_MEMBER(hp9845b_state::kb_irq_clear_w)
 {
 		BIT_CLR(m_irl_pending , 0);
 		BIT_CLR(m_kb_status, 0);
-		update_irl();
+		update_irq();
 		m_lpu->status_w(0);
 		// TODO: beeper start
 }
 
 WRITE8_MEMBER(hp9845b_state::pa_w)
 {
+		m_ppu_pa = data;
+
 		// TODO: handle sts & flg
-		if (data == 0xf) {
-				// RHS tape drive (T15)
-				m_ppu->status_w(1);
-				m_ppu->flag_w(1);
+		if (data == 15) {
+						// RHS tape drive (T15)
+						m_ppu->status_w(m_t15->sts_r());
+						m_ppu->flag_w(m_t15->flg_r());
 		} else {
 				m_ppu->status_w(0);
 				m_ppu->flag_w(0);
+		}
+}
+
+WRITE_LINE_MEMBER(hp9845b_state::t15_irq_w)
+{
+		if (state) {
+				BIT_SET(m_irh_pending , 7);
+		} else {
+				BIT_CLR(m_irh_pending , 7);
+		}
+		update_irq();
+}
+
+WRITE_LINE_MEMBER(hp9845b_state::t15_flg_w)
+{
+		if (m_ppu_pa == 15) {
+				m_ppu->flag_w(state);
+		}
+}
+
+WRITE_LINE_MEMBER(hp9845b_state::t15_sts_w)
+{
+		if (m_ppu_pa == 15) {
+				m_ppu->status_w(state);
 		}
 }
 
@@ -638,6 +678,9 @@ static ADDRESS_MAP_START(ppu_io_map , AS_IO , 16 , hp9845b_state)
 		// PA = 0, IC = 3
 		// Keyboard status input & keyboard interrupt clear
 		AM_RANGE(HP_MAKE_IOADDR(0 , 3) , HP_MAKE_IOADDR(0 , 3)) AM_READWRITE(kb_status_r , kb_irq_clear_w)
+		// PA = 15, IC = 0..3
+		// Right-hand side tape drive (T15)
+		AM_RANGE(HP_MAKE_IOADDR(15 , 0) , HP_MAKE_IOADDR(15 , 3))        AM_DEVREADWRITE("t15" , hp_taco_device , reg_r , reg_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
@@ -652,16 +695,22 @@ static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
 		MCFG_HPHYBRID_PA_CHANGED(WRITE8(hp9845b_state , pa_w))
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845b_state, screen_update)
 		MCFG_SCREEN_RAW_PARAMS(20849400 , 99 * 9 , 0 , 80 * 9 , 26 * 15 , 0 , 25 * 15)
 		MCFG_SCREEN_VBLANK_DRIVER(hp9845b_state, vblank_w)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp9845b_state, scanline_timer, "screen", 0, 1)
 
 	// Actual keyboard refresh rate should be KEY_SCAN_OSCILLATOR / 128 (2560 Hz)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer" , hp9845b_state , kb_scan , attotime::from_hz(100))
+
+		// Tape controller
+		MCFG_DEVICE_ADD("t15" , HP_TACO , 4000000)
+		MCFG_TACO_IRQ_HANDLER(WRITELINE(hp9845b_state , t15_irq_w))
+		MCFG_TACO_FLG_HANDLER(WRITELINE(hp9845b_state , t15_flg_w))
+		MCFG_TACO_STS_HANDLER(WRITELINE(hp9845b_state , t15_sts_w))
 
 		MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
 MACHINE_CONFIG_END

@@ -200,6 +200,10 @@ namespace bgfx
 			RG32I,
 			RG32U,
 			RG32F,
+			RGB8,
+			RGB8I,
+			RGB8U,
+			RGB8S,
 			RGB9E5F,
 			BGRA8,
 			RGBA8,
@@ -264,24 +268,45 @@ namespace bgfx
 		/// Backbuffer ratios:
 		enum Enum
 		{
-			Equal,
-			Half,
-			Quarter,
-			Eighth,
-			Sixteenth,
-			Double,
+			Equal,     //!< Equal to backbuffer.
+			Half,      //!< One half size of backbuffer.
+			Quarter,   //!< One quarter size of backbuffer.
+			Eighth,    //!< One eighth size of backbuffer.
+			Sixteenth, //!< One sixteenth size of backbuffer.
+			Double,    //!< Double size of backbuffer.
 
 			Count
 		};
 	};
 
+	/// Occlusion query result.
+	///
+	/// @attention C99 equivalent is `bgfx_occlusion_query_result_t`.
+	///
 	struct OcclusionQueryResult
 	{
 		enum Enum
 		{
-			Invisible,
-			Visible,
-			NoResult,
+			Invisible, //!< Query failed test.
+			Visible,   //!< Query passed test.
+			NoResult,  //!< Query result is not available yet.
+
+			Count
+		};
+	};
+
+	/// Topology conversion function.
+	///
+	/// @attention C99 equivalent is `bgfx_topology_convert_t`.
+	///
+	struct TopologyConvert
+	{
+		enum Enum
+		{
+			TriListFlipWinding,  //!< Flip winding order of triangle list.
+			TriListToLineList,   //!< Convert triangle list to line list.
+			TriStripToTriList,   //!< Convert triangle strip to triangle list.
+			LineStripToLineList, //!< Convert line strip to line list.
 
 			Count
 		};
@@ -532,6 +557,17 @@ namespace bgfx
 		bool    cubeMap;            //!< Texture is cubemap.
 	};
 
+	/// Frame buffer texture attachemnt info.
+	///
+	/// @attention C99 equivalent is `bgfx_attachment_t`.
+	///
+	struct Attachment
+	{
+		TextureHandle handle; //!< Texture handle.
+		uint16_t mip;         //!< Mip level.
+		uint16_t layer;       //!< Cubemap side or depth layer/slice.
+	};
+
 	/// Transform data.
 	///
 	/// @attention C99 equivalent is `bgfx_transform_t`.
@@ -691,6 +727,24 @@ namespace bgfx
 	/// @attention C99 equivalent is `bgfx_weld_vertices`.
 	///
 	uint16_t weldVertices(uint16_t* _output, const VertexDecl& _decl, const void* _data, uint16_t _num, float _epsilon = 0.001f);
+
+	/// Convert index buffer for use with different primitive topologies.
+	///
+	/// @param[in] _conversion Conversion type, see `TopologyConvert::Enum`.
+	/// @param[in] _dst Destination index buffer. If this argument it NULL
+	///    function will return number of indices after conversion.
+	/// @param[in] _dstSize Destination index buffer in bytes. It must be
+	///    large enough to contain output indices. If destination size is
+	///    insufficient index buffer will be truncated.
+	/// @param[in] _indices Source indices.
+	/// @param[in] _numIndices Number of input indices.
+	/// @param[in] _index32 Set to `true` if input indices are 32-bit.
+	///
+	/// @returns Number of output indices after conversion.
+	///
+	/// @attention C99 equivalent is `bgfx_topology_convert`.
+	///
+	uint32_t topologyConvert(TopologyConvert::Enum _conversion, void* _dst, uint32_t _dstSize, const void* _indices, uint32_t _numIndices, bool _index32);
 
 	/// Swizzle RGBA8 image to BGRA8.
 	///
@@ -1362,8 +1416,8 @@ namespace bgfx
 	/// Update Cube texture.
 	///
 	/// @param[in] _handle Texture handle.
-	/// @param[in] _side Cubemap side, where 0 is +X, 1 is -X, 2 is +Y, 3 is
-	///   -Y, 4 is +Z, and 5 is -Z.
+	/// @param[in] _side Cubemap side `BGFX_CUBE_MAP_<POSITIVE or NEGATIVE>_<X, Y or Z>`,
+	///   where 0 is +X, 1 is -X, 2 is +Y, 3 is -Y, 4 is +Z, and 5 is -Z.
 	///
 	///                  +----------+
 	///                  |-z       2|
@@ -1469,6 +1523,17 @@ namespace bgfx
 	/// @attention C99 equivalent is `bgfx_create_frame_buffer_from_handles`.
 	///
 	FrameBufferHandle createFrameBuffer(uint8_t _num, const TextureHandle* _handles, bool _destroyTextures = false);
+
+	/// Create frame buffer.
+	///
+	/// @param[in] _num Number of texture attachments.
+	/// @param[in] _attachment Attachment texture info. See: `Attachment`.
+	/// @param[in] _destroyTextures If true, textures will be destroyed when
+	///   frame buffer is destroyed.
+	///
+	/// @attention C99 equivalent is `bgfx_create_frame_buffer_from_handles`.
+	///
+	FrameBufferHandle createFrameBuffer(uint8_t _num, const Attachment* _attachment, bool _destroyTextures = false);
 
 	/// Create frame buffer for multiple window rendering.
 	///
@@ -1842,12 +1907,28 @@ namespace bgfx
 	/// Set index buffer for draw primitive.
 	///
 	/// @param[in] _handle Index buffer.
+	///
+	/// @attention C99 equivalent is `bgfx_set_index_buffer`.
+	///
+	void setIndexBuffer(IndexBufferHandle _handle);
+
+	/// Set index buffer for draw primitive.
+	///
+	/// @param[in] _handle Index buffer.
 	/// @param[in] _firstIndex First index to render.
 	/// @param[in] _numIndices Number of indices to render.
 	///
 	/// @attention C99 equivalent is `bgfx_set_index_buffer`.
 	///
-	void setIndexBuffer(IndexBufferHandle _handle, uint32_t _firstIndex = 0, uint32_t _numIndices = UINT32_MAX);
+	void setIndexBuffer(IndexBufferHandle _handle, uint32_t _firstIndex, uint32_t _numIndices);
+
+	/// Set index buffer for draw primitive.
+	///
+	/// @param[in] _handle Dynamic index buffer.
+	///
+	/// @attention C99 equivalent is `bgfx_set_dynamic_index_buffer`.
+	///
+	void setIndexBuffer(DynamicIndexBufferHandle _handle);
 
 	/// Set index buffer for draw primitive.
 	///
@@ -1857,7 +1938,7 @@ namespace bgfx
 	///
 	/// @attention C99 equivalent is `bgfx_set_dynamic_index_buffer`.
 	///
-	void setIndexBuffer(DynamicIndexBufferHandle _handle, uint32_t _firstIndex = 0, uint32_t _numIndices = UINT32_MAX);
+	void setIndexBuffer(DynamicIndexBufferHandle _handle, uint32_t _firstIndex, uint32_t _numIndices);
 
 	/// Set index buffer for draw primitive.
 	///
@@ -1898,11 +1979,20 @@ namespace bgfx
 	/// Set vertex buffer for draw primitive.
 	///
 	/// @param[in] _handle Dynamic vertex buffer.
+	///
+	/// @attention C99 equivalent is `bgfx_set_dynamic_vertex_buffer`.
+	///
+	void setVertexBuffer(DynamicVertexBufferHandle _handle);
+
+	/// Set vertex buffer for draw primitive.
+	///
+	/// @param[in] _handle Dynamic vertex buffer.
+	/// @param[in] _startVertex First vertex to render.
 	/// @param[in] _numVertices Number of vertices to render.
 	///
 	/// @attention C99 equivalent is `bgfx_set_dynamic_vertex_buffer`.
 	///
-	void setVertexBuffer(DynamicVertexBufferHandle _handle, uint32_t _numVertices = UINT32_MAX);
+	void setVertexBuffer(DynamicVertexBufferHandle _handle, uint32_t _startVertex, uint32_t _numVertices);
 
 	/// Set vertex buffer for draw primitive.
 	///
@@ -1984,11 +2074,13 @@ namespace bgfx
 	/// @param[in] _id View id.
 	/// @param[in] _program Program.
 	/// @param[in] _depth Depth for sorting.
+	/// @param[in] _preserveState Preserve internal draw state for next draw
+	///   call submit.
 	/// @returns Number of draw calls.
 	///
 	/// @attention C99 equivalent is `bgfx_submit`.
 	///
-	uint32_t submit(uint8_t _id, ProgramHandle _program, int32_t _depth = 0);
+	uint32_t submit(uint8_t _id, ProgramHandle _program, int32_t _depth = 0, bool _preserveState = false);
 
 	/// Submit primitive with occlusion query for rendering.
 	///
@@ -1996,11 +2088,13 @@ namespace bgfx
 	/// @param[in] _program Program.
 	/// @param[in] _occlusionQuery Occlusion query.
 	/// @param[in] _depth Depth for sorting.
+	/// @param[in] _preserveState Preserve internal draw state for next draw
+	///   call submit.
 	/// @returns Number of draw calls.
 	///
 	/// @attention C99 equivalent is `bgfx_submit_occlusion_query.
 	///
-	uint32_t submit(uint8_t _id, ProgramHandle _program, OcclusionQueryHandle _occlusionQuery, int32_t _depth = 0);
+	uint32_t submit(uint8_t _id, ProgramHandle _program, OcclusionQueryHandle _occlusionQuery, int32_t _depth = 0, bool _preserveState = false);
 
 	/// Submit primitive for rendering with index and instance data info from
 	/// indirect buffer.
@@ -2011,10 +2105,13 @@ namespace bgfx
 	/// @param[in] _start First element in indirect buffer.
 	/// @param[in] _num Number of dispatches.
 	/// @param[in] _depth Depth for sorting.
+	/// @param[in] _preserveState Preserve internal draw state for next draw
+	///   call submit.
+	/// @returns Number of draw calls.
 	///
 	/// @attention C99 equivalent is `bgfx_submit_indirect`.
 	///
-	uint32_t submit(uint8_t _id, ProgramHandle _program, IndirectBufferHandle _indirectHandle, uint16_t _start = 0, uint16_t _num = 1, int32_t _depth = 0);
+	uint32_t submit(uint8_t _id, ProgramHandle _program, IndirectBufferHandle _indirectHandle, uint16_t _start = 0, uint16_t _num = 1, int32_t _depth = 0, bool _preserveState = false);
 
 	/// Set compute index buffer.
 	///

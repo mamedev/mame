@@ -1777,7 +1777,7 @@ public:
 	const char *        m_cputag;
 	devcb_write_line   m_vblank;
 	devcb_write_line   m_stall;
-	
+
 	TIMER_CALLBACK_MEMBER( vblank_off_callback );
 	TIMER_CALLBACK_MEMBER( stall_cpu_callback );
 	TIMER_CALLBACK_MEMBER( vblank_callback );
@@ -1826,11 +1826,9 @@ public:
 	static void raster_generic_2tmu(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
 
 #define RASTERIZER_HEADER(name) \
-	static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, const void *extradata, int threadid); \
-
+	static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, const void *extradata, int threadid);
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
-	RASTERIZER_HEADER(fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1) \
-
+	RASTERIZER_HEADER(fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1)
 #include "voodoo_rast.inc"
 
 #undef RASTERIZER_ENTRY

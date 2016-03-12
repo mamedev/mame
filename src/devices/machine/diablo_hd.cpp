@@ -111,14 +111,11 @@ diablo_hd_device::~diablo_hd_device()
 }
 
 #if DIABLO_DEBUG
-void diablo_hd_device::logprintf(int level, const char* format, ...)
+template <typename Format, typename... Params>
+void diablo_hd_device::logprintf(int level, Format &&fmt, Params &&... args)
 {
-	if (level > m_log_level)
-		return;
-	va_list ap;
-	va_start(ap, format);
-	vlogerror(format, ap);
-	va_end(ap);
+	if (level <= m_log_level)
+		logerror(std::forward<Format>(fmt), std::forward<Params>(args)...);
 }
 #endif
 
@@ -126,7 +123,7 @@ void diablo_hd_device::set_sector_callback(void *cookie, void (*callback)(void *
 {
 	if (m_sector_callback_cookie == cookie && m_sector_callback == callback)
 		return;
-	LOG_DRIVE((0,"[DHD%u] cookie=%p callback=%p\n", m_unit, cookie, callback));
+	LOG_DRIVE((0,"[DHD%u] cookie=%p callback=%p\n", m_unit, cookie, (void *)callback));
 	m_sector_callback_cookie = cookie;
 	m_sector_callback = callback;
 }

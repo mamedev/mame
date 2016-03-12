@@ -405,7 +405,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(80*10, 25*10)
@@ -414,7 +414,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "vt100_video:palette", vt100)
-//  MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+//  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEFAULT_LAYOUT( layout_vt100 )
 
@@ -424,7 +424,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(vt100_state, vt100_read_video_ram_r))
 	MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(vt100_state, vt100_clear_video_interrupt))
 
-	MCFG_DEVICE_ADD("i8251", I8251, 0)
+	MCFG_DEVICE_ADD("i8251", I8251, 0) // 2.7648Mhz phi-clock (not used for tx clock or rx clock?)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
@@ -433,7 +433,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL_5_0688MHz)
+	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL_5_0688MHz/*XTAL_24_8832MHz / 9*/) // COM5016T-013, 2.7648Mhz Clock, currently hacked wrongly
 	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxc))
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("i8251", i8251_device, write_txc))
 

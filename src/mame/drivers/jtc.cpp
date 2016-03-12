@@ -751,7 +751,7 @@ static MACHINE_CONFIG_DERIVED( jtc, basic )
 	MCFG_SCREEN_VISIBLE_AREA(0, 64-1, 0, 64-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -783,7 +783,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( jtces23, basic, jtces23_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jtces23)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

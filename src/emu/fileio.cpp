@@ -187,21 +187,11 @@ emu_file::~emu_file()
 
 
 //-------------------------------------------------
-//  operator core_file - automatically convert
-//  ourselves to a core_file pointer
+//  operator util::core_file - automatically
+//  convert ourselves to a core_file reference
 //-------------------------------------------------
 
-emu_file::operator core_file *()
-{
-	// load the ZIP file now if we haven't yet
-	if (compressed_file_ready())
-		return nullptr;
-
-	// return the core file
-	return m_file;
-}
-
-emu_file::operator core_file &()
+emu_file::operator util::core_file &()
 {
 	// load the ZIP file now if we haven't yet
 	if (compressed_file_ready())
@@ -251,12 +241,12 @@ hash_collection &emu_file::hashes(const char *types)
 	}
 
 	// read the data if we can
-	const UINT8 *filedata = (const UINT8 *)core_fbuffer(m_file);
+	const UINT8 *filedata = (const UINT8 *)m_file->buffer();
 	if (filedata == nullptr)
 		return m_hashes;
 
 	// compute the hash
-	m_hashes.compute(filedata, core_fsize(m_file), needed.c_str());
+	m_hashes.compute(filedata, m_file->size(), needed.c_str());
 	return m_hashes;
 }
 
@@ -348,7 +338,7 @@ file_error emu_file::open_next()
 	while (m_iterator.next(m_fullpath, m_filename.c_str()))
 	{
 		// attempt to open the file directly
-		filerr = core_fopen(m_fullpath.c_str(), m_openflags, &m_file);
+		filerr = util::core_file::open(m_fullpath.c_str(), m_openflags, m_file);
 		if (filerr == FILERR_NONE)
 			break;
 
@@ -384,7 +374,7 @@ file_error emu_file::open_ram(const void *data, UINT32 length)
 	m_crc = 0;
 
 	// use the core_file's built-in RAM support
-	return core_fopen_ram(data, length, m_openflags, &m_file);
+	return util::core_file::open_ram(data, length, m_openflags, m_file);
 }
 
 
@@ -404,9 +394,7 @@ void emu_file::close()
 		zip_file_close(m_zipfile);
 	m_zipfile = nullptr;
 
-	if (m_file != nullptr)
-		core_fclose(m_file);
-	m_file = nullptr;
+	m_file.reset();
 
 	m__7zdata.clear();
 	m_zipdata.clear();
@@ -429,7 +417,7 @@ void emu_file::close()
 
 file_error emu_file::compress(int level)
 {
-	return core_fcompress(m_file, level);
+	return m_file->compress(level);
 }
 
 
@@ -461,8 +449,8 @@ int emu_file::seek(INT64 offset, int whence)
 		return 1;
 
 	// seek if we can
-	if (m_file != nullptr)
-		return core_fseek(m_file, offset, whence);
+	if (m_file)
+		return m_file->seek(offset, whence);
 
 	return 1;
 }
@@ -479,8 +467,8 @@ UINT64 emu_file::tell()
 		return 0;
 
 	// tell if we can
-	if (m_file != nullptr)
-		return core_ftell(m_file);
+	if (m_file)
+		return m_file->tell();
 
 	return 0;
 }
@@ -497,8 +485,8 @@ bool emu_file::eof()
 		return 0;
 
 	// return EOF if we can
-	if (m_file != nullptr)
-		return core_feof(m_file);
+	if (m_file)
+		return m_file->eof();
 
 	return 0;
 }
@@ -518,8 +506,8 @@ UINT64 emu_file::size()
 		return m_ziplength;
 
 	// return length if we can
-	if (m_file != nullptr)
-		return core_fsize(m_file);
+	if (m_file)
+		return m_file->size();
 
 	return 0;
 }
@@ -536,8 +524,8 @@ UINT32 emu_file::read(void *buffer, UINT32 length)
 		return 0;
 
 	// read the data if we can
-	if (m_file != nullptr)
-		return core_fread(m_file, buffer, length);
+	if (m_file)
+		return m_file->read(buffer, length);
 
 	return 0;
 }
@@ -554,8 +542,8 @@ int emu_file::getc()
 		return EOF;
 
 	// read the data if we can
-	if (m_file != nullptr)
-		return core_fgetc(m_file);
+	if (m_file)
+		return m_file->getc();
 
 	return EOF;
 }
@@ -572,8 +560,8 @@ int emu_file::ungetc(int c)
 		return 1;
 
 	// read the data if we can
-	if (m_file != nullptr)
-		return core_ungetc(c, m_file);
+	if (m_file)
+		return m_file->ungetc(c);
 
 	return 1;
 }
@@ -590,8 +578,8 @@ char *emu_file::gets(char *s, int n)
 		return nullptr;
 
 	// read the data if we can
-	if (m_file != nullptr)
-		return core_fgets(s, n, m_file);
+	if (m_file)
+		return m_file->gets(s, n);
 
 	return nullptr;
 }
@@ -604,8 +592,8 @@ char *emu_file::gets(char *s, int n)
 UINT32 emu_file::write(const void *buffer, UINT32 length)
 {
 	// write the data if we can
-	if (m_file != nullptr)
-		return core_fwrite(m_file, buffer, length);
+	if (m_file)
+		return m_file->write(buffer, length);
 
 	return 0;
 }
@@ -618,36 +606,33 @@ UINT32 emu_file::write(const void *buffer, UINT32 length)
 int emu_file::puts(const char *s)
 {
 	// write the data if we can
-	if (m_file != nullptr)
-		return core_fputs(m_file, s);
+	if (m_file)
+		return m_file->puts(s);
 
 	return 0;
 }
 
 
 //-------------------------------------------------
-//  printf - vfprintf to a text file
+//  vfprintf - vfprintf to a text file
 //-------------------------------------------------
 
-int CLIB_DECL emu_file::printf(const char *fmt, ...)
+int emu_file::vprintf(util::format_argument_pack<std::ostream> const &args)
 {
-	int rc;
-	va_list va;
-	va_start(va, fmt);
-	rc = vprintf(fmt, va);
-	va_end(va);
-	return rc;
+	// write the data if we can
+	return m_file ? m_file->vprintf(args) : 0;
 }
 
 
 //-------------------------------------------------
-//  mame_vfprintf - vfprintf to a text file
+//  flush - flush file buffers
 //-------------------------------------------------
 
-int emu_file::vprintf(const char *fmt, va_list va)
+void emu_file::flush()
 {
-	// write the data if we can
-	return (m_file != nullptr) ? core_vfprintf(m_file, fmt, va) : 0;
+	// flush the buffers if we can
+	if (m_file)
+		m_file->flush();
 }
 
 
@@ -766,7 +751,7 @@ file_error emu_file::load_zipped_file()
 	}
 
 	// convert to RAM file
-	file_error filerr = core_fopen_ram(&m_zipdata[0], m_zipdata.size(), m_openflags, &m_file);
+	file_error filerr = util::core_file::open_ram(&m_zipdata[0], m_zipdata.size(), m_openflags, m_file);
 	if (filerr != FILERR_NONE)
 	{
 		m_zipdata.clear();
@@ -895,7 +880,7 @@ file_error emu_file::load__7zped_file()
 	}
 
 	// convert to RAM file
-	file_error filerr = core_fopen_ram(&m__7zdata[0], m__7zdata.size(), m_openflags, &m_file);
+	file_error filerr = util::core_file::open_ram(&m__7zdata[0], m__7zdata.size(), m_openflags, m_file);
 	if (filerr != FILERR_NONE)
 	{
 		m__7zdata.clear();

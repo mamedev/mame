@@ -541,12 +541,12 @@ void tms3203x_device::state_string_export(const device_state_entry &entry, std::
 		case TMS3203X_R5F:
 		case TMS3203X_R6F:
 		case TMS3203X_R7F:
-			strprintf(str, "%12g", m_r[TMR_R0 + (entry.index() - TMS3203X_R0F)].as_double());
+			str = string_format("%12g", m_r[TMR_R0 + (entry.index() - TMS3203X_R0F)].as_double());
 			break;
 
 		case STATE_GENFLAGS:
 			UINT32 temp = m_r[TMR_ST].i32[0];
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				(temp & 0x80) ? 'O':'.',
 				(temp & 0x40) ? 'U':'.',
 				(temp & 0x20) ? 'V':'.',

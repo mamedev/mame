@@ -2593,12 +2593,12 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 	printf("A:%08X MTHD:%08X D:%08X\n\r",address,maddress,data);
 #endif
 	if (maddress == 0x17fc) {
-#if 1 // useful while debugging to see what coordinates have been used
+#if 0 // useful while debugging to see what coordinates have been used
 		static int debugvc = 0;
 		if (debugvc)
 			if (data == 0)
 			{
-				//printf("%d %d\n\r", primitive_type, vertex_first);
+				printf("%d %d\n\r", (int)primitive_type, vertex_first);
 				for (int n = 0; n < vertex_first; n++)
 					printf("%d X:%f Y:%f Z:%f W:%f x:%f y:%f\n\r", n, vertex_software[n].attribute[0].fv[0], vertex_software[n].attribute[0].fv[1], vertex_software[n].attribute[0].fv[2], vertex_software[n].attribute[0].fv[3], vertex_xy[n].x, vertex_xy[n].y);
 			}
@@ -2698,7 +2698,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			}
 		}
 		else {
-			machine().logerror("Unsupported primitive %d for method 0x1810\n", primitive_type);
+			machine().logerror("Unsupported primitive %d for method 0x1810\n", int(primitive_type));
 		}
 		countlen--;
 	}
@@ -2845,7 +2845,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			}
 		}
 		else {
-			machine().logerror("Unsupported primitive %d for method 0x1800/8\n", primitive_type);
+			machine().logerror("Unsupported primitive %d for method 0x1800/8\n", int(primitive_type));
 			countlen = 0;
 		}
 		while (countlen > 0) {
@@ -3025,7 +3025,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			}
 		}
 		else {
-			machine().logerror("Unsupported primitive %d for method 0x1818\n", primitive_type);
+			machine().logerror("Unsupported primitive %d for method 0x1818\n", int(primitive_type));
 			countlen = 0;
 		}
 	}
@@ -3164,7 +3164,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			bytespixel_rendertarget = 1;
 			break;
 		default:
-			machine().logerror("Unknown render target color format %d\n\r", colorformat_rendertarget);
+			machine().logerror("Unknown render target color format %d\n\r", int(colorformat_rendertarget));
 			bytespixel_rendertarget = 4;
 			break;
 		}
@@ -3174,7 +3174,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		pitch_rendertarget=data & 0xffff;
 		pitch_depthbuffer=(data >> 16) & 0xffff;
 #ifdef LOG_NV2A
-		printf("Pitch color %04X zbuffer %04X\n\r",pitch_rendertarget,pitch_depthbuffer);
+		printf("Pitch color %04X zbuffer %04X\n\r", pitch_rendertarget, pitch_depthbuffer);
 #endif
 		countlen--;
 	}

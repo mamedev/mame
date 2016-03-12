@@ -2023,11 +2023,11 @@ WRITE64_MEMBER(viper_state::unk_serial_w)
 
 			if (m_unk_serial_bit_w == 8)
 			{
-				if ((m_unk_serial_cmd & 0x80) == 0)		// register read
+				if ((m_unk_serial_cmd & 0x80) == 0)     // register read
 				{
 					int reg = m_unk_serial_cmd & 0x7f;
 					UINT8 data = m_unk_serial_regs[reg];
-					
+
 					m_unk_serial_data_r = ((data & 0x1) << 7) | ((data & 0x2) << 5) | ((data & 0x4) << 3) | ((data & 0x8) << 1) | ((data & 0x10) >> 1) | ((data & 0x20) >> 3) | ((data & 0x40) >> 5) | ((data & 0x80) >> 7);
 
 					printf("unk_serial read reg %02X: %04X\n", reg, data);
@@ -2035,7 +2035,7 @@ WRITE64_MEMBER(viper_state::unk_serial_w)
 			}
 			if (m_unk_serial_bit_w == 16)
 			{
-				if (m_unk_serial_cmd & 0x80)				// register write
+				if (m_unk_serial_cmd & 0x80)                // register write
 				{
 					int reg = m_unk_serial_cmd & 0x7f;
 					m_unk_serial_regs[reg] = m_unk_serial_data;
@@ -2334,6 +2334,7 @@ ROM_START(gticlub2ea) //*
 	DISK_IMAGE( "941a02", 0,  NO_DUMP )
 ROM_END
 
+/* This CF card has sticker B41C02 */
 ROM_START(jpark3) //*
 	VIPER_BIOS
 
@@ -2342,6 +2343,20 @@ ROM_START(jpark3) //*
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("b41ebc_nvram.u39", 0x00000, 0x2000, CRC(55d1681d) SHA1(26868cf0d14f23f06b81f2df0b4186924439bb43))
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "b41c02", 0, SHA1(fb6b0b43a6f818041d644bcd711f6a727348d3aa) )
+ROM_END
+
+/* This CF card has sticker B41C02 */
+ROM_START(jpark3u) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("b41 ua rtc.u39", 0x00000, 0x1ff8, CRC(75fdda39) SHA1(6292ce0d32afdf6bde33ac7f1f07655fa17282f6))
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "b41c02", 0, SHA1(fb6b0b43a6f818041d644bcd711f6a727348d3aa) )
@@ -2449,7 +2464,7 @@ ROM_START(p911ea)
 	ROM_LOAD("a00eaa_nvram.u39", 0x000000, 0x2000,  CRC(4f3497b6) SHA1(3045c54f98dff92cdf3a1fc0cd4c76ba82d632d7) )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "a00eaa02", 0, SHA1(fa057bf17f4c0fb9b9a09b820ff7a101e44fab7d) )
+	DISK_IMAGE( "a00eaa02_ea", 0, SHA1(fa057bf17f4c0fb9b9a09b820ff7a101e44fab7d) )
 ROM_END
 
 ROM_START(p911j) //*
@@ -2523,7 +2538,7 @@ ROM_START(sscopefh)
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
-	
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "ata:0:hdd:image" )
@@ -2557,7 +2572,7 @@ ROM_START(thrild2a) //*
 	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) )
 ROM_END
 
-ROM_START(thrild2ab) 
+ROM_START(thrild2ab)
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
@@ -2570,7 +2585,7 @@ ROM_START(thrild2ab)
 	DISK_IMAGE( "a41a02_alt", 0, SHA1(7a9cfdab7000765ffdd9198b209f7a74741248f2) )
 ROM_END
 
-ROM_START(thrild2ac) 
+ROM_START(thrild2ac)
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
@@ -2684,9 +2699,10 @@ ROM_START(wcombatu) //*
 	DISK_REGION( "ata:0:hdd:image" )
 	// CHD image provided had evidence of being altered by Windows, probably was put in a Windows machine without write protection hardware (bad idea)
 	// label was the same as this, so this should be a clean and correct version.
-	DISK_IMAGE( "c22d02", 0, SHA1(69a24c9e36b073021d55bec27d89fcc0254a60cc) ) // chs 978,8,3
+	DISK_IMAGE( "c22d02", 0, SHA1(69a24c9e36b073021d55bec27d89fcc0254a60cc) ) // chs 978,8,32
 ROM_END
 
+/* This CF card has sticker C22A02 */
 ROM_START(wcombatj) //*
 	VIPER_BIOS
 
@@ -2697,7 +2713,7 @@ ROM_START(wcombatj) //*
 	ROM_LOAD("wcombatj_nvram.u39", 0x00000, 0x2000, CRC(bd8a6640) SHA1(2d409197ef3fb07d984d27fa943f29c7a711d715))
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "c22a02", 0, BAD_DUMP SHA1(b607fb2ddfd0bd552b7a736cea4ac1aa3ea021bd) )
+	DISK_IMAGE( "c22a02", 0, SHA1(7200c7c436491fd8027d6d7139a80ee3b984697b) ) // chs 978,8,32
 ROM_END
 
 ROM_START(xtrial) //*
@@ -2718,7 +2734,7 @@ ROM_END
 /*
 Mahjong Fight Club (Konami Viper h/w)
 Konami, 2002
-
+78,8,3)
 PCB number - GM941-PWB(A)C Copyright 1999 Konami Made In Japan
 
 Mahjong Fight Club is a multi player Mahjong battle game for up to 8 players. A
@@ -2802,6 +2818,7 @@ GAME(2000, code1db,   code1d,    viper, viper, viper_state, vipercf,  ROT0,  "Ko
 GAME(2001, gticlub2,  kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "GTI Club 2 (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, gticlub2ea,gticlub2,  viper, viper, viper_state, vipercf,  ROT0,  "Konami", "GTI Club 2 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, jpark3,    kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver EBC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, jpark3u,   jpark3,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver UA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, mocapglf,  kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, mocapb,    kviper,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Mocap Boxing (ver AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, mocapbj,   mocapb,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

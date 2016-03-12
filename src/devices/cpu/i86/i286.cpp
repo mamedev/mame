@@ -282,13 +282,13 @@ void i80286_cpu_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-			strprintf(str, "%08X", m_base[CS] + m_ip);
+			str = string_format("%08X", m_base[CS] + m_ip);
 			break;
 
 		case STATE_GENFLAGS:
 			{
 				UINT16 flags = CompressFlags();
-				strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+				str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 					flags & 0x8000 ? '0':'.',
 					flags & 0x4000 ? 'N':'.',
 					flags & 0x2000 ? 'I':'.',

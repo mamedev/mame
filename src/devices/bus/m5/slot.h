@@ -18,7 +18,7 @@ enum
 };
 
 
-#define	M5_STD  0
+#define M5_STD  0
 
 
 // ======================> device_m5_cart_interface

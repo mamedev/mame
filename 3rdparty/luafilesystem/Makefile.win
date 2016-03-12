@@ -1,0 +1,25 @@
+# $Id: Makefile.win,v 1.11 2008/05/07 19:06:37 carregal Exp $
+
+T= lfs
+
+include config.win
+
+SRCS= src\$T.c
+OBJS= src\$T.obj
+
+lib: src\lfs.dll
+
+.c.obj:
+	$(CC) /c /Fo$@ $(CFLAGS) $<
+
+src\lfs.dll: $(OBJS)
+	link /dll /def:src\$T.def /out:src\lfs.dll $(OBJS) "$(LUA_LIB)"
+	IF EXIST src\lfs.dll.manifest mt -manifest src\lfs.dll.manifest -outputresource:src\lfs.dll;2
+
+install: src\lfs.dll
+	IF NOT EXIST "$(LUA_LIBDIR)" mkdir "$(LUA_LIBDIR)"
+	copy src\lfs.dll "$(LUA_LIBDIR)"
+
+clean:
+	del src\lfs.dll $(OBJS) src\$T.lib src\$T.exp
+	IF EXIST src\lfs.dll.manifest del src\lfs.dll.manifest

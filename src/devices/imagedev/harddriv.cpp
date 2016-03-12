@@ -137,7 +137,6 @@ bool harddisk_image_device::call_create(int create_format, option_resolution *cr
 	int err;
 	UINT32 sectorsize, hunksize;
 	UINT32 cylinders, heads, sectors, totalsectors;
-	std::string metadata;
 
 	cylinders   = option_resolution_lookup_int(create_args, 'C');
 	heads       = option_resolution_lookup_int(create_args, 'H');
@@ -149,13 +148,12 @@ bool harddisk_image_device::call_create(int create_format, option_resolution *cr
 
 	/* create the CHD file */
 	chd_codec_type compression[4] = { CHD_CODEC_NONE };
-	err = m_origchd.create(*image_core_file(), (UINT64)totalsectors * (UINT64)sectorsize, hunksize, sectorsize, compression);
+	err = m_origchd.create(image_core_file(), (UINT64)totalsectors * (UINT64)sectorsize, hunksize, sectorsize, compression);
 	if (err != CHDERR_NONE)
 		goto error;
 
 	/* if we created the image and hence, have metadata to set, set the metadata */
-	strprintf(metadata, HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize);
-	err = m_origchd.write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
+	err = m_origchd.write_metadata(HARD_DISK_METADATA_TAG, 0, string_format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize));
 	m_origchd.close();
 
 	if (err != CHDERR_NONE)
@@ -245,14 +243,14 @@ int harddisk_image_device::internal_load_hd()
 	}
 	else
 	{
-		err = m_origchd.open(*image_core_file(), true);
+		err = m_origchd.open(image_core_file(), true);
 		if (err == CHDERR_NONE)
 		{
 			m_chd = &m_origchd;
 		}
 		else if (err == CHDERR_FILE_NOT_WRITEABLE)
 		{
-			err = m_origchd.open(*image_core_file(), false);
+			err = m_origchd.open(image_core_file(), false);
 			if (err == CHDERR_NONE)
 			{
 				err = open_disk_diff(device().machine().options(), basename_noext(), m_origchd, m_diffchd);

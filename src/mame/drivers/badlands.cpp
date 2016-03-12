@@ -217,7 +217,7 @@ MACHINE_RESET_MEMBER(badlands_state,badlands)
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 32);
 
-	memcpy(m_bank_base, &m_bank_source_data[0x0000], 0x1000);
+	membank("soundbank")->set_entry(0);
 }
 
 
@@ -359,7 +359,7 @@ WRITE8_MEMBER(badlands_state::audio_io_w)
 			*/
 
 			/* update the bank */
-			memcpy(m_bank_base, &m_bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
+			membank("soundbank")->set_entry((data >> 6) & 3);
 			break;
 	}
 }
@@ -405,7 +405,8 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, badlands_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(audio_io_r, audio_io_w)
-	AM_RANGE(0x3000, 0xffff) AM_ROM
+	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("soundbank")
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -552,9 +553,8 @@ ROM_START( badlands )
 	ROM_LOAD16_BYTE( "136074-1009.17f",  0x20000, 0x10000, CRC(0e2e807f) SHA1(5b61de066dca12c44335aa68a13c821845657866) )
 	ROM_LOAD16_BYTE( "136074-1007.24f",  0x20001, 0x10000, CRC(99a20c2c) SHA1(9b0a5a5dafb8816e72330d302c60339b600b49a8) )
 
-	ROM_REGION( 0x14000, "audiocpu", 0 )    /* 64k for 6502 code */
-	ROM_LOAD( "136074-1018.9c", 0x10000, 0x4000, CRC(a05fd146) SHA1(d97abbcf7897ca720cc18ff3a323f41cd3b23c34) )
-	ROM_CONTINUE(               0x04000, 0xc000 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
+	ROM_LOAD( "136074-1018.9c", 0x00000, 0x10000, CRC(a05fd146) SHA1(d97abbcf7897ca720cc18ff3a323f41cd3b23c34) )
 
 	ROM_REGION( 0x60000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "136074-1012.4n",  0x000000, 0x10000, CRC(5d124c6c) SHA1(afebaaf90b3751f5e873fc4c45f1d5385ef86a6e) )  /* playfield */
@@ -589,8 +589,7 @@ ROM_END
 DRIVER_INIT_MEMBER(badlands_state,badlands)
 {
 	/* initialize the audio system */
-	m_bank_base = &memregion("audiocpu")->base()[0x03000];
-	m_bank_source_data = &memregion("audiocpu")->base()[0x10000];
+	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x01000);
 }
 
 
@@ -601,7 +600,7 @@ DRIVER_INIT_MEMBER(badlands_state,badlands)
  *
  *************************************/
 
-GAME( 1989, badlands, 0, badlands, badlands, badlands_state, badlands, ROT0, "Atari Games", "Bad Lands", 0 )
+GAME( 1989, badlands, 0, badlands, badlands, badlands_state, badlands, ROT0, "Atari Games", "Bad Lands", MACHINE_SUPPORTS_SAVE )
 
 /* Badlands - Playmark Bootleg support - split this into its own file?
 

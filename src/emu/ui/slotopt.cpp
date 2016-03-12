@@ -163,13 +163,13 @@ void ui_menu_slot_devices::populate()
 		{
 			opt_name.assign(option->name());
 			if (slot->fixed() || slot_get_length(slot) == 0)
-				opt_name.append(" [internal]");
+				opt_name.append(_(" [internal]"));
 		}
 
 		item_append(slot->device().tag() + 1, opt_name.c_str(), (slot->fixed() || slot_get_length(slot) == 0) ? 0 : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), (void *)slot);
 	}
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-	item_append("Reset",  nullptr, 0, (void *)1);
+	item_append(_("Reset"),  nullptr, 0, (void *)1);
 }
 
 ui_menu_slot_devices::~ui_menu_slot_devices()

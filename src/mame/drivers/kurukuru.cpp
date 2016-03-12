@@ -1,10 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca, hap
-/******************************************************************************
+/***********************************************************************************
 
   KURU KURU PYON PYON
-  Taiyo Jidoki / Success
-
+  Success / Taiyo Jidoki
 
   Driver by Roberto Fresca & hap.
 
@@ -16,7 +15,7 @@
   ports, descriptions and a lot of things... :)
 
 
-*******************************************************************************
+************************************************************************************
 
   Technical Notes....
 
@@ -114,27 +113,38 @@
   AB =  NEC C1663C 8926B.
 
 
-*******************************************************************************
+************************************************************************************
 
   General Notes....
 
-  The game name could be translated as "Croak Croak Hop Hop"
-  Kuru is the frog sound, and Pyon is the sound of jumps.
+  There are at least 4 games in the Pyon Pyon series...
+
+  1) Pyon Pyon (a marathon game with froggy characters).
+  2) Kuru Kuru Pyon Pyon (a kind of slots game with the same froggy characters).
+  3) Pyon Pyon Jump (a contents where the same characters try to cross the river jumping on pads).
+  4) Sui Sui Pyon Pyon (a swimming competition where the same characters swim with different styles, even walking).
 
   Coin 1 (key 5) could be set either as Coin 1 or as Payout button, through
   a DIP switch.
 
   If you get a 'medal jam' error, and the game is not responding anymore, press
-  RESET (key 0), and the game will reset to default values (even all counters
+  RESET (key 9), and the game will reset to default values (even all counters
   will be cleared).
 
 
-*******************************************************************************
+************************************************************************************
 
-  * How to play...
+  Games Notes:
+  ------------
 
-  Insert tokens (medals)...
+  * Kuru Kuru Pyon Pyon:
 
+  The game name could be translated as "Croak Croak Hop Hop"
+  Kuru is the frog sound, and Pyon is the sound of jumps.
+
+  How to play...
+
+  Insert tokens (medals).
   You can bet to any (or all) of the following 5 characters: Bote, Oume, Pyoko,
   Kunio, and Pyon Pyon. Press start, and the reels start to roll. You'll win if
   you can get 3 of the choosen character(s) in a row, column or diagonal.
@@ -146,10 +156,9 @@
   Red tadpoles are a bonus. Once you get one, it will go to the right panel,
   revealing a number. This number represents the extra credits you won.
 
+  Bookkeeping...
 
-  * Bookkeeping...
-
-  Pressing Bookkeeping key (key 9), you enter the Bookkeeping Mode. There are
+  Pressing Bookkeeping key (key 0), you enter the Bookkeeping Mode. There are
   2 screens with all the game information like DIP switches and statistics...
 
   1st screen...
@@ -168,30 +177,73 @@
 
   Pressing the Bookkeeping key once more, you exit the mode and go back to the game.
 
+  ----------------------------------------------------------------------------------
 
-*******************************************************************************
+  * Pyon Pyon Jump:
+
+  The game name could be translated as "Hop Hop Jump"
+  Pyon Pyon is an onomatopoeia for hopping or jumping lightly.
+
+  How to play...
+
+  Insert tokens (medals).
+  You can bet to any (or all) of the following 5 characters: Boketa, Kunio, Pyon-Pyon,
+  Pyokorin and Botechin. Press start, and the river's pads start to roll. You'll win
+  if your character gets the three pads to jump to the other side of the river.
+
+  There is also a bonus game with a black tadpole rounding some pads with extra credits.
+  you'll get the extra credits marked in the pad where the tadpole stopped.
+
+  Bookkeeping...
+
+  Pressing Bookkeeping key (key 0), you enter the Bookkeeping Mode. There are
+  2 screens with all the game information like DIP switches and statistics...
+
+  1st screen...
+
+  - [Left panel]:  All the DIP switches parameters.
+
+  - [Right panel]: Bet and Win totals, 100Y/10Y/medal IN/OUT, total of games,
+                   won, loss, won by paid range, and 'omake' (extra/bonus).
+
+  2nd screen (press Bookkeeping key again)...
+
+  - Win distribution by character
+   (Boketa, Kunio, Pyon-Pyon, Pyokorin and Botechin).
+
+  - Bet distribution (1, 2, 3, 4, 5~10)
+
+  - Omake (bonus) distribution (games total, win games, loss games)
+
+  Pressing the Bookkeeping key once more, you exit the mode and go back to the game.
+
+
+************************************************************************************
 
   ADPCM Samples....
 
-  There are 14 samples in the system.
+  There are 14 samples in Kuru Kuru Pyon Pyon.
 
-  00: "Boterin"
+  00: "Botechin"
   01:
-  02: "Hakase" ("professor")
+  02: "Hakase" (professor)
   03: "Pyokorin"
   04: "Kunio"
-  05: "Pyon Pyon"
-  06:
+  05: "Pyon-Pyon"
+  06: "Boketa"
   07:
   08: "Oume"
-  09: "Haipaa" ("hyper")
-  10: "Ichi ni tsuite" ("on your marks")
-  11: "Youi" ("get ready")
-  12: Bang sound for the tadpoles landing in the right panel.
+  09: "Haipaa" (hyper)
+  10: "Ichi ni tsuite" (on your marks)
+  11: "Youi" (get ready)
+  12: "Bang" (sound for the tadpoles landing in the right panel).
   13: Sound effect for reels when running.
 
+  The fact that there are samples for "on your marks", "get ready", and "bang",
+  make me think that these sounds could be shared with the other unemulated marathon
+  game of the series called just "Pyon Pyon".
 
-******************************************************************************/
+***********************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -385,7 +437,7 @@ ADDRESS_MAP_END
 /*
 
  00h  W --> bankswitching reg...
- 
+
  10h  W --> 00's           \
  11h  W --> 02 8f 20 91...  > V9938 OK
  13h  W -->                /
@@ -491,11 +543,11 @@ static INPUT_PORTS_START( kurukuru )
 /*  bits d0-d3 are JAMMA top side pins 20,21,22,23, bits d4-d7 are JAMMA bottom side pins 20,21,22,23
     so that's player 1 left/right/button1/button2 then player 2 left/right/button1/button2
 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("1st (Bote)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("2nd (Oume)")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("3rd (Pyoko)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("4th (Kunio)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("5th (Pyon Pyon)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("1st (Bote/Botechin)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("2nd (Oume)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("3rd (Pyoko/Pyokorin)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("4th (Kunio)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("5th (Pyon-Pyon)")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_N) PORT_NAME("Unknown A0h - bit5")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_M) PORT_NAME("Unknown A0h - bit6")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
@@ -504,9 +556,9 @@ static INPUT_PORTS_START( kurukuru )
 /*  routed to JAMMA top side 15, bottom 15, top 16, bottom 16, top 17, bottom 17, top 24, bottom 24
     so that's test, tilt/slam, coin 1, coin 2, p1 start, p2 start, p1 button 3, p2 button 3
 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Bookkeeping")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Medal In")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Reset Button")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Reset Button")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_A) PORT_NAME("Unknown B0h - bit4")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE (2)
@@ -568,19 +620,19 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ppj )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("1st (Boketa)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("2nd (Kunio)")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("3rd (Pyon-Pyon)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("4th (Pyokorin)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("5th (Botechin)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("1st (Boketa)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("2nd (Kunio)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("3rd (Pyon-Pyon)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("4th (Pyokorin)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("5th (Botechin)")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_S) PORT_NAME("Unknown 70h - bit5")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_D) PORT_NAME("Unknown 70h - bit6")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Bookkeeping")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Medal In")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Reset Button")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Reset Button")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_A) PORT_NAME("Unknown 60h - bit4")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE (2)
@@ -729,13 +781,12 @@ static MACHINE_CONFIG_START( ppj, kurukuru_state )
 MACHINE_CONFIG_END
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************************
+*                 ROMs Loading                   *
+*************************************************/
 
 /*  Kuru Kuru Pyon Pyon.
+    1990, Success / Taiyo Jidoki.
 */
 ROM_START( kurukuru )
 	ROM_REGION( 0x08000, "maincpu", 0 )
@@ -759,6 +810,7 @@ ROM_END
 
 /*  Pyon Pyon Jump.
     Ver 1.40.
+    199?, Success / Taiyo Jidoki.
 */
 ROM_START( ppj )
 	ROM_REGION( 0x08000, "maincpu", 0 )
@@ -781,6 +833,15 @@ ROM_START( ppj )
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                   FULLNAME                        FLAGS  */
-GAME( 199?, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   0 )
+/***************************************************************************
+*                              Game Drivers                                *
+***************************************************************************/
+
+/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                   FULLNAME                          FLAGS  */
+GAME( 1990, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",     0 )
 GAME( 199?, ppj,      0,      ppj,      ppj,      driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", 0 )
+
+// unemulated....
+
+//    199?, Success / Taiyo Jidoki, Pyon Pyon
+//    1990, Success / Taiyo Jidoki, Sui Sui Pyon Pyon

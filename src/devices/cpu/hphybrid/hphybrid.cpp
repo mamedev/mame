@@ -619,7 +619,7 @@ UINT16 hp_hybrid_cpu_device::execute_one_sub(UINT16 opcode)
 void hp_hybrid_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	if (entry.index() == STATE_GENFLAGS) {
-		strprintf(str, "%s %s %c %c",
+		str = string_format("%s %s %c %c",
 					BIT(m_flags , HPHYBRID_DB_BIT) ? "Db":"..",
 					BIT(m_flags , HPHYBRID_CB_BIT) ? "Cb":"..",
 					BIT(m_flags , HPHYBRID_O_BIT) ? 'O':'.',
@@ -673,12 +673,7 @@ UINT16 hp_hybrid_cpu_device::RM(UINT32 addr)
 						return RIO(CURRENT_PA , addr_wo_bsc - HP_REG_R4_ADDR);
 
 				case HP_REG_IV_ADDR:
-						// Correct?
-						if (!BIT(m_flags , HPHYBRID_IRH_SVC_BIT) && !BIT(m_flags , HPHYBRID_IRL_SVC_BIT)) {
-								return m_reg_IV;
-						} else {
-								return m_reg_IV | CURRENT_PA;
-						}
+										return m_reg_IV;
 
 				case HP_REG_PA_ADDR:
 						return CURRENT_PA;
@@ -1021,7 +1016,7 @@ void hp_hybrid_cpu_device::check_for_interrupts(void)
 
 				// Do a double-indirect JSM IV,I instruction
 				WM(AEC_CASE_C , ++m_reg_R , m_reg_P);
-				m_reg_P = RM(AEC_CASE_I , RM(HP_REG_IV_ADDR));
+				m_reg_P = RM(AEC_CASE_I , m_reg_IV + CURRENT_PA);
 				m_reg_I = fetch();
 }
 

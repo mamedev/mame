@@ -13,8 +13,8 @@
   1st revision:
 
   Spelling B (US), 1978
-  - TMS0270 MCU TMC0272 (die labeled 0272A T0270B)
-  - TMS1980 MCU TMC1984 (die labeled 1980A 84A)
+  - TMS0270 MCU TMC0272 (die label 0272A T0270B)
+  - TMS1980 MCU TMC1984 (die label 1980A 84A)
   - 8-digit cyan VFD display (seen with and without apostrophe)
 
   Spelling ABC (UK), 1979: exact same hardware as US version
@@ -26,6 +26,7 @@
   - TMC0355 4KB VSM ROM CD2602*
   - 8-digit cyan VFD display
   - 1-bit sound (indicated by a music note symbol on the top-right of the casing)
+  - note: much rarer than the 1978 version, not much luck finding one on eBay
 
   Spelling ABC (UK), 1979: exact same hardware as US version
 
@@ -82,6 +83,7 @@ public:
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
 	void power_off();
 	void prepare_display();
+	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
 
 	DECLARE_READ8_MEMBER(main_read_k);
 	DECLARE_WRITE16_MEMBER(main_write_o);
@@ -104,7 +106,6 @@ protected:
 void tispellb_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
-	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
 
 	// zerofill
 	m_rev1_ctl = 0;
@@ -138,9 +139,10 @@ void tispellb_state::power_off()
 
 void tispellb_state::prepare_display()
 {
-	// same as snspell
-	UINT16 gridmask = (m_display_decay[15][16] != 0) ? 0xffff : 0x8000;
-	display_matrix_seg(16+1, 16, m_plate | 0x10000, m_grid & gridmask, 0x3fff);
+	// almost same as snspell
+	UINT16 gridmask = vfd_filament_on() ? 0xffff : 0x8000;
+	set_display_segmask(0xff, 0x3fff);
+	display_matrix(16+1, 16, m_plate | 1<<16, m_grid & gridmask);
 }
 
 WRITE16_MEMBER(tispellb_state::main_write_o)
@@ -153,7 +155,7 @@ WRITE16_MEMBER(tispellb_state::main_write_o)
 WRITE16_MEMBER(tispellb_state::main_write_r)
 {
 	// R13: power-off request, on falling edge
-	if ((m_r >> 13 & 1) && !(data >> 13 & 1))
+	if (~data & m_r & 0x2000)
 		power_off();
 
 	// R0-R6: input mux

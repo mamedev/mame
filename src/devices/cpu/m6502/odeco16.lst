@@ -1,3 +1,5 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
 # deco 16 opcodes
 brk_16_imp
 	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_state)

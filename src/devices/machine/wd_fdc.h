@@ -275,7 +275,7 @@ private:
 		WRITE_TRACK,
 		WRITE_SECTOR,
 
-		// Sub states
+		// Sub states, plus the reset-time restore request
 
 		SPINUP,
 		SPINUP_WAIT,
@@ -303,6 +303,8 @@ private:
 		SECTOR_READ,
 		SECTOR_WRITE,
 		TRACK_DONE,
+
+		INITIAL_RESTORE,
 
 		// Live states
 

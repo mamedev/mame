@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles,Paul Priest
+// copyright-holders:Aaron Giles, Paul Priest
 /***************************************************************************
 
-    validity.c
+    validity.cpp
 
     Validity checks on internal data structures.
 
@@ -12,19 +12,6 @@
 #include "validity.h"
 #include "emuopts.h"
 #include <ctype.h>
-
-
-//**************************************************************************
-//  COMPILE-TIME VALIDATION
-//**************************************************************************
-
-// if the following lines error during compile, your PTR64 switch is set incorrectly in the makefile
-#ifdef PTR64
-UINT8 your_ptr64_flag_is_wrong[(int)(sizeof(void *) - 7)];
-#else
-UINT8 your_ptr64_flag_is_wrong[(int)(5 - sizeof(void *))];
-#endif
-
 
 
 //**************************************************************************
@@ -350,9 +337,9 @@ void validity_checker::validate_core()
 
 	// check pointer size
 #ifdef PTR64
-	if (sizeof(void *) != 8) osd_printf_error("PTR64 flag enabled, but was compiled for 32-bit target\n");
+	static_assert(sizeof(void *) == 8, "PTR64 flag enabled, but was compiled for 32-bit target\n");
 #else
-	if (sizeof(void *) != 4) osd_printf_error("PTR64 flag not enabled, but was compiled for 64-bit target\n");
+	static_assert(sizeof(void *) == 4, "PTR64 flag not enabled, but was compiled for 64-bit target\n");
 #endif
 
 	// TODO: check if this is actually working
@@ -377,9 +364,6 @@ void validity_checker::validate_inlines()
 #undef rand
 	volatile UINT64 testu64a = rand() ^ (rand() << 15) ^ ((UINT64)rand() << 30) ^ ((UINT64)rand() << 45);
 	volatile INT64 testi64a = rand() ^ (rand() << 15) ^ ((INT64)rand() << 30) ^ ((INT64)rand() << 45);
-#ifdef PTR64
-	volatile INT64 testi64b = rand() ^ (rand() << 15) ^ ((INT64)rand() << 30) ^ ((INT64)rand() << 45);
-#endif
 	volatile UINT32 testu32a = rand() ^ (rand() << 15);
 	volatile UINT32 testu32b = rand() ^ (rand() << 15);
 	volatile INT32 testi32a = rand() ^ (rand() << 15);
@@ -395,10 +379,6 @@ void validity_checker::validate_inlines()
 	if (testu64a == 0) testu64a++;
 	if (testi64a == 0) testi64a++;
 	else if (testi64a < 0) testi64a = -testi64a;
-#ifdef PTR64
-	if (testi64b == 0) testi64b++;
-	else if (testi64b < 0) testi64b = -testi64b;
-#endif
 	if (testu32a == 0) testu32a++;
 	if (testu32b == 0) testu32b++;
 	if (testi32a == 0) testi32a++;
@@ -497,23 +477,6 @@ void validity_checker::validate_inlines()
 	testi32a = (testi32a | 0xffff0000) & ~0x400000;
 	if (count_leading_ones(testi32a) != 9)
 		osd_printf_error("Error testing count_leading_ones\n");
-
-	testi32b = testi32a;
-	if (compare_exchange32(&testi32a, testi32b, 1000) != testi32b || testi32a != 1000)
-		osd_printf_error("Error testing compare_exchange32\n");
-#ifdef PTR64
-	testi64b = testi64a;
-	if (compare_exchange64(&testi64a, testi64b, 1000) != testi64b || testi64a != 1000)
-		osd_printf_error("Error testing compare_exchange64\n");
-#endif
-	if (atomic_exchange32(&testi32a, testi32b) != 1000)
-		osd_printf_error("Error testing atomic_exchange32\n");
-	if (atomic_add32(&testi32a, 45) != testi32b + 45)
-		osd_printf_error("Error testing atomic_add32\n");
-	if (atomic_increment32(&testi32a) != testi32b + 46)
-		osd_printf_error("Error testing atomic_increment32\n");
-	if (atomic_decrement32(&testi32a) != testi32b + 45)
-		osd_printf_error("Error testing atomic_decrement32\n");
 }
 
 

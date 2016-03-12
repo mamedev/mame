@@ -58,10 +58,10 @@
  @88      HD38820A  1984, Bandai Pair Match (PT-460) (1/2)
  @89      HD38820A  1984, Bandai Pair Match (PT-460) (2/2)
 
- *75      HD44801A  1982, Alpha 8201 protection MCU (have dump)
+  75      HD44801A  1982, Alpha 8201 protection MCU -> machine/alpha8201.*
 
- *35      HD44801B  1983, Alpha 8302 protection MCU (have dump)
- *42      HD44801B  1984, Alpha 8303 protection MCU (have dump)
+  35      HD44801B  1983, Alpha 8302 protection MCU (see 8201)
+  42      HD44801B  1984, Alpha 8303 protection MCU (see 8201)
 
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
@@ -138,7 +138,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
-	void display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety);
+	void display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;
@@ -267,7 +267,7 @@ void hh_hmcs40_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety)
+void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
@@ -276,9 +276,12 @@ void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT64 setx, UINT32 set
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (U64(1) << maxx)) : 0;
 
-	display_update();
+	if (update)
+		display_update();
 }
 
+
+// generic input handlers
 
 UINT16 hh_hmcs40_state::read_inputs(int columns)
 {
@@ -330,7 +333,7 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
 /***************************************************************************
 
   Bambino Dribble Away Basketball (manufactured in Japan)
-  * PCBs are labeled Emix Corp. ET-05
+  * PCB label Emix Corp. ET-05
   * Hitachi HD38750A08 MCU
   * green VFD display Emix-106, with bezel overlay
 
@@ -440,7 +443,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Bambino Knock-Em Out Boxing
-  * PCBs are labeled Emix Corp. ET-06B
+  * PCB label Emix Corp. ET-06B
   * Hitachi HD38750A07 MCU
   * cyan VFD display Emix-103, with blue or green color overlay
 
@@ -574,7 +577,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Bandai Frisky Tom (manufactured in Japan)
-  * PCBs are labeled Kaken Corp., PT-327A
+  * PCB label Kaken Corp., PT-327A
   * Hitachi HD38800A77 MCU
   * cyan/red/green VFD display Futaba DM-43ZK 2E
 
@@ -804,7 +807,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Bandai/Mattel Star Hawk (manufactured in Japan)
-  * PCBs are labeled Kaken, PT-317B
+  * PCB label Kaken, PT-317B
   * Hitachi HD38800A73 MCU
   * cyan/red VFD display Futaba DM-41ZK, with partial color overlay + bezel
 
@@ -2620,7 +2623,7 @@ INPUT_PORTS_END
   Entex Turtles (manufactured in Japan)
   * PCB label 560359
   * Hitachi QFP HD38820A43 MCU
-  * COP411L sub MCU, labeled COP411L-KED/N
+  * COP411L sub MCU, label COP411L-KED/N
   * cyan/red/green VFD display NEC FIP15BM32T
 
   NOTE!: MAME external artwork is required
@@ -2785,7 +2788,7 @@ static MACHINE_CONFIG_START( eturtles, eturtles_state )
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(eturtles_state, grid_w))
 
 	MCFG_CPU_ADD("audiocpu", COP411, 215000) // approximation
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED) // guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_SK_CB(WRITELINE(eturtles_state, speaker_w))
 	MCFG_COP400_WRITE_D_CB(WRITE8(eturtles_state, cop_irq_w))
 	MCFG_COP400_READ_L_CB(READ8(eturtles_state, cop_latch_r))
@@ -2811,7 +2814,7 @@ MACHINE_CONFIG_END
   Entex Stargate (manufactured in Japan)
   * PCB label 5603521/31
   * Hitachi QFP HD38820A42 MCU
-  * COP411L sub MCU, labeled ~/B8236 COP411L-KEC/N
+  * COP411L sub MCU, label ~/B8236 COP411L-KEC/N
   * cyan/red/green VFD display NEC FIP15AM32T (EL628-003) no. 2-421, with partial color overlay
 
   NOTE!: MAME external artwork is required
@@ -2892,7 +2895,7 @@ static MACHINE_CONFIG_START( estargte, estargte_state )
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(eturtles_state, grid_w))
 
 	MCFG_CPU_ADD("audiocpu", COP411, 190000) // approximation
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED) // guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_SK_CB(WRITELINE(eturtles_state, speaker_w))
 	MCFG_COP400_WRITE_D_CB(WRITE8(eturtles_state, cop_irq_w))
 	MCFG_COP400_READ_L_CB(READ8(estargte_state, cop_data_r))
@@ -3400,8 +3403,7 @@ static INPUT_PORTS_START( mwcbaseb )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("P1 1")
 INPUT_PORTS_END
 
-
-static const INT16 mwcbaseb_speaker_levels[] = { 0, 16384, -16384, 0, -16384, 0, -32768, -16384 };
+static const INT16 mwcbaseb_speaker_levels[] = { 0, 0x3fff, -0x4000, 0, -0x4000, 0, -0x8000, -0x4000 };
 
 static MACHINE_CONFIG_START( mwcbaseb, mwcbaseb_state )
 
@@ -3518,7 +3520,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy Kingman (manufactured in Japan)
-  * PCBs are labeled THF-01II 2E138E01/2E128E02
+  * PCB label THF-01II 2E138E01/2E128E02
   * Hitachi HD38800B23 MCU
   * cyan/red/blue VFD display Futaba DM-65ZK 3A
 
@@ -3637,7 +3639,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Tron (manufactured in Japan)
-  * PCBs are labeled THN-02 2E114E07
+  * PCB label THN-02 2E114E07
   * Hitachi HD38800A88 MCU
   * cyan/red/green VFD display NEC FIP10AM24T no. 2-8 1
 

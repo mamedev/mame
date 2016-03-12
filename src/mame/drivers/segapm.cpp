@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Sega Picture Magic (codename JANUS) */
 // http://segaretro.org/Sega_Picture_Magic
 

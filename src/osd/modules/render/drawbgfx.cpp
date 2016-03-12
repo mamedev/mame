@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic,Dario Manesku,Branimir Karadzic,Aaron Giles
+// copyright-holders:Miodrag Milanovic,Ryan Holtz,Dario Manesku,Branimir Karadzic,Aaron Giles
 //============================================================
 //
-//  drawbgfx.c - BGFX drawer
+//  drawbgfx.cpp - BGFX renderer
 //
 //============================================================
 #define __STDC_LIMIT_MACROS
@@ -14,11 +14,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #if defined(SDLMAME_WIN32)
-#if (SDLMAME_SDL2)
 #include <SDL2/SDL_syswm.h>
-#else
-#include <SDL/SDL_syswm.h>
-#endif
 #endif
 #else
 #include "sdlinc.h"
@@ -32,6 +28,18 @@
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 #include <bx/readerwriter.h>
+#include <algorithm>
+
+#include "drawbgfx.h"
+#include "bgfx/texturemanager.h"
+#include "bgfx/targetmanager.h"
+#include "bgfx/shadermanager.h"
+#include "bgfx/effectmanager.h"
+#include "bgfx/chainmanager.h"
+#include "bgfx/effect.h"
+#include "bgfx/texture.h"
+#include "bgfx/target.h"
+#include "bgfx/chain.h"
 
 //============================================================
 //  DEBUGGING
@@ -41,9 +49,15 @@
 //  CONSTANTS
 //============================================================
 
+const uint16_t renderer_bgfx::CACHE_SIZE = 1024;
+const uint32_t renderer_bgfx::PACKABLE_SIZE = 128;
+const uint32_t renderer_bgfx::WHITE_HASH = 0x87654321;
+
 //============================================================
 //  MACROS
 //============================================================
+
+#define GIBBERISH   (0)
 
 //============================================================
 //  INLINES
@@ -54,88 +68,11 @@
 //  TYPES
 //============================================================
 
-
-/* sdl_info is the information about SDL for the current screen */
-class renderer_bgfx : public osd_renderer
-{
-public:
-	renderer_bgfx(osd_window *w)
-	: osd_renderer(w, FLAG_NONE),
-		m_dimensions(0,0)
-	{}
-
-	virtual int create() override;
-	virtual int draw(const int update) override;
-#ifdef OSD_SDL
-	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
-#else
-	virtual void save() override { }
-	virtual void record() override { }
-	virtual void toggle_fsfx() override { }
-#endif
-	virtual void destroy() override;
-	virtual render_primitive_list *get_primitives() override
-	{
-		osd_dim wdim = window().get_size();
-		window().target()->set_bounds(wdim.width(), wdim.height(), window().aspect());
-		return &window().target()->get_primitives();
-	}
-
-	bgfx::ProgramHandle m_progQuad;
-	bgfx::ProgramHandle m_progQuadTexture;
-	bgfx::ProgramHandle m_progLine;
-	bgfx::UniformHandle m_s_texColor;
-	bgfx::FrameBufferHandle fbh;
-	// Original display_mode
-	osd_dim			m_dimensions;
-};
-
-
-//============================================================
-//  PROTOTYPES
-//============================================================
-
-// core functions
-static void drawbgfx_exit(void);
-
-//============================================================
-//  drawnone_create
-//============================================================
-
-static osd_renderer *drawbgfx_create(osd_window *window)
-{
-	return global_alloc(renderer_bgfx(window));
-}
-
-//============================================================
-//  drawbgfx_init
-//============================================================
-
-int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks)
-{
-	// fill in the callbacks
-	//memset(callbacks, 0, sizeof(*callbacks));
-	callbacks->exit = drawbgfx_exit;
-	callbacks->create = drawbgfx_create;
-
-	return 0;
-}
-
-//============================================================
-//  drawbgfx_exit
-//============================================================
-
-static void drawbgfx_exit(void)
-{
-	// Shutdown bgfx.
-	bgfx::shutdown();
-}
+bool renderer_bgfx::s_window_set = false;
 
 //============================================================
 //  renderer_bgfx::create
 //============================================================
-bgfx::ProgramHandle loadProgram(const char* _vsName, const char* _fsName);
-
 
 #ifdef OSD_SDL
 static void* sdlNativeWindowHandle(SDL_Window* _window)
@@ -144,16 +81,20 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 	SDL_VERSION(&wmi.version);
 	if (!SDL_GetWindowWMInfo(_window, &wmi))
 	{
-		return NULL;
+		return nullptr;
 	}
 
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
+#   if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
 	return (void*)wmi.info.x11.window;
-#	elif BX_PLATFORM_OSX
+#   elif BX_PLATFORM_OSX
 	return wmi.info.cocoa.window;
-#	elif BX_PLATFORM_WINDOWS
+#   elif BX_PLATFORM_WINDOWS
 	return wmi.info.win.window;
-#	endif // BX_PLATFORM_
+#   elif BX_PLATFORM_STEAMLINK
+	return wmi.info.vivante.window;
+#   elif BX_PLATFORM_EMSCRIPTEN
+	return nullptr;
+#   endif // BX_PLATFORM_
 }
 #endif
 
@@ -162,53 +103,91 @@ int renderer_bgfx::create()
 	// create renderer
 
 	osd_dim wdim = window().get_size();
+	m_width[window().m_index] = wdim.width();
+	m_height[window().m_index] = wdim.height();
 	if (window().m_index == 0)
 	{
+		if (!s_window_set)
+		{
+			s_window_set = true;
+			ScreenVertex::init();
+		}
+		else
+		{
+			bgfx::shutdown();
+			bgfx::PlatformData blank_pd;
+			memset(&blank_pd, 0, sizeof(bgfx::PlatformData));
+			bgfx::setPlatformData(blank_pd);
+		}
 #ifdef OSD_WINDOWS
 		bgfx::winSetHwnd(window().m_hwnd);
 #else
 		bgfx::sdlSetWindow(window().sdl_window());
 #endif
 		bgfx::init();
-		bgfx::reset(wdim.width(), wdim.height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+		bgfx::reset(m_width[window().m_index], m_height[window().m_index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 		// Enable debug text.
-		bgfx::setDebug(BGFX_DEBUG_TEXT); //BGFX_DEBUG_STATS
-		m_dimensions = osd_dim(wdim.width(), wdim.height());
+		bgfx::setDebug(window().machine().options().verbose() ? BGFX_DEBUG_STATS : BGFX_DEBUG_TEXT);
+		m_dimensions = osd_dim(m_width[0], m_height[0]);
 	}
-	else {
+
+	m_textures = new texture_manager();
+	m_targets = new target_manager(*m_textures);
+	m_shaders = new shader_manager();
+	m_effects = new effect_manager(*m_shaders);
+	m_chains = new chain_manager(*m_textures, *m_targets, *m_effects, m_width[window().m_index], m_height[window().m_index]);
+
+	if (window().m_index != 0)
+	{
 #ifdef OSD_WINDOWS
-		fbh = bgfx::createFrameBuffer(window().m_hwnd, wdim.width(), wdim.height());
+		m_framebuffer = m_targets->create_target("backbuffer", window().m_hwnd, m_width[window().m_index], m_height[window().m_index]);
 #else
-		fbh = bgfx::createFrameBuffer(sdlNativeWindowHandle(window().sdl_window()), wdim.width(), wdim.height());
+		m_framebuffer = m_targets->create_target("backbuffer", sdlNativeWindowHandle(window().sdl_window()), m_width[window().m_index], m_height[window().m_index]);
 #endif
 		bgfx::touch(window().m_index);
 	}
+
 	// Create program from shaders.
-	m_progQuad = loadProgram("vs_quad", "fs_quad");
-	m_progQuadTexture = loadProgram("vs_quad_texture", "fs_quad_texture");
-	m_progLine = loadProgram("vs_line", "fs_line");
-	m_s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
+	m_gui_effect[0] = m_effects->effect("gui_opaque");
+	m_gui_effect[1] = m_effects->effect("gui_blend");
+	m_gui_effect[2] = m_effects->effect("gui_multiply");
+	m_gui_effect[3] = m_effects->effect("gui_add");
+
+	m_screen_effect[0] = m_effects->effect("screen_opaque");
+	m_screen_effect[1] = m_effects->effect("screen_blend");
+	m_screen_effect[2] = m_effects->effect("screen_multiply");
+	m_screen_effect[3] = m_effects->effect("screen_add");
+
+	//m_screen_chain[0] = m_chains->chain("test");
+
+	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
+	m_texture_cache = m_textures->create_texture("#cache", bgfx::TextureFormat::RGBA8, CACHE_SIZE, CACHE_SIZE, nullptr, flags);
+
+	memset(m_white, 0xff, sizeof(uint32_t) * 16 * 16);
+	m_texinfo.push_back(rectangle_packer::packable_rectangle(WHITE_HASH, PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32), 16, 16, 16, nullptr, m_white));
 
 	return 0;
 }
 
 //============================================================
-//  drawbgfx_window_destroy
+//  destructor
 //============================================================
 
-void renderer_bgfx::destroy()
+renderer_bgfx::~renderer_bgfx()
 {
-	if (window().m_index > 0) 
-	{
-		bgfx::destroyFrameBuffer(fbh);
-	}
-	bgfx::destroyUniform(m_s_texColor);
 	// Cleanup.
-	bgfx::destroyProgram(m_progQuad);
-	bgfx::destroyProgram(m_progQuadTexture);
-	bgfx::destroyProgram(m_progLine);
+	delete m_chains;
+	delete m_effects;
+	delete m_shaders;
+	delete m_textures;
+	delete m_targets;
 }
 
+void renderer_bgfx::exit()
+{
+	bgfx::shutdown();
+	s_window_set = false;
+}
 
 //============================================================
 //  drawsdl_xy_to_render_target
@@ -227,198 +206,180 @@ int renderer_bgfx::xy_to_render_target(int x, int y, int *xt, int *yt)
 }
 #endif
 
-static const bgfx::Memory* loadMem(bx::FileReaderI* _reader, const char* _filePath)
-{
-	if (bx::open(_reader, _filePath))
-	{
-		uint32_t size = (uint32_t)bx::getSize(_reader);
-		const bgfx::Memory* mem = bgfx::alloc(size + 1);
-		bx::read(_reader, mem->data, size);
-		bx::close(_reader);
-		mem->data[mem->size - 1] = '\0';
-		return mem;
-	}
-
-	return NULL;
-}
-static bgfx::ShaderHandle loadShader(bx::FileReaderI* _reader, const char* _name)
-{
-	char filePath[512];
-
-	const char* shaderPath = "shaders/dx9/";
-
-	switch (bgfx::getRendererType())
-	{
-	case bgfx::RendererType::Direct3D11:
-	case bgfx::RendererType::Direct3D12:
-		shaderPath = "shaders/dx11/";
-		break;
-
-	case bgfx::RendererType::OpenGL:
-		shaderPath = "shaders/glsl/";
-		break;
-
-	case bgfx::RendererType::Metal:
-		shaderPath = "shaders/metal/";
-		break;
-
-	case bgfx::RendererType::OpenGLES:
-		shaderPath = "shaders/gles/";
-		break;
-
-	default:
-		break;
-	}
-
-	strcpy(filePath, shaderPath);
-	strcat(filePath, _name);
-	strcat(filePath, ".bin");
-
-	return bgfx::createShader(loadMem(_reader, filePath));
-}
-
-bgfx::ProgramHandle loadProgram(bx::FileReaderI* _reader, const char* _vsName, const char* _fsName)
-{
-	bgfx::ShaderHandle vsh = loadShader(_reader, _vsName);
-	bgfx::ShaderHandle fsh = BGFX_INVALID_HANDLE;
-	if (NULL != _fsName)
-	{
-		fsh = loadShader(_reader, _fsName);
-	}
-
-	return bgfx::createProgram(vsh, fsh, true /* destroy shaders when program is destroyed */);
-}
-static auto s_fileReader = new bx::CrtFileReader;
-
-bgfx::ProgramHandle loadProgram(const char* _vsName, const char* _fsName)
-{
-	
-	return loadProgram(s_fileReader, _vsName, _fsName);
-}
 //============================================================
 //  drawbgfx_window_draw
 //============================================================
 
-struct PosColorTexCoord0Vertex
-{
-	float m_x;
-	float m_y;
-	float m_z;
-	uint32_t m_rgba;
-	float m_u;
-	float m_v;
+bgfx::VertexDecl renderer_bgfx::ScreenVertex::ms_decl;
 
-	static void init()
+void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, ScreenVertex* vertex)
+{
+	rectangle_packer::packed_rectangle& rect = m_hash_to_entry[hash];
+	float u0 = float(rect.x()) / float(CACHE_SIZE);
+	float v0 = float(rect.y()) / float(CACHE_SIZE);
+	float u1 = u0 + float(rect.width()) / float(CACHE_SIZE);
+	float v1 = v0 + float(rect.height()) / float(CACHE_SIZE);
+	u1 -= 0.5f / float(CACHE_SIZE);
+	v1 -= 0.5f / float(CACHE_SIZE);
+	u0 += 0.5f / float(CACHE_SIZE);
+	v0 += 0.5f / float(CACHE_SIZE);
+	UINT32 rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
+
+	float x[4] = { prim->bounds.x0, prim->bounds.x1, prim->bounds.x0, prim->bounds.x1 };
+	float y[4] = { prim->bounds.y0, prim->bounds.y0, prim->bounds.y1, prim->bounds.y1 };
+	float u[4] = { u0, u1, u0, u1 };
+	float v[4] = { v0, v0, v1, v1 };
+
+	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_SWAP_XY)
 	{
-		ms_decl.begin()
-			.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-			.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-			.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-			.end();
+		std::swap(u[1], u[2]);
+		std::swap(v[1], v[2]);
 	}
 
-	static bgfx::VertexDecl ms_decl;
-};
-bgfx::VertexDecl PosColorTexCoord0Vertex::ms_decl;
-
-void screenQuad(float _x1
-	, float _y1
-	, float _x2
-	, float _y2
-	, uint32_t _abgr
-	, render_quad_texuv uv
-	)
-{
-	if (bgfx::checkAvailTransientVertexBuffer(6, PosColorTexCoord0Vertex::ms_decl))
+	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_FLIP_X)
 	{
-		bgfx::TransientVertexBuffer vb;
-		bgfx::allocTransientVertexBuffer(&vb, 6, PosColorTexCoord0Vertex::ms_decl);
-		PosColorTexCoord0Vertex* vertex = (PosColorTexCoord0Vertex*)vb.data;
-
-		const float minx = _x1;
-		const float miny = _y1;
-		const float maxx = _x2;
-		const float maxy = _y2;
-		const float zz = 0.0f;
-
-		vertex[0].m_x = minx;
-		vertex[0].m_y = miny;
-		vertex[0].m_z = zz;
-		vertex[0].m_rgba = _abgr;
-		vertex[0].m_u = uv.tl.u;
-		vertex[0].m_v = uv.tl.v;
-
-		vertex[1].m_x = maxx;
-		vertex[1].m_y = miny;
-		vertex[1].m_z = zz;
-		vertex[1].m_rgba = _abgr;
-		vertex[1].m_u = uv.tr.u;
-		vertex[1].m_v = uv.tr.v;
-
-		vertex[2].m_x = maxx;
-		vertex[2].m_y = maxy;
-		vertex[2].m_z = zz;
-		vertex[2].m_rgba = _abgr;
-		vertex[2].m_u = uv.br.u;
-		vertex[2].m_v = uv.br.v;
-
-		vertex[3].m_x = maxx;
-		vertex[3].m_y = maxy;
-		vertex[3].m_z = zz;
-		vertex[3].m_rgba = _abgr;
-		vertex[3].m_u = uv.br.u;
-		vertex[3].m_v = uv.br.v;
-
-		vertex[4].m_x = minx;
-		vertex[4].m_y = maxy;
-		vertex[4].m_z = zz;
-		vertex[4].m_rgba = _abgr;
-		vertex[4].m_u = uv.bl.u;
-		vertex[4].m_v = uv.bl.v;
-
-		vertex[5].m_x = minx;
-		vertex[5].m_y = miny;
-		vertex[5].m_z = zz;
-		vertex[5].m_rgba = _abgr;
-		vertex[5].m_u = uv.tl.u;
-		vertex[5].m_v = uv.tl.v;
-		bgfx::setVertexBuffer(&vb);
+		std::swap(u[0], u[1]);
+		std::swap(v[0], v[1]);
+		std::swap(u[2], u[3]);
+		std::swap(v[2], v[3]);
 	}
+
+	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_FLIP_Y)
+	{
+		std::swap(u[0], u[2]);
+		std::swap(v[0], v[2]);
+		std::swap(u[1], u[3]);
+		std::swap(v[1], v[3]);
+	}
+
+	vertex[0].m_x = x[0]; // 0
+	vertex[0].m_y = y[0];
+	vertex[0].m_z = 0;
+	vertex[0].m_rgba = rgba;
+	vertex[0].m_u = u[0];
+	vertex[0].m_v = v[0];
+
+	vertex[1].m_x = x[1]; // 1
+	vertex[1].m_y = y[1];
+	vertex[1].m_z = 0;
+	vertex[1].m_rgba = rgba;
+	vertex[1].m_u = u[1];
+	vertex[1].m_v = v[1];
+
+	vertex[2].m_x = x[3]; // 3
+	vertex[2].m_y = y[3];
+	vertex[2].m_z = 0;
+	vertex[2].m_rgba = rgba;
+	vertex[2].m_u = u[3];
+	vertex[2].m_v = v[3];
+
+	vertex[3].m_x = x[3]; // 3
+	vertex[3].m_y = y[3];
+	vertex[3].m_z = 0;
+	vertex[3].m_rgba = rgba;
+	vertex[3].m_u = u[3];
+	vertex[3].m_v = v[3];
+
+	vertex[4].m_x = x[2]; // 2
+	vertex[4].m_y = y[2];
+	vertex[4].m_z = 0;
+	vertex[4].m_rgba = rgba;
+	vertex[4].m_u = u[2];
+	vertex[4].m_v = v[2];
+
+	vertex[5].m_x = x[0]; // 0
+	vertex[5].m_y = y[0];
+	vertex[5].m_z = 0;
+	vertex[5].m_rgba = rgba;
+	vertex[5].m_u = u[0];
+	vertex[5].m_v = v[0];
 }
 
-
-struct PosColorVertex
+void renderer_bgfx::render_textured_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer)
 {
-	float m_x;
-	float m_y;
-	uint32_t m_abgr;
+	ScreenVertex* vertex = (ScreenVertex*)buffer->data;
 
-	static void init()
+	UINT32 rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
+
+	vertex[0].m_x = prim->bounds.x0;
+	vertex[0].m_y = prim->bounds.y0;
+	vertex[0].m_z = 0;
+	vertex[0].m_rgba = rgba;
+	vertex[0].m_u = prim->texcoords.tl.u;
+	vertex[0].m_v = prim->texcoords.tl.v;
+
+	vertex[1].m_x = prim->bounds.x1;
+	vertex[1].m_y = prim->bounds.y0;
+	vertex[1].m_z = 0;
+	vertex[1].m_rgba = rgba;
+	vertex[1].m_u = prim->texcoords.tr.u;
+	vertex[1].m_v = prim->texcoords.tr.v;
+
+	vertex[2].m_x = prim->bounds.x1;
+	vertex[2].m_y = prim->bounds.y1;
+	vertex[2].m_z = 0;
+	vertex[2].m_rgba = rgba;
+	vertex[2].m_u = prim->texcoords.br.u;
+	vertex[2].m_v = prim->texcoords.br.v;
+
+	vertex[3].m_x = prim->bounds.x1;
+	vertex[3].m_y = prim->bounds.y1;
+	vertex[3].m_z = 0;
+	vertex[3].m_rgba = rgba;
+	vertex[3].m_u = prim->texcoords.br.u;
+	vertex[3].m_v = prim->texcoords.br.v;
+
+	vertex[4].m_x = prim->bounds.x0;
+	vertex[4].m_y = prim->bounds.y1;
+	vertex[4].m_z = 0;
+	vertex[4].m_rgba = rgba;
+	vertex[4].m_u = prim->texcoords.bl.u;
+	vertex[4].m_v = prim->texcoords.bl.v;
+
+	vertex[5].m_x = prim->bounds.x0;
+	vertex[5].m_y = prim->bounds.y0;
+	vertex[5].m_z = 0;
+	vertex[5].m_rgba = rgba;
+	vertex[5].m_u = prim->texcoords.tl.u;
+	vertex[5].m_v = prim->texcoords.tl.v;
+	bgfx::setVertexBuffer(buffer);
+
+	uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
+	if (video_config.filter == 0)
 	{
-		ms_decl
-			.begin()
-			.add(bgfx::Attrib::Position, 2, bgfx::AttribType::Float)
-			.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-			.end();
+		texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
 	}
 
-	static bgfx::VertexDecl ms_decl;
-};
-bgfx::VertexDecl PosColorVertex::ms_decl;
+	const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(prim->flags & PRIMFLAG_TEXFORMAT_MASK,
+		prim->texture.width, prim->texture.height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
+
+	bgfx::TextureHandle texture = bgfx::createTexture2D((uint16_t)prim->texture.width, (uint16_t)prim->texture.height, 1, bgfx::TextureFormat::RGBA8, texture_flags, mem);
+
+	bgfx_effect** effects = PRIMFLAG_GET_SCREENTEX(prim->flags) ? m_screen_effect : m_gui_effect;
+	UINT32 blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
+	bgfx::setTexture(0, effects[blend]->uniform("s_tex")->handle(), texture);
+	effects[blend]->submit(view);
+
+	bgfx::destroyTexture(texture);
+}
 
 #define MAX_TEMP_COORDS 100
 
-void drawPolygon(const float* _coords, uint32_t _numCoords, float _r, uint32_t _abgr)
+void renderer_bgfx::put_polygon(const float* coords, UINT32 num_coords, float r, UINT32 rgba, ScreenVertex* vertex)
 {
-	float tempCoords[MAX_TEMP_COORDS * 2];
+	float tempCoords[MAX_TEMP_COORDS * 3];
 	float tempNormals[MAX_TEMP_COORDS * 2];
 
-	_numCoords = _numCoords < MAX_TEMP_COORDS ? _numCoords : MAX_TEMP_COORDS;
+	rectangle_packer::packed_rectangle& rect = m_hash_to_entry[WHITE_HASH];
+	float u0 = float(rect.x()) / float(CACHE_SIZE);
+	float v0 = float(rect.y()) / float(CACHE_SIZE);
 
-	for (uint32_t ii = 0, jj = _numCoords - 1; ii < _numCoords; jj = ii++)
+	num_coords = num_coords < MAX_TEMP_COORDS ? num_coords : MAX_TEMP_COORDS;
+
+	for (uint32_t ii = 0, jj = num_coords - 1; ii < num_coords; jj = ii++)
 	{
-		const float* v0 = &_coords[jj * 2];
-		const float* v1 = &_coords[ii * 2];
+		const float* v0 = &coords[jj * 3];
+		const float* v1 = &coords[ii * 3];
 		float dx = v1[0] - v0[0];
 		float dy = v1[1] - v0[1];
 		float d = sqrtf(dx * dx + dy * dy);
@@ -433,7 +394,7 @@ void drawPolygon(const float* _coords, uint32_t _numCoords, float _r, uint32_t _
 		tempNormals[jj * 2 + 1] = -dx;
 	}
 
-	for (uint32_t ii = 0, jj = _numCoords - 1; ii < _numCoords; jj = ii++)
+	for (uint32_t ii = 0, jj = num_coords - 1; ii < num_coords; jj = ii++)
 	{
 		float dlx0 = tempNormals[jj * 2 + 0];
 		float dly0 = tempNormals[jj * 2 + 1];
@@ -454,77 +415,96 @@ void drawPolygon(const float* _coords, uint32_t _numCoords, float _r, uint32_t _
 			dmy *= scale;
 		}
 
-		tempCoords[ii * 2 + 0] = _coords[ii * 2 + 0] + dmx * _r;
-		tempCoords[ii * 2 + 1] = _coords[ii * 2 + 1] + dmy * _r;
+		tempCoords[ii * 3 + 0] = coords[ii * 3 + 0] + dmx * r;
+		tempCoords[ii * 3 + 1] = coords[ii * 3 + 1] + dmy * r;
+		tempCoords[ii * 3 + 2] = coords[ii * 3 + 2];
 	}
 
-	uint32_t numVertices = _numCoords * 6 + (_numCoords - 2) * 3;
-	if (bgfx::checkAvailTransientVertexBuffer(numVertices, PosColorVertex::ms_decl))
+	int vertIndex = 0;
+	UINT32 trans = rgba & 0x00ffffff;
+	for (uint32_t ii = 0, jj = num_coords - 1; ii < num_coords; jj = ii++)
 	{
-		bgfx::TransientVertexBuffer tvb;
-		bgfx::allocTransientVertexBuffer(&tvb, numVertices, PosColorVertex::ms_decl);
-		uint32_t trans = _abgr & 0xffffff;
+		vertex[vertIndex].m_x = coords[ii * 3 + 0];
+		vertex[vertIndex].m_y = coords[ii * 3 + 1];
+		vertex[vertIndex].m_z = coords[ii * 3 + 2];
+		vertex[vertIndex].m_rgba = rgba;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
+		vertIndex++;
 
-		PosColorVertex* vertex = (PosColorVertex*)tvb.data;
-		for (uint32_t ii = 0, jj = _numCoords - 1; ii < _numCoords; jj = ii++)
-		{
-			vertex->m_x = _coords[ii * 2 + 0];
-			vertex->m_y = _coords[ii * 2 + 1];
-			vertex->m_abgr = _abgr;
-			++vertex;
+		vertex[vertIndex].m_x = coords[jj * 3 + 0];
+		vertex[vertIndex].m_y = coords[jj * 3 + 1];
+		vertex[vertIndex].m_z = coords[jj * 3 + 2];
+		vertex[vertIndex].m_rgba = rgba;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
+		vertIndex++;
 
-			vertex->m_x = _coords[jj * 2 + 0];
-			vertex->m_y = _coords[jj * 2 + 1];
-			vertex->m_abgr = _abgr;
-			++vertex;
+		vertex[vertIndex].m_x = tempCoords[jj * 3 + 0];
+		vertex[vertIndex].m_y = tempCoords[jj * 3 + 1];
+		vertex[vertIndex].m_z = tempCoords[jj * 3 + 2];
+		vertex[vertIndex].m_rgba = trans;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
+		vertIndex++;
 
-			vertex->m_x = tempCoords[jj * 2 + 0];
-			vertex->m_y = tempCoords[jj * 2 + 1];
-			vertex->m_abgr = trans;
-			++vertex;
+		vertex[vertIndex].m_x = tempCoords[jj * 3 + 0];
+		vertex[vertIndex].m_y = tempCoords[jj * 3 + 1];
+		vertex[vertIndex].m_z = tempCoords[jj * 3 + 2];
+		vertex[vertIndex].m_rgba = trans;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
+		vertIndex++;
 
-			vertex->m_x = tempCoords[jj * 2 + 0];
-			vertex->m_y = tempCoords[jj * 2 + 1];
-			vertex->m_abgr = trans;
-			++vertex;
+		vertex[vertIndex].m_x = tempCoords[ii * 3 + 0];
+		vertex[vertIndex].m_y = tempCoords[ii * 3 + 1];
+		vertex[vertIndex].m_z = tempCoords[ii * 3 + 2];
+		vertex[vertIndex].m_rgba = trans;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
+		vertIndex++;
 
-			vertex->m_x = tempCoords[ii * 2 + 0];
-			vertex->m_y = tempCoords[ii * 2 + 1];
-			vertex->m_abgr = trans;
-			++vertex;
+		vertex[vertIndex].m_x = coords[ii * 3 + 0];
+		vertex[vertIndex].m_y = coords[ii * 3 + 1];
+		vertex[vertIndex].m_z = coords[ii * 3 + 2];
+		vertex[vertIndex].m_rgba = rgba;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
+		vertIndex++;
+	}
 
-			vertex->m_x = _coords[ii * 2 + 0];
-			vertex->m_y = _coords[ii * 2 + 1];
-			vertex->m_abgr = _abgr;
-			++vertex;
-		}
+	for (uint32_t ii = 2; ii < num_coords; ++ii)
+	{
+		vertex[vertIndex].m_x = coords[0];
+		vertex[vertIndex].m_y = coords[1];
+		vertex[vertIndex].m_z = coords[2];
+		vertex[vertIndex].m_rgba = rgba;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
+		vertIndex++;
 
-		for (uint32_t ii = 2; ii < _numCoords; ++ii)
-		{
-			vertex->m_x = _coords[0];
-			vertex->m_y = _coords[1];
-			vertex->m_abgr = _abgr;
-			++vertex;
+		vertex[vertIndex].m_x = coords[(ii - 1) * 3 + 0];
+		vertex[vertIndex].m_y = coords[(ii - 1) * 3 + 1];
+		vertex[vertIndex].m_z = coords[(ii - 1) * 3 + 2];
+		vertex[vertIndex].m_rgba = rgba;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
+		vertIndex++;
 
-			vertex->m_x = _coords[(ii - 1) * 2 + 0];
-			vertex->m_y = _coords[(ii - 1) * 2 + 1];
-			vertex->m_abgr = _abgr;
-			++vertex;
-
-			vertex->m_x = _coords[ii * 2 + 0];
-			vertex->m_y = _coords[ii * 2 + 1];
-			vertex->m_abgr = _abgr;
-			++vertex;
-		}
-
-		bgfx::setVertexBuffer(&tvb);
+		vertex[vertIndex].m_x = coords[ii * 3 + 0];
+		vertex[vertIndex].m_y = coords[ii * 3 + 1];
+		vertex[vertIndex].m_z = coords[ii * 3 + 2];
+		vertex[vertIndex].m_rgba = rgba;
+		vertex[vertIndex].m_u = u0;
+		vertex[vertIndex].m_v = v0;
+		vertIndex++;
 	}
 }
 
-void drawLine(float _x0, float _y0, float _x1, float _y1, float _r, uint32_t _abgr, float _fth = 1.0f)
+void renderer_bgfx::put_line(float x0, float y0, float x1, float y1, float r, UINT32 rgba, ScreenVertex* vertex, float fth)
 {
-	float dx = _x1 - _x0;
-	float dy = _y1 - _y0;
+	float dx = x1 - x0;
+	float dy = y1 - y0;
 	float d = sqrtf(dx * dx + dy * dy);
 	if (d > 0.0001f)
 	{
@@ -535,49 +515,41 @@ void drawLine(float _x0, float _y0, float _x1, float _y1, float _r, uint32_t _ab
 
 	float nx = dy;
 	float ny = -dx;
-	float verts[4 * 2];
-	_r -= _fth;
-	_r *= 0.5f;
-	if (_r < 0.01f)
+	float verts[4 * 3];
+	r -= fth;
+	r *= 0.5f;
+	if (r < 0.01f)
 	{
-		_r = 0.01f;
+		r = 0.01f;
 	}
 
-	dx *= _r;
-	dy *= _r;
-	nx *= _r;
-	ny *= _r;
+	dx *= r;
+	dy *= r;
+	nx *= r;
+	ny *= r;
 
-	verts[0] = _x0 - dx - nx;
-	verts[1] = _y0 - dy - ny;
+	verts[0] = x0 - dx - nx;
+	verts[1] = y0 - dy - ny;
+	verts[2] = 0;
 
-	verts[2] = _x0 - dx + nx;
-	verts[3] = _y0 - dy + ny;
+	verts[3] = x0 - dx + nx;
+	verts[4] = y0 - dy + ny;
+	verts[5] = 0;
 
-	verts[4] = _x1 + dx + nx;
-	verts[5] = _y1 + dy + ny;
+	verts[6] = x1 + dx + nx;
+	verts[7] = y1 + dy + ny;
+	verts[8] = 0;
 
-	verts[6] = _x1 + dx - nx;
-	verts[7] = _y1 + dy - ny;
+	verts[9] = x1 + dx - nx;
+	verts[10] = y1 + dy - ny;
+	verts[11] = 0;
 
-	drawPolygon(verts, 4, _fth, _abgr);
+	put_polygon(verts, 4, fth, rgba, vertex);
 }
 
-void initVertexDecls()
+uint32_t renderer_bgfx::u32Color(uint32_t r, uint32_t g, uint32_t b, uint32_t a = 255)
 {
-	PosColorTexCoord0Vertex::init();
-	PosColorVertex::init();
-}
-
-static inline
-uint32_t u32Color(uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a = 255)
-{
-	return 0
-		| (uint32_t(_r) << 0)
-		| (uint32_t(_g) << 8)
-		| (uint32_t(_b) << 16)
-		| (uint32_t(_a) << 24)
-		;
+	return (a << 24) | (b << 16) | (g << 8) | r;
 }
 
 //============================================================
@@ -587,7 +559,10 @@ uint32_t u32Color(uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a = 255)
 static inline void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette)
 {
 	for (int x = 0; x < width; x++)
-		*dst++ = 0xff000000 | palette[*src++];
+	{
+		rgb_t srcpixel = palette[*src++];
+		*dst++ = 0xff000000 | (srcpixel.b() << 16) | (srcpixel.g() << 8) | srcpixel.r();
+	}
 }
 
 
@@ -598,7 +573,10 @@ static inline void copyline_palette16(UINT32 *dst, const UINT16 *src, int width,
 static inline void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette)
 {
 	for (int x = 0; x < width; x++)
-		*dst++ = palette[*src++];
+	{
+		rgb_t srcpixel = palette[*src++];
+		*dst++ = (srcpixel.a() << 24) | (srcpixel.b() << 16) | (srcpixel.g() << 8) | srcpixel.r();
+	}
 }
 
 
@@ -609,14 +587,14 @@ static inline void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width
 static inline void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette)
 {
 	int x;
-	
+
 	// palette (really RGB map) case
-	if (palette != NULL)
+	if (palette != nullptr)
 	{
 		for (x = 0; x < width; x++)
 		{
 			rgb_t srcpix = *src++;
-			*dst++ = 0xff000000 | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+			*dst++ = 0xff000000 | palette[0x200 + srcpix.b()] | palette[0x100 + srcpix.g()] | palette[srcpix.r()];
 		}
 	}
 
@@ -624,7 +602,10 @@ static inline void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, con
 	else
 	{
 		for (x = 0; x < width; x++)
-			*dst++ = 0xff000000 | *src++;
+		{
+			rgb_t srcpix = *src++;
+			*dst++ = 0xff000000 | (srcpix.b() << 16) | (srcpix.g() << 8) | srcpix.r();
+		}
 	}
 }
 
@@ -637,12 +618,12 @@ static inline void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, co
 {
 	int x;
 	// palette (really RGB map) case
-	if (palette != NULL)
+	if (palette != nullptr)
 	{
 		for (x = 0; x < width; x++)
 		{
 			rgb_t srcpix = *src++;
-			*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+			*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.b()] | palette[0x100 + srcpix.g()] | palette[srcpix.r()];
 		}
 	}
 
@@ -650,7 +631,10 @@ static inline void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, co
 	else
 	{
 		for (x = 0; x < width; x++)
-			*dst++ = *src++;
+		{
+			rgb_t srcpix = *src++;
+			*dst++ = (srcpix.a() << 24) | (srcpix.b() << 16) | (srcpix.g() << 8) | srcpix.r();
+		}
 	}
 }
 
@@ -692,7 +676,7 @@ static inline UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
 	if (b < 0) b = 0;
 	else if (b > 255) b = 255;
 
-	return rgb_t(0xff, r, g, b);
+	return 0xff000000 | (b << 16) | (g << 8) | r;
 }
 
 //============================================================
@@ -706,7 +690,7 @@ static inline void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int wi
 	assert(width % 2 == 0);
 
 	// palette (really RGB map) case
-	if (palette != NULL)
+	if (palette != nullptr)
 	{
 		for (x = 0; x < width / 2; x++)
 		{
@@ -737,35 +721,64 @@ static inline void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int wi
 		}
 	}
 }
+
+const bgfx::Memory* renderer_bgfx::mame_texture_data_to_bgfx_texture_data(UINT32 format, int width, int height, int rowpixels, const rgb_t *palette, void *base)
+{
+	const bgfx::Memory* mem = bgfx::alloc(width * height * 4);
+	for (int y = 0; y < height; y++)
+	{
+		switch (format)
+		{
+			case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16):
+				copyline_palette16((UINT32*)mem->data + y * width, (UINT16*)base + y * rowpixels, width, palette);
+				break;
+			case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTEA16):
+				copyline_palettea16((UINT32*)mem->data + y * width, (UINT16*)base + y * rowpixels, width, palette);
+				break;
+			case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16):
+				copyline_yuy16_to_argb((UINT32*)mem->data + y * width, (UINT16*)base + y * rowpixels, width, palette, 1);
+				break;
+			case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32):
+				copyline_argb32((UINT32*)mem->data + y * width, (UINT32*)base + y * rowpixels, width, palette);
+				break;
+			case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32):
+				copyline_rgb32((UINT32*)mem->data + y * width, (UINT32*)base + y * rowpixels, width, palette);
+				break;
+			default:
+				break;
+		}
+	}
+	return mem;
+}
+
 int renderer_bgfx::draw(int update)
 {
-	initVertexDecls();	
 	int index = window().m_index;
 	// Set view 0 default viewport.
 	osd_dim wdim = window().get_size();
-	int width = wdim.width();
-	int height = wdim.height();
+	m_width[index] = wdim.width();
+	m_height[index] = wdim.height();
 	if (index == 0)
 	{
-		if ((m_dimensions != osd_dim(width, height))) {
-			bgfx::reset(width, height, video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
-			m_dimensions = osd_dim(width, height);
+		if ((m_dimensions != osd_dim(m_width[index], m_height[index])))
+		{
+			bgfx::reset(m_width[index], m_height[index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+			m_dimensions = osd_dim(m_width[index], m_height[index]);
 		}
 	}
-	else {
-		if ((m_dimensions != osd_dim(width, height))) {
+	else
+	{
+		if ((m_dimensions != osd_dim(m_width[index], m_height[index])))
+		{
 			bgfx::reset(window().m_main->get_size().width(), window().m_main->get_size().height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
-			if (bgfx::isValid(fbh))
-			{
-				bgfx::destroyFrameBuffer(fbh);
-			}
+			delete m_framebuffer;
 #ifdef OSD_WINDOWS
-			fbh = bgfx::createFrameBuffer(window().m_hwnd, width, height);
+			m_framebuffer = m_targets->create_target("backbuffer", window().m_hwnd, m_width[index], m_height[index]);
 #else
-			fbh = bgfx::createFrameBuffer(sdlNativeWindowHandle(window().sdl_window()), width, height);
+			m_framebuffer = m_targets->create_target("backbuffer", sdlNativeWindowHandle(window().sdl_window()), m_width[index], m_height[index]);
 #endif
-			bgfx::setViewFrameBuffer(index, fbh);
-			m_dimensions = osd_dim(width, height);
+			bgfx::setViewFrameBuffer(index, m_framebuffer->target());
+			m_dimensions = osd_dim(m_width[index], m_height[index]);
 			bgfx::setViewClear(index
 				, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
 				, 0x000000ff
@@ -777,9 +790,13 @@ int renderer_bgfx::draw(int update)
 			return 0;
 		}
 	}
-	if (index != 0) bgfx::setViewFrameBuffer(index, fbh);
-	bgfx::setViewSeq(index, true);
-	bgfx::setViewRect(index, 0, 0, width, height);
+
+	if (index != 0)
+	{
+		bgfx::setViewFrameBuffer(index, m_framebuffer->target());
+	}
+		bgfx::setViewSeq(index, true);
+	bgfx::setViewRect(index, 0, 0, m_width[index], m_height[index]);
 
 	// Setup view transform.
 	{
@@ -788,8 +805,8 @@ int renderer_bgfx::draw(int update)
 
 		float left = 0.0f;
 		float top = 0.0f;
-		float right = width;
-		float bottom = height;
+		float right = m_width[index];
+		float bottom = m_height[index];
 		float proj[16];
 		bx::mtxOrtho(proj, left, right, bottom, top, 0.0f, 100.0f);
 		bgfx::setViewTransform(index, view, proj);
@@ -801,171 +818,292 @@ int renderer_bgfx::draw(int update)
 		, 0
 		);
 
-	// This dummy draw call is here to make sure that view 0 is cleared
-	// if no other draw calls are submitted to view 0.
-	bgfx::touch(index);
-
 	window().m_primlist->acquire_lock();
-	// Draw quad.
-	// now draw
-	uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
-	if (video_config.filter==0) texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
-	
-	for (render_primitive *prim = window().m_primlist->first(); prim != NULL; prim = prim->next())
+
+	// Mark our texture atlas as dirty if we need to do so
+	bool atlas_valid = update_atlas();
+
+	render_primitive *prim = window().m_primlist->first();
+	while (prim != nullptr)
 	{
-		uint64_t flags = BGFX_STATE_RGB_WRITE;
-		switch (prim->flags & PRIMFLAG_BLENDMODE_MASK)
+		UINT32 blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
+
+		bgfx::TransientVertexBuffer buffer;
+		allocate_buffer(prim, blend, &buffer);
+
+		buffer_status status = buffer_primitives(index, atlas_valid, &prim, &buffer);
+
+		if (status != BUFFER_EMPTY)
 		{
-		case PRIMFLAG_BLENDMODE(BLENDMODE_NONE):
-			break;
-		case PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA):
-			flags |= BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
-			break;
-		case PRIMFLAG_BLENDMODE(BLENDMODE_RGB_MULTIPLY):
-			flags |= BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_DST_COLOR, BGFX_STATE_BLEND_ZERO);
-			break;
-		case PRIMFLAG_BLENDMODE(BLENDMODE_ADD):
-			flags |= BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_ONE);
+			bgfx::setVertexBuffer(&buffer);
+			bgfx::setTexture(0, m_gui_effect[blend]->uniform("s_tex")->handle(), m_texture_cache->handle());
+			m_gui_effect[blend]->submit(index);
 		}
-		bool alpha = false;
-		switch (prim->type)
+
+		if (status != BUFFER_DONE && status != BUFFER_PRE_FLUSH)
 		{
-			/**
-			 * Try to stay in one Begin/End block as long as possible,
-			 * since entering and leaving one is most expensive..
-			 */
-		case render_primitive::LINE:
-
-			drawLine(prim->bounds.x0, prim->bounds.y0, prim->bounds.x1, prim->bounds.y1,
-				1.0f,
-				u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255),
-				1.0f);
-			bgfx::setState(flags);
-			bgfx::submit(index, m_progLine);
-			break;
-
-		case render_primitive::QUAD:
-			if (prim->texture.base == nullptr) {
-				render_quad_texuv uv;
-				uv.tl.u = uv.tl.v = uv.tr.u = uv.tr.v = 0;
-				uv.bl.u = uv.bl.v = uv.br.u = uv.br.v = 0;
-				screenQuad(prim->bounds.x0, prim->bounds.y0, prim->bounds.x1, prim->bounds.y1,
-					u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255), uv);
-				bgfx::setState(flags);
-				bgfx::submit(index, m_progQuad);
-			}
-			else {
-				screenQuad(prim->bounds.x0, prim->bounds.y0, prim->bounds.x1, prim->bounds.y1,
-					u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255), prim->texcoords);
-				bgfx::TextureHandle m_texture;
-				// render based on the texture coordinates
-				switch (prim->flags & PRIMFLAG_TEXFORMAT_MASK)
-				{
-					case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTEA16):
-						alpha = true;
-					case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16):
-					{
-						auto mem = bgfx::alloc(prim->texture.width*prim->texture.height * 4);
-						if (alpha)
-						{
-							for (int y = 0; y < prim->texture.height; y++)
-							{
-								copyline_palettea16((UINT32*)mem->data + y*prim->texture.width, (UINT16*)prim->texture.base + y*prim->texture.rowpixels, prim->texture.width, prim->texture.palette);
-							}
-						}
-						else
-						{
-							for (int y = 0; y < prim->texture.height; y++)
-							{
-								copyline_palette16((UINT32*)mem->data + y*prim->texture.width, (UINT16*)prim->texture.base + y*prim->texture.rowpixels, prim->texture.width, prim->texture.palette);
-							}
-						}
-
-						m_texture = bgfx::createTexture2D((uint16_t)prim->texture.width
-							, (uint16_t)prim->texture.height
-							, 1
-							, bgfx::TextureFormat::BGRA8
-							, texture_flags
-							, mem
-							);
-					}
-					break;
-				case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16):
-					{
-						auto mem = bgfx::alloc(prim->texture.width*prim->texture.height * 4);
-						for (int y = 0; y < prim->texture.height; y++)
-						{
-							copyline_yuy16_to_argb((UINT32*)mem->data + y*prim->texture.width, (UINT16*)prim->texture.base + y*prim->texture.rowpixels, prim->texture.width, prim->texture.palette, 1);
-						}
-						m_texture = bgfx::createTexture2D((uint16_t)prim->texture.width
-							, (uint16_t)prim->texture.height
-							, 1
-							, bgfx::TextureFormat::BGRA8
-							, texture_flags
-							, mem
-							);
-					}
-					break;
-				case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32):
-					alpha = true;
-				case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32):
-					{
-						if (prim->texture.rowpixels!=prim->texture.width)
-						{
-							auto mem = bgfx::alloc(prim->texture.width*prim->texture.height * 4);
-							if (alpha)
-							{
-								for (int y = 0; y < prim->texture.height; y++)
-								{
-									copyline_argb32((UINT32*)mem->data + y*prim->texture.width, (UINT32*)prim->texture.base + y*prim->texture.rowpixels, prim->texture.width, prim->texture.palette);
-								}
-							}
-							else
-							{
-								for (int y = 0; y < prim->texture.height; y++)
-								{
-									copyline_rgb32((UINT32*)mem->data + y*prim->texture.width, (UINT32*)prim->texture.base + y*prim->texture.rowpixels, prim->texture.width, prim->texture.palette);
-								}
-							}
-
-							m_texture = bgfx::createTexture2D((uint16_t)prim->texture.width
-								, (uint16_t)prim->texture.height
-								, 1
-								, bgfx::TextureFormat::BGRA8
-								, texture_flags
-								, mem
-								);
-						} else {
-							m_texture = bgfx::createTexture2D((uint16_t)prim->texture.width
-								, (uint16_t)prim->texture.height
-								, 1
-								, bgfx::TextureFormat::BGRA8
-								, texture_flags
-								, bgfx::copy(prim->texture.base, prim->texture.width*prim->texture.height*4)
-								);							
-						}
-					}
-					break;
-
-				default:
-					break;
-				}
-				bgfx::setTexture(0, m_s_texColor, m_texture);
-				bgfx::setState(flags);
-				bgfx::submit(index, m_progQuadTexture);
-				bgfx::destroyTexture(m_texture);
-			}
-			break;
-
-		default:
-			throw emu_fatalerror("Unexpected render_primitive type");
+			prim = prim->next();
 		}
 	}
 
 	window().m_primlist->release_lock();
+
+	// This dummy draw call is here to make sure that view 0 is cleared
+	// if no other draw calls are submitted to view 0.
+	bgfx::touch(index);
+
 	// Advance to next frame. Rendering thread will be kicked to
 	// process submitted rendering primitives.
 	if (index==0) bgfx::frame();
 
 	return 0;
+}
+
+renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer)
+{
+	int vertices = 0;
+
+	UINT32 blend = PRIMFLAG_GET_BLENDMODE((*prim)->flags);
+	while (*prim != nullptr)
+	{
+		switch ((*prim)->type)
+		{
+			case render_primitive::LINE:
+				put_line((*prim)->bounds.x0, (*prim)->bounds.y0, (*prim)->bounds.x1, (*prim)->bounds.y1, 1.0f, u32Color((*prim)->color.r * 255, (*prim)->color.g * 255, (*prim)->color.b * 255, (*prim)->color.a * 255), (ScreenVertex*)buffer->data + vertices, 1.0f);
+				vertices += 30;
+				break;
+
+			case render_primitive::QUAD:
+				if ((*prim)->texture.base == nullptr)
+				{
+					put_packed_quad(*prim, WHITE_HASH, (ScreenVertex*)buffer->data + vertices);
+					vertices += 6;
+				}
+				else
+				{
+					const UINT32 hash = get_texture_hash(*prim);
+					if (atlas_valid && (*prim)->packable(PACKABLE_SIZE) && hash != 0 && m_hash_to_entry[hash].hash())
+					{
+						put_packed_quad(*prim, hash, (ScreenVertex*)buffer->data + vertices);
+						vertices += 6;
+					}
+					else
+					{
+						if (vertices > 0)
+						{
+							return BUFFER_PRE_FLUSH;
+						}
+						render_textured_quad(view, *prim, buffer);
+						return BUFFER_EMPTY;
+					}
+				}
+				break;
+
+			default:
+				// Unhandled
+				break;
+		}
+
+		if ((*prim)->next() != nullptr && PRIMFLAG_GET_BLENDMODE((*prim)->next()->flags) != blend)
+		{
+			break;
+		}
+
+		*prim = (*prim)->next();
+	}
+
+	if (*prim == nullptr)
+	{
+		return BUFFER_DONE;
+	}
+	if (vertices == 0)
+	{
+		return BUFFER_EMPTY;
+	}
+	return BUFFER_FLUSH;
+}
+
+void renderer_bgfx::set_bgfx_state(UINT32 blend)
+{
+	uint64_t flags = BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_DEPTH_TEST_ALWAYS;
+
+	switch (blend)
+	{
+		case BLENDMODE_NONE:
+			bgfx::setState(flags);
+			break;
+		case BLENDMODE_ALPHA:
+			bgfx::setState(flags | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA));
+			break;
+		case BLENDMODE_RGB_MULTIPLY:
+			bgfx::setState(flags | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_DST_COLOR, BGFX_STATE_BLEND_ZERO));
+			break;
+		case BLENDMODE_ADD:
+			bgfx::setState(flags | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_ONE));
+			break;
+	}
+}
+
+bool renderer_bgfx::update_atlas()
+{
+	bool atlas_dirty = check_for_dirty_atlas();
+
+	if (atlas_dirty)
+	{
+		m_hash_to_entry.clear();
+
+		std::vector<std::vector<rectangle_packer::packed_rectangle>> packed;
+		if (m_packer.pack(m_texinfo, packed, CACHE_SIZE))
+		{
+			process_atlas_packs(packed);
+		}
+		else
+		{
+			packed.clear();
+
+			m_texinfo.clear();
+			m_texinfo.push_back(rectangle_packer::packable_rectangle(WHITE_HASH, PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32), 16, 16, 16, nullptr, m_white));
+
+			m_packer.pack(m_texinfo, packed, CACHE_SIZE);
+			process_atlas_packs(packed);
+
+			return false;
+		}
+	}
+	return true;
+}
+
+void renderer_bgfx::process_atlas_packs(std::vector<std::vector<rectangle_packer::packed_rectangle>>& packed)
+{
+	for (std::vector<rectangle_packer::packed_rectangle> pack : packed)
+	{
+		for (rectangle_packer::packed_rectangle rect : pack)
+		{
+			if (rect.hash() == 0xffffffff)
+			{
+				continue;
+			}
+			m_hash_to_entry[rect.hash()] = rect;
+			const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(rect.format(), rect.width(), rect.height(), rect.rowpixels(), rect.palette(), rect.base());
+			bgfx::updateTexture2D(m_texture_cache->handle(), 0, rect.x(), rect.y(), rect.width(), rect.height(), mem);
+		}
+	}
+}
+
+UINT32 renderer_bgfx::get_texture_hash(render_primitive *prim)
+{
+#if GIBBERISH
+	UINT32 xor_value = 0x87;
+	UINT32 hash = 0xdabeefed;
+
+	int bpp = 2;
+	UINT32 format = PRIMFLAG_GET_TEXFORMAT(prim->flags);
+	if (format == TEXFORMAT_ARGB32 || format == TEXFORMAT_RGB32)
+	{
+		bpp = 4;
+	}
+
+	for (int y = 0; y < prim->texture.height; y++)
+	{
+		UINT8 *base = reinterpret_cast<UINT8*>(prim->texture.base) + prim->texture.rowpixels * y;
+		for (int x = 0; x < prim->texture.width * bpp; x++)
+		{
+			hash += base[x] ^ xor_value;
+		}
+	}
+	return hash;
+#else
+	return (reinterpret_cast<size_t>(prim->texture.base)) & 0xffffffff;
+#endif
+}
+
+bool renderer_bgfx::check_for_dirty_atlas()
+{
+	bool atlas_dirty = false;
+
+	std::map<UINT32, rectangle_packer::packable_rectangle> acquired_infos;
+	for (render_primitive *prim = window().m_primlist->first(); prim != nullptr; prim = prim->next())
+	{
+		bool pack = prim->packable(PACKABLE_SIZE);
+		if (prim->type == render_primitive::QUAD && prim->texture.base != nullptr && pack)
+		{
+			const UINT32 hash = get_texture_hash(prim);
+			// If this texture is packable and not currently in the atlas, prepare the texture for putting in the atlas
+			if ((hash != 0 && m_hash_to_entry[hash].hash() == 0 && acquired_infos[hash].hash() == 0)
+				|| (hash != 0 && m_hash_to_entry[hash].hash() != hash && acquired_infos[hash].hash() == 0))
+			{   // Create create the texture and mark the atlas dirty
+				atlas_dirty = true;
+
+				m_texinfo.push_back(rectangle_packer::packable_rectangle(hash, prim->flags & PRIMFLAG_TEXFORMAT_MASK,
+					prim->texture.width, prim->texture.height,
+					prim->texture.rowpixels, prim->texture.palette, prim->texture.base));
+				acquired_infos[hash] = m_texinfo[m_texinfo.size() - 1];
+			}
+		}
+	}
+
+	if (m_texinfo.size() == 1)
+	{
+		atlas_dirty = true;
+	}
+
+	return atlas_dirty;
+}
+
+void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::TransientVertexBuffer *buffer)
+{
+	int vertices = 0;
+
+	bool mode_switched = false;
+	while (prim != nullptr && !mode_switched)
+	{
+		switch (prim->type)
+		{
+			case render_primitive::LINE:
+				vertices += 30;
+				break;
+
+			case render_primitive::QUAD:
+				if (!prim->packable(PACKABLE_SIZE))
+				{
+					if (prim->texture.base == nullptr)
+					{
+						vertices += 6;
+					}
+					else
+					{
+						mode_switched = true;
+						if (vertices == 0)
+						{
+							vertices += 6;
+						}
+					}
+				}
+				else
+				{
+					vertices += 6;
+				}
+				break;
+			default:
+				// Do nothing
+				break;
+		}
+
+		prim = prim->next();
+
+		if (prim != nullptr && PRIMFLAG_GET_BLENDMODE(prim->flags) != blend)
+		{
+			mode_switched = true;
+		}
+	}
+
+	if (vertices > 0 && bgfx::checkAvailTransientVertexBuffer(vertices, ScreenVertex::ms_decl))
+	{
+		bgfx::allocTransientVertexBuffer(buffer, vertices, ScreenVertex::ms_decl);
+	}
+}
+
+slider_state* renderer_bgfx::get_slider_list()
+{
+	return nullptr;
 }

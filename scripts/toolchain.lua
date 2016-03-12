@@ -4,6 +4,11 @@
 --
 
 local naclToolchain = ""
+local toolchainPrefix = ""
+
+if _OPTIONS['TOOLCHAIN'] then
+	toolchainPrefix = _OPTIONS["TOOLCHAIN"]
+end
 
 newoption {
 	trigger = "gcc",
@@ -11,8 +16,11 @@ newoption {
 	description = "Choose GCC flavor",
 	allowed = {
 		{ "android-arm",   "Android - ARM"          },
+		{ "android-arm64", "Android - ARM64"          },
 		{ "android-mips",  "Android - MIPS"         },
+		{ "android-mips64","Android - MIPS64"       },
 		{ "android-x86",   "Android - x86"          },
+		{ "android-x64",   "Android - x64"          },
 		{ "asmjs",         "Emscripten/asm.js"      },
 		{ "freebsd",       "FreeBSD"                },
 		{ "linux-gcc",     "Linux (GCC compiler)"   },
@@ -22,14 +30,10 @@ newoption {
 		{ "mingw32-gcc",   "MinGW32"                },
 		{ "mingw64-gcc",   "MinGW64"                },
 		{ "mingw-clang",   "MinGW (clang compiler)" },
-		{ "nacl",          "Native Client"          },
-		{ "nacl-arm",      "Native Client - ARM"    },
 		{ "netbsd",        "NetBSD"                },
-		{ "os2",           "OS/2"                   },
 		{ "osx",           "OSX (GCC compiler)"     },
 		{ "osx-clang",     "OSX (Clang compiler)"   },
 		{ "pnacl",         "Native Client - PNaCl"  },
-		{ "qnx-arm",       "QNX/Blackberry - ARM"   },
 		{ "rpi",           "RaspberryPi"            },
 		{ "solaris", 	   "Solaris"                },
 		{ "steamlink", 	   "Steam Link"             },
@@ -103,36 +107,77 @@ function toolchain(_buildDir, _subDir)
 				print("Set ANDROID_NDK_ARM and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-gcc"
-			premake.gcc.cxx = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-g++"
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
 			premake.gcc.ar  = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-ar"
+			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-arm")
 		end
 
+		if "android-arm64" == _OPTIONS["gcc"] then
+
+			if not os.getenv("ANDROID_NDK_ARM64") or not os.getenv("ANDROID_NDK_ROOT") then
+				print("Set ANDROID_NDK_ARM64 and ANDROID_NDK_ROOT envrionment variables.")
+			end
+
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
+			premake.gcc.ar  = "$(ANDROID_NDK_ARM64)/bin/aarch64-linux-android-ar.exe"
+			premake.gcc.llvm = true
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-arm64")
+		end
+		
 		if "android-mips" == _OPTIONS["gcc"] then
 
 			if not os.getenv("ANDROID_NDK_MIPS") or not os.getenv("ANDROID_NDK_ROOT") then
 				print("Set ANDROID_NDK_MIPS and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-gcc"
-			premake.gcc.cxx = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-g++"
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
 			premake.gcc.ar  = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-ar"
+			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-mips")
 		end
+		
+		if "android-mips64" == _OPTIONS["gcc"] then
 
+			if not os.getenv("ANDROID_NDK_MIPS64") or not os.getenv("ANDROID_NDK_ROOT") then
+				print("Set ANDROID_NDK_MIPS64 and ANDROID_NDK_ROOT envrionment variables.")
+			end
+
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
+			premake.gcc.ar  = "$(ANDROID_NDK_MIPS64)/bin/mips64el-linux-android-ar.exe"
+			premake.gcc.llvm = true
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-mips64")
+		end
+		
 		if "android-x86" == _OPTIONS["gcc"] then
 
 			if not os.getenv("ANDROID_NDK_X86") or not os.getenv("ANDROID_NDK_ROOT") then
 				print("Set ANDROID_NDK_X86 and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_X86)/bin/i686-linux-android-gcc"
-			premake.gcc.cxx = "$(ANDROID_NDK_X86)/bin/i686-linux-android-g++"
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
 			premake.gcc.ar  = "$(ANDROID_NDK_X86)/bin/i686-linux-android-ar"
+			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-x86")
 		end
+		
+		if "android-x64" == _OPTIONS["gcc"] then
 
+			if not os.getenv("ANDROID_NDK_X64") or not os.getenv("ANDROID_NDK_ROOT") then
+				print("Set ANDROID_NDK_X64 and ANDROID_NDK_ROOT envrionment variables.")
+			end
+
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
+			premake.gcc.ar  = "$(ANDROID_NDK_X64)/bin/x86_64-linux-android-ar.exe"
+			premake.gcc.llvm = true
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-x64")
+		end
 		if "asmjs" == _OPTIONS["gcc"] then
 
 			if not os.getenv("EMSCRIPTEN") then
@@ -204,15 +249,18 @@ function toolchain(_buildDir, _subDir)
 			if not os.getenv("MINGW32") then
 				print("Set MINGW32 envrionment variable.")
 			end
-			premake.gcc.cc  = "$(MINGW32)/bin/i686-w64-mingw32-gcc"
-			premake.gcc.cxx = "$(MINGW32)/bin/i686-w64-mingw32-g++"
+			if not toolchainPrefix then
+				toolchainPrefix = "$(MINGW32)/bin/i686-w64-mingw32-"
+			end
+			premake.gcc.cc  = toolchainPrefix .. "gcc"
+			premake.gcc.cxx = toolchainPrefix .. "g++"
 -- work around GCC 4.9.2 not having proper linker for LTO=1 usage
 			local version_4_ar = str_to_version(_OPTIONS["gcc_version"])
 			if (version_4_ar < 50000) then
-				premake.gcc.ar  = "$(MINGW32)/bin/ar"
+				premake.gcc.ar  = toolchainPrefix .. "ar"
 			end
 			if (version_4_ar >= 50000) then
-				premake.gcc.ar  = "$(MINGW32)/bin/gcc-ar"
+				premake.gcc.ar  = toolchainPrefix .. "gcc-ar"
 			end
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-mingw32-gcc")
 		end
@@ -221,19 +269,21 @@ function toolchain(_buildDir, _subDir)
 			if not os.getenv("MINGW64") then
 				print("Set MINGW64 envrionment variable.")
 			end
-			premake.gcc.cc  = "$(MINGW64)/bin/x86_64-w64-mingw32-gcc"
-			premake.gcc.cxx = "$(MINGW64)/bin/x86_64-w64-mingw32-g++"
+			if not toolchainPrefix then
+				toolchainPrefix = "$(MINGW64)/bin/x86_64-w64-mingw32-"
+			end
+			premake.gcc.cc  = toolchainPrefix .. "gcc"
+			premake.gcc.cxx = toolchainPrefix .. "g++"
 -- work around GCC 4.9.2 not having proper linker for LTO=1 usage
 			local version_4_ar = str_to_version(_OPTIONS["gcc_version"])
 			if (version_4_ar < 50000) then
-				premake.gcc.ar  = "$(MINGW64)/bin/ar"
+				premake.gcc.ar  = toolchainPrefix .. "ar"
 			end
 			if (version_4_ar >= 50000) then
-				premake.gcc.ar  = "$(MINGW64)/bin/gcc-ar"
+				premake.gcc.ar  = toolchainPrefix .. "gcc-ar"
 			end
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-mingw64-gcc")
 		end
-
 
 		if "mingw-clang" == _OPTIONS["gcc"] then
 			premake.gcc.cc   = "clang"
@@ -243,58 +293,19 @@ function toolchain(_buildDir, _subDir)
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-mingw-clang")
 		end
 
-		if "nacl" == _OPTIONS["gcc"] then
-
-			if not os.getenv("NACL_SDK_ROOT") then
-				print("Set NACL_SDK_ROOT enviroment variables.")
-			end
-
-			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_x86_newlib/bin/x86_64-nacl-"
-			if os.is("macosx") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_x86_newlib/bin/x86_64-nacl-"
-			elseif os.is("linux") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/linux_x86_newlib/bin/x86_64-nacl-"
-			end
-
-			premake.gcc.cc  = naclToolchain .. "gcc"
-			premake.gcc.cxx = naclToolchain .. "g++"
-			premake.gcc.ar  = naclToolchain .. "ar"
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-nacl")
-		end
-
-		if "nacl-arm" == _OPTIONS["gcc"] then
-
-			if not os.getenv("NACL_SDK_ROOT") then
-				print("Set NACL_SDK_ROOT enviroment variables.")
-			end
-
-			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_arm_newlib/bin/arm-nacl-"
-			if os.is("macosx") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_arm_newlib/bin/arm-nacl-"
-			elseif os.is("linux") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/linux_arm_newlib/bin/arm-nacl-"
-			end
-
-			premake.gcc.cc  = naclToolchain .. "gcc"
-			premake.gcc.cxx = naclToolchain .. "g++"
-			premake.gcc.ar  = naclToolchain .. "ar"
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-nacl-arm")
-		end
-
 		if "osx" == _OPTIONS["gcc"] then
 			if os.is("linux") then
-				local osxToolchain = "x86_64-apple-darwin13-"
-				premake.gcc.cc  = osxToolchain .. "clang"
-				premake.gcc.cxx = osxToolchain .. "clang++"
-				premake.gcc.ar  = osxToolchain .. "ar"
+				premake.gcc.cc  = toolchainPrefix .. "clang"
+				premake.gcc.cxx = toolchainPrefix .. "clang++"
+				premake.gcc.ar  = toolchainPrefix .. "ar"
 			end
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-osx")
 		end
 
 		if "osx-clang" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "clang"
-			premake.gcc.cxx = "clang++"
-			premake.gcc.ar  = "ar"
+			premake.gcc.cc  = toolchainPrefix .. "clang"
+			premake.gcc.cxx = toolchainPrefix .. "clang++"
+			premake.gcc.ar  = toolchainPrefix .. "ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-osx-clang")
 		end
 
@@ -317,25 +328,10 @@ function toolchain(_buildDir, _subDir)
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-pnacl")
 		end
 
-		if "qnx-arm" == _OPTIONS["gcc"] then
-
-			if not os.getenv("QNX_HOST") then
-				print("Set QNX_HOST enviroment variables.")
-			end
-
-			premake.gcc.cc  = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-gcc"
-			premake.gcc.cxx = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-g++"
-			premake.gcc.ar  = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-ar"
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-qnx-arm")
-		end
-
 		if "rpi" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-rpi")
 		end
 
-		if "os2" == _OPTIONS["gcc"] then
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-os2")
-		end
 	elseif _ACTION == "vs2013" or _ACTION == "vs2015" then
 
 		if (_ACTION .. "-clang") == _OPTIONS["vs"] then
@@ -468,7 +464,6 @@ function toolchain(_buildDir, _subDir)
 		removeflags {
 			"StaticRuntime",
 			"NoExceptions",
-			"EnableMinimalRebuild",
 		}
 
 	configuration { "mingw*" }
@@ -496,7 +491,9 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "steamlink" }
 		objdir ( _buildDir .. "steamlink/obj")
-
+		defines {
+			"__STEAMLINK__=1", -- There is no special prefedined compiler symbol to detect SteamLink, faking it.
+		}
 		buildoptions {
 			"-marm",
 			"-mfloat-abi=hard",
@@ -658,12 +655,13 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "android-*" }
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/include",
+			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include",
+			"$(ANDROID_NDK_ROOT)/sources/android/support/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 		}
 		linkoptions {
 			"-nostdlib",
-			"-static-libgcc",
 		}
 		flags {
 			"NoImportLib",
@@ -674,19 +672,21 @@ function toolchain(_buildDir, _subDir)
 			"m",
 			"android",
 			"log",
-			"gnustl_static",
+			"c++_static",
 			"gcc",
 		}
 		buildoptions {
-			"-fPIC",
-			"-no-canonical-prefixes",
-			"-Wa,--noexecstack",
-			"-fstack-protector",
+			"-fpic",
 			"-ffunction-sections",
-			"-Wno-cast-align",
-			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
+			"-funwind-tables",
+			"-fstack-protector-strong",
+			"-no-canonical-prefixes",
+			"-fno-integrated-as",
 			"-Wunused-value",
 			"-Wundef",
+			"-Wno-cast-align",
+			"-Wno-unknown-attributes",
+			"-Wno-macro-redefined",
 		}
 		linkoptions {
 			"-no-canonical-prefixes",
@@ -701,74 +701,145 @@ function toolchain(_buildDir, _subDir)
 		targetdir (_buildDir .. "android-arm" .. "/bin")
 		objdir (_buildDir .. "android-arm" .. "/obj")
 			libdirs {
-				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a",
+				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib",
 			}
 			includedirs {
-				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a/include",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/include",
 			}
 			buildoptions {
-				"-mthumb",
+				"-gcc-toolchain $(ANDROID_NDK_ARM)",
+				"-target armv7-none-linux-androideabi",
 				"-march=armv7-a",
 				"-mfloat-abi=softfp",
-				"-mfpu=neon",
-				"-Wunused-value",
-				"-Wundef",
+				"-mfpu=vfpv3-d16",
+				"-mthumb",
 			}
 			linkoptions {
+				"-gcc-toolchain $(ANDROID_NDK_ARM)",
+				"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtbegin_so.o",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtend_so.o",
+				"-target armv7-none-linux-androideabi",
 				"-march=armv7-a",
-				"-Wl,--fix-cortex-a8",
+				"-mthumb",
 			}
 
+	configuration { "android-arm64" }
+		androidPlatform = "android-21" -- supported from API 21
+		targetdir (_buildDir .. "android-arm64" .. "/bin")
+		objdir (_buildDir .. "android-arm64" .. "/obj")
+			libdirs {
+				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/arm64-v8a",
+				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib64",
+			}
+			includedirs {
+				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/include",
+			}
+			buildoptions {
+				"-gcc-toolchain $(ANDROID_NDK_ARM64)",
+				"-target aarch64-none-linux-android",
+			}
+			linkoptions {
+				"-gcc-toolchain $(ANDROID_NDK_ARM64)",
+				"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64",
+				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib/crtbegin_so.o",
+				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib/crtend_so.o",
+				"-target aarch64-none-linux-android",
+			}
+			
 	configuration { "android-mips" }
 		targetdir (_buildDir .. "android-mips" .. "/bin")
 		objdir (_buildDir .. "android-mips" .. "/obj")
 		libdirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/mips",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/mips",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/mips/include",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/include",
 		}
 		buildoptions {
-			"-Wunused-value",
-			"-Wundef",
+			"-gcc-toolchain $(ANDROID_NDK_MIPS)",
+			"-target mipsel-none-linux-android",
 		}
 		linkoptions {
+			"-gcc-toolchain $(ANDROID_NDK_MIPS)",
+			"-target mipsel-none-linux-android",
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/crtbegin_so.o",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/crtend_so.o",
+		}
+		
+	configuration { "android-mips64" }
+		androidPlatform = "android-21" -- supported from API 21
+		targetdir (_buildDir .. "android-mips64" .. "/bin")
+		objdir (_buildDir .. "android-mips64" .. "/obj")
+		libdirs {
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/mips64",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips64/usr/lib64/",
+		}
+		includedirs {
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips64/usr/include",
+		}
+		buildoptions {
+			"-gcc-toolchain $(ANDROID_NDK_MIPS64)",
+			"-target mips64el-none-linux-android",
+		}
+		linkoptions {
+			"-gcc-toolchain $(ANDROID_NDK_MIPS64)",
+			"-target mips64el-none-linux-android",
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips64",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips64/usr/lib64/crtbegin_so.o",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips64/usr/lib64/crtend_so.o",
 		}
 
 	configuration { "android-x86" }
 		targetdir (_buildDir .. "android-x86" .. "/bin")
 		objdir (_buildDir .. "android-x86" .. "/obj")
 		libdirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/x86",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/x86",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/x86/include",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/include",
 		}
 		buildoptions {
-			"-march=i686",
-			"-mtune=atom",
-			"-mstackrealign",
-			"-msse3",
-			"-mfpmath=sse",
-			"-Wunused-value",
-			"-Wundef",
+			"-gcc-toolchain $(ANDROID_NDK_X86)",
+			"-target i686-none-linux-android",
+			"-mssse3"
 		}
 		linkoptions {
+			"-gcc-toolchain $(ANDROID_NDK_X86)",
+			"-target i686-none-linux-android",
+			"-mssse3",
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib/crtbegin_so.o",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib/crtend_so.o",
 		}
 
-
+	configuration { "android-x64" }
+		androidPlatform = "android-21" -- supported from API 21
+		targetdir (_buildDir .. "android-x64" .. "/bin")
+		objdir (_buildDir .. "android-x64" .. "/obj")
+		libdirs {
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/x86_64",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/lib64",
+		}
+		includedirs {
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/include",
+		}
+		buildoptions {
+			"-gcc-toolchain $(ANDROID_NDK_X64)",
+			"-target x86_64-none-linux-android",
+		}
+		linkoptions {
+			"-gcc-toolchain $(ANDROID_NDK_X64)",
+			"-target x86_64-none-linux-android",
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/lib64/crtbegin_so.o",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/lib64/crtend_so.o",
+		}
+	
 	configuration { "asmjs" }
 		targetdir (_buildDir .. "asmjs" .. "/bin")
 		objdir (_buildDir .. "asmjs" .. "/obj")
@@ -790,7 +861,7 @@ function toolchain(_buildDir, _subDir)
 			"-Wno-extern-c-compat",
 		}
 
-	configuration { "nacl or nacl-arm or pnacl" }
+	configuration { "pnacl" }
 		buildoptions {
 			"-U__STRICT_ANSI__", -- strcasecmp, setenv, unsetenv,...
 			"-fno-stack-protector",
@@ -799,12 +870,7 @@ function toolchain(_buildDir, _subDir)
 			"-ffunction-sections",
 			"-Wunused-value",
 		}
-	configuration { "nacl or nacl-arm" }
-		includedirs {
-			"$(NACL_SDK_ROOT)/include",
-			"$(NACL_SDK_ROOT)/include/newlib",
-		}
-
+	
 	configuration { "pnacl" }
 		buildoptions {
 			"-Wno-tautological-undefined-compare",
@@ -814,36 +880,6 @@ function toolchain(_buildDir, _subDir)
 			"$(NACL_SDK_ROOT)/include",
 			"$(NACL_SDK_ROOT)/include/pnacl",
 		}
-
-	configuration { "x32", "nacl" }
-		targetdir (_buildDir .. "nacl-x86" .. "/bin/x32")
-		objdir (_buildDir .. "nacl-x86" .. "/obj")
-
-	configuration { "x32", "nacl", "Debug" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_32/Debug" }
-
-	configuration { "x32", "nacl", "Release" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_32/Release" }
-
-	configuration { "x64", "nacl" }
-		targetdir (_buildDir .. "nacl-x64" .. "/bin/x64")
-		objdir (_buildDir .. "nacl-x64" .. "/obj")
-
-	configuration { "x64", "nacl", "Debug" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_64/Debug" }
-
-	configuration { "x64", "nacl", "Release" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_64/Release" }
-
-	configuration { "nacl-arm" }
-		targetdir (_buildDir .. "nacl-arm" .. "/bin")
-		objdir (_buildDir .. "nacl-arm" .. "/obj")
-
-	configuration { "nacl-arm", "Debug" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_arm/Debug" }
-
-	configuration { "nacl-arm", "Release" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_arm/Release" }
 
 	configuration { "pnacl" }
 		targetdir (_buildDir .. "pnacl" .. "/bin")
@@ -886,22 +922,9 @@ function toolchain(_buildDir, _subDir)
 		targetdir (_buildDir .. "ios-simulator" .. "/bin")
 		objdir (_buildDir .. "ios-simulator" .. "/obj")
 
-	configuration { "qnx-arm" }
-		targetdir (_buildDir .. "qnx-arm" .. "/bin")
-		objdir (_buildDir .. "qnx-arm" .. "/obj")
-
 	configuration { "rpi" }
 		targetdir (_buildDir .. "rpi" .. "/bin")
 		objdir (_buildDir .. "rpi" .. "/obj")
-
-	configuration { "os2" }
-		objdir (_buildDir .. "os2" .. "/obj")
-
-	configuration { "os2", "Release" }
-		targetdir (_buildDir .. "os2" .. "/bin/Release")
-
-	configuration { "os2", "Debug" }
-		targetdir (_buildDir .. "os2" .. "/bin/Debug")
 
 	configuration {} -- reset configuration
 
@@ -909,6 +932,15 @@ function toolchain(_buildDir, _subDir)
 end
 
 function strip()
+	if _OPTIONS["STRIP_SYMBOLS"]~="1" then
+		return true
+	end
+
+	configuration { "osx-*", "Release" }
+		postbuildcommands {
+			"$(SILENT) echo Stripping symbols.",
+			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] and toolchainPrefix) .. "strip \"$(TARGET)\"",
+		}
 
 	configuration { "android-arm", "Release" }
 		postbuildcommands {
@@ -937,13 +969,12 @@ function strip()
 	configuration { "mingw*", "x64", "Release" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) $(MINGW64)/bin/strip -s \"$(TARGET)\"",
+			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] and toolchainPrefix or "$(MINGW64)/bin/") .. "strip -s \"$(TARGET)\"",
 		}
-
 	configuration { "mingw*", "x32", "Release" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) $(MINGW32)/bin/strip -s \"$(TARGET)\""
+			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] and toolchainPrefix or "$(MINGW32)/bin/") .. "strip -s \"$(TARGET)\"",
 		}
 
 	configuration { "pnacl" }
@@ -952,23 +983,11 @@ function strip()
 			"$(SILENT) " .. naclToolchain .. "finalize \"$(TARGET)\""
 		}
 
-	configuration { "*nacl*", "Release" }
-		postbuildcommands {
-			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) " .. naclToolchain .. "strip -s \"$(TARGET)\""
-		}
-
 	configuration { "asmjs" }
 		postbuildcommands {
 			"$(SILENT) echo Running asmjs finalize.",
 			"$(SILENT) $(EMSCRIPTEN)/emcc -O2 -s TOTAL_MEMORY=268435456 \"$(TARGET)\" -o \"$(TARGET)\".html"
 			-- ALLOW_MEMORY_GROWTH
-		}
-
-	configuration { "os2", "Release" }
-		postbuildcommands {
-			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) lxlite /B- /L- /CS \"$(TARGET)\""
 		}
 
 	configuration {} -- reset configuration

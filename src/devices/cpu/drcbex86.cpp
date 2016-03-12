@@ -789,7 +789,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, UINT3
 			if (inst.opcode() == OP_HANDLE)
 				blockname = inst.param(0).handle().string();
 			else if (inst.opcode() == OP_HASH)
-				blockname = strformat("Code: mode=%d PC=%08X", (UINT32)inst.param(0).immediate(), (offs_t)inst.param(1).immediate()).c_str();
+				blockname = string_format("Code: mode=%d PC=%08X", (UINT32)inst.param(0).immediate(), (offs_t)inst.param(1).immediate()).c_str();
 		}
 
 		// generate code

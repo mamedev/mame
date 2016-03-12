@@ -344,7 +344,7 @@ void sc499_device::device_start()
 
 	m_installed = false;
 
-	if (m_image->image_core_file() == nullptr)
+	if (!m_image->is_open())
 	{
 		LOG2(("start sc499: no cartridge tape"));
 	}
@@ -409,13 +409,32 @@ const char *sc499_device::cpu_context()
 {
 	static char statebuf[64]; /* string buffer containing state description */
 
+	device_t *cpu = machine().firstcpu;
 	osd_ticks_t t = osd_ticks();
 	int s = t / osd_ticks_per_second();
 	int ms = (t % osd_ticks_per_second()) / 1000;
 
-	sprintf(statebuf, "%d.%03d%s:", s, ms, tag());
-
+	/* if we have an executing CPU, output data */
+	if (cpu != nullptr)
+	{
+		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag(),
+				cpu->safe_pcbase(), tag());
+	}
+	else
+	{
+		sprintf(statebuf, "%d.%03d", s, ms);
+	}
 	return statebuf;
+}
+
+/*-------------------------------------------------
+ logerror - log an error message (w/o device tags)
+ -------------------------------------------------*/
+
+template <typename Format, typename... Params>
+void sc499_device::logerror(Format &&fmt, Params &&... args) const
+{
+	machine().logerror(std::forward<Format>(fmt), std::forward<Params>(args)...);
 }
 
 /*-------------------------------------------------

@@ -1814,7 +1814,7 @@ void se3208_device::state_string_export(const device_state_entry &entry, std::st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c %c%c%c%c%c",
+			str = string_format("%c%c%c%c %c%c%c%c%c",
 					m_SR&FLAG_C?'C':'.',
 					m_SR&FLAG_V?'V':'.',
 					m_SR&FLAG_S?'S':'.',
