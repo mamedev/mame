@@ -51,12 +51,12 @@ INPUT_PORTS_END
 static const gfx_layout sprite16x16_layout =
 {
 	16,16,
-	RGN_FRAC(1,2),
+	RGN_FRAC(1,1),
 	4,
 	{ 0, 1, 2, 3 },
-	{ 4, 0, 12, 8, 20, 16, 28, 24, RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+12,RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+20,RGN_FRAC(1,2)+16,RGN_FRAC(1,2)+28,RGN_FRAC(1,2)+24 },
-	{ 8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32, 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32  },
-	32*8
+	{ 4,0  ,12,8,  20,16,  28,24,  36,32,  44,40,  52, 48,  60, 56},
+	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64 },
+	64*16
 };
 
 static const gfx_layout tiles8x8_layout =
@@ -71,7 +71,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( androidp )
-	GFXDECODE_ENTRY( "gfx1", 0, sprite16x16_layout, 0, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, sprite16x16_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -121,9 +121,9 @@ ROM_START( androidp )
 	ROM_REGION( 0x18000, "soundcpu", 0 )
 	ROM_LOAD( "MITSUBISHI_A04.toppcb.m5l27256k.N6.BIN", 0x00000, 0x08000, CRC(13c38fe4) SHA1(34a35fa057159a5c83892a88b8c908faa39d5cb3) )	
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "MITSUBISHI_A06.botpcb.m5l27512k.9E.BIN", 0x00000, 0x10000, CRC(5e42984e) SHA1(2a928960c740dfb94589e011cce093bed2fd7685) )
-	ROM_LOAD( "MITSUBISHI_A07.botpcb.m5l27512k.9B.BIN", 0x10000, 0x10000, CRC(611ff400) SHA1(1a9aed33d0e3f063811f92b9fee3ecbff0e965bf) )
+	ROM_REGION( 0x20000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "MITSUBISHI_A06.botpcb.m5l27512k.9E.BIN", 0x00000, 0x10000, CRC(5e42984e) SHA1(2a928960c740dfb94589e011cce093bed2fd7685) )
+	ROM_LOAD16_BYTE( "MITSUBISHI_A07.botpcb.m5l27512k.9B.BIN", 0x00001, 0x10000, CRC(611ff400) SHA1(1a9aed33d0e3f063811f92b9fee3ecbff0e965bf) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
 	ROM_LOAD( "MITSUBISHI_A05.toppcb.m5l27512k.F5.BIN", 0x00000, 0x10000, CRC(4c72a930) SHA1(f1542844391b55fe43293eef7ce48c09b7aca75a) )
