@@ -102,7 +102,7 @@ struct object_transform
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-// precomputed UV coordinates for various orientations
+// precomputed UV coordinates for raster primitive with various orientations
 static const render_quad_texuv oriented_texcoords[8] =
 {
 	{ { 0,0 }, { 1,0 }, { 0,1 }, { 1,1 } },     // 0
@@ -113,6 +113,12 @@ static const render_quad_texuv oriented_texcoords[8] =
 	{ { 0,1 }, { 0,0 }, { 1,1 }, { 1,0 } },     // ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X
 	{ { 1,0 }, { 1,1 }, { 0,0 }, { 0,1 } },     // ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y
 	{ { 1,1 }, { 1,0 }, { 0,1 }, { 0,0 } }      // ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y
+};
+
+// precomputed UV coordinates for vector primitive
+static const render_quad_texuv oriented_vector_texcoords[1] =
+{
+	{ { 0,0 }, { 1,0 }, { 0,1 }, { 1,1 } }
 };
 
 // layer orders
@@ -1756,18 +1762,39 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					// set the palette
 					prim->texture.palette = curitem->texture()->get_adjusted_palette(container);
 
-					// determine UV coordinates and apply clipping
+					// determine UV coordinates
 					prim->texcoords = oriented_texcoords[finalorient];
+
+					// apply clipping
 					clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
 
 					// apply the final orientation from the quad flags and then build up the final flags
-					prim->flags = (curitem->flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) |
-									PRIMFLAG_TEXORIENT(finalorient) |
-									PRIMFLAG_TEXFORMAT(curitem->texture()->format());
-					if (blendmode != -1)
-						prim->flags |= PRIMFLAG_BLENDMODE(blendmode);
-					else
-						prim->flags |= PRIMFLAG_BLENDMODE(PRIMFLAG_GET_BLENDMODE(curitem->flags()));
+					prim->flags = (curitem->flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK))
+						| PRIMFLAG_TEXORIENT(finalorient)
+						| PRIMFLAG_TEXFORMAT(curitem->texture()->format());
+					prim->flags |= blendmode != -1
+						? PRIMFLAG_BLENDMODE(blendmode)
+						: PRIMFLAG_BLENDMODE(PRIMFLAG_GET_BLENDMODE(curitem->flags()));
+				}
+				else if (curitem->flags() & PRIMFLAG_VECTORBUF_MASK)
+				{
+					// adjust the color for brightness/contrast/gamma
+					prim->color.r = container.apply_brightness_contrast_gamma_fp(prim->color.r);
+					prim->color.g = container.apply_brightness_contrast_gamma_fp(prim->color.g);
+					prim->color.b = container.apply_brightness_contrast_gamma_fp(prim->color.b);
+
+					// determine UV coordinates
+					prim->texcoords = oriented_vector_texcoords[0];
+
+					// apply clipping
+					clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
+
+					// no texture
+					prim->texture.base = nullptr;
+
+					// set the basic flags
+					prim->flags = (curitem->flags() & ~PRIMFLAG_BLENDMODE_MASK)
+						| PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 				}
 				else
 				{
@@ -1776,9 +1803,12 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					prim->color.g = container.apply_brightness_contrast_gamma_fp(prim->color.g);
 					prim->color.b = container.apply_brightness_contrast_gamma_fp(prim->color.b);
 
-					// no texture -- set the basic flags
+					// no texture
 					prim->texture.base = nullptr;
-					prim->flags = (curitem->flags() &~ PRIMFLAG_BLENDMODE_MASK) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
+
+					// set the basic flags
+					prim->flags = (curitem->flags() & ~PRIMFLAG_BLENDMODE_MASK)
+						| PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 
 					// apply clipping
 					clipped = render_clip_quad(&prim->bounds, &cliprect, nullptr);

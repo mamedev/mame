@@ -73,10 +73,10 @@ static const float PHI = 1.618034f;
 // Scanline & Shadowmask Vertex Shader
 //-----------------------------------------------------------------------------
 
-uniform float2 ScreenDims; // size of the window or fullscreen
-uniform float2 SourceDims; // size of the texture in power-of-two size
-uniform float2 SourceRect; // size of the uv rectangle
-uniform float2 TargetDims; // size of the target surface
+uniform float2 ScreenDims;
+uniform float2 SourceDims;
+uniform float2 TargetDims;
+uniform float2 QuadDims;
 
 uniform float2 ShadowDims = float2(32.0f, 32.0f); // size of the shadow texture (extended to power-of-two size)
 uniform float2 ShadowUVOffset = float2(0.0f, 0.0f);
@@ -96,15 +96,15 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.xy -= 0.5f; // center
 	Output.Position.xy *= 2.0f; // zoom
 
-	Output.TexCoord = Input.Position.xy / ScreenDims;
-
+	Output.TexCoord = Input.TexCoord;
 	Output.TexCoord += PrepareBloom
 		? 0.0f / TargetDims  // use half texel offset (DX9) to do the blur for first bloom layer
 		: 0.5f / TargetDims; // fix half texel offset correction (DX9)
 
-	Output.SourceCoord = Input.TexCoord;
-
 	Output.ScreenCoord = Input.Position.xy / ScreenDims;
+
+	Output.SourceCoord = Input.TexCoord;
+	Output.SourceCoord += 0.5f / TargetDims;
 
 	Output.Color = Input.Color;
 
@@ -157,20 +157,55 @@ float2 GetAdjustedCoords(float2 coord, float2 centerOffset)
 	return coord;
 }
 
+// vector screen has the same quad texture coordinates for every screen orientation, raster screen differs
+float2 GetShadowCoord(float2 QuadCoord, float2 SourceCoord)
+{
+	float2 QuadTexel = 1.0f / QuadDims;
+	float2 SourceTexel = 1.0f / SourceDims;
+
+	float2 canvasCoord = ShadowTileMode == 0
+		? QuadCoord + ShadowUVOffset / QuadDims
+		: SourceCoord + ShadowUVOffset / SourceDims;
+	float2 canvasTexelDims = ShadowTileMode == 0
+		? QuadTexel
+		: SourceTexel;
+
+	float2 shadowDims = ShadowDims;
+	float2 shadowUV = ShadowUV;
+	float2 shadowCount = ShadowCount;
+
+	canvasCoord = !VectorScreen && SwapXY
+		? canvasCoord.yx
+		: canvasCoord.xy;
+
+	shadowCount = !VectorScreen && SwapXY
+		? shadowCount.yx
+		: shadowCount.xy;
+
+	float2 shadowTile = canvasTexelDims * shadowCount;
+
+	float2 shadowFrac = frac(canvasCoord / shadowTile);
+	shadowFrac = !VectorScreen && SwapXY
+		? shadowFrac.yx
+		: shadowFrac.xy;
+
+	float2 shadowCoord = (shadowFrac * shadowUV);
+	shadowCoord += 0.5f / shadowDims; // half texel offset
+
+	return shadowCoord;
+}
+
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float2 ScreenTexelDims = 1.0f / ScreenDims;
-	float2 SourceTexelDims = 1.0f / SourceDims;
-
 	float2 ScreenCoord = Input.ScreenCoord;
 	float2 TexCoord = GetAdjustedCoords(Input.TexCoord, 0.5f);
-	float2 SourceCoord = GetAdjustedCoords(Input.SourceCoord, 0.5f * SourceRect);
+	float2 SourceCoord = GetAdjustedCoords(Input.SourceCoord, 0.5f);
 
 	// Color
 	float4 BaseColor = tex2D(DiffuseSampler, TexCoord);
 	BaseColor.a = 1.0f;
 
-	// keep border	
+	// keep border
 	if (!PrepareBloom)
 	{
 		// clip border
@@ -180,41 +215,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// Mask Simulation (may not affect bloom)
 	if (!PrepareBloom && ShadowAlpha > 0.0f)
 	{
-		float2 shadowUVOffset = ShadowUVOffset;
-		shadowUVOffset = SwapXY
-			? ShadowUVOffset.yx
-			: ShadowUVOffset.xy;
-
-		float2 shadowDims = ShadowDims;
-		shadowDims = SwapXY
-			? shadowDims.yx
-			: shadowDims.xy;
-
-		float2 shadowUV = ShadowUV;
-
-		float2 screenCoord = ShadowTileMode == 0
-			? ScreenCoord + shadowUVOffset / ScreenDims
-			: SourceCoord + shadowUVOffset / SourceDims;
-		screenCoord = SwapXY
-			? screenCoord.yx
-			: screenCoord.xy;
-
-		float2 shadowCount = ShadowCount;
-		shadowCount = SwapXY
-			? shadowCount.yx
-			: shadowCount.xy;
-
-		float2 shadowTile = ShadowTileMode == 0 
-			? ScreenTexelDims * shadowCount
-			: SourceTexelDims * shadowCount;
-		shadowTile = SwapXY
-			? shadowTile.yx
-			: shadowTile.xy;
-
-		float2 ShadowFrac = frac(screenCoord / shadowTile);
-
-		float2 ShadowCoord = (ShadowFrac * shadowUV);
-		ShadowCoord += 0.5f / shadowDims; // half texel offset
+		float2 ShadowCoord = GetShadowCoord(ScreenCoord, SourceCoord);
 
 		float4 ShadowColor = tex2D(ShadowSampler, ShadowCoord);
 		float3 ShadowMaskColor = lerp(1.0f, ShadowColor.rgb, ShadowAlpha);
@@ -263,7 +264,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		if (!VectorScreen && HumBarAlpha > 0.0f)
 		{
 			float HumBarStep = frac(TimeMilliseconds * HumBarDesync);
-			float HumBarBrightness = 1.0 - frac(SourceCoord.y / SourceRect.y + HumBarStep) * HumBarAlpha;
+			float HumBarBrightness = 1.0 - frac(SourceCoord.y + HumBarStep) * HumBarAlpha;
 			BaseColor.rgb *= HumBarBrightness;
 		}
 	}

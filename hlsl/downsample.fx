@@ -53,8 +53,6 @@ struct PS_INPUT
 
 uniform float2 ScreenDims;
 uniform float2 TargetDims;
-uniform float2 SourceDims;
-uniform float2 SourceRect;
 uniform float2 QuadDims;
 
 uniform int BloomLevel;
@@ -71,6 +69,9 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
 	float2 HalfTargetTexelDims = 0.5f / TargetDims;
+	HalfTargetTexelDims *= VectorScreen
+		? (ScreenDims / QuadDims)
+		: 1.0f;
 
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
@@ -80,7 +81,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 	Output.Color = Input.Color;
 
-	float2 TexCoord = Input.Position.xy / ScreenDims;
+	float2 TexCoord = Input.TexCoord;
 	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
 	Output.TexCoord01.xy = TexCoord + Coord0Offset * HalfTargetTexelDims;

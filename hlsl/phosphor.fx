@@ -79,7 +79,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.xy -= 0.5f; // center
 	Output.Position.xy *= 2.0f; // zoom
 
-	Output.TexCoord = Input.Position.xy / ScreenDims;
+	Output.TexCoord = Input.TexCoord;
 	Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
 	Output.PrevCoord = Output.TexCoord;

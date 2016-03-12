@@ -36,6 +36,8 @@ struct PS_INPUT
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
+uniform float2 QuadDims;
+
 uniform float2 TimeParams;
 uniform float3 LengthParams;
 
@@ -47,9 +49,9 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.xy /= ScreenDims;
 	Output.Position.y = 1.0f - Output.Position.y; // flip y
 	Output.Position.xy -= 0.5f; // center
-	Output.Position.xy *= 2.0f; // zoom
+	Output.Position.xy *= 2.0f * (ScreenDims / QuadDims); // zoom
 
-	Output.TexCoord = Input.Position.xy / ScreenDims;
+	Output.TexCoord = Input.TexCoord;
 
 	Output.Color = Input.Color;
 
@@ -75,7 +77,9 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	lengthModulate = lerp(lengthModulate, 4.0f, minLength * 0.5f);
 	lengthModulate = lerp(1.0f, timeModulate * lengthModulate, LengthParams.y);
 
-	float4 outColor = Input.Color * float4(lengthModulate, lengthModulate, lengthModulate, 1.0f);
+	float4 outColor = float4(lengthModulate, lengthModulate, lengthModulate, 1.0f);
+	outColor *= Input.Color;
+
 	return outColor;
 }
 
@@ -90,6 +94,6 @@ technique DefaultTechnique
 		Lighting = FALSE;
 
 		VertexShader = compile vs_2_0 vs_main();
-		PixelShader  = compile ps_2_0 ps_main();
+		PixelShader = compile ps_2_0 ps_main();
 	}
 }

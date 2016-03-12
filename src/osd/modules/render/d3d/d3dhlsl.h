@@ -307,7 +307,7 @@ public:
 	void toggle();
 
 	bool vector_enabled() { return master_enable && vector_enable; }
-	d3d_render_target* get_vector_target();
+	d3d_render_target* get_vector_target(render_primitive *prim);
 	void create_vector_target(render_primitive *prim);
 
 	void begin_frame();
@@ -320,8 +320,9 @@ public:
 	void render_quad(poly_info *poly, int vertnum);
 
 	bool register_texture(render_primitive *prim, texture_info *texture);
-	bool add_render_target(renderer_d3d9* d3d, texture_info* info, int width, int height, int target_width, int target_height);
-	bool add_cache_target(renderer_d3d9* d3d, texture_info* info, int width, int height, int screen_index);
+	d3d_render_target* get_texture_target(render_primitive *prim, texture_info *texture);
+	bool add_render_target(renderer_d3d9* d3d, texture_info* texture, int source_width, int source_height, int target_width, int target_height);
+	bool add_cache_target(renderer_d3d9* d3d, texture_info* texture, int source_width, int source_height, int target_width, int target_height, int screen_index);
 
 	void window_save();
 	void window_record();
@@ -332,10 +333,10 @@ public:
 	void record_texture();
 	void init_fsfx_quad(void *vertbuf);
 
-	void                    set_texture(texture_info *texture);
-	d3d_render_target *     find_render_target(texture_info *info);
+	void                    set_texture(texture_info *info);
+	d3d_render_target *     find_render_target(texture_info *texture);
 	void                    remove_render_target(texture_info *texture);
-	void                    remove_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
+	void                    remove_render_target(int source_width, int source_height, UINT32 screen_index, UINT32 page_index);
 	void                    remove_render_target(d3d_render_target *rt);
 
 	int create_resources(bool reset);
@@ -352,7 +353,7 @@ private:
 	void                    end_avi_recording();
 	void                    begin_avi_recording(const char *name);
 
-	d3d_render_target*      find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
+	d3d_render_target*      find_render_target(int source_width, int source_height, UINT32 screen_index, UINT32 page_index);
 	cache_target *          find_cache_target(UINT32 screen_index, int width, int height);
 	void                    remove_cache_target(cache_target *cache);
 

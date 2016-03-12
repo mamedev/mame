@@ -89,6 +89,8 @@ uniform float2 ScreenDims; // size of the window or fullscreen
 uniform float2 TargetDims; // size of the target surface
 uniform float2 QuadDims; // size of the screen quad
 
+uniform bool VectorScreen;
+
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
@@ -101,7 +103,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 	Output.Color = Input.Color;
 
-	Output.TexCoord = Input.Position.xy / ScreenDims;
+	Output.TexCoord = Input.TexCoord;
 	Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
 	return Output;
@@ -117,27 +119,8 @@ uniform float SmoothBorderAmount = 0.0f;
 uniform float VignettingAmount = 0.0f;
 uniform float ReflectionAmount = 0.0f;
 
+uniform bool SwapXY = false;
 uniform int RotationType = 0; // 0 = 0°, 1 = 90°, 2 = 180°, 3 = 270°
-
-float2 GetScreenQuadRatio()
-{
-	float ScreenRatio = ScreenDims.x / ScreenDims.y;
-	float QuadRatio = QuadDims.x / QuadDims.y;
-	float ScreenQuadRatio = QuadRatio / ScreenRatio;
-
-	return ScreenQuadRatio > 1.0f
-		? float2(1.0, 1.0f / ScreenQuadRatio)
-		: float2(ScreenQuadRatio, 1.0);
-}
-
-float2 GetQuadRatio()
-{
-	float QuadRatio = QuadDims.x / QuadDims.y;
-
-	return QuadRatio > 1.0f
-		? float2 (1.0f, 1.0f / QuadRatio)
-		: float2 (QuadRatio, 1.0f);
-}
 
 float GetNoiseFactor(float3 n, float random)
 {
@@ -147,7 +130,7 @@ float GetNoiseFactor(float3 n, float random)
 
 float GetVignetteFactor(float2 coord, float amount)
 {
-	float2 VignetteCoord = coord / (QuadDims / ScreenDims);
+	float2 VignetteCoord = coord;
 
 	float VignetteLength = length(VignetteCoord);
 	float VignetteBlur = (amount * 0.75f) + 0.25;
@@ -161,21 +144,42 @@ float GetVignetteFactor(float2 coord, float amount)
 
 float GetSpotAddend(float2 coord, float amount)
 {
-	float2 QuadRatio = GetQuadRatio();
+	float2 SpotCoord = coord;
 
-	// upper right quadrant
-	float2 spotOffset =
-		RotationType == 1 // 90°
-			? float2(-0.25f, -0.25f)
-			: RotationType == 2 // 180°
-				? float2(0.25f, -0.25f)
-				: RotationType == 3 // 270°
-					? float2(0.25f, 0.25f)
-					: float2(-0.25f, 0.25f);
+	// hack for vector screen
+	if (VectorScreen)
+	{
+		// upper right quadrant
+		float2 spotOffset =
+			RotationType == 1 // 90°
+				? float2(-0.25f, -0.25f)
+				: RotationType == 2 // 180°
+					? float2(0.25f, -0.25f)
+					: RotationType == 3 // 270° else 0°
+						? float2(0.25f, 0.25f)
+						: float2(-0.25f, 0.25f);
 
-	float2 SpotCoord = coord / (QuadDims / ScreenDims);
-	SpotCoord += spotOffset * QuadRatio;
-	SpotCoord *= QuadRatio;
+		// normalized screen canvas ratio
+		float2 CanvasRatio = SwapXY
+			? float2(QuadDims.x / QuadDims.y, 1.0f)
+			: float2(1.0f, QuadDims.y / QuadDims.x);
+
+		SpotCoord += spotOffset;
+		SpotCoord *= CanvasRatio;
+	}
+	else
+	{
+		// upper right quadrant
+		float2 spotOffset = float2(-0.25f, 0.25f);
+
+		// normalized screen canvas ratio
+		float2 CanvasRatio = SwapXY 
+			? float2(1.0f, QuadDims.x / QuadDims.y)
+			: float2(1.0f, QuadDims.y / QuadDims.x);
+
+		SpotCoord += spotOffset;
+		SpotCoord *= CanvasRatio;
+	}
 
 	float SpotBlur = amount;
 
@@ -193,17 +197,20 @@ float GetSpotAddend(float2 coord, float amount)
 
 float GetRoundCornerFactor(float2 coord, float radiusAmount, float smoothAmount)
 {
-	float2 ScreenQuadRatio = GetScreenQuadRatio();
-
 	// reduce smooth amount down to radius amount
 	smoothAmount = min(smoothAmount, radiusAmount);
 
-	float range = min(QuadDims.x, QuadDims.y) * 0.5;
+	float2 quadDims = QuadDims;
+	quadDims = !VectorScreen && SwapXY
+		? quadDims.yx
+		: quadDims.xy;
+
+	float range = min(quadDims.x, quadDims.y) * 0.5;
 	float radius = range * max(radiusAmount, 0.0025f);
 	float smooth = 1.0 / (range * max(smoothAmount, 0.0025f));
 
 	// compute box
-	float box = roundBox(ScreenDims * (coord * 2.0f), ScreenDims * ScreenQuadRatio, radius);
+	float box = roundBox(quadDims * (coord * 2.0f), quadDims, radius);
 
 	// apply smooth
 	box *= smooth;
@@ -240,19 +247,11 @@ float2 GetDistortedCoords(float2 centerCoord, float amount)
 
 float2 GetCoords(float2 coord, float distortionAmount)
 {
-	float2 ScreenQuadRatio = GetScreenQuadRatio();
-
 	// center coordinates
 	coord -= 0.5f;
 
-	// apply ratio difference between screen and quad
-	coord /= ScreenQuadRatio;
-
 	// distort coordinates
 	coord = GetDistortedCoords(coord, distortionAmount);
-
-	// revert ratio difference between screen and quad
-	coord *= ScreenQuadRatio;
 
 	// un-center coordinates
 	coord += 0.5f;

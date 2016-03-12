@@ -226,7 +226,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 	Output.Color = Input.Color;
 
-	float2 TexCoord = Input.Position.xy / ScreenDims;
+	float2 TexCoord = Input.TexCoord;
 	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
 	Output.TexCoord0 = TexCoord.xy; // + (0.5f / Level0Size);

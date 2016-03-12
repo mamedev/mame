@@ -67,8 +67,8 @@ VS_OUTPUT vs_screen_main(VS_INPUT Input)
 	Output.Position.xy -= 0.5f; // center
 	Output.Position.xy *= 2.0f; // zoom
 
-	Output.TexCoord = Input.Position.xy / ScreenDims;
-	Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
+	Output.TexCoord = Input.TexCoord;
+	// Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
 	Output.Color = Input.Color;
 
@@ -85,7 +85,7 @@ VS_OUTPUT vs_vector_buffer_main(VS_INPUT Input)
 	Output.Position.xy -= 0.5f; // center
 	Output.Position.xy *= 2.0f; // zoom
 
-	Output.TexCoord = Input.Position.xy / ScreenDims;
+	Output.TexCoord = Input.TexCoord;
 	Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
 	Output.Color = Input.Color;
@@ -104,6 +104,7 @@ VS_OUTPUT vs_ui_main(VS_INPUT Input)
 	Output.Position.xy *= 2.0f; // zoom
 
 	Output.TexCoord = Input.TexCoord;
+	// Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
 	Output.Color = Input.Color;
 
@@ -124,7 +125,6 @@ float4 ps_screen_main(PS_INPUT Input) : COLOR
 float4 ps_vector_buffer_main(PS_INPUT Input) : COLOR
 {
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
-	BaseTexel *= Input.Color + float4(1.0f, 1.0f, 1.0f, 0.0f);
 
 	return BaseTexel;
 }

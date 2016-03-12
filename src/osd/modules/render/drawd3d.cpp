@@ -420,63 +420,6 @@ d3d_texture_manager::~d3d_texture_manager()
 {
 }
 
-
-//============================================================
-//  d3d_texture_manager::compute_texture_size
-//============================================================
-
-void d3d_texture_manager::compute_texture_size(int texwidth, int texheight, int* p_width, int* p_height)
-{
-	int finalheight = texheight;
-	int finalwidth = texwidth;
-
-	// round width/height up to nearest power of 2 if we need to
-	if (!(get_texture_caps() & D3DPTEXTURECAPS_NONPOW2CONDITIONAL))
-	{
-		// first the width
-		if (finalwidth & (finalwidth - 1))
-		{
-			finalwidth |= finalwidth >> 1;
-			finalwidth |= finalwidth >> 2;
-			finalwidth |= finalwidth >> 4;
-			finalwidth |= finalwidth >> 8;
-			finalwidth++;
-		}
-
-		// then the height
-		if (finalheight & (finalheight - 1))
-		{
-			finalheight |= finalheight >> 1;
-			finalheight |= finalheight >> 2;
-			finalheight |= finalheight >> 4;
-			finalheight |= finalheight >> 8;
-			finalheight++;
-		}
-	}
-
-	// round up to square if we need to
-	if (get_texture_caps() & D3DPTEXTURECAPS_SQUAREONLY)
-	{
-		if (finalwidth < finalheight)
-			finalwidth = finalheight;
-		else
-			finalheight = finalwidth;
-	}
-
-	// adjust the aspect ratio if we need to
-	while (finalwidth < finalheight && finalheight / finalwidth > get_max_texture_aspect())
-	{
-		finalwidth *= 2;
-	}
-	while (finalheight < finalwidth && finalwidth / finalheight > get_max_texture_aspect())
-	{
-		finalheight *= 2;
-	}
-
-	*p_width = finalwidth;
-	*p_height = finalheight;
-}
-
 void d3d_texture_manager::create_resources()
 {
 	// experimental: load a PNG to use for vector rendering; it is treated
@@ -696,16 +639,12 @@ void d3d_texture_manager::update_textures()
 			{
 				if (m_renderer->get_shaders()->enabled())
 				{
-					// create a new texture without prescale, shaders will handle the prescale
+					// if there isn't one, create a new texture without prescale
 					texture = global_alloc(texture_info(this, &prim->texture, 1, prim->flags));
-					if (texture != nullptr)
-					{
-						m_renderer->get_shaders()->register_texture(prim, texture);
-					}
 				}
 				else
 				{
-					// create a new texture
+					// if there isn't one, create a new texture
 					texture = global_alloc(texture_info(this, &prim->texture, m_renderer->window().prescale(), prim->flags));
 				}
 			}
@@ -718,10 +657,21 @@ void d3d_texture_manager::update_textures()
 					texture->get_texinfo().seqid = prim->texture.seqid;
 				}
 			}
+
+			if (m_renderer->get_shaders()->enabled())
+			{
+				if (!m_renderer->get_shaders()->get_texture_target(prim, texture))
+				{
+					if (!m_renderer->get_shaders()->register_texture(prim, texture))
+					{
+						d3dintf->post_fx_available = false;
+					}
+				}
+			}
 		}
 		else if(m_renderer->get_shaders()->vector_enabled() && PRIMFLAG_GET_VECTORBUF(prim->flags))
 		{
-			if (!m_renderer->get_shaders()->get_vector_target())
+			if (!m_renderer->get_shaders()->get_vector_target(prim))
 			{
 				m_renderer->get_shaders()->create_vector_target(prim);
 			}
@@ -754,12 +704,15 @@ void renderer_d3d9::begin_frame()
 		m_shaders->init_fsfx_quad(m_hlsl_buf);
 	}
 
+	// loop over line primitives
 	m_line_count = 0;
-
-	// loop over primitives
 	for (render_primitive *prim = window().m_primlist->first(); prim != nullptr; prim = prim->next())
+	{
 		if (prim->type == render_primitive::LINE && PRIMFLAG_GET_VECTOR(prim->flags))
+		{
 			m_line_count++;
+		}
+	}
 }
 
 void renderer_d3d9::process_primitives()
@@ -1444,6 +1397,9 @@ void renderer_d3d9::batch_vectors()
 	m_vectorbatch = mesh_alloc(m_line_count * vector_size);
 	m_batchindex = 0;
 
+	float width = 0.0f;
+	float height = 0.0f;
+
 	static int start_index = 0;
 	int line_index = 0;
 	float period = options.screen_vector_time_period();
@@ -1468,6 +1424,14 @@ void renderer_d3d9::batch_vectors()
 				}
 				break;
 
+			case render_primitive::QUAD:
+				if (PRIMFLAG_GET_VECTORBUF(prim->flags))
+				{
+					width = prim->bounds.x1 - prim->bounds.x0;
+					height = prim->bounds.y1 - prim->bounds.y0;
+				}
+				break;
+
 			default:
 				// Skip
 				break;
@@ -1476,7 +1440,7 @@ void renderer_d3d9::batch_vectors()
 
 	// now add a polygon entry
 	m_poly[m_numpolys].init(D3DPT_TRIANGLELIST, m_line_count * (options.antialias() ? 8 : 2), vector_size * m_line_count, cached_flags,
-		m_texture_manager->get_vector_texture(), D3DTOP_MODULATE, 0.0f, 1.0f, 0.0f, 0.0f);
+		m_texture_manager->get_vector_texture(), D3DTOP_MODULATE, 0.0f, 1.0f, width, height);
 	m_numpolys++;
 
 	start_index += (int)((float)line_index * period);
@@ -1959,15 +1923,36 @@ texture_info::texture_info(d3d_texture_manager *manager, const render_texinfo* t
 	m_d3dsurface = nullptr;
 	m_d3dfinaltex = nullptr;
 
+	// determine texture type, required to compute texture size
+	if (!PRIMFLAG_GET_SCREENTEX(flags))
+	{
+		m_type = TEXTURE_TYPE_PLAIN;
+	}
+	else
+	{
+		if ((m_xprescale == 1 && m_yprescale == 1) || m_renderer->get_shaders()->enabled())
+		{
+			m_type = m_texture_manager->is_dynamic_supported() ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
+		}
+		else
+		{
+			if (m_texture_manager->is_stretch_supported() && PRIMFLAG_GET_TEXFORMAT(flags) != TEXFORMAT_YUY16)
+			{
+				m_type = TEXTURE_TYPE_SURFACE;
+			}
+			else
+			{
+				m_type = m_texture_manager->is_dynamic_supported() ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
+			}
+		}
+	}
+
+	// compute the size
+	compute_size(texsource->width, texsource->height);
+
 	// non-screen textures are easy
 	if (!PRIMFLAG_GET_SCREENTEX(flags))
 	{
-		// required to compute the size
-		m_type = TEXTURE_TYPE_PLAIN;		
-
-		// compute the size
-		compute_size(texsource->width, texsource->height);
-
 		assert(PRIMFLAG_TEXFORMAT(flags) != TEXFORMAT_YUY16);
 		result = (*d3dintf->device.create_texture)(m_renderer->get_device(), m_rawdims.c.x, m_rawdims.c.y, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &m_d3dtex);
 		if (result != D3D_OK)
@@ -2030,15 +2015,9 @@ texture_info::texture_info(d3d_texture_manager *manager, const render_texinfo* t
 				m_xprescale = m_yprescale = 1;
 			}
 
-			// screen textures with no prescaling are pretty easy and shaders handle prescale itself
+			// screen textures with no prescaling are pretty easy
 			if (m_xprescale == 1 && m_yprescale == 1)
 			{
-				// required to compute the size
-				m_type = m_texture_manager->is_dynamic_supported() ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
-
-				// compute the size
-				compute_size(texsource->width, texsource->height);
-
 				result = (*d3dintf->device.create_texture)(m_renderer->get_device(), m_rawdims.c.x, m_rawdims.c.y, 1, usage, format, pool, &m_d3dtex);
 				if (result == D3D_OK)
 				{
@@ -2053,12 +2032,6 @@ texture_info::texture_info(d3d_texture_manager *manager, const render_texinfo* t
 				// (won't work for YUY textures)
 				if (m_texture_manager->is_stretch_supported() && PRIMFLAG_GET_TEXFORMAT(flags) != TEXFORMAT_YUY16)
 				{
-					// required to compute the size
-					m_type = TEXTURE_TYPE_SURFACE;
-
-					// compute the size
-					compute_size(texsource->width, texsource->height);
-
 					result = (*d3dintf->device.create_offscreen_plain_surface)(m_renderer->get_device(), m_rawdims.c.x, m_rawdims.c.y, format, D3DPOOL_DEFAULT, &m_d3dsurface);
 					if (result != D3D_OK)
 					{
@@ -2068,12 +2041,6 @@ texture_info::texture_info(d3d_texture_manager *manager, const render_texinfo* t
 				// otherwise, we allocate a dynamic texture for the source
 				else
 				{
-					// required to compute the size
-					m_type = m_texture_manager->is_dynamic_supported() ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
-
-					// compute the size
-					compute_size(texsource->width, texsource->height);
-
 					result = (*d3dintf->device.create_texture)(m_renderer->get_device(), m_rawdims.c.x, m_rawdims.c.y, 1, usage, format, pool, &m_d3dtex);
 					if (result != D3D_OK)
 					{
@@ -2122,6 +2089,63 @@ error:
 
 
 //============================================================
+//  texture_info::compute_size_subroutine
+//============================================================
+
+void texture_info::compute_size_subroutine(int texwidth, int texheight, int* p_width, int* p_height)
+{
+	int finalheight = texheight;
+	int finalwidth = texwidth;
+
+	// round width/height up to nearest power of 2 if we need to
+	if (!(m_texture_manager->get_texture_caps() & D3DPTEXTURECAPS_NONPOW2CONDITIONAL))
+	{
+		// first the width
+		if (finalwidth & (finalwidth - 1))
+		{
+			finalwidth |= finalwidth >> 1;
+			finalwidth |= finalwidth >> 2;
+			finalwidth |= finalwidth >> 4;
+			finalwidth |= finalwidth >> 8;
+			finalwidth++;
+		}
+
+		// then the height
+		if (finalheight & (finalheight - 1))
+		{
+			finalheight |= finalheight >> 1;
+			finalheight |= finalheight >> 2;
+			finalheight |= finalheight >> 4;
+			finalheight |= finalheight >> 8;
+			finalheight++;
+		}
+	}
+
+	// round up to square if we need to
+	if (m_texture_manager->get_texture_caps() & D3DPTEXTURECAPS_SQUAREONLY)
+	{
+		if (finalwidth < finalheight)
+			finalwidth = finalheight;
+		else
+			finalheight = finalwidth;
+	}
+
+	// adjust the aspect ratio if we need to
+	while (finalwidth < finalheight && finalheight / finalwidth > m_texture_manager->get_max_texture_aspect())
+	{
+		finalwidth *= 2;
+	}
+	while (finalheight < finalwidth && finalwidth / finalheight > m_texture_manager->get_max_texture_aspect())
+	{
+		finalheight *= 2;
+	}
+
+	*p_width = finalwidth;
+	*p_height = finalheight;
+}
+
+
+//============================================================
 //  texture_info::compute_size
 //============================================================
 
@@ -2156,7 +2180,7 @@ void texture_info::compute_size(int texwidth, int texheight)
 	// take texture size as given when shaders are enabled and we're not creating a surface (UI) texture, still update wrapped textures
 	if (!shaders_enabled || surface_texture || wrap_texture)
 	{
-		m_texture_manager->compute_texture_size(finalwidth, finalheight, &finalwidth, &finalheight);
+		compute_size_subroutine(finalwidth, finalheight, &finalwidth, &finalheight);
 
 		// if we added pixels for the border, and that just barely pushed us over, take it back
 		if (finalwidth > m_texture_manager->get_max_texture_width() || finalheight > m_texture_manager->get_max_texture_height())
@@ -2167,7 +2191,7 @@ void texture_info::compute_size(int texwidth, int texheight)
 			m_xborderpix = 0;
 			m_yborderpix = 0;
 
-			m_texture_manager->compute_texture_size(finalwidth, finalheight, &finalwidth, &finalheight);
+			compute_size_subroutine(finalwidth, finalheight, &finalwidth, &finalheight);
 		}
 	}
 
@@ -2747,10 +2771,10 @@ cache_target::~cache_target()
 //  cache_target::init - initializes a target cache
 //============================================================
 
-bool cache_target::init(renderer_d3d9 *d3d, d3d_base *d3dintf, int target_width, int target_height)
+bool cache_target::init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height)
 {
-	// d3d->get_texture_manager()->compute_texture_size(target_width, target_height, &target_width, &target_height);
-
+	this->width = source_width;
+	this->height = source_height;
 	this->target_width = target_width;
 	this->target_height = target_height;
 
@@ -2815,21 +2839,19 @@ d3d_render_target::~d3d_render_target()
 //  d3d_render_target::init - initializes a render target
 //============================================================
 
-bool d3d_render_target::init(renderer_d3d9 *d3d, d3d_base *d3dintf, int width, int height, int target_width, int target_height)
+bool d3d_render_target::init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height)
 {
 	HRESULT result;
 
-	// d3d->get_texture_manager()->compute_texture_size(target_width, target_height, &target_width, &target_height);
-
-	this->width = width;
-	this->height = height;
+	this->width = source_width;
+	this->height = source_height;
 
 	this->target_width = target_width;
 	this->target_height = target_height;
 
 	for (int index = 0; index < 2; index++)
 	{
-		result = (*d3dintf->device.create_texture)(d3d->get_device(), width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &source_texture[index]);
+		result = (*d3dintf->device.create_texture)(d3d->get_device(), source_width, source_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &source_texture[index]);
 		if (result != D3D_OK)
 		{
 			return false;
@@ -2850,8 +2872,8 @@ bool d3d_render_target::init(renderer_d3d9 *d3d, d3d_base *d3dintf, int width, i
 	// larger blur width for vector screens than raster screens
 	float scale_factor = vector_screen ? 0.5f : 0.75f;
 
-	float bloom_width = (float)width;	
-	float bloom_height = (float)height;
+	float bloom_width = (float)source_width;
+	float bloom_height = (float)source_height;
 	float bloom_size = bloom_width < bloom_height ? bloom_width : bloom_height;
 	for (int bloom_index = 0; bloom_index < 11 && bloom_size >= 2.0f; bloom_size *= scale_factor)
 	{

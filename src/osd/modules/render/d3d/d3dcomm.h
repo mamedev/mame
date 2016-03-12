@@ -77,8 +77,6 @@ public:
 	DWORD                   get_max_texture_width() { return m_texture_max_width; }
 	DWORD                   get_max_texture_height() { return m_texture_max_height; }
 
-	void                    compute_texture_size(int texwidth, int texheight, int* p_width, int* p_height);
-
 	texture_info *          get_default_texture() { return m_default_texture; }
 	texture_info *          get_vector_texture() { return m_vector_texture; }
 
@@ -150,6 +148,7 @@ public:
 private:
 	void prescale();
 	void compute_size(int texwidth, int texheight);
+	void compute_size_subroutine(int texwidth, int texheight, int* p_width, int* p_height);
 
 	d3d_texture_manager *   m_texture_manager;          // texture manager pointer
 
@@ -245,7 +244,7 @@ public:
 	cache_target() { }
 	~cache_target();
 
-	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int width, int height);
+	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height);
 
 	surface *last_target;
 	texture *last_texture;
@@ -270,7 +269,7 @@ public:
 	d3d_render_target() { }
 	~d3d_render_target();
 
-	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int width, int height, int target_width, int target_height);
+	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height);
 	int next_index(int index) { return ++index > 1 ? 0 : index; }
 
 	// real target dimension
