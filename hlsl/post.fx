@@ -174,18 +174,18 @@ float2 GetShadowCoord(float2 QuadCoord, float2 SourceCoord)
 	float2 shadowUV = ShadowUV;
 	float2 shadowCount = ShadowCount;
 
-	canvasCoord = !VectorScreen && SwapXY
+	canvasCoord = !VectorScreen && ShadowTileMode == 0 && SwapXY
 		? canvasCoord.yx
 		: canvasCoord.xy;
 
-	shadowCount = !VectorScreen && SwapXY
+	shadowCount = !VectorScreen && ShadowTileMode == 0 && SwapXY
 		? shadowCount.yx
 		: shadowCount.xy;
 
 	float2 shadowTile = canvasTexelDims * shadowCount;
 
 	float2 shadowFrac = frac(canvasCoord / shadowTile);
-	shadowFrac = !VectorScreen && SwapXY
+	shadowFrac = !VectorScreen && ShadowTileMode == 0 && SwapXY
 		? shadowFrac.yx
 		: shadowFrac.xy;
 
