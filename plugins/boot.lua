@@ -1,6 +1,7 @@
+-- license:BSD-3-Clause
+-- copyright-holders:Miodrag Milanovic
 require('lfs')
-local uv = require('luv')
-local cwd = uv.cwd()
+local cwd = lfs.currentdir()
 package.path = cwd .. "/plugins/?.lua;" .. cwd .. "/plugins/?/init.lua"
 
 local json = require('json')

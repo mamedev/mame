@@ -33,7 +33,7 @@
   upgrades/conversions/hacks.  Are any of them legit?
 
   W-4   New Lucky 8 Lines
-        Bingo - supposed to be a W-4 but unverified
+        Bingo
   F-5   New Lucky 8 Lines w/ Witch Bonus - bootleg/hack??
   W-6   Fever Chance
   W-7   Skill Chance
@@ -181,6 +181,12 @@
   you can see what seems the attract working (still with wrong graphics).
 
   Seems to be sooo slow.... (interrupts?)
+
+
+  * Bingo (Wing)
+
+  It has a different machine driver to support the different pos of gfx
+  layers. I strogly suspect there is a register to adjust the layer position.   
 
 
 ***************************************************************************/
@@ -8091,6 +8097,35 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+/*
+  Golden Star (bootleg of Cherry 1 Gold)
+  Processor: ZILOG Z0840006PSC Z80 CPU 9745 RN
+
+  EPROM:
+
+	Name:  1
+	File:  gs1.bin
+	Type:  TMS JL 27C010A-12 LX78AC96P
+	
+	Name:  2
+	File:  gs2.bin
+	Type:  TMS JL 27C010A-10 LX73A5J4P
+	
+	Nome:  3
+	File:  gs3.bin
+	Type:  TMS JL 29C010A-12 LX78AC96P
+	
+	Nome:  4
+	File:  gs4.bin
+	Type:  TMS JL 27C010A-10 LX73A5J4P
+
+  Other IC's on MB
+
+  - ACTEL A1020B PL84C 9713
+  - 9703R MS6264L-70PC
+  - HOLTEK HT 6116-70 9806K0625
+
+*/
 ROM_START( goldstar )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gs4-cpu.bin",  0x0000, 0x10000, CRC(73e47d4d) SHA1(df2d8233572dc12e8a4b56e5d4f6c566e4ababc9) )
@@ -8105,7 +8140,17 @@ ROM_START( goldstar )
 	ROM_LOAD( "gs1-snd.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
 
+/*
+  Golden Star (blue version)
 
+  This is the blue PCB version. EPROMs are marked with colored stickers.
+
+  The red and yellow EPROMs are for graphics. The red is identical to the one found in normal golden star,
+  while yellow match only 90% (probably the logo)
+
+  The blue one match the golden star ROM 1 and contains ADCPM audio.
+
+*/
 ROM_START( goldstbl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gsb-cpu.bin",  0x0000, 0x10000, CRC(82b238c3) SHA1(1306e700e213f423bdd79b182aa11335796f7f38) )
@@ -8182,44 +8227,6 @@ ROM_END
 
 
 /*
-
-Cherry I Gold
-
-Anno    1998
-Produttore
-N.revisione W4BON (rev.1)
-
-
-CPU
-
-1x TMPZ84C00AP-6 (u12)(main)
-2x D8255AC-2 (u45,u46) (missing)
-1x D71055C (u40) (missing)
-1x YM2149 (u39)
-1x SN76489AN (u38)
-1x oscillator 12.0C45
-
-ROMs
-
-1x I27256 (u3)
-1x I27C010 (u1)
-1x PROM N82S147AN (u2)
-1x M27C512 (u20)
-1x GAL20V8 (pl1)(read protected)
-1x PALCE20V8H (pl2)(read protected)
-1x ispLSI1024-60LJ (pl3)(read protected)
-3x PALCE16V8H (pl4,pl6,pl7)(read protected)
-1x PEEL22CV10 (pl5)(read protected)
-
-Note
-
-1x 36x2 edge connector
-1x 10x2 edge connector
-2x trimmer (volume)
-5x 8x2 switches dip (sw1-5)
-1x push lever (TS)
-
-
 Cherry Gold  (Cherry 10)
 
 Anno    1997
@@ -8282,6 +8289,44 @@ ROM_START( chry10 )
 ROM_END
 
 
+/*
+Cherry I Gold
+
+Anno    1998
+Produttore
+N.revisione W4BON (rev.1)
+
+
+CPU
+
+1x TMPZ84C00AP-6 (u12)(main)
+2x D8255AC-2 (u45,u46) (missing)
+1x D71055C (u40) (missing)
+1x YM2149 (u39)
+1x SN76489AN (u38)
+1x oscillator 12.0C45
+
+ROMs
+
+1x I27256 (u3)
+1x I27C010 (u1)
+1x PROM N82S147AN (u2)
+1x M27C512 (u20)
+1x GAL20V8 (pl1)(read protected)
+1x PALCE20V8H (pl2)(read protected)
+1x ispLSI1024-60LJ (pl3)(read protected)
+3x PALCE16V8H (pl4,pl6,pl7)(read protected)
+1x PEEL22CV10 (pl5)(read protected)
+
+Note
+
+1x 36x2 edge connector
+1x 10x2 edge connector
+2x trimmer (volume)
+5x 8x2 switches dip (sw1-5)
+1x push lever (TS)
+
+*/
 ROM_START( chrygld )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ol-v9.u20",  0x00000, 0x10000, CRC(b61c0695) SHA1(63c44b20fd7f76bdb33331273d2610e8cfd31add) )

@@ -694,7 +694,7 @@ ADDRESS_MAP_END
    x   0   x   x   x   x   x   1     RW    CRTC register r/w
    x   1   *   *   *   **  **  **        read area (rightmost 74ls138):
    x   1   0   0   0   *   *   *     R     SYSTAT_A (a0-a3 chooses the bit of the dipswitches read via d3)
-   x   1   0   0   1   x   x   x    R     SYSTAT_B
+   x   1   0   0   1   x   x   x     R     SYSTAT_B
    x   1   0   1   0   x   x   0     R     i8251 UART data
    x   1   0   1   0   x   x   1     R     i8251 UART status
    x   1   0   1   1   x   x   x     R     unused

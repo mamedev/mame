@@ -203,7 +203,8 @@ const device_type TMS0270 = &device_creator<tms0270_cpu_device>; // 40-pin DIP, 
 // TMS0260 is same or similar?
 
 // TP0320 is TI's first CMOS MCU with integrated LCD controller, the die is still very similar to TMS0980
-// - x
+// - ROM and main RAM is same as on TMS0980 with different row-select
+// - 
 const device_type TP0320 = &device_creator<tp0320_cpu_device>; // 28-pin SDIP, ..
 
 

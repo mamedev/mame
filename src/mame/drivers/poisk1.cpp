@@ -10,13 +10,23 @@
 
 #include "emu.h"
 
-#include "includes/poisk1.h"
 #include "machine/kb_poisk1.h"
+#include "video/cgapal.h"
+#include "imagedev/cassette.h"
+#include "machine/i8255.h"
+#include "bus/isa/isa.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "bus/isa/xsu_cards.h"
+#include "sound/speaker.h"
 
 #include "cpu/i86/i86.h"
 
 #define CGA_PALETTE_SETS 83
 /* one for colour, one for mono, 81 for colour composite */
+
+#define BG_COLOR(x) (((x) & 7)|(((x) & 0x10) >> 1))
 
 #define VERBOSE_DBG 0
 
@@ -30,9 +40,379 @@
 		} \
 	} while (0)
 
+#define POISK1_UPDATE_ROW(name) \
+	void name(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 *videoram, UINT16 ma, UINT8 ra, UINT8 stride)
+
+class p1_state : public driver_device
+{
+public:
+	p1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_pic8259(*this, "pic8259"),
+		m_pit8253(*this, "pit8253"),
+		m_ppi8255n1(*this, "ppi8255n1"),
+		m_ppi8255n2(*this, "ppi8255n2"),
+		m_isabus(*this, "isa"),
+		m_speaker(*this, "speaker"),
+		m_cassette(*this, "cassette"),
+		m_ram(*this, RAM_TAG),
+		m_palette(*this, "palette") { }
+
+	required_device<cpu_device>  m_maincpu;
+	required_device<pic8259_device>  m_pic8259;
+	required_device<pit8253_device>  m_pit8253;
+	required_device<i8255_device>  m_ppi8255n1;
+	required_device<i8255_device>  m_ppi8255n2;
+	required_device<isa8_device>  m_isabus;
+	required_device<speaker_sound_device>  m_speaker;
+	required_device<cassette_image_device>  m_cassette;
+	required_device<ram_device> m_ram;
+	required_device<palette_device> m_palette;
+
+	DECLARE_DRIVER_INIT(poisk1);
+	DECLARE_MACHINE_START(poisk1);
+	DECLARE_MACHINE_RESET(poisk1);
+
+	DECLARE_PALETTE_INIT(p1);
+	virtual void video_start() override;
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void set_palette_luts();
+	POISK1_UPDATE_ROW(cga_gfx_2bpp_update_row);
+	POISK1_UPDATE_ROW(cga_gfx_1bpp_update_row);
+	POISK1_UPDATE_ROW(poisk1_gfx_1bpp_update_row);
+
+	DECLARE_WRITE_LINE_MEMBER(p1_pit8253_out2_changed);
+	DECLARE_WRITE_LINE_MEMBER(p1_speaker_set_spkrdata);
+	UINT8 m_p1_spkrdata;
+	UINT8 m_p1_input;
+
+	UINT8 m_kbpoll_mask;
+
+	struct
+	{
+		UINT8 trap[4];
+		std::unique_ptr<UINT8[]> videoram_base;
+		UINT8 *videoram;
+		UINT8 mode_control_6a;
+		UINT8 color_select_68;
+		UINT8 palette_lut_2bpp[4];
+		int stride;
+		void *update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 *videoram, UINT16 ma, UINT8 ra, UINT8 stride);
+	} m_video;
+
+	DECLARE_READ8_MEMBER(p1_trap_r);
+	DECLARE_WRITE8_MEMBER(p1_trap_w);
+	DECLARE_READ8_MEMBER(p1_cga_r);
+	DECLARE_WRITE8_MEMBER(p1_cga_w);
+	DECLARE_WRITE8_MEMBER(p1_vram_w);
+
+	DECLARE_READ8_MEMBER(p1_ppi_r);
+	DECLARE_WRITE8_MEMBER(p1_ppi_w);
+	DECLARE_WRITE8_MEMBER(p1_ppi_porta_w);
+	DECLARE_READ8_MEMBER(p1_ppi_porta_r);
+	DECLARE_READ8_MEMBER(p1_ppi_portb_r);
+	DECLARE_READ8_MEMBER(p1_ppi_portc_r);
+	DECLARE_WRITE8_MEMBER(p1_ppi_portc_w);
+	DECLARE_WRITE8_MEMBER(p1_ppi2_porta_w);
+	DECLARE_WRITE8_MEMBER(p1_ppi2_portb_w);
+	DECLARE_READ8_MEMBER(p1_ppi2_portc_r);
+	const char *m_cputag;
+};
+
 /*
  * onboard devices:
  */
+
+/*
+ * Poisk-1 doesn't have a mc6845 and always runs in graphics mode.  Text mode is emulated by BIOS;
+ * NMI is triggered on access to video memory and to mc6845 ports.  Address and data are latched into:
+ *
+ * Port 28H (offset 0) -- lower 8 bits of address
+ * Port 29H (offset 1) -- high  -//- and mode bits
+ * Port 2AH (offset 2) -- data
+ */
+
+READ8_MEMBER(p1_state::p1_trap_r)
+{
+	UINT8 data = m_video.trap[offset];
+	DBG_LOG(1,"trap",("R %.2x $%02x\n", 0x28+offset, data));
+	if (offset == 0)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	return data;
+}
+
+WRITE8_MEMBER(p1_state::p1_trap_w)
+{
+	DBG_LOG(1,"trap",("W %.2x $%02x\n", 0x28+offset, data));
+}
+
+READ8_MEMBER(p1_state::p1_cga_r)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	return 0;
+}
+
+WRITE8_MEMBER(p1_state::p1_cga_w)
+{
+	UINT16 port = offset + 0x3d0;
+
+	DBG_LOG(1,"cga",("W %.4x $%02x\n", port, data));
+	m_video.trap[2] = data;
+	m_video.trap[1] = 0xC0 | ((port >> 8) & 0x3f);
+	m_video.trap[0] = port & 255;
+	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+WRITE8_MEMBER(p1_state::p1_vram_w)
+{
+	DBG_LOG(1,"vram",("W %.4x $%02x\n", offset, data));
+	if (m_video.videoram_base)
+		m_video.videoram_base[offset] = data;
+	m_video.trap[2] = data;
+	m_video.trap[1] = 0x80 | ((offset >> 8) & 0x3f);
+	m_video.trap[0] = offset & 255;
+	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+// CGA emulator
+/*
+068h    D42 0..2    R, G, B     XXX Foreground/Background color
+        3   NMI DISABLE NMI trap  1: Disabled  0: Enabled
+        4   PALETTE     XXX Colour palette  0: XXX  1: XXX
+        5   I (INTENS)  XXX Foreground/Background color intensity
+        6   DISPLAY BANK    XXX Video RAM page
+        7   HIRES       1: 640x200  0: 320x200
+*/
+
+WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
+{
+	address_space &space_prg = m_maincpu->space(AS_PROGRAM);
+
+	DBG_LOG(1,"color_select_68",("W $%02x\n", data));
+
+	// NMI DISABLE
+	if (BIT(data, 3) != BIT(m_video.color_select_68, 3)) {
+		if (BIT(data, 3)) {
+			space_prg.install_readwrite_bank( 0xb8000, 0xbbfff, "bank11" );
+		} else {
+			space_prg.install_read_bank( 0xb8000, 0xbbfff, "bank11" );
+			space_prg.install_write_handler( 0xb8000, 0xbbfff, WRITE8_DELEGATE(p1_state, p1_vram_w) );
+		}
+	}
+	// DISPLAY BANK
+	if (BIT(data, 6) != BIT(m_video.color_select_68, 6)) {
+		if (BIT(data, 6))
+			m_video.videoram = m_video.videoram_base.get() + 0x4000;
+		else
+			m_video.videoram = m_video.videoram_base.get();
+	}
+	// HIRES -- XXX
+	if (BIT(data, 7) != BIT(m_video.color_select_68, 7)) {
+		if (BIT(data, 7))
+			machine().first_screen()->set_visible_area(0, 640-1, 0, 200-1);
+		else
+			machine().first_screen()->set_visible_area(0, 320-1, 0, 200-1);
+	}
+	m_video.color_select_68 = data;
+	set_palette_luts();
+}
+
+/*
+06Ah    Dxx 6   Enable/Disable color burst (?)
+        7   Enable/Disable D7H/D7L
+*/
+
+WRITE8_MEMBER(p1_state::p1_ppi_portc_w)
+{
+	DBG_LOG(1,"mode_control_6a",("W $%02x\n", data));
+
+	m_video.mode_control_6a = data;
+	set_palette_luts();
+}
+
+void p1_state::set_palette_luts(void)
+{
+	/* Setup 2bpp palette lookup table */
+	// HIRES
+	if ( m_video.color_select_68 & 0x80 )
+	{
+		m_video.palette_lut_2bpp[0] = 0;
+	}
+	else
+	{
+		m_video.palette_lut_2bpp[0] = BG_COLOR(m_video.color_select_68);
+	}
+	// B&W -- XXX
+/*
+    if ( m_video.mode_control_6a & 0x40 )
+    {
+        m_video.palette_lut_2bpp[1] = ( ( m_video.color_select_68 & 0x20 ) >> 2 ) | 3;
+        m_video.palette_lut_2bpp[2] = ( ( m_video.color_select_68 & 0x20 ) >> 2 ) | 4;
+        m_video.palette_lut_2bpp[3] = ( ( m_video.color_select_68 & 0x20 ) >> 2 ) | 7;
+    }
+    else
+*/
+	{
+		// PALETTE
+		if ( m_video.color_select_68 & 0x20 )
+		{
+			m_video.palette_lut_2bpp[1] = ( ( m_video.color_select_68 & 0x20 ) >> 2 ) | 3;
+			m_video.palette_lut_2bpp[2] = ( ( m_video.color_select_68 & 0x20 ) >> 2 ) | 5;
+			m_video.palette_lut_2bpp[3] = ( ( m_video.color_select_68 & 0x20 ) >> 2 ) | 7;
+		}
+		else
+		{
+			m_video.palette_lut_2bpp[1] = ( ( m_video.color_select_68 & 0x20 ) >> 2 ) | 2;
+			m_video.palette_lut_2bpp[2] = ( ( m_video.color_select_68 & 0x20 ) >> 2 ) | 4;
+			m_video.palette_lut_2bpp[3] = ( ( m_video.color_select_68 & 0x20 ) >> 2 ) | 6;
+		}
+	}
+}
+
+/***************************************************************************
+  Draw graphics mode with 320x200 pixels (default) with 2 bits/pixel.
+  Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
+  cga fetches 2 byte per mc6845 access.
+***************************************************************************/
+
+POISK1_UPDATE_ROW( p1_state::cga_gfx_2bpp_update_row )
+{
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT32  *p = &bitmap.pix32(ra);
+	UINT16  odd, offset;
+	int i;
+
+	if ( ra == 0 ) DBG_LOG(1,"cga_gfx_2bpp_update_row",("\n"));
+	odd = ( ra & 1 ) << 13;
+	offset = ( ma & 0x1fff ) | odd;
+	for ( i = 0; i < stride; i++ )
+	{
+		UINT8 data = videoram[ offset++ ];
+
+		*p = palette[m_video.palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]]; p++;
+		*p = palette[m_video.palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]]; p++;
+		*p = palette[m_video.palette_lut_2bpp[ ( data >> 2 ) & 0x03 ]]; p++;
+		*p = palette[m_video.palette_lut_2bpp[   data        & 0x03 ]]; p++;
+	}
+}
+
+/***************************************************************************
+  Draw graphics mode with 640x200 pixels (default).
+  The cell size is 1x1 (1 scanline is the real default)
+  Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
+***************************************************************************/
+
+POISK1_UPDATE_ROW( p1_state::cga_gfx_1bpp_update_row )
+{
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT32  *p = &bitmap.pix32(ra);
+	UINT8   fg = 15, bg = BG_COLOR(m_video.color_select_68);
+	UINT16  odd, offset;
+	int i;
+
+	if ( ra == 0 ) DBG_LOG(1,"cga_gfx_1bpp_update_row",("bg %d\n", bg));
+	odd = ( ra & 1 ) << 13;
+	offset = ( ma & 0x1fff ) | odd;
+	for ( i = 0; i < stride; i++ )
+	{
+		UINT8 data = videoram[ offset++ ];
+
+		*p = palette[( data & 0x80 ) ? fg : bg ]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg ]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg ]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg ]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg ]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg ]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg ]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg ]; p++;
+	}
+}
+
+/***************************************************************************
+  Draw graphics mode with 640x200 pixels + extra highlight color for text
+  mode emulation
+  Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
+***************************************************************************/
+
+POISK1_UPDATE_ROW( p1_state::poisk1_gfx_1bpp_update_row )
+{
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT32  *p = &bitmap.pix32(ra);
+	UINT8   fg, bg = BG_COLOR(m_video.color_select_68);
+	UINT16  odd, offset;
+	int i;
+
+	if ( ra == 0 ) DBG_LOG(1,"poisk1_gfx_1bpp_update_row",("bg %d\n", bg));
+	odd = ( ra & 1 ) << 13;
+	offset = ( ma & 0x1fff ) | odd;
+	for ( i = 0; i < stride; i++ )
+	{
+		UINT8 data = videoram[ offset++ ];
+
+		fg = (data & 0x80) ? ( (m_video.color_select_68 & 0x20) ? 10 : 11 ) : 15; // XXX
+		*p = palette[bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg ]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg ]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg ]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg ]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg ]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg ]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg ]; p++;
+	}
+}
+
+/* Initialise the cga palette */
+PALETTE_INIT_MEMBER(p1_state, p1)
+{
+	int i;
+
+	DBG_LOG(0,"init",("palette_init()\n"));
+
+	for ( i = 0; i < CGA_PALETTE_SETS * 16; i++ )
+	{
+		palette.set_pen_color(i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2] );
+	}
+}
+
+void p1_state::video_start()
+{
+	address_space &space = m_maincpu->space( AS_PROGRAM );
+
+	DBG_LOG(0,"init",("video_start()\n"));
+
+	memset(&m_video, 0, sizeof(m_video));
+	m_video.videoram_base = std::make_unique<UINT8[]>(0x8000);
+	m_video.videoram = m_video.videoram_base.get();
+	m_video.stride = 80;
+
+	space.install_readwrite_bank(0xb8000, 0xbffff, "bank11" );
+	machine().root_device().membank("bank11")->set_base(m_video.videoram);
+}
+
+UINT32 p1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	UINT16 ra, ma = 0;
+
+	if (!m_video.stride || !m_video.videoram) return 0;
+
+	// bit 6 of 6Ah disables color burst -- not implemented
+	for (ra = cliprect.min_y; ra <= cliprect.max_y; ra++)
+	{
+		if (BIT(m_video.color_select_68, 7)) {
+			if (BIT(m_video.mode_control_6a, 7)) {
+				cga_gfx_1bpp_update_row(bitmap, cliprect, m_video.videoram, ma, ra, m_video.stride);
+			} else {
+				poisk1_gfx_1bpp_update_row(bitmap, cliprect, m_video.videoram, ma, ra, m_video.stride);
+			}
+		} else {
+			cga_gfx_2bpp_update_row(bitmap, cliprect, m_video.videoram, ma, ra, m_video.stride);
+		}
+		if (ra & 1) ma += m_video.stride;
+	}
+
+	return 0;
+}
 
 // Timer.  Poisk-1 uses single XTAL for everything? -- check
 
@@ -177,7 +557,6 @@ DRIVER_INIT_MEMBER( p1_state, poisk1 )
 
 	DBG_LOG(0,"init",("driver_init()\n"));
 
-	program.unmap_readwrite(0, 0x7ffff);
 	program.install_readwrite_bank(0, m_ram->size()-1, "bank10");
 	membank( "bank10" )->set_base( m_ram->pointer() );
 }
@@ -200,10 +579,7 @@ MACHINE_RESET_MEMBER( p1_state, poisk1 )
 
 static ADDRESS_MAP_START( poisk1_map, AS_PROGRAM, 8, p1_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x7ffff) AM_RAM
-	AM_RANGE(0xc0000, 0xc1fff) AM_ROM
-	AM_RANGE(0xc0000, 0xfbfff) AM_NOP
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM
+	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0xc000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( poisk1_io, AS_IO, 8, p1_state )
@@ -238,7 +614,7 @@ static MACHINE_CONFIG_START( poisk1, p1_state )
 	MCFG_PIT8253_CLK2(XTAL_15MHz/12) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(p1_state, p1_pit8253_out2_changed))
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE(":maincpu", 0), VCC, NULL )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_DEVICE_ADD("ppi8255n1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(p1_state, p1_ppi_porta_r)) /*60H*/
@@ -285,15 +661,15 @@ static MACHINE_CONFIG_START( poisk1, p1_state )
 MACHINE_CONFIG_END
 
 ROM_START( poisk1 )
-	ROM_REGION16_LE(0x100000,"maincpu", 0)
+	ROM_REGION16_LE(0x10000,"bios", 0)
 
 	ROM_DEFAULT_BIOS("v91")
 	ROM_SYSTEM_BIOS(0, "v89", "1989")
-	ROMX_LOAD( "biosp1s.rf4", 0xfe000, 0x2000, CRC(1a85f671) SHA1(f0e59b2c4d92164abca55a96a58071ce869ff988), ROM_BIOS(1))
+	ROMX_LOAD( "biosp1s.rf4", 0xe000, 0x2000, CRC(1a85f671) SHA1(f0e59b2c4d92164abca55a96a58071ce869ff988), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v91", "1991")
-	ROMX_LOAD( "poisk_1991.bin", 0xfe000, 0x2000, CRC(d61c56fd) SHA1(de202e1f7422d585a1385a002a4fcf9d756236e5), ROM_BIOS(2))
+	ROMX_LOAD( "poisk_1991.bin", 0xe000, 0x2000, CRC(d61c56fd) SHA1(de202e1f7422d585a1385a002a4fcf9d756236e5), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "v91r2", "1991r2")
-	ROMX_LOAD( "p_bios_nm.bin", 0xfe000, 0x2000, CRC(84430b4f) SHA1(3e477962be3cea09662cb2e3ad9966ad01c7455d), ROM_BIOS(3))
+	ROMX_LOAD( "p_bios_nm.bin", 0xe000, 0x2000, CRC(84430b4f) SHA1(3e477962be3cea09662cb2e3ad9966ad01c7455d), ROM_BIOS(3))
 
 	// 0xc0000, sets 80x25 text and loops asking for 'Boot from hard disk (Y or N)?'
 	ROM_LOAD( "boot_net.rf4", 0x00000, 0x2000, CRC(316c2030) SHA1(d043325596455772252e465b85321f1b5c529d0b)) // NET BIOS

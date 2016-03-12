@@ -1011,6 +1011,7 @@ void running_machine::logfile_callback(const running_machine &machine, const cha
 	if (machine.m_logfile != nullptr)
 	{
 		machine.m_logfile->puts(buffer);
+		
 		machine.m_logfile->flush();
 	}
 }

@@ -1,3 +1,5 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
 # m740 device
 brk740_imp  ora_idx     kil_non     bbs_bar  nop_zpg     ora_zpg     asl_zpg     bbs_bzr     php_imp     ora_imm     asl_acc     seb_bac     nop_aba     ora_aba     asl_aba     seb_biz
 bpl_rel     ora_idy     clt_imp     bbc_bar  nop_zpx     ora_zpx     asl_zpx     bbc_bzr     clc_imp     ora_aby     dec_acc     clb_bac     nop_abx     ora_abx     asl_abx     clb_biz

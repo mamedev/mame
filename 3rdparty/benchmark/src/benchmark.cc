@@ -599,7 +599,7 @@ namespace {
 void RunInThread(const benchmark::internal::Benchmark::Instance* b,
                  size_t iters, int thread_id,
                  ThreadStats* total) EXCLUDES(GetBenchmarkLock()) {
-  State st(iters, b->has_arg1, b->arg1, b->has_arg2, b->arg2, thread_id);
+  State st(iters, b->has_arg1, b->arg1, b->has_arg2, b->arg2, thread_id, b->threads);
   b->benchmark->Run(st);
   CHECK(st.iterations() == st.max_iterations) <<
     "Benchmark returned before State::KeepRunning() returned false!";
@@ -736,15 +736,17 @@ void RunBenchmark(const benchmark::internal::Benchmark::Instance& b,
 }  // namespace
 
 State::State(size_t max_iters, bool has_x, int x, bool has_y, int y,
-             int thread_i)
+             int thread_i, int n_threads)
     : started_(false), total_iterations_(0),
       has_range_x_(has_x), range_x_(x),
       has_range_y_(has_y), range_y_(y),
       bytes_processed_(0), items_processed_(0),
       thread_index(thread_i),
+      threads(n_threads),
       max_iterations(max_iters)
 {
     CHECK(max_iterations != 0) << "At least one iteration must be run";
+    CHECK_LT(thread_index, threads) << "thread_index must be less than threads";
 }
 
 void State::PauseTiming() {

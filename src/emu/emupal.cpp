@@ -744,79 +744,44 @@ void palette_device::configure_rgb_shadows(int mode, float factor)
 
 void palette_device::palette_init_all_black(palette_device &palette)
 {
-	int i;
-
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		palette.set_pen_color(i,rgb_t::black); // black
+		palette.set_pen_color(i, rgb_t::black);
 	}
 }
 
 
 /*-------------------------------------------------
-    black_and_white - basic 2-color black & white
+    monochrome - 2-color black & white
 -------------------------------------------------*/
 
-void palette_device::palette_init_black_and_white(palette_device &palette)
+void palette_device::palette_init_monochrome(palette_device &palette)
 {
-	palette.set_pen_color(0,rgb_t::black); // black
-	palette.set_pen_color(1,rgb_t::white); // white
+	palette.set_pen_color(0, rgb_t::black);
+	palette.set_pen_color(1, rgb_t::white);
 }
 
 
 /*-------------------------------------------------
-    white_and_black - basic 2-color white & black
+    monochrome_inverted - 2-color white & black
 -------------------------------------------------*/
 
-void palette_device::palette_init_white_and_black(palette_device &palette)
+void palette_device::palette_init_monochrome_inverted(palette_device &palette)
 {
-	palette.set_pen_color(0,rgb_t::white); // white
-	palette.set_pen_color(1,rgb_t::black); // black
+	palette.set_pen_color(0, rgb_t::white);
+	palette.set_pen_color(1, rgb_t::black);
 }
 
 
 /*-------------------------------------------------
-    monochrome_amber - 2-color black & amber
+    monochrome_highlight - 3-color
 -------------------------------------------------*/
 
-void palette_device::palette_init_monochrome_amber(palette_device &palette)
+void palette_device::palette_init_monochrome_highlight(palette_device &palette)
 {
-	palette.set_pen_color(0, rgb_t::black); // black
-	palette.set_pen_color(1, rgb_t(0xf7, 0xaa, 0x00)); // amber
-}
-
-
-/*-------------------------------------------------
-    monochrome_green - 2-color black & green
--------------------------------------------------*/
-
-void palette_device::palette_init_monochrome_green(palette_device &palette)
-{
-	palette.set_pen_color(0, rgb_t::black); // black
-	palette.set_pen_color(1, rgb_t(0x00, 0xff, 0x00)); // green
-}
-
-
-/*-------------------------------------------------
-    monochrome_green_highlight - 3-color black & green
--------------------------------------------------*/
-
-void palette_device::palette_init_monochrome_green_highlight(palette_device &palette)
-{
-	palette.set_pen_color(0, rgb_t::black); // black
-	palette.set_pen_color(1, rgb_t(0x00, 0xc0, 0x00)); // green
-	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); // green
-}
-
-
-/*-------------------------------------------------
-    monochrome_yellow - 2-color black & yellow
--------------------------------------------------*/
-
-void palette_device::palette_init_monochrome_yellow(palette_device &palette)
-{
-	palette.set_pen_color(0, rgb_t::black); // black
-	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0x00)); // yellow
+	palette.set_pen_color(0, rgb_t::black);
+	palette.set_pen_color(1, rgb_t(0xc0, 0xc0, 0xc0));
+	palette.set_pen_color(2, rgb_t::white);
 }
 
 

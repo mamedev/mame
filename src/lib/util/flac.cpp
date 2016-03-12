@@ -35,7 +35,7 @@ flac_encoder::flac_encoder(void *buffer, UINT32 buflength)
 }
 
 
-flac_encoder::flac_encoder(core_file &file)
+flac_encoder::flac_encoder(util::core_file &file)
 {
 	init_common();
 	reset(file);
@@ -100,7 +100,7 @@ bool flac_encoder::reset(void *buffer, UINT32 buflength)
 //  reset - reset state with new file parameters
 //-------------------------------------------------
 
-bool flac_encoder::reset(core_file &file)
+bool flac_encoder::reset(util::core_file &file)
 {
 	// configure the output
 	m_compressed_start = nullptr;
@@ -185,7 +185,7 @@ UINT32 flac_encoder::finish()
 {
 	// process the data and return the amount written
 	FLAC__stream_encoder_finish(m_encoder);
-	return (m_file != nullptr) ? core_ftell(m_file) : m_compressed_offset;
+	return (m_file != nullptr) ? m_file->tell() : m_compressed_offset;
 }
 
 
@@ -252,7 +252,7 @@ FLAC__StreamEncoderWriteStatus flac_encoder::write_callback(const FLAC__byte buf
 		{
 			int count = bytes - offset;
 			if (m_file != nullptr)
-				core_fwrite(m_file, buffer, count);
+				m_file->write(buffer, count);
 			else
 			{
 				if (m_compressed_offset + count <= m_compressed_length)
@@ -308,7 +308,7 @@ flac_decoder::flac_decoder(const void *buffer, UINT32 length, const void *buffer
 //  flac_decoder - constructor
 //-------------------------------------------------
 
-flac_decoder::flac_decoder(core_file &file)
+flac_decoder::flac_decoder(util::core_file &file)
 	: m_decoder(FLAC__stream_decoder_new()),
 		m_file(&file),
 		m_compressed_offset(0),
@@ -414,7 +414,7 @@ bool flac_decoder::reset(UINT32 sample_rate, UINT8 num_channels, UINT32 block_si
 //  reset - reset state with new file parameter
 //-------------------------------------------------
 
-bool flac_decoder::reset(core_file &file)
+bool flac_decoder::reset(util::core_file &file)
 {
 	m_file = &file;
 	m_compressed_start = nullptr;
@@ -511,7 +511,7 @@ FLAC__StreamDecoderReadStatus flac_decoder::read_callback(FLAC__byte buffer[], s
 
 	// if a file, just read
 	if (m_file != nullptr)
-		*bytes = core_fread(m_file, buffer, expected);
+		*bytes = m_file->read(buffer, expected);
 
 	// otherwise, copy from memory
 	else

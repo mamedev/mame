@@ -200,7 +200,7 @@ static MACHINE_CONFIG_START( unixpc, unixpc_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_unixpc)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

@@ -270,8 +270,7 @@ void sdl_osd_interface::osd_exit()
 
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
 	{
-		/* FixMe: Bug in SDL2.0, Quitting joystick will cause SIGSEGV */
-		SDL_QuitSubSystem(SDL_INIT_TIMER| SDL_INIT_VIDEO /*| SDL_INIT_JOYSTICK */);
+		SDL_QuitSubSystem(SDL_INIT_TIMER| SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER );
 	}
 }
 
@@ -490,9 +489,9 @@ void sdl_osd_interface::init(running_machine &machine)
 	{
 #ifdef SDLMAME_EMSCRIPTEN
 		// timer brings in threads which are not supported in Emscripten
-		if (SDL_InitSubSystem(SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
+		if (SDL_InitSubSystem(SDL_INIT_VIDEO| SDL_INIT_GAMECONTROLLER|SDL_INIT_NOPARACHUTE)) {
 #else
-		if (SDL_InitSubSystem(SDL_INIT_TIMER| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
+		if (SDL_InitSubSystem(SDL_INIT_TIMER| SDL_INIT_VIDEO| SDL_INIT_GAMECONTROLLER|SDL_INIT_NOPARACHUTE)) {
 #endif
 			osd_printf_error("Could not initialize SDL %s\n", SDL_GetError());
 			exit(-1);

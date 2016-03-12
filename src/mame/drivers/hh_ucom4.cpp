@@ -231,7 +231,7 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
 
   Bambino UFO Master-Blaster Station (manufactured in Japan)
   * PCB label Emix Corp. ET-02
-  * NEC uCOM-44 MCU, labeled EMIX D552C 017
+  * NEC uCOM-44 MCU, label EMIX D552C 017
   * cyan VFD display Emix-101, with blue color overlay
 
   This is Bambino's first game, it is not known if ET-01 exists. Emix Corp.
@@ -310,8 +310,7 @@ static INPUT_PORTS_START( ufombs )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-static const INT16 ufombs_speaker_levels[] = { 0, 32767, -32768, 0 };
+static const INT16 ufombs_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
 static MACHINE_CONFIG_START( ufombs, ufombs_state )
 
@@ -345,7 +344,7 @@ MACHINE_CONFIG_END
 
   Bambino Superstar Football (manufactured in Japan)
   * PCB label Emix Corp. ET-03
-  * NEC uCOM-43 MCU, labeled D553C 031
+  * NEC uCOM-43 MCU, label D553C 031
   * cyan VFD display Emix-102, with bezel
 
   The game was rereleased in 1982 as Classic Football, with an improved VFD.
@@ -444,14 +443,17 @@ static INPUT_PORTS_START( ssfball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) // multiplexed, handled in input_b_r
 
 	PORT_START("IN.3") // port A
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("Ball-carrier Left/Right")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("Ball-carrier Up")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("Ball-carrier Down")
+	PORT_BIT( 0x01, 0x01, IPT_SPECIAL ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // left/right
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pass")
+
+	PORT_START("FAKE") // fake port for left/right combination
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-
-static const INT16 ssfball_speaker_levels[] = { 0, 32767, -32768, 0 };
+static const INT16 ssfball_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
 static MACHINE_CONFIG_START( ssfball, ssfball_state )
 
@@ -485,7 +487,7 @@ MACHINE_CONFIG_END
 
   Bambino Kick The Goal Soccer
   * PCB label Emix Corp. ET-10/08 (PCB is for 2 possible games)
-  * NEC uCOM-44 MCU, labeled D552C 043
+  * NEC uCOM-44 MCU, label D552C 043
   * cyan VFD display Emix-105, with bezel overlay
 
   Press the Display button twice to start the game. Action won't start until
@@ -609,7 +611,7 @@ MACHINE_CONFIG_END
 
   Bambino Safari (manufactured in Japan)
   * PCB label Emix Corp. ET-11
-  * NEC uCOM-44 MCU, labeled EMIX D552C 049
+  * NEC uCOM-44 MCU, label EMIX D552C 049
   * cyan VFD display Emix-108
 
   NOTE!: MAME external artwork is required
@@ -713,7 +715,7 @@ MACHINE_CONFIG_END
 
   Bambino Space Laser Fight (manufactured in Japan)
   * PCB label Emix Corp. ET-12
-  * NEC uCOM-43 MCU, labeled D553C 055
+  * NEC uCOM-43 MCU, label D553C 055
   * cyan VFD display Emix-104, with blue or green color overlay
 
   This is basically a revamp of their earlier Boxing game (ET-06), case and
@@ -828,8 +830,7 @@ static INPUT_PORTS_START( splasfgt )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-static const INT16 splasfgt_speaker_levels[] = { 0, 32767, -32768, 0 };
+static const INT16 splasfgt_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
 static MACHINE_CONFIG_START( splasfgt, splasfgt_state )
 
@@ -863,7 +864,7 @@ MACHINE_CONFIG_END
 
   Bandai Crazy Climber (manufactured in Japan)
   * PCB labels SM-020/SM-021
-  * NEC uCOM-43 MCU, labeled D553C 170
+  * NEC uCOM-43 MCU, label D553C 170
   * cyan/red/green VFD display NEC FIP6AM2-T no. 1-8 2, with partial color overlay and bezel
 
   known releases:
@@ -962,7 +963,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Castle Toy Tactix
-  * NEC uCOM-43 MCU, labeled D557LC 512
+  * NEC uCOM-43 MCU, label D557LC 512
   * 16 LEDs behind buttons
 
   Tactix is similar to Merlin, for 1 or 2 players. In 2-player mode, simply
@@ -1022,34 +1023,34 @@ READ8_MEMBER(tactix_state::input_r)
 
 static INPUT_PORTS_START( tactix )
 	PORT_START("IN.0") // C0 port A
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Button 1")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Button 5")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Button 9")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("Button 13")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Button 5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Button 9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Button 13")
 
 	PORT_START("IN.1") // C1 port A
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Button 2")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Button 6")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Button 10")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Button 14")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Button 2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Button 6")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Button 10")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Button 14")
 
 	PORT_START("IN.2") // C2 port A
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Button 3")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Button 7")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Button 11")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Button 15")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Button 3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Button 7")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Button 11")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Button 15")
 
 	PORT_START("IN.3") // C3 port A
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Button 4")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Button 8")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Button 12")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("Button 16")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_NAME("Button 4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Button 8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Button 12")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Button 16")
 
 	PORT_START("IN.4") // E0 port A
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_NAME("New Game")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Comp Turn")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("New Game")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Comp Turn")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( tactix, tactix_state )
@@ -1080,7 +1081,7 @@ MACHINE_CONFIG_END
 
   Epoch Invader From Space (manufactured in Japan)
   * PCB labels 36010(A/B)
-  * NEC uCOM-44 MCU, labeled D552C 054
+  * NEC uCOM-44 MCU, label D552C 054
   * cyan VFD display NEC FIP9AM18T tube no. 0D, with color overlay
 
   known releases:
@@ -1179,7 +1180,7 @@ MACHINE_CONFIG_END
 
   Epoch Electronic Football (manufactured in Japan)
   * PCB labels 36020(A/B/C)
-  * NEC uCOM-43 MCU, labeled D553C 080
+  * NEC uCOM-43 MCU, label D553C 080
   * cyan VFD display NEC FIP10AM15T tube no. 0F, with bezel overlay
 
   known releases:
@@ -1247,7 +1248,7 @@ static INPUT_PORTS_START( efball )
 	PORT_START("IN.1") // port B
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
+	PORT_BIT( 0x04, 0x04, IPT_SPECIAL ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // left/right
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Pass")
 
 	PORT_START("IN.2") // port C
@@ -1255,6 +1256,10 @@ static INPUT_PORTS_START( efball )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Kick Return")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Kick")
+
+	PORT_START("FAKE") // fake port for left/right combination
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( efball, efball_state )
@@ -1288,7 +1293,7 @@ MACHINE_CONFIG_END
 
   Epoch Galaxy II (manufactured in Japan)
   * PCB labels 19096/96062
-  * NEC uCOM-43 MCU, labeled D553C 153
+  * NEC uCOM-43 MCU, label D553C 153
   * cyan/red VFD display NEC FIP10xM20T, with color overlay. x = multiple VFD
     revisions exist, with different graphics: rev B no. 1-8, rev. D no. 2-21.
 
@@ -1389,7 +1394,7 @@ MACHINE_CONFIG_END
 
   Epoch Astro Command (manufactured in Japan)
   * PCB labels 96111/96112
-  * NEC uCOM-43 MCU, labeled D553C 202
+  * NEC uCOM-43 MCU, label D553C 202
   * cyan/red VFD display NEC FIP9AM20T no. 42-42, with color overlay + bezel
 
   known releases:
@@ -1496,7 +1501,7 @@ MACHINE_CONFIG_END
 
   Epoch Dracula (manufactured in Japan)
   * PCB label 96121
-  * NEC uCOM-43 MCU, labeled D553C 206
+  * NEC uCOM-43 MCU, label D553C 206
   * cyan/red/green VFD display NEC FIP8BM20T no. 2-42
 
   known releases:
@@ -1588,7 +1593,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Mattel Computer Gin
-  * NEC uCOM-43 MCU, labeled D650C 060
+  * NEC uCOM-43 MCU, label D650C 060
 
 ***************************************************************************/
 
@@ -1662,7 +1667,7 @@ MACHINE_CONFIG_END
 
   Mego Mini-Vid Break Free (manufactured in Japan)
   * PCB label Mego 79 rev F
-  * NEC uCOM-43 MCU, labeled D553C 049
+  * NEC uCOM-43 MCU, label D553C 049
   * cyan VFD display Futaba DM-4.5 91
 
   note: MAME external artwork is not needed for this game
@@ -1766,8 +1771,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Cosmic Combat (manufactured in Japan)
-  * PCBs are labeled 2E1019-E01
-  * NEC uCOM-44 MCU, labeled D552C 042
+  * PCB label 2E1019-E01
+  * NEC uCOM-44 MCU, label D552C 042
   * cyan VFD display NEC FIP32AM18Y tube no. 0E, with color overlay
 
   known releases:
@@ -1861,8 +1866,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Tennis (manufactured in Japan)
-  * PCB labeled TOMY TN-04 TENNIS
-  * NEC uCOM-44 MCU, labeled D552C 048
+  * PCB label TOMY TN-04 TENNIS
+  * NEC uCOM-44 MCU, label D552C 048
   * VFD display NEC FIP11AM15T tube no. 0F, with overlay
 
   The initial release of this game was in 1979, known as Pro-Tennis,
@@ -2017,8 +2022,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Pac-Man (manufactured in Japan)
-  * PCBs are labeled TN-08 2E108E01
-  * NEC uCOM-43 MCU, labeled D553C 160
+  * PCB label TN-08 2E108E01
+  * NEC uCOM-43 MCU, label D553C 160
   * cyan/red/green VFD display NEC FIP8AM18T no. 2-21
   * bright yellow round casing
 
@@ -2123,8 +2128,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Scramble (manufactured in Japan)
-  * PCBs are labeled TN-10 2E114E01
-  * NEC uCOM-43 MCU, labeled D553C 192
+  * PCB label TN-10 2E114E01
+  * NEC uCOM-43 MCU, label D553C 192
   * cyan/red/green VFD display NEC FIP10CM20T no. 2-41
 
   known releases:
@@ -2223,8 +2228,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Caveman (manufactured in Japan)
-  * PCBs are labeled TN-12 2E114E03
-  * NEC uCOM-43 MCU, labeled D553C 209
+  * PCB label TN-12 2E114E03
+  * NEC uCOM-43 MCU, label D553C 209
   * cyan/red/green VFD display NEC FIP8AM20T no. 2-42
 
   known releases:
@@ -2319,8 +2324,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy Alien Chase (manufactured in Japan)
-  * PCBs are labeled TN-16 2E121B01
-  * NEC uCOM-43 MCU, labeled D553C 258
+  * PCB label TN-16 2E121B01
+  * NEC uCOM-43 MCU, label D553C 258
   * red/green VFD display NEC FIP9AM24T, with color overlay, 2-sided*
 
   *Player one views the VFD from the front (grid+filament side) while the

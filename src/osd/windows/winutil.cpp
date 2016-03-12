@@ -160,7 +160,7 @@ lazy_loaded_function::lazy_loaded_function(const char * name, const wchar_t* dll
 }
 
 lazy_loaded_function::lazy_loaded_function(const char * name, const wchar_t** dll_names, int dll_count)
-	: m_name(name), m_initialized(false), m_pfn(nullptr)
+	: m_name(name), m_module(NULL), m_initialized(false), m_pfn(nullptr)
 {
 	for (int i = 0; i < dll_count; i++)
 		m_dll_names.push_back(std::wstring(dll_names[i]));
@@ -187,14 +187,20 @@ int lazy_loaded_function::initialize()
 		}
 
 		if (m_module == NULL)
+		{
+			osd_printf_verbose("Could not find DLL to dynamically link function %s.\n", m_name.c_str());
 			return ERROR_DLL_NOT_FOUND;
+		}
 	}
 
 	if (m_pfn == nullptr)
 	{
 		m_pfn = GetProcAddress(m_module, m_name.c_str());
 		if (m_pfn == nullptr)
+		{
+			osd_printf_verbose("Could not find function address to dynamically link function %s.\n", m_name.c_str());
 			return ERROR_NOT_FOUND;
+		}
 	}
 
 	m_initialized = true;

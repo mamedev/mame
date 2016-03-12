@@ -163,7 +163,7 @@ void rx01_device::command_write(UINT16 data)
 					break;
 		}
 	}
-	machine().scheduler().timer_set(attotime::from_msec(100), FUNC(command_execution_callback), 0, this);
+	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(rx01_device::service_command),this));
 }
 
 UINT16 rx01_device::status_read()
@@ -177,7 +177,7 @@ void rx01_device::data_write(UINT16 data)
 //  printf("data_write %04x\n",data);
 	// data can be written only if TR is set
 	if (BIT(m_rxcs,7)) m_rxdb = data;
-	machine().scheduler().timer_set(attotime::from_msec(100), FUNC(command_execution_callback), 0, this);
+	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(rx01_device::service_command),this));
 }
 
 UINT16 rx01_device::data_read()
@@ -187,7 +187,7 @@ UINT16 rx01_device::data_read()
 	return m_rxdb;
 }
 
-void rx01_device::service_command()
+TIMER_CALLBACK_MEMBER(rx01_device::service_command)
 {
 	printf("service_command %d\n",m_state);
 	m_rxes |= m_image[m_unit]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY) << 7;

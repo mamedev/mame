@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * mm5837_noise.c
  *

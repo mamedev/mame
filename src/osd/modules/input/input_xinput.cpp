@@ -16,7 +16,7 @@
 #include <windows.h>
 
 // XInput header
-#include <Xinput.h>
+#include <xinput.h>
 
 #undef interface
 
@@ -187,7 +187,7 @@ private:
 public:
 	xinput_joystick_device(running_machine &machine, const char *name, input_module &module)
 		: device_info(machine, name, DEVICE_CLASS_JOYSTICK, module),
-			gamepad({0}),
+			gamepad({{0}}),
 			xinput_state({0}),
 			xinput_api(nullptr)
 	{

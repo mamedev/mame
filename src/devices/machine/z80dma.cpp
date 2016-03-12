@@ -176,7 +176,7 @@ void z80dma_device::device_start()
 	m_out_iorq_cb.resolve_safe();
 
 	// allocate timer
-	m_timer = machine().scheduler().timer_alloc(FUNC(static_timerproc), (void *)this);
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80dma_device::timerproc), this));
 
 	// register for state saving
 	save_item(NAME(m_regs));
@@ -488,7 +488,7 @@ int z80dma_device::do_write()
 //  timerproc
 //-------------------------------------------------
 
-void z80dma_device::timerproc()
+TIMER_CALLBACK_MEMBER(z80dma_device::timerproc)
 {
 	int done;
 
@@ -837,10 +837,10 @@ void z80dma_device::write(UINT8 data)
 //  rdy_write_callback - deferred RDY signal write
 //-------------------------------------------------
 
-void z80dma_device::rdy_write_callback(int state)
+TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 {
 	// normalize state
-	m_rdy = state;
+	m_rdy = param;
 	m_status = (m_status & 0xFD) | (!is_ready() << 1);
 
 	update_status();
@@ -859,7 +859,7 @@ void z80dma_device::rdy_write_callback(int state)
 WRITE_LINE_MEMBER(z80dma_device::rdy_w)
 {
 	if (LOG) logerror("Z80DMA '%s' RDY: %d Active High: %d\n", tag(), state, READY_ACTIVE_HIGH);
-	machine().scheduler().synchronize(FUNC(static_rdy_write_callback), state, (void *)this);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback),this), state);
 }
 
 

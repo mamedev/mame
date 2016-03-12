@@ -185,6 +185,21 @@
 #include <type_traits>
 #include <utility>
 
+#if defined(__GLIBCXX__) && (__GLIBCXX__ < 20150413)
+namespace std
+{
+template<class _Container>
+  inline constexpr auto
+  cbegin(const _Container& __cont) noexcept(noexcept(std::begin(__cont)))-> decltype(std::begin(__cont))
+  { return std::begin(__cont); }
+
+template<class _Container>
+  inline constexpr auto
+  cend(const _Container& __cont) noexcept(noexcept(std::end(__cont)))-> decltype(std::end(__cont))
+  { return std::end(__cont); }
+}
+#endif
+
 namespace util {
 namespace detail {
 //**************************************************************************
@@ -1040,7 +1055,7 @@ public:
 	{
 		return (m_end && (m_end == it)) || (m_check_nul && (format_chars<char_type>::nul == *it));
 	}
-	std::size_t size() const
+	std::size_t argument_count() const
 	{
 		return m_argument_count;
 	}
@@ -1096,7 +1111,7 @@ protected:
 			format_argument<Stream> const *arguments,
 			std::enable_if_t<handle_container<std::remove_reference_t<Format> >::value, std::size_t> argument_count)
 		: m_begin(fmt.empty() ? nullptr : &*std::cbegin(fmt))
-		, m_end(fmt.empty() ? nullptr : &*std::cend(fmt))
+		, m_end(fmt.empty() ? nullptr : (m_begin + std::distance(std::cbegin(fmt), std::cend(fmt))))
 		, m_check_nul(true)
 		, m_arguments(arguments)
 		, m_argument_count(argument_count)
@@ -1131,6 +1146,9 @@ class format_argument_pack_impl
 	, public format_argument_pack<Stream>
 {
 public:
+	using typename format_argument_pack<Stream>::iterator;
+	using format_argument_pack<Stream>::operator[];
+
 	template <typename Format, typename... Params>
 	format_argument_pack_impl(Format &&fmt, Params &&... args)
 		: std::array<format_argument<Stream>, Count>({ { format_argument<Stream>(std::forward<Params>(args))... } })
@@ -1147,14 +1165,8 @@ public:
 
 
 //**************************************************************************
-//  ARGUMENT PACK CREATOR FUNCTIONS
+//  ARGUMENT PACK CREATOR FUNCTION
 //**************************************************************************
-
-template <typename Stream = std::ostream, typename... Params>
-inline std::array<format_argument<Stream>, sizeof...(Params)> make_format_arguments(Params &&... args)
-{
-	return std::array<format_argument<Stream>, sizeof...(Params)>({ { format_argument<Stream>(std::forward<Params>(args))... } });
-}
 
 template <typename Stream = std::ostream, typename Format, typename... Params>
 inline format_argument_pack_impl<Stream, sizeof...(Params)> make_format_argument_pack(Format &&fmt, Params &&... args)
@@ -1164,54 +1176,16 @@ inline format_argument_pack_impl<Stream, sizeof...(Params)> make_format_argument
 
 
 //**************************************************************************
-//  FORMAT STRING PARSING HELPERS
+//  FORMAT STRING PARSING HELPER
 //**************************************************************************
 
 template <typename Format>
-class format_helper_base : public format_chars<std::remove_cv_t<std::remove_reference_t<decltype(*std::cbegin(std::declval<Format>()))> > >
-{
-public:
-	typedef std::remove_reference_t<decltype(std::cbegin(std::declval<Format>()))> iterator;
-	static iterator begin(Format const &fmt) { return std::cbegin(fmt); }
-	static bool at_end(Format const &fmt, iterator const &it) { return std::cend(fmt) == it; }
-};
-
-template <typename Character>
-class format_helper_base<Character *> : public format_chars<std::remove_cv_t<Character> >
-{
-public:
-	typedef Character const *iterator;
-	static iterator begin(Character const *fmt) { return fmt; }
-	static bool at_end(Character const *fmt, iterator const &it) { return format_helper_base::nul == *it; }
-};
-
-template <typename Character, std::size_t Length>
-class format_helper_base<Character [Length]> : public format_chars<std::remove_cv_t<Character> >
-{
-public:
-	typedef Character const *iterator;
-	static iterator begin(std::remove_const_t<Character> (&fmt)[Length]) { return std::cbegin(fmt); }
-	static iterator begin(std::add_const_t<Character> (&fmt)[Length]) { return std::cbegin(fmt); }
-	static bool at_end(std::remove_const_t<Character> (&fmt)[Length], iterator const &it) { return (std::cend(fmt) == it) || (format_chars<Character>::nul == *it); }
-	static bool at_end(std::add_const_t<Character> (&fmt)[Length], iterator const &it) { return (std::cend(fmt) == it) || (format_helper_base::nul == *it); }
-};
-
-template <typename Stream>
-class format_helper_base<format_argument_pack<Stream> > : public format_chars<typename format_argument_pack<Stream>::char_type>
-{
-public:
-	typedef typename format_argument_pack<Stream>::iterator iterator;
-	static iterator begin(format_argument_pack<Stream> const &fmt) { return fmt.format_begin(); }
-	static bool at_end(format_argument_pack<Stream> const &fmt, iterator const &it) { return fmt.format_at_end(it); }
-};
-
-template <typename Format>
-class format_helper : public format_helper_base<Format>
+class format_helper : public format_chars<typename Format::char_type>
 {
 public:
 	static bool parse_format(
 			Format const &fmt,
-			typename format_helper::iterator &it,
+			typename Format::iterator &it,
 			format_flags &flags,
 			int &next_position,
 			int &argument_position,
@@ -1219,7 +1193,7 @@ public:
 			int &precision_position)
 	{
 		static_assert((format_helper::nine - format_helper::zero) == 9, "Digits must be contiguous");
-		assert(!format_helper::at_end(fmt, it));
+		assert(!fmt.format_at_end(it));
 		assert(format_helper::percent == *it);
 
 		int num;
@@ -1231,8 +1205,8 @@ public:
 		precision_position = -1;
 
 		// Leading zeroes are tricky - they could be a zero-pad flag or part of a position specifier
-		bool const leading_zero(!format_helper::at_end(fmt, it) && (format_helper::zero == *it));
-		while (!format_helper::at_end(fmt, it) && (format_helper::zero == *it)) ++it;
+		bool const leading_zero(!fmt.format_at_end(it) && (format_helper::zero == *it));
+		while (!fmt.format_at_end(it) && (format_helper::zero == *it)) ++it;
 
 		// Digits encountered at this point could be a field width or a position specifier
 		num = 0;
@@ -1258,7 +1232,7 @@ public:
 			}
 
 			// Parse flag characters
-			while (!format_helper::at_end(fmt, it))
+			while (!fmt.format_at_end(it))
 			{
 				switch (*it)
 				{
@@ -1275,7 +1249,7 @@ public:
 			}
 
 			// Check for literal or parameterised field width
-			if (!format_helper::at_end(fmt, it))
+			if (!fmt.format_at_end(it))
 			{
 				if (is_digit(*it))
 				{
@@ -1302,14 +1276,14 @@ public:
 		}
 
 		// Check for literal or parameterised precision
-		if (!format_helper::at_end(fmt, it) && (*it == format_helper::point))
+		if (!fmt.format_at_end(it) && (*it == format_helper::point))
 		{
 			++it;
 			if (have_digit(fmt, it))
 			{
 				flags.set_precision(read_number(fmt, it));
 			}
-			else if (!format_helper::at_end(fmt, it) && (format_helper::asterisk == *it))
+			else if (!fmt.format_at_end(it) && (format_helper::asterisk == *it))
 			{
 				++it;
 				if (have_digit(fmt, it))
@@ -1333,11 +1307,11 @@ public:
 		}
 
 		// Check for length modifiers
-		if (!format_helper::at_end(fmt, it)) switch (*it)
+		if (!fmt.format_at_end(it)) switch (*it)
 		{
 		case format_helper::h:
 			++it;
-			if (!format_helper::at_end(fmt, it) && (format_helper::h == *it))
+			if (!fmt.format_at_end(it) && (format_helper::h == *it))
 			{
 				++it;
 				flags.set_length(format_flags::length::character);
@@ -1349,7 +1323,7 @@ public:
 			break;
 		case format_helper::l:
 			++it;
-			if (!format_helper::at_end(fmt, it) && (format_helper::l == *it))
+			if (!fmt.format_at_end(it) && (format_helper::l == *it))
 			{
 				++it;
 				flags.set_length(format_flags::length::long_long_integer);
@@ -1379,13 +1353,13 @@ public:
 			{
 				++it;
 				format_flags::length length = format_flags::length::size_type;
-				if (!format_helper::at_end(fmt, it))
+				if (!fmt.format_at_end(it))
 				{
 					if ((typename format_helper::char_type(format_helper::zero) + 3) == *it)
 					{
-						typename format_helper::iterator tmp(it);
+						typename Format::iterator tmp(it);
 						++tmp;
-						if (!format_helper::at_end(fmt, tmp) && ((typename format_helper::char_type(format_helper::zero) + 2) == *tmp))
+						if (!fmt.format_at_end(tmp) && ((typename format_helper::char_type(format_helper::zero) + 2) == *tmp))
 						{
 							length = format_flags::length::integer_32;
 							it = ++tmp;
@@ -1393,9 +1367,9 @@ public:
 					}
 					else if ((typename format_helper::char_type(format_helper::zero) + 6) == *it)
 					{
-						typename format_helper::iterator tmp(it);
+						typename Format::iterator tmp(it);
 						++tmp;
-						if (!format_helper::at_end(fmt, tmp) && ((typename format_helper::char_type(format_helper::zero) + 4) == *tmp))
+						if (!fmt.format_at_end(tmp) && ((typename format_helper::char_type(format_helper::zero) + 4) == *tmp))
 						{
 							length = format_flags::length::integer_64;
 							it = ++tmp;
@@ -1414,8 +1388,8 @@ public:
 		}
 
 		// Now we should find a conversion specifier
-		assert(!format_helper::at_end(fmt, it)); // missing conversion
-		if (format_helper::at_end(fmt, it)) return false;
+		assert(!fmt.format_at_end(it)); // missing conversion
+		if (fmt.format_at_end(it)) return false;
 		switch (*it)
 		{
 		case format_helper::d:
@@ -1498,14 +1472,14 @@ public:
 	}
 
 private:
-	static bool have_dollar(Format const &fmt, typename format_helper::iterator const &it)
+	static bool have_dollar(Format const &fmt, typename Format::iterator const &it)
 	{
-		return !format_helper::at_end(fmt, it) && (*it == format_helper::dollar);
+		return !fmt.format_at_end(it) && (*it == format_helper::dollar);
 	}
 
-	static bool have_digit(Format const &fmt, typename format_helper::iterator const &it)
+	static bool have_digit(Format const &fmt, typename Format::iterator const &it)
 	{
-		return !format_helper::at_end(fmt, it) && is_digit(*it);
+		return !fmt.format_at_end(it) && is_digit(*it);
 	}
 
 	static bool is_digit(typename format_helper::char_type value)
@@ -1524,7 +1498,7 @@ private:
 		num = (num * 10) + digit_value(digit);
 	}
 
-	static int read_number(Format const &fmt, typename format_helper::iterator &it)
+	static int read_number(Format const &fmt, typename Format::iterator &it)
 	{
 		assert(have_digit(fmt, it));
 		int value = 0;
@@ -1538,11 +1512,11 @@ private:
 //  CORE FORMATTING FUNCTION
 //**************************************************************************
 
-template <typename Stream, typename Format, typename Params>
-typename Stream::off_type stream_format(Stream &str, Format &&fmt, Params &&args)
+template <typename Stream, typename Base>
+typename Stream::off_type stream_format(Stream &str, format_argument_pack<Base> const &args)
 {
-	typedef format_helper<std::remove_cv_t<std::remove_reference_t<Format> > > format_helper;
-	typedef typename format_helper::iterator iterator;
+	typedef format_helper<format_argument_pack<Base> > format_helper;
+	typedef typename format_argument_pack<Base>::iterator iterator;
 	class stream_preserver
 	{
 	public:
@@ -1572,21 +1546,21 @@ typename Stream::off_type stream_format(Stream &str, Format &&fmt, Params &&args
 	typename Stream::pos_type const begin(str.tellp());
 	stream_preserver const preserver(str);
 	int next_pos(1);
-	iterator start = format_helper::begin(fmt);
-	for (iterator it = start; !format_helper::at_end(fmt, start); )
+	iterator start = args.format_begin();
+	for (iterator it = start; !args.format_at_end(start); )
 	{
-		while (!format_helper::at_end(fmt, it) && (format_helper::percent != *it)) ++it;
+		while (!args.format_at_end(it) && (format_helper::percent != *it)) ++it;
 		if (start != it)
 		{
 			str.write(&*start, it - start);
 			start = it;
 		}
-		if (!format_helper::at_end(fmt, it))
+		if (!args.format_at_end(it))
 		{
 			// Try to parse a percent format specification
 			format_flags flags;
 			int arg_pos, width_pos, prec_pos;
-			if (!format_helper::parse_format(fmt, it, flags, next_pos, arg_pos, width_pos, prec_pos))
+			if (!format_helper::parse_format(args, it, flags, next_pos, arg_pos, width_pos, prec_pos))
 				continue;
 
 			// Handle parameterised width
@@ -1594,8 +1568,8 @@ typename Stream::off_type stream_format(Stream &str, Format &&fmt, Params &&args
 			{
 				assert(flags.get_field_width() == 0U);
 				assert(0 < width_pos);
-				assert(args.size() >= unsigned(width_pos));
-				if ((0 < width_pos) && (args.size() >= unsigned(width_pos)))
+				assert(args.argument_count() >= unsigned(width_pos));
+				if ((0 < width_pos) && (args.argument_count() >= unsigned(width_pos)))
 				{
 					int width;
 					if (args[width_pos - 1].make_integer(width))
@@ -1622,8 +1596,8 @@ typename Stream::off_type stream_format(Stream &str, Format &&fmt, Params &&args
 			{
 				assert(flags.get_precision() < 0);
 				assert(0 < prec_pos);
-				assert(args.size() >= unsigned(prec_pos));
-				if ((0 < prec_pos) && (args.size() >= unsigned(prec_pos)))
+				assert(args.argument_count() >= unsigned(prec_pos));
+				if ((0 < prec_pos) && (args.argument_count() >= unsigned(prec_pos)))
 				{
 					int precision;
 					if (args[prec_pos - 1].make_integer(precision))
@@ -1648,8 +1622,8 @@ typename Stream::off_type stream_format(Stream &str, Format &&fmt, Params &&args
 			else
 			{
 				assert(0 < arg_pos);
-				assert(args.size() >= unsigned(arg_pos));
-				if ((0 >= arg_pos) || (args.size() < unsigned(arg_pos)))
+				assert(args.argument_count() >= unsigned(arg_pos));
+				if ((0 >= arg_pos) || (args.argument_count() < unsigned(arg_pos)))
 					continue;
 				if (format_flags::conversion::tell == flags.get_conversion())
 				{
@@ -1683,19 +1657,19 @@ typename Stream::off_type stream_format(Stream &str, Format &&fmt, Params &&args
 template <typename Stream, typename Format, typename... Params>
 inline typename Stream::off_type stream_format(Stream &str, Format const &fmt, Params &&... args)
 {
-	return detail::stream_format(str, fmt, detail::make_format_arguments<Stream>(std::forward<Params>(args)...));
+	return detail::stream_format(str, detail::make_format_argument_pack<Stream>(fmt, std::forward<Params>(args)...));
 }
 
 template <typename Stream, typename Base>
 inline typename Stream::off_type stream_format(Stream &str, detail::format_argument_pack<Base> const &args)
 {
-	return detail::stream_format(str, args, args);
+	return detail::stream_format(str, args);
 }
 
 template <typename Stream, typename Base>
 inline typename Stream::off_type stream_format(Stream &str, detail::format_argument_pack<Base> &&args)
 {
-	return detail::stream_format(str, args, args);
+	return detail::stream_format(str, args);
 }
 
 
@@ -1722,41 +1696,41 @@ inline String string_format(std::locale const &locale, Format &&fmt, Params &&..
 	return str.str();
 };
 
-template <typename String = std::string, typename Format, typename Stream>
-inline String string_format(Format &&fmt, detail::format_argument_pack<Stream> const &args)
+template <typename String = std::string, typename Stream>
+inline String string_format(detail::format_argument_pack<Stream> const &args)
 {
 	typedef std::basic_ostringstream<typename String::value_type, typename String::traits_type, typename String::allocator_type> ostream;
 	ostream str;
-	stream_format(str, std::forward<Format>(fmt), args);
+	detail::stream_format(str, args);
 	return str.str();
 };
 
-template <typename String = std::string, typename Format, typename Stream>
-inline String string_format(Format &&fmt, detail::format_argument_pack<Stream> &&args)
+template <typename String = std::string, typename Stream>
+inline String string_format(detail::format_argument_pack<Stream> &&args)
 {
 	typedef std::basic_ostringstream<typename String::value_type, typename String::traits_type, typename String::allocator_type> ostream;
 	ostream str;
-	stream_format(str, std::forward<Format>(fmt), std::move(args));
+	detail::stream_format(str, std::move(args));
 	return str.str();
 };
 
-template <typename String = std::string, typename Format, typename Stream>
-inline String string_format(std::locale const &locale, Format &&fmt, detail::format_argument_pack<Stream> const &args)
+template <typename String = std::string, typename Stream>
+inline String string_format(std::locale const &locale, detail::format_argument_pack<Stream> const &args)
 {
 	typedef std::basic_ostringstream<typename String::value_type, typename String::traits_type, typename String::allocator_type> ostream;
 	ostream str;
 	str.imbue(locale);
-	stream_format(str, std::forward<Format>(fmt), args);
+	detail::stream_format(str, args);
 	return str.str();
 };
 
-template <typename String = std::string, typename Format, typename Stream>
-inline String string_format(std::locale const &locale, Format &&fmt, detail::format_argument_pack<Stream> &&args)
+template <typename String = std::string, typename Stream>
+inline String string_format(std::locale const &locale, detail::format_argument_pack<Stream> &&args)
 {
 	typedef std::basic_ostringstream<typename String::value_type, typename String::traits_type, typename String::allocator_type> ostream;
 	ostream str;
 	str.imbue(locale);
-	stream_format(str, std::forward<Format>(fmt), std::move(args));
+	detail::stream_format(str, std::move(args));
 	return str.str();
 };
 

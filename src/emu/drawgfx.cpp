@@ -86,33 +86,6 @@ gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *ta
 //  gfx_element - constructor
 //-------------------------------------------------
 
-#ifdef UNUSED_FUNCTION
-gfx_element::gfx_element()
-	: m_palette(nullptr),
-		m_width(0),
-		m_height(0),
-		m_startx(0),
-		m_starty(0),
-		m_origwidth(0),
-		m_origheight(0),
-		m_total_elements(0),
-		m_color_base(0),
-		m_color_depth(0),
-		m_color_granularity(0),
-		m_total_colors(0),
-		m_line_modulo(0),
-		m_char_modulo(0),
-		m_srcdata(nullptr),
-		m_dirtyseq(1),
-		m_gfxdata(nullptr),
-		m_layout_is_raw(false),
-		m_layout_planes(0),
-		m_layout_xormask(0),
-		m_layout_charincrement(0)
-{
-}
-#endif
-
 gfx_element::gfx_element(palette_device &palette, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 total_colors, UINT32 color_base, UINT32 color_granularity)
 	: m_palette(&palette),
 		m_width(width),

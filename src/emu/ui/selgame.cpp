@@ -299,10 +299,31 @@ void ui_menu_select_game::handle()
 			}
 
 			// Infos
-			else if (ui_globals::rpanel == RP_INFOS && ui_globals::curdats_view > UI_FIRST_LOAD)
+			else if (ui_globals::rpanel == RP_INFOS)
 			{
-				ui_globals::curdats_view--;
-				topline_datsview = 0;
+				if (!isfavorite()) 
+				{
+					const game_driver *drv = (const game_driver *)m_event->itemref;
+					if ((FPTR)drv > skip_main_items && ui_globals::curdats_view > UI_FIRST_LOAD)
+					{
+						ui_globals::curdats_view--;
+						topline_datsview = 0;
+					}
+				}
+				else
+				{
+					ui_software_info *drv = (ui_software_info *)m_event->itemref;
+					if (drv->startempty == 1 && ui_globals::curdats_view > UI_FIRST_LOAD)
+					{
+						ui_globals::curdats_view--;
+						topline_datsview = 0;
+					}
+					else if ((FPTR)drv > skip_main_items && ui_globals::cur_sw_dats_view > 0)
+					{
+						ui_globals::cur_sw_dats_view--;
+						topline_datsview = 0;
+					}
+				}
 			}
 		}
 
@@ -318,10 +339,31 @@ void ui_menu_select_game::handle()
 			}
 
 			// Infos
-			else if (ui_globals::rpanel == RP_INFOS && ui_globals::curdats_view < UI_LAST_LOAD)
+			else if (ui_globals::rpanel == RP_INFOS)
 			{
-				ui_globals::curdats_view++;
-				topline_datsview = 0;
+				if (!isfavorite())
+				{
+					const game_driver *drv = (const game_driver *)m_event->itemref;
+					if ((FPTR)drv > skip_main_items && ui_globals::curdats_view < UI_LAST_LOAD)
+					{
+						ui_globals::curdats_view++;
+						topline_datsview = 0;
+					}
+				}
+				else
+				{
+					ui_software_info *drv = (ui_software_info *)m_event->itemref;
+					if (drv->startempty == 1 && ui_globals::curdats_view < UI_LAST_LOAD)
+					{
+						ui_globals::curdats_view++;
+						topline_datsview = 0;
+					}
+					else if ((FPTR)drv > skip_main_items && ui_globals::cur_sw_dats_view < 1)
+					{
+						ui_globals::cur_sw_dats_view++;
+						topline_datsview = 0;
+					}
+				}
 			}
 		}
 
@@ -358,18 +400,20 @@ void ui_menu_select_game::handle()
 			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
-				if ((FPTR)driver > 3 && machine().datfile().has_data(driver))
+				if ((FPTR)driver > skip_main_items && machine().datfile().has_data(driver))
 					ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, driver));
 			}
 			else
 			{
-				ui_software_info *swinfo  = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > 3 && machine().datfile().has_data(swinfo->driver))
+				ui_software_info *ui_swinfo  = (ui_software_info *)m_event->itemref;
+				datfile_manager &mdat = machine().datfile();
+
+				if ((FPTR)ui_swinfo > skip_main_items)
 				{
-					if (swinfo->startempty == 1)
-						ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, swinfo->driver));
-					else
-						ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, swinfo));
+					if (ui_swinfo->startempty == 1 && mdat.has_history(ui_swinfo->driver))
+						ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo->driver));
+					else if (mdat.has_software(ui_swinfo->listname, ui_swinfo->shortname, ui_swinfo->parentname) || !ui_swinfo->usage.empty())
+						ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo));
 				}
 			}
 		}
@@ -380,7 +424,7 @@ void ui_menu_select_game::handle()
 			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)m_event->itemref;
-				if ((FPTR)driver > 3)
+				if ((FPTR)driver > skip_main_items)
 				{
 					if (!machine().favorite().isgame_favorite(driver))
 					{
@@ -398,7 +442,7 @@ void ui_menu_select_game::handle()
 			else
 			{
 				ui_software_info *swinfo = (ui_software_info *)m_event->itemref;
-				if ((FPTR)swinfo > 3)
+				if ((FPTR)swinfo > skip_main_items)
 				{
 					machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname.c_str());
 					machine().favorite().remove_favorite_game(*swinfo);
@@ -534,24 +578,26 @@ void ui_menu_select_game::populate()
 			}
 
 			// iterate over entries
-			for (size_t curitem = 0; curitem < m_displaylist.size(); ++curitem)
+			int curitem = 0;
+			for (auto & elem : m_displaylist)
 			{
 				UINT32 flags_ui = MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
 
-				if (old_item_selected == -1 && m_displaylist[curitem]->name == reselect_last::driver)
+				if (old_item_selected == -1 && elem->name == reselect_last::driver)
 					old_item_selected = curitem;
 
-				bool cloneof = strcmp(m_displaylist[curitem]->parent, "0");
+				bool cloneof = strcmp(elem->parent, "0");
 				if (cloneof)
 				{
-					int cx = driver_list::find(m_displaylist[curitem]->parent);
+					int cx = driver_list::find(elem->parent);
 					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 						cloneof = false;
 				}
 				if (cloneof)
 					flags_ui |= MENU_FLAG_INVERT;
 
-				item_append(m_displaylist[curitem]->description, nullptr, flags_ui, (void *)m_displaylist[curitem]);
+				item_append(elem->description, nullptr, flags_ui, (void *)elem);
+				curitem++;
 			}
 		}
 	}
@@ -1556,7 +1602,7 @@ void ui_menu_select_game::general_info(const game_driver *driver, std::string &b
 	util::stream_format(str, _("Support Cocktail: %1$s\n"), ((driver->flags & MACHINE_NO_COCKTAIL) ? _("Yes") : _("No")));
 	util::stream_format(str, _("Driver is Bios: %1$s\n"), ((driver->flags & MACHINE_IS_BIOS_ROOT) ? _("Yes") : _("No")));
 	util::stream_format(str, _("Support Save: %1$s\n"), ((driver->flags & MACHINE_SUPPORTS_SAVE) ? _("Yes") : _("No")));
-	util::stream_format(str, _("Screen Orentation: %1$s\n"), ((driver->flags & ORIENTATION_SWAP_XY) ? _("Vertical") : _("Horizontal")));
+	util::stream_format(str, _("Screen Orientation: %1$s\n"), ((driver->flags & ORIENTATION_SWAP_XY) ? _("Vertical") : _("Horizontal")));
 	bool found = false;
 	for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
 		if (ROMENTRY_ISREGION(rom) && ROMREGION_ISDISKDATA(rom))

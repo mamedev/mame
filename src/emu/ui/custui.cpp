@@ -588,7 +588,7 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 	// bottom text
 	// get the text for 'UI Select'
 	std::string ui_select_text = machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
-	topbuf.assign(_("Double click or press ")).append(ui_select_text.c_str()).append(_(" to change the color value"));
+	topbuf = string_format(_("Double click or press %1$s to change the color value"), ui_select_text);
 
 	mui.draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
 									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
@@ -857,7 +857,7 @@ void ui_menu_rgb_ui::populate()
 	if (m_lock_ref != RGB_ALPHA)
 	{
 		arrow_flags = get_arrow_flags(0, 255, m_color->a());
-		item_append(_("Alpha"), string_format("%3d", m_color->a()).c_str(), arrow_flags, (void *)(FPTR)RGB_ALPHA);
+		item_append(_("Alpha"), string_format("%3u", m_color->a()).c_str(), arrow_flags, (void *)(FPTR)RGB_ALPHA);
 	}
 	else
 		item_append(_("Alpha"), s_text.c_str(), 0, (void *)(FPTR)RGB_ALPHA);
@@ -865,7 +865,7 @@ void ui_menu_rgb_ui::populate()
 	if (m_lock_ref != RGB_RED)
 	{
 		arrow_flags = get_arrow_flags(0, 255, m_color->r());
-		item_append(_("Red"), string_format("%3d", m_color->r()).c_str(), arrow_flags, (void *)(FPTR)RGB_RED);
+		item_append(_("Red"), string_format("%3u", m_color->r()).c_str(), arrow_flags, (void *)(FPTR)RGB_RED);
 	}
 	else
 		item_append(_("Red"), s_text.c_str(), 0, (void *)(FPTR)RGB_RED);
@@ -873,7 +873,7 @@ void ui_menu_rgb_ui::populate()
 	if (m_lock_ref != RGB_GREEN)
 	{
 		arrow_flags = get_arrow_flags(0, 255, m_color->g());
-		item_append(_("Green"), string_format("%3d", m_color->g()).c_str(), arrow_flags, (void *)(FPTR)RGB_GREEN);
+		item_append(_("Green"), string_format("%3u", m_color->g()).c_str(), arrow_flags, (void *)(FPTR)RGB_GREEN);
 	}
 	else
 		item_append(_("Green"), s_text.c_str(), 0, (void *)(FPTR)RGB_GREEN);
@@ -881,7 +881,7 @@ void ui_menu_rgb_ui::populate()
 	if (m_lock_ref != RGB_BLUE)
 	{
 		arrow_flags = get_arrow_flags(0, 255, m_color->b());
-		item_append(_("Blue"), string_format("%3d", m_color->b()).c_str(), arrow_flags, (void *)(FPTR)RGB_BLUE);
+		item_append(_("Blue"), string_format("%3u", m_color->b()).c_str(), arrow_flags, (void *)(FPTR)RGB_BLUE);
 	}
 	else
 		item_append(_("Blue"), s_text.c_str(), 0, (void *)(FPTR)RGB_BLUE);

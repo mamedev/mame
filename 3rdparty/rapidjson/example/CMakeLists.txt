@@ -1,6 +1,3 @@
-# Copyright (c) 2011 Milo Yip (miloyip@gmail.com)
-# Copyright (c) 2013 Rafal Jeczalik (rjeczalik@gmail.com)
-# Distributed under the MIT License (see license.txt file)
 cmake_minimum_required(VERSION 2.8)
 
 set(EXAMPLES
@@ -8,6 +5,7 @@ set(EXAMPLES
     condense
     jsonx
     messagereader
+    parsebyparts
     pretty
     prettyauto
     schemavalidator
@@ -22,7 +20,7 @@ include_directories("../include/")
 add_definitions(-D__STDC_FORMAT_MACROS)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -Werror -Wall -Wextra -Weffc++ -Wswitch-default")
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default -Wfloat-equal -Wimplicit-fallthrough -Weverything")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -32,5 +30,9 @@ endif()
 foreach (example ${EXAMPLES})
     add_executable(${example} ${example}/${example}.cpp)
 endforeach()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_link_libraries(parsebyparts pthread)
+endif()
 
 add_custom_target(examples ALL DEPENDS ${EXAMPLES})

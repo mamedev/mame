@@ -6945,9 +6945,8 @@ Currently stalls with "PRINTER ERROR"
 	ROM_LOAD( "mxo-cg1209.u75",   0x18000, 0x8000, CRC(da344256) SHA1(1320c4a8b48a9e61a4607e0a9d08083fde2bd334) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap1144.u50", 0x0000, 0x0100, NO_DUMP )
-	ROM_LOAD( "cap1426.u50", 0x0000, 0x0100, CRC(6c7c3462) SHA1(b5481b548f4db460d27a4bfebb08188f36ca0c11) )
-
+	ROM_LOAD( "cap1144.u50", 0x0000, 0x0100, CRC(c80e88ef) SHA1(51c62a07f660a2f3be46a8fbb5af01cff2660e8d) )
+	
 	ROM_REGION( 0x1000, "printer", 0 ) /* ROM from the printer driver PCB */
 	ROM_LOAD( "lp_86.u9", 0x0000, 0x1000, CRC(cdd93c06) SHA1(96f0a6e231f355a0b82bb0e1e698edbd66ff3020) ) /* 2732 EPROM */
 ROM_END

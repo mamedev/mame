@@ -45,7 +45,7 @@ public:
 
 	win32_keyboard_device(running_machine& machine, const char *name, input_module &module)
 		: event_based_device(machine, name, DEVICE_CLASS_KEYBOARD, module),
-			keyboard({0})
+			keyboard({{0}})
 	{
 	}
 
@@ -68,7 +68,6 @@ protected:
 class keyboard_input_win32 : public wininput_module
 {
 private:
-	const osd_options *    m_options;
 
 public:
 	keyboard_input_win32()
@@ -138,7 +137,7 @@ public:
 	win32_mouse_device(running_machine& machine, const char *name, input_module &module)
 		: event_based_device(machine, name, DEVICE_CLASS_MOUSE, module),
 			mouse({0}),
-			win32_mouse({0})
+			win32_mouse({{0}})
 	{
 	}
 
@@ -172,10 +171,11 @@ public:
 	void reset() override
 	{
 		memset(&mouse, 0, sizeof(mouse));
+		memset(&win32_mouse, 0, sizeof(win32_mouse));
 	}
 
 protected:
-	void process_event(MouseButtonEventArgs &args)
+	void process_event(MouseButtonEventArgs &args) override
 	{
 		// set the button state
 		mouse.rgbButtons[args.button] = args.keydown ? 0x80 : 0x00;
@@ -192,9 +192,6 @@ protected:
 
 class mouse_input_win32 : public wininput_module
 {
-private:
-	const osd_options *    m_options;
-
 public:
 	mouse_input_win32()
 		: wininput_module(OSD_MOUSEINPUT_PROVIDER, "win32")
@@ -301,7 +298,7 @@ public:
 	}
 
 protected:
-	void process_event(MouseButtonEventArgs &args)
+	void process_event(MouseButtonEventArgs &args) override
 	{
 		// Are we in shared axis mode?
 		if (m_lightgun_shared_axis_mode)

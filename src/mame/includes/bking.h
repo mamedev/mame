@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Ed Mueller, Mike Balfour, Zsolt Vasvari
+// license:BSD-3-Clause
+// copyright-holders:Mike Balfour, Zsolt Vasvari
 #include "machine/buggychl.h"
 
 class bking_state : public driver_device

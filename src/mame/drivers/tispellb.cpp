@@ -13,8 +13,8 @@
   1st revision:
 
   Spelling B (US), 1978
-  - TMS0270 MCU TMC0272 (die labeled 0272A T0270B)
-  - TMS1980 MCU TMC1984 (die labeled 1980A 84A)
+  - TMS0270 MCU TMC0272 (die label 0272A T0270B)
+  - TMS1980 MCU TMC1984 (die label 1980A 84A)
   - 8-digit cyan VFD display (seen with and without apostrophe)
 
   Spelling ABC (UK), 1979: exact same hardware as US version

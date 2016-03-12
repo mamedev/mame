@@ -59,7 +59,7 @@ project "zlib"
 	kind "StaticLib"
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
-	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
+	if _OPTIONS["gcc"]~=nil and ((string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android"))) then
 		configuration { "gmake" }
 		if (version >= 30700) then
 			buildoptions {
@@ -276,7 +276,7 @@ end
 			"-Wno-unused-function",
 			"-O0",
 		}
-	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "android")) then
 		buildoptions {
 			"-Wno-enum-conversion",
 		}
@@ -510,64 +510,6 @@ project "lualibs"
 		MAME_DIR .. "3rdparty/luafilesystem/src/lfs.c",
 	}
 
---------------------------------------------------
--- luv lua library objects
---------------------------------------------------
-if _OPTIONS["USE_LIBUV"]=="1" then
-project "luv"
-	uuid "d98ec5ca-da2a-4a50-88a2-52061ca53871"
-	kind "StaticLib"
-
-	if _OPTIONS["targetos"]=="windows" then
-		defines {
-			"_WIN32_WINNT=0x0600",
-		}
-	end
-
-	configuration { "vs*" }
-		buildoptions {
-			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
-		}
-
-	configuration { "gmake" }
-		buildoptions_c {
-			"-Wno-unused-function",
-			"-Wno-strict-prototypes",
-			"-Wno-unused-variable",
-			"-Wno-undef",
-		}
-
-	configuration { "not android-*" }
-		buildoptions_c {
-			"-Wno-maybe-uninitialized",
-		}
-		
-	configuration { "vs2015" }
-		buildoptions {
-			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
-			"/wd4703", -- warning C4703: potentially uninitialized local pointer variable 'xxx' used
-		}
-
-	configuration { }
-		defines {
-			"LUA_COMPAT_ALL",
-		}
-
-	includedirs {
-		MAME_DIR .. "3rdparty/lua/src",
-		MAME_DIR .. "3rdparty/libuv/include",
-	}
-	if _OPTIONS["with-bundled-lua"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/luv/deps/lua/src",
-		}
-	end
-
-	files {
-		MAME_DIR .. "3rdparty/luv/src/luv.c",
-		MAME_DIR .. "3rdparty/luv/src/luv.h",
-	}
-end
 --------------------------------------------------
 -- SQLite3 library objects
 --------------------------------------------------
@@ -830,6 +772,7 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dxbc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dx9bc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_spirv.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/topology.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/vertexdecl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/bgfx_utils.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/bounds.cpp",

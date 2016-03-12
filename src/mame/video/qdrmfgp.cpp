@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Eisuke Watanabe
+// license:BSD-3-Clause
+// copyright-holders:Hau
 /***************************************************************************
 
   video.c

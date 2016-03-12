@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 #include "statereader.h"
 
 uint64_t state_reader::get_enum_from_value(const Value& value, std::string name, const uint64_t default_value, const string_to_enum* enums, const int count)

@@ -21,11 +21,11 @@ using namespace std::tr1;
 
 #include <bgfx/bgfx.h>
 #include <bx/timer.h>
-#include <bx/readerwriter.h>
 #include <bx/allocator.h>
 #include <bx/hash.h>
 #include <bx/float4_t.h>
 #include <bx/fpumath.h>
+#include <bx/crtimpl.h>
 #include "entry/entry.h"
 #include "camera.h"
 #include "imgui/imgui.h"
@@ -989,7 +989,7 @@ typedef std::vector<Group> GroupArray;
 
 namespace bgfx
 {
-	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl);
+	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl, bx::Error* _err = NULL);
 }
 
 struct Mesh

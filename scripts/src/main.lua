@@ -137,11 +137,6 @@ end
 	links {
 		"qtdbg_" .. _OPTIONS["osd"],
 	}
-	if (_OPTIONS["SOURCES"] == nil) then 
-		links {
-			"bus",
-		}
-	end
 	links {
 		"netlist",
 		"optional",
@@ -165,7 +160,6 @@ end
 
 	if _OPTIONS["USE_LIBUV"]=="1" then
 		links {		
-			"luv",
 			"uv",
 			"http-parser",
 		}

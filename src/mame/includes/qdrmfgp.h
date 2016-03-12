@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Eisuke Watanabe
+// license:BSD-3-Clause
+// copyright-holders:Hau
 #include "machine/ataintf.h"
 #include "sound/k054539.h"
 #include "machine/k053252.h"

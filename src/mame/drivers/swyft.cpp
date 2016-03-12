@@ -783,7 +783,7 @@ static MACHINE_CONFIG_START( swyft, swyft_state )
 	MCFG_SCREEN_UPDATE_DRIVER(swyft_state, screen_update_swyft)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(swyft_state,swyft)
 

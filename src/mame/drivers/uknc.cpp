@@ -76,7 +76,7 @@ static MACHINE_CONFIG_START( uknc, uknc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(uknc_state, screen_update_uknc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 /* ROM definition */

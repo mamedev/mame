@@ -46,6 +46,7 @@ function maintargetosdoptions(_target,_subtarget)
 		"comctl32",
 		"comdlg32",
 		"psapi",
+		"ole32",
 	}
 end
 
@@ -216,6 +217,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 	dofile("windows_cfg.lua")
 
 	includedirs {
+		MAME_DIR .. "3rdparty",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/lib",

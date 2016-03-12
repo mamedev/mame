@@ -1,9 +1,9 @@
-// license:???
-// copyright-holders:Enrique Sanchez
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino 
+// thanks-to:Enrique Sanchez
 /***************************************************************************
 
     Yie Ar Kung-Fu memory map (preliminary)
-    enrique.sanchez@cs.us.es
 
 CPU:    Motorola 6809
 

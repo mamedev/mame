@@ -126,7 +126,7 @@ static MACHINE_CONFIG_START( m79152pc, m79152pc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m79152pc_state, screen_update_m79152pc)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m79152pc)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 /* ROM definition */

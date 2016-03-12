@@ -554,7 +554,7 @@ int main(int argc, char *argv[])
 		// open the destination file
 		chd_resample_compressor dstfile(srcfile, info, INT64(offset * 65536.0 * 256.0), INT64(slope * 65536.0 * 256.0));
 		err = create_chd(dstfile, dstfilename, srcfile, info);
-		if (dstfile == nullptr)
+		if (!dstfile.opened())
 		{
 			fprintf(stderr, "Unable to create file '%s'\n", dstfilename);
 			return 1;

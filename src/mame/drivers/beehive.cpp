@@ -293,7 +293,7 @@ static MACHINE_CONFIG_START( beehive, beehive_state )
 	MCFG_CPU_IO_MAP(beehive_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(beehive_state, screen_update)
@@ -301,7 +301,7 @@ static MACHINE_CONFIG_START( beehive, beehive_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 /* ROM definition */

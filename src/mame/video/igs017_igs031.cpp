@@ -374,7 +374,7 @@ int igs017_igs031_device::debug_viewer(bitmap_ind16 &bitmap,const rectangle &cli
 		popmessage("a: %08X w: %03X p: %02x-%02x-%02x",a,w,m_sprites_gfx[a/3*3+0],m_sprites_gfx[a/3*3+1],m_sprites_gfx[a/3*3+2]);
 		m_debug_addr = a;
 		m_debug_width = w;
-		osd_sleep(200000);
+		osd_sleep(osd_ticks_per_second() / 1000 * 200);
 		return 1;
 	}
 #endif

@@ -1370,7 +1370,7 @@ void omti_disk_image_device::device_start()
 {
 	m_image = this;
 
-	if (m_image->image_core_file() == nullptr)
+	if (!m_image->is_open())
 	{
 		LOG1(("device_start_omti_disk: no disk"));
 	}

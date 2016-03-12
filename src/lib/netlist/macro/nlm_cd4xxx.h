@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 #ifndef NLD_CD4XXX_H_
 #define NLD_CD4XXX_H_
 

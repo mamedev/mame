@@ -33,8 +33,6 @@
 #define PERIOD_OF_555_MONOSTABLE(r,c)       attotime::from_nsec(PERIOD_OF_555_MONOSTABLE_NSEC(r,c))
 #define PERIOD_OF_555_ASTABLE(r1,r2,c)      attotime::from_nsec(PERIOD_OF_555_ASTABLE_NSEC(r1,r2,c))
 
-#define TIMER_CALLBACK(name)            void name(running_machine &machine, void *ptr, int param)
-#define TIMER_CALLBACK_MEMBER(name)     void name(void *ptr, INT32 param)
 
 //**************************************************************************
 //  TYPE DEFINITIONS

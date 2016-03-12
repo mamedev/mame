@@ -571,6 +571,7 @@ MACHINES["DIABLO_HD"] = true
 MACHINES["TMS1024"] = true
 MACHINES["NSC810"] = true
 MACHINES["VT82C496"] = true
+MACHINES["GENPC"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -1777,8 +1778,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/mephisto.cpp",
 	MAME_DIR .. "src/mame/drivers/mmodular.cpp",
 	MAME_DIR .. "src/mame/drivers/stratos.cpp",
-	MAME_DIR .. "src/mame/machine/mboard.cpp",
-	MAME_DIR .. "src/mame/includes/mboard.h",
 }
 
 createMESSProjects(_target, _subtarget, "hitachi")
@@ -2172,10 +2171,10 @@ createMESSProjects(_target, _subtarget, "novag")
 files {
 	MAME_DIR .. "src/mame/drivers/mk1.cpp",
 	MAME_DIR .. "src/mame/drivers/mk2.cpp",
+	MAME_DIR .. "src/mame/drivers/novag6502.cpp",
 	MAME_DIR .. "src/mame/drivers/ssystem3.cpp",
 	MAME_DIR .. "src/mame/includes/ssystem3.h",
 	MAME_DIR .. "src/mame/video/ssystem3.cpp",
-	MAME_DIR .. "src/mame/drivers/supercon.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "olivetti")
@@ -2257,8 +2256,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/asst128.cpp",
 	MAME_DIR .. "src/mame/drivers/europc.cpp",
 	MAME_DIR .. "src/mame/drivers/genpc.cpp",
-	MAME_DIR .. "src/mame/includes/genpc.h",
-	MAME_DIR .. "src/mame/machine/genpc.cpp",
 	MAME_DIR .. "src/mame/drivers/ibmpc.cpp",
 	MAME_DIR .. "src/mame/drivers/ibmpcjr.cpp",
 	MAME_DIR .. "src/mame/drivers/pc.cpp",
@@ -2605,8 +2602,6 @@ files {
 createMESSProjects(_target, _subtarget, "svi")
 files {
 	MAME_DIR .. "src/mame/drivers/svi318.cpp",
-	MAME_DIR .. "src/mame/includes/svi318.h",
-	MAME_DIR .. "src/mame/machine/svi318.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "svision")
@@ -2996,9 +2991,6 @@ files {
 	MAME_DIR .. "src/mame/includes/mc1502.h",
 	MAME_DIR .. "src/mame/drivers/poisk1.cpp",
 	MAME_DIR .. "src/mame/machine/kb_poisk1.h",
-	MAME_DIR .. "src/mame/includes/poisk1.h",
-	MAME_DIR .. "src/mame/video/poisk1.cpp",
-	MAME_DIR .. "src/mame/video/poisk1.h",
 }
 
 createMESSProjects(_target, _subtarget, "yamaha")

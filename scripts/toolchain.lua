@@ -107,8 +107,8 @@ function toolchain(_buildDir, _subDir)
 				print("Set ANDROID_NDK_ARM and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang.exe"			
-			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang++.exe"
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
 			premake.gcc.ar  = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-ar"
 			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-arm")
@@ -120,8 +120,8 @@ function toolchain(_buildDir, _subDir)
 				print("Set ANDROID_NDK_ARM64 and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang.exe"			
-			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang++.exe"
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
 			premake.gcc.ar  = "$(ANDROID_NDK_ARM64)/bin/aarch64-linux-android-ar.exe"
 			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-arm64")
@@ -133,8 +133,8 @@ function toolchain(_buildDir, _subDir)
 				print("Set ANDROID_NDK_MIPS and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang.exe"			
-			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang++.exe"
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
 			premake.gcc.ar  = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-ar"
 			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-mips")
@@ -146,8 +146,8 @@ function toolchain(_buildDir, _subDir)
 				print("Set ANDROID_NDK_MIPS64 and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang.exe"			
-			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang++.exe"
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
 			premake.gcc.ar  = "$(ANDROID_NDK_MIPS64)/bin/mips64el-linux-android-ar.exe"
 			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-mips64")
@@ -159,8 +159,8 @@ function toolchain(_buildDir, _subDir)
 				print("Set ANDROID_NDK_X86 and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang.exe"			
-			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang++.exe"
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
 			premake.gcc.ar  = "$(ANDROID_NDK_X86)/bin/i686-linux-android-ar"
 			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-x86")
@@ -172,8 +172,8 @@ function toolchain(_buildDir, _subDir)
 				print("Set ANDROID_NDK_X64 and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang.exe"			
-			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm-3.6/prebuilt/windows-x86_64/bin/clang++.exe"
+			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"			
+			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
 			premake.gcc.ar  = "$(ANDROID_NDK_X64)/bin/x86_64-linux-android-ar.exe"
 			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-x64")
@@ -685,6 +685,8 @@ function toolchain(_buildDir, _subDir)
 			"-Wunused-value",
 			"-Wundef",
 			"-Wno-cast-align",
+			"-Wno-unknown-attributes",
+			"-Wno-macro-redefined",
 		}
 		linkoptions {
 			"-no-canonical-prefixes",

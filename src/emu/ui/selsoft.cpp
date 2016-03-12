@@ -242,14 +242,12 @@ void ui_menu_select_software::handle()
 		else if (m_event->iptkey == IPT_UI_DATS && machine().ui().options().enabled_dats())
 		{
 			ui_software_info *ui_swinfo = (ui_software_info *)m_event->itemref;
+			datfile_manager &mdat = machine().datfile();
 
-			if ((FPTR)ui_swinfo > 1 && machine().datfile().has_data(ui_swinfo->driver))
-			{
-				if (ui_swinfo->startempty == 1)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo->driver));
-				else
-					ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo));
-			}
+			if (ui_swinfo->startempty == 1 && mdat.has_history(ui_swinfo->driver))
+				ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo->driver));
+			else if (mdat.has_software(ui_swinfo->listname, ui_swinfo->shortname, ui_swinfo->parentname) || !ui_swinfo->usage.empty())
+				ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container, ui_swinfo));
 		}
 
 		// handle UI_LEFT_PANEL
@@ -826,7 +824,7 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 		size_t found = copyright.find("\n");
 
 		tempbuf[0].clear();
-		tempbuf[1].assign(emulator_info::get_appname()).append(" ").append(build_version);
+		tempbuf[1] = string_format("%s %s", emulator_info::get_appname(), build_version);
 		tempbuf[2] = copyright.substr(0, found);
 		tempbuf[3] = copyright.substr(found + 1);
 		tempbuf[4].clear();
@@ -2040,7 +2038,7 @@ void ui_bios_selection::handle()
 {
 	// process the menu
 	const ui_menu_event *event = process(0);
-	ui_options &moptions = machine().ui().options();
+	emu_options &moptions = machine().options();
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT && event->itemref != nullptr)
 		for (auto & elem : m_bios)
 			if ((void*)&elem.name == event->itemref)
@@ -2073,7 +2071,7 @@ void ui_bios_selection::handle()
 					drivlist.next();
 					software_list_device *swlist = software_list_device::find_by_name(drivlist.config(), ui_swinfo->listname.c_str());
 					software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
-					if (!moptions.skip_parts_menu() && swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
+					if (!machine().ui().options().skip_parts_menu() && swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
 					{
 						std::unordered_map<std::string, std::string> parts;
 						for (const software_part *swpart = swinfo->first_part(); swpart != nullptr; swpart = swpart->next())

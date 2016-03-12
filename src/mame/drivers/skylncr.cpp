@@ -543,6 +543,22 @@ static const gfx_layout layout8x8x8_alt =   /* for sstar97 */
 	8*8*4
 };
 
+static const gfx_layout layout8x8x8_bdream97 =   /* for bdream97 */
+{
+	8,8,
+	RGN_FRAC(1,2),
+	8,
+	{ STEP8(0,1) },
+	{
+		8*0,RGN_FRAC(1,2)+8*0,
+		RGN_FRAC(1,2)+8*1,8*1,
+		8*2,RGN_FRAC(1,2)+8*2,
+		RGN_FRAC(1,2)+8*3,8*3
+	},
+	{ STEP8(0,8*4) },
+	8*8*4
+};
+
 static const gfx_layout layout8x32x8 =
 {
 	8,32,
@@ -621,6 +637,25 @@ static const gfx_layout layout8x32x8_alt2 =  /* for neraidov */
 	8*32*8/2
 };
 
+static const gfx_layout layout8x32x8_bdream97 =  /* for bdream97 */
+{
+	8,32,
+	RGN_FRAC(1,2),
+	8,
+	{ STEP8(0,1) },
+	{
+		8*1, RGN_FRAC(1,2)+8*1,
+		8*0, RGN_FRAC(1,2)+8*0,
+		8*3, RGN_FRAC(1,2)+8*3,
+		8*2, RGN_FRAC(1,2)+8*2
+	},
+	{
+		STEP16(0,8*4),
+		STEP16(16*8*4,8*4)
+	},
+	8*32*8/2
+};
+
 
 /**************************************
 *           Graphics Decode           *
@@ -642,6 +677,12 @@ static GFXDECODE_START( sstar97 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_alt,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START( bdream97 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_bdream97,    0, 2 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_bdream97,   0, 2 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_bdream97,   0x100, 1 )
 GFXDECODE_END
 
 
@@ -1431,6 +1472,14 @@ static MACHINE_CONFIG_DERIVED( sstar97, skylncr )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( bdream97, skylncr )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_GFXDECODE_MODIFY("gfxdecode", bdream97)
+MACHINE_CONFIG_END
+
+
 /**********************************
 *            ROM Load             *
 **********************************/
@@ -1650,6 +1699,26 @@ ROM_START( sstar97 )
 	ROM_LOAD16_BYTE( "bor_dun_5.u22", 0x40001, 0x20000, CRC(ca17a632) SHA1(d491310ccdbe9b59a1e607f9254646f20700d79d) )
 ROM_END
 
+/* Butterfly Dream 97 / Hudie Meng 97
+   Game is encrypted and needs better decoded graphics.
+*/
+ROM_START( bdream97 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "27c512_subboard.bin",    0x0000, 0x10000, CRC(b0056324) SHA1(8299198d5e7ed50967f380ba0fddff5a39eee857) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )    // All ROMs are 27010.
+	ROM_LOAD16_BYTE( "27c010.u20", 0x00000, 0x20000, CRC(df1fd438) SHA1(8da4d116e768a3c269a2031db6bf38a5b7707029) )
+	ROM_LOAD16_BYTE( "27c010.u22", 0x00001, 0x20000, CRC(e66910eb) SHA1(454dc47caf4ae9408c3d0b759f4a32d346f86ffe) )
+	ROM_LOAD16_BYTE( "27c010.u21", 0x40000, 0x20000, CRC(b984f5bd) SHA1(9a21b46d6d497271cd589e01af3f3143946980b1) )
+	ROM_LOAD16_BYTE( "27c010.u23", 0x40001, 0x20000, CRC(2b6e6fd7) SHA1(cf0c66c90c6ab3ebc69ebe1e4f29b69b72edfdc2) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    // All ROMs are 27010.
+	ROM_LOAD16_BYTE( "27c010.u24", 0x00000, 0x20000, CRC(b77f3fc5) SHA1(63f7b46ed19f256a6d84624e191dc1719a57cbed) )
+	ROM_LOAD16_BYTE( "27c010.u26", 0x00001, 0x20000, CRC(27cd64ef) SHA1(6b39b2919aca967f72fa16cd61b1641d0fb98d88) )
+	ROM_LOAD16_BYTE( "27c010.u25", 0x40000, 0x20000, CRC(bdebdf35) SHA1(245247b23ddeded32519608f4696205bb5541ccc) )
+	ROM_LOAD16_BYTE( "27c010.u27", 0x40001, 0x20000, CRC(0a266de4) SHA1(0ff9ad793e77d5419bd446cb73d4968e42305353) )
+ROM_END
+
 
 /**********************************
 *           Driver Init           *
@@ -1675,3 +1744,4 @@ GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  skylncr, ROT0
 GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  skylncr, ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
 GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr, ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
 GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr, ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
+GAME( 199?, bdream97, 0,       bdream97, skylncr,  skylncr_state,  skylncr, ROT0, "bootleg",              "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_NOT_WORKING )

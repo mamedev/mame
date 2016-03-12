@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-02 07:55+0100\n"
+"POT-Creation-Date: 2016-03-08 02:22+0100\n"
 "PO-Revision-Date: 2016-02-20 18:03+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -321,13 +321,10 @@ msgstr "Восстановить изначальные цвета"
 msgid "UI Colors Settings"
 msgstr "Настройка цветов интерфейса"
 
-#: src/emu/ui/custui.cpp:591 src/emu/ui/selector.cpp:181
-msgid "Double click or press "
-msgstr "Кликните два раза или нажмите "
-
 #: src/emu/ui/custui.cpp:591
-msgid " to change the color value"
-msgstr " для изменения цвета"
+#, c-format
+msgid "Double click or press %1$s to change the color value"
+msgstr ""
 
 #: src/emu/ui/custui.cpp:617
 msgid "Menu Preview"
@@ -416,34 +413,34 @@ msgstr ""
 msgid "Software Usage"
 msgstr ""
 
-#: src/emu/ui/datmenu.cpp:195
+#: src/emu/ui/datmenu.cpp:187
 msgid "Revision: "
 msgstr "Ревизия: "
 
-#: src/emu/ui/datmenu.cpp:287 src/emu/ui/selgame.cpp:39
-#: src/emu/ui/selgame.cpp:2127 src/emu/ui/selgame.cpp:2136
-#: src/emu/ui/selsoft.cpp:1565 src/emu/ui/selsoft.cpp:1583
-#: src/emu/ui/selsoft.cpp:1592
+#: src/emu/ui/datmenu.cpp:277 src/emu/ui/selgame.cpp:39
+#: src/emu/ui/selgame.cpp:2173 src/emu/ui/selgame.cpp:2182
+#: src/emu/ui/selsoft.cpp:1563 src/emu/ui/selsoft.cpp:1581
+#: src/emu/ui/selsoft.cpp:1590
 msgid "History"
 msgstr ""
 
-#: src/emu/ui/datmenu.cpp:289 src/emu/ui/selgame.cpp:40
+#: src/emu/ui/datmenu.cpp:279 src/emu/ui/selgame.cpp:40
 msgid "Mameinfo"
 msgstr ""
 
-#: src/emu/ui/datmenu.cpp:291 src/emu/ui/selgame.cpp:42
+#: src/emu/ui/datmenu.cpp:281 src/emu/ui/selgame.cpp:42
 msgid "Messinfo"
 msgstr ""
 
-#: src/emu/ui/datmenu.cpp:293 src/emu/ui/selgame.cpp:41
+#: src/emu/ui/datmenu.cpp:283 src/emu/ui/selgame.cpp:41
 msgid "Sysinfo"
 msgstr ""
 
-#: src/emu/ui/datmenu.cpp:295 src/emu/ui/selgame.cpp:44
+#: src/emu/ui/datmenu.cpp:285 src/emu/ui/selgame.cpp:44
 msgid "Mamescore"
 msgstr ""
 
-#: src/emu/ui/datmenu.cpp:297 src/emu/ui/selgame.cpp:43
+#: src/emu/ui/datmenu.cpp:287 src/emu/ui/selgame.cpp:43
 msgid "Command"
 msgstr ""
 
@@ -556,12 +553,9 @@ msgid "Folders Setup"
 msgstr "Установки папок"
 
 #: src/emu/ui/dirmenu.cpp:183
-msgid "Current "
-msgstr "Текущий "
-
-#: src/emu/ui/dirmenu.cpp:183
-msgid " Folders"
-msgstr " Папки"
+#, c-format
+msgid "Current %1$s Folders"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
@@ -575,29 +569,24 @@ msgstr "Добавить папку"
 msgid "Remove Folder"
 msgstr "Удалить папку"
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Change)"
-msgstr "Изменить)"
+#: src/emu/ui/dirmenu.cpp:499
+#, c-format
+msgid "Change %1$s Folder - Search: %2$s_"
+msgstr ""
 
-#: src/emu/ui/dirmenu.cpp:497
-msgid "Add"
-msgstr "Добавить"
+#: src/emu/ui/dirmenu.cpp:500
+#, c-format
+msgid "Add %1$s Folder - Search: %2$s_"
+msgstr ""
 
-#: src/emu/ui/dirmenu.cpp:498
-msgid " Folder - Search: "
-msgstr " Папка - Поиск: "
-
-#: src/emu/ui/dirmenu.cpp:533
+#: src/emu/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
 msgstr "Нажмите TAB для выбора"
 
-#: src/emu/ui/dirmenu.cpp:639
-msgid "Remove "
-msgstr "Убрать "
-
-#: src/emu/ui/dirmenu.cpp:639
-msgid " Folder"
-msgstr " Папка"
+#: src/emu/ui/dirmenu.cpp:643
+#, c-format
+msgid "Remove %1$s Folder"
+msgstr ""
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
@@ -660,19 +649,19 @@ msgstr "Настройки видео"
 msgid "File Already Exists - Override?"
 msgstr ""
 
-#: src/emu/ui/filesel.cpp:161 src/emu/ui/selgame.cpp:1552
-#: src/emu/ui/selgame.cpp:1553 src/emu/ui/selgame.cpp:1554
-#: src/emu/ui/selgame.cpp:1555 src/emu/ui/selgame.cpp:1556
-#: src/emu/ui/selgame.cpp:1557 src/emu/ui/selgame.cpp:1558
-#: src/emu/ui/selgame.cpp:1567
+#: src/emu/ui/filesel.cpp:161 src/emu/ui/selgame.cpp:1598
+#: src/emu/ui/selgame.cpp:1599 src/emu/ui/selgame.cpp:1600
+#: src/emu/ui/selgame.cpp:1601 src/emu/ui/selgame.cpp:1602
+#: src/emu/ui/selgame.cpp:1603 src/emu/ui/selgame.cpp:1604
+#: src/emu/ui/selgame.cpp:1613
 msgid "No"
 msgstr ""
 
-#: src/emu/ui/filesel.cpp:162 src/emu/ui/selgame.cpp:1552
-#: src/emu/ui/selgame.cpp:1553 src/emu/ui/selgame.cpp:1554
-#: src/emu/ui/selgame.cpp:1555 src/emu/ui/selgame.cpp:1556
-#: src/emu/ui/selgame.cpp:1557 src/emu/ui/selgame.cpp:1558
-#: src/emu/ui/selgame.cpp:1567
+#: src/emu/ui/filesel.cpp:162 src/emu/ui/selgame.cpp:1598
+#: src/emu/ui/selgame.cpp:1599 src/emu/ui/selgame.cpp:1600
+#: src/emu/ui/selgame.cpp:1601 src/emu/ui/selgame.cpp:1602
+#: src/emu/ui/selgame.cpp:1603 src/emu/ui/selgame.cpp:1604
+#: src/emu/ui/selgame.cpp:1613
 msgid "Yes"
 msgstr ""
 
@@ -903,11 +892,11 @@ msgstr ""
 msgid "Auto"
 msgstr ""
 
-#: src/emu/ui/menu.cpp:2073
+#: src/emu/ui/menu.cpp:2090
 msgid "Images"
 msgstr ""
 
-#: src/emu/ui/menu.cpp:2074
+#: src/emu/ui/menu.cpp:2091
 msgid "Infos"
 msgstr ""
 
@@ -1001,38 +990,38 @@ msgstr "Пропускать меню выбора BIOS"
 msgid "Skip software parts selection menu"
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:648 src/emu/ui/miscmenu.cpp:668
+#: src/emu/ui/miscmenu.cpp:652 src/emu/ui/miscmenu.cpp:672
 #: src/emu/ui/optsmenu.cpp:267
 msgid "Miscellaneous Options"
 msgstr "Дополнительные настройки"
 
-#: src/emu/ui/miscmenu.cpp:733
+#: src/emu/ui/miscmenu.cpp:737
 #, c-format
 msgid "%s.xml saved under ui folder."
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:761
+#: src/emu/ui/miscmenu.cpp:765
 msgid "Name:             Description:\n"
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:773
+#: src/emu/ui/miscmenu.cpp:777
 #, c-format
 msgid "%s.txt saved under ui folder."
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:791
+#: src/emu/ui/miscmenu.cpp:795
 msgid "Export XML format (like -listxml)"
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:792
+#: src/emu/ui/miscmenu.cpp:796
 msgid "Export TXT format (like -listfull)"
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:850
+#: src/emu/ui/miscmenu.cpp:854
 msgid "Dummy"
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:852
+#: src/emu/ui/miscmenu.cpp:856
 msgid "Save machine configuration"
 msgstr ""
 
@@ -1078,17 +1067,12 @@ msgid "Settings"
 msgstr "Настройки"
 
 #: src/emu/ui/optsmenu.cpp:325
-msgid "**Error to save ui.ini**"
+msgid "**Error saving ui.ini**"
 msgstr "**Ошибка при сохранении ui.ini**"
-
-#: src/emu/ui/optsmenu.cpp:347
-#, c-format
-msgid "**Error to load %s.ini**"
-msgstr ""
 
 #: src/emu/ui/optsmenu.cpp:372
 #, c-format
-msgid "**Error to save %s.ini**"
+msgid "**Error saving %s.ini**"
 msgstr ""
 
 #: src/emu/ui/optsmenu.cpp:376
@@ -1103,29 +1087,30 @@ msgid "Selection List - Search: "
 msgstr "Список выбора - Поиск: "
 
 #: src/emu/ui/selector.cpp:181
-msgid " to select"
-msgstr " для выбора"
+#, c-format
+msgid "Double click or press %1$s to select"
+msgstr ""
 
 #: src/emu/ui/selgame.cpp:38
 msgid "General Info"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:388 src/emu/ui/selsoft.cpp:280
+#: src/emu/ui/selgame.cpp:432 src/emu/ui/selsoft.cpp:278
 #, c-format
 msgid ""
 "%s\n"
 " added to favorites list."
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:394 src/emu/ui/selgame.cpp:403
-#: src/emu/ui/selsoft.cpp:285
+#: src/emu/ui/selgame.cpp:438 src/emu/ui/selgame.cpp:447
+#: src/emu/ui/selsoft.cpp:283
 #, c-format
 msgid ""
 "%s\n"
 " removed from favorites list."
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:464
+#: src/emu/ui/selgame.cpp:508
 msgid ""
 "The selected machine is missing one or more required ROM or CHD images. "
 "Please select a different machine.\n"
@@ -1133,271 +1118,271 @@ msgid ""
 "Press any key (except ESC) to continue."
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:601 src/emu/ui/simpleselgame.cpp:262
+#: src/emu/ui/selgame.cpp:647 src/emu/ui/simpleselgame.cpp:262
 msgid "Configure Options"
 msgstr "Изменение настроек"
 
-#: src/emu/ui/selgame.cpp:602
+#: src/emu/ui/selgame.cpp:648
 msgid "Configure Machine"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:758
+#: src/emu/ui/selgame.cpp:804
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:768
+#: src/emu/ui/selgame.cpp:814
 #, c-format
 msgid "%1$s (%2$s - %3$s) - "
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:775 src/emu/ui/selgame.cpp:781
+#: src/emu/ui/selgame.cpp:821 src/emu/ui/selgame.cpp:827
 #, c-format
 msgid "%1$s (%2$s) - "
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:790
+#: src/emu/ui/selgame.cpp:836
 #, c-format
 msgid "%1$s Search: %2$s_"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:838
+#: src/emu/ui/selgame.cpp:884
 #, c-format
 msgid "Romset: %1$-.100s"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:841 src/emu/ui/selgame.cpp:890
-#: src/emu/ui/selsoft.cpp:744 src/emu/ui/selsoft.cpp:794
+#: src/emu/ui/selgame.cpp:887 src/emu/ui/selgame.cpp:936
+#: src/emu/ui/selsoft.cpp:742 src/emu/ui/selsoft.cpp:792
 #: src/emu/ui/simpleselgame.cpp:325
 #, c-format
 msgid "%1$s, %2$-.100s"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:847 src/emu/ui/selsoft.cpp:750
+#: src/emu/ui/selgame.cpp:893 src/emu/ui/selsoft.cpp:748
 #, c-format
 msgid "Driver is clone of: %1$-.100s"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:849 src/emu/ui/selsoft.cpp:752
+#: src/emu/ui/selgame.cpp:895 src/emu/ui/selsoft.cpp:750
 msgid "Driver is parent"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:853 src/emu/ui/selsoft.cpp:756
+#: src/emu/ui/selgame.cpp:899 src/emu/ui/selsoft.cpp:754
 #: src/emu/ui/simpleselgame.cpp:332
 msgid "Overall: NOT WORKING"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:855 src/emu/ui/selsoft.cpp:758
+#: src/emu/ui/selgame.cpp:901 src/emu/ui/selsoft.cpp:756
 #: src/emu/ui/simpleselgame.cpp:334
 msgid "Overall: Unemulated Protection"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:857 src/emu/ui/selsoft.cpp:760
+#: src/emu/ui/selgame.cpp:903 src/emu/ui/selsoft.cpp:758
 #: src/emu/ui/simpleselgame.cpp:336
 msgid "Overall: Working"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:861 src/emu/ui/selsoft.cpp:764
+#: src/emu/ui/selgame.cpp:907 src/emu/ui/selsoft.cpp:762
 msgid "Graphics: Imperfect, "
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:863 src/emu/ui/selsoft.cpp:766
+#: src/emu/ui/selgame.cpp:909 src/emu/ui/selsoft.cpp:764
 msgid "Graphics: OK, "
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:866 src/emu/ui/selsoft.cpp:769
+#: src/emu/ui/selgame.cpp:912 src/emu/ui/selsoft.cpp:767
 msgid "Sound: Unimplemented"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:868 src/emu/ui/selsoft.cpp:771
+#: src/emu/ui/selgame.cpp:914 src/emu/ui/selsoft.cpp:769
 msgid "Sound: Imperfect"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:870 src/emu/ui/selsoft.cpp:773
+#: src/emu/ui/selgame.cpp:916 src/emu/ui/selsoft.cpp:771
 msgid "Sound: OK"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:887
+#: src/emu/ui/selgame.cpp:933
 #, c-format
 msgid "System: %1$-.100s"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:894 src/emu/ui/selsoft.cpp:798
+#: src/emu/ui/selgame.cpp:940 src/emu/ui/selsoft.cpp:796
 #, c-format
 msgid "Software is clone of: %1$-.100s"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:896 src/emu/ui/selsoft.cpp:800
+#: src/emu/ui/selgame.cpp:942 src/emu/ui/selsoft.cpp:798
 msgid "Software is parent"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:901 src/emu/ui/selsoft.cpp:805
+#: src/emu/ui/selgame.cpp:947 src/emu/ui/selsoft.cpp:803
 msgid "Supported: No"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:906 src/emu/ui/selsoft.cpp:810
+#: src/emu/ui/selgame.cpp:952 src/emu/ui/selsoft.cpp:808
 msgid "Supported: Partial"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:911 src/emu/ui/selsoft.cpp:815
+#: src/emu/ui/selgame.cpp:957 src/emu/ui/selsoft.cpp:813
 msgid "Supported: Yes"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:916 src/emu/ui/selsoft.cpp:820
+#: src/emu/ui/selgame.cpp:962 src/emu/ui/selsoft.cpp:818
 #, c-format
 msgid "romset: %1$-.100s"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:923
+#: src/emu/ui/selgame.cpp:969
 #, c-format
 msgid "%1$s %2$s"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1519
+#: src/emu/ui/selgame.cpp:1565
 #, c-format
 msgid "Romset: %1$-.100s\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1520
+#: src/emu/ui/selgame.cpp:1566
 #, c-format
 msgid "Year: %1$s\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1521
+#: src/emu/ui/selgame.cpp:1567
 #, c-format
 msgid "Manufacturer: %1$-.100s\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1525
+#: src/emu/ui/selgame.cpp:1571
 #, c-format
 msgid "Driver is Clone of: %1$-.100s\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1527
+#: src/emu/ui/selgame.cpp:1573
 msgid "Driver is Parent\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1530
+#: src/emu/ui/selgame.cpp:1576
 msgid "Overall: NOT WORKING\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1532
+#: src/emu/ui/selgame.cpp:1578
 msgid "Overall: Unemulated Protection\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1534
+#: src/emu/ui/selgame.cpp:1580
 msgid "Overall: Working\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1537
+#: src/emu/ui/selgame.cpp:1583
 msgid "Graphics: Imperfect Colors\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1541
+#: src/emu/ui/selgame.cpp:1587
 msgid "Graphics: Imperfect\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1543
+#: src/emu/ui/selgame.cpp:1589
 msgid "Graphics: OK\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1546
+#: src/emu/ui/selgame.cpp:1592
 msgid "Sound: Unimplemented\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1548
+#: src/emu/ui/selgame.cpp:1594
 msgid "Sound: Imperfect\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1550
+#: src/emu/ui/selgame.cpp:1596
 msgid "Sound: OK\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1552
+#: src/emu/ui/selgame.cpp:1598
 #, c-format
 msgid "Driver is Skeleton: %1$s\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1553
+#: src/emu/ui/selgame.cpp:1599
 #, c-format
 msgid "Game is Mechanical: %1$s\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1554
+#: src/emu/ui/selgame.cpp:1600
 #, c-format
 msgid "Requires Artwork: %1$s\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1555
+#: src/emu/ui/selgame.cpp:1601
 #, c-format
 msgid "Requires Clickable Artwork: %1$s\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1556
+#: src/emu/ui/selgame.cpp:1602
 #, c-format
 msgid "Support Cocktail: %1$s\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1557
+#: src/emu/ui/selgame.cpp:1603
 #, c-format
 msgid "Driver is Bios: %1$s\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1558
+#: src/emu/ui/selgame.cpp:1604
 #, c-format
 msgid "Support Save: %1$s\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1559
+#: src/emu/ui/selgame.cpp:1605
 #, c-format
-msgid "Screen Orentation: %1$s\n"
+msgid "Screen Orientation: %1$s\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1559
+#: src/emu/ui/selgame.cpp:1605
 msgid "Vertical"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1559
+#: src/emu/ui/selgame.cpp:1605
 msgid "Horizontal"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1567
+#: src/emu/ui/selgame.cpp:1613
 #, c-format
 msgid "Requires CHD: %1$s\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1580
+#: src/emu/ui/selgame.cpp:1626
 msgid "Roms Audit Pass: OK\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1582
+#: src/emu/ui/selgame.cpp:1628
 msgid "Roms Audit Pass: BAD\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1585
+#: src/emu/ui/selgame.cpp:1631
 msgid "Samples Audit Pass: None Needed\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1587
+#: src/emu/ui/selgame.cpp:1633
 msgid "Samples Audit Pass: OK\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1589
+#: src/emu/ui/selgame.cpp:1635
 msgid "Samples Audit Pass: BAD\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:1592
+#: src/emu/ui/selgame.cpp:1638
 msgid ""
 "Roms Audit Pass: Disabled\n"
 "Samples Audit Pass: Disabled\n"
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:2024 src/emu/ui/selgame.cpp:2185
-#: src/emu/ui/selsoft.cpp:1641
+#: src/emu/ui/selgame.cpp:2070 src/emu/ui/selgame.cpp:2231
+#: src/emu/ui/selsoft.cpp:1639
 msgid "No Infos Available"
 msgstr "Нет информации"
 
-#: src/emu/ui/selgame.cpp:2137 src/emu/ui/selsoft.cpp:1593
+#: src/emu/ui/selgame.cpp:2183 src/emu/ui/selsoft.cpp:1591
 msgid "Usage"
 msgstr "Использование"
 
@@ -1405,7 +1390,7 @@ msgstr "Использование"
 msgid " (default)"
 msgstr " (по-умолчанию)"
 
-#: src/emu/ui/selsoft.cpp:380
+#: src/emu/ui/selsoft.cpp:378
 msgid ""
 "The selected software is missing one or more required files. Please select a "
 "different software.\n"
@@ -1413,57 +1398,57 @@ msgid ""
 "Press any key (except ESC) to continue."
 msgstr ""
 
-#: src/emu/ui/selsoft.cpp:683
+#: src/emu/ui/selsoft.cpp:681
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d softwares )"
 msgstr ""
 
-#: src/emu/ui/selsoft.cpp:684
+#: src/emu/ui/selsoft.cpp:682
 #, c-format
 msgid "Driver: \"%1$s\" software list "
 msgstr ""
 
-#: src/emu/ui/selsoft.cpp:687
+#: src/emu/ui/selsoft.cpp:685
 #, c-format
 msgid "Region: %1$s -"
 msgstr ""
 
-#: src/emu/ui/selsoft.cpp:689
+#: src/emu/ui/selsoft.cpp:687
 #, c-format
 msgid "Publisher: %1$s -"
 msgstr ""
 
-#: src/emu/ui/selsoft.cpp:691
+#: src/emu/ui/selsoft.cpp:689
 #, c-format
 msgid "Year: %1$s -"
 msgstr ""
 
-#: src/emu/ui/selsoft.cpp:693
+#: src/emu/ui/selsoft.cpp:691
 #, c-format
 msgid "Software List: %1$s -"
 msgstr ""
 
-#: src/emu/ui/selsoft.cpp:695
+#: src/emu/ui/selsoft.cpp:693
 #, c-format
 msgid "Device type: %1$s -"
 msgstr ""
 
-#: src/emu/ui/selsoft.cpp:697
+#: src/emu/ui/selsoft.cpp:695
 #, c-format
 msgid "%s Search: %s_"
 msgstr ""
 
-#: src/emu/ui/selsoft.cpp:741 src/emu/ui/selsoft.cpp:791
+#: src/emu/ui/selsoft.cpp:739 src/emu/ui/selsoft.cpp:789
 #: src/emu/ui/simpleselgame.cpp:322
 #, c-format
 msgid "%1$-.100s"
 msgstr ""
 
-#: src/emu/ui/selsoft.cpp:1978 src/emu/ui/selsoft.cpp:1998
+#: src/emu/ui/selsoft.cpp:1976 src/emu/ui/selsoft.cpp:1996
 msgid "Software part selection:"
 msgstr ""
 
-#: src/emu/ui/selsoft.cpp:2116 src/emu/ui/selsoft.cpp:2136
+#: src/emu/ui/selsoft.cpp:2114 src/emu/ui/selsoft.cpp:2134
 msgid "Bios selection:"
 msgstr "Выбор BIOS:"
 
@@ -2049,6 +2034,36 @@ msgstr " ЦВЕТА"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr ""
+
+#~ msgid "Double click or press "
+#~ msgstr "Кликните два раза или нажмите "
+
+#~ msgid " to change the color value"
+#~ msgstr " для изменения цвета"
+
+#~ msgid " to select"
+#~ msgstr " для выбора"
+
+#~ msgid "Current "
+#~ msgstr "Текущий "
+
+#~ msgid " Folders"
+#~ msgstr " Папки"
+
+#~ msgid "Change)"
+#~ msgstr "Изменить)"
+
+#~ msgid "Add"
+#~ msgstr "Добавить"
+
+#~ msgid " Folder - Search: "
+#~ msgstr " Папка - Поиск: "
+
+#~ msgid "Remove "
+#~ msgstr "Убрать "
+
+#~ msgid " Folder"
+#~ msgstr " Папка"
 
 #~ msgid " Search: "
 #~ msgstr " Поиск: "

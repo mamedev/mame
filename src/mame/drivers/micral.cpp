@@ -257,13 +257,13 @@ static MACHINE_CONFIG_START( micral, micral_state )
 	MCFG_MACHINE_RESET_OVERRIDE(micral_state, micral)
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
 	MCFG_SCREEN_UPDATE_DRIVER(micral_state, screen_update)
 	MCFG_SCREEN_SIZE(64*6, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", micral)
 
 	MCFG_DEVICE_ADD("crtc", CRT5037, XTAL_17_9712MHz/2)  // xtal freq unknown

@@ -290,19 +290,6 @@ file_error osd_fflush(osd_file *file)
 	if (!file || !file->handle)
 		return FILERR_FAILURE;
 
-	switch (file->type)
-	{
-		case WINFILE_FILE:
-			// attempt to flush file buffers
-			if (!FlushFileBuffers(file->handle))
-				return win_error_to_mame_file_error(GetLastError());
-			break;
-		case WINFILE_SOCKET:
-			return FILERR_FAILURE;
-		case WINFILE_PTTY:
-			return FILERR_FAILURE;
-
-	}
 	return FILERR_NONE;
 }
 

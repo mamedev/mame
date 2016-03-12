@@ -68,34 +68,33 @@ const struct io_procs stdio_ioprocs_noclose =
 
 static void corefile_closeproc(void *file)
 {
-	core_fclose((core_file*)file);
+	delete (util::core_file*)file;
 }
 
 static int corefile_seekproc(void *file, INT64 offset, int whence)
 {
-	return core_fseek((core_file*)file, (long) offset, whence);
+	return ((util::core_file*)file)->seek(offset, whence);
 }
 
 static size_t corefile_readproc(void *file, void *buffer, size_t length)
 {
-	return core_fread((core_file*)file, buffer, length);
+	return ((util::core_file*)file)->read(buffer, length);
 }
 
 static size_t corefile_writeproc(void *file, const void *buffer, size_t length)
 {
-	return core_fwrite((core_file*)file, buffer, length);
+	return ((util::core_file*)file)->write(buffer, length);
 }
 
 static UINT64 corefile_filesizeproc(void *file)
 {
-	long l, sz;
-	l = core_ftell((core_file*)file);
-	if (core_fseek((core_file*)file, 0, SEEK_END))
+	const auto l = ((util::core_file*)file)->tell();
+	if (((util::core_file*)file)->seek(0, SEEK_END))
 		return (size_t) -1;
-	sz = core_ftell((core_file*)file);
-	if (core_fseek((core_file*)file, l, SEEK_SET))
-		return (size_t) -1;
-	return (size_t) sz;
+	const auto sz = ((util::core_file*)file)->tell();
+	if (((util::core_file*)file)->seek(l, SEEK_SET))
+		return UINT64(-1);
+	return UINT64(sz);
 }
 
 const struct io_procs corefile_ioprocs =

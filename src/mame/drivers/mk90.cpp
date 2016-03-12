@@ -82,7 +82,7 @@ static MACHINE_CONFIG_START( mk90, mk90_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mk90_state, screen_update_mk90)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 /* ROM definition */

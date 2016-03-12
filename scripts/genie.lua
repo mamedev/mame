@@ -805,6 +805,10 @@ end
 		"-O".. _OPTIONS["OPTIMIZE"],
 		"-fno-strict-aliasing"
 	}
+configuration { "mingw-clang" }
+	buildoptions {
+		"-O1", -- without this executable crash often
+	}
 
 	-- add the error warning flag
 if _OPTIONS["NOWERROR"]==nil then
@@ -1022,6 +1026,15 @@ end
 if (_OPTIONS["PLATFORM"]=="arm") then
 	buildoptions {
 		"-Wno-cast-align",
+	}
+end
+
+if (_OPTIONS["PLATFORM"]=="arm64") then
+	buildoptions {
+		"-Wno-cast-align",
+	}
+	defines { 
+		"PTR64=1",
 	}
 end
 

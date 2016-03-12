@@ -240,6 +240,19 @@ void screen_device::static_set_video_attributes(device_t &device, UINT32 flags)
 	screen_device &screen = downcast<screen_device &>(device);
 	screen.m_video_attributes = flags;
 }
+
+
+//-------------------------------------------------
+//  static_set_color - set the screen global color
+//-------------------------------------------------
+
+void screen_device::static_set_color(device_t &device, rgb_t color)
+{
+	screen_device &screen = downcast<screen_device &>(device);
+	screen.m_color = color;
+}
+
+
 //-------------------------------------------------
 //  device_validity_check - verify device
 //  configuration

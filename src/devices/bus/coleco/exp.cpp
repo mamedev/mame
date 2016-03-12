@@ -116,7 +116,7 @@ std::string colecovision_cartridge_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
-		UINT32 length = core_fsize(m_file);
+		UINT32 length = m_file->size();
 		if (length == 0x100000 || length == 0x200000)
 			return software_get_default_slot("xin1");
 	}

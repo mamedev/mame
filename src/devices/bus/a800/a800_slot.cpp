@@ -412,13 +412,13 @@ std::string a800_cart_slot_device::get_default_card_software()
 	{
 		const char *slot_string;
 		dynamic_buffer head(0x10);
-		UINT32 len = core_fsize(m_file);
+		UINT32 len = m_file->size();
 		int type = A800_8K;
 
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, &head[0], 0x10);
+			m_file->read(&head[0], 0x10);
 			type = identify_cart_type(&head[0]);
 		}
 		else    // otherwise try to guess based on size
@@ -449,13 +449,13 @@ std::string a5200_cart_slot_device::get_default_card_software()
 	{
 		const char *slot_string;
 		dynamic_buffer head(0x10);
-		UINT32 len = core_fsize(m_file);
+		UINT32 len = m_file->size();
 		int type = A5200_8K;
 
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, &head[0], 0x10);
+			m_file->read(&head[0], 0x10);
 			type = identify_cart_type(&head[0]);
 
 			std::string info;
@@ -482,13 +482,13 @@ std::string xegs_cart_slot_device::get_default_card_software()
 	{
 		const char *slot_string;
 		dynamic_buffer head(0x10);
-		UINT32 len = core_fsize(m_file);
+		UINT32 len = m_file->size();
 		int type = A800_8K;
 
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, &head[0], 0x10);
+			m_file->read(&head[0], 0x10);
 			type = identify_cart_type(&head[0]);
 		}
 		if (type != A800_XEGS)

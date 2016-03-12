@@ -549,7 +549,7 @@ static MACHINE_CONFIG_START( sapi1, sapi1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

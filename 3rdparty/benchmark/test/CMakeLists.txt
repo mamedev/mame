@@ -39,6 +39,9 @@ add_test(basic_benchmark basic_test --benchmark_min_time=0.01)
 compile_benchmark_test(fixture_test)
 add_test(fixture_test fixture_test --benchmark_min_time=0.01)
 
+compile_benchmark_test(map_test)
+add_test(map_test map_test --benchmark_min_time=0.01)
+
 compile_benchmark_test(cxx03_test)
 set_target_properties(cxx03_test
     PROPERTIES COMPILE_FLAGS "${CXX03_FLAGS}")

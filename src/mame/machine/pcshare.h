@@ -31,8 +31,6 @@ public:
 	optional_device<mc146818_device> m_mc146818;
 	required_device<kbdc8042_device> m_kbdc;
 
-	DECLARE_READ8_MEMBER(at_dma8237_2_r);
-	DECLARE_WRITE8_MEMBER(at_dma8237_2_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
 	DECLARE_READ8_MEMBER(pc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);

@@ -574,7 +574,10 @@ ui_menu_misc_options::misc_option ui_menu_misc_options::m_options[] = {
 ui_menu_misc_options::ui_menu_misc_options(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
 	for (int d = 1; d < ARRAY_LENGTH(m_options); ++d)
-		m_options[d].status = machine.ui().options().bool_value(m_options[d].option);
+		if (machine.ui().options().exists(m_options[d].option))
+			m_options[d].status = machine.ui().options().bool_value(m_options[d].option);
+		else
+			m_options[d].status = machine.options().bool_value(m_options[d].option);
 }
 
 ui_menu_misc_options::~ui_menu_misc_options()
@@ -585,7 +588,8 @@ ui_menu_misc_options::~ui_menu_misc_options()
 		{
 			machine().ui().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
 		}
-		else {
+		else 
+		{
 			if (machine().options().bool_value(m_options[d].option) != m_options[d].status)
 			{
 				machine().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);

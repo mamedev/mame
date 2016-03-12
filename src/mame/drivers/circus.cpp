@@ -299,7 +299,7 @@ static MACHINE_CONFIG_START( circus, circus_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", circus)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -334,7 +334,7 @@ static MACHINE_CONFIG_START( robotbwl, circus_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", robotbwl)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( crash, circus_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", circus)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -410,7 +410,7 @@ static MACHINE_CONFIG_START( ripcord, circus_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", circus)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
