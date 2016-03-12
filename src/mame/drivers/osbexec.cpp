@@ -530,11 +530,11 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_CPU_IO_MAP( osbexec_io)
 	MCFG_CPU_CONFIG( osbexec_daisy_config )
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_UPDATE_DRIVER(osbexec_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240 )    /* May not be correct */
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
+	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)

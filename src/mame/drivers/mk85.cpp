@@ -77,7 +77,7 @@ static MACHINE_CONFIG_START( mk85, mk85_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mk85_state, screen_update_mk85)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 /* ROM definition */

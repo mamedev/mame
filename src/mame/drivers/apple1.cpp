@@ -594,7 +594,7 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(apple1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD( A1_PIA_TAG, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(apple1_state, pia_keyboard_r))

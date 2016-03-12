@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( llc1, llc_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", llc1)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEFAULT_LAYOUT(layout_llc1)
 
 	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_3MHz)
@@ -257,7 +257,7 @@ static MACHINE_CONFIG_START( llc2, llc_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", llc2)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

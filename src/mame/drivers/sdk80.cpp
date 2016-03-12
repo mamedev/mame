@@ -178,7 +178,7 @@ static MACHINE_CONFIG_START( sdk80, sdk80_state )
 
 //  MCFG_GFXDECODE_ADD("gfxdecode", "palette", sdk80)
 
-//  MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+//  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// Video board UART
 //  MCFG_DEVICE_ADD( "hd6402", AY31015, 0 )

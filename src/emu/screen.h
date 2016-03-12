@@ -193,6 +193,7 @@ public:
 	static void static_set_screen_vblank(device_t &device, screen_vblank_delegate callback);
 	static void static_set_palette(device_t &device, const char *tag);
 	static void static_set_video_attributes(device_t &device, UINT32 flags);
+	static void static_set_color(device_t &device, rgb_t color);
 
 	// information getters
 	render_container &container() const { assert(m_container != nullptr); return *m_container; }
@@ -365,6 +366,12 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 #define MCFG_SCREEN_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
 	MCFG_SCREEN_TYPE(_type)
+
+#define MCFG_SCREEN_ADD_MONOCHROME(_tag, _type, _color) \
+	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
+	MCFG_SCREEN_TYPE(_type) \
+	MCFG_SCREEN_COLOR(_color)
+
 #define MCFG_SCREEN_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)
 
@@ -442,6 +449,8 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 	screen_device::static_set_palette(*device, FINDER_DUMMY_TAG);
 #define MCFG_SCREEN_VIDEO_ATTRIBUTES(_flags) \
 	screen_device::static_set_video_attributes(*device, _flags);
+#define MCFG_SCREEN_COLOR(_color) \
+	screen_device::static_set_color(*device, _color);
 
 
 //**************************************************************************

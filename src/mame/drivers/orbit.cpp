@@ -306,7 +306,7 @@ static MACHINE_CONFIG_START( orbit, orbit_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", orbit)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

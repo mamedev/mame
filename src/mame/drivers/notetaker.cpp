@@ -695,7 +695,7 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
 	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL_36MHz/4)/8) // the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*, 2, 3, 4, 5, 6, 7, or 8 (* because this is a 74s163 this setting probably means divide by 1; documentation at http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790605_Definition_of_8086_Ports.pdf claims it is 1.5, which makes no sense) and secondarily divided by 8 (again by two to load the 16 bit output shifters after this)

@@ -407,7 +407,7 @@ static MACHINE_CONFIG_START( hp9k, hp9k_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hp9k)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL_16MHz / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
