@@ -52,9 +52,11 @@ TILE_GET_INFO_MEMBER(androidp_state::get_bg_tile_info)
 
 	code |= (attr & 0x7) << 8;
 
+	int color = (attr & 0xf0) >> 4;
+
 	SET_TILE_INFO_MEMBER(1,
 			code,
-			0,
+			color,
 			0);
 }
 
@@ -91,6 +93,9 @@ WRITE8_MEMBER(androidp_state::port_3_w)
 
 WRITE8_MEMBER(androidp_state::port_6_w)
 {
+//	int bank = (data & 0x0e) >> 1;
+//	membank("bank1")->set_entry(bank);
+
 	// seems most likely candidate for ROM BANK
 
 	// 04 during title, 08 during high score
@@ -126,8 +131,7 @@ static ADDRESS_MAP_START( androidp_map, AS_PROGRAM, 8, androidp_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM  // sprites?
-	AM_RANGE(0xa800, 0xa8ff) AM_RAM  // palette?
-	AM_RANGE(0xac00, 0xacff) AM_RAM  // palette?
+	AM_RANGE(0xa800, 0xacff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")  // 0xa800 - 0xa8ff (bg) and 0xac00 - 0xacff (sprites) used
 	AM_RANGE(0xb000, 0xbfff) AM_RAM_WRITE(androidp_bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -213,12 +217,12 @@ GFXDECODE_END
 
 void androidp_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x4000);
+	membank("bank1")->configure_entries(0, 6, memregion("maincpu")->base() + 0x0000, 0x4000);
 }
 
 void androidp_state::machine_reset()
 {
-	membank("bank1")->set_entry(0);
+	membank("bank1")->set_entry(2);
 }
 
 static MACHINE_CONFIG_START( androidp, androidp_state )
@@ -239,9 +243,9 @@ static MACHINE_CONFIG_START( androidp, androidp_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", androidp)
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
