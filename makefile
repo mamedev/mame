@@ -61,6 +61,7 @@
 # USE_SYSTEM_LIB_SQLITE3 = 1
 # USE_SYSTEM_LIB_PORTMIDI = 1
 # USE_SYSTEM_LIB_PORTAUDIO = 1
+# USE_SYSTEM_LIB_UV = 1
 # USE_BUNDLED_LIB_SDL2 = 1
 
 # MESA_INSTALL_ROOT = /opt/mesa
@@ -401,6 +402,10 @@ endif
 
 ifdef USE_BUNDLED_LIB_SDL2
 PARAMS += --with-bundled-sdl2
+endif
+
+ifndef USE_SYSTEM_LIB_UV
+PARAMS += --with-bundled-libuv
 endif
 
 #-------------------------------------------------
