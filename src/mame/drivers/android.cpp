@@ -17,8 +17,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_bgram(*this, "bgram")
-	
+		m_bgram(*this, "bgram"),
+		m_spriteram(*this, "spriteram")
 		{ }
 
 	virtual void machine_start() override;
@@ -30,22 +30,37 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<UINT8> m_bgram;
+	required_shared_ptr<UINT8> m_spriteram;
+
 	tilemap_t *m_bg_tilemap;
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_WRITE8_MEMBER(androidp_bgram_w);
 	DECLARE_WRITE8_MEMBER(bg_scrollx_w);
 
-	DECLARE_WRITE8_MEMBER(port_3_w);
-
-	DECLARE_WRITE8_MEMBER(port_6_w);
-	DECLARE_WRITE8_MEMBER(port_7_w);
 	DECLARE_WRITE8_MEMBER(port_8_w);
 	DECLARE_WRITE8_MEMBER(port_9_w);
 
 	DECLARE_WRITE8_MEMBER(port_b_w);
 
+	// ppi8255_0
+	DECLARE_READ8_MEMBER(ppi_0a_r) { /* printf("%04x: (used) ppi_0a_r\n", m_maincpu->space().device().safe_pc()); */ return 0x00;/*rand();*/ }
+	DECLARE_READ8_MEMBER(ppi_0b_r) { printf("%04x: ppi_0b_r\n", m_maincpu->space().device().safe_pc()); return rand(); }
+	DECLARE_READ8_MEMBER(ppi_0c_r) { /* printf("%04x: (used) ppi_0c_r\n", m_maincpu->space().device().safe_pc()); */ return 0x00;/*rand();*/ }
+	DECLARE_WRITE8_MEMBER(ppi_0a_w) { printf("%04x: ppi_0a_w %02x\n", m_maincpu->space().device().safe_pc(), data); }
+	DECLARE_WRITE8_MEMBER(ppi_0b_w) { printf("%04x: ppi_0b_w %02x\n", m_maincpu->space().device().safe_pc(), data); }
+	DECLARE_WRITE8_MEMBER(ppi_0c_w) { printf("%04x: ppi_0c_w %02x\n", m_maincpu->space().device().safe_pc(), data); }
+
+	// ppi8255_1
+	DECLARE_READ8_MEMBER(ppi_1a_r) { printf("%04x: ppi_1a_r\n", m_maincpu->space().device().safe_pc()); return rand(); }
+	DECLARE_READ8_MEMBER(ppi_1b_r) { printf("%04x: ppi_1b_r\n", m_maincpu->space().device().safe_pc()); return rand(); }
+	DECLARE_READ8_MEMBER(ppi_1c_r) { printf("%04x: ppi_1c_r\n", m_maincpu->space().device().safe_pc()); return rand(); }
+	DECLARE_WRITE8_MEMBER(ppi_1a_w) { printf("%04x: ppi_1a_w %02x\n", m_maincpu->space().device().safe_pc(), data); }
+	DECLARE_WRITE8_MEMBER(ppi_1b_w) { printf("%04x: ppi_1b_w %02x\n", m_maincpu->space().device().safe_pc(), data); }
+	DECLARE_WRITE8_MEMBER(androidp_bankswitch_w);
+
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
+	int m_bank_step;
 };
 
 TILE_GET_INFO_MEMBER(androidp_state::get_bg_tile_info)
@@ -69,7 +84,15 @@ WRITE8_MEMBER(androidp_state::androidp_bgram_w)
 	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
+WRITE8_MEMBER(androidp_state::androidp_bankswitch_w)
+{
+	// THIS IS WRONG
 
+	if ((data & 0x8) == 0x8) membank("bank1")->set_entry(5);
+	else membank("bank1")->set_entry(2);
+
+//	printf("%04x: androidp_bankswitch_w %02x\n", m_maincpu->space().device().safe_pc(), data ); 
+}
 
 void androidp_state::video_start()
 {
@@ -79,6 +102,28 @@ void androidp_state::video_start()
 UINT32 androidp_state::screen_update_androidp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	gfx_element *gfx = m_gfxdecode->gfx(0);
+
+	// 0x00 - 0xbf sprites, 0xc0 - 0xff unused?
+	for (int offs = 0;offs < 0xc0;offs += 4)
+	{
+		int y = m_spriteram[offs + 2];
+		int x = m_spriteram[offs + 3];
+		int code = m_spriteram[offs + 0];
+		int attr = m_spriteram[offs + 1];
+
+		code |= (attr & 0x03) << 8;
+		int colour = (attr & 0x70) >> 4;
+
+		if (attr & 0x8c) printf("attr bits set %02x\n", attr & 0x8c);
+
+		y = 256 - y;
+
+		gfx->transpen(bitmap,cliprect,code,colour,0,0,x,y,15);
+		gfx->transpen(bitmap,cliprect,code,colour,0,0,x,y-256,15);
+	}
+
 	return 0;
 }
 
@@ -88,28 +133,6 @@ WRITE8_MEMBER(androidp_state::bg_scrollx_w)
 }
 
 
-WRITE8_MEMBER(androidp_state::port_3_w)
-{
-	// 9b on startup
-//	printf("port3_w %02x\n", data);
-}
-
-WRITE8_MEMBER(androidp_state::port_6_w)
-{
-//	int bank = (data & 0x0e) >> 1;
-//	membank("bank1")->set_entry(bank);
-
-	// seems most likely candidate for ROM BANK
-
-	// 04 during title, 08 during high score
-	//printf("%04x: port6_w %02x\n", space.device().safe_pc(), data);
-}
-
-WRITE8_MEMBER(androidp_state::port_7_w)
-{
-	// 92 on startup
-	//printf("port7_w %02x\n", data);
-}
 
 WRITE8_MEMBER(androidp_state::port_8_w)
 {
@@ -133,7 +156,7 @@ WRITE8_MEMBER(androidp_state::port_b_w)
 static ADDRESS_MAP_START( androidp_map, AS_PROGRAM, 8, androidp_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM  // sprites?
+	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("spriteram") // sprites?
 	AM_RANGE(0xa800, 0xacff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")  // 0xa800 - 0xa8ff (bg) and 0xac00 - 0xacff (sprites) used
 	AM_RANGE(0xb000, 0xbfff) AM_RAM_WRITE(androidp_bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
@@ -141,12 +164,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( androidp_portmap, AS_IO, 8, androidp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("02") // probably from sub-cpu (inputs read by that?)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write) 
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) 
 
-	AM_RANGE(0x03, 0x03) AM_WRITE( port_3_w )
-
-	AM_RANGE(0x06, 0x06) AM_WRITE( port_6_w )
-	AM_RANGE(0x07, 0x07) AM_WRITE( port_7_w )
 	AM_RANGE(0x08, 0x08) AM_WRITE( port_8_w )
 	AM_RANGE(0x09, 0x09) AM_WRITE( port_9_w )
 
@@ -226,7 +246,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( androidp )
-	GFXDECODE_ENTRY( "sprites", 0, sprite16x16_layout, 0, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, sprite16x16_layout, 0x200, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -240,6 +260,7 @@ void androidp_state::machine_start()
 void androidp_state::machine_reset()
 {
 	membank("bank1")->set_entry(2);
+	m_bank_step = 0;
 }
 
 WRITE_LINE_MEMBER(androidp_state::irqhandler)
@@ -259,16 +280,22 @@ static MACHINE_CONFIG_START( androidp, androidp_state )
 	MCFG_CPU_ADD("subcpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(androidp_sub_map)
 	MCFG_CPU_IO_MAP(androidp_sub_portmap)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", androidp_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-//	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-//	MCFG_I8255_IN_PORTB_CB(IOPORT("IN3"))
+	MCFG_I8255_IN_PORTA_CB(READ8(androidp_state, ppi_0a_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(androidp_state, ppi_0b_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(androidp_state, ppi_0c_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(androidp_state, ppi_0a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(androidp_state, ppi_0b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(androidp_state, ppi_0c_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-//	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-///	MCFG_I8255_IN_PORTB_CB(IOPORT("IN2"))
-//	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTA_CB(READ8(androidp_state, ppi_1a_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(androidp_state, ppi_1b_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(androidp_state, ppi_1c_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(androidp_state, ppi_1a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(androidp_state, ppi_1b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(androidp_state, androidp_bankswitch_w))
 
 	MCFG_SOUND_ADD("ym", YM2203, 4000000) // ? Mhz
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(androidp_state, irqhandler))
@@ -301,7 +328,7 @@ MACHINE_CONFIG_END
 ROM_START( androidp )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "MITSUBISHI_A01.toppcb.m5l27256k.k1.BIN", 0x00000, 0x08000, CRC(25ab85eb) SHA1(e1fab149c83ff880b119258206d5818f3db641c5) )
-	ROM_LOAD( "MITSUBISHI_A02.toppcb.m5l27256k.J1.BIN", 0x08000, 0x08000, CRC(e41426be) SHA1(e7e06ef3ff5160bb7d870e148ba2799da52cf24c) )
+	ROM_LOAD( "MITSUBISHI_A02.toppcb.m5l27256k.J1.BIN", 0x08000, 0x08000, CRC(e41426be) SHA1(e7e06ef3ff5160bb7d870e148ba2799da52cf24c) ) // 2nd half empty (correct?)
 	ROM_LOAD( "MITSUBISHI_A03.toppcb.m5l27256k.G1.BIN", 0x10000, 0x08000, CRC(6cf5f48a) SHA1(b9b4e5e7bace0e8d98fbc9f4ad91bc56ef42099e) )
 
 	ROM_REGION( 0x18000, "subcpu", 0 )
