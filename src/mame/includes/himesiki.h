@@ -25,6 +25,8 @@ public:
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
 	int          m_scrollx[2];
+	int          m_scrolly;
+
 	int        m_flipscreen;
 
 	/* devices */
@@ -33,7 +35,8 @@ public:
 	DECLARE_WRITE8_MEMBER(himesiki_sound_w);
 	DECLARE_WRITE8_MEMBER(himesiki_bg_ram_w);
 	DECLARE_WRITE8_MEMBER(himesiki_scrollx_w);
-	DECLARE_WRITE8_MEMBER(himesiki_flip_w);
+	DECLARE_WRITE8_MEMBER(himesiki_scrolly_w);
+//	DECLARE_WRITE8_MEMBER(himesiki_flip_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
