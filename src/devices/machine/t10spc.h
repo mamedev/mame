@@ -39,7 +39,9 @@ protected:
 	enum sense_key_t
 	{
 		SCSI_SENSE_KEY_NO_SENSE = 0,
-		SCSI_SENSE_KEY_ILLEGAL_REQUEST = 5
+		SCSI_SENSE_KEY_MEDIUM_ERROR = 2,
+		SCSI_SENSE_KEY_ILLEGAL_REQUEST = 5,
+		SCSI_SENSE_KEY_UNIT_ATTENTION = 6
 	};
 
 	enum sense_asc_ascq_t
