@@ -814,6 +814,7 @@ configuration { "mingw-clang" }
 	buildoptions {
 		"-O1", -- without this executable crash often
 	}
+configuration {  }
 
 	-- add the error warning flag
 if _OPTIONS["NOWERROR"]==nil then
