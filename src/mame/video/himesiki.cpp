@@ -52,6 +52,7 @@ void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 	UINT8 *spriteram = m_spriteram;
 	int offs;
 
+	// these sprites are from the ET-P103A board (himesiki only)
 	for (offs = 0x100; offs < 0x160; offs += 4)
 	{
 		int attr = spriteram[offs + 1];
@@ -83,7 +84,8 @@ void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, col, fx, fy, x, y, 15);
 	}
 
-	for (offs = 0; offs < 0x100; offs += 4)
+	// 0xc0 - 0xff unused
+	for (offs = 0; offs < 0xc0; offs += 4)
 	{
 		int attr = spriteram[offs + 1];
 		int code = spriteram[offs + 0] | (attr & 7) << 8;

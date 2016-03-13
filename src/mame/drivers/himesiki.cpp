@@ -100,9 +100,9 @@ A                                                   12.000MHz
 
 WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 {
-	membank("bank1")->set_entry(((data & 0x08) >> 3));
+	membank("bank1")->set_entry(((data & 0x0c) >> 2));
 
-	if (data & 0xf7)
+	if (data & 0xf3)
 		logerror("p06_w %02x\n", data);
 }
 
@@ -335,7 +335,10 @@ MACHINE_CONFIG_END
 ROM_START( himesiki )
 	ROM_REGION( 0x020000, "maincpu", 0 ) /* z80 */
 	ROM_LOAD( "1.1k",  0x00000,  0x08000, CRC(fb4604b3) SHA1(e8155bbafb881125e1bf9a04808d6a6546887e90) )
-	ROM_LOAD( "2.1g",  0x10000,  0x08000, CRC(0c30ded1) SHA1(0ad67115fa15d0b6261a278a946a6d46c06430ef) )
+	// banked data
+	ROM_LOAD( "2.1g",  0x10000,  0x04000, CRC(0c30ded1) SHA1(0ad67115fa15d0b6261a278a946a6d46c06430ef) )
+	ROM_CONTINUE(0x18000, 0x4000)
+	// 1j is unpopulated on this game
 
 	ROM_REGION( 0x010000, "sub", 0 ) /* z80 */
 	ROM_LOAD( "5.6n",  0x00000,  0x08000, CRC(b1214ac7) SHA1(ee5459c28d9c3c2eb3467261716b1259ec486534) )
@@ -364,9 +367,11 @@ ROM_END
 ROM_START( androidp )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "MITSUBISHI_A01.toppcb.m5l27256k.k1.BIN", 0x00000, 0x08000, CRC(25ab85eb) SHA1(e1fab149c83ff880b119258206d5818f3db641c5) )
-
-	ROM_LOAD( "MITSUBISHI_A03.toppcb.m5l27256k.G1.BIN", 0x10000, 0x08000, CRC(6cf5f48a) SHA1(b9b4e5e7bace0e8d98fbc9f4ad91bc56ef42099e) )
-	ROM_LOAD( "MITSUBISHI_A02.toppcb.m5l27256k.J1.BIN", 0x18000, 0x08000, CRC(e41426be) SHA1(e7e06ef3ff5160bb7d870e148ba2799da52cf24c) ) // 2nd half empty (correct?)
+	// banked data
+	ROM_LOAD( "MITSUBISHI_A03.toppcb.m5l27256k.G1.BIN", 0x10000, 0x04000, CRC(6cf5f48a) SHA1(b9b4e5e7bace0e8d98fbc9f4ad91bc56ef42099e) )
+	ROM_CONTINUE(0x18000, 0x4000)
+	ROM_LOAD( "MITSUBISHI_A02.toppcb.m5l27256k.J1.BIN", 0x14000, 0x04000, CRC(e41426be) SHA1(e7e06ef3ff5160bb7d870e148ba2799da52cf24c) )
+	ROM_CONTINUE(0x1c000, 0x4000)
 
 	ROM_REGION( 0x18000, "sub", 0 )
 	ROM_LOAD( "MITSUBISHI_A04.toppcb.m5l27256k.N6.BIN", 0x00000, 0x08000, CRC(13c38fe4) SHA1(34a35fa057159a5c83892a88b8c908faa39d5cb3) )	
