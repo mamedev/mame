@@ -12,6 +12,7 @@ public:
 	himesiki_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_bg_ram(*this, "bg_ram"),
+		m_spriteram_p103a(*this, "sprram_p103a"),
 		m_spriteram(*this, "spriteram"),
 		m_subcpu(*this, "sub"),
 		m_maincpu(*this, "maincpu"),
@@ -20,6 +21,7 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bg_ram;
+	required_shared_ptr<UINT8> m_spriteram_p103a;
 	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */

@@ -56,11 +56,12 @@ WRITE8_MEMBER(himesiki_state::himesiki_flip_w)
 
 void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	UINT8 *spriteram;
 	int offs;
 
 	// these sprites are from the ET-P103A board (himesiki only)
-	for (offs = 0x100; offs < 0x160; offs += 4)
+	spriteram = m_spriteram_p103a;
+	for (offs = 0x00; offs < 0x60; offs += 4)
 	{
 		int attr = spriteram[offs + 1];
 		int code = spriteram[offs + 0] | (attr & 3) << 8;
@@ -88,12 +89,20 @@ void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 				y -= 0x100;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, col, fx, fy, x, y, 15);
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, code, col, fx, fy, x, y, 15);
 	}
 
 	// 0xc0 - 0xff unused
-	for (offs = 0; offs < 0xc0; offs += 4)
+	spriteram = m_spriteram;
+	for (offs = 0; offs < 0x100; offs += 4)
 	{
+		// not sure about this, but you sometimes get a garbage sprite in the corner otherwise.
+		if ((spriteram[offs + 0] == 0x00) && 
+	        (spriteram[offs + 1] == 0x00) &&
+		    (spriteram[offs + 2] == 0x00) &&
+		    (spriteram[offs + 3] == 0x00))
+		 	 continue;
+
 		int attr = spriteram[offs + 1];
 		int code = spriteram[offs + 0] | (attr & 7) << 8;
 		int x = spriteram[offs + 3] | (attr & 8) << 5;
@@ -118,7 +127,7 @@ void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		if (y > 0xf0)
 			y -= 0x100;
 
-		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, code, col, f, f, x, y, 15);
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, col, f, f, x, y, 15);
 	}
 }
 
