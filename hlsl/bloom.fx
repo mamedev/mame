@@ -255,7 +255,7 @@ uniform float2 Level56Weight;
 uniform float2 Level78Weight;
 uniform float2 Level9AWeight;
 
-uniform int BloomBlendMode = 0; // 0 addition, 1 darken
+uniform int BloomBlendMode = 0; // 0 brighten, 1 darken
 uniform float BloomScale;
 uniform float3 BloomOverdrive;
 
@@ -281,7 +281,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 	float3 blend;
 
-	// addition
+	// brighten
 	if (BloomBlendMode == 0)
 	{
 		texel0 *= Level0Weight;

@@ -407,8 +407,6 @@ void shaders::toggle()
 		{
 			// free shader resources before renderer resources
 			delete_resources(false);
-
-			g_slider_list = nullptr;
 		}
 
 		master_enable = !master_enable;
@@ -432,10 +430,6 @@ void shaders::toggle()
 			if (failed)
 			{
 				master_enable = false;
-			}
-			else
-			{
-				g_slider_list = init_slider_list();
 			}
 		}
 	}
@@ -659,8 +653,13 @@ void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 	// check if no driver loaded (not all settings might be loaded yet)
 	if (&machine->system() == &GAME_NAME(___empty))
 	{
+		options->params_init = false;
+		last_options.params_init = false;
+
 		return;
 	}
+
+	enumerate_screens();
 
 	windows_options &winoptions = downcast<windows_options &>(machine->options());
 
@@ -744,8 +743,6 @@ void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 	}
 
 	options->params_dirty = true;
-
-	g_slider_list = init_slider_list();
 }
 
 
@@ -1004,6 +1001,8 @@ int shaders::create_resources(bool reset)
 	distortion_effect->add_uniform("RotationType", uniform::UT_INT, uniform::CU_ROTATION_TYPE);
 
 	initialized = true;
+
+	init_slider_list();
 
 	return 0;
 }
@@ -1675,12 +1674,12 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		curr_texture->increment_frame_count();
 		curr_texture->mask_frame_count(options->yiq_phase_count);
 
-		options->params_dirty = false;
-
 		curr_screen++;
 	}
 	else if (PRIMFLAG_GET_VECTOR(poly->get_flags()) && vector_enable)
 	{
+		lines_pending = true;
+
 		curr_render_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
 
 		d3d_render_target *rt = curr_render_target;
@@ -1689,8 +1688,6 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 			osd_printf_verbose("Direct3D: No vector render target\n");
 			return;
 		}
-
-		lines_pending = true;
 
 		int next_index = 0;
 
@@ -1704,6 +1701,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	}
 	else if (PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable)
 	{
+		curr_screen = curr_screen < num_screens ? curr_screen : 0;
+
 		curr_render_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
 
 		d3d_render_target *rt = curr_render_target;
@@ -1747,11 +1746,15 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		}
 
 		lines_pending = false;
+
+		curr_screen++;
 	}
 	else
 	{
 		ui_pass(poly, vertnum);
 	}
+
+	options->params_dirty = false;
 
 	curr_render_target = nullptr;
 	curr_texture = nullptr;
@@ -1957,8 +1960,6 @@ bool shaders::register_texture(render_primitive *prim, texture_info *texture)
 		return false;
 	}
 
-	enumerate_screens();
-
 	bool swap_xy = d3d->swap_xy();
 	int target_width = swap_xy
 		? static_cast<int>(prim->get_quad_height() + 0.5f)
@@ -1972,8 +1973,6 @@ bool shaders::register_texture(render_primitive *prim, texture_info *texture)
 	{
 		return false;
 	}
-
-	options->params_dirty = true;
 
 	return true;
 }
@@ -2117,6 +2116,8 @@ void shaders::delete_resources(bool reset)
 	}
 
 	shadow_bitmap.reset();
+
+	g_slider_list = nullptr;
 }
 
 
@@ -2346,7 +2347,7 @@ slider_desc shaders::s_sliders[] =
 	{ "Scanline Darkness",                  0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_ALPHA,          0.01f,    "%1.2f", {} },
 	{ "Scanline Screen Scale",              0,   100,   400, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_SCALE,          0.01f,    "%1.2f", {} },
 	{ "Scanline Height",                    0,   100,   400, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_HEIGHT,         0.01f,    "%1.2f", {} },
-	{ "Scanline Brightness",                0,   100,   400, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_BRIGHT_SCALE,   0.01f,    "%1.2f", {} },
+	{ "Scanline Brightness",                0,   100,   200, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_BRIGHT_SCALE,   0.01f,    "%1.2f", {} },
 	{ "Scanline Brightness Overdrive",      0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_BRIGHT_OFFSET,  0.01f,    "%1.2f", {} },
 	{ "Scanline Jitter",                    0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_JITTER,         0.01f,    "%1.2f", {} },
 	{ "Hum Bar Darkness",                   0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_HUM_BAR_ALPHA,           0.01f,    "%2.2f", {} },
@@ -2468,20 +2469,19 @@ void *shaders::get_slider_option(int id, int index)
 	return nullptr;
 }
 
-slider_state *shaders::init_slider_list()
+void shaders::init_slider_list()
 {
 	if (!master_enable || !d3dintf->post_fx_available)
 	{
 		g_slider_list = nullptr;
-		return nullptr;
 	}
 
 	slider_state *listhead = nullptr;
 	slider_state **tailptr = &listhead;
 
-	for (int index = 0; s_sliders[index].name != nullptr; index++)
+	for (int i = 0; s_sliders[i].name != nullptr; i++)
 	{
-		slider_desc *desc = &s_sliders[index];
+		slider_desc *desc = &s_sliders[i];
 
 		int screen_type = machine->first_screen()->screen_type();
 		if ((screen_type == SCREEN_TYPE_VECTOR && (desc->screen_type & SLIDER_SCREEN_TYPE_VECTOR) == SLIDER_SCREEN_TYPE_VECTOR) ||
@@ -2501,9 +2501,10 @@ slider_state *shaders::init_slider_list()
 					count = 1;
 					break;
 			}
-			for (int index = 0; index < count; index++)
+
+			for (int j = 0; j < count; j++)
 			{
-				slider* slider_arg = new slider(desc, get_slider_option(desc->id, index), &options->params_dirty);
+				slider* slider_arg = new slider(desc, get_slider_option(desc->id, j), &options->params_dirty);
 				sliders.push_back(slider_arg);
 				std::string name = desc->name;
 				switch (desc->slider_type)
@@ -2511,13 +2512,13 @@ slider_state *shaders::init_slider_list()
 					case SLIDER_VEC2:
 					{
 						std::string names[2] = { " X", " Y" };
-						name = name + names[index];
+						name = name + names[j];
 						break;
 					}
 					case SLIDER_COLOR:
 					{
 						std::string names[3] = { " Red", " Green", " Blue" };
-						name = name + names[index];
+						name = name + names[j];
 						break;
 					}
 					default:
@@ -2529,7 +2530,7 @@ slider_state *shaders::init_slider_list()
 		}
 	}
 
-	return listhead;
+	g_slider_list = listhead;
 }
 
 

@@ -102,7 +102,7 @@ struct object_transform
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-// precomputed UV coordinates for raster primitive with various orientations
+// precomputed UV coordinates for various orientations
 static const render_quad_texuv oriented_texcoords[8] =
 {
 	{ { 0,0 }, { 1,0 }, { 0,1 }, { 1,1 } },     // 0
@@ -113,12 +113,6 @@ static const render_quad_texuv oriented_texcoords[8] =
 	{ { 0,1 }, { 0,0 }, { 1,1 }, { 1,0 } },     // ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X
 	{ { 1,0 }, { 1,1 }, { 0,0 }, { 0,1 } },     // ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y
 	{ { 1,1 }, { 1,0 }, { 0,1 }, { 0,0 } }      // ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y
-};
-
-// precomputed UV coordinates for vector primitive
-static const render_quad_texuv oriented_vector_texcoords[1] =
-{
-	{ { 0,0 }, { 1,0 }, { 0,1 }, { 1,1 } }
 };
 
 // layer orders
@@ -1776,28 +1770,14 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 						? PRIMFLAG_BLENDMODE(blendmode)
 						: PRIMFLAG_BLENDMODE(PRIMFLAG_GET_BLENDMODE(curitem->flags()));
 				}
-				else if (curitem->flags() & PRIMFLAG_VECTORBUF_MASK)
-				{
-					// adjust the color for brightness/contrast/gamma
-					prim->color.r = container.apply_brightness_contrast_gamma_fp(prim->color.r);
-					prim->color.g = container.apply_brightness_contrast_gamma_fp(prim->color.g);
-					prim->color.b = container.apply_brightness_contrast_gamma_fp(prim->color.b);
-
-					// determine UV coordinates
-					prim->texcoords = oriented_vector_texcoords[0];
-
-					// apply clipping
-					clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
-
-					// no texture
-					prim->texture.base = nullptr;
-
-					// set the basic flags
-					prim->flags = (curitem->flags() & ~PRIMFLAG_BLENDMODE_MASK)
-						| PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
-				}
 				else
 				{
+					if (curitem->flags() & PRIMFLAG_VECTORBUF_MASK)
+					{
+						// determine UV coordinates
+						prim->texcoords = oriented_texcoords[0];
+					}
+
 					// adjust the color for brightness/contrast/gamma
 					prim->color.r = container.apply_brightness_contrast_gamma_fp(prim->color.r);
 					prim->color.g = container.apply_brightness_contrast_gamma_fp(prim->color.g);
