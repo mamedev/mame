@@ -314,7 +314,7 @@ void save_ui_options(running_machine &machine)
 {
 	// attempt to open the output file
 	emu_file file(machine.options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file.open("ui.ini") == FILERR_NONE)
+	if (file.open("ui.ini") == osd_file::error::NONE)
 	{
 		// generate the updated INI
 		std::string initext = machine.ui().options().output_ini();
@@ -339,7 +339,7 @@ void save_main_option(running_machine &machine)
 	// attempt to open the main ini file
 	{
 		emu_file file(machine.options().ini_path(), OPEN_FLAG_READ);
-		if (file.open(emulator_info::get_configname(), ".ini") == FILERR_NONE)
+		if (file.open(emulator_info::get_configname(), ".ini") == osd_file::error::NONE)
 		{
 			bool result = options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
 			if (!result)
@@ -361,7 +361,7 @@ void save_main_option(running_machine &machine)
 	// attempt to open the output file
 	{
 		emu_file file(machine.options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(emulator_info::get_configname(), ".ini") == FILERR_NONE)
+		if (file.open(emulator_info::get_configname(), ".ini") == osd_file::error::NONE)
 		{
 			// generate the updated INI
 			std::string initext = options.output_ini();
@@ -375,4 +375,3 @@ void save_main_option(running_machine &machine)
 	}
 	machine.ui().popup_time(3, "%s", _("\n    Configuration saved    \n\n"));
 }
-

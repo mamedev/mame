@@ -14,7 +14,6 @@
 #include <vector>
 
 // Shared code
-file_error win_error_to_file_error(DWORD error);
 osd_dir_entry_type win_attributes_to_entry_type(DWORD attributes);
 BOOL win_is_gui_application(void);
 HMODULE WINAPI GetModuleHandleUni();
@@ -26,10 +25,10 @@ HMODULE WINAPI GetModuleHandleUni();
 class lazy_loaded_function
 {
 private:
-	std::string					m_name;
-	std::vector<std::wstring>	m_dll_names;
-	HMODULE						m_module;
-	bool						m_initialized;
+	std::string                 m_name;
+	std::vector<std::wstring>   m_dll_names;
+	HMODULE                     m_module;
+	bool                        m_initialized;
 
 protected:
 	void check_init();

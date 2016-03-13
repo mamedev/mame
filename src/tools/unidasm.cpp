@@ -494,7 +494,7 @@ usage:
 
 int main(int argc, char *argv[])
 {
-	file_error filerr;
+	osd_file::error filerr;
 	int displayendian;
 	int displaychunk;
 	UINT32 curbyte;
@@ -513,7 +513,7 @@ int main(int argc, char *argv[])
 
 	// load the file
 	filerr = util::core_file::load(opts.filename, &data, length);
-	if (filerr != FILERR_NONE)
+	if (filerr != osd_file::error::NONE)
 	{
 		fprintf(stderr, "Error opening file '%s'\n", opts.filename);
 		return 1;

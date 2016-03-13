@@ -266,7 +266,7 @@ int cli_frontend::execute(int argc, char **argv)
 		m_result = MAMERR_FATALERROR;
 	}
 
-	_7z_file_cache_clear();
+	_7z_file::cache_clear();
 	global_free(manager);
 
 	return m_result;
@@ -1000,7 +1000,7 @@ void cli_frontend::verifyroms(const char *gamename)
 	}
 
 	// clear out any cached files
-	zip_file_cache_clear();
+	zip_file::cache_clear();
 
 	// return an error if none found
 	if (matched == 0)
@@ -1092,7 +1092,7 @@ void cli_frontend::verifysamples(const char *gamename)
 	}
 
 	// clear out any cached files
-	zip_file_cache_clear();
+	zip_file::cache_clear();
 
 	// return an error if none found
 	if (matched == 0)
@@ -1407,7 +1407,7 @@ void cli_frontend::verifysoftware(const char *gamename)
 	}
 
 	// clear out any cached files
-	zip_file_cache_clear();
+	zip_file::cache_clear();
 
 	// return an error if none found
 	if (matched == 0)
@@ -1529,7 +1529,7 @@ void cli_frontend::verifysoftlist(const char *gamename)
 	}
 
 	// clear out any cached files
-	zip_file_cache_clear();
+	zip_file::cache_clear();
 
 	// return an error if none found
 	if (matched == 0)
@@ -1618,7 +1618,7 @@ void cli_frontend::execute_commands(const char *exename)
 	{
 		// attempt to open the output file
 		emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(emulator_info::get_configname(), ".ini") != FILERR_NONE)
+		if (file.open(emulator_info::get_configname(), ".ini") != osd_file::error::NONE)
 			throw emu_fatalerror("Unable to create file %s.ini\n",emulator_info::get_configname());
 
 		// generate the updated INI
@@ -1626,7 +1626,7 @@ void cli_frontend::execute_commands(const char *exename)
 
 		ui_options ui_opts;
 		emu_file file_ui(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file_ui.open("ui.ini") != FILERR_NONE)
+		if (file_ui.open("ui.ini") != osd_file::error::NONE)
 			throw emu_fatalerror("Unable to create file ui.ini\n");
 
 		// generate the updated INI
@@ -1761,68 +1761,61 @@ void media_identifier::identify(const char *filename)
 	if (core_filename_ends_with(filename, ".7z"))
 	{
 		// first attempt to examine it as a valid _7Z file
-		_7z_file *_7z = nullptr;
-		_7z_error _7zerr = _7z_file_open(filename, &_7z);
-		if (_7zerr == _7ZERR_NONE && _7z != nullptr)
+		_7z_file::ptr _7z;
+		_7z_file::error _7zerr = _7z_file::open(filename, _7z);
+		if (_7zerr == _7z_file::error::NONE && _7z != nullptr)
 		{
-			// loop over entries in the .7z, skipping empty files and directories
-			for (int i = 0; i < _7z->db.db.NumFiles; i++)
-			{
-				const CSzFileItem *f = _7z->db.db.Files + i;
-				_7z->curr_file_idx = i;
-				int namelen = SzArEx_GetFileNameUtf16(&_7z->db, i, nullptr);
-				std::vector<UINT16> temp(namelen);
-				dynamic_buffer temp2(namelen+1);
-				UINT8* temp3 = &temp2[0];
-				memset(temp3, 0x00, namelen);
-				SzArEx_GetFileNameUtf16(&_7z->db, i, &temp[0]);
-				// crude, need real UTF16->UTF8 conversion ideally
-				for (int j=0;j<namelen;j++)
-				{
-					temp3[j] = (UINT8)temp[j];
-				}
+			std::vector<std::uint8_t> data;
 
-				if (!(f->IsDir) && (f->Size != 0))
+			// loop over entries in the .7z, skipping empty files and directories
+			for (int i = _7z->first_file(); i >= 0; i = _7z->next_file())
+			{
+				const std::uint64_t length(_7z->current_uncompressed_length());
+				if ((length != 0) && (std::uint32_t(length) == length))
 				{
 					// decompress data into RAM and identify it
-					dynamic_buffer data(f->Size);
-					_7zerr = _7z_file_decompress(_7z, &data[0], f->Size);
-					if (_7zerr == _7ZERR_NONE)
-						identify_data((const char*)&temp2[0], &data[0], f->Size);
+					try
+					{
+						data.resize(std::size_t(length));
+						_7zerr = _7z->decompress(&data[0], std::uint32_t(length));
+						if (_7zerr == _7z_file::error::NONE)
+							identify_data(_7z->current_name().c_str(), &data[0], length);
+					}
+					catch (...)
+					{
+						// resizing the buffer could cause a bad_alloc if archive contains large files
+					}
+					data.clear();
 				}
 			}
-
-			// close up
-			_7z_file_close(_7z);
 		}
 
 		// clear out any cached files
-		_7z_file_cache_clear();
+		_7z.reset();
+		_7z_file::cache_clear();
 	}
 	else if (core_filename_ends_with(filename, ".zip"))
 	{
 		// first attempt to examine it as a valid ZIP file
-		zip_file *zip = nullptr;
-		zip_error ziperr = zip_file_open(filename, &zip);
-		if (ziperr == ZIPERR_NONE && zip != nullptr)
+		zip_file::ptr zip = nullptr;
+		zip_file::error ziperr = zip_file::open(filename, zip);
+		if (ziperr == zip_file::error::NONE && zip != nullptr)
 		{
 			// loop over entries in the ZIP, skipping empty files and directories
-			for (const zip_file_header *entry = zip_file_first_file(zip); entry != nullptr; entry = zip_file_next_file(zip))
+			for (const zip_file::file_header *entry = zip->first_file(); entry != nullptr; entry = zip->next_file())
 				if (entry->uncompressed_length != 0)
 				{
 					// decompress data into RAM and identify it
 					dynamic_buffer data(entry->uncompressed_length);
-					ziperr = zip_file_decompress(zip, &data[0], entry->uncompressed_length);
-					if (ziperr == ZIPERR_NONE)
+					ziperr = zip->decompress(&data[0], entry->uncompressed_length);
+					if (ziperr == zip_file::error::NONE)
 						identify_data(entry->filename, &data[0], entry->uncompressed_length);
 				}
-
-			// close up
-			zip_file_close(zip);
 		}
 
 		// clear out any cached files
-		zip_file_cache_clear();
+		zip.reset();
+		zip_file::cache_clear();
 	}
 
 	// otherwise, identify as a raw file
@@ -1880,8 +1873,8 @@ void media_identifier::identify_file(const char *name)
 		// load the file and process if it opens and has a valid length
 		UINT32 length;
 		void *data;
-		const file_error filerr = util::core_file::load(name, &data, length);
-		if (filerr == FILERR_NONE && length > 0)
+		const osd_file::error filerr = util::core_file::load(name, &data, length);
+		if (filerr == osd_file::error::NONE && length > 0)
 		{
 			identify_data(name, reinterpret_cast<UINT8 *>(data), length);
 			osd_free(data);

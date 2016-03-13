@@ -134,20 +134,3 @@ void osd_closedir(osd_directory *dir)
 		FindClose(dir->find);
 	free(dir);
 }
-
-
-//============================================================
-//  osd_is_absolute_path
-//============================================================
-
-int osd_is_absolute_path(const char *path)
-{
-	int result = FALSE;
-	TCHAR *t_path = tstring_from_utf8(path);
-	if (t_path != NULL)
-	{
-		result = !PathIsRelative(t_path);
-		osd_free(t_path);
-	}
-	return result;
-}

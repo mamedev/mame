@@ -103,9 +103,7 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 //============================================================
 //  osd_subst_env
 //============================================================
-void osd_subst_env(char **dst, const char *src)
+void osd_subst_env(std::string &dst, const std::string &src)
 {
-	*dst = (char *)osd_malloc_array(strlen(src) + 1);
-	if (*dst != nullptr)
-		strcpy(*dst, src);
+	dst = src;
 }

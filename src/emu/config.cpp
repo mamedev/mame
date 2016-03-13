@@ -68,9 +68,9 @@ int configuration_manager::load_settings()
 	{
 		/* open the config file */
 		emu_file file(machine().options().ctrlr_path(), OPEN_FLAG_READ);
-		file_error filerr = file.open(controller, ".cfg");
+		osd_file::error filerr = file.open(controller, ".cfg");
 
-		if (filerr != FILERR_NONE)
+		if (filerr != osd_file::error::NONE)
 			throw emu_fatalerror("Could not load controller file %s.cfg", controller);
 
 		/* load the XML */
@@ -80,13 +80,13 @@ int configuration_manager::load_settings()
 
 	/* next load the defaults file */
 	emu_file file(machine().options().cfg_directory(), OPEN_FLAG_READ);
-	file_error filerr = file.open("default.cfg");
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = file.open("default.cfg");
+	if (filerr == osd_file::error::NONE)
 		load_xml(file, config_type::CONFIG_TYPE_DEFAULT);
 
 	/* finally, load the game-specific file */
 	filerr = file.open(machine().basename(), ".cfg");
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 		loaded = load_xml(file, config_type::CONFIG_TYPE_GAME);
 
 	/* loop over all registrants and call their final function */
@@ -107,13 +107,13 @@ void configuration_manager::save_settings()
 
 	/* save the defaults file */
 	emu_file file(machine().options().cfg_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	file_error filerr = file.open("default.cfg");
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = file.open("default.cfg");
+	if (filerr == osd_file::error::NONE)
 		save_xml(file, config_type::CONFIG_TYPE_DEFAULT);
 
 	/* finally, save the game-specific file */
 	filerr = file.open(machine().basename(), ".cfg");
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 		save_xml(file, config_type::CONFIG_TYPE_GAME);
 
 	/* loop over all registrants and call their final function */

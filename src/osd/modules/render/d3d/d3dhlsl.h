@@ -227,7 +227,7 @@ struct hlsl_options
 	float                   saturation;
 
 	// NTSC
-	int						yiq_enable;
+	int                     yiq_enable;
 	float                   yiq_jitter;
 	float                   yiq_cc;
 	float                   yiq_a;
@@ -264,17 +264,17 @@ struct hlsl_options
 
 struct slider_desc
 {
-	const char *        		name;
-	int                 		minval;
-	int                 		defval;
-	int                 		maxval;
-	int                 		step;
-	int							slider_type;
-	int                 		screen_type;
-	int                 		id;
-	float						scale;
-	const char *				format;
-	std::vector<const char *>	strings;
+	const char *                name;
+	int                         minval;
+	int                         defval;
+	int                         maxval;
+	int                         step;
+	int                         slider_type;
+	int                         screen_type;
+	int                         id;
+	float                       scale;
+	const char *                format;
+	std::vector<const char *>   strings;
 };
 
 class slider
@@ -285,9 +285,9 @@ public:
 	INT32 update(std::string *str, INT32 newval);
 
 private:
-	slider_desc *	m_desc;
-	void *			m_value;
-	bool *			m_dirty;
+	slider_desc *   m_desc;
+	void *          m_value;
+	bool *          m_dirty;
 };
 
 class shaders
@@ -402,7 +402,7 @@ private:
 	UINT32                  vecbuf_index;
 	UINT32                  vecbuf_count;
 
-	avi_file *              avi_output_file;            // AVI file
+	avi_file::ptr           avi_output_file;            // AVI file
 	bitmap_rgb32            avi_snap;                   // AVI snapshot
 	int                     avi_frame;                  // AVI frame
 	attotime                avi_frame_period;           // AVI frame period
@@ -450,7 +450,7 @@ private:
 	d3d_render_target *     targethead;
 	cache_target *          cachehead;
 
-	std::vector<slider*>	sliders;
+	std::vector<slider*>    sliders;
 
 	static slider_desc      s_sliders[];
 	static hlsl_options     last_options;               // last used options

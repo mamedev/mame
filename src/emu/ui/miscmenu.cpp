@@ -588,7 +588,7 @@ ui_menu_misc_options::~ui_menu_misc_options()
 		{
 			machine().ui().options().set_value(m_options[d].option, m_options[d].status, OPTION_PRIORITY_CMDLINE, error_string);
 		}
-		else 
+		else
 		{
 			if (machine().options().bool_value(m_options[d].option) != m_options[d].status)
 			{
@@ -677,7 +677,7 @@ void ui_menu_misc_options::custom_render(void *selectedref, float top, float bot
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_export::ui_menu_export(running_machine &machine, render_container *container, std::vector<const game_driver *> drvlist) 
+ui_menu_export::ui_menu_export(running_machine &machine, render_container *container, std::vector<const game_driver *> drvlist)
 	: ui_menu(machine, container), m_list(drvlist)
 {
 }
@@ -705,11 +705,11 @@ void ui_menu_export::handle()
 				{
 					std::string filename("exported");
 					emu_file infile(machine().ui().options().ui_path(), OPEN_FLAG_READ);
-					if (infile.open(filename.c_str(), ".xml") == FILERR_NONE)
+					if (infile.open(filename.c_str(), ".xml") == osd_file::error::NONE)
 						for (int seq = 0; ; ++seq)
 						{
 							std::string seqtext = string_format("%s_%04d", filename, seq);
-							if (infile.open(seqtext.c_str(), ".xml") != FILERR_NONE)
+							if (infile.open(seqtext.c_str(), ".xml") != osd_file::error::NONE)
 							{
 								filename = seqtext;
 								break;
@@ -718,7 +718,7 @@ void ui_menu_export::handle()
 
 					// attempt to open the output file
 					emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-					if (file.open(filename.c_str(), ".xml") == FILERR_NONE)
+					if (file.open(filename.c_str(), ".xml") == osd_file::error::NONE)
 					{
 						FILE *pfile;
 						std::string fullpath(file.fullpath());
@@ -745,11 +745,11 @@ void ui_menu_export::handle()
 				{
 					std::string filename("exported");
 					emu_file infile(machine().ui().options().ui_path(), OPEN_FLAG_READ);
-					if (infile.open(filename.c_str(), ".txt") == FILERR_NONE)
+					if (infile.open(filename.c_str(), ".txt") == osd_file::error::NONE)
 						for (int seq = 0; ; ++seq)
 						{
 							std::string seqtext = string_format("%s_%04d", filename, seq);
-							if (infile.open(seqtext.c_str(), ".txt") != FILERR_NONE)
+							if (infile.open(seqtext.c_str(), ".txt") != osd_file::error::NONE)
 							{
 								filename = seqtext;
 								break;
@@ -758,7 +758,7 @@ void ui_menu_export::handle()
 
 					// attempt to open the output file
 					emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-					if (file.open(filename.c_str(), ".txt") == FILERR_NONE)
+					if (file.open(filename.c_str(), ".txt") == osd_file::error::NONE)
 					{
 						// print the header
 						std::ostringstream buffer;
@@ -829,8 +829,8 @@ void ui_menu_machine_configure::handle()
 				{
 					std::string filename(m_drv->name);
 					emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-					file_error filerr = file.open(filename.c_str(), ".ini");
-					if (filerr == FILERR_NONE)
+					osd_file::error filerr = file.open(filename.c_str(), ".ini");
+					if (filerr == osd_file::error::NONE)
 					{
 						std::string inistring = machine().options().output_ini();
 						file.puts(inistring.c_str());

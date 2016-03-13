@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
     unzip.h
@@ -10,129 +10,88 @@
 
 #pragma once
 
-#ifndef __UNZIP_H__
-#define __UNZIP_H__
+#ifndef MAME_LIB_UTIL_UNZIP_H
+#define MAME_LIB_UTIL_UNZIP_H
 
 #include "osdcore.h"
 
-
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-#define ZIP_DECOMPRESS_BUFSIZE  16384
-
-/* Error types */
-enum zip_error
-{
-	ZIPERR_NONE = 0,
-	ZIPERR_OUT_OF_MEMORY,
-	ZIPERR_FILE_ERROR,
-	ZIPERR_BAD_SIGNATURE,
-	ZIPERR_DECOMPRESS_ERROR,
-	ZIPERR_FILE_TRUNCATED,
-	ZIPERR_FILE_CORRUPT,
-	ZIPERR_UNSUPPORTED,
-	ZIPERR_BUFFER_TOO_SMALL
-};
-
+#include <cstdint>
+#include <memory>
+#include <string>
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* contains extracted file header information */
-struct zip_file_header
+// describes an open ZIP file
+class zip_file
 {
-	UINT32          signature;              /* central file header signature */
-	UINT16          version_created;        /* version made by */
-	UINT16          version_needed;         /* version needed to extract */
-	UINT16          bit_flag;               /* general purpose bit flag */
-	UINT16          compression;            /* compression method */
-	UINT16          file_time;              /* last mod file time */
-	UINT16          file_date;              /* last mod file date */
-	UINT32          crc;                    /* crc-32 */
-	UINT32          compressed_length;      /* compressed size */
-	UINT32          uncompressed_length;    /* uncompressed size */
-	UINT16          filename_length;        /* filename length */
-	UINT16          extra_field_length;     /* extra field length */
-	UINT16          file_comment_length;    /* file comment length */
-	UINT16          start_disk_number;      /* disk number start */
-	UINT16          internal_attributes;    /* internal file attributes */
-	UINT32          external_attributes;    /* external file attributes */
-	UINT32          local_header_offset;    /* relative offset of local header */
-	const char *    filename;               /* filename */
+public:
 
-	UINT8 *         raw;                    /* pointer to the raw data */
-	UINT32          rawlength;              /* length of the raw data */
-	UINT8           saved;                  /* saved byte from after filename */
+	// Error types
+	enum class error
+	{
+		NONE = 0,
+		OUT_OF_MEMORY,
+		FILE_ERROR,
+		BAD_SIGNATURE,
+		DECOMPRESS_ERROR,
+		FILE_TRUNCATED,
+		FILE_CORRUPT,
+		UNSUPPORTED,
+		BUFFER_TOO_SMALL
+	};
+
+	// contains extracted file header information
+	struct file_header
+	{
+		std::uint32_t   signature;              // central file header signature
+		std::uint16_t   version_created;        // version made by
+		std::uint16_t   version_needed;         // version needed to extract
+		std::uint16_t   bit_flag;               // general purpose bit flag
+		std::uint16_t   compression;            // compression method
+		std::uint16_t   file_time;              // last mod file time
+		std::uint16_t   file_date;              // last mod file date
+		std::uint32_t   crc;                    // crc-32
+		std::uint32_t   compressed_length;      // compressed size
+		std::uint32_t   uncompressed_length;    // uncompressed size
+		std::uint16_t   filename_length;        // filename length
+		std::uint16_t   extra_field_length;     // extra field length
+		std::uint16_t   file_comment_length;    // file comment length
+		std::uint16_t   start_disk_number;      // disk number start
+		std::uint16_t   internal_attributes;    // internal file attributes
+		std::uint32_t   external_attributes;    // external file attributes
+		std::uint32_t   local_header_offset;    // relative offset of local header
+		const char *    filename;               // filename
+	};
+
+	typedef std::unique_ptr<zip_file> ptr;
+
+
+	/* ----- ZIP file access ----- */
+
+	// open a ZIP file and parse its central directory
+	static error open(const std::string &filename, ptr &zip);
+
+	// close a ZIP file (may actually be left open due to caching)
+	virtual ~zip_file();
+
+	// clear out all open ZIP files from the cache
+	static void cache_clear();
+
+
+	/* ----- contained file access ----- */
+
+	// find the first file in the ZIP
+	virtual const file_header *first_file() = 0;
+
+	// find the next file in the ZIP
+	virtual const file_header *next_file() = 0;
+
+	// decompress the most recently found file in the ZIP
+	virtual error decompress(void *buffer, std::uint32_t length) = 0;
 };
 
 
-/* contains extracted end of central directory information */
-struct zip_ecd
-{
-	UINT32          signature;              /* end of central dir signature */
-	UINT16          disk_number;            /* number of this disk */
-	UINT16          cd_start_disk_number;   /* number of the disk with the start of the central directory */
-	UINT16          cd_disk_entries;        /* total number of entries in the central directory on this disk */
-	UINT16          cd_total_entries;       /* total number of entries in the central directory */
-	UINT32          cd_size;                /* size of the central directory */
-	UINT32          cd_start_disk_offset;   /* offset of start of central directory with respect to the starting disk number */
-	UINT16          comment_length;         /* .ZIP file comment length */
-	const char *    comment;                /* .ZIP file comment */
-
-	UINT8 *         raw;                    /* pointer to the raw data */
-	UINT32          rawlength;              /* length of the raw data */
-};
-
-
-/* describes an open ZIP file */
-struct zip_file
-{
-	const char *    filename;               /* copy of ZIP filename (for caching) */
-	osd_file *      file;                   /* OSD file handle */
-	UINT64          length;                 /* length of zip file */
-
-	zip_ecd         ecd;                    /* end of central directory */
-
-	UINT8 *         cd;                     /* central directory raw data */
-	UINT32          cd_pos;                 /* position in central directory */
-	zip_file_header header;                 /* current file header */
-
-	UINT8           buffer[ZIP_DECOMPRESS_BUFSIZE]; /* buffer for decompression */
-};
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-
-/* ----- ZIP file access ----- */
-
-/* open a ZIP file and parse its central directory */
-zip_error zip_file_open(const char *filename, zip_file **zip);
-
-/* close a ZIP file (may actually be left open due to caching) */
-void zip_file_close(zip_file *zip);
-
-/* clear out all open ZIP files from the cache */
-void zip_file_cache_clear(void);
-
-
-/* ----- contained file access ----- */
-
-/* find the first file in the ZIP */
-const zip_file_header *zip_file_first_file(zip_file *zip);
-
-/* find the next file in the ZIP */
-const zip_file_header *zip_file_next_file(zip_file *zip);
-
-/* decompress the most recently found file in the ZIP */
-zip_error zip_file_decompress(zip_file *zip, void *buffer, UINT32 length);
-
-
-#endif  /* __UNZIP_H__ */
+#endif  // MAME_LIB_UTIL_UNZIP_H

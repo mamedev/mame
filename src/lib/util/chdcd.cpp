@@ -87,13 +87,10 @@ static std::string get_file_path(std::string &path)
 
 static UINT64 get_file_size(const char *filename)
 {
-	osd_file *file;
-	UINT64 filesize = 0;
-	file_error filerr;
+	osd_file::ptr file;
+	std::uint64_t filesize = 0;
 
-	filerr = osd_open(filename, OPEN_FLAG_READ, &file, &filesize);
-	if (filerr == FILERR_NONE)
-		osd_close(file);
+	osd_file::open(filename, OPEN_FLAG_READ, file, filesize);
 
 	return filesize;
 }
@@ -215,57 +212,51 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	UINT32 length, rate, filesize;
 	UINT16 bits, temp16;
 	char buf[32];
-	osd_file *file;
-	file_error filerr;
+	osd_file::ptr file;
 	UINT64 fsize = 0;
-	UINT32 actual;
+	std::uint32_t actual;
 
-	filerr = osd_open(filename, OPEN_FLAG_READ, &file, &fsize);
-	if (filerr != FILERR_NONE)
+	osd_file::error filerr = osd_file::open(filename, OPEN_FLAG_READ, file, fsize);
+	if (filerr != osd_file::error::NONE)
 	{
 		printf("ERROR: could not open (%s)\n", filename);
 		return 0;
 	}
 
 	/* read the core header and make sure it's a WAVE file */
-	osd_read(file, buf, 0, 4, &actual);
+	file->read(buf, 0, 4, actual);
 	offset += actual;
 	if (offset < 4)
 	{
-		osd_close(file);
 		printf("ERROR: unexpected RIFF offset %lu (%s)\n", offset, filename);
 		return 0;
 	}
 	if (memcmp(&buf[0], "RIFF", 4) != 0)
 	{
-		osd_close(file);
 		printf("ERROR: could not find RIFF header (%s)\n", filename);
 		return 0;
 	}
 
 	/* get the total size */
-	osd_read(file, &filesize, offset, 4, &actual);
+	file->read(&filesize, offset, 4, actual);
 	offset += actual;
 	if (offset < 8)
 	{
-		osd_close(file);
 		printf("ERROR: unexpected size offset %lu (%s)\n", offset, filename);
 		return 0;
 	}
 	filesize = LITTLE_ENDIANIZE_INT32(filesize);
 
 	/* read the RIFF file type and make sure it's a WAVE file */
-	osd_read(file, buf, offset, 4, &actual);
+	file->read(buf, offset, 4, actual);
 	offset += actual;
 	if (offset < 12)
 	{
-		osd_close(file);
 		printf("ERROR: unexpected WAVE offset %lu (%s)\n", offset, filename);
 		return 0;
 	}
 	if (memcmp(&buf[0], "WAVE", 4) != 0)
 	{
-		osd_close(file);
 		printf("ERROR: could not find WAVE header (%s)\n", filename);
 		return 0;
 	}
@@ -273,9 +264,9 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	/* seek until we find a format tag */
 	while (1)
 	{
-		osd_read(file, buf, offset, 4, &actual);
+		file->read(buf, offset, 4, actual);
 		offset += actual;
-		osd_read(file, &length, offset, 4, &actual);
+		file->read(&length, offset, 4, actual);
 		offset += actual;
 		length = LITTLE_ENDIANIZE_INT32(length);
 		if (memcmp(&buf[0], "fmt ", 4) == 0)
@@ -285,56 +276,51 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 		offset += length;
 		if (offset >= filesize)
 		{
-			osd_close(file);
 			printf("ERROR: could not find fmt tag (%s)\n", filename);
 			return 0;
 		}
 	}
 
 	/* read the format -- make sure it is PCM */
-	osd_read(file, &temp16, offset, 2, &actual);
+	file->read(&temp16, offset, 2, actual);
 	offset += actual;
 	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
 	if (temp16 != 1)
 	{
-		osd_close(file);
 		printf("ERROR: unsupported format %u - only PCM is supported (%s)\n", temp16, filename);
 		return 0;
 	}
 
 	/* number of channels -- only stereo is supported */
-	osd_read(file, &temp16, offset, 2, &actual);
+	file->read(&temp16, offset, 2, actual);
 	offset += actual;
 	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
 	if (temp16 != 2)
 	{
-		osd_close(file);
 		printf("ERROR: unsupported number of channels %u - only stereo is supported (%s)\n", temp16, filename);
 		return 0;
 	}
 
 	/* sample rate */
-	osd_read(file, &rate, offset, 4, &actual);
+	file->read(&rate, offset, 4, actual);
 	offset += actual;
 	rate = LITTLE_ENDIANIZE_INT32(rate);
 	if (rate != 44100)
 	{
-		osd_close(file);
 		printf("ERROR: unsupported samplerate %u - only 44100 is supported (%s)\n", rate, filename);
 		return 0;
 	}
 
 	/* bytes/second and block alignment are ignored */
-	osd_read(file, buf, offset, 6, &actual);
+	file->read(buf, offset, 6, actual);
 	offset += actual;
 
 	/* bits/sample */
-	osd_read(file, &bits, offset, 2, &actual);
+	file->read(&bits, offset, 2, actual);
 	offset += actual;
 	bits = LITTLE_ENDIANIZE_INT16(bits);
 	if (bits != 16)
 	{
-		osd_close(file);
 		printf("ERROR: unsupported bits/sample %u - only 16 is supported (%s)\n", bits, filename);
 		return 0;
 	}
@@ -345,9 +331,9 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	/* seek until we find a data tag */
 	while (1)
 	{
-		osd_read(file, buf, offset, 4, &actual);
+		file->read(buf, offset, 4, actual);
 		offset += actual;
-		osd_read(file, &length, offset, 4, &actual);
+		file->read(&length, offset, 4, actual);
 		offset += actual;
 		length = LITTLE_ENDIANIZE_INT32(length);
 		if (memcmp(&buf[0], "data", 4) == 0)
@@ -357,13 +343,10 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 		offset += length;
 		if (offset >= filesize)
 		{
-			osd_close(file);
 			printf("ERROR: could not find data tag (%s)\n", filename);
 			return 0;
 		}
 	}
-
-	osd_close(file);
 
 	/* if there was a 0 length data block, we're done */
 	if (length == 0)

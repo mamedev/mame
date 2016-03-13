@@ -618,20 +618,20 @@ bool samples_device::load_samples()
 	{
 		// attempt to open as FLAC first
 		emu_file file(machine().options().sample_path(), OPEN_FLAG_READ);
-		file_error filerr = file.open(basename, PATH_SEPARATOR, samplename, ".flac");
-		if (filerr != FILERR_NONE && altbasename != nullptr)
+		osd_file::error filerr = file.open(basename, PATH_SEPARATOR, samplename, ".flac");
+		if (filerr != osd_file::error::NONE && altbasename != nullptr)
 			filerr = file.open(altbasename, PATH_SEPARATOR, samplename, ".flac");
 
 		// if not, try as WAV
-		if (filerr != FILERR_NONE)
+		if (filerr != osd_file::error::NONE)
 			filerr = file.open(basename, PATH_SEPARATOR, samplename, ".wav");
-		if (filerr != FILERR_NONE && altbasename != nullptr)
+		if (filerr != osd_file::error::NONE && altbasename != nullptr)
 			filerr = file.open(altbasename, PATH_SEPARATOR, samplename, ".wav");
 
 		// if opened, read it
-		if (filerr == FILERR_NONE)
+		if (filerr == osd_file::error::NONE)
 			read_sample(file, m_sample[index]);
-		else if (filerr == FILERR_NOT_FOUND)
+		else if (filerr == osd_file::error::NOT_FOUND)
 		{
 			logerror("%s: Sample '%s' NOT FOUND\n", tag(), samplename);
 			ok = false;

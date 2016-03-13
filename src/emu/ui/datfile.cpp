@@ -548,7 +548,7 @@ bool datfile_manager::parseopen(const char *filename)
 	// so it's better and faster use standard C fileio functions.
 
 	emu_file file(machine().ui().options().history_path(), OPEN_FLAG_READ);
-	if (file.open(filename) != FILERR_NONE)
+	if (file.open(filename) != osd_file::error::NONE)
 		return false;
 
 	m_fullpath = file.fullpath();

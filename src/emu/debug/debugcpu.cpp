@@ -332,8 +332,8 @@ bool debug_comment_save(running_machine &machine)
 		if (found_comments)
 		{
 			emu_file file(machine.options().comment_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			file_error filerr = file.open(machine.basename(), ".cmt");
-			if (filerr == FILERR_NONE)
+			osd_file::error filerr = file.open(machine.basename(), ".cmt");
+			if (filerr == osd_file::error::NONE)
 			{
 				xml_file_write(root, file);
 				comments_saved = true;
@@ -361,10 +361,10 @@ bool debug_comment_load(running_machine &machine)
 {
 	// open the file
 	emu_file file(machine.options().comment_directory(), OPEN_FLAG_READ);
-	file_error filerr = file.open(machine.basename(), ".cmt");
+	osd_file::error filerr = file.open(machine.basename(), ".cmt");
 
 	// if an error, just return false
-	if (filerr != FILERR_NONE)
+	if (filerr != osd_file::error::NONE)
 		return false;
 
 	// wrap in a try/catch to handle errors

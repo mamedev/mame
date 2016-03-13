@@ -2856,9 +2856,9 @@ static void execute_snap(running_machine &machine, int ref, int params, const ch
 		if (fname.find(".png") == -1)
 			fname.append(".png");
 		emu_file file(machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		file_error filerr = file.open(fname.c_str());
+		osd_file::error filerr = file.open(fname.c_str());
 
-		if (filerr != FILERR_NONE)
+		if (filerr != osd_file::error::NONE)
 		{
 			debug_console_printf(machine, "Error creating file '%s'\n", filename);
 			return;

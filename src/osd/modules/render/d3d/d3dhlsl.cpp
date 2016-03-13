@@ -38,7 +38,7 @@
 //============================================================
 
 static slider_state *g_slider_list;
-static file_error open_next(renderer_d3d9 *d3d, emu_file &file, const char *templ, const char *extension, int idx);
+static osd_file::error open_next(renderer_d3d9 *d3d, emu_file &file, const char *templ, const char *extension, int idx);
 
 //============================================================
 //  PROTOTYPES
@@ -279,8 +279,8 @@ void shaders::render_snapshot(surface *surface)
 			int idx = cy * 2 + cx;
 
 			emu_file file(machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			file_error filerr = open_next(d3d, file, nullptr, "png", idx);
-			if (filerr != FILERR_NONE)
+			osd_file::error filerr = open_next(d3d, file, nullptr, "png", idx);
+			if (filerr != osd_file::error::NONE)
 			{
 				return;
 			}
@@ -363,8 +363,8 @@ void shaders::record_texture()
 	{
 		// handle an AVI recording
 		// write the next frame
-		avi_error avierr = avi_append_video_frame(avi_output_file, avi_snap);
-		if (avierr != AVIERR_NONE)
+		avi_file::error avierr = avi_output_file->append_video_frame(avi_snap);
+		if (avierr != avi_file::error::NONE)
 		{
 			end_avi_recording();
 			return;
@@ -388,9 +388,9 @@ void shaders::end_avi_recording()
 		return;
 	}
 
-	if (avi_output_file != nullptr)
+	if (avi_output_file)
 	{
-		avi_close(avi_output_file);
+		avi_output_file.reset();
 	}
 
 	avi_output_file = nullptr;
@@ -463,7 +463,7 @@ void shaders::begin_avi_recording(const char *name)
 	avi_next_frame_time = machine->time();
 
 	// build up information about this new movie
-	avi_movie_info info;
+	avi_file::movie_info info;
 	info.video_format = 0;
 	info.video_timescale = 1000 * ((machine->first_screen() != nullptr) ? ATTOSECONDS_TO_HZ(machine->first_screen()->frame_period().m_attoseconds) : screen_device::DEFAULT_FRAME_RATE);
 	info.video_sampletime = 1000;
@@ -481,7 +481,7 @@ void shaders::begin_avi_recording(const char *name)
 	info.audio_samplerate = machine->sample_rate();
 
 	// create a new temporary movie file
-	file_error filerr;
+	osd_file::error filerr;
 	std::string fullpath;
 	{
 		emu_file tempfile(machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -500,19 +500,19 @@ void shaders::begin_avi_recording(const char *name)
 		}
 
 		// if we succeeded, make a copy of the name and create the real file over top
-		if (filerr == FILERR_NONE)
+		if (filerr == osd_file::error::NONE)
 		{
 			fullpath = tempfile.fullpath();
 		}
 	}
 
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 	{
 		// create the file and free the string
-		avi_error avierr = avi_create(fullpath.c_str(), &info, &avi_output_file);
-		if (avierr != AVIERR_NONE)
+		avi_file::error avierr = avi_file::create(fullpath, info, avi_output_file);
+		if (avierr != avi_file::error::NONE)
 		{
-			osd_printf_error("Error creating AVI: %s\n", avi_error_string(avierr));
+			osd_printf_error("Error creating AVI: %s\n", avi_file::error_string(avierr));
 		}
 	}
 }
@@ -2420,7 +2420,7 @@ slider_desc shaders::s_sliders[] =
 	{ "Gamma,",                           -80,     0,    80, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_POWER,                   0.1f,     "%2.2f", {} },
 	{ "Floor,",                             0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_FLOOR,                   0.01f,    "%2.2f", {} },
 	{ "Phosphor Life,",                     0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_PHOSPHOR,                0.01f,    "%2.2f", {} },
-	{ "Bloom Blend Mode",                   0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY, 	       SLIDER_BLOOM_BLEND_MODE,        0,        "%s",    { "Brighten", "Darken" } },
+	{ "Bloom Blend Mode",                   0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_BLEND_MODE,        0,        "%s",    { "Brighten", "Darken" } },
 	{ "Bloom Scale",                        0,     0,  2000, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_SCALE,             0.001f,   "%1.3f", {} },
 	{ "Bloom Overdrive,",                   0,     0,  2000, 5, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_OVERDRIVE,         0.001f,   "%1.3f", {} },
 	{ "Bloom Level 0 Scale",                0,   100,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL0_SCALE,        0.01f,    "%1.2f", {} },
@@ -3153,7 +3153,7 @@ slider_state *renderer_d3d9::get_slider_list()
 //  scheme
 //-------------------------------------------------
 
-static file_error open_next(renderer_d3d9 *d3d, emu_file &file, const char *templ, const char *extension, int idx)
+static osd_file::error open_next(renderer_d3d9 *d3d, emu_file &file, const char *templ, const char *extension, int idx)
 {
 	UINT32 origflags = file.openflags();
 
@@ -3280,8 +3280,8 @@ static file_error open_next(renderer_d3d9 *d3d, emu_file &file, const char *temp
 			strreplace(fname.assign(snapstr), "%i", string_format("%04d_%d", seq, idx).c_str());
 
 			// try to open the file; stop when we fail
-			file_error filerr = file.open(fname.c_str());
-			if (filerr != FILERR_NONE)
+			osd_file::error filerr = file.open(fname.c_str());
+			if (filerr != osd_file::error::NONE)
 			{
 				break;
 			}

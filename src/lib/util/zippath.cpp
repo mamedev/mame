@@ -66,7 +66,7 @@ public:
 	/** @brief  true to called zip first. */
 	bool called_zip_first;
 	/** @brief  The zipfile. */
-	zip_file *zipfile;
+	zip_file::ptr zipfile;
 	/** @brief  The zipprefix. */
 	std::string zipprefix;
 	/** @brief  The returned dirlist. */
@@ -78,7 +78,7 @@ public:
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subpath, osd_dir_entry_type *type);
+static const zip_file::file_header *zippath_find_sub_path(zip_file &zipfile, const char *subpath, osd_dir_entry_type *type);
 static int is_zip_file(const char *path);
 static int is_zip_file_separator(char c);
 static int is_7z_file(const char *path);
@@ -251,42 +251,42 @@ std::string &zippath_combine(std::string &dst, const char *path1, const char *pa
 
 /*-------------------------------------------------
     file_error_from_zip_error - translates a
-    file_error to a zip_error
+    osd_file::error to a zip_error
 -------------------------------------------------*/
 
 /**
- * @fn  static file_error file_error_from_zip_error(zip_error ziperr)
+ * @fn  static osd_file::error file_error_from_zip_error(zip_file::error ziperr)
  *
  * @brief   File error from zip error.
  *
  * @param   ziperr  The ziperr.
  *
- * @return  A file_error.
+ * @return  A osd_file::error.
  */
 
-static file_error file_error_from_zip_error(zip_error ziperr)
+static osd_file::error file_error_from_zip_error(zip_file::error ziperr)
 {
-	file_error filerr;
+	osd_file::error filerr;
 	switch(ziperr)
 	{
-		case ZIPERR_NONE:
-			filerr = FILERR_NONE;
-			break;
-		case ZIPERR_OUT_OF_MEMORY:
-			filerr = FILERR_OUT_OF_MEMORY;
-			break;
-		case ZIPERR_BAD_SIGNATURE:
-		case ZIPERR_DECOMPRESS_ERROR:
-		case ZIPERR_FILE_TRUNCATED:
-		case ZIPERR_FILE_CORRUPT:
-		case ZIPERR_UNSUPPORTED:
-		case ZIPERR_FILE_ERROR:
-			filerr = FILERR_INVALID_DATA;
-			break;
-		case ZIPERR_BUFFER_TOO_SMALL:
-		default:
-			filerr = FILERR_FAILURE;
-			break;
+	case zip_file::error::NONE:
+		filerr = osd_file::error::NONE;
+		break;
+	case zip_file::error::OUT_OF_MEMORY:
+		filerr = osd_file::error::OUT_OF_MEMORY;
+		break;
+	case zip_file::error::BAD_SIGNATURE:
+	case zip_file::error::DECOMPRESS_ERROR:
+	case zip_file::error::FILE_TRUNCATED:
+	case zip_file::error::FILE_CORRUPT:
+	case zip_file::error::UNSUPPORTED:
+	case zip_file::error::FILE_ERROR:
+		filerr = osd_file::error::INVALID_DATA;
+		break;
+	case zip_file::error::BUFFER_TOO_SMALL:
+	default:
+		filerr = osd_file::error::FAILURE;
+		break;
 	}
 	return filerr;
 }
@@ -298,7 +298,7 @@ static file_error file_error_from_zip_error(zip_error ziperr)
 -------------------------------------------------*/
 
 /**
- * @fn  static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header *header, util::core_file::ptr &file)
+ * @fn  static osd_file::error create_core_file_from_zip(zip_file *zip, const zip_file_header *header, util::core_file::ptr &file)
  *
  * @brief   Creates core file from zip.
  *
@@ -309,28 +309,28 @@ static file_error file_error_from_zip_error(zip_error ziperr)
  * @return  The new core file from zip.
  */
 
-static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header *header, util::core_file::ptr &file)
+static osd_file::error create_core_file_from_zip(zip_file &zip, const zip_file::file_header *header, util::core_file::ptr &file)
 {
-	file_error filerr;
-	zip_error ziperr;
+	osd_file::error filerr;
+	zip_file::error ziperr;
 	void *ptr;
 
 	ptr = malloc(header->uncompressed_length);
 	if (ptr == nullptr)
 	{
-		filerr = FILERR_OUT_OF_MEMORY;
+		filerr = osd_file::error::OUT_OF_MEMORY;
 		goto done;
 	}
 
-	ziperr = zip_file_decompress(zip, ptr, header->uncompressed_length);
-	if (ziperr != ZIPERR_NONE)
+	ziperr = zip.decompress(ptr, header->uncompressed_length);
+	if (ziperr != zip_file::error::NONE)
 	{
 		filerr = file_error_from_zip_error(ziperr);
 		goto done;
 	}
 
 	filerr = util::core_file::open_ram_copy(ptr, header->uncompressed_length, OPEN_FLAG_READ, file);
-	if (filerr != FILERR_NONE)
+	if (filerr != osd_file::error::NONE)
 		goto done;
 
 done:
@@ -345,7 +345,7 @@ done:
 -------------------------------------------------*/
 
 /**
- * @fn  file_error zippath_fopen(const char *filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path)
+ * @fn  osd_file::error zippath_fopen(const char *filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path)
  *
  * @brief   Zippath fopen.
  *
@@ -354,17 +354,16 @@ done:
  * @param [in,out]  file            [in,out] If non-null, the file.
  * @param [in,out]  revised_path    Full pathname of the revised file.
  *
- * @return  A file_error.
+ * @return  A osd_file::error.
  */
 
-file_error zippath_fopen(const char *filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path)
+osd_file::error zippath_fopen(const char *filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path)
 {
-	file_error filerr = FILERR_NOT_FOUND;
-	zip_error ziperr;
-	zip_file *zip = nullptr;
-	const zip_file_header *header;
+	osd_file::error filerr = osd_file::error::NOT_FOUND;
+	zip_file::error ziperr;
+	zip_file::ptr zip;
+	const zip_file::file_header *header;
 	osd_dir_entry_type entry_type;
-	char *alloc_fullpath = nullptr;
 	int len;
 
 	/* first, set up the two types of paths */
@@ -380,30 +379,30 @@ file_error zippath_fopen(const char *filename, UINT32 openflags, util::core_file
 		if (is_zip_file(mainpath.c_str()))
 		{
 			/* this file might be a zip file - lets take a look */
-			ziperr = zip_file_open(mainpath.c_str(), &zip);
-			if (ziperr == ZIPERR_NONE)
+			ziperr = zip_file::open(mainpath, zip);
+			if (ziperr == zip_file::error::NONE)
 			{
 				/* it is a zip file - error if we're not opening for reading */
 				if (openflags != OPEN_FLAG_READ)
 				{
-					filerr = FILERR_ACCESS_DENIED;
+					filerr = osd_file::error::ACCESS_DENIED;
 					goto done;
 				}
 
 				if (subpath.length() > 0)
-					header = zippath_find_sub_path(zip, subpath.c_str(), &entry_type);
+					header = zippath_find_sub_path(*zip, subpath.c_str(), &entry_type);
 				else
-					header = zip_file_first_file(zip);
+					header = zip->first_file();
 
 				if (header == nullptr)
 				{
-					filerr = FILERR_NOT_FOUND;
+					filerr = osd_file::error::NOT_FOUND;
 					goto done;
 				}
 
 				/* attempt to read the file */
-				filerr = create_core_file_from_zip(zip, header, file);
-				if (filerr != FILERR_NONE)
+				filerr = create_core_file_from_zip(*zip, header, file);
+				if (filerr != osd_file::error::NONE)
 					goto done;
 
 				/* update subpath, if appropriate */
@@ -416,17 +415,17 @@ file_error zippath_fopen(const char *filename, UINT32 openflags, util::core_file
 		}
 		else if (is_7z_file(mainpath.c_str()))
 		{
-			filerr = FILERR_INVALID_DATA;
+			filerr = osd_file::error::INVALID_DATA;
 			goto done;
 		}
 
 		if (subpath.length() == 0)
 			filerr = util::core_file::open(filename, openflags, file);
 		else
-			filerr = FILERR_NOT_FOUND;
+			filerr = osd_file::error::NOT_FOUND;
 
 		/* if we errored, then go up a directory */
-		if (filerr != FILERR_NONE)
+		if (filerr != osd_file::error::NONE)
 		{
 			/* go up a directory */
 			std::string temp;
@@ -457,23 +456,19 @@ file_error zippath_fopen(const char *filename, UINT32 openflags, util::core_file
 done:
 	/* store the revised path */
 	revised_path.clear();
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 	{
 		/* cannonicalize mainpath */
-		filerr = osd_get_full_path(&alloc_fullpath, mainpath.c_str());
-		if (filerr == FILERR_NONE)
+		std::string alloc_fullpath;
+		filerr = osd_get_full_path(alloc_fullpath, mainpath);
+		if (filerr == osd_file::error::NONE)
 		{
+			revised_path = alloc_fullpath;
 			if (subpath.length() > 0)
-				revised_path.assign(alloc_fullpath).append(PATH_SEPARATOR).append(subpath);
-			else
-				revised_path.assign(alloc_fullpath);
+				revised_path.append(PATH_SEPARATOR).append(subpath);
 		}
 	}
 
-	if (zip != nullptr)
-		zip_file_close(zip);
-	if (alloc_fullpath != nullptr)
-		osd_free(alloc_fullpath);
 	return filerr;
 }
 
@@ -672,13 +667,13 @@ static char next_path_char(const char *s, int *pos)
  * @return  null if it fails, else a zip_file_header*.
  */
 
-static const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subpath, osd_dir_entry_type *type)
+static const zip_file::file_header *zippath_find_sub_path(zip_file &zipfile, const char *subpath, osd_dir_entry_type *type)
 {
 	int i, j;
 	char c1, c2, last_char;
-	const zip_file_header *header;
+	const zip_file::file_header *header;
 
-	for (header = zip_file_first_file(zipfile); header != nullptr; header = zip_file_next_file(zipfile))
+	for (header = zipfile.first_file(); header != nullptr; header = zipfile.next_file())
 	{
 		/* special case */
 		if (subpath == nullptr)
@@ -726,7 +721,7 @@ static const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const cha
 -------------------------------------------------*/
 
 /**
- * @fn  static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_type, zip_file *&zipfile, std::string &newpath)
+ * @fn  static osd_file::error zippath_resolve(const char *path, osd_dir_entry_type &entry_type, zip_file *&zipfile, std::string &newpath)
  *
  * @brief   Zippath resolve.
  *
@@ -735,12 +730,12 @@ static const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const cha
  * @param [in,out]  zipfile     [in,out] If non-null, the zipfile.
  * @param [in,out]  newpath     The newpath.
  *
- * @return  A file_error.
+ * @return  A osd_file::error.
  */
 
-static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_type, zip_file *&zipfile, std::string &newpath)
+static osd_file::error zippath_resolve(const char *path, osd_dir_entry_type &entry_type, zip_file::ptr &zipfile, std::string &newpath)
 {
-	file_error err;
+	osd_file::error err;
 	osd_directory_entry *current_entry = nullptr;
 	osd_dir_entry_type current_entry_type;
 	int went_up = FALSE;
@@ -750,7 +745,7 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_ty
 
 	/* be conservative */
 	entry_type = ENTTYPE_NONE;
-	zipfile = nullptr;
+	zipfile.reset();
 
 	std::string apath(path);
 	std::string apath_trimmed;
@@ -788,13 +783,13 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_ty
 	/* if we did not find anything, then error out */
 	if (current_entry_type == ENTTYPE_NONE)
 	{
-		err = FILERR_NOT_FOUND;
+		err = osd_file::error::NOT_FOUND;
 		goto done;
 	}
 
 	/* is this file a ZIP file? */
 	if ((current_entry_type == ENTTYPE_FILE) && is_zip_file(apath_trimmed.c_str())
-		&& (zip_file_open(apath_trimmed.c_str(), &zipfile) == ZIPERR_NONE))
+		&& (zip_file::open(apath_trimmed, zipfile) == zip_file::error::NONE))
 	{
 		i = strlen(path + apath.length());
 		while (i > 0 && is_zip_path_separator(path[apath.length() + i - 1]))
@@ -802,10 +797,10 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_ty
 		newpath.assign(path + apath.length(), i);
 
 		/* this was a true ZIP path - attempt to identify the type of path */
-		zippath_find_sub_path(zipfile, newpath.c_str(), &current_entry_type);
+		zippath_find_sub_path(*zipfile, newpath.c_str(), &current_entry_type);
 		if (current_entry_type == ENTTYPE_NONE)
 		{
-			err = FILERR_NOT_FOUND;
+			err = osd_file::error::NOT_FOUND;
 			goto done;
 		}
 	}
@@ -814,7 +809,7 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_ty
 		/* this was a normal path */
 		if (went_up)
 		{
-			err = FILERR_NOT_FOUND;
+			err = osd_file::error::NOT_FOUND;
 			goto done;
 		}
 		newpath.assign(path);
@@ -822,7 +817,7 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_ty
 
 	/* success! */
 	entry_type = current_entry_type;
-	err = FILERR_NONE;
+	err = osd_file::error::NONE;
 
 done:
 	return err;
@@ -834,19 +829,19 @@ done:
 -------------------------------------------------*/
 
 /**
- * @fn  file_error zippath_opendir(const char *path, zippath_directory **directory)
+ * @fn  osd_file::error zippath_opendir(const char *path, zippath_directory **directory)
  *
  * @brief   Zippath opendir.
  *
  * @param   path                Full pathname of the file.
  * @param [in,out]  directory   If non-null, pathname of the directory.
  *
- * @return  A file_error.
+ * @return  A osd_file::error.
  */
 
-file_error zippath_opendir(const char *path, zippath_directory **directory)
+osd_file::error zippath_opendir(const char *path, zippath_directory **directory)
 {
-	file_error err;
+	osd_file::error err;
 
 	/* allocate a directory */
 	zippath_directory *result = nullptr;
@@ -856,19 +851,19 @@ file_error zippath_opendir(const char *path, zippath_directory **directory)
 	}
 	catch (std::bad_alloc &)
 	{
-		err = FILERR_OUT_OF_MEMORY;
+		err = osd_file::error::OUT_OF_MEMORY;
 		goto done;
 	}
 	/* resolve the path */
 	osd_dir_entry_type entry_type;
 	err = zippath_resolve(path, entry_type, result->zipfile, result->zipprefix);
-	if (err != FILERR_NONE)
+	if (err != osd_file::error::NONE)
 		goto done;
 
 	/* we have to be a directory */
 	if (entry_type != ENTTYPE_DIR)
 	{
-		err = FILERR_NOT_FOUND;
+		err = osd_file::error::NOT_FOUND;
 		goto done;
 	}
 
@@ -879,7 +874,7 @@ file_error zippath_opendir(const char *path, zippath_directory **directory)
 		result->directory = osd_opendir(path);
 		if (result->directory == nullptr)
 		{
-			err = FILERR_FAILURE;
+			err = osd_file::error::FAILURE;
 			goto done;
 		}
 
@@ -889,7 +884,7 @@ file_error zippath_opendir(const char *path, zippath_directory **directory)
 	}
 
 done:
-	if ((directory == nullptr || err != FILERR_NONE) && result != nullptr)
+	if ((directory == nullptr || err != osd_file::error::NONE) && result != nullptr)
 	{
 		zippath_closedir(result);
 		result = nullptr;
@@ -918,7 +913,7 @@ void zippath_closedir(zippath_directory *directory)
 		osd_closedir(directory->directory);
 
 	if (directory->zipfile != nullptr)
-		zip_file_close(directory->zipfile);
+		directory->zipfile.reset();
 
 	while (directory->returned_dirlist != nullptr)
 	{
@@ -948,7 +943,7 @@ void zippath_closedir(zippath_directory *directory)
  * @return  null if it fails, else the relative path.
  */
 
-static const char *get_relative_path(zippath_directory *directory, const zip_file_header *header)
+static const char *get_relative_path(zippath_directory *directory, const zip_file::file_header *header)
 {
 	const char *result = nullptr;
 	int len = directory->zipprefix.length();
@@ -982,7 +977,7 @@ static const char *get_relative_path(zippath_directory *directory, const zip_fil
 const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 {
 	const osd_directory_entry *result = nullptr;
-	const zip_file_header *header;
+	const zip_file::file_header *header;
 	const char *relpath;
 	const char *separator;
 	const char *s;
@@ -1023,9 +1018,9 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 			do
 			{
 				if (!directory->called_zip_first)
-					header = zip_file_first_file(directory->zipfile);
+					header = directory->zipfile->first_file();
 				else
-					header = zip_file_next_file(directory->zipfile);
+					header = directory->zipfile->next_file();
 				directory->called_zip_first = true;
 				relpath = nullptr;
 			}

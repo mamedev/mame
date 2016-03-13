@@ -102,23 +102,23 @@ static bool chdinterlaced;
 static void *open_avi(const char *filename, movie_info &info)
 {
 	// open the file
-	avi_file *avi;
-	avi_error avierr = avi_open(filename, &avi);
-	if (avierr != AVIERR_NONE)
+	avi_file::ptr avi;
+	avi_file::error avierr = avi_file::open(filename, avi);
+	if (avierr != avi_file::error::NONE)
 	{
-		fprintf(stderr, "Error opening AVI file: %s\n", avi_error_string(avierr));
+		fprintf(stderr, "Error opening AVI file: %s\n", avi_file::error_string(avierr));
 		return nullptr;
 	}
 
 	// extract movie info
-	const avi_movie_info *aviinfo = avi_get_movie_info(avi);
-	info.framerate = (double)aviinfo->video_timescale / (double)aviinfo->video_sampletime;
-	info.numframes = aviinfo->video_numsamples;
-	info.width = aviinfo->video_width;
-	info.height = aviinfo->video_height;
-	info.samplerate = aviinfo->audio_samplerate;
-	info.channels = aviinfo->audio_channels;
-	return avi;
+	const avi_file::movie_info &aviinfo = avi->get_movie_info();
+	info.framerate = (double)aviinfo.video_timescale / (double)aviinfo.video_sampletime;
+	info.numframes = aviinfo.video_numsamples;
+	info.width = aviinfo.video_width;
+	info.height = aviinfo.video_height;
+	info.samplerate = aviinfo.audio_samplerate;
+	info.channels = aviinfo.audio_channels;
+	return avi.release();
 }
 
 
@@ -131,17 +131,17 @@ static bool read_avi(void *file, int frame, bitmap_yuy16 &bitmap, INT16 *lsound,
 	avi_file *avifile = reinterpret_cast<avi_file *>(file);
 
 	// read the frame
-	avi_error avierr = avi_read_video_frame(avifile, frame, bitmap);
-	if (avierr != AVIERR_NONE)
+	avi_file::error avierr = avifile->read_video_frame(frame, bitmap);
+	if (avierr != avi_file::error::NONE)
 		return FALSE;
 
 	// read the samples
-	const avi_movie_info *aviinfo = avi_get_movie_info(avifile);
-	UINT32 firstsample = (UINT64(aviinfo->audio_samplerate) * UINT64(frame) * UINT64(aviinfo->video_sampletime) + aviinfo->video_timescale - 1) / UINT64(aviinfo->video_timescale);
-	UINT32 lastsample = (UINT64(aviinfo->audio_samplerate) * UINT64(frame + 1) * UINT64(aviinfo->video_sampletime) + aviinfo->video_timescale - 1) / UINT64(aviinfo->video_timescale);
-	avierr = avi_read_sound_samples(avifile, 0, firstsample, lastsample - firstsample, lsound);
-	avierr = avi_read_sound_samples(avifile, 1, firstsample, lastsample - firstsample, rsound);
-	if (avierr != AVIERR_NONE)
+	const avi_file::movie_info &aviinfo = avifile->get_movie_info();
+	UINT32 firstsample = (UINT64(aviinfo.audio_samplerate) * UINT64(frame) * UINT64(aviinfo.video_sampletime) + aviinfo.video_timescale - 1) / UINT64(aviinfo.video_timescale);
+	UINT32 lastsample = (UINT64(aviinfo.audio_samplerate) * UINT64(frame + 1) * UINT64(aviinfo.video_sampletime) + aviinfo.video_timescale - 1) / UINT64(aviinfo.video_timescale);
+	avierr = avifile->read_sound_samples(0, firstsample, lastsample - firstsample, lsound);
+	avierr = avifile->read_sound_samples(1, firstsample, lastsample - firstsample, rsound);
+	if (avierr != avi_file::error::NONE)
 		return false;
 	samples = lastsample - firstsample;
 	return true;
@@ -155,7 +155,7 @@ static bool read_avi(void *file, int frame, bitmap_yuy16 &bitmap, INT16 *lsound,
 static void close_avi(void *file)
 {
 	avi_file *avifile = reinterpret_cast<avi_file *>(file);
-	avi_close(avifile);
+	delete avifile;
 }
 
 

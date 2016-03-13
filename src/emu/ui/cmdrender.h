@@ -87,7 +87,7 @@ void render_font::render_font_command_glyph()
 {
 	emu_file ramfile(OPEN_FLAG_READ);
 
-	if (ramfile.open_ram(font_uicmd14, sizeof(font_uicmd14)) == FILERR_NONE)
+	if (ramfile.open_ram(font_uicmd14, sizeof(font_uicmd14)) == osd_file::error::NONE)
 		load_cached_cmd(ramfile, 0);
 }
 

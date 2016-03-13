@@ -151,7 +151,7 @@ bool inifile_manager::parseopen(const char *filename)
 	// so it's better and faster use standard C fileio functions.
 
 	emu_file file(machine().ui().options().extraini_path(), OPEN_FLAG_READ);
-	if (file.open(filename) != FILERR_NONE)
+	if (file.open(filename) != osd_file::error::NONE)
 		return false;
 
 	m_fullpath = file.fullpath();
@@ -359,7 +359,7 @@ bool favorite_manager::isgame_favorite(ui_software_info &swinfo)
 void favorite_manager::parse_favorite()
 {
 	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_READ);
-	if (file.open(favorite_filename) == FILERR_NONE)
+	if (file.open(favorite_filename) == osd_file::error::NONE)
 	{
 		char readbuf[1024];
 		file.gets(readbuf, 1024);
@@ -418,7 +418,7 @@ void favorite_manager::save_favorite_games()
 {
 	// attempt to open the output file
 	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file.open(favorite_filename) == FILERR_NONE)
+	if (file.open(favorite_filename) == osd_file::error::NONE)
 	{
 		if (m_list.empty())
 		{

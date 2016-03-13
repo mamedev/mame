@@ -870,7 +870,7 @@ int lua_engine::lua_screen::l_snapshot(lua_State *L)
 	luaL_argcheck(L, lua_isstring(L, 2) || lua_isnone(L, 2), 2, "optional argument: filename, string expected");
 
 	emu_file file(sc->machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	file_error filerr;
+	osd_file::error filerr;
 
 	if (!lua_isnone(L, 2)) {
 		const char *filename = lua_tostring(L, 2);
@@ -884,9 +884,9 @@ int lua_engine::lua_screen::l_snapshot(lua_State *L)
 		filerr = sc->machine().video().open_next(file, "png");
 	}
 
-	if (filerr != FILERR_NONE)
+	if (filerr != osd_file::error::NONE)
 	{
-		luaL_error(L, "file_error=%d", filerr);
+		luaL_error(L, "osd_file::error=%d", filerr);
 		return 0;
 	}
 

@@ -64,7 +64,7 @@ ui_menu_control_device_image::ui_menu_control_device_image(running_machine &mach
 			current_directory.assign(image->working_directory());
 
 		/* check to see if the path exists; if not clear it */
-		if (zippath_opendir(current_directory.c_str(), nullptr) != FILERR_NONE)
+		if (zippath_opendir(current_directory.c_str(), nullptr) != osd_file::error::NONE)
 			current_directory.clear();
 	}
 }
@@ -184,8 +184,8 @@ void ui_menu_control_device_image::handle()
 		bool can_create = false;
 		if(image->is_creatable()) {
 			zippath_directory *directory = nullptr;
-			file_error err = zippath_opendir(current_directory.c_str(), &directory);
-			can_create = err == FILERR_NONE && !zippath_is_zip(directory);
+			osd_file::error err = zippath_opendir(current_directory.c_str(), &directory);
+			can_create = err == osd_file::error::NONE && !zippath_is_zip(directory);
 			if(directory)
 				zippath_closedir(directory);
 		}

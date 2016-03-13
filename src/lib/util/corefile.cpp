@@ -23,9 +23,7 @@
 
 
 namespace util {
-
 namespace {
-
 /***************************************************************************
     VALIDATION
 ***************************************************************************/
@@ -143,7 +141,7 @@ class core_proxy_file : public core_file
 public:
 	core_proxy_file(core_file &file) : m_file(file) { }
 	virtual ~core_proxy_file() override { }
-	virtual file_error compress(int level) override { return m_file.compress(level); }
+	virtual osd_file::error compress(int level) override { return m_file.compress(level); }
 
 	virtual int seek(std::int64_t offset, int whence) override { return m_file.seek(offset, whence); }
 	virtual std::uint64_t tell() const override { return m_file.tell(); }
@@ -159,9 +157,9 @@ public:
 	virtual std::uint32_t write(const void *buffer, std::uint32_t length) override { return m_file.write(buffer, length); }
 	virtual int puts(const char *s) override { return m_file.puts(s); }
 	virtual int vprintf(util::format_argument_pack<std::ostream> const &args) override { return m_file.vprintf(args); }
-	virtual file_error truncate(std::uint64_t offset) override { return m_file.truncate(offset); }
+	virtual osd_file::error truncate(std::uint64_t offset) override { return m_file.truncate(offset); }
 
-	virtual file_error flush() override { return m_file.flush(); }
+	virtual osd_file::error flush() override { return m_file.flush(); }
 
 private:
 	core_file &m_file;
@@ -232,7 +230,7 @@ public:
 	}
 
 	~core_in_memory_file() override { purge(); }
-	virtual file_error compress(int level) override { return FILERR_INVALID_ACCESS; }
+	virtual osd_file::error compress(int level) override { return osd_file::error::INVALID_ACCESS; }
 
 	virtual int seek(std::int64_t offset, int whence) override;
 	virtual std::uint64_t tell() const override { return m_offset; }
@@ -243,8 +241,8 @@ public:
 	virtual void const *buffer() override { return m_data; }
 
 	virtual std::uint32_t write(void const *buffer, std::uint32_t length) override { return 0; }
-	virtual file_error truncate(std::uint64_t offset) override;
-	virtual file_error flush() override { clear_putback(); return FILERR_NONE; }
+	virtual osd_file::error truncate(std::uint64_t offset) override;
+	virtual osd_file::error flush() override { clear_putback(); return osd_file::error::NONE; }
 
 protected:
 	core_in_memory_file(std::uint32_t openflags, std::uint64_t length)
@@ -295,9 +293,9 @@ private:
 class core_osd_file : public core_in_memory_file
 {
 public:
-	core_osd_file(std::uint32_t openmode, osd_file *file, std::uint64_t length)
+	core_osd_file(std::uint32_t openmode, osd_file::ptr &&file, std::uint64_t length)
 		: core_in_memory_file(openmode, length)
-		, m_file(file)
+		, m_file(std::move(file))
 		, m_zdata()
 		, m_bufferbase(0)
 		, m_bufferbytes(0)
@@ -305,7 +303,7 @@ public:
 	}
 	~core_osd_file() override;
 
-	virtual file_error compress(int level) override;
+	virtual osd_file::error compress(int level) override;
 
 	virtual int seek(std::int64_t offset, int whence) override;
 
@@ -313,8 +311,8 @@ public:
 	virtual void const *buffer() override;
 
 	virtual std::uint32_t write(void const *buffer, std::uint32_t length) override;
-	virtual file_error truncate(std::uint64_t offset) override;
-	virtual file_error flush() override;
+	virtual osd_file::error truncate(std::uint64_t offset) override;
+	virtual osd_file::error flush() override;
 
 protected:
 
@@ -323,10 +321,10 @@ protected:
 private:
 	static constexpr std::size_t FILE_BUFFER_SIZE = 512;
 
-	file_error osd_or_zlib_read(void *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual);
-	file_error osd_or_zlib_write(void const *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual);
+	osd_file::error osd_or_zlib_read(void *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual);
+	osd_file::error osd_or_zlib_write(void const *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual);
 
-	osd_file *      m_file;                     // OSD file handle
+	osd_file::ptr   m_file;                     // OSD file handle
 	zlib_data::ptr  m_zdata;                    // compression data
 	std::uint64_t   m_bufferbase;               // base offset of internal buffer
 	std::uint32_t   m_bufferbytes;              // bytes currently loaded into buffer
@@ -688,14 +686,14 @@ std::uint32_t core_in_memory_file::read(void *buffer, std::uint32_t length)
     truncate - truncate a file
 -------------------------------------------------*/
 
-file_error core_in_memory_file::truncate(std::uint64_t offset)
+osd_file::error core_in_memory_file::truncate(std::uint64_t offset)
 {
 	if (m_length < offset)
-		return FILERR_FAILURE;
+		return osd_file::error::FAILURE;
 
 	// adjust to new length and offset
 	set_length(offset);
-	return FILERR_NONE;
+	return osd_file::error::NONE;
 }
 
 
@@ -736,8 +734,6 @@ core_osd_file::~core_osd_file()
 	// close files and free memory
 	if (m_zdata)
 		compress(FCOMPRESS_NONE);
-	if (m_file)
-		osd_close(m_file);
 }
 
 
@@ -747,13 +743,13 @@ core_osd_file::~core_osd_file()
     compression, or up to 9 for max compression
 -------------------------------------------------*/
 
-file_error core_osd_file::compress(int level)
+osd_file::error core_osd_file::compress(int level)
 {
-	file_error result = FILERR_NONE;
+	osd_file::error result = osd_file::error::NONE;
 
 	// can only do this for read-only and write-only cases
 	if (read_access() && write_access())
-		return FILERR_INVALID_ACCESS;
+		return osd_file::error::INVALID_ACCESS;
 
 	// if we have been compressing, flush and free the data
 	if (m_zdata && (level == FCOMPRESS_NONE))
@@ -767,7 +763,7 @@ file_error core_osd_file::compress(int level)
 			zerr = m_zdata->finalise();
 			if ((zerr != Z_STREAM_END) && (zerr != Z_OK))
 			{
-				result = FILERR_INVALID_DATA;
+				result = osd_file::error::INVALID_DATA;
 				break;
 			}
 
@@ -775,8 +771,8 @@ file_error core_osd_file::compress(int level)
 			if (m_zdata->has_output())
 			{
 				std::uint32_t actualdata;
-				auto const filerr = osd_write(m_file, m_zdata->buffer_data(), m_zdata->realoffset(), m_zdata->output_size(), &actualdata);
-				if (filerr != FILERR_NONE)
+				auto const filerr = m_file->write(m_zdata->buffer_data(), m_zdata->realoffset(), m_zdata->output_size(), actualdata);
+				if (filerr != osd_file::error::NONE)
 					break;
 				m_zdata->add_realoffset(actualdata);
 				m_zdata->reset_output();
@@ -800,7 +796,7 @@ file_error core_osd_file::compress(int level)
 
 		// on error, return an error
 		if (zerr != Z_OK)
-			return FILERR_OUT_OF_MEMORY;
+			return osd_file::error::OUT_OF_MEMORY;
 
 		// flush buffers
 		m_bufferbytes = 0;
@@ -888,13 +884,12 @@ void const *core_osd_file::buffer()
 		// read the file
 		std::uint32_t read_length = 0;
 		auto const filerr = osd_or_zlib_read(buf, 0, length(), read_length);
-		if ((filerr != FILERR_NONE) || (read_length != length()))
+		if ((filerr != osd_file::error::NONE) || (read_length != length()))
 			purge();
 		else
 		{
 			// close the file because we don't need it anymore
-			osd_close(m_file);
-			m_file = nullptr;
+			m_file.reset();
 		}
 	}
 	return core_in_memory_file::buffer();
@@ -931,19 +926,19 @@ std::uint32_t core_osd_file::write(void const *buffer, std::uint32_t length)
     truncate - truncate a file
 -------------------------------------------------*/
 
-file_error core_osd_file::truncate(std::uint64_t offset)
+osd_file::error core_osd_file::truncate(std::uint64_t offset)
 {
 	if (is_loaded())
 		return core_in_memory_file::truncate(offset);
 
 	// truncate file
-	auto const err = osd_truncate(m_file, offset);
-	if (err != FILERR_NONE)
+	auto const err = m_file->truncate(offset);
+	if (err != osd_file::error::NONE)
 		return err;
 
 	// and adjust to new length and offset
 	set_length(offset);
-	return FILERR_NONE;
+	return osd_file::error::NONE;
 }
 
 
@@ -951,7 +946,7 @@ file_error core_osd_file::truncate(std::uint64_t offset)
     flush - flush file buffers
 -------------------------------------------------*/
 
-file_error core_osd_file::flush()
+osd_file::error core_osd_file::flush()
 {
 	if (is_loaded())
 		return core_in_memory_file::flush();
@@ -962,7 +957,7 @@ file_error core_osd_file::flush()
 	// invalidate any buffered data
 	m_bufferbytes = 0;
 
-	return osd_fflush(m_file);
+	return m_file->flush();
 }
 
 
@@ -971,18 +966,18 @@ file_error core_osd_file::flush()
     handles zlib-compressed data
 -------------------------------------------------*/
 
-file_error core_osd_file::osd_or_zlib_read(void *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual)
+osd_file::error core_osd_file::osd_or_zlib_read(void *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual)
 {
 	// if no compression, just pass through
 	if (!m_zdata)
-		return osd_read(m_file, buffer, offset, length, &actual);
+		return m_file->read(buffer, offset, length, actual);
 
 	// if the offset doesn't match the next offset, fail
 	if (!m_zdata->is_nextoffset(offset))
-		return FILERR_INVALID_ACCESS;
+		return osd_file::error::INVALID_ACCESS;
 
 	// set up the destination
-	file_error filerr = FILERR_NONE;
+	osd_file::error filerr = osd_file::error::NONE;
 	m_zdata->set_output(buffer, length);
 	while (!m_zdata->output_full())
 	{
@@ -992,7 +987,7 @@ file_error core_osd_file::osd_or_zlib_read(void *buffer, std::uint64_t offset, s
 			auto const zerr = m_zdata->decompress();
 			if (Z_OK != zerr)
 			{
-				if (Z_STREAM_END != zerr) filerr = FILERR_INVALID_DATA;
+				if (Z_STREAM_END != zerr) filerr = osd_file::error::INVALID_DATA;
 				break;
 			}
 		}
@@ -1001,8 +996,8 @@ file_error core_osd_file::osd_or_zlib_read(void *buffer, std::uint64_t offset, s
 		if (!m_zdata->has_input())
 		{
 			std::uint32_t actualdata = 0;
-			filerr = osd_read(m_file, m_zdata->buffer_data(), m_zdata->realoffset(), m_zdata->buffer_size(), &actualdata);
-			if (filerr != FILERR_NONE) break;
+			filerr = m_file->read(m_zdata->buffer_data(), m_zdata->realoffset(), m_zdata->buffer_size(), actualdata);
+			if (filerr != osd_file::error::NONE) break;
 			m_zdata->add_realoffset(actualdata);
 			m_zdata->reset_input(actualdata);
 			if (!m_zdata->has_input()) break;
@@ -1022,7 +1017,7 @@ file_error core_osd_file::osd_or_zlib_read(void *buffer, std::uint64_t offset, s
 -------------------------------------------------*/
 
 /**
- * @fn  file_error osd_or_zlib_write(void const *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t actual)
+ * @fn  osd_file::error osd_or_zlib_write(void const *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t actual)
  *
  * @brief   OSD or zlib write.
  *
@@ -1031,18 +1026,18 @@ file_error core_osd_file::osd_or_zlib_read(void *buffer, std::uint64_t offset, s
  * @param   length          The length.
  * @param [in,out]  actual  The actual.
  *
- * @return  A file_error.
+ * @return  A osd_file::error.
  */
 
-file_error core_osd_file::osd_or_zlib_write(void const *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual)
+osd_file::error core_osd_file::osd_or_zlib_write(void const *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual)
 {
 	// if no compression, just pass through
 	if (!m_zdata)
-		return osd_write(m_file, buffer, offset, length, &actual);
+		return m_file->write(buffer, offset, length, actual);
 
 	// if the offset doesn't match the next offset, fail
 	if (!m_zdata->is_nextoffset(offset))
-		return FILERR_INVALID_ACCESS;
+		return osd_file::error::INVALID_ACCESS;
 
 	// set up the source
 	m_zdata->set_input(buffer, length);
@@ -1054,15 +1049,15 @@ file_error core_osd_file::osd_or_zlib_write(void const *buffer, std::uint64_t of
 		{
 			actual = length - m_zdata->input_size();
 			m_zdata->add_nextoffset(actual);
-			return FILERR_INVALID_DATA;
+			return osd_file::error::INVALID_DATA;
 		}
 
 		// write more data if we are full up
 		if (m_zdata->output_full())
 		{
 			std::uint32_t actualdata = 0;
-			auto const filerr = osd_write(m_file, m_zdata->buffer_data(), m_zdata->realoffset(), m_zdata->output_size(), &actualdata);
-			if (filerr != FILERR_NONE)
+			auto const filerr = m_file->write(m_zdata->buffer_data(), m_zdata->realoffset(), m_zdata->output_size(), actualdata);
+			if (filerr != osd_file::error::NONE)
 				return filerr;
 			m_zdata->add_realoffset(actualdata);
 			m_zdata->reset_output();
@@ -1072,7 +1067,7 @@ file_error core_osd_file::osd_or_zlib_write(void const *buffer, std::uint64_t of
 	// we wrote everything
 	actual = length;
 	m_zdata->add_nextoffset(actual);
-	return FILERR_NONE;
+	return osd_file::error::NONE;
 }
 
 } // anonymous namespace
@@ -1088,24 +1083,23 @@ file_error core_osd_file::osd_or_zlib_write(void const *buffer, std::uint64_t of
     return an error code
 -------------------------------------------------*/
 
-file_error core_file::open(char const *filename, std::uint32_t openflags, ptr &file)
+osd_file::error core_file::open(char const *filename, std::uint32_t openflags, ptr &file)
 {
-	// attempt to open the file
-	osd_file *f = nullptr;
-	std::uint64_t length = 0;
-	auto const filerr = osd_open(filename, openflags, &f, &length);
-	if (filerr != FILERR_NONE)
-		return filerr;
-
 	try
 	{
-		file = std::make_unique<core_osd_file>(openflags, f, length);
-		return FILERR_NONE;
+		// attempt to open the file
+		osd_file::ptr f;
+		std::uint64_t length = 0;
+		auto const filerr = osd_file::open(filename, openflags, f, length);
+		if (filerr != osd_file::error::NONE)
+			return filerr;
+
+		file = std::make_unique<core_osd_file>(openflags, std::move(f), length);
+		return osd_file::error::NONE;
 	}
 	catch (...)
 	{
-		osd_close(f);
-		return FILERR_OUT_OF_MEMORY;
+		return osd_file::error::OUT_OF_MEMORY;
 	}
 }
 
@@ -1115,20 +1109,20 @@ file_error core_file::open(char const *filename, std::uint32_t openflags, ptr &f
     like access and return an error code
 -------------------------------------------------*/
 
-file_error core_file::open_ram(void const *data, std::size_t length, std::uint32_t openflags, ptr &file)
+osd_file::error core_file::open_ram(void const *data, std::size_t length, std::uint32_t openflags, ptr &file)
 {
 	// can only do this for read access
 	if ((openflags & OPEN_FLAG_WRITE) || (openflags & OPEN_FLAG_CREATE))
-		return FILERR_INVALID_ACCESS;
+		return osd_file::error::INVALID_ACCESS;
 
 	try
 	{
 		file.reset(new core_in_memory_file(openflags, data, length, false));
-		return FILERR_NONE;
+		return osd_file::error::NONE;
 	}
 	catch (...)
 	{
-		return FILERR_OUT_OF_MEMORY;
+		return osd_file::error::OUT_OF_MEMORY;
 	}
 }
 
@@ -1139,24 +1133,24 @@ file_error core_file::open_ram(void const *data, std::size_t length, std::uint32
     error code
 -------------------------------------------------*/
 
-file_error core_file::open_ram_copy(void const *data, std::size_t length, std::uint32_t openflags, ptr &file)
+osd_file::error core_file::open_ram_copy(void const *data, std::size_t length, std::uint32_t openflags, ptr &file)
 {
 	// can only do this for read access
 	if ((openflags & OPEN_FLAG_WRITE) || (openflags & OPEN_FLAG_CREATE))
-		return FILERR_INVALID_ACCESS;
+		return osd_file::error::INVALID_ACCESS;
 
 	try
 	{
 		ptr result(new core_in_memory_file(openflags, data, length, true));
 		if (!result->buffer())
-			return FILERR_OUT_OF_MEMORY;
+			return osd_file::error::OUT_OF_MEMORY;
 
 		file = std::move(result);
-		return FILERR_NONE;
+		return osd_file::error::NONE;
 	}
 	catch (...)
 	{
-		return FILERR_OUT_OF_MEMORY;
+		return osd_file::error::OUT_OF_MEMORY;
 	}
 }
 
@@ -1166,16 +1160,16 @@ file_error core_file::open_ram_copy(void const *data, std::size_t length, std::u
     object and return an error code
 -------------------------------------------------*/
 
-file_error core_file::open_proxy(core_file &file, ptr &proxy)
+osd_file::error core_file::open_proxy(core_file &file, ptr &proxy)
 {
 	try
 	{
 		proxy = std::make_unique<core_proxy_file>(file);
-		return FILERR_NONE;
+		return osd_file::error::NONE;
 	}
 	catch (...)
 	{
-		return FILERR_OUT_OF_MEMORY;
+		return osd_file::error::OUT_OF_MEMORY;
 	}
 }
 
@@ -1195,19 +1189,19 @@ core_file::~core_file()
     pointer
 -------------------------------------------------*/
 
-file_error core_file::load(char const *filename, void **data, std::uint32_t &length)
+osd_file::error core_file::load(char const *filename, void **data, std::uint32_t &length)
 {
 	ptr file;
 
 	// attempt to open the file
 	auto const err = open(filename, OPEN_FLAG_READ, file);
-	if (err != FILERR_NONE)
+	if (err != osd_file::error::NONE)
 		return err;
 
 	// get the size
 	auto const size = file->size();
 	if (std::uint32_t(size) != size)
-		return FILERR_OUT_OF_MEMORY;
+		return osd_file::error::OUT_OF_MEMORY;
 
 	// allocate memory
 	*data = osd_malloc(size);
@@ -1217,26 +1211,26 @@ file_error core_file::load(char const *filename, void **data, std::uint32_t &len
 	if (file->read(*data, size) != size)
 	{
 		free(*data);
-		return FILERR_FAILURE;
+		return osd_file::error::FAILURE;
 	}
 
 	// close the file and return data
-	return FILERR_NONE;
+	return osd_file::error::NONE;
 }
 
-file_error core_file::load(char const *filename, dynamic_buffer &data)
+osd_file::error core_file::load(char const *filename, dynamic_buffer &data)
 {
 	ptr file;
 
 	// attempt to open the file
 	auto const err = open(filename, OPEN_FLAG_READ, file);
-	if (err != FILERR_NONE)
+	if (err != osd_file::error::NONE)
 		return err;
 
 	// get the size
 	auto const size = file->size();
 	if (std::uint32_t(size) != size)
-		return FILERR_OUT_OF_MEMORY;
+		return osd_file::error::OUT_OF_MEMORY;
 
 	// allocate memory
 	data.resize(size);
@@ -1245,11 +1239,11 @@ file_error core_file::load(char const *filename, dynamic_buffer &data)
 	if (file->read(&data[0], size) != size)
 	{
 		data.clear();
-		return FILERR_FAILURE;
+		return osd_file::error::FAILURE;
 	}
 
 	// close the file and return data
-	return FILERR_NONE;
+	return osd_file::error::NONE;
 }
 
 

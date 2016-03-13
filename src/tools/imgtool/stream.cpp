@@ -104,33 +104,27 @@ static imgtool_stream *stream_open_zip(const char *zipname, const char *subname,
 
 	imgfile->imgtype = IMG_MEM;
 
-	zip_file *z = nullptr;
-	const zip_file_header *zipent = nullptr;
-	zip_file_open(zipname, &z);
+	zip_file::ptr z;
+	const zip_file::file_header *zipent = nullptr;
+	zip_file::open(zipname, z);
 	if (!z)
-		goto error;
+		return nullptr;
 
-	zipent = zip_file_first_file(z);
+	zipent = z->first_file();
 	while (zipent && subname && strcmp(subname, zipent->filename))
-		zipent = zip_file_next_file(z);
+		zipent = z->next_file();
 	if (!zipent)
-		goto error;
+		return nullptr;
 
 	imgfile->filesize = zipent->uncompressed_length;
 	imgfile->buffer = reinterpret_cast<std::uint8_t *>(malloc(zipent->uncompressed_length));
 	if (!imgfile->buffer)
-		goto error;
+		return nullptr;
 
-	if (zip_file_decompress(z, imgfile->buffer, zipent->uncompressed_length))
-		goto error;
+	if (z->decompress(imgfile->buffer, zipent->uncompressed_length) != zip_file::error::NONE)
+		return nullptr;
 
-	zip_file_close(z);
 	return imgfile.release();
-
-error:
-	if (z)
-		zip_file_close(z);
-	return nullptr;
 }
 
 
@@ -154,7 +148,7 @@ imgtool_stream *stream_open(const char *fname, int read_or_write)
 
 	util::core_file::ptr f = nullptr;
 	auto const filerr = util::core_file::open(fname, write_modes[read_or_write], f);
-	if (filerr != FILERR_NONE)
+	if (filerr != osd_file::error::NONE)
 	{
 		if (!read_or_write)
 		{
