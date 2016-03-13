@@ -600,8 +600,8 @@ static INPUT_PORTS_START( fball )
 
 	PORT_START("DSWA") // only one set of dipswitches
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWA:1")
-	PORT_DIPSETTING(    0x01, "0" ) // I guess one is easy, the other hard, which is which?
-	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) ) // smaller starting explosion
 	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:2,3")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -852,6 +852,7 @@ void lwings_state::machine_start()
 	save_item(NAME(m_soundstate));
 	save_item(NAME(m_adpcm));
 	save_item(NAME(m_nmi_mask));
+	save_item(NAME(m_sprbank));
 
 	/*
 	Fireball has 2 copies of the 'fixed' code in the main program rom, with only slight changes.
