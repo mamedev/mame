@@ -2964,7 +2964,6 @@ files {
 
 createMAMEProjects(_target, _subtarget, "sega")
 files {
-	MAME_DIR .. "src/mame/drivers/android.cpp",
 	MAME_DIR .. "src/mame/drivers/angelkds.cpp",
 	MAME_DIR .. "src/mame/includes/angelkds.h",
 	MAME_DIR .. "src/mame/video/angelkds.cpp",

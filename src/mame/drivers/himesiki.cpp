@@ -3,10 +3,16 @@
 /*****************************************************************************
 
 Himeshikibu (C) 1989 Hi-Soft
+Android (C) 198? Nasco
 
     Driver by Uki
 
 *****************************************************************************/
+
+// Note, another VERY different version of Android also exists, see https://www.youtube.com/watch?v=5rtqZqMBACI (uploaded by Chris Hardy)
+// it is unclear if that version is on the same hardware as this
+// Android uses PCBS MK-P102 and MK-P101 ONLY, there is no MK-P103 (extra sprites used on Himeshikibu)
+
 
 /*
 Himeshikibu
@@ -90,6 +96,7 @@ A                                                   12.000MHz
 #include "includes/himesiki.h"
 
 #define MCLK    XTAL_12MHz
+// there is also an 8Mhz XTAL near the CPUs
 
 WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 {
@@ -272,7 +279,7 @@ void himesiki_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 
-	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
 
 	save_item(NAME(m_scrollx));
@@ -326,7 +333,7 @@ MACHINE_CONFIG_END
 /****************************************************************************/
 
 ROM_START( himesiki )
-	ROM_REGION( 0x018000, "maincpu", 0 ) /* z80 */
+	ROM_REGION( 0x020000, "maincpu", 0 ) /* z80 */
 	ROM_LOAD( "1.1k",  0x00000,  0x08000, CRC(fb4604b3) SHA1(e8155bbafb881125e1bf9a04808d6a6546887e90) )
 	ROM_LOAD( "2.1g",  0x10000,  0x08000, CRC(0c30ded1) SHA1(0ad67115fa15d0b6261a278a946a6d46c06430ef) )
 
@@ -352,4 +359,33 @@ ROM_START( himesiki )
 	ROM_LOAD16_BYTE( "14.8c", 0x020001,  0x010000, CRC(8103a207) SHA1(0dde8a0aaf2618d9c1589f35841db210439d0388) )
 ROM_END
 
+
+
+ROM_START( androidp )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "MITSUBISHI_A01.toppcb.m5l27256k.k1.BIN", 0x00000, 0x08000, CRC(25ab85eb) SHA1(e1fab149c83ff880b119258206d5818f3db641c5) )
+
+	ROM_LOAD( "MITSUBISHI_A03.toppcb.m5l27256k.G1.BIN", 0x10000, 0x08000, CRC(6cf5f48a) SHA1(b9b4e5e7bace0e8d98fbc9f4ad91bc56ef42099e) )
+	ROM_LOAD( "MITSUBISHI_A02.toppcb.m5l27256k.J1.BIN", 0x18000, 0x08000, CRC(e41426be) SHA1(e7e06ef3ff5160bb7d870e148ba2799da52cf24c) ) // 2nd half empty (correct?)
+
+	ROM_REGION( 0x18000, "sub", 0 )
+	ROM_LOAD( "MITSUBISHI_A04.toppcb.m5l27256k.N6.BIN", 0x00000, 0x08000, CRC(13c38fe4) SHA1(34a35fa057159a5c83892a88b8c908faa39d5cb3) )	
+
+	ROM_REGION( 0x10000, "bgtiles", 0 )
+	ROM_LOAD( "MITSUBISHI_A05.toppcb.m5l27512k.F5.BIN", 0x00000, 0x10000, CRC(4c72a930) SHA1(f1542844391b55fe43293eef7ce48c09b7aca75a) )
+
+	ROM_REGION( 0x20000, "sprites_1", ROMREGION_ERASEFF )
+
+
+	ROM_REGION( 0x20000, "sprites_2", 0 )
+	ROM_LOAD16_BYTE( "MITSUBISHI_A06.botpcb.m5l27512k.9E.BIN", 0x00000, 0x10000, CRC(5e42984e) SHA1(2a928960c740dfb94589e011cce093bed2fd7685) )
+	ROM_LOAD16_BYTE( "MITSUBISHI_A07.botpcb.m5l27512k.9B.BIN", 0x00001, 0x10000, CRC(611ff400) SHA1(1a9aed33d0e3f063811f92b9fee3ecbff0e965bf) )
+
+
+	// + 2 undumped PLDs
+ROM_END
+
+
 GAME( 1989, himesiki, 0, himesiki, himesiki, driver_device, 0, ROT90, "Hi-Soft", "Himeshikibu (Japan)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 198?, androidp, 0, himesiki, himesiki, driver_device, 0, ROT90, "Nasco", "Android (early build?)", MACHINE_NOT_WORKING )
