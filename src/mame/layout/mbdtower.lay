@@ -4,7 +4,7 @@
 <!-- define elements -->
 
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
-	<element name="static_black2"><rect><color red="0.05" green="0.05" blue="0.05" /></rect></element>
+	<element name="static_black2"><rect><color red="0.03" green="0.03" blue="0.03" /></rect></element>
 	<element name="static_gray"><rect><color red="0.13" green="0.13" blue="0.13" /></rect></element>
 	<element name="static_white"><rect><color red="1.0" green="1.0" blue="1.0" /></rect></element>
 
@@ -28,85 +28,85 @@
 	<element name="b_green"><rect><color red="0.1" green="0.7" blue="0.2" /></rect></element>
 	<element name="text_yes">
 		<rect><color red="0.1" green="0.7" blue="0.2" /></rect>
-		<text string="YES"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="YES"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 	<element name="text_buy">
 		<rect><color red="0.1" green="0.7" blue="0.2" /></rect>
-		<text string="BUY"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="BUY"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 
 	<element name="b_red"><rect><color red="0.9" green="0.1" blue="0.1" /></rect></element>
 	<element name="text_no">
 		<rect><color red="0.9" green="0.1" blue="0.1" /></rect>
-		<text string="NO"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="NO"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 	<element name="text_end">
 		<rect><color red="0.9" green="0.1" blue="0.1" /></rect>
-		<text string="END"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="END"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 
 	<element name="b_orange"><rect><color red="0.9" green="0.3" blue="0.1" /></rect></element>
 	<element name="text_dark">
 		<rect><color red="0.9" green="0.3" blue="0.1" /></rect>
-		<text string="DARK"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="DARK"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 	<element name="text_tower">
 		<rect><color red="0.9" green="0.3" blue="0.1" /></rect>
-		<text string="TOWER"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="TOWER"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 
 	<element name="b_white"><rect><color red="0.9" green="0.9" blue="0.9" /></rect></element>
 	<element name="text_clear">
 		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="CLEAR"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="CLEAR"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 
 	<element name="b_blue1"><rect><color red="0.3" green="0.7" blue="0.9" /></rect></element>
 	<element name="text_bazaar">
 		<rect><color red="0.3" green="0.7" blue="0.9" /></rect>
-		<text string="BAZAAR"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="BAZAAR"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 	<element name="text_tomb">
 		<rect><color red="0.3" green="0.7" blue="0.9" /></rect>
-		<text string="TOMB"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="TOMB"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 	<element name="text_ruin">
 		<rect><color red="0.3" green="0.7" blue="0.9" /></rect>
-		<text string="RUIN"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="RUIN"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 	<element name="text_move">
 		<rect><color red="0.3" green="0.7" blue="0.9" /></rect>
-		<text string="MOVE"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="MOVE"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 	<element name="text_sanctuary">
 		<rect><color red="0.3" green="0.7" blue="0.9" /></rect>
-		<text string="SANCTUARY"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="SANCTUARY"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 	<element name="text_citadel">
 		<rect><color red="0.3" green="0.7" blue="0.9" /></rect>
-		<text string="CITADEL"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="CITADEL"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 	<element name="text_frontier">
 		<rect><color red="0.3" green="0.7" blue="0.9" /></rect>
-		<text string="FRONTIER"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="FRONTIER"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 
 	<element name="b_blue2"><rect><color red="0.7" green="0.8" blue="0.9" /></rect></element>
 	<element name="text_repeat">
 		<rect><color red="0.7" green="0.8" blue="0.9" /></rect>
-		<text string="REPEAT"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="REPEAT"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 
 	<element name="b_yellow1"><rect><color red="0.9" green="0.7" blue="0.1" /></rect></element>
 	<element name="text_haggle">
 		<rect><color red="0.9" green="0.7" blue="0.1" /></rect>
-		<text string="HAGGLE"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="HAGGLE"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 
 	<element name="b_yellow2"><rect><color red="0.7" green="0.6" blue="0.4" /></rect></element>
 	<element name="text_inventory">
 		<rect><color red="0.7" green="0.6" blue="0.4" /></rect>
-		<text string="INVENTORY"><color red="0.05" green="0.05" blue="0.05" /></text>
+		<text string="INVENTORY"><color red="0.03" green="0.03" blue="0.03" /></text>
 	</element>
 
 	<!-- cards -->

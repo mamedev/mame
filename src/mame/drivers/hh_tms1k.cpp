@@ -123,7 +123,7 @@
 #include "cnfball.lh"
 #include "cnfball2.lh"
 #include "cnsector.lh"
-#include "comp4.lh"
+#include "comp4.lh" // clickable
 #include "cqback.lh"
 #include "ebball.lh"
 #include "ebball2.lh"
@@ -1758,7 +1758,7 @@ MACHINE_CONFIG_END
   * TMS1000 MCU, MP0923 (die label MP0923)
   * 3 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
-  The Japanese version was published by Gakken, black casing instead of white.
+  The Japanese version was published by Gakken, black case instead of white.
 
   The sequel to Entex Baseball, this version keeps up with score and innings.
   As its predecessor, the pitcher controls are on a separate joypad.
@@ -3517,7 +3517,7 @@ MACHINE_CONFIG_END
   * 10 LEDs behind bezel, no sound
 
   known releases:
-  - USA: Comp IV (two versions, different casing)
+  - USA: Comp IV (two versions, different case)
   - Europe: Logic 5
   - Japan: Pythaligoras
 
@@ -5764,7 +5764,7 @@ COMP( 1979, astro,     0,        0, astro,     astro,     driver_device, 0, "Kos
 
 CONS( 1980, mdndclab,  0,        0, mdndclab,  mdndclab,  driver_device, 0, "Mattel", "Dungeons & Dragons - Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
-CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
 CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, ssimon,    0,        0, ssimon,    ssimon,    driver_device, 0, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, bigtrak,   0,        0, bigtrak,   bigtrak,   driver_device, 0, "Milton Bradley", "Big Trak", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL ) // ***
