@@ -132,7 +132,7 @@
 #include "efootb4.lh"
 #include "einvader.lh" // test-layout(but still playable)
 #include "elecdet.lh"
-#include "fxmcr165.lh"
+#include "fxmcr165.lh" // clickable
 #include "gjackpot.lh"
 #include "gpoker.lh"
 #include "h2hbaseb.lh"
@@ -5753,7 +5753,7 @@ CONS( 1980, raisedvl,  0,        0, raisedvl,  raisedvl,  driver_device, 0, "Ent
 
 CONS( 1979, gpoker,    0,        0, gpoker,    gpoker,    driver_device, 0, "Gakken", "Poker (Gakken, 1979 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gjackpot,  0,        0, gjackpot,  gjackpot,  driver_device, 0, "Gakken", "Jackpot: Gin Rummy & Black Jack", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, fxmcr165,  0,        0, fxmcr165,  fxmcr165,  driver_device, 0, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, fxmcr165,  0,        0, fxmcr165,  fxmcr165,  driver_device, 0, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ideal", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
 
