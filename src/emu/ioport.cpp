@@ -461,7 +461,7 @@ const char_info charinfo[] =
 	{ UCHAR_MAMEKEY(6_PAD),     "Keypad 6",     nullptr },     // 6 on the numeric keypad
 	{ UCHAR_MAMEKEY(7_PAD),     "Keypad 7",     nullptr },     // 7 on the numeric keypad
 	{ UCHAR_MAMEKEY(8_PAD),     "Keypad 8",     nullptr },     // 8 on the numeric keypad
-	{ UCHAR_MAMEKEY(9_PAD),     "Space Channel 9",     nullptr },     // 9 on the numeric keypad
+	{ UCHAR_MAMEKEY(9_PAD),     "Keypad 9",     nullptr },     // 9 on the numeric keypad
 	{ UCHAR_MAMEKEY(SLASH_PAD), "Keypad /",     nullptr },     // / on the numeric keypad
 	{ UCHAR_MAMEKEY(ASTERISK),  "Keypad *",     nullptr },     // * on the numeric keypad
 	{ UCHAR_MAMEKEY(MINUS_PAD), "Keypad -",     nullptr },     // - on the numeric Keypad
