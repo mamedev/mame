@@ -36,7 +36,7 @@
  *MP1219   TMS1100   1980, U.S. Games Super Sports 4
  @MP1221   TMS1100   1980, Entex Raise The Devil
  *MP1296   TMS1100?  1982, Entex Black Knight
- @MP1312   TMS1100   1985, Gakken FX-Micom R-165/Tandy Radio Shack Science Fair Microcomputer Trainer
+ @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Tandy Radio Shack Science Fair Microcomputer Trainer
  *MP1359   TMS1100?  1985, Capsela CRC2000
  @MP1525   TMS1170   1980, Coleco Head to Head Baseball
  *MP1604   ?         1981, Hanzawa Twinvader III/Tandy Cosmic Fire Away 3000 (? note: VFD-capable)
@@ -1364,19 +1364,21 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Conic Electronic Football (1)
+  Conic Electronic Football
   * TMS1000 MP0170 (die label MP0170)
   * DS8874N, 3*9 LED array, 7 7seg LEDs, 1-bit sound
 
-  This is a clone of Mattel Football. Apparently Mattel has tried to keep imports
+  This is a clone of Mattel Football. Apparently Mattel tried to keep imports
   of infringing games from going through customs. Conic (Hong Kong) answered
   by distributing the game under subsidiary brands - see list below.
 
   known releases:
-  - Hong Kong: Conic Electronic Football
+  - Hong Kong: Electronic Football, Conic
   - USA(1): Football, ERS(Electronic Readout Systems)
   - USA(2): Football, ELECsonic
   - USA(3): Football, no brand!
+  
+  Another hardware revision of this game uses a PIC16 MCU.
 
 ***************************************************************************/
 
@@ -1452,11 +1454,11 @@ static INPUT_PORTS_START( cnfball )
 
 	PORT_START("IN.1") // R10
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Kick")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Score")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Status")
-	PORT_CONFNAME( 0x08, 0x08, "Players" )
-	PORT_CONFSETTING(    0x08, "1" )
-	PORT_CONFSETTING(    0x00, "2" )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Score")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Status")
+	PORT_CONFNAME( 0x08, 0x08, "Skill Level" )
+	PORT_CONFSETTING(    0x08, "1" ) // college
+	PORT_CONFSETTING(    0x00, "2" ) // professional
 
 	PORT_START("FAKE") // fake port for left/right combination
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
@@ -1494,7 +1496,10 @@ MACHINE_CONFIG_END
   * 9-digit LED grid, 1-bit sound
 
   This is a clone of Coleco's Quarterback, similar at hardware-level too.
-  It was also sold by Tandy under the same title.
+
+  known releases:
+  - Hong Kong: Electronic Football II, Conic
+  - USA: Electronic Football II, Tandy Radio Shack
 
 ***************************************************************************/
 
@@ -2819,7 +2824,7 @@ MACHINE_CONFIG_END
 
   known releases:
   - Japan: FX-Micom R-165
-  - USA: Science Fair Microcomputer Trainer, published by Tandy Radio Shack
+  - USA: Science Fair Microcomputer Trainer, published by Tandy Radio Shack.
     Of note is the complete redesign of the case, adding more adjustable wiring
 
 ***************************************************************************/
@@ -5735,7 +5740,7 @@ CONS( 1980, h2hfootb,  0,        0, h2hfootb,  h2hfootb,  driver_device, 0, "Col
 CONS( 1980, h2hbaseb,  0,        0, h2hbaseb,  h2hbaseb,  driver_device, 0, "Coleco", "Head to Head Baseball", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, cnfball,   0,        0, cnfball,   cnfball,   driver_device, 0, "Conic", "Electronic Football (Conic)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, cnfball,   0,        0, cnfball,   cnfball,   driver_device, 0, "Conic", "Electronic Football (Conic, TMS1000 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, cnfball2,  0,        0, cnfball2,  cnfball2,  driver_device, 0, "Conic", "Electronic Football II (Conic)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball (Entex)", MACHINE_SUPPORTS_SAVE )
