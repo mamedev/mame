@@ -76,8 +76,9 @@ READ8_MEMBER(lwings_state::avengers_adpcm_r)
 
 WRITE8_MEMBER(lwings_state::lwings_bankswitch_w)
 {
-//	if (data & 0xf0) printf("bankswitch_w %02x\n", data);
+//	if (data & 0xe0) printf("bankswitch_w %02x\n", data);
 //  Fireball writes 0x20 on startup, maybe reset soundcpu?
+	m_sprbank = (data & 0x10)>>4; // Fireball only
 
 	/* bit 0 is flip screen */
 	flip_screen_set(~data & 0x01);
