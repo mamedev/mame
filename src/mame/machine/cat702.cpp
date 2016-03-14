@@ -90,6 +90,7 @@ const device_type CAT702 = &device_creator<cat702_device>;
 
 cat702_device::cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CAT702, "CAT702", tag, owner, clock, "cat702", __FILE__),
+	m_transform(nullptr),
 	m_dataout_handler(*this)
 {
 }
@@ -159,9 +160,9 @@ void cat702_device::apply_sbox(const UINT8 *sbox)
 	m_state = r;
 }
 
-void cat702_device::init(const UINT8 *transform)
+void cat702_device::static_set_transform_table(device_t &device, const UINT8 *transform)
 {
-	m_transform = transform;
+	downcast<cat702_device &>(device).m_transform = transform;
 }
 
 WRITE_LINE_MEMBER(cat702_device::write_select)
@@ -213,4 +214,10 @@ WRITE_LINE_MEMBER(cat702_device::write_clock)
 WRITE_LINE_MEMBER(cat702_device::write_datain)
 {
 	m_datain = state;
+}
+
+void cat702_device::device_validity_check(validity_checker &valid) const
+{
+	if (m_transform == nullptr)
+		osd_printf_error("No transform table provided\n");
 }
