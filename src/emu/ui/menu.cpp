@@ -2090,7 +2090,16 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 	buffer[RP_IMAGES] = _("Images");
 	buffer[RP_INFOS] = _("Infos");
 
-	for (int cells = RP_IMAGES; cells <= RP_INFOS; cells++)
+	// check size
+	float text_size = 1.0f;
+	for (auto & elem : buffer)
+	{
+		float textlen = mui.get_string_width(elem.c_str()) + 0.01f;
+		float tmp_size = (textlen > midl) ? (midl / textlen) : 1.0f;
+		text_size = MIN(text_size, tmp_size);
+	}
+
+	for (int cells = RP_FIRST; cells <= RP_LAST; ++cells)
 	{
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
 		rgb_t fgcolor = UI_TEXT_COLOR;
@@ -2125,12 +2134,8 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 			container->add_rect(x1 + UI_LINE_WIDTH, y1 + UI_LINE_WIDTH, x1 + midl - UI_LINE_WIDTH, y1 + line_height,
 				bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
-		// check size
-		float textlen = mui.get_string_width(buffer[cells].c_str()) + 0.01f;
-		float tmp_size = (textlen > midl) ? (midl / textlen) : 1.0f;
-
 		mui.draw_text_full(container, buffer[cells].c_str(), x1 + UI_LINE_WIDTH, y1, midl - UI_LINE_WIDTH,
-			JUSTIFY_CENTER, WRAP_NEVER, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
+			JUSTIFY_CENTER, WRAP_NEVER, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
 		x1 += midl;
 	}
 
