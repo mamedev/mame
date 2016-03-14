@@ -94,7 +94,7 @@ function maintargetosdoptions(_target,_subtarget)
 		links {
 			"psapi",
 		}
-		configuration { "mingw*-gcc" }
+		configuration { "mingw*" }
 			linkoptions{
 				"-municode",
 			}

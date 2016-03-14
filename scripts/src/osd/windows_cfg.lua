@@ -5,7 +5,7 @@ defines {
 	"OSD_WINDOWS",
 }
 
-configuration { "mingw*-gcc or vs*" }
+configuration { "mingw* or vs*" }
 	defines {
 		"UNICODE",
 		"_UNICODE",
