@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 
 	/* video hardware */
 	/*MCFG_TMS9928A( &tms9918_interface )*/
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256, 192)
@@ -385,7 +385,7 @@ static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ti99_2)
-	MCFG_PALETTE_ADD_WHITE_AND_BLACK("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 

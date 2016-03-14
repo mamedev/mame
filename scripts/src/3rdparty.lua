@@ -59,7 +59,7 @@ project "zlib"
 	kind "StaticLib"
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
-	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
+	if _OPTIONS["gcc"]~=nil and ((string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android"))) then
 		configuration { "gmake" }
 		if (version >= 30700) then
 			buildoptions {
@@ -276,7 +276,7 @@ end
 			"-Wno-unused-function",
 			"-O0",
 		}
-	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "android")) then
 		buildoptions {
 			"-Wno-enum-conversion",
 		}
@@ -772,6 +772,7 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dxbc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dx9bc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_spirv.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/topology.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/vertexdecl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/bgfx_utils.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/bounds.cpp",
@@ -950,6 +951,7 @@ end
 -- libuv library objects
 --------------------------------------------------
 if _OPTIONS["USE_LIBUV"]=="1" then
+if _OPTIONS["with-bundled-libuv"] then
 project "uv"
 	uuid "cd2afe7f-139d-49c3-9000-fc9119f3cea0"
 	kind "StaticLib"
@@ -1159,6 +1161,11 @@ project "http-parser"
 		}
 	end
 
+else
+links {
+	"libuv",
+}
+end
 --------------------------------------------------
 -- SDL2 library
 --------------------------------------------------

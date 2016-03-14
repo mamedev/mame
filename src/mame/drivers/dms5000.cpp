@@ -70,7 +70,7 @@ static MACHINE_CONFIG_START( dms5000, dms5000_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dms5000_state, screen_update_dms5000)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 /* ROM definition */

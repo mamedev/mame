@@ -13,9 +13,9 @@
 #ifndef __COREFILE_H__
 #define __COREFILE_H__
 
-#include <stdarg.h>
 #include "corestr.h"
 #include "coretmpl.h"
+#include "strformat.h"
 
 #include <cstdint>
 #include <memory>
@@ -114,8 +114,11 @@ public:
 	virtual int puts(const char *s) = 0;
 
 	// printf-style text write to a file
-	virtual int vprintf(const char *fmt, va_list va) = 0;
-	int CLIB_DECL printf(const char *fmt, ...) ATTR_PRINTF(2,3);
+	virtual int vprintf(util::format_argument_pack<std::ostream> const &args) = 0;
+	template <typename Format, typename... Params> int printf(Format &&fmt, Params &&...args)
+	{
+		return vprintf(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
 
 	// file truncation
 	virtual file_error truncate(std::uint64_t offset) = 0;

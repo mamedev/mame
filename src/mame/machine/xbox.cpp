@@ -185,7 +185,7 @@ static void dump_timer_command(running_machine &machine, int ref, int params, co
 	debug_console_printf(machine, "Header.Inserted %d byte\n", space.read_byte(address + 3));
 	debug_console_printf(machine, "Header.SignalState %08X dword\n", space.read_dword_unaligned(address + 4));
 	debug_console_printf(machine, "Header.WaitListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 8), space.read_dword_unaligned(address + 12));
-	debug_console_printf(machine, "DueTime %" I64FMT "x qword\n", (INT64)space.read_qword_unaligned(address + 16));
+	debug_console_printf(machine, "%s", string_format("DueTime %I64x qword\n", (INT64)space.read_qword_unaligned(address + 16)).c_str());
 	debug_console_printf(machine, "TimerListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 24), space.read_dword_unaligned(address + 28));
 	debug_console_printf(machine, "Dpc %08X dword\n", space.read_dword_unaligned(address + 32));
 	debug_console_printf(machine, "Period %d dword\n", space.read_dword_unaligned(address + 36));
@@ -846,13 +846,19 @@ ohci_function_device::ohci_function_device(running_machine &machine)
 	descriptors_pos = 0;
 	address = 0;
 	newaddress = 0;
-	controldirection = 0;
-	controltype = 0;
-	controlrecipient = 0;
-	configurationvalue = 0;
-	remain = 0;
-	position = nullptr;
+	for (int e = 0; e < 256;e++) {
+		endpoints[e].type = -1;
+		endpoints[e].controldirection = 0;
+		endpoints[e].controltype = 0;
+		endpoints[e].controlrecipient = 0;
+		endpoints[e].remain = 0;
+		endpoints[e].position = nullptr;
+	}
+	endpoints[0].type = ControlEndpoint;
 	settingaddress = false;
+	configurationvalue = 0;
+	latest_configuration = nullptr;
+	latest_alternate = nullptr;
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
 	add_interface_descriptor(intdesc);
@@ -862,26 +868,175 @@ ohci_function_device::ohci_function_device(running_machine &machine)
 
 void ohci_function_device::add_device_descriptor(USBStandardDeviceDescriptor &descriptor)
 {
-	memcpy(descriptors + descriptors_pos, &descriptor, sizeof(descriptor));
+	UINT8 *p = descriptors + descriptors_pos;
+
+	p[0] = descriptor.bLength;
+	p[1] = descriptor.bDescriptorType;
+	p[2] = descriptor.bcdUSB & 255;
+	p[3] = descriptor.bcdUSB >> 8;
+	p[4] = descriptor.bDeviceClass;
+	p[5] = descriptor.bDeviceSubClass;
+	p[6] = descriptor.bDeviceProtocol;
+	p[7] = descriptor.bMaxPacketSize0;
+	p[8] = descriptor.idVendor & 255;
+	p[9] = descriptor.idVendor >> 8;
+	p[10] = descriptor.idProduct & 255;
+	p[11] = descriptor.idProduct >> 8;
+	p[12] = descriptor.bcdDevice & 255;
+	p[13] = descriptor.bcdDevice >> 8;
+	p[14] = descriptor.iManufacturer;
+	p[15] = descriptor.iProduct;
+	p[16] = descriptor.iSerialNumber;
+	p[17] = descriptor.bNumConfigurations;
 	descriptors_pos += descriptor.bLength;
+	memcpy(&device_descriptor, &descriptor, sizeof(USBStandardDeviceDescriptor));
 }
 
 void ohci_function_device::add_configuration_descriptor(USBStandardConfigurationDescriptor &descriptor)
 {
-	memcpy(descriptors + descriptors_pos, &descriptor, sizeof(descriptor));
+	usb_device_configuration *c = new usb_device_configuration;
+	UINT8 *p = descriptors + descriptors_pos;
+
+	p[0] = descriptor.bLength;
+	p[1] = descriptor.bDescriptorType;
+	p[2] = descriptor.wTotalLength & 255;
+	p[3] = descriptor.wTotalLength >> 8;
+	p[4] = descriptor.bNumInterfaces;
+	p[5] = descriptor.bConfigurationValue;
+	p[6] = descriptor.iConfiguration;
+	p[7] = descriptor.bmAttributes;
+	p[8] = descriptor.MaxPower;
 	descriptors_pos += descriptor.bLength;
+	memcpy(&c->configuration_descriptor, &descriptor, sizeof(USBStandardConfigurationDescriptor));
+	configurations.push_front(*c);
+	latest_configuration = c;
+	latest_alternate = nullptr;
 }
 
 void ohci_function_device::add_interface_descriptor(USBStandardInterfaceDescriptor &descriptor)
 {
-	memcpy(descriptors + descriptors_pos, &descriptor, sizeof(descriptor));
+	usb_device_interface *ii;
+	usb_device_interface_alternate *aa;
+	UINT8 *p = descriptors + descriptors_pos;
+
+	if (latest_configuration == nullptr)
+		return;
+	p[0] = descriptor.bLength;
+	p[1] = descriptor.bDescriptorType;
+	p[2] = descriptor.bInterfaceNumber;
+	p[3] = descriptor.bAlternateSetting;
+	p[4] = descriptor.bNumEndpoints;
+	p[5] = descriptor.bInterfaceClass;
+	p[6] = descriptor.bInterfaceSubClass;
+	p[7] = descriptor.bInterfaceProtocol;
+	p[8] = descriptor.iInterface;
 	descriptors_pos += descriptor.bLength;
+	for (auto i = latest_configuration->interfaces.begin(); i != latest_configuration->interfaces.end(); ++i)
+	{
+		if (i->alternate_settings.front().interface_descriptor.bInterfaceNumber == descriptor.bInterfaceNumber)
+		{
+			aa = new usb_device_interface_alternate;
+			memcpy(&aa->interface_descriptor, &descriptor, sizeof(USBStandardInterfaceDescriptor));
+			i->alternate_settings.push_front(*aa);
+			latest_alternate = aa;
+			return;
+		}
+	}
+	ii = new usb_device_interface;
+	aa = new usb_device_interface_alternate;
+	memcpy(&aa->interface_descriptor, &descriptor, sizeof(USBStandardInterfaceDescriptor));
+	ii->selected_alternate = -1;
+	ii->alternate_settings.push_front(*aa);
+	latest_alternate = aa;
+	latest_configuration->interfaces.push_front(*ii);
 }
 
 void ohci_function_device::add_endpoint_descriptor(USBStandardEndpointDescriptor &descriptor)
 {
-	memcpy(descriptors + descriptors_pos, &descriptor, sizeof(descriptor));
+	UINT8 *p = descriptors + descriptors_pos;
+
+	if (latest_alternate == nullptr)
+		return;
+	p[0] = descriptor.bLength;
+	p[1] = descriptor.bDescriptorType;
+	p[2] = descriptor.bEndpointAddress;
+	p[3] = descriptor.bmAttributes;
+	p[4] = descriptor.wMaxPacketSize & 255;
+	p[5] = descriptor.wMaxPacketSize >> 8;
+	p[6] = descriptor.bInterval;
 	descriptors_pos += descriptor.bLength;
+	latest_alternate->endpoint_descriptors.push_front(descriptor);
+}
+
+void ohci_function_device::select_configuration(int index)
+{
+	configurationvalue = index;
+	for (auto c = configurations.begin(); c != configurations.end(); ++c)
+	{
+		if (c->configuration_descriptor.bConfigurationValue == index)
+		{
+			selected_configuration = &(*c);
+			for (auto i = c->interfaces.begin(); i != c->interfaces.end(); ++i)
+			{
+				i->selected_alternate = 0;
+				for (auto a = i->alternate_settings.begin(); a != i->alternate_settings.end(); ++a)
+				{
+					if (a->interface_descriptor.bAlternateSetting == 0)
+					{
+						for (auto e = a->endpoint_descriptors.begin(); e != a->endpoint_descriptors.end(); ++e)
+						{
+							endpoints[e->bEndpointAddress].type = e->bmAttributes & 3;
+							endpoints[e->bEndpointAddress].remain = 0;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void ohci_function_device::select_alternate(int interfacei, int index)
+{
+	for (auto i = selected_configuration->interfaces.begin(); i != selected_configuration->interfaces.end(); ++i)
+	{
+		for (auto a = i->alternate_settings.begin(); a != i->alternate_settings.end(); ++a)
+		{
+			if ((a->interface_descriptor.bInterfaceNumber == interfacei) && (a->interface_descriptor.bAlternateSetting == i->selected_alternate))
+			{
+				for (auto e = a->endpoint_descriptors.begin(); e != a->endpoint_descriptors.end(); ++e)
+				{
+					endpoints[e->bEndpointAddress].type = -1;
+				}
+			}
+		}
+		for (auto a = i->alternate_settings.begin(); a != i->alternate_settings.end(); ++a)
+		{
+			if ((a->interface_descriptor.bInterfaceNumber == interfacei) && (a->interface_descriptor.bAlternateSetting == index))
+			{
+				i->selected_alternate = index;
+				for (auto e = a->endpoint_descriptors.begin(); e != a->endpoint_descriptors.end(); ++e)
+				{
+					endpoints[e->bEndpointAddress].type = e->bmAttributes & 3;
+					endpoints[e->bEndpointAddress].remain = 0;
+				}
+			}
+		}
+	}
+}
+
+int ohci_function_device::find_alternate(int interfacei)
+{
+	for (auto i = selected_configuration->interfaces.begin(); i != selected_configuration->interfaces.end(); ++i)
+	{
+		for (auto a = i->alternate_settings.begin(); a != i->alternate_settings.end(); ++a)
+		{
+			if (a->interface_descriptor.bInterfaceNumber == interfacei)
+			{
+				return i->selected_alternate;
+			}
+		}
+	}
+	return 0;
 }
 
 void ohci_function_device::execute_reset()
@@ -894,25 +1049,30 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 {
 	int descriptortype;// descriptorindex;
 
-	if (endpoint == 0) {
-		if (pid == SetupPid) {
-			USBSetupPacket *p=(USBSetupPacket *)buffer;
-			// define direction 0:host->device 1:device->host
-			controldirection = (p->bmRequestType & 128) >> 7;
-			// case ==1, IN data stage and OUT status stage
-			// case ==0, OUT data stage and IN status stage
-			// data stage is optional, IN status stage
-			controltype = (p->bmRequestType & 0x60) >> 5;
-			controlrecipient = p->bmRequestType & 0x1f;
-			position = nullptr;
+	if (pid == SetupPid) {
+		USBSetupPacket *p=(USBSetupPacket *)buffer;
+		// define direction 0:host->device 1:device->host
+		// case == 1, IN data stage and OUT status stage
+		// case == 0, OUT data stage and IN status stage
+		// data stage is optional, IN status stage
+		endpoints[endpoint].controldirection = (p->bmRequestType & 128) >> 7;
+		endpoints[endpoint].controltype = (p->bmRequestType & 0x60) >> 5;
+		endpoints[endpoint].controlrecipient = p->bmRequestType & 0x1f;
+		if (endpoint == 0) {
+			endpoints[endpoint].position = nullptr;
 			// number of byte to transfer in data stage (0 no data stage)
-			remain = p->wLength;
+			endpoints[endpoint].remain = p->wLength;
 			// if standard device request
-			if ((controltype == StandardType) && (controlrecipient == DeviceRecipient)) {
+			if ((endpoints[endpoint].controltype == StandardType) && (endpoints[endpoint].controlrecipient == DeviceRecipient)) {
 				switch (p->bRequest) {
 				case GET_STATUS:
+					return handle_get_status_request(endpoint, p);
+					break;
 				case CLEAR_FEATURE:
+					return handle_clear_feature_request(endpoint, p);
+					break;
 				case SET_FEATURE:
+					return handle_set_feature_request(endpoint, p);
 					break;
 				case SET_ADDRESS:
 					newaddress = p->wValue;
@@ -922,52 +1082,74 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 					descriptortype = p->wValue >> 8;
 					//descriptorindex = p->wValue & 255;
 					if (descriptortype == DEVICE) { // device descriptor
-						position = descriptors;
-						remain = descriptors[0];
+						endpoints[endpoint].position = descriptors;
+						endpoints[endpoint].remain = descriptors[0];
 					}
 					else if (descriptortype == CONFIGURATION) { // configuration descriptor
-						position = descriptors + 18;
-						remain = descriptors[18+2];
+						endpoints[endpoint].position = descriptors + 18;
+						endpoints[endpoint].remain = descriptors[18 + 2];
 					}
 					else if (descriptortype == INTERFACE) { // interface descriptor
-						position = descriptors + 18 + 9;
-						remain = descriptors[18 + 9];
+						endpoints[endpoint].position = descriptors + 18 + 9;
+						endpoints[endpoint].remain = descriptors[18 + 9];
 					}
 					else if (descriptortype == ENDPOINT) { // endpoint descriptor
-						position = descriptors + 18 + 9 + 9;
-						remain = descriptors[18 + 9 + 9];
+						endpoints[endpoint].position = descriptors + 18 + 9 + 9;
+						endpoints[endpoint].remain = descriptors[18 + 9 + 9];
 					}
 					else
-						remain = 0;
-					if (remain > p->wLength)
-						remain = p->wLength;
+						endpoints[endpoint].remain = 0;
+					if (endpoints[endpoint].remain > p->wLength)
+						endpoints[endpoint].remain = p->wLength;
 					break;
 				case SET_CONFIGURATION:
 					if (p->wValue == 0)
 						state = AddressState;
 					else {
-						configurationvalue = p->wValue;
+						select_configuration(p->wValue);
 						state = ConfiguredState;
 					}
 					break;
-				case SET_DESCRIPTOR:
-				case GET_CONFIGURATION:
-				case GET_INTERFACE:
 				case SET_INTERFACE:
+					select_alternate(p->wIndex, p->wValue);
+					break;
+				case SET_DESCRIPTOR:
+					return handle_set_descriptor_request(endpoint, p);
+					break;
+				case GET_CONFIGURATION:
+					endpoints[endpoint].buffer[0] = (UINT8)configurationvalue;
+					endpoints[endpoint].position = endpoints[endpoint].buffer;
+					endpoints[endpoint].remain = 1;
+					if (p->wLength == 0)
+						endpoints[endpoint].remain = 0;
+					break;
+				case GET_INTERFACE:
+					endpoints[endpoint].buffer[0] = (UINT8)find_alternate(p->wIndex);
+					endpoints[endpoint].position = endpoints[endpoint].buffer;
+					endpoints[endpoint].remain = 1;
+					if (p->wLength == 0)
+						endpoints[endpoint].remain = 0;
+					break;
 				case SYNCH_FRAME:
+					return handle_synch_frame_request(endpoint, p);
 				default:
+					return handle_nonstandard_request(endpoint, p);
 					break;
 				}
 			}
 			else
-				return handle_nonstandard_request(p);
+				return handle_nonstandard_request(endpoint, p);
 			size = 0;
 		}
-		else if (pid == InPid) {
+		else
+			return handle_nonstandard_request(endpoint, p);
+	}
+	else if (pid == InPid) {
+		if (endpoint == 0) {
 			// if no data has been transferred (except for the setup stage)
 			// and the lenght of this IN transaction is 0
 			// assume this is the status stage
-			if ((size == 0) && (remain == 0)) {
+			if ((size == 0) && (endpoints[endpoint].remain == 0)) {
 				if (settingaddress == true)
 				{
 					// set of address is active at end of status stage
@@ -980,53 +1162,58 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 			// case ==1, give data
 			// case ==0, nothing
 			// if device->host
-			if (controldirection == 1) {
+			if (endpoints[endpoint].controldirection == DeviceToHost) {
 				// data stage
-				if (size > remain)
-					size = remain;
-				if (position != nullptr)
-					memcpy(buffer, position, size);
-				position = position + size;
-				remain = remain - size;
+				if (size > endpoints[endpoint].remain)
+					size = endpoints[endpoint].remain;
+				if (endpoints[endpoint].position != nullptr)
+					memcpy(buffer, endpoints[endpoint].position, size);
+				endpoints[endpoint].position = endpoints[endpoint].position + size;
+				endpoints[endpoint].remain = endpoints[endpoint].remain - size;
 			}
 		}
-		else if (pid == OutPid) {
+		else
+			return -1;
+	}
+	else if (pid == OutPid) {
+		if (endpoint == 0) {
 			// case ==1, nothing
 			// case ==0, give data
 			// if host->device
-			if (controldirection == 0) {
+			if (endpoints[endpoint].controldirection == HostToDevice) {
 				// data stage
-				if (size > remain)
-					size = remain;
-				if (position != nullptr)
-					memcpy(position, buffer, size);
-				position = position + size;
-				remain = remain - size;
+				if (size > endpoints[endpoint].remain)
+					size = endpoints[endpoint].remain;
+				if (endpoints[endpoint].position != nullptr)
+					memcpy(endpoints[endpoint].position, buffer, size);
+				endpoints[endpoint].position = endpoints[endpoint].position + size;
+				endpoints[endpoint].remain = endpoints[endpoint].remain - size;
 			}
 		}
+		else
+			return -1;
 	}
-	else
-		return -1;
 	return size;
 }
 
-int ohci_function_device::handle_nonstandard_request(USBSetupPacket *setup)
+int ohci_function_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
 	//                              >=8  ==42  !=0  !=0  1,3       2<20 <=20
 	static UINT8 mytestdata[16] = { 0x10,0x42 ,0x32,0x43,1   ,0x65,0x18,0x20,0x98,0xa9,0xba,0xcb,0xdc,0xed,0xfe };
 
-	if ((controltype == VendorType) && (controlrecipient == InterfaceRecipient))
+	if ((endpoints[endpoint].controltype == VendorType) && (endpoints[endpoint].controlrecipient == InterfaceRecipient))
 	{
 		if (setup->bRequest == GET_DESCRIPTOR)
 		{
 			if (setup->wValue == 0x4200)
 			{
-				position = mytestdata;
-				remain = 16;
+				endpoints[endpoint].position = mytestdata;
+				endpoints[endpoint].remain = 16;
+				return 0;
 			}
 		}
 	}
-	return 0;
+	return -1;
 }
 
 void xbox_base_state::usb_ohci_interrupts()
@@ -1232,8 +1419,8 @@ WRITE32_MEMBER(xbox_base_state::audio_apu_w)
 		return;
 	}
 	if (offset == 0x2037c / 4) { // value related to sample rate
-		INT16 v = (INT16)(data >> 16); // upper 16 bits as a signed 16 bit value
-		float vv = ((float)v) / 4096.0f; // divide by 4096
+		INT16 v0 = (INT16)(data >> 16); // upper 16 bits as a signed 16 bit value
+		float vv = ((float)v0) / 4096.0f; // divide by 4096
 		float vvv = powf(2, vv); // two to the vv
 		int f = vvv*48000.0f; // sample rate
 		apust.voices_frequency[apust.voice_number] = f;

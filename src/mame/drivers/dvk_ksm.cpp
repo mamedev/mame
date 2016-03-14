@@ -338,7 +338,7 @@ static MACHINE_CONFIG_START( ksm, ksm_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", ksm_state, scanline_callback, attotime::from_hz(50*28*11))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_15_4MHz/KSM_HORZ_START))
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_UPDATE_DRIVER(ksm_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_15_4MHz, KSM_TOTAL_HORZ, KSM_HORZ_START,
 		KSM_HORZ_START+KSM_DISP_HORZ, KSM_TOTAL_VERT, KSM_VERT_START,
@@ -347,7 +347,7 @@ static MACHINE_CONFIG_START( ksm, ksm_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ksm)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 

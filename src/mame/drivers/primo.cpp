@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( primoa32, primo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(primo_state, screen_update_primo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -8,17 +8,17 @@
 <mamelayout version="2">
 	<element name="backdrop_colour">
 		<rect>
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
 	<element name="lamp_98_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.06">
 			</color>
 		</rect>
 	</element>
@@ -28,7 +28,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<text string="CL">
@@ -40,11 +40,11 @@
 	</element>
 	<element name="lamp_54_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -54,7 +54,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<text string="%">
@@ -66,11 +66,11 @@
 	</element>
 	<element name="lamp_76_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.06">
 			</color>
 		</rect>
 	</element>
@@ -80,7 +80,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<text string="HI">
@@ -92,11 +92,11 @@
 	</element>
 	<element name="lamp_88_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.06">
 			</color>
 		</rect>
 	</element>
@@ -106,7 +106,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<text string="LO">
@@ -118,11 +118,11 @@
 	</element>
 	<element name="lamp_251_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.38" green="0.38" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.09" green="0.09" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -132,7 +132,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.19" green="0.19" blue="0.19">
 			</color>
 		</rect>
 		<text string="L">
@@ -162,11 +162,11 @@
 	</element>
 	<element name="lamp_70_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -176,7 +176,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="FRA">
@@ -188,11 +188,11 @@
 	</element>
 	<element name="lamp_71_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -202,7 +202,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="NKIE">
@@ -214,11 +214,11 @@
 	</element>
 	<element name="lamp_72_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -228,7 +228,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="DETT">
@@ -240,11 +240,11 @@
 	</element>
 	<element name="lamp_73_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -254,7 +254,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="ORI'S">
@@ -266,11 +266,11 @@
 	</element>
 	<element name="lamp_74_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -280,7 +280,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="7TH">
@@ -292,11 +292,11 @@
 	</element>
 	<element name="lamp_75_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -306,7 +306,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="HEAVEN">
@@ -318,11 +318,11 @@
 	</element>
 	<element name="lamp_208_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -332,7 +332,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.19">
 			</color>
 		</rect>
 		<text string="1">
@@ -350,11 +350,11 @@
 	</element>
 	<element name="lamp_209_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -364,7 +364,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.19">
 			</color>
 		</rect>
 		<text string="2">
@@ -382,11 +382,11 @@
 	</element>
 	<element name="lamp_210_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -396,7 +396,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.19">
 			</color>
 		</rect>
 		<text string="3">
@@ -414,11 +414,11 @@
 	</element>
 	<element name="lamp_211_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -428,7 +428,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.19">
 			</color>
 		</rect>
 		<text string="4">
@@ -446,11 +446,11 @@
 	</element>
 	<element name="lamp_212_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -460,7 +460,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.19">
 			</color>
 		</rect>
 		<text string="5">
@@ -478,11 +478,11 @@
 	</element>
 	<element name="lamp_213_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -492,7 +492,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.19">
 			</color>
 		</rect>
 		<text string="6">
@@ -510,11 +510,11 @@
 	</element>
 	<element name="lamp_214_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -524,7 +524,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.19">
 			</color>
 		</rect>
 		<text string="7">
@@ -542,11 +542,11 @@
 	</element>
 	<element name="lamp_215_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -556,7 +556,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.19">
 			</color>
 		</rect>
 		<text string="8">
@@ -574,11 +574,11 @@
 	</element>
 	<element name="lamp_216_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -588,7 +588,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.19">
 			</color>
 		</rect>
 		<text string="9">
@@ -606,11 +606,11 @@
 	</element>
 	<element name="lamp_217_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.13" green="0.25" blue="0.25">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.03" green="0.06" blue="0.06">
 			</color>
 		</rect>
 	</element>
@@ -620,7 +620,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.06" green="0.13" blue="0.13">
 			</color>
 		</rect>
 		<text string="JACK">
@@ -638,11 +638,11 @@
 	</element>
 	<element name="lamp_201_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.13" green="0.25" blue="0.25">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.03" green="0.06" blue="0.06">
 			</color>
 		</rect>
 	</element>
@@ -652,7 +652,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.06" green="0.13" blue="0.13">
 			</color>
 		</rect>
 		<text string="JACK">
@@ -670,11 +670,11 @@
 	</element>
 	<element name="lamp_200_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -684,7 +684,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="9">
@@ -702,11 +702,11 @@
 	</element>
 	<element name="lamp_199_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -716,7 +716,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="8">
@@ -734,11 +734,11 @@
 	</element>
 	<element name="lamp_198_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -748,7 +748,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="7">
@@ -766,11 +766,11 @@
 	</element>
 	<element name="lamp_197_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -780,7 +780,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="6">
@@ -798,11 +798,11 @@
 	</element>
 	<element name="lamp_196_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -812,7 +812,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="5">
@@ -830,11 +830,11 @@
 	</element>
 	<element name="lamp_195_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -844,7 +844,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="4">
@@ -862,11 +862,11 @@
 	</element>
 	<element name="lamp_194_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -876,7 +876,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="3">
@@ -894,11 +894,11 @@
 	</element>
 	<element name="lamp_193_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -908,7 +908,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="2">
@@ -926,11 +926,11 @@
 	</element>
 	<element name="lamp_192_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -940,7 +940,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="1">
@@ -958,11 +958,11 @@
 	</element>
 	<element name="lamp_176_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -972,7 +972,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="$1">
@@ -984,11 +984,11 @@
 	</element>
 	<element name="lamp_177_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -998,7 +998,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="$1.60">
@@ -1010,11 +1010,11 @@
 	</element>
 	<element name="lamp_178_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1024,7 +1024,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="$2">
@@ -1036,11 +1036,11 @@
 	</element>
 	<element name="lamp_179_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1050,7 +1050,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="$2.40">
@@ -1062,11 +1062,11 @@
 	</element>
 	<element name="lamp_180_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1076,7 +1076,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="$3">
@@ -1088,11 +1088,11 @@
 	</element>
 	<element name="lamp_181_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1102,7 +1102,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="$4">
@@ -1114,11 +1114,11 @@
 	</element>
 	<element name="lamp_182_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1128,7 +1128,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="$5">
@@ -1140,11 +1140,11 @@
 	</element>
 	<element name="lamp_183_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1154,7 +1154,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="$6">
@@ -1166,11 +1166,11 @@
 	</element>
 	<element name="lamp_184_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1180,7 +1180,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="$8">
@@ -1192,11 +1192,11 @@
 	</element>
 	<element name="lamp_185_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.13" green="0.25" blue="0.25">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.03" green="0.06" blue="0.06">
 			</color>
 		</rect>
 	</element>
@@ -1206,7 +1206,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.06" green="0.13" blue="0.13">
 			</color>
 		</rect>
 		<text string="JACK">
@@ -1224,11 +1224,11 @@
 	</element>
 	<element name="lamp_160_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1238,7 +1238,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="LUCKY">
@@ -1256,11 +1256,11 @@
 	</element>
 	<element name="lamp_161_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1270,7 +1270,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="ROUND">
@@ -1288,11 +1288,11 @@
 	</element>
 	<element name="lamp_162_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1302,7 +1302,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="ACCUM-">
@@ -1320,11 +1320,11 @@
 	</element>
 	<element name="lamp_163_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1334,7 +1334,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="ON THE">
@@ -1352,11 +1352,11 @@
 	</element>
 	<element name="lamp_164_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1366,7 +1366,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="REEL">
@@ -1384,11 +1384,11 @@
 	</element>
 	<element name="lamp_165_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1398,7 +1398,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="TIC TAC">
@@ -1416,11 +1416,11 @@
 	</element>
 	<element name="lamp_166_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1430,7 +1430,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="MAGIC">
@@ -1448,11 +1448,11 @@
 	</element>
 	<element name="lamp_167_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1462,7 +1462,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="OVER THE">
@@ -1480,11 +1480,11 @@
 	</element>
 	<element name="lamp_168_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1494,7 +1494,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="WIN">
@@ -1512,11 +1512,11 @@
 	</element>
 	<element name="lamp_169_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.13" green="0.25" blue="0.25">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.03" green="0.06" blue="0.06">
 			</color>
 		</rect>
 	</element>
@@ -1526,7 +1526,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.06" green="0.13" blue="0.13">
 			</color>
 		</rect>
 		<text string="JACK">
@@ -1544,11 +1544,11 @@
 	</element>
 	<element name="lamp_107_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -1558,7 +1558,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.19">
 			</color>
 		</rect>
 		<text string="1">
@@ -1570,11 +1570,11 @@
 	</element>
 	<element name="lamp_106_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1584,7 +1584,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="LUCKY">
@@ -1596,11 +1596,11 @@
 	</element>
 	<element name="lamp_105_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1610,7 +1610,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="2">
@@ -1622,11 +1622,11 @@
 	</element>
 	<element name="lamp_104_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1636,7 +1636,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="1">
@@ -1648,11 +1648,11 @@
 	</element>
 	<element name="lamp_103_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -1662,7 +1662,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.06">
 			</color>
 		</rect>
 		<text string="LOSE">
@@ -1674,11 +1674,11 @@
 	</element>
 	<element name="lamp_225_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.50" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.12" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -1688,7 +1688,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.25" blue="0.25">
 			</color>
 		</rect>
 		<text string="EXTRA">
@@ -1706,11 +1706,11 @@
 	</element>
 	<element name="lamp_224_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1720,7 +1720,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="1">
@@ -1732,11 +1732,11 @@
 	</element>
 	<element name="lamp_220_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1746,7 +1746,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="LUCKY">
@@ -1758,11 +1758,11 @@
 	</element>
 	<element name="lamp_219_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1772,7 +1772,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="1">
@@ -1784,11 +1784,11 @@
 	</element>
 	<element name="lamp_204_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.06">
 			</color>
 		</rect>
 	</element>
@@ -1798,7 +1798,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<text string="STEW">
@@ -1816,11 +1816,11 @@
 	</element>
 	<element name="lamp_203_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -1830,7 +1830,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.19">
 			</color>
 		</rect>
 		<text string="2">
@@ -1842,11 +1842,11 @@
 	</element>
 	<element name="lamp_188_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1856,7 +1856,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="1">
@@ -1868,11 +1868,11 @@
 	</element>
 	<element name="lamp_187_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1882,7 +1882,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="1">
@@ -1894,11 +1894,11 @@
 	</element>
 	<element name="lamp_172_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -1908,7 +1908,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.19">
 			</color>
 		</rect>
 		<text string="1">
@@ -1920,11 +1920,11 @@
 	</element>
 	<element name="lamp_171_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1934,7 +1934,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="1">
@@ -1946,11 +1946,11 @@
 	</element>
 	<element name="lamp_90_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1960,7 +1960,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="CRAZY">
@@ -1978,11 +1978,11 @@
 	</element>
 	<element name="lamp_89_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -1992,7 +1992,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="1">
@@ -2004,11 +2004,11 @@
 	</element>
 	<element name="lamp_108_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.06">
 			</color>
 		</rect>
 	</element>
@@ -2018,7 +2018,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<text string="STEW">
@@ -2036,11 +2036,11 @@
 	</element>
 	<element name="lamp_97_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -2050,7 +2050,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="2">
@@ -2062,11 +2062,11 @@
 	</element>
 	<element name="lamp_96_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -2076,7 +2076,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="1">
@@ -2088,11 +2088,11 @@
 	</element>
 	<element name="lamp_99_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -2102,7 +2102,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.19">
 			</color>
 		</rect>
 		<text string="1">
@@ -2114,11 +2114,11 @@
 	</element>
 	<element name="lamp_100_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.06">
 			</color>
 		</rect>
 	</element>
@@ -2128,7 +2128,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<text string="STEW">
@@ -2146,11 +2146,11 @@
 	</element>
 	<element name="lamp_101_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.50" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.12" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -2160,7 +2160,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.25" blue="0.25">
 			</color>
 		</rect>
 		<text string="EXTRA">
@@ -2178,11 +2178,11 @@
 	</element>
 	<element name="lamp_102_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -2192,7 +2192,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="1">
@@ -2204,11 +2204,11 @@
 	</element>
 	<element name="lamp_144_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -2218,7 +2218,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="CRAZY">
@@ -2236,11 +2236,11 @@
 	</element>
 	<element name="lamp_151_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.50" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.12" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -2250,7 +2250,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.25" blue="0.25">
 			</color>
 		</rect>
 		<text string="EXTRA">
@@ -2268,11 +2268,11 @@
 	</element>
 	<element name="lamp_150_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -2282,7 +2282,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="1">
@@ -2294,11 +2294,11 @@
 	</element>
 	<element name="lamp_149_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -2308,7 +2308,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="LUCKY">
@@ -2320,11 +2320,11 @@
 	</element>
 	<element name="lamp_148_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -2334,7 +2334,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="1">
@@ -2346,11 +2346,11 @@
 	</element>
 	<element name="lamp_147_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -2360,7 +2360,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="LOSE">
@@ -2372,11 +2372,11 @@
 	</element>
 	<element name="lamp_146_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.06">
 			</color>
 		</rect>
 	</element>
@@ -2386,7 +2386,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<text string="STEW">
@@ -2404,11 +2404,11 @@
 	</element>
 	<element name="lamp_145_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -2418,7 +2418,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="2">
@@ -2430,11 +2430,11 @@
 	</element>
 	<element name="lamp_226_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -2444,7 +2444,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.25">
 			</color>
 		</rect>
 		<text string="HELD">
@@ -2456,11 +2456,11 @@
 	</element>
 	<element name="lamp_250_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.25" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.06" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -2470,7 +2470,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.13" blue="0.06">
 			</color>
 		</rect>
 		<text string="8">
@@ -2482,11 +2482,11 @@
 	</element>
 	<element name="lamp_249_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.25" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.06" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -2496,7 +2496,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.13" blue="0.06">
 			</color>
 		</rect>
 		<text string="7">
@@ -2508,11 +2508,11 @@
 	</element>
 	<element name="lamp_248_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.25" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.06" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -2522,7 +2522,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.13" blue="0.06">
 			</color>
 		</rect>
 		<text string="6">
@@ -2534,11 +2534,11 @@
 	</element>
 	<element name="lamp_247_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.25" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.06" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -2548,7 +2548,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.13" blue="0.06">
 			</color>
 		</rect>
 		<text string="5">
@@ -2560,11 +2560,11 @@
 	</element>
 	<element name="lamp_245_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.25" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.06" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -2574,7 +2574,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.13" blue="0.06">
 			</color>
 		</rect>
 		<text string="3">
@@ -2586,11 +2586,11 @@
 	</element>
 	<element name="lamp_246_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.25" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.06" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -2600,7 +2600,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.13" blue="0.06">
 			</color>
 		</rect>
 		<text string="BONUS">
@@ -2612,11 +2612,11 @@
 	</element>
 	<element name="lamp_244_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.25" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.06" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -2626,7 +2626,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.13" blue="0.06">
 			</color>
 		</rect>
 		<text string="2">
@@ -2638,11 +2638,11 @@
 	</element>
 	<element name="lamp_243_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.25" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.06" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -2652,7 +2652,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.13" blue="0.06">
 			</color>
 		</rect>
 		<text string="1">
@@ -2664,11 +2664,11 @@
 	</element>
 	<element name="lamp_60_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -2678,7 +2678,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="1">
@@ -2696,11 +2696,11 @@
 	</element>
 	<element name="lamp_38_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -2710,7 +2710,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="2">
@@ -2728,11 +2728,11 @@
 	</element>
 	<element name="lamp_59_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.38" green="0.38" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.09" green="0.09" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -2742,7 +2742,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.19" green="0.19" blue="0.19">
 			</color>
 		</rect>
 		<text string="L">
@@ -2772,11 +2772,11 @@
 	</element>
 	<element name="lamp_34_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -2786,7 +2786,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="6">
@@ -2804,11 +2804,11 @@
 	</element>
 	<element name="lamp_35_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -2818,7 +2818,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="5">
@@ -2836,11 +2836,11 @@
 	</element>
 	<element name="lamp_36_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -2850,7 +2850,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="4">
@@ -2868,11 +2868,11 @@
 	</element>
 	<element name="lamp_37_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -2882,7 +2882,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="3">
@@ -2900,11 +2900,11 @@
 	</element>
 	<element name="lamp_9_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.00" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.00" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -2914,7 +2914,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<text string="WIN">
@@ -2932,11 +2932,11 @@
 	</element>
 	<element name="lamp_10_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.00" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.00" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -2946,7 +2946,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<text string="WIN">
@@ -2964,11 +2964,11 @@
 	</element>
 	<element name="lamp_11_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.00" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.00" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -2978,7 +2978,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<text string="WIN">
@@ -2996,11 +2996,11 @@
 	</element>
 	<element name="lamp_12_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.00" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.00" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -3010,7 +3010,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<text string="WIN">
@@ -3028,11 +3028,11 @@
 	</element>
 	<element name="lamp_55_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.00" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.00" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -3042,7 +3042,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<text string="WIN">
@@ -3060,11 +3060,11 @@
 	</element>
 	<element name="lamp_8_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.00" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.00" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -3074,7 +3074,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<text string="WIN">
@@ -3092,11 +3092,11 @@
 	</element>
 	<element name="lamp_236_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -3106,7 +3106,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="LUCKY">
@@ -3118,11 +3118,11 @@
 	</element>
 	<element name="lamp_152_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.50" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.12" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -3132,7 +3132,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.25" blue="0.25">
 			</color>
 		</rect>
 		<text string="CRACK">
@@ -3150,11 +3150,11 @@
 	</element>
 	<element name="lamp_153_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -3164,7 +3164,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="HEDGE">
@@ -3182,11 +3182,11 @@
 	</element>
 	<element name="lamp_154_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -3196,7 +3196,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="RUN">
@@ -3214,11 +3214,11 @@
 	</element>
 	<element name="lamp_155_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.25" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.06" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -3228,7 +3228,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.13" blue="0.25">
 			</color>
 		</rect>
 		<text string="UP THE">
@@ -3246,11 +3246,11 @@
 	</element>
 	<element name="lamp_156_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.00" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.00" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -3260,7 +3260,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<text string="ALTER">
@@ -3278,11 +3278,11 @@
 	</element>
 	<element name="lamp_92_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.50" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.12" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -3292,7 +3292,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.25" blue="0.25">
 			</color>
 		</rect>
 		<text string="WHIP">
@@ -3304,11 +3304,11 @@
 	</element>
 	<element name="lamp_91_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -3318,7 +3318,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="EXCESS">
@@ -3336,11 +3336,11 @@
 	</element>
 	<element name="lamp_228_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -3350,7 +3350,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="EXTRA">
@@ -3368,11 +3368,11 @@
 	</element>
 	<element name="lamp_229_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.25" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.06" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -3382,7 +3382,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.13" blue="0.06">
 			</color>
 		</rect>
 		<text string="ODDS">
@@ -3400,11 +3400,11 @@
 	</element>
 	<element name="lamp_230_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -3414,7 +3414,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="WALK">
@@ -3432,11 +3432,11 @@
 	</element>
 	<element name="lamp_231_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.50" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.12" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -3446,7 +3446,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.25" blue="0.25">
 			</color>
 		</rect>
 		<text string="DISQU-">
@@ -3464,11 +3464,11 @@
 	</element>
 	<element name="lamp_232_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -3478,7 +3478,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="RANDOM">
@@ -3496,11 +3496,11 @@
 	</element>
 	<element name="lamp_233_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.25" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.06" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -3510,7 +3510,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.13" blue="0.06">
 			</color>
 		</rect>
 		<text string="COLLECT">
@@ -3528,11 +3528,11 @@
 	</element>
 	<element name="lamp_234_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -3542,7 +3542,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="PLACE">
@@ -3560,11 +3560,11 @@
 	</element>
 	<element name="lamp_235_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.50" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.12" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -3574,7 +3574,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.25" blue="0.25">
 			</color>
 		</rect>
 		<text string="RACE">
@@ -3592,11 +3592,11 @@
 	</element>
 	<element name="lamp_227_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.06">
 			</color>
 		</rect>
 	</element>
@@ -3606,7 +3606,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<text string="STEW">
@@ -3624,11 +3624,11 @@
 	</element>
 	<element name="lamp_129_1_border" defstate="0">
 		<disk state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.38">
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.09">
 			</color>
 		</disk>
 	</element>
@@ -3638,7 +3638,7 @@
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.19">
 			</color>
 		</disk>
 		<text string="X">
@@ -3650,11 +3650,11 @@
 	</element>
 	<element name="lamp_130_1_border" defstate="0">
 		<disk state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.38">
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.09">
 			</color>
 		</disk>
 	</element>
@@ -3664,7 +3664,7 @@
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.19">
 			</color>
 		</disk>
 		<text string="X">
@@ -3676,11 +3676,11 @@
 	</element>
 	<element name="lamp_131_1_border" defstate="0">
 		<disk state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.38">
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.09">
 			</color>
 		</disk>
 	</element>
@@ -3690,7 +3690,7 @@
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.19">
 			</color>
 		</disk>
 		<text string="X">
@@ -3702,11 +3702,11 @@
 	</element>
 	<element name="lamp_132_1_border" defstate="0">
 		<disk state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.38">
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.09">
 			</color>
 		</disk>
 	</element>
@@ -3716,7 +3716,7 @@
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.19">
 			</color>
 		</disk>
 		<text string="X">
@@ -3728,11 +3728,11 @@
 	</element>
 	<element name="lamp_133_1_border" defstate="0">
 		<disk state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.38">
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.09">
 			</color>
 		</disk>
 	</element>
@@ -3742,7 +3742,7 @@
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.19">
 			</color>
 		</disk>
 		<text string="X">
@@ -3754,11 +3754,11 @@
 	</element>
 	<element name="lamp_134_1_border" defstate="0">
 		<disk state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.38">
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.09">
 			</color>
 		</disk>
 	</element>
@@ -3768,7 +3768,7 @@
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.19">
 			</color>
 		</disk>
 		<text string="X">
@@ -3780,11 +3780,11 @@
 	</element>
 	<element name="lamp_135_1_border" defstate="0">
 		<disk state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.38">
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.09">
 			</color>
 		</disk>
 	</element>
@@ -3794,7 +3794,7 @@
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.19">
 			</color>
 		</disk>
 		<text string="X">
@@ -3806,11 +3806,11 @@
 	</element>
 	<element name="lamp_136_1_border" defstate="0">
 		<disk state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.38">
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.09">
 			</color>
 		</disk>
 	</element>
@@ -3820,7 +3820,7 @@
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.19">
 			</color>
 		</disk>
 		<text string="X">
@@ -3832,11 +3832,11 @@
 	</element>
 	<element name="lamp_137_1_border" defstate="0">
 		<disk state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.38">
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.09">
 			</color>
 		</disk>
 	</element>
@@ -3846,7 +3846,7 @@
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.19">
 			</color>
 		</disk>
 		<text string="X">
@@ -3858,11 +3858,11 @@
 	</element>
 	<element name="lamp_138_1_border" defstate="0">
 		<disk state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.38">
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.09">
 			</color>
 		</disk>
 	</element>
@@ -3872,7 +3872,7 @@
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.19">
 			</color>
 		</disk>
 		<text string="X">
@@ -3884,11 +3884,11 @@
 	</element>
 	<element name="lamp_139_1_border" defstate="0">
 		<disk state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.38">
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.09">
 			</color>
 		</disk>
 	</element>
@@ -3898,7 +3898,7 @@
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.19">
 			</color>
 		</disk>
 		<text string="X">
@@ -3910,11 +3910,11 @@
 	</element>
 	<element name="lamp_140_1_border" defstate="0">
 		<disk state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.25" blue="0.38">
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.06" blue="0.09">
 			</color>
 		</disk>
 	</element>
@@ -3924,7 +3924,7 @@
 			</color>
 		</disk>
 		<disk state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.13" blue="0.19">
 			</color>
 		</disk>
 		<text string="X">
@@ -3936,11 +3936,11 @@
 	</element>
 	<element name="lamp_124_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -3950,7 +3950,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.06">
 			</color>
 		</rect>
 		<text string="$1">
@@ -3962,11 +3962,11 @@
 	</element>
 	<element name="lamp_123_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -3976,7 +3976,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.06">
 			</color>
 		</rect>
 		<text string="$1.20">
@@ -3988,11 +3988,11 @@
 	</element>
 	<element name="lamp_122_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -4002,7 +4002,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.06">
 			</color>
 		</rect>
 		<text string="$1.60">
@@ -4014,11 +4014,11 @@
 	</element>
 	<element name="lamp_121_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -4028,7 +4028,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.06">
 			</color>
 		</rect>
 		<text string="$2">
@@ -4040,11 +4040,11 @@
 	</element>
 	<element name="lamp_120_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -4054,7 +4054,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.06">
 			</color>
 		</rect>
 		<text string="$2.40">
@@ -4066,11 +4066,11 @@
 	</element>
 	<element name="lamp_119_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -4080,7 +4080,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.06">
 			</color>
 		</rect>
 		<text string="$3">
@@ -4092,11 +4092,11 @@
 	</element>
 	<element name="lamp_118_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -4106,7 +4106,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.06">
 			</color>
 		</rect>
 		<text string="$3.60">
@@ -4118,11 +4118,11 @@
 	</element>
 	<element name="lamp_117_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -4132,7 +4132,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.06">
 			</color>
 		</rect>
 		<text string="$4">
@@ -4144,11 +4144,11 @@
 	</element>
 	<element name="lamp_113_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -4158,7 +4158,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.06">
 			</color>
 		</rect>
 		<text string="$8">
@@ -4170,11 +4170,11 @@
 	</element>
 	<element name="lamp_114_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -4184,7 +4184,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.06">
 			</color>
 		</rect>
 		<text string="$7">
@@ -4196,11 +4196,11 @@
 	</element>
 	<element name="lamp_115_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -4210,7 +4210,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.06">
 			</color>
 		</rect>
 		<text string="$6">
@@ -4222,11 +4222,11 @@
 	</element>
 	<element name="lamp_116_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -4236,7 +4236,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.06">
 			</color>
 		</rect>
 		<text string="$5">
@@ -4248,11 +4248,11 @@
 	</element>
 	<element name="lamp_112_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.13" green="0.25" blue="0.25">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.03" green="0.06" blue="0.06">
 			</color>
 		</rect>
 	</element>
@@ -4262,7 +4262,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.06" green="0.13" blue="0.13">
 			</color>
 		</rect>
 		<text string="JACKPOT">
@@ -4280,11 +4280,11 @@
 	</element>
 	<element name="colour_button_169_border">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -4294,7 +4294,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="CANCEL">
@@ -4306,11 +4306,11 @@
 	</element>
 	<element name="colour_button_170_border">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -4320,7 +4320,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="HOLD">
@@ -4332,11 +4332,11 @@
 	</element>
 	<element name="colour_button_171_border">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -4346,7 +4346,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="HOLD">
@@ -4364,11 +4364,11 @@
 	</element>
 	<element name="colour_button_172_border">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -4378,7 +4378,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="HOLD">
@@ -4396,11 +4396,11 @@
 	</element>
 	<element name="colour_button_173_border">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -4410,7 +4410,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.19">
 			</color>
 		</rect>
 		<text string="STOP">
@@ -4428,11 +4428,11 @@
 	</element>
 	<element name="colour_button_174_border">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.25" green="0.00" blue="0.50">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.06" green="0.00" blue="0.12">
 			</color>
 		</rect>
 	</element>
@@ -4442,7 +4442,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.13" green="0.00" blue="0.25">
 			</color>
 		</rect>
 		<text string="nudge">
@@ -4460,11 +4460,11 @@
 	</element>
 	<element name="colour_button_175_border">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.25" blue="0.13">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.06" blue="0.03">
 			</color>
 		</rect>
 	</element>
@@ -4474,7 +4474,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.13" blue="0.06">
 			</color>
 		</rect>
 		<text string="EXCHANGE">
@@ -4486,11 +4486,11 @@
 	</element>
 	<element name="colour_button_176_border">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -4500,7 +4500,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="START">
@@ -4512,11 +4512,11 @@
 	</element>
 	<element name="colour_button_177_border">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -4526,7 +4526,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="$1">
@@ -4538,11 +4538,11 @@
 	</element>
 	<element name="colour_button_179_border">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.38">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.09">
 			</color>
 		</rect>
 	</element>
@@ -4552,7 +4552,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.19">
 			</color>
 		</rect>
 		<text string="TAKE">
@@ -4564,11 +4564,11 @@
 	</element>
 	<element name="colour_button_180_border">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.00" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -4578,7 +4578,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.00" blue="0.00">
 			</color>
 		</rect>
 		<text string="TAKE">
@@ -4590,11 +4590,11 @@
 	</element>
 	<element name="colour_button_181_border">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.00" green="0.06" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -4604,7 +4604,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.00" green="0.13" blue="0.00">
 			</color>
 		</rect>
 		<text string="TAKE">
@@ -4616,11 +4616,11 @@
 	</element>
 	<element name="colour_button_182_border">
 		<rect state="1">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.50" green="0.50" blue="0.00">
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.00" green="0.00" blue="0.00">
+			<color red="0.12" green="0.12" blue="0.00">
 			</color>
 		</rect>
 	</element>
@@ -4630,7 +4630,7 @@
 			</color>
 		</rect>
 		<rect state="0">
-			<color red="0.94" green="0.94" blue="0.94">
+			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
 		<text string="TAKE">

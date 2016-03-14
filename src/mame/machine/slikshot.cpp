@@ -261,8 +261,8 @@ void itech8_state::vels_to_inters(UINT8 x, UINT8 vx, UINT8 vy,
 
 	/* inter2 can be derived from Vx and Vy */
 	_27d8 = ((UINT64)vy * 0xfbd3) >> 16;
-	*inter2 = 0x30f2e / (_27d8 + ((abs((INT8)vx) << 16) / 0x58f8c));
-	inter2a = 0x30f2e / (_27d8 - ((abs((INT8)vx) << 16) / 0x58f8c));
+	*inter2 = 0x30f2e / (_27d8 + (((UINT32)abs((INT8)vx) << 16) / 0x58f8c));
+	inter2a = 0x30f2e / (_27d8 - (((UINT32)abs((INT8)vx) << 16) / 0x58f8c));
 
 	/* compute it back both ways and pick the closer */
 	inters_to_vels(*inter1, *inter2, 0, 0, &x1, &vx1, &vy1);

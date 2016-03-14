@@ -38,6 +38,12 @@ WRITE8_MEMBER(himesiki_state::himesiki_scrollx_w)
 	m_scrollx[offset] = data;
 }
 
+WRITE8_MEMBER(himesiki_state::himesiki_scrolly_w)
+{
+	m_scrolly = data;
+}
+
+#if 0 // this can't be flipscreen (android uses it for scroll, same PCB)
 WRITE8_MEMBER(himesiki_state::himesiki_flip_w)
 {
 	m_flipscreen = data & 0xc0;
@@ -46,13 +52,16 @@ WRITE8_MEMBER(himesiki_state::himesiki_flip_w)
 	if (data & 0x3f)
 		logerror("p08_w %02x\n",data);
 }
+#endif
 
 void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	UINT8 *spriteram;
 	int offs;
 
-	for (offs = 0x100; offs < 0x160; offs += 4)
+	// these sprites are from the ET-P103A board (himesiki only)
+	spriteram = m_spriteram_p103a;
+	for (offs = 0x00; offs < 0x60; offs += 4)
 	{
 		int attr = spriteram[offs + 1];
 		int code = spriteram[offs + 0] | (attr & 3) << 8;
@@ -80,11 +89,20 @@ void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 				y -= 0x100;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, col, fx, fy, x, y, 15);
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, code, col, fx, fy, x, y, 15);
 	}
 
+	// 0xc0 - 0xff unused
+	spriteram = m_spriteram;
 	for (offs = 0; offs < 0x100; offs += 4)
 	{
+		// not sure about this, but you sometimes get a garbage sprite in the corner otherwise.
+		if ((spriteram[offs + 0] == 0x00) && 
+	        (spriteram[offs + 1] == 0x00) &&
+		    (spriteram[offs + 2] == 0x00) &&
+		    (spriteram[offs + 3] == 0x00))
+		 	 continue;
+
 		int attr = spriteram[offs + 1];
 		int code = spriteram[offs + 0] | (attr & 7) << 8;
 		int x = spriteram[offs + 3] | (attr & 8) << 5;
@@ -109,7 +127,7 @@ void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		if (y > 0xf0)
 			y -= 0x100;
 
-		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, code, col, f, f, x, y, 15);
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, col, f, f, x, y, 15);
 	}
 }
 
@@ -117,6 +135,7 @@ UINT32 himesiki_state::screen_update_himesiki(screen_device &screen, bitmap_ind1
 {
 	int x = -(m_scrollx[0] << 8 | m_scrollx[1]) & 0x1ff;
 	m_bg_tilemap->set_scrolldx(x, x);
+	m_bg_tilemap->set_scrolldy(-m_scrolly, -m_scrolly);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	himesiki_draw_sprites(bitmap, cliprect);

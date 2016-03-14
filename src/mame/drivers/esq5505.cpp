@@ -306,11 +306,11 @@ void esq5505_state::machine_reset()
 
 		if (floppy)
 		{
-			m_duart->ip0_w(ASSERT_LINE);
+			m_duart->ip0_w(CLEAR_LINE);
 		}
 		else
 		{
-			m_duart->ip0_w(CLEAR_LINE);
+			m_duart->ip0_w(ASSERT_LINE);
 		}
 	}
 }
@@ -347,7 +347,7 @@ READ16_MEMBER(esq5505_state::lower_r)
 		m_ram = (UINT16 *)(void *)memshare("osram")->ptr();
 	}
 
-	if (m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
+	if (!space.debugger_access() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
 	{
 		return m_rom[offset];
 	}
@@ -363,7 +363,7 @@ WRITE16_MEMBER(esq5505_state::lower_w)
 
 	if (offset < 0x4000)
 	{
-		if (m_maincpu->get_fc() != 0x6)  // if not supervisor mode, RAM
+		if (space.debugger_access() || m_maincpu->get_fc() != 0x6)  // if not supervisor mode, RAM
 		{
 			COMBINE_DATA(&m_ram[offset]);
 		}

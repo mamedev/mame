@@ -32,6 +32,10 @@ protected:
 
 	virtual void perform_diagnostic() override;
 	virtual void identify_packet_device() override;
+	virtual void process_buffer() override;
+	virtual void ExecCommand() override;
+private:
+	bool m_media_change;
 };
 
 // device type definition

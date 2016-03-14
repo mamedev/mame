@@ -617,25 +617,10 @@ int emu_file::puts(const char *s)
 //  vfprintf - vfprintf to a text file
 //-------------------------------------------------
 
-int emu_file::vprintf(const char *fmt, va_list va)
+int emu_file::vprintf(util::format_argument_pack<std::ostream> const &args)
 {
 	// write the data if we can
-	return (m_file) ? m_file->vprintf(fmt, va) : 0;
-}
-
-
-//-------------------------------------------------
-//  printf - vfprintf to a text file
-//-------------------------------------------------
-
-int CLIB_DECL emu_file::printf(const char *fmt, ...)
-{
-	int rc;
-	va_list va;
-	va_start(va, fmt);
-	rc = vprintf(fmt, va);
-	va_end(va);
-	return rc;
+	return m_file ? m_file->vprintf(args) : 0;
 }
 
 

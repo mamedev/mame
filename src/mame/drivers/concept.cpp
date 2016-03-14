@@ -221,7 +221,7 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	MCFG_SCREEN_UPDATE_DRIVER(concept_state, screen_update_concept)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

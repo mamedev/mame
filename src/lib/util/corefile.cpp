@@ -8,14 +8,15 @@
 
 ***************************************************************************/
 
-#include <assert.h>
-
 #include "corefile.h"
+
 #include "unicode.h"
+#include "vecstream.h"
+
 #include <zlib.h>
 
 #include <algorithm>
-#include <cstdarg>
+#include <cassert>
 #include <cstring>
 #include <ctype.h>
 
@@ -126,6 +127,7 @@ private:
 		m_stream.zalloc = Z_NULL;
 		m_stream.zfree = Z_NULL;
 		m_stream.opaque = Z_NULL;
+		m_stream.avail_in = m_stream.avail_out = 0;
 	}
 
 	bool            m_compress, m_decompress;
@@ -156,7 +158,7 @@ public:
 
 	virtual std::uint32_t write(const void *buffer, std::uint32_t length) override { return m_file.write(buffer, length); }
 	virtual int puts(const char *s) override { return m_file.puts(s); }
-	virtual int vprintf(const char *fmt, va_list va) override { return m_file.vprintf(fmt, va); }
+	virtual int vprintf(util::format_argument_pack<std::ostream> const &args) override { return m_file.vprintf(args); }
 	virtual file_error truncate(std::uint64_t offset) override { return m_file.truncate(offset); }
 
 	virtual file_error flush() override { return m_file.flush(); }
@@ -183,7 +185,7 @@ public:
 	virtual int ungetc(int c) override;
 	virtual char *gets(char *s, int n) override;
 	virtual int puts(char const *s) override;
-	virtual int vprintf(char const *fmt, va_list va) override;
+	virtual int vprintf(util::format_argument_pack<std::ostream> const &args) override;
 
 protected:
 	core_text_file(std::uint32_t openflags)
@@ -191,6 +193,7 @@ protected:
 		, m_text_type(text_file_type::OSD)
 		, m_back_char_head(0)
 		, m_back_char_tail(0)
+		, m_printf_buffer()
 	{
 	}
 
@@ -207,6 +210,7 @@ private:
 	char                m_back_chars[UTF8_CHAR_MAX];    // buffer to hold characters for ungetc
 	int                 m_back_char_head;               // head of ungetc buffer
 	int                 m_back_char_tail;               // tail of ungetc buffer
+	ovectorstream       m_printf_buffer;                // persistent buffer for formatted output
 };
 
 
@@ -341,7 +345,7 @@ private:
     works for most platforms
 -------------------------------------------------*/
 
-static inline int is_directory_separator(char c)
+inline int is_directory_separator(char c)
 {
 	return (c == '\\' || c == '/' || c == ':');
 }
@@ -607,11 +611,13 @@ int core_text_file::puts(char const *s)
     vprintf - vfprintf to a text file
 -------------------------------------------------*/
 
-int core_text_file::vprintf(char const *fmt, va_list va)
+int core_text_file::vprintf(util::format_argument_pack<std::ostream> const &args)
 {
-	char buf[1024];
-	vsnprintf(buf, sizeof(buf), fmt, va);
-	return puts(buf);
+	m_printf_buffer.reserve(1024);
+	m_printf_buffer.seekp(0, ovectorstream::beg);
+	util::stream_format<std::ostream, std::ostream>(m_printf_buffer, args);
+	m_printf_buffer.put('\0');
+	return puts(&m_printf_buffer.vec()[0]);
 }
 
 
@@ -755,11 +761,11 @@ file_error core_osd_file::compress(int level)
 		int zerr = Z_OK;
 
 		// flush any remaining data if we are writing
-		while (write_access() != 0 && (zerr != Z_STREAM_END))
+		while (write_access() && (zerr != Z_STREAM_END))
 		{
 			// deflate some more
 			zerr = m_zdata->finalise();
-			if (zerr != Z_STREAM_END && zerr != Z_OK)
+			if ((zerr != Z_STREAM_END) && (zerr != Z_OK))
 			{
 				result = FILERR_INVALID_DATA;
 				break;
@@ -972,41 +978,41 @@ file_error core_osd_file::osd_or_zlib_read(void *buffer, std::uint64_t offset, s
 		return osd_read(m_file, buffer, offset, length, &actual);
 
 	// if the offset doesn't match the next offset, fail
-	if (m_zdata->is_nextoffset(offset))
+	if (!m_zdata->is_nextoffset(offset))
 		return FILERR_INVALID_ACCESS;
 
 	// set up the destination
+	file_error filerr = FILERR_NONE;
 	m_zdata->set_output(buffer, length);
 	while (!m_zdata->output_full())
 	{
-		int zerr = Z_OK;
-
 		// if we didn't make progress, report an error or the end
 		if (m_zdata->has_input())
-			zerr = m_zdata->decompress();
-		if (zerr != Z_OK)
 		{
-			actual = length - m_zdata->output_space();
-			m_zdata->add_nextoffset(actual);
-			return (zerr == Z_STREAM_END) ? FILERR_NONE : FILERR_INVALID_DATA;
+			auto const zerr = m_zdata->decompress();
+			if (Z_OK != zerr)
+			{
+				if (Z_STREAM_END != zerr) filerr = FILERR_INVALID_DATA;
+				break;
+			}
 		}
 
 		// fetch more data if needed
 		if (!m_zdata->has_input())
 		{
-			std::uint32_t actualdata;
-			auto const filerr = osd_read(m_file, m_zdata->buffer_data(), m_zdata->realoffset(), m_zdata->buffer_size(), &actualdata);
-			if (filerr != FILERR_NONE)
-				return filerr;
-			m_zdata->add_realoffset(actual);
+			std::uint32_t actualdata = 0;
+			filerr = osd_read(m_file, m_zdata->buffer_data(), m_zdata->realoffset(), m_zdata->buffer_size(), &actualdata);
+			if (filerr != FILERR_NONE) break;
+			m_zdata->add_realoffset(actualdata);
 			m_zdata->reset_input(actualdata);
+			if (!m_zdata->has_input()) break;
 		}
 	}
 
-	// we read everything
-	actual = length;
+	// adjust everything
+	actual = length - m_zdata->output_space();
 	m_zdata->add_nextoffset(actual);
-	return FILERR_NONE;
+	return filerr;
 }
 
 
@@ -1054,7 +1060,7 @@ file_error core_osd_file::osd_or_zlib_write(void const *buffer, std::uint64_t of
 		// write more data if we are full up
 		if (m_zdata->output_full())
 		{
-			std::uint32_t actualdata;
+			std::uint32_t actualdata = 0;
 			auto const filerr = osd_write(m_file, m_zdata->buffer_data(), m_zdata->realoffset(), m_zdata->output_size(), &actualdata);
 			if (filerr != FILERR_NONE)
 				return filerr;
@@ -1145,6 +1151,7 @@ file_error core_file::open_ram_copy(void const *data, std::size_t length, std::u
 		if (!result->buffer())
 			return FILERR_OUT_OF_MEMORY;
 
+		file = std::move(result);
 		return FILERR_NONE;
 	}
 	catch (...)
@@ -1243,20 +1250,6 @@ file_error core_file::load(char const *filename, dynamic_buffer &data)
 
 	// close the file and return data
 	return FILERR_NONE;
-}
-
-
-/*-------------------------------------------------
-    printf - printf to a text file
--------------------------------------------------*/
-
-int CLIB_DECL core_file::printf(char const *fmt, ...)
-{
-	va_list va;
-	va_start(va, fmt);
-	auto const rc = vprintf(fmt, va);
-	va_end(va);
-	return rc;
 }
 
 

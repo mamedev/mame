@@ -48,8 +48,7 @@ protected:
 	void data_write(UINT16 data);
 	UINT16 data_read();
 
-	void service_command();
-	static TIMER_CALLBACK( command_execution_callback ) { reinterpret_cast<rx01_device *>(ptr)->service_command(); }
+	TIMER_CALLBACK_MEMBER(service_command);
 
 	void position_head();
 	void read_sector();

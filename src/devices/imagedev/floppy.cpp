@@ -516,15 +516,15 @@ void floppy_image_device::mon_w(int state)
 	if (!mon && image)
 	{
 		revolution_start_time = machine().time();
-				if (motor_always_on) {
-					// Drives with motor that is always spinning are immediately ready when a disk is loaded
-					// because there is no spin-up time
-					ready = false;
-					if(!cur_ready_cb.isnull())
-						cur_ready_cb(this, ready);
-				} else {
-					ready_counter = 2;
-				}
+		if (motor_always_on) {
+			// Drives with motor that is always spinning are immediately ready when a disk is loaded
+			// because there is no spin-up time
+			ready = false;
+			if(!cur_ready_cb.isnull())
+				cur_ready_cb(this, ready);
+		} else {
+			ready_counter = 2;
+		}
 		index_resync();
 	}
 

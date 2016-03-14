@@ -63,7 +63,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	InactiveSelectedBackground = [[NSColor colorWithCalibratedWhite:0.875 alpha:1.0] retain];
 	InactiveSelectedCurrentBackground = [[NSColor colorWithCalibratedRed:0.875 green:0.5 blue:0.625 alpha:1.0] retain];
 
-	NonWhiteCharacters = [[NSCharacterSet whitespaceAndNewlineCharacterSet] invertedSet];
+	NonWhiteCharacters = [[[NSCharacterSet whitespaceAndNewlineCharacterSet] invertedSet] retain];
 }
 
 

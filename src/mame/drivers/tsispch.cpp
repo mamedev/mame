@@ -132,23 +132,22 @@
 *****************************************************************************/
 WRITE_LINE_MEMBER(tsispch_state::i8251_rxrdy_int)
 {
-	machine().device<pic8259_device>("pic8259")->ir1_w(state);
+	m_pic->ir1_w(state);
 }
 
 WRITE_LINE_MEMBER(tsispch_state::i8251_txempty_int)
 {
-	machine().device<pic8259_device>("pic8259")->ir2_w(state);
+	m_pic->ir2_w(state);
 }
 
 WRITE_LINE_MEMBER(tsispch_state::i8251_txrdy_int)
 {
-	machine().device<pic8259_device>("pic8259")->ir3_w(state);
+	m_pic->ir3_w(state);
 }
 
 WRITE8_MEMBER( tsispch_state::i8251_rxd )
 {
-	i8251_device *uart = machine().device<i8251_device>("i8251a_u15");
-	uart->receive_character(data);
+	m_uart->receive_character(data);
 }
 
 /*****************************************************************************

@@ -12,19 +12,19 @@ pc9801_cd_device::pc9801_cd_device(const machine_config &mconfig, const char *ta
 
 void pc9801_cd_device::fill_buffer()
 {
-	atapi_hle_device::fill_buffer();
+	atapi_cdrom_device::fill_buffer();
 	m_status |= IDE_STATUS_DRDY | IDE_STATUS_SERV;
 }
 
 void pc9801_cd_device::process_buffer()
 {
-	atapi_hle_device::process_buffer();
+	atapi_cdrom_device::process_buffer();
 	m_status |= IDE_STATUS_DRDY | IDE_STATUS_SERV;
 }
 
 void pc9801_cd_device::process_command()
 {
-	atapi_hle_device::process_command();
+	atapi_cdrom_device::process_command();
 	switch(m_command)
 	{
 		case IDE_COMMAND_CHECK_POWER_MODE:

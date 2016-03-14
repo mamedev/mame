@@ -90,7 +90,7 @@ void wd_fdc_t::device_start()
 	enmf_cb.resolve();
 
 	if (!has_enmf && !enmf_cb.isnull())
-		logerror("%s: Warning, this chip doesn't have an ENMF line.\n", tag());
+		logerror("Warning, this chip doesn't have an ENMF line.\n");
 
 	t_gen = timer_alloc(TM_GEN);
 	t_cmd = timer_alloc(TM_CMD);
@@ -154,9 +154,9 @@ void wd_fdc_t::soft_reset()
 	intrq_cond = 0;
 	live_abort();
 
-	// restore
-	last_dir = 1;
-	seek_start(RESTORE);
+	// trigger a restore after everything else is reset too, in particular the floppy device itself
+	sub_state = INITIAL_RESTORE;
+	t_gen->adjust(attotime::zero);
 }
 
 void wd_fdc_t::set_floppy(floppy_image_device *_floppy)
@@ -190,13 +190,13 @@ void wd_fdc_t::set_floppy(floppy_image_device *_floppy)
 void wd_fdc_t::dden_w(bool _dden)
 {
 	if(disable_mfm) {
-		logerror("%s: Error, this chip does not have a dden line\n", tag());
+		logerror("Error, this chip does not have a dden line\n");
 		return;
 	}
 
 	if(dden != _dden) {
 		dden = _dden;
-		if (TRACE_LINES) logerror("%s: select %s\n", tag(), dden ? "fm" : "mfm");
+		if (TRACE_LINES) logerror("select %s\n", dden ? "fm" : "mfm");
 	}
 }
 
@@ -215,7 +215,7 @@ std::string wd_fdc_t::ttsn()
 
 void wd_fdc_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (TRACE_EVENT) logerror("%s: Event fired for timer %s\n", tag(), (id==TM_GEN)? "TM_GEN" : (id==TM_CMD)? "TM_CMD" : (id==TM_TRACK)? "TM_TRACK" : "TM_SECTOR");
+	if (TRACE_EVENT) logerror("Event fired for timer %s\n", (id==TM_GEN)? "TM_GEN" : (id==TM_CMD)? "TM_CMD" : (id==TM_TRACK)? "TM_TRACK" : "TM_SECTOR");
 	live_sync();
 
 	switch(id) {
@@ -243,7 +243,7 @@ void wd_fdc_t::command_end()
 
 void wd_fdc_t::seek_start(int state)
 {
-	if (TRACE_COMMAND) logerror("%s: seek %d (track=%d)\n", tag(), data, track);
+	if (TRACE_COMMAND) logerror("seek %d (track=%d)\n", data, track);
 	main_state = state;
 	status &= ~(S_CRC|S_RNF|S_SPIN);
 	if(head_control) {
@@ -263,7 +263,7 @@ void wd_fdc_t::seek_continue()
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
-			if (TRACE_STATE) logerror("%s: SPINUP\n", tag());
+			if (TRACE_STATE) logerror("SPINUP\n");
 			if(!(status & S_MON)) {
 				spinup();
 				return;
@@ -274,11 +274,11 @@ void wd_fdc_t::seek_continue()
 			break;
 
 		case SPINUP_WAIT:
-			if (TRACE_STATE) logerror("%s: SPINUP_WAIT\n", tag());
+			if (TRACE_STATE) logerror("SPINUP_WAIT\n");
 			return;
 
 		case SPINUP_DONE:
-			if (TRACE_STATE) logerror("%s: SPINUP_DONE\n", tag());
+			if (TRACE_STATE) logerror("SPINUP_DONE\n");
 			if(main_state == RESTORE && floppy && !floppy->trk00_r()) {
 				sub_state = SEEK_WAIT_STEP_TIME;
 				delay_cycles(t_gen, step_times[command & 3]);
@@ -296,7 +296,7 @@ void wd_fdc_t::seek_continue()
 			break;
 
 		case SEEK_MOVE:
-			if (TRACE_STATE) logerror("%s: SEEK_MOVE\n", tag());
+			if (TRACE_STATE) logerror("SEEK_MOVE\n");
 			if(floppy) {
 				floppy->dir_w(last_dir);
 				floppy->stp_w(0);
@@ -312,11 +312,11 @@ void wd_fdc_t::seek_continue()
 			return;
 
 		case SEEK_WAIT_STEP_TIME:
-			if (TRACE_STATE) logerror("%s: SEEK_WAIT_STEP_TIME\n", tag());
+			if (TRACE_STATE) logerror("SEEK_WAIT_STEP_TIME\n");
 			return;
 
 		case SEEK_WAIT_STEP_TIME_DONE: {
-			if (TRACE_STATE) logerror("%s: SEEK_WAIT_STEP_TIME_DONE\n", tag());
+			if (TRACE_STATE) logerror("SEEK_WAIT_STEP_TIME_DONE\n");
 			bool done = false;
 			switch(main_state) {
 			case RESTORE:
@@ -349,16 +349,16 @@ void wd_fdc_t::seek_continue()
 		}
 
 		case SEEK_WAIT_STABILIZATION_TIME:
-			if (TRACE_STATE) logerror("%s: SEEK_WAIT_STABILIZATION_TIME\n", tag());
+			if (TRACE_STATE) logerror("SEEK_WAIT_STABILIZATION_TIME\n");
 			return;
 
 		case SEEK_WAIT_STABILIZATION_TIME_DONE:
-			if (TRACE_STATE) logerror("%s: SEEK_WAIT_STABILIZATION_TIME_DONE\n", tag());
+			if (TRACE_STATE) logerror("SEEK_WAIT_STABILIZATION_TIME_DONE\n");
 			sub_state = SEEK_DONE;
 			break;
 
 		case SEEK_DONE:
-			if (TRACE_STATE) logerror("%s: SEEK_DONE\n", tag());
+			if (TRACE_STATE) logerror("SEEK_DONE\n");
 			status |= S_HLD;
 			hld = true;
 			if (!hld_cb.isnull())
@@ -378,7 +378,7 @@ void wd_fdc_t::seek_continue()
 			return;
 
 		case SCAN_ID:
-			if (TRACE_STATE) logerror("%s: SCAN_ID\n", tag());
+			if (TRACE_STATE) logerror("SCAN_ID\n");
 			if(cur_live.idbuf[0] != track) {
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
@@ -392,13 +392,13 @@ void wd_fdc_t::seek_continue()
 			return;
 
 		case SCAN_ID_FAILED:
-			if (TRACE_STATE) logerror("%s: SCAN_ID_FAILED\n", tag());
+			if (TRACE_STATE) logerror("SCAN_ID_FAILED\n");
 			status |= S_RNF;
 			command_end();
 			return;
 
 		default:
-			logerror("%s: seek unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("seek unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -407,7 +407,7 @@ void wd_fdc_t::seek_continue()
 bool wd_fdc_t::sector_matches() const
 {
 	if(TRACE_MATCH)
-		logerror("%s: matching read T=%02x H=%02x S=%02x L=%02x - searched T=%02x S=%02x\n", tag(),
+		logerror("matching read T=%02x H=%02x S=%02x L=%02x - searched T=%02x S=%02x\n",
 					cur_live.idbuf[0], cur_live.idbuf[1], cur_live.idbuf[2], cur_live.idbuf[3],
 					track, sector);
 
@@ -428,7 +428,7 @@ bool wd_fdc_t::is_ready()
 
 void wd_fdc_t::read_sector_start()
 {
-	if (TRACE_COMMAND) logerror("%s: read sector%s (c=%02x) t=%d, s=%d\n", tag(), command & 0x10 ? " multiple" : "", command, track, sector);
+	if (TRACE_COMMAND) logerror("read sector%s (c=%02x) t=%d, s=%d\n", command & 0x10 ? " multiple" : "", command, track, sector);
 	if(!is_ready()) {
 		command_end();
 		return;
@@ -449,7 +449,7 @@ void wd_fdc_t::read_sector_continue()
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
-			if (TRACE_STATE) logerror("%s: SPINUP\n", tag());
+			if (TRACE_STATE) logerror("SPINUP\n");
 			if(!(status & S_MON)) {
 				spinup();
 				return;
@@ -458,11 +458,11 @@ void wd_fdc_t::read_sector_continue()
 			break;
 
 		case SPINUP_WAIT:
-			if (TRACE_STATE) logerror("%s: SPINUP_WAIT\n", tag());
+			if (TRACE_STATE) logerror("SPINUP_WAIT\n");
 			return;
 
 		case SPINUP_DONE:
-			if (TRACE_STATE) logerror("%s: SPINUP_DONE\n", tag());
+			if (TRACE_STATE) logerror("SPINUP_DONE\n");
 			if(command & 4) {
 				sub_state = SETTLE_WAIT;
 				delay_cycles(t_gen, settle_time());
@@ -473,18 +473,18 @@ void wd_fdc_t::read_sector_continue()
 			}
 
 		case SETTLE_WAIT:
-			if (TRACE_STATE) logerror("%s: SETTLE_WAIT\n", tag());
+			if (TRACE_STATE) logerror("SETTLE_WAIT\n");
 			return;
 
 		case SETTLE_DONE:
-			if (TRACE_STATE) logerror("%s: SETTLE_DONE\n", tag());
+			if (TRACE_STATE) logerror("SETTLE_DONE\n");
 			sub_state = SCAN_ID;
 			counter = 0;
 			live_start(SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
-			if (TRACE_STATE) logerror("%s: SCAN_ID\n", tag());
+			if (TRACE_STATE) logerror("SCAN_ID\n");
 			if(!sector_matches()) {
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
@@ -500,13 +500,13 @@ void wd_fdc_t::read_sector_continue()
 			return;
 
 		case SCAN_ID_FAILED:
-			if (TRACE_STATE) logerror("%s: SCAN_ID_FAILED\n", tag());
+			if (TRACE_STATE) logerror("SCAN_ID_FAILED\n");
 			status |= S_RNF;
 			command_end();
 			return;
 
 		case SECTOR_READ:
-			if (TRACE_STATE) logerror("%s: SECTOR_READ\n", tag());
+			if (TRACE_STATE) logerror("SECTOR_READ\n");
 			if(cur_live.crc)
 				status |= S_CRC;
 
@@ -520,7 +520,7 @@ void wd_fdc_t::read_sector_continue()
 			break;
 
 		default:
-			logerror("%s: read sector unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("read sector unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -528,7 +528,7 @@ void wd_fdc_t::read_sector_continue()
 
 void wd_fdc_t::read_track_start()
 {
-	if (TRACE_COMMAND) logerror("%s: read track (c=%02x) t=%d\n", tag(), command, track);
+	if (TRACE_COMMAND) logerror("read track (c=%02x) t=%d\n", command, track);
 
 	if(!is_ready()) {
 		command_end();
@@ -550,7 +550,7 @@ void wd_fdc_t::read_track_continue()
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
-			if (TRACE_STATE) logerror("%s: SPINUP\n", tag());
+			if (TRACE_STATE) logerror("SPINUP\n");
 			if(!(status & S_MON)) {
 				spinup();
 				return;
@@ -559,11 +559,11 @@ void wd_fdc_t::read_track_continue()
 			break;
 
 		case SPINUP_WAIT:
-			if (TRACE_STATE) logerror("%s: SPINUP_WAIT\n", tag());
+			if (TRACE_STATE) logerror("SPINUP_WAIT\n");
 			return;
 
 		case SPINUP_DONE:
-			if (TRACE_STATE) logerror("%s: SPINUP_DONE\n", tag());
+			if (TRACE_STATE) logerror("SPINUP_DONE\n");
 			if(command & 4) {
 				sub_state = SETTLE_WAIT;
 				delay_cycles(t_gen, settle_time());
@@ -575,31 +575,31 @@ void wd_fdc_t::read_track_continue()
 			}
 
 		case SETTLE_WAIT:
-			if (TRACE_STATE) logerror("%s: SETTLE_WAIT\n", tag());
+			if (TRACE_STATE) logerror("SETTLE_WAIT\n");
 			return;
 
 		case SETTLE_DONE:
-			if (TRACE_STATE) logerror("%s: SETTLE_DONE\n", tag());
+			if (TRACE_STATE) logerror("SETTLE_DONE\n");
 			sub_state = WAIT_INDEX;
 			return;
 
 		case WAIT_INDEX:
-			if (TRACE_STATE) logerror("%s: WAIT_INDEX\n", tag());
+			if (TRACE_STATE) logerror("WAIT_INDEX\n");
 			return;
 
 		case WAIT_INDEX_DONE:
-			if (TRACE_STATE) logerror("%s: WAIT_INDEX_DONE\n", tag());
+			if (TRACE_STATE) logerror("WAIT_INDEX_DONE\n");
 			sub_state = TRACK_DONE;
 			live_start(READ_TRACK_DATA);
 			return;
 
 		case TRACK_DONE:
-			if (TRACE_STATE) logerror("%s: TRACK_DONE\n", tag());
+			if (TRACE_STATE) logerror("TRACK_DONE\n");
 			command_end();
 			return;
 
 		default:
-			logerror("%s: read track unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("read track unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -607,7 +607,7 @@ void wd_fdc_t::read_track_continue()
 
 void wd_fdc_t::read_id_start()
 {
-	if (TRACE_COMMAND) logerror("%s: read id (c=%02x)\n", tag(), command);
+	if (TRACE_COMMAND) logerror("read id (c=%02x)\n", command);
 	if(!is_ready()) {
 		command_end();
 		return;
@@ -628,7 +628,7 @@ void wd_fdc_t::read_id_continue()
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
-			if (TRACE_STATE) logerror("%s: SPINUP\n", tag());
+			if (TRACE_STATE) logerror("SPINUP\n");
 			if(!(status & S_MON)) {
 				spinup();
 				return;
@@ -637,11 +637,11 @@ void wd_fdc_t::read_id_continue()
 			break;
 
 		case SPINUP_WAIT:
-			if (TRACE_STATE) logerror("%s: SPINUP_WAIT\n", tag());
+			if (TRACE_STATE) logerror("SPINUP_WAIT\n");
 			return;
 
 		case SPINUP_DONE:
-			if (TRACE_STATE) logerror("%s: SPINUP_DONE\n", tag());
+			if (TRACE_STATE) logerror("SPINUP_DONE\n");
 			if(command & 4) {
 				sub_state = SETTLE_WAIT;
 				delay_cycles(t_gen, settle_time());
@@ -652,29 +652,29 @@ void wd_fdc_t::read_id_continue()
 			}
 
 		case SETTLE_WAIT:
-			if (TRACE_STATE) logerror("%s: SETTLE_WAIT\n", tag());
+			if (TRACE_STATE) logerror("SETTLE_WAIT\n");
 			return;
 
 		case SETTLE_DONE:
-			if (TRACE_STATE) logerror("%s: SETTLE_DONE\n", tag());
+			if (TRACE_STATE) logerror("SETTLE_DONE\n");
 			sub_state = SCAN_ID;
 			counter = 0;
 			live_start(SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
-			if (TRACE_STATE) logerror("%s: SCAN_ID\n", tag());
+			if (TRACE_STATE) logerror("SCAN_ID\n");
 			command_end();
 			return;
 
 		case SCAN_ID_FAILED:
-			if (TRACE_STATE) logerror("%s: SCAN_ID_FAILED\n", tag());
+			if (TRACE_STATE) logerror("SCAN_ID_FAILED\n");
 			status |= S_RNF;
 			command_end();
 			return;
 
 		default:
-			logerror("%s: read id unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("read id unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -682,7 +682,7 @@ void wd_fdc_t::read_id_continue()
 
 void wd_fdc_t::write_track_start()
 {
-	if (TRACE_COMMAND) logerror("%s: write track (c=%02x) t=%d\n", tag(), command, track);
+	if (TRACE_COMMAND) logerror("write track (c=%02x) t=%d\n", command, track);
 
 	if(!is_ready()) {
 		command_end();
@@ -709,7 +709,7 @@ void wd_fdc_t::write_track_continue()
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
-			if (TRACE_STATE) logerror("%s: SPINUP\n", tag());
+			if (TRACE_STATE) logerror("SPINUP\n");
 			if(!(status & S_MON)) {
 				spinup();
 				return;
@@ -718,11 +718,11 @@ void wd_fdc_t::write_track_continue()
 			break;
 
 		case SPINUP_WAIT:
-			if (TRACE_STATE) logerror("%s: SPINUP_WAIT\n", tag());
+			if (TRACE_STATE) logerror("SPINUP_WAIT\n");
 			return;
 
 		case SPINUP_DONE:
-			if (TRACE_STATE) logerror("%s: SPINUP_DONE\n", tag());
+			if (TRACE_STATE) logerror("SPINUP_DONE\n");
 			if(command & 4) {
 				sub_state = SETTLE_WAIT;
 				delay_cycles(t_gen, settle_time());
@@ -733,22 +733,22 @@ void wd_fdc_t::write_track_continue()
 			}
 
 		case SETTLE_WAIT:
-			if (TRACE_STATE) logerror("%s: SETTLE_WAIT\n", tag());
+			if (TRACE_STATE) logerror("SETTLE_WAIT\n");
 			return;
 
 		case SETTLE_DONE:
-			if (TRACE_STATE) logerror("%s: SETTLE_DONE\n", tag());
+			if (TRACE_STATE) logerror("SETTLE_DONE\n");
 			set_drq();
 			sub_state = DATA_LOAD_WAIT;
 			delay_cycles(t_gen, 192);
 			return;
 
 		case DATA_LOAD_WAIT:
-			if (TRACE_STATE) logerror("%s: DATA_LOAD_WAIT\n", tag());
+			if (TRACE_STATE) logerror("DATA_LOAD_WAIT\n");
 			return;
 
 		case DATA_LOAD_WAIT_DONE:
-			if (TRACE_STATE) logerror("%s: DATA_LOAD_WAIT_DONE\n", tag());
+			if (TRACE_STATE) logerror("DATA_LOAD_WAIT_DONE\n");
 			if(drq) {
 				status |= S_LOST;
 				drop_drq();
@@ -759,18 +759,18 @@ void wd_fdc_t::write_track_continue()
 			break;
 
 		case WAIT_INDEX:
-			if (TRACE_STATE) logerror("%s: WAIT_INDEX\n", tag());
+			if (TRACE_STATE) logerror("WAIT_INDEX\n");
 			return;
 
 		case WAIT_INDEX_DONE:
-			if (TRACE_STATE) logerror("%s: WAIT_INDEX_DONE\n", tag());
+			if (TRACE_STATE) logerror("WAIT_INDEX_DONE\n");
 			sub_state = TRACK_DONE;
 			live_start(WRITE_TRACK_DATA);
 			pll_start_writing(machine().time());
 			return;
 
 		case TRACK_DONE:
-			if (TRACE_STATE) logerror("%s: TRACK_DONE\n", tag());
+			if (TRACE_STATE) logerror("TRACK_DONE\n");
 			if(format_last_byte_count) {
 				char buf[32];
 				if(format_last_byte_count > 1)
@@ -779,12 +779,12 @@ void wd_fdc_t::write_track_continue()
 					sprintf(buf, "%02x", format_last_byte);
 				format_description_string += buf;
 			}
-			if (TRACE_DESC) logerror("%s: track description %s\n", tag(), format_description_string.c_str());
+			if (TRACE_DESC) logerror("track description %s\n", format_description_string.c_str());
 			command_end();
 			return;
 
 		default:
-			logerror("%s: write track unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("write track unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -793,7 +793,7 @@ void wd_fdc_t::write_track_continue()
 
 void wd_fdc_t::write_sector_start()
 {
-	if (TRACE_COMMAND) logerror("%s: write sector%s (c=%02x) t=%d, s=%d\n", tag(), command & 0x10 ? " multiple" : "", command, track, sector);
+	if (TRACE_COMMAND) logerror("write sector%s (c=%02x) t=%d, s=%d\n", command & 0x10 ? " multiple" : "", command, track, sector);
 
 	if(!is_ready()) {
 		command_end();
@@ -815,7 +815,7 @@ void wd_fdc_t::write_sector_continue()
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
-			if (TRACE_STATE) logerror("%s: SPINUP\n", tag());
+			if (TRACE_STATE) logerror("SPINUP\n");
 			if(!(status & S_MON)) {
 				spinup();
 				return;
@@ -824,11 +824,11 @@ void wd_fdc_t::write_sector_continue()
 			break;
 
 		case SPINUP_WAIT:
-			if (TRACE_STATE) logerror("%s: SPINUP_WAIT\n", tag());
+			if (TRACE_STATE) logerror("SPINUP_WAIT\n");
 			return;
 
 		case SPINUP_DONE:
-			if (TRACE_STATE) logerror("%s: SPINUP_DONE\n", tag());
+			if (TRACE_STATE) logerror("SPINUP_DONE\n");
 			if(command & 4) {
 				sub_state = SETTLE_WAIT;
 				delay_cycles(t_gen, settle_time());
@@ -839,18 +839,18 @@ void wd_fdc_t::write_sector_continue()
 			}
 
 		case SETTLE_WAIT:
-			if (TRACE_STATE) logerror("%s: SETTLE_WAIT\n", tag());
+			if (TRACE_STATE) logerror("SETTLE_WAIT\n");
 			return;
 
 		case SETTLE_DONE:
-			if (TRACE_STATE) logerror("%s: SETTLE_DONE\n", tag());
+			if (TRACE_STATE) logerror("SETTLE_DONE\n");
 			sub_state = SCAN_ID;
 			counter = 0;
 			live_start(SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
-			if (TRACE_STATE) logerror("%s: SCAN_ID\n", tag());
+			if (TRACE_STATE) logerror("SCAN_ID\n");
 			if(!sector_matches()) {
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
@@ -866,13 +866,13 @@ void wd_fdc_t::write_sector_continue()
 			return;
 
 		case SCAN_ID_FAILED:
-			if (TRACE_STATE) logerror("%s: SCAN_ID_FAILED\n", tag());
+			if (TRACE_STATE) logerror("SCAN_ID_FAILED\n");
 			status |= S_RNF;
 			command_end();
 			return;
 
 		case SECTOR_WRITE:
-			if (TRACE_STATE) logerror("%s: SECTOR_WRITE\n", tag());
+			if (TRACE_STATE) logerror("SECTOR_WRITE\n");
 			if(command & 0x10) {
 				sector++;
 				sub_state = SPINUP_DONE;
@@ -883,7 +883,7 @@ void wd_fdc_t::write_sector_continue()
 			break;
 
 		default:
-			logerror("%s: write sector unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("write sector unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -891,7 +891,7 @@ void wd_fdc_t::write_sector_continue()
 
 void wd_fdc_t::interrupt_start()
 {
-	if (TRACE_COMMAND) logerror("%s: Forced interrupt (c=%02x)\n", tag(), command);
+	if (TRACE_COMMAND) logerror("Forced interrupt (c=%02x)\n", command);
 
 	if(status & S_BUSY) {
 		main_state = sub_state = cur_live.state = IDLE;
@@ -990,6 +990,11 @@ void wd_fdc_t::do_generic()
 		sub_state = DATA_LOAD_WAIT_DONE;
 		break;
 
+	case INITIAL_RESTORE:
+		last_dir = 1;
+		seek_start(RESTORE);
+		break;
+
 	default:
 		if(cur_live.tm.is_never())
 			logerror("%s: do_generic on unknown sub-state %d\n", ttsn().c_str(), sub_state);
@@ -1055,7 +1060,7 @@ void wd_fdc_t::do_cmd_w()
 
 void wd_fdc_t::cmd_w(UINT8 val)
 {
-	if (TRACE_COMP) logerror("%s: Initiating command %02x\n", tag(), val);
+	if (TRACE_COMP) logerror("Initiating command %02x\n", val);
 	if (inverted_bus) val ^= 0xff;
 
 	if(intrq && !(intrq_cond & I_IMM)) {
@@ -1492,7 +1497,7 @@ bool wd_fdc_t::write_one_bit(const attotime &limit)
 
 void wd_fdc_t::live_write_raw(UINT16 raw)
 {
-	if (TRACE_WRITE) logerror("%s: write raw %04x, CRC=%04x\n", tag(), raw, cur_live.crc);
+	if (TRACE_WRITE) logerror("write raw %04x, CRC=%04x\n", raw, cur_live.crc);
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = raw & 1;
 }
@@ -1511,7 +1516,7 @@ void wd_fdc_t::live_write_mfm(UINT8 mfm)
 	}
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = context;
-	if (TRACE_WRITE) logerror("%s: live_write_mfm byte=%02x, raw=%04x, CRC=%04x\n", tag(), mfm, raw, cur_live.crc);
+	if (TRACE_WRITE) logerror("live_write_mfm byte=%02x, raw=%04x, CRC=%04x\n", mfm, raw, cur_live.crc);
 }
 
 
@@ -1524,7 +1529,7 @@ void wd_fdc_t::live_write_fm(UINT8 fm)
 	cur_live.data_reg = fm;
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = fm & 1;
-	if (TRACE_WRITE) logerror("%s: live_write_fm byte=%02x, raw=%04x, CRC=%04x\n", tag(), fm, raw, cur_live.crc);
+	if (TRACE_WRITE) logerror("live_write_fm byte=%02x, raw=%04x, CRC=%04x\n", fm, raw, cur_live.crc);
 }
 
 void wd_fdc_t::live_run(attotime limit)

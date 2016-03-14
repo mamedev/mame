@@ -263,7 +263,7 @@ public:
 
 	rawinput_keyboard_device(running_machine& machine, const char* name, input_module& module)
 		: rawinput_device(machine, name, DEVICE_CLASS_KEYBOARD, module),
-			keyboard({0})
+			keyboard({{0}})
 	{
 	}
 
@@ -370,7 +370,7 @@ public:
 		: wininput_module(type, name),
 			get_rawinput_device_list("GetRawInputDeviceList", L"user32.dll"),
 			get_rawinput_data("GetRawInputData", L"user32.dll"),
-			get_rawinput_device_info("GetRawInputDeviceInfoW", L"user32.dll"),
+			get_rawinput_device_info("GetRawInputDeviceInfo", L"user32.dll"),
 			register_rawinput_devices("RegisterRawInputDevices", L"user32.dll")
 	{
 	}
@@ -549,8 +549,8 @@ public:
 	}
 
 protected:
-	USHORT usagepage() { return 1; }
-	USHORT usage() { return 6; }
+	USHORT usagepage() override { return 1; }
+	USHORT usage() override { return 6; }
 	void add_rawinput_device(running_machine& machine, RAWINPUTDEVICELIST * device) override
 	{
 		// make sure this is a keyboard
@@ -596,8 +596,8 @@ public:
 	}
 
 protected:
-	USHORT usagepage() { return 1; }
-	USHORT usage() { return 2; }
+	USHORT usagepage() override { return 1; }
+	USHORT usage() override { return 2; }
 	void add_rawinput_device(running_machine& machine, RAWINPUTDEVICELIST * device) override
 	{
 		// make sure this is a mouse

@@ -485,7 +485,7 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nanos)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
 	MCFG_DEVICE_ADD("z80ctc_0", Z80CTC, XTAL_4MHz)

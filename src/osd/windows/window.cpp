@@ -12,7 +12,6 @@
 // Needed for RAW Input
 #define WM_INPUT 0x00FF
 
-#include <stdio.h> // must be here otherwise issues with I64FMT in MINGW
 // standard C headers
 #include <process.h>
 
@@ -152,7 +151,7 @@ static void mtlog_dump(void)
 	for (i = 0; i < mtlogindex; i++)
 	{
 		osd_ticks_t curr = mtlog[i].timestamp * 1000000 / cps;
-		fprintf(f, "%20" I64FMT "d %10" I64FMT "d %s\n", (UINT64)curr, (UINT64)(curr - last), mtlog[i].event);
+		fprintf(f, "%s",string_format("%20I64d %10I64d %s\n", (UINT64)curr, (UINT64)(curr - last), mtlog[i].event).c_str());
 		last = curr;
 	}
 	fclose(f);
@@ -174,7 +173,7 @@ bool windows_osd_interface::window_init()
 	size_t temp;
 
 	// determine if we are using multithreading or not
-	multithreading_enabled = downcast<windows_options &>(machine().options()).multithreading();
+	multithreading_enabled = false;//downcast<windows_options &>(machine().options()).multithreading();
 
 	// get the main thread ID before anything else
 	main_threadid = GetCurrentThreadId();

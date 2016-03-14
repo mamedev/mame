@@ -40,7 +40,7 @@ if _OPTIONS["with-bundled-lua"] then
 	}
 end
 
-if (_OPTIONS["targetos"] == "windows") then
+if (_OPTIONS["targetos"] == "windows" and _OPTIONS["osd"] ~= "osdmini") then
 	defines {
 		"UI_WINDOWS",
 	}

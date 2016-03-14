@@ -34,7 +34,7 @@ bool CSVReporter::ReportContext(const Context& context) {
 
   if (context.cpu_scaling_enabled) {
     std::cerr << "***WARNING*** CPU scaling is enabled, the benchmark "
-                 "real time measurements may be noisy and will incure extra "
+                 "real time measurements may be noisy and will incur extra "
                  "overhead.\n";
   }
 

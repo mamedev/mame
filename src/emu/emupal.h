@@ -217,31 +217,20 @@
 	palette_device::static_enable_hilights(*device);
 
 
-// standard palettes
-#define MCFG_PALETTE_ADD_BLACK_AND_WHITE(_tag) \
+// monochrome palettes
+#define MCFG_PALETTE_ADD_MONOCHROME(_tag) \
 	MCFG_PALETTE_ADD(_tag, 2) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_black_and_white), downcast<palette_device *>(device)));
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome), downcast<palette_device *>(device)));
 
-#define MCFG_PALETTE_ADD_WHITE_AND_BLACK(_tag) \
+#define MCFG_PALETTE_ADD_MONOCHROME_INVERTED(_tag) \
 	MCFG_PALETTE_ADD(_tag, 2) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_white_and_black), downcast<palette_device *>(device)));
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome_inverted), downcast<palette_device *>(device)));
 
-#define MCFG_PALETTE_ADD_MONOCHROME_AMBER(_tag) \
-	MCFG_PALETTE_ADD(_tag, 2) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome_amber), downcast<palette_device *>(device)));
-
-#define MCFG_PALETTE_ADD_MONOCHROME_GREEN(_tag) \
-	MCFG_PALETTE_ADD(_tag, 2) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome_green), downcast<palette_device *>(device)));
-
-#define MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT(_tag) \
+#define MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT(_tag) \
 	MCFG_PALETTE_ADD(_tag, 3) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome_green_highlight), downcast<palette_device *>(device)));
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome_highlight), downcast<palette_device *>(device)));
 
-#define MCFG_PALETTE_ADD_MONOCHROME_YELLOW(_tag) \
-	MCFG_PALETTE_ADD(_tag, 2) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome_yellow), downcast<palette_device *>(device)));
-
+// 8-bit palettes
 #define MCFG_PALETTE_ADD_3BIT_RGB(_tag) \
 	MCFG_PALETTE_ADD(_tag, 8) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_rgb), downcast<palette_device *>(device)));
@@ -266,10 +255,12 @@
 	MCFG_PALETTE_ADD(_tag, 8) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_bgr), downcast<palette_device *>(device)));
 
+// 15-bit palettes
 #define MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB(_tag) \
 	MCFG_PALETTE_ADD(_tag, 32768) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB), downcast<palette_device *>(device)));
 
+// 16-bit palettes
 #define MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR(_tag) \
 	MCFG_PALETTE_ADD(_tag, 32768) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_BBBBBGGGGGRRRRR), downcast<palette_device *>(device)));
@@ -437,12 +428,9 @@ public:
 
 	// generic palette init routines
 	void palette_init_all_black(palette_device &palette);
-	void palette_init_black_and_white(palette_device &palette);
-	void palette_init_white_and_black(palette_device &palette);
-	void palette_init_monochrome_amber(palette_device &palette);
-	void palette_init_monochrome_green(palette_device &palette);
-	void palette_init_monochrome_green_highlight(palette_device &palette);
-	void palette_init_monochrome_yellow(palette_device &palette);
+	void palette_init_monochrome(palette_device &palette);
+	void palette_init_monochrome_inverted(palette_device &palette);
+	void palette_init_monochrome_highlight(palette_device &palette);
 	void palette_init_3bit_rgb(palette_device &palette);
 	void palette_init_3bit_rbg(palette_device &palette);
 	void palette_init_3bit_brg(palette_device &palette);

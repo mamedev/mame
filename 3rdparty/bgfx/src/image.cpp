@@ -64,6 +64,10 @@ namespace bgfx
 		{  64, 1, 1,  8, 1, 1,  0, 0, uint8_t(EncodingType::Int  ) }, // RG32I
 		{  64, 1, 1,  8, 1, 1,  0, 0, uint8_t(EncodingType::Uint ) }, // RG32U
 		{  64, 1, 1,  8, 1, 1,  0, 0, uint8_t(EncodingType::Float) }, // RG32F
+		{  24, 1, 1,  3, 1, 1,  0, 0, uint8_t(EncodingType::Unorm) }, // RGB8
+		{  24, 1, 1,  3, 1, 1,  0, 0, uint8_t(EncodingType::Int  ) }, // RGB8I
+		{  24, 1, 1,  3, 1, 1,  0, 0, uint8_t(EncodingType::Uint ) }, // RGB8U
+		{  24, 1, 1,  3, 1, 1,  0, 0, uint8_t(EncodingType::Snorm) }, // RGB8S
 		{  32, 1, 1,  4, 1, 1,  0, 0, uint8_t(EncodingType::Float) }, // RGB9E5F
 		{  32, 1, 1,  4, 1, 1,  0, 0, uint8_t(EncodingType::Unorm) }, // BGRA8
 		{  32, 1, 1,  4, 1, 1,  0, 0, uint8_t(EncodingType::Unorm) }, // RGBA8
@@ -141,6 +145,10 @@ namespace bgfx
 		"RG32I",      // RG32I
 		"RG32U",      // RG32U
 		"RG32F",      // RG32F
+		"RGB8",       // RGB8
+		"RGB8I",      // RGB8I
+		"RGB8U",      // RGB8U
+		"RGB8S",      // RGB8S
 		"RGB9E5",     // RGB9E5F
 		"BGRA8",      // BGRA8
 		"RGBA8",      // RGBA8
@@ -717,23 +725,72 @@ namespace bgfx
 		_dst[1] = float(src[1]);
 	}
 
-	// RGBA8
-	void packRgba8(void* _dst, const float* _src)
+	// RGB8
+	void packRgb8(void* _dst, const float* _src)
 	{
 		uint8_t* dst = (uint8_t*)_dst;
 		dst[0] = uint8_t(toUnorm(_src[0], 255.0f) );
 		dst[1] = uint8_t(toUnorm(_src[1], 255.0f) );
 		dst[2] = uint8_t(toUnorm(_src[2], 255.0f) );
-		dst[3] = uint8_t(toUnorm(_src[3], 255.0f) );
 	}
 
-	void unpackRgba8(float* _dst, const void* _src)
+	void unpackRgb8(float* _dst, const void* _src)
 	{
 		const uint8_t* src = (const uint8_t*)_src;
 		_dst[0] = fromUnorm(src[0], 255.0f);
 		_dst[1] = fromUnorm(src[1], 255.0f);
 		_dst[2] = fromUnorm(src[2], 255.0f);
-		_dst[3] = fromUnorm(src[3], 255.0f);
+	}
+
+	// RGB8S
+	void packRgb8S(void* _dst, const float* _src)
+	{
+		int8_t* dst = (int8_t*)_dst;
+		dst[0] = int8_t(toSnorm(_src[0], 127.0f) );
+		dst[1] = int8_t(toSnorm(_src[1], 127.0f) );
+		dst[2] = int8_t(toSnorm(_src[2], 127.0f) );
+	}
+
+	void unpackRgb8S(float* _dst, const void* _src)
+	{
+		const int8_t* src = (const int8_t*)_src;
+		_dst[0] = fromSnorm(src[0], 127.0f);
+		_dst[1] = fromSnorm(src[1], 127.0f);
+		_dst[2] = fromSnorm(src[2], 127.0f);
+	}
+
+	// RGB8I
+	void packRgb8I(void* _dst, const float* _src)
+	{
+		int8_t* dst = (int8_t*)_dst;
+		dst[0] = int8_t(_src[0]);
+		dst[1] = int8_t(_src[1]);
+		dst[2] = int8_t(_src[2]);
+	}
+
+	void unpackRgb8I(float* _dst, const void* _src)
+	{
+		const int8_t* src = (const int8_t*)_src;
+		_dst[0] = float(src[0]);
+		_dst[1] = float(src[1]);
+		_dst[2] = float(src[2]);
+	}
+
+	// RGB8U
+	void packRgb8U(void* _dst, const float* _src)
+	{
+		uint8_t* dst = (uint8_t*)_dst;
+		dst[0] = uint8_t(_src[0]);
+		dst[1] = uint8_t(_src[1]);
+		dst[2] = uint8_t(_src[2]);
+	}
+
+	void unpackRgb8U(float* _dst, const void* _src)
+	{
+		const uint8_t* src = (const uint8_t*)_src;
+		_dst[0] = float(src[0]);
+		_dst[1] = float(src[1]);
+		_dst[2] = float(src[2]);
 	}
 
 	// BGRA8
@@ -752,6 +809,25 @@ namespace bgfx
 		_dst[0] = fromUnorm(src[2], 255.0f);
 		_dst[1] = fromUnorm(src[1], 255.0f);
 		_dst[2] = fromUnorm(src[0], 255.0f);
+		_dst[3] = fromUnorm(src[3], 255.0f);
+	}
+
+	// RGBA8
+	void packRgba8(void* _dst, const float* _src)
+	{
+		uint8_t* dst = (uint8_t*)_dst;
+		dst[0] = uint8_t(toUnorm(_src[0], 255.0f) );
+		dst[1] = uint8_t(toUnorm(_src[1], 255.0f) );
+		dst[2] = uint8_t(toUnorm(_src[2], 255.0f) );
+		dst[3] = uint8_t(toUnorm(_src[3], 255.0f) );
+	}
+
+	void unpackRgba8(float* _dst, const void* _src)
+	{
+		const uint8_t* src = (const uint8_t*)_src;
+		_dst[0] = fromUnorm(src[0], 255.0f);
+		_dst[1] = fromUnorm(src[1], 255.0f);
+		_dst[2] = fromUnorm(src[2], 255.0f);
 		_dst[3] = fromUnorm(src[3], 255.0f);
 	}
 
@@ -1218,18 +1294,18 @@ namespace bgfx
 	void packR5G6B5(void* _dst, const float* _src)
 	{
 		*( (uint16_t*)_dst) = 0
-			| uint16_t(toUnorm(_src[0], 31.0f)    )
+			| uint16_t(toUnorm(_src[0], 31.0f)<<11)
 			| uint16_t(toUnorm(_src[1], 63.0f)<< 5)
-			| uint16_t(toUnorm(_src[2], 31.0f)<<11)
+			| uint16_t(toUnorm(_src[2], 31.0f)    )
 			;
 	}
 
 	void unpackR5G6B5(float* _dst, const void* _src)
 	{
 		uint16_t packed = *( (const uint16_t*)_src);
-		_dst[0] = float( ( (packed    ) & 0x1f) ) / 31.0f;
+		_dst[0] = float( ( (packed>>11) & 0x1f) ) / 31.0f;
 		_dst[1] = float( ( (packed>> 5) & 0x3f) ) / 63.0f;
-		_dst[2] = float( ( (packed>>11) & 0x1f) ) / 31.0f;
+		_dst[2] = float( ( (packed    ) & 0x1f) ) / 31.0f;
 	}
 
 	// RGBA4
@@ -1252,6 +1328,26 @@ namespace bgfx
 		_dst[3] = float( ( (packed>>12) & 0xf) ) / 15.0f;
 	}
 
+	// RGBA4
+	void packBgra4(void* _dst, const float* _src)
+	{
+		*( (uint16_t*)_dst) = 0
+			| uint16_t(toUnorm(_src[0], 15.0f)<< 8)
+			| uint16_t(toUnorm(_src[1], 15.0f)<< 4)
+			| uint16_t(toUnorm(_src[2], 15.0f)    )
+			| uint16_t(toUnorm(_src[3], 15.0f)<<12)
+			;
+	}
+
+	void unpackBgra4(float* _dst, const void* _src)
+	{
+		uint16_t packed = *( (const uint16_t*)_src);
+		_dst[0] = float( ( (packed>> 8) & 0xf) ) / 15.0f;
+		_dst[1] = float( ( (packed>> 4) & 0xf) ) / 15.0f;
+		_dst[2] = float( ( (packed    ) & 0xf) ) / 15.0f;
+		_dst[3] = float( ( (packed>>12) & 0xf) ) / 15.0f;
+	}
+
 	// RGB5A1
 	void packRgb5a1(void* _dst, const float* _src)
 	{
@@ -1269,6 +1365,26 @@ namespace bgfx
 		_dst[0] = float( ( (packed    ) & 0x1f) ) / 31.0f;
 		_dst[1] = float( ( (packed>> 5) & 0x1f) ) / 31.0f;
 		_dst[2] = float( ( (packed>>10) & 0x1f) ) / 31.0f;
+		_dst[3] = float( ( (packed>>14) &  0x1) );
+	}
+
+	// BGR5A1
+	void packBgr5a1(void* _dst, const float* _src)
+	{
+		*( (uint16_t*)_dst) = 0
+			| uint16_t(toUnorm(_src[0], 31.0f)<<10)
+			| uint16_t(toUnorm(_src[1], 31.0f)<< 5)
+			| uint16_t(toUnorm(_src[2], 31.0f)    )
+			| uint16_t(toUnorm(_src[3],  1.0f)<<15)
+			;
+	}
+
+	void unpackBgr5a1(float* _dst, const void* _src)
+	{
+		uint16_t packed = *( (const uint16_t*)_src);
+		_dst[0] = float( ( (packed>>10) & 0x1f) ) / 31.0f;
+		_dst[1] = float( ( (packed>> 5) & 0x1f) ) / 31.0f;
+		_dst[2] = float( ( (packed    ) & 0x1f) ) / 31.0f;
 		_dst[3] = float( ( (packed>>14) &  0x1) );
 	}
 
@@ -1309,9 +1425,6 @@ namespace bgfx
 		_dst[1] = bx::halfToFloat( (packed>> 7) & 0x7ff0);
 		_dst[2] = bx::halfToFloat( (packed>>17) & 0x7fe0);
 	}
-
-	typedef void (*PackFn)(void*, const float*);
-	typedef void (*UnpackFn)(float*, const void*);
 
 	struct PackUnpack
 	{
@@ -1365,6 +1478,10 @@ namespace bgfx
 		{ packRg32I,      unpackRg32I      }, // RG32I
 		{ packRg32U,      unpackRg32U      }, // RG32U
 		{ packRg32F,      unpackRg32F      }, // RG32F
+		{ packRgb8,       unpackRgb8       }, // RGB8
+		{ packRgb8S,      unpackRgb8S      }, // RGB8S
+		{ packRgb8I,      unpackRgb8I      }, // RGB8I
+		{ packRgb8U,      unpackRgb8U      }, // RGB8U
 		{ packRgb9E5F,    unpackRgb9E5F    }, // RGB9E5F
 		{ packBgra8,      unpackBgra8      }, // BGRA8
 		{ packRgba8,      unpackRgba8      }, // RGBA8
@@ -1396,7 +1513,49 @@ namespace bgfx
 	};
 	BX_STATIC_ASSERT(TextureFormat::Count == BX_COUNTOF(s_packUnpack) );
 
-	bool imageConvert(void* _dst, TextureFormat::Enum _dstFormat, const void* _src, TextureFormat::Enum _srcFormat, uint32_t _width, uint32_t _height)
+	bool imageConvert(TextureFormat::Enum _dstFormat, TextureFormat::Enum _srcFormat)
+	{
+		UnpackFn unpack = s_packUnpack[_srcFormat].unpack;
+		PackFn   pack   = s_packUnpack[_dstFormat].pack;
+		return NULL != pack
+			&& NULL != unpack
+			;
+	}
+
+	void imageConvert(void* _dst, uint32_t _bpp, PackFn _pack, const void* _src, UnpackFn _unpack, uint32_t _size)
+	{
+		const uint8_t* src = (uint8_t*)_src;
+		uint8_t* dst = (uint8_t*)_dst;
+
+		const uint32_t size = _size * 8 / _bpp;
+
+		for (uint32_t ii = 0; ii < size; ++ii)
+		{
+			float rgba[4];
+			_unpack(rgba, &src[ii*_bpp/8]);
+			_pack(&dst[ii*_bpp/8], rgba);
+		}
+	}
+
+	void imageConvert(void* _dst, uint32_t _dstBpp, PackFn _pack, const void* _src, uint32_t _srcBpp, UnpackFn _unpack, uint32_t _width, uint32_t _height, uint32_t _srcPitch)
+	{
+		const uint8_t* src = (uint8_t*)_src;
+		uint8_t* dst = (uint8_t*)_dst;
+
+		const uint32_t dstPitch = _width * _dstBpp / 8;
+
+		for (uint32_t yy = 0; yy < _height; ++yy, src += _srcPitch, dst += dstPitch)
+		{
+			for (uint32_t xx = 0; xx < _width; ++xx)
+			{
+				float rgba[4];
+				_unpack(rgba, &src[xx*_srcBpp/8]);
+				_pack(&dst[xx*_dstBpp/8], rgba);
+			}
+		}
+	}
+
+	bool imageConvert(void* _dst, TextureFormat::Enum _dstFormat, const void* _src, TextureFormat::Enum _srcFormat, uint32_t _width, uint32_t _height, uint32_t _srcPitch)
 	{
 		UnpackFn unpack = s_packUnpack[_srcFormat].unpack;
 		PackFn   pack   = s_packUnpack[_dstFormat].pack;
@@ -1406,25 +1565,17 @@ namespace bgfx
 			return false;
 		}
 
-		const uint8_t* src = (uint8_t*)_src;
-		uint8_t* dst = (uint8_t*)_dst;
-
-		const uint32_t srcBpp   = s_imageBlockInfo[_srcFormat].bitsPerPixel;
-		const uint32_t dstBpp   = s_imageBlockInfo[_dstFormat].bitsPerPixel;
-		const uint32_t srcPitch = _width * srcBpp / 8;
-		const uint32_t dstPitch = _width * dstBpp / 8;
-
-		for (uint32_t yy = 0; yy < _height; ++yy, src += srcPitch, dst += dstPitch)
-		{
-			for (uint32_t xx = 0; xx < _width; ++xx)
-			{
-				float rgba[4];
-				unpack(rgba, &src[xx*srcBpp/8]);
-				pack(&dst[xx*dstBpp/8], rgba);
-			}
-		}
+		const uint32_t srcBpp = s_imageBlockInfo[_srcFormat].bitsPerPixel;
+		const uint32_t dstBpp = s_imageBlockInfo[_dstFormat].bitsPerPixel;
+		imageConvert(_dst, dstBpp, pack, _src, srcBpp, unpack, _width, _height, _srcPitch);
 
 		return true;
+	}
+
+	bool imageConvert(void* _dst, TextureFormat::Enum _dstFormat, const void* _src, TextureFormat::Enum _srcFormat, uint32_t _width, uint32_t _height)
+	{
+		const uint32_t srcBpp = s_imageBlockInfo[_srcFormat].bitsPerPixel;
+		return imageConvert(_dst, _dstFormat, _src, _srcFormat, _width, _height, _width*srcBpp);
 	}
 
 	uint8_t bitRangeConvert(uint32_t _in, uint32_t _from, uint32_t _to)
@@ -2211,9 +2362,9 @@ namespace bgfx
 		}
 	}
 
-	const Memory* imageAlloc(ImageContainer& _imageContainer, TextureFormat::Enum _format, uint16_t _width, uint16_t _height, uint16_t _depth, bool _cubeMap, bool _mipsActive)
+	const Memory* imageAlloc(ImageContainer& _imageContainer, TextureFormat::Enum _format, uint16_t _width, uint16_t _height, uint16_t _depth, bool _cubeMap, bool _generateMips)
 	{
-		const uint8_t numMips = _mipsActive ? imageGetNumMips(_format, _width, _height) : 1;
+		const uint8_t numMips = _generateMips ? imageGetNumMips(_format, _width, _height) : 1;
 		uint32_t size = imageGetSize(_format, _width, _height, 0, false, numMips);
 		const Memory* image = alloc(size);
 
@@ -2673,6 +2824,7 @@ namespace bgfx
 #define KTX_RG16_SNORM                                0x8F99
 #define KTX_RGB16_SNORM                               0x8F9A
 #define KTX_RGBA16_SNORM                              0x8F9B
+#define KTX_SRGB8                                     0x8C41
 #define KTX_SRGB8_ALPHA8                              0x8C43
 #define KTX_RGBA32UI                                  0x8D70
 #define KTX_RGB32UI                                   0x8D71
@@ -2685,6 +2837,7 @@ namespace bgfx
 #define KTX_RGBA16I                                   0x8D88
 #define KTX_RGB16I                                    0x8D89
 #define KTX_RGBA8I                                    0x8D8E
+#define KTX_RGB8                                      0x8051
 #define KTX_RGB8I                                     0x8D8F
 #define KTX_RGB9_E5                                   0x8C3D
 #define KTX_R11F_G11F_B10F                            0x8C3A
@@ -2766,6 +2919,10 @@ namespace bgfx
 		{ KTX_RG32I,                                    KTX_ZERO,                                       KTX_RG,                                       KTX_INT,                          }, // RG32I
 		{ KTX_RG32UI,                                   KTX_ZERO,                                       KTX_RG,                                       KTX_UNSIGNED_INT,                 }, // RG32U
 		{ KTX_RG32F,                                    KTX_ZERO,                                       KTX_RG,                                       KTX_FLOAT,                        }, // RG32F
+		{ KTX_RGB8,                                     KTX_SRGB8,                                      KTX_RGB,                                      KTX_UNSIGNED_BYTE,                }, // RGB8
+		{ KTX_RGB8I,                                    KTX_ZERO,                                       KTX_RGB,                                      KTX_BYTE,                         }, // RGB8I
+		{ KTX_RGB8UI,                                   KTX_ZERO,                                       KTX_RGB,                                      KTX_UNSIGNED_BYTE,                }, // RGB8U
+		{ KTX_RGB8_SNORM,                               KTX_ZERO,                                       KTX_RGB,                                      KTX_BYTE,                         }, // RGB8S
 		{ KTX_RGB9_E5,                                  KTX_ZERO,                                       KTX_RGB,                                      KTX_UNSIGNED_INT_5_9_9_9_REV,     }, // RGB9E5F
 		{ KTX_BGRA,                                     KTX_SRGB8_ALPHA8,                               KTX_BGRA,                                     KTX_UNSIGNED_BYTE,                }, // BGRA8
 		{ KTX_RGBA8,                                    KTX_SRGB8_ALPHA8,                               KTX_RGBA,                                     KTX_UNSIGNED_BYTE,                }, // RGBA8
@@ -3277,8 +3434,11 @@ namespace bgfx
 			break;
 
 		default:
-			// Decompression not implemented... Make ugly red-yellow checkerboard texture.
-			imageCheckerboard(_width, _height, 16, UINT32_C(0xffff0000), UINT32_C(0xffffff00), _dst);
+			if (!imageConvert(_dst, TextureFormat::BGRA8, _src, _format, _width, _height, _pitch) )
+			{
+				// Failed to convert, just make ugly red-yellow checkerboard texture.
+				imageCheckerboard(_width, _height, 16, UINT32_C(0xffff0000), UINT32_C(0xffffff00), _dst);
+			}
 			break;
 		}
 	}
@@ -3544,8 +3704,10 @@ namespace bgfx
 		return false;
 	}
 
-	void imageWriteTga(bx::WriterI* _writer, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, bool _grayscale, bool _yflip)
+	void imageWriteTga(bx::WriterI* _writer, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, bool _grayscale, bool _yflip, bx::Error* _err)
 	{
+		BX_ERROR_SCOPE(_err);
+
 		uint8_t type = _grayscale ? 3 :  2;
 		uint8_t bpp  = _grayscale ? 8 : 32;
 
@@ -3558,7 +3720,7 @@ namespace bgfx
 		header[16] = bpp;
 		header[17] = 32;
 
-		bx::write(_writer, header, sizeof(header) );
+		bx::write(_writer, header, sizeof(header), _err);
 
 		uint32_t dstPitch = _width*bpp/8;
 		if (_yflip)
@@ -3566,52 +3728,56 @@ namespace bgfx
 			uint8_t* data = (uint8_t*)_src + _pitch*_height - _pitch;
 			for (uint32_t yy = 0; yy < _height; ++yy)
 			{
-				bx::write(_writer, data, dstPitch);
+				bx::write(_writer, data, dstPitch, _err);
 				data -= _pitch;
 			}
 		}
 		else if (_pitch == dstPitch)
 		{
-			bx::write(_writer, _src, _height*_pitch);
+			bx::write(_writer, _src, _height*_pitch, _err);
 		}
 		else
 		{
 			uint8_t* data = (uint8_t*)_src;
 			for (uint32_t yy = 0; yy < _height; ++yy)
 			{
-				bx::write(_writer, data, dstPitch);
+				bx::write(_writer, data, dstPitch, _err);
 				data += _pitch;
 			}
 		}
 	}
 
-	static int32_t imageWriteKtxHeader(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips)
+	static int32_t imageWriteKtxHeader(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, bx::Error* _err)
 	{
+		BX_ERROR_SCOPE(_err);
+
 		const KtxFormatInfo& tfi = s_translateKtxFormat[_format];
 
 		int32_t size = 0;
-		size += bx::write(_writer, "\xabKTX 11\xbb\r\n\x1a\n", 12);
-		size += bx::write(_writer, UINT32_C(0x04030201) );
-		size += bx::write(_writer, UINT32_C(0) ); // glType
-		size += bx::write(_writer, UINT32_C(1) ); // glTypeSize
-		size += bx::write(_writer, UINT32_C(0) ); // glFormat
-		size += bx::write(_writer, tfi.m_internalFmt); // glInternalFormat
-		size += bx::write(_writer, tfi.m_fmt); // glBaseInternalFormat
-		size += bx::write(_writer, _width);
-		size += bx::write(_writer, _height);
-		size += bx::write(_writer, _depth);
-		size += bx::write(_writer, UINT32_C(0) ); // numberOfArrayElements
-		size += bx::write(_writer, _cubeMap ? UINT32_C(6) : UINT32_C(0) );
-		size += bx::write(_writer, uint32_t(_numMips) );
-		size += bx::write(_writer, UINT32_C(0) ); // Meta-data size.
+		size += bx::write(_writer, "\xabKTX 11\xbb\r\n\x1a\n", 12, _err);
+		size += bx::write(_writer, UINT32_C(0x04030201), _err);
+		size += bx::write(_writer, UINT32_C(0), _err); // glType
+		size += bx::write(_writer, UINT32_C(1), _err); // glTypeSize
+		size += bx::write(_writer, UINT32_C(0), _err); // glFormat
+		size += bx::write(_writer, tfi.m_internalFmt, _err); // glInternalFormat
+		size += bx::write(_writer, tfi.m_fmt, _err); // glBaseInternalFormat
+		size += bx::write(_writer, _width, _err);
+		size += bx::write(_writer, _height, _err);
+		size += bx::write(_writer, _depth, _err);
+		size += bx::write(_writer, UINT32_C(0), _err); // numberOfArrayElements
+		size += bx::write(_writer, _cubeMap ? UINT32_C(6) : UINT32_C(0), _err);
+		size += bx::write(_writer, uint32_t(_numMips), _err);
+		size += bx::write(_writer, UINT32_C(0), _err); // Meta-data size.
 
-		BX_CHECK(size == 64, "KTX: Failed to write header size %d (expected: %d).", size, 64);
+		BX_WARN(size == 64, "KTX: Failed to write header size %d (expected: %d).", size, 64);
 		return size;
 	}
 
-	void imageWriteKtx(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, const void* _src)
+	void imageWriteKtx(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, const void* _src, bx::Error* _err)
 	{
-		imageWriteKtxHeader(_writer, _format, _cubeMap, _width, _height, _depth, _numMips);
+		BX_ERROR_SCOPE(_err);
+
+		imageWriteKtxHeader(_writer, _format, _cubeMap, _width, _height, _depth, _numMips, _err);
 
 		const ImageBlockInfo& blockInfo = s_imageBlockInfo[_format];
 		const uint8_t  bpp         = blockInfo.bitsPerPixel;
@@ -3632,11 +3798,11 @@ namespace bgfx
 			depth  = bx::uint32_max(1, depth);
 
 			uint32_t size = width*height*depth*bpp/8;
-			bx::write(_writer, size);
+			bx::write(_writer, size, _err);
 
 			for (uint8_t side = 0, numSides = _cubeMap ? 6 : 1; side < numSides; ++side)
 			{
-				bx::write(_writer, src, size);
+				bx::write(_writer, src, size, _err);
 				src += size;
 			}
 
@@ -3646,8 +3812,10 @@ namespace bgfx
 		}
 	}
 
-	void imageWriteKtx(bx::WriterI* _writer, ImageContainer& _imageContainer, const void* _data, uint32_t _size)
+	void imageWriteKtx(bx::WriterI* _writer, ImageContainer& _imageContainer, const void* _data, uint32_t _size, bx::Error* _err)
 	{
+		BX_ERROR_SCOPE(_err);
+
 		imageWriteKtxHeader(_writer
 			, TextureFormat::Enum(_imageContainer.m_format)
 			, _imageContainer.m_cubeMap
@@ -3655,19 +3823,20 @@ namespace bgfx
 			, _imageContainer.m_height
 			, _imageContainer.m_depth
 			, _imageContainer.m_numMips
+			, _err
 			);
 
 		for (uint8_t lod = 0, num = _imageContainer.m_numMips; lod < num; ++lod)
 		{
 			ImageMip mip;
 			imageGetRawData(_imageContainer, 0, lod, _data, _size, mip);
-			bx::write(_writer, mip.m_size);
+			bx::write(_writer, mip.m_size, _err);
 
 			for (uint8_t side = 0, numSides = _imageContainer.m_cubeMap ? 6 : 1; side < numSides; ++side)
 			{
 				if (imageGetRawData(_imageContainer, side, lod, _data, _size, mip) )
 				{
-					bx::write(_writer, mip.m_data, mip.m_size);
+					bx::write(_writer, mip.m_data, mip.m_size, _err);
 				}
 			}
 		}

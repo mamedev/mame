@@ -116,7 +116,7 @@ public:
 
 	void reserve(typename vector_type::size_type size)
 	{
-		if ((m_mode & std::ios_base::out) && (m_storage.size() < size))
+		if ((m_mode & std::ios_base::out) && (m_storage.capacity() < size))
 		{
 			m_storage.reserve(size);
 			adjust();
@@ -150,8 +150,8 @@ protected:
 		bool const out(which & std::ios_base::out);
 		if ((!in && !out) ||
 			(in && out && (std::ios_base::cur == dir)) ||
-			(in && (!(m_mode & std::ios_base::in) || !this->gptr())) ||
-			(out && (!(m_mode & std::ios_base::out) || !this->pptr())))
+			(in && !(m_mode & std::ios_base::in)) ||
+			(out && !(m_mode & std::ios_base::out)))
 		{
 			return pos_type(off_type(-1));
 		}
