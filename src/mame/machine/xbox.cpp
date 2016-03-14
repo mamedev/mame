@@ -839,6 +839,40 @@ static USBStandardInterfaceDescriptor intdesc = {9,4,0,0,2,0x58,0x42,0,0};
 static USBStandardEndpointDescriptor enddesc82 = {7,5,0x82,3,0x20,4};
 static USBStandardEndpointDescriptor enddesc02 = {7,5,0x02,3,0x20,4};
 
+#if 0
+//ic10
+static USBStandardDeviceDescriptor devdesc = { 0x12,0x01,0x0100,0x60,0x00,0x00,0x40,0x0CA3,0x0002,0x0108,0x01,0x02,0x00,0x01 };
+static USBStandardConfigurationDescriptor condesc = { 0x09,0x02,0x0058,0x01,0x01,0x00,0x80,0x96 };
+static USBStandardInterfaceDescriptor intdesc = { 0x09,0x04,0x00,0x00,0x0A,0xFF,0x00,0x00,0x00 };
+static USBStandardEndpointDescriptor enddesc01 = { 0x07,0x05,0x01,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor enddesc02 = { 0x07,0x05,0x02,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor enddesc03 = { 0x07,0x05,0x03,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor enddesc04 = { 0x07,0x05,0x04,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor enddesc05 = { 0x07,0x05,0x05,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor enddesc81 = { 0x07,0x05,0x81,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor enddesc82 = { 0x07,0x05,0x82,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor enddesc83 = { 0x07,0x05,0x83,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor enddesc84 = { 0x07,0x05,0x84,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor enddesc85 = { 0x07,0x05,0x85,0x02,0x0040,0x00 };
+static UINT8 strdesc0[] = { 0x04,0x03,0x00,0x00 };
+static UINT8 strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
+static UINT8 strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x03,0xFF,0x0B };
+
+//pc20
+static USBStandardDeviceDescriptor devdesc = { 0x12,0x01,0x0100,0x60,0x01,0x00,0x40,0x0CA3,0x0003,0x0110,0x01,0x02,0x00,0x01 };
+static USBStandardConfigurationDescriptor condesc = { 0x09,0x02,0x003C,0x01,0x01,0x00,0x80,0x96 };
+static USBStandardInterfaceDescriptor intdesc = { 0x09,0x04,0x00,0x00,0x06,0xFF,0x00,0x00,0x00 };
+static USBStandardEndpointDescriptor enddesc01 = { 0x07,0x05,0x01,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor enddesc02 = { 0x07,0x05,0x02,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor enddesc03 = { 0x07,0x05,0x03,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor enddesc81 = { 0x07,0x05,0x81,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor enddesc82 = { 0x07,0x05,0x82,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor enddesc83 = { 0x07,0x05,0x83,0x02,0x0040,0x00 };
+static UINT8 strdesc0[] = { 0x04,0x03,0x00,0x00 };
+static UINT8 strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
+static UINT8 strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x00,0x44,0x00 };
+#endif
+
 ohci_function_device::ohci_function_device(running_machine &machine)
 {
 	state = DefaultState;
@@ -906,6 +940,8 @@ void ohci_function_device::add_configuration_descriptor(USBStandardConfiguration
 	p[6] = descriptor.iConfiguration;
 	p[7] = descriptor.bmAttributes;
 	p[8] = descriptor.MaxPower;
+	c->position = p;
+	c->size = descriptor.bLength;
 	descriptors_pos += descriptor.bLength;
 	memcpy(&c->configuration_descriptor, &descriptor, sizeof(USBStandardConfigurationDescriptor));
 	configurations.push_front(*c);
@@ -931,12 +967,17 @@ void ohci_function_device::add_interface_descriptor(USBStandardInterfaceDescript
 	p[7] = descriptor.bInterfaceProtocol;
 	p[8] = descriptor.iInterface;
 	descriptors_pos += descriptor.bLength;
+	latest_configuration->size += descriptor.bLength;
 	for (auto i = latest_configuration->interfaces.begin(); i != latest_configuration->interfaces.end(); ++i)
 	{
 		if (i->alternate_settings.front().interface_descriptor.bInterfaceNumber == descriptor.bInterfaceNumber)
 		{
+			i->size += descriptor.bLength;
+			latest_configuration->interfaces.front().size += descriptor.bLength;
 			aa = new usb_device_interface_alternate;
 			memcpy(&aa->interface_descriptor, &descriptor, sizeof(USBStandardInterfaceDescriptor));
+			aa->position = p;
+			aa->size = descriptor.bLength;
 			i->alternate_settings.push_front(*aa);
 			latest_alternate = aa;
 			return;
@@ -945,6 +986,10 @@ void ohci_function_device::add_interface_descriptor(USBStandardInterfaceDescript
 	ii = new usb_device_interface;
 	aa = new usb_device_interface_alternate;
 	memcpy(&aa->interface_descriptor, &descriptor, sizeof(USBStandardInterfaceDescriptor));
+	aa->position = p;
+	aa->size = descriptor.bLength;
+	ii->position = p;
+	ii->size = descriptor.bLength;
 	ii->selected_alternate = -1;
 	ii->alternate_settings.push_front(*aa);
 	latest_alternate = aa;
@@ -966,6 +1011,25 @@ void ohci_function_device::add_endpoint_descriptor(USBStandardEndpointDescriptor
 	p[6] = descriptor.bInterval;
 	descriptors_pos += descriptor.bLength;
 	latest_alternate->endpoint_descriptors.push_front(descriptor);
+	latest_alternate->size += descriptor.bLength;
+	latest_configuration->interfaces.front().size += descriptor.bLength;
+	latest_configuration->size += descriptor.bLength;
+}
+
+void ohci_function_device::add_string_descriptor(UINT8 *descriptor)
+{
+	usb_device_string *ss;
+	int len = descriptor[0];
+	UINT8 *p = descriptors + descriptors_pos;
+
+
+	ss = new usb_device_string;
+	memcpy(p, descriptor, len);
+	descriptors_pos += len;
+	ss->size = len;
+	ss->position = p;
+	device_strings.push_front(*ss);
+	//latest_configuration->size += len;
 }
 
 void ohci_function_device::select_configuration(int index)
@@ -1039,6 +1103,43 @@ int ohci_function_device::find_alternate(int interfacei)
 	return 0;
 }
 
+UINT8 *ohci_function_device::position_device_descriptor(int &size)
+{
+	size = descriptors_pos; // descriptors[0];
+	return descriptors;
+}
+
+UINT8 *ohci_function_device::position_configuration_descriptor(int index, int &size)
+{
+	for (auto c = configurations.begin(); c != configurations.end(); ++c)
+	{
+		if (c->configuration_descriptor.bConfigurationValue == index)
+		{
+			size = c->size;
+			return c->position;
+		}
+	}
+	size = 0;
+	return nullptr;
+}
+
+UINT8 *ohci_function_device::position_string_descriptor(int index, int &size)
+{
+	int i = 0;
+
+	for (auto s = device_strings.begin(); s != device_strings.end(); ++s)
+	{
+		if (index == i)
+		{
+			size = s->size;
+			return s->position;
+		}
+		i++;
+	}
+	size = 0;
+	return nullptr;
+}
+
 void ohci_function_device::execute_reset()
 {
 	address = 0;
@@ -1047,7 +1148,7 @@ void ohci_function_device::execute_reset()
 
 int ohci_function_device::execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size)
 {
-	int descriptortype;// descriptorindex;
+	int descriptortype, descriptorindex;
 
 	if (pid == SetupPid) {
 		USBSetupPacket *p=(USBSetupPacket *)buffer;
@@ -1080,22 +1181,16 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 					break;
 				case GET_DESCRIPTOR:
 					descriptortype = p->wValue >> 8;
-					//descriptorindex = p->wValue & 255;
+					descriptorindex = p->wValue & 255;
 					if (descriptortype == DEVICE) { // device descriptor
-						endpoints[endpoint].position = descriptors;
-						endpoints[endpoint].remain = descriptors[0];
+						endpoints[endpoint].position = position_device_descriptor(endpoints[endpoint].remain);
 					}
 					else if (descriptortype == CONFIGURATION) { // configuration descriptor
-						endpoints[endpoint].position = descriptors + 18;
-						endpoints[endpoint].remain = descriptors[18 + 2];
+						endpoints[endpoint].position = position_configuration_descriptor(descriptorindex, endpoints[endpoint].remain);
 					}
-					else if (descriptortype == INTERFACE) { // interface descriptor
-						endpoints[endpoint].position = descriptors + 18 + 9;
-						endpoints[endpoint].remain = descriptors[18 + 9];
-					}
-					else if (descriptortype == ENDPOINT) { // endpoint descriptor
-						endpoints[endpoint].position = descriptors + 18 + 9 + 9;
-						endpoints[endpoint].remain = descriptors[18 + 9 + 9];
+					else if (descriptortype == STRING) { // string descriptor
+						//p->wIndex; language id
+						endpoints[endpoint].position = position_string_descriptor(descriptorindex, endpoints[endpoint].remain);
 					}
 					else
 						endpoints[endpoint].remain = 0;

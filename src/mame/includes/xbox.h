@@ -227,14 +227,24 @@ enum USBEndpointType
 	InterruptEndpoint
 };
 
+struct usb_device_string
+{
+	UINT8 *position;
+	int size;
+};
+
 struct usb_device_interface_alternate
 {
+	UINT8 *position;
+	int size;
 	USBStandardInterfaceDescriptor interface_descriptor;
 	std::forward_list<USBStandardEndpointDescriptor> endpoint_descriptors;
 };
 
 struct usb_device_interface
 {
+	UINT8 *position;
+	int size;
 	std::forward_list<usb_device_interface_alternate> alternate_settings;
 	int selected_alternate;
 };
@@ -242,6 +252,8 @@ struct usb_device_interface
 struct usb_device_configuration
 {
 	USBStandardConfigurationDescriptor configuration_descriptor;
+	UINT8 *position;
+	int size;
 	std::forward_list<usb_device_interface> interfaces;
 };
 
@@ -262,9 +274,13 @@ private:
 	void add_configuration_descriptor(USBStandardConfigurationDescriptor &descriptor);
 	void add_interface_descriptor(USBStandardInterfaceDescriptor &descriptor);
 	void add_endpoint_descriptor(USBStandardEndpointDescriptor &descriptor);
+	void add_string_descriptor(UINT8 *descriptor);
 	void select_configuration(int index);
 	void select_alternate(int interfacei, int index);
 	int find_alternate(int interfacei);
+	UINT8 *position_device_descriptor(int &size);
+	UINT8 *position_configuration_descriptor(int index, int &size);
+	UINT8 *position_string_descriptor(int index, int &size);
 	struct {
 		int type;
 		int controldirection;
@@ -283,6 +299,7 @@ private:
 	int descriptors_pos;
 	USBStandardDeviceDescriptor device_descriptor;
 	std::forward_list<usb_device_configuration> configurations;
+	std::forward_list<usb_device_string> device_strings;
 	usb_device_configuration *latest_configuration;
 	usb_device_interface_alternate *latest_alternate;
 	usb_device_configuration *selected_configuration;
