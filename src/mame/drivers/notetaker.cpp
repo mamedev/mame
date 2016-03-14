@@ -120,6 +120,7 @@ public:
 	DECLARE_WRITE16_MEMBER(IPConReg_w);
 	DECLARE_WRITE16_MEMBER(FIFOReg_w);
 	DECLARE_WRITE16_MEMBER(FIFOBus_w);
+	DECLARE_WRITE16_MEMBER(DiskReg_w);
 	DECLARE_WRITE16_MEMBER(LoadDispAddr_w);
 
 	// uarts
@@ -158,6 +159,23 @@ public:
 	UINT8 m_SHConB;
 	UINT8 m_SHConA;
 	UINT8 m_SetSH;
+	// DiskReg
+	UINT8 m_ADCSpd0;
+	UINT8 m_ADCSpd1;
+	UINT8 m_StopWordClock_q;
+	UINT8 m_ClrDiskCont_q;
+	UINT8 m_ProgBitClk1;
+	UINT8 m_ProgBitClk2;
+	UINT8 m_ProgBitClk3;
+	UINT8 m_AnSel4;
+	UINT8 m_AnSel2;
+	UINT8 m_AnSel1;
+	UINT8 m_DriveSel1;
+	UINT8 m_DriveSel2;
+	UINT8 m_DriveSel3;
+	UINT8 m_SideSelect;
+	UINT8 m_Disk5VOn;
+	UINT8 m_Disk12VOn;
 	// output fifo, for DAC
 	UINT16 m_outfifo[16]; // technically three 74LS225 5bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo (one bit unused per chip)
 	UINT8 m_outfifo_count;
@@ -248,7 +266,7 @@ WRITE16_MEMBER(notetaker_state::IPConReg_w)
 {
 	m_BootSeqDone = (data&0x80)?1:0;
 	m_ProcLock = (data&0x40)?1:0; // bus lock for this processor (hold other processor in wait state)
-	m_CharCtr = (data&0x20)?1:0; // battery charge control
+	m_CharCtr = (data&0x20)?1:0; // battery charge control (incorrectly called 'Char counter' in source code)
 	m_DisableROM = (data&0x10)?1:0; // disable rom at 0000-0fff
 	m_CorrOn_q = (data&0x08)?1:0; // CorrectionOn (ECC correction enabled); also LedInd5
 	m_LedInd6 = (data&0x04)?1:0;
@@ -334,6 +352,26 @@ WRITE16_MEMBER(notetaker_state::FIFOBus_w)
 	m_outfifo_head_ptr++;
 	m_outfifo_count++;
 	m_outfifo_head_ptr&=0xF;
+}
+
+WRITE16_MEMBER( notetaker_state::DiskReg_w )
+{
+	m_ADCSpd0 = (data&0x8000)?1:0;
+	m_ADCSpd1 = (data&0x4000)?1:0;
+	m_StopWordClock_q = (data&0x2000)?1:0;
+	m_ClrDiskCont_q = (data&0x1000)?1:0;
+	m_ProgBitClk1 = (data&0x0800)?1:0;
+	m_ProgBitClk2 = (data&0x0400)?1:0;
+	m_ProgBitClk3 = (data&0x0200)?1:0;
+	m_AnSel4 = (data&0x0100)?1:0;
+	m_AnSel2 = (data&0x80)?1:0;
+	m_AnSel1 = (data&0x40)?1:0;
+	m_DriveSel1 = (data&0x20)?1:0;
+	m_DriveSel2 = (data&0x10)?1:0;
+	m_DriveSel3 = (data&0x08)?1:0;
+	m_SideSelect = (data&0x04)?1:0;
+	m_Disk5VOn = (data&0x02)?1:0;
+	m_Disk12VOn = (data&0x01)?1:0;
 }
 
 WRITE16_MEMBER( notetaker_state::LoadDispAddr_w )
@@ -519,7 +557,7 @@ static ADDRESS_MAP_START(notetaker_iocpu_io, AS_IO, 16, notetaker_state)
 	AM_RANGE(0x60, 0x61) AM_MIRROR(0x7E1E) AM_WRITE(FIFOReg_w) // DAC sample and hold and frequency setup
 	//AM_RANGE(0xa0, 0xa1) AM_MIRROR(0x7E18) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255
 	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0x7E1E) AM_WRITE(FIFOBus_w) // DAC data write to FIFO
-	//AM_RANGE(0x100, 0x101) AM_MIRROR(0x7E1E) AM_WRITE(DiskReg_w) I/O register (adc speed, crtc pixel clock enable, +5 and +12v relays for floppy, etc)
+	AM_RANGE(0x100, 0x101) AM_MIRROR(0x7E1E) AM_WRITE(DiskReg_w) // I/O register (adc speed, crtc pixel clock enable, +5 and +12v relays for floppy, etc)
 	AM_RANGE(0x120, 0x127) AM_MIRROR(0x7E18) AM_DEVREADWRITE8("wd1791", fd1791_t, read, write, 0x00FF) // floppy controller
 	AM_RANGE(0x140, 0x15f) AM_MIRROR(0x7E00) AM_DEVREADWRITE8("crt5027", crt5027_device, read, write, 0x00FF) // crt controller
 	AM_RANGE(0x160, 0x161) AM_MIRROR(0x7E1E) AM_WRITE(LoadDispAddr_w) // loads the start address for the display framebuffer
@@ -571,7 +609,16 @@ irq7    VSync   (interrupt from the VSYN VSync pin from the crt5027)
 read from 0x0002 (byte wide) (IMR, read interrupt mask, will be 0xFF from above)
 0xaf to port 0x002 PIC (mask out with 0xEF and 0xBF to unnmask interrupts IR4(OddInt) and IR6(KbdInt), and write back to IMR)
 0x0400 to 0x060 (select DAC fifo frequency 2)
-read from 0x44 (byte wide) in a loop forever (read keyboard fifo status)
+read from 0x44 (byte wide) to check input fifo status
+... more stuff here missing relating to making the beep tone through fifo
+(around pc=6b6) read keyboard uart until mouse button is clicked (WaitNoBug)
+(around pc=6bc) read keyboard uart until mouse button is released (WaitBug)
+0x2a23 to port 0x100 (select drive 2)
+0x2a23 to port 0x100 (select drive 2)
+0x3a23 to port 0x100 (unset disk separator clear (allow disk head reading))
+0x3a27 to port 0x100 (select disk side 1)
+0x3a07 to port 0x100 (unselect all drives)
+
 */
 
 /* Emulator CPU */
@@ -645,6 +692,23 @@ void notetaker_state::ip_reset()
 	m_SHConB = 0;
 	m_SHConA = 0;
 	m_SetSH = 0;
+	// reset the DiskReg latches at #c4 and #b4 on the disk/display controller board
+	m_ADCSpd0 = 0;
+	m_ADCSpd1 = 0;
+	m_StopWordClock_q = 0;
+	m_ClrDiskCont_q = 0;
+	m_ProgBitClk1 = 0;
+	m_ProgBitClk2 = 0;
+	m_ProgBitClk3 = 0;
+	m_AnSel4 = 0;
+	m_AnSel2 = 0;
+	m_AnSel1 = 0;
+	m_DriveSel1 = 0;
+	m_DriveSel2 = 0;
+	m_DriveSel3 = 0;
+	m_SideSelect = 0;
+	m_Disk5VOn = 0;
+	m_Disk12VOn = 0;
 	// Clear the DAC FIFO
 	for (int i=0; i<16; i++) m_outfifo[i] = 0;
 	m_outfifo_count = m_outfifo_tail_ptr = m_outfifo_head_ptr = 0;
