@@ -36,7 +36,7 @@
 /* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 */
 #if defined(__MINGW32__) || defined(_MSC_VER)
 #define I64FMT   "I64"
-#elif defined(__linux__) && defined(__LP64__)
+#elif !defined(__APPLE__) && defined(__LP64__)
 #define I64FMT   "l"
 #else
 #define I64FMT   "ll"
