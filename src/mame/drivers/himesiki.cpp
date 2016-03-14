@@ -103,7 +103,10 @@ WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 {
 	membank("bank1")->set_entry(((data & 0x0c) >> 2));
 
-	if (data & 0xf3)
+	m_flipscreen = (data & 0x10)>>4;
+	flip_screen_set(m_flipscreen);
+
+	if (data & 0xe3)
 		logerror("p06_w %02x\n", data);
 }
 
