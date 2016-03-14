@@ -49,7 +49,7 @@ public:
 		return error::NONE;
 	}
 
-	virtual error write(void const *buffer, std::uint64_t offset, std::uint32_t count, std::uint32_t &actual)
+	virtual error write(void const *buffer, std::uint64_t offset, std::uint32_t count, std::uint32_t &actual) override
 	{
 		DWORD bytes_written;
 		if (!WriteFile(m_handle, buffer, count, &bytes_written, NULL))
