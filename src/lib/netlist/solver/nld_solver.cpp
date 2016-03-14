@@ -9,8 +9,6 @@
  * the vectorizations fast-math enables pretty expensive
  */
 
-#pragma GCC optimize "-ffast-math"
-#pragma GCC optimize "-fstrict-aliasing"
 #if 0
 #pragma GCC optimize "-ffast-math"
 #pragma GCC optimize "-fstrict-aliasing"
