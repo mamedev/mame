@@ -28442,7 +28442,7 @@ ssjkrpkr                        // (c) 1982 Southern Systems & Assembly, Ltd.
 tpoker2                         // (c) 1993 Micro Manufacturing, Inc.
 
 @source:notetaker.cpp
-notetakr                        // 
+notetakr                        //
 
 @source:nova2001.cpp
 ninjakun                        // UPL-84003 (c) 1984 Taito Corporation
@@ -33733,6 +33733,9 @@ swyft                           //
 
 @source:sym1.cpp
 sym1                            // Synertek SYM-1
+
+@source:symbolics.cpp
+s3600                           // 
 
 @source:sys2900.cpp
 sys2900                         // 
