@@ -80,7 +80,7 @@ public:
 	pstring operator ()() { return m_val; }
 private:
 	pstring m_val;
-	pstring_list_t m_limit;
+	pstring_vector_t m_limit;
 };
 
 class poption_bool : public poption
@@ -222,7 +222,7 @@ private:
 		return NULL;
 	}
 
-	plist_t<poption *> m_opts;
+	pvector_t<poption *> m_opts;
 	pstring m_app;
 };
 

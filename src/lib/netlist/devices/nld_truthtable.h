@@ -65,10 +65,10 @@ struct truthtable_desc_t
 	{
 	}
 
-	void setup(const pstring_list_t &desc, UINT32 disabled_ignore);
+	void setup(const pstring_vector_t &desc, UINT32 disabled_ignore);
 
 private:
-	void help(unsigned cur, pstring_list_t list,
+	void help(unsigned cur, pstring_vector_t list,
 			UINT64 state,UINT16 val, parray_t<UINT8> &timing_index);
 	static unsigned count_bits(UINT32 v);
 	static UINT32 set_bits(UINT32 v, UINT32 b);
@@ -120,7 +120,7 @@ public:
 
 	}
 
-	nld_truthtable_t(truthtable_t *ttbl, const pstring_list_t &desc)
+	nld_truthtable_t(truthtable_t *ttbl, const pstring_vector_t &desc)
 	: device_t(), m_last_state(0), m_ign(0), m_active(1), m_ttp(ttbl)
 	{
 		m_desc = desc;
@@ -130,12 +130,12 @@ public:
 	{
 		pstring header = m_desc[0];
 
-		pstring_list_t io(header,"|");
+		pstring_vector_t io(header,"|");
 		// checks
 		nl_assert_always(io.size() == 2, "too many '|'");
-		pstring_list_t inout(io[0], ",");
+		pstring_vector_t inout(io[0], ",");
 		nl_assert_always(inout.size() == m_num_bits, "bitcount wrong");
-		pstring_list_t out(io[1], ",");
+		pstring_vector_t out(io[1], ",");
 		nl_assert_always(out.size() == m_NO, "output count wrong");
 
 		for (unsigned i=0; i < m_NI; i++)
@@ -289,7 +289,7 @@ private:
 	INT32 m_active;
 
 	truthtable_t *m_ttp;
-	pstring_list_t m_desc;
+	pstring_vector_t m_desc;
 };
 
 class netlist_base_factory_truthtable_t : public base_factory_t
@@ -307,7 +307,7 @@ public:
 			pfree(m_family);
 	}
 
-	pstring_list_t m_desc;
+	pstring_vector_t m_desc;
 	logic_family_desc_t *m_family;
 };
 

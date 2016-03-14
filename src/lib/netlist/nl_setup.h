@@ -91,7 +91,7 @@ namespace netlist
 		class source_t
 		{
 		public:
-			typedef plist_t<source_t *> list_t;
+			typedef pvector_t<source_t *> list_t;
 
 			source_t()
 			{}
@@ -224,7 +224,7 @@ namespace netlist
 		phashmap_t<pstring, pstring> m_params_temp;
 		phashmap_t<pstring, core_terminal_t *> m_terminals;
 
-		plist_t<link_t> m_links;
+		pvector_t<link_t> m_links;
 
 		factory_list_t *m_factory;
 
@@ -235,7 +235,7 @@ namespace netlist
 
 		std::stack<pstring> m_stack;
 		source_t::list_t m_sources;
-		plist_t<pstring> m_lib;
+		pvector_t<pstring> m_lib;
 
 	};
 

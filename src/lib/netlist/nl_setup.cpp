@@ -170,7 +170,7 @@ void setup_t::register_alias(const pstring &alias, const pstring &out)
 
 void setup_t::register_dippins_arr(const pstring &terms)
 {
-	pstring_list_t list(terms,", ");
+	pstring_vector_t list(terms,", ");
 	if (list.size() == 0 || (list.size() % 2) == 1)
 		log().fatal("You must pass an equal number of pins to DIPPINS");
 	unsigned n = list.size();
@@ -294,7 +294,7 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 
 void setup_t::register_link_arr(const pstring &terms)
 {
-	pstring_list_t list(terms,", ");
+	pstring_vector_t list(terms,", ");
 	if (list.size() < 2)
 		log().fatal("You must pass at least 2 terminals to NET_C");
 	for (std::size_t i = 1; i < list.size(); i++)
@@ -836,7 +836,7 @@ void setup_t::start_devices()
 	if (env != "")
 	{
 		log().debug("Creating dynamic logs ...\n");
-		pstring_list_t loglist(env, ":");
+		pstring_vector_t loglist(env, ":");
 		for (pstring ll : loglist)
 		{
 			device_t *nc = factory().new_device_by_name("LOG");
@@ -944,7 +944,7 @@ void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 		log().fatal("Model error {1}\n", model);
 	remainder = remainder.left(remainder.len() - 1);
 
-	pstring_list_t pairs(remainder," ", true);
+	pstring_vector_t pairs(remainder," ", true);
 	for (pstring &pe : pairs)
 	{
 		int pose = pe.find("=");

@@ -12,9 +12,9 @@
 
 
 template<typename Class>
-static plist_t<int> bubble(const plist_t<Class *> &sl)
+static pvector_t<int> bubble(const pvector_t<Class *> &sl)
 {
-	plist_t<int> ret;
+	pvector_t<int> ret;
 	for (unsigned i=0; i<sl.size(); i++)
 		ret.push_back(i);
 
@@ -101,7 +101,7 @@ void nl_convert_base_t::dump_nl()
 		if (net->terminals().size() == 1)
 			net->set_no_export();
 	}
-	plist_t<int> sorted = bubble(m_devs);
+	pvector_t<int> sorted = bubble(m_devs);
 	for (std::size_t i=0; i<m_devs.size(); i++)
 	{
 		std::size_t j = sorted[i];
@@ -202,7 +202,7 @@ nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
 
 void nl_convert_spice_t::convert(const pstring &contents)
 {
-	pstring_list_t spnl(contents, "\n");
+	pstring_vector_t spnl(contents, "\n");
 
 	// Add gnd net
 
@@ -234,7 +234,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 {
 	if (line != "")
 	{
-		pstring_list_t tt(line, " ", true);
+		pstring_vector_t tt(line, " ", true);
 		double val = 0.0;
 		switch (tt[0].code_at(0))
 		{
@@ -273,7 +273,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					model = tt[5];
 				else
 					model = tt[4];
-				pstring_list_t m(model,"{");
+				pstring_vector_t m(model,"{");
 				if (m.size() == 2)
 				{
 					if (m[1].len() != 4)

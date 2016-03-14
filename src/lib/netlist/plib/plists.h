@@ -90,10 +90,10 @@ private:
 // ----------------------------------------------------------------------------------------
 
 template <typename _ListClass>
-class plist_t : public std::vector<_ListClass>
+class pvector_t : public std::vector<_ListClass>
 {
 public:
-	plist_t() : std::vector<_ListClass>() {}
+	pvector_t() : std::vector<_ListClass>() {}
 
 	void clear_and_free()
 	{
@@ -315,13 +315,13 @@ private:
 // string list
 // ----------------------------------------------------------------------------------------
 
-class pstring_list_t : public plist_t<pstring>
+class pstring_vector_t : public pvector_t<pstring>
 {
 public:
-	pstring_list_t() : plist_t<pstring>() { }
+	pstring_vector_t() : pvector_t<pstring>() { }
 
-	pstring_list_t(const pstring &str, const pstring &onstr, bool ignore_empty = false)
-	: plist_t<pstring>()
+	pstring_vector_t(const pstring &str, const pstring &onstr, bool ignore_empty = false)
+	: pvector_t<pstring>()
 	{
 		int p = 0;
 		int pn;
@@ -343,9 +343,9 @@ public:
 		}
 	}
 
-	static pstring_list_t splitexpr(const pstring &str, const pstring_list_t &onstrl)
+	pstring_vector_t(const pstring &str, const pstring_vector_t &onstrl)
+	: pvector_t<pstring>()
 	{
-		pstring_list_t temp;
 		pstring col = "";
 
 		unsigned i = 0;
@@ -363,10 +363,10 @@ public:
 			if (p>=0)
 			{
 				if (col != "")
-					temp.push_back(col);
+					this->push_back(col);
 
 				col = "";
-				temp.push_back(onstrl[p]);
+				this->push_back(onstrl[p]);
 				i += onstrl[p].blen();
 			}
 			else
@@ -377,8 +377,7 @@ public:
 			}
 		}
 		if (col != "")
-			temp.push_back(col);
-		return temp;
+			this->push_back(col);
 	}
 };
 
@@ -597,7 +596,7 @@ private:
 		}
 
 	}
-	plist_t<element_t> m_values;
+	pvector_t<element_t> m_values;
 	parray_t<int> m_hash;
 };
 

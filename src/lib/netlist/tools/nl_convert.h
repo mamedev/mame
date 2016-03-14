@@ -67,14 +67,14 @@ private:
 		: m_name(aname), m_no_export(false) {}
 
 		const pstring &name() { return m_name;}
-		pstring_list_t &terminals() { return m_terminals; }
+		pstring_vector_t &terminals() { return m_terminals; }
 		void set_no_export() { m_no_export = true; }
 		bool is_no_export() { return m_no_export; }
 
 	private:
 		pstring m_name;
 		bool m_no_export;
-		pstring_list_t m_terminals;
+		pstring_vector_t m_terminals;
 	};
 
 	struct dev_t
@@ -133,9 +133,9 @@ private:
 
 	postringstream m_buf;
 
-	plist_t<dev_t *> m_devs;
+	pvector_t<dev_t *> m_devs;
 	phashmap_t<pstring, net_t *> m_nets;
-	plist_t<pstring> m_ext_alias;
+	pvector_t<pstring> m_ext_alias;
 	phashmap_t<pstring, pin_alias_t *> m_pins;
 
 	static unit_t m_units[];

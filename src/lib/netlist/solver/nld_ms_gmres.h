@@ -62,7 +62,7 @@ private:
 
 	int solve_ilu_gmres(nl_double * RESTRICT x, nl_double * RESTRICT rhs, const unsigned restart_max, const unsigned mr, nl_double accuracy);
 
-	plist_t<int> m_term_cr[_storage_N];
+	pvector_t<int> m_term_cr[_storage_N];
 
 	bool m_use_iLU_preconditioning;
 	bool m_use_more_precise_stop_condition;
