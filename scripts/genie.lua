@@ -816,7 +816,7 @@ configuration { "mingw-clang" }
 	}
 configuration {  }
 
-	-- add the error warning flag
+-- add the error warning flag
 if _OPTIONS["NOWERROR"]==nil then
 	buildoptions {
 		"-Werror",

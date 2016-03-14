@@ -479,11 +479,15 @@ project ("ocore_" .. _OPTIONS["osd"])
 			MAME_DIR .. "src/osd/modules/file/posixsocket.cpp",
 		}
 	elseif BASE_TARGETOS=="win32" then
+		includedirs {
+			MAME_DIR .. "src/osd/windows",
+		}
 		files {
 			MAME_DIR .. "src/osd/modules/file/winfile.cpp",
 			MAME_DIR .. "src/osd/modules/file/winfile.h",
 			MAME_DIR .. "src/osd/modules/file/winptty.cpp",
 			MAME_DIR .. "src/osd/modules/file/winsocket.cpp",
+			MAME_DIR .. "src/osd/windows/winutil.cpp", -- FIXME put the necessary functions somewhere more appropriate
 		}
 	else
 		files {
