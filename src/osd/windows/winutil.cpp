@@ -89,13 +89,16 @@ BOOL win_is_gui_application(void)
 //============================================================
 //  osd_subst_env
 //============================================================
-void osd_subst_env(char **dst, const char *src)
+void osd_subst_env(std::string &dst, const std::string &src)
 {
 	TCHAR buffer[MAX_PATH];
 
-	TCHAR *t_src = tstring_from_utf8(src);
+	TCHAR *t_src = tstring_from_utf8(src.c_str());
 	ExpandEnvironmentStrings(t_src, buffer, ARRAY_LENGTH(buffer));
-	*dst = utf8_from_tstring(buffer);
+	osd_free(t_src);
+	char *cnv = utf8_from_tstring(buffer);
+	dst = cnv;
+	osd_free(cnv);
 }
 
 //-------------------------------------------------
