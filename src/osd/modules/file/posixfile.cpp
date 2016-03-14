@@ -37,6 +37,7 @@
 
 #include <cassert>
 #include <cerrno>
+#include <cstring>
 #include <memory>
 #include <type_traits>
 #include <vector>
