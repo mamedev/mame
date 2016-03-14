@@ -370,7 +370,7 @@ public:
 		: wininput_module(type, name),
 			get_rawinput_device_list("GetRawInputDeviceList", L"user32.dll"),
 			get_rawinput_data("GetRawInputData", L"user32.dll"),
-			get_rawinput_device_info("GetRawInputDeviceInfo", L"user32.dll"),
+			get_rawinput_device_info("GetRawInputDeviceInfoW", L"user32.dll"),
 			register_rawinput_devices("RegisterRawInputDevices", L"user32.dll")
 	{
 	}
