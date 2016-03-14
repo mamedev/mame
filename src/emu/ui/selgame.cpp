@@ -2011,7 +2011,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 		for (int x = UI_FIRST_LOAD; x < UI_LAST_LOAD; ++x)
 		{
 			mui.draw_text_full(container, _(dats_info[x]), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, 
-				WRAP_TRUNCATE, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
+				WRAP_NEVER, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
 			txt_lenght += 0.01f;
 			title_size = MAX(txt_lenght, title_size);
 		}
@@ -2026,12 +2026,17 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 
 		float middle = origx2 - origx1;
 
+		// check size
+		float sc = title_size + 2.0f * gutter_width;
+		float tmp_size = (sc > middle) ? ((middle - 2.0f * gutter_width) / sc) : 1.0f;
+		title_size *= tmp_size;
+
 		if (bgcolor != UI_TEXT_BG_COLOR)
 			mui.draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
 				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		mui.draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
-			WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+			WRAP_NEVER, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
 
 		draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::curdats_view, UI_FIRST_LOAD, UI_LAST_LOAD, title_size);
 
@@ -2084,7 +2089,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 		if (topline_datsview + r_visible_lines >= totallines)
 			topline_datsview = totallines - r_visible_lines;
 
-		float sc = origx2 - origx1 - (2.0f * UI_BOX_LR_BORDER);
+		sc = origx2 - origx1 - (2.0f * UI_BOX_LR_BORDER);
 		for (int r = 0; r < r_visible_lines; ++r)
 		{
 			int itemline = r + topline_datsview;
