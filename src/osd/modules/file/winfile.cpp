@@ -191,7 +191,7 @@ osd_file::error osd_file::open(std::string const &orig_path, UINT32 openflags, p
 		return win_open_ptty(path, openflags, file, filesize);
 
 	// convert path to TCHAR
-	TCHAR *t_path = tstring_from_utf8(path);
+	TCHAR *t_path = tstring_from_utf8(path.c_str());
 	osd_disposer<TCHAR> t_path_disposer(t_path);
 	if (!t_path)
 		return error::OUT_OF_MEMORY;
@@ -204,7 +204,7 @@ osd_file::error osd_file::open(std::string const &orig_path, UINT32 openflags, p
 	DWORD disposition, access, sharemode;
 	if (openflags & OPEN_FLAG_WRITE)
 	{
-		disposition = (!is_path_to_physical_drive(path) && (openflags & OPEN_FLAG_CREATE)) ? CREATE_ALWAYS : OPEN_EXISTING;
+		disposition = (!is_path_to_physical_drive(path.c_str()) && (openflags & OPEN_FLAG_CREATE)) ? CREATE_ALWAYS : OPEN_EXISTING;
 		access = (openflags & OPEN_FLAG_READ) ? (GENERIC_READ | GENERIC_WRITE) : GENERIC_WRITE;
 		sharemode = FILE_SHARE_READ;
 	}
