@@ -45,8 +45,6 @@
 #define OSDOPTION_NUMSCREENS            "numscreens"
 #define OSDOPTION_WINDOW                "window"
 #define OSDOPTION_MAXIMIZE              "maximize"
-#define OSDOPTION_KEEPASPECT            "keepaspect"
-#define OSDOPTION_UNEVENSTRETCH         "unevenstretch"
 #define OSDOPTION_WAITVSYNC             "waitvsync"
 #define OSDOPTION_SYNCREFRESH           "syncrefresh"
 
@@ -109,8 +107,6 @@ public:
 	int numscreens() const { return int_value(OSDOPTION_NUMSCREENS); }
 	bool window() const { return bool_value(OSDOPTION_WINDOW); }
 	bool maximize() const { return bool_value(OSDOPTION_MAXIMIZE); }
-	bool keep_aspect() const { return bool_value(OSDOPTION_KEEPASPECT); }
-	bool uneven_stretch() const { return bool_value(OSDOPTION_UNEVENSTRETCH); }
 	bool wait_vsync() const { return bool_value(OSDOPTION_WAITVSYNC); }
 	bool sync_refresh() const { return bool_value(OSDOPTION_SYNCREFRESH); }
 

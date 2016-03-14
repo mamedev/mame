@@ -124,22 +124,6 @@ void sdl_monitor_info::refresh()
 	m_is_primary = (m_handle == 0);
 }
 
-//============================================================
-//  sdlvideo_monitor_get_aspect
-//============================================================
-
-float osd_monitor_info::aspect()
-{
-	// FIXME: returning 0 looks odd, video_config is bad
-	if (video_config.keepaspect)
-	{
-		return m_aspect / ((float)m_pos_size.width() / (float)m_pos_size.height());
-	}
-	return 0.0f;
-}
-
-
-
 
 //============================================================
 //  update
@@ -305,13 +289,6 @@ static void check_osd_inputs(running_machine &machine)
 		}
 	}
 
-	if (machine.ui_input().pressed(IPT_OSD_2))
-	{
-		//FIXME: on a per window basis
-		video_config.fullstretch = !video_config.fullstretch;
-		machine.ui().popup_time(1, "Uneven stretch %s", video_config.fullstretch? "enabled":"disabled");
-	}
-
 	if (machine.ui_input().pressed(IPT_OSD_4))
 	{
 		//FIXME: on a per window basis
@@ -351,7 +328,6 @@ void sdl_osd_interface::extract_video_config()
 	video_config.filter        = options().filter();
 	video_config.keepaspect    = options().keep_aspect();
 	video_config.numscreens    = options().numscreens();
-	video_config.fullstretch   = options().uneven_stretch();
 	#ifdef SDLMAME_X11
 	video_config.restrictonemonitor = !options().use_all_heads();
 	#endif

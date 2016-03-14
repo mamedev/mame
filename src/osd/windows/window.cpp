@@ -1593,6 +1593,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			 * should be used.
 			 */
 			window->m_monitor->refresh();
+			window->m_monitor->update_resolution(LOWORD(lparam), HIWORD(lparam));
 			break;
 
 		// set focus: if we're not the primary window, switch back
@@ -1654,13 +1655,6 @@ void win_window_info::draw_video_contents(HDC dc, int update)
 }
 
 
-static inline int better_mode(int width0, int height0, int width1, int height1, float desired_aspect)
-{
-	float aspect0 = (float)width0 / (float)height0;
-	float aspect1 = (float)width1 / (float)height1;
-	return (fabs(desired_aspect - aspect0) < fabs(desired_aspect - aspect1)) ? 0 : 1;
-}
-
 //============================================================
 //  constrain_to_aspect_ratio
 //  (window thread)
@@ -1673,19 +1667,19 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	INT32 propwidth, propheight;
 	INT32 minwidth, minheight;
 	INT32 maxwidth, maxheight;
+	INT32 viswidth, visheight;
 	INT32 adjwidth, adjheight;
-	float desired_aspect = 1.0f;
-	osd_dim window_dim = get_size();
-	INT32 target_width = window_dim.width();
-	INT32 target_height = window_dim.height();
-	INT32 xscale = 1, yscale = 1;
-	int newwidth, newheight;
+	float pixel_aspect;
 	osd_monitor_info *monitor = winwindow_video_window_monitor(&rect);
 
 	assert(GetCurrentThreadId() == window_threadid);
 
+	// do not constrain aspect ratio for integer scaled views
+	if (m_target->current_view()->bounds().scale_type != RENDER_SCALE_FRACTIONAL)
+		return rect;
+
 	// get the pixel aspect ratio for the target monitor
-	float pixel_aspect = monitor->aspect();
+	pixel_aspect = monitor->pixel_aspect();
 
 	// determine the proposed width/height
 	propwidth = rect.width() - extrawidth;
@@ -1712,58 +1706,6 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 
 	// get the minimum width/height for the current layout
 	m_target->compute_minimum_size(minwidth, minheight);
-
-	// compute the appropriate visible area if we're trying to keepaspect
-	if (video_config.keepaspect)
-	{
-		// make sure the monitor is up-to-date
-		m_target->compute_visible_area(target_width, target_height, m_monitor->aspect(), m_target->orientation(), target_width, target_height);
-		desired_aspect = (float)target_width / (float)target_height;
-	}
-
-	// non-integer scaling - often gives more pleasing results in full screen
-	newwidth = target_width;
-	newheight = target_height;
-	if (!video_config.fullstretch)
-	{
-		// compute maximum integral scaling to fit the window
-		xscale = (target_width + 2) / newwidth;
-		yscale = (target_height + 2) / newheight;
-
-		// try a little harder to keep the aspect ratio if desired
-		if (video_config.keepaspect)
-		{
-			// if we could stretch more in the X direction, and that makes a better fit, bump the xscale
-			while (newwidth * (xscale + 1) <= window_dim.width() &&
-				better_mode(newwidth * xscale, newheight * yscale, newwidth * (xscale + 1), newheight * yscale, desired_aspect))
-				xscale++;
-
-			// if we could stretch more in the Y direction, and that makes a better fit, bump the yscale
-			while (newheight * (yscale + 1) <= window_dim.height() &&
-				better_mode(newwidth * xscale, newheight * yscale, newwidth * xscale, newheight * (yscale + 1), desired_aspect))
-				yscale++;
-
-			// now that we've maxed out, see if backing off the maximally stretched one makes a better fit
-			if (window_dim.width() - newwidth * xscale < window_dim.height() - newheight * yscale)
-			{
-				while (better_mode(newwidth * xscale, newheight * yscale, newwidth * (xscale - 1), newheight * yscale, desired_aspect) && (xscale >= 0))
-					xscale--;
-			}
-			else
-			{
-				while (better_mode(newwidth * xscale, newheight * yscale, newwidth * xscale, newheight * (yscale - 1), desired_aspect) && (yscale >= 0))
-					yscale--;
-			}
-		}
-
-		// ensure at least a scale factor of 1
-		if (xscale <= 0) xscale = 1;
-		if (yscale <= 0) yscale = 1;
-
-		// apply the final scale
-		newwidth *= xscale;
-		newheight *= yscale;
-	}
 
 	// clamp against the absolute minimum
 	propwidth = MAX(propwidth, MIN_WINDOW_DIM);
@@ -1795,9 +1737,12 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	propwidth = MIN(propwidth, maxwidth);
 	propheight = MIN(propheight, maxheight);
 
+	// compute the visible area based on the proposed rectangle
+	m_target->compute_visible_area(propwidth, propheight, pixel_aspect, m_target->orientation(), viswidth, visheight);
+
 	// compute the adjustments we need to make
-	adjwidth = (propwidth + extrawidth) - rect.width();
-	adjheight = (propheight + extraheight) - rect.height();
+	adjwidth = (viswidth + extrawidth) - rect.width();
+	adjheight = (visheight + extraheight) - rect.height();
 
 	// based on which corner we're adjusting, constrain in different ways
 	osd_rect ret(rect);
@@ -1824,7 +1769,6 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 			ret = rect.move_by(0, -adjheight).resize(rect.width() + adjwidth, rect.height() + adjheight);
 			break;
 	}
-
 	return ret;
 }
 
@@ -1855,7 +1799,7 @@ osd_dim win_window_info::get_min_bounds(int constrain)
 	minheight += wnd_extra_height();
 
 	// if we want it constrained, figure out which one is larger
-	if (constrain)
+	if (constrain && m_target->current_view()->bounds().scale_type == RENDER_SCALE_FRACTIONAL)
 	{
 		// first constrain with no height limit
 		osd_rect test1(0,0,minwidth,10000);
@@ -1915,15 +1859,9 @@ osd_dim win_window_info::get_max_bounds(int constrain)
 	maximum = maximum.resize(tempw, temph);
 
 	// constrain to fit
-	if (constrain)
-	{
+	if (constrain && m_target->current_view()->bounds().scale_type == RENDER_SCALE_FRACTIONAL)
 		maximum = constrain_to_aspect_ratio(maximum, WMSZ_BOTTOMRIGHT);
-	}
-	else
-	{
-		// No - the maxima returned by usable_position_size are in window units, not usable units
-		//maximum = maximum.resize(maximum.width() - wnd_extra_width(), maximum.height() - wnd_extra_height());
-	}
+
 	return maximum.dim();
 }
 

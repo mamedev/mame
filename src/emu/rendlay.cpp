@@ -100,6 +100,14 @@ enum
 
 
 //**************************************************************************
+//  MACROS
+//**************************************************************************
+
+#define FSWAP(var1, var2) do { float temp = var1; var1 = var2; var2 = temp; } while (0)
+
+
+
+//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
@@ -305,6 +313,11 @@ void parse_bounds(running_machine &machine, xml_data_node *boundsnode, render_bo
 	}
 
 	// parse out the data
+	bounds.scale_type = xml_get_attribute_int_with_subst(machine, *boundsnode, "scaletype", 0);
+	int aspectx = xml_get_attribute_int_with_subst(machine, *boundsnode, "aspectx", 1);
+	int aspecty = xml_get_attribute_int_with_subst(machine, *boundsnode, "aspecty", 1);
+	bounds.aspect = (float)aspectx / (float)aspecty;
+
 	if (xml_get_attribute(boundsnode, "left") != nullptr)
 	{
 		// left/right/top/bottom format
@@ -2132,7 +2145,13 @@ void layout_element::component::apply_skew(bitmap_argb32 &dest, int skewwidth)
 layout_view::layout_view(running_machine &machine, xml_data_node &viewnode, simple_list<layout_element> &elemlist)
 	: m_next(nullptr),
 		m_aspect(1.0f),
-		m_scraspect(1.0f)
+		m_scraspect(1.0f),
+		m_physical_width(0),
+		m_physical_height(0),
+		m_orientation(0),
+		m_keepaspect(machine.options().keep_aspect()),
+		m_int_scale_x(machine.options().int_scale_x()),
+		m_int_scale_y(machine.options().int_scale_y())
 {
 	// allocate a copy of the name
 	m_name = xml_get_attribute_string_with_subst(machine, viewnode, "name", "");
@@ -2233,20 +2252,23 @@ void layout_view::recompute(render_layer_config layerconfig)
 		if (m_layenabled[layer])
 			for (item *curitem = first_item(layer); curitem != nullptr; curitem = curitem->next())
 			{
+				// fist apply scale to item bounds if required
+				scale_bounds(&curitem->m_scaledbounds, &curitem->m_rawbounds);
+
 				// accumulate bounds
 				if (first)
-					m_bounds = curitem->m_rawbounds;
+					m_bounds = curitem->m_scaledbounds;
 				else
-					union_render_bounds(&m_bounds, &curitem->m_rawbounds);
+					union_render_bounds(&m_bounds, &curitem->m_scaledbounds);
 				first = false;
 
 				// accumulate screen bounds
 				if (curitem->m_screen != nullptr)
 				{
 					if (scrfirst)
-						m_scrbounds = curitem->m_rawbounds;
+						m_scrbounds = curitem->m_scaledbounds;
 					else
-						union_render_bounds(&m_scrbounds, &curitem->m_rawbounds);
+						union_render_bounds(&m_scrbounds, &curitem->m_scaledbounds);
 					scrfirst = false;
 
 					// accumulate the screens in use while we're scanning
@@ -2257,7 +2279,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 
 	// if we have an explicit bounds, override it
 	if (m_expbounds.x1 > m_expbounds.x0)
-		m_bounds = m_expbounds;
+		scale_bounds(&m_bounds, &m_expbounds);
 
 	// if we're handling things normally, the target bounds are (0,0)-(1,1)
 	render_bounds target_bounds;
@@ -2294,11 +2316,124 @@ void layout_view::recompute(render_layer_config layerconfig)
 	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
 		for (item *curitem = first_item(layer); curitem != nullptr; curitem = curitem->next())
 		{
-			curitem->m_bounds.x0 = target_bounds.x0 + (curitem->m_rawbounds.x0 - xoffs) * xscale;
-			curitem->m_bounds.x1 = target_bounds.x0 + (curitem->m_rawbounds.x1 - xoffs) * xscale;
-			curitem->m_bounds.y0 = target_bounds.y0 + (curitem->m_rawbounds.y0 - yoffs) * yscale;
-			curitem->m_bounds.y1 = target_bounds.y0 + (curitem->m_rawbounds.y1 - yoffs) * yscale;
+			curitem->m_bounds.x0 = target_bounds.x0 + (curitem->m_scaledbounds.x0 - xoffs) * xscale;
+			curitem->m_bounds.x1 = target_bounds.x0 + (curitem->m_scaledbounds.x1 - xoffs) * xscale;
+			curitem->m_bounds.y0 = target_bounds.y0 + (curitem->m_scaledbounds.y0 - yoffs) * yscale;
+			curitem->m_bounds.y1 = target_bounds.y0 + (curitem->m_scaledbounds.y1 - yoffs) * yscale;
 		}
+}
+
+
+//-------------------------------------------------
+//  set_physical_size - update our physical size
+//  information
+//-------------------------------------------------
+
+bool layout_view::set_physical_size(INT32 new_width, INT32 new_height, float new_pixel_aspect, int new_orientation)
+{
+	if ((new_width != 0 && new_height != 0 && new_pixel_aspect != 0.0f) &&
+		(new_width != m_physical_width || new_height != m_physical_height || new_pixel_aspect != m_pixel_aspect || new_orientation != m_orientation))
+	{
+		// physical size has changed
+		m_physical_width = new_width;
+		m_physical_height = new_height;
+		m_pixel_aspect = new_pixel_aspect;
+		m_orientation = new_orientation;
+		return true;
+	}
+	// physical size was already up-to-date
+	return false;
+}
+
+
+//-------------------------------------------------
+//  scale_bounds - apply proper scale type
+//  to render_bounds
+//-------------------------------------------------
+
+void layout_view::scale_bounds(render_bounds *dest, const render_bounds *src)
+{
+	// Start with the raw bounds from the layout file
+	if (src == nullptr || dest == nullptr)
+		return;
+
+	*dest = *src;
+
+	// Get the physical size and properties of the render target which owns us
+	int target_width = m_physical_width;
+	int target_height = m_physical_height;
+	float pixel_aspect = m_keepaspect? m_pixel_aspect: 1.0;
+
+	if (target_width == 0 || target_height == 0)
+		return;
+
+	// Apply orientation if required
+	if (m_orientation & ORIENTATION_SWAP_XY)
+	{
+		FSWAP(target_width, target_height);
+		pixel_aspect = 1.0 / pixel_aspect;
+	}
+
+	// Now, based on the defined scale type for these bounds, apply different methods
+	switch (src->scale_type)
+	{
+		// Fractional: default for standard views (scaletype not defined), just preserve the raw bounds
+		case RENDER_SCALE_FRACTIONAL:
+			break;
+
+		// Full stretch: bounds are scaled to whole size of the render target. Used by integer scaled views
+		// to define the bounds of the actual "view".
+		case RENDER_SCALE_STRETCH_FULL:
+		{
+			dest->x0 *= target_width * pixel_aspect;
+			dest->y0 *= target_height;
+			dest->x1 *= target_width * pixel_aspect;
+			dest->y1 *= target_height;
+			break;
+		}
+
+		// Integer/Strecth-H: bounds are scaled by integer factors. For the Stretch-H case, integer scaling is
+		// only applied to the vertical axis. Used by integer scaled views, to define the bounds of the "screen".
+		case RENDER_SCALE_INTEGER:
+		case RENDER_SCALE_STRETCH_H:
+		{
+			float dest_width, dest_width_asp, dest_height, dest_height_asp, dest_aspect;
+			dest_width = dest_width_asp = (float)target_width;
+			dest_height = dest_height_asp = (float)target_height;
+			dest_aspect = dest_width / dest_height * pixel_aspect;
+
+			// We need to work out which one is the horizontal axis, regardless of the monitor orientation
+			float x_scale, y_scale;
+			if (dest_aspect > 1.0)
+			{
+				// x-axis matches monitor's horizontal dimension
+				dest_width_asp *= m_keepaspect? src->aspect / dest_aspect : 1.0;
+				x_scale = src->scale_type == RENDER_SCALE_INTEGER?
+				          MAX(1, render_round_nearest(dest_width_asp / src->width())) : dest_width_asp / src->width();
+				y_scale = MAX(1, render_round_nearest(dest_height / src->height()));
+			}
+			else
+			{
+				// y-axis matches monitor's vertical dimension
+				dest_height_asp *= m_keepaspect? dest_aspect / src->aspect : 1.0;
+				y_scale = src->scale_type == RENDER_SCALE_INTEGER?
+				          MAX(1, render_round_nearest(dest_height_asp / src->height())) : dest_height_asp / src->height();
+				x_scale = MAX(1, render_round_nearest(dest_width / src->width()));
+			}
+
+			// Check if we have user defined scale factors, if so use them instead
+			x_scale = m_int_scale_x? m_int_scale_x : x_scale;
+			y_scale = m_int_scale_y? m_int_scale_y : y_scale;
+
+			// Finally, apply scale to bounds
+			float new_width = src->width() * x_scale;
+			float new_height = src->height() * y_scale;
+			float x_border = (dest_width - new_width) / 2;
+			float y_border = (dest_height - new_height) / 2;
+			set_render_bounds_wh(dest, x_border * pixel_aspect, y_border, new_width * pixel_aspect, new_height);
+			break;
+		}
+	}
 }
 
 

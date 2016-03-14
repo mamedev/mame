@@ -672,12 +672,12 @@ static void yuv_RGB_to_YUY2X2(const UINT16 *bitmap, UINT8 *ptr, const int pitch,
 
 render_primitive_list *renderer_sdl2::get_primitives()
 {
-	osd_dim nd = window().blit_surface_size();
+	osd_dim nd = window().get_size();
 	if (nd != m_blit_dim)
 	{
 		m_blit_dim = nd;
 		notify_changed();
 	}
-	window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().aspect());
+	window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().pixel_aspect());
 	return &window().target()->get_primitives();
 }

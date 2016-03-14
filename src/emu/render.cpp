@@ -931,6 +931,9 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 	m_base_layerconfig.set_marquees_enabled(manager.machine().options().use_marquees());
 	m_base_layerconfig.set_zoom_to_screen(manager.machine().options().artwork_crop());
 
+	// aspect and scale options
+	m_keepaspect = manager.machine().options().keep_aspect();
+
 	// determine the base orientation based on options
 	if (!manager.machine().options().rotate())
 		m_base_orientation = orientation_reverse(manager.machine().system().flags & ORIENTATION_MASK);
@@ -1005,7 +1008,11 @@ void render_target::set_bounds(INT32 width, INT32 height, float pixel_aspect)
 	m_bounds.x0 = m_bounds.y0 = 0;
 	m_bounds.x1 = (float)width;
 	m_bounds.y1 = (float)height;
-	m_pixel_aspect = pixel_aspect;
+	m_pixel_aspect = pixel_aspect != 0.0? pixel_aspect : 1.0;
+
+	// Check if our layout needs to be recomputed
+	if (m_curview != nullptr && m_curview->set_physical_size(width, height, m_pixel_aspect, m_orientation))
+		m_curview->recompute(m_layerconfig);
 }
 
 
@@ -1144,7 +1151,7 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 	float scale;
 
 	// constrained case
-	if (target_pixel_aspect != 0.0f)
+	if (m_keepaspect)
 	{
 		// start with the aspect ratio of the square pixel layout
 		width = m_curview->effective_aspect(m_layerconfig);
@@ -1214,7 +1221,12 @@ void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
 				const rectangle &visarea = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? vectorvis : screen->visible_area();
 
 				// apply target orientation to the bounds
-				render_bounds bounds = curitem->bounds();
+				render_bounds bounds;
+				if (m_curview->bounds().scale_type == RENDER_SCALE_FRACTIONAL)
+					bounds = curitem->bounds();
+				else
+					set_render_bounds_wh(&bounds, 0, 0, 1, 1);
+
 				apply_orientation(bounds, m_orientation);
 				normalize_bounds(bounds);
 
@@ -2518,7 +2530,7 @@ float render_manager::ui_aspect(render_container *rc)
 
 		// if we have a valid pixel aspect, apply that and return
 		if (m_ui_target->pixel_aspect() != 0.0f)
-				return (aspect / m_ui_target->pixel_aspect());
+				aspect /= m_ui_target->pixel_aspect();
 	} else {
 		// single screen container
 

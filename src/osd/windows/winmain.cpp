@@ -275,10 +275,6 @@ const options_entry windows_options::s_option_entries[] =
 	{ nullptr,                                        nullptr,    OPTION_HEADER,     "WINDOWS VIDEO OPTIONS" },
 	{ WINOPTION_MENU,                                 "0",        OPTION_BOOLEAN,    "enables menu bar if available by UI implementation" },
 
-	// DirectDraw-specific options
-	{ nullptr,                                        nullptr,    OPTION_HEADER,     "DIRECTDRAW-SPECIFIC OPTIONS" },
-	{ WINOPTION_HWSTRETCH ";hws",                     "1",        OPTION_BOOLEAN,    "enables hardware stretching" },
-
 	// post-processing options
 	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "DIRECT3D POST-PROCESSING OPTIONS" },
 	{ WINOPTION_HLSL_ENABLE";hlsl",                             "0",                 OPTION_BOOLEAN,    "enables HLSL post-processing (PS3.0 required)" },

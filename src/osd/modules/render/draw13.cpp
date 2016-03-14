@@ -960,12 +960,12 @@ texture_info * renderer_sdl1::texture_update(const render_primitive &prim)
 
 render_primitive_list *renderer_sdl1::get_primitives()
 {
-	osd_dim nd = window().blit_surface_size();
+	osd_dim nd = window().get_size();
 	if (nd != m_blit_dim)
 	{
 		m_blit_dim = nd;
 		notify_changed();
 	}
-	window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().aspect());
+	window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().pixel_aspect());
 	return &window().target()->get_primitives();
 }
