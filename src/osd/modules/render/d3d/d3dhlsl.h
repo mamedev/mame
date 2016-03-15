@@ -97,6 +97,7 @@ public:
 		CU_POST_SCANLINE_ALPHA,
 		CU_POST_SCANLINE_SCALE,
 		CU_POST_SCANLINE_HEIGHT,
+		CU_POST_SCANLINE_VARIATION,
 		CU_POST_SCANLINE_BRIGHT_SCALE,
 		CU_POST_SCANLINE_BRIGHT_OFFSET,
 		CU_POST_POWER,
@@ -208,6 +209,7 @@ struct hlsl_options
 	float                   scanline_alpha;
 	float                   scanline_scale;
 	float                   scanline_height;
+	float                   scanline_variation;
 	float                   scanline_bright_scale;
 	float                   scanline_bright_offset;
 	float                   scanline_jitter;
@@ -343,7 +345,7 @@ public:
 	void delete_resources(bool reset);
 
 	// slider-related functions
-	slider_state *init_slider_list();
+	void init_slider_list();
 	void *get_slider_option(int id, int index = 0);
 
 private:

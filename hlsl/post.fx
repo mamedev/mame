@@ -125,10 +125,11 @@ uniform float2 ScreenOffset = float2(0.0f, 0.0f);
 
 uniform float ScanlineAlpha = 0.0f;
 uniform float ScanlineScale = 1.0f;
+uniform float ScanlineHeight = 1.0f;
+uniform float ScanlineVariation = 1.0f;
+uniform float ScanlineOffset = 1.0f;
 uniform float ScanlineBrightScale = 1.0f;
 uniform float ScanlineBrightOffset = 1.0f;
-uniform float ScanlineOffset = 1.0f;
-uniform float ScanlineHeight = 1.0f;
 
 uniform float3 BackColor = float3(0.0f, 0.0f, 0.0f);
 
@@ -262,7 +263,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 			float ScanlineCoord = SourceCoord.y * SourceDims.y * ScanlineScale * PI;
 			float ScanlineCoordJitter = ScanlineOffset * PHI;
 			float ScanlineSine = sin(ScanlineCoord + ScanlineCoordJitter);
-			float ScanlineWide = ScanlineHeight + max(1.0f, ScanlineHeight) * (1.0f - ColorBrightness);
+			float ScanlineWide = ScanlineHeight + ScanlineVariation * max(1.0f, ScanlineHeight) * (1.0f - ColorBrightness);
 			float ScanlineAmount = pow(ScanlineSine * ScanlineSine, ScanlineWide);
 			float ScanlineBrightness = ScanlineAmount * BrightnessScale + BrightnessOffset * BrightnessScale;
 

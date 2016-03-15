@@ -691,6 +691,7 @@ void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 		options->scanline_alpha = winoptions.screen_scanline_amount();
 		options->scanline_scale = winoptions.screen_scanline_scale();
 		options->scanline_height = winoptions.screen_scanline_height();
+		options->scanline_variation = winoptions.screen_scanline_variation();
 		options->scanline_bright_scale = winoptions.screen_scanline_bright_scale();
 		options->scanline_bright_offset = winoptions.screen_scanline_bright_offset();
 		options->scanline_jitter = winoptions.screen_scanline_jitter();
@@ -987,6 +988,7 @@ int shaders::create_resources(bool reset)
 	post_effect->add_uniform("ScanlineAlpha", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_ALPHA);
 	post_effect->add_uniform("ScanlineScale", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_SCALE);
 	post_effect->add_uniform("ScanlineHeight", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_HEIGHT);
+	post_effect->add_uniform("ScanlineVariation", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_VARIATION);
 	post_effect->add_uniform("ScanlineBrightScale", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_BRIGHT_SCALE);
 	post_effect->add_uniform("ScanlineBrightOffset", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_BRIGHT_OFFSET);
 	post_effect->add_uniform("Power", uniform::UT_VEC3, uniform::CU_POST_POWER);
@@ -2271,6 +2273,7 @@ enum slider_option
 	SLIDER_SCANLINE_ALPHA,
 	SLIDER_SCANLINE_SCALE,
 	SLIDER_SCANLINE_HEIGHT,
+	SLIDER_SCANLINE_VARIATION,
 	SLIDER_SCANLINE_BRIGHT_SCALE,
 	SLIDER_SCANLINE_BRIGHT_OFFSET,
 	SLIDER_SCANLINE_JITTER,
@@ -2347,6 +2350,7 @@ slider_desc shaders::s_sliders[] =
 	{ "Scanline Darkness",                  0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_ALPHA,          0.01f,    "%1.2f", {} },
 	{ "Scanline Screen Scale",              0,   100,   400, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_SCALE,          0.01f,    "%1.2f", {} },
 	{ "Scanline Height",                    0,   100,   400, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_HEIGHT,         0.01f,    "%1.2f", {} },
+	{ "Scanline Height Variation",          0,   100,   400, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_VARIATION,      0.01f,    "%1.2f", {} },
 	{ "Scanline Brightness",                0,   100,   200, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_BRIGHT_SCALE,   0.01f,    "%1.2f", {} },
 	{ "Scanline Brightness Overdrive",      0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_BRIGHT_OFFSET,  0.01f,    "%1.2f", {} },
 	{ "Scanline Jitter",                    0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_JITTER,         0.01f,    "%1.2f", {} },
@@ -2421,6 +2425,7 @@ void *shaders::get_slider_option(int id, int index)
 		case SLIDER_SCANLINE_ALPHA: return &(options->scanline_alpha);
 		case SLIDER_SCANLINE_SCALE: return &(options->scanline_scale);
 		case SLIDER_SCANLINE_HEIGHT: return &(options->scanline_height);
+		case SLIDER_SCANLINE_VARIATION: return &(options->scanline_variation);
 		case SLIDER_SCANLINE_BRIGHT_SCALE: return &(options->scanline_bright_scale);
 		case SLIDER_SCANLINE_BRIGHT_OFFSET: return &(options->scanline_bright_offset);
 		case SLIDER_SCANLINE_JITTER: return &(options->scanline_jitter);
@@ -2828,6 +2833,9 @@ void uniform::update()
 			break;
 		case CU_POST_SCANLINE_HEIGHT:
 			m_shader->set_float("ScanlineHeight", options->scanline_height);
+			break;
+		case CU_POST_SCANLINE_VARIATION:
+			m_shader->set_float("ScanlineVariation", options->scanline_variation);
 			break;
 		case CU_POST_SCANLINE_BRIGHT_SCALE:
 			m_shader->set_float("ScanlineBrightScale", options->scanline_bright_scale);
