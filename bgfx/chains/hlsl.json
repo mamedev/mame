@@ -26,22 +26,44 @@
 		{ "type": "vec2", "name": "converge_red",          "text": "Red Convergence, ",   "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
 		{ "type": "vec2", "name": "converge_green",        "text": "Green Convergence, ", "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
 		{ "type": "vec2", "name": "converge_blue",         "text": "Blue Convergence, ",  "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
-		{ "type": "vec2", "name": "radial_converge_red",   "text": "Red Convergence, ",   "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
-		{ "type": "vec2", "name": "radial_converge_green", "text": "Green Convergence, ", "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
-		{ "type": "vec2", "name": "radial_converge_blue",  "text": "Blue Convergence, ",  "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" }
+		
+		{ "type": "vec2", "name": "radial_converge_red",   "text": "Red Radial Convergence, ",   "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "radial_converge_green", "text": "Green Radial Convergence, ", "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "radial_converge_blue",  "text": "Blue Radial Convergence, ",  "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
+
+		{ "type": "vec2", "name": "defocus", "text": "Defocus, ",  "default": [ 0, 0 ], "max": [ 500, 500 ], "min": [ 0, 0 ], "step": 1, "scale": 0.1, "format": "%2.1f", "screen": "crt" },
+
+		{ "type": "color", "name": "phosphor", "text": "Phosphor Persistence, ",  "default": [ 0, 0, 0 ], "max": [ 100, 100, 100 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+
+		{ "type": "float",    "name": "scanline_alpha",         "text": "Scanline Amount",            "default": 0,                 "max": 100,               "min": 0,           "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",    "name": "scanline_scale",         "text": "Overall Scanline Scale",     "default": 100,               "max": 400,               "min": 0,           "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",    "name": "scanline_bright_scale",  "text": "Scanline Brightness Scale",  "default": 100,               "max": 400,               "min": 0,           "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",    "name": "scanline_bright_offset", "text": "Scanline Brightness Offset", "default": 0,                 "max": 400,               "min": 0,           "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",    "name": "scanline_jitter_amount", "text": "Scanline Jitter Amount",     "default": 0,                 "max": 400,               "min": 0,           "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",    "name": "scanline_height",        "text": "Individual Scanline Scale",  "default": 100,               "max": 400,               "min": 0,           "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",    "name": "shadow_alpha",           "text": "Shadow Mask Amount",         "default": 0,                 "max": 100,               "min": 0,           "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
+		{ "type": "vec2",     "name": "shadow_count",           "text": "Shadow Mask Pixel Count ",   "default": [ 60, 40 ],        "max": [ 400, 400 ],      "min": [ 0, 0 ],    "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
+		{ "type": "vec2",     "name": "shadow_uv_size",         "text": "Shadow Mask UV Size ",       "default": [ 48, 64 ],        "max": [ 256, 256 ],      "min": [ 0, 0 ],    "step": 1, "scale": 0.00390625, "format": "%1.7f", "screen": "crt" },
+		{ "type": "vec2",     "name": "shadow_uv_offset",       "text": "Shadow Mask UV Offset ",     "default": [  0,  0 ],        "max": [ 256, 256 ],      "min": [ 0, 0 ],    "step": 1, "scale": 0.00390625, "format": "%1.7f", "screen": "crt" },
+		{ "type": "int_enum", "name": "shadow_tile_mode",       "text": "Shadow Mask Tile Mode",      "default": 0,                 "max": 1,                 "min": 0,           "step": 1, "scale": 1.0,        "format": "%s",    "screen": "crt", "strings": [ "Screen", "Source" ] },
+		{ "type": "float",    "name": "humbar_alpha",           "text": "Hum Bar Amount",             "default": 0,                 "max": 100,               "min": 0,           "step": 1, "scale": 0.01,       "format": "%1.7f", "screen": "crt" },
+		{ "type": "float",    "name": "humbar_hertz_rate",      "text": "Hum Bar Frequency",          "default": 100,               "max": 10000,             "min": 0,           "step": 1, "scale": 0.00001,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "color",    "name": "floor",                  "text": "Signal Floor, ",             "default": [   0,   0,   0 ], "max": [ 100, 100, 100 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
+		{ "type": "color",    "name": "power",                  "text": "Signal Exponent, ",          "default": [ 100, 100, 100 ], "max": [ 400, 400, 400 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
+		
+		{ "type": "float", "name": "curvature",     "text": "Screen Curvature Amount", "default": 0, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "round_corner",  "text": "Rounded Corner Amount",   "default": 0, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "smooth_border", "text": "Smooth Border Amount",    "default": 0, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "vignetting",    "text": "Vignetting Amount",       "default": 0, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "reflection",    "text": "Reflection Amount",       "default": 0, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" }
 	],
 	"parameters": [
-		{ "name": "jitter", "type": "frame", "period": 2 }
+		{ "name": "jitter", "type": "frame", "period": 2 },
+		{ "name": "time",   "type": "time",  "limit": 0.0 }
 	],
 	"targets": [
 		{
 			"name": "guest",
-			"mode": "guest",
-			"prescale": 1,
-			"doublebuffer": true
-		},
-		{
-			"name": "deadend",
 			"mode": "guest",
 			"prescale": 1,
 			"doublebuffer": true
@@ -55,6 +77,12 @@
 			"mode": "native",
 			"prescale": 1,
 			"doublebuffer": true
+		},
+		{	"name": "bloom",
+			"mode": "native",
+			"prescale": 1,
+			"doublebuffer": true,
+			"pyramid": true
 		}
 	],
 	"passes": [
@@ -141,6 +169,15 @@
 		},
 		{	"effect": "deconverge",
 			"name": "Deconvergence",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or",  "name": "adjustments",           "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "converge_red",          "value": [ 0, 0 ] },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "converge_green",        "value": [ 0, 0 ] },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "converge_blue",         "value": [ 0, 0 ] },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "radial_converge_red",   "value": [ 0, 0 ] },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "radial_converge_green", "value": [ 0, 0 ] },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "radial_converge_blue",  "value": [ 0, 0 ] }
+			],
 			"uniforms": [
 				{ "uniform": "u_converge_red",          "slider": "converge_red"   },
 				{ "uniform": "u_converge_green",        "slider": "converge_green" },
@@ -148,6 +185,123 @@
 				{ "uniform": "u_radial_converge_red",   "slider": "radial_converge_red"   },
 				{ "uniform": "u_radial_converge_green", "slider": "radial_converge_green" },
 				{ "uniform": "u_radial_converge_blue",  "slider": "radial_converge_blue"  }
+			],
+			"input": [
+				{ "sampler": "DiffuseSampler", "texture": "native" }
+			],
+			"output": "native"
+		},
+		{	"effect": "defocus",
+			"name": "Defocus Pass 1",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "defocus",     "value": [ 0, 0 ] }
+			],
+			"uniforms": [
+				{ "uniform": "u_defocus", "slider": "defocus" }
+			],
+			"input": [
+				{ "sampler": "DiffuseSampler", "texture": "native" }
+			],
+			"output": "native"
+		},
+		{	"effect": "defocus",
+			"name": "Defocus Pass 2",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "defocus",     "value": [ 0, 0 ] }
+			],
+			"uniforms": [
+				{ "uniform": "u_defocus", "slider": "defocus" }
+			],
+			"input": [
+				{ "sampler": "DiffuseSampler", "texture": "native" }
+			],
+			"output": "native"
+		},
+		{	"effect": "phosphor",
+			"name": "Phosphor Decay",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "phosphor",    "value": [ 0, 0, 0 ] }
+			],
+			"uniforms": [
+				{ "uniform": "u_passthrough", "value": [ 0 ] },
+				{ "uniform": "u_phosphor", "slider": "phosphor" }
+			],
+			"input": [
+				{ "sampler": "s_tex", "texture": "native" },
+				{ "sampler": "s_prev", "texture": "previous" }
+			],
+			"output": "native"
+		},
+		{	"effect": "phosphor",
+			"name": "Phosphor Store",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "phosphor",    "value": [ 0, 0, 0 ] }
+			],
+			"uniforms": [
+				{ "uniform": "u_passthrough", "value": [ 1 ] },
+				{ "uniform": "u_phosphor", "slider": "phosphor" }
+			],
+			"input": [
+				{ "sampler": "s_tex", "texture": "native" },
+				{ "sampler": "s_prev", "texture": "native" }
+			],
+			"output": "previous"
+		},
+		{	"effect": "post",
+			"name": "Non-Bloom Post Pass",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or",  "name": "adjustments",    "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "scanline_alpha", "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "shadow_alpha",   "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "humbar_alpha",   "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "floor",          "value": [ 0, 0, 0 ] },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "power",          "value": [ 0, 0, 0 ] }
+			],
+			"textures": [ { "name": "shadow" } ],
+			"uniforms": [
+				{ "uniform": "u_scanline_alpha",         "slider": "scanline_alpha" },
+				{ "uniform": "u_scanline_scale",         "slider": "scanline_scale" },
+				{ "uniform": "u_scanline_bright_scale",  "slider": "scanline_bright_scale" },
+				{ "uniform": "u_scanline_bright_offset", "slider": "scanline_bright_offset" },
+				{ "uniform": "u_shadow_alpha",           "slider": "shadow_alpha" },
+				{ "uniform": "u_shadow_count",           "slider": "shadow_count" },
+				{ "uniform": "u_shadow_uv",              "slider": "shadow_uv_size" },
+				{ "uniform": "u_shadow_uv_offset",       "slider": "shadow_uv_offset" },
+				{ "uniform": "u_shadow_tile_mode",       "slider": "shadow_tile_mode" },
+				{ "uniform": "u_humbar_alpha",           "slider": "humbar_alpha" },
+				{ "uniform": "u_humbar_hertz_rate",      "slider": "humbar_hertz_rate" },
+				{ "uniform": "u_floor",                  "slider": "floor" },
+				{ "uniform": "u_power",                  "slider": "power" },
+				{ "uniform": "u_scanline_jitter",        "slider": "scanline_jitter_amount" },
+				{ "uniform": "u_jitter_amount",          "parameter": "jitter" },
+				{ "uniform": "u_time",                   "parameter": "time" }
+			],
+			"input": [
+				{ "sampler": "DiffuseSampler", "texture": "native" },
+				{ "sampler": "ShadowSampler",  "texture": "shadow" }
+			],
+			"output": "native"
+		},
+		{	"effect": "distortion",
+			"name": "Distortion Pass",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments",    "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "curvature",     "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "round_corner",  "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "smooth_border", "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "vignetting",    "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "reflection",    "value": 0.0 }
+			],
+			"uniforms": [
+				{ "uniform": "u_curvature",     "slider": "curvature" },
+				{ "uniform": "u_round_corner",  "slider": "round_corner" },
+				{ "uniform": "u_smooth_border", "slider": "smooth_border" },
+				{ "uniform": "u_vignetting",    "slider": "vignetting" },
+				{ "uniform": "u_reflection",    "slider": "reflection" }
 			],
 			"input": [
 				{ "sampler": "DiffuseSampler", "texture": "native" }

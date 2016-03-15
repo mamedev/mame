@@ -1,0 +1,23 @@
+{
+    "blend": {
+    	"equation": "add",
+    	"srcColor": "srcAlpha",
+    	"dstColor": "1-srcAlpha",
+    	"srcAlpha": "srcAlpha",
+    	"dstAlpha": "1-srcAlpha"
+    },
+    "depth": {
+    	"function": "always"
+    },
+    "cull": { "mode": "none" },
+    "write": {
+    	"rgb": "true",
+    	"alpha": "true"
+    },
+    "vertex": "vs_bloom_scale",
+    "fragment": "fs_bloom_scale",
+    "uniforms": [
+    	{ "name": "DiffuseSampler",     "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "u_source_dims",      "type": "vec4", "values": [ 1.0,  1.0, 0.0, 0.0 ] }
+    ]
+}

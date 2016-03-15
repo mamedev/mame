@@ -19,7 +19,7 @@ uniform vec4 u_radial_converge_red;
 uniform vec4 u_radial_converge_green;
 uniform vec4 u_radial_converge_blue;
 
-uniform vec4 u_guest_dims;
+uniform vec4 u_source_dims;
 
 void main()
 {
@@ -32,9 +32,9 @@ void main()
 	// radial converge offset to "translate" the most outer pixel as thay would be translated by the linar converge with the same amount
 	vec2 radialConvergeOffset = 2.0 * u_screenrect.xy;
 
-	v_texcoord0 = (a_texcoord0 - HalfSourceRect) * (1.0 + u_radial_converge_red.xy   * radialConvergeOffset) + HalfSourceRect + u_converge_red.xy   * u_guest_dims.xy;
-	v_texcoord1 = (a_texcoord0 - HalfSourceRect) * (1.0 + u_radial_converge_green.xy * radialConvergeOffset) + HalfSourceRect + u_converge_green.xy * u_guest_dims.xy;
-	v_texcoord2 = (a_texcoord0 - HalfSourceRect) * (1.0 + u_radial_converge_blue.xy  * radialConvergeOffset) + HalfSourceRect + u_converge_blue.xy  * u_guest_dims.xy;
+	v_texcoord0 = (a_texcoord0 - HalfSourceRect) * (1.0 + u_radial_converge_red.xy   * radialConvergeOffset) + HalfSourceRect + u_converge_red.xy   * (vec2(1.0, 1.0) / u_source_dims.xy);
+	v_texcoord1 = (a_texcoord0 - HalfSourceRect) * (1.0 + u_radial_converge_green.xy * radialConvergeOffset) + HalfSourceRect + u_converge_green.xy * (vec2(1.0, 1.0) / u_source_dims.xy);
+	v_texcoord2 = (a_texcoord0 - HalfSourceRect) * (1.0 + u_radial_converge_blue.xy  * radialConvergeOffset) + HalfSourceRect + u_converge_blue.xy  * (vec2(1.0, 1.0) / u_source_dims.xy);
 
 	v_color0 = a_color0;
 }

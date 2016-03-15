@@ -13,8 +13,10 @@ SAMPLER2D(s_prev, 1);
 
 void main()
 {
-	vec4 curr = texture2D(s_tex,  v_texcoord0);
-	vec4 prev = texture2D(s_prev, v_texcoord0);
-	vec4 phosphored = vec4(max(curr.r, prev.r * u_phosphor.r), max(curr.g, prev.g * u_phosphor.g), max(curr.b, prev.b * u_phosphor.b), curr.a);
-	gl_FragColor = mix(phosphored, curr, u_passthrough.x) * v_color0;
+	vec4 curr = texture2D(s_tex, v_texcoord0);
+	vec3 prev = texture2D(s_prev, v_texcoord0).rgb * u_phosphor.rgb;
+
+	vec3 maxed = max(curr.rgb, prev);
+
+	gl_FragColor = u_passthrough.x > 0.0 ? curr : vec4(maxed, curr.a);
 }

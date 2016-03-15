@@ -8,6 +8,8 @@
 
 #include "emu.h"
 
+#include <bx/timer.h>
+
 #include "slider.h"
 #include "parameter.h"
 #include "entryuniform.h"
@@ -23,6 +25,7 @@ bgfx_chain::bgfx_chain(std::string name, std::string author, std::vector<bgfx_sl
 	, m_params(params)
 	, m_entries(entries)
     , m_output(output)
+    , m_current_time(0)
 {
     for (bgfx_slider* slider : m_sliders)
     {
@@ -49,22 +52,35 @@ bgfx_chain::~bgfx_chain()
 void bgfx_chain::process(render_primitive* prim, int view, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint64_t blend)
 {
     int current_view = view;
-    for (int index = 0; index < m_entries.size(); index++)
+    for (bgfx_chain_entry* entry : m_entries)
 	{
-        if (!m_entries[index]->skip())
+        if (!entry->skip())
         {
-            m_entries[index]->submit(prim, current_view, textures, screen_width, screen_height, blend);
+            entry->submit(prim, current_view, textures, screen_width, screen_height, blend);
             current_view++;
         }
 	}
+
+    m_current_time = bx::getHPCounter();
+    static int64_t last = m_current_time;
+    const int64_t frameTime = m_current_time - last;
+    last = m_current_time;
+    const double freq = double(bx::getHPFrequency());
+    const double toMs = 1000.0 / freq;
+    const double frameTimeInSeconds = (double)frameTime / 1000000.0;
+
+    for (bgfx_parameter* param : m_params)
+    {
+        param->tick(frameTimeInSeconds* toMs);
+    }
 }
 
 uint32_t bgfx_chain::applicable_passes()
 {
     int applicable_passes = 0;
-    for (int index = 0; index < m_entries.size(); index++)
-    {
-        if (!m_entries[index]->skip())
+    for (bgfx_chain_entry* entry : m_entries)
+	{
+        if (!entry->skip())
         {
             applicable_passes++;
         }

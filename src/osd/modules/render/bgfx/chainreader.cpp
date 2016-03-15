@@ -28,7 +28,7 @@ const chain_reader::string_to_enum chain_reader::STYLE_NAMES[chain_reader::STYLE
 	{ "custom",	TARGET_STYLE_CUSTOM }
 };
 
-bgfx_chain* chain_reader::read_from_value(const Value& value, running_machine& machine, uint32_t window_index, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t screen_width, uint32_t screen_height)
+bgfx_chain* chain_reader::read_from_value(const Value& value, osd_options& options, running_machine& machine, uint32_t window_index, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t screen_width, uint32_t screen_height)
 {
 	validate_parameters(value);
 
@@ -42,7 +42,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, running_machine& m
 		const Value& slider_array = value["sliders"];
 		for (UINT32 i = 0; i < slider_array.Size(); i++)
 		{
-            std::vector<bgfx_slider*> expanded_sliders = slider_reader::read_from_value(slider_array[i], machine);
+            std::vector<bgfx_slider*> expanded_sliders = slider_reader::read_from_value(slider_array[i], machine, window_index);
             for (bgfx_slider* slider : expanded_sliders)
             {
                 sliders.push_back(slider);
@@ -129,7 +129,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, running_machine& m
         const Value& entry_array = value["passes"];
         for (UINT32 i = 0; i < entry_array.Size(); i++)
         {
-            entries.push_back(chain_entry_reader::read_from_value(entry_array[i], textures, targets, effects, slider_map, param_map));
+            entries.push_back(chain_entry_reader::read_from_value(entry_array[i], options, textures, targets, effects, slider_map, param_map));
         }
     }
 

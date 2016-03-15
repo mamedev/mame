@@ -58,8 +58,9 @@ void bgfx_chain_entry::submit(render_primitive* prim, int view, texture_manager&
     put_screen_buffer(prim, &buffer);
     bgfx::setVertexBuffer(&buffer);
 
-    bgfx_uniform* screen_rect = m_effect->uniform("u_screenrect");
-    if (screen_rect != nullptr)
+    bgfx_uniform* inv_screen_dims = m_effect->uniform("u_inv_screen_dims");
+    bgfx_uniform* screen_dims = m_effect->uniform("u_screen_dims");
+    if (screen_dims != nullptr || inv_screen_dims != nullptr)
     {
         float values[2];
         float width = screen_width;
@@ -69,9 +70,18 @@ void bgfx_chain_entry::submit(render_primitive* prim, int view, texture_manager&
             width = float(textures.provider(m_inputs[0].texture())->width());
             height = float(textures.provider(m_inputs[0].texture())->height());
         }
+        
         values[0] = 1.0f / width;
         values[1] = 1.0f / height;
-        screen_rect->set(values, sizeof(float) * 2);
+        if (inv_screen_dims != nullptr) {
+            inv_screen_dims->set(values, sizeof(float) * 2);
+        }
+
+        values[0] = width;
+        values[1] = height;
+        if (screen_dims != nullptr) {
+            screen_dims->set(values, sizeof(float) * 2);
+        }
     }
 
 	bgfx_uniform* quad_dims = m_effect->uniform("u_quad_dims");
@@ -83,13 +93,16 @@ void bgfx_chain_entry::submit(render_primitive* prim, int view, texture_manager&
 		quad_dims->set(values, sizeof(float) * 2);
 	}
 
-    bgfx_uniform* guest_dims = m_effect->uniform("u_guest_dims");
-    if (guest_dims != nullptr)
+    bgfx_uniform* source_dims = m_effect->uniform("u_source_dims");
+    if (source_dims != nullptr)
     {
         float values[2];
-        values[0] = 1.0f / float(prim->texture.width);
-        values[1] = 1.0f / float(prim->texture.height);
-        guest_dims->set(values, sizeof(float) * 2);
+        values[0] = float(prim->texture.width);
+        values[1] = float(prim->texture.height);
+        if (source_dims != nullptr)
+        {
+            source_dims->set(values, sizeof(float) * 2);
+        }
     }
     for (bgfx_entry_uniform* uniform : m_uniforms)
     {

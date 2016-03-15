@@ -1,3 +1,4 @@
+
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 //============================================================
@@ -24,7 +25,7 @@ public:
     virtual ~bgfx_frame_parameter() { }
 
     virtual float value() override;
-    virtual void tick(float delta) override;
+    virtual void tick(double delta) override;
 
 private:
 	uint32_t	m_current_frame;

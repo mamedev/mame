@@ -13,10 +13,12 @@
 #include "parameter.h"
 #include "frameparameter.h"
 #include "windowparameter.h"
+#include "timeparameter.h"
 
 const parameter_reader::string_to_enum parameter_reader::TYPE_NAMES[parameter_reader::TYPE_COUNT] = {
     { "frame",  bgfx_parameter::parameter_type::PARAM_FRAME },
-    { "window", bgfx_parameter::parameter_type::PARAM_WINDOW }
+    { "window", bgfx_parameter::parameter_type::PARAM_WINDOW },
+    { "time",   bgfx_parameter::parameter_type::PARAM_TIME }
 };
 
 bgfx_parameter* parameter_reader::read_from_value(const Value& value, uint32_t window_index)
@@ -31,11 +33,16 @@ bgfx_parameter* parameter_reader::read_from_value(const Value& value, uint32_t w
 		uint32_t period = int(value["period"].GetDouble());
 		return new bgfx_frame_parameter(name, type, period);
 	}
-	else if (type == bgfx_parameter::parameter_type::PARAM_WINDOW)
-	{
-		return new bgfx_window_parameter(name, type, window_index);
-	}
-	else
+    else if (type == bgfx_parameter::parameter_type::PARAM_WINDOW)
+    {
+        return new bgfx_window_parameter(name, type, window_index);
+    }
+    else if (type == bgfx_parameter::parameter_type::PARAM_TIME)
+    {
+        float limit = float(value["limit"].GetDouble());
+        return new bgfx_time_parameter(name, type, limit);
+    }
+    else
 	{
 		assert(false);
 	}
@@ -49,6 +56,12 @@ void parameter_reader::validate_parameters(const Value& value)
 	assert(value["name"].IsString());
 	assert(value.HasMember("type"));
 	assert(value["type"].IsString());
-	assert(value.HasMember("period"));
-	assert(value["period"].IsNumber());
+    if (value.HasMember("period"))
+    {
+        assert(value["period"].IsNumber());
+    }
+    if (value.HasMember("limit"))
+    {
+        assert(value["limit"].IsNumber());
+    }
 }

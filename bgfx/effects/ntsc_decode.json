@@ -18,8 +18,7 @@
     "fragment": "fs_ntsc_decode",
     "uniforms": [
     	{ "name": "DiffuseSampler",     "type": "int",  "values": [ 1.0 ] },
-    	{ "name": "u_texsize",          "type": "vec4", "values": [ 0.5,  0.0, 0.0, 0.0 ] },
-    	{ "name": "u_screenrect",       "type": "vec4", "values": [ 0.5,  0.0, 0.0, 0.0 ] },
+    	{ "name": "u_source_dims",      "type": "vec4", "values": [ 1.0,  1.0, 0.0, 0.0 ] },
     	{ "name": "u_a_value",          "type": "vec4", "values": [ 0.5,  0.0, 0.0, 0.0 ] },
     	{ "name": "u_b_value",          "type": "vec4", "values": [ 0.5,  0.0, 0.0, 0.0 ] },
     	{ "name": "u_cc_value",         "type": "vec4", "values": [ 3.5795454, 0.0, 0.0, 0.0 ] },

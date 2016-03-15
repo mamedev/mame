@@ -1,0 +1,29 @@
+{
+    "blend": {
+    	"equation": "add",
+    	"srcColor": "srcAlpha",
+    	"dstColor": "1-srcAlpha",
+    	"srcAlpha": "srcAlpha",
+    	"dstAlpha": "1-srcAlpha"
+    },
+    "depth": {
+    	"function": "always"
+    },
+    "cull": { "mode": "none" },
+    "write": {
+    	"rgb": "true",
+    	"alpha": "true"
+    },
+    "vertex": "vs_distortion",
+    "fragment": "fs_distortion",
+    "uniforms": [
+    	{ "name": "DiffuseSampler",  "type": "int",  "values": [ 0.0 ] },
+    	{ "name": "u_screen_dims",   "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_curvature",     "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_round_corner",  "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_smooth_border", "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_vignetting",    "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_reflection",    "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_rotation_type", "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] }
+    ]
+}

@@ -80,6 +80,7 @@
 
 #define OSDOPTION_BGFX_PATH             "bgfx_path"
 #define OSDOPTION_BGFX_SCREEN_CHAIN     "screen_chain"
+#define OSDOPTION_BGFX_SHADOW_MASK		"bgfx_shadow_mask"
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -153,6 +154,7 @@ public:
     // BGFX specific options
     const char *bgfx_path() const { return value(OSDOPTION_BGFX_PATH); }
     const char *bgfx_screen_chain() const { return value(OSDOPTION_BGFX_SCREEN_CHAIN); }
+    const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
 
 private:
 	static const options_entry s_option_entries[];

@@ -1701,10 +1701,10 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		int next_index = 0;
 
-		next_index = ntsc_pass(rt, next_index, poly, vertnum);
-		next_index = color_convolution_pass(rt, next_index, poly, vertnum);
-		next_index = prescale_pass(rt, next_index, poly, vertnum);
-		next_index = deconverge_pass(rt, next_index, poly, vertnum);
+		next_index = ntsc_pass(rt, next_index, poly, vertnum); // handled in bgfx
+		next_index = color_convolution_pass(rt, next_index, poly, vertnum); // handled in bgfx
+		next_index = prescale_pass(rt, next_index, poly, vertnum); // handled in bgfx
+		next_index = deconverge_pass(rt, next_index, poly, vertnum); // handled in bgfx
 		next_index = defocus_pass(rt, next_index, poly, vertnum); // 1st pass
 		next_index = defocus_pass(rt, next_index, poly, vertnum); // 2nd pass
 		next_index = phosphor_pass(rt, ct, next_index, poly, vertnum);
@@ -2704,6 +2704,7 @@ void uniform::update()
 					shadersys->curr_poly->get_prim_width(),
 					shadersys->curr_poly->get_prim_height() };
 				m_shader->set_vector("QuadDims", 2, quaddims);
+				printf("Quad Dims: %f, %f\n", quaddims[0], quaddims[1]);
 			}
 			break;
 		}

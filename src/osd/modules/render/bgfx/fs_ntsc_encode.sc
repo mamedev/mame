@@ -18,8 +18,7 @@ uniform vec4 u_scan_time;
 uniform vec4 u_jitter_amount;
 uniform vec4 u_jitter_offset;
 
-uniform vec4 u_texsize;
-uniform vec4 u_screenrect;
+uniform vec4 u_source_dims;
 
 SAMPLER2D(DiffuseSampler, 0);
 
@@ -29,9 +28,7 @@ SAMPLER2D(DiffuseSampler, 0);
 
 void main()
 {
-	vec2 SourceRes = (1.0 / u_texsize.xy) * u_screenrect.xy;
-
-	vec2 PValueSourceTexel = vec2(u_p_value.x, 0.0) * u_texsize.xy;
+	vec2 PValueSourceTexel = vec2(u_p_value.x, 0.0) * u_source_dims.xy;
 
 	vec2 C0 = v_texcoord0 + PValueSourceTexel * vec2(0.0,  0.0);
 	vec2 C1 = v_texcoord0 + PValueSourceTexel * vec2(0.25, 0.0);
@@ -43,9 +40,6 @@ void main()
 	vec4 Texel1 = texture2D(DiffuseSampler, C1);
 	vec4 Texel2 = texture2D(DiffuseSampler, C2);
 	vec4 Texel3 = texture2D(DiffuseSampler, C3);
-
-	vec4 HPosition = Cx / u_screenrect.xxxx;
-	vec4 VPosition = Cy / u_screenrect.yyyy;
 
 	const vec4 YDot = vec4(0.299, 0.587, 0.114, 0.0);
 	const vec4 IDot = vec4(0.595716, -0.274453, -0.321263, 0.0);
@@ -60,9 +54,9 @@ void main()
 	vec4 WoPI = W / PI;
 
 	vec4 HOffset = (u_b_value.xxxx + u_jitter_amount.xxxx * u_jitter_offset.xxxx) / WoPI;
-	vec4 VScale = (u_a_value.xxxx * SourceRes.yyyy) / WoPI;
+	vec4 VScale = (u_a_value.xxxx * u_source_dims.yyyy) / WoPI;
 
-	vec4 T = HPosition + HOffset + VPosition * VScale;
+	vec4 T = Cx + HOffset + Cy * VScale;
 	vec4 TW = T * W;
 
 	vec4 output_rgb = Y + I * cos(TW) + Q * sin(TW);

@@ -39,7 +39,9 @@ public:
 
 	virtual int create() override;
 	virtual slider_state* get_slider_list() override;
+    virtual bool multi_window_sliders() { return true; }
 	virtual int draw(const int update) override;
+
 #ifdef OSD_SDL
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
 #else
@@ -47,12 +49,15 @@ public:
 	virtual void record() override { }
 	virtual void toggle_fsfx() override { }
 #endif
-	virtual render_primitive_list *get_primitives() override
+
+    virtual render_primitive_list *get_primitives() override
 	{
 		osd_dim wdim = window().get_size();
 		window().target()->set_bounds(wdim.width(), wdim.height(), window().aspect());
 		return &window().target()->get_primitives();
 	}
+
+    static const char* WINDOW_PREFIX;
 
 private:
     int handle_screen_chains();

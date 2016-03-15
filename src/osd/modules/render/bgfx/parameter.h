@@ -23,13 +23,14 @@ public:
 	enum parameter_type
 	{
 		PARAM_FRAME,
-        PARAM_WINDOW
+        PARAM_WINDOW,
+        PARAM_TIME
 	};
 
     bgfx_parameter(std::string name, parameter_type type) : m_name(name), m_type(type) { }
     virtual ~bgfx_parameter() { }
 
-    virtual void tick(float delta) = 0;
+    virtual void tick(double delta) = 0;
 
 	// Getters
     virtual float value() = 0;

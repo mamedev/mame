@@ -22,8 +22,7 @@ uniform vec4 u_q_freq_response;
 uniform vec4 u_jitter_amount;
 uniform vec4 u_jitter_offset;
 
-uniform vec4 u_texsize;
-uniform vec4 u_screenrect;
+uniform vec4 u_source_dims;
 
 SAMPLER2D(DiffuseSampler, 0);
 
@@ -35,16 +34,13 @@ void main()
 {
 	vec4 BaseTexel = texture2D(DiffuseSampler, v_texcoord0.xy);
 
-	vec2 SourceTexelDims = u_texsize.xy;
-	vec2 SourceRes = (1.0 / u_texsize.xy) * u_screenrect.xy;
-
 	vec4 zero = vec4(0.0, 0.0, 0.0, 0.0);
 	vec4 quarter = vec4(0.25, 0.25, 0.25, 0.25);
 	vec4 onehalf = vec4(0.5, 0.5, 0.5, 0.5);
 	vec4 one = vec4(1.0, 1.0, 1.0, 1.0);
 	vec4 two = vec4(2.0, 2.0, 2.0, 2.0);
 	vec4 four = vec4(4.0, 4.0, 4.0, 4.0);
-	vec4 TimePerSample = u_scan_time.xxxx / (SourceRes.xxxx * four);
+	vec4 TimePerSample = u_scan_time.xxxx / (u_source_dims.xxxx * four);
 
 	vec4 Fc_y1 = (u_cc_value.xxxx - u_notch_width.xxxx * onehalf) * TimePerSample;
 	vec4 Fc_y2 = (u_cc_value.xxxx + u_notch_width.xxxx * onehalf) * TimePerSample;
@@ -61,27 +57,23 @@ void main()
 	vec4 WoPI = W / PI;
 
 	vec4 HOffset = (u_b_value.xxxx + u_jitter_amount.xxxx * u_jitter_offset.xxxx) / WoPI;
-	vec4 VScale = (u_a_value.xxxx * SourceRes.yyyy) / WoPI;
+	vec4 VScale = (u_a_value.xxxx * u_source_dims.yyyy) / WoPI;
 
 	vec4 YAccum = zero;
 	vec4 IAccum = zero;
 	vec4 QAccum = zero;
-
-	vec4 Cy = v_texcoord0.yyyy;
-	vec4 VPosition = vec4(Cy / u_screenrect.y);
 
 	for (int index = 0; index < 64; index = index + 4)
 	{
 		float n = float(index);
 		vec4 n4 = vec4(n, n, n, n) + vec4(0.0, 1.0, 2.0, 3.0);
 
-		vec4 Cx = v_texcoord0.xxxx + SourceTexelDims.xxxx * (n4 * quarter);
-		vec4 HPosition = Cx / u_screenrect.xxxx;
+		vec4 Cx = v_texcoord0.xxxx + u_source_dims.xxxx * (n4 * quarter);
 
 		// theory: What if we put white in the input of the NTSC decode shader?
-		vec4 C = texture2D(DiffuseSampler, vec2(Cx.x, Cy.x));
+		vec4 C = texture2D(DiffuseSampler, vec2(Cx.x, v_texcoord0.y));
 
-		vec4 T = HPosition + HOffset + VPosition * VScale;
+		vec4 T = Cx + HOffset + v_texcoord0.yyyy * VScale;
 		vec4 WT = W * T + u_o_value.xxxx;
 
 		vec4 SincKernel = vec4(0.54, 0.54, 0.54, 0.54) + vec4(0.46, 0.46, 0.46, 0.46) * cos((PI2 / 1.0) * n4);

@@ -296,6 +296,8 @@ public:
 
 	windows_options &options() { return m_options; }
 
+    int window_count();
+
 private:
 	virtual void osd_exit() override;
 	void build_slider_list();

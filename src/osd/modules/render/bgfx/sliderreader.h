@@ -21,7 +21,7 @@ class running_machine;
 class slider_reader : public state_reader
 {
 public:
-	static std::vector<bgfx_slider*> read_from_value(const Value& value, running_machine& machine);
+	static std::vector<bgfx_slider*> read_from_value(const Value& value, running_machine& machine, uint32_t window_index);
 
 private:
 	static void get_values(const Value& value, std::string name, int* values, const int count);

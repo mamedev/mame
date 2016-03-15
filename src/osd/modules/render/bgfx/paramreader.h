@@ -23,7 +23,7 @@ public:
 private:
 	static void validate_parameters(const Value& value);
 
-    static const int TYPE_COUNT = 2;
+    static const int TYPE_COUNT = 3;
     static const string_to_enum TYPE_NAMES[TYPE_COUNT];
 };
 

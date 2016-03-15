@@ -133,6 +133,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/render/bgfx/entryuniformreader.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/inputpair.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/frameparameter.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/timeparameter.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/paramreader.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/paramuniform.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/shadermanager.cpp",

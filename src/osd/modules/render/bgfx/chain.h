@@ -43,6 +43,7 @@ private:
 	std::vector<bgfx_chain_entry*>      m_entries;
     std::map<std::string, bgfx_slider*> m_slider_map;
     std::string                         m_output;
+    int64_t                             m_current_time;
 };
 
 #endif // __DRAWBGFX_CHAIN__

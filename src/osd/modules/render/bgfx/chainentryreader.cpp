@@ -9,6 +9,9 @@
 #include <string>
 
 #include "emu.h"
+#include "rendutil.h"
+
+#include <modules/lib/osdobj_common.h>
 
 #include "chainentryreader.h"
 
@@ -23,7 +26,7 @@
 #include "suppressor.h"
 #include "suppressorreader.h"
 
-bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, texture_manager& textures, target_manager& targets, effect_manager& effects, std::map<std::string, bgfx_slider*>& sliders, std::map<std::string, bgfx_parameter*>& params)
+bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, std::map<std::string, bgfx_slider*>& sliders, std::map<std::string, bgfx_parameter*>& params)
 {
 	validate_parameters(value);
 
@@ -61,6 +64,20 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, textur
 		for (UINT32 i = 0; i < suppressor_array.Size(); i++)
 		{
 			suppressors.push_back(suppressor_reader::read_from_value(suppressor_array[i], sliders));
+		}
+	}
+
+	if (value.HasMember("textures"))
+	{
+		assert(value["textures"].IsArray());
+		const Value& texture_array = value["textures"];
+		for (UINT32 i = 0; i < texture_array.Size(); i++)
+		{
+			char texture_name[2048];
+			bitmap_argb32 bitmap;
+			emu_file file(options.bgfx_shadow_mask(), OPEN_FLAG_READ);
+			strcpy(texture_name, options.bgfx_shadow_mask());
+			render_load_png(bitmap, file, nullptr, texture_name);
 		}
 	}
 

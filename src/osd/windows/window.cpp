@@ -289,13 +289,24 @@ void windows_osd_interface::update_slider_list()
 	}
 }
 
+int windows_osd_interface::window_count()
+{
+    int count = 0;
+    for (win_window_info *info = win_window_list; info != nullptr; info = info->m_next)
+    {
+        count++;
+    }
+    return count;
+}
+
 void windows_osd_interface::build_slider_list()
 {
 	m_sliders = nullptr;
 	slider_state *curr = m_sliders;
+    int index = 0;
 	for (win_window_info *info = win_window_list; info != nullptr; info = info->m_next)
 	{
-		slider_state *window_sliders = info->m_renderer->get_slider_list();
+        slider_state *window_sliders = info->m_renderer->get_slider_list();
 		if (window_sliders != nullptr)
 		{
 			if (m_sliders == nullptr)
@@ -310,6 +321,7 @@ void windows_osd_interface::build_slider_list()
 				}
 				curr->next = window_sliders;
 			}
+            index++;
 		}
 	}
 }
@@ -841,7 +853,9 @@ void win_window_info::create(running_machine &machine, int index, osd_monitor_in
 		}
 	}
 	else
+    {
 		window->m_init_state = window->complete_create() ? -1 : 1;
+    }
 
 	// handle error conditions
 	if (window->m_init_state == -1)

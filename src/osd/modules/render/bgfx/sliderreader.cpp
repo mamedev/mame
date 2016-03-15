@@ -33,7 +33,7 @@ const slider_reader::string_to_enum slider_reader::SCREEN_NAMES[slider_reader::S
 	{ "all",   uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_ANY) }
 };
 
-std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, running_machine& machine)
+std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, running_machine& machine, uint32_t window_index)
 {
 	validate_parameters(value);
 
@@ -86,21 +86,20 @@ std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, run
         for (int index = 0; index < slider_count; index++)
         {
             std::string desc;
-            char full_name[1024]; // arbitrary
-            snprintf(full_name, 1024, "%s%d", name.c_str(), index);
+            std::string full_name = name + std::to_string(index);
             switch (index)
             {
                 case 0:
-                    desc = description + (type == bgfx_slider::slider_type::SLIDER_VEC2 ? "X" : "Red");
+                    desc = "Window " + std::to_string(window_index) + ", " + description + (type == bgfx_slider::slider_type::SLIDER_VEC2 ? "X" : "Red");
                     break;
                 case 1:
-                    desc = description + (type == bgfx_slider::slider_type::SLIDER_VEC2 ? "Y" : "Green");
+                    desc = "Window " + std::to_string(window_index) + ", " + description + (type == bgfx_slider::slider_type::SLIDER_VEC2 ? "Y" : "Green");
                     break;
                 case 2:
-                    desc = description + (type == bgfx_slider::slider_type::SLIDER_VEC2 ? "Invalid" : "Blue");
+                    desc = "Window " + std::to_string(window_index) + ", " + description + (type == bgfx_slider::slider_type::SLIDER_VEC2 ? "Invalid" : "Blue");
                     break;
                 default:
-                    desc = description + "Invalid";
+                    desc = "Window " + std::to_string(window_index) + ", " + description + "Invalid";
                     break;
             }
             sliders.push_back(new bgfx_slider(machine, full_name, min[index], defaults[index], max[index], step, type, screen_type, scale, format, desc, strings));
@@ -111,7 +110,7 @@ std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, run
         int min = get_int(value, "min", 0);
         int def = get_int(value, "default", 0);
         int max = get_int(value, "max", 100);
-        sliders.push_back(new bgfx_slider(machine, name + "0", min, def, max, step, type, screen_type, scale, format, description, strings));
+        sliders.push_back(new bgfx_slider(machine, name + "0", min, def, max, step, type, screen_type, scale, format, "Window " + std::to_string(window_index) + ", " + description, strings));
     }
 	return sliders;
 }
@@ -121,7 +120,7 @@ void slider_reader::get_values(const Value& value, std::string name, int* values
 	const char* name_str = name.c_str();
     assert(value.HasMember(name_str));
     assert(value[name_str].IsArray());
-	
+
     const Value& value_array = value[name_str];
 	for (UINT32 i = 0; i < value_array.Size() && i < count; i++)
 	{
