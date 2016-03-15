@@ -467,10 +467,10 @@ private:
 		, m_saved_avih_offset(0)
 		, m_soundbuf()
 		, m_soundbuf_samples(0)
-		, m_soundbuf_chansamples{ 0 }
 		, m_soundbuf_chunks(0)
 		, m_soundbuf_frames(0)
 	{
+		std::fill(std::begin(m_soundbuf_chansamples), std::end(m_soundbuf_chansamples), 0);
 	}
 
 	avi_stream *get_video_stream();
