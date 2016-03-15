@@ -1043,7 +1043,7 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG
-			ret = (m_screen->vpos() & 0x3FE) + field; // << 1);
+			ret = (m_screen->vpos() & 0x3FE) + field;
 			break;
 
 		case 0x14/4:        // VI_BURST_REG
@@ -1742,7 +1742,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				{
 					// Read EEPROM status
 					rdata[0] = 0x00;
-					rdata[1] = 0x80;
+					rdata[1] = (machine().root_device().ioport("input")->read() >> 8) & 0xC0;
 					rdata[2] = 0x00;
 
 					return 0;
@@ -2127,9 +2127,7 @@ void n64_periphs::pif_dma(int direction)
 		}
 	}
 	si_status |= 1;
-	si_dma_timer->adjust(attotime::from_hz(1000));
-	//si_status |= 0x1000;
-	//signal_rcp_interrupt(SI_INTERRUPT);
+	si_dma_timer->adjust(attotime::from_hz(10000));
 }
 
 READ32_MEMBER( n64_periphs::si_reg_r )
@@ -2171,6 +2169,7 @@ WRITE32_MEMBER( n64_periphs::si_reg_w )
 
 		case 0x18/4:        // SI_STATUS_REG
 			si_status = 0;
+			si_dma_timer->adjust(attotime::never);
 			clear_rcp_interrupt(SI_INTERRUPT);
 			break;
 
