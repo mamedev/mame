@@ -8890,6 +8890,7 @@ ccbootmr                        // Model Racing bootleg
 cclimber                        // (c) 1980 Nichibutsu
 cclimberj                       // (c) 1980 Nichibutsu
 cclimbroper                     // Operamatic bootleg
+cclimbrrod						// Rodmar bootleg
 ckong                           // (c) 1981 (Kyoei)
 ckongalc                        // bootleg (Alca)
 ckongdks                        // Spanish Crazy Kong bootleg
@@ -35650,6 +35651,7 @@ videopkr                        // (c) 1984 InterFlip
 @source:vigilant.cpp
 buccanrs                        // (c) 1989 Duintronic
 buccanrsa                       // (c) 1989 Duintronic
+buccanrsb						// (c) 1989 Duintronic
 kikcubic                        // (c) 1988 (Japan)
 kikcubicb                       // bootleg
 vigilant                        // (c) 1988 (World Rev E)
