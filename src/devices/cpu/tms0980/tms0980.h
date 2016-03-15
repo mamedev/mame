@@ -489,6 +489,7 @@ protected:
 	// overrides
 	//virtual void device_start() override;
 	//virtual void device_reset() override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	//virtual machine_config_constructor device_mconfig_additions() const override;
 };
