@@ -835,11 +835,11 @@ osd_file::error emu_file::attempt__7zped()
 		if (fileno != -1)
 		{
 			m__7zfile = std::move(_7z);
-			m__7zlength = _7z->current_uncompressed_length();
+			m__7zlength = m__7zfile->current_uncompressed_length();
 
 			// build a hash with just the CRC
 			m_hashes.reset();
-			m_hashes.add_crc(_7z->current_crc());
+			m_hashes.add_crc(m__7zfile->current_crc());
 			return (m_openflags & OPEN_FLAG_NO_PRELOAD) ? osd_file::error::NONE : load__7zped_file();
 		}
 
