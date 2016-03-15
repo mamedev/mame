@@ -42,7 +42,6 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_WATCHDOG ";wdog",             "0",              OPTION_INTEGER,   "force the program to terminate if no updates within specified number of seconds" },
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD PERFORMANCE OPTIONS" },
-	{ OSDOPTION_MULTITHREADING ";mt",         "0",              OPTION_BOOLEAN,   "enable multithreading; this enables rendering and blitting on a separate thread" },
 	{ OSDOPTION_NUMPROCESSORS ";np",          OSDOPTVAL_AUTO,   OPTION_STRING,    "number of processors; this overrides the number the system reports" },
 	{ OSDOPTION_BENCH,                        "0",              OPTION_INTEGER,   "benchmark for the given number of emulated seconds; implies -video none -sound none -nothrottle" },
 

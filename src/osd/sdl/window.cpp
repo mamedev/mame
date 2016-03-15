@@ -90,7 +90,6 @@ sdl_window_info *sdl_window_list;
 static sdl_window_info **last_window_ptr;
 
 // event handling
-static int multithreading_enabled;
 static osd_work_queue *work_queue;
 
 static SDL_threadID main_threadid;
@@ -145,12 +144,7 @@ static inline void execute_async(osd_work_callback callback, const worker_param 
 {
 	worker_param *wp_temp = (worker_param *) osd_malloc(sizeof(worker_param));
 	*wp_temp = wp;
-
-	if (multithreading_enabled)
-	{
-		osd_work_item_queue(work_queue, callback, (void *) wp_temp, WORK_ITEM_FLAG_AUTO_RELEASE);
-	} else
-		callback((void *) wp_temp, 0);
+	callback((void *) wp_temp, 0);
 }
 
 static inline void execute_sync(osd_work_callback callback, const worker_param &wp)
@@ -202,28 +196,13 @@ static OSDWORK_CALLBACK(sdlwindow_thread_id)
 bool sdl_osd_interface::window_init()
 {
 	osd_printf_verbose("Enter sdlwindow_init\n");
-	// determine if we are using multithreading or not
-	multithreading_enabled = false;//options().multithreading();
 
 	// get the main thread ID before anything else
 	main_threadid = SDL_ThreadID();
 
-	// if multithreading, create a thread to run the windows
-	if (multithreading_enabled)
-	{
-		// create a thread to run the windows from
-		work_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_IO);
-		if (work_queue == nullptr)
-			return false;
-		osd_work_item_queue(work_queue, &sdlwindow_thread_id, nullptr, WORK_ITEM_FLAG_AUTO_RELEASE);
-		sdlwindow_sync();
-	}
-	else
-	{
-		// otherwise, treat the window thread as the main thread
-		//window_threadid = main_threadid;
-		sdlwindow_thread_id(nullptr, 0);
-	}
+	// otherwise, treat the window thread as the main thread
+	//window_threadid = main_threadid;
+	sdlwindow_thread_id(nullptr, 0);
 
 	// initialize the drawers
 	if (video_config.mode == VIDEO_MODE_BGFX)
@@ -304,15 +283,7 @@ bool sdl_osd_interface::window_init()
 
 static void sdlwindow_sync(void)
 {
-	if (multithreading_enabled)
-	{
-		// Fallback
-		while (!osd_work_queue_wait(work_queue, osd_ticks_per_second()*10))
-		{
-			osd_printf_warning("sdlwindow_sync: Sleeping...\n");
-			osd_sleep(osd_ticks_per_second() / 1000 * 100);
-		}
-	}
+	// haha, do nothing, losers
 }
 
 
@@ -370,19 +341,8 @@ void sdl_osd_interface::window_exit()
 			break;
 	}
 
-	// if we're multithreaded, clean up the window thread
-	if (multithreading_enabled)
-	{
-		sdlwindow_sync();
-	}
-
 	execute_async_wait(&sdlwindow_exit_wt, wp_dummy);
 
-	if (multithreading_enabled)
-	{
-		osd_work_queue_wait(work_queue, 1000000);
-		osd_work_queue_free(work_queue);
-	}
 	osd_printf_verbose("Leave sdlwindow_exit\n");
 
 }
@@ -731,18 +691,7 @@ int sdl_window_info::window_init()
 
 	wp->set_window(this);
 
-	// FIXME: pass error back in a different way
-	if (multithreading_enabled)
-	{
-		osd_work_item *wi;
-
-		wi = osd_work_item_queue(work_queue, &sdl_window_info::complete_create_wt, (void *) wp, 0);
-		sdlwindow_sync();
-		result = *((int *) (osd_work_item_result)(wi));
-		osd_work_item_release(wi);
-	}
-	else
-		result = *((int *) sdl_window_info::complete_create_wt((void *) wp, 0));
+	result = *((int *) sdl_window_info::complete_create_wt((void *) wp, 0));
 
 	// handle error conditions
 	if (result == 1)
@@ -796,10 +745,6 @@ void sdl_window_info::destroy()
 	sdl_window_info **prevptr;
 
 	ASSERT_MAIN_THREAD();
-	if (multithreading_enabled)
-	{
-		sdlwindow_sync();
-	}
 
 	//osd_event_wait(window->rendered_event, osd_ticks_per_second()*10);
 

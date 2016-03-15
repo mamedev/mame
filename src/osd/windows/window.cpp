@@ -101,8 +101,6 @@ static int in_background;
 static int ui_temp_pause;
 static int ui_temp_was_paused;
 
-static int multithreading_enabled;
-
 static HANDLE window_thread;
 static DWORD window_threadid;
 
@@ -158,7 +156,6 @@ static void mtlog_dump(void)
 }
 #else
 void mtlog_add(const char *event) { }
-static void mtlog_dump(void) { }
 #endif
 
 
@@ -170,11 +167,6 @@ static void mtlog_dump(void) { }
 
 bool windows_osd_interface::window_init()
 {
-	size_t temp;
-
-	// determine if we are using multithreading or not
-	multithreading_enabled = false;//downcast<windows_options &>(machine().options()).multithreading();
-
 	// get the main thread ID before anything else
 	main_threadid = GetCurrentThreadId();
 
@@ -186,30 +178,8 @@ bool windows_osd_interface::window_init()
 	if (!ui_pause_event)
 		fatalerror("Failed to create pause event\n");
 
-	// if multithreading, create a thread to run the windows
-	if (multithreading_enabled)
-	{
-		// create an event to signal when the window thread is ready
-		window_thread_ready_event = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-		if (!window_thread_ready_event)
-			fatalerror("Failed to create window thread ready event\n");
-
-		// create a thread to run the windows from
-		temp = _beginthreadex(nullptr, 0, win_window_info::thread_entry, this, 0, (unsigned *)&window_threadid);
-		window_thread = (HANDLE)temp;
-		if (window_thread == nullptr)
-			fatalerror("Failed to create window thread\n");
-
-		// set the thread priority equal to the main MAME thread
-		SetThreadPriority(window_thread, GetThreadPriority(GetCurrentThread()));
-	}
-
-	// otherwise, treat the window thread as the main thread
-	else
-	{
-		window_thread = GetCurrentThread();
-		window_threadid = main_threadid;
-	}
+	window_thread = GetCurrentThread();
+	window_threadid = main_threadid;
 
 	const int fallbacks[VIDEO_MODE_COUNT] = {
 		-1,                 // NONE -> no fallback
@@ -365,15 +335,6 @@ void windows_osd_interface::window_exit()
 			break;
 		default:
 			break;
-	}
-
-	// if we're multithreaded, clean up the window thread
-	if (multithreading_enabled)
-	{
-		PostThreadMessage(window_threadid, WM_USER_SELF_TERMINATE, 0, 0);
-		WaitForSingleObject(window_thread, INFINITE);
-
-		mtlog_dump();
 	}
 
 	// kill the UI pause event
@@ -839,23 +800,7 @@ void win_window_info::create(running_machine &machine, int index, osd_monitor_in
 	// set the initial maximized state
 	window->m_startmaximized = options.maximize();
 
-	// finish the window creation on the window thread
-	if (multithreading_enabled)
-	{
-		// wait until the window thread is ready to respond to events
-		WaitForSingleObject(window_thread_ready_event, INFINITE);
-
-		PostThreadMessage(window_threadid, WM_USER_FINISH_CREATE_WINDOW, 0, (LPARAM)window);
-		while (window->m_init_state == 0)
-		{
-			winwindow_process_events(machine, 0, 1); //pump the message queue
-			Sleep(1);
-		}
-	}
-	else
-    {
-		window->m_init_state = window->complete_create() ? -1 : 1;
-    }
+	window->m_init_state = window->complete_create() ? -1 : 1;
 
 	// handle error conditions
 	if (window->m_init_state == -1)
@@ -956,10 +901,7 @@ void win_window_info::update()
 			// post a redraw request with the primitive list as a parameter
 			last_update_time = timeGetTime();
 			mtlog_add("winwindow_video_window_update: PostMessage start");
-			if (multithreading_enabled)
-				PostMessage(m_hwnd, WM_USER_REDRAW, 0, (LPARAM)primlist);
-			else
-				SendMessage(m_hwnd, WM_USER_REDRAW, 0, (LPARAM)primlist);
+			SendMessage(m_hwnd, WM_USER_REDRAW, 0, (LPARAM)primlist);
 			mtlog_add("winwindow_video_window_update: PostMessage end");
 		}
 	}
@@ -1115,21 +1057,7 @@ void winwindow_ui_pause_from_main_thread(running_machine &machine, int pause)
 void winwindow_ui_pause_from_window_thread(running_machine &machine, int pause)
 {
 	assert(GetCurrentThreadId() == window_threadid);
-
-	// if we're multithreaded, we have to request a pause on the main thread
-	if (multithreading_enabled)
-	{
-		// request a pause from the main thread
-		PostThreadMessage(main_threadid, WM_USER_UI_TEMP_PAUSE, pause, 0);
-
-		// if we're pausing, block until it happens
-		if (pause)
-			WaitForSingleObject(ui_pause_event, INFINITE);
-	}
-
-	// otherwise, we just do it directly
-	else
-		winwindow_ui_pause_from_main_thread(machine, pause);
+	winwindow_ui_pause_from_main_thread(machine, pause);
 }
 
 
@@ -1143,16 +1071,7 @@ void winwindow_ui_exec_on_main_thread(void (*func)(void *), void *param)
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
-	// if we're multithreaded, we have to request a pause on the main thread
-	if (multithreading_enabled)
-	{
-		// request a pause from the main thread
-		PostThreadMessage(main_threadid, WM_USER_EXEC_FUNC, (WPARAM) func, (LPARAM) param);
-	}
-
-	// otherwise, we just do it directly
-	else
-		(*func)(param);
+	(*func)(param);
 }
 
 
@@ -1551,10 +1470,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 
 		// close: cause MAME to exit
 		case WM_CLOSE:
-			if (multithreading_enabled)
-				PostThreadMessage(main_threadid, WM_QUIT, 0, 0);
-			else
-				window->machine().schedule_exit();
+			window->machine().schedule_exit();
 			break;
 
 		// destroy: clean up all attached rendering bits and nullptr out our hwnd

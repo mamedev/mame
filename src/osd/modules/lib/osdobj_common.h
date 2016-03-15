@@ -37,7 +37,6 @@
 #define OSDOPTION_DEBUGGER_FONT_SIZE    "debugger_font_size"
 #define OSDOPTION_WATCHDOG              "watchdog"
 
-#define OSDOPTION_MULTITHREADING        "multithreading"
 #define OSDOPTION_NUMPROCESSORS         "numprocessors"
 #define OSDOPTION_BENCH                 "bench"
 
@@ -102,7 +101,6 @@ public:
 	int watchdog() const { return int_value(OSDOPTION_WATCHDOG); }
 
 	// performance options
-	bool multithreading() const { return bool_value(OSDOPTION_MULTITHREADING); }
 	const char *numprocessors() const { return value(OSDOPTION_NUMPROCESSORS); }
 	int bench() const { return int_value(OSDOPTION_BENCH); }
 
