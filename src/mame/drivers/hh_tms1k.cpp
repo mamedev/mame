@@ -145,8 +145,8 @@
 #include "simon.lh" // clickable
 #include "ssimon.lh" // clickable
 #include "splitsec.lh"
-#include "starwbc.lh"
-#include "stopthie.lh"
+#include "starwbc.lh" // clickable
+#include "stopthie.lh" // clickable
 #include "tandy12.lh" // clickable
 #include "tbreakup.lh"
 #include "tc4.lh"
@@ -5757,8 +5757,8 @@ COMP( 1983, fxmcr165,  0,        0, fxmcr165,  fxmcr165,  driver_device, 0, "Gak
 
 CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ideal", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
 
-CONS( 1979, starwbc,   0,        0, starwbc,   starwbc,   driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command (patent)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, starwbc,   0,        0, starwbc,   starwbc,   driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 COMP( 1979, astro,     0,        0, astro,     astro,     driver_device, 0, "Kosmos", "Astro", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
