@@ -495,15 +495,12 @@ namespace netlist
 		ATTR_HOT  net_t & net() { return *m_net;}
 
 		ATTR_HOT  bool is_state(const state_e astate) const { return (m_state == astate); }
-		ATTR_HOT  state_e state() const { return m_state; }
+		ATTR_HOT  const state_e &state() const { return m_state; }
 		ATTR_HOT  void set_state(const state_e astate)
 		{
 			nl_assert(astate != STATE_NONEX);
 			m_state = astate;
 		}
-
-
-		ATTR_HOT /* inline */ void update_dev(const UINT32 mask);
 
 	protected:
 		virtual void save_register() override
