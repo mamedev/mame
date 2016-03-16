@@ -547,7 +547,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state, microvsn_cart)
 		if (pla)
 			m_pla = 1;
 
-		tms1xxx_cpu_device::set_output_pla(m_tms1100, m_pla ? microvision_output_pla_1 : microvision_output_pla_0);
+		tms1k_base_device::set_output_pla(m_tms1100, m_pla ? microvision_output_pla_1 : microvision_output_pla_0);
 
 		// Set default setting for PCB type and RC type
 		m_pcb_type = microvision_state::PCB_TYPE_UNKNOWN;

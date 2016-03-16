@@ -166,10 +166,10 @@ static const UINT8 tms0980_mnemonic[512] =
 static const UINT8 tp0320_mnemonic[512] =
 {
 /* 0x000 */
-	0,       zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zCLA,    zDMAN,   zTKA,    zMNEA,   zTKM,    0,       0,       0,       zKNEZ,   0,       // 0
+	0,       zALEM,   zYNEA,   zXMA,    zDYN,    zIYC,    zCLA,    zDMAN,   zTKA,    zMNEA,   zTKM,    0,       0,       zSETR,   zKNEZ,   0,       // 0
 	zDMEA,   zDNAA,   zCCLA,   zNDMEA,  0,       zAMAAC,  0,       0,       zCTMDYN, zXDA,    0,       0,       0,       0,       0,       0,       // 1
 	zTBIT,   zTBIT,   zTBIT,   zTBIT,   0,       0,       0,       0,       zTAY,    zTMA,    zTMY,    zTYA,    zTAMDYN, zTAMIYC, zTAMZA,  zTAM,    // 2
-	zSAMAN,  zCPAIZ,  zIMAC,   zMNEZ,   0,       0,       0,       zYMCY,   zTCY,    zYNEC,   zTCMIY,  zACACC,  zACNAA,  zTAMACS, zALEC,   0,       // 3
+	zSAMAN,  zCPAIZ,  zIMAC,   zMNEZ,   0,       0,       zRSTR,   zYMCY,   zTCY,    zYNEC,   zTCMIY,  zACACC,  zACNAA,  zTAMACS, zALEC,   0,       // 3
 	zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    zTCY,    // 4
 	zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   zYNEC,   // 5
 	zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  zTCMIY,  // 6

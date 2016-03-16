@@ -53,13 +53,6 @@ cycle #5
     - Execute:
         1. Execute BRANCH/CALL/RETN part #1
 
-*/
-
-#include "tms0980.h"
-#include "debugger.h"
-
-/*
-
 The MCU cores contains a set of fixed instructions and a set of
 instructions created using microinstructions. A subset of the
 instruction set could be defined from the microinstructions by
@@ -73,57 +66,8 @@ unknown cycle: CME, SSE, SSS
 
 */
 
-/* Microinstructions */
-#define M_15TN              (1<<0)  /* 15 to -ALU */
-#define M_ATN               (1<<1)  /* ACC to -ALU */
-#define M_AUTA              (1<<2)  /* ALU to ACC */
-#define M_AUTY              (1<<3)  /* ALU to Y */
-#define M_C8                (1<<4)  /* CARRY8 to STATUS */
-#define M_CIN               (1<<5)  /* Carry In to ALU */
-#define M_CKM               (1<<6)  /* CKB to MEM */
-#define M_CKN               (1<<7)  /* CKB to -ALU */
-#define M_CKP               (1<<8)  /* CKB to +ALU */
-#define M_MTN               (1<<9)  /* MEM to -ALU */
-#define M_MTP               (1<<10) /* MEM to +ALU */
-#define M_NATN              (1<<11) /* ~ACC to -ALU */
-#define M_NE                (1<<12) /* COMP to STATUS */
-#define M_STO               (1<<13) /* ACC to MEM */
-#define M_STSL              (1<<14) /* STATUS to Status Latch */
-#define M_YTP               (1<<15) /* Y to +ALU */
-
-#define M_CME               (1<<16) /* Conditional Memory Enable */
-#define M_DMTP              (1<<17) /* DAM to +ALU */
-#define M_NDMTP             (1<<18) /* ~DAM to +ALU */
-#define M_SSE               (1<<19) /* Special Status Enable */
-#define M_SSS               (1<<20) /* Special Status Sample */
-
-#define M_RSTR              (1<<21) /* -> line #36, F_RSTR (TMS02x0 custom) */
-#define M_UNK1              (1<<22) /* -> line #37, F_???? (TMS0270 custom) */
-
-/* Standard/fixed instructions - these are documented more in their specific handlers below */
-#define F_BR                (1<<0)
-#define F_CALL              (1<<1)
-#define F_CLO               (1<<2)
-#define F_COMC              (1<<3)
-#define F_COMX              (1<<4)
-#define F_COMX8             (1<<5)
-#define F_LDP               (1<<6)
-#define F_LDX               (1<<7)
-#define F_RBIT              (1<<8)
-#define F_RETN              (1<<9)
-#define F_RSTR              (1<<10)
-#define F_SBIT              (1<<11)
-#define F_SETR              (1<<12)
-#define F_TDO               (1<<13)
-#define F_TPC               (1<<14)
-
-#define F_OFF               (1<<15)
-#define F_REAC              (1<<16)
-#define F_SAL               (1<<17)
-#define F_SBL               (1<<18)
-#define F_SEAC              (1<<19)
-#define F_XDA               (1<<20)
-
+#include "tms0980.h"
+#include "debugger.h"
 
 // supported types:
 // note: dice information assumes the orientation is pictured with RAM at the bottom-left, except where noted
@@ -209,32 +153,32 @@ const device_type TP0320 = &device_creator<tp0320_cpu_device>; // 28-pin SDIP, .
 
 
 // internal memory maps
-static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1xxx_cpu_device)
+static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1k_base_device)
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(program_10bit_8, AS_PROGRAM, 8, tms1xxx_cpu_device)
+static ADDRESS_MAP_START(program_10bit_8, AS_PROGRAM, 8, tms1k_base_device)
 	AM_RANGE(0x000, 0x3ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(program_11bit_8, AS_PROGRAM, 8, tms1xxx_cpu_device)
+static ADDRESS_MAP_START(program_11bit_8, AS_PROGRAM, 8, tms1k_base_device)
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(program_12bit_8, AS_PROGRAM, 8, tms1xxx_cpu_device)
+static ADDRESS_MAP_START(program_12bit_8, AS_PROGRAM, 8, tms1k_base_device)
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(data_64x4, AS_DATA, 8, tms1xxx_cpu_device)
+static ADDRESS_MAP_START(data_64x4, AS_DATA, 8, tms1k_base_device)
 	AM_RANGE(0x00, 0x3f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_128x4, AS_DATA, 8, tms1xxx_cpu_device)
+static ADDRESS_MAP_START(data_128x4, AS_DATA, 8, tms1k_base_device)
 	AM_RANGE(0x00, 0x7f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_64x9_as4, AS_DATA, 8, tms1xxx_cpu_device)
+static ADDRESS_MAP_START(data_64x9_as4, AS_DATA, 8, tms1k_base_device)
 	AM_RANGE(0x00, 0x7f) AM_RAM
 	AM_RANGE(0x80, 0x8f) AM_RAM AM_MIRROR(0x70) // DAM
 ADDRESS_MAP_END
@@ -242,11 +186,11 @@ ADDRESS_MAP_END
 
 // device definitions
 tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms1xxx_cpu_device(mconfig, TMS1000, "TMS1000", tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 10 /* prg width */, ADDRESS_MAP_NAME(program_10bit_8), 6 /* data width */, ADDRESS_MAP_NAME(data_64x4), "tms1000", __FILE__)
+	: tms1k_base_device(mconfig, TMS1000, "TMS1000", tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 10 /* prg width */, ADDRESS_MAP_NAME(program_10bit_8), 6 /* data width */, ADDRESS_MAP_NAME(data_64x4), "tms1000", __FILE__)
 { }
 
 tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
-	: tms1xxx_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
+	: tms1k_base_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
 { }
 
 tms1070_cpu_device::tms1070_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -497,7 +441,7 @@ offs_t tp0320_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT
 	return CPU_DISASSEMBLE_NAME(tp0320)(this, buffer, pc, oprom, opram, options);
 }
 
-void tms1xxx_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
+void tms1k_base_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -519,7 +463,7 @@ enum
 	TMS1XXX_A, TMS1XXX_X, TMS1XXX_Y, TMS1XXX_STATUS
 };
 
-void tms1xxx_cpu_device::device_start()
+void tms1k_base_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
@@ -630,7 +574,7 @@ void tms1xxx_cpu_device::device_start()
 void tms0270_cpu_device::device_start()
 {
 	// common init
-	tms1xxx_cpu_device::device_start();
+	tms1k_base_device::device_start();
 
 	m_read_ctl.resolve_safe(0);
 	m_write_ctl.resolve_safe();
@@ -665,7 +609,7 @@ void tms0270_cpu_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void tms1xxx_cpu_device::device_reset()
+void tms1k_base_device::device_reset()
 {
 	m_pa = 0xf;
 	m_pb = 0xf;
@@ -696,7 +640,7 @@ void tms1xxx_cpu_device::device_reset()
 void tms1000_cpu_device::device_reset()
 {
 	// common reset
-	tms1xxx_cpu_device::device_reset();
+	tms1k_base_device::device_reset();
 
 	// pre-decode instructionset
 	m_fixed_decode.resize(0x100);
@@ -758,7 +702,7 @@ void tms1400_cpu_device::device_reset()
 void tms0970_cpu_device::device_reset()
 {
 	// common reset
-	tms1xxx_cpu_device::device_reset();
+	tms1k_base_device::device_reset();
 
 	// pre-decode instructionset
 	m_fixed_decode.resize(0x100);
@@ -824,7 +768,7 @@ UINT32 tms0980_cpu_device::decode_micro(UINT8 sel)
 void tms0980_cpu_device::device_reset()
 {
 	// common reset
-	tms1xxx_cpu_device::device_reset();
+	tms1k_base_device::device_reset();
 
 	// pre-decode instructionset
 	m_fixed_decode.resize(0x200);
@@ -876,7 +820,7 @@ void tms0270_cpu_device::device_reset()
 //  program counter/opcode decode
 //-------------------------------------------------
 
-void tms1xxx_cpu_device::next_pc()
+void tms1k_base_device::next_pc()
 {
 	// The program counter is a LFSR. To put it simply, the feedback bit is a XOR of the two highest bits,
 	// but it makes an exception when all low bits are set (eg. in TMS1000 case, when PC is 0x1f or 0x3f).
@@ -891,7 +835,7 @@ void tms1xxx_cpu_device::next_pc()
 	m_pc = (m_pc << 1 | fb) & m_pc_mask;
 }
 
-void tms1xxx_cpu_device::read_opcode()
+void tms1k_base_device::read_opcode()
 {
 	debugger_instruction_hook(this, m_rom_address);
 	m_opcode = m_program->read_byte(m_rom_address);
@@ -918,9 +862,9 @@ void tms0980_cpu_device::read_opcode()
 	else
 		m_micro = m_micro_decode[m_opcode];
 
-	// TMS02x0/TMS1980: RSTR is on the mpla
-	if (m_micro & M_RSTR)
-		m_fixed |= F_RSTR;
+	// redirect mpla fixed instructions
+	if (m_micro & M_RSTR) m_fixed |= F_RSTR;
+	if (m_micro & M_SETR) m_fixed |= F_SETR;
 
 	next_pc();
 }
@@ -931,7 +875,7 @@ void tms0980_cpu_device::read_opcode()
 //  i/o handling
 //-------------------------------------------------
 
-void tms1xxx_cpu_device::write_o_output(UINT8 index)
+void tms1k_base_device::write_o_output(UINT8 index)
 {
 	// a hardcoded table is supported if the output pla is unknown
 	m_o = (m_output_pla_table == nullptr) ? m_opla->read(index) : m_output_pla_table[index];
@@ -988,7 +932,7 @@ void tms0270_cpu_device::dynamic_output()
 }
 
 
-UINT8 tms1xxx_cpu_device::read_k_input()
+UINT8 tms1k_base_device::read_k_input()
 {
 	// K1,2,4,8 (KC test pin is not emulated)
 	return m_read_k(0, 0xff) & 0xf;
@@ -1013,7 +957,7 @@ UINT8 tms0270_cpu_device::read_k_input()
 }
 
 
-void tms1xxx_cpu_device::set_cki_bus()
+void tms1k_base_device::set_cki_bus()
 {
 	switch (m_opcode & 0xf8)
 	{
@@ -1077,7 +1021,7 @@ void tms0980_cpu_device::set_cki_bus()
 // note: add(latch) and bl(branch latch) are specific to 0980 series,
 // c(chapter) bits are specific to 1100(and 1400) series
 
-void tms1xxx_cpu_device::op_br()
+void tms1k_base_device::op_br()
 {
 	// BR/BL: conditional branch
 	if (m_status)
@@ -1089,7 +1033,7 @@ void tms1xxx_cpu_device::op_br()
 	}
 }
 
-void tms1xxx_cpu_device::op_call()
+void tms1k_base_device::op_call()
 {
 	// CALL/CALLL: conditional call
 	if (m_status)
@@ -1109,7 +1053,7 @@ void tms1xxx_cpu_device::op_call()
 	}
 }
 
-void tms1xxx_cpu_device::op_retn()
+void tms1k_base_device::op_retn()
 {
 	// RETN: return from subroutine
 	if (m_clatch == 1)
@@ -1184,7 +1128,7 @@ void tms1400_cpu_device::op_retn()
 
 // TMS1000/common
 
-void tms1xxx_cpu_device::op_sbit()
+void tms1k_base_device::op_sbit()
 {
 	// SBIT: set memory bit
 	if (m_ram_out == -1)
@@ -1192,7 +1136,7 @@ void tms1xxx_cpu_device::op_sbit()
 	m_ram_out |= (m_cki_bus ^ 0xf);
 }
 
-void tms1xxx_cpu_device::op_rbit()
+void tms1k_base_device::op_rbit()
 {
 	// RBIT: reset memory bit
 	if (m_ram_out == -1)
@@ -1200,52 +1144,52 @@ void tms1xxx_cpu_device::op_rbit()
 	m_ram_out &= m_cki_bus;
 }
 
-void tms1xxx_cpu_device::op_setr()
+void tms1k_base_device::op_setr()
 {
 	// SETR: set one R-output line
 	m_r = m_r | (1 << m_y);
 	m_write_r(0, m_r & m_r_mask, 0xffff);
 }
 
-void tms1xxx_cpu_device::op_rstr()
+void tms1k_base_device::op_rstr()
 {
 	// RSTR: reset one R-output line
 	m_r = m_r & ~(1 << m_y);
 	m_write_r(0, m_r & m_r_mask, 0xffff);
 }
 
-void tms1xxx_cpu_device::op_tdo()
+void tms1k_base_device::op_tdo()
 {
 	// TDO: transfer accumulator and status latch to O-output
 	write_o_output(m_status_latch << 4 | m_a);
 }
 
-void tms1xxx_cpu_device::op_clo()
+void tms1k_base_device::op_clo()
 {
 	// CLO: clear O-output
 	write_o_output(0);
 }
 
-void tms1xxx_cpu_device::op_ldx()
+void tms1k_base_device::op_ldx()
 {
 	// LDX: load X register with (x_bits) constant
 	m_x = m_c4 >> (4-m_x_bits);
 }
 
-void tms1xxx_cpu_device::op_comx()
+void tms1k_base_device::op_comx()
 {
 	// COMX: complement X register
 	m_x ^= m_x_mask;
 }
 
-void tms1xxx_cpu_device::op_comx8()
+void tms1k_base_device::op_comx8()
 {
 	// COMX8: complement MSB of X register
 	// note: on TMS1100, the mnemonic is simply called "COMX"
 	m_x ^= 1 << (m_x_bits-1);
 }
 
-void tms1xxx_cpu_device::op_ldp()
+void tms1k_base_device::op_ldp()
 {
 	// LDP: load page buffer with constant
 	m_pb = m_c4;
@@ -1258,17 +1202,17 @@ void tms1100_cpu_device::op_setr()
 {
 	// SETR: same, but X register MSB must be clear
 	if (~m_x & (1 << (m_x_bits-1)))
-		tms1xxx_cpu_device::op_setr();
+		tms1k_base_device::op_setr();
 }
 
 void tms1100_cpu_device::op_rstr()
 {
 	// RSTR: same, but X register MSB must be clear
 	if (~m_x & (1 << (m_x_bits-1)))
-		tms1xxx_cpu_device::op_rstr();
+		tms1k_base_device::op_rstr();
 }
 
-void tms1xxx_cpu_device::op_comc()
+void tms1k_base_device::op_comc()
 {
 	// COMC: complement chapter buffer
 	m_cb ^= 1;
@@ -1277,7 +1221,7 @@ void tms1xxx_cpu_device::op_comc()
 
 // TMS1400-specific
 
-void tms1xxx_cpu_device::op_tpc()
+void tms1k_base_device::op_tpc()
 {
 	// TPC: transfer page buffer to chapter buffer
 	m_cb = m_pb & 3;
@@ -1310,38 +1254,38 @@ void tms0980_cpu_device::op_comx()
 	m_x ^= (m_x_mask >> 1);
 }
 
-void tms1xxx_cpu_device::op_xda()
+void tms1k_base_device::op_xda()
 {
 	// XDA: exchange DAM and A
 	// note: setting A to DAM is done with DMTP and AUTA during this instruction
 	m_ram_address |= (0x10 << (m_x_bits-1));
 }
 
-void tms1xxx_cpu_device::op_off()
+void tms1k_base_device::op_off()
 {
 	// OFF: request auto power-off
 	m_power_off(1);
 }
 
-void tms1xxx_cpu_device::op_seac()
+void tms1k_base_device::op_seac()
 {
 	// SEAC: set end around carry
 	m_eac = 1;
 }
 
-void tms1xxx_cpu_device::op_reac()
+void tms1k_base_device::op_reac()
 {
 	// REAC: reset end around carry
 	m_eac = 0;
 }
 
-void tms1xxx_cpu_device::op_sal()
+void tms1k_base_device::op_sal()
 {
 	// SAL: set add latch (reset is done with RETN)
 	m_add = 1;
 }
 
-void tms1xxx_cpu_device::op_sbl()
+void tms1k_base_device::op_sbl()
 {
 	// SBL: set branch latch (reset is done with RETN)
 	m_bl = 1;
@@ -1388,7 +1332,7 @@ void tms0270_cpu_device::op_tdo()
 //  execute_run
 //-------------------------------------------------
 
-void tms1xxx_cpu_device::execute_run()
+void tms1k_base_device::execute_run()
 {
 	do
 	{

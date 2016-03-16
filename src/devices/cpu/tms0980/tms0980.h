@@ -15,24 +15,24 @@
 
 // K input pins
 #define MCFG_TMS1XXX_READ_K_CB(_devcb) \
-	tms1xxx_cpu_device::set_read_k_callback(*device, DEVCB_##_devcb);
+	tms1k_base_device::set_read_k_callback(*device, DEVCB_##_devcb);
 
 // O/Segment output pins
 #define MCFG_TMS1XXX_WRITE_O_CB(_devcb) \
-	tms1xxx_cpu_device::set_write_o_callback(*device, DEVCB_##_devcb);
+	tms1k_base_device::set_write_o_callback(*device, DEVCB_##_devcb);
 
 // Use this if the output PLA is unknown:
 // If the microinstructions (or other) PLA is unknown, try using one from another romset.
 #define MCFG_TMS1XXX_OUTPUT_PLA(_pla) \
-	tms1xxx_cpu_device::set_output_pla(*device, _pla);
+	tms1k_base_device::set_output_pla(*device, _pla);
 
 // R output pins (also called D on some chips)
 #define MCFG_TMS1XXX_WRITE_R_CB(_devcb) \
-	tms1xxx_cpu_device::set_write_r_callback(*device, DEVCB_##_devcb);
+	tms1k_base_device::set_write_r_callback(*device, DEVCB_##_devcb);
 
 // OFF request on TMS0980 and up
 #define MCFG_TMS1XXX_POWER_OFF_CB(_devcb) \
-	tms1xxx_cpu_device::set_power_off_callback(*device, DEVCB_##_devcb);
+	tms1k_base_device::set_power_off_callback(*device, DEVCB_##_devcb);
 
 
 // TMS0270 was designed to interface with TMS5100, set it up at driver level
@@ -88,11 +88,11 @@
 */
 
 
-class tms1xxx_cpu_device : public cpu_device
+class tms1k_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms1xxx_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	tms1k_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_BIG, byte_bits > 8 ? 16 : 8, prgwidth, 0, program)
 		, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
@@ -113,11 +113,69 @@ public:
 	{ }
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_read_k_callback(device_t &device, _Object object) { return downcast<tms1xxx_cpu_device &>(device).m_read_k.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_o_callback(device_t &device, _Object object) { return downcast<tms1xxx_cpu_device &>(device).m_write_o.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_r_callback(device_t &device, _Object object) { return downcast<tms1xxx_cpu_device &>(device).m_write_r.set_callback(object); }
-	template<class _Object> static devcb_base &set_power_off_callback(device_t &device, _Object object) { return downcast<tms1xxx_cpu_device &>(device).m_power_off.set_callback(object); }
-	static void set_output_pla(device_t &device, const UINT16 *output_pla) { downcast<tms1xxx_cpu_device &>(device).m_output_pla_table = output_pla; }
+	template<class _Object> static devcb_base &set_read_k_callback(device_t &device, _Object object) { return downcast<tms1k_base_device &>(device).m_read_k.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_o_callback(device_t &device, _Object object) { return downcast<tms1k_base_device &>(device).m_write_o.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_r_callback(device_t &device, _Object object) { return downcast<tms1k_base_device &>(device).m_write_r.set_callback(object); }
+	template<class _Object> static devcb_base &set_power_off_callback(device_t &device, _Object object) { return downcast<tms1k_base_device &>(device).m_power_off.set_callback(object); }
+	static void set_output_pla(device_t &device, const UINT16 *output_pla) { downcast<tms1k_base_device &>(device).m_output_pla_table = output_pla; }
+
+	// microinstructions
+	enum
+	{
+		M_15TN  = (1<<0),  /* 15 to -ALU */
+		M_ATN   = (1<<1),  /* ACC to -ALU */
+		M_AUTA  = (1<<2),  /* ALU to ACC */
+		M_AUTY  = (1<<3),  /* ALU to Y */
+		M_C8    = (1<<4),  /* CARRY8 to STATUS */
+		M_CIN   = (1<<5),  /* Carry In to ALU */
+		M_CKM   = (1<<6),  /* CKB to MEM */
+		M_CKN   = (1<<7),  /* CKB to -ALU */
+		M_CKP   = (1<<8),  /* CKB to +ALU */
+		M_MTN   = (1<<9),  /* MEM to -ALU */
+		M_MTP   = (1<<10), /* MEM to +ALU */
+		M_NATN  = (1<<11), /* ~ACC to -ALU */
+		M_NE    = (1<<12), /* COMP to STATUS */
+		M_STO   = (1<<13), /* ACC to MEM */
+		M_STSL  = (1<<14), /* STATUS to Status Latch */
+		M_YTP   = (1<<15), /* Y to +ALU */
+
+		M_CME   = (1<<16), /* Conditional Memory Enable */
+		M_DMTP  = (1<<17), /* DAM to +ALU */
+		M_NDMTP = (1<<18), /* ~DAM to +ALU */
+		M_SSE   = (1<<19), /* Special Status Enable */
+		M_SSS   = (1<<20), /* Special Status Sample */
+
+		M_SETR  = (1<<21), /* -> line #0d, F_SETR (TP0320 custom), */
+		M_RSTR  = (1<<22), /* -> line #36, F_RSTR (TMS02x0 custom), */
+		M_UNK1  = (1<<23)  /* -> line #37, F_???? (TMS0270 custom), */
+	};
+
+	// standard/fixed instructions - these are documented more in their specific handlers
+	enum
+	{
+		F_BR =    (1<<0),
+		F_CALL =  (1<<1),
+		F_CLO =   (1<<2),
+		F_COMC =  (1<<3),
+		F_COMX =  (1<<4),
+		F_COMX8 = (1<<5),
+		F_LDP =   (1<<6),
+		F_LDX =   (1<<7),
+		F_RBIT =  (1<<8),
+		F_RETN =  (1<<9),
+		F_RSTR =  (1<<10),
+		F_SBIT =  (1<<11),
+		F_SETR =  (1<<12),
+		F_TDO =   (1<<13),
+		F_TPC =   (1<<14),
+
+		F_OFF =   (1<<15),
+		F_REAC =  (1<<16),
+		F_SAL =   (1<<17),
+		F_SBL =   (1<<18),
+		F_SEAC =  (1<<19),
+		F_XDA =   (1<<20)
+	};
 
 protected:
 	// device-level overrides
@@ -247,7 +305,7 @@ protected:
 
 
 
-class tms1000_cpu_device : public tms1xxx_cpu_device
+class tms1000_cpu_device : public tms1k_base_device
 {
 public:
 	tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -332,8 +390,8 @@ protected:
 	virtual void op_call() override;
 	virtual void op_retn() override;
 
-	virtual void op_setr() override { tms1xxx_cpu_device::op_setr(); } // no anomaly with MSB of X register
-	virtual void op_rstr() override { tms1xxx_cpu_device::op_rstr(); } // "
+	virtual void op_setr() override { tms1k_base_device::op_setr(); } // no anomaly with MSB of X register
+	virtual void op_rstr() override { tms1k_base_device::op_rstr(); } // "
 };
 
 class tms1470_cpu_device : public tms1400_cpu_device
@@ -429,10 +487,10 @@ protected:
 	// overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void write_o_output(UINT8 index) override { tms1xxx_cpu_device::write_o_output(index); }
-	virtual UINT8 read_k_input() override { return tms1xxx_cpu_device::read_k_input(); }
+	virtual void write_o_output(UINT8 index) override { tms1k_base_device::write_o_output(index); }
+	virtual UINT8 read_k_input() override { return tms1k_base_device::read_k_input(); }
 
-	virtual void op_setr() override { tms1xxx_cpu_device::op_setr(); }
+	virtual void op_setr() override { tms1k_base_device::op_setr(); }
 	virtual void op_tdo() override;
 };
 
@@ -454,7 +512,7 @@ protected:
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void write_o_output(UINT8 index) override { tms1xxx_cpu_device::write_o_output(index); }
+	virtual void write_o_output(UINT8 index) override { tms1k_base_device::write_o_output(index); }
 	virtual UINT8 read_k_input() override;
 	virtual void dynamic_output() override;
 
