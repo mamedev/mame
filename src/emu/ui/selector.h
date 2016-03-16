@@ -28,7 +28,8 @@ enum
 class ui_menu_selector : public ui_menu
 {
 public:
-	ui_menu_selector(running_machine &machine, render_container *container, std::vector<std::string> _sel, UINT16 &_actual, int _category = 0, int _hover = 0);
+	ui_menu_selector(running_machine &machine, render_container *container, std::vector<std::string> const &_sel, UINT16 &_actual, int _category = 0, int _hover = 0);
+	ui_menu_selector(running_machine &machine, render_container *container, std::vector<std::string> &&_sel, UINT16 &_actual, int _category = 0, int _hover = 0);
 	virtual ~ui_menu_selector();
 	virtual void populate() override;
 	virtual void handle() override;

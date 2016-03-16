@@ -18,13 +18,26 @@
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_selector::ui_menu_selector(running_machine &machine, render_container *container, std::vector<std::string> s_sel, UINT16 &s_actual, int category, int _hover)
-	: ui_menu(machine, container), m_selector(s_actual)
+ui_menu_selector::ui_menu_selector(running_machine &machine, render_container *container, std::vector<std::string> const &s_sel, UINT16 &s_actual, int category, int _hover)
+	: ui_menu(machine, container)
+	, m_selector(s_actual)
+	, m_category(category)
+	, m_hover(_hover)
+	, m_first_pass(true)
+	, m_str_items(s_sel)
 {
-	m_category = category;
-	m_first_pass = true;
-	m_hover = _hover;
-	m_str_items = s_sel;
+	m_search[0] = '\0';
+	m_searchlist[0] = nullptr;
+}
+
+ui_menu_selector::ui_menu_selector(running_machine &machine, render_container *container, std::vector<std::string> &&s_sel, UINT16 &s_actual, int category, int _hover)
+	: ui_menu(machine, container)
+	, m_selector(s_actual)
+	, m_category(category)
+	, m_hover(_hover)
+	, m_first_pass(true)
+	, m_str_items(std::move(s_sel))
+{
 	m_search[0] = '\0';
 	m_searchlist[0] = nullptr;
 }

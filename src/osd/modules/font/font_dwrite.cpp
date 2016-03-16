@@ -345,7 +345,7 @@ public:
 	{
 	}
 
-	virtual bool open(const char *font_path, const char *_name, int &height) override
+	virtual bool open(std::string const &font_path, std::string const &_name, int &height) override
 	{
 		if (m_d2dfactory == nullptr || m_dwriteFactory == nullptr || m_wicFactory == nullptr)
 			return false;
@@ -359,11 +359,11 @@ public:
 		bool italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
 
 		// convert the face name
-		auto familyName = std::wstring(std::unique_ptr<WCHAR, void(*)(void *)>(wstring_from_utf8(name.c_str()), osd_free).get());
+		std::unique_ptr<WCHAR, void(*)(void *)> familyName(wstring_from_utf8(name.c_str()), osd_free);
 
 		// find the font
 		HR_RET0(find_font(
-			familyName.c_str(),
+			familyName.get(),
 			bold ? DWRITE_FONT_WEIGHT_BOLD : DWRITE_FONT_WEIGHT_NORMAL,
 			DWRITE_FONT_STRETCH_NORMAL,
 			italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL,
@@ -397,7 +397,7 @@ public:
 	//  pixel of a black & white font
 	//-------------------------------------------------
 
-	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs) override
+	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs) override
 	{
 		const int MEM_ALIGN_CONST = 31;
 		const int BITMAP_PAD = 50;
@@ -714,9 +714,14 @@ public:
 		return 0;
 	}
 
-	virtual osd_font *font_alloc() override
+	virtual osd_font::ptr font_alloc() override
 	{
-		return global_alloc(osd_font_dwrite(m_d2dfactory, m_dwriteFactory, m_wicFactory));
+		return std::make_unique<osd_font_dwrite>(m_d2dfactory, m_dwriteFactory, m_wicFactory);
+	}
+
+	virtual bool get_font_families(std::string const &font_path, std::vector<std::pair<std::string, std::string> > &result) override
+	{
+		return false;
 	}
 };
 
