@@ -266,7 +266,8 @@ osd_font_sdl::TTF_Font_ptr osd_font_sdl::search_font_config(std::string const &n
 	{
 		pat.reset(FcPatternCreate());
 		FcPatternAddString(pat.get(), FC_FAMILY, (const FcChar8 *)name.c_str());
-		FcPatternAddString(pat.get(), FC_STYLE, (const FcChar8 *)"Regular");
+		//Quite a lot of fonts don't have a "Regular" font type attribute
+		//FcPatternAddString(pat.get(), FC_STYLE, (const FcChar8 *)"Regular");
 		FcPatternAddString(pat.get(), FC_FONTFORMAT, (const FcChar8 *)"TrueType");
 		fontset.reset(FcFontList(config, pat.get(), os.get()));
 
