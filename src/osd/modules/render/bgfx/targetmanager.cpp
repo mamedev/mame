@@ -58,19 +58,20 @@ void target_manager::update_guest_targets(uint16_t width, uint16_t height)
 	{
 		m_guest_width = width;
 		m_guest_height = height;
-		std::vector<bgfx_target*> to_resize;
 		for (std::pair<std::string, bgfx_target*> target : m_targets)
 		{
 			if ((target.second)->style() == TARGET_STYLE_GUEST)
 			{
-				to_resize.push_back(target.second);
+                bgfx_target* target_ptr = target.second;
+                std::string name = target_ptr->name();
+                const bgfx::TextureFormat::Enum format = target_ptr->format();
+                const bool double_buffered = target_ptr->double_buffered();
+                const bool filter = target_ptr->filter();
+                delete target_ptr;
+                
+                target.second = new bgfx_target(name, format, width, height, TARGET_STYLE_GUEST, double_buffered, filter);
+                m_textures.add_provider(name, target.second);
 			}
-		}
-
-		for (bgfx_target* target : to_resize)
-		{
-			m_targets[target->name()] = new bgfx_target(target->name(), target->format(), width, height, TARGET_STYLE_GUEST, target->double_buffered(), target->filter());
-			delete target;
 		}
 	}
 }

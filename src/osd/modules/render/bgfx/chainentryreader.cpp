@@ -84,11 +84,11 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, osd_op
     std::string output_name = value["output"].GetString();
     if (output_name != std::string("backbuffer"))
     {
-        return new bgfx_chain_entry(value["name"].GetString(), effect, suppressors, inputs, uniforms, targets.target(output_name));
+        return new bgfx_chain_entry(value["name"].GetString(), effect, suppressors, inputs, uniforms, targets, output_name);
     }
     else
     {
-        return new bgfx_chain_entry(value["name"].GetString(), effect, suppressors, inputs, uniforms, nullptr);
+        return new bgfx_chain_entry(value["name"].GetString(), effect, suppressors, inputs, uniforms, targets, "none");
     }
 }
 

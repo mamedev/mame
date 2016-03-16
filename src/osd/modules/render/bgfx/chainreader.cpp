@@ -84,9 +84,9 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, osd_options& optio
 		{
 			assert(target_array[i].HasMember("name"));
 			assert(target_array[i]["name"].IsString());
-			uint32_t mode = uint32_t(get_enum_from_value(value, "mode", TARGET_STYLE_NATIVE, STYLE_NAMES, STYLE_COUNT));
-			bool bilinear = get_bool(target_array[i], "bilinear", false);
-			bool double_buffer = get_bool(target_array[i], "doublebuffer", false);
+			uint32_t mode = uint32_t(get_enum_from_value(target_array[i], "mode", TARGET_STYLE_NATIVE, STYLE_NAMES, STYLE_COUNT));
+			bool bilinear = get_bool(target_array[i], "bilinear", true);
+			bool double_buffer = get_bool(target_array[i], "doublebuffer", true);
 
 			float prescalef = 1.0f;
 			float default_prescale = 1.0f;

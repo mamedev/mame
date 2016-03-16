@@ -24,12 +24,13 @@
 #include "vertex.h"
 #include "suppressor.h"
 
-bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair> inputs, std::vector<bgfx_entry_uniform*> uniforms, bgfx_target* output)
+bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair> inputs, std::vector<bgfx_entry_uniform*> uniforms, target_manager& targets, std::string output)
 	: m_name(name)
 	, m_effect(effect)
     , m_suppressors(suppressors)
     , m_inputs(inputs)
     , m_uniforms(uniforms)
+    , m_targets(targets)
 	, m_output(output)
 {
 }
@@ -104,16 +105,20 @@ void bgfx_chain_entry::submit(render_primitive* prim, int view, texture_manager&
             source_dims->set(values, sizeof(float) * 2);
         }
     }
+        
     for (bgfx_entry_uniform* uniform : m_uniforms)
     {
-		uniform->bind();
+        if (uniform->name() != "DiffuseSampler")
+        {
+            uniform->bind();
+        }
 	}
 
-	m_effect->submit(view, blend);
-
-    if (m_output != nullptr)
+    m_effect->submit(view, blend);
+    
+    if (m_targets.target(m_output) != nullptr)
     {
-        m_output->page_flip();
+        m_targets.target(m_output)->page_flip();
     }
 }
 
@@ -122,11 +127,12 @@ void bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
 	bgfx::FrameBufferHandle handle = BGFX_INVALID_HANDLE;
 	uint16_t width = screen_width;
 	uint16_t height = screen_height;
-    if (m_output != nullptr)
+    if (m_targets.target(m_output) != nullptr)
     {
-		handle = m_output->target();
-		width = m_output->width();
-		height = m_output->height();
+        bgfx_target* output = m_targets.target(m_output);
+		handle = output->target();
+		width = output->width();
+		height = output->height();
     }
 
     bgfx::setViewFrameBuffer(view, handle);
@@ -136,7 +142,7 @@ void bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
 	bx::mtxIdentity(viewMat);
 
 	float projMat[16];
-	bx::mtxOrtho(projMat, 0.0f, width, height, 0.0f, 0.0f, 100.0f);
+	bx::mtxOrtho(projMat, 0.0f, screen_width, screen_height, 0.0f, 0.0f, 100.0f);
 	bgfx::setViewTransform(view, viewMat, projMat);
 
     bgfx::setViewClear(view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);

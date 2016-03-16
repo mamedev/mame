@@ -24,9 +24,6 @@ uniform vec4 u_saturation;
 #define Scale u_scale.xyz
 #define Saturation u_saturation.x
 
-uniform vec4 u_texsize;
-uniform vec4 u_screenrect;
-
 SAMPLER2D(DiffuseSampler, 0);
 
 void main()

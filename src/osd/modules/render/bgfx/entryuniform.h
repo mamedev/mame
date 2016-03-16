@@ -25,6 +25,7 @@ public:
 	virtual ~bgfx_entry_uniform() { }
 
 	virtual void bind() = 0;
+    std::string name() const { return m_uniform->name(); }
 
 protected:
 	bgfx_uniform* m_uniform;

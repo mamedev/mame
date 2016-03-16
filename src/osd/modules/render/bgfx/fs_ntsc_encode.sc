@@ -28,7 +28,7 @@ SAMPLER2D(DiffuseSampler, 0);
 
 void main()
 {
-	vec2 PValueSourceTexel = vec2(u_p_value.x, 0.0) * u_source_dims.xy;
+	vec2 PValueSourceTexel = vec2(u_p_value.x, 0.0) / u_source_dims.xy;
 
 	vec2 C0 = v_texcoord0 + PValueSourceTexel * vec2(0.0,  0.0);
 	vec2 C1 = v_texcoord0 + PValueSourceTexel * vec2(0.25, 0.0);
@@ -41,6 +41,9 @@ void main()
 	vec4 Texel2 = texture2D(DiffuseSampler, C2);
 	vec4 Texel3 = texture2D(DiffuseSampler, C3);
 
+	vec4 HPosition = Cx;
+	vec4 VPosition = Cy;
+
 	const vec4 YDot = vec4(0.299, 0.587, 0.114, 0.0);
 	const vec4 IDot = vec4(0.595716, -0.274453, -0.321263, 0.0);
 	const vec4 QDot = vec4(0.211456, -0.522591, 0.311135, 0.0);
@@ -48,18 +51,17 @@ void main()
 	vec4 I = vec4(dot(Texel0, IDot), dot(Texel1, IDot), dot(Texel2, IDot), dot(Texel3, IDot));
 	vec4 Q = vec4(dot(Texel0, QDot), dot(Texel1, QDot), dot(Texel2, QDot), dot(Texel3, QDot));
 
-	const vec4 PI = vec4(3.1415927, 3.1415927, 3.1415927, 3.1415927);
-	const vec4 PI2 = vec4(6.2831854, 6.2831854, 6.2831854, 6.2831854);
-	vec4 W = PI2 * u_cc_value.xxxx * u_scan_time.xxxx;
-	vec4 WoPI = W / PI;
+	const float PI = 3.1415927;
+	const float PI2 = 6.2831854;
+	
+	float W = PI2 * u_cc_value.x * u_scan_time.x;
+	float WoPI = W / PI;
 
-	vec4 HOffset = (u_b_value.xxxx + u_jitter_amount.xxxx * u_jitter_offset.xxxx) / WoPI;
-	vec4 VScale = (u_a_value.xxxx * u_source_dims.yyyy) / WoPI;
+	float HOffset = (u_a_value.x + u_jitter_amount.x * u_jitter_offset.x) / WoPI;
+	float VScale =  (u_b_value.x * u_source_dims.y) / WoPI;
 
-	vec4 T = Cx + HOffset + Cy * VScale;
+	vec4 T = Cx + vec4(HOffset, HOffset, HOffset, HOffset) + Cy * vec4(VScale, VScale, VScale, VScale);
 	vec4 TW = T * W;
 
-	vec4 output_rgb = Y + I * cos(TW) + Q * sin(TW);
-	
-	gl_FragColor = vec4(output_rgb.xyz, 1.0);
+	gl_FragColor = Y + I * cos(TW) + Q * sin(TW);
 }

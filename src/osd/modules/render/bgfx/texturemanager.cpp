@@ -28,7 +28,15 @@ texture_manager::~texture_manager()
 
 void texture_manager::add_provider(std::string name, bgfx_texture_handle_provider* provider)
 {
-	m_textures[name] = provider;
+    std::map<std::string, bgfx_texture_handle_provider*>::iterator iter = m_textures.find(name);
+    if (iter != m_textures.end())
+    {
+        iter->second = provider;
+    }
+    else
+    {
+        m_textures[name] = provider;
+    }
 }
 
 bgfx_texture* texture_manager::create_texture(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, void* data, uint32_t flags)
