@@ -249,7 +249,7 @@ osd_font_sdl::TTF_Font_ptr osd_font_sdl::search_font_config(std::string const &n
 	for (int i = 0; (i < fontset->nfont) && !font; i++)
 	{
 		FcValue val;
-		if ((FcPatternGet(fontset->fonts[i], FC_FILE, 0, &val) == FcResultMatch) && (val.type != FcTypeString))
+		if ((FcPatternGet(fontset->fonts[i], FC_FILE, 0, &val) == FcResultMatch) && (val.type == FcTypeString))
 		{
 			osd_printf_verbose("Matching font: %s\n", val.u.s);
 
