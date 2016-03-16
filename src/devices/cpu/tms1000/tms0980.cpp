@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol, hap
+// copyright-holders:hap
 /*
 
   TMS1000 family - TMS0980, TMS1980
@@ -10,7 +10,7 @@
 #include "debugger.h"
 
 // TMS0980
-// - 64x9bit RAM array at the bottom-left (set up as 144x4)
+// - 144x4bit RAM array at the bottom-left (128+16, set up as 8x18x4)
 // - 2048x9bit ROM array at the bottom-left
 // - main instructions PLAs at the top half, to the right of the midline
 //   * top section is assumed to be the CKI bus select
@@ -33,7 +33,7 @@ static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1k_base_device)
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_64x9_as4, AS_DATA, 8, tms1k_base_device)
+static ADDRESS_MAP_START(data_144x4, AS_DATA, 8, tms1k_base_device)
 	AM_RANGE(0x00, 0x7f) AM_RAM
 	AM_RANGE(0x80, 0x8f) AM_RAM AM_MIRROR(0x70) // DAM
 ADDRESS_MAP_END
@@ -41,7 +41,7 @@ ADDRESS_MAP_END
 
 // device definitions
 tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms0970_cpu_device(mconfig, TMS0980, "TMS0980", tag, owner, clock, 8 /* o pins */, 9 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_64x9_as4), "tms0980", __FILE__)
+	: tms0970_cpu_device(mconfig, TMS0980, "TMS0980", tag, owner, clock, 8 /* o pins */, 9 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_144x4), "tms0980", __FILE__)
 { }
 
 tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
@@ -49,7 +49,7 @@ tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_typ
 { }
 
 tms1980_cpu_device::tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms0980_cpu_device(mconfig, TMS1980, "TMS1980", tag, owner, clock, 7, 10, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_64x9_as4), "tms1980", __FILE__)
+	: tms0980_cpu_device(mconfig, TMS1980, "TMS1980", tag, owner, clock, 7, 10, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_144x4), "tms1980", __FILE__)
 { }
 
 

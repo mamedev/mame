@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol, hap
+// copyright-holders:hap
 /*
 
   TMS1000 family - TMS0270
@@ -11,7 +11,8 @@
 
 // TMS0270 is a TMS0980 with earrings and a new hat. The new changes look like a quick afterthought, almost hacky
 // - RAM, ROM, and main instructions PLAs is the same as TMS0980
-// - 64-term microinstructions PLA between the RAM and ROM, supporting 20 microinstructions plus optional separate lines for custom opcode handling
+// - 64-term microinstructions PLA between the RAM and ROM, similar to TMS0980,
+//   plus optional separate lines for custom opcode handling
 // - 48-term output PLA above the RAM (rotate opla 90 degrees)
 const device_type TMS0270 = &device_creator<tms0270_cpu_device>; // 40-pin DIP, 16 O pins, 8+ R pins (some R pins are internally hooked up to support more I/O)
 // newer TMS0270 chips (eg. Speak & Math) have 42 pins
@@ -24,7 +25,7 @@ static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1k_base_device)
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_64x9_as4, AS_DATA, 8, tms1k_base_device)
+static ADDRESS_MAP_START(data_144x4, AS_DATA, 8, tms1k_base_device)
 	AM_RANGE(0x00, 0x7f) AM_RAM
 	AM_RANGE(0x80, 0x8f) AM_RAM AM_MIRROR(0x70) // DAM
 ADDRESS_MAP_END
@@ -32,7 +33,7 @@ ADDRESS_MAP_END
 
 // device definitions
 tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms0980_cpu_device(mconfig, TMS0270, "TMS0270", tag, owner, clock, 16 /* o pins */, 16 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_64x9_as4), "tms0270", __FILE__)
+	: tms0980_cpu_device(mconfig, TMS0270, "TMS0270", tag, owner, clock, 16 /* o pins */, 16 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_144x4), "tms0270", __FILE__)
 	, m_read_ctl(*this)
 	, m_write_ctl(*this)
 	, m_write_pdc(*this)

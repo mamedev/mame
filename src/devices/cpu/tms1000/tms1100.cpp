@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol, hap
+// copyright-holders:hap
 /*
 
   TMS1000 family - TMS1100, TMS1170, TMS1300, TMS1370
