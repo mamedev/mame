@@ -66,7 +66,7 @@ unknown cycle: CME, SSE, SSS
 
 */
 
-#include "tms0980.h"
+#include "tms1k_base.h"
 #include "debugger.h"
 
 // supported types:

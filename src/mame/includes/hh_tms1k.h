@@ -11,7 +11,7 @@
 
 
 #include "emu.h"
-#include "cpu/tms0980/tms0980.h"
+#include "cpu/tms0980/tms1000.h"
 #include "sound/speaker.h"
 
 

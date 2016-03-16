@@ -6,8 +6,8 @@
 
 */
 
-#ifndef _TMS0980_H_
-#define _TMS0980_H_
+#ifndef _TMS1KBASE_H_
+#define _TMS1KBASE_H_
 
 #include "emu.h"
 #include "machine/pla.h"
@@ -574,4 +574,4 @@ extern const device_type TMS0270;
 extern const device_type TP0320;
 
 
-#endif /* _TMS0980_H_ */
+#endif /* _TMS1KBASE_H_ */

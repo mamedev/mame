@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "debugger.h"
-#include "tms0980.h"
+#include "tms1k_base.h"
 
 
 enum e_mnemonics
