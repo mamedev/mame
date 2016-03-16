@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-/***************************************************************************
-
-    emu.h
+/**************************************************************************/
+/**
+    @file emu.h
 
     Core header file to be included by most files.
 
@@ -12,8 +12,8 @@
 
     If you find yourself needing something outside of this file in a
     driver or device, think carefully about what you are doing.
-
-***************************************************************************/
+*/
+/**************************************************************************/
 
 #ifndef __EMU_H__
 #define __EMU_H__
@@ -49,9 +49,14 @@
 #include "romload.h"
 #include "save.h"
 
-// define machine_config_constructor here due to circular dependency
-// between devices and the machine config
-class machine_config;
+
+class machine_config; // forward declaration needed for machine_config_constructor
+
+/** Represents the constructor for a machine_config object.
+ *  Use MACHINE_CONFIG_NAME(_name) to formulate the correct value.
+ *  Defined in emu.h due to circular dependency between devices and the machine config.
+ *  @ingroup MACHINE_CONFIG
+ */
 typedef device_t * (*machine_config_constructor)(machine_config &config, device_t *owner, device_t *device);
 
 // I/O

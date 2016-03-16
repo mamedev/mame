@@ -1,34 +1,34 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-/***************************************************************************
-
-    attotime.h
-
-    Support functions for working with attotime data.
-
-****************************************************************************
-
-    Attotime is an attosecond-accurate timing system implemented as
-    96-bit integers.
-
-        1 second      = 1e0 seconds
-        1 millisecond = 1e-3 seconds
-        1 microsecond = 1e-6 seconds
-        1 nanosecond  = 1e-9 seconds
-        1 picosecond  = 1e-12 seconds
-        1 femtosecond = 1e-15 seconds
-        1 attosecond  = 1e-18 seconds
-
-    This may seem insanely accurate, but it has its uses when multiple
-    clocks in the system are run by independent crystals. It is also
-    useful to compute the attotime for something small, say 1 clock tick,
-    and still have it be accurate and useful for scaling.
-
-    Attotime consists of a 32-bit seconds count and a 64-bit attoseconds
-    count. Because the lower bits are kept as attoseconds and not as a
-    full 64-bit value, there is headroom to make some operations simpler.
-
-***************************************************************************/
+/**************************************************************************/
+/**
+  * @file attotime.h
+  * Support functions for working with attotime data.
+  * @defgroup ATTOTIME Support functions for working with attotime data
+  * @{
+  * .
+  * @class attotime
+  *  Attotime is an attosecond-accurate timing system implemented as
+  *  96-bit integers.
+  *
+  *     1 second      = 1e0 seconds
+  *     1 millisecond = 1e-3 seconds
+  *     1 microsecond = 1e-6 seconds
+  *     1 nanosecond  = 1e-9 seconds
+  *     1 picosecond  = 1e-12 seconds
+  *     1 femtosecond = 1e-15 seconds
+  *     1 attosecond  = 1e-18 seconds
+  *
+  * This may seem insanely accurate, but it has its uses when multiple
+  * clocks in the system are run by independent crystals. It is also
+  * useful to compute the attotime for something small, say 1 clock tick,
+  * and still have it be accurate and useful for scaling.
+  *
+  * Attotime consists of a 32-bit seconds count and a 64-bit attoseconds
+  * count. Because the lower bits are kept as attoseconds and not as a
+  * full 64-bit value, there is headroom to make some operations simpler.
+  */
+/**************************************************************************/
 
 #pragma once
 
@@ -54,7 +54,7 @@ const attoseconds_t ATTOSECONDS_PER_MILLISECOND = ATTOSECONDS_PER_SECOND / 1000;
 const attoseconds_t ATTOSECONDS_PER_MICROSECOND = ATTOSECONDS_PER_SECOND / 1000000;
 const attoseconds_t ATTOSECONDS_PER_NANOSECOND = ATTOSECONDS_PER_SECOND / 1000000000;
 
-const seconds_t ATTOTIME_MAX_SECONDS = 1000000000;
+const seconds_t ATTOTIME_MAX_SECONDS = 1000000000; /**< Cutoff value in seconds; anything higher than this is converted to "never" */
 
 
 
@@ -63,17 +63,25 @@ const seconds_t ATTOTIME_MAX_SECONDS = 1000000000;
 //**************************************************************************
 
 // convert between a double and attoseconds
+/** Convert from attoseconds to seconds (as a double) */
 #define ATTOSECONDS_TO_DOUBLE(x)        ((double)(x) * 1e-18)
+/** Convert from seconds (as a double) to attoseconds */
 #define DOUBLE_TO_ATTOSECONDS(x)        ((attoseconds_t)((x) * 1e18))
 
 // convert between hertz (as a double) and attoseconds
+/** Convert from attoseconds to hertz (as a double) */
 #define ATTOSECONDS_TO_HZ(x)            ((double)ATTOSECONDS_PER_SECOND / (double)(x))
+/** Convert from hertz (as a double) to attoseconds */
 #define HZ_TO_ATTOSECONDS(x)            ((attoseconds_t)(ATTOSECONDS_PER_SECOND / (x)))
 
 // macros for converting other seconds types to attoseconds
+/** Convert from seconds (as a double) to attoseconds */
 #define ATTOSECONDS_IN_SEC(x)           ((attoseconds_t)(x) * ATTOSECONDS_PER_SECOND)
+/** Convert from milliseconds (as a double) to attoseconds */
 #define ATTOSECONDS_IN_MSEC(x)          ((attoseconds_t)(x) * ATTOSECONDS_PER_MILLISECOND)
+/** Convert from microseconds (as a double) to attoseconds */
 #define ATTOSECONDS_IN_USEC(x)          ((attoseconds_t)(x) * ATTOSECONDS_PER_MICROSECOND)
+/** Convert from nanoseconds (as a double) to attoseconds */
 #define ATTOSECONDS_IN_NSEC(x)          ((attoseconds_t)(x) * ATTOSECONDS_PER_NANOSECOND)
 
 
@@ -82,24 +90,27 @@ const seconds_t ATTOTIME_MAX_SECONDS = 1000000000;
 //  TYPE DEFINITIONS
 //***************************************************************************/
 
-// the attotime structure itself
+// class is documented above
 class attotime
 {
 public:
 	// construction/destruction
+    /** Constructs with value of zero. */
 	attotime()
 		: m_seconds(0),
 			m_attoseconds(0) { }
 
+    /** Constructs with @p secs seconds and @p attos attosecons. */
 	attotime(seconds_t secs, attoseconds_t attos)
 		: m_seconds(secs),
 			m_attoseconds(attos) { }
 
+    /** Copy constructor */
 	attotime(const attotime& that)
 		: m_seconds(that.m_seconds),
 			m_attoseconds(that.m_attoseconds) { }
 
-	// assignment
+    /** Assignment */
 	attotime& operator=(const attotime& that)
 	{
 		this->m_seconds = that.m_seconds;
@@ -107,14 +118,17 @@ public:
 		return *this;
 	}
 
-	// queries
+	/** Test if value is zero */
 	bool is_zero() const { return (m_seconds == 0 && m_attoseconds == 0); }
+	/** Test if value is above @ref ATTOTIME_MAX_SECONDS */
 	bool is_never() const { return (m_seconds >= ATTOTIME_MAX_SECONDS); }
 
-	// conversion to other forms
+	/** Convert to a double */
 	double as_double() const { return double(m_seconds) + ATTOSECONDS_TO_DOUBLE(m_attoseconds); }
 	attoseconds_t as_attoseconds() const;
+    /** Convert to ticks based on @p frequency */
 	UINT64 as_ticks(UINT32 frequency) const;
+    /** Convert to string using @p precision */
 	const char *as_string(int precision = 9) const;
 
 	attoseconds_t attoseconds() const { return m_attoseconds; }
@@ -330,10 +344,10 @@ inline attotime min(const attotime &left, const attotime &right)
 }
 
 
-//-------------------------------------------------
-//  max - return the maximum of two attotimes
-//-------------------------------------------------
 
+/** Calculate the maximum
+    @return maximum of @p left and @p right
+*/
 inline attotime max(const attotime &left, const attotime &right)
 {
 	if (left.m_seconds > right.m_seconds)
@@ -346,11 +360,7 @@ inline attotime max(const attotime &left, const attotime &right)
 }
 
 
-//-------------------------------------------------
-//  as_attoseconds - convert to an attoseconds
-//  value, clamping to +/- 1 second
-//-------------------------------------------------
-
+/**  convert to an attoseconds value, clamping to +/- 1 second */
 inline attoseconds_t attotime::as_attoseconds() const
 {
 	// positive values between 0 and 1 second
@@ -416,3 +426,4 @@ inline attotime attotime::from_double(double _time)
 
 
 #endif  // __ATTOTIME_H__
+/** @} */
