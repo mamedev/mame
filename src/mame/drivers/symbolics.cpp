@@ -7,6 +7,7 @@
 ******************************************************************************/
 
 /* Core includes */
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 
 class symbolics_state : public driver_device
