@@ -1843,19 +1843,19 @@ end
 
 --------------------------------------------------
 -- Texas Instruments TMS1000 series
---@src/devices/cpu/tms0980/tms1000.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms1000.h,CPUS["TMS1000"] = true
 --------------------------------------------------
 
 if (CPUS["TMS1000"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/cpu/tms0980/tms1k_base.cpp",
-		MAME_DIR .. "src/devices/cpu/tms0980/tms1k_base.h",
-		MAME_DIR .. "src/devices/cpu/tms0980/tms1000.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1k_base.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1k_base.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1000.h",
 	}
 end
 
 if (CPUS["TMS1000"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms0980/tms1k_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms1000/tms1k_dasm.cpp")
 end
 
 --------------------------------------------------
