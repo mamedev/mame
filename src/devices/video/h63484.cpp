@@ -1913,7 +1913,8 @@ void h63484_device::video_registers_w(int offset)
 
 READ16_MEMBER( h63484_device::status_r )
 {
-	return m_sr;
+	// kothello is coded so that upper byte of this is 0xff otherwise no gfxs are copied. 
+	return m_sr | 0xff00; 
 }
 
 READ16_MEMBER( h63484_device::data_r )
