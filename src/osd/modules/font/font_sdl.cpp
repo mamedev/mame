@@ -161,9 +161,9 @@ void osd_font_sdl::close()
 bool osd_font_sdl::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs)
 {
 	SDL_Color const fcol = { 0xff, 0xff, 0xff };
-	std::uint16_t ustr[16];
-	ustr[utf16_from_uchar(ustr, ARRAY_LENGTH(ustr), chnum)] = 0;
-	std::unique_ptr<SDL_Surface, void (*)(SDL_Surface *)> const drawsurf(TTF_RenderUNICODE_Solid(m_font.get(), ustr, fcol), &SDL_FreeSurface);
+	char ustr[16];
+	ustr[utf8_from_uchar(ustr, ARRAY_LENGTH(ustr), chnum)] = '\0';
+	std::unique_ptr<SDL_Surface, void (*)(SDL_Surface *)> const drawsurf(TTF_RenderUTF8_Solid(m_font.get(), ustr, fcol), &SDL_FreeSurface);
 
 	// was nothing returned?
 	if (drawsurf)
