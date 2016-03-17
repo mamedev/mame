@@ -594,11 +594,11 @@ msgstr "ビデオモード"
 
 #: src/emu/ui/dsplmenu.cpp:40
 msgid "Hardware Stretch"
-msgstr ""
+msgstr "ハードウェアによる拡大"
 
 #: src/emu/ui/dsplmenu.cpp:41
 msgid "Triple Buffering"
-msgstr ""
+msgstr "トリプルバッファ"
 
 #: src/emu/ui/dsplmenu.cpp:42
 msgid "HLSL"
@@ -614,11 +614,11 @@ msgstr "バイリニアフィルタリング"
 
 #: src/emu/ui/dsplmenu.cpp:46
 msgid "Bitmap Prescaling"
-msgstr ""
+msgstr "ビットマッププレスケール"
 
 #: src/emu/ui/dsplmenu.cpp:47
 msgid "Multi-Threaded Rendering"
-msgstr ""
+msgstr "マルチスレッド描画"
 
 #: src/emu/ui/dsplmenu.cpp:48
 msgid "Window Mode"
@@ -626,19 +626,19 @@ msgstr "ウィンドウモード"
 
 #: src/emu/ui/dsplmenu.cpp:49
 msgid "Enforce Aspect Ratio"
-msgstr ""
+msgstr "アスペクト比を維持する"
 
 #: src/emu/ui/dsplmenu.cpp:50
 msgid "Start Out Maximized"
-msgstr ""
+msgstr "開始時に最大化する"
 
 #: src/emu/ui/dsplmenu.cpp:51
 msgid "Synchronized Refresh"
-msgstr ""
+msgstr "リフレッシュを同期"
 
 #: src/emu/ui/dsplmenu.cpp:52
 msgid "Wait Vertical Sync"
-msgstr ""
+msgstr "V-Syncを待つ"
 
 #: src/emu/ui/dsplmenu.cpp:204 src/emu/ui/dsplmenu.cpp:224
 #: src/emu/ui/optsmenu.cpp:265
@@ -647,7 +647,7 @@ msgstr "表示オプション"
 
 #: src/emu/ui/filesel.cpp:159
 msgid "File Already Exists - Override?"
-msgstr ""
+msgstr "ファイルが存在します－上書きしますか？"
 
 #: src/emu/ui/filesel.cpp:161 src/emu/ui/selgame.cpp:1598
 #: src/emu/ui/selgame.cpp:1599 src/emu/ui/selgame.cpp:1600
@@ -655,7 +655,7 @@ msgstr ""
 #: src/emu/ui/selgame.cpp:1603 src/emu/ui/selgame.cpp:1604
 #: src/emu/ui/selgame.cpp:1613
 msgid "No"
-msgstr ""
+msgstr "いいえ"
 
 #: src/emu/ui/filesel.cpp:162 src/emu/ui/selgame.cpp:1598
 #: src/emu/ui/selgame.cpp:1599 src/emu/ui/selgame.cpp:1600
@@ -663,7 +663,7 @@ msgstr ""
 #: src/emu/ui/selgame.cpp:1603 src/emu/ui/selgame.cpp:1604
 #: src/emu/ui/selgame.cpp:1613
 msgid "Yes"
-msgstr ""
+msgstr "はい"
 
 #: src/emu/ui/filesel.cpp:271
 msgid "New Image Name:"
@@ -679,7 +679,7 @@ msgstr "作成"
 
 #: src/emu/ui/filesel.cpp:314
 msgid "Please enter a file extension too"
-msgstr ""
+msgstr "ファイルの拡張子を入力してください"
 
 #: src/emu/ui/filesel.cpp:502 src/emu/ui/swlist.cpp:65
 msgid "[empty slot]"
@@ -711,29 +711,31 @@ msgstr "読み取り／書き込み"
 
 #: src/emu/ui/filesel.cpp:866
 msgid "Read this image, write to another image"
-msgstr ""
+msgstr "このイメージから読み取り、別のイメージに書き込む"
 
 #: src/emu/ui/filesel.cpp:867
 msgid "Read this image, write to diff"
-msgstr ""
+msgstr "このイメージから読み取り、差分（diff）に書き込む"
 
 #: src/emu/ui/imgcntrl.cpp:115
 msgid "Cannot save over directory"
-msgstr ""
+msgstr "別のフォルダには保存できません"
 
 #: src/emu/ui/imgcntrl.cpp:149
 msgid ""
 "The software selected is missing one or more required ROM or CHD images. "
 "Please select a different one."
 msgstr ""
+"選択したソフトウェアに必要な1つ以上のROMまたはCHDが不足しています。"
+"別の物を選択してください。"
 
 #: src/emu/ui/info.cpp:98
 msgid "Not supported"
-msgstr ""
+msgstr "対応していません"
 
 #: src/emu/ui/info.cpp:101
 msgid "Partially supported"
-msgstr ""
+msgstr "部分的に対応"
 
 #: src/emu/ui/info.cpp:109
 msgid "[empty]"
@@ -753,7 +755,7 @@ msgstr "ユーザーインターフェイス"
 
 #: src/emu/ui/inputmap.cpp:59
 msgid "Other Controls"
-msgstr ""
+msgstr "その他のコントロール"
 
 #: src/emu/ui/inputmap.cpp:625 src/emu/ui/miscmenu.cpp:90
 #: src/emu/ui/slotopt.cpp:172
@@ -870,7 +872,7 @@ msgstr "お気に入りに追加または削除"
 
 #: src/emu/ui/menu.cpp:64
 msgid "Export displayed list to file"
-msgstr ""
+msgstr "表示されているリストをファイルに出力"
 
 #: src/emu/ui/menu.cpp:65
 msgid "Show DATs view"
@@ -936,6 +938,8 @@ msgid ""
 "Tickets dispensed: %1$d\n"
 "\n"
 msgstr ""
+"チケット発行: %1$d\n"
+"\n"
 
 #: src/emu/ui/miscmenu.cpp:256
 msgid "Coin %1$c: NA%3$s\n"
@@ -952,7 +956,7 @@ msgstr "（ロック）"
 
 #: src/emu/ui/miscmenu.cpp:518
 msgid "Visible Delay"
-msgstr "目に見えるディレイ"
+msgstr "表示する長さ"
 
 #: src/emu/ui/miscmenu.cpp:557
 msgid "Re-select last machine played"
@@ -1006,7 +1010,7 @@ msgstr "%s.xmlをuiフォルダーに保存しました。"
 
 #: src/emu/ui/miscmenu.cpp:765
 msgid "Name:             Description:\n"
-msgstr ""
+msgstr "名前:             詳細:\n"
 
 #: src/emu/ui/miscmenu.cpp:777
 #, c-format
@@ -1015,15 +1019,15 @@ msgstr "%s.txtをuiフォルダーに保存しました。"
 
 #: src/emu/ui/miscmenu.cpp:795
 msgid "Export XML format (like -listxml)"
-msgstr ""
+msgstr "XML形式で出力（-listxml同様）"
 
 #: src/emu/ui/miscmenu.cpp:796
 msgid "Export TXT format (like -listfull)"
-msgstr ""
+msgstr "TXT形式で出力（-listfull同様）"
 
 #: src/emu/ui/miscmenu.cpp:854
 msgid "Dummy"
-msgstr ""
+msgstr "ダミー"
 
 #: src/emu/ui/miscmenu.cpp:856
 msgid "Save machine configuration"
@@ -1043,7 +1047,7 @@ msgstr " ^!カテゴリ"
 
 #: src/emu/ui/optsmenu.cpp:254
 msgid "^!Setup custom filter"
-msgstr ""
+msgstr "^!カスタムフィルタを設定する"
 
 #: src/emu/ui/optsmenu.cpp:262
 msgid "Customize UI"
@@ -1128,6 +1132,10 @@ msgid ""
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
+"選択したマシンに必要な1つ以上のROMまたはCHDが不足しています。"
+"別のマシンを選択してください。\n"
+"\n"
+"進めるには、何かキー（ESC以外）を押してください。"
 
 #: src/emu/ui/selgame.cpp:647 src/emu/ui/simpleselgame.cpp:262
 msgid "Configure Options"
@@ -1140,7 +1148,7 @@ msgstr "マシンの設定"
 #: src/emu/ui/selgame.cpp:804
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
-msgstr ""
+msgstr "%1$s %2$s ( %3$d / %4$d マシン (%5$d BIOS) )"
 
 #: src/emu/ui/selgame.cpp:814
 #, c-format
@@ -1160,7 +1168,7 @@ msgstr "%1$s検索：%2$s_"
 #: src/emu/ui/selgame.cpp:884
 #, c-format
 msgid "Romset: %1$-.100s"
-msgstr ""
+msgstr "ROMセット： %1$-.100s"
 
 #: src/emu/ui/selgame.cpp:887 src/emu/ui/selgame.cpp:936
 #: src/emu/ui/selsoft.cpp:742 src/emu/ui/selsoft.cpp:792
@@ -1172,77 +1180,77 @@ msgstr ""
 #: src/emu/ui/selgame.cpp:893 src/emu/ui/selsoft.cpp:748
 #, c-format
 msgid "Driver is clone of: %1$-.100s"
-msgstr ""
+msgstr "次のクローンのドライバ： %1$-.100s"
 
 #: src/emu/ui/selgame.cpp:895 src/emu/ui/selsoft.cpp:750
 msgid "Driver is parent"
-msgstr ""
+msgstr "親セットのドライバ"
 
 #: src/emu/ui/selgame.cpp:899 src/emu/ui/selsoft.cpp:754
 #: src/emu/ui/simpleselgame.cpp:332
 msgid "Overall: NOT WORKING"
-msgstr ""
+msgstr "概略： 動作不可"
 
 #: src/emu/ui/selgame.cpp:901 src/emu/ui/selsoft.cpp:756
 #: src/emu/ui/simpleselgame.cpp:334
 msgid "Overall: Unemulated Protection"
-msgstr ""
+msgstr "概略： プロテクトが未エミュレート"
 
 #: src/emu/ui/selgame.cpp:903 src/emu/ui/selsoft.cpp:758
 #: src/emu/ui/simpleselgame.cpp:336
 msgid "Overall: Working"
-msgstr ""
+msgstr "概略： 動作可"
 
 #: src/emu/ui/selgame.cpp:907 src/emu/ui/selsoft.cpp:762
 msgid "Graphics: Imperfect, "
-msgstr ""
+msgstr "グラフィック： 不完全、 "
 
 #: src/emu/ui/selgame.cpp:909 src/emu/ui/selsoft.cpp:764
 msgid "Graphics: OK, "
-msgstr ""
+msgstr "グラフィック： 正常、 "
 
 #: src/emu/ui/selgame.cpp:912 src/emu/ui/selsoft.cpp:767
 msgid "Sound: Unimplemented"
-msgstr "サウンド：未実装"
+msgstr "サウンド： 未実装"
 
 #: src/emu/ui/selgame.cpp:914 src/emu/ui/selsoft.cpp:769
 msgid "Sound: Imperfect"
-msgstr ""
+msgstr "サウンド： 不完全"
 
 #: src/emu/ui/selgame.cpp:916 src/emu/ui/selsoft.cpp:771
 msgid "Sound: OK"
-msgstr ""
+msgstr "サウンド： 正常"
 
 #: src/emu/ui/selgame.cpp:933
 #, c-format
 msgid "System: %1$-.100s"
-msgstr ""
+msgstr "システム： %1$-.100s"
 
 #: src/emu/ui/selgame.cpp:940 src/emu/ui/selsoft.cpp:796
 #, c-format
 msgid "Software is clone of: %1$-.100s"
-msgstr ""
+msgstr "次のクローンのソフトウェア： %1$-.100s"
 
 #: src/emu/ui/selgame.cpp:942 src/emu/ui/selsoft.cpp:798
 msgid "Software is parent"
-msgstr ""
+msgstr "親セットのソフトウェア"
 
 #: src/emu/ui/selgame.cpp:947 src/emu/ui/selsoft.cpp:803
 msgid "Supported: No"
-msgstr ""
+msgstr "対応状況： いいえ"
 
 #: src/emu/ui/selgame.cpp:952 src/emu/ui/selsoft.cpp:808
 msgid "Supported: Partial"
-msgstr ""
+msgstr "対応状況： 部分的"
 
 #: src/emu/ui/selgame.cpp:957 src/emu/ui/selsoft.cpp:813
 msgid "Supported: Yes"
-msgstr ""
+msgstr "対応状況： はい"
 
 #: src/emu/ui/selgame.cpp:962 src/emu/ui/selsoft.cpp:818
 #, c-format
 msgid "romset: %1$-.100s"
-msgstr ""
+msgstr "ROMセット： %1$-.100s"
 
 #: src/emu/ui/selgame.cpp:969
 #, c-format
@@ -1252,7 +1260,7 @@ msgstr ""
 #: src/emu/ui/selgame.cpp:1565
 #, c-format
 msgid "Romset: %1$-.100s\n"
-msgstr ""
+msgstr "ROMセット: %1$-.100s\n"
 
 #: src/emu/ui/selgame.cpp:1566
 #, c-format
@@ -1267,35 +1275,35 @@ msgstr "製造元: %1$-.100s\n"
 #: src/emu/ui/selgame.cpp:1571
 #, c-format
 msgid "Driver is Clone of: %1$-.100s\n"
-msgstr ""
+msgstr "次のクローンのドライバ: %1$-.100s\n"
 
 #: src/emu/ui/selgame.cpp:1573
 msgid "Driver is Parent\n"
-msgstr ""
+msgstr "親セットのドライバ\n"
 
 #: src/emu/ui/selgame.cpp:1576
 msgid "Overall: NOT WORKING\n"
-msgstr ""
+msgstr "概略: 動作不可\n"
 
 #: src/emu/ui/selgame.cpp:1578
 msgid "Overall: Unemulated Protection\n"
-msgstr ""
+msgstr "概略: プロテクトが未エミュレート\n"
 
 #: src/emu/ui/selgame.cpp:1580
 msgid "Overall: Working\n"
-msgstr ""
+msgstr "概略: 動作可\n"
 
 #: src/emu/ui/selgame.cpp:1583
 msgid "Graphics: Imperfect Colors\n"
-msgstr ""
+msgstr "グラフィック: 色が不完全\n"
 
 #: src/emu/ui/selgame.cpp:1587
 msgid "Graphics: Imperfect\n"
-msgstr ""
+msgstr "グラフィック: 不完全\n"
 
 #: src/emu/ui/selgame.cpp:1589
 msgid "Graphics: OK\n"
-msgstr ""
+msgstr "グラフィック: 正常\n"
 
 #: src/emu/ui/selgame.cpp:1592
 msgid "Sound: Unimplemented\n"
@@ -1303,46 +1311,46 @@ msgstr "サウンド: 未実装\n"
 
 #: src/emu/ui/selgame.cpp:1594
 msgid "Sound: Imperfect\n"
-msgstr ""
+msgstr "サウンド: 不完全\n"
 
 #: src/emu/ui/selgame.cpp:1596
 msgid "Sound: OK\n"
-msgstr ""
+msgstr "サウンド: 正常\n"
 
 #: src/emu/ui/selgame.cpp:1598
 #, c-format
 msgid "Driver is Skeleton: %1$s\n"
-msgstr ""
+msgstr "スケルトンドライバ: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1599
 #, c-format
 msgid "Game is Mechanical: %1$s\n"
-msgstr ""
+msgstr "機械仕掛けのゲーム: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1600
 #, c-format
 msgid "Requires Artwork: %1$s\n"
-msgstr ""
+msgstr "アートワークが必要: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1601
 #, c-format
 msgid "Requires Clickable Artwork: %1$s\n"
-msgstr ""
+msgstr "クリック可のアートワークが必要: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1602
 #, c-format
 msgid "Support Cocktail: %1$s\n"
-msgstr ""
+msgstr "カクテルモード対応: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1603
 #, c-format
 msgid "Driver is Bios: %1$s\n"
-msgstr ""
+msgstr "BIOSドライバ: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1604
 #, c-format
 msgid "Support Save: %1$s\n"
-msgstr ""
+msgstr "セーブ対応: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1605
 #, c-format
@@ -1360,33 +1368,35 @@ msgstr "横"
 #: src/emu/ui/selgame.cpp:1613
 #, c-format
 msgid "Requires CHD: %1$s\n"
-msgstr ""
+msgstr "CHDが必要: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1626
 msgid "Roms Audit Pass: OK\n"
-msgstr ""
+msgstr "ROM検証結果: 正常\n"
 
 #: src/emu/ui/selgame.cpp:1628
 msgid "Roms Audit Pass: BAD\n"
-msgstr ""
+msgstr "ROM検証結果: 異常\n"
 
 #: src/emu/ui/selgame.cpp:1631
 msgid "Samples Audit Pass: None Needed\n"
-msgstr ""
+msgstr "サンプル検証結果: 不要\n"
 
 #: src/emu/ui/selgame.cpp:1633
 msgid "Samples Audit Pass: OK\n"
-msgstr ""
+msgstr "サンプル検証結果: 正常\n"
 
 #: src/emu/ui/selgame.cpp:1635
 msgid "Samples Audit Pass: BAD\n"
-msgstr ""
+msgstr "サンプル検証結果: 異常\n"
 
 #: src/emu/ui/selgame.cpp:1638
 msgid ""
 "Roms Audit Pass: Disabled\n"
 "Samples Audit Pass: Disabled\n"
 msgstr ""
+"ROM検証結果: 無効\n"
+"サンプル検証結果: 無効\n"
 
 #: src/emu/ui/selgame.cpp:2070 src/emu/ui/selgame.cpp:2231
 #: src/emu/ui/selsoft.cpp:1639
@@ -1408,11 +1418,15 @@ msgid ""
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
+"選択したソフトウェアに必要な1つ以上のファイルが不足しています。"
+"別のソフトウェアを選択してください。\n"
+"\n"
+"進めるには、何かキー（ESC以外）を押してください。"
 
 #: src/emu/ui/selsoft.cpp:681
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d softwares )"
-msgstr ""
+msgstr "%1$s %2$s ( %3$d / %4$d ソフトウェア )"
 
 #: src/emu/ui/selsoft.cpp:682
 #, c-format
@@ -1471,15 +1485,19 @@ msgid ""
 "If this is your first time using %2$s, please see the config.txt file in the "
 "docs directory for information on configuring %2$s."
 msgstr ""
+"マシンが見つかりません。%1$s.iniファイルで指定したrompathを確認してください。\n"
+"\n"
+"もし %2$s の利用が初めてなら、%2$s の設定方法についてdocsフォルダの"
+"config.txtファイルをご覧ください。"
 
 #: src/emu/ui/simpleselgame.cpp:287
 #, c-format
 msgid "Type name or select: %1$s_"
-msgstr ""
+msgstr "名前を入力もしくは選択： %1$s_"
 
 #: src/emu/ui/simpleselgame.cpp:289
 msgid "Type name or select: (random)"
-msgstr ""
+msgstr "名前を入力もしくは選択： （ランダム）"
 
 #: src/emu/ui/simpleselgame.cpp:328
 #, c-format
@@ -1488,11 +1506,11 @@ msgstr "ドライバ：%1$-.100s"
 
 #: src/emu/ui/simpleselgame.cpp:340 src/emu/ui/simpleselgame.cpp:347
 msgid "Imperfect"
-msgstr ""
+msgstr "不完全"
 
 #: src/emu/ui/simpleselgame.cpp:342 src/emu/ui/simpleselgame.cpp:349
 msgid "OK"
-msgstr ""
+msgstr "正常"
 
 #: src/emu/ui/simpleselgame.cpp:345
 msgid "Unimplemented"
@@ -1525,12 +1543,12 @@ msgstr "【ファイルマネージャ】"
 
 #: src/emu/ui/swlist.cpp:235
 msgid "Switch Item Ordering"
-msgstr ""
+msgstr "項目の並び順の切り替え"
 
 #: src/emu/ui/swlist.cpp:268
 #, c-format
 msgid "Switched Order: entries now ordered by %s"
-msgstr ""
+msgstr "並び順を切り替え： 一覧は現在 %s 順"
 
 #: src/emu/ui/swlist.cpp:268
 msgid "shortname"
@@ -1863,7 +1881,7 @@ msgstr "%1$sの音量"
 #: src/emu/ui/ui.cpp:1999
 #, c-format
 msgid "Overclock CPU %1$s"
-msgstr ""
+msgstr "CPU %1$sのオーバークロック"
 
 #: src/emu/ui/ui.cpp:2019
 #, c-format
@@ -1888,42 +1906,42 @@ msgstr "%1$sのガンマ"
 #: src/emu/ui/ui.cpp:2036
 #, c-format
 msgid "%1$s Horiz Stretch"
-msgstr ""
+msgstr "%1$s 横方向の拡大"
 
 #: src/emu/ui/ui.cpp:2039
 #, c-format
 msgid "%1$s Horiz Position"
-msgstr ""
+msgstr "%1$s 横方向の位置"
 
 #: src/emu/ui/ui.cpp:2042
 #, c-format
 msgid "%1$s Vert Stretch"
-msgstr ""
+msgstr "%1$s 縦方向の拡大"
 
 #: src/emu/ui/ui.cpp:2045
 #, c-format
 msgid "%1$s Vert Position"
-msgstr ""
+msgstr "%1$s 縦方向の位置"
 
 #: src/emu/ui/ui.cpp:2063
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr ""
+msgstr "レーザーディスク '%1$s' 横方向の拡大"
 
 #: src/emu/ui/ui.cpp:2066
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
-msgstr ""
+msgstr "レーザーディスク '%1$s' 横方向の位置"
 
 #: src/emu/ui/ui.cpp:2069
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr ""
+msgstr "レーザーディスク '%1$s' 縦方向の拡大"
 
 #: src/emu/ui/ui.cpp:2072
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
-msgstr ""
+msgstr "レーザーディスク '%1$s' 縦方向の位置"
 
 #: src/emu/ui/ui.cpp:2081
 msgid "Vector Flicker"
@@ -1944,7 +1962,7 @@ msgstr "ビーム強度比重"
 #: src/emu/ui/ui.cpp:2099
 #, c-format
 msgid "Crosshair Scale %1$s"
-msgstr ""
+msgstr "照準の大きさ %1$s"
 
 #: src/emu/ui/ui.cpp:2099 src/emu/ui/ui.cpp:2102
 msgid "X"
@@ -1957,7 +1975,7 @@ msgstr ""
 #: src/emu/ui/ui.cpp:2102
 #, c-format
 msgid "Crosshair Offset %1$s"
-msgstr ""
+msgstr "照準のオフセット %1$s"
 
 #: src/emu/ui/ui.cpp:2121
 #, c-format
@@ -2005,22 +2023,22 @@ msgstr "画面"
 #: src/emu/ui/ui.cpp:2544
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
-msgstr ""
+msgstr "照準の大きさ X %1$1.3f"
 
 #: src/emu/ui/ui.cpp:2544
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
-msgstr ""
+msgstr "照準の大きさ Y %1$1.3f"
 
 #: src/emu/ui/ui.cpp:2563
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
-msgstr ""
+msgstr "照準のオフセット X %1$1.3f"
 
 #: src/emu/ui/ui.cpp:2563
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
-msgstr ""
+msgstr "照準のオフセット Y %1$1.3f"
 
 #: src/emu/ui/videoopt.cpp:55
 #, c-format
