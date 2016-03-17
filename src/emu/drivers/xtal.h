@@ -56,6 +56,7 @@ enum
 	XTAL_2_4576MHz      = 2457600,      /* Atari ST MFP, NEC PC-98xx */
 	XTAL_2_5MHz         = 2500000,      /* Janken Man units */
 	XTAL_3MHz           = 3000000,      /* Probably only used to drive 68705 or similar MCUs on 80's Taito PCBs */
+	XTAL_3_072MHz       = 3072000,      /* INS 8520 input clock rate */
 	XTAL_3_12MHz        = 3120000,      /* SP0250 clock on Gottlieb games */
 	XTAL_3_5MHz         = 3500000,      /* Reported by Commodore 65 document, true xtal unchecked on PCB */
 	XTAL_3_52128MHz     = 3521280,      /* RCA COSMAC VIP */
