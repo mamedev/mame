@@ -365,6 +365,7 @@ ADDRESS_MAP_EXTERN(neogeo_main_map,16);
     Some may be missing, there have been multiple CRCs reported for the same
     revision in some cases (the Universe bios has an option for entering / displaying
     a serial number; these should be noted as such if they're added).
+    Universe bios prior to version 1.3 was incompatible with AES.
 
     The 'japan-hotel' BIOS is a dump of an MVS which could be found in some japanese
     hotels. it is a custom MVS mobo which uses MVS carts but it hasn't jamma
@@ -404,7 +405,8 @@ ADDRESS_MAP_EXTERN(neogeo_main_map,16);
 	ROM_SYSTEM_BIOS( x+ 7, "unibios20", "Universe Bios (Hack, Ver. 2.0)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( x+ 7, "uni-bios_2_0.rom",  0x00000, 0x020000, CRC(0c12c2ad) SHA1(37bcd4d30f3892078b46841d895a6eff16dc921e) ) /* Universe Bios v2.0 (hack) */ \
 	ROM_SYSTEM_BIOS( x+ 8, "unibios13", "Universe Bios (Hack, Ver. 1.3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( x+ 8, "uni-bios_1_3.rom",  0x00000, 0x020000, CRC(b24b44a0) SHA1(eca8851d30557b97c309a0d9f4a9d20e5b14af4e) ) /* Universe Bios v1.3 (hack) */ \
+	ROM_LOAD16_WORD_SWAP_BIOS( x+ 8, "uni-bios_1_3.rom",  0x00000, 0x020000, CRC(b24b44a0) SHA1(eca8851d30557b97c309a0d9f4a9d20e5b14af4e) ) /* Universe Bios v1.3 (hack) */
+#define NEOGEO_UNIBIOS_1_2_AND_OLDER(x) \
 	ROM_SYSTEM_BIOS( x+ 9, "unibios12", "Universe Bios (Hack, Ver. 1.2)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( x+ 9, "uni-bios_1_2.rom",  0x00000, 0x020000, CRC(4fa698e9) SHA1(682e13ec1c42beaa2d04473967840c88fd52c75a) ) /* Universe Bios v1.2 (hack) */ \
 	ROM_SYSTEM_BIOS( x+10, "unibios12o", "Universe Bios (Hack, Ver. 1.2, older)" ) \
@@ -426,7 +428,7 @@ ADDRESS_MAP_EXTERN(neogeo_main_map,16);
 	ROM_SYSTEM_BIOS( 3, "us-e", "US MVS (Ver. 1)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 3, "sp-e.sp1",          0x00000, 0x020000, CRC(2723a5b5) SHA1(5dbff7531cf04886cde3ef022fb5ca687573dcb8) ) /* US, 6 Slot (V5?) */ \
 	ROM_SYSTEM_BIOS( 4, "us-v2", "US MVS (4 slot, Ver 2)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4, "v2.bin",             0x00000, 0x020000, CRC(62f021f4) SHA1(62d372269e1b3161c64ae21123655a0a22ffd1bb) ) /* US, 4 slot */ \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4, "v2.bin",            0x00000, 0x020000, CRC(62f021f4) SHA1(62d372269e1b3161c64ae21123655a0a22ffd1bb) ) /* US, 4 slot */ \
 	\
 	ROM_SYSTEM_BIOS( 5, "asia", "Asia MVS (Ver. 3)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 5, "asia-s3.rom",       0x00000, 0x020000, CRC(91b64be3) SHA1(720a3e20d26818632aedf2c2fd16c54f213543e1) ) /* Asia */ \
@@ -444,7 +446,8 @@ ADDRESS_MAP_EXTERN(neogeo_main_map,16);
 	ROM_SYSTEM_BIOS( 11, "japan-hotel", "Custom Japanese Hotel" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 11, "sp-1v1_3db8c.bin", 0x00000, 0x020000, CRC(162f0ebe) SHA1(fe1c6dd3dfcf97d960065b1bb46c1e11cb7bf271) ) /* 'rare MVS found in japanese hotels' shows v1.3 in test mode */ \
 	\
-	NEOGEO_UNIBIOS(12)
+	NEOGEO_UNIBIOS(12) \
+	NEOGEO_UNIBIOS_1_2_AND_OLDER(12)
 
 
 #define NEO_BIOS_AUDIO_64K(name, hash) \
