@@ -16,7 +16,7 @@
 // So, my main source of information was the careful study of HP software, especially the 9845 system test ROM (09845-66520).
 // The second half of this ROM holds a comprehensive set of tape drive tests.
 // The main shortcomings of my approach are:
-// * I could indentify only those TACO commands that are actually used by the software. I managed
+// * I could identify only those TACO commands that are actually used by the software. I managed
 //   to identify 17 out of 32 possible commands. The purpose of the rest of commands is anyone's guess.
 // * I could only guess the behavior of TACO chips in corner cases (especially behavior in various error/abnormal
 //   conditions)
@@ -51,7 +51,7 @@
 //  9     RW  ? Drive ON according to [1], the actual use seems to be selection of gap length
 //  8     RW  ? Size of gaps according to [1], N/U in my opinion
 //  7     RW  Speed of tape (1 = 90 ips, 0 = 22 ips)
-//  6     RW  Option bit for various commands
+//  6     RW  Option bit for various commands. Most of them use it to select read threshold (0 = low, 1 = high).
 //  5     R   Current track (1 = B)
 //  4     R   Gap detected (1)
 //  3     R   Write protection (1)
@@ -128,7 +128,6 @@
 // * Some code cleanup
 // * Handling of tape holes seems to be wrong: test "C" of test ROM only works partially
 // * Find out what is read from register R6
-// * Handle device_image_interface::call_display to show state of tape
 // * Find more info on TACO chips (does anyone with a working 9845 or access to internal HP docs want to
 //   help me here, please?)
 //
@@ -172,7 +171,8 @@ enum {
 #define SLOW_BRAKE_DIST 197883  // Braking distance at slow speed (~0.2 in)
 #define PREAMBLE_WORD   0       // Value of preamble word
 #define END_GAP_LENGTH  (6 * ONE_INCH_POS)      // Length of final gap: 6"
-#define MIN_IRG_LENGTH  ((tape_pos_t)(0.2 * ONE_INCH_POS))      // Minimum length of IRGs: 0.2" (from 9825, not sure about value in TACO)
+#define SHORT_GAP_LENGTH        ((tape_pos_t)(0.066 * ONE_INCH_POS))    // Minimum length of short gaps: 0.066" ([1], pg 8-10)
+#define LONG_GAP_LENGTH ((tape_pos_t)(1.5 * ONE_INCH_POS))      // Minimum length long gaps: 1.5" ([1], pg 8-10)
 #define NULL_TAPE_POS   ((tape_pos_t)-1)        // Special value for invalid/unknown tape position
 #define NO_DATA_GAP     (17 * ONE_BIT_LEN)      // Minimum gap size to detect end of data: length of longest word (0xffff)
 #define FILE_MAGIC      0x4f434154      // Magic value at start of image file: "TACO"
@@ -193,38 +193,38 @@ enum {
 
 // Commands
 enum {
-		CMD_INDTA_INGAP,        // 00: scan for data first then for gap
-		CMD_UNK_01,             // 01: unknown
-		CMD_FINAL_GAP,          // 02: write final gap
-		CMD_INIT_WRITE,         // 03: write words for tape formatting
-		CMD_STOP,               // 04: stop
-		CMD_UNK_05,             // 05: unknown
-		CMD_SET_TRACK,          // 06: set A/B track
-		CMD_UNK_07,             // 07: unknown
-		CMD_UNK_08,             // 08: unknown
-		CMD_UNK_09,             // 09: unknown
-		CMD_MOVE,               // 0a: move tape
-		CMD_UNK_0b,             // 0b: unknown
-		CMD_INGAP_MOVE,         // 0c: scan for gap then move a bit further (used to gain some margin when inverting tape movement)
-		CMD_UNK_0d,             // 0d: unknown
-		CMD_CLEAR,              // 0e: clear errors/unlatch status bits
-		CMD_UNK_0f,             // 0f: unknown
-		CMD_NOT_INDTA,          // 10: scan for end of data
-		CMD_UNK_11,             // 11: unknown
-		CMD_UNK_12,             // 12: unknown
-		CMD_UNK_13,             // 13: unknown
-		CMD_UNK_14,             // 14: unknown
-		CMD_UNK_15,             // 15: unknown
-		CMD_WRITE_IRG,          // 16: write inter-record gap
-		CMD_UNK_17,             // 17: unknown
-		CMD_SCAN_RECORDS,       // 18: scan records (count IRGs)
-		CMD_RECORD_WRITE,       // 19: write record words
-		CMD_MOVE_INDTA,         // 1a: move then scan for data
-		CMD_UNK_1b,             // 1b: unknown (for now it seems harmless to handle it as NOP)
-		CMD_DELTA_MOVE_HOLE,    // 1c: move tape a given distance, intr at end or first hole found (whichever comes first)
-		CMD_START_READ,         // 1d: start record reading
-		CMD_DELTA_MOVE_IRG,     // 1e: move tape a given distance, detect gaps in parallel
-		CMD_END_READ            // 1f: stop reading
+        CMD_INDTA_INGAP,        // 00: scan for data first then for gap
+        CMD_UNK_01,             // 01: unknown
+        CMD_FINAL_GAP,          // 02: write final gap
+        CMD_INIT_WRITE,         // 03: write words for tape formatting
+        CMD_STOP,               // 04: stop
+        CMD_UNK_05,             // 05: unknown
+        CMD_SET_TRACK,          // 06: set A/B track
+        CMD_UNK_07,             // 07: unknown
+        CMD_UNK_08,             // 08: unknown
+        CMD_UNK_09,             // 09: unknown
+        CMD_MOVE,               // 0a: move tape
+        CMD_UNK_0b,             // 0b: unknown
+        CMD_INGAP_MOVE,         // 0c: scan for gap then move a bit further (used to gain some margin when inverting tape movement)
+        CMD_UNK_0d,             // 0d: unknown
+        CMD_CLEAR,              // 0e: clear errors/unlatch status bits
+        CMD_UNK_0f,             // 0f: unknown
+        CMD_NOT_INDTA,          // 10: scan for end of data
+        CMD_UNK_11,             // 11: unknown
+        CMD_UNK_12,             // 12: unknown
+        CMD_UNK_13,             // 13: unknown
+        CMD_UNK_14,             // 14: unknown
+        CMD_UNK_15,             // 15: unknown
+        CMD_WRITE_IRG,          // 16: write inter-record gap
+        CMD_UNK_17,             // 17: unknown
+        CMD_SCAN_RECORDS,       // 18: scan records (count IRGs)
+        CMD_RECORD_WRITE,       // 19: write record words
+        CMD_MOVE_INDTA,         // 1a: move then scan for data
+        CMD_UNK_1b,             // 1b: unknown (for now it seems harmless to handle it as NOP)
+        CMD_MOVE_INGAP,         // 1c: move tape a given distance then scan for gap (as cmd 0c but in reverse order)
+        CMD_START_READ,         // 1d: start record reading
+        CMD_DELTA_MOVE_IRG,     // 1e: move tape a given distance, detect gaps in parallel
+        CMD_END_READ            // 1f: stop reading
 };
 
 // Bits of status register
@@ -444,7 +444,7 @@ void hp_taco_device::device_timer(emu_timer &timer, device_timer_id id, int para
                         if (m_cmd_state == 0) {
                                 m_cmd_state = 1;
                                 tape_pos_t target = m_tape_pos;
-                                if (next_n_gap(target, 1, MIN_IRG_LENGTH)) {
+                                if (next_n_gap(target, 1, SHORT_GAP_LENGTH)) {
                                         m_tape_timer->adjust(time_to_target(target));
                                 }
                                 return;
@@ -500,7 +500,7 @@ void hp_taco_device::device_timer(emu_timer &timer, device_timer_id id, int para
                         if (m_cmd_state == 0) {
                                 m_cmd_state = 1;
                                 tape_pos_t target = m_tape_pos;
-                                if (next_n_gap(target, 0x10000U - m_tach_reg, MIN_IRG_LENGTH)) {
+                                if (next_n_gap(target, 0x10000U - m_tach_reg, SHORT_GAP_LENGTH)) {
                                         LOG_0(("%u gaps @%d\n" , 0x10000U - m_tach_reg, target));
                                         m_tape_timer->adjust(time_to_target(target));
                                 }
@@ -522,7 +522,19 @@ void hp_taco_device::device_timer(emu_timer &timer, device_timer_id id, int para
                         // m_cmd_state == 1 -> IRQ & cmd end
                         break;
 
-                case CMD_DELTA_MOVE_HOLE:
+                case CMD_MOVE_INGAP:
+                        if (m_cmd_state == 0) {
+                                m_cmd_state = 1;
+                                tape_pos_t target = m_tape_pos;
+                                if (next_n_gap(target, 1, SHORT_GAP_LENGTH)) {
+                                        LOG_0(("GAP @%d\n" , target));
+                                        m_tape_timer->adjust(time_to_target(target));
+                                }
+                                // No IRQ
+                                return;
+                        }
+                        break;
+
                 case CMD_DELTA_MOVE_IRG:
                         // Interrupt at end of movement
                         m_hole_timer->reset();
@@ -596,13 +608,13 @@ void hp_taco_device::device_timer(emu_timer &timer, device_timer_id id, int para
                         break;
 
                 case CMD_SCAN_RECORDS:
-                case CMD_DELTA_MOVE_HOLE:
-                        // Cmds 18 & 1c are terminated at first hole
+                        // Cmds 18 is terminated at first hole
                         m_tape_timer->reset();
                         irq_w(true);
                         // No reloading of hole timer
                         return;
 
+                case CMD_MOVE_INGAP:
                 case CMD_DELTA_MOVE_IRG:
                         // TODO: update r6
                         m_hole_timer->adjust(time_to_next_hole());
@@ -735,9 +747,9 @@ void hp_taco_device::update_tape_pos(void)
         }
         // Gap detection
         bool gap_detected = false;
-        if (m_gap_detect_start != NULL_TAPE_POS && abs(m_gap_detect_start - m_tape_pos) >= MIN_IRG_LENGTH) {
+        if (m_gap_detect_start != NULL_TAPE_POS && abs(m_gap_detect_start - m_tape_pos) >= SHORT_GAP_LENGTH) {
                 tape_pos_t tmp = m_tape_pos;
-                pos_offset(tmp , -MIN_IRG_LENGTH);
+                pos_offset(tmp , -SHORT_GAP_LENGTH);
                 gap_detected = just_gap(tmp , m_tape_pos);
         }
         if (gap_detected) {
@@ -1336,7 +1348,7 @@ void hp_taco_device::start_cmd_exec(UINT16 new_cmd_reg)
                 if (start_tape_cmd(new_cmd_reg , 0 , SPEED_FAST_MASK)) {
                         m_cmd_state = 0;
                         tape_pos_t target = m_tape_pos;
-                        if (next_n_gap(target, 1, MIN_IRG_LENGTH)) {
+                        if (next_n_gap(target, 1, SHORT_GAP_LENGTH)) {
                                 LOG_0(("IRG @%d\n" , target));
                                 cmd_duration = time_to_target(target);
                         }
@@ -1391,9 +1403,11 @@ void hp_taco_device::start_cmd_exec(UINT16 new_cmd_reg)
                 }
                 break;
 
-        case CMD_DELTA_MOVE_HOLE:
+        case CMD_MOVE_INGAP:
+                // Apparently cmd 1c uses b9 for some unknown purpose (to set the gap length?)
         case CMD_DELTA_MOVE_IRG:
                 if (start_tape_cmd(new_cmd_reg , 0 , 0)) {
+                        m_cmd_state = 0;
                         cmd_duration = time_to_tach_pulses();
                         time_to_hole = time_to_next_hole();
                 }
