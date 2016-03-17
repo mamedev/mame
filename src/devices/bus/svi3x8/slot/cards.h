@@ -14,6 +14,7 @@
 #include "emu.h"
 #include "sv801.h"
 #include "sv803.h"
+#include "sv806.h"
 #include "sv807.h"
 
 SLOT_INTERFACE_EXTERN( svi_slot_cards );
