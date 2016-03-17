@@ -536,6 +536,9 @@
 	NEO-MVS PROG42G / NEO-MVS CHA42G
 	. NGH-007
 	NEO-AEG PROG42G / NEO-AEG CHA42G
+	NEO-AEG PROG42G / NEO-AEG CHA-8M
+	. prototype
+	NEO-AEG PROG-EP / NEO-AEG CHA-EP
 ***************************************-->
 
 	<software name="alpham2">
@@ -580,6 +583,7 @@
 	</software>
 
 	<software name="alpham2p" cloneof="alpham2">
+		<!-- AES VERSION -->
 		<description>Alpha Mission II / ASO II - Last Guardian (prototype)</description>
 		<year>1991</year>
 		<publisher>SNK</publisher>
@@ -587,33 +591,33 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
-				<rom loadflag="load16_byte" name="proto_007-p1.p1" offset="0x000001" size="0x080000" crc="c763e52a" sha1="b24acbac255c5ee1a2e92e77cdde6620a24081cf" />
-				<rom loadflag="load16_byte" name="proto_007-p2.p2" offset="0x000000" size="0x080000" crc="7a0b435c" sha1="40e6f42a92001d9f4e51898dd7489da143b6b74b" />
+				<rom loadflag="load16_byte" name="007_p1_faac.p1" offset="0x000001" size="0x080000" crc="c763e52a" sha1="b24acbac255c5ee1a2e92e77cdde6620a24081cf" />
+				<rom loadflag="load16_byte" name="007_p2_1813.p2" offset="0x000000" size="0x080000" crc="7a0b435c" sha1="40e6f42a92001d9f4e51898dd7489da143b6b74b" />
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
-				<rom offset="0x000000" size="0x020000" name="proto_007-s1.s1" crc="efc9ae2e" sha1="a594826b0082fe5a13191673e8d9aa42517230f5" />
+				<rom offset="0x000000" size="0x020000" name="007_s1_36f1.s1" crc="efc9ae2e" sha1="a594826b0082fe5a13191673e8d9aa42517230f5" />
 			</dataarea>
 			<dataarea name="audiocpu" size="0x020000">
-				<rom offset="0x000000" size="0x020000" name="proto_007-m1.m1" crc="5976b464" sha1="ec824567ecc3579f6d86c9d9385710cbaeef16a3" />
+				<rom offset="0x000000" size="0x020000" name="007_m1_9384.m1" crc="5976b464" sha1="ec824567ecc3579f6d86c9d9385710cbaeef16a3" />
 			</dataarea>
 			<dataarea name="ymsnd" size="0x200000">
-				<rom name="proto_007-v11.v11" offset="0x000000" size="0x080000" crc="18eaa9e1" sha1="85c94d8660f8a32e4ca8e015f0bd704208482d68" />
-				<rom name="proto_007-v12.v12" offset="0x080000" size="0x080000" crc="2487d495" sha1="49af3c4dc6a38c5158d3641fd8f9a40041b42aa6" />
-				<rom name="proto_007-v13.v13" offset="0x100000" size="0x080000" crc="25e60f25" sha1="d06b0df872372de38fcf90187195070ac5f8c651" />
+				<rom name="007_v11_1bb4.v11" offset="0x000000" size="0x080000" crc="18eaa9e1" sha1="85c94d8660f8a32e4ca8e015f0bd704208482d68" />
+				<rom name="007_v12_c8e8.v12" offset="0x080000" size="0x080000" crc="2487d495" sha1="49af3c4dc6a38c5158d3641fd8f9a40041b42aa6" />
+				<rom name="007_v13_09fa.v13" offset="0x100000" size="0x080000" crc="25e60f25" sha1="d06b0df872372de38fcf90187195070ac5f8c651" />
 			</dataarea>
 			<dataarea name="ymsnd.deltat" size="0x80000">
-				<rom name="proto_007-v21.v21" offset="0x000000" size="0x080000" crc="ac44b75a" sha1="7399a05cd4e2c7ecde4a7323d3e189255afe5fc2" />
+				<rom name="007_v21_28c2.v21" offset="0x000000" size="0x080000" crc="ac44b75a" sha1="7399a05cd4e2c7ecde4a7323d3e189255afe5fc2" />
 			</dataarea>
 			<dataarea name="sprites" size="0x400000">
-				<!-- note, ROM_LOAD32_BYTE -->
-				<rom loadflag="load32_byte" name="proto_007-c1.c1" offset="0x000000" size="0x080000" crc="24841639" sha1="fcc2a349121dad86ffefc44b9f0e8ba616ce0d30" />
-				<rom loadflag="load32_byte" name="proto_007-c2.c2" offset="0x000002" size="0x080000" crc="912763ab" sha1="cedf26d7d85ad140399ee62813c71f35e65498d6" />
-				<rom loadflag="load32_byte" name="proto_007-c3.c3" offset="0x000001" size="0x080000" crc="0743bde2" sha1="0d13ad6333909ad3cf10f9ac360f9abf191318de" />
-				<rom loadflag="load32_byte" name="proto_007-c4.c4" offset="0x000003" size="0x080000" crc="61240212" sha1="dee36f6604adaeb96e0d761a7256241c066b1cd2" />
-				<rom loadflag="load32_byte" name="proto_007-c5.c5" offset="0x200000" size="0x080000" crc="cf9f4c53" sha1="f979c85f83d9f76e554c2617f85f6d4efca6799c" />
-				<rom loadflag="load32_byte" name="proto_007-c6.c6" offset="0x200002" size="0x080000" crc="3d903b19" sha1="001a8c762336b855fe1df69fe2e605d30a3f00a1" />
-				<rom loadflag="load32_byte" name="proto_007-c7.c7" offset="0x200001" size="0x080000" crc="e41e3875" sha1="730aceb8a66cb33d0194b096568f053ad7dc000a" />
-				<rom loadflag="load32_byte" name="proto_007-c8.c8" offset="0x200003" size="0x080000" crc="4483e2cf" sha1="47c3364f5c36ae9dc3a49fe37ca60bcee0e73314" />
+				<!-- note, load32_byte -->
+				<rom loadflag="load32_byte" name="007_c1_210e.c11" offset="0x000000" size="0x080000" crc="24841639" sha1="fcc2a349121dad86ffefc44b9f0e8ba616ce0d30" />
+				<rom loadflag="load32_byte" name="007_c2_29ae.c12" offset="0x000002" size="0x080000" crc="912763ab" sha1="cedf26d7d85ad140399ee62813c71f35e65498d6" />
+				<rom loadflag="load32_byte" name="007_c3_c873.c13" offset="0x000001" size="0x080000" crc="0743bde2" sha1="0d13ad6333909ad3cf10f9ac360f9abf191318de" />
+				<rom loadflag="load32_byte" name="007_c4_2462.c14" offset="0x000003" size="0x080000" crc="61240212" sha1="dee36f6604adaeb96e0d761a7256241c066b1cd2" />
+				<rom loadflag="load32_byte" name="007_c5_5f16.c15" offset="0x200000" size="0x080000" crc="cf9f4c53" sha1="f979c85f83d9f76e554c2617f85f6d4efca6799c" />
+				<rom loadflag="load32_byte" name="007_c6_8abc.c16" offset="0x200002" size="0x080000" crc="3d903b19" sha1="001a8c762336b855fe1df69fe2e605d30a3f00a1" />
+				<rom loadflag="load32_byte" name="007_c7_c983.c17" offset="0x200001" size="0x080000" crc="e41e3875" sha1="730aceb8a66cb33d0194b096568f053ad7dc000a" />
+				<rom loadflag="load32_byte" name="007_c8_b599.c18" offset="0x200003" size="0x080000" crc="4483e2cf" sha1="47c3364f5c36ae9dc3a49fe37ca60bcee0e73314" />
 			</dataarea>
 		</part>
 	</software>
@@ -1091,6 +1095,8 @@
 	NEO-MVS PROG42G / NEO-MVS CHA42G
 	. NGH-018
 	NEO-AEG PROG42G / NEO-AEG CHA42G
+	. prototype
+	NEO-AEG PROG-EP / NEO-AEG CHA-EP
 ***************************************-->
 
 	<software name="burningf">
@@ -1172,40 +1178,41 @@
 	</software>
 
 	<software name="burningfp" cloneof="burningf">
+		<!-- early prototype - all roms were hand labeled with CRCs, dumps verified against them -->
 		<description>Burning Fight (prototype)</description>
 		<year>1991</year>
 		<publisher>SNK</publisher>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- early prototype - all roms were hand labeled with CRCs, dumps verified against them -->
+			<!-- AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
-				<rom loadflag="load16_byte" name="proto_018-p1.p1" offset="0x000001" size="0x080000" crc="5b4032e7" sha1="55df91dad6f484d3d49c28ab5972700bf71a8662" />
-				<rom loadflag="load16_byte" name="proto_018-p2.p2" offset="0x000000" size="0x080000" crc="78762f68" sha1="12170fc6efe75cb5d32624033d3d341032c97548" />
+				<rom loadflag="load16_byte" name="018_p1_9397.p1" offset="0x000001" size="0x080000" crc="5b4032e7" sha1="55df91dad6f484d3d49c28ab5972700bf71a8662" />
+				<rom loadflag="load16_byte" name="018_p2_e335.p2" offset="0x000000" size="0x080000" crc="78762f68" sha1="12170fc6efe75cb5d32624033d3d341032c97548" />
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
-				<rom offset="0x000000" size="0x020000" name="proto_018-s1.s1" crc="f3d130e8" sha1="2fdeb93f4bb2a60d391cac2822be41661b1e1795" />
+				<rom offset="0x000000" size="0x020000" name="018_s1_9899.s1" crc="f3d130e8" sha1="2fdeb93f4bb2a60d391cac2822be41661b1e1795" />
 			</dataarea>
 			<dataarea name="audiocpu" size="0x020000">
-				<rom offset="0x000000" size="0x020000" name="proto_018-m1.m1" crc="470dd5d4" sha1="4291811b4aefe45261a1ae3631b6999fcd74fb3f" />
+				<rom offset="0x000000" size="0x020000" name="018_m1_4586.m1" crc="470dd5d4" sha1="4291811b4aefe45261a1ae3631b6999fcd74fb3f" />
 			</dataarea>
 			<dataarea name="ymsnd" size="0x200000">
-				<rom name="proto_018-v11.v11" offset="0x000000" size="0x080000" crc="dc07ea3c" sha1="c3e71aaec44ead7ddc581565d16b90030e6db5fd" />
-				<rom name="proto_018-v12.v12" offset="0x080000" size="0x080000" crc="f1ae637c" sha1="02a4c7d4a544350a314ab7b26d8c9d3baa8f5778" />
+				<rom name="018_v11_56ac.v11" offset="0x000000" size="0x080000" crc="dc07ea3c" sha1="c3e71aaec44ead7ddc581565d16b90030e6db5fd" />
+				<rom name="018_v12_db95.v12" offset="0x080000" size="0x080000" crc="f1ae637c" sha1="02a4c7d4a544350a314ab7b26d8c9d3baa8f5778" />
 			</dataarea>
 			<dataarea name="ymsnd.deltat" size="0x80000">
-				<rom name="proto_018-v21.v21" offset="0x000000" size="0x080000" crc="9f3b4eda" sha1="7f516923d04daa483b4b99c9babba66505931a34" />
+				<rom name="018_v21_98dd.v21" offset="0x000000" size="0x080000" crc="9f3b4eda" sha1="7f516923d04daa483b4b99c9babba66505931a34" />
 			</dataarea>
 			<dataarea name="sprites" size="0x400000">
-				<!-- note, ROM_LOAD32_BYTE -->
-				<rom loadflag="load32_byte" name="proto_018-c1.c1" offset="0x000000" size="0x080000" crc="6569018b" sha1="25040e0a9c2b72900100a22a2a41de5f6c339d8a" />
-				<rom loadflag="load32_byte" name="proto_018-c2.c2" offset="0x000002" size="0x080000" crc="6949b501" sha1="d8ee48837faff6cc849046ee8757b2b94d440303" />
-				<rom loadflag="load32_byte" name="proto_018-c3.c3" offset="0x000001" size="0x080000" crc="410f653b" sha1="ce94667721baa7b2c318fc268e3bb9209671c9f5" />
-				<rom loadflag="load32_byte" name="proto_018-c4.c4" offset="0x000003" size="0x080000" crc="d43bf2a5" sha1="c27985d8973611d02570f469a0d8cb4f5b63b614" />
-				<rom loadflag="load32_byte" name="proto_018-c5.c5" offset="0x200000" size="0x080000" crc="837d09d3" sha1="d3b06931fca6123604549599544b04529ef34c53" />
-				<rom loadflag="load32_byte" name="proto_018-c6.c6" offset="0x200002" size="0x080000" crc="5fee51e7" sha1="835c632fa12a1d5b4104cd80b8f686ac80b314a1" />
-				<rom loadflag="load32_byte" name="proto_018-c7.c7" offset="0x200001" size="0x080000" crc="0f3f0823" sha1="ec1d681c1795de43d20f30f85956e2473ec39c95" />
-				<rom loadflag="load32_byte" name="proto_018-c8.c8" offset="0x200003" size="0x080000" crc="67cc9e34" sha1="dc72a464c1456a4d2f7b992b416a984fb7885e99" />
+				<!-- note, load32_byte -->
+				<rom loadflag="load32_byte" name="018_c1_ba06.c11" offset="0x000000" size="0x080000" crc="6569018b" sha1="25040e0a9c2b72900100a22a2a41de5f6c339d8a" />
+				<rom loadflag="load32_byte" name="018_c2_d534.c12" offset="0x000002" size="0x080000" crc="6949b501" sha1="d8ee48837faff6cc849046ee8757b2b94d440303" />
+				<rom loadflag="load32_byte" name="018_c3_9d70.c13" offset="0x000001" size="0x080000" crc="410f653b" sha1="ce94667721baa7b2c318fc268e3bb9209671c9f5" />
+				<rom loadflag="load32_byte" name="018_c4_bf9d.c14" offset="0x000003" size="0x080000" crc="d43bf2a5" sha1="c27985d8973611d02570f469a0d8cb4f5b63b614" />
+				<rom loadflag="load32_byte" name="018_c5_ac9d.c15" offset="0x200000" size="0x080000" crc="837d09d3" sha1="d3b06931fca6123604549599544b04529ef34c53" />
+				<rom loadflag="load32_byte" name="018_c6_d2a5.c16" offset="0x200002" size="0x080000" crc="5fee51e7" sha1="835c632fa12a1d5b4104cd80b8f686ac80b314a1" />
+				<rom loadflag="load32_byte" name="018_c7_d568.c17" offset="0x200001" size="0x080000" crc="0f3f0823" sha1="ec1d681c1795de43d20f30f85956e2473ec39c95" />
+				<rom loadflag="load32_byte" name="018_c8_d256.c18" offset="0x200003" size="0x080000" crc="67cc9e34" sha1="dc72a464c1456a4d2f7b992b416a984fb7885e99" />
 			</dataarea>
 		</part>
 	</software>
@@ -1525,6 +1532,9 @@
 	. NGM-024
 	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
 	. NGH-024
+	
+	. prototype
+	NEO-MVS PROG-EP / NEO-MVS CHA-EPG
 ***************************************-->
 
 	<software name="lresort">
@@ -1561,6 +1571,45 @@
 				<!-- TC534200 -->
 				<rom loadflag="load16_byte" name="024-c4.c4" offset="0x200001" size="0x080000" crc="7382fefb" sha1="e916dec5bb5462eb9ae9711f08c7388937abb980" />
 				<!-- TC534200 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lresortp" cloneof="lresort">
+		<!-- prototype - all roms were hand labeled with CRCs -->
+		<description>Last Resort (prototype)</description>
+		<year>1992</year>
+		<publisher>SNK</publisher>
+		<sharedfeat name="release" value="MVS" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<!-- MVS VERSION -->
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_byte" name="024_p1_5937.podd" offset="0x000001" size="0x080000" crc="8e6008ee" sha1="6779663118782207156dc9fa9e24e81e30c6391c" />
+				<rom loadflag="load16_byte" name="024_p2_8d37.peven" offset="0x000000" size="0x080000" crc="6d9ee90f" sha1="ecd42182988092417bc96db8301ea408e47735f2" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="024_s1_22fe.s1" crc="5cef5cc6" sha1="9ec305007bdb356e9f8f279beae5e2bcb3f2cf7b" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="024_m1_fc7a.m1" crc="22122875" sha1="540c21559163381467679f836cb068adaf526659" />
+			</dataarea>
+			<dataarea name="ymsnd" size="0x200000">
+				<rom name="024_v11_b085.v11" offset="0x000000" size="0x080000" crc="0722da38" sha1="66a9b463d5277908b3a01c03de82b3de9118f2cb" />
+				<rom name="024_v12_d3b7.v12" offset="0x080000" size="0x080000" crc="670ce3ec" sha1="9004aa85d4a9b0ecf9cf9357b073ed55a98fdb02" />
+				<rom name="024_v13_a31e.v13" offset="0x100000" size="0x080000" crc="2e39462b" sha1="b0a9b1a3377bf0369f3020192505c46ca52927d6" />
+				<rom name="024_v24_2f0f.v24" offset="0x180000" size="0x080000" crc="7944754f" sha1="d42a46c5127c6c62041ebffb0007af8a24abd360" />
+			</dataarea>
+			<dataarea name="sprites" size="0x400000">
+				<!-- note, load32_byte -->
+				<rom loadflag="load32_byte" name="024_c1_b764.c1" offset="0x000000" size="0x080000" crc="677749ec" sha1="6f94675e037956a380652ab1056e6f1dec605bec" />
+				<rom loadflag="load32_byte" name="024_c2_1951.c2" offset="0x000002" size="0x080000" crc="104d7b59" sha1="404e8776ee8df4ca282eb7b747759af8628ddca1" />
+				<rom loadflag="load32_byte" name="024_c3_0f63.c3" offset="0x000001" size="0x080000" crc="b0965a74" sha1="e8026dd4f722ccab9c913261d09ab8843ef56a0e" />
+				<rom loadflag="load32_byte" name="024_c4_c5b5.c4" offset="0x000003" size="0x080000" crc="dcfc3860" sha1="8443b455ae8de656adab57f3b7e68919f22d3b9d" />
+				<rom loadflag="load32_byte" name="024_c5_dd03.c5" offset="0x200000" size="0x080000" crc="50322397" sha1="3308fbe48ad165b9894a52fc3a8d9898bbbc0c0e" />
+				<rom loadflag="load32_byte" name="024_c6_c81a.c6" offset="0x200002" size="0x080000" crc="c3c93894" sha1="f23b9d7e2b54d44c96370dde282bdf45cebd9cba" />
+				<rom loadflag="load32_byte" name="024_c7_5edc.c7" offset="0x200001" size="0x080000" crc="21faf72b" sha1="00bf257b06180ae6ede57744cea6257b3488d9f0" />
+				<rom loadflag="load32_byte" name="024_c8_0850.c8" offset="0x200003" size="0x080000" crc="fb57217b" sha1="607a98da754e8b1dd94a6432b21a36cc38e06a0f" />
 			</dataarea>
 		</part>
 	</software>
@@ -2269,8 +2318,8 @@
 		</part>
 	</software>
 
-		<!-- fairly late prototype release, only the code differs from the main set -->
 	<software name="kotm2p" cloneof="kotm2">
+		<!-- fairly late prototype release, only the code differs from the main set -->
 		<description>King of the Monsters 2 - The Next Thing (prototype)</description>
 		<year>1992</year>
 		<publisher>SNK</publisher>
@@ -2298,7 +2347,7 @@
 			</dataarea>
 				<!-- same data as main set, but prototype board layout -->
 			<dataarea name="sprites" size="0x600000">
-				<!-- note, ROM_LOAD32_BYTE -->
+				<!-- note, load32_byte -->
 				<rom loadflag="load32_byte" name="proto_039-c1.c1" offset="0x000000" size="0x100000" crc="7192a787" sha1="7bef6ce79c618103485480aee3c6f856968eb51f" />
 				<rom loadflag="load32_byte" name="proto_039-c2.c2" offset="0x000002" size="0x100000" crc="7157eca1" sha1="65f36c6a3834775b04076d2c38a6047bffe9a8cf" />
 				<rom loadflag="load32_byte" name="proto_039-c3.c3" offset="0x000001" size="0x100000" crc="11d75727" sha1="5a4c7b5ca3f1195e7853b45c5e71c13fe74d16e9" />

@@ -683,6 +683,8 @@ ROM_END
  . NGH-007
  NEO-AEG PROG42G / NEO-AEG CHA42G
  NEO-AEG PROG42G / NEO-AEG CHA-8M
+ . prototype
+ NEO-AEG PROG-EP / NEO-AEG CHA-EP
 ****************************************/
 
 ROM_START( alpham2 ) /* MVS AND AES VERSION */
@@ -727,11 +729,11 @@ ROM_START( alpham2p ) /* early prototype - all roms were hand labeled with CRCs,
 
 	ROM_REGION( 0x400000, "sprites", 0 ) // note, ROM_LOAD32_BYTE
 	ROM_LOAD32_BYTE( "007_c1_210e.c11", 0x000000, 0x80000, CRC(24841639) SHA1(fcc2a349121dad86ffefc44b9f0e8ba616ce0d30) ) /* Plane 0 */
-	ROM_LOAD32_BYTE( "007-c2_29ae.c12", 0x000002, 0x80000, CRC(912763ab) SHA1(cedf26d7d85ad140399ee62813c71f35e65498d6) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "007_c2_29ae.c12", 0x000002, 0x80000, CRC(912763ab) SHA1(cedf26d7d85ad140399ee62813c71f35e65498d6) ) /* Plane 2 */
 	ROM_LOAD32_BYTE( "007_c3_c873.c13", 0x000001, 0x80000, CRC(0743bde2) SHA1(0d13ad6333909ad3cf10f9ac360f9abf191318de) ) /* Plane 1 */
 	ROM_LOAD32_BYTE( "007_c4_2462.c14", 0x000003, 0x80000, CRC(61240212) SHA1(dee36f6604adaeb96e0d761a7256241c066b1cd2) ) /* Plane 3 */
 	ROM_LOAD32_BYTE( "007_c5_5f16.c15", 0x200000, 0x80000, CRC(cf9f4c53) SHA1(f979c85f83d9f76e554c2617f85f6d4efca6799c) ) /* Plane 0 */
-	ROM_LOAD32_BYTE( "007-c6_8abc.c16", 0x200002, 0x80000, CRC(3d903b19) SHA1(001a8c762336b855fe1df69fe2e605d30a3f00a1) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "007_c6_8abc.c16", 0x200002, 0x80000, CRC(3d903b19) SHA1(001a8c762336b855fe1df69fe2e605d30a3f00a1) ) /* Plane 2 */
 	ROM_LOAD32_BYTE( "007_c7_c983.c17", 0x200001, 0x80000, CRC(e41e3875) SHA1(730aceb8a66cb33d0194b096568f053ad7dc000a) ) /* Plane 1 */
 	ROM_LOAD32_BYTE( "007_c8_b599.c18", 0x200003, 0x80000, CRC(4483e2cf) SHA1(47c3364f5c36ae9dc3a49fe37ca60bcee0e73314) ) /* Plane 3 */
 ROM_END
@@ -1023,6 +1025,8 @@ ROM_END
  NEO-MVS PROG42G / NEO-MVS CHA42G
  . NGH-018
  NEO-AEG PROG42G / NEO-AEG CHA42G
+ . prototype
+ NEO-AEG PROG-EP / NEO-AEG CHA-EP
 ****************************************/
 
 ROM_START( burningf ) /* MVS AND AES VERSION */
@@ -1067,8 +1071,7 @@ ROM_START( burningfh ) /* AES VERSION (US) */
 	ROM_LOAD16_BYTE( "018-c4.c4", 0x200001, 0x100000, CRC(e2e0aff7) SHA1(1c691c092a6e2787de4f433b0eb9252bfdaa7e16) ) /* Plane 2,3 */ /* HN62408 */
 ROM_END
 
-ROM_START( burningfp ) /* early prototype - all roms were hand labeled with CRCs, dumps verified against them */ /*AES VERSION */
-	/* NEO-AEG PROG-EP / NEO-AEG CHA-EP */
+ROM_START( burningfp ) /* early prototype - all roms were hand labeled with CRCs, dumps verified against them */ /* AES VERSION */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "018_p1_9397.p1", 0x000001, 0x080000, CRC(5b4032e7) SHA1(55df91dad6f484d3d49c28ab5972700bf71a8662) )
 	ROM_LOAD16_BYTE( "018_p2_e335.p2", 0x000000, 0x080000, CRC(78762f68) SHA1(12170fc6efe75cb5d32624033d3d341032c97548) )
@@ -1288,6 +1291,9 @@ ROM_END
  . NGM-024
  NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
  . NGH-024
+ 
+ . prototype
+ NEO-MVS PROG-EP / NEO-MVS CHA-EPG
 ****************************************/
 
 ROM_START( lresort )
@@ -1312,7 +1318,6 @@ ROM_START( lresort )
 ROM_END
 
 ROM_START( lresortp ) /* prototype - all roms were hand labeled with CRCs */ /* MVS VERSION */
-	/* NEO-MVS PROG-EP / NEO-MVS CHA-EPG */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "024_p1_5937.podd",  0x000001, 0x080000, CRC(8e6008ee) SHA1(6779663118782207156dc9fa9e24e81e30c6391c) )
 	ROM_LOAD16_BYTE( "024_p2_8d37.peven", 0x000000, 0x080000, CRC(6d9ee90f) SHA1(ecd42182988092417bc96db8301ea408e47735f2) )
