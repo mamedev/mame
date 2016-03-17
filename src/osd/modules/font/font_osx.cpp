@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert, R. Belmont
+// copyright-holders:Olivier Galibert, R. Belmont, Vas Crabb
 /*
  * font_osx.c
  *

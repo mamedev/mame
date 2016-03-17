@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert, R. Belmont
+// copyright-holders:Olivier Galibert, R. Belmont, Vas Crabb
 /*
  * font_sdl.c
  *
@@ -60,7 +60,7 @@ private:
 	TTF_Font_ptr search_font_config(std::string const &family, std::string const &style, bool &bakedstyles);
 #endif
 	bool BDF_Check_Magic(std::string const &name);
-	TTF_Font_ptr TTF_OpenFont_Magic(std::string const &name, int fsize);
+	TTF_Font_ptr TTF_OpenFont_Magic(std::string const &name, int fsize, long index);
 
 	TTF_Font_ptr m_font;
 };
@@ -83,7 +83,7 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 	std::string const style((std::string::npos != separator) ? name.substr(separator + 1) : std::string());
 
 	// first up, try it as a filename
-	TTF_Font_ptr font = TTF_OpenFont_Magic(family, POINT_SIZE);
+	TTF_Font_ptr font = TTF_OpenFont_Magic(family, POINT_SIZE, 0);
 
 	// if no success, try the font path
 	if (!font)
@@ -94,7 +94,7 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 		if (file.open(family.c_str()) == osd_file::error::NONE)
 		{
 			std::string full_name = file.fullpath();
-			font = TTF_OpenFont_Magic(full_name, POINT_SIZE);
+			font = TTF_OpenFont_Magic(full_name, POINT_SIZE, 0);
 			if (font)
 				osd_printf_verbose("Found font %s\n", full_name.c_str());
 		}
@@ -191,18 +191,26 @@ bool osd_font_sdl::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, std::in
 	return bitmap.valid();
 }
 
-osd_font_sdl::TTF_Font_ptr osd_font_sdl::TTF_OpenFont_Magic(std::string const &name, int fsize)
+osd_font_sdl::TTF_Font_ptr osd_font_sdl::TTF_OpenFont_Magic(std::string const &name, int fsize, long index)
 {
 	emu_file file(OPEN_FLAG_READ);
 	if (file.open(name.c_str()) == osd_file::error::NONE)
 	{
-		unsigned char const magic[] = { 0x00, 0x01, 0x00, 0x00, 0x00 };
-		unsigned char buffer[sizeof(magic)] = { 0xff, 0xff, 0xff, 0xff, 0xff };
-		if ((sizeof(magic) != file.read(buffer, sizeof(magic))) || memcmp(buffer, magic, sizeof(magic)))
-			return TTF_Font_ptr(nullptr, &TTF_CloseFont);
+		unsigned char const ttf_magic[] = { 0x00, 0x01, 0x00, 0x00, 0x00 };
+		unsigned char const ttc1_magic[] = { 0x74, 0x74, 0x63, 0x66, 0x00, 0x01, 0x00, 0x00 };
+		unsigned char const ttc2_magic[] = { 0x74, 0x74, 0x63, 0x66, 0x00, 0x02, 0x00, 0x00 };
+		unsigned char buffer[std::max({ sizeof(ttf_magic), sizeof(ttc1_magic), sizeof(ttc2_magic) })];
+		auto const bytes_read = file.read(buffer, sizeof(buffer));
 		file.close();
+
+		if ((bytes_read >= sizeof(ttf_magic)) && !std::memcmp(buffer, ttf_magic, sizeof(ttf_magic)))
+			return TTF_Font_ptr(TTF_OpenFont(name.c_str(), POINT_SIZE), &TTF_CloseFont);
+
+		if (((bytes_read >= sizeof(ttc1_magic)) && !std::memcmp(buffer, ttc1_magic, sizeof(ttc1_magic))) ||
+			((bytes_read >= sizeof(ttc2_magic)) && !std::memcmp(buffer, ttc2_magic, sizeof(ttc2_magic))))
+			return TTF_Font_ptr(TTF_OpenFontIndex(name.c_str(), POINT_SIZE, index), &TTF_CloseFont);
 	}
-	return TTF_Font_ptr(TTF_OpenFont(name.c_str(), POINT_SIZE), &TTF_CloseFont);
+	return TTF_Font_ptr(nullptr, &TTF_CloseFont);
 }
 
 bool osd_font_sdl::BDF_Check_Magic(std::string const &name)
@@ -235,6 +243,7 @@ osd_font_sdl::TTF_Font_ptr osd_font_sdl::search_font_config(std::string const &f
 	FcPatternAddString(pat.get(), FC_FONTFORMAT, (const FcChar8 *)"TrueType");
 
 	FcObjectSetAdd(os.get(), FC_FILE);
+	FcObjectSetAdd(os.get(), FC_INDEX);
 	std::unique_ptr<FcFontSet, void (*)(FcFontSet *)> fontset(FcFontList(config, pat.get(), os.get()), &FcFontSetDestroy);
 
 	for (int i = 0; (i < fontset->nfont) && !font; i++)
@@ -244,8 +253,9 @@ osd_font_sdl::TTF_Font_ptr osd_font_sdl::search_font_config(std::string const &f
 		{
 			osd_printf_verbose("Matching font: %s\n", val.u.s);
 
-			std::string match_name((const char*)val.u.s);
-			font = TTF_OpenFont_Magic(match_name, POINT_SIZE);
+			std::string const match_name((const char*)val.u.s);
+			long const index = ((FcPatternGet(fontset->fonts[i], FC_INDEX, 0, &val) == FcResultMatch) && (val.type == FcTypeInteger)) ? val.u.i : 0;
+			font = TTF_OpenFont_Magic(match_name, POINT_SIZE, index);
 
 			if (font)
 				bakedstyles = true;
@@ -253,6 +263,7 @@ osd_font_sdl::TTF_Font_ptr osd_font_sdl::search_font_config(std::string const &f
 	}
 
 	// didn't get a font above?  try again with no baked-in styles
+	// note that this simply returns the first match for the family name, which could be regular if you're lucky, but it could be bold oblique or something
 	if (!font && !style.empty())
 	{
 		pat.reset(FcPatternCreate());
@@ -267,8 +278,12 @@ osd_font_sdl::TTF_Font_ptr osd_font_sdl::search_font_config(std::string const &f
 			{
 				osd_printf_verbose("Matching unstyled font: %s\n", val.u.s);
 
-				std::string const match_name((const char *)val.u.s);
-				font = TTF_OpenFont_Magic(match_name, POINT_SIZE);
+				std::string const match_name((const char*)val.u.s);
+				long const index = ((FcPatternGet(fontset->fonts[i], FC_INDEX, 0, &val) == FcResultMatch) && (val.type == FcTypeInteger)) ? val.u.i : 0;
+				font = TTF_OpenFont_Magic(match_name, POINT_SIZE, index);
+
+				if (font)
+					bakedstyles = false;
 			}
 		}
 	}
