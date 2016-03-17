@@ -14,7 +14,6 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <tchar.h>
 
 #include <memory>
 
@@ -25,7 +24,6 @@
 #include <initguid.h>
 
 // Direct2D
-#include <dxgi1_2.h>
 #include <d2d1_1.h>
 #include <dwrite_1.h>
 
@@ -36,11 +34,8 @@ DEFINE_GUID(GUID_WICPixelFormat8bppAlpha, 0xe6cd0116, 0xeeba, 0x4161, 0xaa, 0x85
 #include <wrl\client.h>
 #undef interface
 
-#include "emu.h"
 #include "strconv.h"
 #include "corestr.h"
-#include "corealloc.h"
-#include "fileio.h"
 #include "winutil.h"
 
 using namespace Microsoft::WRL;
@@ -71,6 +66,16 @@ static const float POINTS_PER_DIP = (3.0f / 4.0f);
 #define HR_RETHR( CALL ) HR_RET(CALL, result)
 #define HR_RET0( CALL ) HR_RET(CALL, 0)
 #define HR_RET1( CALL ) HR_RET(CALL, 1)
+
+struct osd_deleter
+{
+	void operator () (void * osd_pointer) const
+	{
+		osd_free(osd_pointer);
+	}
+};
+
+typedef std::unique_ptr<char, osd_deleter> osd_utf8_ptr;
 
 // Typedefs for dynamically loaded functions
 typedef lazy_loaded_function_p4<HRESULT, D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS*, void**> d2d_create_factory_fn;
@@ -201,32 +206,32 @@ public:
 		m_designUnits = designUnits;
 	}
 
-	UINT16 DesignUnitsPerEm()
+	UINT16 DesignUnitsPerEm() const
 	{
 		return m_designUnitsPerEm;
 	}
 
-	float EmSizeInDip()
+	float EmSizeInDip() const
 	{
 		return m_emSizeInDip;
 	}
 
-	float DesignUnits()
+	float DesignUnits() const
 	{
 		return m_designUnits;
 	}
 
-	int Dips()
+	int Dips() const
 	{
-		return (int)floor((m_designUnits * m_emSizeInDip) / m_designUnitsPerEm);
+		return static_cast<int>(floor((m_designUnits * m_emSizeInDip) / m_designUnitsPerEm));
 	}
 
-	float Points()
+	float Points() const
 	{
 		return Dips() * POINTS_PER_DIP;
 	}
 
-	FontDimension operator-(const FontDimension &other)
+	FontDimension operator-(const FontDimension &other) const
 	{
 		if (m_designUnitsPerEm != other.m_designUnitsPerEm || m_emSizeInDip != other.m_emSizeInDip)
 		{
@@ -236,7 +241,7 @@ public:
 		return FontDimension(m_designUnitsPerEm, m_emSizeInDip, m_designUnits - other.m_designUnits);
 	}
 
-	FontDimension operator+(const FontDimension &other)
+	FontDimension operator+(const FontDimension &other) const
 	{
 		if (m_designUnitsPerEm != other.m_designUnitsPerEm || m_emSizeInDip != other.m_emSizeInDip)
 		{
@@ -267,12 +272,12 @@ public:
 	{
 	}
 
-	FontDimension advanceWidth() { return m_advanceWidth; }
-	FontDimension abcA() { return m_a; }
+	FontDimension advanceWidth() const { return m_advanceWidth; }
+	FontDimension abcA() const { return m_a; }
 
 	// Relationship between advanceWidth and B is ADV = A + B + C so B = ADV - A - C
-	FontDimension abcB() { return advanceWidth() - abcA() - abcC(); }
-	FontDimension abcC() { return m_c; }
+	FontDimension abcB() const { return advanceWidth() - abcA() - abcC(); }
+	FontDimension abcC() const { return m_c; }
 };
 
 //-------------------------------------------------
@@ -287,7 +292,7 @@ private:
 	float m_emSizeInDip;
 
 public:
-	float EmSizeInDip()
+	float EmSizeInDip() const
 	{
 		return m_emSizeInDip;
 	}
@@ -298,25 +303,25 @@ public:
 		m_emSizeInDip = emSizeInDip;
 	}
 
-	FontDimension FromDip(float dip)
+	FontDimension FromDip(float dip) const
 	{
 		float sizeInDesignUnits = (dip / m_emSizeInDip) * m_designUnitsPerEm;
 		return FontDimension(m_designUnitsPerEm, m_emSizeInDip, sizeInDesignUnits);
 	}
 
-	FontDimension FromDesignUnit(float designUnits)
+	FontDimension FromDesignUnit(float designUnits) const
 	{
 		return FontDimension(m_designUnitsPerEm, m_emSizeInDip, designUnits);
 	}
 
-	FontDimension FromPoint(float pointSize)
+	FontDimension FromPoint(float pointSize) const
 	{
 		float sizeInDip = pointSize * (4.0f / 3.0f);
 		float sizeInDesignUnits = (sizeInDip / m_emSizeInDip) * m_designUnitsPerEm;
 		return FontDimension(m_designUnitsPerEm, m_emSizeInDip, sizeInDesignUnits);
 	}
 
-	FontABCWidths CreateAbcWidths(float advanceWidth, float leftSideBearing, float rightSideBearing)
+	FontABCWidths CreateAbcWidths(float advanceWidth, float leftSideBearing, float rightSideBearing) const
 	{
 		return FontABCWidths(
 			FromDesignUnit(advanceWidth),
@@ -341,7 +346,7 @@ private:
 
 public:
 	osd_font_dwrite(ComPtr<ID2D1Factory> d2dfactory, ComPtr<IDWriteFactory> dwriteFactory, ComPtr<IWICImagingFactory> wicFactory)
-		: m_d2dfactory(d2dfactory), m_dwriteFactory(dwriteFactory), m_wicFactory(wicFactory)
+		: m_d2dfactory(d2dfactory), m_dwriteFactory(dwriteFactory), m_wicFactory(wicFactory), m_fontEmHeightInDips(0)
 	{
 	}
 
@@ -373,7 +378,7 @@ public:
 		m_font->GetMetrics(&metrics);
 
 		m_fontEmHeightInDips = DEFAULT_EM_HEIGHT;
-		height = (int)round(m_fontEmHeightInDips * DIPS_PER_POINT);
+		height = static_cast<int>(round(m_fontEmHeightInDips * DIPS_PER_POINT));
 
 		return true;
 	}
@@ -493,7 +498,7 @@ public:
 		target->Clear(D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.0f));
 
 		// now draw the character
-		DWRITE_GLYPH_RUN run = { 0 };
+		DWRITE_GLYPH_RUN run = { nullptr };
 		DWRITE_GLYPH_OFFSET offsets;
 		offsets.advanceOffset = 0;
 		offsets.ascenderOffset = 0;
@@ -528,7 +533,7 @@ public:
 		// Lock the bitmap and get the data pointer
 		WICRect rect = { 0, 0, bmwidth, bmheight };
 		HR_RET0(wicBitmap->Lock(&rect, WICBitmapLockRead, lock.GetAddressOf()));
-		HR_RET0(lock->GetDataPointer(&cbData, (BYTE**)&pixels));
+		HR_RET0(lock->GetDataPointer(&cbData, static_cast<BYTE**>(&pixels)));
 
 		// determine the actual left of the character
 		for (actbounds.min_x = 0; actbounds.min_x < bmwidth; actbounds.min_x++)
@@ -610,9 +615,9 @@ private:
 	//  find_font - finds a font, given attributes
 	//-------------------------------------------------
 
-	HRESULT find_font(std::wstring familyName, DWRITE_FONT_WEIGHT weight, DWRITE_FONT_STRETCH stretch, DWRITE_FONT_STYLE style, IDWriteFont ** ppfont)
+	HRESULT find_font(std::wstring familyName, DWRITE_FONT_WEIGHT weight, DWRITE_FONT_STRETCH stretch, DWRITE_FONT_STYLE style, IDWriteFont ** ppfont) const
 	{
-		HRESULT result = S_OK;
+		HRESULT result;
 
 		ComPtr<IDWriteFontCollection> fonts;
 		HR_RETHR(m_dwriteFactory->GetSystemFontCollection(fonts.GetAddressOf()));
@@ -695,7 +700,7 @@ public:
 			reinterpret_cast<void**>(this->m_d2dfactory.GetAddressOf())));
 
 		// Initialize COM
-		CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 		// Create a DirectWrite factory.
 		HR_RET1(m_pfnDWriteCreateFactory(
@@ -708,7 +713,7 @@ public:
 			NULL,
 			CLSCTX_INPROC_SERVER,
 			__uuidof(IWICImagingFactory),
-			(void**)&m_wicFactory));
+			static_cast<void**>(&m_wicFactory)));
 
 		osd_printf_verbose("FontProvider: DirectWrite initialized successfully.\n");
 		return 0;
@@ -719,9 +724,86 @@ public:
 		return std::make_unique<osd_font_dwrite>(m_d2dfactory, m_dwriteFactory, m_wicFactory);
 	}
 
-	virtual bool get_font_families(std::string const &font_path, std::vector<std::pair<std::string, std::string> > &result) override
+	virtual bool get_font_families(std::string const &font_path, std::vector<std::pair<std::string, std::string> > &fontresult) override
 	{
-		return false;
+		HRESULT result;
+		ComPtr<IDWriteFontFamily> family;
+		ComPtr<IDWriteLocalizedStrings> names;
+
+		// For now, we're just enumerating system fonts, if we want to support custom font
+		// collections, there's more work that neeeds to be done
+		ComPtr<IDWriteFontCollection> fonts;
+		HR_RET0(m_dwriteFactory->GetSystemFontCollection(fonts.GetAddressOf()));
+
+		int family_count = fonts->GetFontFamilyCount();
+		for (int i = 0; i < family_count; i++)
+		{
+			HR_RET0(fonts->GetFontFamily(i, family.ReleaseAndGetAddressOf()));
+
+			HR_RET0(family->GetFamilyNames(names.ReleaseAndGetAddressOf()));
+			
+			std::unique_ptr<WCHAR[]> name = nullptr;
+			HR_RET0(get_localized_familyname(names, name));
+
+			auto utf8_name = osd_utf8_ptr(utf8_from_wstring(name.get()));
+			name.reset();
+
+			// Review: should the config name, be unlocalized?
+			// maybe the english name?
+			fontresult.push_back(
+				make_pair(
+					std::string(utf8_name.get()),
+					std::string(utf8_name.get())));
+
+			utf8_name.reset();
+		}
+
+		std::stable_sort(fontresult.begin(), fontresult.end());
+		return true;
+	}
+
+private:
+	HRESULT get_family_for_locale(ComPtr<IDWriteLocalizedStrings> family_names, const WCHAR* locale, std::unique_ptr<WCHAR[]> &family_name) const
+	{
+		HRESULT result;
+		UINT32 index;
+		BOOL exists = false;
+
+		result = family_names->FindLocaleName(locale, &index, &exists);
+
+		// if the above find did not find a match, retry with US English
+		if (SUCCEEDED(result) && !exists)
+			family_names->FindLocaleName(L"en-us", &index, &exists);
+
+		// If the specified locale doesn't exist, select the first on the list.
+		if (!exists)
+			index = 0;
+
+		// Get the length and allocate our buffer
+		UINT32 name_length = 0;
+		HR_RETHR(family_names->GetStringLength(index, &name_length));
+		auto name_buffer = std::make_unique<WCHAR[]>(name_length + 1);
+
+		// Get the name
+		HR_RETHR(family_names->GetString(index, name_buffer.get(), name_length + 1));
+
+		family_name = std::move(name_buffer);
+		return S_OK;
+	}
+
+	HRESULT get_localized_familyname(ComPtr<IDWriteLocalizedStrings> family_names, std::unique_ptr<WCHAR[]> &family_name) const
+	{
+		wchar_t localeName[LOCALE_NAME_MAX_LENGTH];
+
+		// Get the default locale for this user.
+		int defaultLocaleSuccess = GetUserDefaultLocaleName(localeName, LOCALE_NAME_MAX_LENGTH);
+
+		// If the default locale is returned, find that locale name, otherwise use "en-us".
+		if (defaultLocaleSuccess)
+			return get_family_for_locale(family_names, localeName, family_name);
+		
+		// If locale can't be determined, fall back to US English
+		return get_family_for_locale(family_names, L"en-us", family_name);
 	}
 };
 
