@@ -8,15 +8,19 @@
 #include "font_module.h"
 #include "modules/osdmodule.h"
 
-#if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX) && !defined(SDLMAME_SOLARIS) && !defined(SDLMAME_HAIKU) && !defined(SDLMAME_EMSCRIPTEN)
+#if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX) && !defined(SDLMAME_SOLARIS) && !defined(SDLMAME_HAIKU)
 
 #include "corestr.h"
 #include "corealloc.h"
 #include "fileio.h"
 #include "unicode.h"
 
+#ifdef SDLMAME_EMSCRIPTEN
+#include <SDL_ttf.h>
+#else
 #include <SDL2/SDL_ttf.h>
-#ifndef SDLMAME_HAIKU
+#endif
+#if !defined(SDLMAME_HAIKU) && !defined(SDLMAME_EMSCRIPTEN)
 #include <fontconfig/fontconfig.h>
 #endif
 
@@ -52,7 +56,7 @@ private:
 
 	static constexpr double POINT_SIZE = 144.0;
 
-#ifndef SDLMAME_HAIKU
+#if !defined(SDLMAME_HAIKU) && !defined(SDLMAME_EMSCRIPTEN)
 	TTF_Font_ptr search_font_config(std::string const &name, bool bold, bool italic, bool underline, bool &bakedstyles);
 #endif
 	bool BDF_Check_Magic(std::string const &name);
@@ -97,7 +101,7 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 	}
 
 	// if that didn't work, crank up the FontConfig database
-#ifndef SDLMAME_HAIKU
+#if !defined(SDLMAME_HAIKU) && !defined(SDLMAME_EMSCRIPTEN)
 	if (!font)
 	{
 		font = search_font_config(name, bold, italic, underline, bakedstyles);
@@ -214,7 +218,7 @@ bool osd_font_sdl::BDF_Check_Magic(std::string const &name)
 	return false;
 }
 
-#ifndef SDLMAME_HAIKU
+#if !defined(SDLMAME_HAIKU) && !defined(SDLMAME_EMSCRIPTEN)
 osd_font_sdl::TTF_Font_ptr osd_font_sdl::search_font_config(std::string const &name, bool bold, bool italic, bool underline, bool &bakedstyles)
 {
 	TTF_Font_ptr font(nullptr, &TTF_CloseFont);
@@ -296,12 +300,12 @@ public:
 	{
 	}
 
-	osd_font::ptr font_alloc()
+	osd_font::ptr font_alloc() override
 	{
 		return std::make_unique<osd_font_sdl>();
 	}
 
-	virtual int init(const osd_options &options)
+	virtual int init(const osd_options &options) override
 	{
 		if (TTF_Init() == -1)
 		{
@@ -311,7 +315,7 @@ public:
 		return 0;
 	}
 
-	virtual void exit()
+	virtual void exit() override
 	{
 		TTF_Quit();
 	}
@@ -326,6 +330,7 @@ bool font_sdl::get_font_families(std::string const &font_path, std::vector<std::
 
 	// TODO: enumerate TTF files in font path, since we can load them, too
 
+#if !defined(SDLMAME_HAIKU) && !defined(SDLMAME_EMSCRIPTEN)
 	FcConfig *const config = FcConfigGetCurrent();
 	std::unique_ptr<FcPattern, void (*)(FcPattern *)> pat(FcPatternCreate(), &FcPatternDestroy);
 	FcPatternAddString(pat.get(), FC_FONTFORMAT, (const FcChar8 *)"TrueType");
@@ -355,6 +360,7 @@ bool font_sdl::get_font_families(std::string const &font_path, std::vector<std::
 			if ((result.end() == pos) || (pos->first != font.first)) result.emplace(pos, std::move(font));
 		}
 	}
+#endif
 
 	return true;
 }

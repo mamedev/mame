@@ -1059,6 +1059,7 @@ configuration { "asmjs" }
 	buildoptions {
 		"-std=gnu89",
 		"-Wno-implicit-function-declaration",
+		"-s USE_SDL_TTF=2",
 	}
 	buildoptions_cpp {
 		"-x c++",
