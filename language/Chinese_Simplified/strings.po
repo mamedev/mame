@@ -79,12 +79,14 @@ msgstr "已启用"
 #: src/emu/ui/cheatopt.cpp:284 src/emu/ui/cheatopt.cpp:290
 #: src/emu/ui/dsplmenu.cpp:184 src/emu/ui/menu.cpp:674
 #: src/emu/ui/sndmenu.cpp:134 src/emu/ui/sndmenu.cpp:136
+#: src/emu/ui/miscmenu.cpp:637
 msgid "On"
 msgstr "开"
 
 #: src/emu/ui/cheatopt.cpp:284 src/emu/ui/cheatopt.cpp:290
 #: src/emu/ui/dsplmenu.cpp:184 src/emu/ui/menu.cpp:677
 #: src/emu/ui/sndmenu.cpp:134 src/emu/ui/sndmenu.cpp:136
+#: src/emu/ui/miscmenu.cpp:637
 msgid "Off"
 msgstr "关"
 
