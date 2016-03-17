@@ -109,6 +109,7 @@ end
 			local emccopts = ""
 			emccopts = emccopts .. " -O3"
 			emccopts = emccopts .. " -s USE_SDL=2"
+			emccopts = emccopts .. " -s USE_SDL_TTF=2"
 			emccopts = emccopts .. " --memory-init-file 0"
 			emccopts = emccopts .. " -s ALLOW_MEMORY_GROWTH=0"
 			emccopts = emccopts .. " -s TOTAL_MEMORY=268435456"

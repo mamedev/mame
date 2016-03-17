@@ -416,6 +416,7 @@ void ssem_state::glyph_print(bitmap_rgb32 &bitmap, INT32 x, INT32 y, Format &&fm
 {
 	const rectangle &visarea = m_screen->visible_area();
 
+	m_glyph_print_buf.clear();
 	m_glyph_print_buf.seekp(0, util::ovectorstream::beg);
 	util::stream_format(m_glyph_print_buf, std::forward<Format>(fmt), std::forward<Params>(args)...);
 	m_glyph_print_buf.put('\0');

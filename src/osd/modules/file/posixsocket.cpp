@@ -50,10 +50,6 @@ public:
 
 	virtual error read(void *buffer, std::uint64_t offset, std::uint32_t count, std::uint32_t &actual) override
 	{
-#if defined(EMSCRIPTEN)
-		m_listening = false;
-		return error::FAILURE; // TODO: work out what it dislikes about emscripten
-#else
 		fd_set readfds;
 		FD_ZERO(&readfds);
 		FD_SET(m_sock, &readfds);
@@ -107,7 +103,6 @@ public:
 		{
 			return error::FAILURE;
 		}
-#endif
 	}
 
 	virtual error write(void const *buffer, std::uint64_t offset, std::uint32_t count, std::uint32_t &actual) override
