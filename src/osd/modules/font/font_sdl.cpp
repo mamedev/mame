@@ -57,7 +57,7 @@ private:
 	static constexpr double POINT_SIZE = 144.0;
 
 #if !defined(SDLMAME_HAIKU) && !defined(SDLMAME_EMSCRIPTEN)
-	TTF_Font_ptr search_font_config(std::string const &name, bool bold, bool italic, bool underline, bool &bakedstyles);
+	TTF_Font_ptr search_font_config(std::string const &family, std::string const &style, bool &bakedstyles);
 #endif
 	bool BDF_Check_Magic(std::string const &name);
 	TTF_Font_ptr TTF_OpenFont_Magic(std::string const &name, int fsize);
@@ -69,29 +69,29 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 {
 	bool bakedstyles = false;
 
-	// accept qualifiers from the name
 	std::string name(_name);
 	if (name.compare("default") == 0)
 	{
-		name = "Liberation Sans";
+		name = "Liberation Sans|Regular";
 	}
 
-	bool const bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
-	bool const italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
+	// accept qualifiers from the name
 	bool const underline = (strreplace(name, "[U]", "") + strreplace(name, "[u]", "") > 0);
 	bool const strike = (strreplace(name, "[S]", "") + strreplace(name, "[s]", "") > 0);
+	std::string::size_type const separator = name.rfind('|');
+	std::string const family(name.substr(0, separator));
+	std::string const style((std::string::npos != separator) ? name.substr(separator + 1) : std::string());
 
 	// first up, try it as a filename
-	TTF_Font_ptr font = TTF_OpenFont_Magic(name, POINT_SIZE);
+	TTF_Font_ptr font = TTF_OpenFont_Magic(family, POINT_SIZE);
 
 	// if no success, try the font path
-
 	if (!font)
 	{
-		osd_printf_verbose("Searching font %s in -%s\n", name.c_str(), OPTION_FONTPATH);
+		osd_printf_verbose("Searching font %s in -%s\n", family.c_str(), OPTION_FONTPATH);
 		//emu_file file(options().font_path(), OPEN_FLAG_READ);
 		emu_file file(font_path.c_str(), OPEN_FLAG_READ);
-		if (file.open(name.c_str()) == osd_file::error::NONE)
+		if (file.open(family.c_str()) == osd_file::error::NONE)
 		{
 			std::string full_name = file.fullpath();
 			font = TTF_OpenFont_Magic(full_name, POINT_SIZE);
@@ -104,7 +104,7 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 #if !defined(SDLMAME_HAIKU) && !defined(SDLMAME_EMSCRIPTEN)
 	if (!font)
 	{
-		font = search_font_config(name, bold, italic, underline, bakedstyles);
+		font = search_font_config(family, style, bakedstyles);
 	}
 #endif
 
@@ -118,21 +118,21 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 	}
 
 	// apply styles
-	int style = 0;
+	int styleflags = 0;
 	if (!bakedstyles)
 	{
-		style |= bold ? TTF_STYLE_BOLD : 0;
-		style |= italic ? TTF_STYLE_ITALIC : 0;
+		if ((style.find("Bold") != std::string::npos) || (style.find("Black") != std::string::npos)) styleflags |= TTF_STYLE_BOLD;
+		if ((style.find("Italic") != std::string::npos) || (style.find("Oblique") != std::string::npos)) styleflags |= TTF_STYLE_ITALIC;
 	}
-	style |= underline ? TTF_STYLE_UNDERLINE : 0;
+	styleflags |= underline ? TTF_STYLE_UNDERLINE : 0;
 	// SDL_ttf 2.0.9 and earlier does not define TTF_STYLE_STRIKETHROUGH
 #if SDL_VERSIONNUM(TTF_MAJOR_VERSION, TTF_MINOR_VERSION, TTF_PATCHLEVEL) > SDL_VERSIONNUM(2,0,9)
-	style |= strike ? TTF_STYLE_STRIKETHROUGH : 0;
+	styleflags |= strike ? TTF_STYLE_STRIKETHROUGH : 0;
 #else
 	if (strike)
 		osd_printf_warning("Ignoring strikethrough for SDL_TTF older than 2.0.10\n");
 #endif // PATCHLEVEL
-	TTF_SetFontStyle(font.get(), style);
+	TTF_SetFontStyle(font.get(), styleflags);
 
 	height = TTF_FontLineSkip(font.get());
 
@@ -219,31 +219,18 @@ bool osd_font_sdl::BDF_Check_Magic(std::string const &name)
 }
 
 #if !defined(SDLMAME_HAIKU) && !defined(SDLMAME_EMSCRIPTEN)
-osd_font_sdl::TTF_Font_ptr osd_font_sdl::search_font_config(std::string const &name, bool bold, bool italic, bool underline, bool &bakedstyles)
+osd_font_sdl::TTF_Font_ptr osd_font_sdl::search_font_config(std::string const &family, std::string const &style, bool &bakedstyles)
 {
 	TTF_Font_ptr font(nullptr, &TTF_CloseFont);
 
 	FcConfig *const config = FcConfigGetCurrent();
 	std::unique_ptr<FcPattern, void (*)(FcPattern *)> pat(FcPatternCreate(), &FcPatternDestroy);
 	std::unique_ptr<FcObjectSet, void (*)(FcObjectSet *)> os(FcObjectSetCreate(), &FcObjectSetDestroy);
-	FcPatternAddString(pat.get(), FC_FAMILY, (const FcChar8 *)name.c_str());
+	FcPatternAddString(pat.get(), FC_FAMILY, (const FcChar8 *)family.c_str());
 
 	// try and get a font with the requested styles baked-in
-	if (bold)
-	{
-		if (italic)
-			FcPatternAddString(pat.get(), FC_STYLE, (const FcChar8 *)"Bold Italic");
-		else
-			FcPatternAddString(pat.get(), FC_STYLE, (const FcChar8 *)"Bold");
-	}
-	else if (italic)
-	{
-		FcPatternAddString(pat.get(), FC_STYLE, (const FcChar8 *)"Italic");
-	}
-	else
-	{
-		FcPatternAddString(pat.get(), FC_STYLE, (const FcChar8 *)"Regular");
-	}
+	if (!style.empty())
+		FcPatternAddString(pat.get(), FC_STYLE, (const FcChar8 *)style.c_str());
 
 	FcPatternAddString(pat.get(), FC_FONTFORMAT, (const FcChar8 *)"TrueType");
 
@@ -266,12 +253,10 @@ osd_font_sdl::TTF_Font_ptr osd_font_sdl::search_font_config(std::string const &n
 	}
 
 	// didn't get a font above?  try again with no baked-in styles
-	if (!font)
+	if (!font && !style.empty())
 	{
 		pat.reset(FcPatternCreate());
-		FcPatternAddString(pat.get(), FC_FAMILY, (const FcChar8 *)name.c_str());
-		//Quite a lot of fonts don't have a "Regular" font type attribute
-		//FcPatternAddString(pat.get(), FC_STYLE, (const FcChar8 *)"Regular");
+		FcPatternAddString(pat.get(), FC_FAMILY, (const FcChar8 *)family.c_str());
 		FcPatternAddString(pat.get(), FC_FONTFORMAT, (const FcChar8 *)"TrueType");
 		fontset.reset(FcFontList(config, pat.get(), os.get()));
 
@@ -338,6 +323,7 @@ bool font_sdl::get_font_families(std::string const &font_path, std::vector<std::
 	std::unique_ptr<FcObjectSet, void (*)(FcObjectSet *)> os(FcObjectSetCreate(), &FcObjectSetDestroy);
 	FcObjectSetAdd(os.get(), FC_FAMILY);
 	FcObjectSetAdd(os.get(), FC_FILE);
+	FcObjectSetAdd(os.get(), FC_STYLE);
 
 	std::unique_ptr<FcFontSet, void (*)(FcFontSet *)> fontset(FcFontList(config, pat.get(), os.get()), &FcFontSetDestroy);
 	for (int i = 0; (i < fontset->nfont); i++)
@@ -350,19 +336,30 @@ bool font_sdl::get_font_families(std::string const &font_path, std::vector<std::
 		{
 			auto const compare_fonts = [](std::pair<std::string, std::string> const &a, std::pair<std::string, std::string> const &b) -> bool
 			{
-				int const first = core_stricmp(a.first.c_str(), b.first.c_str());
-				if (first < 0) return true;
-				else if (first > 0) return false;
-				else return core_stricmp(b.second.c_str(), b.second.c_str()) < 0;
+				int const second = core_stricmp(a.second.c_str(), b.second.c_str());
+				if (second < 0) return true;
+				else if (second > 0) return false;
+				else return core_stricmp(b.first.c_str(), b.first.c_str()) < 0;
 			};
-			std::pair<std::string, std::string> font((const char *)val.u.s, (const char *)val.u.s);
+			std::string config((const char *)val.u.s);
+			std::string display(config);
+			if ((FcPatternGet(fontset->fonts[i], FC_STYLE, 0, &val) == FcResultMatch) && (val.type == FcTypeString))
+			{
+				config.push_back('|');
+				config.append((const char *)val.u.s);
+				display.push_back(' ');
+				display.append((const char *)val.u.s);
+			}
+			std::pair<std::string, std::string> font(std::move(config), std::move(display));
 			auto const pos = std::lower_bound(result.begin(), result.end(), font, compare_fonts);
 			if ((result.end() == pos) || (pos->first != font.first)) result.emplace(pos, std::move(font));
 		}
 	}
-#endif
 
 	return true;
+#else
+	return false;
+#endif
 }
 
 #else /* SDLMAME_UNIX */
