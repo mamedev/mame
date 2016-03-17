@@ -12,6 +12,9 @@
 #if 0
 #pragma GCC optimize "-ffast-math"
 #pragma GCC optimize "-fstrict-aliasing"
+#pragma GCC optimize "-ftree-vectorizer-verbose=2"
+#pragma GCC optimize "-fopt-info-vec"
+#pragma GCC optimize "-fopt-info-vec-missed"
 //#pragma GCC optimize "-ftree-parallelize-loops=4"
 #pragma GCC optimize "-funroll-loops"
 #pragma GCC optimize "-funswitch-loops"
@@ -79,7 +82,7 @@ ATTR_COLD void terms_t::set_pointers()
 		m_term[i]->m_gt1 = &m_gt[i];
 		m_term[i]->m_go1 = &m_go[i];
 		m_term[i]->m_Idr1 = &m_Idr[i];
-		m_other_curanalog[i] = &m_term[i]->m_otherterm->net().as_analog().m_cur_Analog;
+		m_other_curanalog[i] = &m_term[i]->m_otherterm->net().m_cur_Analog;
 	}
 }
 
@@ -188,7 +191,7 @@ ATTR_HOT void matrix_solver_t::update_inputs()
 {
 	// avoid recursive calls. Inputs are updated outside this call
 	for (std::size_t i=0; i<m_inps.size(); i++)
-		m_inps[i]->set_Q(m_inps[i]->m_proxied_net->m_cur_Analog);
+		m_inps[i]->set_Q(m_inps[i]->m_proxied_net->Q_Analog());
 }
 
 ATTR_HOT void matrix_solver_t::update_dynamic()
@@ -304,7 +307,7 @@ ATTR_COLD int matrix_solver_t::get_net_idx(net_t *net)
 
 void matrix_solver_t::log_stats()
 {
-	if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
+	//if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
 	{
 		log().verbose("==============================================");
 		log().verbose("Solver {1}", this->name());
@@ -449,7 +452,12 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_sp
 		{
 			if (pstring("SOR_MAT").equals(m_iterative_solver))
 			{
-				typedef matrix_solver_SOR_mat_t<m_N,_storage_N> solver_mat;
+				typedef matrix_solver_SOR_mat_t<m_N,_storage_N> solver_sor_mat;
+				return palloc(solver_sor_mat(&m_params, size));
+			}
+			else if (pstring("MAT").equals(m_iterative_solver))
+			{
+				typedef matrix_solver_direct_t<m_N,_storage_N> solver_mat;
 				return palloc(solver_mat(&m_params, size));
 			}
 			else if (pstring("SOR").equals(m_iterative_solver))
@@ -478,8 +486,7 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_sp
 
 ATTR_COLD void NETLIB_NAME(solver)::post_start()
 {
-	analog_net_t::list_t groups[256];
-	int cur_group = -1;
+	pvector_t<analog_net_t::list_t> groups;
 	const bool use_specific = true;
 
 	m_params.m_pivot = m_pivot.Value();
@@ -519,20 +526,20 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 		{
 			netlist().log().debug("   ==> not a rail net\n");
 			analog_net_t *n = &net->as_analog();
-			if (!n->already_processed(groups, cur_group))
+			if (!n->already_processed(groups))
 			{
-				cur_group++;
-				n->process_net(groups, cur_group);
+				groups.push_back(analog_net_t::list_t());
+				n->process_net(groups);
 			}
 		}
 	}
 
 	// setup the solvers
-	netlist().log().verbose("Found {1} net groups in {2} nets\n", cur_group + 1, netlist().m_nets.size());
-	for (int i = 0; i <= cur_group; i++)
+	netlist().log().verbose("Found {1} net groups in {2} nets\n", groups.size(), netlist().m_nets.size());
+	for (auto & grp : groups)
 	{
 		matrix_solver_t *ms;
-		std::size_t net_count = groups[i].size();
+		std::size_t net_count = grp.size();
 
 		switch (net_count)
 		{
@@ -613,21 +620,19 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
 		register_sub(pfmt("Solver_{1}")(m_mat_solvers.size()), *ms);
 
-		ms->vsetup(groups[i]);
+		ms->vsetup(grp);
 
 		m_mat_solvers.push_back(ms);
 
 		netlist().log().verbose("Solver {1}", ms->name());
-		netlist().log().verbose("       # {1} ==> {2} nets", i, groups[i].size());
+		netlist().log().verbose("       ==> {2} nets", grp.size());
 		netlist().log().verbose("       has {1} elements", ms->is_dynamic() ? "dynamic" : "no dynamic");
 		netlist().log().verbose("       has {1} elements", ms->is_timestep() ? "timestep" : "no timestep");
-		for (std::size_t j=0; j<groups[i].size(); j++)
+		for (net_t *n : grp)
 		{
-			netlist().log().verbose("Net {1}: {2}", j, groups[i][j]->name());
-			net_t *n = groups[i][j];
-			for (std::size_t k = 0; k < n->m_core_terms.size(); k++)
+			netlist().log().verbose("Net {1}", n->name());
+			for (const core_terminal_t *pcore : n->m_core_terms)
 			{
-				const core_terminal_t *pcore = n->m_core_terms[k];
 				netlist().log().verbose("   {1}", pcore->name());
 			}
 		}

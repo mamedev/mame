@@ -95,7 +95,7 @@ ATTR_HOT nl_double matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 		for (unsigned k = 0; k < this->N(); k++)
 		{
 			const analog_net_t *n = this->m_nets[k];
-			const nl_double nv = (n->m_cur_Analog - this->m_last_V[k]) * rez_cts ;
+			const nl_double nv = (n->Q_Analog() - this->m_last_V[k]) * rez_cts ;
 			sq += nv * nv;
 			sqo += this->m_Vdelta[k] * this->m_Vdelta[k];
 			this->m_Vdelta[k] = nv;

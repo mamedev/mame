@@ -467,7 +467,6 @@ public:
 
 	struct element_t
 	{
-		element_t() { }
 		element_t(const K &key, const H &hash, const V &value)
 		: m_key(key), m_hash(hash), m_value(value), m_next(-1)
 		{}
