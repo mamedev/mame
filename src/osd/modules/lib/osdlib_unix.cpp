@@ -14,10 +14,6 @@
 #include <sys/types.h>
 #include <signal.h>
 
-#ifdef SDLMAME_EMSCRIPTEN
-#include <emscripten.h>
-#endif
-
 // MAME headers
 #include "osdcore.h"
 #include "osdlib.h"

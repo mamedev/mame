@@ -2587,3 +2587,41 @@ if (BUSES["NEWBRAIN"]~=null) then
 		MAME_DIR .. "src/devices/bus/newbrain/fdc.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/svi3x8/expander/expander.h,BUSES["SVI_EXPANDER"] = true
+---------------------------------------------------
+
+if (BUSES["SVI_EXPANDER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/expander.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/expander.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/modules.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/modules.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv601.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv601.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/svi3x8/slot/slot.h,BUSES["SVI_SLOT"] = true
+---------------------------------------------------
+
+if (BUSES["SVI_SLOT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/slot.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/slot.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/cards.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/cards.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv801.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv801.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv803.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv803.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv806.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv806.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv807.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv807.h",
+	}
+end

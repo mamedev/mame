@@ -1059,6 +1059,7 @@ configuration { "asmjs" }
 	buildoptions {
 		"-std=gnu89",
 		"-Wno-implicit-function-declaration",
+		"-s USE_SDL_TTF=2",
 	}
 	buildoptions_cpp {
 		"-x c++",
@@ -1280,6 +1281,7 @@ end
 		}
 configuration { "vs2015" }
 		buildoptions {
+			"/wd4334", -- warning C4334: '<<': result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?) 
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
 			"/wd4458", -- warning C4458: declaration of 'xxx' hides class member

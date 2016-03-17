@@ -431,7 +431,7 @@ void m7z_file_impl::make_utf8_name(int index)
 			out_pos += produced;
 		assert(out_pos < m_utf8_buf.size());
 	}
-	m_utf16_buf[out_pos++] = '\0';
+	m_utf8_buf[out_pos++] = '\0';
 }
 
 } // anonymous namespace

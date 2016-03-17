@@ -653,48 +653,23 @@ ATTR_COLD void net_t::save_register()
 	object_t::save_register();
 }
 
-ATTR_HOT /* inline */ void core_terminal_t::update_dev(const UINT32 mask)
-{
-	inc_stat(netdev().stat_call_count);
-	if ((state() & mask) != 0)
-	{
-		device().update_dev();
-	}
-}
-
 ATTR_HOT /* inline */ void net_t::update_devs()
 {
 	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());
 
-	const UINT32 masks[4] = { 1, 5, 3, 1 };
-	const UINT32 mask = masks[ (m_cur_Q  << 1) | m_new_Q ];
+	const int masks[4] = { 1, 5, 3, 1 };
+	const int mask = masks[ (m_cur_Q  << 1) | m_new_Q ];
 
 	m_in_queue = 2; /* mark as taken ... */
 	m_cur_Q = m_new_Q;
-#if 0
-	core_terminal_t * t[256];
-	core_terminal_t *p = m_list_active.first();
-	int cnt = 0;
-	while (p != NULL)
+
+	for (core_terminal_t *p = m_list_active.first(); p != NULL; p = p->next())
 	{
+		inc_stat(p->netdev().stat_call_count);
 		if ((p->state() & mask) != 0)
-			t[cnt++] = p;
-		p = m_list_active.next(p);
+			p->device().update_dev();
 	}
-
-	for (int i=0; i<cnt; i++)
-		t[i]->device().update_dev();
-
-#else
-	core_terminal_t *p = m_list_active.first();
-
-	while (p != NULL)
-	{
-		p->update_dev(mask);
-		p = m_list_active.next(p);
-	}
-#endif
 }
 
 ATTR_COLD void net_t::reset()

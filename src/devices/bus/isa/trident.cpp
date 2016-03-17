@@ -191,6 +191,7 @@ void trident_vga_device::device_reset()
 	// Windows 3.1 TGUI9440AGi drivers do not set the pointer colour registers?
 	tri.cursor_bg = 0x00000000;
 	tri.cursor_fg = 0xffffffff;
+	tri.pixel_depth = 0x10;  //disable 8bpp mode by default
 }
 
 UINT32 trident_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -443,7 +444,6 @@ void trident_vga_device::trident_seq_reg_write(UINT8 index, UINT8 data)
 	}
 	else
 	{
-		if(LOG) logerror("Trident SR%02X: %s mode write %02x\n",index,tri.new_mode ? "new" : "old",data);
 		switch(index)
 		{
 			case 0x0b:
@@ -490,6 +490,7 @@ void trident_vga_device::trident_seq_reg_write(UINT8 index, UINT8 data)
 				if(!LOG) logerror("Trident: Sequencer index %02x read\n",index);
 		}
 	}
+	if(LOG) logerror("Trident SR%02X: %s mode write %02x\n",index,tri.new_mode ? "new" : "old",data);
 }
 
 UINT8 trident_vga_device::trident_crtc_reg_read(UINT8 index)
@@ -605,7 +606,6 @@ void trident_vga_device::trident_crtc_reg_write(UINT8 index, UINT8 data)
 	}
 	else
 	{
-		if(LOG) logerror("Trident CR%02X: write %02x\n",index,data);
 		switch(index)
 		{
 		case 0x1e:  // Module Testing Register
@@ -704,6 +704,7 @@ void trident_vga_device::trident_crtc_reg_write(UINT8 index, UINT8 data)
 			break;
 		}
 	}
+	if(LOG) logerror("Trident CR%02X: write %02x\n",index,data);
 }
 
 UINT8 trident_vga_device::trident_gc_reg_read(UINT8 index)
@@ -764,6 +765,7 @@ void trident_vga_device::trident_gc_reg_write(UINT8 index, UINT8 data)
 			break;
 		}
 	}
+	if(LOG) logerror("Trident GC%02X: write %02x\n",index,data);
 }
 
 READ8_MEMBER(trident_vga_device::port_03c0_r)

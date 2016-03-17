@@ -23,7 +23,7 @@ If the output isn't satisfactory, it prints "I/O BOARD FAILURE".
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pcshare.h"
-#include "video/pc_vga.h"
+#include "bus/isa/trident.h"
 #include "machine/bankdev.h"
 #include "machine/ds128x.h"
 #include "machine/ins8250.h"
@@ -56,7 +56,7 @@ WRITE8_MEMBER(pcat_dyn_state::bank2_w)
 
 static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, pcat_dyn_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
+	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", trident_vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
     AM_RANGE(0x000d0000, 0x000d0fff) AM_ROM AM_REGION("game_prg", 0x0000) AM_WRITE8(bank1_w, 0xffffffff)
     AM_RANGE(0x000d1000, 0x000d1fff) AM_ROM AM_REGION("game_prg", 0x1000) AM_WRITE8(bank2_w, 0xffffffff)
@@ -70,9 +70,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pcat_io, AS_IO, 32, pcat_dyn_state )
 	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
+	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", trident_vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
+	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", trident_vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", trident_vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16550", ns16550_device, ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
@@ -126,7 +126,7 @@ static MACHINE_CONFIG_START( pcat_dyn, pcat_dyn_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
 

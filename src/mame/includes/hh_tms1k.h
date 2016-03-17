@@ -9,9 +9,14 @@
 #ifndef _HH_TMS1K_H_
 #define _HH_TMS1K_H_
 
-
 #include "emu.h"
-#include "cpu/tms0980/tms0980.h"
+#include "cpu/tms1000/tms1000.h"
+#include "cpu/tms1000/tms1100.h"
+#include "cpu/tms1000/tms1400.h"
+#include "cpu/tms1000/tms0970.h"
+#include "cpu/tms1000/tms0980.h"
+#include "cpu/tms1000/tms0270.h"
+#include "cpu/tms1000/tp0320.h"
 #include "sound/speaker.h"
 
 

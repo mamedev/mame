@@ -210,18 +210,14 @@ public:
 
 	ATTR_HOT  void remove(const _ListClass &elem)
 	{
-		_ListClass **p = &m_head;
-		while (*p != &elem)
+		_ListClass **p;
+		for (p = &m_head; *p != &elem; p = &((*p)->m_next))
 		{
 			//nl_assert(*p != NULL);
-			p = &((*p)->m_next);
 		}
 		(*p) = elem.m_next;
 	}
 
-
-	ATTR_HOT static  _ListClass *next(const _ListClass &elem) { return elem.m_next; }
-	ATTR_HOT static  _ListClass *next(const _ListClass *elem) { return elem->m_next; }
 	ATTR_HOT  _ListClass *first() const { return m_head; }
 	ATTR_HOT  void clear() { m_head = NULL; }
 	ATTR_HOT  bool is_empty() const { return (m_head == NULL); }

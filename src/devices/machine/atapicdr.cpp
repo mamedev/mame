@@ -72,9 +72,13 @@ void atapi_cdrom_device::device_start()
 
 	m_identify_buffer[ 49 ] = 0x0600; // Word 49=Capabilities, IORDY may be disabled (bit_10), LBA Supported mandatory (bit_9)
 
-	m_media_change = true;
-
 	atapi_hle_device::device_start();
+}
+
+void atapi_cdrom_device::device_reset()
+{
+	atapi_hle_device::device_reset();
+	m_media_change = true;
 }
 
 void atapi_cdrom_device::process_buffer()
@@ -130,10 +134,10 @@ void atapi_cdrom_device::ExecCommand()
 			}
 			break;
 		case T10SPC_CMD_INQUIRY:
+			break;
 		case T10SPC_CMD_REQUEST_SENSE:
+			m_media_change = false;
 			break;
 	}
 	t10mmc::ExecCommand();
-	if((command[0] == T10SPC_CMD_REQUEST_SENSE) && m_media_change)
-		m_media_change = false;
 }

@@ -1523,27 +1523,12 @@ MACHINE_CONFIG_END
 ROM_START( aes )
 	ROM_REGION16_BE( 0x20000, "mainbios", 0 )
 	ROM_SYSTEM_BIOS( 0, "asia", "Asia AES" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "neo-epo.bin",       0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07) ) /* AES Console (Asia?) Bios */
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "neo-epo.bin",  0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07) ) /* AES Console (Asia?) Bios */
 	ROM_SYSTEM_BIOS( 1, "japan", "Japan AES" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "neo-po.bin",        0x00000, 0x020000, CRC(16d0c132) SHA1(4e4a440cae46f3889d20234aebd7f8d5f522e22c) ) /* AES Console (Japan) Bios */
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "neo-po.bin",   0x00000, 0x020000, CRC(16d0c132) SHA1(4e4a440cae46f3889d20234aebd7f8d5f522e22c) ) /* AES Console (Japan) Bios */
 	ROM_SYSTEM_BIOS( 2, "devel", "Development System ROM" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "neodebug.rom",      0x00000, 0x020000, CRC(698ebb7d) SHA1(081c49aa8cc7dad5939833dc1b18338321ea0a07) ) /* Official debug (development) ROM, for home-use base board */
-	ROM_SYSTEM_BIOS( 3, "unibios31", "Universe Bios (Hack, Ver. 3.1)" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 3, "uni-bios_3_1.rom",  0x00000, 0x020000, CRC(0c58093f) SHA1(29329a3448c2505e1ff45ffa75e61e9693165153) ) /* Universe Bios v3.1 (hack) */
-	ROM_SYSTEM_BIOS( 4, "unibios30", "Universe Bios (Hack, Ver. 3.0)" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 4, "uni-bios_3_0.rom",  0x00000, 0x020000, CRC(a97c89a9) SHA1(97a5eff3b119062f10e31ad6f04fe4b90d366e7f) ) /* Universe Bios v3.0 (hack) */
-	ROM_SYSTEM_BIOS( 5, "unibios23", "Universe Bios (Hack, Ver. 2.3)" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 5, "uni-bios_2_3.rom",  0x00000, 0x020000, CRC(27664eb5) SHA1(5b02900a3ccf3df168bdcfc98458136fd2b92ac0) ) /* Universe Bios v2.3 (hack) */
-	ROM_SYSTEM_BIOS( 6, "unibios23o", "Universe Bios (Hack, Ver. 2.3, older?)" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 6, "uni-bios_2_3o.rom", 0x00000, 0x020000, CRC(601720ae) SHA1(1b8a72c720cdb5ee3f1d735bbcf447b09204b8d9) ) /* Universe Bios v2.3 (hack) alt version, withdrawn? */
-	ROM_SYSTEM_BIOS( 7, "unibios22", "Universe Bios (Hack, Ver. 2.2)" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 7, "uni-bios_2_2.rom",  0x00000, 0x020000, CRC(2d50996a) SHA1(5241a4fb0c63b1a23fd1da8efa9c9a9bd3b4279c) ) /* Universe Bios v2.2 (hack) */
-	ROM_SYSTEM_BIOS( 8, "unibios21", "Universe Bios (Hack, Ver. 2.1)" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 8, "uni-bios_2_1.rom",  0x00000, 0x020000, CRC(8dabf76b) SHA1(c23732c4491d966cf0373c65c83c7a4e88f0082c) ) /* Universe Bios v2.1 (hack) */
-	ROM_SYSTEM_BIOS( 9, "unibios20", "Universe Bios (Hack, Ver. 2.0)" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 9, "uni-bios_2_0.rom",  0x00000, 0x020000, CRC(0c12c2ad) SHA1(37bcd4d30f3892078b46841d895a6eff16dc921e) ) /* Universe Bios v2.0 (hack) */
-	ROM_SYSTEM_BIOS(10, "unibios13", "Universe Bios (Hack, Ver. 1.3)" )
-	ROM_LOAD16_WORD_SWAP_BIOS(10, "uni-bios_1_3.rom",  0x00000, 0x020000, CRC(b24b44a0) SHA1(eca8851d30557b97c309a0d9f4a9d20e5b14af4e) ) /* Universe Bios v1.3 (hack) - note: versions older than 1.3 don't support AES hardware */
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "neodebug.rom", 0x00000, 0x020000, CRC(698ebb7d) SHA1(081c49aa8cc7dad5939833dc1b18338321ea0a07) ) /* Official debug (development) ROM, for home-use base board */
+	NEOGEO_UNIBIOS(3)
 
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 

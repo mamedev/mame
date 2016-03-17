@@ -117,17 +117,6 @@ public:
 	UINT64 as_ticks(UINT32 frequency) const;
 	const char *as_string(int precision = 9) const;
 
-	// Needed by gba.c FIXME: this shouldn't be necessary?
-
-	void normalize()
-	{
-			while (m_attoseconds >= ATTOSECONDS_PER_SECOND)
-			{
-				m_seconds++;
-				m_attoseconds -= ATTOSECONDS_PER_SECOND;
-			}
-	}
-
 	attoseconds_t attoseconds() const { return m_attoseconds; }
 	seconds_t seconds() const { return m_seconds; }
 

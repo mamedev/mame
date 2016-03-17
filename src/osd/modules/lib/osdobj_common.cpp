@@ -506,40 +506,6 @@ void osd_common_t::customize_input_type_list(simple_list<input_type_entry> &type
 
 
 //-------------------------------------------------
-//  font_open - attempt to "open" a handle to the
-//  font with the given name
-//-------------------------------------------------
-
-osd_font *osd_common_t::font_open(const char *name, int &height)
-{
-	return nullptr;
-}
-
-
-//-------------------------------------------------
-//  font_close - release resources associated with
-//  a given OSD font
-//-------------------------------------------------
-
-void osd_common_t::font_close(osd_font *font)
-{
-}
-
-
-//-------------------------------------------------
-//  font_get_bitmap - allocate and populate a
-//  BITMAP_FORMAT_ARGB32 bitmap containing the
-//  pixel values rgb_t(0xff,0xff,0xff,0xff)
-//  or rgb_t(0x00,0xff,0xff,0xff) for each
-//  pixel of a black & white font
-//-------------------------------------------------
-
-bool osd_common_t::font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
-{
-	return false;
-}
-
-//-------------------------------------------------
 //  get_slider_list - allocate and populate a
 //  list of OS-dependent slider values.
 //-------------------------------------------------
