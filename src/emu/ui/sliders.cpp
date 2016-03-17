@@ -108,20 +108,14 @@ void ui_menu_sliders::handle()
 			/* if we got here via up or page up, select the previous item */
 			if (menu_event->iptkey == IPT_UI_UP || menu_event->iptkey == IPT_UI_PAGE_UP)
 			{
-				do
-				{
-					selected = (selected + item.size() - 1) % item.size();
-				} while(((slider_state&)item[selected]).hidden);
-				validate_selection(-1);
+                selected = (selected + item.size() - 1) % item.size();
+                validate_selection(-1);
 			}
 
 			/* otherwise select the next item */
 			else if (menu_event->iptkey == IPT_UI_DOWN || menu_event->iptkey == IPT_UI_PAGE_DOWN)
 			{
-				do
-				{
-					selected = (selected + 1) % item.size();
-				} while(((slider_state&)item[selected]).hidden);
+                selected = (selected + 1) % item.size();
 				validate_selection(1);
 			}
 		}

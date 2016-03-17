@@ -2222,7 +2222,6 @@ static slider_state *slider_alloc(running_machine &machine, int id, const char *
 	state->incval = incval;
 	state->update = update;
 	state->arg = arg;
-	state->hidden = false;
 	state->id = id;
 	strcpy(state->description, title);
 

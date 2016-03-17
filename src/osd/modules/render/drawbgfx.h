@@ -39,7 +39,7 @@ public:
 
 	virtual int create() override;
 	virtual slider_state* get_slider_list() override;
-    virtual bool multi_window_sliders() { return true; }
+    virtual bool multi_window_sliders() override { return true; }
 	virtual int draw(const int update) override;
 
 #ifdef OSD_SDL

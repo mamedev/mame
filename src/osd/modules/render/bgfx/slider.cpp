@@ -63,7 +63,6 @@ slider_state* bgfx_slider::create_core_slider(running_machine& machine)
     state->incval = m_step;
     state->update = update_trampoline;
     state->arg = this;
-    state->hidden = false;
     state->id = 0; // fixme
     strcpy(state->description, m_description.c_str());
 

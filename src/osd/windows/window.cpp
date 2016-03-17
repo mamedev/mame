@@ -273,7 +273,6 @@ void windows_osd_interface::build_slider_list()
 {
 	m_sliders = nullptr;
 	slider_state *curr = m_sliders;
-    int index = 0;
 	for (win_window_info *info = win_window_list; info != nullptr; info = info->m_next)
 	{
         slider_state *window_sliders = info->m_renderer->get_slider_list();
@@ -281,7 +280,8 @@ void windows_osd_interface::build_slider_list()
 		{
 			if (m_sliders == nullptr)
 			{
-				m_sliders = curr = window_sliders;
+				m_sliders = window_sliders;
+                curr = m_sliders;
 			}
 			else
 			{
@@ -291,7 +291,6 @@ void windows_osd_interface::build_slider_list()
 				}
 				curr->next = window_sliders;
 			}
-            index++;
 		}
 	}
 }
