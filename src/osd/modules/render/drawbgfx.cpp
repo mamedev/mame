@@ -132,7 +132,6 @@ int renderer_bgfx::create()
 		bgfx::sdlSetWindow(window().sdl_window());
 #endif
 		std::string backend(options.bgfx_backend());
-		printf("1\n"); fflush(stdout);
 		if (backend == "auto")
 		{
 			bgfx::init();
@@ -822,7 +821,6 @@ int renderer_bgfx::draw(int update)
 
 		if (status != BUFFER_EMPTY)
 		{
-			//printf("Drawing with gui effect\n"); fflush(stdout);
 			bgfx::setVertexBuffer(&buffer);
 			bgfx::setTexture(0, m_gui_effect[blend]->uniform("s_tex")->handle(), m_texture_cache->texture());
 			m_gui_effect[blend]->submit(view_index);
@@ -833,7 +831,6 @@ int renderer_bgfx::draw(int update)
 			prim = prim->next();
 		}
 	}
-	//printf("Done\n\n\n"); fflush(stdout);
 
 	window().m_primlist->release_lock();
 
@@ -861,7 +858,6 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
 		switch ((*prim)->type)
 		{
 			case render_primitive::LINE:
-				//printf("Putting a line at vertex index %d, vertices now %d\n", vertices, vertices + 30); fflush(stdout);
 				put_line((*prim)->bounds.x0, (*prim)->bounds.y0, (*prim)->bounds.x1, (*prim)->bounds.y1, 1.0f, u32Color((*prim)->color.r * 255, (*prim)->color.g * 255, (*prim)->color.b * 255, (*prim)->color.a * 255), (ScreenVertex*)buffer->data + vertices, 1.0f);
 				vertices += 30;
 				break;
@@ -870,7 +866,6 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
 				if ((*prim)->texture.base == nullptr)
 				{
 					put_packed_quad(*prim, WHITE_HASH, (ScreenVertex*)buffer->data + vertices);
-					//printf("Putting a blank quad at vertex index %d, vertices now %d\n", vertices, vertices + 6); fflush(stdout);
 					vertices += 6;
 				}
 				else
@@ -879,29 +874,23 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
 					if (atlas_valid && (*prim)->packable(PACKABLE_SIZE) && hash != 0 && m_hash_to_entry[hash].hash())
 					{
 						put_packed_quad(*prim, hash, (ScreenVertex*)buffer->data + vertices);
-						//printf("Putting a packable quad at vertex index %d, vertices now %d\n", vertices, vertices + 6); fflush(stdout);
 						vertices += 6;
 					}
 					else
 					{
 						if (vertices > 0)
 						{
-							//printf("Pre-flushing buffer\n");
 							return BUFFER_PRE_FLUSH;
 						}
 
                         if (PRIMFLAG_GET_SCREENTEX((*prim)->flags))
                         {
-                            //render_screen_quad(view, *prim);
-							//printf("Rendering a screen quad at vertex index %d\n", vertices); fflush(stdout);
                             render_post_screen_quad(view, *prim, buffer);
                         }
                         else
                         {
-							//printf("Rendering an unpackable quad at vertex index %d\n", vertices); fflush(stdout);
                             render_textured_quad(view, *prim, buffer);
                         }
-						//printf("Ignored %d vertices\n", vertices); fflush(stdout);
 						return BUFFER_EMPTY;
 					}
 				}
@@ -920,7 +909,6 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
 		*prim = (*prim)->next();
 	}
 
-	//printf("Rendered %d vertices\n", vertices); fflush(stdout);
 	if (*prim == nullptr)
 	{
 		return BUFFER_DONE;
@@ -1063,7 +1051,6 @@ bool renderer_bgfx::check_for_dirty_atlas()
 void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::TransientVertexBuffer *buffer)
 {
 	int vertices = 0;
-	//printf("Allocating buffer\n");
 	bool mode_switched = false;
 	while (prim != nullptr && !mode_switched)
 	{
@@ -1071,7 +1058,6 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::
 		{
 			case render_primitive::LINE:
 				vertices += 30;
-				//printf("Encountered a line, vertices now %d\n", vertices);
 				break;
 
 			case render_primitive::QUAD:
@@ -1080,25 +1066,12 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::
 					if (prim->texture.base == nullptr)
 					{
 						vertices += 6;
-						//printf("Encountered a blank quad, vertices now %d\n", vertices);
 					}
 					else
 					{
 						if (vertices == 0)
 						{
 							vertices += 6;
-							if (!PRIMFLAG_GET_SCREENTEX(prim->flags))
-							{
-								//printf("Encountered a screen quad, vertices now %d\n", vertices);
-							}
-							else
-							{
-								//printf("Encountered an unpackable quad, vertices now %d\n", vertices);
-							}
-						}
-						else
-						{
-							//printf("Encountered an unpackable/screen quad with %d vertices left in the buffer, ending loop.\n", vertices);
 						}
 						mode_switched = true;
 					}
@@ -1106,7 +1079,6 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::
 				else
 				{
 					vertices += 6;
-					//printf("Encountered a packable quad, vertices now %d\n", vertices);
 				}
 				break;
 			default:
@@ -1124,7 +1096,6 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::
 
 	if (vertices > 0 && bgfx::checkAvailTransientVertexBuffer(vertices, ScreenVertex::ms_decl))
 	{
-		//printf("Allocating %d transient vertices\n", vertices);
 		bgfx::allocTransientVertexBuffer(buffer, vertices, ScreenVertex::ms_decl);
 	}
 }

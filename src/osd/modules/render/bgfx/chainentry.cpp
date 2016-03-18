@@ -48,7 +48,10 @@ void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager&
 {
     bgfx::setViewSeq(view, true);
 
-	setup_view(view, screen_width, screen_height);
+	if (!setup_view(view, screen_width, screen_height))
+	{
+		return;
+	}
 
     for (bgfx_input_pair input : m_inputs)
     {
@@ -140,7 +143,7 @@ void bgfx_chain_entry::setup_auto_uniforms(render_primitive* prim, texture_manag
 	setup_swapxy_uniform(swap_xy);
 }
 
-void bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t screen_height)
+bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t screen_height)
 {
 	bgfx::FrameBufferHandle handle = BGFX_INVALID_HANDLE;
 	uint16_t width = screen_width;
@@ -148,6 +151,10 @@ void bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
     if (m_targets.target(m_output) != nullptr)
     {
         bgfx_target* output = m_targets.target(m_output);
+        if (output->width() == 0)
+        {
+			return false;
+		}
 		handle = output->target();
 		width = output->width() * output->prescale_x();
 		height = output->height() * output->prescale_y();
@@ -164,6 +171,7 @@ void bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
 	bgfx::setViewTransform(view, viewMat, projMat);
 
     bgfx::setViewClear(view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
+    return true;
 }
 
 void bgfx_chain_entry::put_screen_buffer(render_primitive* prim, bgfx::TransientVertexBuffer* buffer)

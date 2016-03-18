@@ -50,7 +50,7 @@ private:
 	void setup_rotationtype_uniform(uint32_t rotation_type);
 	void setup_swapxy_uniform(bool swap_xy);
 
-	void setup_view(int view, uint16_t screen_width, uint16_t screen_height);
+	bool setup_view(int view, uint16_t screen_width, uint16_t screen_height);
 	void put_screen_buffer(render_primitive* prim, bgfx::TransientVertexBuffer* buffer);
 
 	std::string                     	m_name;

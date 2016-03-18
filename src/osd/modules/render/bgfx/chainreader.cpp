@@ -89,7 +89,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, osd_options& optio
 			bool bilinear = get_bool(target_array[i], "bilinear", true);
 			bool double_buffer = get_bool(target_array[i], "doublebuffer", true);
             bool prescale = get_bool(target_array[i], "prescale", false);
-            
+
 			uint16_t width = 0;
 			uint16_t height = 0;
 			switch (mode)
@@ -119,6 +119,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, osd_options& optio
                 prescale_x = options.bgfx_prescale_x();
                 prescale_y = options.bgfx_prescale_y();
             }
+
 			targets.create_target(target_array[i]["name"].GetString(), bgfx::TextureFormat::RGBA8, width, height, prescale_x, prescale_y, mode, double_buffer, bilinear);
 		}
 	}

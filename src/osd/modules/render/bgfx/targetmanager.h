@@ -25,7 +25,7 @@ class bgfx_target;
 
 class target_manager {
 public:
-	target_manager(texture_manager& textures) : m_textures(textures), m_guest_width(16), m_guest_height(16) { }
+	target_manager(texture_manager& textures) : m_textures(textures), m_guest_width(0), m_guest_height(0) { }
 	~target_manager();
 
 	bgfx_target* create_target(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, uint32_t prescale_x, uint32_t prescale_y, uint32_t style, bool double_buffer, bool filter);

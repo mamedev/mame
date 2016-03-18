@@ -8,7 +8,7 @@
 
 #include "target.h"
 
-bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t prescale_x, uint32_t prescale_y, uint32_t style, bool double_buffer, bool filter)
+bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t prescale_x, uint32_t prescale_y, uint32_t style, bool double_buffer, bool filter, bool init)
 	: m_name(name)
 	, m_format(format)
 	, m_targets(nullptr)
@@ -21,17 +21,23 @@ bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uin
 	, m_style(style)
 	, m_filter(filter)
 	, m_current_page(0)
+	, m_initialized(false)
 	, m_page_count(double_buffer ? 2 : 1)
 {
-	uint32_t wrap_mode = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
-	uint32_t filter_mode = filter ? (BGFX_TEXTURE_MIN_ANISOTROPIC | BGFX_TEXTURE_MAG_ANISOTROPIC) : (BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
-
-	m_textures = new bgfx::TextureHandle[m_page_count];
-	m_targets = new bgfx::FrameBufferHandle[m_page_count];
-	for (int page = 0; page < m_page_count; page++)
+	if (init)
 	{
-		m_textures[page] = bgfx::createTexture2D(width * prescale_x, height * prescale_y, 1, format, wrap_mode | filter_mode | BGFX_TEXTURE_RT);
-		m_targets[page] = bgfx::createFrameBuffer(1, &m_textures[page], false);
+		uint32_t wrap_mode = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
+		uint32_t filter_mode = filter ? (BGFX_TEXTURE_MIN_ANISOTROPIC | BGFX_TEXTURE_MAG_ANISOTROPIC) : (BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
+
+		m_textures = new bgfx::TextureHandle[m_page_count];
+		m_targets = new bgfx::FrameBufferHandle[m_page_count];
+		for (int page = 0; page < m_page_count; page++)
+		{
+			m_textures[page] = bgfx::createTexture2D(width * prescale_x, height * prescale_y, 1, format, wrap_mode | filter_mode | BGFX_TEXTURE_RT);
+			m_targets[page] = bgfx::createFrameBuffer(1, &m_textures[page], false);
+		}
+
+		m_initialized = true;
 	}
 }
 
@@ -48,6 +54,7 @@ bgfx_target::bgfx_target(void *handle, uint16_t width, uint16_t height)
 	, m_style(TARGET_STYLE_CUSTOM)
 	, m_filter(false)
 	, m_current_page(0)
+	, m_initialized(true)
 	, m_page_count(0)
 {
 	m_targets = new bgfx::FrameBufferHandle[1];
@@ -58,6 +65,8 @@ bgfx_target::bgfx_target(void *handle, uint16_t width, uint16_t height)
 
 bgfx_target::~bgfx_target()
 {
+	if (!m_initialized) return;
+
 	if (m_page_count > 0)
 	{
 		for (int page = 0; page < m_page_count; page++)
@@ -77,6 +86,8 @@ bgfx_target::~bgfx_target()
 
 void bgfx_target::page_flip()
 {
+	if (!m_initialized) return;
+
 	if (m_double_buffer)
 	{
 		m_current_page = 1 - m_current_page;
@@ -85,11 +96,14 @@ void bgfx_target::page_flip()
 
 bgfx::FrameBufferHandle bgfx_target::target()
 {
+	if (!m_initialized) return BGFX_INVALID_HANDLE;
 	return m_targets[m_current_page];
 }
 
 bgfx::TextureHandle bgfx_target::texture() const
 {
+	if (!m_initialized) return BGFX_INVALID_HANDLE;
+
     if (m_double_buffer)
     {
         return m_textures[1 - m_current_page];

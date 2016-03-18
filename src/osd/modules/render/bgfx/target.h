@@ -27,7 +27,7 @@ enum
 class bgfx_target : public bgfx_texture_handle_provider
 {
 public:
-	bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t prescale_x, uint32_t prescale_y, uint32_t style, bool double_buffer, bool filter);
+	bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t prescale_x, uint32_t prescale_y, uint32_t style, bool double_buffer, bool filter, bool init = true);
 	bgfx_target(void *handle, uint16_t width, uint16_t height);
 	virtual ~bgfx_target();
 
@@ -67,6 +67,8 @@ private:
 	bool						m_filter;
 
 	uint32_t					m_current_page;
+
+	bool						m_initialized;
 
 	const uint32_t				m_page_count;
 };
