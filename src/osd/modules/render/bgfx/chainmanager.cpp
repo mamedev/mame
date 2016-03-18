@@ -44,7 +44,11 @@ bgfx_chain* chain_manager::chain(std::string name, running_machine& machine, uin
 
 bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine, uint32_t window_index)
 {
-	std::string path = std::string(m_options.bgfx_path()) + "/chains/" + name + ".json";
+	if (name.length() < 5 || (name.compare(name.length() - 5, 5, ".json")!= 0))
+	{
+		name = name + ".json";
+	}
+	std::string path = std::string(m_options.bgfx_path()) + "/chains/" + name;
 
 	bx::CrtFileReader reader;
 	bx::open(&reader, path.c_str());

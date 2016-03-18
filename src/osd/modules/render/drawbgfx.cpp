@@ -271,13 +271,6 @@ void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, ScreenV
 	float u[4] = { u0, u1, u0, u1 };
 	float v[4] = { v0, v0, v1, v1 };
 
-	bgfx::RendererType::Enum renderer_type = bgfx::getRendererType();
-	if (renderer_type == bgfx::RendererType::OpenGL || renderer_type == bgfx::RendererType::OpenGLES)
-	{
-		v[0] = v[1] = v1;
-		v[2] = v[3] = v0;
-	}
-
 	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_SWAP_XY)
 	{
 		std::swap(u[1], u[2]);
