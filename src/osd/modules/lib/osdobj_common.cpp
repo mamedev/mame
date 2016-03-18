@@ -554,7 +554,6 @@ bool osd_common_t::font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_ar
 
 slider_state* osd_common_t::get_slider_list()
 {
-	printf("Core get_slider_list\n");
 	return nullptr;
 }
 

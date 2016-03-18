@@ -140,6 +140,60 @@ float osd_monitor_info::aspect()
 
 
 
+//============================================================
+//  update_slider_list
+//============================================================
+
+void sdl_osd_interface::update_slider_list()
+{
+	for (sdl_window_info *window = sdl_window_list; window != nullptr; window = window->m_next)
+	{
+		if (window->renderer().sliders_dirty())
+		{
+			build_slider_list();
+			return;
+		}
+	}
+}
+
+//============================================================
+//  get_slider_list
+//============================================================
+
+slider_state *sdl_osd_interface::get_slider_list()
+{
+	return m_sliders;
+}
+
+//============================================================
+//  build_slider_list
+//============================================================
+
+void sdl_osd_interface::build_slider_list()
+{
+	m_sliders = nullptr;
+	slider_state *curr = m_sliders;
+	for (sdl_window_info *info = sdl_window_list; info != nullptr; info = info->m_next)
+	{
+        slider_state *window_sliders = info->renderer().get_slider_list();
+		if (window_sliders != nullptr)
+		{
+			if (m_sliders == nullptr)
+			{
+				m_sliders = window_sliders;
+                curr = m_sliders;
+			}
+			else
+			{
+				while (curr->next != nullptr)
+				{
+					curr = curr->next;
+				}
+				curr->next = window_sliders;
+			}
+		}
+	}
+}
 
 //============================================================
 //  update
@@ -151,6 +205,8 @@ void sdl_osd_interface::update(bool skip_redraw)
 
 	if (m_watchdog != NULL)
 		m_watchdog->reset();
+
+	update_slider_list();
 
 	// if we're not skipping this redraw, update all windows
 	if (!skip_redraw)
@@ -385,10 +441,10 @@ void sdl_osd_interface::extract_video_config()
 		if (options().seconds_to_run() == 0)
 			osd_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
-#if (USE_OPENGL)	
+#if (USE_OPENGL)
 	else if (strcmp(stemp, SDLOPTVAL_OPENGL) == 0)
 		video_config.mode = VIDEO_MODE_OPENGL;
-#endif		
+#endif
 	else if ((strcmp(stemp, SDLOPTVAL_SDL2ACCEL) == 0))
 	{
 		video_config.mode = VIDEO_MODE_SDL2ACCEL;

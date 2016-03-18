@@ -732,7 +732,7 @@ int renderer_bgfx::draw(int update)
 #ifdef OSD_WINDOWS
 			m_framebuffer = m_targets->create_backbuffer(window().m_hwnd, m_width[window_index], m_height[window_index]);
 #else
-			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(window().sdl_window()), m_width[index], m_height[index]);
+			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(window().sdl_window()), m_width[window_index], m_height[window_index]);
 #endif
 			bgfx::setViewFrameBuffer(view_index, m_framebuffer->target());
 			m_dimensions = osd_dim(m_width[window_index], m_height[window_index]);

@@ -298,10 +298,12 @@ public:
 
     int window_count();
 
+protected:
+	virtual void build_slider_list() override;
+	virtual void update_slider_list() override;
+
 private:
 	virtual void osd_exit() override;
-	void build_slider_list();
-	void update_slider_list();
 
 	windows_options &   m_options;
 	slider_state *      m_sliders;

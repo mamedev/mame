@@ -87,6 +87,7 @@ public:
 
 	osd_dim blit_surface_size() override;
 	int prescale() const { return m_prescale; }
+    osd_renderer &renderer() const { return *m_renderer; }
 
 	// Pointer to next window
 	sdl_window_info *   m_next;
@@ -122,8 +123,7 @@ private:
 	}
 
 	static OSDWORK_CALLBACK( complete_create_wt );
-protected:
-	osd_renderer &renderer() { return *m_renderer; }
+
 private:
 	int wnd_extra_width();
 	int wnd_extra_height();

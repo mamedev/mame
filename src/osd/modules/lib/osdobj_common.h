@@ -244,6 +244,9 @@ protected:
 	virtual bool input_init();
 	virtual void input_pause();
 
+	virtual void build_slider_list() { }
+	virtual void update_slider_list() { }
+
 private:
 	// internal state
 	running_machine *   m_machine;
