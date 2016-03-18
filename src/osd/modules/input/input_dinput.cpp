@@ -14,7 +14,6 @@
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <winioctl.h>
 #include <tchar.h>
 
 // undef WINNT for dinput.h to prevent duplicate definition
@@ -28,7 +27,6 @@
 // MAME headers
 #include "emu.h"
 #include "osdepend.h"
-#include "ui/ui.h"
 #include "strconv.h"
 
 // MAMEOS headers
@@ -153,13 +151,15 @@ private:
 
 public:
 	dinput_module(const char* type, const char* name)
-		: wininput_module(type, name)
+		: wininput_module(type, name),
+			m_dinput(nullptr),
+			m_dinput_version(0)
 	{
 	}
 
 	int init_internal() override
 	{
-		HRESULT result = S_OK;
+		HRESULT result;
 
 #if DIRECTINPUT_VERSION >= 0x800
 		m_dinput_version = DIRECTINPUT_VERSION;

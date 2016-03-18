@@ -13,7 +13,6 @@
 
 #include <memory>
 #include <chrono>
-#include <string>
 #include <queue>
 
 //============================================================
@@ -444,7 +443,8 @@ public:
 		m_input_enabled(FALSE),
 		m_mouse_enabled(FALSE),
 		m_lightgun_enabled(FALSE),
-		m_input_paused(FALSE)
+		m_input_paused(FALSE),
+		m_options(nullptr)
 	{
 	}
 
