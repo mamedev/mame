@@ -31,8 +31,6 @@
 // core post-processing options
 #define WINOPTION_HLSL_ENABLE               "hlsl_enable"
 #define WINOPTION_HLSLPATH                  "hlslpath"
-#define WINOPTION_HLSL_PRESCALE_X           "hlsl_prescale_x"
-#define WINOPTION_HLSL_PRESCALE_Y           "hlsl_prescale_y"
 #define WINOPTION_HLSL_WRITE                "hlsl_write"
 #define WINOPTION_HLSL_SNAP_WIDTH           "hlsl_snap_width"
 #define WINOPTION_HLSL_SNAP_HEIGHT          "hlsl_snap_height"
@@ -53,6 +51,7 @@
 #define WINOPTION_SCANLINE_AMOUNT           "scanline_alpha"
 #define WINOPTION_SCANLINE_SCALE            "scanline_size"
 #define WINOPTION_SCANLINE_HEIGHT           "scanline_height"
+#define WINOPTION_SCANLINE_VARIATION        "scanline_variation"
 #define WINOPTION_SCANLINE_BRIGHT_SCALE     "scanline_bright_scale"
 #define WINOPTION_SCANLINE_BRIGHT_OFFSET    "scanline_bright_offset"
 #define WINOPTION_SCANLINE_JITTER           "scanline_jitter"
@@ -136,8 +135,6 @@ public:
 	const char *screen_post_fx_dir() const { return value(WINOPTION_HLSLPATH); }
 	bool d3d_hlsl_enable() const { return bool_value(WINOPTION_HLSL_ENABLE); }
 	const char *d3d_hlsl_write() const { return value(WINOPTION_HLSL_WRITE); }
-	int d3d_hlsl_prescale_x() const { return int_value(WINOPTION_HLSL_PRESCALE_X); }
-	int d3d_hlsl_prescale_y() const { return int_value(WINOPTION_HLSL_PRESCALE_Y); }
 	int d3d_snap_width() const { return int_value(WINOPTION_HLSL_SNAP_WIDTH); }
 	int d3d_snap_height() const { return int_value(WINOPTION_HLSL_SNAP_HEIGHT); }
 	int screen_shadow_mask_tile_mode() const { return int_value(WINOPTION_SHADOW_MASK_TILE_MODE); }
@@ -152,6 +149,7 @@ public:
 	float screen_scanline_amount() const { return float_value(WINOPTION_SCANLINE_AMOUNT); }
 	float screen_scanline_scale() const { return float_value(WINOPTION_SCANLINE_SCALE); }
 	float screen_scanline_height() const { return float_value(WINOPTION_SCANLINE_HEIGHT); }
+	float screen_scanline_variation() const { return float_value(WINOPTION_SCANLINE_VARIATION); }
 	float screen_scanline_bright_scale() const { return float_value(WINOPTION_SCANLINE_BRIGHT_SCALE); }
 	float screen_scanline_bright_offset() const { return float_value(WINOPTION_SCANLINE_BRIGHT_OFFSET); }
 	float screen_scanline_jitter() const { return float_value(WINOPTION_SCANLINE_JITTER); }
