@@ -491,11 +491,10 @@ static int load_files(int i, int *found, const char *path)
 	else
 	{
 		util::archive_file::ptr zip;
-		util::archive_file::error ziperr;
 
 		/* wasn't a directory, so try to open it as a zip file */
-		ziperr = util::archive_file::open_zip(path, zip);
-		if (ziperr != util::archive_file::error::NONE)
+		if ((util::archive_file::open_zip(path, zip) != util::archive_file::error::NONE) &&
+			(util::archive_file::open_7z(path, zip) != util::archive_file::error::NONE))
 		{
 			printf("Error, cannot open zip file '%s' !\n", path);
 			return 1;
@@ -504,6 +503,8 @@ static int load_files(int i, int *found, const char *path)
 		/* load all files in zip file */
 		for (int zipent = zip->first_file(); zipent >= 0; zipent = zip->next_file())
 		{
+			if (zip->current_is_directory()) continue;
+
 			int size;
 
 			size = zip->current_uncompressed_length();
