@@ -108,6 +108,7 @@ int renderer_bgfx::create()
 {
 	// create renderer
 
+    osd_options& options = downcast<osd_options &>(window().machine().options());
 	osd_dim wdim = window().get_size();
 	m_width[window().m_index] = wdim.width();
 	m_height[window().m_index] = wdim.height();
@@ -130,14 +131,43 @@ int renderer_bgfx::create()
 #else
 		bgfx::sdlSetWindow(window().sdl_window());
 #endif
-		bgfx::init();
+		std::string backend(options.bgfx_backend());
+		printf("1\n"); fflush(stdout);
+		if (backend == "auto")
+		{
+			bgfx::init();
+		}
+		else if (backend == "dx9" || backend == "d3d9")
+		{
+			bgfx::init(bgfx::RendererType::Direct3D9);
+		}
+		else if (backend == "dx11" || backend == "d3d11")
+		{
+			bgfx::init(bgfx::RendererType::Direct3D11);
+		}
+		else if (backend == "gles")
+		{
+			bgfx::init(bgfx::RendererType::OpenGLES);
+		}
+		else if (backend == "glsl" || backend == "opengl")
+		{
+			bgfx::init(bgfx::RendererType::OpenGL);
+		}
+		else if (backend == "metal")
+		{
+			bgfx::init(bgfx::RendererType::Metal);
+		}
+		else
+		{
+			osd_printf_verbose("Unknown backend type '%s'\n", backend.c_str());
+			assert(false);
+		}
 		bgfx::reset(m_width[window().m_index], m_height[window().m_index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 		// Enable debug text.
-		bgfx::setDebug(window().machine().options().verbose() ? BGFX_DEBUG_STATS : BGFX_DEBUG_TEXT);
+		bgfx::setDebug(options.bgfx_debug() ? BGFX_DEBUG_STATS : BGFX_DEBUG_TEXT);
 		m_dimensions = osd_dim(m_width[0], m_height[0]);
 	}
 
-    osd_options& options = downcast<osd_options &>(window().machine().options());
 	m_textures = new texture_manager();
 	m_targets = new target_manager(*m_textures);
 

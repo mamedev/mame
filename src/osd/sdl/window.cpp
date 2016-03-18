@@ -90,8 +90,6 @@ sdl_window_info *sdl_window_list;
 static sdl_window_info **last_window_ptr;
 
 // event handling
-static osd_work_queue *work_queue;
-
 static SDL_threadID main_threadid;
 static SDL_threadID window_threadid;
 
