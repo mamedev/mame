@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-    miscmenu.c
+    ui/sliders.cpp
 
     Internal MAME menus for the user interface.
 

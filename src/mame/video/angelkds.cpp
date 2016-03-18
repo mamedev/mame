@@ -213,22 +213,6 @@ void angelkds_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-/*** Palette Handling
-
- 4 bits of Red, 4 bits of Green, 4 bits of Blue
-
-*/
-
-WRITE8_MEMBER(angelkds_state::angelkds_paletteram_w)
-{
-	int no;
-
-	m_paletteram[offset] = data;
-
-	no = offset & 0xff;
-	m_palette->set_pen_color(no, pal4bit(m_paletteram[no]), pal4bit(m_paletteram[no]>>4), pal4bit(m_paletteram[no + 0x100]));
-}
-
 /*** Video Start & Update
 
 */

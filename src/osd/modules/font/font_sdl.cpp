@@ -203,10 +203,8 @@ osd_font_sdl::TTF_Font_ptr osd_font_sdl::TTF_OpenFont_Magic(std::string const &n
 		auto const bytes_read = file.read(buffer, sizeof(buffer));
 		file.close();
 
-		if ((bytes_read >= sizeof(ttf_magic)) && !std::memcmp(buffer, ttf_magic, sizeof(ttf_magic)))
-			return TTF_Font_ptr(TTF_OpenFont(name.c_str(), POINT_SIZE), &TTF_CloseFont);
-
-		if (((bytes_read >= sizeof(ttc1_magic)) && !std::memcmp(buffer, ttc1_magic, sizeof(ttc1_magic))) ||
+		if (((bytes_read >= sizeof(ttf_magic)) && !std::memcmp(buffer, ttf_magic, sizeof(ttf_magic))) ||
+			((bytes_read >= sizeof(ttc1_magic)) && !std::memcmp(buffer, ttc1_magic, sizeof(ttc1_magic))) ||
 			((bytes_read >= sizeof(ttc2_magic)) && !std::memcmp(buffer, ttc2_magic, sizeof(ttc2_magic))))
 			return TTF_Font_ptr(TTF_OpenFontIndex(name.c_str(), POINT_SIZE, index), &TTF_CloseFont);
 	}

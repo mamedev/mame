@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-    ui.c
+    ui.cpp
 
     Functions used to handle MAME's user interface.
 

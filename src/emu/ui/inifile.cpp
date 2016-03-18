@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /***************************************************************************
 
     ui/inifile.cpp
@@ -18,8 +18,8 @@
 //-------------------------------------------------
 //  GLOBAL VARIABLES
 //-------------------------------------------------
-UINT16 inifile_manager::current_category = 0;
-UINT16 inifile_manager::current_file = 0;
+UINT16 inifile_manager::c_cat = 0;
+UINT16 inifile_manager::c_file = 0;
 
 //-------------------------------------------------
 //  ctor
@@ -47,10 +47,6 @@ void inifile_manager::directory_scan()
 	{
 		int length = strlen(dir->name);
 		std::string filename(dir->name);
-
-		// skip ui_favorite file
-		if (!core_stricmp("ui_favorite.ini", filename.c_str()))
-			continue;
 
 		// check .ini file ending
 		if ((length > 4) && dir->name[length - 4] == '.' && tolower((UINT8)dir->name[length - 3]) == 'i' &&
@@ -103,8 +99,8 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
 		return;
 
 	bool search_clones = false;
-	std::string filename(ini_index[current_file].name);
-	long offset = ini_index[current_file].category[current_category].offset;
+	std::string filename(ini_index[c_file].first);
+	long offset = ini_index[c_file].second[c_cat].second;
 
 	if (!core_stricmp(filename.c_str(), "category.ini") || !core_stricmp(filename.c_str(), "alltime.ini"))
 		search_clones = true;

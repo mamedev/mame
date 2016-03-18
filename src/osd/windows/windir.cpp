@@ -72,7 +72,7 @@ osd_directory *osd_opendir(const char *dirname)
 	_sntprintf(dirfilter, dirfilter_size, TEXT("%s\\*.*"), t_dirname);
 
 	// attempt to find the first file
-	dir->find = FindFirstFile(dirfilter, &dir->data);
+	dir->find = FindFirstFileEx(dirfilter, FindExInfoStandard, &dir->data, FindExSearchNameMatch, nullptr, 0);
 
 error:
 	// cleanup

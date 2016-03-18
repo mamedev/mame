@@ -253,7 +253,8 @@ public:
 	win32_lightgun_device(running_machine& machine, const char *name, input_module &module)
 		: event_based_device(machine, name, DEVICE_CLASS_LIGHTGUN, module),
 		  m_lightgun_shared_axis_mode(FALSE),
-		  m_gun_index(0)
+		  m_gun_index(0),
+		  mouse({0})
 	{
 		m_lightgun_shared_axis_mode = downcast<windows_options &>(machine.options()).dual_lightgun();
 

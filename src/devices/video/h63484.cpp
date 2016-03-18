@@ -1913,7 +1913,8 @@ void h63484_device::video_registers_w(int offset)
 
 READ16_MEMBER( h63484_device::status_r )
 {
-	return m_sr;
+	// kothello is coded so that upper byte of this should be 0xff (tests with jc opcode). Maybe it's just unconnected?
+	return m_sr | 0xff00;
 }
 
 READ16_MEMBER( h63484_device::data_r )

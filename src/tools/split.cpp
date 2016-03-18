@@ -119,7 +119,7 @@ static int split_file(const char *filename, const char *basename, UINT32 splitsi
 	splitfilename.assign(basename).append(".split");
 
 	// create the split file
-	filerr = util::core_file::open(splitfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, splitfile);
+	filerr = util::core_file::open(splitfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, splitfile);
 	if (filerr != osd_file::error::NONE)
 	{
 		fprintf(stderr, "Fatal error: unable to create split file '%s'\n", splitfilename.c_str());
@@ -155,7 +155,7 @@ static int split_file(const char *filename, const char *basename, UINT32 splitsi
 		outfilename = string_format("%s.%03d", basename, partnum);
 
 		// create it
-		filerr = util::core_file::open(outfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, outfile);
+		filerr = util::core_file::open(outfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, outfile);
 		if (filerr != osd_file::error::NONE)
 		{
 			printf("\n");
@@ -267,7 +267,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 	if (write_output)
 	{
 		// don't overwrite the original!
-		filerr = util::core_file::open(outfilename.c_str(), OPEN_FLAG_READ, outfile);
+		filerr = util::core_file::open(outfilename, OPEN_FLAG_READ, outfile);
 		if (filerr == osd_file::error::NONE)
 		{
 			outfile.reset();
@@ -276,7 +276,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 		}
 
 		// open the output for write
-		filerr = util::core_file::open(outfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, outfile);
+		filerr = util::core_file::open(outfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, outfile);
 		if (filerr != osd_file::error::NONE)
 		{
 			fprintf(stderr, "Fatal error: unable to create file '%s'\n", outfilename.c_str());

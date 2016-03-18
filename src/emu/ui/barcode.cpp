@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /***************************************************************************
 
-    ui/barcode.c
+    ui/barcode.cpp
 
     "Barcode Reader" control
 

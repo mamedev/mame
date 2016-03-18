@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods,Dankan1890
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods, Maurizio Petrarota
 /*********************************************************************
 
-    miscmenu.c
+    ui/miscmenu.cpp
 
     Internal MAME menus for the user interface.
 
@@ -634,7 +634,7 @@ void ui_menu_misc_options::populate()
 {
 	// add options items
 	for (int opt = 1; opt < ARRAY_LENGTH(m_options); ++opt)
-		item_append(_(m_options[opt].description), m_options[opt].status ? "On" : "Off", m_options[opt].status ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)opt);
+		item_append(_(m_options[opt].description), m_options[opt].status ? _("On") : _("Off"), m_options[opt].status ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)opt);
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 	customtop = machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);

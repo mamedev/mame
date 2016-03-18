@@ -37,7 +37,8 @@ protected:
 
 public:
 	wininput_module(const char * type, const char * name)
-		: input_module_base(type, name)
+		: input_module_base(type, name),
+			m_global_inputs_enabled(false)
 	{
 	}
 

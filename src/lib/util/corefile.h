@@ -48,7 +48,7 @@ public:
 	// ----- file open/close -----
 
 	// open a file with the specified filename
-	static osd_file::error open(const char *filename, std::uint32_t openflags, ptr &file);
+	static osd_file::error open(std::string const &filename, std::uint32_t openflags, ptr &file);
 
 	// open a RAM-based "file" using the given data and length (read-only)
 	static osd_file::error open_ram(const void *data, std::size_t length, std::uint32_t openflags, ptr &file);
@@ -100,8 +100,8 @@ public:
 	virtual const void *buffer() = 0;
 
 	// open a file with the specified filename, read it into memory, and return a pointer
-	static osd_file::error load(const char *filename, void **data, std::uint32_t &length);
-	static osd_file::error load(const char *filename, dynamic_buffer &data);
+	static osd_file::error load(std::string const &filename, void **data, std::uint32_t &length);
+	static osd_file::error load(std::string const &filename, dynamic_buffer &data);
 
 
 	// ----- file write -----

@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    ui/devopt.c
+    ui/devopt.cpp
 
     Internal menu for the device configuration.
 

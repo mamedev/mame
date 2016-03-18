@@ -57,8 +57,9 @@ public:
 	virtual error read(void *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual) override
 	{
 		// attempt to set the file pointer
-		LONG upper(std::uint32_t(offset >> 32));
-		DWORD result(SetFilePointer(m_handle, std::uint32_t(offset), &upper, FILE_BEGIN));
+		LARGE_INTEGER largeOffset;
+		largeOffset.QuadPart = offset;
+		DWORD result(SetFilePointerEx(m_handle, largeOffset, NULL, FILE_BEGIN));
 		if (INVALID_SET_FILE_POINTER == result)
 		{
 			DWORD const err(GetLastError());
@@ -77,8 +78,9 @@ public:
 	virtual error write(void const *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual) override
 	{
 		// attempt to set the file pointer
-		LONG upper(std::uint32_t(offset >> 32));
-		DWORD result(SetFilePointer(m_handle, std::uint32_t(offset), &upper, FILE_BEGIN));
+		LARGE_INTEGER largeOffset;
+		largeOffset.QuadPart = offset;
+		DWORD result(SetFilePointerEx(m_handle, largeOffset, NULL, FILE_BEGIN));
 		if (INVALID_SET_FILE_POINTER == result)
 		{
 			DWORD const err(GetLastError());
@@ -97,8 +99,9 @@ public:
 	virtual error truncate(std::uint64_t offset) override
 	{
 		// attempt to set the file pointer
-		LONG upper(std::uint32_t(offset >> 32));
-		DWORD const result(SetFilePointer(m_handle, std::uint32_t(offset), &upper, FILE_BEGIN));
+		LARGE_INTEGER largeOffset;
+		largeOffset.QuadPart = offset;
+		DWORD const result(SetFilePointerEx(m_handle, largeOffset, NULL, FILE_BEGIN));
 		if (INVALID_SET_FILE_POINTER == result)
 		{
 			DWORD const err(GetLastError());
@@ -163,7 +166,8 @@ DWORD create_path_recursive(TCHAR *path)
 	}
 
 	// if the path already exists, we're done
-	if (GetFileAttributes(path) != INVALID_FILE_ATTRIBUTES)
+	WIN32_FILE_ATTRIBUTE_DATA fileinfo;
+	if (GetFileAttributesEx(path, GetFileExInfoStandard, &fileinfo) != INVALID_FILE_ATTRIBUTES)
 		return NO_ERROR;
 	else if (!CreateDirectory(path, NULL))
 		return GetLastError();
@@ -376,12 +380,12 @@ osd_directory_entry *osd_stat(const std::string &path)
 	{
 		// need to do special logic for root directories
 		memset(&find_data, 0, sizeof(find_data));
-		find_data.dwFileAttributes = GetFileAttributes(t_path);
+		GetFileAttributesEx(t_path, GetFileExInfoStandard, &find_data.dwFileAttributes);
 	}
 	else
 	{
 		// attempt to find the first file
-		find = FindFirstFile(t_path, &find_data);
+		find = FindFirstFileEx(t_path, FindExInfoStandard, &find_data, FindExSearchNameMatch, NULL, 0);
 		if (find == INVALID_HANDLE_VALUE)
 			goto done;
 	}

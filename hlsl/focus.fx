@@ -51,8 +51,6 @@ struct PS_INPUT
 
 uniform float2 ScreenDims;
 uniform float2 TargetDims;
-uniform float2 SourceRect;
-uniform float2 QuadDims;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -68,7 +66,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
 	Output.TexCoord = TexCoord;
-	
+
 	Output.Color = Input.Color;
 
 	return Output;
@@ -78,28 +76,21 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Defocus Pixel Shader
 //-----------------------------------------------------------------------------
 
-float2 Coord1Offset = float2( 0.75f,  0.50f);
-float2 Coord2Offset = float2( 0.25f,  1.00f);
-float2 Coord3Offset = float2(-0.50f,  0.75f);
-float2 Coord4Offset = float2(-1.00f,  0.25f);
-float2 Coord5Offset = float2(-0.75f, -0.50f);
-float2 Coord6Offset = float2(-0.25f, -1.00f);
-float2 Coord7Offset = float2( 0.50f, -0.75f);
-float2 Coord8Offset = float2( 1.00f, -0.25f);
-
 uniform float2 Defocus = float2(0.0f, 0.0f);
 
-uniform bool SwapXY = false;
+static const float2 Coord1Offset = float2( 0.75f,  0.50f);
+static const float2 Coord2Offset = float2( 0.25f,  1.00f);
+static const float2 Coord3Offset = float2(-0.50f,  0.75f);
+static const float2 Coord4Offset = float2(-1.00f,  0.25f);
+static const float2 Coord5Offset = float2(-0.75f, -0.50f);
+static const float2 Coord6Offset = float2(-0.25f, -1.00f);
+static const float2 Coord7Offset = float2( 0.50f, -0.75f);
+static const float2 Coord8Offset = float2( 1.00f, -0.25f);
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float2 QuadRatio = 
-		float2(1.0f, SwapXY 
-			? QuadDims.y / QuadDims.x 
-			: QuadDims.x / QuadDims.y);
-
-	// imaginary texel dimensions independed from quad dimensions, but dependend on quad ratio
-	float2 TexelDims = (1.0f / 1024.0) * SourceRect * QuadRatio;
+	// imaginary texel dimensions independed from screen dimension, but ratio
+	float2 TexelDims = (1.0f / 1024);
 
 	float2 DefocusTexelDims = Defocus * TexelDims;
 

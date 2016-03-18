@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-    ui/cheatopt.c
+    ui/cheatopt.cpp
 
     Internal menu for the cheat interface.
 

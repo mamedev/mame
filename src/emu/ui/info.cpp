@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
-    ui/info.c
+    ui/info.cpp
 
     System and image info screens
 
