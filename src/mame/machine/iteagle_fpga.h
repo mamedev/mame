@@ -10,6 +10,8 @@
 #include "machine/idectrl.h"
 #include "machine/eepromser.h"
 
+//MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, _pclass, _subsystem_id)
+
 #define MCFG_ITEAGLE_FPGA_ADD(_tag, _cpu_tag, _irq_num) \
 	MCFG_PCI_DEVICE_ADD(_tag, ITEAGLE_FPGA, 0x55CC33AA, 0xAA, 0xAAAAAA, 0x00) \
 	downcast<iteagle_fpga_device *>(device)->set_irq_info(_cpu_tag, _irq_num);
@@ -18,7 +20,7 @@
 	downcast<iteagle_fpga_device *>(device)->set_init_info(_version, _seq_init);
 
 #define MCFG_ITEAGLE_EEPROM_ADD(_tag) \
-	MCFG_PCI_DEVICE_ADD(_tag, ITEAGLE_EEPROM, 0x80861229, 0x00, 0x088000, 0x00)
+	MCFG_PCI_DEVICE_ADD(_tag, ITEAGLE_EEPROM, 0x80861229, 0x02, 0x020000, 0x00)
 
 #define MCFG_ITEAGLE_EEPROM_INIT(_sw_version, _hw_version) \
 	downcast<iteagle_eeprom_device *>(device)->set_info(_sw_version, _hw_version);
@@ -61,6 +63,7 @@ private:
 	UINT32 m_prev_reg;
 
 	std::string m_serial_str;
+	std::string m_serial_rx3;
 	UINT8 m_serial_idx;
 	bool  m_serial_data;
 	UINT8 m_serial_com0[0x10];
