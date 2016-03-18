@@ -1757,28 +1757,32 @@ void media_identifier::identify(const char *filename)
 	}
 
 	// if that failed, and the filename ends with .zip, identify as a ZIP file
-	if (core_filename_ends_with(filename, ".7z"))
+	if (core_filename_ends_with(filename, ".7z") || core_filename_ends_with(filename, ".zip"))
 	{
 		// first attempt to examine it as a valid _7Z file
-		util::archive_file::ptr _7z;
-		util::archive_file::error _7zerr = util::archive_file::open_7z(filename, _7z);
-		if ((_7zerr == util::archive_file::error::NONE) && _7z)
+		util::archive_file::ptr archive;
+		util::archive_file::error err;
+		if (core_filename_ends_with(filename, ".7z"))
+			err = util::archive_file::open_7z(filename, archive);
+		else
+			err = util::archive_file::open_zip(filename, archive);
+		if ((err == util::archive_file::error::NONE) && archive)
 		{
 			std::vector<std::uint8_t> data;
 
 			// loop over entries in the .7z, skipping empty files and directories
-			for (int i = _7z->first_file(); i >= 0; i = _7z->next_file())
+			for (int i = archive->first_file(); i >= 0; i = archive->next_file())
 			{
-				const std::uint64_t length(_7z->current_uncompressed_length());
-				if (!_7z->current_is_directory() && (length != 0) && (std::uint32_t(length) == length))
+				const std::uint64_t length(archive->current_uncompressed_length());
+				if (!archive->current_is_directory() && (length != 0) && (std::uint32_t(length) == length))
 				{
 					// decompress data into RAM and identify it
 					try
 					{
 						data.resize(std::size_t(length));
-						_7zerr = _7z->decompress(&data[0], std::uint32_t(length));
-						if (_7zerr == util::archive_file::error::NONE)
-							identify_data(_7z->current_name().c_str(), &data[0], length);
+						err = archive->decompress(&data[0], std::uint32_t(length));
+						if (err == util::archive_file::error::NONE)
+							identify_data(archive->current_name().c_str(), &data[0], length);
 					}
 					catch (...)
 					{
@@ -1790,43 +1794,7 @@ void media_identifier::identify(const char *filename)
 		}
 
 		// clear out any cached files
-		_7z.reset();
-		util::archive_file::cache_clear();
-	}
-	else if (core_filename_ends_with(filename, ".zip"))
-	{
-		// first attempt to examine it as a valid ZIP file
-		util::archive_file::ptr zip;
-		util::archive_file::error ziperr = util::archive_file::open_zip(filename, zip);
-		if (ziperr == util::archive_file::error::NONE && zip)
-		{
-			std::vector<std::uint8_t> data;
-
-			// loop over entries in the ZIP, skipping empty files and directories
-			for (int i = zip->first_file(); i >= 0; i = zip->next_file())
-			{
-				const std::uint64_t length(zip->current_uncompressed_length());
-				if (!zip->current_is_directory() && (length != 0) && (std::uint32_t(length) == length))
-				{
-					// decompress data into RAM and identify it
-					try
-					{
-						data.resize(std::size_t(length));
-						ziperr = zip->decompress(&data[0], std::uint32_t(length));
-						if (ziperr == util::archive_file::error::NONE)
-							identify_data(zip->current_name().c_str(), &data[0], length);
-					}
-					catch (...)
-					{
-						// resizing the buffer could cause a bad_alloc if archive contains large files
-					}
-					data.clear();
-				}
-			}
-		}
-
-		// clear out any cached files
-		zip.reset();
+		archive.reset();
 		util::archive_file::cache_clear();
 	}
 

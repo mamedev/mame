@@ -80,7 +80,7 @@ public:
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static int zippath_find_sub_path(archive_file &zipfile, const char *subpath, osd_dir_entry_type *type);
+static int zippath_find_sub_path(archive_file &zipfile, const char *subpath, osd_dir_entry_type &type);
 static int is_zip_file(const char *path);
 static int is_zip_file_separator(char c);
 static int is_7z_file(const char *path);
@@ -392,7 +392,7 @@ osd_file::error zippath_fopen(const char *filename, UINT32 openflags, util::core
 				}
 
 				if (subpath.length() > 0)
-					header = zippath_find_sub_path(*zip, subpath.c_str(), &entry_type);
+					header = zippath_find_sub_path(*zip, subpath.c_str(), entry_type);
 				else
 					header = zip->first_file();
 
@@ -669,44 +669,37 @@ static char next_path_char(const char *s, int *pos)
  * @return  null if it fails, else a zip_file_header*.
  */
 
-static int zippath_find_sub_path(archive_file &zipfile, const char *subpath, osd_dir_entry_type *type)
+static int zippath_find_sub_path(archive_file &zipfile, const char *subpath, osd_dir_entry_type &type)
 {
 	for (int header = zipfile.first_file(); header >= 0; header = zipfile.next_file())
 	{
 		/* special case */
 		if (subpath == nullptr)
 		{
-			if (type != nullptr)
-				*type = ENTTYPE_FILE;
+			type = ENTTYPE_FILE;
 			return header;
 		}
 
-		// FIXME: how is this actually supposed to work?  I'm pretty sure it's broken right now anyway.
 		int i = 0, j = 0;
-		char c1, c2, last_char;
-		last_char = '/';
-		while(((c1 = next_path_char(zipfile.current_name().c_str(), &i)) == (c2 = next_path_char(subpath, &j))) && (c1 != '\0' && c2 != '\0'))
-			last_char = c2;
+		char c1, c2;
+		while (((c1 = next_path_char(zipfile.current_name().c_str(), &i)) == (c2 = next_path_char(subpath, &j))) && c1 && c2) { }
 
-		if (c2 == '\0')
+		if (!c1)
 		{
-			if (c1 == '\0')
+			if (!c2)
 			{
-				if (type != nullptr)
-					*type = ENTTYPE_FILE;
+				type = zipfile.current_is_directory() ? ENTTYPE_DIR : ENTTYPE_FILE;
 				return header;
 			}
-			else if ((last_char == '/') || (c1 == '/'))
+			else if ((c2 == '/') && !(c2 = next_path_char(subpath, &j)) && zipfile.current_is_directory())
 			{
-				if (type != nullptr)
-					*type = ENTTYPE_DIR;
+				type = ENTTYPE_DIR;
 				return header;
 			}
 		}
 	}
 
-	if (type != nullptr)
-		*type = ENTTYPE_NONE;
+	type = ENTTYPE_NONE;
 	return -1;
 }
 
@@ -794,7 +787,7 @@ static osd_file::error zippath_resolve(const char *path, osd_dir_entry_type &ent
 		newpath.assign(path + apath.length(), i);
 
 		/* this was a true ZIP path - attempt to identify the type of path */
-		zippath_find_sub_path(*zipfile, newpath.c_str(), &current_entry_type);
+		zippath_find_sub_path(*zipfile, newpath.c_str(), current_entry_type);
 		if (current_entry_type == ENTTYPE_NONE)
 		{
 			err = osd_file::error::NOT_FOUND;

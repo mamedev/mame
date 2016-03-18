@@ -145,8 +145,6 @@ emu_file::emu_file(UINT32 openflags)
 		m_openflags(openflags),
 		m_zipfile(nullptr),
 		m_ziplength(0),
-		m__7zfile(),
-		m__7zlength(0),
 		m_remove_on_close(false),
 		m_restrict_to_mediapath(false)
 {
@@ -163,8 +161,6 @@ emu_file::emu_file(const char *searchpath, UINT32 openflags)
 		m_openflags(openflags),
 		m_zipfile(nullptr),
 		m_ziplength(0),
-		m__7zfile(),
-		m__7zlength(0),
 		m_remove_on_close(false),
 		m_restrict_to_mediapath(false)
 {
@@ -227,12 +223,6 @@ hash_collection &emu_file::hashes(const char *types)
 		return m_hashes;
 
 	// if we have ZIP data, just hash that directly
-	if (!m__7zdata.empty())
-	{
-		m_hashes.compute(&m__7zdata[0], m__7zdata.size(), needed.c_str());
-		return m_hashes;
-	}
-
 	if (!m_zipdata.empty())
 	{
 		m_hashes.compute(&m_zipdata[0], m_zipdata.size(), needed.c_str());
@@ -385,11 +375,9 @@ osd_file::error emu_file::open_ram(const void *data, UINT32 length)
 void emu_file::close()
 {
 	// close files and free memory
-	m__7zfile.reset();
 	m_zipfile.reset();
 	m_file.reset();
 
-	m__7zdata.clear();
 	m_zipdata.clear();
 
 	if (m_remove_on_close)
@@ -422,10 +410,7 @@ osd_file::error emu_file::compress(int level)
 bool emu_file::compressed_file_ready(void)
 {
 	// load the ZIP file now if we haven't yet
-	if (m__7zfile != nullptr && load__7zped_file() != osd_file::error::NONE)
-		return true;
-
-	if (m_zipfile != nullptr && load_zipped_file() != osd_file::error::NONE)
+	if (m_zipfile && (load_zipped_file() != osd_file::error::NONE))
 		return true;
 
 	return false;
@@ -492,9 +477,6 @@ bool emu_file::eof()
 UINT64 emu_file::size()
 {
 	// use the ZIP length if present
-	if (m__7zfile != nullptr)
-		return m__7zlength;
-
 	if (m_zipfile != nullptr)
 		return m_ziplength;
 
@@ -716,41 +698,6 @@ osd_file::error emu_file::attempt_zipped()
 
 
 //-------------------------------------------------
-//  load_zipped_file - load a ZIPped file
-//-------------------------------------------------
-
-osd_file::error emu_file::load_zipped_file()
-{
-	assert(m_file == nullptr);
-	assert(m_zipdata.empty());
-	assert(m_zipfile != nullptr);
-
-	// allocate some memory
-	m_zipdata.resize(m_ziplength);
-
-	// read the data into our buffer and return
-	auto const ziperr = m_zipfile->decompress(&m_zipdata[0], m_zipdata.size());
-	if (ziperr != util::archive_file::error::NONE)
-	{
-		m_zipdata.clear();
-		return osd_file::error::FAILURE;
-	}
-
-	// convert to RAM file
-	osd_file::error filerr = util::core_file::open_ram(&m_zipdata[0], m_zipdata.size(), m_openflags, m_file);
-	if (filerr != osd_file::error::NONE)
-	{
-		m_zipdata.clear();
-		return osd_file::error::FAILURE;
-	}
-
-	// close out the ZIP file
-	m_zipfile.reset();
-	return osd_file::error::NONE;
-}
-
-
-//-------------------------------------------------
 //  attempt__7zped - attempt to open a .7z file
 //-------------------------------------------------
 
@@ -803,13 +750,13 @@ osd_file::error emu_file::attempt__7zped()
 
 		if (fileno >= 0)
 		{
-			m__7zfile = std::move(_7z);
-			m__7zlength = m__7zfile->current_uncompressed_length();
+			m_zipfile = std::move(_7z);
+			m_ziplength = m_zipfile->current_uncompressed_length();
 
 			// build a hash with just the CRC
 			m_hashes.reset();
-			m_hashes.add_crc(m__7zfile->current_crc());
-			return (m_openflags & OPEN_FLAG_NO_PRELOAD) ? osd_file::error::NONE : load__7zped_file();
+			m_hashes.add_crc(m_zipfile->current_crc());
+			return (m_openflags & OPEN_FLAG_NO_PRELOAD) ? osd_file::error::NONE : load_zipped_file();
 		}
 
 		// close up the _7Z file and try the next level
@@ -819,35 +766,35 @@ osd_file::error emu_file::attempt__7zped()
 
 
 //-------------------------------------------------
-//  load__7zped_file - load a _7Zped file
+//  load_zipped_file - load a ZIPped file
 //-------------------------------------------------
 
-osd_file::error emu_file::load__7zped_file()
+osd_file::error emu_file::load_zipped_file()
 {
 	assert(m_file == nullptr);
-	assert(m__7zdata.empty());
-	assert(m__7zfile);
+	assert(m_zipdata.empty());
+	assert(m_zipfile);
 
 	// allocate some memory
-	m__7zdata.resize(m__7zlength);
+	m_zipdata.resize(m_ziplength);
 
 	// read the data into our buffer and return
-	auto const _7zerr = m__7zfile->decompress(&m__7zdata[0], m__7zdata.size());
-	if (_7zerr != util::archive_file::error::NONE)
+	auto const ziperr = m_zipfile->decompress(&m_zipdata[0], m_zipdata.size());
+	if (ziperr != util::archive_file::error::NONE)
 	{
-		m__7zdata.clear();
+		m_zipdata.clear();
 		return osd_file::error::FAILURE;
 	}
 
 	// convert to RAM file
-	osd_file::error filerr = util::core_file::open_ram(&m__7zdata[0], m__7zdata.size(), m_openflags, m_file);
+	osd_file::error filerr = util::core_file::open_ram(&m_zipdata[0], m_zipdata.size(), m_openflags, m_file);
 	if (filerr != osd_file::error::NONE)
 	{
-		m__7zdata.clear();
+		m_zipdata.clear();
 		return osd_file::error::FAILURE;
 	}
 
-	// close out the _7Z file
-	m__7zfile.reset();
+	// close out the ZIP file
+	m_zipfile.reset();
 	return osd_file::error::NONE;
 }

@@ -145,10 +145,8 @@ private:
 
 	// internal helpers
 	osd_file::error attempt_zipped();
-	osd_file::error load_zipped_file();
-
 	osd_file::error attempt__7zped();
-	osd_file::error load__7zped_file();
+	osd_file::error load_zipped_file();
 
 	// internal state
 	std::string     m_filename;                     // original filename provided
@@ -163,10 +161,6 @@ private:
 	std::unique_ptr<util::archive_file> m_zipfile;  // ZIP file pointer
 	dynamic_buffer  m_zipdata;                      // ZIP file data
 	UINT64          m_ziplength;                    // ZIP file length
-
-	std::unique_ptr<util::archive_file> m__7zfile;  // 7Z file pointer
-	dynamic_buffer  m__7zdata;                      // 7Z file data
-	UINT64          m__7zlength;                    // 7Z file length
 
 	bool            m_remove_on_close;              // flag: remove the file when closing
 	bool            m_restrict_to_mediapath;        // flag: restrict to paths inside the media-path
