@@ -106,6 +106,7 @@ static MACHINE_CONFIG_START( pcat_dyn, pcat_dyn_state )
 	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_DEVICE_REPLACE("vga", TVGA9000_VGA, 0)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 
