@@ -40,7 +40,7 @@ end
 	}
 
 
-project("tests")
+project("mametests")
 	uuid ("66d4c639-196b-4065-a411-7ee9266564f5")
 	kind "ConsoleApp"	
 
