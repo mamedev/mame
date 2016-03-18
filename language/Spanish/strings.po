@@ -11,7 +11,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-08 02:22+0100\n"
 "PO-Revision-Date: 2016-03-05 13:02+0100\n"
-"Last-Translator: Ismael Ferreras Morezuelas <swyterzone+mame@gmail.com>\n"
+"Last-Translator: aviloria\n"
 "Language-Team: Español; Castellano <>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -329,7 +329,7 @@ msgstr "Ajustes de color de interfaz"
 #: src/emu/ui/custui.cpp:591
 #, c-format
 msgid "Double click or press %1$s to change the color value"
-msgstr ""
+msgstr "Haz doble clic o pulsa %1$s para cambiar el color"
 
 #: src/emu/ui/custui.cpp:617
 msgid "Menu Preview"
@@ -447,7 +447,7 @@ msgstr "Puntuación MAME"
 
 #: src/emu/ui/datmenu.cpp:287 src/emu/ui/selgame.cpp:43
 msgid "Command"
-msgstr "Órden"
+msgstr "Orden"
 
 #: src/emu/ui/dirmenu.cpp:31
 msgid "ROMs"
@@ -487,7 +487,7 @@ msgstr "Capturas"
 
 #: src/emu/ui/dirmenu.cpp:41 src/emu/ui/menu.cpp:44
 msgid "Cabinets"
-msgstr "Cajas arcade"
+msgstr "Cabinas arcade"
 
 #: src/emu/ui/dirmenu.cpp:42 src/emu/ui/menu.cpp:47
 msgid "Flyers"
@@ -499,7 +499,7 @@ msgstr "Títulos"
 
 #: src/emu/ui/dirmenu.cpp:44 src/emu/ui/menu.cpp:49
 msgid "Ends"
-msgstr "Extremos"
+msgstr "Finales"
 
 #: src/emu/ui/dirmenu.cpp:45 src/emu/ui/menu.cpp:46
 msgid "PCBs"
@@ -507,7 +507,7 @@ msgstr "Circuitos impresos"
 
 #: src/emu/ui/dirmenu.cpp:46 src/emu/ui/menu.cpp:58 src/emu/ui/videoopt.cpp:223
 msgid "Marquees"
-msgstr "Marcos"
+msgstr "Marquesinas"
 
 #: src/emu/ui/dirmenu.cpp:47
 msgid "Controls Panels"
@@ -586,7 +586,7 @@ msgstr "Añadir carpeta %1$s - Buscar: %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
-msgstr "Pulsa TAB para fijar"
+msgstr "Pulsa TAB para establecer"
 
 #: src/emu/ui/dirmenu.cpp:643
 #, c-format
@@ -684,7 +684,7 @@ msgstr "Crear"
 
 #: src/emu/ui/filesel.cpp:314
 msgid "Please enter a file extension too"
-msgstr "Es necesario que el nombre también tenga una extensión"
+msgstr "Por favor, introduzca también la extensión del fichero"
 
 #: src/emu/ui/filesel.cpp:502 src/emu/ui/swlist.cpp:65
 msgid "[empty slot]"
@@ -732,7 +732,7 @@ msgid ""
 "Please select a different one."
 msgstr ""
 "Al software elegido le falta una o varias imágenes CHD o ROM necesarias. "
-"Prueba eligiendo otro distinto."
+"Por favor elige otro distinto."
 
 #: src/emu/ui/info.cpp:98
 msgid "Not supported"
@@ -1105,7 +1105,7 @@ msgstr "Lista de selección - Buscar: "
 #: src/emu/ui/selector.cpp:181
 #, c-format
 msgid "Double click or press %1$s to select"
-msgstr ""
+msgstr "Haz doble clic o pulsa %1$s para elegir"
 
 #: src/emu/ui/selgame.cpp:38
 msgid "General Info"
@@ -1137,10 +1137,10 @@ msgid ""
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
-"Falta la máquina seleccionada o una o más de sus ROM o imágenes CHD. Prueba "
-"eligiendo otra máquina.\n"
+"Falta la máquina seleccionada o una o más de sus ROM o imágenes CHD. "
+"Por favor, elige otra máquina.\n"
 "\n"
-"Pulsa cualquier tecla menos ESC para continuar."
+"Pulsa cualquier tecla (menos ESC) para continuar."
 
 #: src/emu/ui/selgame.cpp:647 src/emu/ui/simpleselgame.cpp:262
 msgid "Configure Options"
@@ -1216,7 +1216,7 @@ msgstr "Gráficos: Aceptables, "
 
 #: src/emu/ui/selgame.cpp:912 src/emu/ui/selsoft.cpp:767
 msgid "Sound: Unimplemented"
-msgstr "Sonido: Por hacer"
+msgstr "Sonido: Sin implementar"
 
 #: src/emu/ui/selgame.cpp:914 src/emu/ui/selsoft.cpp:769
 msgid "Sound: Imperfect"
@@ -1312,7 +1312,7 @@ msgstr "Gráficos: Aceptables\n"
 
 #: src/emu/ui/selgame.cpp:1592
 msgid "Sound: Unimplemented\n"
-msgstr "Sonido: Por hacer\n"
+msgstr "Sonido: Sin implementar\n"
 
 #: src/emu/ui/selgame.cpp:1594
 msgid "Sound: Imperfect\n"
@@ -1335,12 +1335,12 @@ msgstr "El juego es mecánico: %1$s\n"
 #: src/emu/ui/selgame.cpp:1600
 #, c-format
 msgid "Requires Artwork: %1$s\n"
-msgstr "Necesita arte: %1$s\n"
+msgstr "Requiere arte: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1601
 #, c-format
 msgid "Requires Clickable Artwork: %1$s\n"
-msgstr "Necesita arte clicable: %1$s\n"
+msgstr "Requiere arte clicable: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1602
 #, c-format
@@ -1377,31 +1377,31 @@ msgstr "Necesita CHD: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1626
 msgid "Roms Audit Pass: OK\n"
-msgstr "Cumple con la auditoría de ROMs: SÍ\n"
+msgstr "Auditoría de ROMs: CORRECTA\n"
 
 #: src/emu/ui/selgame.cpp:1628
 msgid "Roms Audit Pass: BAD\n"
-msgstr "Cumple con la auditoría de ROMs: NO\n"
+msgstr "Auditoría de ROMs: INCORRECTA\n"
 
 #: src/emu/ui/selgame.cpp:1631
 msgid "Samples Audit Pass: None Needed\n"
-msgstr "Cumple con la auditoría de las muestras: Innecesaria\n"
+msgstr "Auditoría de las muestras: No Necesaria\n"
 
 #: src/emu/ui/selgame.cpp:1633
 msgid "Samples Audit Pass: OK\n"
-msgstr "Cumple con la auditoría de las muestras: BIEN\n"
+msgstr "Auditoría de las muestras: CORRECTA\n"
 
 #: src/emu/ui/selgame.cpp:1635
 msgid "Samples Audit Pass: BAD\n"
-msgstr "Cumple con la auditoría de las muestras: MAL\n"
+msgstr "Auditoría de las muestras: INCORRECTA\n"
 
 #: src/emu/ui/selgame.cpp:1638
 msgid ""
 "Roms Audit Pass: Disabled\n"
 "Samples Audit Pass: Disabled\n"
 msgstr ""
-"Cumple con la auditoría de las ROMs: Desactivado\n"
-"Cumple con la auditoría de las muestras: Desactivado\n"
+"Auditoría de las ROMs: Desactivado\n"
+"Auditoría de las muestras: Desactivado\n"
 
 #: src/emu/ui/selgame.cpp:2070 src/emu/ui/selgame.cpp:2231
 #: src/emu/ui/selsoft.cpp:1639
@@ -1410,7 +1410,7 @@ msgstr "No hay información disponible"
 
 #: src/emu/ui/selgame.cpp:2183 src/emu/ui/selsoft.cpp:1591
 msgid "Usage"
-msgstr "Uso"
+msgstr "Utilización"
 
 #: src/emu/ui/selsoft.cpp:109
 msgid " (default)"
@@ -1423,10 +1423,10 @@ msgid ""
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
-"Al software elegido le falta uno o varios archivos necesarios. Elige otro "
-"software.\n"
+"Al software elegido le falta uno o varios archivos necesarios. Por favor, "
+"elige otro software.\n"
 "\n"
-"Pulsa cualquier tecla menos ESC para continuar."
+"Pulsa cualquier tecla (menos ESC) para continuar."
 
 #: src/emu/ui/selsoft.cpp:681
 #, c-format
@@ -1493,8 +1493,8 @@ msgstr ""
 "No se ha encontrado ninguna máquina. Comprueba el «rompath» en el archivo "
 "%1$s.ini.\n"
 "\n"
-"Si es la primera vez que utilizas %2$s échale un vistazo al archivo «config."
-"txt» en la carpeta «docs» para informarte de cómo configurar %2$s."
+"Si es la primera vez que utilizas %2$s, por favor, échale un vistazo al archivo "
+"«config.txt» de la carpeta «docs» para informarte sobre cómo configurar %2$s."
 
 #: src/emu/ui/simpleselgame.cpp:287
 #, c-format
@@ -1520,7 +1520,7 @@ msgstr "Aceptable"
 
 #: src/emu/ui/simpleselgame.cpp:345
 msgid "Unimplemented"
-msgstr "Por hacer"
+msgstr "No implementado"
 
 #: src/emu/ui/simpleselgame.cpp:351
 #, c-format
@@ -1625,8 +1625,8 @@ msgid ""
 "\n"
 "Otherwise, type OK or move the joystick left then right to continue"
 msgstr ""
-"El uso de emuladores en ROMs que no poseas legalmente suele estar prohibido "
-"por leyes de propiedad intelectual en varios paises.\n"
+"El uso de emuladores junto con ROMs que no poseas legalmente está prohibido "
+"por las leyes de propiedad intelectual.\n"
 "\n"
 "SI NO TIENES PERMISO PARA JUGAR A «%1$s» PULSA ESC.\n"
 "\n"
@@ -1637,8 +1637,8 @@ msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
 msgstr ""
-"Uno o más ROMs/CHDs de esta máquina son incorrectos, por lo que la máquina "
-"podría no funcionar correctamente.\n"
+"Uno o más ROMs/CHDs de esta máquina son incorrectos. La máquina podría "
+"no funcionar correctamente.\n"
 
 #: src/emu/ui/ui.cpp:1094
 msgid ""
@@ -1687,7 +1687,7 @@ msgstr "Voltear la pantalla en modo cóctel no está soportado.\n"
 
 #: src/emu/ui/ui.cpp:1119
 msgid "The machine requires external artwork files\n"
-msgstr "La máquina requiere necesita datos gráficos externos\n"
+msgstr "La máquina requiere ficheros de arte externos\n"
 
 #: src/emu/ui/ui.cpp:1124
 msgid ""
@@ -1702,12 +1702,12 @@ msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
 msgstr ""
-"Esta máquina no soporta sonido, por lo que MAME no reproducirá audio, no te "
-"sorprendas si no escuchas nada.\n"
+"Esta máquina no soporta sonido, por lo que MAME no reproducirá audio, este "
+"es el comportamiento esperado.\n"
 
 #: src/emu/ui/ui.cpp:1137
 msgid "The machine has protection which isn't fully emulated.\n"
-msgstr "La máquina todavía no emula del todo el sistema de protección.\n"
+msgstr "La máquina todavía no emula completamente el sistema de protección.\n"
 
 #: src/emu/ui/ui.cpp:1140
 msgid ""
