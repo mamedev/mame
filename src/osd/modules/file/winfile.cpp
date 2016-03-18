@@ -57,7 +57,8 @@ public:
 	virtual error read(void *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual) override
 	{
 		// attempt to set the file pointer
-		LARGE_INTEGER largeOffset = { offset };
+		LARGE_INTEGER largeOffset;
+		largeOffset.QuadPart = offset;
 		DWORD result(SetFilePointerEx(m_handle, largeOffset, NULL, FILE_BEGIN));
 		if (INVALID_SET_FILE_POINTER == result)
 		{
@@ -77,7 +78,8 @@ public:
 	virtual error write(void const *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual) override
 	{
 		// attempt to set the file pointer
-		LARGE_INTEGER largeOffset = { offset };
+		LARGE_INTEGER largeOffset;
+		largeOffset.QuadPart = offset;
 		DWORD result(SetFilePointerEx(m_handle, largeOffset, NULL, FILE_BEGIN));
 		if (INVALID_SET_FILE_POINTER == result)
 		{
@@ -97,7 +99,8 @@ public:
 	virtual error truncate(std::uint64_t offset) override
 	{
 		// attempt to set the file pointer
-		LARGE_INTEGER largeOffset = { offset };
+		LARGE_INTEGER largeOffset;
+		largeOffset.QuadPart = offset;
 		DWORD const result(SetFilePointerEx(m_handle, largeOffset, NULL, FILE_BEGIN));
 		if (INVALID_SET_FILE_POINTER == result)
 		{
