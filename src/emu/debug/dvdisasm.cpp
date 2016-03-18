@@ -370,7 +370,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 
 	// allocate disassembly buffer
 	const auto total_bytes = m_total.x * m_total.y;
-	m_dasm.clear();
+	//m_dasm.clear(); // FIXME
 	m_dasm.reserve(total_bytes).seekp(total_bytes);
 
 	// iterate over lines
@@ -388,7 +388,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 
 		// convert back and set the address of this instruction
 		m_byteaddress[instr] = pcbyte;
-		m_dasm.clear();
+		//m_dasm.clear(); // FIXME
 		util::stream_format(m_dasm.seekp(base),
 			source.m_space.is_octal() ? " %0*o  " : " %0*X  ",
 			source.m_space.logaddrchars()/2*char_num, source.m_space.byte_to_address(pcbyte));
