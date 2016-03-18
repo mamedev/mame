@@ -12,9 +12,9 @@
 
 //MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, _pclass, _subsystem_id)
 
-#define MCFG_ITEAGLE_FPGA_ADD(_tag, _cpu_tag, _irq_num) \
+#define MCFG_ITEAGLE_FPGA_ADD(_tag, _cpu_tag, _irq_num, _serial_irq_num) \
 	MCFG_PCI_DEVICE_ADD(_tag, ITEAGLE_FPGA, 0x55CC33AA, 0xAA, 0xAAAAAA, 0x00) \
-	downcast<iteagle_fpga_device *>(device)->set_irq_info(_cpu_tag, _irq_num);
+	downcast<iteagle_fpga_device *>(device)->set_irq_info(_cpu_tag, _irq_num, _serial_irq_num);
 
 #define MCFG_ITEAGLE_FPGA_INIT(_version, _seq_init) \
 	downcast<iteagle_fpga_device *>(device)->set_init_info(_version, _seq_init);
@@ -38,8 +38,8 @@ class iteagle_fpga_device : public pci_device,
 public:
 	iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	void set_init_info(int version, int seq_init) {m_version=version; m_seq_init=seq_init;}
-	void set_irq_info(const char *tag, const int irq_num) {m_cpu_tag = tag; m_irq_num = irq_num;}
-
+	void set_irq_info(const char *tag, const int irq_num, const int serial_num) {
+		m_cpu_tag = tag; m_irq_num = irq_num; m_serial_irq_num = serial_num;}
 
 protected:
 	virtual void device_start() override;
@@ -56,6 +56,7 @@ private:
 	const char *m_cpu_tag;
 	cpu_device *m_cpu;
 	int m_irq_num;
+	int m_serial_irq_num;
 
 	UINT32 m_fpga_regs[0x20/4];
 	UINT32 m_rtc_regs[0x800/4];

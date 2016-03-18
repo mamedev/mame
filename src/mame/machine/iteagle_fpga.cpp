@@ -221,7 +221,7 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 				if (m_serial_rx3.empty()) {
 					m_serial_com3[0] &= ~0x1;
 					m_serial_com3[3] &= ~0x20;
-					m_cpu->set_input_line(4, CLEAR_LINE);
+					m_cpu->set_input_line(m_serial_irq_num, CLEAR_LINE);
 				}
 			}
 			if (LOG_FPGA)
@@ -365,7 +365,7 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 						m_serial_rx3 += "OK\r";
 					m_serial_com3[0] |= 0x1;
 					m_serial_com3[3] = 0x20;
-					m_cpu->set_input_line(4, ASSERT_LINE);
+					m_cpu->set_input_line(m_serial_irq_num, ASSERT_LINE);
 					m_serial_str.clear();
 				}
 			}
