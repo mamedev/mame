@@ -163,12 +163,9 @@ bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
     bgfx::setViewFrameBuffer(view, handle);
 	bgfx::setViewRect(view, 0, 0, width, height);
 
-	float viewMat[16];
-	bx::mtxIdentity(viewMat);
-
 	float projMat[16];
 	bx::mtxOrtho(projMat, 0.0f, screen_width, screen_height, 0.0f, 0.0f, 100.0f);
-	bgfx::setViewTransform(view, viewMat, projMat);
+	bgfx::setViewTransform(view, nullptr, projMat);
 
     bgfx::setViewClear(view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
     return true;
@@ -187,47 +184,59 @@ void bgfx_chain_entry::put_screen_buffer(render_primitive* prim, bgfx::Transient
 
     ScreenVertex* vertex = reinterpret_cast<ScreenVertex*>(buffer->data);
 
-    vertex[0].m_x = prim->bounds.x0;
-    vertex[0].m_y = prim->bounds.y0;
+	float x[4] = { prim->bounds.x0, prim->bounds.x1, prim->bounds.x0, prim->bounds.x1 };
+	float y[4] = { prim->bounds.y0, prim->bounds.y0, prim->bounds.y1, prim->bounds.y1 };
+	float u[4] = { 0, 1, 0, 1 };
+	float v[4] = { 0, 0, 1, 1 };
+
+	bgfx::RendererType::Enum renderer_type = bgfx::getRendererType();
+	if (renderer_type == bgfx::RendererType::OpenGL || renderer_type == bgfx::RendererType::OpenGLES)
+	{
+		v[0] = v[1] = 1;
+		v[2] = v[3] = 0;
+	}
+
+    vertex[0].m_x = x[0];
+    vertex[0].m_y = y[0];
     vertex[0].m_z = 0;
     vertex[0].m_rgba = 0xffffffff;
-    vertex[0].m_u = prim->texcoords.tl.u;
-    vertex[0].m_v = prim->texcoords.tl.v;
+    vertex[0].m_u = u[0];
+    vertex[0].m_v = v[0];
 
-    vertex[1].m_x = prim->bounds.x1;
-    vertex[1].m_y = prim->bounds.y0;
+    vertex[1].m_x = x[1];
+    vertex[1].m_y = y[1];
     vertex[1].m_z = 0;
     vertex[1].m_rgba = 0xffffffff;
-    vertex[1].m_u = prim->texcoords.tr.u;
-    vertex[1].m_v = prim->texcoords.tr.v;
+    vertex[1].m_u = u[1];
+    vertex[1].m_v = v[1];
 
-    vertex[2].m_x = prim->bounds.x1;
-    vertex[2].m_y = prim->bounds.y1;
+    vertex[2].m_x = x[3];
+    vertex[2].m_y = y[3];
     vertex[2].m_z = 0;
     vertex[2].m_rgba = 0xffffffff;
-    vertex[2].m_u = prim->texcoords.br.u;
-    vertex[2].m_v = prim->texcoords.br.v;
+    vertex[2].m_u = u[3];
+    vertex[2].m_v = v[3];
 
-    vertex[3].m_x = prim->bounds.x1;
-    vertex[3].m_y = prim->bounds.y1;
+    vertex[3].m_x = x[3];
+    vertex[3].m_y = y[3];
     vertex[3].m_z = 0;
     vertex[3].m_rgba = 0xffffffff;
-    vertex[3].m_u = prim->texcoords.br.u;
-    vertex[3].m_v = prim->texcoords.br.v;
+    vertex[3].m_u = u[3];
+    vertex[3].m_v = v[3];
 
-    vertex[4].m_x = prim->bounds.x0;
-    vertex[4].m_y = prim->bounds.y1;
+    vertex[4].m_x = x[2];
+    vertex[4].m_y = y[2];
     vertex[4].m_z = 0;
     vertex[4].m_rgba = 0xffffffff;
-    vertex[4].m_u = prim->texcoords.bl.u;
-    vertex[4].m_v = prim->texcoords.bl.v;
+    vertex[4].m_u = u[2];
+    vertex[4].m_v = v[2];
 
-    vertex[5].m_x = prim->bounds.x0;
-    vertex[5].m_y = prim->bounds.y0;
+    vertex[5].m_x = x[0];
+    vertex[5].m_y = y[0];
     vertex[5].m_z = 0;
     vertex[5].m_rgba = 0xffffffff;
-    vertex[5].m_u = prim->texcoords.tl.u;
-    vertex[5].m_v = prim->texcoords.tl.v;
+    vertex[5].m_u = u[0];
+    vertex[5].m_v = v[0];
 }
 
 bool bgfx_chain_entry::skip()

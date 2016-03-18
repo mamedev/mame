@@ -271,6 +271,13 @@ void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, ScreenV
 	float u[4] = { u0, u1, u0, u1 };
 	float v[4] = { v0, v0, v1, v1 };
 
+	bgfx::RendererType::Enum renderer_type = bgfx::getRendererType();
+	if (renderer_type == bgfx::RendererType::OpenGL || renderer_type == bgfx::RendererType::OpenGLES)
+	{
+		v[0] = v[1] = v1;
+		v[2] = v[3] = v0;
+	}
+
 	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_SWAP_XY)
 	{
 		std::swap(u[1], u[2]);
@@ -364,47 +371,74 @@ void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bg
 {
     ScreenVertex* vertex = reinterpret_cast<ScreenVertex*>(buffer->data);
 
-    vertex[0].m_x = prim->bounds.x0;
-    vertex[0].m_y = prim->bounds.y0;
+	float x[4] = { prim->bounds.x0, prim->bounds.x1, prim->bounds.x0, prim->bounds.x1 };
+	float y[4] = { prim->bounds.y0, prim->bounds.y0, prim->bounds.y1, prim->bounds.y1 };
+	float u[4] = { prim->texcoords.tl.u, prim->texcoords.tr.u, prim->texcoords.bl.u, prim->texcoords.br.u };
+	float v[4] = { prim->texcoords.tl.v, prim->texcoords.tr.v, prim->texcoords.bl.v, prim->texcoords.br.v };
+
+	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_SWAP_XY)
+	{
+		std::swap(u[1], u[2]);
+		std::swap(v[1], v[2]);
+	}
+
+	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_FLIP_X)
+	{
+		std::swap(u[0], u[1]);
+		std::swap(v[0], v[1]);
+		std::swap(u[2], u[3]);
+		std::swap(v[2], v[3]);
+	}
+
+	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_FLIP_Y)
+	{
+		std::swap(u[0], u[2]);
+		std::swap(v[0], v[2]);
+		std::swap(u[1], u[3]);
+		std::swap(v[1], v[3]);
+	}
+
+    vertex[0].m_x = x[0];
+    vertex[0].m_y = y[0];
     vertex[0].m_z = 0;
     vertex[0].m_rgba = 0xffffffff;
-    vertex[0].m_u = prim->texcoords.tl.u;
-    vertex[0].m_v = prim->texcoords.tl.v;
+    vertex[0].m_u = u[0];
+    vertex[0].m_v = v[0];
 
-    vertex[1].m_x = prim->bounds.x1;
-    vertex[1].m_y = prim->bounds.y0;
+    vertex[1].m_x = x[1];
+    vertex[1].m_y = y[1];
     vertex[1].m_z = 0;
     vertex[1].m_rgba = 0xffffffff;
-    vertex[1].m_u = prim->texcoords.tr.u;
-    vertex[1].m_v = prim->texcoords.tr.v;
+    vertex[1].m_u = u[1];
+    vertex[1].m_v = v[1];
 
-    vertex[2].m_x = prim->bounds.x1;
-    vertex[2].m_y = prim->bounds.y1;
+    vertex[2].m_x = x[3];
+    vertex[2].m_y = y[3];
     vertex[2].m_z = 0;
     vertex[2].m_rgba = 0xffffffff;
-    vertex[2].m_u = prim->texcoords.br.u;
-    vertex[2].m_v = prim->texcoords.br.v;
+    vertex[2].m_u = u[3];
+    vertex[2].m_v = v[3];
 
-    vertex[3].m_x = prim->bounds.x1;
-    vertex[3].m_y = prim->bounds.y1;
+    vertex[3].m_x = x[3];
+    vertex[3].m_y = y[3];
     vertex[3].m_z = 0;
     vertex[3].m_rgba = 0xffffffff;
-    vertex[3].m_u = prim->texcoords.br.u;
-    vertex[3].m_v = prim->texcoords.br.v;
+    vertex[3].m_u = u[3];
+    vertex[3].m_v = v[3];
 
-    vertex[4].m_x = prim->bounds.x0;
-    vertex[4].m_y = prim->bounds.y1;
+    vertex[4].m_x = x[2];
+    vertex[4].m_y = y[2];
     vertex[4].m_z = 0;
     vertex[4].m_rgba = 0xffffffff;
-    vertex[4].m_u = prim->texcoords.bl.u;
-    vertex[4].m_v = prim->texcoords.bl.v;
+    vertex[4].m_u = u[2];
+    vertex[4].m_v = v[2];
 
-    vertex[5].m_x = prim->bounds.x0;
-    vertex[5].m_y = prim->bounds.y0;
+    vertex[5].m_x = x[0];
+    vertex[5].m_y = y[0];
     vertex[5].m_z = 0;
     vertex[5].m_rgba = 0xffffffff;
-    vertex[5].m_u = prim->texcoords.tl.u;
-    vertex[5].m_v = prim->texcoords.tl.v;
+    vertex[5].m_u = u[0];
+    vertex[5].m_v = v[0];
 
     UINT32 blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
     bgfx::setVertexBuffer(buffer);
@@ -785,18 +819,10 @@ int renderer_bgfx::draw(int update)
 	bgfx::setViewRect(view_index, 0, 0, m_width[window_index], m_height[window_index]);
 
 	// Setup view transform.
-	{
-		float view[16];
-		bx::mtxIdentity(view);
+	float proj[16];
+	bx::mtxOrtho(proj, 0.0f, m_width[window_index], m_height[window_index], 0.0f, 0.0f, 100.0f);
+	bgfx::setViewTransform(view_index, nullptr, proj);
 
-		float left = 0.0f;
-		float top = 0.0f;
-		float right = m_width[window_index];
-		float bottom = m_height[window_index];
-		float proj[16];
-		bx::mtxOrtho(proj, left, right, bottom, top, 0.0f, 100.0f);
-		bgfx::setViewTransform(view_index, view, proj);
-	}
 	bgfx::setViewClear(view_index
 		, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
 		, 0x000000ff
@@ -1117,7 +1143,10 @@ slider_state* renderer_bgfx::get_slider_list()
             tailptr = &(*tailptr)->next;
         }
     }
-    (*tailptr)->next = nullptr;
+    if (*tailptr != nullptr)
+    {
+    	(*tailptr)->next = nullptr;
+	}
     m_sliders_dirty = false;
     return listhead;
 }

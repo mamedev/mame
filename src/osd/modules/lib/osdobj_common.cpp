@@ -144,7 +144,7 @@ const options_entry osd_options::s_option_entries[] =
     { OSDOPTION_BGFX_PATH,                    "bgfx",            OPTION_STRING, "path to BGFX-related files" },
     { OSDOPTION_BGFX_BACKEND,                 "auto",            OPTION_STRING, "BGFX backend to use (d3d9, d3d11, metal, opengl, gles)" },
     { OSDOPTION_BGFX_DEBUG,                   "0",               OPTION_BOOLEAN, "enable BGFX debugging statistics" },
-    { OSDOPTION_BGFX_SCREEN_CHAIN,            "hlsl",            OPTION_STRING, "screen chain JSON file to use" },
+    { OSDOPTION_BGFX_SCREEN_CHAIN,            "default",         OPTION_STRING, "screen chain JSON file to use" },
     { OSDOPTION_BGFX_SHADOW_MASK,             "shadow-mask.png", OPTION_STRING, "shadow mask texture name" },
     { OSDOPTION_BGFX_PRESCALE_X,              "1",               OPTION_INTEGER, "x prescale" },
     { OSDOPTION_BGFX_PRESCALE_Y,              "1",               OPTION_INTEGER, "y prescale" },
