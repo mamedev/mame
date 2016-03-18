@@ -565,7 +565,7 @@ static util::core_file::ptr create_file_and_output_header(std::string &filename,
 	util::core_file::ptr file;
 
 	/* create the indexfile */
-	if (util::core_file::open(filename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, file) != osd_file::error::NONE)
+	if (util::core_file::open(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, file) != osd_file::error::NONE)
 		return util::core_file::ptr();
 
 	/* print a header */
@@ -735,7 +735,7 @@ static int compare_screenshots(summary_file *curfile)
 			fullname = string_format("%s" PATH_SEPARATOR "snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", lists[listnum].dir, curfile->name);
 
 			/* open the file */
-			filerr = util::core_file::open(fullname.c_str(), OPEN_FLAG_READ, file);
+			filerr = util::core_file::open(fullname, OPEN_FLAG_READ, file);
 
 			/* if that failed, look in the old location */
 			if (filerr != osd_file::error::NONE)
@@ -744,7 +744,7 @@ static int compare_screenshots(summary_file *curfile)
 				fullname = string_format("%s" PATH_SEPARATOR "snap" PATH_SEPARATOR "_%s.png", lists[listnum].dir, curfile->name);
 
 				/* open the file */
-				filerr = util::core_file::open(fullname.c_str(), OPEN_FLAG_READ, file);
+				filerr = util::core_file::open(fullname, OPEN_FLAG_READ, file);
 			}
 
 			/* if that worked, load the file */
@@ -853,7 +853,7 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 			tempname = string_format("%s" PATH_SEPARATOR "%s", lists[listnum].dir, srcimgname.c_str());
 
 			/* open the source image */
-			filerr = util::core_file::open(tempname.c_str(), OPEN_FLAG_READ, file);
+			filerr = util::core_file::open(tempname, OPEN_FLAG_READ, file);
 			if (filerr != osd_file::error::NONE)
 				goto error;
 
@@ -925,7 +925,7 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 	}
 
 	/* write the final PNG */
-	filerr = util::core_file::open(dstfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
+	filerr = util::core_file::open(dstfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
 	if (filerr != osd_file::error::NONE)
 		goto error;
 	pngerr = png_write_bitmap(*file, nullptr, finalbitmap, 0, nullptr);

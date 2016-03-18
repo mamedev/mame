@@ -333,7 +333,7 @@ public:
 				{
 					m_file.reset();
 					m_lastfile = m_info.track[tracknum].fname;
-					osd_file::error filerr = util::core_file::open(m_lastfile.c_str(), OPEN_FLAG_READ, m_file);
+					osd_file::error filerr = util::core_file::open(m_lastfile, OPEN_FLAG_READ, m_file);
 					if (filerr != osd_file::error::NONE)
 						report_error(1, "Error opening input file (%s)'", m_lastfile.c_str());
 				}
@@ -1574,7 +1574,7 @@ static void do_create_raw(parameters_t &params)
 	auto input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != params.end())
 	{
-		osd_file::error filerr = util::core_file::open(input_file_str->second->c_str(), OPEN_FLAG_READ, input_file);
+		osd_file::error filerr = util::core_file::open(*input_file_str->second, OPEN_FLAG_READ, input_file);
 		if (filerr != osd_file::error::NONE)
 			report_error(1, "Unable to open file (%s)", input_file_str->second->c_str());
 	}
@@ -1671,7 +1671,7 @@ static void do_create_hd(parameters_t &params)
 	auto input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != params.end())
 	{
-		osd_file::error filerr = util::core_file::open(input_file_str->second->c_str(), OPEN_FLAG_READ, input_file);
+		osd_file::error filerr = util::core_file::open(*input_file_str->second, OPEN_FLAG_READ, input_file);
 		if (filerr != osd_file::error::NONE)
 			report_error(1, "Unable to open file (%s)", input_file_str->second->c_str());
 	}
@@ -2240,7 +2240,7 @@ static void do_extract_raw(parameters_t &params)
 	try
 	{
 		// process output file
-		osd_file::error filerr = util::core_file::open(output_file_str->second->c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
+		osd_file::error filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
 		if (filerr != osd_file::error::NONE)
 			report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
 
@@ -2345,14 +2345,14 @@ static void do_extract_cd(parameters_t &params)
 		}
 
 		// process output file
-		osd_file::error filerr = util::core_file::open(output_file_str->second->c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, output_toc_file);
+		osd_file::error filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, output_toc_file);
 		if (filerr != osd_file::error::NONE)
 			report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
 
 		// process output BIN file
 		if (mode != MODE_GDI)
 		{
-			filerr = util::core_file::open(output_bin_file_str->c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
+			filerr = util::core_file::open(*output_bin_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
 			if (filerr != osd_file::error::NONE)
 				report_error(1, "Unable to open file (%s)", output_bin_file_str->c_str());
 		}
@@ -2388,7 +2388,7 @@ static void do_extract_cd(parameters_t &params)
 
 				output_bin_file.reset();
 
-				filerr = util::core_file::open(trackbin_name.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
+				filerr = util::core_file::open(trackbin_name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
 				if (filerr != osd_file::error::NONE)
 					report_error(1, "Unable to open file (%s)", trackbin_name.c_str());
 
@@ -2795,7 +2795,7 @@ static void do_dump_metadata(parameters_t &params)
 		// create the file
 		if (output_file_str != params.end())
 		{
-			osd_file::error filerr = util::core_file::open(output_file_str->second->c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
+			osd_file::error filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
 			if (filerr != osd_file::error::NONE)
 				report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
 

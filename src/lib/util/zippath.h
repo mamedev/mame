@@ -10,13 +10,15 @@
 
 #pragma once
 
-#ifndef __ZIPPATH_H__
-#define __ZIPPATH_H__
+#ifndef MAME_LIB_UTIL_ZIPPATH_H
+#define MAME_LIB_UTIL_ZIPPATH_H
 
 #include "corefile.h"
 #include <string>
 #include "unzip.h"
 
+
+namespace util {
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -62,6 +64,7 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory);
 /* returns TRUE if this path is a ZIP path or FALSE if not */
 int zippath_is_zip(zippath_directory *directory);
 
+} // namespace util
 
 
-#endif /* __ZIPPATH_H__ */
+#endif /* MAME_LIB_UTIL_ZIPPATH_H */

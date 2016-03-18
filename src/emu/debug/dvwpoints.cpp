@@ -266,6 +266,7 @@ void debug_view_watchpoints::view_update()
 	if (m_visible.y > 0)
 	{
 		linebuf.clear();
+		linebuf.rdbuf()->clear();
 		linebuf << "ID";
 		if (m_sortType == &cIndexAscending) linebuf.put('\\');
 		else if (m_sortType == &cIndexDescending) linebuf.put('/');
@@ -317,6 +318,7 @@ void debug_view_watchpoints::view_update()
 			device_debug::watchpoint *const wp = m_buffer[wpi];
 
 			linebuf.clear();
+			linebuf.rdbuf()->clear();
 			util::stream_format(linebuf, "%2X", wp->index());
 			pad_ostream_to_length(linebuf, tableBreaks[0]);
 			linebuf.put(wp->enabled() ? 'X' : 'O');

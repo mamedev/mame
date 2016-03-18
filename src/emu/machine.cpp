@@ -440,7 +440,7 @@ int running_machine::run(bool firstrun)
 
 	// call all exit callbacks registered
 	call_notifiers(MACHINE_NOTIFY_EXIT);
-	zip_file::cache_clear();
+	util::archive_file::cache_clear();
 
 	// close the logfile
 	m_logfile.reset();

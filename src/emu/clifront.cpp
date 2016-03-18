@@ -15,7 +15,6 @@
 #include "audit.h"
 #include "info.h"
 #include "unzip.h"
-#include "un7z.h"
 #include "validity.h"
 #include "sound/samples.h"
 #include "cliopts.h"
@@ -266,7 +265,7 @@ int cli_frontend::execute(int argc, char **argv)
 		m_result = MAMERR_FATALERROR;
 	}
 
-	_7z_file::cache_clear();
+	util::archive_file::cache_clear();
 	global_free(manager);
 
 	return m_result;
@@ -1000,7 +999,7 @@ void cli_frontend::verifyroms(const char *gamename)
 	}
 
 	// clear out any cached files
-	zip_file::cache_clear();
+	util::archive_file::cache_clear();
 
 	// return an error if none found
 	if (matched == 0)
@@ -1092,7 +1091,7 @@ void cli_frontend::verifysamples(const char *gamename)
 	}
 
 	// clear out any cached files
-	zip_file::cache_clear();
+	util::archive_file::cache_clear();
 
 	// return an error if none found
 	if (matched == 0)
@@ -1407,7 +1406,7 @@ void cli_frontend::verifysoftware(const char *gamename)
 	}
 
 	// clear out any cached files
-	zip_file::cache_clear();
+	util::archive_file::cache_clear();
 
 	// return an error if none found
 	if (matched == 0)
@@ -1529,7 +1528,7 @@ void cli_frontend::verifysoftlist(const char *gamename)
 	}
 
 	// clear out any cached files
-	zip_file::cache_clear();
+	util::archive_file::cache_clear();
 
 	// return an error if none found
 	if (matched == 0)
@@ -1758,28 +1757,32 @@ void media_identifier::identify(const char *filename)
 	}
 
 	// if that failed, and the filename ends with .zip, identify as a ZIP file
-	if (core_filename_ends_with(filename, ".7z"))
+	if (core_filename_ends_with(filename, ".7z") || core_filename_ends_with(filename, ".zip"))
 	{
 		// first attempt to examine it as a valid _7Z file
-		_7z_file::ptr _7z;
-		_7z_file::error _7zerr = _7z_file::open(filename, _7z);
-		if (_7zerr == _7z_file::error::NONE && _7z != nullptr)
+		util::archive_file::ptr archive;
+		util::archive_file::error err;
+		if (core_filename_ends_with(filename, ".7z"))
+			err = util::archive_file::open_7z(filename, archive);
+		else
+			err = util::archive_file::open_zip(filename, archive);
+		if ((err == util::archive_file::error::NONE) && archive)
 		{
 			std::vector<std::uint8_t> data;
 
 			// loop over entries in the .7z, skipping empty files and directories
-			for (int i = _7z->first_file(); i >= 0; i = _7z->next_file())
+			for (int i = archive->first_file(); i >= 0; i = archive->next_file())
 			{
-				const std::uint64_t length(_7z->current_uncompressed_length());
-				if ((length != 0) && (std::uint32_t(length) == length))
+				const std::uint64_t length(archive->current_uncompressed_length());
+				if (!archive->current_is_directory() && (length != 0) && (std::uint32_t(length) == length))
 				{
 					// decompress data into RAM and identify it
 					try
 					{
 						data.resize(std::size_t(length));
-						_7zerr = _7z->decompress(&data[0], std::uint32_t(length));
-						if (_7zerr == _7z_file::error::NONE)
-							identify_data(_7z->current_name().c_str(), &data[0], length);
+						err = archive->decompress(&data[0], std::uint32_t(length));
+						if (err == util::archive_file::error::NONE)
+							identify_data(archive->current_name().c_str(), &data[0], length);
 					}
 					catch (...)
 					{
@@ -1791,31 +1794,8 @@ void media_identifier::identify(const char *filename)
 		}
 
 		// clear out any cached files
-		_7z.reset();
-		_7z_file::cache_clear();
-	}
-	else if (core_filename_ends_with(filename, ".zip"))
-	{
-		// first attempt to examine it as a valid ZIP file
-		zip_file::ptr zip = nullptr;
-		zip_file::error ziperr = zip_file::open(filename, zip);
-		if (ziperr == zip_file::error::NONE && zip != nullptr)
-		{
-			// loop over entries in the ZIP, skipping empty files and directories
-			for (const zip_file::file_header *entry = zip->first_file(); entry != nullptr; entry = zip->next_file())
-				if (entry->uncompressed_length != 0)
-				{
-					// decompress data into RAM and identify it
-					dynamic_buffer data(entry->uncompressed_length);
-					ziperr = zip->decompress(&data[0], entry->uncompressed_length);
-					if (ziperr == zip_file::error::NONE)
-						identify_data(entry->filename, &data[0], entry->uncompressed_length);
-				}
-		}
-
-		// clear out any cached files
-		zip.reset();
-		zip_file::cache_clear();
+		archive.reset();
+		util::archive_file::cache_clear();
 	}
 
 	// otherwise, identify as a raw file

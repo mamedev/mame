@@ -4,7 +4,7 @@
 
     unzip.h
 
-    ZIP file management.
+    archive file management.
 
 ***************************************************************************/
 
@@ -20,12 +20,14 @@
 #include <string>
 
 
+namespace util {
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-// describes an open ZIP file
-class zip_file
+// describes an open archive file
+class archive_file
 {
 public:
 
@@ -43,55 +45,45 @@ public:
 		BUFFER_TOO_SMALL
 	};
 
-	// contains extracted file header information
-	struct file_header
-	{
-		std::uint32_t   signature;              // central file header signature
-		std::uint16_t   version_created;        // version made by
-		std::uint16_t   version_needed;         // version needed to extract
-		std::uint16_t   bit_flag;               // general purpose bit flag
-		std::uint16_t   compression;            // compression method
-		std::uint16_t   file_time;              // last mod file time
-		std::uint16_t   file_date;              // last mod file date
-		std::uint32_t   crc;                    // crc-32
-		std::uint32_t   compressed_length;      // compressed size
-		std::uint32_t   uncompressed_length;    // uncompressed size
-		std::uint16_t   filename_length;        // filename length
-		std::uint16_t   extra_field_length;     // extra field length
-		std::uint16_t   file_comment_length;    // file comment length
-		std::uint16_t   start_disk_number;      // disk number start
-		std::uint16_t   internal_attributes;    // internal file attributes
-		std::uint32_t   external_attributes;    // external file attributes
-		std::uint32_t   local_header_offset;    // relative offset of local header
-		const char *    filename;               // filename
-	};
-
-	typedef std::unique_ptr<zip_file> ptr;
+	typedef std::unique_ptr<archive_file> ptr;
 
 
-	/* ----- ZIP file access ----- */
+	/* ----- archive file access ----- */
 
 	// open a ZIP file and parse its central directory
-	static error open(const std::string &filename, ptr &zip);
+	static error open_zip(const std::string &filename, ptr &zip);
 
-	// close a ZIP file (may actually be left open due to caching)
-	virtual ~zip_file();
+	// open a 7Z file and parse its central directory
+	static error open_7z(const std::string &filename, ptr &result);
 
-	// clear out all open ZIP files from the cache
+	// close an archive file (may actually be left open due to caching)
+	virtual ~archive_file();
+
+	// clear out all open files from the cache
 	static void cache_clear();
 
 
 	/* ----- contained file access ----- */
 
-	// find the first file in the ZIP
-	virtual const file_header *first_file() = 0;
+	// iterating over files - returns negative on reaching end
+	virtual int first_file() = 0;
+	virtual int next_file() = 0;
 
-	// find the next file in the ZIP
-	virtual const file_header *next_file() = 0;
+	// find a file index by crc, filename or both - returns non-negative on match
+	virtual int search(std::uint32_t crc) = 0;
+	virtual int search(const std::string &filename) = 0;
+	virtual int search(std::uint32_t crc, const std::string &filename) = 0;
+
+	// information on most recently found file
+	virtual bool current_is_directory() const = 0;
+	virtual const std::string &current_name() const = 0;
+	virtual std::uint64_t current_uncompressed_length() const = 0;
+	virtual std::uint32_t current_crc() const = 0;
 
 	// decompress the most recently found file in the ZIP
 	virtual error decompress(void *buffer, std::uint32_t length) = 0;
 };
 
+} // namespace util
 
 #endif  // MAME_LIB_UTIL_UNZIP_H
