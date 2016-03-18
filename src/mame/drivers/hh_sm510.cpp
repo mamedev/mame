@@ -89,11 +89,14 @@ WRITE16_MEMBER(hh_sm510_state::lcd_segment_w)
 
 		if (state != m_lcd_output_cache[index])
 		{
-			// output to x.y, where x = row a/b/bs/c*4 + H1-4, y = seg1-16
+			// output to row.seg.H, where:
+			// row = row a/b/bs/c (0/1/2/3)
+			// seg = seg 1-16 (0-15)
+			// H = H1-H4 (0-3)
 			char buf[0x10];
-			sprintf(buf, "%d.%d", offset, seg);
+			sprintf(buf, "%d.%d.%d", offset >> 2, seg, offset & 3);
 			output().set_value(buf, state);
-
+			
 			m_lcd_output_cache[index] = state;
 		}
 	}
