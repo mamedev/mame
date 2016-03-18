@@ -933,6 +933,8 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 
 	// aspect and scale options
 	m_keepaspect = manager.machine().options().keep_aspect();
+ 	m_int_scale_x = manager.machine().options().int_scale_x();
+ 	m_int_scale_y = manager.machine().options().int_scale_y();
 
 	// determine the base orientation based on options
 	if (!manager.machine().options().rotate())
@@ -1008,11 +1010,6 @@ void render_target::set_bounds(INT32 width, INT32 height, float pixel_aspect)
 	m_bounds.x0 = m_bounds.y0 = 0;
 	m_bounds.x1 = (float)width;
 	m_bounds.y1 = (float)height;
-	m_pixel_aspect = pixel_aspect != 0.0? pixel_aspect : 1.0;
-
-	// Check if our layout needs to be recomputed
-	if (m_curview != nullptr && m_curview->set_physical_size(width, height, m_pixel_aspect, m_orientation))
-		m_curview->recompute(m_layerconfig);
 }
 
 
@@ -1221,12 +1218,7 @@ void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
 				const rectangle &visarea = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? vectorvis : screen->visible_area();
 
 				// apply target orientation to the bounds
-				render_bounds bounds;
-				if (m_curview->bounds().scale_type == RENDER_SCALE_FRACTIONAL)
-					bounds = curitem->bounds();
-				else
-					set_render_bounds_wh(&bounds, 0, 0, 1, 1);
-
+				render_bounds bounds = curitem->bounds();
 				apply_orientation(bounds, m_orientation);
 				normalize_bounds(bounds);
 
