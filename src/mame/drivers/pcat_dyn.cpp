@@ -84,34 +84,11 @@ ADDRESS_MAP_END
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
 
 static INPUT_PORTS_START( pcat_dyn )
-	PORT_START("pc_keyboard_0")
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
-	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
-
-	PORT_START("pc_keyboard_1")
-	AT_KEYB_HELPER( 0x0020, "Y",            KEYCODE_Y           ) /* Y                           15  95 */
-	AT_KEYB_HELPER( 0x1000, "Enter",        KEYCODE_ENTER       ) /* Enter                       1C  9C */
-
-	PORT_START("pc_keyboard_2")
-
-	PORT_START("pc_keyboard_3")
-	AT_KEYB_HELPER( 0x0002, "N",            KEYCODE_N           ) /* N                           31  B1 */
-	AT_KEYB_HELPER( 0x0800, "F1",           KEYCODE_S           ) /* F1                          3B  BB */
-
-	PORT_START("pc_keyboard_4")
-
-	PORT_START("pc_keyboard_5")
-
-	PORT_START("pc_keyboard_6")
-	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",       KEYCODE_UP          ) /* Up                          67  e7 */
-	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",         KEYCODE_PGUP        ) /* Page Up                     68  e8 */
-	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",     KEYCODE_LEFT        ) /* Left                        69  e9 */
-	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",    KEYCODE_RIGHT       ) /* Right                       6a  ea */
-	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",     KEYCODE_DOWN        ) /* Down                        6c  ec */
-	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",       KEYCODE_PGDN        ) /* Page Down                   6d  ed */
-	AT_KEYB_HELPER( 0x4000, "Del",                  KEYCODE_A           ) /* Delete                      6f  ef */
-
-	PORT_START("pc_keyboard_7")
+	// 8 -- Bookkeeping
+	// L -- Coin
+	// M,N,Numpad 6 -- Hang
+	// Enter,Numpad 4 -- 5 Credits
+	PORT_INCLUDE(at_keyboard)
 INPUT_PORTS_END
 
 static SLOT_INTERFACE_START(pcat_dyn_com)
@@ -182,7 +159,7 @@ ROM_START(toursol)
 	ROM_LOAD("sol.u21", 0x00000, 0x40000, CRC(e97724d9) SHA1(995b89d129c371b815c6b498093bd1bbf9fd8755))
 	ROM_LOAD("sol.u22", 0x40000, 0x40000, CRC(69d42f50) SHA1(737fe62f3827b00b4f6f3b72ef6c7b6740947e95))
 	ROM_LOAD("sol.u23", 0x80000, 0x40000, CRC(d1e39bd4) SHA1(39c7ee43cddb53fba0f7c0572ddc40289c4edd07))
-	ROM_LOAD("sol.u24", 0xa0000, 0x40000, CRC(555341e0) SHA1(81fee576728855e234ff7aae06f54ae9705c3ab5))
+	ROM_LOAD("sol.u24", 0xc0000, 0x40000, CRC(555341e0) SHA1(81fee576728855e234ff7aae06f54ae9705c3ab5))
 	ROM_LOAD("sol.u28", 0xe0000, 0x02000, CRC(c9374d50) SHA1(49173bc69f70bb2a7e8af9d03e2538b34aa881d8))
 	ROM_FILL(0x2a3e6, 1, 0xeb) // skip prot(?) check
 
@@ -203,7 +180,7 @@ ROM_START(toursol1)
 	ROM_LOAD("prom.0", 0x00000, 0x40000, CRC(f26ce73f) SHA1(5516c31aa18716a47f46e412fc273ae8784d2061))
 	ROM_LOAD("prom.1", 0x40000, 0x40000, CRC(8f96e2a8) SHA1(bc3ce8b99e6ff40e355df2c3f797f1fe88b3b219))
 	ROM_LOAD("prom.2", 0x80000, 0x40000, CRC(8b0ac5cf) SHA1(1c2b6a53c9ff4d18a5227d899facbbc719f40205))
-	ROM_LOAD("prom.3", 0xa0000, 0x40000, CRC(9352e965) SHA1(2bfb647ec27c60a8c821fdf7483199e1a444cea8))
+	ROM_LOAD("prom.3", 0xc0000, 0x40000, CRC(9352e965) SHA1(2bfb647ec27c60a8c821fdf7483199e1a444cea8))
 	ROM_LOAD("prom.7", 0xe0000, 0x02000, CRC(154c8092) SHA1(4439ee82f36d5d5c334494ba7bb4848e839213a7))
 
 	ROM_REGION(128, "rtc", 0)
