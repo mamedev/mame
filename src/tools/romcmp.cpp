@@ -490,43 +490,44 @@ static int load_files(int i, int *found, const char *path)
 	/* if not, try to open as a ZIP file */
 	else
 	{
-		zip_file::ptr zip;
-		const zip_file::file_header* zipent;
-		zip_file::error ziperr;
+		util::archive_file::ptr zip;
+		util::archive_file::error ziperr;
 
 		/* wasn't a directory, so try to open it as a zip file */
-		ziperr = zip_file::open(path, zip);
-		if (ziperr != zip_file::error::NONE)
+		ziperr = util::archive_file::open_zip(path, zip);
+		if (ziperr != util::archive_file::error::NONE)
 		{
 			printf("Error, cannot open zip file '%s' !\n", path);
 			return 1;
 		}
 
 		/* load all files in zip file */
-		for (zipent = zip->first_file(); zipent != nullptr; zipent = zip->next_file())
+		for (int zipent = zip->first_file(); zipent >= 0; zipent = zip->next_file())
 		{
 			int size;
 
-			size = zipent->uncompressed_length;
+			size = zip->current_uncompressed_length();
 			while (size && (size & 1) == 0) size >>= 1;
-			if (zipent->uncompressed_length == 0) // || (size & ~1))
+			if (zip->current_uncompressed_length() == 0) // || (size & ~1))
+			{
 				printf("%-23s %-23s ignored (not a ROM)\n",
-					i ? "" : zipent->filename, i ? zipent->filename : "");
+					i ? "" : zip->current_name().c_str(), i ? zip->current_name().c_str() : "");
+			}
 			else
 			{
 				fileinfo *file = &files[i][found[i]];
-				const char *delim = strrchr(zipent->filename,'/');
+				const char *delim = strrchr(zip->current_name().c_str(), '/');
 
 				if (delim)
 					strcpy (file->name,delim+1);
 				else
-					strcpy(file->name,zipent->filename);
-				file->size = zipent->uncompressed_length;
+					strcpy(file->name,zip->current_name().c_str());
+				file->size = zip->current_uncompressed_length();
 				if ((file->buf = (unsigned char *)malloc(file->size)) == nullptr)
 					printf("%s: out of memory!\n",file->name);
 				else
 				{
-					if (zip->decompress(file->buf, file->size) != zip_file::error::NONE)
+					if (zip->decompress(file->buf, file->size) != util::archive_file::error::NONE)
 					{
 						free(file->buf);
 						file->buf = nullptr;
@@ -743,6 +744,6 @@ int CLIB_DECL main(int argc,char *argv[])
 		}
 	}
 
-	zip_file::cache_clear();
+	util::archive_file::cache_clear();
 	return 0;
 }

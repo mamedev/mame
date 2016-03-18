@@ -104,24 +104,23 @@ static imgtool_stream *stream_open_zip(const char *zipname, const char *subname,
 
 	imgfile->imgtype = IMG_MEM;
 
-	zip_file::ptr z;
-	const zip_file::file_header *zipent = nullptr;
-	zip_file::open(zipname, z);
+	util::archive_file::ptr z;
+	util::archive_file::open_zip(zipname, z);
 	if (!z)
 		return nullptr;
 
-	zipent = z->first_file();
-	while (zipent && subname && strcmp(subname, zipent->filename))
+	int zipent = z->first_file();
+	while ((zipent >= 0) && subname && strcmp(subname, z->current_name().c_str()))
 		zipent = z->next_file();
-	if (!zipent)
+	if (zipent < 0)
 		return nullptr;
 
-	imgfile->filesize = zipent->uncompressed_length;
-	imgfile->buffer = reinterpret_cast<std::uint8_t *>(malloc(zipent->uncompressed_length));
+	imgfile->filesize = z->current_uncompressed_length();
+	imgfile->buffer = reinterpret_cast<std::uint8_t *>(malloc(z->current_uncompressed_length()));
 	if (!imgfile->buffer)
 		return nullptr;
 
-	if (z->decompress(imgfile->buffer, zipent->uncompressed_length) != zip_file::error::NONE)
+	if (z->decompress(imgfile->buffer, z->current_uncompressed_length()) != util::archive_file::error::NONE)
 		return nullptr;
 
 	return imgfile.release();

@@ -158,7 +158,7 @@ void device_image_interface::device_compute_hash(hash_collection &hashes, const 
 image_error_t device_image_interface::set_image_filename(const char *filename)
 {
 	m_image_name = filename;
-	zippath_parent(m_working_directory, filename);
+	util::zippath_parent(m_working_directory, filename);
 	m_basename.assign(m_image_name);
 
 	size_t loc1 = m_image_name.find_last_of('\\');
@@ -319,7 +319,7 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 
 	/* did we successfully identify the directory? */
 	if (success)
-		zippath_combine(m_working_directory, m_working_directory.c_str(), subdir);
+		util::zippath_combine(m_working_directory, m_working_directory.c_str(), subdir);
 
 	return success;
 }
@@ -611,7 +611,7 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
 	std::string revised_path;
 
 	/* attempt to read the file */
-	auto const filerr = zippath_fopen(path, open_flags, m_file, revised_path);
+	auto const filerr = util::zippath_fopen(path, open_flags, m_file, revised_path);
 
 	/* did the open succeed? */
 	switch(filerr)
@@ -663,7 +663,7 @@ int device_image_interface::reopen_for_write(const char *path)
 	std::string revised_path;
 
 	/* attempt to open the file for writing*/
-	auto const filerr = zippath_fopen(path, OPEN_FLAG_READ|OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, m_file, revised_path);
+	auto const filerr = util::zippath_fopen(path, OPEN_FLAG_READ|OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, m_file, revised_path);
 
 	/* did the open succeed? */
 	switch(filerr)

@@ -1872,6 +1872,7 @@ static void execute_dump(running_machine &machine, int ref, int params, const ch
 	for (i = offset; i <= endoffset; i += 16)
 	{
 		output.clear();
+		output.rdbuf()->clear();
 
 		/* print the address */
 		util::stream_format(output, "%0*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(i));
@@ -2306,6 +2307,7 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 			{
 				active_cheat++;
 				output.clear();
+				output.rdbuf()->clear();
 				stream_format(
 						output,
 						"  <cheat desc=\"Possibility %d : %0*X (%0*X)\">\n"
@@ -2516,6 +2518,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 		offs_t tempaddr;
 		int numbytes = 0;
 		output.clear();
+		output.rdbuf()->clear();
 
 		/* print the address */
 		stream_format(output, "%0*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(pcbyte));

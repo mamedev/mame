@@ -365,7 +365,7 @@ floppy_image_format_t *floppy_image_device::identify(std::string filename)
 	util::core_file::ptr fd;
 	std::string revised_path;
 
-	osd_file::error err = zippath_fopen(filename.c_str(), OPEN_FLAG_READ, fd, revised_path);
+	osd_file::error err = util::zippath_fopen(filename.c_str(), OPEN_FLAG_READ, fd, revised_path);
 	if(err != osd_file::error::NONE) {
 		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to open the image file");
 		return nullptr;
@@ -1004,7 +1004,7 @@ void ui_menu_control_floppy_image::hook_load(std::string filename, bool softlist
 		std::string tmp_path;
 		util::core_file::ptr tmp_file;
 		/* attempt to open the file for writing but *without* create */
-		filerr = zippath_fopen(filename.c_str(), OPEN_FLAG_READ | OPEN_FLAG_WRITE, tmp_file, tmp_path);
+		filerr = util::zippath_fopen(filename.c_str(), OPEN_FLAG_READ | OPEN_FLAG_WRITE, tmp_file, tmp_path);
 		if(filerr == osd_file::error::NONE)
 			tmp_file.reset();
 		else
@@ -1048,7 +1048,7 @@ void ui_menu_control_floppy_image::handle()
 			state = START_FILE;
 			handle();
 		} else {
-			zippath_combine(output_filename, current_directory.c_str(), current_file.c_str());
+			util::zippath_combine(output_filename, current_directory.c_str(), current_file.c_str());
 			output_format = format_array[submenu_result];
 			do_load_create();
 			ui_menu::stack_pop(machine());

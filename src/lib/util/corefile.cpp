@@ -1084,7 +1084,7 @@ osd_file::error core_osd_file::osd_or_zlib_write(void const *buffer, std::uint64
     return an error code
 -------------------------------------------------*/
 
-osd_file::error core_file::open(char const *filename, std::uint32_t openflags, ptr &file)
+osd_file::error core_file::open(std::string const &filename, std::uint32_t openflags, ptr &file)
 {
 	try
 	{
@@ -1190,7 +1190,7 @@ core_file::~core_file()
     pointer
 -------------------------------------------------*/
 
-osd_file::error core_file::load(char const *filename, void **data, std::uint32_t &length)
+osd_file::error core_file::load(std::string const &filename, void **data, std::uint32_t &length)
 {
 	ptr file;
 
@@ -1219,7 +1219,7 @@ osd_file::error core_file::load(char const *filename, void **data, std::uint32_t
 	return osd_file::error::NONE;
 }
 
-osd_file::error core_file::load(char const *filename, dynamic_buffer &data)
+osd_file::error core_file::load(std::string const &filename, dynamic_buffer &data)
 {
 	ptr file;
 

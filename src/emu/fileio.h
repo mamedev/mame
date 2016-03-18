@@ -15,7 +15,6 @@
 
 #include "corefile.h"
 #include "hash.h"
-#include "unzip.h"
 
 // some systems use macros for getc/putc rather than functions
 #ifdef getc
@@ -27,7 +26,7 @@
 //**************************************************************************
 
 // forward declarations
-class _7z_file;
+namespace util { class archive_file; }
 
 // ======================> path_iterator
 
@@ -147,8 +146,6 @@ private:
 	// internal helpers
 	osd_file::error attempt_zipped();
 	osd_file::error load_zipped_file();
-	bool zip_filename_match(const zip_file::file_header &header, const std::string &filename);
-	bool zip_header_is_path(const zip_file::file_header &header);
 
 	osd_file::error attempt__7zped();
 	osd_file::error load__7zped_file();
@@ -163,11 +160,11 @@ private:
 	UINT32          m_openflags;                    // flags we used for the open
 	hash_collection m_hashes;                       // collection of hashes
 
-	zip_file::ptr   m_zipfile;                      // ZIP file pointer
+	std::unique_ptr<util::archive_file> m_zipfile;  // ZIP file pointer
 	dynamic_buffer  m_zipdata;                      // ZIP file data
 	UINT64          m_ziplength;                    // ZIP file length
 
-	std::unique_ptr<_7z_file> m__7zfile;            // 7Z file pointer
+	std::unique_ptr<util::archive_file> m__7zfile;  // 7Z file pointer
 	dynamic_buffer  m__7zdata;                      // 7Z file data
 	UINT64          m__7zlength;                    // 7Z file length
 
