@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /***************************************************************************
 
     ui/selsoft.cpp
@@ -86,7 +86,7 @@ bool compare_software(ui_software_info a, ui_software_info b)
 //  get bios count
 //-------------------------------------------------
 
-bool has_multiple_bios(const game_driver *driver, std::vector<s_bios> &biosname)
+bool has_multiple_bios(const game_driver *driver, s_bios &biosname)
 {
 	if (driver->rom == nullptr)
 		return 0;
@@ -901,7 +901,7 @@ void ui_menu_select_software::inkey_select(const ui_menu_event *m_event)
 
 	if (ui_swinfo->startempty == 1)
 	{
-		std::vector<s_bios> biosname;
+		s_bios biosname;
 		if (!mopt.skip_bios_menu() && has_multiple_bios(ui_swinfo->driver, biosname))
 			ui_menu::stack_push(global_alloc_clear<ui_bios_selection>(machine(), container, biosname, (void *)ui_swinfo->driver, false, true));
 		else
@@ -929,7 +929,7 @@ void ui_menu_select_software::inkey_select(const ui_menu_event *m_event)
 
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			std::vector<s_bios> biosname;
+			s_bios biosname;
 			if (!mopt.skip_bios_menu() && has_multiple_bios(ui_swinfo->driver, biosname))
 			{
 				ui_menu::stack_push(global_alloc_clear<ui_bios_selection>(machine(), container, biosname, (void *)ui_swinfo, true, false));
@@ -937,7 +937,7 @@ void ui_menu_select_software::inkey_select(const ui_menu_event *m_event)
 			}
 			else if (!mopt.skip_parts_menu() && swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
 			{
-				std::unordered_map<std::string, std::string> parts;
+				s_parts parts;
 				for (const software_part *swpart = swinfo->first_part(); swpart != nullptr; swpart = swpart->next())
 				{
 					if (swpart->matches_interface(ui_swinfo->interface.c_str()))
@@ -1926,7 +1926,7 @@ void ui_menu_select_software::draw_right_panel(void *selectedref, float origx1, 
 //  ctor
 //-------------------------------------------------
 
-ui_software_parts::ui_software_parts(running_machine &machine, render_container *container, std::unordered_map<std::string, std::string> parts, ui_software_info *ui_info) : ui_menu(machine, container)
+ui_software_parts::ui_software_parts(running_machine &machine, render_container *container, s_parts parts, ui_software_info *ui_info) : ui_menu(machine, container)
 {
 	m_parts = parts;
 	m_uiinfo = ui_info;
@@ -2019,7 +2019,7 @@ void ui_software_parts::custom_render(void *selectedref, float top, float bottom
 //  ctor
 //-------------------------------------------------
 
-ui_bios_selection::ui_bios_selection(running_machine &machine, render_container *container, std::vector<s_bios> biosname, void *_driver, bool _software, bool _inlist) : ui_menu(machine, container)
+ui_bios_selection::ui_bios_selection(running_machine &machine, render_container *container, s_bios biosname, void *_driver, bool _software, bool _inlist) : ui_menu(machine, container)
 {
 	m_bios = biosname;
 	m_driver = _driver;
@@ -2042,7 +2042,7 @@ ui_bios_selection::~ui_bios_selection()
 void ui_bios_selection::populate()
 {
 	for (auto & elem : m_bios)
-		item_append(elem.name.c_str(), nullptr, 0, (void *)&elem.name);
+		item_append(elem.first.c_str(), nullptr, 0, (void *)&elem.first);
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 	customtop = machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
@@ -2059,7 +2059,7 @@ void ui_bios_selection::handle()
 	emu_options &moptions = machine().options();
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT && event->itemref != nullptr)
 		for (auto & elem : m_bios)
-			if ((void*)&elem.name == event->itemref)
+			if ((void*)&elem.first == event->itemref)
 			{
 				if (!m_software)
 				{
@@ -2075,7 +2075,7 @@ void ui_bios_selection::handle()
 					}
 
 					std::string error;
-					moptions.set_value("bios", elem.id, OPTION_PRIORITY_CMDLINE, error);
+					moptions.set_value("bios", elem.second, OPTION_PRIORITY_CMDLINE, error);
 					machine().manager().schedule_new_driver(*s_driver);
 					machine().schedule_hard_reset();
 					ui_menu::stack_reset(machine());
@@ -2084,14 +2084,14 @@ void ui_bios_selection::handle()
 				{
 					ui_software_info *ui_swinfo = (ui_software_info *)m_driver;
 					std::string error;
-					machine().options().set_value("bios", elem.id, OPTION_PRIORITY_CMDLINE, error);
+					machine().options().set_value("bios", elem.second, OPTION_PRIORITY_CMDLINE, error);
 					driver_enumerator drivlist(machine().options(), *ui_swinfo->driver);
 					drivlist.next();
 					software_list_device *swlist = software_list_device::find_by_name(drivlist.config(), ui_swinfo->listname.c_str());
 					software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
 					if (!machine().ui().options().skip_parts_menu() && swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
 					{
-						std::unordered_map<std::string, std::string> parts;
+						s_parts parts;
 						for (const software_part *swpart = swinfo->first_part(); swpart != nullptr; swpart = swpart->next())
 						{
 							if (swpart->matches_interface(ui_swinfo->interface.c_str()))

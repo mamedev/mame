@@ -194,6 +194,7 @@ ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_contai
 	ui_globals::switch_image = false;
 	ui_globals::default_image = true;
 	ui_globals::panels_status = moptions.hide_panels();
+	m_searchlist[0] = nullptr;
 }
 
 //-------------------------------------------------
@@ -810,12 +811,12 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 			m_isabios);
 
 	std::string filtered;
-	if (main_filters::actual == FILTER_CATEGORY && !machine().inifile().ini_index.empty())
+	if (main_filters::actual == FILTER_CATEGORY && machine().inifile().total() > 0)
 	{
 		filtered = string_format(_("%1$s (%2$s - %3$s) - "),
 				main_filters::text[main_filters::actual],
-				machine().inifile().actual_file(),
-				machine().inifile().actual_category());
+				machine().inifile().get_file(),
+				machine().inifile().get_category());
 	}
 	else if (main_filters::actual == FILTER_MANUFACTURER)
 	{
@@ -1097,7 +1098,7 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *m_event)
 					}
 			}
 
-			std::vector<s_bios> biosname;
+			s_bios biosname;
 			if (!machine().ui().options().skip_bios_menu() && has_multiple_bios(driver, biosname))
 				ui_menu::stack_push(global_alloc_clear<ui_bios_selection>(machine(), container, biosname, (void *)driver, false, false));
 			else
@@ -1154,7 +1155,7 @@ void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 		// if everything looks good, schedule the new driver
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			std::vector<s_bios> biosname;
+			s_bios biosname;
 			if (!mopt.skip_bios_menu() && has_multiple_bios(ui_swinfo->driver, biosname))
 				ui_menu::stack_push(global_alloc_clear<ui_bios_selection>(machine(), container, biosname, (void *)ui_swinfo->driver, false, false));
 			else
@@ -1187,7 +1188,7 @@ void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 		media_auditor::summary summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			std::vector<s_bios> biosname;
+			s_bios biosname;
 			if (!mopt.skip_bios_menu() && has_multiple_bios(ui_swinfo->driver, biosname))
 			{
 				ui_menu::stack_push(global_alloc_clear<ui_bios_selection>(machine(), container, biosname, (void *)ui_swinfo, true, false));
@@ -1195,7 +1196,7 @@ void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 			}
 			else if (!mopt.skip_parts_menu() && swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
 			{
-				std::unordered_map<std::string, std::string> parts;
+				s_parts parts;
 				for (const software_part *swpart = swinfo->first_part(); swpart != nullptr; swpart = swpart->next())
 				{
 					if (swpart->matches_interface(ui_swinfo->interface.c_str()))

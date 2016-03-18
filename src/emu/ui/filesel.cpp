@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    ui/filesel.c
+    ui/filesel.cpp
 
     MESS's clunky built-in file manager
 

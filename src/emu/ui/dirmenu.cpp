@@ -55,6 +55,7 @@ static const folders_entry s_folders[] =
 	{ __("Logos"),               OPTION_LOGOS_PATH,         ADDING },
 	{ __("Scores"),              OPTION_SCORES_PATH,        ADDING },
 	{ __("Versus"),              OPTION_VERSUS_PATH,        ADDING },
+	{ __("Covers"),              OPTION_COVER_PATH,         ADDING }
 };
 
 

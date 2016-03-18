@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-    ui/inputmap.c
+    ui/inputmap.cpp
 
     Internal menus for input mappings.
 

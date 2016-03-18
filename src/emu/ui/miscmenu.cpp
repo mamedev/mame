@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods,Dankan1890
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods, Maurizio Petrarota
 /*********************************************************************
 
-    miscmenu.c
+    ui/miscmenu.cpp
 
     Internal MAME menus for the user interface.
 

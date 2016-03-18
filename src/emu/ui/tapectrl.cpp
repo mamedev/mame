@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
-    ui/tapectrl.c
+    ui/tapectrl.cpp
 
     Tape control
 
