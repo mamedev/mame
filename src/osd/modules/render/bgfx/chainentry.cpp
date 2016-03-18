@@ -44,7 +44,7 @@ bgfx_chain_entry::~bgfx_chain_entry()
 	m_uniforms.clear();
 }
 
-void bgfx_chain_entry::submit(render_primitive* prim, int view, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint64_t blend)
+void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint32_t rotation_type, bool swap_xy, uint64_t blend)
 {
     bgfx::setViewSeq(view, true);
 
@@ -59,67 +59,85 @@ void bgfx_chain_entry::submit(render_primitive* prim, int view, texture_manager&
     put_screen_buffer(prim, &buffer);
     bgfx::setVertexBuffer(&buffer);
 
-    bgfx_uniform* inv_screen_dims = m_effect->uniform("u_inv_screen_dims");
-    bgfx_uniform* screen_dims = m_effect->uniform("u_screen_dims");
-    if (screen_dims != nullptr || inv_screen_dims != nullptr)
-    {
-        float values[2];
-        float width = screen_width;
-        float height = screen_height;
-        if (m_inputs.size() > 0)
-        {
-            width = float(textures.provider(m_inputs[0].texture())->width());
-            height = float(textures.provider(m_inputs[0].texture())->height());
-        }
-        
-        values[0] = 1.0f / width;
-        values[1] = 1.0f / height;
-        if (inv_screen_dims != nullptr) {
-            inv_screen_dims->set(values, sizeof(float) * 2);
-        }
+	setup_auto_uniforms(prim, textures, screen_width, screen_height, rotation_type, swap_xy);
 
-        values[0] = width;
-        values[1] = height;
-        if (screen_dims != nullptr) {
-            screen_dims->set(values, sizeof(float) * 2);
-        }
-    }
-
-	bgfx_uniform* quad_dims = m_effect->uniform("u_quad_dims");
-	if (quad_dims != nullptr)
-	{
-		float values[2];
-		values[0] = prim->bounds.x1 - prim->bounds.x0;
-		values[1] = prim->bounds.y1 - prim->bounds.y0;
-		quad_dims->set(values, sizeof(float) * 2);
-	}
-
-    bgfx_uniform* source_dims = m_effect->uniform("u_source_dims");
-    if (source_dims != nullptr)
-    {
-        float values[2];
-        values[0] = float(prim->texture.width);
-        values[1] = float(prim->texture.height);
-        if (source_dims != nullptr)
-        {
-            source_dims->set(values, sizeof(float) * 2);
-        }
-    }
-        
     for (bgfx_entry_uniform* uniform : m_uniforms)
     {
-        if (uniform->name() != "DiffuseSampler")
+        if (uniform->name() != "s_tex")
         {
             uniform->bind();
         }
 	}
 
     m_effect->submit(view, blend);
-    
+
     if (m_targets.target(m_output) != nullptr)
     {
         m_targets.target(m_output)->page_flip();
     }
+}
+
+void bgfx_chain_entry::setup_screensize_uniforms(texture_manager& textures, uint16_t screen_width, uint16_t screen_height)
+{
+	float width = screen_width;
+	float height = screen_height;
+	if (m_inputs.size() > 0)
+	{
+		width = float(textures.provider(m_inputs[0].texture())->width());
+		height = float(textures.provider(m_inputs[0].texture())->height());
+	}
+
+    bgfx_uniform* screen_dims = m_effect->uniform("u_screen_dims");
+    if (screen_dims != nullptr)
+    {
+		float values[2] = { width, height };
+		screen_dims->set(values, sizeof(float) * 2);
+	}
+
+    bgfx_uniform* inv_screen_dims = m_effect->uniform("u_inv_screen_dims");
+	if (inv_screen_dims != nullptr)
+	{
+		float values[2] = { 1.0f / width, 1.0f / height };
+		inv_screen_dims->set(values, sizeof(float) * 2);
+	}
+}
+
+void bgfx_chain_entry::setup_sourcesize_uniform(render_primitive* prim)
+{
+    bgfx_uniform* source_dims = m_effect->uniform("u_source_dims");
+    if (source_dims != nullptr)
+    {
+        float values[2] = { float(prim->texture.width), float(prim->texture.height) };
+		source_dims->set(values, sizeof(float) * 2);
+    }
+}
+
+void bgfx_chain_entry::setup_rotationtype_uniform(uint32_t rotation_type)
+{
+	bgfx_uniform* rotation_type_uniform = m_effect->uniform("u_rotation_type");
+	if (rotation_type_uniform != nullptr)
+	{
+		float values[1] = { float(rotation_type) };
+		rotation_type_uniform->set(values, sizeof(float));
+	}
+}
+
+void bgfx_chain_entry::setup_swapxy_uniform(bool swap_xy)
+{
+	bgfx_uniform* swap_xy_uniform = m_effect->uniform("u_swap_xy");
+	if (swap_xy_uniform != nullptr)
+	{
+		float values[1] = { swap_xy ? 1.0f : 0.0f };
+		swap_xy_uniform->set(values, sizeof(float));
+	}
+}
+
+void bgfx_chain_entry::setup_auto_uniforms(render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint32_t rotation_type, bool swap_xy)
+{
+	setup_screensize_uniforms(textures, screen_width, screen_height);
+	setup_sourcesize_uniform(prim);
+	setup_rotationtype_uniform(rotation_type);
+	setup_swapxy_uniform(swap_xy);
 }
 
 void bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t screen_height)
@@ -131,8 +149,8 @@ void bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
     {
         bgfx_target* output = m_targets.target(m_output);
 		handle = output->target();
-		width = output->width();
-		height = output->height();
+		width = output->width() * output->prescale_x();
+		height = output->height() * output->prescale_y();
     }
 
     bgfx::setViewFrameBuffer(view, handle);

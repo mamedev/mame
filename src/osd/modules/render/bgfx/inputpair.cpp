@@ -9,6 +9,8 @@
 //
 //============================================================
 
+#include "emu.h"
+
 #include "inputpair.h"
 #include "texture.h"
 #include "target.h"
@@ -25,5 +27,6 @@ bgfx_input_pair::bgfx_input_pair(int index, std::string sampler, std::string tex
 
 void bgfx_input_pair::bind(bgfx_effect *effect, texture_manager& textures) const
 {
+    assert(effect->uniform(m_sampler) != nullptr);
 	bgfx::setTexture(m_index, effect->uniform(m_sampler)->handle(), textures.handle(m_texture));
 }

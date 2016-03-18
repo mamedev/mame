@@ -3,44 +3,26 @@ $input v_color0, v_texcoord0
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz,ImJezze
 //-----------------------------------------------------------------------------
-// Defocus Effect
+// Distortion Effect
 //-----------------------------------------------------------------------------
 
 #include "../../../../../3rdparty/bgfx/examples/common/common.sh"
 
-//-----------------------------------------------------------------------------
-// Constants
-//-----------------------------------------------------------------------------
-
-SAMPLER2D(DiffuseSampler, 0);
-
-//-----------------------------------------------------------------------------
-// Uniforms
-//-----------------------------------------------------------------------------
-
+// Autos
 uniform vec4 u_screen_dims;
+uniform vec4 u_rotation_type;
 
+// User-supplied
 uniform vec4 u_curvature;
 uniform vec4 u_round_corner;
 uniform vec4 u_smooth_border;
 uniform vec4 u_vignetting;
 uniform vec4 u_reflection;
 
-uniform vec4 u_rotation_type; // TODO
+// Samplers
+SAMPLER2D(s_tex, 0);
 
-#define CurvatureAmount u_curvature.x
-#define RoundCornerAmount u_round_corner.x
-#define SmoothBorderAmount u_smooth_border.x
-#define VignettingAmount u_vignetting.x
-#define ReflectionAmount u_reflection.x
-
-#define RotationType u_rotation_type.x // TODO
-
-//-----------------------------------------------------------------------------
 // Functions
-//-----------------------------------------------------------------------------
-
-// Holy fuck the number of functions...
 
 // www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
 float rand(vec2 seed)
@@ -103,11 +85,11 @@ float GetSpotAddend(vec2 coord, float amount)
 	// normalized screen quad ratio
 	// upper right quadrant
 	vec2 spotOffset = vec2(-0.25, 0.25); // 0 degrees
-	if (RotationType == 1.0)
+	if (u_rotation_type.x == 1.0)
 		spotOffset = vec2(-0.25, -0.25); // 90 degrees
-	if (RotationType == 2.0)
+	if (u_rotation_type.x == 2.0)
 		spotOffset = vec2(0.25, -0.25); // 180 degrees
-	if (RotationType == 3.0)
+	if (u_rotation_type.x == 3.0)
 		spotOffset = vec2(0.25, 0.25); // 270 degrees
 
 	vec2 SpotCoord = (coord + spotOffset * RatioCorrection) / RatioCorrection;
@@ -193,20 +175,18 @@ vec2 GetCoords(vec2 coord, float distortionAmount)
 	return coord;
 }
 
-//-----------------------------------------------------------------------------
-// Distortion Pixel Shader
-//-----------------------------------------------------------------------------
+// Shader
 
 void main()
 {
 	// Screen Curvature
-	vec2 BaseCoord = GetCoords(v_texcoord0, CurvatureAmount * 0.25); // reduced amount
+	vec2 BaseCoord = GetCoords(v_texcoord0, u_curvature.x * 0.25); // reduced amount
 
 	vec2 BaseCoordCentered = BaseCoord;
 	BaseCoordCentered -= 0.5;
 
 	// Color
-	vec4 BaseColor = texture2D(DiffuseSampler, BaseCoord);
+	vec4 BaseColor = texture2D(s_tex, BaseCoord);
 	BaseColor.a = 1.0;
 
 	// Clamp
@@ -216,7 +196,7 @@ void main()
 	// Vignetting Simulation
 	vec2 VignetteCoord = BaseCoordCentered;
 
-	float VignetteFactor = GetVignetteFactor(VignetteCoord, VignettingAmount);
+	float VignetteFactor = GetVignetteFactor(VignetteCoord, u_vignetting.x);
 	BaseColor.rgb *= VignetteFactor;
 
 	// Light Reflection Simulation
@@ -225,14 +205,14 @@ void main()
 	vec2 SpotCoord = BaseCoordCentered;
 	vec2 NoiseCoord = BaseCoordCentered;
 
-	float SpotAddend = GetSpotAddend(SpotCoord, ReflectionAmount);
+	float SpotAddend = GetSpotAddend(SpotCoord, u_reflection.x);
 	float NoiseFactor = GetNoiseFactor(SpotAddend, rand(NoiseCoord));
 	BaseColor.rgb += SpotAddend * NoiseFactor * LightColor;
 
 	// Round Corners Simulation
 	vec2 RoundCornerCoord = BaseCoordCentered;
 
-	float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, RoundCornerAmount, SmoothBorderAmount);
+	float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, u_round_corner.x, u_smooth_border.x);
 	BaseColor.rgb *= roundCornerFactor;
 
 	gl_FragColor = BaseColor;

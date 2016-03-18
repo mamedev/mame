@@ -27,8 +27,7 @@ bgfx_slider::bgfx_slider(running_machine &machine, std::string name, int32_t min
     m_value = def;
     if (m_type != slider_type::SLIDER_INT && m_type != slider_type::SLIDER_INT_ENUM)
     {
-        float temp = float(def) * scale;
-        m_value = *reinterpret_cast<int32_t*>(&temp);
+        m_value = float(def) * scale;
     }
 
     for (std::string string : strings)
@@ -75,30 +74,28 @@ int32_t bgfx_slider::update(std::string *str, int32_t newval)
     {
         case SLIDER_INT_ENUM:
         {
-            INT32 *val_ptr = reinterpret_cast<INT32 *>(&m_value);
             if (newval != SLIDER_NOCHANGE)
             {
-                *val_ptr = newval;
+                m_value = float(newval);
             }
             if (str != nullptr)
             {
-                *str = string_format(m_format, m_strings[*val_ptr]);
+                *str = string_format(m_format, m_strings[as_int()]);
             }
-            return *val_ptr;
+            return as_int();
         }
 
         case SLIDER_INT:
         {
-            int *val_ptr = reinterpret_cast<int *>(&m_value);
             if (newval != SLIDER_NOCHANGE)
             {
-                *val_ptr = newval;
+                m_value = float(newval);
             }
             if (str != nullptr)
             {
-                *str = string_format(m_format, *val_ptr);
+                *str = string_format(m_format, as_int());
             }
-            return *val_ptr;
+            return as_int();
         }
 
         default:

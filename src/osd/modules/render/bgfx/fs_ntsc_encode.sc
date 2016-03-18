@@ -10,17 +10,22 @@ $input v_color0, v_texcoord0
 
 #include "../../../../../3rdparty/bgfx/examples/common/common.sh"
 
+// Autos
+uniform vec4 u_source_dims;
+
+// User-supplied
 uniform vec4 u_a_value;
 uniform vec4 u_b_value;
 uniform vec4 u_cc_value;
 uniform vec4 u_p_value;
 uniform vec4 u_scan_time;
-uniform vec4 u_jitter_amount;
 uniform vec4 u_jitter_offset;
 
-uniform vec4 u_source_dims;
+// Parametric
+uniform vec4 u_jitter_amount;
 
-SAMPLER2D(DiffuseSampler, 0);
+// Samplers
+SAMPLER2D(s_tex, 0);
 
 //-----------------------------------------------------------------------------
 // Constants
@@ -36,10 +41,10 @@ void main()
 	vec2 C3 = v_texcoord0 + PValueSourceTexel * vec2(0.75, 0.0);
 	vec4 Cx = vec4(C0.x, C1.x, C2.x, C3.x);
 	vec4 Cy = vec4(C0.y, C1.y, C2.y, C3.y);
-	vec4 Texel0 = texture2D(DiffuseSampler, C0);
-	vec4 Texel1 = texture2D(DiffuseSampler, C1);
-	vec4 Texel2 = texture2D(DiffuseSampler, C2);
-	vec4 Texel3 = texture2D(DiffuseSampler, C3);
+	vec4 Texel0 = texture2D(s_tex, C0);
+	vec4 Texel1 = texture2D(s_tex, C1);
+	vec4 Texel2 = texture2D(s_tex, C2);
+	vec4 Texel3 = texture2D(s_tex, C3);
 
 	vec4 HPosition = Cx;
 	vec4 VPosition = Cy;

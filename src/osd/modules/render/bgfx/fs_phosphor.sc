@@ -5,9 +5,11 @@ $input v_color0, v_texcoord0
 
 #include "../../../../../3rdparty/bgfx/examples/common/common.sh"
 
+// User-supplied
 uniform vec4 u_passthrough;
 uniform vec4 u_phosphor;
 
+// Samplers
 SAMPLER2D(s_tex, 0);
 SAMPLER2D(s_prev, 1);
 

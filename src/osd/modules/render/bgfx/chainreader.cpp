@@ -11,6 +11,7 @@
 #include <map>
 
 #include "emu.h"
+#include <modules/lib/osdobj_common.h>
 
 #include "chain.h"
 #include "sliderreader.h"
@@ -87,12 +88,8 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, osd_options& optio
 			uint32_t mode = uint32_t(get_enum_from_value(target_array[i], "mode", TARGET_STYLE_NATIVE, STYLE_NAMES, STYLE_COUNT));
 			bool bilinear = get_bool(target_array[i], "bilinear", true);
 			bool double_buffer = get_bool(target_array[i], "doublebuffer", true);
-
-			float prescalef = 1.0f;
-			float default_prescale = 1.0f;
-			get_float(target_array[i], "prescale", &prescalef, &default_prescale);
-			int prescale = (int)floor(prescalef + 0.5f);
-
+            bool prescale = get_bool(target_array[i], "prescale", false);
+            
 			uint16_t width = 0;
 			uint16_t height = 0;
 			switch (mode)
@@ -115,10 +112,14 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, osd_options& optio
 					break;
 			}
 
-			width *= prescale;
-			height *= prescale;
-
-			targets.create_target(target_array[i]["name"].GetString(), bgfx::TextureFormat::RGBA8, width, height, mode, double_buffer, bilinear);
+            uint32_t prescale_x = 1;
+            uint32_t prescale_y = 1;
+            if (prescale)
+            {
+                prescale_x = options.bgfx_prescale_x();
+                prescale_y = options.bgfx_prescale_y();
+            }
+			targets.create_target(target_array[i]["name"].GetString(), bgfx::TextureFormat::RGBA8, width, height, prescale_x, prescale_y, mode, double_buffer, bilinear);
 		}
 	}
 

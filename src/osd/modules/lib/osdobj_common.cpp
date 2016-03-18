@@ -143,7 +143,9 @@ const options_entry osd_options::s_option_entries[] =
     { nullptr,                                nullptr,           OPTION_HEADER, "BGFX POST-PROCESSING OPTIONS" },
     { OSDOPTION_BGFX_PATH,                    "bgfx",            OPTION_STRING, "path to BGFX-related files" },
     { OSDOPTION_BGFX_SCREEN_CHAIN,            "hlsl",            OPTION_STRING, "screen chain JSON file to use" },
-	{ OSDOPTION_BGFX_SHADOW_MASK,             "shadow-mask.png", OPTION_STRING, "shadow mask texture name" },
+    { OSDOPTION_BGFX_SHADOW_MASK,             "shadow-mask.png", OPTION_STRING, "shadow mask texture name" },
+    { OSDOPTION_BGFX_PRESCALE_X,              "1",               OPTION_INTEGER, "x prescale" },
+    { OSDOPTION_BGFX_PRESCALE_Y,              "1",               OPTION_INTEGER, "y prescale" },
 
         // End of list
 	{ nullptr }

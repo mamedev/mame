@@ -6,10 +6,12 @@ $input v_color0, v_texcoord0
 // NTSC Decode Effect
 //-----------------------------------------------------------------------------
 
-// NB: intentionally wasteful of uniforms in order for easier slider utilization
-
 #include "../../../../../3rdparty/bgfx/examples/common/common.sh"
 
+// Autos
+uniform vec4 u_source_dims;
+
+// User-supplied
 uniform vec4 u_a_value;
 uniform vec4 u_b_value;
 uniform vec4 u_cc_value;
@@ -19,12 +21,13 @@ uniform vec4 u_notch_width;
 uniform vec4 u_y_freq_response;
 uniform vec4 u_i_freq_response;
 uniform vec4 u_q_freq_response;
-uniform vec4 u_jitter_amount;
 uniform vec4 u_jitter_offset;
 
-uniform vec4 u_source_dims;
+// Parametric
+uniform vec4 u_jitter_amount;
 
-SAMPLER2D(DiffuseSampler, 0);
+// Samplers
+SAMPLER2D(s_tex, 0);
 
 //-----------------------------------------------------------------------------
 // Constants
@@ -32,7 +35,7 @@ SAMPLER2D(DiffuseSampler, 0);
 
 void main()
 {
-	vec4 BaseTexel = texture2D(DiffuseSampler, v_texcoord0.xy);
+	vec4 BaseTexel = texture2D(s_tex, v_texcoord0.xy);
 
 	vec4 zero = vec4(0.0, 0.0, 0.0, 0.0);
 	vec4 quarter = vec4(0.25, 0.25, 0.25, 0.25);
@@ -71,7 +74,7 @@ void main()
 		vec4 Cx = v_texcoord0.xxxx + u_source_dims.xxxx * (n4 * quarter);
 
 		// theory: What if we put white in the input of the NTSC decode shader?
-		vec4 C = texture2D(DiffuseSampler, vec2(Cx.x, v_texcoord0.y));
+		vec4 C = texture2D(s_tex, vec2(Cx.x, v_texcoord0.y));
 
 		vec4 T = Cx + HOffset + v_texcoord0.yyyy * VScale;
 		vec4 WT = W * T + u_o_value.xxxx;

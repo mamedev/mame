@@ -8,45 +8,39 @@ $input v_color0, v_texcoord0, v_texcoord1
 
 #include "../../../../../3rdparty/bgfx/examples/common/common.sh"
 
+// Autos
 uniform vec4 u_swap_xy;
+uniform vec4 u_screen_dims; // size of the output window
+uniform vec4 u_source_dims; // size of the guest machine
+uniform vec4 u_screen_scale; // TODO: Hook up ScreenScale code-side
+uniform vec4 u_screen_offset; // TODO: Hook up ScreenOffset code-side
 
-uniform vec4 u_inv_screen_dims; // size of the window or fullscreen
-uniform vec4 u_source_dims; // size of the source texture
-
-uniform vec4 u_shadow_dims; // size of the shadow texture (extended to power-of-two size - not necessarily in bgfx)
-uniform vec4 u_shadow_uv_offset;
-
+// User-supplied
 uniform vec4 u_prepare_bloom; // disables some effects for rendering bloom textures
 uniform vec4 u_prepare_vector;
-
-uniform vec4 u_humbar_hertz_rate; // 60.0f / 59.94f - 1.0f; // difference between the 59.94 Hz field rate and 60 Hz line frequency (NTSC)
-uniform vec4 u_humbar_alpha; // 0.0f;
-
-uniform vec4 u_time; // 0.0f;
-
-uniform vec4 u_screen_scale; // TODO: ScreenScale
-uniform vec4 u_screen_offset; // TODO: ScreenOffset
-
 uniform vec4 u_scanline_alpha;
 uniform vec4 u_scanline_scale;
 uniform vec4 u_scanline_bright_scale;
 uniform vec4 u_scanline_bright_offset;
 uniform vec4 u_scanline_jitter;
-uniform vec4 u_jitter_amount;
 uniform vec4 u_scanline_height;
-
 uniform vec4 u_back_color; // TODO: Unused in current implementation, mostly
+uniform vec4 u_shadow_tile_mode; // 0 based on screen dimension, 1 based on source dimension
+uniform vec4 u_shadow_alpha;
+uniform vec4 u_shadow_uv;
+uniform vec4 u_shadow_uv_offset;
+uniform vec4 u_humbar_hertz_rate; // difference between the 59.94 Hz field rate and 60 Hz line frequency (NTSC)
+uniform vec4 u_humbar_alpha;
+uniform vec4 u_power;
+uniform vec4 u_floor;
 
-uniform vec4 u_shadow_tile_mode; // ShadowTileMode = 0; // 0 based on screen dimension, 1 based on source dimension
-uniform vec4 u_shadow_alpha; // ShadowAlpha = 0.0f;
-uniform vec4 u_shadow_count; // ShadowCount = float2(6.0f, 6.0f);
-uniform vec4 u_shadow_uv; // ShadowUV = float2(0.25f, 0.25f);
+// Parametric
+uniform vec4 u_time;
+uniform vec4 u_jitter_amount;
 
-uniform vec4 u_power; // Power = float3(1.0f, 1.0f, 1.0f);
-uniform vec4 u_floor; // Floor = float3(0.0f, 0.0f, 0.0f);
-
-SAMPLER2D(DiffuseSampler, 0);
-SAMPLER2D(ShadowSampler, 1);
+// Samplers
+SAMPLER2D(s_tex, 0);
+SAMPLER2D(s_shadow, 1);
 
 //-----------------------------------------------------------------------------
 // Scanline & Shadowmask Pixel Shader
@@ -71,17 +65,17 @@ vec2 GetAdjustedCoords(vec2 coord, vec2 center_offset)
 
 void main()
 {
-	vec2 ScreenTexelDims = u_inv_screen_dims.xy;
+	vec2 ScreenTexelDims = vec2(1.0, 1.0) / u_screen_dims.xy;
 	vec2 SourceTexelDims = vec2(1.0, 1.0) / u_source_dims.xy;
 	vec2 SourceRes = u_source_dims.xy;
 
 	vec2 HalfSourceRect = vec2(0.5, 0.5);
 
-	vec2 ScreenCoord = v_texcoord1 / u_inv_screen_dims.xy;
+	vec2 ScreenCoord = v_texcoord0.xy;
 	vec2 BaseCoord = GetAdjustedCoords(v_texcoord0, HalfSourceRect);
 
 	// Color
-	vec4 BaseColor = texture2D(DiffuseSampler, BaseCoord);
+	vec4 BaseColor = texture2D(s_tex, BaseCoord);
 	BaseColor.a = 1.0;
 
 	if (BaseCoord.x < 0.0 || BaseCoord.y < 0.0)
@@ -92,18 +86,16 @@ void main()
 	// Mask Simulation (may not affect bloom)
 	if (u_prepare_bloom.x == 0.0 && u_shadow_alpha.x > 0.0)
 	{
-		vec2 shadowDims = u_swap_xy.x > 0.0 ? u_shadow_dims.yx : u_shadow_dims.xy;
-		vec2 screenCoord = u_shadow_tile_mode.x == 0.0 ? ScreenCoord : BaseCoord;
+		vec2 screenCoord = ScreenCoord;
 		screenCoord = u_swap_xy.x > 0.0 ? screenCoord.yx : screenCoord.xy;
 
-		vec2 shadowCount = u_swap_xy.x > 0.0 ? u_shadow_count.yx : u_shadow_count.xy;
-		vec2 shadowTile = ((u_shadow_tile_mode.x == 0.0 ? ScreenTexelDims : SourceTexelDims) * shadowCount);
+		vec2 shadowTile = (u_shadow_tile_mode.x == 0.0 ? u_screen_dims.xy : u_source_dims.xy);
 		shadowTile = u_swap_xy.x > 0.0 ? shadowTile.yx : shadowTile.xy;
 
-		vec2 ShadowFrac = fract(screenCoord / shadowTile);
+		vec2 ShadowFrac = fract(screenCoord * shadowTile);
 		vec2 ShadowCoord = (ShadowFrac * u_shadow_uv.xy);
 
-		vec4 ShadowColor = texture2D(ShadowSampler, ShadowCoord);
+		vec4 ShadowColor = texture2D(s_shadow, ShadowCoord);
 		vec3 ShadowMaskColor = mix(vec3(1.0, 1.0, 1.0), ShadowColor.rgb, u_shadow_alpha.xxx);
 		float ShadowMaskClear = (1.0 - ShadowColor.a) * u_shadow_alpha.x;
 

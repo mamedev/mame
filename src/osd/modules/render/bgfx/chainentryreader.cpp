@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "rendutil.h"
+#include <modules/render/copyutil.h>
 
 #include <modules/lib/osdobj_common.h>
 
@@ -73,11 +74,10 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, osd_op
 		const Value& texture_array = value["textures"];
 		for (UINT32 i = 0; i < texture_array.Size(); i++)
 		{
-			char texture_name[2048];
-			bitmap_argb32 bitmap;
-			emu_file file(options.bgfx_shadow_mask(), OPEN_FLAG_READ);
-			strcpy(texture_name, options.bgfx_shadow_mask());
-			render_load_png(bitmap, file, nullptr, texture_name);
+            std::string texture_path = std::string(options.bgfx_path()) + "/artwork/";
+            std::string texture_name = texture_array[i].GetString();
+			
+            textures.create_png_texture(texture_path, texture_name, texture_name);
 		}
 	}
 

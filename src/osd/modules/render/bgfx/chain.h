@@ -21,6 +21,7 @@ class render_primitive;
 class bgfx_slider;
 class bgfx_parameter;
 class texture_manager;
+class osd_window;
 
 class bgfx_chain
 {
@@ -28,7 +29,7 @@ public:
 	bgfx_chain(std::string name, std::string author, std::vector<bgfx_slider*> sliders, std::vector<bgfx_parameter*> params, std::vector<bgfx_chain_entry*> entries, std::string output);
 	~bgfx_chain();
 
-	void process(render_primitive* prim, int view, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint64_t blend = 0L);
+	void process(render_primitive* prim, int view, texture_manager& textures, osd_window &window, uint64_t blend = 0L);
 
     // Getters
     std::vector<bgfx_slider*>& sliders() { return m_sliders; }

@@ -15,6 +15,7 @@
 #include "entryuniform.h"
 #include "texturemanager.h"
 #include "vertex.h"
+#include "window.h"
 
 #include "chain.h"
 
@@ -49,14 +50,24 @@ bgfx_chain::~bgfx_chain()
 	}
 }
 
-void bgfx_chain::process(render_primitive* prim, int view, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint64_t blend)
+void bgfx_chain::process(render_primitive* prim, int view, texture_manager& textures, osd_window& window, uint64_t blend)
 {
     int current_view = view;
+    uint16_t screen_width = window.get_size().width();
+    uint16_t screen_height = window.get_size().height();
+    uint32_t rotation_type = (window.target()->orientation() & ROT90) == ROT90 ?
+    					1 : (window.target()->orientation() & ROT180) == ROT180 ?
+						2 : (window.target()->orientation() & ROT270) == ROT270 ?
+						3 : 0;
+	bool orientation_swap_xy = (window.machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+	bool rotation_swap_xy = (window.target()->orientation() & ROT90) == ROT90 || (window.target()->orientation() & ROT270) == ROT270;
+	bool swap_xy = orientation_swap_xy ^ rotation_swap_xy;
+
     for (bgfx_chain_entry* entry : m_entries)
 	{
         if (!entry->skip())
         {
-            entry->submit(prim, current_view, textures, screen_width, screen_height, blend);
+            entry->submit(current_view, prim, textures, screen_width, screen_height, rotation_type, swap_xy, blend);
             current_view++;
         }
 	}

@@ -8,14 +8,14 @@ $input v_color0, v_texcoord0
 
 #include "../../../../../3rdparty/bgfx/examples/common/common.sh"
 
-uniform vec4 u_screenrect;
-
-uniform vec4 u_defocus;
-
-uniform vec4 u_swap_xy;
+// Autos
 uniform vec4 u_screen_dims;
 
-SAMPLER2D(DiffuseSampler, 0);
+// User-supplied
+uniform vec4 u_defocus;
+
+// Samplers
+SAMPLER2D(s_tex, 0);
 
 //-----------------------------------------------------------------------------
 // Constants
@@ -32,19 +32,17 @@ void main()
 	const vec2 Coord7Offset = vec2( 0.50, -0.75);
 	const vec2 Coord8Offset = vec2( 1.00, -0.25);
 
-	vec2 QuadRatio = vec2(1.0, (u_swap_xy.x > 0.0) ? u_screen_dims.y / u_screen_dims.x : u_screen_dims.x / u_screen_dims.y);
-
 	vec2 DefocusTexelDims = u_defocus.xy / u_screen_dims.xy;
 	
-	vec4 d0 = texture2D(DiffuseSampler, v_texcoord0);
-	vec4 d1 = texture2D(DiffuseSampler, v_texcoord0 + Coord1Offset * DefocusTexelDims);
-	vec4 d2 = texture2D(DiffuseSampler, v_texcoord0 + Coord2Offset * DefocusTexelDims);
-	vec4 d3 = texture2D(DiffuseSampler, v_texcoord0 + Coord3Offset * DefocusTexelDims);
-	vec4 d4 = texture2D(DiffuseSampler, v_texcoord0 + Coord4Offset * DefocusTexelDims);
-	vec4 d5 = texture2D(DiffuseSampler, v_texcoord0 + Coord5Offset * DefocusTexelDims);
-	vec4 d6 = texture2D(DiffuseSampler, v_texcoord0 + Coord6Offset * DefocusTexelDims);
-	vec4 d7 = texture2D(DiffuseSampler, v_texcoord0 + Coord7Offset * DefocusTexelDims);
-	vec4 d8 = texture2D(DiffuseSampler, v_texcoord0 + Coord8Offset * DefocusTexelDims);
+	vec4 d0 = texture2D(s_tex, v_texcoord0);
+	vec4 d1 = texture2D(s_tex, v_texcoord0 + Coord1Offset * DefocusTexelDims);
+	vec4 d2 = texture2D(s_tex, v_texcoord0 + Coord2Offset * DefocusTexelDims);
+	vec4 d3 = texture2D(s_tex, v_texcoord0 + Coord3Offset * DefocusTexelDims);
+	vec4 d4 = texture2D(s_tex, v_texcoord0 + Coord4Offset * DefocusTexelDims);
+	vec4 d5 = texture2D(s_tex, v_texcoord0 + Coord5Offset * DefocusTexelDims);
+	vec4 d6 = texture2D(s_tex, v_texcoord0 + Coord6Offset * DefocusTexelDims);
+	vec4 d7 = texture2D(s_tex, v_texcoord0 + Coord7Offset * DefocusTexelDims);
+	vec4 d8 = texture2D(s_tex, v_texcoord0 + Coord8Offset * DefocusTexelDims);
 
 	vec4 blurred = (d0 + d1 + d2 + d3 + d4 + d5 + d6 + d7 + d8) / 9.0;
 

@@ -25,9 +25,9 @@ target_manager::~target_manager()
 	m_targets.clear();
 }
 
-bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, uint32_t style, bool double_buffer, bool filter)
+bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, uint32_t prescale_x, uint32_t prescale_y, uint32_t style, bool double_buffer, bool filter)
 {
-	bgfx_target* target = new bgfx_target(name, format, width, height, style, double_buffer, filter);
+	bgfx_target* target = new bgfx_target(name, format, width, height, prescale_x, prescale_y, style, double_buffer, filter);
 	m_targets[name] = target;
 
 	m_textures.add_provider(name, target);
@@ -67,9 +67,11 @@ void target_manager::update_guest_targets(uint16_t width, uint16_t height)
                 const bgfx::TextureFormat::Enum format = target_ptr->format();
                 const bool double_buffered = target_ptr->double_buffered();
                 const bool filter = target_ptr->filter();
+                const uint32_t prescale_x = target_ptr->prescale_x();
+                const uint32_t prescale_y = target_ptr->prescale_y();
                 delete target_ptr;
                 
-                target.second = new bgfx_target(name, format, width, height, TARGET_STYLE_GUEST, double_buffered, filter);
+                target.second = new bgfx_target(name, format, width, height, prescale_x, prescale_y, TARGET_STYLE_GUEST, double_buffered, filter);
                 m_textures.add_provider(name, target.second);
 			}
 		}

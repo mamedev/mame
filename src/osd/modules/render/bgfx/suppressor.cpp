@@ -39,7 +39,7 @@ bool bgfx_suppressor::suppress()
 		count = 3;
 	}
 
-	int32_t current_values[3];
+	float current_values[3];
 	for (int32_t index = 0; index < count; index++)
 	{
 		current_values[index] = m_sliders[index]->value();

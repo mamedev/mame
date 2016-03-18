@@ -17,14 +17,14 @@
     "vertex": "vs_ntsc_encode",
     "fragment": "fs_ntsc_encode",
     "uniforms": [
-    	{ "name": "DiffuseSampler",     "type": "int",  "values": [ 1.0 ] },
-    	{ "name": "u_source_dims",      "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
-    	{ "name": "u_a_value",          "type": "vec4", "values": [ 0.5, 0.0, 0.0, 0.0 ] },
-    	{ "name": "u_b_value",          "type": "vec4", "values": [ 0.5, 0.0, 0.0, 0.0 ] },
-    	{ "name": "u_cc_value",         "type": "vec4", "values": [ 0.5, 0.0, 0.0, 0.0 ] },
-    	{ "name": "u_p_value",          "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
-    	{ "name": "u_scan_time",        "type": "vec4", "values": [ 52.6, 0.0, 0.0, 0.0 ] },
-    	{ "name": "u_jitter_amount",    "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
-    	{ "name": "u_jitter_offset",    "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] }
+    	{ "name": "s_tex",           "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "u_source_dims",   "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+    	{ "name": "u_a_value",       "type": "vec4", "values": [ 0.5, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_b_value",       "type": "vec4", "values": [ 0.5, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_cc_value",      "type": "vec4", "values": [ 0.5, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_p_value",       "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_scan_time",     "type": "vec4", "values": [ 52.6, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_jitter_amount", "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_jitter_offset", "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] }
     ]
 }
