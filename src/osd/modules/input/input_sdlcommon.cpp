@@ -79,6 +79,10 @@ void sdl_event_manager::process_window_event(running_machine &machine, SDL_Event
 
 	switch (sdlevent.window.event)
 	{
+	case SDL_WINDOWEVENT_SHOWN:
+		m_has_focus = true;
+		break;
+
 	case SDL_WINDOWEVENT_CLOSE:
 		machine.schedule_exit();
 		break;
@@ -120,6 +124,7 @@ void sdl_event_manager::process_window_event(running_machine &machine, SDL_Event
 		m_has_focus = true;
 		break;
 
+	case SDL_WINDOWEVENT_MINIMIZED:
 	case SDL_WINDOWEVENT_FOCUS_LOST:
 		m_has_focus = false;
 		break;
