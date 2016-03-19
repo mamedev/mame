@@ -281,7 +281,7 @@ WRITE8_MEMBER(ctstein_state::write_l)
 {
 	// L0-L3: button lamps (strobed)
 	display_matrix(4, 1, data & 0xf, 1);
-	display_matrix(4, 1, data & 0xf, 0);
+	display_matrix(4, 1, 0, 0);
 }
 
 READ8_MEMBER(ctstein_state::read_l)
@@ -396,7 +396,7 @@ WRITE8_MEMBER(h2hbaskb_state::write_l)
 	// L0-L6: digit segments A-G, L0-L4: led data
 	// strobe display
 	display_matrix(7, 16, data, sel);
-	display_matrix(7, 16, 0, sel);
+	display_matrix(7, 16, 0, 0);
 }
 
 READ8_MEMBER(h2hbaskb_state::read_in)
