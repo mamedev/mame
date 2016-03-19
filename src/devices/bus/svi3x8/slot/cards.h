@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "sv801.h"
+#include "sv802.h"
 #include "sv803.h"
 #include "sv805.h"
 #include "sv806.h"

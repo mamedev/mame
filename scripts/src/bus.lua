@@ -2617,6 +2617,8 @@ if (BUSES["SVI_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/svi3x8/slot/cards.h",
 		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv801.cpp",
 		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv801.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv802.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv802.h",
 		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv803.cpp",
 		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv803.h",
 		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv805.cpp",
