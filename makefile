@@ -844,6 +844,7 @@ FULLTARGET := $(TARGET)$(SUBTARGET)
 endif
 PROJECTDIR := $(BUILDDIR)/projects/$(OSD)/$(FULLTARGET)
 PROJECTDIR_MINI := $(BUILDDIR)/projects/osdmini/$(FULLTARGET)
+PROJECTDIR_SDL := $(BUILDDIR)/projects/sdl/$(FULLTARGET)
 PROJECTDIR_WIN := $(BUILDDIR)/projects/windows/$(FULLTARGET)
 
 .PHONY: all clean regenie generate
@@ -1305,6 +1306,30 @@ endif
 steamlink: generate $(PROJECTDIR)/gmake-steamlink/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-steamlink config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-steamlink config=$(CONFIG)
+
+#-------------------------------------------------
+# gmake-rpi
+#-------------------------------------------------
+
+$(PROJECTDIR_SDL)/gmake-rpi/Makefile: makefile $(SCRIPTS) $(GENIE)
+ifndef RASPBERRY_SDK_PATH
+	$(error RASPBERRY_SDK_PATH is not set)
+endif
+ifndef RASPBERRY_SYSROOT
+	$(error RASPBERRY_SYSROOT is not set)
+endif
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=rpi --gcc_version=4.9.2 --osd=sdl --targetos=rpi --targetos=rpi --NO_USE_MIDI=1 --PLATFORM=arm --NOASM=1 --USE_QTDEBUG=0 --SDL_INSTALL_ROOT=$(RASPBERRY_SYSROOT)/usr  gmake  
+
+.PHONY: rpi
+ifndef RASPBERRY_SDK_PATH
+	$(error RASPBERRY_SDK_PATH is not set)
+endif
+ifndef RASPBERRY_SYSROOT
+	$(error RASPBERRY_SYSROOT is not set)
+endif
+rpi: generate $(PROJECTDIR_SDL)/gmake-rpi/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-rpi config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-rpi config=$(CONFIG)
 
 #-------------------------------------------------
 # cmake
