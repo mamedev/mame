@@ -11,9 +11,9 @@
 #include "entryuniform.h"
 #include "valueuniform.h"
 
-bgfx_entry_uniform* value_uniform_reader::read_from_value(const Value& value, bgfx_uniform* uniform)
+bgfx_entry_uniform* value_uniform_reader::read_from_value(const Value& value, std::string prefix, bgfx_uniform* uniform)
 {
-	validate_parameters(value);
+	validate_parameters(value, prefix);
 
 	float values[4];
 	int count = 1;
@@ -33,8 +33,8 @@ bgfx_entry_uniform* value_uniform_reader::read_from_value(const Value& value, bg
 	return new bgfx_value_uniform(uniform, values, count);
 }
 
-void value_uniform_reader::validate_parameters(const Value& value)
+void value_uniform_reader::validate_parameters(const Value& value, std::string prefix)
 {
-	assert(value.HasMember("value"));
-	assert(value["value"].IsArray() || value["value"].IsNumber());
+    READER_ASSERT(value.HasMember("value"), (prefix + "Must have string value 'value' (what value is being assigned?)\n").c_str());
+    READER_ASSERT(value["value"].IsArray() || value["value"].IsNumber(), (prefix + "Value 'value' must be numeric or an array\n").c_str());
 }

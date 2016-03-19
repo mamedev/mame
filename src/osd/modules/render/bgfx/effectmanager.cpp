@@ -46,12 +46,15 @@ bgfx_effect* effect_manager::effect(std::string name)
 
 bgfx_effect* effect_manager::load_effect(std::string name)
 {
-	std::string path = std::string(m_options.bgfx_path()) + "/effects/" + name + ".json";
+    if (name.length() < 5 || (name.compare(name.length() - 5, 5, ".json") != 0)) {
+        name = name + ".json";
+    }
+    std::string path = std::string(m_options.bgfx_path()) + "/effects/" + name;
 
 	bx::CrtFileReader reader;
 	bx::open(&reader, path.c_str());
 
-	int32_t size = (uint32_t)bx::getSize(&reader);
+	int32_t size (bx::getSize(&reader));
 
 	char* data = new char[size + 1];
 	bx::read(&reader, reinterpret_cast<void*>(data), size);
@@ -60,7 +63,7 @@ bgfx_effect* effect_manager::load_effect(std::string name)
 
 	Document document;
 	document.Parse<0>(data);
-	bgfx_effect* effect = effect_reader::read_from_value(m_shaders, document);
+	bgfx_effect* effect = effect_reader::read_from_value(document, "Effect '" + name + "': ", m_shaders);
 
 	m_effects[name] = effect;
 

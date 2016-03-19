@@ -3,7 +3,7 @@
 	"targets": [
 		{	"name": "temp",
 			"mode": "guest",
-			"bilinear": true
+			"bilinear": false
 		},
 		{	"name": "screen",
 			"mode": "native"

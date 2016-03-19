@@ -33,9 +33,9 @@ const slider_reader::string_to_enum slider_reader::SCREEN_NAMES[slider_reader::S
 	{ "all",   uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_ANY) }
 };
 
-std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, running_machine& machine, uint32_t window_index)
+std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, std::string prefix, running_machine& machine, uint32_t window_index)
 {
-	validate_parameters(value);
+	validate_parameters(value, prefix);
 
 	std::string name = value["name"].GetString();
 	int step = value["step"].GetInt();
@@ -48,9 +48,11 @@ std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, run
     std::vector<std::string> strings;
     if (value.HasMember("strings"))
     {
+        READER_ASSERT(value["strings"].IsArray(), (prefix + "Slider '" + name + "': value 'strings' must be an array\n").c_str());
         const Value& string_array = value["strings"];
         for (UINT32 i = 0; i < string_array.Size(); i++)
         {
+            READER_ASSERT(string_array[i].IsString(), (prefix + "Slider '" + name + "': strings[" + std::to_string(i) + "]: must be a string\n").c_str());
             strings.push_back(std::string(string_array[i].GetString()));
         }
     }
@@ -80,9 +82,12 @@ std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, run
         int min[3];
         int defaults[3];
         int max[3];
-        get_values(value, "min", min, slider_count);
-        get_values(value, "default", defaults, slider_count);
-        get_values(value, "max", max, slider_count);
+        READER_ASSERT(value["min"].IsArray(), (prefix + "Slider '" + name + "': value 'min' must be an array\n").c_str());
+        READER_ASSERT(value["default"].IsArray(), (prefix + "Slider '" + name + "': value 'default' must be an array\n").c_str());
+        READER_ASSERT(value["max"].IsArray(), (prefix + "Slider '" + name + "': value 'max' must be an array\n").c_str());
+        get_values(value, prefix + "Slider '" + name + "': 'min': ", "min", min, slider_count);
+        get_values(value, prefix + "Slider '" + name + "': 'default': ", "default", defaults, slider_count);
+        get_values(value, prefix + "Slider '" + name + "': 'max': ", "max", max, slider_count);
         for (int index = 0; index < slider_count; index++)
         {
             std::string desc;
@@ -115,36 +120,37 @@ std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, run
 	return sliders;
 }
 
-void slider_reader::get_values(const Value& value, std::string name, int* values, const int count)
+void slider_reader::get_values(const Value& value, std::string prefix, std::string name, int* values, const int count)
 {
 	const char* name_str = name.c_str();
-    assert(value.HasMember(name_str));
-    assert(value[name_str].IsArray());
-
     const Value& value_array = value[name_str];
 	for (UINT32 i = 0; i < value_array.Size() && i < count; i++)
 	{
+        READER_ASSERT(value_array[i].IsInt(), (prefix + "Entry " + std::to_string(i) + " must be an integer\n").c_str());
 		values[i] = value_array[i].GetInt();
 	}
 }
 
-void slider_reader::validate_parameters(const Value& value)
+void slider_reader::validate_parameters(const Value& value, std::string prefix)
 {
-	assert(value.HasMember("name"));
-	assert(value["name"].IsString());
-	assert(value.HasMember("min"));
-	assert(value.HasMember("default"));
-	assert(value.HasMember("max"));
-	assert(value.HasMember("step"));
-	assert(value["step"].IsInt());
-	assert(value.HasMember("type"));
-	assert(value["type"].IsString());
-	assert(value.HasMember("screen"));
-	assert(value["screen"].IsString());
-	assert(value.HasMember("scale"));
-	assert(value["scale"].IsFloat());
-	assert(value.HasMember("format"));
-	assert(value["format"].IsString());
-	assert(value.HasMember("text"));
-	assert(value["text"].IsString());
+	READER_ASSERT(value.HasMember("name"), (prefix + "Must have string value 'name'\n").c_str());
+    READER_ASSERT(value["name"].IsString(), (prefix + "Value 'name' must be a string\n").c_str());
+    READER_ASSERT(value.HasMember("min"), (prefix + "Must have integer or array value 'min'\n").c_str());
+    READER_ASSERT(value["min"].IsInt() || value["min"].IsArray(), (prefix + "Value 'min' must be an integer or an array the size of the corresponding slider type\n").c_str());
+    READER_ASSERT(value.HasMember("default"), (prefix + "Must have integer or array value 'default'\n").c_str());
+    READER_ASSERT(value["default"].IsInt() || value["default"].IsArray(), (prefix + "Value 'default' must be an integer or an array the size of the corresponding slider type\n").c_str());
+    READER_ASSERT(value.HasMember("max"), (prefix + "Must have integer or array value 'max'\n").c_str());
+    READER_ASSERT(value["max"].IsInt() || value["max"].IsArray(), (prefix + "Value 'max' must be an integer or an array the size of the corresponding slider type\n").c_str());
+    READER_ASSERT(value.HasMember("step"), (prefix + "Must have integer value 'step'\n").c_str());
+    READER_ASSERT(value["step"].IsInt(), (prefix + "Value 'step' must be an integer (how much does this slider increment by internally?)\n").c_str());
+    READER_ASSERT(value.HasMember("type"), (prefix + "Must have string value 'type'\n").c_str());
+    READER_ASSERT(value["type"].IsString(), (prefix + "Value 'type' must be a string (what type of slider is this? [int_enum, int, float])\n").c_str());
+    READER_ASSERT(value.HasMember("screen"), (prefix + "Must have string value 'screen'\n").c_str());
+    READER_ASSERT(value["screen"].IsString(), (prefix + "Value 'screen' must be a string (what type of output device does this slider apply to? [none, raster, vector, crt, lcd, non_vector, any])\n").c_str());
+    READER_ASSERT(value.HasMember("scale"), (prefix + "Must have numeric value 'scale'\n").c_str());
+    READER_ASSERT(value["scale"].IsNumber(), (prefix + "Value 'scale' must be a number (what do we multiply with to get 1.0?)").c_str());
+    READER_ASSERT(value.HasMember("format"), (prefix + "Must have string value 'format'\n").c_str());
+    READER_ASSERT(value["format"].IsString(), (prefix + "Value 'scale' must be a string (how would we display it in a printf?)").c_str());
+    READER_ASSERT(value.HasMember("text"), (prefix + "Must have string value 'text'\n").c_str());
+    READER_ASSERT(value["text"].IsString(), (prefix + "Value 'text' must be a string (how would you explain it?)").c_str());
 }

@@ -14,9 +14,9 @@
 #include "entryuniform.h"
 #include "slider.h"
 
-bgfx_entry_uniform* slider_uniform_reader::read_from_value(const Value& value, bgfx_uniform* uniform, std::map<std::string, bgfx_slider*>& sliders)
+bgfx_entry_uniform* slider_uniform_reader::read_from_value(const Value& value, std::string prefix, bgfx_uniform* uniform, std::map<std::string, bgfx_slider*>& sliders)
 {
-	validate_parameters(value);
+	validate_parameters(value, prefix);
 
 	std::string name = value["slider"].GetString();
 	std::vector<bgfx_slider*> slider_list;
@@ -35,8 +35,8 @@ bgfx_entry_uniform* slider_uniform_reader::read_from_value(const Value& value, b
 	return new bgfx_slider_uniform(uniform, slider_list);
 }
 
-void slider_uniform_reader::validate_parameters(const Value& value)
+void slider_uniform_reader::validate_parameters(const Value& value, std::string prefix)
 {
-	assert(value.HasMember("slider"));
-	assert(value["slider"].IsString());
+    READER_ASSERT(value.HasMember("slider"), (prefix + "Must have string value 'slider' (what slider are we getting the value of?)\n").c_str());
+    READER_ASSERT(value["slider"].IsString(), (prefix + "Value 'slider' must be a string\n").c_str());
 }

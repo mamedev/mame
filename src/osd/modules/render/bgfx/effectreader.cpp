@@ -22,9 +22,9 @@
 
 #include "effectreader.h"
 
-bgfx_effect* effect_reader::read_from_value(shader_manager& shaders, const Value& value)
+bgfx_effect* effect_reader::read_from_value(const Value& value, std::string prefix, shader_manager& shaders)
 {
-	validate_parameters(value);
+	validate_parameters(value, prefix);
 
 	uint64_t blend = 0;
 	if (value.HasMember("blend"))
@@ -59,22 +59,16 @@ bgfx_effect* effect_reader::read_from_value(shader_manager& shaders, const Value
 	return new bgfx_effect(blend | depth | cull | write, vertex_shader, fragment_shader, uniforms);
 }
 
-void effect_reader::validate_parameters(const Value& value)
+void effect_reader::validate_parameters(const Value& value, std::string prefix)
 {
-	assert(value.HasMember("depth"));
-	assert(value.HasMember("cull"));
-	assert(value.HasMember("write"));
-	assert(value.HasMember("vertex"));
-	assert(value["vertex"].IsString());
-	assert(value.HasMember("fragment") || value.HasMember("pixel"));
-	if (value.HasMember("fragment"))
-	{
-		assert(value["fragment"].IsString());
-	}
-	if (value.HasMember("pixel"))
-	{
-		assert(value["pixel"].IsString());
-	}
-	assert(value.HasMember("uniforms"));
-	assert(value["uniforms"].IsArray());
+    READER_ASSERT(value.HasMember("depth"), (prefix + "Must have object value 'depth' (what are our Z-buffer settings?)\n").c_str());
+    READER_ASSERT(value.HasMember("cull"), (prefix + "Must have object value 'cull' (do we cull triangles based on winding?)\n").c_str());
+    READER_ASSERT(value.HasMember("write"), (prefix + "Must have object value 'write' (what are our color buffer write settings?)\n").c_str());
+    READER_ASSERT(value.HasMember("vertex"), (prefix + "Must have string value 'vertex' (what is our vertex shader?)\n").c_str());
+    READER_ASSERT(value["vertex"].IsString(), (prefix + "Value 'vertex' must be a string\n").c_str());
+    READER_ASSERT(value.HasMember("fragment") || value.HasMember("pixel"), (prefix + "Must have string value named 'fragment' or 'pixel' (what is our fragment/pixel shader?)\n").c_str());
+    READER_ASSERT(!value.HasMember("fragment") || value["fragment"].IsString(), (prefix + "Value 'fragment' must be a string\n").c_str());
+    READER_ASSERT(!value.HasMember("pixel") || value["pixel"].IsString(), (prefix + "Value 'pixel' must be a string\n").c_str());
+    READER_ASSERT(value.HasMember("uniforms"), (prefix + "Must have array value 'uniforms' (what are our shader's parameters?)\n").c_str());
+    READER_ASSERT(value["uniforms"].IsArray(), (prefix + "Value 'uniforms' must be an array\n").c_str());
 }

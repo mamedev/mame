@@ -21,11 +21,11 @@ class running_machine;
 class slider_reader : public state_reader
 {
 public:
-	static std::vector<bgfx_slider*> read_from_value(const Value& value, running_machine& machine, uint32_t window_index);
+	static std::vector<bgfx_slider*> read_from_value(const Value& value, std::string prefix, running_machine& machine, uint32_t window_index);
 
 private:
-	static void get_values(const Value& value, std::string name, int* values, const int count);
-	static void validate_parameters(const Value& value);
+	static void get_values(const Value& value, std::string prefix, std::string name, int* values, const int count);
+	static void validate_parameters(const Value& value, std::string prefix);
 
 	static const int TYPE_COUNT = 5;
 	static const string_to_enum TYPE_NAMES[TYPE_COUNT];

@@ -23,10 +23,10 @@ class bgfx_slider;
 class slider_uniform_reader : public state_reader
 {
 public:
-	static bgfx_entry_uniform* read_from_value(const Value& value, bgfx_uniform* uniform, std::map<std::string, bgfx_slider*>& sliders);
+	static bgfx_entry_uniform* read_from_value(const Value& value, std::string prefix, bgfx_uniform* uniform, std::map<std::string, bgfx_slider*>& sliders);
 
 private:
-	static void validate_parameters(const Value& value);
+	static void validate_parameters(const Value& value, std::string prefix);
 };
 
 #endif // __DRAWBGFX_SLIDER_UNIFORM_READER__

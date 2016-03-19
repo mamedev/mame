@@ -62,7 +62,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine
 
 	Document document;
 	document.Parse<0>(data);
-	bgfx_chain* chain = chain_reader::read_from_value(document, m_options, machine, window_index, m_textures, m_targets, m_effects, m_width, m_height);
+	bgfx_chain* chain = chain_reader::read_from_value(document, name + ": ", m_options, machine, window_index, m_textures, m_targets, m_effects, m_width, m_height);
 
 	m_chains[name + std::to_string(window_index)] = chain;
 

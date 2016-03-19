@@ -21,9 +21,9 @@ const parameter_reader::string_to_enum parameter_reader::TYPE_NAMES[parameter_re
     { "time",   bgfx_parameter::parameter_type::PARAM_TIME }
 };
 
-bgfx_parameter* parameter_reader::read_from_value(const Value& value, uint32_t window_index)
+bgfx_parameter* parameter_reader::read_from_value(const Value& value, std::string prefix, uint32_t window_index)
 {
-	validate_parameters(value);
+	validate_parameters(value, prefix);
 
 	std::string name = value["name"].GetString();
 	bgfx_parameter::parameter_type type = bgfx_parameter::parameter_type(get_enum_from_value(value, "type", bgfx_parameter::parameter_type::PARAM_FRAME, TYPE_NAMES, TYPE_COUNT));
@@ -50,18 +50,12 @@ bgfx_parameter* parameter_reader::read_from_value(const Value& value, uint32_t w
 	return nullptr;
 }
 
-void parameter_reader::validate_parameters(const Value& value)
+void parameter_reader::validate_parameters(const Value& value, std::string prefix)
 {
-	assert(value.HasMember("name"));
-	assert(value["name"].IsString());
-	assert(value.HasMember("type"));
-	assert(value["type"].IsString());
-    if (value.HasMember("period"))
-    {
-        assert(value["period"].IsNumber());
-    }
-    if (value.HasMember("limit"))
-    {
-        assert(value["limit"].IsNumber());
-    }
+    READER_ASSERT(value.HasMember("name"), (prefix + "Must have string value 'name'\n").c_str());
+    READER_ASSERT(value["name"].IsString(), (prefix + "Value 'name' must be a string\n").c_str());
+    READER_ASSERT(value.HasMember("type"), (prefix + "Must have string value 'type'\n").c_str());
+    READER_ASSERT(value["type"].IsString(), (prefix + "Value 'type' must be a string\n").c_str());
+    READER_ASSERT(!value.HasMember("period") || value["period"].IsNumber(), (prefix + "Value 'period' must be numeric\n").c_str());
+    READER_ASSERT(!value.HasMember("limit") || value["limit"].IsNumber(), (prefix + "Value 'period' must be numeric\n").c_str());
 }

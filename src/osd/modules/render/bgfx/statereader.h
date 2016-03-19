@@ -35,6 +35,21 @@ protected:
 	static uint64_t get_enum_from_value(const Value& value, std::string name, const uint64_t default_value, const string_to_enum* enums, const int count);
 	static uint64_t get_param_from_string(std::string value, const string_to_enum* enums, const int count);
 
+protected:
+	static void READER_ASSERT(bool condition, const char* format, ...)
+	{
+		if (!condition)
+		{
+			va_list ap;
+			va_start(ap, format);
+			char buf[2048];
+			vsnprintf(buf, 2048, format, ap);
+            printf("%s\n", buf);
+            fflush(stdout);
+			fatalerror("%s", buf);
+		}
+	}
+
 private:
 	static void get_vec_values(const Value& value_array, float* data, const unsigned int count);
 };

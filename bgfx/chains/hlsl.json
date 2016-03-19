@@ -80,12 +80,6 @@
 		{	"name": "screen",
 			"mode": "native",
 			"doublebuffer": true
-		},
-		{	"name": "bloom",
-			"mode": "guest",
-			"prescale": true,
-			"doublebuffer": true,
-			"pyramid": true
 		}
 	],
 	"passes": [
