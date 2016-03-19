@@ -151,7 +151,7 @@ msgstr "^!Développeur"
 #: src/emu/ui/custmenu.cpp:183 src/emu/ui/custmenu.cpp:468
 #: src/emu/ui/optsmenu.cpp:243
 msgid "^!Year"
-msgstr ""
+msgstr "^!Année"
 
 #: src/emu/ui/custmenu.cpp:192 src/emu/ui/custmenu.cpp:504
 msgid "Remove last filter"
@@ -361,7 +361,7 @@ msgstr "Rouge"
 #: src/emu/ui/custui.cpp:853 src/emu/ui/custui.cpp:856
 #: src/emu/ui/custui.cpp:1010
 msgid "Green"
-msgstr ""
+msgstr "Vert"
 
 #: src/emu/ui/custui.cpp:861 src/emu/ui/custui.cpp:864
 #: src/emu/ui/custui.cpp:1011
@@ -553,7 +553,7 @@ msgstr "Versus"
 
 #: src/emu/ui/dirmenu.cpp:58 src/emu/ui/menu.cpp:59
 msgid "Covers"
-msgstr ""
+msgstr "Covers"
 
 #: src/emu/ui/dirmenu.cpp:116 src/emu/ui/dirmenu.cpp:136
 msgid "Folders Setup"
@@ -562,7 +562,7 @@ msgstr "Configurer les Dossiers"
 #: src/emu/ui/dirmenu.cpp:183
 #, c-format
 msgid "Current %1$s Folders"
-msgstr ""
+msgstr "Dossiers %1$s en Cours"
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
@@ -871,7 +871,7 @@ msgstr ""
 
 #: src/emu/ui/menu.cpp:54
 msgid "Game Over"
-msgstr ""
+msgstr "Game Over"
 
 #: src/emu/ui/menu.cpp:64
 msgid "Add or remove favorites"
@@ -1333,7 +1333,7 @@ msgstr "Le jeu est Mécanique : %1$s\n"
 #: src/emu/ui/selgame.cpp:1614
 #, c-format
 msgid "Requires Artwork: %1$s\n"
-msgstr "Nécessite l'Artwork: %1$s\n"
+msgstr "Nécessite l'Artwork : %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1615
 #, c-format
@@ -1878,7 +1878,7 @@ msgstr "Volume Maître"
 #: src/emu/ui/ui.cpp:1977
 #, c-format
 msgid "%1$s Volume"
-msgstr ""
+msgstr "%1$s Volume"
 
 #: src/emu/ui/ui.cpp:1999
 #, c-format
