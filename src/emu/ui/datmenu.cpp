@@ -100,13 +100,18 @@ void ui_menu_dats_view::handle()
 
 void ui_menu_dats_view::populate()
 {
-	machine().pause();
+	bool paused = machine().paused();
+	if (!paused)
+		machine().pause();
+
 	(m_issoft == true) ? get_data_sw() : get_data();
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, (MENU_FLAG_UI_DATS | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), nullptr);
 	customtop = 2.0f * machine().ui().get_line_height() + 4.0f * UI_BOX_TB_BORDER;
 	custombottom = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-	machine().resume();
+	
+	if (!paused)
+		machine().resume();
 }
 
 //-------------------------------------------------
