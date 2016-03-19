@@ -108,16 +108,6 @@ static INPUT_PORTS_START( pcat_dyn )
 	// Don't use IPT_BUTTON1 or the mouse axes are mapped incorrectly
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_COIN1)
-
-	PORT_START("pc_keyboard_3")
-
-	PORT_START("pc_keyboard_4")
-
-	PORT_START("pc_keyboard_5")
-
-	PORT_START("pc_keyboard_6")
-
-	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
 
 static SLOT_INTERFACE_START(pcat_dyn_com)
