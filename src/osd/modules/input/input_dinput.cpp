@@ -147,7 +147,7 @@ public:
 
 	void reset() override
 	{
-		memset(&keyboard, 0, sizeof(keyboard));
+		memset(&keyboard.state, 0, sizeof(keyboard.state));
 	}
 };
 
@@ -232,7 +232,7 @@ public:
 	{
 		dinput_callback_context context = { this, &machine };
 
-		HRESULT result = IDirectInput_EnumDevices(m_dinput, dinput_devclass(), enum_callback, &context, DIEDFL_ATTACHEDONLY);
+		HRESULT result = IDirectInput_EnumDevices(m_dinput.Get(), dinput_devclass(), enum_callback, &context, DIEDFL_ATTACHEDONLY);
 		if (result != DI_OK)
 			fatalerror("DirectInput: Unable to enumerate keyboards (result=%08X)\n", static_cast<UINT32>(result));
 	}
@@ -258,7 +258,7 @@ protected:
 		TDevice* devinfo = devicelist()->create_device<TDevice>(machine, utf8_instance_name.get(), *this);
 
 		// attempt to create a device
-		result = IDirectInput_CreateDevice(m_dinput, WRAP_REFIID(instance->guidInstance), devinfo->dinput.device.GetAddressOf(), NULL);
+		result = IDirectInput_CreateDevice(m_dinput.Get(), WRAP_REFIID(instance->guidInstance), devinfo->dinput.device.GetAddressOf(), NULL);
 		if (result != DI_OK)
 			goto error;
 
@@ -510,7 +510,7 @@ public:
 
 	void reset() override
 	{
-		memset(&joystick, 0, sizeof(joystick));
+		memset(&joystick.state, 0, sizeof(joystick.state));
 	}
 
 	void poll() override
