@@ -761,6 +761,7 @@ void running_machine::add_notifier(machine_notification event, machine_notify_de
 void running_machine::add_logerror_callback(logerror_callback callback)
 {
 	assert_always(m_current_phase == MACHINE_PHASE_INIT, "Can only call add_logerror_callback at init time!");
+        m_string_buffer.reserve(1024);
 	m_logerror_list.push_back(std::make_unique<logerror_callback_item>(callback));
 }
 
@@ -1011,7 +1012,6 @@ void running_machine::logfile_callback(const running_machine &machine, const cha
 	if (machine.m_logfile != nullptr)
 	{
 		machine.m_logfile->puts(buffer);
-		
 		machine.m_logfile->flush();
 	}
 }
