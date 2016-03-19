@@ -2376,17 +2376,6 @@
 		</part>
 	</software>
 
-	<software name="felipe" cloneof="teddyboy">
-		<description>Felipe em Acao (Bra)</description>
-		<year>19??</year>
-		<publisher>Tec Toy</publisher>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="felipe em acao (b).bin" size="32768" crc="ccb2cab4" sha1="b7601ff0116490b85c9bd50109db175ce2dd9104" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ferias">
 		<description>Férias Frustradas do Pica-Pau (Bra)</description>
 		<year>1996</year>
@@ -6716,17 +6705,6 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="transbot [proto].bin" size="32768" crc="58b99750" sha1="4cd1d5e94b31bb3c3e449bc995890c0a4707bc5f" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="treinam">
-		<description>Treinamento Do Mymo (Bra)</description>
-		<year>19??</year>
-		<publisher>Tec Toy</publisher>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="treinamento do mymo (b).bin" size="262144" crc="e94784f2" sha1="327c3518363ee060b681ff34c0b2eea3ffea27e4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
