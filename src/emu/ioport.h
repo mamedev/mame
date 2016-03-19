@@ -134,15 +134,17 @@ enum ioport_type
 	IPT_TILT4,
 
 	// misc other digital inputs
+	IPT_POWER_ON,
+	IPT_POWER_OFF,
 	IPT_SERVICE,
 	IPT_TILT,
 	IPT_INTERLOCK,
 	IPT_VOLUME_UP,
 	IPT_VOLUME_DOWN,
-	IPT_START,                  // MESS only
-	IPT_SELECT,                 // MESS only
-	IPT_KEYPAD,                 // MESS only
-	IPT_KEYBOARD,               // MESS only
+	IPT_START,              // use the numbered start button(s) for coin-ops
+	IPT_SELECT,
+	IPT_KEYPAD,
+	IPT_KEYBOARD,
 
 	// digital joystick inputs
 	IPT_DIGITAL_JOYSTICK_FIRST,
@@ -206,7 +208,7 @@ enum ioport_type
 		IPT_MAHJONG_KAN,
 		IPT_MAHJONG_PON,
 		IPT_MAHJONG_CHI,
-		IPT_MAHJONG_REACH,  //IPT_MAHJONG_RIICHI,   // REACH is Japanglish
+		IPT_MAHJONG_REACH,
 		IPT_MAHJONG_RON,
 		IPT_MAHJONG_BET,
 		IPT_MAHJONG_LAST_CHANCE,
@@ -256,22 +258,6 @@ enum ioport_type
 		IPT_GAMBLE_STAND,   // player
 		IPT_GAMBLE_BET,     // player
 		IPT_GAMBLE_PAYOUT,  // player
-	//  IPT_GAMBLE_BUTTON1, // player
-	//  IPT_GAMBLE_BUTTON2, // many many gambling games have multi-games and/or multi-function-buttons
-	//  IPT_GAMBLE_BUTTON3, // I suggest to eliminate specific names
-	//  IPT_GAMBLE_BUTTON4,
-	//  IPT_GAMBLE_BUTTON5,
-	//  IPT_GAMBLE_BUTTON6,
-	//  IPT_GAMBLE_BUTTON7,
-	//  IPT_GAMBLE_BUTTON8,
-	//  IPT_GAMBLE_BUTTON9,
-	//  IPT_GAMBLE_BUTTON10,
-	//  IPT_GAMBLE_BUTTON11,
-	//  IPT_GAMBLE_BUTTON12,
-	//  IPT_GAMBLE_BUTTON13,
-	//  IPT_GAMBLE_BUTTON14,
-	//  IPT_GAMBLE_BUTTON15,
-	//  IPT_GAMBLE_BUTTON16,
 
 		// poker-specific inputs
 		IPT_POKER_HOLD1,
