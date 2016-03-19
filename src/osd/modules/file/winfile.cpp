@@ -19,6 +19,7 @@
 #include "osdcore.h"
 
 #include <cassert>
+#include <cstring>
 
 // standard windows headers
 #include <windows.h>
@@ -59,15 +60,11 @@ public:
 		// attempt to set the file pointer
 		LARGE_INTEGER largeOffset;
 		largeOffset.QuadPart = offset;
-		DWORD result(SetFilePointerEx(m_handle, largeOffset, NULL, FILE_BEGIN));
-		if (INVALID_SET_FILE_POINTER == result)
-		{
-			DWORD const err(GetLastError());
-			if (NO_ERROR != err)
-				win_error_to_file_error(err);
-		}
+		if (!SetFilePointerEx(m_handle, largeOffset, nullptr, FILE_BEGIN))
+			return win_error_to_file_error(GetLastError());
 
 		// then perform the read
+		DWORD result = 0;
 		if (!ReadFile(m_handle, buffer, length, &result, NULL))
 			return win_error_to_file_error(GetLastError());
 
@@ -80,15 +77,11 @@ public:
 		// attempt to set the file pointer
 		LARGE_INTEGER largeOffset;
 		largeOffset.QuadPart = offset;
-		DWORD result(SetFilePointerEx(m_handle, largeOffset, NULL, FILE_BEGIN));
-		if (INVALID_SET_FILE_POINTER == result)
-		{
-			DWORD const err(GetLastError());
-			if (NO_ERROR != err)
-				win_error_to_file_error(err);
-		}
+		if (!SetFilePointerEx(m_handle, largeOffset, nullptr, FILE_BEGIN))
+			return win_error_to_file_error(GetLastError());
 
 		// then perform the write
+		DWORD result = 0;
 		if (!WriteFile(m_handle, buffer, length, &result, NULL))
 			return win_error_to_file_error(GetLastError());
 
@@ -101,13 +94,8 @@ public:
 		// attempt to set the file pointer
 		LARGE_INTEGER largeOffset;
 		largeOffset.QuadPart = offset;
-		DWORD const result(SetFilePointerEx(m_handle, largeOffset, NULL, FILE_BEGIN));
-		if (INVALID_SET_FILE_POINTER == result)
-		{
-			DWORD const err(GetLastError());
-			if (NO_ERROR != err)
-				win_error_to_file_error(err);
-		}
+		if (!SetFilePointerEx(m_handle, largeOffset, nullptr, FILE_BEGIN))
+			return win_error_to_file_error(GetLastError());
 
 		// then perform the truncation
 		if (!SetEndOfFile(m_handle))
@@ -167,7 +155,7 @@ DWORD create_path_recursive(TCHAR *path)
 
 	// if the path already exists, we're done
 	WIN32_FILE_ATTRIBUTE_DATA fileinfo;
-	if (GetFileAttributesEx(path, GetFileExInfoStandard, &fileinfo) != INVALID_FILE_ATTRIBUTES)
+	if (GetFileAttributesEx(path, GetFileExInfoStandard, &fileinfo))
 		return NO_ERROR;
 	else if (!CreateDirectory(path, NULL))
 		return GetLastError();
@@ -241,12 +229,15 @@ osd_file::error osd_file::open(std::string const &orig_path, UINT32 openflags, p
 
 				// attempt to reopen the file
 				if (err == NO_ERROR)
+				{
 					h = CreateFile(t_path, access, sharemode, NULL, disposition, 0, NULL);
+					err = GetLastError();
+				}
 			}
 		}
 
 		// if we still failed, clean up and free
-		if (h == INVALID_HANDLE_VALUE)
+		if (INVALID_HANDLE_VALUE == h)
 			return win_error_to_file_error(err);
 	}
 
@@ -365,44 +356,39 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 
 osd_directory_entry *osd_stat(const std::string &path)
 {
-	osd_directory_entry *result = NULL;
-	TCHAR *t_path;
-	HANDLE find = INVALID_HANDLE_VALUE;
-	WIN32_FIND_DATA find_data;
-
 	// convert the path to TCHARs
-	t_path = tstring_from_utf8(path.c_str());
-	if (t_path == NULL)
-		goto done;
+	std::unique_ptr<TCHAR, void (*)(void *)> const t_path(tstring_from_utf8(path.c_str()), &osd_free);
+	if (!t_path)
+		return nullptr;
 
 	// is this path a root directory (e.g. - C:)?
+	WIN32_FIND_DATA find_data;
+	std::memset(&find_data, 0, sizeof(find_data));
 	if (isalpha(path[0]) && (path[1] == ':') && (path[2] == '\0'))
 	{
 		// need to do special logic for root directories
-		memset(&find_data, 0, sizeof(find_data));
-		GetFileAttributesEx(t_path, GetFileExInfoStandard, &find_data.dwFileAttributes);
+		if (!GetFileAttributesEx(t_path.get(), GetFileExInfoStandard, &find_data.dwFileAttributes))
+			find_data.dwFileAttributes = INVALID_FILE_ATTRIBUTES;
 	}
 	else
 	{
 		// attempt to find the first file
-		find = FindFirstFileEx(t_path, FindExInfoStandard, &find_data, FindExSearchNameMatch, NULL, 0);
+		HANDLE find = FindFirstFileEx(t_path.get(), FindExInfoStandard, &find_data, FindExSearchNameMatch, NULL, 0);
 		if (find == INVALID_HANDLE_VALUE)
-			goto done;
+			return nullptr;
+		FindClose(find);
 	}
 
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
-	result = (osd_directory_entry *)osd_malloc_array(sizeof(*result) + path.length() + 1);
+	osd_directory_entry *const result = (osd_directory_entry *)osd_malloc_array(sizeof(*result) + path.length() + 1);
 	if (!result)
-		goto done;
+		return nullptr;
 	strcpy(((char *) result) + sizeof(*result), path.c_str());
 	result->name = ((char *) result) + sizeof(*result);
 	result->type = win_attributes_to_entry_type(find_data.dwFileAttributes);
 	result->size = find_data.nFileSizeLow | ((UINT64) find_data.nFileSizeHigh << 32);
 
-done:
-	if (t_path != NULL)
-		osd_free(t_path);
 	return result;
 }
 
