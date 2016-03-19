@@ -82,6 +82,9 @@ sv806_device::sv806_device(const machine_config &mconfig, const char *tag, devic
 
 void sv806_device::device_start()
 {
+	// register for savestates
+	save_item(NAME(m_ram_enabled));
+	save_pointer(NAME(m_ram.get()), 0x800);
 }
 
 

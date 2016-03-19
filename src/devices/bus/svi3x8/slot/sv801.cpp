@@ -72,6 +72,9 @@ sv801_device::sv801_device(const machine_config &mconfig, const char *tag, devic
 
 void sv801_device::device_start()
 {
+	// register for savestates
+	save_item(NAME(m_irq));
+	save_item(NAME(m_drq));
 }
 
 //-------------------------------------------------
