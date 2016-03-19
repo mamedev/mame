@@ -84,7 +84,7 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 		return nullptr;
 	}
 
-#   if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
+#   if BX_PLATFORM_LINUX || BX_PLATFORM_BSD || BX_PLATFORM_RPI
 	return (void*)wmi.info.x11.window;
 #   elif BX_PLATFORM_OSX
 	return wmi.info.cocoa.window;

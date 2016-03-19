@@ -531,9 +531,9 @@ function toolchain(_buildDir, _subDir)
 			"$(RASPBERRY_SYSROOT)/opt/vc/include/interface/vcos/pthreads",
 			"$(RASPBERRY_SYSROOT)/opt/vc/include/interface/vmcs_host/linux",
 		}
-		links {
-			"rt",
-		}
+		defines {
+			"__VCCOREVER__=0x04000000", -- There is no special prefedined compiler symbol to detect RaspberryPi, faking it.
+		} 
 		linkoptions {
 			"-Wl,--gc-sections",
 		}

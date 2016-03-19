@@ -1128,6 +1128,13 @@ configuration { "rpi" }
 	links {
  		"SDL2",
 		"fontconfig",
+		"X11",
+		"GLESv2",
+		"EGL",
+		"bcm_host",
+		"vcos",
+		"vchiq_arm",
+		"pthread",
 	}	
 
 configuration { "osx* or xcode4" }
