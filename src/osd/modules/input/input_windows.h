@@ -9,6 +9,13 @@
 #ifndef INPUT_WIN_H_
 #define INPUT_WIN_H_
 
+// standard windows headers
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#undef interface
+
+#include "window.h"
+
 //============================================================
 //  TYPEDEFS
 //============================================================
