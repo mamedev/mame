@@ -261,7 +261,6 @@ void ui_menu_dats_view::get_data_sw()
 	std::vector<int> xstart;
 	std::vector<int> xend;
 	std::string buffer;
-	std::vector<std::string> m_item;
 	if (m_items_list[m_actual].option == 0)
 		buffer = m_swinfo->usage;
 	else
