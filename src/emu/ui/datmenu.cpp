@@ -180,14 +180,13 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 		x1 += space;
 		rgb_t fcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0x00) : UI_TEXT_COLOR;
 		rgb_t bcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0xff) : UI_TEXT_BG_COLOR;
-		mui.draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, JUSTIFY_LEFT, WRAP_NEVER,
-			DRAW_NONE, fcolor, bcolor, &width, nullptr);
+		mui.draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, JUSTIFY_LEFT, WRAP_NEVER, DRAW_NONE, fcolor, bcolor, &width, nullptr);
+
 		if (bcolor != UI_TEXT_BG_COLOR)
 			mui.draw_textured_box(container, x1 - (space / 2), y1, x1 + width + (space / 2), y2, bcolor, rgb_t(255, 43, 43, 43),
 				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
-		mui.draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, JUSTIFY_LEFT, WRAP_NEVER,
-			DRAW_NORMAL, fcolor, bcolor, &width, nullptr);
+		mui.draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, JUSTIFY_LEFT, WRAP_NEVER, DRAW_NORMAL, fcolor, bcolor, &width, nullptr);
 		x1 += width + space;
 		++x;
 	}
@@ -195,8 +194,7 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 	// bottom
 	std::string revision;
 	revision.assign(_("Revision: ")).append(m_items_list[m_actual].revision);
-	mui.draw_text_full(container, revision.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	mui.draw_text_full(container, revision.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(origx2 - origx1, width);
 

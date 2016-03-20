@@ -2287,6 +2287,11 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 		float panel_height = origy2 - origy1 - 0.02f - (2.0f * UI_BOX_TB_BORDER) - (2.0f * line_height);
 		int screen_width = machine().render().ui_target().width();
 		int screen_height = machine().render().ui_target().height();
+
+		int rot = machine().render().ui_target().orientation();
+		if (rot == ROT90 || rot == ROT270)
+			std::swap(screen_height, screen_width);
+
 		int panel_width_pixel = panel_width * screen_width;
 		int panel_height_pixel = panel_height * screen_height;
 		float ratio = 0.0f;
