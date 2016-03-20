@@ -56,6 +56,7 @@ TODO: everything below.
 * floppy controller wd1791 and its interrupt
   According to [3] and [5] the format is double density/MFM, 128 bytes per sector, 16 sectors per track, 1 or 2 sided, for 170K or 340K per disk. Drive spins at 300RPM.
 * According to the schematics, we're missing an 82s147 DISKSEP.PROM used as a data separator
+* hook up the DiskInt from the wd1791 either using m_fdc->intrq_r() polling or using device lines (latter is a much better idea)
 
 WIP:
 * crt5027 video controller - the iocpu side is hooked up, but crashes due to a bug in the crt5027/tms9927 code. the actual drawing to screen part is not connected anywhere yet.
