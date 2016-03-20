@@ -1647,43 +1647,24 @@ void ui_menu::get_title_search(std::string &snaptext, std::string &searchstr)
 	snaptext.assign(_(arts_info[ui_globals::curimage_view].title));
 
 	// get search path
+	std::string addpath;
 	if (ui_globals::curimage_view == SNAPSHOT_VIEW)
+	{
+		emu_options moptions;
 		searchstr = machine().options().value(arts_info[ui_globals::curimage_view].path);
+		addpath = moptions.value(arts_info[ui_globals::curimage_view].path);
+	}
 	else
+	{
+		ui_options moptions;
 		searchstr = machine().ui().options().value(arts_info[ui_globals::curimage_view].path);
+		addpath = moptions.value(arts_info[ui_globals::curimage_view].path);
+	}
 
 	std::string tmp(searchstr);
 	path_iterator path(tmp.c_str());
-	std::string curpath, addpath;
-
-	if (ui_globals::curimage_view != SNAPSHOT_VIEW)
-	{
-		ui_options moptions;
-		for (ui_options::entry *f_entry = moptions.first(); f_entry != nullptr; f_entry = f_entry->next())
-		{
-			const char *name = f_entry->name();
-			if (name && strlen(name) && !strcmp(arts_info[ui_globals::curimage_view].path, f_entry->name()))
-			{
-				addpath = f_entry->default_value();
-				break;
-			}
-		}
-	}
-	else
-	{
-		emu_options moptions;
-		for (emu_options::entry *f_entry = moptions.first(); f_entry != nullptr; f_entry = f_entry->next())
-		{
-			const char *name = f_entry->name();
-			if (name && strlen(name) && !strcmp(arts_info[ui_globals::curimage_view].path, f_entry->name()))
-			{
-				addpath = f_entry->default_value();
-				break;
-			}
-		}
-	}
 	path_iterator path_iter(addpath.c_str());
-	std::string c_path;
+	std::string c_path, curpath;
 
 	// iterate over path and add path for zipped formats
 	while (path.next(curpath))

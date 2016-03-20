@@ -22,7 +22,12 @@
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container *container, const game_driver *driver) : ui_menu(machine, container)
+ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container *container, const game_driver *driver) 
+	: ui_menu(machine, container)
+	, m_actual(0)
+	, m_driver((driver == nullptr) ? &machine.system() : driver)
+	, m_issoft(false)
+
 {
 	image_interface_iterator iter(machine.root_device());
 	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
@@ -35,9 +40,6 @@ ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container 
 			m_parent = strensure(image->software_entry()->parentname());
 		}
 	}
-	m_driver = (driver == nullptr) ? &machine.system() : driver;
-	m_actual = 0;
-	m_issoft = false;
 
 	init_items();
 }
@@ -46,17 +48,18 @@ ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container 
 //  ctor
 //-------------------------------------------------
 
-ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container *container, ui_software_info *swinfo, const game_driver *driver) : ui_menu(machine, container)
-{
-	m_list = swinfo->listname;
-	m_short = swinfo->shortname;
-	m_long = swinfo->longname;
-	m_parent = swinfo->parentname;
-	m_driver = (driver == nullptr) ? &machine.system() : driver;
-	m_swinfo = swinfo;
-	m_actual = 0;
-	m_issoft = true;
+ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container *container, ui_software_info *swinfo, const game_driver *driver) 
+	: ui_menu(machine, container)
+	, m_actual(0)
+	, m_driver((driver == nullptr) ? &machine.system() : driver)
+	, m_swinfo(swinfo)
+	, m_list(swinfo->listname)
+	, m_short(swinfo->shortname)
+	, m_long(swinfo->longname)
+	, m_parent(swinfo->parentname)
+	, m_issoft(true)
 
+{
 	if (machine.datfile().has_software(m_list, m_short, m_parent))
 		m_items_list.emplace_back(_("Software History"), UI_HISTORY_LOAD, machine.datfile().rev_history());
 	if (swinfo != nullptr && !swinfo->usage.empty())
@@ -213,7 +216,7 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 
 	// draw the text within it
 	mui.draw_text_full(container, revision.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 //-------------------------------------------------
