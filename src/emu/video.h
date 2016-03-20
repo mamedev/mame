@@ -14,8 +14,10 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __VIDEO_H__
-#define __VIDEO_H__
+#ifndef MAME_EMU_VIDEO_H
+#define MAME_EMU_VIDEO_H
+
+#include "aviio.h"
 
 
 //**************************************************************************
@@ -35,7 +37,7 @@ const int MAX_FRAMESKIP = FRAMESKIP_LEVELS - 2;
 // forward references
 class render_target;
 class screen_device;
-struct avi_file;
+class avi_file;
 
 
 
@@ -64,7 +66,7 @@ public:
 	bool throttled() const { return m_throttled; }
 	float throttle_rate() const { return m_throttle_rate; }
 	bool fastforward() const { return m_fastforward; }
-	bool is_recording() const { return (m_mng_file != nullptr || m_avi_file != nullptr); }
+	bool is_recording() const { return (m_mng_file || m_avi_file); }
 
 	// setters
 	void set_frameskip(int frameskip);
@@ -76,7 +78,7 @@ public:
 	// misc
 	void toggle_throttle();
 	void toggle_record_movie();
-	file_error open_next(emu_file &file, const char *extension);
+	osd_file::error open_next(emu_file &file, const char *extension);
 
 	// render a frame
 	void frame_update(bool debug = false);
@@ -184,7 +186,7 @@ private:
 	UINT32              m_mng_frame;                // current movie frame number
 
 	// movie recording - AVI
-	avi_file *          m_avi_file;                 // handle to the open movie file
+	avi_file::ptr       m_avi_file;                 // handle to the open movie file
 	attotime            m_avi_frame_period;         // period of a single movie frame
 	attotime            m_avi_next_frame_time;      // time of next frame
 	UINT32              m_avi_frame;                // current movie frame number
@@ -205,4 +207,4 @@ private:
 
 };
 
-#endif  /* __VIDEO_H__ */
+#endif // MAME_EMU_VIDEO_H

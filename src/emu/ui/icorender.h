@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890;Victor Laskin
+// copyright-holders:Maurizio Petrarota, Victor Laskin
 /***************************************************************************
 
     ui/icorender.h
@@ -80,9 +80,9 @@ void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 	else
 		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
 
-	file_error filerr = file.open(fname.c_str());
+	osd_file::error filerr = file.open(fname.c_str());
 
-	if (filerr != FILERR_NONE)
+	if (filerr != osd_file::error::NONE)
 		return;
 
 	// allocates a buffer for the image

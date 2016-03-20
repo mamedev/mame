@@ -44,7 +44,7 @@ NETLIB_DEVICE(82S16,
 	logic_output_t m_DOUTQ;
 
 	//netlist_state_t<UINT8[256]> m_ram;
-	UINT8 m_ram[256];
+	UINT64 m_ram[4]; // 256 bits
 );
 
 NETLIB_DEVICE_DERIVED_PURE(82S16_dip, 82S16);

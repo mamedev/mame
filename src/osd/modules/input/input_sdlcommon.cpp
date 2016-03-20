@@ -79,18 +79,23 @@ void sdl_event_manager::process_window_event(running_machine &machine, SDL_Event
 
 	switch (sdlevent.window.event)
 	{
+	case SDL_WINDOWEVENT_SHOWN:
+		m_has_focus = true;
+		break;
+
 	case SDL_WINDOWEVENT_CLOSE:
 		machine.schedule_exit();
 		break;
 
 	case SDL_WINDOWEVENT_LEAVE:
 		machine.ui_input().push_mouse_leave_event(window->target());
-		m_app_has_mouse_focus = 0;
+		m_mouse_over_window = 0;
 		break;
 
 	case SDL_WINDOWEVENT_MOVED:
 		window->notify_changed();
 		m_focus_window = window;
+		m_has_focus = true;
 		break;
 
 	case SDL_WINDOWEVENT_RESIZED:
@@ -105,16 +110,23 @@ void sdl_event_manager::process_window_event(running_machine &machine, SDL_Event
 			window->resize(sdlevent.window.data1, sdlevent.window.data2);
 		}
 		m_focus_window = window;
+		m_has_focus = true;
 		break;
 
 	case SDL_WINDOWEVENT_ENTER:
-		m_app_has_mouse_focus = 1;
+		m_mouse_over_window = 1;
 		/* fall through */
 	case SDL_WINDOWEVENT_FOCUS_GAINED:
 	case SDL_WINDOWEVENT_EXPOSED:
 	case SDL_WINDOWEVENT_MAXIMIZED:
 	case SDL_WINDOWEVENT_RESTORED:
 		m_focus_window = window;
+		m_has_focus = true;
+		break;
+
+	case SDL_WINDOWEVENT_MINIMIZED:
+	case SDL_WINDOWEVENT_FOCUS_LOST:
+		m_has_focus = false;
 		break;
 	}
 }
@@ -268,7 +280,7 @@ bool sdl_osd_interface::should_hide_mouse()
 	if (!options().mouse() && !options().lightgun())
 		return false;
 
-	if (!sdl_event_manager::instance().app_has_mouse_focus())
+	if (!sdl_event_manager::instance().mouse_over_window())
 		return false;
 
 	// otherwise, yes

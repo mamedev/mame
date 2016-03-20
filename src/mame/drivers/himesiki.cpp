@@ -103,7 +103,10 @@ WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 {
 	membank("bank1")->set_entry(((data & 0x0c) >> 2));
 
-	if (data & 0xf3)
+	m_flipscreen = (data & 0x10)>>4;
+	flip_screen_set(m_flipscreen);
+
+	if (data & 0xe3)
 		logerror("p06_w %02x\n", data);
 }
 
@@ -259,15 +262,16 @@ static INPUT_PORTS_START( androidp )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x07, 0x04, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x03, "Invalid" ) // can't coin up or start? (probably a non-functioning freeplay)
+
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

@@ -838,6 +838,54 @@ int lua_engine::lua_screen::l_width(lua_State *L)
 	return 1;
 }
 
+
+//-------------------------------------------------
+//  screen_orientation - return screen orientation
+//  -> manager:machine().screens[":screen"]:orientation()
+//     -> rotation_angle (0, 90, 180, 270)
+//     -> flipx (true, false)
+//     -> flipy (true, false)
+//-------------------------------------------------
+
+int lua_engine::lua_screen::l_orientation(lua_State *L)
+{
+	UINT32 flags = (luaThis->machine().system().flags & ORIENTATION_MASK);
+
+	int rotation_angle = 0;
+	switch (flags)
+	{
+		case ORIENTATION_FLIP_X:
+			rotation_angle = 0;
+			break;
+		case ORIENTATION_SWAP_XY:
+		case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X:
+			rotation_angle = 90;
+			break;
+		case ORIENTATION_FLIP_Y:
+		case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
+			rotation_angle = 180;
+			break;
+		case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_Y:
+		case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
+			rotation_angle = 270;
+			break;
+	}
+
+	lua_createtable(L, 2, 2);
+	lua_pushliteral(L, "rotation_angle");
+	lua_pushinteger(L, rotation_angle);
+
+	lua_settable(L, -3);
+	lua_pushliteral(L, "flipx");
+	lua_pushboolean(L, (flags & ORIENTATION_FLIP_X));
+
+	lua_settable(L, -3);
+	lua_pushliteral(L, "flipy");
+	lua_pushboolean(L, (flags & ORIENTATION_FLIP_Y));
+	lua_settable(L, -3);
+	return 1;
+}
+
 //-------------------------------------------------
 //  screen_refresh - return screen refresh rate
 //  -> manager:machine().screens[":screen"]:refresh()
@@ -870,7 +918,7 @@ int lua_engine::lua_screen::l_snapshot(lua_State *L)
 	luaL_argcheck(L, lua_isstring(L, 2) || lua_isnone(L, 2), 2, "optional argument: filename, string expected");
 
 	emu_file file(sc->machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	file_error filerr;
+	osd_file::error filerr;
 
 	if (!lua_isnone(L, 2)) {
 		const char *filename = lua_tostring(L, 2);
@@ -884,9 +932,9 @@ int lua_engine::lua_screen::l_snapshot(lua_State *L)
 		filerr = sc->machine().video().open_next(file, "png");
 	}
 
-	if (filerr != FILERR_NONE)
+	if (filerr != osd_file::error::NONE)
 	{
-		luaL_error(L, "file_error=%d", filerr);
+		luaL_error(L, "osd_file::error=%d", filerr);
 		return 0;
 	}
 
@@ -1579,6 +1627,7 @@ void lua_engine::initialize()
 				.addCFunction ("draw_text", &lua_screen::l_draw_text)
 				.addCFunction ("height", &lua_screen::l_height)
 				.addCFunction ("width", &lua_screen::l_width)
+				.addCFunction ("orientation", &lua_screen::l_orientation)
 				.addCFunction ("refresh", &lua_screen::l_refresh)
 				.addCFunction ("snapshot", &lua_screen::l_snapshot)
 				.addCFunction ("type", &lua_screen::l_type)

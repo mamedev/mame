@@ -43,17 +43,6 @@ WRITE8_MEMBER(himesiki_state::himesiki_scrolly_w)
 	m_scrolly = data;
 }
 
-#if 0 // this can't be flipscreen (android uses it for scroll, same PCB)
-WRITE8_MEMBER(himesiki_state::himesiki_flip_w)
-{
-	m_flipscreen = data & 0xc0;
-	flip_screen_set(m_flipscreen);
-
-	if (data & 0x3f)
-		logerror("p08_w %02x\n",data);
-}
-#endif
-
 void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 *spriteram;
@@ -77,7 +66,7 @@ void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 
 		if (m_flipscreen)
 		{
-			y = (y + 33) & 0xff;
+			y = (y - 31) & 0xff;
 			x = 224 - x;
 			fx ^= 4;
 			fy = 1;
@@ -116,7 +105,7 @@ void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 
 		if (m_flipscreen)
 		{
-			y += 49;
+			y = (y - 15) &0xff;
 			x = 240 - x;
 			f = 1;
 		}
@@ -135,7 +124,7 @@ UINT32 himesiki_state::screen_update_himesiki(screen_device &screen, bitmap_ind1
 {
 	int x = -(m_scrollx[0] << 8 | m_scrollx[1]) & 0x1ff;
 	m_bg_tilemap->set_scrolldx(x, x);
-	m_bg_tilemap->set_scrolldy(-m_scrolly, -m_scrolly);
+	m_bg_tilemap->set_scrolldy(-m_scrolly, -m_scrolly-64);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	himesiki_draw_sprites(bitmap, cliprect);

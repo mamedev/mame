@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /*********************************************************************
 
     ui/auditmenu.cpp
@@ -174,7 +174,7 @@ void ui_menu_audit::save_available_machines()
 {
 	// attempt to open the output file
 	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file.open(emulator_info::get_configname(), "_avail.ini") == FILERR_NONE)
+	if (file.open(emulator_info::get_configname(), "_avail.ini") == osd_file::error::NONE)
 	{
 		// generate header
 		std::ostringstream buffer;

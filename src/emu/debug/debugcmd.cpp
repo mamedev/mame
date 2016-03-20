@@ -1872,6 +1872,7 @@ static void execute_dump(running_machine &machine, int ref, int params, const ch
 	for (i = offset; i <= endoffset; i += 16)
 	{
 		output.clear();
+		output.rdbuf()->clear();
 
 		/* print the address */
 		util::stream_format(output, "%0*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(i));
@@ -2306,6 +2307,7 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 			{
 				active_cheat++;
 				output.clear();
+				output.rdbuf()->clear();
 				stream_format(
 						output,
 						"  <cheat desc=\"Possibility %d : %0*X (%0*X)\">\n"
@@ -2516,6 +2518,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 		offs_t tempaddr;
 		int numbytes = 0;
 		output.clear();
+		output.rdbuf()->clear();
 
 		/* print the address */
 		stream_format(output, "%0*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(pcbyte));
@@ -2856,9 +2859,9 @@ static void execute_snap(running_machine &machine, int ref, int params, const ch
 		if (fname.find(".png") == -1)
 			fname.append(".png");
 		emu_file file(machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		file_error filerr = file.open(fname.c_str());
+		osd_file::error filerr = file.open(fname.c_str());
 
-		if (filerr != FILERR_NONE)
+		if (filerr != osd_file::error::NONE)
 		{
 			debug_console_printf(machine, "Error creating file '%s'\n", filename);
 			return;

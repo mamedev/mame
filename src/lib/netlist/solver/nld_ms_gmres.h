@@ -62,7 +62,7 @@ private:
 
 	int solve_ilu_gmres(nl_double * RESTRICT x, nl_double * RESTRICT rhs, const unsigned restart_max, const unsigned mr, nl_double accuracy);
 
-	plist_t<int> m_term_cr[_storage_N];
+	pvector_t<int> m_term_cr[_storage_N];
 
 	bool m_use_iLU_preconditioning;
 	bool m_use_more_precise_stop_condition;
@@ -114,7 +114,7 @@ void matrix_solver_GMRES_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 			for (unsigned i = mat.ia[k]; i<nz; i++)
 				if (this->m_terms[k]->net_other()[j] == (int) mat.ja[i])
 				{
-					m_term_cr[k].add(i);
+					m_term_cr[k].push_back(i);
 					break;
 				}
 			nl_assert(m_term_cr[k].size() == this->m_terms[k]->m_railstart);

@@ -91,26 +91,24 @@ void ui_menu_game_options::handle()
 			{
 				if (m_event->iptkey == IPT_UI_LEFT)
 				{
-					machine().inifile().current_file--;
-					machine().inifile().current_category = 0;
+					machine().inifile().move_file(-1);
 					changed = true;
 				}
 				else if (m_event->iptkey == IPT_UI_RIGHT)
 				{
-					machine().inifile().current_file++;
-					machine().inifile().current_category = 0;
+					machine().inifile().move_file(1);
 					changed = true;
 				}
 				else if (m_event->iptkey == IPT_UI_SELECT)
 				{
 					inifile_manager &ifile = machine().inifile();
-					int total = ifile.ini_index.size();
+					int total = ifile.total();
 					std::vector<std::string> s_sel(total);
-					machine().inifile().current_category = 0;
+					machine().inifile().set_cat(0);
 					for (size_t index = 0; index < total; ++index)
-						s_sel[index] = ifile.ini_index[index].name;
+						s_sel[index] = ifile.get_file(index);
 
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, ifile.current_file, SELECTOR_INIFILE));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, ifile.cur_file(), SELECTOR_INIFILE));
 				}
 				break;
 			}
@@ -118,24 +116,23 @@ void ui_menu_game_options::handle()
 			{
 				if (m_event->iptkey == IPT_UI_LEFT)
 				{
-					machine().inifile().current_category--;
+					machine().inifile().move_cat(-1);
 					changed = true;
 				}
 				else if (m_event->iptkey == IPT_UI_RIGHT)
 				{
-					machine().inifile().current_category++;
+					machine().inifile().move_cat(1);
 					changed = true;
 				}
 				else if (m_event->iptkey == IPT_UI_SELECT)
 				{
 					inifile_manager &ifile = machine().inifile();
-					int cfile = ifile.current_file;
-					int total = ifile.ini_index[cfile].category.size();
+					int total = ifile.cat_total();
 					std::vector<std::string> s_sel(total);
 					for (int index = 0; index < total; ++index)
-						s_sel[index] = ifile.ini_index[cfile].category[index].name;
+						s_sel[index] = ifile.get_category(index);
 
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, ifile.current_category, SELECTOR_CATEGORY));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, ifile.cur_cat(), SELECTOR_CATEGORY));
 				}
 				break;
 			}
@@ -217,20 +214,19 @@ void ui_menu_game_options::populate()
 		item_append(_("Filter"), main_filters::text[m_main], arrow_flags, (void *)(FPTR)FILTER_MENU);
 
 		// add category subitem
-		if (m_main == FILTER_CATEGORY && !machine().inifile().ini_index.empty())
+		if (m_main == FILTER_CATEGORY && machine().inifile().total() > 0)
 		{
 			inifile_manager &inif = machine().inifile();
-			int afile = inif.current_file;
 
-			arrow_flags = get_arrow_flags(0, inif.ini_index.size() - 1, afile);
+			arrow_flags = get_arrow_flags(0, inif.total() - 1, inif.cur_file());
 			fbuff = _(" ^!File");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), inif.actual_file().c_str(), arrow_flags, (void *)(FPTR)FILE_CATEGORY_FILTER);
+			item_append(fbuff.c_str(), inif.get_file().c_str(), arrow_flags, (void *)(FPTR)FILE_CATEGORY_FILTER);
 
-			arrow_flags = get_arrow_flags(0, inif.ini_index[afile].category.size() - 1, inif.current_category);
+			arrow_flags = get_arrow_flags(0, inif.cat_total() - 1, inif.cur_cat());
 			fbuff = _(" ^!Category");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), inif.actual_category().c_str(), arrow_flags, (void *)(FPTR)CATEGORY_FILTER);
+			item_append(fbuff.c_str(), inif.get_category().c_str(), arrow_flags, (void *)(FPTR)CATEGORY_FILTER);
 		}
 		// add manufacturer subitem
 		else if (m_main == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
@@ -314,7 +310,7 @@ void save_ui_options(running_machine &machine)
 {
 	// attempt to open the output file
 	emu_file file(machine.options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file.open("ui.ini") == FILERR_NONE)
+	if (file.open("ui.ini") == osd_file::error::NONE)
 	{
 		// generate the updated INI
 		std::string initext = machine.ui().options().output_ini();
@@ -339,7 +335,7 @@ void save_main_option(running_machine &machine)
 	// attempt to open the main ini file
 	{
 		emu_file file(machine.options().ini_path(), OPEN_FLAG_READ);
-		if (file.open(emulator_info::get_configname(), ".ini") == FILERR_NONE)
+		if (file.open(emulator_info::get_configname(), ".ini") == osd_file::error::NONE)
 		{
 			bool result = options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
 			if (!result)
@@ -361,7 +357,7 @@ void save_main_option(running_machine &machine)
 	// attempt to open the output file
 	{
 		emu_file file(machine.options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(emulator_info::get_configname(), ".ini") == FILERR_NONE)
+		if (file.open(emulator_info::get_configname(), ".ini") == osd_file::error::NONE)
 		{
 			// generate the updated INI
 			std::string initext = options.output_ini();
@@ -375,4 +371,3 @@ void save_main_option(running_machine &machine)
 	}
 	machine.ui().popup_time(3, "%s", _("\n    Configuration saved    \n\n"));
 }
-

@@ -8890,6 +8890,7 @@ ccbootmr                        // Model Racing bootleg
 cclimber                        // (c) 1980 Nichibutsu
 cclimberj                       // (c) 1980 Nichibutsu
 cclimbroper                     // Operamatic bootleg
+cclimbrrod						// Rodmar bootleg
 ckong                           // (c) 1981 (Kyoei)
 ckongalc                        // bootleg (Alca)
 ckongdks                        // Spanish Crazy Kong bootleg
@@ -13098,7 +13099,8 @@ chryglda                        // bootleg
 cmast91                         // (c) 1991 Dyna Electronics
 cmast92                         // (c) 1992 Dyna Electronics
 cmast97                         // (c) 1996 Dyna Electronics
-cmast99                         // 1999?
+cmast99                         // (c) 1999 Dyna Electronics
+cmast99b                        // bootleg
 cmaster                         // (c) 1991 Dyna Electronics
 cmasterb                        // (c) 1991 Dyna Electronics
 cmasterbv                       // (c) 1991 Dyna Electronics / Gerald Duhamel?
@@ -14206,6 +14208,7 @@ iskr1031                        //
 istellar                        // (c) 1983 Funai / Gakken
 
 @source:iteagle.cpp
+bbh2sp                          // 
 bbhcotw                         // 
 bbhsc                           // 
 carnking                        // 
@@ -28442,7 +28445,7 @@ ssjkrpkr                        // (c) 1982 Southern Systems & Assembly, Ltd.
 tpoker2                         // (c) 1993 Micro Manufacturing, Inc.
 
 @source:notetaker.cpp
-notetakr                        // 
+notetakr                        //
 
 @source:nova2001.cpp
 ninjakun                        // UPL-84003 (c) 1984 Taito Corporation
@@ -33734,6 +33737,9 @@ swyft                           //
 @source:sym1.cpp
 sym1                            // Synertek SYM-1
 
+@source:symbolics.cpp
+s3600                           // 
+
 @source:sys2900.cpp
 sys2900                         // 
 
@@ -35647,6 +35653,7 @@ videopkr                        // (c) 1984 InterFlip
 @source:vigilant.cpp
 buccanrs                        // (c) 1989 Duintronic
 buccanrsa                       // (c) 1989 Duintronic
+buccanrsb						// (c) 1989 Duintronic
 kikcubic                        // (c) 1988 (Japan)
 kikcubicb                       // bootleg
 vigilant                        // (c) 1988 (World Rev E)

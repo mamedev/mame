@@ -1588,8 +1588,8 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 
 		// attempt to open the file; bail if we can't
 		emu_file layoutfile(manager().machine().options().art_path(), OPEN_FLAG_READ);
-		file_error filerr = layoutfile.open(fname.c_str());
-		if (filerr != FILERR_NONE)
+		osd_file::error filerr = layoutfile.open(fname.c_str());
+		if (filerr != osd_file::error::NONE)
 			return false;
 
 		// read the file
@@ -1756,29 +1756,39 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					// set the palette
 					prim->texture.palette = curitem->texture()->get_adjusted_palette(container);
 
-					// determine UV coordinates and apply clipping
+					// determine UV coordinates
 					prim->texcoords = oriented_texcoords[finalorient];
+
+					// apply clipping
 					clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
 
 					// apply the final orientation from the quad flags and then build up the final flags
-					prim->flags = (curitem->flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) |
-									PRIMFLAG_TEXORIENT(finalorient) |
-									PRIMFLAG_TEXFORMAT(curitem->texture()->format());
-					if (blendmode != -1)
-						prim->flags |= PRIMFLAG_BLENDMODE(blendmode);
-					else
-						prim->flags |= PRIMFLAG_BLENDMODE(PRIMFLAG_GET_BLENDMODE(curitem->flags()));
+					prim->flags = (curitem->flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK))
+						| PRIMFLAG_TEXORIENT(finalorient)
+						| PRIMFLAG_TEXFORMAT(curitem->texture()->format());
+					prim->flags |= blendmode != -1
+						? PRIMFLAG_BLENDMODE(blendmode)
+						: PRIMFLAG_BLENDMODE(PRIMFLAG_GET_BLENDMODE(curitem->flags()));
 				}
 				else
 				{
+					if (curitem->flags() & PRIMFLAG_VECTORBUF_MASK)
+					{
+						// determine UV coordinates
+						prim->texcoords = oriented_texcoords[0];
+					}
+
 					// adjust the color for brightness/contrast/gamma
 					prim->color.r = container.apply_brightness_contrast_gamma_fp(prim->color.r);
 					prim->color.g = container.apply_brightness_contrast_gamma_fp(prim->color.g);
 					prim->color.b = container.apply_brightness_contrast_gamma_fp(prim->color.b);
 
-					// no texture -- set the basic flags
+					// no texture
 					prim->texture.base = nullptr;
-					prim->flags = (curitem->flags() &~ PRIMFLAG_BLENDMODE_MASK) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
+
+					// set the basic flags
+					prim->flags = (curitem->flags() & ~PRIMFLAG_BLENDMODE_MASK)
+						| PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 
 					// apply clipping
 					clipped = render_clip_quad(&prim->bounds, &cliprect, nullptr);

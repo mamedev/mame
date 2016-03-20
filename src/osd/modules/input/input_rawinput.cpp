@@ -14,16 +14,15 @@
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <winioctl.h>
 #include <tchar.h>
 #undef interface
 
 #include <mutex>
+#include <functional>
 
 // MAME headers
 #include "emu.h"
 #include "osdepend.h"
-#include "ui/ui.h"
 #include "strconv.h"
 
 // MAMEOS headers
@@ -50,185 +49,236 @@ typedef lazy_loaded_function_p5<INT, HRAWINPUT, UINT, LPVOID, PINT, UINT> get_ra
 typedef lazy_loaded_function_p4<INT, HANDLE, UINT, LPVOID, PINT> get_rawinput_device_info_ptr;
 typedef lazy_loaded_function_p3<BOOL, PCRAWINPUTDEVICE, UINT, UINT> register_rawinput_devices_ptr;
 
+class safe_regkey
+{
+private:
+	HKEY m_key;
+
+public:
+	safe_regkey()
+		: m_key(nullptr)
+	{
+	}
+
+	explicit safe_regkey(HKEY key)
+		: m_key(key)
+	{
+	}
+
+	bool valid() const { return m_key != nullptr; }
+
+	void close()
+	{
+		if (m_key != nullptr)
+		{
+			RegCloseKey(m_key);
+			m_key = nullptr;
+		}
+	}
+
+	~safe_regkey()
+	{
+		close();
+	}
+
+	operator HKEY() const { return m_key; }
+};
+
+//============================================================
+//  reg_open_key
+//============================================================
+
+static safe_regkey reg_open_key(HKEY basekey, const std::wstring &subkey)
+{
+	HKEY key;
+	if (RegOpenKeyEx(basekey, subkey.c_str(), 0, KEY_READ, &key) == ERROR_SUCCESS)
+		return safe_regkey(key);
+
+	return safe_regkey();
+
+}
+
+//============================================================
+//  reg_enum_key
+//============================================================
+
+static std::wstring reg_enum_key(HKEY key, int index)
+{
+	WCHAR keyname[MAX_PATH];
+	DWORD namelen;
+	if (RegEnumKeyEx(key, index, keyname, &namelen, nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS)
+		return std::wstring(keyname, namelen);
+
+	return std::wstring();
+}
+
 //============================================================
 //  reg_query_string
 //============================================================
 
-static TCHAR *reg_query_string(HKEY key, const TCHAR *path)
+static std::wstring reg_query_string(HKEY key, const TCHAR *path)
 {
-	TCHAR *buffer;
 	DWORD datalen;
 	LONG result;
 
 	// first query to get the length
-	result = RegQueryValueEx(key, path, NULL, NULL, NULL, &datalen);
+	result = RegQueryValueEx(key, path, nullptr, nullptr, nullptr, &datalen);
 	if (result != ERROR_SUCCESS)
-		return NULL;
+		return std::wstring();
 
 	// allocate a buffer
-	buffer = global_alloc_array(TCHAR, datalen + sizeof(*buffer));
-	buffer[datalen / sizeof(*buffer)] = 0;
+	auto buffer = std::make_unique<TCHAR[]>(datalen + sizeof(TCHAR));
+	buffer[datalen / sizeof(TCHAR)] = 0;
 
 	// now get the actual data
-	result = RegQueryValueEx(key, path, NULL, NULL, (LPBYTE)buffer, &datalen);
+	result = RegQueryValueEx(key, path, nullptr, nullptr, reinterpret_cast<LPBYTE>(buffer.get()), &datalen);
 	if (result == ERROR_SUCCESS)
-		return buffer;
+		return std::wstring(buffer.get());
 
-	// otherwise return a NULL buffer
-	global_free_array(buffer);
-	return NULL;
+	// otherwise return an empty string
+	return std::wstring();
+}
+
+static std::wstring trim_prefix(const std::wstring &devicename)
+{
+	// remove anything prior to the final semicolon
+	auto semicolon_index = devicename.find_last_of(';');
+	if (semicolon_index != std::wstring::npos)
+		return devicename.substr(semicolon_index + 1);
+
+	return devicename;
+}
+
+static std::wstring compute_device_regpath(const std::wstring &name)
+{
+	static const std::wstring basepath(L"SYSTEM\\CurrentControlSet\\Enum\\");
+
+	// allocate a temporary string and concatenate the base path plus the name
+	auto regpath_buffer = std::make_unique<TCHAR[]>(basepath.length() + 1 + name.length());
+	wcscpy(regpath_buffer.get(), basepath.c_str());
+	WCHAR * chdst = regpath_buffer.get() + basepath.length();
+
+	// convert all # to \ in the name
+	for (int i = 4; i < name.length(); i++)
+		*chdst++ = (name[i] == '#') ? '\\' : name[i];
+	*chdst = 0;
+
+	// remove the final chunk
+	chdst = wcsrchr(regpath_buffer.get(), '\\');
+	if (chdst == nullptr)
+		return std::wstring();
+
+	*chdst = 0;
+
+	return std::wstring(regpath_buffer.get());
+}
+
+static std::wstring improve_name_from_base_path(const std::wstring &regpath, bool *hid)
+{
+	// now try to open the registry key
+	auto device_key = reg_open_key(HKEY_LOCAL_MACHINE, regpath);
+	if (!device_key.valid())
+		return std::wstring();
+
+	// fetch the device description; if it exists, we are finished
+	auto regstring = reg_query_string(device_key, L"DeviceDesc");
+	if (!regstring.empty())
+		return trim_prefix(regstring);
+
+	// if the key name does not contain "HID", it's not going to be in the USB tree; give up
+	*hid = regpath.find(L"HID") != std::string::npos;
+	return std::wstring();
+}
+
+static void foreach_subkey(HKEY key, std::function<bool(HKEY)> action)
+{
+	for (int i = 0; ; i++)
+	{
+		std::wstring name = reg_enum_key(key, i);
+		if (name.empty())
+			break;
+
+		safe_regkey subkey = reg_open_key(key, name);
+		if (!subkey.valid())
+			break;
+
+		bool shouldcontinue = action(subkey);
+		if (!shouldcontinue)
+			break;
+	}
+}
+
+static std::wstring improve_name_from_usb_path(const std::wstring &regpath)
+{
+	static const std::wstring usbbasepath(L"SYSTEM\\CurrentControlSet\\Enum\\USB");
+
+	// extract the expected parent ID from the regpath
+	size_t last_slash_index = regpath.find_last_of('\\');
+	if (last_slash_index == std::wstring::npos)
+		return std::wstring();
+
+	std::wstring parentid = regpath.substr(last_slash_index + 1);
+
+	// open the USB key
+	auto usb_key = reg_open_key(HKEY_LOCAL_MACHINE, usbbasepath);
+	if (!usb_key.valid())
+		return std::wstring();
+
+	std::wstring regstring;
+
+	foreach_subkey(usb_key, [&regstring, &parentid](HKEY subkey)
+	{
+		foreach_subkey(subkey, [&regstring, &parentid](HKEY endkey)
+		{
+			std::wstring endparentid = reg_query_string(endkey, L"ParentIdPrefix");
+			
+			// This key doesn't have a ParentIdPrefix
+			if (endparentid.empty())
+				return true;
+
+			// do we have a match?
+			if (parentid.find(endparentid) == 0)
+				regstring = reg_query_string(endkey, L"DeviceDesc");
+
+			return regstring.empty();
+		});
+
+		return regstring.empty();
+	});
+
+	return trim_prefix(regstring);
 }
 
 //============================================================
 //  rawinput_device_improve_name
 //============================================================
 
-static TCHAR *rawinput_device_improve_name(TCHAR *name)
+static std::wstring rawinput_device_improve_name(const std::wstring &name)
 {
-	static const TCHAR usbbasepath[] = TEXT("SYSTEM\\CurrentControlSet\\Enum\\USB");
-	static const TCHAR basepath[] = TEXT("SYSTEM\\CurrentControlSet\\Enum\\");
-	TCHAR *regstring = NULL;
-	TCHAR *parentid = NULL;
-	TCHAR *regpath = NULL;
-	const TCHAR *chsrc;
-	HKEY regkey = NULL;
-	int usbindex;
-	TCHAR *chdst;
-	LONG result;
-
 	// The RAW name received is formatted as:
 	//   \??\type-id#hardware-id#instance-id#{DeviceClasses-id}
 	// XP starts with "\??\"
 	// Vista64 starts with "\\?\"
 
 	// ensure the name is something we can handle
-	if (_tcsncmp(name, TEXT("\\\\?\\"), 4) != 0 && _tcsncmp(name, TEXT("\\??\\"), 4) != 0)
+	if (name.find(L"\\\\?\\") != 0 && name.find(L"\\??\\") != 0)
 		return name;
 
-	// allocate a temporary string and concatenate the base path plus the name
-	regpath = global_alloc_array(TCHAR, _tcslen(basepath) + 1 + _tcslen(name));
-	_tcscpy(regpath, basepath);
-	chdst = regpath + _tcslen(regpath);
+	std::wstring regpath = compute_device_regpath(name);
 
-	// convert all # to \ in the name
-	for (chsrc = name + 4; *chsrc != 0; chsrc++)
-		*chdst++ = (*chsrc == '#') ? '\\' : *chsrc;
-	*chdst = 0;
+	bool hid = false;
+	auto improved = improve_name_from_base_path(regpath, &hid);
+	if (!improved.empty())
+		return improved;
 
-	// remove the final chunk
-	chdst = _tcsrchr(regpath, '\\');
-	if (chdst == NULL)
-		goto exit;
-	*chdst = 0;
-
-	// now try to open the registry key
-	result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, regpath, 0, KEY_READ, &regkey);
-	if (result != ERROR_SUCCESS)
-		goto exit;
-
-	// fetch the device description; if it exists, we are finished
-	regstring = reg_query_string(regkey, TEXT("DeviceDesc"));
-	if (regstring != NULL)
-		goto convert;
-
-	// close this key
-	RegCloseKey(regkey);
-	regkey = NULL;
-
-	// if the key name does not contain "HID", it's not going to be in the USB tree; give up
-	if (_tcsstr(regpath, TEXT("HID")) == NULL)
-		goto exit;
-
-	// extract the expected parent ID from the regpath
-	parentid = _tcsrchr(regpath, '\\');
-	if (parentid == NULL)
-		goto exit;
-	parentid++;
-
-	// open the USB key
-	result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, usbbasepath, 0, KEY_READ, &regkey);
-	if (result != ERROR_SUCCESS)
-		goto exit;
-
-	// enumerate the USB key
-	for (usbindex = 0; result == ERROR_SUCCESS && regstring == NULL; usbindex++)
+	if (hid)
 	{
-		TCHAR keyname[MAX_PATH];
-		DWORD namelen;
-
-		// get the next enumerated subkey and scan it
-		namelen = ARRAY_LENGTH(keyname) - 1;
-		result = RegEnumKeyEx(regkey, usbindex, keyname, &namelen, NULL, NULL, NULL, NULL);
-		if (result == ERROR_SUCCESS)
-		{
-			LONG subresult;
-			int subindex;
-			HKEY subkey;
-
-			// open the subkey
-			subresult = RegOpenKeyEx(regkey, keyname, 0, KEY_READ, &subkey);
-			if (subresult != ERROR_SUCCESS)
-				continue;
-
-			// enumerate the subkey
-			for (subindex = 0; subresult == ERROR_SUCCESS && regstring == NULL; subindex++)
-			{
-				// get the next enumerated subkey and scan it
-				namelen = ARRAY_LENGTH(keyname) - 1;
-				subresult = RegEnumKeyEx(subkey, subindex, keyname, &namelen, NULL, NULL, NULL, NULL);
-				if (subresult == ERROR_SUCCESS)
-				{
-					TCHAR *endparentid;
-					LONG endresult;
-					HKEY endkey;
-
-					// open this final key
-					endresult = RegOpenKeyEx(subkey, keyname, 0, KEY_READ, &endkey);
-					if (endresult != ERROR_SUCCESS)
-						continue;
-
-					// do we have a match?
-					endparentid = reg_query_string(endkey, TEXT("ParentIdPrefix"));
-					if (endparentid != NULL && _tcsncmp(parentid, endparentid, _tcslen(endparentid)) == 0)
-						regstring = reg_query_string(endkey, TEXT("DeviceDesc"));
-
-					// free memory and close the key
-					if (endparentid != NULL)
-						global_free_array(endparentid);
-					RegCloseKey(endkey);
-				}
-			}
-
-			// close the subkey
-			RegCloseKey(subkey);
-		}
+		improved = improve_name_from_usb_path(regpath);
+		if (!improved.empty())
+			return improved;
 	}
-
-	// if we didn't find anything, go to the exit
-	if (regstring == NULL)
-		goto exit;
-
-convert:
-	// replace the name with the nicer one
-	global_free_array(name);
-
-	// remove anything prior to the final semicolon
-	chsrc = _tcsrchr(regstring, ';');
-	if (chsrc != NULL)
-		chsrc++;
-	else
-		chsrc = regstring;
-	name = global_alloc_array(TCHAR, _tcslen(chsrc) + 1);
-	_tcscpy(name, chsrc);
-
-exit:
-	if (regstring != NULL)
-		global_free_array(regstring);
-	if (regpath != NULL)
-		global_free_array(regpath);
-	if (regkey != NULL)
-		RegCloseKey(regkey);
-
+	
+	// Fall back to the original name
 	return name;
 }
 
@@ -244,11 +294,12 @@ private:
 
 public:
 	rawinput_device(running_machine& machine, const char* name, input_device_class deviceclass, input_module& module)
-		: event_based_device(machine, name, deviceclass, module)
+		: event_based_device(machine, name, deviceclass, module),
+			m_handle(nullptr)
 	{
 	}
 
-	HANDLE device_handle() { return m_handle; }
+	HANDLE device_handle() const { return m_handle; }
 	void set_handle(HANDLE handle) { m_handle = handle; }
 };
 
@@ -328,7 +379,7 @@ public:
 
 		// update zaxis
 		if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
-			mouse.lZ += (INT16)rawinput.data.mouse.usButtonData * INPUT_RELATIVE_PER_PIXEL;
+			mouse.lZ += static_cast<INT16>(rawinput.data.mouse.usButtonData) * INPUT_RELATIVE_PER_PIXEL;
 
 		// update the button states; always update the corresponding mouse buttons
 		if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) mouse.rgbButtons[0] = 0x80;
@@ -370,7 +421,7 @@ public:
 		: wininput_module(type, name),
 			get_rawinput_device_list("GetRawInputDeviceList", L"user32.dll"),
 			get_rawinput_data("GetRawInputData", L"user32.dll"),
-			get_rawinput_device_info("GetRawInputDeviceInfo", L"user32.dll"),
+			get_rawinput_device_info("GetRawInputDeviceInfoW", L"user32.dll"),
 			register_rawinput_devices("RegisterRawInputDevices", L"user32.dll")
 	{
 	}
@@ -392,7 +443,7 @@ public:
 	{
 		// get the number of devices, allocate a device list, and fetch it
 		int device_count = 0;
-		if (get_rawinput_device_list(NULL, &device_count, sizeof(RAWINPUTDEVICELIST)) != 0)
+		if (get_rawinput_device_list(nullptr, &device_count, sizeof(RAWINPUTDEVICELIST)) != 0)
 			return;
 
 		if (device_count == 0)
@@ -452,10 +503,10 @@ protected:
 	template<class TDevice>
 	TDevice* create_rawinput_device(running_machine &machine, PRAWINPUTDEVICELIST rawinputdevice)
 	{
-		TDevice* devinfo = nullptr;
+		TDevice* devinfo;
 		INT name_length = 0;
 		// determine the length of the device name, allocate it, and fetch it if not nameless
-		if (get_rawinput_device_info(rawinputdevice->hDevice, RIDI_DEVICENAME, NULL, &name_length) != 0)
+		if (get_rawinput_device_info(rawinputdevice->hDevice, RIDI_DEVICENAME, nullptr, &name_length) != 0)
 			return nullptr;
 
 		std::unique_ptr<TCHAR[]> tname = std::make_unique<TCHAR[]>(name_length + 1);
@@ -463,15 +514,15 @@ protected:
 			return nullptr;
 
 		// if this is an RDP name, skip it
-		if (_tcsstr(tname.get(), TEXT("Root#RDP_")) != NULL)
+		if (_tcsstr(tname.get(), TEXT("Root#RDP_")) != nullptr)
 			return nullptr;
 
 		// improve the name and then allocate a device
-		tname = std::unique_ptr<TCHAR[]>(rawinput_device_improve_name(tname.release()));
+		std::wstring name = rawinput_device_improve_name(tname.get());
 
 		// convert name to utf8
 		auto osd_deleter = [](void *ptr) { osd_free(ptr); };
-		auto utf8_name = std::unique_ptr<char, decltype(osd_deleter)>(utf8_from_tstring(tname.get()), osd_deleter);
+		auto utf8_name = std::unique_ptr<char, decltype(osd_deleter)>(utf8_from_wstring(name.c_str()), osd_deleter);
 
 		devinfo = devicelist()->create_device<TDevice>(machine, utf8_name.get(), *this);
 
@@ -487,12 +538,12 @@ protected:
 		if (!input_enabled() || eventid != INPUT_EVENT_RAWINPUT)
 			return FALSE;
 
-		HRAWINPUT rawinputdevice = *(HRAWINPUT*)eventdata;
+		HRAWINPUT rawinputdevice = *static_cast<HRAWINPUT*>(eventdata);
 
 		BYTE small_buffer[4096];
 		std::unique_ptr<BYTE[]> larger_buffer;
 		LPBYTE data = small_buffer;
-		BOOL result = FALSE;
+		BOOL result;
 		int size;
 
 		// ignore if not enabled
@@ -500,7 +551,7 @@ protected:
 			return FALSE;
 
 		// determine the size of databuffer we need
-		if (get_rawinput_data(rawinputdevice, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER)) != 0)
+		if (get_rawinput_data(rawinputdevice, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER)) != 0)
 			return FALSE;
 
 		// if necessary, allocate a temporary buffer and fetch the data
@@ -508,12 +559,12 @@ protected:
 		{
 			larger_buffer = std::make_unique<BYTE[]>(size);
 			data = larger_buffer.get();
-			if (data == NULL)
+			if (data == nullptr)
 				return FALSE;
 		}
 
 		// fetch the data and process the appropriate message types
-		result = get_rawinput_data((HRAWINPUT)rawinputdevice, RID_INPUT, data, &size, sizeof(RAWINPUTHEADER));
+		result = get_rawinput_data(static_cast<HRAWINPUT>(rawinputdevice), RID_INPUT, data, &size, sizeof(RAWINPUTHEADER));
 		if (result)
 		{
 			std::lock_guard<std::mutex> scope_lock(m_module_lock);
@@ -523,11 +574,14 @@ protected:
 			for (int i = 0; i < devicelist()->size(); i++)
 			{
 				devinfo = dynamic_cast<rawinput_device*>(devicelist()->at(i));
-				RAWINPUT *input = reinterpret_cast<RAWINPUT*>(data);
-				if (input->header.hDevice == devinfo->device_handle())
+				if (devinfo)
 				{
-					devinfo->queue_events(input, 1);
-					result = TRUE;
+					RAWINPUT *input = reinterpret_cast<RAWINPUT*>(data);
+					if (input->header.hDevice == devinfo->device_handle())
+					{
+						devinfo->queue_events(input, 1);
+						result = TRUE;
+					}
 				}
 			}
 		}
@@ -559,7 +613,7 @@ protected:
 
 		// allocate and link in a new device
 		rawinput_keyboard_device *devinfo = create_rawinput_device<rawinput_keyboard_device>(machine, device);
-		if (devinfo == NULL)
+		if (devinfo == nullptr)
 			return;
 
 		keyboard_trans_table &table = keyboard_trans_table::instance();
@@ -606,19 +660,19 @@ protected:
 
 		// allocate and link in a new device
 		rawinput_mouse_device *devinfo = create_rawinput_device<rawinput_mouse_device>(machine, device);
-		if (devinfo == NULL)
+		if (devinfo == nullptr)
 			return;
 
 		// populate the axes
 		for (int axisnum = 0; axisnum < 3; axisnum++)
 		{
-			devinfo->device()->add_item(default_axis_name[axisnum], (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &devinfo->mouse.lX + axisnum);
+			devinfo->device()->add_item(default_axis_name[axisnum], static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &devinfo->mouse.lX + axisnum);
 		}
 
 		// populate the buttons
 		for (int butnum = 0; butnum < 5; butnum++)
 		{
-			devinfo->device()->add_item(default_button_name(butnum), (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state, &devinfo->mouse.rgbButtons[butnum]);
+			devinfo->device()->add_item(default_button_name(butnum), static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum), generic_button_get_state, &devinfo->mouse.rgbButtons[butnum]);
 		}
 	}
 };

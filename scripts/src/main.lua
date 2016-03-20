@@ -103,12 +103,16 @@ end
 	configuration { "mingw*" or "vs*" }
 		targetextension ".exe"
 
+	configuration { "rpi" }
+		targetextension ""
+
 	configuration { "asmjs" }
 		targetextension ".bc"  
 		if os.getenv("EMSCRIPTEN") then
 			local emccopts = ""
 			emccopts = emccopts .. " -O3"
 			emccopts = emccopts .. " -s USE_SDL=2"
+			emccopts = emccopts .. " -s USE_SDL_TTF=2"
 			emccopts = emccopts .. " --memory-init-file 0"
 			emccopts = emccopts .. " -s ALLOW_MEMORY_GROWTH=0"
 			emccopts = emccopts .. " -s TOTAL_MEMORY=268435456"

@@ -195,8 +195,8 @@ chd_file *ldplayer_state::get_disc()
 		{
 			// open the file itself via our search path
 			emu_file image_file(machine().options().media_path(), OPEN_FLAG_READ);
-			file_error filerr = image_file.open(dir->name);
-			if (filerr == FILERR_NONE)
+			osd_file::error filerr = image_file.open(dir->name);
+			if (filerr == osd_file::error::NONE)
 			{
 				std::string fullpath(image_file.fullpath());
 				image_file.close();

@@ -314,7 +314,7 @@ long pstring_t<F>::as_long(bool *error) const
 
 #if 1
 
-static pstack_t<pstr_t *> *stk = NULL;
+static std::stack<pstr_t *> *stk = NULL;
 
 static inline unsigned countleadbits(unsigned x)
 {
@@ -373,7 +373,7 @@ template<typename F>
 pstr_t *pstring_t<F>::salloc(int n)
 {
 	if (stk == NULL)
-		stk = palloc_array(pstack_t<pstr_t *>, 17);
+		stk = palloc_array(std::stack<pstr_t *>, 17);
 	pstr_t *p;
 	unsigned sn= ((32 - countleadbits(n)) + 1) / 2;
 	unsigned size = sizeof(pstr_t) + ((UINT64) 1<<(sn * 2)) + 1;
@@ -381,7 +381,8 @@ pstr_t *pstring_t<F>::salloc(int n)
 		p = (pstr_t *) palloc_array(char, size);
 	else
 	{
-		p = stk[sn].pop();
+		p = stk[sn].top();
+		stk[sn].pop();
 	}
 
 	//  str_t *p = (str_t *) _mm_malloc(size, 8);
@@ -395,8 +396,11 @@ void pstring_t<F>::resetmem()
 	{
 		for (unsigned i=0; i<=16; i++)
 		{
-			for (; stk[i].count() > 0; )
-				pfree_array(stk[i].pop());
+			for (; stk[i].size() > 0; )
+			{
+				pfree_array(stk[i].top());
+				stk[i].pop();
+			}
 		}
 		pfree_array(stk);
 		stk = NULL;

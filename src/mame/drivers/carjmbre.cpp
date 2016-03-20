@@ -4,6 +4,14 @@
 
     Car Jamboree
     Omori Electric CAD (OEC) 1983
+    
+    TODO:
+    - colors are wrong
+    - sprite priorities?
+
+----------------------------------------------------------------------------
+
+    PCB sketch:
 
     c14                c.d19
     c13                c.d18           c10

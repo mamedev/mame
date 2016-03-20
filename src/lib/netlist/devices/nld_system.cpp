@@ -78,7 +78,7 @@ NETLIB_START(extclock)
 	connect_late(m_feedback, m_Q);
 	{
 		netlist_time base = netlist_time::from_hz(m_freq.Value()*2);
-		pstring_list_t pat(m_pattern.Value(),",");
+		pstring_vector_t pat(m_pattern.Value(),",");
 		m_off = netlist_time::from_double(m_offset.Value());
 
 		int pati[256];
@@ -301,7 +301,7 @@ NETLIB_START(function)
 	for (int i=0; i < m_N; i++)
 		register_input(pfmt("A{1}")(i), m_I[i]);
 
-	pstring_list_t cmds(m_func.Value(), " ");
+	pstring_vector_t cmds(m_func.Value(), " ");
 	m_precompiled.clear();
 
 	for (std::size_t i=0; i < cmds.size(); i++)
@@ -329,7 +329,7 @@ NETLIB_START(function)
 			if (err)
 				netlist().log().fatal("nld_function: unknown/misformatted token <{1}> in <{2}>", cmd, m_func.Value());
 		}
-		m_precompiled.add(rc);
+		m_precompiled.push_back(rc);
 	}
 
 }

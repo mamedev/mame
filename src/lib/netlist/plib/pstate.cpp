@@ -37,7 +37,7 @@ ATTR_COLD void pstate_manager_t::save_state_ptr(const pstring &stname, const pst
 	};
 
 	pstate_entry_t *p = palloc(pstate_entry_t(stname, dt, owner, size, count, ptr, is_ptr));
-	m_save.add(p);
+	m_save.push_back(p);
 }
 
 ATTR_COLD void pstate_manager_t::remove_save_items(const void *owner)
@@ -47,7 +47,7 @@ ATTR_COLD void pstate_manager_t::remove_save_items(const void *owner)
 	for (std::size_t i=0; i < m_save.size(); i++)
 	{
 		if (m_save[i]->m_owner == owner)
-			todelete.add(m_save[i]);
+			todelete.push_back(m_save[i]);
 	}
 	for (std::size_t i=0; i < todelete.size(); i++)
 	{
@@ -75,6 +75,6 @@ template<> ATTR_COLD void pstate_manager_t::save_item(pstate_callback_t &state, 
 	//save_state_ptr(stname, DT_CUSTOM, 0, 1, &state);
 	pstate_callback_t *state_p = &state;
 	pstate_entry_t *p = palloc(pstate_entry_t(stname, owner, state_p));
-	m_save.add(p);
+	m_save.push_back(p);
 	state.register_state(*this, stname);
 }

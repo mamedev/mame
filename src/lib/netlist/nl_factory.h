@@ -36,8 +36,8 @@ namespace netlist
 		ATTR_COLD const pstring &name() const { return m_name; }
 		ATTR_COLD const pstring &classname() const { return m_classname; }
 		ATTR_COLD const pstring &param_desc() const { return m_def_param; }
-		ATTR_COLD const pstring_list_t term_param_list();
-		ATTR_COLD const pstring_list_t def_params();
+		ATTR_COLD const pstring_vector_t term_param_list();
+		ATTR_COLD const pstring_vector_t def_params();
 
 	protected:
 		pstring m_name;                             /* device name */

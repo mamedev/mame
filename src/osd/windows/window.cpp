@@ -281,6 +281,7 @@ void windows_osd_interface::update_slider_list()
 {
 	for (win_window_info *window = win_window_list; window != nullptr; window = window->m_next)
 	{
+		// check if any window has dirty sliders
 		if (window->m_renderer && window->m_renderer->sliders_dirty())
 		{
 			build_slider_list();
@@ -291,26 +292,13 @@ void windows_osd_interface::update_slider_list()
 
 void windows_osd_interface::build_slider_list()
 {
-	m_sliders = nullptr;
-	slider_state *curr = m_sliders;
-	for (win_window_info *info = win_window_list; info != nullptr; info = info->m_next)
+	// FIXME: take all sliders from all windows without concatenate them by slider_state->next
+
+	for (win_window_info *window = win_window_list; window != nullptr; window = window->m_next)
 	{
-		slider_state *window_sliders = info->m_renderer->get_slider_list();
-		if (window_sliders != nullptr)
-		{
-			if (m_sliders == nullptr)
-			{
-				m_sliders = curr = window_sliders;
-			}
-			else
-			{
-				while (curr->next != nullptr)
-				{
-					curr = curr->next;
-				}
-				curr->next = window_sliders;
-			}
-		}
+		// take the sliders of the first window
+		m_sliders = window->m_renderer->get_slider_list();
+		return;
 	}
 }
 

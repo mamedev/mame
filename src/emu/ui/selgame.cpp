@@ -194,6 +194,7 @@ ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_contai
 	ui_globals::switch_image = false;
 	ui_globals::default_image = true;
 	ui_globals::panels_status = moptions.hide_panels();
+	m_searchlist[0] = nullptr;
 }
 
 //-------------------------------------------------
@@ -800,6 +801,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	bool isstar = false;
 	ui_manager &mui = machine().ui();
 	float tbarspace = mui.get_line_height();
+	float text_size = 1.0f;
 
 	tempbuf[0] = string_format(_("%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"),
 			emulator_info::get_appname(),
@@ -809,12 +811,12 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 			m_isabios);
 
 	std::string filtered;
-	if (main_filters::actual == FILTER_CATEGORY && !machine().inifile().ini_index.empty())
+	if (main_filters::actual == FILTER_CATEGORY && machine().inifile().total() > 0)
 	{
 		filtered = string_format(_("%1$s (%2$s - %3$s) - "),
 				main_filters::text[main_filters::actual],
-				machine().inifile().actual_file(),
-				machine().inifile().actual_category());
+				machine().inifile().get_file(),
+				machine().inifile().get_category());
 	}
 	else if (main_filters::actual == FILTER_MANUFACTURER)
 	{
@@ -839,9 +841,15 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	for (int line = 0; line < 2; ++line)
 	{
 		mui.draw_text_full(container, tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-		                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+			DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(width, maxwidth);
+	}
+
+	if (maxwidth > origx2 - origx1)
+	{
+		text_size = (origx2 - origx1) / maxwidth;
+		maxwidth = origx2 - origx1;
 	}
 
 	// compute our bounds
@@ -862,7 +870,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	for (int line = 0; line < 2; ++line)
 	{
 		mui.draw_text_full(container, tempbuf[line].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER, 
-			DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+			DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
 		y1 += mui.get_line_height();
 	}
 
@@ -992,6 +1000,12 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		maxwidth = MAX(maxwidth, width);
 	}
 
+	if (maxwidth > origx2 - origx1)
+	{
+		text_size = (origx2 - origx1) / maxwidth;
+		maxwidth = origx2 - origx1;
+	}
+
 	// compute our bounds
 	x1 = 0.5f - 0.5f * maxwidth;
 	x2 = x1 + maxwidth;
@@ -1014,7 +1028,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	for (auto & elem : tempbuf)
 	{
 		mui.draw_text_full(container, elem.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-			DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+			DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
 		y1 += mui.get_line_height();
 	}
 }
@@ -1084,7 +1098,7 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *m_event)
 					}
 			}
 
-			std::vector<s_bios> biosname;
+			s_bios biosname;
 			if (!machine().ui().options().skip_bios_menu() && has_multiple_bios(driver, biosname))
 				ui_menu::stack_push(global_alloc_clear<ui_bios_selection>(machine(), container, biosname, (void *)driver, false, false));
 			else
@@ -1141,7 +1155,7 @@ void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 		// if everything looks good, schedule the new driver
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			std::vector<s_bios> biosname;
+			s_bios biosname;
 			if (!mopt.skip_bios_menu() && has_multiple_bios(ui_swinfo->driver, biosname))
 				ui_menu::stack_push(global_alloc_clear<ui_bios_selection>(machine(), container, biosname, (void *)ui_swinfo->driver, false, false));
 			else
@@ -1174,7 +1188,7 @@ void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 		media_auditor::summary summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			std::vector<s_bios> biosname;
+			s_bios biosname;
 			if (!mopt.skip_bios_menu() && has_multiple_bios(ui_swinfo->driver, biosname))
 			{
 				ui_menu::stack_push(global_alloc_clear<ui_bios_selection>(machine(), container, biosname, (void *)ui_swinfo, true, false));
@@ -1182,7 +1196,7 @@ void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 			}
 			else if (!mopt.skip_parts_menu() && swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
 			{
-				std::unordered_map<std::string, std::string> parts;
+				s_parts parts;
 				for (const software_part *swpart = swinfo->first_part(); swpart != nullptr; swpart = swpart->next())
 				{
 					if (swpart->matches_interface(ui_swinfo->interface.c_str()))
@@ -1694,7 +1708,7 @@ bool ui_menu_select_game::load_available_machines()
 {
 	// try to load available drivers from file
 	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_READ);
-	if (file.open(emulator_info::get_configname(), "_avail.ini") != FILERR_NONE)
+	if (file.open(emulator_info::get_configname(), "_avail.ini") != osd_file::error::NONE)
 		return false;
 
 	std::string readbuf;
@@ -1746,7 +1760,7 @@ void ui_menu_select_game::load_custom_filters()
 {
 	// attempt to open the output file
 	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_READ);
-	if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == FILERR_NONE)
+	if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == osd_file::error::NONE)
 	{
 		char buffer[MAX_CHAR_INFO];
 
@@ -2006,14 +2020,14 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 
 		// apply title to right panel
 		float title_size = 0.0f;
-		float txt_lenght = 0.0f;
+		float txt_length = 0.0f;
 
 		for (int x = UI_FIRST_LOAD; x < UI_LAST_LOAD; ++x)
 		{
 			mui.draw_text_full(container, _(dats_info[x]), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, 
-				WRAP_NEVER, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
-			txt_lenght += 0.01f;
-			title_size = MAX(txt_lenght, title_size);
+				WRAP_NEVER, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_length, nullptr);
+			txt_length += 0.01f;
+			title_size = (std::max)(txt_length, title_size);
 		}
 
 		rgb_t fgcolor = UI_TEXT_COLOR;
@@ -2182,17 +2196,17 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 		else
 		{
 			float title_size = 0.0f;
-			float txt_lenght = 0.0f;
+			float txt_length = 0.0f;
 			std::string t_text[2];
 			t_text[0] = _("History");
 			t_text[1] = _("Usage");
 
 			for (auto & elem: t_text)
 			{
-				mui.draw_text_full(container, elem.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE, 
-					DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
-				txt_lenght += 0.01f;
-				title_size = MAX(txt_lenght, title_size);
+				mui.draw_text_full(container, elem.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+					DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_length, nullptr);
+				txt_length += 0.01f;
+				title_size = (std::max)(txt_length, title_size);
 			}
 
 			rgb_t fgcolor = UI_TEXT_COLOR;

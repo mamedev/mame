@@ -287,7 +287,7 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 			if ((m_terms[i]->m_railstart - m_terms[i+1]->m_railstart) * sort_order < 0)
 			{
 				std::swap(m_terms[i],m_terms[i+1]);
-				m_nets.swap(i, i+1);
+				std::swap(m_nets[i], m_nets[i+1]);
 			}
 		}
 

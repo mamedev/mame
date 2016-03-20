@@ -540,8 +540,8 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 		fname.assign(filename);
 	else
 		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
-	file_error filerr = file.open(fname.c_str());
-	if (filerr != FILERR_NONE)
+	osd_file::error filerr = file.open(fname.c_str());
+	if (filerr != osd_file::error::NONE)
 		return false;
 
 	// read the PNG data

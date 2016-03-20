@@ -15,11 +15,9 @@ public:
 		m_bgbotvideoram(*this, "bgbotvideoram"),
 		m_txvideoram(*this, "txvideoram"),
 		m_spriteram(*this, "spriteram"),
-		m_paletteram(*this, "paletteram"),
 		m_subcpu(*this, "sub"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	/* memory pointers */
@@ -27,7 +25,6 @@ public:
 	required_shared_ptr<UINT8> m_bgbotvideoram;
 	required_shared_ptr<UINT8> m_txvideoram;
 	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_paletteram;
 
 	tilemap_t    *m_tx_tilemap;
 	tilemap_t    *m_bgbot_tilemap;
@@ -42,8 +39,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_subcpu;
+	DECLARE_READ8_MEMBER(angeklds_ff_r) { return 0xff; };
 	DECLARE_WRITE8_MEMBER(angelkds_cpu_bank_write);
-	DECLARE_READ8_MEMBER(angelkds_input_r);
 	DECLARE_WRITE8_MEMBER(angelkds_main_sound_w);
 	DECLARE_READ8_MEMBER(angelkds_main_sound_r);
 	DECLARE_WRITE8_MEMBER(angelkds_sub_sound_w);
@@ -57,7 +54,6 @@ public:
 	DECLARE_WRITE8_MEMBER(angelkds_bgbotbank_write);
 	DECLARE_WRITE8_MEMBER(angelkds_bgbotscroll_write);
 	DECLARE_WRITE8_MEMBER(angelkds_layer_ctrl_write);
-	DECLARE_WRITE8_MEMBER(angelkds_paletteram_w);
 	DECLARE_DRIVER_INIT(angelkds);
 	DECLARE_DRIVER_INIT(spcpostn);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
@@ -71,6 +67,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 };

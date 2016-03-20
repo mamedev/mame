@@ -553,6 +553,7 @@ swtpc.cpp
 swtpc09.cpp
 swyft.cpp
 sym1.cpp
+symbolics.cpp
 sys2900.cpp
 systec.cpp
 tamag1.cpp

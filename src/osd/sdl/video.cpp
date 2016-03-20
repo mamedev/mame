@@ -286,12 +286,7 @@ finishit:
 
 static void check_osd_inputs(running_machine &machine)
 {
-#ifdef USE_OLD_SDL_INPUT
-	sdl_window_info *window = sdlinput_get_focus_window();
-#else
-	// BUG: TODO: Fix focus window support
 	sdl_window_info *window = sdl_window_list;
-#endif
 
 	// check for toggling fullscreen mode
 	if (machine.ui_input().pressed(IPT_OSD_1))
