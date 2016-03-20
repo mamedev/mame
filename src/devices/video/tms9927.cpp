@@ -79,7 +79,7 @@ crt5057_device::crt5057_device(const machine_config &mconfig, const char *tag, d
 void tms9927_device::device_start()
 {
 	assert(clock() > 0);
-	if (!(m_hpixels_per_column > 0)) fatalerror("ERROR: TMS9927: number of pixels per column must be explicitly set using MCFG_TMS9927_CHAR_WIDTH()!\n");
+	if (!(m_hpixels_per_column > 0)) fatalerror("TMS9927: number of pixels per column must be explicitly set using MCFG_TMS9927_CHAR_WIDTH()!\n");
 
 	/* copy the initial parameters */
 	m_clock = clock();

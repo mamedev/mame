@@ -372,7 +372,7 @@ int running_machine::run(bool firstrun)
 			g_profiler.start(PROFILER_EXTRA);
 
 #if defined(EMSCRIPTEN)
-			//break out to our async javascript loop and halt
+			// break out to our async javascript loop and halt
 			js_set_main_loop(this);
 #endif
 
@@ -403,7 +403,7 @@ int running_machine::run(bool firstrun)
 	}
 	catch (emu_fatalerror &fatal)
 	{
-		osd_printf_error("FATALERROR: %s\n", fatal.string());
+		osd_printf_error("Fatal error: %s\n", fatal.string());
 		error = MAMERR_FATALERROR;
 		if (fatal.exitcode() != 0)
 			error = fatal.exitcode();
