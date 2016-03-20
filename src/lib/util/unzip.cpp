@@ -400,7 +400,7 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 {
 	// if we're at or past the end, we're done
 	std::string filename;
-	while (m_cd_pos <= m_ecd.cd_size)
+	while ((m_cd_pos + ZIPCFN) <= m_ecd.cd_size)
 	{
 		// extract file header info
 		std::uint8_t const *const raw = &m_cd[0] + m_cd_pos;
