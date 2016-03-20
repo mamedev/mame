@@ -59,7 +59,7 @@ TODO: everything below.
 * hook up the DiskInt from the wd1791 either using m_fdc->intrq_r() polling or using device lines (latter is a much better idea)
 
 WIP:
-* crt5027 video controller - the iocpu side is hooked up, but crashes due to a bug in the crt5027/tms9927 code. the actual drawing to screen part is not connected anywhere yet.
+* crt5027 video controller - the iocpu side is hooked up, screen drawing 'works' but is scrambled due to not emulating the clock chain halting and clock changing yet. The crt5027 core also needs the odd/even interrupt hooked up, and proper interlace support as well as clock change/screen resize support (down to DC/no clock, which I guess should be a 1x1 single black pixel!)
 * pic8259 interrupt controller - this is attached as a device, but only the vblank interrupt is hooked to it yet.
 * Harris 6402 serial/EIA UART - connected to iocpu, other end isn't connected anywhere, interrupt is not connected
 * Harris 6402 keyboard UART (within notetaker) - connected to iocpu, other end isn't connected anywhere, interrupt is not connected
