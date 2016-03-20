@@ -20,6 +20,8 @@ public:
 
 protected:
 	// overrides
+	virtual UINT32 decode_fixed(UINT16 op);
+	virtual UINT32 decode_micro(UINT8 sel);
 	virtual void device_reset() override;
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -30,11 +32,10 @@ protected:
 
 	virtual UINT8 read_k_input() override;
 	virtual void set_cki_bus() override;
+	virtual UINT32 read_micro();
 	virtual void read_opcode() override;
 
 	virtual void op_comx() override;
-
-	UINT32 decode_micro(UINT8 sel);
 };
 
 class tms1980_cpu_device : public tms0980_cpu_device

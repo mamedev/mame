@@ -98,10 +98,24 @@ offs_t tms0980_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 
 
 // device_reset
+UINT32 tms0980_cpu_device::decode_fixed(UINT16 op)
+{
+	UINT32 decode = 0;
+	UINT32 mask = m_ipla->read(op);
+	
+	// 1 line per PLA row, no OR-mask
+	const UINT32 id[15] = { F_LDP, F_SBL, F_OFF, F_RBIT, F_SAL, F_XDA, F_REAC, F_SETR, F_RETN, F_SBIT, F_TDO, F_COMX8, F_COMX, F_LDX, F_SEAC };
+
+	for (int bit = 0; bit < 15; bit++)
+		if (mask & (0x80 << bit))
+			decode |= id[bit];
+	
+	return decode;
+}
+
 UINT32 tms0980_cpu_device::decode_micro(UINT8 sel)
 {
 	UINT32 decode = 0;
-
 	sel = BITSWAP8(sel,7,6,0,1,2,3,4,5); // lines are reversed
 	UINT32 mask = m_mpla->read(sel);
 	mask ^= 0x43fc3; // invert active-negative
@@ -129,23 +143,17 @@ void tms0980_cpu_device::device_reset()
 	m_micro_decode.resize(0x200);
 	memset(&m_micro_decode[0], 0, 0x200*sizeof(UINT32));
 
-	for (int op = 0; op < 0x200; op++)
+	for (UINT16 op = 0; op < 0x200; op++)
 	{
 		// upper half of the opcodes is always branch/call
 		if (op & 0x100)
 			m_fixed_decode[op] = (op & 0x80) ? F_CALL: F_BR;
 
-		UINT32 imask = m_ipla->read(op);
-
 		// 6 output bits select a microinstruction index
-		m_micro_decode[op] = decode_micro(imask & 0x3f);
+		m_micro_decode[op] = decode_micro(m_ipla->read(op) & 0x3f);
 
 		// the other ipla terms each select a fixed instruction
-		const UINT32 id[15] = { F_LDP, F_SBL, F_OFF, F_RBIT, F_SAL, F_XDA, F_REAC, F_SETR, F_RETN, F_SBIT, F_TDO, F_COMX8, F_COMX, F_LDX, F_SEAC };
-
-		for (int bit = 0; bit < 15; bit++)
-			if (imask & (0x80 << bit))
-				m_fixed_decode[op] |= id[bit];
+		m_fixed_decode[op] |= decode_fixed(op);
 	}
 
 	// like on TMS0970, one of the terms directly select a microinstruction index (via R4-R8),
@@ -159,6 +167,16 @@ void tms0980_cpu_device::device_reset()
 
 
 // program counter/opcode decode
+UINT32 tms0980_cpu_device::read_micro()
+{
+	// if ipla term 0 is active, R4-R8 directly select a microinstruction index when R0 or R0^BL is 0
+	int r0 = m_opcode >> 8 & 1;
+	if (m_ipla->read(m_opcode) & 0x40 && !((r0 & m_bl) ^ r0))
+		return m_micro_direct[m_opcode & 0x3f];
+	else
+		return m_micro_decode[m_opcode];
+}
+
 void tms0980_cpu_device::read_opcode()
 {
 	debugger_instruction_hook(this, m_rom_address << 1);
@@ -166,13 +184,7 @@ void tms0980_cpu_device::read_opcode()
 	m_c4 = BITSWAP8(m_opcode,7,6,5,4,0,1,2,3) & 0xf; // opcode operand is bitswapped for most opcodes
 
 	m_fixed = m_fixed_decode[m_opcode];
-
-	// if ipla term 0 is active, R4-R8 directly select a microinstruction index when R0 or R0^BL is 0
-	int r0 = m_opcode >> 8 & 1;
-	if (m_ipla->read(m_opcode) & 0x40 && !((r0 & m_bl) ^ r0))
-		m_micro = m_micro_direct[m_opcode & 0x3f];
-	else
-		m_micro = m_micro_decode[m_opcode];
+	m_micro = read_micro();
 
 	// redirect mpla fixed instructions
 	if (m_micro & M_RSTR) m_fixed |= F_RSTR;
