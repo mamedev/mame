@@ -98,6 +98,8 @@ public:
 	DECLARE_VIDEO_START(apple3);
 	UINT32 screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple3_interrupt);
+	TIMER_CALLBACK_MEMBER(scanstart_cb);
+	TIMER_CALLBACK_MEMBER(scanend_cb);
 	DECLARE_WRITE_LINE_MEMBER(apple3_acia_irq_func);
 	DECLARE_WRITE8_MEMBER(apple3_via_0_out_a);
 	DECLARE_WRITE8_MEMBER(apple3_via_0_out_b);
@@ -106,12 +108,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(apple3_via_0_irq_func);
 	DECLARE_WRITE_LINE_MEMBER(apple3_via_1_irq_func);
 	void apple3_write_charmem();
-	void apple3_video_text40(bitmap_ind16 &bitmap);
-	void apple3_video_text80(bitmap_ind16 &bitmap);
-	void apple3_video_graphics_hgr(bitmap_ind16 &bitmap);
-	void apple3_video_graphics_chgr(bitmap_ind16 &bitmap);
-	void apple3_video_graphics_shgr(bitmap_ind16 &bitmap);
-	void apple3_video_graphics_chires(bitmap_ind16 &bitmap);
+	void text40(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void text80(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void graphics_hgr(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void graphics_chgr(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void graphics_shgr(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void graphics_chires(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT8 *apple3_bankaddr(UINT16 bank, offs_t offset);
 	UINT8 *apple3_get_zpa_addr(offs_t offset);
 	void apple3_update_memory();
@@ -159,6 +161,8 @@ private:
 	int m_c040_time;
 	UINT16 m_lastchar, m_strobe;
 	UINT8 m_transchar;
+
+	emu_timer *m_scanstart, *m_scanend;
 
 	int m_analog_sel;
 	bool m_ramp_active;
