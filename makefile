@@ -1297,13 +1297,13 @@ endif
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --NO_OPENGL=1 --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  gmake  
 
 .PHONY: steamlink
+steamlink: generate $(PROJECTDIR)/gmake-steamlink/Makefile
 ifndef MARVELL_SDK_PATH
 	$(error MARVELL_SDK_PATH is not set)
 endif
 ifndef MARVELL_ROOTFS
 	$(error MARVELL_ROOTFS is not set)
 endif
-steamlink: generate $(PROJECTDIR)/gmake-steamlink/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-steamlink config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-steamlink config=$(CONFIG)
 
@@ -1321,13 +1321,13 @@ endif
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=rpi --gcc_version=4.9.2 --osd=sdl --targetos=rpi --targetos=rpi --NO_USE_MIDI=1 --PLATFORM=arm --NOASM=1 --USE_QTDEBUG=0 --SDL_INSTALL_ROOT=$(RASPBERRY_SYSROOT)/usr  gmake  
 
 .PHONY: rpi
+rpi: generate $(PROJECTDIR_SDL)/gmake-rpi/Makefile
 ifndef RASPBERRY_SDK_PATH
 	$(error RASPBERRY_SDK_PATH is not set)
 endif
 ifndef RASPBERRY_SYSROOT
 	$(error RASPBERRY_SYSROOT is not set)
 endif
-rpi: generate $(PROJECTDIR_SDL)/gmake-rpi/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-rpi config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-rpi config=$(CONFIG)
 
