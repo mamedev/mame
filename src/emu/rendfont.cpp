@@ -153,25 +153,6 @@ render_font::render_font(render_manager &manager, const char *filename)
 	if (filename != nullptr && core_stricmp(filename, "default") == 0)
 		filename = "ui.bdf";
 
-	// attempt to open the cached version of the font
-	if (filename != nullptr)
-	{
-		emu_file cachefile(manager.machine().options().font_path(), OPEN_FLAG_READ);
-		osd_file::error const filerr = cachefile.open(filename);
-		if (filerr == osd_file::error::NONE)
-		{
-			// if we have a cached version, load it
-			bool const result = load_cached(cachefile, 0);
-
-			// if that worked, we're done
-			if (result)
-			{
-				render_font_command_glyph();
-				return;
-			}
-		}
-	}
-
 	// attempt to load the cached version of the font first
 	if (filename != nullptr && load_cached_bdf(filename))
 	{
