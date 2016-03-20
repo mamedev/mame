@@ -73,11 +73,13 @@ const UINT8 RENDER_CREATE_NO_ART        = 0x01;         // ignore any views that
 const UINT8 RENDER_CREATE_SINGLE_FILE   = 0x02;         // only load views from the file specified
 const UINT8 RENDER_CREATE_HIDDEN        = 0x04;         // don't make this target visible
 
-// render scaling types
-const UINT32 RENDER_SCALE_FRACTIONAL    = 0x00;         // compute bounds using dimensionless proportions (default)
-const UINT32 RENDER_SCALE_INTEGER       = 0x01;         // compute integer scaling factors for both axes, based on target dimensions
-const UINT32 RENDER_SCALE_STRETCH_H     = 0x02;         // compute fractional scaling factor for x-axis, and integer factor for y-axis
-const UINT32 RENDER_SCALE_STRETCH_FULL  = 0x03;         // match bounds with physical target dimensions in pixels
+// render scaling modes
+enum
+{
+	SCALE_FRACTIONAL = 0,                               // compute fractional scaling factors for both axes
+	SCALE_FRACTIONAL_X,                                 // compute fractional scaling factor for x-axis, and integer factor for y-axis
+	SCALE_INTEGER                                       // compute integer scaling factors for both axes, based on target dimensions
+};
 
 // flags for primitives
 const int PRIMFLAG_TEXORIENT_SHIFT = 0;
@@ -91,7 +93,6 @@ const UINT32 PRIMFLAG_BLENDMODE_MASK = 15 << PRIMFLAG_BLENDMODE_SHIFT;
 
 const int PRIMFLAG_ANTIALIAS_SHIFT = 12;
 const UINT32 PRIMFLAG_ANTIALIAS_MASK = 1 << PRIMFLAG_ANTIALIAS_SHIFT;
-
 const int PRIMFLAG_SCREENTEX_SHIFT = 13;
 const UINT32 PRIMFLAG_SCREENTEX_MASK = 1 << PRIMFLAG_SCREENTEX_SHIFT;
 
@@ -897,7 +898,7 @@ public:
 	UINT32 width() const { return m_width; }
 	UINT32 height() const { return m_height; }
 	float pixel_aspect() const { return m_pixel_aspect; }
-	int scale_type() const { return m_scale_type; }
+	int scale_mode() const { return m_scale_mode; }
 	float max_update_rate() const { return m_max_refresh; }
 	int orientation() const { return m_orientation; }
 	render_layer_config layer_config() const { return m_layerconfig; }
@@ -1002,7 +1003,7 @@ private:
 	render_bounds           m_bounds;                   // bounds of the target
 	bool                    m_keepaspect;               // constrain aspect ratio
 	float                   m_pixel_aspect;             // aspect ratio of individual pixels
-	int                     m_scale_type;               // type of scale to apply 
+	int                     m_scale_mode;               // type of scale to apply 
 	int                     m_int_scale_x;              // horizontal integer scale factor
 	int                     m_int_scale_y;              // vertical integer scale factor
 	float                   m_max_refresh;              // maximum refresh rate, 0 or if none

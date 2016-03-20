@@ -1192,7 +1192,7 @@ osd_rect sdl_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	osd_monitor_info *monitor = m_monitor;
 
 	// do not constrain aspect ratio for integer scaled views
-	if (m_target->scale_type() != RENDER_SCALE_FRACTIONAL)
+	if (m_target->scale_mode() != SCALE_FRACTIONAL)
 		return rect;
 
 	// get the pixel aspect ratio for the target monitor
@@ -1316,7 +1316,7 @@ osd_dim sdl_window_info::get_min_bounds(int constrain)
 	minheight += wnd_extra_height();
 
 	// if we want it constrained, figure out which one is larger
-	if (constrain && m_target->scale_type() == RENDER_SCALE_FRACTIONAL)
+	if (constrain && m_target->scale_mode() == SCALE_FRACTIONAL)
 	{
 		// first constrain with no height limit
 		osd_rect test1(0,0,minwidth,10000);
@@ -1380,7 +1380,7 @@ osd_dim sdl_window_info::get_max_bounds(int constrain)
 	maximum = maximum.resize(tempw, temph);
 
 	// constrain to fit
-	if (constrain && m_target->scale_type() == RENDER_SCALE_FRACTIONAL)
+	if (constrain && m_target->scale_mode() == SCALE_FRACTIONAL)
 		maximum = constrain_to_aspect_ratio(maximum, WMSZ_BOTTOMRIGHT);
 
 	// remove extra window stuff

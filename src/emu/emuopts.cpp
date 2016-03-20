@@ -91,8 +91,10 @@ const options_entry emu_options::s_option_entries[] =
 	// render options
 	{ nullptr,                                              nullptr,        OPTION_HEADER,     "CORE RENDER OPTIONS" },
 	{ OPTION_KEEPASPECT ";ka",                           "1",         OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
-	{ OPTION_INTSCALEX ";sx",                            "0",         OPTION_INTEGER,    "set horizontal scale factor for integer scaled views."},
-	{ OPTION_INTSCALEY ";sy",                            "0",         OPTION_INTEGER,    "set vertical scale factor for integer scaled views."},
+	{ OPTION_UNEVENSTRETCH ";ues",                       "1",         OPTION_BOOLEAN,    "allow non-integer stretch factors" },
+	{ OPTION_UNEVENSTRETCHX ";uesx",                     "0",         OPTION_BOOLEAN,    "allow non-integer stretch factors only on horizontal axis"},
+	{ OPTION_INTSCALEX ";sx",                            "0",         OPTION_INTEGER,    "set horizontal integer scale factor."},
+	{ OPTION_INTSCALEY ";sy",                            "0",         OPTION_INTEGER,    "set vertical integer scale."},
 
 	// rotation options
 	{ nullptr,                                              nullptr,        OPTION_HEADER,     "CORE ROTATION OPTIONS" },
