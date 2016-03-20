@@ -294,33 +294,34 @@ hp_taco_device::hp_taco_device(const machine_config &mconfig, const char *tag, d
 
 WRITE16_MEMBER(hp_taco_device::reg_w)
 {
-		LOG_0(("wr R%u = %04x\n", 4 + offset , data));
+        LOG_0(("wr R%u = %04x\n", 4 + offset , data));
 
-		// Any I/O activity clears IRQ
-		irq_w(false);
+        // Any I/O activity clears IRQ
+        irq_w(false);
 
-		switch (offset) {
-		case 0:
-				// Data register
-				m_data_reg = data;
-				m_data_reg_full = true;
-				break;
+        switch (offset) {
+        case 0:
+                // Data register
+                m_data_reg = data;
+                m_data_reg_full = true;
+                break;
 
-		case 1:
-				// Command register
-				start_cmd_exec(data & CMD_REG_MASK);
-				break;
+        case 1:
+                // Command register
+                start_cmd_exec(data & CMD_REG_MASK);
+                break;
 
-		case 2:
-				// Tachometer register
-				m_tach_reg = data;
-				break;
+        case 2:
+                // Tachometer register
+                m_tach_reg = data;
+                freeze_tach_reg(true);
+                break;
 
-		case 3:
-				// Timing register
-				m_timing_reg = data;
-				break;
-		}
+        case 3:
+                // Timing register
+                m_timing_reg = data;
+                break;
+        }
 }
 
 READ16_MEMBER(hp_taco_device::reg_r)
@@ -341,10 +342,11 @@ READ16_MEMBER(hp_taco_device::reg_r)
 				res = (m_cmd_reg & CMD_REG_MASK) | (m_status_reg & STATUS_REG_MASK);
 				break;
 
-		case 2:
-				// Tachometer register
-				res = m_tach_reg;
-				break;
+        case 2:
+                // Tachometer register
+                update_tach_reg();
+                res = m_tach_reg;
+                break;
 
 		case 3:
 				// Checksum register: it clears when read
@@ -389,6 +391,8 @@ void hp_taco_device::device_start()
         save_item(NAME(m_cmd_state));
         save_item(NAME(m_status_reg));
         save_item(NAME(m_tach_reg));
+        save_item(NAME(m_tach_reg_ref));
+        save_item(NAME(m_tach_reg_frozen));
         save_item(NAME(m_checksum_reg));
         save_item(NAME(m_timing_reg));
         save_item(NAME(m_irq));
@@ -486,6 +490,7 @@ void hp_taco_device::device_timer(emu_timer &timer, device_timer_id id, int para
                         if (m_cmd_state == 0) {
                                 m_cmd_state = 1;
                                 m_tape_timer->adjust(time_to_tach_pulses());
+                                freeze_tach_reg(false);
                                 return;
                         }
                         break;
@@ -616,7 +621,6 @@ void hp_taco_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
                 case CMD_MOVE_INGAP:
                 case CMD_DELTA_MOVE_IRG:
-                        // TODO: update r6
                         m_hole_timer->adjust(time_to_next_hole());
                         // No IRQ at holes
                         return;
@@ -647,6 +651,8 @@ void hp_taco_device::clear_state(void)
         m_cmd_reg = 0;
         m_status_reg = 0;
         m_tach_reg = 0;
+        m_tach_reg_ref = m_tape_pos;
+        m_tach_reg_frozen = true;
         m_checksum_reg = 0;
         m_timing_reg = 0;
         m_cmd_state = 0;
@@ -715,6 +721,11 @@ bool hp_taco_device::pos_offset(tape_pos_t& pos , tape_pos_t offset) const
 
 hp_taco_device::tape_pos_t hp_taco_device::current_tape_pos(void) const
 {
+        if (m_start_time.is_never()) {
+                // Tape not moving
+                return m_tape_pos;
+        }
+
         attotime delta_time(machine().time() - m_start_time);
         LOG_0(("delta_time = %g\n" , delta_time.as_double()));
         // How many tachometer ticks has the tape moved?
@@ -757,6 +768,37 @@ void hp_taco_device::update_tape_pos(void)
         } else {
                 BIT_CLR(m_status_reg, STATUS_GAP_BIT);
         }
+        // Tach register update
+        update_tach_reg();
+}
+
+void hp_taco_device::update_tach_reg(void)
+{
+        if (m_tach_reg_frozen) {
+                LOG_0(("Tach reg frozen\n"));
+                return;
+        }
+
+        tape_pos_t pos = current_tape_pos();
+        tape_pos_t pos_int = pos / TAPE_POS_FRACT;
+        tape_pos_t ref_int = m_tach_reg_ref / TAPE_POS_FRACT;
+        UINT16 reg_value = (UINT16)(abs(pos_int - ref_int) + m_tach_reg);
+
+        LOG_0(("Tach = %04x @ pos = %d, ref_pos = %d\n" , reg_value , pos , m_tach_reg_ref));
+
+        m_tach_reg = reg_value;
+        m_tach_reg_ref = pos;
+}
+
+void hp_taco_device::freeze_tach_reg(bool freeze)
+{
+        if (freeze) {
+                m_tach_reg_frozen = true;
+        } else {
+                m_tach_reg_frozen = false;
+                m_tach_reg_ref = current_tape_pos();
+        }
+
 }
 
 void hp_taco_device::ensure_a_lt_b(tape_pos_t& a , tape_pos_t& b)
@@ -1359,6 +1401,7 @@ void hp_taco_device::start_cmd_exec(UINT16 new_cmd_reg)
         case CMD_WRITE_IRG:
                 // Errors: WP,CART OUT
                 if (start_tape_cmd(new_cmd_reg , 0 , STATUS_WPR_MASK)) {
+                        freeze_tach_reg(false);
                         m_rw_pos = m_tape_pos;
                         cmd_duration = time_to_tach_pulses();
                         time_to_hole = time_to_next_hole();
@@ -1391,6 +1434,7 @@ void hp_taco_device::start_cmd_exec(UINT16 new_cmd_reg)
                 // Errors: CART OUT,FAST SPEED
                 if (start_tape_cmd(new_cmd_reg , 0 , SPEED_FAST_MASK)) {
                         m_cmd_state = 0;
+                        freeze_tach_reg(false);
                         cmd_duration = time_to_tach_pulses();
                         // Holes detected?
                 }
@@ -1408,6 +1452,7 @@ void hp_taco_device::start_cmd_exec(UINT16 new_cmd_reg)
         case CMD_DELTA_MOVE_IRG:
                 if (start_tape_cmd(new_cmd_reg , 0 , 0)) {
                         m_cmd_state = 0;
+                        freeze_tach_reg(false);
                         cmd_duration = time_to_tach_pulses();
                         time_to_hole = time_to_next_hole();
                 }

@@ -85,6 +85,8 @@ private:
         UINT16 m_cmd_reg;
         UINT16 m_status_reg;
         UINT16 m_tach_reg;
+        tape_pos_t m_tach_reg_ref;
+        bool m_tach_reg_frozen;
         UINT16 m_checksum_reg;
         UINT16 m_timing_reg;
 
@@ -132,6 +134,8 @@ private:
         bool pos_offset(tape_pos_t& pos , tape_pos_t offset) const;
         tape_pos_t current_tape_pos(void) const;
         void update_tape_pos(void);
+        void update_tach_reg(void);
+        void freeze_tach_reg(bool freeze);
         static void ensure_a_lt_b(tape_pos_t& a , tape_pos_t& b);
         static bool any_hole(tape_pos_t tape_pos_a , tape_pos_t tape_pos_b);
         tape_pos_t next_hole(void) const;
