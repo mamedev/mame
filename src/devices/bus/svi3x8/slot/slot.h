@@ -49,9 +49,9 @@
 #define MCFG_SVI_SLOT_BUS_ADD \
 	MCFG_DEVICE_ADD("slotbus", SVI_SLOT_BUS, 0)
 
-#define MCFG_SVI_SLOT_ADD(_tag, _def_slot) \
+#define MCFG_SVI_SLOT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, SVI_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(svi_slot_cards, _def_slot, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	svi_slot_device::set_bus(*device, owner, "slotbus");
 
 #define MCFG_SVI_SLOT_INT_HANDLER(_devcb) \
