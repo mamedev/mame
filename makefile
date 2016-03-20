@@ -1511,9 +1511,12 @@ cppcheck:
 # BGFX shaders
 #-------------------------------------------------
 
-.PHONY: shaders
+.PHONY: shaders bgfx-tools
 
-shaders:
+bgfx-tools:
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/bgfx -f makefile dist-$(GENIEOS)
+
+shaders: bgfx-tools
 	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx rebuild
 	
 #-------------------------------------------------
