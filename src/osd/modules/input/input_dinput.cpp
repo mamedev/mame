@@ -9,7 +9,7 @@
 #include "input_module.h"
 #include "modules/osdmodule.h"
 
-#if defined(OSD_WINDOWS) && (_WIN32_WINNT >= 0x0602)
+#if defined(OSD_WINDOWS)
 
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
