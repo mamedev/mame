@@ -54,6 +54,7 @@ public:
 		m_intvdp(0), m_intexp(0),
 		m_romdis(1), m_ramdis(1),
 		m_cart(1), m_bk21(1),
+		m_rom2(1), m_rom3(1),
 		m_keyboard_row(0)
 	{}
 
@@ -96,6 +97,8 @@ private:
 	int m_ramdis;
 	int m_cart;
 	int m_bk21;
+	int m_rom2;
+	int m_rom3;
 
 	UINT8 m_keyboard_row;
 };
@@ -310,6 +313,8 @@ void svi3x8_state::machine_start()
 	save_item(NAME(m_ramdis));
 	save_item(NAME(m_cart));
 	save_item(NAME(m_bk21));
+	save_item(NAME(m_rom2));
+	save_item(NAME(m_rom3));
 	save_item(NAME(m_keyboard_row));
 }
 
@@ -325,8 +330,9 @@ void svi3x8_state::machine_reset()
 
 READ8_MEMBER( svi3x8_state::page1_r)
 {
+	// cartridge /CCS1 and /CCS2
 	if (m_cart == 0)
-		return m_cart_rom->exists() ? m_cart_rom->read_rom(space, offset) : 0xff;
+		return m_cart_rom->read_rom(space, offset);
 
 	UINT8 data = m_expander->mreq_r(space, offset);
 
@@ -354,6 +360,14 @@ READ8_MEMBER( svi3x8_state::page2_r)
 {
 	offset += 0x8000;
 
+	// cartridge /CCS3
+	if (m_cart == 0 && m_rom2 == 0 && offset < 0xc000)
+		return m_cart_rom->read_rom(space, offset);
+
+	// cartridge /CCS4
+	if (m_cart == 0 && m_rom3 == 0 && offset >= 0xc000)
+		return m_cart_rom->read_rom(space, offset);
+
 	UINT8 data = m_expander->mreq_r(space, offset);
 
 	if (m_ramdis == 1 && (offset >= 0x4000 || IS_SVI328))
@@ -365,6 +379,14 @@ READ8_MEMBER( svi3x8_state::page2_r)
 WRITE8_MEMBER( svi3x8_state::page2_w )
 {
 	offset += 0x8000;
+
+	// cartridge /CCS3
+	if (m_cart == 0 && m_rom2 == 0 && offset < 0xc000)
+		return;
+
+	// cartridge /CCS4
+	if (m_cart == 0 && m_rom3 == 0 && offset >= 0xc000)
+		return;
 
 	m_expander->mreq_w(space, offset, data);
 
@@ -384,7 +406,8 @@ WRITE8_MEMBER( svi3x8_state::bank_w )
 	m_expander->bk31_w(BIT(data, 3));
 	m_expander->bk32_w(BIT(data, 4));
 
-	// TODO: handle ROM2/ROM3 enable (bit 6 + 7)
+	m_rom2 = BIT(data, 6);
+	m_rom3 = BIT(data, 7);
 
 	output().set_value("led_caps_lock", BIT(data, 5));
 }
@@ -449,12 +472,6 @@ WRITE_LINE_MEMBER( svi3x8_state::ramdis_w )
 DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state, cartridge )
 {
 	UINT32 size = m_cart_rom->common_get_size("rom");
-
-	if (size != 0x8000)
-	{
-		popmessage("Cartridge image '%s' invalid size: %u bytes", image.filename(), size);
-		return IMAGE_INIT_FAIL;
-	}
 
 	m_cart_rom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart_rom->common_load_rom(m_cart_rom->get_rom_base(), size, "rom");
