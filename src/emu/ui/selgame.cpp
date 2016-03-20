@@ -47,70 +47,6 @@ std::vector<const game_driver *> ui_menu_select_game::m_sortedlist;
 int ui_menu_select_game::m_isabios = 0;
 
 //-------------------------------------------------
-//  sort
-//-------------------------------------------------
-
-inline int c_stricmp(const char *s1, const char *s2)
-{
-	for (;;)
-	{
-		int c1 = tolower((UINT8)*s1++);
-		int c2 = tolower((UINT8)*s2++);
-		if (c1 == 0 || c1 != c2)
-			return c1 - c2;
-	}
-}
-
-bool sort_game_list(const game_driver *x, const game_driver *y)
-{
-	bool clonex = strcmp(x->parent, "0");
-	bool cloney = strcmp(y->parent, "0");
-
-	if (!clonex && !cloney)
-		return (c_stricmp(x->description, y->description) < 0);
-
-	int cx = -1, cy = -1;
-	if (clonex)
-	{
-		cx = driver_list::find(x->parent);
-		if (cx == -1 || (driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0)
-			clonex = false;
-	}
-
-	if (cloney)
-	{
-		cy = driver_list::find(y->parent);
-		if (cy == -1 || (driver_list::driver(cy).flags & MACHINE_IS_BIOS_ROOT) != 0)
-			cloney = false;
-	}
-
-	if (!clonex && !cloney)
-		return (c_stricmp(x->description, y->description) < 0);
-
-	else if (clonex && cloney)
-	{
-		if (!c_stricmp(x->parent, y->parent))
-			return (c_stricmp(x->description, y->description) < 0);
-		else
-			return (c_stricmp(driver_list::driver(cx).description, driver_list::driver(cy).description) < 0);
-	}
-	else if (!clonex && cloney)
-	{
-		if (!c_stricmp(x->name, y->parent))
-			return true;
-		else
-			return (c_stricmp(x->description, driver_list::driver(cy).description) < 0);
-	}
-	else
-	{
-		if (!c_stricmp(x->parent, y->name))
-			return false;
-		else
-			return (c_stricmp(driver_list::driver(cx).description, y->description) < 0);
-	}
-}
-
-//-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
@@ -776,7 +712,7 @@ void ui_menu_select_game::build_available_list()
 	}
 
 	// sort
-	std::stable_sort(m_availsortedlist.begin(), m_availsortedlist.end(), sort_game_list);
+	std::stable_sort(m_availsortedlist.begin(), m_availsortedlist.end(), sorted_game_list);
 
 	// now build the unavailable list
 	for (int x = 0; x < m_total; ++x)
@@ -784,7 +720,7 @@ void ui_menu_select_game::build_available_list()
 			m_unavailsortedlist.push_back(&driver_list::driver(x));
 
 	// sort
-	std::stable_sort(m_unavailsortedlist.begin(), m_unavailsortedlist.end(), sort_game_list);
+	std::stable_sort(m_unavailsortedlist.begin(), m_unavailsortedlist.end(), sorted_game_list);
 }
 
 //-------------------------------------------------
@@ -1513,7 +1449,7 @@ void ui_menu_select_game::build_category()
 	for (auto actual : temp_filter)
 		m_tmp.push_back(&driver_list::driver(actual));
 
-	std::stable_sort(m_tmp.begin(), m_tmp.end(), sort_game_list);
+	std::stable_sort(m_tmp.begin(), m_tmp.end(), sorted_game_list);
 	m_displaylist = m_tmp;
 }
 
@@ -1697,7 +1633,7 @@ void ui_menu_select_game::init_sorted_list()
 	// sort manufacturers - years and driver
 	std::stable_sort(c_mnfct::ui.begin(), c_mnfct::ui.end());
 	std::stable_sort(c_year::ui.begin(), c_year::ui.end());
-	std::stable_sort(m_sortedlist.begin(), m_sortedlist.end(), sort_game_list);
+	std::stable_sort(m_sortedlist.begin(), m_sortedlist.end(), sorted_game_list);
 }
 
 //-------------------------------------------------
@@ -1925,14 +1861,15 @@ float ui_menu_select_game::draw_left_panel(float x1, float y1, float x2, float y
 		x2 = x1 + 2.0f * UI_BOX_LR_BORDER;
 		y1 = origy1;
 		y2 = origy2;
-		float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
+		float space = x2 - x1;
+		float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
 		rgb_t fgcolor = UI_TEXT_COLOR;
 
 		// set left-right arrows dimension
 		float ar_x0 = 0.5f * (x2 + x1) - 0.5f * lr_arrow_width;
-		float ar_y0 = 0.5f * (y2 + y1) + 0.1f * line_height;
+		float ar_y0 = 0.5f * (y2 + y1) + 0.1f * space;
 		float ar_x1 = ar_x0 + lr_arrow_width;
-		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * line_height;
+		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
 
 		mui.draw_outlined_box(container, x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
@@ -1947,14 +1884,15 @@ float ui_menu_select_game::draw_left_panel(float x1, float y1, float x2, float y
 	}
 	else
 	{
-		float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
+		float space = x2 - x1;
+		float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
 		rgb_t fgcolor = UI_TEXT_COLOR;
 
 		// set left-right arrows dimension
 		float ar_x0 = 0.5f * (x2 + x1) - 0.5f * lr_arrow_width;
-		float ar_y0 = 0.5f * (y2 + y1) + 0.1f * line_height;
+		float ar_y0 = 0.5f * (y2 + y1) + 0.1f * space;
 		float ar_x1 = ar_x0 + lr_arrow_width;
-		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * line_height;
+		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
 
 		mui.draw_outlined_box(container, x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
@@ -2291,17 +2229,17 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 void ui_menu_select_game::draw_right_panel(void *selectedref, float origx1, float origy1, float origx2, float origy2)
 {
 	ui_manager &mui = machine().ui();
-	float line_height = mui.get_line_height();
-	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
 	rgb_t fgcolor = UI_TEXT_COLOR;
 	bool hide = (ui_globals::panels_status == HIDE_RIGHT_PANEL || ui_globals::panels_status == HIDE_BOTH);
 	float x2 = (hide) ? origx2 : origx1 + 2.0f * UI_BOX_LR_BORDER;
+	float space = x2 - origx1;
+	float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
 
 	// set left-right arrows dimension
 	float ar_x0 = 0.5f * (x2 + origx1) - 0.5f * lr_arrow_width;
-	float ar_y0 = 0.5f * (origy2 + origy1) + 0.1f * line_height;
+	float ar_y0 = 0.5f * (origy2 + origy1) + 0.1f * space;
 	float ar_x1 = ar_x0 + lr_arrow_width;
-	float ar_y1 = 0.5f * (origy2 + origy1) + 0.9f * line_height;
+	float ar_y1 = 0.5f * (origy2 + origy1) + 0.9f * space;
 
 	//machine().ui().draw_outlined_box(container, origx1, origy1, origx2, origy2, UI_BACKGROUND_COLOR);
 	mui.draw_outlined_box(container, origx1, origy1, origx2, origy2, rgb_t(0xEF, 0x12, 0x47, 0x7B));

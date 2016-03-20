@@ -7,10 +7,16 @@
 **********************************************************************/
 
 // The games designed for the US model of the Sports Pad controller use the
-// TH line of the controller port as output, to select which nibble, of the
-// two axis bytes, will be read at a time. The Japanese cartridge Sports Pad
-// Soccer uses a different mode, because the Sega Mark III lacks TH output, so
+// TH line of the controller port to select which nibble, of the two axis
+// bytes, will be read at a time. The Japanese cartridge Sports Pad Soccer
+// uses a different mode, because the Sega Mark III lacks the TH line, so
 // there is a different Sports Pad model released in Japan (see sportsjp.c).
+
+// The Japanese SMS has the TH line connected, but doesn't report TH input
+// on port 0xDD. However, a magazine raffled the US Sports Pad along with a
+// Great Ice Hockey cartridge, in Japanese format, to owners of that console.
+// So, Great Ice Hockey seems to just need TH pin as output to work, while
+// other games designed for the US Sports Pad don't work on the Japanese SMS.
 
 // It was discovered that games designed for the Paddle Controller, released
 // in Japan, switch to a mode incompatible with the original Paddle when

@@ -275,7 +275,7 @@ int a78_cart_slot_device::validate_header(int head, bool log)
 	{
 		if (log)
 		{
-			osd_printf_info("Unsupported mapper, please contact MESSdevs (Header 0x%X)\n", head);
+			osd_printf_info("Unsupported mapper, please contact MAMEdevs (Header 0x%X)\n", head);
 			osd_printf_info("Disabling special bits\n");
 		}
 		head &= 0x00ff;
@@ -414,7 +414,7 @@ bool a78_cart_slot_device::call_load()
 					break;
 			}
 
-			// check if cart has a POKEY at $0450 (typically a VersaBoard variant)!
+			// check if cart has a POKEY at $0450 (typically a VersaBoard variant)
 			if (mapper & 0x40)
 			{
 				if (m_type != A78_TYPE2)
@@ -434,13 +434,13 @@ bool a78_cart_slot_device::call_load()
 
 			if (head[58] == 1)
 			{
-				osd_printf_info("This cart support external NVRAM savings, using HSC.\n");
+				osd_printf_info("This cart supports external NVRAM using HSC.\n");
 				osd_printf_info("Run it with the High Score Cart mounted to exploit this feature.\n");
 			}
 			else if (head[58] == 2)
 			{
-				osd_printf_info("This cart support external NVRAM savings, using SaveKey.\n");
-				osd_printf_info("This is not supported in MESS currently.\n");
+				osd_printf_info("This cart supports external NVRAM using SaveKey.\n");
+				osd_printf_info("This is not supported in MAME currently.\n");
 			}
 
 			if (head[63])
@@ -714,12 +714,12 @@ WRITE8_MEMBER(a78_cart_slot_device::write_40xx)
  bit 3 [0x08] - bank 0 of 144K ROM at $4000
  bit 4 [0x10] - bank 6 at $4000
  bit 5 [0x20] - banked RAM at $4000
+ bit 6 [0x40] - POKEY at $0450
 
  bit 8-15 - Special values
- 0 = Normal cart
+ 0 = Normal cart  // normal compared to what? perhaps this should be 'unused'
  1 = Absolute (F18 Hornet)
  2 = Activision (Double Dragon & Rampage)
- 3 = POKEY at $0450
 
  -------------------------------------------------*/
 
@@ -817,6 +817,7 @@ void a78_cart_slot_device::internal_header_logging(UINT8 *header, UINT32 len)
 	logerror( "\t\tbank0 at $4000:  %s\n", BIT(head_mapper, 3) ? "Yes" : "No");
 	logerror( "\t\tbank6 at $4000:  %s\n", BIT(head_mapper, 4) ? "Yes" : "No");
 	logerror( "\t\tbanked RAM:      %s\n", BIT(head_mapper, 5) ? "Yes" : "No");
+	logerror( "\t\tPOKEY at $450:   %s\n", BIT(head_mapper, 6) ? "Yes" : "No");
 	logerror( "\t\tSpecial:         %s ", (head_mapper & 0xff00) ? "Yes" : "No");
 	if (head_mapper & 0xff00)
 	{

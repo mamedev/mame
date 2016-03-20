@@ -84,8 +84,12 @@ bool sorted_game_list(const game_driver *x, const game_driver *y)
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_audit::ui_menu_audit(running_machine &machine, render_container *container, std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted,  int _audit_mode)
-	: ui_menu(machine, container), m_availablesorted(availablesorted), m_unavailablesorted(unavailablesorted), m_audit_mode(_audit_mode), m_first(true)
+ui_menu_audit::ui_menu_audit(running_machine &machine, render_container *container, vptr_game &availablesorted, vptr_game &unavailablesorted,  int _audit_mode)
+	: ui_menu(machine, container)
+	, m_availablesorted(availablesorted)
+	, m_unavailablesorted(unavailablesorted)
+	, m_audit_mode(_audit_mode)
+	, m_first(true)
 {
 	if (m_audit_mode == 2)
 	{
@@ -115,7 +119,7 @@ void ui_menu_audit::handle()
 
 	if (m_audit_mode == 1)
 	{
-		std::vector<const game_driver *>::iterator iter = m_unavailablesorted.begin();
+		vptr_game::iterator iter = m_unavailablesorted.begin();
 		while (iter != m_unavailablesorted.end())
 		{
 			driver_enumerator enumerator(machine().options(), (*iter)->name);

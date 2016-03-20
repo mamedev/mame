@@ -247,7 +247,7 @@ osd_file::error osd_file::open(std::string const &path, std::uint32_t openflags,
 		// create the path if necessary
 		if ((openflags & OPEN_FLAG_CREATE) && (openflags & OPEN_FLAG_CREATE_PATHS))
 		{
-			auto const pathsep = dst.rfind(dst, PATHSEPCH);
+			auto const pathsep = dst.rfind(PATHSEPCH);
 			if (pathsep != std::string::npos)
 			{
 				// create the path up to the file

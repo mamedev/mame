@@ -13099,7 +13099,8 @@ chryglda                        // bootleg
 cmast91                         // (c) 1991 Dyna Electronics
 cmast92                         // (c) 1992 Dyna Electronics
 cmast97                         // (c) 1996 Dyna Electronics
-cmast99                         // 1999?
+cmast99                         // (c) 1999 Dyna Electronics
+cmast99b                        // bootleg
 cmaster                         // (c) 1991 Dyna Electronics
 cmasterb                        // (c) 1991 Dyna Electronics
 cmasterbv                       // (c) 1991 Dyna Electronics / Gerald Duhamel?
@@ -33737,7 +33738,7 @@ swyft                           //
 sym1                            // Synertek SYM-1
 
 @source:symbolics.cpp
-s3600                           // 
+s3670                           // 
 
 @source:sys2900.cpp
 sys2900                         // 

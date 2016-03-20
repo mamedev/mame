@@ -6,6 +6,13 @@
 
 **********************************************************************/
 
+// The Gender Adapter is not an official Sega product. It is produced by the
+// SMSPower website to permit to plug a cartridge on the expansion slot on any
+// SMS 1 model. This includes the Japanese SMS, which has FM sound, so it is
+// a way to get FM music of western cartridges that have FM code but were not
+// released in Japan. Some games have compatibility issues, confirmed on the
+// real hardware, when run plugged-in to the SMS expansion slot.
+
 #include "gender.h"
 
 

@@ -1004,7 +1004,7 @@ void namcos21_state::render_slave_output(UINT16 data)
 {
 	if( m_mpDspState->slaveOutputSize >= 4096 )
 	{
-		fatalerror( "FATAL ERROR: SLAVE OVERFLOW (0x%x)\n",m_mpDspState->slaveOutputBuffer[0]  );
+		fatalerror( "SLAVE OVERFLOW (0x%x)\n",m_mpDspState->slaveOutputBuffer[0]  );
 	}
 
 	/* append word to slave output buffer */

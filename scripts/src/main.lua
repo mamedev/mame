@@ -103,6 +103,9 @@ end
 	configuration { "mingw*" or "vs*" }
 		targetextension ".exe"
 
+	configuration { "rpi" }
+		targetextension ""
+
 	configuration { "asmjs" }
 		targetextension ".bc"  
 		if os.getenv("EMSCRIPTEN") then

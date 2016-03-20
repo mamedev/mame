@@ -443,7 +443,7 @@ public:
 
 	bool should_poll_devices(running_machine& machine) override
 	{
-		return sdl_event_manager::instance().app_has_mouse_focus() && input_enabled();
+		return sdl_event_manager::instance().has_focus() && input_enabled();
 	}
 
 	virtual void handle_event(SDL_Event &sdlevent) override

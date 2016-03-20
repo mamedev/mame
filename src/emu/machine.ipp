@@ -61,6 +61,7 @@ inline void running_machine::logerror(Format &&fmt, Params &&... args) const
 
 		// dump to the buffer
 		m_string_buffer.clear();
+		m_string_buffer.seekp(0);
 		util::stream_format(m_string_buffer, std::forward<Format>(fmt), std::forward<Params>(args)...);
 		m_string_buffer.put('\0');
 

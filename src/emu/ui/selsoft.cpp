@@ -1500,15 +1500,15 @@ float ui_menu_select_software::draw_left_panel(float x1, float y1, float x2, flo
 		x2 = x1 + 2.0f * UI_BOX_LR_BORDER;
 		y1 = origy1;
 		y2 = origy2;
-		line_height = mui.get_line_height();
-		float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
+		float space = x2 - x1;
+		float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
 		rgb_t fgcolor = UI_TEXT_COLOR;
 
 		// set left-right arrows dimension
 		float ar_x0 = 0.5f * (x2 + x1) - 0.5f * lr_arrow_width;
-		float ar_y0 = 0.5f * (y2 + y1) + 0.1f * line_height;
+		float ar_y0 = 0.5f * (y2 + y1) + 0.1f * space;
 		float ar_x1 = ar_x0 + lr_arrow_width;
-		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * line_height;
+		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
 
 		//machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 		mui.draw_outlined_box(container, x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
@@ -1524,15 +1524,15 @@ float ui_menu_select_software::draw_left_panel(float x1, float y1, float x2, flo
 	}
 	else
 	{
-		float line_height = mui.get_line_height();
-		float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
+		float space = x2 - x1;
+		float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
 		rgb_t fgcolor = UI_TEXT_COLOR;
 
 		// set left-right arrows dimension
 		float ar_x0 = 0.5f * (x2 + x1) - 0.5f * lr_arrow_width;
-		float ar_y0 = 0.5f * (y2 + y1) + 0.1f * line_height;
+		float ar_y0 = 0.5f * (y2 + y1) + 0.1f * space;
 		float ar_x1 = ar_x0 + lr_arrow_width;
-		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * line_height;
+		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
 
 		//machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 		mui.draw_outlined_box(container, x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
@@ -1885,17 +1885,17 @@ void ui_menu_select_software::arts_render(void *selectedref, float origx1, float
 void ui_menu_select_software::draw_right_panel(void *selectedref, float origx1, float origy1, float origx2, float origy2)
 {
 	ui_manager &mui = machine().ui();
-	float line_height = mui.get_line_height();
-	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
 	rgb_t fgcolor = UI_TEXT_COLOR;
 	bool hide = (ui_globals::panels_status == HIDE_RIGHT_PANEL || ui_globals::panels_status == HIDE_BOTH);
 	float x2 = (hide) ? origx2 : origx1 + 2.0f * UI_BOX_LR_BORDER;
+	float space = x2 - origx1;
+	float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
 
 	// set left-right arrows dimension
 	float ar_x0 = 0.5f * (x2 + origx1) - 0.5f * lr_arrow_width;
-	float ar_y0 = 0.5f * (origy2 + origy1) + 0.1f * line_height;
+	float ar_y0 = 0.5f * (origy2 + origy1) + 0.1f * space;
 	float ar_x1 = ar_x0 + lr_arrow_width;
-	float ar_y1 = 0.5f * (origy2 + origy1) + 0.9f * line_height;
+	float ar_y1 = 0.5f * (origy2 + origy1) + 0.9f * space;
 
 	//machine().ui().draw_outlined_box(container, origx1, origy1, origx2, origy2, UI_BACKGROUND_COLOR);
 	mui.draw_outlined_box(container, origx1, origy1, origx2, origy2, rgb_t(0xEF, 0x12, 0x47, 0x7B));

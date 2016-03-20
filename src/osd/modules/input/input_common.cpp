@@ -9,10 +9,8 @@
 //============================================================
 
 #include "input_module.h"
-#include "modules/osdmodule.h"
 #include "modules/lib/osdobj_common.h"
 
-#include <mutex>
 #include <memory>
 
 // MAME headers
@@ -200,7 +198,7 @@ keyboard_trans_table::keyboard_trans_table(std::unique_ptr<key_trans_entry[]> en
 	m_table_size = size;
 }
 
-int keyboard_trans_table::lookup_mame_index(const char *scode)
+int keyboard_trans_table::lookup_mame_index(const char *scode) const
 {
 	for (int i = 0; i < m_table_size; i++)
 	{
@@ -210,7 +208,7 @@ int keyboard_trans_table::lookup_mame_index(const char *scode)
 	return -1;
 }
 
-input_item_id keyboard_trans_table::lookup_mame_code(const char *scode)
+input_item_id keyboard_trans_table::lookup_mame_code(const char *scode) const
 {
 	int const index = lookup_mame_index(scode);
 	if (index >= 0)
@@ -222,7 +220,7 @@ input_item_id keyboard_trans_table::lookup_mame_code(const char *scode)
 // Windows specific lookup methods
 #if defined(OSD_WINDOWS)
 
-input_item_id keyboard_trans_table::map_di_scancode_to_itemid(int scancode)
+input_item_id keyboard_trans_table::map_di_scancode_to_itemid(int scancode) const
 {
 	int tablenum;
 
@@ -239,7 +237,7 @@ input_item_id keyboard_trans_table::map_di_scancode_to_itemid(int scancode)
 //  wininput_vkey_for_mame_code
 //============================================================
 
-int keyboard_trans_table::vkey_for_mame_code(input_code code)
+int keyboard_trans_table::vkey_for_mame_code(input_code code) const
 {
 	// only works for keyboard switches
 	if (code.device_class() == DEVICE_CLASS_KEYBOARD && code.item_class() == ITEM_CLASS_SWITCH)

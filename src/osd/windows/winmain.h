@@ -282,9 +282,9 @@ public:
 	void extract_video_config();
 
 	// windows osd specific
-	bool handle_input_event(input_event eventid, void *eventdata);
-	bool should_hide_mouse();
-	void poll_input(running_machine &machine);
+	bool handle_input_event(input_event eventid, void *eventdata) const;
+	bool should_hide_mouse() const;
+	void poll_input(running_machine &machine) const;
 
 	windows_options &options() { return m_options; }
 

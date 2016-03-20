@@ -97,6 +97,25 @@
   as NOT_WORKING till can figure out how can switch between games.
 
 
+  * Cherry Master '99 (V9B.00)
+
+  Inputs are hooked up as DIP switches for testing purposes.  You can access
+  some kind of palette test by momentarily flipping input 2-8 to On position.
+  You can access the input port test by flipping input 2-7 to On position while
+  the game boots (like other Cherry Master games).  All inputs are hooked up
+  correctly.
+
+  When not in the input test, the game appears to be stuck in a loop resetting
+  itself after initialising NVRAM.
+
+
+  * Cherry Master '99 (V9B.00 bootleg / hack)
+
+  Appears to be a bootleg/hack of the other Dyna set - NVRAM initialisation has
+  been changed from "DYNA QL-1 V9B.00" to "     QQ-1 V9B.0", very few other
+  program ROM changes besides hacking out the Dyna name everywhere.
+
+
   * Kkoj Noli
 
   kkuj nol-i / kkoj noli (better romanization).
@@ -186,7 +205,7 @@
   * Bingo (Wing)
 
   It has a different machine driver to support the different pos of gfx
-  layers. I strogly suspect there is a register to adjust the layer position.   
+  layers. I strogly suspect there is a register to adjust the layer position.
 
 
 ***************************************************************************/
@@ -699,7 +718,6 @@ static ADDRESS_MAP_START( cm_map, AS_PROGRAM, 8, goldstar_state )
 
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
-
 
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
@@ -1940,6 +1958,213 @@ static INPUT_PORTS_START( cmast91 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )              PORT_DIPLOCATION("DSW5:8")  /* normally Test Mode For Disp. Of Doll, but no whores in this set */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( cmast99 )
+	PORT_START("IN0") // called "PLAYER" in input test
+	PORT_DIPNAME( 0x01, 0x01, "0-1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "0-2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "0-3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "0-4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "0-5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "0-6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "0-7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "0-8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1") // called "COIN" in input test
+	PORT_DIPNAME( 0x01, 0x01, "1-1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "1-2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "1-3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "1-4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "1-5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "1-6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "1-7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "1-8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+
+	PORT_START("IN2") // called "TEST" in input test
+	PORT_DIPNAME( 0x01, 0x01, "2-1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "2-2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "2-3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "2-4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "2-5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "2-6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "2-7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "2-8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, "Game Min Bet" )              PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPSETTING(    0x03, "15" )
+	PORT_DIPSETTING(    0x02, "30" )
+	PORT_DIPSETTING(    0x01, "45" )
+	PORT_DIPSETTING(    0x00, "60" )
+	PORT_DIPNAME( 0x04, 0x04, "Double Mode" )               PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x00, "No (collect)" )
+	PORT_DIPSETTING(    0x04, "Yes (double)" )
+	PORT_DIPNAME( 0x18, 0x18, "Max Bet" )                   PORT_DIPLOCATION("DSW1:4,5")
+	PORT_DIPSETTING(    0x00, "15" )
+	PORT_DIPSETTING(    0x08, "30" )
+	PORT_DIPSETTING(    0x10, "60" )
+	PORT_DIPSETTING(    0x18, "99" )
+	PORT_DIPNAME( 0x20, 0x20, "Double Picture" )            PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x20, "Fruit" )
+	PORT_DIPSETTING(    0x00, "???" ) // not listed in manual
+	PORT_DIPNAME( 0x40, 0x40, "Payout Rate" )               PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "100" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:8") // not listed in manual
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x06, "Main Game Pay Rate" )        PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPSETTING(    0x00, "55%" )
+	PORT_DIPSETTING(    0x01, "60%" )
+	PORT_DIPSETTING(    0x02, "65%" )
+	PORT_DIPSETTING(    0x03, "70%" )
+	PORT_DIPSETTING(    0x04, "75%" )
+	PORT_DIPSETTING(    0x05, "80%" )
+	PORT_DIPSETTING(    0x06, "85%" )
+	PORT_DIPSETTING(    0x07, "90%" )
+	PORT_DIPNAME( 0x08, 0x08, "Double Up Game Pay Rate" )   PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPSETTING(    0x00, "60%" )
+	PORT_DIPSETTING(    0x08, "70%" )
+	PORT_DIPNAME( 0x30, 0x20, "Coin In Rate" )              PORT_DIPLOCATION("DSW2:5,6")
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x20, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x10, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin/50 Credits" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Key In Rate" )               PORT_DIPLOCATION("DSW2:7,8")
+	PORT_DIPSETTING(    0xc0, "1 Coin/100 Credits" )
+	PORT_DIPSETTING(    0x80, "1 Coin/110 Credits" )
+	PORT_DIPSETTING(    0x40, "1 Coin/120 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin/500 Credits" )
+
+	PORT_START("DSW3") // manual doesn't have explicit defaults, so taking first listed setting for each switch as default
+	PORT_DIPNAME( 0x01, 0x00, "Bonus 2 Poll Mode" )                                         PORT_DIPLOCATION("DSW3:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x02, 0x00, "Bonus 3 Poll Mode" )                                         PORT_DIPLOCATION("DSW3:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x04, 0x04, "???" )                                                       PORT_DIPLOCATION("DSW3:3") // no name given in manual, but settings listed
+	PORT_DIPSETTING(    0x04, "30-40-50" )
+	PORT_DIPSETTING(    0x00, "40-55-70" )
+	PORT_DIPNAME( 0x08, 0x08, "When Watermelon Appear in Center Credit of Bonus Up Mode" )  PORT_DIPLOCATION("DSW3:4")
+	PORT_DIPSETTING(    0x08, "1-3-5" )
+	PORT_DIPSETTING(    0x00, "2-4-6" )
+	PORT_DIPNAME( 0x10, 0x10, "When Bet, Credit of Bonus Up Mode" )                         PORT_DIPLOCATION("DSW3:5")
+	PORT_DIPSETTING(    0x10, "1-3-5" )
+	PORT_DIPSETTING(    0x00, "2-4-6" )
+	PORT_DIPNAME( 0x20, 0x20, "The Max Credit of Bonus 1-3" )                               PORT_DIPLOCATION("DSW3:6")
+	PORT_DIPSETTING(    0x20, "999-1999-3999" )
+	PORT_DIPSETTING(    0x00, "2000-3000-4500" )
+	PORT_DIPNAME( 0x40, 0x40, "Start Up Credit of Bonus 1-3" )                              PORT_DIPLOCATION("DSW3:7")
+	PORT_DIPSETTING(    0x00, "330-660-990" )
+	PORT_DIPSETTING(    0x40, "499-999-1999" )
+	PORT_DIPNAME( 0x80, 0x80, "Start Up Credit of Extra Bonus" )                            PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPSETTING(    0x80, "330" )
+	PORT_DIPSETTING(    0x00, "550" )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x07, 0x00, "Max Pay Credit Limit" )  PORT_DIPLOCATION("DSW4:1,2,3")
+	PORT_DIPSETTING(    0x07,   "5,000" )
+	PORT_DIPSETTING(    0x06,  "10,000" )
+	PORT_DIPSETTING(    0x05,  "15,000" )
+	PORT_DIPSETTING(    0x04,  "20,000" )
+	PORT_DIPSETTING(    0x03,  "30,000" )
+	PORT_DIPSETTING(    0x02,  "40,000" )
+	PORT_DIPSETTING(    0x01,  "50,000" )
+	PORT_DIPSETTING(    0x00, "100,000" )
+	PORT_DIPNAME( 0x08, 0x08, "Display Credit Limit" )  PORT_DIPLOCATION("DSW4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Add On Bonus Poll" )     PORT_DIPLOCATION("DSW4:5")
+	PORT_DIPSETTING(    0x00, "6-3-1" )
+	PORT_DIPSETTING(    0x10, "9-5-1" )
+	PORT_DIPNAME( 0x20, 0x20, "Add On Bonus Min Bet" )  PORT_DIPLOCATION("DSW4:6")
+	PORT_DIPSETTING(    0x20, "16" )
+	PORT_DIPSETTING(    0x00, "32" )
+	PORT_DIPNAME( 0x40, 0x40, "Game Speed" )            PORT_DIPLOCATION("DSW4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Fast" )
+	PORT_DIPNAME( 0x80, 0x80, "Alarm Sound" )           PORT_DIPLOCATION("DSW4:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW5")
+	PORT_DIPNAME( 0x03, 0x03, "Key In Limit" )                          PORT_DIPLOCATION("DSW5:1,2")
+	PORT_DIPSETTING(    0x00,  "1,000" )
+	PORT_DIPSETTING(    0x01,  "5,000" )
+	PORT_DIPSETTING(    0x02, "10,000" )
+	PORT_DIPSETTING(    0x03, "20,000" )
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Girl" )                            PORT_DIPLOCATION("DSW5:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x38, 0x38, "Credit Earned, Profit Table Set Zero" )  PORT_DIPLOCATION("DSW5:4,5,6")
+	PORT_DIPSETTING(    0x00,  "20,000" )
+	PORT_DIPSETTING(    0x08,  "30,000" )
+	PORT_DIPSETTING(    0x10,  "40,000" )
+	PORT_DIPSETTING(    0x18,  "50,000" )
+	PORT_DIPSETTING(    0x20,  "70,000" )
+	PORT_DIPSETTING(    0x28, "100,000" )
+	PORT_DIPSETTING(    0x30, "200,000" )
+	PORT_DIPSETTING(    0x38, "990,000" )
+	PORT_DIPNAME( 0x40, 0x00, "Bonus 2 Poll Rate" )                     PORT_DIPLOCATION("DSW5:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x80, 0x00, "Bonus 3 Poll Rate" )                     PORT_DIPLOCATION("DSW5:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 INPUT_PORTS_END
 
 
@@ -7446,7 +7671,7 @@ static MACHINE_CONFIG_START( cmast91, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cm_map)
 	MCFG_CPU_IO_MAP(cmast91_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -7469,10 +7694,10 @@ static MACHINE_CONFIG_START( cmast91, goldstar_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cmast91)
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,cmast91)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state, cmast91)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -7481,6 +7706,7 @@ static MACHINE_CONFIG_START( cmast91, goldstar_state )
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
+
 
 
 INTERRUPT_GEN_MEMBER(wingco_state::masked_irq)
@@ -8103,21 +8329,21 @@ MACHINE_CONFIG_END
 
   EPROM:
 
-	Name:  1
-	File:  gs1.bin
-	Type:  TMS JL 27C010A-12 LX78AC96P
-	
-	Name:  2
-	File:  gs2.bin
-	Type:  TMS JL 27C010A-10 LX73A5J4P
-	
-	Nome:  3
-	File:  gs3.bin
-	Type:  TMS JL 29C010A-12 LX78AC96P
-	
-	Nome:  4
-	File:  gs4.bin
-	Type:  TMS JL 27C010A-10 LX73A5J4P
+    Name:  1
+    File:  gs1.bin
+    Type:  TMS JL 27C010A-12 LX78AC96P
+
+    Name:  2
+    File:  gs2.bin
+    Type:  TMS JL 27C010A-10 LX73A5J4P
+
+    Nome:  3
+    File:  gs3.bin
+    Type:  TMS JL 29C010A-12 LX78AC96P
+
+    Nome:  4
+    File:  gs4.bin
+    Type:  TMS JL 27C010A-10 LX73A5J4P
 
   Other IC's on MB
 
@@ -9429,20 +9655,15 @@ ROM_END
 
 ROM_START( cmast99 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cm99-041-8.u81", 0x0000, 0x1000, CRC(e0872d9f) SHA1(6d8f5e09e5c9daf834d5c74434eae86e5dd7e194) )
+	ROM_LOAD( "cm99-041-8.u81", 0x0000, 0x1000, CRC(5fb0800e) SHA1(14d316b7b89340c5b5c9fdd0b43d5810513b74d6) )
 	ROM_CONTINUE(0x4000,0x1000)
 	ROM_CONTINUE(0x3000,0x1000)
 	ROM_CONTINUE(0x7000,0x1000)
 	ROM_CONTINUE(0x1000,0x1000)
-	ROM_CONTINUE(0x6000,0x1000) /* maybe wrong */
+	ROM_CONTINUE(0x6000,0x1000)
 	ROM_CONTINUE(0x2000,0x1000)
-	ROM_CONTINUE(0x5000,0x1000) /* maybe wrong */
-	ROM_CONTINUE(0x8000,0x1000)
-	ROM_CONTINUE(0x9000,0x1000) /* maybe wrong */
-	ROM_CONTINUE(0xa000,0x1000) /* maybe wrong */
-	ROM_CONTINUE(0xb000,0x1000) /* maybe wrong */
-	ROM_CONTINUE(0xc000,0x1000) /* maybe wrong */
-	ROM_CONTINUE(0xd000,0x3000) /* padding that isn't visible to CPU (RAM mapped here) */
+	ROM_CONTINUE(0x5000,0x1000)
+	ROM_CONTINUE(0x8000,0x8000)
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "cm99-041-7.u16", 0x00000, 0x8000, CRC(69e2aef2) SHA1(195faec239734650dcd777d55a8da84e3a0ed50c) )
@@ -9458,7 +9679,43 @@ ROM_START( cmast99 )
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_FILL( 0x0000, 0x10000, 0xff ) // U53 (girl bitmaps) not populated
 
-	/* proms taken from cmv4, probably wrong  */
+	/* proms taken from cmv4, probably wrong; U79? and U84 known to be identical to Cherry Master 89 */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) BAD_DUMP )
+	ROM_LOAD( "82s129.u70", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) BAD_DUMP )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) BAD_DUMP )
+ROM_END
+
+
+ROM_START( cmast99b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cm99b-041-8.u81", 0x0000, 0x1000, CRC(e0872d9f) SHA1(6d8f5e09e5c9daf834d5c74434eae86e5dd7e194) )
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000)
+	ROM_CONTINUE(0x5000,0x1000)
+	ROM_CONTINUE(0x8000,0x8000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "cm99-041-7.u16", 0x00000, 0x8000, CRC(69e2aef2) SHA1(195faec239734650dcd777d55a8da84e3a0ed50c) )
+	ROM_LOAD( "cm99-041-6.u11", 0x08000, 0x8000, CRC(900f36f5) SHA1(0fd41f8c8cb2f7940b653a1fad93df2e3f28a34b) )
+	ROM_LOAD( "cm99-041-5.u4",  0x10000, 0x8000, CRC(3e465e38) SHA1(847dc27e45d495cb924b3fd5ce8e68a1cb83ffc8) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "cm99-041-4.u15", 0x0000, 0x2000, CRC(6b870b29) SHA1(d65f24817d9d45c148cb857439b46e9e75dabfe7) )
+	ROM_LOAD( "cm99-041-3.u10", 0x2000, 0x2000, CRC(8a0b205f) SHA1(3afea0464b793526bf23610cac6736a31edc7ec2) )
+	ROM_LOAD( "cm99-041-2.u14", 0x4000, 0x2000, CRC(c84dba45) SHA1(ab4ac891a23d6b9a216df046d516e868c77e8a36) )
+	ROM_LOAD( "cm99-041-1.u9",  0x6000, 0x2000, CRC(44046c31) SHA1(c9703ce2371cf86bc597e5fdb9c0d4dd6d91f7dc) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_FILL( 0x0000, 0x10000, 0xff ) // U53 (girl bitmaps) not populated
+
+	/* proms taken from cmv4, probably wrong; U79? and U84 known to be identical to Cherry Master 89 */
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) BAD_DUMP )
 	ROM_LOAD( "82s129.u70", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) BAD_DUMP )
@@ -10218,9 +10475,9 @@ ROM_END
 
 /*  Lucky Bar
     Unknown reels game based on Wing's Lucky 8 Lines.
-	W-4 hardware
+    W-4 hardware
 
-	Daughterboard with Z80 + program ROM + MC68705P3S MCU at location ic4 (14b)
+    Daughterboard with Z80 + program ROM + MC68705P3S MCU at location ic4 (14b)
 
     Game seems to be meant for progressive modes...
 */
@@ -10257,11 +10514,11 @@ ROM_END
 /*  Cherry Angel
     (W-4 / CB3 hardware)
 
-	Daughterboard with Z80 + program ROM + TTL at location ic4 (14b)
+    Daughterboard with Z80 + program ROM + TTL at location ic4 (14b)
 
-	Encryption pattern:
-	For each 0x100 block:
-	00-7f : 22 2a 82 2a...
+    Encryption pattern:
+    For each 0x100 block:
+    00-7f : 22 2a 82 2a...
     80-ff : a8 88 28 88...
 */
 ROM_START( chryangla )
@@ -13886,7 +14143,6 @@ GAMEL( 1991, cmastere,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,     
 GAMEL( 1991, cmasterf,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 7)",           0,                 layout_cmasterb )
 GAMEL( 1991, cmasterg,  cmaster,  cm,       cmasterg, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 8, V4-B-)",    0,                 layout_cmasterb )
 GAMEL( 1991, cmasterh,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.10)",                  0,                 layout_cmasterb )
-GAME(  199?, cmast99,   0,        cm,       cmv4,     cmaster_state,  cmv4,      ROT0, "????",              "Cherry Master '99",                           MACHINE_NOT_WORKING )
 
 
 GAMEL( 1991, tonypok,   0,        cm,       tonypok,  cmaster_state,  tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
@@ -13897,6 +14153,8 @@ GAME(  1993, pkrmasta,  jkrmast,  pkrmast,  pkrmast,  driver_device,  0,        
 
 GAME(  1991, cmast91,   0,        cmast91,  cmast91,  goldstar_state, cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
 GAME(  1992, cmast92,   0,        cmast91,  cmast91,  goldstar_state, cmast91,   ROT0, "Dyna",              "Cherry Master '92",                           MACHINE_NOT_WORKING ) // no gfx roms are dumped
+GAME(  1999, cmast99,   0,        cm,       cmast99,  cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING )
+GAME(  1999, cmast99b,  cmast99,  cm,       cmast99,  cmaster_state,  cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )
 
 
 // --- Wing W-4 hardware ---
