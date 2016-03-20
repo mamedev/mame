@@ -40,14 +40,11 @@ delegate_mfp::raw_mfp_data delegate_mfp::s_null_mfp = { {0 }};
 delegate_generic_function delegate_mfp::convert_to_generic(delegate_generic_class *&object) const
 {
 #if defined(__arm__) || defined(__ARMEL__) || defined(__aarch64__)
-	// apply the "this" delta to the object first
-	object = reinterpret_cast<delegate_generic_class *>(reinterpret_cast<std::uint8_t *>(object));
-
-	// if the low bit of the vtable index is clear, then it is just a raw function pointer
-	if (m_this_delta==0) {
+	if ((m_this_delta & 1) == 0) {
 #if defined(LOG_DELEGATES)
 		printf("Calculated Addr = %08x\n", (uintptr_t)(void*)(m_function));
 #endif
+		object = reinterpret_cast<delegate_generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 		return reinterpret_cast<delegate_generic_function>(m_function);
 	}
 	object = reinterpret_cast<delegate_generic_class *>(reinterpret_cast<std::uint8_t *>(object));
