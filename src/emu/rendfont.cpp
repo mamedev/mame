@@ -132,7 +132,25 @@ render_font::render_font(render_manager &manager, const char *filename)
 
 	// if this is an OSD font, we're done
 	if (filename != nullptr)
-	{
+	{		
+		// attempt to open the cached version of the font
+		{
+			emu_file cachefile(manager.machine().options().font_path(), OPEN_FLAG_READ);
+			osd_file::error filerr = cachefile.open(filename);
+			if (filerr == osd_file::error::NONE)
+			{
+				// if we have a cached version, load it
+				bool result = load_cached(cachefile, 0);
+
+				// if that worked, we're done
+				if (result)
+				{
+					render_font_command_glyph();
+					return;
+				}
+			}
+		}
+	
 		m_osdfont = manager.machine().osd().font_alloc();
 		if (m_osdfont)
 		{
