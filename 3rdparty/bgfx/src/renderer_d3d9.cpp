@@ -261,6 +261,7 @@ namespace bgfx { namespace d3d9
 		{ D3DFMT_NULL, D3DUSAGE_RENDERTARGET, D3DRTYPE_SURFACE, false },
 		{ D3DFMT_RESZ, D3DUSAGE_RENDERTARGET, D3DRTYPE_SURFACE, false },
 		{ D3DFMT_RAWZ, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, false },
+		{ D3DFMT_ATOC, 0,                     D3DRTYPE_SURFACE, false },
 	};
 
 	static const GUID IID_IDirect3D9         = { 0x81bdcbca, 0x64d4, 0x426d, { 0xae, 0x8d, 0xad, 0x1, 0x47, 0xf4, 0x27, 0x5c } };
@@ -288,9 +289,10 @@ namespace bgfx { namespace d3d9
 			, m_initialized(false)
 			, m_amd(false)
 			, m_nvidia(false)
+			, m_atocSupport(false)
 			, m_instancingSupport(false)
-			, m_timerQuerySupport(false)
 			, m_occlusionQuerySupport(false)
+			, m_timerQuerySupport(false)
 			, m_rtMsaa(false)
 		{
 		}
@@ -374,15 +376,18 @@ namespace bgfx { namespace d3d9
 			&&  NULL != Direct3DCreate9Ex)
 			{
 				Direct3DCreate9Ex(D3D_SDK_VERSION, &m_d3d9ex);
-				HRESULT hr = m_d3d9ex->QueryInterface(IID_IDirect3D9, (void**)&m_d3d9);
-				if (FAILED(hr) )
+				if (NULL != m_d3d9ex)
 				{
-					BX_TRACE("Failed to query D3D9 interface 0x%08x.", hr);
-					DX_RELEASE(m_d3d9ex, 0);
-				}
-				else
-				{
-					m_pool = D3DPOOL_DEFAULT;
+					HRESULT hr = m_d3d9ex->QueryInterface(IID_IDirect3D9, (void**)&m_d3d9);
+					if (FAILED(hr) )
+					{
+						BX_TRACE("Failed to query D3D9 interface 0x%08x.", hr);
+						DX_RELEASE(m_d3d9ex, 0);
+					}
+					else
+					{
+						m_pool = D3DPOOL_DEFAULT;
+					}
 				}
 			}
 
@@ -598,6 +603,10 @@ namespace bgfx { namespace d3d9
 					|| (m_caps.VertexShaderVersion >= D3DVS_VERSION(3, 0) )
 					;
 
+				m_atocSupport = false
+					|| s_extendedFormats[ExtendedFormat::Atoc].m_supported
+					;
+
 				if (m_amd
 				&&  s_extendedFormats[ExtendedFormat::Inst].m_supported)
 				{   // AMD only
@@ -613,7 +622,8 @@ namespace bgfx { namespace d3d9
 				s_textureFormat[TextureFormat::BC4].m_fmt = s_extendedFormats[ExtendedFormat::Ati1].m_supported ? D3DFMT_ATI1 : D3DFMT_UNKNOWN;
 				s_textureFormat[TextureFormat::BC5].m_fmt = s_extendedFormats[ExtendedFormat::Ati2].m_supported ? D3DFMT_ATI2 : D3DFMT_UNKNOWN;
 
-				g_caps.supported |= m_instancingSupport ? BGFX_CAPS_INSTANCING : 0;
+				g_caps.supported |= m_instancingSupport ? BGFX_CAPS_INSTANCING        : 0;
+				g_caps.supported |= m_atocSupport       ? BGFX_CAPS_ALPHA_TO_COVERAGE : 0;
 			}
 
 			for (uint32_t ii = 0; ii < TextureFormat::Count; ++ii)
@@ -1004,8 +1014,29 @@ namespace bgfx { namespace d3d9
 		void resizeTexture(TextureHandle _handle, uint16_t _width, uint16_t _height) BX_OVERRIDE
 		{
 			TextureD3D9& texture = m_textures[_handle.idx];
-			texture.m_width  = _width;
-			texture.m_height = _height;
+
+			uint32_t size = sizeof(uint32_t) + sizeof(TextureCreate);
+			const Memory* mem = alloc(size);
+
+			bx::StaticMemoryBlockWriter writer(mem->data, mem->size);
+			uint32_t magic = BGFX_CHUNK_MAGIC_TEX;
+			bx::write(&writer, magic);
+
+			TextureCreate tc;
+			tc.m_width   = _width;
+			tc.m_height  = _height;
+			tc.m_sides   = 0;
+			tc.m_depth   = 0;
+			tc.m_numMips = 1;
+			tc.m_format  = TextureFormat::Enum(texture.m_requestedFormat);
+			tc.m_cubeMap = false;
+			tc.m_mem     = NULL;
+			bx::write(&writer, tc);
+
+			texture.destroy();
+			texture.create(mem, texture.m_flags, 0);
+
+			release(mem);
 		}
 
 		void overrideInternal(TextureHandle _handle, uintptr_t _ptr) BX_OVERRIDE
@@ -1260,7 +1291,12 @@ namespace bgfx { namespace d3d9
 				? m_caps.MaxAnisotropy
 				: 1
 				;
-			uint32_t flags = _resolution.m_flags & ~(BGFX_RESET_HMD_RECENTER | BGFX_RESET_MAXANISOTROPY);
+			uint32_t flags = _resolution.m_flags & ~(0
+				| BGFX_RESET_HMD_RECENTER
+				| BGFX_RESET_MAXANISOTROPY
+				| BGFX_RESET_DEPTH_CLAMP
+				| BGFX_RESET_SUSPEND
+				);
 
 			if (m_resolution.m_width  != _resolution.m_width
 			||  m_resolution.m_height != _resolution.m_height
@@ -2040,9 +2076,10 @@ namespace bgfx { namespace d3d9
 		bool m_initialized;
 		bool m_amd;
 		bool m_nvidia;
+		bool m_atocSupport;
 		bool m_instancingSupport;
-		bool m_timerQuerySupport;
 		bool m_occlusionQuerySupport;
+		bool m_timerQuerySupport;
 
 		D3DFORMAT m_fmtDepth;
 
@@ -3818,6 +3855,11 @@ namespace bgfx { namespace d3d9
 						DX_CHECK(device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, (newFlags&BGFX_STATE_MSAA) == BGFX_STATE_MSAA) );
 					}
 
+					if (BGFX_STATE_LINEAA & changedFlags)
+					{
+						DX_CHECK(m_device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, !!(newFlags&BGFX_STATE_LINEAA) ) );
+					}
+
 					if ( (BGFX_STATE_ALPHA_WRITE|BGFX_STATE_RGB_WRITE) & changedFlags)
 					{
 						uint32_t writeEnable = (newFlags&BGFX_STATE_ALPHA_WRITE) ? D3DCOLORWRITEENABLE_ALPHA : 0;
@@ -3825,11 +3867,25 @@ namespace bgfx { namespace d3d9
 						DX_CHECK(device->SetRenderState(D3DRS_COLORWRITEENABLE, writeEnable) );
 					}
 
-					if ( (BGFX_STATE_BLEND_MASK|BGFX_STATE_BLEND_EQUATION_MASK) & changedFlags
+					if ( ( (0
+						| BGFX_STATE_BLEND_MASK
+						| BGFX_STATE_BLEND_EQUATION_MASK
+						| BGFX_STATE_BLEND_ALPHA_TO_COVERAGE
+						) & changedFlags)
 					||  blendFactor != draw.m_rgba)
 					{
 						bool enabled = !!(BGFX_STATE_BLEND_MASK & newFlags);
 						DX_CHECK(device->SetRenderState(D3DRS_ALPHABLENDENABLE, enabled) );
+
+						if (m_atocSupport
+						&&  BGFX_STATE_BLEND_ALPHA_TO_COVERAGE & changedFlags)
+						{
+							DX_CHECK(m_device->SetRenderState(D3DRS_ADAPTIVETESS_Y
+								, !!(newFlags&BGFX_STATE_BLEND_ALPHA_TO_COVERAGE)
+								? D3DFMT_ATOC
+								: 0
+								) );
+						}
 
 						if (enabled)
 						{

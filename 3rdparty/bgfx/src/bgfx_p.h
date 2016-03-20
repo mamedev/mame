@@ -88,6 +88,9 @@ namespace bgfx
 
 	void dbgPrintfVargs(const char* _format, va_list _argList);
 	void dbgPrintf(const char* _format, ...);
+
+	inline bool operator==(const VertexDeclHandle& _lhs, const VertexDeclHandle& _rhs) { return _lhs.idx == _rhs.idx; }
+	inline bool operator==(const UniformHandle& _lhs,    const UniformHandle&    _rhs) { return _lhs.idx == _rhs.idx; }
 }
 
 #define _BX_TRACE(_format, ...) \
@@ -134,9 +137,11 @@ namespace bgfx
 #include <bx/allocator.h>
 #include <bx/string.h>
 #include <bx/os.h>
+#include <bx/maputil.h>
 
 #include <bgfx/bgfxplatform.h>
 #include "image.h"
+#include "shader.h"
 
 #define BGFX_CHUNK_MAGIC_CSH BX_MAKEFOURCC('C', 'S', 'H', 0x2)
 #define BGFX_CHUNK_MAGIC_FSH BX_MAKEFOURCC('F', 'S', 'H', 0x4)
@@ -312,7 +317,6 @@ namespace bgfx
 	struct TextureCreate
 	{
 		TextureFormat::Enum m_format;
-		uint32_t m_flags;
 		uint16_t m_width;
 		uint16_t m_height;
 		uint16_t m_sides;
@@ -1890,6 +1894,8 @@ namespace bgfx
 				}
 			}
 
+			bx::mapRemove(m_vertexDeclMap, declHandle);
+
 			return declHandle;
 		}
 
@@ -2265,6 +2271,7 @@ namespace bgfx
 			{
 				CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::DestroyVertexDecl);
 				cmdbuf.write(declHandle);
+				m_render->free(declHandle);
 			}
 
 			m_vertexBufferHandle.free(_handle.idx);
@@ -2553,10 +2560,11 @@ namespace bgfx
 			DynamicVertexBuffer& dvb = m_dynamicVertexBuffers[_handle.idx];
 
 			VertexDeclHandle declHandle = m_declRef.release(dvb.m_handle);
-			if (invalidHandle != declHandle.idx)
+			if (isValid(declHandle) )
 			{
 				CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::DestroyVertexDecl);
 				cmdbuf.write(declHandle);
+				m_render->free(declHandle);
 			}
 
 			if (0 != (dvb.m_flags & BGFX_BUFFER_COMPUTE_WRITE) )
@@ -3037,7 +3045,7 @@ namespace bgfx
 					hash |= pr.m_fsh.idx << 16;
 				}
 
-				m_programHashMap.erase(m_programHashMap.find(hash) );
+				bx::mapRemove(m_programHashMap, hash);
 			}
 		}
 
@@ -3376,14 +3384,7 @@ namespace bgfx
 
 			if (0 == refs)
 			{
-				for (UniformHashMap::iterator it = m_uniformHashMap.begin(), itEnd = m_uniformHashMap.end(); it != itEnd; ++it)
-				{
-					if (it->second.idx == _handle.idx)
-					{
-						m_uniformHashMap.erase(it);
-						break;
-					}
-				}
+				bx::mapRemove(m_uniformHashMap, _handle);
 
 				CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::DestroyUniform);
 				cmdbuf.write(_handle);
