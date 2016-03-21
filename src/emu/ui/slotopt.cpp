@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-    ui/slotopt.c
+    ui/slotopt.cpp
 
     Internal menu for the slot options.
 

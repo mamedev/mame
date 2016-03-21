@@ -29,7 +29,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 h63484_device::h63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, H63484, "HD63484 CRTC (rewrite)", tag, owner, clock, "h63484", __FILE__),
+	: device_t(mconfig, H63484, "HD63484 CRTC", tag, owner, clock, "hd63484", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_ar(0),
@@ -1913,7 +1913,8 @@ void h63484_device::video_registers_w(int offset)
 
 READ16_MEMBER( h63484_device::status_r )
 {
-	return m_sr;
+	// kothello is coded so that upper byte of this should be 0xff (tests with jc opcode). Maybe it's just unconnected?
+	return m_sr | 0xff00;
 }
 
 READ16_MEMBER( h63484_device::data_r )

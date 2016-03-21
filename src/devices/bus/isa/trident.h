@@ -16,7 +16,7 @@ class trident_vga_device :  public svga_device
 {
 public:
 	// construction/destruction
-	trident_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	trident_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	virtual READ8_MEMBER(port_03c0_r) override;
 	virtual WRITE8_MEMBER(port_03c0_w) override;
@@ -113,6 +113,7 @@ protected:
 		INT16 accel_mem_y;
 		UINT32 accel_transfer;
 	} tri;
+	UINT8 m_version;
 private:
 	UINT8 trident_seq_reg_read(UINT8 index);
 	void trident_seq_reg_write(UINT8 index, UINT8 data);
@@ -146,8 +147,20 @@ private:
 	UINT32 handle_rop(UINT32 src, UINT32 dst);
 };
 
+class tgui9860_device : public trident_vga_device
+{
+public:
+	tgui9860_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class tvga9000_device : public trident_vga_device
+{
+public:
+	tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
 
 // device type definition
 extern const device_type TRIDENT_VGA;
+extern const device_type TVGA9000_VGA;
 
 #endif /* TRIDENT_H_ */

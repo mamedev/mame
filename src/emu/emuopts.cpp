@@ -568,8 +568,8 @@ bool emu_options::parse_one_ini(const char *basename, int priority, std::string 
 
 	// open the file; if we fail, that's ok
 	emu_file file(ini_path(), OPEN_FLAG_READ);
-	file_error filerr = file.open(basename, ".ini");
-	if (filerr != FILERR_NONE)
+	osd_file::error filerr = file.open(basename, ".ini");
+	if (filerr != osd_file::error::NONE)
 		return false;
 
 	// parse the file

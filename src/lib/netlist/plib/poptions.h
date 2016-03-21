@@ -80,7 +80,7 @@ public:
 	pstring operator ()() { return m_val; }
 private:
 	pstring m_val;
-	pstring_list_t m_limit;
+	pstring_vector_t m_limit;
 };
 
 class poption_bool : public poption
@@ -127,7 +127,7 @@ public:
 		int i=0;
 		while (o[i] != NULL)
 		{
-			m_opts.add(o[i]);
+			m_opts.push_back(o[i]);
 			i++;
 		}
 	}
@@ -139,7 +139,7 @@ public:
 
 	void register_option(poption *opt)
 	{
-		m_opts.add(opt);
+		m_opts.push_back(opt);
 	}
 
 	int parse(int argc, char *argv[])
@@ -222,7 +222,7 @@ private:
 		return NULL;
 	}
 
-	plist_t<poption *> m_opts;
+	pvector_t<poption *> m_opts;
 	pstring m_app;
 };
 

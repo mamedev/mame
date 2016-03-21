@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-    ui/videoopt.c
+    ui/videoopt.cpp
 
     Internal menus for video options
 

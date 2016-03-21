@@ -607,13 +607,8 @@ void sdl_window_info::update_cursor_state()
 	// the possibility of losing control
 	if (!(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
 	{
-		//FIXME: SDL1.3: really broken: the whole SDL code
-		//       will only work correct with relative mouse movements ...
-#ifdef USE_OLD_SDL_INPUT
-		bool should_hide_mouse = sdlinput_should_hide_mouse();
-#else
 		bool should_hide_mouse = downcast<sdl_osd_interface&>(machine().osd()).should_hide_mouse();
-#endif
+
 		if (!fullscreen() && !should_hide_mouse)
 		{
 			SDL_ShowCursor(SDL_ENABLE);
@@ -727,12 +722,7 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_video_window_destroy_wt )
 	}
 	SDL_DestroyWindow(window->sdl_window());
 	// release all keys ...
-#ifdef USE_OLD_SDL_INPUT
-	sdlinput_release_keys();
-#else
 	downcast<sdl_osd_interface &>(window->machine().osd()).release_keys();
-#endif
-
 
 	osd_free(wp);
 	return nullptr;
@@ -1146,11 +1136,7 @@ OSDWORK_CALLBACK( sdl_window_info::draw_video_contents_wt )
 	ASSERT_REDRAW_THREAD();
 
 	// Some configurations require events to be polled in the worker thread
-#ifdef USE_OLD_SDL_INPUT
-	sdlinput_process_events_buf();
-#else
 	downcast< sdl_osd_interface& >(window->machine().osd()).process_events_buf();
-#endif
 
 	// Check whether window has vector screens
 

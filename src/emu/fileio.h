@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __FILEIO_H__
-#define __FILEIO_H__
+#ifndef MAME_EMU_FILEIO_H
+#define MAME_EMU_FILEIO_H
 
 #include "corefile.h"
 #include "hash.h"
@@ -26,11 +26,7 @@
 //**************************************************************************
 
 // forward declarations
-struct zip_file_header;
-struct zip_file;
-
-struct _7z_file_header;
-struct _7z_file;
+namespace util { class archive_file; }
 
 // ======================> path_iterator
 
@@ -105,20 +101,20 @@ public:
 	void set_restrict_to_mediapath(bool rtmp = true) { m_restrict_to_mediapath = rtmp; }
 
 	// open/close
-	file_error open(const char *name);
-	file_error open(const char *name1, const char *name2);
-	file_error open(const char *name1, const char *name2, const char *name3);
-	file_error open(const char *name1, const char *name2, const char *name3, const char *name4);
-	file_error open(const char *name, UINT32 crc);
-	file_error open(const char *name1, const char *name2, UINT32 crc);
-	file_error open(const char *name1, const char *name2, const char *name3, UINT32 crc);
-	file_error open(const char *name1, const char *name2, const char *name3, const char *name4, UINT32 crc);
-	file_error open_next();
-	file_error open_ram(const void *data, UINT32 length);
+	osd_file::error open(const char *name);
+	osd_file::error open(const char *name1, const char *name2);
+	osd_file::error open(const char *name1, const char *name2, const char *name3);
+	osd_file::error open(const char *name1, const char *name2, const char *name3, const char *name4);
+	osd_file::error open(const char *name, UINT32 crc);
+	osd_file::error open(const char *name1, const char *name2, UINT32 crc);
+	osd_file::error open(const char *name1, const char *name2, const char *name3, UINT32 crc);
+	osd_file::error open(const char *name1, const char *name2, const char *name3, const char *name4, UINT32 crc);
+	osd_file::error open_next();
+	osd_file::error open_ram(const void *data, UINT32 length);
 	void close();
 
 	// control
-	file_error compress(int compress);
+	osd_file::error compress(int compress);
 
 	// position
 	int seek(INT64 offset, int whence);
@@ -148,13 +144,9 @@ private:
 	bool compressed_file_ready(void);
 
 	// internal helpers
-	file_error attempt_zipped();
-	file_error load_zipped_file();
-	bool zip_filename_match(const zip_file_header &header, const std::string &filename);
-	bool zip_header_is_path(const zip_file_header &header);
-
-	file_error attempt__7zped();
-	file_error load__7zped_file();
+	osd_file::error attempt_zipped();
+	osd_file::error attempt__7zped();
+	osd_file::error load_zipped_file();
 
 	// internal state
 	std::string     m_filename;                     // original filename provided
@@ -166,17 +158,12 @@ private:
 	UINT32          m_openflags;                    // flags we used for the open
 	hash_collection m_hashes;                       // collection of hashes
 
-	zip_file *      m_zipfile;                      // ZIP file pointer
+	std::unique_ptr<util::archive_file> m_zipfile;  // ZIP file pointer
 	dynamic_buffer  m_zipdata;                      // ZIP file data
 	UINT64          m_ziplength;                    // ZIP file length
 
-	_7z_file *      m__7zfile;                      // 7Z file pointer
-	dynamic_buffer  m__7zdata;                      // 7Z file data
-	UINT64          m__7zlength;                    // 7Z file length
-
 	bool            m_remove_on_close;              // flag: remove the file when closing
-	bool            m_restrict_to_mediapath;    // flag: restrict to paths inside the media-path
+	bool            m_restrict_to_mediapath;        // flag: restrict to paths inside the media-path
 };
 
-
-#endif  /* __FILEIO_H__ */
+#endif // MAME_EMU_FILEIO_H

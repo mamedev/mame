@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert, R. Belmont
+// copyright-holders:Olivier Galibert, R. Belmont, Vas Crabb
 /*
  * font_osx.c
  *
@@ -10,14 +10,11 @@
 
 #ifdef SDLMAME_MACOSX
 
-#include <Carbon/Carbon.h>
-
 #include "corealloc.h"
 #include "fileio.h"
 
-#define POINT_SIZE 144.0
-#define EXTRA_HEIGHT 1.0
-#define EXTRA_WIDTH 1.15
+#include <ApplicationServices/ApplicationServices.h>
+#include <CoreFoundation/CoreFoundation.h>
 
 //-------------------------------------------------
 //  font_open - attempt to "open" a handle to the
@@ -27,48 +24,64 @@
 class osd_font_osx : public osd_font
 {
 public:
-	virtual ~osd_font_osx() { }
+	osd_font_osx() : m_font(NULL) { }
+	osd_font_osx(osd_font_osx &&obj) : m_font(obj.m_font) { obj.m_font = NULL; }
+	virtual ~osd_font_osx() { close(); }
 
-	virtual bool open(const char *font_path, const char *name, int &height);
+	virtual bool open(std::string const &font_path, std::string const &name, int &height);
 	virtual void close();
-	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
+	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs);
+
+	osd_font_osx &operator=(osd_font_osx &&obj)
+	{
+		using std::swap;
+		swap(m_font, obj.m_font);
+		return *this;
+	}
+
 private:
+	osd_font_osx(osd_font_osx const &) = delete;
+	osd_font_osx &operator=(osd_font_osx const &) = delete;
+
+	static constexpr CGFloat POINT_SIZE = 144.0;
+	static constexpr CGFloat EXTRA_HEIGHT = 1.0;
+	static constexpr CGFloat EXTRA_WIDTH = 1.15;
+
 	CTFontRef m_font;
 };
 
-bool osd_font_osx::open(const char *font_path, const char *name, int &height)
+bool osd_font_osx::open(std::string const &font_path, std::string const &name, int &height)
 {
-	m_font = NULL;
-	osd_printf_verbose("FONT NAME %s\n", name);
+	osd_printf_verbose("FONT NAME %s\n", name.c_str());
 #if 0
-	if (!strcmp(name, "default"))
+	if (name != "default")
 	{
 		name = "LucidaGrande";
 	}
 #endif
 
-	CFStringRef const font_name = CFStringCreateWithCString(NULL, name, kCFStringEncodingUTF8);
-	if (kCFNotFound != CFStringFind(font_name, CFSTR(".BDF"), kCFCompareCaseInsensitive | kCFCompareBackwards | kCFCompareAnchored | kCFCompareNonliteral).location)
+	CFStringRef const font_name = CFStringCreateWithCString(NULL, name.c_str(), kCFStringEncodingUTF8);
+	if (font_name && (kCFNotFound != CFStringFind(font_name, CFSTR(".BDF"), kCFCompareCaseInsensitive | kCFCompareBackwards | kCFCompareAnchored | kCFCompareNonliteral).location))
 	{
 		// handle bdf fonts in the core
 		CFRelease(font_name);
 		return false;
 	}
 	CTFontRef ct_font = NULL;
-	if (font_name != NULL)
+	if (font_name)
 	{
 		CTFontDescriptorRef const font_descriptor = CTFontDescriptorCreateWithNameAndSize(font_name, 0.0);
-		if (font_descriptor != NULL)
+		if (font_descriptor)
 		{
 			ct_font = CTFontCreateWithFontDescriptor(font_descriptor, POINT_SIZE, &CGAffineTransformIdentity);
 			CFRelease(font_descriptor);
 		}
+		CFRelease(font_name);
 	}
-	CFRelease(font_name);
 
 	if (!ct_font)
 	{
-		osd_printf_verbose("Couldn't find/open font %s, using MAME default\n", name);
+		osd_printf_verbose("Couldn't find/open font %s, using MAME default\n", name.c_str());
 		return false;
 	}
 
@@ -84,6 +97,7 @@ bool osd_font_osx::open(const char *font_path, const char *name, int &height)
 	line_height += CTFontGetLeading(ct_font);
 	height = ceilf(line_height * EXTRA_HEIGHT);
 
+	close();
 	m_font = ct_font;
 	return true;
 }
@@ -96,9 +110,8 @@ bool osd_font_osx::open(const char *font_path, const char *name, int &height)
 void osd_font_osx::close()
 {
 	if (m_font != NULL)
-	{
 		CFRelease(m_font);
-	}
+	m_font = NULL;
 }
 
 //-------------------------------------------------
@@ -109,7 +122,7 @@ void osd_font_osx::close()
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bool osd_font_osx::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+bool osd_font_osx::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs)
 {
 	UniChar uni_char;
 	CGGlyph glyph;
@@ -180,21 +193,89 @@ bool osd_font_osx::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &
 class font_osx : public osd_module, public font_module
 {
 public:
-	font_osx()
-	: osd_module(OSD_FONT_PROVIDER, "osx"), font_module()
+	font_osx() : osd_module(OSD_FONT_PROVIDER, "osx"), font_module() { }
+
+	virtual int init(const osd_options &options) override { return 0; }
+	virtual osd_font::ptr font_alloc() override { return std::make_unique<osd_font_osx>(); }
+	virtual bool get_font_families(std::string const &font_path, std::vector<std::pair<std::string, std::string> > &result) override;
+
+private:
+	static CFComparisonResult sort_callback(CTFontDescriptorRef first, CTFontDescriptorRef second, void *refCon)
 	{
+		CFStringRef left = (CFStringRef)CTFontDescriptorCopyLocalizedAttribute(first, kCTFontDisplayNameAttribute, NULL);
+		if (!left) left = (CFStringRef)CTFontDescriptorCopyAttribute(first, kCTFontNameAttribute);
+		CFStringRef right = (CFStringRef)CTFontDescriptorCopyLocalizedAttribute(second, kCTFontDisplayNameAttribute, NULL);
+		if (!right) right = (CFStringRef)CTFontDescriptorCopyAttribute(second, kCTFontNameAttribute);
+
+		CFComparisonResult result;
+		if (left && right) result = CFStringCompareWithOptions(left, right, CFRangeMake(0, CFStringGetLength(left)), kCFCompareCaseInsensitive | kCFCompareLocalized | kCFCompareNonliteral);
+		else if (!left) result = kCFCompareLessThan;
+		else if (!right) result = kCFCompareGreaterThan;
+		else result = kCFCompareEqualTo;
+
+		if (left) CFRelease(left);
+		if (right) CFRelease(right);
+		return result;
 	}
-
-	virtual int init(const osd_options &options) { return 0; }
-
-	osd_font *font_alloc()
-	{
-		return global_alloc(osd_font_osx);
-	}
-
 };
+
+bool font_osx::get_font_families(std::string const &font_path, std::vector<std::pair<std::string, std::string> > &result)
+{
+	CFStringRef keys[] = { kCTFontCollectionRemoveDuplicatesOption };
+	std::uintptr_t values[ARRAY_LENGTH(keys)] = { 1 };
+	CFDictionaryRef const options = CFDictionaryCreate(kCFAllocatorDefault, (void const **)keys, (void const **)values, ARRAY_LENGTH(keys), &kCFTypeDictionaryKeyCallBacks, NULL);
+	CTFontCollectionRef const collection = CTFontCollectionCreateFromAvailableFonts(NULL);
+	CFRelease(options);
+	if (!collection) return false;
+
+	CFArrayRef const descriptors = CTFontCollectionCreateMatchingFontDescriptorsSortedWithCallback(collection, &sort_callback, nullptr);
+	CFRelease(collection);
+	if (!descriptors) return false;
+
+	result.clear();
+	CFIndex const count = CFArrayGetCount(descriptors);
+	result.reserve(count);
+	for (CFIndex i = 0; i != count; i++)
+	{
+		CTFontDescriptorRef const font = (CTFontDescriptorRef)CFArrayGetValueAtIndex(descriptors, i);
+		CFStringRef const name = (CFStringRef)CTFontDescriptorCopyAttribute(font, kCTFontNameAttribute);
+		CFStringRef const display = (CFStringRef)CTFontDescriptorCopyLocalizedAttribute(font, kCTFontDisplayNameAttribute, NULL);
+
+		if (name && display)
+		{
+			char const *utf;
+			std::vector<char> buf;
+
+			utf = CFStringGetCStringPtr(name, kCFStringEncodingUTF8);
+			if (!utf)
+			{
+				buf.resize(CFStringGetMaximumSizeForEncoding(std::max(CFStringGetLength(name), CFStringGetLength(display)), kCFStringEncodingUTF8));
+				CFStringGetCString(name, &buf[0], buf.size(), kCFStringEncodingUTF8);
+			}
+			std::string utf8name(utf ? utf : &buf[0]);
+
+			utf = CFStringGetCStringPtr(display, kCFStringEncodingUTF8);
+			if (!utf)
+			{
+				buf.resize(CFStringGetMaximumSizeForEncoding(CFStringGetLength(display), kCFStringEncodingUTF8));
+				CFStringGetCString(display, &buf[0], buf.size(), kCFStringEncodingUTF8);
+			}
+			std::string utf8display(utf ? utf : &buf[0]);
+
+			result.emplace_back(std::move(utf8name), std::move(utf8display));
+		}
+
+		if (name) CFRelease(name);
+		if (display) CFRelease(display);
+	}
+
+	return true;
+}
+
 #else /* SDLMAME_MACOSX */
-	MODULE_NOT_SUPPORTED(font_osx, OSD_FONT_PROVIDER, "osx")
+
+MODULE_NOT_SUPPORTED(font_osx, OSD_FONT_PROVIDER, "osx")
+
 #endif
 
 MODULE_DEFINITION(FONT_OSX, font_osx)

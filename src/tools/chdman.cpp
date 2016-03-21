@@ -34,8 +34,10 @@
 //  CONSTANTS & DEFINES
 //**************************************************************************
 /* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 */
-#if defined(__MINGW32__) || defined(_MSC_VER)
+#if defined(WIN32)
 #define I64FMT   "I64"
+#elif !defined(__APPLE__) && defined(__LP64__)
+#define I64FMT   "l"
 #else
 #define I64FMT   "ll"
 #endif
@@ -331,8 +333,8 @@ public:
 				{
 					m_file.reset();
 					m_lastfile = m_info.track[tracknum].fname;
-					file_error filerr = util::core_file::open(m_lastfile.c_str(), OPEN_FLAG_READ, m_file);
-					if (filerr != FILERR_NONE)
+					osd_file::error filerr = util::core_file::open(m_lastfile, OPEN_FLAG_READ, m_file);
+					if (filerr != osd_file::error::NONE)
 						report_error(1, "Error opening input file (%s)'", m_lastfile.c_str());
 				}
 
@@ -438,15 +440,15 @@ public:
 					// read the sound samples
 					m_audio[chnum].resize(samples);
 					samplesptr[chnum] = &m_audio[chnum][0];
-					avi_error avierr = avi_read_sound_samples(&m_file, chnum, first_sample, samples, &m_audio[chnum][0]);
-					if (avierr != AVIERR_NONE)
-						report_error(1, "Error reading audio samples %d-%d from channel %d: %s", first_sample, samples, chnum, avi_error_string(avierr));
+					avi_file::error avierr = m_file.read_sound_samples(chnum, first_sample, samples, &m_audio[chnum][0]);
+					if (avierr != avi_file::error::NONE)
+						report_error(1, "Error reading audio samples %d-%d from channel %d: %s", first_sample, samples, chnum, avi_file::error_string(avierr));
 				}
 
 				// read the video data
-				avi_error avierr = avi_read_video_frame(&m_file, effframe / interlace_factor, m_bitmap);
-				if (avierr != AVIERR_NONE)
-					report_error(1, "Error reading AVI frame %d: %s", effframe / interlace_factor, avi_error_string(avierr));
+				avi_file::error avierr = m_file.read_video_frame(effframe / interlace_factor, m_bitmap);
+				if (avierr != avi_file::error::NONE)
+					report_error(1, "Error reading AVI frame %d: %s", effframe / interlace_factor, avi_file::error_string(avierr));
 				bitmap_yuy16 subbitmap(&m_bitmap.pix(effframe % interlace_factor), m_bitmap.width(), m_bitmap.height() / interlace_factor, m_bitmap.rowpixels() * interlace_factor);
 
 				// update metadata for this frame
@@ -1007,8 +1009,8 @@ static void check_existing_output_file(const parameters_t &params, const char *f
 	if (params.find(OPTION_OUTPUT_FORCE) == params.end())
 	{
 		util::core_file::ptr file;
-		file_error filerr = util::core_file::open(filename, OPEN_FLAG_READ, file);
-		if (filerr == FILERR_NONE)
+		osd_file::error filerr = util::core_file::open(filename, OPEN_FLAG_READ, file);
+		if (filerr == osd_file::error::NONE)
 		{
 			file.reset();
 			report_error(1, "Error: file already exists (%s)\nUse --force (or -f) to force overwriting", filename);
@@ -1572,8 +1574,8 @@ static void do_create_raw(parameters_t &params)
 	auto input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != params.end())
 	{
-		file_error filerr = util::core_file::open(input_file_str->second->c_str(), OPEN_FLAG_READ, input_file);
-		if (filerr != FILERR_NONE)
+		osd_file::error filerr = util::core_file::open(*input_file_str->second, OPEN_FLAG_READ, input_file);
+		if (filerr != osd_file::error::NONE)
 			report_error(1, "Unable to open file (%s)", input_file_str->second->c_str());
 	}
 
@@ -1651,7 +1653,7 @@ static void do_create_raw(parameters_t &params)
 		// delete the output file
 		auto output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != params.end())
-			osd_rmfile(output_chd_str->second->c_str());
+			osd_file::remove(*output_chd_str->second);
 		throw;
 	}
 }
@@ -1669,8 +1671,8 @@ static void do_create_hd(parameters_t &params)
 	auto input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != params.end())
 	{
-		file_error filerr = util::core_file::open(input_file_str->second->c_str(), OPEN_FLAG_READ, input_file);
-		if (filerr != FILERR_NONE)
+		osd_file::error filerr = util::core_file::open(*input_file_str->second, OPEN_FLAG_READ, input_file);
+		if (filerr != osd_file::error::NONE)
 			report_error(1, "Unable to open file (%s)", input_file_str->second->c_str());
 	}
 
@@ -1744,8 +1746,8 @@ static void do_create_hd(parameters_t &params)
 	if (ident_str != params.end())
 	{
 		// load the file
-		file_error filerr = util::core_file::load(ident_str->second->c_str(), identdata);
-		if (filerr != FILERR_NONE)
+		osd_file::error filerr = util::core_file::load(ident_str->second->c_str(), identdata);
+		if (filerr != osd_file::error::NONE)
 			report_error(1, "Error reading ident file (%s)", ident_str->second->c_str());
 
 		// must be at least 14 bytes; extract CHS data from there
@@ -1840,7 +1842,7 @@ static void do_create_hd(parameters_t &params)
 		// delete the output file
 		auto output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != params.end())
-			osd_rmfile(output_chd_str->second->c_str());
+			osd_file::remove(*output_chd_str->second);
 		throw;
 	}
 }
@@ -1932,7 +1934,7 @@ static void do_create_cd(parameters_t &params)
 		// delete the output file
 		auto output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != params.end())
-			osd_rmfile(output_chd_str->second->c_str());
+			osd_file::remove(*output_chd_str->second);
 		throw;
 	}
 }
@@ -1946,15 +1948,15 @@ static void do_create_cd(parameters_t &params)
 static void do_create_ld(parameters_t &params)
 {
 	// process input file
-	avi_file *input_file = nullptr;
+	avi_file::ptr input_file;
 	auto input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != params.end())
 	{
-		avi_error avierr = avi_open(input_file_str->second->c_str(), &input_file);
-		if (avierr != AVIERR_NONE)
-			report_error(1, "Error opening AVI file (%s): %s\n", input_file_str->second->c_str(), avi_error_string(avierr));
+		avi_file::error avierr = avi_file::open(*input_file_str->second, input_file);
+		if (avierr != avi_file::error::NONE)
+			report_error(1, "Error opening AVI file (%s): %s\n", input_file_str->second->c_str(), avi_file::error_string(avierr));
 	}
-	const avi_movie_info *aviinfo = avi_get_movie_info(input_file);
+	const avi_file::movie_info &aviinfo = input_file->get_movie_info();
 
 	// process output CHD
 	chd_file output_parent;
@@ -1963,16 +1965,16 @@ static void do_create_ld(parameters_t &params)
 	// process input start/end
 	UINT64 input_start;
 	UINT64 input_end;
-	parse_input_start_end(params, aviinfo->video_numsamples, 0, 1, input_start, input_end);
+	parse_input_start_end(params, aviinfo.video_numsamples, 0, 1, input_start, input_end);
 
 	// determine parameters of the incoming video stream
 	avi_info info;
-	info.fps_times_1million = UINT64(aviinfo->video_timescale) * 1000000 / aviinfo->video_sampletime;
-	info.width = aviinfo->video_width;
-	info.height = aviinfo->video_height;
+	info.fps_times_1million = UINT64(aviinfo.video_timescale) * 1000000 / aviinfo.video_sampletime;
+	info.width = aviinfo.video_width;
+	info.height = aviinfo.video_height;
 	info.interlaced = ((info.fps_times_1million / 1000000) <= 30) && (info.height % 2 == 0) && (info.height > 288);
-	info.channels = aviinfo->audio_channels;
-	info.rate = aviinfo->audio_samplerate;
+	info.channels = aviinfo.audio_channels;
+	info.rate = aviinfo.audio_samplerate;
 
 	// adjust for interlacing
 	if (info.interlaced)
@@ -2008,7 +2010,7 @@ static void do_create_ld(parameters_t &params)
 	if (output_parent.opened())
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->second->c_str());
 	printf("Input file:   %s\n", input_file_str->second->c_str());
-	if (input_start != 0 && input_end != aviinfo->video_numsamples)
+	if (input_start != 0 && input_end != aviinfo.video_numsamples)
 		printf("Input start:  %s\n", big_int_string(tempstr, input_start));
 	printf("Input length: %s (%02d:%02d:%02d)\n", big_int_string(tempstr, input_end - input_start),
 			UINT32((UINT64(input_end - input_start) * 1000000 / info.fps_times_1million / 60 / 60)),
@@ -2059,7 +2061,7 @@ static void do_create_ld(parameters_t &params)
 		// delete the output file
 		auto output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != params.end())
-			osd_rmfile(output_chd_str->second->c_str());
+			osd_file::remove(*output_chd_str->second);
 		throw;
 	}
 }
@@ -2195,7 +2197,7 @@ static void do_copy(parameters_t &params)
 		// delete the output file
 		auto output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != params.end())
-			osd_rmfile(output_chd_str->second->c_str());
+			osd_file::remove(*output_chd_str->second);
 		throw;
 	}
 }
@@ -2238,8 +2240,8 @@ static void do_extract_raw(parameters_t &params)
 	try
 	{
 		// process output file
-		file_error filerr = util::core_file::open(output_file_str->second->c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
-		if (filerr != FILERR_NONE)
+		osd_file::error filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
+		if (filerr != osd_file::error::NONE)
 			report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
 
 		// copy all data
@@ -2273,7 +2275,7 @@ static void do_extract_raw(parameters_t &params)
 		if (output_file != nullptr)
 		{
 			output_file.reset();
-			osd_rmfile(output_file_str->second->c_str());
+			osd_file::remove(*output_file_str->second);
 		}
 		throw;
 	}
@@ -2343,15 +2345,15 @@ static void do_extract_cd(parameters_t &params)
 		}
 
 		// process output file
-		file_error filerr = util::core_file::open(output_file_str->second->c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, output_toc_file);
-		if (filerr != FILERR_NONE)
+		osd_file::error filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, output_toc_file);
+		if (filerr != osd_file::error::NONE)
 			report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
 
 		// process output BIN file
 		if (mode != MODE_GDI)
 		{
-			filerr = util::core_file::open(output_bin_file_str->c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
-			if (filerr != FILERR_NONE)
+			filerr = util::core_file::open(*output_bin_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
+			if (filerr != osd_file::error::NONE)
 				report_error(1, "Unable to open file (%s)", output_bin_file_str->c_str());
 		}
 
@@ -2386,8 +2388,8 @@ static void do_extract_cd(parameters_t &params)
 
 				output_bin_file.reset();
 
-				filerr = util::core_file::open(trackbin_name.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
-				if (filerr != FILERR_NONE)
+				filerr = util::core_file::open(trackbin_name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
+				if (filerr != osd_file::error::NONE)
 					report_error(1, "Unable to open file (%s)", trackbin_name.c_str());
 
 				outputoffs = 0;
@@ -2471,8 +2473,8 @@ static void do_extract_cd(parameters_t &params)
 		// delete the output files
 		output_bin_file.reset();
 		output_toc_file.reset();
-		osd_rmfile(output_bin_file_str->c_str());
-		osd_rmfile(output_file_str->second->c_str());
+		osd_file::remove(*output_bin_file_str);
+		osd_file::remove(*output_file_str->second);
 		throw;
 	}
 }
@@ -2528,7 +2530,7 @@ static void do_extract_ld(parameters_t &params)
 	input_end *= interlace_factor;
 
 	// build up the movie info
-	avi_movie_info info;
+	avi_file::movie_info info;
 	info.video_format = FORMAT_YUY2;
 	info.video_timescale = fps_times_1million / interlace_factor;
 	info.video_sampletime = 1000000;
@@ -2558,12 +2560,12 @@ static void do_extract_ld(parameters_t &params)
 	}
 
 	// catch errors so we can close & delete the output file
-	avi_file *output_file = nullptr;
+	avi_file::ptr output_file;
 	try
 	{
 		// process output file
-		avi_error avierr = avi_create(output_file_str->second->c_str(), &info, &output_file);
-		if (avierr != AVIERR_NONE)
+		avi_file::error avierr = avi_file::create(*output_file_str->second, info, output_file);
+		if (avierr != avi_file::error::NONE)
 			report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
 
 		// create the codec configuration
@@ -2599,30 +2601,29 @@ static void do_extract_ld(parameters_t &params)
 			// write audio
 			for (int chnum = 0; chnum < channels; chnum++)
 			{
-				avi_error avierr = avi_append_sound_samples(output_file, chnum, avconfig.audio[chnum], actsamples, 0);
-				if (avierr != AVIERR_NONE)
-					report_error(1, "Error writing samples for hunk %d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_error_string(avierr));
+				avi_file::error avierr = output_file->append_sound_samples(chnum, avconfig.audio[chnum], actsamples, 0);
+				if (avierr != avi_file::error::NONE)
+					report_error(1, "Error writing samples for hunk %d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_file::error_string(avierr));
 			}
 
 			// write video
 			if ((framenum + 1) % interlace_factor == 0)
 			{
-				avi_error avierr = avi_append_video_frame(output_file, fullbitmap);
-				if (avierr != AVIERR_NONE)
-					report_error(1, "Error writing video for hunk %d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_error_string(avierr));
+				avi_file::error avierr = output_file->append_video_frame(fullbitmap);
+				if (avierr != avi_file::error::NONE)
+					report_error(1, "Error writing video for hunk %d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_file::error_string(avierr));
 			}
 		}
 
 		// close and return
-		avi_close(output_file);
+		output_file.reset();
 		printf("Extraction complete                                    \n");
 	}
 	catch (...)
 	{
 		// delete the output file
-		if (output_file != nullptr)
-			avi_close(output_file);
-		osd_rmfile(output_file_str->second->c_str());
+		output_file.reset();
+		osd_file::remove(*output_file_str->second);
 		throw;
 	}
 }
@@ -2670,8 +2671,8 @@ static void do_add_metadata(parameters_t &params)
 	dynamic_buffer file;
 	if (file_str != params.end())
 	{
-		file_error filerr = util::core_file::load(file_str->second->c_str(), file);
-		if (filerr != FILERR_NONE)
+		osd_file::error filerr = util::core_file::load(file_str->second->c_str(), file);
+		if (filerr != osd_file::error::NONE)
 			report_error(1, "Error reading metadata file (%s)", file_str->second->c_str());
 	}
 
@@ -2794,8 +2795,8 @@ static void do_dump_metadata(parameters_t &params)
 		// create the file
 		if (output_file_str != params.end())
 		{
-			file_error filerr = util::core_file::open(output_file_str->second->c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
-			if (filerr != FILERR_NONE)
+			osd_file::error filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
+			if (filerr != osd_file::error::NONE)
 				report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
 
 			// output the metadata
@@ -2820,7 +2821,7 @@ static void do_dump_metadata(parameters_t &params)
 	{
 		// delete the output file
 		output_file.reset();
-		osd_rmfile(output_file_str->second->c_str());
+		osd_file::remove(*output_file_str->second);
 		throw;
 	}
 }

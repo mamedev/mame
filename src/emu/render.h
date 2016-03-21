@@ -329,6 +329,8 @@ public:
 	// getters
 	render_primitive *next() const { return m_next; }
 	bool packable(const INT32 pack_size) const { return (flags & PRIMFLAG_PACKABLE) && texture.base != nullptr && texture.width <= pack_size && texture.height <= pack_size; }
+	float get_quad_width() const { return bounds.x1 - bounds.x0; }
+	float get_quad_height() const { return bounds.y1 - bounds.y0; }
 
 	// reset to prepare for re-use
 	void reset();

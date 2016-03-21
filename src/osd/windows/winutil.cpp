@@ -18,47 +18,6 @@
 #include "winutil.h"
 #include "strconv.h"
 
-//============================================================
-//  win_error_to_file_error
-//============================================================
-
-file_error win_error_to_file_error(DWORD error)
-{
-	file_error filerr;
-
-	// convert a Windows error to a file_error
-	switch (error)
-	{
-		case ERROR_SUCCESS:
-			filerr = FILERR_NONE;
-			break;
-
-		case ERROR_OUTOFMEMORY:
-			filerr = FILERR_OUT_OF_MEMORY;
-			break;
-
-		case ERROR_FILE_NOT_FOUND:
-		case ERROR_FILENAME_EXCED_RANGE:
-		case ERROR_PATH_NOT_FOUND:
-			filerr = FILERR_NOT_FOUND;
-			break;
-
-		case ERROR_ACCESS_DENIED:
-			filerr = FILERR_ACCESS_DENIED;
-			break;
-
-		case ERROR_SHARING_VIOLATION:
-			filerr = FILERR_ALREADY_OPEN;
-			break;
-
-		default:
-			filerr = FILERR_FAILURE;
-			break;
-	}
-	return filerr;
-}
-
-
 
 //============================================================
 //  win_attributes_to_entry_type
@@ -130,13 +89,16 @@ BOOL win_is_gui_application(void)
 //============================================================
 //  osd_subst_env
 //============================================================
-void osd_subst_env(char **dst, const char *src)
+void osd_subst_env(std::string &dst, const std::string &src)
 {
 	TCHAR buffer[MAX_PATH];
 
-	TCHAR *t_src = tstring_from_utf8(src);
+	TCHAR *t_src = tstring_from_utf8(src.c_str());
 	ExpandEnvironmentStrings(t_src, buffer, ARRAY_LENGTH(buffer));
-	*dst = utf8_from_tstring(buffer);
+	osd_free(t_src);
+	char *cnv = utf8_from_tstring(buffer);
+	dst = cnv;
+	osd_free(cnv);
 }
 
 //-------------------------------------------------

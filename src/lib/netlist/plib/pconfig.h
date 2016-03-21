@@ -12,7 +12,7 @@
 	#define PSTANDALONE (0)
 #endif
 
-//#define PHAS_INT128 (0)
+#define PHAS_INT128 (0)
 
 #ifndef PHAS_INT128
 #define PHAS_INT128 (0)

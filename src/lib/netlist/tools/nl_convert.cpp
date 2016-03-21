@@ -12,11 +12,11 @@
 
 
 template<typename Class>
-static plist_t<int> bubble(const pnamedlist_t<Class *> &sl)
+static pvector_t<int> bubble(const pvector_t<Class *> &sl)
 {
-	plist_t<int> ret(sl.size());
+	pvector_t<int> ret;
 	for (unsigned i=0; i<sl.size(); i++)
-		ret[i] = i;
+		ret.push_back(i);
 
 	for(unsigned i=0; i < sl.size(); i++)
 	{
@@ -37,57 +37,71 @@ static plist_t<int> bubble(const pnamedlist_t<Class *> &sl)
 
 void nl_convert_base_t::add_pin_alias(const pstring &devname, const pstring &name, const pstring &alias)
 {
-	m_pins.add(palloc(pin_alias_t(devname + "." + name, devname + "." + alias)), false);
+	pstring pname = devname + "." + name;
+	m_pins.add(pname, palloc(pin_alias_t(pname, devname + "." + alias)));
 }
 
 void nl_convert_base_t::add_ext_alias(const pstring &alias)
 {
-	m_ext_alias.add(alias);
+	m_ext_alias.push_back(alias);
+}
+
+void nl_convert_base_t::add_device(dev_t *dev)
+{
+	for (auto & d : m_devs)
+		if (d->name() == dev->name())
+		{
+			out("ERROR: Duplicate device {1} ignored.", dev->name());
+			return;
+		}
+	m_devs.push_back(dev);
 }
 
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname, const pstring &amodel)
 {
-	m_devs.add(palloc(dev_t(atype, aname, amodel)), false);
+	add_device(palloc(dev_t(atype, aname, amodel)));
 }
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname, double aval)
 {
-	m_devs.add(palloc(dev_t(atype, aname, aval)), false);
+	add_device(palloc(dev_t(atype, aname, aval)));
 }
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname)
 {
-	m_devs.add(palloc(dev_t(atype, aname)), false);
+	add_device(palloc(dev_t(atype, aname)));
 }
 
 void nl_convert_base_t::add_term(pstring netname, pstring termname)
 {
-	net_t * net = m_nets.find_by_name(netname);
-	if (net == NULL)
+	net_t * net = NULL;
+	if (m_nets.contains(netname))
+		net = m_nets[netname];
+	else
 	{
 		net = palloc(net_t(netname));
-		m_nets.add(net, false);
+		m_nets.add(netname, net);
 	}
 
 	/* if there is a pin alias, translate ... */
-	pin_alias_t *alias = m_pins.find_by_name(termname);
+	pin_alias_t *alias = m_pins[termname];
 
 	if (alias != NULL)
-		net->terminals().add(alias->alias());
+		net->terminals().push_back(alias->alias());
 	else
-		net->terminals().add(termname);
+		net->terminals().push_back(termname);
 }
 
 void nl_convert_base_t::dump_nl()
 {
 	for (std::size_t i=0; i<m_ext_alias.size(); i++)
 	{
-		net_t *net = m_nets.find_by_name(m_ext_alias[i]);
+		net_t *net = m_nets[m_ext_alias[i]];
 		// use the first terminal ...
 		out("ALIAS({}, {})\n", m_ext_alias[i].cstr(), net->terminals()[0].cstr());
 		// if the aliased net only has this one terminal connected ==> don't dump
 		if (net->terminals().size() == 1)
 			net->set_no_export();
 	}
-	plist_t<int> sorted = bubble(m_devs);
+	pvector_t<int> sorted = bubble(m_devs);
 	for (std::size_t i=0; i<m_devs.size(); i++)
 	{
 		std::size_t j = sorted[i];
@@ -105,7 +119,7 @@ void nl_convert_base_t::dump_nl()
 	// print nets
 	for (std::size_t i=0; i<m_nets.size(); i++)
 	{
-		net_t * net = m_nets[i];
+		net_t * net = m_nets.value_at(i);
 		if (!net->is_no_export())
 		{
 			//printf("Net {}\n", net->name().cstr());
@@ -118,8 +132,12 @@ void nl_convert_base_t::dump_nl()
 		}
 	}
 	m_devs.clear_and_free();
-	m_nets.clear_and_free();
-	m_pins.clear_and_free();
+	for (std::size_t i = 0; i < m_nets.size(); i++)
+		pfree(m_nets.value_at(i));
+	m_nets.clear();
+	for (std::size_t i = 0; i < m_pins.size(); i++)
+		pfree(m_pins.value_at(i));
+	m_pins.clear();
 	m_ext_alias.clear();
 }
 
@@ -184,7 +202,7 @@ nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
 
 void nl_convert_spice_t::convert(const pstring &contents)
 {
-	pstring_list_t spnl(contents, "\n");
+	pstring_vector_t spnl(contents, "\n");
 
 	// Add gnd net
 
@@ -216,7 +234,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 {
 	if (line != "")
 	{
-		pstring_list_t tt(line, " ", true);
+		pstring_vector_t tt(line, " ", true);
 		double val = 0.0;
 		switch (tt[0].code_at(0))
 		{
@@ -255,7 +273,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					model = tt[5];
 				else
 					model = tt[4];
-				pstring_list_t m(model,"{");
+				pstring_vector_t m(model,"{");
 				if (m.size() == 2)
 				{
 					if (m[1].len() != 4)

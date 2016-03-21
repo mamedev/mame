@@ -206,8 +206,8 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 		{
 			if ((m_terms[i]->m_railstart - m_terms[i+1]->m_railstart) * sort_order < 0)
 			{
-				std::swap(m_terms[i],m_terms[i+1]);
-				m_nets.swap(i, i+1);
+				std::swap(m_terms[i], m_terms[i+1]);
+				std::swap(m_nets[i], m_nets[i+1]);
 			}
 		}
 
@@ -253,14 +253,14 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 			for (unsigned i = 0; i < t->m_railstart; i++)
 			{
 				if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
-					t->m_nzrd.add(other[i]);
+					t->m_nzrd.push_back(other[i]);
 				if (!t->m_nz.contains(other[i]))
-					t->m_nz.add(other[i]);
+					t->m_nz.push_back(other[i]);
 			}
 		}
 		psort_list(t->m_nzrd);
 
-		t->m_nz.add(k);     // add diagonal
+		t->m_nz.push_back(k);     // add diagonal
 		psort_list(t->m_nz);
 	}
 
@@ -283,7 +283,7 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 			if (touched[row][k])
 			{
 				if (!m_terms[k]->m_nzbd.contains(row))
-					m_terms[k]->m_nzbd.add(row);
+					m_terms[k]->m_nzbd.push_back(row);
 				for (unsigned col = k; col < N(); col++)
 					if (touched[k][col])
 						touched[row][col] = true;

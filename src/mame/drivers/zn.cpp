@@ -118,9 +118,6 @@ public:
 	void atpsx_dma_write(UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void jdredd_vblank(screen_device &screen, bool vblank_state);
 
-protected:
-	virtual void driver_start() override;
-
 private:
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	inline void psxwriteword( UINT32 *p_n_psxram, UINT32 n_address, UINT16 n_data );
@@ -228,119 +225,6 @@ static const UINT8 tt07[ 8 ] = { 0x80, 0x10, 0xf1, 0x03, 0xfa, 0x38, 0x3c, 0xfc 
 static const UINT8 kn01[ 8 ] = { 0xf8, 0xe1, 0xe2, 0xfe, 0x3c, 0x30, 0x70, 0x80 }; /* brute forced */
 static const UINT8 kn02[ 8 ] = { 0x01, 0x18, 0xe2, 0xfe, 0x3c, 0x30, 0x70, 0x80 }; /* brute forced */
 
-static const struct
-{
-	const char *s_name;
-	const UINT8 *p_n_mainsec;
-	const UINT8 *p_n_gamesec;
-} zn_config_table[] =
-{
-	{ "nbajamex", ac01, ac02 }, /* black screen */
-	{ "jdredd",   ac01, ac02 }, /* OK */
-	{ "jdreddb",  ac01, ac02 }, /* OK */
-	{ "primrag2", tw01, tw02 }, /* locks up when starting a game */
-	{ "hvnsgate", at01, at02 }, /* OK */
-	{ "ts2",      cp01, cp02 }, /* OK */
-	{ "ts2a",     cp01, cp02 }, /* OK */
-	{ "ts2j",     cp01, cp02 }, /* OK */
-	{ "starglad", cp01, cp03 }, /* OK */
-	{ "stargladj",cp01, cp03 }, /* OK */
-	{ "sfex",     cp01, cp04 }, /* OK */
-	{ "sfexa",    cp01, cp04 }, /* OK */
-	{ "sfexj",    cp01, cp04 }, /* OK */
-	{ "sfexu",    cp01, cp04 }, /* OK */
-	{ "sfexp",    cp01, cp04 }, /* OK */
-	{ "sfexpu1",  cp01, cp04 }, /* OK */
-	{ "sfexpj",   cp01, cp04 }, /* OK */
-	{ "sfexpj1",  cp01, cp04 }, /* OK */
-	{ "glpracr",  cp01, cp05 }, /* OK */
-	{ "glpracrj", cp01, cp05 }, /* OK */
-	{ "rvschool", cp10, cp06 }, /* OK */
-	{ "rvschoolu",cp10, cp06 }, /* OK */
-	{ "rvschoola",cp10, cp06 }, /* OK */
-	{ "jgakuen",  cp10, cp06 }, /* OK */
-	{ "plsmaswd", cp10, cp07 }, /* OK */
-	{ "stargld2", cp10, cp07 }, /* OK */
-	{ "plsmaswda",cp10, cp07 }, /* OK */
-	{ "sfex2",    cp10, cp08 }, /* OK ( random crashes on garuda ) */
-	{ "sfex2j",   cp10, cp08 }, /* OK ( random crashes on garuda ) */
-	{ "sfex2a",   cp10, cp08 }, /* OK ( random crashes on garuda ) */
-	{ "sfex2h",   cp10, cp08 }, /* OK ( random crashes on garuda ) */
-	{ "techromn", cp10, cp09 }, /* OK */
-	{ "techromnu",cp10, cp09 }, /* OK */
-	{ "kikaioh",  cp10, cp09 }, /* OK */
-	{ "tgmj",     cp10, cp11 }, /* OK */
-	{ "sfex2p",   cp10, cp12 }, /* OK */
-	{ "sfex2pa",  cp10, cp12 }, /* OK */
-	{ "sfex2pj",  cp10, cp12 }, /* OK */
-	{ "sfex2ph",  cp10, cp12 }, /* OK */
-	{ "strider2", cp10, cp13 }, /* OK ( random crashes on bosses ) */
-	{ "strider2a",cp10, cp13 }, /* OK ( random crashes on bosses ) */
-	{ "shiryu2",  cp10, cp13 }, /* OK ( random crashes on bosses ) */
-	{ "beastrzr", et01, et02 }, /* OK */
-	{ "bldyroar", et01, et02 }, /* OK */
-	{ "beastrzrb",et01, et02 }, /* OK */
-	{ "bldyror2", et01, et03 }, /* OK */
-	{ "bldyror2u",et01, et03 }, /* OK */
-	{ "bldyror2a",et01, et03 }, /* OK */
-	{ "bldyror2j",et01, et03 }, /* OK */
-	{ "bam2",     et01, et05 },
-	{ "glpracr2", mg01, mg02 }, /* locks up when starting a game/entering test mode */
-	{ "glpracr2j",mg01, mg02 }, /* locks up when starting a game/entering test mode */
-	{ "glpracr2l",mg01, mg02 }, /* locks up when starting a game/entering test mode */
-	{ "cbaj",     mg01, mg03 }, /* OK */
-	{ "shngmtkb", mg01, mg04 }, /* OK */
-	{ "doapp",    mg01, mg05 }, /* OK */
-	{ "flamegun", mg01, mg06 }, /* OK */
-	{ "flamegunj",mg01, mg06 }, /* OK */
-	{ "lpadv",    mg01, mg07 },
-	{ "glpracr3", mg01, mg08 },
-	{ "glpracr3j",mg01, mg08 },
-	{ "tondemo",  mg01, mg09 }, /* OK */
-	{ "1on1gov",  mg01, mg10 }, /* OK */
-	{ "brvblade", mg01, mg11 }, /* OK */
-	{ "brvbladeu", mg01, mg11 }, /* OK */
-	{ "brvbladea", mg01, mg11 }, /* OK */
-	{ "brvbladej", mg01, mg11 }, /* OK */
-	{ "tblkkuzu", mg01, mg12 }, /* OK */
-	{ "tecmowcm", mg01, mg13 }, /* OK */
-	{ "mfjump",   mg01, mg14 }, /* OK */
-	{ "sfchamp",  tt01, tt02 }, /* OK */
-	{ "sfchampo", tt01, tt02 }, /* OK */
-	{ "sfchampu", tt01, tt02 }, /* OK */
-	{ "sfchampj", tt01, tt02 }, /* OK */
-	{ "psyforce", tt01, tt03 }, /* OK */
-	{ "psyforcej",tt01, tt03 }, /* OK */
-	{ "psyforcex",tt01, tt03 }, /* OK */
-	{ "raystorm", tt01, tt04 }, /* OK */
-	{ "raystormo",tt01, tt04 }, /* OK */
-	{ "raystormu",tt01, tt04 }, /* OK */
-	{ "raystormj",tt01, tt04 }, /* OK */
-	{ "ftimpact", tt01, tt05 }, /* OK */
-	{ "ftimpactu",tt01, tt05 }, /* OK */
-	{ "ftimpactj",tt01, tt05 }, /* OK */
-	{ "ftimpcta", tt01, tt05 }, /* OK */
-	{ "mgcldate", tt01, tt06 }, /* OK */
-	{ "mgcldtex", tt01, tt06 }, /* OK */
-	{ "gdarius",  tt01, tt07 }, /* OK */
-	{ "gdariusb", tt01, tt07 }, /* OK */
-	{ "gdarius2", tt01, tt07 }, /* OK */
-	{ "aerofgts", kn01, kn02 }, /* OK */
-	{ "sncwgltd", kn01, kn02 }, /* OK */
-	/* 2009-10 FP: to avoid crash when running BIOS sets alone, I added the entries below.        */
-	/* Now we get "Error B930 - Cannot Find Program Rom". Is this the correct way to handle them? */
-	{ "acpsx",    ac01, ac02 },
-	{ "atpsx",    tw01, tw02 },
-	{ "atluspsx", at01, at02 },
-	{ "cpzn1",    cp01, cp02 },
-	{ "cpzn2",    cp01, cp02 },
-	{ "psarc95",  et01, et02 },
-	{ "tps",      mg01, mg02 },
-	{ "taitofx1", tt01, tt02 },
-	{ "vspsx",    kn01, kn02 },
-	{ nullptr, nullptr, nullptr }
-};
-
 READ8_MEMBER(zn_state::znsecsel_r)
 {
 	verboselog(2, "znsecsel_r( %08x, %08x )\n", offset, mem_mask );
@@ -440,23 +324,6 @@ static ADDRESS_MAP_START( zn_map, AS_PROGRAM, 32, zn_state )
 	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xffffffff) /* eeprom */
 	AM_RANGE(0x1fb20000, 0x1fb20007) AM_READ16(unknown_r, 0xffffffff)
 ADDRESS_MAP_END
-
-void zn_state::driver_start()
-{
-	int n_game;
-
-	n_game = 0;
-	while( zn_config_table[ n_game ].s_name != nullptr )
-	{
-		if( strcmp( machine().system().name, zn_config_table[ n_game ].s_name ) == 0 )
-		{
-			m_cat702_1->init( zn_config_table[ n_game ].p_n_mainsec );
-			m_cat702_2->init( zn_config_table[ n_game ].p_n_gamesec );
-			break;
-		}
-		n_game++;
-	}
-}
 
 static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 
@@ -735,10 +602,23 @@ static MACHINE_CONFIG_DERIVED( coh1000c, zn1_1mb_vram )
 	MCFG_QSOUND_ADD("qsound", QSOUND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_DEVICE_MODIFY("cat702_1")
+	MCFG_CAT702_TRANSFORM_TABLE(cp01)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(cp02)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( starglad, coh1000c )
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(cp03)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( glpracr, coh1000c )
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, glpracr)
+
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(cp05)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh1002c, zn1_2mb_vram )
@@ -755,6 +635,11 @@ static MACHINE_CONFIG_DERIVED( coh1002c, zn1_2mb_vram )
 	MCFG_QSOUND_ADD("qsound", QSOUND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_DEVICE_MODIFY("cat702_1")
+	MCFG_CAT702_TRANSFORM_TABLE(cp01)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(cp04)
 MACHINE_CONFIG_END
 
 /*
@@ -912,6 +797,41 @@ static MACHINE_CONFIG_DERIVED(coh3002c, zn2)
 	MCFG_QSOUND_ADD("qsound", QSOUND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_DEVICE_MODIFY("cat702_1")
+	MCFG_CAT702_TRANSFORM_TABLE(cp10)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(cp06)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(plsmaswd, coh3002c)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(cp07)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(sfex2, coh3002c)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(cp08)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(techromn, coh3002c)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(cp09)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(tgmj, coh3002c)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(cp11)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(sfex2p, coh3002c)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(cp12)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(strider2, coh3002c)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(cp13)
 MACHINE_CONFIG_END
 
 /*
@@ -1201,6 +1121,21 @@ static MACHINE_CONFIG_DERIVED( coh1000ta, zn1_1mb_vram )
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+
+	MCFG_DEVICE_MODIFY("cat702_1")
+	MCFG_CAT702_TRANSFORM_TABLE(tt01)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(tt02)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( psyforce, coh1000ta )
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(tt03)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( mgcldate, coh1000ta )
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(tt06)
 MACHINE_CONFIG_END
 
 WRITE8_MEMBER(zn_state::fx1b_fram_w)
@@ -1254,6 +1189,16 @@ static MACHINE_CONFIG_DERIVED(coh1000tb, zn1_1mb_vram)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
 	MCFG_FRAGMENT_ADD(taito_zoom_sound)
+
+	MCFG_DEVICE_MODIFY("cat702_1")
+	MCFG_CAT702_TRANSFORM_TABLE(tt01)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(tt04)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(ftimpact, coh1000tb)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(tt05)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(coh1002tb, zn1_2mb_vram)
@@ -1274,6 +1219,11 @@ static MACHINE_CONFIG_DERIVED(coh1002tb, zn1_2mb_vram)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
 	MCFG_FRAGMENT_ADD(taito_zoom_sound)
+
+	MCFG_DEVICE_MODIFY("cat702_1")
+	MCFG_CAT702_TRANSFORM_TABLE(tt01)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(tt07)
 MACHINE_CONFIG_END
 
 /*
@@ -1509,6 +1459,11 @@ static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( zn_state::atpsx_dma_read ), (zn_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( zn_state::atpsx_dma_write ), (zn_state *) owner ) )
+
+	MCFG_DEVICE_MODIFY("cat702_1")
+	MCFG_CAT702_TRANSFORM_TABLE(tw01)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(tw02)
 MACHINE_CONFIG_END
 
 /*
@@ -1706,6 +1661,23 @@ static MACHINE_CONFIG_DERIVED(coh1002e, zn1_2mb_vram)
 	MCFG_SOUND_ADD("ymf", YMF271, XTAL_16_9344MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_DEVICE_MODIFY("cat702_1")
+	MCFG_CAT702_TRANSFORM_TABLE(et01)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(et02)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(bldyror2, coh1002e)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(et03)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(brvblade, coh1002e)
+	MCFG_DEVICE_MODIFY("cat702_1")
+	MCFG_CAT702_TRANSFORM_TABLE(mg01)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(mg11)
 MACHINE_CONFIG_END
 
 
@@ -1825,6 +1797,11 @@ static MACHINE_CONFIG_DERIVED( bam2, zn1_2mb_vram )
 	MCFG_CPU_PROGRAM_MAP(bam2_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, bam2)
+
+	MCFG_DEVICE_MODIFY("cat702_1")
+	MCFG_CAT702_TRANSFORM_TABLE(et01)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(et05)
 MACHINE_CONFIG_END
 
 /*
@@ -2137,16 +2114,20 @@ static MACHINE_CONFIG_DERIVED( coh1000a, zn1_2mb_vram )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000a_map)
 
+	MCFG_DEVICE_MODIFY("cat702_1")
+	MCFG_CAT702_TRANSFORM_TABLE(ac01)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(ac02)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nbajamex, zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED( nbajamex, coh1000a )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nbajamex_map)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, nbajamex)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jdredd, zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED( jdredd, coh1000a )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jdredd_map)
 
@@ -2325,6 +2306,11 @@ static MACHINE_CONFIG_DERIVED(coh1001l, zn1_2mb_vram)
 	MCFG_YMZ280B_IRQ_HANDLER(INPUTLINE("audiocpu", 2))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
+
+	MCFG_DEVICE_MODIFY("cat702_1")
+	MCFG_CAT702_TRANSFORM_TABLE(at01)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(at02)
 MACHINE_CONFIG_END
 
 /*
@@ -2363,6 +2349,11 @@ static MACHINE_CONFIG_DERIVED( coh1002v, zn1_2mb_vram )
 	MCFG_CPU_PROGRAM_MAP(coh1002v_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002v)
+
+	MCFG_DEVICE_MODIFY("cat702_1")
+	MCFG_CAT702_TRANSFORM_TABLE(kn01)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(kn02)
 MACHINE_CONFIG_END
 
 /*
@@ -2546,6 +2537,61 @@ static MACHINE_CONFIG_DERIVED( coh1002m, zn1_2mb_vram )
 	MCFG_CPU_PROGRAM_MAP(coh1002m_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002m)
+
+	MCFG_DEVICE_MODIFY("cat702_1")
+	MCFG_CAT702_TRANSFORM_TABLE(mg01)
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(mg02)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( shngmtkb, coh1002m )
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(mg04)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( doapp, coh1002m )
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(mg05)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( flamegun, coh1002m )
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(mg06)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( lpadv, coh1002m )
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(mg07)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( glpracr3, coh1002m )
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(mg08)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( tondemo, coh1002m )
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(mg09)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( 1on1gov, coh1002m )
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(mg10)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( tblkkuzu, coh1002m )
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(mg12)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( tecmowcm, coh1002m )
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(mg13)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( mfjump, coh1002m )
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(mg14)
 MACHINE_CONFIG_END
 
 READ8_MEMBER(zn_state::cbaj_sound_main_status_r)
@@ -2609,6 +2655,9 @@ static MACHINE_CONFIG_DERIVED( coh1002msnd, coh1002m )
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
+
+	MCFG_DEVICE_MODIFY("cat702_2")
+	MCFG_CAT702_TRANSFORM_TABLE(mg03)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh1002ml, coh1002m )
@@ -4832,8 +4881,8 @@ GAME( 1995, cpzn1,    0,         coh1000c, zn,   driver_device, 0, ROT0, "Capcom
 GAME( 1995, ts2,       cpzn1,    coh1000c, zn6b, driver_device, 0, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, ts2a,      ts2,      coh1000c, zn6b, driver_device, 0, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124) Older", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, ts2j,      ts2,      coh1000c, zn6b, driver_device, 0, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (Japan 951124)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, starglad,  cpzn1,    coh1000c, zn6b, driver_device, 0, ROT0, "Capcom", "Star Gladiator Episode I: Final Crusade (USA 960627)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, stargladj, starglad, coh1000c, zn6b, driver_device, 0, ROT0, "Capcom", "Star Gladiator Episode I: Final Crusade (Japan 960627)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, starglad,  cpzn1,    starglad, zn6b, driver_device, 0, ROT0, "Capcom", "Star Gladiator Episode I: Final Crusade (USA 960627)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, stargladj, starglad, starglad, zn6b, driver_device, 0, ROT0, "Capcom", "Star Gladiator Episode I: Final Crusade (Japan 960627)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, glpracr,   cpzn1,    glpracr,  zn,   driver_device, 0, ROT0, "Tecmo", "Gallop Racer (English Ver 10.17.K)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, glpracrj,  glpracr,  glpracr,  zn,   driver_device, 0, ROT0, "Tecmo", "Gallop Racer (Japanese Ver 9.01.12)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, sfex,      cpzn1,    coh1002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX (Euro 961219)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -4856,24 +4905,24 @@ GAME( 1997, rvschool,  cpzn2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom
 GAME( 1997, rvschoolu, rvschool, coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Rival Schools: United By Fate (USA 971117)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, rvschoola, rvschool, coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Rival Schools: United By Fate (Asia 971117)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, jgakuen,   rvschool, coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Shiritsu Justice Gakuen: Legion of Heroes (Japan 971117)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, sfex2,     cpzn2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 (USA 980526)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, sfex2a,    sfex2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 (Asia 980312)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, sfex2h,    sfex2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 (Hispanic 980312)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, sfex2j,    sfex2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 (Japan 980312)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, plsmaswd,  cpzn2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Plasma Sword: Nightmare of Bilstein (USA 980316)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, plsmaswda, plsmaswd, coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Plasma Sword: Nightmare of Bilstein (Asia 980316)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, stargld2,  plsmaswd, coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Star Gladiator 2: Nightmare of Bilstein (Japan 980316)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, tgmj,      cpzn2,    coh3002c, zn4w, driver_device, 0, ROT0, "Arika / Capcom", "Tetris The Grand Master (Japan 980710)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, techromn,  cpzn2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Tech Romancer (Euro 980914)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, techromnu, techromn, coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Tech Romancer (USA 980914)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, kikaioh,   techromn, coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Choukou Senki Kikaioh (Japan 980914)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, sfex2p,    cpzn2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (USA 990611)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, sfex2pa,   sfex2p,   coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Asia 990611)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, sfex2ph,   sfex2p,   coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Hispanic 990611)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, sfex2pj,   sfex2p,   coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Japan 990611)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, strider2,  cpzn2,    coh3002c, zn,   driver_device, 0, ROT0, "Capcom", "Strider 2 (USA 991213)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // random hangs / crashes
-GAME( 1999, strider2a, strider2, coh3002c, zn,   driver_device, 0, ROT0, "Capcom", "Strider 2 (Asia 991213)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, shiryu2,   strider2, coh3002c, zn,   driver_device, 0, ROT0, "Capcom", "Strider Hiryu 2 (Japan 991213)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING  )
+GAME( 1998, sfex2,     cpzn2,    sfex2,    zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 (USA 980526)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, sfex2a,    sfex2,    sfex2,    zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 (Asia 980312)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, sfex2h,    sfex2,    sfex2,    zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 (Hispanic 980312)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, sfex2j,    sfex2,    sfex2,    zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 (Japan 980312)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, plsmaswd,  cpzn2,    plsmaswd, zn6b, driver_device, 0, ROT0, "Capcom", "Plasma Sword: Nightmare of Bilstein (USA 980316)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, plsmaswda, plsmaswd, plsmaswd, zn6b, driver_device, 0, ROT0, "Capcom", "Plasma Sword: Nightmare of Bilstein (Asia 980316)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, stargld2,  plsmaswd, plsmaswd, zn6b, driver_device, 0, ROT0, "Capcom", "Star Gladiator 2: Nightmare of Bilstein (Japan 980316)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, tgmj,      cpzn2,    tgmj,     zn4w, driver_device, 0, ROT0, "Arika / Capcom", "Tetris The Grand Master (Japan 980710)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, techromn,  cpzn2,    techromn, zn6b, driver_device, 0, ROT0, "Capcom", "Tech Romancer (Euro 980914)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, techromnu, techromn, techromn, zn6b, driver_device, 0, ROT0, "Capcom", "Tech Romancer (USA 980914)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, kikaioh,   techromn, techromn, zn6b, driver_device, 0, ROT0, "Capcom", "Choukou Senki Kikaioh (Japan 980914)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, sfex2p,    cpzn2,    sfex2p,   zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (USA 990611)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, sfex2pa,   sfex2p,   sfex2p,   zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Asia 990611)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, sfex2ph,   sfex2p,   sfex2p,   zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Hispanic 990611)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, sfex2pj,   sfex2p,   sfex2p,   zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Japan 990611)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, strider2,  cpzn2,    strider2, zn,   driver_device, 0, ROT0, "Capcom", "Strider 2 (USA 991213)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // random hangs / crashes
+GAME( 1999, strider2a, strider2, strider2, zn,   driver_device, 0, ROT0, "Capcom", "Strider 2 (Asia 991213)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, shiryu2,   strider2, strider2, zn,   driver_device, 0, ROT0, "Capcom", "Strider Hiryu 2 (Japan 991213)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING  )
 
 /* Atari */
 
@@ -4882,7 +4931,7 @@ GAME( 1999, shiryu2,   strider2, coh3002c, zn,   driver_device, 0, ROT0, "Capcom
 /* it in every zip file */
 GAME( 1996, atpsx,    0,        coh1000w, zn,       driver_device, 0, ROT0, "Atari", "Atari PSX", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1996, primrag2, atpsx,    coh1000w, primrag2, driver_device, 0, ROT0, "Atari", "Primal Rage 2 (Ver 0.36a)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1996, primrag2, atpsx,    coh1000w, primrag2, driver_device, 0, ROT0, "Atari", "Primal Rage 2 (Ver 0.36a)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // locks up when starting a game
 
 /* Acclaim */
 
@@ -4902,22 +4951,22 @@ GAME( 1996, jdreddb,  jdredd,   jdredd,   jdredd, driver_device, 0, ROT0, "Accla
 /* it in every zip file */
 GAME( 1997, tps,      0,         coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "TPS", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1997, glpracr2,  tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "Gallop Racer 2 (USA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, glpracr2,  tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "Gallop Racer 2 (USA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // locks up when starting a game/entering test mode
 GAME( 1997, glpracr2j, glpracr2, coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "Gallop Racer 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1997, glpracr2l, glpracr2, coh1002ml,   zn, driver_device, 0, ROT0, "Tecmo", "Gallop Racer 2 Link HW (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1998, doapp,     tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "Dead Or Alive ++ (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, doapp,     tps,      doapp,       zn, driver_device, 0, ROT0, "Tecmo", "Dead Or Alive ++ (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, cbaj,      tps,      coh1002msnd, zn, driver_device, 0, ROT0, "UEP Systems", "Cool Boarders Arcade Jam", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, shngmtkb,  tps,      coh1002m,    zn, driver_device, 0, ROT0, "Sunsoft / Activision", "Shanghai Matekibuyuu", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, tondemo,   tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "Tondemo Crisis (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, glpracr3,  tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "Gallop Racer 3 (Export)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, glpracr3j, glpracr3, coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "Gallop Racer 3 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, flamegun,  tps,      coh1002m,    zn, driver_device, 0, ROT0, "Gaps Inc.", "Flame Gunner", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, flamegunj, flamegun, coh1002m,    zn, driver_device, 0, ROT0, "Gaps Inc.", "Flame Gunner (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, lpadv,     tps,      coh1002m,    zn, driver_device, 0, ROT0, "Amuse World", "Logic Pro Adventure (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 2000, tblkkuzu,  tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tamsoft / D3 Publisher", "The Block Kuzushi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 2000, 1on1gov,   tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "1 on 1 Government (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 2000, tecmowcm,  tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup Millennium (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 2001, mfjump,    tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "Monster Farm Jump (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, shngmtkb,  tps,      shngmtkb,    zn, driver_device, 0, ROT0, "Sunsoft / Activision", "Shanghai Matekibuyuu", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, tondemo,   tps,      tondemo,     zn, driver_device, 0, ROT0, "Tecmo", "Tondemo Crisis (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, glpracr3,  tps,      glpracr3,    zn, driver_device, 0, ROT0, "Tecmo", "Gallop Racer 3 (Export)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, glpracr3j, glpracr3, glpracr3,    zn, driver_device, 0, ROT0, "Tecmo", "Gallop Racer 3 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, flamegun,  tps,      flamegun,    zn, driver_device, 0, ROT0, "Gaps Inc.", "Flame Gunner", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, flamegunj, flamegun, flamegun,    zn, driver_device, 0, ROT0, "Gaps Inc.", "Flame Gunner (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, lpadv,     tps,      lpadv,       zn, driver_device, 0, ROT0, "Amuse World", "Logic Pro Adventure (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, tblkkuzu,  tps,      tblkkuzu,    zn, driver_device, 0, ROT0, "Tamsoft / D3 Publisher", "The Block Kuzushi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, 1on1gov,   tps,      1on1gov,     zn, driver_device, 0, ROT0, "Tecmo", "1 on 1 Government (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, tecmowcm,  tps,      tecmowcm,    zn, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup Millennium (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 2001, mfjump,    tps,      mfjump,      zn, driver_device, 0, ROT0, "Tecmo", "Monster Farm Jump (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* Video System */
 
@@ -4940,20 +4989,20 @@ GAME( 1995, sfchamp,   taitofx1, coh1000ta, zn, driver_device, 0, ROT0, "Taito",
 GAME( 1995, sfchampo,  sfchamp,  coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Super Football Champ (Ver 2.4O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, sfchampu,  sfchamp,  coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Super Football Champ (Ver 2.4A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, sfchampj,  sfchamp,  coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Super Football Champ (Ver 2.4J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, psyforce,  taitofx1, coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Psychic Force (Ver 2.4O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, psyforcej, psyforce, coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Psychic Force (Ver 2.4J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, psyforcex, psyforce, coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Psychic Force EX (Ver 2.0J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, mgcldate,  mgcldtex, coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Magical Date / Magical Date - dokidoki kokuhaku daisakusen (Ver 2.02J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, mgcldtex,  taitofx1, coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Magical Date EX / Magical Date - sotsugyou kokuhaku daisakusen (Ver 2.01J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, psyforce,  taitofx1, psyforce,  zn, driver_device, 0, ROT0, "Taito", "Psychic Force (Ver 2.4O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, psyforcej, psyforce, psyforce,  zn, driver_device, 0, ROT0, "Taito", "Psychic Force (Ver 2.4J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, psyforcex, psyforce, psyforce,  zn, driver_device, 0, ROT0, "Taito", "Psychic Force EX (Ver 2.0J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, mgcldate,  mgcldtex, mgcldate,  zn, driver_device, 0, ROT0, "Taito", "Magical Date / Magical Date - dokidoki kokuhaku daisakusen (Ver 2.02J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, mgcldtex,  taitofx1, mgcldate,  zn, driver_device, 0, ROT0, "Taito", "Magical Date EX / Magical Date - sotsugyou kokuhaku daisakusen (Ver 2.01J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1996, raystorm,  taitofx1, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.06A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, raystormo, raystorm, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, raystormu, raystorm, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, raystormj, raystorm, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, ftimpact,  ftimpcta, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, ftimpactu, ftimpcta, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, ftimpactj, ftimpcta, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, ftimpcta,  taitofx1, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact A (Ver 2.00J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, ftimpact,  ftimpcta, ftimpact,  zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, ftimpactu, ftimpcta, ftimpact,  zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, ftimpactj, ftimpcta, ftimpact,  zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, ftimpcta,  taitofx1, ftimpact,  zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact A (Ver 2.00J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, gdarius,   gdarius2, coh1002tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.01J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, gdariusb,  gdarius2, coh1002tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.02A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, gdarius2,  taitofx1, coh1002tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius Ver.2 (Ver 2.03J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -4970,16 +5019,16 @@ GAME( 1997, bldyroar,  beastrzr, coh1002e, zn,   driver_device, 0, ROT0, "Eighti
 GAME( 1997, beastrzrb, beastrzr, coh1002e, zn,   driver_device, 0, ROT0, "bootleg", "Beastorizer (USA bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 /* The region on these is determined from the NVRAM, it can't be changed from the test menu, it's pre-programmed */
-GAME( 1998, bldyror2,  psarc95,  coh1002e, zn6b, driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, bldyror2u, bldyror2, coh1002e, zn6b, driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (USA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, bldyror2a, bldyror2, coh1002e, zn6b, driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Asia)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, bldyror2j, bldyror2, coh1002e, zn6b, driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, bldyror2,  psarc95,  bldyror2, zn6b, driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, bldyror2u, bldyror2, bldyror2, zn6b, driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (USA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, bldyror2a, bldyror2, bldyror2, zn6b, driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Asia)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, bldyror2j, bldyror2, bldyror2, zn6b, driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* The region on these is determined from the NVRAM, it can't be changed from the test menu, it's pre-programmed */
-GAME( 2000, brvblade,  tps,      coh1002e, zn,   driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 2000, brvbladeu, brvblade, coh1002e, zn,   driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (USA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 2000, brvbladea, brvblade, coh1002e, zn,   driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (Asia)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 2000, brvbladej, brvblade, coh1002e, zn,   driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, brvblade,  tps,      brvblade, zn,   driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, brvbladeu, brvblade, brvblade, zn,   driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (USA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, brvbladea, brvblade, brvblade, zn,   driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (Asia)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, brvbladej, brvblade, brvblade, zn,   driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* Bust a Move 2 uses the PSARC95 bios and ET series security but the top board is completely different */
 GAME( 1999, bam2,     psarc95,  bam2,     zn,    driver_device, 0, ROT0, "Metro / Enix / Namco", "Bust a Move 2 (Japanese ROM ver. 1999/07/17 10:00:00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

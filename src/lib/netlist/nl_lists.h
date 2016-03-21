@@ -64,12 +64,12 @@ namespace netlist
 			/* Lock */
 			while (atomic_exchange32(&m_lock, 1)) { }
 	#endif
-			const _Time t = e.exec_time();
+			const _Time &t = e.exec_time();
 			entry_t * i = m_end++;
-			while (t > (i - 1)->exec_time())
+			for (; t > (i - 1)->exec_time(); i--)
 			{
 				*(i) = *(i-1);
-				i--;
+				//i--;
 				inc_stat(m_prof_sortmove);
 			}
 			*i = e;
@@ -80,14 +80,14 @@ namespace netlist
 			//nl_assert(m_end - m_list < _Size);
 		}
 
-		ATTR_HOT  const entry_t *pop()
+		ATTR_HOT  const entry_t & pop()
 		{
-			return --m_end;
+			return *(--m_end);
 		}
 
-		ATTR_HOT  const entry_t *peek() const
+		ATTR_HOT  const entry_t & top() const
 		{
-			return (m_end-1);
+			return *(m_end-1);
 		}
 
 		ATTR_HOT  void remove(const _Element &elem)
@@ -96,8 +96,7 @@ namespace netlist
 	#if HAS_OPENMP && USE_OPENMP
 			while (atomic_exchange32(&m_lock, 1)) { }
 	#endif
-			entry_t * i = m_end - 1;
-			while (i > &m_list[0])
+			for (entry_t * i = m_end - 1; i > &m_list[0]; i--)
 			{
 				if (i->object() == elem)
 				{
@@ -112,7 +111,6 @@ namespace netlist
 	#endif
 					return;
 				}
-				i--;
 			}
 	#if HAS_OPENMP && USE_OPENMP
 			m_lock = 0;
@@ -148,9 +146,7 @@ namespace netlist
 		volatile INT32 m_lock;
 	#endif
 		entry_t * m_end;
-		//entry_t m_list[_Size];
 		parray_t<entry_t> m_list;
-
 	};
 
 }

@@ -42,14 +42,3 @@ void osd_closedir(osd_directory *dir)
 	// since there are no standard C library routines for walking directories,
 	// we do nothing
 }
-
-
-//============================================================
-//  osd_is_absolute_path
-//============================================================
-
-int osd_is_absolute_path(const char *path)
-{
-	// assume no for everything
-	return FALSE;
-}

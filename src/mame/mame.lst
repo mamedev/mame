@@ -1142,9 +1142,6 @@ amusco                          // 1987, Amusco.
 @source:amust.cpp
 amust                           // 
 
-@source:android.cpp
-androidp                        // (c) 198? Nasco
-
 @source:angelkds.cpp
 angelkds                        // 833-6599 (c) 1988 Sega / Nasco?
 spcpostn                        // (c) 1986 Sega / Nasco"
@@ -8893,6 +8890,7 @@ ccbootmr                        // Model Racing bootleg
 cclimber                        // (c) 1980 Nichibutsu
 cclimberj                       // (c) 1980 Nichibutsu
 cclimbroper                     // Operamatic bootleg
+cclimbrrod						// Rodmar bootleg
 ckong                           // (c) 1981 (Kyoei)
 ckongalc                        // bootleg (Alca)
 ckongdks                        // Spanish Crazy Kong bootleg
@@ -13101,7 +13099,8 @@ chryglda                        // bootleg
 cmast91                         // (c) 1991 Dyna Electronics
 cmast92                         // (c) 1992 Dyna Electronics
 cmast97                         // (c) 1996 Dyna Electronics
-cmast99                         // 1999?
+cmast99                         // (c) 1999 Dyna Electronics
+cmast99b                        // bootleg
 cmaster                         // (c) 1991 Dyna Electronics
 cmasterb                        // (c) 1991 Dyna Electronics
 cmasterbv                       // (c) 1991 Dyna Electronics / Gerald Duhamel?
@@ -13783,6 +13782,7 @@ sgnascar                        // 2000.09 Nascar Arcade
 
 @source:himesiki.cpp
 himesiki                        // (c) 1989 Hi-Soft
+androidp                        // (c) 198? Nasco
 
 @source:hitme.cpp
 barricad                        // (c) 1976 Ramtek
@@ -14208,6 +14208,7 @@ iskr1031                        //
 istellar                        // (c) 1983 Funai / Gakken
 
 @source:iteagle.cpp
+bbh2sp                          // 
 bbhcotw                         // 
 bbhsc                           // 
 carnking                        // 
@@ -16672,6 +16673,7 @@ trojana                         // 4/1986 (c) 1986 (US)
 trojanb                         // bootleg
 trojanj                         // 4/1986 (c) 1986 (Japan)
 trojanr                         // 4/1986 (c) 1986 + Romstar
+fball                        // 
 
 @source:lynx.cpp
 lynx                            // Atari Lynx Handheld
@@ -28443,7 +28445,7 @@ ssjkrpkr                        // (c) 1982 Southern Systems & Assembly, Ltd.
 tpoker2                         // (c) 1993 Micro Manufacturing, Inc.
 
 @source:notetaker.cpp
-notetakr                        // 
+notetakr                        //
 
 @source:nova2001.cpp
 ninjakun                        // UPL-84003 (c) 1984 Taito Corporation
@@ -33735,6 +33737,9 @@ swyft                           //
 @source:sym1.cpp
 sym1                            // Synertek SYM-1
 
+@source:symbolics.cpp
+s3670                           // 
+
 @source:sys2900.cpp
 sys2900                         // 
 
@@ -35648,6 +35653,7 @@ videopkr                        // (c) 1984 InterFlip
 @source:vigilant.cpp
 buccanrs                        // (c) 1989 Duintronic
 buccanrsa                       // (c) 1989 Duintronic
+buccanrsb						// (c) 1989 Duintronic
 kikcubic                        // (c) 1988 (Japan)
 kikcubicb                       // bootleg
 vigilant                        // (c) 1988 (World Rev E)

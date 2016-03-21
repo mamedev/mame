@@ -40,7 +40,7 @@ end
 	}
 
 
-project("tests")
+project("mametests")
 	uuid ("66d4c639-196b-4065-a411-7ee9266564f5")
 	kind "ConsoleApp"	
 
@@ -70,11 +70,13 @@ project("tests")
 	includedirs {
 		MAME_DIR .. "3rdparty/googletest/googletest/include",
 		MAME_DIR .. "src/osd",
+		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/lib/util",
 	}
 
 	files {
 		MAME_DIR .. "tests/main.cpp",
 		MAME_DIR .. "tests/lib/util/corestr.cpp",
+		MAME_DIR .. "tests/emu/attotime.cpp",
 	}
 

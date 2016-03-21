@@ -783,6 +783,14 @@ typedef uint64_t GLuint64;
 #	define GL_NUM_EXTENSIONS 0x821D
 #endif // GL_NUM_EXTENSIONS
 
+#ifndef GL_SAMPLE_ALPHA_TO_COVERAGE
+#	define GL_SAMPLE_ALPHA_TO_COVERAGE 0x809E
+#endif // GL_SAMPLE_ALPHA_TO_COVERAGE
+
+#ifndef GL_CONSERVATIVE_RASTERIZATION_NV
+#	define GL_CONSERVATIVE_RASTERIZATION_NV 0x9346
+#endif // GL_CONSERVATIVE_RASTERIZATION_NV
+
 // _KHR or _ARB...
 #define GL_DEBUG_OUTPUT_SYNCHRONOUS         0x8242
 #define GL_DEBUG_NEXT_LOGGED_MESSAGE_LENGTH 0x8243
@@ -1058,9 +1066,17 @@ namespace bgfx { namespace gl
 			GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0) );
 		}
 
-		void update(uint32_t _offset, uint32_t _size, void* _data)
+		void update(uint32_t _offset, uint32_t _size, void* _data, bool _discard = false)
 		{
 			BX_CHECK(0 != m_id, "Updating invalid index buffer.");
+
+			if (_discard)
+			{
+				// orphan buffer...
+				destroy();
+				create(m_size, NULL, m_flags);
+			}
+
 			GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id) );
 			GL_CHECK(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER
 				, _offset
@@ -1104,9 +1120,17 @@ namespace bgfx { namespace gl
 			GL_CHECK(glBindBuffer(m_target, 0) );
 		}
 
-		void update(uint32_t _offset, uint32_t _size, void* _data)
+		void update(uint32_t _offset, uint32_t _size, void* _data, bool _discard = false)
 		{
 			BX_CHECK(0 != m_id, "Updating invalid vertex buffer.");
+
+			if (_discard)
+			{
+				// orphan buffer...
+				destroy();
+				create(m_size, NULL, m_decl, 0);
+			}
+
 			GL_CHECK(glBindBuffer(m_target, m_id) );
 			GL_CHECK(glBufferSubData(m_target
 				, _offset

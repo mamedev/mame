@@ -1,4 +1,9 @@
 *~
+.*.sw?
+*.pyc
+*.pyo
+.DS_Store
+
 /*
 /*/
 !/3rdparty/
@@ -26,11 +31,11 @@
 !/makefile
 !/mame.doxygen
 !/*.md
+!/*.bdc
 !/LICENSE
 /.idea
 regtests/chdman/temp
 regtests/jedutil/output
-*.pyc
 *.mo
 /CMakeLists.txt
 /src/devices/cpu/m68000/m68kops.cpp

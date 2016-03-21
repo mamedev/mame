@@ -94,7 +94,7 @@ function maintargetosdoptions(_target,_subtarget)
 		links {
 			"psapi",
 		}
-		configuration { "mingw*-gcc" }
+		configuration { "mingw*" }
 			linkoptions{
 				"-municode",
 			}
@@ -360,6 +360,7 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
+		MAME_DIR .. "src/osd/modules/file",
 		MAME_DIR .. "src/osd/modules/render",
 		MAME_DIR .. "3rdparty",
 		MAME_DIR .. "src/osd/sdl",
@@ -460,10 +461,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/strconv.cpp",
 		MAME_DIR .. "src/osd/strconv.h",
 		MAME_DIR .. "src/osd/sdl/sdldir.cpp",
-		MAME_DIR .. "src/osd/sdl/sdlfile.cpp",
-		MAME_DIR .. "src/osd/sdl/sdlfile.h",
-		MAME_DIR .. "src/osd/sdl/sdlptty_" .. BASE_TARGETOS ..".cpp",
-		MAME_DIR .. "src/osd/sdl/sdlsocket.cpp",
 		MAME_DIR .. "src/osd/sdl/sdlos_" .. SDLOS_TARGETOS .. ".cpp",
 		MAME_DIR .. "src/osd/modules/osdmodule.cpp",
 		MAME_DIR .. "src/osd/modules/osdmodule.h",
@@ -473,6 +470,30 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/sync/osdsync.h",
 		MAME_DIR .. "src/osd/modules/sync/work_osd.cpp",
 	}
+
+	if BASE_TARGETOS=="unix" then
+		files {
+			MAME_DIR .. "src/osd/modules/file/posixfile.cpp",
+			MAME_DIR .. "src/osd/modules/file/posixfile.h",
+			MAME_DIR .. "src/osd/modules/file/posixptty.cpp",
+			MAME_DIR .. "src/osd/modules/file/posixsocket.cpp",
+		}
+	elseif BASE_TARGETOS=="win32" then
+		includedirs {
+			MAME_DIR .. "src/osd/windows",
+		}
+		files {
+			MAME_DIR .. "src/osd/modules/file/winfile.cpp",
+			MAME_DIR .. "src/osd/modules/file/winfile.h",
+			MAME_DIR .. "src/osd/modules/file/winptty.cpp",
+			MAME_DIR .. "src/osd/modules/file/winsocket.cpp",
+			MAME_DIR .. "src/osd/windows/winutil.cpp", -- FIXME put the necessary functions somewhere more appropriate
+		}
+	else
+		files {
+			MAME_DIR .. "src/osd/modules/file/stdfile.cpp",
+		}
+	end
 
 	if _OPTIONS["targetos"]=="macosx" then
 		files {

@@ -245,7 +245,7 @@ public:
 	cache_target() { }
 	~cache_target();
 
-	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int width, int height, int prescale_x, int prescale_y);
+	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height);
 
 	surface *last_target;
 	texture *last_texture;
@@ -270,31 +270,34 @@ public:
 	d3d_render_target() { }
 	~d3d_render_target();
 
-	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int width, int height, int prescale_x, int prescale_y);
+	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height);
 	int next_index(int index) { return ++index > 1 ? 0 : index; }
 
+	// real target dimension
 	int target_width;
 	int target_height;
 
-	int prescale_x;
-	int prescale_y;
-
+	// only used to identify/find the render target
 	int width;
 	int height;
 
 	int screen_index;
 	int page_index;
 
-	surface *prescale_target[2];
-	texture *prescale_texture[2];
-	surface *native_target[2];
-	texture *native_texture[2];
+	surface *target_surface[2];
+	texture *target_texture[2];
+	surface *source_surface[2];
+	texture *source_texture[2];
 
 	d3d_render_target *next;
 	d3d_render_target *prev;
 
-	surface *bloom_target[11];
+	surface *bloom_surface[11];
 	texture *bloom_texture[11];
+
+	float bloom_dims[11][2];
+
+	int bloom_count;
 };
 
 #endif

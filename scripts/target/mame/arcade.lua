@@ -100,7 +100,7 @@ CPUS["SM8500"] = true
 CPUS["MINX"] = true
 CPUS["SSEM"] = true
 CPUS["AVR8"] = true
---CPUS["TMS0980"] = true
+--CPUS["TMS1000"] = true
 CPUS["I4004"] = true
 CPUS["SUPERFX"] = true
 CPUS["Z8"] = true
@@ -257,6 +257,7 @@ SOUNDS["SB0400"] = true
 SOUNDS["AC97"] = true
 SOUNDS["ES1373"] = true
 SOUNDS["L7A1045"] = true
+SOUNDS["AD1848"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -2964,7 +2965,6 @@ files {
 
 createMAMEProjects(_target, _subtarget, "sega")
 files {
-	MAME_DIR .. "src/mame/drivers/android.cpp",
 	MAME_DIR .. "src/mame/drivers/angelkds.cpp",
 	MAME_DIR .. "src/mame/includes/angelkds.h",
 	MAME_DIR .. "src/mame/video/angelkds.cpp",

@@ -5,11 +5,15 @@
  *
  */
 
-#ifndef FONT_MODULE_H_
-#define FONT_MODULE_H_
+#ifndef MAME_OSD_MODULES_FONT_FONTMODULE_H
+#define MAME_OSD_MODULES_FONT_FONTMODULE_H
 
 #include "osdepend.h"
 #include "modules/osdmodule.h"
+
+#include <string>
+#include <vector>
+
 
 //============================================================
 //  CONSTANTS
@@ -21,8 +25,13 @@ class font_module
 {
 public:
 	virtual ~font_module() { }
-	virtual osd_font *font_alloc() = 0;
+
+	/** attempt to allocate a font instance */
+	virtual osd_font::ptr font_alloc() = 0;
+
+	/** attempt to list available font families */
+	virtual bool get_font_families(std::string const &font_path, std::vector<std::pair<std::string, std::string> > &result) = 0;
 };
 
 
-#endif /* FONT_MODULE_H_ */
+#endif // MAME_OSD_MODULES_FONT_FONTMODULE_H

@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    ui/filemngr.c
+    ui/filemngr.cpp
 
     MESS's clunky built-in file manager
 

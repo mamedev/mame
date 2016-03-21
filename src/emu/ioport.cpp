@@ -3407,8 +3407,8 @@ time_t ioport_manager::playback_init()
 		return 0;
 
 	// open the playback file
-	file_error filerr = m_playback_file.open(filename);
-	assert_always(filerr == FILERR_NONE, "Failed to open file for playback");
+	osd_file::error filerr = m_playback_file.open(filename);
+	assert_always(filerr == osd_file::error::NONE, "Failed to open file for playback");
 
 	// read the header and verify that it is a modern version; if not, print an error
 	inp_header header;
@@ -3582,8 +3582,8 @@ void ioport_manager::record_init()
 		return;
 
 	// open the record file
-	file_error filerr = m_record_file.open(filename);
-	assert_always(filerr == FILERR_NONE, "Failed to open file for recording");
+	osd_file::error filerr = m_record_file.open(filename);
+	assert_always(filerr == osd_file::error::NONE, "Failed to open file for recording");
 
 	// get the base time
 	system_time systime;
@@ -3625,8 +3625,8 @@ void ioport_manager::timecode_init() {
 	filename.append(record_filename).append(".timecode");
 	osd_printf_info("Record input timecode file: %s\n", record_filename);
 
-	file_error filerr = m_timecode_file.open(filename.c_str());
-	assert_always(filerr == FILERR_NONE, "Failed to open file for input timecode recording");
+	osd_file::error filerr = m_timecode_file.open(filename.c_str());
+	assert_always(filerr == osd_file::error::NONE, "Failed to open file for input timecode recording");
 
 	m_timecode_file.puts(std::string("# ==========================================\n").c_str());
 	m_timecode_file.puts(std::string("# TIMECODE FILE FOR VIDEO PREVIEW GENERATION\n").c_str());

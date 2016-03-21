@@ -13,7 +13,6 @@
 
 #include <memory>
 #include <chrono>
-#include <string>
 #include <queue>
 
 //============================================================
@@ -407,12 +406,12 @@ public:
 	UINT32 size() { return m_table_size; }
 	
 	// public methods
-	input_item_id lookup_mame_code(const char * scode);
-	int lookup_mame_index(const char * scode);
+	input_item_id lookup_mame_code(const char * scode) const;
+	int lookup_mame_index(const char * scode) const;
 
 #if defined(OSD_WINDOWS)
-	input_item_id map_di_scancode_to_itemid(int di_scancode);
-	int vkey_for_mame_code(input_code code);
+	input_item_id map_di_scancode_to_itemid(int di_scancode) const;
+	int vkey_for_mame_code(input_code code) const;
 #endif
 
 	static keyboard_trans_table& instance()
@@ -444,7 +443,8 @@ public:
 		m_input_enabled(FALSE),
 		m_mouse_enabled(FALSE),
 		m_lightgun_enabled(FALSE),
-		m_input_paused(FALSE)
+		m_input_paused(FALSE),
+		m_options(nullptr)
 	{
 	}
 

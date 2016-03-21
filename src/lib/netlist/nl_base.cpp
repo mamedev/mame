@@ -186,16 +186,15 @@ netlist_t::netlist_t()
 
 netlist_t::~netlist_t()
 {
-	for (std::size_t i=0; i < m_nets.size(); i++)
+	for (net_t *net : m_nets)
 	{
-		if (!m_nets[i]->isRailNet())
+		if (!net->isRailNet())
 		{
-			pfree(m_nets[i]);
+			pfree(net);
 		}
 	}
 
 	m_nets.clear();
-
 	m_devices.clear_and_free();
 
 	pstring::resetmem();
@@ -237,12 +236,9 @@ ATTR_COLD void netlist_t::start()
 	m_use_deactivate = (m_params->m_use_deactivate.Value() ? true : false);
 
 	log().debug("Initializing devices ...\n");
-	for (std::size_t i = 0; i < m_devices.size(); i++)
-	{
-		device_t *dev = m_devices[i];
+	for (device_t *dev : m_devices)
 		if (dev != m_solver && dev != m_params)
 			dev->start_dev();
-	}
 
 }
 
@@ -251,28 +247,23 @@ ATTR_COLD void netlist_t::stop()
 	/* find the main clock and solver ... */
 
 	log().debug("Stopping all devices ...\n");
-
-	// Step all devices once !
-	for (std::size_t i = 0; i < m_devices.size(); i++)
-	{
-		m_devices[i]->stop_dev();
-	}
+	for (device_t *dev : m_devices)
+		dev->stop_dev();
 }
 
 ATTR_COLD net_t *netlist_t::find_net(const pstring &name)
 {
-	for (std::size_t i = 0; i < m_nets.size(); i++)
-	{
-		if (m_nets[i]->name() == name)
-			return m_nets[i];
-	}
+	for (net_t *net : m_nets)
+		if (net->name() == name)
+			return net;
+
 	return NULL;
 }
 
 ATTR_COLD void netlist_t::rebuild_lists()
 {
-	for (std::size_t i = 0; i < m_nets.size(); i++)
-		m_nets[i]->rebuild_list();
+	for (net_t *net : m_nets)
+		net->rebuild_list();
 }
 
 
@@ -303,9 +294,9 @@ ATTR_COLD void netlist_t::reset()
 
 	// FIXME: some const devices rely on this
 	/* make sure params are set now .. */
-	for (std::size_t i = 0; i < m_devices.size(); i++)
+	for (device_t *dev : m_devices)
 	{
-		m_devices[i]->update_param();
+		dev->update_param();
 	}
 }
 
@@ -318,7 +309,7 @@ ATTR_HOT void netlist_t::process_queue(const netlist_time &delta)
 	{
 		while ( (m_time < m_stop) && (m_queue.is_not_empty()))
 		{
-			const queue_t::entry_t e = *m_queue.pop();
+			const queue_t::entry_t &e = m_queue.pop();
 			m_time = e.exec_time();
 			e.object()->update_devs();
 
@@ -336,21 +327,25 @@ ATTR_HOT void netlist_t::process_queue(const netlist_time &delta)
 		{
 			if (m_queue.is_not_empty())
 			{
-				while (m_queue.peek()->exec_time() > mc_time)
+				while (m_queue.top().exec_time() > mc_time)
 				{
 					m_time = mc_time;
 					mc_time += inc;
-					devices::NETLIB_NAME(mainclock)::mc_update(mc_net);
+					mc_net.toggle_new_Q();
+					mc_net.update_devs();
+					//devices::NETLIB_NAME(mainclock)::mc_update(mc_net);
 				}
 
-				const queue_t::entry_t e = *m_queue.pop();
+				const queue_t::entry_t &e = m_queue.pop();
 				m_time = e.exec_time();
 				e.object()->update_devs();
 
 			} else {
 				m_time = mc_time;
 				mc_time += inc;
-				devices::NETLIB_NAME(mainclock)::mc_update(mc_net);
+				mc_net.toggle_new_Q();
+				mc_net.update_devs();
+				//devices::NETLIB_NAME(mainclock)::mc_update(mc_net);
 			}
 
 			add_to_stat(m_perf_out_processed, 1);
@@ -435,13 +430,13 @@ ATTR_HOT netlist_sig_t core_device_t::INPLOGIC_PASSIVE(logic_input_t &inp)
 
 device_t::device_t()
 	: core_device_t(GENERIC),
-		m_terminals(20)
+		m_terminals()
 {
 }
 
 device_t::device_t(const family_t afamily)
 	: core_device_t(afamily),
-		m_terminals(20)
+		m_terminals()
 {
 }
 
@@ -477,7 +472,7 @@ ATTR_COLD void device_t::register_subalias(const pstring &name, core_terminal_t 
 	setup().register_alias_nofqn(alias, term.name());
 
 	if (term.isType(terminal_t::INPUT) || term.isType(terminal_t::TERMINAL))
-		m_terminals.add(alias);
+		m_terminals.push_back(alias);
 }
 
 ATTR_COLD void device_t::register_subalias(const pstring &name, const pstring &aliased)
@@ -497,7 +492,7 @@ ATTR_COLD void device_t::register_terminal(const pstring &name, terminal_t &port
 {
 	setup().register_object(*this, name, port);
 	if (port.isType(terminal_t::INPUT) || port.isType(terminal_t::TERMINAL))
-		m_terminals.add(port.name());
+		m_terminals.push_back(port.name());
 }
 
 ATTR_COLD void device_t::register_output(const pstring &name, logic_output_t &port)
@@ -515,13 +510,13 @@ ATTR_COLD void device_t::register_input(const pstring &name, logic_input_t &inp)
 {
 	inp.set_logic_family(this->logic_family());
 	setup().register_object(*this, name, inp);
-	m_terminals.add(inp.name());
+	m_terminals.push_back(inp.name());
 }
 
 ATTR_COLD void device_t::register_input(const pstring &name, analog_input_t &inp)
 {
 	setup().register_object(*this, name, inp);
-	m_terminals.add(inp.name());
+	m_terminals.push_back(inp.name());
 }
 
 ATTR_COLD void device_t::connect_late(core_terminal_t &t1, core_terminal_t &t2)
@@ -584,7 +579,7 @@ ATTR_COLD net_t::~net_t()
 ATTR_COLD void net_t::init_object(netlist_t &nl, const pstring &aname)
 {
 	object_t::init_object(nl, aname);
-	nl.m_nets.add(this);
+	nl.m_nets.push_back(this);
 }
 
 ATTR_HOT void net_t::inc_active(core_terminal_t &term)
@@ -638,10 +633,10 @@ ATTR_COLD void net_t::rebuild_list()
 
 	unsigned cnt = 0;
 	m_list_active.clear();
-	for (std::size_t i=0; i < m_core_terms.size(); i++)
-		if (m_core_terms[i]->state() != logic_t::STATE_INP_PASSIVE)
+	for (core_terminal_t *term : m_core_terms)
+		if (term->state() != logic_t::STATE_INP_PASSIVE)
 		{
-			m_list_active.add(*m_core_terms[i]);
+			m_list_active.add(*term);
 			cnt++;
 		}
 	m_active = cnt;
@@ -658,55 +653,23 @@ ATTR_COLD void net_t::save_register()
 	object_t::save_register();
 }
 
-ATTR_HOT /* inline */ void core_terminal_t::update_dev(const UINT32 mask)
-{
-	inc_stat(netdev().stat_call_count);
-	if ((state() & mask) != 0)
-	{
-		device().update_dev();
-	}
-}
-
 ATTR_HOT /* inline */ void net_t::update_devs()
 {
 	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());
 
-	const UINT32 masks[4] = { 1, 5, 3, 1 };
-	const UINT32 mask = masks[ (m_cur_Q  << 1) | m_new_Q ];
+	const int masks[4] = { 1, 5, 3, 1 };
+	const int mask = masks[ (m_cur_Q  << 1) | m_new_Q ];
 
 	m_in_queue = 2; /* mark as taken ... */
 	m_cur_Q = m_new_Q;
-#if 0
-	core_terminal_t * t[256];
-	core_terminal_t *p = m_list_active.first();
-	int cnt = 0;
-	while (p != NULL)
+
+	for (core_terminal_t *p = m_list_active.first(); p != NULL; p = p->next())
 	{
+		inc_stat(p->netdev().stat_call_count);
 		if ((p->state() & mask) != 0)
-			t[cnt++] = p;
-		p = m_list_active.next(p);
+			p->device().update_dev();
 	}
-
-	for (int i=0; i<cnt; i++)
-		t[i]->netdev().update_dev();
-	core_terminal_t *p = m_list_active.first();
-
-	while (p != NULL)
-	{
-		p->update_dev(mask);
-		p = m_list_active.next(p);
-	}
-
-#else
-	core_terminal_t *p = m_list_active.first();
-
-	while (p != NULL)
-	{
-		p->update_dev(mask);
-		p = p->m_next;
-	}
-#endif
 }
 
 ATTR_COLD void net_t::reset()
@@ -722,14 +685,14 @@ ATTR_COLD void net_t::reset()
 	/* rebuild m_list */
 
 	m_list_active.clear();
-	for (std::size_t i=0; i < m_core_terms.size(); i++)
-		m_list_active.add(*m_core_terms[i]);
+	for (core_terminal_t *ct : m_core_terms)
+		m_list_active.add(*ct);
 
-	for (std::size_t i=0; i < m_core_terms.size(); i++)
-		m_core_terms[i]->do_reset();
+	for (core_terminal_t *ct : m_core_terms)
+		ct->do_reset();
 
-	for (std::size_t i=0; i < m_core_terms.size(); i++)
-		if (m_core_terms[i]->state() != logic_t::STATE_INP_PASSIVE)
+	for (core_terminal_t *ct : m_core_terms)
+		if (ct->state() != logic_t::STATE_INP_PASSIVE)
 			m_active++;
 }
 
@@ -737,7 +700,7 @@ ATTR_COLD void net_t::register_con(core_terminal_t &terminal)
 {
 	terminal.set_net(*this);
 
-	m_core_terms.add(&terminal);
+	m_core_terms.push_back(&terminal);
 
 	if (terminal.state() != logic_t::STATE_INP_PASSIVE)
 		m_active++;
@@ -745,11 +708,8 @@ ATTR_COLD void net_t::register_con(core_terminal_t &terminal)
 
 ATTR_COLD void net_t::move_connections(net_t *dest_net)
 {
-	for (std::size_t i = 0; i < m_core_terms.size(); i++)
-	{
-		core_terminal_t *p = m_core_terms[i];
-		dest_net->register_con(*p);
-	}
+	for (core_terminal_t *ct : m_core_terms)
+		dest_net->register_con(*ct);
 	m_core_terms.clear();
 	m_active = 0;
 }
@@ -842,10 +802,9 @@ ATTR_COLD void analog_net_t::process_net(list_t *groups, int &cur_group)
 	if (num_cons() == 0)
 		return;
 	/* add the net */
-	groups[cur_group].add(this);
-	for (std::size_t i = 0; i < m_core_terms.size(); i++)
+	groups[cur_group].push_back(this);
+	for (core_terminal_t *p : m_core_terms)
 	{
-		core_terminal_t *p = m_core_terms[i];
 		if (p->isType(terminal_t::TERMINAL))
 		{
 			terminal_t *pt = static_cast<terminal_t *>(p);
@@ -863,7 +822,7 @@ ATTR_COLD void analog_net_t::process_net(list_t *groups, int &cur_group)
 
 ATTR_COLD core_terminal_t::core_terminal_t(const type_t atype, const family_t afamily)
 : device_object_t(atype, afamily)
-, plinkedlist_element_t<core_terminal_t>()
+, plinkedlist_element_t()
 , m_net(NULL)
 , m_state(STATE_NONEX)
 {

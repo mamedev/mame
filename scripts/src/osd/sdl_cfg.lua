@@ -101,7 +101,7 @@ if BASE_TARGETOS=="unix" then
 end
 
 if _OPTIONS["targetos"]=="windows" then
-	configuration { "mingw*-gcc or vs*" }
+	configuration { "mingw* or vs*" }
 		defines {
 			"UNICODE",
 			"_UNICODE",

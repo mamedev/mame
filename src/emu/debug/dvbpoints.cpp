@@ -240,6 +240,7 @@ void debug_view_breakpoints::view_update()
 	if (m_visible.y > 0)
 	{
 		linebuf.clear();
+		linebuf.rdbuf()->clear();
 		linebuf << "ID";
 		if (m_sortType == &cIndexAscending) linebuf.put('\\');
 		else if (m_sortType == &cIndexDescending) linebuf.put('/');
@@ -282,6 +283,7 @@ void debug_view_breakpoints::view_update()
 			device_debug::breakpoint *const bp = m_buffer[bpi];
 
 			linebuf.clear();
+			linebuf.rdbuf()->clear();
 			util::stream_format(linebuf, "%2X", bp->index());
 			pad_ostream_to_length(linebuf, tableBreaks[0]);
 			linebuf.put(bp->enabled() ? 'X' : 'O');

@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /***************************************************************************
 
     ui/cmdrender.h
 
-    UI rendfont.
+    UI command render fonts.
 
 ***************************************************************************/
 
@@ -14,7 +14,6 @@
 void convert_command_glyph(std::string &str)
 {
 	int j;
-	const char *s = str.c_str();
 	int len = str.length();
 	int buflen = (len + 2) * 2;
 	char *d = global_alloc_array(char, buflen);
@@ -23,16 +22,16 @@ void convert_command_glyph(std::string &str)
 	{
 		fix_command_t *fixcmd = nullptr;
 		unicode_char uchar;
-		int ucharcount = uchar_from_utf8(&uchar, s + i, len - i);
+		int ucharcount = uchar_from_utf8(&uchar, str.substr(i).c_str(), len - i);
 		if (ucharcount == -1)
 			break;
 		else if (ucharcount != 1)
 			goto process_next;
-		else if (s[i] == '\n')
+		else if (str[i] == '\n')
 			uchar = '\n';
-		else if (s[i] == COMMAND_CONVERT_TEXT)
+		else if (str[i] == COMMAND_CONVERT_TEXT)
 		{
-			if (s[i] == s[i + 1])
+			if (str[i] == str[i + 1])
 				++i;
 			else
 			{
@@ -42,7 +41,7 @@ void convert_command_glyph(std::string &str)
 					if (!fixtext->glyph_str_len)
 						fixtext->glyph_str_len = strlen(fixtext->glyph_str);
 
-					if (strncmp(fixtext->glyph_str, s + i + 1, fixtext->glyph_str_len) == 0)
+					if (strncmp(fixtext->glyph_str, str.substr(i + 1).c_str(), fixtext->glyph_str_len) == 0)
 					{
 						uchar = fixtext->glyph_code + COMMAND_UNICODE;
 						i += strlen(fixtext->glyph_str);
@@ -51,19 +50,19 @@ void convert_command_glyph(std::string &str)
 				}
 			}
 		}
-		else if (s[i] == COMMAND_DEFAULT_TEXT)
+		else if (str[i] == COMMAND_DEFAULT_TEXT)
 			fixcmd = default_text;
-		else if (s[i] == COMMAND_EXPAND_TEXT)
+		else if (str[i] == COMMAND_EXPAND_TEXT)
 			fixcmd = expand_text;
 
 		if (fixcmd)
 		{
-			if (s[i] == s[i + 1])
+			if (str[i] == str[i + 1])
 				i++;
 			else
 			{
 				for (; fixcmd->glyph_code; ++fixcmd)
-					if (s[i + 1] == fixcmd->glyph_char)
+					if (str[i + 1] == fixcmd->glyph_char)
 					{
 						uchar = fixcmd->glyph_code + COMMAND_UNICODE;
 						++i;
@@ -87,7 +86,7 @@ void render_font::render_font_command_glyph()
 {
 	emu_file ramfile(OPEN_FLAG_READ);
 
-	if (ramfile.open_ram(font_uicmd14, sizeof(font_uicmd14)) == FILERR_NONE)
+	if (ramfile.open_ram(font_uicmd14, sizeof(font_uicmd14)) == osd_file::error::NONE)
 		load_cached_cmd(ramfile, 0);
 }
 

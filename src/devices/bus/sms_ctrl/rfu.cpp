@@ -6,6 +6,9 @@
 
 **********************************************************************/
 
+// This emulated device is the version released by Sega. In Brazil, Tec Toy
+// released a version that does not have any switch to turn on/off auto-repeat.
+
 #include "rfu.h"
 
 
@@ -16,7 +19,7 @@
 
 const device_type SMS_RAPID_FIRE = &device_creator<sms_rapid_fire_device>;
 
-
+// time interval not verified
 #define RAPID_FIRE_INTERVAL attotime::from_hz(10)
 
 

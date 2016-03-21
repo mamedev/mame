@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __OSDOBJ_COMMON_H__
-#define __OSDOBJ_COMMON__
+#ifndef MAME_OSD_LIB_OSDOBJ_COMMON_H
+#define MAME_OSD_LIB_OSDOBJ_COMMON_H
 
 #include "osdepend.h"
 #include "modules/osdmodule.h"
@@ -195,18 +195,14 @@ public:
 	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 
-	// font overridables
-	virtual osd_font *font_open(const char *name, int &height);
-	virtual void font_close(osd_font *font);
-	virtual bool font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
-
 	// video overridables
 	virtual slider_state *get_slider_list() override;
 
 	// command option overrides
 	virtual bool execute_command(const char *command) override;
 
-	virtual osd_font *font_alloc() override { return m_font_module->font_alloc(); }
+	virtual osd_font::ptr font_alloc() override { return m_font_module->font_alloc(); }
+	virtual bool get_font_families(std::string const &font_path, std::vector<std::pair<std::string, std::string> > &result) override { return m_font_module->get_font_families(font_path, result); }
 
 	virtual osd_midi_device *create_midi_device() override { return m_midi->create_midi_device(); }
 
@@ -302,4 +298,4 @@ debug_module *osd_debugger_creator()
 	return global_alloc(_DeviceClass());
 }
 
-#endif  /* __OSDOBJ_COMMON_H__ */
+#endif  // MAME_OSD_LIB_OSDOBJ_COMMON_H

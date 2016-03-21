@@ -833,12 +833,6 @@ void xbox_base_state::usb_ohci_plug(int port, ohci_function_device *function)
 	}
 }
 
-static USBStandardDeviceDescriptor devdesc = {18,1,0x110,0x00,0x00,0x00,64,0x45e,0x202,0x100,0,0,0,1};
-static USBStandardConfigurationDescriptor condesc = {9,2,0x20,1,1,0,0x80,50};
-static USBStandardInterfaceDescriptor intdesc = {9,4,0,0,2,0x58,0x42,0,0};
-static USBStandardEndpointDescriptor enddesc82 = {7,5,0x82,3,0x20,4};
-static USBStandardEndpointDescriptor enddesc02 = {7,5,0x02,3,0x20,4};
-
 ohci_function_device::ohci_function_device(running_machine &machine)
 {
 	state = DefaultState;
@@ -857,16 +851,12 @@ ohci_function_device::ohci_function_device(running_machine &machine)
 	endpoints[0].type = ControlEndpoint;
 	settingaddress = false;
 	configurationvalue = 0;
+	selected_configuration = nullptr;
 	latest_configuration = nullptr;
 	latest_alternate = nullptr;
-	add_device_descriptor(devdesc);
-	add_configuration_descriptor(condesc);
-	add_interface_descriptor(intdesc);
-	add_endpoint_descriptor(enddesc82);
-	add_endpoint_descriptor(enddesc02);
 }
 
-void ohci_function_device::add_device_descriptor(USBStandardDeviceDescriptor &descriptor)
+void ohci_function_device::add_device_descriptor(const USBStandardDeviceDescriptor &descriptor)
 {
 	UINT8 *p = descriptors + descriptors_pos;
 
@@ -892,7 +882,7 @@ void ohci_function_device::add_device_descriptor(USBStandardDeviceDescriptor &de
 	memcpy(&device_descriptor, &descriptor, sizeof(USBStandardDeviceDescriptor));
 }
 
-void ohci_function_device::add_configuration_descriptor(USBStandardConfigurationDescriptor &descriptor)
+void ohci_function_device::add_configuration_descriptor(const USBStandardConfigurationDescriptor &descriptor)
 {
 	usb_device_configuration *c = new usb_device_configuration;
 	UINT8 *p = descriptors + descriptors_pos;
@@ -906,14 +896,16 @@ void ohci_function_device::add_configuration_descriptor(USBStandardConfiguration
 	p[6] = descriptor.iConfiguration;
 	p[7] = descriptor.bmAttributes;
 	p[8] = descriptor.MaxPower;
+	c->position = p;
+	c->size = descriptor.bLength;
 	descriptors_pos += descriptor.bLength;
 	memcpy(&c->configuration_descriptor, &descriptor, sizeof(USBStandardConfigurationDescriptor));
-	configurations.push_front(*c);
+	configurations.push_front(c);
 	latest_configuration = c;
 	latest_alternate = nullptr;
 }
 
-void ohci_function_device::add_interface_descriptor(USBStandardInterfaceDescriptor &descriptor)
+void ohci_function_device::add_interface_descriptor(const USBStandardInterfaceDescriptor &descriptor)
 {
 	usb_device_interface *ii;
 	usb_device_interface_alternate *aa;
@@ -931,13 +923,18 @@ void ohci_function_device::add_interface_descriptor(USBStandardInterfaceDescript
 	p[7] = descriptor.bInterfaceProtocol;
 	p[8] = descriptor.iInterface;
 	descriptors_pos += descriptor.bLength;
+	latest_configuration->size += descriptor.bLength;
 	for (auto i = latest_configuration->interfaces.begin(); i != latest_configuration->interfaces.end(); ++i)
 	{
-		if (i->alternate_settings.front().interface_descriptor.bInterfaceNumber == descriptor.bInterfaceNumber)
+		if ((*i)->alternate_settings.front()->interface_descriptor.bInterfaceNumber == descriptor.bInterfaceNumber)
 		{
+			(*i)->size += descriptor.bLength;
+			latest_configuration->interfaces.front()->size += descriptor.bLength;
 			aa = new usb_device_interface_alternate;
 			memcpy(&aa->interface_descriptor, &descriptor, sizeof(USBStandardInterfaceDescriptor));
-			i->alternate_settings.push_front(*aa);
+			aa->position = p;
+			aa->size = descriptor.bLength;
+			(*i)->alternate_settings.push_front(aa);
 			latest_alternate = aa;
 			return;
 		}
@@ -945,13 +942,17 @@ void ohci_function_device::add_interface_descriptor(USBStandardInterfaceDescript
 	ii = new usb_device_interface;
 	aa = new usb_device_interface_alternate;
 	memcpy(&aa->interface_descriptor, &descriptor, sizeof(USBStandardInterfaceDescriptor));
+	aa->position = p;
+	aa->size = descriptor.bLength;
+	ii->position = p;
+	ii->size = descriptor.bLength;
 	ii->selected_alternate = -1;
-	ii->alternate_settings.push_front(*aa);
+	ii->alternate_settings.push_front(aa);
 	latest_alternate = aa;
-	latest_configuration->interfaces.push_front(*ii);
+	latest_configuration->interfaces.push_front(ii);
 }
 
-void ohci_function_device::add_endpoint_descriptor(USBStandardEndpointDescriptor &descriptor)
+void ohci_function_device::add_endpoint_descriptor(const USBStandardEndpointDescriptor &descriptor)
 {
 	UINT8 *p = descriptors + descriptors_pos;
 
@@ -966,6 +967,25 @@ void ohci_function_device::add_endpoint_descriptor(USBStandardEndpointDescriptor
 	p[6] = descriptor.bInterval;
 	descriptors_pos += descriptor.bLength;
 	latest_alternate->endpoint_descriptors.push_front(descriptor);
+	latest_alternate->size += descriptor.bLength;
+	latest_configuration->interfaces.front()->size += descriptor.bLength;
+	latest_configuration->size += descriptor.bLength;
+}
+
+void ohci_function_device::add_string_descriptor(const UINT8 *descriptor)
+{
+	usb_device_string *ss;
+	int len = descriptor[0];
+	UINT8 *p = descriptors + descriptors_pos;
+
+
+	ss = new usb_device_string;
+	memcpy(p, descriptor, len);
+	descriptors_pos += len;
+	ss->size = len;
+	ss->position = p;
+	device_strings.push_front(ss);
+	//latest_configuration->size += len;
 }
 
 void ohci_function_device::select_configuration(int index)
@@ -973,52 +993,61 @@ void ohci_function_device::select_configuration(int index)
 	configurationvalue = index;
 	for (auto c = configurations.begin(); c != configurations.end(); ++c)
 	{
-		if (c->configuration_descriptor.bConfigurationValue == index)
+		if ((*c)->configuration_descriptor.bConfigurationValue == index)
 		{
-			selected_configuration = &(*c);
-			for (auto i = c->interfaces.begin(); i != c->interfaces.end(); ++i)
+			selected_configuration = *c;
+			// by default, activate alternate setting 0 in each interface
+			for (auto i = (*c)->interfaces.begin(); i != (*c)->interfaces.end(); ++i)
 			{
-				i->selected_alternate = 0;
-				for (auto a = i->alternate_settings.begin(); a != i->alternate_settings.end(); ++a)
+				(*i)->selected_alternate = 0;
+				for (auto a = (*i)->alternate_settings.begin(); a != (*i)->alternate_settings.end(); ++a)
 				{
-					if (a->interface_descriptor.bAlternateSetting == 0)
+					if ((*a)->interface_descriptor.bAlternateSetting == 0)
 					{
-						for (auto e = a->endpoint_descriptors.begin(); e != a->endpoint_descriptors.end(); ++e)
+						// activate the endpoints in interface i alternate setting 0
+						for (auto e = (*a)->endpoint_descriptors.begin(); e != (*a)->endpoint_descriptors.end(); ++e)
 						{
 							endpoints[e->bEndpointAddress].type = e->bmAttributes & 3;
 							endpoints[e->bEndpointAddress].remain = 0;
 						}
+						break;
 					}
 				}
 			}
+			break;
 		}
 	}
 }
 
 void ohci_function_device::select_alternate(int interfacei, int index)
 {
+	// among all the interfaces in the currently selected configuration, consider interface interfacei
 	for (auto i = selected_configuration->interfaces.begin(); i != selected_configuration->interfaces.end(); ++i)
 	{
-		for (auto a = i->alternate_settings.begin(); a != i->alternate_settings.end(); ++a)
+		// deactivate the endpoints in the currently selected alternate setting for interface interfacei
+		for (auto a = (*i)->alternate_settings.begin(); a != (*i)->alternate_settings.end(); ++a)
 		{
-			if ((a->interface_descriptor.bInterfaceNumber == interfacei) && (a->interface_descriptor.bAlternateSetting == i->selected_alternate))
+			if (((*a)->interface_descriptor.bInterfaceNumber == interfacei) && ((*a)->interface_descriptor.bAlternateSetting == (*i)->selected_alternate))
 			{
-				for (auto e = a->endpoint_descriptors.begin(); e != a->endpoint_descriptors.end(); ++e)
+				for (auto e = (*a)->endpoint_descriptors.begin(); e != (*a)->endpoint_descriptors.end(); ++e)
 				{
 					endpoints[e->bEndpointAddress].type = -1;
 				}
+				break;
 			}
 		}
-		for (auto a = i->alternate_settings.begin(); a != i->alternate_settings.end(); ++a)
+		// activate the endpoints in the newly selected alternate setting
+		for (auto a = (*i)->alternate_settings.begin(); a != (*i)->alternate_settings.end(); ++a)
 		{
-			if ((a->interface_descriptor.bInterfaceNumber == interfacei) && (a->interface_descriptor.bAlternateSetting == index))
+			if (((*a)->interface_descriptor.bInterfaceNumber == interfacei) && ((*a)->interface_descriptor.bAlternateSetting == index))
 			{
-				i->selected_alternate = index;
-				for (auto e = a->endpoint_descriptors.begin(); e != a->endpoint_descriptors.end(); ++e)
+				(*i)->selected_alternate = index;
+				for (auto e = (*a)->endpoint_descriptors.begin(); e != (*a)->endpoint_descriptors.end(); ++e)
 				{
 					endpoints[e->bEndpointAddress].type = e->bmAttributes & 3;
 					endpoints[e->bEndpointAddress].remain = 0;
 				}
+				break;
 			}
 		}
 	}
@@ -1026,17 +1055,55 @@ void ohci_function_device::select_alternate(int interfacei, int index)
 
 int ohci_function_device::find_alternate(int interfacei)
 {
+	// find the active alternate setting for interface inteerfacei
 	for (auto i = selected_configuration->interfaces.begin(); i != selected_configuration->interfaces.end(); ++i)
 	{
-		for (auto a = i->alternate_settings.begin(); a != i->alternate_settings.end(); ++a)
+		for (auto a = (*i)->alternate_settings.begin(); a != (*i)->alternate_settings.end(); ++a)
 		{
-			if (a->interface_descriptor.bInterfaceNumber == interfacei)
+			if ((*a)->interface_descriptor.bInterfaceNumber == interfacei)
 			{
-				return i->selected_alternate;
+				return (*i)->selected_alternate;
 			}
 		}
 	}
 	return 0;
+}
+
+UINT8 *ohci_function_device::position_device_descriptor(int &size)
+{
+	size = descriptors_pos; // descriptors[0];
+	return descriptors;
+}
+
+UINT8 *ohci_function_device::position_configuration_descriptor(int index, int &size)
+{
+	for (auto c = configurations.begin(); c != configurations.end(); ++c)
+	{
+		if ((*c)->configuration_descriptor.bConfigurationValue == (index + 1))
+		{
+			size = (*c)->size;
+			return (*c)->position;
+		}
+	}
+	size = 0;
+	return nullptr;
+}
+
+UINT8 *ohci_function_device::position_string_descriptor(int index, int &size)
+{
+	int i = 0;
+
+	for (auto s = device_strings.begin(); s != device_strings.end(); ++s)
+	{
+		if (index == i)
+		{
+			size = (*s)->size;
+			return (*s)->position;
+		}
+		i++;
+	}
+	size = 0;
+	return nullptr;
 }
 
 void ohci_function_device::execute_reset()
@@ -1047,7 +1114,7 @@ void ohci_function_device::execute_reset()
 
 int ohci_function_device::execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size)
 {
-	int descriptortype;// descriptorindex;
+	int descriptortype, descriptorindex;
 
 	if (pid == SetupPid) {
 		USBSetupPacket *p=(USBSetupPacket *)buffer;
@@ -1080,22 +1147,16 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 					break;
 				case GET_DESCRIPTOR:
 					descriptortype = p->wValue >> 8;
-					//descriptorindex = p->wValue & 255;
+					descriptorindex = p->wValue & 255;
 					if (descriptortype == DEVICE) { // device descriptor
-						endpoints[endpoint].position = descriptors;
-						endpoints[endpoint].remain = descriptors[0];
+						endpoints[endpoint].position = position_device_descriptor(endpoints[endpoint].remain);
 					}
 					else if (descriptortype == CONFIGURATION) { // configuration descriptor
-						endpoints[endpoint].position = descriptors + 18;
-						endpoints[endpoint].remain = descriptors[18 + 2];
+						endpoints[endpoint].position = position_configuration_descriptor(descriptorindex, endpoints[endpoint].remain);
 					}
-					else if (descriptortype == INTERFACE) { // interface descriptor
-						endpoints[endpoint].position = descriptors + 18 + 9;
-						endpoints[endpoint].remain = descriptors[18 + 9];
-					}
-					else if (descriptortype == ENDPOINT) { // endpoint descriptor
-						endpoints[endpoint].position = descriptors + 18 + 9 + 9;
-						endpoints[endpoint].remain = descriptors[18 + 9 + 9];
+					else if (descriptortype == STRING) { // string descriptor
+						//p->wIndex; language id
+						endpoints[endpoint].position = position_string_descriptor(descriptorindex, endpoints[endpoint].remain);
 					}
 					else
 						endpoints[endpoint].remain = 0;
@@ -1196,11 +1257,63 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 	return size;
 }
 
-int ohci_function_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
+const USBStandardDeviceDescriptor ohci_game_controller_device::devdesc = { 18,1,0x110,0x00,0x00,0x00,64,0x45e,0x202,0x100,0,0,0,1 };
+const USBStandardConfigurationDescriptor ohci_game_controller_device::condesc = { 9,2,0x20,1,1,0,0x80,50 };
+const USBStandardInterfaceDescriptor ohci_game_controller_device::intdesc = { 9,4,0,0,2,0x58,0x42,0,0 };
+const USBStandardEndpointDescriptor ohci_game_controller_device::enddesc82 = { 7,5,0x82,3,0x20,4 };
+const USBStandardEndpointDescriptor ohci_game_controller_device::enddesc02 = { 7,5,0x02,3,0x20,4 };
+
+#if 0
+//ic10
+static USBStandardDeviceDescriptor ohci_hlean2131qc_device::devdesc = { 0x12,0x01,0x0100,0x60,0x00,0x00,0x40,0x0CA3,0x0002,0x0108,0x01,0x02,0x00,0x01 };
+static USBStandardConfigurationDescriptor ohci_hlean2131qc_device::condesc = { 0x09,0x02,0x0058,0x01,0x01,0x00,0x80,0x96 };
+static USBStandardInterfaceDescriptor ohci_hlean2131qc_device::intdesc = { 0x09,0x04,0x00,0x00,0x0A,0xFF,0x00,0x00,0x00 };
+static USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc01 = { 0x07,0x05,0x01,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc02 = { 0x07,0x05,0x02,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc03 = { 0x07,0x05,0x03,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc04 = { 0x07,0x05,0x04,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc05 = { 0x07,0x05,0x05,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc81 = { 0x07,0x05,0x81,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc82 = { 0x07,0x05,0x82,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc83 = { 0x07,0x05,0x83,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc84 = { 0x07,0x05,0x84,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc85 = { 0x07,0x05,0x85,0x02,0x0040,0x00 };
+static UINT8 ohci_hlean2131qc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
+static UINT8 ohci_hlean2131qc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
+static UINT8 ohci_hlean2131qc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x03,0xFF,0x0B };
+
+//pc20
+static USBStandardDeviceDescriptor ohci_hlean2131sc_device::devdesc = { 0x12,0x01,0x0100,0x60,0x01,0x00,0x40,0x0CA3,0x0003,0x0110,0x01,0x02,0x00,0x01 };
+static USBStandardConfigurationDescriptor ohci_hlean2131sc_device::condesc = { 0x09,0x02,0x003C,0x01,0x01,0x00,0x80,0x96 };
+static USBStandardInterfaceDescriptor ohci_hlean2131sc_device::intdesc = { 0x09,0x04,0x00,0x00,0x06,0xFF,0x00,0x00,0x00 };
+static USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc01 = { 0x07,0x05,0x01,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc02 = { 0x07,0x05,0x02,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc03 = { 0x07,0x05,0x03,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc81 = { 0x07,0x05,0x81,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc82 = { 0x07,0x05,0x82,0x02,0x0040,0x00 };
+static USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc83 = { 0x07,0x05,0x83,0x02,0x0040,0x00 };
+static UINT8 ohci_hlean2131sc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
+static UINT8 ohci_hlean2131sc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
+static UINT8 ohci_hlean2131sc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x00,0x44,0x00 };
+#endif
+
+ohci_game_controller_device::ohci_game_controller_device(running_machine &machine) :
+	ohci_function_device(machine)
+{
+	add_device_descriptor(devdesc);
+	add_configuration_descriptor(condesc);
+	add_interface_descriptor(intdesc);
+	add_endpoint_descriptor(enddesc82);
+	add_endpoint_descriptor(enddesc02);
+}
+
+int ohci_game_controller_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
 	//                              >=8  ==42  !=0  !=0  1,3       2<20 <=20
 	static UINT8 mytestdata[16] = { 0x10,0x42 ,0x32,0x43,1   ,0x65,0x18,0x20,0x98,0xa9,0xba,0xcb,0xdc,0xed,0xfe };
 
+	if (endpoint != 0)
+		return -1;
 	if ((endpoints[endpoint].controltype == VendorType) && (endpoints[endpoint].controlrecipient == InterfaceRecipient))
 	{
 		if (setup->bRequest == GET_DESCRIPTOR)
@@ -1869,7 +1982,7 @@ ADDRESS_MAP_END
 void xbox_base_state::machine_start()
 {
 #ifdef USB_ENABLED
-	ohci_function_device *usb_device;
+	ohci_game_controller_device *usb_device;
 #endif
 
 	nvidia_nv2a = std::make_unique<nv2a_renderer>(machine());
@@ -1910,7 +2023,7 @@ void xbox_base_state::machine_start()
 	ohcist.space = &m_maincpu->space();
 	ohcist.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xbox_base_state::usb_ohci_timer), this), (void *)"USB OHCI Timer");
 	ohcist.timer->enable(false);
-	usb_device = new ohci_function_device(machine());
+	usb_device = new ohci_game_controller_device(machine());
 	usb_ohci_plug(1, usb_device); // test connect
 #endif
 	memset(&superiost, 0, sizeof(superiost));

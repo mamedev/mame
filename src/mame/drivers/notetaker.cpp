@@ -56,9 +56,10 @@ TODO: everything below.
 * floppy controller wd1791 and its interrupt
   According to [3] and [5] the format is double density/MFM, 128 bytes per sector, 16 sectors per track, 1 or 2 sided, for 170K or 340K per disk. Drive spins at 300RPM.
 * According to the schematics, we're missing an 82s147 DISKSEP.PROM used as a data separator
+* hook up the DiskInt from the wd1791 either using m_fdc->intrq_r() polling or using device lines (latter is a much better idea)
 
 WIP:
-* crt5027 video controller - the iocpu side is hooked up, but crashes due to a bug in the crt5027/tms9927 code. the actual drawing to screen part is not connected anywhere yet.
+* crt5027 video controller - the iocpu side is hooked up, screen drawing 'works' but is scrambled due to not emulating the clock chain halting and clock changing yet. The crt5027 core also needs the odd/even interrupt hooked up, and proper interlace support as well as clock change/screen resize support (down to DC/no clock, which I guess should be a 1x1 single black pixel!)
 * pic8259 interrupt controller - this is attached as a device, but only the vblank interrupt is hooked to it yet.
 * Harris 6402 serial/EIA UART - connected to iocpu, other end isn't connected anywhere, interrupt is not connected
 * Harris 6402 keyboard UART (within notetaker) - connected to iocpu, other end isn't connected anywhere, interrupt is not connected
@@ -120,6 +121,7 @@ public:
 	DECLARE_WRITE16_MEMBER(IPConReg_w);
 	DECLARE_WRITE16_MEMBER(FIFOReg_w);
 	DECLARE_WRITE16_MEMBER(FIFOBus_w);
+	DECLARE_WRITE16_MEMBER(DiskReg_w);
 	DECLARE_WRITE16_MEMBER(LoadDispAddr_w);
 
 	// uarts
@@ -158,6 +160,23 @@ public:
 	UINT8 m_SHConB;
 	UINT8 m_SHConA;
 	UINT8 m_SetSH;
+	// DiskReg
+	UINT8 m_ADCSpd0;
+	UINT8 m_ADCSpd1;
+	UINT8 m_StopWordClock_q;
+	UINT8 m_ClrDiskCont_q;
+	UINT8 m_ProgBitClk1;
+	UINT8 m_ProgBitClk2;
+	UINT8 m_ProgBitClk3;
+	UINT8 m_AnSel4;
+	UINT8 m_AnSel2;
+	UINT8 m_AnSel1;
+	UINT8 m_DriveSel1;
+	UINT8 m_DriveSel2;
+	UINT8 m_DriveSel3;
+	UINT8 m_SideSelect;
+	UINT8 m_Disk5VOn;
+	UINT8 m_Disk12VOn;
 	// output fifo, for DAC
 	UINT16 m_outfifo[16]; // technically three 74LS225 5bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo (one bit unused per chip)
 	UINT8 m_outfifo_count;
@@ -248,7 +267,7 @@ WRITE16_MEMBER(notetaker_state::IPConReg_w)
 {
 	m_BootSeqDone = (data&0x80)?1:0;
 	m_ProcLock = (data&0x40)?1:0; // bus lock for this processor (hold other processor in wait state)
-	m_CharCtr = (data&0x20)?1:0; // battery charge control
+	m_CharCtr = (data&0x20)?1:0; // battery charge control (incorrectly called 'Char counter' in source code)
 	m_DisableROM = (data&0x10)?1:0; // disable rom at 0000-0fff
 	m_CorrOn_q = (data&0x08)?1:0; // CorrectionOn (ECC correction enabled); also LedInd5
 	m_LedInd6 = (data&0x04)?1:0;
@@ -334,6 +353,57 @@ WRITE16_MEMBER(notetaker_state::FIFOBus_w)
 	m_outfifo_head_ptr++;
 	m_outfifo_count++;
 	m_outfifo_head_ptr&=0xF;
+}
+
+WRITE16_MEMBER( notetaker_state::DiskReg_w )
+{
+	// See http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19781023_More_NoteTaker_IO_Information.pdf but note that bit 12 (called bit 3 in documentation) was changed between oct 1978 and 1979 to reset the disk controller digital-PLL as ClrDiskCont' rather than acting as ProgBitClk0, which is permanently wired high instead, meaning only the 4.5Mhz - 18Mhz dot clocks are available for the CRTC.
+	m_ADCSpd0 = (data&0x8000)?1:0;
+	m_ADCSpd1 = (data&0x4000)?1:0;
+	m_StopWordClock_q = (data&0x2000)?1:0;
+	//if ((!(m_ClrDiskCont_q)) && (data&0x1000)) m_floppy->device_reset(); // reset on rising edge
+	m_ClrDiskCont_q = (data&0x1000)?1:0; // originally ProgBitClk0, but co-opted later to reset the FDC's external PLL
+	m_ProgBitClk1 = (data&0x0800)?1:0;
+	m_ProgBitClk2 = (data&0x0400)?1:0;
+	m_ProgBitClk3 = (data&0x0200)?1:0;
+	m_AnSel4 = (data&0x0100)?1:0;
+	m_AnSel2 = (data&0x80)?1:0;
+	m_AnSel1 = (data&0x40)?1:0;
+	m_DriveSel1 = (data&0x20)?1:0;
+	m_DriveSel2 = (data&0x10)?1:0; // drive 2 not present on hardware, but could work if present
+	m_DriveSel3 = (data&0x08)?1:0; // drive 3 not present on hardware, but could work if present
+	m_SideSelect = (data&0x04)?1:0;
+	m_Disk5VOn = (data&0x02)?1:0;
+	m_Disk12VOn = (data&0x01)?1:0;
+
+	// ADC stuff
+	//TODO
+
+	// FDC stuff
+	// first handle the motor stuff; we'll clobber whatever was in m_floppy, then reset it to what it should be
+	m_floppy = m_floppy0->get_device();
+	m_floppy->mon_w(!(m_Disk5VOn && m_Disk12VOn)); // Disk5VOn and 12VOn can be thought of as a crude MotorOn signal as the motor won't run with either? of them missing.
+	//m_floppy = m_floppy0->get_device();
+	//m_floppy->mon_w(!(m_Disk5VOn && m_Disk12VOn)); // Disk5VOn and 12VOn can be thought of as a crude MotorOn signal as the motor won't run with either? of them missing.
+	//m_floppy = m_floppy0->get_device();
+	//m_floppy->mon_w(!(m_Disk5VOn && m_Disk12VOn)); // Disk5VOn and 12VOn can be thought of as a crude MotorOn signal as the motor won't run with either? of them missing.
+	// now restore m_floppy state to what it should be
+	if (m_DriveSel1) m_floppy = m_floppy0->get_device();
+	//else if (m_DriveSel2) m_floppy = m_floppy1->get_device();
+	//else if (m_DriveSel3) m_floppy = m_floppy2->get_device();
+	else m_floppy = nullptr;
+	m_fdc->set_floppy(m_floppy); // select the floppy
+	if (m_floppy)
+	{
+		m_floppy->ss_w(m_SideSelect);
+	}
+	// Disk5VOn and 12VOn can be thought of as a crude MotorOn signal as the motor won't run with either? of them missing.
+	//m_floppy0->mon_w(!(m_Disk5VOn && m_Disk12VOn));
+	//m_floppy1->mon_w(!(m_Disk5VOn && m_Disk12VOn));
+	//m_floppy2->mon_w(!(m_Disk5VOn && m_Disk12VOn));
+
+	// CRTC clock rate stuff
+	//TODO
 }
 
 WRITE16_MEMBER( notetaker_state::LoadDispAddr_w )
@@ -519,7 +589,7 @@ static ADDRESS_MAP_START(notetaker_iocpu_io, AS_IO, 16, notetaker_state)
 	AM_RANGE(0x60, 0x61) AM_MIRROR(0x7E1E) AM_WRITE(FIFOReg_w) // DAC sample and hold and frequency setup
 	//AM_RANGE(0xa0, 0xa1) AM_MIRROR(0x7E18) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255
 	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0x7E1E) AM_WRITE(FIFOBus_w) // DAC data write to FIFO
-	//AM_RANGE(0x100, 0x101) AM_MIRROR(0x7E1E) AM_WRITE(DiskReg_w) I/O register (adc speed, crtc pixel clock enable, +5 and +12v relays for floppy, etc)
+	AM_RANGE(0x100, 0x101) AM_MIRROR(0x7E1E) AM_WRITE(DiskReg_w) // I/O register (adc speed, crtc pixel clock and clock enable, +5 and +12v relays for floppy, etc)
 	AM_RANGE(0x120, 0x127) AM_MIRROR(0x7E18) AM_DEVREADWRITE8("wd1791", fd1791_t, read, write, 0x00FF) // floppy controller
 	AM_RANGE(0x140, 0x15f) AM_MIRROR(0x7E00) AM_DEVREADWRITE8("crt5027", crt5027_device, read, write, 0x00FF) // crt controller
 	AM_RANGE(0x160, 0x161) AM_MIRROR(0x7E1E) AM_WRITE(LoadDispAddr_w) // loads the start address for the display framebuffer
@@ -546,8 +616,8 @@ irq7    VSync   (interrupt from the VSYN VSync pin from the crt5027)
 
 /* writes during boot of io roms v2.0:
 0x88 to port 0x020 (PCR; BootSeqDone(1), processor not locked(0), battery charger off(0), rom not disabled(0) correction off&cr4 off(1), cr3 on(0), cr2 on(0), cr1 on (0);)
-0x02 to port 0x100 (IOR write: enable 5v only relay control)
-0x03 to port 0x100 (IOR write: in addition to above, enable 12v relay control)
+0x0002 to port 0x100 (IOR write: enable 5v only relay control)
+0x0003 to port 0x100 (IOR write: in addition to above, enable 12v relay control)
 <dram memory 0x00000-0x3ffff is zeroed here>
 0x13 to port 0x000 PIC (ICW1, 8085 vector 0b000[ignored], edge trigger mode, interval of 8, single mode (no cascade/ICW3), ICW4 needed )
 0x08 to port 0x002 PIC (ICW2, T7-T3 = 0b00001)
@@ -557,21 +627,30 @@ irq7    VSync   (interrupt from the VSYN VSync pin from the crt5027)
 0x0000 to port 0x1ae (reset UART)
 0x0016 to port 0x048 (kbd control reg write)
 0x0005 to port 0x1a8 (UART control reg write)
-0x5f to port 0x140 \
-0xf2 to port 0x142  \
-0x7d to port 0x144   \
-0x1d to port 0x146    \_ set up CRTC
-0x04 to port 0x148    /
-0x10 to port 0x14a   /
-0x00 to port 0x154  /
-0x1e to port 0x15a /
+0x5f to port 0x140 (reg0 95 horizontal lines)               \
+0xf2 to port 0x142 (reg1 interlaced, hswidth=0xE, hsdelay=2) \
+0x7d to port 0x144 (reg2 16 scans/row, 5 chars/datarow)       \
+0x1d to port 0x146 (reg3 0 skew bits, 0x1D datarows/frame)     \_ set up CRTC
+0x04 to port 0x148 (reg4 4 scan lines/frame                    /
+0x10 to port 0x14a (reg5 0x10 vdatastart)                     /
+0x00 to port 0x154 (reset the crtc)                          /
+0x1e to port 0x15a (reg8 load cursor line address = 0x1e)   /
 0x0a03 to port 0x100 (IOR write: set bit clock to 12Mhz)
 0x2a03 to port 0x100 (IOR write: enable crtc clock chain)
 0x00 to port 0x15c (fire off crtc timing chain)
 read from 0x0002 (byte wide) (IMR, read interrupt mask, will be 0xFF from above)
 0xaf to port 0x002 PIC (mask out with 0xEF and 0xBF to unnmask interrupts IR4(OddInt) and IR6(KbdInt), and write back to IMR)
 0x0400 to 0x060 (select DAC fifo frequency 2)
-read from 0x44 (byte wide) in a loop forever (read keyboard fifo status)
+read from 0x44 (byte wide) to check input fifo status
+... more stuff here missing relating to making the beep tone through fifo
+(around pc=6b6) read keyboard uart until mouse button is clicked (WaitNoBug)
+(around pc=6bc) read keyboard uart until mouse button is released (WaitBug)
+0x2a23 to port 0x100 (select drive 1)
+0x2a23 to port 0x100 (select drive 1)
+0x3a23 to port 0x100 (unset disk separator clear (allow disk head reading))
+0x3a27 to port 0x100 (select disk side 1)
+0x3a07 to port 0x100 (unselect all drives)
+
 */
 
 /* Emulator CPU */
@@ -606,8 +685,12 @@ void notetaker_state::machine_start()
 	// allocate the DAC timer, and set it to fire NEVER. We'll set it up properly in IPReset.
 	m_FIFO_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(notetaker_state::timer_fifoclk),this));
 	m_FIFO_timer->adjust(attotime::never);
-	// floppy stuff
-	m_floppy = NULL;
+	// FDC: /DDEN is tied permanently LOW so MFM mode is ALWAYS ON
+	m_fdc->dden_w(0);
+	// Keyboard UART: /SWE is tied permanently LOW
+	m_kbduart->set_input_pin(AY31015_SWE, 0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
+	// EIA UART: /SWE is tied permanently LOW
+	m_eiauart->set_input_pin(AY31015_SWE, 0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
 	// savestate stuff
 	// TODO: add me!
 }
@@ -622,11 +705,12 @@ void notetaker_state::machine_reset()
 /* IP Reset; this emulates the IPReset' signal */
 void notetaker_state::ip_reset()
 {
-	// not-really-reset related, set line on Keybaord UART
-	m_kbduart->set_input_pin(AY31015_SWE, 0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
 	// reset the Keyboard UART
 	m_kbduart->set_input_pin(AY31015_XR, 0); // MR - pin 21
 	m_kbduart->set_input_pin(AY31015_XR, 1); // ''
+	// reset the EIA UART
+	m_eiauart->set_input_pin(AY31015_XR, 0); // MR - pin 21
+	m_eiauart->set_input_pin(AY31015_XR, 1); // ''
 	// reset the IPConReg latch at #f1
 	m_BootSeqDone = 0;
 	m_ProcLock = 0;
@@ -636,6 +720,9 @@ void notetaker_state::ip_reset()
 	m_LedInd6 = 0;
 	m_LedInd7 = 0;
 	m_LedInd8 = 0;
+	// Clear the DAC FIFO
+	for (int i=0; i<16; i++) m_outfifo[i] = 0;
+	m_outfifo_count = m_outfifo_tail_ptr = m_outfifo_head_ptr = 0;
 	// reset the FIFOReg latch at #h9
 	m_TabletYOn = 0;
 	m_TabletXOn = 0;
@@ -645,19 +732,37 @@ void notetaker_state::ip_reset()
 	m_SHConB = 0;
 	m_SHConA = 0;
 	m_SetSH = 0;
-	// Clear the DAC FIFO
-	for (int i=0; i<16; i++) m_outfifo[i] = 0;
-	m_outfifo_count = m_outfifo_tail_ptr = m_outfifo_head_ptr = 0;
-	// Reset the DAC Timer
+	// handle consequences of above
 	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter), divided by 4 (mc14568B with divider 1 pins set to 4), divided by 1,3,5,7,9,11,13,15 (or 0,2,4,6,8,10,12,14?)
-	// stuff on display/eia board also reset by IPReset:
+	// todo: handle tablet and sample/hold stuff as well
+	// reset the DiskReg latches at #c4 and #b4 on the disk/display/eia controller board
+	m_ADCSpd0 = 0;
+	m_ADCSpd1 = 0;
+	m_StopWordClock_q = 0;
+	m_ClrDiskCont_q = 0;
+	m_ProgBitClk1 = 0;
+	m_ProgBitClk2 = 0;
+	m_ProgBitClk3 = 0;
+	m_AnSel4 = 0;
+	m_AnSel2 = 0;
+	m_AnSel1 = 0;
+	m_DriveSel1 = 0;
+	m_DriveSel2 = 0;
+	m_DriveSel3 = 0;
+	m_SideSelect = 0;
+	m_Disk5VOn = 0;
+	m_Disk12VOn = 0;
+	// handle the consequences of the above.
+	// Disk12VOn probably runs the drive motor, and MotorOn is hard-wired to low/active, so turn the motor for all drives OFF
+	m_floppy = m_floppy0->get_device();
+	m_floppy->mon_w(1);
+	//m_floppy = m_floppy1->get_device();
+	//m_floppy->mon_w(1);
+	//m_floppy = m_floppy2->get_device();
+	//m_floppy->mon_w(1);
+	m_floppy = nullptr; // select no drive
 	// reset the Framebuffer Display Address:
 	m_DispAddr = 0;
-	// reset the EIA UART
-	m_eiauart->set_input_pin(AY31015_XR, 0); // MR - pin 21
-	m_eiauart->set_input_pin(AY31015_XR, 1); // ''
-	// reset the DiskReg latches at #c4 and #b4 on the disk/display/eia board
-	//  write me!
 }
 
 /* EP Reset; this emulates the EPReset' signal */

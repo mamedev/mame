@@ -22,13 +22,11 @@ for details on this encryption scheme
 
 /* notes / todo:
 
-Decrypt Space Position Somehow (not something I
-can do)
 Unknown Reads / Writes
 Whats the Prom for? nothing important?
-Is the level order correct?
 the progress sprite on the side of the screen re-appears at the bottom when you get
 to the top, but the wrap-around is needed for other things, actual game bug?
+Angel Kids service mode doesn't seem to work, did it ever?
 
 */
 
@@ -130,7 +128,7 @@ Dumped by Chackn
 #include "machine/segacrp2.h"
 #include "sound/2203intf.h"
 #include "includes/angelkds.h"
-
+#include "machine/i8255.h"
 
 
 
@@ -146,37 +144,8 @@ WRITE8_MEMBER(angelkds_state::angelkds_cpu_bank_write)
 }
 
 
-/*** Fake Inputs
 
-these make the game a bit easier for testing purposes
 
-*/
-
-#define FAKEINPUTS 0
-
-#if FAKEINPUTS
-
-READ8_MEMBER(angelkds_state::angelkds_input_r)
-{
-	int fake;
-	static const char *const portnames[] = { "I81", "I82" };
-	static const char *const fakenames[] = { "FAKE1", "FAKE2" };
-
-	fake = ioport(fakenames[offset])->read();
-
-	return ((fake & 0x01) ? fake  : ioport(portnames[offset])->read());
-}
-
-#else
-
-READ8_MEMBER(angelkds_state::angelkds_input_r)
-{
-	static const char *const portnames[] = { "I81", "I82" };
-
-	return ioport(portnames[offset])->read();
-}
-
-#endif
 
 /*** Memory Structures
 
@@ -202,7 +171,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, angelkds_state )
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(angelkds_bgbotvideoram_w) AM_SHARE("bgbotvideoram") /* Bottom Half of Screen */
 	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(angelkds_txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xec00, 0xecff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xed00, 0xeeff) AM_RAM_WRITE(angelkds_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xed00, 0xedff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xee00, 0xeeff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xef00, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(angelkds_bgtopbank_write)
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(angelkds_bgtopscroll_write)
@@ -220,16 +190,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, angelkds_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP // 00 on start-up, not again
-	AM_RANGE(0x42, 0x42) AM_WRITE(angelkds_cpu_bank_write)
-	AM_RANGE(0x43, 0x43) AM_WRITENOP // 9a on start-up, not again
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("I40")    /* "Coinage" Dip Switches */
-	AM_RANGE(0x41, 0x41) AM_READ_PORT("I41")    /* Other Dip Switches */
-	AM_RANGE(0x42, 0x42) AM_READ_PORT("I42")    /* Players inputs (not needed ?) */
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("I80")    /* System inputs */
-	AM_RANGE(0x81, 0x82) AM_READ(angelkds_input_r)  /* Players inputs */
-	AM_RANGE(0x83, 0x83) AM_WRITENOP // 9b on start-up, not again
+
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+
 	AM_RANGE(0xc0, 0xc3) AM_READWRITE(angelkds_main_sound_r, angelkds_main_sound_w) // 02 various points
 ADDRESS_MAP_END
+
+
+
+
 
 /* sub cpu */
 
@@ -260,16 +230,6 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_PLAYER(player) PORT_8WAY \
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_PLAYER(player) PORT_8WAY \
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_PLAYER(player) PORT_8WAY
-
-#define ANGELDSK_FAKE_PLAYERS_INPUT( player ) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(player)    /* To enter initials */ \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Unused */ \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player) PORT_8WAY \
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(player) PORT_8WAY \
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(player) PORT_8WAY \
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(player) PORT_8WAY \
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(player)    /* To shorten the rope and */ \
-										/* move right in hiscores table */
 
 
 static INPUT_PORTS_START( angelkds )
@@ -339,15 +299,6 @@ static INPUT_PORTS_START( angelkds )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
 
-	PORT_START("I42")       /* inport $42 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // duplicated IPT_JOYSTICK_LEFTRIGHT
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_8WAY  // duplicated IPT_JOYSTICK_LEFTRIGHT
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("I80")       /* inport $80 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -364,23 +315,6 @@ static INPUT_PORTS_START( angelkds )
 
 	PORT_START("I82")       /* inport $82 */
 	ANGELDSK_PLAYERS_INPUT( 2 )
-
-#if FAKEINPUTS
-
-	/* Fake inputs to allow to play the game with 1 joystick instead of 2 */
-	PORT_START("FAKE1")
-	PORT_DIPNAME( 0x01, 0x00, "FAKE (for debug) Joysticks (Player 1)" )
-	PORT_DIPSETTING(    0x01, "1" )
-	PORT_DIPSETTING(    0x00, "2" )
-	ANGELDSK_FAKE_PLAYERS_INPUT( 1 )
-
-	PORT_START("FAKE2")
-	PORT_DIPNAME( 0x01, 0x00, "FAKE (for debug) Joysticks (Player 2)" )
-	PORT_DIPSETTING(    0x01, "1" )
-	PORT_DIPSETTING(    0x00, "2" )
-	ANGELDSK_FAKE_PLAYERS_INPUT( 2 )
-
-#endif
 
 INPUT_PORTS_END
 
@@ -442,16 +376,6 @@ static INPUT_PORTS_START( spcpostn )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )            /* Listed as "Unused" */
-
-	PORT_START("I42")       /* inport $42 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("I80")       /* inport $80 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -601,6 +525,16 @@ static MACHINE_CONFIG_START( angelkds, angelkds_state )
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_IO_MAP(sub_portmap)
 
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("I40"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("I41"))
+	MCFG_I8255_IN_PORTC_CB(READ8(angelkds_state, angeklds_ff_r)) // or left inputs don't work
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(angelkds_state, angelkds_cpu_bank_write))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("I80"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("I81"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("I82"))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -615,6 +549,7 @@ static MACHINE_CONFIG_START( angelkds, angelkds_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", angelkds)
 	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -657,7 +592,7 @@ ROM_START( angelkds )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "11428.c10",    0x00000, 0x08000, CRC(90daacd2) SHA1(7e50ad1cbed0c1e6bad04ef1611cad25538c905f) )
 
-	ROM_REGION( 0x20000, "user1", 0 ) /* Banked Code */
+	ROM_REGION( 0x40000, "user1", 0 ) /* Banked Code */
 	ROM_LOAD( "11424.c1",     0x00000, 0x08000, CRC(b55997f6) SHA1(7ed746becac1851f39591f1fdbeff64aa97d6206) )
 	ROM_LOAD( "11425.c2",     0x08000, 0x08000, CRC(299359de) SHA1(f531dd3bfe6f64e9e043cb4f85d5657455241dc7) )
 	ROM_LOAD( "11426.c3",     0x10000, 0x08000, CRC(5fad8bd3) SHA1(4d865342eb10dcfb779eee4ac1e159bb9ec140cb) )
@@ -704,7 +639,7 @@ ROM_START( spcpostn )
 	ROM_REGION( 0x8000, "maincpu", 0 ) /* D317-0005 (NEC Z80 Custom) */
 	ROM_LOAD( "epr10125.c10", 0x00000, 0x08000, CRC(bffd38c6) SHA1(af02907124343ddecd21439d25f1ebb81ef9f51a) ) /* encrypted */
 
-	ROM_REGION( 0x28000, "user1", 0 ) /* Banked Code */
+	ROM_REGION( 0x40000, "user1", 0 ) /* Banked Code */
 	ROM_LOAD( "epr10120.c1",  0x00000, 0x08000, CRC(d6399f99) SHA1(4c7d19a8798e5a10b688bf793ca74f5170fd9b51) )
 	ROM_LOAD( "epr10121.c2",  0x08000, 0x08000, CRC(d4861560) SHA1(74d28c36a08880abbd3c398cc3e990e8986caccb) )
 	ROM_LOAD( "epr10122.c3",  0x10000, 0x08000, CRC(7a1bff1b) SHA1(e1bda8430fd632c1813dd78e0f210a358e1b0d2f) )
@@ -740,7 +675,7 @@ ROM_END
 DRIVER_INIT_MEMBER(angelkds_state,angelkds)
 {
 	UINT8 *RAM = memregion("user1")->base();
-	membank("bank1")->configure_entries(0, 8, &RAM[0x0000], 0x4000);
+	membank("bank1")->configure_entries(0, 16, &RAM[0x0000], 0x4000);
 }
 
 DRIVER_INIT_MEMBER(angelkds_state,spcpostn)
@@ -750,7 +685,7 @@ DRIVER_INIT_MEMBER(angelkds_state,spcpostn)
 	// 317-0005
 	sega_decode_317(memregion("maincpu")->base(), m_decrypted_opcodes, 1);
 
-	membank("bank1")->configure_entries(0, 10, &RAM[0x0000], 0x4000);
+	membank("bank1")->configure_entries(0, 16, &RAM[0x0000], 0x4000);
 }
 
 

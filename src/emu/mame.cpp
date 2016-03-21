@@ -158,8 +158,8 @@ void machine_manager::start_luaengine()
 	m_lua->initialize();
 	{
 		emu_file file(options().plugins_path(), OPEN_FLAG_READ);
-		file_error filerr = file.open("boot.lua");
-		if (filerr == FILERR_NONE)
+		osd_file::error filerr = file.open("boot.lua");
+		if (filerr == osd_file::error::NONE)
 		{
 			m_lua->load_script(file.fullpath());
 		}

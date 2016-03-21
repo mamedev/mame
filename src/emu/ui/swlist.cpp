@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-    ui/swlist.c
+    ui/swlist.cpp
 
     Internal MAME user interface for software list.
 

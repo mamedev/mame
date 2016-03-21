@@ -57,7 +57,7 @@ private:
 	required_ioport         m_dwconfigport;
 	int                     m_dwtcpport;
 
-	osd_file *m_pSocket;
+	osd_file::ptr m_pSocket;
 
 	unsigned int m_rx_pending;
 	unsigned int m_head;
