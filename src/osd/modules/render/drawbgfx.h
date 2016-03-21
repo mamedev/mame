@@ -92,6 +92,8 @@ private:
 	const bgfx::Memory* mame_texture_data_to_bgfx_texture_data(UINT32 format, int width, int height, int rowpixels, const rgb_t *palette, void *base);
 	UINT32 get_texture_hash(render_primitive *prim);
 
+    std::vector<screen_device*> m_screens;
+
 	bgfx_target* m_framebuffer;
 	bgfx_texture* m_texture_cache;
 

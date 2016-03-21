@@ -765,6 +765,7 @@ int renderer_bgfx::handle_screen_chains()
 
 int renderer_bgfx::draw(int update)
 {
+    m_screens.clear();
 	int window_index = window().m_index;
     int post_view_index = handle_screen_chains();
     int view_index = window_index;
@@ -837,7 +838,7 @@ int renderer_bgfx::draw(int update)
 	bool atlas_valid = update_atlas();
 
 	render_primitive *prim = window().m_primlist->first();
-    int32_t screen = 0;
+    std::vector<screen_device*> screens;
 	while (prim != nullptr)
 	{
 		UINT32 blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
@@ -845,12 +846,23 @@ int renderer_bgfx::draw(int update)
 		bgfx::TransientVertexBuffer buffer;
 		allocate_buffer(prim, blend, &buffer);
 
-		buffer_status status = buffer_primitives(view_index, atlas_valid, &prim, &buffer, screen);
-
-        if (status == BUFFER_SCREEN)
+        int32_t screen = 0;
+        if (PRIMFLAG_GET_SCREENTEX(prim->flags))
         {
-            screen++;
+            for (screen = 0; screen < screens.size(); screen++)
+            {
+                if (screens[screen] == prim->container->screen())
+                {
+                    break;
+                }
+            }
+            if (screen == screens.size())
+            {
+                screens.push_back(prim->container->screen());
+            }
         }
+
+        buffer_status status = buffer_primitives(view_index, atlas_valid, &prim, &buffer, screen);
 
 		if (status != BUFFER_EMPTY && status != BUFFER_SCREEN)
 		{

@@ -62,7 +62,7 @@ void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager&
     put_screen_buffer(prim, &buffer);
     bgfx::setVertexBuffer(&buffer);
 
-	setup_auto_uniforms(prim, textures, screen_width, screen_height, rotation_type, swap_xy);
+	setup_auto_uniforms(prim, textures, screen_width, screen_height, rotation_type, swap_xy, screen);
 
     for (bgfx_entry_uniform* uniform : m_uniforms)
     {
@@ -85,14 +85,19 @@ void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager&
     }
 }
 
-void bgfx_chain_entry::setup_screensize_uniforms(texture_manager& textures, uint16_t screen_width, uint16_t screen_height)
+void bgfx_chain_entry::setup_screensize_uniforms(texture_manager& textures, uint16_t screen_width, uint16_t screen_height, int32_t screen)
 {
 	float width = screen_width;
 	float height = screen_height;
 	if (m_inputs.size() > 0)
 	{
-		width = float(textures.provider(m_inputs[0].texture())->width());
-		height = float(textures.provider(m_inputs[0].texture())->height());
+		std::string name = m_inputs[0].texture();
+		if (name == "previous")
+		{
+			name = name + std::to_string(screen);
+		}
+		width = float(textures.provider(name)->width());
+		height = float(textures.provider(name)->height());
 	}
 
     bgfx_uniform* screen_dims = m_effect->uniform("u_screen_dims");
@@ -140,9 +145,9 @@ void bgfx_chain_entry::setup_swapxy_uniform(bool swap_xy)
 	}
 }
 
-void bgfx_chain_entry::setup_auto_uniforms(render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint32_t rotation_type, bool swap_xy)
+void bgfx_chain_entry::setup_auto_uniforms(render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint32_t rotation_type, bool swap_xy, int32_t screen)
 {
-	setup_screensize_uniforms(textures, screen_width, screen_height);
+	setup_screensize_uniforms(textures, screen_width, screen_height, screen);
 	setup_sourcesize_uniform(prim);
 	setup_rotationtype_uniform(rotation_type);
 	setup_swapxy_uniform(swap_xy);
