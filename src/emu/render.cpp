@@ -1194,14 +1194,18 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 		case SCALE_FRACTIONAL_X:
 		case SCALE_INTEGER:
 		{
+			// Get source size and aspect
 			INT32 src_width, src_height;
 			compute_minimum_size(src_width, src_height);
-			
-			float dest_width, dest_width_asp, dest_height, dest_height_asp;
-			dest_width = dest_width_asp = (float)target_width;
-			dest_height = dest_height_asp = (float)target_height;
-
 			float src_aspect = m_curview->effective_aspect(m_layerconfig);
+
+			// Apply orientation if required
+			if (target_orientation & ORIENTATION_SWAP_XY)
+				src_aspect = 1.0 / src_aspect;
+			
+			// Get destination size and aspect
+			float dest_width = (float)target_width;
+			float dest_height = (float)target_height;
 			float dest_aspect = dest_width / dest_height * target_pixel_aspect;
 
 			// We need to work out which one is the horizontal axis, regardless of the monitor orientation
@@ -1209,17 +1213,17 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 			if (dest_aspect > 1.0)
 			{
 				// x-axis matches monitor's horizontal dimension
-				dest_width_asp *= m_keepaspect? src_aspect / dest_aspect : 1.0;
+				dest_width *= m_keepaspect? src_aspect / dest_aspect : 1.0;
 				xscale = m_scale_mode == SCALE_INTEGER?
-				         MAX(1, render_round_nearest(dest_width_asp / src_width)) : dest_width_asp / src_width;
+				         MAX(1, render_round_nearest(dest_width / src_width)) : dest_width / src_width;
 				yscale = MAX(1, render_round_nearest(dest_height / src_height));
 			}
 			else
 			{
 				// y-axis matches monitor's vertical dimension
-				dest_height_asp *= m_keepaspect? dest_aspect / src_aspect : 1.0;
+				dest_height *= m_keepaspect? dest_aspect / src_aspect : 1.0;
 				yscale = m_scale_mode == SCALE_INTEGER?
-				         MAX(1, render_round_nearest(dest_height_asp / src_height)) : dest_height_asp / src_height;
+				         MAX(1, render_round_nearest(dest_height / src_height)) : dest_height / src_height;
 				xscale = MAX(1, render_round_nearest(dest_width / src_width));
 			}
 
