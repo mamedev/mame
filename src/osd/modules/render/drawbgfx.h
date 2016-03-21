@@ -49,7 +49,7 @@ public:
 	virtual render_primitive_list *get_primitives() override
 	{
 		osd_dim wdim = window().get_size();
-		window().target()->set_bounds(wdim.width(), wdim.height(), window().aspect());
+		window().target()->set_bounds(wdim.width(), wdim.height(), window().pixel_aspect());
 		return &window().target()->get_primitives();
 	}
 

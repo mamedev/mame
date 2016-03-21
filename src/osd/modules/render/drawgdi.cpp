@@ -47,7 +47,7 @@ render_primitive_list *renderer_gdi::get_primitives()
 {
 	RECT client;
 	GetClientRect(window().m_hwnd, &client);
-	window().target()->set_bounds(rect_width(&client), rect_height(&client), window().aspect());
+	window().target()->set_bounds(rect_width(&client), rect_height(&client), window().pixel_aspect());
 	return &window().target()->get_primitives();
 }
 

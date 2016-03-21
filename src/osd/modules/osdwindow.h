@@ -110,8 +110,10 @@ public:
 
 	const char *devicename() { return m_name[0] ? m_name : "UNKNOWN"; }
 
-	float aspect();
+	float aspect() { return m_aspect; }
+	float pixel_aspect() { return m_aspect / ((float)m_pos_size.width() / (float)m_pos_size.height()); }
 
+	void update_resolution(const int new_width, const int new_height) { m_pos_size.resize(new_width, new_height); }
 	void set_aspect(const float a) { m_aspect = a; }
 	bool is_primary() { return m_is_primary; }
 
@@ -131,6 +133,7 @@ private:
 
 	void *              m_handle;                 // handle to the monitor
 	float               m_aspect;                 // computed/configured aspect ratio of the physical device
+	float               m_pixel_aspect;           // computed pixel aspect ratio
 };
 
 class osd_window_config
@@ -166,12 +169,11 @@ public:
 
 	int prescale() const { return m_prescale; };
 
-	float aspect() const { return monitor()->aspect(); }
+	float pixel_aspect() const { return monitor()->pixel_aspect(); }
 
 	virtual osd_dim get_size() = 0;
 
 #ifdef OSD_SDL
-	virtual osd_dim blit_surface_size() = 0;
 	virtual osd_monitor_info *monitor() const = 0;
 	virtual SDL_Window *sdl_window() = 0;
 #else

@@ -25,9 +25,6 @@
 // video options
 #define WINOPTION_MENU                  "menu"
 
-// DirectDraw-specific options
-#define WINOPTION_HWSTRETCH             "hwstretch"
-
 // core post-processing options
 #define WINOPTION_HLSL_ENABLE               "hlsl_enable"
 #define WINOPTION_HLSLPATH                  "hlslpath"
@@ -127,9 +124,6 @@ public:
 
 	// video options
 	bool menu() const { return bool_value(WINOPTION_MENU); }
-
-	// DirectDraw-specific options
-	bool hwstretch() const { return bool_value(WINOPTION_HWSTRETCH); }
 
 	// core post-processing options
 	const char *screen_post_fx_dir() const { return value(WINOPTION_HLSLPATH); }

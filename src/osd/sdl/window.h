@@ -85,7 +85,6 @@ public:
 	render_target *target() override { return m_target; }
 	SDL_Window *sdl_window() override { return m_sdl_window; }
 
-	osd_dim blit_surface_size() override;
 	int prescale() const { return m_prescale; }
 
 	// Pointer to next window
