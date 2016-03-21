@@ -3391,10 +3391,10 @@ ROM_START( myherobl )
 	ROM_LOAD( "x.G4",   0x8000, 0x4000, CRC(37f77a78) SHA1(01d8bd41303bd5e3a6f1cdafa4a1d682e4c659a2) )
 	ROM_LOAD( "B7.K4",  0xc000, 0x4000, CRC(42bdc8f6) SHA1(f31d82641187a7cc77a4a19189b5a15d5168cbd7) )
 
-	ROM_REGION( 0x0100, "proms", 0 ) // not on this PCB?
+	ROM_REGION( 0x0100, "proms", 0 ) // wasn't dumped here, but needed for priority
 	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 
-	ROM_REGION( 0x0100, "promsbl", 0 ) // need to convert this into above format for driver?
+	ROM_REGION( 0x0100, "promsbl", 0 ) // this is related to the bootleg reproduction of the encryption scheme
 	ROM_LOAD( "PROM.A2",     0x0000, 0x0100, CRC(4fcaf000) SHA1(c68592377373b157713b5e129b020feb6c866f91) )
 	ROM_IGNORE(0x100)
 ROM_END
