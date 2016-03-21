@@ -3258,14 +3258,14 @@ ROM_START( teddybbo )
 ROM_END
 
 
-ROM_START( teddybbobl )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr-6739.116",   0x0000, 0x4000, CRC(81a37e69) SHA1(ddd0fd7ba5b3646c43ae4261f1e3fedd4184d92c) ) // 1.f2
-	ROM_LOAD( "epr-6740.109",   0x4000, 0x4000, CRC(715388a9) SHA1(5affc4ecb1e0d58b69093aed732b1e292b8d3118) ) // 2.j2
-	ROM_LOAD( "epr-6741.96",    0x8000, 0x4000, CRC(e5a74f5f) SHA1(ccf18b424d4aaeec0bae1e6f096b4c176f6ab554) ) // 3.k2
+ROM_START( teddybbobl ) // data in romset is an exact match for teddybbo, including encryption
+	ROM_REGION( 0x10000, "maincpu", 0 ) 
+	ROM_LOAD( "1.f2",   0x0000, 0x4000, CRC(81a37e69) SHA1(ddd0fd7ba5b3646c43ae4261f1e3fedd4184d92c) ) // == epr-6739.116 (encrypted
+	ROM_LOAD( "2.j2",   0x4000, 0x4000, CRC(715388a9) SHA1(5affc4ecb1e0d58b69093aed732b1e292b8d3118) ) // == epr-6740.109
+	ROM_LOAD( "3.k2",   0x8000, 0x4000, CRC(e5a74f5f) SHA1(ccf18b424d4aaeec0bae1e6f096b4c176f6ab554) ) // == epr-6741.96
 
-	ROM_REGION( 0x10000, "soundcpu", 0 ) /* board was missing sound rom, using 'older' version which this set mostly matches and marked bad_dump */
-	ROM_LOAD( "epr-6748.120",   0x0000, 0x2000, CRC(9325a1cf) SHA1(555d137b1c974b144ebe6593b4c32c97b3bb5de9) )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "6.e10",   0x0000, 0x2000, CRC(9325a1cf) SHA1(555d137b1c974b144ebe6593b4c32c97b3bb5de9) )
 
 	ROM_REGION( 0xc000, "tiles", 0 ) /* same as parent except 3x16k instead of 6x8k */
 	ROM_LOAD( "11.r7",          0x0000, 0x4000, CRC(55d7aaf7) SHA1(84041b665f91b515968aaa48d8ffe93c84c90c57) ) // epr-6747.62 + epr-6746.61
@@ -3273,13 +3273,16 @@ ROM_START( teddybbobl )
 	ROM_LOAD( "9.r10",          0x8000, 0x4000, CRC(8076d3a3) SHA1(ba7f136b9300a2b41f225a7696345c90a6fbd6a5) ) // epr-6753.66 + epr-6742.65
 
 	ROM_REGION( 0x10000, "sprites", 0 )
-	ROM_LOAD( "epr-6735.117",   0x0000, 0x4000, CRC(1be35a97) SHA1(7524cfa1a9c9a2e37753f119e7ac7aa3158621be) ) // 4.f3
-	ROM_LOAD( "epr-6737.04",    0x4000, 0x4000, CRC(6b53aa7a) SHA1(b1b3ff9460b2321e72b49befa63b61c9c36fedd9) ) // 6.k3
-	ROM_LOAD( "epr-6736.110",   0x8000, 0x4000, CRC(565c25d0) SHA1(5ae524ef01138c5042b223286d65eb9043c0f0d5) ) // 5.h3
-	ROM_LOAD( "epr-6738.05",    0xc000, 0x4000, CRC(e116285f) SHA1(b6fb50b02a981b3b23385200045ae537092d26d6) ) // 7.m3
+	ROM_LOAD( "4.f3",   0x0000, 0x4000, CRC(1be35a97) SHA1(7524cfa1a9c9a2e37753f119e7ac7aa3158621be) )
+	ROM_LOAD( "6.k3",   0x4000, 0x4000, CRC(6b53aa7a) SHA1(b1b3ff9460b2321e72b49befa63b61c9c36fedd9) )
+	ROM_LOAD( "5.h3",   0x8000, 0x4000, CRC(565c25d0) SHA1(5ae524ef01138c5042b223286d65eb9043c0f0d5) )
+	ROM_LOAD( "7.m3",   0xc000, 0x4000, CRC(e116285f) SHA1(b6fb50b02a981b3b23385200045ae537092d26d6) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+
+	ROM_REGION( 0x0100, "promsbl", 0 )
+	ROM_LOAD( "74s287.bin",     0x0000, 0x0100, CRC(de9af32c) SHA1(f999465bb4600a97179a9253e17413f6837703df) )
 ROM_END
 
 
