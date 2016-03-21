@@ -103,6 +103,7 @@ public:
 		required_device<dac_device> m_dacr;
 		required_device<pc_joy_device> m_joy;
 		required_device<midi_port_device> m_mdout;
+		required_ioport m_config;
 
 		void process_fifo(UINT8 cmd);
 		void queue(UINT8 data);
@@ -162,10 +163,11 @@ public:
 
 		DECLARE_READ8_MEMBER(ym3812_16_r);
 		DECLARE_WRITE8_MEMBER(ym3812_16_w);
+		virtual ioport_constructor device_input_ports() const override;
 protected:
 		virtual void device_start() override;
-		virtual void drq_w(int state) override { m_isa->drq1_w(state); }
-		virtual void irq_w(int state, int source) override { m_isa->irq5_w(state); }
+		virtual void drq_w(int state) override;
+		virtual void irq_w(int state, int source) override;
 		virtual UINT8 dack_r(int line) override { return sb_device::dack_r(line); }
 		virtual void dack_w(int line, UINT8 data) override { sb_device::dack_w(line, data); }
 private:
@@ -217,15 +219,16 @@ public:
 		DECLARE_WRITE8_MEMBER(mpu401_w);
 		DECLARE_READ8_MEMBER(mixer_r);
 		DECLARE_WRITE8_MEMBER(mixer_w);
+		virtual ioport_constructor device_input_ports() const override;
 protected:
 		virtual void device_start() override;
 		virtual UINT16 dack16_r(int line) override;
 		virtual UINT8 dack_r(int line) override { return sb_device::dack_r(line); }
 		virtual void dack_w(int line, UINT8 data) override { sb_device::dack_w(line, data); }
 		virtual void dack16_w(int line, UINT16 data) override;
-		virtual void drq16_w(int state) override { m_isa->drq5_w(state); }
-		virtual void drq_w(int state) override { m_isa->drq1_w(state); }
-		virtual void irq_w(int state, int source) override { (state?m_dsp.irq_active|=source:m_dsp.irq_active&=~source); m_isa->irq5_w(m_dsp.irq_active != 0);  }
+		virtual void drq16_w(int state) override;
+		virtual void drq_w(int state) override;
+		virtual void irq_w(int state, int source) override;
 		virtual void mixer_reset() override;
 		void mixer_set();
 		virtual void rcv_complete() override;    // Rx completed receiving byte

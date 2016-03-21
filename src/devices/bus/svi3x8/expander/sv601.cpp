@@ -10,13 +10,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS/MACROS
-//**************************************************************************
-
-#define VERBOSE 0
-
-
-//**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
@@ -32,13 +25,13 @@ static MACHINE_CONFIG_FRAGMENT( sv601 )
 	MCFG_SVI_SLOT_INT_HANDLER(WRITELINE(sv601_device, int_w))
 	MCFG_SVI_SLOT_ROMDIS_HANDLER(WRITELINE(sv601_device, romdis_w))
 	MCFG_SVI_SLOT_RAMDIS_HANDLER(WRITELINE(sv601_device, ramdis_w))
-	MCFG_SVI_SLOT_ADD("0", NULL)
-	MCFG_SVI_SLOT_ADD("1", NULL)
-	MCFG_SVI_SLOT_ADD("2", NULL)
-	MCFG_SVI_SLOT_ADD("3", NULL)
-	MCFG_SVI_SLOT_ADD("4", NULL)
-	MCFG_SVI_SLOT_ADD("5", NULL)
-	MCFG_SVI_SLOT_ADD("6", NULL)
+	MCFG_SVI_SLOT_ADD("0", svi_slot_cards, NULL)
+	MCFG_SVI_SLOT_ADD("1", svi_slot_cards, NULL)
+	MCFG_SVI_SLOT_ADD("2", svi_slot_cards, NULL)
+	MCFG_SVI_SLOT_ADD("3", svi_slot_cards, NULL)
+	MCFG_SVI_SLOT_ADD("4", svi_slot_cards, NULL)
+	MCFG_SVI_SLOT_ADD("5", svi_slot_cards, NULL)
+	MCFG_SVI_SLOT_ADD("6", svi_slot_cards, NULL)
 MACHINE_CONFIG_END
 
 machine_config_constructor sv601_device::device_mconfig_additions() const
@@ -67,14 +60,6 @@ sv601_device::sv601_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 void sv601_device::device_start()
-{
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void sv601_device::device_reset()
 {
 }
 

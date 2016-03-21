@@ -7,30 +7,20 @@
 //============================================================
 
 #include "input_module.h"
-#include "modules/osdmodule.h"
 
 #if defined(OSD_WINDOWS)
-
-// standard windows headers
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <winioctl.h>
-#include <tchar.h>
-#undef interface
 
 // MAME headers
 #include "emu.h"
 #include "osdepend.h"
-#include "ui/ui.h"
 
 // MAMEOS headers
 #include "winmain.h"
-#include "window.h"
 
 #include "input_common.h"
 #include "input_windows.h"
 
-bool windows_osd_interface::should_hide_mouse()
+bool windows_osd_interface::should_hide_mouse() const
 {
 	bool hidemouse = false;
 	hidemouse |= downcast<wininput_module*>(m_keyboard_input)->should_hide_mouse();
@@ -40,7 +30,7 @@ bool windows_osd_interface::should_hide_mouse()
 	return hidemouse;
 }
 
-bool windows_osd_interface::handle_input_event(input_event eventid, void* eventdata)
+bool windows_osd_interface::handle_input_event(input_event eventid, void* eventdata) const
 {
 	bool handled = false;
 	handled |= downcast<wininput_module*>(m_keyboard_input)->handle_input_event(eventid, eventdata);
@@ -50,7 +40,7 @@ bool windows_osd_interface::handle_input_event(input_event eventid, void* eventd
 	return handled;
 }
 
-void windows_osd_interface::poll_input(running_machine &machine)
+void windows_osd_interface::poll_input(running_machine &machine) const
 {
 	m_keyboard_input->poll_if_necessary(machine);
 	m_mouse_input->poll_if_necessary(machine);
@@ -68,7 +58,7 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 	const char* uimode;
 
 	// loop over the defaults
-	for (entry = typelist.first(); entry != NULL; entry = entry->next())
+	for (entry = typelist.first(); entry != nullptr; entry = entry->next())
 		switch (entry->type())
 		{
 			// disable the config menu if the ALT key is down

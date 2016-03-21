@@ -9993,14 +9993,14 @@ a certain item) -->
 	</software>
 
 	<software name="mgear">
-		<description>Master Gear Adapter</description>
+		<description>Master Gear Converter</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<feature name="slot" value="mgear" />
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="1">
-				<!-- this cartridge is just an adapted -->
+				<!-- this cartridge is just an adapter -->
 			</dataarea>
 		</part>
 	</software>

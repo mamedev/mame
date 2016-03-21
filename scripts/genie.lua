@@ -114,6 +114,7 @@ newoption {
 		{ "haiku",         "Haiku"                  },
 		{ "solaris",       "Solaris SunOS"          },
 		{ "steamlink",     "Steam Link"             },
+		{ "rpi",           "Raspberry Pi"           },
 	},
 }
 
@@ -574,7 +575,9 @@ configuration { "Debug" }
 	defines {
 		"MAME_DEBUG",
 		"MAME_PROFILER",
+		"BGFX_CONFIG_DEBUG=1",
 	}
+
 if _OPTIONS["FASTDEBUG"]=="1" then
 	defines {
 		"MAME_DEBUG_FAST"
@@ -1098,7 +1101,7 @@ configuration { "pnacl" }
 	}
 	archivesplit_size "20"
 
-configuration { "linux-*" }
+configuration { "linux-* or rpi"}
 		links {
 			"dl",
 			"rt",
@@ -1122,6 +1125,19 @@ configuration { "steamlink" }
 	defines {
 		"EGL_API_FB",
 	}
+
+configuration { "rpi" }
+	links {
+ 		"SDL2",
+		"fontconfig",
+		"X11",
+		"GLESv2",
+		"EGL",
+		"bcm_host",
+		"vcos",
+		"vchiq_arm",
+		"pthread",
+	}	
 
 configuration { "osx* or xcode4" }
 		links {

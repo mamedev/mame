@@ -14,17 +14,11 @@
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <winioctl.h>
-#include <tchar.h>
 #undef interface
-
-#include <mutex>
 
 // MAME headers
 #include "emu.h"
 #include "osdepend.h"
-#include "ui/ui.h"
-#include "strconv.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -101,13 +95,13 @@ public:
 		if (!input_enabled())
 			return FALSE;
 
-		KeyPressEventArgs *args = nullptr;
+		KeyPressEventArgs *args;
 
 		switch (eventid)
 		{
 			case INPUT_EVENT_KEYDOWN:
 			case INPUT_EVENT_KEYUP:
-				args = (KeyPressEventArgs*)eventdata;
+				args = static_cast<KeyPressEventArgs*>(eventdata);
 				for (int i = 0; i < devicelist()->size(); i++)
 					downcast<win32_keyboard_device*>(devicelist()->at(i))->queue_events(args, 1);
 

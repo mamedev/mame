@@ -25,6 +25,7 @@
  *MP0168   TMS1000   1979, Conic Basketball
  @MP0170   TMS1000   1979, Conic Football
  @MP0914   TMS1000   1979, Entex Baseball 1
+ *MP0919   TMS1000   1979, Tiger Copy Cat (model 7-520)
  @MP0923   TMS1000   1979, Entex Baseball 2
  @MP1030   TMS1100   1980, APF Mathemagician
  @MP1133   TMS1470   1979, Kosmos Astro
@@ -44,6 +45,7 @@
  *MP2139   TMS1370?  1982, Gakken Galaxy Invader 1000
  @MP2726   TMS1040   1979, Tomy Break Up
  *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
+ *MP3005   TMS1000?  1989, Tiger Copy Cat (model 7-522)
  *MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A or B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (model 4850)
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)

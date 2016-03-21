@@ -73,11 +73,13 @@ const UINT8 RENDER_CREATE_NO_ART        = 0x01;         // ignore any views that
 const UINT8 RENDER_CREATE_SINGLE_FILE   = 0x02;         // only load views from the file specified
 const UINT8 RENDER_CREATE_HIDDEN        = 0x04;         // don't make this target visible
 
-// render scaling types
-const UINT32 RENDER_SCALE_FRACTIONAL    = 0x00;         // compute bounds using dimensionless proportions (default)
-const UINT32 RENDER_SCALE_INTEGER       = 0x01;         // compute integer scaling factors for both axes, based on target dimensions
-const UINT32 RENDER_SCALE_STRETCH_H     = 0x02;         // compute fractional scaling factor for x-axis, and integer factor for y-axis
-const UINT32 RENDER_SCALE_STRETCH_FULL  = 0x03;         // match bounds with physical target dimensions in pixels
+// render scaling modes
+enum
+{
+	SCALE_FRACTIONAL = 0,                               // compute fractional scaling factors for both axes
+	SCALE_FRACTIONAL_X,                                 // compute fractional scaling factor for x-axis, and integer factor for y-axis
+	SCALE_INTEGER                                       // compute integer scaling factors for both axes, based on target dimensions
+};
 
 // flags for primitives
 const int PRIMFLAG_TEXORIENT_SHIFT = 0;
@@ -91,7 +93,6 @@ const UINT32 PRIMFLAG_BLENDMODE_MASK = 15 << PRIMFLAG_BLENDMODE_SHIFT;
 
 const int PRIMFLAG_ANTIALIAS_SHIFT = 12;
 const UINT32 PRIMFLAG_ANTIALIAS_MASK = 1 << PRIMFLAG_ANTIALIAS_SHIFT;
-
 const int PRIMFLAG_SCREENTEX_SHIFT = 13;
 const UINT32 PRIMFLAG_SCREENTEX_MASK = 1 << PRIMFLAG_SCREENTEX_SHIFT;
 
@@ -173,8 +174,6 @@ struct render_bounds
 	float               y0;                 // topmost Y coordinate
 	float               x1;                 // rightmost X coordinate
 	float               y1;                 // bottommost Y coordinate
-	float               aspect;             // aspect ratio for this item
-	int                 scale_type;         // type of scale for this item
 
 	float width() const { return x1 - x0; }
 	float height() const { return y1 - y0; }
@@ -809,7 +808,6 @@ public:
 		int                 m_orientation;      // orientation of this item
 		render_bounds       m_bounds;           // bounds of the item
 		render_bounds       m_rawbounds;        // raw (original) bounds of the item
-		render_bounds		m_scaledbounds;     // raw bounds of the item after scale is applied
 		render_color        m_color;            // color of the item
 	};
 
@@ -825,7 +823,6 @@ public:
 	const render_bounds &screen_bounds() const { return m_scrbounds; }
 	const render_screen_list &screens() const { return m_screens; }
 	bool layer_enabled(item_layer layer) const { return m_layenabled[layer]; }
-	int physical_width() const { return m_physical_width; }
 
 	//
 	bool has_art() const { return (m_backdrop_list.count() + m_overlay_list.count() + m_bezel_list.count() + m_cpanel_list.count() + m_marquee_list.count() != 0); }
@@ -833,8 +830,6 @@ public:
 
 	// operations
 	void recompute(render_layer_config layerconfig);
-	bool set_physical_size(INT32 new_width, INT32 new_height, float new_pixel_aspect, int new_orientation);
-	void scale_bounds(render_bounds *dest, const render_bounds *src);
 
 	// resolve tags, if any
 	void resolve_tags();
@@ -845,13 +840,6 @@ private:
 	std::string         m_name;             // name of the layout
 	float               m_aspect;           // X/Y of the layout
 	float               m_scraspect;        // X/Y of the screen areas
-	int                 m_physical_width;   // render_target's width in pixels
-	int                 m_physical_height;  // render_target's height in pixels
-	float               m_pixel_aspect;     // render_target's pixel aspect
-	int                 m_orientation;      // render target's orientation
-	bool                m_keepaspect;       // constrain aspect ratio
-	int                 m_int_scale_x;      // horizontal integer scale factor
-	int                 m_int_scale_y;      // vertical integer scale factor
 	render_screen_list  m_screens;          // list of active screens
 	render_bounds       m_bounds;           // computed bounds of the view
 	render_bounds       m_scrbounds;        // computed bounds of the screens within the view
@@ -910,6 +898,7 @@ public:
 	UINT32 width() const { return m_width; }
 	UINT32 height() const { return m_height; }
 	float pixel_aspect() const { return m_pixel_aspect; }
+	int scale_mode() const { return m_scale_mode; }
 	float max_update_rate() const { return m_max_refresh; }
 	int orientation() const { return m_orientation; }
 	render_layer_config layer_config() const { return m_layerconfig; }
@@ -1014,6 +1003,9 @@ private:
 	render_bounds           m_bounds;                   // bounds of the target
 	bool                    m_keepaspect;               // constrain aspect ratio
 	float                   m_pixel_aspect;             // aspect ratio of individual pixels
+	int                     m_scale_mode;               // type of scale to apply 
+	int                     m_int_scale_x;              // horizontal integer scale factor
+	int                     m_int_scale_y;              // vertical integer scale factor
 	float                   m_max_refresh;              // maximum refresh rate, 0 or if none
 	int                     m_orientation;              // orientation
 	render_layer_config     m_layerconfig;              // layer configuration

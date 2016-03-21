@@ -33,6 +33,8 @@ READ8_MEMBER ( pc_joy_device::joy_port_r )
 WRITE8_MEMBER ( pc_joy_device::joy_port_w )
 {
 	m_stime = machine().time();
+	if(!m_dev)
+		return;
 	m_dev->port_write();
 }
 

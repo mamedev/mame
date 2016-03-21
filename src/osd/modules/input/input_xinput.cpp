@@ -297,13 +297,13 @@ protected:
 					continue;
 
 				// Add the axes
-				for (int i = 0; i < XINPUT_MAX_AXIS; i++)
+				for (int axisnum = 0; axisnum < XINPUT_MAX_AXIS; axisnum++)
 				{
 					devinfo->device()->add_item(
-						xinput_axis_name[i],
-						xinput_axis_ids[i],
+						xinput_axis_name[axisnum],
+						xinput_axis_ids[axisnum],
 						generic_axis_get_state,
-						&devinfo->gamepad.sThumbLX + i);
+						&devinfo->gamepad.sThumbLX + axisnum);
 				}
 
 				// Populate the POVs

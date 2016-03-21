@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "sv601.h"
+#include "sv602.h"
 
 SLOT_INTERFACE_EXTERN( svi_expander_modules );
 

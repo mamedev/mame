@@ -47,6 +47,7 @@ function toolchain(_buildDir, _libDir)
 		allowed = {
 			{ "vs2012-clang",  "Clang 3.6"                       },
 			{ "vs2013-clang",  "Clang 3.6"                       },
+			{ "vs2015-clang",  "Clang 3.9"                       },
 			{ "vs2012-xp",     "Visual Studio 2012 targeting XP" },
 			{ "vs2013-xp",     "Visual Studio 2013 targeting XP" },
 			{ "vs2015-xp",     "Visual Studio 2015 targeting XP" },
@@ -339,7 +340,11 @@ function toolchain(_buildDir, _libDir)
 	elseif _ACTION == "vs2012" or _ACTION == "vs2013" or _ACTION == "vs2015" then
 
 		if (_ACTION .. "-clang") == _OPTIONS["vs"] then
-			premake.vstudio.toolset = ("LLVM-" .. _ACTION)
+			if "vs2015-clang" == _OPTIONS["vs"] then
+				premake.vstudio.toolset = ("LLVM-vs2014")
+			else
+				premake.vstudio.toolset = ("LLVM-" .. _ACTION)
+			end
 			location (path.join(_buildDir, "projects", _ACTION .. "-clang"))
 
 		elseif "winphone8" == _OPTIONS["vs"] then
@@ -746,10 +751,11 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "android-arm/obj"))
 		libdirs {
 			path.join(_libDir, "lib/android-arm"),
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/libs/armeabi-v7a",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a/include",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/libs/armeabi-v7a/include",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/include",
 		}
 		buildoptions {
 			"--sysroot=" .. path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-arm"),

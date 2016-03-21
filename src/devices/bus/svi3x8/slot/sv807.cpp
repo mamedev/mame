@@ -93,6 +93,13 @@ sv807_device::sv807_device(const machine_config &mconfig, const char *tag, devic
 
 void sv807_device::device_start()
 {
+	// register for savestates
+	save_item(NAME(m_bk21));
+	save_item(NAME(m_bk22));
+	save_item(NAME(m_bk31));
+	save_item(NAME(m_bk32));
+	save_pointer(NAME(m_ram_bank1.get()), 0x8000);
+	save_pointer(NAME(m_ram_bank2.get()), 0x8000);
 }
 
 //-------------------------------------------------

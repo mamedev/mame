@@ -617,7 +617,7 @@ static INPUT_PORTS_START( ngp )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("Power")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("Power") PORT_CHANGED_MEMBER(DEVICE_SELF, ngp_state, power_callback, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, ngp_state, power_callback, NULL)
 INPUT_PORTS_END
 
 
@@ -892,5 +892,6 @@ ROM_START( ngpc )
 ROM_END
 
 
-CONS( 1998, ngp, 0, 0, ngp, ngp, driver_device, 0,  "SNK", "NeoGeo Pocket", MACHINE_SUPPORTS_SAVE )
-CONS( 1999, ngpc, ngp, 0, ngpc, ngp, driver_device, 0, "SNK", "NeoGeo Pocket Color", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME  PARENT COMPAT MACHINE INPUT INIT              COMPANY, FULLNAME, FLAGS */
+CONS( 1998, ngp,  0,     0,     ngp,    ngp,  driver_device, 0, "SNK", "NeoGeo Pocket", MACHINE_SUPPORTS_SAVE )
+CONS( 1999, ngpc, ngp,   0,     ngpc,   ngp,  driver_device, 0, "SNK", "NeoGeo Pocket Color", MACHINE_SUPPORTS_SAVE )

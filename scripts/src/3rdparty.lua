@@ -726,6 +726,14 @@ end
 			"-Wno-uninitialized",
 			"-Wno-unused-function",
 		}
+	configuration { "rpi" }
+		buildoptions {
+			"-Wno-unused-but-set-variable",
+			"-Wno-unused-variable",
+		}
+		defines {
+			"__STDC_VERSION__=199901L",
+		}
 
 	configuration { }
 
@@ -769,6 +777,7 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_null.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_vk.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderdoc.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/shader.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dxbc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dx9bc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_spirv.cpp",

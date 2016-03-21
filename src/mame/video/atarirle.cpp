@@ -191,7 +191,7 @@ void atari_rle_objects_device::device_start()
 	// resolve our memory
 	memory_share *share = owner()->memshare(tag());
 	if (share == nullptr)
-		throw emu_fatalerror("Error: unable to find memory share '%s' needed for Atari RLE device", tag());
+		throw emu_fatalerror("Unable to find memory share '%s' needed for Atari RLE device", tag());
 	m_ram.set(*share, 2);
 
 	// register a VBLANK callback

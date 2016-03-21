@@ -257,6 +257,7 @@ SOUNDS["SB0400"] = true
 SOUNDS["AC97"] = true
 SOUNDS["ES1373"] = true
 SOUNDS["L7A1045"] = true
+SOUNDS["AD1848"] = true
 
 --------------------------------------------------
 -- specify available video cores

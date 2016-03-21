@@ -76,6 +76,10 @@ protected:
 	}
 
 public:
+	virtual ~event_manager_t()
+	{
+	}
+
 	void subscribe(int* event_types, int num_event_types, TSubscriber *subscriber)
 	{
 		std::lock_guard<std::mutex> scope_lock(m_lock);
@@ -109,17 +113,20 @@ class sdl_window_info;
 class sdl_event_manager : public event_manager_t<sdl_event_subscriber>
 {
 private:
-	bool                  m_app_has_mouse_focus;
+	bool                  m_mouse_over_window;
+	bool                  m_has_focus;
 	sdl_window_info *     m_focus_window;
 
 	sdl_event_manager()
-		: m_app_has_mouse_focus(true),
+		: m_mouse_over_window(true),
+		  m_has_focus(true),
 		  m_focus_window(nullptr)
 	{
 	}
 
 public:
-	bool app_has_mouse_focus() { return m_app_has_mouse_focus; }
+	bool mouse_over_window() const { return m_mouse_over_window; }
+	bool has_focus() const { return m_focus_window; }
 	sdl_window_info * focus_window() { return m_focus_window; }
 
 	static sdl_event_manager& instance()

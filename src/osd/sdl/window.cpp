@@ -561,13 +561,8 @@ void sdl_window_info::update_cursor_state()
 	// the possibility of losing control
 	if (!(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
 	{
-		//FIXME: SDL1.3: really broken: the whole SDL code
-		//       will only work correct with relative mouse movements ...
-#ifdef USE_OLD_SDL_INPUT
-		bool should_hide_mouse = sdlinput_should_hide_mouse();
-#else
 		bool should_hide_mouse = downcast<sdl_osd_interface&>(machine().osd()).should_hide_mouse();
-#endif
+
 		if (!fullscreen() && !should_hide_mouse)
 		{
 			SDL_ShowCursor(SDL_ENABLE);
@@ -692,12 +687,7 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_video_window_destroy_wt )
 	}
 	SDL_DestroyWindow(window->sdl_window());
 	// release all keys ...
-#ifdef USE_OLD_SDL_INPUT
-	sdlinput_release_keys();
-#else
 	downcast<sdl_osd_interface &>(window->machine().osd()).release_keys();
-#endif
-
 
 	osd_free(wp);
 	return nullptr;
@@ -1108,11 +1098,7 @@ OSDWORK_CALLBACK( sdl_window_info::draw_video_contents_wt )
 	ASSERT_REDRAW_THREAD();
 
 	// Some configurations require events to be polled in the worker thread
-#ifdef USE_OLD_SDL_INPUT
-	sdlinput_process_events_buf();
-#else
 	downcast< sdl_osd_interface& >(window->machine().osd()).process_events_buf();
-#endif
 
 	// Check whether window has vector screens
 
@@ -1192,7 +1178,7 @@ osd_rect sdl_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	osd_monitor_info *monitor = m_monitor;
 
 	// do not constrain aspect ratio for integer scaled views
-	if (m_target->current_view()->bounds().scale_type != RENDER_SCALE_FRACTIONAL)
+	if (m_target->scale_mode() != SCALE_FRACTIONAL)
 		return rect;
 
 	// get the pixel aspect ratio for the target monitor
@@ -1316,7 +1302,7 @@ osd_dim sdl_window_info::get_min_bounds(int constrain)
 	minheight += wnd_extra_height();
 
 	// if we want it constrained, figure out which one is larger
-	if (constrain && m_target->current_view()->bounds().scale_type == RENDER_SCALE_FRACTIONAL)
+	if (constrain && m_target->scale_mode() == SCALE_FRACTIONAL)
 	{
 		// first constrain with no height limit
 		osd_rect test1(0,0,minwidth,10000);
@@ -1380,7 +1366,7 @@ osd_dim sdl_window_info::get_max_bounds(int constrain)
 	maximum = maximum.resize(tempw, temph);
 
 	// constrain to fit
-	if (constrain && m_target->current_view()->bounds().scale_type == RENDER_SCALE_FRACTIONAL)
+	if (constrain && m_target->scale_mode() == SCALE_FRACTIONAL)
 		maximum = constrain_to_aspect_ratio(maximum, WMSZ_BOTTOMRIGHT);
 
 	// remove extra window stuff

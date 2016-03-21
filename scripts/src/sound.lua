@@ -1314,3 +1314,14 @@ if (SOUNDS["VRC6"]~=null) then
 	}
 end
 
+---------------------------------------------------
+-- AD1848
+--@src/devices/sound/ad1848.h,SOUNDS["AD1848"] = true
+---------------------------------------------------
+
+if (SOUNDS["AD1848"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/ad1848.cpp",
+		MAME_DIR .. "src/devices/sound/ad1848.h",
+	}
+end
