@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
-// thanks to: Ian F./trinitr0n
+// thanks-to:Ian F./trinitr0n
 /******************************************************************************
 	Symbolics 36x0 (really in this case, 3670; the original 3600 is considerably rarer, 3670 is backwards compatible for the most part)
 	TODO: add credits, backstory, history, etc here
