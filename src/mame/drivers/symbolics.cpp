@@ -1,9 +1,27 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
+// thanks to: Ian F./trinitr0n
 /******************************************************************************
 	Symbolics 36x0 (really in this case, 3670; the original 3600 is considerably rarer, 3670 is backwards compatible for the most part)
 	TODO: add credits, backstory, history, etc here
-	Front-end Processor dumped only, so far, plds/proms/pals not dumped yet
+
+	Layout of all the Lisp machine models symbolics made, roughly in chronological order:
+	LM-2 - basically a CADR (i.e. a clone of the MIT CADR machine, but doesn't require an umbilical to a PDP-10 like CADR did? this needs more research)
+	3600 - precursor to the L-machine, 98% of the actual L machines- an extended and polished CADR. uses the pre-PE console
+	3670 / 3640 {large, small} L-machines, same architecture but the large cabinet has more slots for boards and can take larger disks like EAGLEs
+	3675 / 3645 - Faster L-machines; same core board set but they come with the later released FPA and instruction prefetch units; ~ 1.5x faster; this is the fastest pre-Ivory machine, faster than all the 36xx machines below
+	3620 - Small G-machine, no room for color graphics etc
+	3630 - Small G-machine with room for a color CADBUFFER (256 color). a "big" 3620
+	3650 - Big G-machine; same core boards as a 3620 / 3630 but more slots and can take bigger disks. The size of the "Small" L-machine (3640)
+	3653 - Basically 3 3620s in a 3650 case.
+	3610 - A gimped 3620- no difference but the ID PROM. Licensed for application deployment but not development
+	MacIvory - First gen ivory, basically a MacIvory II with worse cycle time
+	XL400 - First gen ivory (same as MacIvory II) chips in a standalone machine
+	XL1200 - Second gen ivory (same as MacIvory III) chips, faster, uses memory on the card itself, otherwise in the exact same setup as the XL400
+	NXP1000 - An ivory in a standalone pizzabox. No console connection, FEP prompt over serial, Genera access only over network (X11 forwarding for gui), has scsi disks
+	There were both 256 color (cad buffer) and true color w/framegrabber options for the 36xx family
+
+	3670 new version 'NFEP' Front-end Processor dumped only, so far, plds/proms/pals not dumped yet
 	
 	TODO:
 	The entire lispcpu half (more like 3/4) of the machine
@@ -13,7 +31,7 @@
 	2048x8bit SRAM @F7 and @G7
 	keyboard/mouse (a 68k based console dedicated to this machine; talks through one of the MPSC chips)
 	am9517a-50 DMA controller
-	'NanoFEP' i8749 mcu which runs the front panel and rtc clock (only on 3600, the 3670 lacks this)
+	'NanoFEP' i8749 mcu which runs the front panel and rtc clock (only on original 3600, the 3670 and all later machines lack this)
 	
 	DONE:
 	ROM Loading
@@ -133,6 +151,9 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   0   0   1   0?      W   FEP-HSB-DATA
 1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   0   1   0   0?      W   FEP-HSB-POINTER
 1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   1   0   0   0?      W   P-PORT
+Now for stuff the 3670 nfep code actually accesses:
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   1   1   0   0   0   1       W    ? 0x02 gets written here
+
               |               |               |               |               |               |     hex
           |           |           |           |           |           |           |           |     octal
 @310: write 
