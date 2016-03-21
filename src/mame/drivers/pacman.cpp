@@ -1082,6 +1082,51 @@ static ADDRESS_MAP_START( woodpek_map, AS_PROGRAM, 8, pacman_state )
 ADDRESS_MAP_END
 
 
+/*
+executes the following, which seems to be incorrect
+
+353B: call $9BD7
+9BD7: sbc  a,c
+9BD8: ld   (hl),$C3
+9BDA: db   $ed,$13 < illegal op
+9BDC: rst  $38
+
+*/
+
+static ADDRESS_MAP_START( numcrash_map, AS_PROGRAM, 8, pacman_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x27ff) AM_ROM
+	/* 0x2800 - 0x2fff unmapped? */
+	AM_RANGE(0x3000, 0x37ff) AM_ROM
+	/* 0x3800 - 0x3fff unmapped? */
+	AM_RANGE(0x8000, 0x9fff) AM_ROM
+
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
+
+
+
+	AM_RANGE(0x4c00, 0x4fef) AM_RAM
+	AM_RANGE(0x4ff0, 0x4fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_mask_w)
+	AM_RANGE(0x5001, 0x5001) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
+//	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
+//	AM_RANGE(0x5003, 0x5003) AM_WRITE(pacman_flipscreen_w)
+//	AM_RANGE(0x5004, 0x5005) AM_WRITENOP // AM_WRITE(pacman_leds_w)
+//	AM_RANGE(0x5006, 0x5006) AM_WRITENOP // AM_WRITE(pacman_coin_lockout_global_w)
+//	AM_RANGE(0x5007, 0x5007) AM_WRITE(pacman_coin_counter_w)
+	AM_RANGE(0x5040, 0x505f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
+	AM_RANGE(0x5060, 0x506f) AM_WRITEONLY AM_SHARE("spriteram2")
+//	AM_RANGE(0x5070, 0x507f) AM_WRITENOP
+//	AM_RANGE(0x5080, 0x5080) AM_WRITENOP
+	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
+	AM_RANGE(0x5040, 0x5040) AM_READ_PORT("IN1")
+	AM_RANGE(0x5080, 0x5080) AM_READ_PORT("DSW1")
+	AM_RANGE(0x50c0, 0x50c0) AM_READ_PORT("DSW2")
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( alibaba_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
@@ -3610,6 +3655,12 @@ static MACHINE_CONFIG_DERIVED( woodpek, pacman )
 	MCFG_CPU_PROGRAM_MAP(woodpek_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( numcrash, pacman )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(numcrash_map)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( alibaba, pacman )
 
@@ -7106,7 +7157,7 @@ GAME( 1986, rocktrv2, 0,        rocktrv2, rocktrv2, pacman_state,  rocktrv2, ROT
 
 GAME( 1986, bigbucks, 0,        bigbucks, bigbucks, driver_device, 0,        ROT90,  "Dynasoft Inc.", "Big Bucks", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, numcrash, 0,        woodpek,  numcrash, driver_device, 0,        ROT90,  "Hanshin Goraku", "Number Crash", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // "Peni soft" related?
+GAME( 1983, numcrash, 0,        numcrash, numcrash, driver_device, 0,        ROT90,  "Hanshin Goraku", "Number Crash", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // "Peni soft" related?
 
 GAME( 1985, cannonbp, 0,        pacman,   cannonbp, pacman_state,  cannonbp, ROT90,  "Novomatic", "Cannon Ball (Pac-Man Hardware)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 
