@@ -37,7 +37,8 @@
 		PS3     = "PS3",
 		Xbox360 = "Xbox 360",
 		ARM     = "ARM",
-		Orbis	= "Orbis"
+		Orbis	= "Orbis",
+		Durango = "Durango",
 	}
 
 
