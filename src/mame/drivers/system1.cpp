@@ -3370,6 +3370,36 @@ ROM_START( sscandal )
 	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
+
+ROM_START( myherobl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.f2",   0x0000, 0x4000, CRC(c1d354dc) SHA1(0146dda49ccf5e0d1b507604095b75690e211f1b) )
+	ROM_LOAD( "2.g2",   0x4000, 0x4000, CRC(688c9ede) SHA1(768f2e4bb797c2c85568d0ec2cda974e77efaff3) )
+	ROM_LOAD( "3.h2",   0x8000, 0x4000, CRC(3cbbaf64) SHA1(fdb5f2ca38010729afa4ed24c087119cf398f27d) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "6.E10",   0x0000, 0x2000, CRC(af467223) SHA1(d79a67e761fe483407cad645dd3b93d86e8790e3) )
+
+	ROM_REGION( 0xc000, "tiles", 0 ) // identical to original except for first half of B13.R10 ( has Coreland / Sega copyright tiles like the Japan set, not closer otherwise to the parent set )
+	ROM_LOAD( "B13.R10",   0x0000, 0x4000, CRC(9a4861b1) SHA1(0b09556101a8d06f5dacb40970681113d493cbf5) ) // epr-6966.62             B13.R10      [1/2]      98.498535%
+	ROM_LOAD( "B11.R7",    0x4000, 0x4000, CRC(0d6f248a) SHA1(18229745adc552c58a865a181ddad44dfd62bfad) )
+	ROM_LOAD( "x.R8",      0x8000, 0x4000, CRC(24537709) SHA1(2afbefb41b6541d7e27ebef7339f7a26aa2c00c6) )
+
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "4.f4",   0x0000, 0x4000, CRC(f19e05a1) SHA1(98288ba2e96c03a4ab9c8235faa7e01bb376d021) )
+	ROM_LOAD( "x.H4",   0x4000, 0x4000, CRC(7988adc3) SHA1(4ee9e964c24234366660af4981566e8c45f46db9) )
+	ROM_LOAD( "x.G4",   0x8000, 0x4000, CRC(37f77a78) SHA1(01d8bd41303bd5e3a6f1cdafa4a1d682e4c659a2) )
+	ROM_LOAD( "B7.K4",  0xc000, 0x4000, CRC(42bdc8f6) SHA1(f31d82641187a7cc77a4a19189b5a15d5168cbd7) )
+
+	ROM_REGION( 0x0100, "proms", 0 ) // not on this PCB?
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+
+	ROM_REGION( 0x0100, "promsbl", 0 ) // need to convert this into above format for driver?
+	ROM_LOAD( "PROM.A2",     0x0000, 0x0100, CRC(4fcaf000) SHA1(c68592377373b157713b5e129b020feb6c866f91) )
+	ROM_IGNORE(0x100)
+ROM_END
+
+
 ROM_START( myherok )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* all the three program ROMs have bits 0-1 swapped */
@@ -5703,6 +5733,7 @@ GAME( 1985, teddybbo,   teddybb,  sys1piox,  teddybb,   system1_state, teddybb, 
 GAME( 1985, teddybbobl, teddybb,  sys1piox,  teddybb,   system1_state, teddybb,  ROT0,   "bootleg", "TeddyBoy Blues (Old Ver. bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, myhero,     0,        sys1pio,   myhero,    system1_state, bank00,   ROT0,   "Coreland / Sega", "My Hero (US, not encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, sscandal,   myhero,   sys1piox,  myhero,    system1_state, myheroj,  ROT0,   "Coreland / Sega", "Seishun Scandal (315-5132, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, myherobl,   myhero,   sys1piox,  myhero,    system1_state, myheroj,  ROT0,   "bootleg",         "My Hero (bootleg, 315-5132 encryption)", MACHINE_SUPPORTS_SAVE ) // cloned 315-5132 encryption? might be a direct copy of an undumped original set
 GAME( 1985, myherok,    myhero,   sys1piox,  myhero,    system1_state, myherok,  ROT0,   "Coreland / Sega", "My Hero (Korea)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, 4dwarrio,   0,        sys1piox,  4dwarrio,  system1_state, 4dwarrio, ROT0,   "Coreland / Sega", "4-D Warriors (315-5162)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, raflesia,   0,        sys1piox,  raflesia,  system1_state, 4dwarrio, ROT270, "Coreland / Sega", "Rafflesia (315-5162)", MACHINE_SUPPORTS_SAVE )
