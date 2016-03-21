@@ -86,7 +86,7 @@
 		end
 
 		-- target build rule
-		_p('$(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES) | $(TARGETDIR) $(OBJDIRS)')
+		_p('$(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(EXTERNAL_LIBS) $(RESOURCES) | $(TARGETDIR) $(OBJDIRS)')
 
 		if prj.kind == "StaticLib" then
 			if prj.msgarchiving then
@@ -385,6 +385,7 @@
 
 		_p('  LDDEPS    +=%s', make.list(_MAKE.esc(premake.getlinks(cfg, "siblings", "fullpath"))))
 		_p('  LIBS      += $(LDDEPS)%s', make.list(cc.getlinkflags(cfg)))
+		_p('  EXTERNAL_LIBS +=%s', make.list(cc.getlibfiles(cfg)))
 
 		if cfg.kind == "StaticLib" then
 			if (not prj.options.ArchiveSplit) then

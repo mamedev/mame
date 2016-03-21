@@ -79,10 +79,6 @@ namespace Microsoft {
             ComPtr() throw() : ptr_(nullptr) {}
             ComPtr(decltype(nullptr)) throw() : ptr_(nullptr) {}
 
-            template<class U> ComPtr(U *other) throw() : ptr_(other.ptr_) {
-                InternalAddRef();
-            }
-
             ComPtr(const ComPtr &other) throw() : ptr_(other.ptr_) {
                 InternalAddRef();
             }

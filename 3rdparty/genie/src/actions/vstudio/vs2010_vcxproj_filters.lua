@@ -82,8 +82,13 @@
 -- "ResourceCompile", or "None".
 --
 
-	function vc2010.filefiltergroup(prj, section)
+	function vc2010.filefiltergroup(prj, section, kind)
 		local files = vc2010.getfilegroup(prj, section) or {}
+		
+		if kind == nill then
+			kind = section
+		end
+		
 		if (section == "CustomBuild") then
 			for _, custombuildtask in ipairs(prj.custombuildtask or {}) do
 				for _, buildtask in ipairs(custombuildtask or {}) do
@@ -105,11 +110,11 @@
 				end				
 				
 				if filter ~= "." then
-					_p(2,'<%s Include=\"%s\">', section, path.translate(file.name, "\\"))
+					_p(2,'<%s Include=\"%s\">', kind, path.translate(file.name, "\\"))
 						_p(3,'<Filter>%s</Filter>', path.translate(filter, "\\"))
-					_p(2,'</%s>', section)
+					_p(2,'</%s>', kind)
 				else
-					_p(2,'<%s Include=\"%s\" />', section, path.translate(file.name, "\\"))
+					_p(2,'<%s Include=\"%s\" />', kind, path.translate(file.name, "\\"))
 				end
 			end
 			_p(1,'</ItemGroup>')
@@ -130,5 +135,8 @@
 			vc2010.filefiltergroup(prj, "ClCompile")
 			vc2010.filefiltergroup(prj, "ResourceCompile")
 			vc2010.filefiltergroup(prj, "CustomBuild")
+			vc2010.filefiltergroup(prj, "AppxManifest")
+			vc2010.filefiltergroup(prj, "Image")
+			vc2010.filefiltergroup(prj, "DeploymentContent", "None")
 		_p('</Project>')
 	end

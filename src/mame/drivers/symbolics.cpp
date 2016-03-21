@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
-// thanks to: Ian F./trinitr0n
+// thanks-to:Ian F./trinitr0n
 /******************************************************************************
 	Symbolics 36x0 (really in this case, 3670; the original 3600 is considerably rarer, 3670 is backwards compatible for the most part)
 	TODO: add credits, backstory, history, etc here
 
 	Layout of all the Lisp machine models symbolics made, roughly in chronological order:
-	LM-2 - basically a CADR (i.e. a clone of the MIT CADR machine, but doesn't require an umbilical to a PDP-10 like CADR did? this needs more research)
+	LM-2 - basically a CADR (i.e. a clone of the MIT CADR machine. this needs more research, as there may be differences.)
 	3600 - precursor to the L-machine, 98% of the actual L machines- an extended and polished CADR. uses the pre-PE console
 	3670 / 3640 {large, small} L-machines, same architecture but the large cabinet has more slots for boards and can take larger disks like EAGLEs
 	3675 / 3645 - Faster L-machines; same core board set but they come with the later released FPA and instruction prefetch units; ~ 1.5x faster; this is the fastest pre-Ivory machine, faster than all the 36xx machines below

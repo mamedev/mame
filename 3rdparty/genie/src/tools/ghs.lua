@@ -118,7 +118,17 @@
 		return result
 	end
 
-
+-- Returns a list of project-relative paths to external library files.
+-- This function should examine the linker flags and return any that seem to be
+-- a real path to a library file (e.g. "path/to/a/library.a", but not "GL").
+-- Useful for adding to targets to trigger a relink when an external static
+-- library gets updated.
+-- Not currently supported on this toolchain.
+--
+	function premake.ghs.getlibfiles(cfg)
+		local result = {}
+		return result
+	end
 
 --
 -- This is poorly named: returns a list of linker flags for external

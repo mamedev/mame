@@ -222,6 +222,11 @@
 		return table.contains(extensions, ext)
 	end
 
+	function path.isappxmanifest(fname)
+		local extensions = { ".appxmanifest" }
+		local ext = path.getextension(fname):lower()
+		return table.contains(extensions, ext)
+	end
 
 
 --
