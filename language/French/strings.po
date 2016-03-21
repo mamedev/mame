@@ -775,7 +775,7 @@ msgstr "Configuration des Contrôles pour Tous les Jeux"
 
 #: src/emu/ui/mainmenu.cpp:55
 msgid "Input (this Machine)"
-msgstr "Configuration des Contrôles pour ce Jeu Uniquement"
+msgstr "Configuration des Contrôles pour cette Machine Uniquement"
 
 #: src/emu/ui/mainmenu.cpp:59
 msgid "Analog Controls"
@@ -1136,8 +1136,8 @@ msgid ""
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
-"Une ou plusieurs Images ROM ou CHD sont manquantes pour le Jeu "
-"SélectionnéVeuillez Choisir un Jeu Différent.\n"
+"Une ou plusieurs Images ROM ou CHD sont manquantes pour cette machine"
+"Veuillez Choisir une Machine Différente.\n"
 "\n"
 
 #: src/emu/ui/selgame.cpp:648 src/emu/ui/simpleselgame.cpp:262
