@@ -153,8 +153,8 @@ int renderer_bgfx::create()
 		}
 		else
 		{
-			osd_printf_verbose("Unknown backend type '%s'\n", backend.c_str());
-			assert(false);
+			printf("Unknown backend type '%s', going with auto-detection\n", backend.c_str());
+			bgfx::init();
 		}
 		bgfx::reset(m_width[window().m_index], m_height[window().m_index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 		// Enable debug text.
@@ -356,7 +356,7 @@ void renderer_bgfx::process_screen_quad(int view, render_primitive* prim)
     }
     m_targets->update_guest_targets(tex_width, tex_height);
     m_targets->update_window_count(screens);
-    
+
     m_screen_chain->process(prim, view, view / m_screen_chain->applicable_passes(), *m_textures, window(), get_blend_state(PRIMFLAG_GET_BLENDMODE(prim->flags)));
 
     m_textures->add_provider("screen", nullptr);
@@ -743,7 +743,7 @@ int renderer_bgfx::handle_screen_chains()
 
     // process
     render_primitive *prim = window().m_primlist->first();
-    
+
     int seen = 0;
     while (prim != nullptr)
     {
@@ -846,7 +846,7 @@ int renderer_bgfx::draw(int update)
 		allocate_buffer(prim, blend, &buffer);
 
 		buffer_status status = buffer_primitives(view_index, atlas_valid, &prim, &buffer, screen);
-        
+
         if (status == BUFFER_SCREEN)
         {
             screen++;
