@@ -16,7 +16,10 @@
 
 bgfx_entry_uniform* slider_uniform_reader::read_from_value(const Value& value, std::string prefix, bgfx_uniform* uniform, std::map<std::string, bgfx_slider*>& sliders)
 {
-	validate_parameters(value, prefix);
+	if (!validate_parameters(value, prefix))
+	{
+		return nullptr;
+	}
 
 	std::string name = value["slider"].GetString();
 	std::vector<bgfx_slider*> slider_list;
@@ -35,8 +38,9 @@ bgfx_entry_uniform* slider_uniform_reader::read_from_value(const Value& value, s
 	return new bgfx_slider_uniform(uniform, slider_list);
 }
 
-void slider_uniform_reader::validate_parameters(const Value& value, std::string prefix)
+bool slider_uniform_reader::validate_parameters(const Value& value, std::string prefix)
 {
-    READER_ASSERT(value.HasMember("slider"), (prefix + "Must have string value 'slider' (what slider are we getting the value of?)\n").c_str());
-    READER_ASSERT(value["slider"].IsString(), (prefix + "Value 'slider' must be a string\n").c_str());
+    if (!READER_CHECK(value.HasMember("slider"), (prefix + "Must have string value 'slider' (what slider are we getting the value of?)\n").c_str())) return false;
+    if (!READER_CHECK(value["slider"].IsString(), (prefix + "Value 'slider' must be a string\n").c_str())) return false;
+    return true;
 }

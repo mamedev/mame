@@ -24,7 +24,7 @@ public:
 	static bgfx_effect* read_from_value(const Value& value, std::string prefix, shader_manager& shaders);
 
 private:
-	static void validate_parameters(const Value& value, std::string prefix);
+	static bool validate_parameters(const Value& value, std::string prefix);
 };
 
 #endif // __DRAWBGFX_EFFECT_READER__

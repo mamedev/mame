@@ -21,13 +21,13 @@ const depth_reader::string_to_enum depth_reader::FUNCTION_NAMES[depth_reader::FU
 	{ "always",     BGFX_STATE_DEPTH_TEST_ALWAYS }
 };
 
-uint64_t depth_reader::read_from_value(const Value& value)
+uint64_t depth_reader::read_from_value(const Value& value, std::string prefix)
 {
 	uint64_t write_enable = 0;
-	if (value.HasMember("writeEnable"))
+	if (value.HasMember("writeenable"))
 	{
-		assert(value["writeEnable"].IsBool());
-		write_enable = value["writeEnable"].GetBool() ? BGFX_STATE_DEPTH_WRITE: 0;
+		if (!READER_CHECK(value["writeenable"].IsBool(), (prefix + "Value 'writeenable' must be a boolean\n").c_str())) return 0;
+		write_enable = value["writeenable"].GetBool() ? BGFX_STATE_DEPTH_WRITE: 0;
 	}
 
 	uint64_t function = get_enum_from_value(value, "function", BGFX_STATE_DEPTH_TEST_ALWAYS, FUNCTION_NAMES, FUNCTION_COUNT);

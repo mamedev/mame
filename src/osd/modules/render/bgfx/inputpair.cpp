@@ -25,8 +25,13 @@ bgfx_input_pair::bgfx_input_pair(int index, std::string sampler, std::string tex
 {
 }
 
-void bgfx_input_pair::bind(bgfx_effect *effect, texture_manager& textures) const
+void bgfx_input_pair::bind(bgfx_effect *effect, texture_manager& textures, const int32_t screen) const
 {
     assert(effect->uniform(m_sampler) != nullptr);
-	bgfx::setTexture(m_index, effect->uniform(m_sampler)->handle(), textures.handle(m_texture));
+    std::string texture = m_texture;
+    if (m_texture == "previous")
+    {
+        texture = m_texture + std::to_string(screen);
+    }
+	bgfx::setTexture(m_index, effect->uniform(m_sampler)->handle(), textures.handle(texture));
 }

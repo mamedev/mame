@@ -36,7 +36,7 @@ protected:
 	static uint64_t get_param_from_string(std::string value, const string_to_enum* enums, const int count);
 
 protected:
-	static void READER_ASSERT(bool condition, const char* format, ...)
+	static bool READER_CHECK(bool condition, const char* format, ...)
 	{
 		if (!condition)
 		{
@@ -44,10 +44,10 @@ protected:
 			va_start(ap, format);
 			char buf[2048];
 			vsnprintf(buf, 2048, format, ap);
-            printf("%s\n", buf);
-            fflush(stdout);
-			fatalerror("%s", buf);
+            osd_printf_error("Error: %s\n", buf);
+			va_end(ap);
 		}
+		return condition;
 	}
 
 private:

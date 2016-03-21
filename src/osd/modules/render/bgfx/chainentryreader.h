@@ -29,7 +29,7 @@ public:
 	static bgfx_chain_entry* read_from_value(const Value& value, std::string prefix, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, std::map<std::string, bgfx_slider*>& sliders, std::map<std::string, bgfx_parameter*>& params);
 
 private:
-	static void validate_parameters(const Value& value, std::string prefix);
+	static bool validate_parameters(const Value& value, std::string prefix);
 };
 
 #endif // __DRAWBGFX_CHAIN_ENTRY_READER__

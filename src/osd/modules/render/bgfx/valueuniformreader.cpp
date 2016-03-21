@@ -13,7 +13,10 @@
 
 bgfx_entry_uniform* value_uniform_reader::read_from_value(const Value& value, std::string prefix, bgfx_uniform* uniform)
 {
-	validate_parameters(value, prefix);
+	if (!validate_parameters(value, prefix))
+	{
+		return nullptr;
+	}
 
 	float values[4];
 	int count = 1;
@@ -33,8 +36,9 @@ bgfx_entry_uniform* value_uniform_reader::read_from_value(const Value& value, st
 	return new bgfx_value_uniform(uniform, values, count);
 }
 
-void value_uniform_reader::validate_parameters(const Value& value, std::string prefix)
+bool value_uniform_reader::validate_parameters(const Value& value, std::string prefix)
 {
-    READER_ASSERT(value.HasMember("value"), (prefix + "Must have string value 'value' (what value is being assigned?)\n").c_str());
-    READER_ASSERT(value["value"].IsArray() || value["value"].IsNumber(), (prefix + "Value 'value' must be numeric or an array\n").c_str());
+    if (!READER_CHECK(value.HasMember("value"), (prefix + "Must have string value 'value' (what value is being assigned?)\n").c_str())) return false;
+    if (!READER_CHECK(value["value"].IsArray() || value["value"].IsNumber(), (prefix + "Value 'value' must be numeric or an array\n").c_str())) return false;
+    return true;
 }

@@ -12,6 +12,7 @@
 #include "emu.h"
 
 #include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 
 #include <bx/readerwriter.h>
 #include <bx/crtimpl.h>
@@ -51,7 +52,11 @@ bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine
 	std::string path = std::string(m_options.bgfx_path()) + "/chains/" + name;
 
 	bx::CrtFileReader reader;
-	bx::open(&reader, path.c_str());
+	if (!bx::open(&reader, path.c_str()))
+	{
+        printf("Unable to open chain file %s, falling back to no post processing\n", path.c_str());
+		return nullptr;
+	}
 
 	int32_t size(bx::getSize(&reader));
 
@@ -62,7 +67,22 @@ bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine
 
 	Document document;
 	document.Parse<0>(data);
+
+	if (document.HasParseError())
+	{
+		std::string error(GetParseError_En(document.GetParseError()));
+        printf("Unable to parse chain %s. Errors returned:\n", path.c_str());
+        printf("%s\n", error.c_str());
+		return nullptr;
+	}
+
 	bgfx_chain* chain = chain_reader::read_from_value(document, name + ": ", m_options, machine, window_index, m_textures, m_targets, m_effects, m_width, m_height);
+
+	if (chain == nullptr)
+	{
+        printf("Unable to load chain %s, falling back to no post processing\n", path.c_str());
+		return nullptr;
+	}
 
 	m_chains[name + std::to_string(window_index)] = chain;
 

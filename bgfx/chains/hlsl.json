@@ -71,15 +71,6 @@
 			"mode": "guest",
 			"prescale": true,
 			"doublebuffer": true
-		},
-		{	"name": "previous",
-			"mode": "guest",
-			"prescale": true,
-			"doublebuffer": true
-		},
-		{	"name": "screen",
-			"mode": "native",
-			"doublebuffer": true
 		}
 	],
 	"passes": [
@@ -307,8 +298,7 @@
 			"input": [
 				{ "sampler": "s_tex", "texture": "internal" }
 			],
-			"output": "screen"
+			"output": "output"
 		}
-	],
-	"output": "screen"
+	]
 }

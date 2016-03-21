@@ -31,7 +31,7 @@ bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, std::v
     , m_inputs(inputs)
     , m_uniforms(uniforms)
     , m_targets(targets)
-	, m_output(output)
+    , m_output(output)
 {
 }
 
@@ -44,18 +44,18 @@ bgfx_chain_entry::~bgfx_chain_entry()
 	m_uniforms.clear();
 }
 
-void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint32_t rotation_type, bool swap_xy, uint64_t blend)
+void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen)
 {
     bgfx::setViewSeq(view, true);
 
-	if (!setup_view(view, screen_width, screen_height))
+	if (!setup_view(view, screen_width, screen_height, screen))
 	{
 		return;
 	}
 
     for (bgfx_input_pair input : m_inputs)
     {
-        input.bind(m_effect, textures);
+        input.bind(m_effect, textures, screen);
     }
 
     bgfx::TransientVertexBuffer buffer;
@@ -74,9 +74,14 @@ void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager&
 
     m_effect->submit(view, blend);
 
-    if (m_targets.target(m_output) != nullptr)
+    std::string output_name = m_output;
+    if (output_name == "output" || output_name == "previous")
     {
-        m_targets.target(m_output)->page_flip();
+        output_name = output_name + std::to_string(screen);
+    }
+    if (m_targets.target(output_name) != nullptr)
+    {
+        m_targets.target(output_name)->page_flip();
     }
 }
 
@@ -143,14 +148,19 @@ void bgfx_chain_entry::setup_auto_uniforms(render_primitive* prim, texture_manag
 	setup_swapxy_uniform(swap_xy);
 }
 
-bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t screen_height)
+bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t screen_height, int32_t screen)
 {
 	bgfx::FrameBufferHandle handle = BGFX_INVALID_HANDLE;
 	uint16_t width = screen_width;
 	uint16_t height = screen_height;
-    if (m_targets.target(m_output) != nullptr)
+    std::string output_name = m_output;
+    if (output_name == "output" || output_name == "previous")
     {
-        bgfx_target* output = m_targets.target(m_output);
+        output_name = output_name + std::to_string(screen);
+    }
+    if (m_targets.target(output_name) != nullptr)
+    {
+        bgfx_target* output = m_targets.target(output_name);
         if (output->width() == 0)
         {
 			return false;
@@ -164,7 +174,7 @@ bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
 	bgfx::setViewRect(view, 0, 0, width, height);
 
 	float projMat[16];
-	bx::mtxOrtho(projMat, 0.0f, screen_width, screen_height, 0.0f, 0.0f, 100.0f);
+	bx::mtxOrtho(projMat, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
 	bgfx::setViewTransform(view, nullptr, projMat);
 
     bgfx::setViewClear(view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
@@ -184,8 +194,8 @@ void bgfx_chain_entry::put_screen_buffer(render_primitive* prim, bgfx::Transient
 
     ScreenVertex* vertex = reinterpret_cast<ScreenVertex*>(buffer->data);
 
-	float x[4] = { prim->bounds.x0, prim->bounds.x1, prim->bounds.x0, prim->bounds.x1 };
-	float y[4] = { prim->bounds.y0, prim->bounds.y0, prim->bounds.y1, prim->bounds.y1 };
+	float x[4] = { 0, 1, 0, 1 };
+	float y[4] = { 0, 0, 1, 1 };
 	float u[4] = { 0, 1, 0, 1 };
 	float v[4] = { 0, 0, 1, 1 };
 

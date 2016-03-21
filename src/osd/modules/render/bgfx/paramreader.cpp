@@ -23,7 +23,10 @@ const parameter_reader::string_to_enum parameter_reader::TYPE_NAMES[parameter_re
 
 bgfx_parameter* parameter_reader::read_from_value(const Value& value, std::string prefix, uint32_t window_index)
 {
-	validate_parameters(value, prefix);
+	if (!validate_parameters(value, prefix))
+	{
+		return nullptr;
+	}
 
 	std::string name = value["name"].GetString();
 	bgfx_parameter::parameter_type type = bgfx_parameter::parameter_type(get_enum_from_value(value, "type", bgfx_parameter::parameter_type::PARAM_FRAME, TYPE_NAMES, TYPE_COUNT));
@@ -44,18 +47,19 @@ bgfx_parameter* parameter_reader::read_from_value(const Value& value, std::strin
     }
     else
 	{
-		assert(false);
+		READER_CHECK(false, (prefix + "Unknown parameter type '" + std::string(value["type"].GetString()) + "'\n").c_str());
 	}
 
 	return nullptr;
 }
 
-void parameter_reader::validate_parameters(const Value& value, std::string prefix)
+bool parameter_reader::validate_parameters(const Value& value, std::string prefix)
 {
-    READER_ASSERT(value.HasMember("name"), (prefix + "Must have string value 'name'\n").c_str());
-    READER_ASSERT(value["name"].IsString(), (prefix + "Value 'name' must be a string\n").c_str());
-    READER_ASSERT(value.HasMember("type"), (prefix + "Must have string value 'type'\n").c_str());
-    READER_ASSERT(value["type"].IsString(), (prefix + "Value 'type' must be a string\n").c_str());
-    READER_ASSERT(!value.HasMember("period") || value["period"].IsNumber(), (prefix + "Value 'period' must be numeric\n").c_str());
-    READER_ASSERT(!value.HasMember("limit") || value["limit"].IsNumber(), (prefix + "Value 'period' must be numeric\n").c_str());
+    if (!READER_CHECK(value.HasMember("name"), (prefix + "Must have string value 'name'\n").c_str())) return false;
+    if (!READER_CHECK(value["name"].IsString(), (prefix + "Value 'name' must be a string\n").c_str())) return false;
+    if (!READER_CHECK(value.HasMember("type"), (prefix + "Must have string value 'type'\n").c_str())) return false;
+    if (!READER_CHECK(value["type"].IsString(), (prefix + "Value 'type' must be a string\n").c_str())) return false;
+    if (!READER_CHECK(!value.HasMember("period") || value["period"].IsNumber(), (prefix + "Value 'period' must be numeric\n").c_str())) return false;
+    if (!READER_CHECK(!value.HasMember("limit") || value["limit"].IsNumber(), (prefix + "Value 'period' must be numeric\n").c_str())) return false;
+    return true;
 }

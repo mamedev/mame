@@ -19,13 +19,12 @@
 
 #include "chain.h"
 
-bgfx_chain::bgfx_chain(std::string name, std::string author, std::vector<bgfx_slider*> sliders, std::vector<bgfx_parameter*> params, std::vector<bgfx_chain_entry*> entries, std::string output)
+bgfx_chain::bgfx_chain(std::string name, std::string author, std::vector<bgfx_slider*> sliders, std::vector<bgfx_parameter*> params, std::vector<bgfx_chain_entry*> entries)
 	: m_name(name)
 	, m_author(author)
 	, m_sliders(sliders)
 	, m_params(params)
 	, m_entries(entries)
-    , m_output(output)
     , m_current_time(0)
 {
     for (bgfx_slider* slider : m_sliders)
@@ -50,7 +49,7 @@ bgfx_chain::~bgfx_chain()
 	}
 }
 
-void bgfx_chain::process(render_primitive* prim, int view, texture_manager& textures, osd_window& window, uint64_t blend)
+void bgfx_chain::process(render_primitive* prim, int view, int screen, texture_manager& textures, osd_window& window, uint64_t blend)
 {
     int current_view = view;
     uint16_t screen_width = window.get_size().width();
@@ -67,7 +66,7 @@ void bgfx_chain::process(render_primitive* prim, int view, texture_manager& text
 	{
         if (!entry->skip())
         {
-            entry->submit(current_view, prim, textures, screen_width, screen_height, rotation_type, swap_xy, blend);
+            entry->submit(current_view, prim, textures, screen_width, screen_height, rotation_type, swap_xy, blend, screen);
             current_view++;
         }
 	}

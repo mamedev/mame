@@ -36,11 +36,10 @@ public:
 	bgfx_chain_entry(std::string name, bgfx_effect* effect, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair> inputs, std::vector<bgfx_entry_uniform*> uniforms, target_manager& targets, std::string output);
 	~bgfx_chain_entry();
 
-	void submit(int view, render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint32_t rotation_type, bool swap_xy, uint64_t blend);
+	void submit(int view, render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen);
 
 	// Getters
 	std::string name() const { return m_name; }
-    bgfx_target* target() const { return m_targets.target(m_output); }
     bool skip();
 
 private:
@@ -50,7 +49,7 @@ private:
 	void setup_rotationtype_uniform(uint32_t rotation_type);
 	void setup_swapxy_uniform(bool swap_xy);
 
-	bool setup_view(int view, uint16_t screen_width, uint16_t screen_height);
+	bool setup_view(int view, uint16_t screen_width, uint16_t screen_height, int32_t screen);
 	void put_screen_buffer(render_primitive* prim, bgfx::TransientVertexBuffer* buffer);
 
 	std::string                     	m_name;
@@ -59,7 +58,7 @@ private:
     std::vector<bgfx_input_pair>    	m_inputs;
 	std::vector<bgfx_entry_uniform*>	m_uniforms;
     target_manager&                     m_targets;
-    std::string                    	    m_output;
+    std::string                         m_output;
 };
 
 #endif // __DRAWBGFX_CHAIN_ENTRY__

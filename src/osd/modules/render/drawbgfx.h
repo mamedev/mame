@@ -67,14 +67,15 @@ private:
 	{
 		BUFFER_PRE_FLUSH,
 		BUFFER_FLUSH,
+        BUFFER_SCREEN,
 		BUFFER_EMPTY,
 		BUFFER_DONE
 	};
-	buffer_status buffer_primitives(int view, bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer);
+	buffer_status buffer_primitives(int view, bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer, int32_t screen);
 
     void process_screen_quad(int view, render_primitive* prim);
 	void render_textured_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer);
-    void render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer);
+    void render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int32_t screen);
 
 	void put_packed_quad(render_primitive *prim, UINT32 hash, ScreenVertex* vertex);
 	void put_polygon(const float* coords, UINT32 num_coords, float r, UINT32 rgba, ScreenVertex* vertex);

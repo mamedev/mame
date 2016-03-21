@@ -24,8 +24,8 @@ public:
 	static std::vector<bgfx_slider*> read_from_value(const Value& value, std::string prefix, running_machine& machine, uint32_t window_index);
 
 private:
-	static void get_values(const Value& value, std::string prefix, std::string name, int* values, const int count);
-	static void validate_parameters(const Value& value, std::string prefix);
+	static bool get_values(const Value& value, std::string prefix, std::string name, int* values, const int count);
+	static bool validate_parameters(const Value& value, std::string prefix);
 
 	static const int TYPE_COUNT = 5;
 	static const string_to_enum TYPE_NAMES[TYPE_COUNT];

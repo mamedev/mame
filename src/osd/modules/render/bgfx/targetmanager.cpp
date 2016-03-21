@@ -13,7 +13,10 @@
 
 #include <vector>
 
+#include "modules/lib/osdobj_common.h"
+
 #include "targetmanager.h"
+
 #include "target.h"
 
 target_manager::~target_manager()
@@ -25,9 +28,9 @@ target_manager::~target_manager()
 	m_targets.clear();
 }
 
-bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, uint32_t prescale_x, uint32_t prescale_y, uint32_t style, bool double_buffer, bool filter)
+bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, uint32_t prescale_x, uint32_t prescale_y, uint32_t style, bool double_buffer, bool filter, bool output)
 {
-	bgfx_target* target = new bgfx_target(name, format, width, height, prescale_x, prescale_y, style, double_buffer, filter, width > 0 && height > 0);
+	bgfx_target* target = new bgfx_target(name, format, width, height, prescale_x, prescale_y, style, double_buffer, filter, width > 0 && height > 0, output);
 	m_targets[name] = target;
 
 	m_textures.add_provider(name, target);
@@ -78,8 +81,36 @@ void target_manager::update_guest_targets(uint16_t width, uint16_t height)
 			const uint32_t prescale_y = target->prescale_y();
 			delete target;
 
-			m_targets[name] = new bgfx_target(name, format, width, height, prescale_x, prescale_y, TARGET_STYLE_GUEST, double_buffered, filter);
+			m_targets[name] = new bgfx_target(name, format, m_guest_width, m_guest_height, prescale_x, prescale_y, TARGET_STYLE_GUEST, double_buffered, filter);
 			m_textures.add_provider(name, m_targets[name]);
 		}
 	}
+}
+
+void target_manager::update_window_count(uint32_t count)
+{
+    if (count != m_window_count)
+    {
+        m_window_count = count;
+        rebuild_outputs();
+    }
+}
+
+void target_manager::rebuild_outputs()
+{
+    for (uint32_t i = 0; i < m_window_count; i++)
+    {
+        rebuild_target("output" + std::to_string(i));
+        rebuild_target("previous" + std::to_string(i));
+    }
+}
+
+void target_manager::rebuild_target(std::string name)
+{
+    bgfx_target* target = m_targets[name];
+    if (target != nullptr) {
+        delete target;
+    }
+    m_targets[name] = new bgfx_target(name, bgfx::TextureFormat::RGBA8, m_guest_width, m_guest_height, m_options.bgfx_prescale_x(), m_options.bgfx_prescale_y(), TARGET_STYLE_GUEST, true, true);
+    m_textures.add_provider(name, m_targets[name]);
 }

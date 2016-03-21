@@ -26,14 +26,13 @@ class osd_window;
 class bgfx_chain
 {
 public:
-	bgfx_chain(std::string name, std::string author, std::vector<bgfx_slider*> sliders, std::vector<bgfx_parameter*> params, std::vector<bgfx_chain_entry*> entries, std::string output);
+	bgfx_chain(std::string name, std::string author, std::vector<bgfx_slider*> sliders, std::vector<bgfx_parameter*> params, std::vector<bgfx_chain_entry*> entries);
 	~bgfx_chain();
 
-	void process(render_primitive* prim, int view, texture_manager& textures, osd_window &window, uint64_t blend = 0L);
+	void process(render_primitive* prim, int view, int screen, texture_manager& textures, osd_window &window, uint64_t blend = 0L);
 
     // Getters
     std::vector<bgfx_slider*>& sliders() { return m_sliders; }
-    std::string output() const { return m_output; }
     uint32_t applicable_passes();
 
 private:
@@ -43,7 +42,6 @@ private:
     std::vector<bgfx_parameter*>        m_params;
 	std::vector<bgfx_chain_entry*>      m_entries;
     std::map<std::string, bgfx_slider*> m_slider_map;
-    std::string                         m_output;
     int64_t                             m_current_time;
 };
 

@@ -8,7 +8,7 @@
 
 #include "target.h"
 
-bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t prescale_x, uint32_t prescale_y, uint32_t style, bool double_buffer, bool filter, bool init)
+bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t prescale_x, uint32_t prescale_y, uint32_t style, bool double_buffer, bool filter, bool init, bool output)
 	: m_name(name)
 	, m_format(format)
 	, m_targets(nullptr)
@@ -20,6 +20,7 @@ bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uin
     , m_double_buffer(double_buffer)
 	, m_style(style)
 	, m_filter(filter)
+    , m_output(output)
 	, m_current_page(0)
 	, m_initialized(false)
 	, m_page_count(double_buffer ? 2 : 1)

@@ -27,7 +27,7 @@ public:
 	static bgfx_entry_uniform* read_from_value(const Value& value, std::string prefix, bgfx_effect* effect, std::map<std::string, bgfx_slider*>& sliders, std::map<std::string, bgfx_parameter*>& params);
 
 private:
-	static void validate_parameters(const Value& value, std::string prefix);
+	static bool validate_parameters(const Value& value, std::string prefix);
 };
 
 #endif // __DRAWBGFX_ENTRY_UNIFORM_READER__

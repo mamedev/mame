@@ -66,11 +66,6 @@ const char* renderer_bgfx::WINDOW_PREFIX = "Window 0, ";
 #define GIBBERISH   	(0)
 
 //============================================================
-//  INLINES
-//============================================================
-
-
-//============================================================
 //  TYPES
 //============================================================
 
@@ -168,7 +163,7 @@ int renderer_bgfx::create()
 	}
 
 	m_textures = new texture_manager();
-	m_targets = new target_manager(*m_textures);
+	m_targets = new target_manager(options, *m_textures);
 
 	m_shaders = new shader_manager(options);
 	m_effects = new effect_manager(options, *m_shaders);
@@ -353,14 +348,22 @@ void renderer_bgfx::process_screen_quad(int view, render_primitive* prim)
     bgfx_texture *texture = new bgfx_texture("screen", bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem);
     m_textures->add_provider("screen", texture);
 
+    int screens = 0;
+    screen_device_iterator iter(window().machine().root_device());
+    for (const screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
+    {
+        screens++;
+    }
     m_targets->update_guest_targets(tex_width, tex_height);
-    m_screen_chain->process(prim, view, *m_textures, window(), get_blend_state(PRIMFLAG_GET_BLENDMODE(prim->flags)));
+    m_targets->update_window_count(screens);
+    
+    m_screen_chain->process(prim, view, view / m_screen_chain->applicable_passes(), *m_textures, window(), get_blend_state(PRIMFLAG_GET_BLENDMODE(prim->flags)));
 
     m_textures->add_provider("screen", nullptr);
     delete texture;
 }
 
-void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer)
+void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int32_t screen)
 {
     ScreenVertex* vertex = reinterpret_cast<ScreenVertex*>(buffer->data);
 
@@ -369,13 +372,13 @@ void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bg
 	float u[4] = { prim->texcoords.tl.u, prim->texcoords.tr.u, prim->texcoords.bl.u, prim->texcoords.br.u };
 	float v[4] = { prim->texcoords.tl.v, prim->texcoords.tr.v, prim->texcoords.bl.v, prim->texcoords.br.v };
 
-	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_SWAP_XY)
+	if (false)//PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_SWAP_XY)
 	{
 		std::swap(u[1], u[2]);
 		std::swap(v[1], v[2]);
 	}
 
-	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_FLIP_X)
+	if (false)//PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_FLIP_X)
 	{
 		std::swap(u[0], u[1]);
 		std::swap(v[0], v[1]);
@@ -383,7 +386,7 @@ void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bg
 		std::swap(v[2], v[3]);
 	}
 
-	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_FLIP_Y)
+	if (false)//PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_FLIP_Y)
 	{
 		std::swap(u[0], u[2]);
 		std::swap(v[0], v[2]);
@@ -435,7 +438,7 @@ void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bg
 
     UINT32 blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
     bgfx::setVertexBuffer(buffer);
-    bgfx::setTexture(0, m_screen_effect[blend]->uniform("s_tex")->handle(), m_targets->target(m_screen_chain->output())->texture());
+    bgfx::setTexture(0, m_screen_effect[blend]->uniform("s_tex")->handle(), m_targets->target("output" + std::to_string(screen))->texture());
     m_screen_effect[blend]->submit(view);
 }
 
@@ -731,47 +734,52 @@ const bgfx::Memory* renderer_bgfx::mame_texture_data_to_bgfx_texture_data(UINT32
 
 int renderer_bgfx::handle_screen_chains()
 {
-    window().m_primlist->acquire_lock();
+	if (!m_screen_chain)
+	{
+		return 0;
+	}
 
-    int view = 0;
+    window().m_primlist->acquire_lock();
 
     // process
     render_primitive *prim = window().m_primlist->first();
+    
+    int seen = 0;
     while (prim != nullptr)
     {
         if (PRIMFLAG_GET_SCREENTEX(prim->flags))
         {
-            process_screen_quad(view, prim);
-            const int applicable_passes = m_screen_chain->applicable_passes();
-            bgfx::setViewFrameBuffer(applicable_passes, BGFX_INVALID_HANDLE);
-            window().m_primlist->release_lock();
-            return applicable_passes * (window().m_index + 1);
+			process_screen_quad(m_screen_chain->applicable_passes() * seen, prim);
+            seen++;
         }
         prim = prim->next();
     }
 
     window().m_primlist->release_lock();
 
-    return 0;
+    uint32_t total_passes = seen * m_screen_chain->applicable_passes();
+    bgfx::setViewFrameBuffer(total_passes, BGFX_INVALID_HANDLE);
+
+    return total_passes;
 }
 
 int renderer_bgfx::draw(int update)
 {
+	int window_index = window().m_index;
     int post_view_index = handle_screen_chains();
-    int window_index = window().m_index;
     int view_index = window_index;
     int first_view_index = 0;
-    if (post_view_index > 0)
+    if (m_screen_chain && post_view_index > 0)
     {
-        view_index = post_view_index;
-        first_view_index = m_screen_chain->applicable_passes();
+        view_index += post_view_index;
+        first_view_index = post_view_index;
     }
 
     // Set view 0 default viewport.
 	osd_dim wdim = window().get_size();
 	m_width[window_index] = wdim.width();
 	m_height[window_index] = wdim.height();
-	if (view_index == first_view_index)
+	if (window_index == 0)
 	{
 		if ((m_dimensions != osd_dim(m_width[window_index], m_height[window_index])))
 		{
@@ -829,6 +837,7 @@ int renderer_bgfx::draw(int update)
 	bool atlas_valid = update_atlas();
 
 	render_primitive *prim = window().m_primlist->first();
+    int32_t screen = 0;
 	while (prim != nullptr)
 	{
 		UINT32 blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
@@ -836,9 +845,14 @@ int renderer_bgfx::draw(int update)
 		bgfx::TransientVertexBuffer buffer;
 		allocate_buffer(prim, blend, &buffer);
 
-		buffer_status status = buffer_primitives(view_index, atlas_valid, &prim, &buffer);
+		buffer_status status = buffer_primitives(view_index, atlas_valid, &prim, &buffer, screen);
+        
+        if (status == BUFFER_SCREEN)
+        {
+            screen++;
+        }
 
-		if (status != BUFFER_EMPTY)
+		if (status != BUFFER_EMPTY && status != BUFFER_SCREEN)
 		{
 			bgfx::setVertexBuffer(&buffer);
 			bgfx::setTexture(0, m_gui_effect[blend]->uniform("s_tex")->handle(), m_texture_cache->texture());
@@ -867,7 +881,7 @@ int renderer_bgfx::draw(int update)
 	return 0;
 }
 
-renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer)
+renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer, int32_t screen)
 {
 	int vertices = 0;
 
@@ -902,15 +916,16 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
 							return BUFFER_PRE_FLUSH;
 						}
 
-                        if (PRIMFLAG_GET_SCREENTEX((*prim)->flags))
+                        if (PRIMFLAG_GET_SCREENTEX((*prim)->flags) && m_screen_chain != nullptr)
                         {
-                            render_post_screen_quad(view, *prim, buffer);
+                            render_post_screen_quad(view, *prim, buffer, screen);
+                            return BUFFER_SCREEN;
                         }
                         else
                         {
                             render_textured_quad(view, *prim, buffer);
+                            return BUFFER_EMPTY;
                         }
-						return BUFFER_EMPTY;
 					}
 				}
 				break;
@@ -1121,6 +1136,11 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::
 
 slider_state* renderer_bgfx::get_slider_list()
 {
+	if (!m_screen_chain)
+	{
+		return nullptr;
+	}
+
     slider_state *listhead = nullptr;
     slider_state **tailptr = &listhead;
     std::vector<bgfx_slider*> sliders = m_screen_chain->sliders();

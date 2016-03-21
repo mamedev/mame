@@ -24,7 +24,7 @@ class bgfx_input_pair
 public:
 	bgfx_input_pair(int index, std::string sampler, std::string texture);
 
-	void bind(bgfx_effect *effect, texture_manager& textures) const;
+	void bind(bgfx_effect *effect, texture_manager& textures, const int32_t screen) const;
 
     // Getters
     std::string sampler() const { return m_sampler; }

@@ -4,9 +4,6 @@
 		{	"name": "temp",
 			"mode": "guest",
 			"bilinear": false
-		},
-		{	"name": "screen",
-			"mode": "native"
 		}
 	],
 	"passes": [
@@ -22,8 +19,7 @@
 			"input": [
 				{ "sampler": "s_tex", "texture": "temp" }
 			],
-			"output": "screen"
+			"output": "output"
 		}
-	],
-	"output": "screen"
+	]
 }
