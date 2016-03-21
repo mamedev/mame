@@ -387,14 +387,10 @@ private:
 	bool                    paused;                     // whether or not rendering is currently paused
 	int                     num_screens;                // number of emulated physical screens
 	int                     curr_screen;                // current screen for render target operations
-	int                     curr_frame;                 // current frame (0/1) of a screen for render target operations
 	int                     lastidx;                    // index of the last-encountered target
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
 	hlsl_options *          options;                    // current options
-	D3DPRIMITIVETYPE        vecbuf_type;
-	UINT32                  vecbuf_index;
-	UINT32                  vecbuf_count;
 
 	avi_file::ptr           avi_output_file;            // AVI file
 	bitmap_rgb32            avi_snap;                   // AVI snapshot

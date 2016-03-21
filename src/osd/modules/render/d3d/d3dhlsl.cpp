@@ -60,8 +60,8 @@ static direct3dx9_loadeffect_ptr g_load_effect = nullptr;
 //============================================================
 
 shaders::shaders() :
-	d3dintf(nullptr), machine(nullptr), d3d(nullptr), num_screens(0), curr_screen(0), curr_frame(0),
-	vecbuf_type(), vecbuf_index(0), vecbuf_count(0), avi_output_file(nullptr), avi_frame(0), avi_copy_surface(nullptr), avi_copy_texture(nullptr), avi_final_target(nullptr), avi_final_texture(nullptr),
+	d3dintf(nullptr), machine(nullptr), d3d(nullptr), num_screens(0), curr_screen(0),
+	avi_output_file(nullptr), avi_frame(0), avi_copy_surface(nullptr), avi_copy_texture(nullptr), avi_final_target(nullptr), avi_final_texture(nullptr),
 	black_surface(nullptr), black_texture(nullptr), render_snap(false), snap_rendered(false), snap_copy_target(nullptr), snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr),
 	snap_width(0), snap_height(0), lines_pending(false), backbuffer(nullptr), curr_effect(nullptr), default_effect(nullptr), prescale_effect(nullptr), post_effect(nullptr), distortion_effect(nullptr),
 	focus_effect(nullptr), phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr), ntsc_effect(nullptr), bloom_effect(nullptr),
