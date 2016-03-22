@@ -394,6 +394,17 @@ ADDRESS_MAP_END
   All 3 instances of A005 reads (d07e, d355 and dca8),
   discard the read in a non-sense way....
 
+  IE (from set 2):
+
+  D7B6: A9 00     ; lda #$00
+  D7B8: 85 EE     ; sta $EE
+  D7BA: AD 05 A0  ; lda $A005 <--- Load A with $A005 contents...
+  D7BD: AD 00 A0  ; lda $A000 <--- Load again A with $A000 contents.
+  D7C0: 10 FB     ; bpl $D7BD
+  D7C2: AD 00 A0  ; lda $A000
+  D7C5: 30 FB     ; bmi $D7C2
+  D7C7: 60        ; rts
+
   There is another register (8005h), that is written by the code
   (bit3 on/off) after coin-in, and checking the inputs too...
   Seems coin counter, but the input check is suspicious.
