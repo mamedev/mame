@@ -399,11 +399,21 @@ ADDRESS_MAP_END
   D7B6: A9 00     ; lda #$00
   D7B8: 85 EE     ; sta $EE
   D7BA: AD 05 A0  ; lda $A005 <--- Load A with $A005 contents...
-  D7BD: AD 00 A0  ; lda $A000 <--- Load again A with $A000 contents.
+  D7BD: AD 00 A0  ; lda $A000 <--- Load A again with $A000 contents, overwritting the previous loaded value!
   D7C0: 10 FB     ; bpl $D7BD
   D7C2: AD 00 A0  ; lda $A000
   D7C5: 30 FB     ; bmi $D7C2
   D7C7: 60        ; rts
+
+  IE (from set 3):
+
+  D082: AD 05 A0  ; lda $A005 <--- Here, loading A...
+  D085: E8        ; inx
+  D086: C6 76     ; dec $76
+  D088: D0 F5     ; bne $Do7F
+  D08A: A9 04     ; lda #$04  <--- And here again, overwritting the previous loaded value!
+  D08C: 8D 03 80  ; sta $8003
+  ...
 
   There is another register (8005h), that is written by the code
   (bit3 on/off) after coin-in, and checking the inputs too...
