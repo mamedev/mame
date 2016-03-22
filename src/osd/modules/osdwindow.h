@@ -133,7 +133,6 @@ private:
 
 	void *              m_handle;                 // handle to the monitor
 	float               m_aspect;                 // computed/configured aspect ratio of the physical device
-	float               m_pixel_aspect;           // computed pixel aspect ratio
 };
 
 class osd_window_config
