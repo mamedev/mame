@@ -932,7 +932,7 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 	m_base_layerconfig.set_zoom_to_screen(manager.machine().options().artwork_crop());
 
 	// aspect and scale options
-	m_keepaspect = manager.machine().options().keep_aspect();
+	m_keepaspect = (manager.machine().options().keep_aspect() && !(flags & RENDER_CREATE_HIDDEN));
 	m_int_scale_x = manager.machine().options().int_scale_x();
 	m_int_scale_y = manager.machine().options().int_scale_y();
 	if (manager.machine().options().uneven_stretch() && !manager.machine().options().uneven_stretch_x())
