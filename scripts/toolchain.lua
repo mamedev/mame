@@ -80,6 +80,12 @@ newoption {
 	description = "Set iOS target version (default: 8.0).",
 }
 
+newoption {
+	trigger = "with-windows",
+	value = "#",
+	description = "Set the Windows target platform version (default: 10.0.10240.0).",
+}
+
 function toolchain(_buildDir, _subDir)
 
 	location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION)
@@ -92,6 +98,11 @@ function toolchain(_buildDir, _subDir)
 	local iosPlatform = ""
 	if _OPTIONS["with-ios"] then
 		iosPlatform = _OPTIONS["with-ios"]
+	end
+	
+	local windowsPlatform = "10.0.10240.0"
+	if _OPTIONS["with-windows"] then
+		windowsPlatform = _OPTIONS["with-windows"]
 	end
 
 	if _ACTION == "gmake" then
@@ -370,6 +381,15 @@ function toolchain(_buildDir, _subDir)
 		if "winstore82" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = "v140"
 			premake.vstudio.storeapp = "8.2"
+			
+			-- If needed, depending on GENie version, enable file-level configuration
+			if enablefilelevelconfig ~= nil then
+				enablefilelevelconfig()
+			end
+			
+			local action = premake.action.current()
+			action.vstudio.windowsTargetPlatformVersion = windowsPlatform
+			
 			platforms { "ARM" }
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-winstore82")
 		end
