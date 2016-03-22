@@ -17,8 +17,6 @@ TODO:
 - Sampling rate of some DAC playback in bijokkoy and bijokkog is too high.
   Interrupt problem?
 
-- Input handling is wrong in crystalg, crystal2 and nightlov.
-
 - Some games display "GFXROM BANK OVER!!" or "GFXROM ADDRESS OVER!!"
   in Debug build.
 
