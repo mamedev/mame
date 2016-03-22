@@ -9238,6 +9238,8 @@ coco3p                          // Color Computer 3 (PAL)
 
 @source:cocoloco.cpp
 cocoloco                        // 198?, Petaco S.A.
+cocolocoa                       // 198?, Recel S.A.
+cocolocob                       // 198?, Petaco S.A.
 
 @source:codata.cpp
 codata                          // 

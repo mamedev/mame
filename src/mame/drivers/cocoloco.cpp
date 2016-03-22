@@ -462,6 +462,16 @@ static INPUT_PORTS_START( cocoloco )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( cocolocoa )
+	PORT_INCLUDE( cocoloco )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW2:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW2:2" )
+INPUT_PORTS_END
+
+
+
 /***********************************
 *         Machine Drivers          *
 ***********************************/
@@ -521,7 +531,33 @@ ROM_START( cocoloco )
 	ROM_LOAD( "coco1-h.e1", 0xf800, 0x0800, CRC(b6d0ebea) SHA1(a8f09558f71dfe0d300a6bb946dcb3bf6393c02b) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "prom.c10",   0x0000, 0x0100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) )
+	ROM_LOAD( "prom.c10",   0x0000, 0x0100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) )  // blank. verified
+ROM_END
+
+ROM_START( cocolocoa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "coco1-c1.b1",  0xd000, 0x0800, CRC(bac1df7f) SHA1(e65e528df16186224390803df2d83cc23221af22) )
+	ROM_LOAD( "coco1-d1.bc1", 0xd800, 0x0800, CRC(f5a3754e) SHA1(0de9800dbf414e4f6fc316aeef8882ec42ab64e3) )
+	ROM_LOAD( "coco1-e1.c1",  0xe000, 0x0800, CRC(0dd5abbf) SHA1(1161b27c29401e38b6d97310aa088fb3b0fccf18) )
+	ROM_LOAD( "coco1-f1.d1",  0xe800, 0x0800, CRC(5afb8f77) SHA1(6d9f47287445938581c0879a21338e568c8cb1f9) )
+	ROM_LOAD( "coco1-g1.de1", 0xf000, 0x0800, CRC(481616ce) SHA1(5e2c7ba4a098094da0adbfaeaba095cd54ae0268) )
+	ROM_LOAD( "coco1-h1.e1",  0xf800, 0x0800, CRC(16613f90) SHA1(f16032ba36970686d1534658d54e5bc55735d0b8) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp28l22.bin", 0x0000, 0x0100, CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )  // same decode prom from abattle (astrof.cpp)
+ROM_END
+
+ROM_START( cocolocob )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b1.bin",   0xd000, 0x0800, CRC(5ead42c4) SHA1(f2b8bf48f80c99c8c109ec67cdd6e1105f7f9702) )
+	ROM_LOAD( "b-c1.bin", 0xd800, 0x0800, CRC(104db6b3) SHA1(d0a9ce1b920124078f442bdcb226e8da9f96d60a) )
+	ROM_LOAD( "c1.bin",   0xe000, 0x0800, CRC(8774b1bc) SHA1(b7c09883c136dedfffd0724b49cc5ff987831850) )
+	ROM_LOAD( "d1.bin",   0xe800, 0x0800, CRC(41b22627) SHA1(241659448074e5101ca7da3feb4a0a38580b12e9) )
+	ROM_LOAD( "d-e1.bin", 0xf000, 0x0800, CRC(db93f941) SHA1(b827341e408b5dc50acdfd3586f829f7bb2bb915) )
+	ROM_LOAD( "e1.bin",   0xf800, 0x0800, CRC(4e5705f0) SHA1(271d6c8eff331327dc1a75f7a4b0c64d3e363e3d) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp28l22.bin", 0x0000, 0x0100, CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )  // from the other set.
 ROM_END
 
 
@@ -529,5 +565,7 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME       PARENT   MACHINE   INPUT     STATE          INIT   ROT     COMPANY         FULLNAME      FLAGS  */
-GAME( 198?, cocoloco,  0,       cocoloco, cocoloco, driver_device, 0,     ROT90, "Petaco S.A.",  "Coco Loco", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME       PARENT    MACHINE   INPUT      STATE          INIT   ROT     COMPANY         FULLNAME            FLAGS  */
+GAME( 198?, cocoloco,  0,        cocoloco, cocoloco,  driver_device, 0,     ROT90, "Petaco S.A.",  "Coco Loco (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, cocolocoa, cocoloco, cocoloco, cocolocoa, driver_device, 0,     ROT90, "Recel S.A.",   "Coco Loco (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, cocolocob, cocoloco, cocoloco, cocoloco,  driver_device, 0,     ROT90, "Petaco S.A.",  "Coco Loco (set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
