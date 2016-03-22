@@ -28696,6 +28696,7 @@ mspacmanbcc                     // bootleg
 mspacmanbg                      // bootleg
 mspacmanbgd                     // bootleg
 mspacmanblt                     // bootleg
+mspacmanbhe						// bootleg
 mspacmancr                      // bootleg on Crush Roller board
 mspacmat                        // hack
 mspacmbe                        // bootleg
@@ -28731,6 +28732,8 @@ puckmanb                        // bootleg
 puckmanf                        // hack
 puckmanh                        // hack
 puckmod                         // (c) 1981 Namco
+pacmanso						//
+pacmanpe						//
 rocktrv2                        // (c) 1986 Triumph Software Inc
 shootbul                        // (c) 1985 Bally Midway
 sprglbpg                        // German bootleg

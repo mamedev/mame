@@ -1608,13 +1608,37 @@ static INPUT_PORTS_START( pacmansp )
 	PORT_DIPSETTING(    0x00, "Hard (Invalid)" ) // breaks the attract screen on this version
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( pacuman )
+static INPUT_PORTS_START( pacmanpe )
 	PORT_INCLUDE( pacman )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) // the coin slots seem reverse based on service text
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING(    0x03, "2C/1C, 1C/1C" )
 	PORT_DIPSETTING(    0x01, "1C/2C, 1C/3C" )
+	PORT_DIPSETTING(    0x02, "1C/1C, 1C/3C" )
+	PORT_DIPSETTING(    0x00, "1C/1C, 1C/2C" )
+
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pacuman )
+	PORT_INCLUDE( pacman )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW:1,2")
+	PORT_DIPSETTING(    0x03, "1C/2C, 1C/5C" )
+	PORT_DIPSETTING(    0x01, "1C/2C, 1C/4C" )
 	PORT_DIPSETTING(    0x02, "1C/2C, 1C/4C" )
 	PORT_DIPSETTING(    0x00, "1C/1C, 1C/2C" )
 INPUT_PORTS_END
@@ -3886,6 +3910,60 @@ ROM_START( puckman )
 ROM_END
 
 
+
+ROM_START( pacmanso )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "PM-1R.6E",  0x0000, 0x0800, CRC(76dbed21) SHA1(400e5821aef77c9bb7117b7703afff911786d55a) ) // different
+	ROM_LOAD( "PM-5R.6K",  0x0800, 0x0800, CRC(965bb9b2) SHA1(0865d15fc6fa2f1398672f2195285e65d8401423) ) // ^
+	ROM_LOAD( "PM-2R.6F",  0x1000, 0x0800, CRC(7d177853) SHA1(9b5ddaaa8b564654f97af193dbcc29f81f230a25) )
+	ROM_LOAD( "PM-6R.6M",  0x1800, 0x0800, CRC(d3e8914c) SHA1(c2f00e1773c6864435f29c8b7f44f2ef85d227d3) )
+	ROM_LOAD( "PM-3R.6H",  0x2000, 0x0800, CRC(a5af382c) SHA1(c5e2d89ce565b02a4e21c3afe8add87df63e3d90) ) // ^
+	ROM_LOAD( "PM-7R.6N",  0x2800, 0x0800, CRC(a948ce83) SHA1(08759833f7e0690b2ccae573c929e2a48e5bde7f) )
+	ROM_LOAD( "PM-4R.6J",  0x3000, 0x0800, CRC(cd03135a) SHA1(ccde7d62154778a45f2ce1d12b55fb8531e747db) ) // ^
+	ROM_LOAD( "PM-8R.6P",  0x3800, 0x0800, CRC(fb397ced) SHA1(33722a9a4f77a08ebf05f832ba3393212597a2bd) ) // ^
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "PM-9S.5E",   0x0000, 0x0800, CRC(2ee076d2) SHA1(64defe73a89e348db55a23446aa64017334ffdec) ) // replace NAMCO logo with Sonic logo
+	ROM_LOAD( "PM-11S.5H",  0x0800, 0x0800, CRC(3591b89d) SHA1(79bb456be6c39c1ccd7d077fbe181523131fb300) )
+	ROM_LOAD( "PM-10S.5F",  0x1000, 0x0800, CRC(9e39323a) SHA1(be933e691df4dbe7d12123913c3b7b7b585b7a35) )
+	ROM_LOAD( "PM-12S.5J",  0x1800, 0x0800, CRC(1b1d9096) SHA1(53771c573051db43e7185b1d188533056290a620) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "pm1-1.7f",     0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) ) // 82s123
+	ROM_LOAD( "pm1-4.4a",     0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) ) // 82s126
+
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "pm1-3.1m",     0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) ) // 82s126
+	ROM_LOAD( "pm1-2.3m",     0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // 82s126 - timing - not used
+ROM_END
+
+
+ROM_START( pacmanpe )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "come1.6e",  0x0000, 0x0800, CRC(183d235a) SHA1(e428a91be6756f20e2bd8000cdaeba790d62a408) ) // different
+	ROM_LOAD( "come5.6k",  0x0800, 0x0800, CRC(2771c530) SHA1(48926b46ff43b73d780a51b1249bf373384cb3a4) ) // ^
+	ROM_LOAD( "come2.6f",  0x1000, 0x0800, CRC(7d177853) SHA1(9b5ddaaa8b564654f97af193dbcc29f81f230a25) )
+	ROM_LOAD( "come6.6m",  0x1800, 0x0800, CRC(d3e8914c) SHA1(c2f00e1773c6864435f29c8b7f44f2ef85d227d3) )
+	ROM_LOAD( "come3.6h",  0x2000, 0x0800, CRC(cc92abb1) SHA1(260266615c8431f2dd1d667c3ebdee29bee11c73) ) // ^
+	ROM_LOAD( "come7.6n",  0x2800, 0x0800, CRC(8810b38e) SHA1(c9b4e7ea070ebc80ebefdde6ef0583078ea378ae) ) // ^
+	ROM_LOAD( "come4.6j",  0x3000, 0x0800, CRC(a02ce07f) SHA1(a59b83dc38063dbe4fc52819b268f3b287f745c7) ) // ^
+	ROM_LOAD( "come8.6p",  0x3800, 0x0800, CRC(34e9566d) SHA1(a2ae925e23215d451bdbf77ada3e063f213eadb1) ) // ^
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "come9.5e",   0x0000, 0x0800, CRC(2229ab07) SHA1(56000ed5009ae60c7f0498b5cac1b06da6ae270e) )
+	ROM_LOAD( "come11.5h",  0x0800, 0x0800, CRC(3591b89d) SHA1(79bb456be6c39c1ccd7d077fbe181523131fb300) )
+	ROM_LOAD( "come10.5f",  0x1000, 0x0800, CRC(9e39323a) SHA1(be933e691df4dbe7d12123913c3b7b7b585b7a35) )
+	ROM_LOAD( "come12.5j",  0x1800, 0x0800, CRC(1b1d9096) SHA1(53771c573051db43e7185b1d188533056290a620) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "pm1-1.7f",     0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) ) // 82s123
+	ROM_LOAD( "pm1-4.4a",     0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) ) // 82s126
+
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "pm1-3.1m",     0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) ) // 82s126
+	ROM_LOAD( "pm1-2.3m",     0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // 82s126 - timing - not used
+ROM_END
+
 ROM_START( puckmanb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "namcopac.6e",  0x0000, 0x1000, CRC(fee263b3) SHA1(87117ba5082cd7a615b4ec7c02dd819003fbd669) )
@@ -4122,6 +4200,27 @@ ROM_START( mspacmanbcc )
 	ROM_CONTINUE(0x0800,0x800)
 	ROM_CONTINUE(0x1800,0x800)
 	ROM_IGNORE(0x6000) // this also contains regular pacman gfx, ignore them for now at least
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123.h7",    0x0000, 0x0020, CRC(3545e7e9) SHA1(b866b02579438afb11296e5c53a32c6425bd044d) ) // slightly different to original (verified)
+	ROM_LOAD( "82s129-3.d1",  0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) ) // == 82s126.4a
+
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "82s129-1.a9",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) ) // == 82s126.1m
+	ROM_LOAD( "82s129-2.c9",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) /* timing - not used */ // == 82s126.3m
+ROM_END
+
+ROM_START( mspacmanbhe )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "11.g5",  0x0000, 0x4000,  CRC(b256540f) SHA1(2ffdb9a9af98606793e9cb8b151370070be45091) )
+	ROM_CONTINUE(0x8000,0x4000) // blocks 5+6 are repeated twice in here
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "13.e5",    0x0000, 0x0800, CRC(8ee4a3b0) SHA1(01e3453c99f7a5d78ab083c49c650e898c0dd2ee) )
+	ROM_CONTINUE(0x1000,0x800)
+	ROM_CONTINUE(0x0800,0x800)
+	ROM_CONTINUE(0x1800,0x800)
+	ROM_IGNORE(0x2000) 
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "82s123.h7",    0x0000, 0x0020, CRC(3545e7e9) SHA1(b866b02579438afb11296e5c53a32c6425bd044d) ) // slightly different to original (verified)
@@ -7035,10 +7134,12 @@ GAME( 1980, puckmanb, puckman,  pacman,   pacman,   driver_device, 0,        ROT
 GAME( 1980, puckmanf, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Puck Man (speedup hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, puckmanh, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg (Falcom?)", "Puck Man (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, pacman,   puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "Namco (Midway license)", "Pac-Man (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, pacmanso, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "Namco (Sonic license)", "Pac-Man (SegaSA / Sonic)", MACHINE_SUPPORTS_SAVE ) // from SegaSA / Sonic, could be licensed, could be bootleg - it ignores the service mode credit settings despite listing them which is suspicious
 GAME( 1980, pacmanf,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Pac-Man (Midway, speedup hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, puckmod,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "Namco", "Puck Man (Japan set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacmod,   puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "Namco (Midway license)", "Pac-Man (Midway, harder)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacmanjpm,puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg (JPM)", "Pac-Man (JPM bootleg)", MACHINE_SUPPORTS_SAVE ) // aka 'Muncher', UK bootleg, JPM later made fruit machines etc.
+GAME( 1980, pacmanpe, puckman,  pacman,   pacmanpe, driver_device, 0,        ROT90,  "bootleg (Petaco SA)", "Come Come (Petaco SA bootleg of Puck Man)", MACHINE_SUPPORTS_SAVE ) // might have a speed-up button, check
 GAME( 1980, newpuc2,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Newpuc2 (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, newpuc2b, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Newpuc2 (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, newpuckx, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "New Puck-X", MACHINE_SUPPORTS_SAVE )
@@ -7079,7 +7180,10 @@ GAME( 198?, mspacmanbg, mspacman,woodpek, mspacman, driver_device, 0,        ROT
 GAME( 1992, mspacmanbgd,mspacman,woodpek, mspacman, driver_device, 0,        ROT90,  "bootleg (Datamat)",  "Miss Pukman ('Made in Greece' Datamat bootleg)", MACHINE_SUPPORTS_SAVE ) // shows 'Miss Pukman 1991/1992' but confirmed to be the bootleg distributed by Datamat
 GAME( 1992, mspacmanblt,mspacman,woodpek, mspacman, driver_device, 0,        ROT90,  "bootleg (Triunvi)",  "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Triunvi bootleg)", MACHINE_SUPPORTS_SAVE ) //
 GAME( 1991, mspacmanbcc,mspacman,woodpek, mspacman, driver_device, 0,        ROT90,  "bootleg (Tecnausa)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Tecnausa bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB, also dated 1991, distributed by Tecnausa
+GAME( 1991, mspacmanbhe,mspacman,woodpek, mspacman, driver_device, 0,        ROT90,  "bootleg (Herle SA)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Herle SA bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB
 GAME( 198?, pacmansp,   puckman, pacman,  pacmansp, driver_device, 0,        ROT90,  "bootleg",            "Puck Man (Spanish, 'Made in Greece' bootleg)", MACHINE_SUPPORTS_SAVE ) // probably a further conversion of the mspacmanbg bootleg, still has some MS Pacman code + extra features
+
+
 
 GAME( 1989, clubpacm,  0,        woodpek, mspacman, driver_device, 0,        ROT90,  "Miky SRL", "Pacman Club / Club Lambada (Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1990, clubpacma, clubpacm, woodpek, mspacman, driver_device, 0,        ROT90,  "Miky SRL", "Pacman Club (set 1, Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
