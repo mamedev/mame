@@ -40,8 +40,6 @@ bool target_reader::read_from_value(const Value& value, std::string prefix, targ
 	switch (mode)
 	{
 		case TARGET_STYLE_GUEST:
-			width = targets.guest_width();
-			height = targets.guest_height();
 			break;
 		case TARGET_STYLE_NATIVE:
 			width = screen_width;

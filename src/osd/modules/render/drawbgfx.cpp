@@ -331,7 +331,7 @@ void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, ScreenV
 	vertex[5].m_v = v[0];
 }
 
-void renderer_bgfx::process_screen_quad(int view, render_primitive* prim)
+void renderer_bgfx::process_screen_quad(int screen, render_primitive* prim)
 {
     uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
     if (video_config.filter == 0)
@@ -348,16 +348,9 @@ void renderer_bgfx::process_screen_quad(int view, render_primitive* prim)
     bgfx_texture *texture = new bgfx_texture("screen", bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem);
     m_textures->add_provider("screen", texture);
 
-    int screens = 0;
-    screen_device_iterator iter(window().machine().root_device());
-    for (const screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
-    {
-        screens++;
-    }
-    m_targets->update_guest_targets(tex_width, tex_height);
-    m_targets->update_window_count(screens);
+    m_targets->update_guest_targets(screen, tex_width, tex_height);
 
-    m_screen_chain->process(prim, view, view / m_screen_chain->applicable_passes(), *m_textures, window(), get_blend_state(PRIMFLAG_GET_BLENDMODE(prim->flags)));
+    m_screen_chain->process(prim, screen * m_screen_chain->applicable_passes(), screen, *m_textures, window(), get_blend_state(PRIMFLAG_GET_BLENDMODE(prim->flags)));
 
     m_textures->add_provider("screen", nullptr);
     delete texture;
@@ -744,20 +737,27 @@ int renderer_bgfx::handle_screen_chains()
     // process
     render_primitive *prim = window().m_primlist->first();
 
-    int seen = 0;
+    int screens = 0;
+    screen_device_iterator iter(window().machine().root_device());
+    for (const screen_device *screen = iter.first(); screen != nullptr; screen = iter.next()) {
+        screens++;
+    }
+    m_targets->update_screen_count(screens);
+
+    int seen_screen_quads = 0;
     while (prim != nullptr)
     {
         if (PRIMFLAG_GET_SCREENTEX(prim->flags))
         {
-			process_screen_quad(m_screen_chain->applicable_passes() * seen, prim);
-            seen++;
+			process_screen_quad(seen_screen_quads, prim);
+            seen_screen_quads++;
         }
         prim = prim->next();
     }
 
     window().m_primlist->release_lock();
 
-    uint32_t total_passes = seen * m_screen_chain->applicable_passes();
+    uint32_t total_passes = seen_screen_quads * m_screen_chain->applicable_passes();
     bgfx::setViewFrameBuffer(total_passes, BGFX_INVALID_HANDLE);
 
     return total_passes;

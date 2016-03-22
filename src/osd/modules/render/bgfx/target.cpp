@@ -6,9 +6,11 @@
 //
 //============================================================
 
+#include "emu.h"
+
 #include "target.h"
 
-bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t prescale_x, uint32_t prescale_y, uint32_t style, bool double_buffer, bool filter, bool init, bool output)
+bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t prescale_x, uint32_t prescale_y, uint32_t style, int32_t index, bool double_buffer, bool filter, bool init, bool output)
 	: m_name(name)
 	, m_format(format)
 	, m_targets(nullptr)
@@ -21,7 +23,8 @@ bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uin
 	, m_style(style)
 	, m_filter(filter)
     , m_output(output)
-	, m_current_page(0)
+    , m_index(index)
+    , m_current_page(0)
 	, m_initialized(false)
 	, m_page_count(double_buffer ? 2 : 1)
 {
@@ -35,8 +38,10 @@ bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uin
 		for (int page = 0; page < m_page_count; page++)
 		{
 			m_textures[page] = bgfx::createTexture2D(width * prescale_x, height * prescale_y, 1, format, wrap_mode | filter_mode | BGFX_TEXTURE_RT);
+            assert(m_textures[page].idx != 0xffff);
 			m_targets[page] = bgfx::createFrameBuffer(1, &m_textures[page], false);
-		}
+            assert(m_targets[page].idx != 0xffff);
+        }
 
 		m_initialized = true;
 	}
@@ -55,7 +60,8 @@ bgfx_target::bgfx_target(void *handle, uint16_t width, uint16_t height)
 	, m_style(TARGET_STYLE_CUSTOM)
 	, m_filter(false)
 	, m_current_page(0)
-	, m_initialized(true)
+    , m_index(-1)
+    , m_initialized(true)
 	, m_page_count(0)
 {
 	m_targets = new bgfx::FrameBufferHandle[1];
@@ -66,15 +72,18 @@ bgfx_target::bgfx_target(void *handle, uint16_t width, uint16_t height)
 
 bgfx_target::~bgfx_target()
 {
-	if (!m_initialized) return;
+	if (!m_initialized)
+    {
+        return;
+    }
 
 	if (m_page_count > 0)
 	{
 		for (int page = 0; page < m_page_count; page++)
 		{
 			bgfx::destroyFrameBuffer(m_targets[page]);
-			bgfx::destroyTexture(m_textures[page]);
-		}
+            bgfx::destroyTexture(m_textures[page]);
+        }
 		delete [] m_textures;
 		delete [] m_targets;
 	}

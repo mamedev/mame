@@ -55,7 +55,7 @@ void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager&
 
     for (bgfx_input_pair input : m_inputs)
     {
-        input.bind(m_effect, textures, screen);
+        input.bind(m_effect, m_targets, textures, screen);
     }
 
     bgfx::TransientVertexBuffer buffer;
@@ -74,11 +74,7 @@ void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager&
 
     m_effect->submit(view, blend);
 
-    std::string output_name = m_output;
-    if (output_name == "output" || output_name == "previous")
-    {
-        output_name = output_name + std::to_string(screen);
-    }
+    std::string output_name = m_output + std::to_string(screen);
     if (m_targets.target(output_name) != nullptr)
     {
         m_targets.target(output_name)->page_flip();
@@ -158,11 +154,7 @@ bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
 	bgfx::FrameBufferHandle handle = BGFX_INVALID_HANDLE;
 	uint16_t width = screen_width;
 	uint16_t height = screen_height;
-    std::string output_name = m_output;
-    if (output_name == "output" || output_name == "previous")
-    {
-        output_name = output_name + std::to_string(screen);
-    }
+    std::string output_name = m_output + std::to_string(screen);
     if (m_targets.target(output_name) != nullptr)
     {
         bgfx_target* output = m_targets.target(output_name);

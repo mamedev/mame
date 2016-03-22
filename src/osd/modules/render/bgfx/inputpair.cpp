@@ -17,6 +17,7 @@
 #include "effect.h"
 #include "uniform.h"
 #include "texturemanager.h"
+#include "targetmanager.h"
 
 bgfx_input_pair::bgfx_input_pair(int index, std::string sampler, std::string texture)
 	: m_index(index)
@@ -25,11 +26,11 @@ bgfx_input_pair::bgfx_input_pair(int index, std::string sampler, std::string tex
 {
 }
 
-void bgfx_input_pair::bind(bgfx_effect *effect, texture_manager& textures, const int32_t screen) const
+void bgfx_input_pair::bind(bgfx_effect *effect, target_manager& targets, texture_manager& textures, const int32_t screen) const
 {
     assert(effect->uniform(m_sampler) != nullptr);
     std::string texture = m_texture;
-    if (m_texture == "previous")
+    if (targets.target(m_texture + std::to_string(screen)) != nullptr)
     {
         texture = m_texture + std::to_string(screen);
     }
