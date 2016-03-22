@@ -1012,7 +1012,7 @@ msgstr "%s.xmlをuiフォルダーに保存しました。"
 
 #: src/emu/ui/miscmenu.cpp:765
 msgid "Name:             Description:\n"
-msgstr "名前:             詳細:\n"
+msgstr "ROMセット：       名前：\n"
 
 #: src/emu/ui/miscmenu.cpp:777
 #, c-format
@@ -1170,7 +1170,7 @@ msgstr "%1$s検索：%2$s_"
 #: src/emu/ui/selgame.cpp:828
 #, c-format
 msgid "Romset: %1$-.100s"
-msgstr "ROMセット： %1$-.100s"
+msgstr "ROMセット：%1$-.100s"
 
 #: src/emu/ui/selgame.cpp:831 src/emu/ui/selgame.cpp:880
 #: src/emu/ui/selsoft.cpp:749 src/emu/ui/selsoft.cpp:799
@@ -1182,7 +1182,7 @@ msgstr ""
 #: src/emu/ui/selgame.cpp:837 src/emu/ui/selsoft.cpp:755
 #, c-format
 msgid "Driver is clone of: %1$-.100s"
-msgstr "次のクローンのドライバ： %1$-.100s"
+msgstr "次のクローンのドライバ：%1$-.100s"
 
 #: src/emu/ui/selgame.cpp:839 src/emu/ui/selsoft.cpp:757
 msgid "Driver is parent"
@@ -1191,47 +1191,47 @@ msgstr "親セットのドライバ"
 #: src/emu/ui/selgame.cpp:843 src/emu/ui/selsoft.cpp:761
 #: src/emu/ui/simpleselgame.cpp:332
 msgid "Overall: NOT WORKING"
-msgstr "概略： 動作不可"
+msgstr "概略：動作不可"
 
 #: src/emu/ui/selgame.cpp:845 src/emu/ui/selsoft.cpp:763
 #: src/emu/ui/simpleselgame.cpp:334
 msgid "Overall: Unemulated Protection"
-msgstr "概略： プロテクトが未エミュレート"
+msgstr "概略：プロテクトが未エミュレート"
 
 #: src/emu/ui/selgame.cpp:847 src/emu/ui/selsoft.cpp:765
 #: src/emu/ui/simpleselgame.cpp:336
 msgid "Overall: Working"
-msgstr "概略： 動作可"
+msgstr "概略：動作可"
 
 #: src/emu/ui/selgame.cpp:851 src/emu/ui/selsoft.cpp:769
 msgid "Graphics: Imperfect, "
-msgstr "グラフィック： 不完全、 "
+msgstr "グラフィック：不完全、"
 
 #: src/emu/ui/selgame.cpp:853 src/emu/ui/selsoft.cpp:771
 msgid "Graphics: OK, "
-msgstr "グラフィック： 正常、 "
+msgstr "グラフィック：正常、"
 
 #: src/emu/ui/selgame.cpp:856 src/emu/ui/selsoft.cpp:774
 msgid "Sound: Unimplemented"
-msgstr "サウンド： 未実装"
+msgstr "サウンド：未実装"
 
 #: src/emu/ui/selgame.cpp:858 src/emu/ui/selsoft.cpp:776
 msgid "Sound: Imperfect"
-msgstr "サウンド： 不完全"
+msgstr "サウンド：不完全"
 
 #: src/emu/ui/selgame.cpp:860 src/emu/ui/selsoft.cpp:778
 msgid "Sound: OK"
-msgstr "サウンド： 正常"
+msgstr "サウンド：正常"
 
 #: src/emu/ui/selgame.cpp:877
 #, c-format
 msgid "System: %1$-.100s"
-msgstr "システム： %1$-.100s"
+msgstr "システム：%1$-.100s"
 
 #: src/emu/ui/selgame.cpp:884 src/emu/ui/selsoft.cpp:803
 #, c-format
 msgid "Software is clone of: %1$-.100s"
-msgstr "次のクローンのソフトウェア： %1$-.100s"
+msgstr "次のクローンのソフトウェア：%1$-.100s"
 
 #: src/emu/ui/selgame.cpp:886 src/emu/ui/selsoft.cpp:805
 msgid "Software is parent"
@@ -1239,20 +1239,20 @@ msgstr "親セットのソフトウェア"
 
 #: src/emu/ui/selgame.cpp:891 src/emu/ui/selsoft.cpp:810
 msgid "Supported: No"
-msgstr "対応状況： いいえ"
+msgstr "対応状況：いいえ"
 
 #: src/emu/ui/selgame.cpp:896 src/emu/ui/selsoft.cpp:815
 msgid "Supported: Partial"
-msgstr "対応状況： 部分的"
+msgstr "対応状況：部分的"
 
 #: src/emu/ui/selgame.cpp:901 src/emu/ui/selsoft.cpp:820
 msgid "Supported: Yes"
-msgstr "対応状況： はい"
+msgstr "対応状況：はい"
 
 #: src/emu/ui/selgame.cpp:906 src/emu/ui/selsoft.cpp:825
 #, c-format
 msgid "romset: %1$-.100s"
-msgstr "ROMセット： %1$-.100s"
+msgstr "ソフト：%1$-.100s"
 
 #: src/emu/ui/selgame.cpp:913
 #, c-format
