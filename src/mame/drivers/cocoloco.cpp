@@ -157,6 +157,20 @@
 
 ***************************************************************************************
 
+  Game notes...
+  
+  The third set is resetting after drawing the maze, and when start a game.
+
+  The attract one:
+  
+  bp D28E (this is after all the jsr tables that draw the maze)
+  $D296: jsr $E0CD...
+  $E189 (jsr $6337) ; $6337 ---> Goes nowhere. Hit the 00's (BRK) and reset.
+
+  Maybe should be jsr $E337 (MSB active)? There, there is a subroutina that has sense.
+
+***************************************************************************************
+
   DRIVER UPDATES:
 
   2014-05-11
