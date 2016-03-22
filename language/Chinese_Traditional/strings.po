@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-22 13:51+1100\n"
-"PO-Revision-Date: 2016-03-06 22:30+0800\n"
+"PO-Revision-Date: 2016-03-22 14:16+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -550,7 +550,7 @@ msgstr "對戰"
 
 #: src/emu/ui/dirmenu.cpp:58 src/emu/ui/menu.cpp:59
 msgid "Covers"
-msgstr ""
+msgstr "封面"
 
 #: src/emu/ui/dirmenu.cpp:116 src/emu/ui/dirmenu.cpp:136
 msgid "Folders Setup"
@@ -1153,7 +1153,7 @@ msgstr "%1$s (%2$s - %3$s) - "
 #: src/emu/ui/selgame.cpp:759 src/emu/ui/selgame.cpp:765
 #, c-format
 msgid "%1$s (%2$s) - "
-msgstr ""
+msgstr "%1$s (%2$s) - "
 
 #: src/emu/ui/selgame.cpp:774
 #, c-format
@@ -2064,12 +2064,3 @@ msgstr " 色彩"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " PENS"
-
-#~ msgid "Hardware Stretch"
-#~ msgstr "硬體延展"
-
-#~ msgid "**Error loading %s.ini**"
-#~ msgstr "**載入 %s.ini 時發生錯誤**"
-
-#~ msgid "**Error loading ui.ini**"
-#~ msgstr "載入 ui.ini 時錯誤**"
