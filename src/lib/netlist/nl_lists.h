@@ -13,6 +13,9 @@
 #include "nl_config.h"
 #include "plib/plists.h"
 
+#include <atomic>
+
+
 // ----------------------------------------------------------------------------------------
 // timed queue
 // ----------------------------------------------------------------------------------------
@@ -62,7 +65,7 @@ namespace netlist
 		{
 	#if HAS_OPENMP && USE_OPENMP
 			/* Lock */
-			while (atomic_exchange32(&m_lock, 1)) { }
+			while (m_lock.exchange(1)) { }
 	#endif
 			const _Time &t = e.exec_time();
 			entry_t * i = m_end++;
@@ -94,7 +97,7 @@ namespace netlist
 		{
 			/* Lock */
 	#if HAS_OPENMP && USE_OPENMP
-			while (atomic_exchange32(&m_lock, 1)) { }
+			while (m_lock.exchange(1)) { }
 	#endif
 			for (entry_t * i = m_end - 1; i > &m_list[0]; i--)
 			{
@@ -143,7 +146,7 @@ namespace netlist
 	private:
 
 	#if HAS_OPENMP && USE_OPENMP
-		volatile INT32 m_lock;
+		volatile std::atomic<int> m_lock;
 	#endif
 		entry_t * m_end;
 		parray_t<entry_t> m_list;
