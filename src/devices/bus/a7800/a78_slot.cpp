@@ -707,6 +707,7 @@ WRITE8_MEMBER(a78_cart_slot_device::write_40xx)
 
  [*] Cart type:
 
+ (byte 54)
  bit 0-7 - Hardware "flags"
  bit 0 [0x01] - POKEY at $4000
  bit 1 [0x02] - SuperCart bank switched
@@ -715,11 +716,11 @@ WRITE8_MEMBER(a78_cart_slot_device::write_40xx)
  bit 4 [0x10] - bank 6 at $4000
  bit 5 [0x20] - banked RAM at $4000
  bit 6 [0x40] - POKEY at $0450
+ bit 7 [0x80] - currently unused
 
- bit 8-15 - Special values
- 0 = Normal cart  // normal compared to what? perhaps this should be 'unused'
- 1 = Absolute (F18 Hornet)
- 2 = Activision (Double Dragon & Rampage)
+ (byte 53)
+ bit0 set = Absolute mapper (F18 Hornet)
+ bit1 set = Activision mapper (Double Dragon & Rampage)
 
  -------------------------------------------------*/
 

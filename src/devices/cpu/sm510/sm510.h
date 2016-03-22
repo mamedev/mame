@@ -260,6 +260,7 @@ protected:
 	void op_skip();
 	void op_cend();
 	void op_idiv();
+	void op_dta();
 
 	void op_illegal();
 };

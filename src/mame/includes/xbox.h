@@ -288,7 +288,7 @@ protected:
 		int controlrecipient;
 		int remain;
 		UINT8 *position;
-		UINT8 buffer[4];
+		UINT8 buffer[128];
 	} endpoints[256];
 	int state;
 	bool settingaddress;
@@ -308,8 +308,7 @@ protected:
 class ohci_game_controller_device : public ohci_function_device
 {
 public:
-	ohci_game_controller_device(running_machine &machine);// :
-		//ohci_function_device(machine) {}
+	ohci_game_controller_device(running_machine &machine);
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 private:
 	static const USBStandardDeviceDescriptor devdesc;
@@ -317,6 +316,50 @@ private:
 	static const USBStandardInterfaceDescriptor intdesc;
 	static const USBStandardEndpointDescriptor enddesc82;
 	static const USBStandardEndpointDescriptor enddesc02;
+};
+
+class ohci_hlean2131qc_device: public ohci_function_device
+{
+public:
+	ohci_hlean2131qc_device(running_machine &machine);
+	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
+private:
+	static const USBStandardDeviceDescriptor devdesc;
+	static const USBStandardConfigurationDescriptor condesc;
+	static const USBStandardInterfaceDescriptor intdesc;
+	static const USBStandardEndpointDescriptor enddesc01;
+	static const USBStandardEndpointDescriptor enddesc02;
+	static const USBStandardEndpointDescriptor enddesc03;
+	static const USBStandardEndpointDescriptor enddesc04;
+	static const USBStandardEndpointDescriptor enddesc05;
+	static const USBStandardEndpointDescriptor enddesc81;
+	static const USBStandardEndpointDescriptor enddesc82;
+	static const USBStandardEndpointDescriptor enddesc83;
+	static const USBStandardEndpointDescriptor enddesc84;
+	static const USBStandardEndpointDescriptor enddesc85;
+	static const UINT8 strdesc0[];
+	static const UINT8 strdesc1[];
+	static const UINT8 strdesc2[];
+};
+
+class ohci_hlean2131sc_device : public ohci_function_device
+{
+public:
+	ohci_hlean2131sc_device(running_machine &machine);
+	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
+private:
+	static const USBStandardDeviceDescriptor devdesc;
+	static const USBStandardConfigurationDescriptor condesc;
+	static const USBStandardInterfaceDescriptor intdesc;
+	static const USBStandardEndpointDescriptor enddesc01;
+	static const USBStandardEndpointDescriptor enddesc02;
+	static const USBStandardEndpointDescriptor enddesc03;
+	static const USBStandardEndpointDescriptor enddesc81;
+	static const USBStandardEndpointDescriptor enddesc82;
+	static const USBStandardEndpointDescriptor enddesc83;
+	static const UINT8 strdesc0[];
+	static const UINT8 strdesc1[];
+	static const UINT8 strdesc2[];
 };
 
 class xbox_base_state : public driver_device
