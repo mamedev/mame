@@ -350,14 +350,31 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			coords.x1 = ((float)curpoint->x - xoffs) * xscale;
 			coords.y1 = ((float)curpoint->y - yoffs) * yscale;
 
-			// extend zero-length vector line (vector point) by quarter beam_width on both sides
-			if (fabs(coords.x0 - coords.x1) < FLT_EPSILON &&
-				fabs(coords.y0 - coords.y1) < FLT_EPSILON)
+			float xdistance = coords.x0 - coords.x1;
+			float ydistance = coords.y0 - coords.y1;
+
+			// extend zero-length vector line (vector point) by 3/8 beam_width on both sides
+			if (fabs(xdistance) < FLT_EPSILON &&
+				fabs(ydistance) < FLT_EPSILON)
 			{
-				coords.x0 += xratio * beam_width * 0.25f;
-				coords.y0 += yratio * beam_width * 0.25f;
-				coords.x1 -= xratio * beam_width * 0.25f;
-				coords.y1 -= yratio * beam_width * 0.25f;
+				coords.x0 += xratio * beam_width * 0.375f;
+				coords.y0 += yratio * beam_width * 0.375f;
+				coords.x1 -= xratio * beam_width * 0.375f;
+				coords.y1 -= yratio * beam_width * 0.375f;
+			}
+			// extend vector line by 3/8 beam_width on both sides
+			else
+			{
+				xdistance *= xratio;
+				ydistance *= yratio;
+				float length = sqrt(xdistance * xdistance + ydistance * ydistance);
+				float xdirection = xdistance / length;
+				float ydirection = ydistance / length;
+
+				coords.x0 += xratio * beam_width * 0.375f * xdirection;
+				coords.y0 += yratio * beam_width * 0.375f * ydirection;
+				coords.x1 -= xratio * beam_width * 0.375f * xdirection;
+				coords.y1 -= yratio * beam_width * 0.375f * ydirection;
 			}
 
 			if (curpoint->intensity != 0 && !render_clip_line(&coords, &clip))
