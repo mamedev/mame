@@ -41,6 +41,7 @@ public:
 		m_namco56xx_2(*this, "56xx_2"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_master_workram(*this, "master_workram"),
 		m_slave_sharedram(*this, "slave_sharedram"),
 		m_bgvram(*this, "bgvram"),
 		m_fgvram(*this, "fgvram"),
@@ -58,6 +59,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
+	required_shared_ptr<UINT8> m_master_workram;
 	required_shared_ptr<UINT8> m_slave_sharedram;
 	required_shared_ptr<UINT16> m_bgvram;
 	required_shared_ptr<UINT8> m_fgvram;
@@ -95,7 +97,7 @@ private:
 	
 	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
-
+	void legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 };
 
 PALETTE_INIT_MEMBER(namcos16_state, toypop)
@@ -201,10 +203,55 @@ void namcos16_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 	}
 }
 
+// TODO: this is likely to be a lot more complex, and maybe is per scanline too
+void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
+{
+	gfx_element *gfx_1 = m_gfxdecode->gfx(1);
+	int count;
+	UINT8 *base_spriteram = m_master_workram;
+	const UINT16 bank1 = 0x0800;
+	const UINT16 bank2 = 0x1000;
+	
+	for (count=0x780;count<0x800;count+=2)
+	{
+		bool enabled = (base_spriteram[count+bank2+1] & 2) == 0;
+		
+		if(enabled == false)
+			continue;
+		
+		UINT8 tile = base_spriteram[count];
+		UINT8 color = base_spriteram[count+1];
+		int x = base_spriteram[count+bank1+1] + (base_spriteram[count+bank2+1] << 8);
+		x -= 56;
+		x = cliprect.max_x - x;
+		
+		int y = base_spriteram[count+bank1+0];
+		y -= 9;
+		
+		bool fx = (base_spriteram[count+bank2] & 1) == 1;
+		bool fy = (base_spriteram[count+bank2] & 2) == 2;
+		UINT8 width = ((base_spriteram[count+bank2] & 4) >> 2) + 1;
+		UINT8 height = ((base_spriteram[count+bank2] & 8) >> 3) + 1;
+		
+		if(width == 2)
+			x -=16;
+		
+		for(int yi=0;yi<height;yi++)
+		{
+			for(int xi=0;xi<width;xi++)
+			{
+				UINT16 sprite_offs = tile + xi + yi * 2;
+				gfx_1->transmask(bitmap,cliprect,sprite_offs,color,fx,fy,x + xi*16,y + yi *16,m_palette->transpen_mask(*gfx_1, color, 0xff));
+			}
+		}
+	}
+}
+
 UINT32 namcos16_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	legacy_bg_draw(bitmap,cliprect);
 	legacy_fg_draw(bitmap,cliprect);
+	legacy_obj_draw(bitmap,cliprect);
 	return 0;
 }
 
@@ -257,7 +304,7 @@ WRITE8_MEMBER(namcos16_state::flip)
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, namcos16_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("fgvram")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("fgattr")
-	AM_RANGE(0x0800, 0x1fff) AM_RAM
+	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("master_workram")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("slave_sharedram")
 	// TODO: 0x6xxx-0x7xxx seems to be programmable somehow (PAL?)
 	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("58xx", namco58xx_device, read, write)              
