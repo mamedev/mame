@@ -42,7 +42,6 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_WATCHDOG ";wdog",             "0",              OPTION_INTEGER,   "force the program to terminate if no updates within specified number of seconds" },
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD PERFORMANCE OPTIONS" },
-	{ OSDOPTION_MULTITHREADING ";mt",         "0",              OPTION_BOOLEAN,   "enable multithreading; this enables rendering and blitting on a separate thread" },
 	{ OSDOPTION_NUMPROCESSORS ";np",          OSDOPTVAL_AUTO,   OPTION_STRING,    "number of processors; this overrides the number the system reports" },
 	{ OSDOPTION_BENCH,                        "0",              OPTION_INTEGER,   "benchmark for the given number of emulated seconds; implies -video none -sound none -nothrottle" },
 
@@ -139,7 +138,16 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_AUDIO_EFFECT "9",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 9" },
 #endif
 
-	// End of list
+    { nullptr,                                nullptr,           OPTION_HEADER, "BGFX POST-PROCESSING OPTIONS" },
+    { OSDOPTION_BGFX_PATH,                    "bgfx",            OPTION_STRING, "path to BGFX-related files" },
+    { OSDOPTION_BGFX_BACKEND,                 "auto",            OPTION_STRING, "BGFX backend to use (d3d9, d3d11, metal, opengl, gles)" },
+    { OSDOPTION_BGFX_DEBUG,                   "0",               OPTION_BOOLEAN, "enable BGFX debugging statistics" },
+    { OSDOPTION_BGFX_SCREEN_CHAINS,           "default",         OPTION_STRING, "comma-delimited list of screen chain JSON names, colon-delimited per-window" },
+    { OSDOPTION_BGFX_SHADOW_MASK,             "shadow-mask.png", OPTION_STRING, "shadow mask texture name" },
+    { OSDOPTION_BGFX_PRESCALE_X,              "2",               OPTION_INTEGER, "x prescale" },
+    { OSDOPTION_BGFX_PRESCALE_Y,              "2",               OPTION_INTEGER, "y prescale" },
+
+        // End of list
 	{ nullptr }
 };
 
@@ -514,7 +522,6 @@ void osd_common_t::customize_input_type_list(simple_list<input_type_entry> &type
 
 slider_state* osd_common_t::get_slider_list()
 {
-	printf("Core get_slider_list\n");
 	return nullptr;
 }
 

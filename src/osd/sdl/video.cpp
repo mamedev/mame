@@ -124,7 +124,6 @@ void sdl_monitor_info::refresh()
 	m_is_primary = (m_handle == 0);
 }
 
-
 //============================================================
 //  update
 //============================================================
@@ -135,6 +134,8 @@ void sdl_osd_interface::update(bool skip_redraw)
 
 	if (m_watchdog != NULL)
 		m_watchdog->reset();
+
+	update_slider_list();
 
 	// if we're not skipping this redraw, update all windows
 	if (!skip_redraw)
@@ -356,10 +357,10 @@ void sdl_osd_interface::extract_video_config()
 		if (options().seconds_to_run() == 0)
 			osd_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
-#if (USE_OPENGL)	
+#if (USE_OPENGL)
 	else if (strcmp(stemp, SDLOPTVAL_OPENGL) == 0)
 		video_config.mode = VIDEO_MODE_OPENGL;
-#endif		
+#endif
 	else if ((strcmp(stemp, SDLOPTVAL_SDL2ACCEL) == 0))
 	{
 		video_config.mode = VIDEO_MODE_SDL2ACCEL;

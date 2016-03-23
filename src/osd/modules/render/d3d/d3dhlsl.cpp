@@ -1648,10 +1648,10 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		int next_index = 0;
 
-		next_index = ntsc_pass(rt, next_index, poly, vertnum);
-		next_index = color_convolution_pass(rt, next_index, poly, vertnum);
-		next_index = prescale_pass(rt, next_index, poly, vertnum);
-		next_index = deconverge_pass(rt, next_index, poly, vertnum);
+		next_index = ntsc_pass(rt, next_index, poly, vertnum); // handled in bgfx
+		next_index = color_convolution_pass(rt, next_index, poly, vertnum); // handled in bgfx
+		next_index = prescale_pass(rt, next_index, poly, vertnum); // handled in bgfx
+		next_index = deconverge_pass(rt, next_index, poly, vertnum); // handled in bgfx
 		next_index = defocus_pass(rt, next_index, poly, vertnum); // 1st pass
 		next_index = defocus_pass(rt, next_index, poly, vertnum); // 2nd pass
 		next_index = phosphor_pass(rt, ct, next_index, poly, vertnum);
@@ -2161,7 +2161,7 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 static slider_state *slider_alloc(running_machine &machine, int id, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg)
 {
 	int size = sizeof(slider_state) + strlen(title);
-	slider_state *state = (slider_state *)auto_alloc_array_clear(machine, UINT8, size);
+	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(machine, UINT8, size));
 
 	state->minval = minval;
 	state->defval = defval;
@@ -2169,7 +2169,6 @@ static slider_state *slider_alloc(running_machine &machine, int id, const char *
 	state->incval = incval;
 	state->update = update;
 	state->arg = arg;
-	state->hidden = false;
 	state->id = id;
 	strcpy(state->description, title);
 
@@ -3099,6 +3098,10 @@ ULONG effect::release()
 
 slider_state *renderer_d3d9::get_slider_list()
 {
+    if (window().m_index > 0)
+    {
+        return nullptr;
+    }
 	return g_slider_list;
 }
 

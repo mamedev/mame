@@ -1,0 +1,29 @@
+{
+    "blend": {
+    	"equation": "add",
+    	"srcColor": "1",
+    	"dstColor": "0",
+    	"srcAlpha": "1",
+    	"dstAlpha": "0"
+    },
+    "depth": {
+    	"function": "always"
+    },
+    "cull": { "mode": "none" },
+    "write": {
+    	"rgb": "true",
+    	"alpha": "true"
+    },
+    "vertex": "vs_deconverge",
+    "fragment": "fs_deconverge",
+    "uniforms": [
+    	{ "name": "s_tex",                   "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "u_converge_red",          "type": "vec4", "values": [ 0.5, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_converge_green",        "type": "vec4", "values": [ 0.0, 0.5, 0.0, 0.0 ] },
+    	{ "name": "u_converge_blue",         "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_radial_converge_red",   "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_radial_converge_green", "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_radial_converge_blue",  "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_source_dims",           "type": "vec4", "values": [ 256.0, 256.0, 0.0, 0.0 ] }
+    ]
+}

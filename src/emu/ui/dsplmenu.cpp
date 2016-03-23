@@ -43,7 +43,6 @@ ui_menu_display_options::dspl_option ui_menu_display_options::m_options[] = {
 	{ 0, __("GLSL"),                     OSDOPTION_GL_GLSL },
 	{ 0, __("Bilinear Filtering"),       OSDOPTION_FILTER },
 	{ 0, __("Bitmap Prescaling"),        OSDOPTION_PRESCALE },
-	{ 0, __("Multi-Threaded Rendering"), OSDOPTION_MULTITHREADING },
 	{ 0, __("Window Mode"),              OSDOPTION_WINDOW },
 	{ 0, __("Enforce Aspect Ratio"),     OPTION_KEEPASPECT },
 	{ 0, __("Start Out Maximized"),      OSDOPTION_MAXIMIZE },
