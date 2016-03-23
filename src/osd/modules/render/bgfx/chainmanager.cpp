@@ -25,25 +25,19 @@ using namespace rapidjson;
 
 chain_manager::~chain_manager()
 {
-	for (std::pair<std::string, bgfx_chain*> chain : m_chains)
+	for (bgfx_chain* chain : m_chains)
 	{
-		delete chain.second;
+		delete chain;
 	}
 	m_chains.clear();
 }
 
-bgfx_chain* chain_manager::chain(std::string name, running_machine& machine, uint32_t window_index)
+bgfx_chain* chain_manager::chain(std::string name, running_machine& machine, uint32_t window_index, uint32_t screen_index)
 {
-	std::map<std::string, bgfx_chain*>::iterator iter = m_chains.find(name + std::to_string(window_index));
-	if (iter != m_chains.end())
-	{
-		return iter->second;
-	}
-
-	return load_chain(name, machine, window_index);
+	return load_chain(name, machine, window_index, screen_index);
 }
 
-bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine, uint32_t window_index)
+bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine, uint32_t window_index, uint32_t screen_index)
 {
 	if (name.length() < 5 || (name.compare(name.length() - 5, 5, ".json")!= 0))
 	{
@@ -76,7 +70,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine
 		return nullptr;
 	}
 
-	bgfx_chain* chain = chain_reader::read_from_value(document, name + ": ", m_options, machine, window_index, m_textures, m_targets, m_effects, m_width, m_height);
+	bgfx_chain* chain = chain_reader::read_from_value(document, name + ": ", m_options, machine, window_index, screen_index, m_textures, m_targets, m_effects, m_width, m_height);
 
 	if (chain == nullptr)
 	{
@@ -84,7 +78,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine
 		return nullptr;
 	}
 
-	m_chains[name + std::to_string(window_index)] = chain;
+	m_chains.push_back(chain);
 
 	return chain;
 }

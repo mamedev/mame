@@ -2651,7 +2651,6 @@ void uniform::update()
 					static_cast<float>(static_cast<int>(shadersys->curr_poly->get_prim_width() + 0.5f)),
 					static_cast<float>(static_cast<int>(shadersys->curr_poly->get_prim_height() + 0.5f)) };
 				m_shader->set_vector("QuadDims", 2, quaddims);
-				printf("Quad Dims: %f, %f\n", quaddims[0], quaddims[1]);
 			}
 			break;
 		}
@@ -3099,6 +3098,10 @@ ULONG effect::release()
 
 slider_state *renderer_d3d9::get_slider_list()
 {
+    if (window().m_index > 0)
+    {
+        return nullptr;
+    }
 	return g_slider_list;
 }
 

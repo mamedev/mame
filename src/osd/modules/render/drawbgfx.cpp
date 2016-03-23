@@ -212,27 +212,41 @@ int renderer_bgfx::create()
 
 void renderer_bgfx::parse_screen_chains(std::string chain_str)
 {
-    std::vector<std::string> chains;
+    std::vector<std::vector<std::string>> chains;
     uint32_t length = chain_str.length();
     uint32_t last_start = 0;
+    uint32_t win = 0;
+    chains.push_back(std::vector<std::string>());
     for (uint32_t i = 0; i < length + 1; i++)
     {
-        if (i == length || chain_str[i] == ',')
+        if (i == length || chain_str[i] == ',' || chain_str[i] == ':')
         {
-            chains.push_back(chain_str.substr(last_start, i - last_start));
+            chains[win].push_back(chain_str.substr(last_start, i - last_start));
             last_start = i + 1;
+            if (chain_str[i] == ':')
+            {
+                win++;
+                chains.push_back(std::vector<std::string>());
+            }
         }
     }
 
-    for (uint32_t index = 0; index < chains.size(); index++)
+    for (win = 0; win < chains.size(); win++)
     {
-        bgfx_chain* chain = m_chains->chain(chains[index], window().machine(), index);
-        if (chain == nullptr)
+        m_screen_chains.push_back(std::vector<bgfx_chain*>());
+        if (win != window().m_index)
         {
-            chains.clear();
-            return;
+            continue;
         }
-        m_screen_chains.push_back(chain);
+        for (uint32_t screen = 0; screen < chains[win].size(); screen++)
+        {
+            bgfx_chain* chain = m_chains->chain(chains[win][screen], window().machine(), win, screen);
+            if (chain == nullptr) {
+                chains.clear();
+                return;
+            }
+            m_screen_chains[win].push_back(chain);
+        }
     }
 }
 
@@ -759,7 +773,7 @@ const bgfx::Memory* renderer_bgfx::mame_texture_data_to_bgfx_texture_data(UINT32
 
 int renderer_bgfx::handle_screen_chains()
 {
-	if (m_screen_chains.size() == 0)
+	if (m_screen_chains.size() <= window().m_index || m_screen_chains[window().m_index].size() == 0)
 	{
 		return 0;
 	}
@@ -802,13 +816,13 @@ int renderer_bgfx::handle_screen_chains()
 
 bgfx_chain* renderer_bgfx::screen_chain(int32_t screen)
 {
-    if (screen >= m_screen_chains.size())
+    if (screen >= m_screen_chains[window().m_index].size())
     {
-        return m_screen_chains[m_screen_chains.size() - 1];
+        return m_screen_chains[window().m_index][m_screen_chains.size() - 1];
     }
     else
     {
-        return m_screen_chains[screen];
+        return m_screen_chains[window().m_index][screen];
     }
 }
 
@@ -975,7 +989,7 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
 							return BUFFER_PRE_FLUSH;
 						}
 
-                        if (PRIMFLAG_GET_SCREENTEX((*prim)->flags) && m_screen_chains.size() > 0)
+                        if (PRIMFLAG_GET_SCREENTEX((*prim)->flags) && m_screen_chains.size() > window().m_index && m_screen_chains[window().m_index].size() > 0)
                         {
                             render_post_screen_quad(view, *prim, buffer, screen);
                             return BUFFER_SCREEN;
@@ -1195,26 +1209,29 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::
 
 slider_state* renderer_bgfx::get_slider_list()
 {
-	if (m_screen_chains.size() == 0)
+	if (m_screen_chains.size() <= window().m_index || m_screen_chains[window().m_index].size() == 0)
 	{
 		return nullptr;
 	}
 
     slider_state *listhead = nullptr;
     slider_state **tailptr = &listhead;
-    for (bgfx_chain* chain : m_screen_chains)
+    for (std::vector<bgfx_chain*> screen : m_screen_chains)
     {
-        std::vector<bgfx_slider*> sliders = chain->sliders();
-        for (bgfx_slider* slider : sliders)
+        for (bgfx_chain* chain : screen)
         {
-            if (*tailptr == nullptr)
+            std::vector<bgfx_slider*> sliders = chain->sliders();
+            for (bgfx_slider* slider : sliders)
             {
-                *tailptr = slider->core_slider();
-            }
-            else
-            {
-                (*tailptr)->next = slider->core_slider();
-                tailptr = &(*tailptr)->next;
+                if (*tailptr == nullptr)
+                {
+                    *tailptr = slider->core_slider();
+                }
+                else
+                {
+                    (*tailptr)->next = slider->core_slider();
+                    tailptr = &(*tailptr)->next;
+                }
             }
         }
     }

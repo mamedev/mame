@@ -272,14 +272,33 @@ int windows_osd_interface::window_count()
 
 void windows_osd_interface::build_slider_list()
 {
-	// FIXME: take all sliders from all windows without concatenate them by slider_state->next
-
+    m_sliders = nullptr;
+    slider_state* full_list = nullptr;
+    slider_state* curr = nullptr;
 	for (win_window_info *window = win_window_list; window != nullptr; window = window->m_next)
 	{
 		// take the sliders of the first window
-		m_sliders = window->m_renderer->get_slider_list();
-		return;
+        slider_state* window_sliders = window->m_renderer->get_slider_list();
+        if (window_sliders == nullptr)
+        {
+            continue;
+        }
+
+        if (full_list == nullptr)
+        {
+            full_list = curr = window_sliders;
+        }
+        else
+        {
+            curr->next = window_sliders;
+        }
+
+        while (curr->next != nullptr) {
+            curr = curr->next;
+        }
 	}
+
+    m_sliders = full_list;
 }
 
 //============================================================

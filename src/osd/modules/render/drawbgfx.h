@@ -108,7 +108,7 @@ private:
 
 	bgfx_effect* m_gui_effect[4];
 	bgfx_effect* m_screen_effect[4];
-	std::vector<bgfx_chain*> m_screen_chains;
+	std::vector<std::vector<bgfx_chain*>> m_screen_chains;
 
 	std::map<UINT32, rectangle_packer::packed_rectangle> m_hash_to_entry;
 	std::vector<rectangle_packer::packable_rectangle> m_texinfo;

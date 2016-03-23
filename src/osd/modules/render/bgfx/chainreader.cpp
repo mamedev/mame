@@ -24,7 +24,7 @@
 #include "slider.h"
 #include "parameter.h"
 
-bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix, osd_options& options, running_machine& machine, uint32_t window_index, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t screen_width, uint32_t screen_height)
+bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix, osd_options& options, running_machine& machine, uint32_t window_index, uint32_t screen_index, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t screen_width, uint32_t screen_height)
 {
 	if (!validate_parameters(value, prefix))
 	{
@@ -41,7 +41,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 		const Value& slider_array = value["sliders"];
 		for (UINT32 i = 0; i < slider_array.Size(); i++)
 		{
-            std::vector<bgfx_slider*> expanded_sliders = slider_reader::read_from_value(slider_array[i], prefix + "sliders[" + std::to_string(i) + "]: ", machine, window_index);
+            std::vector<bgfx_slider*> expanded_sliders = slider_reader::read_from_value(slider_array[i], prefix + "sliders[" + std::to_string(i) + "]: ", machine, window_index, screen_index);
             if (expanded_sliders.size() == 0)
             {
 				return nullptr;

@@ -14,7 +14,7 @@
 #ifndef __DRAWBGFX_CHAIN_MANAGER__
 #define __DRAWBGFX_CHAIN_MANAGER__
 
-#include <map>
+#include <vector>
 #include <string>
 
 #include "texturemanager.h"
@@ -39,10 +39,10 @@ public:
 	~chain_manager();
 
 	// Getters
-	bgfx_chain* chain(std::string name, running_machine& machine, uint32_t window_index);
+	bgfx_chain* chain(std::string name, running_machine& machine, uint32_t window_index, uint32_t screen_index);
 
 private:
-	bgfx_chain* load_chain(std::string name, running_machine& machine, uint32_t window_index);
+	bgfx_chain* load_chain(std::string name, running_machine& machine, uint32_t window_index, uint32_t screen_index);
 
     osd_options&                        m_options;
 	texture_manager&					m_textures;
@@ -50,7 +50,7 @@ private:
 	effect_manager&                     m_effects;
 	uint32_t							m_width;
 	uint32_t							m_height;
-	std::map<std::string, bgfx_chain*>	m_chains;
+	std::vector<bgfx_chain*>	        m_chains;
 };
 
 #endif // __DRAWBGFX_CHAIN_MANAGER__
