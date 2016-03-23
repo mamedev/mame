@@ -15,7 +15,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <tchar.h>
-#include <wrl\client.h>
+#include <wrl/client.h>
 
 // undef WINNT for dinput.h to prevent duplicate definition
 #undef WINNT
