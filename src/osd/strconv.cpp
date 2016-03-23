@@ -117,7 +117,7 @@ int osd_uchar_from_osdchar(UINT32 *uchar, const char *osdchar, size_t count)
 	// The multibyte char can't be bigger than the max character size
 	count = MIN(count, cp.MaxCharSize);
 
-	if (!MultiByteToWideChar(CP_ACP, 0, osdchar, static_cast<DWORD>(count), &wch, 1) != 0)
+	if (MultiByteToWideChar(CP_ACP, 0, osdchar, static_cast<DWORD>(count), &wch, 1) != 0)
 		goto error;
 
 	*uchar = wch;
