@@ -2156,3 +2156,5 @@ msgstr " PLUMAS"
 
 #~ msgid "Otherwise, type OK or move the joystick left then right to continue"
 #~ msgstr ""
+#~ "En otro caso, teclee OK o mueva el joystick de izquierda a derecha para "
+#~ "continuar"
