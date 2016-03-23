@@ -80,7 +80,7 @@
 #define OSDOPTION_BGFX_PATH             "bgfx_path"
 #define OSDOPTION_BGFX_BACKEND			"bgfx_backend"
 #define OSDOPTION_BGFX_DEBUG			"bgfx_debug"
-#define OSDOPTION_BGFX_SCREEN_CHAIN     "bgfx_screen_chain"
+#define OSDOPTION_BGFX_SCREEN_CHAINS    "bgfx_screen_chains"
 #define OSDOPTION_BGFX_SHADOW_MASK		"bgfx_shadow_mask"
 #define OSDOPTION_BGFX_PRESCALE_X		"bgfx_prescale_x"
 #define OSDOPTION_BGFX_PRESCALE_Y		"bgfx_prescale_y"
@@ -157,7 +157,7 @@ public:
     const char *bgfx_path() const { return value(OSDOPTION_BGFX_PATH); }
     const char *bgfx_backend() const { return value(OSDOPTION_BGFX_BACKEND); }
     const bool bgfx_debug() const { return bool_value(OSDOPTION_BGFX_DEBUG); }
-    const char *bgfx_screen_chain() const { return value(OSDOPTION_BGFX_SCREEN_CHAIN); }
+    const char *bgfx_screen_chains() const { return value(OSDOPTION_BGFX_SCREEN_CHAINS); }
     const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
     const uint32_t bgfx_prescale_x() const { return int_value(OSDOPTION_BGFX_PRESCALE_X); }
     const uint32_t bgfx_prescale_y() const { return int_value(OSDOPTION_BGFX_PRESCALE_Y); }

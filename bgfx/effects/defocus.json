@@ -18,7 +18,7 @@
     "fragment": "fs_defocus",
     "uniforms": [
     	{ "name": "s_tex",         "type": "int",  "values": [ 1.0 ] },
-    	{ "name": "u_screen_dims", "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_tex_size0",   "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
     	{ "name": "u_defocus",     "type": "vec4", "values": [ 0.5, 0.5, 0.0, 0.0 ] }
     ]
 }

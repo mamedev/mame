@@ -42,7 +42,12 @@ bgfx_effect* effect_reader::read_from_value(const Value& value, std::string pref
 	const Value& uniform_array = value["uniforms"];
 	for (UINT32 i = 0; i < uniform_array.Size(); i++)
 	{
-		uniforms.push_back(uniform_reader::read_from_value(uniform_array[i], prefix + "uniforms[" + std::to_string(i) + "]: "));
+        bgfx_uniform* uniform = uniform_reader::read_from_value(uniform_array[i], prefix + "uniforms[" + std::to_string(i) + "]: ");
+        if (uniform == nullptr)
+        {
+            return nullptr;
+        }
+		uniforms.push_back(uniform);
 	}
 
 	std::string vertex_name(value["vertex"].GetString());

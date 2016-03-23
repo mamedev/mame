@@ -12,6 +12,7 @@
 #include "emu.h"
 
 #include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 
 #include <bgfx/bgfxplatform.h>
 #include <bgfx/bgfx.h>
@@ -52,7 +53,11 @@ bgfx_effect* effect_manager::load_effect(std::string name)
     std::string path = std::string(m_options.bgfx_path()) + "/effects/" + name;
 
 	bx::CrtFileReader reader;
-	bx::open(&reader, path.c_str());
+	if (!bx::open(&reader, path.c_str()))
+    {
+        printf("Unable to open effect file %s\n", path.c_str());
+        return nullptr;
+    }
 
 	int32_t size (bx::getSize(&reader));
 
@@ -63,9 +68,22 @@ bgfx_effect* effect_manager::load_effect(std::string name)
 
 	Document document;
 	document.Parse<0>(data);
-	bgfx_effect* effect = effect_reader::read_from_value(document, "Effect '" + name + "': ", m_shaders);
 
-	m_effects[name] = effect;
+    if (document.HasParseError()) {
+        std::string error(GetParseError_En(document.GetParseError()));
+        printf("Unable to parse effect %s. Errors returned:\n", path.c_str());
+        printf("%s\n", error.c_str());
+        return nullptr;
+    }
+
+    bgfx_effect* effect = effect_reader::read_from_value(document, "Effect '" + name + "': ", m_shaders);
+
+    if (effect == nullptr) {
+        printf("Unable to load effect %s\n", path.c_str());
+        return nullptr;
+    }
+    
+    m_effects[name] = effect;
 
 	return effect;
 }

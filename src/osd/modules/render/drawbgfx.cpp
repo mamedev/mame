@@ -66,10 +66,11 @@ const char* renderer_bgfx::WINDOW_PREFIX = "Window 0, ";
 #define GIBBERISH   	(0)
 
 //============================================================
-//  TYPES
+//  STATICS
 //============================================================
 
 bool renderer_bgfx::s_window_set = false;
+uint32_t renderer_bgfx::s_current_view = 0;
 
 //============================================================
 //  renderer_bgfx::create
@@ -190,7 +191,7 @@ int renderer_bgfx::create()
 	m_screen_effect[3] = m_effects->effect("screen_add");
 
 	m_chains = new chain_manager(options, *m_textures, *m_targets, *m_effects, m_width[window().m_index], m_height[window().m_index]);
-	m_screen_chain = m_chains->chain(options.bgfx_screen_chain(), window().machine(), window().m_index);
+    parse_screen_chains(options.bgfx_screen_chains());
     m_sliders_dirty = true;
 
 	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
@@ -203,6 +204,36 @@ int renderer_bgfx::create()
 	m_texinfo.push_back(rectangle_packer::packable_rectangle(WHITE_HASH, PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32), 16, 16, 16, nullptr, m_white));
 
 	return 0;
+}
+
+//============================================================
+//  parse_screen_chains
+//============================================================
+
+void renderer_bgfx::parse_screen_chains(std::string chain_str)
+{
+    std::vector<std::string> chains;
+    uint32_t length = chain_str.length();
+    uint32_t last_start = 0;
+    for (uint32_t i = 0; i < length + 1; i++)
+    {
+        if (i == length || chain_str[i] == ',')
+        {
+            chains.push_back(chain_str.substr(last_start, i - last_start));
+            last_start = i + 1;
+        }
+    }
+
+    for (uint32_t index = 0; index < chains.size(); index++)
+    {
+        bgfx_chain* chain = m_chains->chain(chains[index], window().machine(), index);
+        if (chain == nullptr)
+        {
+            chains.clear();
+            return;
+        }
+        m_screen_chains.push_back(chain);
+    }
 }
 
 //============================================================
@@ -350,7 +381,8 @@ void renderer_bgfx::process_screen_quad(int screen, render_primitive* prim)
 
     m_targets->update_guest_targets(screen, tex_width, tex_height);
 
-    m_screen_chain->process(prim, screen * m_screen_chain->applicable_passes(), screen, *m_textures, window(), get_blend_state(PRIMFLAG_GET_BLENDMODE(prim->flags)));
+    screen_chain(screen)->process(prim, s_current_view, screen, *m_textures, window(), get_blend_state(PRIMFLAG_GET_BLENDMODE(prim->flags)));
+    s_current_view += screen_chain(screen)->applicable_passes();
 
     m_textures->add_provider("screen", nullptr);
     delete texture;
@@ -727,23 +759,29 @@ const bgfx::Memory* renderer_bgfx::mame_texture_data_to_bgfx_texture_data(UINT32
 
 int renderer_bgfx::handle_screen_chains()
 {
-	if (!m_screen_chain)
+	if (m_screen_chains.size() == 0)
 	{
 		return 0;
 	}
 
     window().m_primlist->acquire_lock();
 
-    // process
     render_primitive *prim = window().m_primlist->first();
 
+    // Determine how many post-processing passes are needed
     int screens = 0;
-    screen_device_iterator iter(window().machine().root_device());
-    for (const screen_device *screen = iter.first(); screen != nullptr; screen = iter.next()) {
-        screens++;
+    while (prim != nullptr)
+    {
+        if (PRIMFLAG_GET_SCREENTEX(prim->flags))
+        {
+            screens++;
+        }
+        prim = prim->next();
     }
     m_targets->update_screen_count(screens);
 
+    // Process each screen as necessary
+    prim = window().m_primlist->first();
     int seen_screen_quads = 0;
     while (prim != nullptr)
     {
@@ -757,24 +795,33 @@ int renderer_bgfx::handle_screen_chains()
 
     window().m_primlist->release_lock();
 
-    uint32_t total_passes = seen_screen_quads * m_screen_chain->applicable_passes();
-    bgfx::setViewFrameBuffer(total_passes, BGFX_INVALID_HANDLE);
+    bgfx::setViewFrameBuffer(s_current_view, BGFX_INVALID_HANDLE);
 
-    return total_passes;
+    return s_current_view;
+}
+
+bgfx_chain* renderer_bgfx::screen_chain(int32_t screen)
+{
+    if (screen >= m_screen_chains.size())
+    {
+        return m_screen_chains[m_screen_chains.size() - 1];
+    }
+    else
+    {
+        return m_screen_chains[screen];
+    }
 }
 
 int renderer_bgfx::draw(int update)
 {
-    m_screens.clear();
 	int window_index = window().m_index;
-    int post_view_index = handle_screen_chains();
-    int view_index = window_index;
-    int first_view_index = 0;
-    if (m_screen_chain && post_view_index > 0)
+    if (window_index == 0)
     {
-        view_index += post_view_index;
-        first_view_index = post_view_index;
+        s_current_view = 0;
     }
+
+    handle_screen_chains();
+    int view_index = s_current_view;
 
     // Set view 0 default viewport.
 	osd_dim wdim = window().get_size();
@@ -803,7 +850,7 @@ int renderer_bgfx::draw(int update)
 			m_dimensions = osd_dim(m_width[window_index], m_height[window_index]);
 			bgfx::setViewClear(view_index
 				, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
-				, 0x000000ff
+				, 0x00ff00ff
 				, 1.0f
 				, 0
 				);
@@ -811,12 +858,10 @@ int renderer_bgfx::draw(int update)
 			bgfx::frame();
 			return 0;
 		}
-	}
 
-	if (view_index != first_view_index)
-	{
-		bgfx::setViewFrameBuffer(view_index, m_framebuffer->target());
-	}
+        bgfx::setViewFrameBuffer(view_index, m_framebuffer->target());
+    }
+
 	bgfx::setViewSeq(view_index, true);
 	bgfx::setViewRect(view_index, 0, 0, m_width[window_index], m_height[window_index]);
 
@@ -885,10 +930,12 @@ int renderer_bgfx::draw(int update)
 
 	// Advance to next frame. Rendering thread will be kicked to
 	// process submitted rendering primitives.
-	if (view_index == first_view_index)
+	if (window_index == 0)
     {
         bgfx::frame();
     }
+
+    s_current_view++;
 
 	return 0;
 }
@@ -928,7 +975,7 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
 							return BUFFER_PRE_FLUSH;
 						}
 
-                        if (PRIMFLAG_GET_SCREENTEX((*prim)->flags) && m_screen_chain != nullptr)
+                        if (PRIMFLAG_GET_SCREENTEX((*prim)->flags) && m_screen_chains.size() > 0)
                         {
                             render_post_screen_quad(view, *prim, buffer, screen);
                             return BUFFER_SCREEN;
@@ -1148,24 +1195,27 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::
 
 slider_state* renderer_bgfx::get_slider_list()
 {
-	if (!m_screen_chain)
+	if (m_screen_chains.size() == 0)
 	{
 		return nullptr;
 	}
 
     slider_state *listhead = nullptr;
     slider_state **tailptr = &listhead;
-    std::vector<bgfx_slider*> sliders = m_screen_chain->sliders();
-    for (bgfx_slider* slider : sliders)
+    for (bgfx_chain* chain : m_screen_chains)
     {
-        if (*tailptr == nullptr)
+        std::vector<bgfx_slider*> sliders = chain->sliders();
+        for (bgfx_slider* slider : sliders)
         {
-            *tailptr = slider->core_slider();
-        }
-        else
-        {
-            (*tailptr)->next = slider->core_slider();
-            tailptr = &(*tailptr)->next;
+            if (*tailptr == nullptr)
+            {
+                *tailptr = slider->core_slider();
+            }
+            else
+            {
+                (*tailptr)->next = slider->core_slider();
+                tailptr = &(*tailptr)->next;
+            }
         }
     }
     if (*tailptr != nullptr)

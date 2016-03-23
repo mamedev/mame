@@ -111,7 +111,7 @@ void bgfx_chain_entry::setup_screensize_uniforms(texture_manager& textures, uint
 	}
 }
 
-void bgfx_chain_entry::setup_sourcesize_uniform(render_primitive* prim)
+void bgfx_chain_entry::setup_sourcesize_uniform(render_primitive* prim) const
 {
     bgfx_uniform* source_dims = m_effect->uniform("u_source_dims");
     if (source_dims != nullptr)
@@ -121,7 +121,7 @@ void bgfx_chain_entry::setup_sourcesize_uniform(render_primitive* prim)
     }
 }
 
-void bgfx_chain_entry::setup_rotationtype_uniform(uint32_t rotation_type)
+void bgfx_chain_entry::setup_rotationtype_uniform(uint32_t rotation_type) const
 {
 	bgfx_uniform* rotation_type_uniform = m_effect->uniform("u_rotation_type");
 	if (rotation_type_uniform != nullptr)
@@ -131,14 +131,24 @@ void bgfx_chain_entry::setup_rotationtype_uniform(uint32_t rotation_type)
 	}
 }
 
-void bgfx_chain_entry::setup_swapxy_uniform(bool swap_xy)
+void bgfx_chain_entry::setup_swapxy_uniform(bool swap_xy) const
 {
-	bgfx_uniform* swap_xy_uniform = m_effect->uniform("u_swap_xy");
-	if (swap_xy_uniform != nullptr)
-	{
-		float values[1] = { swap_xy ? 1.0f : 0.0f };
-		swap_xy_uniform->set(values, sizeof(float));
-	}
+    bgfx_uniform* swap_xy_uniform = m_effect->uniform("u_swap_xy");
+    if (swap_xy_uniform != nullptr)
+    {
+        float values[1] = { swap_xy ? 1.0f : 0.0f };
+        swap_xy_uniform->set(values, sizeof(float));
+    }
+}
+
+void bgfx_chain_entry::setup_quaddims_uniform(render_primitive* prim) const
+{
+    bgfx_uniform* quad_dims_uniform = m_effect->uniform("u_quad_dims");
+    if (quad_dims_uniform != nullptr)
+    {
+        float values[2] = { (prim->bounds.x1 - prim->bounds.x0) + 0.5f, (prim->bounds.y1 - prim->bounds.y0) + 0.5f};
+        quad_dims_uniform->set(values, sizeof(float) * 2);
+    }
 }
 
 void bgfx_chain_entry::setup_auto_uniforms(render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint32_t rotation_type, bool swap_xy, int32_t screen)
@@ -147,9 +157,10 @@ void bgfx_chain_entry::setup_auto_uniforms(render_primitive* prim, texture_manag
 	setup_sourcesize_uniform(prim);
 	setup_rotationtype_uniform(rotation_type);
 	setup_swapxy_uniform(swap_xy);
+    setup_quaddims_uniform(prim);
 }
 
-bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t screen_height, int32_t screen)
+bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t screen_height, int32_t screen) const
 {
 	bgfx::FrameBufferHandle handle = BGFX_INVALID_HANDLE;
 	uint16_t width = screen_width;
@@ -174,11 +185,11 @@ bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
 	bx::mtxOrtho(projMat, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
 	bgfx::setViewTransform(view, nullptr, projMat);
 
-    bgfx::setViewClear(view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
+    bgfx::setViewClear(view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00ff00ff, 1.0f, 0);
     return true;
 }
 
-void bgfx_chain_entry::put_screen_buffer(render_primitive* prim, bgfx::TransientVertexBuffer* buffer)
+void bgfx_chain_entry::put_screen_buffer(render_primitive* prim, bgfx::TransientVertexBuffer* buffer) const
 {
     if (bgfx::checkAvailTransientVertexBuffer(6, ScreenVertex::ms_decl))
     {

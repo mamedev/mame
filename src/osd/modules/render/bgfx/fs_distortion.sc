@@ -9,10 +9,13 @@ $input v_color0, v_texcoord0
 #include "../../../../../3rdparty/bgfx/examples/common/common.sh"
 
 // Autos
+uniform vec4 u_swap_xy;
 uniform vec4 u_screen_dims;
+uniform vec4 u_quad_dims;
 uniform vec4 u_rotation_type;
 
 // User-supplied
+uniform vec4 u_prepare_vector;
 uniform vec4 u_curvature;
 uniform vec4 u_round_corner;
 uniform vec4 u_smooth_border;
@@ -46,15 +49,6 @@ float roundBox(vec2 p, vec2 b, float r)
 	return length(max(abs(p) - b + r, 0.0)) - r;
 }
 
-vec2 GetRatioCorrection()
-{
-	float ScreenQuadRatio = 1.0;
-
-	return ScreenQuadRatio > 1.0f
-		? vec2(1.0, 1.0f / ScreenQuadRatio)
-		: vec2(ScreenQuadRatio, 1.0);
-}
-
 float GetNoiseFactor(float n, float random)
 {
 	// smaller n become more noisy
@@ -77,22 +71,37 @@ float GetVignetteFactor(vec2 coord, float amount)
 
 float GetSpotAddend(vec2 coord, float amount)
 {
-	vec2 RatioCorrection = GetRatioCorrection();
+	vec2 SpotCoord = coord;
+	
+	// hack for vector screen
+	if (u_prepare_vector.x > 0.0)
+	{
+		// upper right quadrant
+		vec2 spotOffset = vec2(-0.25, 0.25); // 0 degrees
+		if (u_rotation_type.x == 1.0)
+			spotOffset = vec2(-0.25, -0.25); // 90 degrees
+		if (u_rotation_type.x == 2.0)
+			spotOffset = vec2(0.25, -0.25); // 180 degrees
+		if (u_rotation_type.x == 3.0)
+			spotOffset = vec2(0.25, 0.25); // 270 degrees
+		
+		// normalized screen canvas ratio
+		vec2 CanvasRatio = ((u_swap_xy.x > 0.0) ? vec2(u_quad_dims.x / u_quad_dims.y, 1.0) : vec2(1.0, u_quad_dims.y / u_quad_dims.x));
+		
+		SpotCoord += spotOffset;
+		SpotCoord *= CanvasRatio;
+	}
+	else
+	{
+		// upper right quadrant
+		vec2 spotOffset = vec2(-0.25, 0.25);
 
-	// normalized screen quad ratio
-	vec2 QuadRatio = vec2(1.0, u_screen_dims.y / u_screen_dims.x);
-
-	// normalized screen quad ratio
-	// upper right quadrant
-	vec2 spotOffset = vec2(-0.25, 0.25); // 0 degrees
-	if (u_rotation_type.x == 1.0)
-		spotOffset = vec2(-0.25, -0.25); // 90 degrees
-	if (u_rotation_type.x == 2.0)
-		spotOffset = vec2(0.25, -0.25); // 180 degrees
-	if (u_rotation_type.x == 3.0)
-		spotOffset = vec2(0.25, 0.25); // 270 degrees
-
-	vec2 SpotCoord = (coord + spotOffset * RatioCorrection) / RatioCorrection;
+		// normalized screen canvas ratio
+		vec2 CanvasRatio = ((u_swap_xy.x > 0.0) ? vec2(1.0, u_quad_dims.x / u_quad_dims.y) : vec2(1.0, u_quad_dims.y / u_quad_dims.x));
+		
+		SpotCoord += spotOffset;
+		SpotCoord *= CanvasRatio;
+	}
 
 	float SpotBlur = amount;
 
@@ -110,17 +119,17 @@ float GetSpotAddend(vec2 coord, float amount)
 
 float GetRoundCornerFactor(vec2 coord, float radiusAmount, float smoothAmount)
 {
-	vec2 RatioCorrection = GetRatioCorrection();
-
 	// reduce smooth amount down to radius amount
 	smoothAmount = min(smoothAmount, radiusAmount);
 
-	float range = min(u_screen_dims.x, u_screen_dims.y) * 0.5;
+	vec2 quadDims = (u_prepare_vector.x > 0.0 && u_swap_xy.x > 0.0) ? u_quad_dims.yx : u_quad_dims.xy;
+
+	float range = min(quadDims.x, quadDims.y) * 0.5;
 	float radius = range * max(radiusAmount, 0.0025);
 	float smooth_val = 1.0 / (range * max(smoothAmount, 0.0025));
 
 	// compute box
-	float box = roundBox(u_screen_dims.xy * (coord * 2.0f), u_screen_dims.xy * RatioCorrection, radius);
+	float box = roundBox(quadDims * (coord * 2.0f), quadDims, radius);
 
 	// apply smooth
 	box *= smooth_val;
@@ -155,19 +164,11 @@ vec2 GetDistortedCoords(vec2 centerCoord, float amount)
 
 vec2 GetCoords(vec2 coord, float distortionAmount)
 {
-	vec2 RatioCorrection = GetRatioCorrection();
-
 	// center coordinates
 	coord -= 0.5;
 
-	// apply ratio difference between screen and quad
-	coord /= RatioCorrection;
-
 	// distort coordinates
 	coord = GetDistortedCoords(coord, distortionAmount);
-
-	// revert ratio difference between screen and quad
-	coord *= RatioCorrection;
 
 	// un-center coordinates
 	coord += 0.5;

@@ -36,6 +36,11 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 	}
 
 	bgfx_effect* effect = effects.effect(value["effect"].GetString());
+    if (effect == nullptr)
+    {
+        return nullptr;
+    }
+
     std::string name = value["name"].GetString();
 
 	std::vector<bgfx_input_pair> inputs;

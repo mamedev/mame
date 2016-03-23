@@ -29,10 +29,19 @@ bgfx_input_pair::bgfx_input_pair(int index, std::string sampler, std::string tex
 void bgfx_input_pair::bind(bgfx_effect *effect, target_manager& targets, texture_manager& textures, const int32_t screen) const
 {
     assert(effect->uniform(m_sampler) != nullptr);
-    std::string texture = m_texture;
+    std::string name = m_texture;
     if (targets.target(m_texture + std::to_string(screen)) != nullptr)
     {
-        texture = m_texture + std::to_string(screen);
+        name = m_texture + std::to_string(screen);
     }
-	bgfx::setTexture(m_index, effect->uniform(m_sampler)->handle(), textures.handle(texture));
+
+    bgfx_texture_handle_provider* provider = textures.provider(name);
+    bgfx_uniform *tex_size = effect->uniform("u_tex_size" + std::to_string(m_index));
+    if (tex_size != nullptr)
+    {
+        float values[2] = { float(provider->width()), float(provider->height()) };
+        tex_size->set(values, sizeof(float) * 2);
+    }
+
+	bgfx::setTexture(m_index, effect->uniform(m_sampler)->handle(), textures.handle(name));
 }

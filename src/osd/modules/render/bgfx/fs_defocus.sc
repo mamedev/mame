@@ -9,7 +9,7 @@ $input v_color0, v_texcoord0
 #include "../../../../../3rdparty/bgfx/examples/common/common.sh"
 
 // Autos
-uniform vec4 u_screen_dims;
+uniform vec4 u_tex_size0;
 
 // User-supplied
 uniform vec4 u_defocus;
@@ -32,7 +32,7 @@ void main()
 	const vec2 Coord7Offset = vec2( 0.50, -0.75);
 	const vec2 Coord8Offset = vec2( 1.00, -0.25);
 
-	vec2 DefocusTexelDims = u_defocus.xy / u_screen_dims.xy;
+	vec2 DefocusTexelDims = u_defocus.xy / u_tex_size0.xy;
 	
 	vec4 d0 = texture2D(s_tex, v_texcoord0);
 	vec4 d1 = texture2D(s_tex, v_texcoord0 + Coord1Offset * DefocusTexelDims);
@@ -46,5 +46,5 @@ void main()
 
 	vec4 blurred = (d0 + d1 + d2 + d3 + d4 + d5 + d6 + d7 + d8) / 9.0;
 
-	gl_FragColor = vec4(blurred.xyz, 1.0) * v_color0;
+	gl_FragColor = vec4(blurred.rgb, 1.0) * v_color0;
 }

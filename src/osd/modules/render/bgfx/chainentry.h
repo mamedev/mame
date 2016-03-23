@@ -45,12 +45,13 @@ public:
 private:
 	void setup_auto_uniforms(render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint32_t rotation_type, bool swap_xy, int32_t screen);
 	void setup_screensize_uniforms(texture_manager& textures, uint16_t screen_width, uint16_t screen_height, int32_t screen);
-	void setup_sourcesize_uniform(render_primitive* prim);
-	void setup_rotationtype_uniform(uint32_t rotation_type);
-	void setup_swapxy_uniform(bool swap_xy);
+	void setup_sourcesize_uniform(render_primitive* prim) const;
+	void setup_rotationtype_uniform(uint32_t rotation_type) const;
+	void setup_swapxy_uniform(bool swap_xy) const;
+    void setup_quaddims_uniform(render_primitive* prim) const;
 
-	bool setup_view(int view, uint16_t screen_width, uint16_t screen_height, int32_t screen);
-	void put_screen_buffer(render_primitive* prim, bgfx::TransientVertexBuffer* buffer);
+	bool setup_view(int view, uint16_t screen_width, uint16_t screen_height, int32_t screen) const;
+	void put_screen_buffer(render_primitive* prim, bgfx::TransientVertexBuffer* buffer) const;
 
 	std::string                     	m_name;
 	bgfx_effect*                    	m_effect;
