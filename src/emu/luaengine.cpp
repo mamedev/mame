@@ -1390,6 +1390,22 @@ void lua_engine::attach_notifiers()
 	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(lua_engine::on_machine_frame), this));
 }
 
+int lua_engine::lua_machine::l_popmessage(lua_State *L)
+{
+	running_machine *m = luabridge::Stack<running_machine *>::get(L, 1);
+	luaL_argcheck(L, lua_isstring(L, 2), 2, "message (string) expected");
+	m->popmessage("%s", luaL_checkstring(L, 2));
+	return 0;
+}
+
+int lua_engine::lua_machine::l_logerror(lua_State *L)
+{
+	running_machine *m = luabridge::Stack<running_machine *>::get(L, 1);
+	luaL_argcheck(L, lua_isstring(L, 2), 2, "message (string) expected");
+	m->logerror("[luaengine] %s\n", luaL_checkstring(L, 2));
+	return 0;
+}
+
 //-------------------------------------------------
 //  initialize - initialize lua hookup to emu engine
 //-------------------------------------------------
@@ -1421,7 +1437,11 @@ void lua_engine::initialize()
 				.addFunction ("machine", &machine_manager::machine)
 				.addFunction ("options", &machine_manager::options)
 			.endClass ()
-			.beginClass <running_machine> ("machine")
+			.beginClass <lua_machine> ("lua_machine")
+				.addCFunction ("popmessage", &lua_machine::l_popmessage)
+				.addCFunction ("logerror", &lua_machine::l_logerror)
+			.endClass ()
+			.deriveClass <running_machine, lua_machine> ("machine")
 				.addFunction ("exit", &running_machine::schedule_exit)
 				.addFunction ("hard_reset", &running_machine::schedule_hard_reset)
 				.addFunction ("soft_reset", &running_machine::schedule_soft_reset)
