@@ -9,6 +9,13 @@
 #ifndef INPUT_WIN_H_
 #define INPUT_WIN_H_
 
+// standard windows headers
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#undef interface
+
+#include "window.h"
+
 //============================================================
 //  TYPEDEFS
 //============================================================
@@ -37,7 +44,8 @@ protected:
 
 public:
 	wininput_module(const char * type, const char * name)
-		: input_module_base(type, name)
+		: input_module_base(type, name),
+			m_global_inputs_enabled(false)
 	{
 	}
 

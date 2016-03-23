@@ -61,6 +61,7 @@
 # USE_SYSTEM_LIB_SQLITE3 = 1
 # USE_SYSTEM_LIB_PORTMIDI = 1
 # USE_SYSTEM_LIB_PORTAUDIO = 1
+# USE_SYSTEM_LIB_UV = 1
 # USE_BUNDLED_LIB_SDL2 = 1
 
 # MESA_INSTALL_ROOT = /opt/mesa
@@ -182,6 +183,13 @@ endif
 ifndef OS
 $(error Unable to detect OS from uname -a: $(UNAME))
 endif
+endif
+
+MINGW:=
+ifdef MINGW64
+	MINGW := $(MINGW64)
+else
+	MINGW := $(MINGW32)
 endif
 
 #-------------------------------------------------
@@ -401,6 +409,10 @@ endif
 
 ifdef USE_BUNDLED_LIB_SDL2
 PARAMS += --with-bundled-sdl2
+endif
+
+ifndef USE_SYSTEM_LIB_UV
+PARAMS += --with-bundled-libuv
 endif
 
 #-------------------------------------------------
@@ -839,6 +851,7 @@ FULLTARGET := $(TARGET)$(SUBTARGET)
 endif
 PROJECTDIR := $(BUILDDIR)/projects/$(OSD)/$(FULLTARGET)
 PROJECTDIR_MINI := $(BUILDDIR)/projects/osdmini/$(FULLTARGET)
+PROJECTDIR_SDL := $(BUILDDIR)/projects/sdl/$(FULLTARGET)
 PROJECTDIR_WIN := $(BUILDDIR)/projects/windows/$(FULLTARGET)
 
 .PHONY: all clean regenie generate
@@ -949,6 +962,13 @@ vs2015_xp: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2015-xp vs2015
 ifdef MSBUILD
 	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2015_uwp
+vs2015_uwp: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=windows --NO_USE_MIDI=1 --USE_LIBUV=0 --NO_OPENGL=1 --USE_QTDEBUG=0 --MODERN_WIN_API=1 vs2015
+ifdef MSBUILD
+	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 #-------------------------------------------------
@@ -1291,15 +1311,39 @@ endif
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --NO_OPENGL=1 --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  gmake  
 
 .PHONY: steamlink
+steamlink: generate $(PROJECTDIR)/gmake-steamlink/Makefile
 ifndef MARVELL_SDK_PATH
 	$(error MARVELL_SDK_PATH is not set)
 endif
 ifndef MARVELL_ROOTFS
 	$(error MARVELL_ROOTFS is not set)
 endif
-steamlink: generate $(PROJECTDIR)/gmake-steamlink/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-steamlink config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-steamlink config=$(CONFIG)
+
+#-------------------------------------------------
+# gmake-rpi
+#-------------------------------------------------
+
+$(PROJECTDIR_SDL)/gmake-rpi/Makefile: makefile $(SCRIPTS) $(GENIE)
+ifndef RASPBERRY_SDK_PATH
+	$(error RASPBERRY_SDK_PATH is not set)
+endif
+ifndef RASPBERRY_SYSROOT
+	$(error RASPBERRY_SYSROOT is not set)
+endif
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=rpi --gcc_version=4.9.2 --osd=sdl --targetos=rpi --targetos=rpi --NO_USE_MIDI=1 --PLATFORM=arm --NOASM=1 --USE_QTDEBUG=0 --SDL_INSTALL_ROOT=$(RASPBERRY_SYSROOT)/usr  gmake  
+
+.PHONY: rpi
+rpi: generate $(PROJECTDIR_SDL)/gmake-rpi/Makefile
+ifndef RASPBERRY_SDK_PATH
+	$(error RASPBERRY_SDK_PATH is not set)
+endif
+ifndef RASPBERRY_SYSROOT
+	$(error RASPBERRY_SYSROOT is not set)
+endif
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-rpi config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-rpi config=$(CONFIG)
 
 #-------------------------------------------------
 # cmake
@@ -1481,9 +1525,17 @@ cppcheck:
 # BGFX shaders
 #-------------------------------------------------
 
-.PHONY: shaders
+.PHONY: shaders bgfx-tools
 
-shaders:
+bgfx-tools:
+	$(SILENT) $(MAKE) -C 3rdparty/bgfx -f makefile dist-$(GENIEOS) CC="$(CC)" CXX="$(CXX)" MINGW="$(MINGW)"
+
+shaders: bgfx-tools
+	-$(call MKDIR,build/bgfx/shaders/dx11)
+	-$(call MKDIR,build/bgfx/shaders/dx9)
+	-$(call MKDIR,build/bgfx/shaders/gles)
+	-$(call MKDIR,build/bgfx/shaders/glsl)
+	-$(call MKDIR,build/bgfx/shaders/metal)	
 	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx rebuild
 	
 #-------------------------------------------------

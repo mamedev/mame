@@ -64,8 +64,6 @@ struct osd_video_config
 	int                 syncrefresh;                // sync only to refresh rate
 	int                 switchres;                  // switch resolutions
 
-	int                 fullstretch;    // FXIME: implement in windows!
-
 	// d3d, accel, opengl
 	int                 filter;                     // enable filtering
 	//int                 filter;         // enable filtering, disabled if glsl_filter>0

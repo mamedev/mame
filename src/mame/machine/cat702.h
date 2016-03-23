@@ -14,6 +14,11 @@ extern const device_type CAT702;
 #define MCFG_CAT702_DATAOUT_HANDLER(_devcb) \
 	devcb = &cat702_device::set_dataout_handler(*device, DEVCB_##_devcb);
 
+#define MCFG_CAT702_TRANSFORM_TABLE(_table) \
+	cat702_device::static_set_transform_table(*device, _table);
+
+class validity_checker;
+
 class cat702_device : public device_t
 {
 public:
@@ -21,8 +26,7 @@ public:
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_dataout_handler(device_t &device, _Object object) { return downcast<cat702_device &>(device).m_dataout_handler.set_callback(object); }
-
-	void init(const UINT8 *transform); // TODO: region
+	static void static_set_transform_table(device_t &device, const UINT8 *transform); // TODO: region
 
 	DECLARE_WRITE_LINE_MEMBER(write_select);
 	DECLARE_WRITE_LINE_MEMBER(write_datain);
@@ -30,6 +34,7 @@ public:
 
 protected:
 	virtual void device_start() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
 	UINT8 compute_sbox_coef(int sel, int bit);

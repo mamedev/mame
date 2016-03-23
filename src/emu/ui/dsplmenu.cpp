@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /*********************************************************************
 
     ui/dsplmenu.cpp
@@ -37,16 +37,14 @@ ui_menu_display_options::dspl_option ui_menu_display_options::m_options[] = {
 	{ 0, nullptr, nullptr },
 	{ 0, __("Video Mode"),               OSDOPTION_VIDEO },
 #if defined(UI_WINDOWS) && !defined(UI_SDL)
-	{ 0, __("Hardware Stretch"),         WINOPTION_HWSTRETCH },
 	{ 0, __("Triple Buffering"),         WINOPTION_TRIPLEBUFFER },
 	{ 0, __("HLSL"),                     WINOPTION_HLSL_ENABLE },
 #endif
 	{ 0, __("GLSL"),                     OSDOPTION_GL_GLSL },
 	{ 0, __("Bilinear Filtering"),       OSDOPTION_FILTER },
 	{ 0, __("Bitmap Prescaling"),        OSDOPTION_PRESCALE },
-	{ 0, __("Multi-Threaded Rendering"), OSDOPTION_MULTITHREADING },
 	{ 0, __("Window Mode"),              OSDOPTION_WINDOW },
-	{ 0, __("Enforce Aspect Ratio"),     OSDOPTION_KEEPASPECT },
+	{ 0, __("Enforce Aspect Ratio"),     OPTION_KEEPASPECT },
 	{ 0, __("Start Out Maximized"),      OSDOPTION_MAXIMIZE },
 	{ 0, __("Synchronized Refresh"),     OSDOPTION_SYNCREFRESH },
 	{ 0, __("Wait Vertical Sync"),       OSDOPTION_WAITVSYNC }

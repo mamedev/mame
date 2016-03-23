@@ -35,27 +35,28 @@
 
 struct ui_arts_info
 {
-	const char *title, *path, *addpath;
+	const char *title, *path;
 };
 
 static const ui_arts_info arts_info[] =
 {
-	{ __("Snapshots"), OPTION_SNAPSHOT_DIRECTORY, "snap" },
-	{ __("Cabinets"), OPTION_CABINETS_PATH, "cabinets;cabdevs" },
-	{ __("Control Panels"), OPTION_CPANELS_PATH, "cpanel" },
-	{ __("PCBs"), OPTION_PCBS_PATH, "pcb" },
-	{ __("Flyers"), OPTION_FLYERS_PATH, "flyers" },
-	{ __("Titles"), OPTION_TITLES_PATH, "titles" },
-	{ __("Ends"), OPTION_ENDS_PATH, "ends" },
-	{ __("Artwork Preview"), OPTION_ARTPREV_PATH, "artwork preview" },
-	{ __("Bosses"), OPTION_BOSSES_PATH, "bosses" },
-	{ __("Logos"), OPTION_LOGOS_PATH, "logo" },
-	{ __("Versus"), OPTION_VERSUS_PATH, "versus" },
-	{ __("Game Over"), OPTION_GAMEOVER_PATH, "gameover" },
-	{ __("HowTo"), OPTION_HOWTO_PATH, "howto" },
-	{ __("Scores"), OPTION_SCORES_PATH, "scores" },
-	{ __("Select"), OPTION_SELECT_PATH, "select" },
-	{ __("Marquees"), OPTION_MARQUEES_PATH, "marquees" },
+	{ __("Snapshots"), OPTION_SNAPSHOT_DIRECTORY },
+	{ __("Cabinets"), OPTION_CABINETS_PATH },
+	{ __("Control Panels"), OPTION_CPANELS_PATH },
+	{ __("PCBs"), OPTION_PCBS_PATH },
+	{ __("Flyers"), OPTION_FLYERS_PATH },
+	{ __("Titles"), OPTION_TITLES_PATH },
+	{ __("Ends"), OPTION_ENDS_PATH },
+	{ __("Artwork Preview"), OPTION_ARTPREV_PATH },
+	{ __("Bosses"), OPTION_BOSSES_PATH },
+	{ __("Logos"), OPTION_LOGOS_PATH },
+	{ __("Versus"), OPTION_VERSUS_PATH },
+	{ __("Game Over"), OPTION_GAMEOVER_PATH },
+	{ __("HowTo"), OPTION_HOWTO_PATH },
+	{ __("Scores"), OPTION_SCORES_PATH },
+	{ __("Select"), OPTION_SELECT_PATH },
+	{ __("Marquees"), OPTION_MARQUEES_PATH },
+	{ __("Covers"), OPTION_COVER_PATH },
 	{ nullptr }
 };
 
@@ -1646,17 +1647,24 @@ void ui_menu::get_title_search(std::string &snaptext, std::string &searchstr)
 	snaptext.assign(_(arts_info[ui_globals::curimage_view].title));
 
 	// get search path
+	std::string addpath;
 	if (ui_globals::curimage_view == SNAPSHOT_VIEW)
+	{
+		emu_options moptions;
 		searchstr = machine().options().value(arts_info[ui_globals::curimage_view].path);
+		addpath = moptions.value(arts_info[ui_globals::curimage_view].path);
+	}
 	else
+	{
+		ui_options moptions;
 		searchstr = machine().ui().options().value(arts_info[ui_globals::curimage_view].path);
+		addpath = moptions.value(arts_info[ui_globals::curimage_view].path);
+	}
 
 	std::string tmp(searchstr);
 	path_iterator path(tmp.c_str());
-	std::string curpath;
-
-	path_iterator path_iter(arts_info[ui_globals::curimage_view].addpath);
-	std::string c_path;
+	path_iterator path_iter(addpath.c_str());
+	std::string c_path, curpath;
 
 	// iterate over path and add path for zipped formats
 	while (path.next(curpath))
@@ -2090,7 +2098,16 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 	buffer[RP_IMAGES] = _("Images");
 	buffer[RP_INFOS] = _("Infos");
 
-	for (int cells = RP_IMAGES; cells <= RP_INFOS; cells++)
+	// check size
+	float text_size = 1.0f;
+	for (auto & elem : buffer)
+	{
+		float textlen = mui.get_string_width(elem.c_str()) + 0.01f;
+		float tmp_size = (textlen > midl) ? (midl / textlen) : 1.0f;
+		text_size = MIN(text_size, tmp_size);
+	}
+
+	for (int cells = RP_FIRST; cells <= RP_LAST; ++cells)
 	{
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
 		rgb_t fgcolor = UI_TEXT_COLOR;
@@ -2126,7 +2143,7 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 				bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		mui.draw_text_full(container, buffer[cells].c_str(), x1 + UI_LINE_WIDTH, y1, midl - UI_LINE_WIDTH,
-			JUSTIFY_CENTER, WRAP_NEVER, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+			JUSTIFY_CENTER, WRAP_NEVER, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
 		x1 += midl;
 	}
 
@@ -2143,6 +2160,7 @@ std::string ui_menu::arts_render_common(float origx1, float origy1, float origx2
 	float line_height = mui.get_line_height();
 	std::string snaptext, searchstr;
 	get_title_search(snaptext, searchstr);
+	float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
 
 	// apply title to right panel
 	float title_size = 0.0f;
@@ -2166,12 +2184,17 @@ std::string ui_menu::arts_render_common(float origx1, float origy1, float origx2
 
 	float middle = origx2 - origx1;
 
+	// check size
+	float sc = title_size + 2.0f * gutter_width;
+	float tmp_size = (sc > middle) ? ((middle - 2.0f * gutter_width) / sc) : 1.0f;
+	title_size *= tmp_size;
+
 	if (bgcolor != UI_TEXT_BG_COLOR)
 		mui.draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
 			origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 	mui.draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+		DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
 
 	draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
 
@@ -2213,16 +2236,15 @@ void ui_menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software
 		if (t_bitmap[x]->valid())
 			m_valid++;
 
-	float x_pixel = 1.0f / container->manager().ui_target().width();
-	int h_len = mui.get_line_height() * container->manager().ui_target().height();
-	h_len = (h_len % 2 == 0) ? h_len : h_len - 1;
-	x1 = (x1 + x2) * 0.5f - x_pixel * (m_valid * ((h_len / 2) + 2));
+	float space_x = (y2 - y1) * container->manager().ui_aspect();
+	float total = (m_valid * space_x) + ((m_valid - 1) * 0.01f);
+	x1 = ((x2 - x1) * 0.5f) - (total / 2);
+	x2 = x1 + space_x;
 
 	for (int z = 0; z < UI_TOOLBAR_BUTTONS; ++z)
 	{
 		if (t_bitmap[z]->valid())
 		{
-			x2 = x1 + x_pixel * h_len;
 			rgb_t color(0xEFEFEFEF);
 			if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y2 > mouse_y)
 			{
@@ -2233,7 +2255,8 @@ void ui_menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software
 			}
 
 			container->add_quad(x1, y1, x2, y2, color, t_texture[z], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			x1 += x_pixel * (h_len + 2);
+			x1 += space_x + ((z < UI_TOOLBAR_BUTTONS - 1) ? 0.01f : 0.0f);
+			x2 = x1 + space_x;
 		}
 	}
 }
@@ -2264,6 +2287,11 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 		float panel_height = origy2 - origy1 - 0.02f - (2.0f * UI_BOX_TB_BORDER) - (2.0f * line_height);
 		int screen_width = machine().render().ui_target().width();
 		int screen_height = machine().render().ui_target().height();
+
+		int rot = machine().render().ui_target().orientation();
+		if (rot == ROT90 || rot == ROT270)
+			std::swap(screen_height, screen_width);
+
 		int panel_width_pixel = panel_width * screen_width;
 		int panel_height_pixel = panel_height * screen_height;
 		float ratio = 0.0f;
@@ -2366,13 +2394,13 @@ void ui_menu::draw_common_arrow(float origx1, float origy1, float origx2, float 
 
 	// apply arrow
 	if (current == dmin)
-		container->add_quad(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor_right, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90) | PRIMFLAG_PACKABLE);
+		draw_arrow(container, ar_x0, ar_y0, ar_x1, ar_y1, fgcolor_right, ROT90);
 	else if (current == dmax)
-		container->add_quad(al_x0, al_y0, al_x1, al_y1, fgcolor_left, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90 ^ ORIENTATION_FLIP_X) | PRIMFLAG_PACKABLE);
+		draw_arrow(container, al_x0, al_y0, al_x1, al_y1, fgcolor_left, ROT90 ^ ORIENTATION_FLIP_X);
 	else
 	{
-		container->add_quad(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor_right, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90) | PRIMFLAG_PACKABLE);
-		container->add_quad(al_x0, al_y0, al_x1, al_y1, fgcolor_left, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90 ^ ORIENTATION_FLIP_X) | PRIMFLAG_PACKABLE);
+		draw_arrow(container, ar_x0, ar_y0, ar_x1, ar_y1, fgcolor_right, ROT90);
+		draw_arrow(container, al_x0, al_y0, al_x1, al_y1, fgcolor_left, ROT90 ^ ORIENTATION_FLIP_X);
 	}
 }
 
@@ -2426,6 +2454,11 @@ void ui_menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 			float panel_height = y1 - y0;
 			int screen_width = machine().render().ui_target().width();
 			int screen_height = machine().render().ui_target().height();
+
+			int rot = machine().render().ui_target().orientation();
+			if (rot == ROT90 || rot == ROT270)
+				std::swap(screen_height, screen_width);
+
 			int panel_width_pixel = panel_width * screen_width;
 			int panel_height_pixel = panel_height * screen_height;
 

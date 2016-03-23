@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    ui/filesel.c
+    ui/filesel.cpp
 
     MESS's clunky built-in file manager
 
@@ -474,7 +474,7 @@ ui_menu_file_selector::file_selector_entry *ui_menu_file_selector::append_dirent
 	}
 
 	// determine the full path
-	zippath_combine(buffer, m_current_directory.c_str(), dirent->name);
+	util::zippath_combine(buffer, m_current_directory.c_str(), dirent->name);
 
 	// create the file selector entry
 	entry = append_entry(
@@ -535,8 +535,8 @@ void ui_menu_file_selector::append_entry_menu_item(const file_selector_entry *en
 
 void ui_menu_file_selector::populate()
 {
-	zippath_directory *directory = nullptr;
-	file_error err;
+	util::zippath_directory *directory = nullptr;
+	osd_file::error err;
 	const osd_directory_entry *dirent;
 	const file_selector_entry *entry;
 	const file_selector_entry *selected_entry = nullptr;
@@ -545,7 +545,7 @@ void ui_menu_file_selector::populate()
 	const char *path = m_current_directory.c_str();
 
 	// open the directory
-	err = zippath_opendir(path, &directory);
+	err = util::zippath_opendir(path, &directory);
 
 	// clear out the menu entries
 	m_entrylist = nullptr;
@@ -579,9 +579,9 @@ void ui_menu_file_selector::populate()
 	}
 
 	// build the menu for each item
-	if (err == FILERR_NONE)
+	if (err == osd_file::error::NONE)
 	{
-		while((dirent = zippath_readdir(directory)) != nullptr)
+		while((dirent = util::zippath_readdir(directory)) != nullptr)
 		{
 			// append a dirent entry
 			entry = append_dirent_entry(dirent);
@@ -611,7 +611,7 @@ void ui_menu_file_selector::populate()
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 
 	if (directory != nullptr)
-		zippath_closedir(directory);
+		util::zippath_closedir(directory);
 }
 
 
@@ -621,7 +621,7 @@ void ui_menu_file_selector::populate()
 
 void ui_menu_file_selector::handle()
 {
-	file_error err;
+	osd_file::error err;
 	const file_selector_entry *entry;
 	const file_selector_entry *selected_entry = nullptr;
 	int bestmatch = 0;
@@ -656,8 +656,8 @@ void ui_menu_file_selector::handle()
 				case SELECTOR_ENTRY_TYPE_DRIVE:
 				case SELECTOR_ENTRY_TYPE_DIRECTORY:
 					// drive/directory - first check the path
-					err = zippath_opendir(entry->fullpath, nullptr);
-					if (err != FILERR_NONE)
+					err = util::zippath_opendir(entry->fullpath, nullptr);
+					if (err != osd_file::error::NONE)
 					{
 						// this path is problematic; present the user with an error and bail
 						machine().ui().popup_time(1, "Error accessing %s", entry->fullpath);

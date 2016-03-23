@@ -91,7 +91,7 @@ namespace netlist
 		class source_t
 		{
 		public:
-			typedef plist_t<source_t *> list_t;
+			typedef pvector_t<source_t *> list_t;
 
 			source_t()
 			{}
@@ -181,7 +181,7 @@ namespace netlist
 
 		/* register a source */
 
-		void register_source(source_t *src) { m_sources.add(src); }
+		void register_source(source_t *src) { m_sources.push_back(src); }
 
 		factory_list_t &factory() { return *m_factory; }
 		const factory_list_t &factory() const { return *m_factory; }
@@ -224,17 +224,18 @@ namespace netlist
 		phashmap_t<pstring, pstring> m_params_temp;
 		phashmap_t<pstring, core_terminal_t *> m_terminals;
 
-		plist_t<link_t> m_links;
+		pvector_t<link_t> m_links;
 
 		factory_list_t *m_factory;
 
 		phashmap_t<pstring, pstring> m_models;
 
 		int m_proxy_cnt;
+		int m_frontier_cnt;
 
-		pstack_t<pstring> m_stack;
+		std::stack<pstring> m_stack;
 		source_t::list_t m_sources;
-		plist_t<pstring> m_lib;
+		pvector_t<pstring> m_lib;
 
 	};
 

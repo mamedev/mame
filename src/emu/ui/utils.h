@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /***************************************************************************
 
     ui/utils.h
@@ -271,9 +271,9 @@ void render_load_jpeg(_T &bitmap, emu_file &file, const char *dirname, const cha
 	else
 		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
 
-	file_error filerr = file.open(fname.c_str());
+	osd_file::error filerr = file.open(fname.c_str());
 
-	if (filerr != FILERR_NONE)
+	if (filerr != osd_file::error::NONE)
 		return;
 
 	// define standard JPEG structures

@@ -84,7 +84,7 @@ class pstate_manager_t;
 class pstate_callback_t
 {
 public:
-	typedef plist_t<pstate_callback_t *> list_t;
+	typedef pvector_t<pstate_callback_t *> list_t;
 
 	virtual ~pstate_callback_t() { };
 
@@ -96,7 +96,7 @@ protected:
 
 struct pstate_entry_t
 {
-	typedef plist_t<pstate_entry_t *> list_t;
+	typedef pvector_t<pstate_entry_t *> list_t;
 
 	pstate_entry_t(const pstring &stname, const pstate_data_type_e dt, const void *owner,
 			const int size, const int count, void *ptr, bool is_ptr)

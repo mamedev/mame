@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /***************************************************************************
 
     ui/inifile.h
@@ -22,41 +22,36 @@
 class inifile_manager
 {
 public:
-	// category structure
-	struct IniCategoryIndex
-	{
-		IniCategoryIndex(std::string _name, long _offset) { name = _name; offset = _offset; }
-		std::string name;
-		long offset;
-	};
-
-	using categoryindex = std::vector<IniCategoryIndex>;
-
-	// ini file structure
-	struct IniFileIndex
-	{
-		IniFileIndex(std::string _name, categoryindex _category) { name = _name; category = _category; }
-		std::string name;
-		categoryindex category;
-	};
-
 	// construction/destruction
 	inifile_manager(running_machine &machine);
 
 	// getters
 	running_machine &machine() const { return m_machine; }
+	std::string get_file(int file = -1) { return ((file == -1) ? ini_index[c_file].first : ini_index[file].first); }
+	std::string get_category(int cat = -1) { return ((cat == -1) ? ini_index[c_file].second[c_cat].first : ini_index[c_file].second[cat].first); }
+	size_t total() { return ini_index.size(); }
+	size_t cat_total() { return ini_index[c_file].second.size(); }
+	UINT16 &cur_file() { return c_file; }
+	UINT16 &cur_cat() { return c_cat; }
 
 	// load games from category
 	void load_ini_category(std::vector<int> &temp_filter);
 
-	// files indices
-	std::vector<IniFileIndex> ini_index;
-	static UINT16 current_file, current_category;
-
-	std::string actual_file() { return ini_index[current_file].name; }
-	std::string actual_category() { return ini_index[current_file].category[current_category].name; }
+	// setters
+	void move_file(int d) { c_file += d; c_cat = 0; }
+	void move_cat(int d) { c_cat += d; }
+	void set_cat(int i = -1) { (i == -1) ? c_cat = 0 : c_cat = i; }
+	void set_file(int i = -1) { (i == -1) ? c_file = 0 : c_file = i; }
 
 private:
+
+	// ini file structure
+	using categoryindex = std::vector<std::pair<std::string, long>>;
+
+	// files indices
+	static UINT16 c_file, c_cat;
+	std::vector<std::pair<std::string, categoryindex>> ini_index;
+
 	// init category index
 	void init_category(std::string &filename);
 

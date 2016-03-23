@@ -6,11 +6,6 @@
 
 **********************************************************************/
 
-// The Japanese Sports Pad controller is only required to play the cartridge
-// Sports Pad Soccer, released in Japan. It uses a different mode than the
-// used by the US model, due to missing output lines on Sega Mark III
-// controller ports.
-
 #pragma once
 
 #ifndef __SMS_SPORTS_PAD_JP__

@@ -80,6 +80,12 @@ newoption {
 	description = "Set iOS target version (default: 8.0).",
 }
 
+newoption {
+	trigger = "with-windows",
+	value = "#",
+	description = "Set the Windows target platform version (default: 10.0.10240.0).",
+}
+
 function toolchain(_buildDir, _subDir)
 
 	location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION)
@@ -92,6 +98,11 @@ function toolchain(_buildDir, _subDir)
 	local iosPlatform = ""
 	if _OPTIONS["with-ios"] then
 		iosPlatform = _OPTIONS["with-ios"]
+	end
+	
+	local windowsPlatform = "10.0.10240.0"
+	if _OPTIONS["with-windows"] then
+		windowsPlatform = _OPTIONS["with-windows"]
 	end
 
 	if _ACTION == "gmake" then
@@ -245,6 +256,16 @@ function toolchain(_buildDir, _subDir)
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-steamlink")
 		end
 
+		if "rpi" == _OPTIONS["gcc"] then
+			if not os.getenv("RASPBERRY_SDK_PATH") then
+				print("Set RASPBERRY_SDK_PATH envrionment variable.")
+			end
+			premake.gcc.cc  = "$(RASPBERRY_SDK_PATH)/bin/arm-linux-gnueabihf-gcc"
+			premake.gcc.cxx = "$(RASPBERRY_SDK_PATH)/bin/arm-linux-gnueabihf-g++"
+			premake.gcc.ar  = "$(RASPBERRY_SDK_PATH)/bin/arm-linux-gnueabihf-ar"
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-rpi")
+		end
+
 		if "mingw32-gcc" == _OPTIONS["gcc"] then
 			if not os.getenv("MINGW32") then
 				print("Set MINGW32 envrionment variable.")
@@ -360,6 +381,15 @@ function toolchain(_buildDir, _subDir)
 		if "winstore82" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = "v140"
 			premake.vstudio.storeapp = "8.2"
+			
+			-- If needed, depending on GENie version, enable file-level configuration
+			if enablefilelevelconfig ~= nil then
+				enablefilelevelconfig()
+			end
+			
+			local action = premake.action.current()
+			action.vstudio.windowsTargetPlatformVersion = windowsPlatform
+			
 			platforms { "ARM" }
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-winstore82")
 		end
@@ -510,6 +540,37 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "steamlink", "Debug" }
 		targetdir (_buildDir .. "steamlink/bin/Debug")
+
+	configuration { "rpi" }
+		objdir ( _buildDir .. "rpi/obj")
+		libdirs {
+			"$(RASPBERRY_SYSROOT)/opt/vc/lib",
+		}
+		includedirs {
+			"$(RASPBERRY_SYSROOT)/opt/vc/include",
+			"$(RASPBERRY_SYSROOT)/opt/vc/include/interface/vcos/pthreads",
+			"$(RASPBERRY_SYSROOT)/opt/vc/include/interface/vmcs_host/linux",
+		}
+		defines {
+			"__VCCOREVER__=0x04000000", -- There is no special prefedined compiler symbol to detect RaspberryPi, faking it.
+		} 
+		linkoptions {
+			"-Wl,--gc-sections",
+		}
+		buildoptions {
+			"--sysroot=$(RASPBERRY_SYSROOT)",
+		}
+		linkoptions {
+			"-static-libgcc",
+			"-static-libstdc++",
+			"--sysroot=$(RASPBERRY_SYSROOT)",
+		}
+
+	configuration { "rpi", "Release" }
+		targetdir (_buildDir .. "rpi/bin/Release")
+
+	configuration { "rpi", "Debug" }
+		targetdir (_buildDir .. "rpi/bin/Debug")
 
 	configuration { "mingw-clang" }
 		linkoptions {

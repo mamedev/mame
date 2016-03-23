@@ -17,20 +17,20 @@ namespace netlist
 // net_device_t_base_factory
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD const pstring_list_t base_factory_t::term_param_list()
+ATTR_COLD const pstring_vector_t base_factory_t::term_param_list()
 {
 	if (m_def_param.startsWith("+"))
-		return pstring_list_t(m_def_param.substr(1), ",");
+		return pstring_vector_t(m_def_param.substr(1), ",");
 	else
-		return pstring_list_t();
+		return pstring_vector_t();
 }
 
-ATTR_COLD const pstring_list_t base_factory_t::def_params()
+ATTR_COLD const pstring_vector_t base_factory_t::def_params()
 {
 	if (m_def_param.startsWith("+") || m_def_param.equals("-"))
-		return pstring_list_t();
+		return pstring_vector_t();
 	else
-		return pstring_list_t(m_def_param, ",");
+		return pstring_vector_t(m_def_param, ",");
 }
 
 

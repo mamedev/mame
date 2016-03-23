@@ -478,8 +478,8 @@ void software_list_device::parse()
 	m_errors.clear();
 
 	// attempt to open the file
-	file_error filerr = m_file.open(m_list_name.c_str(), ".xml");
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = m_file.open(m_list_name.c_str(), ".xml");
+	if (filerr == osd_file::error::NONE)
 	{
 		// parse if no error
 		std::ostringstream errs;

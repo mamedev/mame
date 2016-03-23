@@ -110,8 +110,10 @@ public:
 
 	const char *devicename() { return m_name[0] ? m_name : "UNKNOWN"; }
 
-	float aspect();
+	float aspect() { return m_aspect; }
+	float pixel_aspect() { return m_aspect / ((float)m_pos_size.width() / (float)m_pos_size.height()); }
 
+	void update_resolution(const int new_width, const int new_height) { m_pos_size.resize(new_width, new_height); }
 	void set_aspect(const float a) { m_aspect = a; }
 	bool is_primary() { return m_is_primary; }
 
@@ -166,12 +168,11 @@ public:
 
 	int prescale() const { return m_prescale; };
 
-	float aspect() const { return monitor()->aspect(); }
+	float pixel_aspect() const { return monitor()->pixel_aspect(); }
 
 	virtual osd_dim get_size() = 0;
 
 #ifdef OSD_SDL
-	virtual osd_dim blit_surface_size() = 0;
 	virtual osd_monitor_info *monitor() const = 0;
 	virtual SDL_Window *sdl_window() = 0;
 #else
@@ -235,6 +236,7 @@ public:
 	virtual void record() { };
 	virtual void toggle_fsfx() { };
 	virtual bool sliders_dirty() { return m_sliders_dirty; }
+    virtual bool multi_window_sliders() { return false; }
 
 	static osd_renderer* make_for_type(int mode, osd_window *window, int extra_flags = FLAG_NONE);
 

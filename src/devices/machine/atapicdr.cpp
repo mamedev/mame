@@ -2,6 +2,10 @@
 // copyright-holders:smf
 #include "atapicdr.h"
 
+#define SCSI_SENSE_ASC_MEDIUM_NOT_PRESENT 0x3a
+#define SCSI_SENSE_ASC_NOT_READY_TO_READY_TRANSITION 0x28
+#define T10MMC_GET_EVENT_STATUS_NOTIFICATION 0x4a
+
 // device type definition
 const device_type ATAPI_CDROM = &device_creator<atapi_cdrom_device>;
 
@@ -71,6 +75,22 @@ void atapi_cdrom_device::device_start()
 	atapi_hle_device::device_start();
 }
 
+void atapi_cdrom_device::device_reset()
+{
+	atapi_hle_device::device_reset();
+	m_media_change = true;
+}
+
+void atapi_cdrom_device::process_buffer()
+{
+	if(m_cdrom != m_image->get_cdrom_file())
+	{
+		m_media_change = true;
+		SetDevice(m_image->get_cdrom_file());
+	}
+	atapi_hle_device::process_buffer();
+}
+
 void atapi_cdrom_device::perform_diagnostic()
 {
 	m_error = IDE_ERROR_DIAGNOSTIC_PASSED;
@@ -78,4 +98,46 @@ void atapi_cdrom_device::perform_diagnostic()
 
 void atapi_cdrom_device::identify_packet_device()
 {
+}
+
+void atapi_cdrom_device::ExecCommand()
+{
+	switch(command[0])
+	{
+		case T10SBC_CMD_READ_CAPACITY:
+		case T10SBC_CMD_READ_10:
+		case T10MMC_CMD_READ_SUB_CHANNEL:
+		case T10MMC_CMD_READ_TOC_PMA_ATIP:
+		case T10MMC_CMD_PLAY_AUDIO_10:
+		case T10MMC_CMD_PLAY_AUDIO_TRACK_INDEX:
+		case T10MMC_CMD_PAUSE_RESUME:
+		case T10MMC_CMD_PLAY_AUDIO_12:
+		case T10SBC_CMD_READ_12:
+			if(!m_cdrom)
+			{
+				m_phase = SCSI_PHASE_STATUS;
+				m_sense_key = SCSI_SENSE_KEY_MEDIUM_ERROR;
+				m_sense_asc = SCSI_SENSE_ASC_MEDIUM_NOT_PRESENT;
+				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+				m_transfer_length = 0;
+				return;
+			}
+		default:
+			if(m_media_change)
+			{
+				m_phase = SCSI_PHASE_STATUS;
+				m_sense_key = SCSI_SENSE_KEY_UNIT_ATTENTION;
+				m_sense_asc = SCSI_SENSE_ASC_NOT_READY_TO_READY_TRANSITION;
+				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+				m_transfer_length = 0;
+				return;
+			}
+			break;
+		case T10SPC_CMD_INQUIRY:
+			break;
+		case T10SPC_CMD_REQUEST_SENSE:
+			m_media_change = false;
+			break;
+	}
+	t10mmc::ExecCommand();
 }

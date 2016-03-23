@@ -101,7 +101,7 @@ CPUS["SM8500"] = true
 CPUS["MINX"] = true
 CPUS["SSEM"] = true
 CPUS["AVR8"] = true
-CPUS["TMS0980"] = true
+CPUS["TMS1000"] = true
 CPUS["I4004"] = true
 CPUS["SUPERFX"] = true
 CPUS["Z8"] = true
@@ -652,6 +652,8 @@ BUSES["SMS_EXP"] = true
 BUSES["SNES"] = true
 BUSES["SNES_CTRL"] = true
 BUSES["SPC1000"] = true
+BUSES["SVI_EXPANDER"] = true
+BUSES["SVI_SLOT"] = true
 BUSES["TI99PEB"] = true
 BUSES["TI99X"] = true
 BUSES["TIKI100"] = true
@@ -3162,6 +3164,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/squale.cpp",
 	MAME_DIR .. "src/mame/drivers/swtpc.cpp",
 	MAME_DIR .. "src/mame/drivers/swyft.cpp",
+	MAME_DIR .. "src/mame/drivers/symbolics.cpp",
 	MAME_DIR .. "src/mame/drivers/sys2900.cpp",
 	MAME_DIR .. "src/mame/drivers/systec.cpp",
 	MAME_DIR .. "src/mame/drivers/tavernie.cpp",

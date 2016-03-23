@@ -28,9 +28,9 @@
     HELPERS (also used by diimage.cpp)
  ***************************************************************************/
 
-static file_error common_process_file(emu_options &options, const char *location, const char *ext, const rom_entry *romp, emu_file &image_file)
+static osd_file::error common_process_file(emu_options &options, const char *location, const char *ext, const rom_entry *romp, emu_file &image_file)
 {
-	file_error filerr;
+	osd_file::error filerr;
 
 	if (location != nullptr && strcmp(location, "") != 0)
 		filerr = image_file.open(location, PATH_SEPARATOR, ROM_GETNAME(romp), ext);
@@ -40,7 +40,7 @@ static file_error common_process_file(emu_options &options, const char *location
 	return filerr;
 }
 
-std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, file_error &filerr)
+std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, osd_file::error &filerr)
 {
 	auto image_file = std::make_unique<emu_file>(options.media_path(), OPEN_FLAG_READ);
 
@@ -49,7 +49,7 @@ std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *
 	else
 		filerr = image_file->open(location, PATH_SEPARATOR, ROM_GETNAME(romp));
 
-	if (filerr != FILERR_NONE)
+	if (filerr != osd_file::error::NONE)
 	{
 		image_file = nullptr;
 	}
@@ -549,7 +549,7 @@ void rom_load_manager::region_post_process(const char *rgntag, bool invert)
 
 int rom_load_manager::open_rom_file(const char *regiontag, const rom_entry *romp, std::string &tried_file_names, bool from_list)
 {
-	file_error filerr = FILERR_NOT_FOUND;
+	osd_file::error filerr = osd_file::error::NOT_FOUND;
 	UINT32 romsize = rom_file_size(romp);
 	tried_file_names = "";
 
@@ -656,7 +656,7 @@ int rom_load_manager::open_rom_file(const char *regiontag, const rom_entry *romp
 	m_romsloadedsize += romsize;
 
 	/* return the result */
-	return (filerr == FILERR_NONE);
+	return (filerr == osd_file::error::NONE);
 }
 
 
@@ -959,19 +959,19 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 {
 	emu_file image_file(options.media_path(), OPEN_FLAG_READ);
 	const rom_entry *region, *rom;
-	file_error filerr;
+	osd_file::error filerr;
 	chd_error err;
 
 	/* attempt to open the properly named file, scanning up through parent directories */
-	filerr = FILERR_NOT_FOUND;
-	for (int searchdrv = driver_list::find(*gamedrv); searchdrv != -1 && filerr != FILERR_NONE; searchdrv = driver_list::clone(searchdrv))
+	filerr = osd_file::error::NOT_FOUND;
+	for (int searchdrv = driver_list::find(*gamedrv); searchdrv != -1 && filerr != osd_file::error::NONE; searchdrv = driver_list::clone(searchdrv))
 		filerr = common_process_file(options, driver_list::driver(searchdrv).name, ".chd", romp, image_file);
 
-	if (filerr != FILERR_NONE)
+	if (filerr != osd_file::error::NONE)
 		filerr = common_process_file(options, nullptr, ".chd", romp, image_file);
 
 	/* look for the disk in the locationtag too */
-	if (filerr != FILERR_NONE && locationtag != nullptr)
+	if (filerr != osd_file::error::NONE && locationtag != nullptr)
 	{
 		// check if we are dealing with softwarelists. if so, locationtag
 		// is actually a concatenation of: listname + setname + parentname
@@ -1022,19 +1022,19 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 		else
 		{
 			// try to load from list/setname
-			if ((filerr != FILERR_NONE) && (tag2.c_str() != nullptr))
+			if ((filerr != osd_file::error::NONE) && (tag2.c_str() != nullptr))
 				filerr = common_process_file(options, tag2.c_str(), ".chd", romp, image_file);
 			// try to load from list/parentname (if any)
-			if ((filerr != FILERR_NONE) && has_parent && (tag3.c_str() != nullptr))
+			if ((filerr != osd_file::error::NONE) && has_parent && (tag3.c_str() != nullptr))
 				filerr = common_process_file(options, tag3.c_str(), ".chd", romp, image_file);
 			// try to load from setname
-			if ((filerr != FILERR_NONE) && (tag4.c_str() != nullptr))
+			if ((filerr != osd_file::error::NONE) && (tag4.c_str() != nullptr))
 				filerr = common_process_file(options, tag4.c_str(), ".chd", romp, image_file);
 			// try to load from parentname (if any)
-			if ((filerr != FILERR_NONE) && has_parent && (tag5.c_str() != nullptr))
+			if ((filerr != osd_file::error::NONE) && has_parent && (tag5.c_str() != nullptr))
 				filerr = common_process_file(options, tag5.c_str(), ".chd", romp, image_file);
 			// only for CHD we also try to load from list/
-			if ((filerr != FILERR_NONE) && (tag1.c_str() != nullptr))
+			if ((filerr != osd_file::error::NONE) && (tag1.c_str() != nullptr))
 			{
 				tag1.erase(tag1.length() - 1, 1);    // remove the PATH_SEPARATOR
 				filerr = common_process_file(options, tag1.c_str(), ".chd", romp, image_file);
@@ -1043,7 +1043,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 	}
 
 	/* did the file open succeed? */
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 	{
 		std::string fullpath(image_file.fullpath());
 		image_file.close();
@@ -1073,15 +1073,15 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 							romphashes == hash_collection(ROM_GETHASHDATA(rom)))
 						{
 							/* attempt to open the properly named file, scanning up through parent directories */
-							filerr = FILERR_NOT_FOUND;
-							for (int searchdrv = drv; searchdrv != -1 && filerr != FILERR_NONE; searchdrv = driver_list::clone(searchdrv))
+							filerr = osd_file::error::NOT_FOUND;
+							for (int searchdrv = drv; searchdrv != -1 && filerr != osd_file::error::NONE; searchdrv = driver_list::clone(searchdrv))
 								filerr = common_process_file(options, driver_list::driver(searchdrv).name, ".chd", rom, image_file);
 
-							if (filerr != FILERR_NONE)
+							if (filerr != osd_file::error::NONE)
 								filerr = common_process_file(options, nullptr, ".chd", rom, image_file);
 
 							/* did the file open succeed? */
-							if (filerr == FILERR_NONE)
+							if (filerr == osd_file::error::NONE)
 							{
 								std::string fullpath(image_file.fullpath());
 								image_file.close();
@@ -1108,8 +1108,8 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 	/* try to open the diff */
 	LOG(("Opening differencing image file: %s\n", fname.c_str()));
 	emu_file diff_file(options.diff_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE);
-	file_error filerr = diff_file.open(fname.c_str());
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = diff_file.open(fname.c_str());
+	if (filerr == osd_file::error::NONE)
 	{
 		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
@@ -1122,7 +1122,7 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 	LOG(("Creating differencing image: %s\n", fname.c_str()));
 	diff_file.set_openflags(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	filerr = diff_file.open(fname.c_str());
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 	{
 		std::string fullpath(diff_file.fullpath());
 		diff_file.close();

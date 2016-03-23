@@ -136,7 +136,7 @@ namespace bx
 			: 0
 			;
 #elif BX_PLATFORM_OSX
-#ifdef MACH_TASK_BASIC_INFO
+#	if defined(MACH_TASK_BASIC_INFO)
 		mach_task_basic_info info;
 		mach_msg_type_number_t infoCount = MACH_TASK_BASIC_INFO_COUNT;
 
@@ -145,7 +145,7 @@ namespace bx
 				, (task_info_t)&info
 				, &infoCount
 				);
-#else // MACH_TASK_BASIC_INFO
+#	else // MACH_TASK_BASIC_INFO
 		task_basic_info info;
 		mach_msg_type_number_t infoCount = TASK_BASIC_INFO_COUNT;
 
@@ -154,7 +154,7 @@ namespace bx
 				, (task_info_t)&info
 				, &infoCount
 				);
-#endif // MACH_TASK_BASIC_INFO
+#	endif // MACH_TASK_BASIC_INFO
 		if (KERN_SUCCESS != result)
 		{
 			return 0;

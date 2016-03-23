@@ -1,10 +1,10 @@
 {
     "blend": {
     	"equation": "add",
-    	"srcColor": "1",
-    	"dstColor": "0",
-    	"srcAlpha": "1",
-    	"dstAlpha": "0"
+    	"srcColor": "srcAlpha",
+    	"dstColor": "1-srcAlpha",
+    	"srcAlpha": "srcAlpha",
+    	"dstAlpha": "1-srcAlpha"
     },
     "depth": {
     	"function": "always"
@@ -17,7 +17,6 @@
     "vertex": "vs_screen",
     "fragment": "fs_screen",
     "uniforms": [
-    	{ "name": "s_tex",  "type": "int",  "values": [ 1.0 ] },
-    	{ "name": "u_tint", "type": "vec4", "values": [ 1.0, 1.0, 1.0, 1.0 ] }
+    	{ "name": "s_tex",  "type": "int",  "values": [ 1.0 ] }
     ]
 }

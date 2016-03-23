@@ -1,0 +1,25 @@
+{	"name": "Default Bilinear Filter",
+	"author": "Ryan Holtz",
+	"targets": [
+		{	"name": "temp",
+			"mode": "guest",
+			"bilinear": true
+		}
+	],
+	"passes": [
+		{	"effect": "blit",
+			"name": "Copy To Unstretched Texture",
+			"input": [
+				{ "sampler": "s_tex", "texture": "screen" }
+			],
+			"output": "temp"
+		},
+		{	"effect": "blit",
+			"name": "Final Upscale",
+			"input": [
+				{ "sampler": "s_tex", "texture": "temp" }
+			],
+			"output": "output"
+		}
+	]
+}

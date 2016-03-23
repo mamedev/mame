@@ -494,7 +494,7 @@ public:
 
     bool should_poll_devices(running_machine &machine) override
     {
-        return sdl_event_manager::instance().app_has_mouse_focus();
+        return sdl_event_manager::instance().has_focus();
     }
     
     void before_poll(running_machine &machine) override

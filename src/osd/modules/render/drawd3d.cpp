@@ -204,7 +204,7 @@ render_primitive_list *renderer_d3d9::get_primitives()
 	GetClientRectExceptMenu(window().m_hwnd, &client, window().fullscreen());
 	if (rect_width(&client) > 0 && rect_height(&client) > 0)
 	{
-		window().target()->set_bounds(rect_width(&client), rect_height(&client), window().aspect());
+		window().target()->set_bounds(rect_width(&client), rect_height(&client), window().pixel_aspect());
 		window().target()->set_max_update_rate((get_refresh() == 0) ? get_origmode().RefreshRate : get_refresh());
 	}
 	if (m_shaders != nullptr)

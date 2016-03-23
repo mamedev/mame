@@ -834,7 +834,7 @@ void ngen_state::machine_start()
 	memory_share* fontshare = memshare("fontram");
 	m_hd_buffer.allocate(1024*8);  // 8kB buffer RAM for HD controller
 	if(vidshare == nullptr || fontshare == nullptr)
-		fatalerror("Error: VRAM not found");
+		fatalerror("VRAM not found\n");
 	m_vram.set(*vidshare,2);
 	m_fontram.set(*fontshare,2);
 }

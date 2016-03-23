@@ -18,6 +18,7 @@ for file in lfs.dir("plugins") do
 		local meta = json.parse(readAll(filename))
 		if (meta["plugin"]["type"]=="plugin") and (meta["plugin"]["start"]=="true") then
 			server = require(meta["plugin"]["name"])
+			if server.set_folder~=nil then server.set_folder("plugins/" .. file) end
 			server.startplugin();
 		end
 	end

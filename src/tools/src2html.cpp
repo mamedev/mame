@@ -279,7 +279,7 @@ int main(int argc, char *argv[])
 	// read the template file into an std::string
 	UINT32 bufsize;
 	void *buffer;
-	if (util::core_file::load(tempfilename.c_str(), &buffer, bufsize) == FILERR_NONE)
+	if (util::core_file::load(tempfilename.c_str(), &buffer, bufsize) == osd_file::error::NONE)
 	{
 		tempheader.assign((const char *)buffer, bufsize);
 		osd_free(buffer);
@@ -517,7 +517,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 
 	// open the source file
 	util::core_file::ptr src;
-	if (util::core_file::open(srcfile.c_str(), OPEN_FLAG_READ, src) != FILERR_NONE)
+	if (util::core_file::open(srcfile, OPEN_FLAG_READ, src) != osd_file::error::NONE)
 	{
 		fprintf(stderr, "Unable to read file '%s'\n", srcfile.c_str());
 		return 1;
@@ -732,7 +732,7 @@ static util::core_file::ptr create_file_and_output_header(std::string &filename,
 {
 	// create the indexfile
 	util::core_file::ptr file;
-	if (util::core_file::open(filename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, file) != FILERR_NONE)
+	if (util::core_file::open(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, file) != osd_file::error::NONE)
 		return util::core_file::ptr();
 
 	// print a header
@@ -865,7 +865,7 @@ static bool find_include_file(std::string &srcincpath, int srcrootlen, int dstro
 
 		// see if we can open it
 		util::core_file::ptr testfile;
-		if (util::core_file::open(srcincpath.c_str(), OPEN_FLAG_READ, testfile) == FILERR_NONE)
+		if (util::core_file::open(srcincpath, OPEN_FLAG_READ, testfile) == osd_file::error::NONE)
 		{
 			// close the file
 			testfile.reset();

@@ -25,7 +25,7 @@ class bgfx_effect;
 
 class effect_manager {
 public:
-	effect_manager(shader_manager& shaders) : m_shaders(shaders) { }
+	effect_manager(osd_options& options, shader_manager& shaders) : m_options(options), m_shaders(shaders) { }
 	~effect_manager();
 
 	// Getters
@@ -34,6 +34,7 @@ public:
 private:
 	bgfx_effect* load_effect(std::string name);
 
+    osd_options&                        m_options;
 	shader_manager&                     m_shaders;
 	std::map<std::string, bgfx_effect*> m_effects;
 };

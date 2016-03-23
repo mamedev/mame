@@ -8890,6 +8890,7 @@ ccbootmr                        // Model Racing bootleg
 cclimber                        // (c) 1980 Nichibutsu
 cclimberj                       // (c) 1980 Nichibutsu
 cclimbroper                     // Operamatic bootleg
+cclimbrrod						// Rodmar bootleg
 ckong                           // (c) 1981 (Kyoei)
 ckongalc                        // bootleg (Alca)
 ckongdks                        // Spanish Crazy Kong bootleg
@@ -9237,6 +9238,8 @@ coco3p                          // Color Computer 3 (PAL)
 
 @source:cocoloco.cpp
 cocoloco                        // 198?, Petaco S.A.
+cocolocoa                       // 198?, Recel S.A.
+cocolocob                       // 198?, Petaco S.A.
 
 @source:codata.cpp
 codata                          // 
@@ -12298,6 +12301,7 @@ mooncrsb                        // bootleg
 mooncrsl                        // bootleg (Laguna S.A.)
 mooncrst                        // (c) 1980 Nichibutsu
 mooncrstg                       // (c) 1980 Gremlin
+mooncrstso						// (c) 1980 SegaSA / Sonic
 mooncrsto                       // (c) 1980 Nichibutsu
 mooncrstu                       // (c) 1980 Nichibutsu USA
 mooncrstuk                      // (c) 1980 Nichibutsu UK
@@ -13098,7 +13102,8 @@ chryglda                        // bootleg
 cmast91                         // (c) 1991 Dyna Electronics
 cmast92                         // (c) 1992 Dyna Electronics
 cmast97                         // (c) 1996 Dyna Electronics
-cmast99                         // 1999?
+cmast99                         // (c) 1999 Dyna Electronics
+cmast99b                        // bootleg
 cmaster                         // (c) 1991 Dyna Electronics
 cmasterb                        // (c) 1991 Dyna Electronics
 cmasterbv                       // (c) 1991 Dyna Electronics / Gerald Duhamel?
@@ -13780,6 +13785,7 @@ sgnascar                        // 2000.09 Nascar Arcade
 
 @source:himesiki.cpp
 himesiki                        // (c) 1989 Hi-Soft
+androidp                        // (c) 198? Nasco
 
 @source:hitme.cpp
 barricad                        // (c) 1976 Ramtek
@@ -14205,6 +14211,7 @@ iskr1031                        //
 istellar                        // (c) 1983 Funai / Gakken
 
 @source:iteagle.cpp
+bbh2sp                          // 
 bbhcotw                         // 
 bbhsc                           // 
 carnking                        // 
@@ -16669,6 +16676,7 @@ trojana                         // 4/1986 (c) 1986 (US)
 trojanb                         // bootleg
 trojanj                         // 4/1986 (c) 1986 (Japan)
 trojanr                         // 4/1986 (c) 1986 + Romstar
+fball                        // 
 
 @source:lynx.cpp
 lynx                            // Atari Lynx Handheld
@@ -16842,6 +16850,7 @@ kaiteids                        // (c) 1993 Irem (Japan)
 leaguemn                        // (c) 1993 Irem (Japan)
 lethalth                        // (c) 1991 Irem (World)
 majtitl2                        // (c) 1992 Irem (World)
+majtitl2a						//
 majtitl2j                       // (c) 1992 Irem (Japan)
 mysticri                        // (c) 1992 Irem (World)
 mysticrib                       // bootleg?
@@ -19278,6 +19287,7 @@ mephistp1                       //
 @source:merit.cpp
 bigappg                         // (c) 1986 Merit / Big Apple Games
 casino5                         // (c) 1984 Merit
+chkndraw                        // (c) 1984 Merit
 couple                          // (c) 1988 Merit
 couplei                         // (c) 1988 Merit
 couplep                         // (c) 1988 Merit
@@ -27536,10 +27546,10 @@ cvs2gd                          // 2001.07.05 Capcom Vs. SNK 2 Millionaire Fight
 cvsgd                           // 2001.05 Capcom Vs. SNK Millennium Fight 2000 Pro
 deathcox                        // 2000.10 Death Crimson OX
 demofist                        // 2003.06 Demolish Fist
-derbyo2k                        // 2000.06 Derby Owners Club 2000 Ver.2 (Rev A)
-derbyoc                         // 1999.10 Derby Owners Club (Rev B)
-derbyoc2                        // 2001.10 Derby Owners Club II (Rev B)
-derbyocw                        // 2001.?? Derby Owners Club World Edition (Rev D)
+derbyo2k                        // 2000.06 Derby Owners Club 2000 Ver.2 (Japan) (Rev A)
+derbyoc                         // 1999.10 Derby Owners Club (Japan) (Rev B)
+derbyoc2                        // 2001.10 Derby Owners Club II Ver.2.1 (Japan) (Rev B)
+derbyocw                        // 2005.?? Derby Owners Club World Edition EX (Rev D)
 dirtypig                        // 2004.09 Dirty Pig Skin Football
 doa2                            // 1999.11 Dead or Alive 2
 doa2m                           // 2000.01 Dead or Alive 2 Millennium
@@ -28439,7 +28449,7 @@ ssjkrpkr                        // (c) 1982 Southern Systems & Assembly, Ltd.
 tpoker2                         // (c) 1993 Micro Manufacturing, Inc.
 
 @source:notetaker.cpp
-notetakr                        // 
+notetakr                        //
 
 @source:nova2001.cpp
 ninjakun                        // UPL-84003 (c) 1984 Taito Corporation
@@ -28687,6 +28697,7 @@ mspacmanbcc                     // bootleg
 mspacmanbg                      // bootleg
 mspacmanbgd                     // bootleg
 mspacmanblt                     // bootleg
+mspacmanbhe						// bootleg
 mspacmancr                      // bootleg on Crush Roller board
 mspacmat                        // hack
 mspacmbe                        // bootleg
@@ -28722,6 +28733,8 @@ puckmanb                        // bootleg
 puckmanf                        // hack
 puckmanh                        // hack
 puckmod                         // (c) 1981 Namco
+pacmanso						//
+pacmanpe						//
 rocktrv2                        // (c) 1986 Triumph Software Inc
 shootbul                        // (c) 1985 Bally Midway
 sprglbpg                        // German bootleg
@@ -33731,6 +33744,9 @@ swyft                           //
 @source:sym1.cpp
 sym1                            // Synertek SYM-1
 
+@source:symbolics.cpp
+s3670                           // 
+
 @source:sys2900.cpp
 sys2900                         // 
 
@@ -33761,6 +33777,7 @@ mrviking                        // 834-5383 (c) 1984 (S1)
 mrvikingj                       // 834-5383 (c) 1984 (S1)
 myhero                          // 834-5755 (c) 1985 (S1)
 myherok                         // 834-5755 (c) 1985 Coreland / Sega (S1)
+myherobl						//
 ninja                           // 834-5677 (c) 1985 (S1)
 nob                             // (c) Data East
 nobb                            // bootleg
@@ -33777,6 +33794,7 @@ reguluso                        // 834-5328?(c) 1983 (S1)
 regulusu                        // 834-5328?(c) 1983 (S1)
 seganinj                        // 834-5677 (c) 1985 (S1)
 seganinju                       // 834-5677 (c) 1985 (S1)
+seganinja						// 
 shtngmst                        // 834-5719/5720 (c) 1985 (S2)
 shtngmste                       // 834-5719/5720 (c) 1985 (S2)
 spatter                         // 834-5583 (c) 1984 (S1)
@@ -33803,6 +33821,9 @@ wbmlbge                         // bootleg (Gecas)
 wbmljb                          // (c) 1987 Sega/Westone (S2)
 wbmljo                          // (c) 1987 Sega/Westone (S2)
 wbmlvc                          // Virtual Console
+wbmlvcd							//
+wbmld							//
+wbmljod							//
 wboy                            // 834-5984 (c) 1986 + Escape license (S1)
 wboy2                           // 834-5984 (c) 1986 + Escape license (S1)
 wboy2u                          // 834-5984 (c) 1986 + Escape license (S1)
@@ -35644,6 +35665,7 @@ videopkr                        // (c) 1984 InterFlip
 @source:vigilant.cpp
 buccanrs                        // (c) 1989 Duintronic
 buccanrsa                       // (c) 1989 Duintronic
+buccanrsb						// (c) 1989 Duintronic
 kikcubic                        // (c) 1988 (Japan)
 kikcubicb                       // bootleg
 vigilant                        // (c) 1988 (World Rev E)

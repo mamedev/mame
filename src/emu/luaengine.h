@@ -130,6 +130,10 @@ private:
 	static UINT64 l_state_get_value(const device_state_entry *d);
 	static void l_state_set_value(device_state_entry *d, UINT64 v);
 	static luabridge::LuaRef l_dev_get_memspaces(const device_t *d);
+	struct lua_machine {
+		int l_popmessage(lua_State *L);
+		int l_logerror(lua_State *L);
+	};
 	struct lua_addr_space {
 		template<typename T> int l_mem_read(lua_State *L);
 		template<typename T> int l_mem_write(lua_State *L);
@@ -138,6 +142,7 @@ private:
 	struct lua_screen {
 		int l_height(lua_State *L);
 		int l_width(lua_State *L);
+		int l_orientation(lua_State *L);
 		int l_refresh(lua_State *L);
 		int l_type(lua_State *L);
 		int l_snapshot(lua_State *L);

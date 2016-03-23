@@ -10,15 +10,20 @@
 
 #pragma once
 
-#ifndef __COREALLOC_H__
-#define __COREALLOC_H__
+#ifndef MAME_LIB_UTIL_COREALLOC_H
+#define MAME_LIB_UTIL_COREALLOC_H
+
+#include "osdcore.h"
 
 #include <stdlib.h>
+
+#include <cstddef>
+#include <cstring>
 #include <new>
+#include <memory>
 #include <type_traits>
 #include <utility>
-#include <memory>
-#include "osdcore.h"
+
 
 
 //**************************************************************************
@@ -35,21 +40,21 @@
 
 
 
-template<typename _Tp, typename... _Args>
-inline _Tp* global_alloc_clear(_Args&&... __args)
+template<typename T, typename... Params>
+inline T* global_alloc_clear(Params &&... args)
 {
-	unsigned char * ptr = new unsigned char[sizeof(_Tp)]; // allocate memory
-	memset(ptr, 0, sizeof(_Tp));
-	return new(ptr) _Tp(std::forward<_Args>(__args)...);
+	void *const ptr = ::operator new(sizeof(T)); // allocate memory
+	std::memset(ptr, 0, sizeof(T));
+	return new(ptr) T(std::forward<Params>(args)...);
 }
 
-template<typename _Tp>
-inline _Tp* global_alloc_array_clear(size_t __num)
+template<typename T>
+inline T* global_alloc_array_clear(std::size_t num)
 {
-	auto size = sizeof(_Tp) * __num;
-	unsigned char* ptr = new unsigned char[size]; // allocate memory
-	memset(ptr, 0, size);
-	return new(ptr) _Tp[__num]();
+	auto const size = sizeof(T) * num;
+	void *const ptr = new unsigned char[size]; // allocate memory
+	std::memset(ptr, 0, size);
+	return new(ptr) T[num]();
 }
 
 
@@ -104,4 +109,4 @@ inline typename _MakeUniqClear<_Tp>::__array make_unique_clear(size_t __num)
 template<typename _Tp, typename... _Args>
 inline typename _MakeUniqClear<_Tp>::__invalid_type make_unique_clear(_Args&&...) = delete;
 
-#endif  /* __COREALLOC_H__ */
+#endif  // MAME_LIB_UTIL_COREALLOC_H

@@ -931,6 +931,15 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 	m_base_layerconfig.set_marquees_enabled(manager.machine().options().use_marquees());
 	m_base_layerconfig.set_zoom_to_screen(manager.machine().options().artwork_crop());
 
+	// aspect and scale options
+	m_keepaspect = (manager.machine().options().keep_aspect() && !(flags & RENDER_CREATE_HIDDEN));
+	m_int_scale_x = manager.machine().options().int_scale_x();
+	m_int_scale_y = manager.machine().options().int_scale_y();
+	if (manager.machine().options().uneven_stretch() && !manager.machine().options().uneven_stretch_x())
+		m_scale_mode = SCALE_FRACTIONAL;
+	else
+		m_scale_mode = manager.machine().options().uneven_stretch_x()? SCALE_FRACTIONAL_X : SCALE_INTEGER;
+
 	// determine the base orientation based on options
 	if (!manager.machine().options().rotate())
 		m_base_orientation = orientation_reverse(manager.machine().system().flags & ORIENTATION_MASK);
@@ -1005,7 +1014,7 @@ void render_target::set_bounds(INT32 width, INT32 height, float pixel_aspect)
 	m_bounds.x0 = m_bounds.y0 = 0;
 	m_bounds.x1 = (float)width;
 	m_bounds.y1 = (float)height;
-	m_pixel_aspect = pixel_aspect;
+	m_pixel_aspect = pixel_aspect != 0.0? pixel_aspect : 1.0;
 }
 
 
@@ -1140,41 +1149,87 @@ const render_screen_list &render_target::view_screens(int viewindex)
 
 void render_target::compute_visible_area(INT32 target_width, INT32 target_height, float target_pixel_aspect, int target_orientation, INT32 &visible_width, INT32 &visible_height)
 {
-	float width, height;
-	float scale;
-
-	// constrained case
-	if (target_pixel_aspect != 0.0f)
+	switch (m_scale_mode)
 	{
-		// start with the aspect ratio of the square pixel layout
-		width = m_curview->effective_aspect(m_layerconfig);
-		height = 1.0f;
+		case SCALE_FRACTIONAL:
+		{
+			float width, height;
+			float scale;
 
-		// first apply target orientation
-		if (target_orientation & ORIENTATION_SWAP_XY)
-			FSWAP(width, height);
+			// constrained case
+			if (m_keepaspect)
+			{
+				// start with the aspect ratio of the square pixel layout
+				width = m_curview->effective_aspect(m_layerconfig);
+				height = 1.0f;
 
-		// apply the target pixel aspect ratio
-		height *= target_pixel_aspect;
+				// first apply target orientation
+				if (target_orientation & ORIENTATION_SWAP_XY)
+					FSWAP(width, height);
 
-		// based on the height/width ratio of the source and target, compute the scale factor
-		if (width / height > (float)target_width / (float)target_height)
-			scale = (float)target_width / width;
-		else
-			scale = (float)target_height / height;
+				// apply the target pixel aspect ratio
+				height *= target_pixel_aspect;
+
+				// based on the height/width ratio of the source and target, compute the scale factor
+				if (width / height > (float)target_width / (float)target_height)
+					scale = (float)target_width / width;
+				else
+					scale = (float)target_height / height;
+			}
+
+			// stretch-to-fit case
+			else
+			{
+				width = (float)target_width;
+				height = (float)target_height;
+				scale = 1.0f;
+			}
+
+			// set the final width/height
+			visible_width = render_round_nearest(width * scale);
+			visible_height = render_round_nearest(height * scale);
+			break;
+		}
+
+		case SCALE_FRACTIONAL_X:
+		case SCALE_INTEGER:
+		{
+			// get source size and aspect
+			INT32 src_width, src_height;
+			compute_minimum_size(src_width, src_height);
+			float src_aspect = m_curview->effective_aspect(m_layerconfig);
+
+			// apply orientation if required
+			if (target_orientation & ORIENTATION_SWAP_XY)
+				src_aspect = 1.0 / src_aspect;
+	
+			// get destination size and aspect
+			float dest_width = (float)target_width;
+			float dest_height = (float)target_height;
+			float dest_aspect = dest_width / dest_height * target_pixel_aspect;
+
+			// apply aspect correction to destination rectangle
+			if (dest_aspect > src_aspect)
+				dest_width *= m_keepaspect? src_aspect / dest_aspect : 1.0f;
+			else
+				dest_height *= m_keepaspect? dest_aspect / src_aspect : 1.0f;
+
+			// compute scale factors
+			float xscale = dest_width / src_width;
+			float yscale = dest_height / src_height;
+			xscale = dest_aspect >= 1.0f && m_scale_mode == SCALE_FRACTIONAL_X? xscale : MAX(1, render_round_nearest(xscale));
+			yscale = dest_aspect < 1.0f && m_scale_mode == SCALE_FRACTIONAL_X? yscale : MAX(1, render_round_nearest(yscale));
+
+			// check if we have user defined scale factors, if so use them instead
+			xscale = m_int_scale_x? m_int_scale_x : xscale;
+			yscale = m_int_scale_y? m_int_scale_y : yscale;
+
+			// set the final width/height
+			visible_width = render_round_nearest(src_width * xscale);
+			visible_height = render_round_nearest(src_height * yscale);
+			break;
+		} 
 	}
-
-	// stretch-to-fit case
-	else
-	{
-		width = (float)target_width;
-		height = (float)target_height;
-		scale = 1.0f;
-	}
-
-	// set the final width/height
-	visible_width = render_round_nearest(width * scale);
-	visible_height = render_round_nearest(height * scale);
 }
 
 
@@ -1588,8 +1643,8 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 
 		// attempt to open the file; bail if we can't
 		emu_file layoutfile(manager().machine().options().art_path(), OPEN_FLAG_READ);
-		file_error filerr = layoutfile.open(fname.c_str());
-		if (filerr != FILERR_NONE)
+		osd_file::error filerr = layoutfile.open(fname.c_str());
+		if (filerr != osd_file::error::NONE)
 			return false;
 
 		// read the file
@@ -2528,7 +2583,7 @@ float render_manager::ui_aspect(render_container *rc)
 
 		// if we have a valid pixel aspect, apply that and return
 		if (m_ui_target->pixel_aspect() != 0.0f)
-				return (aspect / m_ui_target->pixel_aspect());
+				aspect /= m_ui_target->pixel_aspect();
 	} else {
 		// single screen container
 

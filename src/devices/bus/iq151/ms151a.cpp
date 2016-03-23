@@ -77,9 +77,9 @@ void iq151_ms151a_device::device_stop()
 {
 #if DUMP_PAPER_INTO_PNG
 	emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	file_error filerr = file.open("iq151_ms151a.png");
+	osd_file::error filerr = file.open("iq151_ms151a.png");
 
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 	{
 		static const rgb_t png_palette[] = { rgb_t::white, rgb_t::black };
 

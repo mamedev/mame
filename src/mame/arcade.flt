@@ -1323,3 +1323,23 @@ zerozone.cpp
 zn.cpp
 zodiack.cpp
 zr107.cpp
+//exceptions + to add - to remove from imported list
+//3do.cpp
+-3do
+-3do_m2
+-3do_pal
+//cdi.cpp
+-cdi490a
+-cdi910
+-cdimono1
+-cdimono2
+//cps1.cpp
+-sfach
+-sfzbch
+-sfzch
+-wofch
+//jaguar.cpp
+-jaguar
+-jaguarcd
+//vectrex.cpp
+-vectrex

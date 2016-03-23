@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-    ui.c
+    ui.cpp
 
     Functions used to handle MAME's user interface.
 
@@ -169,7 +169,7 @@ static void load_ui_options(running_machine &machine)
 	std::string error;
 	// attempt to open the output file
 	emu_file file(machine.options().ini_path(), OPEN_FLAG_READ);
-	if (file.open("ui.ini") == FILERR_NONE)
+	if (file.open("ui.ini") == osd_file::error::NONE)
 	{
 		bool result = machine.ui().options().parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
 		if (!result)
@@ -1941,7 +1941,6 @@ static slider_state *slider_alloc(running_machine &machine, const char *title, I
 	state->incval = incval;
 	state->update = update;
 	state->arg = arg;
-	state->hidden = false;
 	state->id = -1;
 	strcpy(state->description, title);
 

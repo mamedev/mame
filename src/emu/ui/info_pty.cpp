@@ -2,7 +2,7 @@
 // copyright-holders:F.Ulivi
 /***************************************************************************
 
-    ui/info_pty.c
+    ui/info_pty.cpp
 
     Information screen on pseudo terminals
 

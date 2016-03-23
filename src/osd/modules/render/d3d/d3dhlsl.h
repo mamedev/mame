@@ -230,7 +230,7 @@ struct hlsl_options
 	float                   saturation;
 
 	// NTSC
-	int						yiq_enable;
+	int                     yiq_enable;
 	float                   yiq_jitter;
 	float                   yiq_cc;
 	float                   yiq_a;
@@ -274,7 +274,7 @@ struct slider_desc
 	int                 		step;
 	int							slider_type;
 	int                 		screen_type;
-	int                 		id;
+	int							id;
 	float						scale;
 	const char *				format;
 	std::vector<const char *>	strings;
@@ -288,9 +288,9 @@ public:
 	INT32 update(std::string *str, INT32 newval);
 
 private:
-	slider_desc *	m_desc;
-	void *			m_value;
-	bool *			m_dirty;
+	slider_desc *   m_desc;
+	void *          m_value;
+	bool *          m_dirty;
 };
 
 class shaders
@@ -387,16 +387,12 @@ private:
 	bool                    paused;                     // whether or not rendering is currently paused
 	int                     num_screens;                // number of emulated physical screens
 	int                     curr_screen;                // current screen for render target operations
-	int                     curr_frame;                 // current frame (0/1) of a screen for render target operations
 	int                     lastidx;                    // index of the last-encountered target
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
 	hlsl_options *          options;                    // current options
-	D3DPRIMITIVETYPE        vecbuf_type;
-	UINT32                  vecbuf_index;
-	UINT32                  vecbuf_count;
 
-	avi_file *              avi_output_file;            // AVI file
+	avi_file::ptr           avi_output_file;            // AVI file
 	bitmap_rgb32            avi_snap;                   // AVI snapshot
 	int                     avi_frame;                  // AVI frame
 	attotime                avi_frame_period;           // AVI frame period
@@ -444,7 +440,7 @@ private:
 	d3d_render_target *     targethead;
 	cache_target *          cachehead;
 
-	std::vector<slider*>	sliders;
+	std::vector<slider*>    sliders;
 
 	static slider_desc      s_sliders[];
 	static hlsl_options     last_options;               // last used options
