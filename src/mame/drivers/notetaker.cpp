@@ -631,7 +631,7 @@ irq7    VSync   (interrupt from the VSYN VSync pin from the crt5027)
 0xf2 to port 0x142 (reg1 interlaced, hswidth=0xE, hsdelay=2) \
 0x7d to port 0x144 (reg2 16 scans/row, 5 chars/datarow)       \
 0x1d to port 0x146 (reg3 0 skew bits, 0x1D datarows/frame)     \_ set up CRTC
-0x04 to port 0x148 (reg4 4 scan lines/frame                    /
+0x04 to port 0x148 (reg4 4 scan lines/frame)                   /
 0x10 to port 0x14a (reg5 0x10 vdatastart)                     /
 0x00 to port 0x154 (reset the crtc)                          /
 0x1e to port 0x15a (reg8 load cursor line address = 0x1e)   /

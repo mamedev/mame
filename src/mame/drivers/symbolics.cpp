@@ -75,6 +75,7 @@ public:
 	required_device<m68000_base_device> m_maincpu;
 	DECLARE_DRIVER_INIT(symbolics);
 	DECLARE_READ16_MEMBER(buserror_r);
+	DECLARE_READ16_MEMBER(fep_paddle_id_prom_r);
 
 //protected:
 //	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -88,6 +89,11 @@ READ16_MEMBER(symbolics_state::buserror_r)
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
 	return 0;
+}
+
+READ16_MEMBER(symbolics_state::fep_paddle_id_prom_r) // bits 8 and 9 do something special if both are set.
+{
+	return 0x0300;
 }
 
 
@@ -138,7 +144,7 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   0   0   0   1   x?  1       RW  MPSC-1-B
 1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   0   0   1   0   1   *?      R?  SPY-DMA-HIGH-ADDRS
 1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   0   1   0   0   0   *?      R   SPY-DMA-CONTROLLER
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   1   0   0   0   0   ??      R   FEP-PADDLE-ID-PROM
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   1   x?  0   0   0   ??      R   FEP-PADDLE-ID-PROM
 1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   0   0   0   0   0   ??      R   FEP-BOARD-ID-PROM
 1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   0   0   0   0   1       W   FEP-BOARD-ID-CONTROL
 1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   0   0   0   1   1       W   FEP-DMA-AND-CLOCK-CTL
@@ -156,23 +162,37 @@ Now for stuff the 3670 nfep code actually accesses:
 
               |               |               |               |               |               |     hex
           |           |           |           |           |           |           |           |     octal
-@310: write 
-@A2A4: write to FF  
- 
+Soft reset
+[:maincpu] ':maincpu' (000310): unmapped program memory write to FF00E0 = 0202 & 00FF (FEP-BOARD-ID-CONTROL)
+[:maincpu] ':maincpu' (00A2AA): unmapped program memory read from FF00B0 & FF00 (FEP-PADDLE-ID-PROM)
+[:maincpu] ':maincpu' (00A2EA): unmapped program memory write to FF018A = 5555 & FFFF (unknown)
+[:maincpu] ':maincpu' (006B48): unmapped program memory write to 000000 = 000A & FFFF off into the weeds?
+[:maincpu] ':maincpu' (006B4C): unmapped program memory write to 000002 = 0000 & FFFF "
+[:maincpu] ':maincpu' (006B4C): unmapped program memory write to 000004 = 0000 & FFFF "
+[:maincpu] ':maincpu' (006B50): unmapped program memory write to 000006 = 0000 & FFFF "
+[:maincpu] ':maincpu' (006B50): unmapped program memory write to 000008 = 0000 & FFFF "
+[:maincpu] ':maincpu' (006B58): unmapped program memory write to 00000A = FFFF & FFFF "
+[:maincpu] ':maincpu' (006B60): unmapped program memory write to FFFFFE = FFFF & FFFF "
+[:maincpu] ':maincpu' (00A2AA): unmapped program memory read from FF00B0 & FF00 
 
 */
 
 static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, symbolics_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM /* ROM lives here, and writing to 0x00-0x08 writes to the main lisp ram? */
+	//AM_RANGE(0x000000, 0x01ffff) AM_ROM /* ROM lives here */
+	AM_RANGE(0x000000, 0x00bfff) AM_ROM
+	AM_RANGE(0x010000, 0x01bfff) AM_ROM
 	//AM_RANGE(0x020000, 0x03ffff) AM_RAM /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
-	AM_RANGE(0x020000, 0x03ffff) AM_RAM /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
+	AM_RANGE(0x020000, 0x03ffff) AM_RAM AM_REGION("fepdram", 0) /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
 	// 2x AM9128-10PC 2048x8 SRAMs @F7 and @G7 map somewhere
 	// 6x AM2148-50 1024x4bit SRAMs @F22-F27 map somewhere
 	//AM_RANGE(0x040000, 0xffffff) AM_READ(buserror_r);
 	//AM_RANGE(0x800000, 0xffffff) AM_RAM /* paged access to lispm ram? */
 	//FF00B0 is readable, may be to read the MC/SQ/DP/AU continuity lines?
+	AM_RANGE(0xff00b0, 0xff00b1) AM_READ(fep_paddle_id_prom_r)
 	//FF00E1 is writable, may control the LBUS_POWER_RESET line, see http://bitsavers.trailing-edge.com/pdf/symbolics/3600_series/Lisp_Machine_Hardware_Memos.pdf page 90
+	// or may be writing to FEP-LBUS-CONTROL bit 0x02 DOORBELL INT ENABLE ?
+	// or may actually be setting LBUS_ID_REQ as the patent map shows
 	//FF018A is writable, gets 0x5555 written to it
 ADDRESS_MAP_END
 
@@ -209,6 +229,7 @@ TIMER_CALLBACK_MEMBER(symbolics_state::outfifo_read_cb)
 /* Driver init: stuff that needs setting up which isn't directly affected by reset */
 DRIVER_INIT_MEMBER(symbolics_state,symbolics)
 {
+	
 }
 
 static MACHINE_CONFIG_START( symbolics, symbolics_state )
@@ -281,6 +302,7 @@ ROM_START( s3670 )
 		LBARB.4           @I18
 		SERCTL.4          @K6
 	*/
+	ROM_REGION16_BE( 0x20000, "fepdram", ROMREGION_ERASEFF )
 ROM_END
 
 /******************************************************************************
