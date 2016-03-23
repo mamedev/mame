@@ -33794,6 +33794,7 @@ reguluso                        // 834-5328?(c) 1983 (S1)
 regulusu                        // 834-5328?(c) 1983 (S1)
 seganinj                        // 834-5677 (c) 1985 (S1)
 seganinju                       // 834-5677 (c) 1985 (S1)
+seganinja						// 
 shtngmst                        // 834-5719/5720 (c) 1985 (S2)
 shtngmste                       // 834-5719/5720 (c) 1985 (S2)
 spatter                         // 834-5583 (c) 1984 (S1)
@@ -33820,6 +33821,9 @@ wbmlbge                         // bootleg (Gecas)
 wbmljb                          // (c) 1987 Sega/Westone (S2)
 wbmljo                          // (c) 1987 Sega/Westone (S2)
 wbmlvc                          // Virtual Console
+wbmlvcd							//
+wbmld							//
+wbmljod							//
 wboy                            // 834-5984 (c) 1986 + Escape license (S1)
 wboy2                           // 834-5984 (c) 1986 + Escape license (S1)
 wboy2u                          // 834-5984 (c) 1986 + Escape license (S1)
