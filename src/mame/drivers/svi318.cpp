@@ -32,6 +32,13 @@
 
 #define IS_SVI328  (m_ram->size() == 64 * 1024)
 
+#define CCS1       (m_cart == 0 && offset < 0x4000)
+#define CCS2       (m_cart == 0 && offset >= 0x4000 && offset < 0x8000)
+#define CCS3       (m_cart == 0 && m_rom2 == 0 && offset >= 0x8000 && offset < 0xc000)
+#define CCS4       (m_cart == 0 && m_rom3 == 0 && offset >= 0xc000)
+#define ROMCS      (m_romdis == 1 && offset < 0x8000)
+#define RAMCS      (m_ramdis == 1 && offset >= 0x8000)
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -64,10 +71,8 @@ public:
 	DECLARE_WRITE8_MEMBER( bank_w );
 	DECLARE_WRITE_LINE_MEMBER( intvdp_w );
 
-	READ8_MEMBER( page1_r );
-	WRITE8_MEMBER( page1_w );
-	READ8_MEMBER( page2_r );
-	WRITE8_MEMBER( page2_w );
+	READ8_MEMBER( mreq_r );
+	WRITE8_MEMBER( mreq_w );
 
 	// from expander bus
 	DECLARE_WRITE_LINE_MEMBER( intexp_w );
@@ -110,8 +115,7 @@ private:
 
 static ADDRESS_MAP_START( svi3x8_mem, AS_PROGRAM, 8, svi3x8_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(page1_r, page1_w)
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(page2_r, page2_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mreq_r, mreq_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svi3x8_io, AS_IO, 8, svi3x8_state )
@@ -326,71 +330,41 @@ void svi3x8_state::machine_reset()
 	m_ramdis = 1;
 	m_cart = 1;
 	m_bk21 = 1;
+	m_rom2 = 1;
+	m_rom3 = 1;
+	m_keyboard_row = 0;
 }
 
-READ8_MEMBER( svi3x8_state::page1_r)
+READ8_MEMBER( svi3x8_state::mreq_r )
 {
-	// cartridge /CCS1 and /CCS2
-	if (m_cart == 0)
+	if (CCS1 || CCS2 || CCS3 || CCS4)
 		return m_cart_rom->read_rom(space, offset);
 
 	UINT8 data = m_expander->mreq_r(space, offset);
 
-	if (m_romdis == 1)
+	if (ROMCS)
 		data = m_basic->u8(offset);
 
-	if (m_bk21 == 0 && IS_SVI328)
+	if (m_bk21 == 0 && IS_SVI328 && offset < 0x8000)
 		data = m_ram->read(offset);
 
+	if (RAMCS && (IS_SVI328 || offset >= 0xc000))
+		data = m_ram->read(IS_SVI328 ? offset : offset - 0xc000);
+
 	return data;
 }
 
-WRITE8_MEMBER( svi3x8_state::page1_w)
+WRITE8_MEMBER( svi3x8_state::mreq_w )
 {
-	if (m_cart == 0)
+	if (CCS1 || CCS2 || CCS3 || CCS4)
 		return;
 
 	m_expander->mreq_w(space, offset, data);
 
-	if (m_bk21 == 0 && IS_SVI328)
+	if (m_bk21 == 0 && IS_SVI328 && offset < 0x8000)
 		m_ram->write(offset, data);
-}
 
-READ8_MEMBER( svi3x8_state::page2_r)
-{
-	offset += 0x8000;
-
-	// cartridge /CCS3
-	if (m_cart == 0 && m_rom2 == 0 && offset < 0xc000)
-		return m_cart_rom->read_rom(space, offset);
-
-	// cartridge /CCS4
-	if (m_cart == 0 && m_rom3 == 0 && offset >= 0xc000)
-		return m_cart_rom->read_rom(space, offset);
-
-	UINT8 data = m_expander->mreq_r(space, offset);
-
-	if (m_ramdis == 1 && (offset >= 0x4000 || IS_SVI328))
-		return m_ram->read(IS_SVI328 ? offset : offset - 0xc000);
-
-	return data;
-}
-
-WRITE8_MEMBER( svi3x8_state::page2_w )
-{
-	offset += 0x8000;
-
-	// cartridge /CCS3
-	if (m_cart == 0 && m_rom2 == 0 && offset < 0xc000)
-		return;
-
-	// cartridge /CCS4
-	if (m_cart == 0 && m_rom3 == 0 && offset >= 0xc000)
-		return;
-
-	m_expander->mreq_w(space, offset, data);
-
-	if (m_ramdis == 1 && (offset >= 0x4000 || IS_SVI328))
+	if (RAMCS && (IS_SVI328 || offset >= 0xc000))
 		m_ram->write(IS_SVI328 ? offset : offset - 0xc000, data);
 }
 
