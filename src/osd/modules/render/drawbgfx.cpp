@@ -818,7 +818,7 @@ bgfx_chain* renderer_bgfx::screen_chain(int32_t screen)
 {
     if (screen >= m_screen_chains[window().m_index].size())
     {
-        return m_screen_chains[window().m_index][m_screen_chains.size() - 1];
+        return m_screen_chains[window().m_index][m_screen_chains[window().m_index].size() - 1];
     }
     else
     {
