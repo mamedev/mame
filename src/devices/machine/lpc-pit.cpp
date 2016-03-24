@@ -11,7 +11,7 @@ DEVICE_ADDRESS_MAP_START(map, 32, lpc_pit_device)
 	AM_RANGE(0x50, 0x53) AM_WRITE8    (          control_w, 0xff000000)
 ADDRESS_MAP_END
 
-lpc_pit_device::lpc_pit_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+lpc_pit_device::lpc_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: lpc_device(mconfig, LPC_PIT, "LPC PIT", tag, owner, clock, "lpc_pit", __FILE__)
 {
 }
@@ -32,16 +32,16 @@ void lpc_pit_device::device_reset()
 
 READ8_MEMBER( lpc_pit_device::status_r)
 {
-	logerror("%s: status_r %d\n", tag().c_str(), offset);
+	logerror("%s: status_r %d\n", tag(), offset);
 	return 0xff;
 }
 
 WRITE8_MEMBER(lpc_pit_device::access_w)
 {
-	logerror("%s: access_w %d, %02x\n", tag().c_str(), offset, data);
+	logerror("%s: access_w %d, %02x\n", tag(), offset, data);
 }
 
 WRITE8_MEMBER(lpc_pit_device::control_w)
 {
-	logerror("%s: control_w %02x\n", tag().c_str(), data);
+	logerror("%s: control_w %02x\n", tag(), data);
 }

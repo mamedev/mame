@@ -137,20 +137,30 @@ static inline float  ImLengthSqr(const ImVec4& lhs)                             
 static inline float  ImInvLength(const ImVec2& lhs, float fail_value)           { float d = lhs.x*lhs.x + lhs.y*lhs.y; if (d > 0.0f) return 1.0f / sqrtf(d); return fail_value; }
 static inline ImVec2 ImRound(ImVec2 v)                                          { return ImVec2((float)(int)v.x, (float)(int)v.y); }
 
+// We call C++ constructor on own allocated memory via the placement "new(ptr) Type()" syntax.
+// Defining a custom placement new() with a dummy parameter allows us to bypass including <new> which on some platforms complains when user has disabled exceptions.
+#ifdef IMGUI_DEFINE_PLACEMENT_NEW
+struct ImPlacementNewDummy {};
+inline void* operator new(size_t, ImPlacementNewDummy, void* ptr) { return ptr; }
+inline void operator delete(void*, ImPlacementNewDummy, void*) {}
+#define IM_PLACEMENT_NEW(_PTR)  new(ImPlacementNewDummy() ,_PTR)
+#endif
+
 //-----------------------------------------------------------------------------
 // Types
 //-----------------------------------------------------------------------------
 
 enum ImGuiButtonFlags_
 {
-    ImGuiButtonFlags_Repeat             = 1 << 0,
-    ImGuiButtonFlags_PressedOnClick     = 1 << 1,   // return pressed on click only (default requires click+release)
-    ImGuiButtonFlags_PressedOnRelease   = 1 << 2,   // return pressed on release only (default requires click+release)
-    ImGuiButtonFlags_FlattenChilds      = 1 << 3,
-    ImGuiButtonFlags_DontClosePopups    = 1 << 4,
-    ImGuiButtonFlags_Disabled           = 1 << 5,
-    ImGuiButtonFlags_AlignTextBaseLine  = 1 << 6,
-    ImGuiButtonFlags_NoKeyModifiers     = 1 << 7
+    ImGuiButtonFlags_Repeat                 = 1 << 0,   // hold to repeat
+    ImGuiButtonFlags_PressedOnClick         = 1 << 1,   // return pressed on click (default requires click+release)
+    ImGuiButtonFlags_PressedOnRelease       = 1 << 2,   // return pressed on release (default requires click+release)
+    ImGuiButtonFlags_PressedOnDoubleClick   = 1 << 3,   // return pressed on double-click (default requires click+release)
+    ImGuiButtonFlags_FlattenChilds          = 1 << 4,   // allow interaction even if a child window is overlapping
+    ImGuiButtonFlags_DontClosePopups        = 1 << 5,   // disable automatically closing parent popup on press
+    ImGuiButtonFlags_Disabled               = 1 << 6,   // disable interaction
+    ImGuiButtonFlags_AlignTextBaseLine      = 1 << 7,   // vertically align button to match text baseline - ButtonEx() only
+    ImGuiButtonFlags_NoKeyModifiers         = 1 << 8    // disable interaction if a key modifier is held
 };
 
 enum ImGuiTreeNodeFlags_
@@ -167,10 +177,10 @@ enum ImGuiSliderFlags_
 enum ImGuiSelectableFlagsPrivate_
 {
     // NB: need to be in sync with last value of ImGuiSelectableFlags_
-    ImGuiSelectableFlags_Menu               = 1 << 2,
-    ImGuiSelectableFlags_MenuItem           = 1 << 3,
-    ImGuiSelectableFlags_Disabled           = 1 << 4,
-    ImGuiSelectableFlags_DrawFillAvailWidth = 1 << 5
+    ImGuiSelectableFlags_Menu               = 1 << 3,
+    ImGuiSelectableFlags_MenuItem           = 1 << 4,
+    ImGuiSelectableFlags_Disabled           = 1 << 5,
+    ImGuiSelectableFlags_DrawFillAvailWidth = 1 << 6
 };
 
 // FIXME: this is in development, not exposed/functional as a generic feature yet.
@@ -371,7 +381,6 @@ struct ImGuiState
     ImGuiWindow*            MovedWindow;                        // Track the child window we clicked on to move a window. Pointer is only valid if ActiveID is the "#MOVE" identifier of a window.
     ImVector<ImGuiIniData>  Settings;                           // .ini Settings
     float                   SettingsDirtyTimer;                 // Save .ini settinngs on disk when time reaches zero
-    int                     DisableHideTextAfterDoubleHash;
     ImVector<ImGuiColMod>   ColorModifiers;                     // Stack for PushStyleColor()/PopStyleColor()
     ImVector<ImGuiStyleMod> StyleModifiers;                     // Stack for PushStyleVar()/PopStyleVar()
     ImVector<ImFont*>       FontStack;                          // Stack for PushFont()/PopFont()
@@ -426,8 +435,8 @@ struct ImGuiState
     float                   FramerateSecPerFrame[120];          // calculate estimate of framerate for user
     int                     FramerateSecPerFrameIdx;
     float                   FramerateSecPerFrameAccum;
-    bool                    CaptureMouseNextFrame;              // explicit capture via CaptureInputs() sets those flags
-    bool                    CaptureKeyboardNextFrame;
+    int                     CaptureMouseNextFrame;              // explicit capture via CaptureInputs() sets those flags
+    int                     CaptureKeyboardNextFrame;
     char                    TempBuffer[1024*3+1];               // temporary text buffer
 
     ImGuiState()
@@ -455,7 +464,6 @@ struct ImGuiState
         ActiveIdWindow = NULL;
         MovedWindow = NULL;
         SettingsDirtyTimer = 0.0f;
-        DisableHideTextAfterDoubleHash = 0;
 
         SetNextWindowPosVal = ImVec2(0.0f, 0.0f);
         SetNextWindowSizeVal = ImVec2(0.0f, 0.0f);
@@ -494,7 +502,7 @@ struct ImGuiState
         memset(FramerateSecPerFrame, 0, sizeof(FramerateSecPerFrame));
         FramerateSecPerFrameIdx = 0;
         FramerateSecPerFrameAccum = 0.0f;
-        CaptureMouseNextFrame = CaptureKeyboardNextFrame = false;
+        CaptureMouseNextFrame = CaptureKeyboardNextFrame = -1;
         memset(TempBuffer, 0, sizeof(TempBuffer));
     }
 };
@@ -600,7 +608,8 @@ struct IMGUI_API ImGuiWindow
     ImVec2                  ScrollTarget;                       // target scroll position. stored as cursor position with scrolling canceled out, so the highest point is always 0.0f. (FLT_MAX for no change)
     ImVec2                  ScrollTargetCenterRatio;            // 0.0f = scroll so that target position is at top, 0.5f = scroll so that target position is centered
     bool                    ScrollbarX, ScrollbarY;
-    ImVec2                  ScrollbarSizes;                     // 
+    ImVec2                  ScrollbarSizes;
+    float                   BorderSize;
     bool                    Active;                             // Set to true on Begin()
     bool                    WasActive;
     bool                    Accessed;                           // Set to true when any widget access the current window
@@ -667,6 +676,7 @@ namespace ImGui
     inline    ImGuiWindow*  GetCurrentWindowRead()      { ImGuiState& g = *GImGui; return g.CurrentWindow; }
     inline    ImGuiWindow*  GetCurrentWindow()          { ImGuiState& g = *GImGui; g.CurrentWindow->Accessed = true; return g.CurrentWindow; }
     IMGUI_API ImGuiWindow*  GetParentWindow();
+    IMGUI_API ImGuiWindow*  FindWindowByName(const char* name);
     IMGUI_API void          FocusWindow(ImGuiWindow* window);
 
     IMGUI_API void          SetActiveID(ImGuiID id, ImGuiWindow* window);
@@ -684,7 +694,6 @@ namespace ImGui
     IMGUI_API void          FocusableItemUnregister(ImGuiWindow* window);
     IMGUI_API ImVec2        CalcItemSize(ImVec2 size, float default_x, float default_y);
     IMGUI_API float         CalcWrapWidthForPos(const ImVec2& pos, float wrap_pos_x);
-    IMGUI_API void          SetItemAllowOverlap();      // Allow last item to be overlapped by a subsequent item
 
     IMGUI_API void          OpenPopupEx(const char* str_id, bool reopen_existing);
 

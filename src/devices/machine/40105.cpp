@@ -34,7 +34,7 @@ const device_type CMOS_40105 = &device_creator<cmos_40105_device>;
 //  cmos_40105_device - constructor
 //-------------------------------------------------
 
-cmos_40105_device::cmos_40105_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+cmos_40105_device::cmos_40105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CMOS_40105, "40105", tag, owner, clock, "40105", __FILE__),
 		m_write_dir(*this),
 		m_write_dor(*this), m_d(0), m_q(0), m_dir(0), m_dor(0), m_si(0), m_so(0)

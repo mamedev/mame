@@ -44,7 +44,7 @@
 class sbrkout_state : public driver_device
 {
 public:
-	sbrkout_state(const machine_config &mconfig, device_type type, std::string tag)
+	sbrkout_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -594,7 +594,7 @@ static MACHINE_CONFIG_START( sbrkout, sbrkout_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sbrkout_state, screen_update_sbrkout)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

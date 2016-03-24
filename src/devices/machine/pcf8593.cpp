@@ -46,7 +46,7 @@ const device_type PCF8593 = &device_creator<pcf8593_device>;
 //  pcf8593_device - constructor
 //-------------------------------------------------
 
-pcf8593_device::pcf8593_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pcf8593_device::pcf8593_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PCF8593, "PCF8593 RTC", tag, owner, clock, "pcf8593", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this)

@@ -1818,7 +1818,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<year>1995</year>
 		<publisher>Imagineer</publisher>
 		<part name="cart" interface="pico_cart">
-		<feature name="pcb" value="171-6882A" />
+			<feature name="pcb" value="171-6882A" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18565-t.ic1" size="524288" crc="8ba23bbe" sha1="85e6ed98f5e7bfa04c1b099bba79ddd34ccdd40e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>

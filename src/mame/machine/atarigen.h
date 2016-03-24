@@ -11,12 +11,9 @@
 #ifndef __MACHINE_ATARIGEN__
 #define __MACHINE_ATARIGEN__
 
-#include "machine/nvram.h"
-#include "machine/er2055.h"
 #include "machine/eeprompar.h"
 #include "video/atarimo.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/okim6295.h"
 #include "includes/slapstic.h"
 
 
@@ -111,7 +108,7 @@ class atari_sound_comm_device :  public device_t
 {
 public:
 	// construction/destruction
-	atari_sound_comm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void static_set_sound_cpu(device_t &device, const char *cputag);
@@ -184,16 +181,16 @@ class atari_vad_device :    public device_t,
 {
 public:
 	// construction/destruction
-	atari_vad_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &static_set_scanline_int_cb(device_t &device, _Object object) { return downcast<atari_vad_device &>(device).m_scanline_int_cb.set_callback(object); }
 
 	// getters
-	tilemap_device *alpha() const { return m_alpha_tilemap; }
-	tilemap_device *playfield() const { return m_playfield_tilemap; }
-	tilemap_device *playfield2() const { return m_playfield2_tilemap; }
-	atari_motion_objects_device *mob() const { return m_mob; }
+	tilemap_device &alpha() const { return *m_alpha_tilemap; }
+	tilemap_device &playfield() const { return *m_playfield_tilemap; }
+	tilemap_device &playfield2() const { return *m_playfield2_tilemap; }
+	atari_motion_objects_device &mob() const { return *m_mob; }
 
 	// read/write handlers
 	DECLARE_READ16_MEMBER(control_read);
@@ -265,7 +262,7 @@ class atari_eeprom_device : public device_t
 {
 protected:
 	// construction/destruction
-	atari_eeprom_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source);
+	atari_eeprom_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
 
 public:
 	// unlock controls
@@ -296,7 +293,7 @@ class atari_eeprom_2804_device : public atari_eeprom_device
 {
 public:
 	// construction/destruction
-	atari_eeprom_2804_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	atari_eeprom_2804_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
@@ -307,7 +304,7 @@ class atari_eeprom_2816_device : public atari_eeprom_device
 {
 public:
 	// construction/destruction
-	atari_eeprom_2816_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	atari_eeprom_2816_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
@@ -332,7 +329,7 @@ class atarigen_state : public driver_device
 {
 public:
 	// construction/destruction
-	atarigen_state(const machine_config &mconfig, device_type type, std::string tag);
+	atarigen_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	// users must call through to these
 	virtual void machine_start() override;
@@ -358,19 +355,11 @@ public:
 	DECLARE_WRITE16_MEMBER(video_int_ack_w);
 
 	// slapstic helpers
-	void slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, int chipnum);
+	void slapstic_configure(cpu_device &device, offs_t base, offs_t mirror);
 	void slapstic_update_bank(int bank);
 	DECLARE_DIRECT_UPDATE_MEMBER(slapstic_setdirect);
 	DECLARE_WRITE16_MEMBER(slapstic_w);
 	DECLARE_READ16_MEMBER(slapstic_r);
-
-	// sound helpers
-	void set_volume_by_type(int volume, device_type type);
-	void set_ym2151_volume(int volume);
-	void set_ym2413_volume(int volume);
-	void set_pokey_volume(int volume);
-	void set_tms5220_volume(int volume);
-	void set_oki6295_volume(int volume);
 
 	// scanline timing
 	void scanline_timer_reset(screen_device &screen, int frequency);
@@ -383,11 +372,6 @@ public:
 	// misc helpers
 	void blend_gfx(int gfx0, int gfx1, int mask0, int mask1);
 
-	// vector and early raster EAROM interface
-	DECLARE_READ8_MEMBER( earom_r );
-	DECLARE_WRITE8_MEMBER( earom_w );
-	DECLARE_WRITE8_MEMBER( earom_control_w );
-
 	// timer IDs
 	enum
 	{
@@ -396,11 +380,6 @@ public:
 		TID_UNHALT_CPU,
 		TID_ATARIGEN_LAST
 	};
-
-	// vector and early raster EAROM interface
-	optional_device<er2055_device> m_earom;
-	UINT8               m_earom_data;
-	UINT8               m_earom_control;
 
 	UINT8               m_scanline_int_state;
 	UINT8               m_sound_int_state;
@@ -424,10 +403,7 @@ public:
 
 	atarigen_screen_timer   m_screen_timer[2];
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<okim6295_device> m_oki;
 
-	optional_device<atari_sound_comm_device> m_soundcomm;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;

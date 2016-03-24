@@ -76,7 +76,7 @@ ROM_END
 //  bsmt2000_device - constructor
 //-------------------------------------------------
 
-bsmt2000_device::bsmt2000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+bsmt2000_device::bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BSMT2000, "BSMT2000", tag, owner, clock, "bsmt2000", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),

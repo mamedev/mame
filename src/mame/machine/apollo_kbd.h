@@ -47,7 +47,7 @@ class apollo_kbd_device :   public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	apollo_kbd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object) { return downcast<apollo_kbd_device &>(device).m_tx_w.set_callback(object); }
 	template<class _Object> static devcb_base &set_german_cb(device_t &device, _Object object) { return downcast<apollo_kbd_device &>(device).m_german_r.set_callback(object); }
@@ -93,8 +93,7 @@ private:
 		void on();
 	private:
 		int keyboard_has_beeper();
-		void beeper_callback();
-		static TIMER_CALLBACK( static_beeper_callback );
+		TIMER_CALLBACK_MEMBER(beeper_callback);
 
 		apollo_kbd_device *m_device; // pointer back to our device
 		beep_device *m_beeper; // the keyboard beeper device

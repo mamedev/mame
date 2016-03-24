@@ -206,12 +206,12 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 static int output_file(file_type type, int srcrootlen, int dstrootlen, std::string &srcfile, std::string &dstfile, bool link_to_file, std::string &tempheader, std::string &tempfooter);
 
 // HTML helpers
-static core_file *create_file_and_output_header(std::string &filename, std::string &templatefile, std::string &path);
-static void output_footer_and_close_file(core_file *file, std::string &templatefile, std::string &path);
+static util::core_file::ptr create_file_and_output_header(std::string &filename, std::string &templatefile, std::string &path);
+static void output_footer_and_close_file(util::core_file::ptr &&file, std::string &templatefile, std::string &path);
 
 // path helpers
 static std::string &normalized_subpath(std::string &dest, std::string &path, int start);
-static void output_path_as_links(core_file *file, std::string &path, bool end_is_directory, bool link_to_file);
+static void output_path_as_links(util::core_file &file, std::string &path, bool end_is_directory, bool link_to_file);
 static bool find_include_file(std::string &srcincpath, int srcrootlen, int dstrootlen, std::string &srcfile, std::string &dstfile, std::string &filename);
 
 
@@ -279,7 +279,7 @@ int main(int argc, char *argv[])
 	// read the template file into an std::string
 	UINT32 bufsize;
 	void *buffer;
-	if (core_fload(tempfilename.c_str(), &buffer, &bufsize) == FILERR_NONE)
+	if (util::core_file::load(tempfilename.c_str(), &buffer, bufsize) == osd_file::error::NONE)
 	{
 		tempheader.assign((const char *)buffer, bufsize);
 		osd_free(buffer);
@@ -332,13 +332,13 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 
 	// create an index file
 	std::string indexname;
-	strprintf(indexname,"%s%c%s", dstdir.c_str(), PATH_SEPARATOR[0], "index.html");
-	core_file *indexfile = create_file_and_output_header(indexname, tempheader, srcdir_subpath);
+	indexname = string_format("%s%c%s", dstdir.c_str(), PATH_SEPARATOR[0], "index.html");
+	util::core_file::ptr indexfile = create_file_and_output_header(indexname, tempheader, srcdir_subpath);
 
 	// output the directory navigation
-	core_fprintf(indexfile, "<h3>Viewing Directory: ");
-	output_path_as_links(indexfile, srcdir_subpath, true, false);
-	core_fprintf(indexfile, "</h3>");
+	indexfile->printf("<h3>Viewing Directory: ");
+	output_path_as_links(*indexfile, srcdir_subpath, true, false);
+	indexfile->printf("</h3>");
 
 	// iterate first over directories, then over files
 	int result = 0;
@@ -398,11 +398,11 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 		{
 			// add a header
 			if (curlist == list)
-				core_fprintf(indexfile, "\t<h2>%s</h2>\n\t<ul>\n", (entry_type == ENTTYPE_DIR) ? "Directories" : "Files");
+				indexfile->printf("\t<h2>%s</h2>\n\t<ul>\n", (entry_type == ENTTYPE_DIR) ? "Directories" : "Files");
 
 			// build the source filename
 			std::string srcfile;
-			strprintf(srcfile, "%s%c%s", srcdir.c_str(), PATH_SEPARATOR[0], curlist->name.c_str());
+			srcfile = string_format("%s%c%s", srcdir.c_str(), PATH_SEPARATOR[0], curlist->name.c_str());
 
 			// if we have a file, output it
 			std::string dstfile;
@@ -420,9 +420,9 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 				// if we got a valid file, process it
 				if (type != FILE_TYPE_INVALID)
 				{
-					strprintf(dstfile, "%s%c%s.html", dstdir.c_str(), PATH_SEPARATOR[0], curlist->name.c_str());
+					dstfile = string_format("%s%c%s.html", dstdir.c_str(), PATH_SEPARATOR[0], curlist->name.c_str());
 					if (indexfile != nullptr)
-						core_fprintf(indexfile, "\t<li><a href=\"%s.html\">%s</a></li>\n", curlist->name.c_str(), curlist->name.c_str());
+						indexfile->printf("\t<li><a href=\"%s.html\">%s</a></li>\n", curlist->name.c_str(), curlist->name.c_str());
 					result = output_file(type, srcrootlen, dstrootlen, srcfile, dstfile, srcdir.compare(dstdir) == 0, tempheader, tempfooter);
 				}
 			}
@@ -430,16 +430,16 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 			// if we have a directory, recurse
 			else
 			{
-				strprintf(dstfile, "%s%c%s", dstdir.c_str(), PATH_SEPARATOR[0], curlist->name.c_str());
+				dstfile = string_format("%s%c%s", dstdir.c_str(), PATH_SEPARATOR[0], curlist->name.c_str());
 				if (indexfile != nullptr)
-					core_fprintf(indexfile, "\t<li><a href=\"%s/index.html\">%s/</a></li>\n", curlist->name.c_str(), curlist->name.c_str());
+					indexfile->printf("\t<li><a href=\"%s/index.html\">%s/</a></li>\n", curlist->name.c_str(), curlist->name.c_str());
 				result = recurse_dir(srcrootlen, dstrootlen, srcfile, dstfile, tempheader, tempfooter);
 			}
 		}
 
 		// close the list if we found some stuff
 		if (list != nullptr)
-			core_fprintf(indexfile, "\t</ul>\n");
+			indexfile->printf("\t</ul>\n");
 
 		// free all the allocated entries
 		while (list != nullptr)
@@ -451,7 +451,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 	}
 
 	if (indexfile != nullptr)
-		output_footer_and_close_file(indexfile, tempfooter, srcdir_subpath);
+		output_footer_and_close_file(std::move(indexfile), tempfooter, srcdir_subpath);
 	return result;
 }
 
@@ -516,39 +516,39 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 		is_token[(UINT8)token_chars[toknum]] = true;
 
 	// open the source file
-	core_file *src;
-	if (core_fopen(srcfile.c_str(), OPEN_FLAG_READ, &src) != FILERR_NONE)
+	util::core_file::ptr src;
+	if (util::core_file::open(srcfile, OPEN_FLAG_READ, src) != osd_file::error::NONE)
 	{
 		fprintf(stderr, "Unable to read file '%s'\n", srcfile.c_str());
 		return 1;
 	}
 
 	// open the output file
-	core_file *dst = create_file_and_output_header(dstfile, tempheader, srcfile_subpath);
+	util::core_file::ptr dst = create_file_and_output_header(dstfile, tempheader, srcfile_subpath);
 	if (dst == nullptr)
 	{
 		fprintf(stderr, "Unable to write file '%s'\n", dstfile.c_str());
-		core_fclose(src);
 		return 1;
 	}
 
 	// output the directory navigation
-	core_fprintf(dst, "<h3>Viewing File: ");
-	output_path_as_links(dst, srcfile_subpath, false, link_to_file);
-	core_fprintf(dst, "</h3>");
+	dst->printf("<h3>Viewing File: ");
+	output_path_as_links(*dst, srcfile_subpath, false, link_to_file);
+	dst->printf("</h3>");
 
 	// start with some tags
-	core_fprintf(dst, "\t<pre class=\"source\">\n");
+	dst->printf("\t<pre class=\"source\">\n");
 
 	// iterate over lines in the source file
 	int linenum = 1;
 	bool in_comment = false;
 	char srcline[4096];
-	while (core_fgets(srcline, ARRAY_LENGTH(srcline), src) != nullptr)
+	std::ostringstream dstline;
+	while (src->gets(srcline, ARRAY_LENGTH(srcline)) != nullptr)
 	{
 		// start with the line number
-		std::string dstline;
-		strcatprintf(dstline, "<span class=\"linenum\">%5d</span>&nbsp;&nbsp;", linenum++);
+		dstline.str("");
+		util::stream_format(dstline, "<span class=\"linenum\">%5d</span>&nbsp;&nbsp;", linenum++);
 
 		// iterate over characters in the source line
 		bool escape = false;
@@ -568,7 +568,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 			{
 				if (!in_comment && ch == comment_start[0] && strncmp(srcptr - 1, comment_start, strlen(comment_start)) == 0)
 				{
-					strcatprintf(dstline, "<span class=\"comment\">%s", comment_start_esc);
+					util::stream_format(dstline, "<span class=\"comment\">%s", comment_start_esc);
 					curcol += strlen(comment_start);
 					srcptr += strlen(comment_start) - 1;
 					ch = 0;
@@ -576,7 +576,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 				}
 				else if (in_comment && ch == comment_end[0] && strncmp(srcptr - 1, comment_end, strlen(comment_end)) == 0)
 				{
-					strcatprintf(dstline, "%s</span>", comment_end_esc);
+					util::stream_format(dstline, "%s</span>", comment_end_esc);
 					curcol += strlen(comment_end);
 					srcptr += strlen(comment_end) - 1;
 					ch = 0;
@@ -587,7 +587,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 			// track whether or not we are within an inline (C++-style) comment
 			if (!in_quotes && !in_comment && !in_inline_comment && ch == comment_inline[0] && strncmp(srcptr - 1, comment_inline, strlen(comment_inline)) == 0)
 			{
-				strcatprintf(dstline, "<span class=\"comment\">%s", comment_inline_esc);
+				util::stream_format(dstline, "<span class=\"comment\">%s", comment_inline_esc);
 				curcol += strlen(comment_inline);
 				srcptr += strlen(comment_inline) - 1;
 				ch = 0;
@@ -611,7 +611,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 				for (curtoken = token_table; curtoken->token != nullptr; curtoken++)
 					if (strncmp(srcptr - 1, curtoken->token, toklength) == 0 && strlen(curtoken->token) == toklength)
 					{
-						strcatprintf(dstline, "<span class=\"%s\">%s</span>", curtoken->color, curtoken->token);
+						util::stream_format(dstline, "<span class=\"%s\">%s</span>", curtoken->color, curtoken->token);
 						curcol += strlen(curtoken->token);
 						srcptr += strlen(curtoken->token) - 1;
 						ch = 0;
@@ -631,7 +631,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 				int spaces = 4 - curcol % 4;
 				while (spaces--)
 				{
-					dstline.push_back(' ');
+					dstline.put(' ');
 					curcol++;
 				}
 			}
@@ -643,9 +643,9 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 				if (!in_comment && !in_inline_comment && !in_quotes && (ch == '"' || ch == '\''))
 				{
 					if (color_quotes)
-						strcatprintf(dstline, "<span class=\"string\">%c", ch);
+						util::stream_format(dstline, "<span class=\"string\">%c", ch);
 					else
-						dstline.push_back(ch);
+						dstline.put(ch);
 					in_quotes = true;
 					curquote = ch;
 
@@ -659,7 +659,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 							std::string target;
 							if (find_include_file(target, srcrootlen, dstrootlen, srcfile, dstfile, filename))
 							{
-								strcatprintf(dstline, "<a href=\"%s\">", target.c_str());
+								util::stream_format(dstline, "<a href=\"%s\">", target.c_str());
 								quotes_are_linked = true;
 							}
 						}
@@ -670,11 +670,11 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 				else if (!in_comment && !in_inline_comment && in_quotes && (ch == curquote) && !escape)
 				{
 					if (quotes_are_linked)
-						dstline.append("</a>");
+						dstline << "</a>";
 					if (color_quotes)
-						strcatprintf(dstline, "%c</span>", ch);
+						util::stream_format(dstline, "%c</span>", ch);
 					else
-						dstline.push_back(ch);
+						dstline.put(ch);
 					in_quotes = false;
 					curquote = 0;
 					quotes_are_linked = false;
@@ -682,13 +682,13 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 
 				// else just output the current character
 				else if (ch == '&')
-					dstline.append("&amp;");
+					dstline << "&amp;";
 				else if (ch == '<')
-					dstline.append("&lt;");
+					dstline << "&lt;";
 				else if (ch == '>')
-					dstline.append("&gt;");
+					dstline << "&gt;";
 				else
-					dstline.push_back(ch);
+					dstline.put(ch);
 				curcol++;
 			}
 
@@ -700,21 +700,20 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 		// finish inline comments
 		if (in_inline_comment)
 		{
-			dstline.append("</span>");
+			dstline << "</span>";
 			in_inline_comment = false;
 		}
 
 		// append a break and move on
-		dstline.append("\n");
-		core_fputs(dst, dstline.c_str());
+		dstline.put('\n');
+		dst->puts(dstline.str().c_str());
 	}
 
 	// close tags
-	core_fprintf(dst, "\t</pre>\n");
+	dst->printf("\t</pre>\n");
 
 	// close the file
-	output_footer_and_close_file(dst, tempfooter, srcfile_subpath);
-	core_fclose(src);
+	output_footer_and_close_file(std::move(dst), tempfooter, srcfile_subpath);
 	return 0;
 }
 
@@ -729,17 +728,17 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
     HTML file with a standard header
 -------------------------------------------------*/
 
-static core_file *create_file_and_output_header(std::string &filename, std::string &templatefile, std::string &path)
+static util::core_file::ptr create_file_and_output_header(std::string &filename, std::string &templatefile, std::string &path)
 {
 	// create the indexfile
-	core_file *file;
-	if (core_fopen(filename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, &file) != FILERR_NONE)
-		return nullptr;
+	util::core_file::ptr file;
+	if (util::core_file::open(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, file) != osd_file::error::NONE)
+		return util::core_file::ptr();
 
 	// print a header
 	std::string modified(templatefile);
 	strreplace(modified, "<!--PATH-->", path.c_str());
-	core_fwrite(file, modified.c_str(), modified.length());
+	file->write(modified.c_str(), modified.length());
 
 	// return the file
 	return file;
@@ -751,12 +750,12 @@ static core_file *create_file_and_output_header(std::string &filename, std::stri
     standard footer to an HTML file and close it
 -------------------------------------------------*/
 
-static void output_footer_and_close_file(core_file *file, std::string &templatefile, std::string &path)
+static void output_footer_and_close_file(util::core_file::ptr &&file, std::string &templatefile, std::string &path)
 {
 	std::string modified(templatefile);
 	strreplace(modified, "<!--PATH-->", path.c_str());
-	core_fwrite(file, modified.c_str(), modified.length());
-	core_fclose(file);
+	file->write(modified.c_str(), modified.length());
+	file.reset();
 }
 
 
@@ -782,7 +781,7 @@ static std::string &normalized_subpath(std::string &dest, std::string &path, int
     series of links
 -------------------------------------------------*/
 
-static void output_path_as_links(core_file *file, std::string &path, bool end_is_directory, bool link_to_file)
+static void output_path_as_links(util::core_file &file, std::string &path, bool end_is_directory, bool link_to_file)
 {
 	// first count how deep we are
 	int srcdepth = 0;
@@ -792,10 +791,10 @@ static void output_path_as_links(core_file *file, std::string &path, bool end_is
 		srcdepth++;
 
 	// output a link to the root
-	core_fprintf(file, "<a href=\"");
+	file.printf("<a href=\"");
 	for (int depth = 0; depth < srcdepth; depth++)
-		core_fprintf(file, "../");
-	core_fprintf(file, "index.html\">&lt;root&gt;</a>/");
+		file.printf("../");
+	file.printf("index.html\">&lt;root&gt;</a>/");
 
 	// now output links to each path up the chain
 	int curdepth = 0;
@@ -805,10 +804,10 @@ static void output_path_as_links(core_file *file, std::string &path, bool end_is
 		std::string substr(path, lastslash, slashindex - lastslash);
 
 		curdepth++;
-		core_fprintf(file, "<a href=\"");
+		file.printf("<a href=\"");
 		for (int depth = curdepth; depth < srcdepth; depth++)
-			core_fprintf(file, "../");
-		core_fprintf(file, "index.html\">%s</a>/", substr.c_str());
+			file.printf("../");
+		file.printf("index.html\">%s</a>/", substr.c_str());
 
 		lastslash = slashindex + 1;
 	}
@@ -816,11 +815,11 @@ static void output_path_as_links(core_file *file, std::string &path, bool end_is
 	// and a final link to the current directory
 	std::string substr(path, lastslash, -1);
 	if (end_is_directory)
-		core_fprintf(file, "<a href=\"index.html\">%s</a>", substr.c_str());
+		file.printf("<a href=\"index.html\">%s</a>", substr.c_str());
 	else if (link_to_file)
-		core_fprintf(file, "<a href=\"%s\">%s</a>", substr.c_str(), substr.c_str());
+		file.printf("<a href=\"%s\">%s</a>", substr.c_str(), substr.c_str());
 	else
-		core_fprintf(file, "<a href=\"%s.html\">%s</a>", substr.c_str(), substr.c_str());
+		file.printf("<a href=\"%s.html\">%s</a>", substr.c_str(), substr.c_str());
 }
 
 
@@ -865,11 +864,11 @@ static bool find_include_file(std::string &srcincpath, int srcrootlen, int dstro
 		srcincpath.append(PATH_SEPARATOR).append(filename.substr(lastsepindex, -1));
 
 		// see if we can open it
-		core_file *testfile;
-		if (core_fopen(srcincpath.c_str(), OPEN_FLAG_READ, &testfile) == FILERR_NONE)
+		util::core_file::ptr testfile;
+		if (util::core_file::open(srcincpath, OPEN_FLAG_READ, testfile) == osd_file::error::NONE)
 		{
 			// close the file
-			core_fclose(testfile);
+			testfile.reset();
 
 			// find the longest matching directory substring between the include and source file
 			lastsepindex = 0;

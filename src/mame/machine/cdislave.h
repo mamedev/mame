@@ -46,7 +46,7 @@ class cdislave_device : public device_t
 {
 public:
 	// construction/destruction
-	cdislave_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// external callbacks
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_update );

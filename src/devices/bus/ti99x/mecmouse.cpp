@@ -52,7 +52,7 @@
 
 #define POLL_TIMER 1
 
-mecmouse_device::mecmouse_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mecmouse_device::mecmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: joyport_attached_device(mconfig, MECMOUSE, "Mechatronics Mouse", tag, owner, clock, "mecmouse", __FILE__), m_last_select(0), m_read_y_axis(false), m_x(0), m_y(0), m_x_buf(0), m_y_buf(0), m_last_mx(0), m_last_my(0), m_poll_timer(nullptr)
 {
 }

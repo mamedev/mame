@@ -19,8 +19,8 @@ class snapshot_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	snapshot_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	snapshot_image_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	snapshot_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual ~snapshot_image_device();
 
 	static void static_set_interface(device_t &device, const char *_interface) { downcast<snapshot_image_device &>(device).m_interface = _interface; }
@@ -63,7 +63,7 @@ class quickload_image_device : public snapshot_image_device
 {
 public:
 	// construction/destruction
-	quickload_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual iodevice_t image_type() const override { return IO_QUICKLOAD; }
 };

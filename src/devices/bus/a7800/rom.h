@@ -14,8 +14,8 @@ class a78_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	a78_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	a78_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a78_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a78_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -32,8 +32,8 @@ class a78_rom_pokey_device : public a78_rom_device
 {
 public:
 	// construction/destruction
-	a78_rom_pokey_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	a78_rom_pokey_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a78_rom_pokey_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a78_rom_pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -53,8 +53,8 @@ class a78_rom_sg_device : public a78_rom_device
 {
 public:
 	// construction/destruction
-	a78_rom_sg_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	a78_rom_sg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a78_rom_sg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a78_rom_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -75,7 +75,7 @@ class a78_rom_sg_pokey_device : public a78_rom_sg_device
 {
 public:
 	// construction/destruction
-	a78_rom_sg_pokey_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a78_rom_sg_pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -95,8 +95,8 @@ class a78_rom_sg_ram_device : public a78_rom_sg_device
 {
 public:
 	// construction/destruction
-	a78_rom_sg_ram_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	a78_rom_sg_ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a78_rom_sg_ram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a78_rom_sg_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_40xx) override;
@@ -110,8 +110,8 @@ class a78_rom_sg9_device : public a78_rom_sg_device
 {
 public:
 	// construction/destruction
-	a78_rom_sg9_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	a78_rom_sg9_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a78_rom_sg9_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a78_rom_sg9_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_40xx) override;
@@ -125,7 +125,7 @@ class a78_rom_abs_device : public a78_rom_device
 {
 public:
 	// construction/destruction
-	a78_rom_abs_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a78_rom_abs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -146,7 +146,7 @@ class a78_rom_act_device : public a78_rom_device
 {
 public:
 	// construction/destruction
-	a78_rom_act_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a78_rom_act_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -169,7 +169,7 @@ class a78_rom_p450_device : public a78_rom_device
 {
 public:
 	// construction/destruction
-	a78_rom_p450_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a78_rom_p450_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
@@ -188,7 +188,7 @@ class a78_rom_p450_pokey_device : public a78_rom_pokey_device
 {
 public:
 	// construction/destruction
-	a78_rom_p450_pokey_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a78_rom_p450_pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
@@ -207,7 +207,7 @@ class a78_rom_p450_sg_ram_device : public a78_rom_sg_ram_device
 {
 public:
 	// construction/destruction
-	a78_rom_p450_sg_ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a78_rom_p450_sg_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
@@ -226,7 +226,7 @@ class a78_rom_p450_sg9_device : public a78_rom_sg9_device
 {
 public:
 	// construction/destruction
-	a78_rom_p450_sg9_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a78_rom_p450_sg9_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 

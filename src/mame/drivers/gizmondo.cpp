@@ -45,7 +45,7 @@ SYSINTR_GPS      = INT_EINT3, INT_EINT8_23 (EINT18)
 class gizmondo_state : public driver_device
 {
 public:
-	gizmondo_state(const machine_config &mconfig, device_type type, std::string tag)
+	gizmondo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_s3c2440(*this, "s3c2440"),
 		m_maincpu(*this, "maincpu"),

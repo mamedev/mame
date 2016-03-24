@@ -86,7 +86,7 @@ Is there another alt program rom set labeled 9 & 10?
 class sandscrp_state : public driver_device
 {
 public:
-	sandscrp_state(const machine_config &mconfig, device_type type, std::string tag)
+	sandscrp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),

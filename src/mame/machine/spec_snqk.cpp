@@ -48,26 +48,26 @@
 
 static void log_quickload(running_machine &machine, const char *type, UINT32 start, UINT32 length, UINT32 exec, const char *exec_format)
 {
-	std::string tempstring;
+	std::ostringstream tempstring;
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 
 	state->logerror("Loading %04X bytes of RAM at %04X\n", length, start);
 
-	strcatprintf(tempstring,"Quickload type: %s   Length: %d bytes\n", type, length);
-	strcatprintf(tempstring,"Start: 0x%04X   End: 0x%04X   Exec: ", start, start + length - 1);
+	util::stream_format(tempstring, "Quickload type: %s   Length: %d bytes\n", type, length);
+	util::stream_format(tempstring, "Start: 0x%04X   End: 0x%04X   Exec: ", start, start + length - 1);
 
 	state->logerror("Quickload loaded.\n");
 	if (!core_stricmp(exec_format, EXEC_NA))
-		tempstring.append("N/A");
+		tempstring << "N/A";
 	else
 	{
 		state->logerror("Execution can resume with ");
 		state->logerror(exec_format, exec);
 		state->logerror("\n");
-		strcatprintf(tempstring,exec_format, exec);
+		util::stream_format(tempstring, exec_format, exec);
 	}
 
-	machine.ui().popup_time(10, "%s", tempstring.c_str());
+	machine.ui().popup_time(10, "%s", tempstring.str());
 }
 
 /*******************************************************************

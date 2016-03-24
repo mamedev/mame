@@ -127,7 +127,7 @@ How does the Super Famicom Box operates
 class sfcbox_state : public snes_state
 {
 public:
-	sfcbox_state(const machine_config &mconfig, device_type type, std::string tag)
+	sfcbox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: snes_state(mconfig, type, tag),
 		m_bios(*this, "bios"),
 		m_mb90082(*this,"mb90082"),

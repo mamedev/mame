@@ -33,7 +33,7 @@ const device_type AMIGA = &device_creator<amiga_sound_device>;
 //  amiga_sound_device - constructor
 //-------------------------------------------------
 
-amiga_sound_device::amiga_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+amiga_sound_device::amiga_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AMIGA, "Amiga Paula", tag, owner, clock, "amiga_paula", __FILE__),
 	device_sound_interface(mconfig, *this),
 	m_stream(nullptr)

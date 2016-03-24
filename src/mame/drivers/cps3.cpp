@@ -774,7 +774,7 @@ void cps3_state::init_common(void)
 	// flash roms
 	for (int simmnum = 0; simmnum < 7; simmnum++)
 		for (int chipnum = 0; chipnum < 8; chipnum++)
-			m_simm[simmnum][chipnum] = machine().device<fujitsu_29f016a_device>(strformat("simm%d.%d", simmnum + 1, chipnum).c_str());
+			m_simm[simmnum][chipnum] = machine().device<fujitsu_29f016a_device>(string_format("simm%d.%d", simmnum + 1, chipnum).c_str());
 
 	m_eeprom = std::make_unique<UINT32[]>(0x400/4);
 	machine().device<nvram_device>("eeprom")->set_base(m_eeprom.get(), 0x400);
@@ -788,12 +788,25 @@ void cps3_state::init_crypt(UINT32 key1, UINT32 key2, int altEncryption)
 	m_altEncryption = altEncryption;
 
 	// cache pointers to regions
-	m_user4region = memregion("user4")->base();
-	m_user5region = memregion("user5")->base();
+	if (m_user4_region)
+	{
+		m_user4 = m_user4_region->base();
+	}
+	else
+	{
+		m_user4 = auto_alloc_array(machine(), UINT8, USER4REGION_LENGTH);
+	}
 
-	if (!m_user4region) m_user4region = auto_alloc_array(machine(), UINT8, USER4REGION_LENGTH);
-	if (!m_user5region) m_user5region = auto_alloc_array(machine(), UINT8, USER5REGION_LENGTH);
-	m_cps3sound->set_base((INT8*)m_user5region);
+	if (m_user5_region)
+	{
+		m_user5 = m_user5_region->base();
+	}
+	else
+	{
+		m_user5 = auto_alloc_array(machine(), UINT8, USER5REGION_LENGTH);
+	}
+
+	m_cps3sound->set_base((INT8*)m_user5);
 
 	// set strict verify
 	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY);
@@ -1404,22 +1417,22 @@ READ32_MEMBER(cps3_state::cps3_gfxflash_r)
 
 	if (ACCESSING_BITS_24_31)   // GFX Flash 1
 	{
-		logerror("read GFX flash chip %s addr %02x\n", chip0->tag().c_str(), (offset<<1));
+		logerror("read GFX flash chip %s addr %02x\n", chip0->tag(), (offset<<1));
 		result |= chip0->read( (offset<<1) ) << 24;
 	}
 	if (ACCESSING_BITS_16_23)   // GFX Flash 2
 	{
-		logerror("read GFX flash chip %s addr %02x\n", chip1->tag().c_str(), (offset<<1));
+		logerror("read GFX flash chip %s addr %02x\n", chip1->tag(), (offset<<1));
 		result |= chip1->read( (offset<<1) ) << 16;
 	}
 	if (ACCESSING_BITS_8_15)    // GFX Flash 1
 	{
-		logerror("read GFX flash chip %s addr %02x\n", chip0->tag().c_str(), (offset<<1)+1);
+		logerror("read GFX flash chip %s addr %02x\n", chip0->tag(), (offset<<1)+1);
 		result |= chip0->read( (offset<<1)+0x1 ) << 8;
 	}
 	if (ACCESSING_BITS_0_7) // GFX Flash 2
 	{
-		logerror("read GFX flash chip %s addr %02x\n", chip1->tag().c_str(), (offset<<1)+1);
+		logerror("read GFX flash chip %s addr %02x\n", chip1->tag(), (offset<<1)+1);
 		result |= chip1->read( (offset<<1)+0x1 ) << 0;
 	}
 
@@ -1444,19 +1457,19 @@ WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
 	if (ACCESSING_BITS_24_31)   // GFX Flash 1
 	{
 		command = (data >> 24) & 0xff;
-		logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip0->tag().c_str(), (offset<<1), command);
+		logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip0->tag(), (offset<<1), command);
 		chip0->write( (offset<<1), command);
 	}
 	if (ACCESSING_BITS_16_23)   // GFX Flash 2
 	{
 		command = (data >> 16) & 0xff;
-		logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip1->tag().c_str(), (offset<<1), command);
+		logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip1->tag(), (offset<<1), command);
 		chip1->write( (offset<<1), command);
 	}
 	if (ACCESSING_BITS_8_15)    // GFX Flash 1
 	{
 		command = (data >> 8) & 0xff;
-		logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip0->tag().c_str(), (offset<<1)+1, command);
+		logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip0->tag(), (offset<<1)+1, command);
 		chip0->write( (offset<<1)+0x1, command);
 	}
 	if (ACCESSING_BITS_0_7) // GFX Flash 2
@@ -1468,7 +1481,7 @@ WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
 
 	/* make a copy in the linear memory region we actually use for drawing etc.  having it stored in interleaved flash roms isnt' very useful */
 	{
-		UINT32* romdata = (UINT32*)m_user5region;
+		UINT32* romdata = (UINT32*)m_user5;
 		int real_offset = 0;
 		UINT32 newdata;
 
@@ -1551,31 +1564,31 @@ void cps3_state::cps3_flashmain_w(int which, UINT32 offset, UINT32 data, UINT32 
 	if (ACCESSING_BITS_24_31)   // Flash 1
 	{
 		command = (data >> 24) & 0xff;
-		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][0]->tag().c_str(), offset, command);
+		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][0]->tag(), offset, command);
 		m_simm[which][0]->write(offset, command);
 	}
 	if (ACCESSING_BITS_16_23)   // Flash 2
 	{
 		command = (data >> 16) & 0xff;
-		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][1]->tag().c_str(), offset, command);
+		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][1]->tag(), offset, command);
 		m_simm[which][1]->write(offset, command);
 	}
 	if (ACCESSING_BITS_8_15)    // Flash 2
 	{
 		command = (data >> 8) & 0xff;
-		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][2]->tag().c_str(), offset, command);
+		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][2]->tag(), offset, command);
 		m_simm[which][2]->write(offset, command);
 	}
 	if (ACCESSING_BITS_0_7) // Flash 2
 	{
 		command = (data >> 0) & 0xff;
-		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][3]->tag().c_str(), offset, command);
+		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][3]->tag(), offset, command);
 		m_simm[which][3]->write(offset, command);
 	}
 
 	/* copy data into regions to execute from */
 	{
-		UINT32* romdata =  (UINT32*)m_user4region;
+		UINT32* romdata =  (UINT32*)m_user4;
 		UINT32* romdata2 = (UINT32*)m_decrypted_gamerom;
 		int real_offset = 0;
 		UINT32 newdata;
@@ -1799,7 +1812,7 @@ WRITE32_MEMBER(cps3_state::cps3_palettedma_w)
 			if (data & 0x0002)
 			{
 				int i;
-				UINT16* src = (UINT16*)m_user5region;
+				UINT16* src = (UINT16*)m_user5;
 			//  if(DEBUG_PRINTF) printf("CPS3 pal dma start %08x (real: %08x) dest %08x fade %08x other2 %08x (length %04x)\n", m_paldma_source, m_paldma_realsource, m_paldma_dest, m_paldma_fade, m_paldma_other2, m_paldma_length);
 
 				for (i=0;i<m_paldma_length;i++)
@@ -1873,7 +1886,7 @@ UINT32 cps3_state::process_byte( UINT8 real_byte, UINT32 destination, int max_le
 
 void cps3_state::cps3_do_char_dma( UINT32 real_source, UINT32 real_destination, UINT32 real_length )
 {
-	UINT8* sourcedata = (UINT8*)m_user5region;
+	UINT8* sourcedata = (UINT8*)m_user5;
 	int length_remaining;
 
 	m_last_normal_byte = 0;
@@ -1956,7 +1969,7 @@ UINT32 cps3_state::ProcessByte8(UINT8 b,UINT32 dst_offset)
 
 void cps3_state::cps3_do_alt_char_dma( UINT32 src, UINT32 real_dest, UINT32 real_length )
 {
-	UINT8* px = (UINT8*)m_user5region;
+	UINT8* px = (UINT8*)m_user5;
 	UINT32 start = real_dest;
 	UINT32 ds = real_dest;
 
@@ -2299,7 +2312,7 @@ void cps3_state::machine_reset()
 // make a copy in the regions we execute code / draw gfx from
 void cps3_state::copy_from_nvram()
 {
-	UINT32* romdata = (UINT32*)m_user4region;
+	UINT32* romdata = (UINT32*)m_user4;
 	UINT32* romdata2 = (UINT32*)m_decrypted_gamerom;
 	int i;
 	/* copy + decrypt program roms which have been loaded from flashroms/nvram */
@@ -2336,7 +2349,7 @@ void cps3_state::copy_from_nvram()
 		int flashnum = 0;
 		int countoffset = 0;
 
-		romdata = (UINT32*)m_user5region;
+		romdata = (UINT32*)m_user5;
 		for (thebase = 0;thebase < len/2; thebase+=0x200000)
 		{
 		//  printf("flashnums %d. %d\n",flashnum, flashnum+1);

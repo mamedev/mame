@@ -21,17 +21,17 @@ ROM_START( msm6222b_01 )
 	ROM_LOAD( "msm6222b-01.bin", 0x0000, 0x1000, CRC(8ffa8521) SHA1(e108b520e6d20459a7bbd5958bbfa1d551a690bd) )
 ROM_END
 
-msm6222b_device::msm6222b_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+msm6222b_device::msm6222b_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source), cursor_direction(false), cursor_blinking(false), two_line(false), shift_on_write(false), double_height(false), cursor_on(false), display_on(false), adc(0), shift(0), cgrom(nullptr)
 {
 }
 
-msm6222b_device::msm6222b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+msm6222b_device::msm6222b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MSM6222B, "msm6222b-xx", tag, owner, clock, "msm6222b", __FILE__), cursor_direction(false), cursor_blinking(false), two_line(false), shift_on_write(false), double_height(false), cursor_on(false), display_on(false), adc(0), shift(0), cgrom(nullptr)
 {
 }
 
-msm6222b_01_device::msm6222b_01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+msm6222b_01_device::msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	msm6222b_device(mconfig, MSM6222B_01, "msm6222b-01", tag, owner, clock, "msm6222b", __FILE__)
 {
 }

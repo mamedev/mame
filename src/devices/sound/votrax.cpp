@@ -94,7 +94,7 @@ const double votrax_sc01_device::s_glottal_wave[16] =
 //  votrax_sc01_device - constructor
 //-------------------------------------------------
 
-votrax_sc01_device::votrax_sc01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+votrax_sc01_device::votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VOTRAX_SC01, "Votrax SC-01", tag, owner, clock, "votrax", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

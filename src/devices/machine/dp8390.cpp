@@ -9,17 +9,17 @@
 const device_type DP8390D = &device_creator<dp8390d_device>;
 const device_type RTL8019A = &device_creator<rtl8019a_device>;
 
-dp8390d_device::dp8390d_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+dp8390d_device::dp8390d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: dp8390_device(mconfig, DP8390D, "DP8390D", tag, owner, clock, 10.0f, "dp8390d", __FILE__) {
 		m_type = TYPE_DP8390D;
 }
 
-rtl8019a_device::rtl8019a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+rtl8019a_device::rtl8019a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: dp8390_device(mconfig, RTL8019A, "RTL8019A", tag, owner, clock, 10.0f, "rtl8019a", __FILE__) {
 		m_type = TYPE_RTL8019A;
 }
 
-dp8390_device::dp8390_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, float bandwidth, std::string shortname, std::string source)
+dp8390_device::dp8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, float bandwidth, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_network_interface(mconfig, *this, bandwidth), m_type(0),
 		m_irq_cb(*this),

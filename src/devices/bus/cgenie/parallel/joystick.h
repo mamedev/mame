@@ -25,7 +25,7 @@ class cgenie_joystick_device : public device_t, public device_parallel_interface
 {
 public:
 	// construction/destruction
-	cgenie_joystick_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cgenie_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;

@@ -80,7 +80,7 @@ const rom_entry *a2bus_corvfdc02_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_fdc(*this, FDC02_FDC_TAG),
@@ -91,7 +91,7 @@ a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, de
 {
 }
 
-a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, A2BUS_CORVFDC02, "Corvus Systems Buffered Floppy Controller", tag, owner, clock, "crvfdc02", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_fdc(*this, FDC02_FDC_TAG),

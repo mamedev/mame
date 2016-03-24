@@ -17,7 +17,7 @@
 class btoads_state : public driver_device
 {
 public:
-	btoads_state(const machine_config &mconfig, device_type type, std::string tag)
+	btoads_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_audiocpu(*this, "audiocpu"),
 			m_bsmt(*this, "bsmt"),

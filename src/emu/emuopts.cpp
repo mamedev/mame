@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "drivenum.h"
+#include "softlist.h"
 
 #include <ctype.h>
 
@@ -31,7 +32,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_READCONFIG ";rc",                           "1",         OPTION_BOOLEAN,    "enable loading of configuration files" },
 	{ OPTION_WRITECONFIG ";wc",                          "0",         OPTION_BOOLEAN,    "writes configuration to (driver).ini on exit" },
 
-	// seach path options
+	// search path options
 	{ nullptr,                                              nullptr,        OPTION_HEADER,     "CORE SEARCH PATH OPTIONS" },
 	{ OPTION_MEDIAPATH ";rp;biospath;bp",                "roms",      OPTION_STRING,     "path to ROMsets and hard disk images" },
 	{ OPTION_HASHPATH ";hash_directory;hash",            "hash",      OPTION_STRING,     "path to hash files" },
@@ -42,6 +43,8 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_FONTPATH,                                   ".",         OPTION_STRING,     "path to font files" },
 	{ OPTION_CHEATPATH,                                  "cheat",     OPTION_STRING,     "path to cheat files" },
 	{ OPTION_CROSSHAIRPATH,                              "crosshair", OPTION_STRING,     "path to crosshair files" },
+	{ OPTION_PLUGINSPATH,                                "plugins",   OPTION_STRING,     "path to plugin files" },
+	{ OPTION_LANGUAGEPATH,                               "language",  OPTION_STRING,     "path to language files" },
 
 	// output directory options
 	{ nullptr,                                              nullptr,        OPTION_HEADER,     "CORE OUTPUT DIRECTORY OPTIONS" },
@@ -49,7 +52,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_NVRAM_DIRECTORY,                            "nvram",     OPTION_STRING,     "directory to save nvram contents" },
 	{ OPTION_INPUT_DIRECTORY,                            "inp",       OPTION_STRING,     "directory to save input device logs" },
 	{ OPTION_STATE_DIRECTORY,                            "sta",       OPTION_STRING,     "directory to save states" },
-	{ OPTION_SNAPSHOT_DIRECTORY,                         "snap",      OPTION_STRING,     "directory to save screenshots" },
+	{ OPTION_SNAPSHOT_DIRECTORY,                         "snap",      OPTION_STRING,     "directory to save/load screenshots" },
 	{ OPTION_DIFF_DIRECTORY,                             "diff",      OPTION_STRING,     "directory to save hard drive image difference files" },
 	{ OPTION_COMMENT_DIRECTORY,                          "comments",  OPTION_STRING,     "directory to save debugger comments" },
 
@@ -59,6 +62,9 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_AUTOSAVE,                                   "0",         OPTION_BOOLEAN,    "enable automatic restore at startup, and automatic save at exit time" },
 	{ OPTION_PLAYBACK ";pb",                             nullptr,        OPTION_STRING,     "playback an input file" },
 	{ OPTION_RECORD ";rec",                              nullptr,        OPTION_STRING,     "record an input file" },
+	{ OPTION_RECORD_TIMECODE,                            "0",            OPTION_BOOLEAN,    "record an input timecode file (requires -record option)" },
+	{ OPTION_EXIT_AFTER_PLAYBACK,                        "0",            OPTION_BOOLEAN,    "close the program at the end of playback" },
+
 	{ OPTION_MNGWRITE,                                   nullptr,        OPTION_STRING,     "optional filename to write a MNG movie of the current session" },
 	{ OPTION_AVIWRITE,                                   nullptr,        OPTION_STRING,     "optional filename to write an AVI movie of the current session" },
 #ifdef MAME_DEBUG
@@ -81,6 +87,14 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_SLEEP,                                      "1",         OPTION_BOOLEAN,    "enable sleeping, which gives time back to other applications when idle" },
 	{ OPTION_SPEED "(0.01-100)",                         "1.0",       OPTION_FLOAT,      "controls the speed of gameplay, relative to realtime; smaller numbers are slower" },
 	{ OPTION_REFRESHSPEED ";rs",                         "0",         OPTION_BOOLEAN,    "automatically adjusts the speed of gameplay to keep the refresh rate lower than the screen" },
+
+	// render options
+	{ nullptr,                                              nullptr,        OPTION_HEADER,     "CORE RENDER OPTIONS" },
+	{ OPTION_KEEPASPECT ";ka",                           "1",         OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
+	{ OPTION_UNEVENSTRETCH ";ues",                       "1",         OPTION_BOOLEAN,    "allow non-integer stretch factors" },
+	{ OPTION_UNEVENSTRETCHX ";uesx",                     "0",         OPTION_BOOLEAN,    "allow non-integer stretch factors only on horizontal axis"},
+	{ OPTION_INTSCALEX ";sx",                            "0",         OPTION_INTEGER,    "set horizontal integer scale factor."},
+	{ OPTION_INTSCALEY ";sy",                            "0",         OPTION_INTEGER,    "set vertical integer scale."},
 
 	// rotation options
 	{ nullptr,                                              nullptr,        OPTION_HEADER,     "CORE ROTATION OPTIONS" },
@@ -179,13 +193,15 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_CHEAT ";c",                                 "0",         OPTION_BOOLEAN,    "enable cheat subsystem" },
 	{ OPTION_SKIP_GAMEINFO,                              "0",         OPTION_BOOLEAN,    "skip displaying the information screen at startup" },
 	{ OPTION_UI_FONT,                                    "default",   OPTION_STRING,     "specify a font to use" },
+	{ OPTION_UI,                                         "cabinet",   OPTION_STRING,     "type of UI (simple|cabinet)" },
 	{ OPTION_RAMSIZE ";ram",                             nullptr,        OPTION_STRING,     "size of RAM (if supported by driver)" },
 	{ OPTION_CONFIRM_QUIT,                               "0",         OPTION_BOOLEAN,    "display confirm quit screen on exit" },
-	{ OPTION_UI_MOUSE,                                   "0",         OPTION_BOOLEAN,    "display ui mouse cursor" },
+	{ OPTION_UI_MOUSE,                                   "1",         OPTION_BOOLEAN,    "display ui mouse cursor" },
 	{ OPTION_AUTOBOOT_COMMAND ";ab",                     nullptr,        OPTION_STRING,     "command to execute after machine boot" },
-	{ OPTION_AUTOBOOT_DELAY,                             "2",         OPTION_INTEGER,    "timer delay in sec to trigger command execution on autoboot" },
+	{ OPTION_AUTOBOOT_DELAY,                             "0",         OPTION_INTEGER,    "timer delay in sec to trigger command execution on autoboot" },
 	{ OPTION_AUTOBOOT_SCRIPT ";script",                  nullptr,        OPTION_STRING,     "lua script to execute after machine boot" },
 	{ OPTION_CONSOLE,                                    "0",         OPTION_BOOLEAN,    "enable emulator LUA console" },
+	{ OPTION_LANGUAGE ";lang",                           "English",   OPTION_STRING,    "display language" },
 	{ nullptr }
 };
 
@@ -205,6 +221,8 @@ emu_options::emu_options()
 , m_joystick_contradictory(false)
 , m_sleep(true)
 , m_refresh_speed(false)
+, m_slot_options(0)
+, m_device_options(0)
 {
 	add_entries(emu_options::s_option_entries);
 }
@@ -215,18 +233,17 @@ emu_options::emu_options()
 //  options for the configured system
 //-------------------------------------------------
 
-bool emu_options::add_slot_options(bool isfirstpass)
+bool emu_options::add_slot_options(const software_part *swpart)
 {
 	// look up the system configured by name; if no match, do nothing
 	const game_driver *cursystem = system();
 	if (cursystem == nullptr)
 		return false;
+
+	// create the configuration
 	machine_config config(*cursystem, *this);
 
 	// iterate through all slot devices
-	bool first = true;
-
-	// create the configuration
 	int starting_count = options_count();
 	slot_interface_iterator iter(config.root_device());
 	for (const device_slot_interface *slot = iter.first(); slot != nullptr; slot = iter.next())
@@ -236,12 +253,11 @@ bool emu_options::add_slot_options(bool isfirstpass)
 			continue;
 
 		// first device? add the header as to be pretty
-		if (isfirstpass && first)
+		if (m_slot_options++ == 0)
 			add_entry(nullptr, "SLOT DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
-		first = false;
 
 		// retrieve info about the device instance
-		const char *name = slot->device().tag().c_str() + 1;
+		const char *name = slot->device().tag() + 1;
 		if (!exists(name))
 		{
 			// add the option
@@ -255,6 +271,19 @@ bool emu_options::add_slot_options(bool isfirstpass)
 			}
 			add_entry(name, nullptr, flags, defvalue, true);
 		}
+
+		// allow software lists to supply their own defaults
+		if (swpart != nullptr)
+		{
+			std::string featurename = std::string(name).append("_default");
+			const char *value = swpart->feature(featurename.c_str());
+			if (value != nullptr && (*value == '\0' || slot->option(value) != nullptr))
+			{
+				// set priority above INIs but below actual command line
+				std::string error;
+				set_value(name, value, OPTION_PRIORITY_SUBCMD, error);
+			}
+		}
 	}
 	return (options_count() != starting_count);
 }
@@ -265,7 +294,7 @@ bool emu_options::add_slot_options(bool isfirstpass)
 //  depending of image mounted
 //-------------------------------------------------
 
-void emu_options::update_slot_options()
+void emu_options::update_slot_options(const software_part *swpart)
 {
 	// look up the system configured by name; if no match, do nothing
 	const game_driver *cursystem = system();
@@ -278,7 +307,7 @@ void emu_options::update_slot_options()
 	for (device_slot_interface *slot = iter.first(); slot != nullptr; slot = iter.next())
 	{
 		// retrieve info about the device instance
-		const char *name = slot->device().tag().c_str() + 1;
+		const char *name = slot->device().tag() + 1;
 		if (exists(name) && slot->first_option() != nullptr)
 		{
 			std::string defvalue = slot->get_default_card_software();
@@ -290,8 +319,8 @@ void emu_options::update_slot_options()
 			}
 		}
 	}
-	while (add_slot_options(false)) { }
-	add_device_options(false);
+	while (add_slot_options(swpart)) { }
+	add_device_options();
 }
 
 
@@ -300,7 +329,7 @@ void emu_options::update_slot_options()
 //  options for the configured system
 //-------------------------------------------------
 
-void emu_options::add_device_options(bool isfirstpass)
+void emu_options::add_device_options()
 {
 	// look up the system configured by name; if no match, do nothing
 	const game_driver *cursystem = system();
@@ -309,24 +338,22 @@ void emu_options::add_device_options(bool isfirstpass)
 	machine_config config(*cursystem, *this);
 
 	// iterate through all image devices
-	bool first = true;
 	image_interface_iterator iter(config.root_device());
 	for (const device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 	{
 		// first device? add the header as to be pretty
-		if (first && isfirstpass)
+		if (m_device_options++ == 0)
 			add_entry(nullptr, "IMAGE DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
-		first = false;
 
 		// retrieve info about the device instance
-		std::string option_name;
-		strprintf(option_name, "%s;%s", image->instance_name(), image->brief_instance_name());
+		std::ostringstream option_name;
+		util::stream_format(option_name, "%s;%s", image->instance_name(), image->brief_instance_name());
 		if (strcmp(image->device_typename(image->image_type()), image->instance_name()) == 0)
-			strcatprintf(option_name, ";%s1;%s1", image->instance_name(), image->brief_instance_name());
+			util::stream_format(option_name, ";%s1;%s1", image->instance_name(), image->brief_instance_name());
 
 		// add the option
 		if (!exists(image->instance_name()))
-			add_entry(option_name.c_str(), nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, nullptr, true);
+			add_entry(option_name.str().c_str(), nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, nullptr, true);
 	}
 }
 
@@ -348,6 +375,10 @@ void emu_options::remove_device_options()
 		if ((curentry->flags() & OPTION_FLAG_DEVICE) != 0)
 			remove_entry(*curentry);
 	}
+
+	// reset counters
+	m_slot_options = 0;
+	m_device_options = 0;
 }
 
 
@@ -356,7 +387,7 @@ void emu_options::remove_device_options()
 //  and update slot and image devices
 //-------------------------------------------------
 
-bool emu_options::parse_slot_devices(int argc, char *argv[], std::string &error_string, const char *name, const char *value)
+bool emu_options::parse_slot_devices(int argc, char *argv[], std::string &error_string, const char *name, const char *value, const software_part *swpart)
 {
 	// an initial parse to capture the initial set of values
 	bool result;
@@ -364,23 +395,21 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], std::string &error_
 	core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 
 	// keep adding slot options until we stop seeing new stuff
-	bool isfirstpass = true;
-	while (add_slot_options(isfirstpass))
-	{
+	m_slot_options = 0;
+	while (add_slot_options(swpart))
 		core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
-		isfirstpass = false;
-	}
 
 	// add device options and reparse
-	add_device_options(true);
+	m_device_options = 0;
+	add_device_options();
 	if (name != nullptr && exists(name))
-		set_value(name, value, OPTION_PRIORITY_CMDLINE, error_string);
+		set_value(name, value, OPTION_PRIORITY_SUBCMD, error_string);
 	core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 
 	int num;
 	do {
 		num = options_count();
-		update_slot_options();
+		update_slot_options(swpart);
 		result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 	} while (num != options_count());
 
@@ -399,7 +428,7 @@ bool emu_options::parse_command_line(int argc, char *argv[], std::string &error_
 {
 	// parse as normal
 	core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
-	bool result = parse_slot_devices(argc, argv, error_string, nullptr, nullptr);
+	bool result = parse_slot_devices(argc, argv, error_string);
 	update_cached_options();
 	return result;
 }
@@ -523,11 +552,10 @@ void emu_options::set_system_name(const char *name)
 
 		// remove any existing device options and then add them afresh
 		remove_device_options();
-		if (add_slot_options(true))
-			while (add_slot_options(false)) { }
+		while (add_slot_options()) { }
 
 		// then add the options
-		add_device_options(true);
+		add_device_options();
 		int num;
 		do {
 			num = options_count();
@@ -548,18 +576,18 @@ bool emu_options::parse_one_ini(const char *basename, int priority, std::string 
 
 	// open the file; if we fail, that's ok
 	emu_file file(ini_path(), OPEN_FLAG_READ);
-	file_error filerr = file.open(basename, ".ini");
-	if (filerr != FILERR_NONE)
+	osd_file::error filerr = file.open(basename, ".ini");
+	if (filerr != osd_file::error::NONE)
 		return false;
 
 	// parse the file
 	osd_printf_verbose("Parsing %s.ini\n", basename);
 	std::string error;
-	bool result = parse_ini_file((core_file&)file, priority, OPTION_PRIORITY_DRIVER_INI, error);
+	bool result = parse_ini_file((util::core_file&)file, priority, OPTION_PRIORITY_DRIVER_INI, error);
 
 	// append errors if requested
-	if (!error.empty() && error_string != nullptr)
-		strcatprintf(*error_string, "While parsing %s:\n%s\n", file.fullpath(), error.c_str());
+	if (!error.empty() && error_string)
+		error_string->append(string_format("While parsing %s:\n%s\n", file.fullpath(), error));
 
 	return result;
 }

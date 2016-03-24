@@ -14,7 +14,7 @@ void deco_karnovsprites_device::set_gfx_region(device_t &device, int region)
 
 const device_type DECO_KARNOVSPRITES = &device_creator<deco_karnovsprites_device>;
 
-deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_KARNOVSPRITES, "DECO Karnov Sprites", tag, owner, clock, "deco_karnovsprites", __FILE__),
 		m_gfxregion(0),
 		m_gfxdecode(*this),
@@ -27,7 +27,7 @@ deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconf
 //  gfx decoder
 //-------------------------------------------------
 
-void deco_karnovsprites_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
+void deco_karnovsprites_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<deco_karnovsprites_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -118,7 +118,7 @@ void deco_karnovsprites_device::draw_sprites( bitmap_ind16 &bitmap, const rectan
 //  palette device
 //-------------------------------------------------
 
-void deco_karnovsprites_device::static_set_palette_tag(device_t &device, std::string tag)
+void deco_karnovsprites_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<deco_karnovsprites_device &>(device).m_palette.set_tag(tag);
 }

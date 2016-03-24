@@ -205,13 +205,13 @@ void exidy_sound_device::common_sh_start()
 
 const device_type EXIDY = &device_creator<exidy_sound_device>;
 
-exidy_sound_device::exidy_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+exidy_sound_device::exidy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, EXIDY, "Exidy SFX", tag, owner, clock, "exidy_sfx", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 }
 
-exidy_sound_device::exidy_sound_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+exidy_sound_device::exidy_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_riot_irq_state(0),
@@ -669,7 +669,7 @@ WRITE8_MEMBER( venture_sound_device::filter_w )
 
 const device_type EXIDY_VENTURE = &device_creator<venture_sound_device>;
 
-venture_sound_device::venture_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+venture_sound_device::venture_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: exidy_sound_device(mconfig, EXIDY_VENTURE, "Exidy SFX+PSG", tag, owner, clock, "venture_sound", __FILE__)
 {
 }
@@ -924,7 +924,7 @@ WRITE_LINE_MEMBER( victory_sound_device::main_ack_w )
 
 const device_type EXIDY_VICTORY = &device_creator<victory_sound_device>;
 
-victory_sound_device::victory_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+victory_sound_device::victory_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: exidy_sound_device(mconfig, EXIDY_VICTORY, "Exidy SFX+PSG+Speech", tag, owner, clock, "victory_sound", __FILE__),
 	m_victory_sound_response_ack_clk(0)
 {

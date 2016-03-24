@@ -1,12 +1,13 @@
-// license:???
-// copyright-holders:Enrique Sanchez
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino 
+// thanks-to:Enrique Sanchez
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
 
 class yiear_state : public driver_device
 {
 public:
-	yiear_state(const machine_config &mconfig, device_type type, std::string tag)
+	yiear_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),

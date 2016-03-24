@@ -65,7 +65,7 @@ TODO:
 
 const device_type K053252 = &device_creator<k053252_device>;
 
-k053252_device::k053252_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k053252_device::k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053252, "K053252 Timing/Interrupt", tag, owner, clock, "k053252", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_int1_en_cb(*this),
@@ -76,6 +76,7 @@ k053252_device::k053252_device(const machine_config &mconfig, std::string tag, d
 		m_offsx(0),
 		m_offsy(0),
 		// ugly, needed to work with the rungun etc. video demux board
+		m_slave_screen_tag(nullptr),
 		m_slave_screen(nullptr)
 {
 }
@@ -103,7 +104,7 @@ void k053252_device::device_start()
 	save_item(NAME(m_vsw));
 	save_item(NAME(m_hsw));
 
-	if (!m_slave_screen_tag.empty())
+	if (m_slave_screen_tag != nullptr)
 	{
 		// find the screen device if explicitly configured
 		m_slave_screen = device().siblingdevice<screen_device>(m_slave_screen_tag);
@@ -258,7 +259,7 @@ WRITE8_MEMBER( k053252_device::write )
 }
 
 
-void k053252_device::static_set_slave_screen(device_t &device, std::string tag)
+void k053252_device::static_set_slave_screen(device_t &device, const char *tag)
 {
 	k053252_device &dev = downcast<k053252_device &>(device);
 	dev.m_slave_screen_tag = tag;

@@ -16,7 +16,7 @@ const device_type SEGAPCM = &device_creator<segapcm_device>;
 //  segapcm_device - constructor
 //-------------------------------------------------
 
-segapcm_device::segapcm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGAPCM, "Sega PCM", tag, owner, clock, "segapcm", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_rom(*this, DEVICE_SELF),

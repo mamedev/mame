@@ -16,7 +16,7 @@
 class cyberbal_state : public atarigen_state
 {
 public:
-	cyberbal_state(const machine_config &mconfig, device_type type, std::string tag)
+	cyberbal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
@@ -24,6 +24,7 @@ public:
 			m_daccpu(*this, "dac"),
 			m_dac1(*this, "dac1"),
 			m_dac2(*this, "dac2"),
+			m_soundcomm(*this, "soundcomm"),
 			m_jsa(*this, "jsa"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
@@ -40,6 +41,7 @@ public:
 	optional_device<cpu_device> m_daccpu;
 	optional_device<dac_device> m_dac1;
 	optional_device<dac_device> m_dac2;
+	optional_device<atari_sound_comm_device> m_soundcomm;
 	optional_device<atari_jsa_ii_device> m_jsa;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
@@ -55,7 +57,6 @@ public:
 	UINT16          m_playfield_xscroll[2];
 	UINT16          m_playfield_yscroll[2];
 
-	UINT8 *         m_bank_base;
 	UINT8           m_fast_68k_int;
 	UINT8           m_io_68k_int;
 	UINT8           m_sound_data_from_68k;
@@ -76,11 +77,10 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_68k_w);
 	DECLARE_WRITE16_MEMBER(sound_68k_dac_w);
 	DECLARE_DRIVER_INIT(cyberbalt);
-	DECLARE_DRIVER_INIT(cyberbal2p);
-	DECLARE_DRIVER_INIT(cyberbal);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	DECLARE_MACHINE_START(cyberbal);
+	DECLARE_MACHINE_START(cyberbal2p);
 	DECLARE_MACHINE_RESET(cyberbal);
 	DECLARE_VIDEO_START(cyberbal);
 	DECLARE_MACHINE_RESET(cyberbal2p);

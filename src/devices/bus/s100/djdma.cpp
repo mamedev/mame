@@ -102,7 +102,7 @@ machine_config_constructor s100_djdma_device::device_mconfig_additions() const
 //  s100_djdma_device - constructor
 //-------------------------------------------------
 
-s100_djdma_device::s100_djdma_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+s100_djdma_device::s100_djdma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, S100_DJDMA, "DJDMA", tag, owner, clock, "djdma", __FILE__),
 	device_s100_card_interface(mconfig, *this)
 {

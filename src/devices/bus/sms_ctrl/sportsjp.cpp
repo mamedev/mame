@@ -8,7 +8,7 @@
 
 // The Japanese Sports Pad controller is only required to play the cartridge
 // Sports Pad Soccer, released in Japan. It uses a different mode than the
-// used by the US model, due to missing output lines on Sega Mark III
+// used by the US model, due to the missing TH line on Sega Mark III
 // controller ports.
 
 #include "sportsjp.h"
@@ -52,7 +52,7 @@ DECLARE_CUSTOM_INPUT_MEMBER( sms_sports_pad_jp_device::dir_pins_r )
 
 static INPUT_PORTS_START( sms_sports_pad_jp )
 	PORT_START("SPORTS_JP_IN")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_sports_pad_jp_device, dir_pins_r, NULL) // Directional pins
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_sports_pad_jp_device, dir_pins_r, nullptr) // Directional pins
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // Vcc
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // TL (Button 1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // TH
@@ -85,7 +85,7 @@ ioport_constructor sms_sports_pad_jp_device::device_input_ports() const
 //  sms_sports_pad_jp_device - constructor
 //-------------------------------------------------
 
-sms_sports_pad_jp_device::sms_sports_pad_jp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+sms_sports_pad_jp_device::sms_sports_pad_jp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SMS_SPORTS_PAD_JP, "Sega SMS Sports Pad JP", tag, owner, clock, "sms_sports_pad_jp", __FILE__),
 	device_sms_control_port_interface(mconfig, *this),
 	m_sports_jp_in(*this, "SPORTS_JP_IN"),

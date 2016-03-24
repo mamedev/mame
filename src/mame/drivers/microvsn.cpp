@@ -17,7 +17,7 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
-#include "cpu/tms0980/tms0980.h"
+#include "cpu/tms1000/tms1100.h"
 #include "sound/dac.h"
 #include "rendlay.h"
 
@@ -31,7 +31,7 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 class microvision_state : public driver_device
 {
 public:
-	microvision_state(const machine_config &mconfig, device_type type, std::string tag)
+	microvision_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_dac( *this, "dac" ),
 		m_i8021( *this, "maincpu1" ),
@@ -547,7 +547,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state, microvsn_cart)
 		if (pla)
 			m_pla = 1;
 
-		tms1xxx_cpu_device::set_output_pla(m_tms1100, m_pla ? microvision_output_pla_1 : microvision_output_pla_0);
+		tms1100_cpu_device::set_output_pla(m_tms1100, m_pla ? microvision_output_pla_1 : microvision_output_pla_0);
 
 		// Set default setting for PCB type and RC type
 		m_pcb_type = microvision_state::PCB_TYPE_UNKNOWN;

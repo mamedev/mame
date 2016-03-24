@@ -205,7 +205,7 @@ Beeper Circuit, all ICs shown:
 class itt3030_state : public driver_device
 {
 public:
-	itt3030_state(const machine_config &mconfig, device_type type, std::string tag)
+	itt3030_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_kbdmcu(*this, "kbdmcu")
@@ -787,7 +787,7 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", itt3030)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
 	MCFG_RAM_ADD("mainram")
@@ -795,9 +795,8 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
+	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
-
 MACHINE_CONFIG_END
 
 

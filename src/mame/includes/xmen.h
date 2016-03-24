@@ -9,7 +9,7 @@
 class xmen_state : public driver_device
 {
 public:
-	xmen_state(const machine_config &mconfig, device_type type, std::string tag)
+	xmen_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_xmen6p_spriteramleft(*this, "spriteramleft"),
 		m_xmen6p_spriteramright(*this, "spriteramright"),

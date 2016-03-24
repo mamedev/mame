@@ -281,8 +281,9 @@ Known undumped:
 		</part>
 	</software>
 
-	<software name="midgarts">
-		<description>Mid-Garts (Jpn)</description>
+	<!-- Has smooth horizontal scrolling, unlike the MSX2 release - this effect is not emulated correctly -->
+	<software name="midgarts" supported="no">
+		<description>Mid-Garts (MSX2+) (Jpn)</description>
 		<year>1989</year>
 		<publisher>WolfTeam</publisher>
 		<info name="alt_title" value="ミッドガルツ" />
@@ -290,37 +291,37 @@ Known undumped:
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
-				<rom name="middogarutsu. mid-garts dual side (1989)(wolfteam)(jp)(disk 1 of 6).dsk" size="737280" crc="90559e83" sha1="c78e099022ae77c47b95a45fca869324fecb4cb5" offset="0" />
+				<rom name="m2p_006a.dsk" size="737280" crc="9eef9228" sha1="a5c831306c86d445d42ec13f7551346f28814686" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
-				<rom name="middogarutsu. mid-garts dual side (1989)(wolfteam)(jp)(disk 2 of 6).dsk" size="737280" crc="24183de3" sha1="53d6aa633a841878a3c67a3024f7c3ed3e1b4508" offset="0" />
+				<rom name="m2p_006b.dsk" size="737280" crc="26f58049" sha1="5ba41719f93bd8dc55b6a1b027cf321a31dd0884" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="737280">
-				<rom name="middogarutsu. mid-garts dual side (1989)(wolfteam)(jp)(disk 3 of 6).dsk" size="737280" crc="5611fda7" sha1="b30746e7fe256ddef2d2f1cad8a57aea86a4c478" offset="0" />
+				<rom name="m2p_006c.dsk" size="737280" crc="691c1eff" sha1="42cdf6f5bb4d7d39f4a11e7fec31b0a5ecf7ecd4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="737280">
-				<rom name="middogarutsu. mid-garts dual side (1989)(wolfteam)(jp)(disk 4 of 6).dsk" size="737280" crc="7a28644e" sha1="33e94dac0f9cb73f4a15265bb0166e48183bdb35" offset="0" />
+				<rom name="m2p_006d.dsk" size="737280" crc="bdf45ec0" sha1="ee868c95dacc2edee29e7c390bcb2f87ec07b898" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="737280">
-				<rom name="middogarutsu. mid-garts dual side (1989)(wolfteam)(jp)(disk 5 of 6).dsk" size="737280" crc="64acdb49" sha1="47b9228b014d9e953dad956bb04aabedfa4db8a9" offset="0" />
+				<rom name="m2p_006e.dsk" size="737280" crc="406f5f54" sha1="90b4f39cb440b2cb3b2479ee5e633818ebe54bb4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="737280">
-				<rom name="middogarutsu. mid-garts dual side (1989)(wolfteam)(jp)(disk 6 of 6).dsk" size="737280" crc="b920cf5b" sha1="2863537cbf930701a81540948f7e037359ba8ec3" offset="0" />
+				<rom name="m2p_006f.dsk" size="737280" crc="c65264da" sha1="8c847557b7838afff2354eb8a9d7f02e5d70519c" offset="0" />
 			</dataarea>
 		</part>
 	</software>

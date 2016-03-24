@@ -18,7 +18,7 @@ wav_file *wav_open(const char *filename, int sample_rate, int channels)
 	UINT16 align, temp16;
 
 	/* allocate memory for the wav struct */
-	wav = (wav_file *) global_alloc(wav_file);
+	wav = global_alloc_nothrow(wav_file);
 	if (!wav)
 		return nullptr;
 

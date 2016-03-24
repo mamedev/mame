@@ -22,7 +22,7 @@
 class alphasmart_state : public driver_device
 {
 public:
-	alphasmart_state(const machine_config &mconfig, device_type type, std::string tag)
+	alphasmart_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_lcdc0(*this, "ks0066_0"),
@@ -68,7 +68,7 @@ protected:
 class asma2k_state : public alphasmart_state
 {
 public:
-	asma2k_state(const machine_config &mconfig, device_type type, std::string tag)
+	asma2k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: alphasmart_state(mconfig, type, tag),
 			m_intram(*this, "internal_ram")
 		{ }

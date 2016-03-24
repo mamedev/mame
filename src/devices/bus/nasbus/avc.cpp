@@ -47,7 +47,7 @@ machine_config_constructor nascom_avc_device::device_mconfig_additions() const
 //  nascom_avc_device - constructor
 //-------------------------------------------------
 
-nascom_avc_device::nascom_avc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+nascom_avc_device::nascom_avc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, NASCOM_AVC, "Nascom Advanced Video Card", tag, owner, clock, "nascom_avc", __FILE__),
 	device_nasbus_card_interface(mconfig, *this),
 	m_crtc(*this, "mc6845"),

@@ -1796,6 +1796,23 @@ ROM_START( knockoutb )
 	ROM_LOAD( "ta.6e", 0x0000, 0x0020, CRC(624f75df) SHA1(0e9a7c48dd976af1dca1d5351236d4d5bf7a9dc8) )
 ROM_END
 
+ROM_START( knockoutc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin", 0x0000, 0x1000, CRC(7c386d1e) SHA1(e846a70bebd41b240758ffb2c7801fa7260b314e) )
+	ROM_LOAD( "2.bin", 0x1000, 0x1000, CRC(85dc1d78) SHA1(61e82cfb5b0f0da6413713293c382ea57074e801) )
+	ROM_LOAD( "3.bin", 0x2000, 0x1000, CRC(9f734d29) SHA1(430c53b9c3fa888fe45f9feeb4ad8f92011adc05) )
+	ROM_LOAD( "4.bin", 0x3000, 0x1000, CRC(48e2d6cd) SHA1(7eea464b8cfef84dbad66e33dffaba9515605da6) )
+	ROM_LOAD( "5.bin", 0x6000, 0x0800, CRC(26ac55ba) SHA1(876b8bf2ddb0ffb6256d1447408c8b7f7d048d9f) )
+	ROM_CONTINUE(             0x5800, 0x0800             )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "6.bin", 0x0000, 0x0800, CRC(d51cbd6f) SHA1(c3766a69a4599e54b8d7fb893e45802ec8bf6713) )
+	ROM_LOAD( "7.bin", 0x0800, 0x0800, CRC(f21c0059) SHA1(b1ba87f13908e3e662de8bf444f59bd5c2009720) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "ta.6e", 0x0000, 0x0020, CRC(624f75df) SHA1(0e9a7c48dd976af1dca1d5351236d4d5bf7a9dc8) )
+ROM_END
+
 
 ROM_START( mariner )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2315,6 +2332,7 @@ GAME( 1982, triplep,  0,        triplep,  triplep,  scramble_state, scramble_ppi
 GAME( 1982, triplepa, triplep,  triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 2)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1982, knockout, triplep,  triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "bootleg? (KKK)",      "Knock Out!! (bootleg, set 1)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1982, knockoutb,triplep,  triplep,  knockoutb,scramble_state, scramble_ppi, ROT90, "bootleg",             "Knock Out!! (bootleg, set 2)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, knockoutc,triplep,  triplep,  knockoutb,scramble_state, scramble_ppi, ROT90, "bootleg (ESG)",       "Knock Out!! (bootleg, set 3)",         MACHINE_SUPPORTS_SAVE ) // ESG = Elektronik Spiel Gerate 
 
 GAME( 1981, mariner,  0,        mariner,  scramble, scramble_state, mariner,      ROT90, "Amenip",              "Mariner",                        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1981, 800fath,  mariner,  mariner,  800fath,  scramble_state, mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

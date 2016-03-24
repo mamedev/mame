@@ -26,7 +26,7 @@
 class mpf1_state : public driver_device
 {
 public:
-	mpf1_state(const machine_config &mconfig, device_type type, std::string tag)
+	mpf1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_ctc(*this, Z80CTC_TAG),

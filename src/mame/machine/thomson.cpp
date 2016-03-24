@@ -377,9 +377,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
 		m_thom_cart_nb_banks = 4;
 	else
 	{
-		std::string errmsg;
-		strprintf(errmsg,"Invalid cartridge size %u", size);
-		image.seterror(IMAGE_ERROR_UNSUPPORTED, errmsg.c_str());
+		image.seterror(IMAGE_ERROR_UNSUPPORTED, string_format("Invalid cartridge size %u", size).c_str());
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -613,7 +611,7 @@ const device_type TO7_IO_LINE = &device_creator<to7_io_line_device>;
 //  to7_io_line_device - constructor
 //-------------------------------------------------
 
-to7_io_line_device::to7_io_line_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TO7_IO_LINE, "T07 Serial source", tag, owner, clock, "to7_io_line", __FILE__),
 	m_pia_io(*this, THOM_PIA_IO),
 	m_rs232(*this, "rs232"),
@@ -1508,9 +1506,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 		m_thom_cart_nb_banks = 4;
 	else
 	{
-		std::string errmsg;
-		strprintf(errmsg,"Invalid cartridge size %d", (int)size);
-		image.seterror(IMAGE_ERROR_UNSUPPORTED, errmsg.c_str());
+		image.seterror(IMAGE_ERROR_UNSUPPORTED, string_format("Invalid cartridge size %d", size).c_str());
 		return IMAGE_INIT_FAIL;
 	}
 

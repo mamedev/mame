@@ -20,7 +20,7 @@ class ata_hle_device : public device_t,
 	public device_slot_card_interface
 {
 public:
-	ata_hle_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,std::string shortname, std::string source);
+	ata_hle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
 
 	virtual UINT16 read_dma() override;
 	virtual DECLARE_READ16_MEMBER(read_cs0) override;
@@ -126,6 +126,7 @@ protected:
 		IDE_COMMAND_IDENTIFY_DEVICE = 0xec,
 		IDE_COMMAND_SET_FEATURES = 0xef,
 		IDE_COMMAND_SECURITY_UNLOCK = 0xf2,
+		IDE_COMMAND_SECURITY_DISABLE_PASSWORD = 0xf6,
 		IDE_COMMAND_READ_NATIVE_MAX_ADDRESS = 0xf8,
 		IDE_COMMAND_SET_MAX = 0xf9
 	};

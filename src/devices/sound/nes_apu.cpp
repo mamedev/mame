@@ -103,7 +103,7 @@ static void create_noise(uint8 *buf, const int bits, int size)
 
 const device_type NES_APU = &device_creator<nesapu_device>;
 
-nesapu_device::nesapu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NES_APU, "N2A03 APU", tag, owner, clock, "nesapu", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_apu_incsize(0.0),
@@ -134,10 +134,10 @@ nesapu_device::nesapu_device(const machine_config &mconfig, std::string tag, dev
 	}
 }
 
-void nesapu_device::set_tag_memory(std::string tag)
+void nesapu_device::set_tag_memory(const char *tag)
 {
 	/* Initialize individual chips */
-	if (!tag.empty())
+	if (tag)
 		(m_APU.dpcm).memory = &machine().device(tag)->memory().space(AS_PROGRAM);
 }
 

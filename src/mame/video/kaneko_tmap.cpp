@@ -96,7 +96,7 @@ There are more!
 
 const device_type KANEKO_TMAP = &device_creator<kaneko_view2_tilemap_device>;
 
-kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, KANEKO_TMAP, "Kaneko VIEW2 Tilemaps", tag, owner, clock, "kaneko_view2_tilemap", __FILE__),
 	m_gfxdecode(*this)
 {
@@ -108,7 +108,7 @@ kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &m
 //  gfx decoder
 //-------------------------------------------------
 
-void kaneko_view2_tilemap_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
+void kaneko_view2_tilemap_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<kaneko_view2_tilemap_device &>(device).m_gfxdecode.set_tag(tag);
 }

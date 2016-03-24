@@ -50,7 +50,7 @@ Control registers
 
 const device_type PC080SN = &device_creator<pc080sn_device>;
 
-pc080sn_device::pc080sn_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC080SN, "Taito PC080SN", tag, owner, clock, "pc080sn", __FILE__),
 	m_ram(nullptr),
 	m_gfxnum(0),
@@ -78,7 +78,7 @@ pc080sn_device::pc080sn_device(const machine_config &mconfig, std::string tag, d
 //  gfx decoder
 //-------------------------------------------------
 
-void pc080sn_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
+void pc080sn_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<pc080sn_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -88,7 +88,7 @@ void pc080sn_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 //  palette device
 //-------------------------------------------------
 
-void pc080sn_device::static_set_palette_tag(device_t &device, std::string tag)
+void pc080sn_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<pc080sn_device &>(device).m_palette.set_tag(tag);
 }

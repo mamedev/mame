@@ -3092,6 +3092,26 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="sicmouse">
+		<description>SICOS Mouse</description>
+		<year>1990</year>
+		<publisher>SICOS</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="SICOS\nMOUSE DRIVER\nMOUSE TESTER\nMENU MAKER"/>
+			<dataarea name="flop" size="368640">
+				<rom name="sicos_mouse.img" size="368640" crc="3f927fd3" sha1="f1372c69d5d497ca6f3ce85ec144b714dfb2ab94" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="SICOS PAINT\nThe SICOS mouse - paint program"/>
+			<dataarea name="flop" size="368640">
+				<rom name="sicos_paint.img" size="368640" crc="b93dd558" sha1="3e78a30acf4adddbabb04babdc469b5c4ff4af4a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="3c90xed">
 		<description>3Com 3c90x Etherlink Drivers</description>
 		<year>1999</year>

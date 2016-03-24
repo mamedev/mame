@@ -1471,7 +1471,7 @@ std::string input_manager::code_name(input_code code) const
 	const char *devclass = (*devclass_string_table)[code.device_class()];
 
 	// determine the devindex part
-	std::string devindex = strformat("%d", code.device_index() + 1);
+	std::string devindex = string_format("%d", code.device_index() + 1);
 
 	// if we're unifying all devices, don't display a number
 	if (!m_class[code.device_class()]->multi())
@@ -1521,7 +1521,7 @@ std::string input_manager::code_to_token(input_code code) const
 	const char *devclass = (*devclass_token_table)[code.device_class()];
 
 	// determine the devindex part; keyboard 0 doesn't show an index
-	std::string devindex = strformat("%d", code.device_index() + 1);
+	std::string devindex = string_format("%d", code.device_index() + 1);
 	if (code.device_class() == DEVICE_CLASS_KEYBOARD && code.device_index() == 0)
 		devindex.clear();
 

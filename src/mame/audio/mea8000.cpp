@@ -114,7 +114,7 @@ static const int pi_table[32] =
 const device_type MEA8000 = &device_creator<mea8000_device>;
 
 
-mea8000_device::mea8000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+mea8000_device::mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MEA8000, "Philips / Signetics MEA 8000 speech synthesizer", tag, owner, clock, "mea8000", __FILE__),
 	m_write_req(*this),
 	m_dac(*this)

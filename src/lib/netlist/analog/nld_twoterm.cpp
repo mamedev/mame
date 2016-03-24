@@ -20,6 +20,8 @@ ATTR_COLD generic_diode::generic_diode()
 {
 	m_Vd = 0.7;
 	set_param(1e-15, 1, 1e-15);
+	m_G = m_gmin;
+	m_Id = 0.0;
 }
 
 ATTR_COLD void generic_diode::set_param(const nl_double Is, const nl_double n, nl_double gmin)

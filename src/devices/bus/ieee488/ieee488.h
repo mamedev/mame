@@ -90,7 +90,7 @@ class ieee488_device : public device_t
 {
 public:
 	// construction/destruction
-	ieee488_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _write> void set_eoi_callback(_write wr) { m_write_eoi.set_callback(wr); }
 	template<class _write> void set_dav_callback(_write wr) { m_write_dav.set_callback(wr); }
@@ -199,7 +199,7 @@ class ieee488_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	ieee488_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void set_address(int address) { m_address = address; }
 	int get_address() { return m_address; }

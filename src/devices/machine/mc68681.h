@@ -38,7 +38,7 @@ class mc68681_device;
 class mc68681_channel : public device_t, public device_serial_interface
 {
 public:
-	mc68681_channel(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mc68681_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -99,7 +99,7 @@ class mc68681_device : public device_t
 	friend class mc68681_channel;
 
 public:
-	mc68681_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mc68681_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	required_device<mc68681_channel> m_chanA;
 	required_device<mc68681_channel> m_chanB;

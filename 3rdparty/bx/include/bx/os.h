@@ -20,16 +20,17 @@
 	|| BX_PLATFORM_NACL \
 	|| BX_PLATFORM_OSX \
 	|| BX_PLATFORM_PS4 \
-	|| BX_PLATFORM_RPI
-
+	|| BX_PLATFORM_RPI \
+	|| BX_PLATFORM_STEAMLINK
 #	include <sched.h> // sched_yield
 #	if BX_PLATFORM_BSD \
 	|| BX_PLATFORM_IOS \
 	|| BX_PLATFORM_NACL \
 	|| BX_PLATFORM_OSX \
-	|| BX_PLATFORM_PS4
+	|| BX_PLATFORM_PS4 \
+	|| BX_PLATFORM_STEAMLINK
 #		include <pthread.h> // mach_port_t
-#	endif // BX_PLATFORM_IOS || BX_PLATFORM_OSX || BX_PLATFORM_NACL
+#	endif // BX_PLATFORM_*
 
 #	if BX_PLATFORM_NACL
 #		include <sys/nacl_syscalls.h> // nanosleep
@@ -42,7 +43,9 @@
 
 #	if BX_PLATFORM_ANDROID
 #		include <malloc.h> // mallinfo
-#	elif BX_PLATFORM_LINUX || BX_PLATFORM_RPI
+#	elif   BX_PLATFORM_LINUX \
+		|| BX_PLATFORM_RPI \
+		|| BX_PLATFORM_STEAMLINK
 #		include <unistd.h> // syscall
 #		include <sys/syscall.h>
 #	elif BX_PLATFORM_OSX
@@ -72,7 +75,7 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
 		::Sleep(_ms);
-#elif BX_PLATFORM_WINRT
+#elif BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
 		BX_UNUSED(_ms);
 		debugOutput("sleep is not implemented"); debugBreak();
 #else
@@ -88,7 +91,7 @@ namespace bx
 		::SwitchToThread();
 #elif BX_PLATFORM_XBOX360
 		::Sleep(0);
-#elif BX_PLATFORM_WINRT
+#elif BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
 		debugOutput("yield is not implemented"); debugBreak();
 #else
 		::sched_yield();
@@ -99,7 +102,7 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		return ::GetCurrentThreadId();
-#elif BX_PLATFORM_LINUX || BX_PLATFORM_RPI
+#elif BX_PLATFORM_LINUX || BX_PLATFORM_RPI || BX_PLATFORM_STEAMLINK
 		return (pid_t)::syscall(SYS_gettid);
 #elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
 		return (mach_port_t)::pthread_mach_thread_np(pthread_self() );
@@ -133,7 +136,7 @@ namespace bx
 			: 0
 			;
 #elif BX_PLATFORM_OSX
-#ifdef MACH_TASK_BASIC_INFO
+#	if defined(MACH_TASK_BASIC_INFO)
 		mach_task_basic_info info;
 		mach_msg_type_number_t infoCount = MACH_TASK_BASIC_INFO_COUNT;
 
@@ -142,7 +145,7 @@ namespace bx
 				, (task_info_t)&info
 				, &infoCount
 				);
-#else // MACH_TASK_BASIC_INFO
+#	else // MACH_TASK_BASIC_INFO
 		task_basic_info info;
 		mach_msg_type_number_t infoCount = TASK_BASIC_INFO_COUNT;
 
@@ -151,7 +154,7 @@ namespace bx
 				, (task_info_t)&info
 				, &infoCount
 				);
-#endif // MACH_TASK_BASIC_INFO
+#	endif // MACH_TASK_BASIC_INFO
 		if (KERN_SUCCESS != result)
 		{
 			return 0;
@@ -177,6 +180,7 @@ namespace bx
 #elif  BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_NACL \
 	|| BX_PLATFORM_PS4 \
+	|| BX_PLATFORM_XBOXONE \
 	|| BX_PLATFORM_WINRT
 		BX_UNUSED(_filePath);
 		return NULL;
@@ -192,6 +196,7 @@ namespace bx
 #elif  BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_NACL \
 	|| BX_PLATFORM_PS4 \
+	|| BX_PLATFORM_XBOXONE \
 	|| BX_PLATFORM_WINRT
 		BX_UNUSED(_handle);
 #else
@@ -206,6 +211,7 @@ namespace bx
 #elif  BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_NACL \
 	|| BX_PLATFORM_PS4 \
+	|| BX_PLATFORM_XBOXONE \
 	|| BX_PLATFORM_WINRT
 		BX_UNUSED(_handle, _symbol);
 		return NULL;
@@ -219,6 +225,7 @@ namespace bx
 #if BX_PLATFORM_WINDOWS
 		::SetEnvironmentVariableA(_name, _value);
 #elif  BX_PLATFORM_PS4 \
+	|| BX_PLATFORM_XBOXONE \
 	|| BX_PLATFORM_WINRT
 		BX_UNUSED(_name, _value);
 #else
@@ -231,6 +238,7 @@ namespace bx
 #if BX_PLATFORM_WINDOWS
 		::SetEnvironmentVariableA(_name, NULL);
 #elif  BX_PLATFORM_PS4 \
+	|| BX_PLATFORM_XBOXONE \
 	|| BX_PLATFORM_WINRT
 		BX_UNUSED(_name);
 #else
@@ -241,6 +249,7 @@ namespace bx
 	inline int chdir(const char* _path)
 	{
 #if BX_PLATFORM_PS4 \
+ || BX_PLATFORM_XBOXONE \
  || BX_PLATFORM_WINRT
 		BX_UNUSED(_path);
 		return -1;
@@ -254,6 +263,7 @@ namespace bx
 	inline char* pwd(char* _buffer, uint32_t _size)
 	{
 #if BX_PLATFORM_PS4 \
+ || BX_PLATFORM_XBOXONE \
  || BX_PLATFORM_WINRT
 		BX_UNUSED(_buffer, _size);
 		return NULL;

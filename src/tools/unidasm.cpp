@@ -181,6 +181,7 @@ CPU_DISASSEMBLE( tms7000 );
 CPU_DISASSEMBLE( tms9900 );
 CPU_DISASSEMBLE( tms9980 );
 CPU_DISASSEMBLE( tms9995 );
+CPU_DISASSEMBLE( tp0320 );
 CPU_DISASSEMBLE( tx0_64kw );
 CPU_DISASSEMBLE( tx0_8kw );
 CPU_DISASSEMBLE( ucom4 );
@@ -333,6 +334,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "tms9900",    _16be,  0, CPU_DISASSEMBLE_NAME(tms9900) },
 	{ "tms9980",    _8bit,  0, CPU_DISASSEMBLE_NAME(tms9980) },
 	{ "tms9995",    _8bit,  0, CPU_DISASSEMBLE_NAME(tms9995) },
+	{ "tp0320",     _16be,  0, CPU_DISASSEMBLE_NAME(tp0320) },
 	{ "tx0_64kw",   _32be, -2, CPU_DISASSEMBLE_NAME(tx0_64kw) },
 	{ "tx0_8kw",    _32be, -2, CPU_DISASSEMBLE_NAME(tx0_8kw) },
 	{ "ucom4",      _8bit,  0, CPU_DISASSEMBLE_NAME(ucom4) },
@@ -494,7 +496,7 @@ usage:
 
 int main(int argc, char *argv[])
 {
-	file_error filerr;
+	osd_file::error filerr;
 	int displayendian;
 	int displaychunk;
 	UINT32 curbyte;
@@ -512,8 +514,8 @@ int main(int argc, char *argv[])
 		return 1;
 
 	// load the file
-	filerr = core_fload(opts.filename, &data, &length);
-	if (filerr != FILERR_NONE)
+	filerr = util::core_file::load(opts.filename, &data, length);
+	if (filerr != osd_file::error::NONE)
 	{
 		fprintf(stderr, "Error opening file '%s'\n", opts.filename);
 		return 1;
@@ -656,7 +658,7 @@ int main(int argc, char *argv[])
 	}
 	catch (add_exception &aex)
 	{
-		fprintf(stderr, "Tag '%s' already exists in tagged_list\n", aex.tag().c_str());
+		fprintf(stderr, "Tag '%s' already exists in tagged_list\n", aex.tag());
 		result = 1;
 	}
 	catch (std::exception &ex)

@@ -187,14 +187,14 @@ MC6845_ON_UPDATE_ADDR_CHANGED( abc1600_mover_device::crtc_update )
 static MACHINE_CONFIG_FRAGMENT( abc1600_mover )
 	MCFG_DEFAULT_LAYOUT(layout_abc1600)
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
 	MCFG_SCREEN_UPDATE_DRIVER(abc1600_mover_device, screen_update)
 	MCFG_SCREEN_SIZE(958, 1067)
 	MCFG_SCREEN_VISIBLE_AREA(0, 958-1, 0, 1067-1)
 
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD(SY6845E_TAG, SY6845E, SCREEN_TAG, XTAL_64MHz/32)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
@@ -224,7 +224,7 @@ machine_config_constructor abc1600_mover_device::device_mconfig_additions() cons
 //  abc1600_mover_device - constructor
 //-------------------------------------------------
 
-abc1600_mover_device::abc1600_mover_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+abc1600_mover_device::abc1600_mover_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ABC1600_MOVER, "ABC 1600 Mover", tag, owner, clock, "abc1600mover", __FILE__),
 	device_memory_interface(mconfig, *this),
 	m_space_config("vram", ENDIANNESS_BIG, 16, 18, -1, *ADDRESS_MAP_NAME(mover_map)),

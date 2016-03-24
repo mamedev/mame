@@ -16,7 +16,7 @@
 class vt520_state : public driver_device
 {
 public:
-	vt520_state(const machine_config &mconfig, device_type type, std::string tag)
+	vt520_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
@@ -88,7 +88,7 @@ static MACHINE_CONFIG_START( vt520, vt520_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vt520_state, screen_update_vt520)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// On the board there are two M5M44256BJ-7 chips
 	// Which are DRAM 256K x 4bit

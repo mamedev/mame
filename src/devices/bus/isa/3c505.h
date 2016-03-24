@@ -123,8 +123,8 @@ class threecom3c505_device:  public device_t,
 {
 public:
 	// construction/destruction
-	threecom3c505_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	threecom3c505_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock);
+	threecom3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	threecom3c505_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
 
 	// device register I/O
 	virtual DECLARE_READ16_MEMBER(read);
@@ -143,6 +143,7 @@ protected:
 	virtual int setfilter(device_t *, int);
 
 	const char *cpu_context();
+	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 
 	// device-level overrides
 	virtual void device_start() override;

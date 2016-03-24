@@ -16,7 +16,7 @@ const device_type FILTER_RC = &device_creator<filter_rc_device>;
 //  filter_rc_device - constructor
 //-------------------------------------------------
 
-filter_rc_device::filter_rc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+filter_rc_device::filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, FILTER_RC, "RC Filter", tag, owner, clock, "filter_rc", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

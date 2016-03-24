@@ -13,8 +13,8 @@ class sns_rom21_device : public device_t,
 {
 public:
 	// construction/destruction
-	sns_rom21_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	sns_rom21_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sns_rom21_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	sns_rom21_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -31,7 +31,7 @@ class sns_rom21_srtc_device : public sns_rom21_device
 {
 public:
 	// construction/destruction
-	sns_rom21_srtc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sns_rom21_srtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

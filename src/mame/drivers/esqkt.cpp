@@ -98,7 +98,7 @@
 class esqkt_state : public driver_device
 {
 public:
-	esqkt_state(const machine_config &mconfig, device_type type, std::string tag)
+	esqkt_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_esp(*this, "esp"),
@@ -110,7 +110,7 @@ public:
 	required_device<m68ec020_device> m_maincpu;
 	required_device<es5510_device> m_esp;
 	required_device<mc68681_device> m_duart;
-	required_device<esqpanel2x40_sq1_device> m_sq1panel;
+	required_device<esqpanel2x16_sq1_device> m_sq1panel;
 	required_device<midi_port_device> m_mdout;
 
 	virtual void machine_reset() override;
@@ -203,7 +203,7 @@ static MACHINE_CONFIG_START( kt, esqkt_state )
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_ESQPANEL2x40_SQ1_ADD("sq1panel")
+	MCFG_ESQPANEL2x16_SQ1_ADD("sq1panel")
 	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 
 	MCFG_MC68681_ADD("duart", 4000000)

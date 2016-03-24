@@ -168,7 +168,7 @@ Quick Jack administration/service mode:
 class adp_state : public driver_device
 {
 public:
-	adp_state(const machine_config &mconfig, device_type type, std::string tag)
+	adp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_microtouch(*this, "microtouch"),
 		m_maincpu(*this, "maincpu"),

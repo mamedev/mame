@@ -30,7 +30,7 @@
 class cubeqst_state : public driver_device
 {
 public:
-	cubeqst_state(const machine_config &mconfig, device_type type, std::string tag)
+	cubeqst_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc"),
 			m_rotatecpu(*this, "rotate_cpu"),
@@ -532,7 +532,6 @@ static MACHINE_CONFIG_START( cubeqst, cubeqst_state )
 	MCFG_LASERDISC_OVERLAY_CLIP(0, 320-1, 0, 256-8)
 	MCFG_LASERDISC_OVERLAY_POSITION(0.002f, -0.018f)
 	MCFG_LASERDISC_OVERLAY_SCALE(1.0f, 1.030f)
-	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Patrick Lawrence, Aaron Giles
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /*************************************************************************
 
     Atari Crystal Castles hardware
@@ -12,7 +12,7 @@
 class ccastles_state : public driver_device
 {
 public:
-	ccastles_state(const machine_config &mconfig, device_type type, std::string tag)
+	ccastles_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_nvram_4b(*this, "nvram_4b"),

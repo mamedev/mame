@@ -78,7 +78,7 @@ void debug_view_state::enumerate_sources()
 	std::string name;
 	for (device_state_interface *state = iter.first(); state != nullptr; state = iter.next())
 	{
-		strprintf(name,"%s '%s'", state->device().name().c_str(), state->device().tag().c_str());
+		name = string_format("%s '%s'", state->device().name(), state->device().tag());
 		m_source_list.append(*global_alloc(debug_view_state_source(name.c_str(), state->device())));
 	}
 
@@ -98,7 +98,7 @@ void debug_view_state::reset()
 	{
 		state_item *oldhead = m_state_list;
 		m_state_list = oldhead->m_next;
-		auto_free(machine(), oldhead);
+		global_free(oldhead);
 	}
 }
 
@@ -117,39 +117,39 @@ void debug_view_state::recompute()
 
 	// add a cycles entry: cycles:99999999
 	state_item **tailptr = &m_state_list;
-	*tailptr = auto_alloc(machine(), state_item(REG_CYCLES, "cycles", 8));
+	*tailptr = global_alloc(state_item(REG_CYCLES, "cycles", 8));
 	tailptr = &(*tailptr)->m_next;
 
 	// add a beam entry: beamx:1234
-	*tailptr = auto_alloc(machine(), state_item(REG_BEAMX, "beamx", 4));
+	*tailptr = global_alloc(state_item(REG_BEAMX, "beamx", 4));
 	tailptr = &(*tailptr)->m_next;
 
 	// add a beam entry: beamy:5678
-	*tailptr = auto_alloc(machine(), state_item(REG_BEAMY, "beamy", 4));
+	*tailptr = global_alloc(state_item(REG_BEAMY, "beamy", 4));
 	tailptr = &(*tailptr)->m_next;
 
 	// add a beam entry: frame:123456
-	*tailptr = auto_alloc(machine(), state_item(REG_FRAME, "frame", 6));
+	*tailptr = global_alloc(state_item(REG_FRAME, "frame", 6));
 	tailptr = &(*tailptr)->m_next;
 
 	// add a flags entry: flags:xxxxxxxx
-	*tailptr = auto_alloc(machine(), state_item(STATE_GENFLAGS, "flags", source.m_stateintf->state_string_max_length(STATE_GENFLAGS)));
+	*tailptr = global_alloc(state_item(STATE_GENFLAGS, "flags", source.m_stateintf->state_string_max_length(STATE_GENFLAGS)));
 	tailptr = &(*tailptr)->m_next;
 
 	// add a divider entry
-	*tailptr = auto_alloc(machine(), state_item(REG_DIVIDER, "", 0));
+	*tailptr = global_alloc(state_item(REG_DIVIDER, "", 0));
 	tailptr = &(*tailptr)->m_next;
 
 	// add all registers into it
 	for (const device_state_entry *entry = source.m_stateintf->state_first(); entry != nullptr; entry = entry->next())
 		if (entry->divider())
 		{
-			*tailptr = auto_alloc(machine(), state_item(REG_DIVIDER, "", 0));
+			*tailptr = global_alloc(state_item(REG_DIVIDER, "", 0));
 			tailptr = &(*tailptr)->m_next;
 		}
 		else if (entry->visible())
 		{
-			*tailptr = auto_alloc(machine(), state_item(entry->index(), entry->symbol(), source.m_stateintf->state_string_max_length(entry->index())));
+			*tailptr = global_alloc(state_item(entry->index(), entry->symbol(), source.m_stateintf->state_string_max_length(entry->index())));
 			tailptr = &(*tailptr)->m_next;
 		}
 
@@ -242,7 +242,7 @@ void debug_view_state::view_update()
 						if (source.m_execintf != nullptr)
 						{
 							curitem->m_currval = source.m_execintf->cycles_remaining();
-							strprintf(valstr, "%-8d", (UINT32)curitem->m_currval);
+							valstr = string_format("%-8d", (UINT32)curitem->m_currval);
 						}
 						break;
 
@@ -250,7 +250,7 @@ void debug_view_state::view_update()
 						if (screen != nullptr)
 						{
 							curitem->m_currval = screen->hpos();
-							strprintf(valstr, "%4d", (UINT32)curitem->m_currval);
+							valstr = string_format("%4d", (UINT32)curitem->m_currval);
 						}
 						break;
 
@@ -258,7 +258,7 @@ void debug_view_state::view_update()
 						if (screen != nullptr)
 						{
 							curitem->m_currval = screen->vpos();
-							strprintf(valstr, "%4d", (UINT32)curitem->m_currval);
+							valstr = string_format("%4d", (UINT32)curitem->m_currval);
 						}
 						break;
 
@@ -266,7 +266,7 @@ void debug_view_state::view_update()
 						if (screen != nullptr)
 						{
 							curitem->m_currval = screen->frame_number();
-							strprintf(valstr, "%6d", (UINT32)curitem->m_currval);
+							valstr = string_format("%6d", (UINT32)curitem->m_currval);
 						}
 						break;
 				}

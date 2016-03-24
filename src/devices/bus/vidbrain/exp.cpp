@@ -86,7 +86,7 @@ UINT8* device_videobrain_expansion_card_interface::videobrain_ram_pointer(runnin
 //  videobrain_expansion_slot_device - constructor
 //-------------------------------------------------
 
-videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VIDEOBRAIN_EXPANSION_SLOT, "VideoBrain expansion port", tag, owner, clock, "videobrain_expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	device_image_interface(mconfig, *this),

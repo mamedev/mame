@@ -251,7 +251,7 @@ void tms3203x_device::tmsreg::from_double(double val)
 //  tms3203x_device - constructor
 //-------------------------------------------------
 
-tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map, std::string shortname, std::string source)
+tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 24, -2, internal_map),
 		m_chip_type(chiptype),
@@ -280,12 +280,12 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 #endif
 }
 
-tms32031_device::tms32031_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tms32031_device::tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms3203x_device(mconfig, TMS32031, "TMS32031", tag, owner, clock, CHIP_TYPE_TMS32031, ADDRESS_MAP_NAME(internal_32031), "tms32031", __FILE__)
 {
 }
 
-tms32032_device::tms32032_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tms32032_device::tms32032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms3203x_device(mconfig, TMS32032, "TMS32032", tag, owner, clock, CHIP_TYPE_TMS32032, ADDRESS_MAP_NAME(internal_32032), "tms32032", __FILE__)
 {
 }
@@ -541,12 +541,12 @@ void tms3203x_device::state_string_export(const device_state_entry &entry, std::
 		case TMS3203X_R5F:
 		case TMS3203X_R6F:
 		case TMS3203X_R7F:
-			strprintf(str, "%12g", m_r[TMR_R0 + (entry.index() - TMS3203X_R0F)].as_double());
+			str = string_format("%12g", m_r[TMR_R0 + (entry.index() - TMS3203X_R0F)].as_double());
 			break;
 
 		case STATE_GENFLAGS:
 			UINT32 temp = m_r[TMR_ST].i32[0];
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				(temp & 0x80) ? 'O':'.',
 				(temp & 0x40) ? 'U':'.',
 				(temp & 0x20) ? 'V':'.',

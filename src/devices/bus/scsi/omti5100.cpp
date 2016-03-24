@@ -23,7 +23,7 @@ const rom_entry *omti5100_device::device_rom_region() const
 }
 #endif
 
-omti5100_device::omti5100_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+omti5100_device::omti5100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: scsihd_device(mconfig, OMTI5100, "OMTI 5100", tag, owner, clock, "omti5100", __FILE__),
 		m_image0(*this, "image0"),
 		m_image1(*this, "image1")

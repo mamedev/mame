@@ -25,7 +25,7 @@ Note: port 0 bit 4 is NOT a speaker bit. See code at 027B.
 class vta2000_state : public driver_device
 {
 public:
-	vta2000_state(const machine_config &mconfig, device_type type, std::string tag)
+	vta2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")

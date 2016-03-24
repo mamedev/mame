@@ -830,7 +830,7 @@ ioport_constructor c1571_t::device_input_ports() const
 //  c1571_t - constructor
 //-------------------------------------------------
 
-c1571_t::c1571_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+c1571_t::c1571_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cbm_iec_interface(mconfig, *this),
 		device_c64_floppy_parallel_interface(mconfig, *this),
@@ -853,7 +853,7 @@ c1571_t::c1571_t(const machine_config &mconfig, device_type type, std::string na
 {
 }
 
-c1571_t::c1571_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+c1571_t::c1571_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, C1571, "C1571", tag, owner, clock, "c1571", __FILE__),
 		device_cbm_iec_interface(mconfig, *this),
 		device_c64_floppy_parallel_interface(mconfig, *this),
@@ -881,7 +881,7 @@ c1571_t::c1571_t(const machine_config &mconfig, std::string tag, device_t *owner
 //  c1570_t - constructor
 //-------------------------------------------------
 
-c1570_t::c1570_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+c1570_t::c1570_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: c1571_t(mconfig, C1570, "C1570", tag, owner, clock, "c1570", __FILE__)
 {
 }
@@ -891,7 +891,7 @@ c1570_t::c1570_t(const machine_config &mconfig, std::string tag, device_t *owner
 //  c1571cr_t - constructor
 //-------------------------------------------------
 
-c1571cr_t::c1571cr_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+c1571cr_t::c1571cr_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: c1571_t(mconfig, C1571CR, "C1571CR", tag, owner, clock, "c1571cr", __FILE__)
 {
 }
@@ -901,7 +901,7 @@ c1571cr_t::c1571cr_t(const machine_config &mconfig, std::string tag, device_t *o
 //  mini_chief_t - constructor
 //-------------------------------------------------
 
-mini_chief_t::mini_chief_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mini_chief_t::mini_chief_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: c1571_t(mconfig, MINI_CHIEF, "ICT Mini Chief", tag, owner, clock, "minichif", __FILE__)
 {
 }

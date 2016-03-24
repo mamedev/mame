@@ -667,7 +667,7 @@ void mips3_device::static_generate_tlb_mismatch()
 	UML_RECOVER(block, I0, MAPVAR_PC);                                          // recover i0,PC
 	UML_MOV(block, mem(&m_core->pc), I0);                                        // mov     <pc>,i0
 	UML_SHR(block, I1, I0, 12);                                     // shr     i1,i0,12
-	UML_LOAD(block, I1, (void *)vtlb_table(m_vtlb), I1, SIZE_DWORD, SCALE_x4);// load    i1,[vtlb_table],i1,dword
+	UML_LOAD(block, I1, (void *)vtlb_table(), I1, SIZE_DWORD, SCALE_x4);// load    i1,[vtlb_table],i1,dword
 	if (PRINTF_MMU)
 	{
 		static const char text[] = "TLB mismatch @ %08X (ent=%08X)\n";
@@ -839,7 +839,7 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 
 	/* general case: assume paging and perform a translation */
 	UML_SHR(block, I3, I0, 12);                                     // shr     i3,i0,12
-	UML_LOAD(block, I3, (void *)vtlb_table(m_vtlb), I3, SIZE_DWORD, SCALE_x4);// load    i3,[vtlb_table],i3,dword
+	UML_LOAD(block, I3, (void *)vtlb_table(), I3, SIZE_DWORD, SCALE_x4);// load    i3,[vtlb_table],i3,dword
 	UML_TEST(block, I3, iswrite ? VTLB_WRITE_ALLOWED : VTLB_READ_ALLOWED);// test    i3,iswrite ? VTLB_WRITE_ALLOWED : VTLB_READ_ALLOWED
 	UML_JMPc(block, COND_Z, tlbmiss = label++);                                     // jmp     tlbmiss,z
 	UML_ROLINS(block, I0, I3, 0, 0xfffff000);                   // rolins  i0,i3,0,0xfffff000
@@ -1226,7 +1226,7 @@ void mips3_device::generate_sequence_instruction(drcuml_block *block, compiler_s
 	/* validate our TLB entry at this PC; if we fail, we need to handle it */
 	if ((desc->flags & OPFLAG_VALIDATE_TLB) && (desc->pc < 0x80000000 || desc->pc >= 0xc0000000))
 	{
-		const vtlb_entry *tlbtable = vtlb_table(m_vtlb);
+		const vtlb_entry *tlbtable = vtlb_table();
 
 		/* if we currently have a valid TLB read entry, we just verify */
 		if (tlbtable[desc->pc >> 12] & VTLB_FETCH_ALLOWED)

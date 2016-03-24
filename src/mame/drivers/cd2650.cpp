@@ -41,7 +41,7 @@ TODO
 class cd2650_state : public driver_device
 {
 public:
-	cd2650_state(const machine_config &mconfig, device_type type, std::string tag)
+	cd2650_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -114,7 +114,6 @@ INPUT_PORTS_END
 void cd2650_state::machine_reset()
 {
 	m_term_data = 0x80;
-	m_beep->set_frequency(950);    /* guess */
 	m_beep->set_state(0);
 }
 
@@ -278,7 +277,7 @@ static MACHINE_CONFIG_START( cd2650, cd2650_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 159)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cd2650)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", cd2650_state, cd2650, "pgm", 1)
@@ -287,7 +286,7 @@ static MACHINE_CONFIG_START( cd2650, cd2650_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 950) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

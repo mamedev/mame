@@ -131,7 +131,7 @@ WRITE16_MEMBER(arcadecl_state::latch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_oki->set_bank_base((data & 0x80) ? 0x40000 : 0x00000);
-		set_oki6295_volume((data & 0x001f) * 100 / 0x1f);
+		m_oki->set_output_gain(ALL_OUTPUTS, (data & 0x001f) / 31.0f);
 	}
 }
 

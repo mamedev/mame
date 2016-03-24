@@ -22,9 +22,8 @@
 
 bookkeeping_manager::bookkeeping_manager(running_machine &machine)
 	: m_machine(machine),
-	  m_dispensed_tickets(0)
+		m_dispensed_tickets(0)
 {
-
 	/* reset coin counters */
 	for (int counternum = 0; counternum < COIN_COUNTERS; counternum++)
 	{
@@ -33,7 +32,7 @@ bookkeeping_manager::bookkeeping_manager(running_machine &machine)
 		m_coin_count[counternum] = 0;
 	}
 
-	// register coin save state 
+	// register coin save state
 	machine.save().save_item(NAME(m_coin_count));
 	machine.save().save_item(NAME(m_coinlockedout));
 	machine.save().save_item(NAME(m_lastcoin));

@@ -239,7 +239,7 @@ public:
 		TIMER_COUNTER_6MS
 	};
 
-	cat_state(const machine_config &mconfig, device_type type, std::string tag)
+	cat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		//m_nvram(*this, "nvram"), // merge with svram?
@@ -1050,7 +1050,7 @@ static MACHINE_CONFIG_START( cat, cat_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cat_state, screen_update_cat)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 

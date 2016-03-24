@@ -337,7 +337,7 @@ const device_type APEXC = &device_creator<apexc_cpu_device>;
 #define DELAY(n)    {m_icount -= (n); m_current_word = (m_current_word + (n)) & 0x1f;}
 
 
-apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, APEXC, "APEXC", tag, owner, clock, "apexc_cpu", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 15, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 1, 0)
@@ -819,7 +819,7 @@ void apexc_cpu_device::state_string_export(const device_state_entry &entry, std:
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c", m_running ? 'R' : 'S');
+			str = string_format("%c", m_running ? 'R' : 'S');
 			break;
 	}
 }

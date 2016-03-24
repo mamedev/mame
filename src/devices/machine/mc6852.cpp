@@ -93,7 +93,7 @@ const device_type MC6852 = &device_creator<mc6852_device>;
 //  mc6852_device - constructor
 //-------------------------------------------------
 
-mc6852_device::mc6852_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+mc6852_device::mc6852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MC6852, "MC6852", tag, owner, clock, "mc6852", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_write_tx_data(*this),
@@ -270,7 +270,7 @@ WRITE8_MEMBER( mc6852_device::write )
 			Register is set to ones.
 			*/
 
-			if (LOG) logerror("MC6852 '%s' Receiver Reset\n", tag().c_str());
+			if (LOG) logerror("MC6852 '%s' Receiver Reset\n", tag());
 
 			m_status &= ~(S_RX_OVRN | S_PE | S_DCD | S_RDA);
 			m_rsr = 0xff;
@@ -286,15 +286,15 @@ WRITE8_MEMBER( mc6852_device::write )
 			and inhibits the TDRA status bit (in the one-sync-character
 			and two-sync-character modes).*/
 
-			if (LOG) logerror("MC6852 '%s' Transmitter Reset\n", tag().c_str());
+			if (LOG) logerror("MC6852 '%s' Transmitter Reset\n", tag());
 
 			m_status &= ~(S_TUF | S_CTS | S_TDRA);
 		}
 
 		if (LOG)
 		{
-			if (data & C1_STRIP_SYNC) logerror("MC6852 '%s' Strip Synchronization Characters\n", tag().c_str());
-			if (data & C1_CLEAR_SYNC) logerror("MC6852 '%s' Clear Synchronization\n", tag().c_str());
+			if (data & C1_STRIP_SYNC) logerror("MC6852 '%s' Strip Synchronization Characters\n", tag());
+			if (data & C1_CLEAR_SYNC) logerror("MC6852 '%s' Clear Synchronization\n", tag());
 		}
 
 		m_cr[0] = data;

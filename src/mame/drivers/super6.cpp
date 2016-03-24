@@ -193,7 +193,7 @@ READ8_MEMBER( super6_state::fdc_r )
 
 	// don't crash please... but it's true, WAIT does nothing in our Z80
 	//fatalerror("Z80 WAIT not supported by MAME core\n");
-	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
 
 	return !m_fdc->intrq_r() << 7;
 }
@@ -409,14 +409,14 @@ SLOT_INTERFACE_END
 
 WRITE_LINE_MEMBER( super6_state::fdc_intrq_w )
 {
-	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, CLEAR_LINE);
 
 	m_ctc->trg3(!state);
 }
 
 WRITE_LINE_MEMBER( super6_state::fdc_drq_w )
 {
-	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, CLEAR_LINE);
 
 	m_dma->rdy_w(state);
 }

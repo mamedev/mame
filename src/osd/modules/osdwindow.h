@@ -9,12 +9,131 @@
 #ifndef __OSDWINDOW__
 #define __OSDWINDOW__
 
-#include "video.h"
-#include "render.h"
+#include "emu.h"
+#include "ui/ui.h"
+
+#ifdef OSD_SDL
+// standard SDL headers
+#include "sdlinc.h"
+#endif
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
+
+class osd_options;
+class render_primitive_list;
+
+enum
+{
+	VIDEO_MODE_NONE = 0,
+	VIDEO_MODE_GDI,
+	VIDEO_MODE_BGFX,
+#if (USE_OPENGL)
+	VIDEO_MODE_OPENGL,
+#endif
+	VIDEO_MODE_SDL2ACCEL,
+	VIDEO_MODE_D3D,
+	VIDEO_MODE_SOFT,
+
+	VIDEO_MODE_COUNT
+};
+
+class osd_dim
+{
+public:
+	osd_dim(const int &w, const int &h)
+	: m_w(w), m_h(h)
+	{
+	}
+	int width() const { return m_w; }
+	int height() const { return m_h; }
+
+	bool operator!=(const osd_dim &other) { return (m_w != other.width()) || (m_h != other.height()); }
+	bool operator==(const osd_dim &other) { return (m_w == other.width()) && (m_h == other.height()); }
+private:
+	int m_w;
+	int m_h;
+};
+
+class osd_rect
+{
+public:
+	osd_rect()
+	: m_x(0), m_y(0), m_d(0,0)
+	{
+	}
+	osd_rect(const int x, const int y, const int &w, const int &h)
+	: m_x(x), m_y(y), m_d(w,h)
+	{
+	}
+	osd_rect(const int x, const int y, const osd_dim &d)
+	: m_x(x), m_y(y), m_d(d)
+	{
+	}
+	int top() const { return m_y; }
+	int left() const { return m_x; }
+	int width() const { return m_d.width(); }
+	int height() const { return m_d.height(); }
+
+	osd_dim dim() const { return m_d; }
+
+	int bottom() const { return m_y + m_d.height(); }
+	int right() const { return m_x + m_d.width(); }
+
+	osd_rect move_by(int dx, int dy) const { return osd_rect(m_x + dx, m_y + dy, m_d); }
+	osd_rect resize(int w, int h) const { return osd_rect(m_x, m_y, w, h); }
+
+private:
+	int m_x;
+	int m_y;
+	osd_dim m_d;
+};
+
+class osd_monitor_info
+{
+public:
+	osd_monitor_info(void *handle, const char *monitor_device, float aspect)
+	: m_next(NULL), m_handle(handle), m_aspect(aspect)
+	{
+		strncpy(m_name, monitor_device, ARRAY_LENGTH(m_name) - 1);
+	}
+
+	virtual ~osd_monitor_info() { }
+
+	virtual void refresh() = 0;
+
+	const void *oshandle() { return m_handle; }
+
+	const osd_rect &position_size() { return m_pos_size; }
+	const osd_rect &usuable_position_size() { return m_usuable_pos_size; }
+
+	const char *devicename() { return m_name[0] ? m_name : "UNKNOWN"; }
+
+	float aspect() { return m_aspect; }
+	float pixel_aspect() { return m_aspect / ((float)m_pos_size.width() / (float)m_pos_size.height()); }
+
+	void update_resolution(const int new_width, const int new_height) { m_pos_size.resize(new_width, new_height); }
+	void set_aspect(const float a) { m_aspect = a; }
+	bool is_primary() { return m_is_primary; }
+
+	osd_monitor_info    * next() { return m_next; }   // pointer to next monitor in list
+
+	static osd_monitor_info *pick_monitor(osd_options &options, int index);
+	static osd_monitor_info *list;
+
+	// FIXME: should be private!
+	osd_monitor_info    *m_next;                   // pointer to next monitor in list
+protected:
+	osd_rect            m_pos_size;
+	osd_rect            m_usuable_pos_size;
+	bool                m_is_primary;
+	char                m_name[64];
+private:
+
+	void *              m_handle;                 // handle to the monitor
+	float               m_aspect;                 // computed/configured aspect ratio of the physical device
+};
 
 class osd_window_config
 {
@@ -33,11 +152,12 @@ class osd_window
 public:
 	osd_window()
 	:
-#ifdef OSD_SDL
-#else
+#ifndef OSD_SDL
 		m_hwnd(0), m_dc(0), m_focus_hwnd(0), m_resize_state(0),
 #endif
-		m_primlist(NULL),
+		m_primlist(nullptr),
+		m_index(0),
+		m_main(nullptr),
 		m_prescale(1)
 		{}
 	virtual ~osd_window() { }
@@ -48,18 +168,13 @@ public:
 
 	int prescale() const { return m_prescale; };
 
-	float aspect() const { return monitor()->aspect(); }
+	float pixel_aspect() const { return monitor()->pixel_aspect(); }
 
 	virtual osd_dim get_size() = 0;
 
 #ifdef OSD_SDL
-	virtual osd_dim blit_surface_size() = 0;
 	virtual osd_monitor_info *monitor() const = 0;
-#if (SDLMAME_SDL2)
 	virtual SDL_Window *sdl_window() = 0;
-#else
-	virtual SDL_Surface *sdl_surface() = 0;
-#endif
 #else
 	virtual osd_monitor_info *monitor() const = 0;
 	virtual bool win_has_menu() = 0;
@@ -78,6 +193,8 @@ public:
 
 	render_primitive_list   *m_primlist;
 	osd_window_config       m_win_config;
+	int                     m_index;
+	osd_window              *m_main;
 protected:
 	int                     m_prescale;
 };
@@ -96,7 +213,7 @@ public:
 	static const int FLAG_NEEDS_ASYNCBLIT       = 0x0200;
 
 	osd_renderer(osd_window *window, const int flags)
-	: m_window(window), m_flags(flags) { }
+	: m_sliders_dirty(false), m_window(window), m_flags(flags) { }
 
 	virtual ~osd_renderer() { }
 
@@ -112,24 +229,24 @@ public:
 	virtual int create() = 0;
 	virtual render_primitive_list *get_primitives() = 0;
 
+	virtual slider_state* get_slider_list() { return nullptr; }
 	virtual int draw(const int update) = 0;
-#ifdef OSD_SDL
-	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) = 0;
-#else
-	virtual void save() = 0;
-	virtual void record() = 0;
-	virtual void toggle_fsfx() = 0;
-#endif
+	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) { return 0; };
+	virtual void save() { };
+	virtual void record() { };
+	virtual void toggle_fsfx() { };
+	virtual bool sliders_dirty() { return m_sliders_dirty; }
+    virtual bool multi_window_sliders() { return false; }
 
-	virtual void destroy() = 0;
+	static osd_renderer* make_for_type(int mode, osd_window *window, int extra_flags = FLAG_NONE);
 
 protected:
 	/* Internal flags */
 	static const int FI_CHANGED                 = 0x010000;
+	bool        m_sliders_dirty;
 
 private:
-
-	osd_window      *m_window;
+	osd_window  *m_window;
 	int         m_flags;
 };
 

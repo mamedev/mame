@@ -50,7 +50,7 @@ static const char *const joynames[2][4] =
 
 static const char *const keynames[] = { "KP0", "KP1", "KP2", "KP3", "KP4" };
 
-ti99_handset_device::ti99_handset_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ti99_handset_device::ti99_handset_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : joyport_attached_device(mconfig, HANDSET, "TI-99/4 IR handset", tag, owner, clock, "handset", __FILE__), m_ack(0), m_clock_high(false), m_buf(0), m_buflen(0), m_delay_timer(nullptr)
 {
 }
@@ -489,7 +489,7 @@ INPUT_PORTS_START( joysticks )
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1/*, "(2FIRE)", CODE_NONE, OSD_JOY2_FIRE, 0*/) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-ti99_twin_joystick::ti99_twin_joystick(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ti99_twin_joystick::ti99_twin_joystick(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : joyport_attached_device(mconfig, HANDSET, "TI-99/4(A) Twin Joystick", tag, owner, clock, "twinjoy", __FILE__), m_joystick(0)
 {
 }

@@ -26,7 +26,7 @@ class apricot_256k_ram_device : public device_t, public device_apricot_expansion
 {
 public:
 	// construction/destruction
-	apricot_256k_ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	apricot_256k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;
@@ -46,7 +46,7 @@ class apricot_128k_ram_device : public device_t, public device_apricot_expansion
 {
 public:
 	// construction/destruction
-	apricot_128k_ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	apricot_128k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;
@@ -66,7 +66,7 @@ class apricot_512k_ram_device : public device_t, public device_apricot_expansion
 {
 public:
 	// construction/destruction
-	apricot_512k_ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	apricot_512k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;

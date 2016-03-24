@@ -119,7 +119,7 @@ const device_type ADSP2181 = &device_creator<adsp2181_device>;
 //  adsp21xx_device - constructor
 //-------------------------------------------------
 
-adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, std::string shortname, std::string source)
+adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 14, -2),
 		m_data_config("data", ENDIANNESS_LITTLE, 16, 14, -1),
@@ -247,25 +247,25 @@ adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type
 	m_shift_xregs[7] = &m_core.sr.srx.sr1;
 }
 
-adsp2100_device::adsp2100_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+adsp2100_device::adsp2100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: adsp21xx_device(mconfig, ADSP2100, "ADSP-2100", tag, owner, clock, CHIP_TYPE_ADSP2100, "adsp2100", __FILE__) { }
 
-adsp2101_device::adsp2101_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+adsp2101_device::adsp2101_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: adsp21xx_device(mconfig, ADSP2101, "ADSP-2101", tag, owner, clock, CHIP_TYPE_ADSP2101, "adsp2101", __FILE__) { }
 
-adsp2101_device::adsp2101_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, std::string shortname, std::string source)
+adsp2101_device::adsp2101_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, const char *shortname, const char *source)
 	: adsp21xx_device(mconfig, type, name, tag, owner, clock, chiptype, shortname, source) { }
 
-adsp2104_device::adsp2104_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+adsp2104_device::adsp2104_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: adsp2101_device(mconfig, ADSP2104, "ADSP-2104", tag, owner, clock, CHIP_TYPE_ADSP2104, "adsp2104", __FILE__) { }
 
-adsp2105_device::adsp2105_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+adsp2105_device::adsp2105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: adsp2101_device(mconfig, ADSP2105, "ADSP-2105", tag, owner, clock, CHIP_TYPE_ADSP2105, "adsp2105", __FILE__) { }
 
-adsp2115_device::adsp2115_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+adsp2115_device::adsp2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: adsp2101_device(mconfig, ADSP2115, "ADSP-2115", tag, owner, clock, CHIP_TYPE_ADSP2115, "adsp2115", __FILE__) { }
 
-adsp2181_device::adsp2181_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+adsp2181_device::adsp2181_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: adsp21xx_device(mconfig, ADSP2181, "ADSP-2181", tag, owner, clock, CHIP_TYPE_ADSP2181, "adsp2181", __FILE__),
 		m_io_config("I/O", ENDIANNESS_LITTLE, 16, 11, -1) { }
 
@@ -545,13 +545,13 @@ void adsp21xx_device::device_start()
 	state_add(ADSP2100_SR1_SEC, "SR1_SEC",   m_alt.sr.srx.sr1.u);
 
 	for (int ireg = 0; ireg < 8; ireg++)
-		state_add(ADSP2100_I0 + ireg, strformat("I%d", ireg).c_str(), m_i[ireg]).mask(0x3fff).callimport();
+		state_add(ADSP2100_I0 + ireg, string_format("I%d", ireg).c_str(), m_i[ireg]).mask(0x3fff).callimport();
 
 	for (int lreg = 0; lreg < 8; lreg++)
-		state_add(ADSP2100_L0 + lreg, strformat("L%d", lreg).c_str(), m_l[lreg]).mask(0x3fff).callimport();
+		state_add(ADSP2100_L0 + lreg, string_format("L%d", lreg).c_str(), m_l[lreg]).mask(0x3fff).callimport();
 
 	for (int mreg = 0; mreg < 8; mreg++)
-		state_add(ADSP2100_M0 + mreg, strformat("M%d", mreg).c_str(), m_m[mreg]).signed_mask(0x3fff);
+		state_add(ADSP2100_M0 + mreg, string_format("M%d", mreg).c_str(), m_m[mreg]).signed_mask(0x3fff);
 
 	state_add(ADSP2100_PX,      "PX",        m_px);
 	state_add(ADSP2100_CNTR,    "CNTR",      m_cntr).mask(0x3fff);
@@ -570,7 +570,7 @@ void adsp21xx_device::device_start()
 
 	for (int irqnum = 0; irqnum < 4; irqnum++)
 		if (irqnum < 4 || m_chip_type == CHIP_TYPE_ADSP2100)
-			state_add(ADSP2100_IRQSTATE0 + irqnum, strformat("IRQ%d", irqnum).c_str(), m_irq_state[irqnum]).mask(1).callimport();
+			state_add(ADSP2100_IRQSTATE0 + irqnum, string_format("IRQ%d", irqnum).c_str(), m_irq_state[irqnum]).mask(1).callimport();
 
 	state_add(ADSP2100_FLAGIN,  "FLAGIN",    m_flagin).mask(1);
 	state_add(ADSP2100_FLAGOUT, "FLAGOUT",   m_flagout).mask(1);
@@ -724,7 +724,7 @@ void adsp21xx_device::state_string_export(const device_state_entry &entry, std::
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				m_astat & 0x80 ? 'X':'.',
 				m_astat & 0x40 ? 'M':'.',
 				m_astat & 0x20 ? 'Q':'.',

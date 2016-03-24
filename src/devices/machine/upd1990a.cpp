@@ -44,7 +44,7 @@ const device_type UPD4990A = &device_creator<upd4990a_device>;
 //  upd1990a_device - constructor
 //-------------------------------------------------
 
-upd1990a_device::upd1990a_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
+upd1990a_device::upd1990a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_rtc_interface(mconfig, *this),
 		m_write_data(*this),
@@ -53,7 +53,7 @@ upd1990a_device::upd1990a_device(const machine_config &mconfig, device_type type
 {
 }
 
-upd1990a_device::upd1990a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+upd1990a_device::upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD1990A, "uPD1990A", tag, owner, clock, "upd1990a", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		m_write_data(*this),
@@ -62,7 +62,7 @@ upd1990a_device::upd1990a_device(const machine_config &mconfig, std::string tag,
 {
 }
 
-upd4990a_device::upd4990a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+upd4990a_device::upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: upd1990a_device(mconfig, UPD4990A, "uPD4990A RTC", tag, owner, clock, TYPE_4990A, "upd4990a", __FILE__) { }
 
 
@@ -204,7 +204,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 	if (!m_cs)
 		return;
 
-	if (LOG) logerror("uPD1990A '%s' STB %u\n", tag().c_str(), state);
+	if (LOG) logerror("uPD1990A '%s' STB %u\n", tag(), state);
 
 	// rising edge
 	if (!m_stb && state)
@@ -219,7 +219,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 				m_c = MODE_TEST;
 		}
 
-		if (LOG) logerror("uPD1990A '%s' Command %x\n", tag().c_str(), m_c);
+		if (LOG) logerror("uPD1990A '%s' Command %x\n", tag(), m_c);
 
 		// common functions
 		if (m_c == MODE_REGISTER_HOLD || (m_c >= MODE_TP_64HZ && m_c < MODE_TEST))
@@ -390,7 +390,7 @@ WRITE_LINE_MEMBER( upd1990a_device::clk_w )
 	if (!m_cs)
 		return;
 
-	if (LOG) logerror("uPD1990A '%s' CLK %u\n", tag().c_str(), state);
+	if (LOG) logerror("uPD1990A '%s' CLK %u\n", tag(), state);
 
 	// rising edge
 	if (!m_clk && state)
@@ -435,14 +435,14 @@ WRITE_LINE_MEMBER( upd1990a_device::clk_w )
 WRITE_LINE_MEMBER( upd1990a_device::cs_w )
 {
 	// chip select
-	if (LOG) logerror("uPD1990A '%s' CS %u\n", tag().c_str(), state);
+	if (LOG) logerror("uPD1990A '%s' CS %u\n", tag(), state);
 	m_cs = state;
 }
 
 WRITE_LINE_MEMBER( upd1990a_device::oe_w )
 {
 	// output enable
-	if (LOG) logerror("uPD1990A '%s' OE %u\n", tag().c_str(), state);
+	if (LOG) logerror("uPD1990A '%s' OE %u\n", tag(), state);
 
 	int prev_oe = m_oe;
 	m_oe = state;
@@ -453,26 +453,26 @@ WRITE_LINE_MEMBER( upd1990a_device::oe_w )
 
 WRITE_LINE_MEMBER( upd1990a_device::c0_w )
 {
-	if (LOG) logerror("uPD1990A '%s' C0 %u\n", tag().c_str(), state);
+	if (LOG) logerror("uPD1990A '%s' C0 %u\n", tag(), state);
 	m_c_unlatched = (m_c_unlatched & 0x06) | state;
 }
 
 WRITE_LINE_MEMBER( upd1990a_device::c1_w )
 {
-	if (LOG) logerror("uPD1990A '%s' C1 %u\n", tag().c_str(), state);
+	if (LOG) logerror("uPD1990A '%s' C1 %u\n", tag(), state);
 	m_c_unlatched = (m_c_unlatched & 0x05) | (state << 1);
 }
 
 WRITE_LINE_MEMBER( upd1990a_device::c2_w )
 {
-	if (LOG) logerror("uPD1990A '%s' C2 %u\n", tag().c_str(), state);
+	if (LOG) logerror("uPD1990A '%s' C2 %u\n", tag(), state);
 	m_c_unlatched = (m_c_unlatched & 0x03) | (state << 2);
 }
 
 WRITE_LINE_MEMBER( upd1990a_device::data_in_w )
 {
 	// data input
-	if (LOG) logerror("uPD1990A '%s' DATA IN %u\n", tag().c_str(), state);
+	if (LOG) logerror("uPD1990A '%s' DATA IN %u\n", tag(), state);
 	m_data_in = state;
 }
 

@@ -43,7 +43,7 @@ device_ql_expansion_card_interface::device_ql_expansion_card_interface(const mac
 //  ql_expansion_slot_t - constructor
 //-------------------------------------------------
 
-ql_expansion_slot_t::ql_expansion_slot_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+ql_expansion_slot_t::ql_expansion_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, QL_EXPANSION_SLOT, "QL expansion port", tag, owner, clock, "ql_expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_write_ipl0l(*this),

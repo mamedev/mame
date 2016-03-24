@@ -134,7 +134,7 @@ void device_state_entry::format_from_mask()
 	int width = 0;
 	for (UINT64 tempmask = m_datamask; tempmask != 0; tempmask >>= 4)
 		width++;
-	strprintf(m_format,"%%0%dX", width);
+	m_format = string_format("%%0%dX", width);
 }
 
 
@@ -605,7 +605,7 @@ void device_state_interface::interface_post_start()
 {
 	// make sure we got something during startup
 	if (m_state_list.count() == 0)
-		throw emu_fatalerror("No state registered for device '%s' that supports it!", m_device.tag().c_str());
+		throw emu_fatalerror("No state registered for device '%s' that supports it!", m_device.tag());
 }
 
 

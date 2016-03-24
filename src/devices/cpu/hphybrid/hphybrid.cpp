@@ -109,7 +109,7 @@ WRITE_LINE_MEMBER(hp_hybrid_cpu_device::flag_w)
 		}
 }
 
-hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname , UINT8 addrwidth)
+hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname , UINT8 addrwidth)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 			m_pa_changed_func(*this),
 			m_program_config("program", ENDIANNESS_BIG, 16, addrwidth, -1),
@@ -619,7 +619,7 @@ UINT16 hp_hybrid_cpu_device::execute_one_sub(UINT16 opcode)
 void hp_hybrid_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	if (entry.index() == STATE_GENFLAGS) {
-		strprintf(str, "%s %s %c %c",
+		str = string_format("%s %s %c %c",
 					BIT(m_flags , HPHYBRID_DB_BIT) ? "Db":"..",
 					BIT(m_flags , HPHYBRID_CB_BIT) ? "Cb":"..",
 					BIT(m_flags , HPHYBRID_O_BIT) ? 'O':'.',
@@ -673,12 +673,7 @@ UINT16 hp_hybrid_cpu_device::RM(UINT32 addr)
 						return RIO(CURRENT_PA , addr_wo_bsc - HP_REG_R4_ADDR);
 
 				case HP_REG_IV_ADDR:
-						// Correct?
-						if (!BIT(m_flags , HPHYBRID_IRH_SVC_BIT) && !BIT(m_flags , HPHYBRID_IRL_SVC_BIT)) {
-								return m_reg_IV;
-						} else {
-								return m_reg_IV | CURRENT_PA;
-						}
+										return m_reg_IV;
 
 				case HP_REG_PA_ADDR:
 						return CURRENT_PA;
@@ -1021,7 +1016,7 @@ void hp_hybrid_cpu_device::check_for_interrupts(void)
 
 				// Do a double-indirect JSM IV,I instruction
 				WM(AEC_CASE_C , ++m_reg_R , m_reg_P);
-				m_reg_P = RM(AEC_CASE_I , RM(HP_REG_IV_ADDR));
+				m_reg_P = RM(AEC_CASE_I , m_reg_IV + CURRENT_PA);
 				m_reg_I = fetch();
 }
 
@@ -1061,7 +1056,7 @@ void hp_hybrid_cpu_device::WIO(UINT8 pa , UINT8 ic , UINT16 v)
 				m_io->write_word(HP_MAKE_IOADDR(pa, ic) << 1 , v);
 }
 
-hp_5061_3001_cpu_device::hp_5061_3001_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+hp_5061_3001_cpu_device::hp_5061_3001_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: hp_hybrid_cpu_device(mconfig, HP_5061_3001, "HP-5061-3001", tag, owner, clock, "5061-3001", 22),
 			m_boot_mode(false)
 {
@@ -1485,20 +1480,20 @@ UINT32 hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , UINT16 addr)
 				bsc_reg = HP_REG_R37_ADDR;
 				break;
 
-                case AEC_CASE_I:
-                                // Behaviour of AEC during interrupt vector fetch is undocumented but it can be guessed from 9845B firmware.
-                                // Basically in this case the integrated AEC seems to do what the discrete implementation in 9845A does:
-                                // top half of memory is mapped to block 0 (fixed) and bottom half is mapped according to content of R35
-                                // (see pg 334 of patent).
-                                bsc_reg = top_half ? 0 : HP_REG_R35_ADDR;
-                                break;
+				case AEC_CASE_I:
+								// Behaviour of AEC during interrupt vector fetch is undocumented but it can be guessed from 9845B firmware.
+								// Basically in this case the integrated AEC seems to do what the discrete implementation in 9845A does:
+								// top half of memory is mapped to block 0 (fixed) and bottom half is mapped according to content of R35
+								// (see pg 334 of patent).
+								bsc_reg = top_half ? 0 : HP_REG_R35_ADDR;
+								break;
 
-                default:
-                                logerror("hphybrid: aec_case=%d\n" , aec_case);
-                                return 0;
-                }
+				default:
+								logerror("hphybrid: aec_case=%d\n" , aec_case);
+								return 0;
+				}
 
-                UINT16 aec_reg = (bsc_reg != 0) ? (m_reg_aec[ bsc_reg - HP_REG_R32_ADDR ] & BSC_REG_MASK) : 0;
+				UINT16 aec_reg = (bsc_reg != 0) ? (m_reg_aec[ bsc_reg - HP_REG_R32_ADDR ] & BSC_REG_MASK) : 0;
 
 		if (m_forced_bsc_25) {
 				aec_reg = (aec_reg & 0xf) | 0x20;
@@ -1581,7 +1576,7 @@ void hp_5061_3001_cpu_device::write_non_common_reg(UINT16 addr , UINT16 v)
 		}
 }
 
-hp_5061_3011_cpu_device::hp_5061_3011_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+hp_5061_3011_cpu_device::hp_5061_3011_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: hp_hybrid_cpu_device(mconfig, HP_5061_3011, "HP-5061-3011", tag, owner, clock, "5061-3011", 16)
 {
 }

@@ -5,7 +5,7 @@
 
 const device_type NAMCO_SETTINGS = &device_creator<namco_settings_device>;
 
-namco_settings_device::namco_settings_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+namco_settings_device::namco_settings_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, NAMCO_SETTINGS, "Namco Settings", tag, owner, clock, "namco_settings", __FILE__)
 {
 }
@@ -31,7 +31,7 @@ WRITE_LINE_MEMBER( namco_settings_device::clk_w )
 			cur_bit++;
 			if(cur_bit == 16) {
 				cur_bit = 0;
-				logerror("%s: %02x = %02x\n", tag().c_str(), adr, value);
+				logerror("%s: %02x = %02x\n", tag(), adr, value);
 			}
 		}
 	}

@@ -22,7 +22,7 @@
 
 const device_type SEIBU_COP_BOOTLEG = &device_creator<seibu_cop_bootleg_device>;
 
-seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEIBU_COP_BOOTLEG, "Seibu COP (Bootleg)", tag, owner, clock, "seibu_cop_boot", __FILE__),
 	m_cop_mcu_ram(nullptr),
 	m_raiden2cop(*this, ":raiden2cop")

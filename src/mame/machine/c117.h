@@ -28,7 +28,7 @@ class namco_c117_device :
 {
 public:
 	//construction/destruction
-	namco_c117_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	namco_c117_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration
 	static void set_cpu_tags(device_t &device, const char *maintag, const char *subtag);

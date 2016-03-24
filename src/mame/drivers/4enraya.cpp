@@ -408,9 +408,6 @@ void _4enraya_state::machine_start()
 	save_item(NAME(m_videoram));
 	save_item(NAME(m_workram));
 	save_item(NAME(m_soundlatch));
-
-	m_prom = memregion("pal_prom")->base();
-	m_rom = memregion("maincpu")->base();
 }
 
 void _4enraya_state::machine_reset()

@@ -26,7 +26,7 @@ const device_type C128_COMAL80 = &device_creator<c128_comal80_cartridge_device>;
 //  c128_comal80_cartridge_device - constructor
 //-------------------------------------------------
 
-c128_comal80_cartridge_device::c128_comal80_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+c128_comal80_cartridge_device::c128_comal80_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C128_COMAL80, "C128 COMAL 80 cartridge", tag, owner, clock, "c128_comal80", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_bank(0)

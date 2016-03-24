@@ -19,13 +19,13 @@ WRITE8_MEMBER( namcos1_state::_3dcs_w )
 
 READ8_MEMBER( namcos1_state::no_key_r )
 {
-	popmessage("CPU %s PC %08x: keychip read %04x\n", space.device().tag().c_str(), space.device().safe_pc(), offset);
+	popmessage("CPU %s PC %08x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
 	return 0;
 }
 
 WRITE8_MEMBER( namcos1_state::no_key_w )
 {
-	popmessage("CPU %s PC %08x: keychip write %04x=%02x\n", space.device().tag().c_str(), space.device().safe_pc(), offset, data);
+	popmessage("CPU %s PC %08x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
 }
 
 
@@ -455,14 +455,14 @@ READ8_MEMBER( namcos1_state::key_type3_r )
 	if (op == m_key_bottom4) return (offset << 4) | (m_key[m_key_swap4_arg] & 0x0f);
 	if (op == m_key_top4)    return (offset << 4) | (m_key[m_key_swap4_arg] >> 4);
 
-	popmessage("CPU %s PC %08x: keychip read %04x", space.device().tag().c_str(), space.device().safe_pc(), offset);
+	popmessage("CPU %s PC %08x: keychip read %04x", space.device().tag(), space.device().safe_pc(), offset);
 
 	return 0;
 }
 
 WRITE8_MEMBER( namcos1_state::key_type3_w )
 {
-//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space.device().tag().c_str(), space.device().safe_pc(), offset, data);
+//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
 
 	m_key[(offset & 0x70) >> 4] = data;
 }

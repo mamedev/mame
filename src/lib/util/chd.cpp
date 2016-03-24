@@ -190,8 +190,8 @@ inline void chd_file::file_read(UINT64 offset, void *dest, UINT32 length)
 		throw CHDERR_NOT_OPEN;
 
 	// seek and read
-	core_fseek(m_file, offset, SEEK_SET);
-	UINT32 count = core_fread(m_file, dest, length);
+	m_file->seek(offset, SEEK_SET);
+	UINT32 count = m_file->read(dest, length);
 	if (count != length)
 		throw CHDERR_READ_ERROR;
 }
@@ -209,8 +209,8 @@ inline void chd_file::file_write(UINT64 offset, const void *source, UINT32 lengt
 		throw CHDERR_NOT_OPEN;
 
 	// seek and write
-	core_fseek(m_file, offset, SEEK_SET);
-	UINT32 count = core_fwrite(m_file, source, length);
+	m_file->seek(offset, SEEK_SET);
+	UINT32 count = m_file->write(source, length);
 	if (count != length)
 		throw CHDERR_WRITE_ERROR;
 }
@@ -229,10 +229,10 @@ inline UINT64 chd_file::file_append(const void *source, UINT32 length, UINT32 al
 		throw CHDERR_NOT_OPEN;
 
 	// seek to the end and align if necessary
-	core_fseek(m_file, 0, SEEK_END);
+	m_file->seek(0, SEEK_END);
 	if (alignment != 0)
 	{
-		UINT64 offset = core_ftell(m_file);
+		UINT64 offset = m_file->tell();
 		UINT32 delta = offset % alignment;
 		if (delta != 0)
 		{
@@ -243,7 +243,7 @@ inline UINT64 chd_file::file_append(const void *source, UINT32 length, UINT32 al
 			while (delta != 0)
 			{
 				UINT32 bytes_to_write = MIN(sizeof(buffer), delta);
-				UINT32 count = core_fwrite(m_file, buffer, bytes_to_write);
+				UINT32 count = m_file->write(buffer, bytes_to_write);
 				if (count != bytes_to_write)
 					throw CHDERR_WRITE_ERROR;
 				delta -= bytes_to_write;
@@ -252,8 +252,8 @@ inline UINT64 chd_file::file_append(const void *source, UINT32 length, UINT32 al
 	}
 
 	// write the real data
-	UINT64 offset = core_ftell(m_file);
-	UINT32 count = core_fwrite(m_file, source, length);
+	UINT64 offset = m_file->tell();
+	UINT32 count = m_file->write(source, length);
 	if (count != length)
 		throw CHDERR_READ_ERROR;
 	return offset;
@@ -567,7 +567,7 @@ void chd_file::set_parent_sha1(sha1_t parent)
 }
 
 /**
- * @fn  chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 unitbytes, chd_codec_type compression[4])
+ * @fn  chd_error chd_file::create(util::core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 unitbytes, chd_codec_type compression[4])
  *
  * @brief   -------------------------------------------------
  *            create - create a new file with no parent using an existing opened file handle
@@ -582,7 +582,7 @@ void chd_file::set_parent_sha1(sha1_t parent)
  * @return  A chd_error.
  */
 
-chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 unitbytes, chd_codec_type compression[4])
+chd_error chd_file::create(util::core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 unitbytes, chd_codec_type compression[4])
 {
 	// make sure we don't already have a file open
 	if (m_file != nullptr)
@@ -602,7 +602,7 @@ chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbyte
 }
 
 /**
- * @fn  chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, chd_codec_type compression[4], chd_file &parent)
+ * @fn  chd_error chd_file::create(util::core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, chd_codec_type compression[4], chd_file &parent)
  *
  * @brief   -------------------------------------------------
  *            create - create a new file with a parent using an existing opened file handle
@@ -617,7 +617,7 @@ chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbyte
  * @return  A chd_error.
  */
 
-chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, chd_codec_type compression[4], chd_file &parent)
+chd_error chd_file::create(util::core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, chd_codec_type compression[4], chd_file &parent)
 {
 	// make sure we don't already have a file open
 	if (m_file != nullptr)
@@ -659,20 +659,24 @@ chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hun
 		return CHDERR_ALREADY_OPEN;
 
 	// create the new file
-	core_file *file = nullptr;
-	file_error filerr = core_fopen(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
-	if (filerr != FILERR_NONE)
+	util::core_file::ptr file;
+	const osd_file::error filerr = util::core_file::open(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
+	if (filerr != osd_file::error::NONE)
 		return CHDERR_FILE_NOT_FOUND;
 
 	// create the file normally, then claim the file
-	chd_error chderr = create(*file, logicalbytes, hunkbytes, unitbytes, compression);
+	const chd_error chderr = create(*file, logicalbytes, hunkbytes, unitbytes, compression);
 	m_owns_file = true;
 
 	// if an error happened, close and delete the file
 	if (chderr != CHDERR_NONE)
 	{
-		core_fclose(file);
-		osd_rmfile(filename);
+		file.reset();
+		osd_file::remove(filename);
+	}
+	else
+	{
+		file.release();
 	}
 	return chderr;
 }
@@ -700,20 +704,24 @@ chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hun
 		return CHDERR_ALREADY_OPEN;
 
 	// create the new file
-	core_file *file = nullptr;
-	file_error filerr = core_fopen(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
-	if (filerr != FILERR_NONE)
+	util::core_file::ptr file;
+	const osd_file::error filerr = util::core_file::open(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
+	if (filerr != osd_file::error::NONE)
 		return CHDERR_FILE_NOT_FOUND;
 
 	// create the file normally, then claim the file
-	chd_error chderr = create(*file, logicalbytes, hunkbytes, compression, parent);
+	const chd_error chderr = create(*file, logicalbytes, hunkbytes, compression, parent);
 	m_owns_file = true;
 
 	// if an error happened, close and delete the file
 	if (chderr != CHDERR_NONE)
 	{
-		core_fclose(file);
-		osd_rmfile(filename);
+		file.reset();
+		osd_file::remove(filename);
+	}
+	else
+	{
+		file.release();
 	}
 	return chderr;
 }
@@ -739,27 +747,25 @@ chd_error chd_file::open(const char *filename, bool writeable, chd_file *parent)
 		return CHDERR_ALREADY_OPEN;
 
 	// open the file
-	UINT32 openflags = writeable ? (OPEN_FLAG_READ | OPEN_FLAG_WRITE) : OPEN_FLAG_READ;
-	core_file *file = nullptr;
-	file_error filerr = core_fopen(filename, openflags, &file);
-	if (filerr != FILERR_NONE)
+	const UINT32 openflags = writeable ? (OPEN_FLAG_READ | OPEN_FLAG_WRITE) : OPEN_FLAG_READ;
+	util::core_file::ptr file;
+	const osd_file::error filerr = util::core_file::open(filename, openflags, file);
+	if (filerr != osd_file::error::NONE)
 		return CHDERR_FILE_NOT_FOUND;
 
 	// now open the CHD
 	chd_error err = open(*file, writeable, parent);
 	if (err != CHDERR_NONE)
-	{
-		core_fclose(file);
 		return err;
-	}
 
 	// we now own this file
+	file.release();
 	m_owns_file = true;
 	return err;
 }
 
 /**
- * @fn  chd_error chd_file::open(core_file &file, bool writeable, chd_file *parent)
+ * @fn  chd_error chd_file::open(util::core_file &file, bool writeable, chd_file *parent)
  *
  * @brief   -------------------------------------------------
  *            open - open an existing file for read or read/write
@@ -772,7 +778,7 @@ chd_error chd_file::open(const char *filename, bool writeable, chd_file *parent)
  * @return  A chd_error.
  */
 
-chd_error chd_file::open(core_file &file, bool writeable, chd_file *parent)
+chd_error chd_file::open(util::core_file &file, bool writeable, chd_file *parent)
 {
 	// make sure we don't already have a file open
 	if (m_file != nullptr)
@@ -796,8 +802,8 @@ chd_error chd_file::open(core_file &file, bool writeable, chd_file *parent)
 void chd_file::close()
 {
 	// reset file characteristics
-	if (m_owns_file && m_file != nullptr)
-		core_fclose(m_file);
+	if (m_owns_file && m_file)
+		delete m_file;
 	m_file = nullptr;
 	m_owns_file = false;
 	m_allow_reads = false;
@@ -2875,7 +2881,7 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 
 		// queue the next read
 		for (curitem = startitem; curitem < enditem; curitem++)
-			atomic_exchange32(&m_work_item[curitem % WORK_BUFFER_HUNKS].m_status, WS_READING);
+			m_work_item[curitem % WORK_BUFFER_HUNKS].m_status = WS_READING;
 		osd_work_item_queue(m_read_queue, async_read_static, this, WORK_ITEM_FLAG_AUTO_RELEASE);
 		m_read_queue_offset += WORK_BUFFER_HUNKS * hunk_bytes() / 2;
 	}
@@ -2946,7 +2952,7 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 		} while (0);
 
 		// reset the item and advance
-		atomic_exchange32(&item.m_status, WS_READY);
+		item.m_status = WS_READY;
 		m_write_hunk++;
 
 		// if we hit the end, finalize
@@ -2959,7 +2965,7 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 				m_read_queue_offset = m_read_done_offset = 0;
 				m_write_hunk = 0;
 				for (auto & elem : m_work_item)
-					atomic_exchange32(&elem.m_status, WS_READY);
+					elem.m_status = WS_READY;
 			}
 
 			// wait for all reads to finish and if we're compressed, write the final SHA1 and map
@@ -3027,7 +3033,7 @@ void chd_file_compressor::async_walk_parent(work_item &item)
 		item.m_hash[unit].m_crc16 = crc16_creator::simple(item.m_data + unit * unit_bytes(), hunk_bytes());
 		item.m_hash[unit].m_sha1 = sha1_creator::simple(item.m_data + unit * unit_bytes(), hunk_bytes());
 	}
-	atomic_exchange32(&item.m_status, WS_COMPLETE);
+	item.m_status = WS_COMPLETE;
 }
 
 /**
@@ -3077,7 +3083,7 @@ void chd_file_compressor::async_compress_hunk(work_item &item, int threadid)
 		item.m_compression = item.m_codecs->find_best_compressor(item.m_data, item.m_compressed, item.m_complen);
 
 	// mark us complete
-	atomic_exchange32(&item.m_status, WS_COMPLETE);
+	item.m_status = WS_COMPLETE;
 }
 
 /**
@@ -3146,7 +3152,7 @@ void chd_file_compressor::async_read()
 			UINT32 hunknum = curoffs / hunk_bytes();
 			work_item &item = m_work_item[hunknum % WORK_BUFFER_HUNKS];
 			assert(item.m_status == WS_READING);
-			atomic_exchange32(&item.m_status, WS_QUEUED);
+			item.m_status = WS_QUEUED;
 			item.m_hunknum = hunknum;
 			item.m_osd = osd_work_item_queue(m_work_queue, m_walking_parent ? async_walk_parent_static : async_compress_hunk_static, &item, 0);
 		}

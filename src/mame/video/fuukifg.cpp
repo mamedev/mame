@@ -8,14 +8,14 @@
 
 const device_type FUUKI_VIDEO = &device_creator<fuukivid_device>;
 
-fuukivid_device::fuukivid_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+fuukivid_device::fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, FUUKI_VIDEO, "Fuuki Video", tag, owner, clock, "fuukivid", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_gfxdecode(*this)
 {
 }
 
-void fuukivid_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
+void fuukivid_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<fuukivid_device &>(device).m_gfxdecode.set_tag(tag);
 }

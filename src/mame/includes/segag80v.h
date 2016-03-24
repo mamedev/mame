@@ -13,7 +13,7 @@
 class segag80v_state : public driver_device
 {
 public:
-	segag80v_state(const machine_config &mconfig, device_type type, std::string tag)
+	segag80v_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_vectorram(*this, "vectorram"),

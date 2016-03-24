@@ -12,7 +12,7 @@
 class naomi_board : public naomi_g1_device
 {
 public:
-	naomi_board(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	naomi_board(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	static void static_set_eeprom_tag(device_t &device, const char *_eeprom_tag, const char *_actel_tag);
 

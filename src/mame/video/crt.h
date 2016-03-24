@@ -46,7 +46,7 @@ struct crt_point
 class crt_device : public device_t
 {
 public:
-	crt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	crt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~crt_device() { }
 
 	static void set_num_levels(device_t &device, int levels) { downcast<crt_device &>(device).m_num_intensity_levels = levels; }

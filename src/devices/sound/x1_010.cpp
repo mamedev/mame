@@ -85,7 +85,7 @@ struct X1_010_CHANNEL {
 
 const device_type X1_010 = &device_creator<x1_010_device>;
 
-x1_010_device::x1_010_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, X1_010, "X1-010", tag, owner, clock, "x1_010", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),

@@ -41,11 +41,11 @@ CUSTOM_INPUT_MEMBER( sms_paddle_device::tr_pin_r )
 
 static INPUT_PORTS_START( sms_paddle )
 	PORT_START("CTRL_PORT")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_paddle_device, dir_pins_r, NULL) // Directional pins
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_paddle_device, dir_pins_r, nullptr) // Directional pins
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // Vcc
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // TL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // TH
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_paddle_device, tr_pin_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_paddle_device, tr_pin_r, nullptr)
 
 	PORT_START("PADDLE_X") // Paddle knob
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_SENSITIVITY(40) PORT_KEYDELTA(20) PORT_CENTERDELTA(0) PORT_MINMAX(0,255)
@@ -71,7 +71,7 @@ ioport_constructor sms_paddle_device::device_input_ports() const
 //  sms_paddle_device - constructor
 //-------------------------------------------------
 
-sms_paddle_device::sms_paddle_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+sms_paddle_device::sms_paddle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SMS_PADDLE, "Sega SMS Paddle", tag, owner, clock, "sms_paddle", __FILE__),
 	device_sms_control_port_interface(mconfig, *this),
 	m_paddle_pins(*this, "CTRL_PORT"),

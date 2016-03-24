@@ -112,7 +112,7 @@ const device_type MIDWAY_SERIAL_PIC = &device_creator<midway_serial_pic_device>;
 //  midway_serial_pic2_device - constructor
 //-------------------------------------------------
 
-midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MIDWAY_SERIAL_PIC2, "Midway Serial Pic", tag, owner, clock, "midway_serial_pic", __FILE__),
 	m_upper(0),
 	m_buff(0),
@@ -124,7 +124,7 @@ midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig
 	memset(m_data,0,sizeof(m_data));
 }
 
-midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_upper(0),
 	m_buff(0),
@@ -214,7 +214,7 @@ const device_type MIDWAY_SERIAL_PIC2 = &device_creator<midway_serial_pic2_device
 //  midway_serial_pic2_device - constructor
 //-------------------------------------------------
 
-midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	midway_serial_pic_device(mconfig, MIDWAY_SERIAL_PIC2, "Midway Serial Pic 2", tag, owner, clock, "midway_serial_pic2", __FILE__),
 	device_nvram_interface(mconfig, *this),
 	m_latch(0),
@@ -234,7 +234,7 @@ midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconf
 
 }
 
-midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	midway_serial_pic_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_nvram_interface(mconfig, *this),
 	m_latch(0),
@@ -591,7 +591,7 @@ const device_type MIDWAY_IOASIC = &device_creator<midway_ioasic_device>;
 //  midway_serial_pic2_device - constructor
 //-------------------------------------------------
 
-midway_ioasic_device::midway_ioasic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+midway_ioasic_device::midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	midway_serial_pic2_device(mconfig, MIDWAY_IOASIC, "Midway IOASIC", tag, owner, clock, "midway_ioasic", __FILE__),
 	m_has_dcs(0),
 	m_has_cage(0),
@@ -645,11 +645,15 @@ void midway_ioasic_device::device_start()
 	m_cage = machine().device<atari_cage_device>("cage");
 	m_has_cage = (m_cage != nullptr);
 
-	m_dcs_cpu = m_dcs->subdevice("dcs2");
-	if (m_dcs_cpu == nullptr)
-		m_dcs_cpu = m_dcs->subdevice("dsio");
-	if (m_dcs_cpu == nullptr)
-		m_dcs_cpu = m_dcs->subdevice("denver");
+	if (m_has_dcs)
+	{
+		m_dcs_cpu = m_dcs->subdevice("dcs2");
+		if (m_dcs_cpu == nullptr)
+			m_dcs_cpu = m_dcs->subdevice("dsio");
+		if (m_dcs_cpu == nullptr)
+			m_dcs_cpu = m_dcs->subdevice("denver");
+	}
+
 	m_shuffle_map = &shuffle_maps[m_shuffle_type][0];
 	// resolve callbacks
 	m_irq_callback.resolve_safe();
@@ -662,6 +666,7 @@ void midway_ioasic_device::device_start()
 
 	m_reg[IOASIC_SOUNDCTL] = 0x0001;
 
+
 	/* configure the fifo */
 	if (m_has_dcs)
 	{
@@ -671,6 +676,7 @@ void midway_ioasic_device::device_start()
 		m_dcs->set_io_callbacks(write_line_delegate(FUNC(midway_ioasic_device::ioasic_output_full),this),
 			write_line_delegate(FUNC(midway_ioasic_device::ioasic_input_empty),this));
 	}
+
 	fifo_reset_w(1);
 }
 

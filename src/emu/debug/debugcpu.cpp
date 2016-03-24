@@ -19,6 +19,7 @@
 #include "uiinput.h"
 #include "xmlfile.h"
 #include "coreutil.h"
+#include "luaengine.h"
 #include <ctype.h>
 
 
@@ -319,7 +320,7 @@ bool debug_comment_save(running_machine &machine)
 				xml_data_node *curnode = xml_add_child(systemnode, "cpu", nullptr);
 				if (curnode == nullptr)
 					throw emu_exception();
-				xml_set_attribute(curnode, "tag", device->tag().c_str());
+				xml_set_attribute(curnode, "tag", device->tag());
 
 				// export the comments
 				if (!device->debug()->comment_export(*curnode))
@@ -331,8 +332,8 @@ bool debug_comment_save(running_machine &machine)
 		if (found_comments)
 		{
 			emu_file file(machine.options().comment_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			file_error filerr = file.open(machine.basename(), ".cmt");
-			if (filerr == FILERR_NONE)
+			osd_file::error filerr = file.open(machine.basename(), ".cmt");
+			if (filerr == osd_file::error::NONE)
 			{
 				xml_file_write(root, file);
 				comments_saved = true;
@@ -360,10 +361,10 @@ bool debug_comment_load(running_machine &machine)
 {
 	// open the file
 	emu_file file(machine.options().comment_directory(), OPEN_FLAG_READ);
-	file_error filerr = file.open(machine.basename(), ".cmt");
+	osd_file::error filerr = file.open(machine.basename(), ".cmt");
 
 	// if an error, just return false
-	if (filerr != FILERR_NONE)
+	if (filerr != osd_file::error::NONE)
 		return false;
 
 	// wrap in a try/catch to handle errors
@@ -486,7 +487,7 @@ UINT16 debug_read_word(address_space &space, offs_t address, int apply_translati
 	address &= space.logbytemask();
 
 	/* if this is misaligned read, or if there are no word readers, just read two bytes */
-	if ((address & 1) != 0)
+	if (!WORD_ALIGNED(address))
 	{
 		UINT8 byte0 = debug_read_byte(space, address + 0, apply_translation);
 		UINT8 byte1 = debug_read_byte(space, address + 1, apply_translation);
@@ -540,7 +541,7 @@ UINT32 debug_read_dword(address_space &space, offs_t address, int apply_translat
 	address &= space.logbytemask();
 
 	/* if this is misaligned read, or if there are no dword readers, just read two words */
-	if ((address & 3) != 0)
+	if (!DWORD_ALIGNED(address))
 	{
 		UINT16 word0 = debug_read_word(space, address + 0, apply_translation);
 		UINT16 word1 = debug_read_word(space, address + 2, apply_translation);
@@ -594,7 +595,7 @@ UINT64 debug_read_qword(address_space &space, offs_t address, int apply_translat
 	address &= space.logbytemask();
 
 	/* if this is misaligned read, or if there are no qword readers, just read two dwords */
-	if ((address & 7) != 0)
+	if (!QWORD_ALIGNED(address))
 	{
 		UINT32 dword0 = debug_read_dword(space, address + 0, apply_translation);
 		UINT32 dword1 = debug_read_dword(space, address + 4, apply_translation);
@@ -699,7 +700,7 @@ void debug_write_word(address_space &space, offs_t address, UINT16 data, int app
 	address &= space.logbytemask();
 
 	/* if this is a misaligned write, or if there are no word writers, just read two bytes */
-	if ((address & 1) != 0)
+	if (!WORD_ALIGNED(address))
 	{
 		if (space.endianness() == ENDIANNESS_LITTLE)
 		{
@@ -751,7 +752,7 @@ void debug_write_dword(address_space &space, offs_t address, UINT32 data, int ap
 	address &= space.logbytemask();
 
 	/* if this is a misaligned write, or if there are no dword writers, just read two words */
-	if ((address & 3) != 0)
+	if (!DWORD_ALIGNED(address))
 	{
 		if (space.endianness() == ENDIANNESS_LITTLE)
 		{
@@ -803,7 +804,7 @@ void debug_write_qword(address_space &space, offs_t address, UINT64 data, int ap
 	address &= space.logbytemask();
 
 	/* if this is a misaligned write, or if there are no qword writers, just read two dwords */
-	if ((address & 7) != 0)
+	if (!QWORD_ALIGNED(address))
 	{
 		if (space.endianness() == ENDIANNESS_LITTLE)
 		{
@@ -966,7 +967,7 @@ UINT64 debug_read_opcode(address_space &space, offs_t address, int size)
 
 		case 2:
 			result = space.direct().read_word(address & ~1, addrxor);
-			if ((address & 1) != 0)
+			if (!WORD_ALIGNED(address))
 			{
 				result2 = space.direct().read_word((address & ~1) + 2, addrxor);
 				if (space.endianness() == ENDIANNESS_LITTLE)
@@ -979,7 +980,7 @@ UINT64 debug_read_opcode(address_space &space, offs_t address, int size)
 
 		case 4:
 			result = space.direct().read_dword(address & ~3, addrxor);
-			if ((address & 3) != 0)
+			if (!DWORD_ALIGNED(address))
 			{
 				result2 = space.direct().read_dword((address & ~3) + 4, addrxor);
 				if (space.endianness() == ENDIANNESS_LITTLE)
@@ -992,7 +993,7 @@ UINT64 debug_read_opcode(address_space &space, offs_t address, int size)
 
 		case 8:
 			result = space.direct().read_qword(address & ~7, addrxor);
-			if ((address & 7) != 0)
+			if (!QWORD_ALIGNED(address))
 			{
 				result2 = space.direct().read_qword((address & ~7) + 8, addrxor);
 				if (space.endianness() == ENDIANNESS_LITTLE)
@@ -1110,7 +1111,7 @@ static void process_source_file(running_machine &machine)
     based on a case insensitive tag search
 -------------------------------------------------*/
 
-static device_t *expression_get_device(running_machine &machine, std::string tag)
+static device_t *expression_get_device(running_machine &machine, const char *tag)
 {
 	// convert to lowercase then lookup the name (tags are enforced to be all lower case)
 	std::string fullname(tag);
@@ -1792,7 +1793,7 @@ void device_debug::interrupt_hook(int irqline)
 	if ((m_flags & DEBUG_FLAG_STOP_INTERRUPT) != 0 && (m_stopirq == -1 || m_stopirq == irqline))
 	{
 		global->execution_state = EXECUTION_STATE_STOPPED;
-		debug_console_printf(m_device.machine(), "Stopped on interrupt (CPU '%s', IRQ %d)\n", m_device.tag().c_str(), irqline);
+		debug_console_printf(m_device.machine(), "Stopped on interrupt (CPU '%s', IRQ %d)\n", m_device.tag(), irqline);
 		compute_debug_flags();
 	}
 }
@@ -1811,7 +1812,7 @@ void device_debug::exception_hook(int exception)
 	if ((m_flags & DEBUG_FLAG_STOP_EXCEPTION) != 0 && (m_stopexception == -1 || m_stopexception == exception))
 	{
 		global->execution_state = EXECUTION_STATE_STOPPED;
-		debug_console_printf(m_device.machine(), "Stopped on exception (CPU '%s', exception %d)\n", m_device.tag().c_str(), exception);
+		debug_console_printf(m_device.machine(), "Stopped on exception (CPU '%s', exception %d)\n", m_device.tag(), exception);
 		compute_debug_flags();
 	}
 }
@@ -1889,7 +1890,7 @@ void device_debug::instruction_hook(offs_t curpc)
 		// check the temp running breakpoint and break if we hit it
 		else if ((m_flags & DEBUG_FLAG_STOP_PC) != 0 && m_stopaddr == curpc)
 		{
-			debug_console_printf(machine, "Stopped at temporary breakpoint %X on CPU '%s'\n", m_stopaddr, m_device.tag().c_str());
+			debug_console_printf(machine, "Stopped at temporary breakpoint %X on CPU '%s'\n", m_stopaddr, m_device.tag());
 			global->execution_state = EXECUTION_STATE_STOPPED;
 		}
 
@@ -1927,6 +1928,8 @@ void device_debug::instruction_hook(offs_t curpc)
 		{
 			// flush any pending updates before waiting again
 			machine.debug_view().flush_osd_updates();
+
+			machine.manager().lua()->periodic_check();
 
 			// clear the memory modified flag and wait
 			global->memory_modified = false;
@@ -2228,10 +2231,9 @@ void device_debug::go_next_device()
 //  debugger on the next instruction
 //-------------------------------------------------
 
-void device_debug::halt_on_next_instruction(const char *fmt, ...)
+void device_debug::halt_on_next_instruction_impl(util::format_argument_pack<std::ostream> &&args)
 {
 	debugcpu_private *global = m_device.machine().debugcpu_data;
-	va_list arg;
 
 	assert(m_exec != nullptr);
 
@@ -2240,9 +2242,7 @@ void device_debug::halt_on_next_instruction(const char *fmt, ...)
 		return;
 
 	// output the message to the console
-	va_start(arg, fmt);
-	debug_console_vprintf(m_device.machine(), fmt, arg);
-	va_end(arg);
+	debug_console_vprintf(m_device.machine(), std::move(args));
 
 	// if we are live, stop now, otherwise note that we want to break there
 	if (&m_device == global->livecpu)
@@ -2677,7 +2677,6 @@ const char *device_debug::comment_text(offs_t addr) const
 bool device_debug::comment_export(xml_data_node &curnode)
 {
 	// iterate through the comments
-	std::string crc_buf;
 	for (const auto & elem : m_comment_set)
 	{
 		xml_data_node *datanode = xml_add_child(&curnode, "comment", xml_normalize_string(elem.m_text.c_str()));
@@ -2685,8 +2684,7 @@ bool device_debug::comment_export(xml_data_node &curnode)
 			return false;
 		xml_set_attribute_int(datanode, "address", elem.m_address);
 		xml_set_attribute_int(datanode, "color", elem.m_color);
-		strprintf(crc_buf,"%08X", elem.m_crc);
-		xml_set_attribute(datanode, "crc", crc_buf.c_str());
+		xml_set_attribute(datanode, "crc", string_format("%08X", elem.m_crc).c_str());
 	}
 	return true;
 }
@@ -3048,14 +3046,14 @@ void device_debug::watchpoint_check(address_space &space, int type, offs_t addre
 
 				if (type & WATCHPOINT_WRITE)
 				{
-					strprintf(buffer, "Stopped at watchpoint %X writing %s to %08X (PC=%X)", wp->m_index, sizes[size], space.byte_to_address(address), pc);
+					buffer = string_format("Stopped at watchpoint %X writing %s to %08X (PC=%X)", wp->m_index, sizes[size], space.byte_to_address(address), pc);
 					if (value_to_write >> 32)
-						strcatprintf(buffer, " (data=%X%08X)", (UINT32)(value_to_write >> 32), (UINT32)value_to_write);
+						buffer.append(string_format(" (data=%X%08X)", (UINT32)(value_to_write >> 32), (UINT32)value_to_write));
 					else
-						strcatprintf(buffer, " (data=%X)", (UINT32)value_to_write);
+						buffer.append(string_format(" (data=%X)", (UINT32)value_to_write));
 				}
 				else
-					strprintf(buffer,"Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->m_index, sizes[size], space.byte_to_address(address), pc);
+					buffer = string_format("Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->m_index, sizes[size], space.byte_to_address(address), pc);
 				debug_console_printf(space.machine(), "%s\n", buffer.c_str());
 				space.device().debug()->compute_debug_flags();
 			}
@@ -3483,7 +3481,7 @@ void device_debug::tracer::update(offs_t pc)
 	// print the address
 	std::string buffer;
 	int logaddrchars = m_debug.logaddrchars();
-	strprintf(buffer,"%0*X: ", logaddrchars, pc);
+	buffer = string_format("%0*X: ", logaddrchars, pc);
 
 	// print the disassembly
 	std::string dasm;

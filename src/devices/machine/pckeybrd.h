@@ -19,8 +19,8 @@
 class pc_keyboard_device : public device_t
 {
 public:
-	pc_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	pc_keyboard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE_LINE_MEMBER(enable);
@@ -83,7 +83,7 @@ private:
 class at_keyboard_device : public pc_keyboard_device
 {
 public:
-	at_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( write );
 

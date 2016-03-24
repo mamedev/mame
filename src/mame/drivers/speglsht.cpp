@@ -113,7 +113,7 @@ Notes:
 class speglsht_state : public driver_device
 {
 public:
-	speglsht_state(const machine_config &mconfig, device_type type, std::string tag)
+	speglsht_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_shared(*this, "shared"),
 			m_framebuffer(*this, "framebuffer"),

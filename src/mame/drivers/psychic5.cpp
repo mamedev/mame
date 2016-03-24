@@ -309,6 +309,24 @@ The first sprite data is located at f20b,then f21b and so on.
         F= Flip
     SZ=Size 0=16x16 sprite,1=32x32 sprite
         C= Color palette selector
+
+====
+
+Notes (23-Jan-2016 AS):
+- Bombs Away tests CPU roms with a sum8, with following algorithm:
+  * tests rom 0, compares result with [$4]
+  * tests banks 3,2,1, reads [$5], no bank 0 (?)
+  * tests banks 7,6,5,4, reads [$6]
+  fwiw extra roms contains palette/sprite/level data, nothing to do with game logic.
+- Bombs Away sports following issues, which indicates it's a unfinished product:
+  - missing bullets (missing data from ROMs);
+  - missing levels above 4 (missing data from ROMs);
+  - occasionally wrong flip x when the player route is from up to down;
+  - enemy counter stops entirely when the S is collected;
+  - boss fights uses always the same pattern;
+  - single BGM repeated over and over, for every level;
+  - a very sketchy ending screen (just credits with a special BGM played). Game sits there until BGM is finished and no new plays are allowed until so;
+
 */
 
 #include "emu.h"
@@ -714,11 +732,7 @@ static MACHINE_CONFIG_START( psychic5, psychic5_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(53.8)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	/* frames per second hand tuned to match game and music speed */
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,394, 0, 256, 282, 16, 240) // was 53.8 Hz before, assume same as Bombs Away
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_psychic5)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psychic5)
@@ -770,10 +784,7 @@ static MACHINE_CONFIG_START( bombsa, psychic5_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(54)                /* Guru says : VSync - 54Hz . HSync - 15.25kHz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,394, 0, 256, 282, 16, 240) /* Guru says : VSync - 54Hz . HSync - 15.25kHz */
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_bombsa)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bombsa)
@@ -924,12 +935,13 @@ Notes:
       logic on both sides.
 */
 
+
 ROM_START( bombsa )
-	ROM_REGION( 0x30000, "maincpu", 0 )                 /* Main CPU */
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )                 /* Main CPU */
 	ROM_LOAD( "4.7a",         0x00000, 0x08000, CRC(0191f6a7) SHA1(10a0434abbf4be068751e65c81b1a211729e3742) )
-	/* these fail their self-test... should be checked on real hw (hold start1+start2 on boot) */
-	ROM_LOAD( "5.7c",         0x10000, 0x08000, BAD_DUMP CRC(095c451a) SHA1(892ca84376f89640ad4d28f1e548c26bc8f72c0e) ) // contains palettes etc. but fails rom check??
-	ROM_LOAD( "6.7d",         0x20000, 0x10000, BAD_DUMP CRC(89f9dc0f) SHA1(5cf6a7aade3d56bc229d3771bc4141ad0c0e8da2) )
+	/* these two fail their self-test, happens on real HW as well. */
+	ROM_LOAD( "5.7c",         0x10000, 0x08000, CRC(095c451a) SHA1(892ca84376f89640ad4d28f1e548c26bc8f72c0e) )
+	ROM_LOAD( "6.7d",         0x20000, 0x10000, CRC(89f9dc0f) SHA1(5cf6a7aade3d56bc229d3771bc4141ad0c0e8da2) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )                    /* Sound CPU */
 	ROM_LOAD( "1.3a",         0x00000, 0x08000, CRC(92801404) SHA1(c4ff47989d355b18a909eaa88f138e2f68178ecc) )
@@ -939,9 +951,9 @@ ROM_START( bombsa )
 	ROM_LOAD( "3.4s",         0x10000, 0x10000, CRC(9a8a8a97) SHA1(13328631202c196c9d8791cc6063048eb6be0472) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )    /* background tiles */
-	/* some corrupt 'blank' characters, should also be checked with a redump */
-	ROM_LOAD( "8.2l",         0x00000, 0x10000, BAD_DUMP CRC(3391c769) SHA1(7ae7575ac81d6e0d915c279c1f57a9bc6d096bd6) )
-	ROM_LOAD( "9.2m",         0x10000, 0x10000, BAD_DUMP CRC(5b315976) SHA1(d17cc1926f926bdd88b66ea6af88dac30880e7d4) )
+	/* some corrupt 'blank' characters in these */
+	ROM_LOAD( "8.2l",         0x00000, 0x10000, CRC(3391c769) SHA1(7ae7575ac81d6e0d915c279c1f57a9bc6d096bd6) )
+	ROM_LOAD( "9.2m",         0x10000, 0x10000, CRC(5b315976) SHA1(d17cc1926f926bdd88b66ea6af88dac30880e7d4) )
 
 	ROM_REGION( 0x08000, "gfx3", 0 )    /* foreground tiles */
 	ROM_LOAD( "7.4f",         0x00000, 0x08000, CRC(400114b9) SHA1(db2f3ba05a2005ae0e0e7d19c8739353032cbeab) )
@@ -954,4 +966,4 @@ ROM_END
 
 GAME( 1987, psychic5,  0,        psychic5, psychic5, driver_device, 0, ROT270, "Jaleco / NMK", "Psychic 5 (World)", MACHINE_SUPPORTS_SAVE ) // "Oversea's version V2.00 CHANGED BY TAMIO NAKASATO" text present in ROM, various modifications (English names, more complete attract demo etc.)
 GAME( 1987, psychic5j, psychic5, psychic5, psychic5, driver_device, 0, ROT270, "Jaleco / NMK", "Psychic 5 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bombsa,    0,        bombsa,   bombsa,   driver_device, 0, ROT270, "Jaleco", "Bombs Away", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bombsa,    0,        bombsa,   bombsa,   driver_device, 0, ROT270, "Jaleco", "Bombs Away (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )

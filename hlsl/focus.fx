@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz,ImJezze
 //-----------------------------------------------------------------------------
-// Effect File Variables
+// Defocus Effect
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Sampler Definitions
 //-----------------------------------------------------------------------------
 
 texture Diffuse;
@@ -42,22 +46,11 @@ struct PS_INPUT
 };
 
 //-----------------------------------------------------------------------------
-// Functions
-//-----------------------------------------------------------------------------
-
-bool xor(bool a, bool b)
-{
-	return (a || b) && !(a && b);
-}
-
-//-----------------------------------------------------------------------------
-// Simple Vertex Shader
+// Defocus Vertex Shader
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
 uniform float2 TargetDims;
-uniform float2 SourceRect;
-uniform float2 QuadDims;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -73,39 +66,33 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
 	Output.TexCoord = TexCoord;
-	
+
 	Output.Color = Input.Color;
 
 	return Output;
 }
 
 //-----------------------------------------------------------------------------
-// Simple Pixel Shader
+// Defocus Pixel Shader
 //-----------------------------------------------------------------------------
-
-float2 Coord1Offset = float2( 0.75f,  0.50f);
-float2 Coord2Offset = float2( 0.25f,  1.00f);
-float2 Coord3Offset = float2(-0.50f,  0.75f);
-float2 Coord4Offset = float2(-1.00f,  0.25f);
-float2 Coord5Offset = float2(-0.75f, -0.50f);
-float2 Coord6Offset = float2(-0.25f, -1.00f);
-float2 Coord7Offset = float2( 0.50f, -0.75f);
-float2 Coord8Offset = float2( 1.00f, -0.25f);
 
 uniform float2 Defocus = float2(0.0f, 0.0f);
 
-uniform bool OrientationSwapXY = false; // false landscape, true portrait for default screen orientation
-uniform bool RotationSwapXY = false; // swapped default screen orientation due to screen rotation
+static const float2 Coord1Offset = float2( 0.75f,  0.50f);
+static const float2 Coord2Offset = float2( 0.25f,  1.00f);
+static const float2 Coord3Offset = float2(-0.50f,  0.75f);
+static const float2 Coord4Offset = float2(-1.00f,  0.25f);
+static const float2 Coord5Offset = float2(-0.75f, -0.50f);
+static const float2 Coord6Offset = float2(-0.25f, -1.00f);
+static const float2 Coord7Offset = float2( 0.50f, -0.75f);
+static const float2 Coord8Offset = float2( 1.00f, -0.25f);
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float2 QuadRatio = 
-		float2(1.0f, xor(OrientationSwapXY, RotationSwapXY) 
-			? QuadDims.y / QuadDims.x 
-			: QuadDims.x / QuadDims.y);
+	// imaginary texel dimensions independed from screen dimension, but ratio
+	float2 TexelDims = (1.0f / 1024);
 
-	// imaginary texel dimensions independed from quad dimensions, but dependend on quad ratio
-	float2 DefocusTexelDims = (1.0f / 1024.0) * SourceRect * QuadRatio * Defocus;
+	float2 DefocusTexelDims = Defocus * TexelDims;
 
 	float4 d = tex2D(DiffuseSampler, Input.TexCoord);
 	float3 d1 = tex2D(DiffuseSampler, Input.TexCoord + Coord1Offset * DefocusTexelDims).rgb;
@@ -124,16 +111,14 @@ float4 ps_main(PS_INPUT Input) : COLOR
 }
 
 //-----------------------------------------------------------------------------
-// Simple Effect
+// Defocus Technique
 //-----------------------------------------------------------------------------
 
-technique TestTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{
 		Lighting = FALSE;
-
-		Sampler[0] = <DiffuseSampler>;
 
 		VertexShader = compile vs_2_0 vs_main();
 		PixelShader = compile ps_2_0 ps_main();

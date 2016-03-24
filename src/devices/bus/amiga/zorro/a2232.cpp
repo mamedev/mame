@@ -151,7 +151,7 @@ machine_config_constructor a2232_device::device_mconfig_additions() const
 //  a2232_device - constructor
 //-------------------------------------------------
 
-a2232_device::a2232_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+a2232_device::a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, A2232, "CBM A2232 Serial Card", tag, owner, clock, "a2232", __FILE__),
 	device_zorro2_card_interface(mconfig, *this),
 	m_iocpu(*this, "iocpu"),
@@ -222,7 +222,7 @@ void a2232_device::update_irqs()
 WRITE8_MEMBER( a2232_device::int2_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): int2_w %04x\n", shortname().c_str(), basetag().c_str(), data);
+		logerror("%s('%s'): int2_w %04x\n", shortname(), basetag(), data);
 
 	m_slot->int2_w(1);
 }
@@ -230,7 +230,7 @@ WRITE8_MEMBER( a2232_device::int2_w )
 WRITE8_MEMBER( a2232_device::irq_ack_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): irq_ack_w %04x\n", shortname().c_str(), basetag().c_str(), data);
+		logerror("%s('%s'): irq_ack_w %04x\n", shortname(), basetag(), data);
 
 	m_irqs[IRQ_AMIGA] = CLEAR_LINE;
 	update_irqs();
@@ -244,7 +244,7 @@ WRITE8_MEMBER( a2232_device::irq_ack_w )
 void a2232_device::autoconfig_base_address(offs_t address)
 {
 	if (VERBOSE)
-		logerror("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname().c_str(), basetag().c_str(), address);
+		logerror("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname(), basetag(), address);
 
 	if (VERBOSE)
 		logerror("-> installing a2232\n");
@@ -279,7 +279,7 @@ void a2232_device::autoconfig_base_address(offs_t address)
 WRITE_LINE_MEMBER( a2232_device::cfgin_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): configin_w (%d)\n", shortname().c_str(), basetag().c_str(), state);
+		logerror("%s('%s'): configin_w (%d)\n", shortname(), basetag(), state);
 
 	if (state == 0)
 	{
@@ -324,7 +324,7 @@ READ16_MEMBER( a2232_device::shared_ram_r )
 		data |= 0xff00;
 
 	if (VERBOSE_DATA)
-		logerror("%s('%s'): shared_ram_r(%04x) %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), offset << 1, data, mem_mask);
+		logerror("%s('%s'): shared_ram_r(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset << 1, data, mem_mask);
 
 	return data;
 }
@@ -332,7 +332,7 @@ READ16_MEMBER( a2232_device::shared_ram_r )
 WRITE16_MEMBER( a2232_device::shared_ram_w )
 {
 	if (VERBOSE_DATA)
-		logerror("%s('%s'): shared_ram_w(%04x) %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), offset << 1, data, mem_mask);
+		logerror("%s('%s'): shared_ram_w(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset << 1, data, mem_mask);
 
 	if (ACCESSING_BITS_0_7)
 		m_shared_ram[(offset << 1) + 1] = data & 0xff;
@@ -384,7 +384,7 @@ READ16_MEMBER( a2232_device::reset_high_r )
 	UINT16 data = 0xffff;
 
 	if (VERBOSE)
-		logerror("%s('%s'): reset_high_r %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+		logerror("%s('%s'): reset_high_r %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 	m_iocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
@@ -394,7 +394,7 @@ READ16_MEMBER( a2232_device::reset_high_r )
 WRITE16_MEMBER( a2232_device::reset_high_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): reset_high_w %04x [mask = %04x]\n", shortname().c_str(), basetag().c_str(), data, mem_mask);
+		logerror("%s('%s'): reset_high_w %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 	m_iocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }

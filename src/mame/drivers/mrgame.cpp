@@ -44,7 +44,7 @@ ToDo:
 class mrgame_state : public driver_device
 {
 public:
-	mrgame_state(const machine_config &mconfig, device_type type, std::string tag)
+	mrgame_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_p_videoram(*this, "videoram")
@@ -492,7 +492,7 @@ static MACHINE_CONFIG_START( mrgame, mrgame_state )
 	MCFG_DAC_ADD("dacr")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 	MCFG_SOUND_ADD("tms", TMS5220, 672000) // uses a RC combination. 672k copied from jedi.h
-	MCFG_TMS52XX_READYQ_HANDLER(INPUTLINE("audiocpu2", Z80_INPUT_LINE_WAIT))
+	MCFG_TMS52XX_READYQ_HANDLER(INPUTLINE("audiocpu2", Z80_INPUT_LINE_BOGUSWAIT))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 

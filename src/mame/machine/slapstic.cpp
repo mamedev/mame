@@ -182,11 +182,12 @@
 
 
 #include "includes/slapstic.h"
+#include "validity.h"
 
 
 extern const device_type SLAPSTIC = &device_creator<atari_slapstic_device>;
 
-atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SLAPSTIC, "Atari Slapstic", tag, owner, clock, "slapstic", __FILE__),
 	state(0),
 	current_bank(0),
@@ -736,6 +737,12 @@ static const struct slapstic_data *const slapstic_table[] =
 };
 
 
+void atari_slapstic_device::device_validity_check(validity_checker &valid) const
+{
+	// only a small number of chips are known to exist
+	if (m_chipnum < 101 || m_chipnum > 118 || !slapstic_table[m_chipnum - 101])
+		osd_printf_error("Unknown slapstic number: %d\n", m_chipnum);
+}
 
 
 /*************************************
@@ -744,23 +751,17 @@ static const struct slapstic_data *const slapstic_table[] =
  *
  *************************************/
 
-void atari_slapstic_device::slapstic_init(running_machine &machine, int chip)
+void atari_slapstic_device::slapstic_init()
 {
 	if (access_68k == -1)
 	{
 		/* see if we're 68k or 6502/6809 based */
-		device_type cputype = machine.device(":maincpu")->type();
+		device_type cputype = machine().device(":maincpu")->type();
 		access_68k = (cputype == M68000 || cputype == M68010);
 	}
 
-	/* only a small number of chips are known to exist */
-	if (chip < 101 || chip > 118)
-		return;
-
 	/* set up the parameters */
-	if (!slapstic_table[chip - 101])
-		return;
-	slapstic = *slapstic_table[chip - 101];
+	slapstic = *slapstic_table[m_chipnum - 101];
 
 	/* reset the chip */
 	slapstic_reset();

@@ -142,7 +142,7 @@ const device_type DSP32C = &device_creator<dsp32c_device>;
 //  dsp32c_device - constructor
 //-------------------------------------------------
 
-dsp32c_device::dsp32c_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+dsp32c_device::dsp32c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, DSP32C, "DSP32C", tag, owner, clock, "dsp32c", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 24),
 		m_pin(0),
@@ -200,7 +200,7 @@ void dsp32c_device::device_start()
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_iotemp).callimport().callexport().formatstr("%6s").noshow();
 	state_add(DSP32_PC,        "PC",        m_r[15]).mask(0xffffff);
 	for (int regnum = 0; regnum <= 14; regnum++)
-		state_add(DSP32_R0 + regnum, strformat("R%d", regnum).c_str(), m_r[regnum]).mask(0xffffff);
+		state_add(DSP32_R0 + regnum, string_format("R%d", regnum).c_str(), m_r[regnum]).mask(0xffffff);
 	state_add(DSP32_R15,       "R15",       m_r[17]).mask(0xffffff);
 	state_add(DSP32_R16,       "R16",       m_r[18]).mask(0xffffff);
 	state_add(DSP32_R17,       "R17",       m_r[19]).mask(0xffffff);
@@ -373,7 +373,7 @@ void dsp32c_device::state_string_export(const device_state_entry &entry, std::st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				NFLAG ? 'N':'.',
 				ZFLAG ? 'Z':'.',
 				UFLAG ? 'U':'.',
@@ -388,7 +388,7 @@ void dsp32c_device::state_string_export(const device_state_entry &entry, std::st
 		case DSP32_A1:
 		case DSP32_A2:
 		case DSP32_A3:
-			strprintf(str, "%8g", *(double *)entry.dataptr());
+			str = string_format("%8g", *(double *)entry.dataptr());
 			break;
 	}
 }
@@ -452,7 +452,8 @@ inline void dsp32c_device::WBYTE(offs_t addr, UINT8 data)
 inline UINT16 dsp32c_device::RWORD(offs_t addr)
 {
 #if DETECT_MISALIGNED_MEMORY
-	if (addr & 1) fprintf(stderr, "Unaligned word read @ %06X, PC=%06X\n", addr, PC);
+	if (!WORD_ALIGNED(addr))
+		osd_printf_error("Unaligned word read @ %06X, PC=%06X\n", addr, PC);
 #endif
 	return m_program->read_word(addr);
 }
@@ -460,7 +461,8 @@ inline UINT16 dsp32c_device::RWORD(offs_t addr)
 inline UINT32 dsp32c_device::RLONG(offs_t addr)
 {
 #if DETECT_MISALIGNED_MEMORY
-	if (addr & 3) fprintf(stderr, "Unaligned long read @ %06X, PC=%06X\n", addr, PC);
+	if (!DWORD_ALIGNED(addr))
+		osd_printf_error("Unaligned long read @ %06X, PC=%06X\n", addr, PC);
 #endif
 	return m_program->read_dword(addr);
 }
@@ -468,7 +470,8 @@ inline UINT32 dsp32c_device::RLONG(offs_t addr)
 inline void dsp32c_device::WWORD(offs_t addr, UINT16 data)
 {
 #if DETECT_MISALIGNED_MEMORY
-	if (addr & 1) fprintf(stderr, "Unaligned word write @ %06X, PC=%06X\n", addr, PC);
+	if (!WORD_ALIGNED(addr))
+		osd_printf_error("Unaligned word write @ %06X, PC=%06X\n", addr, PC);
 #endif
 	m_program->write_word(addr, data);
 }
@@ -476,7 +479,8 @@ inline void dsp32c_device::WWORD(offs_t addr, UINT16 data)
 inline void dsp32c_device::WLONG(offs_t addr, UINT32 data)
 {
 #if DETECT_MISALIGNED_MEMORY
-	if (addr & 3) fprintf(stderr, "Unaligned long write @ %06X, PC=%06X\n", addr, PC);
+	if (!DWORD_ALIGNED(addr))
+		osd_printf_error("Unaligned long write @ %06X, PC=%06X\n", addr, PC);
 #endif
 	m_program->write_dword(addr, data);
 }

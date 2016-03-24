@@ -194,7 +194,7 @@ public:
 	optional_device<sed1200d0a_device> lcd;
 	required_device<timer_device> midi_timer;
 
-	mt32_state(const machine_config &mconfig, device_type type, std::string tag);
+	mt32_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -223,7 +223,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-mt32_state::mt32_state(const machine_config &mconfig, device_type type, std::string tag) :
+mt32_state::mt32_state(const machine_config &mconfig, device_type type, const char *tag) :
 	driver_device(mconfig, type, tag),
 	cpu(*this, "maincpu"),
 	ram(*this, "ram"),

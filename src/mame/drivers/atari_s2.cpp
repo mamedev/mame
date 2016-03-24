@@ -30,7 +30,7 @@ ToDo:
 class atari_s2_state : public genpin_class
 {
 public:
-	atari_s2_state(const machine_config &mconfig, device_type type, std::string tag)
+	atari_s2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_dac(*this, "dac")

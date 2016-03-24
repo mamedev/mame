@@ -49,11 +49,11 @@ static INPUT_PORTS_START( pic )
 	PORT_DIPSETTING(    0x06, "13 microseconds" )
 	PORT_DIPSETTING(    0x07, "15 microseconds" )
 
-	PORT_DIPNAME( 0x08, 0x00, "Strobe polarity (SW4)" )
+	PORT_DIPNAME( 0x08, 0x08, "Strobe polarity (SW4)" )
 	PORT_DIPSETTING(    0x00, "Positive" )
 	PORT_DIPSETTING(    0x08, "Negative" )
 
-	PORT_DIPNAME( 0x10, 0x00, "Acknowledge polarity (SW5)" )
+	PORT_DIPNAME( 0x10, 0x10, "Acknowledge polarity (SW5)" )
 	PORT_DIPSETTING(    0x00, "Positive" )
 	PORT_DIPSETTING(    0x10, "Negative" )
 
@@ -98,7 +98,7 @@ const rom_entry *a2bus_pic_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, A2BUS_PIC, "Apple Parallel Interface Card", tag, owner, clock, "a2pic", __FILE__),
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
@@ -109,7 +109,7 @@ a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, std::string ta
 {
 }
 
-a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
@@ -181,13 +181,27 @@ UINT8 a2bus_pic_device::read_cnxx(address_space &space, UINT8 offset)
 
 UINT8 a2bus_pic_device::read_c0nx(address_space &space, UINT8 offset)
 {
+	UINT8 rv = 0;
+
 	switch (offset)
 	{
 		case 3:
 			return m_ctx_data_in->read();
 
 		case 4:
-			return m_ack;
+			rv = m_ack;
+
+			// clear flip-flop
+			if (m_dsw1->read() & 0x10)    // negative polarity
+			{
+				m_ack |= 0x80;
+			}
+			else
+			{
+				m_ack &= ~0x80;
+			}
+
+			return rv;
 
 		case 6: // does reading this really work?
 			m_irqenable = true;

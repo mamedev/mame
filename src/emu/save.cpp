@@ -49,6 +49,7 @@ enum
 	SS_MSB_FIRST = 0x02
 };
 
+#define STATE_MAGIC_NUM         "MAMESAVE"
 
 //**************************************************************************
 //  INITIALIZATION
@@ -146,26 +147,26 @@ void save_manager::register_postload(save_prepost_delegate func)
 //  memory
 //-------------------------------------------------
 
-void save_manager::save_memory(device_t *device, std::string module, std::string tag, UINT32 index, std::string name, void *val, UINT32 valsize, UINT32 valcount)
+void save_manager::save_memory(device_t *device, const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount)
 {
 	assert(valsize == 1 || valsize == 2 || valsize == 4 || valsize == 8);
 
 	// check for invalid timing
 	if (!m_reg_allowed)
 	{
-		machine().logerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module.c_str(), tag.c_str(), name.c_str());
+		machine().logerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
 		if (machine().system().flags & MACHINE_SUPPORTS_SAVE)
-			fatalerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module.c_str(), tag.c_str(), name.c_str());
+			fatalerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
 		m_illegal_regs++;
 		return;
 	}
 
 	// create the full name
 	std::string totalname;
-	if (!tag.empty())
-		strprintf(totalname, "%s/%s/%X/%s", module.c_str(), tag.c_str(), index, name.c_str());
+	if (tag != nullptr)
+		totalname = string_format("%s/%s/%X/%s", module, tag, index, name);
 	else
-		strprintf(totalname, "%s/%X/%s", module.c_str(), index, name.c_str());
+		totalname = string_format("%s/%X/%s", module, index, name);
 
 	// look for duplicates and an entry to insert in front of
 	state_entry *insert_after = nullptr;
@@ -182,7 +183,7 @@ void save_manager::save_memory(device_t *device, std::string module, std::string
 	}
 
 	// insert us into the list
-	m_entry_list.insert_after(*global_alloc(state_entry(val, totalname.c_str(), device, module.c_str(), tag, index, valsize, valcount)), insert_after);
+	m_entry_list.insert_after(*global_alloc(state_entry(val, totalname.c_str(), device, module, tag ? tag : "", index, valsize, valcount)), insert_after);
 }
 
 
@@ -292,7 +293,7 @@ save_error save_manager::write_file(emu_file &file)
 
 	// generate the header
 	UINT8 header[HEADER_SIZE];
-	memcpy(&header[0], emulator_info::get_state_magic_num(), 8);
+	memcpy(&header[0], STATE_MAGIC_NUM, 8);
 	header[8] = SAVE_VERSION;
 	header[9] = NATIVE_ENDIAN_VALUE_LE_BE(0, SS_MSB_FIRST);
 	strncpy((char *)&header[0x0a], machine().system().name, 0x1c - 0x0a);
@@ -365,7 +366,7 @@ save_error save_manager::validate_header(const UINT8 *header, const char *gamena
 	void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix)
 {
 	// check magic number
-	if (memcmp(header, emulator_info::get_state_magic_num(), 8))
+	if (memcmp(header, STATE_MAGIC_NUM, 8))
 	{
 		if (errormsg != nullptr)
 			(*errormsg)("%sThis is not a %s save file", error_prefix,emulator_info::get_appname());
@@ -418,7 +419,7 @@ save_manager::state_callback::state_callback(save_prepost_delegate callback)
 //  state_entry - constructor
 //-------------------------------------------------
 
-state_entry::state_entry(void *data, std::string name, device_t *device, std::string module, std::string tag, int index, UINT8 size, UINT32 count)
+state_entry::state_entry(void *data, const char *name, device_t *device, const char *module, const char *tag, int index, UINT8 size, UINT32 count)
 	: m_next(nullptr),
 		m_data(data),
 		m_name(name),

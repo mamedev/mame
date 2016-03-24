@@ -45,7 +45,7 @@
 class barata_state : public driver_device
 {
 public:
-	barata_state(const machine_config &mconfig, device_type type, std::string tag)
+	barata_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac") { }
@@ -54,7 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_READ8_MEMBER(port2_r);
 	void fpga_send(unsigned char cmd);
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
 private:

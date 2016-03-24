@@ -29,7 +29,7 @@ ToDo:
 class by17_state : public genpin_class
 {
 public:
-	by17_state(const machine_config &mconfig, device_type type, std::string tag)
+	by17_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_nvram(*this, "nvram")

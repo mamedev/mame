@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Samuele Zannoli
 
+#include <forward_list>
+
 struct OHCIEndpointDescriptor {
 	int mps; // MaximumPacketSize
 	int f; // Format
@@ -111,7 +113,7 @@ struct USBSetupPacket {
 	UINT16 wLength;
 };
 
-struct USBStandardDeviceDscriptor {
+struct USBStandardDeviceDescriptor {
 	UINT8 bLength;
 	UINT8 bDescriptorType;
 	UINT16 bcdUSB;
@@ -188,26 +190,182 @@ enum USBDescriptorType {
 	ENDPOINT=5
 };
 
+enum USBRequestType
+{
+	StandardType=0,
+	ClassType,
+	VendorType,
+	ReservedType
+};
+
+enum USBRequestRecipient
+{
+	DeviceRecipient=0,
+	InterfaceRecipient,
+	EndpointRecipient,
+	OtherRecipient
+};
+
+enum USBDeviceState
+{
+	DefaultState,
+	AddressState,
+	ConfiguredState
+};
+
+enum USBControlDirection
+{
+	HostToDevice=0,
+	DeviceToHost=1
+};
+
+enum USBEndpointType
+{
+	ControlEndpoint=0,
+	IsochronousEndpoint,
+	BulkEndpoint,
+	InterruptEndpoint
+};
+
+struct usb_device_string
+{
+	UINT8 *position;
+	int size;
+};
+
+struct usb_device_interface_alternate
+{
+	UINT8 *position;
+	int size;
+	USBStandardInterfaceDescriptor interface_descriptor;
+	std::forward_list<USBStandardEndpointDescriptor> endpoint_descriptors;
+};
+
+struct usb_device_interface
+{
+	UINT8 *position;
+	int size;
+	std::forward_list<usb_device_interface_alternate *> alternate_settings;
+	int selected_alternate;
+};
+
+struct usb_device_configuration
+{
+	USBStandardConfigurationDescriptor configuration_descriptor;
+	UINT8 *position;
+	int size;
+	std::forward_list<usb_device_interface *> interfaces;
+};
+
 class ohci_function_device {
 public:
-	ohci_function_device();
+	ohci_function_device(running_machine &machine);
 	void execute_reset();
-	int execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size);
-private:
-	int address;
-	int newaddress;
-	int controldirection;
-	int controltype;
-	int controlrecipient;
+	int execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size) ;
+protected:
+	virtual int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) { return -1; };
+	virtual int handle_get_status_request(int endpoint, USBSetupPacket *setup) { return 0; };
+	virtual int handle_clear_feature_request(int endpoint, USBSetupPacket *setup) { return 0; };
+	virtual int handle_set_feature_request(int endpoint, USBSetupPacket *setup) { return 0; };
+	virtual int handle_set_descriptor_request(int endpoint, USBSetupPacket *setup) { return 0; };
+	virtual int handle_synch_frame_request(int endpoint, USBSetupPacket *setup) { return 0; };
+
+	void add_device_descriptor(const USBStandardDeviceDescriptor &descriptor);
+	void add_configuration_descriptor(const USBStandardConfigurationDescriptor &descriptor);
+	void add_interface_descriptor(const USBStandardInterfaceDescriptor &descriptor);
+	void add_endpoint_descriptor(const USBStandardEndpointDescriptor &descriptor);
+	void add_string_descriptor(const UINT8 *descriptor);
+	void select_configuration(int index);
+	void select_alternate(int interfacei, int index);
+	int find_alternate(int interfacei);
+	UINT8 *position_device_descriptor(int &size);
+	UINT8 *position_configuration_descriptor(int index, int &size);
+	UINT8 *position_string_descriptor(int index, int &size);
+	struct {
+		int type;
+		int controldirection;
+		int controltype;
+		int controlrecipient;
+		int remain;
+		UINT8 *position;
+		UINT8 buffer[128];
+	} endpoints[256];
+	int state;
 	bool settingaddress;
-	int remain;
-	UINT8 *position;
+	int newaddress;
+	int address;
+	int configurationvalue;
+	UINT8 *descriptors;
+	int descriptors_pos;
+	USBStandardDeviceDescriptor device_descriptor;
+	std::forward_list<usb_device_configuration *> configurations;
+	std::forward_list<usb_device_string *> device_strings;
+	usb_device_configuration *latest_configuration;
+	usb_device_interface_alternate *latest_alternate;
+	usb_device_configuration *selected_configuration;
+};
+
+class ohci_game_controller_device : public ohci_function_device
+{
+public:
+	ohci_game_controller_device(running_machine &machine);
+	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
+private:
+	static const USBStandardDeviceDescriptor devdesc;
+	static const USBStandardConfigurationDescriptor condesc;
+	static const USBStandardInterfaceDescriptor intdesc;
+	static const USBStandardEndpointDescriptor enddesc82;
+	static const USBStandardEndpointDescriptor enddesc02;
+};
+
+class ohci_hlean2131qc_device: public ohci_function_device
+{
+public:
+	ohci_hlean2131qc_device(running_machine &machine);
+	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
+private:
+	static const USBStandardDeviceDescriptor devdesc;
+	static const USBStandardConfigurationDescriptor condesc;
+	static const USBStandardInterfaceDescriptor intdesc;
+	static const USBStandardEndpointDescriptor enddesc01;
+	static const USBStandardEndpointDescriptor enddesc02;
+	static const USBStandardEndpointDescriptor enddesc03;
+	static const USBStandardEndpointDescriptor enddesc04;
+	static const USBStandardEndpointDescriptor enddesc05;
+	static const USBStandardEndpointDescriptor enddesc81;
+	static const USBStandardEndpointDescriptor enddesc82;
+	static const USBStandardEndpointDescriptor enddesc83;
+	static const USBStandardEndpointDescriptor enddesc84;
+	static const USBStandardEndpointDescriptor enddesc85;
+	static const UINT8 strdesc0[];
+	static const UINT8 strdesc1[];
+	static const UINT8 strdesc2[];
+};
+
+class ohci_hlean2131sc_device : public ohci_function_device
+{
+public:
+	ohci_hlean2131sc_device(running_machine &machine);
+	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
+private:
+	static const USBStandardDeviceDescriptor devdesc;
+	static const USBStandardConfigurationDescriptor condesc;
+	static const USBStandardInterfaceDescriptor intdesc;
+	static const USBStandardEndpointDescriptor enddesc01;
+	static const USBStandardEndpointDescriptor enddesc02;
+	static const USBStandardEndpointDescriptor enddesc03;
+	static const USBStandardEndpointDescriptor enddesc81;
+	static const USBStandardEndpointDescriptor enddesc82;
+	static const USBStandardEndpointDescriptor enddesc83;
+	static const UINT8 strdesc0[];
+	static const UINT8 strdesc1[];
+	static const UINT8 strdesc2[];
 };
 
 class xbox_base_state : public driver_device
 {
 public:
-	xbox_base_state(const machine_config &mconfig, device_type type, std::string tag) :
+	xbox_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		nvidia_nv2a(nullptr),
 		debug_irq_active(false),

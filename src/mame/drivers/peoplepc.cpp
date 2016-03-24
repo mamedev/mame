@@ -16,7 +16,7 @@
 class peoplepc_state : public driver_device
 {
 public:
-	peoplepc_state(const machine_config &mconfig, device_type type, std::string tag) :
+	peoplepc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
@@ -176,7 +176,7 @@ void peoplepc_state::machine_reset()
 
 void peoplepc_state::machine_start()
 {
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(machine().device<palette_device>("palette"), peoplepc_charlayout, &m_charram[0], 0, 1, 0));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(*m_palette, peoplepc_charlayout, &m_charram[0], 0, 1, 0));
 	m_dma0pg = 0;
 
 	// FIXME: cheat as there no docs about how or obvious ports that set to control the motor
@@ -252,12 +252,12 @@ static MACHINE_CONFIG_START( olypeopl, peoplepc_state)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_22MHz,640,0,640,475,0,475)
 	MCFG_SCREEN_UPDATE_DEVICE( "h46505", mc6845_device, screen_update )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD("h46505", H46505, "screen", XTAL_22MHz/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

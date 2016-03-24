@@ -81,22 +81,22 @@ class terms_t
 
 	unsigned m_railstart;
 
-	plist_t<unsigned> m_nz;   /* all non zero for multiplication */
-	plist_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination */
-	plist_t<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
+	pvector_t<unsigned> m_nz;   /* all non zero for multiplication */
+	pvector_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination */
+	pvector_t<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
 private:
-	plist_t<terminal_t *> m_term;
-	plist_t<int> m_net_other;
-	plist_t<nl_double> m_go;
-	plist_t<nl_double> m_gt;
-	plist_t<nl_double> m_Idr;
-	plist_t<nl_double *> m_other_curanalog;
+	pvector_t<terminal_t *> m_term;
+	pvector_t<int> m_net_other;
+	pvector_t<nl_double> m_go;
+	pvector_t<nl_double> m_gt;
+	pvector_t<nl_double> m_Idr;
+	pvector_t<nl_double *> m_other_curanalog;
 };
 
 class matrix_solver_t : public device_t
 {
 public:
-	typedef plist_t<matrix_solver_t *> list_t;
+	typedef pvector_t<matrix_solver_t *> list_t;
 	typedef core_device_t::list_t dev_list_t;
 
 	enum eSolverType
@@ -146,8 +146,8 @@ protected:
 
 	virtual void  add_term(int net_idx, terminal_t *term) = 0;
 
-	plist_t<analog_net_t *> m_nets;
-	plist_t<analog_output_t *> m_inps;
+	pvector_t<analog_net_t *> m_nets;
+	pvector_t<analog_output_t *> m_inps;
 
 	int m_stat_calculations;
 	int m_stat_newton_raphson;

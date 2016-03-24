@@ -217,7 +217,7 @@ machine_config_constructor victor_9000_fdc_t::device_mconfig_additions() const
 //  victor_9000_fdc_t - constructor
 //-------------------------------------------------
 
-victor_9000_fdc_t::victor_9000_fdc_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+victor_9000_fdc_t::victor_9000_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VICTOR_9000_FDC, "Victor 9000 FDC", tag, owner, clock, "victor9k_fdc", __FILE__),
 	m_irq_cb(*this),
 	m_syn_cb(*this),
@@ -564,10 +564,10 @@ void victor_9000_fdc_t::update_stepper_motor(floppy_image_device *floppy, int st
 void victor_9000_fdc_t::update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, UINT8 &da)
 {
 	if (start && !stop && floppy->mon_r()) {
-		if (LOG_SCP) logerror("%s: motor start\n", floppy->tag().c_str());
+		if (LOG_SCP) logerror("%s: motor start\n", floppy->tag());
 		floppy->mon_w(0);
 	} else if (stop && !floppy->mon_r()) {
-		if (LOG_SCP) logerror("%s: motor stop\n", floppy->tag().c_str());
+		if (LOG_SCP) logerror("%s: motor stop\n", floppy->tag());
 		floppy->mon_w(1);
 		t_tach->reset();
 	}
@@ -577,7 +577,7 @@ void victor_9000_fdc_t::update_spindle_motor(floppy_image_device *floppy, emu_ti
 		if (!floppy->mon_r()) {
 			float tach = rpm[da] / 60 * SPINDLE_RATIO * MOTOR_POLES;
 
-			if (LOG_SCP) logerror("%s: motor speed %u rpm / tach %0.1f hz (DA %02x)\n", floppy->tag().c_str(), rpm[da], (double) tach, da);
+			if (LOG_SCP) logerror("%s: motor speed %u rpm / tach %0.1f hz (DA %02x)\n", floppy->tag(), rpm[da], (double) tach, da);
 
 			t_tach->adjust(attotime::from_hz(tach*2), 0, attotime::from_hz(tach*2));
 			floppy->set_rpm(rpm[da]);

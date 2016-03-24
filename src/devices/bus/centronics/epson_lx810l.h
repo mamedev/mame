@@ -40,11 +40,11 @@ class epson_lx810l_t : public device_t,
 {
 public:
 	// construction/destruction
-	epson_lx810l_t(const machine_config &mconfig, std::string tag,
+	epson_lx810l_t(const machine_config &mconfig, const char *tag,
 					device_t *owner, UINT32 clock);
 	epson_lx810l_t(const machine_config &mconfig, device_type type,
-					std::string name, std::string tag, device_t *owner,
-					UINT32 clock, std::string shortname, std::string source);
+					const char *name, const char *tag, device_t *owner,
+					UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
@@ -143,7 +143,7 @@ class epson_ap2000_t : public epson_lx810l_t
 {
 public:
 	// construction/destruction
-	epson_ap2000_t(const machine_config &mconfig, std::string tag,
+	epson_ap2000_t(const machine_config &mconfig, const char *tag,
 					device_t *owner, UINT32 clock);
 
 	// optional information overrides

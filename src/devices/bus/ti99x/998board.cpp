@@ -203,7 +203,7 @@
 #define TRACE_SPEECH 0
 #define TRACE_DETAIL 0
 
-mainboard8_device::mainboard8_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: bus8z_device(mconfig, MAINBOARD8, "TI-99/8 Main board", tag, owner, clock, "ti998_mainboard", __FILE__),
 	m_ready(*this), m_dsr_selected(false), m_hexbus_selected(false), m_CRUS(false), m_PTGE(false), m_waitcount(0), m_sram(nullptr), m_dram(nullptr), m_rom0(nullptr), m_rom1(nullptr), m_pcode(nullptr),
 	m_oso(*this, OSO_TAG)
@@ -218,7 +218,7 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, std::string 
 
 READ8Z_MEMBER(mainboard8_device::crureadz)
 {
-	if (TRACE_CRU) logerror("%s: read CRU %04x ignored\n", tag().c_str(), offset);
+	if (TRACE_CRU) logerror("%s: read CRU %04x ignored\n", tag(), offset);
 	// Nothing here.
 }
 
@@ -236,10 +236,10 @@ WRITE8_MEMBER(mainboard8_device::cruwrite)
 		case 0:
 			// Turn on/off the internal DSR
 			m_dsr_selected = (data!=0);
-			if (TRACE_CRU) logerror("%s: DSR select = %d\n", tag().c_str(), data);
+			if (TRACE_CRU) logerror("%s: DSR select = %d\n", tag(), data);
 			break;
 		case 1:
-			if (TRACE_CRU) logerror("%s: System reset by CRU request\n", tag().c_str());
+			if (TRACE_CRU) logerror("%s: System reset by CRU request\n", tag());
 			machine().schedule_soft_reset();
 			break;
 		}
@@ -254,10 +254,10 @@ WRITE8_MEMBER(mainboard8_device::cruwrite)
 		case 0:
 			// Turn on/off the Hexbus DSR
 			m_hexbus_selected = (data!=0);
-			if (TRACE_CRU) logerror("%s: Hexbus select = %d\n", tag().c_str(), data);
+			if (TRACE_CRU) logerror("%s: Hexbus select = %d\n", tag(), data);
 			break;
 		default:
-			if (TRACE_CRU) logerror("%s: Set CRU>%04x (Hexbus) to %d\n", tag().c_str(), offset,data);
+			if (TRACE_CRU) logerror("%s: Set CRU>%04x (Hexbus) to %d\n", tag(), offset,data);
 			break;
 		}
 		return;
@@ -265,14 +265,14 @@ WRITE8_MEMBER(mainboard8_device::cruwrite)
 
 	if ((offset & 0xff00)>=0x0100)
 	{
-		if (TRACE_CRU) logerror("%s: Set CRU>%04x (unknown) to %d\n", tag().c_str(), offset,data);
+		if (TRACE_CRU) logerror("%s: Set CRU>%04x (unknown) to %d\n", tag(), offset,data);
 		return;
 	}
 }
 
 void mainboard8_device::CRUS_set(bool state)
 {
-	if (TRACE_CRU) logerror("%s: set CRUS=%d\n", tag().c_str(), state);
+	if (TRACE_CRU) logerror("%s: set CRUS=%d\n", tag(), state);
 	m_CRUS = state;
 }
 
@@ -281,7 +281,7 @@ void mainboard8_device::CRUS_set(bool state)
 */
 void mainboard8_device::PTGE_set(bool state)
 {
-	if (TRACE_CRU) logerror("%s: set PTGEN=%d\n", tag().c_str(), state? 1:0);
+	if (TRACE_CRU) logerror("%s: set PTGEN=%d\n", tag(), state? 1:0);
 	m_PTGE = state;
 }
 
@@ -296,7 +296,7 @@ READ8_MEMBER( mainboard8_device::readm )
 {
 	UINT8 value = 0;
 	bool found;
-	if (TRACE_MEM) logerror("%s: read from %04x\n", tag().c_str(), offset);
+	if (TRACE_MEM) logerror("%s: read from %04x\n", tag(), offset);
 	found = access_logical_r(space, offset, &value, mem_mask);
 	m_waitcount = 2;
 
@@ -365,7 +365,7 @@ READ8Z_MEMBER( mainboard8_device::readz )
 		{
 			//  Starts at 0x4000 in the image
 			*value = m_rom1[0x4000 | (offset & 0x1fff)];
-			if (TRACE_MEM) logerror("%s: (intDSR)  %04x -> %02x\n", tag().c_str(), offset, *value);
+			if (TRACE_MEM) logerror("%s: (intDSR)  %04x -> %02x\n", tag(), offset, *value);
 		}
 		else
 		{
@@ -379,7 +379,7 @@ READ8Z_MEMBER( mainboard8_device::readz )
 				{
 					//  Starts at 0x6000 in the image
 					*value = m_rom1[0x6000 | (offset & 0x1fff)];
-					if (TRACE_MEM) logerror("%s: (HexDSR)  %04x -> %02x\n", tag().c_str(), offset, *value);
+					if (TRACE_MEM) logerror("%s: (HexDSR)  %04x -> %02x\n", tag(), offset, *value);
 				}
 			}
 		}
@@ -388,7 +388,7 @@ READ8Z_MEMBER( mainboard8_device::readz )
 	{
 		if (((offset & 0xfff0)==0xf870 && m_CRUS==false)||(((offset & 0xfff0)==0x8810 && m_CRUS==true)))
 		{
-			if (TRACE_MEM) logerror("%s: read access to mapper ignored: %04x\n", tag().c_str(), offset);
+			if (TRACE_MEM) logerror("%s: read access to mapper ignored: %04x\n", tag(), offset);
 		}
 	}
 }
@@ -410,18 +410,18 @@ WRITE8_MEMBER( mainboard8_device::write )
 			}
 			else
 			{
-				logerror("%s: Write access to Hexbus DSR address %06x ignored\n", tag().c_str(), offset);
+				logerror("%s: Write access to Hexbus DSR address %06x ignored\n", tag(), offset);
 			}
 		}
 		else
 		{
 			if (m_dsr_selected)
 			{
-				logerror("%s: Write access to internal DSR address %06x ignored\n", tag().c_str(), offset);
+				logerror("%s: Write access to internal DSR address %06x ignored\n", tag(), offset);
 			}
 			else
 			{
-				logerror("%s: Write access to unmapped DSR space at address %06x ignored\n", tag().c_str(), offset);
+				logerror("%s: Write access to unmapped DSR space at address %06x ignored\n", tag(), offset);
 			}
 		}
 	}
@@ -449,7 +449,7 @@ void mainboard8_device::mapwrite(int offset, UINT8 data)
 		int bankindx = (data & 0x0e)>>1;
 		if (data & 1)
 		{
-			if (TRACE_MAP) logerror("%s: load mapper from SRAM, bank %d\n", tag().c_str(), bankindx);
+			if (TRACE_MAP) logerror("%s: load mapper from SRAM, bank %d\n", tag(), bankindx);
 			// Load from SRAM
 			// In reality the CPU is put on HOLD during this transfer
 			for (int i=0; i < 16; i++)
@@ -457,12 +457,12 @@ void mainboard8_device::mapwrite(int offset, UINT8 data)
 				int ptr = (bankindx << 6);
 				m_pas_offset[i] =   (m_sram[(i<<2) + ptr] << 24) | (m_sram[(i<<2)+ ptr+1] << 16)
 				| (m_sram[(i<<2) + ptr+2] << 8) | (m_sram[(i<<2) + ptr+3]);
-				if (TRACE_MAP) logerror("%s: load %d=%08x\n", tag().c_str(), i, m_pas_offset[i]);
+				if (TRACE_MAP) logerror("%s: load %d=%08x\n", tag(), i, m_pas_offset[i]);
 			}
 		}
 		else
 		{
-			if (TRACE_MAP) logerror("%s: store mapper to SRAM, bank %d\n", tag().c_str(), bankindx);
+			if (TRACE_MAP) logerror("%s: store mapper to SRAM, bank %d\n", tag(), bankindx);
 			// Store in SRAM
 			for (int i=0; i < 16; i++)
 			{
@@ -471,7 +471,7 @@ void mainboard8_device::mapwrite(int offset, UINT8 data)
 				m_sram[(i<<2) + ptr +1] =  (m_pas_offset[i] >> 16)& 0xff;
 				m_sram[(i<<2) + ptr +2] =  (m_pas_offset[i] >> 8)& 0xff;
 				m_sram[(i<<2) + ptr +3] =  (m_pas_offset[i])& 0xff;
-				if (TRACE_MAP) logerror("%s: save %d=%08x\n", tag().c_str(), i, m_pas_offset[i]);
+				if (TRACE_MAP) logerror("%s: save %d=%08x\n", tag(), i, m_pas_offset[i]);
 			}
 		}
 	}
@@ -487,10 +487,10 @@ bool mainboard8_device::access_logical_r(address_space& space, offs_t offset, UI
 	logically_addressed_device *ldev = m_logcomp.first();
 	bus8z_device *bdev;
 
-	if (TRACE_MEM) logerror("%s: offset=%04x; CRUS=%d, PTGEN=%d\n", tag().c_str(), offset, m_CRUS? 1:0, m_PTGE? 0:1);
+	if (TRACE_MEM) logerror("%s: offset=%04x; CRUS=%d, PTGEN=%d\n", tag(), offset, m_CRUS? 1:0, m_PTGE? 0:1);
 	while (ldev != nullptr)
 	{
-		if (TRACE_MEM) logerror("%s: checking node=%s\n", tag().c_str(), ldev->m_config->name);
+		if (TRACE_MEM) logerror("%s: checking node=%s\n", tag(), ldev->m_config->name);
 		// Check the mode
 		if (((ldev->m_config->mode == NATIVE) && (m_CRUS==false))
 			|| ((ldev->m_config->mode == TI99EM) && (m_CRUS==true))
@@ -502,21 +502,21 @@ bool mainboard8_device::access_logical_r(address_space& space, offs_t offset, UI
 				{
 				case MAP8_SRAM:
 					*value = m_sram[offset & ~ldev->m_config->address_mask];
-					if (TRACE_MEM) logerror("%s: (SRAM) %04x -> %02x\n", tag().c_str(), offset, *value);
+					if (TRACE_MEM) logerror("%s: (SRAM) %04x -> %02x\n", tag(), offset, *value);
 					break;
 				case MAP8_ROM0:
 					// Starts at 0000
 					*value = m_rom0[offset & ~ldev->m_config->address_mask];
-					if (TRACE_MEM) logerror("%s: (ROM0)  %04x -> %02x\n", tag().c_str(), offset, *value);
+					if (TRACE_MEM) logerror("%s: (ROM0)  %04x -> %02x\n", tag(), offset, *value);
 					break;
 				case MAP8_DEV:
 					// device
 					bdev = static_cast<bus8z_device*>(ldev->m_device);
 					bdev->readz(space, offset, value, mem_mask);
-					if (TRACE_MEM) logerror("%s: (dev %s)  %04x -> %02x\n", tag().c_str(), ldev->m_config->name, offset, *value);
+					if (TRACE_MEM) logerror("%s: (dev %s)  %04x -> %02x\n", tag(), ldev->m_config->name, offset, *value);
 					break;
 				default:
-					if (TRACE_MEM) logerror("%s: Invalid kind for read access: %d\n", tag().c_str(), ldev->m_kind);
+					if (TRACE_MEM) logerror("%s: Invalid kind for read access: %d\n", tag(), ldev->m_kind);
 				}
 				found = true;
 				if (ldev->m_config->stop==STOP) break;
@@ -546,19 +546,19 @@ bool mainboard8_device::access_logical_w(address_space& space, offs_t offset, UI
 				{
 				case MAP8_SRAM:
 					m_sram[offset & ~ldev->m_config->address_mask] = data;
-					if (TRACE_MEM) logerror("%s: (SRAM) %04x <- %02x\n", tag().c_str(), offset, data);
+					if (TRACE_MEM) logerror("%s: (SRAM) %04x <- %02x\n", tag(), offset, data);
 					break;
 				case MAP8_ROM0:
-					if (TRACE_MEM) logerror("%s: (ROM0)  %04x <- %02x (ignored)\n", tag().c_str(), offset, data);
+					if (TRACE_MEM) logerror("%s: (ROM0)  %04x <- %02x (ignored)\n", tag(), offset, data);
 					break;
 				case MAP8_DEV:
 					// device
 					bdev = static_cast<bus8z_device*>(ldev->m_device);
 					bdev->write(space, offset, data, mem_mask);
-					if (TRACE_MEM) logerror("%s: (dev %s)  %04x <- %02x\n", tag().c_str(), ldev->m_config->name, offset, data);
+					if (TRACE_MEM) logerror("%s: (dev %s)  %04x <- %02x\n", tag(), ldev->m_config->name, offset, data);
 					break;
 				default:
-					if (TRACE_MEM) logerror("%s: Invalid kind for write access: %d\n", tag().c_str(), ldev->m_kind);
+					if (TRACE_MEM) logerror("%s: Invalid kind for write access: %d\n", tag(), ldev->m_kind);
 				}
 				found = true;
 				if (ldev->m_config->stop==STOP) break;
@@ -583,34 +583,34 @@ void mainboard8_device::access_physical_r( address_space& space, offs_t pas_addr
 			{
 			case MAP8_DRAM:
 				*value = m_dram[pas_address & ~pdev->m_config->address_mask];
-				if (TRACE_MEM) logerror("%s: (DRAM) %06x -> %02x\n", tag().c_str(), pas_address, *value);
+				if (TRACE_MEM) logerror("%s: (DRAM) %06x -> %02x\n", tag(), pas_address, *value);
 				break;
 			case MAP8_ROM1A0:
 				// Starts at 0000 in the image, 8K
 				*value = m_rom1[pas_address & 0x1fff];
-				if (TRACE_MEM) logerror("%s: (ROM) %06x -> %02x\n", tag().c_str(), pas_address, *value);
+				if (TRACE_MEM) logerror("%s: (ROM) %06x -> %02x\n", tag(), pas_address, *value);
 				break;
 			case MAP8_ROM1C0:
 				// Starts at 2000 in the image, 8K
 				*value = m_rom1[0x2000 | (pas_address & 0x1fff)];
-				if (TRACE_MEM) logerror("%s: (ROM)  %06x -> %02x\n", tag().c_str(), pas_address, *value);
+				if (TRACE_MEM) logerror("%s: (ROM)  %06x -> %02x\n", tag(), pas_address, *value);
 				break;
 			case MAP8_PCODE:
 				*value = m_pcode[pas_address & 0x3fff];
-				if (TRACE_MEM) logerror("%s: (PCODE) %06x -> %02x\n", tag().c_str(), pas_address, *value);
+				if (TRACE_MEM) logerror("%s: (PCODE) %06x -> %02x\n", tag(), pas_address, *value);
 				break;
 			case MAP8_INTS:
 				// Interrupt sense
-				logerror("%s: ILSENSE not implemented.\n", tag().c_str());
+				logerror("%s: ILSENSE not implemented.\n", tag());
 				break;
 			case MAP8_DEV:
 				// devices
 				bdev = static_cast<bus8z_device*>(pdev->m_device);
 				bdev->readz(space, pas_address, value, mem_mask);
-				if (TRACE_MEM) logerror("%s: (dev %s)  %06x -> %02x\n", tag().c_str(), pdev->m_config->name, pas_address, *value);
+				if (TRACE_MEM) logerror("%s: (dev %s)  %06x -> %02x\n", tag(), pdev->m_config->name, pas_address, *value);
 				break;
 			default:
-				logerror("%s: Invalid kind for physical read access: %d\n", tag().c_str(), pdev->m_kind);
+				logerror("%s: Invalid kind for physical read access: %d\n", tag(), pdev->m_kind);
 			}
 			if (pdev->m_config->stop==STOP) break;
 		}
@@ -631,27 +631,27 @@ void mainboard8_device::access_physical_w( address_space& space, offs_t pas_addr
 			{
 			case MAP8_DRAM:
 				m_dram[pas_address & ~pdev->m_config->address_mask] = data;
-				if (TRACE_MEM) logerror("%s: (DRAM) %06x <- %02x\n", tag().c_str(), pas_address, data);
+				if (TRACE_MEM) logerror("%s: (DRAM) %06x <- %02x\n", tag(), pas_address, data);
 				break;
 			case MAP8_ROM1A0:
 			case MAP8_ROM1C0:
-				if (TRACE_MEM) logerror("%s: (ROM1)  %06x <- %02x (ignored)\n", tag().c_str(), pas_address, data);
+				if (TRACE_MEM) logerror("%s: (ROM1)  %06x <- %02x (ignored)\n", tag(), pas_address, data);
 				break;
 			case MAP8_PCODE:
-				if (TRACE_MEM) logerror("%s: (PCODE)  %06x <- %02x (ignored)\n", tag().c_str(), pas_address, data);
+				if (TRACE_MEM) logerror("%s: (PCODE)  %06x <- %02x (ignored)\n", tag(), pas_address, data);
 				break;
 			case MAP8_INTS:
 				// Interrupt sense
-				logerror("%s: write to ilsense ignored\n", tag().c_str());
+				logerror("%s: write to ilsense ignored\n", tag());
 				break;
 			case MAP8_DEV:
 				// devices
 				bdev = static_cast<bus8z_device*>(pdev->m_device);
-				if (TRACE_MEM) logerror("%s: (dev %s)  %06x <- %02x\n", tag().c_str(), pdev->m_config->name, pas_address, data);
+				if (TRACE_MEM) logerror("%s: (dev %s)  %06x <- %02x\n", tag(), pdev->m_config->name, pas_address, data);
 				bdev->write(space, pas_address, data, mem_mask);
 				break;
 			default:
-				logerror("%s: Invalid kind for physical write access: %d\n", tag().c_str(), pdev->m_kind);
+				logerror("%s: Invalid kind for physical write access: %d\n", tag(), pdev->m_kind);
 			}
 			if (pdev->m_config->stop==STOP) break;
 		}
@@ -684,7 +684,7 @@ void mainboard8_device::clock_in(int clock)
 */
 void mainboard8_device::device_start()
 {
-	logerror("%s: Starting mapper\n", tag().c_str());
+	logerror("%s: Starting mapper\n", tag());
 
 	// String values of the pseudo constants, used in the configuration.
 	const char *const pseudodev[7] = { SRAMNAME, ROM0NAME, ROM1A0NAME, ROM1C0NAME, DRAMNAME, PCODENAME, INTSNAME };
@@ -737,24 +737,24 @@ void mainboard8_device::device_start()
 					{
 						auto ad = new logically_addressed_device(kind, (device_t*)dev, entry[i]);
 						m_logcomp.append(*ad);
-						if (TRACE_CONFIG) logerror("%s: Device %s mounted into logical address space.\n", tag().c_str(), entry[i].name);
+						if (TRACE_CONFIG) logerror("%s: Device %s mounted into logical address space.\n", tag(), entry[i].name);
 					}
 					else
 					{
 						auto ad = new physically_addressed_device(kind, (device_t*)dev, entry[i]);
 						m_physcomp.append(*ad);
-						if (TRACE_CONFIG) logerror("%s: Device %s mounted into physical address space.\n", tag().c_str(), entry[i].name);
+						if (TRACE_CONFIG) logerror("%s: Device %s mounted into physical address space.\n", tag(), entry[i].name);
 					}
 				}
 				else
 				{
-					if (TRACE_CONFIG) logerror("%s: Device %s not found.\n", tag().c_str(), entry[i].name);
+					if (TRACE_CONFIG) logerror("%s: Device %s not found.\n", tag(), entry[i].name);
 				}
 			}
 		}
 	}
-	if (TRACE_CONFIG) logerror("%s: Mapper logical device count = %d\n", tag().c_str(), m_logcomp.count());
-	if (TRACE_CONFIG) logerror("%s: Mapper physical device count = %d\n", tag().c_str(), m_physcomp.count());
+	if (TRACE_CONFIG) logerror("%s: Mapper logical device count = %d\n", tag(), m_logcomp.count());
+	if (TRACE_CONFIG) logerror("%s: Mapper physical device count = %d\n", tag(), m_physcomp.count());
 
 	m_dsr_selected = false;
 	m_CRUS = true;
@@ -858,7 +858,7 @@ enum
 	SHSK = 0x01
 };
 
-ti998_oso_device::ti998_oso_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ti998_oso_device::ti998_oso_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : device_t(mconfig, OSO, "OSO Hexbus interface", tag, owner, clock, "ti998_oso", __FILE__), m_data(0), m_status(0), m_control(0), m_xmit(0)
 {
 }
@@ -871,23 +871,23 @@ READ8_MEMBER( ti998_oso_device::read )
 	{
 	case 0:
 		// read 5FF8: read data register
-		if (TRACE_OSO) logerror("%s: Read data register = %02x\n", tag().c_str(), value);
+		if (TRACE_OSO) logerror("%s: Read data register = %02x\n", tag(), value);
 		value = m_data;
 		break;
 	case 1:
 		// read 5FFA: read status register
 		value = m_status;
-		if (TRACE_OSO) logerror("%s: Read status %02x\n", tag().c_str(), value);
+		if (TRACE_OSO) logerror("%s: Read status %02x\n", tag(), value);
 		break;
 	case 2:
 		// read 5FFC: read control register
 		value = m_control;
-		if (TRACE_OSO) logerror("%s: Read control register = %02x\n", tag().c_str(), value);
+		if (TRACE_OSO) logerror("%s: Read control register = %02x\n", tag(), value);
 		break;
 	case 3:
 		// read 5FFE: read transmit register
 		value = m_xmit;
-		if (TRACE_OSO) logerror("%s: Read transmit register = %02x\n", tag().c_str(), value);
+		if (TRACE_OSO) logerror("%s: Read transmit register = %02x\n", tag(), value);
 		break;
 	}
 	return value;
@@ -900,7 +900,7 @@ WRITE8_MEMBER( ti998_oso_device::write )
 	{
 	case 0:
 		// write 5FF8: write transmit register
-		if (TRACE_OSO) logerror("%s: Write transmit register %02x\n", tag().c_str(), data);
+		if (TRACE_OSO) logerror("%s: Write transmit register %02x\n", tag(), data);
 		m_xmit = data;
 		// We set the status register directly in order to prevent lock-ups
 		// until we have a complete Hexbus implementation
@@ -908,12 +908,12 @@ WRITE8_MEMBER( ti998_oso_device::write )
 		break;
 	case 1:
 		// write 5FFA: write control register
-		if (TRACE_OSO) logerror("%s: Write control register %02x\n", tag().c_str(), data);
+		if (TRACE_OSO) logerror("%s: Write control register %02x\n", tag(), data);
 		m_control = data;
 		break;
 	default:
 		// write 5FFC, 5FFE: undefined
-		if (TRACE_OSO) logerror("%s: Invalid write on %04x: %02x\n", tag().c_str(), (offset<<1) | 0x5ff0, data);
+		if (TRACE_OSO) logerror("%s: Invalid write on %04x: %02x\n", tag(), (offset<<1) | 0x5ff0, data);
 		break;
 	}
 }
@@ -947,7 +947,7 @@ const device_type OSO = &device_creator<ti998_oso_device>;
 #define SPEECHSYN_TAG "speechsyn"
 #define REAL_TIMING 0
 
-ti998_spsyn_device::ti998_spsyn_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ti998_spsyn_device::ti998_spsyn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : bus8z_device(mconfig, SPEECH8, "TI-99/8 Onboard Speech synthesizer", tag, owner, clock, "ti998_speech", __FILE__), m_vsp(nullptr),
 	m_ready(*this)
 {
@@ -963,7 +963,7 @@ READ8Z_MEMBER( ti998_spsyn_device::readz )
 	m_vsp->wsq_w(TRUE);
 	m_vsp->rsq_w(FALSE);
 	*value = m_vsp->read(offset) & 0xff;
-	if (TRACE_SPEECH) logerror("%s: read value = %02x\n", tag().c_str(), *value);
+	if (TRACE_SPEECH) logerror("%s: read value = %02x\n", tag(), *value);
 }
 
 /*
@@ -973,7 +973,7 @@ WRITE8_MEMBER( ti998_spsyn_device::write )
 {
 	m_vsp->rsq_w(m_vsp, TRUE);
 	m_vsp->wsq_w(m_vsp, FALSE);
-	if (TRACE_SPEECH) logerror("%s: write value = %02x\n", tag().c_str(), data);
+	if (TRACE_SPEECH) logerror("%s: write value = %02x\n", tag(), data);
 	m_vsp->write(offset, data);
 }
 
@@ -984,7 +984,7 @@ READ8Z_MEMBER( ti998_spsyn_device::readz )
 {
 	machine().device("maincpu")->execute().adjust_icount(-(18+3));      /* this is just a minimum, it can be more */
 	*value = m_vsp->status_r(space, offset, 0xff) & 0xff;
-	if (TRACE_SPEECH) logerror("%s: read value = %02x\n", tag().c_str(), *value);
+	if (TRACE_SPEECH) logerror("%s: read value = %02x\n", tag(), *value);
 }
 
 /*
@@ -1002,12 +1002,12 @@ WRITE8_MEMBER( ti998_spsyn_device::write )
 	{
 		attotime time_to_ready = attotime::from_double(m_vsp->time_to_ready());
 		int cycles_to_ready = machine().device<cpu_device>("maincpu")->attotime_to_cycles(time_to_ready);
-		if (TRACE_SPEECH && TRACE_DETAIL) logerror("%s: time to ready: %f -> %d\n", tag().c_str(), time_to_ready.as_double(), (int) cycles_to_ready);
+		if (TRACE_SPEECH && TRACE_DETAIL) logerror("%s: time to ready: %f -> %d\n", tag(), time_to_ready.as_double(), (int) cycles_to_ready);
 
 		machine().device("maincpu")->execute().adjust_icount(-cycles_to_ready);
 		machine().scheduler().timer_set(attotime::zero, FUNC_NULL);
 	}
-	if (TRACE_SPEECH) logerror("%s: write value = %02x\n", tag().c_str(), data);
+	if (TRACE_SPEECH) logerror("%s: write value = %02x\n", tag(), data);
 	m_vsp->data_w(space, offset, data);
 }
 #endif
@@ -1018,7 +1018,7 @@ WRITE_LINE_MEMBER( ti998_spsyn_device::speech8_ready )
 {
 	// The TMS5200 implementation uses TRUE/FALSE, not ASSERT/CLEAR semantics
 	m_ready((state==0)? ASSERT_LINE : CLEAR_LINE);
-	if (TRACE_SPEECH) logerror("%s: READY = %d\n", tag().c_str(), (state==0));
+	if (TRACE_SPEECH) logerror("%s: READY = %d\n", tag(), (state==0));
 
 #if REAL_TIMING
 	// Need to do that here (see explanations in spchsyn.c)
@@ -1040,7 +1040,7 @@ void ti998_spsyn_device::device_start()
 
 void ti998_spsyn_device::device_reset()
 {
-	if (TRACE_SPEECH) logerror("%s: reset\n", tag().c_str());
+	if (TRACE_SPEECH) logerror("%s: reset\n", tag());
 }
 
 // Unlike the TI-99/4A, the 99/8 uses the CD2501ECD

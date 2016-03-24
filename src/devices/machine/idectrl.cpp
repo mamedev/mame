@@ -26,12 +26,12 @@
 
 const device_type IDE_CONTROLLER = &device_creator<ide_controller_device>;
 
-ide_controller_device::ide_controller_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	ata_interface_device(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock, "ide_controller", __FILE__)
 {
 }
 
-ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	ata_interface_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -89,12 +89,12 @@ WRITE16_MEMBER( ide_controller_device::write_cs1 )
 
 const device_type IDE_CONTROLLER_32 = &device_creator<ide_controller_32_device>;
 
-ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	ide_controller_device(mconfig, IDE_CONTROLLER, "IDE Controller (32 bit)", tag, owner, clock, "ide_controller32", __FILE__)
 {
 }
 
-ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	ide_controller_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -168,7 +168,7 @@ WRITE32_MEMBER(ide_controller_32_device::write_cs1)
 
 const device_type BUS_MASTER_IDE_CONTROLLER = &device_creator<bus_master_ide_controller_device>;
 
-bus_master_ide_controller_device::bus_master_ide_controller_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+bus_master_ide_controller_device::bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	ide_controller_32_device(mconfig, BUS_MASTER_IDE_CONTROLLER, "Bus Master IDE Controller", tag, owner, clock, "bus_master_ide_controller", __FILE__),
 	m_dma_address(0),
 	m_dma_bytes_left(0),
@@ -191,10 +191,10 @@ void bus_master_ide_controller_device::device_start()
 	{
 		device_t *bmtarget = machine().device(m_bmcpu);
 		if (bmtarget == nullptr)
-			throw emu_fatalerror("IDE controller '%s' bus master target '%s' doesn't exist!", tag().c_str(), m_bmcpu);
+			throw emu_fatalerror("IDE controller '%s' bus master target '%s' doesn't exist!", tag(), m_bmcpu);
 		device_memory_interface *memory;
 		if (!bmtarget->interface(memory))
-			throw emu_fatalerror("IDE controller '%s' bus master target '%s' has no memory!", tag().c_str(), m_bmcpu);
+			throw emu_fatalerror("IDE controller '%s' bus master target '%s' has no memory!", tag(), m_bmcpu);
 		m_dma_space = &memory->space(m_bmspace);
 		m_dma_address_xor = (m_dma_space->endianness() == ENDIANNESS_LITTLE) ? 0 : 3;
 	}

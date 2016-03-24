@@ -117,7 +117,7 @@ const device_type ATARI_GTIA = &device_creator<gtia_device>;
 //  upd7220_device - constructor
 //-------------------------------------------------
 
-gtia_device::gtia_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+gtia_device::gtia_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 				device_t(mconfig, ATARI_GTIA, "Atari GTIA", tag, owner, clock, "gtia", __FILE__),
 				m_read_cb(*this),
 				m_write_cb(*this)

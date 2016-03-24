@@ -594,7 +594,7 @@ void nc_state::nc_sound_update(int channel)
 	/* set state */
 	beeper_device->set_state(on);
 	/* set frequency */
-	beeper_device->set_frequency(frequency);
+	beeper_device->set_clock(frequency);
 }
 
 WRITE8_MEMBER(nc_state::nc_sound_w)

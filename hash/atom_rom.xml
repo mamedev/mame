@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+
+  Missing:
+
+  - econet
+  - axr2 (APP Laboratories)
+
+-->
+<softwarelist name="atom_rom" description="Acorn Atom expansion ROMs">
+
+	<software name="josbox">
+		<description>AXR1</description>
+		<year>198?</year>
+		<publisher>ECD Computer Workshop</publisher>
+		<part name="cart" interface="atom_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="axr1.rom" size="4096" crc="868fda8b" sha1="f8417787c28818a7646b9b59d706ef890255049f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcharme">
+		<description>P-Charme Interpreter</description>
+		<year>1984</year>
+		<publisher>Frans van Hoesel</publisher>
+		<part name="cart" interface="atom_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="pcharme.rom" size="4096" crc="9e8bd79f" sha1="66c57622448b448aa6080911dccb03456d0e3b81" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gags">
+		<description>GAGS v2.3</description>
+		<year>198?</year>
+		<publisher>G. Hillebrand</publisher>
+		<part name="cart" interface="atom_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="gags.rom" size="4096" crc="35e1d713" sha1="94cc2887ad9fea1849d1d53c64d0668e77696ef4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="werom">
+		<description>WE-ROM</description>
+		<year>1983</year>
+		<publisher>Watford Electronics</publisher>
+		<part name="cart" interface="atom_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="werom.rom" size="4096" crc="dfcb3bf8" sha1="85a19146844da2d6f03e1cde37ee17429eedeb0d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="afuk">
+		<description>A&amp;F Utility Kit</description>
+		<year>1982</year>
+		<publisher>A&amp;F Software</publisher>
+		<part name="cart" interface="atom_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="utilikit.rom" size="4096" crc="013b8f93" sha1="b4341f116a6d1e0cbcd39d64e0b5d14a90dc0356" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="combox">
+		<description>COM-Box</description>
+		<year>198?</year>
+		<publisher>B. Poot</publisher>
+		<part name="cart" interface="atom_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="combox.rom" size="4096" crc="9c8210ab" sha1="ea293f49a98721cdbdf985d6f2fe636290ef0e75" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="salfaa">
+		<description>SALFAA v2.6</description>
+		<year>198?</year>
+		<publisher>B. Poot &amp; J. Jobse</publisher>
+		<part name="cart" interface="atom_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="salfaa.rom" size="4096" crc="ef857b25" sha1="b3812427233060972fa01faf3ce381a21576a5ed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mousebox">
+		<description>Mouse-Dos Box v1.01</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="atom_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="mousebox.rom" size="4096" crc="0dff30e4" sha1="b7c0b9c23fcc5cfdc06cb2d2a9e7c2658e248ef7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="windows">
+		<description>Atomic Windows v1.0</description>
+		<year>198?</year>
+		<publisher>Kees van Oss</publisher>
+		<part name="cart" interface="atom_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="atomicw.rom" size="4096" crc="a3fd737d" sha1="d418d9322c69c49106ed2c268ad0864c0f2c4c1b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toolkit">
+		<description>Programmer's Toolkit</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="atom_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="toolkit.rom" size="4096" crc="9661561c" sha1="faa0394232caf7626499c9bc57c6af36017fe852" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

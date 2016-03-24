@@ -39,7 +39,7 @@ clocks 50MHz (near 3DFX) and 14.31818MHz (near RAMDAC)
 class taitowlf_state : public pcat_base_state
 {
 public:
-	taitowlf_state(const machine_config &mconfig, device_type type, std::string tag)
+	taitowlf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag),
 		m_bootscreen_rom(*this, "bootscreen"),
 		m_bank1(*this, "bank1"),
@@ -373,8 +373,8 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, "", intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, "", intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 

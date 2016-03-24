@@ -337,7 +337,7 @@ READ8_MEMBER(astrocde_state::gorf_io_2_r)
 		case 4: output().set_lamp_value(4, data); break;
 		case 5: output().set_lamp_value(5, data); break;
 		case 6: /* n/c */                       break;
-		case 7: osd_printf_debug("io_2:%d\n", data); break;
+		case 7: output().set_lamp_value(7, data); break;
 	}
 	return 0xff;
 }

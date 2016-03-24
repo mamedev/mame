@@ -219,7 +219,7 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 const device_type SPC700 = &device_creator<spc700_device>;
 
 
-spc700_device::spc700_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+spc700_device::spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SPC700, "SPC700", tag, owner, clock, "spc700", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_a(0)
@@ -1249,7 +1249,7 @@ void spc700_device::state_string_export(const device_state_entry &entry, std::st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				(m_flag_n & 0x80)        ? 'N':'.',
 				((m_flag_v & 0x80) >> 1) ? 'V':'.',
 				(m_flag_p>>3)            ? 'P':'.',

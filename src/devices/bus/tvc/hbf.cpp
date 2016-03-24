@@ -58,7 +58,7 @@ const device_type TVC_HBF = &device_creator<tvc_hbf_device>;
 //  tvc_hbf_device - constructor
 //-------------------------------------------------
 
-tvc_hbf_device::tvc_hbf_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tvc_hbf_device::tvc_hbf_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, TVC_HBF, "HBF floppy interface", tag, owner, clock, "tvc_hbf", __FILE__),
 		device_tvcexp_interface( mconfig, *this ),
 		m_fdc(*this, "fdc"), m_rom(nullptr), m_ram(nullptr), m_rom_bank(0)
@@ -123,7 +123,7 @@ WRITE8_MEMBER(tvc_hbf_device::write)
 	if (offset>=0x1000)
 		m_ram[offset & 0x0fff] = data;
 	else
-		logerror("'%s': unmapped write to %04x %02x\n", tag().c_str(), offset, data);
+		logerror("'%s': unmapped write to %04x %02x\n", tag(), offset, data);
 }
 
 

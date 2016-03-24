@@ -31,7 +31,7 @@ class softlist_parser
 {
 public:
 	// construction (== execution)
-	softlist_parser(software_list_device &list, std::string &errors);
+	softlist_parser(software_list_device &list, std::ostringstream &errors);
 
 private:
 	enum parse_position
@@ -51,7 +51,7 @@ private:
 	const char *parser_error() const { return XML_ErrorString(XML_GetErrorCode(m_parser)); }
 
 	// internal error helpers
-	void ATTR_PRINTF(2,3) parse_error(const char *fmt, ...);
+	template <typename Format, typename... Params> void parse_error(Format &&fmt, Params &&... args);
 	void unknown_tag(const char *tagname) { parse_error("Unknown tag: %s", tagname); }
 	void unknown_attribute(const char *attrname) { parse_error("Unknown attribute: %s", attrname); }
 
@@ -77,7 +77,7 @@ private:
 
 	// internal parsing state
 	software_list_device &  m_list;
-	std::string &           m_errors;
+	std::ostringstream &    m_errors;
 	XML_Parser              m_parser;
 	bool                    m_done;
 	bool                    m_data_accum_expected;
@@ -273,7 +273,7 @@ bool software_info::has_multiple_parts(const char *interface) const
 //  software_list_device - constructor
 //-------------------------------------------------
 
-software_list_device::software_list_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+software_list_device::software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SOFTWARE_LIST, "Software list", tag, owner, clock, "software_list", __FILE__),
 		m_list_type(SOFTWARE_LIST_ORIGINAL_SYSTEM),
 		m_filter(nullptr),
@@ -478,15 +478,17 @@ void software_list_device::parse()
 	m_errors.clear();
 
 	// attempt to open the file
-	file_error filerr = m_file.open(m_list_name.c_str(), ".xml");
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = m_file.open(m_list_name.c_str(), ".xml");
+	if (filerr == osd_file::error::NONE)
 	{
 		// parse if no error
-		softlist_parser parser(*this, m_errors);
+		std::ostringstream errs;
+		softlist_parser parser(*this, errs);
 		m_file.close();
+		m_errors = errs.str();
 	}
 	else
-		strprintf(m_errors, "Error opening file: %s\n", filename());
+		m_errors = string_format("Error opening file: %s\n", filename());
 
 	// indicate that we've been parsed
 	m_parsed = true;
@@ -647,7 +649,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 //  softlist_parser - constructor
 //-------------------------------------------------
 
-softlist_parser::softlist_parser(software_list_device &list, std::string &errors)
+softlist_parser::softlist_parser(software_list_device &list, std::ostringstream &errors)
 	: m_list(list),
 		m_errors(errors),
 		m_done(false),
@@ -723,19 +725,17 @@ void softlist_parser::expat_free(void *ptr)
 //  filename, line and column information
 //-------------------------------------------------
 
-void ATTR_PRINTF(2,3) softlist_parser::parse_error(const char *fmt, ...)
+template <typename Format, typename... Params>
+inline void softlist_parser::parse_error(Format &&fmt, Params &&... args)
 {
 	// always start with filename(line.column):
-	strcatprintf(m_errors, "%s(%d.%d): ", filename(), line(), column());
+	util::stream_format(m_errors, "%s(%d.%d): ", filename(), line(), column());
 
 	// append the remainder of the string
-	va_list va;
-	va_start(va, fmt);
-	strcatvprintf(m_errors, fmt, va);
-	va_end(va);
+	util::stream_format(m_errors, std::forward<Format>(fmt), std::forward<Params>(args)...);
 
 	// append a newline at the end
-	m_errors.append("\n");
+	m_errors.put('\n');
 }
 
 
@@ -1151,14 +1151,14 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 				std::string hashdata;
 				if (nodump)
 				{
-					strprintf(hashdata, "%s", NO_DUMP);
+					hashdata = string_format("%s", NO_DUMP);
 					if (crc != nullptr && sha1 != nullptr)
 						parse_error("No need for hash definition");
 				}
 				else
 				{
 					if (crc != nullptr && sha1 != nullptr)
-						strprintf(hashdata, "%c%s%c%s%s", hash_collection::HASH_CRC, crc, hash_collection::HASH_SHA1, sha1, (baddump ? BAD_DUMP : ""));
+						hashdata = string_format("%c%s%c%s%s", hash_collection::HASH_CRC, crc, hash_collection::HASH_SHA1, sha1, (baddump ? BAD_DUMP : ""));
 					else
 						parse_error("Incomplete rom hash definition");
 				}
@@ -1201,8 +1201,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 			bool baddump = (status != nullptr && strcmp(status, "baddump") == 0);
 			bool nodump = (status != nullptr && strcmp(status, "nodump" ) == 0);
 			bool writeable = (writeablestr != nullptr && strcmp(writeablestr, "yes") == 0);
-			std::string hashdata;
-			strprintf(hashdata, "%c%s%s", hash_collection::HASH_SHA1, sha1, (nodump ? NO_DUMP : (baddump ? BAD_DUMP : "")));
+			std::string hashdata = string_format("%c%s%s", hash_collection::HASH_SHA1, sha1, (nodump ? NO_DUMP : (baddump ? BAD_DUMP : "")));
 
 			add_rom_entry(name, hashdata.c_str(), 0, 0, ROMENTRYTYPE_ROM | (writeable ? DISK_READWRITE : DISK_READONLY));
 		}

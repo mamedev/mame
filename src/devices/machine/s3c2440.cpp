@@ -41,7 +41,7 @@ UINT32 s3c2440_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 const device_type S3C2440 = &device_creator<s3c2440_device>;
 
-s3c2440_device::s3c2440_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+s3c2440_device::s3c2440_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, S3C2440, "Samsung S3C2440", tag, owner, clock, "s3c2440", __FILE__),
 		m_palette(*this),
 		m_cpu(*this, ":maincpu"),
@@ -93,7 +93,7 @@ s3c2440_device::~s3c2440_device()
 //  palette device
 //-------------------------------------------------
 
-void s3c2440_device::static_set_palette_tag(device_t &device, std::string tag)
+void s3c2440_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<s3c2440_device &>(device).m_palette.set_tag(tag);
 }

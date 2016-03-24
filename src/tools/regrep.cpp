@@ -148,15 +148,15 @@ static int CLIB_DECL compare_file(const void *file0ptr, const void *file1ptr);
 static summary_file *sort_file_list(void);
 
 /* HTML helpers */
-static core_file *create_file_and_output_header(std::string &filename, std::string &templatefile, std::string &title);
-static void output_footer_and_close_file(core_file *file, std::string &templatefile, std::string &title);
+static util::core_file::ptr create_file_and_output_header(std::string &filename, std::string &templatefile, std::string &title);
+static void output_footer_and_close_file(util::core_file::ptr &&file, std::string &templatefile, std::string &title);
 
 /* report generators */
 static void output_report(std::string &dirname, std::string &tempheader, std::string &tempfooter, summary_file *filelist);
 static int compare_screenshots(summary_file *curfile);
 static int generate_png_diff(const summary_file *curfile, std::string &destdir, const char *destname);
 static void create_linked_file(std::string &dirname, const summary_file *curfile, const summary_file *prevfile, const summary_file *nextfile, const char *pngfile, std::string &tempheader, std::string &tempfooter);
-static void append_driver_list_table(const char *header, std::string &dirname, core_file *indexfile, const summary_file *listhead, std::string &tempheader, std::string &tempfooter);
+static void append_driver_list_table(const char *header, std::string &dirname, util::core_file &indexfile, const summary_file *listhead, std::string &tempheader, std::string &tempfooter);
 
 
 
@@ -235,7 +235,7 @@ int main(int argc, char *argv[])
 
 	/* read the template file into an astring */
 	std::string tempheader;
-	if (core_fload(tempfilename.c_str(), &buffer, &bufsize) == FILERR_NONE)
+	if (util::core_file::load(tempfilename.c_str(), &buffer, bufsize) == osd_file::error::NONE)
 	{
 		tempheader.assign((const char *)buffer, bufsize);
 		osd_free(buffer);
@@ -560,18 +560,18 @@ static summary_file *sort_file_list(void)
     HTML file with a standard header
 -------------------------------------------------*/
 
-static core_file *create_file_and_output_header(std::string &filename, std::string &templatefile, std::string &title)
+static util::core_file::ptr create_file_and_output_header(std::string &filename, std::string &templatefile, std::string &title)
 {
-	core_file *file;
+	util::core_file::ptr file;
 
 	/* create the indexfile */
-	if (core_fopen(filename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, &file) != FILERR_NONE)
-		return nullptr;
+	if (util::core_file::open(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, file) != osd_file::error::NONE)
+		return util::core_file::ptr();
 
 	/* print a header */
 	std::string modified(templatefile);
 	strreplace(modified, "<!--TITLE-->", title.c_str());
-	core_fwrite(file, modified.c_str(), modified.length());
+	file->write(modified.c_str(), modified.length());
 
 	/* return the file */
 	return file;
@@ -583,12 +583,12 @@ static core_file *create_file_and_output_header(std::string &filename, std::stri
     standard footer to an HTML file and close it
 -------------------------------------------------*/
 
-static void output_footer_and_close_file(core_file *file, std::string &templatefile, std::string &title)
+static void output_footer_and_close_file(util::core_file::ptr &&file, std::string &templatefile, std::string &title)
 {
 	std::string modified(templatefile);
 	strreplace(modified, "<!--TITLE-->", title.c_str());
-	core_fwrite(file, modified.c_str(), modified.length());
-	core_fclose(file);
+	file->write(modified.c_str(), modified.length());
+	file.reset();
 }
 
 
@@ -609,7 +609,7 @@ static void output_report(std::string &dirname, std::string &tempheader, std::st
 	std::string title("MAME Regressions");
 	std::string tempname;
 	int listnum, bucknum;
-	core_file *indexfile;
+	util::core_file::ptr indexfile;
 	int count = 0, total;
 
 	/* initialize the lists */
@@ -686,9 +686,9 @@ static void output_report(std::string &dirname, std::string &tempheader, std::st
 		*buckettailptr[bucknum] = nullptr;
 
 	/* output header */
-	strprintf(tempname,"%s" PATH_SEPARATOR "%s", dirname.c_str(), "index.html");
+	tempname = string_format("%s" PATH_SEPARATOR "%s", dirname.c_str(), "index.html");
 	indexfile = create_file_and_output_header(tempname, tempheader, title);
-	if (indexfile == nullptr)
+	if (!indexfile)
 	{
 		fprintf(stderr, "Error creating file '%s'\n", tempname.c_str());
 		return;
@@ -702,12 +702,12 @@ static void output_report(std::string &dirname, std::string &tempheader, std::st
 		if (buckethead[curbucket] != nullptr)
 		{
 			fprintf(stderr, "Outputting bucket: %s\n", bucket_name[curbucket]);
-			append_driver_list_table(bucket_name[curbucket], dirname, indexfile, buckethead[curbucket], tempheader, tempfooter);
+			append_driver_list_table(bucket_name[curbucket], dirname, *indexfile, buckethead[curbucket], tempheader, tempfooter);
 		}
 	}
 
 	/* output footer */
-	output_footer_and_close_file(indexfile, tempfooter, title);
+	output_footer_and_close_file(std::move(indexfile), tempfooter, title);
 }
 
 
@@ -728,30 +728,30 @@ static int compare_screenshots(summary_file *curfile)
 		if (curfile->status[listnum] == STATUS_SUCCESS)
 		{
 			std::string fullname;
-			file_error filerr;
-			core_file *file;
+			osd_file::error filerr;
+			util::core_file::ptr file;
 
 			/* get the filename for the image */
-			strprintf(fullname,"%s" PATH_SEPARATOR "snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", lists[listnum].dir, curfile->name);
+			fullname = string_format("%s" PATH_SEPARATOR "snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", lists[listnum].dir, curfile->name);
 
 			/* open the file */
-			filerr = core_fopen(fullname.c_str(), OPEN_FLAG_READ, &file);
+			filerr = util::core_file::open(fullname, OPEN_FLAG_READ, file);
 
 			/* if that failed, look in the old location */
-			if (filerr != FILERR_NONE)
+			if (filerr != osd_file::error::NONE)
 			{
 				/* get the filename for the image */
-				strprintf(fullname, "%s" PATH_SEPARATOR "snap" PATH_SEPARATOR "_%s.png", lists[listnum].dir, curfile->name);
+				fullname = string_format("%s" PATH_SEPARATOR "snap" PATH_SEPARATOR "_%s.png", lists[listnum].dir, curfile->name);
 
 				/* open the file */
-				filerr = core_fopen(fullname.c_str(), OPEN_FLAG_READ, &file);
+				filerr = util::core_file::open(fullname, OPEN_FLAG_READ, file);
 			}
 
 			/* if that worked, load the file */
-			if (filerr == FILERR_NONE)
+			if (filerr == osd_file::error::NONE)
 			{
-				png_read_bitmap(file, bitmaps[listnum]);
-				core_fclose(file);
+				png_read_bitmap(*file, bitmaps[listnum]);
+				file.reset();
 			}
 		}
 
@@ -836,30 +836,30 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 	int width, height, maxwidth;
 	int bitmapcount = 0;
 	int listnum, bmnum;
-	core_file *file = nullptr;
-	file_error filerr;
+	util::core_file::ptr file;
+	osd_file::error filerr;
 	png_error pngerr;
 	int error = -1;
 	int starty;
 
 	/* generate the common source filename */
-	strprintf(dstfilename,"%s" PATH_SEPARATOR "%s", destdir.c_str(), destname);
-	strprintf(srcimgname,"snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", curfile->name);
+	dstfilename = string_format("%s" PATH_SEPARATOR "%s", destdir.c_str(), destname);
+	srcimgname = string_format("snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", curfile->name);
 
 	/* open and load all unique bitmaps */
 	for (listnum = 0; listnum < list_count; listnum++)
 		if (curfile->matchbitmap[listnum] == listnum)
 		{
-			strprintf(tempname, "%s" PATH_SEPARATOR "%s", lists[listnum].dir, srcimgname.c_str());
+			tempname = string_format("%s" PATH_SEPARATOR "%s", lists[listnum].dir, srcimgname.c_str());
 
 			/* open the source image */
-			filerr = core_fopen(tempname.c_str(), OPEN_FLAG_READ, &file);
-			if (filerr != FILERR_NONE)
+			filerr = util::core_file::open(tempname, OPEN_FLAG_READ, file);
+			if (filerr != osd_file::error::NONE)
 				goto error;
 
 			/* load the source image */
-			pngerr = png_read_bitmap(file, bitmaps[bitmapcount++]);
-			core_fclose(file);
+			pngerr = png_read_bitmap(*file, bitmaps[bitmapcount++]);
+			file.reset();
 			if (pngerr != PNGERR_NONE)
 				goto error;
 		}
@@ -925,11 +925,11 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 	}
 
 	/* write the final PNG */
-	filerr = core_fopen(dstfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
-	if (filerr != FILERR_NONE)
+	filerr = util::core_file::open(dstfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
+	if (filerr != osd_file::error::NONE)
 		goto error;
-	pngerr = png_write_bitmap(file, nullptr, finalbitmap, 0, nullptr);
-	core_fclose(file);
+	pngerr = png_write_bitmap(*file, nullptr, finalbitmap, 0, nullptr);
+	file.reset();
 	if (pngerr != PNGERR_NONE)
 		goto error;
 
@@ -938,7 +938,7 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 
 error:
 	if (error)
-		osd_rmfile(dstfilename.c_str());
+		osd_file::remove(dstfilename);
 	return error;
 }
 
@@ -953,15 +953,15 @@ static void create_linked_file(std::string &dirname, const summary_file *curfile
 	std::string linkname;
 	std::string filename;
 	std::string title;
-	core_file *linkfile;
+	util::core_file::ptr linkfile;
 	int listnum;
 
 	/* create the filename */
-	strprintf(filename,"%s.html", curfile->name);
+	filename = string_format("%s.html", curfile->name);
 
 	/* output header */
-	strprintf(title, "%s Regressions (%s)", curfile->name, curfile->source);
-	strprintf(linkname,"%s" PATH_SEPARATOR "%s", dirname.c_str(), filename.c_str());
+	title = string_format("%s Regressions (%s)", curfile->name, curfile->source);
+	linkname = string_format("%s" PATH_SEPARATOR "%s", dirname.c_str(), filename.c_str());
 	linkfile = create_file_and_output_header(linkname, tempheader, title);
 	if (linkfile == nullptr)
 	{
@@ -970,19 +970,19 @@ static void create_linked_file(std::string &dirname, const summary_file *curfile
 	}
 
 	/* link to the previous/next entries */
-	core_fprintf(linkfile, "\t<p>\n");
-	core_fprintf(linkfile, "\t<table width=\"100%%\">\n");
-	core_fprintf(linkfile, "\t\t<td align=\"left\" width=\"40%%\" style=\"border:none\">");
+	linkfile->printf("\t<p>\n");
+	linkfile->printf("\t<table width=\"100%%\">\n");
+	linkfile->printf("\t\t<td align=\"left\" width=\"40%%\" style=\"border:none\">");
 	if (prevfile != nullptr)
-		core_fprintf(linkfile, "<a href=\"%s.html\"><< %s (%s)</a>", prevfile->name, prevfile->name, prevfile->source);
-	core_fprintf(linkfile, "</td>\n");
-	core_fprintf(linkfile, "\t\t<td align=\"center\" width=\"20%%\" style=\"border:none\"><a href=\"index.html\">Home</a></td>\n");
-	core_fprintf(linkfile, "\t\t<td align=\"right\" width=\"40%%\" style=\"border:none\">");
+		linkfile->printf("<a href=\"%s.html\"><< %s (%s)</a>", prevfile->name, prevfile->name, prevfile->source);
+	linkfile->printf("</td>\n");
+	linkfile->printf("\t\t<td align=\"center\" width=\"20%%\" style=\"border:none\"><a href=\"index.html\">Home</a></td>\n");
+	linkfile->printf("\t\t<td align=\"right\" width=\"40%%\" style=\"border:none\">");
 	if (nextfile != nullptr)
-		core_fprintf(linkfile, "<a href=\"%s.html\">%s (%s) >></a>", nextfile->name, nextfile->name, nextfile->source);
-	core_fprintf(linkfile, "</td>\n");
-	core_fprintf(linkfile, "\t</table>\n");
-	core_fprintf(linkfile, "\t</p>\n");
+		linkfile->printf("<a href=\"%s.html\">%s (%s) >></a>", nextfile->name, nextfile->name, nextfile->source);
+	linkfile->printf("</td>\n");
+	linkfile->printf("\t</table>\n");
+	linkfile->printf("\t</p>\n");
 
 	/* output data for each one */
 	for (listnum = 0; listnum < list_count; listnum++)
@@ -990,34 +990,34 @@ static void create_linked_file(std::string &dirname, const summary_file *curfile
 		int imageindex = -1;
 
 		/* generate the HTML */
-		core_fprintf(linkfile, "\n\t<h2>%s</h2>\n", lists[listnum].version);
-		core_fprintf(linkfile, "\t<p>\n");
-		core_fprintf(linkfile, "\t<b>Status:</b> %s\n", status_text[curfile->status[listnum]]);
+		linkfile->printf("\n\t<h2>%s</h2>\n", lists[listnum].version);
+		linkfile->printf("\t<p>\n");
+		linkfile->printf("\t<b>Status:</b> %s\n", status_text[curfile->status[listnum]]);
 		if (pngfile != nullptr)
 			imageindex = get_unique_index(curfile, listnum);
 		if (imageindex != -1)
-			core_fprintf(linkfile, " [%d]", imageindex);
-		core_fprintf(linkfile, "\t</p>\n");
+			linkfile->printf(" [%d]", imageindex);
+		linkfile->printf("\t</p>\n");
 		if (curfile->text[listnum].length() != 0)
 		{
-			core_fprintf(linkfile, "\t<p>\n");
-			core_fprintf(linkfile, "\t<b>Errors:</b>\n");
-			core_fprintf(linkfile, "\t<pre>%s</pre>\n", curfile->text[listnum].c_str());
-			core_fprintf(linkfile, "\t</p>\n");
+			linkfile->printf("\t<p>\n");
+			linkfile->printf("\t<b>Errors:</b>\n");
+			linkfile->printf("\t<pre>%s</pre>\n", curfile->text[listnum].c_str());
+			linkfile->printf("\t</p>\n");
 		}
 	}
 
 	/* output link to the image */
 	if (pngfile != nullptr)
 	{
-		core_fprintf(linkfile, "\n\t<h2>Screenshot Comparisons</h2>\n");
-		core_fprintf(linkfile, "\t<p>\n");
-		core_fprintf(linkfile, "\t<img src=\"%s\" />\n", pngfile);
-		core_fprintf(linkfile, "\t</p>\n");
+		linkfile->printf("\n\t<h2>Screenshot Comparisons</h2>\n");
+		linkfile->printf("\t<p>\n");
+		linkfile->printf("\t<img src=\"%s\" />\n", pngfile);
+		linkfile->printf("\t</p>\n");
 	}
 
 	/* output footer */
-	output_footer_and_close_file(linkfile, tempfooter, title);
+	output_footer_and_close_file(std::move(linkfile), tempfooter, title);
 }
 
 
@@ -1026,28 +1026,28 @@ static void create_linked_file(std::string &dirname, const summary_file *curfile
     of drivers from a list to an HTML file
 -------------------------------------------------*/
 
-static void append_driver_list_table(const char *header, std::string &dirname, core_file *indexfile, const summary_file *listhead, std::string &tempheader, std::string &tempfooter)
+static void append_driver_list_table(const char *header, std::string &dirname, util::core_file &indexfile, const summary_file *listhead, std::string &tempheader, std::string &tempfooter)
 {
 	const summary_file *curfile, *prevfile;
 	int width = 100 / (2 + list_count);
 	int listnum;
 
 	/* output a header */
-	core_fprintf(indexfile, "\t<h2>%s</h2>\n", header);
+	indexfile.printf("\t<h2>%s</h2>\n", header);
 
 	/* start the table */
-	core_fprintf(indexfile, "\t<p><table width=\"90%%\">\n");
-	core_fprintf(indexfile, "\t\t<tr>\n\t\t\t<th width=\"%d%%\">Source</th><th width=\"%d%%\">Driver</th>", width, width);
+	indexfile.printf("\t<p><table width=\"90%%\">\n");
+	indexfile.printf("\t\t<tr>\n\t\t\t<th width=\"%d%%\">Source</th><th width=\"%d%%\">Driver</th>", width, width);
 	for (listnum = 0; listnum < list_count; listnum++)
-		core_fprintf(indexfile, "<th width=\"%d%%\">%s</th>", width, lists[listnum].version);
-	core_fprintf(indexfile, "\n\t\t</tr>\n");
+		indexfile.printf("<th width=\"%d%%\">%s</th>", width, lists[listnum].version);
+	indexfile.printf("\n\t\t</tr>\n");
 
 	/* if nothing, print a default message */
 	if (listhead == nullptr)
 	{
-		core_fprintf(indexfile, "\t\t<tr>\n\t\t\t");
-		core_fprintf(indexfile, "<td colspan=\"%d\" align=\"center\">(No regressions detected)</td>", list_count + 2);
-		core_fprintf(indexfile, "\n\t\t</tr>\n");
+		indexfile.printf("\t\t<tr>\n\t\t\t");
+		indexfile.printf("<td colspan=\"%d\" align=\"center\">(No regressions detected)</td>", list_count + 2);
+		indexfile.printf("\n\t\t</tr>\n");
 	}
 
 	/* iterate over files */
@@ -1083,10 +1083,10 @@ static void append_driver_list_table(const char *header, std::string &dirname, c
 		create_linked_file(dirname, curfile, prevfile, curfile->next, (pngdiffname[0] == 0) ? nullptr : pngdiffname, tempheader, tempfooter);
 
 		/* create a row */
-		core_fprintf(indexfile, "\t\t<tr>\n\t\t\t");
+		indexfile.printf("\t\t<tr>\n\t\t\t");
 		if (rowspan > 0)
-			core_fprintf(indexfile, "<td rowspan=\"%d\">%s</td>", rowspan, curfile->source);
-		core_fprintf(indexfile, "<td><a href=\"%s.html\">%s</a></td>", curfile->name, curfile->name);
+			indexfile.printf("<td rowspan=\"%d\">%s</td>", rowspan, curfile->source);
+		indexfile.printf("<td><a href=\"%s.html\">%s</a></td>", curfile->name, curfile->name);
 		for (listnum = 0; listnum < list_count; listnum++)
 		{
 			int unique_index = -1;
@@ -1094,16 +1094,16 @@ static void append_driver_list_table(const char *header, std::string &dirname, c
 			if (pngdiffname[0] != 0)
 				unique_index = get_unique_index(curfile, listnum);
 			if (unique_index != -1)
-				core_fprintf(indexfile, "<td><span style=\"%s\">&nbsp;&nbsp;&nbsp;</span> %s [<a href=\"%s\" target=\"blank\">%d</a>]</td>", status_color[curfile->status[listnum]], status_text[curfile->status[listnum]], pngdiffname, unique_index);
+				indexfile.printf("<td><span style=\"%s\">&nbsp;&nbsp;&nbsp;</span> %s [<a href=\"%s\" target=\"blank\">%d</a>]</td>", status_color[curfile->status[listnum]], status_text[curfile->status[listnum]], pngdiffname, unique_index);
 			else
-				core_fprintf(indexfile, "<td><span style=\"%s\">&nbsp;&nbsp;&nbsp;</span> %s</td>", status_color[curfile->status[listnum]], status_text[curfile->status[listnum]]);
+				indexfile.printf("<td><span style=\"%s\">&nbsp;&nbsp;&nbsp;</span> %s</td>", status_color[curfile->status[listnum]], status_text[curfile->status[listnum]]);
 		}
-		core_fprintf(indexfile, "\n\t\t</tr>\n");
+		indexfile.printf("\n\t\t</tr>\n");
 
 		/* also print the name and source file */
 		printf("%s %s\n", curfile->name, curfile->source);
 	}
 
 	/* end of table */
-	core_fprintf(indexfile, "</table></p>\n");
+	indexfile.printf("</table></p>\n");
 }

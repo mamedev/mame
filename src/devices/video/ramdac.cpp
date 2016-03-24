@@ -40,7 +40,7 @@ const device_type RAMDAC = &device_creator<ramdac_device>;
 //  ramdac_device - constructor
 //-------------------------------------------------
 
-ramdac_device::ramdac_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ramdac_device::ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RAMDAC, "RAMDAC", tag, owner, clock, "ramdac", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(ramdac_palram)),
@@ -54,7 +54,7 @@ ramdac_device::ramdac_device(const machine_config &mconfig, std::string tag, dev
 //  palette device
 //-------------------------------------------------
 
-void ramdac_device::static_set_palette_tag(device_t &device, std::string tag)
+void ramdac_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<ramdac_device &>(device).m_palette.set_tag(tag);
 }

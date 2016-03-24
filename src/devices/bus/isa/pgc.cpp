@@ -203,7 +203,7 @@ ioport_constructor isa8_pgc_device::device_input_ports() const
 //  isa8_pgc_device - constructor
 //-------------------------------------------------
 
-isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ISA8_PGC, "IBM Professional Graphics Controller", tag, owner, clock, "isa_ibm_pgc", __FILE__),
 	device_isa8_card_interface(mconfig, *this),
 	m_cpu(*this, "maincpu"),
@@ -212,7 +212,7 @@ isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, std::string tag,
 {
 }
 
-isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_isa8_card_interface(mconfig, *this),
 	m_cpu(*this, "maincpu"),

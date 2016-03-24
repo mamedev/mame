@@ -34,7 +34,7 @@ machine_config_constructor cpc_amdrum_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_amdrum_device::cpc_amdrum_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+cpc_amdrum_device::cpc_amdrum_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CPC_AMDRUM, "Amdrum", tag, owner, clock, "cpc_amdrum", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_slot(nullptr),

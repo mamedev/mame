@@ -19,6 +19,7 @@ enum
 	NSC800_RSTB,
 	NSC800_RSTC,
 	Z80_INPUT_LINE_WAIT,
+	Z80_INPUT_LINE_BOGUSWAIT, /* WAIT pin implementation used to be nonexistent, please remove this when all drivers are updated with Z80_INPUT_LINE_WAIT */
 	Z80_INPUT_LINE_BUSRQ
 };
 
@@ -39,16 +40,14 @@ enum
 class z80_device : public cpu_device
 {
 public:
-	z80_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-
-	DECLARE_WRITE_LINE_MEMBER( irq_line );
+	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void z80_set_cycle_tables(const UINT8 *op, const UINT8 *cb, const UINT8 *ed, const UINT8 *xy, const UINT8 *xycb, const UINT8 *ex);
 	template<class _Object> static devcb_base &set_irqack_cb(device_t &device, _Object object) { return downcast<z80_device &>(device).m_irqack_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_refresh_cb(device_t &device, _Object object) { return downcast<z80_device &>(device).m_refresh_cb.set_callback(object); }
 
 protected:
-	z80_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	z80_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -238,6 +237,7 @@ protected:
 	void ei();
 
 	void take_interrupt();
+	void take_nmi();
 
 	// address spaces
 	const address_space_config m_program_config;
@@ -298,7 +298,7 @@ extern const device_type Z80;
 class nsc800_device : public z80_device
 {
 public:
-	nsc800_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

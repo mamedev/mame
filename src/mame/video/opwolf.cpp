@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:David Graves, Jarek Burczynski
 /***************************************************************************
   Functions to emulate video hardware on these Taito games:

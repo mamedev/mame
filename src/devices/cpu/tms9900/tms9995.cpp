@@ -176,7 +176,7 @@ enum
     Constructor
 ****************************************************************************/
 
-tms9995_device::tms9995_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tms9995_device::tms9995_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, TMS9995, "TMS9995", tag, owner, clock, "tms9995", __FILE__),
 		m_state_any(0),
 		PC(0),
@@ -198,7 +198,7 @@ tms9995_device::tms9995_device(const machine_config &mconfig, std::string tag, d
 /*
     Called from subclass.
 */
-tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 		: cpu_device(mconfig, TMS9995, name, tag, owner, clock, shortname, source),
 		m_state_any(0),
 		PC(0),
@@ -269,13 +269,13 @@ void tms9995_device::device_start()
 	// Set up the lookup table for command decoding
 	build_command_lookup_table();
 
-	if (TRACE_CONFIG) logerror("%s: Variant = %s, Overflow int = %s\n", tag().c_str(), m_mp9537? "MP9537 (no on-chip RAM)" : "with on-chip RAM", m_check_overflow? "check" : "no check");
+	if (TRACE_CONFIG) logerror("%s: Variant = %s, Overflow int = %s\n", tag(), m_mp9537? "MP9537 (no on-chip RAM)" : "with on-chip RAM", m_check_overflow? "check" : "no check");
 }
 
 void tms9995_device::device_stop()
 {
 	int k = 0;
-	if (TRACE_CONFIG) logerror("%s: Deleting lookup tables\n", tag().c_str());
+	if (TRACE_CONFIG) logerror("%s: Deleting lookup tables\n", tag());
 	while (m_lotables[k]!=nullptr) delete[] m_lotables[k++];
 }
 

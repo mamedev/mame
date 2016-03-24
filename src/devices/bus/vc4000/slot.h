@@ -33,7 +33,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
 
-	void rom_alloc(UINT32 size, std::string tag);
+	void rom_alloc(UINT32 size, const char *tag);
 	void ram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
 	UINT8* get_ram_base() { return &m_ram[0]; }
@@ -58,7 +58,7 @@ class vc4000_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	vc4000_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	vc4000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~vc4000_cart_slot_device();
 
 	// device-level overrides
@@ -103,7 +103,7 @@ class h21_cart_slot_device : public vc4000_cart_slot_device
 {
 public:
 	// construction/destruction
-	h21_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h21_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~h21_cart_slot_device();
 
 	virtual const char *image_interface() const override { return "h21_cart"; }

@@ -42,7 +42,7 @@ class mc68hc11_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	mc68hc11_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mc68hc11_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O enable flag
 	static void set_has_extended_io(device_t &device, int has_extended_io) { downcast<mc68hc11_cpu_device &>(device).m_has_extended_io = has_extended_io; }

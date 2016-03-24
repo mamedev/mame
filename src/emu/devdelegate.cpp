@@ -21,7 +21,7 @@ delegate_late_bind &device_delegate_helper::bound_object(device_t &search_root)
 {
 	device_t *device = search_root.subdevice(m_device_name);
 	if (device == nullptr)
-		throw emu_fatalerror("Unable to locate device '%s' relative to '%s'\n", m_device_name.c_str(), search_root.tag().c_str());
+		throw emu_fatalerror("Unable to locate device '%s' relative to '%s'\n", m_device_name, search_root.tag());
 	return *device;
 }
 
@@ -31,7 +31,7 @@ delegate_late_bind &device_delegate_helper::bound_object(device_t &search_root)
 //  the object is not valid
 //-------------------------------------------------
 
-std::string device_delegate_helper::safe_tag(device_t *object)
+const char *device_delegate_helper::safe_tag(device_t *object)
 {
 	return (object != nullptr) ? object->tag() : "(unknown)";
 }

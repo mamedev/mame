@@ -129,8 +129,8 @@ const UINT32 mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
 //  ctor
 //-------------------------------------------------
 
-mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,
-		const UINT8 *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, bool supports_partial_body_scanlines, std::string shortname, std::string source)
+mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,
+		const UINT8 *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, bool supports_partial_body_scanlines, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_write_hsync(*this),
 		m_write_fsync(*this),
@@ -546,7 +546,7 @@ const char *mc6847_friend_device::describe_context(void)
 //  ctor
 //-------------------------------------------------
 
-mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, double tpfs, std::string shortname, std::string source) :
+mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, double tpfs, const char *shortname, const char *source) :
 	mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL), tpfs, 25+191, true, shortname, source),
 	m_input_cb(*this),
 	m_black_and_white(false),
@@ -1651,7 +1651,7 @@ mc6847_base_device::artifacter::artifacter()
 void mc6847_base_device::artifacter::setup_config(device_t *device)
 {
 	char port_name[32];
-	snprintf(port_name, ARRAY_LENGTH(port_name), "%s:%s", device->tag().c_str(), ARTIFACTING_TAG);
+	snprintf(port_name, ARRAY_LENGTH(port_name), "%s:%s", device->tag(), ARTIFACTING_TAG);
 	m_config = device->ioport(port_name);
 }
 
@@ -1769,7 +1769,7 @@ const device_type M5C6847P1 = &device_creator<m5c6847p1_device>;
 //  mc6847_ntsc_device
 //-------------------------------------------------
 
-mc6847_ntsc_device::mc6847_ntsc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mc6847_ntsc_device::mc6847_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mc6847_base_device(mconfig, MC6847_NTSC, "MC6847_NTSC", tag, owner, clock, ntsc_square_fontdata8x12, 262.0, "mc6847_ntsc", __FILE__)
 {
 }
@@ -1780,7 +1780,7 @@ mc6847_ntsc_device::mc6847_ntsc_device(const machine_config &mconfig, std::strin
 //  mc6847_pal_device
 //-------------------------------------------------
 
-mc6847_pal_device::mc6847_pal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mc6847_pal_device::mc6847_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mc6847_base_device(mconfig, MC6847_PAL, "MC6847_PAL", tag, owner, clock, pal_square_fontdata8x12, 313.0, "mc6847_pal", __FILE__)
 {
 }
@@ -1791,7 +1791,7 @@ mc6847_pal_device::mc6847_pal_device(const machine_config &mconfig, std::string 
 //  mc6847y_ntsc_device
 //-------------------------------------------------
 
-mc6847y_ntsc_device::mc6847y_ntsc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mc6847y_ntsc_device::mc6847y_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mc6847_base_device(mconfig, MC6847Y_NTSC, "MC6847Y_NTSC", tag, owner, clock, ntsc_square_fontdata8x12, 262.5, "mc6847y", __FILE__)
 {
 }
@@ -1802,7 +1802,7 @@ mc6847y_ntsc_device::mc6847y_ntsc_device(const machine_config &mconfig, std::str
 //  mc6847y_pal_device
 //-------------------------------------------------
 
-mc6847y_pal_device::mc6847y_pal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mc6847y_pal_device::mc6847y_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mc6847_base_device(mconfig, MC6847Y_PAL, "MC6847Y_PAL", tag, owner, clock, pal_square_fontdata8x12, 313.0, "mc6847y_pal", __FILE__)
 {
 }
@@ -1813,7 +1813,7 @@ mc6847y_pal_device::mc6847y_pal_device(const machine_config &mconfig, std::strin
 //  mc6847t1_ntsc_device
 //-------------------------------------------------
 
-mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mc6847_base_device(mconfig, MC6847T1_NTSC, "MC6847T1_NTSC", tag, owner, clock, ntsc_round_fontdata8x12, 262.0, "mc6847t1_ntsc", __FILE__)
 {
 }
@@ -1824,7 +1824,7 @@ mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, std::s
 //  mc6847t1_pal_device
 //-------------------------------------------------
 
-mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mc6847_base_device(mconfig, MC6847T1_PAL, "MC6847T1_PAL", tag, owner, clock, pal_round_fontdata8x12, 313.0, "mc6847t1_pal", __FILE__)
 {
 }
@@ -1835,7 +1835,7 @@ mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, std::str
 //  s68047_device
 //-------------------------------------------------
 
-s68047_device::s68047_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+s68047_device::s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mc6847_base_device(mconfig, S68047, "S68047", tag, owner, clock, s68047_fontdata8x12, 262.0, "s68047", __FILE__)
 {
 }
@@ -1884,7 +1884,7 @@ const UINT32 s68047_device::s_s68047_hack_palette[16] =
 //  m5c6847p1_device
 //-------------------------------------------------
 
-m5c6847p1_device::m5c6847p1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+m5c6847p1_device::m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mc6847_base_device(mconfig, M5C6847P1, "M5C6847P-1", tag, owner, clock, ntsc_square_fontdata8x12, 262.5, "m5c6847p1", __FILE__)
 {
 }

@@ -23,8 +23,8 @@ class isa8_pgc_device :
 {
 public:
 	// construction/destruction
-	isa8_pgc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	isa8_pgc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	isa8_pgc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_pgc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

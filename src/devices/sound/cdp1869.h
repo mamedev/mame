@@ -191,7 +191,7 @@ class cdp1869_device :  public device_t,
 {
 public:
 	// construction/destruction
-	cdp1869_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_pal_ntsc_rd_callback(device_t &device, _Object object) { return downcast<cdp1869_device &>(device).m_read_pal_ntsc.set_callback(object); }
 	template<class _Object> static devcb_base &set_prd_wr_callback(device_t &device, _Object object) { return downcast<cdp1869_device &>(device).m_write_prd.set_callback(object); }

@@ -22,7 +22,7 @@
 const device_type I82371AB = &device_creator<i82371ab_device>;
 
 
-i82371ab_device::i82371ab_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i82371ab_device::i82371ab_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: southbridge_device(mconfig, I82371AB, "Intel 82371AB", tag, owner, clock, "i82371ab", __FILE__),
 		pci_device_interface( mconfig, *this )
 {

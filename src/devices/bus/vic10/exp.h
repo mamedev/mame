@@ -93,7 +93,7 @@ class vic10_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	vic10_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_res_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_res.set_callback(object); }

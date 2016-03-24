@@ -226,7 +226,7 @@ void skns_state::hit_recalc()
 */
 }
 
-WRITE32_MEMBER(skns_state::skns_hit_w)
+WRITE32_MEMBER(skns_state::hit_w)
 //void hit_w(UINT32 adr, UINT32 data, int type)
 {
 	hit_t &hit = m_hit;
@@ -291,7 +291,7 @@ WRITE32_MEMBER(skns_state::skns_hit_w)
 	hit_recalc();
 }
 
-WRITE32_MEMBER(skns_state::skns_hit2_w)
+WRITE32_MEMBER(skns_state::hit2_w)
 {
 	hit_t &hit = m_hit;
 
@@ -324,7 +324,7 @@ WRITE32_MEMBER(skns_state::skns_hit2_w)
 }
 
 
-READ32_MEMBER(skns_state::skns_hit_r)
+READ32_MEMBER(skns_state::hit_r)
 //UINT32 hit_r(UINT32 adr, int type)
 {
 	hit_t &hit = m_hit;
@@ -422,6 +422,46 @@ TIMER_DEVICE_CALLBACK_MEMBER(skns_state::interrupt_callback)
 	m_maincpu->set_input_line(param, HOLD_LINE);
 }
 
+void skns_state::machine_start()
+{
+	m_btiles = memregion("gfx3")->base();
+	
+	save_pointer(NAME(m_btiles), memregion("gfx3")->bytes());
+	save_item(NAME(m_hit.x1p));
+	save_item(NAME(m_hit.y1p));
+	save_item(NAME(m_hit.z1p));
+	save_item(NAME(m_hit.x1s));
+	save_item(NAME(m_hit.y1s));
+	save_item(NAME(m_hit.z1s));
+	save_item(NAME(m_hit.x2p));
+	save_item(NAME(m_hit.y2p));
+	save_item(NAME(m_hit.z2p));
+	save_item(NAME(m_hit.x2s));
+	save_item(NAME(m_hit.y2s));
+	save_item(NAME(m_hit.z2s));
+	save_item(NAME(m_hit.org));
+	save_item(NAME(m_hit.x1_p1));
+	save_item(NAME(m_hit.x1_p2));
+	save_item(NAME(m_hit.y1_p1));
+	save_item(NAME(m_hit.y1_p2));
+	save_item(NAME(m_hit.z1_p1));
+	save_item(NAME(m_hit.z1_p2));
+	save_item(NAME(m_hit.x2_p1));
+	save_item(NAME(m_hit.x2_p2));
+	save_item(NAME(m_hit.y2_p1));
+	save_item(NAME(m_hit.y2_p2));
+	save_item(NAME(m_hit.z2_p1));
+	save_item(NAME(m_hit.z2_p2));
+	save_item(NAME(m_hit.x1tox2));
+	save_item(NAME(m_hit.y1toy2));
+	save_item(NAME(m_hit.z1toz2));
+	save_item(NAME(m_hit.x_in));
+	save_item(NAME(m_hit.y_in));
+	save_item(NAME(m_hit.z_in));
+	save_item(NAME(m_hit.flag));
+	save_item(NAME(m_hit.disconnect));
+}
+
 void skns_state::machine_reset()
 {
 	hit_t &hit = m_hit;
@@ -435,7 +475,7 @@ void skns_state::machine_reset()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(skns_state::skns_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(skns_state::irq)
 {
 	int scanline = param;
 
@@ -456,7 +496,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(skns_state::skns_irq)
 
 CUSTOM_INPUT_MEMBER(skns_state::paddle_r)
 {
-	std::string tag = (const char *)param;
+	const char *tag = (const char *)param;
 	return ioport(tag)->read();
 }
 
@@ -599,7 +639,7 @@ INPUT_PORTS_END
 
 
 
-WRITE32_MEMBER(skns_state::skns_io_w)
+WRITE32_MEMBER(skns_state::io_w)
 {
 	switch(offset) {
 	case 2:
@@ -662,10 +702,8 @@ WRITE32_MEMBER(skns_state::skns_io_w)
 
 /* end old driver code */
 
-WRITE32_MEMBER(skns_state::skns_v3t_w)
+WRITE32_MEMBER(skns_state::v3t_w)
 {
-	UINT8 *btiles = memregion("gfx3")->base();
-
 	COMBINE_DATA(&m_v3t_ram[offset]);
 
 	m_gfxdecode->gfx(1)->mark_dirty(offset/0x40);
@@ -673,15 +711,16 @@ WRITE32_MEMBER(skns_state::skns_v3t_w)
 
 	data = m_v3t_ram[offset];
 // i think we need to swap around to decode .. endian issues?
-	btiles[offset*4+0] = (data & 0xff000000) >> 24;
-	btiles[offset*4+1] = (data & 0x00ff0000) >> 16;
-	btiles[offset*4+2] = (data & 0x0000ff00) >> 8;
-	btiles[offset*4+3] = (data & 0x000000ff) >> 0;
+	
+	m_btiles[offset*4+0] = (data & 0xff000000) >> 24;
+	m_btiles[offset*4+1] = (data & 0x00ff0000) >> 16;
+	m_btiles[offset*4+2] = (data & 0x0000ff00) >> 8;
+	m_btiles[offset*4+3] = (data & 0x000000ff) >> 0;
 }
 
 static ADDRESS_MAP_START( skns_map, AS_PROGRAM, 32, skns_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM /* BIOS ROM */
-	AM_RANGE(0x00400000, 0x0040000f) AM_WRITE(skns_io_w) /* I/O Write */
+	AM_RANGE(0x00400000, 0x0040000f) AM_WRITE(io_w) /* I/O Write */
 	AM_RANGE(0x00400000, 0x00400003) AM_READ_PORT("400000")
 	AM_RANGE(0x00400004, 0x00400007) AM_READ_PORT("400004")
 	/* In between is write only */
@@ -689,18 +728,18 @@ static ADDRESS_MAP_START( skns_map, AS_PROGRAM, 32, skns_state )
 	AM_RANGE(0x00800000, 0x00801fff) AM_RAM AM_SHARE("nvram") /* 'backup' RAM */
 	AM_RANGE(0x00c00000, 0x00c00003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xffff0000) /* ymz280_w (sound) */
 	AM_RANGE(0x01000000, 0x0100000f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0xffffffff)
-	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(skns_hit2_w)
+	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(hit2_w)
 	AM_RANGE(0x02000000, 0x02003fff) AM_RAM AM_SHARE("spriteram") /* sprite ram */
 	AM_RANGE(0x02100000, 0x0210003f) AM_RAM AM_SHARE("spc_regs") /* sprite registers */
-	AM_RANGE(0x02400000, 0x0240007f) AM_RAM_WRITE(skns_v3_regs_w) AM_SHARE("v3_regs") /* tilemap registers */
-	AM_RANGE(0x02500000, 0x02503fff) AM_RAM_WRITE(skns_tilemapA_w) AM_SHARE("tilemapa_ram") /* tilemap A */
-	AM_RANGE(0x02504000, 0x02507fff) AM_RAM_WRITE(skns_tilemapB_w) AM_SHARE("tilemapb_ram") /* tilemap B */
+	AM_RANGE(0x02400000, 0x0240007f) AM_RAM_WRITE(v3_regs_w) AM_SHARE("v3_regs") /* tilemap registers */
+	AM_RANGE(0x02500000, 0x02503fff) AM_RAM_WRITE(tilemapA_w) AM_SHARE("tilemapa_ram") /* tilemap A */
+	AM_RANGE(0x02504000, 0x02507fff) AM_RAM_WRITE(tilemapB_w) AM_SHARE("tilemapb_ram") /* tilemap B */
 	AM_RANGE(0x02600000, 0x02607fff) AM_RAM AM_SHARE("v3slc_ram") /* tilemap linescroll */
-	AM_RANGE(0x02a00000, 0x02a0001f) AM_RAM_WRITE(skns_pal_regs_w) AM_SHARE("pal_regs")
-	AM_RANGE(0x02a40000, 0x02a5ffff) AM_RAM_WRITE(skns_palette_ram_w) AM_SHARE("palette_ram")
-	AM_RANGE(0x02f00000, 0x02f000ff) AM_READWRITE(skns_hit_r, skns_hit_w)
+	AM_RANGE(0x02a00000, 0x02a0001f) AM_RAM_WRITE(pal_regs_w) AM_SHARE("pal_regs")
+	AM_RANGE(0x02a40000, 0x02a5ffff) AM_RAM_WRITE(palette_ram_w) AM_SHARE("palette_ram")
+	AM_RANGE(0x02f00000, 0x02f000ff) AM_READWRITE(hit_r, hit_w)
 	AM_RANGE(0x04000000, 0x041fffff) AM_ROMBANK("bank1") /* GAME ROM */
-	AM_RANGE(0x04800000, 0x0483ffff) AM_RAM_WRITE(skns_v3t_w) AM_SHARE("v3t_ram") /* tilemap b ram based tiles */
+	AM_RANGE(0x04800000, 0x0483ffff) AM_RAM_WRITE(v3t_w) AM_SHARE("v3t_ram") /* tilemap b ram based tiles */
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM AM_SHARE("cache_ram") /* 'cache' RAM */
 ADDRESS_MAP_END
@@ -746,7 +785,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( skns, skns_state )
 	MCFG_CPU_ADD("maincpu", SH2,28638000)
 	MCFG_CPU_PROGRAM_MAP(skns_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", skns_state, skns_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", skns_state, irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 
@@ -765,8 +804,7 @@ static MACHINE_CONFIG_START( skns, skns_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(340,262)
 	MCFG_SCREEN_VISIBLE_AREA(0,319,0,239)
-	MCFG_SCREEN_UPDATE_DRIVER(skns_state, screen_update_skns)
-	MCFG_SCREEN_VBLANK_DRIVER(skns_state, screen_eof_skns)
+	MCFG_SCREEN_UPDATE_DRIVER(skns_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skns_bg)
@@ -944,7 +982,7 @@ READ32_MEMBER(skns_state::sengekij_speedup_r)// 60006ee  600308e
 	return m_main_ram[0xb7380/4];
 }
 
-void skns_state::init_skns()
+void skns_state::init_drc()
 {
 	// init DRC to fastest options
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
@@ -958,25 +996,25 @@ void skns_state::set_drc_pcflush(UINT32 addr)
 	m_maincpu->sh2drc_add_pcflush(addr);
 }
 
-DRIVER_INIT_MEMBER(skns_state,galpani4)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-5,-1); init_skns();  }
-DRIVER_INIT_MEMBER(skns_state,galpanis)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-5,-1); init_skns();  }
-DRIVER_INIT_MEMBER(skns_state,cyvern)     { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+0,+2); init_skns();m_maincpu->space(AS_PROGRAM).install_read_handler(0x604d3c8, 0x604d3cb, read32_delegate(FUNC(skns_state::cyvern_speedup_r),this) );  set_drc_pcflush(0x402ebd2);  }
-DRIVER_INIT_MEMBER(skns_state,galpans2)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60fb6bc, 0x60fb6bf, read32_delegate(FUNC(skns_state::galpans2_speedup_r),this) ); set_drc_pcflush(0x4049ae2); }
-DRIVER_INIT_MEMBER(skns_state,gutsn)      { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+0,+0); init_skns();m_maincpu->space(AS_PROGRAM).install_read_handler(0x600c780, 0x600c783, read32_delegate(FUNC(skns_state::gutsn_speedup_r),this) ); set_drc_pcflush(0x402206e); }
-DRIVER_INIT_MEMBER(skns_state,panicstr)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60f19e4, 0x60f19e7, read32_delegate(FUNC(skns_state::panicstr_speedup_r),this) ); set_drc_pcflush(0x404e68a);  }
-DRIVER_INIT_MEMBER(skns_state,senknow)    { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+1,+1); init_skns();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60000dc, 0x60000df, read32_delegate(FUNC(skns_state::senknow_speedup_r),this) ); set_drc_pcflush(0x4017dce);  }
-DRIVER_INIT_MEMBER(skns_state,puzzloope)  { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6081d38, 0x6081d3b, read32_delegate(FUNC(skns_state::puzzloope_speedup_r),this) ); set_drc_pcflush(0x401da14); }
-DRIVER_INIT_MEMBER(skns_state,puzzloopj)  { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6086714, 0x6086717, read32_delegate(FUNC(skns_state::puzzloopj_speedup_r),this) ); set_drc_pcflush(0x401dca0); }
-DRIVER_INIT_MEMBER(skns_state,puzzloopa)  { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6085bcc, 0x6085bcf, read32_delegate(FUNC(skns_state::puzzloopa_speedup_r),this) ); set_drc_pcflush(0x401d9d4); }
-DRIVER_INIT_MEMBER(skns_state,puzzloopu)  { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6085cec, 0x6085cef, read32_delegate(FUNC(skns_state::puzzloopu_speedup_r),this) ); set_drc_pcflush(0x401dab0); }
-DRIVER_INIT_MEMBER(skns_state,jjparads)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000994, 0x6000997, read32_delegate(FUNC(skns_state::jjparads_speedup_r),this) ); set_drc_pcflush(0x4015e84); }
-DRIVER_INIT_MEMBER(skns_state,jjparad2)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000984, 0x6000987, read32_delegate(FUNC(skns_state::jjparad2_speedup_r),this) ); set_drc_pcflush(0x401620a); }
-DRIVER_INIT_MEMBER(skns_state,ryouran)    { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000a14, 0x6000a17, read32_delegate(FUNC(skns_state::ryouran_speedup_r),this) );  set_drc_pcflush(0x40182ce); }
-DRIVER_INIT_MEMBER(skns_state,teljan)     { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6002fb4, 0x6002fb7, read32_delegate(FUNC(skns_state::teljan_speedup_r),this) ); set_drc_pcflush(0x401ba32); }
-DRIVER_INIT_MEMBER(skns_state,sengekis)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-192,-272); init_skns();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60b74bc, 0x60b74bf, read32_delegate(FUNC(skns_state::sengekis_speedup_r),this) ); set_drc_pcflush(0x60006ec); }
-DRIVER_INIT_MEMBER(skns_state,sengekij)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-192,-272); init_skns();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60b7380, 0x60b7383, read32_delegate(FUNC(skns_state::sengekij_speedup_r),this) ); set_drc_pcflush(0x60006ec); }
-DRIVER_INIT_MEMBER(skns_state,sarukani)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns(); set_drc_pcflush(0x4013b42); } // Speedup is in skns_io_w()
-DRIVER_INIT_MEMBER(skns_state,galpans3)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns();  }
+DRIVER_INIT_MEMBER(skns_state,galpani4)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-5,-1); init_drc();  }
+DRIVER_INIT_MEMBER(skns_state,galpanis)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-5,-1); init_drc();  }
+DRIVER_INIT_MEMBER(skns_state,cyvern)     { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+0,+2); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x604d3c8, 0x604d3cb, read32_delegate(FUNC(skns_state::cyvern_speedup_r),this) );  set_drc_pcflush(0x402ebd2);  }
+DRIVER_INIT_MEMBER(skns_state,galpans2)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60fb6bc, 0x60fb6bf, read32_delegate(FUNC(skns_state::galpans2_speedup_r),this) ); set_drc_pcflush(0x4049ae2); }
+DRIVER_INIT_MEMBER(skns_state,gutsn)      { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+0,+0); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x600c780, 0x600c783, read32_delegate(FUNC(skns_state::gutsn_speedup_r),this) ); set_drc_pcflush(0x402206e); }
+DRIVER_INIT_MEMBER(skns_state,panicstr)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60f19e4, 0x60f19e7, read32_delegate(FUNC(skns_state::panicstr_speedup_r),this) ); set_drc_pcflush(0x404e68a);  }
+DRIVER_INIT_MEMBER(skns_state,senknow)    { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+1,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60000dc, 0x60000df, read32_delegate(FUNC(skns_state::senknow_speedup_r),this) ); set_drc_pcflush(0x4017dce);  }
+DRIVER_INIT_MEMBER(skns_state,puzzloope)  { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6081d38, 0x6081d3b, read32_delegate(FUNC(skns_state::puzzloope_speedup_r),this) ); set_drc_pcflush(0x401da14); }
+DRIVER_INIT_MEMBER(skns_state,puzzloopj)  { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6086714, 0x6086717, read32_delegate(FUNC(skns_state::puzzloopj_speedup_r),this) ); set_drc_pcflush(0x401dca0); }
+DRIVER_INIT_MEMBER(skns_state,puzzloopa)  { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6085bcc, 0x6085bcf, read32_delegate(FUNC(skns_state::puzzloopa_speedup_r),this) ); set_drc_pcflush(0x401d9d4); }
+DRIVER_INIT_MEMBER(skns_state,puzzloopu)  { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6085cec, 0x6085cef, read32_delegate(FUNC(skns_state::puzzloopu_speedup_r),this) ); set_drc_pcflush(0x401dab0); }
+DRIVER_INIT_MEMBER(skns_state,jjparads)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000994, 0x6000997, read32_delegate(FUNC(skns_state::jjparads_speedup_r),this) ); set_drc_pcflush(0x4015e84); }
+DRIVER_INIT_MEMBER(skns_state,jjparad2)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000984, 0x6000987, read32_delegate(FUNC(skns_state::jjparad2_speedup_r),this) ); set_drc_pcflush(0x401620a); }
+DRIVER_INIT_MEMBER(skns_state,ryouran)    { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000a14, 0x6000a17, read32_delegate(FUNC(skns_state::ryouran_speedup_r),this) );  set_drc_pcflush(0x40182ce); }
+DRIVER_INIT_MEMBER(skns_state,teljan)     { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6002fb4, 0x6002fb7, read32_delegate(FUNC(skns_state::teljan_speedup_r),this) ); set_drc_pcflush(0x401ba32); }
+DRIVER_INIT_MEMBER(skns_state,sengekis)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-192,-272); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60b74bc, 0x60b74bf, read32_delegate(FUNC(skns_state::sengekis_speedup_r),this) ); set_drc_pcflush(0x60006ec); }
+DRIVER_INIT_MEMBER(skns_state,sengekij)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-192,-272); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60b7380, 0x60b7383, read32_delegate(FUNC(skns_state::sengekij_speedup_r),this) ); set_drc_pcflush(0x60006ec); }
+DRIVER_INIT_MEMBER(skns_state,sarukani)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_drc(); set_drc_pcflush(0x4013b42); } // Speedup is in io_w()
+DRIVER_INIT_MEMBER(skns_state,galpans3)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_drc();  }
 
 
 

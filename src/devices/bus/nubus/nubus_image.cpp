@@ -34,7 +34,7 @@ class messimg_disk_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	messimg_disk_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_QUICKLOAD; }
@@ -68,7 +68,7 @@ extern const device_type MESSIMG_DISK;
 
 const device_type MESSIMG_DISK = &device_creator<messimg_disk_image_device>;
 
-messimg_disk_image_device::messimg_disk_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+messimg_disk_image_device::messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MESSIMG_DISK, "Mac image", tag, owner, clock, "messimg_disk_image", __FILE__),
 		device_image_interface(mconfig, *this), m_size(0), m_data(nullptr), m_ejected(false)
 {
@@ -173,13 +173,13 @@ const rom_entry *nubus_image_device::device_rom_region() const
 //  nubus_image_device - constructor
 //-------------------------------------------------
 
-nubus_image_device::nubus_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+nubus_image_device::nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, NUBUS_IMAGE, "Disk Image Pseudo-Card", tag, owner, clock, "nb_image", __FILE__),
 		device_nubus_card_interface(mconfig, *this), m_image(nullptr)
 {
 }
 
-nubus_image_device::nubus_image_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+nubus_image_device::nubus_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_nubus_card_interface(mconfig, *this), m_image(nullptr)
 {
@@ -310,7 +310,7 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 		strcpy(fullpath, (const char *)filectx.curdir);
 		strcat(fullpath, "/");
 		strcat(fullpath, (const char*)filectx.filename);
-		if(osd_open((const char*)fullpath, OPEN_FLAG_READ, &filectx.fd, &filectx.filelen) != FILERR_NONE) printf("Error opening %s\n", fullpath);
+		if(osd_file::open(std::string(fullpath), OPEN_FLAG_READ, filectx.fd, filectx.filelen) != osd_file::error::NONE) printf("Error opening %s\n", fullpath);
 		filectx.bytecount = 0;
 		break;
 	case kFileCmdPutFile:
@@ -318,7 +318,7 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 		strcpy(fullpath, (const char *)filectx.curdir);
 		strcat(fullpath, "/");
 		strcat(fullpath, (const char*)filectx.filename);
-		if(osd_open((const char*)fullpath, OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, &filectx.fd, &filesize) != FILERR_NONE) printf("Error opening %s\n", fullpath);
+		if(osd_file::open(std::string(fullpath), OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, filectx.fd, filesize) != osd_file::error::NONE) printf("Error opening %s\n", fullpath);
 		filectx.bytecount = 0;
 		break;
 	}
@@ -331,33 +331,31 @@ READ32_MEMBER( nubus_image_device::file_cmd_r )
 
 WRITE32_MEMBER( nubus_image_device::file_data_w )
 {
-	UINT32 count = 4;
-	UINT32 actualcount = 0;
+	std::uint32_t count = 4;
+	std::uint32_t actualcount = 0;
 
 	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
-	if(filectx.fd != nullptr) {
+	if(filectx.fd) {
 		//data = ni_ntohl(data);
 		if((filectx.bytecount + count) > filectx.filelen) count = filectx.filelen - filectx.bytecount;
-		osd_write(filectx.fd, &data, filectx.bytecount, count, &actualcount);
+		filectx.fd->write(&data, filectx.bytecount, count, actualcount);
 		filectx.bytecount += actualcount;
 
 		if(filectx.bytecount >= filectx.filelen) {
-			osd_close(filectx.fd);
-			filectx.fd = nullptr;
+			filectx.fd.reset();
 		}
 	}
 }
 
 READ32_MEMBER( nubus_image_device::file_data_r )
 {
-	if(filectx.fd != nullptr) {
-		UINT32 ret;
-		UINT32 actual = 0;
-		osd_read(filectx.fd, &ret, filectx.bytecount, sizeof(ret), &actual);
+	if(filectx.fd) {
+		std::uint32_t ret;
+		std::uint32_t actual = 0;
+		filectx.fd->read(&ret, filectx.bytecount, sizeof(ret), actual);
 		filectx.bytecount += actual;
 		if(actual < sizeof(ret)) {
-			osd_close(filectx.fd);
-			filectx.fd = nullptr;
+			filectx.fd.reset();
 		}
 		return ni_htonl(ret);
 	}

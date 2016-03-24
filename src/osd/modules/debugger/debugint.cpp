@@ -1495,7 +1495,7 @@ static void handle_keys(running_machine &machine)
 			debug_cpu_get_visible_cpu(machine)->debug()->go();
 		}
 	}
-	
+
 	if(machine.input().code_pressed_once(KEYCODE_F5))
 		debug_cpu_get_visible_cpu(machine)->debug()->go();
 	if(machine.input().code_pressed_once(KEYCODE_F6))
@@ -1556,7 +1556,7 @@ static void handle_keys(running_machine &machine)
 
 			set_focus_view(ndv);
 		}
-	}	
+	}
 	if(machine.input().code_pressed_once(KEYCODE_L))
 	{
 		if(machine.input().code_pressed(KEYCODE_LCONTROL))
@@ -1619,7 +1619,7 @@ static void handle_keys(running_machine &machine)
 		}
 	}
 
-	
+
 	// pass keypresses to debug view with focus
 	if(machine.input().code_pressed_once(KEYCODE_UP))
 		focus_view->view->process_char(DCH_UP);
@@ -1763,8 +1763,6 @@ static void handle_menus(running_machine &machine)
 
 static void followers_set_cpu(device_t *device)
 {
-	std::string title;
-
 	for (DView *dv = list; dv != nullptr; dv = dv->next)
 	{
 		if (dview_is_state(dv, VIEW_STATE_FOLLOW_CPU))
@@ -1775,8 +1773,7 @@ static void followers_set_cpu(device_t *device)
 			case DVT_DISASSEMBLY:
 			case DVT_STATE:
 				dv->view->set_source(*source);
-				strprintf(title, "%s", source->name());
-				dview_set_title(dv, title);
+				dview_set_title(dv, string_format("%s", source->name()));
 				break;
 			}
 		}

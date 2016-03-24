@@ -89,7 +89,7 @@ struct keyboard_t
 class mbc55x_state : public driver_device
 {
 public:
-	mbc55x_state(const machine_config &mconfig, device_type type, std::string tag)
+	mbc55x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
 		m_crtc(*this, VID_MC6845_NAME),

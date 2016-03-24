@@ -25,7 +25,7 @@
 class beckerport_device : public device_t
 {
 public:
-	beckerport_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	beckerport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~beckerport_device();
 
 	// optional information overrides
@@ -57,7 +57,7 @@ private:
 	required_ioport         m_dwconfigport;
 	int                     m_dwtcpport;
 
-	osd_file *m_pSocket;
+	osd_file::ptr m_pSocket;
 
 	unsigned int m_rx_pending;
 	unsigned int m_head;

@@ -42,7 +42,7 @@ static const int div_tab[4] = { 1, 4, 8, 16 };
 const device_type MC68HC11 = &device_creator<mc68hc11_cpu_device>;
 
 
-mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, MC68HC11, "MC68HC11", tag, owner, clock, "mc68hc11", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0 )
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
@@ -453,7 +453,7 @@ void mc68hc11_cpu_device::state_string_export(const device_state_entry &entry, s
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				(m_ccr & CC_S) ? 'S' : '.',
 				(m_ccr & CC_X) ? 'X' : '.',
 				(m_ccr & CC_H) ? 'H' : '.',

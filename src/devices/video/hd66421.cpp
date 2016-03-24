@@ -116,7 +116,7 @@ inline void hd66421_device::writebyte(offs_t address, UINT8 data)
 //  hd66421_device - constructor
 //-------------------------------------------------
 
-hd66421_device::hd66421_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+hd66421_device::hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HD66421, "Hitachi HD66421 LCD Controller", tag, owner, clock, "hd66421", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(hd66421)),

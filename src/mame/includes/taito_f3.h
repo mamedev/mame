@@ -52,10 +52,10 @@ public:
 		TIMER_F3_INTERRUPT3
 	};
 
-	taito_f3_state(const machine_config &mconfig, device_type type, std::string tag)
+	taito_f3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
+		m_audiocpu(*this, "taito_en:audiocpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),

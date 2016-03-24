@@ -11,9 +11,9 @@ class atari_maria_device :  public device_t
 {
 public:
 	// construction/destruction
-	atari_maria_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	atari_maria_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void set_cpu_tag(device_t &device, std::string tag) { downcast<atari_maria_device &>(device).m_cpu_tag = tag; }
+	static void set_cpu_tag(device_t &device, const char *tag) { downcast<atari_maria_device &>(device).m_cpu_tag = tag; }
 
 	void interrupt(int lines);
 	void startdma(int lines);
@@ -55,7 +55,7 @@ private:
 	int is_holey(unsigned int addr);
 	int write_line_ram(int addr, UINT8 offset, int pal);
 
-	std::string m_cpu_tag;
+	const char *m_cpu_tag;
 	cpu_device *m_cpu;  // CPU whose space(AS_PROGRAM) serves as DMA source
 	screen_device *m_screen;
 };

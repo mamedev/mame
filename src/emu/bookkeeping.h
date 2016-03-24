@@ -44,14 +44,14 @@ public:
 	// increment the number of dispensed tickets
 	void increment_dispensed_tickets(int delta);
 
-	// ----- coin counters ----- 
+	// ----- coin counters -----
 	// write to a particular coin counter (clocks on active high edge)
 	void coin_counter_w(int num, int on);
 
 	// return the coin count for a given coin
 	int coin_counter_get_count(int num);
 
-	// enable/disable coin lockout for a particular coin 
+	// enable/disable coin lockout for a particular coin
 	void coin_lockout_w(int num, int on);
 
 	// return current lockout state for a particular coin

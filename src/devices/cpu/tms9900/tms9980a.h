@@ -26,7 +26,7 @@ enum
 class tms9980a_device : public tms99xx_device
 {
 public:
-	tms9980a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms9980a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	void        mem_read(void) override;

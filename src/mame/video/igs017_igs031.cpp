@@ -75,7 +75,7 @@ GFXDECODE_END
 
 const device_type IGS017_IGS031 = &device_creator<igs017_igs031_device>;
 
-igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, IGS017_IGS031, "IGS017_IGS031", tag, owner, clock, "igs017_igs031", __FILE__),
 		device_gfx_interface(mconfig, *this, gfxinfo),
 		device_video_interface(mconfig, *this),
@@ -374,7 +374,7 @@ int igs017_igs031_device::debug_viewer(bitmap_ind16 &bitmap,const rectangle &cli
 		popmessage("a: %08X w: %03X p: %02x-%02x-%02x",a,w,m_sprites_gfx[a/3*3+0],m_sprites_gfx[a/3*3+1],m_sprites_gfx[a/3*3+2]);
 		m_debug_addr = a;
 		m_debug_width = w;
-		osd_sleep(200000);
+		osd_sleep(osd_ticks_per_second() / 1000 * 200);
 		return 1;
 	}
 #endif

@@ -987,7 +987,6 @@ void pcw16_state::machine_start()
 	m_interrupt_counter = 0;
 
 	m_beeper->set_state(0);
-	m_beeper->set_frequency(3750);
 }
 
 static INPUT_PORTS_START(pcw16)
@@ -1049,7 +1048,7 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3750)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */

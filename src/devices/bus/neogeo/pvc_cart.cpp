@@ -18,7 +18,7 @@
 const device_type NEOGEO_PVC_CART = &device_creator<neogeo_pvc_cart>;
 
 
-neogeo_pvc_cart::neogeo_pvc_cart(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT16 clock, std::string shortname, std::string source)
+neogeo_pvc_cart::neogeo_pvc_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_neogeo_cart_interface(mconfig, *this),
 	m_banked_cart(*this, "banked_cart"),
@@ -28,7 +28,7 @@ neogeo_pvc_cart::neogeo_pvc_cart(const machine_config &mconfig, device_type type
 {
 }
 
-neogeo_pvc_cart::neogeo_pvc_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT16 clock)
+neogeo_pvc_cart::neogeo_pvc_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock)
 	: device_t(mconfig, NEOGEO_PVC_CART, "NEOGEO PCM2 Cart", tag, owner, clock, "neogeo_rom", __FILE__),
 	device_neogeo_cart_interface(mconfig, *this),
 	m_banked_cart(*this, "banked_cart"),
@@ -83,7 +83,7 @@ machine_config_constructor neogeo_pvc_cart::device_mconfig_additions() const
 
 const device_type NEOGEO_PVC_MSLUG5_CART = &device_creator<neogeo_pvc_mslug5_cart>;
 
-neogeo_pvc_mslug5_cart::neogeo_pvc_mslug5_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_pvc_cart(mconfig, NEOGEO_PVC_MSLUG5_CART, "NEOGEO PCM2 mslug5 Cart", tag, owner, clock, "p2_mslug5_cart", __FILE__) {}
+neogeo_pvc_mslug5_cart::neogeo_pvc_mslug5_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_pvc_cart(mconfig, NEOGEO_PVC_MSLUG5_CART, "NEOGEO PCM2 mslug5 Cart", tag, owner, clock, "p2_mslug5_cart", __FILE__) {}
 
 void neogeo_pvc_mslug5_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 {
@@ -99,7 +99,7 @@ void neogeo_pvc_mslug5_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_PVC_SVC_CART = &device_creator<neogeo_pvc_svc_cart>;
 
-neogeo_pvc_svc_cart::neogeo_pvc_svc_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_pvc_cart(mconfig, NEOGEO_PVC_SVC_CART, "NEOGEO PCM2 svc Cart", tag, owner, clock, "p2_svc_cart", __FILE__) {}
+neogeo_pvc_svc_cart::neogeo_pvc_svc_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_pvc_cart(mconfig, NEOGEO_PVC_SVC_CART, "NEOGEO PCM2 svc Cart", tag, owner, clock, "p2_svc_cart", __FILE__) {}
 
 void neogeo_pvc_svc_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 {
@@ -116,7 +116,7 @@ void neogeo_pvc_svc_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_PVC_KOF2003_CART = &device_creator<neogeo_pvc_kof2003_cart>;
 
-neogeo_pvc_kof2003_cart::neogeo_pvc_kof2003_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_pvc_cart(mconfig, NEOGEO_PVC_KOF2003_CART, "NEOGEO PCM2 kof2003 Cart", tag, owner, clock, "p2_kof2003_cart", __FILE__) {}
+neogeo_pvc_kof2003_cart::neogeo_pvc_kof2003_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_pvc_cart(mconfig, NEOGEO_PVC_KOF2003_CART, "NEOGEO PCM2 kof2003 Cart", tag, owner, clock, "p2_kof2003_cart", __FILE__) {}
 
 void neogeo_pvc_kof2003_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 {
@@ -128,7 +128,7 @@ void neogeo_pvc_kof2003_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_PVC_KOF2003H_CART = &device_creator<neogeo_pvc_kof2003h_cart>;
 
-neogeo_pvc_kof2003h_cart::neogeo_pvc_kof2003h_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) : neogeo_pvc_cart(mconfig, NEOGEO_PVC_KOF2003H_CART, "NEOGEO PCM2 kof2003h Cart", tag, owner, clock, "p2_kof2003h_cart", __FILE__) {}
+neogeo_pvc_kof2003h_cart::neogeo_pvc_kof2003h_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : neogeo_pvc_cart(mconfig, NEOGEO_PVC_KOF2003H_CART, "NEOGEO PCM2 kof2003h Cart", tag, owner, clock, "p2_kof2003h_cart", __FILE__) {}
 
 void neogeo_pvc_kof2003h_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 {

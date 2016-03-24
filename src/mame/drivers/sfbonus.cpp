@@ -143,7 +143,7 @@ Model No. S2000-B
 Graphics: HM86171
      OSC: 25.000MHz, 12.000MHz & 4.9152MHz
    Sound: OKI M6295
-   Other: XILINX XC9536XL (socketted)
+   Other: XILINX XC9536XL (socketed)
 
 HM86171-120 - HMC 28 pin DIP Color Palette RAMDAC
    ULN2003A - 16 pin DIP Seven Darlington Arrays
@@ -195,7 +195,7 @@ Model No. S2000C SALTIRE
   +----------+-------+-------------------------------+
 
 Basically the same as the VCG-1 SALTIRE below, but the
-XILINX chip is socketted and no H1 or H2 connector.
+XILINX chip is socketed and no H1 or H2 connector.
 
 ------------------------------------------------------------
 
@@ -283,7 +283,7 @@ MH86171 Color Palette RAMDAC
 class sfbonus_state : public driver_device
 {
 public:
-	sfbonus_state(const machine_config &mconfig, device_type type, std::string tag)
+	sfbonus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -294,7 +294,9 @@ public:
 		m_2801_regs(*this, "2801_regs"),
 		m_2c01_regs(*this, "2c01_regs"),
 		m_3000_regs(*this, "3000_regs"),
-		m_3800_regs(*this, "3800_regs")  { }
+		m_3800_regs(*this, "3800_regs")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -5843,9 +5845,6 @@ ROM_START( amclink )
 	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 )
 ROM_END
 
-//ROM_REGION( 0x80000, "user1", 0 ) /* Z80 Code */
-//ROM_LOAD( "dummy.rom", 0x00000, 0x40000, CRC(1) SHA1(1) )
-
 DRIVER_INIT_MEMBER(sfbonus_state,sfbonus_common)
 {
 	m_tilemap_ram = std::make_unique<UINT8[]>(0x4000);
@@ -5873,46 +5872,6 @@ DRIVER_INIT_MEMBER(sfbonus_state,sfbonus_common)
 	memset(m_videoram.get(), 0xff, 0x10000);
 
 	save_pointer(NAME(m_videoram.get()), 0x10000);
-
-	// dummy.rom helper
-	{
-		UINT8 *ROM = memregion("maincpu")->base();
-		int length = memregion("maincpu")->bytes();
-		UINT8* ROM2 = memregion("user1")->base();
-
-		if (ROM2)
-		{
-			printf("X %02x %02x %02x %02x %02x %02x %02x %02x\n", ROM[0x50], ROM[0x51], ROM[0x52], ROM[0x53], ROM[0x54], ROM[0x55],ROM[0x56],ROM[0x57]);
-
-			{
-				int x;
-				int y;
-				for (y = 0; y < 0x8; y++)
-				{
-					printf("@Echo Off\n");
-					printf("a.exe ");
-					for (x = 0; x < 0x20 * 0x8; x += 0x8)
-					{
-						printf("%02x %02x ", ROM[x + y], ROM2[x + y]);
-					}
-					printf("\n");
-				}
-
-			}
-
-			{
-				FILE *fp;
-				char filename[256];
-				sprintf(filename,"decr_%s", machine().system().name);
-				fp = fopen(filename, "w+b");
-				if (fp)
-				{
-					fwrite(ROM, length, 1, fp);
-					fclose(fp);
-				}
-			}
-		}
-	}
 }
 
 void sfbonus_state::sfbonus_bitswap(
@@ -6348,8 +6307,6 @@ GAME( 2006, version4o,   version4, sfbonus,    amcoe1_reels3, sfbonus_state,    
 // Known sets but no roms dumped at all for these:
 // Merry Circus
 // Devil Island - 14 Liner version
-// Fruit Bonus 2010 (or is this on the older goldstar.c style hardware)
-
 
 // ?? what is this
 GAME( 200?, amclink,     0,        sfbonus,    amcoe1_reels3, sfbonus_state,    sfbonus_common,  ROT0,  "Amcoe", "Amcoe Link Control Box (Version 2.2)", MACHINE_NOT_WORKING)

@@ -26,8 +26,6 @@ static int verbose = VERBOSE;
 #define LOG1(d,x) { if (verbose > 0) LOG(d,x)}
 #define LOG2(d,x) { if (verbose > 1) LOG(d,x)}
 
-#define  MAINCPU "maincpu"
-
 #ifdef LSB_FIRST
 static UINT16 uint16_to_le(UINT16 value)
 {
@@ -303,7 +301,7 @@ const device_type ISA16_3C505 = &device_creator<threecom3c505_device> ;
 // threecom3c505_device - constructor
 //-------------------------------------------------
 
-threecom3c505_device::threecom3c505_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+threecom3c505_device::threecom3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ISA16_3C505, "3Com 3C505 Network Adaptor", tag, owner, clock, "3c505", __FILE__),
 	device_network_interface(mconfig, *this, 10.0f),
 	device_isa16_card_interface(mconfig, *this),
@@ -313,7 +311,7 @@ threecom3c505_device::threecom3c505_device(const machine_config &mconfig, std::s
 {
 }
 
-threecom3c505_device::threecom3c505_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock)
+threecom3c505_device::threecom3c505_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, "3Com 3C505 Network Adaptor", tag, owner, clock, "3c505", __FILE__),
 	device_network_interface(mconfig, *this, 10.0f),
 	device_isa16_card_interface(mconfig, *this),
@@ -424,7 +422,7 @@ const char *threecom3c505_device::cpu_context()
 {
 	static char statebuf[64]; /* string buffer containing state description */
 
-	device_t *cpu = machine().device(MAINCPU);
+	device_t *cpu = machine().firstcpu;
 	osd_ticks_t t = osd_ticks();
 	int s = t / osd_ticks_per_second();
 	int ms = (t % osd_ticks_per_second()) / 1000;
@@ -432,14 +430,24 @@ const char *threecom3c505_device::cpu_context()
 	/* if we have an executing CPU, output data */
 	if (cpu != nullptr)
 	{
-		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag().c_str(),
-				cpu->safe_pcbase(), tag().c_str());
+		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag(),
+				cpu->safe_pcbase(), tag());
 	}
 	else
 	{
 		sprintf(statebuf, "%d.%03d", s, ms);
 	}
 	return statebuf;
+}
+
+/*-------------------------------------------------
+ logerror - log an error message (w/o device tags)
+ -------------------------------------------------*/
+
+template <typename Format, typename... Params>
+void threecom3c505_device::logerror(Format &&fmt, Params &&... args) const
+{
+	machine().logerror(std::forward<Format>(fmt), std::forward<Params>(args)...);
 }
 
 //**************************************************************************
@@ -855,8 +863,8 @@ void threecom3c505_device::do_receive_command()
 
 void threecom3c505_device::set_command_pending(int state)
 {
-	LOG2(this,("set_command_pending %d -> %d m_wait_for_ack=%d m_wait_for_nak=%d m_rx_pending=%d%s",
-					m_command_pending, state, m_wait_for_ack, m_wait_for_nak, m_rx_pending, state ? "" :"\n"));
+	LOG2(this,("set_command_pending %d -> %d m_wait_for_ack=%d m_wait_for_nak=%d m_rx_pending=%d",
+					m_command_pending, state, m_wait_for_ack, m_wait_for_nak, m_rx_pending));
 
 //- verbose = onoff ? 1 : 2;
 
@@ -1657,7 +1665,7 @@ void threecom3c505_device::set_verbose(int on_off)
 
 int threecom3c505_device::tx_data(device_t *device, const UINT8 data[], int length)
 {
-	LOG1(device,("threecom3c505_device::tx_data length=%d", length));
+	LOG1(this,("threecom3c505_device::tx_data length=%d", length));
 	return 1;
 }
 

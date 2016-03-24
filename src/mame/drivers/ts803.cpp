@@ -61,7 +61,7 @@ PAGE SEL bit in PORT0 set to 1:
 class ts803_state : public driver_device
 {
 public:
-	ts803_state(const machine_config &mconfig, device_type type, std::string tag)
+	ts803_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
@@ -124,20 +124,20 @@ ADDRESS_MAP_END
 
 I/0 Port Addresses
 
-System Status Switch 1									00
-Diagnostic Indicators 1 and 2							10
-Diagnostic Indicators 3 and 4							11
-RS-422 Control and Auto Wait							12
-Memory Bank Select										13
-STI Device (modem)										20-2F
-DART Dual Asynchronous Receiver Transmitter 
-Device (keyboard, printer, mouse)						30-33
-RS-422 SIO Device·										40-43
-Floppy Disk Controller									80-83
-Floppy Disk Drive Decoder								90
-Winchester Disk Controller Reset						A0
-Winchester Disk Controller								B0-BF
-Graphics Controller										C0-CF
+System Status Switch 1                                  00
+Diagnostic Indicators 1 and 2                           10
+Diagnostic Indicators 3 and 4                           11
+RS-422 Control and Auto Wait                            12
+Memory Bank Select                                      13
+STI Device (modem)                                      20-2F
+DART Dual Asynchronous Receiver Transmitter
+Device (keyboard, printer, mouse)                       30-33
+RS-422 SIO Device                                       40-43
+Floppy Disk Controller                                  80-83
+Floppy Disk Drive Decoder                               90
+Winchester Disk Controller Reset                        A0
+Winchester Disk Controller                              B0-BF
+Graphics Controller                                     C0-CF
 
 */
 static ADDRESS_MAP_START(ts803_io, AS_IO, 8, ts803_state)
@@ -176,7 +176,7 @@ WRITE8_MEMBER( ts803_state::keyboard_put )
 		//m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 
 		if (data==0x0d) m_maincpu->space(AS_PROGRAM).write_byte(0xf83f,0xC1);
-		else 
+		else
 		{
 			m_maincpu->space(AS_PROGRAM).write_byte(0xf83f,0x4f);
 			m_maincpu->space(AS_PROGRAM).write_byte(0xf890,data);
@@ -260,7 +260,7 @@ READ8_MEMBER( ts803_state::ts803_porthi_r )
 WRITE8_MEMBER( ts803_state::ts803_porthi_w )
 {
 	//printf("PortHI write [%2x] [%2x]\n",offset+0x91,data);
-	
+
 	switch (offset+0x91)
 	{
 		case 0xc4:
@@ -416,11 +416,11 @@ WRITE8_MEMBER( ts803_state::crtc_controlreg_w )
 {
 /*
 Bit 0 = 0 alpha mode
-				1 graphics mode
+                1 graphics mode
 Bit 1 = 0 page 1 (alpha mode only)
-				1 page 2 (alpha mode only)
+                1 page 2 (alpha mode only)
 Bit 2 = 0 alpha memory access (round off)
-				1 graphics memory access (normal CPU address)
+                1 graphics memory access (normal CPU address)
 */
 
 	//printf("CRTC::c4 write [%2x]\n",data);
@@ -496,12 +496,12 @@ static MACHINE_CONFIG_START( ts803, ts803_state )
 	MCFG_CPU_CONFIG(daisy_chain)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640,240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* crtc */
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 13608000 / 8)

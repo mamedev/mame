@@ -13,8 +13,8 @@ class msx_slot_rom_device : public device_t,
 							public msx_internal_slot_interface
 {
 public:
-	msx_slot_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	msx_slot_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	msx_slot_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	msx_slot_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void set_rom_start(device_t &device, const char *region, UINT32 offset);

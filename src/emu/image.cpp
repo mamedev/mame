@@ -55,7 +55,7 @@ image_manager::image_manager(running_machine &machine)
 				unload_all();
 
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
-					image->device().name().c_str(),
+					image->device().name(),
 					image_basename.c_str(),
 					image_err.c_str());
 			}
@@ -155,8 +155,8 @@ int image_manager::write_config(emu_options &options, const char *filename, cons
 	}
 
 	emu_file file(options.ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-	file_error filerr = file.open(filename);
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = file.open(filename);
+	if (filerr == osd_file::error::NONE)
 	{
 		std::string inistring = options.output_ini();
 		file.puts(inistring.c_str());
@@ -231,16 +231,15 @@ void image_manager::postdevice_init()
 			{
 				/* retrieve image error message */
 				std::string image_err = std::string(image->error());
-				
+
 				/* unload all images */
 				unload_all();
 
 				fatalerror_exitcode(machine(), MAMERR_DEVICE, "Device %s load failed: %s",
-					image->device().name().c_str(),
+					image->device().name(),
 					image_err.c_str());
 			}
 	}
 	/* add a callback for when we shut down */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(image_manager::unload_all), this));
 }
-

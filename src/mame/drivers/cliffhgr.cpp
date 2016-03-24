@@ -89,7 +89,7 @@ Side 2 = 0x8F7DDD (or 0x880000 | ( 0x77 << 12 ) | 0x0DDD)
 class cliffhgr_state : public driver_device
 {
 public:
-	cliffhgr_state(const machine_config &mconfig, device_type type, std::string tag)
+	cliffhgr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc"),
 			m_port_bank(0),

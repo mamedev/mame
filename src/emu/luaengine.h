@@ -24,6 +24,8 @@
 #undef None
 #endif
 
+class cheat_manager;
+
 struct lua_State;
 namespace luabridge
 {
@@ -45,9 +47,11 @@ public:
 	void serve_lua();
 	void periodic_check();
 	bool frame_hook();
+	void execute_function(const char *id);
 
 	void resume(lua_State *L, int nparam = 0, lua_State *root = nullptr);
 	void set_machine(running_machine *machine) { m_machine = machine; update_machine(); }
+	void attach_notifiers();
 private:
 	struct hook {
 		lua_State *L;
@@ -78,6 +82,13 @@ private:
 	running_machine &machine() const { return *m_machine; }
 
 	void update_machine();
+
+	void on_machine_start();
+	void on_machine_stop();
+	void on_machine_pause();
+	void on_machine_resume();
+	void on_machine_frame();
+
 	void output_notifier(const char *outname, INT32 value);
 	static void s_output_notifier(const char *outname, INT32 value, void *param);
 
@@ -102,14 +113,27 @@ private:
 	static int l_emu_pause(lua_State *L);
 	static int l_emu_unpause(lua_State *L);
 	static int l_emu_set_hook(lua_State *L);
+	static int l_emu_register_start(lua_State *L);
+	static int l_emu_register_stop(lua_State *L);
+	static int l_emu_register_pause(lua_State *L);
+	static int l_emu_register_resume(lua_State *L);
+	static int l_emu_register_frame(lua_State *L);
+	static int register_function(lua_State *L, const char *id);
 
 	// "emu.machine" namespace
 	static luabridge::LuaRef l_machine_get_devices(const running_machine *r);
+	static luabridge::LuaRef l_ioport_get_ports(const ioport_manager *i);
+	static luabridge::LuaRef l_render_get_targets(const render_manager *r);
+	static luabridge::LuaRef l_ioports_port_get_fields(const ioport_port *i);
 	static luabridge::LuaRef devtree_dfs(device_t *root, luabridge::LuaRef dev_table);
 	static luabridge::LuaRef l_dev_get_states(const device_t *d);
 	static UINT64 l_state_get_value(const device_state_entry *d);
 	static void l_state_set_value(device_state_entry *d, UINT64 v);
 	static luabridge::LuaRef l_dev_get_memspaces(const device_t *d);
+	struct lua_machine {
+		int l_popmessage(lua_State *L);
+		int l_logerror(lua_State *L);
+	};
 	struct lua_addr_space {
 		template<typename T> int l_mem_read(lua_State *L);
 		template<typename T> int l_mem_write(lua_State *L);
@@ -118,9 +142,28 @@ private:
 	struct lua_screen {
 		int l_height(lua_State *L);
 		int l_width(lua_State *L);
+		int l_orientation(lua_State *L);
+		int l_refresh(lua_State *L);
+		int l_type(lua_State *L);
+		int l_snapshot(lua_State *L);
 		int l_draw_box(lua_State *L);
 		int l_draw_line(lua_State *L);
 		int l_draw_text(lua_State *L);
+	};
+
+	struct lua_video {
+		int l_begin_recording(lua_State *L);
+		int l_end_recording(lua_State *L);
+	};
+
+	static luabridge::LuaRef l_cheat_get_entries(const cheat_manager *c);
+	struct lua_cheat_entry {
+		int l_get_state(lua_State *L);
+	};
+
+	template<typename T> static luabridge::LuaRef l_options_get_entries(const T *o);
+	struct lua_options_entry {
+		int l_entry_value(lua_State *L);
 	};
 
 	void resume(void *L, INT32 param);

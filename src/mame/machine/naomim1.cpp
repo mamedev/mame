@@ -12,7 +12,7 @@ DEVICE_ADDRESS_MAP_START(submap, 16, naomi_m1_board)
 	AM_INHERIT_FROM(naomi_board::submap)
 ADDRESS_MAP_END
 
-naomi_m1_board::naomi_m1_board(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+naomi_m1_board::naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: naomi_board(mconfig, NAOMI_M1_BOARD, "Sega NAOMI M1 Board", tag, owner, clock, "naomi_m1_board", __FILE__)
 {
 }
@@ -37,7 +37,7 @@ void naomi_m1_board::device_start()
 		key = strtoll(skey.c_str(), nullptr, 16);
 	else
 	{
-		logerror("%s: Warning: key not provided\n", tag().c_str());
+		logerror("%s: Warning: key not provided\n", tag());
 		key = 0;
 	}
 

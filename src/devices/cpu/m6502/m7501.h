@@ -21,7 +21,7 @@
 
 class m7501_device : public m6510_device {
 public:
-	m7501_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m7501_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 enum {

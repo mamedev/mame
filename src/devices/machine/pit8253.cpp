@@ -46,7 +46,7 @@ enum
 const device_type PIT8253 = &device_creator<pit8253_device>;
 
 
-pit8253_device::pit8253_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PIT8253, "8253 PIT", tag, owner, clock, "pit8253", __FILE__),
 	m_clk0(0),
 	m_clk1(0),
@@ -57,7 +57,7 @@ pit8253_device::pit8253_device(const machine_config &mconfig, std::string tag, d
 {
 }
 
-pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_clk0(0),
 	m_clk1(0),
@@ -71,7 +71,7 @@ pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, 
 
 const device_type PIT8254 = &device_creator<pit8254_device>;
 
-pit8254_device::pit8254_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pit8254_device::pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pit8253_device(mconfig, PIT8254, "8254 PIT", tag, owner, clock, "pit8254", __FILE__)
 {
 }
@@ -723,7 +723,7 @@ void pit8253_device::update(pit8253_timer *timer)
 	attotime elapsed_time = now - timer->last_updated;
 	INT64 elapsed_cycles = elapsed_time.as_double() * timer->clockin;
 
-	LOG1(("pit8253: update(): timer %d, %" I64FMT "d elapsed_cycles\n", timer->index, elapsed_cycles));
+	LOG1(("pit8253: update(): timer %d, %d elapsed_cycles\n", timer->index, elapsed_cycles));
 
 	if (timer->clockin)
 		timer->last_updated += elapsed_cycles * attotime::from_hz(timer->clockin);

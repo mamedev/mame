@@ -108,7 +108,7 @@ ioport_constructor vic1515_t::device_input_ports() const
 //  vic1515_t - constructor
 //-------------------------------------------------
 
-vic1515_t::vic1515_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+vic1515_t::vic1515_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VIC1515, "VIC-1515", tag, owner, clock, "vic1515", __FILE__),
 	device_cbm_iec_interface(mconfig, *this)
 {

@@ -42,7 +42,7 @@ class k051960_device : public device_t,
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_gradius3);
 
 public:
-	k051960_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k051960_device() {}
 
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object)
@@ -54,7 +54,7 @@ public:
 	// static configuration
 	static void set_k051960_callback(device_t &device, k051960_cb_delegate callback) { downcast<k051960_device &>(device).m_k051960_cb = callback; }
 	static void set_plane_order(device_t &device, int order);
-	static void set_screen_tag(device_t &device, device_t *owner, std::string tag);
+	static void set_screen_tag(device_t &device, device_t *owner, const char *tag);
 
 	/*
 	The callback is passed:
@@ -92,7 +92,7 @@ private:
 	UINT8 *m_sprite_rom;
 	UINT32 m_sprite_size;
 
-	std::string m_screen_tag;
+	const char *m_screen_tag;
 	screen_device *m_screen;
 	emu_timer *m_scanline_timer;
 

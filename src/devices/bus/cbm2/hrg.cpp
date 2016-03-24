@@ -85,12 +85,12 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( cbm2_hrg_a )
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
 	MCFG_SCREEN_UPDATE_DEVICE(EF9365_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
 	MCFG_SCREEN_REFRESH_RATE(25)
-    MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD(EF9365_TAG, EF9365, 1750000)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
@@ -106,12 +106,12 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( cbm2_hrg_b )
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
 	MCFG_SCREEN_UPDATE_DEVICE(EF9366_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD(EF9366_TAG, EF9365, 1750000)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
@@ -147,7 +147,7 @@ machine_config_constructor cbm2_hrg_b_t::device_mconfig_additions() const
 //  cbm2_hrg_t - constructor
 //-------------------------------------------------
 
-cbm2_hrg_t::cbm2_hrg_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+cbm2_hrg_t::cbm2_hrg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_cbm2_expansion_card_interface(mconfig, *this),
 	m_gdc(*this, EF9366_TAG),
@@ -155,12 +155,12 @@ cbm2_hrg_t::cbm2_hrg_t(const machine_config &mconfig, device_type type, std::str
 {
 }
 
-cbm2_hrg_a_t::cbm2_hrg_a_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+cbm2_hrg_a_t::cbm2_hrg_a_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	cbm2_hrg_t(mconfig, CBM2_HRG_A, "CBM 500/600/700 High Resolution Graphics (A)", tag, owner, clock, "cbm2_hrga", __FILE__)
 {
 }
 
-cbm2_hrg_b_t::cbm2_hrg_b_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+cbm2_hrg_b_t::cbm2_hrg_b_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	cbm2_hrg_t(mconfig, CBM2_HRG_B, "CBM 500/600/700 High Resolution Graphics (B)", tag, owner, clock, "cbm2_hrgb", __FILE__)
 {
 }

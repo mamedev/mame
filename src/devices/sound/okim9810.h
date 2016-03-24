@@ -72,7 +72,7 @@ class okim9810_device : public device_t,
 {
 public:
 	// construction/destruction
-	okim9810_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	okim9810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	UINT8 read_status();
 	void write_TMP_register(UINT8 command);

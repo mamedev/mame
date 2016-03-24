@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( pic16c5x_ram_7, AS_DATA, 8, pic16c5x_device )
 ADDRESS_MAP_END
 
 
-pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, int picmodel)
+pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, int picmodel)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, program_width, -1
 		, ( ( program_width == 9 ) ? ADDRESS_MAP_NAME(pic16c5x_rom_9) : ( ( program_width == 10 ) ? ADDRESS_MAP_NAME(pic16c5x_rom_10) : ADDRESS_MAP_NAME(pic16c5x_rom_11) )))
@@ -127,27 +127,27 @@ pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type
 }
 
 
-pic16c54_device::pic16c54_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pic16c54_device::pic16c54_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pic16c5x_device(mconfig, PIC16C54, "PIC16C54", tag, owner, clock, "pic16c54", 9, 5, 0x16C54)
 {
 }
 
-pic16c55_device::pic16c55_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pic16c55_device::pic16c55_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pic16c5x_device(mconfig, PIC16C55, "PIC16C55", tag, owner, clock, "pic16c55", 9, 5, 0x16C55)
 {
 }
 
-pic16c56_device::pic16c56_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pic16c56_device::pic16c56_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pic16c5x_device(mconfig, PIC16C56, "PIC16C56", tag, owner, clock, "pic16c56", 10, 5, 0x16C56)
 {
 }
 
-pic16c57_device::pic16c57_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pic16c57_device::pic16c57_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pic16c5x_device(mconfig, PIC16C57, "PIC16C57", tag, owner, clock, "pic16c57", 11, 7, 0x16C57)
 {
 }
 
-pic16c58_device::pic16c58_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pic16c58_device::pic16c58_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pic16c5x_device(mconfig, PIC16C58, "PIC16C58", tag, owner, clock, "pic16c58", 11, 7, 0x16C58)
 {
 }
@@ -928,11 +928,11 @@ void pic16c5x_device::state_string_export(const device_state_entry &entry, std::
 	switch (entry.index())
 	{
 		case PIC16C5x_PSCL:
-			strprintf(str, "%c%02X", ((m_OPTION & 0x08) ? 'W' : 'T'), m_prescaler);
+			str = string_format("%c%02X", ((m_OPTION & 0x08) ? 'W' : 'T'), m_prescaler);
 			break;
 
 		case STATE_GENFLAGS:
-			strprintf(str, "%01x%c%c%c%c%c %c%c%c%03x",
+			str = string_format("%01x%c%c%c%c%c %c%c%c%03x",
 				(STATUS & 0xe0) >> 5,
 				STATUS & 0x10 ? '.':'O',      /* WDT Overflow */
 				STATUS & 0x08 ? 'P':'D',      /* Power/Down */

@@ -377,7 +377,7 @@ extern const device_type COJAG_HARDDISK;
 class cojag_hdd : public ide_hdd_device
 {
 public:
-	cojag_hdd(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+	cojag_hdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: ide_hdd_device(mconfig, COJAG_HARDDISK, "HDD CoJag", tag, owner, clock, "cojag_hdd", __FILE__)
 	{
 	}
@@ -427,9 +427,10 @@ void jaguar_state::machine_reset()
 	}
 
 	/* configure banks for gfx/sound ROMs */
-	UINT8 *romboard = memregion("romboard")->base();
-	if (romboard != nullptr)
+	if (m_romboard_region != nullptr)
 	{
+		UINT8 *romboard = m_romboard_region->base();
+
 		/* graphics banks */
 		if (m_is_r3000)
 		{
@@ -480,13 +481,13 @@ void jaguar_state::machine_reset()
 emu_file jaguar_state::*jaguar_nvram_fopen( UINT32 openflags)
 {
     device_image_interface *image = dynamic_cast<device_image_interface *>(machine().device("cart"));
-    file_error filerr;
+    osd_file::error filerr;
     emu_file *file;
     if (image->exists())
     {
         std::string fname(machine().system().name, PATH_SEPARATOR, image->basename_noext(), ".nv");
         filerr = mame_fopen( SEARCHPATH_NVRAM, fname, openflags, &file);
-        return (filerr == FILERR_NONE) ? file : NULL;
+        return (filerr == osd_file::error::NONE) ? file : NULL;
     }
     else
         return NULL;
@@ -617,7 +618,7 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
 	}
 
 	/* adjust banking */
-	if (memregion("romboard")->base())
+	if (m_romboard_region != NULL)
 	{
 		membank("mainsndbank")->set_entry((data >> 1) & 7);
 		membank("dspsndbank")->set_entry((data >> 1) & 7);
@@ -776,10 +777,12 @@ WRITE32_MEMBER(jaguar_state::latch_w)
 	logerror("%08X:latch_w(%X)\n", space.device().safe_pcbase(), data);
 
 	/* adjust banking */
-	if (memregion("romboard")->base())
+	if (m_romboard_region != NULL)
 	{
 		if (m_is_r3000)
+		{
 			membank("maingfxbank")->set_entry(data & 1);
+		}
 		membank("gpugfxbank")->set_entry(data & 1);
 	}
 }
@@ -1915,7 +1918,8 @@ MACHINE_CONFIG_END
 
 void jaguar_state::fix_endian( UINT32 addr, UINT32 size )
 {
-	UINT8 j[4], *ram = memregion("maincpu")->base();
+	UINT8 j[4];
+	UINT8 *ram = memregion("maincpu")->base();
 	UINT32 i;
 	size += addr;
 	logerror("File Loaded to address range %X to %X\n",addr,size-1);

@@ -22,7 +22,7 @@ class isa16_svga_s3_device :
 {
 public:
 		// construction/destruction
-		isa16_svga_s3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		isa16_svga_s3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
@@ -44,7 +44,7 @@ class isa16_s3virge_device :
 {
 public:
 		// construction/destruction
-		isa16_s3virge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		isa16_s3virge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
@@ -65,7 +65,7 @@ class isa16_s3virgedx_device :
 {
 public:
 		// construction/destruction
-		isa16_s3virgedx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		isa16_s3virgedx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
@@ -86,7 +86,7 @@ class isa16_stealth3d2kpro_device :
 {
 public:
 		// construction/destruction
-		isa16_stealth3d2kpro_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		isa16_stealth3d2kpro_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;

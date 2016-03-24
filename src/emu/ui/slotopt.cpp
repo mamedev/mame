@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-    ui/slotopt.c
+    ui/slotopt.cpp
 
     Internal menu for the slot options.
 
@@ -29,7 +29,7 @@ device_slot_option *ui_menu_slot_devices::slot_get_current_option(device_slot_in
 	}
 	else
 	{
-		current = machine().options().main_value(slot->device().tag().c_str() + 1);
+		current = machine().options().main_value(slot->device().tag() + 1);
 	}
 
 	return slot->option(current.c_str());
@@ -135,7 +135,7 @@ const char *ui_menu_slot_devices::slot_get_option(device_slot_interface *slot, i
 void ui_menu_slot_devices::set_slot_device(device_slot_interface *slot, const char *val)
 {
 	std::string error;
-	machine().options().set_value(slot->device().tag().c_str()+1, val, OPTION_PRIORITY_CMDLINE, error);
+	machine().options().set_value(slot->device().tag()+1, val, OPTION_PRIORITY_CMDLINE, error);
 	assert(error.empty());
 }
 
@@ -163,13 +163,13 @@ void ui_menu_slot_devices::populate()
 		{
 			opt_name.assign(option->name());
 			if (slot->fixed() || slot_get_length(slot) == 0)
-				opt_name.append(" [internal]");
+				opt_name.append(_(" [internal]"));
 		}
 
-		item_append(slot->device().tag().c_str() + 1, opt_name.c_str(), (slot->fixed() || slot_get_length(slot) == 0) ? 0 : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), (void *)slot);
+		item_append(slot->device().tag() + 1, opt_name.c_str(), (slot->fixed() || slot_get_length(slot) == 0) ? 0 : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), (void *)slot);
 	}
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-	item_append("Reset",  nullptr, 0, (void *)1);
+	item_append(_("Reset"),  nullptr, 0, (void *)1);
 }
 
 ui_menu_slot_devices::~ui_menu_slot_devices()
@@ -189,7 +189,7 @@ void ui_menu_slot_devices::handle()
 	{
 		if ((FPTR)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
 		{
-			machine().options().add_slot_options(false);
+			machine().options().add_slot_options();
 			machine().schedule_hard_reset();
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
@@ -204,7 +204,7 @@ void ui_menu_slot_devices::handle()
 			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
 			device_slot_option *option = slot_get_current_option(slot);
 			if (option)
-				ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_device_config>(machine(), container, slot, option)));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_device_config>(machine(), container, slot, option));
 		}
 	}
 }

@@ -466,21 +466,22 @@ const char *debug_cmderr_to_string(CMDERR error)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    debug_console_printf - printfs the given
+    debug_console_vprintf - vprintfs the given
     arguments using the format to the debug
     console
 -------------------------------------------------*/
 
-void CLIB_DECL debug_console_printf(running_machine &machine, const char *format, ...)
+void debug_console_vprintf(running_machine &machine, util::format_argument_pack<std::ostream> const &args)
 {
-	std::string buffer;
-	va_list arg;
+	text_buffer_print(console_textbuf, util::string_format(args).c_str());
 
-	va_start(arg, format);
-	strvprintf(buffer, format, arg);
-	va_end(arg);
+	/* force an update of any console views */
+	machine.debug_view().update_all(DVT_CONSOLE);
+}
 
-	text_buffer_print(console_textbuf, buffer.c_str());
+void debug_console_vprintf(running_machine &machine, util::format_argument_pack<std::ostream> &&args)
+{
+	text_buffer_print(console_textbuf, util::string_format(std::move(args)).c_str());
 
 	/* force an update of any console views */
 	machine.debug_view().update_all(DVT_CONSOLE);
@@ -488,39 +489,22 @@ void CLIB_DECL debug_console_printf(running_machine &machine, const char *format
 
 
 /*-------------------------------------------------
-    debug_console_vprintf - printfs the given
+    debug_console_vprintf_wrap - vprintfs the given
     arguments using the format to the debug
     console
 -------------------------------------------------*/
 
-void CLIB_DECL debug_console_vprintf(running_machine &machine, const char *format, va_list args)
+void debug_console_vprintf_wrap(running_machine &machine, int wrapcol, util::format_argument_pack<std::ostream> const &args)
 {
-	std::string buffer;
-
-	strvprintf(buffer, format, args);
-	text_buffer_print(console_textbuf, buffer.c_str());
+	text_buffer_print_wrap(console_textbuf, util::string_format(args).c_str(), wrapcol);
 
 	/* force an update of any console views */
 	machine.debug_view().update_all(DVT_CONSOLE);
 }
 
-
-/*-------------------------------------------------
-    debug_console_printf_wrap - printfs the given
-    arguments using the format to the debug
-    console
--------------------------------------------------*/
-
-void CLIB_DECL debug_console_printf_wrap(running_machine &machine, int wrapcol, const char *format, ...)
+void debug_console_vprintf_wrap(running_machine &machine, int wrapcol, util::format_argument_pack<std::ostream> &&args)
 {
-	std::string buffer;
-	va_list arg;
-
-	va_start(arg, format);
-	strvprintf(buffer, format, arg);
-	va_end(arg);
-
-	text_buffer_print_wrap(console_textbuf, buffer.c_str(), wrapcol);
+	text_buffer_print_wrap(console_textbuf, util::string_format(std::move(args)).c_str(), wrapcol);
 
 	/* force an update of any console views */
 	machine.debug_view().update_all(DVT_CONSOLE);

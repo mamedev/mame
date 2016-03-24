@@ -71,12 +71,13 @@ enum
 //  MACROS
 //**************************************************************************
 
+#define TIMER_CALLBACK(name)            void name(running_machine &machine, void *ptr, int param)
+#define TIMER_CALLBACK_MEMBER(name)     void name(void *ptr, INT32 param)
+
 // IRQ callback to be called by device implementations when an IRQ is actually taken
-#define IRQ_CALLBACK(func)              int func(device_t *device, int irqline)
 #define IRQ_CALLBACK_MEMBER(func)       int func(device_t &device, int irqline)
 
 // interrupt generator callback called as a VBLANK or periodic interrupt
-#define INTERRUPT_GEN(func)             void func(device_t *device)
 #define INTERRUPT_GEN_MEMBER(func)      void func(device_t &device)
 
 
@@ -92,7 +93,7 @@ enum
 #define MCFG_DEVICE_VBLANK_INT_DEVICE(_tag, _devtag, _class, _func) \
 	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)0), _tag);
 #define MCFG_DEVICE_VBLANK_INT_REMOVE()  \
-	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(), "");
+	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(), NULL);
 #define MCFG_DEVICE_PERIODIC_INT_DRIVER(_class, _func, _rate) \
 	device_execute_interface::static_set_periodic_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0), attotime::from_hz(_rate));
 #define MCFG_DEVICE_PERIODIC_INT_DEVICE(_devtag, _class, _func, _rate) \
@@ -146,11 +147,10 @@ public:
 	UINT64 attotime_to_cycles(const attotime &duration) const { return clocks_to_cycles(device().attotime_to_clocks(duration)); }
 	UINT32 input_lines() const { return execute_input_lines(); }
 	UINT32 default_irq_vector() const { return execute_default_irq_vector(); }
-	bool is_octal() const { return m_is_octal; }
 
 	// static inline configuration helpers
 	static void static_set_disable(device_t &device);
-	static void static_set_vblank_int(device_t &device, device_interrupt_delegate function, std::string tag, int rate = 0);
+	static void static_set_vblank_int(device_t &device, device_interrupt_delegate function, const char *tag, int rate = 0);
 	static void static_set_periodic_int(device_t &device, device_interrupt_delegate function, const attotime &rate);
 	static void static_set_irq_acknowledge_callback(device_t &device, device_irq_acknowledge_delegate callback);
 
@@ -247,8 +247,7 @@ protected:
 		int             m_qindex;           // index within the queue
 
 	private:
-		static void static_empty_event_queue(running_machine &machine, void *ptr, int param);
-		void empty_event_queue();
+		TIMER_CALLBACK_MEMBER(empty_event_queue);
 	};
 
 	// scheduler
@@ -257,10 +256,9 @@ protected:
 	// configuration
 	bool                    m_disabled;                 // disabled from executing?
 	device_interrupt_delegate m_vblank_interrupt;       // for interrupts tied to VBLANK
-	std::string               m_vblank_interrupt_screen;  // the screen that causes the VBLANK interrupt
+	const char *            m_vblank_interrupt_screen;  // the screen that causes the VBLANK interrupt
 	device_interrupt_delegate m_timed_interrupt;        // for interrupts not tied to VBLANK
 	attotime                m_timed_interrupt_period;   // period for periodic interrupts
-	bool                    m_is_octal;                 // to determine if messages/debugger will show octal or hex
 
 	// execution lists
 	device_execute_interface *m_nextexec;               // pointer to the next device to execute, in order
@@ -294,12 +292,11 @@ protected:
 
 private:
 	// callbacks
-	static void static_timed_trigger_callback(running_machine &machine, void *ptr, int param);
+	TIMER_CALLBACK_MEMBER(timed_trigger_callback);
 
 	void on_vblank(screen_device &screen, bool vblank_state);
 
-	static void static_trigger_periodic_interrupt(running_machine &machine, void *ptr, int param);
-	void trigger_periodic_interrupt();
+	TIMER_CALLBACK_MEMBER(trigger_periodic_interrupt);
 	void suspend_resume_changed();
 
 	attoseconds_t minimum_quantum() const;

@@ -314,8 +314,8 @@ int pcap_module::init(const osd_options &options)
 void pcap_module::exit()
 {
 	clear_netdev();
-	FreeLibrary(handle);
-	handle = NULL;
+	//FreeLibrary(handle);
+	//handle = NULL;
 }
 #else
 	#include "modules/osdmodule.h"

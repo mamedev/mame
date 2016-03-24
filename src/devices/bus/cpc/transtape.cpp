@@ -29,8 +29,8 @@ const rom_entry *cpc_transtape_device::device_rom_region() const
 
 static INPUT_PORTS_START(cpc_transtape)
 	PORT_START("transtape")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Red Button") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_transtape_device,button_red_w,1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Black Button") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_transtape_device,button_black_w,1)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Red Button") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_transtape_device,button_red_w,nullptr)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Black Button") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_transtape_device,button_black_w,nullptr)
 INPUT_PORTS_END
 
 ioport_constructor cpc_transtape_device::device_input_ports() const
@@ -42,7 +42,7 @@ ioport_constructor cpc_transtape_device::device_input_ports() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_transtape_device::cpc_transtape_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+cpc_transtape_device::cpc_transtape_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CPC_TRANSTAPE, "HM Transtape", tag, owner, clock, "cpc_transtape", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr), m_cpu(nullptr), m_space(nullptr), m_ram(nullptr),
 	m_rom_active(false),

@@ -5,7 +5,7 @@
 class fantland_state : public driver_device
 {
 public:
-	fantland_state(const machine_config &mconfig, device_type type, std::string tag)
+	fantland_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_msm1(*this, "msm1"),
 		m_msm2(*this, "msm2"),

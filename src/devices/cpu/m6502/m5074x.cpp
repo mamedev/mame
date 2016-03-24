@@ -39,7 +39,7 @@ const device_type M50741 = &device_creator<m50741_device>;
 //-------------------------------------------------
 //  m5074x_device - constructor
 //-------------------------------------------------
-m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, address_map_constructor internal_map, std::string shortname, std::string source) :
+m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map, const char *shortname, const char *source) :
 	m740_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 13, 0, internal_map),
 	read_p0(*this),
@@ -489,12 +489,12 @@ static ADDRESS_MAP_START( m50740_map, AS_PROGRAM, 8, m50740_device )
 	AM_RANGE(0x1400, 0x1fff) AM_ROM AM_REGION(M5074X_INTERNAL_ROM_REGION, 0)
 ADDRESS_MAP_END
 
-m50740_device::m50740_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+m50740_device::m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	m5074x_device(mconfig, M50740, "Mitsubishi M50740", tag, owner, clock, ADDRESS_MAP_NAME(m50740_map), "m50740", __FILE__)
 {
 }
 
-m50740_device::m50740_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+m50740_device::m50740_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	m5074x_device(mconfig, type, name, tag, owner, clock, ADDRESS_MAP_NAME(m50740_map), shortname, source)
 {
 }
@@ -507,12 +507,12 @@ static ADDRESS_MAP_START( m50741_map, AS_PROGRAM, 8, m50741_device )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("internal", 0)
 ADDRESS_MAP_END
 
-m50741_device::m50741_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+m50741_device::m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	m5074x_device(mconfig, M50740, "Mitsubishi M50741", tag, owner, clock, ADDRESS_MAP_NAME(m50741_map), "m50741", __FILE__)
 {
 }
 
-m50741_device::m50741_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+m50741_device::m50741_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	m5074x_device(mconfig, type, name, tag, owner, clock, ADDRESS_MAP_NAME(m50741_map), shortname, source)
 {
 }

@@ -14,8 +14,8 @@ class neogeo_fatfury2_cart : public device_t,
 {
 public:
 	// construction/destruction
-	neogeo_fatfury2_cart(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT16 clock, std::string shortname, std::string source);
-	neogeo_fatfury2_cart(const machine_config &mconfig, std::string tag, device_t *owner, UINT16 clock);
+	neogeo_fatfury2_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source);
+	neogeo_fatfury2_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -6,27 +6,27 @@
 const device_type H8_TIMER8_CHANNEL  = &device_creator<h8_timer8_channel_device>;
 const device_type H8H_TIMER8_CHANNEL = &device_creator<h8h_timer8_channel_device>;
 
-h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, H8_TIMER8_CHANNEL, "H8 8-bits timer channel", tag, owner, clock, "h8_8bits_timer_channel", __FILE__),
-	cpu(*this, "^"), chained_timer(nullptr), intc(nullptr), irq_ca(0), irq_cb(0), irq_v(0), chain_type(0), tcr(0), tcsr(0), tcnt(0), extra_clock_bit(false),
+	cpu(*this, "^"), chained_timer(nullptr), intc(nullptr), chain_tag(nullptr), intc_tag(nullptr), irq_ca(0), irq_cb(0), irq_v(0), chain_type(0), tcr(0), tcsr(0), tcnt(0), extra_clock_bit(false),
 	has_adte(false), has_ice(false), clock_type(0), clock_divider(0), clear_type(0), counter_cycle(0), last_clock_update(0), event_time(0)
 {
 }
 
-h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	cpu(*this, "^"), chained_timer(nullptr), intc(nullptr), irq_ca(0), irq_cb(0), irq_v(0), chain_type(0), tcr(0), tcsr(0), tcnt(0), extra_clock_bit(false),
+	cpu(*this, "^"), chained_timer(nullptr), intc(nullptr), chain_tag(nullptr), intc_tag(nullptr), irq_ca(0), irq_cb(0), irq_v(0), chain_type(0), tcr(0), tcsr(0), tcnt(0), extra_clock_bit(false),
 	has_adte(false), has_ice(false), clock_type(0), clock_divider(0), clear_type(0), counter_cycle(0), last_clock_update(0), event_time(0)
 {
 }
 
-void h8_timer8_channel_device::set_info(std::string intc, int _irq_ca, int _irq_cb, int _irq_v, int div1, int div2, int div3, int div4, int div5, int div6)
+void h8_timer8_channel_device::set_info(const char *intc, int _irq_ca, int _irq_cb, int _irq_v, int div1, int div2, int div3, int div4, int div5, int div6)
 {
 	intc_tag = intc;
 	irq_ca = _irq_ca;
 	irq_cb = _irq_cb;
 	irq_v = _irq_v;
-	chain_tag.clear();
+	chain_tag = nullptr;
 	chain_type = STOPPED;
 	has_adte = false;
 	has_ice = false;
@@ -65,37 +65,37 @@ void h8_timer8_channel_device::update_tcr()
 	case 0:
 		clock_type = STOPPED;
 		clock_divider = 0;
-		logerror("%s: clock stopped", tag().c_str());
+		logerror("%s: clock stopped", tag());
 		break;
 
 	case 1: case 2: case 3:
 		clock_type = DIV;
 		clock_divider = div_tab[((tcr & TCR_CKS)-1)*2 + extra_clock_bit];
-		logerror("%s: clock %dHz", tag().c_str(), cpu->clock()/clock_divider);
+		logerror("%s: clock %dHz", tag(), cpu->clock()/clock_divider);
 		break;
 
 	case 4:
 		clock_type = chain_type;
 		clock_divider = 0;
-		logerror("%s: clock chained %s", tag().c_str(), clock_type == CHAIN_A ? "tcora" : "overflow");
+		logerror("%s: clock chained %s", tag(), clock_type == CHAIN_A ? "tcora" : "overflow");
 		break;
 
 	case 5:
 		clock_type = INPUT_UP;
 		clock_divider = 0;
-		logerror("%s: clock external raising edge", tag().c_str());
+		logerror("%s: clock external raising edge", tag());
 		break;
 
 	case 6:
 		clock_type = INPUT_DOWN;
 		clock_divider = 0;
-		logerror("%s: clock external falling edge", tag().c_str());
+		logerror("%s: clock external falling edge", tag());
 		break;
 
 	case 7:
 		clock_type = INPUT_UPDOWN;
 		clock_divider = 0;
-		logerror("%s: clock external both edges", tag().c_str());
+		logerror("%s: clock external both edges", tag());
 		break;
 	}
 
@@ -140,7 +140,7 @@ WRITE8_MEMBER(h8_timer8_channel_device::tcsr_w)
 	tcsr = (tcsr & ~mask) | (data & mask);
 	tcsr &= data | 0x1f;
 
-	logerror("%s: tcsr_w %02x\n", tag().c_str(), tcsr);
+	logerror("%s: tcsr_w %02x\n", tag(), tcsr);
 
 	recalc_event();
 }
@@ -154,7 +154,7 @@ WRITE8_MEMBER(h8_timer8_channel_device::tcor_w)
 {
 	update_counter();
 	tcor[offset] = data;
-	logerror("%s: tcor%c_w %02x\n", tag().c_str(), 'a'+offset, data);
+	logerror("%s: tcor%c_w %02x\n", tag(), 'a'+offset, data);
 	recalc_event();
 }
 
@@ -169,14 +169,14 @@ WRITE8_MEMBER(h8_timer8_channel_device::tcnt_w)
 {
 	update_counter();
 	tcnt = data;
-	logerror("%s: tcnt_w %02x\n", tag().c_str(), data);
+	logerror("%s: tcnt_w %02x\n", tag(), data);
 	recalc_event();
 }
 
 void h8_timer8_channel_device::device_start()
 {
 	intc = siblingdevice<h8_intc_device>(intc_tag);
-	if(!chain_tag.empty())
+	if(chain_tag)
 		chained_timer = siblingdevice<h8_timer8_channel_device>(chain_tag);
 	else
 		chained_timer = nullptr;
@@ -203,7 +203,7 @@ UINT64 h8_timer8_channel_device::internal_update(UINT64 current_time)
 	if(event_time && current_time >= event_time) {
 		update_counter(current_time);
 		if(0)
-			logerror("%s: Reached event time (%ld), counter=%02x, dt=%d\n", tag().c_str(), long(current_time), tcnt, int(current_time - event_time));
+			logerror("%s: Reached event time (%ld), counter=%02x, dt=%d\n", tag(), long(current_time), tcnt, int(current_time - event_time));
 		recalc_event(current_time);
 	}
 
@@ -346,7 +346,7 @@ void h8_timer8_channel_device::timer_tick()
 	}
 }
 
-h8h_timer8_channel_device::h8h_timer8_channel_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8h_timer8_channel_device::h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8_timer8_channel_device(mconfig, H8H_TIMER8_CHANNEL, "H8H 8-bits timer channel", tag, owner, clock, "h8h_8bits_timer_channel", __FILE__)
 {
 }
@@ -355,7 +355,7 @@ h8h_timer8_channel_device::~h8h_timer8_channel_device()
 {
 }
 
-void h8h_timer8_channel_device::set_info(std::string intc, int _irq_ca, int _irq_cb, int _irq_v, std::string _chain_tag, int _chain_type, bool _has_adte, bool _has_ice)
+void h8h_timer8_channel_device::set_info(const char *intc, int _irq_ca, int _irq_cb, int _irq_v, const char *_chain_tag, int _chain_type, bool _has_adte, bool _has_ice)
 {
 	intc_tag = intc;
 	irq_ca = _irq_ca;

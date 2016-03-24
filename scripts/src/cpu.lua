@@ -10,14 +10,6 @@
 ---------------------------------------------------------------------------
 
 --------------------------------------------------
--- Shared code
---------------------------------------------------
-
-files {
-	MAME_DIR .. "src/devices/cpu/vtlb.cpp",
-}
-
---------------------------------------------------
 -- Dynamic recompiler objects
 --------------------------------------------------
 
@@ -43,7 +35,6 @@ if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RS
 		MAME_DIR .. "src/devices/cpu/drcbex64.cpp",
 		MAME_DIR .. "src/devices/cpu/drcbex64.h",
 		MAME_DIR .. "src/devices/cpu/drcumlsh.h",
-		MAME_DIR .. "src/devices/cpu/vtlb.h",
 		MAME_DIR .. "src/devices/cpu/x86emit.h",		
 	}
 end
@@ -1851,19 +1842,39 @@ if (CPUS["AVR8"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
--- Texas Instruments TMS0980
---@src/devices/cpu/tms0980/tms0980.h,CPUS["TMS0980"] = true
+-- Texas Instruments TMS1000 series
+--@src/devices/cpu/tms1000/tms1000.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms1100.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms1400.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms0970.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms0980.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms0270.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tp0320.h,CPUS["TMS1000"] = true
 --------------------------------------------------
 
-if (CPUS["TMS0980"]~=null) then
+if (CPUS["TMS1000"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/cpu/tms0980/tms0980.cpp",
-		MAME_DIR .. "src/devices/cpu/tms0980/tms0980.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1k_base.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1k_base.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1000.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1000.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1100.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1100.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1400.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1400.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms0970.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms0970.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms0980.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms0980.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms0270.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms0270.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tp0320.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tp0320.h",
 	}
 end
 
-if (CPUS["TMS0980"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms0980/tms0980d.cpp")
+if (CPUS["TMS1000"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms1000/tms1k_dasm.cpp")
 end
 
 --------------------------------------------------
@@ -1888,7 +1899,6 @@ end
 --@src/devices/cpu/tms9900/tms9900.h,CPUS["TMS9900"] = true
 --@src/devices/cpu/tms9900/tms9980a.h,CPUS["TMS9900"] = true
 --@src/devices/cpu/tms9900/tms9995.h,CPUS["TMS9900"] = true
-
 --------------------------------------------------
 
 if (CPUS["TMS9900"]~=null) then

@@ -31,7 +31,7 @@ void t10mmc::t10_reset()
 	SetDevice( m_image->get_cdrom_file() );
 	if( !m_cdrom )
 	{
-		m_device->logerror( "T10MMC %s: no CD found!\n", m_image->tag().c_str());
+		m_device->logerror( "T10MMC %s: no CD found!\n", m_image->tag() );
 	}
 
 	m_lba = 0;

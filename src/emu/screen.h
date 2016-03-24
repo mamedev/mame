@@ -161,7 +161,7 @@ class screen_device : public device_t
 
 public:
 	// construction/destruction
-	screen_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~screen_device();
 
 	// configuration readers
@@ -191,13 +191,15 @@ public:
 	static void static_set_screen_update(device_t &device, screen_update_ind16_delegate callback);
 	static void static_set_screen_update(device_t &device, screen_update_rgb32_delegate callback);
 	static void static_set_screen_vblank(device_t &device, screen_vblank_delegate callback);
-	static void static_set_palette(device_t &device, std::string tag);
+	static void static_set_palette(device_t &device, const char *tag);
 	static void static_set_video_attributes(device_t &device, UINT32 flags);
+	static void static_set_color(device_t &device, rgb_t color);
 
 	// information getters
 	render_container &container() const { assert(m_container != nullptr); return *m_container; }
 	bitmap_ind8 &priority() { return m_priority; }
-	palette_device *palette() { return m_palette; }
+	palette_device &palette() const { assert(m_palette.found()); return *m_palette; }
+	bool has_palette() const { return m_palette.found(); }
 
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
@@ -218,7 +220,7 @@ public:
 	attotime time_until_vblank_end() const;
 	attotime time_until_update() const { return (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
 	attotime scan_period() const { return attotime(0, m_scantime); }
-	attotime frame_period() const { return (this == nullptr) ? DEFAULT_FRAME_PERIOD : attotime(0, m_frame_period); };
+	attotime frame_period() const { return attotime(0, m_frame_period); }
 	UINT64 frame_number() const { return m_frame_number; }
 
 	// updating
@@ -364,6 +366,12 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 #define MCFG_SCREEN_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
 	MCFG_SCREEN_TYPE(_type)
+
+#define MCFG_SCREEN_ADD_MONOCHROME(_tag, _type, _color) \
+	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
+	MCFG_SCREEN_TYPE(_type) \
+	MCFG_SCREEN_COLOR(_color)
+
 #define MCFG_SCREEN_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)
 
@@ -441,6 +449,8 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 	screen_device::static_set_palette(*device, FINDER_DUMMY_TAG);
 #define MCFG_SCREEN_VIDEO_ATTRIBUTES(_flags) \
 	screen_device::static_set_video_attributes(*device, _flags);
+#define MCFG_SCREEN_COLOR(_color) \
+	screen_device::static_set_color(*device, _color);
 
 
 //**************************************************************************

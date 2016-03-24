@@ -59,7 +59,7 @@
 const device_type F8 = &device_creator<f8_cpu_device>;
 
 
-f8_cpu_device::f8_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, F8, "Fairchild F8", tag, owner, clock, "f8", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
@@ -2050,12 +2050,12 @@ void f8_cpu_device::state_string_export(const device_state_entry &entry, std::st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c",
-							m_w & 0x10 ? 'I':'.',
-							m_w & 0x08 ? 'O':'.',
-							m_w & 0x04 ? 'Z':'.',
-							m_w & 0x02 ? 'C':'.',
-							m_w & 0x01 ? 'S':'.');
+			str = string_format("%c%c%c%c%c",
+					m_w & 0x10 ? 'I':'.',
+					m_w & 0x08 ? 'O':'.',
+					m_w & 0x04 ? 'Z':'.',
+					m_w & 0x02 ? 'C':'.',
+					m_w & 0x01 ? 'S':'.');
 			break;
 	}
 }

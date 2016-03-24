@@ -56,7 +56,7 @@ READ8_MEMBER( decocass_state::decocass_sound_command_main_r)
 
 WRITE8_MEMBER(decocass_state::decocass_sound_command_w)
 {
-	LOG(2,("CPU %s sound command -> $%02x\n", space.device().tag().c_str(), data));
+	LOG(2,("CPU %s sound command -> $%02x\n", space.device().tag(), data));
 	soundlatch_byte_w(space, 0, data);
 	m_sound_ack |= 0x80;
 	/* remove snd cpu data ack bit. i don't see it in the schems, but... */
@@ -67,20 +67,20 @@ WRITE8_MEMBER(decocass_state::decocass_sound_command_w)
 READ8_MEMBER(decocass_state::decocass_sound_data_r)
 {
 	UINT8 data = soundlatch2_byte_r(space, 0);
-	LOG(2,("CPU %s sound data    <- $%02x\n", space.device().tag().c_str(), data));
+	LOG(2,("CPU %s sound data    <- $%02x\n", space.device().tag(), data));
 	return data;
 }
 
 READ8_MEMBER(decocass_state::decocass_sound_ack_r)
 {
 	UINT8 data = m_sound_ack;   /* D6+D7 */
-	LOG(4,("CPU %s sound ack     <- $%02x\n", space.device().tag().c_str(), data));
+	LOG(4,("CPU %s sound ack     <- $%02x\n", space.device().tag(), data));
 	return data;
 }
 
 WRITE8_MEMBER(decocass_state::decocass_sound_data_w)
 {
-	LOG(2,("CPU %s sound data    -> $%02x\n", space.device().tag().c_str(), data));
+	LOG(2,("CPU %s sound data    -> $%02x\n", space.device().tag(), data));
 	soundlatch2_byte_w(space, 0, data);
 	m_sound_ack |= 0x40;
 }
@@ -88,7 +88,7 @@ WRITE8_MEMBER(decocass_state::decocass_sound_data_w)
 READ8_MEMBER(decocass_state::decocass_sound_command_r)
 {
 	UINT8 data = soundlatch_byte_r(space, 0);
-	LOG(4,("CPU %s sound command <- $%02x\n", space.device().tag().c_str(), data));
+	LOG(4,("CPU %s sound command <- $%02x\n", space.device().tag(), data));
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	m_sound_ack &= ~0x80;
 	return data;
@@ -117,14 +117,14 @@ READ8_MEMBER(decocass_state::decocass_sound_nmi_enable_r)
 READ8_MEMBER(decocass_state::decocass_sound_data_ack_reset_r)
 {
 	UINT8 data = 0xff;
-	LOG(2,("CPU %s sound ack rst <- $%02x\n", space.device().tag().c_str(), data));
+	LOG(2,("CPU %s sound ack rst <- $%02x\n", space.device().tag(), data));
 	m_sound_ack &= ~0x40;
 	return data;
 }
 
 WRITE8_MEMBER(decocass_state::decocass_sound_data_ack_reset_w)
 {
-	LOG(2,("CPU %s sound ack rst -> $%02x\n", space.device().tag().c_str(), data));
+	LOG(2,("CPU %s sound ack rst -> $%02x\n", space.device().tag(), data));
 	m_sound_ack &= ~0x40;
 }
 

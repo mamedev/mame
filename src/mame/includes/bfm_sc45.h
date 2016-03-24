@@ -63,7 +63,7 @@
 class bfm_sc45_state : public driver_device
 {
 public:
-	bfm_sc45_state(const machine_config &mconfig, device_type type, std::string tag)
+	bfm_sc45_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_duart(*this, "duart68681"),
 			m_vfd0(*this, "vfd0"),
@@ -98,7 +98,7 @@ void bfm_sc45_write_serial_vfd(running_machine &machine, bool cs, bool clock, bo
 class sc4_state : public bfm_sc45_state
 {
 public:
-	sc4_state(const machine_config &mconfig, device_type type, std::string tag)
+	sc4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: bfm_sc45_state(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_cpuregion(*this, "maincpu"),
@@ -623,7 +623,7 @@ protected:
 class sc4_adder4_state : public sc4_state
 {
 public:
-	sc4_adder4_state(const machine_config &mconfig, device_type type, std::string tag)
+	sc4_adder4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sc4_state(mconfig, type, tag),
 			m_adder4cpu(*this, "adder4")
 	{ }

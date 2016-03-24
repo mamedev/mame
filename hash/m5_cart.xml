@@ -57,8 +57,8 @@ Learning Soft:
 
 Programming Languages:
 
- - FLAC
- - FLAC-II
+ - FALC
+ - FALC-II
  - BASIC-I
  - BASIC-G
  - BASIC-F
@@ -97,7 +97,7 @@ and why some of the dumps below have weird size?
 		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="tank battlaion (1980)(namco)(jp).bin" size="8192" crc="daa0d610" sha1="5867090fbe2584654dd2c2aaa215e69243f2f599" offset="00000" status="baddump" />
+				<rom name="tank battalion (1980)(namco)(jp).bin" size="8192" crc="daa0d610" sha1="5867090fbe2584654dd2c2aaa215e69243f2f599" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -162,7 +162,7 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="スーパーコブラ" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="super cobra (1981)(konami)(jp).bin" size="8192" crc="55cbd90b" sha1="d29f1d1d88a0b6738b68cf8d2406fbf1f05ba39b" offset="00000" status="baddump" />
+				<rom name="super cobra (1981)(konami)(jp).bin" size="8192" crc="55cbd90b" sha1="d29f1d1d88a0b6738b68cf8d2406fbf1f05ba39b" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -232,14 +232,14 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="pooyana" cloneof="pooyan">
-		<description>Pooyan (Alt)</description>
+		<description>Pooyan (Alt)Modified version cooperating with 64kB RAM</description>
 		<year>1982</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="11" />
 		<info name="alt_title" value="プーヤン" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="pooyan (1982)(konami)(jp).bin" size="8192" crc="ded8b4f4" sha1="4c9e58e52d336b4c01a24e3ca2e62fb7757407fd" offset="00000" status="baddump" />
+				<rom name="pooyan (1982)(konami)(jp).bin" size="8192" crc="ded8b4f4" sha1="4c9e58e52d336b4c01a24e3ca2e62fb7757407fd" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -252,7 +252,7 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="ヘビーボクシング" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="heavy boxing (1983)(takara)(jp).bin" size="8192" crc="19540dce" sha1="388838ed501bcc3a9fd18e32488f13a6ce6a0689" offset="00000" status="baddump" />
+				<rom name="heavy boxing (1983)(takara)(jp).bin" size="8192" crc="19540dce" sha1="388838ed501bcc3a9fd18e32488f13a6ce6a0689" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -265,7 +265,7 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="リアルテニス" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="real tennis (1983)(takara)(jp).bin" size="8192" crc="ed80d6c9" sha1="03f3385b360c3573edab1fca53f82b4d6a4f8736" offset="00000" status="baddump" />
+				<rom name="real tennis (1983)(takara)(jp).bin" size="8192" crc="ed80d6c9" sha1="03f3385b360c3573edab1fca53f82b4d6a4f8736" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -278,7 +278,7 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="ワードメイズ" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="word maze (19xx)(sord)(jp).bin" size="8192" crc="fda88e0d" sha1="a0fbe727bfca773d3cc193eb7a9c77e7b418b0a2" offset="00000" status="baddump" />
+				<rom name="word maze (19xx)(sord)(jp).bin" size="8192" crc="fda88e0d" sha1="a0fbe727bfca773d3cc193eb7a9c77e7b418b0a2" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -344,7 +344,7 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="エスキモン" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="eskimon (1984)(takara)(jp).bin" size="8192" crc="96931021" sha1="115eee645e5213c16ad4a27bbeed5e2f3fa4be22" offset="00000" status="baddump" />
+				<rom name="eskimon (1984)(takara)(jp).bin" size="8192" crc="96931021" sha1="115eee645e5213c16ad4a27bbeed5e2f3fa4be22" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -357,7 +357,7 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="ファニーマウス" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="funny mouse (1983)(takara)(jp).bin" size="8192" crc="94145074" sha1="43c2a1a5959ab8057c7d149472512a0c7996c798" offset="00000" status="baddump" />
+				<rom name="funny mouse (1983)(takara)(jp).bin" size="8192" crc="94145074" sha1="43c2a1a5959ab8057c7d149472512a0c7996c798" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -394,7 +394,7 @@ and why some of the dumps below have weird size?
 		<publisher>Takara</publisher>
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="dragon attack (1983)(takara)(jp).bin" size="4096" crc="5862d06c" sha1="f2707ad6dd564df01e7f81a21a00842e17cd49a4" offset="00000" status="baddump" />
+				<rom name="dragon attack (1983)(takara)(jp).bin" size="4096" crc="5862d06c" sha1="f2707ad6dd564df01e7f81a21a00842e17cd49a4" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -405,7 +405,7 @@ and why some of the dumps below have weird size?
 		<publisher>Takara</publisher>
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="fruit search (1983)(takara)(jp).bin" size="4096" crc="333ac50f" sha1="a838fbf0bc4513d3b6bcc3165f1eac33ca27d6fa" offset="00000" status="baddump" />
+				<rom name="fruit search (1983)(takara)(jp).bin" size="4096" crc="333ac50f" sha1="a838fbf0bc4513d3b6bcc3165f1eac33ca27d6fa" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -431,7 +431,7 @@ and why some of the dumps below have weird size?
 		<publisher>Sord</publisher>
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="20480">
-				<rom name="basic-f (198x)(sord)(jp).bin" size="20480" crc="47be051f" sha1="9942b8f05a441b5dee7ab31ec5b8a643f7e268b8" offset="00000" status="baddump" />
+				<rom name="basic-f (198x)(sord)(jp).bin" size="20480" crc="47be051f" sha1="9942b8f05a441b5dee7ab31ec5b8a643f7e268b8" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -442,7 +442,7 @@ and why some of the dumps below have weird size?
 		<publisher>Sord</publisher>
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="basic-g (198x)(sord)(jp).bin" size="16384" crc="107b5ddc" sha1="071fa84c7b10d9d7841c504564825609ebf66140" offset="00000" status="baddump" />
+				<rom name="basic-g (198x)(sord)(jp).bin" size="16384" crc="107b5ddc" sha1="071fa84c7b10d9d7841c504564825609ebf66140" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -453,7 +453,7 @@ and why some of the dumps below have weird size?
 		<publisher>Sord</publisher>
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="basic-i (198x)(sord)(jp).bin" size="8192" crc="9a98e6ce" sha1="d11f7623919ee593e275e9f00f8a4acf7aed3cf5" offset="00000" status="baddump" />
+				<rom name="basic-i (198x)(sord)(jp).bin" size="8192" crc="9a98e6ce" sha1="d11f7623919ee593e275e9f00f8a4acf7aed3cf5" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -465,7 +465,7 @@ and why some of the dumps below have weird size?
 		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="falc (198x)(sord)(jp).bin" size="16384" crc="78037f97" sha1="4cd917388a626d38dd8b16834c2e610d0ba6d505" offset="00000" status="baddump" />
+				<rom name="falc (198x)(sord)(jp).bin" size="16384" crc="78037f97" sha1="4cd917388a626d38dd8b16834c2e610d0ba6d505" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -476,32 +476,32 @@ and why some of the dumps below have weird size?
 		<publisher>Sord</publisher>
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="zzz-unk-pdesigne.bin" size="16384" crc="af987f7b" sha1="3a4cffc8d81a384f8bb2dfebf5e02cda1f0c7e21" offset="00000" status="baddump" />
+				<rom name="zzz-unk-pdesigner.bin" size="16384" crc="af987f7b" sha1="3a4cffc8d81a384f8bb2dfebf5e02cda1f0c7e21" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
 
 <!-- Unidentified items -->
 	<software name="basicw">
-		<!-- is this legit?!? might it be Disk BASIC? -->
+		<!-- Modified Basic-F with floppy support(WD2797B) -->
 		<description>BASIC-W</description>
 		<year>198?</year>
 		<publisher>Sord?</publisher>
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="20480">
-				<rom name="basic-w (198x)(sord)(jp).bin" size="20480" crc="2b1087cf" sha1="aa8d7c6c405e1360f074590abdc3d82df07cb564" offset="00000" status="baddump" />
+				<rom name="basic-w (198x)(sord)(jp).bin" size="20480" crc="2b1087cf" sha1="aa8d7c6c405e1360f074590abdc3d82df07cb564" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="m5term">
-		<!-- is this legit?!? might it be M-Editor? -->
+		<!-- Terminal for serial interface -->
 		<description>M5 Terminal</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="7168">
-				<rom name="m5 terminal (19xx)(-).bin" size="7168" crc="2b73c483" sha1="53c093d4c3c5ba990bf8673963f9ff529e99a252" offset="00000" status="baddump" />
+				<rom name="m5 terminal (19xx)(-).bin" size="7168" crc="2b73c483" sha1="53c093d4c3c5ba990bf8673963f9ff529e99a252" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -512,7 +512,7 @@ and why some of the dumps below have weird size?
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="4400">
-				<rom name="zac banic (19xx)(-).bin" size="4400" crc="fd421eea" sha1="6c3d5c15817617508de5f994c0a980ff6c6ca303" offset="00000" status="baddump" />
+				<rom name="zac banic (19xx)(-).bin" size="4400" crc="fd421eea" sha1="6c3d5c15817617508de5f994c0a980ff6c6ca303" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -536,7 +536,7 @@ and why some of the dumps below have weird size?
 		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="6176">
-				<rom name="drops (1986)(spc)(jp).bin" size="6176" crc="fa321348" sha1="e9a44e12eed9d51cdb40ce4b6f1cb19a1ebed35d" offset="00000" status="baddump" />
+				<rom name="drops (1986)(spc)(jp).bin" size="6176" crc="fa321348" sha1="e9a44e12eed9d51cdb40ce4b6f1cb19a1ebed35d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -548,7 +548,7 @@ and why some of the dumps below have weird size?
 		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="5920">
-				<rom name="jumping jack (1986)(spc)(jp).bin" size="5920" crc="49030973" sha1="c8716276fe6c4b0808078086f505efce1137afc9" offset="00000" status="baddump" />
+				<rom name="jumping jack (1986)(spc)(jp).bin" size="5920" crc="49030973" sha1="c8716276fe6c4b0808078086f505efce1137afc9" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -560,7 +560,7 @@ and why some of the dumps below have weird size?
 		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="12288">
-				<rom name="masterchess (19xx)(-).bin" size="12288" crc="c10a6e96" sha1="5dd24aae17c3a293ae91ef5086c1c4f3e59263ed" offset="00000" status="baddump" />
+				<rom name="masterchess (19xx)(-).bin" size="12288" crc="c10a6e96" sha1="5dd24aae17c3a293ae91ef5086c1c4f3e59263ed" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -572,7 +572,7 @@ and why some of the dumps below have weird size?
 		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="6392">
-				<rom name="reversi (19xx)(games of skill).bin" size="6392" crc="ca2cd257" sha1="a048a1055d175ace09155e50da0387986e150f92" offset="00000" status="baddump" />
+				<rom name="reversi (19xx)(games of skill).bin" size="6392" crc="ca2cd257" sha1="a048a1055d175ace09155e50da0387986e150f92" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -580,11 +580,10 @@ and why some of the dumps below have weird size?
 <!-- these come from TOSEC: they do not work and it's not clear where they
 come from... they might be eventually removed -->
 
-<!-- the first contains Czech text strings so it might be a real Czech cart,
-but we need more info -->
+<!-- Actualy this is wordmaze translated into Czech 1990 by ROS-->
 	<software name="unk_maze" supported="no">
 		<description>Unknown CSMAZE</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8448">
@@ -602,6 +601,90 @@ but we need more info -->
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="5376">
 				<rom name="zzz-unk-intruder.bin" size="5376" crc="12859c5d" sha1="fd8fc752be6afcbf016f8a33e21ad9e1b7c50c48" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
+<!-- This is only Sord memory expansion -->
+	<software name="em-5" supported="no">
+		<description>EM-5 Expansion memory 32Kb</description>
+		<year>198?</year>
+		<publisher>Sord</publisher>
+		<part name="cart" interface="m5_cart">
+			<feature name="slot" value="ram"/>
+			<dataarea name="ram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Homebrew memory modules -->
+
+	<software name="64kbi" supported="no">
+		<description>EM-64 Expansion memory 64Kb</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<part name="cart" interface="m5_cart">
+			<feature name="slot" value="ram"/>
+			<dataarea name="ram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="64kbf" supported="no">
+		<description>64Kbf Expansion memory 64Kb</description>
+		<year>199?</year>
+		<publisher>unknown</publisher>
+		<part name="cart" interface="m5_cart">
+			<feature name="slot" value="ram"/>
+			<dataarea name="ram" size="65536">
+			</dataarea>
+			<dataarea name="rom" size="20480">
+				<rom name="basic-f (198x)(sord)(jp).bin" size="20480" crc="47be051f" sha1="9942b8f05a441b5dee7ab31ec5b8a643f7e268b8" offset="00000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="64krx" supported="no">
+		<description>64Krx Expansion board 64Kb</description>
+		<year>199?</year>
+		<publisher>unknown</publisher>
+		<part name="cart" interface="m5_cart">
+			<feature name="slot" value="ram"/>
+			<dataarea name="ram" size="65536">
+			</dataarea>
+			<dataarea name="rom" size="0x16000">
+				<rom name="krx_rom2.rom" size="0x2000" crc="5AF18FBD" sha1="cd67d65fb51cdb3a47cc8350a878a77360a353c8" offset="0x0000"/>
+				<rom name="basic-i (198x)(sord)(jp).bin" size="0x2000" crc="9a98e6ce" sha1="d11f7623919ee593e275e9f00f8a4acf7aed3cf5" offset="0x2000"/>
+				<rom name="krx_rom4.rom" size="0x4000" crc="27FFB883" sha1="be930946e7cd5f0f3e803792906e087cce122703" offset="0x6000"/>
+				<rom name="krx_rom5.rom" size="0x4000" crc="107B5DDC" sha1="071fa84c7b10d9d7841c504564825609ebf66140" offset="0xa000"/>
+				<rom name="krx_rom6.rom" size="0x4000" crc="4D6E9C1A" sha1="d8bf96fc4016e245fd84d713fd988dd503a38d0b" offset="0xe000"/>
+				<rom name="krx_rom7.rom" size="0x4000" crc="4EF7830A" sha1="9527236af9dd0db25498f4029793703ba8672af5" offset="0x12000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Brno mod ROMs -->
+
+	<software name="brno_con" supported="no">
+		<description>Boot for Brno ramdisk [console version]</description>
+		<year>1989</year>
+		<publisher>&lt;Pavel Brychta a spol.&gt;</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="3456">
+				<rom name="brno_boot.rom" size="3456" crc="60008729" sha1="FB26E2AE9F74B0AE0D723B417A038A8EF3D72782" offset="00000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brno_win" supported="no">
+		<description>Boot for Brno ramdisk [windows version]</description>
+		<year>1989</year>
+		<publisher>&lt;Ladislav Novak&gt;</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="brno_win.rom" size="8192" crc="f4cfb2ee" sha1="23f41d2d9ac915545409dd0163f3dc298f04eea2" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>

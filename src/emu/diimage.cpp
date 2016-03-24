@@ -57,8 +57,8 @@ const image_device_type_info device_image_interface::m_device_info_array[] =
 device_image_interface::device_image_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "image"),
 		m_err(),
-		m_file(nullptr),
-		m_mame_file(nullptr),
+		m_file(),
+		m_mame_file(),
 		m_software_info_ptr(nullptr),
 		m_software_part_ptr(nullptr),
 		m_supported(0),
@@ -158,32 +158,30 @@ void device_image_interface::device_compute_hash(hash_collection &hashes, const 
 image_error_t device_image_interface::set_image_filename(const char *filename)
 {
 	m_image_name = filename;
-	zippath_parent(m_working_directory, filename);
+	util::zippath_parent(m_working_directory, filename);
 	m_basename.assign(m_image_name);
 
-	int loc1 = m_image_name.find_last_of('\\');
-	int loc2 = m_image_name.find_last_of('/');
-	int loc3 = m_image_name.find_last_of(':');
-	int loc = MAX(loc1,MAX(loc2,loc3));
-	if (loc!=-1) {
+	size_t loc1 = m_image_name.find_last_of('\\');
+	size_t loc2 = m_image_name.find_last_of('/');
+	size_t loc3 = m_image_name.find_last_of(':');
+	size_t loc = MAX(loc1,MAX(loc2, loc3));
+	if (loc != -1) {
 		if (loc == loc3)
 		{
 			// temp workaround for softlists now that m_image_name contains the part name too (e.g. list:gamename:cart)
 			m_basename = m_basename.substr(0, loc);
-			std::string tmpstr = std::string(m_basename);
-			int tmploc = tmpstr.find_last_of(':');
-			m_basename = m_basename.substr(tmploc + 1,loc-tmploc);
+			size_t tmploc = m_basename.find_last_of(':');
+			m_basename = m_basename.substr(tmploc + 1, loc - tmploc);
 		}
 		else
-			m_basename = m_basename.substr(loc + 1, m_basename.length() - loc);
+			m_basename = m_basename.substr(loc + 1);
 	}
-	m_basename_noext = m_basename.assign(m_basename);
+	m_basename_noext = m_basename;
 	m_filetype = "";
 	loc = m_basename_noext.find_last_of('.');
-	if (loc!=-1) {
-		m_basename_noext = m_basename_noext.substr(0,loc);
-		m_filetype = m_basename.assign(m_basename);
-		m_filetype = m_filetype.substr(loc + 1, m_filetype.length() - loc);
+	if (loc != -1) {
+		m_basename_noext = m_basename_noext.substr(0, loc);
+		m_filetype = m_basename.substr(loc + 1);
 	}
 
 	return IMAGE_ERROR_SUCCESS;
@@ -321,7 +319,7 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 
 	/* did we successfully identify the directory? */
 	if (success)
-		zippath_combine(m_working_directory, m_working_directory.c_str(), subdir);
+		util::zippath_combine(m_working_directory, m_working_directory.c_str(), subdir);
 
 	return success;
 }
@@ -332,11 +330,8 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 
 void device_image_interface::setup_working_directory()
 {
-	char *dst = nullptr;
-
-	osd_get_full_path(&dst,".");
 	/* first set up the working directory to be the starting directory */
-	m_working_directory = dst;
+	osd_get_full_path(m_working_directory, ".");
 
 	/* now try browsing down to "software" */
 	if (try_change_working_directory("software"))
@@ -348,7 +343,6 @@ void device_image_interface::setup_working_directory()
 			gamedrv = driver_list::compatible_with(gamedrv);
 		}
 	}
-	osd_free(dst);
 }
 
 //-------------------------------------------------
@@ -371,15 +365,16 @@ const char * device_image_interface::working_directory()
     get_software_region
 -------------------------------------------------*/
 
-UINT8 *device_image_interface::get_software_region(std::string tag)
+UINT8 *device_image_interface::get_software_region(const char *tag)
 {
 	char full_tag[256];
 
 	if ( m_software_info_ptr == nullptr || m_software_part_ptr == nullptr )
 		return nullptr;
 
-	sprintf( full_tag, "%s:%s", device().tag().c_str(), tag.c_str() );
-	return device().machine().root_device().memregion( full_tag )->base();
+	sprintf( full_tag, "%s:%s", device().tag(), tag );
+	memory_region *region = device().machine().root_device().memregion(full_tag);
+	return region != NULL ? region->base() : NULL;
 }
 
 
@@ -387,12 +382,14 @@ UINT8 *device_image_interface::get_software_region(std::string tag)
     image_get_software_region_length
 -------------------------------------------------*/
 
-UINT32 device_image_interface::get_software_region_length(std::string tag)
+UINT32 device_image_interface::get_software_region_length(const char *tag)
 {
 	char full_tag[256];
 
-	sprintf( full_tag, "%s:%s", device().tag().c_str(), tag.c_str() );
-	return device().machine().root_device().memregion( full_tag )->bytes();
+	sprintf( full_tag, "%s:%s", device().tag(), tag );
+
+	memory_region *region = device().machine().root_device().memregion(full_tag);
+	return region != NULL ? region->bytes() : 0;
 }
 
 
@@ -410,7 +407,7 @@ const char *device_image_interface::get_feature(const char *feature_name)
 //  load_software_region -
 //-------------------------------------------------
 
-bool device_image_interface::load_software_region(std::string tag, optional_shared_ptr<UINT8> &ptr)
+bool device_image_interface::load_software_region(const char *tag, optional_shared_ptr<UINT8> &ptr)
 {
 	size_t size = get_software_region_length(tag);
 
@@ -511,14 +508,14 @@ void device_image_interface::battery_load(void *buffer, int length, int fill)
 {
 	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
 
-	file_error filerr;
+	osd_file::error filerr;
 	int bytes_read = 0;
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
 
 	/* try to open the battery file and read it in, if possible */
 	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_READ);
 	filerr = file.open(fname.c_str());
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 		bytes_read = file.read(buffer, length);
 
 	/* fill remaining bytes (if necessary) */
@@ -529,14 +526,14 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 {
 	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
 
-	file_error filerr;
+	osd_file::error filerr;
 	int bytes_read = 0;
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
 
 	/* try to open the battery file and read it in, if possible */
 	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_READ);
 	filerr = file.open(fname.c_str());
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 		bytes_read = file.read(buffer, length);
 
 	/* if no file was present, copy the default battery */
@@ -557,8 +554,8 @@ void device_image_interface::battery_save(const void *buffer, int length)
 
 	/* try to open the battery file and write it out, if possible */
 	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	file_error filerr = file.open(fname.c_str());
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = file.open(fname.c_str());
+	if (filerr == osd_file::error::NONE)
 		file.write(buffer, length);
 }
 
@@ -610,42 +607,41 @@ bool device_image_interface::is_loaded()
 
 image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, const char *path)
 {
-	file_error filerr;
 	image_error_t err;
 	std::string revised_path;
 
 	/* attempt to read the file */
-	filerr = zippath_fopen(path, open_flags, m_file, revised_path);
+	auto const filerr = util::zippath_fopen(path, open_flags, m_file, revised_path);
 
 	/* did the open succeed? */
 	switch(filerr)
 	{
-		case FILERR_NONE:
+		case osd_file::error::NONE:
 			/* success! */
 			m_readonly = (open_flags & OPEN_FLAG_WRITE) ? 0 : 1;
 			m_created = (open_flags & OPEN_FLAG_CREATE) ? 1 : 0;
 			err = IMAGE_ERROR_SUCCESS;
 			break;
 
-		case FILERR_NOT_FOUND:
-		case FILERR_ACCESS_DENIED:
+		case osd_file::error::NOT_FOUND:
+		case osd_file::error::ACCESS_DENIED:
 			/* file not found (or otherwise cannot open); continue */
 			err = IMAGE_ERROR_FILENOTFOUND;
 			break;
 
-		case FILERR_OUT_OF_MEMORY:
+		case osd_file::error::OUT_OF_MEMORY:
 			/* out of memory */
 			err = IMAGE_ERROR_OUTOFMEMORY;
 			break;
 
-		case FILERR_ALREADY_OPEN:
+		case osd_file::error::ALREADY_OPEN:
 			/* this shouldn't happen */
 			err = IMAGE_ERROR_ALREADYOPEN;
 			break;
 
-		case FILERR_FAILURE:
-		case FILERR_TOO_MANY_FILES:
-		case FILERR_INVALID_DATA:
+		case osd_file::error::FAILURE:
+		case osd_file::error::TOO_MANY_FILES:
+		case osd_file::error::INVALID_DATA:
 		default:
 			/* other errors */
 			err = IMAGE_ERROR_INTERNAL;
@@ -653,7 +649,7 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
 	}
 
 	/* if successful, set the file name */
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 		set_image_filename(revised_path.c_str());
 
 	return err;
@@ -661,45 +657,43 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
 
 int device_image_interface::reopen_for_write(const char *path)
 {
-	if(m_file)
-		core_fclose(m_file);
+	m_file.reset();
 
-	file_error filerr;
 	image_error_t err;
 	std::string revised_path;
 
 	/* attempt to open the file for writing*/
-	filerr = zippath_fopen(path, OPEN_FLAG_READ|OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, m_file, revised_path);
+	auto const filerr = util::zippath_fopen(path, OPEN_FLAG_READ|OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, m_file, revised_path);
 
 	/* did the open succeed? */
 	switch(filerr)
 	{
-		case FILERR_NONE:
+		case osd_file::error::NONE:
 			/* success! */
 			m_readonly = 0;
 			m_created = 1;
 			err = IMAGE_ERROR_SUCCESS;
 			break;
 
-		case FILERR_NOT_FOUND:
-		case FILERR_ACCESS_DENIED:
+		case osd_file::error::NOT_FOUND:
+		case osd_file::error::ACCESS_DENIED:
 			/* file not found (or otherwise cannot open); continue */
 			err = IMAGE_ERROR_FILENOTFOUND;
 			break;
 
-		case FILERR_OUT_OF_MEMORY:
+		case osd_file::error::OUT_OF_MEMORY:
 			/* out of memory */
 			err = IMAGE_ERROR_OUTOFMEMORY;
 			break;
 
-		case FILERR_ALREADY_OPEN:
+		case osd_file::error::ALREADY_OPEN:
 			/* this shouldn't happen */
 			err = IMAGE_ERROR_ALREADYOPEN;
 			break;
 
-		case FILERR_FAILURE:
-		case FILERR_TOO_MANY_FILES:
-		case FILERR_INVALID_DATA:
+		case osd_file::error::FAILURE:
+		case osd_file::error::TOO_MANY_FILES:
+		case osd_file::error::INVALID_DATA:
 		default:
 			/* other errors */
 			err = IMAGE_ERROR_INTERNAL;
@@ -707,7 +701,7 @@ int device_image_interface::reopen_for_write(const char *path)
 	}
 
 	/* if successful, set the file name */
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 		set_image_filename(revised_path.c_str());
 
 	return err;
@@ -805,7 +799,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 			/* handle files */
 			if (ROMENTRY_ISFILE(romp))
 			{
-				file_error filerr = FILERR_NOT_FOUND;
+				osd_file::error filerr = osd_file::error::NOT_FOUND;
 
 				UINT32 crc = 0;
 				bool has_crc = hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
@@ -874,11 +868,10 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 
 				warningcount += verify_length_and_hash(m_mame_file.get(),ROM_GETNAME(romp),ROM_GETLENGTH(romp),hash_collection(ROM_GETHASHDATA(romp)));
 
-				if (filerr == FILERR_NONE)
-				{
-					m_file = *m_mame_file;
+				if (filerr == osd_file::error::NONE)
+					filerr = util::core_file::open_proxy(*m_mame_file, m_file);
+				if (filerr == osd_file::error::NONE)
 					retVal = TRUE;
-				}
 
 				break; // load first item for start
 			}
@@ -1117,17 +1110,8 @@ bool device_image_interface::create(const char *path, const image_device_format 
 
 void device_image_interface::clear()
 {
-	if (m_mame_file)
-	{
-		m_mame_file = nullptr;
-		m_file = nullptr;
-	} else {
-		if (m_file)
-		{
-			core_fclose(m_file);
-			m_file = nullptr;
-		}
-	}
+	m_mame_file.reset();
+	m_file.reset();
 
 	m_image_name.clear();
 	m_readonly = false;
@@ -1180,8 +1164,8 @@ void device_image_interface::update_names(const device_type device_type, const c
 	const char *brief_name = (device_type!=nullptr) ? brief : device_brieftypename(image_type());
 	if (count > 1)
 	{
-		strprintf(m_instance_name,"%s%d", inst_name, index + 1);
-		strprintf(m_brief_instance_name, "%s%d", brief_name, index + 1);
+		m_instance_name = string_format("%s%d", inst_name, index + 1);
+		m_brief_instance_name = string_format("%s%d", brief_name, index + 1);
 	}
 	else
 	{
@@ -1311,8 +1295,7 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 	bool result = call_softlist_load(swpart->info().list(), swpart->info().shortname(), swpart->romdata());
 
 	// Tell the world which part we actually loaded
-	std::string full_sw_name;
-	strprintf(full_sw_name,"%s:%s:%s", swpart->info().list().list_name(), swpart->info().shortname(), swpart->name());
+	std::string full_sw_name = string_format("%s:%s:%s", swpart->info().list().list_name(), swpart->info().shortname(), swpart->name());
 
 	// check compatibility
 	if (!swpart->is_compatible(swpart->info().list()))
@@ -1378,7 +1361,7 @@ std::string device_image_interface::software_get_default_slot(const char *defaul
 
 ui_menu *device_image_interface::get_selection_menu(running_machine &machine, render_container *container)
 {
-	return auto_alloc_clear(machine, <ui_menu_control_device_image>(machine, container, this));
+	return global_alloc_clear<ui_menu_control_device_image>(machine, container, this);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -1417,4 +1400,3 @@ struct io_procs image_ioprocs =
 	image_fwrite_thunk,
 	image_fsize_thunk
 };
-

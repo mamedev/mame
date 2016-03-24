@@ -473,7 +473,7 @@ WRITE_LINE_MEMBER(jpmsys5_state::pia_irq)
 READ8_MEMBER(jpmsys5_state::u29_porta_r)
 {
 	int meter_bit =0;
-	
+
 	if (m_meters != nullptr)
 	{
 		int combined_meter = m_meters->GetActivity(0) | m_meters->GetActivity(1) |
@@ -492,7 +492,7 @@ READ8_MEMBER(jpmsys5_state::u29_porta_r)
 
 		return m_direct_port->read() | meter_bit;
 	}
-	
+
 	else
 		return m_direct_port->read() | meter_bit;
 }
@@ -880,7 +880,7 @@ MACHINE_CONFIG_START( jpmsys5_ym, jpmsys5_state )
 	MCFG_PTM6840_OUT0_CB(WRITE8(jpmsys5_state, u26_o1_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
-	
+
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
 MACHINE_CONFIG_END
@@ -933,7 +933,7 @@ MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
 	MCFG_PTM6840_OUT0_CB(WRITE8(jpmsys5_state, u26_o1_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
-	
+
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
 MACHINE_CONFIG_END

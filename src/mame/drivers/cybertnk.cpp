@@ -179,7 +179,7 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 class cybertnk_state : public driver_device
 {
 public:
-	cybertnk_state(const machine_config &mconfig, device_type type, std::string tag)
+	cybertnk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),

@@ -46,7 +46,7 @@ const rom_entry *c64_nl10_interface_device::device_rom_region() const
 //  c64_nl10_interface_device - constructor
 //-------------------------------------------------
 
-c64_nl10_interface_device::c64_nl10_interface_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+c64_nl10_interface_device::c64_nl10_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, C64_NL10_INTERFACE, "Star NL-10 C64 Interface Cartridge", tag, owner, clock, "c64_nl10", __FILE__),
 		device_cbm_iec_interface(mconfig, *this)
 {

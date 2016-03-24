@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- BBC Micro - ARM Co-Processor Discs -->
+
+<!-- Loading Instructions:
+
+      Hold down the SHIFT key and press and release the BREAK key.
+-->
+
+<softwarelist name="bbc_flop_arm" description="ARM Co-Processor Discs">
+
+	<software name="armevals" supported="no">
+		<description>ARM Evaluation System Discs</description>
+		<year>1986</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="format" value="ADFS" />
+		<info name="compatibility" value="ARM co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="TWIN and ASSEMBLER"/>
+			<dataarea name="flop" size="655360">
+				<rom name="armevaluationsystem-disc1.adl" size="655360" crc="82fe3687" sha1="494bf65dcf070a198512115fa42456315a86e535" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities 1"/>
+			<dataarea name="flop" size="655360">
+				<rom name="armevaluationsystem-disc2.adl" size="655360" crc="600e6976" sha1="f6f29281668e9673da7dee9a4fc9dec2b8c40343" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities 2 &amp; BASIC"/>
+			<dataarea name="flop" size="655360">
+				<rom name="armevaluationsystem-disc3.adl" size="655360" crc="44fa03a3" sha1="f5114ff744f6f742da3959a91a1b98af0bd1db5d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Cambridge LISP"/>
+			<dataarea name="flop" size="655360">
+				<rom name="armevaluationsystem-disc4.adl" size="655360" crc="99b8850d" sha1="aba50d169c63088a11e5ef106a86f26dd9e65db3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="PROLOG"/>
+			<dataarea name="flop" size="655360">
+				<rom name="armevaluationsystem-disc5.adl" size="655360" crc="c4756884" sha1="171f86f0c5591a8ee5388e42db76f81d30ab0484" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="FORTRAN 77"/>
+			<dataarea name="flop" size="655360">
+				<rom name="armevaluationsystem-disc6.adl" size="655360" crc="3545ff34" sha1="88a74bfe6eb864574be41e09a6f338f5895bc980" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

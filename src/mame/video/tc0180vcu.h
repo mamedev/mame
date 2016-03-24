@@ -6,11 +6,11 @@
 class tc0180vcu_device : public device_t
 {
 public:
-	tc0180vcu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tc0180vcu_device() {}
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void set_bg_colorbase(device_t &device, int color) { downcast<tc0180vcu_device &>(device).m_bg_color_base = color; }
 	static void set_fg_colorbase(device_t &device, int color) { downcast<tc0180vcu_device &>(device).m_fg_color_base = color; }
 	static void set_tx_colorbase(device_t &device, int color) { downcast<tc0180vcu_device &>(device).m_tx_color_base = color; }

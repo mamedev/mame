@@ -40,7 +40,7 @@
 class pce220_state : public driver_device
 {
 public:
-	pce220_state(const machine_config &mconfig, device_type type, std::string tag)
+	pce220_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_ram(*this, RAM_TAG),
@@ -102,7 +102,7 @@ public:
 class pcg850v_state : public pce220_state
 {
 public:
-	pcg850v_state(const machine_config &mconfig, device_type type, std::string tag)
+	pcg850v_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pce220_state(mconfig, type, tag)
 		{ }
 
@@ -942,7 +942,7 @@ static MACHINE_CONFIG_START( pce220, pce220_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
@@ -978,7 +978,7 @@ static MACHINE_CONFIG_START( pcg850v, pcg850v_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))

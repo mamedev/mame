@@ -23,7 +23,7 @@ months for an average citizen.
 class mk90_state : public driver_device
 {
 public:
-	mk90_state(const machine_config &mconfig, device_type type, std::string tag)
+	mk90_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
@@ -82,7 +82,7 @@ static MACHINE_CONFIG_START( mk90, mk90_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mk90_state, screen_update_mk90)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 /* ROM definition */

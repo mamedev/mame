@@ -1186,17 +1186,16 @@ WRITE8_MEMBER( x07_state::x07_io_w )
 			m_cass_tick->reset();
 		}
 
-#if(1)
 		if((data & 0x0e) == 0x0e)
 		{
+			UINT16 div = (m_regs_w[2] | m_regs_w[3] << 8) & 0x0fff;
+			m_beep->set_clock((div == 0) ? 0 : 192000 / div);
 			m_beep->set_state(1);
-			m_beep->set_frequency(192000 / ((m_regs_w[2] | (m_regs_w[3] << 8)) & 0x0fff));
 
 			m_beep_stop->adjust(attotime::from_msec(m_ram->pointer()[0x450] * 0x20));
 		}
 		else
 			m_beep->set_state(0);
-#endif
 		break;
 
 	case 0xf5:

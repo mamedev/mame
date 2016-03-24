@@ -146,7 +146,7 @@ device_nes_cart_interface::~device_nes_cart_interface()
 //  pointer allocators
 //-------------------------------------------------
 
-void device_nes_cart_interface::prg_alloc(size_t size, std::string tag)
+void device_nes_cart_interface::prg_alloc(size_t size, const char *tag)
 {
 	if (m_prg == nullptr)
 	{
@@ -213,7 +213,7 @@ void device_nes_cart_interface::prg_alloc(size_t size, std::string tag)
 	}
 }
 
-void device_nes_cart_interface::vrom_alloc(size_t size, std::string tag)
+void device_nes_cart_interface::vrom_alloc(size_t size, const char *tag)
 {
 	if (m_vrom == nullptr)
 	{
@@ -742,7 +742,7 @@ void device_nes_cart_interface::nes_banks_restore()
 //-------------------------------------------------
 //  nes_cart_slot_device - constructor
 //-------------------------------------------------
-nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, NES_CART_SLOT, "NES Cartridge Slot", tag, owner, clock, "nes_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -917,10 +917,10 @@ std::string nes_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string = "nrom";
-		UINT32 len = core_fsize(m_file);
+		UINT32 len = m_file->size();
 		dynamic_buffer rom(len);
 
-		core_fread(m_file, &rom[0], len);
+		m_file->read(&rom[0], len);
 
 		if ((rom[0] == 'N') && (rom[1] == 'E') && (rom[2] == 'S'))
 			slot_string = get_default_card_ines(&rom[0], len);

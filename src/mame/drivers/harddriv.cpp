@@ -340,7 +340,7 @@ Notes:
 
 const device_type HARDDRIV_DEVICE = &device_creator<harddriv_state>;
 
-harddriv_state::harddriv_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HARDDRIV_DEVICE, "Hard Drivin' PCB Family", tag, owner, clock, "harddriv_pcb", __FILE__),
 /*  device_video_interface(mconfig, *this, false), */
 			m_maincpu(*this, "maincpu"),
@@ -358,12 +358,12 @@ harddriv_state::harddriv_state(const machine_config &mconfig, std::string tag, d
 			m_screen(*this, "screen"),
 			m_duartn68681(*this, "duartn68681"),
 			m_hd34010_host_access(0),
-			m_dsk_pio_access(0),
 			m_msp_ram(*this, "msp_ram"),
 			m_dsk_ram(nullptr),
 			m_dsk_rom(nullptr),
 			m_dsk_10c(*this, "dsk_10c"),
 			m_dsk_30c(*this, "dsk_30c"),
+			m_dsk_pio_access(0),
 			m_m68k_slapstic_base(nullptr),
 			m_m68k_sloop_alt_base(nullptr),
 			m_200e(*this, "200e"),
@@ -410,7 +410,7 @@ harddriv_state::harddriv_state(const machine_config &mconfig, std::string tag, d
 			m_sim_memory(nullptr),
 			m_sim_memory_size(0),
 			m_adsp_pgm_memory_word(nullptr),
-			m_ds3_sdata_memory(nullptr),
+			m_ds3_sdata_memory(*this, "ds3sdsp_data"),
 			m_ds3_sdata_memory_size(0),
 			m_ds3_gcmd(0),
 			m_ds3_gflag(0),
@@ -504,7 +504,7 @@ harddriv_state::harddriv_state(const machine_config &mconfig, std::string tag, d
 class harddriv_new_state : public driver_device
 {
 public:
-	harddriv_new_state(const machine_config &mconfig, device_type type, std::string tag)
+	harddriv_new_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_mainpcb(*this, "mainpcb")
 		, m_leftpcb(*this, "leftpcb")
@@ -1425,7 +1425,7 @@ static MACHINE_CONFIG_FRAGMENT( driver_nomsp )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", harddriv_state, video_int_gen)
 	MCFG_CPU_PERIODIC_INT_DRIVER(harddriv_state, hd68k_irq_gen,  (double)HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
 
-	MCFG_SLAPSTIC_ADD("slapstic")
+	MCFG_SLAPSTIC_ADD("slapstic", 117)
 	MCFG_SLAPSTIC_68K_ACCESS(1)
 
 	MCFG_CPU_ADD("gsp", TMS34010, HARDDRIV_GSP_CLOCK)
@@ -1472,6 +1472,7 @@ static MACHINE_CONFIG_FRAGMENT( driver_msp )
 	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(harddriv_state, hdmsp_irq_gen))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
+	MCFG_DEVICE_REMOVE("slapstic")
 MACHINE_CONFIG_END
 
 
@@ -1510,6 +1511,7 @@ static MACHINE_CONFIG_FRAGMENT( multisync_msp )
 	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(harddriv_state, hdmsp_irq_gen))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
+	MCFG_DEVICE_REMOVE("slapstic")
 MACHINE_CONFIG_END
 
 
@@ -1524,6 +1526,8 @@ static MACHINE_CONFIG_FRAGMENT( multisync2 )
 
 	MCFG_CPU_MODIFY("gsp")
 	MCFG_CPU_PROGRAM_MAP(multisync2_gsp_map)
+
+	MCFG_DEVICE_REMOVE("slapstic")
 MACHINE_CONFIG_END
 
 
@@ -1682,6 +1686,7 @@ static MACHINE_CONFIG_FRAGMENT( stunrun )
 	MCFG_CPU_MODIFY("gsp")
 	MCFG_TMS340X0_PIXEL_CLOCK(5000000)  /* pixel clock */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
+	MCFG_DEVICE_REMOVE("slapstic")
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1740,7 +1745,7 @@ MACHINE_CONFIG_END
 
 const device_type HARDDRIV_BOARD_DEVICE = &device_creator<harddriv_board_device_state>;
 
-harddriv_board_device_state::harddriv_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+harddriv_board_device_state::harddriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1766,7 +1771,7 @@ void harddrivc_board_device_state::device_start()
 
 const device_type HARDDRIVC_BOARD_DEVICE = &device_creator<harddrivc_board_device_state>;
 
-harddrivc_board_device_state::harddrivc_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+harddrivc_board_device_state::harddrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1794,7 +1799,7 @@ void racedrivb1_board_device_state::device_start()
 const device_type RACEDRIV_BOARD_DEVICE = &device_creator<racedriv_board_device_state>;
 const device_type RACEDRIVB1_BOARD_DEVICE = &device_creator<racedrivb1_board_device_state>;
 
-racedriv_board_device_state::racedriv_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+racedriv_board_device_state::racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1831,7 +1836,7 @@ const device_type RACEDRIVC_BOARD_DEVICE = &device_creator<racedrivc_board_devic
 const device_type RACEDRIVC1_BOARD_DEVICE = &device_creator<racedrivc1_board_device_state>;
 const device_type RACEDRIVC_PANORAMA_SIDE_BOARD_DEVICE = &device_creator<racedrivc_panorama_side_board_device_state>;
 
-racedrivc_board_device_state::racedrivc_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+racedrivc_board_device_state::racedrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1857,7 +1862,7 @@ void stunrun_board_device_state::device_start()
 
 const device_type STUNRUN_BOARD_DEVICE = &device_creator<stunrun_board_device_state>;
 
-stunrun_board_device_state::stunrun_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+stunrun_board_device_state::stunrun_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1891,7 +1896,7 @@ const device_type STEELTAL_BOARD_DEVICE = &device_creator<steeltal_board_device_
 const device_type STEELTAL1_BOARD_DEVICE = &device_creator<steeltal1_board_device_state>;
 const device_type STEELTALP_BOARD_DEVICE = &device_creator<steeltalp_board_device_state>;
 
-steeltal_board_device_state::steeltal_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+steeltal_board_device_state::steeltal_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1911,7 +1916,7 @@ void strtdriv_board_device_state::device_start()
 
 const device_type STRTDRIV_BOARD_DEVICE = &device_creator<strtdriv_board_device_state>;
 
-strtdriv_board_device_state::strtdriv_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+strtdriv_board_device_state::strtdriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1938,7 +1943,7 @@ void hdrivairp_board_device_state::device_start()
 const device_type HDRIVAIR_BOARD_DEVICE = &device_creator<hdrivair_board_device_state>;
 const device_type HDRIVAIRP_BOARD_DEVICE = &device_creator<hdrivairp_board_device_state>;
 
-hdrivair_board_device_state::hdrivair_board_device_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+hdrivair_board_device_state::hdrivair_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -2005,8 +2010,8 @@ MACHINE_CONFIG_END
 WRITE_LINE_MEMBER(harddriv_new_state::tx_a)
 {
 	// passive connection, one way, to both screens
-	m_leftpcb->m_duartn68681->rx_a_w(state);
-	m_rightpcb->m_duartn68681->rx_a_w(state);
+	m_leftpcb->get_duart()->rx_a_w(state);
+	m_rightpcb->get_duart()->rx_a_w(state);
 }
 
 static MACHINE_CONFIG_START( racedriv_panorama_machine, harddriv_new_state )
@@ -2018,6 +2023,10 @@ static MACHINE_CONFIG_START( racedriv_panorama_machine, harddriv_new_state )
 	MCFG_DEVICE_MODIFY("mainpcb:duartn68681")
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, harddriv_new_state,tx_a))
 
+	// boots with 'PROGRAM OK' when using standard Hard Drivin' board type (needs 137412-115 slapstic)
+	MCFG_DEVICE_MODIFY("mainpcb:slapstic")
+	MCFG_SLAPSTIC_NUM(115)
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hack_timer", harddriv_new_state, hack_timer, attotime::from_hz(60))
 //  MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 MACHINE_CONFIG_END
@@ -2026,9 +2035,9 @@ MACHINE_CONFIG_END
 // by forcing them to stay in sync using this ugly method everything works much better.
 TIMER_DEVICE_CALLBACK_MEMBER(harddriv_new_state::hack_timer)
 {
-	m_leftpcb->m_screen->reset_origin(0, 0);
-	m_mainpcb->m_screen->reset_origin(0, 0);
-	m_rightpcb->m_screen->reset_origin(0, 0);
+	m_leftpcb->get_screen()->reset_origin(0, 0);
+	m_mainpcb->get_screen()->reset_origin(0, 0);
+	m_rightpcb->get_screen()->reset_origin(0, 0);
 }
 
 /*************************************
@@ -2589,9 +2598,8 @@ ROM_START( stunrun )
 	ROM_LOAD16_BYTE( "136070-2112.200w", 0x0a0000, 0x010000, CRC(3f896aaf) SHA1(817136ddc37566108de15f6bfedc6e0da13a2df2) )
 	ROM_LOAD16_BYTE( "136070-2111.210w", 0x0a0001, 0x010000, CRC(47f010ad) SHA1(a2587ce1d01c78f1d757fb3e4512be9655d17f9c) )
 
-	ROM_REGION( 0x14000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
-	ROM_LOAD( "136070-2123.10c", 0x010000, 0x004000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
+	ROM_LOAD( "136070-2123.10c", 0x00000, 0x10000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
 
 	ROM_REGION16_BE( 0x60000, "mainpcb:user1", 0 )  /* 384k for ADSP object ROM */
 	ROM_LOAD16_BYTE( "136070-2121.90h", 0x000000, 0x010000, CRC(0ebf8e58) SHA1(b6bf3e020b29a34ef3eaca6b5e1f17bb89fdc476) )
@@ -2630,9 +2638,8 @@ ROM_START( stunrunj )
 	ROM_LOAD16_BYTE( "136070-2112.200w", 0x0a0000, 0x010000, CRC(3f896aaf) SHA1(817136ddc37566108de15f6bfedc6e0da13a2df2) )
 	ROM_LOAD16_BYTE( "136070-2111.210w", 0x0a0001, 0x010000, CRC(47f010ad) SHA1(a2587ce1d01c78f1d757fb3e4512be9655d17f9c) )
 
-	ROM_REGION( 0x14000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
-	ROM_LOAD( "136070-2123.10c", 0x010000, 0x004000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
+	ROM_LOAD( "136070-2123.10c", 0x00000, 0x10000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
 
 	ROM_REGION16_BE( 0x60000, "mainpcb:user1", 0 )  /* 384k for ADSP object ROM */
 	ROM_LOAD16_BYTE( "136070-2121.90h", 0x000000, 0x010000, CRC(0ebf8e58) SHA1(b6bf3e020b29a34ef3eaca6b5e1f17bb89fdc476) )
@@ -2671,9 +2678,8 @@ ROM_START( stunrun5 )
 	ROM_LOAD16_BYTE( "136070-2112.200w", 0x0a0000, 0x010000, CRC(3f896aaf) SHA1(817136ddc37566108de15f6bfedc6e0da13a2df2) )
 	ROM_LOAD16_BYTE( "136070-2111.210w", 0x0a0001, 0x010000, CRC(47f010ad) SHA1(a2587ce1d01c78f1d757fb3e4512be9655d17f9c) )
 
-	ROM_REGION( 0x14000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
-	ROM_LOAD( "136070-2123.10c", 0x010000, 0x004000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
+	ROM_LOAD( "136070-2123.10c", 0x00000, 0x10000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
 
 	ROM_REGION16_BE( 0x60000, "mainpcb:user1", 0 )  /* 384k for ADSP object ROM */
 	ROM_LOAD16_BYTE( "136070-2121.90h", 0x000000, 0x010000, CRC(0ebf8e58) SHA1(b6bf3e020b29a34ef3eaca6b5e1f17bb89fdc476) )
@@ -2712,9 +2718,8 @@ ROM_START( stunrune )
 	ROM_LOAD16_BYTE( "136070-2112.200w", 0x0a0000, 0x010000, CRC(3f896aaf) SHA1(817136ddc37566108de15f6bfedc6e0da13a2df2) )
 	ROM_LOAD16_BYTE( "136070-2111.210w", 0x0a0001, 0x010000, CRC(47f010ad) SHA1(a2587ce1d01c78f1d757fb3e4512be9655d17f9c) )
 
-	ROM_REGION( 0x14000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
-	ROM_LOAD( "136070-2123.10c", 0x010000, 0x004000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
+	ROM_LOAD( "136070-2123.10c", 0x00000, 0x10000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
 
 	ROM_REGION16_BE( 0x60000, "mainpcb:user1", 0 )  /* 384k for ADSP object ROM */
 	ROM_LOAD16_BYTE( "136070-2121.90h", 0x000000, 0x010000, CRC(0ebf8e58) SHA1(b6bf3e020b29a34ef3eaca6b5e1f17bb89fdc476) )
@@ -2753,9 +2758,8 @@ ROM_START( stunrun4 )
 	ROM_LOAD16_BYTE( "136070-2112.200w", 0x0a0000, 0x010000, CRC(3f896aaf) SHA1(817136ddc37566108de15f6bfedc6e0da13a2df2) )
 	ROM_LOAD16_BYTE( "136070-2111.210w", 0x0a0001, 0x010000, CRC(47f010ad) SHA1(a2587ce1d01c78f1d757fb3e4512be9655d17f9c) )
 
-	ROM_REGION( 0x14000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
-	ROM_LOAD( "136070-2123.10c", 0x010000, 0x004000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
+	ROM_LOAD( "136070-2123.10c", 0x00000, 0x10000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
 
 	ROM_REGION16_BE( 0x60000, "mainpcb:user1", 0 )  /* 384k for ADSP object ROM */
 	ROM_LOAD16_BYTE( "136070-2121.90h", 0x000000, 0x010000, CRC(0ebf8e58) SHA1(b6bf3e020b29a34ef3eaca6b5e1f17bb89fdc476) )
@@ -2794,9 +2798,8 @@ ROM_START( stunrun3 )
 	ROM_LOAD16_BYTE( "136070-2112.200w", 0x0a0000, 0x010000, CRC(3f896aaf) SHA1(817136ddc37566108de15f6bfedc6e0da13a2df2) )
 	ROM_LOAD16_BYTE( "136070-2111.210w", 0x0a0001, 0x010000, CRC(47f010ad) SHA1(a2587ce1d01c78f1d757fb3e4512be9655d17f9c) )
 
-	ROM_REGION( 0x14000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
-	ROM_LOAD( "136070-2123.10c", 0x010000, 0x004000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
+	ROM_LOAD( "136070-2123.10c", 0x00000, 0x10000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
 
 	ROM_REGION16_BE( 0x60000, "mainpcb:user1", 0 )  /* 384k for ADSP object ROM */
 	ROM_LOAD16_BYTE( "136070-2121.90h", 0x000000, 0x010000, CRC(0ebf8e58) SHA1(b6bf3e020b29a34ef3eaca6b5e1f17bb89fdc476) )
@@ -2835,9 +2838,8 @@ ROM_START( stunrun3e )
 	ROM_LOAD16_BYTE( "136070-2112.200w", 0x0a0000, 0x010000, CRC(3f896aaf) SHA1(817136ddc37566108de15f6bfedc6e0da13a2df2) )
 	ROM_LOAD16_BYTE( "136070-2111.210w", 0x0a0001, 0x010000, CRC(47f010ad) SHA1(a2587ce1d01c78f1d757fb3e4512be9655d17f9c) )
 
-	ROM_REGION( 0x14000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
-	ROM_LOAD( "136070-2123.10c", 0x010000, 0x004000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
+	ROM_LOAD( "136070-2123.10c", 0x00000, 0x10000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
 
 	ROM_REGION16_BE( 0x60000, "mainpcb:user1", 0 )  /* 384k for ADSP object ROM */
 	ROM_LOAD16_BYTE( "136070-2121.90h", 0x000000, 0x010000, CRC(0ebf8e58) SHA1(b6bf3e020b29a34ef3eaca6b5e1f17bb89fdc476) )
@@ -2876,9 +2878,8 @@ ROM_START( stunrun2 )
 	ROM_LOAD16_BYTE( "136070-2112.200w", 0x0a0000, 0x010000, CRC(3f896aaf) SHA1(817136ddc37566108de15f6bfedc6e0da13a2df2) )
 	ROM_LOAD16_BYTE( "136070-2111.210w", 0x0a0001, 0x010000, CRC(47f010ad) SHA1(a2587ce1d01c78f1d757fb3e4512be9655d17f9c) )
 
-	ROM_REGION( 0x14000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
-	ROM_LOAD( "136070-2123.10c", 0x010000, 0x004000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
+	ROM_LOAD( "136070-2123.10c", 0x00000, 0x10000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
 
 	ROM_REGION16_BE( 0x60000, "mainpcb:user1", 0 )  /* 384k for ADSP object ROM */
 	ROM_LOAD16_BYTE( "136070-2121.90h", 0x000000, 0x010000, CRC(0ebf8e58) SHA1(b6bf3e020b29a34ef3eaca6b5e1f17bb89fdc476) )
@@ -2917,9 +2918,8 @@ ROM_START( stunrun2e )
 	ROM_LOAD16_BYTE( "136070-2112.200w", 0x0a0000, 0x010000, CRC(3f896aaf) SHA1(817136ddc37566108de15f6bfedc6e0da13a2df2) )
 	ROM_LOAD16_BYTE( "136070-2111.210w", 0x0a0001, 0x010000, CRC(47f010ad) SHA1(a2587ce1d01c78f1d757fb3e4512be9655d17f9c) )
 
-	ROM_REGION( 0x14000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
-	ROM_LOAD( "136070-2123.10c", 0x010000, 0x004000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
+	ROM_LOAD( "136070-2123.10c", 0x00000, 0x10000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
 
 	ROM_REGION16_BE( 0x60000, "mainpcb:user1", 0 )  /* 384k for ADSP object ROM */
 	ROM_LOAD16_BYTE( "136070-2121.90h", 0x000000, 0x010000, CRC(0ebf8e58) SHA1(b6bf3e020b29a34ef3eaca6b5e1f17bb89fdc476) )
@@ -2958,9 +2958,8 @@ ROM_START( stunrun0 )
 	ROM_LOAD16_BYTE( "136070-2112.200w", 0x0a0000, 0x010000, CRC(3f896aaf) SHA1(817136ddc37566108de15f6bfedc6e0da13a2df2) )
 	ROM_LOAD16_BYTE( "136070-2111.210w", 0x0a0001, 0x010000, CRC(47f010ad) SHA1(a2587ce1d01c78f1d757fb3e4512be9655d17f9c) )
 
-	ROM_REGION( 0x14000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
-	ROM_LOAD( "136070-2123.10c", 0x010000, 0x004000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
+	ROM_LOAD( "136070-2123.10c", 0x00000, 0x10000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
 
 	ROM_REGION16_BE( 0x60000, "mainpcb:user1", 0 )  /* 384k for ADSP object ROM */
 	ROM_LOAD16_BYTE( "136070-2121.90h", 0x000000, 0x010000, CRC(0ebf8e58) SHA1(b6bf3e020b29a34ef3eaca6b5e1f17bb89fdc476) )
@@ -2999,9 +2998,8 @@ ROM_START( stunrunp )
 	ROM_LOAD16_BYTE( "136070-2112.200w", 0x0a0000, 0x010000, CRC(3f896aaf) SHA1(817136ddc37566108de15f6bfedc6e0da13a2df2) )
 	ROM_LOAD16_BYTE( "136070-2111.210w", 0x0a0001, 0x010000, CRC(47f010ad) SHA1(a2587ce1d01c78f1d757fb3e4512be9655d17f9c) )
 
-	ROM_REGION( 0x14000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
-	ROM_LOAD( "136070-2123.10c", 0x010000, 0x004000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
+	ROM_LOAD( "136070-2123.10c", 0x00000, 0x10000, CRC(121ab09a) SHA1(c26b8ddbcb011416e6ab695980d2cf37e672e973) )
 
 	ROM_REGION16_BE( 0x60000, "mainpcb:user1", 0 )  /* 384k for ADSP object ROM */
 	ROM_LOAD16_BYTE( "136070-2121.90h", 0x000000, 0x010000, CRC(0ebf8e58) SHA1(b6bf3e020b29a34ef3eaca6b5e1f17bb89fdc476) )
@@ -4070,7 +4068,6 @@ Filename    Location    Label           Board
 ROM_START( racedrivpan )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 )        /* 2MB for 68000 code */
 	// Multisync PBB A045988 - Central Monitor
-	// boots with 'PROGRAM OK' when using standard Hard Drivin' board type (needs 137412-115 slapstic)
 	ROM_LOAD16_BYTE( "088-1002.bin", 0x000000, 0x010000, CRC(49a97391) SHA1(dbe4086cd87669a02d2a2133d0d9e2895946b383) )
 	ROM_LOAD16_BYTE( "088-1001.bin", 0x000001, 0x010000, CRC(4473accc) SHA1(099bda6cfe31d4e53cbe74046679ddf8b874982d) )
 	ROM_LOAD16_BYTE( "088-1004.bin", 0x020000, 0x010000, CRC(33b84ca6) SHA1(9e3cafadfb23bfc4a44e503043cc05db27d939a9) )
@@ -4210,9 +4207,8 @@ ROM_START( steeltal )
 	ROM_LOAD16_BYTE( "136087-1016.200y", 0x0e0000, 0x010000, CRC(db62362e) SHA1(e1d392aa00ac36296728257fa26c6aa68a4ebe5f) )
 	ROM_LOAD16_BYTE( "136087-1015.210y", 0x0e0001, 0x010000, CRC(ef517db7) SHA1(16e7e351326391480bf36c58d6b34ef4128b6627) )
 
-	ROM_REGION( 0x14000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
-	ROM_LOAD( "136087-5001.1f",  0x010000, 0x004000, CRC(c52d8218) SHA1(3511c8c65583c7e44242f4cc48d7cc46fc748868) )
-	ROM_CONTINUE(                0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
+	ROM_LOAD( "136087-5001.1f",  0x00000, 0x10000, CRC(c52d8218) SHA1(3511c8c65583c7e44242f4cc48d7cc46fc748868) )
 
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )       /* 64k for ASIC65 */
 	ROM_LOAD( "136087-9007.10c", 0x000000, 0x002000, CRC(2956984f) SHA1(63c9a99b00c3cbb63aca908b076c2c4d3f70f386) )
@@ -4274,9 +4270,8 @@ ROM_START( steeltalg )
 	ROM_LOAD16_BYTE( "136087-1016.200y", 0x0e0000, 0x010000, CRC(db62362e) SHA1(e1d392aa00ac36296728257fa26c6aa68a4ebe5f) )
 	ROM_LOAD16_BYTE( "136087-1015.210y", 0x0e0001, 0x010000, CRC(ef517db7) SHA1(16e7e351326391480bf36c58d6b34ef4128b6627) )
 
-	ROM_REGION( 0x14000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
-	ROM_LOAD( "136087-5001.1f",  0x010000, 0x004000, CRC(c52d8218) SHA1(3511c8c65583c7e44242f4cc48d7cc46fc748868) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
+	ROM_LOAD( "136087-5001.1f",  0x00000, 0x10000, CRC(c52d8218) SHA1(3511c8c65583c7e44242f4cc48d7cc46fc748868) )
 
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )       /* 64k for ASIC65 */
 	ROM_LOAD( "136087-9007.10c", 0x000000, 0x002000, CRC(2956984f) SHA1(63c9a99b00c3cbb63aca908b076c2c4d3f70f386) )
@@ -4338,9 +4333,8 @@ ROM_START( steeltal1 )
 	ROM_LOAD16_BYTE( "136087-1016.200y", 0x0e0000, 0x010000, CRC(db62362e) SHA1(e1d392aa00ac36296728257fa26c6aa68a4ebe5f) )
 	ROM_LOAD16_BYTE( "136087-1015.210y", 0x0e0001, 0x010000, CRC(ef517db7) SHA1(16e7e351326391480bf36c58d6b34ef4128b6627) )
 
-	ROM_REGION( 0x14000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
-	ROM_LOAD( "136087-5001.1f",  0x010000, 0x004000, CRC(c52d8218) SHA1(3511c8c65583c7e44242f4cc48d7cc46fc748868) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
+	ROM_LOAD( "136087-5001.1f",  0x00000, 0x10000, CRC(c52d8218) SHA1(3511c8c65583c7e44242f4cc48d7cc46fc748868) )
 
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )       /* 64k for ASIC65 */
 	ROM_LOAD( "136087-9007.10c", 0x000000, 0x002000, CRC(2956984f) SHA1(63c9a99b00c3cbb63aca908b076c2c4d3f70f386) )
@@ -4402,9 +4396,8 @@ ROM_START( steeltalp )
 	ROM_LOAD16_BYTE( "rom-200y.bin", 0xe0000, 0x10000, CRC(b568e1be) SHA1(5d62037892e040515e4262db43057f33436fa12d) )
 	ROM_LOAD16_BYTE( "rom-210y.bin", 0xe0001, 0x10000, CRC(3f5cdd3e) SHA1(c33c155158a5c69a7f2e61cd88b297dc14ecd479) )
 
-	ROM_REGION( 0x14000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
-	ROM_LOAD( "136087-5001.1f",  0x010000, 0x004000, CRC(c52d8218) SHA1(3511c8c65583c7e44242f4cc48d7cc46fc748868) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "mainpcb:jsa:cpu", 0 )     /* 64k for 6502 code */
+	ROM_LOAD( "136087-5001.1f",  0x00000, 0x10000, CRC(c52d8218) SHA1(3511c8c65583c7e44242f4cc48d7cc46fc748868) )
 
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )       /* 64k for ASIC65 */
 	ROM_LOAD( "136087-9007.10c", 0x000000, 0x002000, CRC(2956984f) SHA1(63c9a99b00c3cbb63aca908b076c2c4d3f70f386) )
@@ -4485,7 +4478,7 @@ ROM_START( strtdriv )
 	ROM_LOAD( "136091-0033.10j", 0x000000, 0x010000, CRC(57504ab6) SHA1(ec8361b7da964c07ca0da48a87537badc3986fe0) )
 
 	ROM_REGION16_BE( 0x100000, "mainpcb:ds3xdsp", 0 )  /* DS III auxillary ADSP-2105 (unused) */
-	ROM_FILL(                    0x000000, 0x010000, nullptr)
+	ROM_FILL(                    0x000000, 0x010000, 0x00)
 
 	ROM_REGION( 0x80000, "mainpcb:ds3sdsp_data", 0 )
 	ROM_LOAD16_BYTE( "136052-1123.12lm",0x00000, 0x10000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
@@ -4652,7 +4645,7 @@ void harddriv_state::init_multisync(int compact_inputs)
 	m_gsp_multisync = TRUE;
 
 	// if we have a JSA board, install the read/write handlers
-	if (m_jsa != nullptr)
+	if (m_jsa.found())
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x600000, 0x603fff, read8_delegate(FUNC(atari_jsa_base_device::main_response_r),m_jsa.target()), write8_delegate(FUNC(atari_jsa_base_device::main_command_w),m_jsa.target()), 0xff00);
 
 	/* install handlers for the compact driving games' inputs */
@@ -4707,9 +4700,7 @@ void harddriv_state::init_ds3()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x823800, 0x823fff, write16_delegate(FUNC(harddriv_state::hd68k_ds3_control_w), this));
 
 	/* predetermine memory regions */
-	m_ds3_sdata_memory = (UINT16 *)memregion("ds3sdsp_data")->base();
-	m_ds3_sdata_memory_size = memregion("ds3sdsp_data")->bytes() / 2;
-
+	m_ds3_sdata_memory_size = m_ds3_sdata_memory.bytes() / 2;
 /*
 
 
@@ -4938,7 +4929,7 @@ void harddriv_state::init_racedriv(void)
 	init_driver_sound();
 
 	/* set up the slapstic */
-	m_slapstic_device->slapstic_init(machine(), 117);
+	m_slapstic_device->slapstic_init();
 	m_m68k_slapstic_base = m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
 
 	/* synchronization */
@@ -4959,7 +4950,7 @@ void harddriv_state::racedrivc_init_common(offs_t gsp_protection)
 	init_driver_sound();
 
 	/* set up the slapstic */
-	m_slapstic_device->slapstic_init(machine(), 117);
+	m_slapstic_device->slapstic_init();
 	m_m68k_slapstic_base = m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
 
 	/* synchronization */
@@ -4989,7 +4980,7 @@ void harddriv_state::init_racedrivc_panorama_side()
 	init_adsp();
 
 	/* set up the slapstic */
-	m_slapstic_device->slapstic_init(machine(), 117);
+	m_slapstic_device->slapstic_init();
 	m_m68k_slapstic_base = m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
 
 	/* set up protection hacks */
@@ -5081,7 +5072,7 @@ void harddriv_state::init_strtdriv(void)
 	init_dsk();
 
 	/* set up the slapstic */
-	m_slapstic_device->slapstic_init(machine(), 117);
+	m_slapstic_device->slapstic_init();
 	m_m68k_slapstic_base = m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa80000, 0xafffff, read16_delegate(FUNC(harddriv_state::hda68k_port1_r), this));

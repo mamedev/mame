@@ -133,7 +133,7 @@
 
 class wd_fdc_t : public device_t {
 public:
-	wd_fdc_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	wd_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).intrq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).drq_cb.set_callback(object); }
@@ -275,7 +275,7 @@ private:
 		WRITE_TRACK,
 		WRITE_SECTOR,
 
-		// Sub states
+		// Sub states, plus the reset-time restore request
 
 		SPINUP,
 		SPINUP_WAIT,
@@ -303,6 +303,8 @@ private:
 		SECTOR_READ,
 		SECTOR_WRITE,
 		TRACK_DONE,
+
+		INITIAL_RESTORE,
 
 		// Live states
 
@@ -446,7 +448,7 @@ private:
 
 class wd_fdc_analog_t : public wd_fdc_t {
 public:
-	wd_fdc_analog_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	wd_fdc_analog_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	virtual void pll_reset(bool fm, bool enmf, const attotime &when) override;
@@ -464,7 +466,7 @@ private:
 
 class wd_fdc_digital_t : public wd_fdc_t {
 public:
-	wd_fdc_digital_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	wd_fdc_digital_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	static const int wd_digital_step_times[4];
@@ -508,7 +510,7 @@ private:
 
 class fd1771_t : public wd_fdc_analog_t {
 public:
-	fd1771_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fd1771_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int calc_sector_size(UINT8 size, UINT8 command) const override;
@@ -516,7 +518,7 @@ protected:
 
 class fd1781_t : public wd_fdc_analog_t {
 public:
-	fd1781_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fd1781_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int calc_sector_size(UINT8 size, UINT8 command) const override;
@@ -524,32 +526,32 @@ protected:
 
 class fd1791_t : public wd_fdc_analog_t {
 public:
-	fd1791_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fd1791_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class fd1792_t : public wd_fdc_analog_t {
 public:
-	fd1792_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fd1792_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class fd1793_t : public wd_fdc_analog_t {
 public:
-	fd1793_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fd1793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class kr1818vg93_t : public wd_fdc_analog_t {
 public:
-	kr1818vg93_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	kr1818vg93_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class fd1794_t : public wd_fdc_analog_t {
 public:
-	fd1794_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fd1794_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class fd1795_t : public wd_fdc_analog_t {
 public:
-	fd1795_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fd1795_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int calc_sector_size(UINT8 size, UINT8 command) const override;
@@ -557,7 +559,7 @@ protected:
 
 class fd1797_t : public wd_fdc_analog_t {
 public:
-	fd1797_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fd1797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int calc_sector_size(UINT8 size, UINT8 command) const override;
@@ -565,32 +567,32 @@ protected:
 
 class mb8866_t : public wd_fdc_analog_t {
 public:
-	mb8866_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mb8866_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class mb8876_t : public wd_fdc_analog_t {
 public:
-	mb8876_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mb8876_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class mb8877_t : public wd_fdc_analog_t {
 public:
-	mb8877_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mb8877_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class fd1761_t : public wd_fdc_analog_t {
 public:
-	fd1761_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fd1761_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class fd1763_t : public wd_fdc_analog_t {
 public:
-	fd1763_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fd1763_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class fd1765_t : public wd_fdc_analog_t {
 public:
-	fd1765_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fd1765_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int calc_sector_size(UINT8 size, UINT8 command) const override;
@@ -598,7 +600,7 @@ protected:
 
 class fd1767_t : public wd_fdc_analog_t {
 public:
-	fd1767_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fd1767_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int calc_sector_size(UINT8 size, UINT8 command) const override;
@@ -606,19 +608,19 @@ protected:
 
 class wd2791_t : public wd_fdc_analog_t {
 public:
-	wd2791_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	wd2791_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	DECLARE_WRITE_LINE_MEMBER(enmf_w) { enmf = state ? false : true; }
 };
 
 class wd2793_t : public wd_fdc_analog_t {
 public:
-	wd2793_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	DECLARE_WRITE_LINE_MEMBER(enmf_w) { enmf = state ? false : true; }
 };
 
 class wd2795_t : public wd_fdc_analog_t {
 public:
-	wd2795_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	wd2795_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int calc_sector_size(UINT8 size, UINT8 command) const override;
@@ -626,7 +628,7 @@ protected:
 
 class wd2797_t : public wd_fdc_analog_t {
 public:
-	wd2797_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	wd2797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int calc_sector_size(UINT8 size, UINT8 command) const override;
@@ -634,12 +636,12 @@ protected:
 
 class wd1770_t : public wd_fdc_digital_t {
 public:
-	wd1770_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	wd1770_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class wd1772_t : public wd_fdc_digital_t {
 public:
-	wd1772_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	wd1772_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int settle_time() const override;
@@ -647,7 +649,7 @@ protected:
 
 class wd1773_t : public wd_fdc_digital_t {
 public:
-	wd1773_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	wd1773_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type FD1771;

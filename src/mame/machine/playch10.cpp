@@ -38,7 +38,7 @@ void playch10_state::machine_reset()
 
 void playch10_state::machine_start()
 {
-	m_vrom = memregion("gfx2")->base();
+	m_vrom = (m_vrom_region != NULL) ? m_vrom_region->base() : NULL;
 
 	/* allocate 4K of nametable ram here */
 	/* move to individual boards as documentation of actual boards allows */
@@ -58,7 +58,7 @@ void playch10_state::machine_start()
 
 MACHINE_START_MEMBER(playch10_state,playch10_hboard)
 {
-	m_vrom = memregion("gfx2")->base();
+	m_vrom = (m_vrom_region != NULL) ? m_vrom_region->base() : NULL;
 
 	/* allocate 4K of nametable ram here */
 	/* move to individual boards as documentation of actual boards allows */

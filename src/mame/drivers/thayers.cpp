@@ -42,7 +42,7 @@ public:
 		TIMER_SSI263_PHONEME_TICK
 	};
 
-	thayers_state(const machine_config &mconfig, device_type type, std::string tag)
+	thayers_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_pr7820(*this, "laserdisc"),
 		m_ldv1000(*this, "ldv1000"),
@@ -780,7 +780,7 @@ static MACHINE_CONFIG_START( thayers, thayers_state )
 	MCFG_CPU_IO_MAP(thayers_io_map)
 
 	MCFG_CPU_ADD("mcu", COP421, XTAL_4MHz/2) // COP421L-PCA/N
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED )
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false )
 	MCFG_COP400_READ_L_CB(READ8(thayers_state, cop_l_r))
 	MCFG_COP400_WRITE_L_CB(WRITE8(thayers_state, cop_l_w))
 	MCFG_COP400_READ_G_CB(READ8(thayers_state, cop_g_r))

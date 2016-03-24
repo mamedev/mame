@@ -20,7 +20,7 @@ class z88_1024k_flash_device : public device_t,
 {
 public:
 	// construction/destruction
-	z88_1024k_flash_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	z88_1024k_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

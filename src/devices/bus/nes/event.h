@@ -12,7 +12,7 @@ class nes_event_device : public nes_sxrom_device
 {
 public:
 	// construction/destruction
-	nes_event_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nes_event_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -21,7 +21,7 @@ class rom_image_device :    public device_t,
 {
 public:
 	// construction/destruction
-	rom_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~rom_image_device();
 
 	// image-level overrides
@@ -65,7 +65,7 @@ class cpc_rom_device  : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cpc_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

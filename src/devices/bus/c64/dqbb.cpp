@@ -35,7 +35,7 @@ const device_type C64_DQBB = &device_creator<c64_dqbb_cartridge_device>;
 //  c64_dqbb_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_dqbb_cartridge_device::c64_dqbb_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+c64_dqbb_cartridge_device::c64_dqbb_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_DQBB, "C64 Double Quick Brown Box cartridge", tag, owner, clock, "c64_dqbb", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),

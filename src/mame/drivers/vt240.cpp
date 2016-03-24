@@ -47,7 +47,7 @@
 class vt240_state : public driver_device
 {
 public:
-	vt240_state(const machine_config &mconfig, device_type type, std::string tag)
+	vt240_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_i8251(*this, "i8251"),
@@ -219,7 +219,7 @@ static MACHINE_CONFIG_FRAGMENT( vt240_motherboard )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 //  MCFG_VIDEO_START_OVERRIDE(vt240_state,vt240)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vt240)
 
 	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_4MHz / 4)

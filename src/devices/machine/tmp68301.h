@@ -25,7 +25,7 @@ class tmp68301_device : public device_t,
 						public device_memory_interface
 {
 public:
-	tmp68301_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tmp68301_device() {}
 
 	template<class _Object> static devcb_base &set_in_parallel_callback(device_t &device, _Object object) { return downcast<tmp68301_device &>(device).m_in_parallel_cb.set_callback(object); }

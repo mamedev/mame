@@ -1,4 +1,4 @@
-// license:GPL2+
+// license:GPL-2.0+
 // copyright-holders:FelipeSanches, Sandro Ronco
 //
 // Wacky Gator
@@ -30,7 +30,7 @@
 class wackygtr_state : public driver_device
 {
 public:
-	wackygtr_state(const machine_config &mconfig, device_type type, std::string tag)
+	wackygtr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),

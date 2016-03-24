@@ -59,7 +59,7 @@ device_a800_cart_interface::~device_a800_cart_interface ()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_a800_cart_interface::rom_alloc(UINT32 size, std::string tag)
+void device_a800_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -101,14 +101,14 @@ void device_a800_cart_interface::nvram_alloc(UINT32 size)
 //-------------------------------------------------
 //  ****_cart_slot_device - constructor
 //-------------------------------------------------
-a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 						device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this), m_cart(nullptr), m_type(0)
 {
 }
 
-a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, A800_CART_SLOT, "Atari 8bit Cartridge Slot", tag, owner, clock, "a800_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this), m_cart(nullptr), m_type(0)
@@ -116,13 +116,13 @@ a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, std:
 }
 
 
-a5200_cart_slot_device::a5200_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+a5200_cart_slot_device::a5200_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						a800_cart_slot_device(mconfig, A5200_CART_SLOT, "Atari 5200 Cartridge Slot", tag, owner, clock, "a5200_cart_slot", __FILE__)
 {
 }
 
 
-xegs_cart_slot_device::xegs_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+xegs_cart_slot_device::xegs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						a800_cart_slot_device(mconfig, XEGS_CART_SLOT, "Atari XEGS Cartridge Slot", tag, owner, clock, "xegs_cart_slot", __FILE__)
 {
 }
@@ -412,13 +412,13 @@ std::string a800_cart_slot_device::get_default_card_software()
 	{
 		const char *slot_string;
 		dynamic_buffer head(0x10);
-		UINT32 len = core_fsize(m_file);
+		UINT32 len = m_file->size();
 		int type = A800_8K;
 
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, &head[0], 0x10);
+			m_file->read(&head[0], 0x10);
 			type = identify_cart_type(&head[0]);
 		}
 		else    // otherwise try to guess based on size
@@ -449,13 +449,13 @@ std::string a5200_cart_slot_device::get_default_card_software()
 	{
 		const char *slot_string;
 		dynamic_buffer head(0x10);
-		UINT32 len = core_fsize(m_file);
+		UINT32 len = m_file->size();
 		int type = A5200_8K;
 
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, &head[0], 0x10);
+			m_file->read(&head[0], 0x10);
 			type = identify_cart_type(&head[0]);
 
 			std::string info;
@@ -482,13 +482,13 @@ std::string xegs_cart_slot_device::get_default_card_software()
 	{
 		const char *slot_string;
 		dynamic_buffer head(0x10);
-		UINT32 len = core_fsize(m_file);
+		UINT32 len = m_file->size();
 		int type = A800_8K;
 
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, &head[0], 0x10);
+			m_file->read(&head[0], 0x10);
 			type = identify_cart_type(&head[0]);
 		}
 		if (type != A800_XEGS)

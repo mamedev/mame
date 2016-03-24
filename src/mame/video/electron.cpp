@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 /******************************************************************************
+
     Acorn Electron driver
 
     MESS Driver By:
@@ -15,30 +16,50 @@
 /*
   From the ElectrEm site:
 
-Timing is somewhat of a thorny issue on the Electron. It is almost certain the Electron could have been a much faster machine if BBC Micro OS level compatibility had not been not a design requirement.
+Timing is somewhat of a thorny issue on the Electron. It is almost certain the
+Electron could have been a much faster machine if BBC Micro OS level
+compatibility had not been not a design requirement.
 
-When accessing the ROM regions, the CPU always runs at 2MHz. When accessing the FC (1 MHz bus) or FD (JIM) pages, the CPU always runs at 1MHz.
+When accessing the ROM regions, the CPU always runs at 2MHz. When accessing
+the FC (1 MHz bus) or FD (JIM) pages, the CPU always runs at 1MHz.
 
-The timing for RAM accesses varies depending on the graphics mode, and how many bytes are required to be read by the video circuits per scanline. When accessing RAM in modes 4-6, the CPU is simply moved to a 1MHz clock. This occurs for any RAM access at any point during the frame.
+The timing for RAM accesses varies depending on the graphics mode, and how
+many bytes are required to be read by the video circuits per scanline. When
+accessing RAM in modes 4-6, the CPU is simply moved to a 1MHz clock. This
+occurs for any RAM access at any point during the frame.
 
-In modes 0-3, if the CPU tries to access RAM at any time during which the video circuits are fetching bytes, it is halted by means of receiving a stopped clock until the video circuits next stop fetching bytes.
+In modes 0-3, if the CPU tries to access RAM at any time during which the
+video circuits are fetching bytes, it is halted by means of receiving a
+stopped clock until the video circuits next stop fetching bytes.
 
-Each scanline is drawn in exactly 64us, and of that the video circuits fetch bytes for 40us. In modes 0, 1 and 2, 256 scanlines have pixels on, whereas in mode 3 only 250 scanlines are affected as mode 3 is a 'spaced' mode.
+Each scanline is drawn in exactly 64us, and of that the video circuits fetch
+bytes for 40us. In modes 0, 1 and 2, 256 scanlines have pixels on, whereas in
+mode 3 only 250 scanlines are affected as mode 3 is a 'spaced' mode.
 
-As opposed to one clock generator which changes pace, the 1MHz and 2MHz clocks are always available, so the ULA acts to simply change which clock is piped to the CPU. This means in half of all cases, a further 2MHz cycle is lost waiting for the 2MHz and 1MHz clocks to synchronise during a 2MHz to 1MHz step.
+As opposed to one clock generator which changes pace, the 1MHz and 2MHz clocks
+are always available, so the ULA acts to simply change which clock is piped to
+the CPU. This means in half of all cases, a further 2MHz cycle is lost waiting
+for the 2MHz and 1MHz clocks to synchronise during a 2MHz to 1MHz step.
 
-The video circuits run from a constant 2MHz clock, and generate 312 scanlines a frame, one scanline every 128 cycles. This actually gives means the Electron is running at 50.08 frames a second.
+The video circuits run from a constant 2MHz clock, and generate 312 scanlines
+a frame, one scanline every 128 cycles. This actually gives means the Electron
+is running at 50.08 frames a second.
 
-Creating a scanline numbering scheme where the first scanline with pixels is scanline 0, in all modes the end of display interrupt is generated at the end of scanline 255, and the RTC interrupt is generated upon the end of scanline 99.
+Creating a scanline numbering scheme where the first scanline with pixels is
+scanline 0, in all modes the end of display interrupt is generated at the end
+of scanline 255, and the RTC interrupt is generated upon the end of scanline 99.
 
-From investigating some code for vertical split modes printed in Electron User volume 7, issue 7 it seems that the exact timing of the end of display interrupt is somewhere between 24 and 40 cycles after the end of pixels. This may coincide with HSYNC. I have no similarly accurate timing for the real time clock interrupt at this time.
+From investigating some code for vertical split modes printed in Electron User
+volume 7, issue 7 it seems that the exact timing of the end of display interrupt
+is somewhere between 24 and 40 cycles after the end of pixels. This may coincide
+with HSYNC. I have no similarly accurate timing for the real time clock
+interrupt at this time.
 
-Mode changes are 'immediate', so any change in RAM access timing occurs exactly after the write cycle of the changing instruction. Similarly palette changes take effect immediately. VSYNC is not signalled in any way.
+Mode changes are 'immediate', so any change in RAM access timing occurs exactly
+after the write cycle of the changing instruction. Similarly palette changes
+take effect immediately. VSYNC is not signalled in any way.
 
 */
-
-
-
 
 void electron_state::video_start()
 {

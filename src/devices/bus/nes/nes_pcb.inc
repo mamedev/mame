@@ -381,7 +381,7 @@ const char * nes_cart_slot_device::nes_get_slot( int pcb_id )
 
 struct nes_cart_lines
 {
-	const char* tag;
+	const char *tag;
 	int line;
 };
 
@@ -414,7 +414,7 @@ static int nes_cart_get_line( const char *feature )
 	if (feature == nullptr)
 		return 128;
 
-	while (nes_line->tag!=nullptr)
+	while (nes_line->tag)
 	{
 		if (strcmp(nes_line->tag, feature) == 0)
 			break;

@@ -49,6 +49,7 @@
 //#include "osdepend.h"
 
 #include <math.h>
+#include <mutex>
 
 
 //**************************************************************************
@@ -61,7 +62,9 @@ enum
 	BLENDMODE_NONE = 0,                                 // no blending
 	BLENDMODE_ALPHA,                                    // standard alpha blend
 	BLENDMODE_RGB_MULTIPLY,                             // apply source alpha to source pix, then multiply RGB values
-	BLENDMODE_ADD                                       // apply source alpha to source pix, then add to destination
+	BLENDMODE_ADD,                                      // apply source alpha to source pix, then add to destination
+
+	BLENDMODE_COUNT
 };
 
 
@@ -70,6 +73,13 @@ const UINT8 RENDER_CREATE_NO_ART        = 0x01;         // ignore any views that
 const UINT8 RENDER_CREATE_SINGLE_FILE   = 0x02;         // only load views from the file specified
 const UINT8 RENDER_CREATE_HIDDEN        = 0x04;         // don't make this target visible
 
+// render scaling modes
+enum
+{
+	SCALE_FRACTIONAL = 0,                               // compute fractional scaling factors for both axes
+	SCALE_FRACTIONAL_X,                                 // compute fractional scaling factor for x-axis, and integer factor for y-axis
+	SCALE_INTEGER                                       // compute integer scaling factors for both axes, based on target dimensions
+};
 
 // flags for primitives
 const int PRIMFLAG_TEXORIENT_SHIFT = 0;
@@ -83,7 +93,6 @@ const UINT32 PRIMFLAG_BLENDMODE_MASK = 15 << PRIMFLAG_BLENDMODE_SHIFT;
 
 const int PRIMFLAG_ANTIALIAS_SHIFT = 12;
 const UINT32 PRIMFLAG_ANTIALIAS_MASK = 1 << PRIMFLAG_ANTIALIAS_SHIFT;
-
 const int PRIMFLAG_SCREENTEX_SHIFT = 13;
 const UINT32 PRIMFLAG_SCREENTEX_MASK = 1 << PRIMFLAG_SCREENTEX_SHIFT;
 
@@ -103,6 +112,9 @@ const int PRIMFLAG_TYPE_SHIFT = 19;
 const UINT32 PRIMFLAG_TYPE_MASK = 3 << PRIMFLAG_TYPE_SHIFT;
 const UINT32 PRIMFLAG_TYPE_LINE = 0 << PRIMFLAG_TYPE_SHIFT;
 const UINT32 PRIMFLAG_TYPE_QUAD = 1 << PRIMFLAG_TYPE_SHIFT;
+
+const int PRIMFLAG_PACKABLE_SHIFT = 21;
+const UINT32 PRIMFLAG_PACKABLE = 1 << PRIMFLAG_PACKABLE_SHIFT;
 
 //**************************************************************************
 //  MACROS
@@ -322,6 +334,9 @@ public:
 
 	// getters
 	render_primitive *next() const { return m_next; }
+	bool packable(const INT32 pack_size) const { return (flags & PRIMFLAG_PACKABLE) && texture.base != nullptr && texture.width <= pack_size && texture.height <= pack_size; }
+	float get_quad_width() const { return bounds.x1 - bounds.x0; }
+	float get_quad_height() const { return bounds.y1 - bounds.y0; }
 
 	// reset to prepare for re-use
 	void reset();
@@ -358,8 +373,8 @@ public:
 	render_primitive *first() const { return m_primlist.first(); }
 
 	// lock management
-	void acquire_lock() { osd_lock_acquire(m_lock); }
-	void release_lock() { osd_lock_release(m_lock); }
+	void acquire_lock() { m_lock.lock(); }
+	void release_lock() { m_lock.unlock(); }
 
 	// reference management
 	void add_reference(void *refptr);
@@ -388,7 +403,7 @@ private:
 	fixed_allocator<render_primitive> m_primitive_allocator;// allocator for primitives
 	fixed_allocator<reference> m_reference_allocator;       // allocator for references
 
-	osd_lock *          m_lock;                             // lock to protect list accesses
+	std::recursive_mutex     m_lock;                             // lock to protect list accesses
 };
 
 
@@ -429,7 +444,7 @@ public:
 
 private:
 	// internal helpers
-	void get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist);
+	void get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, UINT32 flags = 0);
 	const rgb_t *get_adjusted_palette(render_container &container);
 
 	static const int MAX_TEXTURE_SCALES = 16;
@@ -883,6 +898,7 @@ public:
 	UINT32 width() const { return m_width; }
 	UINT32 height() const { return m_height; }
 	float pixel_aspect() const { return m_pixel_aspect; }
+	int scale_mode() const { return m_scale_mode; }
 	float max_update_rate() const { return m_max_refresh; }
 	int orientation() const { return m_orientation; }
 	render_layer_config layer_config() const { return m_layerconfig; }
@@ -985,7 +1001,11 @@ private:
 	INT32                   m_width;                    // width in pixels
 	INT32                   m_height;                   // height in pixels
 	render_bounds           m_bounds;                   // bounds of the target
+	bool                    m_keepaspect;               // constrain aspect ratio
 	float                   m_pixel_aspect;             // aspect ratio of individual pixels
+	int                     m_scale_mode;               // type of scale to apply 
+	int                     m_int_scale_x;              // horizontal integer scale factor
+	int                     m_int_scale_y;              // vertical integer scale factor
 	float                   m_max_refresh;              // maximum refresh rate, 0 or if none
 	int                     m_orientation;              // orientation
 	render_layer_config     m_layerconfig;              // layer configuration

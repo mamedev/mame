@@ -60,7 +60,7 @@ device_sms_control_port_interface::~device_sms_control_port_interface()
 //  sms_control_port_device - constructor
 //-------------------------------------------------
 
-sms_control_port_device::sms_control_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+sms_control_port_device::sms_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, SMS_CONTROL_PORT, "Sega SMS control port", tag, owner, clock, "sms_control_port", __FILE__),
 						device_slot_interface(mconfig, *this), m_device(nullptr),
 						m_th_pin_handler(*this),

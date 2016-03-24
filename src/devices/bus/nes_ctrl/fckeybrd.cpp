@@ -144,7 +144,7 @@ machine_config_constructor nes_fckeybrd_device::device_mconfig_additions() const
 //  nes_fckeybrd_device - constructor
 //-------------------------------------------------
 
-nes_fckeybrd_device::nes_fckeybrd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+nes_fckeybrd_device::nes_fckeybrd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 					device_t(mconfig, NES_FCKEYBOARD, "Nintendo Family Computer Keyboard Component", tag, owner, clock, "nes_fckeybrd", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_cassette(*this, "tape"),

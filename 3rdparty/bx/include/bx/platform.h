@@ -22,6 +22,7 @@
 #define BX_PLATFORM_PS4        0
 #define BX_PLATFORM_QNX        0
 #define BX_PLATFORM_RPI        0
+#define BX_PLATFORM_STEAMLINK  0
 #define BX_PLATFORM_WINDOWS    0
 #define BX_PLATFORM_WINRT      0
 #define BX_PLATFORM_XBOX360    0
@@ -122,7 +123,7 @@
 #if defined(_XBOX_VER)
 #	undef  BX_PLATFORM_XBOX360
 #	define BX_PLATFORM_XBOX360 1
-#elif defined (_DURANGO)
+#elif defined(_DURANGO) || defined(_XBOX_ONE)
 #	undef  BX_PLATFORM_XBOXONE
 #	define BX_PLATFORM_XBOXONE 1
 #elif defined(_WIN32) || defined(_WIN64)
@@ -152,20 +153,24 @@
 #		undef  BX_PLATFORM_WINRT
 #		define BX_PLATFORM_WINRT 1
 #	endif
-#elif defined(__VCCOREVER__)
-// RaspberryPi compiler defines __linux__
-#	undef  BX_PLATFORM_RPI
-#	define BX_PLATFORM_RPI 1
-#elif defined(__native_client__)
-// NaCl compiler defines __linux__
-#	include <ppapi/c/pp_macros.h>
-#	undef  BX_PLATFORM_NACL
-#	define BX_PLATFORM_NACL PPAPI_RELEASE
 #elif defined(__ANDROID__)
 // Android compiler defines __linux__
 #	include <android/api-level.h>
 #	undef  BX_PLATFORM_ANDROID
 #	define BX_PLATFORM_ANDROID __ANDROID_API__
+#elif defined(__native_client__)
+// NaCl compiler defines __linux__
+#	include <ppapi/c/pp_macros.h>
+#	undef  BX_PLATFORM_NACL
+#	define BX_PLATFORM_NACL PPAPI_RELEASE
+#elif defined(__STEAMLINK__)
+// SteamLink compiler defines __linux__
+#	undef  BX_PLATFORM_STEAMLINK
+#	define BX_PLATFORM_STEAMLINK 1
+#elif defined(__VCCOREVER__)
+// RaspberryPi compiler defines __linux__
+#	undef  BX_PLATFORM_RPI
+#	define BX_PLATFORM_RPI 1
 #elif defined(__linux__)
 #	undef  BX_PLATFORM_LINUX
 #	define BX_PLATFORM_LINUX 1
@@ -204,6 +209,7 @@
 						|| BX_PLATFORM_NACL \
 						|| BX_PLATFORM_OSX \
 						|| BX_PLATFORM_QNX \
+						|| BX_PLATFORM_STEAMLINK \
 						|| BX_PLATFORM_PS4 \
 						|| BX_PLATFORM_RPI \
 						)
@@ -223,15 +229,15 @@
 				BX_STRINGIZE(__clang_minor__) "." \
 				BX_STRINGIZE(__clang_patchlevel__)
 #elif BX_COMPILER_MSVC
-#	if BX_COMPILER_MSVC >= 1900
+#	if BX_COMPILER_MSVC >= 1900 // Visual Studio 2015
 #		define BX_COMPILER_NAME "MSVC 14.0"
-#	elif BX_COMPILER_MSVC >= 1800
+#	elif BX_COMPILER_MSVC >= 1800 // Visual Studio 2013
 #		define BX_COMPILER_NAME "MSVC 12.0"
-#	elif BX_COMPILER_MSVC >= 1700
+#	elif BX_COMPILER_MSVC >= 1700 // Visual Studio 2012
 #		define BX_COMPILER_NAME "MSVC 11.0"
-#	elif BX_COMPILER_MSVC >= 1600
+#	elif BX_COMPILER_MSVC >= 1600 // Visual Studio 2010
 #		define BX_COMPILER_NAME "MSVC 10.0"
-#	elif BX_COMPILER_MSVC >= 1500
+#	elif BX_COMPILER_MSVC >= 1500 // Visual Studio 2008
 #		define BX_COMPILER_NAME "MSVC 9.0"
 #	else
 #		define BX_COMPILER_NAME "MSVC"
@@ -263,6 +269,8 @@
 #	define BX_PLATFORM_NAME "QNX"
 #elif BX_PLATFORM_RPI
 #	define BX_PLATFORM_NAME "RaspberryPi"
+#elif BX_PLATFORM_STEAMLINK
+#	define BX_PLATFORM_NAME "SteamLink"
 #elif BX_PLATFORM_WINDOWS
 #	define BX_PLATFORM_NAME "Windows"
 #elif BX_PLATFORM_WINRT

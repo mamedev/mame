@@ -32,33 +32,34 @@
 
 PALETTE_INIT_MEMBER(btime_state,btime)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
-
-
 	/* Burger Time doesn't have a color PROM, but Hamburge has. */
 	/* This function is also used by Eggs. */
-	if (color_prom == nullptr) return;
-
-	for (i = 0; i < palette.entries(); i++)
+	if (m_prom_region == nullptr)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		return;
+	}
 
+	const UINT8 *color_prom = m_prom_region->base();
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
 		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int bit0 = (color_prom[i] >> 0) & 0x01;
+		int bit1 = (color_prom[i] >> 1) & 0x01;
+		int bit2 = (color_prom[i] >> 2) & 0x01;
+		int r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* green component */
 		bit0 = (color_prom[i] >> 3) & 0x01;
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* blue component */
 		bit0 = 0;
 		bit1 = (color_prom[i] >> 6) & 0x01;
 		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
@@ -84,27 +85,26 @@ PALETTE_INIT_MEMBER(btime_state,btime)
 PALETTE_INIT_MEMBER(btime_state,lnc)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
-
 		/* red component */
-		bit0 = (color_prom[i] >> 7) & 0x01;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int bit0 = (color_prom[i] >> 7) & 0x01;
+		int bit1 = (color_prom[i] >> 6) & 0x01;
+		int bit2 = (color_prom[i] >> 5) & 0x01;
+		int r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* green component */
 		bit0 = (color_prom[i] >> 4) & 0x01;
 		bit1 = (color_prom[i] >> 3) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* blue component */
 		bit0 = 0;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 0) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r,g,b));
 	}

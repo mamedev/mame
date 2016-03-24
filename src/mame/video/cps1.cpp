@@ -2806,7 +2806,7 @@ void cps_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 void cps_state::cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
-	UINT8 *stars_rom = memregion("stars")->base();
+	UINT8 *stars_rom = m_region_stars->base();
 
 	if (!stars_rom && (m_stars_enabled[0] || m_stars_enabled[1]))
 	{
@@ -2967,7 +2967,10 @@ UINT32 cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap
 		bitmap.fill(m_palette->black_pen(), cliprect);
 	}
 
-	cps1_render_stars(screen, bitmap, cliprect);
+	if (m_region_stars)
+	{
+		cps1_render_stars(screen, bitmap, cliprect);
+	}
 
 	/* Draw layers (0 = sprites, 1-3 = tilemaps) */
 	l0 = (layercontrol >> 0x06) & 03;

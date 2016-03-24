@@ -15,7 +15,7 @@
 
 class deco16_device : public m6502_device {
 public:
-	deco16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	deco16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static const disasm_entry disasm_entries[0x100];
 

@@ -39,7 +39,7 @@ const device_type ES8712 = &device_creator<es8712_device>;
 //  es8712_device - constructor
 //-------------------------------------------------
 
-es8712_device::es8712_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+es8712_device::es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ES8712, "ES8712", tag, owner, clock, "es8712", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_rom(*this, DEVICE_SELF),
@@ -288,7 +288,7 @@ void es8712_device::play()
 	/* invalid samples go here */
 	else
 	{
-		logerror("ES871295:'%s' requested to play invalid sample range %06x-%06x\n", tag().c_str(), m_start, m_end);
+		logerror("ES871295:'%s' requested to play invalid sample range %06x-%06x\n", tag(), m_start, m_end);
 
 		if (m_playing)
 		{

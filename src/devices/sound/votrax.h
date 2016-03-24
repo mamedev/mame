@@ -35,14 +35,14 @@ class votrax_sc01_device :  public device_t,
 {
 public:
 	// construction/destruction
-	votrax_sc01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_request_callback(device_t &device, _Object object) { return downcast<votrax_sc01_device &>(device).m_request_cb.set_callback(object); }
 
 	// writers
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE8_MEMBER( inflection_w );
-	DECLARE_READ_LINE_MEMBER( request ) { return m_request_state; }
+	DECLARE_READ_LINE_MEMBER( request ) { m_stream->update(); return m_request_state; }
 
 protected:
 	// device-level overrides

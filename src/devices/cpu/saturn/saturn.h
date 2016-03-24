@@ -76,7 +76,7 @@ class saturn_device : public cpu_device
 {
 public:
 	// construction/destruction
-	saturn_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_out_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_out_func.set_callback(object); }

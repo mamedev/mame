@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "render.h"
 #include "ui/selgame.h"
+#include "ui/simpleselgame.h"
 
 
 //**************************************************************************
@@ -21,7 +22,7 @@ class empty_state : public driver_device
 {
 public:
 	// constructor
-	empty_state(const machine_config &mconfig, device_type type, std::string tag)
+	empty_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 	{
 	}
@@ -29,7 +30,11 @@ public:
 	virtual void machine_start() override
 	{
 		// force the UI to show the game select screen
-		ui_menu_select_game::force_game_select(machine(), &machine().render().ui_container());
+		if (strcmp(machine().options().ui(),"simple")==0) {
+			ui_simple_menu_select_game::force_game_select(machine(), &machine().render().ui_container());
+		} else {
+			ui_menu_select_game::force_game_select(machine(), &machine().render().ui_container());
+		}
 	}
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

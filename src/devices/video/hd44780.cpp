@@ -45,20 +45,20 @@ ROM_END
 //  hd44780_device - constructor
 //-------------------------------------------------
 
-hd44780_device::hd44780_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, HD44780, "HD44780 A00", tag, owner, clock, "hd44780_a00", __FILE__),
 	m_pixel_update_func(nullptr)
 {
 	set_charset_type(CHARSET_HD44780_A00);
 }
 
-hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_pixel_update_func(nullptr)
 {
 }
 
-ks0066_f05_device::ks0066_f05_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+ks0066_f05_device::ks0066_f05_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	hd44780_device(mconfig, KS0066_F05, "KS0066 F05", tag, owner, clock, "ks0066_f05", __FILE__)
 {
 	set_charset_type(CHARSET_KS0066_F05);
@@ -264,7 +264,7 @@ inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, UINT8 line, UINT8
 		}
 		else
 		{
-			fatalerror("%s: use a custom callback for this LCD configuration (%d x %d)\n", tag().c_str(), m_lines, m_chars);
+			fatalerror("%s: use a custom callback for this LCD configuration (%d x %d)\n", tag(), m_lines, m_chars);
 		}
 	}
 }
@@ -393,7 +393,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		correct_ac();
 		set_busy_flag(37);
 
-		if (LOG) logerror("HD44780 '%s': set DDRAM address %x\n", tag().c_str(), m_ac);
+		if (LOG) logerror("HD44780 '%s': set DDRAM address %x\n", tag(), m_ac);
 		return;
 	}
 	else if (BIT(m_ir, 6))
@@ -403,7 +403,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		m_ac = m_ir & 0x3f;
 		set_busy_flag(37);
 
-		if (LOG) logerror("HD44780 '%s': set CGRAM address %x\n", tag().c_str(), m_ac);
+		if (LOG) logerror("HD44780 '%s': set CGRAM address %x\n", tag(), m_ac);
 		return;
 	}
 	else if (BIT(m_ir, 5))
@@ -411,7 +411,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		// function set
 		if (!m_first_cmd && m_data_len == (BIT(m_ir, 4) ? 8 : 4) && (m_char_size != (BIT(m_ir, 2) ? 10 : 8) || m_num_line != (BIT(m_ir, 3) + 1)))
 		{
-			logerror("HD44780 '%s': function set cannot be executed after other instructions unless the interface data length is changed\n", tag().c_str());
+			logerror("HD44780 '%s': function set cannot be executed after other instructions unless the interface data length is changed\n", tag());
 			return;
 		}
 
@@ -421,7 +421,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		correct_ac();
 		set_busy_flag(37);
 
-		if (LOG) logerror("HD44780 '%s': char size 5x%d, data len %d, lines %d\n", tag().c_str(), m_char_size, m_data_len, m_num_line);
+		if (LOG) logerror("HD44780 '%s': char size 5x%d, data len %d, lines %d\n", tag(), m_char_size, m_data_len, m_num_line);
 		return;
 	}
 	else if (BIT(m_ir, 4))
@@ -429,7 +429,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		// cursor or display shift
 		int direction = (BIT(m_ir, 2)) ? +1 : -1;
 
-		if (LOG) logerror("HD44780 '%s': %s shift %d\n", tag().c_str(), BIT(m_ir, 3) ? "display" : "cursor", direction);
+		if (LOG) logerror("HD44780 '%s': %s shift %d\n", tag(), BIT(m_ir, 3) ? "display" : "cursor", direction);
 
 		if (BIT(m_ir, 3))
 			shift_display(direction);
@@ -446,7 +446,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		m_blink_on   = BIT(m_ir, 0);
 		set_busy_flag(37);
 
-		if (LOG) logerror("HD44780 '%s': display %d, cursor %d, blink %d\n", tag().c_str(), m_display_on, m_cursor_on, m_blink_on);
+		if (LOG) logerror("HD44780 '%s': display %d, cursor %d, blink %d\n", tag(), m_display_on, m_cursor_on, m_blink_on);
 	}
 	else if (BIT(m_ir, 2))
 	{
@@ -455,12 +455,12 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		m_shift_on  = BIT(m_ir, 0);
 		set_busy_flag(37);
 
-		if (LOG) logerror("HD44780 '%s': entry mode set: direction %d, shift %d\n", tag().c_str(), m_direction, m_shift_on);
+		if (LOG) logerror("HD44780 '%s': entry mode set: direction %d, shift %d\n", tag(), m_direction, m_shift_on);
 	}
 	else if (BIT(m_ir, 1))
 	{
 		// return home
-		if (LOG) logerror("HD44780 '%s': return home\n", tag().c_str());
+		if (LOG) logerror("HD44780 '%s': return home\n", tag());
 
 		m_ac         = 0;
 		m_active_ram = DDRAM;
@@ -471,7 +471,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 	else if (BIT(m_ir, 0))
 	{
 		// clear display
-		if (LOG) logerror("HD44780 '%s': clear display\n", tag().c_str());
+		if (LOG) logerror("HD44780 '%s': clear display\n", tag());
 
 		m_ac         = 0;
 		m_active_ram = DDRAM;
@@ -506,7 +506,7 @@ WRITE8_MEMBER(hd44780_device::data_write)
 {
 	if (m_busy_flag)
 	{
-		logerror("HD44780 '%s': Ignoring data write %02x due of busy flag\n", tag().c_str(), data);
+		logerror("HD44780 '%s': Ignoring data write %02x due of busy flag\n", tag(), data);
 		return;
 	}
 
@@ -529,7 +529,7 @@ WRITE8_MEMBER(hd44780_device::data_write)
 		m_dr = data;
 	}
 
-	if (LOG) logerror("HD44780 '%s': %sRAM write %x %x '%c'\n", tag().c_str(), m_active_ram == DDRAM ? "DD" : "CG", m_ac, m_dr, isprint(m_dr) ? m_dr : '.');
+	if (LOG) logerror("HD44780 '%s': %sRAM write %x %x '%c'\n", tag(), m_active_ram == DDRAM ? "DD" : "CG", m_ac, m_dr, isprint(m_dr) ? m_dr : '.');
 
 	if (m_active_ram == DDRAM)
 		m_ddram[m_ac] = m_dr;
@@ -546,7 +546,7 @@ READ8_MEMBER(hd44780_device::data_read)
 {
 	UINT8 data = (m_active_ram == DDRAM) ? m_ddram[m_ac] : m_cgram[m_ac];
 
-	if (LOG) logerror("HD44780 '%s': %sRAM read %x %c\n", tag().c_str(), m_active_ram == DDRAM ? "DD" : "CG", m_ac, data);
+	if (LOG) logerror("HD44780 '%s': %sRAM read %x %c\n", tag(), m_active_ram == DDRAM ? "DD" : "CG", m_ac, data);
 
 	if (m_data_len == 4)
 	{

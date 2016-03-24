@@ -32,7 +32,7 @@ const device_type I8089 = &device_creator<i8089_device>;
 //  i8089_device - constructor
 //-------------------------------------------------
 
-i8089_device::i8089_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+i8089_device::i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	cpu_device(mconfig, I8089, "I8089", tag, owner, clock, "i8089", __FILE__),
 	m_icount(0),
 	m_ch1(*this, "1"),
@@ -168,30 +168,30 @@ void i8089_device::state_string_export(const device_state_entry &entry, std::str
 	switch (entry.index())
 	{
 	case SYSBUS:
-		strprintf(str, "%c", sysbus_width() ? 'W' : '.');
+		str = string_format("%c", sysbus_width() ? 'W' : '.');
 		break;
 	case SOC:
-		strprintf(str, "%c%c", remotebus_width() ? 'I' : '.', request_grant() ? 'R' : '.');
+		str = string_format("%c%c", remotebus_width() ? 'I' : '.', request_grant() ? 'R' : '.');
 		break;
 	case CH1_GA:
 	case CH2_GA:
-		strprintf(str, "%d %05X", ch->m_r[i8089_channel::GA].t & 1, ch->m_r[i8089_channel::GA].w);
+		str = string_format("%d %05X", ch->m_r[i8089_channel::GA].t & 1, ch->m_r[i8089_channel::GA].w);
 		break;
 	case CH1_GB:
 	case CH2_GB:
-		strprintf(str, "%d %05X", ch->m_r[i8089_channel::GB].t & 1, ch->m_r[i8089_channel::GB].w);
+		str = string_format("%d %05X", ch->m_r[i8089_channel::GB].t & 1, ch->m_r[i8089_channel::GB].w);
 		break;
 	case CH1_GC:
 	case CH2_GC:
-		strprintf(str, "%d %05X", ch->m_r[i8089_channel::GC].t & 1, ch->m_r[i8089_channel::GC].w);
+		str = string_format("%d %05X", ch->m_r[i8089_channel::GC].t & 1, ch->m_r[i8089_channel::GC].w);
 		break;
 	case CH1_TP:
 	case CH2_TP:
-		strprintf(str, "%d %05X", ch->m_r[i8089_channel::TP].t & 1, ch->m_r[i8089_channel::TP].w);
+		str = string_format("%d %05X", ch->m_r[i8089_channel::TP].t & 1, ch->m_r[i8089_channel::TP].w);
 		break;
 	case CH1_PSW:
 	case CH2_PSW:
-		strprintf(str, "%c%s%c%s%s%s%c%c",
+		str = string_format("%c%s%c%s%s%s%c%c",
 			BIT(ch->m_r[i8089_channel::PSW].w, 7) ? 'P':'.',
 			BIT(ch->m_r[i8089_channel::PSW].w, 6) ? "XF":"..",
 			BIT(ch->m_r[i8089_channel::PSW].w, 5) ? 'B':'.',
@@ -269,13 +269,13 @@ void i8089_device::initialize()
 	// output some debug info
 	if (VERBOSE)
 	{
-		logerror("%s('%s'): ---- initializing ----\n", shortname().c_str(), basetag().c_str());
-		logerror("%s('%s'): %s system bus\n", shortname().c_str(), basetag().c_str(), sysbus_width() ? "16-bit" : "8-bit");
-		logerror("%s('%s'): system configuration block location: %06x\n", shortname().c_str(), basetag().c_str(), m_scb);
-		logerror("%s('%s'): %s remote bus\n", shortname().c_str(), basetag().c_str(), remotebus_width() ? "16-bit" : "8-bit");
-		logerror("%s('%s'): request/grant: %d\n", shortname().c_str(), basetag().c_str(), request_grant());
-		logerror("%s('%s'): is %s\n", shortname().c_str(), basetag().c_str(), m_master ? "master" : "slave");
-		logerror("%s('%s'): channel control block location: %06x\n", shortname().c_str(), basetag().c_str(), cb_address);
+		logerror("%s('%s'): ---- initializing ----\n", shortname(), basetag());
+		logerror("%s('%s'): %s system bus\n", shortname(), basetag(), sysbus_width() ? "16-bit" : "8-bit");
+		logerror("%s('%s'): system configuration block location: %06x\n", shortname(), basetag(), m_scb);
+		logerror("%s('%s'): %s remote bus\n", shortname(), basetag(), remotebus_width() ? "16-bit" : "8-bit");
+		logerror("%s('%s'): request/grant: %d\n", shortname(), basetag(), request_grant());
+		logerror("%s('%s'): is %s\n", shortname(), basetag(), m_master ? "master" : "slave");
+		logerror("%s('%s'): channel control block location: %06x\n", shortname(), basetag(), cb_address);
 	}
 }
 
@@ -289,7 +289,7 @@ UINT16 i8089_device::read_word(bool space, offs_t address)
 	UINT16 data;
 	address_space *aspace = (space ? m_io : m_mem);
 
-	if (sysbus_width() && !(address & 1))
+	if (sysbus_width() && WORD_ALIGNED(address))
 	{
 		data = aspace->read_word(address);
 	}
@@ -311,7 +311,7 @@ void i8089_device::write_word(bool space, offs_t address, UINT16 data)
 {
 	address_space *aspace = (space ? m_io : m_mem);
 
-	if (sysbus_width() && !(address & 1))
+	if (sysbus_width() && WORD_ALIGNED(address))
 	{
 		aspace->write_word(address, data);
 	}
@@ -356,7 +356,7 @@ void i8089_device::execute_run()
 WRITE_LINE_MEMBER( i8089_device::ca_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): ca_w: %u\n", shortname().c_str(), basetag().c_str(), state);
+		logerror("%s('%s'): ca_w: %u\n", shortname(), basetag(), state);
 
 	if (m_ca == 1 && state == 0)
 	{

@@ -58,7 +58,7 @@
 class proteus3_state : public driver_device
 {
 public:
-	proteus3_state(const machine_config &mconfig, device_type type, std::string tag)
+	proteus3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_pia(*this, "pia")
@@ -326,7 +326,7 @@ static MACHINE_CONFIG_START( proteus3, proteus3_state )
 	MCFG_SCREEN_UPDATE_DRIVER(proteus3_state, screen_update_proteus3)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", proteus3)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)

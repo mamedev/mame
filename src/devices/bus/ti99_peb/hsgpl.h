@@ -25,7 +25,7 @@ extern const device_type TI99_HSGPL;
 class snug_high_speed_gpl_device : public ti_expansion_card_device
 {
 public:
-	snug_high_speed_gpl_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	snug_high_speed_gpl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 

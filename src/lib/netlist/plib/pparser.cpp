@@ -21,22 +21,22 @@ pstring ptokenizer::currentline_str()
 
 void ptokenizer::skipeol()
 {
-	pstring::code_t c = getc();
+	pstring::code_t c = _getc();
 	while (c)
 	{
 		if (c == 10)
 		{
-			c = getc();
+			c = _getc();
 			if (c != 13)
-				ungetc();
+				_ungetc();
 			return;
 		}
-		c = getc();
+		c = _getc();
 	}
 }
 
 
-pstring::code_t ptokenizer::getc()
+pstring::code_t ptokenizer::_getc()
 {
 	if (m_px >= m_cur_line.len())
 	{
@@ -51,7 +51,7 @@ pstring::code_t ptokenizer::getc()
 	return m_cur_line.code_at(m_px++);
 }
 
-void ptokenizer::ungetc()
+void ptokenizer::_ungetc()
 {
 	m_px--;
 }
@@ -159,10 +159,10 @@ ptokenizer::token_t ptokenizer::get_token()
 ptokenizer::token_t ptokenizer::get_token_internal()
 {
 	/* skip ws */
-	pstring::code_t c = getc();
+	pstring::code_t c = _getc();
 	while (m_whitespace.find(c)>=0)
 	{
-		c = getc();
+		c = _getc();
 		if (eof())
 		{
 			return token_t(ENDOFFILE);
@@ -182,9 +182,9 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 			else if (m_number_chars.find(c)<0)
 				break;
 			tokstr += c;
-			c = getc();
+			c = _getc();
 		}
-		ungetc();
+		_ungetc();
 		return token_t(ret, tokstr);
 	}
 	else if (m_identifier_chars.find(c)>=0)
@@ -193,9 +193,9 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 		pstring tokstr = "";
 		while (m_identifier_chars.find(c)>=0) {
 			tokstr += c;
-			c = getc();
+			c = _getc();
 		}
-		ungetc();
+		_ungetc();
 		token_id_t id = token_id_t(m_tokens.indexof(tokstr));
 		if (id.id() >= 0)
 			return token_t(id, tokstr);
@@ -207,11 +207,11 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 	else if (c == m_string)
 	{
 		pstring tokstr = "";
-		c = getc();
+		c = _getc();
 		while (c != m_string)
 		{
 			tokstr += c;
-			c = getc();
+			c = _getc();
 		}
 		return token_t(STRING, tokstr);
 	}
@@ -228,9 +228,9 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 				if (id.id() >= 0)
 					return token_t(id, tokstr);
 			}
-			c = getc();
+			c = _getc();
 		}
-		ungetc();
+		_ungetc();
 		token_id_t id = token_id_t(m_tokens.indexof(tokstr));
 		if (id.id() >= 0)
 			return token_t(id, tokstr);
@@ -255,16 +255,16 @@ ATTR_COLD void ptokenizer::error(const pstring &errs)
 ppreprocessor::ppreprocessor()
 : m_ifflag(0), m_level(0), m_lineno(0)
 {
-	m_expr_sep.add("!");
-	m_expr_sep.add("(");
-	m_expr_sep.add(")");
-	m_expr_sep.add("+");
-	m_expr_sep.add("-");
-	m_expr_sep.add("*");
-	m_expr_sep.add("/");
-	m_expr_sep.add("==");
-	m_expr_sep.add(" ");
-	m_expr_sep.add("\t");
+	m_expr_sep.push_back("!");
+	m_expr_sep.push_back("(");
+	m_expr_sep.push_back(")");
+	m_expr_sep.push_back("+");
+	m_expr_sep.push_back("-");
+	m_expr_sep.push_back("*");
+	m_expr_sep.push_back("/");
+	m_expr_sep.push_back("==");
+	m_expr_sep.push_back(" ");
+	m_expr_sep.push_back("\t");
 
 	m_defines.add("__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1"));
 }
@@ -276,7 +276,7 @@ void ppreprocessor::error(const pstring &err)
 
 
 
-double ppreprocessor::expr(const pstring_list_t &sexpr, std::size_t &start, int prio)
+double ppreprocessor::expr(const pstring_vector_t &sexpr, std::size_t &start, int prio)
 {
 	double val;
 	pstring tok=sexpr[start];
@@ -357,7 +357,7 @@ ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 
 pstring ppreprocessor::replace_macros(const pstring &line)
 {
-	pstring_list_t elems = pstring_list_t::splitexpr(line, m_expr_sep);
+	pstring_vector_t elems(line, m_expr_sep);
 	pstringbuffer ret = "";
 	for (std::size_t i=0; i<elems.size(); i++)
 	{
@@ -370,7 +370,7 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 	return ret;
 }
 
-static pstring catremainder(const pstring_list_t &elems, std::size_t start, pstring sep)
+static pstring catremainder(const pstring_vector_t &elems, std::size_t start, pstring sep)
 {
 	pstringbuffer ret = "";
 	for (std::size_t i=start; i<elems.size(); i++)
@@ -389,13 +389,13 @@ pstring  ppreprocessor::process_line(const pstring &line)
 	// FIXME ... revise and extend macro handling
 	if (lt.startsWith("#"))
 	{
-		pstring_list_t lti(lt, " ", true);
+		pstring_vector_t lti(lt, " ", true);
 		if (lti[0].equals("#if"))
 		{
 			m_level++;
 			std::size_t start = 0;
 			lt = replace_macros(lt);
-			pstring_list_t t = pstring_list_t::splitexpr(lt.substr(3).replace(" ",""), m_expr_sep);
+			pstring_vector_t t(lt.substr(3).replace(" ",""), m_expr_sep);
 			int val = expr(t, start, 0);
 			if (val == 0)
 				m_ifflag |= (1 << m_level);

@@ -4,7 +4,7 @@
 
 const device_type ZNDIP = &device_creator<zndip_device>;
 
-zndip_device::zndip_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+zndip_device::zndip_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ZNDIP, "Sony ZNDIP", tag, owner, clock, "zndip", __FILE__),
 	m_data_handler(*this),
 	m_dataout_handler(*this),

@@ -22,8 +22,8 @@ const device_type K033906 = &device_creator<k033906_device>;
 //  k033906_device - constructor
 //-------------------------------------------------
 
-k033906_device::k033906_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K033906, "K033906 PCI bridge", tag, owner, clock, "k033906", __FILE__), m_reg_set(0), m_voodoo(nullptr)
+k033906_device::k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K033906, "K033906 PCI bridge", tag, owner, clock, "k033906", __FILE__), m_reg_set(0), m_voodoo_tag(nullptr), m_voodoo(nullptr)
 {
 }
 
@@ -33,7 +33,7 @@ k033906_device::k033906_device(const machine_config &mconfig, std::string tag, d
 
 void k033906_device::device_start()
 {
-	m_voodoo = machine().device(m_voodoo_tag);
+	m_voodoo = (voodoo_device*)machine().device(m_voodoo_tag);
 
 	m_reg_set = 0;
 
@@ -95,7 +95,7 @@ void k033906_device::reg_w(int reg, UINT32 data)
 
 		case 0x10:      // initEnable
 		{
-			voodoo_set_init_enable(m_voodoo, data);
+			m_voodoo->voodoo_set_init_enable(data);
 			break;
 		}
 

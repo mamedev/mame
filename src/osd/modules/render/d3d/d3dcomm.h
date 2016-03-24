@@ -13,10 +13,9 @@
 //  FORWARD DECLARATIONS
 //============================================================
 
-namespace d3d
-{
 class texture_info;
-class renderer;
+class renderer_d3d9;
+struct d3d_base;
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -51,12 +50,12 @@ public:
 	} c;
 };
 
-class texture_manager
+class d3d_texture_manager
 {
 public:
-	texture_manager() { }
-	texture_manager(renderer *d3d);
-	~texture_manager();
+	d3d_texture_manager() { }
+	d3d_texture_manager(renderer_d3d9 *d3d);
+	~d3d_texture_manager();
 
 	void                    update_textures();
 
@@ -81,10 +80,10 @@ public:
 	texture_info *          get_default_texture() { return m_default_texture; }
 	texture_info *          get_vector_texture() { return m_vector_texture; }
 
-	renderer *              get_d3d() { return m_renderer; }
+	renderer_d3d9 *         get_d3d() { return m_renderer; }
 
 private:
-	renderer *              m_renderer;
+	renderer_d3d9 *         m_renderer;
 
 	texture_info *          m_texlist;                  // list of active textures
 	int                     m_dynamic_supported;        // are dynamic textures supported?
@@ -108,39 +107,39 @@ private:
 class texture_info
 {
 public:
-	texture_info(texture_manager *manager, const render_texinfo *texsource, int prescale, UINT32 flags);
+	texture_info(d3d_texture_manager *manager, const render_texinfo *texsource, int prescale, UINT32 flags);
 	~texture_info();
 
 	render_texinfo &        get_texinfo() { return m_texinfo; }
 
-	int                     get_width() { return m_rawdims.c.x; }
-	int                     get_height() { return m_rawdims.c.y; }
-	int                     get_xscale() { return m_xprescale; }
-	int                     get_yscale() { return m_yprescale; }
+	int                     get_width() const { return m_rawdims.c.x; }
+	int                     get_height() const { return m_rawdims.c.y; }
+	int                     get_xscale() const { return m_xprescale; }
+	int                     get_yscale() const { return m_yprescale; }
 
-	UINT32                  get_flags() { return m_flags; }
+	UINT32                  get_flags() const { return m_flags; }
 
 	void                    set_data(const render_texinfo *texsource, UINT32 flags);
 
-	texture_info *          get_next() { return m_next; }
-	texture_info *          get_prev() { return m_prev; }
+	texture_info *          get_next() const { return m_next; }
+	texture_info *          get_prev() const { return m_prev; }
 
-	UINT32                  get_hash() { return m_hash; }
+	UINT32                  get_hash() const { return m_hash; }
 
 	void                    set_next(texture_info *next) { m_next = next; }
 	void                    set_prev(texture_info *prev) { m_prev = prev; }
 
-	bool                    paused() { return m_cur_frame == m_prev_frame; }
+	bool                    paused() const { return m_cur_frame == m_prev_frame; }
 	void                    advance_frame() { m_prev_frame = m_cur_frame; }
 	void                    increment_frame_count() { m_cur_frame++; }
 	void                    mask_frame_count(int mask) { m_cur_frame %= mask; }
 
-	int                     get_cur_frame() { return m_cur_frame; }
-	int                     get_prev_frame() { return m_prev_frame; }
+	int                     get_cur_frame() const { return m_cur_frame; }
+	int                     get_prev_frame() const { return m_prev_frame; }
 
-	texture *               get_tex() { return m_d3dtex; }
-	surface *               get_surface() { return m_d3dsurface; }
-	texture *               get_finaltex() { return m_d3dfinaltex; }
+	texture *               get_tex() const { return m_d3dtex; }
+	surface *               get_surface() const { return m_d3dsurface; }
+	texture *               get_finaltex() const { return m_d3dfinaltex; }
 
 	vec2f &                 get_uvstart() { return m_start; }
 	vec2f &                 get_uvstop() { return m_stop; }
@@ -151,9 +150,9 @@ private:
 	void compute_size(int texwidth, int texheight);
 	void compute_size_subroutine(int texwidth, int texheight, int* p_width, int* p_height);
 
-	texture_manager *       m_texture_manager;          // texture manager pointer
+	d3d_texture_manager *   m_texture_manager;          // texture manager pointer
 
-	renderer *              m_renderer;                 // renderer pointer
+	renderer_d3d9 *         m_renderer;                 // renderer pointer
 
 	texture_info *          m_next;                     // next texture in the list
 	texture_info *          m_prev;                     // prev texture in the list
@@ -174,33 +173,34 @@ private:
 	texture *               m_d3dfinaltex;              // Direct3D final (post-scaled) texture
 };
 
-/* d3d::poly_info holds information about a single polygon/d3d primitive */
+/* poly_info holds information about a single polygon/d3d primitive */
 class poly_info
 {
 public:
 	poly_info() { }
 
 	void init(D3DPRIMITIVETYPE type, UINT32 count, UINT32 numverts,
-			UINT32 flags, d3d::texture_info *texture, UINT32 modmode,
+			UINT32 flags, texture_info *texture, UINT32 modmode,
 			float prim_width, float prim_height);
 	void init(D3DPRIMITIVETYPE type, UINT32 count, UINT32 numverts,
-			UINT32 flags, d3d::texture_info *texture, UINT32 modmode,
+			UINT32 flags, texture_info *texture, UINT32 modmode,
 			float line_time, float line_length,
 			float prim_width, float prim_height);
 
-	D3DPRIMITIVETYPE        get_type() { return m_type; }
-	UINT32                  get_count() { return m_count; }
-	UINT32                  get_vertcount() { return m_numverts; }
-	UINT32                  get_flags() { return m_flags; }
+    // TODO: Remove needless 'get_' prefix
+	D3DPRIMITIVETYPE        get_type() const { return m_type; }
+	UINT32                  get_count() const { return m_count; }
+	UINT32                  get_vertcount() const { return m_numverts; }
+	UINT32                  get_flags() const { return m_flags; }
 
-	d3d::texture_info *     get_texture() { return m_texture; }
-	DWORD                   get_modmode() { return m_modmode; }
+	texture_info *          get_texture() const { return m_texture; }
+	DWORD                   get_modmode() const { return m_modmode; }
 
-	float                   get_line_time() { return m_line_time; }
-	float                   get_line_length() { return m_line_length; }
+	float                   get_line_time() const { return m_line_time; }
+	float                   get_line_length() const { return m_line_length; }
 
-	float                   get_prim_width() { return m_prim_width; }
-	float                   get_prim_height() { return m_prim_height; }
+	float                   get_prim_width() const { return m_prim_width; }
+	float                   get_prim_height() const { return m_prim_height; }
 
 private:
 
@@ -219,16 +219,14 @@ private:
 	float                   m_prim_height;                // used by quads
 };
 
-} // d3d
-
 /* vertex describes a single vertex */
 struct vertex
 {
-	float                   x, y, z;                    // X,Y,Z coordinates
-	float                   rhw;                        // RHW when no HLSL, padding when HLSL
-	D3DCOLOR                color;                      // diffuse color
-	float                   u0, v0;                     // texture stage 0 coordinates
-	float                   u1, v1;                     // additional info for vector data
+	float       x, y, z;                    // X,Y,Z coordinates
+	float       rhw;                        // RHW when no HLSL, padding when HLSL
+	D3DCOLOR    color;                      // diffuse color
+	float       u0, v0;                     // texture stage 0 coordinates
+	float       u1, v1;                     // additional info for vector data
 };
 
 
@@ -239,5 +237,67 @@ struct line_aa_step
 	float                   weight;                     // weight contribution
 };
 
+/* cache_target is a simple linked list containing only a rednerable target and texture, used for phosphor effects */
+class cache_target
+{
+public:
+	// construction/destruction
+	cache_target() { }
+	~cache_target();
+
+	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height);
+
+	surface *last_target;
+	texture *last_texture;
+
+	int target_width;
+	int target_height;
+
+	int width;
+	int height;
+
+	int screen_index;
+
+	cache_target *next;
+	cache_target *prev;
+};
+
+/* render_target is the information about a Direct3D render target chain */
+class d3d_render_target
+{
+public:
+	// construction/destruction
+	d3d_render_target() { }
+	~d3d_render_target();
+
+	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height);
+	int next_index(int index) { return ++index > 1 ? 0 : index; }
+
+	// real target dimension
+	int target_width;
+	int target_height;
+
+	// only used to identify/find the render target
+	int width;
+	int height;
+
+	int screen_index;
+	int page_index;
+
+	surface *target_surface[2];
+	texture *target_texture[2];
+	surface *source_surface[2];
+	texture *source_texture[2];
+
+	d3d_render_target *next;
+	d3d_render_target *prev;
+
+	surface *bloom_surface[11];
+	texture *bloom_texture[11];
+
+	float bloom_dims[11][2];
+
+	int bloom_count;
+};
 
 #endif

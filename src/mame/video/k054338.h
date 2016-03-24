@@ -25,7 +25,7 @@ class k054338_device : public device_t,
 						public device_video_interface
 {
 public:
-	k054338_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k054338_device() {}
 
 	// static configuration
@@ -38,7 +38,7 @@ public:
 	DECLARE_READ16_MEMBER( word_r );        // CLTC
 
 	int register_r(int reg);
-	void update_all_shadows(int rushingheroes_hack, palette_device *palette);          // called at the beginning of SCREEN_UPDATE()
+	void update_all_shadows(int rushingheroes_hack, palette_device &palette);          // called at the beginning of SCREEN_UPDATE()
 	void fill_solid_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect);             // solid backcolor fill
 	void fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &cliprect, const pen_t *pal_ptr, int mode);  // solid or gradient fill using k055555
 	int  set_alpha_level(int pblend);                         // blend style 0-2

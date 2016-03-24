@@ -64,7 +64,7 @@ KISEKAE -- info
 class macs_state : public driver_device
 {
 public:
-	macs_state(const machine_config &mconfig, device_type type, std::string tag)
+	macs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_ram2(*this, "ram2"),
 			m_maincpu(*this,"maincpu")

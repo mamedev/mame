@@ -20,7 +20,7 @@ public:
 		TIMER_RESET
 	};
 
-	mikro80_state(const machine_config &mconfig, device_type type, std::string tag)
+	mikro80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cursor_ram(*this, "cursor_ram"),
 		m_video_ram(*this, "video_ram"),

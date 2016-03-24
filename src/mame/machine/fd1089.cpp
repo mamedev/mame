@@ -221,7 +221,7 @@ ADDRESS_MAP_END
 //  fd1089_base_device - constructor
 //-------------------------------------------------
 
-fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: m68000_device(mconfig, tag, owner, clock, shortname, source),
 		m_decrypted_opcodes(*this, ":fd1089_decrypted_opcodes")
 {
@@ -232,12 +232,12 @@ fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_typ
 	m_address_map[AS_DECRYPTED_OPCODES] = ADDRESS_MAP_NAME(decrypted_opcodes_map);
 }
 
-fd1089a_device::fd1089a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+fd1089a_device::fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: fd1089_base_device(mconfig, FD1089A, "FD1089A", tag, owner, clock, "fd1089a", __FILE__)
 {
 }
 
-fd1089b_device::fd1089b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+fd1089b_device::fd1089b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: fd1089_base_device(mconfig, FD1089B, "FD1089B", tag, owner, clock, "fd1089b", __FILE__)
 {
 }

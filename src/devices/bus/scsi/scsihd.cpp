@@ -11,12 +11,12 @@
 // device type definition
 const device_type SCSIHD = &device_creator<scsihd_device>;
 
-scsihd_device::scsihd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+scsihd_device::scsihd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: scsihle_device(mconfig, SCSIHD, "SCSI HD", tag, owner, clock, "scsihd", __FILE__)
 {
 }
 
-scsihd_device::scsihd_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+scsihd_device::scsihd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	scsihle_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

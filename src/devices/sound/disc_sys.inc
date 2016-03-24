@@ -34,7 +34,7 @@ DISCRETE_START( dso_csvlog )
 	log_num = m_device->same_module_index(*this);
 	m_sample_num = 0;
 
-	sprintf(m_name, "discrete_%s_%d.csv", m_device->tag().c_str(), log_num);
+	sprintf(m_name, "discrete_%s_%d.csv", m_device->tag(), log_num);
 	m_csv_file = fopen(m_name, "w");
 	/* Output some header info */
 	fprintf(m_csv_file, "\"MAME Discrete System Node Log\"\n");
@@ -61,7 +61,7 @@ DISCRETE_STEP( dso_csvlog )
 	int nodenum;
 
 	/* Dump any csv logs */
-	fprintf(m_csv_file, "%" I64FMT "d", ++m_sample_num);
+	fprintf(m_csv_file, "%s", string_format("%I64d", ++m_sample_num).c_str());
 	for (nodenum = 0; nodenum < this->active_inputs(); nodenum++)
 	{
 		fprintf(m_csv_file, ", %f", *this->m_input[nodenum]);
@@ -80,7 +80,7 @@ DISCRETE_START( dso_wavlog )
 	int log_num;
 
 	log_num = m_device->same_module_index(*this);
-	sprintf(m_name, "discrete_%s_%d.wav", m_device->tag().c_str(), log_num);
+	sprintf(m_name, "discrete_%s_%d.wav", m_device->tag(), log_num);
 	m_wavfile = wav_open(m_name, sample_rate(), active_inputs()/2);
 }
 

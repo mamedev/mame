@@ -9,7 +9,6 @@ Preliminary driver by Tomasz Slanina
 PCB Layout
 ----------
 
-
 |-----------------------------------------------|
 |  AY8930   DSW5  TCL.1E                        |
 |           DSW4  TCL.3E   TCL.3F  TCL.3H       |
@@ -36,8 +35,7 @@ Notes:
           VSync: 60Hz
           HSync: 15.15kHz
 
- This appears to be based off a Blue
- Dyna Cherry Master board -- emualted goldstar.c
+ This appears to be based off a Blue Dyna Cherry Master board -- emulated in goldstar.cpp
  but with extra protection (the sub-board with CPU)
 
 */
@@ -51,7 +49,7 @@ Notes:
 class tcl_state : public driver_device
 {
 public:
-	tcl_state(const machine_config &mconfig, device_type type, std::string tag)
+	tcl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 

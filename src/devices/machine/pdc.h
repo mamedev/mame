@@ -35,7 +35,7 @@ class pdc_device :  public device_t
 {
 public:
 		/* Constructor and Destructor */
-	pdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		/* Optional information overrides */
 		virtual machine_config_constructor device_mconfig_additions() const override;

@@ -35,7 +35,7 @@ Other outs:
 class headonb_state : public driver_device
 {
 public:
-	headonb_state(const machine_config &mconfig, device_type type, std::string tag)
+	headonb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -174,7 +174,7 @@ static MACHINE_CONFIG_START( headonb, headonb_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", headonb)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	// TODO

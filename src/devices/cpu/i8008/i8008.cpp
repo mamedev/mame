@@ -33,7 +33,7 @@ const device_type I8008 = &device_creator<i8008_device>;
 //-------------------------------------------------
 //  i8008_device - constructor
 //-------------------------------------------------
-i8008_device::i8008_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8008_device::i8008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, I8008, "i8008", tag, owner, clock, "i8008", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 14),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 8),
@@ -93,7 +93,7 @@ void i8008_device::device_start()
 	state_add(I8008_L,        "L",        m_L);
 
 	for (int addrnum = 0; addrnum < 8; addrnum++)
-		state_add(I8008_ADDR1 + addrnum, strformat("ADDR%d", addrnum + 1).c_str(), m_ADDR[addrnum].w.l).mask(0xfff);
+		state_add(I8008_ADDR1 + addrnum, string_format("ADDR%d", addrnum + 1).c_str(), m_ADDR[addrnum].w.l).mask(0xfff);
 
 	init_tables();
 }
@@ -191,7 +191,7 @@ void i8008_device::state_string_export(const device_state_entry &entry, std::str
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c",
+			str = string_format("%c%c%c%c",
 				m_CF ? 'C':'.',
 				m_ZF ? 'Z':'.',
 				m_SF ? 'S':'.',

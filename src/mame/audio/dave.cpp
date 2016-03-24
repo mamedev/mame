@@ -52,7 +52,7 @@ ADDRESS_MAP_END
 //  dave_device - constructor
 //-------------------------------------------------
 
-dave_device::dave_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+dave_device::dave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DAVE, "DAVE", tag, owner, clock, "dave", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),

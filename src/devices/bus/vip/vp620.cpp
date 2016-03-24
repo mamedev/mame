@@ -61,7 +61,7 @@ machine_config_constructor vp620_device::device_mconfig_additions() const
 //  vp620_device - constructor
 //-------------------------------------------------
 
-vp620_device::vp620_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+vp620_device::vp620_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VP620, "VP620", tag, owner, clock, "vp620", __FILE__),
 	device_vip_byteio_port_interface(mconfig, *this),
 	m_keydata(0),

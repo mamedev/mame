@@ -28,7 +28,7 @@ public:
 	info_xml_creator(driver_enumerator &drivlist);
 
 	// output
-	void output(FILE *out);
+	void output(FILE *out, bool nodevices = false);
 
 private:
 	// internal helper

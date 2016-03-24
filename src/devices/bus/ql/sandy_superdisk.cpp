@@ -111,7 +111,7 @@ machine_config_constructor sandy_super_disk_t::device_mconfig_additions() const
 //  sandy_super_disk_t - constructor
 //-------------------------------------------------
 
-sandy_super_disk_t::sandy_super_disk_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+sandy_super_disk_t::sandy_super_disk_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SANDY_SUPER_DISK, "Sandy Super Disk", tag, owner, clock, "ql_sdisk", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),

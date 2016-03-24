@@ -6,10 +6,11 @@
 
 const device_type ORICEXT_CONNECTOR = &device_creator<oricext_connector>;
 
-oricext_connector::oricext_connector(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+oricext_connector::oricext_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ORICEXT_CONNECTOR, "ORIC extension connector", tag, owner, clock, "oricext_connector", __FILE__),
 	device_slot_interface(mconfig, *this),
-	irq_handler(*this)
+	irq_handler(*this),
+	cputag(nullptr)
 {
 }
 
@@ -17,7 +18,7 @@ oricext_connector::~oricext_connector()
 {
 }
 
-void oricext_connector::set_cputag(std::string tag)
+void oricext_connector::set_cputag(const char *tag)
 {
 	cputag = tag;
 }
@@ -39,9 +40,10 @@ void oricext_connector::device_config_complete()
 		dev->set_cputag(cputag);
 }
 
-oricext_device::oricext_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+oricext_device::oricext_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	device_slot_card_interface(mconfig, *this),	
+	device_slot_card_interface(mconfig, *this),
+	cputag(nullptr),
 	cpu(nullptr),
 	connector(nullptr),
 	bank_c000_r(nullptr),
@@ -55,7 +57,7 @@ oricext_device::oricext_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-void oricext_device::set_cputag(std::string tag)
+void oricext_device::set_cputag(const char *tag)
 {
 	cputag = tag;
 }

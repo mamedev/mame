@@ -23,7 +23,7 @@ class pci9050_device :
 	public pci_device
 {
 public:
-	pci9050_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pci9050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// PCI9050 I/O register space handlers
 	DECLARE_READ32_MEMBER( lasrr_r  );

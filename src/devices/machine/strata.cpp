@@ -46,7 +46,7 @@
 
 const device_type STRATAFLASH = &device_creator<strataflash_device>;
 
-strataflash_device::strataflash_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+strataflash_device::strataflash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, STRATAFLASH, "Intel 28F640J5", tag, owner, clock, "strataflash", __FILE__),
 		device_nvram_interface(mconfig, *this)
 {

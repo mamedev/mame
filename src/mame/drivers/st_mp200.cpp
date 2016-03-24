@@ -27,7 +27,7 @@ ToDo:
 class st_mp200_state : public genpin_class
 {
 public:
-	st_mp200_state(const machine_config &mconfig, device_type type, std::string tag)
+	st_mp200_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_s14001a(*this, "speech")
@@ -73,11 +73,11 @@ private:
 	bool m_u11_cb2;
 	bool m_timer_x;
 	bool m_u11_timer;
-	bool m_su; // speech unit fitted yes/no
 	bool m_7d; // 7-digit display yes/no
 	UINT8 m_digit;
 	UINT8 m_counter;
 	UINT8 m_segment[5];
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<s14001a_device> m_s14001a;
@@ -320,9 +320,9 @@ WRITE_LINE_MEMBER( st_mp200_state::u10_ca2_w )
 
 WRITE_LINE_MEMBER( st_mp200_state::u10_cb2_w )
 {
-	if (m_su)
+	if (m_s14001a)
 	{
-		if (m_s14001a->bsy_r())
+		if (m_s14001a->busy_r())
 			m_pia_u11->cb1_w(0);
 		else
 			m_pia_u11->cb1_w(state);
@@ -333,18 +333,19 @@ WRITE_LINE_MEMBER( st_mp200_state::u11_ca2_w )
 {
 	output().set_value("led0", !state);
 
-	if ((m_su) & (state))
+	if (m_s14001a && state)
 	{
 		if BIT(m_u10a, 7)
 		{
-			m_s14001a->reg_w(m_u10a & 0x3f);
-			m_s14001a->rst_w(1);
-			m_s14001a->rst_w(0);
+			m_s14001a->data_w(generic_space(), 0, m_u10a & 0x3f);
+			m_s14001a->start_w(1);
+			m_s14001a->start_w(0);
 		}
 		else
 		if BIT(m_u10a, 6)
 		{
-			m_s14001a->set_volume(((m_u10a & 0x38) >> 3) + 1);
+			m_s14001a->force_update();
+			m_s14001a->set_output_gain(0, ((m_u10a >> 3 & 0xf) + 1) / 16.0);
 
 			UINT8 clock_divisor = 16 - (m_u10a & 0x07);
 
@@ -534,6 +535,10 @@ WRITE8_MEMBER( st_mp200_state::u11_b_w )
 	}
 }
 
+void st_mp200_state::machine_start()
+{
+}
+
 void st_mp200_state::machine_reset()
 {
 	m_u10a = 0;
@@ -546,19 +551,16 @@ void st_mp200_state::machine_reset()
 DRIVER_INIT_MEMBER( st_mp200_state, st_mp200 )
 {
 	m_7d = 1;
-	m_su = 0;
 }
 
 DRIVER_INIT_MEMBER( st_mp200_state, st_mp201 )
 {
 	m_7d = 1;
-	m_su = 1;
 }
 
 DRIVER_INIT_MEMBER( st_mp200_state, st_mp202 )
 {
 	m_7d = 0;
-	m_su = 0;
 }
 
 // zero-cross detection
@@ -614,7 +616,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( st_mp201, st_mp200 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speech", S14001A, S14001_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 

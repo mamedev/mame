@@ -33,7 +33,7 @@ public:
 		TIMER_MBEE_NEWKB
 	};
 
-	mbee_state(const machine_config &mconfig, device_type type, std::string tag)
+	mbee_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")

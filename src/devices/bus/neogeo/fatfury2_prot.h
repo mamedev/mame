@@ -18,7 +18,7 @@ class fatfury2_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	fatfury2_prot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	fatfury2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ16_MEMBER( fatfury2_protection_16_r );
 	DECLARE_WRITE16_MEMBER( fatfury2_protection_16_w );

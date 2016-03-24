@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    tilemap.c
+    tilemap.cpp
 
     Generic tilemap management system.
 
@@ -348,7 +348,7 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, device_gfx_interface &decod
 	// populate managers and devices
 	m_manager = &manager;
 	m_device = dynamic_cast<tilemap_device *>(this);
-	m_palette = decoder.palette();
+	m_palette = &decoder.palette();
 	m_next = nullptr;
 	m_user_data = nullptr;
 
@@ -409,17 +409,17 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, device_gfx_interface &decod
 
 	// save relevant state
 	int instance = manager.alloc_instance();
-	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_enable));
-	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_attributes));
-	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_palette_offset));
-	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_scrollrows));
-	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_scrollcols));
-	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_rowscroll));
-	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_colscroll));
-	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_dx));
-	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_dx_flipped));
-	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_dy));
-	machine().save().save_item(m_device, "tilemap", std::string(), instance, NAME(m_dy_flipped));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_enable));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_attributes));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_palette_offset));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_scrollrows));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_scrollcols));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_rowscroll));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_colscroll));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dx));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dx_flipped));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dy));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dy_flipped));
 
 	// reset everything after a load
 	machine().save().register_postload(save_prepost_delegate(FUNC(tilemap_t::postload), this));
@@ -558,22 +558,22 @@ void tilemap_t::configure_groups(gfx_element &gfx, int transcolor)
 //  order with optional flipping
 //-------------------------------------------------
 
-tilemap_memory_index tilemap_t::scan_rows(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_rows(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return row * num_cols + col;
 }
 
-tilemap_memory_index tilemap_t::scan_rows_flip_x(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_rows_flip_x(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return row * num_cols + (num_cols - 1 - col);
 }
 
-tilemap_memory_index tilemap_t::scan_rows_flip_y(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_rows_flip_y(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return (num_rows - 1 - row) * num_cols + col;
 }
 
-tilemap_memory_index tilemap_t::scan_rows_flip_xy(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_rows_flip_xy(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return (num_rows - 1 - row) * num_cols + (num_cols - 1 - col);
 }
@@ -587,22 +587,22 @@ tilemap_memory_index tilemap_t::scan_rows_flip_xy(driver_device &device, UINT32 
 //  major order with optional flipping
 //-------------------------------------------------
 
-tilemap_memory_index tilemap_t::scan_cols(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_cols(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return col * num_rows + row;
 }
 
-tilemap_memory_index tilemap_t::scan_cols_flip_x(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_cols_flip_x(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return (num_cols - 1 - col) * num_rows + row;
 }
 
-tilemap_memory_index tilemap_t::scan_cols_flip_y(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_cols_flip_y(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return col * num_rows + (num_rows - 1 - row);
 }
 
-tilemap_memory_index tilemap_t::scan_cols_flip_xy(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_cols_flip_xy(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return (num_cols - 1 - col) * num_rows + (num_rows - 1 - row);
 }
@@ -1519,22 +1519,6 @@ tilemap_manager::~tilemap_manager()
 //  tilemaps
 //-------------------------------------------------
 
-static const struct
-{
-	tilemap_memory_index (*func)(driver_device &, UINT32, UINT32, UINT32, UINT32);
-	const char *name;
-} s_standard_mappers[TILEMAP_STANDARD_COUNT] =
-{
-	{ FUNC(tilemap_t::scan_rows) },
-	{ FUNC(tilemap_t::scan_rows_flip_x) },
-	{ FUNC(tilemap_t::scan_rows_flip_y) },
-	{ FUNC(tilemap_t::scan_rows_flip_xy) },
-	{ FUNC(tilemap_t::scan_cols) },
-	{ FUNC(tilemap_t::scan_cols_flip_x) },
-	{ FUNC(tilemap_t::scan_cols_flip_y) },
-	{ FUNC(tilemap_t::scan_cols_flip_xy) }
-};
-
 tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated)
 {
 	if (allocated == nullptr)
@@ -1546,7 +1530,19 @@ tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_in
 {
 	if (allocated == nullptr)
 		allocated = global_alloc(tilemap_t);
-	return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(s_standard_mappers[mapper].func, s_standard_mappers[mapper].name, machine().driver_data()), tilewidth, tileheight, cols, rows));
+
+	switch (mapper)
+	{
+		case TILEMAP_SCAN_ROWS :return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(FUNC(tilemap_t::scan_rows), allocated), tilewidth, tileheight, cols, rows));
+		case TILEMAP_SCAN_ROWS_FLIP_X:return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(FUNC(tilemap_t::scan_rows_flip_x), allocated), tilewidth, tileheight, cols, rows));
+		case TILEMAP_SCAN_ROWS_FLIP_Y:return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(FUNC(tilemap_t::scan_rows_flip_y), allocated), tilewidth, tileheight, cols, rows));
+		case TILEMAP_SCAN_ROWS_FLIP_XY:return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(FUNC(tilemap_t::scan_rows_flip_xy),allocated), tilewidth, tileheight, cols, rows));
+		case TILEMAP_SCAN_COLS:return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(FUNC(tilemap_t::scan_cols),allocated), tilewidth, tileheight, cols, rows));
+		case TILEMAP_SCAN_COLS_FLIP_X:return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(FUNC(tilemap_t::scan_cols_flip_x),allocated), tilewidth, tileheight, cols, rows));
+		case TILEMAP_SCAN_COLS_FLIP_Y:return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(FUNC(tilemap_t::scan_cols_flip_y),allocated), tilewidth, tileheight, cols, rows));
+		case TILEMAP_SCAN_COLS_FLIP_XY:return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(FUNC(tilemap_t::scan_cols_flip_xy),allocated), tilewidth, tileheight, cols, rows));
+		default: throw emu_fatalerror("Tilemap manager create unknown mapper %d", mapper);
+	}
 }
 
 
@@ -1586,7 +1582,7 @@ const device_type TILEMAP = &device_creator<tilemap_device>;
 //  tilemap_device - constructor
 //-------------------------------------------------
 
-tilemap_device::tilemap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tilemap_device::tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TILEMAP, "Tilemap", tag, owner, clock, "tilemap", __FILE__),
 		m_gfxdecode(*this),
 		m_standard_mapper(TILEMAP_STANDARD_COUNT),
@@ -1606,7 +1602,7 @@ tilemap_device::tilemap_device(const machine_config &mconfig, std::string tag, d
 //  gfx decoder
 //-------------------------------------------------
 
-void tilemap_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
+void tilemap_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<tilemap_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -1764,9 +1760,9 @@ void tilemap_device::device_start()
 {
 	// check configuration
 	if (m_get_info.isnull())
-		throw emu_fatalerror("Tilemap device '%s' has no get info callback!", tag().c_str());
+		throw emu_fatalerror("Tilemap device '%s' has no get info callback!", tag());
 	if (m_standard_mapper == TILEMAP_STANDARD_COUNT && m_mapper.isnull())
-		throw emu_fatalerror("Tilemap device '%s' has no mapper callback!", tag().c_str());
+		throw emu_fatalerror("Tilemap device '%s' has no mapper callback!", tag());
 
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();

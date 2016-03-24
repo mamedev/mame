@@ -109,13 +109,23 @@ char *utf8_from_wstring(const WCHAR *wstring)
 int osd_uchar_from_osdchar(UINT32 *uchar, const char *osdchar, size_t count)
 {
 	WCHAR wch;
+	CPINFO cp;
 
-	count = MIN(count, IsDBCSLeadByte(*osdchar) ? 2 : 1);
-	if (MultiByteToWideChar(CP_ACP, 0, osdchar, (DWORD)count, &wch, 1) != 0)
-		*uchar = wch;
-	else
-		*uchar = 0;
-	return (int) count;
+	if (!GetCPInfo(CP_ACP, &cp))
+		goto error;
+
+	// The multibyte char can't be bigger than the max character size
+	count = MIN(count, cp.MaxCharSize);
+
+	if (MultiByteToWideChar(CP_ACP, 0, osdchar, static_cast<DWORD>(count), &wch, 1) == 0)
+		goto error;
+
+	*uchar = wch;
+	return static_cast<int>(count);
+
+error:
+	*uchar = 0;
+	return static_cast<int>(count);
 }
 
 #else

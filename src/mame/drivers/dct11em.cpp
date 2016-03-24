@@ -14,7 +14,7 @@
 class dct11em_state : public driver_device
 {
 public:
-	dct11em_state(const machine_config &mconfig, device_type type, std::string tag)
+	dct11em_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 	virtual void machine_reset() override;
@@ -65,7 +65,7 @@ static MACHINE_CONFIG_START( dct11em, dct11em_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dct11em_state, screen_update_dct11em)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 /* ROM definition */

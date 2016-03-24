@@ -25,11 +25,11 @@ typedef device_delegate<UINT32 (UINT32)> vsystem_tile_indirection_delegate;
 class vsystem_spr_device : public device_t
 {
 public:
-	vsystem_spr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
-	static void static_set_palette_tag(device_t &device, std::string tag);
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_offsets(device_t &device, int xoffs, int yoffs);
 	static void set_pdraw(device_t &device, bool pdraw);
 	static void set_tile_indirect_cb(device_t &device,vsystem_tile_indirection_delegate newtilecb);

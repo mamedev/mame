@@ -49,7 +49,7 @@ ToDo:
 class zorba_state : public driver_device
 {
 public:
-	zorba_state(const machine_config &mconfig, device_type type, std::string tag)
+	zorba_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
@@ -320,7 +320,6 @@ GFXDECODE_END
 MACHINE_RESET_MEMBER( zorba_state, zorba )
 {
 	m_fdc_rq = 0;
-	m_beep->set_frequency(800);
 	m_p_chargen = memregion("chargen")->base();
 	membank("bankr0")->set_entry(1); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -354,15 +353,15 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_CPU_PROGRAM_MAP(zorba_kbdmem)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zorba)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
+	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */

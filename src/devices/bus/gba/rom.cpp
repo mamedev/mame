@@ -29,40 +29,40 @@ const device_type GBA_ROM_FLASH = &device_creator<gba_rom_flash_device>;
 const device_type GBA_ROM_FLASH1M = &device_creator<gba_rom_flash1m_device>;
 
 
-gba_rom_device::gba_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+gba_rom_device::gba_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_gba_cart_interface( mconfig, *this )
 {
 }
 
-gba_rom_device::gba_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gba_rom_device::gba_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, GBA_ROM_STD, "GBA Carts", tag, owner, clock, "gba_rom", __FILE__),
 						device_gba_cart_interface( mconfig, *this )
 {
 }
 
-gba_rom_sram_device::gba_rom_sram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gba_rom_sram_device::gba_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: gba_rom_device(mconfig, GBA_ROM_SRAM, "GBA Carts + SRAM", tag, owner, clock, "gba_sram", __FILE__)
 {
 }
 
-gba_rom_eeprom_device::gba_rom_eeprom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gba_rom_eeprom_device::gba_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: gba_rom_device(mconfig, GBA_ROM_EEPROM, "GBA Carts + EEPROM", tag, owner, clock, "gba_eeprom", __FILE__)
 {
 }
 
-gba_rom_eeprom64_device::gba_rom_eeprom64_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gba_rom_eeprom64_device::gba_rom_eeprom64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: gba_rom_device(mconfig, GBA_ROM_EEPROM64, "GBA Carts + EEPROM 64K", tag, owner, clock, "gba_eeprom64", __FILE__)
 {
 }
 
-gba_rom_flash_device::gba_rom_flash_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gba_rom_flash_device::gba_rom_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: gba_rom_device(mconfig, GBA_ROM_FLASH, "GBA Carts + Panasonic Flash", tag, owner, clock, "gba_flash", __FILE__), m_flash_mask(0),
 						m_flash(*this, "flash")
 {
 }
 
-gba_rom_flash1m_device::gba_rom_flash1m_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gba_rom_flash1m_device::gba_rom_flash1m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: gba_rom_device(mconfig, GBA_ROM_FLASH1M, "GBA Carts + Sanyo Flash", tag, owner, clock, "gba_flash1m", __FILE__), m_flash_mask(0),
 						m_flash(*this, "flash")
 {

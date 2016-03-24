@@ -77,7 +77,7 @@ class c140_device : public device_t,
 					public device_sound_interface
 {
 public:
-	c140_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	c140_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~c140_device() { }
 
 	// static configuration
@@ -110,6 +110,7 @@ private:
 	std::unique_ptr<INT16[]> m_mixer_buffer_right;
 
 	int m_baserate;
+	optional_region_ptr<INT8> m_rom_ptr;
 	INT8 *m_pRom;
 	UINT8 m_REG[0x200];
 

@@ -65,7 +65,7 @@
 class pda600_state : public driver_device
 {
 public:
-	pda600_state(const machine_config &mconfig, device_type type, std::string tag)
+	pda600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 		{}
@@ -212,7 +212,7 @@ static MACHINE_CONFIG_START( pda600, pda600_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pda600)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// NVRAM needs to be filled with random data to fail the checksum and be initialized correctly
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")

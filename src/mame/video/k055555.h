@@ -80,7 +80,7 @@
 class k055555_device : public device_t
 {
 public:
-	k055555_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k055555_device() { }
 
 	void K055555_write_reg(UINT8 regnum, UINT8 regdat);

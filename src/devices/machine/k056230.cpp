@@ -21,7 +21,7 @@ const device_type K056230 = &device_creator<k056230_device>;
 //  k056230_device - constructor
 //-------------------------------------------------
 
-k056230_device::k056230_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k056230_device::k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K056230, "K056230 LANC", tag, owner, clock, "k056230", __FILE__),
 		m_is_thunderh(0),
 		m_cpu(*this)
@@ -54,12 +54,7 @@ READ8_MEMBER(k056230_device::read)
 	return 0;
 }
 
-TIMER_CALLBACK( k056230_device::network_irq_clear_callback )
-{
-	reinterpret_cast<k056230_device*>(ptr)->network_irq_clear();
-}
-
-void k056230_device::network_irq_clear()
+TIMER_CALLBACK_MEMBER(k056230_device::network_irq_clear)
 {
 	if (m_cpu)
 		m_cpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
@@ -84,7 +79,7 @@ WRITE8_MEMBER(k056230_device::write)
 					if (m_cpu)
 						m_cpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 
-					machine().scheduler().timer_set(attotime::from_usec(10), FUNC(network_irq_clear_callback), 0, (void*)this);
+					machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(k056230_device::network_irq_clear), this));
 				}
 			}
 //          else

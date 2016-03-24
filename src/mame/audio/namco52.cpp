@@ -159,7 +159,7 @@ ROM_END
 
 const device_type NAMCO_52XX = &device_creator<namco_52xx_device>;
 
-namco_52xx_device::namco_52xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+namco_52xx_device::namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NAMCO_52XX, "Namco 52xx", tag, owner, clock, "namco52", __FILE__),
 	m_cpu(*this, "mcu"),
 	m_discrete(*this),

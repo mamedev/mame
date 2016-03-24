@@ -79788,6 +79788,22 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
+	<software name="mc_cb198" supported="no">
+		<description>CoolBoy 198-in-1</description>
+		<year>201?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="coolboy" />
+			<feature name="pcb" value="UNL-COOLBOY" />
+			<dataarea name="prg" size="33554432">
+				<rom name="cb198in1.bin" size="33554432" crc="253364ea" sha1="808ad7ff037e016c6a7a88dbe7b2bf1d41a46546" offset="00000" />
+			</dataarea>
+			<!-- 256k VRAM on cartridge -->
+			<dataarea name="vram" size="262144">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_7x6ss" supported="no">
 		<description>777777-in-1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)(Unl)[U][!]</description>
 		<year>19??</year>
@@ -79836,9 +79852,8 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-
 	<software name="mc_cb400" supported="no">
-		<description>CoolBoy 400 in 1</description>
+		<description>CoolBoy 400-in-1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -79914,6 +79929,54 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
+	<software name="mc_g450" supported="no">
+		<description>Game 450-in-1</description>
+		<year>201?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="coolboy" />
+			<feature name="pcb" value="UNL-COOLBOY" />
+			<dataarea name="prg" size="33554432">
+				<rom name="g450in1.bin" size="33554432" crc="a4396e58" sha1="780d85b737bfc3ba9918f84d09c2d90d72c88dd3" offset="00000" />
+			</dataarea>
+			<!-- 256k VRAM on cartridge -->
+			<dataarea name="vram" size="262144">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_g500" supported="no">
+		<description>Game 500-in-1</description>
+		<year>201?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="coolboy" />
+			<feature name="pcb" value="UNL-COOLBOY" />
+			<dataarea name="prg" size="33554432">
+				<rom name="g500in1.bin" size="33554432" crc="74787d9d" sha1="63f28d991351320f3427ddd541c9edb6d3c8fe5f" offset="00000" />
+			</dataarea>
+			<!-- 256k VRAM on cartridge -->
+			<dataarea name="vram" size="262144">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_sg218" supported="no">
+		<description>Super Game 218-in-1</description>
+		<year>201?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="coolboy" />
+			<feature name="pcb" value="UNL-COOLBOY" />
+			<dataarea name="prg" size="33554432">
+				<rom name="sg218in1.bin" size="33554432" crc="82fc4149" sha1="080cb14134e2756472114227267b6ade4f1aab9b" offset="00000" />
+			</dataarea>
+			<!-- 256k VRAM on cartridge -->
+			<dataarea name="vram" size="262144">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_sg360" supported="no">
 		<description>Super Game 360-in-1</description>
 		<year>19??</year>
@@ -79930,9 +79993,24 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
+	<software name="mc_sg402" supported="no">
+		<description>Super Game 402-in-1</description>
+		<year>201?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="coolboy" />
+			<feature name="pcb" value="UNL-COOLBOY" />
+			<dataarea name="prg" size="33554432">
+				<rom name="sg402in1.bin" size="33554432" crc="205daab3" sha1="b403daad9e0cd3b8490ef9127bcb7acd5b40f710" offset="00000" />
+			</dataarea>
+			<!-- 128k VRAM on cartridge -->
+			<dataarea name="vram" size="131072">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="mc_gx121" supported="no">
-		<description>Games Xplosion 121 in 1</description>
+		<description>Games Xplosion 121-in-1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -79947,6 +80025,18 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
+	<software name="mc_hh210" supported="no">
+		<description>Handheld 210-in-1</description>
+		<year>201?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="coolboy" />
+			<feature name="pcb" value="UNL-COOLBOY" />
+			<dataarea name="prg" size="33554432">
+				<rom name="MSP55LV128T.bin" size="16777216" crc="9ba520d4" sha1="627f811b24314197e289a2ade668ff4115421bed" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- TO SORT AND RENAME PROPERLY!!! -->
 

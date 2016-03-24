@@ -52,7 +52,7 @@ MX29F1610MC 16M FlashROM (x7)
 class xtom3d_state : public pcat_base_state
 {
 public:
-	xtom3d_state(const machine_config &mconfig, device_type type, std::string tag)
+	xtom3d_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
 			{ }
 
@@ -404,8 +404,8 @@ static MACHINE_CONFIG_START( xtom3d, xtom3d_state )
 	MCFG_FRAGMENT_ADD( pcat_common )
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, "", intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, "", intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

@@ -96,7 +96,7 @@ public:
 
 	token_id_t register_token(pstring token)
 	{
-		m_tokens.add(token);
+		m_tokens.push_back(token);
 		return token_id_t(m_tokens.size() - 1);
 	}
 
@@ -120,8 +120,8 @@ protected:
 private:
 	void skipeol();
 
-	pstring::code_t getc();
-	void ungetc();
+	pstring::code_t _getc();
+	void _ungetc();
 
 	bool eof() { return m_strm.eof(); }
 
@@ -136,7 +136,7 @@ private:
 	pstring m_identifier_chars;
 	pstring m_number_chars;
 	pstring m_number_chars_start;
-	plist_t<pstring> m_tokens;
+	pvector_t<pstring> m_tokens;
 	pstring m_whitespace;
 	pstring::code_t  m_string;
 
@@ -174,7 +174,7 @@ protected:
 
 	postream &process_i(pistream &istrm, postream &ostrm);
 
-	double expr(const pstring_list_t &sexpr, std::size_t &start, int prio);
+	double expr(const pstring_vector_t &sexpr, std::size_t &start, int prio);
 
 	define_t *get_define(const pstring &name);
 
@@ -187,7 +187,7 @@ private:
 	pstring process_line(const pstring &line);
 
 	phashmap_t<pstring, define_t> m_defines;
-	pstring_list_t m_expr_sep;
+	pstring_vector_t m_expr_sep;
 
 	//pstringbuffer m_ret;
 	UINT32 m_ifflag; // 31 if levels

@@ -320,7 +320,7 @@ const device_type TMS36XX = &device_creator<tms36xx_device>;
 //  tms36xx_device - constructor
 //-------------------------------------------------
 
-tms36xx_device::tms36xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tms36xx_device::tms36xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS36XX, "TMS36XX", tag, owner, clock, "tms36xx", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_subtype(nullptr),

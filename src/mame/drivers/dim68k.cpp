@@ -39,12 +39,12 @@
 #include "video/mc6845.h"
 #include "machine/keyboard.h"
 #include "machine/upd765.h"
-
+#include "softlist.h"
 
 class dim68k_state : public driver_device
 {
 public:
-	dim68k_state(const machine_config &mconfig, device_type type, std::string tag)
+	dim68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "crtc"),
@@ -315,7 +315,7 @@ static MACHINE_CONFIG_START( dim68k, dim68k_state )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 250-1)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dim68k)
 
 	/* sound hardware */
@@ -335,6 +335,9 @@ static MACHINE_CONFIG_START( dim68k, dim68k_state )
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(dim68k_state, kbd_put))
+
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "dim68k")
 MACHINE_CONFIG_END
 
 /*

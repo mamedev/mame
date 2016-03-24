@@ -67,7 +67,7 @@
 class pcm_state : public driver_device
 {
 public:
-	pcm_state(const machine_config &mconfig, device_type type, std::string tag)
+	pcm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_pio_s(*this, "z80pio_s"),
@@ -267,7 +267,7 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcm)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -30,7 +30,7 @@ class sms_ctrl_adaptor_device : public device_t,
 {
 public:
 	// construction/destruction
-	sms_ctrl_adaptor_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sms_ctrl_adaptor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER(th_pin_w);
 	DECLARE_READ32_MEMBER(pixel_r);

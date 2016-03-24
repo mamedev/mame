@@ -59,7 +59,7 @@ ioport_constructor pet_userport_joystick_adapter_device::device_input_ports() co
 //  pet_userport_joystick_adapter_device - constructor
 //-------------------------------------------------
 
-pet_userport_joystick_adapter_device::pet_userport_joystick_adapter_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+pet_userport_joystick_adapter_device::pet_userport_joystick_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PET_USERPORT_JOYSTICK_ADAPTER, "PET Userport Joystick Adapter", tag, owner, clock, "petuja", __FILE__),
 	device_pet_user_port_interface(mconfig, *this),
 	m_up1(1),

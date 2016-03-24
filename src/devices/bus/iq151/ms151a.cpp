@@ -46,7 +46,7 @@ const device_type IQ151_MS151A = &device_creator<iq151_ms151a_device>;
 //  iq151_ms151a_device - constructor
 //-------------------------------------------------
 
-iq151_ms151a_device::iq151_ms151a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+iq151_ms151a_device::iq151_ms151a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, IQ151_MS151A, "IQ151 MS151A", tag, owner, clock, "iq151_ms151a", __FILE__),
 		device_iq151cart_interface( mconfig, *this ), m_rom(nullptr), m_posx(0), m_posy(0), m_pen(0), m_paper(nullptr)
 	{
@@ -77,9 +77,9 @@ void iq151_ms151a_device::device_stop()
 {
 #if DUMP_PAPER_INTO_PNG
 	emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	file_error filerr = file.open("iq151_ms151a.png");
+	osd_file::error filerr = file.open("iq151_ms151a.png");
 
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 	{
 		static const rgb_t png_palette[] = { rgb_t::white, rgb_t::black };
 

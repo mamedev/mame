@@ -239,10 +239,12 @@ public:
 	INT8                m_addrbus_shift;
 	UINT8               m_logaddr_width;
 	UINT8               m_page_shift;
+	bool                m_is_octal;                 // to determine if messages/debugger will show octal or hex
+
 	address_map_constructor m_internal_map;
 	address_map_constructor m_default_map;
-	address_map_delegate m_internal_map_delegate;
-	address_map_delegate m_default_map_delegate;
+	address_map_delegate    m_internal_map_delegate;
+	address_map_delegate    m_default_map_delegate;
 };
 
 
@@ -283,6 +285,7 @@ public:
 	int addr_width() const { return m_config.addr_width(); }
 	endianness_t endianness() const { return m_config.endianness(); }
 	UINT64 unmap() const { return m_unmap; }
+	bool is_octal() const { return m_config.m_is_octal; }
 
 	offs_t addrmask() const { return m_addrmask; }
 	offs_t bytemask() const { return m_bytemask; }
@@ -370,9 +373,9 @@ public:
 	void install_read_port(offs_t addrstart, offs_t addrend, const char *rtag) { install_read_port(addrstart, addrend, 0, 0, rtag); }
 	void install_write_port(offs_t addrstart, offs_t addrend, const char *wtag) { install_write_port(addrstart, addrend, 0, 0, wtag); }
 	void install_readwrite_port(offs_t addrstart, offs_t addrend, const char *rtag, const char *wtag) { install_readwrite_port(addrstart, addrend, 0, 0, rtag, wtag); }
-	void install_read_bank(offs_t addrstart, offs_t addrend, std::string tag) { install_read_bank(addrstart, addrend, 0, 0, tag); }
-	void install_write_bank(offs_t addrstart, offs_t addrend, std::string tag) { install_write_bank(addrstart, addrend, 0, 0, tag); }
-	void install_readwrite_bank(offs_t addrstart, offs_t addrend, std::string tag) { install_readwrite_bank(addrstart, addrend, 0, 0, tag); }
+	void install_read_bank(offs_t addrstart, offs_t addrend, const char *tag) { install_read_bank(addrstart, addrend, 0, 0, tag); }
+	void install_write_bank(offs_t addrstart, offs_t addrend, const char *tag) { install_write_bank(addrstart, addrend, 0, 0, tag); }
+	void install_readwrite_bank(offs_t addrstart, offs_t addrend, const char *tag) { install_readwrite_bank(addrstart, addrend, 0, 0, tag); }
 	void install_read_bank(offs_t addrstart, offs_t addrend, memory_bank *bank) { install_read_bank(addrstart, addrend, 0, 0, bank); }
 	void install_write_bank(offs_t addrstart, offs_t addrend, memory_bank *bank) { install_write_bank(addrstart, addrend, 0, 0, bank); }
 	void install_readwrite_bank(offs_t addrstart, offs_t addrend, memory_bank *bank) { install_readwrite_bank(addrstart, addrend, 0, 0, bank); }
@@ -384,9 +387,9 @@ public:
 	void install_read_port(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag) { install_readwrite_port(addrstart, addrend, addrmask, addrmirror, rtag, nullptr); }
 	void install_write_port(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *wtag) { install_readwrite_port(addrstart, addrend, addrmask, addrmirror, nullptr, wtag); }
 	void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag);
-	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::string tag) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, tag.c_str(), nullptr); }
-	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::string tag) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, nullptr, tag.c_str()); }
-	void install_readwrite_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::string tag)  { install_bank_generic(addrstart, addrend, addrmask, addrmirror, tag.c_str(), tag.c_str()); }
+	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, tag, nullptr); }
+	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, nullptr, tag); }
+	void install_readwrite_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag)  { install_bank_generic(addrstart, addrend, addrmask, addrmirror, tag, tag); }
 	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, memory_bank *bank) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, bank, nullptr); }
 	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, memory_bank *bank) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, nullptr, bank); }
 	void install_readwrite_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, memory_bank *bank)  { install_bank_generic(addrstart, addrend, addrmask, addrmirror, bank, bank); }
@@ -455,7 +458,7 @@ private:
 	void adjust_addresses(offs_t &start, offs_t &end, offs_t &mask, offs_t &mirror);
 	void *find_backing_memory(offs_t addrstart, offs_t addrend);
 	bool needs_backing_store(const address_map_entry *entry);
-	memory_bank &bank_find_or_allocate(std::string tag, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite);
+	memory_bank &bank_find_or_allocate(const char *tag, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite);
 	address_map_entry *block_assign_intersecting(offs_t bytestart, offs_t byteend, UINT8 *base);
 
 protected:
@@ -568,7 +571,7 @@ class memory_bank
 
 public:
 	// construction/destruction
-	memory_bank(address_space &space, int index, offs_t bytestart, offs_t byteend, std::string tag = nullptr);
+	memory_bank(address_space &space, int index, offs_t bytestart, offs_t byteend, const char *tag = nullptr);
 	~memory_bank();
 
 	// getters
@@ -579,7 +582,7 @@ public:
 	bool anonymous() const { return m_anonymous; }
 	offs_t bytestart() const { return m_bytestart; }
 	void *base() const { return *m_baseptr; }
-	std::string tag() const { return m_tag.c_str(); }
+	const char *tag() const { return m_tag.c_str(); }
 	const char *name() const { return m_name.c_str(); }
 
 	// compare a range against our range
@@ -641,9 +644,7 @@ public:
 
 	// getters
 	memory_share *next() const { return m_next; }
-	// NOTE: this being NULL in a C++ member function can lead to undefined behavior.
-	// However, it is relied on throughout MAME, so will remain for now.
-	void *ptr() const { if (this == nullptr) return nullptr; return m_ptr; }
+	void *ptr() const { return m_ptr; }
 	size_t bytes() const { return m_bytes; }
 	endianness_t endianness() const { return m_endianness; }
 	UINT8 bitwidth() const { return m_bitwidth; }
@@ -682,9 +683,9 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	memory_region *next() const { return m_next; }
-	UINT8 *base() { return (this != nullptr) ? &m_buffer[0] : nullptr; }
-	UINT8 *end() { return (this != nullptr) ? base() + m_buffer.size() : nullptr; }
-	UINT32 bytes() const { return (this != nullptr) ? m_buffer.size() : 0; }
+	UINT8 *base() { return &m_buffer[0]; }
+	UINT8 *end() { return base() + m_buffer.size(); }
+	UINT32 bytes() const { return m_buffer.size(); }
 	const char *name() const { return m_name.c_str(); }
 
 	// flag expansion
@@ -744,9 +745,9 @@ public:
 private:
 	// internal helpers
 	memory_bank *first_bank() const { return m_banklist.first(); }
-	memory_bank *bank(std::string tag) const { return m_banklist.find(tag); }
-	memory_region *region(std::string tag) { return m_regionlist.find(tag); }
-	memory_share *shared(std::string tag) { return m_sharelist.find(tag); }
+	memory_bank *bank(const char *tag) const { return m_banklist.find(tag); }
+	memory_region *region(const char *tag) { return m_regionlist.find(tag); }
+	memory_share *shared(const char *tag) { return m_sharelist.find(tag); }
 	void bank_reattach();
 
 	// internal state
@@ -866,6 +867,12 @@ private:
 // read/write a dword to a 64-bit space
 #define DWORD_XOR_BE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(4,0))
 #define DWORD_XOR_LE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,4))
+
+
+// helpers for checking address alignment
+#define WORD_ALIGNED(a)                 (((a) & 1) == 0)
+#define DWORD_ALIGNED(a)                (((a) & 3) == 0)
+#define QWORD_ALIGNED(a)                (((a) & 7) == 0)
 
 
 

@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /***************************************************************************
 
-    ui/barcode.c
+    ui/barcode.cpp
 
     "Barcode Reader" control
 
@@ -69,11 +69,11 @@ void ui_menu_barcode_reader::populate()
 			new_barcode = m_barcode_buffer;
 		}
 
-		item_append("New Barcode:", new_barcode, 0, ITEMREF_NEW_BARCODE);
+		item_append(_("New Barcode:"), new_barcode, 0, ITEMREF_NEW_BARCODE);
 
 		// finish up the menu
 		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-		item_append("Enter Code", nullptr, 0, ITEMREF_ENTER_BARCODE);
+		item_append(_("Enter Code"), nullptr, 0, ITEMREF_ENTER_BARCODE);
 
 		customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	}
@@ -115,7 +115,7 @@ void ui_menu_barcode_reader::handle()
 					std::string tmp_file(m_barcode_buffer);
 					//printf("code %s\n", m_barcode_buffer);
 					if (!current_device()->is_valid(tmp_file.length()))
-						machine().ui().popup_time(5, "Barcode length invalid!");
+						machine().ui().popup_time(5, "%s", _("Barcode length invalid!"));
 					else
 					{
 						current_device()->write_code(tmp_file.c_str(), tmp_file.length());

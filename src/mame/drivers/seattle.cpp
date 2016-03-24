@@ -423,7 +423,7 @@ struct widget_data
 class seattle_state : public driver_device
 {
 public:
-	seattle_state(const machine_config &mconfig, device_type type, std::string tag)
+	seattle_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_nvram(*this, "nvram") ,
 		m_rambase(*this, "rambase"),
@@ -540,7 +540,7 @@ public:
 
 UINT32 seattle_state::screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return voodoo_update(m_voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 
@@ -876,7 +876,7 @@ void seattle_state::pci_3dfx_w(address_space &space, UINT8 reg, UINT8 type, UINT
 			break;
 
 		case 0x10:      /* initEnable register */
-			voodoo_set_init_enable(m_voodoo, data);
+			m_voodoo->voodoo_set_init_enable(data);
 			break;
 	}
 	if (LOG_PCI)
@@ -2864,7 +2864,7 @@ ROM_START( calspeeda )
 	ROM_SYSTEM_BIOS( 3, "up16_3",       "Disk Update 1.0x to 2.1a (1.25) Step 3 of 3" )
 	ROMX_LOAD("eprom #3 2.1A 3286", 0x000000, 0x100000, CRC(e7d8c88f) SHA1(06c11241ac439527b361826784aef4c58689892e), ROM_BIOS(4))
 
-		
+
 	DISK_REGION( "ide:0:hdd:image" )    /* Release version 1.0r8a (4/10/98) (Guts 4/10/98, Main 4/10/98) */
 	DISK_IMAGE( "cs_10r8a", 0, SHA1(ba4e7589740e0647938c81c5082bb71d8826bad4) )
 

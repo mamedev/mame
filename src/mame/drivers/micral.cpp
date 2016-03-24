@@ -30,7 +30,7 @@
 class micral_state : public driver_device
 {
 public:
-	micral_state(const machine_config &mconfig, device_type type, std::string tag)
+	micral_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_beep(*this, "beeper")
@@ -242,7 +242,6 @@ MACHINE_RESET_MEMBER( micral_state, micral )
 {
 	//membank("bankr0")->set_entry(0); // point at rom
 	//membank("bankw0")->set_entry(0); // always write to ram
-	m_beep->set_frequency(2000);
 	m_maincpu->set_state_int(Z80_PC, 0xf800);
 }
 
@@ -258,13 +257,13 @@ static MACHINE_CONFIG_START( micral, micral_state )
 	MCFG_MACHINE_RESET_OVERRIDE(micral_state, micral)
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
 	MCFG_SCREEN_UPDATE_DRIVER(micral_state, screen_update)
 	MCFG_SCREEN_SIZE(64*6, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", micral)
 
 	MCFG_DEVICE_ADD("crtc", CRT5037, XTAL_17_9712MHz/2)  // xtal freq unknown
@@ -274,7 +273,7 @@ static MACHINE_CONFIG_START( micral, micral_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 2000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

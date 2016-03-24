@@ -43,7 +43,7 @@ UINT32 screen_device::m_id_counter = 0;
 //  screen_device - constructor
 //-------------------------------------------------
 
-screen_device::screen_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+screen_device::screen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SCREEN, "Video Screen", tag, owner, clock, "screen", __FILE__),
 		m_type(SCREEN_TYPE_RASTER),
 		m_oldstyle_vblank_supplied(false),
@@ -224,7 +224,7 @@ void screen_device::static_set_screen_vblank(device_t &device, screen_vblank_del
 //  configuration
 //-------------------------------------------------
 
-void screen_device::static_set_palette(device_t &device, std::string tag)
+void screen_device::static_set_palette(device_t &device, const char *tag)
 {
 	downcast<screen_device &>(device).m_palette.set_tag(tag);
 }
@@ -240,6 +240,19 @@ void screen_device::static_set_video_attributes(device_t &device, UINT32 flags)
 	screen_device &screen = downcast<screen_device &>(device);
 	screen.m_video_attributes = flags;
 }
+
+
+//-------------------------------------------------
+//  static_set_color - set the screen global color
+//-------------------------------------------------
+
+void screen_device::static_set_color(device_t &device, rgb_t color)
+{
+	screen_device &screen = downcast<screen_device &>(device);
+	screen.m_color = color;
+}
+
+
 //-------------------------------------------------
 //  device_validity_check - verify device
 //  configuration
@@ -481,7 +494,7 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	if (m_oldstyle_vblank_supplied)
 	{
 		m_vblank_period = m_vblank;
-		logerror("%s: Deprecated legacy Old Style screen configured (MCFG_SCREEN_VBLANK_TIME), please use MCFG_SCREEN_RAW_PARAMS instead.\n",this->tag().c_str());
+		logerror("%s: Deprecated legacy Old Style screen configured (MCFG_SCREEN_VBLANK_TIME), please use MCFG_SCREEN_RAW_PARAMS instead.\n",this->tag());
 	}
 	else
 		m_vblank_period = m_scantime * (height - visarea.height());
@@ -590,7 +603,7 @@ bool screen_device::update_partial(int scanline)
 	// validate arguments
 	assert(scanline >= 0);
 
-	LOG_PARTIAL_UPDATES(("Partial: update_partial(%s, %d): ", tag().c_str(), scanline));
+	LOG_PARTIAL_UPDATES(("Partial: update_partial(%s, %d): ", tag(), scanline));
 
 	// these two checks only apply if we're allowed to skip frames
 	if (!(m_video_attributes & VIDEO_ALWAYS_UPDATE))
@@ -1140,8 +1153,8 @@ void screen_device::finalize_burnin()
 
 	// compute the name and create the file
 	emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	file_error filerr = file.open(machine().basename(), PATH_SEPARATOR "burnin-", this->tag().c_str() + 1, ".png") ;
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = file.open(machine().basename(), PATH_SEPARATOR "burnin-", this->tag()+1, ".png") ;
+	if (filerr == osd_file::error::NONE)
 	{
 		png_info pnginfo = { nullptr };
 //      png_error pngerr;

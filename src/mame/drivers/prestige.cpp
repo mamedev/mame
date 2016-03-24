@@ -89,7 +89,7 @@ Notes:
 class prestige_state : public driver_device
 {
 public:
-	prestige_state(const machine_config &mconfig, device_type type, std::string tag)
+	prestige_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_ram(*this, RAM_TAG),
@@ -625,9 +625,15 @@ void prestige_state::machine_start()
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
 	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *cart = m_cart_rom->base();
-	if (cart == nullptr)
+	UINT8 *cart = NULL;
+	if (m_cart_rom != NULL)
+	{
+		cart = m_cart_rom->base();
+	}
+	else
+	{
 		cart = rom + 0x40000;   // internal ROM also includes extra contents that are activated by a cartridge that works as a jumper
+	}
 	UINT8 *ram = m_ram->pointer();
 	memset(ram, 0x00, m_ram->size());
 
@@ -769,6 +775,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( snotec, glcolor )
 	MCFG_SOFTWARE_LIST_REMOVE("cart_list")
+	MCFG_SOFTWARE_LIST_REMOVE("snotec_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "snotec")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("glcolor_cart", "glcolor")
 MACHINE_CONFIG_END

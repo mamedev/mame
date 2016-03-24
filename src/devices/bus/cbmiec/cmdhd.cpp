@@ -108,7 +108,7 @@ machine_config_constructor cmd_hd_device::device_mconfig_additions() const
 //  cmd_hd_device - constructor
 //-------------------------------------------------
 
-cmd_hd_device::cmd_hd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+cmd_hd_device::cmd_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CMD_HD, "HD", tag, owner, clock, "cmdhd", __FILE__),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG),

@@ -25,7 +25,7 @@ public:
 		TIMER_TAITOZ_CPUB_INTERRUPT5
 	};
 
-	taitoz_state(const machine_config &mconfig, device_type type, std::string tag)
+	taitoz_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),

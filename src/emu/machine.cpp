@@ -78,6 +78,8 @@
 #include "uiinput.h"
 #include "crsshair.h"
 #include "unzip.h"
+#include "ui/datfile.h"
+#include "ui/inifile.h"
 #include "debug/debugvw.h"
 #include "image.h"
 #include "luaengine.h"
@@ -89,15 +91,6 @@
 
 void js_set_main_loop(running_machine * machine);
 #endif
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// a giant string buffer for temporary strings
-static char giant_string_buffer[65536] = { 0 };
 
 
 
@@ -186,7 +179,10 @@ const char *running_machine::describe_context()
 	{
 		cpu_device *cpu = dynamic_cast<cpu_device *>(&executing->device());
 		if (cpu != nullptr)
-			strprintf(m_context, "'%s' (%s)", cpu->tag().c_str(), core_i64_format(cpu->pc(), cpu->space(AS_PROGRAM).logaddrchars(), cpu->is_octal()));
+		{
+			address_space &prg = cpu->space(AS_PROGRAM);
+			m_context = string_format(prg.is_octal() ? "'%s' (%0*o)" :  "'%s' (%0*X)", cpu->tag(), prg.logaddrchars(), cpu->pc());
+		}
 	}
 	else
 		m_context.assign("(no context)");
@@ -232,6 +228,10 @@ void running_machine::start()
 	// create the video manager
 	m_video = std::make_unique<video_manager>(*this);
 	m_ui = std::make_unique<ui_manager>(*this);
+	m_ui->init();
+
+	// start the inifile manager
+	m_inifile = std::make_unique<inifile_manager>(*this);
 
 	// initialize the base time (needed for doing record/playback)
 	::time(&m_base_time);
@@ -305,6 +305,12 @@ void running_machine::start()
 	// allocate autoboot timer
 	m_autoboot_timer = scheduler().timer_alloc(timer_expired_delegate(FUNC(running_machine::autoboot_callback), this));
 
+	// start datfile manager
+	m_datfile = std::make_unique<datfile_manager>(*this);
+
+	// start favorite manager
+	m_favorite = std::make_unique<favorite_manager>(*this);
+
 	manager().update_machine();
 }
 
@@ -327,8 +333,8 @@ int running_machine::run(bool firstrun)
 		if (options().log() && &system() != &GAME_NAME(___empty))
 		{
 			m_logfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			file_error filerr = m_logfile->open("error.log");
-			assert_always(filerr == FILERR_NONE, "unable to open log file");
+			osd_file::error filerr = m_logfile->open("error.log");
+			assert_always(filerr == osd_file::error::NONE, "unable to open log file");
 			add_logerror_callback(logfile_callback);
 		}
 
@@ -366,14 +372,16 @@ int running_machine::run(bool firstrun)
 			g_profiler.start(PROFILER_EXTRA);
 
 #if defined(EMSCRIPTEN)
-			//break out to our async javascript loop and halt
+			// break out to our async javascript loop and halt
 			js_set_main_loop(this);
 #endif
 
 			// execute CPUs if not paused
 			if (!m_paused)
+			{
 				m_scheduler.timeslice();
-
+				manager().lua()->periodic_check();
+			}
 			// otherwise, just pump video updates through
 			else
 				m_video->frame_update();
@@ -395,7 +403,7 @@ int running_machine::run(bool firstrun)
 	}
 	catch (emu_fatalerror &fatal)
 	{
-		osd_printf_error("FATALERROR: %s\n", fatal.string());
+		osd_printf_error("Fatal error: %s\n", fatal.string());
 		error = MAMERR_FATALERROR;
 		if (fatal.exitcode() != 0)
 			error = fatal.exitcode();
@@ -412,7 +420,7 @@ int running_machine::run(bool firstrun)
 	}
 	catch (add_exception &aex)
 	{
-		osd_printf_error("Tag '%s' already exists in tagged_list\n", aex.tag().c_str());
+		osd_printf_error("Tag '%s' already exists in tagged_list\n", aex.tag());
 		error = MAMERR_FATALERROR;
 	}
 	catch (std::exception &ex)
@@ -432,7 +440,7 @@ int running_machine::run(bool firstrun)
 
 	// call all exit callbacks registered
 	call_notifiers(MACHINE_NOTIFY_EXIT);
-	zip_file_cache_clear();
+	util::archive_file::cache_clear();
 
 	// close the logfile
 	m_logfile.reset();
@@ -753,70 +761,8 @@ void running_machine::add_notifier(machine_notification event, machine_notify_de
 void running_machine::add_logerror_callback(logerror_callback callback)
 {
 	assert_always(m_current_phase == MACHINE_PHASE_INIT, "Can only call add_logerror_callback at init time!");
+        m_string_buffer.reserve(1024);
 	m_logerror_list.push_back(std::make_unique<logerror_callback_item>(callback));
-}
-
-/*-------------------------------------------------
-    popmessage - pop up a user-visible message
--------------------------------------------------*/
-
-void running_machine::popmessage(const char *format, ...) const
-{
-	// if the format is NULL, it is a signal to clear the popmessage
-	if (format == nullptr)
-		ui().popup_time(0, " ");
-
-	// otherwise, generate the buffer and call the UI to display the message
-	else
-	{
-		std::string temp;
-		va_list arg;
-
-		// dump to the buffer
-		va_start(arg, format);
-		strvprintf(temp,format, arg);
-		va_end(arg);
-
-		// pop it in the UI
-		ui().popup_time(temp.length() / 40 + 2, "%s", temp.c_str());
-	}
-}
-
-
-/*-------------------------------------------------
-    logerror - log to the debugger and any other
-    OSD-defined output streams
--------------------------------------------------*/
-
-void running_machine::logerror(const char *format, ...) const
-{
-	va_list arg;
-	va_start(arg, format);
-	vlogerror(format, arg);
-	va_end(arg);
-}
-
-
-//-------------------------------------------------
-//  vlogerror - vprintf-style error logging
-//-------------------------------------------------
-
-void running_machine::vlogerror(const char *format, va_list args) const
-{
-	// process only if there is a target
-	if (!m_logerror_list.empty())
-	{
-		g_profiler.start(PROFILER_LOGERROR);
-
-		// dump to the buffer
-		vsnprintf(giant_string_buffer, ARRAY_LENGTH(giant_string_buffer), format, args);
-
-		// log to all callbacks
-		for (auto& cb : m_logerror_list)
-			(cb->m_func)(*this, giant_string_buffer);
-
-		g_profiler.stop();
-	}
 }
 
 
@@ -876,76 +822,76 @@ void running_machine::call_notifiers(machine_notification which)
 
 void running_machine::handle_saveload()
 {
-	UINT32 openflags = (m_saveload_schedule == SLS_LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	const char *opnamed = (m_saveload_schedule == SLS_LOAD) ? "loaded" : "saved";
-	const char *opname = (m_saveload_schedule == SLS_LOAD) ? "load" : "save";
-	file_error filerr = FILERR_NONE;
-
 	// if no name, bail
-	emu_file file(m_saveload_searchpath, openflags);
-	if (m_saveload_pending_file.empty())
-		goto cancel;
-
-	// if there are anonymous timers, we can't save just yet, and we can't load yet either
-	// because the timers might overwrite data we have loaded
-	if (!m_scheduler.can_save())
+	if (!m_saveload_pending_file.empty())
 	{
-		// if more than a second has passed, we're probably screwed
-		if ((this->time() - m_saveload_schedule_time) > attotime::from_seconds(1))
+		const char *const opname = (m_saveload_schedule == SLS_LOAD) ? "load" : "save";
+
+		// if there are anonymous timers, we can't save just yet, and we can't load yet either
+		// because the timers might overwrite data we have loaded
+		if (!m_scheduler.can_save())
 		{
-			popmessage("Unable to %s due to pending anonymous timers. See error.log for details.", opname);
-			goto cancel;
+			// if more than a second has passed, we're probably screwed
+			if ((this->time() - m_saveload_schedule_time) > attotime::from_seconds(1))
+				popmessage("Unable to %s due to pending anonymous timers. See error.log for details.", opname);
+			else
+				return; // return without cancelling the operation
 		}
-		return;
-	}
-
-	// open the file
-	filerr = file.open(m_saveload_pending_file.c_str());
-	if (filerr == FILERR_NONE)
-	{
-		// read/write the save state
-		save_error saverr = (m_saveload_schedule == SLS_LOAD) ? m_save.read_file(file) : m_save.write_file(file);
-
-		// handle the result
-		switch (saverr)
+		else
 		{
-			case STATERR_ILLEGAL_REGISTRATIONS:
-				popmessage("Error: Unable to %s state due to illegal registrations. See error.log for details.", opname);
-				break;
+			UINT32 const openflags = (m_saveload_schedule == SLS_LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
-			case STATERR_INVALID_HEADER:
-				popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this game.", opname);
-				break;
+			// open the file
+			emu_file file(m_saveload_searchpath, openflags);
+			auto const filerr = file.open(m_saveload_pending_file.c_str());
+			if (filerr == osd_file::error::NONE)
+			{
+				const char *const opnamed = (m_saveload_schedule == SLS_LOAD) ? "loaded" : "saved";
 
-			case STATERR_READ_ERROR:
-				popmessage("Error: Unable to %s state due to a read error (file is likely corrupt).", opname);
-				break;
+				// read/write the save state
+				save_error saverr = (m_saveload_schedule == SLS_LOAD) ? m_save.read_file(file) : m_save.write_file(file);
 
-			case STATERR_WRITE_ERROR:
-				popmessage("Error: Unable to %s state due to a write error. Verify there is enough disk space.", opname);
-				break;
+				// handle the result
+				switch (saverr)
+				{
+				case STATERR_ILLEGAL_REGISTRATIONS:
+					popmessage("Error: Unable to %s state due to illegal registrations. See error.log for details.", opname);
+					break;
 
-			case STATERR_NONE:
-				if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
-					popmessage("State successfully %s.\nWarning: Save states are not officially supported for this game.", opnamed);
-				else
-					popmessage("State successfully %s.", opnamed);
-				break;
+				case STATERR_INVALID_HEADER:
+					popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this game.", opname);
+					break;
 
-			default:
-				popmessage("Error: Unknown error during state %s.", opnamed);
-				break;
+				case STATERR_READ_ERROR:
+					popmessage("Error: Unable to %s state due to a read error (file is likely corrupt).", opname);
+					break;
+
+				case STATERR_WRITE_ERROR:
+					popmessage("Error: Unable to %s state due to a write error. Verify there is enough disk space.", opname);
+					break;
+
+				case STATERR_NONE:
+					if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
+						popmessage("State successfully %s.\nWarning: Save states are not officially supported for this game.", opnamed);
+					else
+						popmessage("State successfully %s.", opnamed);
+					break;
+
+				default:
+					popmessage("Error: Unknown error during state %s.", opnamed);
+					break;
+				}
+
+				// close and perhaps delete the file
+				if (saverr != STATERR_NONE && m_saveload_schedule == SLS_SAVE)
+					file.remove_on_close();
+			}
+			else
+				popmessage("Error: Failed to open file for %s operation.", opname);
 		}
-
-		// close and perhaps delete the file
-		if (saverr != STATERR_NONE && m_saveload_schedule == SLS_SAVE)
-			file.remove_on_close();
 	}
-	else
-		popmessage("Error: Failed to open file for %s operation.", opname);
 
 	// unschedule the operation
-cancel:
 	m_saveload_pending_file.clear();
 	m_saveload_searchpath = nullptr;
 	m_saveload_schedule = SLS_NONE;
@@ -1064,7 +1010,10 @@ void running_machine::watchdog_vblank(screen_device &screen, bool vblank_state)
 void running_machine::logfile_callback(const running_machine &machine, const char *buffer)
 {
 	if (machine.m_logfile != nullptr)
+	{
 		machine.m_logfile->puts(buffer);
+		machine.m_logfile->flush();
+	}
 }
 
 
@@ -1092,7 +1041,7 @@ void running_machine::start_all_devices()
 						device->set_machine(*this);
 
 					// now start the device
-					osd_printf_verbose("Starting %s '%s'\n", device->name().c_str(), device->tag().c_str());
+					osd_printf_verbose("Starting %s '%s'\n", device->name(), device->tag());
 					device->start();
 				}
 
@@ -1182,9 +1131,10 @@ void running_machine::postload_all_devices()
 std::string running_machine::nvram_filename(device_t &device) const
 {
 	// start with either basename or basename_biosnum
-	std::string result(basename());
+	std::ostringstream result;
+	result << basename();
 	if (root_device().system_bios() != 0 && root_device().default_bios() != root_device().system_bios())
-		strcatprintf(result, "_%d", root_device().system_bios() - 1);
+		util::stream_format(result, "_%d", root_device().system_bios() - 1);
 
 	// device-based NVRAM gets its own name in a subdirectory
 	if (device.owner() != nullptr)
@@ -1201,14 +1151,14 @@ std::string running_machine::nvram_filename(device_t &device) const
 			}
 		}
 		if (software != nullptr && *software != '\0')
-			result.append(PATH_SEPARATOR).append(software);
+			result << PATH_SEPARATOR << software;
 
 		std::string tag(device.tag());
 		tag.erase(0, 1);
 		strreplacechr(tag,':', '_');
-		result.append(PATH_SEPARATOR).append(tag);
+		result << PATH_SEPARATOR << tag;
 	}
-	return result;
+	return result.str();
 }
 
 /*-------------------------------------------------
@@ -1221,7 +1171,7 @@ void running_machine::nvram_load()
 	for (device_nvram_interface *nvram = iter.first(); nvram != nullptr; nvram = iter.next())
 	{
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
-		if (file.open(nvram_filename(nvram->device()).c_str()) == FILERR_NONE)
+		if (file.open(nvram_filename(nvram->device()).c_str()) == osd_file::error::NONE)
 		{
 			nvram->nvram_load(file);
 			file.close();
@@ -1242,7 +1192,7 @@ void running_machine::nvram_save()
 	for (device_nvram_interface *nvram = iter.first(); nvram != nullptr; nvram = iter.next())
 	{
 		emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(nvram_filename(nvram->device()).c_str()) == FILERR_NONE)
+		if (file.open(nvram_filename(nvram->device()).c_str()) == osd_file::error::NONE)
 		{
 			nvram->nvram_save(file);
 			file.close();
@@ -1314,7 +1264,7 @@ void system_time::full_time::set(struct tm &t)
 	month   = t.tm_mon;
 	year    = t.tm_year + 1900;
 	weekday = t.tm_wday;
-	day     = t.tm_yday;
+	day  = t.tm_yday;
 	is_dst  = t.tm_isdst;
 }
 

@@ -1,11 +1,11 @@
-// license:???
-// copyright-holders:Ed Mueller, Mike Balfour, Zsolt Vasvari
+// license:BSD-3-Clause
+// copyright-holders:Mike Balfour, Zsolt Vasvari
 #include "machine/buggychl.h"
 
 class bking_state : public driver_device
 {
 public:
-	bking_state(const machine_config &mconfig, device_type type, std::string tag)
+	bking_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_audiocpu(*this, "audiocpu"),

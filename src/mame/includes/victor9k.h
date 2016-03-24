@@ -51,7 +51,7 @@
 class victor9k_state : public driver_device
 {
 public:
-	victor9k_state(const machine_config &mconfig, device_type type, std::string tag) :
+	victor9k_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, I8088_TAG),
 		m_ieee488(*this, IEEE488_TAG),

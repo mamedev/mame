@@ -35,7 +35,7 @@ class dac_device : public device_t,
 
 public:
 	// construction/destruction
-	dac_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	dac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// public interface
 	INT16 output() const { return m_output; }

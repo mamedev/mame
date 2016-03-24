@@ -51,7 +51,7 @@ ToDo:
 class allied_state : public genpin_class
 {
 public:
-	allied_state(const machine_config &mconfig, device_type type, std::string tag)
+	allied_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ic1(*this, "ic1")

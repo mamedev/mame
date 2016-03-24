@@ -98,7 +98,7 @@ but unlike to DC/AW/Naomi SH4 'peripheral clock' (at which works TMU timers and 
 class atvtrack_state : public driver_device
 {
 public:
-	atvtrack_state(const machine_config &mconfig, device_type type, std::string tag)
+	atvtrack_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu") { }
@@ -134,7 +134,7 @@ protected:
 class smashdrv_state : public atvtrack_state
 {
 public:
-	smashdrv_state(const machine_config &mconfig, device_type type, std::string tag)
+	smashdrv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atvtrack_state(mconfig, type, tag) { }
 
 	virtual void machine_start() override;
@@ -327,7 +327,7 @@ READ64_MEMBER(atvtrack_state::ioport_r)
 {
 	if (offset == SH4_IOPORT_16/8) {
 		// much simplified way
-		if (space.device().tag() == ":maincpu")
+		if (strcmp(space.device().tag(), ":maincpu") == 0)
 #ifndef SPECIALMODE
 			return -1; // normal
 #else

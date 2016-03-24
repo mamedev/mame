@@ -108,16 +108,16 @@ inline std::string number_and_format::format() const
 	{
 		default:
 		case XML_INT_FORMAT_DECIMAL:
-			return strformat("%d", (UINT32)m_value);
+			return string_format("%d", (UINT32)m_value);
 
 		case XML_INT_FORMAT_DECIMAL_POUND:
-			return strformat("#%d", (UINT32)m_value);
+			return string_format("#%d", (UINT32)m_value);
 
 		case XML_INT_FORMAT_HEX_DOLLAR:
-			return strformat("$%X", (UINT32)m_value);
+			return string_format("$%X", (UINT32)m_value);
 
 		case XML_INT_FORMAT_HEX_C:
-			return strformat("0x%X", (UINT32)m_value);
+			return string_format("0x%X", (UINT32)m_value);
 	}
 }
 
@@ -174,12 +174,13 @@ const char *cheat_parameter::text()
 {
 	// are we a value cheat?
 	if (!has_itemlist())
-		strprintf(m_curtext,"%d (0x%X)", UINT32(m_value), UINT32(m_value));
-
-	// if not, we're an item cheat
+	{
+		m_curtext = string_format("%d (0x%X)", UINT32(m_value), UINT32(m_value));
+	}
 	else
 	{
-		strprintf(m_curtext, "??? (%d)", UINT32(m_value));
+		// if not, we're an item cheat
+		m_curtext = string_format("??? (%d)", UINT32(m_value));
 		for (item *curitem = m_itemlist.first(); curitem != nullptr; curitem = curitem->next())
 			if (curitem->value() == m_value)
 			{
@@ -502,7 +503,7 @@ void cheat_script::script_entry::execute(cheat_manager &manager, UINT64 &arginde
 			curarg += arg->values(argindex, &params[curarg]);
 
 		// generate the astring
-		strprintf(manager.get_output_astring(m_line, m_justify), m_format.c_str(),
+		manager.get_output_astring(m_line, m_justify) = string_format(m_format,
 			(UINT32)params[0],  (UINT32)params[1],  (UINT32)params[2],  (UINT32)params[3],
 			(UINT32)params[4],  (UINT32)params[5],  (UINT32)params[6],  (UINT32)params[7],
 			(UINT32)params[8],  (UINT32)params[9],  (UINT32)params[10], (UINT32)params[11],
@@ -697,7 +698,7 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 		// create the symbol table
 		m_symbols.add("argindex", symbol_table::READ_ONLY, &m_argindex);
 		for (int curtemp = 0; curtemp < tempcount; curtemp++) {
-			m_symbols.add(strformat("temp%d", curtemp).c_str(), symbol_table::READ_WRITE);
+			m_symbols.add(string_format("temp%d", curtemp).c_str(), symbol_table::READ_WRITE);
 		}
 
 		// read the first comment node
@@ -1030,6 +1031,9 @@ std::unique_ptr<cheat_script> &cheat_entry::script_for_state(script_state state)
 //  CHEAT MANAGER
 //**************************************************************************
 
+const int cheat_manager::CHEAT_VERSION;
+
+
 //-------------------------------------------------
 //  cheat_manager - constructor
 //-------------------------------------------------
@@ -1042,6 +1046,9 @@ cheat_manager::cheat_manager(running_machine &machine)
 	// if the cheat engine is disabled, we're done
 	if (!machine.options().cheat())
 		return;
+
+	m_output.resize(UI_TARGET_FONT_ROWS*2);
+	m_justify.resize(UI_TARGET_FONT_ROWS*2);
 
 	// request a callback
 	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(cheat_manager::frame_update), this));
@@ -1130,9 +1137,7 @@ void cheat_manager::reload()
 			// have the same shortname
 			if (image->software_entry() != nullptr)
 			{
-				std::string filename;
-				strprintf(filename, "%s%s%s", image->software_list_name(), PATH_SEPARATOR, image->basename());
-				load_cheats(filename.c_str());
+				load_cheats(string_format("%s%s%s", image->software_list_name(), PATH_SEPARATOR, image->basename()).c_str());
 				break;
 			}
 			// else we are loading outside the software list, try to load machine_basename/crc32.xml
@@ -1141,9 +1146,7 @@ void cheat_manager::reload()
 				UINT32 crc = image->crc();
 				if (crc != 0)
 				{
-					std::string filename;
-					strprintf(filename, "%s%s%08X", machine().basename(), PATH_SEPARATOR, crc);
-					load_cheats(filename.c_str());
+					load_cheats(string_format("%s%s%08X", machine().basename(), PATH_SEPARATOR, crc).c_str());
 					break;
 				}
 			}
@@ -1168,10 +1171,10 @@ bool cheat_manager::save_all(const char *filename)
 {
 	// open the file with the proper name
 	emu_file cheatfile(machine().options().cheat_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	file_error filerr = cheatfile.open(filename, ".xml");
+	osd_file::error filerr = cheatfile.open(filename, ".xml");
 
 	// if that failed, return nothing
-	if (filerr != FILERR_NONE)
+	if (filerr != osd_file::error::NONE)
 		return false;
 
 	// wrap the rest of catch errors
@@ -1209,7 +1212,7 @@ bool cheat_manager::save_all(const char *filename)
 void cheat_manager::render_text(render_container &container)
 {
 	// render any text and free it along the way
-	for (int linenum = 0; linenum < ARRAY_LENGTH(m_output); linenum++)
+	for (int linenum = 0; linenum < m_output.size(); linenum++)
 		if (!m_output[linenum].empty())
 		{
 			// output the text
@@ -1337,7 +1340,7 @@ void cheat_manager::frame_update()
 	// set up for accumulating output
 	m_lastline = 0;
 	m_numlines = floor(1.0f / machine().ui().get_line_height());
-	m_numlines = MIN(m_numlines, ARRAY_LENGTH(m_output));
+	m_numlines = MIN(m_numlines, m_output.size());
 	for (auto & elem : m_output)
 		elem.clear();
 
@@ -1358,14 +1361,21 @@ void cheat_manager::frame_update()
 void cheat_manager::load_cheats(const char *filename)
 {
 	xml_data_node *rootnode = nullptr;
-	emu_file cheatfile(machine().options().cheat_path(), OPEN_FLAG_READ);
+	std::string searchstr(machine().options().cheat_path());
+	path_iterator path(searchstr.c_str());
+	std::string curpath;
+	while (path.next(curpath))
+	{
+		searchstr.append(";").append(curpath).append(PATH_SEPARATOR).append("cheat");
+	}
+	emu_file cheatfile(searchstr.c_str(), OPEN_FLAG_READ);
 	try
 	{
 		// open the file with the proper name
-		file_error filerr = cheatfile.open(filename, ".xml");
+		osd_file::error filerr = cheatfile.open(filename, ".xml");
 
 		// loop over all instrances of the files found in our search paths
-		while (filerr == FILERR_NONE)
+		while (filerr == osd_file::error::NONE)
 		{
 			osd_printf_verbose("Loading cheats file from %s\n", cheatfile.fullpath());
 

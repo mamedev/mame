@@ -10,7 +10,7 @@
 
 const device_type ISBC_215G = &device_creator<isbc_215g_device>;
 
-isbc_215g_device::isbc_215g_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isbc_215g_device::isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ISBC_215G, "ISBC 215G Winchester Disk Controller", tag, owner, clock, "isbc_215g", __FILE__),
 	m_dmac(*this, "u84"),
 	m_hdd0(*this, "drive0"),

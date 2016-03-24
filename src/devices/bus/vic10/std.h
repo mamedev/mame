@@ -27,7 +27,7 @@ class vic10_standard_cartridge_device :  public device_t,
 {
 public:
 	// construction/destruction
-	vic10_standard_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	vic10_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

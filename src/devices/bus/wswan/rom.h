@@ -13,8 +13,8 @@ class ws_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	ws_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	ws_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ws_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ws_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -54,7 +54,7 @@ class ws_rom_sram_device : public ws_rom_device
 {
 public:
 	// construction/destruction
-	ws_rom_sram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ws_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -76,7 +76,7 @@ class ws_rom_eeprom_device : public ws_rom_device
 {
 public:
 	// construction/destruction
-	ws_rom_eeprom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ws_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

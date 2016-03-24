@@ -82,8 +82,8 @@ class tms9928a_device : public device_t,
 {
 public:
 	// construction/destruction
-	tms9928a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	tms9928a_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva, bool is_99, std::string shortname, std::string source);
+	tms9928a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms9928a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva, bool is_99, const char *shortname, const char *source);
 
 	static void set_vram_size(device_t &device, int vram_size) { downcast<tms9928a_device &>(device).m_vram_size = vram_size; }
 	template<class _Object> static devcb_base &set_out_int_line_callback(device_t &device, _Object object) { return downcast<tms9928a_device &>(device).m_out_int_line_cb.set_callback(object); }
@@ -158,49 +158,49 @@ private:
 class tms9918_device : public tms9928a_device
 {
 public:
-	tms9918_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms9918_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms9918a_device : public tms9928a_device
 {
 public:
-	tms9918a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms9918a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms9118_device : public tms9928a_device
 {
 public:
-	tms9118_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms9118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms9128_device : public tms9928a_device
 {
 public:
-	tms9128_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms9128_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms9929_device : public tms9928a_device
 {
 public:
-	tms9929_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms9929_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms9929a_device : public tms9928a_device
 {
 public:
-	tms9929a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms9929a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class tms9129_device : public tms9928a_device
 {
 public:
-	tms9129_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms9129_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

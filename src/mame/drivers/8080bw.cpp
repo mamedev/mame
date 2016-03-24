@@ -789,7 +789,7 @@ MACHINE_CONFIG_START( spacecom, _8080bw_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_spacecom)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_audio)
@@ -2543,7 +2543,7 @@ MACHINE_CONFIG_START( shuttlei, _8080bw_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_shuttlei)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -3274,26 +3274,10 @@ WRITE8_MEMBER(_8080bw_state::invmulti_eeprom_w)
 
 WRITE8_MEMBER(_8080bw_state::invmulti_bank_w)
 {
-	m_invmulti_bank = data; //needed to restore the bankswitch post load
-
 	// d0, d4, d6: bank
 	int bank = (data & 1) | (data >> 3 & 2) | (data >> 4 & 4);
-	membank("bank1")->set_base(memregion("maincpu")->base() + bank * 0x4000 + 0x0000);
-	membank("bank2")->set_base(memregion("maincpu")->base() + bank * 0x4000 + 0x2000);
-}
-
-void _8080bw_state::invmulti_bankswitch_restore()
-{
-	invmulti_bank_w(m_maincpu->space(AS_PROGRAM), 0, m_invmulti_bank);
-}
-
-MACHINE_RESET_MEMBER(_8080bw_state,invmulti)
-{
-	m_invmulti_bank = 0;
-
-	invmulti_bank_w(m_maincpu->space(AS_PROGRAM), 0, 0);
-
-	MACHINE_RESET_CALL_MEMBER(mw8080bw);
+	membank("bank1")->set_entry(bank);
+	membank("bank2")->set_entry(bank);
 }
 
 MACHINE_CONFIG_DERIVED_CLASS( invmulti, invaders, _8080bw_state )
@@ -3304,7 +3288,7 @@ MACHINE_CONFIG_DERIVED_CLASS( invmulti, invaders, _8080bw_state )
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
-	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,invmulti)
+	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(_8080bw_state,invmulti)
@@ -3317,8 +3301,10 @@ DRIVER_INIT_MEMBER(_8080bw_state,invmulti)
 	for (int i = 0; i < len; i++)
 		dest[i] = BITSWAP8(src[(i & 0x100ff) | (BITSWAP8(i >> 8 & 0xff, 7,3,4,5,0,6,1,2) << 8)],0,6,5,7,4,3,1,2);
 
-	save_item(NAME(m_invmulti_bank));
-	machine().save().register_postload(save_prepost_delegate(FUNC(_8080bw_state::invmulti_bankswitch_restore), this));
+	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
+	membank("bank1")->set_entry(0);
+	membank("bank2")->configure_entries(0, 8, memregion("maincpu")->base() + 0x2000, 0x4000);
+	membank("bank2")->set_entry(0);
 }
 
 
@@ -4807,7 +4793,7 @@ GAME( 1979, moonbasea,  invadpt2, invadpt2,  invadpt2,  driver_device, 0, ROT270
 
 GAME( 1980, spclaser,   0,        invadpt2,  spclaser,  driver_device, 0, ROT270, "Taito", "Space Laser", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, intruder,   spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270, "Taito (Game Plan license)", "Intruder", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1980, laser,      spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270, "bootleg (Leisure Time Electronics Inc.)", "Astro Laser (bootleg of Space Laser)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, laser,      spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270, "bootleg (Leisure Time Electronics)", "Astro Laser (bootleg of Space Laser)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, spcewarl,   spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270, "Leijac Corporation", "Space War (Leijac Corporation)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Taito's version is actually a spin-off of this?
 
 GAME( 1979, lrescue,    0,        lrescue,   lrescue,   driver_device, 0, ROT270, "Taito", "Lunar Rescue", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

@@ -24,8 +24,8 @@
 
 class h83006_device : public h8h_device {
 public:
-	h83006_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	h83006_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h83006_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	h83006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(syscr_r);
 	DECLARE_WRITE8_MEMBER(syscr_w);
@@ -71,7 +71,7 @@ protected:
 
 class h83007_device : public h83006_device {
 public:
-	h83007_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h83007_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type H83006;

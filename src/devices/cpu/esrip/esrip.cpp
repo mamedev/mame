@@ -355,7 +355,7 @@ void esrip_device::state_string_export(const device_state_entry &entry, std::str
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c%c",
 				(m_status & 0x80) ? '3' : '.',
 				(m_status & 0x40) ? '2' : '.',
 				(m_status & 0x20) ? '1' : '.',
@@ -1690,7 +1690,7 @@ const device_type ESRIP = &device_creator<esrip_device>;
 //  esrip_device - constructor
 //-------------------------------------------------
 
-esrip_device::esrip_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+esrip_device::esrip_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, ESRIP, "ESRIP", tag, owner, clock, "esrip", __FILE__),
 		m_program_config("program", ENDIANNESS_BIG, 64, 9, -3),
 		m_fdt_r(*this),

@@ -26,7 +26,7 @@ class wpcsnd_device : public device_t
 {
 public:
 	// construction/destruction
-	wpcsnd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	wpcsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	required_device<cpu_device> m_cpu;
 	required_device<ym2151_device> m_ym2151;
@@ -49,7 +49,7 @@ public:
 	UINT8 ctrl_r();
 	UINT8 data_r();
 
-	static void static_set_gfxregion(device_t &device, std::string tag);
+	static void static_set_gfxregion(device_t &device, const char *tag);
 
 	// callbacks
 	template<class _reply> void set_reply_callback(_reply reply) { m_reply_cb.set_callback(reply); }
@@ -61,7 +61,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
-	std::string m_regiontag;
+	const char* m_regiontag;
 	UINT8 m_latch;
 	UINT8 m_reply;
 	bool m_reply_available;

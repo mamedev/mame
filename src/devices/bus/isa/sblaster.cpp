@@ -1069,6 +1069,118 @@ WRITE8_MEMBER( sb16_device::mixer_w )
 	return;
 }
 
+void sb8_device::drq_w(int state)
+{
+	switch(m_config->read() & 0x0c)
+	{
+		case 0:
+		default:
+			m_isa->drq1_w(state);
+			break;
+		case 4:
+			m_isa->drq3_w(state);
+			break;
+	}
+}
+
+void sb8_device::irq_w(int state, int source)
+{
+	switch(m_config->read() & 0x03)
+	{
+		case 0:
+		default:
+			m_isa->irq5_w(state);
+			break;
+		case 1:
+			m_isa->irq7_w(state);
+			break;
+	}
+}
+
+// TODO: sb16 irq/drq is software set
+void sb16_device::drq_w(int state)
+{
+	switch(m_config->read() & 0x0c)
+	{
+		case 0:
+		default:
+			m_isa->drq1_w(state);
+			break;
+		case 4:
+			m_isa->drq3_w(state);
+			break;
+	}
+}
+
+void sb16_device::irq_w(int state, int source)
+{
+	if(state)
+		m_dsp.irq_active |= source;
+	else
+		m_dsp.irq_active &= ~source;
+
+	switch(m_config->read() & 0x03)
+	{
+		case 0:
+		default:
+			m_isa->irq5_w(m_dsp.irq_active != 0);
+			break;
+		case 1:
+			m_isa->irq7_w(m_dsp.irq_active != 0);
+			break;
+	}
+}
+
+void sb16_device::drq16_w(int state)
+{
+	switch(m_config->read() & 0xc0)
+	{
+		case 0:
+		default:
+			m_isa->drq5_w(state);
+			break;
+		case 0x40:
+			m_isa->drq6_w(state);
+			break;
+		case 0x80:
+			m_isa->drq7_w(state);
+			break;
+	}
+}
+
+static INPUT_PORTS_START( sb8 )
+	PORT_START("CONFIG")
+	PORT_CONFNAME(0x03, 0x00, "Default IRQ")
+	PORT_CONFSETTING( 0x00, "IRQ5")
+	PORT_CONFSETTING( 0x01, "IRQ7")
+	PORT_CONFNAME(0x0c, 0x00, "Default DMA")
+	PORT_CONFSETTING( 0x00, "DMA1")
+	PORT_CONFSETTING( 0x04, "DMA3")
+	//PORT_CONFNAME(0x30, 0x00, "Default Port Base")
+	//PORT_CONFSETTING( 0x00, "220")
+	//PORT_CONFSETTING( 0x10, "240")
+	//PORT_CONFSETTING( 0x20, "260")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sb16 )
+	PORT_INCLUDE(sb8)
+	PORT_MODIFY("CONFIG")
+	PORT_CONFNAME(0xc0, 0x00, "Default DMA16")
+	PORT_CONFSETTING( 0x00, "DMA5")
+	PORT_CONFSETTING( 0x40, "DMA6")
+	PORT_CONFSETTING( 0x80, "DMA7")
+INPUT_PORTS_END
+
+ioport_constructor sb8_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(sb8);
+}
+
+ioport_constructor sb16_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(sb16);
+}
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -1101,24 +1213,25 @@ machine_config_constructor isa16_sblaster16_device::device_mconfig_additions() c
 //  LIVE DEVICE
 //**************************************************************************
 
-sb_device::sb_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname, std::string source) :
+sb_device::sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_serial_interface(mconfig, *this),
 	m_dacl(*this, "sbdacl"),
 	m_dacr(*this, "sbdacr"),
 	m_joy(*this, "pc_joy"),
-	m_mdout(*this, "mdout"), m_dack_out(0), m_onebyte_midi(false), m_uart_midi(false), m_uart_irq(false), m_mpu_midi(false), m_rx_waiting(0), m_tx_waiting(0), m_xmit_read(0), m_xmit_write(0), m_recv_read(0), m_recv_write(0), m_tx_busy(false), m_timer(nullptr)
+	m_mdout(*this, "mdout"),
+	m_config(*this, "CONFIG"), m_dack_out(0), m_onebyte_midi(false), m_uart_midi(false), m_uart_irq(false), m_mpu_midi(false), m_rx_waiting(0), m_tx_waiting(0), m_xmit_read(0), m_xmit_write(0), m_recv_read(0), m_recv_write(0), m_tx_busy(false), m_timer(nullptr)
 {
 }
 
-sb8_device::sb8_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname, std::string source) :
+sb8_device::sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source) :
 	sb_device(mconfig, type, tag, owner, clock, name, shortname, source),
 	device_isa8_card_interface(mconfig, *this),
 	m_ym3812(*this, "ym3812")
 {
 }
 
-sb16_device::sb16_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname, std::string source) :
+sb16_device::sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source) :
 	sb_device(mconfig, type, tag, owner, clock, name, shortname, source),
 	device_isa16_card_interface(mconfig, *this)
 {
@@ -1128,19 +1241,19 @@ sb16_device::sb16_device(const machine_config &mconfig, device_type type, std::s
 //  isa8_sblaster_device - constructor
 //-------------------------------------------------
 
-isa8_sblaster1_0_device::isa8_sblaster1_0_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_sblaster1_0_device::isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_0, tag, owner, clock, "Sound Blaster 1.0", "isa_sblaster1_0", __FILE__),
 	m_saa1099_1(*this, "saa1099.1"),
 	m_saa1099_2(*this, "saa1099.2")
 {
 }
 
-isa8_sblaster1_5_device::isa8_sblaster1_5_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa8_sblaster1_5_device::isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_5, tag, owner, clock, "Sound Blaster 1.5", "isa_sblaster1_5", __FILE__)
 {
 }
 
-isa16_sblaster16_device::isa16_sblaster16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+isa16_sblaster16_device::isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	sb16_device(mconfig, ISA16_SOUND_BLASTER_16, tag, owner, clock, "Sound Blaster 16", "isa_sblaster_16", __FILE__)
 {
 }

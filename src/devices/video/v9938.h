@@ -76,7 +76,7 @@ class v99x8_device :    public device_t,
 {
 protected:
 	// construction/destruction
-	v99x8_device(const machine_config &mconfig, device_type type, std::string name, std::string shortname, std::string tag, device_t *owner, UINT32 clock);
+	v99x8_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock);
 
 public:
 	template<class _irq> void set_interrupt_callback(_irq irq) {
@@ -277,7 +277,7 @@ protected:
 class v9938_device : public v99x8_device
 {
 public:
-	v9938_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_PALETTE_INIT(v9938);
 protected:
@@ -287,7 +287,7 @@ protected:
 class v9958_device : public v99x8_device
 {
 public:
-	v9958_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_PALETTE_INIT(v9958);
 

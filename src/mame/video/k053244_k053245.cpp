@@ -81,7 +81,7 @@ GFXDECODE_MEMBER( k05324x_device::gfxinfo_6bpp )
 GFXDECODE_END
 
 
-k05324x_device::k05324x_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053244, "K053244 & 053245 Sprite Generator", tag, owner, clock, "k05324x", __FILE__),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_ram(nullptr),
@@ -123,9 +123,9 @@ void k05324x_device::device_start()
 
 	/* decode the graphics */
 	decode_gfx();
-	m_gfx[0]->set_colors(m_palette->entries() / m_gfx[0]->depth());
+	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
-	if (VERBOSE && !(m_palette->shadows_enabled()))
+	if (VERBOSE && !(palette().shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	m_ramsize = 0x800;
@@ -458,7 +458,7 @@ void k05324x_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		ox -= (zoomx * w) >> 13;
 		oy -= (zoomy * h) >> 13;
 
-		drawmode_table[m_gfx[0]->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		drawmode_table[gfx(0)->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
 		for (y = 0; y < h; y++)
 		{
@@ -522,7 +522,7 @@ void k05324x_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
 				{
-					m_gfx[0]->prio_transtable(bitmap,cliprect,
+					gfx(0)->prio_transtable(bitmap,cliprect,
 							c,color,
 							fx,fy,
 							sx,sy,
@@ -531,7 +531,7 @@ void k05324x_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 				}
 				else
 				{
-					m_gfx[0]->prio_zoom_transtable(bitmap,cliprect,
+					gfx(0)->prio_zoom_transtable(bitmap,cliprect,
 							c,color,
 							fx,fy,
 							sx,sy,

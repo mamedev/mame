@@ -15,7 +15,7 @@ class beep_device : public device_t,
 					public device_sound_interface
 {
 public:
-	beep_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	beep_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~beep_device() { }
 
 protected:
@@ -26,9 +26,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	void set_state(int on);
-	void set_frequency(int frequency);
-	void set_volume(int volume);
+	DECLARE_WRITE_LINE_MEMBER(set_state);   // enable/disable sound output
+	void set_clock(UINT32 frequency);       // output frequency
 
 private:
 	sound_stream *m_stream;   /* stream number */

@@ -24,7 +24,7 @@ namespace stl = tinystl;
 
 void* load(bx::FileReaderI* _reader, bx::AllocatorI* _allocator, const char* _filePath, uint32_t* _size)
 {
-	if (0 == bx::open(_reader, _filePath) )
+	if (bx::open(_reader, _filePath) )
 	{
 		uint32_t size = (uint32_t)bx::getSize(_reader);
 		void* data = BX_ALLOC(_allocator, size);
@@ -45,6 +45,7 @@ void* load(bx::FileReaderI* _reader, bx::AllocatorI* _allocator, const char* _fi
 	{
 		*_size = 0;
 	}
+
 	return NULL;
 }
 
@@ -60,7 +61,7 @@ void unload(void* _ptr)
 
 static const bgfx::Memory* loadMem(bx::FileReaderI* _reader, const char* _filePath)
 {
-	if (0 == bx::open(_reader, _filePath) )
+	if (bx::open(_reader, _filePath) )
 	{
 		uint32_t size = (uint32_t)bx::getSize(_reader);
 		const bgfx::Memory* mem = bgfx::alloc(size+1);
@@ -76,7 +77,7 @@ static const bgfx::Memory* loadMem(bx::FileReaderI* _reader, const char* _filePa
 
 static void* loadMem(bx::FileReaderI* _reader, bx::AllocatorI* _allocator, const char* _filePath, uint32_t* _size)
 {
-	if (0 == bx::open(_reader, _filePath) )
+	if (bx::open(_reader, _filePath) )
 	{
 		uint32_t size = (uint32_t)bx::getSize(_reader);
 		void* data = BX_ALLOC(_allocator, size);
@@ -388,7 +389,7 @@ struct Group
 
 namespace bgfx
 {
-	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl);
+	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl, bx::Error* _err = NULL);
 }
 
 struct Mesh
@@ -408,7 +409,9 @@ struct Mesh
 		bx::AllocatorI* allocator = entry::getAllocator();
 
 		uint32_t chunk;
-		while (4 == bx::read(_reader, chunk) )
+		bx::Error err;
+		while (4 == bx::read(_reader, chunk, &err)
+		&&     err.isOk() )
 		{
 			switch (chunk)
 			{
@@ -537,17 +540,16 @@ struct Mesh
 				;
 		}
 
-		uint32_t cached = bgfx::setTransform(_mtx);
+		bgfx::setTransform(_mtx);
+		bgfx::setState(_state);
 
 		for (GroupArray::const_iterator it = m_groups.begin(), itEnd = m_groups.end(); it != itEnd; ++it)
 		{
 			const Group& group = *it;
 
-			bgfx::setTransform(cached);
 			bgfx::setIndexBuffer(group.m_ibh);
 			bgfx::setVertexBuffer(group.m_vbh);
-			bgfx::setState(_state);
-			bgfx::submit(_id, _program);
+			bgfx::submit(_id, _program, 0, it != itEnd-1);
 		}
 	}
 
@@ -557,26 +559,28 @@ struct Mesh
 
 		for (uint32_t pass = 0; pass < _numPasses; ++pass)
 		{
+			bgfx::setTransform(cached, _numMatrices);
+
 			const MeshState& state = *_state[pass];
+			bgfx::setState(state.m_state);
+
+			for (uint8_t tex = 0; tex < state.m_numTextures; ++tex)
+			{
+				const MeshState::Texture& texture = state.m_textures[tex];
+				bgfx::setTexture(texture.m_stage
+						, texture.m_sampler
+						, texture.m_texture
+						, texture.m_flags
+						);
+			}
 
 			for (GroupArray::const_iterator it = m_groups.begin(), itEnd = m_groups.end(); it != itEnd; ++it)
 			{
 				const Group& group = *it;
 
-				bgfx::setTransform(cached, _numMatrices);
-				for (uint8_t tex = 0; tex < state.m_numTextures; ++tex)
-				{
-					const MeshState::Texture& texture = state.m_textures[tex];
-					bgfx::setTexture(texture.m_stage
-							, texture.m_sampler
-							, texture.m_texture
-							, texture.m_flags
-							);
-				}
 				bgfx::setIndexBuffer(group.m_ibh);
 				bgfx::setVertexBuffer(group.m_vbh);
-				bgfx::setState(state.m_state);
-				bgfx::submit(state.m_viewId, state.m_program);
+				bgfx::submit(state.m_viewId, state.m_program, 0, it != itEnd-1);
 			}
 		}
 	}
@@ -596,10 +600,14 @@ Mesh* meshLoad(bx::ReaderSeekerI* _reader)
 Mesh* meshLoad(const char* _filePath)
 {
 	bx::FileReaderI* reader = entry::getFileReader();
-	bx::open(reader, _filePath);
-	Mesh* mesh = meshLoad(reader);
-	bx::close(reader);
-	return mesh;
+	if (bx::open(reader, _filePath) )
+	{
+		Mesh* mesh = meshLoad(reader);
+		bx::close(reader);
+		return mesh;
+	}
+
+	return NULL;
 }
 
 void meshUnload(Mesh* _mesh)
@@ -639,10 +647,13 @@ Args::Args(int _argc, char** _argv)
 	{
 		m_type = bgfx::RendererType::OpenGL;
 	}
-	else if (cmdLine.hasArg("noop")
-		 ||  cmdLine.hasArg("vk") )
+	else if (cmdLine.hasArg("vk") )
 	{
-		m_type = bgfx::RendererType::OpenGL;
+		m_type = bgfx::RendererType::Vulkan;
+	}
+	else if (cmdLine.hasArg("noop") )
+	{
+		m_type = bgfx::RendererType::Null;
 	}
 	else if (BX_ENABLED(BX_PLATFORM_WINDOWS) )
 	{

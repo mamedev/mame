@@ -279,7 +279,7 @@ void rollext_renderer::display(bitmap_rgb32 *bitmap, const rectangle &cliprect)
 class rollext_state : public driver_device
 {
 public:
-	rollext_state(const machine_config &mconfig, device_type type, std::string tag)
+	rollext_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette_ram(*this, "palette_ram"),

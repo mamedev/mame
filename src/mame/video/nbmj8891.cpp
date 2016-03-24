@@ -480,9 +480,8 @@ void nbmj8891_state::gfxdraw()
 
 
 ******************************************************************************/
-VIDEO_START_MEMBER(nbmj8891_state,_1layer)
+VIDEO_START_MEMBER( nbmj8891_state, _1layer )
 {
-	UINT8 *CLUT = memregion("protection")->base();
 	int width = m_screen->width();
 	int height = m_screen->height();
 
@@ -497,7 +496,13 @@ VIDEO_START_MEMBER(nbmj8891_state,_1layer)
 
 	if (m_nb1413m3->m_nb1413m3_type == NB1413M3_TAIWANMB)
 	{
-		for (int i = 0; i < 0x0800; i++) m_clut[i] = CLUT[i];
+		if (m_clut_ptr)
+		{
+			for (int i = 0; i < 0x0800; i++)
+			{
+				m_clut[i] = m_clut_ptr[i];
+			}
+		}
 		save_item(NAME(m_param_cnt));
 		save_item(NAME(m_param_old));
 	}

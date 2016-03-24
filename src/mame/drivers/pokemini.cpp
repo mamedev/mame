@@ -51,7 +51,7 @@ struct TIMERS
 class pokemini_state : public driver_device
 {
 public:
-	pokemini_state(const machine_config &mconfig, device_type type, std::string tag)
+	pokemini_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_p_ram(*this, "p_ram"),

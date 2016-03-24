@@ -62,7 +62,7 @@ PIO A-Data 0F4h, A-Command 0F5h, B-Data 0F6h, B-Command 0F7h
 class mccpm_state : public driver_device
 {
 public:
-	mccpm_state(const machine_config &mconfig, device_type type, std::string tag)
+	mccpm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG),

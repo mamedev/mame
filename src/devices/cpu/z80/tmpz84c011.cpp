@@ -30,7 +30,7 @@ static ADDRESS_MAP_START( tmpz84c011_internal_io_map, AS_IO, 8, tmpz84c011_devic
 ADDRESS_MAP_END
 
 
-tmpz84c011_device::tmpz84c011_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tmpz84c011_device::tmpz84c011_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: z80_device(mconfig, TMPZ84C011, "TMPZ84C011", tag, owner, clock, "tmpz84c011", __FILE__),
 	m_io_space_config( "io", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME( tmpz84c011_internal_io_map ) ),
 	m_ctc(*this, "tmpz84c011_ctc"),

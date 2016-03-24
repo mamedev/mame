@@ -145,7 +145,7 @@ Medium size chip with heat sink on it
 class magictg_state : public driver_device
 {
 public:
-	magictg_state(const machine_config &mconfig, device_type type, std::string tag)
+	magictg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_mips(*this, "mips"),
 		m_adsp(*this, "adsp"),
@@ -180,7 +180,7 @@ public:
 
 
 	/* 3Dfx Voodoo */
-	device_t*                           m_voodoo[2];
+	voodoo_device*                           m_voodoo[2];
 
 	struct
 	{
@@ -241,8 +241,8 @@ public:
 
 void magictg_state::machine_start()
 {
-	m_voodoo[0] = machine().device("voodoo_0");
-	m_voodoo[1] = machine().device("voodoo_1");
+	m_voodoo[0] = (voodoo_device*)machine().device("voodoo_0");
+	m_voodoo[1] = (voodoo_device*)machine().device("voodoo_1");
 }
 
 
@@ -278,7 +278,7 @@ void magictg_state::video_start()
 
 UINT32 magictg_state::screen_update_magictg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return voodoo_update(m_voodoo[0], bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return m_voodoo[0]->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 
@@ -338,7 +338,7 @@ static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, 
 			break;
 		case 0x40:
 			state->m_voodoo_pci_regs[0].init_enable = data;
-			voodoo_set_init_enable(state->m_voodoo[0], data);
+			state->m_voodoo[0]->voodoo_set_init_enable(data);
 			break;
 
 		default:
@@ -929,7 +929,7 @@ static MACHINE_CONFIG_START( magictg, magictg_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, "", pci_dev0_r, pci_dev0_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, pci_dev0_r, pci_dev0_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, "voodoo_0", voodoo_0_pci_r, voodoo_0_pci_w)
 
 #if defined(USE_TWO_3DFX)

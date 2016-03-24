@@ -27,7 +27,7 @@
 
 const device_type DS1315 = &device_creator<ds1315_device>;
 
-ds1315_device::ds1315_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ds1315_device::ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, DS1315, "Dallas Semiconductor DS1315", tag, owner, clock, "ds1315", __FILE__), m_mode(), m_count(0)
 			{
 }

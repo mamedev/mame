@@ -26,7 +26,7 @@ const device_type MEMEXP_SLOT = &device_creator<memexp_slot_device>;
 //  memexp_slot_device - constructor
 //-------------------------------------------------
 
-memexp_slot_device::memexp_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+memexp_slot_device::memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MEMEXP_SLOT, "Memory Expansion Slot", tag, owner, clock, "memexp_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_program(nullptr),

@@ -27,7 +27,7 @@ const device_type GOMOKU = &device_creator<gomoku_sound_device>;
 //  gomoku_sound_device - constructor
 //-------------------------------------------------
 
-gomoku_sound_device::gomoku_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gomoku_sound_device::gomoku_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GOMOKU, "Gomoku Narabe Renju Audio Custom", tag, owner, clock, "gomoku_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_last_channel(nullptr),

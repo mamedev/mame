@@ -9,8 +9,8 @@ class hc55516_device : public device_t,
 									public device_sound_interface
 {
 public:
-	hc55516_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	hc55516_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hc55516_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~hc55516_device() {}
 
 	/* sets the digit (0 or 1) */
@@ -66,7 +66,7 @@ extern const device_type HC55516;
 class mc3417_device : public hc55516_device
 {
 public:
-	mc3417_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mc3417_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -80,7 +80,7 @@ extern const device_type MC3417;
 class mc3418_device : public hc55516_device
 {
 public:
-	mc3418_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mc3418_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -85,8 +85,8 @@ class sprite_device : public device_t
 
 protected:
 	// construction/destruction - only for subclasses
-	sprite_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source, int dirty_granularity = 3)
-		: device_t(mconfig, type, name, tag, owner, 0, shortname, source),
+	sprite_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file, int dirty_granularity = 3)
+		: device_t(mconfig, type, name, tag, owner, 0, shortname, file),
 			m_xorigin(0),
 			m_yorigin(0),
 			m_spriteram(nullptr),

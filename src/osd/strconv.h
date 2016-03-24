@@ -6,8 +6,8 @@
 //
 //============================================================
 
-#ifndef __OSD_STRCONV__
-#define __OSD_STRCONV__
+#ifndef MAME_OSD_STRCONV_H
+#define MAME_OSD_STRCONV_H
 
 #include "osdcore.h"
 
@@ -17,12 +17,14 @@
 //  FUNCTION PROTOTYPES
 //============================================================
 
-#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
+#if defined(WIN32)
 
-#if defined(SDLMAME_WIN32)
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #endif
+
+#include <windows.h>
+
 // the result of these functions has to be released with osd_free()
 
 CHAR *astring_from_utf8(const char *s);
@@ -39,7 +41,7 @@ char *utf8_from_wstring(const WCHAR *s);
 #define utf8_from_tstring   utf8_from_astring
 #endif // UNICODE
 
-#endif //SDLMAME_WIN32
+#endif // defined(WIN32)
 
 
-#endif // __OSD_STRCONV__
+#endif // MAME_OSD_STRCONV_H

@@ -57,7 +57,7 @@ class crt9021_t :  public device_t,
 {
 public:
 	// construction/destruction
-	crt9021_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	crt9021_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void static_set_display_callback(device_t &device, crt9021_draw_character_delegate callback) { downcast<crt9021_t &>(device).m_display_cb = callback; }
 

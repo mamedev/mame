@@ -194,7 +194,7 @@ class esq1_filters : public device_t,
 {
 public:
 	// construction/destruction
-	esq1_filters(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void set_vca(int channel, UINT8 value);
 	void set_vpan(int channel, UINT8 value);
@@ -225,7 +225,7 @@ private:
 
 static const device_type ESQ1_FILTERS = &device_creator<esq1_filters>;
 
-esq1_filters::esq1_filters(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+esq1_filters::esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ESQ1_FILTERS, "ESQ1 Filters stage", tag, owner, clock, "esq1-filters", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
@@ -382,7 +382,7 @@ void esq1_filters::sound_stream_update(sound_stream &stream, stream_sample_t **i
 class esq1_state : public driver_device
 {
 public:
-	esq1_state(const machine_config &mconfig, device_type type, std::string tag)
+	esq1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),

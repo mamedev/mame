@@ -136,7 +136,7 @@ void pcu_service_interrupts(dsp56k_core* cpustate);
 
 void dsp56k_irq_table_init(void);
 void dsp56k_set_irq_source(UINT8 irq_num, UINT16 iv, const char* source);
-int dsp56k_get_irq_index_by_tag(std::string tag);
+int dsp56k_get_irq_index_by_tag(const char* tag);
 
 void dsp56k_add_pending_interrupt(dsp56k_core* cpustate, const char* name);     // Call me to add an interrupt to the queue
 

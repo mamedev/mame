@@ -15,7 +15,7 @@
 class mes_state : public driver_device
 {
 public:
-	mes_state(const machine_config &mconfig, device_type type, std::string tag)
+	mes_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_p_videoram(*this, "p_videoram"){ }
@@ -118,7 +118,7 @@ static MACHINE_CONFIG_START( mes, mes_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 

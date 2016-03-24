@@ -7,7 +7,7 @@
 class sbasketb_state : public driver_device
 {
 public:
-	sbasketb_state(const machine_config &mconfig, device_type type, std::string tag)
+	sbasketb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),

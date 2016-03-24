@@ -38,7 +38,6 @@ UINT64 resource_pool::s_id = 0;
 
 resource_pool::resource_pool(int hash_size)
 	: m_hash_size(hash_size),
-		m_listlock(osd_lock_alloc()),
 		m_hash(hash_size),
 		m_ordered_head(nullptr),
 		m_ordered_tail(nullptr)
@@ -56,8 +55,6 @@ resource_pool::resource_pool(int hash_size)
 resource_pool::~resource_pool()
 {
 	clear();
-	if (m_listlock != nullptr)
-		osd_lock_free(m_listlock);
 }
 
 
@@ -67,7 +64,7 @@ resource_pool::~resource_pool()
 
 void resource_pool::add(resource_pool_item &item, size_t size, const char *type)
 {
-	osd_lock_acquire(m_listlock);
+	std::lock_guard<std::mutex> lock(m_listlock);
 
 	// insert into hash table
 	int hashval = reinterpret_cast<FPTR>(item.m_ptr) % m_hash_size;
@@ -107,8 +104,6 @@ void resource_pool::add(resource_pool_item &item, size_t size, const char *type)
 		item.m_ordered_prev = nullptr;
 		m_ordered_head = &item;
 	}
-
-	osd_lock_release(m_listlock);
 }
 
 
@@ -124,7 +119,7 @@ void resource_pool::remove(void *ptr)
 		return;
 
 	// search for the item
-	osd_lock_acquire(m_listlock);
+	std::lock_guard<std::mutex> lock(m_listlock);
 
 	int hashval = reinterpret_cast<FPTR>(ptr) % m_hash_size;
 	for (resource_pool_item **scanptr = &m_hash[hashval]; *scanptr != nullptr; scanptr = &(*scanptr)->m_next)
@@ -152,8 +147,6 @@ void resource_pool::remove(void *ptr)
 			global_free(deleteme);
 			break;
 		}
-
-	osd_lock_release(m_listlock);
 }
 
 
@@ -165,15 +158,13 @@ void resource_pool::remove(void *ptr)
 resource_pool_item *resource_pool::find(void *ptr)
 {
 	// search for the item
-	osd_lock_acquire(m_listlock);
+	std::lock_guard<std::mutex> lock(m_listlock);
 
 	int hashval = reinterpret_cast<FPTR>(ptr) % m_hash_size;
 	resource_pool_item *item;
 	for (item = m_hash[hashval]; item != nullptr; item = item->m_next)
 		if (item->m_ptr == ptr)
 			break;
-
-	osd_lock_release(m_listlock);
 
 	return item;
 }
@@ -190,7 +181,7 @@ bool resource_pool::contains(void *_ptrstart, void *_ptrend)
 	UINT8 *ptrend = reinterpret_cast<UINT8 *>(_ptrend);
 
 	// search for the item
-	osd_lock_acquire(m_listlock);
+	std::lock_guard<std::mutex> lock(m_listlock);
 
 	resource_pool_item *item = nullptr;
 	for (item = m_ordered_head; item != nullptr; item = item->m_ordered_next)
@@ -198,13 +189,9 @@ bool resource_pool::contains(void *_ptrstart, void *_ptrend)
 		UINT8 *objstart = reinterpret_cast<UINT8 *>(item->m_ptr);
 		UINT8 *objend = objstart + item->m_size;
 		if (ptrstart >= objstart && ptrend <= objend)
-			goto found;
+			return true;
 	}
-
-found:
-	osd_lock_release(m_listlock);
-
-	return (item != nullptr);
+	return false;
 }
 
 
@@ -214,12 +201,8 @@ found:
 
 void resource_pool::clear()
 {
-	osd_lock_acquire(m_listlock);
-
 	// important: delete from earliest to latest; this allows objects to clean up after
 	// themselves if they wish
 	while (m_ordered_head != nullptr)
 		remove(m_ordered_head->m_ptr);
-
-	osd_lock_release(m_listlock);
 }

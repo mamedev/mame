@@ -28,7 +28,7 @@
 class namconb1_state : public namcos2_shared_state
 {
 public:
-	namconb1_state(const machine_config &mconfig, device_type type, std::string tag)
+	namconb1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcos2_shared_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),

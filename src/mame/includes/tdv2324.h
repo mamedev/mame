@@ -47,7 +47,7 @@
 class tdv2324_state : public driver_device
 {
 public:
-	tdv2324_state(const machine_config &mconfig, device_type type, std::string tag)
+	tdv2324_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, P8085AH_0_TAG),
 			m_subcpu(*this, P8085AH_1_TAG),

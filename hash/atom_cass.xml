@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- Acorn Atom - Cassette images -->
+
+<softwarelist name="atom_cass" description="Acorn Atom cassettes">
+
+	<software name="747">
+		<description>747 (12K)</description>
+		<year>1981</year>
+		<publisher>Bug Byte</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="4252">
+				<rom name="747(bugbyte).hq.uef" size="4252" crc="098b61ec" sha1="e819e5e7a85e481bb21d1332140bae702615eb9d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adventre">
+		<description>Adventure (12K)</description>
+		<year>1981</year>
+		<publisher>Program Power</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="4505">
+				<rom name="adventure(programpower).hq.uef" size="4505" crc="31b5e31c" sha1="8c91aa7a353e03b4ec607c1e616a5cdafe80ed35" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adventrs">
+		<description>Adventures (Adventure/Dungeon/House/Intergalactic)</description>
+		<year>1981</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="13965">
+				<rom name="adventures(acornsoft).hq.uef" size="13965" crc="18e3d1d4" sha1="6513f6951f34c64555027615f0afdc18987f2e38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="africadi">
+		<description>The Africa Diamond (10K)</description>
+		<year>1982</year>
+		<publisher>Ramtronics</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="7512">
+				<rom name="africadiamond(ramtronics).hq.uef" size="7512" crc="1c80dbe5" sha1="1682c82b2892f7ebdd80673ab313f17b4138fbee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atdbase">
+		<description>Atom Database</description>
+		<year>1980</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="4389">
+				<rom name="database(acornsoft).hq.uef" size="4389" crc="d4fcb5d8" sha1="1568a25063197149792e3aa7c1f4b16b7e050e79" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atstore">
+		<description>AtomStore (12K)</description>
+		<year>1981</year>
+		<publisher>Program Power</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="3517">
+				<rom name="atomstore(programpower).hq.uef" size="3517" crc="6604a70b" sha1="fd0b98ca8415591111cbb5ab188eefb40733f5f8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atsynth">
+		<description>Atom Synthesiser (5K)</description>
+		<year>1981</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="4663">
+				<rom name="synthesiser(acornsoft).hq.uef" size="4663" crc="8dbbdca0" sha1="4f12bad56fe7c4b5a10471a0d1e164100158ce94" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakout">
+		<description>Breakout (4K)</description>
+		<year>1981</year>
+		<publisher>Bug Byte</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="3460">
+				<rom name="breakout(bugbyte).hq.uef" size="3460" crc="36b837d3" sha1="774f827ffb97d29831b29985b7c79bcece525cbc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="busgame">
+		<description>Business Game</description>
+		<year>1982</year>
+		<publisher>Program Power</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="3459">
+				<rom name="businessgame(programpower).hq.uef" size="3459" crc="c2e72bbb" sha1="4acdf3e491aba4a0bf22f2f9bebb546e3487c089" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="centiped">
+		<description>Centipede</description>
+		<year>198?</year>
+		<publisher>Micromania</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="4067">
+				<rom name="centipede(micromania).hq.uef" size="4067" crc="f4e450e7" sha1="88c83eeec83dbfe5507e308c6a7c3476fa47c66a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuckie">
+		<description>Atomic Chuckie Egg (32K)</description>
+		<year>2012</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;CHUCKIE&quot;" />
+		<part name="cass1" interface="atom_cass">
+			<feature name="part_id" value="Monochrome"/>
+			<dataarea name="cass" size="9070">
+				<rom name="mchuck.uef" size="9070" crc="0ccd10cd" sha1="2c33026fc6a64ea30197e44896ce4f763183d14b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="atom_cass">
+			<feature name="part_id" value="Colour"/>
+			<dataarea name="cass" size="9062">
+				<rom name="cchuck.uef" size="9062" crc="ab4b3a62" sha1="4240d4401c61fac78c9c8b7ce8a12b56266654d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deathsat">
+		<description>Death Satellite (12K)</description>
+		<year>1982</year>
+		<publisher>A&amp;F Software</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="10114">
+				<rom name="deathsatellite(anf).hq.uef" size="10114" crc="2c303b50" sha1="c8a7a9fba2c9913c8d0ffd3b0296f6742109a4e1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defender">
+		<description>Defender</description>
+		<year>1982</year>
+		<publisher>Micromania</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="4424">
+				<rom name="defender(micromania).hq.uef" size="4424" crc="15a7abd3" sha1="4d7c788787b8e98c6a5d5317a82b5b5081c370ce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demondun">
+		<description>Demon Dungeon (5K)</description>
+		<year>1980</year>
+		<publisher>Program Power</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="5116">
+				<rom name="demondungeon(programpower).hq.uef" size="5116" crc="3f82cb6f" sha1="326b7b29a56735df61c4f75e3cb5899be85b1e5f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gala">
+		<description>Galaforce (32K)</description>
+		<year>2012</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;LOADER&quot;" />
+		<part name="cass1" interface="atom_cass">
+			<feature name="part_id" value="Monochrome"/>
+			<dataarea name="cass" size="9913">
+				<rom name="mgala.uef" size="9913" crc="71ce39de" sha1="83519ddabf85255a3fb222e8946300ae1ebe11c8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="atom_cass">
+			<feature name="part_id" value="Colour"/>
+			<dataarea name="cass" size="9933">
+				<rom name="cgala.uef" size="9933" crc="49582b6a" sha1="7eae37d834cc79f5d066fe0f8b465f629bf6b279" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxian">
+		<description>Galaxian (12K)</description>
+		<year>1981</year>
+		<publisher>Bug Byte</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="4106">
+				<rom name="galaxian(bugbyte).hq.uef" size="4106" crc="da761b61" sha1="88fd7efe9a4defa2e593ec713070081e30dfad8f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamepk1">
+		<description>Games Pack 1 (Asteroids/Sub Hunt/Breakout)</description>
+		<year>1981</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="6080">
+				<rom name="gamespack1(acornsoft).hq.uef" size="6080" crc="fe4ed08b" sha1="986348d3b7b4d3f895a21e015f2d89be00f41824" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamepk3">
+		<description>Games Pack 3 (Rat Trap/Lunar Lander/Black Box)</description>
+		<year>1981</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="5707">
+				<rom name="gamespack3(acornsoft).hq.uef" size="5707" crc="e00f2289" sha1="2715c998002885f355430d6aa61e66610da6c7ae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamepk4">
+		<description>Games Pack 4 (Star Trek/Four Row/Space Attack)</description>
+		<year>1981</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="8390">
+				<rom name="gamespack4(acornsoft).hq.uef" size="8390" crc="17255110" sha1="98df80200d5aacd7bf8aa98c60dc74848ad1d028" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamepk8">
+		<description>Games Pack 8 (Stargate/Gomoku/Robots)</description>
+		<year>1981</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="8659">
+				<rom name="gamespack8(acornsoft).hq.uef" size="8659" crc="6ca83cd1" sha1="b95b10021e5b85f814c4562c92ad1905da470b18" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamepk9">
+		<description>Games Pack 9 (Snapper/Minotaur/Babies)</description>
+		<year>1981</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="9710">
+				<rom name="gamespack9(acornsoft).hq.uef" size="9710" crc="587742c0" sha1="1b0f064539383c2255cc9a560607c1c7e62c5c7b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamepk10">
+		<description>Games Pack 10 (Breakout/Mastermind/Snake/Simon/Moon/Hectic/Ski-Run/Track/Squash/Bombs-Away)</description>
+		<year>1981</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="5389">
+				<rom name="gamespack10(acornsoft).hq.uef" size="5389" crc="329712bb" sha1="2a70142356a601b94324b7bd6127ff71fc915e32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hardhath">
+		<description>Hard Hat Harry (32K)</description>
+		<year>2011</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Tom Walker" />
+		<info name="usage" value="Load with *RUN&quot;LOADER&quot;" />
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="8911">
+				<rom name="hardhatharry.uef" size="8911" crc="901ca53a" sha1="b195c7ee16da9b91c83f4cd7705e0a250a5a61a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hyperfir">
+		<description>Hyperfire (12K)</description>
+		<year>1982</year>
+		<publisher>Program Power</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="4245">
+				<rom name="hyperfire(programpower).hq.uef" size="4245" crc="470b61d7" sha1="5000117044c1c9b5c10951f85ffe5b028f8ca4fe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hypervpr">
+		<description>Hyper Viper (12K)</description>
+		<year>2011</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kenton Price" />
+		<info name="usage" value="Load with *RUN&quot;LOADER&quot;" />
+		<part name="cass1" interface="atom_cass">
+			<feature name="part_id" value="Monochrome"/>
+			<dataarea name="cass" size="4055">
+				<rom name="mhyperviper.uef" size="4055" crc="c77e31b1" sha1="0cbf321aa49357371a242127a90d2fe56e712e65" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="atom_cass">
+			<feature name="part_id" value="Colour"/>
+			<dataarea name="cass" size="4053">
+				<rom name="chyperviper.uef" size="4053" crc="f2cdc664" sha1="06834429d0c133ebca1e47aab143bab4aec0dd7f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jetsetmn">
+		<description>Jet Set Miner (12K)</description>
+		<year>2009</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;LOADER&quot;" />
+		<part name="cass1" interface="atom_cass">
+			<feature name="part_id" value="Monochrome"/>
+			<dataarea name="cass" size="3960">
+				<rom name="mjetsetminer.uef" size="3960" crc="08bf1104" sha1="7db984f82f230531ee2485cb602caa13fc9279cb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="atom_cass">
+			<feature name="part_id" value="Colour"/>
+			<dataarea name="cass" size="4021">
+				<rom name="cjetsetminer.uef" size="4021" crc="d1765c3d" sha1="1ce54ed41b878ba7abf0059785497eb7645430f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="joeblade">
+		<description>Atomic Joe Blade (32K)</description>
+		<year>2014</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;LOADER&quot;" />
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="15022">
+				<rom name="joeblade.uef" size="15022" crc="76b7572e" sha1="0079738ca604e6cfbba4016a9e3d6937b6e8f358" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jungle">
+		<description>Jungle Journey (32K)</description>
+		<year>2012</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;JUNGLE&quot;" />
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="13807">
+				<rom name="jungle.uef" size="13807" crc="d5ed427b" sha1="7d78b13538820e6a39b08da9ea9b0ac6b0dfddfc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="labyrint">
+		<description>Labyrinth (12K)</description>
+		<year>1981</year>
+		<publisher>Bug Byte</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="5009">
+				<rom name="labyrinth(bugbyte).hq.uef" size="5009" crc="445a3221" sha1="86cb47e30cddbd36407691abdf8ee46bf1b3d265" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="omegamis">
+		<description>Omega Mission</description>
+		<year>1982</year>
+		<publisher>Micromania</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="5081">
+				<rom name="omegamission(micromania).hq.uef" size="5081" crc="76fa7cdd" sha1="751466ae1e19788641063540510d61b37ab080df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="peekocom">
+		<description>Peeko-Computer</description>
+		<year>1981</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="4483">
+				<rom name="peekocomputer(acornsoft).hq.uef" size="4483" crc="0c74b9c7" sha1="bf804a058a5012b12d3b4c9dbc44d885c42e1c8c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinball">
+		<description>Pinball (6K)</description>
+		<year>1980</year>
+		<publisher>Bug Byte</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="4501">
+				<rom name="pinball(bugbyte).hq.uef" size="4501" crc="29501b59" sha1="0cd917188dd3bd22a1c7d5804bdf872a86ea694e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="protectr">
+		<description>The Protector</description>
+		<year>1982</year>
+		<publisher>Micromania</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="3726">
+				<rom name="protector(micromania).hq.uef" size="3726" crc="dc0a2ac4" sha1="19e24ab434f3fcdba79425a58e263d9405d46f91" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="repton">
+		<description>Repton (32K)</description>
+		<year>2013</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;LOADER&quot;" />
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="14895">
+				<rom name="repton.uef" size="14895" crc="1a69941a" sha1="ce3fc486457f1b51b1a4bde83e25936201bb63dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spfightr">
+		<description>Space Fighter (6K)</description>
+		<year>1981</year>
+		<publisher>Program Power</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="4341">
+				<rom name="spacefighter(programpower).hq.uef" size="4341" crc="4783c679" sha1="ef2591d569a0ddece32020e7328d721eef573ee5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swarm">
+		<description>Swarm</description>
+		<year>1981</year>
+		<publisher>Program Power</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="3800">
+				<rom name="swarm(programpower).hq.uef" size="3800" crc="9e6706e9" sha1="563811e318bad804b874089fa2733906104494c0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="typist">
+		<description>Atom Typist (7K)</description>
+		<year>1981</year>
+		<publisher>Bug Byte</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="3136">
+				<rom name="atomtypist(bugbyte).hq.uef" size="3136" crc="4339f00b" sha1="92ae659767cf0cf3fb3e747088620cce2b7132a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufobombr">
+		<description>UFO Bomber (7K)</description>
+		<year>1981</year>
+		<publisher>Bug Byte</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="3309">
+				<rom name="ufobomber(bugbyte).hq.uef" size="3309" crc="660cc687" sha1="d8ec60072e596628171e132dea978a5190c9030b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zodiac">
+		<description>Zodiac (12K)</description>
+		<year>1981</year>
+		<publisher>A&amp;F Software</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="7969">
+				<rom name="zodiac(anf).hq.uef" size="7969" crc="2d3e6f50" sha1="75342bca3fb0560b08964280457493b59f6f3120" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

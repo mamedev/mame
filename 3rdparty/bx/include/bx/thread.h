@@ -8,6 +8,9 @@
 
 #if BX_PLATFORM_POSIX
 #	include <pthread.h>
+#	if defined(__GLIBC__) && !( (__GLIBC__ > 2) || ( (__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 12) ) )
+#		include <sys/prctl.h>
+#	endif // defined(__GLIBC__) ...
 #elif BX_PLATFORM_WINRT
 using namespace Platform;
 using namespace Windows::Foundation;
@@ -31,7 +34,7 @@ namespace bx
 
 	public:
 		Thread()
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
 			: m_handle(INVALID_HANDLE_VALUE)
 			, m_threadId(UINT32_MAX)
 #elif BX_PLATFORM_POSIX
@@ -149,7 +152,13 @@ namespace bx
 		{
 #if BX_PLATFORM_OSX || BX_PLATFORM_IOS
 			pthread_setname_np(_name);
-#elif (BX_PLATFORM_LINUX && defined(__GLIBC__)) || BX_PLATFORM_BSD
+#elif BX_PLATFORM_LINUX
+#	if defined(__GLIBC__) && (__GLIBC__ > 2) || ( (__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 12) )
+			pthread_setname_np(m_handle, _name);
+#	else
+			prctl(PR_SET_NAME,_name, 0, 0, 0);
+#	endif // defined(__GLIBC__) ...
+#elif BX_PLATFORM_BSD
 			pthread_setname_np(m_handle, _name);
 #elif BX_PLATFORM_WINDOWS && BX_COMPILER_MSVC
 #	pragma pack(push, 8)
@@ -215,7 +224,7 @@ namespace bx
 		}
 #endif // BX_PLATFORM_
 
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
 		HANDLE m_handle;
 		DWORD  m_threadId;
 #elif BX_PLATFORM_POSIX
@@ -260,7 +269,7 @@ namespace bx
 		uint32_t m_id;
 	};
 
-#elif !BX_PLATFORM_WINRT
+#elif !(BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT)
 
 	class TlsData
 	{

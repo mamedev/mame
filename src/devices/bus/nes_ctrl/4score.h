@@ -26,7 +26,7 @@ class nes_4score_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_4score_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nes_4score_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	// device-level overrides
@@ -45,7 +45,7 @@ class nes_4score_p1p3_device : public nes_4score_device
 {
 public:
 	// construction/destruction
-	nes_4score_p1p3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nes_4score_p1p3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -63,7 +63,7 @@ class nes_4score_p2p4_device : public nes_4score_device
 {
 public:
 	// construction/destruction
-	nes_4score_p2p4_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nes_4score_p2p4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 

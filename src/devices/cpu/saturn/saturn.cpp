@@ -42,7 +42,7 @@
 const device_type SATURN = &device_creator<saturn_device>;
 
 
-saturn_device::saturn_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+saturn_device::saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SATURN, "HP Saturn", tag, owner, clock, "saturn_cpu", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 	, m_out_func(*this)
@@ -177,47 +177,47 @@ void saturn_device::state_string_export(const device_state_entry &entry, std::st
 	switch (entry.index())
 	{
 		case SATURN_A:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[A]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[A]) );
 			break;
 
 		case SATURN_B:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[B]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[B]) );
 			break;
 
 		case SATURN_C:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[C]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[C]) );
 			break;
 
 		case SATURN_D:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[D]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[D]) );
 			break;
 
 		case SATURN_R0:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[R0]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[R0]) );
 			break;
 
 		case SATURN_R1:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[R1]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[R1]) );
 			break;
 
 		case SATURN_R2:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[R2]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[R2]) );
 			break;
 
 		case SATURN_R3:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[R3]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[R3]) );
 			break;
 
 		case SATURN_R4:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[R4]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[R4]) );
 			break;
 
 		case SATURN_IRQ_STATE:
-			strprintf(str,  "%c%c%c%i", m_in_irq?'S':'.', m_irq_enable?'e':'.', m_pending_irq?'p':'.', m_irq_state );
+			str = string_format( "%c%c%c%i", m_in_irq?'S':'.', m_irq_enable?'e':'.', m_pending_irq?'p':'.', m_irq_state );
 			break;
 
 		case STATE_GENFLAGS:
-			strprintf(str,  "%c%c", m_decimal?'D':'.', m_carry ? 'C':'.' );
+			str = string_format( "%c%c", m_decimal?'D':'.', m_carry ? 'C':'.' );
 			break;
 	}
 }
@@ -325,7 +325,7 @@ void saturn_device::saturn_take_irq()
 	saturn_push(m_pc);
 	m_pc=IRQ_ADDRESS;
 
-	LOG(("Saturn '%s' takes IRQ ($%04x)\n", tag().c_str(), m_pc));
+	LOG(("Saturn '%s' takes IRQ ($%04x)\n", tag(), m_pc));
 
 	standard_irq_callback(SATURN_IRQ_LINE);
 }
@@ -366,7 +366,7 @@ void saturn_device::execute_set_input(int inputnum, int state)
 			m_nmi_state = state;
 			if ( state != CLEAR_LINE )
 			{
-				LOG(( "SATURN '%s' set_nmi_line(ASSERT)\n", tag().c_str()));
+				LOG(( "SATURN '%s' set_nmi_line(ASSERT)\n", tag()));
 				m_pending_irq = 1;
 			}
 			break;
@@ -376,7 +376,7 @@ void saturn_device::execute_set_input(int inputnum, int state)
 			m_irq_state = state;
 			if ( state != CLEAR_LINE && m_irq_enable )
 			{
-				LOG(( "SATURN '%s' set_irq_line(ASSERT)\n", tag().c_str()));
+				LOG(( "SATURN '%s' set_irq_line(ASSERT)\n", tag()));
 				m_pending_irq = 1;
 			}
 			break;
@@ -384,7 +384,7 @@ void saturn_device::execute_set_input(int inputnum, int state)
 		case SATURN_WAKEUP_LINE:
 			if (m_sleeping && state==1)
 			{
-				LOG(( "SATURN '%s' set_wakeup_line(ASSERT)\n", tag().c_str()));
+				LOG(( "SATURN '%s' set_wakeup_line(ASSERT)\n", tag()));
 				standard_irq_callback(SATURN_WAKEUP_LINE);
 				m_sleeping = 0;
 			}

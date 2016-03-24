@@ -29,7 +29,7 @@
 class c900_state : public driver_device
 {
 public:
-	c900_state(const machine_config &mconfig, device_type type, std::string tag)
+	c900_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG)
@@ -116,7 +116,7 @@ static MACHINE_CONFIG_START( c900, c900_state )
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(c900_state, kbd_put))
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c900)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 ROM_START( c900 )

@@ -54,7 +54,7 @@ TODO:
 class sangho_state : public driver_device
 {
 public:
-	sangho_state(const machine_config &mconfig, device_type type, std::string tag)
+	sangho_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_v9958(*this, "v9958")
 		, m_maincpu(*this, "maincpu")

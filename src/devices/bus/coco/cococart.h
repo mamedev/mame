@@ -75,7 +75,7 @@ class cococart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	cococart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &static_set_cart_callback(device_t &device, _Object object)  { return downcast<cococart_slot_device &>(device).m_cart_callback.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_nmi_callback(device_t &device, _Object object)  { return downcast<cococart_slot_device &>(device).m_nmi_callback.set_callback(object); }

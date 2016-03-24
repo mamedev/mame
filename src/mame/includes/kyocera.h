@@ -55,7 +55,7 @@
 class kc85_state : public driver_device
 {
 public:
-	kc85_state(const machine_config &mconfig, device_type type, std::string tag)
+	kc85_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, I8085_TAG),
 			m_rtc(*this, UPD1990A_TAG),
@@ -160,7 +160,7 @@ public:
 class trsm100_state : public kc85_state
 {
 public:
-	trsm100_state(const machine_config &mconfig, device_type type, std::string tag)
+	trsm100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: kc85_state(mconfig, type, tag) { }
 
 	virtual void machine_start() override;
@@ -169,7 +169,7 @@ public:
 class pc8201_state : public kc85_state
 {
 public:
-	pc8201_state(const machine_config &mconfig, device_type type, std::string tag)
+	pc8201_state(const machine_config &mconfig, device_type type, const char *tag)
 		: kc85_state(mconfig, type, tag),
 			m_cas_cart(*this, "cas_cartslot")
 	{ }
@@ -199,7 +199,7 @@ public:
 class tandy200_state : public driver_device
 {
 public:
-	tandy200_state(const machine_config &mconfig, device_type type, std::string tag)
+	tandy200_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, I8085_TAG),
 			m_rtc(*this, RP5C01A_TAG),

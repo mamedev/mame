@@ -34,7 +34,7 @@
 class c64_state : public driver_device
 {
 public:
-	c64_state(const machine_config &mconfig, device_type type, std::string tag) :
+	c64_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, M6510_TAG),
 		m_pla(*this, PLA_TAG),
@@ -179,7 +179,7 @@ public:
 class sx64_state : public c64_state
 {
 public:
-	sx64_state(const machine_config &mconfig, device_type type, std::string tag)
+	sx64_state(const machine_config &mconfig, device_type type, const char *tag)
 		: c64_state(mconfig, type, tag)
 	{ }
 
@@ -191,7 +191,7 @@ public:
 class c64c_state : public c64_state
 {
 public:
-	c64c_state(const machine_config &mconfig, device_type type, std::string tag)
+	c64c_state(const machine_config &mconfig, device_type type, const char *tag)
 		: c64_state(mconfig, type, tag)
 	{ }
 };
@@ -200,7 +200,7 @@ public:
 class c64gs_state : public c64c_state
 {
 public:
-	c64gs_state(const machine_config &mconfig, device_type type, std::string tag)
+	c64gs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: c64c_state(mconfig, type, tag)
 	{ }
 

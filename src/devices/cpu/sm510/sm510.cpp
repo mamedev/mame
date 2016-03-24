@@ -19,7 +19,10 @@
   - callback for lcd screen as MAME bitmap (when needed)
   - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)
   - LB/SBM is correct?
-  - SM511 unknown opcodes
+  - SM511 undocumented/guessed opcodes:
+    * $01 is guessed as DIV to ACC transfer, unknown which bits
+    * $5d is certainly CEND
+    * $65 is certainly IDIV, but not sure if it behaves same as on SM510
 
 */
 
@@ -274,7 +277,7 @@ void sm510_base_device::init_melody()
 	{
 		UINT8 data = m_melody_rom[i];
 		if (data & 0xc0 || (data & 0x0f) > 13)
-			logerror("%s unknown melody ROM data $%02X at $%02X\n", tag().c_str(), data, i);
+			logerror("%s unknown melody ROM data $%02X at $%02X\n", tag(), data, i);
 	}
 }
 

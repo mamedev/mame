@@ -104,7 +104,7 @@ struct ps_rtc_regs_t
 class pockstat_state : public driver_device
 {
 public:
-	pockstat_state(const machine_config &mconfig, device_type type, std::string tag)
+	pockstat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_lcd_buffer(*this, "lcd_buffer"),
 		m_maincpu(*this, "maincpu"),
@@ -991,7 +991,7 @@ static MACHINE_CONFIG_START( pockstat, pockstat_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32-1, 0, 32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pockstat_state, screen_update_pockstat)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)

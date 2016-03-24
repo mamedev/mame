@@ -47,7 +47,7 @@
 class horizon_state : public driver_device
 {
 public:
-	horizon_state(const machine_config &mconfig, device_type type, std::string tag)
+	horizon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_usart_l(*this, I8251_L_TAG),
@@ -168,7 +168,7 @@ static MACHINE_CONFIG_START( horizon, horizon_state )
 
 	// S-100
 	MCFG_S100_BUS_ADD()
-	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT))
+	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
 	//MCFG_S100_SLOT_ADD("s100_1", horizon_s100_cards, NULL, NULL) // CPU
 	MCFG_S100_SLOT_ADD("s100_2", horizon_s100_cards, nullptr) // RAM
 	MCFG_S100_SLOT_ADD("s100_3", horizon_s100_cards, "mdsad") // MDS

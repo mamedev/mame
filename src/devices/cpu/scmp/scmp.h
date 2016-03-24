@@ -30,8 +30,8 @@ class scmp_device : public cpu_device
 {
 public:
 	// construction/destruction
-	scmp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	scmp_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	scmp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scmp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_flag_out_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_flag_out_func.set_callback(object); }
@@ -105,7 +105,7 @@ class ins8060_device : public scmp_device
 {
 public:
 	// construction/destruction
-	ins8060_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ins8060_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 2 - 1) / 2; }

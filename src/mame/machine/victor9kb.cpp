@@ -566,7 +566,7 @@ ioport_constructor victor_9000_keyboard_t::device_input_ports() const
 //  victor_9000_keyboard_t - constructor
 //-------------------------------------------------
 
-victor_9000_keyboard_t::victor_9000_keyboard_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+victor_9000_keyboard_t::victor_9000_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VICTOR9K_KEYBOARD, "Victor 9000 Keyboard", tag, owner, clock, "victor9kb", __FILE__),
 	m_maincpu(*this, I8021_TAG),
 	m_y0(*this, "Y0"),

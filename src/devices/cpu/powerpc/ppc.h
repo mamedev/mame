@@ -14,7 +14,7 @@
 #ifndef __PPC_H__
 #define __PPC_H__
 
-#include "cpu/vtlb.h"
+#include "divtlb.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
@@ -171,7 +171,7 @@ enum
 class ppc_frontend;
 
 
-class ppc_device : public cpu_device
+class ppc_device : public cpu_device, public device_vtlb_interface
 {
 	friend class ppc_frontend;
 
@@ -211,7 +211,7 @@ protected:
 
 public:
 	// construction/destruction
-	ppc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int address_bits, int data_bits, powerpc_flavor flavor, UINT32 cap, UINT32 tb_divisor, address_map_constructor internal_map);
+	ppc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int address_bits, int data_bits, powerpc_flavor flavor, UINT32 cap, UINT32 tb_divisor, address_map_constructor internal_map);
 
 	static void set_bus_frequency(device_t &device, UINT32 bus_frequency) { downcast<ppc_device &>(device).c_bus_frequency = bus_frequency; }
 
@@ -462,9 +462,6 @@ protected:
 	UINT32 m_sebr;
 	UINT32 m_ser;
 
-	/* MMU */
-	vtlb_state *m_vtlb;
-
 	/* architectural distinctions */
 	powerpc_flavor  m_flavor;
 	UINT32          m_cap;
@@ -681,7 +678,7 @@ protected:
 //class ppc403_device : public ppc_device
 //{
 //public:
-//  ppc403_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+//  ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 //
 //protected:
 //  virtual UINT32 execute_input_lines() const { return 8; }
@@ -691,7 +688,7 @@ protected:
 //class ppc405_device : public ppc_device
 //{
 //public:
-//  ppc405_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+//  ppc405_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 //
 //protected:
 //  virtual UINT32 execute_input_lines() const { return 8; }
@@ -701,56 +698,56 @@ protected:
 class ppc603_device : public ppc_device
 {
 public:
-	ppc603_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ppc603_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class ppc603e_device : public ppc_device
 {
 public:
-	ppc603e_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ppc603e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class ppc603r_device : public ppc_device
 {
 public:
-	ppc603r_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ppc603r_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class ppc602_device : public ppc_device
 {
 public:
-	ppc602_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ppc602_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class mpc8240_device : public ppc_device
 {
 public:
-	mpc8240_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mpc8240_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class ppc601_device : public ppc_device
 {
 public:
-	ppc601_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ppc601_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class ppc604_device : public ppc_device
 {
 public:
-	ppc604_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ppc604_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class ppc4xx_device : public ppc_device
 {
 public:
-	ppc4xx_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, powerpc_flavor flavor, UINT32 cap, UINT32 tb_divisor);
+	ppc4xx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, powerpc_flavor flavor, UINT32 cap, UINT32 tb_divisor);
 
 	void ppc4xx_spu_set_tx_handler(write8_delegate callback);
 	void ppc4xx_spu_receive_byte(UINT8 byteval);
@@ -772,21 +769,21 @@ protected:
 class ppc403ga_device : public ppc4xx_device
 {
 public:
-	ppc403ga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ppc403ga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class ppc403gcx_device : public ppc4xx_device
 {
 public:
-	ppc403gcx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ppc403gcx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class ppc405gp_device : public ppc4xx_device
 {
 public:
-	ppc405gp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ppc405gp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

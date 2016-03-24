@@ -28,7 +28,7 @@
 class superslave_state : public driver_device
 {
 public:
-	superslave_state(const machine_config &mconfig, device_type type, std::string tag)
+	superslave_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_dart0(*this, Z80DART_0_TAG),

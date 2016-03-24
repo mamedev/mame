@@ -55,7 +55,7 @@ class dmac_device : public device_t, public amiga_autoconfig
 {
 public:
 	// construction/destruction
-	dmac_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// callbacks
 	template<class _Object> static devcb_base &set_cfgout_handler(device_t &device, _Object object)
@@ -128,7 +128,7 @@ private:
 		ISTR_FE_FLG = 0x001     // fifo-empty flag
 	};
 
-	static const int ISTR_INT_MASK = 0x1fc;
+	static const int ISTR_INT_MASK = 0x1ec;
 
 	// callbacks
 	devcb_write_line m_cfgout_handler;

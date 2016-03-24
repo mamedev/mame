@@ -1711,7 +1711,7 @@ MACHINE_CONFIG_FRAGMENT( apollo_graphics )
 	MCFG_SCREEN_ADD(VIDEO_SCREEN_TAG, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(76)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(657))
+	MCFG_SCREEN_RAW_PARAMS(68000000, 1343, 0, 1024, 841, 0, 800)
 	MCFG_SCREEN_SIZE(1024, 800)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1023, 0, 799)
 	MCFG_SCREEN_UPDATE_DEVICE(APOLLO_SCREEN_TAG, apollo_graphics_15i, screen_update)
@@ -1719,14 +1719,14 @@ MACHINE_CONFIG_END
 
 const device_type APOLLO_GRAPHICS = &device_creator<apollo_graphics_15i> ;
 
-apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,std::string tag, device_t *owner, UINT32 clock) :
+apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, APOLLO_GRAPHICS, "Apollo Screen", tag, owner, clock,"apollo_graphics_15i", __FILE__),
 	m_lut_fifo(nullptr),
 	m_bt458(nullptr)
 {
 }
 
-apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,std::string tag, device_t *owner, UINT32 clock, device_type type,const char *name, std::string shortname, std::string source) :
+apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, UINT32 clock, device_type type,const char *name, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_lut_fifo(nullptr),
 	m_bt458(nullptr)
@@ -1891,11 +1891,11 @@ void apollo_graphics_15i::device_reset()
 
 MACHINE_CONFIG_FRAGMENT( apollo_mono19i )
 	MCFG_DEFAULT_LAYOUT( layout_apollo )
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_SCREEN_ADD(VIDEO_SCREEN_TAG, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(64)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(616))
+	MCFG_SCREEN_RAW_PARAMS(120000000, 1728, 0, 1280, 1066, 0, 1024)
 	MCFG_SCREEN_SIZE(1280, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1279, 0, 1023)
 	MCFG_SCREEN_UPDATE_DEVICE(APOLLO_SCREEN_TAG, apollo_graphics_19i, screen_update)
@@ -1904,7 +1904,7 @@ MACHINE_CONFIG_FRAGMENT( apollo_mono19i )
 const device_type APOLLO_MONO19I = &device_creator<apollo_graphics_19i> ;
 
 apollo_graphics_19i::apollo_graphics_19i(const machine_config &mconfig,
-		std::string tag, device_t *owner, UINT32 clock) :
+		const char *tag, device_t *owner, UINT32 clock) :
 	apollo_graphics_15i(mconfig, tag, owner, clock, APOLLO_MONO19I,
 			"Apollo 19\" Monochrome Screen", "apollo_graphics_19i", __FILE__)
 {

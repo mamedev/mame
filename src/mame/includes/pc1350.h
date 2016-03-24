@@ -27,7 +27,7 @@ public:
 		TIMER_POWER_UP
 	};
 
-	pc1350_state(const machine_config &mconfig, device_type type, std::string tag)
+	pc1350_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pocketc_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG) { }

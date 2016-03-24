@@ -23,7 +23,7 @@
 class apogee_state : public radio86_state
 {
 public:
-	apogee_state(const machine_config &mconfig, device_type type, std::string tag)
+	apogee_state(const machine_config &mconfig, device_type type, const char *tag)
 		: radio86_state(mconfig, type, tag),
 		m_speaker(*this, "speaker") { }
 

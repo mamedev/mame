@@ -4,7 +4,7 @@
 
 const device_type APIC = &device_creator<apic_device>;
 
-apic_device::apic_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+apic_device::apic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, APIC, "I/O Advanced Programmable Interrupt Controller", tag, owner, clock, "apic", __FILE__)
 {
 }

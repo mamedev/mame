@@ -1,0 +1,127 @@
+version: '{build}'
+
+configuration:
+  - Static Debug
+  - Static Release
+#  - Shared Debug
+#  - Shared Release
+
+platform:
+  - x86
+  - x64
+
+environment:
+  matrix:
+    - compiler: msvc-12-seh
+    - compiler: msvc-14-seh
+    - compiler: gcc-4.9.2-posix
+#    - compiler: gcc-4.8.4-posix
+
+artifacts:
+  - path: '_build/CMakeFiles/*.log'
+    name: logs
+  - path: '_build/Testing/**/*.xml'
+    name: test_results
+
+install:
+  # derive some extra information
+  - for /f "tokens=1-2" %%a in ("%configuration%") do (@set "linkage=%%a")
+  - for /f "tokens=1-2" %%a in ("%configuration%") do (@set "variant=%%b")
+  - if "%linkage%"=="Shared" (set shared=YES) else (set shared=NO)
+  - for /f "tokens=1-3 delims=-" %%a in ("%compiler%") do (@set "compiler_name=%%a")
+  - for /f "tokens=1-3 delims=-" %%a in ("%compiler%") do (@set "compiler_version=%%b")
+  - for /f "tokens=1-3 delims=-" %%a in ("%compiler%") do (@set "compiler_threading=%%c")
+  - if "%platform%"=="x64" (set arch=x86_64)
+  - if "%platform%"=="x86" (set arch=i686)
+  # download the specific version of MinGW
+  - if "%compiler_name%"=="gcc" (for /f %%a in ('python mingw.py --quiet --version "%compiler_version%" --arch "%arch%" --threading "%compiler_threading%" --location "C:\mingw-builds"') do @set "compiler_path=%%a")
+
+before_build:
+  # Set up mingw commands
+  - if "%compiler_name%"=="gcc" (set "generator=MinGW Makefiles")
+  - if "%compiler_name%"=="gcc" (set "build=mingw32-make -j4")
+  - if "%compiler_name%"=="gcc" (set "test=mingw32-make CTEST_OUTPUT_ON_FAILURE=1 test")
+  # msvc specific commands
+  - if "%compiler_name%"=="msvc" if "%compiler_version%"=="12" if "%platform%"=="x86" (set "generator=Visual Studio 12 2013")
+  - if "%compiler_name%"=="msvc" if "%compiler_version%"=="12" if "%platform%"=="x64" (set "generator=Visual Studio 12 2013 Win64")
+  - if "%compiler_name%"=="msvc" if "%compiler_version%"=="14" if "%platform%"=="x86" (set "generator=Visual Studio 14 2015")
+  - if "%compiler_name%"=="msvc" if "%compiler_version%"=="14" if "%platform%"=="x64" (set "generator=Visual Studio 14 2015 Win64")
+  - if "%compiler_name%"=="msvc" (set "build=cmake --build . --config %variant%")
+  - if "%compiler_name%"=="msvc" (set "test=ctest -c Release -D CTEST_OUTPUT_ON_FAILURE:STRING=1")
+  # add the compiler path if needed
+  - if not "%compiler_path%"=="" (set "PATH=%PATH%;%compiler_path%")
+  # git bash conflicts with MinGW makefiles
+  - if "%generator%"=="MinGW Makefiles" (set "PATH=%PATH:C:\Program Files\Git\usr\bin;=%")
+
+build_script:
+- ps: |
+    md _build -Force
+    cd _build
+    & cmake -G "$env:generator" "-DCMAKE_BUILD_TYPE=$env:variant" "-DBUILD_SHARED_LIBS=$env:shared" ..
+    if ($LastExitCode -ne 0) {
+        throw "Exec: $ErrorMessage"
+    }
+    iex "& $env:build"
+    if ($LastExitCode -ne 0) {
+        throw "Exec: $ErrorMessage"
+    }
+
+test_script:
+- ps: |
+    iex "& $env:test"
+    if ($LastExitCode -ne 0) {
+        throw "Exec: $ErrorMessage"
+    }
+
+    function Add-CTest-Result($testResult)
+    {
+        $tests = ([xml](get-content $testResult)).Site.Testing
+        $testsCount = 0
+        $anyFailures = $FALSE
+
+        foreach ($test in $tests.test) {
+            $testsCount++
+            $testName = $test.Name
+            $testpath = $test.Path
+            $timeNode = $test.SelectSingleNode('Results/NamedMeasurement[@name="Execution Time"]/Value')
+            if ($test.status -eq "failure") {
+                $time = ([double]$timeNode.InnerText * 1000)
+                Add-AppveyorTest $testName -Outcome Failed -FileName $testpath -Duration $time -ErrorMessage $($test.results.measurement.value)
+                Add-AppveyorMessage `"$testName failed`" -Category Error
+                $anyFailures = $TRUE
+            }
+            elseif ($test.status -eq "skipped") {
+                Add-AppveyorTest $testName -Outcome Ignored -Filename $testpath
+            }
+            else {
+                $time = ([double]$timeNode.InnerText * 1000)
+                Add-AppveyorTest $testName -Outcome Passed -FileName $testpath -Duration $time -StdOut $($test.results.measurement.value)
+            }
+        }
+        return $testsCount, $anyFailures
+    }
+
+    $testsCount = 0
+    $anyFailures = $FALSE
+
+    # Run tests and upload results to AppVeyor one by one
+    Get-ChildItem ".\Testing\*.xml" -Recurse | foreach {
+        $testfile = $_.fullname
+        $count, $testsResult = Add-CTest-Result $testfile
+        Write-Host "Found $testfile with $count tests"
+        $testsCount = $testsCount + $count
+        $anyFailures = $anyFailures -or $testsResult
+    }
+
+    Write-Host "There are $testsCount tests found"
+
+    if ($anyFailures -eq $TRUE){
+        Write-Host "Failing build as there are broken tests"
+        $host.SetShouldExit(1)
+    }
+
+matrix:
+  fast_finish: true
+
+cache:
+  - C:\mingw-builds

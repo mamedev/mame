@@ -172,36 +172,50 @@ TODO:
 
 SAMPLES_START_CB_MEMBER(ninjakd2_state::ninjakd2_init_samples)
 {
-	const UINT8* const rom = memregion("pcm")->base();
-	const int length = memregion("pcm")->bytes();
+	if (m_pcm_region == NULL)
+	{
+		return;
+	}
+
+	const UINT8* const rom = m_pcm_region->base();
+	const int length = m_pcm_region->bytes();
 	INT16* sampledata = auto_alloc_array(machine(), INT16, length);
 
 	// convert unsigned 8-bit PCM to signed 16-bit
 	for (int i = 0; i < length; ++i)
+	{
 		sampledata[i] = rom[i] << 7;
+	}
 
 	m_sampledata = sampledata;
 }
 
 WRITE8_MEMBER(ninjakd2_state::ninjakd2_pcm_play_w)
 {
-	const UINT8* const rom = memregion("pcm")->base();
-
 	// only Ninja Kid II uses this
-	if (rom)
+	if (m_pcm_region == NULL)
 	{
-		const int length = memregion("pcm")->bytes();
-		const int start = data << 8;
+		return;
+	}
 
-		// find end of sample
-		int end = start;
-		while (end < length && rom[end] != 0x00)
-			++end;
+	const UINT8* const rom = m_pcm_region->base();
+	const int length = m_pcm_region->bytes();
+	const int start = data << 8;
 
-		if (end - start)
-			m_pcm->start_raw(0, &m_sampledata[start], end - start, NE555_FREQUENCY);
-		else
-			m_pcm->stop(0);
+	// find end of sample
+	int end = start;
+	while (end < length && rom[end] != 0x00)
+	{
+		++end;
+	}
+
+	if (end - start)
+	{
+		m_pcm->start_raw(0, &m_sampledata[start], end - start, NE555_FREQUENCY);
+	}
+	else
+	{
+		m_pcm->stop(0);
 	}
 }
 
@@ -453,6 +467,13 @@ static ADDRESS_MAP_START( ninjakd2_sound_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(ninjakd2_pcm_play_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( ninjakid_nopcm_sound_cpu, AS_PROGRAM, 8, ninjakd2_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf000, 0xf000) AM_NOP
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
@@ -972,6 +993,9 @@ static MACHINE_CONFIG_DERIVED( mnight, ninjakd2_core )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mnight_main_cpu)
 
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,mnight)
 
@@ -980,10 +1004,12 @@ static MACHINE_CONFIG_DERIVED( mnight, ninjakd2_core )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( arkarea, ninjakd2_core )
-
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mnight_main_cpu)
+
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,arkarea)
@@ -997,6 +1023,9 @@ static MACHINE_CONFIG_DERIVED( robokid, mnight )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(robokid_main_cpu)
+
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", robokid)
@@ -1015,6 +1044,9 @@ static MACHINE_CONFIG_DERIVED( omegaf, robokid )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(omegaf_main_cpu)
+
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	MCFG_MACHINE_START_OVERRIDE(ninjakd2_state,omegaf)
 	MCFG_MACHINE_RESET_OVERRIDE(ninjakd2_state,omegaf)

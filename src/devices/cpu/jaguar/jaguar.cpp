@@ -140,7 +140,7 @@ const device_type JAGUARGPU = &device_creator<jaguargpu_cpu_device>;
 const device_type JAGUARDSP = &device_creator<jaguardsp_cpu_device>;
 
 
-jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, bool isdsp)
+jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool isdsp)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 24, 0)
 	, m_isdsp(isdsp)
@@ -162,13 +162,13 @@ jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type 
 }
 
 
-jaguargpu_cpu_device::jaguargpu_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+jaguargpu_cpu_device::jaguargpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: jaguar_cpu_device(mconfig, JAGUARGPU, "Jaguar GPU", tag, owner, clock, "jaguargpu", __FILE__, false)
 {
 }
 
 
-jaguardsp_cpu_device::jaguardsp_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+jaguardsp_cpu_device::jaguardsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: jaguar_cpu_device(mconfig, JAGUARDSP, "Jaguar DSP", tag, owner, clock, "jaguardsp", __FILE__, true)
 {
 }
@@ -405,7 +405,7 @@ void jaguar_cpu_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c%c%c%c",
 				FLAGS & 0x8000 ? 'D':'.',
 				FLAGS & 0x4000 ? 'A':'.',
 				FLAGS & 0x0100 ? '4':'.',

@@ -30,7 +30,7 @@ public:
 		TIMER_PULSE_NMI
 	};
 
-	microtan_state(const machine_config &mconfig, device_type type, std::string tag)
+	microtan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),

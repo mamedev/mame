@@ -92,7 +92,7 @@ struct s3c240x_iis_t
 class gp32_state : public driver_device
 {
 public:
-	gp32_state(const machine_config &mconfig, device_type type, std::string tag)
+	gp32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_s3c240x_ram(*this, "s3c240x_ram"),
 		m_maincpu(*this, "maincpu"),

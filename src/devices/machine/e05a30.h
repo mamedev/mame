@@ -46,7 +46,7 @@
 class e05a30_device : public device_t
 {
 public:
-	e05a30_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	e05a30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~e05a30_device() {}
 
 	template<class _Object> static devcb_base &set_printhead_wr_callback(device_t &device, _Object object) { return downcast<e05a30_device &>(device).m_write_printhead.set_callback(object); }

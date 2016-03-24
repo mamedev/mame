@@ -45,8 +45,14 @@ private:
 		SELECT_GAME,
 		BIOS_SELECTION,
 		BARCODE_READ,
-				PTY_INFO
+		PTY_INFO,
+		EXTERNAL_DATS,
+		ADD_FAVORITE,
+		REMOVE_FAVORITE,
+		QUIT_GAME
 	};
+
+	//bool submenu;
 };
 
 #endif  /* __UI_MAINMENU_H__ */

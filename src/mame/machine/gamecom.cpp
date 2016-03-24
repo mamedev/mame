@@ -177,8 +177,8 @@ WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
 				/* P3 bit6 clear, bit7 set -> enable cartridge port #1? */
 				switch (data & 0xc0)
 				{
-				case 0x40: m_cart_ptr = m_cart1_rom->base(); break;
-				case 0x80: m_cart_ptr = m_cart2_rom->base(); break;
+				case 0x40: m_cart_ptr = m_cart1_rom != NULL ? m_cart1_rom->base() : NULL; break;
+				case 0x80: m_cart_ptr = m_cart2_rom != NULL ? m_cart2_rom->base() : NULL; break;
 				default:   m_cart_ptr = nullptr;       break;
 				}
 				return;

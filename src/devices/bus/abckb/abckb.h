@@ -45,7 +45,7 @@ class abc_keyboard_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	abc_keyboard_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	abc_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_out_rx_handler(device_t &device, _Object object) { return downcast<abc_keyboard_port_device &>(device).m_out_rx_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_trxc_handler(device_t &device, _Object object) { return downcast<abc_keyboard_port_device &>(device).m_out_trxc_handler.set_callback(object); }

@@ -141,7 +141,7 @@ inline void wangpc_wdc_device::set_irq(int state)
 //  wangpc_wdc_device - constructor
 //-------------------------------------------------
 
-wangpc_wdc_device::wangpc_wdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+wangpc_wdc_device::wangpc_wdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, WANGPC_WDC, "Wang PC-PM001", tag, owner, clock, "wangpc_wdc", __FILE__),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),

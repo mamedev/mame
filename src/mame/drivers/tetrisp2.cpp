@@ -1841,7 +1841,7 @@ Custom: SS91022-03
         SS91022-05
 
 Other:  Sigma XILINX XCS30
-        Sigma XILINX XC9536 (socketted and stamped SL4)
+        Sigma XILINX XC9536 (socketed and stamped SL4)
 
 
 PCB Layout for sound rom board (from Rock'n 3):

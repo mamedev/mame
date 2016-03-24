@@ -3,8 +3,6 @@
 /******************************************************************************
  Mephisto Chess Computers using plugin modules
 
- Vancouver Chess Computer 68000 (driver recalled) by R. Schaefer (2010)
-
  (most of the magnetic sensor versions with 680x0 family modules)
 
  Almeria 68000 12Mhz
@@ -15,7 +13,6 @@
  Vancouver 68020 12Mhz
  Genius 68030 V4.00 33.333 Mhz
  Genius 68030 V4.01 33.333 Mhz
- Genius 68030 V4.01 33.333x2 Mhz (custom MESS overclocked version for higher ELO)
  Berlin Pro 68020 24.576 Mhz (not modular board, but otherwise close to milano)
  Berlin Pro (London) 68020 24.576 Mhz (not modular board, but otherwise close to milano)
  London 68030 V5.00k 33.333 Mhz (probably the Genius 3/4 update ROM)
@@ -58,12 +55,6 @@
                        holding CLEAR clears Battery Backed RAM on the Berlin (Pro) 68020
 ******************************************************************************/
 
-/******************************************************************************
- Mephisto Polgar & Milano
- 2010 Dirk V., Ralf Schafer, Cowering
-
-******************************************************************************/
-
 /*
 
 CPU 65C02 P4 4.9152 MHz
@@ -97,7 +88,6 @@ Bit 5+6  LED 1-8 enable
 
 #include "rendlay.h"
 
-#include "includes/mboard.h"
 #include "machine/nvram.h"
 
 //static UINT16 unknown2_data = 0;
@@ -126,15 +116,17 @@ INPUT_PORTS_EXTERN( chessboard );
 
 UINT8 lcd32_char;
 
-class polgar_state : public mboard_state
+class polgar_state : public driver_device
 {
 public:
-	polgar_state(const machine_config &mconfig, device_type type, std::string tag)
-		: mboard_state(mconfig, type, tag),
+	polgar_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
 			m_lcdc(*this, "hd44780"),
 			m_beeper(*this, "beeper")
 		{ }
 
+	required_device<cpu_device> m_maincpu;
 	optional_device<hd44780_device> m_lcdc;
 	optional_device<beep_device> m_beeper;
 
@@ -638,9 +630,9 @@ WRITE8_MEMBER(polgar_state::monteciv_3006)
 
 WRITE8_MEMBER(polgar_state::academy_write_board)
 {
-	latch_data = data;
+	//latch_data = data;
 //    logerror("acad_write_latch %02x\n",data);
-	if (data != 0xff) mboard_write_board_8(space,0, data);
+	//if (data != 0xff) mboard_write_board_8(space,0, data);
 }
 
 WRITE8_MEMBER(polgar_state::milano_write_board)
@@ -659,7 +651,7 @@ READ8_MEMBER(polgar_state::milano_read_board)
 
 	if (latch_data)
 	{
-		line = get_first_cleared_bit(latch_data);
+		line = 0;//get_first_cleared_bit(latch_data);
 		tmp = ioport(board_lines[line])->read();
 
 		if (tmp != 0xff)
@@ -713,7 +705,7 @@ READ32_MEMBER(polgar_state::read_keys_BPL32)
 	} else {
 		if (BPL32latch_data & 0x7f) {
 			logerror("ReadingBoard %02x\n",BPL32latch_data);
-			line = get_first_cleared_bit(BPL32latch_data);
+			line = 0;//get_first_cleared_bit(BPL32latch_data);
 			tmp = ioport(board_lines[line])->read();
 
 			if (tmp != 0xff)
@@ -752,7 +744,7 @@ READ8_MEMBER(polgar_state::read_keys_board_monteciv)
 	UINT8 data = 0;
 
 	if (monteciv_select[0] == 0xff && monteciv_select[1] == 0xff) {
-			data = mboard_read_board_8(space,0);
+			//data = mboard_read_board_8(space,0);
 	} else {
 		if (monteciv_select[0] == 0x0) {
 			data = ioport("BUTTONS_MONTE2")->read();
@@ -790,7 +782,7 @@ READ8_MEMBER(polgar_state::read_keys_board_academy)
 		data = ioport("BUTTONS_ACAD")->read();
 	} else {
 //      if (latch_data & 0x7f) {
-		data = mboard_read_board_8(space,0);
+		//data = mboard_read_board_8(space,0);
 //      data = milano_read_board(space,0);
 
 //          logerror("ReadingBoard %02x\n",latch_data);
@@ -998,16 +990,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::timer_update_irq_academy)
 MACHINE_START_MEMBER(polgar_state,van32)
 {
 // patch LCD delay loop on the 68030 machines until waitstates and/or opcode timings are fixed in MAME core
-// patches gen32 gen32_41 gen32_oc lond030
+// patches gen32 gen32_41 lond030
 
 	UINT8 *rom = memregion("maincpu")->base();
 
 	if(rom[0x870] == 0x0c && rom[0x871] == 0x78) {
-		if (!strcmp(machine().system().name,"gen32_oc")) {
-			rom[0x870] = 0x6c;
-		} else {
-			rom[0x870] = 0x38;
-		}
+		rom[0x870] = 0x38;
 	}
 }
 
@@ -1019,20 +1007,16 @@ MACHINE_START_MEMBER(polgar_state,risc)
 
 void polgar_state::common_chess_start()
 {
-	mboard_set_border_pieces();
-	mboard_set_board();
 }
 
 MACHINE_START_MEMBER(polgar_state,polgar)
 {
 	common_chess_start();
-	mboard_savestate_register();
 }
 
 MACHINE_START_MEMBER(polgar_state,sfortea)
 {
 	common_chess_start();
-	mboard_savestate_register();
 }
 
 MACHINE_START_MEMBER(polgar_state,diablo68)
@@ -1042,7 +1026,6 @@ MACHINE_START_MEMBER(polgar_state,diablo68)
 
 MACHINE_START_MEMBER(polgar_state,van16)
 {
-	mboard_savestate_register();
 }
 
 MACHINE_RESET_MEMBER(polgar_state,van16)
@@ -1101,9 +1084,9 @@ GFXDECODE_END
 
 static ADDRESS_MAP_START(polgar_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-	AM_RANGE( 0x2400, 0x2400 ) AM_WRITE(mboard_write_LED_8 )        // Chessboard
-	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE(mboard_write_board_8)       // Chessboard
-	AM_RANGE( 0x3000, 0x3000 ) AM_READ(mboard_read_board_8 )        // Chessboard
+	//AM_RANGE( 0x2400, 0x2400 ) AM_WRITE(mboard_write_LED_8 )        // Chessboard
+//	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE(mboard_write_board_8)       // Chessboard
+//	AM_RANGE( 0x3000, 0x3000 ) AM_READ(mboard_read_board_8 )        // Chessboard
 	AM_RANGE( 0x3400, 0x3405 ) AM_WRITE(polgar_write_LED)   // Function LEDs
 	AM_RANGE( 0x2c00, 0x2c07 ) AM_READ(read_keys)
 	AM_RANGE( 0x2004, 0x2004 ) AM_WRITE(write_polgar_IO )   // LCD Instr. Reg + Beeper
@@ -1126,11 +1109,11 @@ static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x00000000,  0x0003ffff )  AM_ROM
 
-	AM_RANGE( 0xc0000000 , 0xc0000003 )  AM_READ(mboard_read_board_32 )
-	AM_RANGE( 0xc8000000 , 0xc8000003 )  AM_WRITE(mboard_write_board_32 )
-	AM_RANGE( 0xc8000004 , 0xc8000007 )  AM_WRITE(mboard_write_board_32 )
-	AM_RANGE( 0xd0000000 , 0xd0000003 )  AM_WRITE(mboard_write_LED_32 )
-	AM_RANGE( 0xd0000004 , 0xd0000007 )  AM_WRITE(mboard_write_LED_32 )
+	//AM_RANGE( 0xc0000000 , 0xc0000003 )  AM_READ(mboard_read_board_32 )
+	//AM_RANGE( 0xc8000000 , 0xc8000003 )  AM_WRITE(mboard_write_board_32 )
+	//AM_RANGE( 0xc8000004 , 0xc8000007 )  AM_WRITE(mboard_write_board_32 )
+	//AM_RANGE( 0xd0000000 , 0xd0000003 )  AM_WRITE(mboard_write_LED_32 )
+	//AM_RANGE( 0xd0000004 , 0xd0000007 )  AM_WRITE(mboard_write_LED_32 )
 	AM_RANGE( 0xf0000004 , 0xf0000013 )  AM_READ(read_buttons_gen32 )
 	AM_RANGE( 0xe0000000 , 0xe0000003 )  AM_WRITE(write_LCD_data_32 )
 	AM_RANGE( 0xe0000010 , 0xe0000013 )  AM_WRITE(write_IOenables_32 )
@@ -1147,7 +1130,7 @@ static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32, polgar_state )
 static ADDRESS_MAP_START(bpl32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x000000,  0x03ffff )  AM_ROM
-	AM_RANGE( 0x800000 , 0x800003 )  AM_READ(read_keys_BPL32 )
+//	AM_RANGE( 0x800000 , 0x800003 )  AM_READ(read_keys_BPL32 )
 	AM_RANGE( 0x900000 , 0x900003 )  AM_WRITE(write_board_BPL32 )
 	AM_RANGE( 0xa00000 , 0xa00003 )  AM_WRITE(write_LED_BPL32 )
 	AM_RANGE( 0xc00000 , 0xc00003 )  AM_WRITE(write_LCD_data_32 )
@@ -1161,9 +1144,9 @@ static ADDRESS_MAP_START(van32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x00000000,  0x0003ffff )  AM_ROM
 
-	AM_RANGE( 0x800000fc , 0x800000ff )  AM_READ(mboard_read_board_32 )
-	AM_RANGE( 0x88000000 , 0x88000007 )  AM_WRITE(mboard_write_board_32 )
-	AM_RANGE( 0x90000000 , 0x90000007 )  AM_WRITE(mboard_write_LED_32 )
+	//AM_RANGE( 0x800000fc , 0x800000ff )  AM_READ(mboard_read_board_32 )
+//	AM_RANGE( 0x88000000 , 0x88000007 )  AM_WRITE(mboard_write_board_32 )
+//	AM_RANGE( 0x90000000 , 0x90000007 )  AM_WRITE(mboard_write_LED_32 )
 	AM_RANGE( 0x800000ec , 0x800000ff )  AM_READ(read_buttons_van32 )
 	AM_RANGE( 0xa0000000 , 0xa0000003 )  AM_WRITE(write_LCD_data_32 )
 	AM_RANGE( 0xa0000010 , 0xa0000013 )  AM_WRITE(write_IOenables_32 )
@@ -1181,9 +1164,9 @@ static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x00000000,  0x0001ffff )  AM_ROM
 
-	AM_RANGE( 0x800000fc , 0x800000ff )  AM_READ(mboard_read_board_32 )
-	AM_RANGE( 0x88000000 , 0x88000007 )  AM_WRITE(mboard_write_board_32 )
-	AM_RANGE( 0x90000000 , 0x90000007 )  AM_WRITE(mboard_write_LED_32 )
+	//AM_RANGE( 0x800000fc , 0x800000ff )  AM_READ(mboard_read_board_32 )
+	//AM_RANGE( 0x88000000 , 0x88000007 )  AM_WRITE(mboard_write_board_32 )
+	//AM_RANGE( 0x90000000 , 0x90000007 )  AM_WRITE(mboard_write_LED_32 )
 	AM_RANGE( 0x800000ec , 0x800000ff )  AM_READ(read_buttons_van32 )
 	AM_RANGE( 0xa0000000 , 0xa0000003 )  AM_WRITE(write_LCD_data_32 )
 	AM_RANGE( 0xa0000010 , 0xa0000013 )  AM_WRITE(write_IOenables_32 )
@@ -1209,9 +1192,9 @@ static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16, polgar_state )
 
 	AM_RANGE( 0x000000,  0x03ffff )  AM_ROM
 
-	AM_RANGE( 0xc00000 , 0xc00001 )  AM_READ(mboard_read_board_16 )
-	AM_RANGE( 0xc80000 , 0xc80001 )  AM_WRITE(mboard_write_board_16 )
-	AM_RANGE( 0xd00000 , 0xd00001 )  AM_WRITE(mboard_write_LED_16 )
+	//AM_RANGE( 0xc00000 , 0xc00001 )  AM_READ(mboard_read_board_16 )
+	//AM_RANGE( 0xc80000 , 0xc80001 )  AM_WRITE(mboard_write_board_16 )
+	//AM_RANGE( 0xd00000 , 0xd00001 )  AM_WRITE(mboard_write_LED_16 )
 	AM_RANGE( 0xf00000 , 0xf00009 )  AM_READ(read_buttons_van16 )
 	AM_RANGE( 0xd80000 , 0xd80001 )  AM_WRITE(write_LCD_data )
 	AM_RANGE( 0xd80008 , 0xd80009 )  AM_WRITE(write_IOenables )
@@ -1228,9 +1211,9 @@ static ADDRESS_MAP_START(alm16_mem, AS_PROGRAM, 16, polgar_state )
 
 	AM_RANGE( 0x000000,  0x01ffff )  AM_ROM
 
-	AM_RANGE( 0xc00000 , 0xc00001 )  AM_READ(mboard_read_board_16 )
-	AM_RANGE( 0xc80000 , 0xc80001 )  AM_WRITE(mboard_write_board_16 )
-	AM_RANGE( 0xd00000 , 0xd00001 )  AM_WRITE(mboard_write_LED_16 )
+	//AM_RANGE( 0xc00000 , 0xc00001 )  AM_READ(mboard_read_board_16 )
+	//AM_RANGE( 0xc80000 , 0xc80001 )  AM_WRITE(mboard_write_board_16 )
+	//AM_RANGE( 0xd00000 , 0xd00001 )  AM_WRITE(mboard_write_LED_16 )
 	AM_RANGE( 0xf00000 , 0xf00009 )  AM_READ(read_buttons_van16 )
 	AM_RANGE( 0xd80000 , 0xd80001 )  AM_WRITE(write_LCD_data )
 	AM_RANGE( 0xd80008 , 0xd80009 )  AM_WRITE(write_IOenables )
@@ -1247,7 +1230,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(milano_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1f9f ) AM_RAM
 	AM_RANGE( 0x1fd0, 0x1fd0 ) AM_WRITE(milano_write_board )        // Chessboard
-	AM_RANGE( 0x1fe0, 0x1fe0 ) AM_READ(milano_read_board )      // Chessboard
+//	AM_RANGE( 0x1fe0, 0x1fe0 ) AM_READ(milano_read_board )      // Chessboard
 	AM_RANGE( 0x1fe8, 0x1fed ) AM_WRITE(milano_write_LED )  // Function LEDs
 	AM_RANGE( 0x1fd8, 0x1fdf ) AM_READ(read_keys)
 	AM_RANGE( 0x1ff0, 0x1ff0 ) AM_WRITE(write_polgar_IO)    // IO control
@@ -1260,7 +1243,7 @@ static ADDRESS_MAP_START(academy_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
 	AM_RANGE( 0x2400, 0x2400 ) AM_READ(read_keys_board_academy )
 	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE(academy_write_board )       // Chessboard
-	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE(mboard_write_LED_8 )        // Chessboard
+	//AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE(mboard_write_LED_8 )        // Chessboard
 	AM_RANGE( 0x3002, 0x3002 ) AM_WRITE(beep_academy )
 	AM_RANGE( 0x3001, 0x3001 ) AM_WRITE(academy_inhibitNMI )
 	AM_RANGE( 0x3400, 0x3400 ) AM_WRITE(academy_write_LED )
@@ -1272,7 +1255,7 @@ static ADDRESS_MAP_START(monteciv_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
 	AM_RANGE( 0x2400, 0x2400 ) AM_READ(read_keys_board_monteciv )
 	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE(academy_write_board )       // Chessboard
-	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE(mboard_write_LED_8 )        // Chessboard
+	//AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE(mboard_write_LED_8 )        // Chessboard
 	AM_RANGE( 0x3400, 0x3400 ) AM_WRITE(academy_write_LED )         // Status LEDs
 	AM_RANGE( 0x3000, 0x3001 ) AM_WRITE(monteciv_select_line )          // Select Keyline
 	AM_RANGE( 0x3002, 0x3002 ) AM_WRITE(beep_academy )
@@ -1339,8 +1322,6 @@ static INPUT_PORTS_START( polgar )
 //  PORT_START("KEY1_8")
 //  PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(" A") PORT_CODE(KEYCODE_1)
 
-	PORT_INCLUDE( chessboard )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sfortea )
@@ -1374,8 +1355,6 @@ static INPUT_PORTS_START( sfortea )
     PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RST1") PORT_CODE(KEYCODE_7)
     PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RST2") PORT_CODE(KEYCODE_8)
 */
-
-	PORT_INCLUDE( chessboard )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( academy )
@@ -1389,7 +1368,6 @@ static INPUT_PORTS_START( academy )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(" ENT") PORT_CODE(KEYCODE_F7)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(" CL") PORT_CODE(KEYCODE_F8)
 
-	PORT_INCLUDE( chessboard )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( megaiv )
@@ -1413,7 +1391,6 @@ static INPUT_PORTS_START( megaiv )
 //  PORT_START("KEY1_8")
 //  PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(" A") PORT_CODE(KEYCODE_1)
 
-	PORT_INCLUDE( chessboard )
 
 INPUT_PORTS_END
 
@@ -1440,7 +1417,6 @@ static INPUT_PORTS_START( monteciv )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_8)
 
 
-	PORT_INCLUDE( chessboard )
 INPUT_PORTS_END
 
 
@@ -1458,7 +1434,6 @@ static INPUT_PORTS_START( gen32 )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("CL") PORT_CODE(KEYCODE_BACKSLASH)
 
-	PORT_INCLUDE( chessboard )
 
 INPUT_PORTS_END
 
@@ -1473,7 +1448,6 @@ static INPUT_PORTS_START( bpl32 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("CL") PORT_CODE(KEYCODE_BACKSLASH)
 
-	PORT_INCLUDE( chessboard )
 INPUT_PORTS_END
 
 
@@ -1492,9 +1466,8 @@ static INPUT_PORTS_START( van32 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("CL") PORT_CODE(KEYCODE_BACKSLASH)
 
-	PORT_INCLUDE( chessboard )
 
-	INPUT_PORTS_END
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( van16 )
 
@@ -1510,7 +1483,6 @@ static INPUT_PORTS_START( van16 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("DOWN") PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("CL") PORT_CODE(KEYCODE_BACKSLASH)
 
-	PORT_INCLUDE( chessboard )
 
 INPUT_PORTS_END
 
@@ -1536,7 +1508,7 @@ static MACHINE_CONFIG_FRAGMENT ( chess_common )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -1551,7 +1523,7 @@ static MACHINE_CONFIG_START( polgar, polgar_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", polgar_state, cause_nmi, attotime::from_hz(600))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(100))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(100))
 
 MACHINE_CONFIG_END
 
@@ -1568,7 +1540,7 @@ static MACHINE_CONFIG_START( sfortea, polgar_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", polgar_state, cause_M6502_irq, attotime::from_hz(600))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(100))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( alm32, polgar_state )
@@ -1577,7 +1549,7 @@ static MACHINE_CONFIG_START( alm32, polgar_state )
 	MCFG_MACHINE_START_OVERRIDE(polgar_state,van32)
 	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq6, attotime::from_hz(750))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
 
 	MCFG_FRAGMENT_ADD( chess_common )
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1606,11 +1578,11 @@ static MACHINE_CONFIG_START( monteciv, polgar_state )
 	MCFG_MACHINE_START_OVERRIDE(polgar_state, polgar )
 	MCFG_MACHINE_RESET_OVERRIDE(polgar_state, monteciv )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", polgar_state, cause_nmi, attotime::from_hz(600))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(100))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(100))
 
 MACHINE_CONFIG_END
 
@@ -1631,7 +1603,7 @@ static MACHINE_CONFIG_START( diablo68, polgar_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq2, attotime::from_hz(60))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(30))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
 
 
 MACHINE_CONFIG_END
@@ -1643,7 +1615,7 @@ static MACHINE_CONFIG_START( van16, polgar_state )
 	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq6, attotime::from_hz(600))
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq6, attotime::from_hz(587))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
 	MCFG_FRAGMENT_ADD( chess_common )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1660,7 +1632,7 @@ static MACHINE_CONFIG_START( van32, polgar_state )
 	MCFG_MACHINE_START_OVERRIDE(polgar_state,van32)
 	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq6, attotime::from_hz(750))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
 
 	MCFG_FRAGMENT_ADD( chess_common )
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1672,7 +1644,7 @@ static MACHINE_CONFIG_START( risc, polgar_state )
 	MCFG_CPU_PROGRAM_MAP(risc_mem)
 	MCFG_MACHINE_START_OVERRIDE(polgar_state,risc)
 	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
 
 	MCFG_FRAGMENT_ADD( chess_common )
 //  MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1686,19 +1658,10 @@ static MACHINE_CONFIG_START( gen32, polgar_state )
 	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq6, attotime::from_hz(375))
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq6, attotime::from_hz(368.64))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
 
 	MCFG_FRAGMENT_ADD( chess_common )
 	MCFG_NVRAM_ADD_0FILL("nvram")
-
-
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( gen32_oc, gen32 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL_33_333MHz * 2 )
-	MCFG_DEVICE_REMOVE("int_timer")
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq6, attotime::from_hz(500))
 
 
 MACHINE_CONFIG_END
@@ -1709,7 +1672,7 @@ static MACHINE_CONFIG_START( bpl32, polgar_state )
 	MCFG_MACHINE_START_OVERRIDE(polgar_state,van32)
 	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq6, attotime::from_hz(750))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(100))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(100))
 
 	MCFG_FRAGMENT_ADD( chess_common )
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1851,11 +1814,6 @@ ROM_START( gen32_41 )
 	ROM_LOAD("gen32_41.bin", 0x00000, 0x40000,CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c))
 ROM_END
 
-ROM_START( gen32_oc )
-	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD("gen32_41.bin", 0x00000, 0x40000,CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c))
-ROM_END
-
 ROM_START( berlinp )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("berlinp.bin", 0x00000, 0x40000,CRC(82FBAF6E) SHA1(729B7CEF3DFAECC4594A6178FC4BA6015AFA6202))
@@ -1882,30 +1840,29 @@ DRIVER_INIT_MEMBER(polgar_state,polgar)
 }
 
 /*       YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     INIT     COMPANY                      FULLNAME                     FLAGS */
-	CONS(  1986, polgar,   0,       0,      polgar,    polgar, polgar_state,   polgar,  "Hegener & Glaser",          "Mephisto Polgar Schachcomputer", MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK)
-	CONS(  1987, sfortea,  0,       0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte Chess Computer (version A)", MACHINE_NO_SOUND|MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1988, alm16,    van16,   0,      alm16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Almeria 68000", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1988, alm32,    van16,   0,      alm32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Alimera 68020", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1988, sforteb,  sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte Chess Computer (version B)", MACHINE_NO_SOUND|MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1988, sforteba, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte Chess Computer (version B, alt)", MACHINE_NO_SOUND|MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1988, sexpertb, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Expert B Chess Computer", MACHINE_NO_SOUND|MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1986, polgar,   0,       0,      polgar,    polgar, polgar_state,   polgar,  "Hegener & Glaser",          "Mephisto Polgar Schachcomputer", MACHINE_NOT_WORKING | MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK)
+	CONS(  1987, sfortea,  0,       0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte Chess Computer (version A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1988, alm16,    van16,   0,      alm16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Almeria 68000", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1988, alm32,    van16,   0,      alm32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Alimera 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1988, sforteb,  sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte Chess Computer (version B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1988, sforteba, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte Chess Computer (version B, alt)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1988, sexpertb, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Expert B Chess Computer", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1989, academy,  0,       0,      academy,   academy, driver_device,  0,       "Hegener & Glaser",          "Mephisto Academy Schachcomputer", MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1989, megaiv,   0,       0,      megaiv,    megaiv, driver_device,   0,       "Hegener & Glaser",          "Mephisto Mega IV Schachcomputer", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1989, megaiv,   0,       0,      megaiv,    megaiv, driver_device,   0,       "Hegener & Glaser",          "Mephisto Mega IV Schachcomputer", MACHINE_NOT_WORKING|MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1989, milano,   polgar,  0,      milano,    polgar, polgar_state,   polgar,  "Hegener & Glaser",          "Mephisto Milano Schachcomputer", MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-//CONS(  1989, montec4,  0,       0,      monteciv,  monteciv, driver_device, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1989, sfortec,  sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte Chess Computer (version C)", MACHINE_NO_SOUND|MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1989, sexpertc, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Expert C Chess Computer", MACHINE_NO_SOUND|MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1990, lyon16,   van16,   0,      alm16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68000", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1990, lyon32,   van16,   0,      alm32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68020", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1990, monteciv, 0,       0,      monteciv,  monteciv, driver_device, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV LE Schachcomputer", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1991, diablo68, 0,       0,      diablo68,  sfortea, driver_device,  0,       "Novag",                     "Novag Diablo 68000 Chess Computer", MACHINE_NO_SOUND|MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1991, van16,    0,       0,      van16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68000", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1991, van32,    van16,   0,      van32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68020", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1992, risc,     0,       0,      risc,      van16, driver_device,    0,       "Saitek",                    "RISC2500", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1993, gen32,    van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.00", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1993, gen32_41, van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1993, gen32_oc, van16,   0,      gen32_oc,  gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01OC", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_UNOFFICIAL | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1994, berlinp,  van16,   0,      bpl32,     bpl32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro 68020", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1996, bpl32,    van16,   0,      bpl32,     bpl32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro London Upgrade V5.00", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1996, lond020,  van16,   0,      van32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto London 68020 32 Bit", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1996, lond030,  van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 London Upgrade V5.00", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+//CONS(  1989, montec4,  0,       0,      monteciv,  monteciv, driver_device, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV", MACHINE_NOT_WORKING|MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1989, sfortec,  sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte Chess Computer (version C)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1989, sexpertc, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Expert C Chess Computer", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1990, lyon16,   van16,   0,      alm16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68000", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1990, lyon32,   van16,   0,      alm32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1990, monteciv, 0,       0,      monteciv,  monteciv, driver_device, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV LE Schachcomputer", MACHINE_NOT_WORKING|MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1991, diablo68, 0,       0,      diablo68,  sfortea, driver_device,  0,       "Novag",                     "Novag Diablo 68000 Chess Computer", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1991, van16,    0,       0,      van16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68000", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1991, van32,    van16,   0,      van32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1992, risc,     0,       0,      risc,      van16, driver_device,    0,       "Saitek",                    "RISC2500", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1993, gen32,    van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.00", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1993, gen32_41, van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1994, berlinp,  van16,   0,      bpl32,     bpl32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1996, bpl32,    van16,   0,      bpl32,     bpl32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro London Upgrade V5.00", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1996, lond020,  van16,   0,      van32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto London 68020 32 Bit", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1996, lond030,  van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 London Upgrade V5.00", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )

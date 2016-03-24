@@ -56,7 +56,7 @@ const rom_entry *comx_epr_device::device_rom_region() const
 //  comx_epr_device - constructor
 //-------------------------------------------------
 
-comx_epr_device::comx_epr_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+comx_epr_device::comx_epr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COMX_EPR, "COMX-35 F&M EPROM Switchboard", tag, owner, clock, "comx_epr", __FILE__),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_rom(*this, "f800"),

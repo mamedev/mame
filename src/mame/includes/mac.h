@@ -151,7 +151,7 @@ class mac_sound_device : public device_t,
 							public device_sound_interface
 {
 public:
-	mac_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mac_sound_device() {}
 
 	void enable_sound(int on);
@@ -190,7 +190,7 @@ extern const device_type MAC_SOUND;
 class mac_state : public driver_device
 {
 public:
-	mac_state(const machine_config &mconfig, device_type type, std::string tag)
+	mac_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via1(*this, "via6522_0"),
@@ -520,6 +520,8 @@ public:
 	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
 	TIMER_CALLBACK_MEMBER(dafb_vbl_tick);
 	TIMER_CALLBACK_MEMBER(dafb_cursor_tick);
+	TIMER_CALLBACK_MEMBER(mac_adb_tick);    // macadb.c
+	TIMER_CALLBACK_MEMBER(mac_pmu_tick);    // macadb.c
 	DECLARE_WRITE_LINE_MEMBER(mac_via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
 	DECLARE_READ8_MEMBER(mac_via_in_a);

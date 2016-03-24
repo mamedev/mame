@@ -46,7 +46,6 @@
 #include "machine/sgi.h"
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
-#include "includes/at.h"
 #include "machine/8042kbdc.h"
 #include "machine/pit8253.h"
 #include "video/newport.h"
@@ -99,7 +98,7 @@ public:
 		TIMER_IP22_MSEC
 	};
 
-	ip22_state(const machine_config &mconfig, device_type type, std::string tag) :
+	ip22_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_wd33c93(*this, "wd33c93"),

@@ -54,7 +54,7 @@
 class cbm2_state : public driver_device
 {
 public:
-	cbm2_state(const machine_config &mconfig, device_type type, std::string tag)
+	cbm2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M6509_TAG),
 			m_pla1(*this, PLA1_TAG),
@@ -247,7 +247,7 @@ public:
 class cbm2hp_state : public cbm2_state
 {
 public:
-	cbm2hp_state(const machine_config &mconfig, device_type type, std::string tag)
+	cbm2hp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cbm2_state(mconfig, type, tag)
 	{ }
 
@@ -261,7 +261,7 @@ public:
 class p500_state : public cbm2_state
 {
 public:
-	p500_state(const machine_config &mconfig, device_type type, std::string tag)
+	p500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cbm2_state(mconfig, type, tag),
 			m_pla2(*this, PLA2_TAG),
 			m_vic(*this, MOS6569_TAG),

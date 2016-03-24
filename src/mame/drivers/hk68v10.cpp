@@ -191,7 +191,7 @@
 class hk68v10_state : public driver_device
 {
 public:
-hk68v10_state(const machine_config &mconfig, device_type type, std::string tag) :
+hk68v10_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device (mconfig, type, tag),
 		m_maincpu (*this, "maincpu")
 		,m_sccterm(*this, "scc")
@@ -243,7 +243,7 @@ INPUT_PORTS_END
 /* Start it up */
 void hk68v10_state::machine_start ()
 {
-		LOG (("%" I64FMT "d %s\n", m_maincpu->total_cycles(), __func__));
+		LOG (("%d %s\n", m_maincpu->total_cycles(), __func__));
 
 		/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
 	m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x0fc0000);
@@ -257,7 +257,7 @@ void hk68v10_state::machine_start ()
 */
 void hk68v10_state::machine_reset ()
 {
-		LOG (("%" I64FMT "d %s\n", m_maincpu->total_cycles(), __func__));
+		LOG (("%d %s\n", m_maincpu->total_cycles(), __func__));
 
 		/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
 		if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */

@@ -30,7 +30,7 @@ public:
 		TIMER_PAD_FUNC
 	};
 
-	pcfx_state(const machine_config &mconfig, device_type type, std::string tag)
+	pcfx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_huc6261(*this, "huc6261") { }

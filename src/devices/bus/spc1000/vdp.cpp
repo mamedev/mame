@@ -52,7 +52,7 @@ const device_type SPC1000_VDP_EXP = &device_creator<spc1000_vdp_exp_device>;
 //  spc1000_vdp_exp_device - constructor
 //-------------------------------------------------
 
-spc1000_vdp_exp_device::spc1000_vdp_exp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+spc1000_vdp_exp_device::spc1000_vdp_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, SPC1000_VDP_EXP, "SPC1000 VDP expansion", tag, owner, clock, "spc1000_vdp_exp", __FILE__),
 			device_spc1000_card_interface(mconfig, *this),
 			m_vdp(*this, "tms")

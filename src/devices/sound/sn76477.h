@@ -93,7 +93,7 @@ class sn76477_device : public device_t,
 						public device_sound_interface
 {
 public:
-	sn76477_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sn76477_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~sn76477_device() {}
 
 	static void set_noise_params(device_t &device, double clock_res, double filter_res, double filter_cap)
@@ -304,31 +304,6 @@ private:
 	inline UINT32 generate_next_real_noise_bit();
 
 	void state_save_register();
-
-	void _SN76477_enable_w(UINT32 data);
-	void _SN76477_vco_w(UINT32 data);
-	void _SN76477_mixer_a_w(UINT32 data);
-	void _SN76477_mixer_b_w(UINT32 data);
-	void _SN76477_mixer_c_w(UINT32 data);
-	void _SN76477_envelope_1_w(UINT32 data);
-	void _SN76477_envelope_2_w(UINT32 data);
-	void _SN76477_one_shot_res_w(double data);
-	void _SN76477_one_shot_cap_w(double data);
-	void _SN76477_slf_res_w(double data);
-	void _SN76477_slf_cap_w(double data);
-	void _SN76477_vco_res_w(double data);
-	void _SN76477_vco_cap_w(double data);
-	void _SN76477_vco_voltage_w(double data);
-	void _SN76477_noise_clock_res_w(double data);
-	void _SN76477_noise_filter_res_w(double data);
-	void _SN76477_noise_filter_cap_w(double data);
-	void _SN76477_decay_res_w(double data);
-	void _SN76477_attack_res_w(double data);
-	void _SN76477_attack_decay_cap_w(double data);
-	void _SN76477_amplitude_res_w(double data);
-	void _SN76477_feedback_res_w(double data);
-	void _SN76477_pitch_voltage_w(double data);
-	void SN76477_test_enable_w(UINT32 data);
 };
 
 extern const device_type SN76477;

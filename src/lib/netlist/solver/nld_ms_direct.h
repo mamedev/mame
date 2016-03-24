@@ -11,6 +11,7 @@
 #include <algorithm>
 
 #include "solver/nld_solver.h"
+#include "solver/vector_base.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -105,7 +106,7 @@ ATTR_HOT nl_double matrix_solver_direct_t<m_N, _storage_N>::compute_next_timeste
 		{
 			analog_net_t *n = m_nets[k];
 
-			const nl_double DD_n = (n->m_cur_Analog - m_last_V[k]);
+			const nl_double DD_n = (n->Q_Analog() - m_last_V[k]);
 			const nl_double hn = current_timestep();
 
 			nl_double DD2 = (DD_n / hn - n->m_DD_n_m_1 / n->m_h_n_m_1) / (hn + n->m_h_n_m_1);
@@ -206,8 +207,8 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 		{
 			if ((m_terms[i]->m_railstart - m_terms[i+1]->m_railstart) * sort_order < 0)
 			{
-				std::swap(m_terms[i],m_terms[i+1]);
-				m_nets.swap(i, i+1);
+				std::swap(m_terms[i], m_terms[i+1]);
+				std::swap(m_nets[i], m_nets[i+1]);
 			}
 		}
 
@@ -253,14 +254,14 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 			for (unsigned i = 0; i < t->m_railstart; i++)
 			{
 				if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
-					t->m_nzrd.add(other[i]);
+					t->m_nzrd.push_back(other[i]);
 				if (!t->m_nz.contains(other[i]))
-					t->m_nz.add(other[i]);
+					t->m_nz.push_back(other[i]);
 			}
 		}
 		psort_list(t->m_nzrd);
 
-		t->m_nz.add(k);     // add diagonal
+		t->m_nz.push_back(k);     // add diagonal
 		psort_list(t->m_nz);
 	}
 
@@ -283,7 +284,7 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 			if (touched[row][k])
 			{
 				if (!m_terms[k]->m_nzbd.contains(row))
-					m_terms[k]->m_nzbd.add(row);
+					m_terms[k]->m_nzbd.push_back(row);
 				for (unsigned col = k; col < N(); col++)
 					if (touched[k][col])
 						touched[row][col] = true;
@@ -409,8 +410,13 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 				const nl_double f1 = - A(j,i) * f;
 				if (f1 != NL_FCONST(0.0))
 				{
-					for (unsigned k = i+1; k < kN; k++)
-						A(j,k) += A(i,k) * f1;
+					nl_double * RESTRICT pi = &m_A[i][i+1];
+					nl_double * RESTRICT pj = &m_A[j][i+1];
+					vec_add_mult_scalar(kN-i-1,pj,f1,pi);
+					//for (unsigned k = i+1; k < kN; k++)
+					//	pj[k] = pj[k] + pi[k] * f1;
+					//for (unsigned k = i+1; k < kN; k++)
+						//A(j,k) += A(i,k) * f1;
 					m_RHS[j] += m_RHS[i] * f1;
 				}
 			}
@@ -430,10 +436,14 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 			{
 				const unsigned j = pb[jb];
 				const nl_double f1 = - A(j,i) * f;
+#if 0
+				nl_double * RESTRICT pi = &m_A[i][i+1];
+				nl_double * RESTRICT pj = &m_A[j][i+1];
+				vec_add_mult_scalar(kN-i-1,pi,f1,pj);
+#else
 				for (unsigned k = 0; k < e; k++)
-				{
 					A(j,p[k]) += A(i,p[k]) * f1;
-				}
+#endif
 				m_RHS[j] += m_RHS[i] * f1;
 			}
 		}
@@ -576,6 +586,8 @@ ATTR_HOT inline int matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(
 		m_RHS[i] = m_last_RHS[i];
 
 	this->LE_solve();
+
+	this->m_stat_calculations++;
 
 	return this->solve_non_dynamic(newton_raphson);
 }

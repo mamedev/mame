@@ -46,7 +46,7 @@ ioport_constructor vcs_wheel_device::device_input_ports() const
 //  vcs_wheel_device - constructor
 //-------------------------------------------------
 
-vcs_wheel_device::vcs_wheel_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+vcs_wheel_device::vcs_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VCS_WHEEL, "Atari / CBM Driving Wheel", tag, owner, clock, "vcs_wheel", __FILE__),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),

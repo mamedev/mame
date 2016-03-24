@@ -34,7 +34,7 @@
       1  | xxxxxxxx x------- | not used?
 */
 
-TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_targeth_screen0)
+TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_screen0)
 {
 	int data = m_videoram[tile_index << 1];
 	int data2 = m_videoram[(tile_index << 1) + 1];
@@ -43,7 +43,7 @@ TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_targeth_screen0)
 	SET_TILE_INFO_MEMBER(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
 }
 
-TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_targeth_screen1)
+TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_screen1)
 {
 	int data = m_videoram[(0x2000/2) + (tile_index << 1)];
 	int data2 = m_videoram[(0x2000/2) + (tile_index << 1) + 1];
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_targeth_screen1)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(targeth_state::targeth_vram_w)
+WRITE16_MEMBER(targeth_state::vram_w)
 {
 	m_videoram[offset] = data;
 	m_pant[(offset & 0x1fff) >> 12]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
@@ -73,8 +73,8 @@ WRITE16_MEMBER(targeth_state::targeth_vram_w)
 
 void targeth_state::video_start()
 {
-	m_pant[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_targeth_screen0),this),TILEMAP_SCAN_ROWS,16,16,64,32);
-	m_pant[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_targeth_screen1),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_screen0),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_screen1),this),TILEMAP_SCAN_ROWS,16,16,64,32);
 
 	m_pant[0]->set_transparent_pen(0);
 }
@@ -105,10 +105,9 @@ void targeth_state::video_start()
 
 void targeth_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
-	for (i = 3; i < (0x1000 - 6)/2; i += 4){
+	for (int i = 3; i < (0x1000 - 6)/2; i += 4){
 		int sx = m_spriteram[i+2] & 0x03ff;
 		int sy = (240 - (m_spriteram[i] & 0x00ff)) & 0x00ff;
 		int number = m_spriteram[i+3] & 0x3fff;
@@ -130,7 +129,7 @@ void targeth_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 ***************************************************************************/
 
-UINT32 targeth_state::screen_update_targeth(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 targeth_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* set scroll registers */
 	m_pant[0]->set_scrolly(0, m_vregs[0]);

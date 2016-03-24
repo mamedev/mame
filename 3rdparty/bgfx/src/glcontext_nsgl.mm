@@ -115,6 +115,8 @@ namespace bgfx { namespace gl
 		}
 
 		import();
+
+		g_internalData.context = m_context;
 	}
 
 	void GlContext::destroy()
@@ -125,8 +127,8 @@ namespace bgfx { namespace gl
 			[glView release];
 		}
 
-		m_view    = 0;
-		m_context = 0;
+		m_view    = NULL;
+		m_context = NULL;
 		bx::dlclose(s_opengl);
 	}
 

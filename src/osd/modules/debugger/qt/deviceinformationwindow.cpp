@@ -30,7 +30,7 @@ DeviceInformationWindow::~DeviceInformationWindow()
 void DeviceInformationWindow::fill_device_information()
 {
 	char title[4069];
-	sprintf(title, "Debug: Device %s", m_device->tag().c_str());
+	sprintf(title, "Debug: Device %s", m_device->tag());
 	setWindowTitle(title);
 
 
@@ -44,11 +44,11 @@ void DeviceInformationWindow::fill_device_information()
 	primaryFrame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
 	QGridLayout *gl1 = new QGridLayout(primaryFrame);
 	gl1->addWidget(new QLabel(QString("Tag"), primaryFrame), 0, 0);
-	gl1->addWidget(new QLabel(QString(m_device->tag().c_str()), primaryFrame), 0, 1);
+	gl1->addWidget(new QLabel(QString(m_device->tag()), primaryFrame), 0, 1);
 	gl1->addWidget(new QLabel(QString("Name"), primaryFrame), 1, 0);
-	gl1->addWidget(new QLabel(QString(m_device->name().c_str()), primaryFrame), 1, 1);
+	gl1->addWidget(new QLabel(QString(m_device->name()), primaryFrame), 1, 1);
 	gl1->addWidget(new QLabel(QString("Shortname"), primaryFrame), 2, 0);
-	gl1->addWidget(new QLabel(QString(m_device->shortname().c_str()), primaryFrame), 2, 1);
+	gl1->addWidget(new QLabel(QString(m_device->shortname()), primaryFrame), 2, 1);
 
 	int cpos = 3;
 	device_interface *intf = m_device->first_interface();
@@ -89,7 +89,7 @@ void DeviceInformationWindow::fill_device_information()
 	setCentralWidget(mainWindowFrame);
 }
 
-void DeviceInformationWindow::set_device(std::string tag)
+void DeviceInformationWindow::set_device(const char *tag)
 {
 	m_device = m_machine->device(tag);
 	if(!m_device)
@@ -99,7 +99,7 @@ void DeviceInformationWindow::set_device(std::string tag)
 
 const char *DeviceInformationWindow::device_tag() const
 {
-	return m_device->tag().c_str();
+	return m_device->tag();
 }
 
 

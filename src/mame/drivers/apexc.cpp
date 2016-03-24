@@ -15,7 +15,7 @@
 class apexc_state : public driver_device
 {
 public:
-	apexc_state(const machine_config &mconfig, device_type type, std::string tag)
+	apexc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -74,7 +74,7 @@ class apexc_cylinder_image_device : public device_t, public device_image_interfa
 {
 public:
 	// construction/destruction
-	apexc_cylinder_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_CYLINDER; }
@@ -100,7 +100,7 @@ private:
 
 const device_type APEXC_CYLINDER = &device_creator<apexc_cylinder_image_device>;
 
-apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, APEXC_CYLINDER, "APEXC Cylinder", tag, owner, clock, "apexc_cylinder_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -203,7 +203,7 @@ class apexc_tape_puncher_image_device : public device_t, public device_image_int
 {
 public:
 	// construction/destruction
-	apexc_tape_puncher_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
@@ -224,7 +224,7 @@ protected:
 
 const device_type APEXC_TAPE_PUNCHER = &device_creator<apexc_tape_puncher_image_device>;
 
-apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, APEXC_TAPE_PUNCHER, "APEXC Tape Puncher", tag, owner, clock, "apexc_tape_puncher_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -237,7 +237,7 @@ class apexc_tape_reader_image_device :  public device_t, public device_image_int
 {
 public:
 	// construction/destruction
-	apexc_tape_reader_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
@@ -258,7 +258,7 @@ protected:
 
 const device_type APEXC_TAPE_READER = &device_creator<apexc_tape_reader_image_device>;
 
-apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, APEXC_TAPE_READER, "APEXC Tape Reader", tag, owner, clock, "apexc_tape_reader_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {

@@ -26,7 +26,7 @@ BUGS:
 
 const device_type BETA_DISK = &device_creator<beta_disk_device>;
 
-beta_disk_device::beta_disk_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BETA_DISK, "Beta Disk Interface", tag, owner, clock, "betadisk", __FILE__)
 	, m_betadisk_active(0)
 	, m_wd179x(*this, "wd179x")
@@ -184,9 +184,13 @@ SLOT_INTERFACE_END
 static MACHINE_CONFIG_FRAGMENT( beta_disk )
 	MCFG_KR1818VG93_ADD("wd179x", XTAL_8MHz / 8)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", beta_disk_floppies, "drive0", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:1", beta_disk_floppies, "drive1", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:2", beta_disk_floppies, "drive2", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:3", beta_disk_floppies, "drive3", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 ROM_START( beta_disk )

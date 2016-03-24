@@ -1,4 +1,5 @@
-
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 #define NETLIST_DEVELOPMENT 1
 
 #include "netlist/nl_dice_compat.h"

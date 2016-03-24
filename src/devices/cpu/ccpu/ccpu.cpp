@@ -62,7 +62,7 @@ do { \
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-ccpu_cpu_device::ccpu_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ccpu_cpu_device::ccpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, CCPU, "Cinematronics CPU", tag, owner, clock, "ccpu", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 15, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 32, -1)
@@ -145,7 +145,7 @@ void ccpu_cpu_device::state_string_export(const device_state_entry &entry, std::
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c",
 					TEST_A0 ? '0' : 'o',
 					TEST_NC ? 'N' : 'n',
 					TEST_LT ? 'L' : 'l',

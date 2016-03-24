@@ -10,16 +10,16 @@ const device_type H8_ADC_2320 = &device_creator<h8_adc_2320_device>;
 const device_type H8_ADC_2357 = &device_creator<h8_adc_2357_device>;
 const device_type H8_ADC_2655 = &device_creator<h8_adc_2655_device>;
 
-h8_adc_device::h8_adc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+h8_adc_device::h8_adc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	cpu(*this, DEVICE_SELF_OWNER), intc(nullptr), io(nullptr), intc_vector(0), adcsr(0), adcr(0), register_mask(0), trigger(0), start_mode(0), start_channel(0),
+	cpu(*this, DEVICE_SELF_OWNER), intc(nullptr), io(nullptr), intc_tag(nullptr), intc_vector(0), adcsr(0), adcr(0), register_mask(0), trigger(0), start_mode(0), start_channel(0),
 	end_channel(0), start_count(0), mode(0), channel(0), count(0), analog_powered(false), adtrg(false), next_event(0)
 {
 	suspend_on_interrupt = false;
 	analog_power_control = false;
 }
 
-void h8_adc_device::set_info(std::string _intc_tag, int _intc_vector)
+void h8_adc_device::set_info(const char *_intc_tag, int _intc_vector)
 {
 	intc_tag = _intc_tag;
 	intc_vector = _intc_vector;
@@ -27,31 +27,31 @@ void h8_adc_device::set_info(std::string _intc_tag, int _intc_vector)
 
 READ8_MEMBER(h8_adc_device::addr8_r)
 {
-	logerror("%s: addr8_r %d %03x\n", tag().c_str(), offset, addr[offset >> 1]);
+	logerror("%s: addr8_r %d %03x\n", tag(), offset, addr[offset >> 1]);
 	return offset & 1 ? addr[offset >> 1] >> 2 : addr[offset >> 1] << 6;
 }
 
 READ16_MEMBER(h8_adc_device::addr16_r)
 {
-	logerror("%s: addr16_r %d %03x\n", tag().c_str(), offset, addr[offset]);
+	logerror("%s: addr16_r %d %03x\n", tag(), offset, addr[offset]);
 	return addr[offset];
 }
 
 READ8_MEMBER(h8_adc_device::adcsr_r)
 {
-	logerror("%s: adcsr_r %02x\n", tag().c_str(), adcsr);
+	logerror("%s: adcsr_r %02x\n", tag(), adcsr);
 	return adcsr;
 }
 
 READ8_MEMBER(h8_adc_device::adcr_r)
 {
-	logerror("%s: adcr_r %02x\n", tag().c_str(), adcr);
+	logerror("%s: adcr_r %02x\n", tag(), adcr);
 	return adcr;
 }
 
 WRITE8_MEMBER(h8_adc_device::adcsr_w)
 {
-	logerror("%s: adcsr_w %02x\n", tag().c_str(), data);
+	logerror("%s: adcsr_w %02x\n", tag(), data);
 	UINT8 prev = adcsr;
 	adcsr = (data & 0x7f) | (adcsr & data & F_ADF);
 	mode_update();
@@ -72,7 +72,7 @@ WRITE8_MEMBER(h8_adc_device::adcsr_w)
 
 WRITE8_MEMBER(h8_adc_device::adcr_w)
 {
-	logerror("%s: adcr_w %02x\n", tag().c_str(), data);
+	logerror("%s: adcr_w %02x\n", tag(), data);
 	adcr = data;
 	mode_update();
 }
@@ -163,13 +163,13 @@ void h8_adc_device::conversion_wait(bool first, bool poweron, UINT64 current_tim
 void h8_adc_device::buffer_value(int port, int buffer)
 {
 	buf[buffer] = io->read_word(2*(h8_device::ADC_0 + port));
-	logerror("%s: adc buffer %d -> %d:%03x\n", tag().c_str(), port, buffer, buf[buffer]);
+	logerror("%s: adc buffer %d -> %d:%03x\n", tag(), port, buffer, buf[buffer]);
 }
 
 void h8_adc_device::commit_value(int reg, int buffer)
 {
 	reg &= register_mask;
-	logerror("%s: adc commit %d -> %d:%03x\n", tag().c_str(), buffer, reg, buf[buffer]);
+	logerror("%s: adc commit %d -> %d:%03x\n", tag(), buffer, reg, buf[buffer]);
 	addr[reg] = buf[buffer];
 }
 
@@ -257,16 +257,16 @@ void h8_adc_device::timeout(UINT64 current_time)
 
 void h8_adc_device::do_buffering(int buffer)
 {
-	throw emu_fatalerror("%s: Buffering requested but unimplemented for this device\n", tag().c_str());
+	throw emu_fatalerror("%s: Buffering requested but unimplemented for this device\n", tag());
 }
 
 int h8_adc_device::get_channel_index(int count)
 {
-	throw emu_fatalerror("%s: Indexing requested but unimplemented for this device\n", tag().c_str());
+	throw emu_fatalerror("%s: Indexing requested but unimplemented for this device\n", tag());
 }
 
 
-h8_adc_3337_device::h8_adc_3337_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8_adc_3337_device::h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8_adc_device(mconfig, H8_ADC_3337, "H8 ADC 3337", tag, owner, clock, "h8_adc_3337", __FILE__)
 {
 	register_mask = 3;
@@ -297,7 +297,7 @@ void h8_adc_3337_device::mode_update()
 }
 
 
-h8_adc_3006_device::h8_adc_3006_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8_adc_3006_device::h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8_adc_device(mconfig, H8_ADC_3006, "H8 ADC 3006", tag, owner, clock, "h8_adc_3006", __FILE__)
 {
 	register_mask = 3;
@@ -328,7 +328,7 @@ void h8_adc_3006_device::mode_update()
 }
 
 
-h8_adc_2245_device::h8_adc_2245_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8_adc_2245_device::h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8_adc_device(mconfig, H8_ADC_2245, "H8 ADC 2245", tag, owner, clock, "h8_adc_2245", __FILE__)
 {
 	register_mask = 3;
@@ -359,7 +359,7 @@ void h8_adc_2245_device::mode_update()
 }
 
 
-h8_adc_2320_device::h8_adc_2320_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8_adc_2320_device::h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8_adc_device(mconfig, H8_ADC_2320, "H8 ADC 2320", tag, owner, clock, "h8_adc_2320", __FILE__)
 {
 	register_mask = 3;
@@ -396,7 +396,7 @@ void h8_adc_2320_device::mode_update()
 }
 
 
-h8_adc_2357_device::h8_adc_2357_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8_adc_2357_device::h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8_adc_device(mconfig, H8_ADC_2357, "H8 ADC 2357", tag, owner, clock, "h8_adc_2357", __FILE__)
 {
 	register_mask = 3;
@@ -427,7 +427,7 @@ void h8_adc_2357_device::mode_update()
 }
 
 
-h8_adc_2655_device::h8_adc_2655_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+h8_adc_2655_device::h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	h8_adc_device(mconfig, H8_ADC_2655, "H8 ADC 2655", tag, owner, clock, "h8_adc_2655", __FILE__)
 {
 	suspend_on_interrupt = true;

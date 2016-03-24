@@ -1,4 +1,4 @@
-// license:GPL2+
+// license:GPL-2.0+
 // copyright-holders:FelipeSanches
 /*
  * canon_s80.c
@@ -23,7 +23,7 @@
 class canons80_state : public driver_device
 {
 public:
-	canons80_state(const machine_config &mconfig, device_type type, std::string tag)
+	canons80_state(const machine_config &mconfig, device_type type, const char *tag)
 			: driver_device(mconfig, type, tag)
 			{ }
 

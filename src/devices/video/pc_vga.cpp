@@ -125,71 +125,71 @@ const device_type ATI_VGA = &device_creator<ati_vga_device>;
 const device_type IBM8514A = &device_creator<ibm8514a_device>;
 const device_type MACH8 = &device_creator<mach8_device>;
 
-vga_device::vga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+vga_device::vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_palette(*this, "^palette"),
 		m_screen(*this,"^screen")
 {
 }
 
-vga_device::vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+vga_device::vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VGA, "VGA", tag, owner, clock, "vga", __FILE__),
 		m_palette(*this, "^palette"),
 		m_screen(*this,"^screen")
 {
 }
 
-svga_device::svga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+svga_device::svga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-tseng_vga_device::tseng_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: svga_device(mconfig, TSENG_VGA, "TSENG LABS VGA", tag, owner, clock, "tseng_vga", __FILE__)
 {
 }
 
-s3_vga_device::s3_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+s3_vga_device::s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ati_vga_device(mconfig, S3_VGA, "S3 Graphics VGA", tag, owner, clock, "s3_vga", __FILE__)
 {
 }
 
-s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: ati_vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: svga_device(mconfig, GAMTOR_VGA, "GAMTOR VGA", tag, owner, clock, "gamtor_vga", __FILE__)
 {
 }
 
-ati_vga_device::ati_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ati_vga_device::ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: svga_device(mconfig, ATI_VGA, "ATI VGA", tag, owner, clock, "ati_vga", __FILE__)
 {
 }
 
-ati_vga_device::ati_vga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+ati_vga_device::ati_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: svga_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-ibm8514a_device::ibm8514a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ibm8514a_device::ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, IBM8514A, "IBM8514A Video", tag, owner, clock, "ibm8514a", __FILE__)
 {
 }
 
-ibm8514a_device::ibm8514a_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+ibm8514a_device::ibm8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-mach8_device::mach8_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+mach8_device::mach8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: ibm8514a_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-mach8_device::mach8_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mach8_device::mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ibm8514a_device(mconfig, MACH8, "MACH8", tag, owner, clock, "mach8", __FILE__)
 {
 }
@@ -220,6 +220,17 @@ void svga_device::zero()
 TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
 {
 	vga.crtc.start_addr = vga.crtc.start_addr_latch;
+	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
+	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
+}
+
+TIMER_CALLBACK_MEMBER(s3_vga_device::vblank_timer_cb)
+{
+	// not sure if this is correct, but XF86_S3 seems to expect the viewport scrolling to be faster
+	if(s3.memory_config & 0x08)
+		vga.crtc.start_addr = vga.crtc.start_addr_latch << 2;
+	else
+		vga.crtc.start_addr = vga.crtc.start_addr_latch;
 	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
 	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }
@@ -1051,50 +1062,53 @@ UINT32 s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 //          printf("%08x: %02x %02x %02x %02x\n",src+x*4,vga.memory[src+x*4],vga.memory[src+x*4+1],vga.memory[src+x*4+2],vga.memory[src+x*4+3]);
 		for(y=0;y<64;y++)
 		{
-			dst = &bitmap.pix32(cy + y, cx);
-			for(x=0;x<64;x++)
+			if(cy + y < cliprect.max_y && cx < cliprect.max_x)
 			{
-				UINT16 bita = (vga.memory[(src+1) % vga.svga_intf.vram_size] | ((vga.memory[(src+0) % vga.svga_intf.vram_size]) << 8)) >> (15-(x % 16));
-				UINT16 bitb = (vga.memory[(src+3) % vga.svga_intf.vram_size] | ((vga.memory[(src+2) % vga.svga_intf.vram_size]) << 8)) >> (15-(x % 16));
-				val = ((bita & 0x01) << 1) | (bitb & 0x01);
-				if(s3.extended_dac_ctrl & 0x10)
-				{  // X11 mode
-					switch(val)
-					{
-					case 0x00:
-						// no change
-						break;
-					case 0x01:
-						// no change
-						break;
-					case 0x02:
-						dst[x] = bg_col;
-						break;
-					case 0x03:
-						dst[x] = fg_col;
-						break;
+				dst = &bitmap.pix32(cy + y, cx);
+				for(x=0;x<64;x++)
+				{
+					UINT16 bita = (vga.memory[(src+1) % vga.svga_intf.vram_size] | ((vga.memory[(src+0) % vga.svga_intf.vram_size]) << 8)) >> (15-(x % 16));
+					UINT16 bitb = (vga.memory[(src+3) % vga.svga_intf.vram_size] | ((vga.memory[(src+2) % vga.svga_intf.vram_size]) << 8)) >> (15-(x % 16));
+					val = ((bita & 0x01) << 1) | (bitb & 0x01);
+					if(s3.extended_dac_ctrl & 0x10)
+					{  // X11 mode
+						switch(val)
+						{
+						case 0x00:
+							// no change
+							break;
+						case 0x01:
+							// no change
+							break;
+						case 0x02:
+							dst[x] = bg_col;
+							break;
+						case 0x03:
+							dst[x] = fg_col;
+							break;
+						}
 					}
-				}
-				else
-				{  // Windows mode
-					switch(val)
-					{
-					case 0x00:
-						dst[x] = bg_col;
-						break;
-					case 0x01:
-						dst[x] = fg_col;
-						break;
-					case 0x02:  // screen data
-						// no change
-						break;
-					case 0x03:  // inverted screen data
-						dst[x] = ~(dst[x]);
-						break;
+					else
+					{  // Windows mode
+						switch(val)
+						{
+						case 0x00:
+							dst[x] = bg_col;
+							break;
+						case 0x01:
+							dst[x] = fg_col;
+							break;
+						case 0x02:  // screen data
+							// no change
+							break;
+						case 0x03:  // inverted screen data
+							dst[x] = ~(dst[x]);
+							break;
+						}
 					}
+					if(x % 16 == 15)
+						src+=4;
 				}
-				if(x % 16 == 15)
-					src+=4;
 			}
 		}
 	}
@@ -3388,7 +3402,6 @@ void ibm8514a_device::ibm8514_write(UINT32 offset, UINT32 src)
 {
 	int data_size = 8;
 	UINT32 xfer;
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch(ibm8514.pixel_control & 0x00c0)
 	{
@@ -3428,6 +3441,7 @@ void ibm8514a_device::ibm8514_write(UINT32 offset, UINT32 src)
 			ibm8514.src_x = 0;
 		break;
 	case 0x00c0:  // use source plane
+		address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 		if(m_vga->mem_linear_r(space,src,0xff) != 0x00)
 			ibm8514_write_fg(offset);
 		else

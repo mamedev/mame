@@ -101,7 +101,7 @@ class vega_state : public driver_device
 {
 public:
 
-	vega_state(const machine_config &mconfig, device_type type, std::string tag)
+	vega_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_i8255(*this, "ppi8255"),

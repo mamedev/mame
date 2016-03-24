@@ -53,7 +53,7 @@ Standard dm01 memorymap
 
 const device_type BF_DM01 = &device_creator<bfmdm01_device>;
 
-bfmdm01_device::bfmdm01_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+bfmdm01_device::bfmdm01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BF_DM01, "BFM Dotmatrix 01", tag, owner, clock, "bfm_dm01", __FILE__),
 	m_data_avail(0),
 	m_control(0),

@@ -462,7 +462,7 @@
 class majorpkr_state : public driver_device
 {
 public:
-	majorpkr_state(const machine_config &mconfig, device_type type, std::string tag)
+	majorpkr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette_bank(*this, "palette_bank"),

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Derrick Renaud
+// copyright-holders:Derrick Renaud,Hans Andersson
 /***************************************************************************
 
     Sigma Spiders hardware

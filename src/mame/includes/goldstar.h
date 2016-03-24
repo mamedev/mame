@@ -8,7 +8,7 @@
 class goldstar_state : public driver_device
 {
 public:
-	goldstar_state(const machine_config &mconfig, device_type type, std::string tag) :
+	goldstar_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_fg_vidram(*this, "fg_vidram"),
 		m_fg_atrram(*this, "fg_atrram"),
@@ -96,7 +96,7 @@ protected:
 class cmaster_state : public goldstar_state
 {
 public:
-	cmaster_state(const machine_config &mconfig, device_type type, std::string tag) :
+	cmaster_state(const machine_config &mconfig, device_type type, const char *tag) :
 		goldstar_state(mconfig, type, tag)
 	{
 	}
@@ -122,6 +122,7 @@ public:
 	DECLARE_DRIVER_INIT(rp35);
 	DECLARE_DRIVER_INIT(rp36);
 	DECLARE_DRIVER_INIT(rp36c3);
+	DECLARE_DRIVER_INIT(rp96sub);
 
 	UINT32 screen_update_amcoe1a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -152,7 +153,7 @@ protected:
 class wingco_state : public goldstar_state
 {
 public:
-	wingco_state(const machine_config &mconfig, device_type type, std::string tag) :
+	wingco_state(const machine_config &mconfig, device_type type, const char *tag) :
 		goldstar_state(mconfig, type, tag)
 	{
 	}
@@ -188,7 +189,7 @@ private:
 class cb3_state : public goldstar_state
 {
 public:
-	cb3_state(const machine_config &mconfig, device_type type, std::string tag) :
+	cb3_state(const machine_config &mconfig, device_type type, const char *tag) :
 		goldstar_state(mconfig, type, tag)
 	{
 	}
@@ -211,7 +212,7 @@ protected:
 class sanghopm_state : public goldstar_state
 {
 public:
-	sanghopm_state(const machine_config &mconfig, device_type type, std::string tag) :
+	sanghopm_state(const machine_config &mconfig, device_type type, const char *tag) :
 		goldstar_state(mconfig, type, tag),
 		m_reel1_attrram(*this, "reel1_attrram"),
 		m_reel2_attrram(*this, "reel2_attrram"),
@@ -252,7 +253,7 @@ private:
 class unkch_state : public goldstar_state
 {
 public:
-	unkch_state(const machine_config &mconfig, device_type type, std::string tag) :
+	unkch_state(const machine_config &mconfig, device_type type, const char *tag) :
 		goldstar_state(mconfig, type, tag),
 		m_reel1_attrram(*this, "reel1_attrram"),
 		m_reel2_attrram(*this, "reel2_attrram"),

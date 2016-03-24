@@ -68,45 +68,45 @@ const device_type ASTROCADE_WHITERAM    = &device_creator<astrocade_whiteram_dev
 const device_type ASTROCADE_RL64RAM     = &device_creator<astrocade_rl64ram_device>;
 
 
-astrocade_blueram_4k_device::astrocade_blueram_4k_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+astrocade_blueram_4k_device::astrocade_blueram_4k_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_astrocade_card_interface(mconfig, *this),
 						m_write_prot(*this, "RAM_PROTECT")
 {
 }
 
-astrocade_blueram_4k_device::astrocade_blueram_4k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+astrocade_blueram_4k_device::astrocade_blueram_4k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, ASTROCADE_BLUERAM_4K, "Bally Astrocade Blue RAM 4K", tag, owner, clock, "astrocade_br4", __FILE__),
 						device_astrocade_card_interface(mconfig, *this),
 						m_write_prot(*this, "RAM_PROTECT")
 {
 }
 
-astrocade_blueram_16k_device::astrocade_blueram_16k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+astrocade_blueram_16k_device::astrocade_blueram_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: astrocade_blueram_4k_device(mconfig, ASTROCADE_BLUERAM_16K, "Bally Astrocade Blue RAM 16K", tag, owner, clock, "astrocade_br16", __FILE__)
 {
 }
 
-astrocade_blueram_32k_device::astrocade_blueram_32k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+astrocade_blueram_32k_device::astrocade_blueram_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: astrocade_blueram_4k_device(mconfig, ASTROCADE_BLUERAM_32K, "Bally Astrocade Blue RAM 32K", tag, owner, clock, "astrocade_br32", __FILE__)
 {
 }
 
-astrocade_viper_sys1_device::astrocade_viper_sys1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+astrocade_viper_sys1_device::astrocade_viper_sys1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, ASTROCADE_VIPER_SYS1, "Bally Astrocade Viper System 1", tag, owner, clock, "astrocade_vs1", __FILE__),
 						device_astrocade_card_interface(mconfig, *this),
 						m_write_prot(*this, "RAM_PROTECT")
 {
 }
 
-astrocade_whiteram_device::astrocade_whiteram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+astrocade_whiteram_device::astrocade_whiteram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, ASTROCADE_WHITERAM, "Bally Astrocade Lil' White RAM 32K", tag, owner, clock, "astrocade_lwr", __FILE__),
 						device_astrocade_card_interface(mconfig, *this),
 						m_write_prot(*this, "RAM_PROTECT")
 {
 }
 
-astrocade_rl64ram_device::astrocade_rl64ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+astrocade_rl64ram_device::astrocade_rl64ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, ASTROCADE_RL64RAM, "Bally Astrocade R&L RAM 64K", tag, owner, clock, "astrocade_rl64", __FILE__),
 						device_astrocade_card_interface(mconfig, *this),
 						m_write_prot(*this, "RAM_PROTECT")

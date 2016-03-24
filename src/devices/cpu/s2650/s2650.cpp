@@ -31,7 +31,7 @@
 const device_type S2650 = &device_creator<s2650_device>;
 
 
-s2650_device::s2650_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+s2650_device::s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, S2650, "S2650", tag, owner, clock, "s2650", __FILE__ )
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 15)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 9)
@@ -881,7 +881,7 @@ void s2650_device::state_string_export(const device_state_entry &entry, std::str
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				m_psu & 0x80 ? 'S':'.',
 				m_psu & 0x40 ? 'O':'.',
 				m_psu & 0x20 ? 'I':'.',

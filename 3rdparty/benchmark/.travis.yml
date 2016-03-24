@@ -1,0 +1,41 @@
+language: cpp
+
+# NOTE: The COMPILER variable is unused. It simply makes the display on
+# travis-ci.org more readable.
+matrix:
+    include:
+        - compiler: gcc
+          env: COMPILER=g++-4.6     STD=c++0x BUILD_TYPE=Coverage
+        - compiler: gcc
+          env: COMPILER=g++-4.6     STD=c++0x BUILD_TYPE=Debug
+        - compiler: gcc
+          env: COMPILER=g++-4.6     STD=c++0x BUILD_TYPE=Release
+        - compiler: gcc
+          env: COMPILER=g++-4.8     STD=c++11 BUILD_TYPE=Debug
+        - compiler: gcc
+          env: COMPILER=g++-4.8     STD=c++11 BUILD_TYPE=Release
+        - compiler: clang
+          env: COMPILER=clang++-3.6 STD=c++11 BUILD_TYPE=Debug
+        - compiler: clang
+          env: COMPILER=clang++-3.6 STD=c++11 BUILD_TYPE=Release
+
+before_script:
+    - source .travis-setup.sh
+    - mkdir build && cd build
+
+install:
+  - if [ "${BUILD_TYPE}" == "Coverage" -a "${TRAVIS_OS_NAME}" == "linux" ]; then
+      PATH=~/.local/bin:${PATH};
+      pip install --user --upgrade pip;
+      pip install --user cpp-coveralls;
+    fi
+
+script:
+    - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS="-std=${STD}"
+    - make
+    - make CTEST_OUTPUT_ON_FAILURE=1 test
+
+after_success:
+  - if [ "${BUILD_TYPE}" == "Coverage" -a "${TRAVIS_OS_NAME}" == "linux" ]; then
+      coveralls --include src --include include --gcov-options '\-lp' --root .. --build-root .;
+    fi

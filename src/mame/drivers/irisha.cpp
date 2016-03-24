@@ -27,7 +27,7 @@
 class irisha_state : public driver_device
 {
 public:
-	irisha_state(const machine_config &mconfig, device_type type, std::string tag) :
+	irisha_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -400,7 +400,7 @@ static MACHINE_CONFIG_START( irisha, irisha_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", irisha)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

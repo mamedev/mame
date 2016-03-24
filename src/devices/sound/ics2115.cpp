@@ -17,7 +17,7 @@
 // device type definition
 const device_type ICS2115 = &device_creator<ics2115_device>;
 
-ics2115_device::ics2115_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ICS2115, "ICS2115", tag, owner, clock, "ics2115", __FILE__),
 		device_sound_interface(mconfig, *this), m_stream(nullptr),
 		m_rom(*this, DEVICE_SELF),

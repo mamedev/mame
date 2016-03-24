@@ -43,22 +43,22 @@ const device_type NES_TENGEN_800032 = &device_creator<nes_tengen032_device>;
 const device_type NES_TENGEN_800037 = &device_creator<nes_tengen037_device>;
 
 
-nes_tengen008_device::nes_tengen008_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_tengen008_device::nes_tengen008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_TENGEN_800008, "NES Cart Tengen 800008 PCB", tag, owner, clock, "nes_tengen008", __FILE__)
 {
 }
 
-nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_reset(0), m_irq_enable(0), m_latch(0), irq_timer(nullptr)
 				{
 }
 
-nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_TENGEN_800032, "NES Cart Tengen 800032 PCB", tag, owner, clock, "nes_tengen032", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_reset(0), m_irq_enable(0), m_latch(0), irq_timer(nullptr)
 {
 }
 
-nes_tengen037_device::nes_tengen037_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_tengen037_device::nes_tengen037_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_tengen032_device(mconfig, NES_TENGEN_800037, "NES Cart Tengen 800037 PCB", tag, owner, clock, "nes_tengen037", __FILE__)
 {
 }

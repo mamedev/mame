@@ -75,7 +75,7 @@ TODO:
 const device_type MINX = &device_creator<minx_cpu_device>;
 
 
-minx_cpu_device::minx_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+minx_cpu_device::minx_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, MINX, "Nintendo Minx", tag, owner, clock, "minx", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 24, 0)
 {
@@ -126,7 +126,7 @@ void minx_cpu_device::state_string_export(const device_state_entry &entry, std::
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c-%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c-%c%c%c%c%c",
 				m_F & FLAG_I ? 'I' : '.',
 				m_F & FLAG_D ? 'D' : '.',
 				m_F & FLAG_L ? 'L' : '.',

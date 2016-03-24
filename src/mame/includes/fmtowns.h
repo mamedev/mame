@@ -78,7 +78,7 @@ struct towns_video_controller
 class towns_state : public driver_device
 {
 	public:
-	towns_state(const machine_config &mconfig, device_type type, std::string tag)
+	towns_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_speaker(*this, "speaker"),
@@ -363,7 +363,7 @@ public:
 class towns16_state : public towns_state
 {
 	public:
-	towns16_state(const machine_config &mconfig, device_type type, std::string tag)
+	towns16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: towns_state(mconfig, type, tag)
 	{ }
 };
@@ -371,7 +371,7 @@ class towns16_state : public towns_state
 class marty_state : public towns_state
 {
 	public:
-	marty_state(const machine_config &mconfig, device_type type, std::string tag)
+	marty_state(const machine_config &mconfig, device_type type, const char *tag)
 		: towns_state(mconfig, type, tag)
 	{ }
 

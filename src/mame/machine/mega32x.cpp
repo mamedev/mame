@@ -204,7 +204,7 @@ GFX check (these don't explicitly fails):
 const device_type SEGA_32X_NTSC = &device_creator<sega_32x_ntsc_device>;
 const device_type SEGA_32X_PAL = &device_creator<sega_32x_pal_device>;
 
-sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_master_cpu(*this, "32x_master_sh2"),
 		m_slave_cpu(*this, "32x_slave_sh2"),
@@ -215,12 +215,12 @@ sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type
 {
 }
 
-sega_32x_ntsc_device::sega_32x_ntsc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_32x_ntsc_device::sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_32x_device(mconfig, SEGA_32X_NTSC, "sega_32x_ntsc", tag, owner, clock, "sega_32x_ntsc", __FILE__)
 {
 }
 
-sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_32x_device(mconfig, SEGA_32X_PAL, "sega_32x_pal", tag, owner, clock, "sega_32x_pal", __FILE__)
 {
 }
@@ -230,13 +230,10 @@ sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, std::str
 //  palette device
 //-------------------------------------------------
 
-void sega_32x_device::static_set_palette_tag(device_t &device, std::string tag)
+void sega_32x_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<sega_32x_device &>(device).m_palette.set_tag(tag);
 }
-
-TIMER_CALLBACK( _32x_pwm_callback );
-
 
 
 READ16_MEMBER( sega_32x_device::_32x_68k_palette_r )
@@ -817,7 +814,7 @@ void sega_32x_device::calculate_pwm_timer()
 }
 
 
-void sega_32x_device::handle_pwm_callback()
+TIMER_CALLBACK_MEMBER(sega_32x_device::handle_pwm_callback)
 {
 	if(m_lch_index_r < PWM_FIFO_SIZE)
 	{
@@ -859,12 +856,6 @@ void sega_32x_device::handle_pwm_callback()
 	}
 
 	m_32x_pwm_timer->adjust(attotime::from_hz((PWM_CLOCK) / (m_pwm_cycle - 1)));
-}
-
-TIMER_CALLBACK( _32x_pwm_callback )
-{
-	sega_32x_device* _32xdev = (sega_32x_device*)ptr;
-	_32xdev->handle_pwm_callback();
 }
 
 READ16_MEMBER( sega_32x_device::_32x_pwm_r )
@@ -1832,7 +1823,7 @@ machine_config_constructor sega_32x_pal_device::device_mconfig_additions() const
 
 void sega_32x_device::device_start()
 {
-	m_32x_pwm_timer = machine().scheduler().timer_alloc(FUNC(_32x_pwm_callback), (void*)this);
+	m_32x_pwm_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega_32x_device::handle_pwm_callback), this));
 	m_32x_pwm_timer->adjust(attotime::never);
 
 	m_32x_dram0 = std::make_unique<UINT16[]>(0x40000/2);

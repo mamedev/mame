@@ -32,7 +32,7 @@ ToDo:
 class ampro_state : public driver_device
 {
 public:
-	ampro_state(const machine_config &mconfig, device_type type, std::string tag)
+	ampro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_dart(*this, "z80dart")

@@ -58,15 +58,15 @@ class dynamic_bind
 public:
 	// constructor which looks up the function
 	dynamic_bind(const TCHAR *dll, const char *symbol)
-		: m_function(NULL)
+		: m_function(nullptr)
 	{
 		HMODULE module = LoadLibrary(dll);
-		if (module != NULL)
+		if (module != nullptr)
 			m_function = reinterpret_cast<_FunctionPtr>(GetProcAddress(module, symbol));
 	}
 
-	// bool to test if the function is NULL or not
-	operator bool() const { return (m_function != NULL); }
+	// bool to test if the function is nullptr or not
+	operator bool() const { return (m_function != nullptr); }
 
 	// dereference to get the underlying pointer
 	_FunctionPtr operator *() const { return m_function; }
@@ -132,14 +132,14 @@ private:
 	bool parse_sym_line(const char *line, FPTR &address, std::string &symbol);
 	bool parse_map_line(const char *line, FPTR &address, std::string &symbol);
 	void scan_cache_for_address(FPTR address);
-	void format_symbol(const char *name, UINT32 displacement, const char *filename = NULL, int linenumber = 0);
+	void format_symbol(const char *name, UINT32 displacement, const char *filename = nullptr, int linenumber = 0);
 
 	static FPTR get_text_section_base();
 
 	struct cache_entry
 	{
 		cache_entry(FPTR address, const char *symbol) :
-			m_next(NULL), m_address(address), m_name(symbol) { }
+			m_next(nullptr), m_address(address), m_name(symbol) { }
 		cache_entry *next() const { return m_next; }
 
 		cache_entry *   m_next;
@@ -206,11 +206,11 @@ public:
 			char buffer[1024];
 
 			// if we are in fullscreen mode, go to windowed mode
-			if ((video_config.windowed == 0) && (win_window_list != NULL))
+			if ((video_config.windowed == 0) && (win_window_list != nullptr))
 				winwindow_toggle_full_screen();
 
 			vsnprintf(buffer, ARRAY_LENGTH(buffer), msg, args);
-			win_message_box_utf8(win_window_list ? win_window_list->m_hwnd : NULL, buffer, emulator_info::get_appname(), MB_OK);
+			win_message_box_utf8(win_window_list ? win_window_list->m_hwnd : nullptr, buffer, emulator_info::get_appname(), MB_OK);
 		}
 		else
 			chain_output(channel, msg, args);
@@ -242,8 +242,8 @@ static running_machine *g_current_machine;
 static int timeresult = !TIMERR_NOERROR;
 static TIMECAPS timecaps;
 
-static sampling_profiler *profiler = NULL;
-static symbol_manager *symbols = NULL;
+static sampling_profiler *profiler = nullptr;
+static symbol_manager *symbols = nullptr;
 
 bool stack_walker::s_initialized = false;
 
@@ -267,25 +267,19 @@ static LONG WINAPI exception_filter(struct _EXCEPTION_POINTERS *info);
 const options_entry windows_options::s_option_entries[] =
 {
 	// performance options
-	{ NULL,                                           NULL,       OPTION_HEADER,     "WINDOWS PERFORMANCE OPTIONS" },
+	{ nullptr,                                        nullptr,    OPTION_HEADER,     "WINDOWS PERFORMANCE OPTIONS" },
 	{ WINOPTION_PRIORITY "(-15-1)",                   "0",        OPTION_INTEGER,    "thread priority for the main game thread; range from -15 to 1" },
 	{ WINOPTION_PROFILE,                              "0",        OPTION_INTEGER,    "enables profiling, specifying the stack depth to track" },
 
 	// video options
-	{ NULL,                                           NULL,       OPTION_HEADER,     "WINDOWS VIDEO OPTIONS" },
+	{ nullptr,                                        nullptr,    OPTION_HEADER,     "WINDOWS VIDEO OPTIONS" },
 	{ WINOPTION_MENU,                                 "0",        OPTION_BOOLEAN,    "enables menu bar if available by UI implementation" },
 
-	// DirectDraw-specific options
-	{ NULL,                                           NULL,       OPTION_HEADER,     "DIRECTDRAW-SPECIFIC OPTIONS" },
-	{ WINOPTION_HWSTRETCH ";hws",                     "1",        OPTION_BOOLEAN,    "enables hardware stretching" },
-
 	// post-processing options
-	{ NULL,                                                     NULL,                OPTION_HEADER,     "DIRECT3D POST-PROCESSING OPTIONS" },
+	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "DIRECT3D POST-PROCESSING OPTIONS" },
 	{ WINOPTION_HLSL_ENABLE";hlsl",                             "0",                 OPTION_BOOLEAN,    "enables HLSL post-processing (PS3.0 required)" },
 	{ WINOPTION_HLSLPATH,                                       "hlsl",              OPTION_STRING,     "path to hlsl files" },
-	{ WINOPTION_HLSL_PRESCALE_X,                                "0",                 OPTION_INTEGER,    "HLSL pre-scale override factor for X (0 for auto)" },
-	{ WINOPTION_HLSL_PRESCALE_Y,                                "0",                 OPTION_INTEGER,    "HLSL pre-scale override factor for Y (0 for auto)" },
-	{ WINOPTION_HLSL_WRITE,                                     NULL,                OPTION_STRING,     "enables HLSL AVI writing (huge disk bandwidth suggested)" },
+	{ WINOPTION_HLSL_WRITE,                                     nullptr,             OPTION_STRING,     "enables HLSL AVI writing (huge disk bandwidth suggested)" },
 	{ WINOPTION_HLSL_SNAP_WIDTH,                                "2048",              OPTION_STRING,     "HLSL upscaled-snapshot width" },
 	{ WINOPTION_HLSL_SNAP_HEIGHT,                               "1536",              OPTION_STRING,     "HLSL upscaled-snapshot height" },
 	{ WINOPTION_SHADOW_MASK_TILE_MODE,                          "0",                 OPTION_INTEGER,    "shadow mask tile mode (0 for screen based, 1 for source based)" },
@@ -303,34 +297,37 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_REFLECTION";fs_ref(0.0-1.0)",                   "0.0",               OPTION_FLOAT,      "screen reflection amount" },
 	{ WINOPTION_VIGNETTING";fs_vig(0.0-1.0)",                   "0.0",               OPTION_FLOAT,      "image vignetting amount" },
 	/* Beam-related values below this line*/
-	{ WINOPTION_SCANLINE_AMOUNT";fs_scanam(0.0-4.0)",           "1.0",               OPTION_FLOAT,      "overall alpha scaling value for scanlines" },
+	{ WINOPTION_SCANLINE_AMOUNT";fs_scanam(0.0-4.0)",           "0.0",               OPTION_FLOAT,      "overall alpha scaling value for scanlines" },
 	{ WINOPTION_SCANLINE_SCALE";fs_scansc(0.0-4.0)",            "1.0",               OPTION_FLOAT,      "overall height scaling value for scanlines" },
 	{ WINOPTION_SCANLINE_HEIGHT";fs_scanh(0.0-4.0)",            "1.0",               OPTION_FLOAT,      "individual height scaling value for scanlines" },
+	{ WINOPTION_SCANLINE_VARIATION";fs_scanv(0.0-4.0)",         "1.0",               OPTION_FLOAT,      "individual height varying value for scanlines" },
 	{ WINOPTION_SCANLINE_BRIGHT_SCALE";fs_scanbs(0.0-2.0)",     "1.0",               OPTION_FLOAT,      "overall brightness scaling value for scanlines (multiplicative)" },
 	{ WINOPTION_SCANLINE_BRIGHT_OFFSET";fs_scanbo(0.0-1.0)",    "0.0",               OPTION_FLOAT,      "overall brightness offset value for scanlines (additive)" },
-	{ WINOPTION_SCANLINE_OFFSET";fs_scanjt(0.0-4.0)",           "0.0",               OPTION_FLOAT,      "overall interlace jitter scaling value for scanlines" },
-	{ WINOPTION_DEFOCUS";fs_focus",                             "1.0,0.0",           OPTION_STRING,     "overall defocus value in screen-relative coords" },
-	{ WINOPTION_CONVERGE_X";fs_convx",                          "0.25,0.00,-0.25",   OPTION_STRING,     "convergence in screen-relative X direction" },
-	{ WINOPTION_CONVERGE_Y";fs_convy",                          "0.0,0.25,-0.25",    OPTION_STRING,     "convergence in screen-relative Y direction" },
+	{ WINOPTION_SCANLINE_JITTER";fs_scanjt(0.0-4.0)",           "0.0",               OPTION_FLOAT,      "overall interlace jitter scaling value for scanlines" },
+	{ WINOPTION_HUM_BAR_ALPHA";fs_humba(0.0-1.0)",              "0.0",               OPTION_FLOAT,      "overall alpha scaling value for hum bar" },
+	{ WINOPTION_DEFOCUS";fs_focus",                             "0.0,0.0",           OPTION_STRING,     "overall defocus value in screen-relative coords" },
+	{ WINOPTION_CONVERGE_X";fs_convx",                          "0.0,0.0,0.0",       OPTION_STRING,     "convergence in screen-relative X direction" },
+	{ WINOPTION_CONVERGE_Y";fs_convy",                          "0.0,0.0,0.0",       OPTION_STRING,     "convergence in screen-relative Y direction" },
 	{ WINOPTION_RADIAL_CONVERGE_X";fs_rconvx",                  "0.0,0.0,0.0",       OPTION_STRING,     "radial convergence in screen-relative X direction" },
 	{ WINOPTION_RADIAL_CONVERGE_Y";fs_rconvy",                  "0.0,0.0,0.0",       OPTION_STRING,     "radial convergence in screen-relative Y direction" },
 	/* RGB colorspace convolution below this line */
 	{ WINOPTION_RED_RATIO";fs_redratio",                        "1.0,0.0,0.0",       OPTION_STRING,     "red output signal generated by input signal" },
 	{ WINOPTION_GRN_RATIO";fs_grnratio",                        "0.0,1.0,0.0",       OPTION_STRING,     "green output signal generated by input signal" },
 	{ WINOPTION_BLU_RATIO";fs_bluratio",                        "0.0,0.0,1.0",       OPTION_STRING,     "blue output signal generated by input signal" },
-	{ WINOPTION_SATURATION";fs_sat(0.0-4.0)",                   "1.4",               OPTION_FLOAT,      "saturation scaling value" },
+	{ WINOPTION_SATURATION";fs_sat(0.0-4.0)",                   "1.0",               OPTION_FLOAT,      "saturation scaling value" },
 	{ WINOPTION_OFFSET";fs_offset",                             "0.0,0.0,0.0",       OPTION_STRING,     "signal offset value (additive)" },
-	{ WINOPTION_SCALE";fs_scale",                               "0.95,0.95,0.95",    OPTION_STRING,     "signal scaling value (multiplicative)" },
-	{ WINOPTION_POWER";fs_power",                               "0.8,0.8,0.8",       OPTION_STRING,     "signal power value (exponential)" },
-	{ WINOPTION_FLOOR";fs_floor",                               "0.05,0.05,0.05",    OPTION_STRING,     "signal floor level" },
-	{ WINOPTION_PHOSPHOR";fs_phosphor",                         "0.4,0.4,0.4",       OPTION_STRING,     "phosphorescence decay rate (0.0 is instant, 1.0 is forever)" },
+	{ WINOPTION_SCALE";fs_scale",                               "1.0,1.0,1.0",       OPTION_STRING,     "signal scaling value (multiplicative)" },
+	{ WINOPTION_POWER";fs_power",                               "1.0,1.0,1.0",       OPTION_STRING,     "signal power value (exponential)" },
+	{ WINOPTION_FLOOR";fs_floor",                               "0.0,0.0,0.0",       OPTION_STRING,     "signal floor level" },
+	{ WINOPTION_PHOSPHOR";fs_phosphor",                         "0.0,0.0,0.0",       OPTION_STRING,     "phosphorescence decay rate (0.0 is instant, 1.0 is forever)" },
 	/* NTSC simulation below this line */
-	{ NULL,                                                     NULL,                OPTION_HEADER,     "NTSC POST-PROCESSING OPTIONS" },
+	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "NTSC POST-PROCESSING OPTIONS" },
 	{ WINOPTION_YIQ_ENABLE";yiq",                               "0",                 OPTION_BOOLEAN,    "enables YIQ-space HLSL post-processing" },
-	{ WINOPTION_YIQ_CCVALUE";yiqcc",                            "3.59754545",        OPTION_FLOAT,      "Color Carrier frequency for NTSC signal processing" },
+	{ WINOPTION_YIQ_JITTER";yiqj",                              "0.0",               OPTION_FLOAT,      "Jitter for the NTSC signal processing" },
+	{ WINOPTION_YIQ_CCVALUE";yiqcc",                            "3.57954545",        OPTION_FLOAT,      "Color Carrier frequency for NTSC signal processing" },
 	{ WINOPTION_YIQ_AVALUE";yiqa",                              "0.5",               OPTION_FLOAT,      "A value for NTSC signal processing" },
 	{ WINOPTION_YIQ_BVALUE";yiqb",                              "0.5",               OPTION_FLOAT,      "B value for NTSC signal processing" },
-	{ WINOPTION_YIQ_OVALUE";yiqo",                              "1.570796325",       OPTION_FLOAT,      "Outgoing Color Carrier phase offset for NTSC signal processing" },
+	{ WINOPTION_YIQ_OVALUE";yiqo",                              "0.0",               OPTION_FLOAT,      "Outgoing Color Carrier phase offset for NTSC signal processing" },
 	{ WINOPTION_YIQ_PVALUE";yiqp",                              "1.0",               OPTION_FLOAT,      "Incoming Pixel Clock scaling value for NTSC signal processing" },
 	{ WINOPTION_YIQ_NVALUE";yiqn",                              "1.0",               OPTION_FLOAT,      "Y filter notch width for NTSC signal processing" },
 	{ WINOPTION_YIQ_YVALUE";yiqy",                              "6.0",               OPTION_FLOAT,      "Y filter cutoff frequency for NTSC signal processing" },
@@ -338,42 +335,40 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_YIQ_QVALUE";yiqq",                              "0.6",               OPTION_FLOAT,      "Q filter cutoff frequency for NTSC signal processing" },
 	{ WINOPTION_YIQ_SCAN_TIME";yiqsc",                          "52.6",              OPTION_FLOAT,      "Horizontal scanline duration for NTSC signal processing (in usec)" },
 	{ WINOPTION_YIQ_PHASE_COUNT";yiqp",                         "2",                 OPTION_INTEGER,    "Phase Count value for NTSC signal processing" },
-	{ WINOPTION_YIQ_SCAN_TIME";yiqsc",                          "52.6",              OPTION_FLOAT,      "Horizontal scanline duration for NTSC signal processing (in usec)" },
-	{ WINOPTION_YIQ_PHASE_COUNT";yiqp",                         "2",                 OPTION_INTEGER,    "Phase Count value for NTSC signal processing" },
 	/* Vector simulation below this line */
-	{ NULL,                                                     NULL,                OPTION_HEADER,     "VECTOR POST-PROCESSING OPTIONS" },
+	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "VECTOR POST-PROCESSING OPTIONS" },
 	{ WINOPTION_VECTOR_LENGTH_SCALE";veclength",                "0.5",               OPTION_FLOAT,      "How much length affects vector fade" },
 	{ WINOPTION_VECTOR_LENGTH_RATIO";vecsize",                  "500.0",             OPTION_FLOAT,      "Vector fade length (4.0 - vectors fade the most at and above 4 pixels, etc.)" },
 	/* Bloom below this line */
-	{ NULL,                                                     NULL,                OPTION_HEADER,     "BLOOM POST-PROCESSING OPTIONS" },
-	{ WINOPTION_BLOOM_BLEND_MODE,                               "0",                 OPTION_INTEGER,    "bloom blend mode (0 for addition, 1 for darken)" },
-	{ WINOPTION_BLOOM_SCALE,                                    "0.25",              OPTION_FLOAT,      "Intensity factor for bloom" },
+	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "BLOOM POST-PROCESSING OPTIONS" },
+	{ WINOPTION_BLOOM_BLEND_MODE,                               "0",                 OPTION_INTEGER,    "bloom blend mode (0 for brighten, 1 for darken)" },
+	{ WINOPTION_BLOOM_SCALE,                                    "0.0",               OPTION_FLOAT,      "Intensity factor for bloom" },
 	{ WINOPTION_BLOOM_OVERDRIVE,                                "1.0,1.0,1.0",       OPTION_STRING,     "Overdrive factor for bloom" },
 	{ WINOPTION_BLOOM_LEVEL0_WEIGHT,                            "1.0",               OPTION_FLOAT,      "Bloom level 0  (full-size target) weight" },
-	{ WINOPTION_BLOOM_LEVEL1_WEIGHT,                            "0.64",              OPTION_FLOAT,      "Bloom level 1  (half-size target) weight" },
-	{ WINOPTION_BLOOM_LEVEL2_WEIGHT,                            "0.32",              OPTION_FLOAT,      "Bloom level 2  (quarter-size target) weight" },
-	{ WINOPTION_BLOOM_LEVEL3_WEIGHT,                            "0.16",              OPTION_FLOAT,      "Bloom level 3  (.) weight" },
-	{ WINOPTION_BLOOM_LEVEL4_WEIGHT,                            "0.08",              OPTION_FLOAT,      "Bloom level 4  (.) weight" },
-	{ WINOPTION_BLOOM_LEVEL5_WEIGHT,                            "0.04",              OPTION_FLOAT,      "Bloom level 5  (.) weight" },
-	{ WINOPTION_BLOOM_LEVEL6_WEIGHT,                            "0.04",              OPTION_FLOAT,      "Bloom level 6  (.) weight" },
-	{ WINOPTION_BLOOM_LEVEL7_WEIGHT,                            "0.02",              OPTION_FLOAT,      "Bloom level 7  (.) weight" },
-	{ WINOPTION_BLOOM_LEVEL8_WEIGHT,                            "0.02",              OPTION_FLOAT,      "Bloom level 8  (.) weight" },
-	{ WINOPTION_BLOOM_LEVEL9_WEIGHT,                            "0.01",              OPTION_FLOAT,      "Bloom level 9  (.) weight" },
-	{ WINOPTION_BLOOM_LEVEL10_WEIGHT,                           "0.01",              OPTION_FLOAT,      "Bloom level 10 (1x1 target) weight" },
+	{ WINOPTION_BLOOM_LEVEL1_WEIGHT,                            "0.64",              OPTION_FLOAT,      "Bloom level 1  (1/2-size target) weight" },
+	{ WINOPTION_BLOOM_LEVEL2_WEIGHT,                            "0.32",              OPTION_FLOAT,      "Bloom level 2  (1/4-size target) weight" },
+	{ WINOPTION_BLOOM_LEVEL3_WEIGHT,                            "0.16",              OPTION_FLOAT,      "Bloom level 3  (1/8-size target) weight" },
+	{ WINOPTION_BLOOM_LEVEL4_WEIGHT,                            "0.08",              OPTION_FLOAT,      "Bloom level 4  (1/16-size target) weight" },
+	{ WINOPTION_BLOOM_LEVEL5_WEIGHT,                            "0.04",              OPTION_FLOAT,      "Bloom level 5  (1/32-size target) weight" },
+	{ WINOPTION_BLOOM_LEVEL6_WEIGHT,                            "0.04",              OPTION_FLOAT,      "Bloom level 6  (1/64-size target) weight" },
+	{ WINOPTION_BLOOM_LEVEL7_WEIGHT,                            "0.02",              OPTION_FLOAT,      "Bloom level 7  (1/128-size target) weight" },
+	{ WINOPTION_BLOOM_LEVEL8_WEIGHT,                            "0.02",              OPTION_FLOAT,      "Bloom level 8  (1/256-size target) weight" },
+	{ WINOPTION_BLOOM_LEVEL9_WEIGHT,                            "0.01",              OPTION_FLOAT,      "Bloom level 9  (1/512-size target) weight" },
+	{ WINOPTION_BLOOM_LEVEL10_WEIGHT,                           "0.01",              OPTION_FLOAT,      "Bloom level 10 (1/1024-size target) weight" },
 
 	// full screen options
-	{ NULL,                                           NULL,       OPTION_HEADER,     "FULL SCREEN OPTIONS" },
+	{ nullptr,                                        nullptr,    OPTION_HEADER,     "FULL SCREEN OPTIONS" },
 	{ WINOPTION_TRIPLEBUFFER ";tb",                   "0",        OPTION_BOOLEAN,    "enables triple buffering" },
 	{ WINOPTION_FULLSCREENBRIGHTNESS ";fsb(0.1-2.0)", "1.0",      OPTION_FLOAT,      "brightness value in full screen mode" },
 	{ WINOPTION_FULLSCREENCONTRAST ";fsc(0.1-2.0)",   "1.0",      OPTION_FLOAT,      "contrast value in full screen mode" },
 	{ WINOPTION_FULLSCREENGAMMA ";fsg(0.1-3.0)",      "1.0",      OPTION_FLOAT,      "gamma value in full screen mode" },
 
 	// input options
-	{ NULL,                                           NULL,       OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
+	{ nullptr,                                        nullptr,    OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
 	{ WINOPTION_GLOBAL_INPUTS ";global_inputs",       "0",        OPTION_BOOLEAN,    "enables global inputs" },
 	{ WINOPTION_DUAL_LIGHTGUN ";dual",                "0",        OPTION_BOOLEAN,    "enables dual lightgun input" },
 
-	{ NULL }
+	{ nullptr }
 };
 
 //**************************************************************************
@@ -389,9 +384,9 @@ int main(int argc, char *argv[])
 {
 	// use small output buffers on non-TTYs (i.e. pipes)
 	if (!isatty(fileno(stdout)))
-		setvbuf(stdout, (char *) NULL, _IOFBF, 64);
+		setvbuf(stdout, (char *) nullptr, _IOFBF, 64);
 	if (!isatty(fileno(stderr)))
-		setvbuf(stderr, (char *) NULL, _IOFBF, 64);
+		setvbuf(stderr, (char *) nullptr, _IOFBF, 64);
 
 	// initialize common controls
 	InitCommonControls();
@@ -434,7 +429,7 @@ int main(int argc, char *argv[])
 		osd_output::pop(&winerror);
 	}
 	// free symbols
-	symbols = NULL;
+	symbols = nullptr;
 	return result;
 }
 
@@ -469,7 +464,7 @@ static BOOL WINAPI control_handler(DWORD type)
 
 	// if we don't have a machine yet, or if we are handling ctrl+c/ctrl+break,
 	// just terminate hard, without throwing or handling any atexit stuff
-	if (g_current_machine == NULL || type == CTRL_C_EVENT || type == CTRL_BREAK_EVENT)
+	if (g_current_machine == nullptr || type == CTRL_C_EVENT || type == CTRL_BREAK_EVENT)
 	{
 		fprintf(stderr, ", exiting\n");
 		TerminateProcess(GetCurrentProcess(), MAMERR_FATALERROR);
@@ -505,7 +500,9 @@ static void output_oslog(const running_machine &machine, const char *buffer)
 //============================================================
 
 windows_osd_interface::windows_osd_interface(windows_options &options)
-: osd_common_t(options), m_options(options)
+	: osd_common_t(options)
+	, m_options(options)
+	, m_sliders(nullptr)
 {
 }
 
@@ -525,11 +522,10 @@ windows_osd_interface::~windows_osd_interface()
 
 void windows_osd_interface::video_register()
 {
-	video_options_add("gdi", NULL);
-	video_options_add("ddraw", NULL);
-	video_options_add("d3d", NULL);
-	video_options_add("bgfx", NULL);
-	//video_options_add("auto", NULL); // making d3d video default one
+	video_options_add("gdi", nullptr);
+	video_options_add("d3d", nullptr);
+	video_options_add("bgfx", nullptr);
+	//video_options_add("auto", nullptr); // making d3d video default one
 }
 
 //============================================================
@@ -561,7 +557,6 @@ void windows_osd_interface::init(running_machine &machine)
 	if (profile > 0)
 	{
 		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_MULTITHREADING, false, OPTION_PRIORITY_MAXIMUM, error_string);
 		options.set_value(OSDOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM, error_string);
 		assert(error_string.empty());
 	}
@@ -589,11 +584,9 @@ void windows_osd_interface::init(running_machine &machine)
 	osd_common_t::init_subsystems();
 
 	// notify listeners of screen configuration
-	std::string tempstring;
-	for (win_window_info *info = win_window_list; info != NULL; info = info->m_next)
+	for (win_window_info *info = win_window_list; info != nullptr; info = info->m_next)
 	{
-		strprintf(tempstring, "Orientation(%s)", info->m_monitor->devicename());
-		machine.output().set_value(tempstring.c_str(), info->m_targetorient);
+		machine.output().set_value(string_format("Orientation(%s)", info->m_monitor->devicename()).c_str(), info->m_targetorient);
 	}
 
 	// hook up the debugger log
@@ -610,12 +603,12 @@ void windows_osd_interface::init(running_machine &machine)
 	int watchdog = options.watchdog();
 	if (watchdog != 0)
 	{
-		watchdog_reset_event = CreateEvent(NULL, FALSE, FALSE, NULL);
-		assert_always(watchdog_reset_event != NULL, "Failed to create watchdog reset event");
-		watchdog_exit_event = CreateEvent(NULL, TRUE, FALSE, NULL);
-		assert_always(watchdog_exit_event != NULL, "Failed to create watchdog exit event");
-		watchdog_thread = CreateThread(NULL, 0, watchdog_thread_entry, (LPVOID)(FPTR)watchdog, 0, NULL);
-		assert_always(watchdog_thread != NULL, "Failed to create watchdog thread");
+		watchdog_reset_event = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+		assert_always(watchdog_reset_event != nullptr, "Failed to create watchdog reset event");
+		watchdog_exit_event = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+		assert_always(watchdog_exit_event != nullptr, "Failed to create watchdog exit event");
+		watchdog_thread = CreateThread(nullptr, 0, watchdog_thread_entry, (LPVOID)(FPTR)watchdog, 0, nullptr);
+		assert_always(watchdog_thread != nullptr, "Failed to create watchdog thread");
 	}
 
 	// create and start the profiler
@@ -640,7 +633,7 @@ void windows_osd_interface::init(running_machine &machine)
 void windows_osd_interface::osd_exit()
 {
 	// no longer have a machine
-	g_current_machine = NULL;
+	g_current_machine = nullptr;
 
 	// cleanup sockets
 	win_cleanup_sockets();
@@ -648,20 +641,20 @@ void windows_osd_interface::osd_exit()
 	osd_common_t::osd_exit();
 
 	// take down the watchdog thread if it exists
-	if (watchdog_thread != NULL)
+	if (watchdog_thread != nullptr)
 	{
 		SetEvent(watchdog_exit_event);
 		WaitForSingleObject(watchdog_thread, INFINITE);
 		CloseHandle(watchdog_reset_event);
 		CloseHandle(watchdog_exit_event);
 		CloseHandle(watchdog_thread);
-		watchdog_reset_event = NULL;
-		watchdog_exit_event = NULL;
-		watchdog_thread = NULL;
+		watchdog_reset_event = nullptr;
+		watchdog_exit_event = nullptr;
+		watchdog_thread = nullptr;
 	}
 
 	// stop the profiler
-	if (profiler != NULL)
+	if (profiler != nullptr)
 	{
 		profiler->stop();
 		profiler->print_results(*symbols);
@@ -689,7 +682,7 @@ void winmain_dump_stack()
 
 	// walk the stack
 	while (walker.unwind())
-		fprintf(stderr, "  %p: %p%s\n", (void *)walker.frame(), (void *)walker.ip(), (symbols == NULL) ? "" : symbols->symbol_for_address(walker.ip()));
+		fprintf(stderr, "  %p: %p%s\n", (void *)walker.frame(), (void *)walker.ip(), (symbols == nullptr) ? "" : symbols->symbol_for_address(walker.ip()));
 }
 
 
@@ -754,7 +747,7 @@ static DWORD WINAPI watchdog_thread_entry(LPVOID lpParameter)
 void winmain_watchdog_ping(void)
 {
 	// if we have a watchdog, reset it
-	if (watchdog_reset_event != NULL)
+	if (watchdog_reset_event != nullptr)
 		SetEvent(watchdog_reset_event);
 }
 
@@ -867,7 +860,7 @@ static LONG WINAPI exception_filter(struct _EXCEPTION_POINTERS *info)
 
 	// walk the stack
 	while (walker.unwind())
-		fprintf(stderr, "  %p: %p%s\n", (void *)walker.frame(), (void *)walker.ip(), (symbols == NULL) ? "" : symbols->symbol_for_address(walker.ip()));
+		fprintf(stderr, "  %p: %p%s\n", (void *)walker.frame(), (void *)walker.ip(), (symbols == nullptr) ? "" : symbols->symbol_for_address(walker.ip()));
 
 	// flush stderr, so the data is actually written when output is being redirected
 	fflush(stderr);
@@ -902,7 +895,7 @@ stack_walker::stack_walker()
 	// initialize the symbols
 	if (!s_initialized && m_sym_initialize && m_stack_walk_64 && m_sym_function_table_access_64 && m_sym_get_module_base_64)
 	{
-		(*m_sym_initialize)(m_process, NULL, TRUE);
+		(*m_sym_initialize)(m_process, nullptr, TRUE);
 		s_initialized = true;
 	}
 }
@@ -976,9 +969,9 @@ bool stack_walker::unwind()
 	if (s_initialized)
 	{
 #ifdef PTR64
-		return (*m_stack_walk_64)(IMAGE_FILE_MACHINE_AMD64, m_process, m_thread, &m_stackframe, &m_context, NULL, *m_sym_function_table_access_64, *m_sym_get_module_base_64, NULL);
+		return (*m_stack_walk_64)(IMAGE_FILE_MACHINE_AMD64, m_process, m_thread, &m_stackframe, &m_context, nullptr, *m_sym_function_table_access_64, *m_sym_get_module_base_64, nullptr);
 #else
-		return (*m_stack_walk_64)(IMAGE_FILE_MACHINE_I386, m_process, m_thread, &m_stackframe, &m_context, NULL, *m_sym_function_table_access_64, *m_sym_get_module_base_64, NULL);
+		return (*m_stack_walk_64)(IMAGE_FILE_MACHINE_I386, m_process, m_thread, &m_stackframe, &m_context, nullptr, *m_sym_function_table_access_64, *m_sym_get_module_base_64, nullptr);
 #endif
 	}
 
@@ -1028,7 +1021,7 @@ symbol_manager::symbol_manager(const char *argv0)
 #endif
 
 	// expand the buffer to be decently large up front
-	strprintf(m_buffer,"%500s", "");
+	m_buffer = string_format("%500s", "");
 }
 
 
@@ -1057,7 +1050,7 @@ const char *symbol_manager::symbol_for_address(FPTR address)
 	if (!query_system_for_address(address))
 	{
 		// if that fails, scan the cache if we have one
-		if (m_cache.first() != NULL)
+		if (m_cache.first() != nullptr)
 			scan_cache_for_address(address);
 
 		// or else try to open a sym/map file and find it there
@@ -1114,20 +1107,20 @@ bool symbol_manager::query_system_for_address(FPTR address)
 void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 {
 	bool is_symfile = false;
-	FILE *srcfile = NULL;
+	FILE *srcfile = nullptr;
 
 #ifdef __GNUC__
 	// see if we have a symbol file (gcc only)
 	srcfile = fopen(m_symfile.c_str(), "r");
-	is_symfile = (srcfile != NULL);
+	is_symfile = (srcfile != nullptr);
 #endif
 
 	// if not, see if we have a map file
-	if (srcfile == NULL)
+	if (srcfile == nullptr)
 		srcfile = fopen(m_mapfile.c_str(), "r");
 
 	// if not, fail
-	if (srcfile == NULL)
+	if (srcfile == nullptr)
 		return;
 
 	// reset the best info
@@ -1180,7 +1173,7 @@ void symbol_manager::scan_cache_for_address(FPTR address)
 	FPTR best_addr = 0;
 
 	// walk the cache, looking for valid entries
-	for (cache_entry *entry = m_cache.first(); entry != NULL; entry = entry->next())
+	for (cache_entry *entry = m_cache.first(); entry != nullptr; entry = entry->next())
 
 		// if this is the best one so far, remember it
 		if (entry->m_address <= address && entry->m_address > best_addr)
@@ -1213,7 +1206,7 @@ bool symbol_manager::parse_sym_line(const char *line, FPTR &address, std::string
 
 	// first look for a (ty) entry
 	const char *type = strstr(line, "(ty  20)");
-	if (type == NULL)
+	if (type == nullptr)
 		return false;
 
 	// scan forward in the line to find the address
@@ -1295,13 +1288,13 @@ bool symbol_manager::parse_map_line(const char *line, FPTR &address, std::string
 void symbol_manager::format_symbol(const char *name, UINT32 displacement, const char *filename, int linenumber)
 {
 	// start with the address and offset
-	strprintf(m_buffer, " (%s", name);
+	m_buffer = string_format(" (%s", name);
 	if (displacement != 0)
-		strcatprintf(m_buffer, "+0x%04x", (UINT32)displacement);
+		m_buffer.append(string_format("+0x%04x", (UINT32)displacement));
 
 	// append file/line if present
-	if (filename != NULL)
-		strcatprintf(m_buffer, ", %s:%d", filename, linenumber);
+	if (filename != nullptr)
+		m_buffer.append(string_format(", %s:%d", filename, linenumber));
 
 	// close up the string
 	m_buffer.append(")");
@@ -1320,18 +1313,18 @@ FPTR symbol_manager::get_text_section_base()
 
 	// start with the image base
 	PVOID base = reinterpret_cast<PVOID>(GetModuleHandleUni());
-	assert(base != NULL);
+	assert(base != nullptr);
 
 	// make sure we have the functions we need
 	if (image_nt_header && image_rva_to_section)
 	{
 		// get the NT header
 		PIMAGE_NT_HEADERS headers = (*image_nt_header)(base);
-		assert(headers != NULL);
+		assert(headers != nullptr);
 
 		// look ourself up (assuming we are in the .text section)
 		PIMAGE_SECTION_HEADER section = (*image_rva_to_section)(headers, base, reinterpret_cast<FPTR>(get_text_section_base) - reinterpret_cast<FPTR>(base));
-		if (section != NULL)
+		if (section != nullptr)
 			return reinterpret_cast<FPTR>(base) + section->VirtualAddress;
 	}
 
@@ -1350,8 +1343,8 @@ FPTR symbol_manager::get_text_section_base()
 //-------------------------------------------------
 
 sampling_profiler::sampling_profiler(UINT32 max_seconds, UINT8 stack_depth = 0)
-	:   m_target_thread(NULL),
-		m_thread(NULL),
+	:   m_target_thread(nullptr),
+		m_thread(nullptr),
 		m_thread_id(0),
 		m_thread_exit(false),
 		m_stack_depth(stack_depth),
@@ -1387,8 +1380,8 @@ void sampling_profiler::start()
 	m_thread_exit = false;
 
 	// start the thread
-	m_thread = CreateThread(NULL, 0, thread_entry, (LPVOID)this, 0, &m_thread_id);
-	assert_always(m_thread != NULL, "Failed to create profiler thread\n");
+	m_thread = CreateThread(nullptr, 0, thread_entry, (LPVOID)this, 0, &m_thread_id);
+	assert_always(m_thread != nullptr, "Failed to create profiler thread\n");
 
 	// max out the priority
 	SetThreadPriority(m_thread, THREAD_PRIORITY_TIME_CRITICAL);
@@ -1556,7 +1549,7 @@ void sampling_profiler::thread_run()
 			*count += 1;
 		}
 
-		// fill in any missing parts with NULLs
+		// fill in any missing parts with nulls
 		for (; frame <= m_stack_depth; frame++)
 			*m_buffer_ptr++ = 0;
 

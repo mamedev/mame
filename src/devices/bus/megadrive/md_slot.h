@@ -102,7 +102,7 @@ public:
 	/* this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly */
 	virtual DECLARE_WRITE16_MEMBER(write_tmss_bank) { m_device.logerror("Write to TMSS bank: offset %x data %x\n", 0xa14000 + (offset << 1), data); };
 
-	virtual void rom_alloc(size_t size, std::string tag);
+	virtual void rom_alloc(size_t size, const char *tag);
 	virtual void nvram_alloc(size_t size);
 	virtual UINT16* get_rom_base() { return m_rom; };
 	virtual UINT16* get_nvram_base() { return &m_nvram[0]; };
@@ -140,7 +140,7 @@ class base_md_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	base_md_cart_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual ~base_md_cart_slot_device();
 
 	// device-level overrides
@@ -201,7 +201,7 @@ class md_cart_slot_device :  public base_md_cart_slot_device
 {
 public:
 	// construction/destruction
-	md_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual const char *image_interface() const override { return "megadriv_cart"; }
 	virtual const char *file_extensions() const override { return "smd,bin,md,gen"; }
 };
@@ -212,7 +212,7 @@ class pico_cart_slot_device :  public base_md_cart_slot_device
 {
 public:
 	// construction/destruction
-	pico_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual const char *image_interface() const override { return "pico_cart"; }
 	virtual const char *file_extensions() const override { return "bin,md"; }
 };
@@ -223,7 +223,7 @@ class copera_cart_slot_device :  public base_md_cart_slot_device
 {
 public:
 	// construction/destruction
-	copera_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual const char *image_interface() const override { return "copera_cart"; }
 	virtual const char *file_extensions() const override { return "bin,md"; }
 };

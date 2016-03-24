@@ -312,7 +312,7 @@ void i386_device::i486_group0F01_16()      // Opcode 0x0f 01
 				}
 				ea = GetEA(modrm,-1);
 				CYCLES(25); // TODO: add to cycles.h
-				vtlb_flush_address(m_vtlb, ea);
+				vtlb_flush_address(ea);
 				break;
 			}
 		default:
@@ -430,7 +430,7 @@ void i386_device::i486_group0F01_32()      // Opcode 0x0f 01
 				}
 				ea = GetEA(modrm,-1);
 				CYCLES(25); // TODO: add to cycles.h
-				vtlb_flush_address(m_vtlb, ea);
+				vtlb_flush_address(ea);
 				break;
 			}
 		default:
@@ -500,12 +500,12 @@ void i386_device::i486_mov_cr_r32()        // Opcode 0x0f 22
 		case 0:
 			CYCLES(CYCLES_MOV_REG_CR0);
 			if((oldcr ^ m_cr[cr]) & 0x80010000)
-				vtlb_flush_dynamic(m_vtlb);
+				vtlb_flush_dynamic();
 			break;
 		case 2: CYCLES(CYCLES_MOV_REG_CR2); break;
 		case 3:
 			CYCLES(CYCLES_MOV_REG_CR3);
-			vtlb_flush_dynamic(m_vtlb);
+			vtlb_flush_dynamic();
 			break;
 		case 4: CYCLES(1); break; // TODO
 		default:

@@ -50,7 +50,7 @@ ioport_constructor a2052_device::device_input_ports() const
 //  a2052_device - constructor
 //-------------------------------------------------
 
-a2052_device::a2052_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+a2052_device::a2052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, A2052, "CBM A2052 Fast Memory", tag, owner, clock, "a2052", __FILE__),
 	device_zorro2_card_interface(mconfig, *this),
 	m_config(*this, "config")
@@ -74,7 +74,7 @@ void a2052_device::device_start()
 void a2052_device::autoconfig_base_address(offs_t address)
 {
 	if (VERBOSE)
-		logerror("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname().c_str(), basetag().c_str(), address);
+		logerror("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname(), basetag(), address);
 
 	if (VERBOSE)
 		logerror("-> installing a2052\n");
@@ -92,7 +92,7 @@ void a2052_device::autoconfig_base_address(offs_t address)
 WRITE_LINE_MEMBER( a2052_device::cfgin_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): configin_w (%d)\n", shortname().c_str(), basetag().c_str(), state);
+		logerror("%s('%s'): configin_w (%d)\n", shortname(), basetag(), state);
 
 	if (state == 0)
 	{

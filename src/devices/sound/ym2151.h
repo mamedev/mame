@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 /*
 ** File: ym2151.h - header file for software implementation of YM2151

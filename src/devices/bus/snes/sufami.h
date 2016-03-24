@@ -13,7 +13,7 @@ class sns_rom_sufami_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_sufami_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sns_rom_sufami_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -36,7 +36,7 @@ class sns_rom_strom_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_strom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sns_rom_strom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -13,7 +13,7 @@
 class deco32_state : public driver_device
 {
 public:
-	deco32_state(const machine_config &mconfig, device_type type, std::string tag)
+	deco32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -189,7 +189,7 @@ public:
 class dragngun_state : public deco32_state
 {
 public:
-	dragngun_state(const machine_config &mconfig, device_type type, std::string tag)
+	dragngun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: deco32_state(mconfig, type, tag),
 		m_sprite_layout_0_ram(*this, "lay0"),
 		m_sprite_layout_1_ram(*this, "lay1"),

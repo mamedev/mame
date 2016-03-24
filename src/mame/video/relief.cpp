@@ -96,17 +96,17 @@ VIDEO_START_MEMBER(relief_state,relief)
 UINT32 relief_state::screen_update_relief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// start drawing
-	m_vad->mob()->draw_async(cliprect);
+	m_vad->mob().draw_async(cliprect);
 
 	/* draw the playfield */
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	priority_bitmap.fill(0, cliprect);
-	m_vad->playfield()->draw(screen, bitmap, cliprect, 0, 0);
-	m_vad->playfield2()->draw(screen, bitmap, cliprect, 0, 1);
+	m_vad->playfield().draw(screen, bitmap, cliprect, 0, 0);
+	m_vad->playfield2().draw(screen, bitmap, cliprect, 0, 1);
 
 	// draw and merge the MO
-	bitmap_ind16 &mobitmap = m_vad->mob()->bitmap();
-	for (const sparse_dirty_rect *rect = m_vad->mob()->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
+	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
+	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap.pix16(y);

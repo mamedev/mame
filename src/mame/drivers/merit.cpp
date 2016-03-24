@@ -59,7 +59,7 @@ Merit Riviera Notes - There are several known versions:
   Riviera Super Star (not dumped)
   Riviera Montana Version (with journal printer, not dumped)
   Riviera Tennessee Draw (not dumped)
-  Michigan Superstar Draw Poker (not dumped)
+  Michigan Super Draw Poker (Is there a "Superstar" version?)
   Americana
 
   There are several law suites over the Riviera games. Riviera Distributors Inc. bought earlier versions
@@ -87,7 +87,7 @@ Merit Riviera Notes - There are several known versions:
 class merit_state : public driver_device
 {
 public:
-	merit_state(const machine_config &mconfig, device_type type, std::string tag)
+	merit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram_attr(*this, "raattr"),
 		m_ram_video(*this, "ravideo"),
@@ -422,6 +422,19 @@ static ADDRESS_MAP_START( bigappg_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( misdraw_map, AS_PROGRAM, 8, merit_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("cpunvram") // overlays other NVRAM? or is it banked?
+	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write) // swapped compared to other set?
+	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("ravideo")
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( dodge_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("nvram")
@@ -590,6 +603,8 @@ static INPUT_PORTS_START( meritpoker )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
 
+
+
 static INPUT_PORTS_START( bigappg )
 	PORT_INCLUDE( meritpoker )
 
@@ -617,6 +632,57 @@ static INPUT_PORTS_START( bigappg )
 	PORT_DIPSETTING(    0xc0, "20" )
 	PORT_DIPSETTING(    0x00, "50" ) PORT_CONDITION("DSW", 0x08, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, "99" ) PORT_CONDITION("DSW", 0x08, EQUALS, 0x08)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( chkndraw )
+	PORT_INCLUDE( meritpoker )
+
+	PORT_MODIFY("IN0") /* Pins #65 through #58 of J3 in decending order */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME( "Hold 3 / Take Half / Dbl Half" )
+
+	PORT_MODIFY("IN1") /* Pins #57 through #51 of J3 in decending order */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_COCKTAIL PORT_CODE(KEYCODE_W) PORT_NAME( "P2 Deal")
+	PORT_DIPNAME( 0xc0, 0xc0, "Percentage (Rate of Return)" )    PORT_DIPLOCATION("Special:1,2") /* Pins #52 & #51?? Listed as "Switch Common Ground" */
+	PORT_DIPSETTING(    0x80, "80%" )
+	PORT_DIPSETTING(    0xc0, "85%" )
+	PORT_DIPSETTING(    0x40, "90%" )
+	PORT_DIPSETTING(    0x00, "85%" ) /* Duplicate setting - Likely not used */
+
+	PORT_MODIFY("IN2") /* Pins #46 through #41 of J3 in decending order */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_CODE(KEYCODE_A) PORT_NAME( "P2 Hold 1 / Take / Lo" )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_CODE(KEYCODE_S) PORT_NAME( "P2 Hold 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_CODE(KEYCODE_D) PORT_NAME( "P2 Hold 3 / Take Half / Dbl Half" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL PORT_CODE(KEYCODE_F) PORT_NAME( "P2 Hold 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_COCKTAIL PORT_CODE(KEYCODE_G) PORT_NAME( "P2 Hold 5 / Double Up / Hi" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_COCKTAIL PORT_CODE(KEYCODE_L) PORT_NAME( "P2 Bet")
+
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x00, "Raise Option" )         PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "Raise Enabled" )
+	PORT_DIPSETTING(    0x00, "No Raise" )
+	PORT_DIPNAME( 0x02, 0x00, "Format" )     PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, "Format S" )
+	PORT_DIPSETTING(    0x00, "Format M" )
+	PORT_DIPNAME( 0x04, 0x00, "Second Joker In Deck" )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, "Play 4 Points" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Points Per Coin" )   PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x10, "1" )
+	PORT_DIPNAME( 0x20, 0x00, "Players" )     PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, "One Player" )
+	PORT_DIPSETTING(    0x00, "Two Plaerys" )
+	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" )   PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x40, "1 Point Per Hand" )
+	PORT_DIPSETTING(    0xc0, "10" )
+	PORT_DIPSETTING(    0x80, "20" )
+	PORT_DIPSETTING(    0x00, "50" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( riviera )
@@ -1260,6 +1326,14 @@ static MACHINE_CONFIG_DERIVED( bigappg, pitboss )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( misdraw, bigappg )
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(misdraw_map)
+
+	MCFG_NVRAM_ADD_0FILL("cpunvram")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( dodge, pitboss )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -1427,6 +1501,23 @@ ROM_START( mroundup )
 	ROM_LOAD( "chr7.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
 ROM_END
 
+ROM_START( chkndraw )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2131-04_u5-1.u5", 0x0000, 0x2000, CRC(abc38151) SHA1(a56f7e535e265cbff697863fdfa5e5c2ef8b690a) ) /* 02131-10 U50 U60 U70 102984 */
+	ROM_LOAD( "2131-04_u6-0.u6", 0x2000, 0x2000, CRC(a0ad37b6) SHA1(f6722a8920d894cbce43fa78f2812cd81e5e9185) )
+	ROM_LOAD( "2131-04_u7-0.u7", 0x4000, 0x2000, CRC(c8af231d) SHA1(97f36420c9f4dd75c673003b9fd8287517b948f0) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "u39", 0x0000, 0x2000, CRC(115d1fe5) SHA1(c01287bf2ee34f94f38092a14ef6a76ebc970c2c) )
+	ROM_LOAD( "u38", 0x2000, 0x2000, CRC(841f5515) SHA1(47451418d9da845b5c4cf054e1dbbf68afa5bcee) )
+	ROM_LOAD( "u37", 0x4000, 0x2000, CRC(f554134d) SHA1(417dc83d24b4d39232b680e4004bf050c9cbb159) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+//	ROM_LOAD( "u40",  0x0000, 0x2000, BAD_DUMP CRC(01722f98) SHA1(c75c9511c07379ea087be5d75cbc3e705628c824) )
+//	ROM_LOAD( "u40a", 0x0000, 0x2000, BAD_DUMP CRC(03543d67) SHA1(5ae08dbc0f736c11070befb4cfad87ddaa24cef2) )
+	ROM_LOAD( "u40b", 0x0000, 0x2000, BAD_DUMP CRC(c53a9e90) SHA1(2076d045c279405083fec8949425532e7e7e7844) )
+ROM_END
+
 ROM_START( riviera ) /* PAL16L8ANC labeled DEC-003 at U13 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2131-08_u5-4a.u5", 0x0000, 0x8000, CRC(0bc8cf26) SHA1(da52010be2d44a240160bb1a13288b35e8feade2) ) /* 08 U5-4A 111287 2131-84A, label shows (c) 1988 */
@@ -1477,6 +1568,23 @@ ROM_START( bigappg )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "haip_u40.u40", 0x0000, 0x2000, CRC(ac4983b8) SHA1(a552a15f813c331de67eaae2ed42cc037b26c5bd) )
+ROM_END
+
+ROM_START( misdraw )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2131-16_u5-2.u5", 0x0000, 0x8000, CRC(fc756320) SHA1(6b810c57ed1be844a04a6081d727e182509604b4) ) /* 2131-16 U5-2 081889 */
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "u39.u39", 0x0000, 0x2000, CRC(0f09d19b) SHA1(1f98559d5bad7c84d92ecea5a6df9429914a47f0) )
+	ROM_LOAD( "u38.u38", 0x2000, 0x2000, CRC(8210a48d) SHA1(9af3e8ac8dcf1e548c4ba3ca8096e48dbb3b4700) )
+	ROM_LOAD( "u37.u37", 0x4000, 0x2000, CRC(34ca07d5) SHA1(3656b3eb78dd6ea06cf323a08fc3f949a01b76a3) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "haip_u40.u40", 0x0000, 0x2000, CRC(ac4983b8) SHA1(a552a15f813c331de67eaae2ed42cc037b26c5bd) )
+
+	ROM_REGION( 0x0800, "cpunvram", ROMREGION_ERASEFF )
+	// this contains CODE, the game jumps there on startup
+	ROM_LOAD( "crt-209_2131-16", 0x0000, 0x0800, CRC(34729437) SHA1(f097a1a97d8078d7d6a6af85be416b1d1d09c7f2) ) /* 2816 EEPROM in Z80 epoxy CPU module */
 ROM_END
 
 ROM_START( dodgectya )
@@ -2180,11 +2288,14 @@ GAME( 1984, casino5,  0,       casino5,  casino5,  driver_device,  0,   ROT0,  "
 
 GAME( 1984, mroundup, 0,       pitboss,  mroundup, driver_device,  0,   ROT0,  "Merit", "The Round Up",                      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
+GAME( 1984, chkndraw, 0,       pitboss,  chkndraw, driver_device,  0,   ROT0,  "Merit", "Chicken Draw (2131-04, U5-01)",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+
 GAME( 1987, riviera,  0,       dodge,    riviera,  driver_device,  0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1986, rivieraa, riviera, dodge,    riviera,  driver_device,  0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1986, rivierab, riviera, dodge,    rivierab, driver_device,  0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1986, bigappg,  0,       bigappg,  bigappg,  driver_device,  0,   ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, misdraw,  0,       misdraw,  bigappg,  driver_device,  0,   ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, dodgectya,dodgecty,dodge,    dodge,    driver_device,  0,   ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1986, dodgectyb,dodgecty,dodge,    dodge,    driver_device,  0,   ROT0,  "Merit", "Dodge City (2131-82, U5-50)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

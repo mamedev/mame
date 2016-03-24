@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo, Jarek Burczynski, Aaron Giles, Jonathan Gevaryahu, Couriersud
 /**********************************************************************************************
 
@@ -1049,8 +1049,6 @@ static const unsigned int example_word_TEN[619]={
 
 void tms5110_device::device_start()
 {
-	m_table = region()->base();
-
 	set_variant(TMS5110_IS_TMS5110A);
 
 	/* resolve lines */
@@ -1530,81 +1528,83 @@ WRITE_LINE_MEMBER( tmsprom_device::enable_w )
 
 const device_type TMS5110 = &device_creator<tms5110_device>;
 
-tms5110_device::tms5110_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TMS5110, "TMS5110", tag, owner, clock, "tms5110", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_m0_cb(*this),
-		m_m1_cb(*this),
-		m_addr_cb(*this),
-		m_data_cb(*this),
-		m_romclk_cb(*this)
+tms5110_device::tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TMS5110, "TMS5110", tag, owner, clock, "tms5110", __FILE__)
+	, device_sound_interface(mconfig, *this)
+	, m_table(*this, DEVICE_SELF)
+	, m_m0_cb(*this)
+	, m_m1_cb(*this)
+	, m_addr_cb(*this)
+	, m_data_cb(*this)
+	, m_romclk_cb(*this)
 {
 }
 
-tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_sound_interface(mconfig, *this),
-		m_m0_cb(*this),
-		m_m1_cb(*this),
-		m_addr_cb(*this),
-		m_data_cb(*this),
-		m_romclk_cb(*this)
+tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	, device_sound_interface(mconfig, *this)
+	, m_table(*this, DEVICE_SELF)
+	, m_m0_cb(*this)
+	, m_m1_cb(*this)
+	, m_addr_cb(*this)
+	, m_data_cb(*this)
+	, m_romclk_cb(*this)
 {
 }
 
 
 const device_type TMS5100 = &device_creator<tms5100_device>;
 
-tms5100_device::tms5100_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tms5100_device::tms5100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms5110_device(mconfig, TMS5100, "TMS5100", tag, owner, clock, "tms5100", __FILE__)
 {
 }
 
 const device_type TMC0281 = &device_creator<tmc0281_device>;
 
-tmc0281_device::tmc0281_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tmc0281_device::tmc0281_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms5110_device(mconfig, TMC0281, "TMC0281", tag, owner, clock, "tmc0281", __FILE__)
 {
 }
 
 const device_type TMS5100A = &device_creator<tms5100a_device>;
 
-tms5100a_device::tms5100a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tms5100a_device::tms5100a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms5110_device(mconfig, TMS5100A, "TMS5100A", tag, owner, clock, "tms5100a", __FILE__)
 {
 }
 
 const device_type TMC0281D = &device_creator<tmc0281d_device>;
 
-tmc0281d_device::tmc0281d_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tmc0281d_device::tmc0281d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms5110_device(mconfig, TMC0281D, "TMC0281D", tag, owner, clock, "tmc0281d", __FILE__)
 {
 }
 
 const device_type CD2801 = &device_creator<cd2801_device>;
 
-cd2801_device::cd2801_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+cd2801_device::cd2801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms5110_device(mconfig, CD2801, "CD2801", tag, owner, clock, "cd2801", __FILE__)
 {
 }
 
 const device_type CD2802 = &device_creator<cd2802_device>;
 
-cd2802_device::cd2802_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+cd2802_device::cd2802_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms5110_device(mconfig, CD2802, "CD2802", tag, owner, clock, "cd2802", __FILE__)
 {
 }
 
 const device_type TMS5110A = &device_creator<tms5110a_device>;
 
-tms5110a_device::tms5110a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tms5110a_device::tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms5110_device(mconfig, TMS5110A, "TMS5110A", tag, owner, clock, "tms5110a", __FILE__)
 {
 }
 
 const device_type M58817 = &device_creator<m58817_device>;
 
-m58817_device::m58817_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+m58817_device::m58817_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms5110_device(mconfig, M58817, "M58817", tag, owner, clock, "m58817", __FILE__)
 {
 }
@@ -1612,7 +1612,7 @@ m58817_device::m58817_device(const machine_config &mconfig, std::string tag, dev
 
 const device_type TMSPROM = &device_creator<tmsprom_device>;
 
-tmsprom_device::tmsprom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMSPROM, "TMSPROM", tag, owner, clock, "tmsprom", __FILE__),
 		m_prom_region(""),
 		m_rom_size(0),

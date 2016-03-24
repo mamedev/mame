@@ -32,7 +32,7 @@ t=tile, p=palette
 
 const device_type VS920A = &device_creator<vs920a_text_tilemap_device>;
 
-vs920a_text_tilemap_device::vs920a_text_tilemap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+vs920a_text_tilemap_device::vs920a_text_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VS920A, "VS920A Text Tilemap", tag, owner, clock, "vs920a", __FILE__),
 	m_vram(nullptr),
 	m_pal_base(0),
@@ -68,7 +68,7 @@ void vs920a_text_tilemap_device::set_gfx_region(device_t &device, int gfxregion)
 	dev.m_gfx_region = gfxregion;
 }
 
-void vs920a_text_tilemap_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
+void vs920a_text_tilemap_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<vs920a_text_tilemap_device &>(device).m_gfxdecode.set_tag(tag);
 }

@@ -93,7 +93,7 @@ inline void zx8302_device::transmit_ipc_data()
 	switch (m_ipc_state)
 	{
 	case IPC_START:
-		if (LOG) logerror("ZX8302 '%s' COMDATA Start Bit\n", tag().c_str());
+		if (LOG) logerror("ZX8302 '%s' COMDATA Start Bit\n", tag());
 
 		m_out_comdata_cb(BIT(m_idr, 0));
 		m_ipc_busy = 1;
@@ -101,7 +101,7 @@ inline void zx8302_device::transmit_ipc_data()
 		break;
 
 	case IPC_DATA:
-		if (LOG) logerror("ZX8302 '%s' COMDATA Data Bit: %x\n", tag().c_str(), BIT(m_idr, 1));
+		if (LOG) logerror("ZX8302 '%s' COMDATA Data Bit: %x\n", tag(), BIT(m_idr, 1));
 
 		m_comdata_to_ipc = BIT(m_idr, 1);
 		m_out_comdata_cb(m_comdata_to_ipc);
@@ -109,7 +109,7 @@ inline void zx8302_device::transmit_ipc_data()
 		break;
 
 	case IPC_STOP:
-		if (LOG) logerror("ZX8302 '%s' COMDATA Stop Bit\n", tag().c_str());
+		if (LOG) logerror("ZX8302 '%s' COMDATA Stop Bit\n", tag());
 
 		m_out_comdata_cb(BIT(m_idr, 2));
 		m_ipc_busy = 0;
@@ -127,7 +127,7 @@ inline void zx8302_device::transmit_ipc_data()
 //  zx8302_device - constructor
 //-------------------------------------------------
 
-zx8302_device::zx8302_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ZX8302, "Sinclair ZX8302", tag, owner, clock, "zx8302", __FILE__),
 		device_serial_interface(mconfig, *this),
 		m_rtc_clock(0),
@@ -340,7 +340,7 @@ READ8_MEMBER( zx8302_device::rtc_r )
 
 WRITE8_MEMBER( zx8302_device::rtc_w )
 {
-	if (LOG) logerror("ZX8302 '%s' Set Real Time Clock: %02x\n", tag().c_str(), data);
+	if (LOG) logerror("ZX8302 '%s' Set Real Time Clock: %02x\n", tag(), data);
 }
 
 
@@ -350,7 +350,7 @@ WRITE8_MEMBER( zx8302_device::rtc_w )
 
 WRITE8_MEMBER( zx8302_device::control_w )
 {
-	if (LOG) logerror("ZX8302 '%s' Transmit Control: %02x\n", tag().c_str(), data);
+	if (LOG) logerror("ZX8302 '%s' Transmit Control: %02x\n", tag(), data);
 
 	int baud = (19200 >> (data & BAUD_MASK));
 	int baudx4 = baud * 4;
@@ -370,7 +370,7 @@ WRITE8_MEMBER( zx8302_device::control_w )
 
 READ8_MEMBER( zx8302_device::mdv_track_r )
 {
-	if (LOG) logerror("ZX8302 '%s' Microdrive Track %u: %02x\n", tag().c_str(), m_track, m_mdv_data[m_track]);
+	if (LOG) logerror("ZX8302 '%s' Microdrive Track %u: %02x\n", tag(), m_track, m_mdv_data[m_track]);
 
 	UINT8 data = m_mdv_data[m_track];
 
@@ -422,7 +422,7 @@ READ8_MEMBER( zx8302_device::status_r )
 	// COMDATA
 	data |= m_comdata_to_cpu << 7;
 
-	if (LOG) logerror("ZX8302 '%s' Status: %02x\n", tag().c_str(), data);
+	if (LOG) logerror("ZX8302 '%s' Status: %02x\n", tag(), data);
 
 	return data;
 }
@@ -444,7 +444,7 @@ READ8_MEMBER( zx8302_device::status_r )
 
 WRITE8_MEMBER( zx8302_device::ipc_command_w )
 {
-	if (LOG) logerror("ZX8302 '%s' IPC Command: %02x\n", tag().c_str(), data);
+	if (LOG) logerror("ZX8302 '%s' IPC Command: %02x\n", tag(), data);
 
 	m_idr = data;
 	m_ipc_state = IPC_START;
@@ -474,7 +474,7 @@ WRITE8_MEMBER( zx8302_device::mdv_control_w )
 
 	*/
 
-	if (LOG) logerror("ZX8302 '%s' Microdrive Control: %02x\n", tag().c_str(), data);
+	if (LOG) logerror("ZX8302 '%s' Microdrive Control: %02x\n", tag(), data);
 
 	m_out_mdseld_cb(BIT(data, 0));
 	m_out_mdselck_cb(BIT(data, 1));
@@ -494,7 +494,7 @@ WRITE8_MEMBER( zx8302_device::mdv_control_w )
 
 READ8_MEMBER( zx8302_device::irq_status_r )
 {
-	if (LOG) logerror("ZX8302 '%s' Interrupt Status: %02x\n", tag().c_str(), m_irq);
+	if (LOG) logerror("ZX8302 '%s' Interrupt Status: %02x\n", tag(), m_irq);
 
 	return m_irq;
 }
@@ -506,7 +506,7 @@ READ8_MEMBER( zx8302_device::irq_status_r )
 
 WRITE8_MEMBER( zx8302_device::irq_acknowledge_w )
 {
-	if (LOG) logerror("ZX8302 '%s' Interrupt Acknowledge: %02x\n", tag().c_str(), data);
+	if (LOG) logerror("ZX8302 '%s' Interrupt Acknowledge: %02x\n", tag(), data);
 
 	m_irq &= ~data;
 
@@ -523,7 +523,7 @@ WRITE8_MEMBER( zx8302_device::irq_acknowledge_w )
 
 WRITE8_MEMBER( zx8302_device::data_w )
 {
-	if (LOG) logerror("ZX8302 '%s' Data Register: %02x\n", tag().c_str(), data);
+	if (LOG) logerror("ZX8302 '%s' Data Register: %02x\n", tag(), data);
 
 	m_tdr = data;
 	m_status |= STATUS_TX_BUFFER_FULL;
@@ -538,7 +538,7 @@ WRITE_LINE_MEMBER( zx8302_device::vsync_w )
 {
 	if (state)
 	{
-		if (LOG) logerror("ZX8302 '%s' Frame Interrupt\n", tag().c_str());
+		if (LOG) logerror("ZX8302 '%s' Frame Interrupt\n", tag());
 
 		trigger_interrupt(INT_FRAME);
 	}
@@ -551,7 +551,7 @@ WRITE_LINE_MEMBER( zx8302_device::vsync_w )
 
 WRITE_LINE_MEMBER( zx8302_device::comctl_w )
 {
-	if (LOG) logerror("ZX8302 '%s' COMCTL: %x\n", tag().c_str(), state);
+	if (LOG) logerror("ZX8302 '%s' COMCTL: %x\n", tag(), state);
 
 	if (state)
 	{
@@ -569,7 +569,7 @@ WRITE_LINE_MEMBER( zx8302_device::comctl_w )
 
 WRITE_LINE_MEMBER( zx8302_device::comdata_w )
 {
-	if (LOG) logerror("ZX8302 '%s' COMDATA->CPU(pending): %x\n", tag().c_str(), state);
+	if (LOG) logerror("ZX8302 '%s' COMDATA->CPU(pending): %x\n", tag(), state);
 
 	m_comdata_from_ipc = state;
 }
@@ -581,7 +581,7 @@ WRITE_LINE_MEMBER( zx8302_device::comdata_w )
 
 WRITE_LINE_MEMBER( zx8302_device::extint_w )
 {
-	if (LOG) logerror("ZX8302 '%s' EXTINT: %x\n", tag().c_str(), state);
+	if (LOG) logerror("ZX8302 '%s' EXTINT: %x\n", tag(), state);
 
 	if (state == ASSERT_LINE)
 	{

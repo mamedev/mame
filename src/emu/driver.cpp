@@ -32,7 +32,7 @@ ADDRESS_MAP_END
 //  driver_device - constructor
 //-------------------------------------------------
 
-driver_device::driver_device(const machine_config &mconfig, device_type type, std::string tag)
+driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
 	: device_t(mconfig, type, "Driver Device", tag, nullptr, 0, "", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("generic", ENDIANNESS_LITTLE, 8, 32, 0, nullptr, *ADDRESS_MAP_NAME(generic)),
@@ -578,7 +578,7 @@ repeated both in the upper and lower half
 
 CUSTOM_INPUT_MEMBER(driver_device::custom_port_read)
 {
-	std::string tag = (const char *)param;
+	const char *tag = (const char *)param;
 	return ioport(tag)->read();
 }
 

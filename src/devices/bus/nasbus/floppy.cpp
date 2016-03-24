@@ -63,7 +63,7 @@ machine_config_constructor nascom_fdc_device::device_mconfig_additions() const
 //  wordpro_device - constructor
 //-------------------------------------------------
 
-nascom_fdc_device::nascom_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+nascom_fdc_device::nascom_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, NASCOM_FDC, "Nascom Floppy Disc Controller", tag, owner, clock, "nascom_fdc", __FILE__),
 	device_nasbus_card_interface(mconfig, *this),
 	m_fdc(*this, "fd1793"),

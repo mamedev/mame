@@ -135,7 +135,6 @@ ATTR_HOT inline int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(con
 
 	/* uncommenting the line below will force dynamic updates every X iterations
 	 * althought the system has not converged yet. This is a proof of concept,
-	 * 91glub
 	 *
 	 */
 	const bool interleaved_dynamic_updates = false;
@@ -168,7 +167,6 @@ ATTR_HOT inline int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(con
 	} while (resched && ((!interleaved_dynamic_updates && resched_cnt < this->m_params.m_gs_loops) || (interleaved_dynamic_updates && resched_cnt < 5 )));
 
 	this->m_iterative_total += resched_cnt;
-	this->m_stat_calculations++;
 
 	if (resched && !interleaved_dynamic_updates)
 	{
@@ -176,6 +174,8 @@ ATTR_HOT inline int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(con
 		this->m_iterative_fail++;
 		return matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(newton_raphson);
 	}
+
+	this->m_stat_calculations++;
 
 	if (interleaved_dynamic_updates)
 	{

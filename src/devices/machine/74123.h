@@ -96,7 +96,7 @@ class ttl74123_device :  public device_t
 {
 public:
 	// construction/destruction
-	ttl74123_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void set_connection_type(device_t &device, int type) { downcast<ttl74123_device &>(device).m_connection_type = type; }
 	static void set_resistor_value(device_t &device, double value) { downcast<ttl74123_device &>(device).m_res = value; }

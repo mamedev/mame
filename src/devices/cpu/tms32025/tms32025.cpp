@@ -208,7 +208,7 @@ const device_type TMS32025 = &device_creator<tms32025_device>;
 const device_type TMS32026 = &device_creator<tms32026_device>;
 
 
-tms32025_device::tms32025_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, TMS32025, "TMS32025", tag, owner, clock, "tms32025", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1)
@@ -217,7 +217,7 @@ tms32025_device::tms32025_device(const machine_config &mconfig, std::string tag,
 }
 
 
-tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1)
@@ -226,7 +226,7 @@ tms32025_device::tms32025_device(const machine_config &mconfig, device_type type
 }
 
 
-tms32026_device::tms32026_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tms32026_device::tms32026_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms32025_device(mconfig, TMS32026, "TMS32026", tag, owner, clock, "tms32026", __FILE__)
 {
 }
@@ -1806,7 +1806,7 @@ void tms32025_device::state_string_export(const device_state_entry &entry, std::
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "arp%d%c%c%c%cdp%03x  arb%d%c%c%c%c%c%c%c%c%c%c%cpm%d",
+			str = string_format("arp%d%c%c%c%cdp%03x  arb%d%c%c%c%c%c%c%c%c%c%c%cpm%d",
 				(m_STR0 & 0xe000) >> 13,
 				m_STR0 & 0x1000 ? 'O':'.',
 				m_STR0 & 0x0800 ? 'M':'.',

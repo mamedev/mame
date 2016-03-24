@@ -12,7 +12,7 @@ class nes_gs2015_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_gs2015_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nes_gs2015_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -30,7 +30,7 @@ class nes_gs2004_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_gs2004_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nes_gs2004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -46,7 +46,7 @@ class nes_gs2013_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_gs2013_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nes_gs2013_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -62,7 +62,7 @@ class nes_tf9_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_tf9_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nes_tf9_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -78,7 +78,7 @@ class nes_3dblock_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_3dblock_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nes_3dblock_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -219,7 +219,7 @@ struct bt471_t
 class mpu4vid_state : public mpu4_state
 {
 public:
-	mpu4vid_state(const machine_config &mconfig, device_type type, std::string tag)
+	mpu4vid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mpu4_state(mconfig, type, tag),
 		m_videocpu(*this, "video"),
 		m_scn2674(*this, "scn2674_vid"),

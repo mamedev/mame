@@ -47,7 +47,7 @@ ioport_constructor vcs_joystick_device::device_input_ports() const
 //  vcs_joystick_device - constructor
 //-------------------------------------------------
 
-vcs_joystick_device::vcs_joystick_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+vcs_joystick_device::vcs_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VCS_JOYSTICK, "Atari / CBM Digital joystick", tag, owner, clock, "vcs_joystick", __FILE__),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY")

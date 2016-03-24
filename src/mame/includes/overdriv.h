@@ -14,7 +14,7 @@
 class overdriv_state : public driver_device
 {
 public:
-	overdriv_state(const machine_config &mconfig, device_type type, std::string tag)
+	overdriv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
@@ -24,7 +24,6 @@ public:
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
 		m_k053252(*this, "k053252"),
-		m_sprram(*this, "sprram"),
 		m_screen(*this, "screen")
 	{ }
 
@@ -45,22 +44,25 @@ public:
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
 	required_device<k053252_device> m_k053252;
-	required_shared_ptr<UINT16> m_sprram;
 	required_device<screen_device> m_screen;
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_WRITE16_MEMBER(cpuA_ctrl_w);
 	DECLARE_READ16_MEMBER(cpuB_ctrl_r);
 	DECLARE_WRITE16_MEMBER(cpuB_ctrl_w);
 	DECLARE_WRITE16_MEMBER(overdriv_soundirq_w);
-	DECLARE_WRITE16_MEMBER(overdriv_cpuB_irq_x_w);
-	DECLARE_WRITE16_MEMBER(overdriv_cpuB_irq_y_w);
+	DECLARE_WRITE8_MEMBER(sound_ack_w);
+	DECLARE_WRITE16_MEMBER(slave_irq4_assert_w);
+	DECLARE_WRITE16_MEMBER(slave_irq5_assert_w);
+	DECLARE_WRITE16_MEMBER(objdma_w);
+	TIMER_CALLBACK_MEMBER(objdma_end_cb);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	UINT32 screen_update_overdriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(cpuB_interrupt);
+	//INTERRUPT_GEN_MEMBER(cpuB_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(overdriv_cpuA_scanline);
+	int m_fake_timer;
 
-	DECLARE_WRITE16_MEMBER( overdriv_k053246_word_w );
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K053246_CB_MEMBER(sprite_callback);

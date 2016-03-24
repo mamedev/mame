@@ -3,6 +3,9 @@ bx
 
 Base library.
 
+[![Build Status](https://travis-ci.org/bkaradzic/bx.svg?branch=master)](https://travis-ci.org/bkaradzic/bx)
+[![Build status](https://ci.appveyor.com/api/projects/status/edras3mltmoy31g5?svg=true)](https://ci.appveyor.com/project/bkaradzic/bx)
+
 Contact
 -------
 

@@ -173,7 +173,7 @@ machine_config_constructor c64_ieee488_device::device_mconfig_additions() const
 //  c64_ieee488_device - constructor
 //-------------------------------------------------
 
-c64_ieee488_device::c64_ieee488_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+c64_ieee488_device::c64_ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_IEEE488, "IEEE-488", tag, owner, clock, "c64_ieee488", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_tpi(*this, MOS6525_TAG),

@@ -306,7 +306,7 @@ ioport_constructor pdc_device::device_input_ports() const
 //  pdc_device - constructor
 //-------------------------------------------------
 
-pdc_device::pdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PDC, "ROLM PDC", tag, owner, clock, "pdc", __FILE__),
 		m_pdccpu(*this, Z80_TAG),
 	m_dma8237(*this, FDCDMA_TAG),

@@ -215,7 +215,7 @@ TODO:
 class expro02_state : public driver_device
 {
 public:
-	expro02_state(const machine_config &mconfig, device_type type, std::string tag)
+	expro02_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_expro02_fg_ind8_pixram(*this, "fg_ind8ram"),
 		m_expro02_bg_rgb555_pixram(*this, "bg_rgb555ram"),

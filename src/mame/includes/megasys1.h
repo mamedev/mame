@@ -21,7 +21,7 @@
 class megasys1_state : public driver_device
 {
 public:
-	megasys1_state(const machine_config &mconfig, device_type type, std::string tag)
+	megasys1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_vregs(*this, "vregs"),
 		m_objectram(*this, "objectram"),
@@ -65,8 +65,8 @@ public:
 	bitmap_ind16 m_sprite_buffer_bitmap;
 
 	UINT16 *m_spriteram;
-	UINT16 m_ip_select;
-	UINT16 m_ip_select_values[5];
+	UINT16 m_ip_select_values[7];
+	UINT16 m_ip_latched;
 	UINT8 m_ignore_oki_status;
 	UINT16 m_protection_val;
 	int m_scrollx[3];

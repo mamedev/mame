@@ -8,7 +8,7 @@ class beezer_sound_device;
 class beezer_state : public driver_device
 {
 public:
-	beezer_state(const machine_config &mconfig, device_type type, std::string tag)
+	beezer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -70,7 +70,7 @@ class beezer_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	beezer_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	beezer_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~beezer_sound_device() {}
 
 	DECLARE_READ8_MEMBER( sh6840_r );

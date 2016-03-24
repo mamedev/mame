@@ -65,7 +65,7 @@
 #define VERBOSE 1
 #define LOG logerror
 
-horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : ti_expansion_card_device(mconfig, TI99_HORIZON, "Horizon 4000 Ramdisk", tag, owner, clock,"ti99_horizon",__FILE__),
 	device_nvram_interface(mconfig, *this), m_ram(nullptr), m_nvram(nullptr), m_ros(nullptr), m_select6_value(0), m_select_all(0), m_page(0), m_cru_horizon(0), m_cru_phoenix(0), m_timode(false), m_32k_installed(false), m_split_mode(false), m_rambo_mode(false), m_killswitch(false), m_use_rambo(false)
 {
@@ -408,7 +408,7 @@ INPUT_PORTS_START( horizon )
 		PORT_DIPSETTING(    0x02, "Geneve mode" )
 
 	PORT_START( "HORIZONACT" )
-	PORT_DIPNAME( 0x01, 0x00, "Horizon killswitch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, horizon_ramdisk_device, ks_changed, 1)
+	PORT_DIPNAME( 0x01, 0x00, "Horizon killswitch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, horizon_ramdisk_device, ks_changed, nullptr)
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
@@ -432,7 +432,7 @@ INPUT_PORTS_END
 
 ROM_START( horizon )
 	ROM_REGION(MAXRAM_SIZE, NVRAMREGION, 0)
-	ROM_FILL(0x0000, MAXRAM_SIZE, nullptr)
+	ROM_FILL(0x0000, MAXRAM_SIZE, 0x00)
 	ROM_REGION(0x8000, RAMREGION, 0)
 	ROM_FILL(0x0000, 0x8000, 0x00)
 ROM_END

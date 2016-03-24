@@ -44,7 +44,7 @@ class cmc_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	cmc_prot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cmc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void decrypt(UINT8 *r0, UINT8 *r1,
 		UINT8 c0, UINT8 c1,

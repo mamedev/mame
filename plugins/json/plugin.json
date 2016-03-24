@@ -1,0 +1,8 @@
+{
+  "plugin": {
+    "name": "json",
+    "version": "2.5.0",
+    "author": "David Kolf",
+	"type": "library",
+  }
+}

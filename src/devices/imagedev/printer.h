@@ -25,7 +25,7 @@ class printer_image_device : public device_t,
 {
 public:
 	// construction/destruction
-	printer_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_online_callback(device_t &device, _Object object) { return downcast<printer_image_device &>(device).m_online_cb.set_callback(object); }
 

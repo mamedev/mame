@@ -14,7 +14,7 @@
 
 /* Only problems ... */
 #if defined(_WIN32)
-#define SDLMAME_WIN32
+#define SDLMAME_WIN32 1
 #define _SDL_main_h
 #endif
 
@@ -57,10 +57,6 @@
 
 #if defined(__DragonFly__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #define SDLMAME_BSD 1
-#endif
-
-#if defined(__OS2__)
-#define SDLMAME_OS2 1
 #endif
 
 #if defined(__HAIKU__)

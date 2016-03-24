@@ -14,7 +14,7 @@ class ds12885_device : public mc146818_device
 {
 public:
 	// construction/destruction
-	ds12885_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ds12885_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int data_size() override { return 128; }

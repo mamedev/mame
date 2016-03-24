@@ -148,7 +148,7 @@ the wide tilemap mode)
 
 const device_type TC0100SCN = &device_creator<tc0100scn_device>;
 
-tc0100scn_device::tc0100scn_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0100SCN, "Taito TC0100SCN", tag, owner, clock, "tc0100scn", __FILE__),
 	m_ram(nullptr),
 	m_bg_ram(nullptr),
@@ -188,7 +188,7 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, std::string ta
 //  gfx decoder
 //-------------------------------------------------
 
-void tc0100scn_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
+void tc0100scn_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<tc0100scn_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -198,7 +198,7 @@ void tc0100scn_device::static_set_gfxdecode_tag(device_t &device, std::string ta
 //  palette device
 //-------------------------------------------------
 
-void tc0100scn_device::static_set_palette_tag(device_t &device, std::string tag)
+void tc0100scn_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<tc0100scn_device &>(device).m_palette.set_tag(tag);
 }

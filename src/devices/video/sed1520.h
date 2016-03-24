@@ -30,7 +30,7 @@ class sed1520_device :  public device_t
 {
 public:
 	// construction/destruction
-	sed1520_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sed1520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void static_set_screen_update_cb(device_t &device, sed1520_screen_update_func _cb) { downcast<sed1520_device &>(device).m_screen_update_func = _cb; }

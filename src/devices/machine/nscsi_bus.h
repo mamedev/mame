@@ -17,7 +17,7 @@ class nscsi_device;
 class nscsi_bus_device : public device_t
 {
 public:
-	nscsi_bus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void ctrl_w(int refid, UINT32 lines, UINT32 mask);
 	void data_w(int refid, UINT32 lines);
@@ -51,7 +51,7 @@ class nscsi_connector: public device_t,
 						public device_slot_interface
 {
 public:
-	nscsi_connector(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~nscsi_connector();
 
 	nscsi_device *get_device();
@@ -86,7 +86,7 @@ public:
 		S_PHASE_MASK     = S_MSG|S_CTL|S_INP
 	};
 
-	nscsi_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nscsi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	void connect_to_bus(nscsi_bus_device *bus, int refid, int default_scsi_id);
 	virtual void scsi_ctrl_changed();
@@ -101,7 +101,7 @@ protected:
 class nscsi_full_device : public nscsi_device
 {
 public:
-	nscsi_full_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	nscsi_full_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	virtual void scsi_ctrl_changed() override;
 protected:

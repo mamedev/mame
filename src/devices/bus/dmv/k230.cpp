@@ -106,7 +106,7 @@ const device_type DMV_K235 = &device_creator<dmv_k235_device>;
 //  dmv_k230_device - constructor
 //-------------------------------------------------
 
-dmv_k230_device::dmv_k230_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+dmv_k230_device::dmv_k230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, DMV_K230, "K230 8088 without interrupt controller", tag, owner, clock, "dmv_k230", __FILE__),
 		device_dmvslot_interface( mconfig, *this ),
 		m_maincpu(*this, "maincpu"),
@@ -114,7 +114,7 @@ dmv_k230_device::dmv_k230_device(const machine_config &mconfig, std::string tag,
 	{
 }
 
-dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_dmvslot_interface( mconfig, *this ),
 		m_maincpu(*this, "maincpu"),
@@ -126,7 +126,7 @@ dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type
 //  dmv_k231_device - constructor
 //-------------------------------------------------
 
-dmv_k231_device::dmv_k231_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+dmv_k231_device::dmv_k231_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: dmv_k230_device(mconfig, DMV_K231, "K231 8088 without interrupt controller", tag, owner, clock, "dmv_k231", __FILE__)
 {
 }
@@ -135,7 +135,7 @@ dmv_k231_device::dmv_k231_device(const machine_config &mconfig, std::string tag,
 //  dmv_k234_device - constructor
 //-------------------------------------------------
 
-dmv_k234_device::dmv_k234_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+dmv_k234_device::dmv_k234_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: dmv_k230_device(mconfig, DMV_K234, "K234 68008", tag, owner, clock, "dmv_k234", __FILE__), m_snr(0)
 	{
 }
@@ -144,7 +144,7 @@ dmv_k234_device::dmv_k234_device(const machine_config &mconfig, std::string tag,
 //  dmv_k235_device - constructor
 //-------------------------------------------------
 
-dmv_k235_device::dmv_k235_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+dmv_k235_device::dmv_k235_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: dmv_k230_device(mconfig, DMV_K235, "K235 8088 with interrupt controller", tag, owner, clock, "dmv_k235", __FILE__),
 		m_pic(*this, "pic8259"),
 		m_dsw(*this, "DSW")

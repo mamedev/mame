@@ -4,7 +4,7 @@
 
 const device_type NSCSI_CB = &device_creator<nscsi_callback_device>;
 
-nscsi_callback_device::nscsi_callback_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nscsi_callback_device::nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: nscsi_device(mconfig, NSCSI_CB, "SCSI callback (new)", tag, owner, clock, "nscsi_cb", __FILE__),
 		m_write_rst(*this),
 		m_write_atn(*this),

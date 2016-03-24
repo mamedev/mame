@@ -149,6 +149,21 @@ void machine_manager::schedule_new_driver(const game_driver &driver)
 void machine_manager::update_machine()
 {
 	m_lua->set_machine(m_machine);
+	m_lua->attach_notifiers();
+}
+
+
+void machine_manager::start_luaengine()
+{
+	m_lua->initialize();
+	{
+		emu_file file(options().plugins_path(), OPEN_FLAG_READ);
+		osd_file::error filerr = file.open("boot.lua");
+		if (filerr == osd_file::error::NONE)
+		{
+			m_lua->load_script(file.fullpath());
+		}
+	}
 }
 
 /*-------------------------------------------------
@@ -166,7 +181,6 @@ int machine_manager::execute()
 	bool exit_pending = false;
 	int error = MAMERR_NONE;
 
-	m_lua->initialize();
 	if (m_options.console()) {
 		m_lua->start_console();
 	}
@@ -231,6 +245,25 @@ int machine_manager::execute()
 				m_options.set_value(OPTION_RAMSIZE, "", OPTION_PRIORITY_CMDLINE, error_string);
 			}
 			firstrun = true;
+			if (m_options.software_name())
+			{
+				std::string sw_load(m_options.software_name());
+				std::string sw_list, sw_name, sw_part, sw_instance, option_errors, error_string;
+				int left = sw_load.find_first_of(':');
+				int middle = sw_load.find_first_of(':', left + 1);
+				int right = sw_load.find_last_of(':');
+
+				sw_list = sw_load.substr(0, left - 1);
+				sw_name = sw_load.substr(left + 1, middle - left - 1);
+				sw_part = sw_load.substr(middle + 1, right - middle - 1);
+				sw_instance = sw_load.substr(right + 1);
+				sw_load.assign(sw_load.substr(0, right));
+
+				char arg[] = "mame";
+				char *argv = &arg[0];
+				m_options.set_value(OPTION_SOFTWARENAME, sw_name.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+				m_options.parse_slot_devices(1, &argv, option_errors, sw_instance.c_str(), sw_load.c_str());
+			}
 		}
 		else
 		{

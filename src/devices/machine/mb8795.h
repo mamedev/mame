@@ -24,7 +24,7 @@ class mb8795_device :   public device_t,
 						public device_network_interface
 {
 public:
-	mb8795_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_tx_irq_wr_callback(device_t &device, _Object object) { return downcast<mb8795_device &>(device).irq_tx_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_rx_irq_wr_callback(device_t &device, _Object object) { return downcast<mb8795_device &>(device).irq_rx_cb.set_callback(object); }

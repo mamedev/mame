@@ -13,8 +13,10 @@
 class atarisy1_state : public atarigen_state
 {
 public:
-	atarisy1_state(const machine_config &mconfig, device_type type, std::string tag)
+	atarisy1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_audiocpu(*this, "audiocpu"),
+			m_soundcomm(*this, "soundcomm"),
 			m_bankselect(*this, "bankselect"),
 			m_mob(*this, "mob"),
 			m_joystick_timer(*this, "joystick_timer"),
@@ -24,6 +26,9 @@ public:
 			m_scanline_timer(*this, "scan_timer"),
 			m_int3off_timer(*this, "int3off_timer"),
 			m_tms(*this, "tms") { }
+
+	required_device<cpu_device> m_audiocpu;
+	required_device<atari_sound_comm_device> m_soundcomm;
 
 	required_shared_ptr<UINT16> m_bankselect;
 	required_device<atari_motion_objects_device> m_mob;
@@ -67,8 +72,7 @@ public:
 	DECLARE_READ8_MEMBER(via_pa_r);
 	DECLARE_WRITE8_MEMBER(via_pb_w);
 	DECLARE_READ8_MEMBER(via_pb_r);
-	DECLARE_DRIVER_INIT(roadb110);
-	DECLARE_DRIVER_INIT(roadb109);
+	DECLARE_DRIVER_INIT(roadblst);
 	DECLARE_DRIVER_INIT(peterpak);
 	DECLARE_DRIVER_INIT(marble);
 	DECLARE_DRIVER_INIT(roadrunn);

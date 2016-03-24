@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:David Graves, Jarek Burczynski
 // thanks-to:Richard Bush
 /****************************************************************************
@@ -23,7 +23,7 @@ The screen layout and registers and sprites appear to be identical.
 
 Taito TC0030CMD chip labeled B20-18 (at least for the US boards)
 Taito PC060HA looks like it might be a DIP28 Fujitsu MB884x chip
-There are 4 socketted PALs (DIP20 type PAL16L8ACN) labeled B20-09
+There are 4 socketed PALs (DIP20 type PAL16L8ACN) labeled B20-09
       through B20-12 (not read)
 
 OSC:  Main board: 16MHz, 12MHz & 26.686MHz

@@ -61,7 +61,7 @@ machine_config_constructor isa8_adlib_device::device_mconfig_additions() const
 //  isa8_adlib_device - constructor
 //-------------------------------------------------
 
-isa8_adlib_device::isa8_adlib_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+isa8_adlib_device::isa8_adlib_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, ISA8_ADLIB, "Ad Lib Sound Card", tag, owner, clock, "isa_adlib", __FILE__),
 		device_isa8_card_interface( mconfig, *this ),
 		m_ym3812(*this, "ym3812")

@@ -844,14 +844,6 @@ struct priority
 
 */
 
-static const struct priority priorities[] =
-{
-	{   "chimerab",
-		{ 0x14032,0x04132,0x14032,0x04132,0xfffff,0xfffff,0xfffff,0xfffff,
-			0xfffff,0xfffff,0x01324,0xfffff,0xfffff,0xfffff,0xfffff,0xfffff }
-	},
-	{   nullptr   }   // end of list: use the prom's data
-};
 
 
 /*
@@ -902,26 +894,7 @@ void megasys1_state::megasys1_priority_create()
 	const UINT8 *color_prom = memregion("proms")->base();
 	int pri_code, offset, i, order;
 
-	/* First check if we have an hand-crafted priority scheme
-	   available (this should happen only if no good dump
-	   of the prom is known) */
-
-	i = 0;
-	while ( priorities[i].driver &&
-			strcmp(priorities[i].driver, machine().system().name) != 0 &&
-			strcmp(priorities[i].driver, machine().system().parent) != 0)
-		i++;
-
-	if (priorities[i].driver)
-	{
-		memcpy (m_layers_order, priorities[i].priorities, 16 * sizeof(int));
-
-		logerror("WARNING: using an hand-crafted priorities scheme\n");
-
-		return;
-	}
-
-	/* Otherwise, perform the conversion from the prom itself */
+	/* convert PROM to something we can use */
 
 	for (pri_code = 0; pri_code < 0x10 ; pri_code++)    // 16 priority codes
 	{

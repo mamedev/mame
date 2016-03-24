@@ -22,7 +22,7 @@ class sega_315_5838_comp_device :  public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5838_comp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	sega_dec_read_delegate m_read_ch2;
 
@@ -65,17 +65,19 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	UINT16 m_decathlt_prottable1[24];
+	UINT16 m_decathlt_dictionaryy[128];
+
+	UINT32 m_srcoffset;
+
+	UINT32 m_decathlt_lastcount;
+	UINT32 m_decathlt_prot_uploadmode;
+	UINT32 m_decathlt_prot_uploadoffset;
+
 
 	// Decathlete specific variables and functions (see machine/decathlt.c)
 	struct channel_type
 	{
-		UINT32 m_srcoffset;
-		UINT16 m_decathlt_prottable1[24];
-		UINT16 m_decathlt_dictionary[128];
-
-		UINT32 m_decathlt_lastcount;
-		UINT32 m_decathlt_prot_uploadmode;
-		UINT32 m_decathlt_prot_uploadoffset;
 		sega_dec_read_delegate m_read_ch;
 
 	};

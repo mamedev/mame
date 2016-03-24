@@ -71,7 +71,7 @@ struct hd63450_regs
 class hd63450_device : public device_t
 {
 public:
-	hd63450_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~hd63450_device() {}
 
 	template<class _Object> static devcb_base &set_dma_end_callback(device_t &device, _Object object) { return downcast<hd63450_device &>(device).m_dma_end.set_callback(object); }
@@ -85,7 +85,7 @@ public:
 	template<class _Object> static devcb_base &set_dma_write_2_callback(device_t &device, _Object object) { return downcast<hd63450_device &>(device).m_dma_write_2.set_callback(object); }
 	template<class _Object> static devcb_base &set_dma_write_3_callback(device_t &device, _Object object) { return downcast<hd63450_device &>(device).m_dma_write_3.set_callback(object); }
 
-	static void set_cpu_tag(device_t &device, std::string tag) { downcast<hd63450_device &>(device).m_cpu_tag = tag; }
+	static void set_cpu_tag(device_t &device, const char *tag) { downcast<hd63450_device &>(device).m_cpu_tag = tag; }
 	static void set_our_clocks(device_t &device, const attotime &clk1, const attotime &clk2, const attotime &clk3, const attotime &clk4)
 	{
 		hd63450_device &dev = downcast<hd63450_device &>(device);
@@ -132,7 +132,7 @@ private:
 	devcb_write8 m_dma_write_2;
 	devcb_write8 m_dma_write_3;
 
-	std::string m_cpu_tag;
+	const char *m_cpu_tag;
 	attotime m_our_clock[4];
 	attotime m_burst_clock[4];
 

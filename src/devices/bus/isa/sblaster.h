@@ -97,12 +97,13 @@ class sb_device :
 {
 public:
 		// construction/destruction
-		sb_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname, std::string source);
+		sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source);
 
 		required_device<dac_device> m_dacl;
 		required_device<dac_device> m_dacr;
 		required_device<pc_joy_device> m_joy;
 		required_device<midi_port_device> m_mdout;
+		required_ioport m_config;
 
 		void process_fifo(UINT8 cmd);
 		void queue(UINT8 data);
@@ -158,14 +159,15 @@ class sb8_device : public sb_device,
 {
 public:
 		// construction/destruction
-		sb8_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname, std::string source);
+		sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source);
 
 		DECLARE_READ8_MEMBER(ym3812_16_r);
 		DECLARE_WRITE8_MEMBER(ym3812_16_w);
+		virtual ioport_constructor device_input_ports() const override;
 protected:
 		virtual void device_start() override;
-		virtual void drq_w(int state) override { m_isa->drq1_w(state); }
-		virtual void irq_w(int state, int source) override { m_isa->irq5_w(state); }
+		virtual void drq_w(int state) override;
+		virtual void irq_w(int state, int source) override;
 		virtual UINT8 dack_r(int line) override { return sb_device::dack_r(line); }
 		virtual void dack_w(int line, UINT8 data) override { sb_device::dack_w(line, data); }
 private:
@@ -176,7 +178,7 @@ class isa8_sblaster1_0_device : public sb8_device
 {
 public:
 		// construction/destruction
-		isa8_sblaster1_0_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
@@ -198,7 +200,7 @@ class isa8_sblaster1_5_device : public sb8_device
 {
 public:
 		// construction/destruction
-		isa8_sblaster1_5_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
@@ -212,20 +214,21 @@ class sb16_device : public sb_device,
 {
 public:
 		// construction/destruction
-		sb16_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, std::string name, std::string shortname, std::string source);
+		sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source);
 		DECLARE_READ8_MEMBER(mpu401_r);
 		DECLARE_WRITE8_MEMBER(mpu401_w);
 		DECLARE_READ8_MEMBER(mixer_r);
 		DECLARE_WRITE8_MEMBER(mixer_w);
+		virtual ioport_constructor device_input_ports() const override;
 protected:
 		virtual void device_start() override;
 		virtual UINT16 dack16_r(int line) override;
 		virtual UINT8 dack_r(int line) override { return sb_device::dack_r(line); }
 		virtual void dack_w(int line, UINT8 data) override { sb_device::dack_w(line, data); }
 		virtual void dack16_w(int line, UINT16 data) override;
-		virtual void drq16_w(int state) override { m_isa->drq5_w(state); }
-		virtual void drq_w(int state) override { m_isa->drq1_w(state); }
-		virtual void irq_w(int state, int source) override { (state?m_dsp.irq_active|=source:m_dsp.irq_active&=~source); m_isa->irq5_w(m_dsp.irq_active != 0);  }
+		virtual void drq16_w(int state) override;
+		virtual void drq_w(int state) override;
+		virtual void irq_w(int state, int source) override;
 		virtual void mixer_reset() override;
 		void mixer_set();
 		virtual void rcv_complete() override;    // Rx completed receiving byte
@@ -237,7 +240,7 @@ class isa16_sblaster16_device : public sb16_device
 {
 public:
 		// construction/destruction
-		isa16_sblaster16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;

@@ -26,7 +26,7 @@ const device_type C64_KINGSOFT = &device_creator<c64_kingsoft_cartridge_device>;
 //  c64_kingsoft_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_kingsoft_cartridge_device::c64_kingsoft_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+c64_kingsoft_cartridge_device::c64_kingsoft_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_KINGSOFT, "C64 Kingsoft cartridge", tag, owner, clock, "c64_kingsoft", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this)
 {

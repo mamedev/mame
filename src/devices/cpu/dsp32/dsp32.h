@@ -96,7 +96,7 @@ class dsp32c_device : public cpu_device
 {
 public:
 	// construction/destruction
-	dsp32c_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	dsp32c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_output_pins_callback(device_t &device, _Object object) { return downcast<dsp32c_device &>(device).m_output_pins_changed.set_callback(object); }
 

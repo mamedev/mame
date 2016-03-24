@@ -1,10 +1,9 @@
-// license:???
-// copyright-holders:Kenneth Lin
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
+// thanks-to:Kenneth Lin (original driver author)
 /***************************************************************************
 
   jackal.c
-
-  Written by Kenneth Lin (kenneth_lin@ai.vancouver.bc.ca)
 
 Notes:
 - This game uses two 005885 gfx chip in parallel. The unique thing about it is

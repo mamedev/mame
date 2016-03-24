@@ -39,75 +39,95 @@ const device_type PENTIUM3 = &device_creator<pentium3_device>;
 const device_type PENTIUM4 = &device_creator<pentium4_device>;
 
 
-i386_device::i386_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i386_device::i386_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, I386, "I386", tag, owner, clock, "i386", __FILE__)
+	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 32, 16, 0)
 	, m_smiact(*this)
 {
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = 12;
+
+	// 32 unified
+	set_vtlb_dynamic_entries(32);
 }
 
 
-i386_device::i386_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int program_data_width, int program_addr_width, int io_data_width)
+i386_device::i386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int program_data_width, int program_addr_width, int io_data_width)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
 	, m_smiact(*this)
 {
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = 12;
+
+	// 32 unified
+	set_vtlb_dynamic_entries(32);
 }
 
-i386SX_device::i386SX_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i386SX_device::i386SX_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i386_device(mconfig, I386SX, "I386SX", tag, owner, clock, "i386sx", __FILE__, 16, 24, 16)
 {
 }
 
-i486_device::i486_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i486_device::i486_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i386_device(mconfig, I486, "I486", tag, owner, clock, "i486", __FILE__)
 {
 }
 
-pentium_device::pentium_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pentium_device::pentium_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i386_device(mconfig, PENTIUM, "PENTIUM", tag, owner, clock, "pentium", __FILE__)
 {
+	// 64 dtlb small, 8 dtlb large, 32 itlb
+	set_vtlb_dynamic_entries(96);
 }
 
-pentium_device::pentium_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+pentium_device::pentium_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: i386_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
+	// 64 dtlb small, 8 dtlb large, 32 itlb
+	set_vtlb_dynamic_entries(96);
 }
 
-mediagx_device::mediagx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mediagx_device::mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i386_device(mconfig, MEDIAGX, "MEDIAGX", tag, owner, clock, "mediagx", __FILE__)
 {
 }
 
-pentium_pro_device::pentium_pro_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pentium_pro_device::pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pentium_device(mconfig, PENTIUM_PRO, "Pentium Pro", tag, owner, clock, "pentium_pro", __FILE__)
 {
 }
 
-pentium_mmx_device::pentium_mmx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pentium_mmx_device::pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pentium_device(mconfig, PENTIUM_MMX, "Pentium MMX", tag, owner, clock, "pentium_mmx", __FILE__)
 {
+	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
+	set_vtlb_dynamic_entries(96);
 }
 
-pentium2_device::pentium2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pentium2_device::pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pentium_device(mconfig, PENTIUM2, "Pentium II", tag, owner, clock, "pentium2", __FILE__)
 {
+	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
+	set_vtlb_dynamic_entries(96);
 }
 
-pentium3_device::pentium3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pentium3_device::pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pentium_device(mconfig, PENTIUM3, "Pentium III", tag, owner, clock, "pentium3", __FILE__)
 {
+	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
+	set_vtlb_dynamic_entries(96);
 }
 
-pentium4_device::pentium4_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pentium4_device::pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pentium_device(mconfig, PENTIUM4, "Pentium 4", tag, owner, clock, "pentium4", __FILE__)
 {
+	// 128 dtlb, 64 itlb
+	set_vtlb_dynamic_entries(196);
 }
 
 
@@ -956,10 +976,10 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 					//logerror("IRQ (%08x): Interrupt during V8086 task\n",m_pc);
 					if(type & 0x08)
 					{
-						PUSH32(m_sreg[GS].selector & 0xffff);
-						PUSH32(m_sreg[FS].selector & 0xffff);
-						PUSH32(m_sreg[DS].selector & 0xffff);
-						PUSH32(m_sreg[ES].selector & 0xffff);
+						PUSH32SEG(m_sreg[GS].selector & 0xffff);
+						PUSH32SEG(m_sreg[FS].selector & 0xffff);
+						PUSH32SEG(m_sreg[DS].selector & 0xffff);
+						PUSH32SEG(m_sreg[ES].selector & 0xffff);
 					}
 					else
 					{
@@ -981,7 +1001,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 				if(type & 0x08)
 				{
 					// 32-bit gate
-					PUSH32(oldSS);
+					PUSH32SEG(oldSS);
 					PUSH32(oldESP);
 				}
 				else
@@ -1043,7 +1063,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 			else
 			{
 				PUSH32(oldflags & 0x00ffffff );
-				PUSH32(m_sreg[CS].selector );
+				PUSH32SEG(m_sreg[CS].selector );
 				if(irq == 3 || irq == 4 || irq == 9 || irq_gate == 1)
 					PUSH32(m_eip );
 				else
@@ -1306,7 +1326,7 @@ void i386_device::i386_task_switch(UINT16 selector, UINT8 nested)
 	}
 	m_cr[3] = READ32(tss+0x1c);  // CR3 (PDBR)
 	if(oldcr3 != m_cr[3])
-		vtlb_flush_dynamic(m_vtlb);
+		vtlb_flush_dynamic();
 
 	/* Set the busy bit in the new task's descriptor */
 	if(selector & 0x0004)
@@ -1915,7 +1935,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 
 					if(operand32 != 0)
 					{
-						PUSH32(oldSS);
+						PUSH32SEG(oldSS);
 						PUSH32(oldESP);
 					}
 					else
@@ -2049,7 +2069,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 		else
 		{
 			/* 32-bit operand size */
-			PUSH32(m_sreg[CS].selector );
+			PUSH32SEG(m_sreg[CS].selector );
 			PUSH32(m_eip );
 			m_sreg[CS].selector = selector;
 			m_performed_intersegment_jump = 1;
@@ -2344,6 +2364,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 	I386_SREG desc,stack;
 	UINT8 CPL, RPL, DPL;
 	UINT32 newflags;
+	UINT8 IOPL = m_IOP1 | (m_IOP2 << 1);
 
 	CPL = m_CPL;
 	UINT32 ea = i386_translate(SS, (STACK_32BIT)?REG32(ESP):REG16(SP), 0);
@@ -2363,7 +2384,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 	if(V8086_MODE)
 	{
 		UINT32 oldflags = get_flags();
-		if(!m_IOP1 || !m_IOP2)
+		if(IOPL != 3)
 		{
 			logerror("IRET (%08x): Is in Virtual 8086 mode and IOPL != 3.\n",m_pc);
 			FAULT(FAULT_GP,0)
@@ -2435,6 +2456,8 @@ void i386_device::i386_protected_mode_iret(int operand32)
 			{
 				UINT32 oldflags = get_flags();
 				newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+				if(CPL > IOPL)
+					newflags = (newflags & ~0x200 ) | (oldflags & 0x200);
 			}
 			set_flags(newflags);
 			m_eip = POP32() & 0xffff;  // high 16 bits are ignored
@@ -2551,7 +2574,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				}
 				if((desc.flags & 0x0080) == 0)
 				{
-					logerror("IRET: Return CS segment is not present.\n");
+					logerror("IRET: (%08x) Return CS segment is not present.\n", m_pc);
 					FAULT(FAULT_NP,newCS & ~0x03)
 				}
 				if(newEIP > desc.limit)
@@ -2564,6 +2587,8 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				{
 					UINT32 oldflags = get_flags();
 					newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+					if(CPL > IOPL)
+						newflags = (newflags & ~0x200 ) | (oldflags & 0x200);
 				}
 
 				if(operand32 == 0)
@@ -2733,6 +2758,8 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				{
 					UINT32 oldflags = get_flags();
 					newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+					if(CPL > IOPL)
+						newflags = (newflags & ~0x200 ) | (oldflags & 0x200);
 				}
 
 				if(operand32 == 0)
@@ -3178,7 +3205,7 @@ void i386_device::i386_postload()
 	CHANGE_PC(m_eip);
 }
 
-void i386_device::i386_common_init(int tlbsize)
+void i386_device::i386_common_init()
 {
 	int i, j;
 	static const int regs8[8] = {AL,CL,DL,BL,AH,CH,DH,BH};
@@ -3211,7 +3238,6 @@ void i386_device::i386_common_init(int tlbsize)
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_io = &space(AS_IO);
-	m_vtlb = vtlb_alloc(this, AS_PROGRAM, 0, tlbsize);
 	m_smi = false;
 	m_debugger_temp = 0;
 	m_lock = false;
@@ -3294,7 +3320,7 @@ void i386_device::i386_common_init(int tlbsize)
 
 void i386_device::device_start()
 {
-	i386_common_init(32);
+	i386_common_init();
 
 	build_opcode_table(OP_I386);
 	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_I386].get();
@@ -3470,55 +3496,55 @@ void i386_device::state_string_export(const device_state_entry &entry, std::stri
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%08X", get_flags());
+			str = string_format("%08X", get_flags());
 			break;
 		case X87_ST0:
-			strprintf(str, "%f", fx80_to_double(ST(0)));
+			str = string_format("%f", fx80_to_double(ST(0)));
 			break;
 		case X87_ST1:
-			strprintf(str, "%f", fx80_to_double(ST(1)));
+			str = string_format("%f", fx80_to_double(ST(1)));
 			break;
 		case X87_ST2:
-			strprintf(str, "%f", fx80_to_double(ST(2)));
+			str = string_format("%f", fx80_to_double(ST(2)));
 			break;
 		case X87_ST3:
-			strprintf(str, "%f", fx80_to_double(ST(3)));
+			str = string_format("%f", fx80_to_double(ST(3)));
 			break;
 		case X87_ST4:
-			strprintf(str, "%f", fx80_to_double(ST(4)));
+			str = string_format("%f", fx80_to_double(ST(4)));
 			break;
 		case X87_ST5:
-			strprintf(str, "%f", fx80_to_double(ST(5)));
+			str = string_format("%f", fx80_to_double(ST(5)));
 			break;
 		case X87_ST6:
-			strprintf(str, "%f", fx80_to_double(ST(6)));
+			str = string_format("%f", fx80_to_double(ST(6)));
 			break;
 		case X87_ST7:
-			strprintf(str, "%f", fx80_to_double(ST(7)));
+			str = string_format("%f", fx80_to_double(ST(7)));
 			break;
 		case SSE_XMM0:
-			strprintf(str, "%08x%08x%08x%08x", XMM(0).d[3], XMM(0).d[2], XMM(0).d[1], XMM(0).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(0).d[3], XMM(0).d[2], XMM(0).d[1], XMM(0).d[0]);
 			break;
 		case SSE_XMM1:
-			strprintf(str, "%08x%08x%08x%08x", XMM(1).d[3], XMM(1).d[2], XMM(1).d[1], XMM(1).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(1).d[3], XMM(1).d[2], XMM(1).d[1], XMM(1).d[0]);
 			break;
 		case SSE_XMM2:
-			strprintf(str, "%08x%08x%08x%08x", XMM(2).d[3], XMM(2).d[2], XMM(2).d[1], XMM(2).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(2).d[3], XMM(2).d[2], XMM(2).d[1], XMM(2).d[0]);
 			break;
 		case SSE_XMM3:
-			strprintf(str, "%08x%08x%08x%08x", XMM(3).d[3], XMM(3).d[2], XMM(3).d[1], XMM(3).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(3).d[3], XMM(3).d[2], XMM(3).d[1], XMM(3).d[0]);
 			break;
 		case SSE_XMM4:
-			strprintf(str, "%08x%08x%08x%08x", XMM(4).d[3], XMM(4).d[2], XMM(4).d[1], XMM(4).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(4).d[3], XMM(4).d[2], XMM(4).d[1], XMM(4).d[0]);
 			break;
 		case SSE_XMM5:
-			strprintf(str, "%08x%08x%08x%08x", XMM(5).d[3], XMM(5).d[2], XMM(5).d[1], XMM(5).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(5).d[3], XMM(5).d[2], XMM(5).d[1], XMM(5).d[0]);
 			break;
 		case SSE_XMM6:
-			strprintf(str, "%08x%08x%08x%08x", XMM(6).d[3], XMM(6).d[2], XMM(6).d[1], XMM(6).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(6).d[3], XMM(6).d[2], XMM(6).d[1], XMM(6).d[0]);
 			break;
 		case SSE_XMM7:
-			strprintf(str, "%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
 			break;
 	}
 }
@@ -3698,7 +3724,6 @@ void i386_device::zero_state()
 void i386_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -3731,6 +3756,7 @@ void i386_device::device_reset()
 	// Family 3 (386), Model 0 (DX), Stepping 8 (D1)
 	REG32(EAX) = 0;
 	REG32(EDX) = (3 << 8) | (0 << 4) | (8);
+	m_cpu_version = REG32(EDX);
 
 	m_CPL = 0;
 
@@ -3804,7 +3830,7 @@ void i386_device::pentium_smi()
 	WRITE32(REG32(ESI), smram_state+SMRAM_ESI);
 	WRITE32(REG32(EDI), smram_state+SMRAM_EDI);
 	WRITE32(m_eip, smram_state+SMRAM_EIP);
-	WRITE32(old_flags, smram_state+SMRAM_EAX);
+	WRITE32(old_flags, smram_state+SMRAM_EFLAGS);
 	WRITE32(m_cr[3], smram_state+SMRAM_CR3);
 	WRITE32(old_cr0, smram_state+SMRAM_CR0);
 
@@ -3890,7 +3916,7 @@ void i386_device::i386_set_a20_line(int state)
 		m_a20_mask = ~(1 << 20);
 	}
 	// TODO: how does A20M and the tlb interact
-	vtlb_flush_dynamic(m_vtlb);
+	vtlb_flush_dynamic();
 }
 
 void i386_device::execute_run()
@@ -3976,7 +4002,7 @@ offs_t i386_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
 
 void i486_device::device_start()
 {
-	i386_common_init(32);
+	i386_common_init();
 
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486);
 	build_x87_opcode_table();
@@ -3989,7 +4015,6 @@ void i486_device::device_start()
 void i486_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4022,6 +4047,7 @@ void i486_device::device_reset()
 	// Family 4 (486), Model 0/1 (DX), Stepping 3
 	REG32(EAX) = 0;
 	REG32(EDX) = (4 << 8) | (0 << 4) | (3);
+	m_cpu_version = REG32(EDX);
 
 	CHANGE_PC(m_eip);
 }
@@ -4033,8 +4059,7 @@ void i486_device::device_reset()
 
 void pentium_device::device_start()
 {
-	// 64 dtlb small, 8 dtlb large, 32 itlb
-	i386_common_init(96);
+	i386_common_init();
 	register_state_i386_x87();
 
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM);
@@ -4046,7 +4071,6 @@ void pentium_device::device_start()
 void pentium_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4107,8 +4131,7 @@ void pentium_device::device_reset()
 
 void mediagx_device::device_start()
 {
-	// probably 32 unified
-	i386_common_init(32);
+	i386_common_init();
 	register_state_i386_x87();
 
 	build_x87_opcode_table();
@@ -4120,7 +4143,6 @@ void mediagx_device::device_start()
 void mediagx_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4172,8 +4194,7 @@ void mediagx_device::device_reset()
 
 void pentium_pro_device::device_start()
 {
-	// 64 dtlb small, 32 itlb
-	i386_common_init(96);
+	i386_common_init();
 	register_state_i386_x87();
 
 	build_x87_opcode_table();
@@ -4185,7 +4206,6 @@ void pentium_pro_device::device_start()
 void pentium_pro_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4247,8 +4267,7 @@ void pentium_pro_device::device_reset()
 
 void pentium_mmx_device::device_start()
 {
-	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
-	i386_common_init(96);
+	i386_common_init();
 	register_state_i386_x87();
 
 	build_x87_opcode_table();
@@ -4260,7 +4279,6 @@ void pentium_mmx_device::device_start()
 void pentium_mmx_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4320,8 +4338,7 @@ void pentium_mmx_device::device_reset()
 
 void pentium2_device::device_start()
 {
-	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
-	i386_common_init(96);
+	i386_common_init();
 	register_state_i386_x87();
 
 	build_x87_opcode_table();
@@ -4333,7 +4350,6 @@ void pentium2_device::device_start()
 void pentium2_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4387,8 +4403,7 @@ void pentium2_device::device_reset()
 
 void pentium3_device::device_start()
 {
-	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
-	i386_common_init(96);
+	i386_common_init();
 	register_state_i386_x87_xmm();
 
 	build_x87_opcode_table();
@@ -4400,7 +4415,6 @@ void pentium3_device::device_start()
 void pentium3_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4456,8 +4470,7 @@ void pentium3_device::device_reset()
 
 void pentium4_device::device_start()
 {
-	// 128 dtlb, 64 itlb
-	i386_common_init(196);
+	i386_common_init();
 	register_state_i386_x87_xmm();
 
 	build_x87_opcode_table();
@@ -4469,7 +4482,6 @@ void pentium4_device::device_start()
 void pentium4_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;

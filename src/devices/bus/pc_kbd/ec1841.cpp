@@ -280,7 +280,7 @@ ioport_constructor ec_1841_keyboard_device::device_input_ports() const
 //  ec_1841_keyboard_device - constructor
 //-------------------------------------------------
 
-ec_1841_keyboard_device::ec_1841_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ec_1841_keyboard_device::ec_1841_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC_KBD_EC_1841, "EC-1841 Keyboard", tag, owner, clock, "kb_ec1841", __FILE__),
 		device_pc_kbd_interface(mconfig, *this),
 		m_maincpu(*this, I8048_TAG),
@@ -339,7 +339,7 @@ void ec_1841_keyboard_device::device_reset()
 
 WRITE_LINE_MEMBER( ec_1841_keyboard_device::clock_write )
 {
-	DBG_LOG(1,0,( "%s: clock write %d\n", tag().c_str(), state));
+	DBG_LOG(1,0,( "%s: clock write %d\n", tag(), state));
 }
 
 
@@ -349,7 +349,7 @@ WRITE_LINE_MEMBER( ec_1841_keyboard_device::clock_write )
 
 WRITE_LINE_MEMBER( ec_1841_keyboard_device::data_write )
 {
-	DBG_LOG(1,0,( "%s: data write %d\n", tag().c_str(), state));
+	DBG_LOG(1,0,( "%s: data write %d\n", tag(), state));
 }
 
 
@@ -359,7 +359,7 @@ WRITE_LINE_MEMBER( ec_1841_keyboard_device::data_write )
 
 WRITE8_MEMBER( ec_1841_keyboard_device::bus_w )
 {
-	DBG_LOG(2,0,( "%s: bus_w %02x\n", tag().c_str(), data));
+	DBG_LOG(2,0,( "%s: bus_w %02x\n", tag(), data));
 
 	m_bus = data;
 }
@@ -391,7 +391,7 @@ READ8_MEMBER( ec_1841_keyboard_device::p1_r )
 	data |= clock_signal();
 	data |= data_signal() << 1;
 
-	DBG_LOG(1,0,( "%s: p1_r %02x\n", tag().c_str(), data));
+	DBG_LOG(1,0,( "%s: p1_r %02x\n", tag(), data));
 
 	return data;
 }
@@ -415,7 +415,7 @@ WRITE8_MEMBER( ec_1841_keyboard_device::p1_w )
 	    6       LED XXX
 	    7       LED XXX
 	*/
-	DBG_LOG(1,0,( "%s: p1_w %02x\n", tag().c_str(), data));
+	DBG_LOG(1,0,( "%s: p1_w %02x\n", tag(), data));
 
 	m_p1 = data;
 }
@@ -439,7 +439,7 @@ WRITE8_MEMBER( ec_1841_keyboard_device::p2_w )
 	    6       XXX CLOCK out 2?
 	    7       XXX
 	*/
-	DBG_LOG(1,0,( "%s: p2_w %02x\n", tag().c_str(), data));
+	DBG_LOG(1,0,( "%s: p2_w %02x\n", tag(), data));
 
 	m_pc_kbdc->data_write_from_kb(BIT(data, 2));
 	m_pc_kbdc->clock_write_from_kb(BIT(data, 1));
@@ -480,7 +480,7 @@ READ8_MEMBER( ec_1841_keyboard_device::t1_r )
 		m_q = BIT(sense, (m_bus >> 4) & 7);
 	}
 
-	DBG_LOG(1,0,( "%s: bus %02X t1_r %d\n", tag().c_str(), m_bus, m_q));
+	DBG_LOG(1,0,( "%s: bus %02X t1_r %d\n", tag(), m_bus, m_q));
 
 	return m_q;
 }

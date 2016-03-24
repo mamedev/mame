@@ -37,7 +37,7 @@ struct line_buffer_t
 class esripsys_state : public driver_device
 {
 public:
-	esripsys_state(const machine_config &mconfig, device_type type, std::string tag)
+	esripsys_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_framecpu(*this, "frame_cpu"),
 			m_videocpu(*this, "video_cpu"),

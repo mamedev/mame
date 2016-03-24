@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 
-
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
@@ -47,7 +46,6 @@ struct buf_t
 
 struct shmem_t
 {
-	volatile INT32  lock;
 	buf_t               buf[2];
 };
 
@@ -62,7 +60,7 @@ struct osd_shared_mem
 class gaelco_serial_device : public device_t
 {
 public:
-	gaelco_serial_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~gaelco_serial_device() {}
 
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<gaelco_serial_device &>(device).m_irq_handler.set_callback(object); }
@@ -106,6 +104,7 @@ private:
 	buf_t *m_out_ptr;
 	osd_shared_mem *m_os_shmem;
 	shmem_t *m_shmem;
+	std::mutex m_mutex;
 
 	TIMER_CALLBACK_MEMBER( set_status_cb );
 	TIMER_CALLBACK_MEMBER( link_cb );

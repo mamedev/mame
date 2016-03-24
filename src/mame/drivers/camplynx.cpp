@@ -129,7 +129,7 @@
 class camplynx_state : public driver_device
 {
 public:
-	camplynx_state(const machine_config &mconfig, device_type type, std::string tag)
+	camplynx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
@@ -831,7 +831,7 @@ static MACHINE_CONFIG_START( lynx48k, camplynx_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx48k_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("maincpu", z80_device, irq_line))
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( lynx96k, lynx48k )
@@ -871,7 +871,7 @@ static MACHINE_CONFIG_START( lynx128k, camplynx_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx128k_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("maincpu", z80_device, irq_line))
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_FRAGMENT_ADD(lynx_disk)
 MACHINE_CONFIG_END

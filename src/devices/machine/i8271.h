@@ -26,7 +26,7 @@
 class i8271_device : public device_t
 {
 public:
-	i8271_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~i8271_device() {}
 
 	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).intrq_cb.set_callback(object); }
@@ -215,6 +215,7 @@ private:
 	UINT8 srate, hset, icnt, hload;
 	int sector_size;
 	int cur_rate;
+	int idle_icnt;
 
 	static std::string tts(attotime t);
 	std::string ttsn();

@@ -44,7 +44,7 @@ class i8089_device : public cpu_device
 
 public:
 	// construction/destruction
-	i8089_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// callbacks
 	template<class _sintr1> void set_sintr1_callback(_sintr1 sintr1) { m_write_sintr1.set_callback(sintr1); }

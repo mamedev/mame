@@ -72,7 +72,7 @@
 
 const device_type CORVUS_HDC = &device_creator<corvus_hdc_t>;
 
-corvus_hdc_t::corvus_hdc_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+corvus_hdc_t::corvus_hdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CORVUS_HDC, "Corvus Flat Cable HDC", tag, owner, clock, "corvus_hdc", __FILE__),
 	m_status(0),
 	m_prep_mode(false),
@@ -874,7 +874,7 @@ UINT8 corvus_hdc_t::corvus_read_firmware_block(UINT8 head, UINT8 sector) {
 //      Status of command
 //
 UINT8 corvus_hdc_t::corvus_write_firmware_block(UINT8 head, UINT8 sector, UINT8 *buffer) {
-	UINT16  relative_sector;    // Relative sector on drive for Physical Read
+	UINT16  relative_sector;    // Relative sector on drive for Physical Write
 	UINT8   status;
 
 	relative_sector = head * m_sectors_per_track + sector;

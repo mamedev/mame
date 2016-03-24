@@ -39,7 +39,7 @@
 const device_type NES_SOMARI = &device_creator<nes_somari_device>;
 
 
-nes_somari_device::nes_somari_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_somari_device::nes_somari_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_txrom_device(mconfig, NES_SOMARI, "NES Cart Team Somari PCB", tag, owner, clock, "nes_somari", __FILE__),
 	m_board_mode(0),
 	m_mmc3_mirror_reg(0),

@@ -18,7 +18,7 @@ class namco_c116_device :
 {
 public:
 	//construction/destruction
-	namco_c116_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	namco_c116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	//read/write handlers
 	DECLARE_READ8_MEMBER( read );

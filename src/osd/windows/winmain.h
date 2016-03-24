@@ -25,14 +25,9 @@
 // video options
 #define WINOPTION_MENU                  "menu"
 
-// DirectDraw-specific options
-#define WINOPTION_HWSTRETCH             "hwstretch"
-
 // core post-processing options
 #define WINOPTION_HLSL_ENABLE               "hlsl_enable"
 #define WINOPTION_HLSLPATH                  "hlslpath"
-#define WINOPTION_HLSL_PRESCALE_X           "hlsl_prescale_x"
-#define WINOPTION_HLSL_PRESCALE_Y           "hlsl_prescale_y"
 #define WINOPTION_HLSL_WRITE                "hlsl_write"
 #define WINOPTION_HLSL_SNAP_WIDTH           "hlsl_snap_width"
 #define WINOPTION_HLSL_SNAP_HEIGHT          "hlsl_snap_height"
@@ -53,9 +48,11 @@
 #define WINOPTION_SCANLINE_AMOUNT           "scanline_alpha"
 #define WINOPTION_SCANLINE_SCALE            "scanline_size"
 #define WINOPTION_SCANLINE_HEIGHT           "scanline_height"
+#define WINOPTION_SCANLINE_VARIATION        "scanline_variation"
 #define WINOPTION_SCANLINE_BRIGHT_SCALE     "scanline_bright_scale"
 #define WINOPTION_SCANLINE_BRIGHT_OFFSET    "scanline_bright_offset"
-#define WINOPTION_SCANLINE_OFFSET           "scanline_jitter"
+#define WINOPTION_SCANLINE_JITTER           "scanline_jitter"
+#define WINOPTION_HUM_BAR_ALPHA             "hum_bar_alpha"
 #define WINOPTION_DEFOCUS                   "defocus"
 #define WINOPTION_CONVERGE_X                "converge_x"
 #define WINOPTION_CONVERGE_Y                "converge_y"
@@ -71,6 +68,7 @@
 #define WINOPTION_PHOSPHOR                  "phosphor_life"
 #define WINOPTION_SATURATION                "saturation"
 #define WINOPTION_YIQ_ENABLE                "yiq_enable"
+#define WINOPTION_YIQ_JITTER                "yiq_jitter"
 #define WINOPTION_YIQ_CCVALUE               "yiq_cc"
 #define WINOPTION_YIQ_AVALUE                "yiq_a"
 #define WINOPTION_YIQ_BVALUE                "yiq_b"
@@ -110,8 +108,6 @@
 #define WINOPTION_GLOBAL_INPUTS         "global_inputs"
 #define WINOPTION_DUAL_LIGHTGUN         "dual_lightgun"
 
-
-
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
@@ -129,15 +125,10 @@ public:
 	// video options
 	bool menu() const { return bool_value(WINOPTION_MENU); }
 
-	// DirectDraw-specific options
-	bool hwstretch() const { return bool_value(WINOPTION_HWSTRETCH); }
-
 	// core post-processing options
 	const char *screen_post_fx_dir() const { return value(WINOPTION_HLSLPATH); }
 	bool d3d_hlsl_enable() const { return bool_value(WINOPTION_HLSL_ENABLE); }
 	const char *d3d_hlsl_write() const { return value(WINOPTION_HLSL_WRITE); }
-	int d3d_hlsl_prescale_x() const { return int_value(WINOPTION_HLSL_PRESCALE_X); }
-	int d3d_hlsl_prescale_y() const { return int_value(WINOPTION_HLSL_PRESCALE_Y); }
 	int d3d_snap_width() const { return int_value(WINOPTION_HLSL_SNAP_WIDTH); }
 	int d3d_snap_height() const { return int_value(WINOPTION_HLSL_SNAP_HEIGHT); }
 	int screen_shadow_mask_tile_mode() const { return int_value(WINOPTION_SHADOW_MASK_TILE_MODE); }
@@ -152,9 +143,11 @@ public:
 	float screen_scanline_amount() const { return float_value(WINOPTION_SCANLINE_AMOUNT); }
 	float screen_scanline_scale() const { return float_value(WINOPTION_SCANLINE_SCALE); }
 	float screen_scanline_height() const { return float_value(WINOPTION_SCANLINE_HEIGHT); }
+	float screen_scanline_variation() const { return float_value(WINOPTION_SCANLINE_VARIATION); }
 	float screen_scanline_bright_scale() const { return float_value(WINOPTION_SCANLINE_BRIGHT_SCALE); }
 	float screen_scanline_bright_offset() const { return float_value(WINOPTION_SCANLINE_BRIGHT_OFFSET); }
-	float screen_scanline_offset() const { return float_value(WINOPTION_SCANLINE_OFFSET); }
+	float screen_scanline_jitter() const { return float_value(WINOPTION_SCANLINE_JITTER); }
+	float screen_hum_bar_alpha() const { return float_value(WINOPTION_HUM_BAR_ALPHA); }
 	float screen_reflection() const { return float_value(WINOPTION_REFLECTION); }
 	float screen_curvature() const { return float_value(WINOPTION_CURVATURE); }
 	float screen_round_corner() const { return float_value(WINOPTION_ROUND_CORNER); }
@@ -169,6 +162,7 @@ public:
 	const char *screen_grn_ratio() const { return value(WINOPTION_GRN_RATIO); }
 	const char *screen_blu_ratio() const { return value(WINOPTION_BLU_RATIO); }
 	bool screen_yiq_enable() const { return bool_value(WINOPTION_YIQ_ENABLE); }
+	float screen_yiq_jitter() const { return float_value(WINOPTION_YIQ_JITTER); }
 	float screen_yiq_cc() const { return float_value(WINOPTION_YIQ_CCVALUE); }
 	float screen_yiq_a() const { return float_value(WINOPTION_YIQ_AVALUE); }
 	float screen_yiq_b() const { return float_value(WINOPTION_YIQ_BVALUE); }
@@ -236,6 +230,29 @@ private:
 //  TYPE DEFINITIONS
 //============================================================
 
+enum input_event
+{
+	INPUT_EVENT_KEYDOWN,
+	INPUT_EVENT_KEYUP,
+	INPUT_EVENT_RAWINPUT,
+	INPUT_EVENT_MOUSE_BUTTON
+};
+
+struct KeyPressEventArgs
+{
+	input_event event_id;
+	UINT8 vkey;
+	UINT8 scancode;
+};
+
+struct MouseButtonEventArgs
+{
+	int button;
+	int keydown;
+	int xpos;
+	int ypos;
+};
+
 class windows_osd_interface : public osd_common_t
 {
 public:
@@ -248,32 +265,40 @@ public:
 	virtual void update(bool skip_redraw) override;
 
 	// video overridables
-	virtual void *get_slider_list() override;
+	virtual slider_state *get_slider_list() override;
 
-	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 
 	virtual void video_register() override;
 
 	virtual bool video_init() override;
 	virtual bool window_init() override;
-	virtual bool input_init() override;
-	virtual void input_pause() override;
-	virtual void input_resume() override;
 	virtual bool output_init() override;
 
 	virtual void video_exit() override;
 	virtual void window_exit() override;
-	virtual void input_exit() override;
 	virtual void output_exit() override;
 
 	void extract_video_config();
 
+	// windows osd specific
+	bool handle_input_event(input_event eventid, void *eventdata) const;
+	bool should_hide_mouse() const;
+	void poll_input(running_machine &machine) const;
+
 	windows_options &options() { return m_options; }
+
+    int window_count();
+
+protected:
+	virtual void build_slider_list() override;
+	virtual void update_slider_list() override;
 
 private:
 	virtual void osd_exit() override;
-	windows_options &m_options;
+
+	windows_options &   m_options;
+	slider_state *      m_sliders;
 
 	static const int DEFAULT_FONT_HEIGHT = 200;
 };

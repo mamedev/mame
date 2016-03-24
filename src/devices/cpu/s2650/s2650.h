@@ -36,7 +36,7 @@ class s2650_device : public cpu_device
 {
 public:
 	// construction/destruction
-	s2650_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER(write_sense);
 

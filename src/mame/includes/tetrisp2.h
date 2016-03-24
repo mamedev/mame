@@ -3,7 +3,7 @@
 class tetrisp2_state : public driver_device
 {
 public:
-	tetrisp2_state(const machine_config &mconfig, device_type type, std::string tag)
+	tetrisp2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
@@ -138,7 +138,7 @@ public:
 class stepstag_state : public tetrisp2_state
 {
 public:
-	stepstag_state(const machine_config &mconfig, device_type type, std::string tag)
+	stepstag_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tetrisp2_state(mconfig, type, tag),
 			m_spriteram3(*this, "spriteram3") { }
 

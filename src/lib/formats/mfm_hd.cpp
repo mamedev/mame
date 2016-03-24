@@ -320,7 +320,7 @@ chd_error mfmhd_generic_format::load(chd_file* chdfile, UINT16* trackimage, int 
 	int sec_il_start = (m_param.cylskew * cylinder + m_param.headskew * head) % sectorcount;
 	int delta = (sectorcount + m_param.interleave-1) / m_param.interleave;
 
-	if (TRACE_RWTRACK) osd_printf_verbose("%s: Load track (c=%d,h=%d) from CHD, interleave=%d, cylskew=%d, headskew=%d\n", tag().c_str(), cylinder, head, m_param.interleave, m_param.cylskew, m_param.headskew);
+	if (TRACE_RWTRACK) osd_printf_verbose("%s: Load track (c=%d,h=%d) from CHD, interleave=%d, cylskew=%d, headskew=%d\n", tag(), cylinder, head, m_param.interleave, m_param.cylskew, m_param.headskew);
 
 	m_lastbit = false;
 
@@ -337,7 +337,7 @@ chd_error mfmhd_generic_format::load(chd_file* chdfile, UINT16* trackimage, int 
 	// Gap 1
 	mfm_encode(trackimage, position, 0x4e, m_param.gap1);
 
-	if (TRACE_LAYOUT) osd_printf_verbose("%s: cyl=%d head=%d: sector sequence = ", tag().c_str(), cylinder, head);
+	if (TRACE_LAYOUT) osd_printf_verbose("%s: cyl=%d head=%d: sector sequence = ", tag(), cylinder, head);
 
 	sec_number = sec_il_start;
 	for (int sector = 0; sector < sectorcount; sector++)
@@ -388,7 +388,7 @@ chd_error mfmhd_generic_format::load(chd_file* chdfile, UINT16* trackimage, int 
 		}
 		else
 		{
-			osd_printf_verbose("%s: Invalid CHS data (%d,%d,%d); not loading from CHD\n", tag().c_str(), cylinder, head, sector);
+			osd_printf_verbose("%s: Invalid CHS data (%d,%d,%d); not loading from CHD\n", tag(), cylinder, head, sector);
 		}
 
 		for (int i=0; i < size; i++)
@@ -436,7 +436,7 @@ enum
 
 chd_error mfmhd_generic_format::save(chd_file* chdfile, UINT16* trackimage, int tracksize, int current_cylinder, int current_head)
 {
-	if (TRACE_RWTRACK) osd_printf_verbose("%s: write back (c=%d,h=%d) to CHD\n", tag().c_str(), current_cylinder, current_head);
+	if (TRACE_RWTRACK) osd_printf_verbose("%s: write back (c=%d,h=%d) to CHD\n", tag(), current_cylinder, current_head);
 
 	UINT8 buffer[16384]; // for header or sector content
 
@@ -550,7 +550,7 @@ chd_error mfmhd_generic_format::save(chd_file* chdfile, UINT16* trackimage, int 
 
 		case FOUND_A1:
 			crc = ccitt_crc16_one(crc, byte);
-			// osd_printf_verbose("%s: MFM HD: Byte = %02x, CRC=%04x\n", tag().c_str(), byte, crc);
+			// osd_printf_verbose("%s: MFM HD: Byte = %02x, CRC=%04x\n", tag(), byte, crc);
 
 			// Put byte into buffer
 			// but not the data mark and the CRC
@@ -576,7 +576,7 @@ chd_error mfmhd_generic_format::save(chd_file* chdfile, UINT16* trackimage, int 
 						if (m_param.headerlen == 5) cylinder |= ((buffer[2]&0x70)<<4);
 						else
 						{
-							osd_printf_verbose("%s: Unexpected header size: %d, cylinder=%d, position=%04x\n", tag().c_str(), m_param.headerlen, cylinder, bytepos);
+							osd_printf_verbose("%s: Unexpected header size: %d, cylinder=%d, position=%04x\n", tag(), m_param.headerlen, cylinder, bytepos);
 							showtrack(trackimage, tracksize);
 						}
 
@@ -586,17 +586,17 @@ chd_error mfmhd_generic_format::save(chd_file* chdfile, UINT16* trackimage, int 
 
 						if (identexp != ident)
 						{
-							osd_printf_verbose("%s: Field error; ident = %02x (expected %02x) for sector chs=(%d,%d,%d)\n", tag().c_str(), ident, identexp, cylinder, head, sector);
+							osd_printf_verbose("%s: Field error; ident = %02x (expected %02x) for sector chs=(%d,%d,%d)\n", tag(), ident, identexp, cylinder, head, sector);
 						}
 
 						if (cylinder != current_cylinder)
 						{
-							osd_printf_verbose("%s: Sector header of sector %d defines cylinder = %02x (should be %02x)\n", tag().c_str(), sector, cylinder, current_cylinder);
+							osd_printf_verbose("%s: Sector header of sector %d defines cylinder = %02x (should be %02x)\n", tag(), sector, cylinder, current_cylinder);
 						}
 
 						if (head != current_head)
 						{
-							osd_printf_verbose("%s: Sector header of sector %d defines head = %02x (should be %02x)\n", tag().c_str(), sector, head, current_head);
+							osd_printf_verbose("%s: Sector header of sector %d defines head = %02x (should be %02x)\n", tag(), sector, head, current_head);
 						}
 
 						// Check skew
@@ -629,7 +629,7 @@ chd_error mfmhd_generic_format::save(chd_file* chdfile, UINT16* trackimage, int 
 						}
 
 						search_header = false;
-						if (TRACE_DETAIL) osd_printf_verbose("%s: Found sector chs=(%d,%d,%d)\n", tag().c_str(), cylinder, head, sector);
+						if (TRACE_DETAIL) osd_printf_verbose("%s: Found sector chs=(%d,%d,%d)\n", tag(), cylinder, head, sector);
 						headerpos = pos;
 						// Start the GAP2 counter (if not already determined)
 						if (m_param.gap2==0) countgap2 = true;
@@ -641,17 +641,17 @@ chd_error mfmhd_generic_format::save(chd_file* chdfile, UINT16* trackimage, int 
 						int lbaposition = chs_to_lba(cylinder, head, sector);
 						if (lbaposition>=0)
 						{
-							if (TRACE_DETAIL) osd_printf_verbose("%s: Writing sector chs=(%d,%d,%d) to CHD\n", tag().c_str(), current_cylinder, current_head, sector);
+							if (TRACE_DETAIL) osd_printf_verbose("%s: Writing sector chs=(%d,%d,%d) to CHD\n", tag(), current_cylinder, current_head, sector);
 							chdstate = chdfile->write_units(chs_to_lba(current_cylinder, current_head, sector), buffer);
 
 							if (chdstate != CHDERR_NONE)
 							{
-								osd_printf_verbose("%s: Write error while writing sector chs=(%d,%d,%d)\n", tag().c_str(), cylinder, head, sector);
+								osd_printf_verbose("%s: Write error while writing sector chs=(%d,%d,%d)\n", tag(), cylinder, head, sector);
 							}
 						}
 						else
 						{
-							osd_printf_verbose("%s: Invalid CHS data in track image: (%d,%d,%d); not saving to CHD\n", tag().c_str(), cylinder, head, sector);
+							osd_printf_verbose("%s: Invalid CHS data in track image: (%d,%d,%d); not saving to CHD\n", tag(), cylinder, head, sector);
 						}
 						if (m_param.gap3==0) countgap3 = true;
 						search_header = true;
@@ -662,7 +662,7 @@ chd_error mfmhd_generic_format::save(chd_file* chdfile, UINT16* trackimage, int 
 					// Let's test for a 5-byte header
 					if (search_header && m_param.headerlen==4 && current_cylinder==0 && current_head==0)
 					{
-						if (TRACE_DETAIL) osd_printf_verbose("%s: CRC error for 4-byte header; trying 5 bytes\n", tag().c_str());
+						if (TRACE_DETAIL) osd_printf_verbose("%s: CRC error for 4-byte header; trying 5 bytes\n", tag());
 						m_param.headerlen=5;
 						count = 1;
 						bytepos++;
@@ -670,7 +670,7 @@ chd_error mfmhd_generic_format::save(chd_file* chdfile, UINT16* trackimage, int 
 					}
 					else
 					{
-						osd_printf_verbose("%s: CRC error in %s of (%d,%d,%d)\n", tag().c_str(), search_header? "header" : "data", cylinder, head, sector);
+						osd_printf_verbose("%s: CRC error in %s of (%d,%d,%d)\n", tag(), search_header? "header" : "data", cylinder, head, sector);
 						search_header = true;
 					}
 				}
@@ -679,7 +679,7 @@ chd_error mfmhd_generic_format::save(chd_file* chdfile, UINT16* trackimage, int 
 
 				if (!search_header && (pos - headerpos) > 30)
 				{
-					osd_printf_verbose("%s: Error; missing DAM; searching next header\n", tag().c_str());
+					osd_printf_verbose("%s: Error; missing DAM; searching next header\n", tag());
 					search_header = true;
 				}
 			}
@@ -693,7 +693,7 @@ chd_error mfmhd_generic_format::save(chd_file* chdfile, UINT16* trackimage, int 
 		// Successfully determined the interleave
 		m_param.interleave = interleave;
 		if (TRACE_FORMAT)
-			if (current_cylinder==0 && current_head==0) osd_printf_verbose("%s: Determined interleave = %d\n", tag().c_str(), m_param.interleave);
+			if (current_cylinder==0 && current_head==0) osd_printf_verbose("%s: Determined interleave = %d\n", tag(), m_param.interleave);
 	}
 
 	if (check_skew == false)
@@ -703,12 +703,12 @@ chd_error mfmhd_generic_format::save(chd_file* chdfile, UINT16* trackimage, int 
 			if (m_secnumber[1] != -1)
 			{
 				if (save_param(MFMHD_HSKEW)) m_param.headskew = m_secnumber[1]-m_secnumber[0];
-				if (TRACE_FORMAT) osd_printf_verbose("%s: Determined head skew = %d\n", tag().c_str(), m_param.headskew);
+				if (TRACE_FORMAT) osd_printf_verbose("%s: Determined head skew = %d\n", tag(), m_param.headskew);
 			}
 			if (m_secnumber[2] != -1)
 			{
 				if (save_param(MFMHD_CSKEW)) m_param.cylskew = m_secnumber[2]-m_secnumber[0];
-				if (TRACE_FORMAT) osd_printf_verbose("%s: Determined cylinder skew = %d\n", tag().c_str(), m_param.cylskew);
+				if (TRACE_FORMAT) osd_printf_verbose("%s: Determined cylinder skew = %d\n", tag(), m_param.cylskew);
 			}
 		}
 	}

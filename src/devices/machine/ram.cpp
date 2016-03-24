@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Dirk Best
+// license:BSD-3-Clause
+// copyright-holders: Dirk Best
 /*************************************************************************
 
     RAM device
@@ -23,13 +23,11 @@
 // device type definition
 const device_type RAM = &device_creator<ram_device>;
 
-
-
 //-------------------------------------------------
 //  ram_device - constructor
 //-------------------------------------------------
 
-ram_device::ram_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RAM, "RAM", tag, owner, clock, "ram", __FILE__)
 {
 	m_size = 0;
@@ -37,8 +35,6 @@ ram_device::ram_device(const machine_config &mconfig, std::string tag, device_t 
 	m_extra_options = nullptr;
 	m_default_value = 0xCD;
 }
-
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -48,7 +44,7 @@ void ram_device::device_start()
 {
 	/* the device named 'ram' can get ram options from command line */
 	m_size = 0;
-	if (strcmp(tag().c_str(), ":" RAM_TAG) == 0)
+	if (strcmp(tag(), ":" RAM_TAG) == 0)
 	{
 		const char *ramsize_string = machine().options().ram_size();
 		if ((ramsize_string != nullptr) && (ramsize_string[0] != '\0'))
@@ -68,7 +64,6 @@ void ram_device::device_start()
 	save_item(NAME(m_pointer));
 }
 
-
 //-------------------------------------------------
 //  device_validity_check - device-specific validity
 //  checks
@@ -86,7 +81,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("Invalid default RAM option: %s\n", m_default_size);
 
 	/* command line options are only parsed for the device named RAM_TAG */
-	if (!tag().empty() && strcmp(tag().c_str(), ":" RAM_TAG) == 0)
+	if (tag() != nullptr && strcmp(tag(), ":" RAM_TAG) == 0)
 	{
 		/* verify command line ram option */
 		ramsize_string = mconfig().options().ram_size();
@@ -153,16 +148,16 @@ void ram_device::device_validity_check(validity_checker &valid) const
 
 	if (!is_valid)
 	{
-		std::string output;
-		strcatprintf(output, "Cannot recognize the RAM option %s", ramsize_string);
-		strcatprintf(output, " (valid options are %s", m_default_size);
+		std::ostringstream output;
+		util::stream_format(output, "Cannot recognize the RAM option %s", ramsize_string);
+		util::stream_format(output, " (valid options are %s", m_default_size);
 
 		if (m_extra_options != nullptr)
-			strcatprintf(output, ",%s).\n", m_extra_options);
+			util::stream_format(output, ",%s).\n", m_extra_options);
 		else
-			strcatprintf(output, ").\n");
+			util::stream_format(output, ").\n");
 
-		osd_printf_error("%s", output.c_str());
+		osd_printf_error("%s", output.str().c_str());
 
 		osd_printf_warning("Setting value to default %s\n",m_default_size);
 		std::string error;
@@ -170,8 +165,6 @@ void ram_device::device_validity_check(validity_checker &valid) const
 		assert(error.empty());
 	}
 }
-
-
 
 //-------------------------------------------------
 //  parse_string - convert a ram string to an
@@ -209,8 +202,6 @@ UINT32 ram_device::parse_string(const char *s)
 
 	return ram;
 }
-
-
 
 //-------------------------------------------------
 //  default_size

@@ -25,7 +25,7 @@
 class jtc_state : public driver_device
 {
 public:
-	jtc_state(const machine_config &mconfig, device_type type, std::string tag)
+	jtc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, UB8830D_TAG),
 			m_cassette(*this, "cassette"),
@@ -57,7 +57,7 @@ public:
 class jtces88_state : public jtc_state
 {
 public:
-	jtces88_state(const machine_config &mconfig, device_type type, std::string tag)
+	jtces88_state(const machine_config &mconfig, device_type type, const char *tag)
 		: jtc_state(mconfig, type, tag)
 	{ }
 };
@@ -66,7 +66,7 @@ public:
 class jtces23_state : public jtc_state
 {
 public:
-	jtces23_state(const machine_config &mconfig, device_type type, std::string tag)
+	jtces23_state(const machine_config &mconfig, device_type type, const char *tag)
 		: jtc_state(mconfig, type, tag)
 	{ }
 
@@ -78,7 +78,7 @@ public:
 class jtces40_state : public jtc_state
 {
 public:
-	jtces40_state(const machine_config &mconfig, device_type type, std::string tag)
+	jtces40_state(const machine_config &mconfig, device_type type, const char *tag)
 		: jtc_state(mconfig, type, tag)
 	{ }
 
@@ -751,7 +751,7 @@ static MACHINE_CONFIG_DERIVED( jtc, basic )
 	MCFG_SCREEN_VISIBLE_AREA(0, 64-1, 0, 64-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -783,7 +783,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( jtces23, basic, jtces23_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jtces23)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

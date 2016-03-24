@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- Acorn Atom - Floppy disk images -->
+
+<!-- Loading Instructions:
+
+    *DOS - enters the DOS. The LOAD and SAVE commands apply now to disk, not cassette. Use the BREAK key to return to the cassette basic.
+    *DIR - load the directory information into a buffer (but does not show it). This is a sort of mount command.
+    *CAT - prints the directory information from the buffer on the screen. If the disk was spinning, an implicit *DIR is executed.
+
+-->
+
+<softwarelist name="atom_flop" description="Acorn Atom disk images">
+
+	<software name="chuckie">
+		<description>Atomic Chuckie Egg (32K)</description>
+		<year>2012</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;runme&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="chuckie.dsk" size="102400" crc="1241ac5d" sha1="4ef6e1a18af27c922003415abb69987d54efe391" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gala">
+		<description>Galaforce (32K)</description>
+		<year>2012</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;runme&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="gala.dsk" size="102400" crc="db52a3ae" sha1="ffece5ae2295818f649735c5b7711e740dfe4731" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hardhath">
+		<description>Hard Hat Harry (32K)</description>
+		<year>2011</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Tom Walker" />
+		<info name="usage" value="Load with *RUN&quot;LOADER&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="hardhatharry.dsk" size="102400" crc="654cadd3" sha1="fd2f6ff91bfb105b5eb866562d23f3a6edc91276" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hypervpr">
+		<description>Hyper Viper (12K)</description>
+		<year>2011</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kenton Price" />
+		<info name="usage" value="Load with *RUN&quot;LOADER&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="hyperviper.dsk" size="102400" crc="401dadb9" sha1="ece2cf9d7740c0266ebe5072dd298e9811dd0f47" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jetsetmn">
+		<description>Jet Set Miner (12K)</description>
+		<year>2009</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;LOADER&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="jetsetminer.dsk" size="102400" crc="de1a54f2" sha1="62d97d25fb748ee72ee972ad42c30f69d31ec5e0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jsw">
+		<description>Jet Set Willy (32K)</description>
+		<year>2015</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;JSWRUN&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="jsw.dsk" size="102400" crc="01625c6a" sha1="ee1f5cc7e21cbc7044d4b6741b144facf45130e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jsw2">
+		<description>Jet Set Willy 2 (32K)</description>
+		<year>2015</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;JSW2RUN&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="jsw2.dsk" size="102400" crc="28566aed" sha1="394859c86d20d404a210e984b759c067aa2dc67d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="joeblade">
+		<description>Atomic Joe Blade (32K)</description>
+		<year>2014</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;JOE&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="joeblade.dsk" size="102400" crc="6b5fc7a5" sha1="58c812c2bdecc358e0a127d470ee26aa0c190262" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jungle">
+		<description>Jungle Journey (32K)</description>
+		<year>2012</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;runme&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="jungle.dsk" size="102400" crc="92c50fe2" sha1="a6ffbdbf0f2f7b5c4038d44632a14e1b89682db0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="repton">
+		<description>Repton (32K)</description>
+		<year>2013</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;runme&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="repton.dsk" size="102400" crc="17cebe3d" sha1="0657e2bb63ba46e0de7e21abca5cab6dcdf666d1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

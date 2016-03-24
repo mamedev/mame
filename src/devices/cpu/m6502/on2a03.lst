@@ -1,3 +1,5 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
 # n2a03 opcodes - same as 6502 but with d disabled
 adc_nd_aba
 	TMP = read_pc();

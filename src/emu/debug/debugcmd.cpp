@@ -603,7 +603,7 @@ int debug_command_parameter_cpu_space(running_machine &machine, const char *para
 	/* fetch the space pointer */
 	if (!cpu->memory().has_space(spacenum))
 	{
-		debug_console_printf(machine, "No matching memory space found for CPU '%s'\n", cpu->tag().c_str());
+		debug_console_printf(machine, "No matching memory space found for CPU '%s'\n", cpu->tag());
 		return FALSE;
 	}
 	result = &cpu->memory().space(spacenum);
@@ -699,7 +699,7 @@ static void execute_print(running_machine &machine, int ref, int params, const c
 
 	/* then print each one */
 	for (i = 0; i < params; i++)
-		debug_console_printf(machine, "%s", core_i64_hex_format(values[i], 0));
+		debug_console_printf(machine, "%X", values[i]);
 	debug_console_printf(machine, "\n");
 }
 
@@ -1013,7 +1013,7 @@ static void execute_focus(running_machine &machine, int ref, int params, const c
 	for (device_execute_interface *exec = iter.first(); exec != nullptr; exec = iter.next())
 		if (&exec->device() != cpu)
 			exec->device().debug()->ignore(true);
-	debug_console_printf(machine, "Now focused on CPU '%s'\n", cpu->tag().c_str());
+	debug_console_printf(machine, "Now focused on CPU '%s'\n", cpu->tag());
 }
 
 
@@ -1036,14 +1036,14 @@ static void execute_ignore(running_machine &machine, int ref, int params, const 
 			if (!exec->device().debug()->observing())
 			{
 				if (buffer.empty())
-					strprintf(buffer, "Currently ignoring device '%s'", exec->device().tag().c_str());
+					buffer = string_format("Currently ignoring device '%s'", exec->device().tag());
 				else
-					strcatprintf(buffer, ", '%s'", exec->device().tag().c_str());
+					buffer.append(string_format(", '%s'", exec->device().tag()));
 			}
 
 		/* special message for none */
 		if (buffer.empty())
-			strprintf(buffer, "Not currently ignoring any devices");
+			buffer = string_format("Not currently ignoring any devices");
 		debug_console_printf(machine, "%s\n", buffer.c_str());
 	}
 
@@ -1076,7 +1076,7 @@ static void execute_ignore(running_machine &machine, int ref, int params, const 
 			}
 
 			devicelist[paramnum]->debug()->ignore(true);
-			debug_console_printf(machine, "Now ignoring device '%s'\n", devicelist[paramnum]->tag().c_str());
+			debug_console_printf(machine, "Now ignoring device '%s'\n", devicelist[paramnum]->tag());
 		}
 	}
 }
@@ -1101,14 +1101,14 @@ static void execute_observe(running_machine &machine, int ref, int params, const
 			if (exec->device().debug()->observing())
 			{
 				if (buffer.empty())
-					strprintf(buffer, "Currently observing CPU '%s'", exec->device().tag().c_str());
+					buffer = string_format("Currently observing CPU '%s'", exec->device().tag());
 				else
-					strcatprintf(buffer, ", '%s'", exec->device().tag().c_str());
+					buffer.append(string_format(", '%s'", exec->device().tag()));
 			}
 
 		/* special message for none */
 		if (buffer.empty())
-			strprintf(buffer, "Not currently observing any devices");
+			buffer = string_format("Not currently observing any devices");
 		debug_console_printf(machine, "%s\n", buffer.c_str());
 	}
 
@@ -1126,7 +1126,7 @@ static void execute_observe(running_machine &machine, int ref, int params, const
 		for (int paramnum = 0; paramnum < params; paramnum++)
 		{
 			devicelist[paramnum]->debug()->ignore(false);
-			debug_console_printf(machine, "Now observing device '%s'\n", devicelist[paramnum]->tag().c_str());
+			debug_console_printf(machine, "Now observing device '%s'\n", devicelist[paramnum]->tag());
 		}
 	}
 }
@@ -1324,16 +1324,16 @@ static void execute_bplist(running_machine &machine, int ref, int params, const 
 	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 		if (device->debug()->breakpoint_first() != nullptr)
 		{
-			debug_console_printf(machine, "Device '%s' breakpoints:\n", device->tag().c_str());
+			debug_console_printf(machine, "Device '%s' breakpoints:\n", device->tag());
 
 			/* loop over the breakpoints */
 			for (device_debug::breakpoint *bp = device->debug()->breakpoint_first(); bp != nullptr; bp = bp->next())
 			{
-				strprintf(buffer, "%c%4X @ %s", bp->enabled() ? ' ' : 'D', bp->index(), core_i64_hex_format(bp->address(), device->debug()->logaddrchars()));
+				buffer = string_format("%c%4X @ %0*X", bp->enabled() ? ' ' : 'D', bp->index(), device->debug()->logaddrchars(), bp->address());
 				if (std::string(bp->condition()).compare("1") != 0)
-					strcatprintf(buffer, " if %s", bp->condition());
+					buffer.append(string_format(" if %s", bp->condition()));
 				if (std::string(bp->action()).compare("") != 0)
-					strcatprintf(buffer, " do %s", bp->action());
+					buffer.append(string_format(" do %s", bp->action()));
 				debug_console_printf(machine, "%s\n", buffer.c_str());
 				printed++;
 			}
@@ -1490,20 +1490,20 @@ static void execute_wplist(running_machine &machine, int ref, int params, const 
 			{
 				static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
 
-				debug_console_printf(machine, "Device '%s' %s space watchpoints:\n", device->tag().c_str(),
+				debug_console_printf(machine, "Device '%s' %s space watchpoints:\n", device->tag(),
 																						device->debug()->watchpoint_first(spacenum)->space().name());
 
 				/* loop over the watchpoints */
 				for (device_debug::watchpoint *wp = device->debug()->watchpoint_first(spacenum); wp != nullptr; wp = wp->next())
 				{
-					strprintf(buffer, "%c%4X @ %s-%s %s", wp->enabled() ? ' ' : 'D', wp->index(),
-							core_i64_hex_format(wp->space().byte_to_address(wp->address()), wp->space().addrchars()),
-							core_i64_hex_format(wp->space().byte_to_address_end(wp->address() + wp->length()) - 1, wp->space().addrchars()),
+					buffer = string_format("%c%4X @ %0*X-%0*X %s", wp->enabled() ? ' ' : 'D', wp->index(),
+							wp->space().addrchars(), wp->space().byte_to_address(wp->address()),
+							wp->space().addrchars(), wp->space().byte_to_address_end(wp->address() + wp->length()) - 1,
 							types[wp->type() & 3]);
 					if (std::string(wp->condition()).compare("1") != 0)
-						strcatprintf(buffer, " if %s", wp->condition());
+						buffer.append(string_format(" if %s", wp->condition()));
 					if (std::string(wp->action()).compare("") != 0)
-						strcatprintf(buffer, " do %s", wp->action());
+						buffer.append(string_format(" do %s", wp->action()));
 					debug_console_printf(machine, "%s\n", buffer.c_str());
 					printed++;
 				}
@@ -1634,15 +1634,14 @@ static void execute_rplist(running_machine &machine, int ref, int params, const 
 	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 		if (device->debug()->registerpoint_first() != nullptr)
 		{
-			debug_console_printf(machine, "Device '%s' registerpoints:\n", device->tag().c_str());
+			debug_console_printf(machine, "Device '%s' registerpoints:\n", device->tag());
 
 			/* loop over the breakpoints */
 			for (device_debug::registerpoint *rp = device->debug()->registerpoint_first(); rp != nullptr; rp = rp->next())
 			{
-				strprintf(buffer, "%c%4X ", rp->enabled() ? ' ' : 'D', rp->index());
-				strcatprintf(buffer, "if %s", rp->condition());
+				buffer = string_format("%c%4X if %s", rp->enabled() ? ' ' : 'D', rp->index(), rp->condition());
 				if (rp->action() != nullptr)
-					strcatprintf(buffer, " do %s", rp->action());
+					buffer.append(string_format(" do %s", rp->action()));
 				debug_console_printf(machine, "%s\n", buffer.c_str());
 				printed++;
 			}
@@ -1671,7 +1670,7 @@ static void execute_hotspot(running_machine &machine, int ref, int params, const
 			if (device->debug()->hotspot_tracking_enabled())
 			{
 				device->debug()->hotspot_track(0, 0);
-				debug_console_printf(machine, "Cleared hotspot tracking on CPU '%s'\n", device->tag().c_str());
+				debug_console_printf(machine, "Cleared hotspot tracking on CPU '%s'\n", device->tag());
 				cleared = true;
 			}
 
@@ -1693,7 +1692,7 @@ static void execute_hotspot(running_machine &machine, int ref, int params, const
 
 	/* attempt to install */
 	device->debug()->hotspot_track(count, threshhold);
-	debug_console_printf(machine, "Now tracking hotspots on CPU '%s' using %d slots with a threshhold of %d\n", device->tag().c_str(), (int)count, (int)threshhold);
+	debug_console_printf(machine, "Now tracking hotspots on CPU '%s' using %d slots with a threshhold of %d\n", device->tag(), (int)count, (int)threshhold);
 }
 
 
@@ -1819,7 +1818,7 @@ static void execute_load(running_machine &machine, int ref, int params, const ch
 	if ( i == offset)
 		debug_console_printf(machine, "Length specified too large, load failed\n");
 	else
-		debug_console_printf(machine, "Data loaded successfully to memory : 0x%s to 0x%s\n", core_i64_hex_format(offset,0), core_i64_hex_format(i-1,0));
+		debug_console_printf(machine, "Data loaded successfully to memory : 0x%X to 0x%X\n", offset, i-1);
 }
 
 
@@ -1868,13 +1867,15 @@ static void execute_dump(running_machine &machine, int ref, int params, const ch
 	}
 
 	/* now write the data out */
+	util::ovectorstream output;
+	output.reserve(200);
 	for (i = offset; i <= endoffset; i += 16)
 	{
-		char output[200];
-		int outdex = 0;
+		output.clear();
+		output.rdbuf()->clear();
 
 		/* print the address */
-		outdex += sprintf(&output[outdex], "%s: ", core_i64_hex_format((UINT32)space->byte_to_address(i), space->logaddrchars()));
+		util::stream_format(output, "%0*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(i));
 
 		/* print the bytes */
 		for (j = 0; j < 16; j += width)
@@ -1885,34 +1886,35 @@ static void execute_dump(running_machine &machine, int ref, int params, const ch
 				if (debug_cpu_translate(*space, TRANSLATE_READ_DEBUG, &curaddr))
 				{
 					UINT64 value = debug_read_memory(*space, i + j, width, TRUE);
-					outdex += sprintf(&output[outdex], " %s", core_i64_hex_format(value, width * 2));
+					util::stream_format(output, " %0*X", width * 2, value);
 				}
 				else
-					outdex += sprintf(&output[outdex], " %.*s", (int)width * 2, "****************");
+					util::stream_format(output, " %.*s", width * 2, "****************");
 			}
 			else
-				outdex += sprintf(&output[outdex], " %*s", (int)width * 2, "");
+				util::stream_format(output, " %*s", width * 2, "");
 		}
 
 		/* print the ASCII */
 		if (ascii)
 		{
-			outdex += sprintf(&output[outdex], "  ");
+			util::stream_format(output, "  ");
 			for (j = 0; j < 16 && (i + j) <= endoffset; j++)
 			{
 				offs_t curaddr = i + j;
 				if (debug_cpu_translate(*space, TRANSLATE_READ_DEBUG, &curaddr))
 				{
 					UINT8 byte = debug_read_byte(*space, i + j, TRUE);
-					outdex += sprintf(&output[outdex], "%c", (byte >= 32 && byte < 127) ? byte : '.');
+					util::stream_format(output, "%c", (byte >= 32 && byte < 127) ? byte : '.');
 				}
 				else
-					outdex += sprintf(&output[outdex], " ");
+					util::stream_format(output, " ");
 			}
 		}
 
 		/* output the result */
-		fprintf(f, "%s\n", output);
+		auto const &text = output.vec();
+		fprintf(f, "%.*s\n", int(unsigned(text.size())), &text[0]);
 	}
 
 	/* close the file */
@@ -1989,14 +1991,14 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 		{
 			cheat_region[region_count].offset = space->address_to_byte(entry->m_addrstart) & space->bytemask();
 			cheat_region[region_count].endoffset = space->address_to_byte(entry->m_addrend) & space->bytemask();
-			cheat_region[region_count].share = entry->m_share.c_str();
+			cheat_region[region_count].share = entry->m_share;
 			cheat_region[region_count].disabled = (entry->m_write.m_type == AMH_RAM) ? FALSE : TRUE;
 
 			/* disable double share regions */
-			if (!entry->m_share.empty())
+			if (entry->m_share != nullptr)
 				for (i = 0; i < region_count; i++)
 					if (cheat_region[i].share != nullptr)
-						if (strcmp(cheat_region[i].share, entry->m_share.c_str()) == 0)
+						if (strcmp(cheat_region[i].share, entry->m_share) == 0)
 							cheat_region[region_count].disabled = TRUE;
 
 			region_count++;
@@ -2071,7 +2073,7 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 	/* give a detailed init message to avoid searches being mistakingly carried out on the wrong CPU */
 	device_t *cpu = nullptr;
 	debug_command_parameter_cpu(machine, cheat.cpu, &cpu);
-	debug_console_printf(machine, "%u cheat initialized for CPU index %s ( aka %s )\n", active_cheat, cheat.cpu, cpu->tag().c_str());
+	debug_console_printf(machine, "%u cheat initialized for CPU index %s ( aka %s )\n", active_cheat, cheat.cpu, cpu->tag());
 }
 
 
@@ -2293,6 +2295,7 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 	}
 
 	/* write the cheat list */
+	util::ovectorstream output;
 	for (cheatindex = 0; cheatindex < cheat.cheatmap.size(); cheatindex += 1)
 	{
 		if (cheat.cheatmap[cheatindex].state == 1)
@@ -2303,14 +2306,28 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 			if (params > 0)
 			{
 				active_cheat++;
-				fprintf(f, "  <cheat desc=\"Possibility %d : %s (%s)\">\n", active_cheat, core_i64_hex_format(address, space->logaddrchars()), core_i64_hex_format(value, cheat.width * 2));
-				fprintf(f, "    <script state=\"run\">\n");
-				fprintf(f, "      <action>%s.p%c%c@%s=%s</action>\n", cpu->tag().c_str(), spaceletter, sizeletter, core_i64_hex_format(address, space->logaddrchars()), core_i64_hex_format(cheat_byte_swap(&cheat, cheat.cheatmap[cheatindex].first_value) & sizemask, cheat.width * 2));
-				fprintf(f, "    </script>\n");
-				fprintf(f, "  </cheat>\n\n");
+				output.clear();
+				output.rdbuf()->clear();
+				stream_format(
+						output,
+						"  <cheat desc=\"Possibility %d : %0*X (%0*X)\">\n"
+						"    <script state=\"run\">\n"
+						"      <action>%s.p%c%c@%0*X=%0*X</action>\n"
+						"    </script>\n"
+						"  </cheat>\n\n",
+						active_cheat, space->logaddrchars(), address, cheat.width * 2, value,
+						cpu->tag(), spaceletter, sizeletter, space->logaddrchars(), address, cheat.width * 2, cheat_byte_swap(&cheat, cheat.cheatmap[cheatindex].first_value) & sizemask);
+				auto const &text(output.vec());
+				fprintf(f, "%.*s", int(unsigned(text.size())), &text[0]);
 			}
 			else
-				debug_console_printf(machine, "Address=%s Start=%s Current=%s\n", core_i64_hex_format(address, space->logaddrchars()), core_i64_hex_format(cheat_byte_swap(&cheat, cheat.cheatmap[cheatindex].first_value) & sizemask, cheat.width * 2), core_i64_hex_format(value, cheat.width * 2));
+			{
+				debug_console_printf(
+						machine, "Address=%0*X Start=%0*X Current=%0*X\n",
+						space->logaddrchars(), address,
+						cheat.width * 2, cheat_byte_swap(&cheat, cheat.cheatmap[cheatindex].first_value) & sizemask,
+						cheat.width * 2, value);
+			}
 		}
 	}
 	if (params > 0)
@@ -2381,11 +2398,12 @@ static void execute_find(running_machine &machine, int ref, int params, const ch
 	for (int i = 2; i < params; i++)
 	{
 		const char *pdata = param[i];
+		size_t pdatalen = strlen(pdata) - 1;
 
 		/* check for a string */
-		if (pdata[0] == '"' && pdata[strlen(pdata) - 1] == '"')
+		if (pdata[0] == '"' && pdata[pdatalen] == '"')
 		{
-			for (j = 1; j < strlen(pdata) - 1; j++)
+			for (j = 1; j < pdatalen; j++)
 			{
 				data_to_find[data_count] = pdata[j];
 				data_size[data_count++] = 1;
@@ -2436,7 +2454,7 @@ static void execute_find(running_machine &machine, int ref, int params, const ch
 		if (match)
 		{
 			found++;
-			debug_console_printf(machine, "Found at %s\n", core_i64_hex_format((UINT32)space->byte_to_address(i), space->addrchars()));
+			debug_console_printf(machine, "Found at %0*X\n", space->addrchars(), (UINT32)space->byte_to_address(i));
 		}
 	}
 
@@ -2490,17 +2508,20 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 	}
 
 	/* now write the data out */
+	util::ovectorstream output;
+	output.reserve(512);
 	for (UINT64 i = 0; i < length; )
 	{
 		int pcbyte = space->address_to_byte(offset + i) & space->bytemask();
-		char output[512], disasm[200];
+		char disasm[200];
 		const char *comment;
 		offs_t tempaddr;
-		int outdex = 0;
 		int numbytes = 0;
+		output.clear();
+		output.rdbuf()->clear();
 
 		/* print the address */
-		outdex += sprintf(&output[outdex], "%s: ", core_i64_hex_format((UINT32)space->byte_to_address(pcbyte), space->logaddrchars()));
+		stream_format(output, "%0*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(pcbyte));
 
 		/* make sure we can translate the address */
 		tempaddr = pcbyte;
@@ -2522,38 +2543,37 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 		/* print the bytes */
 		if (bytes)
 		{
-			int startdex = outdex;
+			auto const startdex = output.tellp();
 			numbytes = space->address_to_byte(numbytes);
 			for (j = 0; j < numbytes; j += minbytes)
-				outdex += sprintf(&output[outdex], "%s ", core_i64_hex_format(debug_read_opcode(*decrypted_space, pcbyte + j, minbytes), minbytes * 2));
-			if (outdex - startdex < byteswidth)
-				outdex += sprintf(&output[outdex], "%*s", byteswidth - (outdex - startdex), "");
-			outdex += sprintf(&output[outdex], "  ");
+				stream_format(output, "%0*X ", minbytes * 2, debug_read_opcode(*decrypted_space, pcbyte + j, minbytes));
+			if ((output.tellp() - startdex) < byteswidth)
+				stream_format(output, "%*s", byteswidth - (output.tellp() - startdex), "");
+			stream_format(output, "  ");
 		}
 
 		/* add the disassembly */
-		sprintf(&output[outdex], "%s", disasm);
+		stream_format(output, "%s", disasm);
 
 		/* attempt to add the comment */
 		comment = space->device().debug()->comment_text(tempaddr);
 		if (comment != nullptr)
 		{
 			/* somewhat arbitrary guess as to how long most disassembly lines will be [column 60] */
-			if (strlen(output) < 60)
+			if (output.tellp() < 60)
 			{
 				/* pad the comment space out to 60 characters and null-terminate */
-				for (outdex = (int)strlen(output); outdex < 60; outdex++)
-					output[outdex] = ' ' ;
-				output[outdex] = 0 ;
+				while (output.tellp() < 60) output.put(' ');
 
-				sprintf(&output[strlen(output)], "// %s", comment) ;
+				stream_format(output, "// %s", comment);
 			}
 			else
-				sprintf(&output[strlen(output)], "\t// %s", comment) ;
+				stream_format(output, "\t// %s", comment);
 		}
 
 		/* output the result */
-		fprintf(f, "%s\n", output);
+		auto const &text(output.vec());
+		fprintf(f, "%.*s\n", int(unsigned(text.size())), &text[0]);
 	}
 
 	/* close the file */
@@ -2607,9 +2627,9 @@ static void execute_trace_internal(running_machine &machine, int ref, int params
 	/* do it */
 	cpu->debug()->trace(f, trace_over, action);
 	if (f)
-		debug_console_printf(machine, "Tracing CPU '%s' to file %s\n", cpu->tag().c_str(), filename.c_str());
+		debug_console_printf(machine, "Tracing CPU '%s' to file %s\n", cpu->tag(), filename.c_str());
 	else
-		debug_console_printf(machine, "Stopped tracing on CPU '%s'\n", cpu->tag().c_str());
+		debug_console_printf(machine, "Stopped tracing on CPU '%s'\n", cpu->tag());
 }
 
 
@@ -2684,7 +2704,7 @@ static void execute_history(running_machine &machine, int ref, int params, const
 		char buffer[200];
 		debug->disassemble(buffer, pc, opbuf, argbuf);
 
-		debug_console_printf(machine, "%s: %s\n", core_i64_hex_format(pc, space->logaddrchars()), buffer);
+		debug_console_printf(machine, "%0*X: %s\n", space->logaddrchars(), pc, buffer);
 	}
 }
 
@@ -2839,9 +2859,9 @@ static void execute_snap(running_machine &machine, int ref, int params, const ch
 		if (fname.find(".png") == -1)
 			fname.append(".png");
 		emu_file file(machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		file_error filerr = file.open(fname.c_str());
+		osd_file::error filerr = file.open(fname.c_str());
 
-		if (filerr != FILERR_NONE)
+		if (filerr != osd_file::error::NONE)
 		{
 			debug_console_printf(machine, "Error creating file '%s'\n", filename);
 			return;
@@ -2890,10 +2910,15 @@ static void execute_map(running_machine &machine, int ref, int params, const cha
 		if (debug_cpu_translate(*space, intention, &taddress))
 		{
 			const char *mapname = space->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? ROW_WRITE : ROW_READ, taddress);
-			debug_console_printf(machine, "%7s: %s logical == %s physical -> %s\n", intnames[intention & 3], core_i64_hex_format(address, space->logaddrchars()), core_i64_hex_format(space->byte_to_address(taddress), space->addrchars()), mapname);
+			debug_console_printf(
+					machine, "%7s: %0*X logical == %0*X physical -> %s\n",
+					intnames[intention & 3],
+					space->logaddrchars(), address,
+					space->addrchars(), space->byte_to_address(taddress),
+					mapname);
 		}
 		else
-			debug_console_printf(machine, "%7s: %s logical is unmapped\n", intnames[intention & 3], core_i64_hex_format(address, space->logaddrchars()));
+			debug_console_printf(machine, "%7s: %0*X logical is unmapped\n", intnames[intention & 3], space->logaddrchars(), address);
 	}
 }
 
@@ -2945,7 +2970,7 @@ static void execute_symlist(running_machine &machine, int ref, int params, const
 		if (!debug_command_parameter_cpu(machine, param[0], &cpu))
 			return;
 		symtable = &cpu->debug()->symtable();
-		debug_console_printf(machine, "CPU '%s' symbols:\n", cpu->tag().c_str());
+		debug_console_printf(machine, "CPU '%s' symbols:\n", cpu->tag());
 	}
 	else
 	{
@@ -2977,7 +3002,7 @@ static void execute_symlist(running_machine &machine, int ref, int params, const
 		UINT64 value = entry->value();
 
 		/* only display "register" type symbols */
-		debug_console_printf(machine, "%s = %s", namelist[symnum], core_i64_hex_format(value, 0));
+		debug_console_printf(machine, "%s = %X", namelist[symnum], value);
 		if (!entry->is_lval())
 			debug_console_printf(machine, "  (read-only)");
 		debug_console_printf(machine, "\n");

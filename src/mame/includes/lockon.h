@@ -22,7 +22,7 @@
 class lockon_state : public driver_device
 {
 public:
-	lockon_state(const machine_config &mconfig, device_type type, std::string tag)
+	lockon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_char_ram(*this, "char_ram"),
 		m_hud_ram(*this, "hud_ram"),

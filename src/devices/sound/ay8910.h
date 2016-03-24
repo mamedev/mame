@@ -100,9 +100,9 @@ public:
 	};
 
 	// construction/destruction
-	ay8910_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	ay8910_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner,
-					UINT32 clock, psg_type_t psg_type, int streams, int ioports, std::string shortname, std::string source);
+	ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ay8910_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner,
+					UINT32 clock, psg_type_t psg_type, int streams, int ioports, const char *shortname, const char *source);
 
 	// static configuration helpers
 	static void set_flags(device_t &device, int flags) { downcast<ay8910_device &>(device).m_flags = flags; }
@@ -204,7 +204,7 @@ extern const device_type AY8910;
 class ay8912_device : public ay8910_device
 {
 public:
-	ay8912_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type AY8912;
@@ -212,7 +212,7 @@ extern const device_type AY8912;
 class ay8913_device : public ay8910_device
 {
 public:
-	ay8913_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type AY8913;
@@ -220,7 +220,7 @@ extern const device_type AY8913;
 class ay8914_device : public ay8910_device
 {
 public:
-	ay8914_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	/* AY8914 handlers needed due to different register map */
 	DECLARE_READ8_MEMBER( read );
@@ -232,7 +232,7 @@ extern const device_type AY8914;
 class ay8930_device : public ay8910_device
 {
 public:
-	ay8930_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type AY8930;
@@ -240,7 +240,7 @@ extern const device_type AY8930;
 class ym2149_device : public ay8910_device
 {
 public:
-	ym2149_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type YM2149;
@@ -248,7 +248,7 @@ extern const device_type YM2149;
 class ym3439_device : public ay8910_device
 {
 public:
-	ym3439_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type YM3439;
@@ -256,7 +256,7 @@ extern const device_type YM3439;
 class ymz284_device : public ay8910_device
 {
 public:
-	ymz284_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type YMZ284;
@@ -264,7 +264,7 @@ extern const device_type YMZ284;
 class ymz294_device : public ay8910_device
 {
 public:
-	ymz294_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type YMZ294;

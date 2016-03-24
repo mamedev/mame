@@ -21,7 +21,7 @@
 class nmk004_device : public device_t
 {
 public:
-	nmk004_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nmk004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	WRITE8_MEMBER( write );
 	READ8_MEMBER( read );

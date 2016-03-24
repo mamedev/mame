@@ -851,8 +851,11 @@ void sms_state::setup_media_slots()
 
 void sms_state::setup_bios()
 {
-	m_BIOS = memregion("user1")->base();
-	m_bios_page_count = (m_BIOS ? memregion("user1")->bytes() / 0x4000 : 0);
+	if (memregion("user1") != nullptr)
+	{
+		m_BIOS = memregion("user1")->base();
+		m_bios_page_count = (m_BIOS ? memregion("user1")->bytes() / 0x4000 : 0);
+	}
 
 	if (m_BIOS == nullptr || m_BIOS[0] == 0x00)
 	{

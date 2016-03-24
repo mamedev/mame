@@ -76,7 +76,7 @@ class cbm_iec_device : public device_t
 {
 public:
 	// construction/destruction
-	cbm_iec_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _write> void set_srq_callback(_write wr) { m_write_srq.set_callback(wr); }
 	template<class _write> void set_atn_callback(_write wr) { m_write_atn.set_callback(wr); }
@@ -159,7 +159,7 @@ class cbm_iec_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	cbm_iec_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void set_address(int address) { m_address = address; }
 	int get_address() { return m_address; }

@@ -65,34 +65,23 @@
 
 
 /* 8-bit values */
-using UINT8 = uint8_t;
-using INT8 = int8_t;
+using UINT8 = std::uint8_t;
+using INT8 = std::int8_t;
 
 /* 16-bit values */
-using UINT16 = uint16_t;
-using INT16 = int16_t;
+using UINT16 = std::uint16_t;
+using INT16 = std::int16_t;
 
 /* 32-bit values */
-using UINT32 = uint32_t;
-using INT32 = int32_t;
+using UINT32 = std::uint32_t;
+using INT32 = std::int32_t;
 
 /* 64-bit values */
-#ifndef _WINDOWS_H
-#ifdef _MSC_VER
-using UINT64 = unsigned __int64;
-using INT64 = signed  __int64;
-#else
-using UINT64 = unsigned long long;
-using INT64 = signed long long;
-#endif
-#endif
+using UINT64 = std::uint64_t;
+using INT64 = std::int64_t;
 
 /* pointer-sized values */
-#ifdef PTR64
-using FPTR = UINT64;
-#else
-using FPTR = UINT32;
-#endif
+using FPTR = uintptr_t;
 
 
 
@@ -138,25 +127,6 @@ using FPTR = UINT32;
 #define CONCAT_64(hi,lo)    (((UINT64)(hi) << 32) | (UINT32)(lo))
 #define EXTRACT_64HI(val)   ((UINT32)((val) >> 32))
 #define EXTRACT_64LO(val)   ((UINT32)(val))
-
-
-/* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 */
-#if defined(__MINGW32__) || defined(_MSC_VER)
-#define I64FMT   "I64"
-#else
-#define I64FMT   "ll"
-#endif
-
-#if defined(_MSC_VER) || defined(__MINGW32__)
-#ifdef PTR64
-#define SIZETFMT   "I64u"
-#else
-#define SIZETFMT   "u"
-#endif
-#else
-#define SIZETFMT   "zu"
-#endif
-
 
 /* Highly useful macro for compile-time knowledge of an array size */
 #define ARRAY_LENGTH(x)     (sizeof(x) / sizeof(x[0]))

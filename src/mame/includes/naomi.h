@@ -37,7 +37,7 @@ enum {
 class naomi_state : public dc_state
 {
 	public:
-		naomi_state(const machine_config &mconfig, device_type type, std::string tag)
+		naomi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dc_state(mconfig, type, tag),
 		pvr2_texture_ram(*this, "textureram2"),
 		pvr2_framebuffer_ram(*this, "frameram2"),

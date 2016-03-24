@@ -327,21 +327,21 @@ some other components. It will be documented at a later date.
     Game status:
         ppp2nd              POST: "DIP SWITCH ERROR", "NO SECURITY ERROR"
         boxingm             Goes to attract mode when ran with memory card check. Coins up.
-        code1d,b            Inf loop on blue screen (writes to I2C before)
-        gticlub2            Inf loop on blue screen (writes to I2C before)
+        code1d,b            RTC self check bad
+        gticlub2            Attract mode works. Coins up. Hangs in car selection.
         gticlub2ea          Doesn't boot: bad CHD?
         jpark3              POST?: Shows "Now loading..." then black screen (sets global timer 1 on EPIC...)
-        mocapglf            Inf loop on blue screen (writes to I2C before)
-        mocapb,j            POST: U13 bad
-        p911,e,j,uc,kc      POST: U13 bad
-        p9112               POST: U13 bad
+        mocapglf            Security code error
+        mocapb,j            Crash after self checks
+        p911,e,j,uc,kc      "Distribution error"
+        p9112               RTC self check bad
         popn9               Doesn't boot: bad CHD?
-        sscopex/sogeki      Inf loop on blue screen
+        sscopex/sogeki      Security code error
         thrild2,a           Attract mode with partial graphics. Coins up. Hangs in car selection screen.
         thrild2c            Inf loop on blue screen
         tsurugi             Goes to attract mode when ran with memory card check. Coins up.
         tsurugij            No NVRAM
-        wcombat             Hangs on blue screen
+        wcombat             Stuck on network check
         xtrial              Attract mode. Hangs.
         mfightc,c           Passes POST. Waits for network connection from main unit? Spams writes to 0xffe08000 (8-bit)
 */
@@ -355,7 +355,7 @@ some other components. It will be documented at a later date.
 #include "video/voodoo.h"
 
 #define VIPER_DEBUG_LOG
-#define VIPER_DEBUG_EPIC_INTS       1
+#define VIPER_DEBUG_EPIC_INTS       0
 #define VIPER_DEBUG_EPIC_TIMERS     0
 #define VIPER_DEBUG_EPIC_REGS       0
 #define VIPER_DEBUG_EPIC_I2C        0
@@ -363,7 +363,6 @@ some other components. It will be documented at a later date.
 
 #define SDRAM_CLOCK         166666666       // Main SDRAMs run at 166MHz
 
-static UINT32 *workram;
 
 
 static emu_timer *ds2430_timer;
@@ -373,11 +372,12 @@ static timer_device *ds2430_bit_timer;
 class viper_state : public driver_device
 {
 public:
-	viper_state(const machine_config &mconfig, device_type type, std::string tag)
+	viper_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ata(*this, "ata"),
-		m_voodoo(*this, "voodoo")
+		m_voodoo(*this, "voodoo"),
+		m_workram(*this, "workram")
 	{
 	}
 
@@ -385,6 +385,11 @@ public:
 	int m_cf_card_ide;
 	int m_unk1_bit;
 	UINT32 m_voodoo3_pci_reg[0x100];
+	int m_unk_serial_bit_w;
+	UINT16 m_unk_serial_cmd;
+	UINT16 m_unk_serial_data;
+	UINT16 m_unk_serial_data_r;
+	UINT8 m_unk_serial_regs[0x80];
 
 	DECLARE_READ32_MEMBER(epic_r);
 	DECLARE_WRITE32_MEMBER(epic_w);
@@ -413,15 +418,21 @@ public:
 	DECLARE_WRITE64_MEMBER(cf_card_w);
 	DECLARE_READ64_MEMBER(ata_r);
 	DECLARE_WRITE64_MEMBER(ata_w);
+	DECLARE_READ64_MEMBER(unk_serial_r);
+	DECLARE_WRITE64_MEMBER(unk_serial_w);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank);
 	DECLARE_DRIVER_INIT(viper);
 	DECLARE_DRIVER_INIT(vipercf);
+	DECLARE_DRIVER_INIT(viperhd);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	UINT32 screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(viper_vblank);
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
+#if VIPER_DEBUG_EPIC_REGS
+	const char* epic_get_register_name(UINT32 reg);
+#endif
 	void epic_update_interrupts();
 	void mpc8240_interrupt(int irq);
 	void mpc8240_epic_init();
@@ -431,16 +442,18 @@ public:
 	required_device<ppc_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
 	required_device<voodoo_3_device> m_voodoo;
+	required_shared_ptr<UINT64> m_workram;
 };
 
 UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	device_t *device = machine().device("voodoo");
-	return voodoo_update(device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo");
+	return voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 UINT32 m_mpc8240_regs[256/4];
 
+#ifdef UNUSED_FUNCTION
 static inline UINT64 read64le_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
@@ -459,12 +472,16 @@ static inline void write64le_with_32le_device_handler(write32_delegate handler, 
 	if (ACCESSING_BITS_32_63)
 		handler(space, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
+#endif
 
 static inline UINT64 read64be_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
 {
-	UINT64 result;
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	result = read64le_with_32le_device_handler(handler, space, offset, mem_mask);
+	UINT64 result = 0;
+	if (ACCESSING_BITS_0_31)
+		result = (UINT64)(handler)(space, offset * 2, mem_mask & 0xffffffff);
+	if (ACCESSING_BITS_32_63)
+		result |= (UINT64)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
 	return FLIPENDIAN_INT64(result);
 }
 
@@ -473,7 +490,10 @@ static inline void write64be_with_32le_device_handler(write32_delegate handler, 
 {
 	data = FLIPENDIAN_INT64(data);
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	write64le_with_32le_device_handler(handler, space, offset, data, mem_mask);
+	if (ACCESSING_BITS_0_31)
+		handler(space, offset * 2, data & 0xffffffff, mem_mask & 0xffffffff);
+	if (ACCESSING_BITS_32_63)
+		handler(space, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 
 /*****************************************************************************/
@@ -608,7 +628,7 @@ struct MPC8240_EPIC
 static MPC8240_EPIC epic;
 
 #if VIPER_DEBUG_EPIC_REGS
-const viper_state::char* epic_get_register_name(UINT32 reg)
+const char* viper_state::epic_get_register_name(UINT32 reg)
 {
 	switch (reg >> 16)
 	{
@@ -850,7 +870,9 @@ READ32_MEMBER(viper_state::epic_r)
 					{
 						if (epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)
 						{
+#if VIPER_DEBUG_EPIC_I2C
 							printf("I2C address cycle read\n");
+#endif
 
 							epic.i2c_state = I2C_STATE_DATA_TRANSFER;
 
@@ -860,7 +882,9 @@ READ32_MEMBER(viper_state::epic_r)
 							// generate interrupt if interrupt are enabled
 							if (epic.i2c_cr & 0x40)
 							{
+#if VIPER_DEBUG_EPIC_I2C
 								printf("I2C interrupt\n");
+#endif
 								mpc8240_interrupt(MPC8240_I2C_IRQ);
 
 								// set interrupt flag in status register
@@ -869,7 +893,9 @@ READ32_MEMBER(viper_state::epic_r)
 						}
 						else if (epic.i2c_state == I2C_STATE_DATA_TRANSFER)
 						{
+#if VIPER_DEBUG_EPIC_I2C
 							printf("I2C data read\n");
+#endif
 
 							epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
 
@@ -951,7 +977,7 @@ READ32_MEMBER(viper_state::epic_r)
 					ret |= epic.irq[MPC8240_I2C_IRQ].priority << 16;
 					ret |= epic.irq[MPC8240_I2C_IRQ].vector;
 					ret |= epic.irq[MPC8240_I2C_IRQ].active ? 0x40000000 : 0;
-					return ret;
+					break;
 				}
 			}
 			break;
@@ -1740,7 +1766,7 @@ READ64_MEMBER(viper_state::unk1_r)
 		reg |= (unk1_bit << 5);
 		reg |= 0x40;        // if this bit is 0, loads a disk copier instead
 		//r |= 0x04;    // screen flip
-		//reg |= 0x08;      // memory card check (1 = enable)
+		reg |= 0x08;      // memory card check (1 = enable)
 
 		r |= reg << 40;
 
@@ -1836,8 +1862,8 @@ void viper_state::DS2430_w(int bit)
 
 		case DS2430_STATE_READ_MEM:
 		{
+			unk1_bit = (ds2430_rom[(ds2430_data_count/8)] >> (ds2430_data_count%8)) & 1;
 			ds2430_data_count++;
-			unk1_bit = rand () & 1;
 			printf("DS2430_w: read mem %d, bit = %d\n", ds2430_data_count, unk1_bit);
 
 			if (ds2430_data_count >= 256)
@@ -1962,12 +1988,74 @@ READ64_MEMBER(viper_state::e00000_r)
 	return r;
 }
 
+READ64_MEMBER(viper_state::unk_serial_r)
+{
+	UINT64 r = 0;
+	if (ACCESSING_BITS_16_31)
+	{
+		int bit = m_unk_serial_data_r & 0x1;
+		m_unk_serial_data_r >>= 1;
+		r |= bit << 17;
+	}
+	return r;
+}
+
+WRITE64_MEMBER(viper_state::unk_serial_w)
+{
+	if (ACCESSING_BITS_16_31)
+	{
+		if (data & 0x10000)
+		{
+			int bit = (data & 0x20000) ? 1 : 0;
+			if (m_unk_serial_bit_w < 8)
+			{
+				if (m_unk_serial_bit_w > 0)
+					m_unk_serial_cmd <<= 1;
+				m_unk_serial_cmd |= bit;
+			}
+			else
+			{
+				if (m_unk_serial_bit_w > 8)
+					m_unk_serial_data <<= 1;
+				m_unk_serial_data |= bit;
+			}
+			m_unk_serial_bit_w++;
+
+			if (m_unk_serial_bit_w == 8)
+			{
+				if ((m_unk_serial_cmd & 0x80) == 0)     // register read
+				{
+					int reg = m_unk_serial_cmd & 0x7f;
+					UINT8 data = m_unk_serial_regs[reg];
+
+					m_unk_serial_data_r = ((data & 0x1) << 7) | ((data & 0x2) << 5) | ((data & 0x4) << 3) | ((data & 0x8) << 1) | ((data & 0x10) >> 1) | ((data & 0x20) >> 3) | ((data & 0x40) >> 5) | ((data & 0x80) >> 7);
+
+					printf("unk_serial read reg %02X: %04X\n", reg, data);
+				}
+			}
+			if (m_unk_serial_bit_w == 16)
+			{
+				if (m_unk_serial_cmd & 0x80)                // register write
+				{
+					int reg = m_unk_serial_cmd & 0x7f;
+					m_unk_serial_regs[reg] = m_unk_serial_data;
+					printf("unk_serial write reg %02X: %04X\n", reg, m_unk_serial_data);
+				}
+
+				m_unk_serial_bit_w = 0;
+				m_unk_serial_cmd = 0;
+				m_unk_serial_data = 0;
+			}
+		}
+	}
+}
+
 
 
 /*****************************************************************************/
 
 static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64, viper_state )
-	AM_RANGE(0x00000000, 0x00ffffff) AM_MIRROR(0x1000000) AM_RAM
+	AM_RANGE(0x00000000, 0x00ffffff) AM_MIRROR(0x1000000) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0x80000000, 0x800fffff) AM_READWRITE32(epic_r, epic_w,U64(0xffffffffffffffff))
 	AM_RANGE(0x82000000, 0x83ffffff) AM_READWRITE(voodoo3_r, voodoo3_w)
 	AM_RANGE(0x84000000, 0x85ffffff) AM_READWRITE(voodoo3_lfb_r, voodoo3_lfb_w)
@@ -1976,7 +2064,7 @@ static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64, viper_state )
 	AM_RANGE(0xfee00000, 0xfeefffff) AM_READWRITE(pci_config_data_r, pci_config_data_w)
 	// 0xff000000, 0xff000fff - cf_card_data_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff200000, 0xff200fff - cf_card_r/w (installed in DRIVER_INIT(vipercf))
-	AM_RANGE(0xff300000, 0xff300fff) AM_READWRITE(ata_r, ata_w)
+	// 0xff300000, 0xff300fff - ata_r/w (installed in DRIVER_INIT(viperhd))
 	AM_RANGE(0xffe00000, 0xffe00007) AM_READ(e00000_r)
 	AM_RANGE(0xffe00008, 0xffe0000f) AM_READWRITE(e00008_r, e00008_w)
 	AM_RANGE(0xffe10000, 0xffe10007) AM_READ(unk1_r)
@@ -2066,7 +2154,7 @@ void viper_state::machine_start()
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x00ffffff, FALSE, workram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x00ffffff, FALSE, m_workram);
 
 	ds2430_rom = (UINT8*)memregion("ds2430")->base();
 }
@@ -2127,12 +2215,21 @@ DRIVER_INIT_MEMBER(viper_state,viper)
 //  m_maincpu->space(AS_PROGRAM).install_legacy_readwrite_handler( *ide, 0xff200000, 0xff207fff, FUNC(hdd_r), FUNC(hdd_w) ); //TODO
 }
 
+DRIVER_INIT_MEMBER(viper_state,viperhd)
+{
+	DRIVER_INIT_CALL(viper);
+
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff300000, 0xff300fff, read64_delegate(FUNC(viper_state::ata_r), this), write64_delegate(FUNC(viper_state::ata_w), this));
+}
+
 DRIVER_INIT_MEMBER(viper_state,vipercf)
 {
 	DRIVER_INIT_CALL(viper);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff000000, 0xff000fff, read64_delegate(FUNC(viper_state::cf_card_data_r), this), write64_delegate(FUNC(viper_state::cf_card_data_w), this) );
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff200000, 0xff200fff, read64_delegate(FUNC(viper_state::cf_card_r), this), write64_delegate(FUNC(viper_state::cf_card_w), this) );
+
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff300000, 0xff300fff, read64_delegate(FUNC(viper_state::unk_serial_r), this), write64_delegate(FUNC(viper_state::unk_serial_w), this) );
 }
 
 
@@ -2228,6 +2325,8 @@ ROM_END
 ROM_START(gticlub2ea) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("941eaa_nvram.u39", 0x00000, 0x2000, CRC(5ee7004d) SHA1(92e0ce01049308f459985d466fbfcfac82f34a47))
 
@@ -2235,6 +2334,7 @@ ROM_START(gticlub2ea) //*
 	DISK_IMAGE( "941a02", 0,  NO_DUMP )
 ROM_END
 
+/* This CF card has sticker B41C02 */
 ROM_START(jpark3) //*
 	VIPER_BIOS
 
@@ -2243,6 +2343,20 @@ ROM_START(jpark3) //*
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("b41ebc_nvram.u39", 0x00000, 0x2000, CRC(55d1681d) SHA1(26868cf0d14f23f06b81f2df0b4186924439bb43))
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "b41c02", 0, SHA1(fb6b0b43a6f818041d644bcd711f6a727348d3aa) )
+ROM_END
+
+/* This CF card has sticker B41C02 */
+ROM_START(jpark3u) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("b41 ua rtc.u39", 0x00000, 0x1ff8, CRC(75fdda39) SHA1(6292ce0d32afdf6bde33ac7f1f07655fa17282f6))
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "b41c02", 0, SHA1(fb6b0b43a6f818041d644bcd711f6a727348d3aa) )
@@ -2340,6 +2454,19 @@ ROM_START(p911e) //*
 	DISK_IMAGE( "a00eaa02", 0, SHA1(81565a2dce2e2b0a7927078a784354948af1f87c) )
 ROM_END
 
+ROM_START(p911ea)
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("a00eaa_nvram.u39", 0x000000, 0x2000,  CRC(4f3497b6) SHA1(3045c54f98dff92cdf3a1fc0cd4c76ba82d632d7) )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "a00eaa02_ea", 0, SHA1(fa057bf17f4c0fb9b9a09b820ff7a101e44fab7d) )
+ROM_END
+
 ROM_START(p911j) //*
 	VIPER_BIOS
 
@@ -2407,6 +2534,17 @@ ROM_START(sogeki) //*
 	DISK_IMAGE( "a13b02", 0, SHA1(c25a61b76d365794c2da4a9e7de88a5519e944ec) )
 ROM_END
 
+ROM_START(sscopefh)
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "ccca02", 0, SHA1(ec0d9a1520f17c73750de71dba8b31bc8c9d0409) )
+ROM_END
+
 ROM_START(thrild2) //*
 	VIPER_BIOS
 
@@ -2432,6 +2570,32 @@ ROM_START(thrild2a) //*
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) )
+ROM_END
+
+ROM_START(thrild2ab)
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("a41aaa_nvram.u39", 0x00000, 0x2000, CRC(d5de9b8e) SHA1(768bcd46a6ad20948f60f5e0ecd2f7b9c2901061))
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "a41a02_alt", 0, SHA1(7a9cfdab7000765ffdd9198b209f7a74741248f2) )
+ROM_END
+
+ROM_START(thrild2ac)
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("a41aaa_nvram.u39", 0x00000, 0x2000, CRC(d5de9b8e) SHA1(768bcd46a6ad20948f60f5e0ecd2f7b9c2901061))
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "a41a02_alt2", 0, SHA1(c8bfbac4f5a1a2241df7417ad2f9eba7d9e9a9df) )
 ROM_END
 
 /* This CF card has sticker 941EAA02 */
@@ -2474,6 +2638,17 @@ ROM_START(tsurugij) //*
 	DISK_IMAGE( "a30c02", 0, SHA1(533b5669b00884a800df9ba29651777a76559862) )
 ROM_END
 
+ROM_START(tsurugie)
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "a30eab02", 0, SHA1(fcc5b69f89e246f26ca4b8546cc409d3488bbdd9) )
+ROM_END
+
 /* This CF card has sticker C22D02 */
 ROM_START(wcombat) //*
 	VIPER_BIOS
@@ -2488,8 +2663,23 @@ ROM_START(wcombat) //*
 	DISK_IMAGE( "c22d02", 0, SHA1(69a24c9e36b073021d55bec27d89fcc0254a60cc) ) // chs 978,8,32
 ROM_END
 
+ROM_START(wcombatb) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("wcombat_nvram.u39", 0x00000, 0x2000, CRC(4f8b5858) SHA1(68066241c6f9db7f45e55b3c5da101987f4ce53c))
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "c22d02_alt", 0, SHA1(772e3fe7910f5115ec8f2235bb48ba9fcac6950d) ) // chs 978,8,32
+ROM_END
+
 ROM_START(wcombatk) //*
 	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("wcombatk_nvram.u39", 0x00000, 0x2000, CRC(ebd4d645) SHA1(2fa7e2c6b113214f3eb1900c8ceef4d5fcf0bb76))
@@ -2501,15 +2691,18 @@ ROM_END
 ROM_START(wcombatu) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("Warzaid u39 c22d02", 0x00000, 0x2000, CRC(71744990) SHA1(19ed07572f183e7b3a712704ebddf7a848c48a78) )
 
 	DISK_REGION( "ata:0:hdd:image" )
 	// CHD image provided had evidence of being altered by Windows, probably was put in a Windows machine without write protection hardware (bad idea)
 	// label was the same as this, so this should be a clean and correct version.
-	DISK_IMAGE( "c22d02", 0, SHA1(69a24c9e36b073021d55bec27d89fcc0254a60cc) ) // chs 978,8,3
+	DISK_IMAGE( "c22d02", 0, SHA1(69a24c9e36b073021d55bec27d89fcc0254a60cc) ) // chs 978,8,32
 ROM_END
 
+/* This CF card has sticker C22A02 */
 ROM_START(wcombatj) //*
 	VIPER_BIOS
 
@@ -2520,7 +2713,7 @@ ROM_START(wcombatj) //*
 	ROM_LOAD("wcombatj_nvram.u39", 0x00000, 0x2000, CRC(bd8a6640) SHA1(2d409197ef3fb07d984d27fa943f29c7a711d715))
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "c22a02", 0, BAD_DUMP SHA1(b607fb2ddfd0bd552b7a736cea4ac1aa3ea021bd) )
+	DISK_IMAGE( "c22a02", 0, SHA1(7200c7c436491fd8027d6d7139a80ee3b984697b) ) // chs 978,8,32
 ROM_END
 
 ROM_START(xtrial) //*
@@ -2541,7 +2734,7 @@ ROM_END
 /*
 Mahjong Fight Club (Konami Viper h/w)
 Konami, 2002
-
+78,8,3)
 PCB number - GM941-PWB(A)C Copyright 1999 Konami Made In Japan
 
 Mahjong Fight Club is a multi player Mahjong battle game for up to 8 players. A
@@ -2617,7 +2810,7 @@ ROM_END
 /* Viper BIOS */
 GAME(1999, kviper,    0,         viper, viper, viper_state, viper,    ROT0,  "Konami", "Konami Viper BIOS", MACHINE_IS_BIOS_ROOT)
 
-GAME(2001, ppp2nd,    kviper,    viper, viper, viper_state, viper,    ROT0,  "Konami", "ParaParaParadise 2nd Mix", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, ppp2nd,    kviper,    viper, viper, viper_state, viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 
 GAME(2001, boxingm,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Boxing Mania (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2000, code1d,    kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Code One Dispatch (ver D)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
@@ -2625,6 +2818,7 @@ GAME(2000, code1db,   code1d,    viper, viper, viper_state, vipercf,  ROT0,  "Ko
 GAME(2001, gticlub2,  kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "GTI Club 2 (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, gticlub2ea,gticlub2,  viper, viper, viper_state, vipercf,  ROT0,  "Konami", "GTI Club 2 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, jpark3,    kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver EBC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, jpark3u,   jpark3,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver UA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, mocapglf,  kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, mocapb,    kviper,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Mocap Boxing (ver AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, mocapbj,   mocapb,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
@@ -2632,17 +2826,23 @@ GAME(2001, p911,      kviper,    viper, viper, viper_state, vipercf,  ROT90,  "K
 GAME(2001, p911uc,    p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 911 (ver UAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p911kc,    p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 911 (ver KAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p911e,     p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 24/7 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, p911ea,    p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 24/7 (ver EAA, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p911j,     p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Keisatsukan Shinjuku 24ji (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p9112,     kviper,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2003, popn9,     kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Pop'n Music 9 (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, sscopex,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, sogeki,    sscopex,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, sscopefh,  kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, thrild2,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, thrild2a,  thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2ab, thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2ac, thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt 2)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, thrild2c,  thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, tsurugi,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, tsurugie,  tsurugi,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, tsurugij,  tsurugi,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombat,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombatb,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombatk,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver KBC:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombatu,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat / Warzaid (ver UCD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombatj,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

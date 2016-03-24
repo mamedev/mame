@@ -78,7 +78,7 @@ machine_config_constructor vp550_device::device_mconfig_additions() const
 //  vp550_device - constructor
 //-------------------------------------------------
 
-vp550_device::vp550_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+vp550_device::vp550_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VP550, "VP550", tag, owner, clock, "vp550", __FILE__),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_pfg_a(*this, CDP1863_A_TAG),
@@ -106,7 +106,7 @@ void vp550_device::device_start()
 
 void vp550_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (LOG) logerror("VP550 '%s' Interrupt\n", tag().c_str());
+	if (LOG) logerror("VP550 '%s' Interrupt\n", tag());
 
 	m_slot->interrupt_w(ASSERT_LINE);
 }
@@ -147,7 +147,7 @@ void vp550_device::vip_sc_w(int data)
 {
 	if (BIT(data, 1))
 	{
-		if (LOG) logerror("VP550 '%s' Clear Interrupt\n", tag().c_str());
+		if (LOG) logerror("VP550 '%s' Clear Interrupt\n", tag());
 
 		m_slot->interrupt_w(CLEAR_LINE);
 	}
@@ -205,7 +205,7 @@ WRITE8_MEMBER( vp550_device::octave_w )
 	case CHANNEL_B: m_pfg_b->set_clk2(clock2); break;
 	}
 
-	if (LOG) logerror("VP550 '%s' Clock %c: %u Hz\n", tag().c_str(), 'A' + channel, clock2);
+	if (LOG) logerror("VP550 '%s' Clock %c: %u Hz\n", tag(), 'A' + channel, clock2);
 }
 
 
@@ -215,7 +215,7 @@ WRITE8_MEMBER( vp550_device::octave_w )
 
 WRITE8_MEMBER( vp550_device::vlmna_w )
 {
-	if (LOG) logerror("VP550 '%s' A Volume: %u\n", tag().c_str(), data & 0x0f);
+	if (LOG) logerror("VP550 '%s' A Volume: %u\n", tag(), data & 0x0f);
 
 	float gain = (data & 0x0f) * 0.0666;
 
@@ -229,7 +229,7 @@ WRITE8_MEMBER( vp550_device::vlmna_w )
 
 WRITE8_MEMBER( vp550_device::vlmnb_w )
 {
-	if (LOG) logerror("VP550 '%s' B Volume: %u\n", tag().c_str(), data & 0x0f);
+	if (LOG) logerror("VP550 '%s' B Volume: %u\n", tag(), data & 0x0f);
 
 	float gain = (data & 0x0f) * 0.0666;
 
@@ -243,7 +243,7 @@ WRITE8_MEMBER( vp550_device::vlmnb_w )
 
 WRITE8_MEMBER( vp550_device::sync_w )
 {
-	if (LOG) logerror("VP550 '%s' Interrupt Enable: %u\n", tag().c_str(), BIT(data, 0));
+	if (LOG) logerror("VP550 '%s' Interrupt Enable: %u\n", tag(), BIT(data, 0));
 
 	m_sync_timer->enable(BIT(data, 0));
 }

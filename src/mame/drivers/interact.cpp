@@ -66,7 +66,7 @@
 class interact_state : public hec2hrp_state
 {
 public:
-	interact_state(const machine_config &mconfig, device_type type, std::string tag)
+	interact_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hec2hrp_state(mconfig, type, tag),
 			m_videoram(*this, "videoram") { }
 

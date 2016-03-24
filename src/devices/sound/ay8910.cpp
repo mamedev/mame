@@ -654,11 +654,11 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 				if (!m_port_a_write_cb.isnull())
 					m_port_a_write_cb((offs_t)0, m_regs[AY_PORTA]);
 				else
-					logerror("warning - write %02x to 8910 '%s' Port A\n",m_regs[AY_PORTA],tag().c_str());
+					logerror("warning - write %02x to 8910 '%s' Port A\n",m_regs[AY_PORTA],tag());
 			}
 			else
 			{
-				logerror("warning: write to 8910 '%s' Port A set as input - ignored\n", tag().c_str());
+				logerror("warning: write to 8910 '%s' Port A set as input - ignored\n",tag());
 			}
 			break;
 		case AY_PORTB:
@@ -667,11 +667,11 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 				if (!m_port_b_write_cb.isnull())
 					m_port_b_write_cb((offs_t)0, m_regs[AY_PORTB]);
 				else
-					logerror("warning - write %02x to 8910 '%s' Port B\n",m_regs[AY_PORTB],tag().c_str());
+					logerror("warning - write %02x to 8910 '%s' Port B\n",m_regs[AY_PORTB],tag());
 			}
 			else
 			{
-				logerror("warning: write to 8910 '%s' Port B set as input - ignored\n", tag().c_str());
+				logerror("warning: write to 8910 '%s' Port B set as input - ignored\n",tag());
 			}
 			break;
 	}
@@ -881,10 +881,10 @@ void ay8910_device::device_start()
 	int master_clock = clock();
 
 	if (m_ioports < 1 && !(m_port_a_read_cb.isnull() && m_port_a_write_cb.isnull()))
-		fatalerror("Device '%s' is a %s and has no port A!", tag().c_str(), name().c_str());
+		fatalerror("Device '%s' is a %s and has no port A!", tag(), name());
 
 	if (m_ioports < 2 && !(m_port_b_read_cb.isnull() && m_port_b_write_cb.isnull()))
-		fatalerror("Device '%s' is a %s and has no port B!", tag().c_str(), name().c_str());
+		fatalerror("Device '%s' is a %s and has no port B!", tag(), name());
 
 	m_port_a_read_cb.resolve();
 	m_port_b_read_cb.resolve();
@@ -893,7 +893,7 @@ void ay8910_device::device_start()
 
 	if ((m_flags & AY8910_SINGLE_OUTPUT) != 0)
 	{
-		logerror("%s device '%s' using single output!\n", name().c_str(), tag().c_str());
+		logerror("%s device '%s' using single output!\n", name(), tag());
 		m_streams = 1;
 	}
 
@@ -1001,7 +1001,7 @@ int ay8910_device::ay8910_read_ym()
 	{
 	case AY_PORTA:
 		if ((m_regs[AY_ENABLE] & 0x40) != 0)
-			logerror("warning: read from 8910 '%s' Port A set as output\n", tag().c_str());
+			logerror("warning: read from 8910 '%s' Port A set as output\n",tag());
 		/*
 		   even if the port is set as output, we still need to return the external
 		   data. Some games, like kidniki, need this to work.
@@ -1015,15 +1015,15 @@ int ay8910_device::ay8910_read_ym()
 		if (!m_port_a_read_cb.isnull())
 			m_regs[AY_PORTA] = m_port_a_read_cb(0);
 		else
-			logerror("%s: warning - read 8910 '%s' Port A\n",machine().describe_context(),tag().c_str());
+			logerror("%s: warning - read 8910 '%s' Port A\n",machine().describe_context(),tag());
 		break;
 	case AY_PORTB:
 		if ((m_regs[AY_ENABLE] & 0x80) != 0)
-			logerror("warning: read from 8910 '%s' Port B set as output\n", tag().c_str());
+			logerror("warning: read from 8910 '%s' Port B set as output\n",tag());
 		if (!m_port_b_read_cb.isnull())
 			m_regs[AY_PORTB] = m_port_b_read_cb(0);
 		else
-			logerror("%s: warning - read 8910 '%s' Port B\n",machine().describe_context(),tag().c_str());
+			logerror("%s: warning - read 8910 '%s' Port B\n",machine().describe_context(),tag());
 		break;
 	}
 
@@ -1124,7 +1124,7 @@ WRITE8_MEMBER( ay8914_device::write )
 
 const device_type AY8910 = &device_creator<ay8910_device>;
 
-ay8910_device::ay8910_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AY8910, "AY-3-8910A", tag, owner, clock, "ay8910", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_type(PSG_TYPE_AY),
@@ -1165,8 +1165,8 @@ ay8910_device::ay8910_device(const machine_config &mconfig, std::string tag, dev
 	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
 }
 
-ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock,
-								psg_type_t psg_type, int streams, int ioports, std::string shortname, std::string source)
+ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,
+								psg_type_t psg_type, int streams, int ioports, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_type(psg_type),
@@ -1209,7 +1209,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, st
 
 const device_type AY8912 = &device_creator<ay8912_device>;
 
-ay8912_device::ay8912_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ay8910_device(mconfig, AY8912, "AY-3-8912A", tag, owner, clock, PSG_TYPE_AY, 3, 1, "ay8912", __FILE__)
 {
 }
@@ -1217,7 +1217,7 @@ ay8912_device::ay8912_device(const machine_config &mconfig, std::string tag, dev
 
 const device_type AY8913 = &device_creator<ay8913_device>;
 
-ay8913_device::ay8913_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ay8910_device(mconfig, AY8913, "AY-3-8913A", tag, owner, clock, PSG_TYPE_AY, 3, 0, "ay8913", __FILE__)
 {
 }
@@ -1225,7 +1225,7 @@ ay8913_device::ay8913_device(const machine_config &mconfig, std::string tag, dev
 
 const device_type AY8914 = &device_creator<ay8914_device>;
 
-ay8914_device::ay8914_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ay8910_device(mconfig, AY8914, "AY-3-8914", tag, owner, clock, PSG_TYPE_AY, 3, 2, "ay8914", __FILE__)
 {
 }
@@ -1233,7 +1233,7 @@ ay8914_device::ay8914_device(const machine_config &mconfig, std::string tag, dev
 
 const device_type AY8930 = &device_creator<ay8930_device>;
 
-ay8930_device::ay8930_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ay8910_device(mconfig, AY8930, "AY8930", tag, owner, clock, PSG_TYPE_AY, 3, 2, "ay8930", __FILE__)
 {
 }
@@ -1241,7 +1241,7 @@ ay8930_device::ay8930_device(const machine_config &mconfig, std::string tag, dev
 
 const device_type YM2149 = &device_creator<ym2149_device>;
 
-ym2149_device::ym2149_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ay8910_device(mconfig, YM2149, "YM2149", tag, owner, clock, PSG_TYPE_YM, 3, 2, "ym2149", __FILE__)
 {
 }
@@ -1249,7 +1249,7 @@ ym2149_device::ym2149_device(const machine_config &mconfig, std::string tag, dev
 
 const device_type YM3439 = &device_creator<ym3439_device>;
 
-ym3439_device::ym3439_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ay8910_device(mconfig, YM3439, "YM3439", tag, owner, clock, PSG_TYPE_YM, 3, 2, "ym3429", __FILE__)
 {
 }
@@ -1257,7 +1257,7 @@ ym3439_device::ym3439_device(const machine_config &mconfig, std::string tag, dev
 
 const device_type YMZ284 = &device_creator<ymz284_device>;
 
-ymz284_device::ymz284_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ay8910_device(mconfig, YMZ284, "YMZ284", tag, owner, clock, PSG_TYPE_YM, 1, 0, "ymz284", __FILE__)
 {
 }
@@ -1265,7 +1265,7 @@ ymz284_device::ymz284_device(const machine_config &mconfig, std::string tag, dev
 
 const device_type YMZ294 = &device_creator<ymz294_device>;
 
-ymz294_device::ymz294_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ymz294_device::ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ay8910_device(mconfig, YMZ294, "YMZ294", tag, owner, clock, PSG_TYPE_YM, 1, 0, "ymz294", __FILE__)
 {
 }

@@ -88,7 +88,7 @@ Dip locations and factory settings verified with China Gate US manual.
 class chinagat_state : public ddragon_state
 {
 public:
-	chinagat_state(const machine_config &mconfig, device_type type, std::string tag)
+	chinagat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ddragon_state(mconfig, type, tag),
 		m_adpcm(*this, "adpcm") { };
 

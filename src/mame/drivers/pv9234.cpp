@@ -27,7 +27,7 @@ be found!
 class pv9234_state : public driver_device
 {
 public:
-	pv9234_state(const machine_config &mconfig, device_type type, std::string tag)
+	pv9234_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_p_ram(*this, "p_ram"),
 		m_maincpu(*this, "maincpu") { }
@@ -151,7 +151,7 @@ static MACHINE_CONFIG_START( pv9234, pv9234_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pv9234_state, screen_update_pv9234)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 MACHINE_CONFIG_END
 

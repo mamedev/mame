@@ -182,7 +182,7 @@ const device_type I8080A = &device_creator<i8080a_cpu_device>;
 const device_type I8085A = &device_creator<i8085a_cpu_device>;
 
 
-i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, I8085A, "8085A", tag, owner, clock, "i8085a", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
@@ -195,7 +195,7 @@ i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, std::string 
 }
 
 
-i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int cputype)
+i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cputype)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
@@ -208,13 +208,13 @@ i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type 
 }
 
 
-i8080_cpu_device::i8080_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8080_cpu_device::i8080_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i8085a_cpu_device(mconfig, I8080, "8080", tag, owner, clock, "i8080", __FILE__, CPUTYPE_8080)
 {
 }
 
 
-i8080a_cpu_device::i8080a_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8080a_cpu_device::i8080a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i8085a_cpu_device(mconfig, I8080A, "8080A", tag, owner, clock, "i8080a", __FILE__, CPUTYPE_8080)
 {
 }
@@ -1053,7 +1053,7 @@ void i8085a_cpu_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				m_AF.b.l & 0x80 ? 'S':'.',
 				m_AF.b.l & 0x40 ? 'Z':'.',
 				m_AF.b.l & 0x20 ? 'X':'.', // X5

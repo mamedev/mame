@@ -46,7 +46,7 @@ ToDo:
 class spectra_state : public genpin_class
 {
 public:
-	spectra_state(const machine_config &mconfig, device_type type, std::string tag)
+	spectra_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_snsnd(*this, "snsnd")

@@ -54,8 +54,8 @@ class alpha8201_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	alpha8201_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	alpha8201_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	alpha8201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	alpha8201_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	// device-level overrides
@@ -409,7 +409,7 @@ class alpha8301_cpu_device : public alpha8201_cpu_device
 {
 public:
 	// construction/destruction
-	alpha8301_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	alpha8301_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

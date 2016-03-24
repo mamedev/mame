@@ -89,7 +89,7 @@ machine_config_constructor isa8_finalchs_device::device_mconfig_additions() cons
 //  isa8_finalchs_device - constructor
 //-------------------------------------------------
 
-isa8_finalchs_device::isa8_finalchs_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+isa8_finalchs_device::isa8_finalchs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, ISA8_FINALCHS, "Final Chess Card", tag, owner, clock, "finalchs", __FILE__),
 		device_isa8_card_interface( mconfig, *this ), m_FCH_latch_data(0)
 	{

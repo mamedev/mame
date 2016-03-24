@@ -29,7 +29,7 @@ class turbo_kontroller_device :  public device_t,
 {
 public:
 	// construction/destruction
-	turbo_kontroller_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	turbo_kontroller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;

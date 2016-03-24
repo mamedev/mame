@@ -24,7 +24,7 @@ needs inputs, prom decode, sound, artwork (lamps), probably some irq masking and
 class summit_state : public driver_device
 {
 public:
-	summit_state(const machine_config &mconfig, device_type type, std::string tag)
+	summit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_attr(*this, "attr"),
 		m_vram(*this, "vram"),

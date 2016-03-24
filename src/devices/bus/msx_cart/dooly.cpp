@@ -7,7 +7,7 @@
 const device_type MSX_CART_DOOLY = &device_creator<msx_cart_dooly>;
 
 
-msx_cart_dooly::msx_cart_dooly(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+msx_cart_dooly::msx_cart_dooly(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_DOOLY, "MSX Cartridge - Dooly", tag, owner, clock, "msx_cart_dooly", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_prot(0)

@@ -23,7 +23,7 @@ class segas18_state : public sega_16bit_common_base
 {
 public:
 	// construction/destruction
-	segas18_state(const machine_config &mconfig, device_type type, std::string tag)
+	segas18_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_16bit_common_base(mconfig, type, tag),
 			m_mapper(*this, "mapper"),
 			m_maincpu(*this, "maincpu"),
@@ -115,6 +115,7 @@ protected:
 	};
 
 	// device overrides
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

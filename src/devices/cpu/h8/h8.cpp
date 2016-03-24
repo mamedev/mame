@@ -13,7 +13,7 @@
 #include "debugger.h"
 #include "h8.h"
 
-h8_device::h8_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, bool mode_a16, address_map_delegate map_delegate) :
+h8_device::h8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool mode_a16, address_map_delegate map_delegate) :
 	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	program_config("program", ENDIANNESS_BIG, 16, mode_a16 ? 16 : 24, 0, map_delegate),
 	io_config("io", ENDIANNESS_BIG, 16, 16, -1), program(nullptr), io(nullptr), direct(nullptr), PPC(0), NPC(0), PC(0), PIR(0), EXR(0), CCR(0), MAC(0), MACF(0),
@@ -221,27 +221,27 @@ void h8_device::state_string_export(const device_state_entry &entry, std::string
 	switch(entry.index()) {
 	case STATE_GENFLAGS:
 		if(has_exr)
-			strprintf(str, "%c%c %c%c%c%c%c%c%c%c",
-							(EXR & EXR_T) ? 'T' : '-',
-							'0' + (EXR & EXR_I),
-							(CCR & F_I)  ? 'I' : '-',
-							(CCR & F_UI) ? 'u' : '-',
-							(CCR & F_H)  ? 'H' : '-',
-							(CCR & F_U)  ? 'U' : '-',
-							(CCR & F_N)  ? 'N' : '-',
-							(CCR & F_Z)  ? 'Z' : '-',
-							(CCR & F_V)  ? 'V' : '-',
-							(CCR & F_C)  ? 'C' : '-');
+			str = string_format("%c%c %c%c%c%c%c%c%c%c",
+					(EXR & EXR_T) ? 'T' : '-',
+					'0' + (EXR & EXR_I),
+					(CCR & F_I)  ? 'I' : '-',
+					(CCR & F_UI) ? 'u' : '-',
+					(CCR & F_H)  ? 'H' : '-',
+					(CCR & F_U)  ? 'U' : '-',
+					(CCR & F_N)  ? 'N' : '-',
+					(CCR & F_Z)  ? 'Z' : '-',
+					(CCR & F_V)  ? 'V' : '-',
+					(CCR & F_C)  ? 'C' : '-');
 		else
-			strprintf(str, "%c%c%c%c%c%c%c%c",
-							(CCR & F_I)  ? 'I' : '-',
-							(CCR & F_UI) ? 'u' : '-',
-							(CCR & F_H)  ? 'H' : '-',
-							(CCR & F_U)  ? 'U' : '-',
-							(CCR & F_N)  ? 'N' : '-',
-							(CCR & F_Z)  ? 'Z' : '-',
-							(CCR & F_V)  ? 'V' : '-',
-							(CCR & F_C)  ? 'C' : '-');
+			str = string_format("%c%c%c%c%c%c%c%c",
+					(CCR & F_I)  ? 'I' : '-',
+					(CCR & F_UI) ? 'u' : '-',
+					(CCR & F_H)  ? 'H' : '-',
+					(CCR & F_U)  ? 'U' : '-',
+					(CCR & F_N)  ? 'N' : '-',
+					(CCR & F_Z)  ? 'Z' : '-',
+					(CCR & F_V)  ? 'V' : '-',
+					(CCR & F_C)  ? 'C' : '-');
 		break;
 	case H8_R0:
 	case H8_R1:
@@ -252,7 +252,7 @@ void h8_device::state_string_export(const device_state_entry &entry, std::string
 	case H8_R6:
 	case H8_R7: {
 		int r = entry.index() - H8_R0;
-		strprintf(str, "%04x %04x", R[r + 8], R[r]);
+		str = string_format("%04x %04x", R[r + 8], R[r]);
 		break;
 	}
 	}
@@ -281,7 +281,7 @@ void h8_device::disassemble_am(char *&buffer, int am, offs_t pc, const UINT8 *op
 		"e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7",
 	};
 
-	static const char *const r32_names[88] = {
+	static const char *const r32_names[8] = {
 		"er0", "er1", "er2", "er3", "er4", "er5", "er6", "sp",
 	};
 
@@ -592,17 +592,17 @@ void h8_device::internal(int cycles)
 
 void h8_device::illegal()
 {
-	throw emu_fatalerror("%s: Illegal instruction at address %x\n", tag().c_str(), PPC);
+	throw emu_fatalerror("%s: Illegal instruction at address %x\n", tag(), PPC);
 }
 
 int h8_device::trace_setup()
 {
-	throw emu_fatalerror("%s: Trace setup called but unimplemented.\n", tag().c_str());
+	throw emu_fatalerror("%s: Trace setup called but unimplemented.\n", tag());
 }
 
 int h8_device::trapa_setup()
 {
-	throw emu_fatalerror("%s: Trapa setup called but unimplemented.\n", tag().c_str());
+	throw emu_fatalerror("%s: Trapa setup called but unimplemented.\n", tag());
 }
 
 UINT8 h8_device::do_addx8(UINT8 v1, UINT8 v2)

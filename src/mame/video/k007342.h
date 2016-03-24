@@ -9,11 +9,11 @@ typedef device_delegate<void (int layer, int bank, int *code, int *color, int *f
 class k007342_device : public device_t
 {
 public:
-	k007342_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k007342_device() {}
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_gfxnum(device_t &device, int gfxnum) { downcast<k007342_device &>(device).m_gfxnum = gfxnum; }
 	static void static_set_callback(device_t &device, k007342_delegate callback) { downcast<k007342_device &>(device).m_callback = callback; }
 

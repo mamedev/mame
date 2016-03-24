@@ -46,7 +46,7 @@ typedef device_delegate<void (void)> wswan_video_dmasnd_cb_delegate;
 class wswan_video_device : public device_t
 {
 public:
-	wswan_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~wswan_video_device() {}
 
 	// static configuration

@@ -9,7 +9,7 @@
 extern const device_type NGBOOTLEG_PROT = &device_creator<ngbootleg_prot_device>;
 
 
-ngbootleg_prot_device::ngbootleg_prot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ngbootleg_prot_device::ngbootleg_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NGBOOTLEG_PROT, "NeoGeo Protection (Bootleg)", tag, owner, clock, "ngbootleg_prot", __FILE__),
 	kof2k3_overlay(0),
 	m_mainrom(nullptr),
@@ -142,8 +142,7 @@ WRITE16_MEMBER( ngbootleg_prot_device::kof10th_custom_w )
 		//UINT16 *prom = (UINT16*)m_mainrom;
 		COMBINE_DATA(&m_cartridge_ram2[(0x00000/2) + (offset & 0xFFFF)]);
 	} else { // Write S data on-the-fly
-		UINT8 *srom = m_fixedrom;
-		srom[offset] = BITSWAP8(data,7,6,0,4,3,2,1,5);
+		m_fixedrom[offset] = BITSWAP8(data,7,6,0,4,3,2,1,5);
 	}
 }
 
@@ -173,6 +172,7 @@ void ngbootleg_prot_device::install_kof10th_protection (cpu_device* maincpu, neo
 	maincpu->space(AS_PROGRAM).install_write_handler(0x240000, 0x2fffff, write16_delegate(FUNC(ngbootleg_prot_device::kof10th_bankswitch_w),this));
 	memcpy(m_cartridge_ram2, cpurom + 0xe0000, 0x20000);
 
+	save_pointer(NAME(m_fixedrom), 0x40000);
 }
 
 void ngbootleg_prot_device::decrypt_kof10th(UINT8* cpurom, UINT32 cpurom_size)

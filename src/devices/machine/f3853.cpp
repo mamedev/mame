@@ -49,7 +49,7 @@ const device_type F3853 = &device_creator<f3853_device>;
 //  f3853_device - constructor
 //-------------------------------------------------
 
-f3853_device::f3853_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+f3853_device::f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, F3853, "F3853", tag, owner, clock, "f3853", __FILE__)
 {
 }
@@ -77,7 +77,7 @@ void f3853_device::device_start()
 
 	m_interrupt_req_cb.bind_relative_to(*owner());
 
-	m_timer = machine().scheduler().timer_alloc(FUNC(f3853_timer_callback), (void *)this );
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(f3853_device::timer_callback),this));
 
 	save_item(NAME(m_high) );
 	save_item(NAME(m_low) );
@@ -128,13 +128,7 @@ void f3853_device::timer_start(UINT8 value)
 	m_timer->adjust(period);
 }
 
-
-TIMER_CALLBACK( f3853_device::f3853_timer_callback )
-{
-	reinterpret_cast<f3853_device*>(ptr)->timer();
-}
-
-void f3853_device::timer()
+TIMER_CALLBACK_MEMBER(f3853_device::timer_callback)
 {
 	if(m_timer_enable)
 	{

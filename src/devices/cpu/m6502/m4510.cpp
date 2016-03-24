@@ -13,7 +13,7 @@
 
 const device_type M4510 = &device_creator<m4510_device>;
 
-m4510_device::m4510_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+m4510_device::m4510_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	m65ce02_device(mconfig, M4510, "M4510", tag, owner, clock, "m4510", __FILE__),
 	map_enable(0),
 	nomap(false)

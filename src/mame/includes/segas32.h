@@ -16,7 +16,7 @@
 class segas32_state : public device_t
 {
 public:
-	segas32_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	required_shared_ptr<UINT8> m_z80_shared_ram;
 	optional_shared_ptr<UINT8> m_ga2_dpram;
@@ -266,7 +266,7 @@ protected:
 class segas32_regular_state :  public segas32_state
 {
 public:
-	segas32_regular_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -277,7 +277,7 @@ protected:
 class segas32_v25_state :  public segas32_state
 {
 public:
-	segas32_v25_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -288,7 +288,7 @@ protected:
 class sega_multi32_state :  public segas32_state
 {
 public:
-	sega_multi32_state(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sega_multi32_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

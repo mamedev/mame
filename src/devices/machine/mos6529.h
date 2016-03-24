@@ -67,7 +67,7 @@ class mos6529_device :  public device_t
 {
 public:
 	// construction/destruction
-	mos6529_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_p0_handler(device_t &device, _Object object) { return downcast<mos6529_device &>(device).m_p0_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_p1_handler(device_t &device, _Object object) { return downcast<mos6529_device &>(device).m_p1_handler.set_callback(object); }

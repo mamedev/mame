@@ -44,7 +44,7 @@ public:
 		TIMER_SET_CPU_MODE
 	};
 
-	cidelsa_state(const machine_config &mconfig, device_type type, std::string tag)
+	cidelsa_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_vis(*this, CDP1869_TAG)
@@ -90,7 +90,7 @@ protected:
 class draco_state : public cidelsa_state
 {
 public:
-	draco_state(const machine_config &mconfig, device_type type, std::string tag)
+	draco_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cidelsa_state(mconfig, type, tag),
 			m_psg(*this, AY8910_TAG)
 	{ }

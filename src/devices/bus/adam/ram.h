@@ -27,7 +27,7 @@ class adam_ram_expansion_device :  public device_t,
 {
 public:
 	// construction/destruction
-	adam_ram_expansion_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	adam_ram_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

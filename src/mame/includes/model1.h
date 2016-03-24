@@ -13,7 +13,7 @@ enum {MAT_STACK_SIZE = 32};
 class model1_state : public driver_device
 {
 public:
-	model1_state(const machine_config &mconfig, device_type type, std::string tag)
+	model1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_m1audio(*this, "m1audio"),

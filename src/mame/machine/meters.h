@@ -18,8 +18,7 @@
 
 
 #define MCFG_METERS_NUMBER(_number) \
-	meters_device::static_set_number_meters(*device, _number); \
-
+	meters_device::static_set_number_meters(*device, _number);
 #define MAXMECHMETERS 8
 
 #define METERREACTTIME 0.025 // number of seconds meter has to be active to tick
@@ -27,7 +26,7 @@
 class meters_device : public device_t
 {
 public:
-	meters_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	meters_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~meters_device() {}
 
 	static void static_set_number_meters(device_t &device, int number) { downcast<meters_device &>(device).m_number_mtr = number; }
@@ -56,7 +55,7 @@ private:
 		bool state;     // state 0/1
 		emu_timer *meter_timer;
 	};
-	
+
 	meter_info m_meter_info[MAXMECHMETERS];
 
 	int m_number_mtr;

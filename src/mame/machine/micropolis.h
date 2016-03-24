@@ -41,14 +41,14 @@
 class micropolis_device : public device_t
 {
 public:
-	micropolis_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~micropolis_device() {}
 
 	template<class _Object> static devcb_base &set_dden_rd_callback(device_t &device, _Object object) { return downcast<micropolis_device &>(device).m_read_dden.set_callback(object); }
 	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<micropolis_device &>(device).m_write_intrq.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<micropolis_device &>(device).m_write_drq.set_callback(object); }
 
-	static void set_drive_tags(device_t &device, std::string tag1, std::string tag2, std::string tag3, std::string tag4)
+	static void set_drive_tags(device_t &device, const char *tag1, const char *tag2, const char *tag3, const char *tag4)
 	{
 		micropolis_device &dev = downcast<micropolis_device &>(device);
 		dev.m_floppy_drive_tags[0] = tag1;
@@ -80,7 +80,7 @@ private:
 	devcb_write_line m_write_intrq;
 	devcb_write_line m_write_drq;
 
-	std::string m_floppy_drive_tags[4];
+	const char *m_floppy_drive_tags[4];
 
 	/* register */
 	UINT8 m_data;

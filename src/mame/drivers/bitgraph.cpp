@@ -91,7 +91,7 @@
 class bitgraph_state : public driver_device
 {
 public:
-	bitgraph_state(const machine_config &mconfig, device_type type, std::string tag)
+	bitgraph_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, M68K_TAG)
 		, m_ram(*this, RAM_TAG)
@@ -466,7 +466,7 @@ static MACHINE_CONFIG_FRAGMENT( bg_motherboard )
 	MCFG_SCREEN_UPDATE_DRIVER(bitgraph_state, screen_update)
 
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD(ACIA0_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE(RS232_H_TAG, rs232_port_device, write_txd))

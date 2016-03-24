@@ -28,9 +28,9 @@
     HELPERS (also used by diimage.cpp)
  ***************************************************************************/
 
-static file_error common_process_file(emu_options &options, const char *location, const char *ext, const rom_entry *romp, emu_file &image_file)
+static osd_file::error common_process_file(emu_options &options, const char *location, const char *ext, const rom_entry *romp, emu_file &image_file)
 {
-	file_error filerr;
+	osd_file::error filerr;
 
 	if (location != nullptr && strcmp(location, "") != 0)
 		filerr = image_file.open(location, PATH_SEPARATOR, ROM_GETNAME(romp), ext);
@@ -40,7 +40,7 @@ static file_error common_process_file(emu_options &options, const char *location
 	return filerr;
 }
 
-std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, file_error &filerr)
+std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, osd_file::error &filerr)
 {
 	auto image_file = std::make_unique<emu_file>(options.media_path(), OPEN_FLAG_READ);
 
@@ -49,7 +49,7 @@ std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *
 	else
 		filerr = image_file->open(location, PATH_SEPARATOR, ROM_GETNAME(romp));
 
-	if (filerr != FILERR_NONE)
+	if (filerr != osd_file::error::NONE)
 	{
 		image_file = nullptr;
 	}
@@ -302,15 +302,15 @@ void rom_load_manager::determine_bios_rom(device_t *device, const char *specbios
 		/* if we got neither an empty string nor 'default' then warn the user */
 		if (specbios[0] != 0 && strcmp(specbios, "default") != 0)
 		{
-			strcatprintf(m_errorstring, "%s: invalid bios\n", specbios);
-			m_errors++;
+			m_errorstring.append(string_format("%s: invalid bios, reverting to default\n", specbios));
+			m_warnings++;
 		}
 
 		/* set to default */
 		device->set_system_bios(default_no);
 	}
 	device->set_default_bios(default_no);
-	LOG(("For \"%s\" using System BIOS: %d\n", device->tag().c_str(), device->system_bios()));
+	LOG(("For \"%s\" using System BIOS: %d\n", device->tag(), device->system_bios()));
 }
 
 
@@ -370,13 +370,13 @@ void rom_load_manager::handle_missing_file(const rom_entry *romp, std::string tr
 
 	bool is_chd_error = (is_chd && chderr != CHDERR_FILE_NOT_FOUND);
 	if (is_chd_error)
-		strcatprintf(m_errorstring, "%s CHD ERROR: %s\n", name.c_str(), chd_file::error_string(chderr));
+		m_errorstring.append(string_format("%s CHD ERROR: %s\n", name.c_str(), chd_file::error_string(chderr)));
 
 	/* optional files are okay */
 	if (ROM_ISOPTIONAL(romp))
 	{
 		if (!is_chd_error)
-			strcatprintf(m_errorstring, "OPTIONAL %s NOT FOUND%s\n", name.c_str(), tried_file_names.c_str());
+			m_errorstring.append(string_format("OPTIONAL %s NOT FOUND%s\n", name.c_str(), tried_file_names.c_str()));
 		m_warnings++;
 	}
 
@@ -384,7 +384,7 @@ void rom_load_manager::handle_missing_file(const rom_entry *romp, std::string tr
 	else if (hash_collection(ROM_GETHASHDATA(romp)).flag(hash_collection::FLAG_NO_DUMP))
 	{
 		if (!is_chd_error)
-			strcatprintf(m_errorstring, "%s NOT FOUND (NO GOOD DUMP KNOWN)%s\n", name.c_str(), tried_file_names.c_str());
+			m_errorstring.append(string_format("%s NOT FOUND (NO GOOD DUMP KNOWN)%s\n", name, tried_file_names));
 		m_knownbad++;
 	}
 
@@ -392,7 +392,7 @@ void rom_load_manager::handle_missing_file(const rom_entry *romp, std::string tr
 	else
 	{
 		if (!is_chd_error)
-			strcatprintf(m_errorstring, "%s NOT FOUND%s\n", name.c_str(), tried_file_names.c_str());
+			m_errorstring.append(string_format("%s NOT FOUND%s\n", name.c_str(), tried_file_names));
 		m_errors++;
 	}
 }
@@ -406,8 +406,8 @@ void rom_load_manager::handle_missing_file(const rom_entry *romp, std::string tr
 
 void rom_load_manager::dump_wrong_and_correct_checksums(const hash_collection &hashes, const hash_collection &acthashes)
 {
-	strcatprintf(m_errorstring, "    EXPECTED: %s\n", hashes.macro_string().c_str());
-	strcatprintf(m_errorstring, "       FOUND: %s\n", acthashes.macro_string().c_str());
+	m_errorstring.append(string_format("    EXPECTED: %s\n", hashes.macro_string().c_str()));
+	m_errorstring.append(string_format("       FOUND: %s\n", acthashes.macro_string().c_str()));
 }
 
 
@@ -426,7 +426,7 @@ void rom_load_manager::verify_length_and_hash(const char *name, UINT32 explength
 	UINT32 actlength = m_file->size();
 	if (explength != actlength)
 	{
-		strcatprintf(m_errorstring, "%s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength);
+		m_errorstring.append(string_format("%s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength));
 		m_warnings++;
 	}
 
@@ -434,21 +434,21 @@ void rom_load_manager::verify_length_and_hash(const char *name, UINT32 explength
 	hash_collection &acthashes = m_file->hashes(hashes.hash_types().c_str());
 	if (hashes.flag(hash_collection::FLAG_NO_DUMP))
 	{
-		strcatprintf(m_errorstring, "%s NO GOOD DUMP KNOWN\n", name);
+		m_errorstring.append(string_format("%s NO GOOD DUMP KNOWN\n", name));
 		m_knownbad++;
 	}
 	/* verify checksums */
 	else if (hashes != acthashes)
 	{
 		/* otherwise, it's just bad */
-		strcatprintf(m_errorstring, "%s WRONG CHECKSUMS:\n", name);
+		m_errorstring.append(string_format("%s WRONG CHECKSUMS:\n", name));
 		dump_wrong_and_correct_checksums(hashes, acthashes);
 		m_warnings++;
 	}
 	/* If it matches, but it is actually a bad dump, write it */
 	else if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
 	{
-		strcatprintf(m_errorstring, "%s ROM NEEDS REDUMP\n",name);
+		m_errorstring.append(string_format("%s ROM NEEDS REDUMP\n", name));
 		m_knownbad++;
 	}
 }
@@ -464,7 +464,7 @@ void rom_load_manager::display_loading_rom_message(const char *name, bool from_l
 	char buffer[200];
 
 	if (name != nullptr)
-		sprintf(buffer, "Loading %s (%d%%)", from_list ? "Software" : emulator_info::get_capstartgamenoun(), (UINT32)(100 * (UINT64)m_romsloadedsize / (UINT64)m_romstotalsize));
+		sprintf(buffer, "%s (%d%%)", from_list ? "Loading Software" : "Loading Machine", (UINT32)(100 * (UINT64)m_romsloadedsize / (UINT64)m_romstotalsize));
 	else
 		sprintf(buffer, "Loading Complete");
 
@@ -488,15 +488,13 @@ void rom_load_manager::display_rom_load_results(bool from_list)
 	{
 		/* create the error message and exit fatally */
 		osd_printf_error("%s", m_errorstring.c_str());
-		fatalerror_exitcode(machine(), MAMERR_MISSING_FILES, "Required files are missing, the %s cannot be run.",emulator_info::get_gamenoun());
+		fatalerror_exitcode(machine(), MAMERR_MISSING_FILES, "Required files are missing, the machine cannot be run.");
 	}
 
 	/* if we had warnings, output them, but continue */
 	if ((m_warnings) || (m_knownbad))
 	{
-		m_errorstring.append("WARNING: the ");
-		m_errorstring.append(emulator_info::get_gamenoun());
-		m_errorstring.append(" might not run correctly.");
+		m_errorstring.append("WARNING: the machine might not run correctly.");
 		osd_printf_warning("%s\n", m_errorstring.c_str());
 	}
 }
@@ -551,7 +549,7 @@ void rom_load_manager::region_post_process(const char *rgntag, bool invert)
 
 int rom_load_manager::open_rom_file(const char *regiontag, const rom_entry *romp, std::string &tried_file_names, bool from_list)
 {
-	file_error filerr = FILERR_NOT_FOUND;
+	osd_file::error filerr = osd_file::error::NOT_FOUND;
 	UINT32 romsize = rom_file_size(romp);
 	tried_file_names = "";
 
@@ -658,7 +656,7 @@ int rom_load_manager::open_rom_file(const char *regiontag, const rom_entry *romp
 	m_romsloadedsize += romsize;
 
 	/* return the result */
-	return (filerr == FILERR_NONE);
+	return (filerr == osd_file::error::NONE);
 }
 
 
@@ -961,19 +959,19 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 {
 	emu_file image_file(options.media_path(), OPEN_FLAG_READ);
 	const rom_entry *region, *rom;
-	file_error filerr;
+	osd_file::error filerr;
 	chd_error err;
 
 	/* attempt to open the properly named file, scanning up through parent directories */
-	filerr = FILERR_NOT_FOUND;
-	for (int searchdrv = driver_list::find(*gamedrv); searchdrv != -1 && filerr != FILERR_NONE; searchdrv = driver_list::clone(searchdrv))
+	filerr = osd_file::error::NOT_FOUND;
+	for (int searchdrv = driver_list::find(*gamedrv); searchdrv != -1 && filerr != osd_file::error::NONE; searchdrv = driver_list::clone(searchdrv))
 		filerr = common_process_file(options, driver_list::driver(searchdrv).name, ".chd", romp, image_file);
 
-	if (filerr != FILERR_NONE)
+	if (filerr != osd_file::error::NONE)
 		filerr = common_process_file(options, nullptr, ".chd", romp, image_file);
 
 	/* look for the disk in the locationtag too */
-	if (filerr != FILERR_NONE && locationtag != nullptr)
+	if (filerr != osd_file::error::NONE && locationtag != nullptr)
 	{
 		// check if we are dealing with softwarelists. if so, locationtag
 		// is actually a concatenation of: listname + setname + parentname
@@ -1024,19 +1022,19 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 		else
 		{
 			// try to load from list/setname
-			if ((filerr != FILERR_NONE) && (tag2.c_str() != nullptr))
+			if ((filerr != osd_file::error::NONE) && (tag2.c_str() != nullptr))
 				filerr = common_process_file(options, tag2.c_str(), ".chd", romp, image_file);
 			// try to load from list/parentname (if any)
-			if ((filerr != FILERR_NONE) && has_parent && (tag3.c_str() != nullptr))
+			if ((filerr != osd_file::error::NONE) && has_parent && (tag3.c_str() != nullptr))
 				filerr = common_process_file(options, tag3.c_str(), ".chd", romp, image_file);
 			// try to load from setname
-			if ((filerr != FILERR_NONE) && (tag4.c_str() != nullptr))
+			if ((filerr != osd_file::error::NONE) && (tag4.c_str() != nullptr))
 				filerr = common_process_file(options, tag4.c_str(), ".chd", romp, image_file);
 			// try to load from parentname (if any)
-			if ((filerr != FILERR_NONE) && has_parent && (tag5.c_str() != nullptr))
+			if ((filerr != osd_file::error::NONE) && has_parent && (tag5.c_str() != nullptr))
 				filerr = common_process_file(options, tag5.c_str(), ".chd", romp, image_file);
 			// only for CHD we also try to load from list/
-			if ((filerr != FILERR_NONE) && (tag1.c_str() != nullptr))
+			if ((filerr != osd_file::error::NONE) && (tag1.c_str() != nullptr))
 			{
 				tag1.erase(tag1.length() - 1, 1);    // remove the PATH_SEPARATOR
 				filerr = common_process_file(options, tag1.c_str(), ".chd", romp, image_file);
@@ -1045,7 +1043,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 	}
 
 	/* did the file open succeed? */
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 	{
 		std::string fullpath(image_file.fullpath());
 		image_file.close();
@@ -1075,15 +1073,15 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 							romphashes == hash_collection(ROM_GETHASHDATA(rom)))
 						{
 							/* attempt to open the properly named file, scanning up through parent directories */
-							filerr = FILERR_NOT_FOUND;
-							for (int searchdrv = drv; searchdrv != -1 && filerr != FILERR_NONE; searchdrv = driver_list::clone(searchdrv))
+							filerr = osd_file::error::NOT_FOUND;
+							for (int searchdrv = drv; searchdrv != -1 && filerr != osd_file::error::NONE; searchdrv = driver_list::clone(searchdrv))
 								filerr = common_process_file(options, driver_list::driver(searchdrv).name, ".chd", rom, image_file);
 
-							if (filerr != FILERR_NONE)
+							if (filerr != osd_file::error::NONE)
 								filerr = common_process_file(options, nullptr, ".chd", rom, image_file);
 
 							/* did the file open succeed? */
-							if (filerr == FILERR_NONE)
+							if (filerr == osd_file::error::NONE)
 							{
 								std::string fullpath(image_file.fullpath());
 								image_file.close();
@@ -1110,8 +1108,8 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 	/* try to open the diff */
 	LOG(("Opening differencing image file: %s\n", fname.c_str()));
 	emu_file diff_file(options.diff_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE);
-	file_error filerr = diff_file.open(fname.c_str());
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = diff_file.open(fname.c_str());
+	if (filerr == osd_file::error::NONE)
 	{
 		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
@@ -1124,7 +1122,7 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 	LOG(("Creating differencing image: %s\n", fname.c_str()));
 	diff_file.set_openflags(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	filerr = diff_file.open(fname.c_str());
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 	{
 		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
@@ -1181,13 +1179,13 @@ void rom_load_manager::process_disk_entries(const char *regiontag, const rom_ent
 			/* verify the hash */
 			if (hashes != acthashes)
 			{
-				strcatprintf(m_errorstring, "%s WRONG CHECKSUMS:\n", filename.c_str());
+				m_errorstring.append(string_format("%s WRONG CHECKSUMS:\n", filename));
 				dump_wrong_and_correct_checksums(hashes, acthashes);
 				m_warnings++;
 			}
 			else if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
 			{
-				strcatprintf(m_errorstring, "%s CHD NEEDS REDUMP\n", filename.c_str());
+				m_errorstring.append(string_format("%s CHD NEEDS REDUMP\n", filename));
 				m_knownbad++;
 			}
 
@@ -1198,7 +1196,7 @@ void rom_load_manager::process_disk_entries(const char *regiontag, const rom_ent
 				err = open_disk_diff(machine().options(), romp, chd->orig_chd(), chd->diff_chd());
 				if (err != CHDERR_NONE)
 				{
-					strcatprintf(m_errorstring, "%s DIFF CHD ERROR: %s\n", filename.c_str(), chd_file::error_string(err));
+					m_errorstring.append(string_format("%s DIFF CHD ERROR: %s\n", filename, chd_file::error_string(err)));
 					m_errors++;
 					chd = nullptr;
 					continue;
@@ -1278,13 +1276,13 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		UINT32 supported = swinfo->supported();
 		if (supported == SOFTWARE_SUPPORTED_PARTIAL)
 		{
-			strcatprintf(m_errorstring, "WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
-			strcatprintf(m_softwarningstring, "Support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
+			m_errorstring.append(string_format("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name()));
+			m_softwarningstring.append(string_format("Support for software %s (in list %s) is only partial\n", swname, swlist.list_name()));
 		}
 		if (supported == SOFTWARE_SUPPORTED_NO)
 		{
-			strcatprintf(m_errorstring, "WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
-			strcatprintf(m_softwarningstring, "Support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
+			m_errorstring.append(string_format("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name()));
+			m_softwarningstring.append(string_format("Support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name()));
 		}
 
 		// attempt reading up the chain through the parents and create a locationtag std::string in the format
@@ -1420,7 +1418,7 @@ void rom_load_manager::process_region_list()
 #endif
 
 				/* now process the entries in the region */
-				process_rom_entries(device->shortname().c_str(), region, region + 1, device, FALSE);
+				process_rom_entries(device->shortname(), region, region + 1, device, FALSE);
 			}
 			else if (ROMREGION_ISDISKDATA(region))
 				process_disk_entries(regiontag.c_str(), region, region + 1, nullptr);
@@ -1460,7 +1458,7 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 			if (device->owner() == nullptr) {
 				specbios.assign(machine.options().bios());
 			} else {
-				specbios = machine.options().sub_value(std::string(device->owner()->tag()).c_str()+1,"bios");
+				specbios = machine.options().sub_value(device->owner()->tag()+1,"bios");
 				if (specbios.empty()) {
 					specbios = device->default_bios_tag();
 				}

@@ -37,7 +37,7 @@ enum vdt911_model_t
 class vdt911_device : public device_t
 {
 public:
-	vdt911_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(cru_r);
 	DECLARE_WRITE8_MEMBER(cru_w);

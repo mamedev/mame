@@ -25,7 +25,7 @@ class astrocade_exp_device : public device_t,
 {
 public:
 	// construction/destruction
-	astrocade_exp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	astrocade_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~astrocade_exp_device();
 
 	// device-level overrides

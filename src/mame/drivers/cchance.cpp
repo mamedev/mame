@@ -42,7 +42,7 @@ cha3    $10d8
 class cchance_state : public tnzs_state
 {
 public:
-	cchance_state(const machine_config &mconfig, device_type type, std::string tag)
+	cchance_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tnzs_state(mconfig, type, tag) { }
 
 	UINT8 m_hop_io;

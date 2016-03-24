@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski, Angelo Salese
 /****************************************************************************
 
@@ -134,7 +134,7 @@ video z80
 class mazerbla_state : public driver_device
 {
 public:
-	mazerbla_state(const machine_config &mconfig, device_type type, std::string tag)
+	mazerbla_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),

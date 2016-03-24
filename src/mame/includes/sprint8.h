@@ -5,7 +5,7 @@
 class sprint8_state : public driver_device
 {
 public:
-	sprint8_state(const machine_config &mconfig, device_type type, std::string tag)
+	sprint8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_pos_h_ram(*this, "pos_h_ram"),

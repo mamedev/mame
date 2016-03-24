@@ -5,12 +5,12 @@
 
 const device_type NSCSI_HARDDISK = &device_creator<nscsi_harddisk_device>;
 
-nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	nscsi_full_device(mconfig, NSCSI_HARDDISK, "SCSI HARDDISK", tag, owner, clock, "scsi_harddisk", __FILE__), harddisk(nullptr), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)
 {
 }
 
-nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	nscsi_full_device(mconfig, type, name, tag, owner, clock, shortname, source), harddisk(nullptr), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)
 {
 }
@@ -58,7 +58,7 @@ UINT8 nscsi_harddisk_device::scsi_get_data(int id, int pos)
 	if(clba != cur_lba) {
 		cur_lba = clba;
 		if(!hard_disk_read(harddisk, cur_lba, block)) {
-			logerror("%s: HD READ ERROR !\n", tag().c_str());
+			logerror("%s: HD READ ERROR !\n", tag());
 			memset(block, 0, sizeof(block));
 		}
 	}
@@ -77,7 +77,7 @@ void nscsi_harddisk_device::scsi_put_data(int id, int pos, UINT8 data)
 	int clba = lba + pos / bytes_per_sector;
 	if(offset == bytes_per_sector-1) {
 		if(!hard_disk_write(harddisk, clba, block))
-			logerror("%s: HD WRITE ERROR !\n", tag().c_str());
+			logerror("%s: HD WRITE ERROR !\n", tag());
 	}
 }
 
@@ -97,7 +97,7 @@ void nscsi_harddisk_device::scsi_command()
 
 	switch(scsi_cmdbuf[0]) {
 	case SC_TEST_UNIT_READY:
-		logerror("%s: command TEST UNIT READY\n", tag().c_str());
+		logerror("%s: command TEST UNIT READY\n", tag());
 		scsi_status_complete(SS_GOOD);
 		break;
 
@@ -108,7 +108,7 @@ void nscsi_harddisk_device::scsi_command()
 			blocks = 256;
 
 		logerror("%s: command READ start=%08x blocks=%04x\n",
-					tag().c_str(), lba, blocks);
+					tag(), lba, blocks);
 
 		scsi_data_in(2, blocks*bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
@@ -121,7 +121,7 @@ void nscsi_harddisk_device::scsi_command()
 			blocks = 256;
 
 		logerror("%s: command WRITE start=%08x blocks=%04x\n",
-					tag().c_str(), lba, blocks);
+					tag(), lba, blocks);
 
 		scsi_data_out(2, blocks*bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
@@ -130,7 +130,7 @@ void nscsi_harddisk_device::scsi_command()
 	case SC_INQUIRY: {
 		int lun = get_lun(scsi_cmdbuf[1] >> 5);
 		logerror("%s: command INQUIRY lun=%d EVPD=%d page=%d alloc=%02x link=%02x\n",
-					tag().c_str(),
+					tag(),
 					lun, scsi_cmdbuf[1] & 1, scsi_cmdbuf[2], scsi_cmdbuf[4], scsi_cmdbuf[5]);
 		if(lun) {
 			bad_lun();
@@ -180,7 +180,7 @@ void nscsi_harddisk_device::scsi_command()
 	case SC_MODE_SENSE_6: {
 		int lun = get_lun(scsi_cmdbuf[1] >> 5);
 		logerror("%s: command MODE SENSE 6 lun=%d page=%02x alloc=%02x link=%02x\n",
-					tag().c_str(),
+					tag(),
 					lun, scsi_cmdbuf[2] & 0x3f, scsi_cmdbuf[4], scsi_cmdbuf[5]);
 		if(lun) {
 			bad_lun();
@@ -301,7 +301,7 @@ void nscsi_harddisk_device::scsi_command()
 			}
 
 			default:
-				logerror("%s: mode sense page %02x unhandled\n", tag().c_str(), page);
+				logerror("%s: mode sense page %02x unhandled\n", tag(), page);
 				break;
 			}
 		}
@@ -315,12 +315,12 @@ void nscsi_harddisk_device::scsi_command()
 	}
 
 	case SC_START_STOP_UNIT:
-		logerror("%s: command START STOP UNIT\n", tag().c_str());
+		logerror("%s: command START STOP UNIT\n", tag());
 		scsi_status_complete(SS_GOOD);
 		break;
 
 	case SC_READ_CAPACITY: {
-		logerror("%s: command READ CAPACITY\n", tag().c_str());
+		logerror("%s: command READ CAPACITY\n", tag());
 
 		hard_disk_info *info = hard_disk_get_info(harddisk);
 		UINT32 size = info->cylinders * info->heads * info->sectors - 1;
@@ -344,7 +344,7 @@ void nscsi_harddisk_device::scsi_command()
 		blocks = (scsi_cmdbuf[7] << 8) | scsi_cmdbuf[8];
 
 		logerror("%s: command READ EXTENDED start=%08x blocks=%04x\n",
-					tag().c_str(), lba, blocks);
+					tag(), lba, blocks);
 
 		scsi_data_in(2, blocks*bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
@@ -355,14 +355,14 @@ void nscsi_harddisk_device::scsi_command()
 		blocks = (scsi_cmdbuf[7] << 8) | scsi_cmdbuf[8];
 
 		logerror("%s: command WRITE EXTENDED start=%08x blocks=%04x\n",
-					tag().c_str(), lba, blocks);
+					tag(), lba, blocks);
 
 		scsi_data_out(2, blocks*bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
 		break;
 
 	default:
-		logerror("%s: command %02x ***UNKNOWN***\n", tag().c_str(), scsi_cmdbuf[0]);
+		logerror("%s: command %02x ***UNKNOWN***\n", tag(), scsi_cmdbuf[0]);
 		nscsi_full_device::scsi_command();
 		break;
 	}

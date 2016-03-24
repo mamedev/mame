@@ -14,7 +14,7 @@ struct iox_t
 class srmp2_state : public driver_device
 {
 public:
-	srmp2_state(const machine_config &mconfig, device_type type, std::string tag)
+	srmp2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_seta001(*this, "spritegen"),

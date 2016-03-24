@@ -51,7 +51,7 @@ class com8116_device :  public device_t
 {
 public:
 	// construction/destruction
-	com8116_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_fx4_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_fx4_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_fr_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_fr_handler.set_callback(object); }
@@ -63,8 +63,14 @@ public:
 	DECLARE_WRITE8_MEMBER( stt_w );
 
 	static const int divisors_16X_5_0688MHz[];
+	static const int divisors_16X_6_01835MHz[];
 	static const int divisors_16X_4_9152MHz[];
 	static const int divisors_32X_5_0688MHz[];
+	static const int divisors_16X_2_7648MHz[];
+	static const int divisors_16X_5_0688MHz_030[];
+	static const int divisors_16X_4_6080MHz[];
+	static const int divisors_16X_4_9152MHz_SY2661_1[];
+	static const int divisors_16X_4_9152MHz_SY2661_2[];
 
 protected:
 	// device-level overrides

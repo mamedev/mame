@@ -64,7 +64,7 @@
 class itgamble_state : public driver_device
 {
 public:
-	itgamble_state(const machine_config &mconfig, device_type type, std::string tag)
+	itgamble_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_palette(*this, "palette")
@@ -713,4 +713,4 @@ GAME( 200?, abacus,   0,       itgamble, itgamble, driver_device, 0,   ROT0, "<u
 GAME( 200?, bookthr,  0,       itgamble, itgamble, driver_device, 0,   ROT0, "<unknown>",             "Book Theatre (Ver 1.2)",        MACHINE_IS_SKELETON )
 
 /* different hardware */
-GAME( 200?, mnumber,  0,       mnumber,  itgamble, driver_device, 0,   ROT0, "M.M. - B.R.L.",         "Mystery Number",                MACHINE_IS_SKELETON )
+GAME( 2000, mnumber,  0,       mnumber,  itgamble, driver_device, 0,   ROT0, "MM / BRL Bologna",      "Mystery Number",                MACHINE_IS_SKELETON )

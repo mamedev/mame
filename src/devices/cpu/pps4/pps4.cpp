@@ -70,7 +70,7 @@
 
 const device_type PPS4 = &device_creator<pps4_device>;
 
-pps4_device::pps4_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pps4_device::pps4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, PPS4, "PPS4", tag, owner, clock, "pps4", __FILE__ )
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 12)  // 4bit RAM
@@ -1557,7 +1557,7 @@ void pps4_device::state_string_export(const device_state_entry &entry, std::stri
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c",
+			str = string_format("%c%c%c",
 				m_C ? 'C':'.',
 				m_FF1 ? '1':'.',
 				m_FF2 ? '2':'.');

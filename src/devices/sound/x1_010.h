@@ -11,7 +11,7 @@ class x1_010_device : public device_t,
 						public device_sound_interface
 {
 public:
-	x1_010_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~x1_010_device() {}
 
 	// static configuration

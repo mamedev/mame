@@ -44,7 +44,7 @@ class hd66421_device :  public device_t,
 {
 public:
 	// construction/destruction
-	hd66421_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( reg_idx_r );
 	DECLARE_WRITE8_MEMBER( reg_idx_w );

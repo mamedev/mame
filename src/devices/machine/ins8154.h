@@ -68,7 +68,7 @@ class ins8154_device :  public device_t
 {
 public:
 	// construction/destruction
-	ins8154_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_in_a_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_in_a_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_a_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_out_a_cb.set_callback(object); }

@@ -91,7 +91,7 @@ const device_type I8275 = &device_creator<i8275_device>;
 //  i8275_device - constructor
 //-------------------------------------------------
 
-i8275_device::i8275_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+i8275_device::i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, I8275, "I8275 CRTC", tag, owner, clock, "i8275x", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_write_irq(*this),
@@ -201,24 +201,24 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 	switch (id)
 	{
 	case TIMER_HRTC_ON:
-		//if (LOG) logerror("I8275 '%s' y %u x %u HRTC 1\n", tag().c_str(), y, x);
+		//if (LOG) logerror("I8275 '%s' y %u x %u HRTC 1\n", tag(), y, x);
 		m_write_hrtc(1);
 		break;
 
 	case TIMER_DRQ_ON:
-		//if (LOG) logerror("I8275 '%s' y %u x %u DRQ 1\n", tag().c_str(), y, x);
+		//if (LOG) logerror("I8275 '%s' y %u x %u DRQ 1\n", tag(), y, x);
 		m_write_drq(1);
 		break;
 
 	case TIMER_SCANLINE:
 		if (!(m_status & ST_VE)) break;
 
-		//if (LOG) logerror("I8275 '%s' y %u x %u HRTC 0\n", tag().c_str(), y, x);
+		//if (LOG) logerror("I8275 '%s' y %u x %u HRTC 0\n", tag(), y, x);
 		m_write_hrtc(0);
 
 		if (m_scanline == 0)
 		{
-			//if (LOG) logerror("I8275 '%s' y %u x %u VRTC 0\n", tag().c_str(), y, x);
+			//if (LOG) logerror("I8275 '%s' y %u x %u VRTC 0\n", tag(), y, x);
 			m_write_vrtc(0);
 		}
 
@@ -231,7 +231,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 					m_status |= ST_DU;
 					m_du = true;
 
-					//if (LOG) logerror("I8275 '%s' y %u x %u DMA Underrun\n", tag().c_str(), y, x);
+					//if (LOG) logerror("I8275 '%s' y %u x %u DMA Underrun\n", tag(), y, x);
 
 					m_write_drq(0);
 				}
@@ -256,7 +256,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		{
 			if (m_status & ST_IE)
 			{
-				//if (LOG) logerror("I8275 '%s' y %u x %u IRQ 1\n", tag().c_str(), y, x);
+				//if (LOG) logerror("I8275 '%s' y %u x %u IRQ 1\n", tag(), y, x);
 				m_status |= ST_IR;
 				m_write_irq(ASSERT_LINE);
 			}
@@ -264,7 +264,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 		if (m_scanline == m_vrtc_scanline)
 		{
-			//if (LOG) logerror("I8275 '%s' y %u x %u VRTC 1\n", tag().c_str(), y, x);
+			//if (LOG) logerror("I8275 '%s' y %u x %u VRTC 1\n", tag(), y, x);
 			m_write_vrtc(1);
 
 			// reset field attributes
@@ -456,7 +456,7 @@ READ8_MEMBER( i8275_device::read )
 
 		if (m_status & ST_IR)
 		{
-			//if (LOG) logerror("I8275 '%s' IRQ 0\n", tag().c_str());
+			//if (LOG) logerror("I8275 '%s' IRQ 0\n", tag());
 			m_write_irq(CLEAR_LINE);
 		}
 
@@ -485,15 +485,15 @@ WRITE8_MEMBER( i8275_device::write )
 {
 	if (offset & 0x01)
 	{
-		if (LOG) logerror("I8275 '%s' Command %02x\n", tag().c_str(), data);
+		if (LOG) logerror("I8275 '%s' Command %02x\n", tag(), data);
 
 		switch (data >> 5)
 		{
 		case CMD_RESET:
-			if (LOG) logerror("I8275 '%s' Reset\n", tag().c_str());
+			if (LOG) logerror("I8275 '%s' Reset\n", tag());
 
 			m_status &= ~ST_IE;
-			if (LOG) logerror("I8275 '%s' IRQ 0\n", tag().c_str());
+			if (LOG) logerror("I8275 '%s' IRQ 0\n", tag());
 			m_write_irq(CLEAR_LINE);
 			m_write_drq(0);
 
@@ -504,47 +504,47 @@ WRITE8_MEMBER( i8275_device::write )
 		case CMD_START_DISPLAY:
 			{
 				m_param[REG_DMA] = data;
-				if (LOG) logerror("I8275 '%s' Start Display %u %u\n", tag().c_str(), DMA_BURST_COUNT, DMA_BURST_SPACE);
+				if (LOG) logerror("I8275 '%s' Start Display %u %u\n", tag(), DMA_BURST_COUNT, DMA_BURST_SPACE);
 				m_status |= (ST_IE | ST_VE);
 			}
 			break;
 
 		case CMD_STOP_DISPLAY:
-			if (LOG) logerror("I8275 '%s' Stop Display\n", tag().c_str());
+			if (LOG) logerror("I8275 '%s' Stop Display\n", tag());
 			m_status &= ~ST_VE;
 			break;
 
 		case CMD_READ_LIGHT_PEN:
-			if (LOG) logerror("I8275 '%s' Read Light Pen\n", tag().c_str());
+			if (LOG) logerror("I8275 '%s' Read Light Pen\n", tag());
 			m_param_idx = REG_LPEN_COL;
 			m_param_end = REG_LPEN_ROW;
 			break;
 
 		case CMD_LOAD_CURSOR:
-			if (LOG) logerror("I8275 '%s' Load Cursor\n", tag().c_str());
+			if (LOG) logerror("I8275 '%s' Load Cursor\n", tag());
 			m_param_idx = REG_CUR_COL;
 			m_param_end = REG_CUR_ROW;
 			break;
 
 		case CMD_ENABLE_INTERRUPT:
-			if (LOG) logerror("I8275 '%s' Enable Interrupt\n", tag().c_str());
+			if (LOG) logerror("I8275 '%s' Enable Interrupt\n", tag());
 			m_status |= ST_IE;
 			break;
 
 		case CMD_DISABLE_INTERRUPT:
-			if (LOG) logerror("I8275 '%s' Disable Interrupt\n", tag().c_str());
+			if (LOG) logerror("I8275 '%s' Disable Interrupt\n", tag());
 			m_status &= ~ST_IE;
 			break;
 
 		case CMD_PRESET_COUNTERS:
-			if (LOG) logerror("I8275 '%s' Preset Counters\n", tag().c_str());
+			if (LOG) logerror("I8275 '%s' Preset Counters\n", tag());
 			m_scanline = 0;
 			break;
 		}
 	}
 	else
 	{
-		if (LOG) logerror("I8275 '%s' Parameter %02x\n", tag().c_str(), data);
+		if (LOG) logerror("I8275 '%s' Parameter %02x\n", tag(), data);
 
 		m_param[m_param_idx] = data;
 
@@ -564,7 +564,7 @@ WRITE8_MEMBER( i8275_device::write )
 
 WRITE8_MEMBER( i8275_device::dack_w )
 {
-	//if (LOG) logerror("I8275 '%s' y %u x %u DACK %04x:%02x %u\n", tag().c_str(), m_screen->vpos(), m_screen->hpos(), offset, data, m_buffer_idx);
+	//if (LOG) logerror("I8275 '%s' y %u x %u DACK %04x:%02x %u\n", tag(), m_screen->vpos(), m_screen->hpos(), offset, data, m_buffer_idx);
 
 	m_write_drq(0);
 

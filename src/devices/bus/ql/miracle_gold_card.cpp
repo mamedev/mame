@@ -50,7 +50,7 @@ const rom_entry *miracle_gold_card_t::device_rom_region() const
 //  miracle_gold_card_t - constructor
 //-------------------------------------------------
 
-miracle_gold_card_t::miracle_gold_card_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+miracle_gold_card_t::miracle_gold_card_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MIRACLE_GOLD_CARD, "Miracle Gold Card", tag, owner, clock, "ql_gold", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this)
 {

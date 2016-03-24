@@ -3393,7 +3393,7 @@ void cp1610_cpu_device::execute_set_input(int irqline, int state)
 }
 
 
-cp1610_cpu_device::cp1610_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+cp1610_cpu_device::cp1610_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, CP1610, "CP1610", tag, owner, clock, "cp1610", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_read_bext(*this)
@@ -3406,7 +3406,7 @@ void cp1610_cpu_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c",
+			str = string_format("%c%c%c%c",
 				m_flags & 0x80 ? 'S':'.',
 				m_flags & 0x40 ? 'Z':'.',
 				m_flags & 0x20 ? 'V':'.',

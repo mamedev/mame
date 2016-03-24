@@ -19,8 +19,8 @@ QVariant DevicesWindowModel::data(const QModelIndex &index, int role) const
 
 	device_t *dev = static_cast<device_t *>(index.internalPointer());
 	switch(index.column()) {
-	case 0: return dev == &m_machine->root_device() ? QString("<root>") : QString(dev->basetag().c_str());
-	case 1: return QString(dev->name().c_str());
+	case 0: return dev == &m_machine->root_device() ? QString("<root>") : QString(dev->basetag());
+	case 1: return QString(dev->name());
 	}
 
 	return QVariant();

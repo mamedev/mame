@@ -1,12 +1,10 @@
-// license:???
-// copyright-holders:Per Ola Ingvarsson, Tomas Karlsson
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
+// thanks-to:Per Ola Ingvarsson, Tomas Karlsson
 /******************************************************************************
 
     drivers/compis.c
     machine driver
-
-    Per Ola Ingvarsson
-    Tomas Karlsson
 
     Hardware:
         - Intel 80186 CPU 8MHz, integrated DMA(8237?), PIC(8259?), PIT(8253?)
@@ -638,7 +636,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_80186_TMROUT1_HANDLER(DEVWRITELINE(DEVICE_SELF, compis_state, tmr1_w))
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
@@ -651,7 +649,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(compis_state, hgdc_display_pixels)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// devices
 	MCFG_DEVICE_ADD(I80130_TAG, I80130, XTAL_16MHz/2)

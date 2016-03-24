@@ -111,7 +111,7 @@ WRITE32_MEMBER(seibuspi_state::tilemap_dma_start_w)
 	int dma_length_real = (m_video_dma_length + 1) * 2; // ideally we should be using this, let's check if we have to:
 	if (m_video_dma_length != 0 && dma_length_user != dma_length_real)
 		popmessage("Tile LEN %X %X, contact MAMEdev", dma_length_user, dma_length_real); // shouldn't happen
-	else if ((m_video_dma_address & 3) != 0 || (m_video_dma_length & 3) != 3 || (m_video_dma_address + dma_length_user) > 0x40000)
+	else if (!DWORD_ALIGNED(m_video_dma_address) || (m_video_dma_length & 3) != 3 || (m_video_dma_address + dma_length_user) > 0x40000)
 		popmessage("Tile DMA %X %X, contact MAMEdev", m_video_dma_address, m_video_dma_length); // shouldn't happen
 	if (m_video_dma_address < 0x800)
 		logerror("tilemap_dma_start_w in I/O area: %X\n", m_video_dma_address);
@@ -198,7 +198,7 @@ WRITE32_MEMBER(seibuspi_state::palette_dma_start_w)
 	int dma_length = (m_video_dma_length + 1) * 2;
 
 	// safety check
-	if ((m_video_dma_address & 3) != 0 || (m_video_dma_length & 3) != 3 || dma_length > m_palette_ram_size || (m_video_dma_address + dma_length) > 0x40000)
+	if (!DWORD_ALIGNED(m_video_dma_address) || (m_video_dma_length & 3) != 3 || dma_length > m_palette_ram_size || (m_video_dma_address + dma_length) > 0x40000)
 		popmessage("Pal DMA %X %X, contact MAMEdev", m_video_dma_address, m_video_dma_length); // shouldn't happen
 	if (m_video_dma_address < 0x800)
 		logerror("palette_dma_start_w in I/O area: %X\n", m_video_dma_address);
@@ -219,7 +219,7 @@ WRITE32_MEMBER(seibuspi_state::palette_dma_start_w)
 WRITE16_MEMBER(seibuspi_state::sprite_dma_start_w)
 {
 	// safety check
-	if ((m_video_dma_address & 3) != 0 || (m_video_dma_address + m_sprite_ram_size) > 0x40000)
+	if (!DWORD_ALIGNED(m_video_dma_address) || (m_video_dma_address + m_sprite_ram_size) > 0x40000)
 		popmessage("Sprite DMA %X, contact MAMEdev", m_video_dma_address); // shouldn't happen
 	if (m_video_dma_address < 0x800)
 		logerror("sprite_dma_start_w in I/O area: %X\n", m_video_dma_address);

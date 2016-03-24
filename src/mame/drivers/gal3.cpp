@@ -139,7 +139,7 @@ better notes (complete chip lists) for each board still needed
 class gal3_state : public namcos2_shared_state
 {
 public:
-	gal3_state(const machine_config &mconfig, device_type type, std::string tag)
+	gal3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcos2_shared_state(mconfig, type, tag) ,
 		m_rso_shared_ram(*this, "rso_shared_ram"),
 		m_generic_paletteram_16(*this, "paletteram") { }

@@ -29,7 +29,7 @@ SOUND : (none)
 class dotrikun_state : public driver_device
 {
 public:
-	dotrikun_state(const machine_config &mconfig, device_type type, std::string tag)
+	dotrikun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_dotrikun_bitmap(*this, "dotrikun_bitmap"),
 		m_maincpu(*this, "maincpu"),

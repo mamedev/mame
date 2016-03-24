@@ -58,7 +58,7 @@ class z80ctc_device :   public device_t,
 {
 public:
 	// construction/destruction
-	z80ctc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_intr_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_intr_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_zc0_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc0_cb.set_callback(object); }
@@ -103,7 +103,7 @@ private:
 
 		attotime period() const;
 		void trigger(UINT8 data);
-		void timer_callback();
+		TIMER_CALLBACK_MEMBER(timer_callback);
 
 		z80ctc_device * m_device;               // pointer back to our device
 		int             m_index;                // our channel index
@@ -113,9 +113,6 @@ private:
 		UINT8           m_extclk;               // current signal from the external clock
 		emu_timer *     m_timer;                // array of active timers
 		UINT8           m_int_state;            // interrupt status (for daisy chain)
-
-	private:
-		static TIMER_CALLBACK( static_timer_callback ) { reinterpret_cast<z80ctc_device::ctc_channel *>(ptr)->timer_callback(); }
 	};
 
 	// internal state

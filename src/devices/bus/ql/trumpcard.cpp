@@ -111,7 +111,7 @@ machine_config_constructor ql_trump_card_t::device_mconfig_additions() const
 //  ql_trump_card_t - constructor
 //-------------------------------------------------
 
-ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, QL_TRUMP_CARD, "QL Trump Card", tag, owner, clock, "ql_trump", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),
@@ -123,7 +123,7 @@ ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, std::string tag,
 {
 }
 
-ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int ram_size) :
+ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int ram_size) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),
@@ -135,13 +135,13 @@ ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, device_type type
 {
 }
 
-ql_trump_card_256k_t::ql_trump_card_256k_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ql_trump_card_256k_t::ql_trump_card_256k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_256K, "QL Trump Card 256K", tag, owner, clock, "ql_trump256", __FILE__, 256*1024) { }
 
-ql_trump_card_512k_t::ql_trump_card_512k_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ql_trump_card_512k_t::ql_trump_card_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_512K, "QL Trump Card 512K", tag, owner, clock, "ql_trump512", __FILE__, 512*1024) { }
 
-ql_trump_card_768k_t::ql_trump_card_768k_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ql_trump_card_768k_t::ql_trump_card_768k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_768K, "QL Trump Card 768K", tag, owner, clock, "ql_trump768", __FILE__, 768*1024) { }
 
 

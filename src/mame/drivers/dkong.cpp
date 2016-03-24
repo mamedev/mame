@@ -439,8 +439,6 @@ MACHINE_START_MEMBER(dkong_state,dkong2b)
 {
 	m_hardware_type = HARDWARE_TKG04;
 
-	m_snd_rom = memregion("soundcpu")->base();
-
 	save_item(NAME(m_decrypt_counter));
 	save_item(NAME(m_dma_latch));
 }

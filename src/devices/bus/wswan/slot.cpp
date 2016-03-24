@@ -48,7 +48,7 @@ device_ws_cart_interface::~device_ws_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_ws_cart_interface::rom_alloc(UINT32 size, std::string tag)
+void device_ws_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -76,7 +76,7 @@ void device_ws_cart_interface::nvram_alloc(UINT32 size)
 //-------------------------------------------------
 //  ws_cart_slot_device - constructor
 //-------------------------------------------------
-ws_cart_slot_device::ws_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+ws_cart_slot_device::ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, WS_CART_SLOT, "Wonderswan Cartridge Slot", tag, owner, clock, "ws_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -311,12 +311,12 @@ std::string ws_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 size = core_fsize(m_file);
+		UINT32 size = m_file->size();
 		dynamic_buffer rom(size);
 		int type;
 		UINT32 nvram;
 
-		core_fread(m_file, &rom[0], size);
+		m_file->read(&rom[0], size);
 
 		// nvram size is not really used here, but we set it up nevertheless
 		type = get_cart_type(&rom[0], size, nvram);

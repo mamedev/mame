@@ -4284,7 +4284,7 @@ class discrete_device : public device_t
 
 protected:
 	// construction/destruction
-	discrete_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock);
+	discrete_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 public:
 	// inline configuration helpers
@@ -4373,7 +4373,7 @@ class discrete_sound_device :   public discrete_device,
 {
 public:
 	// construction/destruction
-	discrete_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~discrete_sound_device(void) { };
 
 	/* --------------------------------- */

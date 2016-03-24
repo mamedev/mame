@@ -380,11 +380,11 @@
 const device_type PDP1 = &device_creator<pdp1_device>;
 
 
-pdp1_device::pdp1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pdp1_device::pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, PDP1, "PDP1", tag, owner, clock, "pdp1_cpu", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 18, 0)
 {
-	m_is_octal = true;
+	m_program_config.m_is_octal = true;
 }
 
 
@@ -742,7 +742,7 @@ void pdp1_device::state_string_export(const device_state_entry &entry, std::stri
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c-%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c-%c%c%c%c%c%c",
 					(FLAGS & 040) ? '1' : '.',
 					(FLAGS & 020) ? '2' : '.',
 					(FLAGS & 010) ? '3' : '.',

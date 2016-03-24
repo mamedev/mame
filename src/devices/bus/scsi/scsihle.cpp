@@ -10,7 +10,7 @@ Base class for HLE'd SCSI devices.
 
 #include "scsihle.h"
 
-scsihle_device::scsihle_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+scsihle_device::scsihle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	scsi_port_interface(mconfig, *this),
 	m_scsi_id(*this, "SCSI_ID"),
@@ -133,7 +133,7 @@ static const char *const phasenames[] =
 
 void scsihle_device::data_out(UINT8 data)
 {
-//  printf( "%s data out %02x\n", tag().c_str(), data );
+//  printf( "%s data out %02x\n", tag(), data );
 	output_data0(BIT(data, 0));
 	output_data1(BIT(data, 1));
 	output_data2(BIT(data, 2));

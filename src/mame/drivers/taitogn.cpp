@@ -346,7 +346,7 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 class taitogn_state : public driver_device
 {
 public:
-	taitogn_state(const machine_config &mconfig, device_type type, std::string tag) :
+	taitogn_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_sio0(*this, "maincpu:sio0"),
 		m_cat702_1(*this, "cat702_1"),
@@ -392,7 +392,6 @@ public:
 	DECLARE_DRIVER_INIT(coh3002t_nz);
 
 protected:
-	virtual void driver_start() override;
 	virtual void machine_reset() override;
 
 private:
@@ -592,14 +591,6 @@ READ32_MEMBER(taitogn_state::zsg2_ext_r)
 	return 0;
 }
 
-// Init and reset
-
-void taitogn_state::driver_start()
-{
-	m_cat702_1->init(tt10);
-	m_cat702_2->init(tt16);
-}
-
 void taitogn_state::machine_reset()
 {
 	// halt sound CPU since it has no valid program at start
@@ -680,9 +671,11 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 
 	MCFG_DEVICE_ADD("cat702_1", CAT702, 0)
 	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(taitogn_state, cat702_1_dataout))
+	MCFG_CAT702_TRANSFORM_TABLE(tt10)
 
 	MCFG_DEVICE_ADD("cat702_2", CAT702, 0)
 	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(taitogn_state, cat702_2_dataout))
+	MCFG_CAT702_TRANSFORM_TABLE(tt16)
 
 	MCFG_DEVICE_ADD("zndip", ZNDIP, 0)
 	MCFG_ZNDIP_DATAOUT_HANDLER(WRITELINE(taitogn_state, zndip_dataout))

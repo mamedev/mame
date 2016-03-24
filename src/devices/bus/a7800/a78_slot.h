@@ -53,7 +53,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_30xx) {}
 	virtual DECLARE_WRITE8_MEMBER(write_40xx) {}
 
-	void rom_alloc(UINT32 size, std::string tag);
+	void rom_alloc(UINT32 size, const char *tag);
 	void ram_alloc(UINT32 size);
 	void nvram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
@@ -86,7 +86,7 @@ class a78_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	a78_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~a78_cart_slot_device();
 
 	// device-level overrides

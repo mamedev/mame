@@ -940,12 +940,13 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, NULL)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_ls_b", "bbcb_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_b", "bbcb_flop")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_orig", "bbcb_orig_flop")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_z80", "bbc_z80_flop")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_32016", "bbc_32016_flop")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_68000", "bbc_68000_flop")
+	MCFG_SOFTWARE_LIST_ADD("cass_ls_b",      "bbcb_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_b",      "bbcb_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_orig", "bbcb_flop_orig")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_z80",    "bbc_flop_z80")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_32016",  "bbc_flop_32016")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_68000",  "bbc_flop_68000")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_6502",   "bbc_flop_6502")
 MACHINE_CONFIG_END
 
 
@@ -970,7 +971,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bbcb_de, bbcb )
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_de", "bbcb_de_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_de", "bbcb_cass_de")
 MACHINE_CONFIG_END
 
 
@@ -982,7 +983,7 @@ static MACHINE_CONFIG_DERIVED( bbcb_us, bbcb )
 	MCFG_SCREEN_REFRESH_RATE(60)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_us", "bbcb_us_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_us", "bbcb_flop_us")
 MACHINE_CONFIG_END
 
 
@@ -1033,10 +1034,11 @@ static MACHINE_CONFIG_DERIVED( torchf, bbcb )
 	/* Add Torch Z80 Communicator co-processor */
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_torch", "bbc_torch_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_torch", "bbc_flop_torch")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_6502")
 MACHINE_CONFIG_END
 
 
@@ -1082,6 +1084,7 @@ static MACHINE_CONFIG_DERIVED( abc110, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_6502")
 MACHINE_CONFIG_END
 
 
@@ -1104,6 +1107,7 @@ static MACHINE_CONFIG_DERIVED( acw443, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_6502")
 MACHINE_CONFIG_END
 
 
@@ -1124,6 +1128,7 @@ static MACHINE_CONFIG_DERIVED( abc310, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_6502")
 MACHINE_CONFIG_END
 
 
@@ -1159,6 +1164,7 @@ static MACHINE_CONFIG_DERIVED( reutapm, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_6502")
 MACHINE_CONFIG_END
 
 
@@ -1240,13 +1246,13 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_SOFTWARE_LIST_ADD("cass_ls_m", "bbcm_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_m", "bbcm_flop")
 	MCFG_SOFTWARE_LIST_ADD("cart_ls_m", "bbcm_cart")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_z80", "bbc_z80_flop")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_32016", "bbc_32016_flop")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_68000", "bbc_68000_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_a", "bbca_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_b", "bbcb_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b", "bbcb_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b_orig", "bbcb_orig_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_z80",   "bbc_flop_z80")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_32016", "bbc_flop_32016")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_68000", "bbc_flop_68000")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_a",      "bbca_cass")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_b",      "bbcb_cass")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b",      "bbcb_flop")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b_orig", "bbcb_flop_orig")
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
@@ -1308,7 +1314,7 @@ static MACHINE_CONFIG_DERIVED( bbcmt, bbcm )
 	/* Add 65C102 co-processor */
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_65c102", "bbc_65c102_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_65c102", "bbc_flop_65c102")
 MACHINE_CONFIG_END
 
 
@@ -1360,7 +1366,7 @@ static MACHINE_CONFIG_DERIVED( bbcm512, bbcm )
 	/* Add Intel 80186 co-processor */
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_80186", "bbc_80186_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_80186", "bbc_flop_80186")
 MACHINE_CONFIG_END
 
 
@@ -1369,7 +1375,7 @@ static MACHINE_CONFIG_DERIVED( bbcmarm, bbcm )
 	/* Add ARM co-processor */
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_arm", "bbc_arm_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_arm", "bbc_flop_arm")
 MACHINE_CONFIG_END
 
 
@@ -1652,10 +1658,12 @@ ROM_START(torchf)
 	ROM_DEFAULT_BIOS("mcp120cbl")
 	ROM_SYSTEM_BIOS( 0, "mcp120cbl", "MCP120CBL" )
 	ROMX_LOAD("mcp120cbl.rom", 0x38000, 0x4000, CRC(851d0879) SHA1(2e54ef15692ba7dd9fcfd1ef0d660464a772b156), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "mcp041cbl", "MCP041CBL" )
-	ROMX_LOAD("mcp041cbl.rom", 0x38000, 0x4000, CRC(b36f07f4) SHA1(bd53f09bf73357845a6f97df1ee9e5aea5cdca90), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS( 2, "cpn071", "CPN71+" )
-	ROMX_LOAD("cpn071.rom",    0x38000, 0x2000, CRC(fcb1bdc8) SHA1(756e22f6d76eb26206765f92c78c7152944102b6), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS( 1, "mcp101ci", "MCP101CI" )
+	ROMX_LOAD("mcp101ci.rom", 0x38000, 0x4000, NO_DUMP, ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 2, "mcp041cbl", "MCP041CBL" )
+	ROMX_LOAD("mcp041cbl.rom", 0x38000, 0x4000, CRC(b36f07f4) SHA1(bd53f09bf73357845a6f97df1ee9e5aea5cdca90), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS( 3, "cpn071", "CPN71+" )
+	ROMX_LOAD("cpn071.rom",    0x38000, 0x2000, CRC(fcb1bdc8) SHA1(756e22f6d76eb26206765f92c78c7152944102b6), ROM_BIOS(4))
 	ROM_RELOAD(                0x3a000, 0x2000 )
 
 	ROM_REGION(0x4000, "os", 0)
@@ -2095,8 +2103,8 @@ COMP ( 1983, bbcb_us,  bbcb,     0,     bbcb_us,  bbcb,  bbc_state,   bbc,     "
 COMP ( 1984, bbcb1770, bbcb,     0,     bbcb1770, bbcb,  bbc_state,   bbc,     "Acorn",    "BBC Micro Model B w/1770 FDC",  MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1985, bbcbp,    0,        bbcb,  bbcbp,    bbcbp, bbc_state,   bbc,     "Acorn",    "BBC Micro Model B+ 64K",        MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1985, bbcbp128, bbcbp,    0,     bbcbp128, bbcbp, bbc_state,   bbc,     "Acorn",    "BBC Micro Model B+ 128K",       MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1985, acw443,   bbcbp,    0,     acw443,   abc,   bbc_state,   bbc,     "Acorn",    "ABC 210/Cambridge Workstation", MACHINE_NOT_WORKING)
 COMP ( 1985, abc110,   bbcbp,    0,     abc110,   abc,   bbc_state,   bbc,     "Acorn",    "ABC 110",                       MACHINE_NOT_WORKING)
+COMP ( 1985, acw443,   bbcbp,    0,     acw443,   abc,   bbc_state,   bbc,     "Acorn",    "ABC 210/Cambridge Workstation", MACHINE_NOT_WORKING)
 COMP ( 1985, abc310,   bbcbp,    0,     abc310,   abc,   bbc_state,   bbc,     "Acorn",    "ABC 310",                       MACHINE_NOT_WORKING)
 COMP ( 1985, reutapm,  bbcbp,    0,     reutapm,  bbcb,  bbc_state,   bbc,     "Acorn",    "Reuters APM",                   MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
 COMP ( 1986, bbcm,     0,        bbcb,  bbcm,     bbcm,  bbc_state,   bbc,     "Acorn",    "BBC Master 128",                MACHINE_IMPERFECT_GRAPHICS)

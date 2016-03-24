@@ -88,7 +88,7 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 class mtech_state : public md_base_state
 {
 public:
-	mtech_state(const machine_config &mconfig, device_type type, std::string tag)
+	mtech_state(const machine_config &mconfig, device_type type, const char *tag)
 	: md_base_state(mconfig, type, tag),
 		m_vdp1(*this, "vdp1"),
 		m_cart1(*this, "mt_slot1"),

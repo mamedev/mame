@@ -26,7 +26,7 @@ const device_type QL_STANDARD_ROM_CARTRIDGE = &device_creator<ql_standard_rom_ca
 //  ql_standard_rom_cartridge_t - constructor
 //-------------------------------------------------
 
-ql_standard_rom_cartridge_t::ql_standard_rom_cartridge_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+ql_standard_rom_cartridge_t::ql_standard_rom_cartridge_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, QL_STANDARD_ROM_CARTRIDGE, "QL standard ROM cartridge", tag, owner, clock, "ql_standard", __FILE__),
 	device_ql_rom_cartridge_card_interface(mconfig, *this)
 {

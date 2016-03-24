@@ -46,7 +46,7 @@ device_gba_cart_interface::~device_gba_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_gba_cart_interface::rom_alloc(UINT32 size, std::string tag)
+void device_gba_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -74,7 +74,7 @@ void device_gba_cart_interface::nvram_alloc(UINT32 size)
 //-------------------------------------------------
 //  gba_cart_slot_device - constructor
 //-------------------------------------------------
-gba_cart_slot_device::gba_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+gba_cart_slot_device::gba_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, GBA_CART_SLOT, "Game Boy Advance Cartridge Slot", tag, owner, clock, "gba_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -295,17 +295,17 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 	// first detect nvram type based on strings inside the file
 	for (int i = 0; i < len; i++)
 	{
-		if (!memcmp(&ROM[i], "EEPROM_V", 8))
+		if ((i<len-8) && !memcmp(&ROM[i], "EEPROM_V", 8))
 			chip |= GBA_CHIP_EEPROM; // should be either GBA_CHIP_EEPROM_4K or GBA_CHIP_EEPROM_64K, but it is not yet possible to automatically detect which one
-		else if ((!memcmp(&ROM[i], "SRAM_V", 6)) || (!memcmp(&ROM[i], "SRAM_F_V", 8))) // || (!memcmp(&data[i], "ADVANCEWARS", 11))) //advance wars 1 & 2 has SRAM, but no "SRAM_" string can be found inside the ROM space
+		else if (((i<len-6) && !memcmp(&ROM[i], "SRAM_V", 6)) || ((i<len-8) && !memcmp(&ROM[i], "SRAM_F_V", 8))) // || ((i<len-11) && !memcmp(&data[i], "ADVANCEWARS", 11))) //advance wars 1 & 2 has SRAM, but no "SRAM_" string can be found inside the ROM space
 			chip |= GBA_CHIP_SRAM;
-		else if (!memcmp(&ROM[i], "FLASH1M_V", 9))
+		else if ((i<len-9) && !memcmp(&ROM[i], "FLASH1M_V", 9))
 			chip |= GBA_CHIP_FLASH_1M;
-		else if (!memcmp(&ROM[i], "FLASH512_V", 10))
+		else if ((i<len-10) && !memcmp(&ROM[i], "FLASH512_V", 10))
 			chip |= GBA_CHIP_FLASH_512;
-		else if (!memcmp(&ROM[i], "FLASH_V", 7))
+		else if ((i<len-7) && !memcmp(&ROM[i], "FLASH_V", 7))
 			chip |= GBA_CHIP_FLASH;
-		else if (!memcmp(&ROM[i], "SIIRTC_V", 8))
+		else if ((i<len-8) && !memcmp(&ROM[i], "SIIRTC_V", 8))
 			chip |= GBA_CHIP_RTC;
 	}
 	osd_printf_info("GBA: Detected (ROM) %s\n", gba_chip_string(chip).c_str());
@@ -405,11 +405,11 @@ std::string gba_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 len = core_fsize(m_file);
+		UINT32 len = m_file->size();
 		dynamic_buffer rom(len);
 		int type;
 
-		core_fread(m_file, &rom[0], len);
+		m_file->read(&rom[0], len);
 
 		type = get_cart_type(&rom[0], len);
 		slot_string = gba_get_slot(type);

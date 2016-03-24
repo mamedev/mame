@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 MAIN:
 	// check interrupt lines
 	switch(get_pending_interrupt())

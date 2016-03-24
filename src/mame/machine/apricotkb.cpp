@@ -245,7 +245,7 @@ ioport_constructor apricot_keyboard_device::device_input_ports() const
 //  apricot_keyboard_device - constructor
 //-------------------------------------------------
 
-apricot_keyboard_device::apricot_keyboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+apricot_keyboard_device::apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, APRICOT_KEYBOARD, "Apricot Keyboard", tag, owner, clock, "aprikb", __FILE__),
 	m_write_txd(*this),
 	m_y0(*this, "Y0"),

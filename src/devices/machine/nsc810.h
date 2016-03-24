@@ -15,7 +15,7 @@ class nsc810_device :  public device_t
 {
 public:
 	// construction/destruction
-	nsc810_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_portA_read_callback(device_t &device, _Object object) { return downcast<nsc810_device &>(device).m_portA_r.set_callback(object); }
 	template<class _Object> static devcb_base &set_portB_read_callback(device_t &device, _Object object) { return downcast<nsc810_device &>(device).m_portB_r.set_callback(object); }

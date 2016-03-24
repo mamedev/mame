@@ -497,7 +497,7 @@ public:
 	// getters
 	running_machine &machine() const;
 	tilemap_device *device() const { return m_device; }
-	palette_device *palette() const { return m_palette; }
+	palette_device &palette() const { return *m_palette; }
 	tilemap_t *next() const { return m_next; }
 	void *user_data() const { return m_user_data; }
 	memory_array &basemem() { return m_basemem; }
@@ -518,7 +518,7 @@ public:
 	// setters
 	void enable(bool enable = true) { m_enable = enable; }
 	void set_user_data(void *user_data) { m_user_data = user_data; }
-	void set_palette(palette_device *palette) { m_palette = palette; }
+	void set_palette(palette_device &palette) { m_palette = &palette; }
 	void set_palette_offset(UINT32 offset) { m_palette_offset = offset; }
 	void set_scrolldx(int dx, int dx_flipped) { m_dx = dx; m_dx_flipped = dx_flipped; }
 	void set_scrolldy(int dy, int dy_flipped) { m_dy = dy; m_dy_flipped = dy_flipped; }
@@ -550,16 +550,16 @@ public:
 
 	// mappers
 	// scan in row-major order with optional flipping
-	static tilemap_memory_index scan_rows(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_rows_flip_x(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_rows_flip_y(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_rows_flip_xy(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_rows(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_rows_flip_x(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_rows_flip_y(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_rows_flip_xy(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
 
 	// scan in column-major order with optional flipping
-	static tilemap_memory_index scan_cols(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_cols_flip_x(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_cols_flip_y(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_cols_flip_xy(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_cols(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_cols_flip_x(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_cols_flip_y(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_cols_flip_xy(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
 
 	// optional memory accessors
 	UINT32 basemem_read(int index) { return m_basemem.read(index); }
@@ -724,10 +724,10 @@ class tilemap_device :  public device_t,
 {
 public:
 	// construction/destruction
-	tilemap_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_bytes_per_entry(device_t &device, int bpe);
 	static void static_set_info_callback(device_t &device, tilemap_get_info_delegate tile_get_info);
 	static void static_set_layout(device_t &device, tilemap_standard_mapper mapper, int columns, int rows);

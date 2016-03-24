@@ -60,7 +60,7 @@ Due to no input checking, misuse of commands can crash the system.
 class z1013_state : public driver_device
 {
 public:
-	z1013_state(const machine_config &mconfig, device_type type, std::string tag)
+	z1013_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_cass(*this, "cassette"),
@@ -378,7 +378,7 @@ static MACHINE_CONFIG_START( z1013, z1013_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", z1013)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

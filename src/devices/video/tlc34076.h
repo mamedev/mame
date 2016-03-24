@@ -34,7 +34,7 @@ class tlc34076_device : public device_t
 {
 public:
 	// construction/destruction
-	tlc34076_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tlc34076_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void static_set_bits(device_t &device, tlc34076_bits bits);

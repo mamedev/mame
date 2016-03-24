@@ -14,7 +14,7 @@ class msx_cart_moonsound : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_moonsound(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	msx_cart_moonsound(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

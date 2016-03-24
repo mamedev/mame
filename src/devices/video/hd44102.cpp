@@ -67,7 +67,7 @@ inline void hd44102_device::count_up_or_down()
 //  hd44102_device - constructor
 //-------------------------------------------------
 
-hd44102_device::hd44102_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+hd44102_device::hd44102_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HD44102, "HD44102", tag, owner, clock, "hd44102", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_cs2(0),
@@ -172,25 +172,25 @@ WRITE8_MEMBER( hd44102_device::control_w )
 	switch (data)
 	{
 	case CONTROL_DISPLAY_OFF:
-		if (LOG) logerror("HD44102 '%s' Display Off\n", tag().c_str());
+		if (LOG) logerror("HD44102 '%s' Display Off\n", tag());
 
 		m_status |= STATUS_DISPLAY_OFF;
 		break;
 
 	case CONTROL_DISPLAY_ON:
-		if (LOG) logerror("HD44102 '%s' Display On\n", tag().c_str());
+		if (LOG) logerror("HD44102 '%s' Display On\n", tag());
 
 		m_status &= ~STATUS_DISPLAY_OFF;
 		break;
 
 	case CONTROL_COUNT_DOWN_MODE:
-		if (LOG) logerror("HD44102 '%s' Count Down Mode\n", tag().c_str());
+		if (LOG) logerror("HD44102 '%s' Count Down Mode\n", tag());
 
 		m_status &= ~STATUS_COUNT_UP;
 		break;
 
 	case CONTROL_COUNT_UP_MODE:
-		if (LOG) logerror("HD44102 '%s' Count Up Mode\n", tag().c_str());
+		if (LOG) logerror("HD44102 '%s' Count Up Mode\n", tag());
 
 		m_status |= STATUS_COUNT_UP;
 		break;
@@ -202,17 +202,17 @@ WRITE8_MEMBER( hd44102_device::control_w )
 
 		if ((data & CONTROL_Y_ADDRESS_MASK) == CONTROL_DISPLAY_START_PAGE)
 		{
-			if (LOG) logerror("HD44102 '%s' Display Start Page %u\n", tag().c_str(), x);
+			if (LOG) logerror("HD44102 '%s' Display Start Page %u\n", tag(), x);
 
 			m_page = x;
 		}
 		else if (y > 49)
 		{
-			logerror("HD44102 '%s' Invalid Address X %u Y %u (%02x)!\n", tag().c_str(), data, x, y);
+			logerror("HD44102 '%s' Invalid Address X %u Y %u (%02x)!\n", tag(), data, x, y);
 		}
 		else
 		{
-			if (LOG) logerror("HD44102 '%s' Address X %u Y %u (%02x)\n", tag().c_str(), data, x, y);
+			if (LOG) logerror("HD44102 '%s' Address X %u Y %u (%02x)\n", tag(), data, x, y);
 
 			m_x = x;
 			m_y = y;

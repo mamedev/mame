@@ -142,7 +142,7 @@ const device_type WD2010 = &device_creator<wd2010_device>;
 //  wd2010_device - constructor
 //-------------------------------------------------
 
-wd2010_device::wd2010_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+wd2010_device::wd2010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : device_t(mconfig, WD2010, "Western Digital WD2010", tag, owner, clock, "wd2010", __FILE__),
 m_out_intrq_cb(*this),
 m_out_bdrq_cb(*this),
@@ -245,10 +245,10 @@ READ8_MEMBER(wd2010_device::read)
 
 		if (offset == TASK_FILE_SDH_REGISTER)
 		{
-			logerror("(READ) %s WD2010 '%s' SDH: %u\n", machine().describe_context(), tag().c_str(), data);
-			logerror("(READ) %s WD2010 '%s' Head: %u\n", machine().describe_context(), tag().c_str(), HEAD);
-			logerror("(READ) %s WD2010 '%s' Drive: %u\n", machine().describe_context(), tag().c_str(), DRIVE);
-			logerror("(READ) %s WD2010 '%s' Sector Size: %u\n", machine().describe_context(), tag().c_str(), SECTOR_SIZE);
+			logerror("(READ) %s WD2010 '%s' SDH: %u\n", machine().describe_context(), tag(), data);
+			logerror("(READ) %s WD2010 '%s' Head: %u\n", machine().describe_context(), tag(), HEAD);
+			logerror("(READ) %s WD2010 '%s' Drive: %u\n", machine().describe_context(), tag(), DRIVE);
+			logerror("(READ) %s WD2010 '%s' Sector Size: %u\n", machine().describe_context(), tag(), SECTOR_SIZE);
 		}
 
 		break;
@@ -269,32 +269,32 @@ WRITE8_MEMBER(wd2010_device::write)
 	switch (offset)
 	{
 	case TASK_FILE_WRITE_PRECOMP_CYLINDER:
-		if (LOG) logerror("%s WD2010 '%s' Write Precomp Cylinder: %u\n", machine().describe_context(), tag().c_str(), WRITE_PRECOMP_CYLINDER);
+		if (LOG) logerror("%s WD2010 '%s' Write Precomp Cylinder: %u\n", machine().describe_context(), tag(), WRITE_PRECOMP_CYLINDER);
 		break;
 
 	case TASK_FILE_SECTOR_COUNT:
-		if (LOG) logerror("%s WD2010 '%s' Sector Count: %u\n", machine().describe_context(), tag().c_str(), SECTOR_COUNT);
+		if (LOG) logerror("%s WD2010 '%s' Sector Count: %u\n", machine().describe_context(), tag(), SECTOR_COUNT);
 		break;
 
 	case TASK_FILE_SECTOR_NUMBER:
-		if (LOG) logerror("%s WD2010 '%s' Sector Number: %u\n", machine().describe_context(), tag().c_str(), SECTOR_NUMBER);
+		if (LOG) logerror("%s WD2010 '%s' Sector Number: %u\n", machine().describe_context(), tag(), SECTOR_NUMBER);
 		break;
 
 	case TASK_FILE_CYLINDER_LOW:
-		if (LOG) logerror("%s WD2010 '%s' Cylinder (lower bits set): %u\n", machine().describe_context(), tag().c_str(), CYLINDER);
+		if (LOG) logerror("%s WD2010 '%s' Cylinder (lower bits set): %u\n", machine().describe_context(), tag(), CYLINDER);
 		break;
 
 	case TASK_FILE_CYLINDER_HIGH:
-		if (LOG) logerror("%s WD2010 '%s' Cylinder (MSB bits set): %u\n", machine().describe_context(), tag().c_str(), CYLINDER);
+		if (LOG) logerror("%s WD2010 '%s' Cylinder (MSB bits set): %u\n", machine().describe_context(), tag(), CYLINDER);
 		break;
 
 	case TASK_FILE_SDH_REGISTER:
 		if (LOG)
 		{
-			logerror("(WRITE) %s WD2010 '%s' SDH: %u\n", machine().describe_context(), tag().c_str(), data);
-			logerror("(WRITE) %s WD2010 '%s' Head: %u\n", machine().describe_context(), tag().c_str(), HEAD);
-			logerror("(WRITE) %s WD2010 '%s' Drive: %u\n", machine().describe_context(), tag().c_str(), DRIVE);
-			logerror("(WRITE) %s WD2010 '%s' Sector Size: %u\n", machine().describe_context(), tag().c_str(), SECTOR_SIZE);
+			logerror("(WRITE) %s WD2010 '%s' SDH: %u\n", machine().describe_context(), tag(), data);
+			logerror("(WRITE) %s WD2010 '%s' Head: %u\n", machine().describe_context(), tag(), HEAD);
+			logerror("(WRITE) %s WD2010 '%s' Drive: %u\n", machine().describe_context(), tag(), DRIVE);
+			logerror("(WRITE) %s WD2010 '%s' Sector Size: %u\n", machine().describe_context(), tag(), SECTOR_SIZE);
 		}
 		break;
 
@@ -305,12 +305,12 @@ WRITE8_MEMBER(wd2010_device::write)
 
 		if (data == COMMAND_COMPUTE_CORRECTION)
 		{
-			if (LOG) logerror("%s WD2010 '%s' COMPUTE CORRECTION\n", machine().describe_context(), tag().c_str());
+			if (LOG) logerror("%s WD2010 '%s' COMPUTE CORRECTION\n", machine().describe_context(), tag());
 			compute_correction(data);
 		}
 		else if ((data & COMMAND_SET_PARAMETER_MASK) == COMMAND_SET_PARAMETER)
 		{
-			if (LOG) logerror("%s WD2010 '%s' SET PARAMETER\n", machine().describe_context(), tag().c_str());
+			if (LOG) logerror("%s WD2010 '%s' SET PARAMETER\n", machine().describe_context(), tag());
 			set_parameter(data);
 		}
 		else
@@ -318,32 +318,32 @@ WRITE8_MEMBER(wd2010_device::write)
 			switch (data & COMMAND_MASK)
 			{
 			case COMMAND_RESTORE:
-				if (LOG) logerror("%s WD2010 '%s' RESTORE\n", machine().describe_context(), tag().c_str());
+				if (LOG) logerror("%s WD2010 '%s' RESTORE\n", machine().describe_context(), tag());
 				restore(data);
 				break;
 
 			case COMMAND_SEEK:
-				if (LOG) logerror("%s WD2010 '%s' SEEK\n", machine().describe_context(), tag().c_str());
+				if (LOG) logerror("%s WD2010 '%s' SEEK\n", machine().describe_context(), tag());
 				seek(data);
 				break;
 
 			case COMMAND_READ_SECTOR:
-				if (LOG) logerror("%s WD2010 '%s' READ SECTOR (I = %u) (M = %u)\n", machine().describe_context(), tag().c_str(), ((data & 8)>0), ((data & 4)>0));
+				if (LOG) logerror("%s WD2010 '%s' READ SECTOR (I = %u) (M = %u)\n", machine().describe_context(), tag(), ((data & 8)>0), ((data & 4)>0));
 				read_sector(data);
 				break;
 
 			case COMMAND_WRITE_SECTOR:
-				if (LOG) logerror("%s WD2010 '%s' WRITE SECTOR (M = %u)\n", machine().describe_context(), tag().c_str(), ((data & 4) > 0));
+				if (LOG) logerror("%s WD2010 '%s' WRITE SECTOR (M = %u)\n", machine().describe_context(), tag(), ((data & 4) > 0));
 				write_sector(data);
 				break;
 
 			case COMMAND_SCAN_ID:
-				if (LOG) logerror("%s WD2010 '%s' SCAN ID\n", machine().describe_context(), tag().c_str());
+				if (LOG) logerror("%s WD2010 '%s' SCAN ID\n", machine().describe_context(), tag());
 				scan_id(data);
 				break;
 
 			case COMMAND_WRITE_FORMAT:
-				if (LOG) logerror("%s WD2010 '%s' WRITE FORMAT\n", machine().describe_context(), tag().c_str());
+				if (LOG) logerror("%s WD2010 '%s' WRITE FORMAT\n", machine().describe_context(), tag());
 				format(data);
 				break;
 			}

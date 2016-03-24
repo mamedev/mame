@@ -52,7 +52,7 @@ class ie15_state : public driver_device,
 	public device_serial_interface
 {
 public:
-	ie15_state(const machine_config &mconfig, device_type type, std::string tag) :
+	ie15_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		device_serial_interface(mconfig, *this),
 		m_maincpu(*this, "maincpu"),
@@ -211,7 +211,7 @@ WRITE8_MEMBER( ie15_state::mem_addr_hi_w ) {
 
 TIMER_CALLBACK_MEMBER(ie15_state::ie15_beepoff)
 {
-	machine().device<beep_device>("beeper")->set_state(0);
+	m_beeper->set_state(0);
 }
 
 WRITE8_MEMBER( ie15_state::beep_w ) {
@@ -222,7 +222,7 @@ WRITE8_MEMBER( ie15_state::beep_w ) {
 		DBG_LOG(1,"beep",("(%s)\n", m_long_beep ? "short" : "long"));
 	}
 	machine().scheduler().timer_set(attotime::from_msec(length), timer_expired_delegate(FUNC(ie15_state::ie15_beepoff),this));
-	machine().device<beep_device>("beeper")->set_state(1);
+	m_beeper->set_state(1);
 }
 
 /* keyboard */
@@ -448,8 +448,7 @@ void ie15_state::machine_reset()
 	m_kb_ruslat = m_long_beep = m_kb_control = m_kb_data = m_kb_flag0 = 0;
 	m_kb_flag = IE_TRUE;
 
-	machine().device<beep_device>("beeper")->set_frequency(2400);
-	machine().device<beep_device>("beeper")->set_state(0);
+	m_beeper->set_state(0);
 
 	m_serial_tx_ready = m_serial_rx_ready = IE_TRUE;
 	set_data_frame(1 /* start bits */, 8 /* data bits */, PARITY_NONE, STOP_BITS_1);
@@ -616,7 +615,7 @@ static MACHINE_CONFIG_START( ie15, ie15_state )
 	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_30_8MHz/(2*IE15_HORZ_START)))
 
 	/* Video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_UPDATE_DRIVER(ie15_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_30_8MHz/2, IE15_TOTAL_HORZ, IE15_HORZ_START,
 		IE15_HORZ_START+IE15_DISP_HORZ, IE15_TOTAL_VERT, IE15_VERT_START,
@@ -625,7 +624,7 @@ static MACHINE_CONFIG_START( ie15, ie15_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ie15)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_ie15)
 
@@ -637,7 +636,7 @@ static MACHINE_CONFIG_START( ie15, ie15_state )
 	MCFG_RS232_RXD_HANDLER(WRITELINE(ie15_state, serial_rx_callback))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 

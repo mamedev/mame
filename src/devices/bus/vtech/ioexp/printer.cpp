@@ -43,7 +43,7 @@ machine_config_constructor printer_interface_device::device_mconfig_additions() 
 //  printer_interface_device - constructor
 //-------------------------------------------------
 
-printer_interface_device::printer_interface_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+printer_interface_device::printer_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PRINTER_INTERFACE, "Laser/VZ Printer Interface", tag, owner, clock, "printer", __FILE__),
 	device_ioexp_interface(mconfig, *this),
 	m_centronics(*this, "centronics"),

@@ -40,7 +40,7 @@ const UINT8 dm9368_device::m_segment_data[16] =
 //  dm9368_device - constructor
 //-------------------------------------------------
 
-dm9368_device::dm9368_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+dm9368_device::dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, DM9368, "DM9368 7-Segment Decoder", tag, owner, clock, "dm9368", __FILE__),
 	device_output_interface(mconfig, *this),
 	m_write_rbo(*this),
@@ -76,14 +76,14 @@ void dm9368_device::a_w(UINT8 data)
 
 	if (!m_rbi && !a)
 	{
-		if (LOG) logerror("DM9368 '%s' Blanked Rippling Zero\n", tag().c_str());
+		if (LOG) logerror("DM9368 '%s' Blanked Rippling Zero\n", tag());
 
 		// blank rippling 0
 		m_rbo = 0;
 	}
 	else
 	{
-		if (LOG) logerror("DM9368 '%s' Output Data: %u = %02x\n", tag().c_str(), a, m_segment_data[a]);
+		if (LOG) logerror("DM9368 '%s' Output Data: %u = %02x\n", tag(), a, m_segment_data[a]);
 
 		value = m_segment_data[a];
 

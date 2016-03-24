@@ -36,7 +36,7 @@ https://www.youtube.com/watch?v=9DIhuOEVwf4
 class aftrshok_state : public driver_device
 {
 public:
-	aftrshok_state(const machine_config &mconfig, device_type type, std::string tag)
+	aftrshok_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 	//  ,m_maincpu(*this, "maincpu")
 	{ }

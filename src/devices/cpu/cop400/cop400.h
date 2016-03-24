@@ -111,12 +111,6 @@ enum cop400_cko_bond {
 	COP400_CKO_GENERAL_PURPOSE_INPUT
 };
 
-/* microbus bonding options */
-enum cop400_microbus {
-	COP400_MICROBUS_DISABLED = 0,
-	COP400_MICROBUS_ENABLED
-};
-
 
 #define MCFG_COP400_CONFIG(_cki, _cko, _microbus) \
 	cop400_cpu_device::set_cki(*device, _cki); \
@@ -128,7 +122,7 @@ class cop400_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	cop400_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, UINT8 program_addr_bits, UINT8 data_addr_bits, UINT8 featuremask, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data);
+	cop400_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, UINT8 program_addr_bits, UINT8 data_addr_bits, UINT8 featuremask, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -146,7 +140,10 @@ public:
 
 	static void set_cki(device_t &device, cop400_cki_bond cki) { downcast<cop400_cpu_device &>(device).m_cki = cki; }
 	static void set_cko(device_t &device, cop400_cko_bond cko) { downcast<cop400_cpu_device &>(device).m_cko = cko; }
-	static void set_microbus(device_t &device, cop400_microbus microbus) { downcast<cop400_cpu_device &>(device).m_microbus = microbus; }
+	static void set_microbus(device_t &device, bool has_microbus) { downcast<cop400_cpu_device &>(device).m_has_microbus = has_microbus; }
+
+	DECLARE_READ8_MEMBER( microbus_rd );
+	DECLARE_WRITE8_MEMBER( microbus_wr );
 
 protected:
 	// device-level overrides
@@ -194,7 +191,7 @@ protected:
 
 	cop400_cki_bond m_cki;
 	cop400_cko_bond m_cko;
-	cop400_microbus m_microbus;
+	bool m_has_microbus;
 
 	bool m_has_counter;
 	bool m_has_inil;
@@ -241,9 +238,6 @@ protected:
 	int m_halt;               /* halt mode */
 	int m_idle;               /* idle mode */
 
-	/* microbus */
-	int m_microbus_int;       /* microbus interrupt */
-
 	/* execution logic */
 	int m_InstLen[256];       /* instruction length in bytes */
 	int m_icount;             /* instruction counter */
@@ -252,7 +246,6 @@ protected:
 	emu_timer *m_serial_timer;
 	emu_timer *m_counter_timer;
 	emu_timer *m_inil_timer;
-	emu_timer *m_microbus_timer;
 
 	typedef void ( cop400_cpu_device::*cop400_opcode_func ) (UINT8 opcode);
 
@@ -277,7 +270,6 @@ protected:
 	void serial_tick();
 	void counter_tick();
 	void inil_tick();
-	void microbus_tick();
 
 	void PUSH(UINT16 data);
 	void POP();
@@ -370,7 +362,7 @@ class cop401_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop401_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cop401_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -378,7 +370,7 @@ class cop410_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop410_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cop410_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -387,7 +379,7 @@ class cop411_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop411_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cop411_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -397,7 +389,7 @@ class cop402_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop402_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cop402_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -405,7 +397,7 @@ class cop420_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop420_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cop420_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -414,7 +406,7 @@ class cop421_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop421_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cop421_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -423,7 +415,7 @@ class cop422_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop422_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cop422_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -433,7 +425,7 @@ class cop404_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop404_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cop404_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -442,7 +434,7 @@ class cop424_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop424_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cop424_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -451,7 +443,7 @@ class cop425_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop425_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cop425_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -460,7 +452,7 @@ class cop426_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop426_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cop426_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -468,7 +460,7 @@ class cop444_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop444_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cop444_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -477,7 +469,7 @@ class cop445_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop445_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cop445_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

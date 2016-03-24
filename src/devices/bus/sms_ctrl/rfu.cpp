@@ -6,6 +6,9 @@
 
 **********************************************************************/
 
+// This emulated device is the version released by Sega. In Brazil, Tec Toy
+// released a version that does not have any switch to turn on/off auto-repeat.
+
 #include "rfu.h"
 
 
@@ -16,7 +19,7 @@
 
 const device_type SMS_RAPID_FIRE = &device_creator<sms_rapid_fire_device>;
 
-
+// time interval not verified
 #define RAPID_FIRE_INTERVAL attotime::from_hz(10)
 
 
@@ -49,7 +52,7 @@ ioport_constructor sms_rapid_fire_device::device_input_ports() const
 //  sms_rapid_fire_device - constructor
 //-------------------------------------------------
 
-sms_rapid_fire_device::sms_rapid_fire_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+sms_rapid_fire_device::sms_rapid_fire_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SMS_RAPID_FIRE, "Sega SMS Rapid Fire", tag, owner, clock, "sms_rapid_fire", __FILE__),
 	device_sms_control_port_interface(mconfig, *this),
 	m_rfire_sw(*this, "rfu_sw"),

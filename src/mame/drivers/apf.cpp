@@ -87,7 +87,7 @@ ToDo:
 class apf_state : public driver_device
 {
 public:
-	apf_state(const machine_config &mconfig, device_type type, std::string tag)
+	apf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_has_cart_ram(false)
 		, m_maincpu(*this, "maincpu")

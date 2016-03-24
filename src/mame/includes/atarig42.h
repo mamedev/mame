@@ -14,7 +14,7 @@
 class atarig42_state : public atarigen_state
 {
 public:
-	atarig42_state(const machine_config &mconfig, device_type type, std::string tag)
+	atarig42_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_jsa(*this, "jsa"),

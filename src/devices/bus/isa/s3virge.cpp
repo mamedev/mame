@@ -20,27 +20,27 @@ const device_type S3VIRGE = &device_creator<s3virge_vga_device>;
 const device_type S3VIRGEDX = &device_creator<s3virgedx_vga_device>;
 const device_type S3VIRGEDX1 = &device_creator<s3virgedx_rev1_vga_device>;
 
-s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: s3_vga_device(mconfig, S3VIRGE, "S3 86C325", tag, owner, clock, "virge_vga", __FILE__)
 {
 }
 
-s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: s3_vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: s3virge_vga_device(mconfig, S3VIRGEDX, "S3 86C375", tag, owner, clock, "virgedx_vga", __FILE__)
 {
 }
 
-s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: s3virge_vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-s3virgedx_rev1_vga_device::s3virgedx_rev1_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+s3virgedx_rev1_vga_device::s3virgedx_rev1_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: s3virgedx_vga_device(mconfig, S3VIRGEDX1, "S3 86C375 (rev 1)", tag, owner, clock, "virgedx_r1", __FILE__)
 {
 }

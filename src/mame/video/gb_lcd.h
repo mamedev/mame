@@ -33,8 +33,8 @@ class gb_lcd_device :   public device_t,
 						public device_video_interface
 {
 public:
-	gb_lcd_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	gb_lcd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gb_lcd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	gb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -141,7 +141,7 @@ protected:
 class mgb_lcd_device : public gb_lcd_device
 {
 public:
-	mgb_lcd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mgb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 
@@ -153,7 +153,7 @@ protected:
 class sgb_lcd_device : public gb_lcd_device
 {
 public:
-	sgb_lcd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sgb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void sgb_io_write_pal(int offs, UINT8 *data);
 
@@ -172,7 +172,7 @@ protected:
 class cgb_lcd_device : public gb_lcd_device
 {
 public:
-	cgb_lcd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cgb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual DECLARE_READ8_MEMBER(video_r) override;
 	virtual DECLARE_WRITE8_MEMBER(video_w) override;

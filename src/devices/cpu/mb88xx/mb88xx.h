@@ -64,8 +64,8 @@ class mb88_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	mb88_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	mb88_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int program_width, int data_width);
+	mb88_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb88_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int program_width, int data_width);
 
 	// static configuration helpers
 	static void set_pla(device_t &device, UINT8 *pla) { downcast<mb88_cpu_device &>(device).m_PLA = pla; }
@@ -161,7 +161,7 @@ class mb88201_cpu_device : public mb88_cpu_device
 {
 public:
 	// construction/destruction
-	mb88201_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mb88201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -169,7 +169,7 @@ class mb88202_cpu_device : public mb88_cpu_device
 {
 public:
 	// construction/destruction
-	mb88202_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mb88202_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -177,7 +177,7 @@ class mb8841_cpu_device : public mb88_cpu_device
 {
 public:
 	// construction/destruction
-	mb8841_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mb8841_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -185,7 +185,7 @@ class mb8842_cpu_device : public mb88_cpu_device
 {
 public:
 	// construction/destruction
-	mb8842_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mb8842_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -193,7 +193,7 @@ class mb8843_cpu_device : public mb88_cpu_device
 {
 public:
 	// construction/destruction
-	mb8843_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mb8843_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -201,7 +201,7 @@ class mb8844_cpu_device : public mb88_cpu_device
 {
 public:
 	// construction/destruction
-	mb8844_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mb8844_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

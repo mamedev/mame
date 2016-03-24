@@ -39,7 +39,7 @@ class gp9001vdp_device : public device_t,
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 public:
-	gp9001vdp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	UINT16 gp9001_voffs;
 	UINT16 gp9001_scroll_reg;

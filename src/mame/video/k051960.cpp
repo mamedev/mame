@@ -125,12 +125,13 @@ GFXDECODE_MEMBER( k051960_device::gfxinfo_gradius3 )
 GFXDECODE_END
 
 
-k051960_device::k051960_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k051960_device::k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K051960, "K051960 Sprite Generator", tag, owner, clock, "k051960", __FILE__),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_ram(nullptr),
 	m_sprite_rom(nullptr),
 	m_sprite_size(0),
+	m_screen_tag(nullptr),
 	m_screen(nullptr),
 	m_scanline_timer(nullptr),
 	m_irq_handler(*this),
@@ -170,7 +171,7 @@ void k051960_device::set_plane_order(device_t &device, int order)
 //  set_screen_tag - set screen we are attached to
 //-------------------------------------------------
 
-void k051960_device::set_screen_tag(device_t &device, device_t *owner, std::string tag)
+void k051960_device::set_screen_tag(device_t &device, device_t *owner, const char *tag)
 {
 	k051960_device &dev = dynamic_cast<k051960_device &>(device);
 	dev.m_screen_tag = tag;
@@ -195,9 +196,9 @@ void k051960_device::device_start()
 	m_sprite_size = region()->bytes();
 
 	decode_gfx();
-	m_gfx[0]->set_colors(m_palette->entries() / m_gfx[0]->depth());
+	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
-	if (VERBOSE && !(m_palette->shadows_enabled()))
+	if (VERBOSE && !(palette().shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	m_ram = make_unique_clear<UINT8[]>(0x400);
@@ -465,7 +466,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 			flipy = !flipy;
 		}
 
-		drawmode_table[m_gfx[0]->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		drawmode_table[gfx(0)->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
 		if (zoomx == 0x10000 && zoomy == 0x10000)
 		{
@@ -491,14 +492,14 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 						c += yoffset[y];
 
 					if (max_priority == -1)
-						m_gfx[0]->prio_transtable(bitmap,cliprect,
+						gfx(0)->prio_transtable(bitmap,cliprect,
 								c,color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
 								priority_bitmap,pri,
 								drawmode_table);
 					else
-						m_gfx[0]->transtable(bitmap,cliprect,
+						gfx(0)->transtable(bitmap,cliprect,
 								c,color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
@@ -532,7 +533,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 						c += yoffset[y];
 
 					if (max_priority == -1)
-						m_gfx[0]->prio_zoom_transtable(bitmap,cliprect,
+						gfx(0)->prio_zoom_transtable(bitmap,cliprect,
 								c,color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
@@ -540,7 +541,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 								priority_bitmap,pri,
 								drawmode_table);
 					else
-						m_gfx[0]->zoom_transtable(bitmap,cliprect,
+						gfx(0)->zoom_transtable(bitmap,cliprect,
 								c,color,
 								flipx,flipy,
 								sx & 0x1ff,sy,

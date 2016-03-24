@@ -102,7 +102,7 @@ X - change banks
 class bigbord2_state : public driver_device
 {
 public:
-	bigbord2_state(const machine_config &mconfig, device_type type, std::string tag)
+	bigbord2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_6845(*this, "crtc"),
@@ -471,7 +471,6 @@ void bigbord2_state::machine_reset()
 	for (i = 0; i < 8; i++)
 		m_c8[i] = 0;
 	m_beeper->set_state(0);
-	m_beeper->set_frequency(950); // actual frequency is unknown
 	m_bankr->set_entry(0);
 	m_bankv->set_entry(0);
 	m_banka->set_entry(0);
@@ -553,7 +552,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigbord2)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* keyboard */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bigbord2_state, ctc_tick, attotime::from_hz(MAIN_CLOCK))
@@ -595,7 +594,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 950) // actual frequency is unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

@@ -133,7 +133,7 @@ public:
 		TIMER_SOL20_BOOT
 	};
 
-	sol20_state(const machine_config &mconfig, device_type type, std::string tag)
+	sol20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cass1(*this, "cassette")
@@ -737,7 +737,7 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sol20)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -50,7 +50,7 @@ const rom_entry *cst_ql_disc_interface_t::device_rom_region() const
 //  cst_ql_disc_interface_t - constructor
 //-------------------------------------------------
 
-cst_ql_disc_interface_t::cst_ql_disc_interface_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+cst_ql_disc_interface_t::cst_ql_disc_interface_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CST_QL_DISC_INTERFACE, "CST QL Disc Interface", tag, owner, clock, "ql_qdisc", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this)
 {

@@ -30,7 +30,7 @@ class wozfdc_device:
 
 public:
 	// construction/destruction
-	wozfdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	wozfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
@@ -83,7 +83,7 @@ private:
 class diskii_fdc : public wozfdc_device
 {
 public:
-	diskii_fdc(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	diskii_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void device_reset() override;
 
@@ -93,7 +93,7 @@ public:
 class appleiii_fdc : public wozfdc_device
 {
 public:
-	appleiii_fdc(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	appleiii_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void device_reset() override;
 

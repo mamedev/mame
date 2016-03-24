@@ -56,6 +56,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/debugger/debugwin.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_sdl.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_windows.cpp",
+		MAME_DIR .. "src/osd/modules/font/font_dwrite.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_osx.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_none.cpp",
 		MAME_DIR .. "src/osd/modules/netdev/taptun.cpp",
@@ -67,13 +68,35 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/sound/direct_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/coreaudio_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.cpp",
+		MAME_DIR .. "src/osd/modules/sound/xaudio2_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/none.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_module.h",
+		MAME_DIR .. "src/osd/modules/input/input_common.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_common.h",
+		MAME_DIR .. "src/osd/modules/input/input_dinput.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_none.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_rawinput.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_win32.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_sdl.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_sdlcommon.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_sdlcommon.h",
+		MAME_DIR .. "src/osd/modules/input/input_x11.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_windows.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_windows.h",
+		MAME_DIR .. "src/osd/modules/input/input_xinput.cpp",
 	}
 
 	if _OPTIONS["targetos"]=="windows" then
 		includedirs {
 			MAME_DIR .. "3rdparty/winpcap/Include",
+			MAME_DIR .. "3rdparty/compat/mingw",
 		}
+
+		if _OPTIONS["MODERN_WIN_API"]~="1" then
+			includedirs {
+				MAME_DIR .. "3rdparty/compat/winsdk-override",
+			}
+		end
 	end
 
 	if _OPTIONS["NO_OPENGL"]=="1" then
@@ -88,7 +111,6 @@ function osdmodulesbuild()
 			MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.h",
 			MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.h",
 			MAME_DIR .. "src/osd/modules/opengl/osd_opengl.h",
-			MAME_DIR .. "src/osd/modules/opengl/SDL1211_opengl.h",
 		}
 		defines {
 			"USE_OPENGL=1",
@@ -100,18 +122,51 @@ function osdmodulesbuild()
 		end
 	end
 
-	if USE_BGFX == 1 then
-		files {
-			MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
-		}
-		defines {
-			"USE_BGFX"
-		}
-		includedirs {
-			MAME_DIR .. "3rdparty/bgfx/include",
-			MAME_DIR .. "3rdparty/bx/include",
-		}
-	end
+	files {
+		MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
+		MAME_DIR .. "src/osd/modules/render/binpacker.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/blendreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/chain.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/chainentry.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/chainentryreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/chainmanager.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/chainreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/cullreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/depthreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/effect.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/effectmanager.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/effectreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/entryuniformreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/inputpair.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/frameparameter.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/timeparameter.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/paramreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/paramuniform.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/paramuniformreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/shadermanager.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/slider.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/sliderreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/slideruniform.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/slideruniformreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/statereader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/suppressor.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/suppressorreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/target.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/targetreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/targetmanager.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/texture.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/texturemanager.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/uniform.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/uniformreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/valueuniform.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/valueuniformreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/writereader.cpp",
+	}
+	includedirs {
+		MAME_DIR .. "3rdparty/bgfx/include",
+		MAME_DIR .. "3rdparty/bx/include",
+		MAME_DIR .. "3rdparty/rapidjson/include",
+	}
 
 	if _OPTIONS["NO_USE_MIDI"]=="1" then
 		defines {
@@ -355,14 +410,6 @@ newoption {
 	},
 }
 
-if not _OPTIONS["NO_OPENGL"] then
-	if _OPTIONS["targetos"]=="os2" then
-		_OPTIONS["NO_OPENGL"] = "1"
-	else
-		_OPTIONS["NO_OPENGL"] = "0"
-	end
-end
-
 newoption {
 	trigger = "USE_DISPATCH_GL",
 	description = "Use GL-dispatching",
@@ -373,11 +420,7 @@ newoption {
 }
 
 if not _OPTIONS["USE_DISPATCH_GL"] then
-	if USE_BGFX == 1 then
-		_OPTIONS["USE_DISPATCH_GL"] = "0"
-	else
-		_OPTIONS["USE_DISPATCH_GL"] = "1"
-	end
+	_OPTIONS["USE_DISPATCH_GL"] = "0"
 end
 
 newoption {
@@ -390,12 +433,21 @@ newoption {
 }
 
 if not _OPTIONS["NO_USE_MIDI"] then
-	if _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="openbsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="solaris" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"] == "asmjs" or _OPTIONS["targetos"] == "os2" then
+	if _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="openbsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="solaris" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"] == "asmjs" then
 		_OPTIONS["NO_USE_MIDI"] = "1"
 	else
 		_OPTIONS["NO_USE_MIDI"] = "0"
 	end
 end
+
+newoption {
+	trigger = "MODERN_WIN_API",
+	description = "Use Modern Windows APIs",
+	allowed = {
+		{ "0",  "Use classic Windows APIs - allows support for XP and later"   },
+		{ "1",  "Use Modern Windows APIs - support for Windows 8.1 and later"  },
+	},
+}
 
 newoption {
 	trigger = "USE_QTDEBUG",
@@ -413,7 +465,7 @@ newoption {
 
 
 if not _OPTIONS["USE_QTDEBUG"] then
-	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="solaris" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"] == "asmjs" or _OPTIONS["targetos"] == "os2" then
+	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="solaris" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"] == "asmjs" then
 		_OPTIONS["USE_QTDEBUG"] = "0"
 	else
 		_OPTIONS["USE_QTDEBUG"] = "1"

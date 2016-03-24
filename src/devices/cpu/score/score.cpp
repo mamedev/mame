@@ -52,7 +52,7 @@ const score7_cpu_device::op_handler score7_cpu_device::s_opcode16_table[8] =
 //  score7_cpu_device - constructor
 //-------------------------------------------------
 
-score7_cpu_device::score7_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+score7_cpu_device::score7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SCORE7, "S+core 7", tag, owner, clock, "score7", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0),
 		m_pc(0),
@@ -81,13 +81,13 @@ void score7_cpu_device::device_start()
 	state_add(SCORE_PC  , "PC"  , m_pc).callimport().callexport().formatstr("%08X");
 
 	for(int i=0; i<0x20; i++)
-		state_add(SCORE_GPR + i, strformat("r%d", i).c_str(), m_gpr[i]).callimport().callexport().formatstr("%08X");
+		state_add(SCORE_GPR + i, string_format("r%d", i).c_str(), m_gpr[i]).callimport().callexport().formatstr("%08X");
 
 	for(int i=0; i<0x20; i++)
-		state_add(SCORE_CR + i, strformat("cr%d", i).c_str(), m_cr[i]).callimport().callexport().formatstr("%08X");
+		state_add(SCORE_CR + i, string_format("cr%d", i).c_str(), m_cr[i]).callimport().callexport().formatstr("%08X");
 
 	for(int i=0; i<3; i++)
-		state_add(SCORE_SR + i, strformat("sr%d", i).c_str(), m_sr[i]).callimport().callexport().formatstr("%08X");
+		state_add(SCORE_SR + i, string_format("sr%d", i).c_str(), m_sr[i]).callimport().callexport().formatstr("%08X");
 
 	state_add(SCORE_CEH, "ceh", REG_CEH).callimport().callexport().formatstr("%08X");
 	state_add(SCORE_CEL, "cel", REG_CEL).callimport().callexport().formatstr("%08X");
@@ -135,7 +135,7 @@ void score7_cpu_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%s%s%s%s%s",
+			str = string_format("%s%s%s%s%s",
 				REG_CR & FLAG_V ? "V" : ".",
 				REG_CR & FLAG_C ? "C" : ".",
 				REG_CR & FLAG_Z ? "Z" : ".",
@@ -944,7 +944,7 @@ void score7_cpu_device::op_crform()
 			break;
 		default:
 			if ((GET_CR_OP(m_op) & 0xc0) == 0)
-				fatalerror("%s: unemulated Coprocessor 0x%x (PC=0x%08x)\n", tag().c_str(), GET_CR_OP(m_op) & 0x07, m_ppc);
+				fatalerror("%s: unemulated Coprocessor 0x%x (PC=0x%08x)\n", tag(), GET_CR_OP(m_op) & 0x07, m_ppc);
 			else
 				op_undef();
 	}
@@ -1339,11 +1339,11 @@ void score7_cpu_device::op_iform1b()
 
 void score7_cpu_device::op_undef()
 {
-	logerror("%s: undefined instruction 0x%x (PC=0x%08x)\n", tag().c_str(), m_op, m_ppc);
+	logerror("%s: undefined instruction 0x%x (PC=0x%08x)\n", tag(), m_op, m_ppc);
 	gen_exception(EXCEPTION_RI);
 }
 
 void score7_cpu_device::unemulated_op(const char * op)
 {
-	fatalerror("%s: unemulated %s (PC=0x%08x)\n", tag().c_str(), op, m_ppc);
+	fatalerror("%s: unemulated %s (PC=0x%08x)\n", tag(), op, m_ppc);
 }

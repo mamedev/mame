@@ -127,7 +127,7 @@ ioport_constructor mshark_device::device_input_ports() const
 //  mshark_device - constructor
 //-------------------------------------------------
 
-mshark_device::mshark_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mshark_device::mshark_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SHARK, "Mator SHARK", tag, owner, clock, "mshark", __FILE__),
 		device_ieee488_interface(mconfig, *this),
 		m_maincpu(*this, I8085_TAG)

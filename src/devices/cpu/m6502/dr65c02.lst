@@ -1,3 +1,5 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
 # r65c02 - rockwell variant, with the bitwise instructions and stp/wai
 brk_c_imp   ora_idx     nop_imm     nop_c_imp   tsb_zpg     ora_zpg     asl_zpg     rmb_bzp     php_imp     ora_imm     asl_acc     nop_c_imp   tsb_aba     ora_aba     asl_aba     bbr_zpb
 bpl_rel     ora_idy     ora_zpi     nop_c_imp   trb_zpg     ora_zpx     asl_zpx     rmb_bzp     clc_imp     ora_aby     inc_acc     nop_c_imp   trb_aba     ora_abx     asl_c_abx   bbr_zpb

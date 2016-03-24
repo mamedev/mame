@@ -26,7 +26,7 @@
  */
 
 #include "epson_lx810l.h"
-extern const char layout_lx800[]; /* use layout from lx800 */
+//extern const char layout_lx800[]; /* use layout from lx800 */
 
 //#define LX810LDEBUG
 #ifdef LX810LDEBUG
@@ -132,7 +132,7 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx810l )
 	MCFG_UPD7810_CO0(WRITELINE(epson_lx810l_t, co0_w))
 	MCFG_UPD7810_CO1(WRITELINE(epson_lx810l_t, co1_w))
 
-	MCFG_DEFAULT_LAYOUT(layout_lx800)
+//  MCFG_DEFAULT_LAYOUT(layout_lx800)
 
 	/* video hardware (simulates paper) */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -192,7 +192,7 @@ static INPUT_PORTS_START( epson_lx810l )
 
 	/* Buttons on printer */
 	PORT_START("ONLINE")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_O) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_t, online_sw, NULL)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_O) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_t, online_sw, nullptr)
 	PORT_START("FORMFEED")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Form Feed") PORT_CODE(KEYCODE_F) PORT_TOGGLE
 	PORT_START("LINEFEED")
@@ -285,7 +285,7 @@ INPUT_CHANGED_MEMBER(epson_lx810l_t::online_sw)
 //  epson_lx810l_t - constructor
 //-------------------------------------------------
 
-epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, EPSON_LX810L, "Epson LX-810L", tag, owner, clock, "lx810l", __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
@@ -306,7 +306,7 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, std::string tag, d
 {
 }
 
-epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
@@ -327,7 +327,7 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, 
 {
 }
 
-epson_ap2000_t::epson_ap2000_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+epson_ap2000_t::epson_ap2000_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: epson_lx810l_t(mconfig, EPSON_AP2000, "Epson ActionPrinter 2000", tag, owner, clock, "ap2000", __FILE__)
 { }
 

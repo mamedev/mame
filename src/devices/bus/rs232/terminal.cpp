@@ -2,7 +2,7 @@
 // copyright-holders:smf
 #include "terminal.h"
 
-serial_terminal_device::serial_terminal_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: generic_terminal_device(mconfig, SERIAL_TERMINAL, "Serial Terminal", tag, owner, clock, "serial_terminal", __FILE__),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),

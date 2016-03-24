@@ -35,8 +35,6 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 	}
 }
 
-#define GBA_ATTOTIME_NORMALIZE(a)   a.normalize()
-
 static const UINT32 timer_clks[4] = { 16777216, 16777216/64, 16777216/256, 16777216/1024 };
 
 
@@ -343,7 +341,6 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 		final = clocksel / rate;
 		m_timer_hz[tmr] = final;
 		time = attotime::from_hz(final);
-		GBA_ATTOTIME_NORMALIZE(time);
 		m_tmr_timer[tmr]->adjust(time, tmr, time);
 	}
 
@@ -1639,7 +1636,6 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 					if( !(data & 0x40000) ) // if we're not in Count-Up mode
 					{
 						attotime time = attotime::from_hz(final);
-						GBA_ATTOTIME_NORMALIZE(time);
 						m_tmr_timer[offset]->adjust(time, offset, time);
 					}
 				}

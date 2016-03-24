@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski, Tomasz Slanina
 /**********************************************************
 Strike Bowling  (c)1982 Taito
@@ -49,7 +49,7 @@ PROMs : NEC B406 (1kx4) x2
 class sbowling_state : public driver_device
 {
 public:
-	sbowling_state(const machine_config &mconfig, device_type type, std::string tag)
+	sbowling_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),

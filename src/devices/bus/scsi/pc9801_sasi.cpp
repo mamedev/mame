@@ -6,7 +6,7 @@
 
 const device_type PC9801_SASI = &device_creator<pc9801_sasi_device>;
 
-pc9801_sasi_device::pc9801_sasi_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+pc9801_sasi_device::pc9801_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: scsihd_device(mconfig, PC9801_SASI, "PC-9801 SASI Controller", tag, owner, clock, "pc9801_sasi", __FILE__)
 {
 }

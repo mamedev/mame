@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
-    ui/tapectrl.c
+    ui/tapectrl.cpp
 
     Tape control
 
@@ -81,29 +81,29 @@ void ui_menu_tape_control::populate()
 			state = current_device()->get_state();
 			item_append(
 						(state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED
-						?   "stopped"
+						?   _("stopped")
 						:   ((state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY
-								? ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? "playing" : "(playing)")
-								: ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? "recording" : "(recording)")
+								? ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? _("playing") : _("(playing)"))
+								: ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? _("recording") : _("(recording)"))
 								),
 								timepos.c_str(),
 						tapeflags,
 						TAPECMD_SLIDER);
 
 			// pause or stop
-			item_append("Pause/Stop", nullptr, 0, TAPECMD_STOP);
+			item_append(_("Pause/Stop"), nullptr, 0, TAPECMD_STOP);
 
 			// play
-			item_append("Play", nullptr, 0, TAPECMD_PLAY);
+			item_append(_("Play"), nullptr, 0, TAPECMD_PLAY);
 
 			// record
-			item_append("Record", nullptr, 0, TAPECMD_RECORD);
+			item_append(_("Record"), nullptr, 0, TAPECMD_RECORD);
 
 			// rewind
-			item_append("Rewind", nullptr, 0, TAPECMD_REWIND);
+			item_append(_("Rewind"), nullptr, 0, TAPECMD_REWIND);
 
 			// fast forward
-			item_append("Fast Forward", nullptr, 0, TAPECMD_FAST_FORWARD);
+			item_append(_("Fast Forward"), nullptr, 0, TAPECMD_FAST_FORWARD);
 		}
 	}
 }
@@ -171,9 +171,9 @@ void ui_menu_tape_control::get_time_string(std::string &dest, cassette_image_dev
 	t1 = cassette->get_length();
 
 	if (t1)
-		strprintf(dest, "%04d/%04d", (int)t0, (int)t1);
+		dest = string_format("%04d/%04d", (int)t0, (int)t1);
 	else
-		strprintf(dest, "%04d/%04d", 0, (int)t1);
+		dest = string_format("%04d/%04d", 0, (int)t1);
 
 	if (curpos != nullptr)
 		*curpos = t0;

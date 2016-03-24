@@ -6,7 +6,7 @@
 const device_type MSX_CART_CROSSBLAIM = &device_creator<msx_cart_crossblaim>;
 
 
-msx_cart_crossblaim::msx_cart_crossblaim(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+msx_cart_crossblaim::msx_cart_crossblaim(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_CROSSBLAIM, "MSX Cartridge - Cross Blaim", tag, owner, clock, "msx_cart_crossblaim", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_selected_bank(1)

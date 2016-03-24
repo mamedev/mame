@@ -23,7 +23,7 @@
 class bbcbc_state : public driver_device
 {
 public:
-	bbcbc_state(const machine_config &mconfig, device_type type, std::string tag)
+	bbcbc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot")
@@ -160,5 +160,5 @@ ROM_END
 
 ***************************************************************************/
 
-/*   YEAR  NAME  PARENT  COMPAT  MACHINE INPUT  INIT  COMPANY  FULLNAME  FLAGS */
-CONS(1985, bbcbc,     0, 0,      bbcbc,  bbcbc, driver_device, 0,    "BBC",   "Bridge Companion", MACHINE_NO_SOUND_HW )
+/*   YEAR  NAME   PARENT  COMPAT  MACHINE INPUT  CLASS          INIT  COMPANY                 FULLNAME            FLAGS */
+CONS(1985, bbcbc, 0,      0,      bbcbc,  bbcbc, driver_device, 0,    "BBC Enterprises Ltd.", "Bridge Companion", MACHINE_NO_SOUND_HW )

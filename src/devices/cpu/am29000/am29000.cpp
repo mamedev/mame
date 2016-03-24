@@ -78,7 +78,7 @@ const device_type AM29000 = &device_creator<am29000_cpu_device>;
     STATE ACCESSORS
 ***************************************************************************/
 
-am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, AM29000, "AMD Am29000", tag, owner, clock, "am29000", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 32, 32, 0)
@@ -409,16 +409,17 @@ void am29000_cpu_device::state_string_export(const device_state_entry &entry, st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c%c|%3d", m_alu & ALU_V ? 'V' : '.',
-													m_alu & ALU_Z ? 'Z' : '.',
-													m_alu & ALU_N ? 'N' : '.',
-													m_alu & ALU_C ? 'C' : '.',
-													m_cps & CPS_IP ? 'I' : '.',
-													m_cps & CPS_FZ ? 'F' : '.',
-													m_cps & CPS_SM ? 'S' : 'U',
-													m_cps & CPS_DI ? 'I' : '.',
-													m_cps & CPS_DA ? 'D' : '.',
-													(m_r[1] >> 2) & 0x7f);
+			str = string_format("%c%c%c%c%c%c%c%c%c|%3d",
+					m_alu & ALU_V ? 'V' : '.',
+					m_alu & ALU_Z ? 'Z' : '.',
+					m_alu & ALU_N ? 'N' : '.',
+					m_alu & ALU_C ? 'C' : '.',
+					m_cps & CPS_IP ? 'I' : '.',
+					m_cps & CPS_FZ ? 'F' : '.',
+					m_cps & CPS_SM ? 'S' : 'U',
+					m_cps & CPS_DI ? 'I' : '.',
+					m_cps & CPS_DA ? 'D' : '.',
+					(m_r[1] >> 2) & 0x7f);
 			break;
 	}
 }

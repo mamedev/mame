@@ -7,7 +7,7 @@
 class hyprduel_state : public driver_device
 {
 public:
-	hyprduel_state(const machine_config &mconfig, device_type type, std::string tag)
+	hyprduel_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),

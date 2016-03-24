@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /*
   Rather skeleton driver for a LG GP40NW10 usb dvd writer.
 
@@ -10,7 +12,7 @@
 
 class lg_dvd_state : public driver_device {
 public:
-	lg_dvd_state(const machine_config &mconfig, device_type type, std::string tag)
+	lg_dvd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			maincpu(*this, "maincpu")
 	{ }

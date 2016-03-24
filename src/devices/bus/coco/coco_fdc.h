@@ -34,8 +34,8 @@ class coco_fdc_device :
 {
 public:
 		// construction/destruction
-		coco_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-		coco_fdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+		coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		coco_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 		DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -89,7 +89,7 @@ class coco_fdc_v11_device :
 {
 public:
 		// construction/destruction
-		coco_fdc_v11_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual const rom_entry *device_rom_region() const override;
@@ -106,7 +106,7 @@ class coco3_hdb1_device :
 {
 public:
 		// construction/destruction
-		coco3_hdb1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		coco3_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual const rom_entry *device_rom_region() const override;
@@ -123,7 +123,7 @@ class cp400_fdc_device :
 {
 public:
 		// construction/destruction
-		cp400_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		cp400_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual const rom_entry *device_rom_region() const override;
@@ -140,8 +140,8 @@ class dragon_fdc_device :
 {
 public:
 		// construction/destruction
-		dragon_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-		dragon_fdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+		dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		dragon_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
@@ -166,7 +166,7 @@ class sdtandy_fdc_device :
 {
 public:
 		// construction/destruction
-		sdtandy_fdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+		sdtandy_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual const rom_entry *device_rom_region() const override;

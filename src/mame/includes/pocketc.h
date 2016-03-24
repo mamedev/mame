@@ -14,7 +14,7 @@ typedef const char *POCKETC_FIGURE[];
 class pocketc_state : public driver_device
 {
 public:
-	pocketc_state(const machine_config &mconfig, device_type type, std::string tag)
+	pocketc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_PALETTE_INIT(pocketc);

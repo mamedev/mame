@@ -34,7 +34,7 @@ enum  s_pgm_t
 class at29x_device : public device_t, public device_nvram_interface
 {
 public:
-	at29x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	at29x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -89,19 +89,19 @@ private:
 class at29c020_device : public at29x_device
 {
 public:
-	at29c020_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	at29c020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class at29c040_device : public at29x_device
 {
 public:
-	at29c040_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	at29c040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class at29c040a_device : public at29x_device
 {
 public:
-	at29c040a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	at29c040a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 #define MCFG_AT29C020_ADD(_tag )    \

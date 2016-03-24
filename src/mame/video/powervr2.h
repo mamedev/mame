@@ -136,7 +136,7 @@ public:
 	int scanline;
 	int next_y;
 
-	powervr2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	template<class _cb> void set_irq_cb(_cb cb) { irq_cb.set_callback(cb); }
 
 	DECLARE_READ32_MEMBER(  id_r );

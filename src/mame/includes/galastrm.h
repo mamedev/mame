@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Hau
 #include "machine/eepromser.h"
 
@@ -48,7 +48,7 @@ public:
 		TIMER_GALASTRM_INTERRUPT6
 	};
 
-	galastrm_state(const machine_config &mconfig, device_type type, std::string tag)
+	galastrm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this,"ram"),
 		m_spriteram(*this,"spriteram") ,

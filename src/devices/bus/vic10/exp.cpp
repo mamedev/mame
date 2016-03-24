@@ -56,7 +56,7 @@ device_vic10_expansion_card_interface::~device_vic10_expansion_card_interface()
 //  vic10_expansion_slot_device - constructor
 //-------------------------------------------------
 
-vic10_expansion_slot_device::vic10_expansion_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+vic10_expansion_slot_device::vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, VIC10_EXPANSION_SLOT, "VIC-10 expansion port", tag, owner, clock, "vic10_expansion_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this),
@@ -139,7 +139,7 @@ bool vic10_expansion_slot_device::call_load()
 				int exrom = 1;
 				int game = 1;
 
-				if (cbm_crt_read_header(m_file, &roml_size, &romh_size, &exrom, &game))
+				if (cbm_crt_read_header(*m_file, &roml_size, &romh_size, &exrom, &game))
 				{
 					UINT8 *roml = nullptr;
 					UINT8 *romh = nullptr;
@@ -150,7 +150,7 @@ bool vic10_expansion_slot_device::call_load()
 					if (roml_size) roml = m_card->m_lorom;
 					if (romh_size) romh = m_card->m_lorom;
 
-					cbm_crt_read_data(m_file, roml, romh);
+					cbm_crt_read_data(*m_file, roml, romh);
 				}
 			}
 		}
@@ -187,7 +187,7 @@ std::string vic10_expansion_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		if (!core_stricmp(filetype(), "crt"))
-			return cbm_crt_get_card(m_file);
+			return cbm_crt_get_card(*m_file);
 
 		clear();
 	}

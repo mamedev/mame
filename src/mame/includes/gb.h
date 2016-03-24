@@ -46,7 +46,7 @@
 class gb_state : public driver_device
 {
 public:
-	gb_state(const machine_config &mconfig, device_type type, std::string tag)
+	gb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cartslot(*this, "gbslot"),
 		m_maincpu(*this, "maincpu"),
@@ -143,7 +143,7 @@ protected:
 class megaduck_state : public gb_state
 {
 public:
-	megaduck_state(const machine_config &mconfig, device_type type, std::string tag)
+	megaduck_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gb_state(mconfig, type, tag)
 		, m_cartslot(*this, "duckslot")
 	{ }

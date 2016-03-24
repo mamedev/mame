@@ -21,7 +21,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, ncr5390_device)
 	AM_RANGE(0x9, 0x9) AM_WRITE(clock_w)
 ADDRESS_MAP_END
 
-ncr5390_device::ncr5390_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ncr5390_device::ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: nscsi_device(mconfig, NCR5390, "5390 SCSI", tag, owner, clock, "ncr5390", __FILE__), tm(nullptr), config(0), status(0), istatus(0), clock_conv(0), sync_offset(0), sync_period(0), bus_id(0),
 	select_timeout(0), seq(0), tcount(0), mode(0), fifo_pos(0), command_pos(0), state(0), xfr_phase(0), command_length(0), dma_dir(0), irq(false), drq(false),
 	m_irq_handler(*this),
@@ -105,7 +105,7 @@ void ncr5390_device::scsi_ctrl_changed()
 {
 	UINT32 ctrl = scsi_bus->ctrl_r();
 	if(ctrl & S_RST) {
-		logerror("%s: scsi bus reset\n", tag().c_str());
+		logerror("%s: scsi bus reset\n", tag());
 		return;
 	}
 
@@ -125,7 +125,7 @@ void ncr5390_device::step(bool timeout)
 
 	if(0)
 		logerror("%s: state=%d.%d %s\n",
-					tag().c_str(), state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT,
+					tag(), state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT,
 					timeout ? "timeout" : "change");
 
 	if(mode == MODE_I && !(ctrl & S_BSY)) {
@@ -200,10 +200,10 @@ void ncr5390_device::step(bool timeout)
 		scsi_bus->ctrl_w(scsi_refid, 0, S_SEL);
 
 		if(c == CD_RESELECT) {
-			logerror("%s: mode switch to Target\n", tag().c_str());
+			logerror("%s: mode switch to Target\n", tag());
 			mode = MODE_T;
 		} else {
-			logerror("%s: mode switch to Initiator\n", tag().c_str());
+			logerror("%s: mode switch to Initiator\n", tag());
 			mode = MODE_I;
 		}
 		state &= STATE_MASK;
@@ -213,7 +213,7 @@ void ncr5390_device::step(bool timeout)
 	case ARB_TIMEOUT_BUSY << SUB_SHIFT:
 		if(timeout) {
 			scsi_bus->data_w(scsi_refid, 0);
-			logerror("%s: select timeout\n", tag().c_str());
+			logerror("%s: select timeout\n", tag());
 			state = (state & STATE_MASK) | (ARB_TIMEOUT_ABORT << SUB_SHIFT);
 			delay(1000);
 		} else if(ctrl & S_BSY) {
@@ -393,7 +393,7 @@ void ncr5390_device::step(bool timeout)
 			break;
 
 		default:
-			logerror("%s: xfer on phase %d\n", tag().c_str(), scsi_bus->ctrl_r() & S_PHASE_MASK);
+			logerror("%s: xfer on phase %d\n", tag(), scsi_bus->ctrl_r() & S_PHASE_MASK);
 			function_complete();
 			break;
 		}
@@ -475,7 +475,7 @@ void ncr5390_device::step(bool timeout)
 
 	default:
 		logerror("%s: step() unexpected state %d.%d\n",
-					tag().c_str(),
+					tag(),
 					state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT);
 		exit(0);
 	}
@@ -545,7 +545,7 @@ void ncr5390_device::delay_cycles(int cycles)
 
 READ8_MEMBER(ncr5390_device::tcount_lo_r)
 {
-	logerror("%s: tcount_lo_r %02x (%08x)\n", tag().c_str(), tcount & 0xff, space.device().safe_pc());
+	logerror("%s: tcount_lo_r %02x (%08x)\n", tag(), tcount & 0xff, space.device().safe_pc());
 	return tcount;
 }
 
@@ -553,12 +553,12 @@ WRITE8_MEMBER(ncr5390_device::tcount_lo_w)
 {
 	tcount = (tcount & 0xff00) | data;
 	status &= ~S_TC0;
-	logerror("%s: tcount_lo_w %02x (%08x)\n", tag().c_str(), data, space.device().safe_pc());
+	logerror("%s: tcount_lo_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
 }
 
 READ8_MEMBER(ncr5390_device::tcount_hi_r)
 {
-	logerror("%s: tcount_hi_r %02x (%08x)\n", tag().c_str(), tcount >> 8, space.device().safe_pc());
+	logerror("%s: tcount_hi_r %02x (%08x)\n", tag(), tcount >> 8, space.device().safe_pc());
 	return tcount >> 8;
 }
 
@@ -566,7 +566,7 @@ WRITE8_MEMBER(ncr5390_device::tcount_hi_w)
 {
 	tcount = (tcount & 0x00ff) | (data << 8);
 	status &= ~S_TC0;
-	logerror("%s: tcount_hi_w %02x (%08x)\n", tag().c_str(), data, space.device().safe_pc());
+	logerror("%s: tcount_hi_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
 }
 
 UINT8 ncr5390_device::fifo_pop()
@@ -606,13 +606,13 @@ WRITE8_MEMBER(ncr5390_device::fifo_w)
 
 READ8_MEMBER(ncr5390_device::command_r)
 {
-	logerror("%s: command_r (%08x)\n", tag().c_str(), space.device().safe_pc());
+	logerror("%s: command_r (%08x)\n", tag(), space.device().safe_pc());
 	return command[0];
 }
 
 WRITE8_MEMBER(ncr5390_device::command_w)
 {
-	//  logerror("%s: command_w %02x (%08x)\n", tag().c_str(), data, space.device().safe_pc());
+	//  logerror("%s: command_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
 	if(command_pos == 2) {
 		status |= S_GROSS_ERROR;
 		check_irq();
@@ -638,7 +638,7 @@ void ncr5390_device::start_command()
 {
 	UINT8 c = command[0] & 0x7f;
 	if(!check_valid_command(c)) {
-		logerror("%s: invalid command %02x\n", tag().c_str(), command[0]);
+		logerror("%s: invalid command %02x\n", tag(), command[0]);
 		istatus |= I_ILLEGAL;
 		check_irq();
 		return;
@@ -707,7 +707,7 @@ void ncr5390_device::start_command()
 		break;
 
 	default:
-		logerror("%s: start unimplemented command %02x\n", tag().c_str(), c);
+		logerror("%s: start unimplemented command %02x\n", tag(), c);
 		exit(0);
 	}
 }
@@ -751,7 +751,7 @@ READ8_MEMBER(ncr5390_device::status_r)
 {
 	UINT32 ctrl = scsi_bus->ctrl_r();
 	UINT8 res = status | (ctrl & S_MSG ? 4 : 0) | (ctrl & S_CTL ? 2 : 0) | (ctrl & S_INP ? 1 : 0);
-	logerror("%s: status_r %02x (%08x)\n", tag().c_str(), res, space.device().safe_pc());
+	logerror("%s: status_r %02x (%08x)\n", tag(), res, space.device().safe_pc());
 	if(irq)
 		status &= ~(S_GROSS_ERROR|S_PARITY|S_TCC);
 	return res;
@@ -760,7 +760,7 @@ READ8_MEMBER(ncr5390_device::status_r)
 WRITE8_MEMBER(ncr5390_device::bus_id_w)
 {
 	bus_id = data & 7;
-	logerror("%s: bus_id=%d\n", tag().c_str(), bus_id);
+	logerror("%s: bus_id=%d\n", tag(), bus_id);
 }
 
 READ8_MEMBER(ncr5390_device::istatus_r)
@@ -772,7 +772,7 @@ READ8_MEMBER(ncr5390_device::istatus_r)
 	if(res)
 		command_pop_and_chain();
 
-	logerror("%s: istatus_r %02x (%08x)\n", tag().c_str(), res, space.device().safe_pc());
+	logerror("%s: istatus_r %02x (%08x)\n", tag(), res, space.device().safe_pc());
 	return res;
 }
 
@@ -783,7 +783,7 @@ WRITE8_MEMBER(ncr5390_device::timeout_w)
 
 READ8_MEMBER(ncr5390_device::seq_step_r)
 {
-	logerror("%s: seq_step_r %d (%08x)\n", tag().c_str(), seq, space.device().safe_pc());
+	logerror("%s: seq_step_r %d (%08x)\n", tag(), seq, space.device().safe_pc());
 	return seq;
 }
 

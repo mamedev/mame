@@ -45,7 +45,7 @@ device_vectrex_cart_interface::~device_vectrex_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_vectrex_cart_interface::rom_alloc(UINT32 size, std::string tag)
+void device_vectrex_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -62,7 +62,7 @@ void device_vectrex_cart_interface::rom_alloc(UINT32 size, std::string tag)
 //-------------------------------------------------
 //  vectrex_cart_slot_device - constructor
 //-------------------------------------------------
-vectrex_cart_slot_device::vectrex_cart_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+vectrex_cart_slot_device::vectrex_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, VECTREX_CART_SLOT, "GCE Vectrex Cartridge Slot", tag, owner, clock, "vectrex_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -222,11 +222,11 @@ std::string vectrex_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 size = core_fsize(m_file);
+		UINT32 size = m_file->size();
 		dynamic_buffer rom(size);
 		int type = VECTREX_STD;
 
-		core_fread(m_file, &rom[0], size);
+		m_file->read(&rom[0], size);
 
 		if (!memcmp(&rom[0x06], "SRAM", 4))
 			type = VECTREX_SRAM;

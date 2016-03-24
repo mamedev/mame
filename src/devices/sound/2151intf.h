@@ -39,7 +39,7 @@ class ym2151_device :   public device_t,
 {
 public:
 	// construction/destruction
-	ym2151_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ym2151_device &>(device).m_irqhandler.set_callback(object); }

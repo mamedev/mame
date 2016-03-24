@@ -25,7 +25,7 @@
 class jr200_state : public driver_device
 {
 public:
-	jr200_state(const machine_config &mconfig, device_type type, std::string tag)
+	jr200_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram"),
@@ -312,7 +312,7 @@ WRITE8_MEMBER(jr200_state::jr200_beep_freq_w)
 
 	beep_freq = ((m_freq_reg[0]<<8) | (m_freq_reg[1] & 0xff)) + 1;
 
-	m_beeper->set_frequency(84000 / beep_freq);
+	m_beeper->set_clock(84000 / beep_freq);
 }
 
 WRITE8_MEMBER(jr200_state::jr200_border_col_w)
@@ -512,8 +512,6 @@ GFXDECODE_END
 
 void jr200_state::machine_start()
 {
-	m_beeper->set_frequency(0);
-	m_beeper->set_state(0);
 	m_timer_d = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jr200_state::timer_d_callback),this));
 }
 

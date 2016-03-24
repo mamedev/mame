@@ -8,7 +8,7 @@
 #include "softfloat/milieu.h"
 #include "softfloat/softfloat.h"
 #include "debug/debugcpu.h"
-#include "cpu/vtlb.h"
+#include "divtlb.h"
 
 
 #define INPUT_LINE_A20      1
@@ -24,12 +24,12 @@
 
 #define X86_NUM_CPUS        4
 
-class i386_device : public cpu_device
+class i386_device : public cpu_device, public device_vtlb_interface
 {
 public:
 	// construction/destruction
-	i386_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	i386_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int program_data_width=32, int program_addr_width=32, int io_data_width=32);
+	i386_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int program_data_width=32, int program_addr_width=32, int io_data_width=32);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_smiact(device_t &device, _Object object) { return downcast<i386_device &>(device).m_smiact.set_callback(object); }
@@ -270,8 +270,6 @@ struct I386_CALL_GATE
 	UINT8 *m_cycle_table_pm;
 	UINT8 *m_cycle_table_rm;
 
-	vtlb_state *m_vtlb;
-
 	bool m_smm;
 	bool m_smi;
 	bool m_smi_latched;
@@ -335,6 +333,7 @@ struct I386_CALL_GATE
 	inline UINT32 DEC32(UINT32 dst);
 	inline void PUSH16(UINT16 value);
 	inline void PUSH32(UINT32 value);
+	inline void PUSH32SEG(UINT32 value);
 	inline void PUSH8(UINT8 value);
 	inline UINT8 POP8();
 	inline UINT16 POP16();
@@ -1411,7 +1410,7 @@ struct I386_CALL_GATE
 	void build_x87_opcode_table_df();
 	void build_x87_opcode_table();
 	void i386_postload();
-	void i386_common_init(int tlbsize);
+	void i386_common_init();
 	void build_opcode_table(UINT32 features);
 	void pentium_smi();
 	void zero_state();
@@ -1424,7 +1423,7 @@ class i386SX_device : public i386_device
 {
 public:
 	// construction/destruction
-	i386SX_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i386SX_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -1432,7 +1431,7 @@ class i486_device : public i386_device
 {
 public:
 	// construction/destruction
-	i486_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	i486_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -1444,8 +1443,8 @@ class pentium_device : public i386_device
 {
 public:
 	// construction/destruction
-	pentium_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	pentium_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	pentium_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pentium_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -1458,7 +1457,7 @@ class mediagx_device : public i386_device
 {
 public:
 	// construction/destruction
-	mediagx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -1470,7 +1469,7 @@ class pentium_pro_device : public pentium_device
 {
 public:
 	// construction/destruction
-	pentium_pro_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -1482,7 +1481,7 @@ class pentium_mmx_device : public pentium_device
 {
 public:
 	// construction/destruction
-	pentium_mmx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -1494,7 +1493,7 @@ class pentium2_device : public pentium_device
 {
 public:
 	// construction/destruction
-	pentium2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -1506,7 +1505,7 @@ class pentium3_device : public pentium_device
 {
 public:
 	// construction/destruction
-	pentium3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -1518,7 +1517,7 @@ class pentium4_device : public pentium_device
 {
 public:
 	// construction/destruction
-	pentium4_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_start() override;

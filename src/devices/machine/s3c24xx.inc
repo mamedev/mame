@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Tim Schuerewegen
 /*******************************************************************************
 
     Samsung S3C2400 / S3C2410 / S3C2440

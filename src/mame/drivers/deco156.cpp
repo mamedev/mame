@@ -8,9 +8,6 @@
 
     See also deco32.c, deco_mlc.c, backfire.c
 
-    Todo:
-        complete co-processor emulation for wcvol95
-
     Emulation by Bryan McPhail, mish@tendril.co.uk
 */
 
@@ -28,7 +25,7 @@
 class deco156_state : public driver_device
 {
 public:
-	deco156_state(const machine_config &mconfig, device_type type, std::string tag)
+	deco156_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_deco_tilegen1(*this, "tilegen1"),
@@ -67,7 +64,7 @@ public:
 	virtual void video_start() override;
 	UINT32 screen_update_wcvol95(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
-	void descramble_sound( std::string tag );
+	void descramble_sound( const char *tag );
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 };
@@ -628,11 +625,39 @@ ROM_START( wcvol95 )
 
 //  ROM_REGION( 0x80, "user1", 0 ) /* eeprom */
 //  ROM_LOAD( "93c46.3k",    0x00, 0x80, CRC(88f8e270) SHA1(cb82203ad38e0c12ea998562b7b785979726afe5) )
+
+	ROM_REGION( 0x200, "gals", 0 )
+	ROM_LOAD( "GAL16V8B.10J.bin",    0x000, 0x117,  CRC(06bbcbd5) SHA1(f7adb4bca13bb799bc42411eb178edfdc11a76c7) )
+	ROM_LOAD( "GAL16V8B.5D.bin",     0x000, 0x117,  CRC(117784f0) SHA1(daf3720740621fc3af49333c96795718b693f4d2))
 ROM_END
+
+
+
+ROM_START( wcvol95x )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE156 code (encrypted) */
+	// no label markings were present
+	ROM_LOAD32_WORD( "2f.bin",    0x000002, 0x080000, CRC(ac06633d) SHA1(5d37ca3050f35d5fc06f70e91b1522e325471585) )
+	ROM_LOAD32_WORD( "4f.bin",    0x000000, 0x080000, CRC(e211f67a) SHA1(d008c2b809482f17ada608134357fa1205d767d4) )
+
+	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_LOAD( "mbx-00.9a",    0x000000, 0x080000, CRC(a0b24204) SHA1(cec8089c6c635f23b3a4aeeef2c43f519568ad70) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "mbx-01.12a",    0x000000, 0x100000, CRC(73deb3f1) SHA1(c0cabecfd88695afe0f27c5bb115b4973907207d) )
+	ROM_LOAD16_BYTE( "mbx-02.13a",    0x000001, 0x100000, CRC(3204d324) SHA1(44102f71bae44bf3a9bd2de7e5791d959a2c9bdd) )
+
+	ROM_REGION( 0x200000, "ymz", 0 ) /* YMZ280B-F samples */
+	ROM_LOAD( "mbx-03.13j",    0x00000, 0x200000,  CRC(061632bc) SHA1(7900ac56e59f4a4e5768ce72f4a4b7c5875f5ae8) )
+
+	ROM_REGION( 0x200, "gals", 0 )
+	ROM_LOAD( "GAL16V8B.10J.bin",    0x000, 0x117,  CRC(06bbcbd5) SHA1(f7adb4bca13bb799bc42411eb178edfdc11a76c7) )
+	ROM_LOAD( "GAL16V8B.5D.bin",     0x000, 0x117,  CRC(117784f0) SHA1(daf3720740621fc3af49333c96795718b693f4d2))
+ROM_END
+
 
 /**********************************************************************************/
 
-void deco156_state::descramble_sound( std::string tag )
+void deco156_state::descramble_sound( const char *tag )
 {
 	UINT8 *rom = memregion(tag)->base();
 	int length = memregion(tag)->bytes();
@@ -677,3 +702,4 @@ GAME( 1993, hvysmsh,  0,       hvysmsh, hvysmsh, deco156_state, hvysmsh,  ROT0, 
 GAME( 1993, hvysmsha, hvysmsh, hvysmsh, hvysmsh, deco156_state, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Asia version -4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hvysmshj, hvysmsh, hvysmsh, hvysmsh, deco156_state, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Japan version -2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wcvol95,  0,       wcvol95, wcvol95, deco156_state, wcvol95,  ROT0, "Data East Corporation", "World Cup Volley '95 (Japan v1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wcvol95x, wcvol95, wcvol95, wcvol95, deco156_state, wcvol95,  ROT0, "Data East Corporation", "World Cup Volley '95 Extra Version (Asia v2.0B)", MACHINE_SUPPORTS_SAVE )

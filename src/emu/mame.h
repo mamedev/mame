@@ -55,18 +55,8 @@ public:
 	static const char * get_appname();
 	static const char * get_appname_lower();
 	static const char * get_configname();
-	static const char * get_capgamenoun();
-	static const char * get_capstartgamenoun();
-	static const char * get_gamenoun();
-	static const char * get_gamesnoun();
 	static const char * get_copyright();
 	static const char * get_copyright_info();
-	static const char * get_disclaimer();
-	static const char * get_usage();
-	static const char * get_xml_root();
-	static const char * get_xml_top();
-	static const char * get_state_magic_num();
-	static void printf_usage(const char *par1, const char *par2);
 };
 
 class lua_engine;
@@ -96,6 +86,7 @@ public:
 
 	/* execute as configured by the OPTION_SYSTEMNAME option on the specified options */
 	int execute();
+	void start_luaengine();
 	void schedule_new_driver(const game_driver &driver);
 private:
 	osd_interface &         m_osd;                  // reference to OSD system

@@ -19,14 +19,14 @@ class segaybd_state : public sega_16bit_common_base
 {
 public:
 	// construction/destruction
-	segaybd_state(const machine_config &mconfig, device_type type, std::string tag)
+	segaybd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_16bit_common_base(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_subx(*this, "subx"),
 			m_suby(*this, "suby"),
 			m_soundcpu(*this, "soundcpu"),
 			m_linkcpu(*this, "linkcpu"),
-			m_bsprites(*this, "bsprites"),
+			m_bsprites(*this, "sprites"),
 			m_ysprites(*this, "ysprites"),
 			m_segaic16vid(*this, "segaic16vid"),
 			m_digital_ports(*this, digital_ports),

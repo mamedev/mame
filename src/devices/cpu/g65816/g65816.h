@@ -59,8 +59,8 @@ class g65816_device : public cpu_device
 {
 public:
 	// construction/destruction
-	g65816_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	g65816_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int cpu_type, address_map_constructor internal = nullptr);
+	g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	g65816_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal = nullptr);
 
 	void set_read_vector_callback(read8_delegate read_vector);
 
@@ -1529,7 +1529,7 @@ protected:
 class _5a22_device : public g65816_device
 {
 public:
-	_5a22_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( wrmpya_w );
 	DECLARE_WRITE8_MEMBER( wrmpyb_w );

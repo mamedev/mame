@@ -16,7 +16,7 @@
 
 class nextkbd_device : public device_t {
 public:
-	nextkbd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_int_change_wr_callback(device_t &device, _Object object) { return downcast<nextkbd_device &>(device).int_change_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_int_power_wr_callback(device_t &device, _Object object) { return downcast<nextkbd_device &>(device).int_power_cb.set_callback(object); }

@@ -55,7 +55,7 @@ machine_config_constructor c64_geocable_device::device_mconfig_additions() const
 //  c64_geocable_device - constructor
 //-------------------------------------------------
 
-c64_geocable_device::c64_geocable_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+c64_geocable_device::c64_geocable_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_GEOCABLE, "C64 geoCable", tag, owner, clock, "c64_geocable", __FILE__),
 	device_pet_user_port_interface(mconfig, *this),
 	m_centronics(*this, CENTRONICS_TAG)

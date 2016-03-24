@@ -289,7 +289,7 @@ machine_config_constructor sega_segacd_device::device_mconfig_additions() const
 }
 
 
-sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_gfx_interface(mconfig, *this, GFXDECODE_NAME( segacd )),
 		m_scdcpu(*this, "segacd_68k"),
@@ -305,17 +305,17 @@ sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_typ
 {
 }
 
-sega_segacd_us_device::sega_segacd_us_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_segacd_us_device::sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_segacd_device(mconfig, SEGA_SEGACD_US, "sega_segacd_us", tag, owner, clock, "sega_segacd_us", __FILE__)
 {
 }
 
-sega_segacd_japan_device::sega_segacd_japan_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_segacd_japan_device::sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_segacd_device(mconfig, SEGA_SEGACD_JAPAN, "sega_segacd_japan", tag, owner, clock, "sega_segacd_japan", __FILE__)
 {
 }
 
-sega_segacd_europe_device::sega_segacd_europe_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_segacd_europe_device::sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_segacd_device(mconfig, SEGA_SEGACD_EUROPE, "sega_segacd_europe", tag, owner, clock, "sega_segacd_europe", __FILE__)
 {
 }
@@ -911,23 +911,23 @@ WRITE16_MEMBER( sega_segacd_device::scd_a12006_hint_register_w )
 
 void sega_segacd_device::segacd_mark_tiles_dirty(int offset)
 {
-	m_gfx[0]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
-	m_gfx[1]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
-	m_gfx[2]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
-	m_gfx[3]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
-	m_gfx[4]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
-	m_gfx[5]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
-	m_gfx[6]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
-	m_gfx[7]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx(0)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx(1)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx(2)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx(3)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx(4)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx(5)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx(6)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx(7)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
 
-	m_gfx[8]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
-	m_gfx[9]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
-	m_gfx[10]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
-	m_gfx[11]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
-	m_gfx[12]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
-	m_gfx[13]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
-	m_gfx[14]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
-	m_gfx[15]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx(8)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx(9)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx(10)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx(11)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx(12)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx(13)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx(14)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx(15)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
 }
 
 
@@ -1062,11 +1062,11 @@ inline UINT8 sega_segacd_device::get_stampmap_16x16_1x1_tile_info_pixel(int xpos
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_16x16_1x1(tile_region,tileno,(int)tile_index);
 
-	tileno %= m_gfx[tile_region]->elements();
+	tileno %= gfx(tile_region)->elements();
 
 	if (tileno==0) return 0x00;
 
-	const UINT8* srcdata = m_gfx[tile_region]->get_data(tileno);
+	const UINT8* srcdata = gfx(tile_region)->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
@@ -1100,11 +1100,11 @@ inline UINT8 sega_segacd_device::get_stampmap_32x32_1x1_tile_info_pixel(int xpos
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_1x1(tile_region,tileno,(int)tile_index);
 
-	tileno %= m_gfx[tile_region]->elements();
+	tileno %= gfx(tile_region)->elements();
 
 	if (tileno==0) return 0x00; // does this apply in this mode?
 
-	const UINT8* srcdata = m_gfx[tile_region]->get_data(tileno);
+	const UINT8* srcdata = gfx(tile_region)->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
@@ -1138,11 +1138,11 @@ inline UINT8 sega_segacd_device::get_stampmap_16x16_16x16_tile_info_pixel(int xp
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_16x16_16x16(tile_region,tileno,(int)tile_index);
 
-	tileno %= m_gfx[tile_region]->elements();
+	tileno %= gfx(tile_region)->elements();
 
 	if (tileno==0) return 0x00; // does this apply in this mode
 
-	const UINT8* srcdata = m_gfx[tile_region]->get_data(tileno);
+	const UINT8* srcdata = gfx(tile_region)->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
@@ -1176,11 +1176,11 @@ inline UINT8 sega_segacd_device::get_stampmap_32x32_16x16_tile_info_pixel(int xp
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_16x16(tile_region,tileno,(int)tile_index);
 
-	tileno %= m_gfx[tile_region]->elements();
+	tileno %= gfx(tile_region)->elements();
 
 	if (tileno==0) return 0x00;
 
-	const UINT8* srcdata = m_gfx[tile_region]->get_data(tileno);
+	const UINT8* srcdata = gfx(tile_region)->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 

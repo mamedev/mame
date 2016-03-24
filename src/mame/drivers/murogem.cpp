@@ -115,7 +115,7 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 class murogem_state : public driver_device
 {
 public:
-	murogem_state(const machine_config &mconfig, device_type type, std::string tag)
+	murogem_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),

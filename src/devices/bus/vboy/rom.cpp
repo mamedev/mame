@@ -21,19 +21,19 @@ const device_type VBOY_ROM_STD = &device_creator<vboy_rom_device>;
 const device_type VBOY_ROM_EEPROM = &device_creator<vboy_eeprom_device>;
 
 
-vboy_rom_device::vboy_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+vboy_rom_device::vboy_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_vboy_cart_interface( mconfig, *this )
 {
 }
 
-vboy_rom_device::vboy_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+vboy_rom_device::vboy_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, VBOY_ROM_STD, "Nintendo Virtual Boy Carts", tag, owner, clock, "vboy_rom", __FILE__),
 						device_vboy_cart_interface( mconfig, *this )
 {
 }
 
-vboy_eeprom_device::vboy_eeprom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+vboy_eeprom_device::vboy_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: vboy_rom_device(mconfig, VBOY_ROM_EEPROM, "Nintendo Virtual Boy Carts + EEPROM", tag, owner, clock, "vboy_eeprom", __FILE__)
 {
 }

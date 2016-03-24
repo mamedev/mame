@@ -39,7 +39,7 @@ class rtc4543_device :  public device_t,
 {
 public:
 	// construction/destruction
-	rtc4543_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	rtc4543_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( wr_w );

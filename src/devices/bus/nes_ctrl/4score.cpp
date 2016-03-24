@@ -110,20 +110,20 @@ ioport_constructor nes_4score_p2p4_device::device_input_ports() const
 //  nes_4score_device - constructor
 //-------------------------------------------------
 
-nes_4score_device::nes_4score_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_4score_device::nes_4score_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_nes_control_port_interface(mconfig, *this), m_latch(0)
 				{
 }
 
-nes_4score_p1p3_device::nes_4score_p1p3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+nes_4score_p1p3_device::nes_4score_p1p3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 					nes_4score_device(mconfig, NES_4SCORE_P1P3, "Nintendo Four Score Adapter P1/P3", tag, owner, clock, "nes_4score_p1p3", __FILE__),
 					m_joypad1(*this, "PAD1"),
 					m_joypad3(*this, "PAD3")
 {
 }
 
-nes_4score_p2p4_device::nes_4score_p2p4_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+nes_4score_p2p4_device::nes_4score_p2p4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 					nes_4score_device(mconfig, NES_4SCORE_P2P4, "Nintendo Four Score Adapter P2/P4", tag, owner, clock, "nes_4score_p2p4", __FILE__),
 					m_joypad2(*this, "PAD2"),
 					m_joypad4(*this, "PAD4")

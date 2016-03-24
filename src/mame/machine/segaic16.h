@@ -51,13 +51,14 @@ class sega_16bit_common_base : public driver_device
 {
 public:
 	// construction/destruction
-	sega_16bit_common_base(const machine_config &mconfig, device_type type, std::string tag);
+	sega_16bit_common_base(const machine_config &mconfig, device_type type, const char *tag);
 
 	// open bus read helpers
 	DECLARE_READ16_MEMBER( open_bus_r );
 
 	// palette helpers
 	DECLARE_WRITE16_MEMBER( paletteram_w );
+	DECLARE_WRITE16_MEMBER( philko_paletteram_w );
 
 protected:
 	// internal helpers
@@ -89,7 +90,7 @@ public:
 	typedef device_delegate<void (UINT8)> sound_write_delegate;
 
 	// construction/destruction
-	sega_315_5195_mapper_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void static_set_cputag(device_t &device, const char *cpu);
@@ -182,7 +183,7 @@ class sega_315_5248_multiplier_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5248_multiplier_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// public interface
 	DECLARE_READ16_MEMBER( read );
@@ -205,7 +206,7 @@ class sega_315_5249_divider_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5249_divider_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// public interface
 	DECLARE_READ16_MEMBER( read );
@@ -234,7 +235,7 @@ public:
 	typedef device_delegate<void ()> timer_ack_delegate;
 
 	// construction/destruction
-	sega_315_5250_compare_timer_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void static_set_timer_ack(device_t &device, timer_ack_delegate callback);

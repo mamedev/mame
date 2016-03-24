@@ -83,7 +83,7 @@ static const UINT16 BDAcharset[]=
 	0x4406, // 0100 0100 0000 0110 ?
 };
 
-bfm_bda_t::bfm_bda_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+bfm_bda_t::bfm_bda_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BFM_BDA, "BFM BDA VFD controller", tag, owner, clock, "bfm_bda", __FILE__),
 	m_port_val(0)
 {

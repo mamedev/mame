@@ -44,32 +44,32 @@ const device_type NES_TXC_STRIKEW = &device_creator<nes_txc_strikew_device>;
 const device_type NES_TXC_COMMANDOS = &device_creator<nes_txc_commandos_device>;
 
 
-nes_txc_22211_device::nes_txc_22211_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_txc_22211_device::nes_txc_22211_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-nes_txc_22211_device::nes_txc_22211_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_txc_22211_device::nes_txc_22211_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_TXC_22211, "NES Cart TXC 22211 PCB", tag, owner, clock, "nes_txc_22211", __FILE__)
 {
 }
 
-nes_txc_dumarc_device::nes_txc_dumarc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_txc_dumarc_device::nes_txc_dumarc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_txc_22211_device(mconfig, NES_TXC_DUMARACING, "NES Cart TXC Du Ma Racing PCB", tag, owner, clock, "nes_dumarc", __FILE__)
 {
 }
 
-nes_txc_mjblock_device::nes_txc_mjblock_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_txc_mjblock_device::nes_txc_mjblock_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_txc_22211_device(mconfig, NES_TXC_MJBLOCK, "NES Cart TXC Mahjong Block PCB", tag, owner, clock, "nes_mjblock", __FILE__)
 {
 }
 
-nes_txc_strikew_device::nes_txc_strikew_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_txc_strikew_device::nes_txc_strikew_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_TXC_STRIKEW, "NES Cart Strike Wolf PCB", tag, owner, clock, "nes_txc_strikew", __FILE__)
 {
 }
 
-nes_txc_commandos_device::nes_txc_commandos_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_txc_commandos_device::nes_txc_commandos_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_TXC_COMMANDOS, "NES Cart Commandos (and others) PCB", tag, owner, clock, "nes_txc_comm", __FILE__)
 {
 }

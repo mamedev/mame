@@ -357,7 +357,7 @@ class tx0_readtape_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	tx0_readtape_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
@@ -381,7 +381,7 @@ protected:
 
 const device_type TX0_READTAPE = &device_creator<tx0_readtape_image_device>;
 
-tx0_readtape_image_device::tx0_readtape_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tx0_readtape_image_device::tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TX0_READTAPE, "TX0 Tape Reader", tag, owner, clock, "tx0_readtape_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -392,7 +392,7 @@ class tx0_punchtape_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	tx0_punchtape_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
@@ -416,7 +416,7 @@ protected:
 
 const device_type TX0_PUNCHTAPE = &device_creator<tx0_punchtape_image_device>;
 
-tx0_punchtape_image_device::tx0_punchtape_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tx0_punchtape_image_device::tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TX0_PUNCHTAPE, "TX0 Tape Puncher", tag, owner, clock, "tx0_punchtape_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -428,7 +428,7 @@ class tx0_printer_image_device :    public device_t,
 {
 public:
 	// construction/destruction
-	tx0_printer_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_PRINTER; }
@@ -452,7 +452,7 @@ protected:
 
 const device_type TX0_PRINTER = &device_creator<tx0_printer_image_device>;
 
-tx0_printer_image_device::tx0_printer_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tx0_printer_image_device::tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TX0_PRINTER, "TX0 Typewriter", tag, owner, clock, "tx0_printer_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -463,7 +463,7 @@ class tx0_magtape_image_device :    public device_t,
 {
 public:
 	// construction/destruction
-	tx0_magtape_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_MAGTAPE; }
@@ -487,7 +487,7 @@ protected:
 
 const device_type TX0_MAGTAPE = &device_creator<tx0_magtape_image_device>;
 
-tx0_magtape_image_device::tx0_magtape_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tx0_magtape_image_device::tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TX0_MAGTAPE, "TX0 Magnetic Tape", tag, owner, clock, "tx0_magtape_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {

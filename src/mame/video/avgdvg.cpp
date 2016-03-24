@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Eric Smith, Brad Oliver, Bernd Wiebelt, Aaron Giles, Andrew Caldwell
+// copyright-holders:Mathis Rosenhauer
+// thanks-to:Eric Smith, Brad Oliver, Bernd Wiebelt, Aaron Giles, Andrew Caldwell
 /*************************************************************************
 
     avgdvg.c: Atari DVG and AVG
@@ -1343,7 +1344,11 @@ void avg_device::device_start()
 	avgdvg_vectorram = reinterpret_cast<UINT8 *>(machine().root_device().memshare("vectorram")->ptr());
 	avgdvg_vectorram_size = machine().root_device().memshare("vectorram")->bytes();
 
-	avgdvg_colorram = reinterpret_cast<UINT8 *>(machine().root_device().memshare("colorram")->ptr());
+	memory_share *colorram = machine().root_device().memshare("colorram");
+	if (colorram != NULL)
+	{
+		avgdvg_colorram = reinterpret_cast<UINT8 *>(colorram->ptr());
+	}
 
 	xmin = visarea.min_x;
 	ymin = visarea.min_y;
@@ -1379,7 +1384,11 @@ void dvg_device::device_start()
 	avgdvg_vectorram = reinterpret_cast<UINT8 *>(machine().root_device().memshare("vectorram")->ptr());
 	avgdvg_vectorram_size = machine().root_device().memshare("vectorram")->bytes();
 
-	avgdvg_colorram = reinterpret_cast<UINT8 *>(machine().root_device().memshare("colorram")->ptr());
+	memory_share *colorram = machine().root_device().memshare("colorram");
+	if (colorram != NULL)
+	{
+		avgdvg_colorram = reinterpret_cast<UINT8 *>(colorram->ptr());
+	}
 
 	xmin = visarea.min_x;
 	ymin = visarea.min_y;
@@ -1390,12 +1399,12 @@ void dvg_device::device_start()
 	register_state();
 }
 
-void avgdvg_device::static_set_vector_tag(device_t &device, std::string tag)
+void avgdvg_device::static_set_vector_tag(device_t &device, const char *tag)
 {
 	downcast<avgdvg_device &>(device).m_vector.set_tag(tag);
 }
 
-avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_vector(*this)
 {
@@ -1451,47 +1460,47 @@ avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, st
 	nvect = 0;
 }
 
-dvg_device::dvg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+dvg_device::dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		avgdvg_device(mconfig, DVG, "Atari DVG", tag, owner, clock, "dvg", __FILE__)
 {
 }
 
-avg_device::avg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+avg_device::avg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		avgdvg_device(mconfig, AVG, "Atari AVG", tag, owner, clock, "avg", __FILE__)
 {
 }
 
-avg_device::avg_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
+avg_device::avg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		avgdvg_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
 
-avg_tempest_device::avg_tempest_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+avg_tempest_device::avg_tempest_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		avg_device(mconfig, AVG_TEMPEST, "Atari AVG (Tempest)", tag, owner, clock, "avg_tempest", __FILE__)
 {
 }
-avg_mhavoc_device::avg_mhavoc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+avg_mhavoc_device::avg_mhavoc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		avg_device(mconfig, AVG_MHAVOC, "Atari AVG (Major Havoc)", tag, owner, clock, "avg_mhavoc", __FILE__)
 {
 }
 
-avg_starwars_device::avg_starwars_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+avg_starwars_device::avg_starwars_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		avg_device(mconfig, AVG_STARWARS, "Atari AVG (Star Wars)", tag, owner, clock, "avg_starwars", __FILE__)
 {
 }
 
-avg_quantum_device::avg_quantum_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+avg_quantum_device::avg_quantum_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		avg_device(mconfig, AVG_QUANTUM, "Atari AVG (Quantum)", tag, owner, clock, "avg_quantum", __FILE__)
 {
 }
 
-avg_bzone_device::avg_bzone_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+avg_bzone_device::avg_bzone_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		avg_device(mconfig, AVG_BZONE, "Atari AVG (Battle Zone)", tag, owner, clock, "avg_bzone", __FILE__)
 {
 }
 
-avg_tomcat_device::avg_tomcat_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+avg_tomcat_device::avg_tomcat_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		avg_device(mconfig, AVG_TOMCAT, "Atari AVG (TomCat)", tag, owner, clock, "avg_tomcat", __FILE__)
 {
 }

@@ -104,7 +104,7 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 class dreamwld_state : public driver_device
 {
 public:
-	dreamwld_state(const machine_config &mconfig, device_type type, std::string tag)
+	dreamwld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_bg_videoram(*this, "bg_videoram"),

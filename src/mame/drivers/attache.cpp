@@ -69,7 +69,7 @@
 class attache_state : public driver_device
 {
 public:
-	attache_state(const machine_config &mconfig, device_type type, std::string tag)
+	attache_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this,"maincpu"),
 			m_rom(*this,"boot"),
@@ -931,7 +931,7 @@ static MACHINE_CONFIG_START( attache, attache_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(64)) /* not accurate */
 	MCFG_SCREEN_SIZE(640,240)
@@ -939,7 +939,7 @@ static MACHINE_CONFIG_START( attache, attache_state )
 	MCFG_SCREEN_UPDATE_DRIVER(attache_state, screen_update)
 	MCFG_SCREEN_VBLANK_DRIVER(attache_state, vblank_int)
 
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
+	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("psg", AY8912, XTAL_8MHz / 4)

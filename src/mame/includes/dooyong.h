@@ -5,7 +5,7 @@
 class dooyong_state : public driver_device
 {
 public:
-	dooyong_state(const machine_config &mconfig, device_type type, std::string tag)
+	dooyong_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -54,7 +54,7 @@ public:
 class dooyong_z80_state : public dooyong_state
 {
 public:
-	dooyong_z80_state(const machine_config &mconfig, device_type type, std::string tag)
+	dooyong_z80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dooyong_state(mconfig, type, tag),
 		m_txvideoram(*this, "txvideoram"),
 		m_spriteram(*this, "spriteram")
@@ -98,7 +98,7 @@ public:
 class dooyong_z80_ym2203_state : public dooyong_z80_state
 {
 public:
-	dooyong_z80_ym2203_state(const machine_config &mconfig, device_type type, std::string tag)
+	dooyong_z80_ym2203_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dooyong_z80_state(mconfig, type, tag)
 	{ }
 
@@ -122,7 +122,7 @@ public:
 class dooyong_68k_state : public dooyong_state
 {
 public:
-	dooyong_68k_state(const machine_config &mconfig, device_type type, std::string tag)
+	dooyong_68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dooyong_state(mconfig, type, tag),
 		m_spriteram(*this, "spriteram")
 	{ }

@@ -13,7 +13,7 @@
 extern const device_type INDER_VIDEO = &device_creator<inder_vid_device>;
 
 
-inder_vid_device::inder_vid_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+inder_vid_device::inder_vid_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, INDER_VIDEO, "Inder / Dinamic TMS Video", tag, owner, clock, "indervd", __FILE__),
 /*  device_video_interface(mconfig, *this, false), */
 		m_vram(*this, "vram"),

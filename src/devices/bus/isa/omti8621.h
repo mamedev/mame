@@ -33,7 +33,7 @@ class omti_disk_image_device;
 class omti8621_device : public device_t, public device_isa16_card_interface
 {
 public:
-	omti8621_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock);
+	omti8621_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
 	~omti8621_device() {}
 
 	DECLARE_READ16_MEMBER(read);
@@ -114,6 +114,9 @@ private:
 	void copy_sectors(INT32 dst_addr, INT32 src_addr, UINT8 count, UINT8 lun);
 	void format_track(const UINT8 * cdb);
 	void set_esdi_defect_list(UINT8 lun, UINT8 head);
+
+	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
+
 	void log_command(const UINT8 cdb[], const UINT16 cdb_length);
 	void log_data();
 	void do_command(const UINT8 cdb[], const UINT16 cdb_length);
@@ -130,7 +133,7 @@ private:
 class omti8621_pc_device : public omti8621_device
 {
 public:
-	omti8621_pc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	omti8621_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type ISA16_OMTI8621;
@@ -140,7 +143,7 @@ extern const device_type ISA16_OMTI8621;
 class omti8621_apollo_device : public omti8621_device
 {
 public:
-	omti8621_apollo_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	omti8621_apollo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// get sector diskaddr of logical unit lun into data_buffer
 	UINT32 get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 length, UINT8 lun);

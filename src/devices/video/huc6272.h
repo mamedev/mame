@@ -32,7 +32,7 @@ class huc6272_device :  public device_t,
 {
 public:
 	// construction/destruction
-	huc6272_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
 	DECLARE_WRITE32_MEMBER( write );

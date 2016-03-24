@@ -41,7 +41,7 @@ class seibu_crtc_device : public device_t,
 {
 public:
 	// construction/destruction
-	seibu_crtc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_layer_en_callback(device_t &device, _Object object) { return downcast<seibu_crtc_device &>(device).m_layer_en_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_layer_scroll_callback(device_t &device, _Object object) { return downcast<seibu_crtc_device &>(device).m_layer_scroll_cb.set_callback(object); }

@@ -10,7 +10,7 @@ public:
 		TIMER_DAC_IRQ
 	};
 
-	trucocl_state(const machine_config &mconfig, device_type type, std::string tag)
+	trucocl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),

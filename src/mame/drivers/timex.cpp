@@ -212,9 +212,13 @@ WRITE8_MEMBER( spectrum_state::ts2068_port_ff_w )
  *******************************************************************/
 void spectrum_state::ts2068_update_memory()
 {
-	UINT8 *messram = m_ram->pointer();
+	UINT8 *messram = nullptr;
+	if (m_ram) messram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *DOCK = m_dock_crt->base();
+	UINT8 *DOCK = nullptr;
+	if (m_dock_crt) DOCK = m_dock_crt->base();
+
+
 	UINT8 *ExROM = memregion("maincpu")->base() + 0x014000;
 	UINT8 *ChosenROM;
 

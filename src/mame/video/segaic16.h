@@ -10,6 +10,10 @@
 #ifndef __SEGAIC16VID_H__
 #define __SEGAIC16VID_H__
 
+typedef device_delegate<void (int, UINT16*, UINT16*, UINT16*, UINT16*)> segaic16_video_pagelatch_delegate;
+
+#define MCFG_SEGAIC16_VIDEO_SET_PAGELATCH_CB( _class, _method) \
+	segaic16_video_device::set_pagelatch_cb(*device, segaic16_video_pagelatch_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
 
 
 /* tilemap systems */
@@ -95,11 +99,12 @@ class segaic16_video_device :   public device_t,
 								public device_video_interface
 {
 public:
-	segaic16_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~segaic16_video_device() {}
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void set_pagelatch_cb(device_t &device,segaic16_video_pagelatch_delegate newtilecb);
 
 	UINT8 m_display_enable;
 	optional_shared_ptr<UINT16> m_tileram;
@@ -117,6 +122,8 @@ public:
 //  void draw_virtual_tilemap(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority);
 //  void tilemap_16b_reset(screen_device &screen, struct tilemap_info *info);
 
+	segaic16_video_pagelatch_delegate m_pagelatch_cb;
+	void tilemap_16b_fill_latch(int i, UINT16* latched_pageselect, UINT16* latched_yscroll, UINT16* latched_xscroll, UINT16* textram);
 	TIMER_CALLBACK_MEMBER( tilemap_16b_latch_values );
 
 	struct rotate_info m_rotate[SEGAIC16_MAX_ROTATE];

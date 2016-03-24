@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 /****************************************************************************
 
@@ -50,7 +50,7 @@ A1                   2101            2101
 class aceal_state : public driver_device
 {
 public:
-	aceal_state(const machine_config &mconfig, device_type type, std::string tag)
+	aceal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_scoreram(*this, "scoreram"),
@@ -331,7 +331,7 @@ static MACHINE_CONFIG_START( ace, aceal_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ace)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	/* ???? */

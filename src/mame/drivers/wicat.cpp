@@ -33,7 +33,7 @@ Wicat - various systems.
 class wicat_state : public driver_device
 {
 public:
-	wicat_state(const machine_config &mconfig, device_type type, std::string tag)
+	wicat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
@@ -874,13 +874,13 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 
 	MCFG_X2210_ADD("vsram")  // XD2210
 
-	MCFG_SCREEN_ADD("screen",RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_SIZE(720,300)
 	MCFG_SCREEN_VISIBLE_AREA(0,720-1,0,300-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DEVICE("video",i8275_device,screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("video", I8275, XTAL_19_6608MHz/8)
 	MCFG_I8275_CHARACTER_WIDTH(9)

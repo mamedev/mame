@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( sega315_5124, AS_0, 8, sega315_5124_device )
 ADDRESS_MAP_END
 
 
-sega315_5124_device::sega315_5124_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t( mconfig, SEGA315_5124, "Sega 315-5124 VDP", tag, owner, clock, "sega315_5124", __FILE__)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
@@ -176,7 +176,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, std::str
 }
 
 
-sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240, std::string shortname, std::string source)
+sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240, const char *shortname, const char *source)
 	: device_t( mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
@@ -192,13 +192,13 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 }
 
 
-sega315_5246_device::sega315_5246_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega315_5246_device::sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega315_5124_device( mconfig, SEGA315_5246, "Sega 315-5246 VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5246", __FILE__)
 {
 }
 
 
-sega315_5378_device::sega315_5378_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega315_5378_device::sega315_5378_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega315_5124_device( mconfig, SEGA315_5378, "Sega 315-5378 VDP", tag, owner, clock, SEGA315_5378_CRAM_SIZE, 0x10, true, "sega315_5378", __FILE__)
 {
 }
@@ -690,7 +690,7 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 		case 2:     /* VDP register write */
 			reg_num = data & 0x0f;
 			m_reg[reg_num] = m_addr & 0xff;
-			//logerror("%s: %s: setting register %x to %02x\n", machine().describe_context(), tag().c_str(), reg_num, m_addr & 0xff);
+			//logerror("%s: %s: setting register %x to %02x\n", machine().describe_context(), tag(), reg_num, m_addr & 0xff);
 
 			switch (reg_num)
 			{

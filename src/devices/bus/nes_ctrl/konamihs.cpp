@@ -42,7 +42,7 @@ ioport_constructor nes_konamihs_device::device_input_ports() const
 //  nes_konamihs_device - constructor
 //-------------------------------------------------
 
-nes_konamihs_device::nes_konamihs_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+nes_konamihs_device::nes_konamihs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 					device_t(mconfig, NES_KONAMIHS, "Konami Hyper Shot Controller", tag, owner, clock, "nes_konamihs", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_ipt_p1(*this, "P1"),

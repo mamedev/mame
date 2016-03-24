@@ -16,7 +16,7 @@
 class m79152pc_state : public driver_device
 {
 public:
-	m79152pc_state(const machine_config &mconfig, device_type type, std::string tag)
+	m79152pc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "p_videoram"),
 		m_p_attributes(*this, "p_attributes"),
@@ -126,7 +126,7 @@ static MACHINE_CONFIG_START( m79152pc, m79152pc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m79152pc_state, screen_update_m79152pc)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m79152pc)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 /* ROM definition */

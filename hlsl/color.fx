@@ -4,6 +4,10 @@
 // Color-Convolution Effect
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+// Sampler Definitions
+//-----------------------------------------------------------------------------
+
 texture Diffuse;
 
 sampler DiffuseSampler = sampler_state
@@ -43,7 +47,7 @@ struct PS_INPUT
 };
 
 //-----------------------------------------------------------------------------
-// Post-Processing Vertex Shader
+// Color-Convolution Vertex Shader
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
@@ -68,7 +72,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 }
 
 //-----------------------------------------------------------------------------
-// Post-Processing Pixel Shader
+// Color-Convolution Pixel Shader
 //-----------------------------------------------------------------------------
 
 uniform float3 RedRatios = float3(1.0f, 0.0f, 0.0f);
@@ -81,23 +85,23 @@ uniform float Saturation = 1.0f;
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
-	
+
 	float3 OutRGB = BaseTexel.rgb;
 
 	// RGB Tint & Shift
 	float ShiftedRed = dot(OutRGB, RedRatios);
 	float ShiftedGrn = dot(OutRGB, GrnRatios);
 	float ShiftedBlu = dot(OutRGB, BluRatios);
-	
+
 	// RGB Scale & Offset
 	float3 OutTexel = float3(ShiftedRed, ShiftedGrn, ShiftedBlu) * Scale + Offset;
-	
+
 	// Saturation
 	float3 Grayscale = float3(0.299f, 0.587f, 0.114f);
 	float OutLuma = dot(OutTexel, Grayscale);
 	float3 OutChroma = OutTexel - OutLuma;
 	float3 Saturated = OutLuma + OutChroma * Saturation;
-	
+
 	return float4(Saturated, BaseTexel.a);
 }
 
@@ -105,7 +109,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 // Color-Convolution Technique
 //-----------------------------------------------------------------------------
 
-technique ColorTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{

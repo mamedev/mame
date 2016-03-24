@@ -180,31 +180,31 @@ const device_type GB_LCD_CGB = &device_creator<cgb_lcd_device>;
 
 
 
-gb_lcd_device::gb_lcd_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+gb_lcd_device::gb_lcd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 				: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_video_interface(mconfig, *this),
 					m_sgb_border_hack(0)
 {
 }
 
-gb_lcd_device::gb_lcd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+gb_lcd_device::gb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, GB_LCD_DMG, "DMG LCD", tag, owner, clock, "dmg_lcd", __FILE__),
 					device_video_interface(mconfig, *this),
 					m_sgb_border_hack(0)
 {
 }
 
-mgb_lcd_device::mgb_lcd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mgb_lcd_device::mgb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: gb_lcd_device(mconfig, GB_LCD_MGB, "MGB LCD", tag, owner, clock, "mgb_lcd", __FILE__)
 {
 }
 
-sgb_lcd_device::sgb_lcd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sgb_lcd_device::sgb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: gb_lcd_device(mconfig, GB_LCD_SGB, "SGB LCD", tag, owner, clock, "sgb_lcd", __FILE__)
 {
 }
 
-cgb_lcd_device::cgb_lcd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+cgb_lcd_device::cgb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: gb_lcd_device(mconfig, GB_LCD_CGB, "CGB LCD", tag, owner, clock, "cgb_lcd", __FILE__)
 {
 }

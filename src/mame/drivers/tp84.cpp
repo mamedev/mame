@@ -1,11 +1,8 @@
-// license:???
-// copyright-holders:Marc Lafontaine
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /***************************************************************************
 
 Time Pilot 84  (c) 1984 Konami
-
-driver by Marc Lafontaine
-
 
 ---- Master 6809 ------
 

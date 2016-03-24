@@ -450,7 +450,13 @@ void sm510_base_device::op_idiv()
 	m_div = 0;
 }
 
+void sm510_base_device::op_dta()
+{
+	// DTA: transfer divider low bits to ACC
+	m_acc = BITSWAP16(m_div,0,0,0,0, 0,0,0,0, 0,0,0,0, 7,8,9,10) & 0xf;
+}
+
 void sm510_base_device::op_illegal()
 {
-	logerror("%s unknown opcode $%02X at $%04X\n", tag().c_str(), m_op, m_prev_pc);
+	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_prev_pc);
 }

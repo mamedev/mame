@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 /***************************************************************************
 
     KCGD (Kontroller Cvetnogo Graficheskogo Displeya = Colour Graphics
@@ -54,7 +56,7 @@
 class kcgd_state : public driver_device
 {
 public:
-	kcgd_state(const machine_config &mconfig, device_type type, std::string tag) :
+	kcgd_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 //      m_ms7004(*this, "ms7004"),
@@ -307,7 +309,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kcgd_state::scanline_callback)
 
 	offset = BIT(m_video.status, KCGD_STATUS_PAGE) ? (KCGD_PAGE_1 >> 1) : (KCGD_PAGE_0 >> 1);
 
-	DBG_LOG(2,"scanline_cb", ("frame %" I64FMT "d y %.3d page %d offset %04X *offset %04X\n",
+	DBG_LOG(2,"scanline_cb", ("frame %d y %.3d page %d offset %04X *offset %04X\n",
 		m_screen->frame_number(), BIT(m_video.status, KCGD_STATUS_PAGE),
 		y, offset + y, m_videoram[offset + y]));
 

@@ -7,10 +7,16 @@
 **********************************************************************/
 
 // The games designed for the US model of the Sports Pad controller use the
-// TH line of the controller port as output, to select which nibble, of the
-// two axis bytes, will be read at a time. The Japanese cartridge Sports Pad
-// Soccer uses a different mode, because the Sega Mark III lacks TH output, so
+// TH line of the controller port to select which nibble, of the two axis
+// bytes, will be read at a time. The Japanese cartridge Sports Pad Soccer
+// uses a different mode, because the Sega Mark III lacks the TH line, so
 // there is a different Sports Pad model released in Japan (see sportsjp.c).
+
+// The Japanese SMS has the TH line connected, but doesn't report TH input
+// on port 0xDD. However, a magazine raffled the US Sports Pad along with a
+// Great Ice Hockey cartridge, in Japanese format, to owners of that console.
+// So, Great Ice Hockey seems to just need TH pin as output to work, while
+// other games designed for the US Sports Pad don't work on the Japanese SMS.
 
 // It was discovered that games designed for the Paddle Controller, released
 // in Japan, switch to a mode incompatible with the original Paddle when
@@ -103,17 +109,17 @@ CUSTOM_INPUT_MEMBER( sms_sports_pad_device::dir_pins_r )
 
 static INPUT_PORTS_START( sms_sports_pad )
 	PORT_START("SPORTS_IN")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_sports_pad_device, dir_pins_r, NULL) // Directional pins
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_sports_pad_device, dir_pins_r, nullptr) // Directional pins
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // Vcc
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // TL (Button 1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_sports_pad_device, th_pin_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_sports_pad_device, th_pin_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) // TR (Button 2)
 
 	PORT_START("SPORTS_OUT")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED ) // Directional pins
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // Vcc
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) // TL (Button 1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_CHANGED_MEMBER(DEVICE_SELF, sms_sports_pad_device, th_pin_w, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_CHANGED_MEMBER(DEVICE_SELF, sms_sports_pad_device, th_pin_w, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // TR (Button 2)
 
 	PORT_START("SPORTS_X")    /* Sports Pad X axis */
@@ -143,7 +149,7 @@ ioport_constructor sms_sports_pad_device::device_input_ports() const
 //  sms_sports_pad_device - constructor
 //-------------------------------------------------
 
-sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SMS_SPORTS_PAD, "Sega SMS Sports Pad US", tag, owner, clock, "sms_sports_pad", __FILE__),
 	device_sms_control_port_interface(mconfig, *this),
 	m_sports_in(*this, "SPORTS_IN"),

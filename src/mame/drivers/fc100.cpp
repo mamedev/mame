@@ -49,7 +49,7 @@ TODO:
 class fc100_state : public driver_device
 {
 public:
-	fc100_state(const machine_config &mconfig, device_type type, std::string tag)
+	fc100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_vdg(*this, "vdg")
@@ -523,8 +523,9 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	// other lines not connected
 
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "vdg")
+	MCFG_SCREEN_COLOR(rgb_t::amber)
 	MCFG_GFXDECODE_ADD("gfxdecode", "f4palette", fc100)
-	MCFG_PALETTE_ADD_MONOCHROME_AMBER("f4palette")
+	MCFG_PALETTE_ADD_MONOCHROME("f4palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

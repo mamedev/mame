@@ -206,7 +206,7 @@
 class jubilee_state : public driver_device
 {
 public:
-	jubilee_state(const machine_config &mconfig, device_type type, std::string tag)
+	jubilee_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoworkram"),
 		m_colorram(*this, "colorram"),

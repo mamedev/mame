@@ -73,7 +73,7 @@ class z80dma_device :   public device_t,
 {
 public:
 	// construction/destruction
-	z80dma_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_out_busreq_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_busreq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_int_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_int_cb.set_callback(object); }
@@ -111,13 +111,11 @@ private:
 	void do_transfer_write();
 	void do_search();
 
-	static TIMER_CALLBACK( static_timerproc ) { reinterpret_cast<z80dma_device *>(ptr)->timerproc(); }
-	void timerproc();
+	TIMER_CALLBACK_MEMBER(timerproc);
 
 	void update_status();
 
-	static TIMER_CALLBACK( static_rdy_write_callback ) { reinterpret_cast<z80dma_device *>(ptr)->rdy_write_callback(param); }
-	void rdy_write_callback(int state);
+	TIMER_CALLBACK_MEMBER(rdy_write_callback);
 
 	// internal state
 	devcb_write_line   m_out_busreq_cb;

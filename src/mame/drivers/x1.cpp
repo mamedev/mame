@@ -1041,6 +1041,7 @@ WRITE8_MEMBER( x1_state::x1_fdc_w )
 			break;
 
 		case 0x0ffc:
+			m_fdc_ctrl = data;
 			switch (data & 0x03)
 			{
 			case 0: floppy = m_floppy0->get_device(); break;
@@ -1069,6 +1070,22 @@ WRITE8_MEMBER( x1_state::x1_fdc_w )
 WRITE_LINE_MEMBER(x1_state::fdc_drq_w)
 {
 	m_dma->rdy_w(state ^ 1);
+}
+
+WRITE_LINE_MEMBER(x1_state::hdl_w)
+{
+	floppy_image_device *floppy = nullptr;
+
+	if(!state)
+		return;
+	switch (m_fdc_ctrl & 0x03)
+	{
+	case 0: floppy = m_floppy0->get_device(); break;
+	case 1: floppy = m_floppy1->get_device(); break;
+	case 2: floppy = m_floppy2->get_device(); break;
+	case 3: floppy = m_floppy3->get_device(); break;
+	}
+	floppy->mon_w(CLEAR_LINE);
 }
 
 /*************************************
@@ -2485,6 +2502,7 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 
 	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(x1_state, hdl_w)) // XXX: wag
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)

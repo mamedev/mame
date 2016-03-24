@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Joseph Zbiciak,Tim Lindner
 /**********************************************************************
 
@@ -27,19 +27,6 @@
    GI SP0256 Narrator Speech Processor
 
    By Joe Zbiciak. Ported to MESS by tim lindner.
-
- Copyright Joseph Zbiciak, all rights reserved.
- Copyright tim lindner, all rights reserved.
-
- - This source code is released as freeware for non-commercial purposes.
- - You are free to use and redistribute this code in modified or
-   unmodified form, provided you list us in the credits.
- - If you modify this source code, you must add a notice to each
-   modified source file that it has been changed.  If you're a nice
-   person, you will clearly mark each change too.  :)
- - If you wish to use this for commercial purposes, please contact us at
-   intvnut@gmail.com (Joe Zbiciak), tlindner@macmess.org (tim lindner)
- - This entire notice must remain in the source code.
 
 */
 
@@ -71,7 +58,7 @@ class sp0256_device : public device_t,
 						public device_sound_interface
 {
 public:
-	sp0256_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~sp0256_device() { }
 
 	template<class _Object> static devcb_base &set_data_request_callback(device_t &device, _Object object) { return downcast<sp0256_device &>(device).m_drq_cb.set_callback(object); }

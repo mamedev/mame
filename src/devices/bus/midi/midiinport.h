@@ -18,7 +18,7 @@ class midiin_port_device : public device_t,
 	public device_midi_port_interface
 {
 public:
-	midiin_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	midiin_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( read ) { output_rxd(state); }
 

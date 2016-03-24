@@ -19,7 +19,7 @@ public:
 		TIMER_IRQ_ON,
 		TIMER_IRQ_OFF
 	};
-	pentagon_state(const machine_config &mconfig, device_type type, std::string tag)
+	pentagon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_state(mconfig, type, tag)
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")

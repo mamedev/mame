@@ -38,7 +38,7 @@ INPUT_CHANGED_MEMBER( sms_light_phaser_device::position_changed )
 static INPUT_PORTS_START( sms_light_phaser )
 	PORT_START("CTRL_PORT")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // TL (trigger)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_light_phaser_device, th_pin_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_light_phaser_device, th_pin_r, nullptr)
 	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("LPHASER_X")
@@ -68,7 +68,7 @@ ioport_constructor sms_light_phaser_device::device_input_ports() const
 //  sms_light_phaser_device - constructor
 //-------------------------------------------------
 
-sms_light_phaser_device::sms_light_phaser_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+sms_light_phaser_device::sms_light_phaser_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SMS_LIGHT_PHASER, "Sega SMS Light Phaser", tag, owner, clock, "sms_light_phaser", __FILE__),
 	device_video_interface(mconfig, *this),
 	device_sms_control_port_interface(mconfig, *this),

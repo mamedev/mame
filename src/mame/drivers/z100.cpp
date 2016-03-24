@@ -154,7 +154,7 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
 class z100_state : public driver_device
 {
 public:
-	z100_state(const machine_config &mconfig, device_type type, std::string tag)
+	z100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pia0(*this, "pia0"),

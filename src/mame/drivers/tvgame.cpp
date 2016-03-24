@@ -19,7 +19,7 @@
 class tvgame_state : public driver_device
 {
 public:
-	tvgame_state(const machine_config &mconfig, device_type type, std::string tag)
+	tvgame_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
@@ -105,7 +105,7 @@ static MACHINE_CONFIG_START( tvgame, tvgame_state )
 	MCFG_SCREEN_SIZE(216, 213)
 	MCFG_SCREEN_VISIBLE_AREA(0, 215, 0, 212)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

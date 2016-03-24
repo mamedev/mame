@@ -47,7 +47,7 @@ To Do:
 class sbrain_state : public driver_device
 {
 public:
-	sbrain_state(const machine_config &mconfig, device_type type, std::string tag) :
+	sbrain_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -270,7 +270,6 @@ SLOT_INTERFACE_END
 
 MACHINE_RESET_MEMBER( sbrain_state, sbrain )
 {
-	m_beep->set_frequency(800);
 	m_p_chargen = memregion("chargen")->base();
 	m_bankr0->set_entry(1); // point at rom
 	m_bankw0->set_entry(0); // always write to ram
@@ -325,7 +324,7 @@ static MACHINE_CONFIG_START( sbrain, sbrain_state )
 	MCFG_CPU_IO_MAP(sbrain_subio)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(sbrain_state, screen_update)
@@ -333,11 +332,11 @@ static MACHINE_CONFIG_START( sbrain, sbrain_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */

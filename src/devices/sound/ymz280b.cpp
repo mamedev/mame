@@ -581,9 +581,14 @@ void ymz280b_device::device_start()
 
 	/* initialize the rest of the structure */
 	m_master_clock = (double)clock() / 384.0;
-	m_mem_base = region()->base();
-	m_mem_size = region()->bytes();
 	m_irq_handler.resolve();
+
+	if (region() != NULL)
+	{
+		/* Some systems (e.g. Konami Firebeat) have a YMZ280B on-board that isn't hooked up to ROM, so be safe. */
+		m_mem_base = region()->base();
+		m_mem_size = region()->bytes();
+	}
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -936,7 +941,7 @@ WRITE8_MEMBER( ymz280b_device::write )
 
 const device_type YMZ280B = &device_creator<ymz280b_device>;
 
-ymz280b_device::ymz280b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YMZ280B, "YMZ280B", tag, owner, clock, "ymz280b", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_current_register(0),

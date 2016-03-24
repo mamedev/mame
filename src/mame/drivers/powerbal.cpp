@@ -24,7 +24,7 @@ Magic Sticks:
 class powerbal_state : public playmark_state
 {
 public:
-	powerbal_state(const machine_config &mconfig, device_type type, std::string tag)
+	powerbal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: playmark_state(mconfig, type, tag),
 			m_eeprom(*this, "eeprom") { }
 

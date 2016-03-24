@@ -107,6 +107,7 @@ namespace bgfx { namespace d3d9
 			Null,
 			Resz,
 			Rawz,
+			Atoc,
 
 			Count,
 		};
@@ -236,7 +237,6 @@ namespace bgfx { namespace d3d9
 		}
 
 		void create(const Memory* _mem);
-		DWORD* getShaderCode(uint8_t _fragmentBit, const Memory* _mem);
 
 		void destroy()
 		{
@@ -325,10 +325,20 @@ namespace bgfx { namespace d3d9
 
 		void destroy()
 		{
-			DX_RELEASE(m_ptr, 0);
+			if (0 == (m_flags & BGFX_TEXTURE_INTERNAL_SHARED) )
+			{
+				DX_RELEASE(m_ptr, 0);
+			}
 			DX_RELEASE(m_surface, 0);
 			DX_RELEASE(m_staging, 0);
 			m_textureFormat = TextureFormat::Unknown;
+		}
+
+		void overrideInternal(uintptr_t _ptr)
+		{
+			destroy();
+			m_flags |= BGFX_TEXTURE_INTERNAL_SHARED;
+			m_ptr = (IDirect3DBaseTexture9*)_ptr;
 		}
 
 		void updateBegin(uint8_t _side, uint8_t _mip);
@@ -373,13 +383,14 @@ namespace bgfx { namespace d3d9
 		FrameBufferD3D9()
 			: m_hwnd(NULL)
 			, m_denseIdx(UINT16_MAX)
-			, m_num(0)
 			, m_needResolve(0)
+			, m_num(0)
+			, m_numTh(0)
+			, m_dsIdx(UINT8_MAX)
 		{
-			m_depthHandle.idx = invalidHandle;
 		}
 
-		void create(uint8_t _num, const TextureHandle* _handles);
+		void create(uint8_t _num, const Attachment* _attachment);
 		void create(uint16_t _denseIdx, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat);
 		uint16_t destroy();
 		HRESULT present();
@@ -388,18 +399,18 @@ namespace bgfx { namespace d3d9
 		void postReset();
 		void createNullColorRT();
 
-		IDirect3DSurface9* m_color[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
-		IDirect3DSurface9* m_depthStencil;
+		IDirect3DSurface9* m_surface[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
 		IDirect3DSwapChain9* m_swapChain;
 		HWND m_hwnd;
 		uint32_t m_width;
 		uint32_t m_height;
 
-		TextureHandle m_colorHandle[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
-		TextureHandle m_depthHandle;
+		Attachment m_attachment[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
 		uint16_t m_denseIdx;
-		uint8_t m_num;
 		bool m_needResolve;
+		uint8_t m_num;
+		uint8_t m_numTh;
+		uint8_t m_dsIdx;
 	};
 
 	struct TimerQueryD3D9

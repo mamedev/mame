@@ -58,10 +58,10 @@
  @88      HD38820A  1984, Bandai Pair Match (PT-460) (1/2)
  @89      HD38820A  1984, Bandai Pair Match (PT-460) (2/2)
 
- *75      HD44801A  1982, Alpha 8201 protection MCU (have dump)
+  75      HD44801A  1982, Alpha 8201 protection MCU -> machine/alpha8201.*
 
- *35      HD44801B  1983, Alpha 8302 protection MCU (have dump)
- *42      HD44801B  1984, Alpha 8303 protection MCU (have dump)
+  35      HD44801B  1983, Alpha 8302 protection MCU (see 8201)
+  42      HD44801B  1984, Alpha 8303 protection MCU (see 8201)
 
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
@@ -94,7 +94,7 @@
 class hh_hmcs40_state : public driver_device
 {
 public:
-	hh_hmcs40_state(const machine_config &mconfig, device_type type, std::string tag)
+	hh_hmcs40_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -138,7 +138,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
-	void display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety);
+	void display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;
@@ -267,7 +267,7 @@ void hh_hmcs40_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety)
+void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
@@ -276,9 +276,12 @@ void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT64 setx, UINT32 set
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (U64(1) << maxx)) : 0;
 
-	display_update();
+	if (update)
+		display_update();
 }
 
+
+// generic input handlers
 
 UINT16 hh_hmcs40_state::read_inputs(int columns)
 {
@@ -330,7 +333,7 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
 /***************************************************************************
 
   Bambino Dribble Away Basketball (manufactured in Japan)
-  * PCBs are labeled Emix Corp. ET-05
+  * PCB label Emix Corp. ET-05
   * Hitachi HD38750A08 MCU
   * green VFD display Emix-106, with bezel overlay
 
@@ -341,7 +344,7 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
 class bambball_state : public hh_hmcs40_state
 {
 public:
-	bambball_state(const machine_config &mconfig, device_type type, std::string tag)
+	bambball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -440,7 +443,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Bambino Knock-Em Out Boxing
-  * PCBs are labeled Emix Corp. ET-06B
+  * PCB label Emix Corp. ET-06B
   * Hitachi HD38750A07 MCU
   * cyan VFD display Emix-103, with blue or green color overlay
 
@@ -451,7 +454,7 @@ MACHINE_CONFIG_END
 class bmboxing_state : public hh_hmcs40_state
 {
 public:
-	bmboxing_state(const machine_config &mconfig, device_type type, std::string tag)
+	bmboxing_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -574,7 +577,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Bandai Frisky Tom (manufactured in Japan)
-  * PCBs are labeled Kaken Corp., PT-327A
+  * PCB label Kaken Corp., PT-327A
   * Hitachi HD38800A77 MCU
   * cyan/red/green VFD display Futaba DM-43ZK 2E
 
@@ -585,7 +588,7 @@ MACHINE_CONFIG_END
 class bfriskyt_state : public hh_hmcs40_state
 {
 public:
-	bfriskyt_state(const machine_config &mconfig, device_type type, std::string tag)
+	bfriskyt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -661,7 +664,7 @@ static INPUT_PORTS_START( bfriskyt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, bfriskyt_state, input_changed, NULL)
 
 	PORT_START("IN.5") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(bfriskyt_state::input_changed)
@@ -713,7 +716,7 @@ MACHINE_CONFIG_END
 class packmon_state : public hh_hmcs40_state
 {
 public:
-	packmon_state(const machine_config &mconfig, device_type type, std::string tag)
+	packmon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -804,7 +807,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Bandai/Mattel Star Hawk (manufactured in Japan)
-  * PCBs are labeled Kaken, PT-317B
+  * PCB label Kaken, PT-317B
   * Hitachi HD38800A73 MCU
   * cyan/red VFD display Futaba DM-41ZK, with partial color overlay + bezel
 
@@ -822,7 +825,7 @@ MACHINE_CONFIG_END
 class msthawk_state : public hh_hmcs40_state
 {
 public:
-	msthawk_state(const machine_config &mconfig, device_type type, std::string tag)
+	msthawk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -948,7 +951,7 @@ MACHINE_CONFIG_END
 class bzaxxon_state : public hh_hmcs40_state
 {
 public:
-	bzaxxon_state(const machine_config &mconfig, device_type type, std::string tag)
+	bzaxxon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1016,7 +1019,7 @@ static INPUT_PORTS_START( bzaxxon )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, bzaxxon_state, input_changed, NULL)
 
 	PORT_START("IN.4") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.5") // port D
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SELECT )
@@ -1066,7 +1069,7 @@ MACHINE_CONFIG_END
 class zackman_state : public hh_hmcs40_state
 {
 public:
-	zackman_state(const machine_config &mconfig, device_type type, std::string tag)
+	zackman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1183,7 +1186,7 @@ MACHINE_CONFIG_END
 class bpengo_state : public hh_hmcs40_state
 {
 public:
-	bpengo_state(const machine_config &mconfig, device_type type, std::string tag)
+	bpengo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1309,7 +1312,7 @@ MACHINE_CONFIG_END
 class bbtime_state : public hh_hmcs40_state
 {
 public:
-	bbtime_state(const machine_config &mconfig, device_type type, std::string tag)
+	bbtime_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1431,7 +1434,7 @@ MACHINE_CONFIG_END
 class bdoramon_state : public hh_hmcs40_state
 {
 public:
-	bdoramon_state(const machine_config &mconfig, device_type type, std::string tag)
+	bdoramon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1470,7 +1473,7 @@ WRITE16_MEMBER(bdoramon_state::grid_w)
 
 static INPUT_PORTS_START( bdoramon )
 	PORT_START("IN.0") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.1") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)1)
@@ -1527,7 +1530,7 @@ MACHINE_CONFIG_END
 class bultrman_state : public hh_hmcs40_state
 {
 public:
-	bultrman_state(const machine_config &mconfig, device_type type, std::string tag)
+	bultrman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1566,7 +1569,7 @@ WRITE16_MEMBER(bultrman_state::grid_w)
 
 static INPUT_PORTS_START( bultrman )
 	PORT_START("IN.0") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.1") // port D
 	PORT_CONFNAME( 0x0010, 0x0000, "Factory Test" )
@@ -1615,7 +1618,7 @@ MACHINE_CONFIG_END
 class machiman_state : public hh_hmcs40_state
 {
 public:
-	machiman_state(const machine_config &mconfig, device_type type, std::string tag)
+	machiman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1655,7 +1658,7 @@ WRITE16_MEMBER(machiman_state::grid_w)
 
 static INPUT_PORTS_START( machiman )
 	PORT_START("IN.0") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.1") // port D
 	PORT_BIT( 0x3fff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1707,7 +1710,7 @@ MACHINE_CONFIG_END
 class pairmtch_state : public hh_hmcs40_state
 {
 public:
-	pairmtch_state(const machine_config &mconfig, device_type type, std::string tag)
+	pairmtch_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1857,7 +1860,7 @@ MACHINE_CONFIG_END
 class alnattck_state : public hh_hmcs40_state
 {
 public:
-	alnattck_state(const machine_config &mconfig, device_type type, std::string tag)
+	alnattck_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -1966,7 +1969,7 @@ MACHINE_CONFIG_END
 class cdkong_state : public hh_hmcs40_state
 {
 public:
-	cdkong_state(const machine_config &mconfig, device_type type, std::string tag)
+	cdkong_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -2030,7 +2033,7 @@ WRITE16_MEMBER(cdkong_state::grid_w)
 
 static INPUT_PORTS_START( cdkong )
 	PORT_START("IN.0") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.1") // port D
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
@@ -2098,7 +2101,7 @@ MACHINE_CONFIG_END
 class cgalaxn_state : public hh_hmcs40_state
 {
 public:
-	cgalaxn_state(const machine_config &mconfig, device_type type, std::string tag)
+	cgalaxn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -2166,7 +2169,7 @@ static INPUT_PORTS_START( cgalaxn )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.3") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)1)
@@ -2229,7 +2232,7 @@ MACHINE_CONFIG_END
 class cpacman_state : public hh_hmcs40_state
 {
 public:
-	cpacman_state(const machine_config &mconfig, device_type type, std::string tag)
+	cpacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -2343,7 +2346,7 @@ MACHINE_CONFIG_END
 class cmspacmn_state : public hh_hmcs40_state
 {
 public:
-	cmspacmn_state(const machine_config &mconfig, device_type type, std::string tag)
+	cmspacmn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -2450,7 +2453,7 @@ MACHINE_CONFIG_END
 class egalaxn2_state : public hh_hmcs40_state
 {
 public:
-	egalaxn2_state(const machine_config &mconfig, device_type type, std::string tag)
+	egalaxn2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -2572,7 +2575,7 @@ MACHINE_CONFIG_END
 class epacman2_state : public egalaxn2_state
 {
 public:
-	epacman2_state(const machine_config &mconfig, device_type type, std::string tag)
+	epacman2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: egalaxn2_state(mconfig, type, tag)
 	{ }
 };
@@ -2620,7 +2623,7 @@ INPUT_PORTS_END
   Entex Turtles (manufactured in Japan)
   * PCB label 560359
   * Hitachi QFP HD38820A43 MCU
-  * COP411L sub MCU, labeled COP411L-KED/N
+  * COP411L sub MCU, label COP411L-KED/N
   * cyan/red/green VFD display NEC FIP15BM32T
 
   NOTE!: MAME external artwork is required
@@ -2630,7 +2633,7 @@ INPUT_PORTS_END
 class eturtles_state : public hh_hmcs40_state
 {
 public:
-	eturtles_state(const machine_config &mconfig, device_type type, std::string tag)
+	eturtles_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag),
 		m_cop_irq(0)
 	{ }
@@ -2785,7 +2788,7 @@ static MACHINE_CONFIG_START( eturtles, eturtles_state )
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(eturtles_state, grid_w))
 
 	MCFG_CPU_ADD("audiocpu", COP411, 215000) // approximation
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED) // guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_SK_CB(WRITELINE(eturtles_state, speaker_w))
 	MCFG_COP400_WRITE_D_CB(WRITE8(eturtles_state, cop_irq_w))
 	MCFG_COP400_READ_L_CB(READ8(eturtles_state, cop_latch_r))
@@ -2811,7 +2814,7 @@ MACHINE_CONFIG_END
   Entex Stargate (manufactured in Japan)
   * PCB label 5603521/31
   * Hitachi QFP HD38820A42 MCU
-  * COP411L sub MCU, labeled ~/B8236 COP411L-KEC/N
+  * COP411L sub MCU, label ~/B8236 COP411L-KEC/N
   * cyan/red/green VFD display NEC FIP15AM32T (EL628-003) no. 2-421, with partial color overlay
 
   NOTE!: MAME external artwork is required
@@ -2821,7 +2824,7 @@ MACHINE_CONFIG_END
 class estargte_state : public eturtles_state
 {
 public:
-	estargte_state(const machine_config &mconfig, device_type type, std::string tag)
+	estargte_state(const machine_config &mconfig, device_type type, const char *tag)
 		: eturtles_state(mconfig, type, tag)
 	{ }
 
@@ -2892,7 +2895,7 @@ static MACHINE_CONFIG_START( estargte, estargte_state )
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(eturtles_state, grid_w))
 
 	MCFG_CPU_ADD("audiocpu", COP411, 190000) // approximation
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED) // guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_SK_CB(WRITELINE(eturtles_state, speaker_w))
 	MCFG_COP400_WRITE_D_CB(WRITE8(eturtles_state, cop_irq_w))
 	MCFG_COP400_READ_L_CB(READ8(estargte_state, cop_data_r))
@@ -2929,7 +2932,7 @@ MACHINE_CONFIG_END
 class ghalien_state : public hh_hmcs40_state
 {
 public:
-	ghalien_state(const machine_config &mconfig, device_type type, std::string tag)
+	ghalien_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3043,7 +3046,7 @@ MACHINE_CONFIG_END
 class gckong_state : public hh_hmcs40_state
 {
 public:
-	gckong_state(const machine_config &mconfig, device_type type, std::string tag)
+	gckong_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3111,7 +3114,7 @@ static INPUT_PORTS_START( gckong )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, gckong_state, input_changed, NULL)
 
 	PORT_START("IN.4") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.5") // port D
 	PORT_CONFNAME( 0x0010, 0x0000, "Skill Level" )
@@ -3164,7 +3167,7 @@ MACHINE_CONFIG_END
 class gdigdug_state : public hh_hmcs40_state
 {
 public:
-	gdigdug_state(const machine_config &mconfig, device_type type, std::string tag)
+	gdigdug_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3234,7 +3237,7 @@ static INPUT_PORTS_START( gdigdug )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gdigdug_state, input_changed, NULL)
 
 	PORT_START("IN.5") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(gdigdug_state::input_changed)
@@ -3287,7 +3290,7 @@ MACHINE_CONFIG_END
 class mwcbaseb_state : public hh_hmcs40_state
 {
 public:
-	mwcbaseb_state(const machine_config &mconfig, device_type type, std::string tag)
+	mwcbaseb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3400,8 +3403,7 @@ static INPUT_PORTS_START( mwcbaseb )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("P1 1")
 INPUT_PORTS_END
 
-
-static const INT16 mwcbaseb_speaker_levels[] = { 0, 16384, -16384, 0, -16384, 0, -32768, -16384 };
+static const INT16 mwcbaseb_speaker_levels[] = { 0, 0x3fff, -0x4000, 0, -0x4000, 0, -0x8000, -0x4000 };
 
 static MACHINE_CONFIG_START( mwcbaseb, mwcbaseb_state )
 
@@ -3443,7 +3445,7 @@ MACHINE_CONFIG_END
 class pbqbert_state : public hh_hmcs40_state
 {
 public:
-	pbqbert_state(const machine_config &mconfig, device_type type, std::string tag)
+	pbqbert_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3518,7 +3520,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy Kingman (manufactured in Japan)
-  * PCBs are labeled THF-01II 2E138E01/2E128E02
+  * PCB label THF-01II 2E138E01/2E128E02
   * Hitachi HD38800B23 MCU
   * cyan/red/blue VFD display Futaba DM-65ZK 3A
 
@@ -3529,7 +3531,7 @@ MACHINE_CONFIG_END
 class kingman_state : public hh_hmcs40_state
 {
 public:
-	kingman_state(const machine_config &mconfig, device_type type, std::string tag)
+	kingman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3637,7 +3639,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Tron (manufactured in Japan)
-  * PCBs are labeled THN-02 2E114E07
+  * PCB label THN-02 2E114E07
   * Hitachi HD38800A88 MCU
   * cyan/red/green VFD display NEC FIP10AM24T no. 2-8 1
 
@@ -3648,7 +3650,7 @@ MACHINE_CONFIG_END
 class tmtron_state : public hh_hmcs40_state
 {
 public:
-	tmtron_state(const machine_config &mconfig, device_type type, std::string tag)
+	tmtron_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -3721,7 +3723,7 @@ static INPUT_PORTS_START( tmtron )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_CHANGED_MEMBER(DEVICE_SELF, tmtron_state, input_changed, NULL)
 
 	PORT_START("IN.4") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(tmtron_state::input_changed)
@@ -3771,7 +3773,7 @@ MACHINE_CONFIG_END
 class vinvader_state : public hh_hmcs40_state
 {
 public:
-	vinvader_state(const machine_config &mconfig, device_type type, std::string tag)
+	vinvader_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
@@ -4087,8 +4089,8 @@ CONS( 1981, packmon,   0,        0, packmon,  packmon,  driver_device, 0, "Banda
 CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  driver_device, 0, "Bandai (Mattel license)", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, bzaxxon,   0,        0, bzaxxon,  bzaxxon,  driver_device, 0, "Bandai", "Zaxxon (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
 CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Bandai", "Zackman", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, bpengo,    0,        0, bpengo,   bpengo,   driver_device, 0, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
-CONS( 1983, bbtime,    0,        0, bbtime,   bbtime,   driver_device, 0, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1983, bpengo,    0,        0, bpengo,   bpengo,   driver_device, 0, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, bbtime,    0,        0, bbtime,   bbtime,   driver_device, 0, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1983, bdoramon,  0,        0, bdoramon, bdoramon, driver_device, 0, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1983, bultrman,  0,        0, bultrman, bultrman, driver_device, 0, "Bandai", "Ultra Man (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
 CONS( 1984, machiman,  0,        0, machiman, machiman, driver_device, 0, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

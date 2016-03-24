@@ -349,7 +349,8 @@ WRITE8_MEMBER( c1p_state::osi630_ctrl_w )
 
 WRITE8_MEMBER( c1p_state::osi630_sound_w )
 {
-	if (data) m_beep->set_frequency(49152 / data);
+	if (data != 0)
+		m_beep->set_clock(49152 / data);
 }
 
 /* Disk Drive */
@@ -788,7 +789,7 @@ static MACHINE_CONFIG_START( c1p, c1p_state )
 	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
 	MCFG_DISCRETE_INTF(osi600c_discrete_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
@@ -885,7 +886,7 @@ void sb2m600_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_SETUP_BEEP:
 		m_beeper->set_state(0);
-		m_beeper->set_frequency(300);
+		m_beeper->set_clock(300);
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in sb2m600_state::device_timer");

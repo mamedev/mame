@@ -73,7 +73,7 @@ class necdsp_device : public cpu_device
 {
 protected:
 	// construction/destruction
-	necdsp_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name, std::string shortname, std::string source);
+	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name, const char *shortname, const char *source);
 
 public:
 
@@ -213,14 +213,14 @@ class upd7725_device : public necdsp_device
 {
 public:
 	// construction/destruction
-	upd7725_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	upd7725_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class upd96050_device : public necdsp_device
 {
 public:
 	// construction/destruction
-	upd96050_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	UINT16 dataram_r(UINT16 addr) { return dataRAM[addr]; }
 	void dataram_w(UINT16 addr, UINT16 data) { dataRAM[addr] = data; }

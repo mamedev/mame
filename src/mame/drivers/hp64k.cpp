@@ -169,7 +169,7 @@
 class hp64k_state : public driver_device
 {
 public:
-		hp64k_state(const machine_config &mconfig, device_type type, std::string tag);
+		hp64k_state(const machine_config &mconfig, device_type type, const char *tag);
 
 		virtual void driver_start() override;
 		//virtual void machine_start();
@@ -347,7 +347,7 @@ static ADDRESS_MAP_START(cpu_io_map , AS_IO , 16 , hp64k_state)
 		AM_RANGE(HP_MAKE_IOADDR(12 , 0) , HP_MAKE_IOADDR(12 , 3)) AM_WRITE(hp64k_irl_mask_w)
 ADDRESS_MAP_END
 
-hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, std::string tag)
+hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig , type , tag),
 		m_cpu(*this , "cpu"),
 		m_crtc(*this , "crtc"),
@@ -1350,11 +1350,11 @@ static MACHINE_CONFIG_START(hp64k , hp64k_state)
 				MCFG_I8275_DRQ_CALLBACK(WRITELINE(hp64k_state , hp64k_crtc_drq_w))
 				MCFG_I8275_VRTC_CALLBACK(WRITELINE(hp64k_state , hp64k_crtc_vrtc_w))
 
-				MCFG_SCREEN_ADD("screen" , RASTER)
+				MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 				MCFG_SCREEN_UPDATE_DEVICE("crtc" , i8275_device , screen_update)
 				MCFG_SCREEN_REFRESH_RATE(60)
 				MCFG_SCREEN_SIZE(720 , 390)
-				MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
+				MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 				MCFG_FD1791_ADD("fdc" , XTAL_4MHz / 4)
 				MCFG_WD_FDC_FORCE_READY

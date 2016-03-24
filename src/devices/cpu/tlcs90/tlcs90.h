@@ -25,7 +25,7 @@ class tlcs90_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tlcs90_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, address_map_constructor program_map);
+	tlcs90_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, address_map_constructor program_map);
 
 	DECLARE_READ8_MEMBER( t90_internal_registers_r );
 	DECLARE_WRITE8_MEMBER( t90_internal_registers_w );
@@ -145,7 +145,7 @@ class tmp90840_device : public tlcs90_device
 {
 public:
 	// construction/destruction
-	tmp90840_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tmp90840_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -153,7 +153,7 @@ class tmp90841_device : public tlcs90_device
 {
 public:
 	// construction/destruction
-	tmp90841_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tmp90841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -161,7 +161,7 @@ class tmp91640_device : public tlcs90_device
 {
 public:
 	// construction/destruction
-	tmp91640_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tmp91640_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -169,7 +169,7 @@ class tmp91641_device : public tlcs90_device
 {
 public:
 	// construction/destruction
-	tmp91641_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tmp91641_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

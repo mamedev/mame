@@ -227,7 +227,6 @@ void render_primitive::reset()
 //-------------------------------------------------
 
 render_primitive_list::render_primitive_list()
-	: m_lock(osd_lock_alloc())
 {
 }
 
@@ -239,7 +238,6 @@ render_primitive_list::render_primitive_list()
 render_primitive_list::~render_primitive_list()
 {
 	release_all();
-	osd_lock_free(m_lock);
 }
 
 
@@ -296,10 +294,8 @@ inline render_primitive *render_primitive_list::alloc(render_primitive::primitiv
 void render_primitive_list::release_all()
 {
 	// release all the live items while under the lock
-	acquire_lock();
 	m_primitive_allocator.reclaim_all(m_primlist);
 	m_reference_allocator.reclaim_all(m_reflist);
-	release_lock();
 }
 
 
@@ -446,7 +442,7 @@ void render_texture::hq_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const 
 //  get_scaled - get a scaled bitmap (if we can)
 //-------------------------------------------------
 
-void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist)
+void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, UINT32 flags)
 {
 	// source width/height come from the source bounds
 	int swidth = m_sbounds.width();
@@ -681,7 +677,7 @@ void render_container::add_char(float x0, float y0, float height, float aspect, 
 	// add it like a quad
 	item &newitem = add_generic(CONTAINER_ITEM_QUAD, bounds.x0, bounds.y0, bounds.x1, bounds.y1, argb);
 	newitem.m_texture = texture;
-	newitem.m_flags = PRIMFLAG_TEXORIENT(ROT0) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
+	newitem.m_flags = PRIMFLAG_TEXORIENT(ROT0) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE;
 	newitem.m_internal = INTERNAL_FLAG_CHAR;
 }
 
@@ -935,6 +931,15 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 	m_base_layerconfig.set_marquees_enabled(manager.machine().options().use_marquees());
 	m_base_layerconfig.set_zoom_to_screen(manager.machine().options().artwork_crop());
 
+	// aspect and scale options
+	m_keepaspect = (manager.machine().options().keep_aspect() && !(flags & RENDER_CREATE_HIDDEN));
+	m_int_scale_x = manager.machine().options().int_scale_x();
+	m_int_scale_y = manager.machine().options().int_scale_y();
+	if (manager.machine().options().uneven_stretch() && !manager.machine().options().uneven_stretch_x())
+		m_scale_mode = SCALE_FRACTIONAL;
+	else
+		m_scale_mode = manager.machine().options().uneven_stretch_x()? SCALE_FRACTIONAL_X : SCALE_INTEGER;
+
 	// determine the base orientation based on options
 	if (!manager.machine().options().rotate())
 		m_base_orientation = orientation_reverse(manager.machine().system().flags & ORIENTATION_MASK);
@@ -1009,7 +1014,7 @@ void render_target::set_bounds(INT32 width, INT32 height, float pixel_aspect)
 	m_bounds.x0 = m_bounds.y0 = 0;
 	m_bounds.x1 = (float)width;
 	m_bounds.y1 = (float)height;
-	m_pixel_aspect = pixel_aspect;
+	m_pixel_aspect = pixel_aspect != 0.0? pixel_aspect : 1.0;
 }
 
 
@@ -1055,8 +1060,9 @@ int render_target::configured_view(const char *viewname, int targetindex, int nu
 	if (strcmp(viewname, "auto") != 0)
 	{
 		// scan for a matching view name
+		size_t viewlen = strlen(viewname);
 		for (view = view_by_index(viewindex = 0); view != nullptr; view = view_by_index(++viewindex))
-			if (core_strnicmp(view->name(), viewname, strlen(viewname)) == 0)
+			if (core_strnicmp(view->name(), viewname, viewlen) == 0)
 				break;
 	}
 
@@ -1143,41 +1149,87 @@ const render_screen_list &render_target::view_screens(int viewindex)
 
 void render_target::compute_visible_area(INT32 target_width, INT32 target_height, float target_pixel_aspect, int target_orientation, INT32 &visible_width, INT32 &visible_height)
 {
-	float width, height;
-	float scale;
-
-	// constrained case
-	if (target_pixel_aspect != 0.0f)
+	switch (m_scale_mode)
 	{
-		// start with the aspect ratio of the square pixel layout
-		width = m_curview->effective_aspect(m_layerconfig);
-		height = 1.0f;
+		case SCALE_FRACTIONAL:
+		{
+			float width, height;
+			float scale;
 
-		// first apply target orientation
-		if (target_orientation & ORIENTATION_SWAP_XY)
-			FSWAP(width, height);
+			// constrained case
+			if (m_keepaspect)
+			{
+				// start with the aspect ratio of the square pixel layout
+				width = m_curview->effective_aspect(m_layerconfig);
+				height = 1.0f;
 
-		// apply the target pixel aspect ratio
-		height *= target_pixel_aspect;
+				// first apply target orientation
+				if (target_orientation & ORIENTATION_SWAP_XY)
+					FSWAP(width, height);
 
-		// based on the height/width ratio of the source and target, compute the scale factor
-		if (width / height > (float)target_width / (float)target_height)
-			scale = (float)target_width / width;
-		else
-			scale = (float)target_height / height;
+				// apply the target pixel aspect ratio
+				height *= target_pixel_aspect;
+
+				// based on the height/width ratio of the source and target, compute the scale factor
+				if (width / height > (float)target_width / (float)target_height)
+					scale = (float)target_width / width;
+				else
+					scale = (float)target_height / height;
+			}
+
+			// stretch-to-fit case
+			else
+			{
+				width = (float)target_width;
+				height = (float)target_height;
+				scale = 1.0f;
+			}
+
+			// set the final width/height
+			visible_width = render_round_nearest(width * scale);
+			visible_height = render_round_nearest(height * scale);
+			break;
+		}
+
+		case SCALE_FRACTIONAL_X:
+		case SCALE_INTEGER:
+		{
+			// get source size and aspect
+			INT32 src_width, src_height;
+			compute_minimum_size(src_width, src_height);
+			float src_aspect = m_curview->effective_aspect(m_layerconfig);
+
+			// apply orientation if required
+			if (target_orientation & ORIENTATION_SWAP_XY)
+				src_aspect = 1.0 / src_aspect;
+	
+			// get destination size and aspect
+			float dest_width = (float)target_width;
+			float dest_height = (float)target_height;
+			float dest_aspect = dest_width / dest_height * target_pixel_aspect;
+
+			// apply aspect correction to destination rectangle
+			if (dest_aspect > src_aspect)
+				dest_width *= m_keepaspect? src_aspect / dest_aspect : 1.0f;
+			else
+				dest_height *= m_keepaspect? dest_aspect / src_aspect : 1.0f;
+
+			// compute scale factors
+			float xscale = dest_width / src_width;
+			float yscale = dest_height / src_height;
+			xscale = dest_aspect >= 1.0f && m_scale_mode == SCALE_FRACTIONAL_X? xscale : MAX(1, render_round_nearest(xscale));
+			yscale = dest_aspect < 1.0f && m_scale_mode == SCALE_FRACTIONAL_X? yscale : MAX(1, render_round_nearest(yscale));
+
+			// check if we have user defined scale factors, if so use them instead
+			xscale = m_int_scale_x? m_int_scale_x : xscale;
+			yscale = m_int_scale_y? m_int_scale_y : yscale;
+
+			// set the final width/height
+			visible_width = render_round_nearest(src_width * xscale);
+			visible_height = render_round_nearest(src_height * yscale);
+			break;
+		} 
 	}
-
-	// stretch-to-fit case
-	else
-	{
-		width = (float)target_width;
-		height = (float)target_height;
-		scale = 1.0f;
-	}
-
-	// set the final width/height
-	visible_width = render_round_nearest(width * scale);
-	visible_height = render_round_nearest(height * scale);
 }
 
 
@@ -1591,8 +1643,8 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 
 		// attempt to open the file; bail if we can't
 		emu_file layoutfile(manager().machine().options().art_path(), OPEN_FLAG_READ);
-		file_error filerr = layoutfile.open(fname.c_str());
-		if (filerr != FILERR_NONE)
+		osd_file::error filerr = layoutfile.open(fname.c_str());
+		if (filerr != osd_file::error::NONE)
 			return false;
 
 		// read the file
@@ -1754,34 +1806,44 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					width = MIN(width, m_maxtexwidth);
 					height = MIN(height, m_maxtexheight);
 
-					curitem->texture()->get_scaled(width, height, prim->texture, list);
+					curitem->texture()->get_scaled(width, height, prim->texture, list, curitem->flags());
 
 					// set the palette
 					prim->texture.palette = curitem->texture()->get_adjusted_palette(container);
 
-					// determine UV coordinates and apply clipping
+					// determine UV coordinates
 					prim->texcoords = oriented_texcoords[finalorient];
+
+					// apply clipping
 					clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
 
 					// apply the final orientation from the quad flags and then build up the final flags
-					prim->flags = (curitem->flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) |
-									PRIMFLAG_TEXORIENT(finalorient) |
-									PRIMFLAG_TEXFORMAT(curitem->texture()->format());
-					if (blendmode != -1)
-						prim->flags |= PRIMFLAG_BLENDMODE(blendmode);
-					else
-						prim->flags |= PRIMFLAG_BLENDMODE(PRIMFLAG_GET_BLENDMODE(curitem->flags()));
+					prim->flags = (curitem->flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK))
+						| PRIMFLAG_TEXORIENT(finalorient)
+						| PRIMFLAG_TEXFORMAT(curitem->texture()->format());
+					prim->flags |= blendmode != -1
+						? PRIMFLAG_BLENDMODE(blendmode)
+						: PRIMFLAG_BLENDMODE(PRIMFLAG_GET_BLENDMODE(curitem->flags()));
 				}
 				else
 				{
+					if (curitem->flags() & PRIMFLAG_VECTORBUF_MASK)
+					{
+						// determine UV coordinates
+						prim->texcoords = oriented_texcoords[0];
+					}
+
 					// adjust the color for brightness/contrast/gamma
 					prim->color.r = container.apply_brightness_contrast_gamma_fp(prim->color.r);
 					prim->color.g = container.apply_brightness_contrast_gamma_fp(prim->color.g);
 					prim->color.b = container.apply_brightness_contrast_gamma_fp(prim->color.b);
 
-					// no texture -- set the basic flags
+					// no texture
 					prim->texture.base = nullptr;
-					prim->flags = (curitem->flags() &~ PRIMFLAG_BLENDMODE_MASK) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
+
+					// set the basic flags
+					prim->flags = (curitem->flags() & ~PRIMFLAG_BLENDMODE_MASK)
+						| PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 
 					// apply clipping
 					clipped = render_clip_quad(&prim->bounds, &cliprect, nullptr);
@@ -1857,7 +1919,7 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 
 		// get the scaled texture and append it
 
-		texture->get_scaled(width, height, prim->texture, list);
+		texture->get_scaled(width, height, prim->texture, list, prim->flags);
 
 		// compute the clip rect
 		render_bounds cliprect;
@@ -2521,7 +2583,7 @@ float render_manager::ui_aspect(render_container *rc)
 
 		// if we have a valid pixel aspect, apply that and return
 		if (m_ui_target->pixel_aspect() != 0.0f)
-				return (aspect / m_ui_target->pixel_aspect());
+				aspect /= m_ui_target->pixel_aspect();
 	} else {
 		// single screen container
 

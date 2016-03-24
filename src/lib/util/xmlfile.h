@@ -97,13 +97,13 @@ struct xml_parse_options
 xml_data_node *xml_file_create(void);
 
 /* parse an XML file into its nodes */
-xml_data_node *xml_file_read(core_file *file, xml_parse_options *opts);
+xml_data_node *xml_file_read(util::core_file &file, xml_parse_options *opts);
 
 /* parse an XML string into its nodes */
 xml_data_node *xml_string_read(const char *string, xml_parse_options *opts);
 
 /* write an XML tree to a file */
-void xml_file_write(xml_data_node *node, core_file *file);
+void xml_file_write(xml_data_node *node, util::core_file &file);
 
 /* free an XML file object */
 void xml_file_free(xml_data_node *node);

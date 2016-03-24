@@ -13,7 +13,7 @@ class sega8_mgear_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_mgear_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sega8_mgear_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

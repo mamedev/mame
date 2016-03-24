@@ -131,7 +131,7 @@ enum
 
 inline void am9517a_device::dma_request(int channel, int state)
 {
-	if (LOG) logerror("AM9517A '%s' Channel %u DMA Request: %u\n", tag().c_str(), channel, state);
+	if (LOG) logerror("AM9517A '%s' Channel %u DMA Request: %u\n", tag(), channel, state);
 
 	if (state ^ COMMAND_DREQ_ACTIVE_LOW)
 	{
@@ -317,7 +317,7 @@ inline void am9517a_device::dma_write()
 	case MODE_TRANSFER_VERIFY: {
 		UINT8 v1 = m_in_memr_cb(offset);
 		if(0 && m_temp != v1)
-			logerror("%s: verify error %02x vs. %02x\n", tag().c_str(), m_temp, v1);
+			logerror("%s: verify error %02x vs. %02x\n", tag(), m_temp, v1);
 		break;
 	}
 
@@ -471,7 +471,7 @@ inline void am9517a_device::end_of_process()
 //-------------------------------------------------
 
 
-am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname)
+am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -498,7 +498,7 @@ am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, 
 }
 
 
-am9517a_device::am9517a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AM9517A, "AM9517A", tag, owner, clock, "am9517a", __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -525,7 +525,7 @@ am9517a_device::am9517a_device(const machine_config &mconfig, std::string tag, d
 {
 }
 
-upd71071_v53_device::upd71071_v53_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+upd71071_v53_device::upd71071_v53_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: am9517a_device(mconfig, V53_DMAU, "V53 DMAU", tag, owner, clock, "v53_dmau")
 {
 }
@@ -887,7 +887,7 @@ WRITE8_MEMBER( am9517a_device::write )
 				m_channel[channel].m_address = (m_channel[channel].m_address & 0xff00) | data;
 			}
 
-			if (LOG) logerror("AM9517A '%s' Channel %u Base Address: %04x\n", tag().c_str(), channel, m_channel[channel].m_base_address);
+			if (LOG) logerror("AM9517A '%s' Channel %u Base Address: %04x\n", tag(), channel, m_channel[channel].m_base_address);
 			break;
 
 		case REGISTER_WORD_COUNT:
@@ -902,7 +902,7 @@ WRITE8_MEMBER( am9517a_device::write )
 				m_channel[channel].m_count = (m_channel[channel].m_count & 0xff00) | data;
 			}
 
-			if (LOG) logerror("AM9517A '%s' Channel %u Base Word Count: %04x\n", tag().c_str(), channel, m_channel[channel].m_base_count);
+			if (LOG) logerror("AM9517A '%s' Channel %u Base Word Count: %04x\n", tag(), channel, m_channel[channel].m_base_count);
 			break;
 		}
 
@@ -915,7 +915,7 @@ WRITE8_MEMBER( am9517a_device::write )
 		case REGISTER_COMMAND:
 			m_command = data;
 
-			if (LOG) logerror("AM9517A '%s' Command Register: %02x\n", tag().c_str(), m_command);
+			if (LOG) logerror("AM9517A '%s' Command Register: %02x\n", tag(), m_command);
 			break;
 
 		case REGISTER_REQUEST:
@@ -935,7 +935,7 @@ WRITE8_MEMBER( am9517a_device::write )
 					m_request &= ~(1 << (channel + 4));
 				}
 
-				if (LOG) logerror("AM9517A '%s' Request Register: %01x\n", tag().c_str(), m_request);
+				if (LOG) logerror("AM9517A '%s' Request Register: %01x\n", tag(), m_request);
 			}
 			break;
 
@@ -952,7 +952,7 @@ WRITE8_MEMBER( am9517a_device::write )
 					m_mask &= ~(1 << channel);
 				}
 
-				if (LOG) logerror("AM9517A '%s' Mask Register: %01x\n", tag().c_str(), m_mask);
+				if (LOG) logerror("AM9517A '%s' Mask Register: %01x\n", tag(), m_mask);
 			}
 			break;
 
@@ -965,24 +965,24 @@ WRITE8_MEMBER( am9517a_device::write )
 				// clear terminal count
 				m_status &= ~(1 << channel);
 
-				if (LOG) logerror("AM9517A '%s' Channel %u Mode: %02x\n", tag().c_str(), channel, data & 0xfc);
+				if (LOG) logerror("AM9517A '%s' Channel %u Mode: %02x\n", tag(), channel, data & 0xfc);
 			}
 			break;
 
 		case REGISTER_BYTE_POINTER:
-			if (LOG) logerror("AM9517A '%s' Clear Byte Pointer Flip-Flop\n", tag().c_str());
+			if (LOG) logerror("AM9517A '%s' Clear Byte Pointer Flip-Flop\n", tag());
 
 			m_msb = 0;
 			break;
 
 		case REGISTER_MASTER_CLEAR:
-			if (LOG) logerror("AM9517A '%s' Master Clear\n", tag().c_str());
+			if (LOG) logerror("AM9517A '%s' Master Clear\n", tag());
 
 			device_reset();
 			break;
 
 		case REGISTER_CLEAR_MASK:
-			if (LOG) logerror("AM9517A '%s' Clear Mask Register\n", tag().c_str());
+			if (LOG) logerror("AM9517A '%s' Clear Mask Register\n", tag());
 
 			m_mask = 0;
 			break;
@@ -990,7 +990,7 @@ WRITE8_MEMBER( am9517a_device::write )
 		case REGISTER_MASK:
 			m_mask = data & 0x0f;
 
-			if (LOG) logerror("AM9517A '%s' Mask Register: %01x\n", tag().c_str(), m_mask);
+			if (LOG) logerror("AM9517A '%s' Mask Register: %01x\n", tag(), m_mask);
 			break;
 		}
 	}
@@ -1004,7 +1004,7 @@ WRITE8_MEMBER( am9517a_device::write )
 
 WRITE_LINE_MEMBER( am9517a_device::hack_w )
 {
-	if (LOG) logerror("AM9517A '%s' Hold Acknowledge: %u\n", tag().c_str(), state);
+	if (LOG) logerror("AM9517A '%s' Hold Acknowledge: %u\n", tag(), state);
 
 	m_hack = state;
 	trigger(1);
@@ -1017,7 +1017,7 @@ WRITE_LINE_MEMBER( am9517a_device::hack_w )
 
 WRITE_LINE_MEMBER( am9517a_device::ready_w )
 {
-	if (LOG) logerror("AM9517A '%s' Ready: %u\n", tag().c_str(), state);
+	if (LOG) logerror("AM9517A '%s' Ready: %u\n", tag(), state);
 
 	m_ready = state;
 }
@@ -1029,7 +1029,7 @@ WRITE_LINE_MEMBER( am9517a_device::ready_w )
 
 WRITE_LINE_MEMBER( am9517a_device::eop_w )
 {
-	if (LOG) logerror("AM9517A '%s' End of Process: %u\n", tag().c_str(), state);
+	if (LOG) logerror("AM9517A '%s' End of Process: %u\n", tag(), state);
 }
 
 

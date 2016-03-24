@@ -3,7 +3,7 @@
 /**********************************************************************************************
 
     Texas Instruments TMS6100 Voice Synthesis Memory (VSM)
-    
+
     References:
     - TMS 6100 Voice Synthesis Memory Data Manual
     - TMS 6125 Voice Synthesis Memory Data Manual
@@ -27,7 +27,7 @@
 
 const device_type TMS6100 = &device_creator<tms6100_device>;
 
-tms6100_device::tms6100_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+tms6100_device::tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_rom(*this, DEVICE_SELF),
 	m_reverse_bits(false),
@@ -35,7 +35,7 @@ tms6100_device::tms6100_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-tms6100_device::tms6100_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tms6100_device::tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS6100, "TMS6100", tag, owner, clock, "tms6100", __FILE__),
 	m_rom(*this, DEVICE_SELF),
 	m_reverse_bits(false),
@@ -45,7 +45,7 @@ tms6100_device::tms6100_device(const machine_config &mconfig, std::string tag, d
 
 const device_type M58819 = &device_creator<m58819_device>;
 
-m58819_device::m58819_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+m58819_device::m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms6100_device(mconfig, M58819, "M58819S", tag, owner, clock, "m58819s", __FILE__)
 {
 }
@@ -147,11 +147,11 @@ WRITE_LINE_MEMBER(tms6100_device::clk_w)
 			UINT8 m = m_m1 << 1 | m_m0;
 			if ((m & ~m_prev_m & 1) || (m & ~m_prev_m & 2))
 				handle_command(m);
-			
+
 			m_prev_m = m;
 		}
 	}
-	
+
 	m_clk = (state) ? 1 : 0;
 }
 
@@ -190,7 +190,7 @@ void tms6100_device::handle_command(UINT8 cmd)
 					// or shift(rotate) right
 					m_sa = (m_sa >> 1) | (m_sa << 7 & 0x80);
 				}
-				
+
 				// output to DATA pin(s)
 				if (!m_4bit_mode)
 				{
@@ -205,16 +205,16 @@ void tms6100_device::handle_command(UINT8 cmd)
 					else
 						m_data = m_sa & 0xf;
 				}
-				
+
 				// 8 bits in 1-bit mode, otherwise 2 nybbles
 				m_count = (m_count + 1) & (m_4bit_mode ? 1 : 7);
-				
+
 				// TB8
 				if (m_count == 0)
 					m_address++; // CS bits too
 			}
 			break;
-		
+
 		// LA: load address
 		case M_LA:
 			if (m_prev_cmd == M_TB)
@@ -232,7 +232,7 @@ void tms6100_device::handle_command(UINT8 cmd)
 					const UINT8 shift = 4 * (m_count+1);
 					m_address = (m_address & ~(0xf << shift)) | (m_add << shift);
 				}
-				
+
 				m_count = (m_count + 1) & 7;
 			}
 			break;
@@ -251,10 +251,10 @@ void tms6100_device::handle_command(UINT8 cmd)
 				m_address = (m_address & ~0x3fff) | (rb & 0x3fff);
 			}
 			break;
-		
+
 		default:
 			break;
 	}
-	
+
 	m_prev_cmd = cmd;
 }

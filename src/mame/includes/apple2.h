@@ -125,7 +125,7 @@ struct apple2_memmap_config
 class apple2_state : public driver_device
 {
 public:
-	apple2_state(const machine_config &mconfig, device_type type, std::string tag)
+	apple2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),

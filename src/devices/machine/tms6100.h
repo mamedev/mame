@@ -56,7 +56,7 @@
        DATA/ADD8 | 6    11 |  CS          NC        | 6    11 |  /CS
        NC        | 7    10 |  M1          NC        | 7    10 |  M1
        M0        | 8     9 |  VSS         M0        | 8     9 |  VSS
-                 +---------+                        +---------+         
+                 +---------+                        +---------+
 
 
     Mitsubishi M58819S EPROM Interface:
@@ -94,8 +94,8 @@
 class tms6100_device : public device_t
 {
 public:
-	tms6100_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	tms6100_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	static void enable_4bit_mode(device_t &device) { downcast<tms6100_device &>(device).m_4bit_mode = true; }
 
@@ -112,14 +112,14 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	
+
 	void handle_command(UINT8 cmd);
 
 	// internal state
 	required_region_ptr<UINT8> m_rom;
 	bool m_reverse_bits;
 	bool m_4bit_mode;
-	
+
 	UINT32 m_rommask;
 	UINT32 m_address;   // internal address + chipselect
 	UINT8 m_sa;         // romdata shift register
@@ -140,7 +140,7 @@ protected:
 class m58819_device : public tms6100_device
 {
 public:
-	m58819_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides

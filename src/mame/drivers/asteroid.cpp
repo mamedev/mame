@@ -772,6 +772,23 @@ ROM_START( asteroidb )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
 
+/*  Space Rocks (J.Estevez, Barcelona).
+    Seems to be a legit spanish set, since there are documented cabs
+    registered in Spain.
+*/
+ROM_START( spcrocks )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "1.bin", 0x6800, 0x0800, CRC(0cc75459) SHA1(2af85c9689b878155004da47fedbde5853a18723) )
+	ROM_LOAD( "2.bin", 0x7000, 0x0800, CRC(096ed35c) SHA1(064d680ded7f30c543f93ae5ca85f90d550f73e5) )
+	ROM_LOAD( "3.bin", 0x7800, 0x0800, CRC(b912754d) SHA1(d4ada3e162ff454a48468f6309947276df0c5331) )
+	/* Vector ROM */
+	ROM_LOAD( "e.bin",  0x5000, 0x0800, CRC(148ef465) SHA1(4b1158112364bc55b8aab4127949f9238c36b238) )
+
+	/* DVG PROM */
+	ROM_REGION( 0x100, "user1", 0 )
+	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, BAD_DUMP CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) ) // still undumped.
+ROM_END
+
 ROM_START( aerolitos )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "2516_1e.bin", 0x6800, 0x0800, CRC(0cc75459) SHA1(2af85c9689b878155004da47fedbde5853a18723) )
@@ -994,7 +1011,6 @@ ROM_START( llandert )
 ROM_END
 
 
-
 /*************************************
  *
  *  Driver initialization
@@ -1013,6 +1029,7 @@ DRIVER_INIT_MEMBER(asteroid_state,asterock)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2007, read8_delegate(FUNC(asteroid_state::asterock_IN0_r),this));
 }
 
+
 /*************************************
  *
  *  Game drivers
@@ -1023,6 +1040,7 @@ GAME( 1979, asteroid,  0,         asteroid,  asteroid,  driver_device,  0,      
 GAME( 1979, asteroid2, asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "Atari",   "Asteroids (rev 2)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1979, asteroid1, asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "Atari",   "Asteroids (rev 1)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1979, asteroidb, asteroid,  asteroid,  asteroidb, asteroid_state, asteroidb, ROT0, "bootleg", "Asteroids (bootleg on Lunar Lander hardware)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1981, spcrocks,  asteroid,  asteroid,  aerolitos, driver_device,  0,         ROT0, "J.Estevez (Barcelona)", "Space Rocks (Spanish clone of Asteroids)",        MACHINE_SUPPORTS_SAVE ) // Space Rocks seems to be a legit set. Cabinet registered to 'J.Estevez (Barcelona).
 GAME( 1980, aerolitos, asteroid,  asteroid,  aerolitos, driver_device,  0,         ROT0, "bootleg (Rodmar Elec.)","Aerolitos (Spanish bootleg of Asteroids)",        MACHINE_SUPPORTS_SAVE ) // 'Aerolitos' appears on the cabinet, this was distributed in Spain, the Spanish text is different to that contained in the original version (corrected)
 GAME( 1979, asterock,  asteroid,  asterock,  asterock,  asteroid_state, asterock,  ROT0, "bootleg (Sidam)",       "Asterock (Sidam bootleg of Asteroids)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1979, asterockv, asteroid,  asterock,  asterock,  asteroid_state, asterock,  ROT0, "bootleg (Videotron)",   "Asterock (Videotron bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )

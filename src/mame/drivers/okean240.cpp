@@ -65,7 +65,7 @@ public:
 		TIMER_OKEAN_BOOT
 	};
 
-	okean240_state(const machine_config &mconfig, device_type type, std::string tag)
+	okean240_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_term_data(0),
 		m_j(0),
@@ -488,7 +488,7 @@ static MACHINE_CONFIG_START( okean240t, okean240_state )
 	MCFG_SCREEN_UPDATE_DRIVER(okean240_state, screen_update_okean240)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(okean240_state, kbd_put))

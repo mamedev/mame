@@ -15,7 +15,7 @@
 class gf4500_device : public device_t
 {
 public:
-	gf4500_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	gf4500_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~gf4500_device() {}
 
 

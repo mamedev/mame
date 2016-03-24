@@ -6,11 +6,11 @@
 class st0020_device : public device_t
 {
 public:
-	st0020_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, std::string tag);
-	static void static_set_palette_tag(device_t &device, std::string tag);
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_is_st0032(device_t &device, int is_st0032);
 	static void set_is_jclub2o(device_t &device, int is_jclub2o);
 
@@ -47,6 +47,8 @@ private:
 	DECLARE_WRITE16_MEMBER(st0020_blit_w);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	UINT8* m_rom_ptr;
+	size_t m_rom_size;
 };
 
 #define ST0020_ST0032_BYTESWAP_DATA \

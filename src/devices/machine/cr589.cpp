@@ -139,7 +139,7 @@ void matsushita_cr589_device::WriteData( UINT8 *data, int dataLength )
 // device type definition
 const device_type CR589 = &device_creator<matsushita_cr589_device>;
 
-matsushita_cr589_device::matsushita_cr589_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+matsushita_cr589_device::matsushita_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	atapi_cdrom_device(mconfig, CR589, "Matsushita CR589 CD-ROM Drive", tag, owner, clock, "cr589", __FILE__),
 	device_nvram_interface(mconfig, *this)
 {

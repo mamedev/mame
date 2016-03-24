@@ -24,7 +24,7 @@ struct osd_event;
 
 
 /*-----------------------------------------------------------------------------
-    osd_lock_event_alloc: allocate a new event
+    osd_event_alloc: allocate a new event
 
     Parameters:
 
@@ -102,90 +102,5 @@ void osd_event_set(osd_event *event);
         None.
 -----------------------------------------------------------------------------*/
 void osd_event_free(osd_event *event);
-
-/***************************************************************************
-    SYNCHRONIZATION INTERFACES - Threads
-***************************************************************************/
-
-/* osd_thread is an opaque type which represents a thread */
-struct osd_thread;
-
-
-/* osd_thread_callback is a callback function that will be called from the thread */
-typedef void *(*osd_thread_callback)(void *param);
-
-
-/*-----------------------------------------------------------------------------
-    osd_thread_create: create a new thread
-
-    Parameters:
-
-        callback - The callback function to be called once the thread is up
-        cbparam  - The parameter to pass to the callback function.
-
-    Return value:
-
-        A pointer to the created thread.
------------------------------------------------------------------------------*/
-osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam);
-
-/*-----------------------------------------------------------------------------
-    osd_thread_adjust_priority: adjust priority of a thread
-
-    Parameters:
-
-        thread - A pointer to a previously created thread.
-        adjust - signed integer to add to the thread priority
-
-    Return value:
-
-        TRUE on success, FALSE on failure
------------------------------------------------------------------------------*/
-int osd_thread_adjust_priority(osd_thread *thread, int adjust);
-
-
-/*-----------------------------------------------------------------------------
-    osd_thread_cpu_affinity: change cpu affinity of a thread
-
-    Parameters:
-
-        thread - A pointer to a previously created thread
-                 or NULL for main thread
-        mask   - bitmask to which cpus to bind
-                 i.e. 0x01 1st cpu, 0x02, 2nd cpu, 0x04 3rd cpu
-
-    Return value:
-
-        TRUE on success, FALSE on failure
------------------------------------------------------------------------------*/
-int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask);
-
-
-/*-----------------------------------------------------------------------------
-    osd_thread_wait_free: wait for thread to finish and free resources
-
-    Parameters:
-
-        thread - A pointer to a previously created thread.
-
-    Return value:
-
-        None.
------------------------------------------------------------------------------*/
-void osd_thread_wait_free(osd_thread *thread);
-
-//============================================================
-//  Scalable Locks
-//============================================================
-
-struct osd_scalable_lock;
-
-osd_scalable_lock *osd_scalable_lock_alloc(void);
-
-INT32 osd_scalable_lock_acquire(osd_scalable_lock *lock);
-
-void osd_scalable_lock_release(osd_scalable_lock *lock, INT32 myslot);
-
-void osd_scalable_lock_free(osd_scalable_lock *lock);
 
 #endif  /* __OSDSYNC__ */

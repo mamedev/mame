@@ -57,7 +57,7 @@
 class savquest_state : public pcat_base_state
 {
 public:
-	savquest_state(const machine_config &mconfig, device_type type, std::string tag)
+	savquest_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag),
 		m_vga(*this, "vga"),
 		m_voodoo(*this, "voodoo")
@@ -336,7 +336,7 @@ void savquest_state::vid_3dfx_init()
 	m_pci_3dfx_regs[0x08 / 4] = 2; // revision ID
 	m_pci_3dfx_regs[0x10 / 4] = 0xff000000;
 	m_pci_3dfx_regs[0x40 / 4] = 0x4000; //INITEN_SECONDARY_REV_ID
-	voodoo_set_init_enable(m_voodoo, 0x4000); //INITEN_SECONDARY_REV_ID
+	m_voodoo->voodoo_set_init_enable(0x4000); //INITEN_SECONDARY_REV_ID
 }
 
 static UINT32 pci_3dfx_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -358,7 +358,7 @@ osd_printf_warning("PCI write: %x %x\n", reg, data);
 	}
 	else if (reg == 0x40)
 	{
-		voodoo_set_init_enable(state->m_voodoo, data);
+		state->m_voodoo->voodoo_set_init_enable(data);
 	}
 	else if (reg == 0x54)
 	{
@@ -808,9 +808,9 @@ static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_DS12885_ADD("rtc")
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, "", intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, "", intel82371ab_pci_r, intel82371ab_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(13, "", pci_3dfx_r, pci_3dfx_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(13, nullptr, pci_3dfx_r, pci_3dfx_w)
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))

@@ -137,7 +137,7 @@ WRITE8_MEMBER( ymf262_device::write )
 
 const device_type YMF262 = &device_creator<ymf262_device>;
 
-ymf262_device::ymf262_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YMF262, "YMF262", tag, owner, clock, "ymf262", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this)

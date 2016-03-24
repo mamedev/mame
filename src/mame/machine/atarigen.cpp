@@ -10,11 +10,6 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/2151intf.h"
-#include "sound/2413intf.h"
-#include "sound/tms5220.h"
-#include "sound/okim6295.h"
-#include "sound/pokey.h"
 #include "video/atarimo.h"
 #include "atarigen.h"
 
@@ -43,7 +38,7 @@ inline const atarigen_screen_timer *get_screen_timer(screen_device &screen)
 		if (state->m_screen_timer[i].screen == &screen)
 			return &state->m_screen_timer[i];
 
-	fatalerror("Unexpected: no atarivc_eof_update_timer for screen '%s'\n", screen.tag().c_str());
+	fatalerror("Unexpected: no atarivc_eof_update_timer for screen '%s'\n", screen.tag());
 	return nullptr;
 }
 
@@ -60,8 +55,9 @@ const device_type ATARI_SOUND_COMM = &device_creator<atari_sound_comm_device>;
 //  atari_sound_comm_device - constructor
 //-------------------------------------------------
 
-atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ATARI_SOUND_COMM, "Atari Sound Communications", tag, owner, clock, "atarscom", __FILE__),
+		m_sound_cpu_tag(nullptr),
 		m_main_int_cb(*this),
 		m_sound_cpu(nullptr),
 		m_main_to_sound_ready(false),
@@ -352,7 +348,7 @@ const device_type ATARI_VAD = &device_creator<atari_vad_device>;
 //  atari_vad_device - constructor
 //-------------------------------------------------
 
-atari_vad_device::atari_vad_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+atari_vad_device::atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ATARI_VAD, "Atari VAD", tag, owner, clock, "atarivad", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_scanline_int_cb(*this),
@@ -830,8 +826,8 @@ const device_type ATARI_EEPROM_2816 = &device_creator<atari_eeprom_2816_device>;
 //  atari_eeprom_device - constructor
 //-------------------------------------------------
 
-atari_eeprom_device::atari_eeprom_device(const machine_config &mconfig, device_type devtype, std::string name, std::string tag, device_t *owner, std::string shortname, std::string source)
-	: device_t(mconfig, devtype, name, tag, owner, 0, shortname, source),
+atari_eeprom_device::atari_eeprom_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
+	: device_t(mconfig, devtype, name, tag, owner, 0, shortname, file),
 		m_eeprom(*this, "eeprom"),
 		m_unlocked(false)
 {
@@ -897,7 +893,7 @@ void atari_eeprom_device::device_reset()
 //  atari_eeprom_2804_device - constructor
 //-------------------------------------------------
 
-atari_eeprom_2804_device::atari_eeprom_2804_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+atari_eeprom_2804_device::atari_eeprom_2804_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: atari_eeprom_device(mconfig, ATARI_EEPROM_2804, "Atari EEPROM Interface (2804)", tag, owner, "atari2804", __FILE__)
 {
 }
@@ -922,7 +918,7 @@ machine_config_constructor atari_eeprom_2804_device::device_mconfig_additions() 
 //  atari_eeprom_2816_device - constructor
 //-------------------------------------------------
 
-atari_eeprom_2816_device::atari_eeprom_2816_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+atari_eeprom_2816_device::atari_eeprom_2816_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: atari_eeprom_device(mconfig, ATARI_EEPROM_2816, "Atari EEPROM Interface (2816)", tag, owner, "atari2816", __FILE__)
 {
 }
@@ -948,11 +944,8 @@ machine_config_constructor atari_eeprom_2816_device::device_mconfig_additions() 
     OVERALL INIT
 ***************************************************************************/
 
-atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, std::string tag)
+atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-		m_earom(*this, "earom"),
-		m_earom_data(0),
-		m_earom_control(0),
 		m_scanline_int_state(0),
 		m_sound_int_state(0),
 		m_video_int_state(0),
@@ -967,9 +960,6 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_slapstic_mirror(0),
 		m_scanlines_per_callback(0),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_oki(*this, "oki"),
-		m_soundcomm(*this, "soundcomm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -1003,9 +993,6 @@ void atarigen_state::machine_start()
 	save_item(NAME(m_slapstic_last_address));
 
 	save_item(NAME(m_scanlines_per_callback));
-
-	save_item(NAME(m_earom_data));
-	save_item(NAME(m_earom_control));
 }
 
 
@@ -1014,14 +1001,10 @@ void atarigen_state::machine_reset()
 	// reset the interrupt states
 	m_video_int_state = m_sound_int_state = m_scanline_int_state = 0;
 
-	// reset the control latch on the EAROM, if present
-	if (m_earom != nullptr)
-		m_earom->set_control(0, 1, 1, 0, 0);
-
 	// reset the slapstic
 	if (m_slapstic_num != 0)
 	{
-		if (!m_slapstic_device)
+		if (!m_slapstic_device.found())
 			fatalerror("Slapstic device is missing?\n");
 
 		m_slapstic_device->slapstic_reset();
@@ -1196,8 +1179,8 @@ void atarigen_state::device_post_load()
 {
 	if (m_slapstic_num != 0)
 	{
-		if (!m_slapstic_device)
-		fatalerror("Slapstic device is missing?\n");
+		if (!m_slapstic_device.found())
+			fatalerror("Slapstic device is missing?\n");
 
 		slapstic_update_bank(m_slapstic_device->slapstic_bank());
 	}
@@ -1231,37 +1214,30 @@ DIRECT_UPDATE_MEMBER(atarigen_state::slapstic_setdirect)
 //  slapstic and sets the chip number.
 //-------------------------------------------------
 
-void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, int chipnum)
+void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t mirror)
 {
-	// reset in case we have no state
-	m_slapstic_num = chipnum;
-	m_slapstic = nullptr;
+	if (!m_slapstic_device.found())
+		fatalerror("Slapstic device is missing\n");
 
-	// if we have a chip, install it
-	if (chipnum != 0)
-	{
-		if (!m_slapstic_device)
-			fatalerror("Slapstic device is missing\n");
+	// initialize the slapstic
+	m_slapstic_num = m_slapstic_device->m_chipnum;
+	m_slapstic_device->slapstic_init();
 
-		// initialize the slapstic
-		m_slapstic_device->slapstic_init(machine(), chipnum);
+	// install the memory handlers
+	address_space &program = device.space(AS_PROGRAM);
+	m_slapstic = program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, read16_delegate(FUNC(atarigen_state::slapstic_r), this), write16_delegate(FUNC(atarigen_state::slapstic_w), this));
+	program.set_direct_update_handler(direct_update_delegate(FUNC(atarigen_state::slapstic_setdirect), this));
 
-		// install the memory handlers
-		address_space &program = device.space(AS_PROGRAM);
-		m_slapstic = program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, read16_delegate(FUNC(atarigen_state::slapstic_r), this), write16_delegate(FUNC(atarigen_state::slapstic_w), this));
-		program.set_direct_update_handler(direct_update_delegate(FUNC(atarigen_state::slapstic_setdirect), this));
+	// allocate memory for a copy of bank 0
+	m_slapstic_bank0.resize(0x2000);
+	memcpy(&m_slapstic_bank0[0], m_slapstic, 0x2000);
 
-		// allocate memory for a copy of bank 0
-		m_slapstic_bank0.resize(0x2000);
-		memcpy(&m_slapstic_bank0[0], m_slapstic, 0x2000);
+	// ensure we recopy memory for the bank
+	m_slapstic_bank = 0xff;
 
-		// ensure we recopy memory for the bank
-		m_slapstic_bank = 0xff;
-
-		// install an opcode base handler if we are a 68000 or variant
-		m_slapstic_base = base;
-		m_slapstic_mirror = mirror;
-	}
+	// install an opcode base handler if we are a 68000 or variant
+	m_slapstic_base = base;
+	m_slapstic_mirror = mirror;
 }
 
 
@@ -1273,7 +1249,7 @@ void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t 
 
 WRITE16_MEMBER(atarigen_state::slapstic_w)
 {
-	if (!m_slapstic_device)
+	if (!m_slapstic_device.found())
 		fatalerror("Slapstic device is missing?\n");
 
 	slapstic_update_bank(m_slapstic_device->slapstic_tweak(space, offset));
@@ -1287,7 +1263,7 @@ WRITE16_MEMBER(atarigen_state::slapstic_w)
 
 READ16_MEMBER(atarigen_state::slapstic_r)
 {
-	if (!m_slapstic_device)
+	if (!m_slapstic_device.found())
 		fatalerror("Slapstic device is missing?\n");
 
 	// fetch the result from the current bank first
@@ -1296,57 +1272,6 @@ READ16_MEMBER(atarigen_state::slapstic_r)
 	// then determine the new one
 	slapstic_update_bank(m_slapstic_device->slapstic_tweak(space, offset));
 	return result;
-}
-
-
-
-/***************************************************************************
-    SOUND HELPERS
-***************************************************************************/
-
-//-------------------------------------------------
-//  set_volume_by_type: Scans for a particular
-//  sound chip and changes the volume on all
-//  channels associated with it.
-//-------------------------------------------------
-
-void atarigen_state::set_volume_by_type(int volume, device_type type)
-{
-	sound_interface_iterator iter(*this);
-	for (device_sound_interface *sound = iter.first(); sound != nullptr; sound = iter.next())
-		if (sound->device().type() == type)
-			sound->set_output_gain(ALL_OUTPUTS, volume / 100.0);
-}
-
-
-//-------------------------------------------------
-//  set_XXXXX_volume: Sets the volume for a given
-//  type of chip.
-//-------------------------------------------------
-
-void atarigen_state::set_ym2151_volume(int volume)
-{
-	set_volume_by_type(volume, YM2151);
-}
-
-void atarigen_state::set_ym2413_volume(int volume)
-{
-	set_volume_by_type(volume, YM2413);
-}
-
-void atarigen_state::set_pokey_volume(int volume)
-{
-	set_volume_by_type(volume, POKEY);
-}
-
-void atarigen_state::set_tms5220_volume(int volume)
-{
-	set_volume_by_type(volume, TMS5220);
-}
-
-void atarigen_state::set_oki6295_volume(int volume)
-{
-	set_volume_by_type(volume, OKIM6295);
 }
 
 
@@ -1463,44 +1388,4 @@ void atarigen_state::blend_gfx(int gfx0, int gfx1, int mask0, int mask1)
 
 	// free the second graphics element
 	m_gfxdecode->set_gfx(gfx1, nullptr);
-}
-
-
-
-//**************************************************************************
-//  VECTOR AND EARLY RASTER EAROM INTERFACE
-//**************************************************************************
-
-READ8_MEMBER( atarigen_state::earom_r )
-{
-	// return data latched from previous clock
-	return m_earom->data();
-}
-
-
-WRITE8_MEMBER( atarigen_state::earom_w )
-{
-	// remember the value written
-	m_earom_data = data;
-
-	// output latch only enabled if control bit 2 is set
-	if (m_earom_control & 4)
-		m_earom->set_data(m_earom_data);
-
-	// always latch the address
-	m_earom->set_address(offset);
-}
-
-
-WRITE8_MEMBER( atarigen_state::earom_control_w )
-{
-	// remember the control state
-	m_earom_control = data;
-
-	// ensure ouput data is put on data lines prior to updating controls
-	if (m_earom_control & 4)
-		m_earom->set_data(m_earom_data);
-
-	// set the control lines; /CS2 is always held low
-	m_earom->set_control(data & 8, 1, ~data & 4, data & 2, data & 1);
 }

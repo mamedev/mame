@@ -27,7 +27,7 @@ class cst_q_plus4_t : public device_t,
 {
 public:
 	// construction/destruction
-	cst_q_plus4_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cst_q_plus4_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;

@@ -29,9 +29,9 @@ class dc_controller_device : public maple_device
 {
 public:
 	// construction/destruction
-	dc_controller_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void static_set_port_tag(device_t &device, int port, std::string tag);
+	static void static_set_port_tag(device_t &device, int port, const char *tag);
 	static void static_set_id(device_t &device, const char *id);
 	static void static_set_license(device_t &device, const char *license);
 	static void static_set_versions(device_t &device, const char *versions);
@@ -47,7 +47,7 @@ private:
 	void free_status(UINT32 *dest);
 	void read(UINT32 *dest);
 
-	std::string port_tag[8];
+	const char *port_tag[8];
 	const char *id, *license, *versions;
 
 	ioport_port *port[8];

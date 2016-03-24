@@ -32,7 +32,7 @@
 class univac_state : public driver_device
 {
 public:
-	univac_state(const machine_config &mconfig, device_type type, std::string tag)
+	univac_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
@@ -173,14 +173,14 @@ static MACHINE_CONFIG_START( uts20, univac_state )
 	MCFG_CPU_CONFIG(daisy_chain)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(univac_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)

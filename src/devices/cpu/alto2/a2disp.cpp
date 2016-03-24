@@ -581,8 +581,8 @@ void alto2_cpu_device::reset_disp()
 UINT32 alto2_cpu_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	pen_t palette_bw[2];
-	palette_bw[0] = screen.palette()->white_pen();
-	palette_bw[1] = screen.palette()->black_pen();
+	palette_bw[0] = screen.palette().white_pen();
+	palette_bw[1] = screen.palette().black_pen();
 	// copy even or odd field
 	for (int y = m_dsp.odd_frame ? 0 : 1; y < ALTO2_DISPLAY_HEIGHT; y += 2)
 		draw_scanline8(*m_dsp.bitmap, 0, y, ALTO2_DISPLAY_WIDTH, m_dsp.scanline[y], palette_bw);

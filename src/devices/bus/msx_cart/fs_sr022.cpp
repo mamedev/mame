@@ -7,7 +7,7 @@
 const device_type MSX_CART_FS_SR022 = &device_creator<msx_cart_fs_sr022>;
 
 
-msx_cart_fs_sr022::msx_cart_fs_sr022(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+msx_cart_fs_sr022::msx_cart_fs_sr022(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_FS_SR022, "MSX Cartridge - FS-SR022", tag, owner, clock, "msx_cart_fs_sr022", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_bunsetsu_rom(nullptr)

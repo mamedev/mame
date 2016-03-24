@@ -143,7 +143,7 @@ static void apply_char_overrides(int nb_char_overrides, const char_override_t ch
 
 const device_type VDT911 = &device_creator<vdt911_device>;
 
-vdt911_device::vdt911_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VDT911, "911 VDT", tag, owner, clock, "vdt911", __FILE__),
 		m_beeper(*this, "beeper"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -187,8 +187,6 @@ void vdt911_device::device_start()
 
 	/* set up cursor blink clock.  2Hz frequency -> .25s half-period. */
 	/*m_blink_clock =*/
-
-	// m_beeper->set_frequency(2000);
 
 	m_blink_timer = timer_alloc(BLINK_TIMER);
 	m_beep_timer = timer_alloc(BEEP_TIMER);
@@ -818,7 +816,7 @@ static MACHINE_CONFIG_FRAGMENT( vdt911 )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.50)
 
 	MCFG_PALETTE_ADD("palette", 8)

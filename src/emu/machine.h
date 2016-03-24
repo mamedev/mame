@@ -17,6 +17,8 @@
 #ifndef __MACHINE_H__
 #define __MACHINE_H__
 
+#include "vecstream.h"
+
 #include <time.h>
 
 // forward declaration instead of osdepend.h
@@ -73,6 +75,7 @@ const int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is e
 #define auto_alloc_array_clear(m, t, c) pool_alloc_array_clear(static_cast<running_machine &>(m).respool(), t, c)
 #define auto_free(m, v)                 pool_free(static_cast<running_machine &>(m).respool(), v)
 
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -95,8 +98,10 @@ class image_manager;
 class rom_load_manager;
 class debugger_manager;
 class osd_interface;
+class datfile_manager;
 enum class config_type;
-
+class inifile_manager;
+class favorite_manager;
 struct debugcpu_private;
 
 
@@ -165,6 +170,9 @@ public:
 	ioport_manager &ioport() { return m_ioport; }
 	parameters_manager &parameters() { return m_parameters; }
 	cheat_manager &cheat() const { assert(m_cheat != nullptr); return *m_cheat; }
+	datfile_manager &datfile() const { assert(m_datfile != nullptr); return *m_datfile; }
+	inifile_manager &inifile() const { assert(m_inifile != nullptr); return *m_inifile; }
+	favorite_manager &favorite() const { assert(m_favorite != nullptr); return *m_favorite; }
 	render_manager &render() const { assert(m_render != nullptr); return *m_render; }
 	input_manager &input() const { assert(m_input != nullptr); return *m_input; }
 	sound_manager &sound() const { assert(m_sound != nullptr); return *m_sound; }
@@ -198,8 +206,8 @@ public:
 	bool scheduled_event_pending() const { return m_exit_pending || m_hard_reset_pending; }
 
 	// fetch items by name
-	inline device_t *device(std::string tag) const { return root_device().subdevice(tag); }
-	template<class _DeviceClass> inline _DeviceClass *device(std::string tag) { return downcast<_DeviceClass *>(device(tag)); }
+	inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
+	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) { return downcast<_DeviceClass *>(device(tag)); }
 
 	// immediate operations
 	int run(bool firstrun);
@@ -232,9 +240,9 @@ public:
 	INT32 get_vblank_watchdog_counter() const { return m_watchdog_counter; }
 
 	// misc
-	void popmessage(const char *format, ...) const ATTR_PRINTF(2,3);
-	void logerror(const char *format, ...) const ATTR_PRINTF(2,3);
-	void vlogerror(const char *format, va_list args) const;
+	void popmessage() const { popmessage(static_cast<char const *>(nullptr)); }
+	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
+	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 	UINT32 rand();
 	const char *describe_context();
 
@@ -254,6 +262,8 @@ public:
 
 private:
 	// internal helpers
+	template <typename T> struct is_null { template <typename U> static bool value(U &&x) { return false; } };
+	template <typename T> struct is_null<T *> { template <typename U> static bool value(U &&x) { return !x; } };
 	void start();
 	void set_saveload_filename(const char *filename);
 	std::string get_statename(const char *statename_opt) const;
@@ -294,11 +304,11 @@ private:
 	std::unique_ptr<network_manager> m_network;        // internal data from network.cpp
 	std::unique_ptr<bookkeeping_manager> m_bookkeeping;// internal data from bookkeeping.cpp
 	std::unique_ptr<configuration_manager> m_configuration; // internal data from config.cpp
-	std::unique_ptr<output_manager> m_output;		   // internal data from output.cpp
-	std::unique_ptr<crosshair_manager> m_crosshair;	   // internal data from crsshair.cpp
-	std::unique_ptr<image_manager> m_image;	           // internal data from image.cpp
-	std::unique_ptr<rom_load_manager> m_rom_load;	   // internal data from romload.cpp
-	std::unique_ptr<debugger_manager> m_debugger;	   // internal data from debugger.cpp
+	std::unique_ptr<output_manager> m_output;          // internal data from output.cpp
+	std::unique_ptr<crosshair_manager> m_crosshair;    // internal data from crsshair.cpp
+	std::unique_ptr<image_manager> m_image;            // internal data from image.cpp
+	std::unique_ptr<rom_load_manager> m_rom_load;      // internal data from romload.cpp
+	std::unique_ptr<debugger_manager> m_debugger;      // internal data from debugger.cpp
 
 	// system state
 	machine_phase           m_current_phase;        // current execution phase
@@ -363,7 +373,13 @@ private:
 	parameters_manager      m_parameters;           // parameters manager
 	device_scheduler        m_scheduler;            // scheduler object
 	emu_timer               *m_autoboot_timer;      // autoboot timer
-};
 
+	std::unique_ptr<datfile_manager>   m_datfile;      // internal data from datfile.c
+	std::unique_ptr<inifile_manager>   m_inifile;      // internal data from inifile.c for INIs
+	std::unique_ptr<favorite_manager>  m_favorite;     // internal data from inifile.c for favorites
+
+	// string formatting buffer
+	mutable util::ovectorstream	m_string_buffer;
+};
 
 #endif  /* __MACHINE_H__ */

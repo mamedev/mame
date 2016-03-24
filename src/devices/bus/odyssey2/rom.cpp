@@ -22,26 +22,26 @@ const device_type O2_ROM_12K = &device_creator<o2_rom12_device>;
 const device_type O2_ROM_16K = &device_creator<o2_rom16_device>;
 
 
-o2_rom_device::o2_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+o2_rom_device::o2_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_o2_cart_interface(mconfig, *this),
 		m_bank_base(0)
 {
 }
 
-o2_rom_device::o2_rom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+o2_rom_device::o2_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, O2_ROM_STD, "Odyssey 2 Standard Carts", tag, owner, clock, "o2_rom", __FILE__),
 						device_o2_cart_interface( mconfig, *this ),
 	m_bank_base(0)
 				{
 }
 
-o2_rom12_device::o2_rom12_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+o2_rom12_device::o2_rom12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: o2_rom_device(mconfig, O2_ROM_12K, "Odyssey 2 12K Carts", tag, owner, clock, "o2_rom12", __FILE__)
 {
 }
 
-o2_rom16_device::o2_rom16_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+o2_rom16_device::o2_rom16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: o2_rom_device(mconfig, O2_ROM_16K, "Odyssey 2 16K Carts", tag, owner, clock, "o2_rom16", __FILE__)
 {
 }

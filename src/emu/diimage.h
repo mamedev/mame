@@ -178,21 +178,22 @@ public:
 	const char *basename() { if (m_basename.empty()) return nullptr; else return m_basename.c_str(); }
 	const char *basename_noext()  { if (m_basename_noext.empty()) return nullptr; else return m_basename_noext.c_str(); }
 	const char *filetype()  { if (m_filetype.empty()) return nullptr; else return m_filetype.c_str(); }
-	core_file *image_core_file() { return m_file; }
-	UINT64 length() { check_for_file(); return core_fsize(m_file); }
+	bool is_open() const { return bool(m_file); }
+	util::core_file &image_core_file() { return *m_file; }
+	UINT64 length() { check_for_file(); return m_file->size(); }
 	bool is_readonly() { return m_readonly; }
 	bool has_been_created() { return m_created; }
 	void make_readonly() { m_readonly = true; }
-	UINT32 fread(void *buffer, UINT32 length) { check_for_file(); return core_fread(m_file, buffer, length); }
+	UINT32 fread(void *buffer, UINT32 length) { check_for_file(); return m_file->read(buffer, length); }
 	UINT32 fread(optional_shared_ptr<UINT8> &ptr, UINT32 length) { ptr.allocate(length); return fread(ptr.target(), length); }
 	UINT32 fread(optional_shared_ptr<UINT8> &ptr, UINT32 length, offs_t offset) { ptr.allocate(length); return fread(ptr + offset, length - offset); }
-	UINT32 fwrite(const void *buffer, UINT32 length) { check_for_file(); return core_fwrite(m_file, buffer, length); }
-	int fseek(INT64 offset, int whence) { check_for_file(); return core_fseek(m_file, offset, whence); }
-	UINT64 ftell() { check_for_file(); return core_ftell(m_file); }
+	UINT32 fwrite(const void *buffer, UINT32 length) { check_for_file(); return m_file->write(buffer, length); }
+	int fseek(INT64 offset, int whence) { check_for_file(); return m_file->seek(offset, whence); }
+	UINT64 ftell() { check_for_file(); return m_file->tell(); }
 	int fgetc() { char ch; if (fread(&ch, 1) != 1) ch = '\0'; return ch; }
-	char *fgets(char *buffer, UINT32 length) { check_for_file(); return core_fgets(buffer, length, m_file); }
-	int image_feof() { check_for_file(); return core_feof(m_file); }
-	void *ptr() {check_for_file(); return (void *) core_fbuffer(m_file); }
+	char *fgets(char *buffer, UINT32 length) { check_for_file(); return m_file->gets(buffer, length); }
+	int image_feof() { check_for_file(); return m_file->eof(); }
+	void *ptr() {check_for_file(); return const_cast<void *>(m_file->buffer()); }
 	// configuration access
 	void set_init_phase() { m_init_phase = TRUE; }
 
@@ -208,10 +209,10 @@ public:
 	void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
 	const char * working_directory();
 
-	UINT8 *get_software_region(std::string tag);
-	UINT32 get_software_region_length(std::string tag);
+	UINT8 *get_software_region(const char *tag);
+	UINT32 get_software_region_length(const char *tag);
 	const char *get_feature(const char *feature_name);
-	bool load_software_region(std::string tag, optional_shared_ptr<UINT8> &ptr);
+	bool load_software_region(const char *tag, optional_shared_ptr<UINT8> &ptr);
 
 	UINT32 crc();
 	hash_collection& hash() { return m_hash; }
@@ -250,7 +251,7 @@ protected:
 
 	void clear_error();
 
-	void check_for_file() { assert_always(m_file != nullptr, "Illegal operation on unmounted image"); }
+	void check_for_file() { assert_always(m_file, "Illegal operation on unmounted image"); }
 
 	void setup_working_directory();
 	bool try_change_working_directory(const char *subdir);
@@ -274,7 +275,7 @@ protected:
 	std::string m_err_message;
 
 	/* variables that are only non-zero when an image is mounted */
-	core_file *m_file;
+	util::core_file::ptr m_file;
 	std::unique_ptr<emu_file> m_mame_file;
 	std::string m_image_name;
 	std::string m_basename;

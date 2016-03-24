@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles,Paul Priest
+// copyright-holders:Aaron Giles, Paul Priest
 /***************************************************************************
 
-    validity.c
+    validity.cpp
 
     Validity checks on internal data structures.
 
@@ -12,19 +12,6 @@
 #include "validity.h"
 #include "emuopts.h"
 #include <ctype.h>
-
-
-//**************************************************************************
-//  COMPILE-TIME VALIDATION
-//**************************************************************************
-
-// if the following lines error during compile, your PTR64 switch is set incorrectly in the makefile
-#ifdef PTR64
-UINT8 your_ptr64_flag_is_wrong[(int)(sizeof(void *) - 7)];
-#else
-UINT8 your_ptr64_flag_is_wrong[(int)(5 - sizeof(void *))];
-#endif
-
 
 
 //**************************************************************************
@@ -184,10 +171,11 @@ void validity_checker::check_shared_source(const game_driver &driver)
 
 
 //-------------------------------------------------
-//  check_all - check all drivers
+//  check_all_matching - check all drivers whose
+//  names match the given string
 //-------------------------------------------------
 
-bool validity_checker::check_all()
+bool validity_checker::check_all_matching(const char *string)
 {
 	// start by checking core stuff
 	validate_begin();
@@ -210,7 +198,8 @@ bool validity_checker::check_all()
 	// then iterate over all drivers and check them
 	m_drivlist.reset();
 	while (m_drivlist.next())
-		validate_one(m_drivlist.driver());
+		if (m_drivlist.matches(string, m_drivlist.driver().name))
+			validate_one(m_drivlist.driver());
 
 	// cleanup
 	validate_end();
@@ -348,9 +337,9 @@ void validity_checker::validate_core()
 
 	// check pointer size
 #ifdef PTR64
-	if (sizeof(void *) != 8) osd_printf_error("PTR64 flag enabled, but was compiled for 32-bit target\n");
+	static_assert(sizeof(void *) == 8, "PTR64 flag enabled, but was compiled for 32-bit target\n");
 #else
-	if (sizeof(void *) != 4) osd_printf_error("PTR64 flag not enabled, but was compiled for 64-bit target\n");
+	static_assert(sizeof(void *) == 4, "PTR64 flag not enabled, but was compiled for 64-bit target\n");
 #endif
 
 	// TODO: check if this is actually working
@@ -375,9 +364,6 @@ void validity_checker::validate_inlines()
 #undef rand
 	volatile UINT64 testu64a = rand() ^ (rand() << 15) ^ ((UINT64)rand() << 30) ^ ((UINT64)rand() << 45);
 	volatile INT64 testi64a = rand() ^ (rand() << 15) ^ ((INT64)rand() << 30) ^ ((INT64)rand() << 45);
-#ifdef PTR64
-	volatile INT64 testi64b = rand() ^ (rand() << 15) ^ ((INT64)rand() << 30) ^ ((INT64)rand() << 45);
-#endif
 	volatile UINT32 testu32a = rand() ^ (rand() << 15);
 	volatile UINT32 testu32b = rand() ^ (rand() << 15);
 	volatile INT32 testi32a = rand() ^ (rand() << 15);
@@ -393,10 +379,6 @@ void validity_checker::validate_inlines()
 	if (testu64a == 0) testu64a++;
 	if (testi64a == 0) testi64a++;
 	else if (testi64a < 0) testi64a = -testi64a;
-#ifdef PTR64
-	if (testi64b == 0) testi64b++;
-	else if (testi64b < 0) testi64b = -testi64b;
-#endif
 	if (testu32a == 0) testu32a++;
 	if (testu32b == 0) testu32b++;
 	if (testi32a == 0) testi32a++;
@@ -495,23 +477,6 @@ void validity_checker::validate_inlines()
 	testi32a = (testi32a | 0xffff0000) & ~0x400000;
 	if (count_leading_ones(testi32a) != 9)
 		osd_printf_error("Error testing count_leading_ones\n");
-
-	testi32b = testi32a;
-	if (compare_exchange32(&testi32a, testi32b, 1000) != testi32b || testi32a != 1000)
-		osd_printf_error("Error testing compare_exchange32\n");
-#ifdef PTR64
-	testi64b = testi64a;
-	if (compare_exchange64(&testi64a, testi64b, 1000) != testi64b || testi64a != 1000)
-		osd_printf_error("Error testing compare_exchange64\n");
-#endif
-	if (atomic_exchange32(&testi32a, testi32b) != 1000)
-		osd_printf_error("Error testing atomic_exchange32\n");
-	if (atomic_add32(&testi32a, 45) != testi32b + 45)
-		osd_printf_error("Error testing atomic_add32\n");
-	if (atomic_increment32(&testi32a) != testi32b + 46)
-		osd_printf_error("Error testing atomic_increment32\n");
-	if (atomic_decrement32(&testi32a) != testi32b + 45)
-		osd_printf_error("Error testing atomic_decrement32\n");
 }
 
 
@@ -852,7 +817,7 @@ void validity_checker::validate_condition(ioport_condition &condition, device_t 
 	// resolve the tag
 	// then find a matching port
 	if (port_map.find(device.subtag(condition.tag())) == port_map.end())
-		osd_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag().c_str());
+		osd_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag());
 }
 
 
@@ -887,12 +852,12 @@ void validity_checker::validate_inputs()
 		// do a first pass over ports to add their names and find duplicates
 		for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
 			if (!port_map.insert(port->tag()).second)
-				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port->tag().c_str());
+				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port->tag());
 
 		// iterate over ports
 		for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
 		{
-			m_current_ioport = port->tag().c_str();
+			m_current_ioport = port->tag();
 
 			// iterate through the fields on this port
 			for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
@@ -968,29 +933,25 @@ void validity_checker::validate_devices()
 	device_iterator iter_find(m_current_config->root_device());
 	for (const device_t *device = iter_find.first(); device != nullptr; device = iter_find.next())
 	{
-		device->findit(true);
-	}
-
-	// iterate over devices
-	device_iterator iter(m_current_config->root_device());
-	for (const device_t *device = iter.first(); device != nullptr; device = iter.next())
-	{
 		// track the current device
 		m_current_device = device;
 
+		// validate auto-finders
+		device->findit(true);
+
 		// validate the device tag
-		validate_tag(device->basetag().c_str());
+		validate_tag(device->basetag());
 
 		// look for duplicates
 		if (!device_map.insert(device->tag()).second)
-			osd_printf_error("Multiple devices with the same tag '%s' defined\n", device->tag().c_str());
+			osd_printf_error("Multiple devices with the same tag '%s' defined\n", device->tag());
 
 		// all devices must have a shortname
-		if (device->shortname().empty())
+		if (strcmp(device->shortname(), "") == 0)
 			osd_printf_error("Device does not have short name defined\n");
 
 		// all devices must have a source file defined
-		if (device->source().empty())
+		if (strcmp(device->source(), "") == 0)
 			osd_printf_error("Device does not have source file location defined\n");
 
 		// check for device-specific validity check
@@ -1017,9 +978,9 @@ void validity_checker::validate_devices()
 				if (!device->configured())
 					device->config_complete();
 
-			if (dev->shortname().empty()) {
+			if (strcmp(dev->shortname(), "") == 0) {
 				if (slot_device_map.insert(dev->name()).second)
-					osd_printf_error("Device '%s' is slot cart device but does not have short name defined\n",dev->name().c_str());
+					osd_printf_error("Device '%s' is slot cart device but does not have short name defined\n",dev->name());
 			}
 
 			const_cast<machine_config &>(*m_current_config).device_remove(&m_current_config->root_device(), temptag.c_str());
@@ -1042,7 +1003,7 @@ void validity_checker::build_output_prefix(std::string &str)
 
 	// if we have a current (non-root) device, indicate that
 	if (m_current_device != nullptr && m_current_device->owner() != nullptr)
-		str.append(m_current_device->name()).append(" device '").append(m_current_device->tag().c_str()+1).append("': ");
+		str.append(m_current_device->name()).append(" device '").append(m_current_device->tag()+1).append("': ");
 
 	// if we have a current port, indicate that as well
 	if (m_current_ioport != nullptr)

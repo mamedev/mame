@@ -25,7 +25,7 @@
 
 class esqvfd_t : public device_t {
 public:
-	esqvfd_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	esqvfd_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_WRITE8_MEMBER( write ) { write_char(data); }
 
@@ -57,7 +57,7 @@ protected:
 
 class esq1x22_t : public esqvfd_t {
 public:
-	esq1x22_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	esq1x22_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void write_char(int data) override;
 
@@ -69,7 +69,7 @@ private:
 
 class esq2x40_t : public esqvfd_t {
 public:
-	esq2x40_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	esq2x40_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void write_char(int data) override;
 
@@ -81,7 +81,7 @@ private:
 
 class esq2x40_sq1_t : public esqvfd_t {
 public:
-	esq2x40_sq1_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	esq2x40_sq1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void write_char(int data) override;
 

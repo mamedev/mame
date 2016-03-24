@@ -18,7 +18,7 @@ class sega_315_5881_crypt_device :  public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5881_crypt_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 
 	UINT16 do_decrypt(UINT8 *&base);

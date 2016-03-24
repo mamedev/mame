@@ -27,7 +27,7 @@ Electro-mechanical bubble hockey games:
 class chexx_state : public driver_device
 {
 public:
-	chexx_state(const machine_config &mconfig, device_type type, std::string tag)
+	chexx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_via(*this, "via6522"),

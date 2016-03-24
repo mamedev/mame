@@ -1,0 +1,4452 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- BBC Micro Model B Original Disks -->
+
+<!-- Loading Instructions:
+
+      Hold down the SHIFT key and press and release the BREAK key.
+-->
+
+<!-- This list was compiled from the archive at http://www.stairwaytohell.com/. Additional titles will be added as they are made available at http://stardot.org.uk/ forum. -->
+
+<!-- All images in this list were created from original discs, most contain copy protection. -->
+
+<softwarelist name="bbcb_flop_orig" description="BBC Micro Model B Original disks">
+
+	<!-- Games -->
+
+	<software name="magicmus">
+		<description>Magic Mushrooms</description>
+		<year>1985</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG46" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55146">
+				<rom name="004 magic mushrooms.fsd" size="55146" crc="cac03f12" sha1="6efe0e75045805057ec45c44338ba5d2e9ec2c4e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcadian">
+		<description>Arcadians</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG14" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="35063">
+				<rom name="005 arcadians.fsd" size="35063" crc="9e2f412b" sha1="6c833c589a619a4dac186d7e7a1db02b94ee8aba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcadian48" cloneof="arcadian">
+		<description>Arcadians (40/80t)</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG14" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55277">
+				<rom name="006 arcadians 40-80.fsd" size="55277" crc="94e7e5cf" sha1="66c84208dd461605ed48233b02e3ee6570e95de3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boxer48">
+		<description>Boxer (40/80t)</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG31" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55273">
+				<rom name="007 boxer 40-80.fsd" size="55273" crc="365164a9" sha1="7f25cfa4f4cfccfbcececd0619884d02f1023628" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hopper48">
+		<description>Hopper (40/80t)</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG23" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101175">
+				<rom name="008 hopper 40-80.fsd" size="101175" crc="597ee0d9" sha1="3e0e2ad75147ab28cc514f125221c4e765f5f308" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volcano">
+		<description>Volcano</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG33" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55275">
+				<rom name="009 volcano.fsd" size="55275" crc="4e16b301" sha1="8775b14d2bb46b3e4254f3e7227463ff77cfd619" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meteors">
+		<description>Meteors</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG13" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="24709">
+				<rom name="010 meteors.fsd" size="24709" crc="9f4226a2" sha1="6f529751be461cb695bad9778d2f4998784fda34" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="labyrint">
+		<description>Labyrinth</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG41" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55277">
+				<rom name="011 labyrinth.fsd" size="55277" crc="919768d4" sha1="12e9b368afa58198c823e789ad4827ff6aaabbb3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bboxgamb">
+		<description>Black Box and Gambit</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG34" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102329">
+				<rom name="015 black box and gambit.fsd" size="102329" crc="876b301b" sha1="c5114ea239fd42e4ae6d64c98b25a7f1ed714581" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metmissn">
+		<description>Meteor Mission</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG29" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55282">
+				<rom name="016 meteor mission.fsd" size="55282" crc="8c538999" sha1="abab70a653d18ed50ab0d838cb9fe89efedb9aa9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetrapod">
+		<description>Tetrapod</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG32" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55276">
+				<rom name="017 tetrapod.fsd" size="55276" crc="bc5f3936" sha1="0752cabb3c168cb4695df1d668c9a968c7b44979" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="firebug">
+		<description>Firebug</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG39" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55275">
+				<rom name="018 firebug.fsd" size="55275" crc="826d3399" sha1="0120f272bc4de8f6ffa480bfc235e0a579c85444" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snapper">
+		<description>Snapper</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG04" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55138">
+				<rom name="019 snapper.fsd" size="55138" crc="526d12a5" sha1="a40b51aa75e02bd096e08c13fd8372e0f2c71069" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drogna">
+		<description>Drogna</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG27" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55274">
+				<rom name="020 drogna.fsd" size="55274" crc="4ff2895f" sha1="019545da835024bf31959d78bab351988c60ba47" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="go">
+		<description>Go</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG42" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55270">
+				<rom name="026 go.fsd" size="55270" crc="bb260970" sha1="cdbca519a0825c2d54a08e685cc5dc2cb9ce2842" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maze">
+		<description>Maze</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG11" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55272">
+				<rom name="027 maze.fsd" size="55272" crc="38c998e4" sha1="00eee0558e2f12ba864b9612a09e911e5ba61e2e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quondam">
+		<description>Quondam</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG40" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55275">
+				<rom name="028 quondam.fsd" size="55275" crc="10efe562" sha1="09c5069b68ff7dbfcfabfb0a04934e153d664945" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bouncer">
+		<description>Bouncer</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG35" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55275">
+				<rom name="029 bouncer.fsd" size="55275" crc="8166acf9" sha1="bc3f9fe318d6f22266698f3d70f9ba3509510813" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="revs">
+		<description>Revs</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG43" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104934">
+				<rom name="030 revs.fsd" size="104934" crc="48f95827" sha1="2a8d2e82f1d4b0fdd56d39e2400f445a59855f98" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="revs4tra">
+		<description>Revs 4 Tracks</description>
+		<year>1985</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG44" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102322">
+				<rom name="031 revs 4 tracks.fsd" size="102322" crc="d1cbdf33" sha1="b4281b2b55c292b7ed96798a52139d9a1a50b661" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acheton" cloneof="achetont">
+		<description>Acheton</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG37" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program"/>
+			<dataarea name="flop" size="102461">
+				<rom name="033 acheton program.fsd" size="102461" crc="0c6c46ca" sha1="6322945135310ea8ae1dbf2f1aced77f21688008" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data"/>
+			<dataarea name="flop" size="105079">
+				<rom name="033 acheton data.fsd" size="105079" crc="86fdca91" sha1="57f448a17868f0bdbbc6a415464220da0c418f72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monsters">
+		<description>Monsters</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG03" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55276">
+				<rom name="034 monsters.fsd" size="55276" crc="ba2223e5" sha1="66359136ad78a049733eca596a77115037fdbe82" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monsters4" cloneof="monsters">
+		<description>Monsters (40t)</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG03" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="24710">
+				<rom name="054 monsters 40track.fsd" size="24710" crc="3e371d1d" sha1="f35c4b15f8f3358c4ff9c6fc63c850d228f2e6b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snookera">
+		<description>Snooker</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG21" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55275">
+				<rom name="035 snooker.fsd" size="55275" crc="08eaa805" sha1="42254fc9b39029f30abac5e4c2da6eeec16dec4a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carousel">
+		<description>Carousel</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG24" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101177">
+				<rom name="036 carousel.fsd" size="101177" crc="dac1680a" sha1="b70cd85993adc22155ef750ef0ec3905e429d195" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freefall">
+		<description>Free Fall</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG28" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55277">
+				<rom name="037 free fall.fsd" size="55277" crc="eca72121" sha1="279300664a66bc95908fe48a37075adc24fb5aa1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crtracer">
+		<description>Crazy Tracer</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG26" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101318">
+				<rom name="038 crazy tracer.fsd" size="101318" crc="40d4e30b" sha1="1a35ba220245b1d75319628c1c0cd5fcd53b82e9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kofhamil" cloneof="kohamilt">
+		<description>Kingdom of Hamil</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG25" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="73134">
+				<rom name="039 kingdom of hamil.fsd" size="73134" crc="3fe60d1e" sha1="a441d9c67a1677069f855e3b29f638b47b18aaea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sshipcom">
+		<description>Starship Command</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG22" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101185">
+				<rom name="040 starship command.fsd" size="101185" crc="f0bc6523" sha1="446ca8e624a0edfe29540e94b6ad76fcd80b9bfc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ctodoom" cloneof="ctodoomt">
+		<description>Countdown to Doom</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG19" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="73495">
+				<rom name="041 countdown to doom.fsd" size="73495" crc="ba37517e" sha1="2cb63f7f044e99bd38abab273229c303f5801259" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="missbase">
+		<description>Missile Base</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG18" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101181">
+				<rom name="042 missile base.fsd" size="101181" crc="91a46fa1" sha1="6afc77cb445e4aa1e8069ae9134449d51786b704" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phquest" cloneof="phquestt">
+		<description>Philosopher's Quest</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG01" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55287">
+				<rom name="043 philosopher's quest.fsd" size="55287" crc="d69898f3" sha1="ea76abc3dd58565d9219c76e2c15db3168ec96be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aviator">
+		<description>Aviator</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG02" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55275">
+				<rom name="044 aviator.fsd" size="55275" crc="8249a0f0" sha1="a6f2a56059851b211c0dc753b14643571b3f4002" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sphinx">
+		<description>Sphinx Adventure</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG07" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55284">
+				<rom name="045 sphinx adventure.fsd" size="55284" crc="65f04493" sha1="45faab5009902c6df0e14fb780e74d487dcf7376" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plantoid">
+		<description>Planetoid</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG15" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55277">
+				<rom name="046 planetoid.fsd" size="55277" crc="c9b6bd5c" sha1="48fc462499de9fd37a3e5164e723f9022ab0f870" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plantoid4" cloneof="plantoid">
+		<description>Planetoid (40t)</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG15" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="24711">
+				<rom name="055 planetoid 40track.fsd" size="24711" crc="f8f6c291" sha1="d7a8d0b55052d62f748301b6a0ece3d6d063e606" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superinv">
+		<description>Super Invaders</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG16" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55282">
+				<rom name="047 super invaders.fsd" size="55282" crc="e639e138" sha1="61fa94d5beb55b178b1ec732c69649d4a6bdb6ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superinv4" cloneof="superinv">
+		<description>Super Invaders (40t)</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG16" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="24716">
+				<rom name="053 super invaders 40track.fsd" size="24716" crc="0a8e861d" sha1="7d81dbf2a01a83266b4531c913d956a68bc63a12" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rocketra">
+		<description>Rocket Raid</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG05" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55279">
+				<rom name="048 rocket raid.fsd" size="55279" crc="06311675" sha1="e7524e853b83906c12ec3a17497339d25596eee8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sconrans">
+		<description>Shirley Conran's Magic Garden</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNX04" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104959">
+				<rom name="067 shirley conran's magic garden.fsd" size="104959" crc="dd05b72c" sha1="5914bd14014f89cfae12b8e55a9b4b8349835286" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spooky">
+		<description>Spooky Manor</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNE18" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102321">
+				<rom name="068 spooky manor.fsd" size="102321" crc="077375a1" sha1="2b2d7cccd4bfa6fe2e8c352098e11acc685633f4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="peekoc">
+		<description>Peeko-Computer</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNE02" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55478">
+				<rom name="069 peeko-computer.fsd" size="55478" crc="149db5f7" sha1="62967f65582d2e3d78c28be407dbd68da5609824" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="busgames">
+		<description>Business Games</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNE03" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102323">
+				<rom name="070 business games.fsd" size="102323" crc="47b34ec1" sha1="96fe3ca59520a28113387606d5d6826a236e9027" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microtxt">
+		<description>Microtext</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNL04" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104939">
+				<rom name="075 microtext.fsd" size="104939" crc="b614ea31" sha1="224e87db1a3fa677e53f3506fa1401ee598bd2b2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elitedem">
+		<description>Elite (Demo)</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104376">
+				<rom name="202 elite demo.fsd" size="104376" crc="cd84ea0a" sha1="d7452ab1a7d6d619cf44f64b5743b8fa22a75367" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prtdrvgn">
+		<description>Printer Driver Generator</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNB16" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105091">
+				<rom name="227 printer driver generator.fsd" size="105091" crc="c047f362" sha1="024b53fe31bdbec2083de9a9ffc8c9d2737f398d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forth">
+		<description>FORTH</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNL01" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="81355">
+				<rom name="235 forth.fsd" size="81355" crc="5d6ba897" sha1="f58964a536b59012e85298ffc55c2165b05bd154" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jars">
+		<description>Jars</description>
+		<year>198?</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNE15" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="29478">
+				<rom name="262 jars.fsd" size="29478" crc="6613abb4" sha1="19024209a8fe98df7726acbefa78744459637dcf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chemanal">
+		<description>Chemical Analysis</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNE12" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104947">
+				<rom name="263 chemical analysis.fsd" size="104947" crc="1c0ecd19" sha1="04f9c198dda70bb498844594d206918344aa13d3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jcbdiggr">
+		<description>JCB Digger</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG09" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101190">
+				<rom name="286 jcb digger.fsd" size="101190" crc="16102871" sha1="e0226e03b831d260c8ccbab5e1a6885a0b362b10" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homeedu">
+		<description>Home Education</description>
+		<year>1985</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="E0?" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104944">
+				<rom name="336 home education.fsd" size="104944" crc="34a7242f" sha1="1d667119e1abecc208c2f77d2e8617768501117e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="omegaorb">
+		<description>Omega Orb</description>
+		<year>1986</year>
+		<publisher>Audiogenic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104939">
+				<rom name="077 omega orb.fsd" size="104939" crc="92433f95" sha1="76ff1011144660c06c13a0c058a168e32a6d9e63" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tstruck2">
+		<description>Thunderstruck 2: Mind Master</description>
+		<year>1986</year>
+		<publisher>Audiogenic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105098">
+				<rom name="078 thunderstruck 2.fsd" size="105098" crc="7da6829a" sha1="34e1b77e47b91455f12ca2a8f328fe1b029cfc50" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blast">
+		<description>Blast!</description>
+		<year>1989</year>
+		<publisher>Audiogenic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104936">
+				<rom name="084 blast!.fsd" size="104936" crc="25e91719" sha1="42203574fa4ad32b8464d326a11fb81cd56ada4d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psycast">
+		<description>Psycastria</description>
+		<year>1986</year>
+		<publisher>Audiogenic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105077">
+				<rom name="143 psycastria.fsd" size="105077" crc="3e79d475" sha1="0d3174a153da3b41ae1044874690317b2abf7f72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakthr">
+		<description>Breakthrough</description>
+		<year>1990</year>
+		<publisher>Audiogenic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104943">
+				<rom name="144 breakthrough.fsd" size="104943" crc="f3b5f98b" sha1="a8429c0b2398c5ab90de318e30c29beafeeeda46" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shark">
+		<description>Shark</description>
+		<year>1988</year>
+		<publisher>Audiogenic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104935">
+				<rom name="145 shark.fsd" size="104935" crc="1cb6d77a" sha1="6afe49ab8ed8057e7262556dd6121617bd61e931" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impact">
+		<description>Impact</description>
+		<year>1987</year>
+		<publisher>Audiogenic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105073">
+				<rom name="146 impact.fsd" size="105073" crc="f02f0a19" sha1="7304eba08b8f27fcc9214975875e77b38a786ba4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ziggy">
+		<description>Ziggy</description>
+		<year>1987</year>
+		<publisher>Audiogenic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104935">
+				<rom name="147 ziggy.fsd" size="104935" crc="9d5e5fc0" sha1="dd6bde5b7ae47ddfb1e7ca983e748e18064ceb09" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ransack">
+		<description>Ransack!</description>
+		<year>1987</year>
+		<publisher>Audiogenic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104937">
+				<rom name="148 ransack.fsd" size="104937" crc="04cf2bc5" sha1="dafa70507979a70026e4f666de711b0bf37a7661" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="despride">
+		<description>Despatch Rider</description>
+		<year>1987</year>
+		<publisher>Audiogenic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104944">
+				<rom name="149 despatch rider.fsd" size="104944" crc="adbfbd97" sha1="a5e1b47e70404e09c0147f41275b6b61f1ebd381" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heltersk">
+		<description>Helter Skelter</description>
+		<year>1990</year>
+		<publisher>Audiogenic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104944">
+				<rom name="150 helter skelter.fsd" size="104944" crc="0321f080" sha1="91ccb93a3c61acbdbe100e61ed9e599cf8910580" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fabfour1">
+		<description>Fab Four Vol.1</description>
+		<year>1989</year>
+		<publisher>Audiogenic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side [A]"/>
+			<dataarea name="flop" size="104944">
+				<rom name="151 fab four vol 1 [a].fsd" size="104944" crc="f683f7ac" sha1="a8a43297779e2da6e80055fcc2ce80424ad86558" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side [B]"/>
+			<dataarea name="flop" size="104944">
+				<rom name="151 fab four vol 1 [b].fsd" size="104944" crc="88473bf5" sha1="23a31ca311f2ad7c32bf18199cae8fb1fc3e6ca9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbcbonz">
+		<description>BBC Bonanza</description>
+		<year>1987</year>
+		<publisher>Audiogenic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side [A]"/>
+			<dataarea name="flop" size="105078">
+				<rom name="152 bbc bonanza [a].fsd" size="105078" crc="2b10b64f" sha1="2731e2e301bbb9e8ceb8e7cadd0b37b05daa83ab" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side [B]"/>
+			<dataarea name="flop" size="105078">
+				<rom name="152 bbc bonanza [b].fsd" size="105078" crc="c12d9858" sha1="5f1061b8abd05b603e3892d82846593dea07b092" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emlynqz">
+		<description>Emlyn Hughes Arcade Quiz</description>
+		<year>1991</year>
+		<publisher>Audiogenic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104954">
+				<rom name="157 emlyn hughes arcade quiz.fsd" size="104954" crc="7ab6c8c7" sha1="cce3b3ad142f2f4d0db48b0a568f645e2afe63de" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loopz">
+		<description>Loopz</description>
+		<year>1990</year>
+		<publisher>Audiogenic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104935">
+				<rom name="158 loopz.fsd" size="104935" crc="52fe55a6" sha1="85e4ea724281f3999d0e56d18536c00d3a712047" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sphdest">
+		<description>Sphere of Destiny</description>
+		<year>1986</year>
+		<publisher>Audiogenic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105084">
+				<rom name="167 sphere of destiny.fsd" size="105084" crc="2bda2617" sha1="da5bb898e4e8dbac0336ab225e38f0534f13848b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colos4ch">
+		<description>Colossus 4 Chess</description>
+		<year>1988</year>
+		<publisher>CDS</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="104953">
+				<rom name="000 colossus chess 4 side 1.fsd" size="104953" crc="c759e652" sha1="04a92c17cfec2827b4c6e85e4a271831346c9d00" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="104953">
+				<rom name="000 colossus chess 4 side 2.fsd" size="104953" crc="2eda7e43" sha1="2b25c2d66c2d9ab40a90710ea931e01471b7a5d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="infinity">
+		<description>Infinity</description>
+		<year>1989</year>
+		<publisher>White Panther</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="113298">
+				<rom name="002 infinity.fsd" size="113298" crc="f39fad09" sha1="340f35470179ccca582c2a57b63f05f3a97036b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starquak">
+		<description>Star Quake</description>
+		<year>1987</year>
+		<publisher>Bubble Bus</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="78570">
+				<rom name="012 starquake.fsd" size="78570" crc="9f7a8053" sha1="802cb77d35ed81aeb8651a5da63d6f3d5a5e2737" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wknight">
+		<description>White Knight Mk12</description>
+		<year>1985</year>
+		<publisher>BBC Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104947">
+				<rom name="032 white knight mk12.fsd" size="104947" crc="526d60ba" sha1="cff5986414e73f0659014f2dd5a2a72b47920d2f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="firetrak">
+		<description>Fire Track</description>
+		<year>1987</year>
+		<publisher>Aardvark</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="81667">
+				<rom name="050 firetrack.fsd" size="81667" crc="474ed4f7" sha1="6a6694f3d4f4ab03334a7513937b18f4150d97cf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fortress">
+		<description>Fortress</description>
+		<year>1984</year>
+		<publisher>Pace</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="27817">
+				<rom name="061 fortress.fsd" size="27817" crc="5d967134" sha1="1230f14adf671005e20636ec8d8272d8668d2b85" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xoraba" cloneof="xor">
+		<description>XOR (A&amp;B Computing) (alt)</description>
+		<year>1987</year>
+		<publisher>Logotron</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102528">
+				<rom name="064 xor (a+b)-2.fsd" size="102528" crc="d559d5b6" sha1="841cf3861da0c10e8824c024088fe50263c056c5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xorab" cloneof="xor">
+		<description>XOR (A&amp;B Computing)</description>
+		<year>1987</year>
+		<publisher>Logotron</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102528">
+				<rom name="064 xor (a+b).fsd" size="102528" crc="0ac04a73" sha1="36b478d42541975037ee97fd1b10a74dd5f6d62a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xor">
+		<description>XOR</description>
+		<year>1987</year>
+		<publisher>Logotron</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102522">
+				<rom name="065 xor.fsd" size="102522" crc="166cd24a" sha1="12a85d8058d459a8890b778c472b25e0af31ff5f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xordesgn">
+		<description>XOR Designer</description>
+		<year>1987</year>
+		<publisher>Logotron</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104999">
+				<rom name="066 xor designer.fsd" size="104999" crc="97241bdb" sha1="9ee46c346167d6a352e048f6c6a93b79e1ae00f0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sinkbism">
+		<description>Sink the Bismarck</description>
+		<year>1986</year>
+		<publisher>Design People</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="68253">
+				<rom name="071 sink the bismarck.fsd" size="68253" crc="85fb8e93" sha1="829951372cb6ed89412d360e85bf58801606e051" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsentinl">
+		<description>The Sentinel</description>
+		<year>1986</year>
+		<publisher>Firebird</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="78834">
+				<rom name="073 the sentinel.fsd" size="78834" crc="ca2e8436" sha1="54fc3d458c86f571f43214e760408fccc190bc1a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="evenstar">
+		<description>Evening Star</description>
+		<year>1987</year>
+		<publisher>Hewson Consultants</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105080">
+				<rom name="074 evening star.fsd" size="105080" crc="40f24ae7" sha1="87ba44647a54ac67db3a0458d33e9388be206a50" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beachead">
+		<description>Beach Head</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105077">
+				<rom name="076 beach-head.fsd" size="105077" crc="ae5024f2" sha1="11f429599303c0f28feadf1d6f3bf2a941e573ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apocalyc">
+		<description>Apocalypse (Command)</description>
+		<year>1987</year>
+		<publisher>Command</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104940">
+				<rom name="081 apocalypse.fsd" size="104940" crc="da99bbd1" sha1="e915edb63d15614609919daf00852fae46899a52" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="villsoul">
+		<description>Village of Lost Souls</description>
+		<year>1987</year>
+		<publisher>Robico</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105088">
+				<rom name="082 village of lost souls.fsd" size="105088" crc="5fd2cbb2" sha1="bcf5d2897be1139fd5a53404350a3826da7cb2bb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="huntshau">
+		<description>The Hunt: Search for Shauna</description>
+		<year>1987</year>
+		<publisher>Robico</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105093">
+				<rom name="083 the hunt search for shauna.fsd" size="105093" crc="7914a1a8" sha1="bcef28049a2962965742a0931deb11431fbf2657" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vutype">
+		<description>Vu-Type</description>
+		<year>1984</year>
+		<publisher>BBC Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104937">
+				<rom name="091 vu-type.fsd" size="104937" crc="9f3310a9" sha1="b09ec00aea21db3bb00d096244a18c0420d29f29" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battbrit">
+		<description>Battle of Britain</description>
+		<year>1984</year>
+		<publisher>Betasoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104947">
+				<rom name="092 battle of britain.fsd" size="104947" crc="6ba3eb9e" sha1="d0798a2bd0717cf3fc872cfdaee77e35fee9913e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rhansont">
+		<description>The Rick Hanson Trilogy - Saga of a Spy</description>
+		<year>1986</year>
+		<publisher>Robico</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105106">
+				<rom name="093 the rick hanson trilogy - saga of a spy.fsd" size="105106" crc="ee8438de" sha1="95dbcef42ff4c40754567e5d5012d88b1f3bad9a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bribbon1">
+		<description>Blue Ribbon Games Disk No.1</description>
+		<year>1985</year>
+		<publisher>Blue Ribbon</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104957">
+				<rom name="094 blue ribbon games disk no 1.fsd" size="104957" crc="6c3094bb" sha1="61a6ec8bd025beb135db182150b9a7a0165dbd50" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bribbon2">
+		<description>Blue Ribbon Games Disk No.2</description>
+		<year>1985</year>
+		<publisher>Blue Ribbon</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104957">
+				<rom name="095 blue ribbon games disk no 2.fsd" size="104957" crc="316ed0fc" sha1="9961df49786fa5dcbb510a34d9ce19ec56559b39" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bribbon3">
+		<description>Blue Ribbon Games Disk No.3</description>
+		<year>1985</year>
+		<publisher>Blue Ribbon</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104957">
+				<rom name="096 blue ribbon games disk no 3.fsd" size="104957" crc="eca0ae33" sha1="7fcc50e9614f950b5f14415d7d5a595ba3ed1815" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jumpjeta">
+		<description>Jump Jet</description>
+		<year>1985</year>
+		<publisher>Anirog</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="36929">
+				<rom name="098 jump jet.fsd" size="36929" crc="41c43f6a" sha1="78ee556141909966138b5aedbff43fbea76e2d6b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="war">
+		<description>W.A.R.</description>
+		<year>1986</year>
+		<publisher>Martech</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105070">
+				<rom name="099 war.fsd" size="105070" crc="7c6460ea" sha1="26828685ebd2127257b4e6922fac1c6a08b48b9f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yiear">
+		<description>Yie Ar Kung Fu</description>
+		<year>1984</year>
+		<publisher>Imagine</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105081">
+				<rom name="100 yie ar kung fu.fsd" size="105081" crc="75022df9" sha1="a0c0e92db0ed9a0b3cfa0c31562ab15faf964a73" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dambustr">
+		<description>The Dam Busters</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105077">
+				<rom name="101 dambusters.fsd" size="105077" crc="44dac52e" sha1="44583ea514799ebe43f821a164696189b6136ae4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impmiss">
+		<description>Impossible Mission</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105085">
+				<rom name="102 impossible mission.fsd" size="105085" crc="4453c805" sha1="7f773a609222cf0e618721b379b7c2ff4c66d253" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brucelee">
+		<description>Bruce Lee</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105076">
+				<rom name="103 bruce lee.fsd" size="105076" crc="d4b5ca15" sha1="0cfa4617e97dd5bd9d0508c6286a6c3a6c34e914" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hyperspo">
+		<description>Hyper Sports</description>
+		<year>1985</year>
+		<publisher>Imagine</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105087">
+				<rom name="104 hyper sports.fsd" size="105087" crc="d21cef74" sha1="09e64619a9bb0b0a933978186d139f5ce7da794c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paperboy">
+		<description>Paperboy</description>
+		<year>1984</year>
+		<publisher>Elite</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="78728">
+				<rom name="105 paperboy.fsd" size="78728" crc="b003d5db" sha1="3f3f6ec3572f1c2e678e52a8f2756dfc309ed06d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airwolf">
+		<description>Airwolf</description>
+		<year>1985</year>
+		<publisher>Elite</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104937">
+				<rom name="106 airwolf.fsd" size="104937" crc="40e3a8e1" sha1="2b0c0aeb9f25f5cbf5905c6593ad734842b7649c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commando">
+		<description>Commando</description>
+		<year>1985</year>
+		<publisher>Elite</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104938">
+				<rom name="107 commando.fsd" size="104938" crc="98c52361" sha1="c72d07c98da31150622495064add6e21d16f5d94" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkanoid">
+		<description>Arkanoid</description>
+		<year>1987</year>
+		<publisher>Imagine</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105075">
+				<rom name="108 arkanoid.fsd" size="105075" crc="8e21d5a2" sha1="a6cd09e531488e7f258225c428e3f5541b964177" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raidmosc">
+		<description>Raid Over Moscow</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105083">
+				<rom name="109 raid over moscow.fsd" size="105083" crc="9e0f96b3" sha1="3326a2761cac3d974cfecb0e50ea95ebc46ead6d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wayotef">
+		<description>The Way of the Exploding Fist</description>
+		<year>1985</year>
+		<publisher>Melbourne House</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105096">
+				<rom name="110 the way of the exploding fist.fsd" size="105096" crc="17f7e77c" sha1="7290a74156c4d9666e6af1e928f7939808ed07be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sharrier">
+		<description>Strike Force Harrier</description>
+		<year>1985</year>
+		<publisher>Mirrorsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102539">
+				<rom name="111 strike force harrier.fsd" size="102539" crc="8e4dbbe4" sha1="fef93e95b88963c958234c7e8d9ee36813ec44cc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetrism">
+		<description>Tetris</description>
+		<year>1987</year>
+		<publisher>Mirrorsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="86589">
+				<rom name="112 tetris.fsd" size="86589" crc="5233bcdd" sha1="0ff0269595bb929504f9cc1b764203f77fac504e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pipemani">
+		<description>Pipe Mania</description>
+		<year>1989</year>
+		<publisher>Empire</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102575">
+				<rom name="113 pipe mania.fsd" size="102575" crc="a1590704" sha1="931e93720e87035ee4f813e17b073c84904914af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tarzanm">
+		<description>Tarzan (Martech)</description>
+		<year>1987</year>
+		<publisher>Martech</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105073">
+				<rom name="114 tarzan.fsd" size="105073" crc="7cc3db73" sha1="9b29951449b38c7d711a31192d91183142b2c920" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="samfoxsp">
+		<description>Samantha Fox Strip Poker</description>
+		<year>1986</year>
+		<publisher>Martech</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105091">
+				<rom name="115 samantha fox strip poker.fsd" size="105091" crc="813cd5ce" sha1="61f2e38713b5ab22098f77c1107c1e012eb2563f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kayleth">
+		<description>Kayleth</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105074">
+				<rom name="116 kayleth.fsd" size="105074" crc="d77a0f43" sha1="8642156eaeaf3cf175dced0ae47aad89410a3d47" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skirmish">
+		<description>Skirmish</description>
+		<year>1988</year>
+		<publisher>Godax</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="103890">
+				<rom name="117 skirmish.fsd" size="103890" crc="5f00c4db" sha1="0750f32230ab429802e048185b1364f986230a9c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kourtyd">
+		<description>Kourtyard</description>
+		<year>1988</year>
+		<publisher>Godax</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104609">
+				<rom name="118 kourtyard.fsd" size="104609" crc="808ecc4a" sha1="3696dc1fd4df99213e254d362a5501c6a3f32dce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strandgr">
+		<description>Stranger Danger</description>
+		<year>1988</year>
+		<publisher>Roger Hargreaves</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104945">
+				<rom name="119 stranger danger.fsd" size="104945" crc="f2c5f3f1" sha1="41a69302866fcc436dc474cc96810c98c27bf421" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megapoca">
+		<description>Mega-Apocalypse</description>
+		<year>1988</year>
+		<publisher>Martech</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105082">
+				<rom name="134 mega apocalypse.fsd" size="105082" crc="cf3a7d6e" sha1="296c43f5b55a9ddf9894ec47647e5ce978ad4249" offset="0" />
+				</dataarea>
+		</part>
+	</software>
+
+	<software name="cholo">
+		<description>Cholo</description>
+		<year>1986</year>
+		<publisher>Firebird</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105072">
+				<rom name="135 cholo.fsd" size="105072" crc="8f23bd24" sha1="464bec1cf14d34f902d783e62f7ea4789458cee8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="icarus">
+		<description>Icarus</description>
+		<year>1988</year>
+		<publisher>Mandarin</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102315">
+				<rom name="136 icarus.fsd" size="102315" crc="a0ae7c9a" sha1="c8ac4964859127838228372dadf64f0391320c57" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicoll">
+		<description>The Musicsoft Collection</description>
+		<year>1986</year>
+		<publisher>Duckworth</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105091">
+				<rom name="137 the musicsoft collection.fsd" size="105091" crc="f877e2ca" sha1="2a7331c81bc61ff72d9adb167e86833928f863f4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midway">
+		<description>Midway</description>
+		<year>1988</year>
+		<publisher>Design People</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="70863">
+				<rom name="138 midway.fsd" size="70863" crc="9bef6082" sha1="1264d847abf6c458570913ec3cda6c9ff0fb1d94" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ckeypodd">
+		<description>Concept Keyboard Podd</description>
+		<year>1988</year>
+		<publisher>ESM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104951">
+				<rom name="139 concept keyboard podd.fsd" size="104951" crc="b83dce35" sha1="abd3f44590143f7e4febcae3c4ec2f2db6c17019" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gradvcre">
+		<description>The Graphic Adventure Creator</description>
+		<year>1986</year>
+		<publisher>Incentive</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104959">
+				<rom name="140 the graphic adventure creator.fsd" size="104959" crc="11341d1c" sha1="9df4cf2853bf58c5010d8dba0d479c65c5d962c7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buffers">
+		<description>Buffers</description>
+		<year>1986</year>
+		<publisher>FSoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="81624">
+				<rom name="141 fsoft buffers (corrupt).fsd" size="81624" crc="30376f2f" sha1="f0fedbf368444fbcb12da926109cd7523dbbf1e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicmak">
+		<description>Music Maker</description>
+		<year>1983</year>
+		<publisher>FSoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="81628">
+				<rom name="142 fsoft music maker.fsd" size="81628" crc="add9d908" sha1="76d8d04d294d475330afaa4fe901f8b076f06187" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="krakout">
+		<description>Krakout</description>
+		<year>1988</year>
+		<publisher>Gremlin</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89348">
+				<rom name="165 krakout.fsd" size="89348" crc="35067841" sha1="06cf690fba697dd83c1efb1e331d4b67ff11537c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dpool">
+		<description>3D Pool</description>
+		<year>1989</year>
+		<publisher>Firebird</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105881">
+				<rom name="166 3d pool.fsd" size="105881" crc="b8d584c4" sha1="0ad3835f40fca9d967c4537b96733b88ebee460a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redarrow">
+		<description>Red Arrows</description>
+		<year>1985</year>
+		<publisher>Database</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="59426">
+				<rom name="168 red arrows.fsd" size="59426" crc="5e9b2984" sha1="53211145e7de4742e43cff009ca212ce3167468b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phancomb">
+		<description>Phantom Combat (BBC Series)</description>
+		<year>1985</year>
+		<publisher>Doctor Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104944">
+				<rom name="169 phantom combat (bbc series).fsd" size="104944" crc="fe65a681" sha1="bd249fcaccaec422ea753aafe9b24efe68d88a20" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phancombb" cloneof="phancomb">
+		<description>Phantom Combat (BBC 'B' 32K)</description>
+		<year>1985</year>
+		<publisher>Doctor Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="54572">
+				<rom name="170 phantom combat (bbc 'b' 32k).fsd" size="54572" crc="513a6b64" sha1="4ff0d568790fe448d5f803098923a677815a6a53" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phancombbp" cloneof="phancomb">
+		<description>Phantom Combat (BBC B &amp; 'Plus')</description>
+		<year>1985</year>
+		<publisher>Doctor Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="54572">
+				<rom name="170 phantom combat (bbc b &amp; 'plus').fsd" size="54572" crc="f0e01ac7" sha1="a242b35ee1fd2e403a7ea26a5dd3f708154b77ce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccastles">
+		<description>Crystal Castles</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105082">
+				<rom name="171 crystal castles.fsd" size="105082" crc="533f83de" sha1="765c6d8bbadc46ffe954afd626b6e54dbc7b7819" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daleytst">
+		<description>Daley Thompson's Super-Test</description>
+		<year>1985</year>
+		<publisher>Ocean</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105094">
+				<rom name="172 daley thompson's super-test.fsd" size="105094" crc="76dec00e" sha1="c5e82c7338d985272abf099a51420988d0658bba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dgraphd">
+		<description>3D Graphics Development System</description>
+		<year>1985</year>
+		<publisher>Glentop Publishers</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Startup"/>
+			<dataarea name="flop" size="97078">
+				<rom name="173 3d graphics development system.fsd" size="97078" crc="407466ba" sha1="304eaf043119e382888771d1afbcf29f8d02038f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Database"/>
+			<dataarea name="flop" size="105073">
+				<rom name="173 3d graphics development system database.fsd" size="105073" crc="b6b986fe" sha1="b425ea1f925032293509423ebe0296db42a356bf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wediag">
+		<description>Diagnostics Disc</description>
+		<year>1985</year>
+		<publisher>Watford Electronics</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="15852">
+				<rom name="185 watford electronics diagnostics disc.fsd" size="15852" crc="74cd2892" sha1="ebbc2de75ed329ecdb657ea821864c626d9fa905" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discdebg">
+		<description>Disc Debug and Copy All</description>
+		<year>1983</year>
+		<publisher>Basil Bloom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104953">
+				<rom name="190 disk debug and copy-all.fsd" size="104953" crc="20dc59e1" sha1="c5e998e839cef9f9a53b531e10a0d2de4ee8050a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discexec">
+		<description>Disc Executor</description>
+		<year>198?</year>
+		<publisher>Vision Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104943">
+				<rom name="191 disc executor.fsd" size="104943" crc="ec1e85a4" sha1="df46bf83ecac015b2b6f5f2ebfe68e42b00a4b12" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mooncrstl" cloneof="mooncrst">
+		<description>Moon Cresta (no Lenslok)</description>
+		<year>1986</year>
+		<publisher>Incentive</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105078">
+				<rom name="200 moon cresta (no lenslock).fsd" size="105078" crc="791afbfa" sha1="8a397320421f3a2cc00c2a5ac8378cc677dbbd76" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mooncrst">
+		<description>Moon Cresta</description>
+		<year>1986</year>
+		<publisher>Incentive</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105078">
+				<rom name="200 moon cresta.fsd" size="105078" crc="b663fcde" sha1="7fe86e62536655b69308b59047e4867e06ff0c6b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmindqm">
+		<description>BBC Mastermind Quizmaster</description>
+		<year>1984</year>
+		<publisher>Mirrorsoft-Ivan Berg</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102330">
+				<rom name="201 mastermind quizmaster.fsd" size="102330" crc="70955427" sha1="423ce6de7e159de72261802cf82a0db5db4169c4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmind">
+		<description>BBC Mastermind</description>
+		<year>1984</year>
+		<publisher>Mirrorsoft-Ivan Berg</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102529">
+				<rom name="201 mastermind.fsd" size="102529" crc="a775c8b7" sha1="c11f149e7827ac5d83544593652f5fb9c8d97910" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tcrosswd">
+		<description>The Times Crosswords Vol.1</description>
+		<year>1988</year>
+		<publisher>The Times</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="209879">
+				<rom name="203 the times crosswords volume 1 side 1.fsd" size="209879" crc="c24e1d46" sha1="43e6a446f763ecebac75fd83e2ee315cf4b7dadc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="209879">
+				<rom name="203 the times crosswords volume 1 side 2.fsd" size="209879" crc="341f1170" sha1="59bf18805722ef0e6b3672d35f9ac7192936f3b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amxpagem">
+		<description>AMX Pagemaker</description>
+		<year>1986</year>
+		<publisher>Advanced Memory Systems</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105080">
+				<rom name="204 amx pagemaker.fsd" size="105080" crc="8f888021" sha1="252b293243a01d2f3fd89036918800ca6de1d8db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tessalat">
+		<description>Tesselator</description>
+		<year>1984</year>
+		<publisher>Addison-Wesley</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="63004">
+				<rom name="205 tesselator.fsd" size="63004" crc="ee1b75ee" sha1="8f603b6ac22739fddc7185d31a1ce79d4716098c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlogic">
+		<description>D-Logic</description>
+		<year>1983</year>
+		<publisher>SciCAL Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104937">
+				<rom name="207 d-logic.fsd" size="104937" crc="0a65c978" sha1="8b7b411e4e27a505749afd6daffdaaa2b16b9cb0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uridium">
+		<description>Uridium</description>
+		<year>1987</year>
+		<publisher>Hewson Consultants</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104675">
+				<rom name="209 uridium.fsd" size="104675" crc="8f3637f9" sha1="a68156d3fa600e4c4035102600ff4869fa4c01ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmsys86" cloneof="tmsys">
+		<description>The Music System (1986)</description>
+		<year>1986</year>
+		<publisher>Island Logic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104951">
+				<rom name="210 the music system (1986 release).fsd" size="104951" crc="e61c1d8a" sha1="4e322c6fdef611c55fe16be9ec6302a4051f0c24" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmsys">
+		<description>The Music System</description>
+		<year>1984</year>
+		<publisher>Island Logic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="1a"/>
+			<dataarea name="flop" size="104741">
+				<rom name="244 the music system 1a.fsd" size="104741" crc="5c2bcbbc" sha1="832dca99880d53b258f68c1f66ef0ce365c02b97" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="1b"/>
+			<dataarea name="flop" size="104741">
+				<rom name="244 the music system 1b.fsd" size="104741" crc="705e8c30" sha1="e7f0f1f379213c995e403fd2b15445dfc75eb7f5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="1c"/>
+			<dataarea name="flop" size="104741">
+				<rom name="244 the music system 1c.fsd" size="104741" crc="c45ef959" sha1="655e0815acb01a9c9f474c58d6ebb9753aae9d56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtspec">
+		<description>Sport Spectacular</description>
+		<year>198?</year>
+		<publisher>Alternative</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="99705">
+				<rom name="211 sport spectacular side 1.fsd" size="99705" crc="12330a00" sha1="ed2368cde11a6cf26115e2dae85b4ce5ee5f3032" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="99706">
+				<rom name="211 sport spectacular side 2.fsd" size="99706" crc="e68f751d" sha1="0325f070f4263480d4ac5bf3d3d3f14282effccf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mexico86">
+		<description>Mexico 86</description>
+		<year>1986</year>
+		<publisher>Qualsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104939">
+				<rom name="214 mexico 86.fsd" size="104939" crc="ce06c188" sha1="3785e14ab12404589877959cd6fb6f4ee5f1ab1f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="notapenn">
+		<description>Not a Penny More, Not a Penny Less</description>
+		<year>1987</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="104964">
+				<rom name="215 napmnapl side 1.fsd" size="104964" crc="8e59911a" sha1="91e5f2aaeee1eb7adb2ee8d898e8b46b53125c48" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="104964">
+				<rom name="215 napmnapl side 2.fsd" size="104964" crc="ad51aaac" sha1="ef0e5a6daddaac0de147d28b4a7399baf7f3eb1c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discdup2">
+		<description>Disc Duplicator II</description>
+		<year>1984</year>
+		<publisher>Howard Spurr</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="51116">
+				<rom name="216 disc duplicator ii.fsd" size="51116" crc="fa519064" sha1="832aa615e66f5594a688666769c9074a46bc054c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starseek">
+		<description>Star Seeker</description>
+		<year>1985</year>
+		<publisher>Mirrorsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102530">
+				<rom name="217 star seeker.fsd" size="102530" crc="54e36349" sha1="8943dc64d52ff43dd6cb42f16b1ff2f94709bcd0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dunjunz">
+		<description>Dunjunz</description>
+		<year>1987</year>
+		<publisher>Bug Byte</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="104937">
+				<rom name="226 dunjunz side a.fsd" size="104937" crc="25fc923b" sha1="9d05d9f79b506129347eeaf28711409058d029c9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="104937">
+				<rom name="226 dunjunz side b.fsd" size="104937" crc="3f717792" sha1="915acda5b0522d96dabad0e3e0cfb0d1b260cae4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybplay">
+		<description>Keyboard Player</description>
+		<year>1986</year>
+		<publisher>Chalksoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104945">
+				<rom name="253 keyboard player.fsd" size="104945" crc="ee551142" sha1="4742502caa112bc7c61231af0925becd2b7359e4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="v2140dd">
+		<description>Vector 2 v1.40 (Acorn 1770)</description>
+		<year>1985</year>
+		<publisher>Chalice Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="62238">
+				<rom name="256 vector 2 v140 acorn 1770.fsd" size="62238" crc="bb051095" sha1="3d41d8708ef97b77d63946886ef374d281106cbd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="v2140sd">
+		<description>Vector 2 v1.40 (Single Density)</description>
+		<year>1985</year>
+		<publisher>Chalice Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="59718">
+				<rom name="256 vector 2 v140 single density.fsd" size="59718" crc="38bcae0c" sha1="b585492a62d7a3d96b2f738ccb959eb4b170dfd2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="v1120">
+		<description>Vector 1 v1.20</description>
+		<year>1985</year>
+		<publisher>Chalice Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="63766">
+				<rom name="257 vector 1 v120.fsd" size="63766" crc="28a5004c" sha1="b9aded368127bcefbf699ceb9ebf798bcd536f30" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="v1120b">
+		<description>Vector 1 v1.20b</description>
+		<year>1985</year>
+		<publisher>Chalice Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="63766">
+				<rom name="257 vector 1 v120b.fsd" size="63766" crc="2331b7c7" sha1="ab20b1a9ac3f03c550c71a11f030d2aafb5e73e4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doscopy">
+		<description>DOSCOPY</description>
+		<year>1986</year>
+		<publisher>Baksoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104945">
+				<rom name="258 baksoft doscopy.fsd" size="104945" crc="145a38f8" sha1="e340fc48921e863cc606cb64ca3aecd77ba5878e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puff">
+		<description>Puff</description>
+		<year>1986</year>
+		<publisher>ESM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104938">
+				<rom name="279 esm puff.fsd" size="104938" crc="fea462d2" sha1="40f61cb68e77ca9be67352f45ab3462f8083cb7c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spshuttm">
+		<description>Space Shuttle</description>
+		<year>1983</year>
+		<publisher>Microdeal</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="28928">
+				<rom name="291 shuttle.fsd" size="28928" crc="602ae93b" sha1="c7ecaf30794d5a4e917903487da94743d030124d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dddcalc">
+		<description>DDD-calc</description>
+		<year>1985</year>
+		<publisher>Gemini</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="85808">
+				<rom name="293 ddd-calc.fsd" size="85808" crc="f66ccedc" sha1="0cfa84a59f4cbe0b82c581cbb7e7f2203660bd60" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="olympdec">
+		<description>Olympic Decathlon</description>
+		<year>1984</year>
+		<publisher>Alligata</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="78737">
+				<rom name="294 olympic decathlon.fsd" size="78737" crc="b4543527" sha1="a0ed535c21a3f5cd4a65f2655391938d0d0d64ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="egyptadv">
+		<description>Egyptian Adventure</description>
+		<year>1987</year>
+		<publisher>Duckworth</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105085">
+				<rom name="295 egyptian adventure.fsd" size="105085" crc="aa65c795" sha1="a33c0188feb8029ede52a56428ca141af09648b9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akhdisku">
+		<description>Akhter BBC Disk Utilities</description>
+		<year>198?</year>
+		<publisher>Akhter</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="81366">
+				<rom name="296 akhter bbc disk utilities.fsd" size="81366" crc="5eb84680" sha1="f973e9f756d50715d9e51c0883cb324d1c99dde8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discdup3m" cloneof="discdup3">
+		<description>Disc Duplicator 3 (modified to copy itself)</description>
+		<year>1985</year>
+		<publisher>FSoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="47298">
+				<rom name="297 disc duplicator 3 (modified to copy itself).fsd" size="47298" crc="a27ba46e" sha1="b65903c0e47b118d586634ab52948f3b87eb2614" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discdup3">
+		<description>Disc Duplicator 3</description>
+		<year>1985</year>
+		<publisher>FSoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="47298">
+				<rom name="297 disc duplicator 3.fsd" size="47298" crc="b59f2073" sha1="adb2e3c2c481cd1f6b55cb6ae0866c1814072d29" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lotr">
+		<description>The Lord of the Rings</description>
+		<year>1986</year>
+		<publisher>Melbourne House</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="105091">
+				<rom name="300 lord of the rings side 1.fsd" size="105091" crc="922d9f1b" sha1="cc684e196b8d87c5ebb2791e163855242bfabf19" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="105091">
+				<rom name="300 lord of the rings side 2.fsd" size="105091" crc="b986982f" sha1="11ae12b8d274ac76b351b9e7b4e8cd192ad1b51d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="offcmate">
+		<description>Office Mate</description>
+		<year>1986</year>
+		<publisher>Watford Electronics</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104941">
+				<rom name="301 office mate.fsd" size="104941" crc="7944a905" sha1="0cf2b74e31ebebca042e5a5d823f9f7fa3e6c39a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="offcmast">
+		<description>Office Master</description>
+		<year>1986</year>
+		<publisher>Gemini</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104943">
+				<rom name="302 office master.fsd" size="104943" crc="ee2343b2" sha1="65844467183ed02b6253954ba9e498a1fc645e22" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hobbit">
+		<description>The Hobbit</description>
+		<year>1983</year>
+		<publisher>Melbourne House</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="105084">
+				<rom name="304 the hobbit side 1.fsd" size="105084" crc="291aea5c" sha1="28b78d006b36dc3d4338729d6d92cb0454f9f285" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Picture Disk 1"/>
+			<dataarea name="flop" size="104955">
+				<rom name="304 the hobbit picture disk 1.fsd" size="104955" crc="c6b638f4" sha1="a0e0683312eaa726b1bfec3e859a7c87bcaff175" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="105084">
+				<rom name="304 the hobbit side 2.fsd" size="105084" crc="2629eaff" sha1="ab033a5c6d74d7c86b0e4d03be4a2fd76814cfe2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Picture Disk 2"/>
+			<dataarea name="flop" size="104955">
+				<rom name="304 the hobbit picture disk 2.fsd" size="104955" crc="b7a26a82" sha1="f8bc3078627fca6bf6760c86f1078686d8388061" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Save Game Disk"/>
+			<dataarea name="flop" size="104955">
+				<rom name="304 the hobbit save game disk.fsd" size="104955" crc="1f5b81aa" sha1="11f80d16b0d20258138791cd2a3649c4424f92c4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrtmeasr">
+		<description>Mr T's Measuring Games</description>
+		<year>1983</year>
+		<publisher>Good Housekeeping Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="49641">
+				<rom name="316 mr t's measuring games.fsd" size="49641" crc="b6c64f34" sha1="edc9bff92859328c2e3271a8269ad048dd500fa0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clone">
+		<description>Clone</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="34162">
+				<rom name="334 clone.fsd" size="34162" crc="5389bd26" sha1="9ac88e04d8c39699e7ed53a1ee27baf91ba99c10" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enthar7">
+		<description>Enthar Seven</description>
+		<year>1985</year>
+		<publisher>Robico</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disc"/>
+			<dataarea name="flop" size="105092">
+				<rom name="335 enthar seven program disc.fsd" size="105092" crc="d5312823" sha1="2c87de7cd8d5a47bc892b544f1486a9b60003cc9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Database Disc"/>
+			<dataarea name="flop" size="105093">
+				<rom name="335 enthar seven database disc.fsd" size="105093" crc="e49c3c99" sha1="82ec0bd187eb38bb96940173740b8f35a20d98f5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="story">
+		<description>Story</description>
+		<year>1983</year>
+		<publisher>H&amp;H Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105191">
+				<rom name="342 story.fsd" size="105191" crc="3cfde5fc" sha1="99e1bdaacf6615d10279b87c279213188434a57a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crosswds">
+		<description>Crosswords</description>
+		<year>1986</year>
+		<publisher>H.S.Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="100224">
+				<rom name="344 crosswords.fsd" size="100224" crc="703fe0a0" sha1="fabc8e0d7481e8f16efdefa13a7b38b080515f01" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="readrigh">
+		<description>Read-Right-Away</description>
+		<year>1986</year>
+		<publisher>H.S.Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="58293">
+				<rom name="346 read-right-away.fsd" size="58293" crc="3801fa45" sha1="96f0009bd0c7ef6906a075ef2aba206b9ef7a1a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goldcoll">
+		<description>The Gold Collection</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 0"/>
+			<dataarea name="flop" size="105086">
+				<rom name="351 the gold collection side 0.fsd" size="105086" crc="394f6d76" sha1="462bb55bcf122f9d5d998eacf3f927c7d64bd802" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="105086">
+				<rom name="351 the gold collection side 1.fsd" size="105086" crc="aebd2b3d" sha1="77b604df862fd7ed18480ab09bb73f63f81adead" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bismarck">
+		<description>Bismarck: Death of a Battleship</description>
+		<year>1987</year>
+		<publisher>BBC Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104960">
+				<rom name="352 bismarck death of a battleship.fsd" size="104960" crc="171efe2c" sha1="779c4405331e85da57c86463ef9c89e10fecc98c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stdsnook">
+		<description>Steve Davis Snooker</description>
+		<year>1986</year>
+		<publisher>CDS</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104949">
+				<rom name="359 steve davis snooker.fsd" size="104949" crc="fe76aa4b" sha1="d8ac57145d3fd2ddaf93746bab7fbac38e0b6354" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbcomp2">
+		<description>The Bug-Byte Compilation II</description>
+		<year>1987</year>
+		<publisher>Bug Byte</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104957">
+				<rom name="360 the bug-byte compilation ii.fsd" size="104957" crc="f15d6567" sha1="2789823d36f9001996a9d1c463b4789333137a89" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="replica2">
+		<description>Replica II</description>
+		<year>1983</year>
+		<publisher>Clares</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104940">
+				<rom name="323 replica ii.fsd" size="104940" crc="2127ca86" sha1="653efe9ebe4d4f0c6c4d13cadab9dd91701edf8b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="replica3">
+		<description>Replica III</description>
+		<year>1985</year>
+		<publisher>Clares</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="53033">
+				<rom name="324 replica iii.fsd" size="53033" crc="7ffdc729" sha1="a0062dd8035f644c8bf292fc4e05ae1ffeecafba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thekey">
+		<description>The Key</description>
+		<year>1983</year>
+		<publisher>Clares</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="18444">
+				<rom name="325 the key.fsd" size="18444" crc="0494a7bc" sha1="4b42068026abd56496ea6e85931cc27cc772a795" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="funhous">
+		<description>Fun House</description>
+		<year>1984</year>
+		<publisher>Clares</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="41627">
+				<rom name="326 fun house.fsd" size="41627" crc="12eedc8d" sha1="65509df6eb06707e1afbd2066e9d2b0daba47deb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grafdisk">
+		<description>Grafdisk</description>
+		<year>1983</year>
+		<publisher>Clares</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104938">
+				<rom name="327 grafdisk.fsd" size="104938" crc="5037d4c4" sha1="82e229f2666e749240c2b438a1cb81bf40ff7563" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fwplus">
+		<description>Fontwise Plus</description>
+		<year>198?</year>
+		<publisher>Clares</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105455">
+				<rom name="328 fontwise plus.fsd" size="105455" crc="661e024d" sha1="2b3451d5938963a930175977750c3593884b370e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fwfonted">
+		<description>Fontwise Font Editor</description>
+		<year>198?</year>
+		<publisher>Clares</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105277">
+				<rom name="329 font editor.fsd" size="105277" crc="a5d91d15" sha1="2c422b94fdf41cff99c0356974d49adfe52828a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profile">
+		<description>Profile</description>
+		<year>1985</year>
+		<publisher>Clares</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105449">
+				<rom name="330 profile.fsd" size="105449" crc="993e5239" sha1="e5b403c5a421e0a83b51763e8c9cc493fe901f29" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbase">
+		<description>Beta-Base</description>
+		<year>1983</year>
+		<publisher>Clares</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105451">
+				<rom name="331 beta base.fsd" size="105451" crc="c4846f7a" sha1="109496d5ba557db716de1e150b6a894e70539af1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbaseutl">
+		<description>Beta-Base Utilities 1</description>
+		<year>198?</year>
+		<publisher>Clares</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105463">
+				<rom name="332 beta base utilities 1.fsd" size="105463" crc="437852e2" sha1="7dfd059bc601d869bb91ac7b3e412bced4d2b62e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="klax">
+		<description>Klax</description>
+		<year>1990</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104934">
+				<rom name="353 klax.fsd" size="104934" crc="5ebf42dc" sha1="561eee716bdbb1d959d94f49dc818f541081044a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starwars">
+		<description>Star Wars</description>
+		<year>1987</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105197">
+				<rom name="354 star wars.fsd" size="105197" crc="90d585a7" sha1="c70e00a1565720319baf011662e2715c2ea6f7ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="esb">
+		<description>The Empire Strikes Back</description>
+		<year>1988</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102595">
+				<rom name="355 the empire strikes back.fsd" size="102595" crc="a633c113" sha1="919914ef1515093be5db820ea93a8e8de407d65b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jedi">
+		<description>Return of the Jedi</description>
+		<year>1988</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104948">
+				<rom name="356 return of the jedi.fsd" size="104948" crc="71a32e01" sha1="a8a096ca6ba6f1dc96bafc20d56b8547e4ff7e23" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lickill">
+		<description>License to Kill</description>
+		<year>1989</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104945">
+				<rom name="357 licence to kill.fsd" size="104945" crc="2acfd2e6" sha1="a6a961b3c688ed70a1368081c7e5494b571d9c5b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="livdayl">
+		<description>The Living Daylights</description>
+		<year>1983</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="106031">
+				<rom name="358 the living daylights.fsd" size="106031" crc="03288645" sha1="b4be4e23f0ca89092385cc9337a3cbb39ba329e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holedout">
+		<description>Holed Out</description>
+		<year>1989</year>
+		<publisher>4th Dimension</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104939">
+				<rom name="-121 holed out.fsd" size="104939" crc="5bd94592" sha1="2ec2c244fe8f2a3a6d6552c7b40d2edadf9d8538" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whimagi2">
+		<description>White Magic 2</description>
+		<year>1989</year>
+		<publisher>4th Dimension</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104943">
+				<rom name="097 white magic 2.fsd" size="104943" crc="a51d8e1a" sha1="8a114a55de1f3feea15dbad0a6c4db8c753c953e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nevryon">
+		<description>Nevyron</description>
+		<year>1991</year>
+		<publisher>4th Dimension</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104937">
+				<rom name="120 nevryon.fsd" size="104937" crc="a699d6e8" sha1="dade4d81c4bdb9bc51065a80958e72b7212891db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uim">
+		<description>U.I.M.</description>
+		<year>1989</year>
+		<publisher>4th Dimension</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105070">
+				<rom name="122 uim.fsd" size="105070" crc="7a1272d1" sha1="b81fed0a92de79f7a41e598ed0bdba4f1055dbaa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="etype">
+		<description>E-Type</description>
+		<year>1990</year>
+		<publisher>4th Dimension</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104936">
+				<rom name="123 e-type.fsd" size="104936" crc="48a0cf59" sha1="252ce33d06bc16b844563750a8c75d4a18089995" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whimagic">
+		<description>White Magic</description>
+		<year>1989</year>
+		<publisher>4th Dimension</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105078">
+				<rom name="124 white magic.fsd" size="105078" crc="f4b7103e" sha1="c1d8757f87a8734c64a130b3cde6573c2c5c94af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arsoccer">
+		<description>Arcade Soccer</description>
+		<year>1989</year>
+		<publisher>4th Dimension</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104943">
+				<rom name="125 arcade soccer.fsd" size="104943" crc="ca1aa429" sha1="95eb3f63cb2e43cc4a36836490a972a0f2de2fd9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zenon">
+		<description>Zenon</description>
+		<year>1989</year>
+		<publisher>Impact</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104935">
+				<rom name="126 zenon.fsd" size="104935" crc="527d6a51" sha1="1913335c3075fe5410a8db6f750023689280feee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clogger">
+		<description>Clogger</description>
+		<year>1988</year>
+		<publisher>Impact</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105074">
+				<rom name="127 clogger.fsd" size="105074" crc="37eddb7b" sha1="eabb0ece6f7a29cc42006e2ffb03a4078db2b2f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="orbital">
+		<description>Orbital</description>
+		<year>1989</year>
+		<publisher>Impact</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105074">
+				<rom name="128 orbital.fsd" size="105074" crc="c62d6e23" sha1="1aaf7b08df9ac24abc854bee8d628b14e88d53d1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artstudi">
+		<description>The Art Studio</description>
+		<year>1989</year>
+		<publisher>Impact</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104944">
+				<rom name="129 the art studio.fsd" size="104944" crc="e4338f0a" sha1="fd5c30303169cbc1ffaf98197644ec17bfe5d7bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cheatj1">
+		<description>Cheat It Again Joe Vol.1</description>
+		<year>1988</year>
+		<publisher>Impact</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102473">
+				<rom name="130 cheat it again, joe volume 1.fsd" size="102473" crc="7a090ddd" sha1="03dc30e97ec3ebcfd7a014a89be2c2cf4f535654" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cheatj2">
+		<description>Cheat It Again Joe Vol.2</description>
+		<year>1988</year>
+		<publisher>Impact</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105094">
+				<rom name="131 cheat it again, joe volume 2.fsd" size="105094" crc="9305d08f" sha1="a543c79a6143e9777316a41802c1910febae07cf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cheatj4">
+		<description>Cheat It Again Joe Vol.4</description>
+		<year>1988</year>
+		<publisher>Impact</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102336">
+				<rom name="132 cheat it again, joe volume 4.fsd" size="102336" crc="70504e56" sha1="ca955b36a1035cf6bbe8b12670383c23bf940a2e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holedoc1">
+		<description>Holed Out Extra Courses Vol.1</description>
+		<year>1990</year>
+		<publisher>4th Dimension</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104959">
+				<rom name="298 holed out extra courses vol1.fsd" size="104959" crc="5b41e1e6" sha1="b8a1feca41cd9f445c96bfec4da9b1b9c5d7049e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holedoc2">
+		<description>Holed Out Extra Courses Vol.2</description>
+		<year>1990</year>
+		<publisher>4th Dimension</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104959">
+				<rom name="299 holed out extra courses vol2.fsd" size="104959" crc="26ea5dbd" sha1="f497036e19b42b9fa657d5ccadb7c1217c2e2e5f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reteden">
+		<description>Return to Eden</description>
+		<year>1984</year>
+		<publisher>Level 9 Computing</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="35171">
+				<rom name="014 return to eden.fsd" size="35171" crc="3fe8c91d" sha1="18277447d0447b0ad5c8bbe8d7389ebe044933e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colossal">
+		<description>Colossal Adventure</description>
+		<year>1983</year>
+		<publisher>Level 9 Computing</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="35175">
+				<rom name="051 colossal adventure.fsd" size="35175" crc="0dcf036c" sha1="7344c685c8a06f557814190fc0fde7b54d703b5b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snowball">
+		<description>Snowball</description>
+		<year>1983</year>
+		<publisher>Level 9 Computing</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="35165">
+				<rom name="063 snowball.fsd" size="35165" crc="5ef47761" sha1="2c2c2d2bfa4d158c2fe11c72378005d0b1af5ad8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lordstme">
+		<description>Lords of Time</description>
+		<year>1983</year>
+		<publisher>Level 9 Computing</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="35170">
+				<rom name="085 lords of time.fsd" size="35170" crc="b3cbfeac" sha1="eb0e7b24b566b6cfb28af36a4a726e24e6936ee6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advquest">
+		<description>Adventure Quest</description>
+		<year>1983</year>
+		<publisher>Level 9 Computing</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="35172">
+				<rom name="333 adventure quest.fsd" size="35172" crc="1d6057ce" sha1="7a5349928958c53b4ad883aac1e0e1d9084b31ab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timemagk">
+		<description>Time and Magik - The Trilogy</description>
+		<year>1988</year>
+		<publisher>Mandarin</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Game"/>
+			<dataarea name="flop" size="209864">
+				<rom name="345 time and magik game side.fsd" size="209864" crc="03dd16fe" sha1="09c2bbaaf1a98292093933c139e3946b41faeddb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Pictures"/>
+			<dataarea name="flop" size="209849">
+				<rom name="345 time and magik pictures side.fsd" size="209849" crc="c8f7b4d5" sha1="4662ba6a2dd6445b293465165630bdfce6d9b4c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lancelot">
+		<description>Lancelot</description>
+		<year>1988</year>
+		<publisher>Mandarin</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Game"/>
+			<dataarea name="flop" size="209868">
+				<rom name="350 lancelot game side.fsd" size="209868" crc="c4189869" sha1="5d65d025aded494d6030cf281d2bffe31049739d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Pictures"/>
+			<dataarea name="flop" size="209872">
+				<rom name="350 lancelot pictures side.fsd" size="209872" crc="1a29bbe1" sha1="fb60bc459afc8b66b84a40a409076adad3b0b4f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="imogen">
+		<description>Imogen</description>
+		<year>1986</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="94532">
+				<rom name="062 imogen.fsd" size="94532" crc="086b1ab5" sha1="fcf66c457b50a282517c037f0836bdecd8085dcc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castleq">
+		<description>Castle Quest</description>
+		<year>1985</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="65627">
+				<rom name="072 castle quest.fsd" size="65627" crc="83552111" sha1="13458425fff08bd90686d048102a4d0befc66477" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stockcar">
+		<description>Stock Car</description>
+		<year>1983</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="82193">
+				<rom name="086 stock car.fsd" size="82193" crc="45c927de" sha1="617c17abce10221837b1c6483e3d96d4925b8b0b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cybermis">
+		<description>Cybertron Mission</description>
+		<year>1983</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="87383">
+				<rom name="087 cybertron mission.fsd" size="87383" crc="24d1af1e" sha1="a8e0f30ded1a13a899558d6cb7e92fd41731902b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="duneridr">
+		<description>Dune Rider</description>
+		<year>1984</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102922">
+				<rom name="088 dune rider.fsd" size="102922" crc="83414390" sha1="6256e43c97f8e2746baa543c4ec4b9535035e85f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="intergal">
+		<description>Intergalactic Trader</description>
+		<year>1983</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104950">
+				<rom name="089 intergalactic trader.fsd" size="104950" crc="0fe3f66a" sha1="e0cbd9ec0a41a59b13c7e3f9f2684de3095b52c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starflen">
+		<description>Starfleet Encounter</description>
+		<year>1984</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102931">
+				<rom name="090 starfleet encounter.fsd" size="102931" crc="85c85b37" sha1="ee81acfaffd937f1d5fea2b19f45844ae43a8881" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drwhomin">
+		<description>Doctor Who and the Mines of Terror (Master/B+)</description>
+		<year>1986</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="86617">
+				<rom name="133 doctor who and the mines of terror.fsd" size="86617" crc="c5eade21" sha1="b3bdd76eae53561f8ee4977d2a0088f223f5464b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drwhominb" cloneof="drwhomin">
+		<description>Doctor Who and the Mines of Terror (with ROM)</description>
+		<year>1985</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="54004">
+				<rom name="303 doctor who and the mines of terror.fsd" size="54004" crc="dc4254fb" sha1="20f65441000054a4b878f033cda49ec6d376a2bd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cart1" interface="bbc_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="DoctorWhoAndTheMinesOfTerror.rom" size="16384" crc="9ce48a7e" sha1="9287aa2c0ef535d008f7d0e7e34a96400098816a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blockbus">
+		<description>Blockbuster</description>
+		<year>1984</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="79605">
+				<rom name="193 block buster.fsd" size="79605" crc="6ab8275c" sha1="6af1dcac1cb4d61e83ac11e29230a9ecd8209f04" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mree">
+		<description>Mr Ee!</description>
+		<year>1984</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102917">
+				<rom name="194 mr ee.fsd" size="102917" crc="366d3852" sha1="7cd6deb7ceaebf088986e5dd60341d112079c4a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frenzy">
+		<description>Frenzy</description>
+		<year>1983</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="77008">
+				<rom name="195 frenzy.fsd" size="77008" crc="ccc3499e" sha1="eb3759b0c1b1c9a61adf9a84d3d32894afc73331" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="killergo">
+		<description>Killer Gorilla</description>
+		<year>1984</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="82198">
+				<rom name="196 killer gorilla.fsd" size="82198" crc="7788ebfd" sha1="988898b520b46a0fb0ca5ad342284493261f90ef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghouls">
+		<description>Ghouls</description>
+		<year>1984</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92554">
+				<rom name="197 ghouls.fsd" size="92554" crc="bfe5cffa" sha1="36e6bf5052a4b894e449446146ca1a1676babfd5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="themine">
+		<description>The Mine</description>
+		<year>1984</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="82192">
+				<rom name="198 the mine.fsd" size="82192" crc="ddf67dd6" sha1="3aa22c441642e05558a42dc3ce93f722df261d27" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="felixfac">
+		<description>Felix in the Factory</description>
+		<year>1982</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="82204">
+				<rom name="199 felix in the factory.fsd" size="82204" crc="693a92fd" sha1="0a7ac7c5086685b0f8bc705a2ff558ce44a01570" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="felixwee">
+		<description>Felix Meets the Evil Weevils</description>
+		<year>1984</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="100347">
+				<rom name="255 felix meets the evil weevils.fsd" size="100347" crc="71182cc8" sha1="798b4d58b98207e1f5491b76926b4a7198bc3578" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rubbletr">
+		<description>Rubble Trouble</description>
+		<year>1983</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89971">
+				<rom name="264 rubbletrouble.fsd" size="89971" crc="cd1cf430" sha1="3ae07e2aa6d38c682cd1810b6c076a200bcba441" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpmagic">
+		<description>Micro Power Magic</description>
+		<year>1986</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side One"/>
+			<dataarea name="flop" size="86602">
+				<rom name="305 micro power magic i side one.fsd" size="86602" crc="5808f35e" sha1="8d290c1179560e0cca601fff17ea876050706158" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side Two"/>
+			<dataarea name="flop" size="86602">
+				<rom name="305 micro power magic i side two.fsd" size="86602" crc="59188f60" sha1="faf9b366e650c808b3438bcc2e1c77a11ac1d529" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpmagic2">
+		<description>Micro Power Magic II</description>
+		<year>1986</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side One"/>
+			<dataarea name="flop" size="94466">
+				<rom name="306 micro power magic ii side one.fsd" size="94466" crc="02bfc44e" sha1="d323933d217c4b206f2cf7eefbd57b3b046b54bf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side Two"/>
+			<dataarea name="flop" size="70877">
+				<rom name="306 micro power magic ii side two.fsd" size="70877" crc="2638f310" sha1="d9af8ba63ca03ff74f8fa3b2ab75b34fdc774b9d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpmagic3">
+		<description>Micro Power Magic III</description>
+		<year>1986</year>
+		<publisher>Micro Power</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side One"/>
+			<dataarea name="flop" size="104951">
+				<rom name="307 micro power magic iii side one.fsd" size="104951" crc="b50c606d" sha1="fd5995c4bdbea382563eaa4216e14494d4d781b9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side Two"/>
+			<dataarea name="flop" size="104951">
+				<rom name="307 micro power magic iii side two.fsd" size="104951" crc="b7404184" sha1="db1afd4c596654de069ad0e568a6a7d9f846c123" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="repton">
+		<description>Repton</description>
+		<year>1985</year>
+		<publisher>Superior Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104312">
+				<rom name="080 repton.fsd" size="104312" crc="425cfb77" sha1="f8bbb2b5264e3c3512302e72149715fdd2f6117e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="citadel">
+		<description>Citadel</description>
+		<year>1985</year>
+		<publisher>Superior Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104937">
+				<rom name="174 citadel.fsd" size="104937" crc="36debf02" sha1="7014e8d9f93fbf394481fccf28a83e6776efcbb1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="karatec">
+		<description>Karate Combat</description>
+		<year>1986</year>
+		<publisher>Superior Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="44660">
+				<rom name="175 karate combat.fsd" size="44660" crc="96365316" sha1="bedde7da96eda08f3828d2dbc7873174ca32c5c7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tempest">
+		<description>Tempest</description>
+		<year>1985</year>
+		<publisher>Superior Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31549">
+				<rom name="176 tempest.fsd" size="31549" crc="671f7206" sha1="1d8ebbe1f3750d3d03ba9505a4a33cc93d365ca4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deathsta">
+		<description>Death Star</description>
+		<year>1985</year>
+		<publisher>Superior Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="34172">
+				<rom name="177 deathstar.fsd" size="34172" crc="4a5c042c" sha1="f1371e67a4c1941ab2db1a8bcb5e5b01f93ab4dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="repton2">
+		<description>Repton 2</description>
+		<year>1985</year>
+		<publisher>Superior Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104938">
+				<rom name="178 repton 2.fsd" size="104938" crc="f37ac03b" sha1="84d0122678bb87263822d4fb5e3d89b2a067f552" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thrust">
+		<description>Thrust</description>
+		<year>1986</year>
+		<publisher>Superior Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="49895">
+				<rom name="179 thrust.fsd" size="49895" crc="52762853" sha1="a3de8ea8f50dfc8ceb2adea54734337874c34ba6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaforc">
+		<description>Galaforce</description>
+		<year>1986</year>
+		<publisher>Superior Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="47277">
+				<rom name="180 galaforce.fsd" size="47277" crc="885acb2c" sha1="65d96bdd73f8572a8b42bed368e0fc03ce2c9a02" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strykrun">
+		<description>Stryker's Run</description>
+		<year>1986</year>
+		<publisher>Superior Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104943">
+				<rom name="181 stryker's run.fsd" size="104943" crc="92e3c589" sha1="cc943acffa8bfec35ac0eb249ebbeb98b6673314" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="repton3">
+		<description>Repton 3</description>
+		<year>1986</year>
+		<publisher>Superior Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104938">
+				<rom name="183 repton 3.fsd" size="104938" crc="98782628" sha1="acd102483cb429b14cdd501bba85f41384b332be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speech">
+		<description>Speech!</description>
+		<year>1985</year>
+		<publisher>Superior Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104936">
+				<rom name="184 speech.fsd" size="104936" crc="a7fa3db9" sha1="cda4594b29c63fa97f93bf6df64c32bbb1034493" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="overdriv">
+		<description>Overdrive</description>
+		<year>1984</year>
+		<publisher>Superior Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104939">
+				<rom name="321 overdrive.fsd" size="104939" crc="724512e0" sha1="1de4283665315ea0e9e736280048c3c07b31595e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="froggys">
+		<description>Froggy</description>
+		<year>1982</year>
+		<publisher>Superior Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104936">
+				<rom name="322 froggy.fsd" size="104936" crc="6105cdaa" sha1="a836c603c8902fc706b16744037f4063a3bc322b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exilev1" cloneof="exilev3">
+		<description>Exile (Version 1)</description>
+		<year>1988</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102387">
+				<rom name="001 exile.fsd" size="102387" crc="f720c7b2" sha1="e91b32a57a78356df8d3f19632c729378557214f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exilev2" cloneof="exilev3">
+		<description>Exile (Version 2)</description>
+		<year>1988</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102387">
+				<rom name="188 exile (version 2).fsd" size="102387" crc="e2374b4e" sha1="5dbcc3339e36821d56aad9e234efb628806365fe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exilev3">
+		<description>Exile (Version 3)</description>
+		<year>1988</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104935">
+				<rom name="189 exile (version 3).fsd" size="104935" crc="7d43daa0" sha1="784a7b912ab844d2406ee9dd55872f1429055863" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exilerc" cloneof="exilev3">
+		<description>Exile (Review Copy)</description>
+		<year>1988</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="version" value="D100.43 14/10/88" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102399">
+				<rom name="021 exile review copy.fsd" size="102399" crc="57bdb594" sha1="7d41668c3f9ed52e5e75f01a2e6349a3a7f59111" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ravskull">
+		<description>Ravenskull</description>
+		<year>1987</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104940">
+				<rom name="182 ravenskull.fsd" size="104940" crc="8b9ec17e" sha1="1d80d85ec1001d67047d8c3b352543ec44508bce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="retdoom">
+		<description>Return to Doom</description>
+		<year>1988</year>
+		<publisher>Topologika</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Game"/>
+			<dataarea name="flop" size="35495">
+				<rom name="057 return to doom.fsd" size="35495" crc="3e5c81b5" sha1="4e580a652a0df941fd2d434dfd507cff886a6280" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Database"/>
+			<dataarea name="flop" size="104953">
+				<rom name="057 return to doom database.fsd" size="104953" crc="51b8a45c" sha1="bf910c6d9c027a48d23d4c638c06104724bcb340" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gkiller">
+		<description>Giant Killer</description>
+		<year>1987</year>
+		<publisher>Topologika</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104942">
+				<rom name="265 giant killer.fsd" size="104942" crc="a8ea4980" sha1="a0b7fc50d52301df4247fc488e907c8cfa7cc354" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ctodoomt">
+		<description>Countdown to Doom (Topologika)</description>
+		<year>1987</year>
+		<publisher>Topologika</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="72192">
+				<rom name="317 countdown to doom.fsd" size="72192" crc="28bd79f0" sha1="50c4ee07914e508811a08f0deb944d8d2e1c9496" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phquestt">
+		<description>Philosopher's Quest (Topologika)</description>
+		<year>1987</year>
+		<publisher>Topologika</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="82678">
+				<rom name="318 philosopher's quest.fsd" size="82678" crc="3d146faa" sha1="a722ade607790f89457211cf3e7fa2a0edee367e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldaydoom">
+		<description>Last Days of Doom</description>
+		<year>1990</year>
+		<publisher>Topologika</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="137797">
+				<rom name="319 last days of doom.fsd" size="137797" crc="fad16393" sha1="e21901c31869acc162fa0e427bfa839d56fda000" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="achetont">
+		<description>Acheton (Topologika)</description>
+		<year>1987</year>
+		<publisher>Topologika</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="145650">
+				<rom name="320 acheton.fsd" size="145650" crc="bdac2c79" sha1="ccb1c915838b2cb94c693b1baaa389491e9ac687" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avon">
+		<description>Avon</description>
+		<year>1989</year>
+		<publisher>Topologika</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="82663">
+				<rom name="avon.fsd" size="82663" crc="67cbc628" sha1="7c4c9fc66d4eb2fa1f96244a665208881a90a72f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kohamilt">
+		<description>Kingdom of Hamil (Topologika)</description>
+		<year>1987</year>
+		<publisher>Topologika</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="61696">
+				<rom name="kingdom of hamil.fsd" size="61696" crc="59ce6256" sha1="438bb9612bc7aaf6d9a7ece58c06168957991e2f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="murdac">
+		<description>Murdac</description>
+		<year>1989</year>
+		<publisher>Topologika</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="61697">
+				<rom name="murdac.fsd" size="61697" crc="5c81cfdb" sha1="193d8db2d1bf4b72a98310e4836bed27c1126f6f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wolympia">
+		<description>Winter Olympiad 88</description>
+		<year>1988</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="107328">
+				<rom name="013 winter olympiad 88.fsd" size="107328" crc="1e502929" sha1="e19e3cff176dea9485806ea81bfc9978fb82bd35" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indoorsp">
+		<description>Indoor Sports</description>
+		<year>1988</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="119005">
+				<rom name="056 indoor sports.fsd" size="119005" crc="e72ce832" sha1="31c0aeb42b4464612bf42f6d3cf6615836cbd164" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdash">
+		<description>Boulder Dash</description>
+		<year>1988</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="116858">
+				<rom name="058 boulder dash.fsd" size="116858" crc="b3f9c0b5" sha1="4cc05e633e3e7204a02e3fd01f2d8c83cabab23e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saigon">
+		<description>Saigon</description>
+		<year>1988</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="118644">
+				<rom name="059 saigon.fsd" size="118644" crc="8cee8780" sha1="9b14463dffdb0f1fe47c2dfbbabb39bd5195fb27" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="solympid">
+		<description>Summer Olympiad</description>
+		<year>1988</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105201">
+				<rom name="060 summer olympiad.fsd" size="105201" crc="46a76941" sha1="b07d3c9dde884a26316cb1ee382b68800d0839a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spyvsspy">
+		<description>Spy vs Spy</description>
+		<year>1984</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="81351">
+				<rom name="079 spy vs spy.fsd" size="81351" crc="831855a9" sha1="9d329a6ca19be5ec044d4e3c0071109b999cc127" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="circusga">
+		<description>Circus Games</description>
+		<year>1988</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104942">
+				<rom name="153 circus games.fsd" size="104942" crc="facb9c3d" sha1="0dd2404a9eb9e0bcd9af68c6841e30da7184e5c5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantom">
+		<description>Phantom</description>
+		<year>1987</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104937">
+				<rom name="154 phantom.fsd" size="104937" crc="d37cdfff" sha1="38889a30f3a2d9bcebd0db20fe999f7f5f819d9f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="futuresh">
+		<description>Future Shock</description>
+		<year>1986</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102362">
+				<rom name="155 future shock.fsd" size="102362" crc="310f80ad" sha1="1e91ba0d64bbb69749a258290b7a69d171458c40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bhillcop">
+		<description>Beverly Hills Cop</description>
+		<year>1990</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 00"/>
+			<dataarea name="flop" size="104947">
+				<rom name="156 beverly hills  cop (side 00).fsd" size="104947" crc="11ecb37b" sha1="85cef485bd4936ac62fe350fcc3242bd62119f51" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 02"/>
+			<dataarea name="flop" size="104947">
+				<rom name="156 beverly hills  cop (side 02).fsd" size="104947" crc="05d06984" sha1="308cf3ff46e6b88478ab471bd412fc2d86d53e75" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 01"/>
+			<dataarea name="flop" size="104948">
+				<rom name="156 beverly hills  cop (side 01).fsd" size="104948" crc="4ce85ea9" sha1="1e2951fb058fe10c212a5b59842733ba3dc09504" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 03"/>
+			<dataarea name="flop" size="104947">
+				<rom name="156 beverly hills  cop (side 03).fsd" size="104947" crc="bc1da561" sha1="8ac0badcea6caaedfe7a1404c4670928c8631fd7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goal">
+		<description>Goal!</description>
+		<year>1986</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="81345">
+				<rom name="159 goal.fsd" size="81345" crc="cdde2e1d" sha1="c77dbe6694beb7c2e3f301a85779d5e10b277a52" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cwgames">
+		<description>Commonwealth Games</description>
+		<year>1986</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="80 track"/>
+			<dataarea name="flop" size="209868">
+				<rom name="160 commonwealth games.fsd" size="209868" crc="7303c63a" sha1="377a42858481e6e5f2494058b70977f4a52ce4a3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="40 track"/>
+			<dataarea name="flop" size="104948">
+				<rom name="160 commonwealth games (40 track).fsd" size="104948" crc="12792e7e" sha1="d3a676358eaae38ca9b0d31d6bc4cf0687098575" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wolympic">
+		<description>Winter Olympics</description>
+		<year>1986</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104945">
+				<rom name="161 winter olympics.fsd" size="104945" crc="af0cff69" sha1="15c2950b6d3d49ea33d45b1a8d692a60933f6893" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superman">
+		<description>Superman: The Man of Steel</description>
+		<year>1989</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 00"/>
+			<dataarea name="flop" size="201995">
+				<rom name="162 superman (side 00).fsd" size="201995" crc="08577c45" sha1="7ea9dedb20495773418a47ae09ca88714a6d95c2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 01"/>
+			<dataarea name="flop" size="201995">
+				<rom name="162 superman (side 01).fsd" size="201995" crc="de9ef62e" sha1="f74cc1cb34fcabf44b40489a2c00573f89c47add" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jetsetw2">
+		<description>Jet Set Willy II</description>
+		<year>1985</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="81357">
+				<rom name="208 jet set willy ii.fsd" size="81357" crc="84c8235b" sha1="56379360fefe1b14a38b14efadce203bf0739ba1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Business -->
+
+	<software name="mailsys">
+		<description>Mailing System</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNB09" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104944">
+				<rom name="228 mailing system.fsd" size="104944" crc="e3f570ed" sha1="cd5ec03cb9c28636496b5af912d615226d78677a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="database">
+		<description>Database</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNB06" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102318">
+				<rom name="229 database.fsd" size="102318" crc="abebfbc3" sha1="49219fd09580b758bd2d5ab8d285555027407c05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acctrecv">
+		<description>Accounts Receivable</description>
+		<year>1984</year>
+		<publisher>Acornsoft/MI</publisher>
+		<info name="release" value="SNB10" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104949">
+				<rom name="230 accounts receivable.fsd" size="104949" crc="ac819ec1" sha1="a9fe53efcaa39051ee4bb9bbb2b71f1009ddc8ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acctpay">
+		<description>Accounts Payable</description>
+		<year>1984</year>
+		<publisher>Acornsoft/MI</publisher>
+		<info name="release" value="SNB13" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104946">
+				<rom name="231 accounts payable.fsd" size="104946" crc="cb182be6" sha1="d47a2e8b18f8efb533bc300e334b88bd06125e48" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="purchsng">
+		<description>Purchasing</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNB14" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104940">
+				<rom name="232 purchasing.fsd" size="104940" crc="29d5cbdf" sha1="6c0751612fd710e6d09f347cbe0cb1fba3472bd7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invoicng">
+		<description>Invoicing</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNB08" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104939">
+				<rom name="234 invoicing.fsd" size="104939" crc="3fdd7673" sha1="a33910702375886d4ec4e48337861634e6783d14" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="farmman">
+		<description>Farm Management Suite</description>
+		<year>198?</year>
+		<publisher>Acornsoft</publisher>
+		<info name="protection" value="None" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="FarmCash Setup"/>
+			<dataarea name="flop" size="204800">
+				<rom name="240 farmcash.ssd" size="204800" crc="ba011313" sha1="5f502b669b83dd80ef524addc75875b946ae0121" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="FieldFile Setup"/>
+			<dataarea name="flop" size="204800">
+				<rom name="241 fieldfile.ssd" size="204800" crc="61938782" sha1="50ede0e4380043268a9b010587a4bdb5285ea0f2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="CapCost Setup"/>
+			<dataarea name="flop" size="204800">
+				<rom name="242 capcost.ssd" size="204800" crc="78f00286" sha1="d747ca27c7490c7638870a099e7660d623eaf54e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="FarmPlanner Setup"/>
+			<dataarea name="flop" size="204800">
+				<rom name="243 farmplanner.ssd" size="204800" crc="142493ad" sha1="3dc58f3d23893f9a926858ff16edf3418ba1b0fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moffice">
+		<description>Mini Office</description>
+		<year>1984</year>
+		<publisher>Database</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="103283">
+				<rom name="206 mini office.fsd" size="103283" crc="0978164e" sha1="abfd772d691743157f4842776e80be8b5b496fcf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moffice2">
+		<description>Mini Office II</description>
+		<year>1986</year>
+		<publisher>Database</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="109842">
+				<rom name="003 mini office ii.fsd" size="109842" crc="7fd56209" sha1="ae85a100242e4c564347148759b2e6eff0cf5dea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Educational -->
+
+	<software name="flowercr">
+		<description>Flowers of Crystal</description>
+		<year>198?</year>
+		<publisher>4mation</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102590">
+				<rom name="238 flowers of crystal.fsd" size="102590" crc="caf2ded1" sha1="515dd079c17c63b12c5b75e9129405373eef4013" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragonwb">
+		<description>Dragon World (BBC Only)</description>
+		<year>1985</year>
+		<publisher>4mation</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102584">
+				<rom name="246 dragon world bbc only.fsd" size="102584" crc="717df981" sha1="fc761572e5d2683f32aa48c873959ba0ffea041b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragonw">
+		<description>Dragon World</description>
+		<year>1985</year>
+		<publisher>4mation</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102721">
+				<rom name="247 dragon world.fsd" size="102721" crc="68168c56" sha1="bad0599d4fddc84c5d295f50957f2e27f6360f6d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinodisc">
+		<description>Dinosaur Discovery</description>
+		<year>198?</year>
+		<publisher>4mation</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102506">
+				<rom name="248 dinosaur discovery.fsd" size="102506" crc="a552c6cc" sha1="c948b46c8a88c52fcc021fb0c7d0efe9dec8b01b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrldword">
+		<description>World Without Words</description>
+		<year>198?</year>
+		<publisher>4mation</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104949">
+				<rom name="249 world without words.fsd" size="104949" crc="afd53f5b" sha1="9326f106f479469f53e4abe09e9a096c2091cbe7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boxtres">
+		<description>Box of Treasures</description>
+		<year>1985</year>
+		<publisher>4mation</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Game"/>
+			<dataarea name="flop" size="102503">
+				<rom name="250 box of treasures.fsd" size="102503" crc="7e2a3d56" sha1="2a92a30c363b4830b3e9261b037fdee242103686" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Create"/>
+			<dataarea name="flop" size="102725">
+				<rom name="250 box of treasures create.fsd" size="102725" crc="94a92558" sha1="3116adba9d0c5c454f966ccb02e5ec571c616a12" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ggarden">
+		<description>Granny's Garden</description>
+		<year>1984</year>
+		<publisher>4mation</publisher>
+		<info name="protection" value="None" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="245 granny's garden.ssd" size="102400" crc="60287cc8" sha1="3e9c0f0390fdc35d44923535226115173c43e49f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="childspc">
+		<description>Children from Space</description>
+		<year>1984</year>
+		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE16" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="79288">
+				<rom name="218 children from space.fsd" size="79288" crc="2a1f96c7" sha1="dda2f5479a755d065d830c9938370a6d743b5e28" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hideseek">
+		<description>Hide &amp; Seek</description>
+		<year>1984</year>
+		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE11" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="79280">
+				<rom name="219 hide and seek.fsd" size="79280" crc="6a537a1b" sha1="e1d3b464985e13da5476a1da4e40117c9cef0306" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="facemake">
+		<description>Facemaker</description>
+		<year>1984</year>
+		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE10" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="76468">
+				<rom name="220 facemaker.fsd" size="76468" crc="02565c9f" sha1="c3044473cad293f2c0cb2f57d2ff30ffda3ac40b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="squeeze">
+		<description>Squeeze</description>
+		<year>1984</year>
+		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE28" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55138">
+				<rom name="221 squeeze.fsd" size="55138" crc="9b9689e7" sha1="6d2af4e6c8454fb9e6ad588611fb22b369b2a845" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numbergu">
+		<description>Number Gulper</description>
+		<year>1984</year>
+		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE13" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="79282">
+				<rom name="222 number gulper.fsd" size="79282" crc="2827a37e" sha1="1c03bfb9f0af780ef9d271f715e856758795a215" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cranky">
+		<description>Cranky</description>
+		<year>1984</year>
+		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE17" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="79275">
+				<rom name="223 cranky.fsd" size="79275" crc="2cef012f" sha1="b693814f465653020504f87c57a7909e6a3225a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tableadv">
+		<description>Table Adventures</description>
+		<year>1984</year>
+		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE18" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="79285">
+				<rom name="224 table adventures.fsd" size="79285" crc="098d33cf" sha1="5d21be7e707cdfd2248a6f0beb1612a4cda4a08c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jugglepu">
+		<description>Juggle Puzzle</description>
+		<year>1984</year>
+		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE27" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55144">
+				<rom name="225 juggle puzzle.fsd" size="55144" crc="244d1ac3" sha1="b71d331ee864e91c863065b468617e2ec13179d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pazazz">
+		<description>Pazazz</description>
+		<year>1985</year>
+		<publisher>ASK</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102525">
+				<rom name="343 pazazz.fsd" size="102525" crc="bb5b4b00" sha1="1fbf3db293278565163476c5eb9d8fbb84f1b3f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="letscoun">
+		<description>Let's Count</description>
+		<year>1984</year>
+		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE12" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="79280">
+				<rom name="347 let's count.fsd" size="79280" crc="8d69c2ba" sha1="7dc53270ea1a36964cd2040f3044ae83f936b27a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrdswrds">
+		<description>Words Words Words</description>
+		<year>1984</year>
+		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE19" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="72642">
+				<rom name="348 words words words.fsd" size="72642" crc="ecda7e69" sha1="c2706c4bd45d6eee0af3ce176a8a34d8111bcbd9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="podd">
+		<description>Podd</description>
+		<year>1984</year>
+		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE26" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102386">
+				<rom name="349 podd.fsd" size="102386" crc="6d764be9" sha1="8d6334c45f7e9d28e4300b7fe3f8a2f608e833a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timeman1">
+		<description>Timeman One</description>
+		<year>1983</year>
+		<publisher>Bourne Educational Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="15827">
+				<rom name="337 timeman one.fsd" size="15827" crc="9eed5d71" sha1="8a70525233f6d8a4b3e4be6bfe4312d8e67e0fd6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="happynum">
+		<description>Happy Numbers</description>
+		<year>198?</year>
+		<publisher>Bourne Educational Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="15829">
+				<rom name="338 happy numbers.fsd" size="15829" crc="94324df5" sha1="6daf43ab38a632a1a239b24ef513862053620066" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs2-68">
+		<description>Fun School 2 (For 6-8 year olds)</description>
+		<year>1989</year>
+		<publisher>Database Educational Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104946">
+				<rom name="163 fun school 2 6-8.fsd" size="104946" crc="709bc9d4" sha1="0d773bb6e39370f16e57f71e1a9f91507d1271e4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs2-ov8">
+		<description>Fun School 2 (For the Over-8s)</description>
+		<year>1989</year>
+		<publisher>Database Educational Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104949">
+				<rom name="164 fun school 2 over 8.fsd" size="104949" crc="a530027a" sha1="e0bc5957023ed932788bf6e031de3603b1e439c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="symbmole">
+		<description>Symbols to Moles</description>
+		<year>198?</year>
+		<publisher>Five Ways Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="98864">
+				<rom name="340 symbols to moles sn1638.fsd" size="98864" crc="83cafdd7" sha1="542f8a8f348b9bc29ddd1294d2b51680b2c7145d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="longwave">
+		<description>Longitudinal Waves</description>
+		<year>1983</year>
+		<publisher>Five Ways Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="57770">
+				<rom name="341 longitudinal waves.fsd" size="57770" crc="700e2dfe" sha1="45dd567282170c0cccc8dcd5c23fc50089d8c39e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bertboot">
+		<description>Bert Boot</description>
+		<year>1984</year>
+		<publisher>H.S.Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="21593">
+				<rom name="212 bert boot.fsd" size="21593" crc="01f34468" sha1="1428fefdbe06b89e3f410b8aa8b3788bddfb2f72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadcft1">
+		<description>Roadcraft 1</description>
+		<year>1984</year>
+		<publisher>H.S.Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="21595">
+				<rom name="213 roadcraft 1.fsd" size="21595" crc="0ee47b08" sha1="3aca175651cd0daa237d2d9d40588aa8fc247775" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frmistra">
+		<description>The French Mistress Level A</description>
+		<year>1983</year>
+		<publisher>Kosmos</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104957">
+				<rom name="251 the french mistress level a.fsd" size="104957" crc="33a4b3d3" sha1="25fc6b8a07def80334808d4e917ef3eb4c093bdb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frmistrb">
+		<description>The French Mistress Level B</description>
+		<year>1983</year>
+		<publisher>Kosmos</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104957">
+				<rom name="252 the french mistress level b.fsd" size="104957" crc="3c427fcc" sha1="ec1f59eedf4abf1b7c21d5d42a3d0768dc295efc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tpicnic">
+		<description>The Teddy Bears' Picnic</description>
+		<year>1989</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="104960">
+				<rom name="186 the teddy bears' picnic side 1.fsd" size="104960" crc="83657179" sha1="1d12b5579fca525558115fd3338ecf41d1c38ec8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="104960">
+				<rom name="186 the teddy bears' picnic side 2.fsd" size="104960" crc="139afdc0" sha1="6ffbb34bd86c2117fde0d559ba1b1a2e9ad9bba5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="connectn">
+		<description>Connections</description>
+		<year>1990</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104941">
+				<rom name="187 connections.fsd" size="104941" crc="59113b53" sha1="4a764f10bad44ebfad503696726ff4d4528521d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vowlsnd2">
+		<description>Short Vowel Sounds v2</description>
+		<year>1983</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105085">
+				<rom name="270 short vowel sounds v2.fsd" size="105085" crc="a21326f0" sha1="681521dcd515c8d49cfa7fc3b92662fa8f0ad1db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vowlsnd" cloneof="vowlsnd2">
+		<description>Short Vowel Sounds</description>
+		<year>1983</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104948">
+				<rom name="266 short vowel sounds.fsd" size="104948" crc="616d6bdd" sha1="c9a3ff853e963451adb501a0e1d0995687542e2d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tcircus">
+		<description>The Circus</description>
+		<year>1985</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="40 track"/>
+			<dataarea name="flop" size="104940">
+				<rom name="267 the circus.fsd" size="104940" crc="3aabf560" sha1="caca0c3362ffd5fe2d3c164a36c9177690be9236" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="80 track"/>
+			<dataarea name="flop" size="105020">
+				<rom name="267 the circus (80 track).fsd" size="105020" crc="bbf1118d" sha1="1eb0e41786ad7e43443b2a22f79e9d4a700460e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathsnap">
+		<description>Maths Snap</description>
+		<year>198?</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105077">
+				<rom name="268 maths snap.fsd" size="105077" crc="533dedc1" sha1="25815346eadbbc6b30dcdb60f7a9ecdb0587ecb4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbuild2">
+		<description>Word Builder MkII</description>
+		<year>1985</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="107132">
+				<rom name="272 word builder mkii.fsd" size="107132" crc="f4bf3718" sha1="cb1e3e74d3b87c7d6c718bcfe4462aa7061e28a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbuild2a" cloneof="wbuild2">
+		<description>Word Builder MkII (alt)</description>
+		<year>1985</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="107132">
+				<rom name="273 word builder mkii.fsd" size="107132" crc="533c68ff" sha1="07547298a79c30571d46e2abc67b1d407076cff1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbuild">
+		<description>Word Builder</description>
+		<year>198?</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="105079">
+				<rom name="269 word builder.fsd" size="105079" crc="65291309" sha1="710bd3f042e81bed5342a8b3457e639683a86d5a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tensunit">
+		<description>Tens and Units</description>
+		<year>1985</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="107129">
+				<rom name="271 tens and units.fsd" size="107129" crc="232afd42" sha1="7138fcd17c27d6eaefc80864982e7ef0dc5b768c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbuild">
+		<description>Graph Builder</description>
+		<year>1986</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="107128">
+				<rom name="274 graph builder.fsd" size="107128" crc="731b8fc5" sha1="5394615051514b193776759d90b2914c1dc5beb2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbuilda" cloneof="gbuild">
+		<description>Graph Builder (alt)</description>
+		<year>1986</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104943">
+				<rom name="284 graph builder.fsd" size="104943" crc="f4aef12c" sha1="98aeef93536d6401271b2b8e6ec9b1d9a7b50d4e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizretna" cloneof="wizretn">
+		<description>The Wizard's Return (alt)</description>
+		<year>1989</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 1"/>
+			<dataarea name="flop" size="107134">
+				<rom name="275 the wizard's return disc 1.fsd" size="107134" crc="1702b5d1" sha1="c5e7a19a7a2b1968f2d145dda2c0485a486c33fa" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 2"/>
+			<dataarea name="flop" size="107134">
+				<rom name="275 the wizard's return disc 2.fsd" size="107134" crc="934a51ba" sha1="fa954c26816ab5f1f1c91aa75f7cfbf909d7764b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizretn">
+		<description>The Wizard's Return</description>
+		<year>1985</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Part 1"/>
+			<dataarea name="flop" size="104949">
+				<rom name="313 the wizards return part 1.fsd" size="104949" crc="1d850a68" sha1="3c0df079d109623487b29357523597a7e5269855" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Part 2"/>
+			<dataarea name="flop" size="104949">
+				<rom name="313 the wizards return part 2.fsd" size="104949" crc="f3b0af75" sha1="f32b5340455d8bac2b2bb6f5f617b759314f310c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uareaa" cloneof="uarea">
+		<description>Understanding Area (alt)</description>
+		<year>1986</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="107133">
+				<rom name="276 understanding area.fsd" size="107133" crc="843de51c" sha1="eecb88db50820e863deeb72abb6e43056ea62180" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uarea">
+		<description>Understanding Area</description>
+		<year>1986</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104948">
+				<rom name="285 understanding area.fsd" size="104948" crc="75f77e4c" sha1="a8bb7871d9177d1e76cd780d1fd6daef341bf22f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dreamtim">
+		<description>Dream Time</description>
+		<year>1989</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="The Lost Box"/>
+			<dataarea name="flop" size="104952">
+				<rom name="277 dreamtime the lost box.fsd" size="104952" crc="d5f3161f" sha1="a3cf6ef2c84ee90ea1abc99768f9df11bdb36b31" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="The Lost Toy"/>
+			<dataarea name="flop" size="104952">
+				<rom name="277 dreamtime the lost toy.fsd" size="104952" crc="bce9d536" sha1="d63b17b405b622e61e0454af9e2f3cc504056f1c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teachcup">
+		<description>The Teachers Cupboard</description>
+		<year>198?</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="The Apple"/>
+			<dataarea name="flop" size="104961">
+				<rom name="278 the teachers cupboard the apple.fsd" size="104961" crc="c2210968" sha1="9bcf2de3eb9928fba90da41e876c22218fe7f9cc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="The Crown"/>
+			<dataarea name="flop" size="104961">
+				<rom name="278 the teachers cupboard the crown.fsd" size="104961" crc="92f645c6" sha1="dbd30585b46d08c9f830319a0d43d8b76a55c49e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="easytype">
+		<description>Easy Type</description>
+		<year>1984</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="107124">
+				<rom name="280 easy type.fsd" size="107124" crc="034cf940" sha1="6c32e19b82b5a9287dd87a256ffac826bab5224f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magice">
+		<description>Magic E</description>
+		<year>198?</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="107122">
+				<rom name="281 magic e.fsd" size="107122" crc="e6c930b5" sha1="a5c83281287b9417c9f1983dec52f565001b2d85" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="storysta">
+		<description>Story Starts</description>
+		<year>198?</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="1 The House on the Hill"/>
+			<dataarea name="flop" size="107151">
+				<rom name="282 story starts 1 the house on the hill.fsd" size="107151" crc="cdb59931" sha1="1650a33d33fd9b5a278e2eb1b25c374c7449cb45" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="2 Escape from the Castle of Evil"/>
+			<dataarea name="flop" size="107160">
+				<rom name="282 story starts 2 escape from the castle of evil.fsd" size="107160" crc="bc37093c" sha1="6b5af817f84e9f7d01d490d20cb44baca0748732" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="3 The Box"/>
+			<dataarea name="flop" size="107137">
+				<rom name="282 story starts 3 the box.fsd" size="107137" crc="b97f2204" sha1="32d798223831e5df66ab0c327a7d94d5d2a97854" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="4 The Junk Shop"/>
+			<dataarea name="flop" size="107143">
+				<rom name="282 story starts 4 the junk shop.fsd" size="107143" crc="901c4d1a" sha1="4da1e8d3af012e48da2e174a4e56a80cdfe64350" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizrevng">
+		<description>The Wizard's Revenge</description>
+		<year>1989</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="40 track"/>
+			<dataarea name="flop" size="104950">
+				<rom name="283 the wizards revenge.fsd" size="104950" crc="a6595fae" sha1="9c0b74e7ec586eab95532bb1c8274fb3cedf14c1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="80 track"/>
+			<dataarea name="flop" size="105165">
+				<rom name="283 the wizard's revenge (80 track).fsd" size="105165" crc="189b2b12" sha1="7a16e39562c6634ea24a965c88aecb3c18f3d4a5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zillion">
+		<description>Zillion</description>
+		<year>1990</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Startup"/>
+			<dataarea name="flop" size="104945">
+				<rom name="287 zillion startup.fsd" size="104945" crc="5f418e9e" sha1="24c89246b9f4b25577b61fe03b9ca90704af0da9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Planet"/>
+			<dataarea name="flop" size="104944">
+				<rom name="287 zillion planet.fsd" size="104944" crc="5730fb6b" sha1="0b1f058cbc31c68e4d7ee18292635185b6160187" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Solar"/>
+			<dataarea name="flop" size="104943">
+				<rom name="287 zillion solar.fsd" size="104943" crc="31e6903e" sha1="3b2aa66e6c060b73654b99d1bd50e3c1b4312772" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="animresc">
+		<description>Animal Rescue</description>
+		<year>1986</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Part 1"/>
+			<dataarea name="flop" size="105162">
+				<rom name="288 animal rescue part 1 (80 track).fsd" size="105162" crc="bd4297a5" sha1="72d9de024711aef34bd6485bf1f0e874b9722e42" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Part 2"/>
+			<dataarea name="flop" size="105165">
+				<rom name="288 animal rescue part 2 (80 track).fsd" size="105165" crc="c22c14a8" sha1="7fdbf88045b672d64d63ade918a6af5402651907" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Part 3"/>
+			<dataarea name="flop" size="105165">
+				<rom name="288 animal rescue part 3 (80 track).fsd" size="105165" crc="e2777096" sha1="f8309a72370535af6569890a4941daf6ca48d19c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Problems Disk"/>
+			<dataarea name="flop" size="105172">
+				<rom name="288 animal rescue problems disk (80 track).fsd" size="105172" crc="3ebdc332" sha1="ff15becac2e10ef9d64c0dcda3a1dc4a7e0a1dd2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="naturadv">
+		<description>The Nature Park Adventure</description>
+		<year>1987</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Part 1"/>
+			<dataarea name="flop" size="105095">
+				<rom name="289 nature park adventure part 1.fsd" size="105095" crc="a5d883c0" sha1="d9ac74f9432ef948d55f87c4b00c3dd416c94c7f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Part 2"/>
+			<dataarea name="flop" size="105095">
+				<rom name="289 nature park adventure part 2.fsd" size="105095" crc="94f2b938" sha1="e5b49a1ec877cc5bee5bdbab8527656d8b70d172" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Part 3"/>
+			<dataarea name="flop" size="105095">
+				<rom name="289 nature park adventure part 3.fsd" size="105095" crc="23e7b649" sha1="5b243c89097cec8b5c47a57fbbd6faf8cd5c0561" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Problems Disk"/>
+			<dataarea name="flop" size="105102">
+				<rom name="289 nature park adventure problems disk.fsd" size="105102" crc="255f2e11" sha1="3cd50cf3e4424e4e4b7355687497aca38a2160a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="naturadvb" cloneof="naturadv">
+		<description>The Nature Park Adventure (alt)</description>
+		<year>1987</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Part 1"/>
+			<dataarea name="flop" size="104958">
+				<rom name="289b nature park adventure part 1.fsd" size="104958" crc="a61197f5" sha1="4468498ea1e4f9a31895b9fa074ae7ff0e65bb9b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Part 2"/>
+			<dataarea name="flop" size="104958">
+				<rom name="289b nature park adventure part 2.fsd" size="104958" crc="c306712d" sha1="bffcda49cd64ae843412f7cff4004d84e37215ee" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Part 3"/>
+			<dataarea name="flop" size="104959">
+				<rom name="289b nature park adventure part 3.fsd" size="104959" crc="8460904d" sha1="53dfcbd310aa7934c400e54703cf0f29624e252d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Problems Disk"/>
+			<dataarea name="flop" size="104965">
+				<rom name="289b nature park adventure problems disk.fsd" size="104965" crc="50569566" sha1="59c8e26e2582204637c7dbf2e7b020efe31902e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tobybeac">
+		<description>Toby at the Beach</description>
+		<year>1990</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Fun and Games"/>
+			<dataarea name="flop" size="105041">
+				<rom name="290 toby at the beach fun and games (80 track).fsd" size="105041" crc="651d558a" sha1="41159a812f10991ed1da2543439854f369f300b8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Judy's Shop"/>
+			<dataarea name="flop" size="105039">
+				<rom name="290 toby at the beach judy's shop (80 track).fsd" size="105039" crc="a786702b" sha1="3e8ae35f26714ff35a7f66c8d71db3ad3ac3705c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Punch + Judy-Rockpools"/>
+			<dataarea name="flop" size="105052">
+				<rom name="290 toby at the beach punch + judy-rockpools (80 track).fsd" size="105052" crc="1becee05" sha1="9e6459a380a56bff5e682f40c82ca3019c43d721" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Ship Ahoy"/>
+			<dataarea name="flop" size="105037">
+				<rom name="290 toby at the beach ship ahoy (80 track).fsd" size="105037" crc="2080c6f9" sha1="dbbf24699a02dcca0acfb65bf9186971140a76ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anialpha">
+		<description>The Animated Alphabet</description>
+		<year>198?</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 0"/>
+			<dataarea name="flop" size="104955">
+				<rom name="292 the animated alphabet side 0.fsd" size="104955" crc="9ed822f1" sha1="9df716119c502dd1236c6339be4bacb824e3de1b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="104955">
+				<rom name="292 the animated alphabet side 1.fsd" size="104955" crc="2604da04" sha1="57f0f1942e3846be99a0443ce18f952067a45d24" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sellador">
+		<description>Selladore Tales</description>
+		<year>1991</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Startup Disk"/>
+			<dataarea name="flop" size="104945">
+				<rom name="308 selladore tales startup disk.fsd" size="104945" crc="ae135f24" sha1="7fcad53681521abe225cd33b47ca9bb1885cd25e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="User Disk"/>
+			<dataarea name="flop" size="104945">
+				<rom name="308 selladore tales user disk.fsd" size="104945" crc="170e5791" sha1="210cae555661d056bb2ef016fd33486ea53c3b9b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thefarm">
+		<description>The Farm</description>
+		<year>1987</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="104938">
+				<rom name="309 the farm side 1.fsd" size="104938" crc="39c245da" sha1="fcf750803e8bdd7ac50e2f40f1205096f9b85dc7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="104938">
+				<rom name="309 the farm side 2.fsd" size="104938" crc="ba7dbe11" sha1="269aeef0129233bd8e6f315f3c6e56ecccdb1319" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mryog">
+		<description>Mr Yog and the Nippet</description>
+		<year>1984</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104951">
+				<rom name="310 mr yog and the nippet.fsd" size="104951" crc="2db88f43" sha1="b68811764db954b2bf86d993d929474fd94bcaf8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mapventu">
+		<description>Mapventure</description>
+		<year>1988</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Part 1"/>
+			<dataarea name="flop" size="106732">
+				<rom name="311 mapventure part 1.fsd" size="106732" crc="a13ffb19" sha1="0d537c94c54c2ba9fb626f3ef81a58635f5c6b22" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Part 2"/>
+			<dataarea name="flop" size="104940">
+				<rom name="311 mapventure part 2.fsd" size="104940" crc="aa5e5609" sha1="30659104edf7ed2257b743765d9deaed7e13dea7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aninumbr">
+		<description>Animated Numbers</description>
+		<year>198?</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104946">
+				<rom name="312 animated numbers.fsd" size="104946" crc="d97a5ff8" sha1="03bdf36ee151ea7630d630e71648b80f7ad5a43b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="typesett">
+		<description>Typesetter!</description>
+		<year>198?</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Startup Disk"/>
+			<dataarea name="flop" size="104948">
+				<rom name="314 typesetter startup disc.fsd" size="104948" crc="2489ed9c" sha1="864a14ee1d3d8d3cbc1ba2269849b085dccb7105" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="User Disk"/>
+			<dataarea name="flop" size="104945">
+				<rom name="314 typesetter user disc.fsd" size="104945" crc="ac538429" sha1="c14cf40cd64c65bc5d96aca3c7c4641f2f16cc50" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Font Disk"/>
+			<dataarea name="flop" size="104945">
+				<rom name="314 typesetter font disc.fsd" size="104945" crc="8de73319" sha1="5d3dda7bd8495ec9f12c164103764e6ff2f4b975" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Font Disk II"/>
+			<dataarea name="flop" size="104948">
+				<rom name="314 typesetter font disc ii.fsd" size="104948" crc="9233d18a" sha1="f76720b5d42d5c9b973150367c3f24f58398a66d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="osketchp">
+		<description>Ollie Octopus' Sketchpad</description>
+		<year>1983</year>
+		<publisher>Storm Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104954">
+				<rom name="315 ollie octopus' sketchpad.fsd" size="104954" crc="8352e2b8" sha1="8c9b1b7c9cfb4fbb651d94d0a0f2799aca7997e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gtverbs">
+		<description>The Grammar Tree - Verbs &amp; Adverbs</description>
+		<year>1983</year>
+		<publisher>Sulis Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102364">
+				<rom name="259 thegrammartree-verbs&amp;adverbs.fsd" size="102364" crc="264f9b92" sha1="3c7120b87cf6374fa01f174362bf62e6089b3654" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gtsenten">
+		<description>The Grammar Tree - Sentences</description>
+		<year>1983</year>
+		<publisher>Sulis Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104150">
+				<rom name="260 thegrammartree-sentences.fsd" size="104150" crc="cbf7ff57" sha1="299eb82358b3f02970f01b482e67ae71858ca51f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gtnouns">
+		<description>The Grammar Tree - Nouns &amp; Adjectives</description>
+		<year>1983</year>
+		<publisher>Sulis Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102367">
+				<rom name="261 thegrammartree-nouns&amp;adjectives.fsd" size="102367" crc="c3d75e80" sha1="d6e343bb1cdb3c218cde7809db6b6d1dd1dd2e5c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timetrav">
+		<description>Time Traveller</description>
+		<year>1983</year>
+		<publisher>Sulis Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="104944">
+				<rom name="339 time traveller.fsd" size="104944" crc="8183b124" sha1="4a3f08b0f443fa3cf47e427d0a6d5d6e3e6e2991" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

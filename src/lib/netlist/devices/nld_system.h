@@ -309,7 +309,7 @@ private:
 	analog_output_t m_Q;
 	analog_input_t m_I[10];
 
-	plist_t<rpn_inst> m_precompiled;
+	pvector_t<rpn_inst> m_precompiled;
 };
 
 // -----------------------------------------------------------------------------

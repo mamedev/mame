@@ -2,7 +2,7 @@
 // copyright-holders:Barry Rodewald
 #include "machine/x68k_kbd.h"
 
-x68k_keyboard_device::x68k_keyboard_device(const machine_config& mconfig, std::string tag, device_t* owner, UINT32 clock) :
+x68k_keyboard_device::x68k_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	serial_keyboard_device(mconfig, X68K_KEYBOARD, "X68k Keyboard", tag, owner, 0, "x68k_keyboard", __FILE__),
 	m_io_kbd8(*this, "TERM_LINE8"),
 	m_io_kbd9(*this, "TERM_LINE9"),

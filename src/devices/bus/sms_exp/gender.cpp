@@ -6,6 +6,13 @@
 
 **********************************************************************/
 
+// The Gender Adapter is not an official Sega product. It is produced by the
+// SMSPower website to permit to plug a cartridge on the expansion slot on any
+// SMS 1 model. This includes the Japanese SMS, which has FM sound, so it is
+// a way to get FM music of western cartridges that have FM code but were not
+// released in Japan. Some games have compatibility issues, confirmed on the
+// real hardware, when run plugged-in to the SMS expansion slot.
+
 #include "gender.h"
 
 
@@ -26,7 +33,7 @@ const device_type SMS_GENDER_ADAPTER = &device_creator<sms_gender_adapter_device
 //  sms_gender_adapter_device - constructor
 //-------------------------------------------------
 
-sms_gender_adapter_device::sms_gender_adapter_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+sms_gender_adapter_device::sms_gender_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SMS_GENDER_ADAPTER, "Gender Adapter", tag, owner, clock, "sms_gender_adapter", __FILE__),
 	device_sms_expansion_slot_interface(mconfig, *this),
 	m_subslot(*this, "subslot")

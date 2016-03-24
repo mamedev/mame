@@ -22,7 +22,7 @@ extern const device_type DIABLO_HD;
 class diablo_hd_device : public device_t
 {
 public:
-	diablo_hd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	diablo_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~diablo_hd_device();
 
 	static const int DIABLO_UNIT_MAX = 2;           //!< max number of drive units
@@ -76,7 +76,7 @@ protected:
 private:
 #if DIABLO_DEBUG
 	int m_log_level;
-	void logprintf(int level, const char* format, ...);
+	template <typename Format, typename... Params> void logprintf(int level, Format &&fmt, Params &&... args);
 #   define  LOG_DRIVE(x) logprintf x
 
 #else

@@ -134,7 +134,7 @@ TODO: Tests on a real machine
 /*
     Constructor
 */
-tms9901_device::tms9901_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tms9901_device::tms9901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : device_t(mconfig, TMS9901, "TMS9901 Programmable System Interface", tag, owner, clock, "tms9901", __FILE__),
 	m_read_block(*this),
 	m_write_p0(*this),
@@ -171,12 +171,12 @@ void tms9901_device::field_interrupts(void)
 		// if timer is enabled, INT3 pin is overridden by timer
 		if (m_timer_int_pending)
 		{
-			if (TRACE_CLOCK) logerror("%s: timer fires\n", tag().c_str());
+			if (TRACE_CLOCK) logerror("%s: timer fires\n", tag());
 			current_ints |= TMS9901_INT3;
 		}
 		else
 		{
-			if (TRACE_CLOCK) logerror("%s: timer clear\n", tag().c_str());
+			if (TRACE_CLOCK) logerror("%s: timer clear\n", tag());
 			current_ints &= ~TMS9901_INT3;
 		}
 	}
@@ -300,7 +300,7 @@ READ8_MEMBER( tms9901_device::read )
 			// Set those bits here
 			answer |= (m_pio_output_mirror & m_pio_direction_mirror) & 0xFF;
 		}
-		if (TRACE_PINS) logerror("%s: input on lines INT7..CB = %02x\n", tag().c_str(), answer);
+		if (TRACE_PINS) logerror("%s: input on lines INT7..CB = %02x\n", tag(), answer);
 		break;
 	case 1:
 		if (m_clock_mode)
@@ -320,7 +320,7 @@ READ8_MEMBER( tms9901_device::read )
 			answer &= ~(m_pio_direction_mirror >> 8);
 			answer |= (m_pio_output_mirror & m_pio_direction_mirror) >> 8;
 		}
-		if (TRACE_PINS) logerror("%s: input on lines INT15..INT8 = %02x\n", tag().c_str(), answer);
+		if (TRACE_PINS) logerror("%s: input on lines INT15..INT8 = %02x\n", tag(), answer);
 		break;
 	case 2:
 		/* exit timer mode */
@@ -334,7 +334,7 @@ READ8_MEMBER( tms9901_device::read )
 
 		answer &= ~m_pio_direction;
 		answer |= (m_pio_output & m_pio_direction) & 0xFF;
-		if (TRACE_PINS) logerror("%s: input on lines P7..P0 = %02x\n", tag().c_str(), answer);
+		if (TRACE_PINS) logerror("%s: input on lines P7..P0 = %02x\n", tag(), answer);
 
 		break;
 	case 3:
@@ -347,7 +347,7 @@ READ8_MEMBER( tms9901_device::read )
 
 		answer &= ~(m_pio_direction >> 8);
 		answer |= (m_pio_output & m_pio_direction) >> 8;
-		if (TRACE_PINS) logerror("%s: input on lines P15..P8 = %02x\n", tag().c_str(), answer);
+		if (TRACE_PINS) logerror("%s: input on lines P15..P8 = %02x\n", tag(), answer);
 
 		break;
 	}
@@ -376,7 +376,7 @@ WRITE8_MEMBER ( tms9901_device::write )
 	if (offset >= 0x10)
 	{
 		int pin = offset & 0x0F;
-		if (TRACE_PINS) logerror("%s: output on P%d = %d\n", tag().c_str(), pin, data);
+		if (TRACE_PINS) logerror("%s: output on P%d = %d\n", tag(), pin, data);
 
 		int bit = (1 << pin);
 
@@ -454,12 +454,12 @@ WRITE8_MEMBER ( tms9901_device::write )
 		{
 			// Switch to interrupt mode; quit clock mode
 			m_clock_mode = false;
-			if (TRACE_MODE) logerror("%s: int mode\n", tag().c_str());
+			if (TRACE_MODE) logerror("%s: int mode\n", tag());
 		}
 		else
 		{
 			m_clock_mode = true;
-			if (TRACE_MODE) logerror("%s: clock mode\n", tag().c_str());
+			if (TRACE_MODE) logerror("%s: clock mode\n", tag());
 			// we are switching to clock mode: latch the current value of
 			// the decrementer register
 			if (m_clock_register != 0)
@@ -485,7 +485,7 @@ WRITE8_MEMBER ( tms9901_device::write )
 					// Spec is not clear on whether the mask bits are also reset by RST2*
 					// TODO: Check on a real machine. (I'd guess from the text they are not touched)
 					m_enabled_ints = 0;
-					if (TRACE_MODE) logerror("%s: Soft reset (RST2*)\n", tag().c_str());
+					if (TRACE_MODE) logerror("%s: Soft reset (RST2*)\n", tag());
 				}
 			}
 			else
@@ -495,7 +495,7 @@ WRITE8_MEMBER ( tms9901_device::write )
 				else
 					m_enabled_ints &= ~0x4000;      /* unset bit */
 
-				if (TRACE_PINS) logerror("%s: interrupts = %04x\n", tag().c_str(), m_enabled_ints);
+				if (TRACE_PINS) logerror("%s: interrupts = %04x\n", tag(), m_enabled_ints);
 				field_interrupts();     /* changed interrupt state */
 			}
 		}
@@ -517,7 +517,7 @@ WRITE8_MEMBER ( tms9901_device::write )
 					m_clock_register &= ~bit;      /* clear bit */
 
 				/* reset clock timer (page 8) */
-				if (TRACE_CLOCK) logerror("%s: clock register = %04x\n", tag().c_str(), m_clock_register);
+				if (TRACE_CLOCK) logerror("%s: clock register = %04x\n", tag(), m_clock_register);
 				timer_reload();
 			}
 			else
@@ -532,7 +532,7 @@ WRITE8_MEMBER ( tms9901_device::write )
 				if (offset == 3)
 					m_timer_int_pending = false;    /* SBO 3 clears pending timer interrupt (??) */
 
-				if (TRACE_MODE) logerror("%s: enabled interrupts = %04x\n", tag().c_str(), m_enabled_ints);
+				if (TRACE_MODE) logerror("%s: enabled interrupts = %04x\n", tag(), m_enabled_ints);
 				field_interrupts();     /* changed interrupt state */
 			}
 		}
@@ -550,7 +550,7 @@ void tms9901_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	if (id==DECREMENTER) // we have only that one
 	{
 		m_decrementer_value--;
-		if (TRACE_CLOCK) logerror("%s: decrementer = %d\n", tag().c_str(), m_decrementer_value);
+		if (TRACE_CLOCK) logerror("%s: decrementer = %d\n", tag(), m_decrementer_value);
 		if (m_decrementer_value<=0)
 		{
 			m_timer_int_pending = true;         // decrementer interrupt requested

@@ -80,7 +80,7 @@ class atari_jsa_base_device :   public device_t,
 {
 protected:
 	// construction/destruction
-	atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int channels);
+	atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int channels);
 
 public:
 	// static configuration
@@ -137,7 +137,7 @@ class atari_jsa_oki_base_device : public atari_jsa_base_device
 {
 protected:
 	// derived construction/destruction
-	atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int channels);
+	atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int channels);
 
 public:
 	// read/write handlers
@@ -177,7 +177,7 @@ class atari_jsa_i_device : public atari_jsa_base_device
 {
 public:
 	// construction/destruction
-	atari_jsa_i_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// read/write handlers
 	DECLARE_READ8_MEMBER( rdio_r );
@@ -214,7 +214,7 @@ class atari_jsa_ii_device : public atari_jsa_oki_base_device
 {
 public:
 	// construction/destruction
-	atari_jsa_ii_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// read/write handlers
 	DECLARE_READ8_MEMBER( rdio_r );
@@ -234,11 +234,11 @@ class atari_jsa_iii_device : public atari_jsa_oki_base_device
 {
 public:
 	// construction/destruction
-	atari_jsa_iii_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// derived construction/destruction
-	atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int channels);
+	atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int channels);
 
 public:
 	// read/write handlers
@@ -259,7 +259,7 @@ class atari_jsa_iiis_device : public atari_jsa_iii_device
 {
 public:
 	// construction/destruction
-	atari_jsa_iiis_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device level overrides

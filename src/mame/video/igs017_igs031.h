@@ -20,7 +20,7 @@ class igs017_igs031_device : public device_t,
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 public:
-	igs017_igs031_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 
 	static void set_palette_scramble_cb(device_t &device,igs017_igs031_palette_scramble_delegate newtilecb);

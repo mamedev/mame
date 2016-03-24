@@ -14,7 +14,7 @@
 
 const device_type SEGA315_5313 = &device_creator<sega315_5313_device>;
 
-sega315_5313_device::sega315_5313_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega315_5124_device(mconfig, SEGA315_5313, "Sega 315-5313 Megadrive VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5313", __FILE__), m_render_bitmap(nullptr),
 	m_render_line(nullptr), m_render_line_raw(nullptr), m_megadriv_scanline_timer(nullptr),
 	m_sndirqline_callback(*this),
@@ -35,7 +35,7 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, std::str
 //  palette device
 //-------------------------------------------------
 
-void sega315_5313_device::static_set_palette_tag(device_t &device, std::string tag)
+void sega315_5313_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<sega315_5313_device &>(device).m_palette.set_tag(tag);
 }
@@ -56,37 +56,17 @@ machine_config_constructor sega315_5313_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( sega_genesis_vdp );
 }
 
-static TIMER_CALLBACK( render_timer_callback )
-{
-	sega315_5313_device* vdp = (sega315_5313_device*)ptr;
-	vdp->render_scanline();
-}
-
-void sega315_5313_device::vdp_handle_irq6_on_timer_callback(int param)
+TIMER_CALLBACK_MEMBER(sega315_5313_device::irq6_on_timer_callback)
 {
 // m_irq6_pending = 1;
 	if (MEGADRIVE_REG01_IRQ6_ENABLE)
 		m_lv6irqline_callback(true);
 }
 
-static TIMER_CALLBACK( irq6_on_timer_callback )
-{
-	sega315_5313_device* vdp = (sega315_5313_device*)ptr;
-	vdp->vdp_handle_irq6_on_timer_callback(param);
-}
-
-void sega315_5313_device::vdp_handle_irq4_on_timer_callback(int param)
+TIMER_CALLBACK_MEMBER(sega315_5313_device::irq4_on_timer_callback)
 {
 	m_lv4irqline_callback(true);
 }
-
-static TIMER_CALLBACK( irq4_on_timer_callback )
-{
-	sega315_5313_device* vdp = (sega315_5313_device*)ptr;
-	vdp->vdp_handle_irq4_on_timer_callback(param);
-}
-
-
 
 void sega315_5313_device::set_alt_timing(device_t &device, int use_alt_timing)
 {
@@ -189,9 +169,9 @@ void sega315_5313_device::device_start()
 	if (m_use_alt_timing)
 		save_pointer(NAME(m_render_line.get()), 320/2);
 
-	m_irq6_on_timer = machine().scheduler().timer_alloc(FUNC(irq6_on_timer_callback), (void*)this);
-	m_irq4_on_timer = machine().scheduler().timer_alloc(FUNC(irq4_on_timer_callback), (void*)this);
-	m_render_timer = machine().scheduler().timer_alloc(FUNC(render_timer_callback), (void*)this);
+	m_irq6_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::irq6_on_timer_callback), this));
+	m_irq4_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::irq4_on_timer_callback), this));
+	m_render_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::render_scanline), this));
 
 	m_space68k = &machine().device<m68000_base_device>(":maincpu")->space();
 	m_cpu68k = machine().device<m68000_base_device>(":maincpu");
@@ -2598,7 +2578,7 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 	}
 }
 
-void sega315_5313_device::render_scanline()
+TIMER_CALLBACK_MEMBER(sega315_5313_device::render_scanline)
 {
 	int scanline = get_scanline_counter();
 

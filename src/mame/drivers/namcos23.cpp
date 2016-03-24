@@ -1396,7 +1396,7 @@ struct render_t
 class namcos23_state : public driver_device
 {
 public:
-	namcos23_state(const machine_config &mconfig, device_type type, std::string tag)
+	namcos23_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
@@ -1704,7 +1704,7 @@ void namcos23_state::c435_state_set_projection_matrix_line(const UINT16 *param)
 	for(int i=0; i<8; i++)
 		p += sprintf(p, " %f", f24_to_f32((param[2*i+1] << 16) | param[2*i+2]));
 	p += sprintf(p, "\n");
-	logerror("%s\n",buf);
+	logerror(buf);
 }
 
 void namcos23_state::c435_state_set(UINT16 type, const UINT16 *param)
@@ -1719,7 +1719,7 @@ void namcos23_state::c435_state_set(UINT16 type, const UINT16 *param)
 		for(int i=0; i<c435_get_state_entry_size(type); i++)
 			p += sprintf(p, " %04x", param[i]);
 		p += sprintf(p, "\n");
-		logerror("%s",buf);
+		logerror(buf);
 		break;
 	}
 	}
@@ -1966,7 +1966,7 @@ void namcos23_state::c435_pio_w(UINT16 data)
 		for(int i=0; i<m_c435_buffer_pos; i++)
 			p += sprintf(p, " %04x", m_c435_buffer[i]);
 		p += sprintf(p, "\n");
-		logerror("%s",buf);
+		logerror(buf);
 	}
 
 	m_c435_buffer_pos = 0;

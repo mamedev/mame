@@ -228,7 +228,7 @@ const device_type ARM = &device_creator<arm_cpu_device>;
 const device_type ARM_BE = &device_creator<arm_be_cpu_device>;
 
 
-arm_cpu_device::arm_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+arm_cpu_device::arm_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, ARM, "ARM", tag, owner, clock, "arm", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 26, 0)
 	, m_endian(ENDIANNESS_LITTLE)
@@ -238,7 +238,7 @@ arm_cpu_device::arm_cpu_device(const machine_config &mconfig, std::string tag, d
 }
 
 
-arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, endianness_t endianness)
+arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, endianness_t endianness)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", endianness, 32, 26, 0)
 	, m_endian(endianness)
@@ -248,7 +248,7 @@ arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, 
 }
 
 
-arm_be_cpu_device::arm_be_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+arm_be_cpu_device::arm_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: arm_cpu_device(mconfig, ARM_BE, "ARM (big endian)", tag, owner, clock, "arm be", __FILE__, ENDIANNESS_BIG)
 {
 }
@@ -259,7 +259,7 @@ void arm_cpu_device::cpu_write32( int addr, UINT32 data )
 {
 	/* Unaligned writes are treated as normal writes */
 	m_program->write_dword(addr&ADDRESS_MASK,data);
-	if (ARM_DEBUG_CORE && addr&3) logerror("%08x: Unaligned write %08x\n",R15,addr);
+	if (ARM_DEBUG_CORE && !DWORD_ALIGNED(addr)) logerror("%08x: Unaligned write %08x\n",R15,addr);
 }
 
 void arm_cpu_device::cpu_write8( int addr, UINT8 data )
@@ -272,9 +272,9 @@ UINT32 arm_cpu_device::cpu_read32( int addr )
 	UINT32 result = m_program->read_dword(addr&ADDRESS_MASK);
 
 	/* Unaligned reads rotate the word, they never combine words */
-	if (addr&3)
+	if (!DWORD_ALIGNED(addr))
 	{
-		if (ARM_DEBUG_CORE && addr&1)
+		if (ARM_DEBUG_CORE && !WORD_ALIGNED(addr))
 			logerror("%08x: Unaligned byte read %08x\n",R15,addr);
 
 		if ((addr&3)==1)
@@ -559,14 +559,14 @@ void arm_cpu_device::state_string_export(const device_state_entry &entry, std::s
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c %s",
+			str = string_format("%c%c%c%c%c%c %s",
 				(m_sArmRegister[15] & N_MASK) ? 'N' : '-',
 				(m_sArmRegister[15] & Z_MASK) ? 'Z' : '-',
 				(m_sArmRegister[15] & C_MASK) ? 'C' : '-',
 				(m_sArmRegister[15] & V_MASK) ? 'V' : '-',
 				(m_sArmRegister[15] & I_MASK) ? 'I' : '-',
 				(m_sArmRegister[15] & F_MASK) ? 'F' : '-',
-				s[m_sArmRegister[15] & 3] );
+				s[m_sArmRegister[15] & 3]);
 			break;
 	}
 }

@@ -189,7 +189,7 @@ protected:
 
 	// Debugging
 	void    showtrack(UINT16* enctrack, int length);
-	virtual std::string tag() { return m_devtag; }
+	virtual const char* tag() { return m_devtag.c_str(); }
 };
 
 class mfmhd_generic_format : public mfmhd_image_format_t

@@ -520,6 +520,18 @@ C1066 - ??
 		</part>
 	</software>
 
+	<software name="gprace" supported="no">
+		<description>GP Race</description>
+		<year>1992</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="C1056" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="c1-056.bin" size="131072" crc="447595e4" sha1="1b471f8ac8ffb107c62ec3b765c43e268d90b73a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fanttrav" supported="no">
 		<description>Fantasy Travel</description>
 		<year>1993</year>

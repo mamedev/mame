@@ -118,7 +118,7 @@ machine_config_constructor adam_digital_data_pack_device::device_mconfig_additio
 //  adam_digital_data_pack_device - constructor
 //-------------------------------------------------
 
-adam_digital_data_pack_device::adam_digital_data_pack_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+adam_digital_data_pack_device::adam_digital_data_pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ADAM_DDP, "Adam DDP", tag, owner, clock, "adam_ddp", __FILE__),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG),

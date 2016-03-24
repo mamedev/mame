@@ -39,9 +39,9 @@
 
 class h8_adc_device : public device_t {
 public:
-	h8_adc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	h8_adc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	void set_info(std::string intc_tag, int vect);
+	void set_info(const char *intc_tag, int vect);
 
 	DECLARE_READ8_MEMBER(addr8_r);
 	DECLARE_READ16_MEMBER(addr16_r);
@@ -58,7 +58,7 @@ protected:
 	required_device<h8_device> cpu;
 	h8_intc_device *intc;
 	address_space *io;
-	std::string intc_tag;
+	const char *intc_tag;
 	int intc_vector;
 
 	enum {
@@ -113,7 +113,7 @@ protected:
 
 class h8_adc_3337_device : public h8_adc_device {
 public:
-	h8_adc_3337_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int conversion_time(bool first, bool poweron) override;
@@ -122,7 +122,7 @@ protected:
 
 class h8_adc_3006_device : public h8_adc_device {
 public:
-	h8_adc_3006_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int conversion_time(bool first, bool poweron) override;
@@ -131,7 +131,7 @@ protected:
 
 class h8_adc_2245_device : public h8_adc_device {
 public:
-	h8_adc_2245_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int conversion_time(bool first, bool poweron) override;
@@ -140,7 +140,7 @@ protected:
 
 class h8_adc_2320_device : public h8_adc_device {
 public:
-	h8_adc_2320_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int conversion_time(bool first, bool poweron) override;
@@ -149,7 +149,7 @@ protected:
 
 class h8_adc_2357_device : public h8_adc_device {
 public:
-	h8_adc_2357_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int conversion_time(bool first, bool poweron) override;
@@ -158,7 +158,7 @@ protected:
 
 class h8_adc_2655_device : public h8_adc_device {
 public:
-	h8_adc_2655_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual int conversion_time(bool first, bool poweron) override;

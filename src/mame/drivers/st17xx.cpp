@@ -45,7 +45,7 @@
 class st17xx_state : public driver_device
 {
 public:
-	st17xx_state(const machine_config &mconfig, device_type type, std::string tag)
+	st17xx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
 	virtual void machine_start() override;

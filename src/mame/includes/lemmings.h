@@ -7,7 +7,7 @@
 class lemmings_state : public driver_device
 {
 public:
-	lemmings_state(const machine_config &mconfig, device_type type, std::string tag)
+	lemmings_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_bitmap0(2048, 256),
 		m_audiocpu(*this, "audiocpu"),

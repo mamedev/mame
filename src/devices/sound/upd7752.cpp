@@ -34,7 +34,7 @@ ADDRESS_MAP_END
 //  upd7752_device - constructor
 //-------------------------------------------------
 
-upd7752_device::upd7752_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+upd7752_device::upd7752_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD7752, "uPD7752", tag, owner, clock, "upd7752", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this), m_stream(nullptr),

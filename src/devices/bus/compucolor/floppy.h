@@ -50,7 +50,7 @@ public:
 class compucolor_floppy_port_device : public rs232_port_device
 {
 public:
-	compucolor_floppy_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	compucolor_floppy_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~compucolor_floppy_port_device() { }
 
 	DECLARE_WRITE_LINE_MEMBER( rw_w ) { if (m_dev) m_dev->rw_w(state); }
@@ -74,7 +74,7 @@ class compucolor_floppy_device : public device_t,
 {
 public:
 	// construction/destruction
-	compucolor_floppy_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	compucolor_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 

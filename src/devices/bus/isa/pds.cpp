@@ -20,7 +20,7 @@
 
 const device_type ISA8_PDS = &device_creator<isa8_pds_device>;
 
-isa8_pds_device::isa8_pds_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+isa8_pds_device::isa8_pds_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, ISA8_PDS, "Programmers Development System", tag, owner, clock, "isa_pds", __FILE__),
 		device_isa8_card_interface( mconfig, *this ),
 		m_ppi(*this,"pds_ppi")

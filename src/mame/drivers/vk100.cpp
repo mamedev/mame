@@ -167,7 +167,7 @@ public:
 		TIMER_EXECUTE_VG
 	};
 
-	vk100_state(const machine_config &mconfig, device_type type, std::string tag) :
+	vk100_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "crtc"),
@@ -694,7 +694,7 @@ ADDRESS_MAP_END
    x   0   x   x   x   x   x   1     RW    CRTC register r/w
    x   1   *   *   *   **  **  **        read area (rightmost 74ls138):
    x   1   0   0   0   *   *   *     R     SYSTAT_A (a0-a3 chooses the bit of the dipswitches read via d3)
-   x   1   0   0   1   x   x   x    R     SYSTAT_B
+   x   1   0   0   1   x   x   x     R     SYSTAT_B
    x   1   0   1   0   x   x   0     R     i8251 UART data
    x   1   0   1   0   x   x   1     R     i8251 UART status
    x   1   0   1   1   x   x   x     R     unused
@@ -918,7 +918,6 @@ INPUT_PORTS_END
 
 void vk100_state::machine_start()
 {
-	m_speaker->set_frequency(116); //116 hz (page 172 of TM), but duty cycle is wrong here!
 	output().set_value("online_led",1);
 	output().set_value("local_led", 0);
 	output().set_value("noscroll_led",1);
@@ -1063,7 +1062,7 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 	MCFG_DEFAULT_LAYOUT( layout_vk100 )
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
+	MCFG_SOUND_ADD( "beeper", BEEP, 116 ) // 116 hz (page 172 of TM), but duty cycle is wrong here!
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.25 )
 MACHINE_CONFIG_END
 

@@ -30,7 +30,7 @@ static MACHINE_CONFIG_FRAGMENT( wpc_dmd )
 MACHINE_CONFIG_END
 
 
-wpc_dmd_device::wpc_dmd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+wpc_dmd_device::wpc_dmd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, WPC_DMD, "Williams Pinball Controller Dot Matrix Display", tag, owner, clock, "wpc_dmd", __FILE__),
 	scanline_cb(*this),
 	dmd0(*this, ":dmd0"),

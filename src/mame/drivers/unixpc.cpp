@@ -26,7 +26,7 @@
 class unixpc_state : public driver_device
 {
 public:
-	unixpc_state(const machine_config &mconfig, device_type type, std::string tag)
+	unixpc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_ram(*this, RAM_TAG),
@@ -200,7 +200,7 @@ static MACHINE_CONFIG_START( unixpc, unixpc_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_unixpc)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

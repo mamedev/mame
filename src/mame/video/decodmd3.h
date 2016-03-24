@@ -19,7 +19,7 @@
 class decodmd_type3_device : public device_t
 {
 public:
-	decodmd_type3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	required_device<cpu_device> m_cpu;
 	required_device<mc6845_device> m_mc6845;
 	required_device<ram_device> m_ram;
@@ -38,7 +38,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(dmd_irq);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	static void static_set_gfxregion(device_t &device, std::string tag);
+	static void static_set_gfxregion(device_t &device, const char *tag);
 
 	memory_region* m_rom;
 
@@ -56,7 +56,7 @@ private:
 	UINT8 m_busy;
 	UINT8 m_command;
 
-	std::string m_gfxtag;
+	const char* m_gfxtag;
 };
 
 extern const device_type DECODMD3;

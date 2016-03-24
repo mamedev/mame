@@ -23,7 +23,7 @@ class coco_vhd_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	coco_vhd_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	coco_vhd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~coco_vhd_image_device();
 
 	// image-level overrides

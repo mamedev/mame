@@ -43,7 +43,7 @@ Year + Game                       System    Protection
     Peek-a-Boo!                     D       Inputs
 ---------------------------------------------------------------------
 
-NOTE: Chimera Beast is the only game missing a dump of its priority PROM
+NOTE: Chimera Beast PROM has not been dumped, but looks like it should match 64street based on game analysis.
 
 
 Hardware    Main CPU    Sound CPU   Sound Chips
@@ -94,10 +94,6 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
                                 Issues / To Do
                                 --------------
 
-- There is a 512 byte PROM in the video section (differs by game) that
-  controls the priorities. This prom is currently missing for one game,
-  so we have to use fake data for it (Chimera Beast).
-
 - Making the M6295 status register return 0 fixes the music tempo in
   avspirit, 64street, astyanax etc. but makes most of the effects in
   hachoo disappear! Define SOUND_HACK to 0 to turn this hack off
@@ -105,15 +101,9 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
   bootleg version of rodlandj has one instruction patched out to do exactly
   the same thing that we are doing (ignoring the 6295 status).
 
-- Understand properly how irqs truly works, kazan / iganinju is (again) broken.
+- Understand properly how irqs truly works, kazan / iganinju solution seems hacky
 
-- 64street: player characters in attract mode doesn't move at all, protection?
-  they move on the real PCB
-
-- tshingen: unemulated mosaic effect when killing enemies with the flashing sword.
-  See https://youtu.be/m4ZH0v8UqWs
-  The effect can be tested in e.g. stdragon and p47 test mode:
-  See https://youtu.be/zo3FTCqkNBc and https://youtu.be/dEqH017YBzw
+- P47 intro effect is imperfect ( https://www.youtube.com/watch?v=eozZGcVspVw )
 
 - Understand a handful of unknown bits in video regs
 
@@ -145,15 +135,14 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 MACHINE_RESET_MEMBER(megasys1_state,megasys1)
 {
 	m_ignore_oki_status = 1;    /* ignore oki status due 'protection' */
-	m_ip_select = 0;    /* reset protection */
+	m_ip_latched = 0x0006; /* reset protection - some games expect this initial read without sending anything */
 	m_mcu_hs = 0;
 }
 
 MACHINE_RESET_MEMBER(megasys1_state,megasys1_hachoo)
 {
+	MACHINE_RESET_CALL_MEMBER(megasys1);
 	m_ignore_oki_status = 0;    /* strangely hachoo need real oki status */
-	m_ip_select = 0;    /* reset protection */
-	m_mcu_hs = 0;
 }
 
 
@@ -199,7 +188,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_iganinju_scanline)
 	int scanline = param;
 
 	// TODO: there's more than one hint that MCU controls IRQ signals via work RAM buffers.
-	//		 This is a bare miminum guessing for this specific game, it definitely don't like neither lv 1 nor 2.
+	//       This is a bare miminum guessing for this specific game, it definitely don't like neither lv 1 nor 2.
 	//       Of course MCU is probably doing a lot more to mask and probably set a specific line too.
 	if(m_ram[0] == 0)
 		return;
@@ -254,7 +243,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1B_scanline)
 
  in that order.         */
 
-READ16_MEMBER(megasys1_state::ip_select_r)
+READ16_MEMBER(megasys1_state::ip_select_r) // FROM MCU
+{
+	return m_ip_latched;
+}
+
+
+
+WRITE16_MEMBER(megasys1_state::ip_select_w) // TO MCU
 {
 	int i;
 
@@ -266,26 +262,24 @@ READ16_MEMBER(megasys1_state::ip_select_r)
 //  20      21      22      23      24      < edf
 //  51      52      53      54      55      < hayaosi1
 
-
 	/* f(x) = ((x*x)>>4)&0xFF ; f(f($D)) == 6 */
-	if ((m_ip_select & 0xF0) == 0xF0) return 0x000D;
 
-	for (i = 0; i < 5; i++) if (m_ip_select == m_ip_select_values[i]) break;
+	for (i = 0; i < 7; i++) if ((data & 0x00ff) == m_ip_select_values[i]) break;
 
 	switch (i)
 	{
-			case 0 :    return m_io_system->read();
-			case 1 :    return m_io_p1->read();
-			case 2 :    return m_io_p2->read();
-			case 3 :    return m_io_dsw1->read();
-			case 4 :    return m_io_dsw2->read();
-			default  :  return 0x0006;
+			case 0 :    m_ip_latched = m_io_system->read(); break;
+			case 1 :    m_ip_latched = m_io_p1->read(); break;
+			case 2 :    m_ip_latched = m_io_p2->read(); break;
+			case 3 :    m_ip_latched = m_io_dsw1->read(); break;
+			case 4 :    m_ip_latched = m_io_dsw2->read(); break;
+			case 5 :    m_ip_latched = 0x0d; break; // startup check?
+			case 6 :    m_ip_latched = 0x06; break; // sent before each other command
+			default:  return; // get out if it wasn't a valid request
 	}
-}
 
-WRITE16_MEMBER(megasys1_state::ip_select_w)
-{
-	COMBINE_DATA(&m_ip_select);
+
+	// if the command is valid, generate an IRQ from the MCU
 	m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
@@ -1812,6 +1806,40 @@ ROM_START( 64street )
 	ROM_LOAD( "pr91009.12",  0x0000, 0x0200, CRC(c69423d6) SHA1(ba9644a9899df2d73a5a16bf7ceef1954c2e25f3) ) // same as pr-91044 on hayaosi1
 ROM_END
 
+ROM_START( 64streetja )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_LOAD16_BYTE( "ic53.bin", 0x000000, 0x040000, CRC(c978d086) SHA1(b091faf570841f098d4d70bf3ca4f26d6cda890a) )
+	ROM_LOAD16_BYTE( "ic52.bin", 0x000001, 0x040000, CRC(af475852) SHA1(5e0a375dd904a4176ca6fdccdb67a907e270e9be) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
+	ROM_LOAD16_BYTE( "64th_08.rom", 0x000000, 0x010000, CRC(632be0c1) SHA1(626073037249d96ac70b2d11b2dd72b22bac49c7) )
+	ROM_LOAD16_BYTE( "64th_07.rom", 0x000001, 0x010000, CRC(13595d01) SHA1(e730a530ca232aab883217fa12804075cb2aa640) )
+
+	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, M50747? */
+	ROM_LOAD( "64street.mcu", 0x000000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) /* Scroll 0 */
+	ROM_LOAD( "64th_01.rom", 0x000000, 0x080000, CRC(06222f90) SHA1(52b6cb88b9d2209c16d1633c83c0224b6ebf29dc) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 ) /* Scroll 1 */
+	ROM_LOAD( "64th_06.rom", 0x000000, 0x080000, CRC(2bfcdc75) SHA1(f49f92f1ff58dccf72e05ecf80761c7b65a25ba3) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 ) /* Scroll 2 */
+	ROM_LOAD( "64th_09.rom", 0x000000, 0x020000, CRC(a4a97db4) SHA1(1179457a6f33b3b44fac6056f6245f3aaae6afd5) )
+
+	ROM_REGION( 0x100000, "gfx4", 0 ) /* Sprites */
+	ROM_LOAD( "64th_05.rom", 0x000000, 0x080000, CRC(a89a7020) SHA1(be36e58e9314688ee39249944c5a6c201e0249ee) )
+	ROM_LOAD( "64th_04.rom", 0x080000, 0x080000, CRC(98f83ef6) SHA1(e9b72487695ac7cdc4fbf595389c4b8781ed207e) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )        /* Samples */
+	ROM_LOAD( "64th_11.rom", 0x000000, 0x020000, CRC(b0b8a65c) SHA1(b7e42d9083d0bbfe160fc73a7317d696e90d83d6) )
+
+	ROM_REGION( 0x40000, "oki2", 0 )        /* Samples */
+	ROM_LOAD( "64th_10.rom", 0x000000, 0x040000, CRC(a3390561) SHA1(f86d5c61e3e80d30408535c2203940ca1e95ac18) )
+
+	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
+	ROM_LOAD( "pr91009.12",  0x0000, 0x0200, CRC(c69423d6) SHA1(ba9644a9899df2d73a5a16bf7ceef1954c2e25f3) ) // same as pr-91044 on hayaosi1
+ROM_END
 
 ROM_START( 64streetj )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
@@ -2251,7 +2279,7 @@ ROM_START( chimerab )
 	ROM_LOAD( "voi10.bin", 0x000000, 0x040000, CRC(67498914) SHA1(8d89fa90f38fd102b15f26f71491ea833ec32cb2) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "prom",         0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "pr-91044",  0x0000, 0x0200, BAD_DUMP CRC(c69423d6) SHA1(ba9644a9899df2d73a5a16bf7ceef1954c2e25f3) ) // guess, but 99% sure it's meant to be the same as 64street/hayaosi1 based on analysis of game and previous handcrafted data
 ROM_END
 
 
@@ -3988,6 +4016,10 @@ DRIVER_INIT_MEMBER(megasys1_state,64street)
 	m_ip_select_values[2] = 0x54;
 	m_ip_select_values[3] = 0x55;
 	m_ip_select_values[4] = 0x56;
+
+	m_ip_select_values[5] = 0xfa;
+	m_ip_select_values[6] = 0x06;
+
 }
 
 READ16_MEMBER(megasys1_state::megasys1A_mcu_hs_r)
@@ -4041,6 +4073,10 @@ DRIVER_INIT_MEMBER(megasys1_state,avspirit)
 	m_ip_select_values[3] = 0x33;
 	m_ip_select_values[4] = 0x34;
 
+	m_ip_select_values[5] = 0xff;
+	m_ip_select_values[6] = 0x06;
+
+
 	// has twice less RAM
 	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x060000, 0x06ffff);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x070000, 0x07ffff, m_ram);
@@ -4053,6 +4089,10 @@ DRIVER_INIT_MEMBER(megasys1_state,bigstrik)
 	m_ip_select_values[2] = 0x55;
 	m_ip_select_values[3] = 0x56;
 	m_ip_select_values[4] = 0x57;
+
+	m_ip_select_values[5] = 0xfb;
+	m_ip_select_values[6] = 0x06;
+
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,chimerab)
@@ -4063,6 +4103,10 @@ DRIVER_INIT_MEMBER(megasys1_state,chimerab)
 	m_ip_select_values[2] = 0x53;
 	m_ip_select_values[3] = 0x54;
 	m_ip_select_values[4] = 0x55;
+
+	m_ip_select_values[5] = 0xf2;
+	m_ip_select_values[6] = 0x06;
+
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,cybattlr)
@@ -4072,6 +4116,9 @@ DRIVER_INIT_MEMBER(megasys1_state,cybattlr)
 	m_ip_select_values[2] = 0x53;
 	m_ip_select_values[3] = 0x54;
 	m_ip_select_values[4] = 0x55;
+
+	m_ip_select_values[5] = 0xf2;
+	m_ip_select_values[6] = 0x06;
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,edf)
@@ -4081,6 +4128,10 @@ DRIVER_INIT_MEMBER(megasys1_state,edf)
 	m_ip_select_values[2] = 0x22;
 	m_ip_select_values[3] = 0x23;
 	m_ip_select_values[4] = 0x24;
+
+	m_ip_select_values[5] = 0xf0;
+	m_ip_select_values[6] = 0x06;
+
 }
 
 READ16_MEMBER(megasys1_state::edfbl_input_r)
@@ -4115,6 +4166,10 @@ DRIVER_INIT_MEMBER(megasys1_state,hayaosi1)
 	m_ip_select_values[2] = 0x53;
 	m_ip_select_values[3] = 0x54;
 	m_ip_select_values[4] = 0x55;
+
+	m_ip_select_values[5] = 0xfc;
+	m_ip_select_values[6] = 0x06;
+
 }
 
 READ16_MEMBER(megasys1_state::iganinju_mcu_hs_r)
@@ -4390,7 +4445,8 @@ GAME( 1993, hayaosi1, 0,        system_B_hayaosi1, hayaosi1, megasys1_state, hay
 
 // Type C
 GAME( 1991, 64street, 0,        system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", 0 )
-GAME( 1991, 64streetj,64street, system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan)", 0 )
+GAME( 1991, 64streetj,64street, system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", 0 )
+GAME( 1991, 64streetja,64street,system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", 0 )
 GAME( 1992, bigstrik, 0,        system_C,          bigstrik, megasys1_state, bigstrik, ROT0,   "Jaleco", "Big Striker", 0 )
 GAME( 1993, chimerab, 0,        system_C,          chimerab, megasys1_state, chimerab, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype)", 0 )
 GAME( 1993, cybattlr, 0,        system_C,          cybattlr, megasys1_state, cybattlr, ROT90,  "Jaleco", "Cybattler", 0 )

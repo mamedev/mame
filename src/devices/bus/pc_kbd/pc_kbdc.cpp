@@ -31,7 +31,7 @@ const device_type PC_KBDC_SLOT = &device_creator<pc_kbdc_slot_device>;
 //-------------------------------------------------
 //  pc_kbdc_slot_device - constructor
 //-------------------------------------------------
-pc_kbdc_slot_device::pc_kbdc_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+pc_kbdc_slot_device::pc_kbdc_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PC_KBDC_SLOT, "PC_KBDC_SLOT", tag, owner, clock, "pc_kbdc_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 	m_kbdc_device(nullptr)
@@ -70,7 +70,7 @@ const device_type PC_KBDC = &device_creator<pc_kbdc_device>;
 //-------------------------------------------------
 //  pc_kbdc_device - constructor
 //-------------------------------------------------
-pc_kbdc_device::pc_kbdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+pc_kbdc_device::pc_kbdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PC_KBDC, "PC_KBDC", tag, owner, clock, "pc_kbdc", __FILE__),
 		m_out_clock_cb(*this),
 		m_out_data_cb(*this),
@@ -196,7 +196,7 @@ WRITE_LINE_MEMBER( pc_kbdc_device::data_write_from_kb )
 device_pc_kbd_interface::device_pc_kbd_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
 		m_pc_kbdc(nullptr),
-		m_next(nullptr)
+		m_pc_kbdc_tag(nullptr), m_next(nullptr)
 {
 }
 

@@ -11,7 +11,7 @@
 //const device_type NEOGEO_SPRITE_BASE = &device_creator<neosprite_base_device>;
 
 /*
-neosprite_base_device::neosprite_base_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+neosprite_base_device::neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, NEOGEO_SPRITE_BASE, "NeoGeo Sprites", tag, owner, clock, "neospritebase", __FILE__),
     m_bppshift(4)
 {
@@ -19,7 +19,7 @@ neosprite_base_device::neosprite_base_device(const machine_config &mconfig, std:
 }
 */
 
-neosprite_base_device::neosprite_base_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, device_type type)
+neosprite_base_device::neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type)
 	: device_t(mconfig, type, "Neogeo Sprites", tag, owner, clock, "neosprite", __FILE__),
 	m_bppshift(4)
 {
@@ -654,7 +654,7 @@ void neosprite_base_device::set_pens(const pen_t* pens)
 
 const device_type NEOGEO_SPRITE_REGULAR = &device_creator<neosprite_regular_device>;
 
-neosprite_regular_device::neosprite_regular_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+neosprite_regular_device::neosprite_regular_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: neosprite_base_device(mconfig, tag, owner, clock, NEOGEO_SPRITE_REGULAR)
 {
 }
@@ -704,7 +704,7 @@ inline void neosprite_regular_device::draw_pixel(int romaddr, UINT32* dst, const
 
 const device_type NEOGEO_SPRITE_OPTIMZIED = &device_creator<neosprite_optimized_device>;
 
-neosprite_optimized_device::neosprite_optimized_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+neosprite_optimized_device::neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: neosprite_base_device(mconfig, tag, owner, clock, NEOGEO_SPRITE_OPTIMZIED),
 	m_spritegfx8(nullptr)
 {
@@ -742,7 +742,7 @@ inline void neosprite_optimized_device::draw_pixel(int romaddr, UINT32* dst, con
 const device_type NEOGEO_SPRITE_MIDAS = &device_creator<neosprite_midas_device>;
 
 
-neosprite_midas_device::neosprite_midas_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+neosprite_midas_device::neosprite_midas_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: neosprite_base_device(mconfig, tag, owner, clock, NEOGEO_SPRITE_MIDAS)
 {
 	m_bppshift = 8;

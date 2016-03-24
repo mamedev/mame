@@ -63,18 +63,17 @@ class a2bus_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	a2bus_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	a2bus_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
 
 	// inline configuration
-	static void static_set_a2bus_slot(device_t &device, std::string tag, std::string slottag);
+	static void static_set_a2bus_slot(device_t &device, const char *tag, const char *slottag);
 protected:
 	// configuration
-	std::string m_a2bus_tag;
-	std::string m_a2bus_slottag;
+	const char *m_a2bus_tag, *m_a2bus_slottag;
 };
 
 // device type definition
@@ -89,11 +88,11 @@ class a2bus_device : public device_t
 	friend class a2bus_mcms2_device;
 public:
 	// construction/destruction
-	a2bus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	a2bus_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// inline configuration
-	static void static_set_cputag(device_t &device, std::string tag);
+	static void static_set_cputag(device_t &device, const char *tag);
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<a2bus_device &>(device).m_out_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<a2bus_device &>(device).m_out_nmi_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_inh_callback(device_t &device, _Object object) { return downcast<a2bus_device &>(device).m_out_inh_cb.set_callback(object); }
@@ -129,7 +128,7 @@ protected:
 	devcb_write8        m_out_inh_cb;
 
 	device_a2bus_card_interface *m_device_list[8];
-	std::string m_cputag;
+	const char *m_cputag;
 
 	UINT8 m_slot_irq_mask;
 	UINT8 m_slot_nmi_mask;
@@ -187,11 +186,10 @@ public:
 	void slot_dma_write_no_space(UINT16 offset, UINT8 data) { m_a2bus->dma_nospace_w(offset, data); }
 
 	// inline configuration
-	static void static_set_a2bus_tag(device_t &device, std::string tag, std::string slottag);
+	static void static_set_a2bus_tag(device_t &device, const char *tag, const char *slottag);
 public:
 	a2bus_device  *m_a2bus;
-	std::string m_a2bus_tag;
-	std::string m_a2bus_slottag;
+	const char *m_a2bus_tag, *m_a2bus_slottag;
 	int m_slot;
 	device_a2bus_card_interface *m_next;
 };

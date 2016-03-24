@@ -53,39 +53,39 @@ const device_type NES_QJ_PCB = &device_creator<nes_qj_device>;
 const device_type NES_ZZ_PCB = &device_creator<nes_zz_device>;
 
 
-nes_txrom_device::nes_txrom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_txrom_device::nes_txrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_prg_base(0), m_prg_mask(0), m_chr_base(0), m_chr_mask(0),
 	m_latch(0), m_wram_protect(0), m_alt_irq(0), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
 				{
 }
 
-nes_txrom_device::nes_txrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_txrom_device::nes_txrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_TXROM, "NES Cart TxROM (MMC-3) PCB", tag, owner, clock, "nes_txrom", __FILE__), m_prg_base(0), m_prg_mask(0), m_chr_base(0), m_chr_mask(0),
 	m_latch(0), m_wram_protect(0), m_alt_irq(0), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
 				{
 }
 
-nes_hkrom_device::nes_hkrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_hkrom_device::nes_hkrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_txrom_device(mconfig, NES_HKROM, "NES Cart HKROM (MMC-6) PCB", tag, owner, clock, "nes_hkrom", __FILE__), m_wram_enable(0), m_mmc6_reg(0)
 				{
 }
 
-nes_txsrom_device::nes_txsrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_txsrom_device::nes_txsrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_txrom_device(mconfig, NES_TXSROM, "NES Cart TxSROM PCB", tag, owner, clock, "nes_txsrom", __FILE__)
 {
 }
 
-nes_tqrom_device::nes_tqrom_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_tqrom_device::nes_tqrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_txrom_device(mconfig, NES_TQROM, "NES Cart TQROM PCB", tag, owner, clock, "nes_tqrom", __FILE__)
 {
 }
 
-nes_qj_device::nes_qj_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_qj_device::nes_qj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_txrom_device(mconfig, NES_QJ_PCB, "NES Cart NES-QJ PCB", tag, owner, clock, "nes_qj", __FILE__)
 {
 }
 
-nes_zz_device::nes_zz_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_zz_device::nes_zz_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_txrom_device(mconfig, NES_ZZ_PCB, "NES Cart PAL-ZZ PCB", tag, owner, clock, "nes_zz", __FILE__)
 {
 }

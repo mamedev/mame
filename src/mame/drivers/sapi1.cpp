@@ -44,7 +44,7 @@ Unable to proceed due to no info available (& in English).
 class sapi1_state : public driver_device
 {
 public:
-	sapi1_state(const machine_config &mconfig, device_type type, std::string tag)
+	sapi1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_bank1(*this, "bank1"),
@@ -549,7 +549,7 @@ static MACHINE_CONFIG_START( sapi1, sapi1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

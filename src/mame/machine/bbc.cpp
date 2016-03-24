@@ -1426,14 +1426,26 @@ WRITE_LINE_MEMBER(bbc_state::write_acia_clock)
 
 WRITE_LINE_MEMBER(bbc_state::motor_w)
 {
-	m_i8271->subdevice<floppy_connector>("0")->get_device()->mon_w(!state);
-	m_i8271->subdevice<floppy_connector>("1")->get_device()->mon_w(!state);
+	for (int i=0; i != 2; i++) {
+		char devname[1];
+		sprintf(devname, "%d", i);
+		floppy_connector *con = m_i8271->subdevice<floppy_connector>(devname);
+		if (con) {
+			con->get_device()->mon_w(!state);
+		}
+	}
 }
 
 WRITE_LINE_MEMBER(bbc_state::side_w)
 {
-	m_i8271->subdevice<floppy_connector>("0")->get_device()->ss_w(state);
-	m_i8271->subdevice<floppy_connector>("1")->get_device()->ss_w(state);
+	for (int i=0; i != 2; i++) {
+		char devname[1];
+		sprintf(devname, "%d", i);
+		floppy_connector *con = m_i8271->subdevice<floppy_connector>(devname);
+		if (con) {
+			con->get_device()->ss_w(state);
+		}
+	}
 }
 
 
@@ -1661,7 +1673,7 @@ DRIVER_INIT_MEMBER(bbc_state,bbc)
 void bbc_state::bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size)
 {
 	std::string region_tag;
-	memory_region *tmp_reg = nullptr;
+	memory_region *tmp_reg;
 	UINT8 *eprom[4];
 	if (m_exp1 && (tmp_reg = memregion(region_tag.assign(m_exp1->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
 		eprom[0] = tmp_reg->base() + shift;
@@ -1695,7 +1707,7 @@ void bbc_state::bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, U
 void bbc_state::bbcm_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size)
 {
 	std::string region_tag;
-	memory_region *tmp_reg = nullptr;
+	memory_region *tmp_reg;
 	UINT8 *eprom[2];
 	if (m_exp1 && (tmp_reg = memregion(region_tag.assign(m_exp1->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
 		eprom[0] = tmp_reg->base() + shift;

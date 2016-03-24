@@ -64,8 +64,8 @@ class pioneer_pr8210_device : public laserdisc_device
 {
 public:
 	// construction/destruction
-	pioneer_pr8210_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	pioneer_pr8210_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// input and output
 	void control_w(UINT8 data);
@@ -139,7 +139,7 @@ class simutrek_special_device : public pioneer_pr8210_device
 {
 public:
 	// construction/destruction
-	simutrek_special_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	simutrek_special_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// input and output
 	void data_w(UINT8 data);

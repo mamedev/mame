@@ -2207,12 +2207,15 @@ MACHINE_CONFIG_END
 
 MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
 {
-	/* copy protection data every reset */
-	UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
-	int i, len = memregion("user1")->bytes();
+	if (memregion("user1") != nullptr)
+	{
+		/* copy protection data every reset */
+		UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
+		int i, len = memregion("user1")->bytes();
 
-	for (i = 0; i < len / 2; i++)
-		m_mainram[0x000/2 + i] = PROTDATA[i];
+		for (i = 0; i < len / 2; i++)
+			m_mainram[0x000 / 2 + i] = PROTDATA[i];
+	}
 
 	MACHINE_RESET_CALL_MEMBER(tumbleb);
 }

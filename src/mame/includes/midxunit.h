@@ -11,7 +11,7 @@
 class midxunit_state : public midtunit_state
 {
 public:
-	midxunit_state(const machine_config &mconfig, device_type type, std::string tag)
+	midxunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: midtunit_state(mconfig, type, tag),
 			m_nvram(*this, "nvram"),
 			m_midway_serial_pic(*this, "serial_pic") { }

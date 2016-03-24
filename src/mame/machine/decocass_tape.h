@@ -6,7 +6,7 @@
 class decocass_tape_device : public device_t
 {
 public:
-	decocass_tape_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	decocass_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~decocass_tape_device() {}
 
 	UINT8 get_status_bits();

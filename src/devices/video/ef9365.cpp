@@ -155,7 +155,7 @@ const address_space_config *ef9365_device::memory_space_config(address_spacenum 
 //  ef9365_device - constructor
 //-------------------------------------------------
 
-ef9365_device::ef9365_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+ef9365_device::ef9365_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, EF9365, "EF9365", tag, owner, clock, "ef9365", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -171,7 +171,7 @@ ef9365_device::ef9365_device(const machine_config &mconfig, std::string tag, dev
 //  palette device
 //-------------------------------------------------
 
-void ef9365_device::static_set_palette_tag(device_t &device, std::string tag)
+void ef9365_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<ef9365_device &>(device).m_palette.set_tag(tag);
 }

@@ -49,7 +49,7 @@ ADDRESS_MAP_END
 
 
 
-n2a03_device::n2a03_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	m6502_device(mconfig, N2A03, "N2A03", tag, owner, clock, "n2a03", __FILE__),
 	m_apu(*this, "nesapu"),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(n2a03_map))

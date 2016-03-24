@@ -16,7 +16,7 @@ class msx_slot_ram_mm_device : public device_t
 							, public msx_internal_slot_interface
 {
 public:
-	msx_slot_ram_mm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	msx_slot_ram_mm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void set_total_size(device_t &device, UINT32 total_size) { dynamic_cast<msx_slot_ram_mm_device &>(device).m_total_size = total_size; }
 	static void set_ramio_set_bits(device_t &device, UINT8 ramio_set_bits) { dynamic_cast<msx_slot_ram_mm_device &>(device).m_ramio_set_bits = ramio_set_bits; }

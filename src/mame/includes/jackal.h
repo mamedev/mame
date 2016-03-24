@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Kenneth Lin
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
+// thanks-to:Kenneth Lin (original driver author)
 
 #define MASTER_CLOCK         XTAL_18_432MHz
 #define SOUND_CLOCK          XTAL_3_579545MHz
@@ -9,7 +10,7 @@
 class jackal_state : public driver_device
 {
 public:
-	jackal_state(const machine_config &mconfig, device_type type, std::string tag)
+	jackal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoctrl(*this, "videoctrl"),
 		m_mastercpu(*this, "master"),

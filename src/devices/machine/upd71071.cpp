@@ -92,7 +92,7 @@
 
 const device_type UPD71071 = &device_creator<upd71071_device>;
 
-upd71071_device::upd71071_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+upd71071_device::upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, UPD71071, "NEC uPD71071", tag, owner, clock, "upd71071", __FILE__),
 				m_upd_clock(0),
 				m_out_hreq_cb(*this),

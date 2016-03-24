@@ -74,7 +74,7 @@ static const char *const mc6843_cmd[16] =
 
 const device_type MC6843 = &device_creator<mc6843_device>;
 
-mc6843_device::mc6843_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MC6843, "MC6843 floppy controller", tag, owner, clock, "mc6843", __FILE__),
 	m_write_irq(*this),
 	m_CTAR(0),

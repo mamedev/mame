@@ -147,7 +147,7 @@
 class miniboy7_state : public driver_device
 {
 public:
-	miniboy7_state(const machine_config &mconfig, device_type type, std::string tag)
+	miniboy7_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram_a(*this, "videoram_a"),
 		m_colorram_a(*this, "colorram_a"),

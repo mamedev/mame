@@ -18,7 +18,7 @@
 
 class h8h_device : public h8_device {
 public:
-	h8h_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, address_map_delegate map_delegate);
+	h8h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, address_map_delegate map_delegate);
 
 protected:
 	static const disasm_entry disasm_entries[];

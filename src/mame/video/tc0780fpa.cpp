@@ -392,7 +392,7 @@ void tc0780fpa_renderer::render(UINT16 *polygon_fifo, int length)
 
 const device_type TC0780FPA = &device_creator<tc0780fpa_device>;
 
-tc0780fpa_device::tc0780fpa_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tc0780fpa_device::tc0780fpa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0780FPA, "TC0780FPA Polygon Renderer", tag, owner, clock, "tc0780fpa", __FILE__),
 	device_video_interface(mconfig, *this)
 {

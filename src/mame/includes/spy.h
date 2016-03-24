@@ -13,7 +13,7 @@
 class spy_state : public driver_device
 {
 public:
-	spy_state(const machine_config &mconfig, device_type type, std::string tag)
+	spy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),

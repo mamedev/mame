@@ -116,7 +116,7 @@
 		</part>
 	</software>
 
-	<software name="cgen2"> 	<!-- cart for Ordisavant -->
+	<software name="cgen2">     <!-- cart for Ordisavant -->
 		<description>Connaissances Generales II</description>
 		<year>1988</year>
 		<publisher>VTech</publisher>
@@ -127,7 +127,7 @@
 		</part>
 	</software>
 
-	<software name="encyclop"> 	<!-- cart for Ordisavant -->
+	<software name="encyclop">  <!-- cart for Ordisavant -->
 		<description>Encyclopedie</description>
 		<year>1988</year>
 		<publisher>VTech</publisher>

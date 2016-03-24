@@ -15,7 +15,6 @@
 #include "audit.h"
 #include "info.h"
 #include "unzip.h"
-#include "un7z.h"
 #include "validity.h"
 #include "sound/samples.h"
 #include "cliopts.h"
@@ -27,7 +26,8 @@
 #include "osdepend.h"
 #include "softlist.h"
 
-#include <algorithm>
+#include "ui/moptions.h"
+
 #include <new>
 #include <ctype.h>
 
@@ -88,7 +88,6 @@ cli_frontend::~cli_frontend()
 	m_options.remove_device_options();
 }
 
-
 //-------------------------------------------------
 //  execute - execute a game via the standard
 //  command line interface
@@ -98,6 +97,8 @@ int cli_frontend::execute(int argc, char **argv)
 {
 	// wrap the core execution in a try/catch to field all fatal errors
 	m_result = MAMERR_NONE;
+	machine_manager *manager = machine_manager::instance(m_options, m_osd);
+
 	try
 	{
 		// first parse options to be able to get software from it
@@ -105,6 +106,11 @@ int cli_frontend::execute(int argc, char **argv)
 		m_options.parse_command_line(argc, argv, option_errors);
 
 		m_options.parse_standard_inis(option_errors);
+
+		//load_translation();
+		load_translation(m_options);
+
+		manager->start_luaengine();
 
 		if (*(m_options.software_name()) != 0)
 		{
@@ -145,11 +151,10 @@ int cli_frontend::execute(int argc, char **argv)
 											// mount only if not already mounted
 											if (*option == 0)
 											{
-												std::string val;
-												strprintf(val, "%s:%s:%s", swlistdev->list_name(), m_options.software_name(), swpart->name());
+												std::string val = string_format("%s:%s:%s", swlistdev->list_name(), m_options.software_name(), swpart->name());
 
 												// call this in order to set slot devices according to mounting
-												m_options.parse_slot_devices(argc, argv, option_errors, image->instance_name(), val.c_str());
+												m_options.parse_slot_devices(argc, argv, option_errors, image->instance_name(), val.c_str(), swpart);
 												break;
 											}
 										}
@@ -210,9 +215,7 @@ int cli_frontend::execute(int argc, char **argv)
 				throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
 
 			// otherwise just run the game
-			machine_manager *manager = machine_manager::instance(m_options, m_osd);
 			m_result = manager->execute();
-			global_free(manager);
 		}
 	}
 
@@ -235,7 +238,7 @@ int cli_frontend::execute(int argc, char **argv)
 
 			// print them out
 			osd_printf_error("\n\"%s\" approximately matches the following\n"
-					"supported %s (best match first):\n\n", m_options.system_name(),emulator_info::get_gamesnoun());
+					"supported machines (best match first):\n\n", m_options.system_name());
 			for (auto & matche : matches)
 				if (matche != -1)
 					osd_printf_error("%-18s%s\n", drivlist.driver(matche).name, drivlist.driver(matche).description);
@@ -248,7 +251,7 @@ int cli_frontend::execute(int argc, char **argv)
 	}
 	catch (add_exception &aex)
 	{
-		osd_printf_error("Tag '%s' already exists in tagged_list\n", aex.tag().c_str());
+		osd_printf_error("Tag '%s' already exists in tagged_list\n", aex.tag());
 		m_result = MAMERR_FATALERROR;
 	}
 	catch (std::exception &ex)
@@ -262,7 +265,8 @@ int cli_frontend::execute(int argc, char **argv)
 		m_result = MAMERR_FATALERROR;
 	}
 
-	_7z_file_cache_clear();
+	util::archive_file::cache_clear();
+	global_free(manager);
 
 	return m_result;
 }
@@ -439,7 +443,7 @@ void cli_frontend::listcrc(const char *gamename)
 					// if we have a CRC, display it
 					UINT32 crc;
 					if (hash_collection(ROM_GETHASHDATA(rom)).crc(crc))
-						osd_printf_info("%08x %-16s \t %-8s \t %s\n", crc, ROM_GETNAME(rom), device->shortname().c_str(), device->name().c_str());
+						osd_printf_info("%08x %-16s \t %-8s \t %s\n", crc, ROM_GETNAME(rom), device->shortname(), device->name());
 				}
 	}
 }
@@ -550,6 +554,13 @@ void cli_frontend::listsamples(const char *gamename)
 //  referenced by a given game or set of games
 //-------------------------------------------------
 
+int cli_frontend::compare_devices(const void *i1, const void *i2)
+{
+	device_t *dev1 = *(device_t **)i1;
+	device_t *dev2 = *(device_t **)i2;
+	return strcmp(dev1->tag(), dev2->tag());
+}
+
 void cli_frontend::listdevices(const char *gamename)
 {
 	// determine which drivers to output; return an error if none found
@@ -574,36 +585,33 @@ void cli_frontend::listdevices(const char *gamename)
 			device_list.push_back(device);
 
 		// sort them by tag
-		std::sort(device_list.begin(), device_list.end(), [](device_t *dev1, device_t *dev2) {
-			return dev1->tag() < dev2->tag();
-		});
+		qsort(&device_list[0], device_list.size(), sizeof(device_list[0]), compare_devices);
 
 		// dump the results
-		for (device_t *device : device_list)
+		for (auto device : device_list)
 		{
 			// extract the tag, stripping the leading colon
-			std::string tag = device->tag();
-			if (tag[0] == ':')
-				tag = tag.erase(0, 1);
+			const char *tag = device->tag();
+			if (*tag == ':')
+				tag++;
 
 			// determine the depth
 			int depth = 1;
-			if (tag.empty())
+			if (*tag == 0)
 			{
 				tag = "<root>";
 				depth = 0;
 			}
 			else
 			{
-				const char *tag_c = tag.c_str();
-				for (const char *c = tag_c; *c != 0; c++)
+				for (const char *c = tag; *c != 0; c++)
 					if (*c == ':')
 					{
-						tag_c = c + 1;
+						tag = c + 1;
 						depth++;
 					}
 			}
-			printf("   %*s%-*s %s", depth * 2, "", 30 - depth * 2, tag.c_str(), device->name().c_str());
+			printf("   %*s%-*s %s", depth * 2, "", 30 - depth * 2, tag, device->name());
 
 			// add more information
 			UINT32 clock = device->clock();
@@ -648,7 +656,7 @@ void cli_frontend::listslots(const char *gamename)
 		{
 			if (slot->fixed()) continue;
 			// output the line, up to the list of extensions
-			printf("%-13s%-10s   ", first ? drivlist.driver().name : "", std::string(slot->device().tag()).erase(0,1).c_str());
+			printf("%-13s%-10s   ", first ? drivlist.driver().name : "", slot->device().tag()+1);
 
 			bool first_option = true;
 
@@ -660,9 +668,9 @@ void cli_frontend::listslots(const char *gamename)
 					device_t *dev = (*option->devtype())(drivlist.config(), "dummy", &drivlist.config().root_device(), 0);
 					dev->config_complete();
 					if (first_option) {
-						printf("%-15s %s\n", option->name(),dev->name().c_str());
+						printf("%-15s %s\n", option->name(),dev->name());
 					} else {
-						printf("%-23s   %-15s %s\n", "",option->name(),dev->name().c_str());
+						printf("%-23s   %-15s %s\n", "",option->name(),dev->name());
 					}
 					global_free(dev);
 
@@ -708,8 +716,7 @@ void cli_frontend::listmedia(const char *gamename)
 		for (const device_image_interface *imagedev = iter.first(); imagedev != nullptr; imagedev = iter.next())
 		{
 			// extract the shortname with parentheses
-			std::string paren_shortname;
-			strprintf(paren_shortname,"(%s)", imagedev->brief_instance_name());
+			std::string paren_shortname = string_format("(%s)", imagedev->brief_instance_name());
 
 			// output the line, up to the list of extensions
 			printf("%-13s%-12s%-8s   ", first ? drivlist.driver().name : "", imagedev->instance_name(), paren_shortname.c_str());
@@ -811,8 +818,8 @@ void cli_frontend::verifyroms(const char *gamename)
 			device_iterator iter(config.root_device());
 			for (device_t *dev = iter.first(); dev != nullptr; dev = iter.next())
 			{
-				if (dev->owner() != nullptr && (!dev->shortname().empty()) && dev->rom_region() != nullptr && (device_map.insert(dev->shortname()).second)) {
-					if (core_strwildcmp(gamename, dev->shortname().c_str()) == 0)
+				if (dev->owner() != nullptr && (*(dev->shortname()) != 0) && dev->rom_region() != nullptr && (device_map.insert(dev->shortname()).second)) {
+					if (core_strwildcmp(gamename, dev->shortname()) == 0)
 					{
 						matched++;
 
@@ -827,11 +834,11 @@ void cli_frontend::verifyroms(const char *gamename)
 						{
 							// output the summary of the audit
 							std::string summary_string;
-							auditor.summarize(dev->shortname().c_str(),&summary_string);
+							auditor.summarize(dev->shortname(),&summary_string);
 							osd_printf_info("%s", summary_string.c_str());
 
 							// display information about what we discovered
-							osd_printf_info("romset %s ", dev->shortname().c_str());
+							osd_printf_info("romset %s ", dev->shortname());
 
 							// switch off of the result
 							switch (summary)
@@ -875,7 +882,7 @@ void cli_frontend::verifyroms(const char *gamename)
 							device->config_complete();
 
 					if (device_map.insert(dev->shortname()).second) {
-						if (core_strwildcmp(gamename, dev->shortname().c_str()) == 0)
+						if (core_strwildcmp(gamename, dev->shortname()) == 0)
 						{
 							matched++;
 							if (dev->rom_region() != nullptr)
@@ -892,11 +899,11 @@ void cli_frontend::verifyroms(const char *gamename)
 								{
 									// output the summary of the audit
 									std::string summary_string;
-									auditor.summarize(dev->shortname().c_str(),&summary_string);
+									auditor.summarize(dev->shortname(),&summary_string);
 									osd_printf_info("%s", summary_string.c_str());
 
 									// display information about what we discovered
-									osd_printf_info("romset %s ", dev->shortname().c_str());
+									osd_printf_info("romset %s ", dev->shortname());
 
 									// switch off of the result
 									switch (summary)
@@ -930,11 +937,11 @@ void cli_frontend::verifyroms(const char *gamename)
 							device_iterator subsubiter(*device);
 							for (device_t *subdev = subsubiter.first(); subdev != nullptr; subdev = subsubiter.next())
 							{
-								if (subdev->owner() == device && subdev->rom_region() != nullptr && !subdev->shortname().empty())
+								if (subdev->owner() == device && subdev->rom_region() != nullptr && subdev->shortname() != nullptr && subdev->shortname()[0] != '\0')
 								{
 									if (device_map.insert(subdev->shortname()).second)
 									{
-										if (core_strwildcmp(gamename, subdev->shortname().c_str()) == 0)
+										if (core_strwildcmp(gamename, subdev->shortname()) == 0)
 										{
 											matched++;
 
@@ -950,11 +957,11 @@ void cli_frontend::verifyroms(const char *gamename)
 											{
 												// output the summary of the audit
 												std::string summary_string;
-												auditor.summarize(subdev->shortname().c_str(),&summary_string);
+												auditor.summarize(subdev->shortname(),&summary_string);
 												osd_printf_info("%s", summary_string.c_str());
 
 												// display information about what we discovered
-												osd_printf_info("romset %s ", subdev->shortname().c_str());
+												osd_printf_info("romset %s ", subdev->shortname());
 
 												// switch off of the result
 												switch (summary)
@@ -992,7 +999,7 @@ void cli_frontend::verifyroms(const char *gamename)
 	}
 
 	// clear out any cached files
-	zip_file_cache_clear();
+	util::archive_file::cache_clear();
 
 	// return an error if none found
 	if (matched == 0)
@@ -1084,7 +1091,7 @@ void cli_frontend::verifysamples(const char *gamename)
 	}
 
 	// clear out any cached files
-	zip_file_cache_clear();
+	util::archive_file::cache_clear();
 
 	// return an error if none found
 	if (matched == 0)
@@ -1399,7 +1406,7 @@ void cli_frontend::verifysoftware(const char *gamename)
 	}
 
 	// clear out any cached files
-	zip_file_cache_clear();
+	util::archive_file::cache_clear();
 
 	// return an error if none found
 	if (matched == 0)
@@ -1521,7 +1528,7 @@ void cli_frontend::verifysoftlist(const char *gamename)
 	}
 
 	// clear out any cached files
-	zip_file_cache_clear();
+	util::archive_file::cache_clear();
 
 	// return an error if none found
 	if (matched == 0)
@@ -1583,7 +1590,7 @@ void cli_frontend::execute_commands(const char *exename)
 	// showusage?
 	if (strcmp(m_options.command(), CLICOMMAND_SHOWUSAGE) == 0)
 	{
-		emulator_info::printf_usage(exename, emulator_info::get_gamenoun());
+		osd_printf_info("Usage:  %s [machine] [media] [software] [options]",exename);
 		osd_printf_info("\n\nOptions:\n%s", m_options.output_help().c_str());
 		return;
 	}
@@ -1592,7 +1599,8 @@ void cli_frontend::execute_commands(const char *exename)
 	if (strcmp(m_options.command(), CLICOMMAND_VALIDATE) == 0)
 	{
 		validity_checker valid(m_options);
-		bool result = valid.check_all();
+		const char *sysname = m_options.system_name();
+		bool result = valid.check_all_matching((sysname[0] == 0) ? "*" : sysname);
 		if (!result)
 			throw emu_fatalerror(MAMERR_FAILED_VALIDITY, "Validity check failed (%d errors, %d warnings in total)\n", valid.errors(), valid.warnings());
 		return;
@@ -1609,11 +1617,19 @@ void cli_frontend::execute_commands(const char *exename)
 	{
 		// attempt to open the output file
 		emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(emulator_info::get_configname(), ".ini") != FILERR_NONE)
+		if (file.open(emulator_info::get_configname(), ".ini") != osd_file::error::NONE)
 			throw emu_fatalerror("Unable to create file %s.ini\n",emulator_info::get_configname());
 
 		// generate the updated INI
 		file.puts(m_options.output_ini().c_str());
+
+		ui_options ui_opts;
+		emu_file file_ui(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		if (file_ui.open("ui.ini") != osd_file::error::NONE)
+			throw emu_fatalerror("Unable to create file ui.ini\n");
+
+		// generate the updated INI
+		file_ui.puts(ui_opts.output_ini().c_str());
 		return;
 	}
 
@@ -1676,8 +1692,10 @@ void cli_frontend::execute_commands(const char *exename)
 void cli_frontend::display_help()
 {
 	osd_printf_info("%s v%s\n%s\n\n", emulator_info::get_appname(),build_version,emulator_info::get_copyright_info());
-	osd_printf_info("%s\n", emulator_info::get_disclaimer());
-	emulator_info::printf_usage(emulator_info::get_appname(),emulator_info::get_gamenoun());
+	osd_printf_info("This software reproduces, more or less faithfully, the behaviour of a wide range\n"
+					"of machines. But hardware is useless without software, so images of the ROMs and\n"
+					"other media which run on that hardware are also required.\n\n");
+	osd_printf_info("Usage:  %s [machine] [media] [software] [options]",emulator_info::get_appname());
 	osd_printf_info("\n\n"
 			"        %s -showusage    for a brief list of options\n"
 			"        %s -showconfig   for a list of configuration options\n"
@@ -1739,71 +1757,45 @@ void media_identifier::identify(const char *filename)
 	}
 
 	// if that failed, and the filename ends with .zip, identify as a ZIP file
-	if (core_filename_ends_with(filename, ".7z"))
+	if (core_filename_ends_with(filename, ".7z") || core_filename_ends_with(filename, ".zip"))
 	{
 		// first attempt to examine it as a valid _7Z file
-		_7z_file *_7z = nullptr;
-		_7z_error _7zerr = _7z_file_open(filename, &_7z);
-		if (_7zerr == _7ZERR_NONE && _7z != nullptr)
+		util::archive_file::ptr archive;
+		util::archive_file::error err;
+		if (core_filename_ends_with(filename, ".7z"))
+			err = util::archive_file::open_7z(filename, archive);
+		else
+			err = util::archive_file::open_zip(filename, archive);
+		if ((err == util::archive_file::error::NONE) && archive)
 		{
-			// loop over entries in the .7z, skipping empty files and directories
-			for (int i = 0; i < _7z->db.db.NumFiles; i++)
-			{
-				const CSzFileItem *f = _7z->db.db.Files + i;
-				_7z->curr_file_idx = i;
-				int namelen = SzArEx_GetFileNameUtf16(&_7z->db, i, nullptr);
-				std::vector<UINT16> temp(namelen);
-				dynamic_buffer temp2(namelen+1);
-				UINT8* temp3 = &temp2[0];
-				memset(temp3, 0x00, namelen);
-				SzArEx_GetFileNameUtf16(&_7z->db, i, &temp[0]);
-				// crude, need real UTF16->UTF8 conversion ideally
-				for (int j=0;j<namelen;j++)
-				{
-					temp3[j] = (UINT8)temp[j];
-				}
+			std::vector<std::uint8_t> data;
 
-				if (!(f->IsDir) && (f->Size != 0))
+			// loop over entries in the .7z, skipping empty files and directories
+			for (int i = archive->first_file(); i >= 0; i = archive->next_file())
+			{
+				const std::uint64_t length(archive->current_uncompressed_length());
+				if (!archive->current_is_directory() && (length != 0) && (std::uint32_t(length) == length))
 				{
 					// decompress data into RAM and identify it
-					dynamic_buffer data(f->Size);
-					_7zerr = _7z_file_decompress(_7z, &data[0], f->Size);
-					if (_7zerr == _7ZERR_NONE)
-						identify_data((const char*)&temp2[0], &data[0], f->Size);
+					try
+					{
+						data.resize(std::size_t(length));
+						err = archive->decompress(&data[0], std::uint32_t(length));
+						if (err == util::archive_file::error::NONE)
+							identify_data(archive->current_name().c_str(), &data[0], length);
+					}
+					catch (...)
+					{
+						// resizing the buffer could cause a bad_alloc if archive contains large files
+					}
+					data.clear();
 				}
 			}
-
-			// close up
-			_7z_file_close(_7z);
 		}
 
 		// clear out any cached files
-		_7z_file_cache_clear();
-	}
-	else if (core_filename_ends_with(filename, ".zip"))
-	{
-		// first attempt to examine it as a valid ZIP file
-		zip_file *zip = nullptr;
-		zip_error ziperr = zip_file_open(filename, &zip);
-		if (ziperr == ZIPERR_NONE && zip != nullptr)
-		{
-			// loop over entries in the ZIP, skipping empty files and directories
-			for (const zip_file_header *entry = zip_file_first_file(zip); entry != nullptr; entry = zip_file_next_file(zip))
-				if (entry->uncompressed_length != 0)
-				{
-					// decompress data into RAM and identify it
-					dynamic_buffer data(entry->uncompressed_length);
-					ziperr = zip_file_decompress(zip, &data[0], entry->uncompressed_length);
-					if (ziperr == ZIPERR_NONE)
-						identify_data(entry->filename, &data[0], entry->uncompressed_length);
-				}
-
-			// close up
-			zip_file_close(zip);
-		}
-
-		// clear out any cached files
-		zip_file_cache_clear();
+		archive.reset();
+		util::archive_file::cache_clear();
 	}
 
 	// otherwise, identify as a raw file
@@ -1861,8 +1853,8 @@ void media_identifier::identify_file(const char *name)
 		// load the file and process if it opens and has a valid length
 		UINT32 length;
 		void *data;
-		file_error filerr = core_fload(name, &data, &length);
-		if (filerr == FILERR_NONE && length > 0)
+		const osd_file::error filerr = util::core_file::load(name, &data, length);
+		if (filerr == osd_file::error::NONE && length > 0)
 		{
 			identify_data(name, reinterpret_cast<UINT8 *>(data), length);
 			osd_free(data);

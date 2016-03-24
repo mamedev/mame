@@ -47,7 +47,7 @@ public:
 		TIMER_BOOT
 	};
 
-	sys2900_state(const machine_config &mconfig, device_type type, std::string tag)
+	sys2900_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
@@ -130,7 +130,7 @@ static MACHINE_CONFIG_START( sys2900, sys2900_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sys2900_state, screen_update_sys2900)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 MACHINE_CONFIG_END
 

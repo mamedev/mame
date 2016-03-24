@@ -15,7 +15,7 @@ Konami 037122
 
 const device_type K037122 = &device_creator<k037122_device>;
 
-k037122_device::k037122_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+k037122_device::k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K037122, "K037122 2D Tilemap", tag, owner, clock, "k037122", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_tile_ram(nullptr),
@@ -32,7 +32,7 @@ k037122_device::k037122_device(const machine_config &mconfig, std::string tag, d
 //  gfx decoder
 //-------------------------------------------------
 
-void k037122_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
+void k037122_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<k037122_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -42,7 +42,7 @@ void k037122_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
 //  palette device
 //-------------------------------------------------
 
-void k037122_device::static_set_palette_tag(device_t &device, std::string tag)
+void k037122_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<k037122_device &>(device).m_palette.set_tag(tag);
 }

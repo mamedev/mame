@@ -53,7 +53,7 @@ device_ql_rom_cartridge_card_interface::~device_ql_rom_cartridge_card_interface(
 //  ql_rom_cartridge_slot_t - constructor
 //-------------------------------------------------
 
-ql_rom_cartridge_slot_t::ql_rom_cartridge_slot_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+ql_rom_cartridge_slot_t::ql_rom_cartridge_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, QL_ROM_CARTRIDGE_SLOT, "QL ROM cartridge slot", tag, owner, clock, "ql_rom_cartridge_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	device_image_interface(mconfig, *this), m_card(nullptr)

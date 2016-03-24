@@ -78,6 +78,8 @@ public:
 	// constants
 	static const rgb_t black;
 	static const rgb_t white;
+	static const rgb_t green;
+	static const rgb_t amber;
 
 private:
 	UINT32  m_data;

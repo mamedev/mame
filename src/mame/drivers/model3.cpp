@@ -92,11 +92,11 @@ Tilemap entry formats (16-bit wide):
     are the palette select bits for 8bpp and PHI-T5 for 4bpp.
 
 ===================================================================================
-
-Model 3 Hardware Overview.
+Guru-Readme
+Model 3 Hardware Overview
 Sega, 1996-1998
 
-This document covers all games running on the original Model 3 hardware and is produced with
+This document covers all games running on the original Model 3 hardware with
 reference to a Scud Race PCB and Virtua Fighter 3TB PCB. ALL PCB numbers are identical.
 Scud Race runs on the original Sega Model 3 hardware. It's the same PCB as Virtua Fighter 3, there
 is no mention of 'Step 1.5' or even 'Step 1.0' on any of the PCBs and there is no 50MHz or
@@ -135,8 +135,6 @@ The Lost World Special
 Virtua Striker 2
 Virtua Striker 2 Version '98
 
-
-[There is an external MPEG PCB used on some games but it was not available for documenting]
 
 COMM Board
 ----------
@@ -195,6 +193,30 @@ Notes:
       Jumpers   - These jumper settings match Scud Race and VF3TB. Jumpers may be different for other games, but
                   if different, it's likely only for the games that use 64MBit MASKROMs.
       ROMs      - Not all sockets are populated. See MAME src for exact ROM usage.
+
+(For dumping reference)
+Jumpers    centre pin joins
+-------------------------------------------------------
+JP3: 2-3   pin2 of ic 1 to ic 16 and pin 39 of ic 17 to ic 20
+JP4: 2-3   pin2 of ic 1 to ic 16 and pin 39 of ic 17 to ic 20
+JP5: 2-3   pin2 of ic 1 to ic 16 and pin 39 of ic 17 to ic 20
+JP6: 2-3   pin2 of ic 1 to ic 16 and pin 39 of ic 17 to ic 20
+JP7: 2-3   pin2 of ic 22 to ic 25 and pin 39 ic ic21
+JP8: 2-3   pin32 of ic 22 to ic 25
+JP9: 2-3   pin32 of ic 22 to ic 25
+Jumper pos. 1 is +5V
+
+JP1: 1-2   gnd
+JP2: 2-3   +5v
+Jumper pos. 1 is GND
+Jumper pos. 3 is +5V
+
+           pin1 joins
+-------------------------------
+JP10: 1-2  pin32 of ic 26 to ic 41
+
+All CROM ROMs are 32M MASK
+ALL VROM ROMs are 16M MASK
 
 
 CPU Board
@@ -317,12 +339,69 @@ Notes:
              Other than the revision of the listed chips, the PCBs are identical.
 
 
+External MPEG Audio Board
+-------------------------
+This is the first version of the Model 3 Digital Audio Board used
+on Scud Race and is usually just mounted bare onto the outside of
+the main board metal box.
 
-Harley Davidson (Rev.A)
-Sega, 1997
+837-10084 DIGITAL AUDIO BD SEGA 1993
+171-6614B PC BD
+Sticker: 837-12941
+|-------------------------------------------------|
+|   CN3  CN4     CN1  R   RCA-1  CN2   RCA-2      |
+| MB84256  PC910 4040  7805 TL062 TL062  D6376    |
+|          D71051                           SM5840|
+| EPROM.IC2                             |------|  |
+| Z80            16MHz                  |NEC   |  |
+|                                       |D65654|  |
+|             |--------|                |------|  |
+|             |SEGA    |        KM68257           |
+|             |315-5762|        KM68257           |
+|             |        |        KM68257  MB84256  |
+|        20MHz|--------|                          |
+|                                                 |
+| MB3771                         JP1 JP2 MROM.IC57|
+|                               12.288MHz         |
+|                                        MROM.IC58|
+|                                                 |
+|                                        MROM.IC59|
+|                                                 |
+|DSW(4) G G G G                          MROM.IC60|
+|-------------------------------------------------|
+Notes:
+      Z80 - Clock 4.000MHz [16/4]
+EPROM.IC2 - 27C1001/27C010 EPROM (DIP32)
+              - Scud Race : EPR-19612.IC2
+    MROM* - 8M/16M Mask ROM (DIP42)
+              - Scud Race : MPR-19603/04/05/06
+  MB84256 - Fujitsu MB84256 32kx8 SRAM (DIP28)
+  KM68257 - Samsung KM68257 32kx8 SRAM (DIP28). On this PCB pin 1 (A14) is grounded with a jumper wire on all 3 chips making it 16k
+    PC910 - Sharp PC910 Optocoupler (DIP8)
+     4040 - 74HC4040 logic chip
+     7805 - 12V to 5V Voltage Regulator
+   MB3771 - Fujitsu MB3771 Master Reset IC (DIP8)
+    TL062 - Texas Instruments TL062 Low Power JFET-Input Operational Amplifier (DIP8)
+   D71051 - NEC uPD71051 Serial Control Unit USART, functionally equivalent to uPD8251 (SOP28)
+   D65654 - NEC uPD65654 CMOS Gate Array (QFP100)
+   SM5840 - Nippon Precision Circuits SM5840 Digital Audio Multi-Function Digital Filter (DIP18)
+    D6376 - NEC uPD6376GS Audio 2-Channel 16-bit D/A converter (DIP16)
+ 315-5762 - Sega custom chip, probably a NEC or Texas Instruments DSP or MCU, clock input 20MHz (PLCC68)
+        R - Red LED
+        G - Green LED
+      DSW - 4 position DIP switch, all OFF
+      JP1 - 1-2 (Select 16M ROM on bank 1 - IC57 & IC58). alt is select 8M
+      JP2 - 1-2 (Select 16M ROM on bank 2 - IC59 & IC60). alt is select 8M
+      CN1 - 10-pin power input connector
+      CN2 - 5-pin connector for Left+/Left-/Right+/Right- Stereo Audio Output
+      CN3 - 6-pin connector for MIDI TX+/TX-/RX+/RX- communication
+      CN4 - 4-pin connector (not used)
+     RCA* - Left/Right RCA Audio Output Jacks (not used)
 
-This game runs on Sega Model3 Step2 hardware.
 
+Sega Model 3 Step2 hardware
+---------------------------
+This covers most, if not all of the later MODEL 3 games on Step 2 & 2.1 hardware.
 
 ROM Board
 ---------
@@ -351,6 +430,8 @@ ROM Board
 | VROM17.40   VROM16.41    CROM31.15   CROM30.16                                                    |
 |                                                                                                   |
 |---------------------------------------------------------------------------------------------------|
+
+Notes:  (ROMs documented are for Harley Davidson)
 
 VROM00.27 mpr-20378 \
 VROM01.26 mpr-20377 |
@@ -491,7 +572,7 @@ CPU Board
 |                                                                             CN25                  |
 |                                                    RTC72423             (Connector for )          |
 | KM4132G271AQ-10                                                         (Protection PCB)          |
-|                                                                         (   not used   )          |
+|                                                                                                   |
 |              32MHz                                 BATT_3V                                        |
 |                          NEC D71051-10                                                            |
 |                                                                                                   |
@@ -573,76 +654,68 @@ Security Board
 315-6050 Lattice ispLSI 2032
 315-5881 TQFP100 stamped 317-0247-COM for Spikeout FE
 
+
+External MPEG Audio Board
+-------------------------
+This is the second version of the Model 3 Digital Audio Board used on
+Sega Rally 2, Daytona USA 2 and others and is mounted inside a metal box.
+
+837-12273 DIGITAL SOUND BD 2 SEGA 1995
+171-7165D PC BD
+Sticker: 837-12273-92
+Sticker: 837-13376
+|-------------------------------------------------|
+|   CN1  CN2 R      CN5         CN6 LMC6484  CN7  |
+|315-5932    D71051 PQ30RV21 7805  D63210  D63210 |
+|PC910                      R      12.288MHz      |
+|         JP8                                     |
+|68EC000                   315-6028A              |
+|            33MHz                                |
+|KM62256                   *                      |
+|KM62256     MCM6206                              |
+|            MCM6206  JP4/5/6/7                   |
+|                     JP1/2/3             315-5934|
+|3771                                   JP10      |
+|                                       JP9       |
+|     EPROM.IC2                                   |
+| RGRG  MROM.IC18  MROM.IC20 MROM.IC22 MROM.IC24  |
+|DSW(4)   MROM.IC19  MROM.IC21 MROM.IC23 MROM.IC25|
+|-------------------------------------------------|
+Notes:
+    68000 - Motorola 68EC000FN12 CPU, clock 11.000MHz [33/3] (PLCC68)
+EPROM.IC2 - 27C1024 EPROM (DIP40)
+              - Sega Rally 2 : EPR-20641.IC2
+              - Daytona 2    : EPR-20886.IC2
+    MROM* - Mask ROM (DIP42)
+              - Sega Rally 2 : MPR-20637/38/39/40
+              - Daytona 2    : MPR-20887/88/89/90
+  KM62256 - Samsung KM62256 32kx8 SRAM (SOP28)
+  MCM6206 - Motorola MCM6206 32kx8 SRAM (SOP28)
+    PC910 - Sharp PC910 Optocoupler (DIP8)
+     7805 - 12V to 5V Voltage Regulator
+ PQ30RV21 - Sharp PQ30RV21 3.3V Voltage Regulator
+   MB3771 - Fujitsu MB3771 Master Reset IC (SOIC8)
+ 315-5934 - GAL16V8 (PLCC20)
+ 315-5932 - GAL16V8 (PLCC20)
+  LMC6484 - Texas Instruments LMC6484IM CMOS Quad Rail-to-Rail Input and Output Operational Amplifier (SOIC14)
+   D71051 - NEC uPD71051 Serial Control Unit USART, functionally equivalent to uPD8251 (SOP28)
+   D63210 - NEC uPD63210 16-bit D/A Converter with built-in Digital Filter for Audio (SOP28)
+315-6028A - Sega custom chip, probably a NEC DSP, clock input 12.228MHz (QFP100)
+        * - Unpopulated position on bottom side of PCB for a NEC uPD77016 DSP. The Sega chip above may be similar to this
+        R - Red LED
+        G - Green LED
+      DSW - 4 position DIP switch, all OFF
+  JP1/2/3 - Jumpers to configure ROMs
+JP4/5/6/7 - Jumpers to configure ROMs
+      JP8 - Jumper tied to pin 26 (IPL1) of MC68EC000
+   JP9/10 - Jumpers to configure ROMs, tied to GAL16V8 315-5934
+      CN1 - 6-pin connector for MIDI TX+/TX-/RX+/RX- communication
+      CN2 - 4-pin connector (not used)
+      CN5 - 10-pin power input connector
+      CN6 - 5-pin connector for Left+/Left-/Right+/Right- Stereo Audio Output
+      CN7 - 5-pin connector (not used)
 ===================================================================================
 
-Scud Race
-Sega, 1996
-
-Tis game runs on Sega Model 3 Step 1.5 hardware
-
-
-Sound Board (bolted to outside of the metal box)
------------
-
-PCB Layout
-----------
-
-PCB Number: 837-10084 DIGITAL AUDIO BD (C) SEGA 1993
----------------------------------------------------------------
-84256     D71051GU-10                 D6376    SM5840
-epr-19612
-Z80             16MHz     SEGA                D65654GF102
-                          315-5762            (QFP100)
-                          (PLCC68)
-                     20MHz           KM68257
-                                     KM68257          84256
-                                     KM68257
-                                          12.288MHz   mpr-19603
-                                                      mpr-19604
-                                                      mpr-19605
-DSW1                                                  mpr-19606
-----------------------------------------------------------------
-
-
-Jumpers
-JP1: 1-2 (Select 16M ROM on bank 1 - ic57 & ic58)
-JP2: 1-2 (Select 16M ROM on bank 2 - ic59 & ic60)
-
-
-
-ROM Board
----------
-
-PCB Number: 837-11860 MODEL3 ROM BOARD (C) SEGA 1995
-
-(For dumping reference)
-
-Jumpers    centre pin joins
--------------------------------------------------------
-JP3: 2-3   pin2 of ic 1 to 16 and pin 39 of ic 17 to 20
-JP4: 2-3   pin2 of ic 1 to 16 and pin 39 of ic 17 to 20
-JP5: 2-3   pin2 of ic 1 to 16 and pin 39 of ic 17 to 20
-JP6: 2-3   pin2 of ic 1 to 16 and pin 39 of ic 17 to 20
-JP7: 2-3   pin2 of ic 22 to 25 and pin 39 ic ic21
-JP8: 2-3   pin32 of ic 22 to 25
-JP9: 2-3   pin32 of ic 22 to 25
-Jumper pos. 1 is +5V
-
-JP1: 1-2   gnd
-JP2: 2-3   +5v
-Jumper pos. 1 is GND
-Jumper pos. 3 is +5V
-
-           pin1 joins
--------------------------------
-JP10: 1-2  pin32 of ic 26 to 41
-
-All CROM ROMs are 32M MASK
-ALL VROM ROMs are 16M MASK
-
-*/
-
-/*
     magtruck locations of interest
 
     000006ee (word)  - incremented each vblank, used by mainline to busywait.
@@ -1546,7 +1619,7 @@ WRITE64_MEMBER(model3_state::model3_sys_w)
 			}
 			else
 			{
-				logerror("Unknown 0x18/8 write %" I64FMT "x mask %" I64FMT"x\n", data, mem_mask);
+				logerror("Unknown 0x18/8 write %x mask %x\n", data, mem_mask);
 			}
 			break;
 		case 0x08/8:

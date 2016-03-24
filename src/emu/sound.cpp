@@ -75,8 +75,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 		m_callback = stream_update_delegate(FUNC(device_sound_interface::sound_stream_update),(device_sound_interface *)sound);
 
 	// create a unique tag for saving
-	std::string state_tag;
-	strprintf(state_tag, "%d", m_device.machine().sound().m_stream_list.count());
+	std::string state_tag = string_format("%d", m_device.machine().sound().m_stream_list.count());
 	m_device.machine().save().save_item(&m_device, "stream", state_tag.c_str(), 0, NAME(m_sample_rate));
 	m_device.machine().save().register_postload(save_prepost_delegate(FUNC(sound_stream::postload), this));
 
@@ -163,17 +162,19 @@ float sound_stream::output_gain(int outputnum) const
 //  on a given stream's input
 //-------------------------------------------------
 
-const char *sound_stream::input_name(int inputnum, std::string &str) const
+std::string sound_stream::input_name(int inputnum) const
 {
+	std::ostringstream str;
+
 	// start with our device name and tag
 	assert(inputnum >= 0 && inputnum < m_input.size());
-	strprintf(str, "%s '%s': ", m_device.name().c_str(), m_device.tag().c_str());
+	util::stream_format(str, "%s '%s': ", m_device.name(), m_device.tag());
 
 	// if we have a source, indicate where the sound comes from by device name and tag
 	if (m_input[inputnum].m_source != nullptr && m_input[inputnum].m_source->m_stream != nullptr)
 	{
 		device_t &source = m_input[inputnum].m_source->m_stream->device();
-		strcatprintf(str, "%s '%s'", source.name().c_str(), source.tag().c_str());
+		util::stream_format(str, "%s '%s'", source.name(), source.tag());
 
 		// get the sound interface; if there is more than 1 output we need to figure out which one
 		device_sound_interface *sound;
@@ -186,12 +187,12 @@ const char *sound_stream::input_name(int inputnum, std::string &str) const
 			for (int outputnum = 0; (outstream = sound->output_to_stream_output(outputnum, streamoutputnum)) != nullptr; outputnum++)
 				if (outstream == m_input[inputnum].m_source->m_stream && m_input[inputnum].m_source == &outstream->m_output[streamoutputnum])
 				{
-					strcatprintf(str, " Ch.%d", outputnum);
+					util::stream_format(str, " Ch.%d", outputnum);
 					break;
 				}
 		}
 	}
-	return str.c_str();
+	return str.str();
 }
 
 
@@ -225,16 +226,16 @@ int sound_stream::input_source_outputnum(int inputnum) const
 
 void sound_stream::set_input(int index, sound_stream *input_stream, int output_index, float gain)
 {
-	VPRINTF(("stream_set_input(%p, '%s', %d, %p, %d, %f)\n", (void *)this, m_device.tag().c_str(),
+	VPRINTF(("stream_set_input(%p, '%s', %d, %p, %d, %f)\n", (void *)this, m_device.tag(),
 			index, (void *)input_stream, output_index, (double) gain));
 
 	// make sure it's a valid input
 	if (index >= m_input.size())
-		fatalerror("Fatal error: stream_set_input attempted to configure non-existant input %d (%d max)\n", index, int(m_input.size()));
+		fatalerror("stream_set_input attempted to configure non-existant input %d (%d max)\n", index, int(m_input.size()));
 
 	// make sure it's a valid output
 	if (input_stream != nullptr && output_index >= input_stream->m_output.size())
-		fatalerror("Fatal error: stream_set_input attempted to use a non-existant output %d (%d max)\n", output_index, int(m_output.size()));
+		fatalerror("stream_set_input attempted to use a non-existant output %d (%d max)\n", output_index, int(m_output.size()));
 
 	// if this input is already wired, update the dependent info
 	stream_input &input = m_input[index];

@@ -36,8 +36,8 @@ namespace netlist
 		ATTR_COLD const pstring &name() const { return m_name; }
 		ATTR_COLD const pstring &classname() const { return m_classname; }
 		ATTR_COLD const pstring &param_desc() const { return m_def_param; }
-		ATTR_COLD const pstring_list_t term_param_list();
-		ATTR_COLD const pstring_list_t def_params();
+		ATTR_COLD const pstring_vector_t term_param_list();
+		ATTR_COLD const pstring_vector_t def_params();
 
 	protected:
 		pstring m_name;                             /* device name */
@@ -45,7 +45,7 @@ namespace netlist
 		pstring m_def_param;                        /* default parameter */
 	};
 
-	template <class C>
+	template <class _device_class>
 	class factory_t : public base_factory_t
 	{
 		P_PREVENT_COPYING(factory_t)
@@ -56,7 +56,7 @@ namespace netlist
 
 		ATTR_COLD device_t *Create() override
 		{
-			device_t *r = palloc(C);
+			device_t *r = palloc(_device_class);
 			//r->init(setup, name);
 			return r;
 		}
@@ -68,11 +68,11 @@ namespace netlist
 		factory_list_t(setup_t &m_setup);
 		~factory_list_t();
 
-		template<class _C>
+		template<class _device_class>
 		ATTR_COLD void register_device(const pstring &name, const pstring &classname,
 				const pstring &def_param)
 		{
-			if (!add(name, palloc(factory_t< _C >(name, classname, def_param))))
+			if (!add(name, palloc(factory_t< _device_class >(name, classname, def_param))))
 				error("factory already contains " + name);
 		}
 

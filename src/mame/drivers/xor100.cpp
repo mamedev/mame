@@ -189,7 +189,7 @@ READ8_MEMBER( xor100_state::fdc_wait_r )
 		if (!m_fdc_irq && !m_fdc_drq)
 		{
 			fatalerror("Z80 WAIT not supported by MAME core\n");
-			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+			m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
 		}
 	}
 
@@ -442,7 +442,7 @@ void xor100_state::fdc_intrq_w(bool state)
 	if (state)
 	{
 		fatalerror("Z80 WAIT not supported by MAME core\n");
-		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
 	}
 }
 
@@ -453,7 +453,7 @@ void xor100_state::fdc_drq_w(bool state)
 	if (state)
 	{
 		fatalerror("Z80 WAIT not supported by MAME core\n");
-		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
 	}
 }
 
@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 
 	// S-100
 	MCFG_S100_BUS_ADD()
-	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT))
+	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
 	MCFG_S100_SLOT_ADD("s100_1", xor100_s100_cards, nullptr)
 	MCFG_S100_SLOT_ADD("s100_2", xor100_s100_cards, nullptr)
 	MCFG_S100_SLOT_ADD("s100_3", xor100_s100_cards, nullptr)

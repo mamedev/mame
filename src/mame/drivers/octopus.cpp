@@ -113,7 +113,7 @@ Its BIOS performs POST and halts as there's no keyboard.
 class octopus_state : public driver_device
 {
 public:
-	octopus_state(const machine_config &mconfig, device_type type, std::string tag)
+	octopus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
@@ -179,7 +179,7 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_SCREEN_UPDATE_DRIVER(octopus_state, screen_update_octopus)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 /* ROM definition */

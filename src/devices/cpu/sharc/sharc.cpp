@@ -55,7 +55,7 @@ static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 64, adsp21062_device )
 ADDRESS_MAP_END
 
 
-adsp21062_device::adsp21062_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, ADSP21062, "ADSP21062", tag, owner, clock, "adsp21062", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 64, 24, -3, ADDRESS_MAP_NAME(internal_pgm))
 	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, -2)

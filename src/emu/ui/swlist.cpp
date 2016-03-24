@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-    ui/swlist.c
+    ui/swlist.cpp
 
     Internal MAME user interface for software list.
 
@@ -62,18 +62,18 @@ void ui_menu_software_parts::populate()
 		software_part_menu_entry *entry1 = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry1));
 		entry1->type = T_EMPTY;
 		entry1->part = nullptr;
-		item_append("[empty slot]", nullptr, 0, entry1);
+		item_append(_("[empty slot]"), nullptr, 0, entry1);
 
 		software_part_menu_entry *entry2 = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry2));
 		entry2->type = T_FMGR;
 		entry2->part = nullptr;
-		item_append("[file manager]", nullptr, 0, entry2);
+		item_append(_("[file manager]"), nullptr, 0, entry2);
 
 
 		software_part_menu_entry *entry3 = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry3));
 		entry3->type = T_SWLIST;
 		entry3->part = nullptr;
-		item_append("[software list]", nullptr, 0, entry3);
+		item_append(_("[software list]"), nullptr, 0, entry3);
 	}
 
 	for (const software_part *swpart = m_info->first_part(); swpart != nullptr; swpart = swpart->next())
@@ -232,7 +232,7 @@ void ui_menu_software_list::populate()
 		append_software_entry(swinfo);
 
 	// add an entry to change ordering
-	item_append("Switch Item Ordering", nullptr, 0, (void *)1);
+	item_append(_("Switch Item Ordering"), nullptr, 0, (void *)1);
 
 	// append all of the menu entries
 	for (entry_info *entry = m_entrylist; entry != nullptr; entry = entry->next)
@@ -265,7 +265,7 @@ void ui_menu_software_list::handle()
 
 			// reload the menu with the new order
 			reset(UI_MENU_RESET_REMEMBER_REF);
-			machine().popmessage("Switched Order: entries now ordered by %s", m_ordered_by_shortname ? "shortname" : "description");
+			machine().popmessage(_("Switched Order: entries now ordered by %s"), m_ordered_by_shortname ? _("shortname") : _("description"));
 		}
 		// handle selections
 		else if (event->iptkey == IPT_UI_SELECT)
@@ -355,7 +355,10 @@ void ui_menu_software_list::handle()
 				}
 
 				if (selected_entry != nullptr && selected_entry != cur_selected)
-					set_selection((void *) selected_entry);
+				{
+					set_selection((void *)selected_entry);
+					top_line = selected - (visible_lines / 2);
+				}
 			}
 		}
 		else if (event->iptkey == IPT_UI_CANCEL)
@@ -430,7 +433,7 @@ void ui_menu_software::populate()
 				if (found)
 				{
 					if (!have_compatible)
-						item_append("[compatible lists]", nullptr, MENU_FLAG_DISABLE, nullptr);
+						item_append(_("[compatible lists]"), nullptr, MENU_FLAG_DISABLE, nullptr);
 					item_append(swlistdev->description(), nullptr, 0, (void *)swlistdev);
 				}
 				have_compatible = true;
@@ -448,7 +451,7 @@ void ui_menu_software::handle()
 	const ui_menu_event *event = process(0);
 
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT) {
-		//      ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_software_list>(machine(), container, (software_list_config *)event->itemref, image)));
+		//      ui_menu::stack_push(global_alloc_clear<ui_menu_software_list>(machine(), container, (software_list_config *)event->itemref, image));
 		*m_result = (software_list_device *)event->itemref;
 		ui_menu::stack_pop(machine());
 	}

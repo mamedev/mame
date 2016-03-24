@@ -90,14 +90,14 @@ const UINT8 i8086_cpu_device::m_i8086_timing[] =
 const device_type I8086 = &device_creator<i8086_cpu_device>;
 const device_type I8088 = &device_creator<i8088_cpu_device>;
 
-i8088_cpu_device::i8088_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8088_cpu_device::i8088_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i8086_cpu_device(mconfig, I8088, "I8088", tag, owner, clock, "i8088", __FILE__, 8)
 {
 	memcpy(m_timing, m_i8086_timing, sizeof(m_i8086_timing));
 	m_fetch_xor = 0;
 }
 
-i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: i8086_common_cpu_device(mconfig, I8086, "I8086", tag, owner, clock, "i8086", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
@@ -106,7 +106,7 @@ i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, std::string ta
 	m_fetch_xor = BYTE_XOR_LE(0);
 }
 
-i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int data_bus_size)
+i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int data_bus_size)
 	: i8086_common_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, data_bus_size, 16, 0)
@@ -144,7 +144,7 @@ void i8086_cpu_device::execute_run()
 			m_seg_prefix = false;
 
 				/* Dispatch IRQ */
-			if ( m_pending_irq && m_no_interrupt == 0 )
+			if ( m_pending_irq && (m_no_interrupt == 0) )
 			{
 				if ( m_pending_irq & NMI_IRQ )
 				{
@@ -159,25 +159,29 @@ void i8086_cpu_device::execute_run()
 				}
 			}
 
-			/* No interrupt allowed between last instruction and this one */
-			if ( m_no_interrupt )
+			/* Trap should allow one instruction to be executed.
+			   CPUID.ASM (by Bob Smith, 1985) suggests that in situations where m_no_interrupt is 1,
+			   (directly after POP SS / MOV_SREG), single step IRQs don't fire.
+			*/
+			if (m_fire_trap )
 			{
-				m_no_interrupt--;
-			}
-
-			/* trap should allow one instruction to be executed */
-			if ( m_fire_trap )
-			{
-				if ( m_fire_trap >= 2 )
+				if ( (m_fire_trap >= 2) && (m_no_interrupt == 0) )
 				{
+					m_fire_trap = 0; // reset trap flag upon entry
 					interrupt(1);
-					m_fire_trap = 0;
 				}
 				else
 				{
 					m_fire_trap++;
 				}
 			}
+
+			/* No interrupt allowed between last instruction and this one */
+			if ( m_no_interrupt )
+			{
+				m_no_interrupt--;
+			}
+
 		}
 
 		if (!m_seg_prefix)
@@ -252,7 +256,7 @@ void i8086_cpu_device::execute_run()
 				if(!common_op(op))
 				{
 					m_icount -= 10;
-					logerror("%s: %06x: Invalid Opcode %02x\n", tag().c_str(), pc(), op);
+					logerror("%s: %06x: Invalid Opcode %02x\n", tag(), pc(), op);
 					break;
 				}
 				break;
@@ -272,7 +276,7 @@ void i8086_cpu_device::device_start()
 	state_add(STATE_GENPC, "curpc", m_pc).callimport().callexport().formatstr("%05X");
 }
 
-i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_ip(0)
 	, m_TF(0)
@@ -319,13 +323,13 @@ void i8086_common_cpu_device::state_string_export(const device_state_entry &entr
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-			strprintf(str, "%08X", (m_sregs[CS] << 4) + m_ip);
+			str = string_format("%08X", (m_sregs[CS] << 4) + m_ip);
 			break;
 
 		case STATE_GENFLAGS:
 			{
 				UINT16 flags = CompressFlags();
-				strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+				str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 					flags & 0x8000 ? '1':'.',
 					flags & 0x4000 ? '1':'.',
 					flags & 0x2000 ? '1':'.',
@@ -1404,6 +1408,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 			m_src = GetRMWord();
 			m_sregs[(m_modrm & 0x18) >> 3] = m_src; // confirmed on hw: modrm bit 5 ignored
 			CLKM(MOV_SR,MOV_SM);
+			m_no_interrupt = 1; // Disable IRQ after load segment register.
 			break;
 
 		case 0x8f: // i_popw
@@ -1852,7 +1857,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 			m_modrm = fetch();
 			GetRMByte();
 			CLK(NOP);
-			logerror("%s: %06x: Unimplemented floating point escape %02x%02x\n", tag().c_str(), pc(), op, m_modrm);
+			logerror("%s: %06x: Unimplemented floating point escape %02x%02x\n", tag(), pc(), op, m_modrm);
 			break;
 
 
@@ -2019,7 +2024,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 
 		case 0xf0: // i_lock
 		case 0xf1: // 0xf1 is 0xf0; verified on real CPU
-			logerror("%s: %06x: Warning - BUSLOCK\n", tag().c_str(), pc());
+			logerror("%s: %06x: Warning - BUSLOCK\n", tag(), pc());
 			m_lock = true;
 			m_no_interrupt = 1;
 			CLK(NOP);
@@ -2044,7 +2049,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 				case 0xae:  CLK(OVERRIDE); if (c) do { i_scasb(); c--; } while (c>0 && !ZF && m_icount>0);   m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 				case 0xaf:  CLK(OVERRIDE); if (c) do { i_scasw(); c--; } while (c>0 && !ZF && m_icount>0);   m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 				default:
-					logerror("%s: %06x: REPNE invalid\n", tag().c_str(), pc());
+					logerror("%s: %06x: REPNE invalid\n", tag(), pc());
 					// Decrement IP so the normal instruction will be executed next
 					m_ip--;
 					invalid = true;
@@ -2077,7 +2082,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 				case 0xae:  CLK(OVERRIDE); if (c) do { i_scasb(); c--; } while (c>0 && ZF && m_icount>0);    m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 				case 0xaf:  CLK(OVERRIDE); if (c) do { i_scasw(); c--; } while (c>0 && ZF && m_icount>0);    m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 				default:
-					logerror("%s: %06x: REPE invalid\n", tag().c_str(), pc());
+					logerror("%s: %06x: REPE invalid\n", tag(), pc());
 					// Decrement IP so the normal instruction will be executed next
 					m_ip--;
 					invalid = true;
@@ -2092,7 +2097,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 			break;
 
 		case 0xf4: // i_hlt
-			//logerror("%s: %06x: HALT\n", tag().c_str(), pc());
+			//logerror("%s: %06x: HALT\n", tag(), pc());
 			m_icount = 0;
 			m_halt = true;
 			break;
@@ -2337,7 +2342,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 					CLKM(INCDEC_R8,INCDEC_M8);
 					break;
 				default:
-					logerror("%s: %06x: FE Pre with unimplemented mod\n", tag().c_str(), pc());
+					logerror("%s: %06x: FE Pre with unimplemented mod\n", tag(), pc());
 					break;
 				}
 			}
@@ -2393,7 +2398,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 					CLKM(PUSH_R16,PUSH_M16);
 					break;
 				default:
-					logerror("%s: %06x: FF Pre with unimplemented mod\n", tag().c_str(), pc());
+					logerror("%s: %06x: FF Pre with unimplemented mod\n", tag(), pc());
 					break;
 				}
 			}

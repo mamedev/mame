@@ -26,7 +26,7 @@ const device_type C64_SUPER_GAMES = &device_creator<c64_super_games_cartridge_de
 //  c64_super_games_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_super_games_cartridge_device::c64_super_games_cartridge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+c64_super_games_cartridge_device::c64_super_games_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_SUPER_GAMES, "C64 Super Games cartridge", tag, owner, clock, "c64_super_games", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_bank(0)

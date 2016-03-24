@@ -19,7 +19,7 @@
 class k8915_state : public driver_device
 {
 public:
-	k8915_state(const machine_config &mconfig, device_type type, std::string tag)
+	k8915_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_p_videoram(*this, "p_videoram")
@@ -156,7 +156,7 @@ static MACHINE_CONFIG_START( k8915, k8915_state )
 	MCFG_CPU_IO_MAP(k8915_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(k8915_state, screen_update)
@@ -164,7 +164,7 @@ static MACHINE_CONFIG_START( k8915, k8915_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(k8915_state, kbd_put))

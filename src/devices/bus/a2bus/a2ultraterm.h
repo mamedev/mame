@@ -25,7 +25,7 @@ class a2bus_videx160_device:
 {
 public:
 	// construction/destruction
-	a2bus_videx160_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	a2bus_videx160_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -59,7 +59,7 @@ private:
 class a2bus_ultraterm_device : public a2bus_videx160_device
 {
 public:
-	a2bus_ultraterm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a2bus_ultraterm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual const rom_entry *device_rom_region() const override;
 };
@@ -67,7 +67,7 @@ public:
 class a2bus_ultratermenh_device : public a2bus_videx160_device
 {
 public:
-	a2bus_ultratermenh_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	a2bus_ultratermenh_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual const rom_entry *device_rom_region() const override;
 };

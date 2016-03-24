@@ -17,7 +17,7 @@
 const device_type ARC = &device_creator<arc_device>;
 
 
-arc_device::arc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+arc_device::arc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, ARC, "ARCtangent A4", tag, owner, clock, "arc", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 24, 0), m_pc(0), m_program(nullptr), m_icount(0), m_debugger_temp(0)
 // some docs describe these as 'middle endian'?!

@@ -13,7 +13,7 @@ with: PAC2 BACKUP DATA. We only store the raw sram contents.
 const device_type MSX_CART_FMPAC = &device_creator<msx_cart_fmpac>;
 
 
-msx_cart_fmpac::msx_cart_fmpac(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+msx_cart_fmpac::msx_cart_fmpac(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_FMPAC, "MSX Cartridge - FM-PAC", tag, owner, clock, "msx_cart_fmpac", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_ym2413(*this, "ym2413")

@@ -35,7 +35,7 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
     quality resampling of a texture
 -------------------------------------------------*/
 
-void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, const render_color &color)
+void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, const render_color &color, bool force)
 {
 	if (dest.width() == 0 || dest.height() == 0)
 		return;
@@ -52,7 +52,7 @@ void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, 
 	UINT32 dy = (sheight << 12) / dheight;
 
 	/* if the source is higher res than the target, use full averaging */
-	if (dx > 0x1000 || dy > 0x1000)
+	if (dx > 0x1000 || dy > 0x1000 || force)
 		resample_argb_bitmap_average(&dest.pix(0), dest.rowpixels(), dwidth, dheight, sbase, source.rowpixels(), swidth, sheight, color, dx, dy);
 	else
 		resample_argb_bitmap_bilinear(&dest.pix(0), dest.rowpixels(), dwidth, dheight, sbase, source.rowpixels(), swidth, sheight, color, dx, dy);
@@ -540,8 +540,8 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 		fname.assign(filename);
 	else
 		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
-	file_error filerr = file.open(fname.c_str());
-	if (filerr != FILERR_NONE)
+	osd_file::error filerr = file.open(fname.c_str());
+	if (filerr != osd_file::error::NONE)
 		return false;
 
 	// read the PNG data

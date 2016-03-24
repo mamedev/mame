@@ -999,7 +999,7 @@ void scudsp_cpu_device::execute_set_input(int irqline, int state)
 	}
 }
 
-scudsp_cpu_device::scudsp_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+scudsp_cpu_device::scudsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SCUDSP, "SCUDSP", tag, owner, clock, "scudsp", __FILE__)
 	, m_out_irq_cb(*this)
 	, m_in_dma_cb(*this)
@@ -1015,7 +1015,7 @@ void scudsp_cpu_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%s%s%s%c%c%c%c%c%s%s%s",
+			str = string_format("%s%s%s%c%c%c%c%c%s%s%s",
 				m_flags & 0x4000000 ? "PR":"..",
 				m_flags & 0x2000000 ? "EP":"..",
 				m_flags & 0x800000 ? "T0":"..",

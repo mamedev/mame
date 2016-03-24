@@ -74,7 +74,7 @@ Dumped by Uki
 class galpani3_state : public driver_device
 {
 public:
-	galpani3_state(const machine_config &mconfig, device_type type, std::string tag)
+	galpani3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_grap2_0(*this,"grap2_0"),

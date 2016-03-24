@@ -36,7 +36,7 @@
 class aim65_state : public driver_device
 {
 public:
-	aim65_state(const machine_config &mconfig, device_type type, std::string tag)
+	aim65_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cassette1(*this, "cassette"),

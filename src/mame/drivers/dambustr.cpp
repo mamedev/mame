@@ -60,7 +60,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 class dambustr_state : public galaxold_state
 {
 public:
-	dambustr_state(const machine_config &mconfig, device_type type, std::string tag)
+	dambustr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: galaxold_state(mconfig, type, tag),
 		m_custom(*this, "cust") { }
 

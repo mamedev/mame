@@ -33,7 +33,7 @@ class pci_connector: public device_t,
 						public device_slot_interface
 {
 public:
-	pci_connector(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pci_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~pci_connector();
 
 	pci_device_interface *get_device();
@@ -50,7 +50,7 @@ class pci_bus_device :  public device_t
 {
 public:
 	// construction/destruction
-	pci_bus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
@@ -60,7 +60,7 @@ public:
 
 	void set_busnum(int busnum) { m_busnum = busnum; }
 	void set_father(const char *father) { m_father = father; }
-	void set_device(int num, std::string tag) {
+	void set_device(int num, const char *tag) {
 		m_devtag[num] = tag; }
 
 	pci_bus_device *pci_search_bustree(int busnum, int devicenum, pci_bus_device *pcibus);
@@ -75,7 +75,7 @@ protected:
 private:
 	UINT8               m_busnum;
 
-	std::string           m_devtag[32];
+	const char *        m_devtag[32];
 	pci_device_interface *m_device[32];
 
 	const char *        m_father;

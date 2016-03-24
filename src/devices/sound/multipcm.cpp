@@ -453,7 +453,7 @@ static ADDRESS_MAP_START( multipcm, AS_0, 8, multipcm_device )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 ADDRESS_MAP_END
 
-multipcm_device::multipcm_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MULTIPCM, "Sega/Yamaha 315-5560", tag, owner, clock, "multipcm", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),

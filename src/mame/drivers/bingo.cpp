@@ -9,7 +9,7 @@
 class bingo_state : public driver_device
 {
 public:
-	bingo_state(const machine_config &mconfig, device_type type, std::string tag)
+	bingo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }
@@ -52,7 +52,7 @@ MACHINE_CONFIG_END
 class seeben_state : public driver_device
 {
 public:
-	seeben_state(const machine_config &mconfig, device_type type, std::string tag)
+	seeben_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }
@@ -92,7 +92,7 @@ MACHINE_CONFIG_END
 class splin_state : public driver_device
 {
 public:
-	splin_state(const machine_config &mconfig, device_type type, std::string tag)
+	splin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }

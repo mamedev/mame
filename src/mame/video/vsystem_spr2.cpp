@@ -29,7 +29,7 @@
 
 const device_type VSYSTEM_SPR2 = &device_creator<vsystem_spr2_device>;
 
-vsystem_spr2_device::vsystem_spr2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+vsystem_spr2_device::vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VSYSTEM_SPR2, "Video System Sprites Type 2", tag, owner, clock, "vsystem_spr2", __FILE__),
 		m_gfxdecode(*this),
 		m_palette(*this)
@@ -46,7 +46,7 @@ vsystem_spr2_device::vsystem_spr2_device(const machine_config &mconfig, std::str
 //  gfx decoder
 //-------------------------------------------------
 
-void vsystem_spr2_device::static_set_gfxdecode_tag(device_t &device, std::string tag)
+void vsystem_spr2_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<vsystem_spr2_device &>(device).m_gfxdecode.set_tag(tag);
 }
@@ -56,7 +56,7 @@ void vsystem_spr2_device::static_set_gfxdecode_tag(device_t &device, std::string
 //  palette device
 //-------------------------------------------------
 
-void vsystem_spr2_device::static_set_palette_tag(device_t &device, std::string tag)
+void vsystem_spr2_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<vsystem_spr2_device &>(device).m_palette.set_tag(tag);
 }

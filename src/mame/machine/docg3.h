@@ -22,7 +22,7 @@ class diskonchip_g3_device : public device_t,
 {
 public:
 	// construction/destruction
-	diskonchip_g3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	diskonchip_g3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void set_size(int _size) { m_size = _size; }
 protected:

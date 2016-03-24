@@ -27,8 +27,8 @@ class k1ge_device : public device_t,
 					public device_video_interface
 {
 public:
-	k1ge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	k1ge_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k1ge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -70,7 +70,7 @@ protected:
 class k2ge_device : public k1ge_device
 {
 public:
-	k2ge_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_PALETTE_INIT(k2ge);
 protected:

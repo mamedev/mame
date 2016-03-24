@@ -16,7 +16,7 @@ const device_type TIA = &device_creator<tia_device>;
 //  tia_device - constructor
 //-------------------------------------------------
 
-tia_device::tia_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+tia_device::tia_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TIA, "TIA", tag, owner, clock, "tia_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),

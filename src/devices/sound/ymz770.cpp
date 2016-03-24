@@ -30,7 +30,7 @@ const device_type YMZ770 = &device_creator<ymz770_device>;
 //  ymz770_device - constructor
 //-------------------------------------------------
 
-ymz770_device::ymz770_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+ymz770_device::ymz770_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YMZ770, "Yamaha YMZ770", tag, owner, clock, "ymz770", __FILE__),
 		device_sound_interface(mconfig, *this), m_stream(nullptr),
 		m_cur_reg(0),

@@ -448,6 +448,8 @@ namespace bgfx
 
 	struct DxbcSubOperand
 	{
+		DxbcSubOperand() { /* not pod */ }
+
 		DxbcOperandType::Enum type;
 		uint8_t mode;
 		uint8_t modeBits;
@@ -459,6 +461,8 @@ namespace bgfx
 
 	struct DxbcOperand
 	{
+		DxbcOperand() { /* not pod */ }
+
 		DxbcOperandType::Enum type;
 		DxbcOperandMode::Enum mode;
 		uint8_t modeBits;
@@ -480,6 +484,8 @@ namespace bgfx
 
 	struct DxbcInstruction
 	{
+		DxbcInstruction() { /* not pod */ }
+
 		struct ExtendedType
 		{
 			enum Enum
@@ -540,12 +546,14 @@ namespace bgfx
 		DxbcOperand operand[6];
 	};
 
-	int32_t read(bx::ReaderI* _reader, DxbcInstruction& _instruction);
-	int32_t write(bx::WriterI* _writer, const DxbcInstruction& _instruction);
+	int32_t read(bx::ReaderI* _reader, DxbcInstruction& _instruction, bx::Error* _err);
+	int32_t write(bx::WriterI* _writer, const DxbcInstruction& _instruction, bx::Error* _err);
 	int32_t toString(char* _out, int32_t _size, const DxbcInstruction& _instruction);
 
 	struct DxbcSignature
 	{
+		DxbcSignature() { /* not pod */ }
+
 		struct Element
 		{
 			stl::string name;
@@ -562,24 +570,25 @@ namespace bgfx
 		stl::vector<Element> elements;
 	};
 
-	int32_t read(bx::ReaderSeekerI* _reader, DxbcSignature& _signature);
-	int32_t write(bx::WriterI* _writer, const DxbcSignature& _signature);
+	int32_t read(bx::ReaderSeekerI* _reader, DxbcSignature& _signature, bx::Error* _err);
+	int32_t write(bx::WriterI* _writer, const DxbcSignature& _signature, bx::Error* _err);
 
 	struct DxbcShader
 	{
 		uint32_t version;
 		stl::vector<uint8_t> byteCode;
 		bool shex;
+		bool aon9;
 	};
 
-	int32_t read(bx::ReaderSeekerI* _reader, DxbcShader& _shader);
-	int32_t write(bx::WriterI* _writer, const DxbcShader& _shader);
+	int32_t read(bx::ReaderSeekerI* _reader, DxbcShader& _shader, bx::Error* _err);
+	int32_t write(bx::WriterI* _writer, const DxbcShader& _shader, bx::Error* _err);
 
 	typedef bool (*DxbcParseFn)(uint32_t _offset, const DxbcInstruction& _instruction, void* _userData);
-	void parse(const DxbcShader& _src, DxbcParseFn _fn, void* _userData);
+	void parse(const DxbcShader& _src, DxbcParseFn _fn, void* _userData, bx::Error* _err = NULL);
 
 	typedef void (*DxbcFilterFn)(DxbcInstruction& _instruction, void* _userData);
-	void filter(DxbcShader& _dst, const DxbcShader& _src, DxbcFilterFn _fn, void* _userData);
+	void filter(DxbcShader& _dst, const DxbcShader& _src, DxbcFilterFn _fn, void* _userData, bx::Error* _err = NULL);
 
 	struct DxbcContext
 	{
@@ -598,8 +607,8 @@ namespace bgfx
 		DxbcShader shader;
 	};
 
-	int32_t read(bx::ReaderSeekerI* _reader, DxbcContext& _dxbc);
-	int32_t write(bx::WriterSeekerI* _writer, const DxbcContext& _dxbc);
+	int32_t read(bx::ReaderSeekerI* _reader, DxbcContext& _dxbc, bx::Error* _err);
+	int32_t write(bx::WriterSeekerI* _writer, const DxbcContext& _dxbc, bx::Error* _err);
 
 	/// Calculate DXBC hash from data.
 	void dxbcHash(const void* _data, uint32_t _size, void* _digest);

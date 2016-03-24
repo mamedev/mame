@@ -48,42 +48,42 @@ const device_type NES_SUNSOFT_FME7 = &device_creator<nes_sunsoft_fme7_device>;
 const device_type NES_SUNSOFT_5 = &device_creator<nes_sunsoft_5_device>;
 
 
-nes_sunsoft_1_device::nes_sunsoft_1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_sunsoft_1_device::nes_sunsoft_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SUNSOFT_1, "NES Cart Sunsoft 1 PCB", tag, owner, clock, "nes_sun1", __FILE__)
 {
 }
 
-nes_sunsoft_2_device::nes_sunsoft_2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_sunsoft_2_device::nes_sunsoft_2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SUNSOFT_2, "NES Cart Sunsoft 2 PCB", tag, owner, clock, "nes_sun2", __FILE__)
 {
 }
 
-nes_sunsoft_3_device::nes_sunsoft_3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_sunsoft_3_device::nes_sunsoft_3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SUNSOFT_3, "NES Cart Sunsoft 3 PCB", tag, owner, clock, "nes_sun3", __FILE__), m_irq_count(0), m_irq_enable(0), m_irq_toggle(0), irq_timer(nullptr)
 				{
 }
 
-nes_sunsoft_4_device::nes_sunsoft_4_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_sunsoft_4_device::nes_sunsoft_4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_reg(0), m_latch1(0), m_latch2(0), m_wram_enable(0)
 				{
 }
 
-nes_sunsoft_4_device::nes_sunsoft_4_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_sunsoft_4_device::nes_sunsoft_4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SUNSOFT_4, "NES Cart Sunsoft 4 PCB", tag, owner, clock, "nes_sun4", __FILE__), m_reg(0), m_latch1(0), m_latch2(0), m_wram_enable(0)
 				{
 }
 
-nes_sunsoft_fme7_device::nes_sunsoft_fme7_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+nes_sunsoft_fme7_device::nes_sunsoft_fme7_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0), m_wram_bank(0)
 				{
 }
 
-nes_sunsoft_fme7_device::nes_sunsoft_fme7_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_sunsoft_fme7_device::nes_sunsoft_fme7_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SUNSOFT_4, "NES Cart Sunsoft FME7 PCB", tag, owner, clock, "nes_fme7", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0), m_wram_bank(0)
 				{
 }
 
-nes_sunsoft_5_device::nes_sunsoft_5_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+nes_sunsoft_5_device::nes_sunsoft_5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_sunsoft_fme7_device(mconfig, NES_SUNSOFT_5, "NES Cart Sunsoft 5A/5B PCB", tag, owner, clock, "nes_sun5", __FILE__),
 						m_ym2149(*this, "ay")
 {

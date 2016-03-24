@@ -44,8 +44,8 @@ class c1571_t :  public device_t,
 {
 public:
 	// construction/destruction
-	c1571_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
-	c1571_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	c1571_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	c1571_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
@@ -131,7 +131,7 @@ class c1570_t :  public c1571_t
 {
 public:
 	// construction/destruction
-	c1570_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	c1570_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
@@ -145,7 +145,7 @@ class c1571cr_t :  public c1571_t
 {
 public:
 	// construction/destruction
-	c1571cr_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	c1571cr_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
@@ -162,7 +162,7 @@ class mini_chief_t :  public c1571_t
 {
 public:
 	// construction/destruction
-	mini_chief_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	mini_chief_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;

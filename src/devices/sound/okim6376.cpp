@@ -112,7 +112,7 @@ static void reset_adpcm(struct ADPCMVoice *voice)
 
 const device_type OKIM6376 = &device_creator<okim6376_device>;
 
-okim6376_device::okim6376_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, OKIM6376, "OKI6376", tag, owner, clock, "okim6376", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_region_base(*this, DEVICE_SELF),
@@ -439,14 +439,14 @@ READ_LINE_MEMBER( okim6376_device::busy_r )
 
 READ_LINE_MEMBER( okim6376_device::nar_r )
 {
-	MSM6376LOG(("OKIM6376:'%s' NAR %x\n", tag().c_str(),m_nar));
+	MSM6376LOG(("OKIM6376:'%s' NAR %x\n",tag(),m_nar));
 	return m_nar;
 }
 
 WRITE_LINE_MEMBER( okim6376_device::ch2_w )
 {
 	m_ch2_update = 0;//Clear flag
-	MSM6376LOG(("OKIM6376:'%s' CH2 %x\n", tag().c_str(),state));
+	MSM6376LOG(("OKIM6376:'%s' CH2 %x\n",tag(),state));
 
 	if (m_ch2 != state)
 	{
@@ -459,7 +459,7 @@ WRITE_LINE_MEMBER( okim6376_device::ch2_w )
 		struct ADPCMVoice *voice0 = &m_voice[0];
 		struct ADPCMVoice *voice1 = &m_voice[1];
 		// We set to channel 2
-		MSM6376LOG(("OKIM6376:'%s' Channel 1\n", tag().c_str()));
+		MSM6376LOG(("OKIM6376:'%s' Channel 1\n",tag()));
 		m_channel = 1;
 
 		if ((voice0->playing)&&(m_st))
@@ -474,7 +474,7 @@ WRITE_LINE_MEMBER( okim6376_device::ch2_w )
 	{
 		m_stage[1]=0;
 		oki_process(1, m_command[1]);
-		MSM6376LOG(("OKIM6376:'%s' Channel 0\n", tag().c_str()));
+		MSM6376LOG(("OKIM6376:'%s' Channel 0\n",tag()));
 		m_channel = 0;
 	}
 }
@@ -485,7 +485,7 @@ WRITE_LINE_MEMBER( okim6376_device::st_w )
 	//As in STart, presumably, this triggers everything
 
 	m_st_update = 0;//Clear flag
-	MSM6376LOG(("OKIM6376:'%s' ST %x\n", tag().c_str(),state));
+	MSM6376LOG(("OKIM6376:'%s' ST %x\n",tag(),state));
 
 	if (m_st != state)
 	{
@@ -497,7 +497,7 @@ WRITE_LINE_MEMBER( okim6376_device::st_w )
 			struct ADPCMVoice *voice = &m_voice[m_channel];
 			{
 				m_st_pulses ++;
-				MSM6376LOG(("OKIM6376:'%s' ST pulses %x\n", tag().c_str(),m_st_pulses));
+				MSM6376LOG(("OKIM6376:'%s' ST pulses %x\n",tag(),m_st_pulses));
 				if (m_st_pulses > 3)
 				{
 					m_st_pulses = 3; //undocumented behaviour beyond 3 pulses

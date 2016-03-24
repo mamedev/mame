@@ -24,7 +24,7 @@
 
 #define NOVRAM_SIZE 256
 
-snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : ti_expansion_card_device(mconfig, TI99_EVPC, "SNUG Enhanced Video Processor Card", tag, owner, clock, "ti99_evpc", __FILE__),
 	device_nvram_interface(mconfig, *this),
 	m_dsrrom(nullptr),

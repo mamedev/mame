@@ -12,7 +12,7 @@
 class naomi_m4_board : public naomi_board
 {
 public:
-	naomi_m4_board(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void static_set_tags(device_t &device, const char *_key_tag);
 

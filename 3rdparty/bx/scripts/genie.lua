@@ -58,17 +58,18 @@ project "bx.test"
 		path.join(BX_DIR, "tests/**.H"),
 	}
 
-	configuration { "vs*" }
+	configuration { "vs* or mingw*" }
+		links {
+			"psapi",
+		}
 
 	configuration { "android*" }
-		kind "ConsoleApp"
 		targetextension ".so"
 		linkoptions {
 			"-shared",
 		}
 
 	configuration { "nacl or nacl-arm" }
-		kind "ConsoleApp"
 		targetextension ".nexe"
 		links {
 			"ppapi",
@@ -76,7 +77,6 @@ project "bx.test"
 		}
 
 	configuration { "pnacl" }
-		kind "ConsoleApp"
 		targetextension ".pexe"
 		links {
 			"ppapi",

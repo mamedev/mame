@@ -100,7 +100,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 class looping_state : public driver_device
 {
 public:
-	looping_state(const machine_config &mconfig, device_type type, std::string tag)
+	looping_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -626,7 +626,7 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	MCFG_TMS99xx_ADD("audiocpu", TMS9980A,  SOUND_CLOCK/4, looping_sound_map, looping_sound_io_map)
 
 	MCFG_CPU_ADD("mcu", COP420, COP_CLOCK)
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED )
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
 	MCFG_COP400_WRITE_L_CB(WRITE8(looping_state, cop_l_w))
 	MCFG_COP400_READ_L_CB(READ8(looping_state, cop_unk_r))
 	MCFG_COP400_READ_G_CB(READ8(looping_state, cop_unk_r))

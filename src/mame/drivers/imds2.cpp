@@ -164,7 +164,7 @@ static ADDRESS_MAP_START(kb_io_map , AS_IO , 8 , imds2_state)
 	AM_RANGE(MCS48_PORT_T1 , MCS48_PORT_T1) AM_READ(imds2_kb_port_t1_r)
 ADDRESS_MAP_END
 
-imds2_state::imds2_state(const machine_config &mconfig, device_type type, std::string tag)
+imds2_state::imds2_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig , type , tag),
 	m_ipccpu(*this , "ipccpu"),
 	m_ipcsyspic(*this , "ipcsyspic"),
@@ -597,7 +597,6 @@ void imds2_state::video_start()
 
 void imds2_state::machine_reset()
 {
-	m_iocbeep->set_frequency(IOC_BEEP_FREQ);
 	m_ipc_control = 0x00;
 	m_ipc_ioc_status = 0x0f;
 
@@ -841,10 +840,10 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_SCREEN_UPDATE_DEVICE("ioccrtc" , i8275_device , screen_update)
 		MCFG_SCREEN_REFRESH_RATE(50)
 		MCFG_GFXDECODE_ADD("gfxdecode" , "palette" , imds2)
-		MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+		MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 		MCFG_SPEAKER_STANDARD_MONO("mono")
-		MCFG_SOUND_ADD("iocbeep" , BEEP , 0)
+		MCFG_SOUND_ADD("iocbeep" , BEEP , IOC_BEEP_FREQ)
 		MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
 
 		MCFG_DEVICE_ADD("iocdma" , I8257 , IOC_XTAL_Y2 / 9)

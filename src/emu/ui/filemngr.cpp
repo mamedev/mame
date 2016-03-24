@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    ui/filemngr.c
+    ui/filemngr.cpp
 
     MESS's clunky built-in file manager
 
@@ -68,7 +68,7 @@ void ui_menu_file_manager::custom_render(void *selectedref, float top, float bot
 void ui_menu_file_manager::fill_image_line(device_image_interface *img, std::string &instance, std::string &filename)
 {
 	// get the image type/id
-	strprintf(instance,"%s (%s)", img->instance_name(), img->brief_instance_name());
+	instance = string_format("%s (%s)", img->instance_name(), img->brief_instance_name());
 
 	// get the base name
 	if (img->basename() != nullptr)
@@ -103,7 +103,7 @@ void ui_menu_file_manager::fill_image_line(device_image_interface *img, std::str
 
 void ui_menu_file_manager::populate()
 {
-	std::string buffer, tmp_inst, tmp_name;
+	std::string tmp_inst, tmp_name;
 	bool first_entry = true;
 
 	if (!m_warnings.empty())
@@ -130,7 +130,7 @@ void ui_menu_file_manager::populate()
 			for (device_image_interface *scan = subiterator.first(); scan != nullptr; scan = subiterator.next())
 			{
 				// if it is a children device, and not something further down the device tree, we want it in the menu!
-				if (scan->device().owner()->tag() == dev->tag())
+				if (strcmp(scan->device().owner()->tag(), dev->tag()) == 0)
 					if (devtags.insert(scan->device().tag()).second)
 					{
 						// check whether we already had some devices with the same owner: if not, output the owner tag!
@@ -140,8 +140,7 @@ void ui_menu_file_manager::populate()
 								first_entry = false;
 							else
 								item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-							strprintf(buffer, "[root%s]", dev->tag().c_str());
-							item_append(buffer.c_str(), nullptr, 0, nullptr);
+							item_append(string_format("[root%s]", dev->tag()).c_str(), nullptr, 0, nullptr);
 							tag_appended = true;
 						}
 						// finally, append the image interface to the menu
@@ -195,10 +194,10 @@ void ui_menu_file_manager::force_file_manager(running_machine &machine, render_c
 	ui_menu::stack_reset(machine);
 
 	// add the quit entry followed by the game select entry
-	ui_menu *quit = auto_alloc_clear(machine, <ui_menu_quit_game>(machine, container));
+	ui_menu *quit = global_alloc_clear<ui_menu_quit_game>(machine, container);
 	quit->set_special_main_menu(true);
 	ui_menu::stack_push(quit);
-	ui_menu::stack_push(auto_alloc_clear(machine, <ui_menu_file_manager>(machine, container, warnings)));
+	ui_menu::stack_push(global_alloc_clear<ui_menu_file_manager>(machine, container, warnings));
 
 	// force the menus on
 	machine.ui().show_menu();

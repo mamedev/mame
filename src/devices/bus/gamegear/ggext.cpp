@@ -54,7 +54,7 @@ device_gg_ext_port_interface::~device_gg_ext_port_interface()
 //  gg_ext_port_device - constructor
 //-------------------------------------------------
 
-gg_ext_port_device::gg_ext_port_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+gg_ext_port_device::gg_ext_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, GG_EXT_PORT, "EXT Port", tag, owner, clock, "gg_ext_port", __FILE__),
 						device_slot_interface(mconfig, *this), m_device(nullptr),
 						m_th_pin_handler(*this),

@@ -67,7 +67,7 @@ Z - more scan lines per row (cursor is bigger)
 class tavernie_state : public driver_device
 {
 public:
-	tavernie_state(const machine_config &mconfig, device_type type, std::string tag) :
+	tavernie_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_cass(*this, "cassette"),
@@ -179,7 +179,6 @@ MACHINE_RESET_MEMBER( tavernie_state, cpu09)
 MACHINE_RESET_MEMBER( tavernie_state, ivg09)
 {
 	m_p_chargen = memregion("chargen")->base();
-	m_beep->set_frequency(950);    /* guess */
 	m_beep->set_state(1);
 	m_term_data = 0;
 	m_pia_ivg->cb1_w(1);
@@ -350,11 +349,11 @@ static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
 	MCFG_SCREEN_SIZE(80*8, 25*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*10-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEFAULT_LAYOUT(layout_tavernie)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 950) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

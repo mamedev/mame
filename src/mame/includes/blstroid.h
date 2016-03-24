@@ -19,7 +19,7 @@ public:
 		TIMER_IRQ_ON
 	};
 
-	blstroid_state(const machine_config &mconfig, device_type type, std::string tag)
+	blstroid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_playfield_tilemap(*this, "playfield"),
 			m_jsa(*this, "jsa"),

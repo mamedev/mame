@@ -25,7 +25,8 @@
 #include "debugger.h"
 
 #include "window.h"
-#include "../../windows/input.h"
+#include "../input/input_common.h"
+#include "../input/input_windows.h"
 
 
 class debugger_windows : public osd_module, public debug_module, protected debugger_windows_interface
@@ -121,7 +122,7 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 	show_all();
 
 	// run input polling to ensure that our status is in sync
-	wininput_poll(*m_machine);
+	downcast<windows_osd_interface&>(machine().osd()).poll_input(*m_machine);
 
 	// get and process messages
 	MSG message;
@@ -202,7 +203,7 @@ bool debugger_windows::seq_pressed() const
 		else
 		{
 			// handle everything else as a series of ANDs
-			int const vkey = wininput_vkey_for_mame_code(code);
+			int const vkey = keyboard_trans_table::instance().vkey_for_mame_code(code);
 			bool const pressed = (vkey != 0) && ((GetAsyncKeyState(vkey) & 0x8000) != 0);
 
 			if (first)          // if this is the first in the sequence, result is set equal

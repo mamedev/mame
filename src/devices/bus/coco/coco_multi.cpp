@@ -138,7 +138,7 @@ const device_type COCO_MULTIPAK = &device_creator<coco_multipak_device>;
 //  coco_multipak_device - constructor
 //-------------------------------------------------
 
-coco_multipak_device::coco_multipak_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, COCO_MULTIPAK, "CoCo Multi-Pak Interface", tag, owner, clock, "coco_multipak", __FILE__),
 		device_cococart_interface( mconfig, *this ), m_owner(nullptr), m_select(0)
 	{

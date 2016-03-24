@@ -42,7 +42,7 @@ const device_type SEGA_315_5250_COMPARE_TIMER = &device_creator<sega_315_5250_co
 //  sega_16bit_common_base - constructor
 //-------------------------------------------------
 
-sega_16bit_common_base::sega_16bit_common_base(const machine_config &mconfig, device_type type, std::string tag)
+sega_16bit_common_base::sega_16bit_common_base(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
 		m_paletteram(*this, "paletteram"),
 		m_open_bus_recurse(false),
@@ -164,6 +164,30 @@ WRITE16_MEMBER( sega_16bit_common_base::paletteram_w )
 	m_palette->set_pen_color(offset + 2 * m_palette_entries, m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]);
 }
 
+WRITE16_MEMBER( sega_16bit_common_base::philko_paletteram_w )
+{
+	// compute the number of entries
+	if (m_palette_entries == 0)
+		m_palette_entries = memshare("paletteram")->bytes() / 2;
+
+	// get the new value
+	UINT16 newval = m_paletteram[offset];
+	COMBINE_DATA(&newval);
+	m_paletteram[offset] = newval;
+
+	//     byte 0    byte 1
+	//  sRRR RRGG GGGB BBBB
+	//  x432 1043 2104 3210
+	int b = (newval >> 0) & 0x1f;
+	int g = (newval >> 5) & 0x1f;
+	int r = (newval >> 10) & 0x1f;
+
+	// normal colors
+	m_palette->set_pen_color(offset + 0 * m_palette_entries, m_palette_normal[r],  m_palette_normal[g],  m_palette_normal[b]);
+	m_palette->set_pen_color(offset + 1 * m_palette_entries, m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
+	m_palette->set_pen_color(offset + 2 * m_palette_entries, m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]);
+}
+
 
 
 //**************************************************************************
@@ -174,8 +198,9 @@ WRITE16_MEMBER( sega_16bit_common_base::paletteram_w )
 //  sega_315_5195_mapper_device - constructor
 //-------------------------------------------------
 
-sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, "Sega 315-5195 Memory Mapper", tag, owner, clock, "sega_315_5195", __FILE__),
+		m_cputag(nullptr),
 		m_cpu(nullptr),
 		m_space(nullptr),
 		m_decrypted_space(nullptr),
@@ -717,7 +742,7 @@ void sega_315_5195_mapper_device::decrypt_bank::update()
 //  sega_315_5248_multiplier_device - constructor
 //-------------------------------------------------
 
-sega_315_5248_multiplier_device::sega_315_5248_multiplier_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_315_5248_multiplier_device::sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA_315_5248_MULTIPLIER, "Sega 315-5248 Multiplier", tag, owner, clock, "sega_315_5248", __FILE__)
 {
 }
@@ -785,7 +810,7 @@ void sega_315_5248_multiplier_device::device_reset()
 //  sega_315_5249_divider_device - constructor
 //-------------------------------------------------
 
-sega_315_5249_divider_device::sega_315_5249_divider_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_315_5249_divider_device::sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA_315_5248_MULTIPLIER, "Sega 315-5249 Divider", tag, owner, clock, "sega_315_5249", __FILE__)
 {
 }
@@ -930,7 +955,7 @@ void sega_315_5249_divider_device::execute(int mode)
 //  constructor
 //-------------------------------------------------
 
-sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA_315_5250_COMPARE_TIMER, "Sega 315-5250 Compare/Timer", tag, owner, clock, "sega_315_5250", __FILE__)
 {
 }

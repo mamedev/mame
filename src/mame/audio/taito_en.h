@@ -15,7 +15,7 @@ class taito_en_device : public device_t
 
 {
 public:
-	taito_en_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~taito_en_device() {}
 
 	DECLARE_READ8_MEMBER( en_68000_share_r );
@@ -35,6 +35,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	// inherited devices/pointers
@@ -56,8 +57,3 @@ private:
 };
 
 extern const device_type TAITO_EN;
-
-MACHINE_CONFIG_EXTERN( taito_en_sound );
-
-#define MCFG_TAITO_EN_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TAITO_EN, 0)

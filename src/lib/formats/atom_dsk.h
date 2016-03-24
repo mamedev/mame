@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #ifndef __ATOM_DSK_H__
 #define __ATOM_DSK_H__
 

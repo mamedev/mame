@@ -13,7 +13,7 @@
 class offtwall_state : public atarigen_state
 {
 public:
-	offtwall_state(const machine_config &mconfig, device_type type, std::string tag)
+	offtwall_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_jsa(*this, "jsa"),
 			m_vad(*this, "vad"),

@@ -25,7 +25,7 @@ class s11c_bg_device : public device_t
 {
 public:
 	// construction/destruction
-	s11c_bg_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	required_device<cpu_device> m_cpu;
 	required_device<ym2151_device> m_ym2151;
@@ -46,7 +46,7 @@ public:
 	void ctrl_w(UINT8 data);
 	void data_w(UINT8 data);
 
-	static void static_set_gfxregion(device_t &device, std::string tag);
+	static void static_set_gfxregion(device_t &device, const char *tag);
 
 protected:
 	// overrides
@@ -55,7 +55,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
-	std::string m_regiontag;
+	const char* m_regiontag;
 
 };
 

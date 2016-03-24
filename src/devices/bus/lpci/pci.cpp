@@ -89,10 +89,13 @@ const device_type PCI_BUS = &device_creator<pci_bus_device>;
 //-------------------------------------------------
 //  pci_bus_device - constructor
 //-------------------------------------------------
-pci_bus_device::pci_bus_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+pci_bus_device::pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PCI_BUS, "PCI Bus", tag, owner, clock, "pci_bus", __FILE__), m_busnum(0),
 		m_father(nullptr), m_address(0), m_devicenum(0), m_busnumber(0), m_busnumaddr(nullptr)
 {
+	for (auto & elem : m_devtag) {
+		elem= nullptr;
+	}
 	m_siblings_count = 0;
 }
 
@@ -127,7 +130,7 @@ READ32_MEMBER( pci_bus_device::read )
 	}
 
 	if (LOG_PCI)
-		logerror("read('%s'): offset=%d result=0x%08X\n", tag().c_str(), offset, result);
+		logerror("read('%s'): offset=%d result=0x%08X\n", tag(), offset, result);
 
 	return result;
 }
@@ -159,7 +162,7 @@ WRITE32_MEMBER( pci_bus_device::write )
 	offset %= 2;
 
 	if (LOG_PCI)
-		logerror("write('%s'): offset=%d data=0x%08X\n", tag().c_str(), offset, data);
+		logerror("write('%s'): offset=%d data=0x%08X\n", tag(), offset, data);
 
 	switch (offset)
 	{
@@ -311,7 +314,7 @@ pci_device_interface::~pci_device_interface()
 const device_type PCI_CONNECTOR = &device_creator<pci_connector>;
 
 
-pci_connector::pci_connector(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock) :
+pci_connector::pci_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PCI_CONNECTOR, "PCI device connector abstraction", tag, owner, clock, "pci_connector", __FILE__),
 	device_slot_interface(mconfig, *this)
 {

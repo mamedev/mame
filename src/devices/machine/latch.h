@@ -30,7 +30,7 @@
 class output_latch_device : public device_t
 {
 public:
-	output_latch_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	output_latch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_bit0_handler(device_t &device, _Object object) { return downcast<output_latch_device &>(device).m_bit0_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_bit1_handler(device_t &device, _Object object) { return downcast<output_latch_device &>(device).m_bit1_handler.set_callback(object); }

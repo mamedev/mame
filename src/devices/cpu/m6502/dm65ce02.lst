@@ -1,3 +1,5 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
 # m65ce02 - Adds the B and Z registers to the r65c02, a bunch of instructions, and changes most of the timings
 brk_ce_imp  ora_ce_idx  cle_imp     see_imp     tsb_ce_zpg  ora_ce_zpg  asl_ce_zpg  rmb_ce_bzp  php_ce_imp  ora_imm     asl_ce_acc  tsy_imp     tsb_ce_aba  ora_aba     asl_ce_aba  bbr_ce_zpb
 bpl_ce_rel  ora_ce_idy  ora_idz     bpl_rw2     trb_ce_zpg  ora_ce_zpx  asl_ce_zpx  rmb_ce_bzp  clc_ce_imp  ora_ce_aby  inc_ce_acc  inz_imp     trb_ce_aba  ora_ce_abx  asl_ce_abx  bbr_ce_zpb

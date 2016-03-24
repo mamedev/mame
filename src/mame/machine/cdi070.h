@@ -140,7 +140,7 @@ class cdi68070_device : public device_t
 {
 public:
 	// construction/destruction
-	cdi68070_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// external callbacks
 	void uart_rx(UINT8 data);

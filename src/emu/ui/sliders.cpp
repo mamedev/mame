@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-    miscmenu.c
+    ui/sliders.cpp
 
     Internal MAME menus for the user interface.
 
@@ -17,9 +17,9 @@
 #include "ui/sliders.h"
 
 
-ui_menu_sliders::ui_menu_sliders(running_machine &machine, render_container *container, bool _menuless_mode) : ui_menu(machine, container)
+ui_menu_sliders::ui_menu_sliders(running_machine &machine, render_container *container, bool menuless_mode) : ui_menu(machine, container)
 {
-	menuless_mode = hidden = _menuless_mode;
+	m_menuless_mode = m_hidden = menuless_mode;
 }
 
 ui_menu_sliders::~ui_menu_sliders()
@@ -35,7 +35,7 @@ void ui_menu_sliders::handle()
 	const ui_menu_event *menu_event;
 
 	/* process the menu */
-	menu_event = process(UI_MENU_PROCESS_LR_REPEAT | (hidden ? UI_MENU_PROCESS_CUSTOM_ONLY : 0));
+	menu_event = process(UI_MENU_PROCESS_LR_REPEAT | (m_hidden ? UI_MENU_PROCESS_CUSTOM_ONLY : 0));
 	if (menu_event != nullptr)
 	{
 		/* handle keys if there is a valid item selected */
@@ -49,10 +49,10 @@ void ui_menu_sliders::handle()
 			{
 				/* toggle visibility */
 				case IPT_UI_ON_SCREEN_DISPLAY:
-					if (menuless_mode)
+					if (m_menuless_mode)
 						ui_menu::stack_pop(machine());
 					else
-						hidden = !hidden;
+						m_hidden = !m_hidden;
 					break;
 
 				/* decrease value */
@@ -103,19 +103,19 @@ void ui_menu_sliders::handle()
 		}
 
 		/* if we are selecting an invalid item and we are hidden, skip to the next one */
-		else if (hidden)
+		else if (m_hidden)
 		{
 			/* if we got here via up or page up, select the previous item */
 			if (menu_event->iptkey == IPT_UI_UP || menu_event->iptkey == IPT_UI_PAGE_UP)
 			{
-				selected = (selected + numitems - 1) % numitems;
-				validate_selection(-1);
+                selected = (selected + item.size() - 1) % item.size();
+                validate_selection(-1);
 			}
 
 			/* otherwise select the next item */
 			else if (menu_event->iptkey == IPT_UI_DOWN || menu_event->iptkey == IPT_UI_PAGE_DOWN)
 			{
-				selected = (selected + 1) % numitems;
+                selected = (selected + 1) % item.size();
 				validate_selection(1);
 			}
 		}
@@ -242,7 +242,7 @@ UINT32 ui_menu_sliders::ui_handler(running_machine &machine, render_container *c
 
 	/* if this is the first call, push the sliders menu */
 	if (state)
-		ui_menu::stack_push(auto_alloc_clear(machine, <ui_menu_sliders>(machine, container, true)));
+		ui_menu::stack_push(global_alloc_clear<ui_menu_sliders>(machine, container, true));
 
 	/* handle standard menus */
 	result = ui_menu::ui_handler(machine, container, state);
@@ -252,5 +252,5 @@ UINT32 ui_menu_sliders::ui_handler(running_machine &machine, render_container *c
 		ui_menu::stack_pop(machine);
 
 	ui_menu_sliders *uim = dynamic_cast<ui_menu_sliders *>(menu_stack);
-	return uim && uim->menuless_mode ? 0 : UI_HANDLER_CANCEL;
+	return uim && uim->m_menuless_mode ? 0 : UI_HANDLER_CANCEL;
 }

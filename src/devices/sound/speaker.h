@@ -26,7 +26,7 @@ class speaker_sound_device : public device_t,
 								public device_sound_interface
 {
 public:
-	speaker_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~speaker_sound_device() {}
 
 	// static configuration

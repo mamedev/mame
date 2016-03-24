@@ -28,9 +28,9 @@
 class namco_52xx_device : public device_t
 {
 public:
-	namco_52xx_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void set_discrete(device_t &device, std::string tag) { downcast<namco_52xx_device &>(device).m_discrete.set_tag(tag); }
+	static void set_discrete(device_t &device, const char *tag) { downcast<namco_52xx_device &>(device).m_discrete.set_tag(tag); }
 	static void set_basenote(device_t &device, int node) { downcast<namco_52xx_device &>(device).m_basenode = node; }
 	static void set_extclock(device_t &device, attoseconds_t clk) { downcast<namco_52xx_device &>(device).m_extclock = clk; }
 	template<class _Object> static devcb_base &set_romread_callback(device_t &device, _Object object) { return downcast<namco_52xx_device &>(device).m_romread.set_callback(object); }

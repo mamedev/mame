@@ -236,6 +236,8 @@ void psychic5_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	for (int offs = 0; offs < m_spriteram.bytes(); offs += 16)
 	{
 		int attr  = m_spriteram[offs + 13];
+		if(attr & 2) // Bombs Away: disable sprite if enabled
+			continue;
 		int code  = m_spriteram[offs + 14] | ((attr & 0xc0) << 2);
 		int color = m_spriteram[offs + 15] & 0x0f;
 		int flipx = attr & 0x10;

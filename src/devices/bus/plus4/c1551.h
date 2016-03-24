@@ -31,7 +31,7 @@ class c1551_t :  public device_t,
 {
 public:
 	// construction/destruction
-	c1551_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	c1551_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;

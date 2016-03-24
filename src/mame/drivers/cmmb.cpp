@@ -53,7 +53,7 @@ OSC @ 72.576MHz
 class cmmb_state : public driver_device
 {
 public:
-	cmmb_state(const machine_config &mconfig, device_type type, std::string tag)
+	cmmb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),

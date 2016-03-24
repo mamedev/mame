@@ -47,7 +47,7 @@ class c8050_fdc_t :  public device_t
 {
 public:
 	// construction/destruction
-	c8050_fdc_t(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_sync.set_callback(object); }
 	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_ready.set_callback(object); }

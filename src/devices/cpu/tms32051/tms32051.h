@@ -57,8 +57,8 @@ class tms32051_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms32051_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	tms32051_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
+	tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_READ16_MEMBER( cpuregs_r );
 	DECLARE_WRITE16_MEMBER( cpuregs_w );
@@ -373,7 +373,7 @@ class tms32053_device : public tms32051_device
 {
 public:
 	// construction/destruction
-	tms32053_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual void device_config_complete() override;

@@ -20,7 +20,7 @@
 class primo_state : public driver_device
 {
 public:
-	primo_state(const machine_config &mconfig, device_type type, std::string tag)
+	primo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_iec(*this, CBM_IEC_TAG),

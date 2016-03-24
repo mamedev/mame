@@ -5740,9 +5740,9 @@ ROM_START( royalcrd_nes )
 	ROM_LOAD( "82s147.bin",    0x0000, 0x0200, CRC(5377c680) SHA1(33857bbbfebfce28b8a68c69e030bf560a701e83) )
 
 	// and this is just an untouched NES multigame..
-	ROM_REGION( 0x0100000, "nes_prg", 0 ) 
+	ROM_REGION( 0x0100000, "nes_prg", 0 )
 	ROM_LOAD( "me0.bin",    0x0000, 0x0100000, CRC(83a4e841) SHA1(280e1a26737fe0b90dd19be706df89e09ef84c77) ) // == 64 in 1 [a1][p1].prg  nes:mc_64a 64 in 1 (Alt Games)
-	ROM_REGION( 0x80000, "nes_chr", 0 ) 
+	ROM_REGION( 0x80000, "nes_chr", 0 )
 	ROM_LOAD( "me1.bin",    0x0000, 0x80000, CRC(7114b404) SHA1(0f5a206af25725b2e97c404a616e341f15925431) ) // == 64 in 1 [a1][p1].chr  nes:mc_64a 64 in 1 (Alt Games)
 ROM_END
 
@@ -5759,7 +5759,7 @@ ROM_START( royalcrd_msx )
 	ROM_LOAD( "24c04.bin",    0x0000, 0x0200, CRC(2a1e8abe) SHA1(639a704f25af02597ead2e69d15ac47953c27f09) )
 
 	// some kind of MSX multigame?
-	ROM_REGION( 0x0100000, "msx_prg", 0 ) 
+	ROM_REGION( 0x0100000, "msx_prg", 0 )
 	ROM_LOAD( "me0.bin",    0x0000, 0x10000, CRC(bd5be18b) SHA1(b43a176db0522bcda0a17dd0c210c987dc380c97) ) // weird pattern? might be bad if not a lookup table?  BADADDR        -------xxxxxxxxx
 	ROM_LOAD( "me1.bin",    0x0000, 0x40000, CRC(2152c6b7) SHA1(e512e29f4a899cc3f91a446141fd4432a487228f) )
 ROM_END

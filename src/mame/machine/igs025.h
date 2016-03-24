@@ -13,7 +13,7 @@ typedef device_delegate<void (void)> igs025_execute_external;
 class igs025_device : public device_t
 {
 public:
-	igs025_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
+	igs025_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ16_MEMBER( killbld_igs025_prot_r );
 	// use setters instead of making public?

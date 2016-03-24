@@ -161,7 +161,7 @@ void m107_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const
 {
 	UINT16 *spriteram = m_buffered_spriteram.get();
 	int offs;
-	UINT8 *rom = memregion("user1")->base();
+	UINT8 *rom = m_user1_ptr;
 
 	for (offs = 0;offs < 0x800;offs += 4)
 	{
@@ -216,6 +216,9 @@ void m107_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const
 		else
 		{
 			int rom_offs = sprite*8;
+
+			if (!rom)
+				return;
 
 			if (rom[rom_offs+1] || rom[rom_offs+3] || rom[rom_offs+5] || rom[rom_offs+7])
 			{

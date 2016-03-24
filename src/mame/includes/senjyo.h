@@ -8,7 +8,7 @@
 class senjyo_state : public driver_device
 {
 public:
-	senjyo_state(const machine_config &mconfig, device_type type, std::string tag)
+	senjyo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pio(*this, "z80pio"),

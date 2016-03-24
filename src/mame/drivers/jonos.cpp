@@ -19,7 +19,7 @@
 class jonos_state : public driver_device
 {
 public:
-	jonos_state(const machine_config &mconfig, device_type type, std::string tag)
+	jonos_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
@@ -133,7 +133,7 @@ static MACHINE_CONFIG_START( jonos, jonos_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jonos)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(jonos_state,jonos)

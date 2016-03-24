@@ -4,20 +4,31 @@
 
     315-5838 - Decathlete (ST-V)
     317-0229 - Dead or Alive (Model 2A)
+    317-0229 - Name Club / Name Club Ver 2 (ST-V) (tested as RCDD2 in the service menu!)
+    317-0231 - Print Club Love Love / Print Club Love Love Ver 2 (ST-V)
+
+    Several Print Club (ST-V) carts have
+    an unpopulated space marked '317-0229' on the PCB
 
     Package Type: TQFP100
 
-    This appears to be a dual channel compression chip, used in 1996, predating the 5881.
-    Decathlete uses it to compress ALL the game graphics, Dead or Alive uses it for a
-    dumb security check, decompressing a single string.
+    Decathlete accesses the chip at 2 different addresses, however, I don't think there
+    are 2 channels / sets of registers, instead the 2nd set of addresses are just a
+    mirror that allows access to a different set of source roms; the tables etc. are
+    re-uploaded before every transfer.
 
-    Each channel appears to be connected to a different set of ROMs, however there is
-    defintiely only a single 315-5838 chip. (could the different channels actually just
-    be mirror addresses, with part of the address determining the ROMs to use?)
-
-    Dead of Alive only uses a single channel, and has the source data in RAM, not ROM.
+    Dead of Alive has the source data in RAM, not ROM.
     This is similar to how some 5881 games were set up, with the ST-V versions decrypting
     data directly from ROM and the Model 2 ones using a RAM source buffer.
+
+    Decathlete decompresses all graphic data with the chip.
+
+    The Name Club games use the chip for decompressing data for the printer (full size
+    versions of the graphics?)
+
+    Print Club Love Love decrypts some start up code/data required for booting.
+
+    Dead or Alive decrypts a string that is checked on startup, nothing else.
 
     Looking at the values read I don't think there is any address based encryption, for
     example many blocks where you'd expect a zero fill start with repeating patterns
@@ -40,7 +51,7 @@ extern const device_type SEGA315_5838_COMP = &device_creator<sega_315_5838_comp_
 
 //#define DEBUG_DATA_DUMP
 
-sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
+sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA315_5838_COMP, "Sega 315-5838 / 317-0029 Compression (Encryption?)", tag, owner, clock, "sega315_5838", __FILE__)
 {
 }
@@ -49,11 +60,12 @@ sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconf
 
 void sega_315_5838_comp_device::device_start()
 {
+	m_decathlt_lastcount = 0;
+	m_decathlt_prot_uploadmode = 0;
+	m_decathlt_prot_uploadoffset = 0;
+
 	for (auto & elem : m_channel)
 	{
-		elem.m_decathlt_lastcount = 0;
-		elem.m_decathlt_prot_uploadmode = 0;
-		elem.m_decathlt_prot_uploadoffset = 0;
 		elem.m_read_ch.bind_relative_to(*owner());
 
 	}
@@ -61,14 +73,10 @@ void sega_315_5838_comp_device::device_start()
 
 void sega_315_5838_comp_device::device_reset()
 {
-	for (auto & elem : m_channel)
-	{
-		elem.m_srcoffset = 0;
-		elem.m_decathlt_lastcount = 0;
-		elem.m_decathlt_prot_uploadmode = 0;
-		elem.m_decathlt_prot_uploadoffset = 0;
-	}
-
+	m_srcoffset = 0;
+	m_decathlt_lastcount = 0;
+	m_decathlt_prot_uploadmode = 0;
+	m_decathlt_prot_uploadoffset = 0;
 	m_protstate = 0;
 }
 
@@ -100,46 +108,46 @@ UINT32 sega_315_5838_comp_device::genericdecathlt_prot_r(UINT32 mem_mask, int ch
 //  UINT32 *fake0 = (UINT32*)memregion( ":fake0" )->base();
 //  UINT32 retvalue = 0xffff;
 
-	switch (m_channel[channel].m_srcoffset)
+	switch (m_srcoffset)
 	{
 		default:
 
-		m_channel[channel].m_decathlt_lastcount++;
+		m_decathlt_lastcount++;
 
 		UINT32 tempdata = 0;
-		tempdata |= m_channel[channel].m_read_ch(m_channel[channel].m_srcoffset) << 0;
-		m_channel[channel].m_srcoffset++;
-		tempdata |= m_channel[channel].m_read_ch(m_channel[channel].m_srcoffset) << 16;
-		m_channel[channel].m_srcoffset++;
+		tempdata |= m_channel[channel].m_read_ch(m_srcoffset) << 0;
+		m_srcoffset++;
+		tempdata |= m_channel[channel].m_read_ch(m_srcoffset) << 16;
+		m_srcoffset++;
 
 
 		#ifdef DEBUG_DATA_DUMP
-		//printf("read addr %08x, blah_r %08x - read count count %08x\n", m_channel[channel].m_srcoffset*2, tempdata,  m_channel[channel].m_decathlt_lastcount*4);
+		//printf("read addr %08x, blah_r %08x - read count count %08x\n", m_srcoffset*2, tempdata,  m_decathlt_lastcount*4);
 		fwrite(&tempdata, 1, 4, tempfile);
 		#else
-		logerror("read addr %08x, blah_r %08x - read count count %08x\n", m_channel[channel].m_srcoffset*2, tempdata,  m_channel[channel].m_decathlt_lastcount*4);
+		logerror("read addr %08x, blah_r %08x - read count count %08x\n", m_srcoffset*2, tempdata,  m_decathlt_lastcount*4);
 		#endif
 
 		return tempdata;
 #if 0
 		case 0x03228e4:
-			if (fake0) retvalue = fake0[(((0x20080/4)+m_channel[channel].m_decathlt_lastcount))];
-			m_channel[channel].m_decathlt_lastcount++;
+			if (fake0) retvalue = fake0[(((0x20080/4)+m_decathlt_lastcount))];
+			m_decathlt_lastcount++;
 			return retvalue;
 
 		case 0x00a9f3a:
-			if (fake0) retvalue = fake0[(((0x00000/4)+m_channel[channel].m_decathlt_lastcount))];
-			m_channel[channel].m_decathlt_lastcount++;
+			if (fake0) retvalue = fake0[(((0x00000/4)+m_decathlt_lastcount))];
+			m_decathlt_lastcount++;
 			return retvalue;
 
 		case 0x0213ab4:
-			if (fake0) retvalue = fake0[(((0x40000/4)+m_channel[channel].m_decathlt_lastcount))];
-			m_channel[channel].m_decathlt_lastcount++;
+			if (fake0) retvalue = fake0[(((0x40000/4)+m_decathlt_lastcount))];
+			m_decathlt_lastcount++;
 			return retvalue;
 
 		case 0x01efaf0:
-			if (fake0) retvalue = fake0[(((0x60000/4)+m_channel[channel].m_decathlt_lastcount))];
-			m_channel[channel].m_decathlt_lastcount++;
+			if (fake0) retvalue = fake0[(((0x60000/4)+m_decathlt_lastcount))];
+			m_decathlt_lastcount++;
 			return retvalue;
 
 		case 0x033f16c:
@@ -180,14 +188,14 @@ UINT32 sega_315_5838_comp_device::genericdecathlt_prot_r(UINT32 mem_mask, int ch
 void sega_315_5838_comp_device::set_prot_addr(UINT32 data, UINT32 mem_mask, int channel)
 {
 //  printf("set_prot_addr\n");
-	COMBINE_DATA(&m_channel[channel].m_srcoffset);
+	COMBINE_DATA(&m_srcoffset);
 
-	//if (m_decathlt_part==0) logerror("%d, last read count was %06x\n",channel, m_channel[channel].m_decathlt_lastcount*4);
-	m_channel[channel].m_decathlt_lastcount = 0;
+	//if (m_decathlt_part==0) logerror("%d, last read count was %06x\n",channel, m_decathlt_lastcount*4);
+	m_decathlt_lastcount = 0;
 
 	if (mem_mask == 0x0000ffff)
 	{
-		printf("set source address to %08x (channel %d)\n", m_channel[channel].m_srcoffset, channel);
+		printf("set source address to %08x (channel %d)\n", m_srcoffset, channel);
 	}
 
 
@@ -198,24 +206,24 @@ void sega_315_5838_comp_device::set_prot_addr(UINT32 data, UINT32 mem_mask, int 
 			fclose(tempfile);
 
 		char filename[256];
-		sprintf(filename, "%d_compressed_%08x", channel, m_channel[channel].m_srcoffset * 2);
+		sprintf(filename, "%d_compressed_%08x", channel, m_srcoffset * 2);
 		tempfile = fopen(filename, "w+b");
 
 		// the table and dictionary are uploaded repeatedly, usually before groups of data transfers but
 		// it's always the same tables (one pair for each channel)
 		{
 			FILE* fp;
-			sprintf(filename, "%d_compressed_table1", channel);
+			sprintf(filename, "%d_compressed_table1_%08x", channel, m_srcoffset * 2);
 			fp = fopen(filename, "w+b");
-			fwrite(&m_channel[channel].m_decathlt_prottable1, 24, 2, fp);
+			fwrite(&m_decathlt_prottable1, 24, 2, fp);
 			fclose(fp);
 		}
 
 		{
 			FILE* fp;
-			sprintf(filename, "%d_compressed_dictionary", channel);
+			sprintf(filename, "%d_compressed_dictionary_%08x", channel, m_srcoffset * 2);
 			fp = fopen(filename, "w+b");
-			fwrite(&m_channel[channel].m_decathlt_dictionary, 128, 2, fp);
+			fwrite(&m_decathlt_dictionaryy, 128, 2, fp);
 			fclose(fp);
 		}
 	}
@@ -228,13 +236,13 @@ void sega_315_5838_comp_device::set_upload_mode(UINT16 data, int channel)
 	if ((data == 0x8000) || (data == 0x0000))
 	{
 	//  logerror("changed to upload mode 1\n");
-		m_channel[channel].m_decathlt_prot_uploadmode = 1;
-		m_channel[channel].m_decathlt_prot_uploadoffset = 0;
+		m_decathlt_prot_uploadmode = 1;
+		m_decathlt_prot_uploadoffset = 0;
 	}
 	else if ((data == 0x8080) || (data == 0x0080))
 	{
-		m_channel[channel].m_decathlt_prot_uploadmode = 2;
-		m_channel[channel].m_decathlt_prot_uploadoffset = 0;
+		m_decathlt_prot_uploadmode = 2;
+		m_decathlt_prot_uploadoffset = 0;
 	}
 	else
 	{
@@ -244,30 +252,30 @@ void sega_315_5838_comp_device::set_upload_mode(UINT16 data, int channel)
 
 void sega_315_5838_comp_device::upload_table_data(UINT16 data, int channel)
 {
-	if (m_channel[channel].m_decathlt_prot_uploadmode == 1)
+	if (m_decathlt_prot_uploadmode == 1)
 	{
-		if (m_channel[channel].m_decathlt_prot_uploadoffset >= 24)
+		if (m_decathlt_prot_uploadoffset >= 24)
 		{
 			fatalerror("upload mode 1 error, too big\n");
 			return;
 		}
 
-		//logerror("uploading table 1 %04x %04x\n",m_channel[channel].m_decathlt_prot_uploadoffset, data&0xffff);
-		m_channel[channel].m_decathlt_prottable1[m_channel[channel].m_decathlt_prot_uploadoffset] = data & 0xffff;
-		m_channel[channel].m_decathlt_prot_uploadoffset++;
+		//logerror("uploading table 1 %04x %04x\n",m_decathlt_prot_uploadoffset, data&0xffff);
+		m_decathlt_prottable1[m_decathlt_prot_uploadoffset] = data & 0xffff;
+		m_decathlt_prot_uploadoffset++;
 		printf("unk table 1 %04x (channel %d)\n", data & 0xffff, channel);
 	}
-	else if (m_channel[channel].m_decathlt_prot_uploadmode == 2)
+	else if (m_decathlt_prot_uploadmode == 2)
 	{
-		if (m_channel[channel].m_decathlt_prot_uploadoffset >= 128)
+		if (m_decathlt_prot_uploadoffset >= 128)
 		{
 			fatalerror("upload mode 2 error, too big\n");
 			return;
 		}
 
-		//logerror("uploading table 2 %04x %04x\n",m_channel[channel].m_decathlt_prot_uploadoffset, data&0xffff);
-		m_channel[channel].m_decathlt_dictionary[m_channel[channel].m_decathlt_prot_uploadoffset] = data & 0xffff;
-		m_channel[channel].m_decathlt_prot_uploadoffset++;
+		//logerror("uploading table 2 %04x %04x\n",m_decathlt_prot_uploadoffset, data&0xffff);
+		m_decathlt_dictionaryy[m_decathlt_prot_uploadoffset] = data & 0xffff;
+		m_decathlt_prot_uploadoffset++;
 		printf("dictionary %04x (channel %d)\n", data & 0xffff, channel);
 	}
 }

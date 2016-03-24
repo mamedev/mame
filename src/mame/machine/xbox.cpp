@@ -185,7 +185,7 @@ static void dump_timer_command(running_machine &machine, int ref, int params, co
 	debug_console_printf(machine, "Header.Inserted %d byte\n", space.read_byte(address + 3));
 	debug_console_printf(machine, "Header.SignalState %08X dword\n", space.read_dword_unaligned(address + 4));
 	debug_console_printf(machine, "Header.WaitListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 8), space.read_dword_unaligned(address + 12));
-	debug_console_printf(machine, "DueTime %" I64FMT "x qword\n", (INT64)space.read_qword_unaligned(address + 16));
+	debug_console_printf(machine, "%s", string_format("DueTime %I64x qword\n", (INT64)space.read_qword_unaligned(address + 16)).c_str());
 	debug_console_printf(machine, "TimerListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 24), space.read_dword_unaligned(address + 28));
 	debug_console_printf(machine, "Dpc %08X dword\n", space.read_dword_unaligned(address + 32));
 	debug_console_printf(machine, "Period %d dword\n", space.read_dword_unaligned(address + 36));
@@ -633,7 +633,8 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 	int changed = 0;
 	int list = 1;
 	bool cont = false;
-	int pid, remain, mps;
+	bool retire = false;
+	int pid, remain, mps, done;
 
 	hcca = ohcist.hc_regs[HcHCCA];
 	if (ohcist.state == UsbOperational) {
@@ -658,15 +659,16 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 			// select list, do transfer
 			if (list == 0) {
 				if (ohcist.hc_regs[HcControl] & (1 << 2)) {
-					// periodic
+					// periodic list
 					if (ohcist.hc_regs[HcControl] & (1 << 3)) {
-						// isochronous
+						// isochronous list
 					}
 				}
 				list = -1;
 			}
 			if (list == 1) {
-				// control
+				// control list
+				// check if control list active
 				if (ohcist.hc_regs[HcControl] & (1 << 4)) {
 					cont = true;
 					while (cont == true) {
@@ -676,119 +678,263 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 							if (ohcist.hc_regs[HcCommandStatus] & (1 << 1)) {
 								// ... if 1 start processing from the head of the list
 								ohcist.hc_regs[HcControlCurrentED] = ohcist.hc_regs[HcControlHeadED];
+								// clear CLF (ControlListFilled)
 								ohcist.hc_regs[HcCommandStatus] &= ~(1 << 1);
 								// but if the list is empty, go to the next list
 								if (ohcist.hc_regs[HcControlCurrentED] == 0)
 									cont = false;
+								else
+									cont = true;
 							}
 							else
 								cont = false;
 						}
-						if (cont == true) {
-							// service endpoint descriptor
-							usb_ohci_read_endpoint_descriptor(ohcist.hc_regs[HcControlCurrentED]);
-							// only if it is not halted and not to be skipped
-							if (!(ohcist.endpoint_descriptor.h | ohcist.endpoint_descriptor.k)) {
-								// compare the Endpoint Descriptor?s TailPointer and NextTransferDescriptor fields.
-								if (ohcist.endpoint_descriptor.headp != ohcist.endpoint_descriptor.tailp) {
-									UINT32 a, b;
-									// service transfer descriptor
-									usb_ohci_read_transfer_descriptor(ohcist.endpoint_descriptor.headp);
-									// get pid
-									if (ohcist.endpoint_descriptor.d == 1)
-										pid=OutPid; // out
-									else if (ohcist.endpoint_descriptor.d == 2)
-										pid=InPid; // in
-									else {
-										pid = ohcist.transfer_descriptor.dp; // 0 setup 1 out 2 in
+						else
+							cont = true;
+						if (cont == false)
+							break;
+						// service endpoint descriptor
+						usb_ohci_read_endpoint_descriptor(ohcist.hc_regs[HcControlCurrentED]);
+						// only if it is not halted and not to be skipped
+						if (!(ohcist.endpoint_descriptor.h | ohcist.endpoint_descriptor.k)) {
+							// compare the Endpoint Descriptor TailPointer and NextTransferDescriptor fields.
+							if (ohcist.endpoint_descriptor.headp != ohcist.endpoint_descriptor.tailp) {
+								UINT32 a, b;
+								// set CLF (ControlListFilled)
+								ohcist.hc_regs[HcCommandStatus] |= (1 << 1);
+								// service transfer descriptor
+								usb_ohci_read_transfer_descriptor(ohcist.endpoint_descriptor.headp);
+								// get pid
+								if (ohcist.endpoint_descriptor.d == 1)
+									pid=OutPid; // out
+								else if (ohcist.endpoint_descriptor.d == 2)
+									pid=InPid; // in
+								else {
+									pid = ohcist.transfer_descriptor.dp; // 0 setup 1 out 2 in
+								}
+								// determine how much data to transfer
+								// setup pid must be 8 bytes
+								a = ohcist.transfer_descriptor.be & 0xfff;
+								b = ohcist.transfer_descriptor.cbp & 0xfff;
+								if ((ohcist.transfer_descriptor.be ^ ohcist.transfer_descriptor.cbp) & 0xfffff000)
+									a |= 0x1000;
+								remain = a - b + 1;
+								mps = ohcist.endpoint_descriptor.mps;
+								if ((pid == InPid) || (pid == OutPid)) {
+									if (remain < mps)
+										mps = remain;
+								}
+								if (ohcist.transfer_descriptor.cbp == 0) {
+									remain = 0;
+									mps = 0;
+								}
+								b = ohcist.transfer_descriptor.cbp;
+								// if sending ...
+								if (pid != InPid) {
+									// ... get mps bytes
+									for (int c = 0; c < remain; c++) {
+										ohcist.buffer[c] = ohcist.space->read_byte(b);
+										b++;
+										if ((b & 0xfff) == 0)
+											b = ohcist.transfer_descriptor.be & 0xfffff000;
 									}
-									// determine how much data to transfer
-									// setup pid must be 8 bytes
-									a = ohcist.transfer_descriptor.be & 0xfff;
-									b = ohcist.transfer_descriptor.cbp & 0xfff;
-									if ((ohcist.transfer_descriptor.be ^ ohcist.transfer_descriptor.cbp) & 0xfffff000)
-										a |= 0x1000;
-									remain = a - b + 1;
-									if (pid == InPid) {
-										mps = ohcist.endpoint_descriptor.mps;
-										if (remain < mps)
-											mps = remain;
+								}
+								// should check for time available
+								// execute transaction
+								done=ohcist.ports[1].function->execute_transfer(ohcist.endpoint_descriptor.fa, ohcist.endpoint_descriptor.en, pid, ohcist.buffer, mps);
+								// if receiving ...
+								if (pid == InPid) {
+									// ... store done bytes
+									for (int c = 0; c < done; c++) {
+										ohcist.space->write_byte(b,ohcist.buffer[c]);
+										b++;
+										if ((b & 0xfff) == 0)
+											b = ohcist.transfer_descriptor.be & 0xfffff000;
 									}
-									else {
-										mps = ohcist.endpoint_descriptor.mps;
+								}
+								// status writeback (CompletionCode field, DataToggleControl field, CurrentBufferPointer field, ErrorCount field)
+								ohcist.transfer_descriptor.cc = NoError;
+								ohcist.transfer_descriptor.t = (ohcist.transfer_descriptor.t ^ 1) | 2;
+								// if all data is transferred (or there was no data to transfer) cbp must be 0 ?
+								if ((done == remain) || (pid == SetupPid))
+									b = 0;
+								ohcist.transfer_descriptor.cbp = b;
+								ohcist.transfer_descriptor.ec = 0;
+								retire = false;
+								if ((done == mps) && (done == remain)) {
+									retire = true;
+								}
+								if ((done != mps) && (done <= remain))
+									retire = true;
+								if (done == 0)
+									retire = true;
+								if (retire == true) {
+									// retire transfer descriptor
+									a = ohcist.endpoint_descriptor.headp;
+									ohcist.endpoint_descriptor.headp = ohcist.transfer_descriptor.nexttd;
+									ohcist.transfer_descriptor.nexttd = ohcist.hc_regs[HcDoneHead];
+									ohcist.hc_regs[HcDoneHead] = a;
+									ohcist.endpoint_descriptor.c = ohcist.transfer_descriptor.t & 1;
+									if (ohcist.transfer_descriptor.di != 7) {
+										if (ohcist.transfer_descriptor.di < ohcist.writebackdonehadcounter)
+											ohcist.writebackdonehadcounter = ohcist.transfer_descriptor.di;
 									}
-									if (ohcist.transfer_descriptor.cbp == 0)
-										mps = 0;
-									b = ohcist.transfer_descriptor.cbp;
-									// if sending ...
-									if (pid != InPid) {
-										// ... get mps bytes
-										for (int c = 0; c < mps; c++) {
-											ohcist.buffer[c] = ohcist.space->read_byte(b);
-											b++;
-											if ((b & 0xfff) == 0)
-												b = ohcist.transfer_descriptor.be & 0xfffff000;
-										}
-									}
-									// should check for time available
-									// execute transaction
-									mps=ohcist.ports[1].function->execute_transfer(ohcist.endpoint_descriptor.fa, ohcist.endpoint_descriptor.en, pid, ohcist.buffer, mps);
-									// if receiving ...
-									if (pid == InPid) {
-										// ... store mps bytes
-										for (int c = 0; c < mps; c++) {
-											ohcist.space->write_byte(b,ohcist.buffer[c]);
-											b++;
-											if ((b & 0xfff) == 0)
-												b = ohcist.transfer_descriptor.be & 0xfffff000;
-										}
-									}
-									// status writeback (CompletionCode field, DataToggleControl field, CurrentBufferPointer field, ErrorCount field)
-									ohcist.transfer_descriptor.cc = NoError;
-									ohcist.transfer_descriptor.t = (ohcist.transfer_descriptor.t ^ 1) | 2;
-									ohcist.transfer_descriptor.cbp = b;
-									ohcist.transfer_descriptor.ec = 0;
-									if ((remain == mps) || (mps == 0)) {
-										// retire transfer descriptor
-										a = ohcist.endpoint_descriptor.headp;
-										ohcist.endpoint_descriptor.headp = ohcist.transfer_descriptor.nexttd;
-										ohcist.transfer_descriptor.nexttd = ohcist.hc_regs[HcDoneHead];
-										ohcist.hc_regs[HcDoneHead] = a;
-										ohcist.endpoint_descriptor.c = ohcist.transfer_descriptor.t & 1;
-										if (ohcist.transfer_descriptor.di != 7) {
-											if (ohcist.transfer_descriptor.di < ohcist.writebackdonehadcounter)
-												ohcist.writebackdonehadcounter = ohcist.transfer_descriptor.di;
-										}
-										usb_ohci_writeback_transfer_descriptor(a);
-										usb_ohci_writeback_endpoint_descriptor(ohcist.hc_regs[HcControlCurrentED]);
-									} else {
-										usb_ohci_writeback_transfer_descriptor(ohcist.endpoint_descriptor.headp);
-									}
-								} else
-									ohcist.hc_regs[HcControlCurrentED] = ohcist.endpoint_descriptor.nexted;
-							} else
-								ohcist.hc_regs[HcControlCurrentED] = ohcist.endpoint_descriptor.nexted;
-							// one bulk every n control transfers
-							ohcist.interruptbulkratio--;
-							if (ohcist.interruptbulkratio <= 0) {
-								ohcist.interruptbulkratio = (ohcist.hc_regs[HcControl] & 3) + 1;
-								cont = false;
+									usb_ohci_writeback_transfer_descriptor(a);
+									usb_ohci_writeback_endpoint_descriptor(ohcist.hc_regs[HcControlCurrentED]);
+								} else {
+									usb_ohci_writeback_transfer_descriptor(ohcist.endpoint_descriptor.headp);
+								}
 							}
+							else {
+								// no transfer descriptors for this endpoint, so go to next endpoint
+								ohcist.hc_regs[HcControlCurrentED] = ohcist.endpoint_descriptor.nexted;
+							}
+						}
+						else {
+							// not enabled, so go to next endpoint
+							ohcist.hc_regs[HcControlCurrentED] = ohcist.endpoint_descriptor.nexted;
+						}
+						// one bulk every n control transfers
+						ohcist.interruptbulkratio--;
+						if (ohcist.interruptbulkratio <= 0) {
+							ohcist.interruptbulkratio = (ohcist.hc_regs[HcControl] & 3) + 1;
+							cont = false;
 						}
 					}
 				}
 				list = 2;
 			}
 			if (list == 2) {
-				// bulk
+				// bulk list
+				// check if bulk list active
 				if (ohcist.hc_regs[HcControl] & (1 << 5)) {
-					ohcist.hc_regs[HcCommandStatus] &= ~(1 << 2);
-					if (ohcist.hc_regs[HcControlCurrentED] == 0)
-						list = 0;
-					else if (ohcist.hc_regs[HcControl] & (1 << 4))
-						list = 1;
+					// if current endpoint descriptor is not 0 use it, otherwise ...
+					if (ohcist.hc_regs[HcBulkCurrentED] == 0) {
+						// ... check the filled bit ...
+						if (ohcist.hc_regs[HcCommandStatus] & (1 << 2)) {
+							// ... if 1 start processing from the head of the list
+							ohcist.hc_regs[HcBulkCurrentED] = ohcist.hc_regs[HcBulkHeadED];
+							// clear BLF (BulkListFilled)
+							ohcist.hc_regs[HcCommandStatus] &= ~(1 << 2);
+							// but if the list is empty, go to the next list
+							if (ohcist.hc_regs[HcBulkCurrentED] == 0)
+								cont = false;
+							else
+								cont = true;
+						}
+						else
+							cont = false;
+					}
 					else
-						list = 0;
+						cont = true;
+					if (cont == true) {
+						// service endpoint descriptor
+						usb_ohci_read_endpoint_descriptor(ohcist.hc_regs[HcBulkCurrentED]);
+						// only if it is not halted and not to be skipped
+						if (!(ohcist.endpoint_descriptor.h | ohcist.endpoint_descriptor.k)) {
+							// compare the Endpoint Descriptor TailPointer and NextTransferDescriptor fields.
+							if (ohcist.endpoint_descriptor.headp != ohcist.endpoint_descriptor.tailp) {
+								UINT32 a, b;
+								// set BLF (BulkListFilled)
+								ohcist.hc_regs[HcCommandStatus] |= (1 << 2);
+								// service transfer descriptor
+								usb_ohci_read_transfer_descriptor(ohcist.endpoint_descriptor.headp);
+								// get pid
+								if (ohcist.endpoint_descriptor.d == 1)
+									pid = OutPid; // out
+								else if (ohcist.endpoint_descriptor.d == 2)
+									pid = InPid; // in
+								else {
+									pid = ohcist.transfer_descriptor.dp; // 0 setup 1 out 2 in
+								}
+								// determine how much data to transfer
+								a = ohcist.transfer_descriptor.be & 0xfff;
+								b = ohcist.transfer_descriptor.cbp & 0xfff;
+								if ((ohcist.transfer_descriptor.be ^ ohcist.transfer_descriptor.cbp) & 0xfffff000)
+									a |= 0x1000;
+								remain = a - b + 1;
+								mps = ohcist.endpoint_descriptor.mps;
+								if (remain < mps)
+									mps = remain;
+								if (ohcist.transfer_descriptor.cbp == 0) {
+									remain = 0;
+									mps = 0;
+								}
+								b = ohcist.transfer_descriptor.cbp;
+								// if sending ...
+								if (pid != InPid) {
+									// ... get mps bytes
+									for (int c = 0; c < remain; c++) {
+										ohcist.buffer[c] = ohcist.space->read_byte(b);
+										b++;
+										if ((b & 0xfff) == 0)
+											b = ohcist.transfer_descriptor.be & 0xfffff000;
+									}
+								}
+								// should check for time available
+								// execute transaction
+								done = ohcist.ports[1].function->execute_transfer(ohcist.endpoint_descriptor.fa, ohcist.endpoint_descriptor.en, pid, ohcist.buffer, mps);
+								// if receiving ...
+								if (pid == InPid) {
+									// ... store done bytes
+									for (int c = 0; c < done; c++) {
+										ohcist.space->write_byte(b, ohcist.buffer[c]);
+										b++;
+										if ((b & 0xfff) == 0)
+											b = ohcist.transfer_descriptor.be & 0xfffff000;
+									}
+								}
+								// status writeback (CompletionCode field, DataToggleControl field, CurrentBufferPointer field, ErrorCount field)
+								ohcist.transfer_descriptor.cc = NoError;
+								ohcist.transfer_descriptor.t = (ohcist.transfer_descriptor.t ^ 1) | 2;
+								// if all data is transferred (or there was no data to transfer) cbp must be 0 ?
+								if (done == remain)
+									b = 0;
+								ohcist.transfer_descriptor.cbp = b;
+								ohcist.transfer_descriptor.ec = 0;
+								retire = false;
+								if ((done == mps) && (done == remain)) {
+									retire = true;
+								}
+								if ((done != mps) && (done <= remain))
+									retire = true;
+								if (done == 0)
+									retire = true;
+								if (retire == true) {
+									// retire transfer descriptor
+									a = ohcist.endpoint_descriptor.headp;
+									ohcist.endpoint_descriptor.headp = ohcist.transfer_descriptor.nexttd;
+									ohcist.transfer_descriptor.nexttd = ohcist.hc_regs[HcDoneHead];
+									ohcist.hc_regs[HcDoneHead] = a;
+									ohcist.endpoint_descriptor.c = ohcist.transfer_descriptor.t & 1;
+									if (ohcist.transfer_descriptor.di != 7) {
+										if (ohcist.transfer_descriptor.di < ohcist.writebackdonehadcounter)
+											ohcist.writebackdonehadcounter = ohcist.transfer_descriptor.di;
+									}
+									usb_ohci_writeback_transfer_descriptor(a);
+									usb_ohci_writeback_endpoint_descriptor(ohcist.hc_regs[HcBulkCurrentED]);
+								}
+								else {
+									usb_ohci_writeback_transfer_descriptor(ohcist.endpoint_descriptor.headp);
+								}
+							}
+							else {
+								// no transfer descriptors for this endpoint, so go to next endpoint
+								ohcist.hc_regs[HcBulkCurrentED] = ohcist.endpoint_descriptor.nexted;
+							}
+						}
+						else {
+							// not enabled, so go to next endpoint
+							ohcist.hc_regs[HcBulkCurrentED] = ohcist.endpoint_descriptor.nexted;
+						}
+					}
+					// go to the next list
+					if ((ohcist.hc_regs[HcCommandStatus] & (1 << 1)) && (ohcist.hc_regs[HcControl] & (1 << 4)))
+						list = 1; // go to control list if enabled and filled
+					else if ((ohcist.hc_regs[HcCommandStatus] & (1 << 2)) && (ohcist.hc_regs[HcControl] & (1 << 5)))
+						list = 2; // otherwise stai in bulk list if enabled and filled
+					else
+						list = 0; // if no control or bulk lists, go to periodic list
 				}
 			}
 		}
@@ -822,16 +968,277 @@ void xbox_base_state::usb_ohci_plug(int port, ohci_function_device *function)
 	}
 }
 
-static USBStandardDeviceDscriptor devdesc = {18,1,0x201,0xff,0x34,0x56,64,0x100,0x101,0x301,0,0,0,1};
-
-ohci_function_device::ohci_function_device()
+ohci_function_device::ohci_function_device(running_machine &machine)
 {
+	state = DefaultState;
+	descriptors = auto_alloc_array(machine, UINT8, 1024);
+	descriptors_pos = 0;
 	address = 0;
 	newaddress = 0;
-	controldirection = 0;
-	remain = 0;
-	position = nullptr;
+	for (int e = 0; e < 256;e++) {
+		endpoints[e].type = -1;
+		endpoints[e].controldirection = 0;
+		endpoints[e].controltype = 0;
+		endpoints[e].controlrecipient = 0;
+		endpoints[e].remain = 0;
+		endpoints[e].position = nullptr;
+	}
+	endpoints[0].type = ControlEndpoint;
 	settingaddress = false;
+	configurationvalue = 0;
+	selected_configuration = nullptr;
+	latest_configuration = nullptr;
+	latest_alternate = nullptr;
+}
+
+void ohci_function_device::add_device_descriptor(const USBStandardDeviceDescriptor &descriptor)
+{
+	UINT8 *p = descriptors + descriptors_pos;
+
+	p[0] = descriptor.bLength;
+	p[1] = descriptor.bDescriptorType;
+	p[2] = descriptor.bcdUSB & 255;
+	p[3] = descriptor.bcdUSB >> 8;
+	p[4] = descriptor.bDeviceClass;
+	p[5] = descriptor.bDeviceSubClass;
+	p[6] = descriptor.bDeviceProtocol;
+	p[7] = descriptor.bMaxPacketSize0;
+	p[8] = descriptor.idVendor & 255;
+	p[9] = descriptor.idVendor >> 8;
+	p[10] = descriptor.idProduct & 255;
+	p[11] = descriptor.idProduct >> 8;
+	p[12] = descriptor.bcdDevice & 255;
+	p[13] = descriptor.bcdDevice >> 8;
+	p[14] = descriptor.iManufacturer;
+	p[15] = descriptor.iProduct;
+	p[16] = descriptor.iSerialNumber;
+	p[17] = descriptor.bNumConfigurations;
+	descriptors_pos += descriptor.bLength;
+	memcpy(&device_descriptor, &descriptor, sizeof(USBStandardDeviceDescriptor));
+}
+
+void ohci_function_device::add_configuration_descriptor(const USBStandardConfigurationDescriptor &descriptor)
+{
+	usb_device_configuration *c = new usb_device_configuration;
+	UINT8 *p = descriptors + descriptors_pos;
+
+	p[0] = descriptor.bLength;
+	p[1] = descriptor.bDescriptorType;
+	p[2] = descriptor.wTotalLength & 255;
+	p[3] = descriptor.wTotalLength >> 8;
+	p[4] = descriptor.bNumInterfaces;
+	p[5] = descriptor.bConfigurationValue;
+	p[6] = descriptor.iConfiguration;
+	p[7] = descriptor.bmAttributes;
+	p[8] = descriptor.MaxPower;
+	c->position = p;
+	c->size = descriptor.bLength;
+	descriptors_pos += descriptor.bLength;
+	memcpy(&c->configuration_descriptor, &descriptor, sizeof(USBStandardConfigurationDescriptor));
+	configurations.push_front(c);
+	latest_configuration = c;
+	latest_alternate = nullptr;
+}
+
+void ohci_function_device::add_interface_descriptor(const USBStandardInterfaceDescriptor &descriptor)
+{
+	usb_device_interface *ii;
+	usb_device_interface_alternate *aa;
+	UINT8 *p = descriptors + descriptors_pos;
+
+	if (latest_configuration == nullptr)
+		return;
+	p[0] = descriptor.bLength;
+	p[1] = descriptor.bDescriptorType;
+	p[2] = descriptor.bInterfaceNumber;
+	p[3] = descriptor.bAlternateSetting;
+	p[4] = descriptor.bNumEndpoints;
+	p[5] = descriptor.bInterfaceClass;
+	p[6] = descriptor.bInterfaceSubClass;
+	p[7] = descriptor.bInterfaceProtocol;
+	p[8] = descriptor.iInterface;
+	descriptors_pos += descriptor.bLength;
+	latest_configuration->size += descriptor.bLength;
+	for (auto i = latest_configuration->interfaces.begin(); i != latest_configuration->interfaces.end(); ++i)
+	{
+		if ((*i)->alternate_settings.front()->interface_descriptor.bInterfaceNumber == descriptor.bInterfaceNumber)
+		{
+			(*i)->size += descriptor.bLength;
+			latest_configuration->interfaces.front()->size += descriptor.bLength;
+			aa = new usb_device_interface_alternate;
+			memcpy(&aa->interface_descriptor, &descriptor, sizeof(USBStandardInterfaceDescriptor));
+			aa->position = p;
+			aa->size = descriptor.bLength;
+			(*i)->alternate_settings.push_front(aa);
+			latest_alternate = aa;
+			return;
+		}
+	}
+	ii = new usb_device_interface;
+	aa = new usb_device_interface_alternate;
+	memcpy(&aa->interface_descriptor, &descriptor, sizeof(USBStandardInterfaceDescriptor));
+	aa->position = p;
+	aa->size = descriptor.bLength;
+	ii->position = p;
+	ii->size = descriptor.bLength;
+	ii->selected_alternate = -1;
+	ii->alternate_settings.push_front(aa);
+	latest_alternate = aa;
+	latest_configuration->interfaces.push_front(ii);
+}
+
+void ohci_function_device::add_endpoint_descriptor(const USBStandardEndpointDescriptor &descriptor)
+{
+	UINT8 *p = descriptors + descriptors_pos;
+
+	if (latest_alternate == nullptr)
+		return;
+	p[0] = descriptor.bLength;
+	p[1] = descriptor.bDescriptorType;
+	p[2] = descriptor.bEndpointAddress;
+	p[3] = descriptor.bmAttributes;
+	p[4] = descriptor.wMaxPacketSize & 255;
+	p[5] = descriptor.wMaxPacketSize >> 8;
+	p[6] = descriptor.bInterval;
+	descriptors_pos += descriptor.bLength;
+	latest_alternate->endpoint_descriptors.push_front(descriptor);
+	latest_alternate->size += descriptor.bLength;
+	latest_configuration->interfaces.front()->size += descriptor.bLength;
+	latest_configuration->size += descriptor.bLength;
+}
+
+void ohci_function_device::add_string_descriptor(const UINT8 *descriptor)
+{
+	usb_device_string *ss;
+	int len = descriptor[0];
+	UINT8 *p = descriptors + descriptors_pos;
+
+
+	ss = new usb_device_string;
+	memcpy(p, descriptor, len);
+	descriptors_pos += len;
+	ss->size = len;
+	ss->position = p;
+	device_strings.push_front(ss);
+	//latest_configuration->size += len;
+}
+
+void ohci_function_device::select_configuration(int index)
+{
+	configurationvalue = index;
+	for (auto c = configurations.begin(); c != configurations.end(); ++c)
+	{
+		if ((*c)->configuration_descriptor.bConfigurationValue == index)
+		{
+			selected_configuration = *c;
+			// by default, activate alternate setting 0 in each interface
+			for (auto i = (*c)->interfaces.begin(); i != (*c)->interfaces.end(); ++i)
+			{
+				(*i)->selected_alternate = 0;
+				for (auto a = (*i)->alternate_settings.begin(); a != (*i)->alternate_settings.end(); ++a)
+				{
+					if ((*a)->interface_descriptor.bAlternateSetting == 0)
+					{
+						// activate the endpoints in interface i alternate setting 0
+						for (auto e = (*a)->endpoint_descriptors.begin(); e != (*a)->endpoint_descriptors.end(); ++e)
+						{
+							endpoints[e->bEndpointAddress].type = e->bmAttributes & 3;
+							endpoints[e->bEndpointAddress].remain = 0;
+						}
+						break;
+					}
+				}
+			}
+			break;
+		}
+	}
+}
+
+void ohci_function_device::select_alternate(int interfacei, int index)
+{
+	// among all the interfaces in the currently selected configuration, consider interface interfacei
+	for (auto i = selected_configuration->interfaces.begin(); i != selected_configuration->interfaces.end(); ++i)
+	{
+		// deactivate the endpoints in the currently selected alternate setting for interface interfacei
+		for (auto a = (*i)->alternate_settings.begin(); a != (*i)->alternate_settings.end(); ++a)
+		{
+			if (((*a)->interface_descriptor.bInterfaceNumber == interfacei) && ((*a)->interface_descriptor.bAlternateSetting == (*i)->selected_alternate))
+			{
+				for (auto e = (*a)->endpoint_descriptors.begin(); e != (*a)->endpoint_descriptors.end(); ++e)
+				{
+					endpoints[e->bEndpointAddress].type = -1;
+				}
+				break;
+			}
+		}
+		// activate the endpoints in the newly selected alternate setting
+		for (auto a = (*i)->alternate_settings.begin(); a != (*i)->alternate_settings.end(); ++a)
+		{
+			if (((*a)->interface_descriptor.bInterfaceNumber == interfacei) && ((*a)->interface_descriptor.bAlternateSetting == index))
+			{
+				(*i)->selected_alternate = index;
+				for (auto e = (*a)->endpoint_descriptors.begin(); e != (*a)->endpoint_descriptors.end(); ++e)
+				{
+					endpoints[e->bEndpointAddress].type = e->bmAttributes & 3;
+					endpoints[e->bEndpointAddress].remain = 0;
+				}
+				break;
+			}
+		}
+	}
+}
+
+int ohci_function_device::find_alternate(int interfacei)
+{
+	// find the active alternate setting for interface inteerfacei
+	for (auto i = selected_configuration->interfaces.begin(); i != selected_configuration->interfaces.end(); ++i)
+	{
+		for (auto a = (*i)->alternate_settings.begin(); a != (*i)->alternate_settings.end(); ++a)
+		{
+			if ((*a)->interface_descriptor.bInterfaceNumber == interfacei)
+			{
+				return (*i)->selected_alternate;
+			}
+		}
+	}
+	return 0;
+}
+
+UINT8 *ohci_function_device::position_device_descriptor(int &size)
+{
+	size = descriptors_pos; // descriptors[0];
+	return descriptors;
+}
+
+UINT8 *ohci_function_device::position_configuration_descriptor(int index, int &size)
+{
+	for (auto c = configurations.begin(); c != configurations.end(); ++c)
+	{
+		if ((*c)->configuration_descriptor.bConfigurationValue == (index + 1))
+		{
+			size = (*c)->size;
+			return (*c)->position;
+		}
+	}
+	size = 0;
+	return nullptr;
+}
+
+UINT8 *ohci_function_device::position_string_descriptor(int index, int &size)
+{
+	int i = 0;
+
+	for (auto s = device_strings.begin(); s != device_strings.end(); ++s)
+	{
+		if (index == i)
+		{
+			size = (*s)->size;
+			return (*s)->position;
+		}
+		i++;
+	}
+	size = 0;
+	return nullptr;
 }
 
 void ohci_function_device::execute_reset()
@@ -842,94 +1249,278 @@ void ohci_function_device::execute_reset()
 
 int ohci_function_device::execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size)
 {
-	if (endpoint == 0) {
-		if (pid == SetupPid) {
-			struct USBSetupPacket *p=(struct USBSetupPacket *)buffer;
-			// define direction 0:host->device 1:device->host
-			controldirection = (p->bmRequestType & 128) >> 7;
-			// case ==1, IN data stage and OUT status stage
-			// case ==0, OUT data stage and IN status stage
-			// data stage is optional, IN status stage
-			controltype = (p->bmRequestType & 0x60) >> 5;
-			controlrecipient = p->bmRequestType & 0x1f;
-			position = nullptr;
-			remain = p->wLength;
-			// if standard
-			if (controltype == 0) {
+	int descriptortype, descriptorindex;
+
+	if (pid == SetupPid) {
+		USBSetupPacket *p=(USBSetupPacket *)buffer;
+		// define direction 0:host->device 1:device->host
+		// case == 1, IN data stage and OUT status stage
+		// case == 0, OUT data stage and IN status stage
+		// data stage is optional, IN status stage
+		endpoints[endpoint].controldirection = (p->bmRequestType & 128) >> 7;
+		endpoints[endpoint].controltype = (p->bmRequestType & 0x60) >> 5;
+		endpoints[endpoint].controlrecipient = p->bmRequestType & 0x1f;
+		if (endpoint == 0) {
+			endpoints[endpoint].position = nullptr;
+			// number of byte to transfer in data stage (0 no data stage)
+			endpoints[endpoint].remain = p->wLength;
+			// if standard device request
+			if ((endpoints[endpoint].controltype == StandardType) && (endpoints[endpoint].controlrecipient == DeviceRecipient)) {
 				switch (p->bRequest) {
 				case GET_STATUS:
+					return handle_get_status_request(endpoint, p);
+					break;
 				case CLEAR_FEATURE:
+					return handle_clear_feature_request(endpoint, p);
+					break;
 				case SET_FEATURE:
+					return handle_set_feature_request(endpoint, p);
 					break;
 				case SET_ADDRESS:
 					newaddress = p->wValue;
 					settingaddress = true;
 					break;
 				case GET_DESCRIPTOR:
-					if ((p->wValue >> 8) == DEVICE) { // device descriptor
-						//p->wValue & 255;
-						position = (UINT8 *)&devdesc;
-						remain = sizeof(devdesc);
+					descriptortype = p->wValue >> 8;
+					descriptorindex = p->wValue & 255;
+					if (descriptortype == DEVICE) { // device descriptor
+						endpoints[endpoint].position = position_device_descriptor(endpoints[endpoint].remain);
 					}
-					else if ((p->wValue >> 8) == CONFIGURATION) { // configuration descriptor
-						remain = 0;
+					else if (descriptortype == CONFIGURATION) { // configuration descriptor
+						endpoints[endpoint].position = position_configuration_descriptor(descriptorindex, endpoints[endpoint].remain);
 					}
-					if (remain > p->wLength)
-						remain = p->wLength;
+					else if (descriptortype == STRING) { // string descriptor
+						//p->wIndex; language id
+						endpoints[endpoint].position = position_string_descriptor(descriptorindex, endpoints[endpoint].remain);
+					}
+					else
+						endpoints[endpoint].remain = 0;
+					if (endpoints[endpoint].remain > p->wLength)
+						endpoints[endpoint].remain = p->wLength;
+					break;
+				case SET_CONFIGURATION:
+					if (p->wValue == 0)
+						state = AddressState;
+					else {
+						select_configuration(p->wValue);
+						state = ConfiguredState;
+					}
+					break;
+				case SET_INTERFACE:
+					select_alternate(p->wIndex, p->wValue);
 					break;
 				case SET_DESCRIPTOR:
+					return handle_set_descriptor_request(endpoint, p);
+					break;
 				case GET_CONFIGURATION:
-				case SET_CONFIGURATION:
+					endpoints[endpoint].buffer[0] = (UINT8)configurationvalue;
+					endpoints[endpoint].position = endpoints[endpoint].buffer;
+					endpoints[endpoint].remain = 1;
+					if (p->wLength == 0)
+						endpoints[endpoint].remain = 0;
+					break;
 				case GET_INTERFACE:
-				case SET_INTERFACE:
+					endpoints[endpoint].buffer[0] = (UINT8)find_alternate(p->wIndex);
+					endpoints[endpoint].position = endpoints[endpoint].buffer;
+					endpoints[endpoint].remain = 1;
+					if (p->wLength == 0)
+						endpoints[endpoint].remain = 0;
+					break;
 				case SYNCH_FRAME:
+					return handle_synch_frame_request(endpoint, p);
 				default:
+					return handle_nonstandard_request(endpoint, p);
 					break;
 				}
 			}
+			else
+				return handle_nonstandard_request(endpoint, p);
+			size = 0;
 		}
-		else if (pid == InPid) {
+		else
+			return handle_nonstandard_request(endpoint, p);
+	}
+	else if (pid == InPid) {
+		if (endpoint == 0) {
 			// if no data has been transferred (except for the setup stage)
 			// and the lenght of this IN transaction is 0
 			// assume this is the status stage
-			if (size == 0) {
+			if ((size == 0) && (endpoints[endpoint].remain == 0)) {
 				if (settingaddress == true)
 				{
 					// set of address is active at end of status stage
 					address = newaddress;
 					settingaddress = false;
+					state = AddressState;
 				}
 				return 0;
 			}
 			// case ==1, give data
 			// case ==0, nothing
 			// if device->host
-			if (controldirection == 1) {
+			if (endpoints[endpoint].controldirection == DeviceToHost) {
 				// data stage
-				if (size > remain)
-					size = remain;
-				if (position != nullptr)
-					memcpy(buffer, position, size);
-				position = position + size;
-				remain = remain - size;
+				if (size > endpoints[endpoint].remain)
+					size = endpoints[endpoint].remain;
+				if (endpoints[endpoint].position != nullptr)
+					memcpy(buffer, endpoints[endpoint].position, size);
+				endpoints[endpoint].position = endpoints[endpoint].position + size;
+				endpoints[endpoint].remain = endpoints[endpoint].remain - size;
 			}
 		}
-		else if (pid == OutPid) {
+		else
+			return -1;
+	}
+	else if (pid == OutPid) {
+		if (endpoint == 0) {
 			// case ==1, nothing
 			// case ==0, give data
 			// if host->device
-			if (controldirection == 0) {
+			if (endpoints[endpoint].controldirection == HostToDevice) {
 				// data stage
-				if (size > remain)
-					size = remain;
-				if (position != nullptr)
-					memcpy(position, buffer, size);
-				position = position + size;
-				remain = remain - size;
+				if (size > endpoints[endpoint].remain)
+					size = endpoints[endpoint].remain;
+				if (endpoints[endpoint].position != nullptr)
+					memcpy(endpoints[endpoint].position, buffer, size);
+				endpoints[endpoint].position = endpoints[endpoint].position + size;
+				endpoints[endpoint].remain = endpoints[endpoint].remain - size;
+			}
+		}
+		else
+			return -1;
+	}
+	return size;
+}
+
+const USBStandardDeviceDescriptor ohci_game_controller_device::devdesc = { 18,1,0x110,0x00,0x00,0x00,64,0x45e,0x202,0x100,0,0,0,1 };
+const USBStandardConfigurationDescriptor ohci_game_controller_device::condesc = { 9,2,0x20,1,1,0,0x80,50 };
+const USBStandardInterfaceDescriptor ohci_game_controller_device::intdesc = { 9,4,0,0,2,0x58,0x42,0,0 };
+const USBStandardEndpointDescriptor ohci_game_controller_device::enddesc82 = { 7,5,0x82,3,0x20,4 };
+const USBStandardEndpointDescriptor ohci_game_controller_device::enddesc02 = { 7,5,0x02,3,0x20,4 };
+
+ohci_game_controller_device::ohci_game_controller_device(running_machine &machine) :
+	ohci_function_device(machine)
+{
+	add_device_descriptor(devdesc);
+	add_configuration_descriptor(condesc);
+	add_interface_descriptor(intdesc);
+	add_endpoint_descriptor(enddesc82);
+	add_endpoint_descriptor(enddesc02);
+}
+
+int ohci_game_controller_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
+{
+	//                              >=8  ==42  !=0  !=0  1,3       2<20 <=20
+	const UINT8 mytestdata[16] = { 0x10,0x42 ,0x32,0x43,1   ,0x65,0x18,0x20,0x98,0xa9,0xba,0xcb,0xdc,0xed,0xfe };
+
+	if (endpoint != 0)
+		return -1;
+	if ((endpoints[endpoint].controltype == VendorType) && (endpoints[endpoint].controlrecipient == InterfaceRecipient))
+	{
+		if (setup->bRequest == GET_DESCRIPTOR)
+		{
+			if (setup->wValue == 0x4200)
+			{
+				endpoints[endpoint].position = (UINT8 *)mytestdata;
+				endpoints[endpoint].remain = 16;
+				return 0;
 			}
 		}
 	}
-	return size;
+	return -1;
+}
+
+//ic10
+const USBStandardDeviceDescriptor ohci_hlean2131qc_device::devdesc = { 0x12,0x01,0x0100,0x60,0x00,0x00,0x40,0x0CA3,0x0002,0x0108,0x01,0x02,0x00,0x01 };
+const USBStandardConfigurationDescriptor ohci_hlean2131qc_device::condesc = { 0x09,0x02,0x0058,0x01,0x01,0x00,0x80,0x96 };
+const USBStandardInterfaceDescriptor ohci_hlean2131qc_device::intdesc = { 0x09,0x04,0x00,0x00,0x0A,0xFF,0x00,0x00,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc01 = { 0x07,0x05,0x01,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc02 = { 0x07,0x05,0x02,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc03 = { 0x07,0x05,0x03,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc04 = { 0x07,0x05,0x04,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc05 = { 0x07,0x05,0x05,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc81 = { 0x07,0x05,0x81,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc82 = { 0x07,0x05,0x82,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc83 = { 0x07,0x05,0x83,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc84 = { 0x07,0x05,0x84,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc85 = { 0x07,0x05,0x85,0x02,0x0040,0x00 };
+const UINT8 ohci_hlean2131qc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
+const UINT8 ohci_hlean2131qc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
+const UINT8 ohci_hlean2131qc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x03,0xFF,0x0B };
+
+ohci_hlean2131qc_device::ohci_hlean2131qc_device(running_machine &machine) :
+	ohci_function_device(machine)
+{
+	add_device_descriptor(devdesc);
+	add_configuration_descriptor(condesc);
+	add_interface_descriptor(intdesc);
+	add_endpoint_descriptor(enddesc81);
+	add_endpoint_descriptor(enddesc82);
+	add_endpoint_descriptor(enddesc83);
+	add_endpoint_descriptor(enddesc84);
+	add_endpoint_descriptor(enddesc85);
+	add_endpoint_descriptor(enddesc01);
+	add_endpoint_descriptor(enddesc02);
+	add_endpoint_descriptor(enddesc03);
+	add_endpoint_descriptor(enddesc04);
+	add_endpoint_descriptor(enddesc05);
+	add_string_descriptor(strdesc0);
+	add_string_descriptor(strdesc1);
+	add_string_descriptor(strdesc2);
+}
+
+int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
+{
+	if (endpoint != 0)
+		return -1;
+	for (int n = 0; n < setup->wLength; n++)
+		endpoints[endpoint].buffer[n] = 0xa0 ^ n;
+	endpoints[endpoint].buffer[0] = 0;
+	endpoints[endpoint].position = endpoints[endpoint].buffer;
+	endpoints[endpoint].remain = setup->wLength;
+	return 0;
+}
+
+//pc20
+const USBStandardDeviceDescriptor ohci_hlean2131sc_device::devdesc = { 0x12,0x01,0x0100,0x60,0x01,0x00,0x40,0x0CA3,0x0003,0x0110,0x01,0x02,0x00,0x01 };
+const USBStandardConfigurationDescriptor ohci_hlean2131sc_device::condesc = { 0x09,0x02,0x003C,0x01,0x01,0x00,0x80,0x96 };
+const USBStandardInterfaceDescriptor ohci_hlean2131sc_device::intdesc = { 0x09,0x04,0x00,0x00,0x06,0xFF,0x00,0x00,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc01 = { 0x07,0x05,0x01,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc02 = { 0x07,0x05,0x02,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc03 = { 0x07,0x05,0x03,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc81 = { 0x07,0x05,0x81,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc82 = { 0x07,0x05,0x82,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc83 = { 0x07,0x05,0x83,0x02,0x0040,0x00 };
+const UINT8 ohci_hlean2131sc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
+const UINT8 ohci_hlean2131sc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
+const UINT8 ohci_hlean2131sc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x00,0x44,0x00 };
+
+ohci_hlean2131sc_device::ohci_hlean2131sc_device(running_machine &machine) :
+	ohci_function_device(machine)
+{
+	add_device_descriptor(devdesc);
+	add_configuration_descriptor(condesc);
+	add_interface_descriptor(intdesc);
+	add_endpoint_descriptor(enddesc81);
+	add_endpoint_descriptor(enddesc82);
+	add_endpoint_descriptor(enddesc83);
+	add_endpoint_descriptor(enddesc01);
+	add_endpoint_descriptor(enddesc02);
+	add_endpoint_descriptor(enddesc03);
+	add_string_descriptor(strdesc0);
+	add_string_descriptor(strdesc1);
+	add_string_descriptor(strdesc2);
+}
+
+int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
+{
+	if (endpoint != 0)
+		return -1;
+	for (int n = 0; n < setup->wLength; n++)
+		endpoints[endpoint].buffer[n] = 0xa0 ^ n;
+	endpoints[endpoint].position = endpoints[endpoint].buffer;
+	endpoints[endpoint].remain = setup->wLength;
+	return 0;
 }
 
 void xbox_base_state::usb_ohci_interrupts()
@@ -1135,8 +1726,8 @@ WRITE32_MEMBER(xbox_base_state::audio_apu_w)
 		return;
 	}
 	if (offset == 0x2037c / 4) { // value related to sample rate
-		INT16 v = (INT16)(data >> 16); // upper 16 bits as a signed 16 bit value
-		float vv = ((float)v) / 4096.0f; // divide by 4096
+		INT16 v0 = (INT16)(data >> 16); // upper 16 bits as a signed 16 bit value
+		float vv = ((float)v0) / 4096.0f; // divide by 4096
 		float vvv = powf(2, vv); // two to the vv
 		int f = vvv*48000.0f; // sample rate
 		apust.voices_frequency[apust.voice_number] = f;
@@ -1331,11 +1922,7 @@ READ8_MEMBER(xbox_base_state::get_slave_ack)
 IRQ_CALLBACK_MEMBER(xbox_base_state::irq_callback)
 {
 	int r = 0;
-	r = xbox_base_devs.pic8259_2->acknowledge();
-	if (r == 0)
-	{
-		r = xbox_base_devs.pic8259_1->acknowledge();
-	}
+	r = xbox_base_devs.pic8259_1->acknowledge();
 	if (debug_irq_active)
 		debug_generate_irq(debug_irq_number, false);
 	return r;
@@ -1521,7 +2108,7 @@ WRITE8_MEMBER(xbox_base_state::superio_write)
 			superiost.configuration_mode = true;
 		return;
 	}
-	if ((offset == 0) && (data == 0xaa)) 
+	if ((offset == 0) && (data == 0xaa))
 	{
 		// config port 0x2e
 		superiost.configuration_mode = false;
@@ -1543,7 +2130,7 @@ WRITE8_MEMBER(xbox_base_state::superio_write)
 		{
 			superiost.registers[superiost.selected][superiost.index] = data;
 			//if ((superiost.selected == 4) && (superiost.index == 0x30) && (data != 0))
-			//	; // add handlers 0x3f8- +7
+			//  ; // add handlers 0x3f8- +7
 		}
 	}
 }
@@ -1588,6 +2175,12 @@ ADDRESS_MAP_END
 
 void xbox_base_state::machine_start()
 {
+#ifdef USB_ENABLED
+	//ohci_game_controller_device *usb_device;
+	ohci_hlean2131qc_device *usb_device;
+	//ohci_hlean2131sc_device *usb_device;
+#endif
+
 	nvidia_nv2a = std::make_unique<nv2a_renderer>(machine());
 	memset(pic16lc_buffer, 0, sizeof(pic16lc_buffer));
 	pic16lc_buffer[0] = 'B';
@@ -1626,7 +2219,10 @@ void xbox_base_state::machine_start()
 	ohcist.space = &m_maincpu->space();
 	ohcist.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xbox_base_state::usb_ohci_timer), this), (void *)"USB OHCI Timer");
 	ohcist.timer->enable(false);
-	usb_ohci_plug(1, new ohci_function_device()); // test connect
+	//usb_device = new ohci_game_controller_device(machine());
+	usb_device = new ohci_hlean2131qc_device(machine());
+	//usb_device = new ohci_hlean2131sc_device(machine());
+	usb_ohci_plug(1, usb_device); // test connect
 #endif
 	memset(&superiost, 0, sizeof(superiost));
 	superiost.configuration_mode = false;
