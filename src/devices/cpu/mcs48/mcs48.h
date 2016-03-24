@@ -8,7 +8,6 @@
 
     Copyright Mirko Buffoni
     Based on the original work Copyright Dan Boris, an 8048 emulator
-    You are not allowed to distribute this software commercially
 
 ***************************************************************************/
 
