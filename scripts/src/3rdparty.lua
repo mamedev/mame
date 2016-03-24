@@ -761,6 +761,7 @@ end
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",
 		"__STDC_CONSTANT_MACROS",
+		"BGFX_CONFIG_MAX_FRAME_BUFFERS=128",
 	}
 	files {
 		MAME_DIR .. "3rdparty/bgfx/src/bgfx.cpp",
