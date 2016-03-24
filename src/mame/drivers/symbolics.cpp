@@ -282,7 +282,7 @@ ROM_START( s3670 )
 		LBAAR.4           @A12 <- 4887235 page 625 has LBAAR rev4, pal16l8
 		LBPAR.4A          @A13 <- 4887235 page 624 has LBPAR rev9, pal16l8
 		PROCA.4  pal16R8A @A25 <- 4887235 page 621 has PROCA rev8, pal16r8
-		HSADR.4  pal1???? @C4  <- 4887235 page 626 has LBPAR rev9, pal16r4
+		HSADR.4  pal1???? @C4  <- 4887235 page 626 has HSADR rev9, pal16r4
 		DYNMEM.5 pal16R8A @C20 <- 4887235 page 627 has DYNMEM rev15, pal16r8
 		PCDYNCTL          @C21 <- 4887235 page 628 has DYNCTL rev7, pal16l8
 		REQSEL.4A         @C22 <- 4887235 page 620 has REQSEL rev28, pal16l8
