@@ -2583,7 +2583,15 @@ float render_manager::ui_aspect(render_container *rc)
 
 		// if we have a valid pixel aspect, apply that and return
 		if (m_ui_target->pixel_aspect() != 0.0f)
-				aspect /= m_ui_target->pixel_aspect();
+		{
+			float pixel_aspect = m_ui_target->pixel_aspect();
+
+			if (orient & ORIENTATION_SWAP_XY)
+				pixel_aspect = 1.0f / pixel_aspect;
+
+			return aspect /= pixel_aspect;
+		}
+
 	} else {
 		// single screen container
 
