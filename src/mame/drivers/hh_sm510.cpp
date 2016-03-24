@@ -44,6 +44,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(input_r);
 	virtual DECLARE_WRITE8_MEMBER(input_w);
 	virtual DECLARE_WRITE16_MEMBER(lcd_segment_w);
+	virtual DECLARE_WRITE8_MEMBER(sm511_melody_w);
 
 protected:
 	virtual void machine_start() override;
@@ -138,6 +139,17 @@ READ8_MEMBER(hh_sm510_state::input_r)
 {
 	return read_inputs(m_inp_lines);
 }
+
+
+// other generic output handlers
+
+WRITE8_MEMBER(hh_sm510_state::sm511_melody_w)
+{
+	// SM511 R pin is melody output
+	m_speaker->level_w(data & 1);
+}
+
+
 
 
 
@@ -240,17 +252,7 @@ public:
 	{
 		m_inp_lines = 3;
 	}
-
-	DECLARE_WRITE8_MEMBER(speaker_w);
 };
-
-// handlers
-
-WRITE8_MEMBER(ktmnt_state::speaker_w)
-{
-	m_speaker->level_w(data >> 0 & 1);
-}
-
 
 // config
 
@@ -283,7 +285,69 @@ static MACHINE_CONFIG_START( ktmnt, ktmnt_state )
 	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(ktmnt_state, speaker_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, sm511_melody_w))
+
+	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Konami Contra
+  * Sharp SM511
+
+***************************************************************************/
+
+class kcontra_state : public hh_sm510_state
+{
+public:
+	kcontra_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 3;
+	}
+};
+
+// config
+
+static INPUT_PORTS_START( kcontra )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
+
+	PORT_START("IN.1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
+
+	PORT_START("IN.2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL) // on
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( kcontra, kcontra_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
+	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, sm511_melody_w))
 
 	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
 
@@ -385,6 +449,15 @@ ROM_START( ktmnt )
 ROM_END
 
 
+ROM_START( kcontra )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "contra.bin", 0x0000, 0x1000, CRC(5496d84a) SHA1(7e31f8ff8037a1a9ec510798c2197d55a8e9799a) )
+
+	ROM_REGION( 0x100, "maincpu:music", 0 )
+	ROM_LOAD( "contra_tones.bin", 0x000, 0x100, CRC(e678a199) SHA1(beff871b0aa52690f0fe456401ca75abb746a5cc) )
+ROM_END
+
+
 ROM_START( gnwmndon )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dm53_cms54c_565", 0x0000, 0x1000, CRC(e21fc0f5) SHA1(3b65ccf9f98813319410414e11a3231b787cdee6) )
@@ -395,5 +468,6 @@ ROM_END
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1989, ktopgun,   0,        0, ktopgun,   ktopgun,   driver_device, 0, "Konami", "Top Gun (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
 CONS( 1989, ktmnt,     0,        0, ktmnt,     ktmnt,     driver_device, 0, "Konami", "Teenage Mutant Ninja Turtles (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1989, kcontra,   0,        0, kcontra,   kcontra,   driver_device, 0, "Konami", "Contra (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
 
 CONS( 1982, gnwmndon,  0,        0, gnwmndon,  gnwmndon,  driver_device, 0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
