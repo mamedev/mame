@@ -301,68 +301,6 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Konami Contra
-  * Sharp SM511
-
-***************************************************************************/
-
-class kcontra_state : public hh_sm510_state
-{
-public:
-	kcontra_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_sm510_state(mconfig, type, tag)
-	{
-		m_inp_lines = 3;
-	}
-};
-
-// config
-
-static INPUT_PORTS_START( kcontra )
-	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
-
-	PORT_START("IN.1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
-
-	PORT_START("IN.2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL) // on
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
-INPUT_PORTS_END
-
-static MACHINE_CONFIG_START( kcontra, kcontra_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, sm511_melody_w))
-
-	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
-
-
-
-
-
-/***************************************************************************
-
   Nintendo Game & Watch: Mickey & Donald (model DM-53)
   * PCB label DM-53
   * Sharp SM510 label DM-53 (die label CMS54C, CMS565)
@@ -451,10 +389,10 @@ ROM_END
 
 ROM_START( kcontra )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "contra.bin", 0x0000, 0x1000, CRC(5496d84a) SHA1(7e31f8ff8037a1a9ec510798c2197d55a8e9799a) )
+	ROM_LOAD( "bh002_c.prog", 0x0000, 0x1000, BAD_DUMP CRC(5496d84a) SHA1(7e31f8ff8037a1a9ec510798c2197d55a8e9799a) ) // from patent US5120057, may have errors
 
 	ROM_REGION( 0x100, "maincpu:music", 0 )
-	ROM_LOAD( "contra_tones.bin", 0x000, 0x100, CRC(e678a199) SHA1(beff871b0aa52690f0fe456401ca75abb746a5cc) )
+	ROM_LOAD( "bh002_c.music", 0x000, 0x100, CRC(e678a199) SHA1(beff871b0aa52690f0fe456401ca75abb746a5cc) )
 ROM_END
 
 
@@ -466,8 +404,8 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1989, ktopgun,   0,        0, ktopgun,   ktopgun,   driver_device, 0, "Konami", "Top Gun (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
-CONS( 1989, ktmnt,     0,        0, ktmnt,     ktmnt,     driver_device, 0, "Konami", "Teenage Mutant Ninja Turtles (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
-CONS( 1989, kcontra,   0,        0, kcontra,   kcontra,   driver_device, 0, "Konami", "Contra (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1989, kcontra,   0,        0, ktmnt,     ktopgun,   driver_device, 0, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1989, ktopgun,   0,        0, ktopgun,   ktopgun,   driver_device, 0, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1989, ktmnt,     0,        0, ktmnt,     ktmnt,     driver_device, 0, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
 
 CONS( 1982, gnwmndon,  0,        0, gnwmndon,  gnwmndon,  driver_device, 0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
