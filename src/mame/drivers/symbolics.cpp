@@ -175,6 +175,8 @@ Soft reset
 [:maincpu] ':maincpu' (006B60): unmapped program memory write to FFFFFE = FFFF & FFFF "
 [:maincpu] ':maincpu' (00A2AA): unmapped program memory read from FF00B0 & FF00 
 
+currently dies at context switch code loaded to ram around 38EE0, see patent 4887235 pages 441/442
+
 */
 
 static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, symbolics_state )
@@ -276,31 +278,31 @@ ROM_START( s3670 )
 	/*
 		LBBUFA.4 mb7124   @A6
 		LBBUFB.4 mb7124   @A7
-		LBBUFC.4 mb7124   @A9
-		LBAAR.4           @A12
-		LBPAR.4A          @A13
-		PROCA.4  pal16R8A @A25
-		HSADR.4  pal1???? @C4
-		DYNMEM.5 pal16R8A @C20
-		PCDYNCTL          @C21
-		REQSEL.4A         @C22
-		DY2ACK   pal16L8A @C23
-		PROC.4   pal?     @C25
-		UDMAHA.4 pal?     @D3
+		LBBUFC.4 mb7124   @A9 <- 4887235 page 630 has LBBUFC.UCODE rev27
+		LBAAR.4           @A12 <- 4887235 page 625 has LBAAR rev4, pal16l8
+		LBPAR.4A          @A13 <- 4887235 page 624 has LBPAR rev9, pal16l8
+		PROCA.4  pal16R8A @A25 <- 4887235 page 621 has PROCA rev8, pal16r8
+		HSADR.4  pal1???? @C4  <- 4887235 page 626 has LBPAR rev9, pal16r4
+		DYNMEM.5 pal16R8A @C20 <- 4887235 page 627 has DYNMEM rev15, pal16r8
+		PCDYNCTL          @C21 <- 4887235 page 628 has DYNCTL rev7, pal16l8
+		REQSEL.4A         @C22 <- 4887235 page 620 has REQSEL rev28, pal16l8
+		DV2ACK   pal16L8A @C23 <- 4887235 page 629 has DEVACK rev?, pal16l8 <- controls fep mem map; this is DIFFERENT between FEP v24 (DEVACK) and NFEP v127 (DV2ACK)
+		PROC.4   pal?     @C25 <- 4887235 page 622 has PROC rev4, pal16l8
+		UDMAHA.4 pal?     @D3 <- 4887235 page 619 has UDMAHA rev2, pal16l8
 		FEP 4642 16pprom? @D5 <- this is the serial number of the FEP board stored in a prom, readable at one of the local-io addresses
-		HRSQ.4   pal      @D6
+		HSRQ.4   pal      @D6 <- 4887235 page 626 has HSRQ rev?, pal16l8
 		d7, d8, d10 are eproms, see above
 		d11 is empty socket marked 2764
 		d13, d14, d16 are eproms, see above
 		d17 is empty socket marked 2764
-		?DVZNUR?          @E21 <- unreadable label, recheck!
-		LDBD.4   pal16L8A @G18
-		PAGTAG.5          @H20
-		UDMABC.4 pal      @I4
-		SERDMA.4          @I8
-		SERIAB.4          @I9
-		LBARB.4           @I18
-		SERCTL.4          @K6
+		DV2NUM            @E21 <- 4887235 page 629 has DEVNUM rev8, pal16l8 <- controls fep mem map; this is DIFFERENT between FEP v24 (DEVNUM) and NFEP v127 (DV2NUM)
+		LBBD.4   pal16L8A @G18 <- 4887235 page 624 has LBBD rev6, pal16l8
+		PAGTAG.5          @H20 <- 4887235 page 623 has PAGTAG rev5, pal16l8
+		UDMABC.4 pal      @I4 <- 4887235 page 619 has UDMABC rev3, pal16l8
+		SERDMA.4          @I8 <- 4887235 page 620 has SERDMA rev8, pal16l8
+		SERIAB.4          @I9 <- 4887235 page 620 has SERIAB rev2, pal16l8
+		LBARB.4           @I18 <- 4887235 page 625 has LBARB rev1, pal16l8
+		SERCTL.4          @K6 <- 4887235 page 620 has SERCTL rev4, pal16l8
 	*/
 	ROM_REGION16_BE( 0x20000, "fepdram", ROMREGION_ERASEFF )
 ROM_END
