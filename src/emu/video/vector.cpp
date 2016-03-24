@@ -332,18 +332,16 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		}
 		else
 		{
-			float beam_intensity_width = m_beam_width_min;
-
 			float intensity = (float)curpoint->intensity / 255.0f;
+			float intensity_weight = normalized_sigmoid(intensity, m_beam_intensity_weight);
 
-			// check for dynamic intensity
-			if (m_min_intensity != m_max_intensity)
-			{
-				float intensity_weight = normalized_sigmoid(intensity, m_beam_intensity_weight);
-				beam_intensity_width = (m_beam_width_max - m_beam_width_min) * intensity_weight + m_beam_width_min;
-			}
+			// check for static intensity
+			float beam_width = m_min_intensity == m_max_intensity
+				? m_beam_width_min
+				: m_beam_width_min + intensity_weight * (m_beam_width_max - m_beam_width_min);
 
-			float beam_width = beam_intensity_width * (1.0f / (float)VECTOR_WIDTH_DENOM);
+			// normalize width
+			beam_width *= 1.0f / (float)VECTOR_WIDTH_DENOM;
 
 			coords.x0 = ((float)lastx - xoffs) * xscale;
 			coords.y0 = ((float)lasty - yoffs) * yscale;
@@ -365,16 +363,14 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			// extend vector line by 3/8 beam_width on both sides
 			else
 			{
-				xdistance *= xratio;
-				ydistance *= yratio;
 				float length = sqrt(xdistance * xdistance + ydistance * ydistance);
 				float xdirection = xdistance / length;
 				float ydirection = ydistance / length;
 
-				coords.x0 += xratio * beam_width * 0.375f * xdirection;
-				coords.y0 += yratio * beam_width * 0.375f * ydirection;
-				coords.x1 -= xratio * beam_width * 0.375f * xdirection;
-				coords.y1 -= yratio * beam_width * 0.375f * ydirection;
+				coords.x0 += xratio * beam_width * 0.375f * (xdirection / xratio);
+				coords.y0 += yratio * beam_width * 0.375f * (ydirection / yratio);
+				coords.x1 -= xratio * beam_width * 0.375f * (xdirection / xratio);
+				coords.y1 -= yratio * beam_width * 0.375f * (ydirection / yratio);
 			}
 
 			if (curpoint->intensity != 0 && !render_clip_line(&coords, &clip))
