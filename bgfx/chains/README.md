@@ -1,4 +1,4 @@
-# **Tests** #
+# **BGFX shader chains** #
 
 Cointains definitions for BGFX shader chains
 
