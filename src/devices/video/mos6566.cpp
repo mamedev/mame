@@ -1,17 +1,11 @@
-// license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// license:GPL-2.0+
+// copyright-holders:Curt Coder,Christian Bauer
 /***************************************************************************
 
     MOS 6566/6567/6569 Video Interface Chip (VIC-II) emulation
 
     A part of the code (cycle routine and drawing routines) is a modified version of the vic ii emulation used in
     commodore 64 emulator "frodo" by Christian Bauer
-
-    http://frodo.cebix.net/
-    The rights on the source code remain at the author.
-    It may not - not even in parts - used for commercial purposes without explicit written permission by the author.
-    Permission to use it for non-commercial purposes is hereby granted als long as my copyright notice remains in the program.
-    You are not allowed to use the source to create and distribute a modified version of Frodo.
 
 ***************************************************************************/
 
