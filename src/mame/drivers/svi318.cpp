@@ -5,9 +5,6 @@
 
     Spectravideo SVI-318/328
 
-    TODO:
-    - Expansion port (and all attached peripherals)
-
 ***************************************************************************/
 
 #include "emu.h"
