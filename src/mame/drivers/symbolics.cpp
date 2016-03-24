@@ -121,45 +121,54 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 ?   ?   ?   ?   ?   0   0   1   1   1   *   *   *   *   *   *   *   *   *   *   *   *   *   0       R   Open Bus (socket @D17 second half)
 ?   ?   ?   ?   ?   0   0   1   1   1   *   *   *   *   *   *   *   *   *   *   *   *   *   1       R   Open Bus (socket @D11 second half)
 ?   ?   ?   ?   ?   0   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       RW  RAM (4164 DRAMs; these have parity as well, which is checked in the i/o area somehow?)
-1   1   1   1   1   1   1   1   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   *       ?   SPY BUS and FEP peripherals for OLD FEP hardware, not the NFEP we have here; the map of this area is listed in octal on pdf page 399 of us patent 4887235. The NFEP map is certainly not the same, but is probably similar.
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   0   0   *   *   *   *       RW  SPY-CMEM (writes CMEM WD, reads UIR)
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   0   0   1   1   1   *       W   SPY-SQ-CTL
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   0   0   1   1   1   0       R   SPY-BOARD-ID (read a given board's id prom, board select is in U AMRA register)
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   0   1   0   0   0   *       R   SPY-SQ-STATUS
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   0   1   0   0   1   *       ?   SPY-NEXT-CPC
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   0   1   0   0   1   0?      ?   SPY-TASK
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   0   1   0   0   1   1       R   SPY-CTOS-HIGH
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   0   1   0   1   1   0?      R   SPY-OPC
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   0   0   0   0?      W   SPY-MC-CONTROL
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   0   0   0   0       R   SPY-MC-ID
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   0   0   0   1       R   SPY-MC-ERROR-STATUS
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   0   0   1   0       R   SPY-ECC-SYNDROME
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   0   0   1   1       R   SPY-ECC-ADDRESS
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   0   1   0   *?      R   SPY-MC-STATUS
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   1   0   0   0       W   SPY-NET-SELECT
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   1   0   0   1       W   SPY-NET-CONTROL
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   0   0   0   0   x?  0       RW  MPSC-0-A
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   0   0   0   0   x?  1       RW  MPSC-0-B
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   0   0   0   1   x?  0       RW  MPSC-1-A
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   0   0   0   1   x?  1       RW  MPSC-1-B
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   0   0   1   0   1   *?      R?  SPY-DMA-HIGH-ADDRS
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   0   1   0   0   0   *?      R   SPY-DMA-CONTROLLER
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   1   x?  0   0   0   ??      R   FEP-PADDLE-ID-PROM
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   0   0   0   0   0   ??      R   FEP-BOARD-ID-PROM
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   0   0   0   0   1       W   FEP-BOARD-ID-CONTROL
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   0   0   0   1   1       W   FEP-DMA-AND-CLOCK-CTL
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   0   0   1   0   0       W   FEP-DMA-CONTROL
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   0   0   1   0   1       W   FEP-PROC-CONTROL
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   0   1   0   0   0?      W   FEP(SPY)-LBUS-CONTROL
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   0   1   1   0   0?      W   FEP-SERIAL-BAUD-RATE-0
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   0   1   1   1   0?      W   FEP-SERIAL-BAUD-RATE-1
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   0   0   0   0?      W   FEP-HSB-CONTROL
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   0   0   1   0?      W   FEP-HSB-DATA
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   0   1   0   0?      W   FEP-HSB-POINTER
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   1   0   0   0?      W   P-PORT
+a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  (a0 via UDS/LDS)
+1   1   1   1   1   1   1   1   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   *  Iiii ?   SPY BUS and FEP peripherals for OLD FEP hardware, not the NFEP we have here; the map of this area is listed in octal on pdf page 399 of us patent 4887235. The NFEP map is certainly not the same, but is probably similar. I is device ID from DEVNUM pal
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   0   0   *   *   *   *  0010 RW  SPY-CMEM (writes CMEM WD, reads UIR)
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   0   0   1   1   1   *  0010 W   SPY-SQ-CTL
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   0   0   1   1   1   0  0010 R   SPY-BOARD-ID (read a given board's id prom, board select is in U AMRA register)
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   0   1   0   0   0   *  0010 R   SPY-SQ-STATUS
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   0   1   0   0   1   *  0010 ?   SPY-NEXT-CPC
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   0   1   0   0   1   0? 0010 ?   SPY-TASK
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   0   1   0   0   1   1  0010 R   SPY-CTOS-HIGH
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   0   1   0   1   1   0? 0010 R   SPY-OPC
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   0   0   0   0? 0010 W   SPY-MC-CONTROL
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   0   0   0   0  0010 R   SPY-MC-ID
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   0   0   0   1  0010 R   SPY-MC-ERROR-STATUS
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   0   0   1   0  0010 R   SPY-ECC-SYNDROME
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   0   0   1   1  0010 R   SPY-ECC-ADDRESS
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   0   1   0   *? 0010 R   SPY-MC-STATUS
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   1   0   0   0  0010 W   SPY-NET-SELECT
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   0   1   0   0   1  0010 W   SPY-NET-CONTROL
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   0   1   1   1   x   x   x   x  0010 .   Open bus?
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   0   0   0   0   x?  0  0001 RW  MPSC-0-A
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   0   0   0   0   x?  1  0001 RW  MPSC-0-B
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   0   0   0   1   x?  0  0001 RW  MPSC-1-A
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   0   0   0   1   x?  1  0001 RW  MPSC-1-B
+                                          [       |           ]                                         HA5
+                                          [   |           |           |           ]                     HA10
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   0   0   1   1   x?  *  0110 RW  SPY-DMA-HIGH-ADDRS
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   0   1   x?  x?  x?  *  0111 RW  SPY-DMA-CONTROLLER
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   1   *?  *?  *?  *?  *  0100 R   FEP-PADDLE-ID-PROM
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   0   *?  *?  *?  *?  *  0101 R   FEP-BOARD-ID-PROM
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   0   0   0   0   1  0011 RW  FEP-BOARD-ID-CONTROL
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   0   0   0   1   1  0011 RW  FEP-DMA-AND-CLOCK-CTL
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   0   0   1   0   0  0011 RW  FEP-DMA-CONTROL
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   0   0   1   0   1  0011 RW  FEP-PROC-CONTROL
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   0   1   0   0   *  1100 RW  FEP(SPY)-LBUS-CONTROL
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   0   1   1   0   *  1101 RW  FEP-SERIAL-BAUD-RATE-0
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   0   1   1   1   *  1101 RW  FEP-SERIAL-BAUD-RATE-1
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   0   0   0   *  1001 RW  FEP-HSB-CONTROL
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   0   0   1   *  1001 RW  FEP-HSB-DATA
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   0   1   0   *  1001 RW  FEP-HSB-POINTER
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   0   1   1   x  1001 .   Open bus?
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   1   0   x?  *  1110 RW  P-PORT
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   1   1   0   *  1010 RW  NanoFEP i8749
+1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   1   1   1   1   1   1   *  1011 RW  CART
+                                                                                               0000 unused/no device selected
+                                                                                               1000 unused
+                                                                                               1111 unused
+a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  (a0 via UDS/LDS)
 Now for stuff the 3670 nfep code actually accesses:
-1   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   1   0   1   1   0   0   0   1       W    ? 0x02 gets written here
-
               |               |               |               |               |               |     hex
           |           |           |           |           |           |           |           |     octal
 Soft reset
@@ -276,9 +285,9 @@ ROM_START( s3670 )
 	// note: load all the PLAs, PALs and PROMs here
 	// picture is at https://4310b1a9-a-11c96037-s-sites.googlegroups.com/a/ricomputermuseum.org/home/Home/equipment/symbolics-3645/Symbolics_3645_FEP.jpg
 	/*
-		LBBUFA.4 mb7124   @A6
-		LBBUFB.4 mb7124   @A7
-		LBBUFC.4 mb7124   @A9 <- 4887235 page 630 has LBBUFC.UCODE rev27
+		LBBUFA.4 mb7124   @A6 <- 4887235 page 630 has LBBUFC.UCODE rev27 \
+		LBBUFB.4 mb7124   @A7 <- 4887235 page 630 has LBBUFC.UCODE rev27  > all 3 of these are stored in the same file
+		LBBUFC.4 mb7124   @A9 <- 4887235 page 630 has LBBUFC.UCODE rev27 /
 		LBAAR.4           @A12 <- 4887235 page 625 has LBAAR rev4, pal16l8
 		LBPAR.4A          @A13 <- 4887235 page 624 has LBPAR rev9, pal16l8
 		PROCA.4  pal16R8A @A25 <- 4887235 page 621 has PROCA rev8, pal16r8
