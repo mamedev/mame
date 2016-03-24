@@ -3034,7 +3034,7 @@ ROM_END
 ******************************/
 
 /*
-Program Roms contain
+The below-referenced Program Roms contain
 
 Designed and Programmed by A.M.T. Research & Development Department 03/30/1991.
 Copying or Revising for Commercial Use Is Not Permitted.
