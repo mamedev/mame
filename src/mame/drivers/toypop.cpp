@@ -4,6 +4,8 @@
 
 	"Universal System 16" Hardware (c) 1983/1986 Namco
 
+	driver by Angelo Salese, based off "wiped off due of not anymore licenseable" driver by Edgardo E. Contini Salvan.   
+
 	TODO:
 	- PAL is presumably inverted with address bit 11 (0x800) for 0x6000-0x7fff area 
 	  between Libble Rabble and Toy Pop. 
