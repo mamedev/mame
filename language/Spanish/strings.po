@@ -252,7 +252,7 @@ msgstr "Ajustes tipográficos de interfaz"
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 msgstr ""
 "Texto de ejemplo - Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-"Pingüino; ñame en ábaco."
+"La cigüeña olía el paté de atún del camión más lejano."
 
 #: src/emu/ui/custui.cpp:506
 msgid "Normal text"
@@ -555,7 +555,7 @@ msgstr "Versus"
 
 #: src/emu/ui/dirmenu.cpp:58 src/emu/ui/menu.cpp:59
 msgid "Covers"
-msgstr ""
+msgstr "Cubiertas"
 
 #: src/emu/ui/dirmenu.cpp:116 src/emu/ui/dirmenu.cpp:136
 msgid "Folders Setup"
@@ -619,7 +619,7 @@ msgstr "Filtrado bilineal"
 
 #: src/emu/ui/dsplmenu.cpp:45
 msgid "Bitmap Prescaling"
-msgstr "Preescalar texturas"
+msgstr "Preescalado de texturas"
 
 #: src/emu/ui/dsplmenu.cpp:46
 msgid "Window Mode"
@@ -727,8 +727,8 @@ msgid ""
 "The software selected is missing one or more required ROM or CHD images. "
 "Please select a different one."
 msgstr ""
-"Al software elegido le falta una o varias imágenes CHD o ROM necesarias. Por "
-"favor elige otro distinto."
+"Al software elegido le falta una o varias ROMs o imágenes CHD necesarias. "
+"Por favor elige otro distinto."
 
 #: src/emu/ui/info.cpp:98
 msgid "Not supported"
@@ -1138,8 +1138,8 @@ msgid ""
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
-"Falta la máquina seleccionada o una o más de sus ROM o imágenes CHD. Por "
-"favor, elige otra máquina.\n"
+"Falta la máquina seleccionada o una o más de sus ROMs o imágenes CHD. "
+"Por favor, elige otra máquina.\n"
 "\n"
 "Pulsa cualquier tecla (menos ESC) para continuar."
 
@@ -1604,11 +1604,11 @@ msgstr "Grabar"
 
 #: src/emu/ui/tapectrl.cpp:103
 msgid "Rewind"
-msgstr "Retroceder"
+msgstr "Rebobinar"
 
 #: src/emu/ui/tapectrl.cpp:106
 msgid "Fast Forward"
-msgstr "Más rápido"
+msgstr "Avance rápido"
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
@@ -2154,7 +2154,7 @@ msgstr " PLUMAS"
 #~ "ESC.\n"
 #~ "\n"
 #~ msgstr ""
-#~ "SI NO ESTÁ LEGALMENTE LEGITIMADO PARA REPRODUCIR \"%s\" EN ESTE EMULADOR, "
+#~ "SI NO TIENES PERMISO PARA JUGAR A \"%s\" EN ESTE EMULADOR, "
 #~ "PULSE ESC.\n"
 #~ "\n"
 
