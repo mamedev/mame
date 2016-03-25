@@ -88,6 +88,8 @@ public:
 	DECLARE_WRITE8_MEMBER(slave_shared_w);
 	DECLARE_WRITE16_MEMBER(slave_irq_enable_w);
 	DECLARE_WRITE8_MEMBER(sound_halt_ctrl_w);
+	DECLARE_READ8_MEMBER(bg_rmw_r);
+	DECLARE_WRITE8_MEMBER(bg_rmw_w);
 protected:
 	// driver_device overrides
 //	virtual void machine_start() override;
@@ -302,6 +304,23 @@ WRITE16_MEMBER(namcos16_state::slave_irq_enable_w)
 	m_slave_irq_enable = (offset & 0x40000) ? false : true;
 }
 
+READ8_MEMBER(namcos16_state::bg_rmw_r)
+{
+	UINT8 res;
+
+	res = 0;
+	// note: following offset is written as offset * 2
+	res |= (m_bgvram[offset] & 0x0f00) >> 4;
+	res |= (m_bgvram[offset] & 0x000f);
+	return res;
+}
+
+WRITE8_MEMBER(namcos16_state::bg_rmw_w)
+{
+	// note: following offset is written as offset * 2
+	m_bgvram[offset] = (data & 0xf) | ((data & 0xf0) << 4);
+}
+
 READ8_MEMBER(namcos16_state::dipA_l){ return ioport("DSW1")->read(); }                // dips A
 READ8_MEMBER(namcos16_state::dipA_h){ return ioport("DSW1")->read() >> 4; }           // dips A
 READ8_MEMBER(namcos16_state::dipB_l){ return ioport("DSW2")->read(); }                // dips B
@@ -348,6 +367,7 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, namcos16_state )
 	AM_RANGE(0x000000, 0x007fff) AM_ROM AM_REGION("slave_rom", 0)
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE8(slave_shared_r,slave_shared_w,0x00ff)
+	AM_RANGE(0x180000, 0x187fff) AM_READWRITE8(bg_rmw_r,bg_rmw_w,0xffff)
 	AM_RANGE(0x190000, 0x1dffff) AM_RAM AM_SHARE("bgvram")
 	AM_RANGE(0x300000, 0x3fffff) AM_WRITE(slave_irq_enable_w)
 ADDRESS_MAP_END
