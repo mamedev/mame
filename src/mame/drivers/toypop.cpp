@@ -8,6 +8,8 @@
 	- PAL is presumably inverted with address bit 11 (0x800) for 0x6000-0x7fff area 
 	  between Libble Rabble and Toy Pop. 
     - Proper sprite DMA.
+	- Flip Screen;
+	- Remaining outputs;
 	
 	Notes:
 	------
@@ -82,6 +84,7 @@ public:
 	DECLARE_READ8_MEMBER(dipB_h);
 	//DECLARE_WRITE8_MEMBER(out_coin0);
 	//DECLARE_WRITE8_MEMBER(out_coin1);
+	DECLARE_WRITE8_MEMBER(pal_bank_w);
 	DECLARE_WRITE8_MEMBER(flip);
 	DECLARE_WRITE8_MEMBER(slave_halt_ctrl_w);
 	DECLARE_READ8_MEMBER(slave_shared_r);
@@ -99,6 +102,7 @@ protected:
 private:
 	bool m_master_irq_enable;
 	bool m_slave_irq_enable;
+	UINT8 m_pal_bank;
 	
 	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
@@ -157,7 +161,7 @@ PALETTE_INIT_MEMBER(namcos16_state, toypop)
 void namcos16_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	int x, y;
-	const UINT16 pal_base = 0x300;
+	const UINT16 pal_base = 0x300 + (m_pal_bank << 4);
 	const UINT32 src_base = 0x200/2;
 	const UINT16 src_pitch = 288 / 2;
 	
@@ -202,7 +206,7 @@ void namcos16_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 		}
 		
 		UINT16 tile = m_fgvram[count];
-		UINT8 color = (m_fgattr[count] & 0x3f) + 0x40;
+		UINT8 color = (m_fgattr[count] & 0x3f) + (m_pal_bank<<6);
 
 		gfx_0->transpen(bitmap,cliprect,tile,color,0,0,x*8,y*8,0);
 	}
@@ -240,8 +244,8 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 		UINT8 width = ((base_spriteram[count+bank2] & 4) >> 2) + 1;
 		UINT8 height = ((base_spriteram[count+bank2] & 8) >> 3) + 1;
 		
-		if(width == 2)
-			x -=16;
+		if(height == 2)
+			y -=16;
 		
 		for(int yi=0;yi<height;yi++)
 		{
@@ -331,6 +335,11 @@ WRITE8_MEMBER(namcos16_state::flip)
 	flip_screen_set(data & 1);
 }
 
+WRITE8_MEMBER(namcos16_state::pal_bank_w)
+{
+	m_pal_bank = offset & 1;
+}
+
 static ADDRESS_MAP_START( namcos16_master_base_map, AS_PROGRAM, 8, namcos16_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("fgvram")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("fgattr")
@@ -341,7 +350,7 @@ static ADDRESS_MAP_START( namcos16_master_base_map, AS_PROGRAM, 8, namcos16_stat
 	
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(slave_halt_ctrl_w)
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(sound_halt_ctrl_w)
-	// 0xa000 palette bank
+	AM_RANGE(0xa000, 0xa001) AM_WRITE(pal_bank_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("master_rom",0)
 ADDRESS_MAP_END
 
@@ -748,5 +757,5 @@ ROM_START( toypop )
 	ROM_LOAD( "tp1-6.3d", 0x0000, 0x0100, CRC(16a9166a) SHA1(847cbaf7c88616576c410177e066ae1d792ac0ba) )
 ROM_END
 
-GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, driver_device, 0,   ROT0,   "Namco", "Libble Rabble", MACHINE_IS_SKELETON )
-GAME( 1986, toypop,   0,     toypop,   toypop, 	 driver_device, 0,   ROT0,   "Namco", "Toypop", MACHINE_IS_SKELETON )
+GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, driver_device, 0,   ROT0,   "Namco", "Libble Rabble", MACHINE_NO_COCKTAIL )
+GAME( 1986, toypop,   0,     toypop,   toypop, 	 driver_device, 0,   ROT0,   "Namco", "Toypop", MACHINE_NO_COCKTAIL )
