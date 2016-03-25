@@ -81,7 +81,7 @@ const bgfx::Memory* shader_manager::load_mem(std::string name)
 	bx::CrtFileReader reader;
 	bx::open(&reader, name.c_str());
 
-	uint32_t size = (uint32_t)bx::getSize(&reader);
+	uint32_t size(bx::getSize(&reader));
 	const bgfx::Memory* mem = bgfx::alloc(size + 1);
 	bx::read(&reader, mem->data, size);
 	bx::close(&reader);

@@ -45,6 +45,7 @@
 #include "bgfx/vertex.h"
 #include "bgfx/uniform.h"
 #include "bgfx/slider.h"
+#include "bgfx/target.h"
 
 //============================================================
 //  DEBUGGING
@@ -190,15 +191,12 @@ int renderer_bgfx::create()
 	m_screen_effect[2] = m_effects->effect("screen_multiply");
 	m_screen_effect[3] = m_effects->effect("screen_add");
 
-	m_chains = new chain_manager(options, *m_textures, *m_targets, *m_effects, m_width[window().m_index], m_height[window().m_index]);
+	m_chains = new chain_manager(options, *m_textures, *m_targets, *m_effects);
     parse_screen_chains(options.bgfx_screen_chains());
     m_sliders_dirty = true;
 
 	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
 	m_texture_cache = m_textures->create_texture("#cache", bgfx::TextureFormat::RGBA8, CACHE_SIZE, CACHE_SIZE, nullptr, flags);
-
-    uint32_t shadow_flags = 0;//BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
-    m_textures->create_png_texture(window().machine().options().art_path(), options.bgfx_shadow_mask(), "shadow", shadow_flags);
 
     memset(m_white, 0xff, sizeof(uint32_t) * 16 * 16);
 	m_texinfo.push_back(rectangle_packer::packable_rectangle(WHITE_HASH, PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32), 16, 16, 16, nullptr, m_white));
@@ -390,15 +388,16 @@ void renderer_bgfx::process_screen_quad(int screen, render_primitive* prim)
     const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(prim->flags & PRIMFLAG_TEXFORMAT_MASK,
         tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
 
-    bgfx_texture *texture = new bgfx_texture("screen", bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem);
-    m_textures->add_provider("screen", texture);
+    std::string full_name = "screen" + std::to_string(screen);
+    bgfx_texture *texture = new bgfx_texture(full_name, bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem);
+    m_textures->add_provider(full_name, texture);
 
-    m_targets->update_guest_targets(screen, tex_width, tex_height);
+    m_targets->update_target_sizes(screen, tex_width, tex_height, TARGET_STYLE_GUEST);
 
     screen_chain(screen)->process(prim, s_current_view, screen, *m_textures, window(), get_blend_state(PRIMFLAG_GET_BLENDMODE(prim->flags)));
     s_current_view += screen_chain(screen)->applicable_passes();
 
-    m_textures->add_provider("screen", nullptr);
+    m_textures->add_provider(full_name, nullptr);
     delete texture;
 }
 
@@ -477,7 +476,7 @@ void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bg
 
     UINT32 blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
     bgfx::setVertexBuffer(buffer);
-    bgfx::setTexture(0, m_screen_effect[blend]->uniform("s_tex")->handle(), m_targets->target("output" + std::to_string(screen))->texture());
+    bgfx::setTexture(0, m_screen_effect[blend]->uniform("s_tex")->handle(), m_targets->target(screen, "output")->texture());
     m_screen_effect[blend]->submit(view);
 }
 
@@ -792,17 +791,31 @@ int renderer_bgfx::handle_screen_chains()
         }
         prim = prim->next();
     }
-    m_targets->update_screen_count(screens);
+
+    const uint32_t available_chains = m_screen_chains[window().m_index].size();
+    screens = screens >= available_chains ? available_chains: screens;
+
+    if (screens > 0)
+    {
+        m_targets->update_screen_count(screens);
+    }
 
     // Process each screen as necessary
     prim = window().m_primlist->first();
-    int seen_screen_quads = 0;
+    int screen_index = 0;
     while (prim != nullptr)
     {
         if (PRIMFLAG_GET_SCREENTEX(prim->flags))
         {
-			process_screen_quad(seen_screen_quads, prim);
-            seen_screen_quads++;
+            if (screen_index >= available_chains)
+            {
+                break;
+            }
+            uint16_t screen_width(floor((prim->bounds.x1 - prim->bounds.x0) + 0.5f));
+            uint16_t screen_height(floor((prim->bounds.y1 - prim->bounds.y0) + 0.5f));
+        	m_targets->update_target_sizes(screen_index, screen_width, screen_height, TARGET_STYLE_NATIVE);
+			process_screen_quad(screen_index, prim);
+            screen_index++;
         }
         prim = prim->next();
     }
@@ -841,6 +854,7 @@ int renderer_bgfx::draw(int update)
 	osd_dim wdim = window().get_size();
 	m_width[window_index] = wdim.width();
 	m_height[window_index] = wdim.height();
+
 	if (window_index == 0)
 	{
 		if ((m_dimensions != osd_dim(m_width[window_index], m_height[window_index])))
@@ -989,7 +1003,7 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
 							return BUFFER_PRE_FLUSH;
 						}
 
-                        if (PRIMFLAG_GET_SCREENTEX((*prim)->flags) && m_screen_chains.size() > window().m_index && m_screen_chains[window().m_index].size() > 0)
+                        if (PRIMFLAG_GET_SCREENTEX((*prim)->flags) && m_screen_chains.size() > window().m_index && screen < m_screen_chains[window().m_index].size())
                         {
                             render_post_screen_quad(view, *prim, buffer, screen);
                             return BUFFER_SCREEN;

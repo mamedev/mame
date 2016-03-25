@@ -40,17 +40,18 @@
 		{ "type": "float",    "name": "scanline_bright_offset", "text": "Scanline Brightness Offset", "default": 0,                 "max": 400,               "min": 0,           "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
 		{ "type": "float",    "name": "scanline_jitter_amount", "text": "Scanline Jitter Amount",     "default": 0,                 "max": 400,               "min": 0,           "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
 		{ "type": "float",    "name": "scanline_height",        "text": "Individual Scanline Scale",  "default": 100,               "max": 400,               "min": 0,           "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",    "name": "scanline_variation",     "text": "Scanline Variation",         "default": 100,               "max": 400,               "min": 0,           "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
 		{ "type": "float",    "name": "shadow_alpha",           "text": "Shadow Mask Amount",         "default": 0,                 "max": 100,               "min": 0,           "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
 		{ "type": "vec2",     "name": "shadow_uv_size",         "text": "Shadow Mask UV Size ",       "default": [ 250, 333 ],      "max": [ 1000, 1000 ],    "min": [ 0, 0 ],    "step": 1, "scale": 0.001,      "format": "%1.4f", "screen": "crt" },
 		{ "type": "vec2",     "name": "shadow_uv_offset",       "text": "Shadow Mask UV Offset ",     "default": [   0,   0 ],      "max": [ 1000, 1000 ],    "min": [ 0, 0 ],    "step": 1, "scale": 0.001,      "format": "%1.4f", "screen": "crt" },
 		{ "type": "int_enum", "name": "shadow_tile_mode",       "text": "Shadow Mask Tile Mode",      "default": 0,                 "max": 1,                 "min": 0,           "step": 1, "scale": 1.0,        "format": "%s",    "screen": "crt", "strings": [ "Screen", "Source" ] },
-		{ "type": "float",    "name": "humbar_alpha",           "text": "Hum Bar Amount",             "default": 5,                 "max": 100,               "min": 0,           "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",    "name": "humbar_alpha",           "text": "Hum Bar Amount",             "default": 0,                 "max": 100,               "min": 0,           "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
 		{ "type": "float",    "name": "humbar_hertz_rate",      "text": "Hum Bar Frequency",          "default": 100,               "max": 10000,             "min": 0,           "step": 1, "scale": 0.00001,    "format": "%1.7f", "screen": "crt" },
-		{ "type": "color",    "name": "floor",                  "text": "Signal Floor, ",             "default": [   5,   5,   5 ], "max": [ 100, 100, 100 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
-		{ "type": "color",    "name": "power",                  "text": "Signal Exponent, ",          "default": [  80,  80,  80 ], "max": [ 400, 400, 400 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
+		{ "type": "color",    "name": "floor",                  "text": "Signal Floor, ",             "default": [   0,   0,   0 ], "max": [ 100, 100, 100 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
+		{ "type": "color",    "name": "power",                  "text": "Signal Exponent, ",          "default": [ 100, 100, 100 ], "max": [ 400, 400, 400 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01,       "format": "%1.2f", "screen": "crt" },
 		
 		{ "type": "float", "name": "curvature",     "text": "Screen Curvature Amount", "default": 25, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "round_corner",  "text": "Rounded Corner Amount",   "default": 20, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "round_corner",  "text": "Rounded Corner Amount",   "default": 15, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "smooth_border", "text": "Smooth Border Amount",    "default": 5,  "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "vignetting",    "text": "Vignetting Amount",       "default": 20, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "reflection",    "text": "Reflection Amount",       "default": 30, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" }
@@ -64,12 +65,11 @@
 			"name": "guest",
 			"mode": "guest",
 			"bilinear": false,
-			"prescale": false,
 			"doublebuffer": true
 		},
 		{	"name": "internal",
-			"mode": "guest",
-			"prescale": true,
+			"mode": "native",
+			"oversample": true,
 			"doublebuffer": true
 		}
 	],
@@ -114,7 +114,7 @@
 				{ "uniform": "u_jitter_amount",   "parameter": "jitter" }
 			],
 			"input": [
-				{ "sampler": "s_tex", "texture": "guest" }
+				{ "sampler": "s_tex", "target": "guest" }
 			],
 			"output": "guest"
 		},
@@ -125,7 +125,7 @@
 				{ "type": "slider", "condition": "notequal", "combine": "and", "name": "ntsc",        "value": 0 }
 			],
 			"input": [
-				{ "sampler": "s_tex", "texture": "screen" }
+				{ "sampler": "s_tex", "target": "screen" }
 			],
 			"output": "guest"
 		},
@@ -143,14 +143,14 @@
 				{ "uniform": "u_saturation", "slider": "saturation" }
 			],
 			"input": [
-				{ "sampler": "s_tex", "texture": "guest" }
+				{ "sampler": "s_tex", "target": "guest" }
 			],
 			"output": "guest"
 		},
- 		{	"effect": "blit",
+ 		{	"effect": "prescale",
 			"name": "Prescale",
 			"input": [
-				{ "sampler": "s_tex", "texture": "guest" }
+				{ "sampler": "s_tex", "target": "guest" }
 			],
 			"output": "internal"
 		},
@@ -174,7 +174,7 @@
 				{ "uniform": "u_radial_converge_blue",  "slider": "radial_converge_blue"  }
 			],
 			"input": [
-				{ "sampler": "s_tex", "texture": "internal" }
+				{ "sampler": "s_tex", "target": "internal" }
 			],
 			"output": "internal"
 		},
@@ -188,7 +188,7 @@
 				{ "uniform": "u_defocus", "slider": "defocus" }
 			],
 			"input": [
-				{ "sampler": "s_tex", "texture": "internal" }
+				{ "sampler": "s_tex", "target": "internal" }
 			],
 			"output": "internal"
 		},
@@ -202,7 +202,7 @@
 				{ "uniform": "u_defocus", "slider": "defocus" }
 			],
 			"input": [
-				{ "sampler": "s_tex", "texture": "internal" }
+				{ "sampler": "s_tex", "target": "internal" }
 			],
 			"output": "internal"
 		},
@@ -217,8 +217,8 @@
 				{ "uniform": "u_phosphor", "slider": "phosphor" }
 			],
 			"input": [
-				{ "sampler": "s_tex", "texture": "internal" },
-				{ "sampler": "s_prev", "texture": "previous" }
+				{ "sampler": "s_tex", "target": "internal" },
+				{ "sampler": "s_prev", "target": "previous" }
 			],
 			"output": "internal"
 		},
@@ -233,8 +233,8 @@
 				{ "uniform": "u_phosphor", "slider": "phosphor" }
 			],
 			"input": [
-				{ "sampler": "s_tex", "texture": "internal" },
-				{ "sampler": "s_prev", "texture": "internal" }
+				{ "sampler": "s_tex", "target": "internal" },
+				{ "sampler": "s_prev", "target": "internal" }
 			],
 			"output": "previous"
 		},
@@ -253,6 +253,8 @@
 				{ "uniform": "u_scanline_scale",         "slider": "scanline_scale" },
 				{ "uniform": "u_scanline_bright_scale",  "slider": "scanline_bright_scale" },
 				{ "uniform": "u_scanline_bright_offset", "slider": "scanline_bright_offset" },
+				{ "uniform": "u_scanline_height",        "slider": "scanline_height" },
+				{ "uniform": "u_scanline_variation",        "slider": "scanline_variation" },
 				{ "uniform": "u_shadow_alpha",           "slider": "shadow_alpha" },
 				{ "uniform": "u_shadow_uv",              "slider": "shadow_uv_size" },
 				{ "uniform": "u_shadow_uv_offset",       "slider": "shadow_uv_offset" },
@@ -266,8 +268,8 @@
 				{ "uniform": "u_time",                   "parameter": "time" }
 			],
 			"input": [
-				{ "sampler": "s_tex", "texture": "internal" },
-				{ "sampler": "s_shadow",  "texture": "shadow" }
+				{ "sampler": "s_tex", "target": "internal" },
+				{ "sampler": "s_shadow",  "option": "bgfx_shadow_mask" }
 			],
 			"output": "internal"
 		},
@@ -289,14 +291,14 @@
 				{ "uniform": "u_reflection",    "slider": "reflection" }
 			],
 			"input": [
-				{ "sampler": "s_tex", "texture": "internal" }
+				{ "sampler": "s_tex", "target": "internal" }
 			],
 			"output": "internal"
 		},
 		{	"effect": "blit",
-			"name": "Final Downscale",
+			"name": "Final Blit",
 			"input": [
-				{ "sampler": "s_tex", "texture": "internal" }
+				{ "sampler": "s_tex", "target": "internal" }
 			],
 			"output": "output"
 		}

@@ -18,12 +18,12 @@
     "fragment": "fs_deconverge",
     "uniforms": [
     	{ "name": "s_tex",                   "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "u_tex_size0",             "type": "vec4", "values": [ 256.0, 256.0, 0.0, 0.0 ] },
     	{ "name": "u_converge_red",          "type": "vec4", "values": [ 0.5, 0.0, 0.0, 0.0 ] },
     	{ "name": "u_converge_green",        "type": "vec4", "values": [ 0.0, 0.5, 0.0, 0.0 ] },
     	{ "name": "u_converge_blue",         "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
     	{ "name": "u_radial_converge_red",   "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
     	{ "name": "u_radial_converge_green", "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
-    	{ "name": "u_radial_converge_blue",  "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
-    	{ "name": "u_source_dims",           "type": "vec4", "values": [ 256.0, 256.0, 0.0, 0.0 ] }
+    	{ "name": "u_radial_converge_blue",  "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] }
     ]
 }

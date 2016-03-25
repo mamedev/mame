@@ -62,6 +62,8 @@ bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine
 	Document document;
 	document.Parse<0>(data);
 
+    delete [] data;
+
 	if (document.HasParseError())
 	{
 		std::string error(GetParseError_En(document.GetParseError()));
@@ -70,7 +72,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine
 		return nullptr;
 	}
 
-	bgfx_chain* chain = chain_reader::read_from_value(document, name + ": ", m_options, machine, window_index, screen_index, m_textures, m_targets, m_effects, m_width, m_height);
+	bgfx_chain* chain = chain_reader::read_from_value(document, name + ": ", m_options, machine, window_index, screen_index, m_textures, m_targets, m_effects);
 
 	if (chain == nullptr)
 	{

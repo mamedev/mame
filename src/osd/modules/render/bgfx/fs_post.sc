@@ -24,6 +24,7 @@ uniform vec4 u_scanline_bright_scale;
 uniform vec4 u_scanline_bright_offset;
 uniform vec4 u_scanline_jitter;
 uniform vec4 u_scanline_height;
+uniform vec4 u_scanline_variation;
 uniform vec4 u_back_color; // TODO: Unused in current implementation, mostly
 uniform vec4 u_shadow_tile_mode; // 0 based on screen dimension, 1 based on source dimension
 uniform vec4 u_shadow_alpha;
@@ -65,14 +66,8 @@ vec2 GetAdjustedCoords(vec2 coord, vec2 center_offset)
 
 void main()
 {
-	vec2 ScreenTexelDims = vec2(1.0, 1.0) / u_screen_dims.xy;
-	vec2 SourceTexelDims = vec2(1.0, 1.0) / u_source_dims.xy;
-	vec2 SourceRes = u_source_dims.xy;
-
-	vec2 HalfSourceRect = vec2(0.5, 0.5);
-
 	vec2 ScreenCoord = v_texcoord0.xy;
-	vec2 BaseCoord = GetAdjustedCoords(v_texcoord0, HalfSourceRect);
+	vec2 BaseCoord = GetAdjustedCoords(v_texcoord0, vec2(0.5, 0.5));
 
 	// Color
 	vec4 BaseColor = texture2D(s_tex, BaseCoord);
@@ -118,31 +113,37 @@ void main()
 	BaseColor.b = pow(BaseColor.b, u_power.b);
 
 	// Scanline Simulation (may not affect bloom)
-	if (u_prepare_bloom.x == 0.0)
-	{
+	//if (u_prepare_bloom.x == 0.0)
+	//{
 		// Scanline Simulation (may not affect vector screen)
-		if (u_prepare_vector.x == 0.0 && u_scanline_alpha.x > 0.0f)
-		{
+		//if (u_prepare_vector.x == 0.0 && u_scanline_alpha.x > 0.0f)
+		//{
+			float BrightnessOffset = (u_scanline_bright_offset.x * u_scanline_alpha.x);
+			float BrightnessScale = (u_scanline_bright_scale.x * u_scanline_alpha.x) + (1.0 - u_scanline_alpha.x);
+
+			float ColorBrightness = 0.299 * BaseColor.r + 0.587 * BaseColor.g + 0.114 * BaseColor.b;
+
 			float ScanCoord = v_texcoord0.y * u_source_dims.y * u_scanline_scale.x * 3.1415927;
 			float ScanCoordJitter = u_scanline_jitter.x * u_jitter_amount.x * 1.618034;
 			float ScanSine = sin(ScanCoord + ScanCoordJitter);
-			float ScanSineScaled = pow(ScanSine * ScanSine, 1.0);//u_scanline_height.x);
-			float ScanBrightness = (ScanSineScaled * u_scanline_bright_scale.x + 1.0 + u_scanline_bright_offset.x) * 0.5;
+			float ScanlineWide = u_scanline_height.x + u_scanline_variation.x * max(1.0, u_scanline_height.x) * (1.0 - ColorBrightness);
+			float ScanSineScaled = pow(ScanSine * ScanSine, ScanlineWide);
+			float ScanBrightness = ScanSineScaled * BrightnessScale + BrightnessOffset * BrightnessScale;
 
 			BaseColor.rgb *= mix(vec3(1.0, 1.0, 1.0), vec3(ScanBrightness, ScanBrightness, ScanBrightness), u_scanline_alpha.xxx);
-		}
+		//}
 
 		// Hum Bar Simulation (may not affect vector screen)
-		if (u_prepare_vector.x == 0.0 && u_humbar_alpha.x > 0.0f)
-		{
-			float HumTimeStep = fract(u_time.x * 0.001);
-			float HumBrightness = 1.0 - fract(BaseCoord.y + HumTimeStep) * u_humbar_alpha.x;
-			BaseColor.rgb *= HumBrightness;
-		}
-	}
+		//if (u_prepare_vector.x == 0.0 && u_humbar_alpha.x > 0.0f)
+		//{
+			//float HumTimeStep = fract(u_time.x * 0.001);
+			//float HumBrightness = 1.0 - fract(BaseCoord.y + HumTimeStep) * u_humbar_alpha.x;
+			//BaseColor.rgb *= HumBrightness;
+		//}
+	//}
 
-	vec4 Output = u_prepare_vector.x > 0.0 ? BaseColor * (v_color0 + vec4(1.0, 1.0, 1.0, 0.0)) : BaseColor * v_color0;
-	Output.a = 1.0;
+	//vec4 Output = u_prepare_vector.x > 0.0 ? BaseColor * (v_color0 + vec4(1.0, 1.0, 1.0, 0.0)) : BaseColor * v_color0;
+	//Output.a = 1.0;
 
-	gl_FragColor = Output;
+	gl_FragColor = vec4(BaseColor.rgb, 1.0);//Output;
 }

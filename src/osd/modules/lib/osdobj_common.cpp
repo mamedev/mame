@@ -144,8 +144,6 @@ const options_entry osd_options::s_option_entries[] =
     { OSDOPTION_BGFX_DEBUG,                   "0",               OPTION_BOOLEAN, "enable BGFX debugging statistics" },
     { OSDOPTION_BGFX_SCREEN_CHAINS,           "default",         OPTION_STRING, "comma-delimited list of screen chain JSON names, colon-delimited per-window" },
     { OSDOPTION_BGFX_SHADOW_MASK,             "shadow-mask.png", OPTION_STRING, "shadow mask texture name" },
-    { OSDOPTION_BGFX_PRESCALE_X,              "2",               OPTION_INTEGER, "x prescale" },
-    { OSDOPTION_BGFX_PRESCALE_Y,              "2",               OPTION_INTEGER, "y prescale" },
 
         // End of list
 	{ nullptr }
