@@ -129,7 +129,7 @@ ATTR_HOT inline int matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic
 	int  resched_cnt = 0;
 
 	this->build_LE_A();
-	this->build_LE_RHS(this->m_RHS);
+	this->build_LE_RHS();
 
 #if 0
 	static int ws_cnt = 0;
@@ -184,7 +184,7 @@ ATTR_HOT inline int matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic
 			for (unsigned i = 0; i < e; i++)
 				Idrive = Idrive + this->A(k,p[i]) * new_v[p[i]];
 
-			const nl_double delta = m_omega * (this->m_RHS[k] - Idrive) / this->A(k,k);
+			const nl_double delta = m_omega * (this->RHS(k) - Idrive) / this->A(k,k);
 			cerr = std::max(cerr, nl_math::abs(delta));
 			new_v[k] += delta;
 		}

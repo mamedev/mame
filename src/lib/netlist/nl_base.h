@@ -586,7 +586,7 @@ namespace netlist
 
 		virtual void reset() override;
 	private:
-		ATTR_HOT  void set_ptr(nl_double *ptr, const nl_double val)
+		ATTR_HOT void set_ptr(nl_double *ptr, const nl_double val)
 		{
 			if (ptr != NULL && *ptr != val)
 			{

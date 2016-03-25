@@ -39,7 +39,7 @@ ATTR_HOT nl_double matrix_solver_direct2_t::vsolve()
 ATTR_HOT inline int matrix_solver_direct2_t::vsolve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
 	build_LE_A();
-	build_LE_RHS(m_RHS);
+	build_LE_RHS();
 
 	const nl_double a = A(0,0);
 	const nl_double b = A(0,1);
@@ -47,8 +47,8 @@ ATTR_HOT inline int matrix_solver_direct2_t::vsolve_non_dynamic(ATTR_UNUSED cons
 	const nl_double d = A(1,1);
 
 	nl_double new_val[2];
-	new_val[1] = (a * m_RHS[1] - c * m_RHS[0]) / (a * d - b * c);
-	new_val[0] = (m_RHS[0] - b * new_val[1]) / a;
+	new_val[1] = (a * RHS(1) - c * RHS(0)) / (a * d - b * c);
+	new_val[0] = (RHS(0) - b * new_val[1]) / a;
 
 	if (is_dynamic())
 	{
