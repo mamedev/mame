@@ -24,11 +24,10 @@
 #include "texturemanager.h"
 
 class bgfx_target;
-class osd_options;
 
 class target_manager {
 public:
-	target_manager(osd_options& options, texture_manager& textures);
+	target_manager(texture_manager& textures);
 	~target_manager();
 
 	bgfx_target* create_target(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, uint32_t style, bool double_buffer, bool filter, bool smooth, uint32_t screen);
@@ -46,7 +45,6 @@ private:
 
 	std::map<std::string, bgfx_target*> m_targets;
 	texture_manager& m_textures;
-    osd_options& m_options;
 
 	std::vector<osd_dim> m_guest_dims;
 	std::vector<osd_dim> m_native_dims;

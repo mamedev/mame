@@ -21,9 +21,8 @@
 
 const int32_t target_manager::MAX_SCREENS = 100;
 
-target_manager::target_manager(osd_options& options, texture_manager& textures)
+target_manager::target_manager(texture_manager& textures)
     : m_textures(textures)
-    , m_options(options)
     , m_screen_count(0)
 {
 }

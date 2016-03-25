@@ -165,7 +165,7 @@ int renderer_bgfx::create()
 	}
 
 	m_textures = new texture_manager();
-	m_targets = new target_manager(options, *m_textures);
+	m_targets = new target_manager(*m_textures);
 
 	m_shaders = new shader_manager(options);
 	m_effects = new effect_manager(options, *m_shaders);
