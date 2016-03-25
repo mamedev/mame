@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 //============================================================
 //
-//  timeparameter.cpp - Time-based dynamic shader param
+//  timeparameter.h - Time-based dynamic shader param
 //
 //============================================================
 

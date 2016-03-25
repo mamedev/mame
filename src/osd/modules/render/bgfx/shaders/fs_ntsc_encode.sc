@@ -8,7 +8,7 @@ $input v_color0, v_texcoord0
 
 // NB: intentionally wasteful of uniforms in order for easier slider utilization
 
-#include "../../../../../3rdparty/bgfx/examples/common/common.sh"
+#include "../../../../../../3rdparty/bgfx/examples/common/common.sh"
 
 // Autos
 uniform vec4 u_source_dims;

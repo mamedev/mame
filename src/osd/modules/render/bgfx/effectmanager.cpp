@@ -68,7 +68,7 @@ bgfx_effect* effect_manager::load_effect(std::string name)
 	data[size] = 0;
 
 	Document document;
-	document.Parse<0>(data);
+	document.Parse<kParseCommentsFlag>(data);
 
     delete [] data;
 
@@ -85,7 +85,7 @@ bgfx_effect* effect_manager::load_effect(std::string name)
         printf("Unable to load effect %s\n", path.c_str());
         return nullptr;
     }
-    
+
     m_effects[name] = effect;
 
 	return effect;

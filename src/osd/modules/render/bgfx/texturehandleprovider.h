@@ -2,7 +2,8 @@
 // copyright-holders:Ryan Holtz
 //============================================================
 //
-//  texturehandleprovider.h
+//  texturehandleprovider.h - base class for any class that
+//  can potentially return information about a texture handle
 //
 //============================================================
 

@@ -4,8 +4,8 @@
 //
 //  chainmanager.h - BGFX shader chain manager
 //
-//  Maintains a string-to-entry lookup of BGFX shader
-//  effect chains, defined by chain.h and read by chainreader.h
+//  Provides loading for BGFX shader effect chains, defined
+//  by chain.h and read by chainreader.h
 //
 //============================================================
 

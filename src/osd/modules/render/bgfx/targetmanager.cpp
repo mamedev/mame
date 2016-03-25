@@ -4,8 +4,8 @@
 //
 //  targetmanager.cpp - BGFX render target manager
 //
-//  Maintains a string-to-entry mapping for any registered
-//  render targets.
+//  Maintains a per-screen string-to-entry mapping for any
+//  registered render targets.
 //
 //============================================================
 

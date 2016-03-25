@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 //============================================================
 //
-//  valueuniform.cpp - BGFX shader chain fixed uniform
+//  valueuniform.h - BGFX shader chain fixed uniform
 //
 //  Represents the mapping between a fixed value and a chain
 //  shader uniform for a given entry

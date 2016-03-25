@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:ImJezze
+//============================================================
+//
+//  prescale.json: Unfiltered upscale shader for CRT
+//  simulation.
+//
+//============================================================
 {
     "blend": {
     	"equation": "add",
@@ -11,8 +19,8 @@
     },
     "cull": { "mode": "none" },
     "write": {
-    	"rgb": "true",
-    	"alpha": "true"
+    	"rgb": true,
+    	"alpha": true
     },
     "vertex": "vs_prescale",
     "fragment": "fs_prescale",

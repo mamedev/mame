@@ -1,5 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
+//================================================================
+//
+//  statereader.h - Generic functions for reading state from a
+//  JSON file using RapidJSON.
+//
+//================================================================
+
 #pragma once
 
 #ifndef __DRAWBGFX_STATE_READER__

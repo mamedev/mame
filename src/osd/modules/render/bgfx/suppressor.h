@@ -3,7 +3,7 @@
 //============================================================
 //
 //  suppressor.h - Conditionally suppress a bgfx chain entry
-//                 from being processed.
+//  from being processed.
 //
 //============================================================
 

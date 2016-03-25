@@ -6,7 +6,7 @@ $input v_color0, v_texcoord0, v_texcoord1
 // Defocus Effect
 //-----------------------------------------------------------------------------
 
-#include "../../../../../3rdparty/bgfx/examples/common/common.sh"
+#include "../../../../../../3rdparty/bgfx/examples/common/common.sh"
 
 // Autos
 uniform vec4 u_swap_xy;
@@ -113,11 +113,11 @@ void main()
 	BaseColor.b = pow(BaseColor.b, u_power.b);
 
 	// Scanline Simulation (may not affect bloom)
-	//if (u_prepare_bloom.x == 0.0)
-	//{
+	if (u_prepare_bloom.x == 0.0)
+	{
 		// Scanline Simulation (may not affect vector screen)
-		//if (u_prepare_vector.x == 0.0 && u_scanline_alpha.x > 0.0f)
-		//{
+		if (u_prepare_vector.x == 0.0 && u_scanline_alpha.x > 0.0f)
+		{
 			float BrightnessOffset = (u_scanline_bright_offset.x * u_scanline_alpha.x);
 			float BrightnessScale = (u_scanline_bright_scale.x * u_scanline_alpha.x) + (1.0 - u_scanline_alpha.x);
 
@@ -131,19 +131,19 @@ void main()
 			float ScanBrightness = ScanSineScaled * BrightnessScale + BrightnessOffset * BrightnessScale;
 
 			BaseColor.rgb *= mix(vec3(1.0, 1.0, 1.0), vec3(ScanBrightness, ScanBrightness, ScanBrightness), u_scanline_alpha.xxx);
-		//}
+		}
 
 		// Hum Bar Simulation (may not affect vector screen)
-		//if (u_prepare_vector.x == 0.0 && u_humbar_alpha.x > 0.0f)
-		//{
-			//float HumTimeStep = fract(u_time.x * 0.001);
-			//float HumBrightness = 1.0 - fract(BaseCoord.y + HumTimeStep) * u_humbar_alpha.x;
-			//BaseColor.rgb *= HumBrightness;
-		//}
-	//}
+		if (u_prepare_vector.x == 0.0 && u_humbar_alpha.x > 0.0f)
+		{
+			float HumTimeStep = fract(u_time.x * 0.001);
+			float HumBrightness = 1.0 - fract(BaseCoord.y + HumTimeStep) * u_humbar_alpha.x;
+			BaseColor.rgb *= HumBrightness;
+		}
+	}
 
-	//vec4 Output = u_prepare_vector.x > 0.0 ? BaseColor * (v_color0 + vec4(1.0, 1.0, 1.0, 0.0)) : BaseColor * v_color0;
-	//Output.a = 1.0;
+	vec4 Output = u_prepare_vector.x > 0.0 ? BaseColor * (v_color0 + vec4(1.0, 1.0, 1.0, 0.0)) : BaseColor * v_color0;
+	Output.a = 1.0;
 
-	gl_FragColor = vec4(BaseColor.rgb, 1.0);//Output;
+	gl_FragColor = Output;
 }

@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 //============================================================
 //
-//  inputpair.h - BGFX sampler-and-texture pair
+//  inputpair.cpp - BGFX sampler-and-texture pair
 //
 //  Keeps track of the texture which is bound to the sampler
 //  which is bound to the specified stage index.

@@ -1,6 +1,6 @@
-BGFX_DIR=../../../../../3rdparty/bgfx
-RUNTIME_DIR=../../../../..
-BUILD_DIR=../../../../../build
+BGFX_DIR=../../../../../../3rdparty/bgfx
+RUNTIME_DIR=../../../../../..
+BUILD_DIR=../../../../../../build
 
 include $(BGFX_DIR)/scripts/shader.mk
 
