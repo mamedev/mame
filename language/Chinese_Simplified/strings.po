@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 10:01+0100\n"
-"PO-Revision-Date: 2016-03-22 14:16+0800\n"
+"PO-Revision-Date: 2016-03-25 20:06+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh\n"
@@ -1030,7 +1030,7 @@ msgstr "保存机械设定"
 #: src/emu/ui/miscmenu.cpp:967 src/emu/ui/miscmenu.cpp:987
 #: src/emu/ui/selgame.cpp:586
 msgid "Plugins"
-msgstr ""
+msgstr "插件"
 
 #: src/emu/ui/optsmenu.cpp:214
 msgid "Filter"
@@ -2066,5 +2066,3 @@ msgstr " 色彩"
 msgid " PENS"
 msgstr " PENS"
 
-#~ msgid "Multi-Threaded Rendering"
-#~ msgstr "多线程描绘"
