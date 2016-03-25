@@ -2137,8 +2137,7 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 			mui.draw_textured_box(container, x1 + UI_LINE_WIDTH, y1 + UI_LINE_WIDTH, x1 + midl - UI_LINE_WIDTH, y1 + line_height,
 				bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		}
-
-		if (bgcolor == UI_MOUSEOVER_BG_COLOR)
+		else if (bgcolor == UI_MOUSEOVER_BG_COLOR)
 			container->add_rect(x1 + UI_LINE_WIDTH, y1 + UI_LINE_WIDTH, x1 + midl - UI_LINE_WIDTH, y1 + line_height,
 				bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
@@ -2159,13 +2158,13 @@ std::string ui_menu::arts_render_common(float origx1, float origy1, float origx2
 	ui_manager &mui = machine().ui();
 	float line_height = mui.get_line_height();
 	std::string snaptext, searchstr;
-	get_title_search(snaptext, searchstr);
-	float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
-
-	// apply title to right panel
 	float title_size = 0.0f;
 	float txt_lenght = 0.0f;
+	float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
 
+	get_title_search(snaptext, searchstr);
+
+	// apply title to right panel
 	for (int x = FIRST_VIEW; x < LAST_VIEW; x++)
 	{
 		mui.draw_text_full(container, _(arts_info[x].title), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
@@ -2174,14 +2173,8 @@ std::string ui_menu::arts_render_common(float origx1, float origy1, float origx2
 		title_size = MAX(txt_lenght, title_size);
 	}
 
-	rgb_t fgcolor = UI_TEXT_COLOR;
-	rgb_t bgcolor = UI_TEXT_BG_COLOR;
-	if (m_focus == focused_menu::rightbottom)
-	{
-		fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
-		bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
-	}
-
+	rgb_t fgcolor = (m_focus == focused_menu::rightbottom) ? rgb_t(0xff, 0xff, 0xff, 0x00) : UI_TEXT_COLOR;
+	rgb_t bgcolor = (m_focus == focused_menu::rightbottom) ? rgb_t(0xff, 0xff, 0xff, 0xff) : UI_TEXT_BG_COLOR;
 	float middle = origx2 - origx1;
 
 	// check size
@@ -2233,11 +2226,15 @@ void ui_menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software
 
 	int m_valid = 0;
 	for (int x = 0; x < UI_TOOLBAR_BUTTONS; ++x)
+	{
 		if (t_bitmap[x]->valid())
+		{
 			m_valid++;
+		}
+	}
 
 	float space_x = (y2 - y1) * container->manager().ui_aspect();
-	float total = (m_valid * space_x) + ((m_valid - 1) * 0.01f);
+	float total = (m_valid * space_x) + ((m_valid - 1) * 0.001f);
 	x1 = ((x2 - x1) * 0.5f) - (total / 2);
 	x2 = x1 + space_x;
 
@@ -2255,7 +2252,7 @@ void ui_menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software
 			}
 
 			container->add_quad(x1, y1, x2, y2, color, t_texture[z], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			x1 += space_x + ((z < UI_TOOLBAR_BUTTONS - 1) ? 0.01f : 0.0f);
+			x1 += space_x + ((z < UI_TOOLBAR_BUTTONS - 1) ? 0.001f : 0.0f);
 			x2 = x1 + space_x;
 		}
 	}
@@ -2288,13 +2285,11 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 		int screen_width = machine().render().ui_target().width();
 		int screen_height = machine().render().ui_target().height();
 
-		int rot = machine().render().ui_target().orientation();
-		if (rot == ROT90 || rot == ROT270)
+		if (machine().render().ui_target().orientation() & ORIENTATION_SWAP_XY)
 			std::swap(screen_height, screen_width);
 
 		int panel_width_pixel = panel_width * screen_width;
 		int panel_height_pixel = panel_height * screen_height;
-		float ratio = 0.0f;
 
 		// Calculate resize ratios for resizing
 		float ratioW = (float)panel_width_pixel / tmp_bitmap->width();
@@ -2309,7 +2304,7 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 			// smaller ratio will ensure that the image fits in the view
 			dest_yPixel = tmp_bitmap->width() * 0.75f;
 			ratioH = (float)panel_height_pixel / dest_yPixel;
-			ratio = MIN(ratioW, ratioH);
+			float ratio = MIN(ratioW, ratioH);
 			dest_xPixel = tmp_bitmap->width() * ratio;
 			dest_yPixel *= ratio;
 		}
@@ -2317,7 +2312,7 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 		else if (ratioW < 1 || ratioH < 1 || (machine().ui().options().enlarge_snaps() && !no_available))
 		{
 			// smaller ratio will ensure that the image fits in the view
-			ratio = MIN(ratioW, ratioH);
+			float ratio = MIN(ratioW, ratioH);
 			dest_xPixel = tmp_bitmap->width() * ratio;
 			dest_yPixel = tmp_bitmap->height() * ratio;
 		}
@@ -2455,8 +2450,7 @@ void ui_menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 			int screen_width = machine().render().ui_target().width();
 			int screen_height = machine().render().ui_target().height();
 
-			int rot = machine().render().ui_target().orientation();
-			if (rot == ROT90 || rot == ROT270)
+			if (machine().render().ui_target().orientation() & ORIENTATION_SWAP_XY)
 				std::swap(screen_height, screen_width);
 
 			int panel_width_pixel = panel_width * screen_width;
@@ -2500,12 +2494,9 @@ void ui_menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 
 			icons_texture[linenum]->set_bitmap(*icons_bitmap[linenum], icons_bitmap[linenum]->cliprect(), TEXFORMAT_ARGB32);
 		}
-		else {
-			if (icons_bitmap[linenum] != nullptr)
-			{
-				icons_bitmap[linenum]->reset();
-			}
-		}
+		else if (icons_bitmap[linenum] != nullptr)
+			icons_bitmap[linenum]->reset();
+
 		auto_free(machine(), tmp);
 	}
 
