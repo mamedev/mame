@@ -129,24 +129,6 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 		}
 	}
 
-	if (value.HasMember("textures"))
-	{
-		const Value& texture_array = value["textures"];
-		for (UINT32 i = 0; i < texture_array.Size(); i++)
-		{
-            std::string texture_path = std::string(options.bgfx_path()) + "/artwork/";
-            if (!READER_CHECK(texture_array[i].IsString(), (prefix + "textures[" + std::to_string(i) + "]: Value must be a string\n").c_str()))
-            {
-				for (bgfx_entry_uniform* uniform : uniforms) delete uniform;
-				for (bgfx_suppressor* suppressor : suppressors) delete suppressor;
-				return nullptr;
-			}
-            std::string texture_name = texture_array[i].GetString();
-
-            textures.create_png_texture(texture_path, texture_name, texture_name);
-		}
-	}
-
     std::string output = value["output"].GetString();
     return new bgfx_chain_entry(name, effect, suppressors, inputs, uniforms, targets, output);
 }
@@ -162,6 +144,5 @@ bool chain_entry_reader::validate_parameters(const Value& value, std::string pre
     if (!READER_CHECK(!value.HasMember("input") || value["input"].IsArray(), (prefix + "Value 'input' must be an array\n").c_str())) return false;
     if (!READER_CHECK(!value.HasMember("uniforms") || value["uniforms"].IsArray(), (prefix + "Value 'uniforms' must be an array\n").c_str())) return false;
     if (!READER_CHECK(!value.HasMember("disablewhen") || value["disablewhen"].IsArray(), (prefix + "Value 'disablewhen' must be an array\n").c_str())) return false;
-    if (!READER_CHECK(!value.HasMember("textures") || value["textures"].IsArray(), (prefix + "Value 'textures' must be an array\n").c_str())) return false;
     return true;
 }
