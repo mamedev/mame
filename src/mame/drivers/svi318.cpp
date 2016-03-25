@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
+#include "machine/bankdev.h"
 #include "machine/i8255.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"
@@ -48,7 +49,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
+		m_io(*this, "io"),
 		m_basic(*this, "basic"),
+		m_vdp(*this, "vdp"),
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
 		m_cart_rom(*this, "cartslot"),
@@ -59,6 +62,7 @@ public:
 		m_romdis(1), m_ramdis(1),
 		m_cart(1), m_bk21(1),
 		m_rom2(1), m_rom3(1),
+		m_ctrl1(-1),
 		m_keyboard_row(0)
 	{}
 
@@ -75,6 +79,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( intexp_w );
 	DECLARE_WRITE_LINE_MEMBER( romdis_w );
 	DECLARE_WRITE_LINE_MEMBER( ramdis_w );
+	DECLARE_WRITE_LINE_MEMBER( ctrl1_w );
+
+	DECLARE_READ8_MEMBER( excs_r );
+	DECLARE_WRITE8_MEMBER( excs_w );
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
 
@@ -85,7 +93,9 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_device<address_map_bank_device> m_io;
 	required_memory_region m_basic;
+	required_device<tms9928a_device> m_vdp;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<generic_slot_device> m_cart_rom;
@@ -101,6 +111,7 @@ private:
 	int m_bk21;
 	int m_rom2;
 	int m_rom3;
+	int m_ctrl1;
 
 	UINT8 m_keyboard_row;
 };
@@ -117,16 +128,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svi3x8_io, AS_IO, 8, svi3x8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x7f) AM_DEVREADWRITE("exp", svi_expander_device, iorq_r, iorq_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x22) AM_DEVWRITE("vdp", tms9928a_device, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x22) AM_DEVWRITE("vdp", tms9928a_device, register_write)
-	AM_RANGE(0x84, 0x84) AM_MIRROR(0x22) AM_DEVREAD("vdp", tms9928a_device, vram_read)
-	AM_RANGE(0x85, 0x85) AM_MIRROR(0x22) AM_DEVREAD("vdp", tms9928a_device, register_read)
-	AM_RANGE(0x88, 0x88) AM_MIRROR(0x23) AM_DEVWRITE("psg", ay8910_device, address_w)
-	AM_RANGE(0x8c, 0x8c) AM_MIRROR(0x23) AM_DEVWRITE("psg", ay8910_device, data_w)
-	AM_RANGE(0x90, 0x90) AM_MIRROR(0x23) AM_DEVREAD("psg", ay8910_device, data_r)
-	AM_RANGE(0x94, 0x97) AM_DEVWRITE("ppi", i8255_device, write)
-	AM_RANGE(0x98, 0x9a) AM_DEVREAD("ppi", i8255_device, read)
+	AM_RANGE(0x00, 0xff) AM_DEVICE("io", address_map_bank_device, amap8)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( svi3x8_io_bank, AS_PROGRAM, 8, svi3x8_state )
+	AM_RANGE(0x000, 0x0ff) AM_DEVREADWRITE("exp", svi_expander_device, iorq_r, iorq_w)
+	AM_RANGE(0x100, 0x17f) AM_DEVREADWRITE("exp", svi_expander_device, iorq_r, iorq_w)
+	AM_RANGE(0x180, 0x180) AM_MIRROR(0x22) AM_DEVWRITE("vdp", tms9928a_device, vram_write)
+	AM_RANGE(0x181, 0x181) AM_MIRROR(0x22) AM_DEVWRITE("vdp", tms9928a_device, register_write)
+	AM_RANGE(0x184, 0x184) AM_MIRROR(0x22) AM_DEVREAD("vdp", tms9928a_device, vram_read)
+	AM_RANGE(0x185, 0x185) AM_MIRROR(0x22) AM_DEVREAD("vdp", tms9928a_device, register_read)
+	AM_RANGE(0x188, 0x188) AM_MIRROR(0x23) AM_DEVWRITE("psg", ay8910_device, address_w)
+	AM_RANGE(0x18c, 0x18c) AM_MIRROR(0x23) AM_DEVWRITE("psg", ay8910_device, data_w)
+	AM_RANGE(0x190, 0x190) AM_MIRROR(0x23) AM_DEVREAD("psg", ay8910_device, data_r)
+	AM_RANGE(0x194, 0x197) AM_DEVWRITE("ppi", i8255_device, write)
+	AM_RANGE(0x198, 0x19a) AM_DEVREAD("ppi", i8255_device, read)
 ADDRESS_MAP_END
 
 
@@ -294,10 +310,12 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER( svi3x8_state::intvdp_w )
 {
-	// note: schematics show a CNTRL line that allows switching between
-	// IRQ and NMI for the interrupt
 	m_intvdp = state;
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_intvdp || m_intexp) ? ASSERT_LINE : CLEAR_LINE);
+
+	if (m_ctrl1 == 0)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, m_intvdp ? ASSERT_LINE : CLEAR_LINE);
+	else
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_intvdp || m_intexp) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -316,6 +334,7 @@ void svi3x8_state::machine_start()
 	save_item(NAME(m_bk21));
 	save_item(NAME(m_rom2));
 	save_item(NAME(m_rom3));
+	save_item(NAME(m_ctrl1));
 	save_item(NAME(m_keyboard_row));
 }
 
@@ -330,10 +349,17 @@ void svi3x8_state::machine_reset()
 	m_rom2 = 1;
 	m_rom3 = 1;
 	m_keyboard_row = 0;
+
+	if (m_ctrl1 == -1)
+		ctrl1_w(1);
 }
 
 READ8_MEMBER( svi3x8_state::mreq_r )
 {
+	// ctrl1 inverts a15
+	if (m_ctrl1 == 0)
+		offset ^= 0x8000;
+
 	if (CCS1 || CCS2 || CCS3 || CCS4)
 		return m_cart_rom->read_rom(space, offset);
 
@@ -353,6 +379,10 @@ READ8_MEMBER( svi3x8_state::mreq_r )
 
 WRITE8_MEMBER( svi3x8_state::mreq_w )
 {
+	// ctrl1 inverts a15
+	if (m_ctrl1 == 0)
+		offset ^= 0x8000;
+
 	if (CCS1 || CCS2 || CCS3 || CCS4)
 		return;
 
@@ -422,7 +452,11 @@ WRITE8_MEMBER( svi3x8_state::ppi_port_c_w )
 WRITE_LINE_MEMBER( svi3x8_state::intexp_w )
 {
 	m_intexp = state;
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_intvdp || m_intexp) ? ASSERT_LINE : CLEAR_LINE);
+
+	if (m_ctrl1 == 0)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_intexp ? ASSERT_LINE : CLEAR_LINE);
+	else
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_intvdp || m_intexp) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( svi3x8_state::romdis_w )
@@ -433,6 +467,30 @@ WRITE_LINE_MEMBER( svi3x8_state::romdis_w )
 WRITE_LINE_MEMBER( svi3x8_state::ramdis_w )
 {
 	m_ramdis = state;
+}
+
+WRITE_LINE_MEMBER( svi3x8_state::ctrl1_w )
+{
+	m_ctrl1 = state;
+
+	// ctrl1 disables internal io address decoding
+	m_io->set_bank(m_ctrl1);
+}
+
+READ8_MEMBER( svi3x8_state::excs_r )
+{
+	if (offset & 1)
+		return m_vdp->register_read(space, 0);
+	else
+		return m_vdp->vram_read(space, 0);
+}
+
+WRITE8_MEMBER( svi3x8_state::excs_w )
+{
+	if (offset & 1)
+		m_vdp->register_write(space, 0, data);
+	else
+		m_vdp->vram_write(space, 0, data);
 }
 
 
@@ -463,6 +521,12 @@ static MACHINE_CONFIG_START( svi318, svi3x8_state )
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
+
+	MCFG_DEVICE_ADD("io", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(svi3x8_io_bank)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(9)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(svi3x8_state, ppi_port_a_r))
@@ -505,6 +569,9 @@ static MACHINE_CONFIG_START( svi318, svi3x8_state )
 	MCFG_SVI_EXPANDER_INT_HANDLER(WRITELINE(svi3x8_state, intexp_w))
 	MCFG_SVI_EXPANDER_ROMDIS_HANDLER(WRITELINE(svi3x8_state, romdis_w))
 	MCFG_SVI_EXPANDER_RAMDIS_HANDLER(WRITELINE(svi3x8_state, ramdis_w))
+	MCFG_SVI_EXPANDER_CTRL1_HANDLER(WRITELINE(svi3x8_state, ctrl1_w))
+	MCFG_SVI_EXPANDER_EXCSR_HANDLER(READ8(svi3x8_state, excs_r))
+	MCFG_SVI_EXPANDER_EXCSW_HANDLER(WRITE8(svi3x8_state, excs_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svi318n, svi318 )

@@ -34,7 +34,9 @@ svi_expander_device::svi_expander_device(const machine_config &mconfig, const ch
 	m_romdis_handler(*this),
 	m_ramdis_handler(*this),
 	m_ctrl1_handler(*this),
-	m_ctrl2_handler(*this)
+	m_ctrl2_handler(*this),
+	m_excsr_handler(*this),
+	m_excsw_handler(*this)
 {
 }
 
@@ -61,6 +63,8 @@ void svi_expander_device::device_start()
 	m_ramdis_handler.resolve_safe();
 	m_ctrl1_handler.resolve_safe();
 	m_ctrl2_handler.resolve_safe();
+	m_excsr_handler.resolve_safe(0xff);
+	m_excsw_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -77,6 +81,9 @@ void svi_expander_device::device_reset()
 
 READ8_MEMBER( svi_expander_device::mreq_r )
 {
+	romdis_w(1);
+	ramdis_w(1);
+
 	if (m_module)
 		return m_module->mreq_r(space, offset);
 
@@ -85,6 +92,9 @@ READ8_MEMBER( svi_expander_device::mreq_r )
 
 WRITE8_MEMBER( svi_expander_device::mreq_w )
 {
+	romdis_w(1);
+	ramdis_w(1);
+
 	if (m_module)
 		m_module->mreq_w(space, offset, data);
 }
