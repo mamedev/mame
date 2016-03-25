@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 10:01+0100\n"
-"PO-Revision-Date: 2016-03-23 13:50+0100\n"
+"PO-Revision-Date: 2016-03-25 12:00+0100\n"
 "Last-Translator: Lothar Serra Mari <scummvm@rootfather.de>\n"
 "Language-Team: MAME Language Team\n"
 "Language: de\n"
@@ -1035,7 +1035,7 @@ msgstr "Konfiguration der Maschine speichern"
 #: src/emu/ui/miscmenu.cpp:967 src/emu/ui/miscmenu.cpp:987
 #: src/emu/ui/selgame.cpp:586
 msgid "Plugins"
-msgstr ""
+msgstr "Erweiterungen"
 
 #: src/emu/ui/optsmenu.cpp:214
 msgid "Filter"
