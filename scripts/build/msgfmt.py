@@ -1,4 +1,5 @@
 #! /usr/bin/env python3
+# -*- coding: utf-8 -*-
 # Written by Martin v. Löwis <loewis@informatik.hu-berlin.de>
 
 """Generate binary message catalog from textual translation description.
@@ -24,15 +25,17 @@ Options:
         Display version information and exit.
 """
 
+from __future__ import print_function
 import os
 import sys
-import ast
 import getopt
 import struct
 import array
+import re
+import codecs
 from email.parser import HeaderParser
 
-__version__ = "1.1"
+__version__ = "1.2"
 
 MESSAGES = {}
 
@@ -52,6 +55,26 @@ def add(id, str, fuzzy):
     if not fuzzy and str:
         MESSAGES[id] = str
 
+def dequote(s):
+    if (s[0] == s[-1]) and s.startswith(("'", '"')):
+        return s[1:-1]
+    return s
+
+# decode_escapes from http://stackoverflow.com/a/24519338
+ESCAPE_SEQUENCE_RE = re.compile(r'''
+    ( \\U........      # 8-digit hex escapes
+    | \\u....          # 4-digit hex escapes
+    | \\x..            # 2-digit hex escapes
+    | \\[0-7]{1,3}     # Octal escapes
+    | \\N\{[^}]+\}     # Unicode characters by name
+    | \\[\\'"abfnrtv]  # Single-character escapes
+    )''', re.UNICODE | re.VERBOSE)
+
+def decode_escapes(s):
+    def decode_match(match):
+        return codecs.decode(match.group(0), 'unicode-escape')
+
+    return ESCAPE_SEQUENCE_RE.sub(decode_match, s)
 
 
 def generate():
@@ -116,16 +139,20 @@ def make(filename, outfile):
 
     section = None
     fuzzy = 0
+    empty = 0
+
+    # Start off assuming Latin-1, so everything decodes without failure,
+    # until we know the exact encoding
+    charset = None
+    encoding = 'latin-1'
 
     # Start off assuming Latin-1, so everything decodes without failure,
     # until we know the exact encoding
     encoding = 'latin-1'
 
     # Parse the catalog
-    lno = 0
-    for l in lines:
+    for lno, l in enumerate(lines):
         l = l.decode(encoding)
-        lno += 1
         # If we get a comment line after a msgstr, this is a new entry
         if l[0] == '#' and section == STR:
             add(msgid, msgstr, fuzzy)
@@ -151,6 +178,14 @@ def make(filename, outfile):
             l = l[5:]
             msgid = msgstr = b''
             is_plural = False
+            if l.strip() == '""':
+                # Check if next line is msgstr. If so, this is a multiline msgid.
+                if lines[lno+1].decode(encoding).startswith('msgstr'):
+                    # If this is the first empty msgid and is followed by msgstr, this is the header, which may contain the encoding declaration.
+                    # Otherwise this file is not valid
+                    if empty > 1:
+                        print("Found multiple empty msgids on line " + str(lno) + ", not valid!")
+                    empty += 1
         # This is a message with plural forms
         elif l.startswith('msgid_plural'):
             if section != ID:
@@ -172,6 +207,24 @@ def make(filename, outfile):
                 if msgstr:
                     msgstr += b'\0' # Separator of the various plural forms
             else:
+                if (l[6:].strip() == '""') and (empty == 1) and (not charset):
+                    header = ""
+                    # parse up until next empty line = end of header
+                    hdrno = lno
+                    while(hdrno < len(lines)):
+                        # This is a roundabout way to strip non-ASCII unicode characters from the header.
+                        # As we are only parsing out the encoding, we don't need any unicode chars in it.
+                        l = lines[hdrno+1].decode('unicode_escape').encode('ascii','ignore').decode(encoding)
+                        if l.strip():
+                            header += decode_escapes(dequote(l.strip()))
+                        else:
+                            break
+                        hdrno += 1
+                    # See whether there is an encoding declaration
+                    p = HeaderParser()
+                    charset = p.parsestr(header).get_content_charset()
+                    if charset:
+                        encoding = charset
                 if is_plural:
                     print('indexed msgstr required for plural on  %s:%d' % (infile, lno),
                           file=sys.stderr)
@@ -181,7 +234,7 @@ def make(filename, outfile):
         l = l.strip()
         if not l:
             continue
-        l = ast.literal_eval(l)
+        l = decode_escapes(dequote(l)) # strip quotes and replace newlines if present
         if section == ID:
             msgid += l.encode(encoding)
         elif section == STR:
