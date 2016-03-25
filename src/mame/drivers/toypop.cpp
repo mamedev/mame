@@ -69,7 +69,7 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	
-	INTERRUPT_GEN_MEMBER(master_vblank_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(master_scanline);
 	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
 
 	DECLARE_READ8_MEMBER(irq_enable_r);
@@ -214,6 +214,7 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 	UINT8 *base_spriteram = m_master_workram;
 	const UINT16 bank1 = 0x0800;
 	const UINT16 bank2 = 0x1000;
+
 	
 	for (count=0x780;count<0x800;count+=2)
 	{
@@ -225,11 +226,12 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 		UINT8 tile = base_spriteram[count];
 		UINT8 color = base_spriteram[count+1];
 		int x = base_spriteram[count+bank1+1] + (base_spriteram[count+bank2+1] << 8);
-		x -= 56;
-		x = cliprect.max_x - x;
+		x -= 71;
 		
 		int y = base_spriteram[count+bank1+0];
-		y -= 9;
+		y += 7;
+		// TODO: actually m_screen.height()
+		y = 224 - y;
 		
 		bool fx = (base_spriteram[count+bank2] & 1) == 1;
 		bool fy = (base_spriteram[count+bank2] & 2) == 2;
@@ -586,10 +588,25 @@ void namcos16_state::machine_reset()
 	m_sound_cpu->set_input_line(INPUT_LINE_RESET,ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(namcos16_state::master_vblank_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(namcos16_state::master_scanline)
 {
-	if(m_master_irq_enable == true)
-		device.execute().set_input_line(M6809_IRQ_LINE,HOLD_LINE);
+	int scanline = param;
+
+	if(scanline == 224 && m_master_irq_enable == true)
+		m_master_cpu->set_input_line(M6809_IRQ_LINE,HOLD_LINE);
+
+	// TODO: definitely can't fire from this, presume that a command send has a timing response ...
+	if(scanline == 0)
+	{
+		if (!m_namco58xx->read_reset_line())
+			m_namco58xx->customio_run();
+		
+		if (!m_namco56xx_1->read_reset_line())
+			m_namco56xx_1->customio_run();
+
+		if (!m_namco56xx_2->read_reset_line())
+			m_namco56xx_2->customio_run();
+	}
 }
 
 INTERRUPT_GEN_MEMBER(namcos16_state::slave_vblank_irq)
@@ -601,7 +618,7 @@ INTERRUPT_GEN_MEMBER(namcos16_state::slave_vblank_irq)
 static MACHINE_CONFIG_START( liblrabl, namcos16_state )
  	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(master_liblrabl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos16_state,  master_vblank_irq)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos16_state, master_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", M68000, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(slave_map) 
