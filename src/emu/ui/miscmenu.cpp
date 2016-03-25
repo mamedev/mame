@@ -890,3 +890,100 @@ void ui_menu_machine_configure::custom_render(void *selectedref, float top, floa
 	mui.draw_text_full(container, m_drv->description, x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
+
+//-------------------------------------------------
+//  ctor / dtor
+//-------------------------------------------------
+
+ui_menu_plugins_configure::ui_menu_plugins_configure(running_machine &machine, render_container *container)
+	: ui_menu(machine, container)
+{
+}
+
+ui_menu_plugins_configure::~ui_menu_plugins_configure()
+{
+	emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	if (file_plugin.open("plugin.ini") != osd_file::error::NONE)
+		throw emu_fatalerror("Unable to create file plugin.ini\n");
+	// generate the updated INI
+	file_plugin.puts(machine().manager().plugins().output_ini().c_str());
+}
+
+//-------------------------------------------------
+//  handlethe options menu
+//-------------------------------------------------
+
+void ui_menu_plugins_configure::handle()
+{
+	// process the menu
+	bool changed = false;
+	plugin_options& plugins = machine().manager().plugins();
+	ui_menu::menu_stack->parent->process(UI_MENU_PROCESS_NOINPUT);
+	const ui_menu_event *m_event = process(UI_MENU_PROCESS_NOIMAGE);
+	if (m_event != nullptr && m_event->itemref != nullptr)
+	{
+		if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT || m_event->iptkey == IPT_UI_SELECT)
+		{
+			int oldval = plugins.int_value((const char*)m_event->itemref);
+			std::string error_string;
+			plugins.set_value((const char*)m_event->itemref, oldval == 1 ? 0 : 1, OPTION_PRIORITY_CMDLINE, error_string);
+			changed = true;
+		}
+	}
+	if (changed)
+		reset(UI_MENU_RESET_REMEMBER_REF);
+}
+
+//-------------------------------------------------
+//  populate
+//-------------------------------------------------
+
+void ui_menu_plugins_configure::populate()
+{
+	plugin_options& plugins = machine().manager().plugins();
+	
+	for (auto curentry = plugins.first(); curentry != nullptr; curentry = curentry->next())
+	{	
+		if (!curentry->is_header())
+		{
+			auto enabled = std::string(curentry->value()) == "1";
+			item_append(curentry->description(), enabled ? _("On") : _("Off"),
+				enabled ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)curentry->name());
+		}
+	}
+	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	customtop = machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
+}
+
+//-------------------------------------------------
+//  perform our special rendering
+//-------------------------------------------------
+
+void ui_menu_plugins_configure::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+{
+	float width;
+	ui_manager &mui = machine().ui();
+
+	mui.draw_text_full(container, _("Plugins"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	width += 2 * UI_BOX_LR_BORDER;
+	float maxwidth = MAX(origx2 - origx1, width);
+
+	// compute our bounds
+	float x1 = 0.5f - 0.5f * maxwidth;
+	float x2 = x1 + maxwidth;
+	float y1 = origy1 - top;
+	float y2 = origy1 - UI_BOX_TB_BORDER;
+
+	// draw a box
+	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+
+	// take off the borders
+	x1 += UI_BOX_LR_BORDER;
+	x2 -= UI_BOX_LR_BORDER;
+	y1 += UI_BOX_TB_BORDER;
+
+	// draw the text within it
+	mui.draw_text_full(container, _("Plugins"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+}

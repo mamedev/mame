@@ -41,6 +41,7 @@ private:
 	{
 		CONF_OPTS = 1,
 		CONF_MACHINE,
+		CONF_PLUGINS,
 	};
 
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
