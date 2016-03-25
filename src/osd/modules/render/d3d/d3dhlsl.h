@@ -45,7 +45,6 @@ public:
 	{
 		CU_SCREEN_DIMS = 0,
 		CU_SOURCE_DIMS,
-		CU_SOURCE_RECT,
 		CU_TARGET_DIMS,
 		CU_QUAD_DIMS,
 
@@ -384,6 +383,7 @@ private:
 
 	bool                    master_enable;              // overall enable flag
 	bool                    vector_enable;              // vector post-processing enable flag
+	bool                    oversampling_enable;        // oversampling enable flag
 	bool                    paused;                     // whether or not rendering is currently paused
 	int                     num_screens;                // number of emulated physical screens
 	int                     curr_screen;                // current screen for render target operations

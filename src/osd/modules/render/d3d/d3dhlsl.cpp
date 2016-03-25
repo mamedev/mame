@@ -69,6 +69,7 @@ shaders::shaders() :
 {
 	master_enable = false;
 	vector_enable = true;
+	oversampling_enable = false;
 	shadow_texture = nullptr;
 	options = nullptr;
 	paused = true;
@@ -664,6 +665,7 @@ void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 	windows_options &winoptions = downcast<windows_options &>(machine->options());
 
 	master_enable = winoptions.d3d_hlsl_enable();
+	oversampling_enable = winoptions.d3d_hlsl_oversampling();
 	snap_width = winoptions.d3d_snap_width();
 	snap_height = winoptions.d3d_snap_height();
 
@@ -945,7 +947,6 @@ int shaders::create_resources(bool reset)
 	for (int i = 0; i < 13; i++)
 	{
 		effects[i]->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
-		effects[i]->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
 		effects[i]->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
 		effects[i]->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 		effects[i]->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS);
@@ -1438,7 +1439,6 @@ int shaders::downsample_pass(d3d_render_target *rt, int source_index, poly_info 
 	for (int bloom_index = 0; bloom_index < rt->bloom_count; bloom_index++)
 	{
 		curr_effect->set_vector("TargetDims", 2, rt->bloom_dims[bloom_index]);
-		curr_effect->set_int("BloomLevel", bloom_index + 1);
 		curr_effect->set_texture("DiffuseTexture",
 			bloom_index == 0
 				? rt->source_texture[next_index]
@@ -1824,6 +1824,9 @@ d3d_render_target* shaders::get_texture_target(render_primitive *prim, texture_i
 		? static_cast<int>(prim->get_quad_width() + 0.5f)
 		: static_cast<int>(prim->get_quad_height() + 0.5f);
 
+	target_width *= oversampling_enable ? 2 : 1;
+	target_height *= oversampling_enable ? 2 : 1;
+
 	// find render target and check if the size of the target quad has changed 
 	d3d_render_target *target = find_render_target(texture);
 	if (target != nullptr && target->target_width == target_width && target->target_height == target_height)
@@ -1846,6 +1849,9 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim)
 	int target_width = static_cast<int>(prim->get_quad_width() + 0.5f);
 	int target_height = static_cast<int>(prim->get_quad_height() + 0.5f);
 
+	target_width *= oversampling_enable ? 2 : 1;
+	target_height *= oversampling_enable ? 2 : 1;
+
 	// find render target and check of the size of the target quad has changed 
 	d3d_render_target *target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
 	if (target != nullptr && target->target_width == target_width && target->target_height == target_height)
@@ -1863,7 +1869,10 @@ void shaders::create_vector_target(render_primitive *prim)
 	int target_width = static_cast<int>(prim->get_quad_width() + 0.5f);
 	int target_height = static_cast<int>(prim->get_quad_height() + 0.5f);
 
-	osd_printf_verbose("create_vector_target() - %f, %f; %d, %d\n", prim->get_quad_width(), prim->get_quad_height(), (int)(prim->get_quad_width() + 0.5f), (int)(prim->get_quad_height() + 0.5f));
+	target_width *= oversampling_enable ? 2 : 1;
+	target_height *= oversampling_enable ? 2 : 1;
+
+	osd_printf_verbose("create_vector_target() - %d, %d\n", target_width, target_height);
 	if (!add_render_target(d3d, nullptr, d3d->get_width(), d3d->get_height(), target_width, target_height))
 	{
 		vector_enable = false;
@@ -1970,7 +1979,10 @@ bool shaders::register_texture(render_primitive *prim, texture_info *texture)
 		? static_cast<int>(prim->get_quad_width() + 0.5f)
 		: static_cast<int>(prim->get_quad_height() + 0.5f);
 
-	osd_printf_verbose("register_texture() - %f, %f; %d, %d\n", prim->get_quad_width(), prim->get_quad_height(), (int)(prim->get_quad_width() + 0.5f), (int)(prim->get_quad_height() + 0.5f));
+	target_width *= oversampling_enable ? 2 : 1;
+	target_height *= oversampling_enable ? 2 : 1;
+
+	osd_printf_verbose("register_texture() - %d, %d\n", target_width, target_height);
 	if (!add_render_target(d3d, texture, texture->get_width(), texture->get_height(), target_width, target_height))
 	{
 		return false;
@@ -2369,7 +2381,7 @@ slider_desc shaders::s_sliders[] =
 	{ "Floor,",                             0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_FLOOR,                   0.01f,    "%2.2f", {} },
 	{ "Phosphor Life,",                     0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_PHOSPHOR,                0.01f,    "%2.2f", {} },
 	{ "Bloom Blend Mode",                   0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_BLEND_MODE,        0,        "%s",    { "Brighten", "Darken" } },
-	{ "Bloom Scale",                        0,     0,  2000, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_SCALE,             0.001f,   "%1.3f", {} },
+	{ "Bloom Scale",                        0,     0,  4000, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_SCALE,             0.001f,   "%1.3f", {} },
 	{ "Bloom Overdrive,",                   0,     0,  2000, 5, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_OVERDRIVE,         0.001f,   "%1.3f", {} },
 	{ "Bloom Level 0 Scale",                0,   100,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL0_SCALE,        0.01f,    "%1.2f", {} },
 	{ "Bloom Level 1 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL1_SCALE,        0.01f,    "%1.2f", {} },
@@ -2605,35 +2617,16 @@ void uniform::update()
 		}
 		case CU_SOURCE_DIMS:
 		{
-			if (shadersys->curr_texture != nullptr)
+			if (shadersys->curr_texture)
 			{
 				vec2f sourcedims = shadersys->curr_texture->get_rawdims();
 				m_shader->set_vector("SourceDims", 2, &sourcedims.c.x);
-			}
-			else
-			{
-				vec2f sourcedims = d3d->get_dims();
-				m_shader->set_vector("SourceDims", 2, &sourcedims.c.x);
-			}
-			break;
-		}
-		case CU_SOURCE_RECT:
-		{
-			if (shadersys->curr_texture != nullptr)
-			{
-				vec2f delta = shadersys->curr_texture->get_uvstop() - shadersys->curr_texture->get_uvstart();
-				m_shader->set_vector("SourceRect", 2, &delta.c.x);
-			}
-			else
-			{
-				float delta[2] = { 1.0f, 1.0f };
-				m_shader->set_vector("SourceRect", 2, delta);
 			}
 			break;
 		}
 		case CU_TARGET_DIMS:
 		{
-			if (shadersys->curr_render_target != nullptr)
+			if (shadersys->curr_render_target)
 			{
 				float targetdims[2] = {
 					static_cast<float>(shadersys->curr_render_target->target_width),
@@ -2644,7 +2637,7 @@ void uniform::update()
 		}
 		case CU_QUAD_DIMS:
 		{
-			if (shadersys->curr_poly != nullptr)
+			if (shadersys->curr_poly)
 			{
 				float quaddims[2] = {
 					// round

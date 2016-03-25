@@ -3,6 +3,7 @@ HLSL-Related Enable Switches
 
 Name                    Values		Description
 hlsl_enable             0/1             Enables HLSL post-processing in Direct3D 9 modes.
+hlsl_oversampling       0/1             Enables HLSL oversampling.
 yiq_enable              0/1             Enables YIQ-colorspace post-processing. Causes a
                                         performance drop but gives a much more authentic
                                         NTSC TV appearance on TV-based systems when configured
@@ -103,7 +104,7 @@ Bloom Post-Processing Options
 -----------------------------
 Name                    Default Values  Description
 bloom_blend_mode        0 or 1          0 for brighten blend mode or 1 for darken blend mode.
-bloom_scale             0.0             Bloom intensity factor.  (0.000-2.000)
+bloom_scale             0.0             Bloom intensity factor.  (0.000-4.000)
 bloom_overdrive         0.0,0.0,0.0     Bloom overdrive factor to bright full saturated colors.  (0.000-2.000)
 bloom_lvl0_weight       1.00            Bloom level 0  (full-size target) weight.  (0.00-1.00)
 bloom_lvl1_weight       0.64            Bloom level 1  (1/2-size target) weight.  (0.00-1.00)
