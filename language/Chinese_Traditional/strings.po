@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 23:59+0100\n"
-"PO-Revision-Date: 2016-03-25 20:05+0800\n"
+"PO-Revision-Date: 2016-03-26 13:55+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -442,7 +442,7 @@ msgstr "Mamescore"
 
 #: src/emu/ui/datmenu.cpp:294 src/emu/ui/selgame.cpp:44
 msgid "Gameinit"
-msgstr ""
+msgstr "Gameinit"
 
 #: src/emu/ui/datmenu.cpp:296 src/emu/ui/selgame.cpp:43
 msgid "Command"
@@ -1025,7 +1025,7 @@ msgstr "匯出為 TXT 格式 （同 -listfull）"
 
 #: src/emu/ui/miscmenu.cpp:854
 msgid "Dummy"
-msgstr ""
+msgstr "Dummy"
 
 #: src/emu/ui/miscmenu.cpp:856
 msgid "Save machine configuration"
@@ -2065,6 +2065,3 @@ msgstr " 色彩"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " PENS"
-
-#~ msgid "Configure Machine"
-#~ msgstr "設定機台"
