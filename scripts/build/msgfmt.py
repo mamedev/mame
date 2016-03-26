@@ -140,10 +140,10 @@ def make(filename, outfile):
     section = None
     fuzzy = 0
     empty = 0
+    header_attempted = False
 
     # Start off assuming Latin-1, so everything decodes without failure,
     # until we know the exact encoding
-    charset = None
     encoding = 'latin-1'
 
     # Start off assuming Latin-1, so everything decodes without failure,
@@ -207,11 +207,11 @@ def make(filename, outfile):
                 if msgstr:
                     msgstr += b'\0' # Separator of the various plural forms
             else:
-                if (l[6:].strip() == '""') and (empty == 1) and (not charset):
+                if (l[6:].strip() == '""') and (empty == 1) and (not header_attempted):
                     header = ""
                     # parse up until next empty line = end of header
                     hdrno = lno
-                    while(hdrno < len(lines)):
+                    while(hdrno < len(lines)-1):
                         # This is a roundabout way to strip non-ASCII unicode characters from the header.
                         # As we are only parsing out the encoding, we don't need any unicode chars in it.
                         l = lines[hdrno+1].decode('unicode_escape').encode('ascii','ignore').decode(encoding)
@@ -221,10 +221,12 @@ def make(filename, outfile):
                             break
                         hdrno += 1
                     # See whether there is an encoding declaration
-                    p = HeaderParser()
-                    charset = p.parsestr(header).get_content_charset()
-                    if charset:
-                        encoding = charset
+                    if(hdrno > lno):
+                        p = HeaderParser()
+                        charset = p.parsestr(header).get_content_charset()
+                        header_attempted = 1
+                        if charset:
+                            encoding = charset
                 if is_plural:
                     print('indexed msgstr required for plural on  %s:%d' % (infile, lno),
                           file=sys.stderr)
