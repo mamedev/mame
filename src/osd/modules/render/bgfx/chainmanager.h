@@ -4,8 +4,8 @@
 //
 //  chainmanager.h - BGFX shader chain manager
 //
-//  Maintains a string-to-entry lookup of BGFX shader
-//  effect chains, defined by chain.h and read by chainreader.h
+//  Provides loading for BGFX shader effect chains, defined
+//  by chain.h and read by chainreader.h
 //
 //============================================================
 
@@ -27,13 +27,11 @@ class bgfx_chain;
 
 class chain_manager {
 public:
-	chain_manager(osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t width, uint32_t height)
+	chain_manager(osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects)
 		: m_options(options)
         , m_textures(textures)
 		, m_targets(targets)
 		, m_effects(effects)
-		, m_width(width)
-		, m_height(height)
 	{
 	}
 	~chain_manager();
@@ -48,8 +46,6 @@ private:
 	texture_manager&					m_textures;
 	target_manager&						m_targets;
 	effect_manager&                     m_effects;
-	uint32_t							m_width;
-	uint32_t							m_height;
 	std::vector<bgfx_chain*>	        m_chains;
 };
 

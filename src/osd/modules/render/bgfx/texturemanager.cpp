@@ -50,11 +50,17 @@ bgfx_texture* texture_manager::create_texture(std::string name, bgfx::TextureFor
 	return texture;
 }
 
-bgfx_texture* texture_manager::create_png_texture(std::string path, std::string file_name, std::string texture_name, uint32_t flags)
+bgfx_texture* texture_manager::create_png_texture(std::string path, std::string file_name, std::string texture_name, uint32_t flags, uint32_t screen)
 {
     bitmap_argb32 bitmap;
     emu_file file(path.c_str(), OPEN_FLAG_READ);
     render_load_png(bitmap, file, nullptr, file_name.c_str());
+
+    if (bitmap.width() == 0 || bitmap.height() == 0)
+    {
+        printf("Unable to load PNG '%s' from path '%s'\n", path.c_str(), file_name.c_str());
+        return nullptr;
+    }
 
     uint8_t *texture_data = new uint8_t[bitmap.width() * bitmap.height() * 4];
 
@@ -66,6 +72,10 @@ bgfx_texture* texture_manager::create_png_texture(std::string path, std::string 
         copy_util::copyline_argb32(reinterpret_cast<UINT32 *>(texture_data) + y * width, reinterpret_cast<UINT32 *>(base) + y * rowpixels, width, nullptr);
     }
 
+    if (screen >= 0)
+    {
+        texture_name += std::to_string(screen);
+    }
     bgfx_texture* texture = create_texture(texture_name, bgfx::TextureFormat::RGBA8, width, height, texture_data, flags);
 
     delete[] texture_data;

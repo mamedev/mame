@@ -75,9 +75,6 @@ READ8_MEMBER( svi_slot_bus_device::mreq_r )
 	device_svi_slot_interface *entry = m_dev.first();
 	UINT8 data = 0xff;
 
-	romdis_w(1);
-	ramdis_w(1);
-
 	while (entry)
 	{
 		data &= entry->mreq_r(space, offset);
@@ -94,9 +91,6 @@ READ8_MEMBER( svi_slot_bus_device::mreq_r )
 WRITE8_MEMBER( svi_slot_bus_device::mreq_w )
 {
 	device_svi_slot_interface *entry = m_dev.first();
-
-	romdis_w(1);
-	ramdis_w(1);
 
 	while (entry)
 	{

@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 //============================================================
 //
-//  effect.cpp - BGFX shader material to be applied to a mesh
+//  effect.h - BGFX shader material to be applied to a mesh
 //
 //============================================================
 

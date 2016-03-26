@@ -74,10 +74,9 @@ void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager&
 
     m_effect->submit(view, blend);
 
-    std::string output_name = m_output + std::to_string(screen);
-    if (m_targets.target(output_name) != nullptr)
+    if (m_targets.target(screen, m_output) != nullptr)
     {
-        m_targets.target(output_name)->page_flip();
+        m_targets.target(screen, m_output)->page_flip();
     }
 }
 
@@ -87,11 +86,7 @@ void bgfx_chain_entry::setup_screensize_uniforms(texture_manager& textures, uint
 	float height = screen_height;
 	if (m_inputs.size() > 0)
 	{
-		std::string name = m_inputs[0].texture();
-		if (name == "previous")
-		{
-			name = name + std::to_string(screen);
-		}
+		std::string name = m_inputs[0].texture() + std::to_string(screen);
 		width = float(textures.provider(name)->width());
 		height = float(textures.provider(name)->height());
 	}
@@ -165,17 +160,16 @@ bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
 	bgfx::FrameBufferHandle handle = BGFX_INVALID_HANDLE;
 	uint16_t width = screen_width;
 	uint16_t height = screen_height;
-    std::string output_name = m_output + std::to_string(screen);
-    if (m_targets.target(output_name) != nullptr)
+    if (m_targets.target(screen, m_output) != nullptr)
     {
-        bgfx_target* output = m_targets.target(output_name);
+        bgfx_target* output = m_targets.target(screen, m_output);
         if (output->width() == 0)
         {
 			return false;
 		}
 		handle = output->target();
-		width = output->width() * output->prescale_x();
-		height = output->height() * output->prescale_y();
+		width = output->width();
+		height = output->height();
     }
 
     bgfx::setViewFrameBuffer(view, handle);

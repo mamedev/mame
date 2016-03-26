@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz,ImJezze
+//============================================================
+//
+//  post.json: Scanline, hum-bar, shadow-mask, and final
+//  color convolution shader for CRT simulation.
+//
+//============================================================
 {
     "blend": {
     	"equation": "add",
@@ -11,8 +19,8 @@
     },
     "cull": { "mode": "none" },
     "write": {
-    	"rgb": "true",
-    	"alpha": "true"
+    	"rgb": true,
+    	"alpha": true
     },
     "vertex": "vs_post",
     "fragment": "fs_post",
@@ -35,8 +43,9 @@
     	{ "name": "u_scanline_bright_scale",  "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
     	{ "name": "u_scanline_bright_offset", "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
     	{ "name": "u_scanline_jitter",        "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
-    	{ "name": "u_jitter_amount",          "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
     	{ "name": "u_scanline_height",        "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_scanline_variation",     "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_jitter_amount",          "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
     	{ "name": "u_back_color",             "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
     	{ "name": "u_shadow_tile_mode",       "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
     	{ "name": "u_shadow_alpha",           "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },

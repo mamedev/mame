@@ -2,8 +2,8 @@
 // copyright-holders:Ryan Holtz
 //============================================================
 //
-//  suppressor.h - Conditionally suppress a bgfx chain entry
-//                 from being processed.
+//  suppressor.cpp - Conditionally suppress a bgfx chain entry
+//  from being processed.
 //
 //============================================================
 

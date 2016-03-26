@@ -17,7 +17,7 @@
 		{	"effect": "blit",
 			"name": "Final Upscale",
 			"input": [
-				{ "sampler": "s_tex", "texture": "temp" }
+				{ "sampler": "s_tex", "target": "temp" }
 			],
 			"output": "output"
 		}

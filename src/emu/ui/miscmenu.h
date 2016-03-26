@@ -141,5 +141,18 @@ private:
 	const game_driver *m_drv;
 };
 
+//-------------------------------------------------
+//  plugins configure menu
+//-------------------------------------------------
+
+class ui_menu_plugins_configure : public ui_menu
+{
+public:
+	ui_menu_plugins_configure(running_machine &machine, render_container *container);
+	virtual ~ui_menu_plugins_configure();
+	virtual void populate() override;
+	virtual void handle() override;
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+};
 
 #endif  /* __UI_MISCMENU_H__ */

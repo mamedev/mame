@@ -4,8 +4,8 @@
 //
 //  chainmanager.cpp - BGFX shader chain manager
 //
-//  Maintains a string-to-entry lookup of BGFX shader effect
-//  chains, defined by chain.h and read by chainreader.h
+//  Provides loading for BGFX shader effect chains, defined
+//  by chain.h and read by chainreader.h
 //
 //============================================================
 
@@ -60,7 +60,9 @@ bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine
 	data[size] = 0;
 
 	Document document;
-	document.Parse<0>(data);
+	document.Parse<kParseCommentsFlag>(data);
+
+    delete [] data;
 
 	if (document.HasParseError())
 	{
@@ -70,7 +72,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine
 		return nullptr;
 	}
 
-	bgfx_chain* chain = chain_reader::read_from_value(document, name + ": ", m_options, machine, window_index, screen_index, m_textures, m_targets, m_effects, m_width, m_height);
+	bgfx_chain* chain = chain_reader::read_from_value(document, name + ": ", m_options, machine, window_index, screen_index, m_textures, m_targets, m_effects);
 
 	if (chain == nullptr)
 	{

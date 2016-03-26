@@ -285,6 +285,50 @@ static void sdlwindow_sync(void)
 }
 
 
+void sdl_osd_interface::update_slider_list()
+{
+	for (sdl_window_info *window = sdl_window_list; window != nullptr; window = window->m_next)
+	{
+		// check if any window has dirty sliders
+		if (&window->renderer() && window->renderer().sliders_dirty())
+		{
+			build_slider_list();
+			return;
+		}
+	}
+}
+
+void sdl_osd_interface::build_slider_list()
+{
+    m_sliders = nullptr;
+    slider_state* full_list = nullptr;
+    slider_state* curr = nullptr;
+	for (sdl_window_info *window = sdl_window_list; window != nullptr; window = window->m_next)
+	{
+		// take the sliders of the first window
+        slider_state* window_sliders = window->renderer().get_slider_list();
+        if (window_sliders == nullptr)
+        {
+            continue;
+        }
+
+        if (full_list == nullptr)
+        {
+            full_list = curr = window_sliders;
+        }
+        else
+        {
+            curr->next = window_sliders;
+        }
+
+        while (curr->next != nullptr) {
+            curr = curr->next;
+        }
+	}
+
+    m_sliders = full_list;
+}
+
 //============================================================
 //  sdlwindow_exit
 //  (main thread)

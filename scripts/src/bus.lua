@@ -2603,6 +2603,8 @@ if (BUSES["SVI_EXPANDER"]~=null) then
 		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv601.h",
 		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv602.cpp",
 		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv602.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv603.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv603.h",
 	}
 end
 

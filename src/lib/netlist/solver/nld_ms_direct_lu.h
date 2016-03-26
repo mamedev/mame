@@ -185,7 +185,7 @@ ATTR_HOT nl_double matrix_solver_direct_t<m_N, _storage_N>::compute_next_timeste
 		{
 			analog_net_t *n = m_nets[k];
 
-			const nl_double DD_n = (n->m_cur_Analog - m_last_V[k]);
+			const nl_double DD_n = (n->Q_Analog() - m_last_V[k]);
 			const nl_double hn = current_timestep();
 
 			nl_double DD2 = (DD_n / hn - n->m_DD_n_m_1 / n->m_h_n_m_1) / (hn + n->m_h_n_m_1);

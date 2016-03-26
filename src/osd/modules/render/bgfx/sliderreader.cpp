@@ -12,7 +12,7 @@
 #include "slider.h"
 
 const slider_reader::string_to_enum slider_reader::TYPE_NAMES[slider_reader::TYPE_COUNT] = {
-	{ "int_enum", uint64_t(bgfx_slider::slider_type::SLIDER_INT_ENUM) },
+	{ "intenum", uint64_t(bgfx_slider::slider_type::SLIDER_INT_ENUM) },
 	{ "float",    uint64_t(bgfx_slider::slider_type::SLIDER_FLOAT) },
 	{ "int",      uint64_t(bgfx_slider::slider_type::SLIDER_INT) },
 	{ "color",    uint64_t(bgfx_slider::slider_type::SLIDER_COLOR) },
@@ -24,11 +24,11 @@ const slider_reader::string_to_enum slider_reader::SCREEN_NAMES[slider_reader::S
 	{ "raster",  uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_RASTER) },
 	{ "vector",    uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_VECTOR) },
 	{ "crt",  uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_VECTOR_OR_RASTER) },
-	{ "vector_raster",  uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_VECTOR_OR_RASTER) },
+	{ "vectorraster",  uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_VECTOR_OR_RASTER) },
 	{ "lcd",   uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_LCD) },
-	{ "non_vector",   uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_LCD_OR_RASTER) },
-	{ "lcd_raster",   uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_LCD_OR_RASTER) },
-	{ "lcd_vector",   uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_LCD_OR_VECTOR) },
+	{ "nonvector",   uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_LCD_OR_RASTER) },
+	{ "lcdraster",   uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_LCD_OR_RASTER) },
+	{ "lcdvector",   uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_LCD_OR_VECTOR) },
 	{ "any",   uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_ANY) },
 	{ "all",   uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_ANY) }
 };

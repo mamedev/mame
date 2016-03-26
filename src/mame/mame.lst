@@ -9266,7 +9266,6 @@ czz50                           // Bit Corporation Chuang Zao Zhe 50
 dina                            // Telegames Dina
 onyx                            // Microdigital ONYX (Brazilian Coleco clone / unreleased prototype)
 prsarcde                        // Telegames Personal Arcade
-svi603                          // Spectravideo SVI-603 Coleco Game Adapter
 
 @source:combatsc.cpp
 bootcamp                        // GX611 (c) 1987
@@ -12318,6 +12317,7 @@ omni                            // bootleg
 orbitron                        // (c) 1982 Signatron USA (Arcade Tv Game List - P.160, Left, 22 from top)
 pacmanbl                        // bootleg
 pacmanbla                       // bootleg
+pacmanblb						// bootleg
 pajaroes                        // bootleg
 phoenxp2                        // bootleg
 pisces                          // Subelectro
@@ -13684,6 +13684,7 @@ maniac                          // Ideal
 
 @source:hh_sm510.cpp
 gnwmndon                        // Nintendo
+kcontra                         // Konami
 ktmnt                           // Konami
 ktopgun                         // Konami
 
@@ -27760,6 +27761,7 @@ wldkicksa                       // 2000.03 World Kicks (Asia, WK2 Ver.A)
 wldkicksj                       // 2000.03 World Kicks PCB (Japan, WKC1 Ver.A)
 wldrider                        // 2001.05 Wild Riders
 wrungp                          // 2001.08 Wave Runner GP
+wrungpo                         // 2001.?? Wave Runner GP (original, Rev A)
 wsbbgd                          // 2001.06 Super Major League / World Series Baseball
 wwfroyal                        // 2000.11 WWF Royal Rumble
 xtrmhnt2                        // 2006.09 Extreme Hunting 2 Tournament Edition
@@ -36336,6 +36338,9 @@ mysticmp                        // (c) 1983 Prototype
 playball                        // (c) 1983
 robotron                        // (c) 1982
 robotronyo                      // (c) 1982
+robotron87						// 
+robotron12						//
+robotrontd						//
 sinistar                        // (c) 1982
 sinistar1                       // (c) 1982
 sinistar2                       // (c) 1982

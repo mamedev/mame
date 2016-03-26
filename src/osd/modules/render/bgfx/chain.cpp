@@ -52,8 +52,8 @@ bgfx_chain::~bgfx_chain()
 void bgfx_chain::process(render_primitive* prim, int view, int screen, texture_manager& textures, osd_window& window, uint64_t blend)
 {
     int current_view = view;
-    uint16_t screen_width = window.get_size().width();
-    uint16_t screen_height = window.get_size().height();
+    uint16_t screen_width(floor((prim->bounds.x1 - prim->bounds.x0) + 0.5f));
+    uint16_t screen_height(floor((prim->bounds.y1 - prim->bounds.y0) + 0.5f));
     uint32_t rotation_type = (window.target()->orientation() & ROT90) == ROT90 ?
     					1 : (window.target()->orientation() & ROT180) == ROT180 ?
 						2 : (window.target()->orientation() & ROT270) == ROT270 ?

@@ -1,9 +1,18 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  screen_multiply.json: Shader used when drawing a final
+//  post-processed screen image to the output window with
+//  multiply blending.
+//
+//============================================================
 {
     "blend": {
     	"equation": "add",
-    	"srcColor": "dstColor",
+    	"srcColor": "dstcolor",
     	"dstColor": "0",
-    	"srcAlpha": "dstAlpha",
+    	"srcAlpha": "dstalpha",
     	"dstAlpha": "0"
     },
     "depth": {
@@ -11,8 +20,8 @@
     },
     "cull": { "mode": "none" },
     "write": {
-    	"rgb": "true",
-    	"alpha": "true"
+    	"rgb": true,
+    	"alpha": true
     },
     "vertex": "vs_screen",
     "fragment": "fs_screen",

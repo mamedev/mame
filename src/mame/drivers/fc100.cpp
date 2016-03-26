@@ -523,7 +523,6 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	// other lines not connected
 
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "vdg")
-	MCFG_SCREEN_COLOR(rgb_t::amber)
 	MCFG_GFXDECODE_ADD("gfxdecode", "f4palette", fc100)
 	MCFG_PALETTE_ADD_MONOCHROME("f4palette")
 

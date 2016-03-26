@@ -14,8 +14,8 @@ const blend_reader::string_to_enum blend_reader::EQUATION_NAMES[blend_reader::EQ
 	{ "add",            BGFX_STATE_BLEND_EQUATION_ADD },
 	{ "sub",            BGFX_STATE_BLEND_EQUATION_SUB },
 	{ "subtract",       BGFX_STATE_BLEND_EQUATION_SUB },
-	{ "revSub",         BGFX_STATE_BLEND_EQUATION_REVSUB },
-	{ "revSubtract",    BGFX_STATE_BLEND_EQUATION_REVSUB },
+	{ "revsub",         BGFX_STATE_BLEND_EQUATION_REVSUB },
+	{ "revsubtract",    BGFX_STATE_BLEND_EQUATION_REVSUB },
 	{ "min",            BGFX_STATE_BLEND_EQUATION_MIN },
 	{ "max",            BGFX_STATE_BLEND_EQUATION_MAX }
 };
@@ -25,18 +25,18 @@ const blend_reader::string_to_enum blend_reader::FUNCTION_NAMES[blend_reader::FU
 	{ "zero",           BGFX_STATE_BLEND_ZERO },
 	{ "1",              BGFX_STATE_BLEND_ONE },
 	{ "one",            BGFX_STATE_BLEND_ONE },
-	{ "srcColor",       BGFX_STATE_BLEND_SRC_COLOR },
-	{ "1-srcColor",     BGFX_STATE_BLEND_INV_SRC_COLOR },
-	{ "invSrcColor",    BGFX_STATE_BLEND_INV_SRC_COLOR },
-	{ "dstColor",       BGFX_STATE_BLEND_DST_COLOR },
-	{ "1-dstColor",     BGFX_STATE_BLEND_INV_DST_COLOR },
-	{ "invDstColor",    BGFX_STATE_BLEND_INV_DST_COLOR },
-	{ "srcAlpha",       BGFX_STATE_BLEND_SRC_ALPHA },
-	{ "1-srcAlpha",     BGFX_STATE_BLEND_INV_SRC_ALPHA },
-	{ "invSrcAlpha",    BGFX_STATE_BLEND_INV_SRC_ALPHA },
-	{ "dstAlpha",       BGFX_STATE_BLEND_DST_ALPHA },
-	{ "1-dstAlpha",     BGFX_STATE_BLEND_INV_DST_ALPHA },
-	{ "invDstAlpha",    BGFX_STATE_BLEND_INV_DST_ALPHA }
+	{ "srccolor",       BGFX_STATE_BLEND_SRC_COLOR },
+	{ "1-srccolor",     BGFX_STATE_BLEND_INV_SRC_COLOR },
+	{ "invsrccolor",    BGFX_STATE_BLEND_INV_SRC_COLOR },
+	{ "dstcolor",       BGFX_STATE_BLEND_DST_COLOR },
+	{ "1-dstcolor",     BGFX_STATE_BLEND_INV_DST_COLOR },
+	{ "invdstcolor",    BGFX_STATE_BLEND_INV_DST_COLOR },
+	{ "srcalpha",       BGFX_STATE_BLEND_SRC_ALPHA },
+	{ "1-srcalpha",     BGFX_STATE_BLEND_INV_SRC_ALPHA },
+	{ "invsrcalpha",    BGFX_STATE_BLEND_INV_SRC_ALPHA },
+	{ "dstalpha",       BGFX_STATE_BLEND_DST_ALPHA },
+	{ "1-dstalpha",     BGFX_STATE_BLEND_INV_DST_ALPHA },
+	{ "invdstalpha",    BGFX_STATE_BLEND_INV_DST_ALPHA }
 };
 
 uint64_t blend_reader::read_from_value(const Value& value)

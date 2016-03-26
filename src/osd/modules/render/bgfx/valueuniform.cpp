@@ -10,6 +10,7 @@
 //============================================================
 
 #include "valueuniform.h"
+#include <cstring>
 
 bgfx_value_uniform::bgfx_value_uniform(bgfx_uniform* uniform, float* values, const int count)
 	: bgfx_entry_uniform(uniform)

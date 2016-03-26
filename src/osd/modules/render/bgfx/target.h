@@ -27,7 +27,7 @@ enum
 class bgfx_target : public bgfx_texture_handle_provider
 {
 public:
-	bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t prescale_x, uint32_t prescale_y, uint32_t style, int32_t index, bool double_buffer, bool filter, bool init = true, bool output = false);
+	bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t style, bool double_buffer, bool filter, bool smooth, uint32_t screen);
 	bgfx_target(void *handle, uint16_t width, uint16_t height);
 	virtual ~bgfx_target();
 
@@ -39,11 +39,9 @@ public:
 	std::string 				name() const { return m_name; }
 	bool						double_buffered() const { return m_double_buffer; }
 	uint32_t 					style() const { return m_style; }
-	bool 						filter() const { return m_filter; }
-    uint32_t                    prescale_x() const { return m_prescale_x; }
-    uint32_t                    prescale_y() const { return m_prescale_y; }
-    bool                        output() const { return m_output; }
-    int32_t                     index() const { return m_index; }
+    bool 						filter() const { return m_filter; }
+    bool 						smooth() const { return m_smooth; }
+    uint32_t                    screen_index() const { return m_screen; }
 
 	// bgfx_texture_handle_provider
 	virtual uint16_t width() const override { return m_width; }
@@ -61,14 +59,12 @@ private:
 	uint16_t					m_width;
 	uint16_t					m_height;
 
-    uint32_t                    m_prescale_x;
-    uint32_t                    m_prescale_y;
-
     bool						m_double_buffer;
 	uint32_t					m_style;
 	bool						m_filter;
-    bool                        m_output;
-    int32_t                     m_index;
+    bool                        m_smooth;
+
+    int32_t                     m_screen;
 
 	uint32_t					m_current_page;
 

@@ -11,6 +11,7 @@
 #include <algorithm>
 
 #include "solver/nld_solver.h"
+#include "solver/vector_base.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -105,7 +106,7 @@ ATTR_HOT nl_double matrix_solver_direct_t<m_N, _storage_N>::compute_next_timeste
 		{
 			analog_net_t *n = m_nets[k];
 
-			const nl_double DD_n = (n->m_cur_Analog - m_last_V[k]);
+			const nl_double DD_n = (n->Q_Analog() - m_last_V[k]);
 			const nl_double hn = current_timestep();
 
 			nl_double DD2 = (DD_n / hn - n->m_DD_n_m_1 / n->m_h_n_m_1) / (hn + n->m_h_n_m_1);
@@ -409,8 +410,13 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 				const nl_double f1 = - A(j,i) * f;
 				if (f1 != NL_FCONST(0.0))
 				{
-					for (unsigned k = i+1; k < kN; k++)
-						A(j,k) += A(i,k) * f1;
+					nl_double * RESTRICT pi = &m_A[i][i+1];
+					nl_double * RESTRICT pj = &m_A[j][i+1];
+					vec_add_mult_scalar(kN-i-1,pj,f1,pi);
+					//for (unsigned k = i+1; k < kN; k++)
+					//	pj[k] = pj[k] + pi[k] * f1;
+					//for (unsigned k = i+1; k < kN; k++)
+						//A(j,k) += A(i,k) * f1;
 					m_RHS[j] += m_RHS[i] * f1;
 				}
 			}
@@ -430,10 +436,14 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 			{
 				const unsigned j = pb[jb];
 				const nl_double f1 = - A(j,i) * f;
+#if 0
+				nl_double * RESTRICT pi = &m_A[i][i+1];
+				nl_double * RESTRICT pj = &m_A[j][i+1];
+				vec_add_mult_scalar(kN-i-1,pi,f1,pj);
+#else
 				for (unsigned k = 0; k < e; k++)
-				{
 					A(j,p[k]) += A(i,p[k]) * f1;
-				}
+#endif
 				m_RHS[j] += m_RHS[i] * f1;
 			}
 		}
@@ -576,6 +586,8 @@ ATTR_HOT inline int matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(
 		m_RHS[i] = m_last_RHS[i];
 
 	this->LE_solve();
+
+	this->m_stat_calculations++;
 
 	return this->solve_non_dynamic(newton_raphson);
 }

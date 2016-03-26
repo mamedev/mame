@@ -115,6 +115,7 @@ newoption {
 		{ "solaris",       "Solaris SunOS"          },
 		{ "steamlink",     "Steam Link"             },
 		{ "rpi",           "Raspberry Pi"           },
+		{ "ci20",          "Creator-Ci20"           },
 	},
 }
 
@@ -1101,7 +1102,7 @@ configuration { "pnacl" }
 	}
 	archivesplit_size "20"
 
-configuration { "linux-* or rpi"}
+configuration { "linux-* or rpi or ci20"}
 		links {
 			"dl",
 			"rt",
@@ -1138,6 +1139,17 @@ configuration { "rpi" }
 		"vchiq_arm",
 		"pthread",
 	}	
+
+
+configuration { "ci20" }
+	links {
+ 		"SDL2",
+		"asound",
+		"fontconfig",
+		"freetype",
+		"pthread",
+	}	
+
 
 configuration { "osx* or xcode4" }
 		links {

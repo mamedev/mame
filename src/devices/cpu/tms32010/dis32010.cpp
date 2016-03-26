@@ -4,8 +4,6 @@
 	*               Texas Instruments TMS32010 DSP Disassembler                *
 	*                                                                          *
 	*                 Copyright Tony La Porta                                  *
-	*      You are not allowed to distribute this software commercially.       *
-	*                      Written for the MAME project.                       *
 	*                                                                          *
 	*      Notes : Data is expected to be read from source file as MSB first.  *
 	*              This is a word based microcontroller, with addressing       *

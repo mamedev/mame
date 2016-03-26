@@ -110,6 +110,7 @@ machine_manager* machine_manager::instance()
 machine_manager::machine_manager(emu_options &options,osd_interface &osd)
 		: m_osd(osd),
 		m_options(options),
+		m_plugins(std::make_unique<plugin_options>()),
 		m_lua(global_alloc(lua_engine)),
 		m_new_driver_pending(nullptr),
 		m_machine(nullptr)
@@ -155,7 +156,27 @@ void machine_manager::update_machine()
 
 void machine_manager::start_luaengine()
 {
+	path_iterator iter(options().plugins_path());
+	std::string pluginpath;
+	while (iter.next(pluginpath))
+	{
+		m_plugins->parse_json(pluginpath);
+	}
+
+	{
+		// parse the file
+		std::string error;
+		// attempt to open the output file
+		emu_file file(options().ini_path(), OPEN_FLAG_READ);
+		if (file.open("plugin.ini") == osd_file::error::NONE)
+		{
+			bool result = m_plugins->parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+			if (!result)
+				osd_printf_error("**Error loading plugin.ini**");
+		}
+	}
 	m_lua->initialize();
+	
 	{
 		emu_file file(options().plugins_path(), OPEN_FLAG_READ);
 		osd_file::error filerr = file.open("boot.lua");

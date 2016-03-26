@@ -1,3 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:ImJezze
+//============================================================
+//
+//  distortion.json: Output distortion shader for CRT
+//  simulation.
+//
+//============================================================
 {
     "blend": {
     	"equation": "add",
@@ -11,8 +19,8 @@
     },
     "cull": { "mode": "none" },
     "write": {
-    	"rgb": "true",
-    	"alpha": "true"
+    	"rgb": true,
+    	"alpha": true
     },
     "vertex": "vs_distortion",
     "fragment": "fs_distortion",

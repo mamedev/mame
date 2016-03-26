@@ -290,6 +290,8 @@ void ui_menu_dats_view::init_items()
 		m_items_list.emplace_back(_("Sysinfo"), UI_SYSINFO_LOAD, datfile.rev_sysinfo());
 	if (datfile.has_story(m_driver))
 		m_items_list.emplace_back(_("Mamescore"), UI_STORY_LOAD, datfile.rev_storyinfo());
+	if (datfile.has_gameinit(m_driver))
+		m_items_list.emplace_back(_("Gameinit"), UI_GINIT_LOAD, datfile.rev_ginitinfo());
 	if (datfile.has_command(m_driver))
 		m_items_list.emplace_back(_("Command"), UI_COMMAND_LOAD, "");
 }

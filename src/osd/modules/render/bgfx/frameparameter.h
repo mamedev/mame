@@ -1,9 +1,8 @@
-
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 //============================================================
 //
-//  frameparameter.cpp - Frame-based dynamic shader param
+//  frameparameter.h - Frame-based dynamic shader param
 //
 //============================================================
 

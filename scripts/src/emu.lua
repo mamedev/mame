@@ -25,6 +25,7 @@ includedirs {
 	MAME_DIR .. "src/devices", -- till deps are fixed
 	MAME_DIR .. "src/lib",
 	MAME_DIR .. "src/lib/util",
+	MAME_DIR .. "3rdparty/rapidjson/include",
 	MAME_DIR .. "3rdparty",
 	GEN_DIR  .. "emu",
 	GEN_DIR  .. "emu/layout",
@@ -169,6 +170,8 @@ files {
 	MAME_DIR .. "src/emu/network.h",
 	MAME_DIR .. "src/emu/parameters.cpp",
 	MAME_DIR .. "src/emu/parameters.h",
+	MAME_DIR .. "src/emu/pluginopts.cpp",
+	MAME_DIR .. "src/emu/pluginopts.h",
 	MAME_DIR .. "src/emu/output.cpp",
 	MAME_DIR .. "src/emu/output.h",
 	MAME_DIR .. "src/emu/render.cpp",
