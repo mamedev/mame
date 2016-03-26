@@ -1356,7 +1356,7 @@ msgstr "Υποστηρίζει Αποθήκευση: %1$s\n"
 #: src/emu/ui/selgame.cpp:1567
 #, c-format
 msgid "Screen Orientation: %1$s\n"
-msgstr "Προσανατολισμός Οθόνης %1$s\n"
+msgstr "Προσανατολισμός Οθόνης: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1567
 msgid "Vertical"
