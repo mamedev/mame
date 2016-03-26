@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 23:59+0100\n"
-"PO-Revision-Date: 2016-03-08 15:22+0200\n"
+"PO-Revision-Date: 2016-03-26 02:10+0200\n"
 "Last-Translator: Mame.gr\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -67,7 +67,7 @@ msgstr "Κατάσταση Autofire"
 #: src/emu/ui/videoopt.cpp:215 src/emu/ui/videoopt.cpp:219
 #: src/emu/ui/videoopt.cpp:223
 msgid "Disabled"
-msgstr "Ανενεργό"
+msgstr "Απενεργοποιημένο"
 
 #: src/emu/ui/cheatopt.cpp:258 src/emu/ui/ui.cpp:1742
 #: src/emu/ui/videoopt.cpp:207 src/emu/ui/videoopt.cpp:211
@@ -247,8 +247,7 @@ msgstr "Ρυθμίσεις γραμματοσειρών UI"
 
 #: src/emu/ui/custui.cpp:408
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr ""
-"Δείγμα κειμένου - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+msgstr "Δείγμα κειμένου - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 #: src/emu/ui/custui.cpp:506
 msgid "Normal text"
@@ -443,7 +442,7 @@ msgstr "Mamescore"
 
 #: src/emu/ui/datmenu.cpp:294 src/emu/ui/selgame.cpp:44
 msgid "Gameinit"
-msgstr ""
+msgstr "Gameinit"
 
 #: src/emu/ui/datmenu.cpp:296 src/emu/ui/selgame.cpp:43
 msgid "Command"
@@ -555,7 +554,7 @@ msgstr "Versus"
 
 #: src/emu/ui/dirmenu.cpp:58 src/emu/ui/menu.cpp:59
 msgid "Covers"
-msgstr ""
+msgstr "Εξώφυλλα"
 
 #: src/emu/ui/dirmenu.cpp:116 src/emu/ui/dirmenu.cpp:136
 msgid "Folders Setup"
@@ -568,25 +567,25 @@ msgstr "Τρέχοντες Φάκελοι για %1$s"
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
-msgstr "Αλλαγή φακέλου"
+msgstr "Αλλαγή Φακέλου"
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Add Folder"
-msgstr "Προσθήκη φακέλου"
+msgstr "Προσθήκη Φακέλου"
 
 #: src/emu/ui/dirmenu.cpp:198
 msgid "Remove Folder"
-msgstr "Αφαίρεση φακέλου"
+msgstr "Αφαίρεση Φακέλου"
 
 #: src/emu/ui/dirmenu.cpp:496
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
-msgstr "Αλλαγή %1$s Φακέλου - Αναζήτηση: %2$s_"
+msgstr "Αλλαγή Φακέλου %1$s - Αναζήτηση: %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:497
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
-msgstr "Προσθήκη %1$s Φακέλου - Αναζήτηση: %2$s_"
+msgstr "Προσθήκη Φακέλου %1$s - Αναζήτηση: %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:534
 msgid "Press TAB to set"
@@ -595,7 +594,7 @@ msgstr "Πιέστε το πλήκτρο TAB για να ορίσετε"
 #: src/emu/ui/dirmenu.cpp:640
 #, c-format
 msgid "Remove %1$s Folder"
-msgstr "Αφαίρεση %1$s Φακέλου"
+msgstr "Αφαίρεση Φακέλου %1$s"
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
@@ -969,7 +968,7 @@ msgstr "Μεγέθυνση εικόνων στο δεξιό πίνακα"
 
 #: src/emu/ui/miscmenu.cpp:559
 msgid "DATs info"
-msgstr "Πληροφορίες DATs "
+msgstr "Πληροφορίες DATs"
 
 #: src/emu/ui/miscmenu.cpp:561
 msgid "Show mouse pointer"
@@ -1037,7 +1036,7 @@ msgstr "Αποθήκευση παραμετροποίησης μηχανήματ
 #: src/emu/ui/miscmenu.cpp:967 src/emu/ui/miscmenu.cpp:987
 #: src/emu/ui/selgame.cpp:587
 msgid "Plugins"
-msgstr ""
+msgstr "Πρόσθετα"
 
 #: src/emu/ui/optsmenu.cpp:214
 msgid "Filter"
@@ -1045,11 +1044,11 @@ msgstr "Φίλτρο"
 
 #: src/emu/ui/optsmenu.cpp:222
 msgid " ^!File"
-msgstr "^! Αρχείο"
+msgstr " ^!Αρχείο"
 
 #: src/emu/ui/optsmenu.cpp:227
 msgid " ^!Category"
-msgstr "^! Κατηγορία"
+msgstr " ^!Κατηγορία"
 
 #: src/emu/ui/optsmenu.cpp:250
 msgid "^!Setup custom filter"
@@ -1082,7 +1081,7 @@ msgstr "Ρυθμίσεις"
 
 #: src/emu/ui/optsmenu.cpp:321
 msgid "**Error saving ui.ini**"
-msgstr "** Σφάλμα αποθήκευσης ui.ini**"
+msgstr "**Σφάλμα αποθήκευσης ui.ini**"
 
 #: src/emu/ui/optsmenu.cpp:368
 #, c-format
@@ -1684,8 +1683,7 @@ msgstr "Το μηχάνημα δεν έχει ήχο.\n"
 
 #: src/emu/ui/ui.cpp:1115
 msgid "Screen flipping in cocktail mode is not supported.\n"
-msgstr ""
-"Το αναποδογύρισμα της οθόνης σε κοκτέιλ λειτουργία δεν υποστηρίζεται.\n"
+msgstr "Το αναποδογύρισμα της οθόνης σε κοκτέιλ λειτουργία δεν υποστηρίζεται.\n"
 
 #: src/emu/ui/ui.cpp:1119
 msgid "The machine requires external artwork files\n"
@@ -1709,8 +1707,7 @@ msgstr ""
 
 #: src/emu/ui/ui.cpp:1137
 msgid "The machine has protection which isn't fully emulated.\n"
-msgstr ""
-"Αυτό το μηχάνημα έχει προστασία η οποία δεν είναι πλήρως εξομοιωμένη.\n"
+msgstr "Αυτό το μηχάνημα έχει προστασία η οποία δεν είναι πλήρως εξομοιωμένη.\n"
 
 #: src/emu/ui/ui.cpp:1140
 msgid ""
@@ -1820,7 +1817,7 @@ msgstr "Κατάσταση Εξομοίωσης Πληκτρολογίου"
 
 #: src/emu/ui/ui.cpp:1579
 msgid "Mode: PARTIAL Emulation"
-msgstr "Λειτουργία: Μερική Εξομοίωση"
+msgstr "Λειτουργία: ΜΕΡΙΚΗ Εξομοίωση"
 
 #: src/emu/ui/ui.cpp:1580
 msgid "UI:   Enabled"
@@ -1836,7 +1833,7 @@ msgstr "Λειτουργία: ΠΛΗΡΗΣ Εξομοίωση"
 
 #: src/emu/ui/ui.cpp:1590
 msgid "UI:   Disabled"
-msgstr "Απενεργοποιημένο UI"
+msgstr "UI:   Απενεργοποιημένο"
 
 #: src/emu/ui/ui.cpp:1736
 msgid "Autofire can't be enabled"
@@ -2063,7 +2060,7 @@ msgstr "Περιστροφή"
 
 #: src/emu/ui/videoopt.cpp:207
 msgid "Backdrops"
-msgstr "Backdrops"
+msgstr "Σκηνικά"
 
 #: src/emu/ui/videoopt.cpp:211
 msgid "Overlays"
@@ -2071,7 +2068,7 @@ msgstr "Επικαλύψεις"
 
 #: src/emu/ui/videoopt.cpp:215
 msgid "Bezels"
-msgstr "Bezels"
+msgstr "Προσόψεις"
 
 #: src/emu/ui/videoopt.cpp:219
 msgid "CPanels"
@@ -2096,12 +2093,3 @@ msgstr " ΧΡΩΜΑΤΑ"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " ΓΡΑΦΙΔΕΣ"
-
-#~ msgid "Configure Machine"
-#~ msgstr "Ρύθμιση Μηχανήματος"
-
-#~ msgid "Multi-Threaded Rendering"
-#~ msgstr "Multi-Threaded Rendering"
-
-#~ msgid "Hardware Stretch"
-#~ msgstr "Hardware Stretch"
