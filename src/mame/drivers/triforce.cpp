@@ -1024,7 +1024,7 @@ ROM_START( mkartag2a )
 ROM_END
 
 /* Main board */
-/*Triforce*/GAME( 2002, triforce, 0,        triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Triforce Bios", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT )
+/*Triforce*/GAME( 2002, triforce, 0,        triforce_base,    triforce, driver_device, 0, ROT0, "Sega",                               "Triforce Bios", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT )
 
 /* GDT-xxxx (Sega GD-ROM games) */
 /* 0001  */ GAME( 2002, vs2002j,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Amusement Vision",            "Virtua Striker 2002 (GDT-0001)", MACHINE_IS_SKELETON )
