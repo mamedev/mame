@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 23:59+0100\n"
-"PO-Revision-Date: 2016-03-25 12:00+0100\n"
+"PO-Revision-Date: 2016-03-26 10:46+0100\n"
 "Last-Translator: Lothar Serra Mari <scummvm@rootfather.de>\n"
 "Language-Team: MAME Language Team\n"
 "Language: de\n"
@@ -445,7 +445,7 @@ msgstr "Mamespielstand"
 
 #: src/emu/ui/datmenu.cpp:294 src/emu/ui/selgame.cpp:44
 msgid "Gameinit"
-msgstr ""
+msgstr "Gameinit"
 
 #: src/emu/ui/datmenu.cpp:296 src/emu/ui/selgame.cpp:43
 msgid "Command"
@@ -1030,7 +1030,7 @@ msgstr "Im TXT-Format exportieren"
 
 #: src/emu/ui/miscmenu.cpp:854
 msgid "Dummy"
-msgstr "Dummy"
+msgstr "Platzhalter"
 
 #: src/emu/ui/miscmenu.cpp:856
 msgid "Save machine configuration"
