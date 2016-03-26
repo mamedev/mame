@@ -2,7 +2,22 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Sega Master System "Control Pad"/generic joystick emulation
+    Sega Mark III "Joypad" / Master System "Control Pad" emulation
+
+
+Release data from the Sega Retro project:
+
+- Joypad:
+
+  Year: 1985    Country/region: JP    Model code: SJ-152
+
+- Control Pad:
+
+  Year: 1986    Country/region: US    Model code: 3020
+  Year: 1987    Country/region: JP    Model code: 3020
+  Year: 1987    Country/region: EU    Model code: ?
+  Year: 1989    Country/region: BR    Model code: 011770
+  Year: 1989    Country/region: KR    Model code: ?
 
 **********************************************************************/
 
