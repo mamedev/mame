@@ -40,7 +40,7 @@ msgid ""
 "Cheat Comment:\n"
 "%s"
 msgstr ""
-"Valsspeel commentaar:\n"
+"Cheat commentaar:\n"
 "\n"
 
 #: src/emu/ui/cheatopt.cpp:90
@@ -97,7 +97,7 @@ msgstr "Geen knoppen gevonden op deze machine!"
 
 #: src/emu/ui/cheatopt.cpp:312 src/emu/ui/cheatopt.cpp:316
 msgid "Autofire Delay"
-msgstr "Autofire vertraging"
+msgstr "Vertraging autofire"
 
 #: src/emu/ui/ctrlmenu.cpp:20
 msgid "Lightgun Device Assignment"
@@ -121,11 +121,11 @@ msgstr "Paddle toewijzing"
 
 #: src/emu/ui/ctrlmenu.cpp:25
 msgid "Dial Device Assignment"
-msgstr "Dial toewijzing"
+msgstr "Dial-apparaat toewijzing"
 
 #: src/emu/ui/ctrlmenu.cpp:26
 msgid "Positional Device Assignment"
-msgstr "Positie toewijzing"
+msgstr "Positie-apparaat toewijzing"
 
 #: src/emu/ui/ctrlmenu.cpp:27
 msgid "Mouse Device Assignment"
@@ -134,7 +134,7 @@ msgstr "Muis toewijzing"
 #: src/emu/ui/ctrlmenu.cpp:106 src/emu/ui/ctrlmenu.cpp:126
 #: src/emu/ui/optsmenu.cpp:264
 msgid "Device Mapping"
-msgstr "Invoerapparaat toewijzing"
+msgstr "Invoerapparaat mapping"
 
 #: src/emu/ui/custmenu.cpp:157 src/emu/ui/custmenu.cpp:445
 msgid "Main filter"
@@ -172,7 +172,7 @@ msgstr "^!Uitgever"
 
 #: src/emu/ui/custmenu.cpp:481
 msgid "^!Software List"
-msgstr "^!Software lijst"
+msgstr "^!Softwarelijst"
 
 #: src/emu/ui/custmenu.cpp:490
 msgid "^!Device type"
@@ -240,15 +240,15 @@ msgstr "Lijnen"
 
 #: src/emu/ui/custui.cpp:364
 msgid "Infos text size"
-msgstr "Infos tekst grootte"
+msgstr "Tekstgrootte informatie"
 
 #: src/emu/ui/custui.cpp:381
 msgid "UI Fonts Settings"
-msgstr "UI Lettertype Instellingen"
+msgstr "Instellingen lettertype gebruikersinterface"
 
 #: src/emu/ui/custui.cpp:408
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr "Voorbeeld tekst - De kat krabt de krullen van de trap."
+msgstr "Voorbeeldtekst - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 #: src/emu/ui/custui.cpp:506
 msgid "Normal text"
@@ -264,15 +264,15 @@ msgstr "Normale tekst achtergrond"
 
 #: src/emu/ui/custui.cpp:509
 msgid "Selected background color"
-msgstr "Geselecteerde achtergrond kleur"
+msgstr "Geselecteerde achtergrondkleur"
 
 #: src/emu/ui/custui.cpp:510
 msgid "Subitem color"
-msgstr "Subitem kleur"
+msgstr "Kleur subitem"
 
 #: src/emu/ui/custui.cpp:511 src/emu/ui/custui.cpp:606
 msgid "Clone"
-msgstr "Kloon"
+msgstr "Clone/Variant"
 
 #: src/emu/ui/custui.cpp:512
 msgid "Border"
@@ -292,11 +292,11 @@ msgstr "Niet beschikbaar kleur"
 
 #: src/emu/ui/custui.cpp:516
 msgid "Slider color"
-msgstr "Schuif kleur"
+msgstr "Slider kleur"
 
 #: src/emu/ui/custui.cpp:517
 msgid "Gfx viewer background"
-msgstr "Gfx viewer achtergrond"
+msgstr "Gfx-viewer achtergrond"
 
 #: src/emu/ui/custui.cpp:518
 msgid "Mouse over color"
@@ -320,7 +320,7 @@ msgstr "Herstel originele kleuren"
 
 #: src/emu/ui/custui.cpp:540
 msgid "UI Colors Settings"
-msgstr "UI Kleur Instellingen"
+msgstr "Kleurinstellingen gebruikersinterface"
 
 #: src/emu/ui/custui.cpp:568
 #, c-format
@@ -479,7 +479,7 @@ msgstr "Iconen"
 
 #: src/emu/ui/dirmenu.cpp:39 src/emu/ui/miscmenu.cpp:560
 msgid "Cheats"
-msgstr "Valsspelen"
+msgstr "Cheats"
 
 #: src/emu/ui/dirmenu.cpp:40 src/emu/ui/menu.cpp:43
 msgid "Snapshots"
@@ -523,7 +523,7 @@ msgstr "Artwork"
 
 #: src/emu/ui/dirmenu.cpp:50 src/emu/ui/menu.cpp:51
 msgid "Bosses"
-msgstr "Bazen"
+msgstr "Eindbazen"
 
 #: src/emu/ui/dirmenu.cpp:51
 msgid "Artworks Preview"
@@ -535,7 +535,7 @@ msgstr "Selecteer"
 
 #: src/emu/ui/dirmenu.cpp:53
 msgid "GameOver"
-msgstr "Einde spel"
+msgstr "Game over"
 
 #: src/emu/ui/dirmenu.cpp:54 src/emu/ui/menu.cpp:55
 msgid "HowTo"
@@ -564,7 +564,7 @@ msgstr "Map instellingen"
 #: src/emu/ui/dirmenu.cpp:183
 #, c-format
 msgid "Current %1$s Folders"
-msgstr "Huidige %$1s mappen"
+msgstr "Huidige %1$s mappen"
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
@@ -581,12 +581,12 @@ msgstr "Verwijder map"
 #: src/emu/ui/dirmenu.cpp:496
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
-msgstr "Wijzig %$1s map - Zoek: %2$s_"
+msgstr "Wijzig %1$s map - Zoek: %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:497
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
-msgstr "Voeg %$1s map toe - Zoek: %2$s_"
+msgstr "Voeg %1$s map toe - Zoek: %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:534
 msgid "Press TAB to set"
@@ -595,7 +595,7 @@ msgstr "Druk op TAB om te kiezen"
 #: src/emu/ui/dirmenu.cpp:640
 #, c-format
 msgid "Remove %1$s Folder"
-msgstr "Verwijder %$1s map"
+msgstr "Verwijder %1$s map"
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
@@ -603,7 +603,7 @@ msgstr "Video modus"
 
 #: src/emu/ui/dsplmenu.cpp:40
 msgid "Triple Buffering"
-msgstr "Driedubbele buffering"
+msgstr "Drievoudige buffering"
 
 #: src/emu/ui/dsplmenu.cpp:41
 msgid "HLSL"
@@ -619,7 +619,7 @@ msgstr "Bilineaire filtering"
 
 #: src/emu/ui/dsplmenu.cpp:45
 msgid "Bitmap Prescaling"
-msgstr "Bitmapvoorschaling"
+msgstr "Bitmap prescaling"
 
 #: src/emu/ui/dsplmenu.cpp:46
 msgid "Window Mode"
@@ -639,12 +639,12 @@ msgstr "Gesynchroniseerde verversing"
 
 #: src/emu/ui/dsplmenu.cpp:50
 msgid "Wait Vertical Sync"
-msgstr "Wacht verticale synchronisatie"
+msgstr "Wacht V-Sync"
 
 #: src/emu/ui/dsplmenu.cpp:202 src/emu/ui/dsplmenu.cpp:222
 #: src/emu/ui/optsmenu.cpp:261
 msgid "Display Options"
-msgstr "Schermopties"
+msgstr "Video-opties"
 
 #: src/emu/ui/filesel.cpp:159
 msgid "File Already Exists - Override?"
@@ -668,7 +668,7 @@ msgstr "Ja"
 
 #: src/emu/ui/filesel.cpp:271
 msgid "New Image Name:"
-msgstr "Naam nieuw bestand:"
+msgstr "Nieuwe bestandsnaam:"
 
 #: src/emu/ui/filesel.cpp:277
 msgid "Image Format:"
@@ -676,7 +676,7 @@ msgstr "Bestandsformaat:"
 
 #: src/emu/ui/filesel.cpp:283
 msgid "Create"
-msgstr "Creëer"
+msgstr "Aanmaken"
 
 #: src/emu/ui/filesel.cpp:314
 msgid "Please enter a file extension too"
@@ -688,7 +688,7 @@ msgstr "[lege plek]"
 
 #: src/emu/ui/filesel.cpp:506
 msgid "[create]"
-msgstr "[creëer]"
+msgstr "[aanmaken]"
 
 #: src/emu/ui/filesel.cpp:510 src/emu/ui/swlist.cpp:76
 msgid "[software list]"
@@ -837,7 +837,7 @@ msgstr "Vizieropties"
 
 #: src/emu/ui/mainmenu.cpp:132
 msgid "Cheat"
-msgstr "Valsspelen"
+msgstr "Cheat"
 
 #: src/emu/ui/mainmenu.cpp:136
 msgid "External DAT View"
@@ -849,7 +849,7 @@ msgstr "Voeg toe aan favorieten"
 
 #: src/emu/ui/mainmenu.cpp:144
 msgid "Remove From Favorites"
-msgstr "Verwijder uit favorieten"
+msgstr "Verwijder van favorieten"
 
 #: src/emu/ui/mainmenu.cpp:151
 msgid "Select New Machine"
@@ -861,7 +861,7 @@ msgstr "Bedieningspanelen"
 
 #: src/emu/ui/menu.cpp:50
 msgid "Artwork Preview"
-msgstr "Artwork voorvertoning"
+msgstr "Voorvertoning Artwork"
 
 #: src/emu/ui/menu.cpp:54
 msgid "Game Over"
@@ -873,7 +873,7 @@ msgstr "Naar of van favorietenlijst"
 
 #: src/emu/ui/menu.cpp:65
 msgid "Export displayed list to file"
-msgstr "Exporteer lijst naar bestand"
+msgstr "Exporteer getoonde lijst naar bestand"
 
 #: src/emu/ui/menu.cpp:66
 msgid "Show DATs view"
@@ -957,7 +957,7 @@ msgstr " (afgeschermd)"
 
 #: src/emu/ui/miscmenu.cpp:518
 msgid "Visible Delay"
-msgstr "Zichtbaar vertraging"
+msgstr "Vertraging zichtbaarheid"
 
 #: src/emu/ui/miscmenu.cpp:557
 msgid "Re-select last machine played"
@@ -965,7 +965,7 @@ msgstr "Kies laatst gespeelde machine opnieuw"
 
 #: src/emu/ui/miscmenu.cpp:558
 msgid "Enlarge images in the right panel"
-msgstr "Vergroot plaatsen in het rechter paneel"
+msgstr "Vergroot plaatjes in het rechter paneel"
 
 #: src/emu/ui/miscmenu.cpp:559
 msgid "DATs info"
@@ -985,7 +985,7 @@ msgstr "Sla informatiescherm bij het opstarten over"
 
 #: src/emu/ui/miscmenu.cpp:564
 msgid "Force 4:3 appearance for software snapshot"
-msgstr "Toon software snapshot geforceerd in 4:3 formaat"
+msgstr "Toon software snapshot altijd in 4:3 formaat"
 
 #: src/emu/ui/miscmenu.cpp:565
 msgid "Use image as background"
@@ -1007,7 +1007,7 @@ msgstr "Overige opties"
 #: src/emu/ui/miscmenu.cpp:737
 #, c-format
 msgid "%s.xml saved under ui folder."
-msgstr "%s.xml opgeslagen in 'ui' map."
+msgstr "%s.xml is opgeslagen in de map 'ui'."
 
 #: src/emu/ui/miscmenu.cpp:765
 msgid "Name:             Description:\n"
@@ -1016,7 +1016,7 @@ msgstr "Naam:             Omschrijving:\n"
 #: src/emu/ui/miscmenu.cpp:777
 #, c-format
 msgid "%s.txt saved under ui folder."
-msgstr "%s.txt opgeslagen in 'ui' map."
+msgstr "%s.txt is opgeslagen in de map 'ui'."
 
 #: src/emu/ui/miscmenu.cpp:795
 msgid "Export XML format (like -listxml)"
@@ -1037,7 +1037,7 @@ msgstr "Sla machineconfiguratie op"
 #: src/emu/ui/miscmenu.cpp:967 src/emu/ui/miscmenu.cpp:987
 #: src/emu/ui/selgame.cpp:587
 msgid "Plugins"
-msgstr ""
+msgstr "Plugins"
 
 #: src/emu/ui/optsmenu.cpp:214
 msgid "Filter"
@@ -1057,7 +1057,7 @@ msgstr "^!Stel eigen filter in"
 
 #: src/emu/ui/optsmenu.cpp:258
 msgid "Customize UI"
-msgstr "Pas UI aan"
+msgstr "Pas gebruikersinterface aan"
 
 #: src/emu/ui/optsmenu.cpp:259
 msgid "Configure Directories"
@@ -1119,7 +1119,7 @@ msgid ""
 " added to favorites list."
 msgstr ""
 "%s\n"
-" toegevoegd aan favorieten."
+" toegevoegd aan favorietenlijst."
 
 #: src/emu/ui/selgame.cpp:376 src/emu/ui/selgame.cpp:385
 #: src/emu/ui/selsoft.cpp:283
@@ -1129,7 +1129,7 @@ msgid ""
 " removed from favorites list."
 msgstr ""
 "%s\n"
-" verwijderd van favorieten."
+" verwijderd van favorietenlijst."
 
 #: src/emu/ui/selgame.cpp:446
 msgid ""
@@ -1182,11 +1182,11 @@ msgstr "%1$s, %2$-.100s"
 #: src/emu/ui/selgame.cpp:839 src/emu/ui/selsoft.cpp:755
 #, c-format
 msgid "Driver is clone of: %1$-.100s"
-msgstr "Driver is een kloon van: %1$-.100s"
+msgstr "Driver is een variant van: %1$-.100s"
 
 #: src/emu/ui/selgame.cpp:841 src/emu/ui/selsoft.cpp:757
 msgid "Driver is parent"
-msgstr "Driver is ouder"
+msgstr "Driver is hoofddriver"
 
 #: src/emu/ui/selgame.cpp:845 src/emu/ui/selsoft.cpp:761
 #: src/emu/ui/simpleselgame.cpp:332
@@ -1231,11 +1231,11 @@ msgstr "Systeem: %1$-.100s"
 #: src/emu/ui/selgame.cpp:886 src/emu/ui/selsoft.cpp:803
 #, c-format
 msgid "Software is clone of: %1$-.100s"
-msgstr "Software is kloon van: %1$-.100s"
+msgstr "Software is een variant van: %1$-.100s"
 
 #: src/emu/ui/selgame.cpp:888 src/emu/ui/selsoft.cpp:805
 msgid "Software is parent"
-msgstr "Software is ouder"
+msgstr "Software is hoofdsoftware"
 
 #: src/emu/ui/selgame.cpp:893 src/emu/ui/selsoft.cpp:810
 msgid "Supported: No"
@@ -1277,11 +1277,11 @@ msgstr "Fabrikant: %1$-.100s\n"
 #: src/emu/ui/selgame.cpp:1533
 #, c-format
 msgid "Driver is Clone of: %1$-.100s\n"
-msgstr "Driver is kloon van: %1$-.100s\n"
+msgstr "Driver is een variant van: %1$-.100s\n"
 
 #: src/emu/ui/selgame.cpp:1535
 msgid "Driver is Parent\n"
-msgstr "Driver is ouder\n"
+msgstr "Driver is hoofddriver\n"
 
 #: src/emu/ui/selgame.cpp:1538
 msgid "Overall: NOT WORKING\n"
@@ -1342,7 +1342,7 @@ msgstr "Vereist klikbare artwork: %1$s\n"
 #: src/emu/ui/selgame.cpp:1564
 #, c-format
 msgid "Support Cocktail: %1$s\n"
-msgstr "Ondersteund cocktail: %1$s\n"
+msgstr "Ondersteunt cocktail: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1565
 #, c-format
@@ -1374,31 +1374,31 @@ msgstr "Vereist CHD: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1588
 msgid "Roms Audit Pass: OK\n"
-msgstr "Roms controle stap: OK\n"
+msgstr "Roms controle: OK\n"
 
 #: src/emu/ui/selgame.cpp:1590
 msgid "Roms Audit Pass: BAD\n"
-msgstr "Roms controle stap: FOUT\n"
+msgstr "Roms controle: FOUT\n"
 
 #: src/emu/ui/selgame.cpp:1593
 msgid "Samples Audit Pass: None Needed\n"
-msgstr "Samples controle stap: Geen benodigd\n"
+msgstr "Samples controle: Niet nodig\n"
 
 #: src/emu/ui/selgame.cpp:1595
 msgid "Samples Audit Pass: OK\n"
-msgstr "Samples controle stap: OK\n"
+msgstr "Samples controle: OK\n"
 
 #: src/emu/ui/selgame.cpp:1597
 msgid "Samples Audit Pass: BAD\n"
-msgstr "Samples controle stap: FOUT\n"
+msgstr "Samples controle: FOUT\n"
 
 #: src/emu/ui/selgame.cpp:1600
 msgid ""
 "Roms Audit Pass: Disabled\n"
 "Samples Audit Pass: Disabled\n"
 msgstr ""
-"Roms controle stap: Uitgeschakeld\n"
-"Samples controle stap: Uitgeschakeld\n"
+"Roms controle: Uitgeschakeld\n"
+"Samples controle: Uitgeschakeld\n"
 
 #: src/emu/ui/selgame.cpp:2039 src/emu/ui/selgame.cpp:2200
 #: src/emu/ui/selsoft.cpp:1657
@@ -1428,7 +1428,7 @@ msgstr ""
 #: src/emu/ui/selsoft.cpp:682
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d softwares )"
-msgstr "%1$s %2$s ( %3$d / %4$d softwares )"
+msgstr "%1$s %2$s ( %3$d / %4$d software )"
 
 #: src/emu/ui/selsoft.cpp:683
 #, c-format
@@ -1546,12 +1546,12 @@ msgstr "[Bestandsbeheer]"
 
 #: src/emu/ui/swlist.cpp:235
 msgid "Switch Item Ordering"
-msgstr "Wissel onderdeel volgorde"
+msgstr "Wijzig de volgorde van de onderdelen"
 
 #: src/emu/ui/swlist.cpp:268
 #, c-format
 msgid "Switched Order: entries now ordered by %s"
-msgstr "Volgorde gewijzigd: elementen zijn nu gesorteerd op %s"
+msgstr "Volgorde gewijzigd: de elementen zijn nu gesorteerd op %s"
 
 #: src/emu/ui/swlist.cpp:268
 msgid "shortname"
@@ -1575,7 +1575,7 @@ msgstr "afspelen"
 
 #: src/emu/ui/tapectrl.cpp:86
 msgid "(playing)"
-msgstr "(afspelen)"
+msgstr "(aan het afspelen)"
 
 #: src/emu/ui/tapectrl.cpp:87
 msgid "recording"
@@ -1583,7 +1583,7 @@ msgstr "opnemen"
 
 #: src/emu/ui/tapectrl.cpp:87
 msgid "(recording)"
-msgstr "(opnemen)"
+msgstr "(aan het opnemen)"
 
 #: src/emu/ui/tapectrl.cpp:94
 msgid "Pause/Stop"
@@ -1591,7 +1591,7 @@ msgstr "Pauzeer/Stop"
 
 #: src/emu/ui/tapectrl.cpp:97
 msgid "Play"
-msgstr "Speel"
+msgstr "Speel af"
 
 #: src/emu/ui/tapectrl.cpp:100
 msgid "Record"
@@ -1599,15 +1599,15 @@ msgstr "Neem op"
 
 #: src/emu/ui/tapectrl.cpp:103
 msgid "Rewind"
-msgstr "Terugspoelen"
+msgstr "Terug spoelen"
 
 #: src/emu/ui/tapectrl.cpp:106
 msgid "Fast Forward"
-msgstr "Snel vooruit"
+msgstr "Vooruit spoelen"
 
 #: src/emu/ui/ui.cpp:415
 msgid "This driver requires images to be loaded in the following device(s): "
-msgstr "Deze driver vereist images ingelezen in de volgende device(s): "
+msgstr "Deze driver vereist software ingelezen in de volgende device(s): "
 
 #: src/emu/ui/ui.cpp:1043
 #, c-format
@@ -1634,13 +1634,13 @@ msgid ""
 "There are known problems with this machine\n"
 "\n"
 msgstr ""
-"Er zijn bekende problemen met deze machine\n"
+"Er zijn problemen bekend met de emulatie van deze machine\n"
 "\n"
 
 #: src/emu/ui/ui.cpp:1098
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
-msgstr "Éémn of meerder ROMs/CHDs voor de machine zijn niet correct gedumpt.\n"
+msgstr "Één of meerdere ROMs/CHDs voor deze machine zijn niet correct gedumpt.\n"
 
 #: src/emu/ui/ui.cpp:1102
 #, c-format
@@ -1672,11 +1672,11 @@ msgstr "Deze machine heeft geen geluid.\n"
 
 #: src/emu/ui/ui.cpp:1115
 msgid "Screen flipping in cocktail mode is not supported.\n"
-msgstr "Schermflippen in cocktail modus is niet ondersteund.\n"
+msgstr "Schermflippen wordt in cocktailmodus niet ondersteund.\n"
 
 #: src/emu/ui/ui.cpp:1119
 msgid "The machine requires external artwork files\n"
-msgstr "Deze machine vereist extern artwork bestanden\n"
+msgstr "Deze machine vereist externe artwork bestanden\n"
 
 #: src/emu/ui/ui.cpp:1124
 msgid ""
@@ -1684,19 +1684,19 @@ msgid ""
 "elements that are not bugs in the emulation.\n"
 msgstr ""
 "Deze machine was nooit afgemaakt. Het kan vreemd gedrag vertonen of "
-"elementen missen die geen fouten zijn met de emulatie.\n"
+"elementen missen; dit zijn geen fouten van de emulatie.\n"
 
 #: src/emu/ui/ui.cpp:1129
 msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
 msgstr ""
-"Deze machine heeft geen geluidhardware, MAME zal geen geluid produceren, dit "
+"Deze machine heeft geen geluidshardware, MAME zal geen geluid produceren, dit "
 "is verwacht gedrag.\n"
 
 #: src/emu/ui/ui.cpp:1137
 msgid "The machine has protection which isn't fully emulated.\n"
-msgstr "Deze machine heeft beveiliging die nog niet volledig is geëmuleerd.\n"
+msgstr "Deze machine heeft een beveiliging die nog niet volledig is geëmuleerd.\n"
 
 #: src/emu/ui/ui.cpp:1140
 msgid ""
@@ -1707,7 +1707,7 @@ msgid ""
 msgstr ""
 "DEZE MACHINE DOET HET NIET. De emulatie van deze machine is nog niet "
 "compleet. Er is niets wat je kunt doen om dit probleem te verhelpen afgezien "
-"van het afwachten tot de ontwikkelaars de emulatie verder verbeteren.\n"
+"van het afwachten tot ontwikkelaars de emulatie verder verbeteren.\n"
 
 #: src/emu/ui/ui.cpp:1144
 msgid ""
@@ -1719,7 +1719,7 @@ msgstr ""
 "\n"
 "Bepaalde onderdelen van deze machine kunnen niet worden geëmuleerd in "
 "verband met fysieke interactie of het gebruik van mechanische componenten. "
-"Het is niet mogelijk deze machine volledig te spelen.\n"
+"Het is niet mogelijk om deze machine volledig te spelen.\n"
 
 #: src/emu/ui/ui.cpp:1163
 msgid ""
@@ -1901,7 +1901,7 @@ msgstr "%1$s gamma"
 #: src/emu/ui/ui.cpp:2035
 #, c-format
 msgid "%1$s Horiz Stretch"
-msgstr "%1$s horizontale strekking"
+msgstr "%1$s horizontale stretch"
 
 #: src/emu/ui/ui.cpp:2038
 #, c-format
@@ -1911,7 +1911,7 @@ msgstr "%1$s horizontale positie"
 #: src/emu/ui/ui.cpp:2041
 #, c-format
 msgid "%1$s Vert Stretch"
-msgstr "%1$s verticale strekking"
+msgstr "%1$s verticale stretch"
 
 #: src/emu/ui/ui.cpp:2044
 #, c-format
@@ -1921,7 +1921,7 @@ msgstr "%1$s verticale positie"
 #: src/emu/ui/ui.cpp:2062
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr "Laserdisc '%1$s' horizontale strekking"
+msgstr "Laserdisc '%1$s' horizontale stretch"
 
 #: src/emu/ui/ui.cpp:2065
 #, c-format
@@ -1931,7 +1931,7 @@ msgstr "Laserdisc '%1$s' horizontale positie"
 #: src/emu/ui/ui.cpp:2068
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr "Laserdic '%1$s' verticale strekking"
+msgstr "Laserdic '%1$s' verticale stretch"
 
 #: src/emu/ui/ui.cpp:2071
 #, c-format
@@ -1944,15 +1944,15 @@ msgstr ""
 
 #: src/emu/ui/ui.cpp:2082
 msgid "Beam Width Minimum"
-msgstr "Minimale straal breedte"
+msgstr "Minimale straalbreedte"
 
 #: src/emu/ui/ui.cpp:2084
 msgid "Beam Width Maximum"
-msgstr "Maximale straal breedte"
+msgstr "Maximale straalbreedte"
 
 #: src/emu/ui/ui.cpp:2086
 msgid "Beam Intensity Weight"
-msgstr "Gewicht straal intensiteit"
+msgstr "Gewicht straalintensiteit"
 
 #: src/emu/ui/ui.cpp:2098
 #, c-format
@@ -2084,4 +2084,4 @@ msgstr " PENNEN"
 #~ msgstr "Configureer machine"
 
 #~ msgid "Multi-Threaded Rendering"
-#~ msgstr "Multithreaded tekenen"
+#~ msgstr "Multithreaded renderen"
