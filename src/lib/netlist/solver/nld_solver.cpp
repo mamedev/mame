@@ -105,7 +105,7 @@ ATTR_COLD matrix_solver_t::~matrix_solver_t()
 	m_inps.clear_and_free();
 }
 
-ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
+ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 {
 	log().debug("New solver setup\n");
 
@@ -185,14 +185,14 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 }
 
 
-ATTR_HOT void matrix_solver_t::update_inputs()
+void matrix_solver_t::update_inputs()
 {
 	// avoid recursive calls. Inputs are updated outside this call
 	for (std::size_t i=0; i<m_inps.size(); i++)
 		m_inps[i]->set_Q(m_inps[i]->m_proxied_net->Q_Analog());
 }
 
-ATTR_HOT void matrix_solver_t::update_dynamic()
+void matrix_solver_t::update_dynamic()
 {
 	/* update all non-linear devices  */
 	for (std::size_t i=0; i < m_dynamic_devices.size(); i++)
@@ -236,15 +236,14 @@ ATTR_COLD void matrix_solver_t::update_forced()
 		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
 }
 
-ATTR_HOT void matrix_solver_t::step(const netlist_time delta)
+void matrix_solver_t::step(const netlist_time delta)
 {
 	const nl_double dd = delta.as_double();
 	for (std::size_t k=0; k < m_step_devices.size(); k++)
 		m_step_devices[k]->step_time(dd);
 }
 
-template<class C >
-void matrix_solver_t::solve_base(C *p)
+nl_double matrix_solver_t::solve_base()
 {
 	m_stat_vsolver_calls++;
 	if (is_dynamic())
@@ -255,7 +254,7 @@ void matrix_solver_t::solve_base(C *p)
 		{
 			update_dynamic();
 			// Gauss-Seidel will revert to Gaussian elemination if steps exceeded.
-			this_resched = p->vsolve_non_dynamic(true);
+			this_resched = this->vsolve_non_dynamic(true);
 			newton_loops++;
 		} while (this_resched > 1 && newton_loops < m_params.m_nr_loops);
 
@@ -269,11 +268,12 @@ void matrix_solver_t::solve_base(C *p)
 	}
 	else
 	{
-		p->vsolve_non_dynamic(false);
+		this->vsolve_non_dynamic(false);
 	}
+	return this->compute_next_timestep();
 }
 
-ATTR_HOT nl_double matrix_solver_t::solve()
+nl_double matrix_solver_t::solve()
 {
 	const netlist_time now = netlist().time();
 	const netlist_time delta = now - m_last_step;
@@ -289,7 +289,7 @@ ATTR_HOT nl_double matrix_solver_t::solve()
 
 	step(delta);
 
-	const nl_double next_time_step = vsolve();
+	const nl_double next_time_step = solve_base();
 
 	update_inputs();
 	return next_time_step;
@@ -358,7 +358,7 @@ NETLIB_START(solver)
 
 	/* automatic time step */
 	register_param("DYNAMIC_TS", m_dynamic, 0);
-	register_param("LTE", m_lte, 5e-5);                     // diff/timestep
+	register_param("DYNAMIC_LTE", m_lte, 5e-5);                     // diff/timestep
 	register_param("MIN_TIMESTEP", m_min_timestep, 1e-6);   // nl_double timestep resolution
 
 	register_param("LOG_STATS", m_log_stats, 1);   // nl_double timestep resolution
@@ -618,7 +618,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
 		register_sub(pfmt("Solver_{1}")(m_mat_solvers.size()), *ms);
 
-		ms->vsetup(grp);
+		ms->setup(grp);
 
 		m_mat_solvers.push_back(ms);
 

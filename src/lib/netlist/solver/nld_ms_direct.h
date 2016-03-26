@@ -39,33 +39,31 @@ public:
 	virtual void vsetup(analog_net_t::list_t &nets) override;
 	virtual void reset() override { matrix_solver_t::reset(); }
 
-	ATTR_HOT inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
+	inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
-	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
+	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
 
 protected:
 	virtual void add_term(int net_idx, terminal_t *term) override;
 
-	ATTR_HOT virtual nl_double vsolve() override;
-
-	ATTR_HOT int solve_non_dynamic(const bool newton_raphson);
-	ATTR_HOT void build_LE_A();
-	ATTR_HOT void build_LE_RHS();
-	ATTR_HOT void LE_solve();
-	ATTR_HOT void LE_back_subst(nl_double * RESTRICT x);
+	int solve_non_dynamic(const bool newton_raphson);
+	void build_LE_A();
+	void build_LE_RHS();
+	void LE_solve();
+	void LE_back_subst(nl_double * RESTRICT x);
 
 	/* Full LU back substitution, not used currently, in for future use */
 
-	ATTR_HOT void LE_back_subst_full(nl_double * RESTRICT x);
+	void LE_back_subst_full(nl_double * RESTRICT x);
 
-	ATTR_HOT nl_double delta(const nl_double * RESTRICT V);
-	ATTR_HOT void store(const nl_double * RESTRICT V);
+	nl_double delta(const nl_double * RESTRICT V);
+	void store(const nl_double * RESTRICT V);
 
 	/* bring the whole system to the current time
 	 * Don't schedule a new calculation time. The recalculation has to be
 	 * triggered by the caller after the netlist element was changed.
 	 */
-	ATTR_HOT nl_double compute_next_timestep();
+	virtual nl_double compute_next_timestep() override;
 
 
 #if (NL_USE_DYNAMIC_ALLOCATION)
@@ -117,7 +115,7 @@ matrix_solver_direct_t<m_N, _storage_N>::~matrix_solver_direct_t()
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT nl_double matrix_solver_direct_t<m_N, _storage_N>::compute_next_timestep()
+nl_double matrix_solver_direct_t<m_N, _storage_N>::compute_next_timestep()
 {
 	nl_double new_solver_timestep = m_params.m_max_timestep;
 
@@ -146,6 +144,8 @@ ATTR_HOT nl_double matrix_solver_direct_t<m_N, _storage_N>::compute_next_timeste
 
 			if (new_net_timestep < new_solver_timestep)
 				new_solver_timestep = new_net_timestep;
+
+			m_last_V[k] = n->Q_Analog();
 		}
 		if (new_solver_timestep < m_params.m_min_timestep)
 			new_solver_timestep = m_params.m_min_timestep;
@@ -191,7 +191,7 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 		m_rails_temp[k].clear();
 	}
 
-	matrix_solver_t::setup(nets);
+	matrix_solver_t::setup_base(nets);
 
 	for (unsigned k = 0; k < N(); k++)
 	{
@@ -347,7 +347,7 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::build_LE_A()
+void matrix_solver_direct_t<m_N, _storage_N>::build_LE_A()
 {
 	const unsigned iN = N();
 	for (unsigned k = 0; k < iN; k++)
@@ -376,7 +376,7 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::build_LE_A()
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS()
+void matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS()
 {
 	const unsigned iN = N();
 	for (unsigned k = 0; k < iN; k++)
@@ -401,7 +401,7 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS()
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
+void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 {
 	const unsigned kN = N();
 
@@ -481,7 +481,7 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
+void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 		nl_double * RESTRICT x)
 {
 	const unsigned kN = N();
@@ -517,7 +517,7 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst_full(
+void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst_full(
 		nl_double * RESTRICT x)
 {
 	const unsigned kN = N();
@@ -551,7 +551,7 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst_full(
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT nl_double matrix_solver_direct_t<m_N, _storage_N>::delta(
+nl_double matrix_solver_direct_t<m_N, _storage_N>::delta(
 		const nl_double * RESTRICT V)
 {
 	/* FIXME: Ideally we should also include currents (RHS) here. This would
@@ -567,7 +567,7 @@ ATTR_HOT nl_double matrix_solver_direct_t<m_N, _storage_N>::delta(
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::store(
+void matrix_solver_direct_t<m_N, _storage_N>::store(
 		const nl_double * RESTRICT V)
 {
 	for (unsigned i = 0, iN=N(); i < iN; i++)
@@ -576,19 +576,13 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::store(
 	}
 }
 
-template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT nl_double matrix_solver_direct_t<m_N, _storage_N>::vsolve()
-{
-	this->solve_base(this);
-	return this->compute_next_timestep();
-}
-
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT int matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
+int matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
 	nl_double new_V[_storage_N]; // = { 0.0 };
 
+	this->LE_solve();
 	this->LE_back_subst(new_V);
 
 	if (newton_raphson)
@@ -607,7 +601,7 @@ ATTR_HOT int matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNU
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT inline int matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+inline int matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	this->build_LE_A();
 	this->build_LE_RHS();
@@ -615,10 +609,7 @@ ATTR_HOT inline int matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(
 	for (unsigned i=0, iN=N(); i < iN; i++)
 		m_last_RHS[i] = RHS(i);
 
-	this->LE_solve();
-
 	this->m_stat_calculations++;
-
 	return this->solve_non_dynamic(newton_raphson);
 }
 

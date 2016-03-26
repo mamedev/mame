@@ -20,23 +20,15 @@ public:
 	matrix_solver_direct1_t(const solver_parameters_t *params)
 		: matrix_solver_direct_t<1, 1>(params, 1)
 		{}
-	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
-protected:
-	ATTR_HOT virtual nl_double vsolve() override;
-private:
+	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
+
 };
 
 // ----------------------------------------------------------------------------------------
 // matrix_solver - Direct1
 // ----------------------------------------------------------------------------------------
 
-ATTR_HOT nl_double matrix_solver_direct1_t::vsolve()
-{
-	solve_base<matrix_solver_direct1_t>(this);
-	return this->compute_next_timestep();
-}
-
-ATTR_HOT inline int matrix_solver_direct1_t::vsolve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
+inline int matrix_solver_direct1_t::vsolve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
 	analog_net_t *net = m_nets[0];
 	this->build_LE_A();

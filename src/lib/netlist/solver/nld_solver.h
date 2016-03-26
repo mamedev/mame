@@ -68,14 +68,14 @@ class terms_t
 
 	ATTR_COLD void add(terminal_t *term, int net_other, bool sorted);
 
-	ATTR_HOT inline unsigned count() { return m_term.size(); }
+	inline unsigned count() { return m_term.size(); }
 
-	ATTR_HOT inline terminal_t **terms() { return m_term.data(); }
-	ATTR_HOT inline int *net_other() { return m_net_other.data(); }
-	ATTR_HOT inline nl_double *gt() { return m_gt.data(); }
-	ATTR_HOT inline nl_double *go() { return m_go.data(); }
-	ATTR_HOT inline nl_double *Idr() { return m_Idr.data(); }
-	ATTR_HOT inline nl_double **other_curanalog() { return m_other_curanalog.data(); }
+	inline terminal_t **terms() { return m_term.data(); }
+	inline int *net_other() { return m_net_other.data(); }
+	inline nl_double *gt() { return m_gt.data(); }
+	inline nl_double *go() { return m_go.data(); }
+	inline nl_double *Idr() { return m_Idr.data(); }
+	inline nl_double **other_curanalog() { return m_other_curanalog.data(); }
 
 	ATTR_COLD void set_pointers();
 
@@ -108,43 +108,42 @@ public:
 	ATTR_COLD matrix_solver_t(const eSolverType type, const solver_parameters_t *params);
 	virtual ~matrix_solver_t();
 
-	virtual void vsetup(analog_net_t::list_t &nets) = 0;
+	void setup(analog_net_t::list_t &nets) { vsetup(nets); }
 
-	template<class C>
-	void solve_base(C *p);
+	nl_double solve_base();
 
-	ATTR_HOT nl_double solve();
+	nl_double solve();
 
-	ATTR_HOT inline bool is_dynamic() { return m_dynamic_devices.size() > 0; }
-	ATTR_HOT inline bool is_timestep() { return m_step_devices.size() > 0; }
+	inline bool is_dynamic() const { return m_dynamic_devices.size() > 0; }
+	inline bool is_timestep() const { return m_step_devices.size() > 0; }
 
-	ATTR_HOT void update_forced();
-	ATTR_HOT inline void update_after(const netlist_time after)
+	void update_forced();
+	void update_after(const netlist_time after)
 	{
 		m_Q_sync.net().reschedule_in_queue(after);
 	}
 
 	/* netdevice functions */
-	ATTR_HOT  virtual void update() override;
+	virtual void update() override;
 	virtual void start() override;
 	virtual void reset() override;
 
 	ATTR_COLD int get_net_idx(net_t *net);
 
-	inline eSolverType type() const { return m_type; }
+	eSolverType type() const { return m_type; }
 	plog_base<NL_DEBUG> &log() { return netlist().log(); }
 
 	virtual void log_stats();
 
 protected:
 
-	ATTR_COLD void setup(analog_net_t::list_t &nets);
-	ATTR_HOT void update_dynamic();
-
-	// should return next time step
-	ATTR_HOT virtual nl_double vsolve() = 0;
+	ATTR_COLD void setup_base(analog_net_t::list_t &nets);
+	void update_dynamic();
 
 	virtual void  add_term(int net_idx, terminal_t *term) = 0;
+	virtual void vsetup(analog_net_t::list_t &nets) = 0;
+	virtual int vsolve_non_dynamic(const bool newton_raphson) = 0;
+	virtual nl_double compute_next_timestep() = 0;
 
 	pvector_t<analog_net_t *> m_nets;
 	pvector_t<analog_output_t *> m_inps;
@@ -157,7 +156,7 @@ protected:
 
 	const solver_parameters_t &m_params;
 
-	ATTR_HOT inline nl_double current_timestep() { return m_cur_ts; }
+	inline nl_double current_timestep() { return m_cur_ts; }
 private:
 
 	netlist_time m_last_step;
@@ -168,9 +167,9 @@ private:
 	logic_input_t m_fb_sync;
 	logic_output_t m_Q_sync;
 
-	ATTR_HOT void step(const netlist_time delta);
+	void step(const netlist_time delta);
 
-	ATTR_HOT void update_inputs();
+	void update_inputs();
 
 	const eSolverType m_type;
 };
@@ -188,13 +187,13 @@ public:
 	ATTR_COLD void post_start();
 	ATTR_COLD void stop() override;
 
-	ATTR_HOT inline nl_double gmin() { return m_gmin.Value(); }
+	inline nl_double gmin() { return m_gmin.Value(); }
 
 protected:
-	ATTR_HOT void update() override;
-	ATTR_HOT void start() override;
-	ATTR_HOT void reset() override;
-	ATTR_HOT void update_param() override;
+	void update() override;
+	void start() override;
+	void reset() override;
+	void update_param() override;
 
 	logic_input_t m_fb_step;
 	logic_output_t m_Q_step;
