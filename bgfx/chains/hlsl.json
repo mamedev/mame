@@ -1,6 +1,60 @@
-{	"name": "Classic D3D HLSL CRT Simulation",
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz,ImJezze
+//============================================================
+//
+//  hlsl.json: A port of MAME's Direct3D HLSL CRT simulation.
+//
+//============================================================
+{
+	// name (unused): This value should contain a suitable name for the screen chain. It is not read by MAME, though it is still suggested that it be put in any user-made chains.
+	// type: string
+	"name": "Classic D3D HLSL CRT Simulation",
+	
+	// author (unused): This value should contain a suitable name for this chain's author. Again, it is not read by MAME, but it is still advisable to have.
+	// type: string
 	"author": "Ryan Holtz & ImJezze",
+	
+	// sliders (optional): The list of sliders used by all of the entries in this chain. Can be omitted if no entries use any sliders.
 	"sliders": [
+		// type (required): The sliders's conceptual type. Is it a list of string selections? Is it a single floating-point value? Does it require RGB values, or XY values?
+		// values: "int_enum", "int", "float", "vec2", "color"
+		// 
+		// name (required): The internal name of the slider, used to attach it to entry uniforms.
+		// value: Any valid ASCII string.
+		// 
+		// text (required): The description of the slider, to which "X" or "Y" is appended for the "vec2" type, and to which "Red", "Green" or "Blue" will be appended for the "color" type.
+		// value: Any valid user-understandable ASCII string.
+		// 
+		// default (required): The value that this slider should have upon creation.
+		// type: Either a single integer value or an array of integer values corresponding to the size of the slider type:
+		//       "int_enum": Single integer value
+		//       "int": Single integer value
+		//       "float": Single integer value
+		//       "vec2": Array of two integer values
+		//       "color": Array of three integer values
+		// 
+		// max (required): The upper limit to which the slider can be adjusted by a user.
+		// type: See type for "default"
+		// 
+		// min (required): The lower limit to which the slider can be adjusted by a user.
+		// type: See type for "default"
+		// 
+		// step (required): How much, in integer units, does a single left/right adjustment adjust the slider?
+		// type: Integer value
+		// 
+		// scale (required): By what value should we multiply the slider's integer value in order to get a usable value to disable?
+		// type: Numeric value
+		// 
+		// format (required): A C-style formatting string to use when displaying the slider's value.
+		// type: Any standard C-style formatting string (%s, %d, %1.2f, and so on)
+		// 
+		// screen (required): The type of screens for which we should populate this slider [NOT YET IMPLEMENTED]
+		// values: "none", "raster", "vector", "crt", "vectorraster", "lcd", "nonvector", "lcdraster", "lcdvector", "any", "all"
+		// "crt", "nonvector", and "all" are provided as aliases for "vectorraster", "lcdraster", and "any"
+		// 
+		// strings (optional): A list of strings to use with the "int_enum" type, to select from a list of text options instead of simply numbers.
+		// value: An array of 2 or more entries, with one entry per possible slider setting from "min" to "max" inclusive.
+		
 		{ "type": "int_enum", "name": "adjustments", "text": "Enable Adjustments", "default": 0, "max": 1, "min": 0, "step": 1, "scale": 1.0, "format": "%s", "screen": "any", "strings": [ "Off", "On" ] },
 
 		{ "type": "int_enum", "name": "ntsc",            "text": "Enable NTSC",                   "default": 0,        "max": 1,        "min": 0,        "step": 1,   "scale": 1.0,       "format": "%s",    "screen": "any", "strings": [ "Off", "On" ] },
@@ -56,11 +110,50 @@
 		{ "type": "float", "name": "vignetting",    "text": "Vignetting Amount",       "default": 20, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "reflection",    "text": "Reflection Amount",       "default": 30, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" }
 	],
+	
+	// parameters (optional): A list of procedurally-generated parameters that can be bound to entry uniforms.
 	"parameters": [
+		// name (required): The internal name of the parameter that will be used when binding to an entry uniform.
+		// value: Any valid ASCII string.
+		// 
+		// type (required): The type of the parameter.
+		// values:
+		//     "frame": Increment by 1 for each rendered frame. Limited to a given value range. Can be use for A/B field jitter and such.
+		//     "window": Contains the index of the window to which this screen belongs.
+		//     "time": The current time, in milliseconds. Can be limited to a given value range.
+		// 
+		// period (required by type "frame"): The range of frames across which to count. A value of 20 will make the value loop from 0-19.
+		// value: Any integer value.
+		// 
+		// limit (required by type "time"): The range of time across which to loop. 0.0 means run indefinitely.
+		// value: Any numeric value.
+		
 		{ "name": "jitter", "type": "frame", "period": 2 },
 		{ "name": "time",   "type": "time",  "limit": 0.0 }
 	],
+	
+	// targets (optional): A list of all render targets that will be used by the chain entries in this chain.
 	"targets": [
+		// name (required): The name of the target. Will be used to bind it as a texture and as an output in chain entries.
+		// value: Any valid ASCII string.
+		// 
+		// mode (required): The mode of the target. Can be used for different implicit and explicit sizing options.
+		// values:
+		//     "guest": Use the size of the emulated screen that is being processed (e.g. 256x256 when running "targ")
+		//     "native": Use the size of the displayed screen inside the window that is being displayed (the same size as the window size, for single-screen games with no artwork)
+		//     "custom": Use a custom size.
+		// 
+		// bilinear (optional): Whether or not to apply bilinear filtering to this render target.
+		// values: true, false
+		// default: true
+		// 
+		// doublebuffer (optional): Whether or not this render target will be needed as a source texture. If you don't know what this means, omit it or set it to true.
+		// values: true, false
+		// default: true
+		// 
+		// oversample (optional): Double the internal size of this render target. Certain effects benefit from operating at a higher internal resolution. If you're not sure, leave it as false.
+		// values: true, false
+		// default: false
 		{
 			"name": "guest",
 			"mode": "guest",
@@ -73,14 +166,62 @@
 			"doublebuffer": true
 		}
 	],
+	
+	// passes (required): The list of individual shaders to invoke, and any dynamic input parameters they need.
 	"passes": [
-		{	"effect": "ntsc_encode",
+		{
+			// effect (required): The name of the effect JSON file to load for this pass.
+			// value: Any valid JSON filename included in your shader chain, without the extension.
+			"effect": "ntsc_encode",
+
+			// name (required): A verbal name for the effect. It is only used internally, but is required nonetheless.
+			// value: Any valid ASCII string.
 			"name": "NTSC Encode",
+
+			// disablewhen (optional): An array of conditions that can be used to disable this pass.
 			"disablewhen": [
+				// type (optional): Reserved for future expansion. Currently only "slider" is supported.
+				// value: "slider"
+				// 
+				// condition (optional): The disabler is active when the named slider is either equal or not equal to the reference value.
+				// values: "equal", "notequal"
+				// default: "equal"
+				// 
+				// combine (optional): All "and" conditions are ANDed together, all "or" conditions are OR'd together, then these two
+				//                     values are OR'd together to finally determine whether this pass should run or not.
+				// values: "or", "and"
+				// default: "or"
+				// 
+				// name (required): The name of the slider to use for this condition.
+				// value: Any valid ASCII string.
+				// 
+				// value (required): The value against which we are comparing to determine whether this disabler is active.
+				// type: Either a single integer value or an array of integer values corresponding to the size of the slider's type:
+				//       "int_enum": Single integer value
+				//       "int": Single integer value
+				//       "float": Single integer value
+				//       "vec2": Array of two integer values
+				//       "color": Array of three integer values
 				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
 				{ "type": "slider", "condition": "equal", "combine": "or", "name": "ntsc",        "value": 0 }
 			],
+			
+			// uniforms (optional): Non-sampler uniform bindings for this chain entry.
 			"uniforms": [
+				// uniform (required): The name of the uniform, as it is referenced in the shader source code itself.
+				// value: Any valid ASCII string.
+				// 
+				// The remaining options can be one of either "slider", "parameter", or "value":
+				// 
+				// slider (optional): The name of the slider to bind to this uniform.
+				// value: Any valid ASCII string that corresponds to the name of a slider.
+				//
+				// parameter (optional): The name of the dynamic parameter to bind to this uniform.
+				// value: Any valid ASCII string that corresponds to the name of a parameter.
+				// 
+				// value (optional): An array of numeric values that should be loaded into this uniform.
+				// values: Should be an array containing anywhere from 1-16 numeric values, corresponding to the size of the uniform's type.
+				
 				{ "uniform": "u_a_value",         "slider": "a_value" },
 				{ "uniform": "u_b_value",         "slider": "b_value" },
 				{ "uniform": "u_cc_value",        "slider": "cc_value" },
@@ -89,9 +230,28 @@
 				{ "uniform": "u_jitter_offset",   "slider": "jitter_offset" },
 				{ "uniform": "u_jitter_amount",   "parameter": "jitter" }
 			],
+			
+			// inputs (optional): A list of samplers used by this entry, and their corresponding bindings.
 			"input": [
+				// sampler (required): The name of the sampler, as it is referenced in the shader source code itself.
+				// value: Any valid ASCII string.
+				// 
+				// The remaining options can be one of either "texture", "target", or "option".
+				// 
+				// texture (optional): Either "screen" for the texture that MAME provided for this chain's screen, or the name of a texture file in the artwork directory.
+				// value: Any valid ASCII string.
+				// 
+				// target (optioanl): Any target from the "targets" list, or "previous" or "output" for two native-sized automatically-generated targets.
+				// value: Any valid ASCII string that names a target.
+				// 
+				// option (optional): The name of any MAME option, which will have its value fetched and used as the name of a PNG to load from the artwork directory.
+				// value: Any valid MAME INI option name.
 				{ "sampler": "s_tex", "texture": "screen" }
 			],
+			
+			// output (required): The target to use as the output for this pass. Can be one of the named targets in "targets", or "output" 
+			//                    or "previous" for one of two automatically-generated targets.
+			// value: Any valid ASCII string that names a target.
 			"output": "guest"
 		},
 		{	"effect": "ntsc_decode",
@@ -254,7 +414,7 @@
 				{ "uniform": "u_scanline_bright_scale",  "slider": "scanline_bright_scale" },
 				{ "uniform": "u_scanline_bright_offset", "slider": "scanline_bright_offset" },
 				{ "uniform": "u_scanline_height",        "slider": "scanline_height" },
-				{ "uniform": "u_scanline_variation",        "slider": "scanline_variation" },
+				{ "uniform": "u_scanline_variation",     "slider": "scanline_variation" },
 				{ "uniform": "u_shadow_alpha",           "slider": "shadow_alpha" },
 				{ "uniform": "u_shadow_uv",              "slider": "shadow_uv_size" },
 				{ "uniform": "u_shadow_uv_offset",       "slider": "shadow_uv_offset" },
