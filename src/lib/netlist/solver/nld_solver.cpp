@@ -79,9 +79,7 @@ ATTR_COLD void terms_t::set_pointers()
 {
 	for (unsigned i = 0; i < count(); i++)
 	{
-		m_term[i]->m_gt1 = &m_gt[i];
-		m_term[i]->m_go1 = &m_go[i];
-		m_term[i]->m_Idr1 = &m_Idr[i];
+		m_term[i]->set_ptrs(&m_gt[i], &m_go[i], &m_Idr[i]);
 		m_other_curanalog[i] = &m_term[i]->m_otherterm->net().m_cur_Analog;
 	}
 }

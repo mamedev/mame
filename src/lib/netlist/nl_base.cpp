@@ -840,10 +840,10 @@ ATTR_COLD void core_terminal_t::set_net(net_t &anet)
 
 ATTR_COLD terminal_t::terminal_t()
 : analog_t(TERMINAL)
+, m_otherterm(NULL)
 , m_Idr1(NULL)
 , m_go1(NULL)
 , m_gt1(NULL)
-, m_otherterm(NULL)
 {
 }
 
