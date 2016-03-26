@@ -223,7 +223,7 @@ def make(filename, outfile):
                     # See whether there is an encoding declaration
                     if(hdrno > lno):
                         p = HeaderParser()
-                        charset = p.parsestr(header).get_content_charset()
+                        charset = p.parsestr(str(header)).get_content_charset()
                         header_attempted = True
                         if charset:
                             encoding = charset
