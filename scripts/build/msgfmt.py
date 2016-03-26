@@ -224,7 +224,7 @@ def make(filename, outfile):
                     if(hdrno > lno):
                         p = HeaderParser()
                         charset = p.parsestr(header).get_content_charset()
-                        header_attempted = 1
+                        header_attempted = True
                         if charset:
                             encoding = charset
                 if is_plural:
