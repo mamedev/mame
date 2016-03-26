@@ -26,6 +26,7 @@ target_manager::target_manager(osd_options& options, texture_manager& textures)
     , m_options(options)
     , m_screen_count(0)
 {
+	(void)m_options; // prevent carping about unused variable
 }
 
 target_manager::~target_manager()

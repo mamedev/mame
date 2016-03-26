@@ -376,6 +376,9 @@ void emu_options::remove_device_options()
 			remove_entry(*curentry);
 	}
 
+	// take also care of ramsize options
+	set_default_value(OPTION_RAMSIZE, "");
+
 	// reset counters
 	m_slot_options = 0;
 	m_device_options = 0;
@@ -550,17 +553,57 @@ void emu_options::set_system_name(const char *name)
 		set_value(OPTION_SYSTEMNAME, name, OPTION_PRIORITY_CMDLINE, error);
 		assert(error.empty());
 
-		// remove any existing device options and then add them afresh
+		// remove any existing device options
 		remove_device_options();
-		while (add_slot_options()) { }
+		const game_driver *cursystem = system();
+		if (cursystem == nullptr)
+			return;
 
-		// then add the options
-		add_device_options();
-		int num;
-		do {
-			num = options_count();
-			update_slot_options();
-		} while(num != options_count());
+		if (software_name())
+		{
+			std::string sw_load(software_name());
+			std::string sw_list, sw_name, sw_part, sw_instance, option_errors, error_string;
+			int left = sw_load.find_first_of(':');
+			int middle = sw_load.find_first_of(':', left + 1);
+			int right = sw_load.find_last_of(':');
+
+			sw_list = sw_load.substr(0, left - 1);
+			sw_name = sw_load.substr(left + 1, middle - left - 1);
+			sw_part = sw_load.substr(middle + 1, right - middle - 1);
+			sw_instance = sw_load.substr(right + 1);
+			sw_load.assign(sw_load.substr(0, right));
+
+			// look up the software part
+			machine_config config(*cursystem, *this);
+			software_list_device *swlist = software_list_device::find_by_name(config, sw_list.c_str());
+			software_info *swinfo = swlist->find(sw_name.c_str());
+			software_part *swpart = swinfo->find_part(sw_part.c_str());
+
+			// then add the options
+			while (add_slot_options(swpart)) { }
+			add_device_options();
+
+			set_value(OPTION_SOFTWARENAME, sw_name.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+			if (exists(sw_instance.c_str()))
+				set_value(sw_instance.c_str(), sw_load.c_str(), OPTION_PRIORITY_SUBCMD, error_string);
+
+			int num;
+			do {
+				num = options_count();
+				update_slot_options(swpart);
+			} while(num != options_count());
+		}
+		else
+		{
+			// add the options afresh
+			while (add_slot_options()) { }
+			add_device_options();
+			int num;
+			do {
+				num = options_count();
+				update_slot_options();
+			} while(num != options_count());
+		}
 	}
 }
 
