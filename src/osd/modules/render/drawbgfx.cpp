@@ -5,10 +5,6 @@
 //  drawbgfx.cpp - BGFX renderer
 //
 //============================================================
-#define __STDC_LIMIT_MACROS
-#define __STDC_FORMAT_MACROS
-#define __STDC_CONSTANT_MACROS
-
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
@@ -95,7 +91,7 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 	return wmi.info.win.window;
 #   elif BX_PLATFORM_STEAMLINK
 	return wmi.info.vivante.window;
-#   elif BX_PLATFORM_EMSCRIPTEN
+#   elif BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_ANDROID
 	return nullptr;
 #   endif // BX_PLATFORM_
 }

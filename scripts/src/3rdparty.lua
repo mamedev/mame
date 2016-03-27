@@ -1182,9 +1182,38 @@ end
 if _OPTIONS["with-bundled-sdl2"] then
 project "SDL2"
 	uuid "caab3327-574f-4abf-b25b-74d5238ae59b"
+if _OPTIONS["targetos"]=="android" then	
+	kind "SharedLib"
+	targetextension ".so"
+	targetprefix "lib"
+	links {
+		"GLESv1_CM",
+		"GLESv2",
+		"log",
+	}
+	if _OPTIONS["SEPARATE_BIN"]~="1" then 
+		if _OPTIONS["PLATFORM"]=="arm" then
+			targetdir(MAME_DIR .. "android-project/app/src/main/libs/armeabi-v7a")
+		end
+		if _OPTIONS["PLATFORM"]=="arm64" then
+			targetdir(MAME_DIR .. "android-project/app/src/main/libs/arm64-v8a")
+		end
+		if _OPTIONS["PLATFORM"]=="mips" then
+			targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips")
+		end
+		if _OPTIONS["PLATFORM"]=="mips64" then
+			targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips64")
+		end
+		if _OPTIONS["PLATFORM"]=="x86" then
+			targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86")
+		end
+		if _OPTIONS["PLATFORM"]=="x64" then
+			targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86_64")
+		end
+	end	
+else
 	kind "StaticLib"
-
-	configuration {  }
+end	
 	
 	files {
 		MAME_DIR .. "3rdparty/SDL2/include/begin_code.h",
@@ -1356,7 +1385,6 @@ project "SDL2"
 		MAME_DIR .. "3rdparty/SDL2/src/stdlib/SDL_qsort.c",
 		MAME_DIR .. "3rdparty/SDL2/src/stdlib/SDL_stdlib.c",
 		MAME_DIR .. "3rdparty/SDL2/src/stdlib/SDL_string.c",
-		MAME_DIR .. "3rdparty/SDL2/src/thread/generic/SDL_syscond.c",
 		MAME_DIR .. "3rdparty/SDL2/src/thread/SDL_systhread.h",
 		MAME_DIR .. "3rdparty/SDL2/src/thread/SDL_thread.c",
 		MAME_DIR .. "3rdparty/SDL2/src/thread/SDL_thread_c.h",
@@ -1520,6 +1548,7 @@ project "SDL2"
 
 	if _OPTIONS["targetos"]=="windows" then
 		files {
+			MAME_DIR .. "3rdparty/SDL2/src/thread/generic/SDL_syscond.c",
 			MAME_DIR .. "3rdparty/SDL2/src/audio/directsound/SDL_directsound.c",
 			MAME_DIR .. "3rdparty/SDL2/src/audio/directsound/SDL_directsound.h",
 			MAME_DIR .. "3rdparty/SDL2/src/audio/winmm/SDL_winmm.c",
