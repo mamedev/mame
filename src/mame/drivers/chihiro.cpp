@@ -240,8 +240,8 @@ Notes:
       24LC64    - Microchip 24LC64 64K I2C Serial EEPROM (SOIC8)
       24LC024   - Microchip 24LC024 2K I2C Serial EEPROM (SOIC8)
       M68AF127B - ST Microelectronics 1Mbit (128K x8), 5V Asynchronous SRAM (SOP32)
-      AN2131QC  - Cypress AN2131 EZ-USB-Family 8051-based High-Speed USB IC's (QFP80)
-      AN2131SC  /                                                             (QFP44)
+      AN2131QC  - Cypress AN2131 EZ-USB-Family 8051-based High-Speed USB IC's (QFP80) firmware in IC11
+      AN2131SC  /                                                             (QFP44) firmware in IC32
       ADM3222   - Analog Devices ADM3222 High-Speed, +3.3V, 2-Channel RS232/V.28 Interface Device (SOIC20)
       SN65240   - Texas Instruments SN65240 USB Port Transient Suppressor (SOIC8)
       BA7623    - Rohm BA7623 75-Ohm driver IC with 3 internal circuits (SOIC8)
@@ -572,7 +572,7 @@ static const struct {
 		UINT32 address;
 		UINT8 write_byte;
 	} modify[16];
-} hacks[2] = { { "chihiro", { { 0x6a79f, 0x01 }, { 0x6a7a0, 0x00 }, { 0x6b575, 0x00 }, { 0x6b576, 0x00 }, { 0x6b5af, 0x75 }, { 0x6b78a, 0x75 }, { 0x6b7ca, 0x00 }, { 0x6b7b8, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e, 0x74 }, { 0x79b80, 0x74 }, { 0x79b97, 0x74 }, { 0, 0 } } },
+} hacks[2] = { { "chihiro", { { 0x6a79f/*3f79f*/, 0x01 }, { 0x6a7a0/*3f7a0*/, 0x00 }, { 0x6b575/*40575*/, 0x00 }, { 0x6b576/*40576*/, 0x00 }, { 0x6b5af/*405af*/, 0x75 }, { 0x6b78a/*4078a*/, 0x75 }, { 0x6b7ca/*407ca*/, 0x00 }, { 0x6b7b8/*407b8*/, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e/*2ea9e*/, 0x74 }, { 0x79b80/*2eb80*/, 0x74 }, { 0x79b97/*2eb97*/, 0x74 }, { 0, 0 } } },
 				{ "outr2", { { 0x12e4cf, 0x01 }, { 0x12e4d0, 0x00 }, { 0x4793e, 0x01 }, { 0x4793f, 0x00 }, { 0x47aa3, 0x01 }, { 0x47aa4, 0x00 }, { 0x14f2b6, 0x84 }, { 0x14f2d1, 0x75 }, { 0x8732f, 0x7d }, { 0x87384, 0x7d }, { 0x87388, 0xeb }, { 0, 0 } } } };
 
 void chihiro_state::hack_usb()
