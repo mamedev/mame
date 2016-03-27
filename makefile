@@ -273,6 +273,9 @@ endif
 endif
 
 ifeq ($(OS),windows)
+ifndef $(MINGW64)
+ARCHITECTURE := _x86
+endif
 ifeq ($(ARCHITECTURE),_x64)
 WINDRES  := $(MINGW64)/bin/windres
 else
