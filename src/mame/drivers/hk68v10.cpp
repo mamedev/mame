@@ -184,10 +184,7 @@
 #endif
 
 #define BAUDGEN_CLOCK XTAL_19_6608MHz /* Raltron */
-/*
- */
-#define SCC_CLOCK (BAUDGEN_CLOCK / 128) /* This gives prompt at the RS232 terminal device (9600) */
-//#define SCC_CLOCK (BAUDGEN_CLOCK / 4) /* This is correct giving 4.9152MHz as documentation says */
+#define SCC_CLOCK (BAUDGEN_CLOCK / 4) /* Giving 4.9152MHz as documentation says */
 class hk68v10_state : public driver_device
 {
 public:
@@ -207,7 +204,6 @@ DECLARE_WRITE16_MEMBER (bootvect_w);
 //DECLARE_WRITE16_MEMBER (vme_a16_w);
 virtual void machine_start () override;
 virtual void machine_reset () override;
-DECLARE_WRITE_LINE_MEMBER (write_sccterm_clock);
 
 protected:
 
@@ -325,12 +321,7 @@ WRITE16_MEMBER (hk68v10_state::vme_a16_w){
  * D1,DO = 10 for 12 Mhz MPU clock
  *
  * Original HBUG configuration word: 0x003D = 0000 0000 0011 1101
- *
  */
-WRITE_LINE_MEMBER (hk68v10_state::write_sccterm_clock){
-		m_sccterm->txca_w (state);
-		m_sccterm->rxca_w (state);
-}
 
 /*
  * Machine configuration
@@ -341,7 +332,7 @@ MCFG_CPU_ADD ("maincpu", M68010, XTAL_10MHz)
 MCFG_CPU_PROGRAM_MAP (hk68v10_mem)
 
 /* Terminal Port config */
-MCFG_SCC8530_ADD("scc", XTAL_4MHz, 0, 0, 0, 0 )
+MCFG_SCC8530_ADD("scc", SCC_CLOCK, 0, 0, 0, 0 )
 MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_txd))
 MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_dtr))
 MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_rts))
@@ -349,9 +340,6 @@ MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_rts))
 MCFG_RS232_PORT_ADD ("rs232trm", default_rs232_devices, "terminal")
 MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc8530_device, rxa_w))
 MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc8530_device, ctsa_w))
-
-MCFG_DEVICE_ADD ("sccterm_clock", CLOCK, SCC_CLOCK)
-MCFG_CLOCK_SIGNAL_HANDLER (WRITELINE (hk68v10_state, write_sccterm_clock))
 
 MACHINE_CONFIG_END
 
