@@ -76,7 +76,7 @@ TODO:
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define VERBOSE 2
+#define VERBOSE 0
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 #if VERBOSE == 2
