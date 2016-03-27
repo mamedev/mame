@@ -533,8 +533,6 @@ void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname
 	// deallocate previous bitmap
 	bitmap.reset();
 
-	bitmap_format format = bitmap.format();
-
 	// define file's full name
 	std::string fname;
 
@@ -584,21 +582,16 @@ void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname
 
 		if (s == 1)
 			for (int i = 0; i < w; ++i)
-				if (format == BITMAP_FORMAT_ARGB32)
-					bitmap.pix32(j, i) = rgb_t(0xFF, buffer[0][i], buffer[0][i], buffer[0][i]);
-				else
-					bitmap.pix32(j, i) = rgb_t(buffer[0][i], buffer[0][i], buffer[0][i]);
+				bitmap.pix32(j, i) = rgb_t(0xFF, buffer[0][i], buffer[0][i], buffer[0][i]);
 
 		else if (s == 3)
 			for (int i = 0; i < w; ++i)
-				if (format == BITMAP_FORMAT_ARGB32)
-					bitmap.pix32(j, i) = rgb_t(0xFF, buffer[0][i * s], buffer[0][i * s + 1], buffer[0][i * s + 2]);
-				else
-					bitmap.pix32(j, i) = rgb_t(buffer[0][i * s], buffer[0][i * s + 1], buffer[0][i * s + 2]);
+				bitmap.pix32(j, i) = rgb_t(0xFF, buffer[0][i * s], buffer[0][i * s + 1], buffer[0][i * s + 2]);
 
 		else
 		{
 			osd_printf_error("Cannot read JPEG data from %s file.\n", fname.c_str());
+			bitmap.reset();
 			break;
 		}
 	}
