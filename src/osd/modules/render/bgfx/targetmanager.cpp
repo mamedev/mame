@@ -25,7 +25,7 @@ target_manager::target_manager(texture_manager& textures)
     : m_textures(textures)
     , m_screen_count(0)
 {
-	(void)m_options; // prevent carping about unused variable
+	//(void)m_options; // prevent carping about unused variable
 }
 
 target_manager::~target_manager()
