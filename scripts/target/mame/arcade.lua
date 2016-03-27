@@ -1862,6 +1862,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/m62.cpp",
 	MAME_DIR .. "src/mame/includes/m62.h",
 	MAME_DIR .. "src/mame/video/m62.cpp",
+	MAME_DIR .. "src/mame/drivers/spartanxtec.cpp",
 	MAME_DIR .. "src/mame/drivers/m63.cpp",
 	MAME_DIR .. "src/mame/drivers/m72.cpp",
 	MAME_DIR .. "src/mame/includes/m72.h",
