@@ -1191,6 +1191,10 @@ if _OPTIONS["targetos"]=="android" then
 		"GLESv2",
 		"log",
 	}
+	linkoptions {
+		"-Wl,-soname,liSDL2.so"
+	}
+	
 	if _OPTIONS["SEPARATE_BIN"]~="1" then 
 		if _OPTIONS["PLATFORM"]=="arm" then
 			targetdir(MAME_DIR .. "android-project/app/src/main/libs/armeabi-v7a")

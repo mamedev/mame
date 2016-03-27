@@ -32,6 +32,7 @@ end
 		targetextension ".so"
 		linkoptions {
 			"-shared",
+			"-Wl,-soname,libmain.so"
 		}
 		links {
 			"EGL",
@@ -144,6 +145,7 @@ end
 		files {
 			MAME_DIR .. "3rdparty/SDL2/src/main/android/SDL_android_main.c",
 		}
+		targetsuffix ""
 		if _OPTIONS["SEPARATE_BIN"]~="1" then 
 			if _OPTIONS["PLATFORM"]=="arm" then
 				targetdir(MAME_DIR .. "android-project/app/src/main/libs/armeabi-v7a")
