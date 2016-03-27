@@ -251,40 +251,9 @@ int machine_manager::execute()
 		// check the state of the machine
 		if (m_new_driver_pending)
 		{
-			std::string old_system_name(m_options.system_name());
-			bool new_system = (old_system_name.compare(m_new_driver_pending->name)!=0);
-			// first: if we scheduled a new system, remove device options of the old system
-			// notice that, if we relaunch the same system, there is no effect on the emulation
-			if (new_system)
-				m_options.remove_device_options();
-			// second: set up new system name (and the related device options)
+			// set up new system name and adjust device options accordingly
 			m_options.set_system_name(m_new_driver_pending->name);
-			// third: if we scheduled a new system, take also care of ramsize options
-			if (new_system)
-			{
-				std::string error_string;
-				m_options.set_value(OPTION_RAMSIZE, "", OPTION_PRIORITY_CMDLINE, error_string);
-			}
 			firstrun = true;
-			if (m_options.software_name())
-			{
-				std::string sw_load(m_options.software_name());
-				std::string sw_list, sw_name, sw_part, sw_instance, option_errors, error_string;
-				int left = sw_load.find_first_of(':');
-				int middle = sw_load.find_first_of(':', left + 1);
-				int right = sw_load.find_last_of(':');
-
-				sw_list = sw_load.substr(0, left - 1);
-				sw_name = sw_load.substr(left + 1, middle - left - 1);
-				sw_part = sw_load.substr(middle + 1, right - middle - 1);
-				sw_instance = sw_load.substr(right + 1);
-				sw_load.assign(sw_load.substr(0, right));
-
-				char arg[] = "mame";
-				char *argv = &arg[0];
-				m_options.set_value(OPTION_SOFTWARENAME, sw_name.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-				m_options.parse_slot_devices(1, &argv, option_errors, sw_instance.c_str(), sw_load.c_str());
-			}
 		}
 		else
 		{
