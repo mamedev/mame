@@ -67,7 +67,7 @@ void sm510_base_device::op_lb()
 	UINT8 hi = 0;
 	switch (m_bl)
 	{
-		case 0: hi = 3; break;
+		case 0: hi = 0; break;
 		case 1: hi = 0; break;
 		case 2: hi = 0; break;
 		case 3: hi = 3; break;
