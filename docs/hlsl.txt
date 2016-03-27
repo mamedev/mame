@@ -2,8 +2,9 @@ HLSL-Related Enable Switches
 ----------------------------
 
 Name                    Values		Description
-hlsl_enable             0/1             Enables HLSL post-processing in Direct3D 9 modes.
-yiq_enable              0/1             Enables YIQ-colorspace post-processing. Causes a
+hlsl_enable             0 or 1          Enables HLSL post-processing in Direct3D 9 modes.
+hlsl_oversampling       0 or 1          Enables HLSL oversampling.
+yiq_enable              0 or 1          Enables YIQ-colorspace post-processing. Causes a
                                         performance drop but gives a much more authentic
                                         NTSC TV appearance on TV-based systems when configured
                                         properly.

@@ -55,8 +55,6 @@ uniform float2 ScreenDims;
 uniform float2 TargetDims;
 uniform float2 QuadDims;
 
-uniform int BloomLevel;
-
 uniform bool VectorScreen;
 
 static const float2 Coord0Offset = float2(-0.5f, -0.5f);
