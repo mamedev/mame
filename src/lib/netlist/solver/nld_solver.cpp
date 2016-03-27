@@ -46,6 +46,7 @@
 #else
 #include "nld_ms_direct_lu.h"
 #endif
+#include "nld_ms_sm.h"
 #include "nld_ms_direct1.h"
 #include "nld_ms_direct2.h"
 #include "nld_ms_sor.h"
@@ -458,7 +459,7 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_sp
 			}
 			else if (pstring("MAT").equals(m_iterative_solver))
 			{
-				typedef matrix_solver_direct_t<m_N,_storage_N> solver_mat;
+				typedef matrix_solver_sm_t<m_N,_storage_N> solver_mat;
 				return palloc(solver_mat(&m_params, size));
 			}
 			else if (pstring("SOR").equals(m_iterative_solver))
