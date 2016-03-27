@@ -17,37 +17,235 @@ class spartanxtec_state : public driver_device
 public:
 	spartanxtec_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_palette(*this, "palette")
+		m_m62_tileram(*this, "m62_tileram"),
+		m_scroll_lo(*this, "scroll_lo"),
+		m_scroll_hi(*this, "scroll_hi"),
+
+		m_palette(*this, "palette"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
+
+	required_shared_ptr<UINT8> m_m62_tileram;
+	required_shared_ptr<UINT8> m_scroll_lo;
+	required_shared_ptr<UINT8> m_scroll_hi;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	UINT32 screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(spartanxtec);
+	
+	tilemap_t*             m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(kungfum_tileram_w);
+	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
 
 	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 
 };
 
 
+
+
+WRITE8_MEMBER(spartanxtec_state::kungfum_tileram_w)
+{
+	m_m62_tileram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
+}
+
+// WRONG for this bootleg
+TILE_GET_INFO_MEMBER(spartanxtec_state::get_kungfum_bg_tile_info)
+{
+	int code;
+	int color;
+	int flags;
+	code = m_m62_tileram[tile_index];
+	color = m_m62_tileram[tile_index + 0x800];
+	flags = 0;
+	if ((color & 0x20))
+	{
+		flags |= TILE_FLIPX;
+	}
+	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0)<< 2), color & 0x1f, flags);
+
+	/* is the following right? */
+	if ((tile_index / 64) < 6 || ((color & 0x1f) >> 1) > 0x0c)
+		tileinfo.category = 1;
+	else
+		tileinfo.category = 0;
+}
+
 void spartanxtec_state::video_start()
 {
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spartanxtec_state::get_kungfum_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap->set_scroll_rows(32);
 }
 
 
 UINT32 spartanxtec_state::screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// there are 4 sets of scroll registers
+	// how to split them isn't clear, 4 groups of 8 rows would be logical
+	// but only 6 rows should use the first scroll register and the
+	// remaining 2 rows scroll values from there can't wrap onto the bottom
+	// as that doesn't work. (breaks playfield scroll)
+
+
+	for (int i = 0; i < 32; i++)
+	{
+		int scrollval;
+
+		if (i<6) scrollval = m_scroll_lo[0] | (m_scroll_hi[0] << 8);
+		else scrollval = m_scroll_lo[1] | (m_scroll_hi[1] << 8);
+
+		// always the same as 1
+		//scrollval = m_scroll_lo[2] | (m_scroll_hi[2] << 8);
+		//scrollval = m_scroll_lo[3] | (m_scroll_hi[3] << 8);
+
+		m_bg_tilemap->set_scrollx(i, scrollval+28-128);
+	}
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+//	draw_sprites(bitmap, cliprect, 0x1f, 0x00, 0x00);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
+
 	return 0;
 }
 
 
+
+
+
 static ADDRESS_MAP_START( spartanxtec_map, AS_PROGRAM, 8, spartanxtec_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM
+
+	AM_RANGE(0x8000, 0x8000) AM_WRITENOP
+
+	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("IN0")
+	AM_RANGE(0x8101, 0x8101) AM_READ_PORT("IN1")
+	AM_RANGE(0x8102, 0x8102) AM_READ_PORT("IN2")
+	AM_RANGE(0x8103, 0x8103) AM_READ_PORT("IN3")
+
+	AM_RANGE(0x8200, 0x8200) AM_WRITENOP // sound cmd?
+	
+	AM_RANGE(0xA801, 0xA801) AM_WRITENOP
+
+	AM_RANGE(0xa900, 0xa903) AM_RAM AM_SHARE("scroll_lo")
+	AM_RANGE(0xa980, 0xa983) AM_RAM AM_SHARE("scroll_hi")
+
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(kungfum_tileram_w) AM_SHARE("m62_tileram")
+
+	AM_RANGE(0xe000, 0xefff) AM_RAM
+
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( spartanxtec )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x01, 0x01, "IN3" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -107,10 +305,10 @@ static MACHINE_CONFIG_START( spartanxtec, spartanxtec_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
+	MCFG_SCREEN_REFRESH_RATE(55)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790) /* frames per second and vblank duration from the Lode Runner manual */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(spartanxtec_state, screen_update_spartanxtec)
 	MCFG_SCREEN_PALETTE("palette")
 
