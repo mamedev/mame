@@ -30,25 +30,23 @@ public:
 
 inline int matrix_solver_direct1_t::vsolve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
-	analog_net_t *net = m_nets[0];
 	this->build_LE_A();
 	this->build_LE_RHS();
 	//NL_VERBOSE_OUT(("{1} {2}\n", new_val, m_RHS[0] / m_A[0][0]);
 
-	nl_double new_val =  RHS(0) / A(0,0);
+	nl_double new_val[1] = { RHS(0) / A(0,0) };
 
-	nl_double e = (new_val - net->Q_Analog());
-	nl_double cerr = nl_math::abs(e);
-
-	net->m_cur_Analog = new_val;
-
-	if (is_dynamic() && (cerr  > m_params.m_accuracy))
+	if (is_dynamic())
 	{
-		return 2;
+		nl_double err = this->delta(new_val);
+		store(new_val);
+		if (err > m_params.m_accuracy )
+			return 2;
+		else
+			return 1;
 	}
-	else
-		return 1;
-
+	store(new_val);
+	return 1;
 }
 
 NETLIB_NAMESPACE_DEVICES_END()

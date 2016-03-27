@@ -1062,7 +1062,7 @@ namespace netlist
 
 		ATTR_HOT  nl_double INPANALOG(const analog_input_t &inp) const { return inp.Q_Analog(); }
 
-		ATTR_HOT  nl_double TERMANALOG(const terminal_t &term) const { return term.net().as_analog().Q_Analog(); }
+		ATTR_HOT  nl_double TERMANALOG(const terminal_t &term) const { return term.net().Q_Analog(); }
 
 		ATTR_HOT  void OUTANALOG(analog_output_t &out, const nl_double val)
 		{

@@ -39,32 +39,30 @@ public:
 	virtual void vsetup(analog_net_t::list_t &nets) override;
 	virtual void reset() override { matrix_solver_t::reset(); }
 
-	inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
-
-	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
-
 protected:
 	virtual void add_term(int net_idx, terminal_t *term) override;
-
+	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
 	int solve_non_dynamic(const bool newton_raphson);
+
+	inline const unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
+
 	void build_LE_A();
 	void build_LE_RHS();
 	void LE_solve();
-	void LE_back_subst(nl_double * RESTRICT x);
 
-	/* Full LU back substitution, not used currently, in for future use */
+	template <typename T>
+	void LE_back_subst(T * RESTRICT x);
 
-	void LE_back_subst_full(nl_double * RESTRICT x);
+	template <typename T>
+	T delta(const T * RESTRICT V);
 
-	nl_double delta(const nl_double * RESTRICT V);
-	void store(const nl_double * RESTRICT V);
+	template <typename T>
+	void store(const T * RESTRICT V);
 
-	/* bring the whole system to the current time
-	 * Don't schedule a new calculation time. The recalculation has to be
-	 * triggered by the caller after the netlist element was changed.
-	 */
-	virtual nl_double compute_next_timestep() override;
+	virtual netlist_time compute_next_timestep() override;
 
+	terms_t **m_terms;
+	terms_t *m_rails_temp;
 
 #if (NL_USE_DYNAMIC_ALLOCATION)
 	template <typename T1, typename T2>
@@ -76,13 +74,11 @@ protected:
 	inline nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r][c]; }
 	template <typename T1>
 	inline nl_ext_double &RHS(const T1 &r) { return m_A[r][N()]; }
-
 #endif
 	ATTR_ALIGN nl_double m_last_RHS[_storage_N]; // right hand side - contains currents
 	ATTR_ALIGN nl_double m_last_V[_storage_N];
 
-	terms_t **m_terms;
-	terms_t *m_rails_temp;
+
 
 private:
 	static const unsigned m_pitch = (((_storage_N + 1) + 7) / 8) * 8;
@@ -94,6 +90,7 @@ private:
 	//ATTR_ALIGN nl_ext_double m_RHSx[_storage_N];
 
 	const unsigned m_dim;
+
 };
 
 // ----------------------------------------------------------------------------------------
@@ -115,7 +112,7 @@ matrix_solver_direct_t<m_N, _storage_N>::~matrix_solver_direct_t()
 }
 
 template <unsigned m_N, unsigned _storage_N>
-nl_double matrix_solver_direct_t<m_N, _storage_N>::compute_next_timestep()
+netlist_time matrix_solver_direct_t<m_N, _storage_N>::compute_next_timestep()
 {
 	nl_double new_solver_timestep = m_params.m_max_timestep;
 
@@ -152,7 +149,7 @@ nl_double matrix_solver_direct_t<m_N, _storage_N>::compute_next_timestep()
 	}
 	//if (new_solver_timestep > 10.0 * hn)
 	//    new_solver_timestep = 10.0 * hn;
-	return new_solver_timestep;
+	return netlist_time::from_double(new_solver_timestep);
 }
 
 template <unsigned m_N, unsigned _storage_N>
@@ -284,9 +281,15 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 					t->m_nz.push_back(other[i]);
 			}
 		}
+		/* Add RHS element */
+		if (!t->m_nzrd.contains(N()))
+			t->m_nzrd.push_back(N());
+
+		/* and sort */
 		psort_list(t->m_nzrd);
 
 		t->m_nz.push_back(k);     // add diagonal
+
 		psort_list(t->m_nz);
 	}
 
@@ -437,7 +440,7 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 				if (f1 != NL_FCONST(0.0))
 				{
 					nl_double * RESTRICT pi = &A(i,i+1);
-					nl_double * RESTRICT pj = &A(j,i+1);
+					const nl_double * RESTRICT pj = &A(j,i+1);
 #if 1
 					vec_add_mult_scalar(kN-i,pj,f1,pi);
 #else
@@ -466,23 +469,18 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 			{
 				const unsigned j = pb[jb];
 				const nl_double f1 = - A(j,i) * f;
-#if 0
-				nl_double * RESTRICT pi = &m_A[i][i+1];
-				nl_double * RESTRICT pj = &m_A[j][i+1];
-				vec_add_mult_scalar(kN-i-1,pi,f1,pj);
-#else
 				for (unsigned k = 0; k < e; k++)
 					A(j,p[k]) += A(i,p[k]) * f1;
-#endif
-				RHS(j) += RHS(i) * f1;
+				//RHS(j) += RHS(i) * f1;
 			}
 		}
 	}
 }
 
 template <unsigned m_N, unsigned _storage_N>
+template <typename T>
 void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
-		nl_double * RESTRICT x)
+		T * RESTRICT x)
 {
 	const unsigned kN = N();
 
@@ -491,7 +489,7 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 	{
 		for (int j = kN - 1; j >= 0; j--)
 		{
-			nl_double tmp = 0;
+			T tmp = 0;
 			for (unsigned k = j+1; k < kN; k++)
 				tmp += A(j,k) * x[k];
 			x[j] = (RHS(j) - tmp) / A(j,j);
@@ -501,10 +499,10 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 	{
 		for (int j = kN - 1; j >= 0; j--)
 		{
-			nl_double tmp = 0;
+			T tmp = 0;
 
 			const unsigned *p = m_terms[j]->m_nzrd.data();
-			const unsigned e = m_terms[j]->m_nzrd.size();
+			const unsigned e = m_terms[j]->m_nzrd.size() - 1; /* exclude RHS element */
 
 			for (unsigned k = 0; k < e; k++)
 			{
@@ -516,43 +514,11 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 	}
 }
 
-template <unsigned m_N, unsigned _storage_N>
-void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst_full(
-		nl_double * RESTRICT x)
-{
-	const unsigned kN = N();
-
-	/* back substitution */
-
-	// int ip;
-	// ii=-1
-
-	//for (int i=0; i < kN; i++)
-	//  x[i] = m_RHS[i];
-
-	for (int i=0; i < kN; i++)
-	{
-		//ip=indx[i]; USE_PIVOT_SEARCH
-		//sum=b[ip];
-		//b[ip]=b[i];
-		double sum=RHS(i);//x[i];
-		for (int j=0; j < i; j++)
-			sum -= A(i,j) * x[j];
-		x[i]=sum;
-	}
-	for (int i=kN-1; i >= 0; i--)
-	{
-		double sum=x[i];
-		for (int j = i+1; j < kN; j++)
-			sum -= A(i,j)*x[j];
-		x[i] = sum / A(i,i);
-	}
-
-}
 
 template <unsigned m_N, unsigned _storage_N>
-nl_double matrix_solver_direct_t<m_N, _storage_N>::delta(
-		const nl_double * RESTRICT V)
+template <typename T>
+T matrix_solver_direct_t<m_N, _storage_N>::delta(
+		const T * RESTRICT V)
 {
 	/* FIXME: Ideally we should also include currents (RHS) here. This would
 	 * need a revaluation of the right hand side after voltages have been updated
@@ -560,15 +526,16 @@ nl_double matrix_solver_direct_t<m_N, _storage_N>::delta(
 	 */
 
 	const unsigned iN = this->N();
-	nl_double cerr = 0;
+	T cerr = 0;
 	for (unsigned i = 0; i < iN; i++)
 		cerr = std::max(cerr, nl_math::abs(V[i] - this->m_nets[i]->m_cur_Analog));
 	return cerr;
 }
 
 template <unsigned m_N, unsigned _storage_N>
+template <typename T>
 void matrix_solver_direct_t<m_N, _storage_N>::store(
-		const nl_double * RESTRICT V)
+		const T * RESTRICT V)
 {
 	for (unsigned i = 0, iN=N(); i < iN; i++)
 	{

@@ -31,7 +31,16 @@
 
 #include <iostream>
 #include <algorithm>
+//#include "nld_twoterm.h"
+#include "nl_lists.h"
+
+#if HAS_OPENMP
+#include "omp.h"
+#endif
+
 #include "nld_solver.h"
+#include "nld_matrix_solver.h"
+
 #if 1
 #include "nld_ms_direct.h"
 #else
@@ -42,12 +51,6 @@
 #include "nld_ms_sor.h"
 #include "nld_ms_sor_mat.h"
 #include "nld_ms_gmres.h"
-//#include "nld_twoterm.h"
-#include "nl_lists.h"
-
-#if HAS_OPENMP
-#include "omp.h"
-#endif
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -222,28 +225,28 @@ ATTR_COLD void matrix_solver_t::reset()
 
 ATTR_COLD void matrix_solver_t::update()
 {
-	const nl_double new_timestep = solve();
+	const netlist_time new_timestep = solve();
 
-	if (m_params.m_dynamic && is_timestep() && new_timestep > 0)
-		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(new_timestep));
+	if (m_params.m_dynamic && is_timestep() && new_timestep > netlist_time::zero)
+		m_Q_sync.net().reschedule_in_queue(new_timestep);
 }
 
 ATTR_COLD void matrix_solver_t::update_forced()
 {
-	ATTR_UNUSED const nl_double new_timestep = solve();
+	ATTR_UNUSED const netlist_time new_timestep = solve();
 
 	if (m_params.m_dynamic && is_timestep())
 		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
 }
 
-void matrix_solver_t::step(const netlist_time delta)
+void matrix_solver_t::step(const netlist_time &delta)
 {
 	const nl_double dd = delta.as_double();
 	for (std::size_t k=0; k < m_step_devices.size(); k++)
 		m_step_devices[k]->step_time(dd);
 }
 
-nl_double matrix_solver_t::solve_base()
+netlist_time matrix_solver_t::solve_base()
 {
 	m_stat_vsolver_calls++;
 	if (is_dynamic())
@@ -273,7 +276,7 @@ nl_double matrix_solver_t::solve_base()
 	return this->compute_next_timestep();
 }
 
-nl_double matrix_solver_t::solve()
+netlist_time matrix_solver_t::solve()
 {
 	const netlist_time now = netlist().time();
 	const netlist_time delta = now - m_last_step;
@@ -281,7 +284,7 @@ nl_double matrix_solver_t::solve()
 	// We are already up to date. Avoid oscillations.
 	// FIXME: Make this a parameter!
 	if (delta < netlist_time::from_nsec(1)) // 20000
-		return -1.0;
+		return netlist_time::from_nsec(0);
 
 	/* update all terminals for new time step */
 	m_last_step = now;
@@ -289,7 +292,7 @@ nl_double matrix_solver_t::solve()
 
 	step(delta);
 
-	const nl_double next_time_step = solve_base();
+	const netlist_time next_time_step = solve_base();
 
 	update_inputs();
 	return next_time_step;
@@ -427,7 +430,7 @@ NETLIB_UPDATE(solver)
 	for (auto & solver : m_mat_solvers)
 		if (solver->is_timestep())
 			// Ignore return value
-			ATTR_UNUSED const nl_double ts = solver->solve();
+			ATTR_UNUSED const netlist_time ts = solver->solve();
 #endif
 
 	/* step circuit */
