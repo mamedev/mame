@@ -1445,6 +1445,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/ramcard128k.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ezcgi.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/ezcgi.h",
+		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.h",
 	}
 end
 
