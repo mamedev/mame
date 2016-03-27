@@ -9935,8 +9935,8 @@ crgolfc                         // (c) 1984 Nasco Japan
 crgolfhi                        // (c) 1984 Nasco Japan
 
 @source:crimfght.cpp
-crimfght                        // GX821 (c) 1989 (US)
-crimfght2                       // GX821 (c) 1989 (World)
+crimfght                        // GX821 (c) 1989 (World)
+crimfghtu                       // GX821 (c) 1989 (US)
 crimfghtj                       // GX821 (c) 1989 (Japan)
 
 @source:crospang.cpp
