@@ -129,7 +129,7 @@ public:
 	// methods
 	void initialize(running_machine &machine);
 	UINT32 set_handler(ui_callback callback, UINT32 param);
-	void display_startup_screens(bool first_time, bool show_disclaimer);
+	void display_startup_screens(bool first_time);
 	void set_startup_text(const char *text, bool force);
 	void update_and_render(render_container *container);
 	render_font *get_font();
@@ -213,7 +213,6 @@ private:
 	static slider_state     *slider_current;
 
 	// text generators
-	std::string &disclaimer_string(std::string &buffer);
 	std::string &warnings_string(std::string &buffer);
 
 	// UI handlers

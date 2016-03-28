@@ -359,9 +359,9 @@ UINT32 ui_manager::set_handler(ui_callback callback, UINT32 param)
 //  various startup screens
 //-------------------------------------------------
 
-void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
+void ui_manager::display_startup_screens(bool first_time)
 {
-	const int maxstate = 4;
+	const int maxstate = 3;
 	int str = machine().options().seconds_to_run();
 	bool show_gameinfo = !machine().options().skip_gameinfo();
 	bool show_warnings = true, show_mandatory_fileman = true;
@@ -370,11 +370,11 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 	// disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
 	// or if we are debugging
 	if (!first_time || (str > 0 && str < 60*5) || &machine().system() == &GAME_NAME(___empty) || (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		show_gameinfo = show_warnings = show_disclaimer = show_mandatory_fileman = FALSE;
+		show_gameinfo = show_warnings = show_mandatory_fileman = FALSE;
 
 	#if defined(EMSCRIPTEN)
 	// also disable for the JavaScript port since the startup screens do not run asynchronously
-	show_gameinfo = show_warnings = show_disclaimer = FALSE;
+	show_gameinfo = show_warnings = FALSE;
 	#endif
 
 	// loop over states
@@ -388,11 +388,6 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 		switch (state)
 		{
 			case 0:
-				if (show_disclaimer && disclaimer_string(messagebox_text).length() > 0)
-					set_handler(handler_messagebox_anykey, 0);
-				break;
-
-			case 1:
 				if (show_warnings && warnings_string(messagebox_text).length() > 0)
 				{
 					set_handler(handler_messagebox_anykey, 0);
@@ -403,12 +398,12 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 				}
 				break;
 
-			case 2:
+			case 1:
 				if (show_gameinfo && game_info_astring(messagebox_text).length() > 0)
 					set_handler(handler_messagebox_anykey, 0);
 				break;
 
-			case 3:
+			case 2:
 				if (show_mandatory_fileman && machine().image().mandatory_scan(messagebox_text).length() > 0)
 				{
 					std::string warning;
@@ -1031,22 +1026,6 @@ bool ui_manager::show_timecode_total()
 /***************************************************************************
     TEXT GENERATORS
 ***************************************************************************/
-
-//-------------------------------------------------
-//  disclaimer_string - print the disclaimer
-//  text to the given buffer
-//-------------------------------------------------
-
-std::string &ui_manager::disclaimer_string(std::string &str)
-{
-	str = string_format(
-			_("Usage of emulators in conjunction with ROMs you don't own is forbidden by copyright law.\n\n"
-			"IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%1$s\" ON THIS EMULATOR, PRESS ESC.\n\n"
-			"Otherwise, type OK or move the joystick left then right to continue"),
-			machine().system().description);
-	return str;
-}
-
 
 //-------------------------------------------------
 //  warnings_string - print the warning flags
