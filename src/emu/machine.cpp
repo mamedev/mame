@@ -356,7 +356,7 @@ int running_machine::run(bool firstrun)
 		ui().initialize(*this);
 
 		// display the startup screens
-		ui().display_startup_screens(firstrun, false);
+		ui().display_startup_screens(firstrun);
 
 		// perform a soft reset -- this takes us to the running phase
 		soft_reset();
