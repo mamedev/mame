@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-28 09:02+0200\n"
-"PO-Revision-Date: 2016-03-26 10:46+0100\n"
+"PO-Revision-Date: 2016-03-28 11:54+0200\n"
 "Last-Translator: Lothar Serra Mari <scummvm@rootfather.de>\n"
 "Language-Team: MAME Language Team\n"
 "Language: de\n"
@@ -1733,6 +1733,9 @@ msgid ""
 "\n"
 "Press any key to continue"
 msgstr ""
+"\n"
+"\n"
+"Drücken Sie eine beliebige Taste zum Fortfahren."
 
 #: src/emu/ui/ui.cpp:1171
 #, c-format
