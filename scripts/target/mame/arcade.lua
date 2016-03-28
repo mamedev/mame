@@ -2443,6 +2443,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mcr3.cpp",
 	MAME_DIR .. "src/mame/includes/mcr3.h",
 	MAME_DIR .. "src/mame/video/mcr3.cpp",
+	MAME_DIR .. "src/mame/drivers/spyhuntertec.cpp",
 	MAME_DIR .. "src/mame/drivers/mcr68.cpp",
 	MAME_DIR .. "src/mame/includes/mcr68.h",
 	MAME_DIR .. "src/mame/machine/mcr68.cpp",
