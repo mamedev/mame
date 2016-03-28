@@ -99,6 +99,9 @@ public:
 	void mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy, int interlaced);
 
 
+	int m_analog_read_ready;
+	int m_analog_latched_value;
+	int m_analog_read_count;
 };
 
 WRITE8_MEMBER(spyhuntertec_state::ay1_porta_w)
@@ -117,6 +120,29 @@ READ8_MEMBER(spyhuntertec_state::ay1_porta_r)
 WRITE8_MEMBER(spyhuntertec_state::ay2_porta_w)
 {
 //	printf("ay2_porta_w %02x\n", data);
+	// write 80 / 00
+	// or 81 / 01 
+	// depending on which sound command was used
+	// assuming input select
+
+	if (data == 0x80)
+	{
+		m_analog_read_ready = 1;
+		m_analog_read_count = 0;
+		m_analog_latched_value = ioport("PEDAL")->read();
+	}
+	else if (data == 0x81)
+	{
+		m_analog_read_ready = 1;
+		m_analog_read_count = 0;
+		m_analog_latched_value = ioport("PADDLE")->read();
+
+	}
+
+	
+	
+	
+
 }
 
 READ8_MEMBER(spyhuntertec_state::ay2_porta_r)
@@ -124,7 +150,7 @@ READ8_MEMBER(spyhuntertec_state::ay2_porta_r)
 // read often, even if port is set to output mode
 // maybe latches something?
 //	printf("ay2_porta_r\n");
-	return rand();
+	return 0x00; // not sure value matters
 }
 
 WRITE8_MEMBER(spyhuntertec_state::spyhunt_videoram_w)
@@ -385,7 +411,27 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 	
 	*/
 
-	UINT8 ret = ioport("IN2")->read();
+	UINT8 ret = ioport("IN2")->read()&~0x40;
+
+	if (m_analog_read_ready)
+	{
+		if (m_analog_read_count >= m_analog_latched_value)
+		{
+			ret |= 0x40;
+			m_analog_read_count = 0;
+			m_analog_read_ready = 0;
+		}
+		else
+		{
+		//	ret |= 0x40;
+			m_analog_read_count++;
+		}
+	}
+	else
+	{
+		ret |= 0x40;
+	}
+
 //	printf("%04x spyhuntertec_in2_r\n", space.device().safe_pc());
 	return ret;
 }
@@ -528,9 +574,7 @@ static INPUT_PORTS_START( spyhuntertec )
 	PORT_DIPNAME( 0x0001, 0x0001, "2" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "start" ) // start
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -543,9 +587,7 @@ static INPUT_PORTS_START( spyhuntertec )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "pedal inverse" )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) // analog signal
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -569,12 +611,13 @@ static INPUT_PORTS_START( spyhuntertec )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "coin" ) // coin?
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "machineguns" ) // machine guns
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+
+	PORT_START("PEDAL")
+	PORT_BIT( 0xff, 0x02, IPT_PEDAL ) PORT_MINMAX(0x02,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
+	PORT_START("PADDLE")
+	PORT_BIT( 0xff, 0x02, IPT_PADDLE ) PORT_MINMAX(0x02,0xff) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_REVERSE
 INPUT_PORTS_END
 
 
@@ -640,6 +683,9 @@ void spyhuntertec_state::machine_start()
 
 void spyhuntertec_state::machine_reset()
 {
+	m_analog_read_ready = 0;
+	m_analog_latched_value = 0;
+	m_analog_read_count = 0;
 }
 
 
