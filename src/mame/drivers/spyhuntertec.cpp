@@ -15,8 +15,7 @@ non-interlaced
 
 sound system appears to be the same as 'spartanxtec.cpp'
 
-how do the inputs work? is it modified to use joystick? is the sound cpu reading them / latching them via the AY?
-if so how does it communicate, timing?
+analog inputs seem to be read by the sound CPU, with serial communication
 
 */
 
@@ -125,7 +124,7 @@ READ8_MEMBER(spyhuntertec_state::ay2_porta_r)
 // read often, even if port is set to output mode
 // maybe latches something?
 //	printf("ay2_porta_r\n");
-	return 0;
+	return rand();
 }
 
 WRITE8_MEMBER(spyhuntertec_state::spyhunt_videoram_w)
@@ -310,12 +309,28 @@ UINT32 spyhuntertec_state::screen_update_spyhuntertec(screen_device &screen, bit
 
 WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_fd00_w)
 {
+//	printf("%04x spyhuntertec_fd00_w %02x\n", space.device().safe_pc(), data);
 	soundlatch_byte_w(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 {
+	// it writes 04 / 14 to the sound latch (spyhuntertec_fd00_w) before
+	// reading bit 6 here a minimum of 32 times.
+	// seems to be how it reads the analog controls? probably via sound CPU??
+
+	/* note, these commands trigger a read from ay2_porta on the sound cpu side, followed by 2 writes
+
+	a52a spyhuntertec_fd00_w 14
+	ay2_porta_r
+	ay2_porta_w 80
+	ay2_porta_w 00
+	a52a spyhuntertec_fd00_w 04
+	ay2_porta_r
+	ay2_porta_w 81
+	ay2_porta_w 01
+	*/
 	UINT8 ret = ioport("IN2")->read();
 //	printf("%04x spyhuntertec_in2_r\n", space.device().safe_pc());
 	return ret;
