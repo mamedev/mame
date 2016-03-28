@@ -222,49 +222,24 @@ ATTR_COLD void matrix_solver_sm_t<m_N, _storage_N>::vsetup(analog_net_t::list_t 
 		m_terms[k]->set_pointers();
 	}
 
-#if 1
-
-	/* Sort in descending order by number of connected matrix voltages.
-	 * The idea is, that for Gauss-Seidel algo the first voltage computed
-	 * depends on the greatest number of previous voltages thus taking into
-	 * account the maximum amout of information.
-	 *
-	 * This actually improves performance on popeye slightly. Average
-	 * GS computations reduce from 2.509 to 2.370
-	 *
-	 * Smallest to largest : 2.613
-	 * Unsorted            : 2.509
-	 * Largest to smallest : 2.370
-	 *
-	 * Sorting as a general matrix pre-conditioning is mentioned in
-	 * literature but I have found no articles about Gauss Seidel.
-	 *
-	 * For Gaussian Elimination however increasing order is better suited.
-	 * FIXME: Even better would be to sort on elements right of the matrix diagonal.
-	 *
-	 */
-
-	int sort_order = (type() == GAUSS_SEIDEL ? 1 : -1);
-
-	for (unsigned k = 0; k < N() / 2; k++)
-		for (unsigned i = 0; i < N() - 1; i++)
-		{
-			if ((m_terms[i]->m_railstart - m_terms[i+1]->m_railstart) * sort_order < 0)
-			{
-				std::swap(m_terms[i], m_terms[i+1]);
-				std::swap(m_nets[i], m_nets[i+1]);
-			}
-		}
-
+	/* create a list of non zero elements. */
 	for (unsigned k = 0; k < N(); k++)
 	{
-		int *other = m_terms[k]->net_other();
-		for (unsigned i = 0; i < m_terms[k]->count(); i++)
-			if (other[i] != -1)
-				other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_otherterm->net());
-	}
+		terms_t * t = m_terms[k];
+		/* pretty brutal */
+		int *other = t->net_other();
 
-#endif
+		t->m_nz.clear();
+
+		for (unsigned i = 0; i < t->m_railstart; i++)
+			if (!t->m_nz.contains(other[i]))
+				t->m_nz.push_back(other[i]);
+
+		t->m_nz.push_back(k);     // add diagonal
+
+		/* and sort */
+		psort_list(t->m_nz);
+	}
 
 	/* create a list of non zero elements right of the diagonal
 	 * These list anticipate the population of array elements by
@@ -275,8 +250,6 @@ ATTR_COLD void matrix_solver_sm_t<m_N, _storage_N>::vsetup(analog_net_t::list_t 
 		terms_t * t = m_terms[k];
 		/* pretty brutal */
 		int *other = t->net_other();
-
-		t->m_nz.clear();
 
 		if (k==0)
 			t->m_nzrd.clear();
@@ -294,19 +267,11 @@ ATTR_COLD void matrix_solver_sm_t<m_N, _storage_N>::vsetup(analog_net_t::list_t 
 		}
 
 		for (unsigned i = 0; i < t->m_railstart; i++)
-		{
 			if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
 				t->m_nzrd.push_back(other[i]);
-			if (!t->m_nz.contains(other[i]))
-				t->m_nz.push_back(other[i]);
-		}
 
 		/* and sort */
 		psort_list(t->m_nzrd);
-
-		t->m_nz.push_back(k);     // add diagonal
-
-		psort_list(t->m_nz);
 	}
 
 	/* create a list of non zero elements below diagonal k
@@ -535,7 +500,8 @@ template <unsigned m_N, unsigned _storage_N>
 int matrix_solver_sm_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
 	static const bool incremental = true;
-	static UINT32 cnt = 0;
+	static unsigned cnt = 0;
+	const auto iN = N();
 
 	nl_double new_V[_storage_N]; // = { 0.0 };
 
@@ -546,9 +512,7 @@ int matrix_solver_sm_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const boo
 	}
 	else
 	{
-		const auto iN = N();
-
-		if (!incremental)
+		if (not incremental)
 		{
 			for (int row = 0; row < iN; row ++)
 				for (int k = 0; k < iN; k++)
