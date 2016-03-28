@@ -239,7 +239,10 @@ function hiscore.startplugin()
 	end
 	
 	emu.register_start(function()
-		print("Starting " .. emu.gamename())
+		current_game = ""
+		mem_check_passed = false
+	   	scores_have_been_read = false;
+	  	print("Starting " .. emu.gamename())
 		-- check if we've just soft reset
 		-- reset() -- there's no way to reliably save scores after a soft reset currently 
 		current_game = emu.romname()
