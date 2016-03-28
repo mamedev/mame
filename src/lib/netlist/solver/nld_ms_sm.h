@@ -3,6 +3,31 @@
 /*
  * nld_ms_direct.h
  *
+ *
+ * Sherman-Morrison Solver
+ *
+ * Computes the updated inverse of A given that the change in A is
+ *
+ * A <- A + (u x v)   u,v vectors
+ *
+ * In this specific implementation, u is a unit vector specifying the row which
+ * changed. Thus v contains the changed column.
+ *
+ * Than z = A⁻¹ u ,  w = transpose(A⁻¹) v , lambda = v z
+ *
+ * A⁻¹ <- 1.0 / (1.0 + lambda) * (z x w)
+ *
+ * The approach is iterative and applied for each row changed.
+ *
+ * The performance for a typical circuit like kidniki compared to Gaussian
+ * elimination is poor:
+ *
+ * a) The code needs to be run for each row change.
+ * b) The inverse of A typically is fully occupied.
+ *
+ * It may have advantages for circuits with a high number of elements and only
+ * few dynamic/active components.
+ *
  */
 
 #ifndef NLD_MS_SM_H_
