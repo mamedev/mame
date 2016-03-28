@@ -218,7 +218,6 @@ private:
 
 	// UI handlers
 	static UINT32 handler_messagebox(running_machine &machine, render_container *container, UINT32 state);
-	static UINT32 handler_messagebox_ok(running_machine &machine, render_container *container, UINT32 state);
 	static UINT32 handler_messagebox_anykey(running_machine &machine, render_container *container, UINT32 state);
 	static UINT32 handler_ingame(running_machine &machine, render_container *container, UINT32 state);
 	static UINT32 handler_load_save(running_machine &machine, render_container *container, UINT32 state);

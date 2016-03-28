@@ -389,13 +389,13 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 		{
 			case 0:
 				if (show_disclaimer && disclaimer_string(messagebox_text).length() > 0)
-					set_handler(handler_messagebox_ok, 0);
+					set_handler(handler_messagebox_anykey, 0);
 				break;
 
 			case 1:
 				if (show_warnings && warnings_string(messagebox_text).length() > 0)
 				{
-					set_handler(handler_messagebox_ok, 0);
+					set_handler(handler_messagebox_anykey, 0);
 					if (machine().system().flags & (MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_KEYBOARD | MACHINE_NO_SOUND))
 						messagebox_backcolor = UI_YELLOW_COLOR;
 					if (machine().system().flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_MECHANICAL))
@@ -1174,7 +1174,7 @@ std::string &ui_manager::warnings_string(std::string &str)
 	}
 
 	// add the 'press OK' string
-	str.append(_("\n\nType OK or move the joystick left then right to continue"));
+	str.append(_("\n\nPress any key to continue"));
 	return str;
 }
 
@@ -1313,35 +1313,6 @@ UINT32 ui_manager::handler_messagebox(running_machine &machine, render_container
 {
 	machine.ui().draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 	return 0;
-}
-
-
-//-------------------------------------------------
-//  handler_messagebox_ok - displays the current
-//  messagebox_text string and waits for an OK
-//-------------------------------------------------
-
-UINT32 ui_manager::handler_messagebox_ok(running_machine &machine, render_container *container, UINT32 state)
-{
-	// draw a standard message window
-	machine.ui().draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
-
-	// an 'O' or left joystick kicks us to the next state
-	if (state == 0 && (machine.input().code_pressed_once(KEYCODE_O) || machine.ui_input().pressed(IPT_UI_LEFT)))
-		state++;
-
-	// a 'K' or right joystick exits the state
-	else if (state == 1 && (machine.input().code_pressed_once(KEYCODE_K) || machine.ui_input().pressed(IPT_UI_RIGHT)))
-		state = UI_HANDLER_CANCEL;
-
-	// if the user cancels, exit out completely
-	else if (machine.ui_input().pressed(IPT_UI_CANCEL))
-	{
-		machine.schedule_exit();
-		state = UI_HANDLER_CANCEL;
-	}
-
-	return state;
 }
 
 
