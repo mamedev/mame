@@ -535,7 +535,7 @@ template <unsigned m_N, unsigned _storage_N>
 int matrix_solver_sm_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
 	static const bool incremental = true;
-	static uint cnt = 0;
+	static UINT32 cnt = 0;
 
 	nl_double new_V[_storage_N]; // = { 0.0 };
 
