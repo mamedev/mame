@@ -8,12 +8,14 @@ single PCB with 2x Z80
 significant changes compared to original HW
 non-interlaced
 
+sound system appears to be the same as 'spartanxtec.cpp'
+
 */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "machine/z80ctc.h" // not actually present here?
+
 
 #define MASTER_CLOCK        XTAL_20MHz // ??
 
@@ -69,6 +71,7 @@ public:
 	DECLARE_WRITE8_MEMBER(spyhunt_videoram_w);
 	DECLARE_WRITE8_MEMBER(spyhunt_alpharam_w);
 	DECLARE_WRITE8_MEMBER(spyhunt_scroll_value_w);
+	DECLARE_WRITE8_MEMBER(sound_irq_ack);
 
 	TILEMAP_MAPPER_MEMBER(spyhunt_bg_scan);
 	TILE_GET_INFO_MEMBER(spyhunt_get_bg_tile_info);
@@ -262,6 +265,8 @@ UINT32 spyhuntertec_state::screen_update_spyhuntertec(screen_device &screen, bit
 
 WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_fd00_w)
 {
+	soundlatch_byte_w(space, 0, data);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( spyhuntertec_map, AS_PROGRAM, 8, spyhuntertec_state )
@@ -305,12 +310,21 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spyhuntertec_sound_map, AS_PROGRAM, 8, spyhuntertec_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-//  AM_RANGE(0xfe00, 0xffff) AM_RAM
+
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
+
+
+WRITE8_MEMBER(spyhuntertec_state::sound_irq_ack)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+}
 
 static ADDRESS_MAP_START( spyhuntertec_sound_portmap, AS_IO, 8, spyhuntertec_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+
+	AM_RANGE(0x00, 0x00) AM_WRITE(sound_irq_ack)
 
 	AM_RANGE(0x12, 0x13) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
 	AM_RANGE(0x14, 0x15) AM_DEVWRITE("ay2", ay8912_device, address_data_w)
@@ -501,18 +515,7 @@ static MACHINE_CONFIG_START( spyhuntertec, spyhuntertec_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(spyhuntertec_map)
 	MCFG_CPU_IO_MAP(spyhuntertec_portmap)
-//	MCFG_CPU_CONFIG(mcr_daisy_chain)
-//	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", spyhuntertec_state, mcr_interrupt, "screen", 0, 1)
-
-//	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK/4 /* same as "maincpu" */)
-//	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-//	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
-
-	//MCFG_WATCHDOG_VBLANK_INIT(16)
-//	MCFG_MACHINE_START_OVERRIDE(spyhuntertec_state,mcr)
-//	MCFG_MACHINE_RESET_OVERRIDE(spyhuntertec_state,mcr)
-
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spyhuntertec_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -530,10 +533,10 @@ static MACHINE_CONFIG_START( spyhuntertec, spyhuntertec_state )
 //	MCFG_PALETTE_INIT_OWNER(spyhuntertec_state,spyhunt)
 
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000 )
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000 )
 	MCFG_CPU_PROGRAM_MAP(spyhuntertec_sound_map)
 	MCFG_CPU_IO_MAP(spyhuntertec_sound_portmap)
-//  MCFG_CPU_PERIODIC_INT_DRIVER(spyhuntertec_state, irq0_line_hold, 4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(spyhuntertec_state, irq0_line_assert, 1000)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -33,6 +33,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_scroll_lo(*this, "scroll_lo"),
 		m_scroll_hi(*this, "scroll_hi"),
+		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode")
@@ -42,6 +43,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_scroll_lo;
 	required_shared_ptr<UINT8> m_scroll_hi;
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 
 	virtual void machine_start() override;
@@ -56,6 +58,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
 	DECLARE_WRITE8_MEMBER(spartanxtec_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(a801_w);
+	DECLARE_WRITE8_MEMBER(sound_irq_ack);
+	DECLARE_WRITE8_MEMBER(irq_ack);
+
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -165,6 +170,10 @@ WRITE8_MEMBER(spartanxtec_state::a801_w)
 	if (data != 0xf0) printf("a801_w %02x\n", data);
 }
 
+WRITE8_MEMBER(spartanxtec_state::irq_ack)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+}
 
 
 static ADDRESS_MAP_START( spartanxtec_map, AS_PROGRAM, 8, spartanxtec_state )
@@ -178,7 +187,7 @@ static ADDRESS_MAP_START( spartanxtec_map, AS_PROGRAM, 8, spartanxtec_state )
 	AM_RANGE(0x8102, 0x8102) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x8103, 0x8103) AM_READ_PORT("P1")
 
-//	AM_RANGE(0x8200, 0x8200) AM_WRITENOP
+	AM_RANGE(0x8200, 0x8200) AM_WRITE(irq_ack)
 	
 	AM_RANGE(0xA801, 0xA801) AM_WRITE(a801_w)
 
@@ -191,8 +200,15 @@ static ADDRESS_MAP_START( spartanxtec_map, AS_PROGRAM, 8, spartanxtec_state )
 
 ADDRESS_MAP_END
 
+
+
+WRITE8_MEMBER(spartanxtec_state::sound_irq_ack)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+}
+
+
 static ADDRESS_MAP_START( spartanxtec_sound_map, AS_PROGRAM, 8, spartanxtec_state )
-	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
@@ -202,7 +218,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spartanxtec_sound_io, AS_IO, 8, spartanxtec_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
+	AM_RANGE(0x0000, 0x0000) AM_WRITE( sound_irq_ack )
 
 	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
 	AM_RANGE(0x0012, 0x0012) AM_DEVREAD("ay3", ay8910_device, data_r)
@@ -341,12 +357,12 @@ static MACHINE_CONFIG_START( spartanxtec, spartanxtec_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(spartanxtec_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(spartanxtec_sound_map)
 	MCFG_CPU_IO_MAP(spartanxtec_sound_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(spartanxtec_state, irq0_line_hold, 1000) // controls speed of music
+	MCFG_CPU_PERIODIC_INT_DRIVER(spartanxtec_state, irq0_line_assert, 1000) // controls speed of music
 //	MCFG_CPU_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_hold)
 
 	/* video hardware */
