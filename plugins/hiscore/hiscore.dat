@@ -9,6 +9,9 @@
 ;This file can be edited with a text editor, but keep the same format:
 ; all fields are separated by a comma (,)
 ; <gamename>:
+; or
+; <gamename>,<softwarename>:
+; for machines with softlists
 ; @<cputag>,<addressspace>,<address>,<length>,<value to wait for 
 ; in the first byte/word>,<value to wait for in the last byte/word>
 ; [repeat the above as many times as necessary]
@@ -13965,3 +13968,6 @@ zodiack:
 @:maincpu,program,b35f,1,08,08
 @:maincpu,program,b37f,1,00,00
 @:maincpu,program,b39f,1,00,00
+
+genesis,tf3:
+@:maincpu,program,fff2ac,4,00,90

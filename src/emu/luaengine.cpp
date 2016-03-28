@@ -245,6 +245,16 @@ int lua_engine::l_emu_romname(lua_State *L)
 }
 
 //-------------------------------------------------
+//  emu_softname - returns softlist name
+//-------------------------------------------------
+
+int lua_engine::l_emu_softname(lua_State *L)
+{
+	lua_pushstring(L, luaThis->machine().options().software_name());
+	return 1;
+}
+
+//-------------------------------------------------
 //  emu_pause/emu_unpause - pause/unpause game
 //-------------------------------------------------
 
@@ -1418,6 +1428,7 @@ void lua_engine::initialize()
 			.addCFunction ("app_version", l_emu_app_version )
 			.addCFunction ("gamename",    l_emu_gamename )
 			.addCFunction ("romname",     l_emu_romname )
+			.addCFunction ("softname",    l_emu_softname )
 			.addCFunction ("keypost",     l_emu_keypost )
 			.addCFunction ("hook_output", l_emu_hook_output )
 			.addCFunction ("sethook",     l_emu_set_hook )
