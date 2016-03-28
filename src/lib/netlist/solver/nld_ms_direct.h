@@ -269,16 +269,14 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 			}
 		}
 
-		for (unsigned j = 0; j < N(); j++)
+		for (unsigned i = 0; i < t->m_railstart; i++)
 		{
-			for (unsigned i = 0; i < t->m_railstart; i++)
-			{
-				if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
-					t->m_nzrd.push_back(other[i]);
-				if (!t->m_nz.contains(other[i]))
-					t->m_nz.push_back(other[i]);
-			}
+			if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
+				t->m_nzrd.push_back(other[i]);
+			if (!t->m_nz.contains(other[i]))
+				t->m_nz.push_back(other[i]);
 		}
+
 		/* Add RHS element */
 		if (!t->m_nzrd.contains(N()))
 			t->m_nzrd.push_back(N());

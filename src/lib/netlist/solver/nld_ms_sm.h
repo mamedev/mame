@@ -13,11 +13,6 @@
 #include "solver/nld_solver.h"
 #include "solver/vector_base.h"
 
-/* Disabling dynamic allocation gives a ~10% boost in performance
- * This flag has been added to support continuous storage for arrays
- * going forward in case we implement cuda solvers in the future.
- */
-
 NETLIB_NAMESPACE_DEVICES_START()
 
 //#define nl_ext_double __float128 // slow, very slow
@@ -273,16 +268,14 @@ ATTR_COLD void matrix_solver_sm_t<m_N, _storage_N>::vsetup(analog_net_t::list_t 
 			}
 		}
 
-		for (unsigned j = 0; j < N(); j++)
+		for (unsigned i = 0; i < t->m_railstart; i++)
 		{
-			for (unsigned i = 0; i < t->m_railstart; i++)
-			{
-				if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
-					t->m_nzrd.push_back(other[i]);
-				if (!t->m_nz.contains(other[i]))
-					t->m_nz.push_back(other[i]);
-			}
+			if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
+				t->m_nzrd.push_back(other[i]);
+			if (!t->m_nz.contains(other[i]))
+				t->m_nz.push_back(other[i]);
 		}
+
 		/* and sort */
 		psort_list(t->m_nzrd);
 
@@ -476,8 +469,10 @@ void matrix_solver_sm_t<m_N, _storage_N>::LE_compute_x(
 
 	for (int k=0; k<kN; k++)
 	{
+		const nl_double f = RHS(k);
+
 		for (int i=0; i<kN; i++)
-			x[i] += Ainv(i,k) * RHS(k);
+			x[i] += Ainv(i,k) * f;
 	}
 }
 
@@ -514,11 +509,12 @@ void matrix_solver_sm_t<m_N, _storage_N>::store(
 template <unsigned m_N, unsigned _storage_N>
 int matrix_solver_sm_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
+	static const bool incremental = true;
 	static uint cnt = 0;
 
 	nl_double new_V[_storage_N]; // = { 0.0 };
 
-	if (0 || (cnt % 100 == 0))
+	if (0 || ((cnt % 200) == 0))
 	{
 		/* complete calculation */
 		this->LE_invert();
@@ -526,40 +522,57 @@ int matrix_solver_sm_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const boo
 	else
 	{
 		const auto iN = N();
-		for (int row = 0; row < iN; row ++)
-			for (int k = 0; k < iN; k++)
-				Ainv(row,k) = lAinv(row, k);
 
-		for (int row = 0; row < N(); row ++)
+		if (not incremental)
 		{
-			nl_double v[m_pitch];
-			bool changed = false;
-			for (int k = 0; k < N(); k++)
-				v[k] = A(row,k) - lA(row,k);
-			for (int k = 0; k < N(); k++)
-				if (v[k] != 0.0)
-				{
-					changed = true;
-					break;
-				}
+			for (int row = 0; row < iN; row ++)
+				for (int k = 0; k < iN; k++)
+					Ainv(row,k) = lAinv(row, k);
+		}
+		for (int row = 0; row < iN; row ++)
+		{
+			nl_double v[m_pitch] = {0};
+			unsigned cols[m_pitch];
+			unsigned colcount = 0;
 
-			if (changed)
+			auto &nz = m_terms[row]->m_nz;
+			for (auto & col : nz)
+			{
+				v[col] = A(row,col) - lA(row,col);
+				if (incremental)
+					lA(row,col) = A(row,col);
+				if (v[col] != 0.0)
+					cols[colcount++] = col;
+			}
+
+			if (colcount > 0)
 			{
 				nl_double lamba = 0.0;
 				nl_double w[m_pitch] = {0};
-				nl_double z[m_pitch] = {0};
+				nl_double z[m_pitch];
 				/* compute w and lamba */
-				for (int k = 0; k < N(); k++)
+				for (unsigned i = 0; i < iN; i++)
+					z[i] = Ainv(i, row); /* u is row'th column */
+
+				for (unsigned j = 0; j < colcount; j++)
+					lamba += v[cols[j]] * z[cols[j]];
+
+				for (unsigned j=0; j<colcount; j++)
 				{
-					for (int j=0; j<N(); j++)
-						w[k] += Ainv(j,k) * v[j]; /* Transpose(Ainv) * v */
-					z[k] = Ainv(k, row); /* u is row'th column */
-					lamba += v[k] * z[k];
+					auto col = cols[j];
+					auto f = v[col];
+					for (unsigned k = 0; k < iN; k++)
+						w[k] += Ainv(col,k) * f; /* Transpose(Ainv) * v */
 				}
+
 				lamba = -1.0 / (1.0 + lamba);
-				for (int i=0; i<N(); i++)
-					for (int k = 0; k < N(); k++)
-						Ainv(i,k) += lamba * z[i] * w[k];
+				for (int i=0; i<iN; i++)
+				{
+					const nl_double f = lamba * z[i];
+					if (f != 0.0)
+						for (int k = 0; k < iN; k++)
+							Ainv(i,k) += f * w[k];
+				}
 			}
 
 		}
