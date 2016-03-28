@@ -11,7 +11,6 @@
 #define __RENDUTIL_H__
 
 #include "render.h"
-#include "libjpeg/jpeglib.h"
 
 #include <math.h>
 

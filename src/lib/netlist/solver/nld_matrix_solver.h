@@ -46,7 +46,7 @@ class terms_t
 	unsigned m_railstart;
 
 	pvector_t<unsigned> m_nz;   /* all non zero for multiplication */
-	pvector_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, includes RHS element */
+	pvector_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
 	pvector_t<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
 private:
 	pvector_t<terminal_t *> m_term;
