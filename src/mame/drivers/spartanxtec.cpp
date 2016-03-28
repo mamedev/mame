@@ -112,7 +112,7 @@ void spartanxtec_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 	for (int i = 0; i < 0x400; i += 4)
 	{
 		int x = m_spriteram[i+2]+128;
-		int y = (224-m_spriteram[i+1])&0xff;
+		int y = (225-m_spriteram[i+1])&0xff; // 224 or 225? 224 sometimes gives an ugly line on player death sprite, 225 also aligns better with original
 		int code = m_spriteram[i+0];
 		int attr = m_spriteram[i+3];
 		code |= (attr & 0xc0) << 2;
@@ -251,7 +251,7 @@ static INPUT_PORTS_START( spartanxtec )
 	IREM_Z80_COINAGE_TYPE_3_LOC(SW1)
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1") // I don't think this is implemented in the bootleg, it just shifts the sprites a bit
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2")
