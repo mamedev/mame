@@ -31,23 +31,27 @@
 
 #include <iostream>
 #include <algorithm>
-#include "nld_solver.h"
-#if 1
-#include "nld_ms_direct.h"
-#else
-#include "nld_ms_direct_lu.h"
-#endif
-#include "nld_ms_direct1.h"
-#include "nld_ms_direct2.h"
-#include "nld_ms_sor.h"
-#include "nld_ms_sor_mat.h"
-#include "nld_ms_gmres.h"
 //#include "nld_twoterm.h"
 #include "nl_lists.h"
 
 #if HAS_OPENMP
 #include "omp.h"
 #endif
+
+#include "nld_solver.h"
+#include "nld_matrix_solver.h"
+
+#if 1
+#include "nld_ms_direct.h"
+#else
+#include "nld_ms_direct_lu.h"
+#endif
+#include "nld_ms_sm.h"
+#include "nld_ms_direct1.h"
+#include "nld_ms_direct2.h"
+#include "nld_ms_sor.h"
+#include "nld_ms_sor_mat.h"
+#include "nld_ms_gmres.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -79,9 +83,7 @@ ATTR_COLD void terms_t::set_pointers()
 {
 	for (unsigned i = 0; i < count(); i++)
 	{
-		m_term[i]->m_gt1 = &m_gt[i];
-		m_term[i]->m_go1 = &m_go[i];
-		m_term[i]->m_Idr1 = &m_Idr[i];
+		m_term[i]->set_ptrs(&m_gt[i], &m_go[i], &m_Idr[i]);
 		m_other_curanalog[i] = &m_term[i]->m_otherterm->net().m_cur_Analog;
 	}
 }
@@ -107,7 +109,7 @@ ATTR_COLD matrix_solver_t::~matrix_solver_t()
 	m_inps.clear_and_free();
 }
 
-ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
+ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 {
 	log().debug("New solver setup\n");
 
@@ -187,14 +189,14 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 }
 
 
-ATTR_HOT void matrix_solver_t::update_inputs()
+void matrix_solver_t::update_inputs()
 {
 	// avoid recursive calls. Inputs are updated outside this call
 	for (std::size_t i=0; i<m_inps.size(); i++)
 		m_inps[i]->set_Q(m_inps[i]->m_proxied_net->Q_Analog());
 }
 
-ATTR_HOT void matrix_solver_t::update_dynamic()
+void matrix_solver_t::update_dynamic()
 {
 	/* update all non-linear devices  */
 	for (std::size_t i=0; i < m_dynamic_devices.size(); i++)
@@ -224,29 +226,28 @@ ATTR_COLD void matrix_solver_t::reset()
 
 ATTR_COLD void matrix_solver_t::update()
 {
-	const nl_double new_timestep = solve();
+	const netlist_time new_timestep = solve();
 
-	if (m_params.m_dynamic && is_timestep() && new_timestep > 0)
-		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(new_timestep));
+	if (m_params.m_dynamic && is_timestep() && new_timestep > netlist_time::zero)
+		m_Q_sync.net().reschedule_in_queue(new_timestep);
 }
 
 ATTR_COLD void matrix_solver_t::update_forced()
 {
-	ATTR_UNUSED const nl_double new_timestep = solve();
+	ATTR_UNUSED const netlist_time new_timestep = solve();
 
 	if (m_params.m_dynamic && is_timestep())
 		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
 }
 
-ATTR_HOT void matrix_solver_t::step(const netlist_time delta)
+void matrix_solver_t::step(const netlist_time &delta)
 {
 	const nl_double dd = delta.as_double();
 	for (std::size_t k=0; k < m_step_devices.size(); k++)
 		m_step_devices[k]->step_time(dd);
 }
 
-template<class C >
-void matrix_solver_t::solve_base(C *p)
+netlist_time matrix_solver_t::solve_base()
 {
 	m_stat_vsolver_calls++;
 	if (is_dynamic())
@@ -257,7 +258,7 @@ void matrix_solver_t::solve_base(C *p)
 		{
 			update_dynamic();
 			// Gauss-Seidel will revert to Gaussian elemination if steps exceeded.
-			this_resched = p->vsolve_non_dynamic(true);
+			this_resched = this->vsolve_non_dynamic(true);
 			newton_loops++;
 		} while (this_resched > 1 && newton_loops < m_params.m_nr_loops);
 
@@ -271,11 +272,12 @@ void matrix_solver_t::solve_base(C *p)
 	}
 	else
 	{
-		p->vsolve_non_dynamic(false);
+		this->vsolve_non_dynamic(false);
 	}
+	return this->compute_next_timestep();
 }
 
-ATTR_HOT nl_double matrix_solver_t::solve()
+netlist_time matrix_solver_t::solve()
 {
 	const netlist_time now = netlist().time();
 	const netlist_time delta = now - m_last_step;
@@ -283,7 +285,7 @@ ATTR_HOT nl_double matrix_solver_t::solve()
 	// We are already up to date. Avoid oscillations.
 	// FIXME: Make this a parameter!
 	if (delta < netlist_time::from_nsec(1)) // 20000
-		return -1.0;
+		return netlist_time::from_nsec(0);
 
 	/* update all terminals for new time step */
 	m_last_step = now;
@@ -291,7 +293,7 @@ ATTR_HOT nl_double matrix_solver_t::solve()
 
 	step(delta);
 
-	const nl_double next_time_step = vsolve();
+	const netlist_time next_time_step = solve_base();
 
 	update_inputs();
 	return next_time_step;
@@ -307,7 +309,7 @@ ATTR_COLD int matrix_solver_t::get_net_idx(net_t *net)
 
 void matrix_solver_t::log_stats()
 {
-	//if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
+	if (this->m_stat_calculations != 0 && this->m_stat_vsolver_calls && this->m_params.m_log_stats)
 	{
 		log().verbose("==============================================");
 		log().verbose("Solver {1}", this->name());
@@ -360,7 +362,7 @@ NETLIB_START(solver)
 
 	/* automatic time step */
 	register_param("DYNAMIC_TS", m_dynamic, 0);
-	register_param("LTE", m_lte, 5e-5);                     // diff/timestep
+	register_param("DYNAMIC_LTE", m_lte, 5e-5);                     // diff/timestep
 	register_param("MIN_TIMESTEP", m_min_timestep, 1e-6);   // nl_double timestep resolution
 
 	register_param("LOG_STATS", m_log_stats, 1);   // nl_double timestep resolution
@@ -429,7 +431,7 @@ NETLIB_UPDATE(solver)
 	for (auto & solver : m_mat_solvers)
 		if (solver->is_timestep())
 			// Ignore return value
-			ATTR_UNUSED const nl_double ts = solver->solve();
+			ATTR_UNUSED const netlist_time ts = solver->solve();
 #endif
 
 	/* step circuit */
@@ -457,7 +459,13 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_sp
 			}
 			else if (pstring("MAT").equals(m_iterative_solver))
 			{
-				typedef matrix_solver_direct_t<m_N,_storage_N> solver_mat;
+				typedef matrix_solver_sm_t<m_N,_storage_N> solver_mat;
+				return palloc(solver_mat(&m_params, size));
+			}
+			else if (pstring("SM").equals(m_iterative_solver))
+			{
+				/* Sherman-Morrison Formula */
+				typedef matrix_solver_sm_t<m_N,_storage_N> solver_mat;
 				return palloc(solver_mat(&m_params, size));
 			}
 			else if (pstring("SOR").equals(m_iterative_solver))
@@ -620,7 +628,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
 		register_sub(pfmt("Solver_{1}")(m_mat_solvers.size()), *ms);
 
-		ms->vsetup(grp);
+		ms->setup(grp);
 
 		m_mat_solvers.push_back(ms);
 

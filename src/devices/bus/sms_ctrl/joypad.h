@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Sega Master System "Control Pad"/generic joystick emulation
+    Sega Mark III "Joypad" / Master System "Control Pad" emulation
 
 **********************************************************************/
 

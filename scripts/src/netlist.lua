@@ -73,6 +73,7 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/analog/nld_opamps.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_solver.cpp",
 		MAME_DIR .. "src/lib/netlist/solver/nld_solver.h",
+    MAME_DIR .. "src/lib/netlist/solver/nld_matrix_solver.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_direct.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_direct1.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_direct2.h",

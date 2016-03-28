@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Sega Master System "Rapid Fire Unit" emulation
+    Sega SG-1000/Mark-III/SMS "Rapid Fire Unit" emulation
 
 **********************************************************************/
 

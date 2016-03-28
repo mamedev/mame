@@ -4,6 +4,14 @@
 
     Sega Master System "Light Phaser" (light gun) emulation
 
+
+Release data from the Sega Retro project:
+
+  Year: 1986    Country/region: US    Model code: 3050
+  Year: 1987    Country/region: EU    Model code: ?
+  Year: 1989    Country/region: BR    Model code: 010470
+  Year: 198?    Country/region: KR    Model code: ?
+
 **********************************************************************/
 
 #include "lphaser.h"

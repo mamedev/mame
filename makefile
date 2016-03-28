@@ -273,6 +273,9 @@ endif
 endif
 
 ifeq ($(OS),windows)
+ifndef MINGW64
+ARCHITECTURE := _x86
+endif
 ifeq ($(ARCHITECTURE),_x64)
 WINDRES  := $(MINGW64)/bin/windres
 else
@@ -975,145 +978,145 @@ endif
 # android-arm
 #-------------------------------------------------
 
-$(PROJECTDIR_MINI)/gmake-android-arm/Makefile: makefile $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/gmake-android-arm/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_ARM
 	$(error ANDROID_NDK_ARM is not set)
 endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=3.8.0 --osd=osdmini --targetos=android-arm --targetos=android --PLATFORM=arm --NOASM=1 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=arm --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 --NOASM=1 gmake
 
 .PHONY: android-arm
-android-arm: generate $(PROJECTDIR_MINI)/gmake-android-arm/Makefile
+android-arm: generate $(PROJECTDIR_SDL)/gmake-android-arm/Makefile
 ifndef ANDROID_NDK_ARM
 	$(error ANDROID_NDK_ARM is not set)
 endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif	
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-arm config=$(CONFIG) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-arm config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-arm config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-arm config=$(CONFIG)
 
 #-------------------------------------------------
 # android-arm64
 #-------------------------------------------------
 
-$(PROJECTDIR_MINI)/gmake-android-arm64/Makefile: makefile $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/gmake-android-arm64/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_ARM64
 	$(error ANDROID_NDK_ARM64 is not set)
 endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm64 --gcc_version=3.8.0 --osd=osdmini --targetos=android-arm64 --targetos=android --PLATFORM=arm64 --NOASM=1 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm64 --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=arm64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 --NOASM=1 gmake
 
 .PHONY: android-arm64
-android-arm64: generate $(PROJECTDIR_MINI)/gmake-android-arm64/Makefile
+android-arm64: generate $(PROJECTDIR_SDL)/gmake-android-arm64/Makefile
 ifndef ANDROID_NDK_ARM64
 	$(error ANDROID_NDK_ARM64 is not set)
 endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif	
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-arm64 config=$(CONFIG) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-arm64 config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-arm64 config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-arm64 config=$(CONFIG)
 
 #-------------------------------------------------
 # android-mips
 #-------------------------------------------------
 
-$(PROJECTDIR_MINI)/gmake-android-mips/Makefile: makefile $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/gmake-android-mips/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_MIPS
 	$(error ANDROID_NDK_MIPS is not set)
 endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=3.8.0 --osd=osdmini --targetos=android-mips --targetos=android --PLATFORM=mips --NOASM=1 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=mips --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 --NOASM=1 gmake
 
 .PHONY: android-mips
-android-mips: generate $(PROJECTDIR_MINI)/gmake-android-mips/Makefile
+android-mips: generate $(PROJECTDIR_SDL)/gmake-android-mips/Makefile
 ifndef ANDROID_NDK_MIPS
 	$(error ANDROID_NDK_MIPS is not set)
 endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-mips config=$(CONFIG) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-mips config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-mips config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-mips config=$(CONFIG)
 
 #-------------------------------------------------
 # android-mips64
 #-------------------------------------------------
 
-$(PROJECTDIR_MINI)/gmake-android-mips64/Makefile: makefile $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/gmake-android-mips64/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_MIPS64
 	$(error ANDROID_NDK_MIPS64 is not set)
 endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips64 --gcc_version=3.8.0 --osd=osdmini --targetos=android-mips64 --targetos=android --PLATFORM=mips64 --NOASM=1 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips64 --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=mips64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 --NOASM=1 gmake
 
 .PHONY: android-mips64
-android-mips64: generate $(PROJECTDIR_MINI)/gmake-android-mips64/Makefile
+android-mips64: generate $(PROJECTDIR_SDL)/gmake-android-mips64/Makefile
 ifndef ANDROID_NDK_MIPS64
 	$(error ANDROID_NDK_MIPS64 is not set)
 endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-mips64 config=$(CONFIG) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-mips64 config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-mips64 config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-mips64 config=$(CONFIG)
 
 #-------------------------------------------------
 # android-x86
 #-------------------------------------------------
 
-$(PROJECTDIR_MINI)/gmake-android-x86/Makefile: makefile $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/gmake-android-x86/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_X86
 	$(error ANDROID_NDK_X86 is not set)
 endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=3.8.0 --osd=osdmini --targetos=android-x86 --targetos=android --PLATFORM=x86 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=x86 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 gmake
 
 .PHONY: android-x86
-android-x86: generate $(PROJECTDIR_MINI)/gmake-android-x86/Makefile
+android-x86: generate $(PROJECTDIR_SDL)/gmake-android-x86/Makefile
 ifndef ANDROID_NDK_X86
 	$(error ANDROID_NDK_X86 is not set)
 endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-x86 config=$(CONFIG) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-x86 config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-x86 config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-x86 config=$(CONFIG)
 
 #-------------------------------------------------
 # android-x64
 #-------------------------------------------------
 
-$(PROJECTDIR_MINI)/gmake-android-x64/Makefile: makefile $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/gmake-android-x64/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_X64
 	$(error ANDROID_NDK_X64 is not set)
 endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x64 --gcc_version=3.8.0 --osd=osdmini --targetos=android-x64 --targetos=android --PLATFORM=x64 gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x64 --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=x64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 gmake
 
 .PHONY: android-x64
-android-x64: generate $(PROJECTDIR_MINI)/gmake-android-x64/Makefile
+android-x64: generate $(PROJECTDIR_SDL)/gmake-android-x64/Makefile
 ifndef ANDROID_NDK_X64
 	$(error ANDROID_NDK_X64 is not set)
 endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-x64 config=$(CONFIG) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-android-x64 config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-x64 config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-x64 config=$(CONFIG)
 
 #-------------------------------------------------
 # asmjs / Emscripten

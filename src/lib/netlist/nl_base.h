@@ -551,10 +551,6 @@ namespace netlist
 
 		ATTR_COLD terminal_t();
 
-		nl_double *m_Idr1; // drive current
-		nl_double *m_go1;  // conductance for Voltage from other term
-		nl_double *m_gt1;  // conductance for total conductance
-
 		terminal_t *m_otherterm;
 
 		ATTR_HOT  void set(const nl_double G)
@@ -581,19 +577,31 @@ namespace netlist
 		ATTR_HOT void schedule_solve();
 		ATTR_HOT void schedule_after(const netlist_time &after);
 
+		void set_ptrs(nl_double *gt, nl_double *go, nl_double *Idr)
+		{
+			m_gt1 = gt;
+			m_go1 = go;
+			m_Idr1 = Idr;
+		}
+
 	protected:
 		virtual void save_register() override;
 
 		virtual void reset() override;
 	private:
-		ATTR_HOT  void set_ptr(nl_double *ptr, const nl_double val)
+		ATTR_HOT void set_ptr(nl_double *ptr, const nl_double val)
 		{
 			if (ptr != NULL && *ptr != val)
 			{
 				*ptr = val;
 			}
 		}
-	};
+
+		nl_double *m_Idr1; // drive current
+		nl_double *m_go1;  // conductance for Voltage from other term
+		nl_double *m_gt1;  // conductance for total conductance
+
+};
 
 
 	// -----------------------------------------------------------------------------
@@ -1054,7 +1062,7 @@ namespace netlist
 
 		ATTR_HOT  nl_double INPANALOG(const analog_input_t &inp) const { return inp.Q_Analog(); }
 
-		ATTR_HOT  nl_double TERMANALOG(const terminal_t &term) const { return term.net().as_analog().Q_Analog(); }
+		ATTR_HOT  nl_double TERMANALOG(const terminal_t &term) const { return term.net().Q_Analog(); }
 
 		ATTR_HOT  void OUTANALOG(analog_output_t &out, const nl_double val)
 		{

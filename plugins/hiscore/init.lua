@@ -64,7 +64,11 @@ function hiscore.startplugin()
 	  if not file then
 		file = io.open( hiscore_plugin_path .. "/hiscore.dat", "r" );
 	  end
-	  rm_match = '^' .. emu.romname() .. ':';
+	  if emu.softname() ~= "" then
+		rm_match = '^' .. emu.romname() .. ',' .. emu.softname() .. ':';
+	  else
+	    rm_match = '^' .. emu.romname() .. ':';
+      end
 	  cluster = "";
 	  current_is_match = false;
 	  if file then
@@ -113,7 +117,11 @@ function hiscore.startplugin()
 
 
 	function get_file_name ()
-	  r = hiscore_path .. '/' .. emu.romname() .. ".hi";
+	  if emu.softname() ~= "" then
+	  	r = hiscore_path .. '/' .. emu.romname() .. "_" .. emu.softname() .. ".hi";
+	  else
+	  	r = hiscore_path .. '/' .. emu.romname() .. ".hi";
+	  end
 	  return r;
 	end
 
@@ -225,19 +233,18 @@ function hiscore.startplugin()
 		  write_scores(positions)
 		end
 	  end
-	  current_game = nil
+	  current_game = ""
 	  mem_check_passed = false
+   	  scores_have_been_read = false;
 	end
 	
 	emu.register_start(function()
 		print("Starting " .. emu.gamename())
 		-- check if we've just soft reset
-		if reset then
-			reset()
-		end
+		-- reset() -- there's no way to reliably save scores after a soft reset currently 
 		current_game = emu.romname()
 		dat = read_hiscore_dat()
-		if dat then
+		if dat and dat ~= "" then
 			print( "found hiscore.dat entry for " .. emu.romname() );
 			positions = parse_table( dat );
 			if not positions then

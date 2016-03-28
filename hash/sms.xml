@@ -252,6 +252,7 @@
 		<info name="serial" value="G-1330"/>
 		<info name="release" value="19871115"/>
 		<info name="alt_title" value="アレックスキッド BMXトライアル" />
+		<sharedfeat name="ctrl1_default" value="paddle" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="alex kidd bmx trial (japan).bin" size="131072" crc="f9dbb533" sha1="77cc767bfae01e9cc81612c780c939ed954a6312" offset="000000" />
@@ -392,6 +393,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="altbeast">
 		<description>Altered Beast (Euro, USA, Bra)</description>
 		<year>1989</year>
@@ -534,6 +536,7 @@
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7040"/>
+		<sharedfeat name="ctrl1_default" value="lphaser" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="assault city (europe) (light phaser).bin" size="262144" crc="861b6e79" sha1="835217550ecb92422d887a3353ff43890c71566b" offset="000000" />
@@ -665,6 +668,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="aliensyn">
 		<description>Alien Syndrome (Euro, USA, Bra)</description>
 		<year>1987</year>
@@ -752,6 +756,7 @@
 		<description>Back to the Future Part III (Euro)</description>
 		<year>1992</year>
 		<publisher>Image Works</publisher>
+		<info name="usage" value="Only runs with PAL/50Hz drivers, e.g. smspal" />
 		<info name="serial" value="MK-27020-50"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
@@ -1022,6 +1027,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: 3D glasses support -->
 	<software name="bladeag1" cloneof="bladeag">
 		<description>Blade Eagle (USA, Prototype)</description>
 		<year>1988</year>
@@ -1245,6 +1251,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="calgames">
 		<description>California Games (Euro, USA, Bra)</description>
 		<year>1989</year>
@@ -1278,6 +1285,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="captsilvu" cloneof="captsilv">
 		<description>Captain Silver (USA)</description>
 		<year>1988</year>
@@ -1290,6 +1298,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="casino">
 		<description>Casino Games (Euro, USA)</description>
 		<year>1989</year>
@@ -1505,6 +1514,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="cloudmst">
 		<description>Cloud Master (Euro, USA)</description>
 		<year>1989</year>
@@ -1603,10 +1613,12 @@
 		</part>
 	</software>
 
+	<!-- Notes: Requires an extra-height video mode absent on the 315-5124 VDP -->
 	<software name="cosmic">
 		<description>Cosmic Spacehead (Euro)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
+		<info name="usage" value="Video mode is correct only on SMS 2 drivers, e.g. smspal" />
 		<info name="serial" value="MK-27074-50"/>
 		<part name="cart" interface="sms_cart">
 			<feature name="slot" value="codemasters" />
@@ -1639,6 +1651,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="cyborgh">
 		<description>Cyborg Hunter (Euro, USA, Bra)</description>
 		<year>1988</year>
@@ -1719,6 +1732,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="ddragonk" cloneof="ddragon">
 		<description>Double Dragon (Kor)</description>
 		<year>198?</year>
@@ -1828,6 +1842,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="dokidokip" cloneof="pengland">
 		<description>Doki Doki Penguin Land - Uchuu Daibouken (Jpn, Prototype)</description>
 		<year>1987</year>
@@ -2139,10 +2154,12 @@
 		</part>
 	</software>
 
+	<!-- Notes: Requires an extra-height video mode absent on the 315-5124 VDP -->
 	<software name="excdizzy" supported="no">
 		<description>The Excellent Dizzy Collection (Euro, USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
+		<info name="usage" value="Video mode is correct only on SMS 2 drivers, e.g. smspal" />
 		<part name="cart" interface="sms_cart">
 			<feature name="slot" value="codemasters" />
 			<dataarea name="rom" size="262144">
@@ -2249,10 +2266,12 @@
 		</part>
 	</software>
 
+	<!-- Notes: Requires an extra-height video mode absent on the 315-5124 VDP -->
 	<software name="fantdizz">
 		<description>Fantastic Dizzy (Euro)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
+		<info name="usage" value="Video mode is correct only on SMS 2 drivers, e.g. smspal" />
 		<info name="serial" value="MK-27074-50"/>
 		<part name="cart" interface="sms_cart">
 			<feature name="slot" value="codemasters" />
@@ -2262,6 +2281,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="fantzon2">
 		<description>Fantasy Zone II - The Tears of Opa-Opa (Euro, USA, Bra)</description>
 		<year>1987</year>
@@ -2350,6 +2370,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="fantzonm">
 		<description>Fantasy Zone - The Maze (Euro, USA)</description>
 		<year>1987</year>
@@ -2547,6 +2568,8 @@
 		<info name="serial" value="G-1348"/>
 		<info name="release" value="19880221"/>
 		<info name="alt_title" value="ギャラクティック プロテクター" />
+		<sharedfeat name="ctrl1_default" value="paddle" />
+		<sharedfeat name="ctrl2_default" value="paddle" />
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on SMS Power -->
 			<feature name="pcb" value="171-5552" />
@@ -2569,6 +2592,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="gforce">
 		<description>Galaxy Force (Euro, Bra)</description>
 		<year>1989</year>
@@ -2585,6 +2609,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="gforceu" cloneof="gforce">
 		<description>Galaxy Force (USA)</description>
 		<year>1989</year>
@@ -2597,6 +2622,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="gamebox">
 		<description>Game Box Série Esportes Radicais (Bra)</description>
 		<year>19??</year>
@@ -2634,6 +2660,8 @@
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5074, 023.120"/>
+		<sharedfeat name="ctrl1_default" value="lphaser" />
+		<sharedfeat name="ctrl2_default" value="lphaser" />
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on US cart (nepereny's), to check the cart with MPR-10577 -->
 			<feature name="pcb" value="171-5519" />
@@ -2778,6 +2806,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="globald">
 		<description>Global Defense (Euro, USA)</description>
 		<year>1987</year>
@@ -2793,6 +2822,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="globaldp" cloneof="globald">
 		<description>Global Defense (Euro, USA, Prototype)</description>
 		<year>1987</year>
@@ -2816,6 +2846,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="golfaman">
 		<description>Golfamania (Euro, Bra)</description>
 		<year>1990</year>
@@ -2836,6 +2867,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="golfamanp" cloneof="golfaman">
 		<description>Golfamania (Prototype)</description>
 		<year>1990</year>
@@ -2850,6 +2882,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="golvell">
 		<description>Golvellius (Euro, USA)</description>
 		<year>1988</year>
@@ -2955,6 +2988,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="greatglf1" cloneof="greatglf">
 		<description>Great Golf (Euro, USA, v1.0)</description>
 		<year>1987</year>
@@ -3008,6 +3042,8 @@
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5062 (USA)"/>
+		<sharedfeat name="ctrl1_default" value="sportspad" />
+		<sharedfeat name="ctrl2_default" value="sportspad" />
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on SMS Power (Jpn cart) -->
 			<feature name="pcb" value="171-5552" />
@@ -3270,6 +3306,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="hwaran" cloneof="kenseid">
 		<description>Hwarang Ui Geom (Kor)</description>
 		<year>1988</year>
@@ -3484,6 +3521,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="kenseid">
 		<description>Kenseiden (Euro, USA, Bra)</description>
 		<year>1988</year>
@@ -3631,6 +3669,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional Light Phaser support -->
 	<software name="lghost">
 		<description>Laser Ghost (Euro)</description>
 		<year>1991</year>
@@ -3695,10 +3734,12 @@
 		</part>
 	</software>
 
+	<!-- Notes: 3D glasses support -->
 	<software name="loffire">
 		<description>Line of Fire (Euro, Bra, Kor)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
+		<info name="usage" value="To play in 3-D on SMS1, hold buttons 1 and 2 while powering up the system." />
 		<info name="serial" value="9006, GB-4011JG"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
@@ -3720,6 +3761,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="lordswrd">
 		<description>Lord of the Sword (Euro, USA, Bra)</description>
 		<year>1988</year>
@@ -3881,6 +3923,7 @@
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="6080"/>
+		<sharedfeat name="ctrl1_default" value="lphaser" />
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on SMS Power -->
 			<feature name="pcb" value="??" />
@@ -3897,6 +3940,7 @@
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="6003"/>
+		<sharedfeat name="ctrl1_default" value="lphaser" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="marksman shooting &amp; trap shooting (usa).bin" size="131072" crc="e8ea842c" sha1="5491cce7b9c19cb49060da94ab8f9c4331e77cb3" offset="000000" />
@@ -3931,6 +3975,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support, 3D glasses support -->
 	<software name="mazehunt">
 		<description>Maze Hunter 3-D (Euro, USA, Bra)</description>
 		<year>1988</year>
@@ -3972,6 +4017,7 @@
 		<info name="serial" value="G-1359"/>
 		<info name="release" value="19880730"/>
 		<info name="alt_title" value="(め)組レスキュー" />
+		<sharedfeat name="ctrl1_default" value="paddle" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="megumi rescue (japan).bin" size="131072" crc="29bc7fad" sha1="7bd156cf8dc2ad07c666ac58ccb3c0ff6671b93f" offset="000000" />
@@ -4022,10 +4068,12 @@
 		</part>
 	</software>
 
+	<!-- Notes: Requires an extra-height video mode absent on the 315-5124 VDP -->
 	<software name="micromac">
 		<description>Micro Machines (Euro)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
+		<info name="usage" value="Video mode is correct only on SMS 2 drivers, e.g. smspal" />
 		<info name="serial" value="19001"/>
 		<part name="cart" interface="sms_cart">
 			<feature name="slot" value="codemasters" />
@@ -4046,6 +4094,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="miracle">
 		<description>Miracle Warriors - Seal of the Dark Lord (Euro, USA, Bra)</description>
 		<year>1987</year>
@@ -4061,6 +4110,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="miraclep" cloneof="miracle">
 		<description>Miracle Warriors - Seal of the Dark Lord (Prototype)</description>
 		<year>1987</year>
@@ -4075,11 +4125,13 @@
 		</part>
 	</software>
 
+	<!-- Notes: 3D glasses support -->
 	<software name="missil3d">
 		<description>Missile Defense 3-D (Euro, USA, Bra)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="8001, 023.230"/>
+		<sharedfeat name="ctrl1_default" value="lphaser" />
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on US cart (nepereny's) -->
 			<feature name="pcb" value="171-5519" />
@@ -4129,6 +4181,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="monica" cloneof="wboymlnd">
 		<description>Mônica no Castelo do Dragao (Bra)</description>
 		<year>1991</year>
@@ -4457,6 +4510,7 @@
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7039"/>
+		<sharedfeat name="ctrl1_default" value="lphaser" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="operation wolf (europe).bin" size="262144" crc="205caae8" sha1="064040452b6bacc75443dae7916a0fd573f1600d" offset="000000" />
@@ -4476,7 +4530,7 @@
 		</part>
 	</software>
 
-	<!-- Notes: FM support -->
+	<!-- Notes: FM support, optional Paddle Control support -->
 	<software name="outrun">
 		<description>Out Run (World)</description>
 		<year>1987</year>
@@ -4494,6 +4548,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support, 3D glasses support, optional Paddle Control support -->
 	<software name="outrun3d">
 		<description>Out Run 3-D (Euro, Bra)</description>
 		<year>1991</year>
@@ -4560,6 +4615,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="parlour">
 		<description>Parlour Games (Euro, USA)</description>
 		<year>1987</year>
@@ -4600,6 +4656,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="pengland">
 		<description>Penguin Land (Euro, USA)</description>
 		<year>1987</year>
@@ -4680,6 +4737,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support, 3D glasses support -->
 	<software name="poseidon">
 		<description>Poseidon Wars 3-D (Euro, USA, Bra)</description>
 		<year>1988</year>
@@ -4695,6 +4753,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="pstrike">
 		<description>Power Strike (Euro, Bra, Kor)</description>
 		<year>1988</year>
@@ -4866,6 +4925,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<!-- This is the MegaDrive version (released in 1994), also included in "Phantasy Star Collection" for the Sega Saturn -->
 	<!-- It currently does not work in the megadrij driver -->
 	<software name="pstarjmd" cloneof="pstar">
@@ -5026,6 +5086,7 @@
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7015"/>
+		<sharedfeat name="ctrl1_default" value="lphaser" />
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on US cart (nepereny's) -->
 			<feature name="pcb" value="171-5507" />
@@ -5036,6 +5097,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="rampage">
 		<description>Rampage (Euro, USA, Bra)</description>
 		<year>1988</year>
@@ -5063,6 +5125,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="rastan">
 		<description>Rastan (Euro, USA, Bra)</description>
 		<year>1988</year>
@@ -5125,11 +5188,13 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="rescuems">
 		<description>Rescue Mission (Euro, USA, Bra)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5106"/>
+		<sharedfeat name="ctrl1_default" value="lphaser" />
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on US cart (nepereny's) -->
 			<feature name="pcb" value="171-5519" />
@@ -5236,6 +5301,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="rtypep" cloneof="rtype">
 		<description>R-Type (Prototype)</description>
 		<year>1988</year>
@@ -5381,6 +5447,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="sspirits">
 		<description>Scramble Spirits (Euro, Bra)</description>
 		<year>1989</year>
@@ -5438,6 +5505,7 @@
 		<description>Sega Graphic Board (Jpn, Prototype v2.0)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="ctrl1_default" value="graphic" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="graphic board v2.0.bin" size="32768" crc="276aa542" sha1="d04ea11e1f6743ab4e73eadd95fa9f9fb2eb01fe" offset="000000" />
@@ -5528,6 +5596,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="shanghai">
 		<description>Shanghai (Euro, USA)</description>
 		<year>1988</year>
@@ -5540,6 +5609,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="shanghaip" cloneof="shanghai">
 		<description>Shanghai (Prototype)</description>
 		<year>1988</year>
@@ -5566,6 +5636,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support, 3D glasses support -->
 	<software name="sharr3d">
 		<description>Space Harrier 3-D (Euro, USA, Bra)</description>
 		<year>1988</year>
@@ -5616,6 +5687,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="shinobi">
 		<description>Shinobi (Euro, USA, Bra, v1)</description>
 		<year>1988</year>
@@ -5648,6 +5720,7 @@
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5072"/>
+		<sharedfeat name="ctrl1_default" value="lphaser" />
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on SMS Power -->
 			<feature name="pcb" value="??" />
@@ -5944,6 +6017,7 @@
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9010"/>
+		<sharedfeat name="ctrl1_default" value="lphaser" />
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on SMS Power (Euro cart?) -->
 			<feature name="pcb" value="171-5559-01D" />
@@ -5991,6 +6065,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="spellcst">
 		<description>SpellCaster (Euro, USA, Bra)</description>
 		<year>1988</year>
@@ -6039,6 +6114,8 @@
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5060"/>
+		<sharedfeat name="ctrl1_default" value="sportspad" />
+		<sharedfeat name="ctrl2_default" value="sportspad" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sports pad football (usa).bin" size="131072" crc="e42e4998" sha1="556d9ab4ba3c3a34440b36c6fc8e972f70f16d72" offset="000000" />
@@ -6046,7 +6123,6 @@
 		</part>
 	</software>
 
-	<!-- Notes: Sports Pad support -->
 	<software name="sportssc" cloneof="worldsoc">
 		<description>Sports Pad Soccer (Jpn)</description>
 		<year>1988</year>
@@ -6054,6 +6130,8 @@
 		<info name="serial" value="G-1365"/>
 		<info name="release" value="19881029"/>
 		<info name="alt_title" value="スポーツパッドサッカー" />
+		<sharedfeat name="ctrl1_default" value="sportspadjp" />
+		<sharedfeat name="ctrl2_default" value="sportspadjp" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sports pad soccer (japan).bin" size="131072" crc="41c948bf" sha1="7634ce39e87049dad1ee4f32a80d728e4bd1f81f" offset="000000" />
@@ -6284,10 +6362,13 @@
 		</part>
 	</software>
 
+	<!-- Notes: This clone replaced the original paddle code with code for the regular controller, but like the former it is used only when
+	the system region is detected as Japanese, what happens with Korean Mark-III/SMS1 versions, but not with Korean SMS2 versions. -->
 	<software name="superark" cloneof="woodypop">
 		<description>Super Arkanoid (Kor)</description>
 		<year>1989</year>
 		<publisher>HiCom</publisher>
+		<info name="usage" value="Input works only with drivers of Japanese region, e.g. sms1kr,smsj" />
 		<info name="serial" value="G-2101"/>
 		<info name="alt_title" value="슈퍼알카노이드" />
 		<part name="cart" interface="sms_cart">
@@ -6396,7 +6477,7 @@
 		</part>
 	</software>
 
-	<!-- Notes: FM support -->
+	<!-- Notes: FM support, optional Paddle Control support -->
 	<software name="superrac">
 		<description>Super Racing (Jpn)</description>
 		<year>1988</year>
@@ -6528,6 +6609,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="tennis">
 		<description>Tennis Ace (Euro, Bra)</description>
 		<year>1989</year>
@@ -6591,6 +6673,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="tblade">
 		<description>Thunder Blade (Euro, USA, Bra)</description>
 		<year>1988</year>
@@ -6621,6 +6704,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="timesold">
 		<description>Time Soldiers (Euro, USA, Bra)</description>
 		<year>1989</year>
@@ -6733,6 +6817,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="turmamon" cloneof="wboy3">
 		<description>Turma da Mônica em O Resgate (Bra)</description>
 		<year>1993</year>
@@ -6760,6 +6845,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="ultima4">
 		<description>Ultima IV - Quest of the Avatar (Euro, Bra)</description>
 		<year>1990</year>
@@ -6780,6 +6866,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="ultima4p" cloneof="ultima4">
 		<description>Ultima IV - Quest of the Avatar (Euro, Prototype)</description>
 		<year>1990</year>
@@ -6829,6 +6916,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="vigilant">
 		<description>Vigilante (Euro, USA, Bra)</description>
 		<year>1989</year>
@@ -6861,6 +6949,7 @@
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5118"/>
+		<sharedfeat name="ctrl1_default" value="lphaser" />
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on SMS Power (Euro cart?) -->
 			<feature name="pcb" value="??" />
@@ -6898,6 +6987,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="wboy3">
 		<description>Wonder Boy III - The Dragon's Trap (Euro, USA, Kor)</description>
 		<year>1989</year>
@@ -6913,6 +7003,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="wboymlnd">
 		<description>Wonder Boy in Monster Land (Euro, USA)</description>
 		<year>1988</year>
@@ -6928,6 +7019,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="wboymlndp" cloneof="wboymlnd">
 		<description>Wonder Boy in Monster Land (Prototype)</description>
 		<year>1988</year>
@@ -6954,6 +7046,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<!-- From Bock: "This hack does two things: force the game to run in Japanese mode (with an harder difficulty level), and allows to
 	Pause the game by pressing LEFT+RIGHT+Button 2 on joypad 1 (a combination that cannot be done on a normal SMS joypad). -->
 	<software name="wboymlnda" cloneof="wboymlnd">
@@ -7187,6 +7280,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: optional Sports Pad (US model) support -->
 	<software name="worldsoc">
 		<description>World Soccer (Euro, Jpn, Kor) ~ Great Soccer (USA)</description>
 		<year>1987</year>
@@ -7288,11 +7382,12 @@
 		</part>
 	</software>
 
-	<!-- Notes: FM support -->
+	<!-- Notes: FM support, video code relies on the tilemap mirroring bug of the 315-5124 VDP -->
 	<software name="ysj" cloneof="ys">
 		<description>Ys (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="usage" value="Video only works correctly on drivers with SMS1 VDP, e.g. smsj" />
 		<info name="serial" value="G-1370"/>
 		<info name="release" value="19881015"/>
 		<info name="alt_title" value="イース" />
@@ -7354,6 +7449,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: 3D glasses support -->
 	<software name="zaxxon3dp" cloneof="zaxxon3d">
 		<description>Zaxxon 3-D (World, Prototype)</description>
 		<year>1987</year>
@@ -7792,6 +7888,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-519"/>
 		<info name="release" value="19870315"/>
+		<sharedfeat name="ctrl1_default" value="paddle" />
 		<part name="cart" interface="sms_card">
 			<dataarea name="rom" size="32768">
 				<rom name="woody pop - shinjinrui no block kuzushi (japan).bin" size="32768" crc="315917d4" sha1="b74078c4a3e6d20d21ca81e88c0cb3381b0c84a4" offset="000000" />

@@ -70,6 +70,10 @@
 struct _IO_FILE {};  //_IO_FILE is an opaque type in the emscripten libc which makes clang cranky
 #endif
 
+#if defined(__ANDROID__)
+#define SDLMAME_ANDROID 1
+#endif
+
 // fix for Ubuntu 8.10
 #ifdef _FORTIFY_SOURCE
 #undef _FORTIFY_SOURCE

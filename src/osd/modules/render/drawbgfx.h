@@ -30,6 +30,7 @@ public:
 	renderer_bgfx(osd_window *w)
 		: osd_renderer(w, FLAG_NONE)
 		, m_dimensions(0, 0)
+        , m_max_view(0)
 	{
 	}
 	virtual ~renderer_bgfx();
@@ -64,6 +65,11 @@ private:
     void parse_screen_chains(std::string chain_str);
     bgfx_chain* screen_chain(int32_t screen);
 
+    bool update_dimensions();
+    void setup_view(uint32_t view_index, bool screen);
+    void init_ui_view();
+    void setup_matrices(uint32_t view_index, bool screen);
+
 	void allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::TransientVertexBuffer *buffer);
 	enum buffer_status
 	{
@@ -73,10 +79,10 @@ private:
 		BUFFER_EMPTY,
 		BUFFER_DONE
 	};
-	buffer_status buffer_primitives(int view, bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer, int32_t screen);
+	buffer_status buffer_primitives(bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer, int32_t screen);
 
     void process_screen_quad(int view, render_primitive* prim);
-	void render_textured_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer);
+	void render_textured_quad(render_primitive* prim, bgfx::TransientVertexBuffer* buffer);
     void render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int32_t screen);
 
 	void put_packed_quad(render_primitive *prim, UINT32 hash, ScreenVertex* vertex);
@@ -117,6 +123,8 @@ private:
 	uint32_t m_width[16];
 	uint32_t m_height[16];
 	uint32_t m_white[16*16];
+	int32_t m_ui_view;
+    uint32_t m_max_view;
 
 	static const uint16_t CACHE_SIZE;
 	static const uint32_t PACKABLE_SIZE;

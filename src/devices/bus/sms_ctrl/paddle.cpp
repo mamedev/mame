@@ -2,7 +2,24 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Sega Master System "Paddle Control" emulation
+    Sega Mark III "Paddle Control" emulation
+
+
+Release data from the Sega Retro project:
+
+  Year: 1987    Country/region: JP    Model code: HPD-200
+
+Notes:
+
+  The main chip contained in the device is labeled 315-5243.
+
+  The Paddle Control was only released in Japan. To work with the device,
+  paddle games need to detect the system region as Japanese, else they switch
+  to a different mode that uses the TH line as output to select which nibble
+  of the X axis will be read. This other mode is similar to how the US Sports
+  Pad works, so on an Export system, paddle games are somewhat playable with
+  that device, though it needs to be used inverted and the trackball needs to
+  be moved slowly, else the software for the paddle think it's moving backward.
 
 **********************************************************************/
 

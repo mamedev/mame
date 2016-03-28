@@ -23,6 +23,12 @@
 // MAME headers
 #include "osdcore.h"
 
+#ifdef SDLMAME_ANDROID
+char *osd_get_clipboard_text(void)
+{
+	return nullptr;
+}
+#else
 //============================================================
 //  osd_get_clipboard_text
 //============================================================
@@ -40,3 +46,5 @@ char *osd_get_clipboard_text(void)
 	}
 	return result;
 }
+
+#endif

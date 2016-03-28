@@ -542,6 +542,47 @@ ROM_START( toki )
 ROM_END
 
 
+ROM_START( tokip )
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_LOAD16_BYTE( "6 10-M",   0x00000, 0x20000, CRC(91b554a3) SHA1(ab003e82552eba381099eb2d00577f952cad42f7) ) // different
+	ROM_LOAD16_BYTE( "4 10-K",   0x00001, 0x20000, CRC(404220f7) SHA1(f614692d05f1280cbe801fe0486a611f38b5e866) ) // different
+	ROM_LOAD16_BYTE( "5 12-M",   0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
+	ROM_LOAD16_BYTE( "3 12-K",   0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
+	ROM_LOAD( "8 3-M",   0x00000, 0x02000, CRC(6c87c4c5) SHA1(d76822bcde3d42afae72a0945b6acbf3c6a1d955) )  /* encrypted */
+	ROM_LOAD( "7 7-M",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )  /* banked stuff */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "1 5-C",   0x000000, 0x10000, CRC(fd0ff303) SHA1(e861b8efd7b3050b95a7d9ff1732bb9641e4dbcc) )   /* chars */ // different
+	ROM_LOAD( "2 3-C",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "OBJ 1-0.ROM10",  0x00000, 0x20000, CRC(a027bd8e) SHA1(33cc4ae75332ab35df1c03f74db8cb17f2749ead) )
+	ROM_LOAD16_BYTE( "OBJ 1-1.ROM9",   0x00001, 0x20000, CRC(43a767ea) SHA1(bfc879ff714828f7a1b8f784db8728c91287ed20) )
+	ROM_LOAD16_BYTE( "OBJ 1-2.ROM12",  0x40000, 0x20000, CRC(1aecc9d8) SHA1(e7a79783e71de472f07761f9dc71f2a78e629676) )
+	ROM_LOAD16_BYTE( "OBJ 1-3.ROM11",  0x40001, 0x20000, CRC(d65c0c6d) SHA1(6b895ce06dae1ecc21c64993defbb3be6b6f8ac2) )
+	ROM_LOAD16_BYTE( "OBJ 2-0.ROM14",  0x80000, 0x20000, CRC(cedaccaf) SHA1(82f135c9f6a51e49df543e370861918d582a7923) )
+	ROM_LOAD16_BYTE( "OBJ 2-1.ROM13",  0x80001, 0x20000, CRC(013f539b) SHA1(d62c048a95b9c331cedc5343f70947bb50e49c87) )
+	ROM_LOAD16_BYTE( "OBJ 2-2.ROM16",  0xc0000, 0x20000, CRC(6a8e6e22) SHA1(a6144201e9a18aa46f65957694653a40071d92d4) )
+	ROM_LOAD16_BYTE( "OBJ 2-3.ROM15",  0xc0001, 0x20000, CRC(25d9a16c) SHA1(059d1e2e874bb41f8ef576e0cf33bdbffb57ddc0) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 )
+	ROM_LOAD16_BYTE( "BACK 1-0.ROM5",  0x00000, 0x20000, CRC(fac7e32f) SHA1(13f789c209aa6a6866dfc5a83ca68d83271b12c6) )
+	ROM_LOAD16_BYTE( "BACK 1-1.ROM6",  0x00001, 0x20000 ,CRC(ee1135d6) SHA1(299bb3f82d6ded4f401fb407e298842a47a45b1d) )
+	ROM_LOAD16_BYTE( "BACK 1-2.ROM7",  0x40000, 0x20000, CRC(78db8d57) SHA1(a03bb854205c410c05d9a82f20354370c0af0bda) )
+	ROM_LOAD16_BYTE( "BACK 1-3.ROM8",  0x40001, 0x20000, CRC(d719de71) SHA1(decbb5213d97f75b80ae74e4ccf2ff465d1dfad9) )
+
+	ROM_REGION( 0x080000, "gfx4", 0 )
+	ROM_LOAD16_BYTE( "BACK 2-0.ROM1",  0x00000, 0x20000, CRC(949d8025) SHA1(919821647d1bfd0b5b35afcb1c76fddc51a74854))
+	ROM_LOAD16_BYTE( "BACK 2-1.ROM2",  0x00001, 0x20000, CRC(4b28b4b4) SHA1(22e5d9098069833ab1dcc89abe07f9ade1b00459) )
+	ROM_LOAD16_BYTE( "BACK 2-2.ROM3",  0x40000, 0x20000, CRC(1aa9a5cf) SHA1(305101589f6f56584c8147456dbb4360eaa31fef) )
+	ROM_LOAD16_BYTE( "BACK 2-3.ROM4",  0x40001, 0x20000, CRC(6759571f) SHA1(bff3a73ed33c236b38425570f3eb0bbf9a3ca84c) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "9 1-M",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) ) //
+ROM_END
+
 ROM_START( tokia )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "6.m10",    0x00000, 0x20000, CRC(03d726b1) SHA1(bbe3a1ea1943cd73b821b3de4d5bf3dfbffd2168) )
@@ -911,6 +952,9 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 // these 2 are both unique revisions
 GAME( 1989, toki,  0,    tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, tokiu, toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 1)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1989, tokip, toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, prototype?)", MACHINE_SUPPORTS_SAVE )
+
 
 // these 3 are all the same revision, only the region byte differs
 GAME( 1989, tokia, toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 2)", MACHINE_SUPPORTS_SAVE )

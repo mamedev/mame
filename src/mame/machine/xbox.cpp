@@ -984,6 +984,7 @@ ohci_function_device::ohci_function_device(running_machine &machine)
 		endpoints[e].position = nullptr;
 	}
 	endpoints[0].type = ControlEndpoint;
+	wantstatuscallback = false;
 	settingaddress = false;
 	configurationvalue = 0;
 	selected_configuration = nullptr;
@@ -1253,13 +1254,22 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 
 	if (pid == SetupPid) {
 		USBSetupPacket *p=(USBSetupPacket *)buffer;
+		// control transfers are done in 3 stages: first the setup stage, then an optional data stage, then a status stage
+		// so there are 3 cases:
+		// 1- control transfer with a data stage where the host sends data to the device
+		//    in this case the sequence of pids transferred is control pid, data out pid, data in pid
+		// 2- control transfer with a data stage where the host receives data from the device
+		//    in this case the sequence of pids transferred is control pid, data in pid, data out pid
+		// 3- control transfer without a data stage
+		//    in this case the sequence of pids transferred is control pid, data in pid
 		// define direction 0:host->device 1:device->host
-		// case == 1, IN data stage and OUT status stage
-		// case == 0, OUT data stage and IN status stage
-		// data stage is optional, IN status stage
+		// direction == 1 -> IN data stage and OUT status stage
+		// direction == 0 -> OUT data stage and IN status stage
+		// data stage not present -> IN status stage
 		endpoints[endpoint].controldirection = (p->bmRequestType & 128) >> 7;
 		endpoints[endpoint].controltype = (p->bmRequestType & 0x60) >> 5;
 		endpoints[endpoint].controlrecipient = p->bmRequestType & 0x1f;
+		wantstatuscallback = false;
 		if (endpoint == 0) {
 			endpoints[endpoint].position = nullptr;
 			// number of byte to transfer in data stage (0 no data stage)
@@ -1341,23 +1351,26 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 			return handle_nonstandard_request(endpoint, p);
 	}
 	else if (pid == InPid) {
-		if (endpoint == 0) {
+		if (endpoints[endpoint].type == ControlEndpoint) { //if (endpoint == 0) {
 			// if no data has been transferred (except for the setup stage)
 			// and the lenght of this IN transaction is 0
 			// assume this is the status stage
-			if ((size == 0) && (endpoints[endpoint].remain == 0)) {
-				if (settingaddress == true)
+			if ((endpoints[endpoint].remain == 0) && (size == 0)) {
+				if ((endpoint == 0) && (settingaddress == true))
 				{
 					// set of address is active at end of status stage
 					address = newaddress;
 					settingaddress = false;
 					state = AddressState;
 				}
+				if (wantstatuscallback == true)
+					handle_status_stage(endpoint);
+				wantstatuscallback = false;
 				return 0;
 			}
 			// case ==1, give data
 			// case ==0, nothing
-			// if device->host
+			// if device->host, since InPid then this is data stage
 			if (endpoints[endpoint].controldirection == DeviceToHost) {
 				// data stage
 				if (size > endpoints[endpoint].remain)
@@ -1367,15 +1380,22 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 				endpoints[endpoint].position = endpoints[endpoint].position + size;
 				endpoints[endpoint].remain = endpoints[endpoint].remain - size;
 			}
+			else {
+				if (wantstatuscallback == true)
+					handle_status_stage(endpoint);
+				wantstatuscallback = false;
+			}
 		}
+		else if (endpoints[endpoint].type == BulkEndpoint)
+			return handle_bulk_pid(endpoint, pid, buffer, size);
 		else
 			return -1;
 	}
 	else if (pid == OutPid) {
-		if (endpoint == 0) {
+		if (endpoints[endpoint].type == ControlEndpoint) { //if (endpoint == 0) {
 			// case ==1, nothing
 			// case ==0, give data
-			// if host->device
+			// if host->device, since OutPid then this is data stage
 			if (endpoints[endpoint].controldirection == HostToDevice) {
 				// data stage
 				if (size > endpoints[endpoint].remain)
@@ -1385,7 +1405,14 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 				endpoints[endpoint].position = endpoints[endpoint].position + size;
 				endpoints[endpoint].remain = endpoints[endpoint].remain - size;
 			}
+			else {
+				if (wantstatuscallback == true)
+					handle_status_stage(endpoint);
+				wantstatuscallback = false;
+			}
 		}
+		else if (endpoints[endpoint].type == BulkEndpoint)
+			return handle_bulk_pid(endpoint, pid, buffer, size);
 		else
 			return -1;
 	}
@@ -1454,31 +1481,63 @@ ohci_hlean2131qc_device::ohci_hlean2131qc_device(running_machine &machine) :
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
 	add_interface_descriptor(intdesc);
-	add_endpoint_descriptor(enddesc81);
-	add_endpoint_descriptor(enddesc82);
-	add_endpoint_descriptor(enddesc83);
-	add_endpoint_descriptor(enddesc84);
-	add_endpoint_descriptor(enddesc85);
+	// it is important to add the endpoints in the same order they are found in the device firmware
 	add_endpoint_descriptor(enddesc01);
 	add_endpoint_descriptor(enddesc02);
 	add_endpoint_descriptor(enddesc03);
 	add_endpoint_descriptor(enddesc04);
 	add_endpoint_descriptor(enddesc05);
+	add_endpoint_descriptor(enddesc81);
+	add_endpoint_descriptor(enddesc82);
+	add_endpoint_descriptor(enddesc83);
+	add_endpoint_descriptor(enddesc84);
+	add_endpoint_descriptor(enddesc85);
 	add_string_descriptor(strdesc0);
 	add_string_descriptor(strdesc1);
 	add_string_descriptor(strdesc2);
+	maximum_send = 0;
+	region = nullptr;
+}
+
+void ohci_hlean2131qc_device::set_region_base(UINT8 *data)
+{
+	region = data;
 }
 
 int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
 	if (endpoint != 0)
 		return -1;
+	printf("Control request: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
+	//if ((setup->bRequest == 0x18) && (setup->wValue == 0x8000))
+	if (setup->bRequest == 0x17)
+	{
+		maximum_send = setup->wIndex;
+		if (maximum_send > 0x40)
+			maximum_send = 0x40;
+		endpoints[2].remain = maximum_send;
+		endpoints[2].position = region + 0x2000 + setup->wValue;
+	}
 	for (int n = 0; n < setup->wLength; n++)
 		endpoints[endpoint].buffer[n] = 0xa0 ^ n;
 	endpoints[endpoint].buffer[0] = 0;
 	endpoints[endpoint].position = endpoints[endpoint].buffer;
 	endpoints[endpoint].remain = setup->wLength;
 	return 0;
+}
+
+int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size)
+{
+	printf("Bulk request: %x %d %x\n\r", endpoint, pid, size);
+	if ((endpoint == 2) && (pid == InPid))
+	{
+		if (size > endpoints[2].remain)
+			size = endpoints[2].remain;
+		memcpy(buffer, endpoints[2].position, size);
+		endpoints[2].position = endpoints[3].position + size;
+		endpoints[2].remain = endpoints[3].remain - size;
+	}
+	return size;
 }
 
 //pc20
@@ -1501,12 +1560,13 @@ ohci_hlean2131sc_device::ohci_hlean2131sc_device(running_machine &machine) :
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
 	add_interface_descriptor(intdesc);
-	add_endpoint_descriptor(enddesc81);
-	add_endpoint_descriptor(enddesc82);
-	add_endpoint_descriptor(enddesc83);
+	// it is important to add the endpoints in the same order they are found in the device firmware
 	add_endpoint_descriptor(enddesc01);
 	add_endpoint_descriptor(enddesc02);
 	add_endpoint_descriptor(enddesc03);
+	add_endpoint_descriptor(enddesc81);
+	add_endpoint_descriptor(enddesc82);
+	add_endpoint_descriptor(enddesc83);
 	add_string_descriptor(strdesc0);
 	add_string_descriptor(strdesc1);
 	add_string_descriptor(strdesc2);
@@ -2221,6 +2281,7 @@ void xbox_base_state::machine_start()
 	ohcist.timer->enable(false);
 	//usb_device = new ohci_game_controller_device(machine());
 	usb_device = new ohci_hlean2131qc_device(machine());
+	usb_device->set_region_base(memregion(":others")->base()); // temporary, should be in chihiro
 	//usb_device = new ohci_hlean2131sc_device(machine());
 	usb_ohci_plug(1, usb_device); // test connect
 #endif
