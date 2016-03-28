@@ -62,8 +62,8 @@ project("mametests")
 	links {
 		"gtest",
 		"utils",
-		"expat",
-		"zlib",
+		ext_lib("expat"),
+		ext_lib("zlib"),
 		"ocore_" .. _OPTIONS["osd"],
 	}
 
@@ -72,6 +72,8 @@ project("mametests")
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/lib/util",
+		ext_includedir("expat"),
+		ext_includedir("zlib"),
 	}
 
 	files {

@@ -13,7 +13,7 @@
 -- expat library objects
 --------------------------------------------------
 
-if _OPTIONS["with-bundled-expat"] then
+if not _OPTIONS["with-system-expat"] then
 project "expat"
 	uuid "f4cd40b1-c37c-452d-9785-640f26f0bf54"
 	kind "StaticLib"
@@ -45,7 +45,7 @@ end
 	}
 else
 links {
-	"expat",
+	ext_lib("expat"),
 }
 end
 
@@ -53,7 +53,7 @@ end
 -- zlib library objects
 --------------------------------------------------
 
-if _OPTIONS["with-bundled-zlib"] then
+if not _OPTIONS["with-system-zlib"] then
 project "zlib"
 	uuid "3d78bd2a-2bd0-4449-8087-42ddfaef7ec9"
 	kind "StaticLib"
@@ -110,7 +110,7 @@ end
 	}
 else
 links {
-	"z",
+	ext_lib("zlib"),
 }
 end
 
@@ -152,7 +152,7 @@ end
 -- libJPEG library objects
 --------------------------------------------------
 
-if _OPTIONS["with-bundled-jpeg"] then
+if not _OPTIONS["with-system-jpeg"] then
 project "jpeg"
 	uuid "447c6800-dcfd-4c48-b72a-a8223bb409ca"
 	kind "StaticLib"
@@ -221,7 +221,7 @@ end
 	}
 else
 links {
-	"jpeg",
+	ext_lib("jpeg"),
 }
 end
 
@@ -229,7 +229,7 @@ end
 -- libflac library objects
 --------------------------------------------------
 
-if _OPTIONS["with-bundled-flac"] then
+if not _OPTIONS["with-system-flac"] then
 project "flac"
 	uuid "b6fc19e8-073a-4541-bb7b-d24b548d424a"
 	kind "StaticLib"
@@ -312,7 +312,7 @@ end
 	}
 else
 links {
-	"FLAC",
+	ext_lib("flac"),
 }
 end
 
@@ -370,7 +370,7 @@ end
 -- LUA library objects
 --------------------------------------------------
 
-if _OPTIONS["with-bundled-lua"] then
+if not _OPTIONS["with-system-lua"] then
 project "lua"
 	uuid "d9e2eed1-f1ab-4737-a6ac-863700b1a5a9"
 	kind "StaticLib"
@@ -460,7 +460,7 @@ end
 	}
 else
 links {
-	"lua",
+	ext_lib("lua"),
 }
 end
 
@@ -493,16 +493,10 @@ project "lualibs"
 	includedirs {
 		MAME_DIR .. "3rdparty",
 	}
-	if _OPTIONS["with-bundled-lua"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/lua/src",
-		}
-	end
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end	
+	includedirs {
+		ext_includedir("lua"),
+		ext_includedir("zlib"),
+	}
 
 	files {
 		MAME_DIR .. "3rdparty/lsqlite3/lsqlite3.c",
@@ -514,7 +508,7 @@ project "lualibs"
 -- SQLite3 library objects
 --------------------------------------------------
 
-if _OPTIONS["with-bundled-sqlite3"] then
+if not _OPTIONS["with-system-sqlite3"] then
 project "sqllite3"
 	uuid "5cb3d495-57ed-461c-81e5-80dc0857517d"
 	kind "StaticLib"
@@ -565,7 +559,7 @@ end
 	}
 else
 links {
-	"sqlite3",
+	ext_lib("sqlite3"),
 }
 end
 
@@ -573,7 +567,7 @@ end
 -- portmidi library objects
 --------------------------------------------------
 if _OPTIONS["NO_USE_MIDI"]~="1" then
-if _OPTIONS["with-bundled-portmidi"] then
+if not _OPTIONS["with-system-portmidi"] then
 project "portmidi"
 	uuid "587f2da6-3274-4a65-86a2-f13ea315bb98"
 	kind "StaticLib"
@@ -652,7 +646,7 @@ end
 	end
 else
 links {
-	"portmidi",
+	ext_lib("portmidi"),
 }
 end
 end
@@ -808,7 +802,7 @@ end
 -- PortAudio library objects
 --------------------------------------------------
 
-if _OPTIONS["with-bundled-portaudio"] then
+if not _OPTIONS["with-system-portaudio"] then
 project "portaudio"
 	uuid "0755c5f5-eccf-47f3-98a9-df67018a94d4"
 	kind "StaticLib"
@@ -953,7 +947,7 @@ end
 
 else
 links {
-	"portaudio",
+	ext_lib("portaudio"),
 }
 end
 
@@ -961,7 +955,7 @@ end
 -- libuv library objects
 --------------------------------------------------
 if _OPTIONS["USE_LIBUV"]=="1" then
-if _OPTIONS["with-bundled-libuv"] then
+if not _OPTIONS["with-system-uv"] then
 project "uv"
 	uuid "cd2afe7f-139d-49c3-9000-fc9119f3cea0"
 	kind "StaticLib"
@@ -1173,7 +1167,7 @@ project "http-parser"
 
 else
 links {
-	"libuv",
+	ext_lib("uv"),
 }
 end
 --------------------------------------------------
