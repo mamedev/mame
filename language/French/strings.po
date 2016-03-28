@@ -859,15 +859,15 @@ msgstr "Sélectionner une Nouvelle Machine"
 
 #: src/emu/ui/menu.cpp:45
 msgid "Control Panels"
-msgstr ""
+msgstr "Control Panels"
 
 #: src/emu/ui/menu.cpp:50
 msgid "Artwork Preview"
-msgstr ""
+msgstr "Prévisualiser les Artworks"
 
 #: src/emu/ui/menu.cpp:54
 msgid "Game Over"
-msgstr ""
+msgstr "Game Over"
 
 #: src/emu/ui/menu.cpp:64
 msgid "Add or remove favorites"
@@ -923,7 +923,7 @@ msgid ""
 "Uptime: %1$d:%2$02d:%3$02d\n"
 "\n"
 msgstr ""
-"Uptime: %1$d:%2$02d:%3$02d\n"
+"Uptime : %1$d:%2$02d:%3$02d\n"
 "\n"
 
 #: src/emu/ui/miscmenu.cpp:241
@@ -932,7 +932,7 @@ msgid ""
 "Uptime: %1$d:%2$02d\n"
 "\n"
 msgstr ""
-"Uptime: %1$d:%2$02d\n"
+"Uptime : %1$d:%2$02d\n"
 "\n"
 
 #: src/emu/ui/miscmenu.cpp:245
@@ -1105,7 +1105,7 @@ msgstr "Liste de Sélection - Recherche : "
 #: src/emu/ui/selector.cpp:194
 #, c-format
 msgid "Double click or press %1$s to select"
-msgstr ""
+msgstr "Double Cliquer ou Pressez %1$s pour Choisir"
 
 #: src/emu/ui/selgame.cpp:38
 msgid "General Info"
@@ -1138,7 +1138,7 @@ msgid ""
 "Press any key (except ESC) to continue."
 msgstr ""
 "Une ou plusieurs Images ROM ou CHD sont manquantes pour le Jeu "
-"SélectionnéVeuillez Choisir un Jeu Différent.\n"
+"Veuillez choisir un autre jeu.\n"
 "\n"
 
 #: src/emu/ui/selgame.cpp:585 src/emu/ui/simpleselgame.cpp:262
