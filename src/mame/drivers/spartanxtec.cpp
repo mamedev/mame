@@ -7,17 +7,22 @@ single PCB with 2x Z80
 similar looking to the '1942p' and 'spyhuntpr' PCBs
 
 
-P2 inputs don't work
+P2 inputs don't work in 'cocktail' mode (maybe it's just unsupported on this PCB?)
+
 DIPS etc. are near the 2nd CPU, should it be reading them?
 
 visible area is 16 lines less than the original, otherwise you get bad sprites
 but I think this is probably correct.
+
+some sprites are a bit glitchy when entering playfield (see title screen)
+probably an original bug?
 
 */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/iremipt.h"
+#include "sound/ay8910.h"
 
 class spartanxtec_state : public driver_device
 {
@@ -28,7 +33,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_scroll_lo(*this, "scroll_lo"),
 		m_scroll_hi(*this, "scroll_hi"),
-
+		m_audiocpu(*this, "audiocpu"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
@@ -37,6 +42,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_scroll_lo;
 	required_shared_ptr<UINT8> m_scroll_hi;
+	required_device<cpu_device> m_audiocpu;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -48,7 +54,8 @@ public:
 	tilemap_t*             m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(kungfum_tileram_w);
 	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
-
+	DECLARE_WRITE8_MEMBER(spartanxtec_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(a801_w);
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -147,21 +154,33 @@ UINT32 spartanxtec_state::screen_update_spartanxtec(screen_device &screen, bitma
 
 
 
+WRITE8_MEMBER(spartanxtec_state::spartanxtec_soundlatch_w)
+{
+	soundlatch_byte_w(space, 0, data);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
+WRITE8_MEMBER(spartanxtec_state::a801_w)
+{
+	if (data != 0xf0) printf("a801_w %02x\n", data);
+}
+
+
 
 static ADDRESS_MAP_START( spartanxtec_map, AS_PROGRAM, 8, spartanxtec_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("spriteram")
 
-	AM_RANGE(0x8000, 0x8000) AM_WRITENOP
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(spartanxtec_soundlatch_w)
 
 	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8101, 0x8101) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8102, 0x8102) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x8103, 0x8103) AM_READ_PORT("P1")
 
-	AM_RANGE(0x8200, 0x8200) AM_WRITENOP // sound cmd?
+//	AM_RANGE(0x8200, 0x8200) AM_WRITENOP
 	
-	AM_RANGE(0xA801, 0xA801) AM_WRITENOP
+	AM_RANGE(0xA801, 0xA801) AM_WRITE(a801_w)
 
 	AM_RANGE(0xa900, 0xa903) AM_RAM AM_SHARE("scroll_lo")
 	AM_RANGE(0xa980, 0xa983) AM_RAM AM_SHARE("scroll_hi")
@@ -173,9 +192,29 @@ static ADDRESS_MAP_START( spartanxtec_map, AS_PROGRAM, 8, spartanxtec_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spartanxtec_sound_map, AS_PROGRAM, 8, spartanxtec_state )
+	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
+
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
+
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( spartanxtec_sound_io, AS_IO, 8, spartanxtec_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
+
+	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
+	AM_RANGE(0x0012, 0x0012) AM_DEVREAD("ay3", ay8910_device, data_r)
+
+	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x0014, 0x0014) AM_DEVREAD("ay1", ay8910_device, data_r)
+
+	AM_RANGE(0x0018, 0x0019) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
+	AM_RANGE(0x0018, 0x0018) AM_DEVREAD("ay2", ay8910_device, data_r)
+ADDRESS_MAP_END
+
+
 
 
 static INPUT_PORTS_START( spartanxtec )
@@ -201,7 +240,7 @@ static INPUT_PORTS_START( spartanxtec )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x02, "Cocktail (invalid?)" )
 	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "Mode 1" )
 	PORT_DIPSETTING(    0x00, "Mode 2" )
@@ -304,14 +343,17 @@ static MACHINE_CONFIG_START( spartanxtec, spartanxtec_state )
 	MCFG_CPU_PROGRAM_MAP(spartanxtec_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80,4000000)
+	MCFG_CPU_ADD("audiocpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(spartanxtec_sound_map)
+	MCFG_CPU_IO_MAP(spartanxtec_sound_io)
+	MCFG_CPU_PERIODIC_INT_DRIVER(spartanxtec_state, irq0_line_hold, 1000) // controls speed of music
+//	MCFG_CPU_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_hold)
 
 	/* video hardware */
-	// todo, proper screen timings for this bootleg PCB
+	// todo, proper screen timings for this bootleg PCB - as visible area is less it's probably ~60hz, not 55
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(55)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790) /* frames per second and vblank duration from the Lode Runner manual */)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(spartanxtec_state, screen_update_spartanxtec)
@@ -324,6 +366,14 @@ static MACHINE_CONFIG_START( spartanxtec, spartanxtec_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ay1", AY8910, 1000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8910, 1000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay3", AY8910, 1000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 MACHINE_CONFIG_END
 
 
@@ -333,7 +383,7 @@ ROM_START( spartanxtec )
 	ROM_LOAD( "1.bin", 0x00000, 0x04000, CRC(d5d6cddf) SHA1(baaec83be455bf2267d51ea2a2c1fcda22f27bd5) )
 	ROM_LOAD( "2.bin", 0x04000, 0x04000, CRC(2803bb72) SHA1(d0f93c61f3f08fb866e2a4617a7824e72f61c97f) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "3.bin", 0x00000, 0x01000, CRC(9a18af94) SHA1(1644295aa0c837dced5934360e41d77e0a93ccd1) )
 
 	ROM_REGION( 0x6000, "gfx1", ROMREGION_INVERT )
@@ -371,5 +421,5 @@ ROM_END
 
 
 
-GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, driver_device,  0, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", MACHINE_NOT_WORKING )
+GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, driver_device,  0, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )
 
