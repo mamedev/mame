@@ -65,7 +65,7 @@ void main()
 	float HOffset = (u_a_value.x + u_jitter_amount.x * u_jitter_offset.x) / WoPI;
 	float VScale =  (u_b_value.x * u_source_dims.y) / WoPI;
 
-	vec4 T = Cx + vec4(HOffset, HOffset, HOffset, HOffset) + Cy * vec4(VScale, VScale, VScale, VScale);
+	vec4 T = HPosition + vec4(HOffset, HOffset, HOffset, HOffset) + VPosition * vec4(VScale, VScale, VScale, VScale);
 	vec4 TW = T * W;
 
 	gl_FragColor = Y + I * cos(TW) + Q * sin(TW);
