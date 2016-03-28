@@ -11,6 +11,7 @@
 #define __RENDUTIL_H__
 
 #include "render.h"
+#include "libjpeg/jpeglib.h"
 
 #include <math.h>
 
@@ -25,6 +26,7 @@ void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, 
 int render_clip_line(render_bounds *bounds, const render_bounds *clip);
 int render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_quad_texuv *texcoords);
 void render_line_to_quad(const render_bounds *bounds, float width, render_bounds *bounds0, render_bounds *bounds1);
+void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename);
 bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename, bool load_as_alpha_to_existing = false);
 
 

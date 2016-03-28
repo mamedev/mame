@@ -580,8 +580,8 @@ void emu_options::set_system_name(const char *name)
 		// look up the software part
 		machine_config config(*cursystem, *this);
 		software_list_device *swlist = software_list_device::find_by_name(config, sw_list.c_str());
-		software_info *swinfo = swlist->find(sw_name.c_str());
-		software_part *swpart = swinfo->find_part(sw_part.c_str());
+		software_info *swinfo = swlist != nullptr ? swlist->find(sw_name.c_str()) : nullptr;
+		software_part *swpart = swinfo != nullptr ? swinfo->find_part(sw_part.c_str()) : nullptr;
 
 		// then add the options
 		if (new_system)

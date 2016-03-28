@@ -122,6 +122,12 @@ function osdmodulesbuild()
 		end
 	end
 
+	defines {
+		"__STDC_LIMIT_MACROS",
+		"__STDC_FORMAT_MACROS",
+		"__STDC_CONSTANT_MACROS",
+	}
+	
 	files {
 		MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
 		MAME_DIR .. "src/osd/modules/render/binpacker.cpp",

@@ -38,7 +38,7 @@ function maintargetosdoptions(_target,_subtarget)
 		}
 	end
 
-	if BASE_TARGETOS=="unix" and _OPTIONS["targetos"]~="macosx" then
+	if BASE_TARGETOS=="unix" and _OPTIONS["targetos"]~="macosx" and _OPTIONS["targetos"]~="android" then
 		links {
 			"SDL2_ttf",
 		}
@@ -239,7 +239,7 @@ elseif _OPTIONS["targetos"]=="macosx" then
 	SDL_NETWORK         = "pcap"
 end
 
-if _OPTIONS["with-bundled-sdl2"]~=nil then
+if _OPTIONS["with-bundled-sdl2"]~=nil or _OPTIONS["targetos"]=="android" then
 	includedirs {
 		GEN_DIR .. "includes",
 	}
@@ -295,7 +295,7 @@ if BASE_TARGETOS=="unix" then
 				"/usr/openwin/lib",
 			}
 		end
-		if _OPTIONS["with-bundled-sdl2"]~=nil then
+		if _OPTIONS["with-bundled-sdl2"]~=nil and _OPTIONS["targetos"]~="android" then
 			links {
 				"SDL2",
 			}
@@ -305,7 +305,7 @@ if BASE_TARGETOS=="unix" then
 			addoptionsfromstring(str)
 		end	
 		
-		if _OPTIONS["targetos"]~="haiku" then
+		if _OPTIONS["targetos"]~="haiku" and _OPTIONS["targetos"]~="android" then
 			links {
 				"m",
 				"pthread",

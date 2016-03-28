@@ -27,13 +27,18 @@ end
 	kind "ConsoleApp"
 	
 	configuration { "android*" }
+		targetprefix "lib"
+		targetname "main"
 		targetextension ".so"
 		linkoptions {
 			"-shared",
+			"-Wl,-soname,libmain.so"
 		}
 		links {
 			"EGL",
+			"GLESv1_CM",
 			"GLESv2",
+			"SDL2",
 		} 	
 	configuration { "pnacl" }
 		kind "ConsoleApp"
@@ -132,8 +137,39 @@ end
 
 	configuration { }
 
-	if _OPTIONS["SEPARATE_BIN"]~="1" then 
-		targetdir(MAME_DIR)
+	if _OPTIONS["targetos"]=="android" then
+		includedirs {
+			MAME_DIR .. "3rdparty/SDL2/include",
+		}
+	
+		files {
+			MAME_DIR .. "3rdparty/SDL2/src/main/android/SDL_android_main.c",
+		}
+		targetsuffix ""
+		if _OPTIONS["SEPARATE_BIN"]~="1" then 
+			if _OPTIONS["PLATFORM"]=="arm" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/armeabi-v7a")
+			end
+			if _OPTIONS["PLATFORM"]=="arm64" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/arm64-v8a")
+			end
+			if _OPTIONS["PLATFORM"]=="mips" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips")
+			end
+			if _OPTIONS["PLATFORM"]=="mips64" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips64")
+			end
+			if _OPTIONS["PLATFORM"]=="x86" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86")
+			end
+			if _OPTIONS["PLATFORM"]=="x64" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86_64")
+			end
+		end
+	else
+		if _OPTIONS["SEPARATE_BIN"]~="1" then 
+			targetdir(MAME_DIR)
+		end
 	end
 	
 	findfunction("linkProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])

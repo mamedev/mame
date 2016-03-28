@@ -261,7 +261,7 @@ class ohci_function_device {
 public:
 	ohci_function_device(running_machine &machine);
 	void execute_reset();
-	int execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size) ;
+	int execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size);
 protected:
 	virtual int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) { return -1; };
 	virtual int handle_get_status_request(int endpoint, USBSetupPacket *setup) { return 0; };
@@ -269,6 +269,8 @@ protected:
 	virtual int handle_set_feature_request(int endpoint, USBSetupPacket *setup) { return 0; };
 	virtual int handle_set_descriptor_request(int endpoint, USBSetupPacket *setup) { return 0; };
 	virtual int handle_synch_frame_request(int endpoint, USBSetupPacket *setup) { return 0; };
+	virtual void handle_status_stage(int endpoint) { return; };
+	virtual int handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size) { return 0; };
 
 	void add_device_descriptor(const USBStandardDeviceDescriptor &descriptor);
 	void add_configuration_descriptor(const USBStandardConfigurationDescriptor &descriptor);
@@ -297,6 +299,7 @@ protected:
 	int configurationvalue;
 	UINT8 *descriptors;
 	int descriptors_pos;
+	bool wantstatuscallback;
 	USBStandardDeviceDescriptor device_descriptor;
 	std::forward_list<usb_device_configuration *> configurations;
 	std::forward_list<usb_device_string *> device_strings;
@@ -323,6 +326,8 @@ class ohci_hlean2131qc_device: public ohci_function_device
 public:
 	ohci_hlean2131qc_device(running_machine &machine);
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
+	int handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size) override;
+	void set_region_base(UINT8 *data);
 private:
 	static const USBStandardDeviceDescriptor devdesc;
 	static const USBStandardConfigurationDescriptor condesc;
@@ -340,6 +345,8 @@ private:
 	static const UINT8 strdesc0[];
 	static const UINT8 strdesc1[];
 	static const UINT8 strdesc2[];
+	int maximum_send;
+	UINT8 *region;
 };
 
 class ohci_hlean2131sc_device : public ohci_function_device

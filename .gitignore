@@ -8,6 +8,7 @@
 /*
 /*/
 !/3rdparty/
+!/android-project/
 !/benchmarks/
 !/artwork/
 !/bgfx/

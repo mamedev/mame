@@ -37,9 +37,7 @@ public:
 
 	virtual void vsetup(analog_net_t::list_t &nets) override;
 
-	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
-protected:
-	ATTR_HOT virtual nl_double vsolve() override;
+	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
 
 private:
 	nl_double m_Vdelta[_storage_N];
@@ -65,9 +63,10 @@ void matrix_solver_SOR_mat_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets
 	this->save(NLNAME(m_Vdelta));
 }
 
-
+#if 0
+//FIXME: move to solve_base
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT nl_double matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
+nl_double matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 {
 	/*
 	 * enable linear prediction on first newton pass
@@ -111,9 +110,10 @@ ATTR_HOT nl_double matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 
 	return this->compute_next_timestep();
 }
+#endif
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT inline int matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+int matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	/* The matrix based code looks a lot nicer but actually is 30% slower than
 	 * the optimized code which works directly on the data structures.
@@ -204,7 +204,6 @@ ATTR_HOT inline int matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic
 		//this->netlist().warning("Falling back to direct solver .. Consider increasing RESCHED_LOOPS");
 		this->m_gs_fail++;
 
-		this->LE_solve();
 		return matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(newton_raphson);
 	}
 	else {

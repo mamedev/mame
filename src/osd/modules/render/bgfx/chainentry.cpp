@@ -179,7 +179,7 @@ bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
 	bx::mtxOrtho(projMat, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
 	bgfx::setViewTransform(view, nullptr, projMat);
 
-    bgfx::setViewClear(view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00ff00ff, 1.0f, 0);
+    bgfx::setViewClear(view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
     return true;
 }
 
