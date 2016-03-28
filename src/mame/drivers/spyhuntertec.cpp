@@ -331,6 +331,60 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 	ay2_porta_w 81
 	ay2_porta_w 01
 	*/
+
+	/*
+
+		-- input reading code here
+		A388: 3E 14         ld   a,$14
+		A38A: 28 04         jr   z,$A390
+		A38C: DD 23         inc  ix
+		A38E: 3E 04         ld   a,$04
+		A390: CD 20 A5      call $A520 << write command to sub-cpu
+
+		-- delay loop / timeout loop for reading result? value of b doesn't get used in the end
+		A393: 06 1F         ld   b,$1F << loop counter
+		A395: 21 02 FC      ld   hl,$FC02
+		loopstart:
+		A398: CB 76         bit  6,(hl)
+		A39A: 28 06         jr   z,$A3A2 to dest2
+		A39C: 10 FA         djnz $A398 (to loopstart)
+
+		A39E: 06 0F         ld   b,$0F <
+		A3A0: 18 1E         jr   $A3C0  to dest 3
+
+		dest2:
+		A3A2: 06 33         ld   b,$33  << loop counter
+		loop2start:
+		A3A4: CB 76         bit  6,(hl)
+		A3A6: 20 11         jr   nz,$A3B9 (to outofloop)
+		A3A8: CB 76         bit  6,(hl)
+		A3AA: 00            nop
+		A3AB: CB 76         bit  6,(hl)
+		A3AD: 20 0A         jr   nz,$A3B9 (to outofloop)
+		A3AF: 10 F3         djnz $A3A4 (to loop2start)
+
+		A3B1: 00            nop
+		A3B2: 00            nop
+		A3B3: 00            nop
+		A3B4: 00            nop
+		A3B5: 00            nop
+		A3B6: 00            nop
+		A3B7: 00            nop
+		A3B8: 00            nop
+
+		outofloop:
+		A3B9: 78            ld   a,b
+		A3BA: FE 20         cp   $20
+		A3BC: 38 02         jr   c,$A3C0
+		A3BE: 06 1F         ld   b,$1F
+
+		dest3:
+		A3C0: 21 B6 A6      ld   hl,$A6B6
+		...
+	
+	
+	*/
+
 	UINT8 ret = ioport("IN2")->read();
 //	printf("%04x spyhuntertec_in2_r\n", space.device().safe_pc());
 	return ret;
