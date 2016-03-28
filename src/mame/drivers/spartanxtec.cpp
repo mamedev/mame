@@ -6,11 +6,18 @@ Kung-Fu Master / Spartan X (Tecfri bootleg)
 single PCB with 2x Z80
 similar looking to the '1942p' and 'spyhuntpr' PCBs
 
+
+P2 inputs don't work
+DIPS etc. are near the 2nd CPU, should it be reading them?
+
+visible area is 16 lines less than the original, otherwise you get bad sprites
+but I think this is probably correct.
+
 */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-
+#include "includes/iremipt.h"
 
 class spartanxtec_state : public driver_device
 {
@@ -18,6 +25,7 @@ public:
 	spartanxtec_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_m62_tileram(*this, "m62_tileram"),
+		m_spriteram(*this, "spriteram"),
 		m_scroll_lo(*this, "scroll_lo"),
 		m_scroll_hi(*this, "scroll_hi"),
 
@@ -26,12 +34,14 @@ public:
 	{ }
 
 	required_shared_ptr<UINT8> m_m62_tileram;
+	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_scroll_lo;
 	required_shared_ptr<UINT8> m_scroll_hi;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(spartanxtec);
 	
@@ -54,7 +64,7 @@ WRITE8_MEMBER(spartanxtec_state::kungfum_tileram_w)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-// WRONG for this bootleg
+
 TILE_GET_INFO_MEMBER(spartanxtec_state::get_kungfum_bg_tile_info)
 {
 	int code;
@@ -83,31 +93,52 @@ void spartanxtec_state::video_start()
 }
 
 
+void spartanxtec_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	gfx_element *gfx = m_gfxdecode->gfx(1);
+
+	for (int i = 0; i < 0x400; i += 4)
+	{
+		int x = m_spriteram[i+2]+128;
+		int y = (224-m_spriteram[i+1])&0xff;
+		int code = m_spriteram[i+0];
+		int attr = m_spriteram[i+3];
+		code |= (attr & 0xc0) << 2;
+
+		int colour = attr & 0x1f;
+		int flipx = attr & 0x20;
+		int flipy = 0;
+
+		gfx->transpen(bitmap,cliprect,code,colour,flipx,flipy,x,y,7);
+
+	}
+
+	
+}
+
+
 UINT32 spartanxtec_state::screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// there are 4 sets of scroll registers
 	// how to split them isn't clear, 4 groups of 8 rows would be logical
 	// but only 6 rows should use the first scroll register and the
 	// remaining 2 rows scroll values from there can't wrap onto the bottom
-	// as that doesn't work. (breaks playfield scroll)
+	// as that doesn't work. (breaks bottom 2 lines of playfield scroll)
+	// HOWEVER sprites are also broken in that area, so I think this bootleg
+	// probably just displays less lines.
 
 
 	for (int i = 0; i < 32; i++)
 	{
 		int scrollval;
 
-		if (i<6) scrollval = m_scroll_lo[0] | (m_scroll_hi[0] << 8);
-		else scrollval = m_scroll_lo[1] | (m_scroll_hi[1] << 8);
+		scrollval = m_scroll_lo[i/8] | (m_scroll_hi[i/8] << 8);
 
-		// always the same as 1
-		//scrollval = m_scroll_lo[2] | (m_scroll_hi[2] << 8);
-		//scrollval = m_scroll_lo[3] | (m_scroll_hi[3] << 8);
-
-		m_bg_tilemap->set_scrollx(i, scrollval+28-128);
+		m_bg_tilemap->set_scrollx((i-2)&0xff, scrollval+28-128);
 	}
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-//	draw_sprites(bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
 
 	return 0;
@@ -119,14 +150,14 @@ UINT32 spartanxtec_state::screen_update_spartanxtec(screen_device &screen, bitma
 
 static ADDRESS_MAP_START( spartanxtec_map, AS_PROGRAM, 8, spartanxtec_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("spriteram")
 
 	AM_RANGE(0x8000, 0x8000) AM_WRITENOP
 
-	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("IN0")
-	AM_RANGE(0x8101, 0x8101) AM_READ_PORT("IN1")
-	AM_RANGE(0x8102, 0x8102) AM_READ_PORT("IN2")
-	AM_RANGE(0x8103, 0x8103) AM_READ_PORT("IN3")
+	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("DSW1")
+	AM_RANGE(0x8101, 0x8101) AM_READ_PORT("DSW2")
+	AM_RANGE(0x8102, 0x8102) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x8103, 0x8103) AM_READ_PORT("P1")
 
 	AM_RANGE(0x8200, 0x8200) AM_WRITENOP // sound cmd?
 	
@@ -141,111 +172,72 @@ static ADDRESS_MAP_START( spartanxtec_map, AS_PROGRAM, 8, spartanxtec_state )
 
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( spartanxtec_sound_map, AS_PROGRAM, 8, spartanxtec_state )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_RAM
+ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( spartanxtec )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x02, 0x02, "Energy Loss" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, "Slow" )
+	PORT_DIPSETTING(    0x00, "Fast" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
+	/* Manual says that only coin mode 1 is available and SW2:3 should be always OFF */
+	/* However, coin mode 2 works perfectly. */
+	IREM_Z80_COINAGE_TYPE_3_LOC(SW1)
 
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, "Mode 1" )
+	PORT_DIPSETTING(    0x00, "Mode 2" )
+	/* In slowmo mode, press 2 to slow game speed */
+	PORT_DIPNAME( 0x08, 0x08, "Slow Motion Mode (Cheat)" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	/* In freeze mode, press 2 to stop and 1 to restart */
+	PORT_DIPNAME( 0x10, 0x10, "Freeze (Cheat)" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	/* In level selection mode, press 1 to select and 2 to restart */
+	PORT_DIPNAME( 0x20, 0x20, "Level Selection Mode (Cheat)" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)" ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "IN2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(19)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x01, "IN3" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 INPUT_PORTS_END
 
 
@@ -273,8 +265,8 @@ static const gfx_layout tiles16x16_layout =
 
 
 static GFXDECODE_START( news )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x100, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0, 32 )
 GFXDECODE_END
 
 
@@ -289,8 +281,18 @@ void spartanxtec_state::machine_reset()
 
 PALETTE_INIT_MEMBER(spartanxtec_state, spartanxtec)
 {
-//	const UINT8 *color_prom = memregion("cprom")->base();
+	// todo, proper weights for this bootleg PCB
+	const UINT8 *color_prom = memregion("cprom")->base();
+	for (int i = 0; i < 0x200; i++)
+	{
+		int r, g, b;
 
+		b = (color_prom[i+0x000]&0x0f)<<4;
+		g = (color_prom[i+0x200]&0x0f)<<4;
+		r = (color_prom[i+0x400]&0x0f)<<4;
+
+		palette.set_pen_color(i, rgb_t(r,g,b));
+	}
 }
 
 
@@ -302,17 +304,20 @@ static MACHINE_CONFIG_START( spartanxtec, spartanxtec_state )
 	MCFG_CPU_PROGRAM_MAP(spartanxtec_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_hold)
 
+	MCFG_CPU_ADD("soundcpu", Z80,4000000)
+	MCFG_CPU_PROGRAM_MAP(spartanxtec_sound_map)
 
 	/* video hardware */
+	// todo, proper screen timings for this bootleg PCB
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(55)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790) /* frames per second and vblank duration from the Lode Runner manual */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(spartanxtec_state, screen_update_spartanxtec)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(spartanxtec_state,spartanxtec)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", news)
@@ -331,12 +336,21 @@ ROM_START( spartanxtec )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "3.bin", 0x00000, 0x01000, CRC(9a18af94) SHA1(1644295aa0c837dced5934360e41d77e0a93ccd1) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "4.bin", 0x00000, 0x02000, CRC(b55672ef) SHA1(7bd556a76e130be1262aa7db09df84c6463ce9ef) )
-	ROM_LOAD( "5.bin", 0x02000, 0x02000, CRC(8a3d2978) SHA1(e50ba8d63e894c6a555d92c3144682be68f111b0) )
-	ROM_LOAD( "6.bin", 0x04000, 0x02000, CRC(b1570b6b) SHA1(380a692309690e6ff6b57fda657192fff95167e0) )
+	ROM_REGION( 0x6000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "5.bin", 0x00000, 0x0800, CRC(8a3d2978) SHA1(e50ba8d63e894c6a555d92c3144682be68f111b0))
+	ROM_CONTINUE(0x1000, 0x0800)
+	ROM_CONTINUE(0x0800, 0x0800)
+	ROM_CONTINUE(0x1800, 0x0800)
+	ROM_LOAD( "6.bin", 0x02000, 0x0800, CRC(b1570b6b) SHA1(380a692309690e6ff6b57fda657192fff95167e0) )
+	ROM_CONTINUE(0x3000, 0x0800)
+	ROM_CONTINUE(0x2800, 0x0800)
+	ROM_CONTINUE(0x3800, 0x0800)
+	ROM_LOAD( "4.bin", 0x04000, 0x0800, CRC(b55672ef) SHA1(7bd556a76e130be1262aa7db09df84c6463ce9ef) )
+	ROM_CONTINUE(0x5000, 0x0800)
+	ROM_CONTINUE(0x4800, 0x0800)
+	ROM_CONTINUE(0x5800, 0x0800)
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_REGION( 0x18000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "7.bin", 0x00000, 0x08000, CRC(aa897e30) SHA1(90b3b316800be106d3baa6783ca894703f369d4e) )
 	ROM_LOAD( "8.bin", 0x08000, 0x08000, CRC(98a1803b) SHA1(3edfc45c289f850b07a0231ce0b792cbec6fb245) )
 	ROM_LOAD( "9.bin", 0x10000, 0x08000, CRC(e3bf0d73) SHA1(4562422c07399e240081792b96b9018d1e7dd97b) )
