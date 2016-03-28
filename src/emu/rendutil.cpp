@@ -12,7 +12,7 @@
 #include "rendutil.h"
 #include "png.h"
 
-
+#include "libjpeg/jpeglib.h"
 
 /***************************************************************************
     FUNCTION PROTOTYPES
