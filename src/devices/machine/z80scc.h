@@ -137,7 +137,7 @@ public:
 	UINT8 do_sccreg_rr5();
 	UINT8 do_sccreg_rr6();
 	UINT8 do_sccreg_rr7();
-//  UINT8 do_sccreg_rr8();
+	// UINT8 do_sccreg_rr8(); Short cutted due to frequent use
 	UINT8 do_sccreg_rr9();
 	UINT8 do_sccreg_rr10();
 	UINT8 do_sccreg_rr11();
@@ -236,21 +236,21 @@ protected:
 	// Read registers
 	enum
 	{
-		REG_RR0_STATUS      = 0, // SIO
+		REG_RR0_STATUS          = 0, // SIO
 		REG_RR1_SPEC_RCV_COND   = 1, // SIO
 		REG_RR2_INTERRUPT_VECT  = 2, // SIO
 		REG_RR3_INTERUPPT_PEND  = 3,
-		REG_RR4_WR4_OR_RR0  = 4,
-		REG_RR5_WR5_OR_RR0  = 5,
-		REG_RR6_LSB_OR_RR2  = 6,
-		REG_RR7_MSB_OR_RR3  = 7,
+		REG_RR4_WR4_OR_RR0      = 4,
+		REG_RR5_WR5_OR_RR0      = 5,
+		REG_RR6_LSB_OR_RR2      = 6,
+		REG_RR7_MSB_OR_RR3      = 7,
 		REG_RR8_RECEIVE_DATA    = 8,
-		REG_RR9_WR3_OR_RR13 = 9,
+		REG_RR9_WR3_OR_RR13     = 9,
 		REG_RR10_MISC_STATUS    = 10,
 		REG_RR11_WR10_OR_RR15   = 11,
 		REG_RR12_LO_TIME_CONST  = 12,
 		REG_RR13_HI_TIME_CONST  = 13,
-		REG_RR14_WR7_OR_R10 = 14,
+		REG_RR14_WR7_OR_R10     = 14,
 		REG_RR15_WR15_EXT_STAT  = 15
 	};
 
@@ -259,10 +259,10 @@ protected:
 	{
 		REG_WR0_COMMAND_REGPT   = 0, // SIO
 		REG_WR1_INT_DMA_ENABLE  = 1, // SIO
-		REG_WR2_INT_VECTOR  = 2, // SIO
-		REG_WR3_RX_CONTROL  = 3, // SIO
-		REG_WR4_RX_TX_MODES = 4, // SIO
-		REG_WR5_TX_CONTROL  = 5, // SIO
+		REG_WR2_INT_VECTOR      = 2, // SIO
+		REG_WR3_RX_CONTROL      = 3, // SIO
+		REG_WR4_RX_TX_MODES     = 4, // SIO
+		REG_WR5_TX_CONTROL      = 5, // SIO
 		REG_WR6_SYNC_OR_SDLC_A  = 6, // SIO
 		REG_WR7_SYNC_OR_SDLC_F  = 7, // SIO
 		REG_WR8_TRANSMIT_DATA   = 8,
@@ -271,21 +271,21 @@ protected:
 		REG_WR11_CLOCK_MODES    = 11,
 		REG_WR12_LO_BAUD_GEN    = 12,
 		REG_WR13_HI_BAUD_GEN    = 13,
-		REG_WR14_MISC_CTRL  = 14,
+		REG_WR14_MISC_CTRL      = 14,
 		REG_WR15_EXT_ST_INT_CTRL= 15
 	};
 
 	enum
 	{
 		RR0_RX_CHAR_AVAILABLE     = 0x01, // SIO bit
-		RR0_ZC            = 0x02, // SCC bit
-		RR0_TX_BUFFER_EMPTY   = 0x04, // SIO
-		RR0_DCD           = 0x08, // SIO
-		RR0_RI            = 0x10, // DART bit?  TODO: investigate function and remove
-		RR0_SYNC_HUNT         = 0x10, // SIO bit, not supported
-		RR0_CTS           = 0x20, // SIO bit
-		RR0_TX_UNDERRUN       = 0x40, // SIO bit, not supported
-		RR0_BREAK_ABORT       = 0x80  // SIO bit, not supported
+		RR0_ZC                    = 0x02, // SCC bit
+		RR0_TX_BUFFER_EMPTY       = 0x04, // SIO
+		RR0_DCD                   = 0x08, // SIO
+		RR0_RI                    = 0x10, // DART bit?  TODO: investigate function and remove
+		RR0_SYNC_HUNT             = 0x10, // SIO bit, not supported
+		RR0_CTS                   = 0x20, // SIO bit
+		RR0_TX_UNDERRUN           = 0x40, // SIO bit, not supported
+		RR0_BREAK_ABORT           = 0x80  // SIO bit, not supported
 	};
 
 	enum
@@ -456,15 +456,30 @@ protected:
 	enum
 	{
 		WR14_DPLL_CMD_MASK    = 0xe0, // Command
-		WR14_CMD_NULL     = 0x00, // 0 0 0
-		WR14_CMD_ESM      = 0x20, // 0 0 1
-		WR14_CMD_RMC      = 0x40, // 0 1 0
+		WR14_CMD_NULL         = 0x00, // 0 0 0
+		WR14_CMD_ESM          = 0x20, // 0 0 1
+		WR14_CMD_RMC          = 0x40, // 0 1 0
 		WR14_CMD_DISABLE_DPLL = 0x60, // 0 1 1
-		WR14_CMD_SS_BGR   = 0x80, // 1 0 0
+		WR14_CMD_SS_BRG       = 0x80, // 1 0 0
 		WR14_CMD_SS_RTXC      = 0xa0, // 1 0 1
-		WR14_CMD_SET_FM   = 0xc0, // 1 1 0
-		WR14_CMD_SET_NRZI     = 0xe0  // 1 1 1
+		WR14_CMD_SET_FM       = 0xc0, // 1 1 0
+		WR14_CMD_SET_NRZI     = 0xe0, // 1 1 1
+		WR14_BRG_ENABLE       = 0x01,
+		WR14_BRG_SOURCE       = 0x02,
+		WR14_DTR_REQ_FUNC     = 0x04,
+		WR14_AUTO_ECHO        = 0x08,
+		WR14_LOCAL_LOOPBACK   = 0x010
 	};
+
+	enum
+	{
+		TIMER_ID_BAUD,
+		TIMER_ID_XTAL,
+		TIMER_ID_RTXC,
+		TIMER_ID_TRXC
+	};
+	emu_timer *baudtimer;
+	UINT16 m_brg_counter;
 
 	void update_serial();
 	void set_dtr(int state);
