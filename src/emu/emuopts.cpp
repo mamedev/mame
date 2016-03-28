@@ -563,7 +563,7 @@ void emu_options::set_system_name(const char *name)
 	if (cursystem == nullptr)
 		return;
 
-	if (software_name())
+	if (*software_name() != 0)
 	{
 		std::string sw_load(software_name());
 		std::string sw_list, sw_name, sw_part, sw_instance, option_errors, error_string;
