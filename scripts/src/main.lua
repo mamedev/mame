@@ -129,7 +129,7 @@ end
 			emccopts = emccopts .. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/chains@bgfx/chains"
 			emccopts = emccopts .. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/effects@bgfx/effects"
 			emccopts = emccopts .. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/shaders/gles@bgfx/shaders/gles"
-			emccopts = emccopts .. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/shadow-mask.png@artwork/shadow-mask.png"
+			emccopts = emccopts .. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/slot-mask.png@artwork/slot-mask.png"
 			postbuildcommands {
 				os.getenv("EMSCRIPTEN") .. "/emcc " .. emccopts .. " $(TARGET) -o " .. _MAKE.esc(MAME_DIR) .. _OPTIONS["target"] .. _OPTIONS["subtarget"] .. ".js",
 			}
