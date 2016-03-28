@@ -6,9 +6,17 @@ Spy Hunter(Tecfri bootleg)
 single PCB with 2x Z80
 
 significant changes compared to original HW
+
+Very different hardware, probably bootleg despite the license text printed on the PCB, similar to '1942p' and 'spartanxtec.cpp'
+PCB made by Tecfri for Recreativos Franco S.A. in Spain, has Bally Midway logo, and licensing text on the PCB.
+Board is dated '85' so seems to be a low-cost rebuild? it is unclear if it made it to market.
+
 non-interlaced
 
 sound system appears to be the same as 'spartanxtec.cpp'
+
+how do the inputs work? is it modified to use joystick? is the sound cpu reading them / latching them via the AY?
+if so how does it communicate, timing?
 
 */
 
@@ -27,6 +35,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2"),
 		m_paletteram(*this, "paletteram"),
 		m_spyhunt_alpharam(*this, "spyhunt_alpha"),
 		m_palette(*this, "palette"),
@@ -38,6 +47,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_paletteram;
 	required_shared_ptr<UINT8> m_spyhunt_alpharam;
 
@@ -67,11 +77,22 @@ public:
 //	UINT32 screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_port04_w);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_fd00_w);
+	DECLARE_WRITE8_MEMBER(spyhuntertec_portf0_w);
 	
 	DECLARE_WRITE8_MEMBER(spyhunt_videoram_w);
 	DECLARE_WRITE8_MEMBER(spyhunt_alpharam_w);
 	DECLARE_WRITE8_MEMBER(spyhunt_scroll_value_w);
 	DECLARE_WRITE8_MEMBER(sound_irq_ack);
+
+
+	DECLARE_WRITE8_MEMBER(ay1_porta_w);
+	DECLARE_READ8_MEMBER(ay1_porta_r);
+
+	DECLARE_WRITE8_MEMBER(ay2_porta_w);
+	DECLARE_READ8_MEMBER(ay2_porta_r);
+
+	DECLARE_READ8_MEMBER(spyhuntertec_in2_r);
+	DECLARE_READ8_MEMBER(spyhuntertec_in3_r);
 
 	TILEMAP_MAPPER_MEMBER(spyhunt_bg_scan);
 	TILE_GET_INFO_MEMBER(spyhunt_get_bg_tile_info);
@@ -81,7 +102,31 @@ public:
 
 };
 
+WRITE8_MEMBER(spyhuntertec_state::ay1_porta_w)
+{
+//	printf("ay1_porta_w %02x\n", data);
+}
 
+READ8_MEMBER(spyhuntertec_state::ay1_porta_r)
+{
+//	printf("ay1_porta_r\n");
+	return 0;
+}
+
+
+
+WRITE8_MEMBER(spyhuntertec_state::ay2_porta_w)
+{
+//	printf("ay2_porta_w %02x\n", data);
+}
+
+READ8_MEMBER(spyhuntertec_state::ay2_porta_r)
+{
+// read often, even if port is set to output mode
+// maybe latches something?
+//	printf("ay2_porta_r\n");
+	return 0;
+}
 
 WRITE8_MEMBER(spyhuntertec_state::spyhunt_videoram_w)
 {
@@ -269,6 +314,20 @@ WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_fd00_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
+READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
+{
+	UINT8 ret = ioport("IN2")->read();
+//	printf("%04x spyhuntertec_in2_r\n", space.device().safe_pc());
+	return ret;
+}
+
+READ8_MEMBER(spyhuntertec_state::spyhuntertec_in3_r)
+{
+	UINT8 ret = ioport("IN3")->read();
+//	printf("%04x spyhuntertec_in3_r\n", space.device().safe_pc());
+	return ret;
+}
+
 static ADDRESS_MAP_START( spyhuntertec_map, AS_PROGRAM, 8, spyhuntertec_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xa800, 0xa8ff) AM_RAM // the ROM is a solid fill in these areas, and they get tested as RAM, I think they moved the 'real' scroll regs here
@@ -279,21 +338,27 @@ static ADDRESS_MAP_START( spyhuntertec_map, AS_PROGRAM, 8, spyhuntertec_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE(spyhunt_alpharam_w) AM_SHARE("spyhunt_alpha")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM //AM_SHARE("nvram")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_SHARE("spriteram") // origional spriteram
 	AM_RANGE(0xfa00, 0xfa7f) AM_MIRROR(0x0180) AM_RAM_WRITE(spyhuntertec_paletteram_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("DSW0")
 	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfc02, 0xfc02) AM_READ_PORT("IN2")
-	AM_RANGE(0xfc03, 0xfc03) AM_READ_PORT("IN3")
+	AM_RANGE(0xfc02, 0xfc02) AM_READ(spyhuntertec_in2_r)
+	AM_RANGE(0xfc03, 0xfc03) AM_READ(spyhuntertec_in3_r)
 
 	AM_RANGE(0xfd00, 0xfd00) AM_WRITE( spyhuntertec_fd00_w )
 
-	AM_RANGE(0xfe00, 0xffff) AM_RAM // a modified copy of spriteram for this hw??
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram2") // actual spriteram for this hw??
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_port04_w)
 {
+}
+
+WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_portf0_w)
+{
+	// 0x08 on startup, then 0x03, probably CTC leftovers from the original.
+	if ((data != 0x03) && (data != 0x08)) printf("spyhuntertec_portf0_w %02x\n", data);
 }
 
 static ADDRESS_MAP_START( spyhuntertec_portmap, AS_IO, 8, spyhuntertec_state )
@@ -303,7 +368,7 @@ static ADDRESS_MAP_START( spyhuntertec_portmap, AS_IO, 8, spyhuntertec_state )
 	AM_RANGE(0x84, 0x86) AM_WRITE(spyhunt_scroll_value_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITENOP // was watchdog
 //  AM_RANGE(0xe8, 0xe8) AM_WRITENOP
-//	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE( spyhuntertec_portf0_w )
 ADDRESS_MAP_END
 
 
@@ -326,9 +391,14 @@ static ADDRESS_MAP_START( spyhuntertec_sound_portmap, AS_IO, 8, spyhuntertec_sta
 
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_irq_ack)
 
-	AM_RANGE(0x12, 0x13) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
-	AM_RANGE(0x14, 0x15) AM_DEVWRITE("ay2", ay8912_device, address_data_w)
-	AM_RANGE(0x18, 0x19) AM_DEVWRITE("ay3", ay8912_device, address_data_w)
+	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
+	AM_RANGE(0x0012, 0x0012) AM_DEVREAD("ay3", ay8910_device, data_r)
+
+	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x0014, 0x0014) AM_DEVREAD("ay1", ay8910_device, data_r)
+
+	AM_RANGE(0x0018, 0x0019) AM_DEVWRITE("ay2", ay8910_device, address_data_w) // data written to port a
+	AM_RANGE(0x0018, 0x0018) AM_DEVREAD("ay2", ay8910_device, data_r) // actually read
 
 ADDRESS_MAP_END
 
@@ -542,8 +612,14 @@ static MACHINE_CONFIG_START( spyhuntertec, spyhuntertec_state )
 
 	MCFG_SOUND_ADD("ay1", AY8912, 3000000/2) // AY-3-8912
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(spyhuntertec_state, ay1_porta_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(spyhuntertec_state, ay1_porta_w))
+
 	MCFG_SOUND_ADD("ay2", AY8912, 3000000/2) // "
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(spyhuntertec_state, ay2_porta_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(spyhuntertec_state, ay2_porta_w))
+
 	MCFG_SOUND_ADD("ay3", AY8912, 3000000/2) // "
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -642,16 +718,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(spyhuntertec_state,spyhuntertec)
 {
-//	mcr_common_init();
-//  machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(spyhuntertec_state::spyhunt_ip1_r),this));
-//  machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(spyhuntertec_state::spyhunt_ip2_r),this));
-//  machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(spyhuntertec_state::spyhunt_op4_w),this));
-
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 16;
 }
 
 
-// very different hardware, probably bootleg despite the license text printed on the PCB, similar to '1942p' in 1942.c.  Probably should be put in separate driver.
-// PCB made by Tecfri for Recreativos Franco S.A. in Spain, has Bally Midway logo, and licensing text on the PCB.  Board is dated '85' so seems to be a low-cost rebuild? it is unclear if it made it to market.
 GAME (1983, spyhuntpr,spyhunt,  spyhuntertec, spyhuntertec,spyhuntertec_state,  spyhuntertec,ROT90, "Bally Midway (Recreativos Franco S.A. license)", "Spy Hunter (Spain, Tecfri / Recreativos Franco S.A. PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
