@@ -96,8 +96,6 @@
 #define WINOPTION_BLOOM_LEVEL6_WEIGHT       "bloom_lvl6_weight"
 #define WINOPTION_BLOOM_LEVEL7_WEIGHT       "bloom_lvl7_weight"
 #define WINOPTION_BLOOM_LEVEL8_WEIGHT       "bloom_lvl8_weight"
-#define WINOPTION_BLOOM_LEVEL9_WEIGHT       "bloom_lvl9_weight"
-#define WINOPTION_BLOOM_LEVEL10_WEIGHT      "bloom_lvl10_weight"
 
 // full screen options
 #define WINOPTION_TRIPLEBUFFER          "triplebuffer"
@@ -191,8 +189,6 @@ public:
 	float screen_bloom_lvl6_weight() const { return float_value(WINOPTION_BLOOM_LEVEL6_WEIGHT); }
 	float screen_bloom_lvl7_weight() const { return float_value(WINOPTION_BLOOM_LEVEL7_WEIGHT); }
 	float screen_bloom_lvl8_weight() const { return float_value(WINOPTION_BLOOM_LEVEL8_WEIGHT); }
-	float screen_bloom_lvl9_weight() const { return float_value(WINOPTION_BLOOM_LEVEL9_WEIGHT); }
-	float screen_bloom_lvl10_weight() const { return float_value(WINOPTION_BLOOM_LEVEL10_WEIGHT); }
 	const char *screen_offset() const { return value(WINOPTION_OFFSET); }
 	const char *screen_scale() const { return value(WINOPTION_SCALE); }
 	const char *screen_power() const { return value(WINOPTION_POWER); }
