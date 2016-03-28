@@ -260,8 +260,6 @@ struct hlsl_options
 	float                   bloom_level6_weight;
 	float                   bloom_level7_weight;
 	float                   bloom_level8_weight;
-	float                   bloom_level9_weight;
-	float                   bloom_level10_weight;
 };
 
 struct slider_desc
