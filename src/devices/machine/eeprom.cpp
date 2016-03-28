@@ -146,7 +146,7 @@ void eeprom_base_device::static_set_timing(device_t &device, timing_type type, c
 UINT32 eeprom_base_device::read(offs_t address)
 {
 	if (!ready())
-		logerror("EEPROM: Read performed before previous operation completed!");
+		logerror("EEPROM: Read performed before previous operation completed!\n");
 	return internal_read(address);
 }
 
@@ -158,7 +158,7 @@ UINT32 eeprom_base_device::read(offs_t address)
 void eeprom_base_device::write(offs_t address, UINT32 data)
 {
 	if (!ready())
-		logerror("EEPROM: Write performed before previous operation completed!");
+		logerror("EEPROM: Write performed before previous operation completed!\n");
 	internal_write(address, data);
 	m_completion_time = machine().time() + m_operation_time[WRITE_TIME];
 }
@@ -173,7 +173,7 @@ void eeprom_base_device::write(offs_t address, UINT32 data)
 void eeprom_base_device::write_all(UINT32 data)
 {
 	if (!ready())
-		logerror("EEPROM: Write all performed before previous operation completed!");
+		logerror("EEPROM: Write all performed before previous operation completed!\n");
 	for (offs_t address = 0; address < (1 << m_address_bits); address++)
 		internal_write(address, internal_read(address) & data);
 	m_completion_time = machine().time() + m_operation_time[WRITE_ALL_TIME];
@@ -187,7 +187,7 @@ void eeprom_base_device::write_all(UINT32 data)
 void eeprom_base_device::erase(offs_t address)
 {
 	if (!ready())
-		logerror("EEPROM: Erase performed before previous operation completed!");
+		logerror("EEPROM: Erase performed before previous operation completed!\n");
 	internal_write(address, ~0);
 	m_completion_time = machine().time() + m_operation_time[ERASE_TIME];
 }
@@ -200,7 +200,7 @@ void eeprom_base_device::erase(offs_t address)
 void eeprom_base_device::erase_all()
 {
 	if (!ready())
-		logerror("EEPROM: Erase all performed before previous operation completed!");
+		logerror("EEPROM: Erase all performed before previous operation completed!\n");
 	for (offs_t address = 0; address < (1 << m_address_bits); address++)
 		internal_write(address, ~0);
 	m_completion_time = machine().time() + m_operation_time[ERASE_ALL_TIME];
