@@ -366,7 +366,7 @@ newoption {
 	}
 }
 
-dofile("extlib.lua")
+dofile ("extlib.lua")
 
 if _OPTIONS["SHLIB"]=="1" then
 	LIBTYPE = "SharedLib"
@@ -622,30 +622,17 @@ else
 	end
 end
 
--- need to ensure FLAC functions are statically linked
-if not _OPTIONS["with-system-flac"] then
+if _OPTIONS["with-system-jpeg"]~=nil then
+	defines {
+		"XMD_H",
+	}
+end
+
+if _OPTIONS["with-system-flac"]~=nil then
 	defines {
 		"FLAC__NO_DLL",
 	}
-	end
-
-if _OPTIONS["with-system-jpeg"] then
-	defines {
-		"USE_SYSTEM_JPEGLIB",
-	}
-	end
-
-if _OPTIONS["with-system-portmidi"] then
-	defines {
-		"USE_SYSTEM_PORTMIDI",
-	}
-	end
-
-if _OPTIONS["with-system-sqlite3"] then
-	defines {
-		"USE_SYSTEM_SQLITE",
-	}
-	end
+end
 
 if _OPTIONS["NOASM"]=="1" then
 	defines {
@@ -666,11 +653,6 @@ if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
 		configuration {  }
 	end
 end
-
--- define USE_SYSTEM_JPEGLIB if library shipped with MAME is not used
---ifneq ($(BUILD_JPEGLIB),1)
---DEFS += -DUSE_SYSTEM_JPEGLIB
---endif
 
 	defines {
 		"LUA_COMPAT_ALL",
