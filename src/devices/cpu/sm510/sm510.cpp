@@ -22,7 +22,7 @@
   - SM511 undocumented/guessed opcodes:
     * $01 is guessed as DIV to ACC transfer, unknown which bits
     * $5d is certainly CEND
-    * $65 is certainly IDIV, but not sure if it behaves same as on SM510
+    * $65 is certainly divider reset, but not sure if it behaves same as on SM510
 
 */
 
@@ -144,6 +144,7 @@ void sm510_base_device::device_start()
 
 void sm510_base_device::device_reset()
 {
+	// ACL
 	m_skip = false;
 	m_halt = false;
 	m_op = m_prev_op = 0;
@@ -317,7 +318,7 @@ TIMER_CALLBACK_MEMBER(sm510_base_device::div_timer_cb)
 {
 	m_div = (m_div + 1) & 0x7fff;
 
-	// 1S signal on overflow(falling edge of f1)
+	// 1S signal on overflow(falling edge of F1)
 	if (m_div == 0)
 		m_1s = true;
 
