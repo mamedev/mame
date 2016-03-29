@@ -1,11 +1,14 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- the Pocket Challenge V1 rom here doesn't work in the wswan driver, bad dump or incompatible hardware? (there's no V33 boot code at the end)-->
+<!-- this is NOT Wonderswan based hardware (should be connected to a new driver instead) -->
 
 <softwarelist name="pockchalv1" description="Pocket Challenge V1 cartridges">
-	<software name="0be311" supported="no" >
-		<description>unknown (0BE311)</description>
+
+	<!-- *K : Chuugaku Koumin -->
+
+	<software name="chuukoum" supported="no" >
+		<description>Chuugaku Koumin (1K - 0BE311)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
 		<part name="cart" interface="wswan_cart">
