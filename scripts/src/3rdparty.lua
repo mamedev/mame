@@ -510,7 +510,7 @@ project "lualibs"
 --------------------------------------------------
 
 if not _OPTIONS["with-system-sqlite3"] then
-project "sqllite3"
+project "sqlite3"
 	uuid "5cb3d495-57ed-461c-81e5-80dc0857517d"
 	kind "StaticLib"
 
