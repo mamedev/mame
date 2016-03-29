@@ -1319,6 +1319,11 @@ int lua_engine::register_function(lua_State *L, const char *id)
 	return 1;
 }
 
+int lua_engine::l_emu_register_prestart(lua_State *L)
+{
+	return register_function(L, "LUA_ON_PRESTART");
+}
+
 int lua_engine::l_emu_register_start(lua_State *L)
 {
 	return register_function(L, "LUA_ON_START");
@@ -1342,6 +1347,11 @@ int lua_engine::l_emu_register_resume(lua_State *L)
 int lua_engine::l_emu_register_frame(lua_State *L)
 {
 	return register_function(L, "LUA_ON_FRAME");
+}
+
+void lua_engine::on_machine_prestart()
+{
+	execute_function("LUA_ON_PRESTART");
 }
 
 void lua_engine::on_machine_start()
@@ -1393,6 +1403,7 @@ void lua_engine::update_machine()
 
 void lua_engine::attach_notifiers()
 {
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(lua_engine::on_machine_prestart), this), true);
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(lua_engine::on_machine_start), this));
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(lua_engine::on_machine_stop), this));
 	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(lua_engine::on_machine_pause), this));
@@ -1439,6 +1450,7 @@ void lua_engine::initialize()
 			.addCFunction ("start",       l_emu_start )
 			.addCFunction ("pause",       l_emu_pause )
 			.addCFunction ("unpause",     l_emu_unpause )
+			.addCFunction ("register_prestart", l_emu_register_prestart )
 			.addCFunction ("register_start", l_emu_register_start )
 			.addCFunction ("register_stop",  l_emu_register_stop )
 			.addCFunction ("register_pause", l_emu_register_pause )

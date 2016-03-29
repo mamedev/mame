@@ -127,7 +127,7 @@ function hiscore.startplugin()
 
 
 	function write_scores ( posdata )
-	print("write_scores")
+	  print("write_scores")
 	  local output = io.open(get_file_name(), "wb");
 	  if not output then
 		-- attempt to create the directory, and try again
@@ -242,9 +242,8 @@ function hiscore.startplugin()
 		current_game = ""
 		mem_check_passed = false
 	   	scores_have_been_read = false;
+		last_write_time = -10
 	  	print("Starting " .. emu.gamename())
-		-- check if we've just soft reset
-		-- reset() -- there's no way to reliably save scores after a soft reset currently 
 		current_game = emu.romname()
 		dat = read_hiscore_dat()
 		if dat and dat ~= "" then
@@ -254,14 +253,17 @@ function hiscore.startplugin()
 				print("hiscore.dat parse error");
 				return;
 			end
-			emu.sethook( tick, "frame" );
-			emu.register_stop(function()
-				reset()
-			end)
-		end		
 
+		end		
+		emu.sethook( tick, "frame" );
 	end)
     
+	emu.register_stop(function()
+		reset()
+	end)
+	emu.register_prestart(function()
+		reset()
+	end)
 end
 
 return exports

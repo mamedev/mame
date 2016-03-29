@@ -83,6 +83,7 @@ private:
 
 	void update_machine();
 
+	void on_machine_prestart();
 	void on_machine_start();
 	void on_machine_stop();
 	void on_machine_pause();
@@ -114,6 +115,7 @@ private:
 	static int l_emu_pause(lua_State *L);
 	static int l_emu_unpause(lua_State *L);
 	static int l_emu_set_hook(lua_State *L);
+	static int l_emu_register_prestart(lua_State *L);
 	static int l_emu_register_start(lua_State *L);
 	static int l_emu_register_stop(lua_State *L);
 	static int l_emu_register_pause(lua_State *L);
