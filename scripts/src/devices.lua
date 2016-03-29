@@ -39,6 +39,7 @@ function devicesProject(_target, _subtarget)
 		GEN_DIR  .. "emu/layout",
 		ext_includedir("expat"),
 		ext_includedir("lua"),
+		ext_includedir("flac"),
 	}
 
 	dofile(path.join("src", "cpu.lua"))

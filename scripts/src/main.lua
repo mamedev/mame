@@ -237,6 +237,7 @@ end
 		GEN_DIR  .. _target .. "/layout",
 		GEN_DIR  .. "resource",
 		ext_includedir("zlib"),
+		ext_includedir("flac"),
 	}
 
 	if _OPTIONS["targetos"]=="macosx" and (not override_resources) then
