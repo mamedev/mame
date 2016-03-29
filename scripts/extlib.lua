@@ -92,7 +92,12 @@ function ext_best(lib, default, idx)
 		-- override default if provided (format <libname:includedir>)
 		local x = opt:explode(":")
 		if x[idx]~=nil then
-			found = x[idx]
+			local y = x[idx]:explode(",")
+			if y[1]~=nil then
+				found = y
+			else
+				found = x[idx]
+			end
 		end
 	end
 	return found
