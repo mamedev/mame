@@ -80,6 +80,9 @@ includedirs {
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
 }
+includedirs {
+	ext_includedir("flac"),
+}
 
 files {
 	MAME_DIR .. "src/tools/chdman.cpp",
@@ -209,6 +212,9 @@ includedirs {
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
 }
+includedirs {
+	ext_includedir("flac"),
+}
 
 files {
 	MAME_DIR .. "src/tools/ldresample.cpp",
@@ -251,6 +257,9 @@ includedirs {
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
+}
+includedirs {
+	ext_includedir("flac"),
 }
 
 files {
