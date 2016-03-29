@@ -26,10 +26,10 @@ project "expat"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd111",  			-- remark #111: statement is unreachable
-			"/Qwd1879", 			-- warning #1879: unimplemented pragma ignored
-			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
-			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
+			"/Qwd111",              -- remark #111: statement is unreachable
+			"/Qwd1879",             -- warning #1879: unimplemented pragma ignored
+			"/Qwd2557",             -- remark #2557: comparison between signed and unsigned operands
+			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
 	configuration { "vs2015" }
@@ -76,8 +76,8 @@ project "zlib"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd111",  			-- remark #111: statement is unreachable
-			"/Qwd280",  			-- remark #280: selector expression is constant
+			"/Qwd111",              -- remark #111: statement is unreachable
+			"/Qwd280",              -- remark #280: selector expression is constant
 		}
 end
 	configuration "Debug"
@@ -137,7 +137,7 @@ project "softfloat"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
+			"/Qwd2557",             -- remark #2557: comparison between signed and unsigned operands
 		}
 end
 	configuration { }
@@ -165,7 +165,7 @@ project "jpeg"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
+			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
 
@@ -243,11 +243,11 @@ project "flac"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd111",  			-- remark #111: statement is unreachable
-			"/Qwd177",  			-- remark #177: function "xxx" was declared but never referenced
-			"/Qwd181",  			-- remark #181: argument of type "UINT32={unsigned int}" is incompatible with format "%d", expecting argument of type "int"
-			"/Qwd188",  			-- error #188: enumerated type mixed with another type
-			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
+			"/Qwd111",              -- remark #111: statement is unreachable
+			"/Qwd177",              -- remark #177: function "xxx" was declared but never referenced
+			"/Qwd181",              -- remark #181: argument of type "UINT32={unsigned int}" is incompatible with format "%d", expecting argument of type "int"
+			"/Qwd188",              -- error #188: enumerated type mixed with another type
+			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
 
@@ -330,7 +330,7 @@ project "7z"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
+			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
 	configuration { "vs2015" }
@@ -381,7 +381,7 @@ project "lua"
 	-- In addition comment out the "extern "C""
 	-- in lua.hpp and do the same in luaengine.c line 47
 	--options {
-	--	"ForceCPP",
+	--  "ForceCPP",
 	--}
 
 	configuration { "gmake" }
@@ -524,8 +524,8 @@ project "sqlite3"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
-			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
+			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
+			"/Qwd2557",             -- remark #2557: comparison between signed and unsigned operands
 		}
 end
 	configuration { "pnacl" }
@@ -587,10 +587,10 @@ project "portmidi"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd188",  			-- error #188: enumerated type mixed with another type
-			"/Qwd344",  			-- remark #344: typedef name has already been declared (with same type)
-			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
-			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
+			"/Qwd188",              -- error #188: enumerated type mixed with another type
+			"/Qwd344",              -- remark #344: typedef name has already been declared (with same type)
+			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
+			"/Qwd2557",             -- remark #2557: comparison between signed and unsigned operands
 		}
 end
 
@@ -668,9 +668,9 @@ project "bgfx"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd906",  			-- message #906: effect of this "#pragma pack" directive is local to function "xxx"
-			"/Qwd1879", 			-- warning #1879: unimplemented pragma ignored
-			"/Qwd82",   			-- remark #82: storage class is not first
+			"/Qwd906",              -- message #906: effect of this "#pragma pack" directive is local to function "xxx"
+			"/Qwd1879",             -- warning #1879: unimplemented pragma ignored
+			"/Qwd82",               -- remark #82: storage class is not first
 		}
 end
 	configuration { }
@@ -819,10 +819,10 @@ project "portaudio"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
-			"/Qwd1478", 			-- warning #1478: function "xxx" (declared at line yyy of "zzz") was declared deprecated
-			"/Qwd2544", 			-- message #2544: empty dependent statement in if-statement
-			"/Qwd1879", 			-- warning #1879: unimplemented pragma ignored
+			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
+			"/Qwd1478",             -- warning #1478: function "xxx" (declared at line yyy of "zzz") was declared deprecated
+			"/Qwd2544",             -- message #2544: empty dependent statement in if-statement
+			"/Qwd1879",             -- warning #1879: unimplemented pragma ignored
 		}
 end
 	configuration { "vs2015" }
@@ -1021,7 +1021,7 @@ project "uv"
 			"WIN32_LEAN_AND_MEAN",
 			"_WIN32_WINNT=0x0502",
 		}
-        if _ACTION == "vs2013" then
+		if _ACTION == "vs2013" then
 			files {
 				MAME_DIR .. "3rdparty/libuv/src/win/snprintf.c",
 			}
@@ -1106,7 +1106,7 @@ project "uv"
 			MAME_DIR .. "3rdparty/libuv/src/unix/proctitle.c",
 		}
 	end
-			
+
 	if _OPTIONS["targetos"]=="android" then
 		defines {
 			"_GNU_SOURCE",
@@ -1124,7 +1124,7 @@ project "uv"
 			MAME_DIR .. "3rdparty/libuv/src/unix/android-ifaddrs.c",
 		}
 	end
-			
+
 	if _OPTIONS["targetos"]=="solaris" then
 		defines {
 			"__EXTENSIONS__",
@@ -1177,7 +1177,7 @@ end
 if _OPTIONS["with-bundled-sdl2"] then
 project "SDL2"
 	uuid "caab3327-574f-4abf-b25b-74d5238ae59b"
-if _OPTIONS["targetos"]=="android" then	
+if _OPTIONS["targetos"]=="android" then
 	kind "SharedLib"
 	targetextension ".so"
 	targetprefix "lib"
@@ -1189,8 +1189,8 @@ if _OPTIONS["targetos"]=="android" then
 	linkoptions {
 		"-Wl,-soname,liSDL2.so"
 	}
-	
-	if _OPTIONS["SEPARATE_BIN"]~="1" then 
+
+	if _OPTIONS["SEPARATE_BIN"]~="1" then
 		if _OPTIONS["PLATFORM"]=="arm" then
 			targetdir(MAME_DIR .. "android-project/app/src/main/libs/armeabi-v7a")
 		end
@@ -1209,11 +1209,11 @@ if _OPTIONS["targetos"]=="android" then
 		if _OPTIONS["PLATFORM"]=="x64" then
 			targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86_64")
 		end
-	end	
+	end
 else
 	kind "StaticLib"
-end	
-	
+end
+
 	files {
 		MAME_DIR .. "3rdparty/SDL2/include/begin_code.h",
 		MAME_DIR .. "3rdparty/SDL2/include/close_code.h",
@@ -1287,8 +1287,8 @@ end
 		MAME_DIR .. "3rdparty/SDL2/include/SDL_types.h",
 		MAME_DIR .. "3rdparty/SDL2/include/SDL_version.h",
 		MAME_DIR .. "3rdparty/SDL2/include/SDL_video.h",
-		
-		
+
+
 		MAME_DIR .. "3rdparty/SDL2/src/atomic/SDL_atomic.c",
 		MAME_DIR .. "3rdparty/SDL2/src/atomic/SDL_spinlock.c",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/disk/SDL_diskaudio.c",
@@ -1457,13 +1457,13 @@ end
 			MAME_DIR .. "3rdparty/SDL2/src/render/opengles/SDL_glesfuncs.h",
 		}
 	end
-	
+
 	if _OPTIONS["targetos"]=="android" then
 		files {
 			MAME_DIR .. "3rdparty/SDL2/src/audio/android/SDL_androidaudio.c",
 			MAME_DIR .. "3rdparty/SDL2/src/audio/android/SDL_androidaudio.h",
-			MAME_DIR .. "3rdparty/SDL2/src/core/android/SDL_android.c",	
-			MAME_DIR .. "3rdparty/SDL2/src/core/android/SDL_android.h",	
+			MAME_DIR .. "3rdparty/SDL2/src/core/android/SDL_android.c",
+			MAME_DIR .. "3rdparty/SDL2/src/core/android/SDL_android.h",
 			MAME_DIR .. "3rdparty/SDL2/src/filesystem/android/SDL_sysfilesystem.c",
 			MAME_DIR .. "3rdparty/SDL2/src/haptic/dummy/SDL_syshaptic.c",
 			MAME_DIR .. "3rdparty/SDL2/src/joystick/android/SDL_sysjoystick.c",
@@ -1497,7 +1497,7 @@ end
 			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidwindow.h",
 		}
 	end
-	
+
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
 			MAME_DIR .. "3rdparty/SDL2/src/audio/coreaudio/SDL_coreaudio.c",
@@ -1510,7 +1510,7 @@ end
 			MAME_DIR .. "3rdparty/SDL2/src/joystick/darwin/SDL_sysjoystick.c",
 			MAME_DIR .. "3rdparty/SDL2/src/joystick/darwin/SDL_sysjoystick_c.h",
 			MAME_DIR .. "3rdparty/SDL2/src/loadso/dlopen/SDL_sysloadso.c",
-			MAME_DIR .. "3rdparty/SDL2/src/power/macosx/SDL_syspower.c",			
+			MAME_DIR .. "3rdparty/SDL2/src/power/macosx/SDL_syspower.c",
 			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_syscond.c",
 			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_sysmutex.c",
 			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_sysmutex_c.h",
@@ -1605,25 +1605,25 @@ end
 			MAME_DIR .. "3rdparty/SDL2/src/main/windows/version.rc",
 		}
 	end
-		
+
 	configuration { "vs*" }
 		files {
 			MAME_DIR .. "3rdparty/SDL2/src/audio/xaudio2/SDL_xaudio2.c",
 		}
-	
+
 		buildoptions {
 			"/wd4200", -- warning C4200: nonstandard extension used: zero-sized array in struct/union
 			"/wd4055", -- warning C4055: 'type cast': from data pointer 'void *' to function pointer 'xxx'
 			"/wd4152", -- warning C4152: nonstandard extension, function/data pointer conversion in expression
 			"/wd4057", -- warning C4057: 'function': 'xxx' differs in indirection to slightly different base types from 'xxx'
 			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
-			"/wd4204", -- warning C4204: nonstandard extension used: non-constant aggregate initializer	
+			"/wd4204", -- warning C4204: nonstandard extension used: non-constant aggregate initializer
 			"/wd4054", -- warning C4054: 'type cast': from function pointer 'xxx' to data pointer 'xxx'
 		}
 		defines {
 			"HAVE_LIBC",
 		}
-        
+
 	configuration { "mingw*"}
 		includedirs {
 			MAME_DIR .. "3rdparty/SDL2-override/mingw",
@@ -1635,21 +1635,21 @@ end
 			"-Wno-bad-function-cast",
 			"-Wno-discarded-qualifiers",
 			"-Wno-unused-but-set-variable",
-		}		
+		}
 
 	configuration { "osx*"}
 		buildoptions {
 			"-Wno-undef",
-        }
-    	buildoptions_objc {
-    		"-x objective-c",
-	       	"-std=c99",
-    	}
-        
+		}
+		buildoptions_objc {
+			"-x objective-c",
+			"-std=c99",
+		}
+
 		buildoptions_c {
 			"-Wno-bad-function-cast",
-		}		
-		
+		}
+
 	configuration { "android-*"}
 		defines {
 			"GL_GLEXT_PROTOTYPES",
@@ -1659,8 +1659,8 @@ end
 			"-Wno-incompatible-pointer-types-discards-qualifiers",
 			"-Wno-unneeded-internal-declaration",
 			"-Wno-unused-const-variable",
-		}		
-		
+		}
+
 	configuration { }
 		includedirs {
 			MAME_DIR .. "3rdparty/SDL2/include",

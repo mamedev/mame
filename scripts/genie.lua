@@ -2,8 +2,8 @@
 -- copyright-holders:MAMEdev Team
 
 newoption {
-    trigger = 'build-dir',
-    description = 'Build directory name',
+	trigger = 'build-dir',
+	description = 'Build directory name',
 }
 
 premake.check_paths = true
@@ -32,23 +32,23 @@ function str_to_version(str)
 		val = val + tonumber(word) * cnt
 		cnt = cnt / 100
 	end
-    return val
+	return val
 end
 
 function findfunction(x)
-  assert(type(x) == "string")
-  local f=_G
-  for v in x:gmatch("[^%.]+") do
-    if type(f) ~= "table" then
-       return nil, "looking for '"..v.."' expected table, not "..type(f)
-    end
-    f=f[v]
-  end
-  if type(f) == "function" then
-    return f
-  else
-    return nil, "expected function, not "..type(f)
-  end
+	assert(type(x) == "string")
+	local f=_G
+	for v in x:gmatch("[^%.]+") do
+	if type(f) ~= "table" then
+		return nil, "looking for '"..v.."' expected table, not "..type(f)
+	end
+	f=f[v]
+	end
+	if type(f) == "function" then
+	return f
+	else
+	return nil, "expected function, not "..type(f)
+	end
 end
 
 function layoutbuildtask(_folder, _name)
@@ -57,9 +57,9 @@ function layoutbuildtask(_folder, _name)
 end
 
 function precompiledheaders()
-    configuration { "not xcode4" }
-	   pchheader("emu.h")
-    configuration { }
+	configuration { "not xcode4" }
+		pchheader("emu.h")
+	configuration { }
 end
 
 function addprojectflags()
@@ -101,13 +101,13 @@ newoption {
 	trigger = "targetos",
 	description = "Choose target OS",
 	allowed = {
-		{ "android",  	   "Android" 	            },
+		{ "android",       "Android"                },
 		{ "asmjs",         "Emscripten/asm.js"      },
 		{ "freebsd",       "FreeBSD"                },
 		{ "netbsd",        "NetBSD"                 },
 		{ "openbsd",       "OpenBSD"                },
 		{ "pnacl",         "Native Client - PNaCl"  },
-		{ "linux",     	   "Linux"                  },
+		{ "linux",         "Linux"                  },
 		{ "ios",           "iOS"                    },
 		{ "macosx",        "OSX"                    },
 		{ "windows",       "Windows"                },
@@ -120,15 +120,15 @@ newoption {
 }
 
 newoption {
-    trigger = 'with-bundled-sdl2',
-    description = 'Build bundled SDL2 library',
+	trigger = 'with-bundled-sdl2',
+	description = 'Build bundled SDL2 library',
 }
 
 newoption {
 	trigger = "distro",
 	description = "Choose distribution",
 	allowed = {
-		{ "generic", 		   "generic"         	},
+		{ "generic",           "generic"            },
 		{ "debian-stable",     "debian-stable"      },
 		{ "ubuntu-intrepid",   "ubuntu-intrepid"    },
 	},
@@ -246,7 +246,7 @@ newoption {
 	trigger = "DEPRECATED",
 	description = "Generate deprecation warnings during compilation.",
 	allowed = {
-		{ "0",   "Disabled" 	},
+		{ "0",   "Disabled"     },
 		{ "1",   "Enabled"      },
 	}
 }
@@ -255,7 +255,7 @@ newoption {
 	trigger = "LTO",
 	description = "Clang link time optimization.",
 	allowed = {
-		{ "0",   "Disabled" 	},
+		{ "0",   "Disabled"     },
 		{ "1",   "Enabled"      },
 	}
 }
@@ -264,7 +264,7 @@ newoption {
 	trigger = "SSE2",
 	description = "SSE2 optimized code and SSE2 code generation.",
 	allowed = {
-		{ "0",   "Disabled" 	},
+		{ "0",   "Disabled"     },
 		{ "1",   "Enabled"      },
 	}
 }
@@ -273,7 +273,7 @@ newoption {
 	trigger = "SSE3",
 	description = "SSE3 optimized code and SSE3 code generation.",
 	allowed = {
-		{ "0",   "Disabled" 	},
+		{ "0",   "Disabled"     },
 		{ "1",   "Enabled"      },
 	}
 }
@@ -282,7 +282,7 @@ newoption {
 	trigger = "OPENMP",
 	description = "OpenMP optimized code.",
 	allowed = {
-		{ "0",   "Disabled" 	},
+		{ "0",   "Disabled"     },
 		{ "1",   "Enabled"      },
 	}
 }
@@ -291,7 +291,7 @@ newoption {
 	trigger = "FASTDEBUG",
 	description = "Fast DEBUG.",
 	allowed = {
-		{ "0",   "Disabled" 	},
+		{ "0",   "Disabled"     },
 		{ "1",   "Enabled"      },
 	}
 }
@@ -300,7 +300,7 @@ newoption {
 	trigger = "SEPARATE_BIN",
 	description = "Use separate bin folders.",
 	allowed = {
-		{ "0",   "Disabled" 	},
+		{ "0",   "Disabled"     },
 		{ "1",   "Enabled"      },
 	}
 }
@@ -314,7 +314,7 @@ newoption {
 	trigger = "SHADOW_CHECK",
 	description = "Shadow checks.",
 	allowed = {
-		{ "0",   "Disabled" 	},
+		{ "0",   "Disabled"     },
 		{ "1",   "Enabled"      },
 	}
 }
@@ -323,7 +323,7 @@ newoption {
 	trigger = "STRIP_SYMBOLS",
 	description = "Symbols stripping.",
 	allowed = {
-		{ "0",   "Disabled" 	},
+		{ "0",   "Disabled"     },
 		{ "1",   "Enabled"      },
 	}
 }
@@ -333,7 +333,7 @@ newoption {
 	trigger = "SHLIB",
 	description = "Generate shared libs.",
 	allowed = {
-		{ "0",   "Static libs" 	},
+		{ "0",   "Static libs"  },
 		{ "1",   "Shared libs"  },
 	}
 }
@@ -347,7 +347,7 @@ newoption {
 	trigger = "FORCE_VERSION_COMPILE",
 	description = "Force compiling of version.c file.",
 	allowed = {
-		{ "0",   "Disabled" 	},
+		{ "0",   "Disabled"     },
 		{ "1",   "Enabled"      },
 	}
 }
@@ -361,7 +361,7 @@ newoption {
 	trigger = "USE_LIBUV",
 	description = "Use libuv.",
 	allowed = {
-		{ "0",   "Disabled" 	},
+		{ "0",   "Disabled"     },
 		{ "1",   "Enabled"      },
 	}
 }
@@ -426,15 +426,15 @@ configurations {
 }
 
 if _ACTION == "xcode4" then
-    platforms {
-        "x64",
-    }
+	platforms {
+		"x64",
+	}
 else
-    platforms {
-        "x32",
-        "x64",
-        "Native", -- for targets where bitness is not specified
-    }
+	platforms {
+		"x32",
+		"x64",
+		"Native", -- for targets where bitness is not specified
+	}
 end
 
 language "C++"
@@ -476,7 +476,7 @@ end
 if _OPTIONS["targetos"] == "android" then
 	_OPTIONS["with-bundled-sdl2"] = "1"
 end
-	
+
 configuration {}
 
 msgcompile ("Compiling $(subst ../,,$<)...")
@@ -789,7 +789,7 @@ if _OPTIONS["OPTIMIZE"] then
 -- windows native mingw GCC 5.2 fails with -flto=x with x > 1. bug unfixed as of this commit
 			"-flto=1",
 -- if ld fails, just buy more RAM or uncomment this!
---			"-Wl,-no-keep-memory",
+--          "-Wl,-no-keep-memory",
 			"-Wl,-v",
 -- silence redefine warnings from discrete.c.
 			"-Wl,-allow-multiple-definition",
@@ -801,17 +801,17 @@ if _OPTIONS["OPTIMIZE"] then
 			"-flto-odr-type-merging",
 			"-Wodr",
 			"-flto-compression-level=0", -- lto doesn't work with anything <9 on linux with < 12G RAM, much slower if <> 0
---			"-flto-report", -- if you get an error in lto after [WPA] stage, but before [LTRANS] stage, you need more memory!
---			"-fmem-report-wpa","-fmem-report","-fpre-ipa-mem-report","-fpost-ipa-mem-report","-flto-report-wpa","-fmem-report",
+--          "-flto-report", -- if you get an error in lto after [WPA] stage, but before [LTRANS] stage, you need more memory!
+--          "-fmem-report-wpa","-fmem-report","-fpre-ipa-mem-report","-fpost-ipa-mem-report","-flto-report-wpa","-fmem-report",
 -- this six flag combo lets MAME compile with LTO=1 on linux with no errors and ~2% speed boost, but compile time is much longer
 -- if you are going to wait on lto, you might as well enable these for GCC
---			"-fdevirtualize-at-ltrans","-fgcse-sm","-fgcse-las",
---			"-fipa-pta","-fipa-icf","-fvariable-expansion-in-unroller",
+--          "-fdevirtualize-at-ltrans","-fgcse-sm","-fgcse-las",
+--          "-fipa-pta","-fipa-icf","-fvariable-expansion-in-unroller",
 		}
 -- same flags are needed by linker
 		linkoptions {
 			"-flto=1",
---			"-Wl,-no-keep-memory",
+--          "-Wl,-no-keep-memory",
 			"-Wl,-v",
 			"-Wl,-allow-multiple-definition",
 			"-fuse-linker-plugin",
@@ -819,12 +819,12 @@ if _OPTIONS["OPTIMIZE"] then
 			"-flto-odr-type-merging",
 			"-Wodr",
 			"-flto-compression-level=0", -- lto doesn't work with anything <9 on linux with < 12G RAM, much slower if <> 0
---			"-flto-report", -- if you get an error in lto after [WPA] stage, but before [LTRANS] stage, you need more memory!
---			"-fmem-report-wpa","-fmem-report","-fpre-ipa-mem-report","-fpost-ipa-mem-report","-flto-report-wpa","-fmem-report",
+--          "-flto-report", -- if you get an error in lto after [WPA] stage, but before [LTRANS] stage, you need more memory!
+--          "-fmem-report-wpa","-fmem-report","-fpre-ipa-mem-report","-fpost-ipa-mem-report","-flto-report-wpa","-fmem-report",
 -- this six flag combo lets MAME compile with LTO=1 on linux with no errors and ~2% speed boost, but compile time is much longer
 -- if you are going to wait on lto, you might as well enable these for GCC
---			"-fdevirtualize-at-ltrans","-fgcse-sm","-fgcse-las",
---			"-fipa-pta","-fipa-icf","-fvariable-expansion-in-unroller",
+--          "-fdevirtualize-at-ltrans","-fgcse-sm","-fgcse-las",
+--          "-fipa-pta","-fipa-icf","-fvariable-expansion-in-unroller",
 
 		}
 
@@ -971,7 +971,7 @@ end
 				}
 		end
 	end
-	
+
 if (_OPTIONS["PLATFORM"]=="arm") then
 	buildoptions {
 		"-Wno-cast-align",
@@ -982,7 +982,7 @@ if (_OPTIONS["PLATFORM"]=="arm64") then
 	buildoptions {
 		"-Wno-cast-align",
 	}
-	defines { 
+	defines {
 		"PTR64=1",
 	}
 end
@@ -1029,7 +1029,7 @@ configuration { "android-arm64" }
 	buildoptions {
 		"-Wno-asm-operand-widths",
 	}
-	
+
 configuration { "pnacl" }
 	buildoptions {
 		"-std=gnu89",
@@ -1058,17 +1058,17 @@ configuration { "linux-* or rpi or ci20"}
 configuration { "steamlink" }
 	links {
 		"dl",
-		"EGL",		
+		"EGL",
 		"GLESv2",
- 		"SDL2",
-	}	
+		"SDL2",
+	}
 	defines {
 		"EGL_API_FB",
 	}
 
 configuration { "rpi" }
 	links {
- 		"SDL2",
+		"SDL2",
 		"fontconfig",
 		"X11",
 		"GLESv2",
@@ -1077,17 +1077,17 @@ configuration { "rpi" }
 		"vcos",
 		"vchiq_arm",
 		"pthread",
-	}	
+	}
 
 
 configuration { "ci20" }
 	links {
- 		"SDL2",
+		"SDL2",
 		"asound",
 		"fontconfig",
 		"freetype",
 		"pthread",
-	}	
+	}
 
 
 configuration { "osx* or xcode4" }
@@ -1117,7 +1117,7 @@ configuration { "mingw-clang" }
 		linkoptions {
 			"-pthread",
 		}
-		
+
 
 configuration { "vs*" }
 		defines {
@@ -1141,7 +1141,7 @@ configuration { "vs*" }
 		}
 
 		buildoptions {
-			"/WX",	   -- Treats all compiler warnings as errors.
+			"/WX",     -- Treats all compiler warnings as errors.
 			"/wd4025", -- warning C4025: 'number' : based pointer passed to function with variable arguments: parameter number
 			"/wd4003", -- warning C4003: not enough actual parameters for macro 'xxx'
 			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
@@ -1205,38 +1205,38 @@ configuration { "vs*" }
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd9",    			-- remark #9: nested comment is not allowed
-			"/Qwd82",   			-- remark #82: storage class is not first
-			"/Qwd111",  			-- remark #111: statement is unreachable
-			"/Qwd128",  			-- remark #128: loop is not reachable
-			"/Qwd177",  			-- remark #177: function "xxx" was declared but never referenced
-			"/Qwd181",  			-- remark #181: argument of type "UINT32={unsigned int}" is incompatible with format "%d", expecting argument of type "int"
-			"/Qwd185",  			-- remark #185: dynamic initialization in unreachable code
-			"/Qwd280",  			-- remark #280: selector expression is constant
-			"/Qwd344",  			-- remark #344: typedef name has already been declared (with same type)
-			"/Qwd411",  			-- remark #411: class "xxx" defines no constructor to initialize the following
-			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
-			"/Qwd2545", 			-- remark #2545: empty dependent statement in "else" clause of if - statement
-			"/Qwd2553", 			-- remark #2553: nonstandard second parameter "TCHAR={WCHAR = { __wchar_t } } **" of "main", expected "char *[]" or "char **" extern "C" int _tmain(int argc, TCHAR **argv)
-			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
-			"/Qwd3280", 			-- remark #3280: declaration hides member "attotime::seconds" (declared at line 126) static attotime from_seconds(INT32 seconds) { return attotime(seconds, 0); }
+			"/Qwd9",                -- remark #9: nested comment is not allowed
+			"/Qwd82",               -- remark #82: storage class is not first
+			"/Qwd111",              -- remark #111: statement is unreachable
+			"/Qwd128",              -- remark #128: loop is not reachable
+			"/Qwd177",              -- remark #177: function "xxx" was declared but never referenced
+			"/Qwd181",              -- remark #181: argument of type "UINT32={unsigned int}" is incompatible with format "%d", expecting argument of type "int"
+			"/Qwd185",              -- remark #185: dynamic initialization in unreachable code
+			"/Qwd280",              -- remark #280: selector expression is constant
+			"/Qwd344",              -- remark #344: typedef name has already been declared (with same type)
+			"/Qwd411",              -- remark #411: class "xxx" defines no constructor to initialize the following
+			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
+			"/Qwd2545",             -- remark #2545: empty dependent statement in "else" clause of if - statement
+			"/Qwd2553",             -- remark #2553: nonstandard second parameter "TCHAR={WCHAR = { __wchar_t } } **" of "main", expected "char *[]" or "char **" extern "C" int _tmain(int argc, TCHAR **argv)
+			"/Qwd2557",             -- remark #2557: comparison between signed and unsigned operands
+			"/Qwd3280",             -- remark #3280: declaration hides member "attotime::seconds" (declared at line 126) static attotime from_seconds(INT32 seconds) { return attotime(seconds, 0); }
 
-			"/Qwd170",  			-- error #170: pointer points outside of underlying object
-			"/Qwd188",  			-- error #188: enumerated type mixed with another type
+			"/Qwd170",              -- error #170: pointer points outside of underlying object
+			"/Qwd188",              -- error #188: enumerated type mixed with another type
 
-			"/Qwd63",   			-- warning #63: shift count is too large
-			"/Qwd177",  			-- warning #177: label "xxx" was declared but never referenced
-			"/Qwd186",  			-- warning #186: pointless comparison of unsigned integer with zero
-			"/Qwd488",  			-- warning #488: template parameter "_FunctionClass" is not used in declaring the parameter types of function template "device_delegate<_Signature>::device_delegate<_FunctionClass>(delegate<_Signature>:
-			"/Qwd1478", 			-- warning #1478: function "xxx" (declared at line yyy of "zzz") was declared deprecated
-			"/Qwd1879", 			-- warning #1879: unimplemented pragma ignored
-			"/Qwd3291", 			-- warning #3291: invalid narrowing conversion from "double" to "int"
-			"/Qwd1195", 			-- error #1195: conversion from integer to smaller pointer
-			"/Qwd47",			-- error #47: incompatible redefinition of macro "xxx"
-			"/Qwd265",			-- error #265: floating-point operation result is out of range
+			"/Qwd63",               -- warning #63: shift count is too large
+			"/Qwd177",              -- warning #177: label "xxx" was declared but never referenced
+			"/Qwd186",              -- warning #186: pointless comparison of unsigned integer with zero
+			"/Qwd488",              -- warning #488: template parameter "_FunctionClass" is not used in declaring the parameter types of function template "device_delegate<_Signature>::device_delegate<_FunctionClass>(delegate<_Signature>:
+			"/Qwd1478",             -- warning #1478: function "xxx" (declared at line yyy of "zzz") was declared deprecated
+			"/Qwd1879",             -- warning #1879: unimplemented pragma ignored
+			"/Qwd3291",             -- warning #3291: invalid narrowing conversion from "double" to "int"
+			"/Qwd1195",             -- error #1195: conversion from integer to smaller pointer
+			"/Qwd47",               -- error #47: incompatible redefinition of macro "xxx"
+			"/Qwd265",              -- error #265: floating-point operation result is out of range
 			-- these occur on a release build, while we can increase the size limits instead some of the files do require extreme amounts
-			"/Qwd11074",			-- remark #11074: Inlining inhibited by limit max-size  / remark #11074: Inlining inhibited by limit max-total-size
-			"/Qwd11075",			-- remark #11075: To get full report use -Qopt-report:4 -Qopt-report-phase ipo
+			"/Qwd11074",            -- remark #11074: Inlining inhibited by limit max-size  / remark #11074: Inlining inhibited by limit max-total-size
+			"/Qwd11075",            -- remark #11075: To get full report use -Qopt-report:4 -Qopt-report-phase ipo
 		}
 end
 
@@ -1248,7 +1248,7 @@ end
 		}
 configuration { "vs2015" }
 		buildoptions {
-			"/wd4334", -- warning C4334: '<<': result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?) 
+			"/wd4334", -- warning C4334: '<<': result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
 			"/wd4458", -- warning C4458: declaration of 'xxx' hides class member
@@ -1308,7 +1308,7 @@ findfunction("createProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarg
 
 group "emulator"
 dofile(path.join("src", "main.lua"))
-if (_OPTIONS["SOURCES"] == nil) then 
+if (_OPTIONS["SOURCES"] == nil) then
 	if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
 		startproject (_OPTIONS["target"])
 	else
@@ -1320,7 +1320,7 @@ if (_OPTIONS["SOURCES"] == nil) then
 	end
 else
 	startproject (_OPTIONS["subtarget"])
-end 
+end
 mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 strip()
 

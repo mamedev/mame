@@ -280,7 +280,7 @@ files {
 	MAME_DIR .. "src/emu/ui/starimg.h",
 	MAME_DIR .. "src/emu/ui/toolbar.h",
 	MAME_DIR .. "src/emu/ui/utils.cpp",
-	MAME_DIR .. "src/emu/ui/utils.h",	
+	MAME_DIR .. "src/emu/ui/utils.h",
 	MAME_DIR .. "src/emu/validity.cpp",
 	MAME_DIR .. "src/emu/validity.h",
 	MAME_DIR .. "src/emu/video.cpp",

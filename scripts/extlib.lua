@@ -19,48 +19,48 @@ local extlibs = {
 
 -- system lib options
 newoption {
-    trigger = 'with-system-expat',
-    description = 'Use system Expat library',
+	trigger = 'with-system-expat',
+	description = 'Use system Expat library',
 }
 
 newoption {
-    trigger = 'with-system-zlib',
-    description = 'Use system Zlib library',
+	trigger = 'with-system-zlib',
+	description = 'Use system Zlib library',
 }
 
 newoption {
-    trigger = 'with-system-jpeg',
-    description = 'Use system JPEG library',
+	trigger = 'with-system-jpeg',
+	description = 'Use system JPEG library',
 }
 
 newoption {
-    trigger = 'with-system-flac',
-    description = 'Use system FLAC library',
+	trigger = 'with-system-flac',
+	description = 'Use system FLAC library',
 }
 
 newoption {
-    trigger = 'with-system-sqlite3',
-    description = 'Use system SQLite library',
+	trigger = 'with-system-sqlite3',
+	description = 'Use system SQLite library',
 }
 
 newoption {
-    trigger = 'with-system-portmidi',
-    description = 'Use system PortMidi library',
+	trigger = 'with-system-portmidi',
+	description = 'Use system PortMidi library',
 }
 
 newoption {
-    trigger = 'with-system-portaudio',
-    description = 'Use system PortAudio library',
+	trigger = 'with-system-portaudio',
+	description = 'Use system PortAudio library',
 }
 
 newoption {
-    trigger = "with-system-lua",
-    description = "Use system LUA library",
+	trigger = "with-system-lua",
+	description = "Use system LUA library",
 }
 
 newoption {
-    trigger = 'with-system-uv',
-    description = 'Use system uv library',
+	trigger = 'with-system-uv',
+	description = 'Use system uv library',
 }
 
 -- build helpers

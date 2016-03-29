@@ -25,7 +25,7 @@ project "gtest"
 	configuration { "vs*" }
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd1195", 			-- error #1195: conversion from integer to smaller pointer
+			"/Qwd1195",             -- error #1195: conversion from integer to smaller pointer
 		}
 end
 
@@ -42,13 +42,13 @@ end
 
 project("mametests")
 	uuid ("66d4c639-196b-4065-a411-7ee9266564f5")
-	kind "ConsoleApp"	
+	kind "ConsoleApp"
 
 	flags {
-		"Symbols", -- always include minimum symbols for executables 	
+		"Symbols", -- always include minimum symbols for executables
 	}
 
-	if _OPTIONS["SEPARATE_BIN"]~="1" then 
+	if _OPTIONS["SEPARATE_BIN"]~="1" then
 		targetdir(MAME_DIR)
 	end
 
