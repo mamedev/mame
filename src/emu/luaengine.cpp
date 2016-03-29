@@ -10,7 +10,7 @@
 
 #include <limits>
 #include <thread>
-#include "lua.hpp"
+#include <lua.hpp>
 #include "luabridge/Source/LuaBridge/LuaBridge.h"
 #include <signal.h>
 #include "emu.h"

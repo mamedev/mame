@@ -192,53 +192,29 @@ if #disasm_files > 0 then
 end
 	links {
 		"utils",
-		"expat",
+		ext_lib("expat"),
 		"softfloat",
-		"jpeg",
+		ext_lib("jpeg"),
 		"7z",
-		"lua",
+		ext_lib("lua"),
 		"lualibs",
 	}
 
 	if _OPTIONS["USE_LIBUV"]=="1" then
 		links {		
-			"uv",
+			ext_lib("uv"),
 			"http-parser",
 		}
 	end
-	if _OPTIONS["with-bundled-zlib"] then
-		links {
-			"zlib",
-		}
-	else
-		links {
-			"z",
-		}
-	end
-
-	if _OPTIONS["with-bundled-flac"] then
-		links {
-			"flac",
-		}
-	else
-		links {
-			"FLAC",
-		}
-	end
-
-	if _OPTIONS["with-bundled-sqlite3"] then
-		links {
-			"sqllite3",
-		}
-	else
-		links {
-			"sqlite3",
-		}
-	end
+	links {
+		ext_lib("zlib"),
+		ext_lib("flac"),
+		ext_lib("sqlite3"),
+	}
 
 	if _OPTIONS["NO_USE_MIDI"]~="1" then
 		links {
-			"portmidi",
+			ext_lib("portmidi"),
 		}
 	end
 	links {
@@ -260,13 +236,8 @@ end
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. _target .. "/layout",
 		GEN_DIR  .. "resource",
+		ext_includedir("zlib"),
 	}
-
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end
 
 	if _OPTIONS["targetos"]=="macosx" and (not override_resources) then
 		linkoptions {

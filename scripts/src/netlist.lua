@@ -19,13 +19,8 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist",
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/lib/util",
+	--      ext_includedir("expat"),
 	}
-	--	if _OPTIONS["with-bundled-expat"] then
-	--	includedirs {
-	--		MAME_DIR .. "3rdparty/expat/lib",
-	--	}
-	--end
-
 
 	files {
 		MAME_DIR .. "src/lib/netlist/nl_config.h",

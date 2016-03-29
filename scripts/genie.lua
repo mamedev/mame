@@ -120,53 +120,8 @@ newoption {
 }
 
 newoption {
-    trigger = 'with-bundled-expat',
-    description = 'Build bundled Expat library',
-}
-
-newoption {
-    trigger = 'with-bundled-zlib',
-    description = 'Build bundled Zlib library',
-}
-
-newoption {
-    trigger = 'with-bundled-jpeg',
-    description = 'Build bundled JPEG library',
-}
-
-newoption {
-    trigger = 'with-bundled-flac',
-    description = 'Build bundled FLAC library',
-}
-
-newoption {
-    trigger = 'with-bundled-lua',
-    description = 'Build bundled LUA library',
-}
-
-newoption {
-    trigger = 'with-bundled-sqlite3',
-    description = 'Build bundled SQLite library',
-}
-
-newoption {
-    trigger = 'with-bundled-portmidi',
-    description = 'Build bundled PortMidi library',
-}
-
-newoption {
-    trigger = 'with-bundled-portaudio',
-    description = 'Build bundled PortAudio library',
-}
-
-newoption {
     trigger = 'with-bundled-sdl2',
     description = 'Build bundled SDL2 library',
-}
-
-newoption {
-    trigger = 'with-bundled-libuv',
-    description = 'Build bundled libuv library',
 }
 
 newoption {
@@ -410,6 +365,8 @@ newoption {
 		{ "1",   "Enabled"      },
 	}
 }
+
+dofile ("extlib.lua")
 
 if _OPTIONS["SHLIB"]=="1" then
 	LIBTYPE = "SharedLib"
@@ -665,30 +622,17 @@ else
 	end
 end
 
--- need to ensure FLAC functions are statically linked
-if _OPTIONS["with-bundled-flac"] then
+if _OPTIONS["with-system-jpeg"]~=nil then
+	defines {
+		"XMD_H",
+	}
+end
+
+if _OPTIONS["with-system-flac"]~=nil then
 	defines {
 		"FLAC__NO_DLL",
 	}
-	end
-
-if not _OPTIONS["with-bundled-jpeg"] then
-	defines {
-		"USE_SYSTEM_JPEGLIB",
-	}
-	end
-
-if not _OPTIONS["with-bundled-portmidi"] then
-	defines {
-		"USE_SYSTEM_PORTMIDI",
-	}
-	end
-
-if not _OPTIONS["with-bundled-sqlite3"] then
-	defines {
-		"USE_SYSTEM_SQLITE",
-	}
-	end
+end
 
 if _OPTIONS["NOASM"]=="1" then
 	defines {
@@ -709,11 +653,6 @@ if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
 		configuration {  }
 	end
 end
-
--- define USE_SYSTEM_JPEGLIB if library shipped with MAME is not used
---ifneq ($(BUILD_JPEGLIB),1)
---DEFS += -DUSE_SYSTEM_JPEGLIB
---endif
 
 	defines {
 		"LUA_COMPAT_ALL",

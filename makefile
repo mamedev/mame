@@ -376,36 +376,36 @@ endif
 # which 3rdparty library to build;
 #  link against system (common) library otherwise
 #-------------------------------------------------
-ifndef USE_SYSTEM_LIB_EXPAT
-PARAMS += --with-bundled-expat
+ifdef USE_SYSTEM_LIB_EXPAT
+PARAMS += --with-system-expat='$(USE_SYSTEM_LIB_EXPAT)'
 endif
 
-ifndef USE_SYSTEM_LIB_ZLIB
-PARAMS += --with-bundled-zlib
+ifdef USE_SYSTEM_LIB_ZLIB
+PARAMS += --with-system-zlib='$(USE_SYSTEM_LIB_ZLIB)'
 endif
 
-ifndef USE_SYSTEM_LIB_JPEG
-PARAMS += --with-bundled-jpeg
+ifdef USE_SYSTEM_LIB_JPEG
+PARAMS += --with-system-jpeg='$(USE_SYSTEM_LIB_JPEG)'
 endif
 
-ifndef USE_SYSTEM_LIB_FLAC
-PARAMS += --with-bundled-flac
+ifdef USE_SYSTEM_LIB_FLAC
+PARAMS += --with-system-flac='$(USE_SYSTEM_LIB_FLAC)'
 endif
 
-ifndef USE_SYSTEM_LIB_LUA
-PARAMS += --with-bundled-lua
+ifdef USE_SYSTEM_LIB_LUA
+PARAMS += --with-system-lua='$(USE_SYSTEM_LIB_LUA)'
 endif
 
-ifndef USE_SYSTEM_LIB_SQLITE3
-PARAMS += --with-bundled-sqlite3
+ifdef USE_SYSTEM_LIB_SQLITE3
+PARAMS += --with-system-sqlite3='$(USE_SYSTEM_LIB_SQLITE3)'
 endif
 
-ifndef USE_SYSTEM_LIB_PORTMIDI
-PARAMS += --with-bundled-portmidi
+ifdef USE_SYSTEM_LIB_PORTMIDI
+PARAMS += --with-system-portmidi='$(USE_SYSTEM_LIB_PORTMIDI)'
 endif
 
-ifndef USE_SYSTEM_LIB_PORTAUDIO
-PARAMS += --with-bundled-portaudio
+ifdef USE_SYSTEM_LIB_PORTAUDIO
+PARAMS += --with-system-portaudio='$(USE_SYSTEM_LIB_PORTAUDIO)'
 endif
 
 # reverse logic for this one
@@ -414,8 +414,8 @@ ifdef USE_BUNDLED_LIB_SDL2
 PARAMS += --with-bundled-sdl2
 endif
 
-ifndef USE_SYSTEM_LIB_UV
-PARAMS += --with-bundled-libuv
+ifdef USE_SYSTEM_LIB_UV
+PARAMS += --with-system-uv='$(USE_SYSTEM_LIB_UV)'
 endif
 
 #-------------------------------------------------

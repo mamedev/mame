@@ -30,16 +30,12 @@ includedirs {
 	GEN_DIR  .. "emu",
 	GEN_DIR  .. "emu/layout",
 }
-if _OPTIONS["with-bundled-expat"] then
-	includedirs {
-		MAME_DIR .. "3rdparty/expat/lib",
-	}
-end
-if _OPTIONS["with-bundled-lua"] then
-	includedirs {
-		MAME_DIR .. "3rdparty/lua/src",
-	}
-end
+
+includedirs {
+	ext_includedir("expat"),
+	ext_includedir("lua"),
+	ext_includedir("flac"),
+}
 
 if (_OPTIONS["targetos"] == "windows" and _OPTIONS["osd"] ~= "osdmini") then
 	defines {
