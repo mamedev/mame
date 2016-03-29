@@ -496,6 +496,7 @@ project "lualibs"
 	includedirs {
 		ext_includedir("lua"),
 		ext_includedir("zlib"),
+		ext_includedir("sqlite3"),
 	}
 
 	files {
