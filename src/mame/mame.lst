@@ -32642,6 +32642,9 @@ shougi2                         // (c) 1982 (Arcade TV Game List - P.80, Left, 1
 @source:shtzone.cpp
 shtzone                         // (c) 1987
 
+@source:sms_bootleg.cpp
+smssgame
+
 @source:shuuz.cpp
 shuuz                           // 136083           (c) 1990
 shuuz2                          // 136083           (c) 1990

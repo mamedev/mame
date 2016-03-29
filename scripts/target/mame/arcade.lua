@@ -632,8 +632,8 @@ BUSES["RS232"] = true
 BUSES["SCSI"] = true
 --BUSES["SCV"] = true
 --BUSES["SEGA8"] = true
---BUSES["SMS_CTRL"] = true
---BUSES["SMS_EXP"] = true
+BUSES["SMS_CTRL"] = true
+BUSES["SMS_EXP"] = true
 --BUSES["SNES"] = true
 --BUSES["SPC1000"] = true
 --BUSES["TI99PEB"] = true
@@ -3062,6 +3062,10 @@ files {
 	MAME_DIR .. "src/mame/drivers/puckpkmn.cpp",
 	MAME_DIR .. "src/mame/drivers/segac2.cpp",
 	MAME_DIR .. "src/mame/drivers/segae.cpp",
+	MAME_DIR .. "src/mame/drivers/sms.cpp",
+	MAME_DIR .. "src/mame/includes/sms.h",
+	MAME_DIR .. "src/mame/machine/sms.cpp",
+	MAME_DIR .. "src/mame/drivers/sms_bootleg.cpp",
 	MAME_DIR .. "src/mame/drivers/shtzone.cpp",
 	MAME_DIR .. "src/mame/drivers/segacoin.cpp",
 	MAME_DIR .. "src/mame/drivers/segag80r.cpp",
