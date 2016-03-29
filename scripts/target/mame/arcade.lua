@@ -783,6 +783,10 @@ function createMAMEProjects(_target, _subtarget, _name)
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. "mame/layout",
 	}
+	includedirs {
+		ext_includedir("flac"),
+	}
+	
 end
 
 function createProjects_mame_arcade(_target, _subtarget)
