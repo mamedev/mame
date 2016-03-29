@@ -80,7 +80,7 @@ function ext_includedir(lib)
 		-- using bundled, prepend MAME_DIR
 		default = MAME_DIR .. extlibs[lib][2]
 	else
-		default = "/usr/include/" .. lib
+		default = ""
 	end
 	return ext_best(lib, default, 2)
 end
