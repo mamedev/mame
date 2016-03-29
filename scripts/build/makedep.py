@@ -236,6 +236,7 @@ if sys.argv[3]=='target':
     sys.stdout.write('        MAME_DIR .. "src/lib/util",\n')
     sys.stdout.write('        MAME_DIR .. "src/lib/netlist",\n')
     sys.stdout.write('        MAME_DIR .. "3rdparty",\n')
+    sys.stdout.write('        GEN_DIR  .. "mame/layout",\n')
     sys.stdout.write('        ext_includedir("zlib"),\n')
     sys.stdout.write('        ext_includedir("flac"),\n')
     sys.stdout.write('    }\n')
