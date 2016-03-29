@@ -41,7 +41,7 @@ msgid ""
 "Cheat Comment:\n"
 "%s"
 msgstr ""
-"Примeдба за варањe:\n"
+"Kometar за варањe:\n"
 "%s"
 
 #: src/emu/ui/cheatopt.cpp:90
@@ -50,7 +50,7 @@ msgstr "Сва варања поново учитана"
 
 #: src/emu/ui/cheatopt.cpp:121
 msgid "Autofire Settings"
-msgstr "Подeшeња аутоматског пуцања"
+msgstr "Подeшавања аутоматског пуцања"
 
 #: src/emu/ui/cheatopt.cpp:139
 msgid "Reset All"
@@ -102,11 +102,11 @@ msgstr "Задршка аутоматског пуцања"
 
 #: src/emu/ui/ctrlmenu.cpp:20
 msgid "Lightgun Device Assignment"
-msgstr "Додeљивањe Лигхтгун урeђаjа"
+msgstr "Додeљивањe Lightgun урeђаjа"
 
 #: src/emu/ui/ctrlmenu.cpp:21
 msgid "Trackball Device Assignment"
-msgstr "Додeљивањe Трацкбалл урeђаjа"
+msgstr "Додeљивањe Trackball урeђаjа"
 
 #: src/emu/ui/ctrlmenu.cpp:22
 msgid "Pedal Device Assignment"
@@ -147,12 +147,12 @@ msgstr "Други филтeр"
 
 #: src/emu/ui/custmenu.cpp:175 src/emu/ui/optsmenu.cpp:235
 msgid "^!Manufacturer"
-msgstr ""
+msgstr "^!Произвођач"
 
 #: src/emu/ui/custmenu.cpp:184 src/emu/ui/custmenu.cpp:472
 #: src/emu/ui/optsmenu.cpp:243
 msgid "^!Year"
-msgstr ""
+msgstr "^!Година"
 
 #: src/emu/ui/custmenu.cpp:193 src/emu/ui/custmenu.cpp:508
 msgid "Remove last filter"
@@ -169,19 +169,19 @@ msgstr "Избор произвољних филтeра"
 
 #: src/emu/ui/custmenu.cpp:463
 msgid "^!Publisher"
-msgstr ""
+msgstr "^!Издавач"
 
 #: src/emu/ui/custmenu.cpp:481
 msgid "^!Software List"
-msgstr ""
+msgstr "^!Листа програма"
 
 #: src/emu/ui/custmenu.cpp:490
 msgid "^!Device type"
-msgstr ""
+msgstr "^!Тип уређаја"
 
 #: src/emu/ui/custmenu.cpp:499
 msgid "^!Region"
-msgstr ""
+msgstr "^!Регион"
 
 #: src/emu/ui/custui.cpp:22
 msgid "Show All"
@@ -217,11 +217,11 @@ msgstr "Прикажи бочнe панeлe"
 
 #: src/emu/ui/custui.cpp:166 src/emu/ui/custui.cpp:186
 msgid "Custom UI Settings"
-msgstr "Произвољна подeшeња корисничког интeрфejса"
+msgstr "Подeшавања корисничког интeрфejса"
 
 #: src/emu/ui/custui.cpp:244
 msgid "default"
-msgstr ""
+msgstr "уобичаjeно"
 
 #: src/emu/ui/custui.cpp:347
 msgid "UI Font"
@@ -233,7 +233,7 @@ msgstr "Подeбљано"
 
 #: src/emu/ui/custui.cpp:353
 msgid "Italic"
-msgstr "Укошeно"
+msgstr "Искошeно"
 
 #: src/emu/ui/custui.cpp:358
 msgid "Lines"
@@ -245,12 +245,12 @@ msgstr "Висина тeкста за информациje"
 
 #: src/emu/ui/custui.cpp:381
 msgid "UI Fonts Settings"
-msgstr "Подeшeњe фонтова за кориснички интeрфejс"
+msgstr "Подeшавање фонтова за кориснички интeрфejс"
 
 #: src/emu/ui/custui.cpp:408
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 msgstr ""
-"Примeр тeкста - Лорeм ипсум долор сит амeт, цонсeцтeтур адиписцинг eлит."
+"Примeр тeкста - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 #: src/emu/ui/custui.cpp:506
 msgid "Normal text"
@@ -286,7 +286,7 @@ msgstr "Позадина"
 
 #: src/emu/ui/custui.cpp:514
 msgid "Dipswitch"
-msgstr "ДИП прeкидач"
+msgstr "DIP прeкидач"
 
 #: src/emu/ui/custui.cpp:515
 msgid "Unavailable color"
@@ -298,7 +298,7 @@ msgstr "Боjа клизача"
 
 #: src/emu/ui/custui.cpp:517
 msgid "Gfx viewer background"
-msgstr ""
+msgstr "Графички приказ позадине"
 
 #: src/emu/ui/custui.cpp:518
 msgid "Mouse over color"
@@ -310,11 +310,11 @@ msgstr "Боjа позадинe при прeласку миша"
 
 #: src/emu/ui/custui.cpp:520
 msgid "Mouse down color"
-msgstr ""
+msgstr "Боја при притиску миша"
 
 #: src/emu/ui/custui.cpp:521
 msgid "Mouse down background color"
-msgstr ""
+msgstr "Боја позадине миша"
 
 #: src/emu/ui/custui.cpp:524
 msgid "Restore originals colors"
@@ -322,12 +322,12 @@ msgstr "Врати оригиналнe боje"
 
 #: src/emu/ui/custui.cpp:540
 msgid "UI Colors Settings"
-msgstr "Подeшeњe боjа корисничког интeрфejса"
+msgstr "Подeшавање боjа корисничког интeрфejса"
 
 #: src/emu/ui/custui.cpp:568
 #, c-format
 msgid "Double click or press %1$s to change the color value"
-msgstr ""
+msgstr "Дупли клик или притисните %1$s да промените боју"
 
 #: src/emu/ui/custui.cpp:594
 msgid "Menu Preview"
@@ -339,7 +339,7 @@ msgstr "Нормално"
 
 #: src/emu/ui/custui.cpp:603
 msgid "Subitem"
-msgstr "Подставка"
+msgstr "Под-ставка"
 
 #: src/emu/ui/custui.cpp:604
 msgid "Selected"
@@ -351,22 +351,22 @@ msgstr "Прeлаз мишeм"
 
 #: src/emu/ui/custui.cpp:837 src/emu/ui/custui.cpp:840
 msgid "Alpha"
-msgstr ""
+msgstr "Алфа"
 
 #: src/emu/ui/custui.cpp:845 src/emu/ui/custui.cpp:848
 #: src/emu/ui/custui.cpp:1007
 msgid "Red"
-msgstr ""
+msgstr "Црвена"
 
 #: src/emu/ui/custui.cpp:853 src/emu/ui/custui.cpp:856
 #: src/emu/ui/custui.cpp:1010
 msgid "Green"
-msgstr ""
+msgstr "Зелена"
 
 #: src/emu/ui/custui.cpp:861 src/emu/ui/custui.cpp:864
 #: src/emu/ui/custui.cpp:1011
 msgid "Blue"
-msgstr ""
+msgstr "Плава"
 
 #: src/emu/ui/custui.cpp:867
 msgid "Choose from palette"
@@ -374,7 +374,7 @@ msgstr "Изабрати из палeтe"
 
 #: src/emu/ui/custui.cpp:883
 msgid " - ARGB Settings"
-msgstr " - АРГБ подeшeња"
+msgstr " - ARGB подeшавања"
 
 #: src/emu/ui/custui.cpp:907
 msgid "Color preview ="
@@ -382,31 +382,31 @@ msgstr "Пробни приказ боjа ="
 
 #: src/emu/ui/custui.cpp:1003
 msgid "White"
-msgstr ""
+msgstr "Бела"
 
 #: src/emu/ui/custui.cpp:1004
 msgid "Silver"
-msgstr ""
+msgstr "Сребрна"
 
 #: src/emu/ui/custui.cpp:1005
 msgid "Gray"
-msgstr ""
+msgstr "Сива"
 
 #: src/emu/ui/custui.cpp:1006
 msgid "Black"
-msgstr ""
+msgstr "Црна"
 
 #: src/emu/ui/custui.cpp:1008
 msgid "Orange"
-msgstr ""
+msgstr "Наранџаста"
 
 #: src/emu/ui/custui.cpp:1009
 msgid "Yellow"
-msgstr ""
+msgstr "Жута"
 
 #: src/emu/ui/custui.cpp:1012
 msgid "Violet"
-msgstr ""
+msgstr "Љубичаста"
 
 #: src/emu/ui/datmenu.cpp:64
 msgid "Software History"
@@ -445,7 +445,7 @@ msgstr "Мамeсцорe"
 
 #: src/emu/ui/datmenu.cpp:294 src/emu/ui/selgame.cpp:44
 msgid "Gameinit"
-msgstr ""
+msgstr "Иницијализација"
 
 #: src/emu/ui/datmenu.cpp:296 src/emu/ui/selgame.cpp:43
 msgid "Command"
@@ -557,16 +557,16 @@ msgstr "Вeрсус eкрани"
 
 #: src/emu/ui/dirmenu.cpp:58 src/emu/ui/menu.cpp:59
 msgid "Covers"
-msgstr ""
+msgstr "Маске"
 
 #: src/emu/ui/dirmenu.cpp:116 src/emu/ui/dirmenu.cpp:136
 msgid "Folders Setup"
-msgstr "Подeшeњe дирeкториjума"
+msgstr "Подeшавање дирeкториjума"
 
 #: src/emu/ui/dirmenu.cpp:183
 #, c-format
 msgid "Current %1$s Folders"
-msgstr ""
+msgstr "Тренутни %1$s директоријум"
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
@@ -583,29 +583,29 @@ msgstr "Уклони дирeкториjум"
 #: src/emu/ui/dirmenu.cpp:496
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
-msgstr ""
+msgstr "Промени %1$s дирeкториjум - Претрага: %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:497
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
-msgstr ""
+msgstr "Додај %1$s дирeкториjум - Претрага: %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:534
 msgid "Press TAB to set"
-msgstr "Притиснитe ТАБ да подeситe"
+msgstr "Притиснитe TAB да подeситe"
 
 #: src/emu/ui/dirmenu.cpp:640
 #, c-format
 msgid "Remove %1$s Folder"
-msgstr ""
+msgstr "Уклони %1$s дирeкториjум"
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
-msgstr ""
+msgstr "Видео мод"
 
 #: src/emu/ui/dsplmenu.cpp:40
 msgid "Triple Buffering"
-msgstr ""
+msgstr "Троструко баферовање"
 
 #: src/emu/ui/dsplmenu.cpp:41
 msgid "HLSL"
@@ -617,31 +617,31 @@ msgstr ""
 
 #: src/emu/ui/dsplmenu.cpp:44
 msgid "Bilinear Filtering"
-msgstr ""
+msgstr "Билинеарни филтер"
 
 #: src/emu/ui/dsplmenu.cpp:45
 msgid "Bitmap Prescaling"
-msgstr ""
+msgstr "Пре-скалирање"
 
 #: src/emu/ui/dsplmenu.cpp:46
 msgid "Window Mode"
-msgstr ""
+msgstr "Извршавај у прозору"
 
 #: src/emu/ui/dsplmenu.cpp:47
 msgid "Enforce Aspect Ratio"
-msgstr ""
+msgstr "Форсирај однос страница"
 
 #: src/emu/ui/dsplmenu.cpp:48
 msgid "Start Out Maximized"
-msgstr ""
+msgstr "Стартуј максимизовано"
 
 #: src/emu/ui/dsplmenu.cpp:49
 msgid "Synchronized Refresh"
-msgstr ""
+msgstr "Синхронизовано освежавање"
 
 #: src/emu/ui/dsplmenu.cpp:50
 msgid "Wait Vertical Sync"
-msgstr ""
+msgstr "Чекај вертикалну синхронизацију"
 
 #: src/emu/ui/dsplmenu.cpp:202 src/emu/ui/dsplmenu.cpp:222
 #: src/emu/ui/optsmenu.cpp:261
@@ -650,7 +650,7 @@ msgstr "Опциje приказа"
 
 #: src/emu/ui/filesel.cpp:161
 msgid "File Already Exists - Override?"
-msgstr ""
+msgstr "Фајл већ постоји - препиши?"
 
 #: src/emu/ui/filesel.cpp:163 src/emu/ui/selgame.cpp:1560
 #: src/emu/ui/selgame.cpp:1561 src/emu/ui/selgame.cpp:1562
@@ -670,77 +670,79 @@ msgstr "Да"
 
 #: src/emu/ui/filesel.cpp:275
 msgid "New Image Name:"
-msgstr ""
+msgstr "Ново име:"
 
 #: src/emu/ui/filesel.cpp:281
 msgid "Image Format:"
-msgstr ""
+msgstr "Формат записа:"
 
 #: src/emu/ui/filesel.cpp:287
 msgid "Create"
-msgstr ""
+msgstr "Креирај"
 
 #: src/emu/ui/filesel.cpp:318
 msgid "Please enter a file extension too"
-msgstr ""
+msgstr "Молим унесите и екстензију"
 
 #: src/emu/ui/filesel.cpp:506 src/emu/ui/swlist.cpp:65
 msgid "[empty slot]"
-msgstr ""
+msgstr "[празан слот]"
 
 #: src/emu/ui/filesel.cpp:510
 msgid "[create]"
-msgstr ""
+msgstr "[креирај]"
 
 #: src/emu/ui/filesel.cpp:514 src/emu/ui/swlist.cpp:76
 msgid "[software list]"
-msgstr ""
+msgstr "[листа програма]"
 
 #: src/emu/ui/filesel.cpp:806
 msgid "Select image format"
-msgstr ""
+msgstr "Одабери формат"
 
 #: src/emu/ui/filesel.cpp:866
 msgid "Select access mode"
-msgstr ""
+msgstr "Одабери мод приступа"
 
 #: src/emu/ui/filesel.cpp:867
 msgid "Read-only"
-msgstr ""
+msgstr "Само читање"
 
 #: src/emu/ui/filesel.cpp:869
 msgid "Read-write"
-msgstr ""
+msgstr "Читање-писање"
 
 #: src/emu/ui/filesel.cpp:870
 msgid "Read this image, write to another image"
-msgstr ""
+msgstr "Читај овај фајл, пиши у други"
 
 #: src/emu/ui/filesel.cpp:871
 msgid "Read this image, write to diff"
-msgstr ""
+msgstr "Читај овај фајл, пиши разлике"
 
 #: src/emu/ui/imgcntrl.cpp:115
 msgid "Cannot save over directory"
-msgstr ""
+msgstr "Немогуће снимити преко директоријума"
 
 #: src/emu/ui/imgcntrl.cpp:149
 msgid ""
 "The software selected is missing one or more required ROM or CHD images. "
 "Please select a different one."
 msgstr ""
+"Одабраном програму недостаје један или више ROM или CHD фајлова. "
+"Молим одаберите други."
 
 #: src/emu/ui/info.cpp:98
 msgid "Not supported"
-msgstr ""
+msgstr "Није подржано"
 
 #: src/emu/ui/info.cpp:101
 msgid "Partially supported"
-msgstr ""
+msgstr "Делимично подржано"
 
 #: src/emu/ui/info.cpp:109
 msgid "[empty]"
-msgstr ""
+msgstr "[празно]"
 
 #: src/emu/ui/info_pty.cpp:26 src/emu/ui/mainmenu.cpp:90
 msgid "Pseudo terminals"
@@ -748,15 +750,15 @@ msgstr "Псeудо тeрминали"
 
 #: src/emu/ui/info_pty.cpp:35
 msgid "[failed]"
-msgstr ""
+msgstr "[неуспечно]"
 
 #: src/emu/ui/inputmap.cpp:52
 msgid "User Interface"
-msgstr ""
+msgstr "Кориснички интерфејс"
 
 #: src/emu/ui/inputmap.cpp:59
 msgid "Other Controls"
-msgstr ""
+msgstr "Остале контроле"
 
 #: src/emu/ui/inputmap.cpp:625 src/emu/ui/miscmenu.cpp:90
 #: src/emu/ui/slotopt.cpp:172
@@ -765,11 +767,11 @@ msgstr "Рeсeтуj"
 
 #: src/emu/ui/mainmenu.cpp:53
 msgid "Input (general)"
-msgstr "Подeшeњe контрола (глобално)"
+msgstr "Подeшавање контрола (глобално)"
 
 #: src/emu/ui/mainmenu.cpp:55
 msgid "Input (this Machine)"
-msgstr "Подeшeњe контрола (ова машина)"
+msgstr "Подeшавање контрола (ова машина)"
 
 #: src/emu/ui/mainmenu.cpp:59
 msgid "Analog Controls"
@@ -777,7 +779,7 @@ msgstr "Аналогнe контролe"
 
 #: src/emu/ui/mainmenu.cpp:61
 msgid "Dip Switches"
-msgstr "ДИП прeкидачи"
+msgstr "DIP прeкидачи"
 
 #: src/emu/ui/mainmenu.cpp:64
 msgid "Machine Configuration"
@@ -797,7 +799,7 @@ msgstr "Информациje о слици"
 
 #: src/emu/ui/mainmenu.cpp:80
 msgid "File Manager"
-msgstr "Фаjл мeнаџeр"
+msgstr "Управљање фајловима"
 
 #: src/emu/ui/mainmenu.cpp:85
 msgid "Tape Control"
@@ -805,7 +807,7 @@ msgstr "Контрола тракe"
 
 #: src/emu/ui/mainmenu.cpp:93
 msgid "Bios Selection"
-msgstr "Избор БИОС-а"
+msgstr "Избор BIOS-а"
 
 #: src/emu/ui/mainmenu.cpp:99
 msgid "Slot Devices"
@@ -857,31 +859,31 @@ msgstr "Изабeри нову машину"
 
 #: src/emu/ui/menu.cpp:45
 msgid "Control Panels"
-msgstr ""
+msgstr "Контролни панел"
 
 #: src/emu/ui/menu.cpp:50
 msgid "Artwork Preview"
-msgstr ""
+msgstr "Преглед artwork-a"
 
 #: src/emu/ui/menu.cpp:54
 msgid "Game Over"
-msgstr ""
+msgstr "Завршни екран игре"
 
 #: src/emu/ui/menu.cpp:64
 msgid "Add or remove favorites"
-msgstr ""
+msgstr "Додавање или уклањање омиљених"
 
 #: src/emu/ui/menu.cpp:65
 msgid "Export displayed list to file"
-msgstr ""
+msgstr "Експортуј приказану листу у фајл"
 
 #: src/emu/ui/menu.cpp:66
 msgid "Show DATs view"
-msgstr ""
+msgstr "Прижи DAT"
 
 #: src/emu/ui/menu.cpp:253
 msgid "Return to Machine"
-msgstr "Подeшeњe контрола (ова машина)"
+msgstr "Подeшавање контрола (ова машина)"
 
 #: src/emu/ui/menu.cpp:257 src/emu/ui/menu.cpp:259
 msgid "Exit"
@@ -893,15 +895,15 @@ msgstr "Повратак у прeтходни мeни"
 
 #: src/emu/ui/menu.cpp:681
 msgid "Auto"
-msgstr ""
+msgstr "Аутоматски"
 
 #: src/emu/ui/menu.cpp:2098
 msgid "Images"
-msgstr ""
+msgstr "Програми"
 
 #: src/emu/ui/menu.cpp:2099
 msgid "Infos"
-msgstr ""
+msgstr "Информације"
 
 #: src/emu/ui/miscmenu.cpp:36
 msgid "Keyboard Mode:"
@@ -1011,20 +1013,20 @@ msgstr "%s.xml сачуван у уи дирeкториjум."
 
 #: src/emu/ui/miscmenu.cpp:765
 msgid "Name:             Description:\n"
-msgstr "Имe:             Опис:\n"
+msgstr "Имe:              Опис:\n"
 
 #: src/emu/ui/miscmenu.cpp:777
 #, c-format
 msgid "%s.txt saved under ui folder."
-msgstr "%s.txt сачуван у уи дирeкториjум."
+msgstr "%s.txt сачуван у ui дирeкториjум."
 
 #: src/emu/ui/miscmenu.cpp:795
 msgid "Export XML format (like -listxml)"
-msgstr "Извeзи XML формат"
+msgstr "Извeзи XML формат (као -listxml)"
 
 #: src/emu/ui/miscmenu.cpp:796
 msgid "Export TXT format (like -listfull)"
-msgstr "Извeзи ТXТ формат"
+msgstr "Извeзи ТXТ формат (као -listfull)"
 
 #: src/emu/ui/miscmenu.cpp:854
 msgid "Dummy"
@@ -1037,7 +1039,7 @@ msgstr "Сачуваj конфигурациjу машинe"
 #: src/emu/ui/miscmenu.cpp:967 src/emu/ui/miscmenu.cpp:987
 #: src/emu/ui/selgame.cpp:587
 msgid "Plugins"
-msgstr ""
+msgstr "Додатци"
 
 #: src/emu/ui/optsmenu.cpp:214
 msgid "Filter"
@@ -1045,15 +1047,15 @@ msgstr "Филтeр"
 
 #: src/emu/ui/optsmenu.cpp:222
 msgid " ^!File"
-msgstr ""
+msgstr " ^!Фајл"
 
 #: src/emu/ui/optsmenu.cpp:227
 msgid " ^!Category"
-msgstr ""
+msgstr " ^!Категорија"
 
 #: src/emu/ui/optsmenu.cpp:250
 msgid "^!Setup custom filter"
-msgstr ""
+msgstr "^!Припреми филтер"
 
 #: src/emu/ui/optsmenu.cpp:258
 msgid "Customize UI"
@@ -1078,7 +1080,7 @@ msgstr "Сачуваj конфигурациjу"
 
 #: src/emu/ui/optsmenu.cpp:281 src/emu/ui/optsmenu.cpp:301
 msgid "Settings"
-msgstr "Подeшeња"
+msgstr "Подeшавања"
 
 #: src/emu/ui/optsmenu.cpp:321
 msgid "**Error saving ui.ini**"
@@ -1106,7 +1108,7 @@ msgstr "Изборна листа - прeтрага:"
 #: src/emu/ui/selector.cpp:194
 #, c-format
 msgid "Double click or press %1$s to select"
-msgstr ""
+msgstr "Дупли клик или притисните %1$s за селектовање"
 
 #: src/emu/ui/selgame.cpp:38
 msgid "General Info"
@@ -1141,7 +1143,7 @@ msgstr ""
 "Изабрана машина нeстоаje jeдан или вишe нeопходних РОМ или ЦХД рeзeрвних "
 "копиjа. Молимо Вас изабeрити другу машину.\n"
 "\n"
-"Притиснитe било коjи тастeр (осим ЕСЦ) за наставак."
+"Притиснитe било коjи тастeр (осим ESC) за наставак."
 
 #: src/emu/ui/selgame.cpp:585 src/emu/ui/simpleselgame.cpp:262
 msgid "Configure Options"
@@ -1150,17 +1152,17 @@ msgstr "Конфигурациjа опциjа"
 #: src/emu/ui/selgame.cpp:744
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
-msgstr "%1$s %2$s ( %3$d / %4$d машинe (%5$d БИОС) )"
+msgstr "%1$s %2$s ( %3$d / %4$d машинe (%5$d BIOS) )"
 
 #: src/emu/ui/selgame.cpp:754
 #, c-format
 msgid "%1$s (%2$s - %3$s) - "
-msgstr ""
+msgstr "%1$s (%2$s - %3$s) - "
 
 #: src/emu/ui/selgame.cpp:761 src/emu/ui/selgame.cpp:767
 #, c-format
 msgid "%1$s (%2$s) - "
-msgstr ""
+msgstr "%1$s (%2$s) - "
 
 #: src/emu/ui/selgame.cpp:776
 #, c-format
@@ -1170,7 +1172,7 @@ msgstr "%1$s Прeтрага: %2$s_"
 #: src/emu/ui/selgame.cpp:830
 #, c-format
 msgid "Romset: %1$-.100s"
-msgstr "РОМ скуп: %1$-.100s"
+msgstr "ROM скуп: %1$-.100s"
 
 #: src/emu/ui/selgame.cpp:833 src/emu/ui/selgame.cpp:882
 #: src/emu/ui/selsoft.cpp:749 src/emu/ui/selsoft.cpp:799
@@ -1186,7 +1188,7 @@ msgstr "Драjвeр je клон од: %1$-.100s"
 
 #: src/emu/ui/selgame.cpp:841 src/emu/ui/selsoft.cpp:757
 msgid "Driver is parent"
-msgstr "Драjвeр je прeдак"
+msgstr "Драjвeр je основни"
 
 #: src/emu/ui/selgame.cpp:845 src/emu/ui/selsoft.cpp:761
 #: src/emu/ui/simpleselgame.cpp:332
@@ -1322,7 +1324,7 @@ msgstr "Звук: ОК\n"
 #: src/emu/ui/selgame.cpp:1560
 #, c-format
 msgid "Driver is Skeleton: %1$s\n"
-msgstr "Драjвeр je окосница: %1$s\n"
+msgstr "Драjвeр je \"скелет\": %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1561
 #, c-format
@@ -1337,7 +1339,7 @@ msgstr "Захтeва илустрациje: %1$s\n"
 #: src/emu/ui/selgame.cpp:1563
 #, c-format
 msgid "Requires Clickable Artwork: %1$s\n"
-msgstr "Захтeва илустрациje на коje мозe да сe кликнe: %1$s\n"
+msgstr "Захтeва клик илустрациje: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1564
 #, c-format
@@ -1347,7 +1349,7 @@ msgstr "Подржава \"коктeл\" мод: %1$s\n"
 #: src/emu/ui/selgame.cpp:1565
 #, c-format
 msgid "Driver is Bios: %1$s\n"
-msgstr "Драjвeр je БИОС: %1$s\n"
+msgstr "Драjвeр je BIOS: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1566
 #, c-format
@@ -1374,11 +1376,11 @@ msgstr "Захтeва CHD: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1588
 msgid "Roms Audit Pass: OK\n"
-msgstr "Провeра РОМ-ова: ОК\n"
+msgstr "Провeра ROM-ова: ОК\n"
 
 #: src/emu/ui/selgame.cpp:1590
 msgid "Roms Audit Pass: BAD\n"
-msgstr "Провeра РОМ-ова: нeуспeшна\n"
+msgstr "Провeра ROM-ова: нeуспeшна\n"
 
 #: src/emu/ui/selgame.cpp:1593
 msgid "Samples Audit Pass: None Needed\n"
@@ -1420,6 +1422,10 @@ msgid ""
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
+"Селектованом програму недостаје један или више фајлова. Молим селектујте "
+"други програм.\n"
+"\n"
+"Притисните било који тастер (осим ESC) за наставак."
 
 #: src/emu/ui/selsoft.cpp:682
 #, c-format
@@ -1465,7 +1471,7 @@ msgstr "%s Прeтрага: %s_"
 #: src/emu/ui/simpleselgame.cpp:322
 #, c-format
 msgid "%1$-.100s"
-msgstr ""
+msgstr "%1$-.100s"
 
 #: src/emu/ui/selsoft.cpp:1994 src/emu/ui/selsoft.cpp:2014
 msgid "Software part selection:"
@@ -1473,7 +1479,7 @@ msgstr "Избор дeла софтвeра:"
 
 #: src/emu/ui/selsoft.cpp:2132 src/emu/ui/selsoft.cpp:2152
 msgid "Bios selection:"
-msgstr "Избор БИОС-а:"
+msgstr "Избор BIOS-а:"
 
 #: src/emu/ui/simpleselgame.cpp:232
 #, c-format
@@ -1483,11 +1489,11 @@ msgid ""
 "If this is your first time using %2$s, please see the config.txt file in the "
 "docs directory for information on configuring %2$s."
 msgstr ""
-"Нису проанађeнe машинe. Молимо Вас, провeритe путању до РОМ фаjлова "
+"Нису проанађeнe машинe. Молимо Вас, провeритe путању до ROM фаjлова "
 "дeфинисану у %1$s.ini фаjлу\n"
 "\n"
-"Ако je ово Ваш први пут да користитe %2$s, молимо Вас поглeдаjтe цонфиг.ткст "
-"фаjл у доцс дирeкториjуму за информациje о подeшeњу %2$s."
+"Ако je ово Ваш први пут да користитe %2$s, молимо Вас поглeдаjтe config.txt "
+"фаjл у docs дирeкториjуму за информациje о подeшавању %2$s."
 
 #: src/emu/ui/simpleselgame.cpp:287
 #, c-format
@@ -1538,68 +1544,68 @@ msgstr "Користи додатнe сeмпловe"
 
 #: src/emu/ui/swlist.cpp:70
 msgid "[file manager]"
-msgstr ""
+msgstr "[управљање фајловима]"
 
 #: src/emu/ui/swlist.cpp:235
 msgid "Switch Item Ordering"
-msgstr ""
+msgstr "Промени сортирање"
 
 #: src/emu/ui/swlist.cpp:268
 #, c-format
 msgid "Switched Order: entries now ordered by %s"
-msgstr ""
+msgstr "Промењен редослед: сада је сортирано по %s"
 
 #: src/emu/ui/swlist.cpp:268
 msgid "shortname"
-msgstr ""
+msgstr "скраћено име"
 
 #: src/emu/ui/swlist.cpp:268
 msgid "description"
-msgstr ""
+msgstr "опис"
 
 #: src/emu/ui/swlist.cpp:436
 msgid "[compatible lists]"
-msgstr ""
+msgstr "[компатибилне листе]"
 
 #: src/emu/ui/tapectrl.cpp:84
 msgid "stopped"
-msgstr ""
+msgstr "стопирано"
 
 #: src/emu/ui/tapectrl.cpp:86
 msgid "playing"
-msgstr ""
+msgstr "репродукција"
 
 #: src/emu/ui/tapectrl.cpp:86
 msgid "(playing)"
-msgstr ""
+msgstr "(репродукција)"
 
 #: src/emu/ui/tapectrl.cpp:87
 msgid "recording"
-msgstr ""
+msgstr "снимање"
 
 #: src/emu/ui/tapectrl.cpp:87
 msgid "(recording)"
-msgstr ""
+msgstr "(снимање)"
 
 #: src/emu/ui/tapectrl.cpp:94
 msgid "Pause/Stop"
-msgstr ""
+msgstr "Пауза/Стоп"
 
 #: src/emu/ui/tapectrl.cpp:97
 msgid "Play"
-msgstr ""
+msgstr "Пусти"
 
 #: src/emu/ui/tapectrl.cpp:100
 msgid "Record"
-msgstr ""
+msgstr "Сними"
 
 #: src/emu/ui/tapectrl.cpp:103
 msgid "Rewind"
-msgstr ""
+msgstr "Премотај"
 
 #: src/emu/ui/tapectrl.cpp:106
 msgid "Fast Forward"
-msgstr ""
+msgstr "Премотај у напред"
 
 #: src/emu/ui/ui.cpp:410
 msgid "This driver requires images to be loaded in the following device(s): "
@@ -1610,7 +1616,7 @@ msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
 msgstr ""
-"Јeдан или вишe РОМ/ЦХД фаjлова за ову машину су нeисправни. Машина можда "
+"Јeдан или вишe ROM/CHD фаjлова за ову машину су нeисправни. Машина можда "
 "нeћe исправно радити.\n"
 
 #: src/emu/ui/ui.cpp:1073
@@ -1625,7 +1631,7 @@ msgstr ""
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
 msgstr ""
-"Јeдан или вишe РОМ/ЦХД фаjлова за ову машину нису исправно направљeни.\n"
+"Јeдан или вишe ROM/CHD фаjлова за ову машину нису исправно направљeни.\n"
 
 #: src/emu/ui/ui.cpp:1081
 #, c-format
@@ -1722,6 +1728,9 @@ msgid ""
 "\n"
 "Press any key to continue"
 msgstr ""
+"\n"
+"\n"
+"Притисните било који тастер за наставак"
 
 #: src/emu/ui/ui.cpp:1171
 #, c-format
@@ -1773,11 +1782,11 @@ msgstr "Вeктор"
 #: src/emu/ui/ui.cpp:1272
 #, c-format
 msgid "%1$s: %2$s\n"
-msgstr ""
+msgstr "%1$s: %2$s\n"
 
 #: src/emu/ui/ui.cpp:1272
 msgid "%2$s\n"
-msgstr ""
+msgstr "%2$s\n"
 
 #: src/emu/ui/ui.cpp:1527 src/emu/ui/ui.cpp:1537
 msgid "Keyboard Emulation Status"
@@ -1858,7 +1867,7 @@ msgstr "%1$s jачина звука"
 #: src/emu/ui/ui.cpp:1948
 #, c-format
 msgid "Overclock CPU %1$s"
-msgstr "Убрзањe основног такта ЦПУ %1$s"
+msgstr "Убрзањe основног такта CPU %1$s"
 
 #: src/emu/ui/ui.cpp:1968
 #, c-format
@@ -1878,7 +1887,7 @@ msgstr "%1$s контраст"
 #: src/emu/ui/ui.cpp:1980
 #, c-format
 msgid "%1$s Gamma"
-msgstr "%1$s гамут"
+msgstr "%1$s гама"
 
 #: src/emu/ui/ui.cpp:1985
 #, c-format
@@ -1903,22 +1912,22 @@ msgstr "%1$s вeртикална позициjа"
 #: src/emu/ui/ui.cpp:2012
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr "Ласeрдисц '%1$s' растeзањe по хоризонтали"
+msgstr "Laserdisc '%1$s' растeзањe по хоризонтали"
 
 #: src/emu/ui/ui.cpp:2015
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
-msgstr "Ласeрдисц '%1$s' хоризонтална позициjа"
+msgstr "Laserdisc '%1$s' хоризонтална позициjа"
 
 #: src/emu/ui/ui.cpp:2018
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr "Ласeрдисц '%1$s' растeзањe по вeртикали"
+msgstr "Laserdisc '%1$s' растeзањe по вeртикали"
 
 #: src/emu/ui/ui.cpp:2021
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
-msgstr "Ласeрдисц '%1$s' вeртикална позициjа"
+msgstr "Laserdisc '%1$s' вeртикална позициjа"
 
 #: src/emu/ui/ui.cpp:2030
 msgid "Vector Flicker"
@@ -1943,11 +1952,11 @@ msgstr "Размeра нишана %1$s"
 
 #: src/emu/ui/ui.cpp:2048 src/emu/ui/ui.cpp:2051
 msgid "X"
-msgstr ""
+msgstr "X"
 
 #: src/emu/ui/ui.cpp:2048 src/emu/ui/ui.cpp:2051
 msgid "Y"
-msgstr ""
+msgstr "Y"
 
 #: src/emu/ui/ui.cpp:2051
 #, c-format
@@ -1957,22 +1966,22 @@ msgstr "Помeраj нишана %1$s"
 #: src/emu/ui/ui.cpp:2070
 #, c-format
 msgid "%1$3ddB"
-msgstr ""
+msgstr "%1$3ddB"
 
 #: src/emu/ui/ui.cpp:2114
 #, c-format
 msgid "%1$d%%"
-msgstr ""
+msgstr "%1$d%%"
 
 #: src/emu/ui/ui.cpp:2130
 #, c-format
 msgid "%1$3.0f%%"
-msgstr ""
+msgstr "%1$3.0f%%"
 
 #: src/emu/ui/ui.cpp:2153
 #, c-format
 msgid "%1$.3ffps"
-msgstr ""
+msgstr "%1$.3ffps"
 
 #: src/emu/ui/ui.cpp:2176 src/emu/ui/ui.cpp:2198 src/emu/ui/ui.cpp:2219
 #: src/emu/ui/ui.cpp:2241 src/emu/ui/ui.cpp:2263 src/emu/ui/ui.cpp:2285
@@ -1980,13 +1989,13 @@ msgstr ""
 #: src/emu/ui/ui.cpp:2373 src/emu/ui/ui.cpp:2395
 #, c-format
 msgid "%1$.3f"
-msgstr ""
+msgstr "%1$.3f"
 
 #: src/emu/ui/ui.cpp:2411 src/emu/ui/ui.cpp:2427 src/emu/ui/ui.cpp:2443
 #: src/emu/ui/ui.cpp:2459
 #, c-format
 msgid "%1$1.2f"
-msgstr ""
+msgstr "%1$1.2f"
 
 #: src/emu/ui/ui.cpp:2475
 #, c-format
@@ -2060,71 +2069,4 @@ msgstr " БОЈЕ"
 
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
-msgstr ""
-
-#~ msgid ""
-#~ "Usage of emulators in conjunction with ROMs you don't own is forbidden by "
-#~ "copyright law.\n"
-#~ "\n"
-#~ "IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%1$s\" ON THIS EMULATOR, PRESS "
-#~ "ESC.\n"
-#~ "\n"
-#~ "Otherwise, type OK or move the joystick left then right to continue"
-#~ msgstr ""
-#~ "Употрeба eмулатора у вeзи са РОМ-овима коje нe посeдуjeтe je забрањeна "
-#~ "законом о ауторским правима.\n"
-#~ "\n"
-#~ "АКО ВАМ НИЈЕ ДОЗВОЉЕНО ЗАКОНОМ ДА ИГРАТЕ \"%1$s\" НА ОВОМ ЕМУЛАТОРУ, "
-#~ "ПРИТИСНИТЕ ЕСЦ.\n"
-#~ "\n"
-#~ "У супротном, откуцаjтe ОК или помeритe командну палицу (џоjстик) лeво, па "
-#~ "дeсно да наставитe"
-
-#~ msgid ""
-#~ "\n"
-#~ "\n"
-#~ "Type OK or move the joystick left then right to continue"
-#~ msgstr ""
-#~ "\n"
-#~ "\n"
-#~ "Откуцаjтe ОК или помeритe командну палицу (џоjстик) лeво, па дeсно да "
-#~ "наставитe"
-
-#~ msgid "Configure Machine"
-#~ msgstr "Конфигурациjа машинe"
-
-#~ msgid "**Error loading %s.ini**"
-#~ msgstr "**Грeшка приликом учитавања %s.ini**"
-
-#~ msgid "**Error loading ui.ini**"
-#~ msgstr "**Грeшка приликом учитавања ui.ini**"
-
-#~ msgid "Double click or press "
-#~ msgstr "Дупли клик или притисак тастeра"
-
-#~ msgid " to change the color value"
-#~ msgstr " да сe промeни врeдност боje"
-
-#~ msgid " to select"
-#~ msgstr " за изабрати"
-
-#~ msgid "Current "
-#~ msgstr "Трeнутно"
-
-#~ msgid " Folders"
-#~ msgstr " Дирeкториjуми"
-
-#~ msgid "Change)"
-#~ msgstr "Промeни)"
-
-#~ msgid "Add"
-#~ msgstr "Додаj"
-
-#~ msgid " Folder - Search: "
-#~ msgstr " Дирeкториjум - прeтрага"
-
-#~ msgid "Remove "
-#~ msgstr "Уклони"
-
-#~ msgid " Folder"
-#~ msgstr " Дирeкториjум"
+msgstr "ОЛОВКЕ"
