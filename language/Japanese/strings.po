@@ -444,7 +444,7 @@ msgstr "Mamescoreファイル"
 
 #: src/emu/ui/datmenu.cpp:294 src/emu/ui/selgame.cpp:44
 msgid "Gameinit"
-msgstr ""
+msgstr "Gameinitファイル"
 
 #: src/emu/ui/datmenu.cpp:296 src/emu/ui/selgame.cpp:43
 msgid "Command"
@@ -556,7 +556,7 @@ msgstr "バーサス"
 
 #: src/emu/ui/dirmenu.cpp:58 src/emu/ui/menu.cpp:59
 msgid "Covers"
-msgstr ""
+msgstr "カバー"
 
 #: src/emu/ui/dirmenu.cpp:116 src/emu/ui/dirmenu.cpp:136
 msgid "Folders Setup"
@@ -1038,7 +1038,7 @@ msgstr "マシン設定を保存する"
 #: src/emu/ui/miscmenu.cpp:967 src/emu/ui/miscmenu.cpp:987
 #: src/emu/ui/selgame.cpp:587
 msgid "Plugins"
-msgstr ""
+msgstr "プラグイン"
 
 #: src/emu/ui/optsmenu.cpp:214
 msgid "Filter"
@@ -1727,6 +1727,9 @@ msgid ""
 "\n"
 "Press any key to continue"
 msgstr ""
+"\n"
+"\n"
+"進めるには、何かキーを押してください。"
 
 #: src/emu/ui/ui.cpp:1171
 #, c-format
