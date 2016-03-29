@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:K.Wilkins
+// copyright-holders:K.Wilkins,Stephane Humbert
 /***************************************************************************
 
   Toaplan Slap Fight hardware

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Darren Olafson, Quench
+// copyright-holders:Darren Olafson, Quench,Stephane Humbert
 /***************************************************************************
                 ToaPlan game hardware from 1988-1991
                 ------------------------------------
