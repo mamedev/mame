@@ -178,6 +178,10 @@ function osdmodulesbuild()
 		defines {
 			"NO_USE_MIDI",
 		}
+	else
+		includedirs {
+			ext_includedir("portmidi"),
+		}
 	end
 
 	if _OPTIONS["USE_QTDEBUG"]=="1" then

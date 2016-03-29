@@ -21,6 +21,7 @@ project "utils"
 		MAME_DIR .. "3rdparty",
 		ext_includedir("expat"),
 		ext_includedir("zlib"),
+		ext_includedir("flac"),
 	}
 
 	files {

@@ -34,6 +34,7 @@ includedirs {
 includedirs {
 	ext_includedir("expat"),
 	ext_includedir("lua"),
+	ext_includedir("flac"),
 }
 
 if (_OPTIONS["targetos"] == "windows" and _OPTIONS["osd"] ~= "osdmini") then
