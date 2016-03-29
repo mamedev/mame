@@ -127,7 +127,7 @@ void sm511_device::execute_one()
 		case 0x62: op_wr(); break;
 		case 0x63: op_ws(); break;
 		case 0x64: op_incb(); break;
-		case 0x65: op_idiv(); break;
+		case 0x65: op_dr(); break; // guessed
 		case 0x66: op_rc(); break;
 		case 0x67: op_sc(); break;
 		case 0x6c: op_decb(); break;
