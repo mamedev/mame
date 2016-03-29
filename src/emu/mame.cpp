@@ -154,25 +154,59 @@ void machine_manager::update_machine()
 }
 
 
+std::vector<std::string> split(const std::string &text, char sep)
+{
+    std::vector<std::string> tokens;
+    std::size_t start = 0, end = 0;
+    while ((end = text.find(sep, start)) != std::string::npos) {
+        std::string temp = text.substr(start, end - start);
+        if (temp != "") tokens.push_back(temp);
+        start = end + 1;
+    }
+    std::string temp = text.substr(start);
+    if (temp != "") tokens.push_back(temp);
+    return tokens;
+}
+
 void machine_manager::start_luaengine()
 {
-	path_iterator iter(options().plugins_path());
-	std::string pluginpath;
-	while (iter.next(pluginpath))
+	if (options().plugins()) 
 	{
-		m_plugins->parse_json(pluginpath);
-	}
-
-	{
-		// parse the file
-		std::string error;
-		// attempt to open the output file
-		emu_file file(options().ini_path(), OPEN_FLAG_READ);
-		if (file.open("plugin.ini") == osd_file::error::NONE)
+		path_iterator iter(options().plugins_path());
+		std::string pluginpath;
+		while (iter.next(pluginpath))
 		{
-			bool result = m_plugins->parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
-			if (!result)
-				osd_printf_error("**Error loading plugin.ini**");
+			m_plugins->parse_json(pluginpath);
+		}
+		std::vector<std::string> include = split(options().plugin(),',');
+		std::vector<std::string> exclude = split(options().no_plugin(),',');
+		{
+			// parse the file
+			std::string error;
+			// attempt to open the output file
+			emu_file file(options().ini_path(), OPEN_FLAG_READ);
+			if (file.open("plugin.ini") == osd_file::error::NONE)
+			{
+				bool result = m_plugins->parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+				if (!result)
+					osd_printf_error("**Error loading plugin.ini**");
+			}
+		}
+		for (auto curentry = m_plugins->first(); curentry != nullptr; curentry = curentry->next())
+		{	
+			if (!curentry->is_header())
+			{
+				if (std::find(include.begin(), include.end(), curentry->name()) != include.end()) 
+				{
+					std::string error_string;
+					m_plugins->set_value(curentry->name(), "1", OPTION_PRIORITY_CMDLINE, error_string);
+				}
+				if (std::find(exclude.begin(), exclude.end(), curentry->name()) != exclude.end()) 
+				{
+					std::string error_string;
+					m_plugins->set_value(curentry->name(), "0", OPTION_PRIORITY_CMDLINE, error_string);
+				}
+			}
 		}
 	}
 	m_lua->initialize();

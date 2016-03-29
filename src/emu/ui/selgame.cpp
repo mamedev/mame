@@ -584,8 +584,12 @@ void ui_menu_select_game::populate()
 		UINT32 flags_ui = MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
 		item_append(_("Configure Options"), nullptr, flags_ui, (void *)(FPTR)CONF_OPTS);
 //		item_append(_("Configure Machine"), nullptr, flags_ui, (void *)(FPTR)CONF_MACHINE); TODO
-		item_append(_("Plugins"), nullptr, flags_ui, (void *)(FPTR)CONF_PLUGINS);
-		skip_main_items = 2;
+		skip_main_items = 1;
+		if (machine().options().plugins()) 
+		{
+			item_append(_("Plugins"), nullptr, flags_ui, (void *)(FPTR)CONF_PLUGINS);
+			skip_main_items++;
+		}
 	}
 	else
 		skip_main_items = 0;

@@ -203,6 +203,9 @@ enum
 #define OPTION_AUTOBOOT_SCRIPT      "autoboot_script"
 
 #define OPTION_CONSOLE              "console"
+#define OPTION_PLUGINS              "plugins"
+#define OPTION_PLUGIN               "plugin"
+#define OPTION_NO_PLUGIN            "noplugin"
 
 #define OPTION_LANGUAGE             "language"
 
@@ -393,6 +396,11 @@ public:
 	const char *autoboot_script() const { return value(OPTION_AUTOBOOT_SCRIPT); }
 
 	bool console() const { return bool_value(OPTION_CONSOLE); }
+	
+	bool plugins() const { return bool_value(OPTION_PLUGINS); }
+	
+	const char *plugin() const { return value(OPTION_PLUGIN); }
+	const char *no_plugin() const { return value(OPTION_NO_PLUGIN); }
 
 	const char *language() const { return value(OPTION_LANGUAGE); }
 
