@@ -763,17 +763,33 @@ int renderer_bgfx::handle_screen_chains()
 
     // Determine how many post-processing passes are needed
     int screens = 0;
+    int total_screen_textures = 0;
+    std::vector<void*> bases;
     while (prim != nullptr)
     {
         if (PRIMFLAG_GET_SCREENTEX(prim->flags))
         {
-            screens++;
+            total_screen_textures++;
+            bool found = false;
+            for (void* base : bases)
+            {
+                if (base == prim->texture.base)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                screens++;
+                bases.push_back(prim->texture.base);
+            }
         }
         prim = prim->next();
     }
 
     const uint32_t available_chains = m_screen_chains[window().m_index].size();
-    screens = screens >= available_chains ? available_chains: screens;
+    screens = screens >= available_chains ? available_chains : screens;
 
     if (screens > 0)
     {
@@ -827,6 +843,7 @@ int renderer_bgfx::draw(int update)
         s_current_view = 0;
     }
 
+    m_seen_views.clear();
 	m_ui_view = -1;
 
     // Set view 0 default viewport.
@@ -857,7 +874,7 @@ int renderer_bgfx::draw(int update)
 	bool atlas_valid = update_atlas();
 
 	render_primitive *prim = window().m_primlist->first();
-    std::vector<screen_device*> screens;
+    std::vector<void*> sources;
 	while (prim != nullptr)
 	{
 		UINT32 blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
@@ -868,16 +885,16 @@ int renderer_bgfx::draw(int update)
         int32_t screen = -1;
         if (PRIMFLAG_GET_SCREENTEX(prim->flags))
         {
-            for (screen = 0; screen < screens.size(); screen++)
+            for (screen = 0; screen < sources.size(); screen++)
             {
-                if (screens[screen] == prim->container->screen())
+                if (sources[screen] == prim->texture.base)
                 {
                     break;
                 }
             }
-            if (screen == screens.size())
+            if (screen == sources.size())
             {
-                screens.push_back(prim->container->screen());
+                sources.push_back(prim->texture.base);
             }
         }
 
@@ -966,8 +983,17 @@ void renderer_bgfx::setup_view(uint32_t view_index, bool screen)
 
 #if SCENE_VIEW
     if (view_index == m_max_view)
-#endif
     {
+#else
+    while ((view_index + 1) > m_seen_views.size())
+    {
+        m_seen_views.push_back(false);
+    }
+
+    if (!m_seen_views[view_index])
+    {
+        m_seen_views[view_index] = true;
+#endif
         bgfx::setViewClear(view_index, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
     }
 

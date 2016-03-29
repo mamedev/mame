@@ -146,6 +146,16 @@ void bgfx_chain_entry::setup_quaddims_uniform(render_primitive* prim) const
     }
 }
 
+void bgfx_chain_entry::setup_screenindex_uniform(int32_t screen) const
+{
+    bgfx_uniform* screen_index = m_effect->uniform("u_screen_index");
+    if (screen_index != nullptr)
+    {
+        float values[1] = { float(screen) };
+        screen_index->set(values, sizeof(float));
+    }
+}
+
 void bgfx_chain_entry::setup_auto_uniforms(render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint32_t rotation_type, bool swap_xy, int32_t screen)
 {
 	setup_screensize_uniforms(textures, screen_width, screen_height, screen);
@@ -153,6 +163,7 @@ void bgfx_chain_entry::setup_auto_uniforms(render_primitive* prim, texture_manag
 	setup_rotationtype_uniform(rotation_type);
 	setup_swapxy_uniform(swap_xy);
     setup_quaddims_uniform(prim);
+    setup_screenindex_uniform(screen);
 }
 
 bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t screen_height, int32_t screen) const

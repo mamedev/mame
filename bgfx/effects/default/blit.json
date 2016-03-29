@@ -16,15 +16,15 @@
     	"equation": "add",
     	
     	// blend function parameters (optional): What factors to use in the blend function when calculating the final pixel.
-    	// values: "0", "1", "srcColor", "1-srcColor", "dstColor", "1-dstColor", "srcAlpha", "1-srcAlpha", "dstAlpha", "1-dstAlpha"
+    	// values: "0", "1", "srccolor", "1-srccolor", "dstcolor", "1-dstcolor", "srcalpha", "1-srcalpha", "dstalpha", "1-dstalpha"
     	// defaults (srcColor, srcAlpha): "1"
     	// defaults (dstColor, dstAlpha): "0"
     	// 
-    	// "zero", "one", "invSrcColor", "invDstColor", "invSrcAlpha", and "invDstAlpha" are provided as aliases for "0", "1", "1-srcColor", "1-dstColor", "1-srcAlpha", and "1-dstAlpha"
-    	"srcColor": "1",
-    	"dstColor": "0",
-    	"srcAlpha": "1",
-    	"dstAlpha": "0"
+    	// "zero", "one", "invsrccolor", "invdstcolor", "invsrcalpha", and "invdstalpha" are provided as aliases for "0", "1", "1-srccolor", "1-dstcolor", "1-srcalpha", and "1-dstalpha"
+    	"srcColor": "srcalpha",
+    	"dstColor": "1-srcalpha",
+    	"srcAlpha": "srcalpha",
+    	"dstAlpha": "1-srcalpha"
     },
     
     // depth (required): The depth state for this effect.

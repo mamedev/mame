@@ -188,33 +188,36 @@ void main()
 
 	// Color
 	vec4 BaseColor = texture2D(s_tex, BaseCoord);
-	BaseColor.a = 1.0;
 
 	// Clamp
 	if (BaseCoord.x > 1.0 || BaseCoord.y > 1.0 || BaseCoord.x < 0.0 || BaseCoord.y < 0.0)
-		BaseColor.rgb = vec3(0.0, 0.0, 0.0);
-	
-	// Vignetting Simulation
-	vec2 VignetteCoord = BaseCoordCentered;
+	{
+		gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+	}
+	else
+	{
+		// Vignetting Simulation
+		vec2 VignetteCoord = BaseCoordCentered;
 
-	float VignetteFactor = GetVignetteFactor(VignetteCoord, u_vignetting.x);
-	BaseColor.rgb *= VignetteFactor;
+		float VignetteFactor = GetVignetteFactor(VignetteCoord, u_vignetting.x);
+		BaseColor.rgb *= VignetteFactor;
 
-	// Light Reflection Simulation
-	vec3 LightColor = vec3(1.0, 0.90, 0.80); // color temperature 5.000 Kelvin
+		// Light Reflection Simulation
+		vec4 LightColor = vec4(1.0, 0.90, 0.80, 1.0); // color temperature 5.000 Kelvin
 
-	vec2 SpotCoord = BaseCoordCentered;
-	vec2 NoiseCoord = BaseCoordCentered;
+		vec2 SpotCoord = BaseCoordCentered;
+		vec2 NoiseCoord = BaseCoordCentered;
 
-	float SpotAddend = GetSpotAddend(SpotCoord, u_reflection.x);
-	float NoiseFactor = GetNoiseFactor(SpotAddend, rand(NoiseCoord));
-	BaseColor.rgb += SpotAddend * NoiseFactor * LightColor;
+		float SpotAddend = GetSpotAddend(SpotCoord, u_reflection.x);
+		float NoiseFactor = GetNoiseFactor(SpotAddend, rand(NoiseCoord));
+		BaseColor += SpotAddend * NoiseFactor * LightColor;
 
-	// Round Corners Simulation
-	vec2 RoundCornerCoord = BaseCoordCentered;
+		// Round Corners Simulation
+		vec2 RoundCornerCoord = BaseCoordCentered;
 
-	float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, u_round_corner.x, u_smooth_border.x);
-	BaseColor.rgb *= roundCornerFactor;
+		float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, u_round_corner.x, u_smooth_border.x);
+		BaseColor.rgb *= roundCornerFactor;
 
-	gl_FragColor = BaseColor;
+		gl_FragColor = BaseColor;
+	}
 }

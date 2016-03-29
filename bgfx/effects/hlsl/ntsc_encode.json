@@ -9,10 +9,10 @@
 {
     "blend": {
     	"equation": "add",
-    	"srcColor": "1",
-    	"dstColor": "0",
-    	"srcAlpha": "1",
-    	"dstAlpha": "0"
+    	"srcColor": "srcalpha",
+    	"dstColor": "1-srcalpha",
+    	"srcAlpha": "srcalpha",
+    	"dstAlpha": "1-srcalpha"
     },
     "depth": {
     	"function": "always"

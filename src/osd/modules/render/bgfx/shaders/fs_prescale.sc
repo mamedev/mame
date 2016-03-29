@@ -26,5 +26,5 @@ void main()
 
 	vec2 TexCoord = (i + f) / u_source_dims.xy;
 
-	gl_FragColor = texture2D(s_tex, TexCoord) * v_color0;
+	gl_FragColor = texture2D(s_tex, v_texcoord0.xy) * v_color0;
 }

@@ -87,9 +87,9 @@
 
 		{ "type": "vec2", "name": "defocus", "text": "Defocus, ",  "default": [ 15, 15 ], "max": [ 500, 500 ], "min": [ 0, 0 ], "step": 1, "scale": 0.1, "format": "%2.1f", "screen": "crt" },
 
-		{ "type": "color", "name": "phosphor", "text": "Phosphor Persistence, ",  "default": [ 55, 55, 55 ], "max": [ 100, 100, 100 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "color", "name": "phosphor", "text": "Phosphor Persistence, ",  "default": [ 45, 45, 45 ], "max": [ 100, 100, 100 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
 
-		{ "type": "float",   "name": "scanline_alpha",         "text": "Scanline Amount",            "default": 6,             "max": 100,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",   "name": "scanline_alpha",         "text": "Scanline Amount",            "default": 60,             "max": 100,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "float",   "name": "scanline_scale",         "text": "Overall Scanline Scale",     "default": 100,            "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "float",   "name": "scanline_bright_scale",  "text": "Scanline Brightness Scale",  "default": 200,            "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "float",   "name": "scanline_bright_offset", "text": "Scanline Brightness Offset", "default": 0,              "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
@@ -176,15 +176,6 @@
 	// passes (required): The list of individual shaders to invoke, and any dynamic input parameters they need.
 	"passes": [
 		{
-			// See the pass after this one for a verbose explanation of each parameter.
-			"effect": "hlsl/blit",
-			"name": "NTSC Blit to bilinear-able target",
-			"input": [
-				{ "sampler": "s_tex", "texture": "screen" }
-			],
-			"output": "ntsc"
-		},
-		{
 			// effect (required): The name of the effect JSON file to load for this pass.
 			// value: Any valid JSON filename included in your shader chain, without the extension.
 			"effect": "hlsl/ntsc_encode",
@@ -261,7 +252,7 @@
 				// 
 				// option (optional): The name of any MAME option, which will have its value fetched and used as the name of a PNG to load from the artwork directory.
 				// value: Any valid MAME INI option name.
-				{ "sampler": "s_tex", "target": "ntsc" }
+				{ "sampler": "s_tex", "texture": "screen" }
 			],
 			
 			// output (required): The target to use as the output for this pass. Can be one of the named targets in "targets", or "output" 
@@ -290,7 +281,8 @@
 				{ "uniform": "u_jitter_amount",   "parameter": "jitter" }
 			],
 			"input": [
-				{ "sampler": "s_tex", "target": "ntsc" }
+				{ "sampler": "s_tex", "target": "ntsc" },
+				{ "sampler": "s_screen", "texture": "screen" }
 			],
 			"output": "guest"
 		},
@@ -301,7 +293,7 @@
 				{ "type": "slider", "condition": "notequal", "combine": "and", "name": "ntsc",        "value": 0 }
 			],
 			"input": [
-				{ "sampler": "s_tex", "target": "screen" }
+				{ "sampler": "s_tex", "texture": "screen" }
 			],
 			"output": "guest"
 		},
@@ -444,8 +436,8 @@
 				{ "uniform": "u_time",                   "parameter": "time" }
 			],
 			"input": [
-				{ "sampler": "s_tex", "target": "internal" },
-				{ "sampler": "s_shadow",  "option": "bgfx_shadow_mask" }
+				{ "sampler": "s_tex",    "target": "internal" },
+				{ "sampler": "s_shadow", "option": "bgfx_shadow_mask" }
 			],
 			"output": "internal"
 		},

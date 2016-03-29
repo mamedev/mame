@@ -28,6 +28,7 @@ uniform vec4 u_jitter_amount;
 
 // Samplers
 SAMPLER2D(s_tex, 0);
+SAMPLER2D(s_screen, 1);
 
 //-----------------------------------------------------------------------------
 // Constants
@@ -35,7 +36,7 @@ SAMPLER2D(s_tex, 0);
 
 void main()
 {
-	vec4 BaseTexel = texture2D(s_tex, v_texcoord0.xy);
+	vec4 BaseTexel = texture2D(s_screen, v_texcoord0.xy);
 
 	vec4 zero = vec4(0.0, 0.0, 0.0, 0.0);
 	vec4 quarter = vec4(0.25, 0.25, 0.25, 0.25);

@@ -1,4 +1,4 @@
-$input v_color0, v_texcoord0, v_texcoord1
+$input v_color0, v_texcoord0
 
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz,ImJezze
@@ -101,7 +101,6 @@ void main()
 
 	// Color
 	vec4 BaseColor = texture2D(s_tex, BaseCoord);
-	BaseColor.a = 1.0;
 
 	if (BaseCoord.x < 0.0 || BaseCoord.y < 0.0)
 	{
@@ -123,7 +122,7 @@ void main()
 	// Color Compression
 	// increasing the floor of the signal without affecting the ceiling
 	BaseColor.rgb = u_floor.rgb + (vec3(1.0, 1.0, 1.0) - u_floor.rgb) * BaseColor.rgb;
-
+	
 	// Color Power
 	BaseColor.r = pow(BaseColor.r, u_power.r);
 	BaseColor.g = pow(BaseColor.g, u_power.g);
@@ -155,5 +154,5 @@ void main()
 		BaseColor.rgb *= HumBrightness;
 	}
 
-	gl_FragColor = vec4(BaseColor.rgb * v_color0.rgb, 1.0);
+	gl_FragColor = vec4(BaseColor.rgb * v_color0.rgb, BaseColor.a);
 }

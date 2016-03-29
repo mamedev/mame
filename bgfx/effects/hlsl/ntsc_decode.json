@@ -26,6 +26,7 @@
     "fragment": "fs_ntsc_decode",
     "uniforms": [
     	{ "name": "s_tex",             "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "s_screen",        "type": "int",  "values": [ 1.0 ] },
     	{ "name": "u_source_dims",     "type": "vec4", "values": [ 1.0,  1.0, 0.0, 0.0 ] },
     	{ "name": "u_a_value",         "type": "vec4", "values": [ 0.5,  0.5, 0.5, 0.5 ] },
     	{ "name": "u_b_value",         "type": "vec4", "values": [ 0.5,  0.5, 0.5, 0.5 ] },

@@ -46,5 +46,6 @@ void main()
 
 	vec4 blurred = (d0 + d1 + d2 + d3 + d4 + d5 + d6 + d7 + d8) / 9.0;
 
-	gl_FragColor = vec4(blurred.rgb, 1.0) * v_color0;
+	blurred.a = blurred.a + d0.a;
+	gl_FragColor = blurred * v_color0;
 }
