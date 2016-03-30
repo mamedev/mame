@@ -850,7 +850,7 @@ void z80scc_channel::device_reset()
 
 void z80scc_channel::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-//	LOG(("%s %d\n", FUNCNAME, id));
+//  LOG(("%s %d\n", FUNCNAME, id));
 
 	switch(id)
 	{
@@ -1837,7 +1837,7 @@ void z80scc_channel::do_sccreg_wr14(UINT8 data)
 		{
 			int rate = m_owner->clock() / m_brg_counter;
 			LOG(("PCLK as source, rate (%d) = PCLK (%d) / (%d)\n", rate, m_owner->clock(), m_brg_counter));
-		
+
 			baudtimer->adjust(attotime::from_hz(rate), TIMER_ID_BAUD, attotime::from_hz(rate)); // Start the baudrate generator
 		}
 		else
@@ -2250,24 +2250,24 @@ WRITE_LINE_MEMBER( z80scc_channel::sync_w )
 WRITE_LINE_MEMBER( z80scc_channel::rxc_w )
 {
 /* Support for external clock as source for BRG yet to be finished */
-#if 0 
+#if 0
 	//LOG(("Z80SCC \"%s\": %c : Receiver Clock Pulse\n", m_owner->tag(), m_index + 'A'));
 	if ( ((m_wr3 & WR3_RX_ENABLE) | (m_wr5 & WR5_TX_ENABLE)) && m_wr14 & WR14_BRG_ENABLE)
 	{
-		if (!(m_wr14 & WR14_BRG_SOURCE)) // Is the Baud rate Generator driven by RTxC? 
+		if (!(m_wr14 & WR14_BRG_SOURCE)) // Is the Baud rate Generator driven by RTxC?
 		{
 			printf("x");
 			if (!m_brg_counter) // Zero crossing?!
 			{
 				printf(".");
 				m_brg_counter =  m_wr13 << 8 | m_wr12; // Reload BRG counter
-				if ((m_wr11 & WR11_TRACLK_SRC_MASK) == WR11_TRACLK_SRC_BR) // Is transmitt clock driven by BRG? 
+				if ((m_wr11 & WR11_TRACLK_SRC_MASK) == WR11_TRACLK_SRC_BR) // Is transmitt clock driven by BRG?
 				{
 					printf("+");
 					txc_w(state);
 				}
 			}
-			else 
+			else
 			{
 				m_brg_counter--;
 				if ((m_wr11 & WR11_RCVCLK_SRC_MASK) == WR11_RCVCLK_SRC_BR) // Is receive clock driven by BRG and not zero cross

@@ -128,7 +128,7 @@ private:
 	std::mutex m_device_lock;
 
 public:
-	keyboard_state	keyboard;
+	keyboard_state  keyboard;
 
 	dinput_keyboard_device(running_machine &machine, const char *name, input_module &module)
 		: dinput_device(machine, name, DEVICE_CLASS_KEYBOARD, module),
@@ -215,7 +215,7 @@ public:
 	}
 
 	virtual BOOL device_enum_callback(LPCDIDEVICEINSTANCE instance, LPVOID ref) = 0;
-	
+
 	struct dinput_callback_context
 	{
 		dinput_module *     self;
@@ -504,7 +504,7 @@ public:
 
 	dinput_joystick_device(running_machine &machine, const char *name, input_module &module)
 		: dinput_device(machine, name, DEVICE_CLASS_JOYSTICK, module),
-		  joystick({{0}})
+			joystick({{0}})
 	{
 	}
 

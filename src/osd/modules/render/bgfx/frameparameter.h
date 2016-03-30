@@ -20,15 +20,15 @@
 class bgfx_frame_parameter : public bgfx_parameter
 {
 public:
-    bgfx_frame_parameter(std::string name, parameter_type type, uint32_t period);
-    virtual ~bgfx_frame_parameter() { }
+	bgfx_frame_parameter(std::string name, parameter_type type, uint32_t period);
+	virtual ~bgfx_frame_parameter() { }
 
-    virtual float value() override;
-    virtual void tick(double delta) override;
+	virtual float value() override;
+	virtual void tick(double delta) override;
 
 private:
-	uint32_t	m_current_frame;
-	uint32_t	m_period;
+	uint32_t    m_current_frame;
+	uint32_t    m_period;
 };
 
 #endif // __DRAWBGFX_FRAME_PARAMETER__

@@ -38,7 +38,7 @@ bgfx_entry_uniform* value_uniform_reader::read_from_value(const Value& value, st
 
 bool value_uniform_reader::validate_parameters(const Value& value, std::string prefix)
 {
-    if (!READER_CHECK(value.HasMember("value"), (prefix + "Must have string value 'value' (what value is being assigned?)\n").c_str())) return false;
-    if (!READER_CHECK(value["value"].IsArray() || value["value"].IsNumber(), (prefix + "Value 'value' must be numeric or an array\n").c_str())) return false;
-    return true;
+	if (!READER_CHECK(value.HasMember("value"), (prefix + "Must have string value 'value' (what value is being assigned?)\n").c_str())) return false;
+	if (!READER_CHECK(value["value"].IsArray() || value["value"].IsNumber(), (prefix + "Value 'value' must be numeric or an array\n").c_str())) return false;
+	return true;
 }

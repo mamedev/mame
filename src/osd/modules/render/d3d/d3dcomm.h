@@ -193,7 +193,7 @@ public:
 			float line_time, float line_length,
 			float prim_width, float prim_height);
 
-    // TODO: Remove needless 'get_' prefix
+	// TODO: Remove needless 'get_' prefix
 	D3DPRIMITIVETYPE        get_type() const { return m_type; }
 	UINT32                  get_count() const { return m_count; }
 	UINT32                  get_vertcount() const { return m_numverts; }

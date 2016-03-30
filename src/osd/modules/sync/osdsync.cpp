@@ -20,7 +20,7 @@
 //============================================================
 
 struct osd_event {
-	std::mutex			     *mutex;
+	std::mutex               *mutex;
 	std::condition_variable  *cond;
 	std::atomic<INT32>       autoreset;
 	std::atomic<INT32>       signalled;
@@ -118,7 +118,7 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 					}
 					else
 						break;
-				} else 
+				} else
 					break;
 
 			} while (TRUE);
@@ -130,4 +130,3 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 
 	return TRUE;
 }
-

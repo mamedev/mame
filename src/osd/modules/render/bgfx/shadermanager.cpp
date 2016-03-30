@@ -44,9 +44,9 @@ bgfx::ShaderHandle shader_manager::load_shader(std::string name)
 	std::string shader_path;
 	switch (bgfx::getRendererType())
 	{
-        case bgfx::RendererType::Direct3D9:
-            shader_path = m_options.bgfx_path() + std::string("/shaders/dx9/");
-            break;
+		case bgfx::RendererType::Direct3D9:
+			shader_path = m_options.bgfx_path() + std::string("/shaders/dx9/");
+			break;
 
 		case bgfx::RendererType::Direct3D11:
 		case bgfx::RendererType::Direct3D12:
@@ -66,7 +66,7 @@ bgfx::ShaderHandle shader_manager::load_shader(std::string name)
 			break;
 
 		default:
-            fatalerror("Unknown BGFX renderer type %d", bgfx::getRendererType());
+			fatalerror("Unknown BGFX renderer type %d", bgfx::getRendererType());
 	}
 
 	bgfx::ShaderHandle handle = bgfx::createShader(load_mem(shader_path + name + ".bin"));

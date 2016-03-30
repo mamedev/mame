@@ -20,11 +20,11 @@
 class bgfx_time_parameter : public bgfx_parameter
 {
 public:
-    bgfx_time_parameter(std::string name, parameter_type type, double limit);
-    virtual ~bgfx_time_parameter() { }
+	bgfx_time_parameter(std::string name, parameter_type type, double limit);
+	virtual ~bgfx_time_parameter() { }
 
-    virtual float value() override;
-    virtual void tick(double delta) override;
+	virtual float value() override;
+	virtual void tick(double delta) override;
 
 private:
 	double m_current_time;

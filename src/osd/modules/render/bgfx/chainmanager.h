@@ -29,7 +29,7 @@ class chain_manager {
 public:
 	chain_manager(osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects)
 		: m_options(options)
-        , m_textures(textures)
+		, m_textures(textures)
 		, m_targets(targets)
 		, m_effects(effects)
 	{
@@ -42,11 +42,11 @@ public:
 private:
 	bgfx_chain* load_chain(std::string name, running_machine& machine, uint32_t window_index, uint32_t screen_index);
 
-    osd_options&                        m_options;
-	texture_manager&					m_textures;
-	target_manager&						m_targets;
+	osd_options&                        m_options;
+	texture_manager&                    m_textures;
+	target_manager&                     m_targets;
 	effect_manager&                     m_effects;
-	std::vector<bgfx_chain*>	        m_chains;
+	std::vector<bgfx_chain*>            m_chains;
 };
 
 #endif // __DRAWBGFX_CHAIN_MANAGER__

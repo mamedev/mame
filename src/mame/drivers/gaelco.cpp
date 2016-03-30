@@ -500,7 +500,7 @@ void gaelco_state::machine_start()
 {
 	if (memregion("oki")->bytes() > 0x040000) //bigkarnk oki isn't banked
 		membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
-}		
+}
 
 static MACHINE_CONFIG_START( bigkarnk, gaelco_state )
 

@@ -262,43 +262,43 @@ void windows_osd_interface::update_slider_list()
 
 int windows_osd_interface::window_count()
 {
-    int count = 0;
-    for (win_window_info *info = win_window_list; info != nullptr; info = info->m_next)
-    {
-        count++;
-    }
-    return count;
+	int count = 0;
+	for (win_window_info *info = win_window_list; info != nullptr; info = info->m_next)
+	{
+		count++;
+	}
+	return count;
 }
 
 void windows_osd_interface::build_slider_list()
 {
-    m_sliders = nullptr;
-    slider_state* full_list = nullptr;
-    slider_state* curr = nullptr;
+	m_sliders = nullptr;
+	slider_state* full_list = nullptr;
+	slider_state* curr = nullptr;
 	for (win_window_info *window = win_window_list; window != nullptr; window = window->m_next)
 	{
 		// take the sliders of the first window
-        slider_state* window_sliders = window->m_renderer->get_slider_list();
-        if (window_sliders == nullptr)
-        {
-            continue;
-        }
+		slider_state* window_sliders = window->m_renderer->get_slider_list();
+		if (window_sliders == nullptr)
+		{
+			continue;
+		}
 
-        if (full_list == nullptr)
-        {
-            full_list = curr = window_sliders;
-        }
-        else
-        {
-            curr->next = window_sliders;
-        }
+		if (full_list == nullptr)
+		{
+			full_list = curr = window_sliders;
+		}
+		else
+		{
+			curr->next = window_sliders;
+		}
 
-        while (curr->next != nullptr) {
-            curr = curr->next;
-        }
+		while (curr->next != nullptr) {
+			curr = curr->next;
+		}
 	}
 
-    m_sliders = full_list;
+	m_sliders = full_list;
 }
 
 //============================================================

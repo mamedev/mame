@@ -2,17 +2,17 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Super Cross II (c) 1987 GM Shoji
+    Super Cross II (c) 1987 GM Shoji
 
-	driver by Angelo Salese, based off "wiped off due of not anymore licenseable" driver by insideoutboy.   
+    driver by Angelo Salese, based off "wiped off due of not anymore licenseable" driver by insideoutboy.
 
-	TODO:
-	- complete rewrite;
-	- scanline renderer;
-	- understand irq 0 source;
-	- output bit 0 might be watchdog armed bit/sprite start DMA instead of irq enable;
-	- weird visible area resolution, 224 or 240 x 224? Maybe it's really just 256 x 224 and then it's supposed 
-	  to show garbage/nothing on the edges?
+    TODO:
+    - complete rewrite;
+    - scanline renderer;
+    - understand irq 0 source;
+    - output bit 0 might be watchdog armed bit/sprite start DMA instead of irq enable;
+    - weird visible area resolution, 224 or 240 x 224? Maybe it's really just 256 x 224 and then it's supposed
+      to show garbage/nothing on the edges?
 
 ===================================
 
@@ -85,7 +85,7 @@ public:
 	required_shared_ptr<UINT8> m_bgattr;
 	required_shared_ptr<UINT8> m_sprram;
 
-	
+
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(sprcros2);
@@ -108,7 +108,7 @@ protected:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-	
+
 private:
 	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
@@ -132,7 +132,7 @@ void sprcros2_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 			tile |= (m_bgattr[count] & 7) << 8;
 			bool flipx = bool(m_bgattr[count] & 0x08);
 			UINT8 color = (m_bgattr[count] & 0xf0) >> 4;
-			
+
 			gfx_0->opaque(bitmap,cliprect,tile,color,flipx,0,x*8-m_bg_scrollx,y*8-m_bg_scrolly);
 			gfx_0->opaque(bitmap,cliprect,tile,color,flipx,0,x*8+256-m_bg_scrollx,y*8-m_bg_scrolly);
 			gfx_0->opaque(bitmap,cliprect,tile,color,flipx,0,x*8-m_bg_scrollx,y*8+256-m_bg_scrolly);
@@ -141,7 +141,7 @@ void sprcros2_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 			count++;
 		}
 	}
-	
+
 }
 
 void sprcros2_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
@@ -152,7 +152,7 @@ void sprcros2_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 	{
 		UINT8 x,y,tile,color;
 		bool flipx;
-		
+
 		y = 224-m_sprram[count+2];
 		x = m_sprram[count+3];
 		tile = m_sprram[count+0];
@@ -207,21 +207,21 @@ WRITE8_MEMBER(sprcros2_state::master_output_w)
 {
 	//popmessage("%02x",data);
 	//if(data & 0xbe)
-	//	printf("master 07 -> %02x\n",data);
+	//  printf("master 07 -> %02x\n",data);
 
 	membank("master_rombank")->set_entry((data&0x40)>>6);
 	m_master_nmi_enable = bool(data & 1);
 	m_screen_enable = bool(data & 4);
 	m_master_irq_enable = bool(data & 8);
-//	if(data & 0x80)
-//		m_master_cpu->set_input_line(0,HOLD_LINE);
+//  if(data & 0x80)
+//      m_master_cpu->set_input_line(0,HOLD_LINE);
 }
 
 WRITE8_MEMBER(sprcros2_state::slave_output_w)
 {
 	//if(data & 0xf6)
-	//	printf("slave 03 -> %02x\n",data);
-	
+	//  printf("slave 03 -> %02x\n",data);
+
 	m_slave_nmi_enable = bool(data & 1);
 	membank("slave_rombank")->set_entry((data&8)>>3);
 }
@@ -453,7 +453,7 @@ static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_IO_MAP(slave_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sprcros2_state,  slave_vblank_irq)
-	
+
 	MCFG_QUANTUM_PERFECT_CPU("master_cpu")
 
 	/* video hardware */
@@ -494,7 +494,7 @@ ROM_START( sprcros2 )
 	ROM_LOAD( "scm-03.10g", 0x00000, 0x4000, CRC(b9757908) SHA1(d59cb2aac1b6268fc766306850f5711d4a12d897) )
 	ROM_LOAD( "scm-02.10j", 0x04000, 0x4000, CRC(849c5c87) SHA1(0e02c4990e371d6a290efa53301818e769648945) )
 	ROM_LOAD( "scm-01.10k", 0x08000, 0x4000, CRC(385a62de) SHA1(847bf9d97ab3fa8949d9198e4e509948a940d6aa) )
-	
+
 	ROM_REGION( 0x4000, "master_bank", 0)
 	ROM_LOAD( "scm-00.10l", 0x00000, 0x4000, CRC(13fa3684) SHA1(611b7a237e394f285dcc5beb027dacdbdd58a7a0) )
 
@@ -534,13 +534,13 @@ ROM_START( sprcros2a )
 	ROM_LOAD( "scm-01.10k", 0x08000, 0x4000, CRC(385a62de) SHA1(847bf9d97ab3fa8949d9198e4e509948a940d6aa) )
 
 	ROM_REGION( 0x4000, "master_bank", 0)
-	ROM_LOAD( "scm-00.10l", 0x00000, 0x4000, CRC(13fa3684) SHA1(611b7a237e394f285dcc5beb027dacdbdd58a7a0) ) 
-	
+	ROM_LOAD( "scm-00.10l", 0x00000, 0x4000, CRC(13fa3684) SHA1(611b7a237e394f285dcc5beb027dacdbdd58a7a0) )
+
 	ROM_REGION( 0xc000, "slave", 0 )
 	ROM_LOAD( "scs-30.5f",  0x00000, 0x4000, CRC(c0a40e41) SHA1(e74131b353855749258dffa45091c825ccdbf05a) )
 	ROM_LOAD( "scs-29.5h",  0x04000, 0x4000, CRC(83d49fa5) SHA1(7112110df2f382bbc0e651adcec975054a485b9b) )
 	ROM_LOAD( "scs-28.5j",  0x08000, 0x4000, CRC(480d351f) SHA1(d1b86f441ae0e58b30e0f089ab25de219d5f30e3) )
-	
+
 	ROM_REGION( 0x4000, "slave_bank", 0)
 	ROM_LOAD( "scs-27.5k",  0x00000, 0x4000, CRC(2cf720cb) SHA1(a95c5b8c88371cf597bb7d80afeca6a48c7b74e6) )
 

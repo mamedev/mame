@@ -396,9 +396,9 @@ public:
 	const char *autoboot_script() const { return value(OPTION_AUTOBOOT_SCRIPT); }
 
 	bool console() const { return bool_value(OPTION_CONSOLE); }
-	
+
 	bool plugins() const { return bool_value(OPTION_PLUGINS); }
-	
+
 	const char *plugin() const { return value(OPTION_PLUGIN); }
 	const char *no_plugin() const { return value(OPTION_NO_PLUGIN); }
 

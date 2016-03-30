@@ -115,26 +115,26 @@ WRITE8_MEMBER( svi_expander_device::iorq_w )
 
 WRITE_LINE_MEMBER( svi_expander_device::bk21_w )
 {
-	 if (m_module)
-		 m_module->bk21_w(state);
+		if (m_module)
+			m_module->bk21_w(state);
 }
 
 WRITE_LINE_MEMBER( svi_expander_device::bk22_w )
 {
-	 if (m_module)
-		 m_module->bk22_w(state);
+		if (m_module)
+			m_module->bk22_w(state);
 }
 
 WRITE_LINE_MEMBER( svi_expander_device::bk31_w )
 {
-	 if (m_module)
-		 m_module->bk31_w(state);
+		if (m_module)
+			m_module->bk31_w(state);
 }
 
 WRITE_LINE_MEMBER( svi_expander_device::bk32_w )
 {
-	 if (m_module)
-		 m_module->bk32_w(state);
+		if (m_module)
+			m_module->bk32_w(state);
 }
 
 

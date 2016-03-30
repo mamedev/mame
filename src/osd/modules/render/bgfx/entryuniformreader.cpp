@@ -22,11 +22,11 @@ bgfx_entry_uniform* entry_uniform_reader::read_from_value(const Value& value, st
 		return nullptr;
 	}
 
-    std::string name = value["uniform"].GetString();
+	std::string name = value["uniform"].GetString();
 	bgfx_uniform* uniform = effect->uniform(name);
 
-    if (!READER_CHECK(uniform != nullptr, (prefix + "Uniform '" + name + " does not appear to exist\n").c_str()))
-    {
+	if (!READER_CHECK(uniform != nullptr, (prefix + "Uniform '" + name + " does not appear to exist\n").c_str()))
+	{
 		return nullptr;
 	}
 
@@ -53,7 +53,7 @@ bgfx_entry_uniform* entry_uniform_reader::read_from_value(const Value& value, st
 
 bool entry_uniform_reader::validate_parameters(const Value& value, std::string prefix)
 {
-    if (!READER_CHECK(value.HasMember("uniform"), (prefix + "Must have string value 'uniform' (what uniform are we mapping?)\n").c_str())) return false;
-    if (!READER_CHECK(value["uniform"].IsString(), (prefix + "Value 'effect' must be a string\n").c_str())) return false;
-    return true;
+	if (!READER_CHECK(value.HasMember("uniform"), (prefix + "Must have string value 'uniform' (what uniform are we mapping?)\n").c_str())) return false;
+	if (!READER_CHECK(value["uniform"].IsString(), (prefix + "Value 'effect' must be a string\n").c_str())) return false;
+	return true;
 }

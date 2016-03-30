@@ -133,7 +133,7 @@ A Korean version has been seen too (unless this can be switched?)
 static ADDRESS_MAP_START( sms_supergame_map, AS_PROGRAM, 8, smsbootleg_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xfff7) AM_RAM
-//	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
+//  AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(smsbootleg_state::port08_w)
@@ -286,7 +286,7 @@ ROM_START( smssgame )
 	ROM_LOAD( "Rom1.bin", 0x00000, 0x10000, CRC(0e1f258e) SHA1(9240dc0d01e3061c0c8807c07c0a1d033ebe9116) ) // yes, this rom is smaller (menu rom)
 
 	ROM_LOAD( "rom2.bin",0x020000, 0x20000, CRC(c1478323) SHA1(27b524a234f072e81ef41fb89a5fff5617e9b951) ) // Buk Doo Sun
-	ROM_LOAD( "rom3.bin",0x040000, 0x20000, CRC(96c8705d) SHA1(ba4f4af0cfdad1d63a08201ed186c79aea062b95) ) // ? Kung Fu game (Hello Kang Si?)	 
+	ROM_LOAD( "rom3.bin",0x040000, 0x20000, CRC(96c8705d) SHA1(ba4f4af0cfdad1d63a08201ed186c79aea062b95) ) // ? Kung Fu game (Hello Kang Si?)
 	// there is something in the position marked ROM4.
 
 	// k12 unpopulated
@@ -302,7 +302,7 @@ ROM_START( smssgame )
 	ROM_LOAD( "K2.bin",  0x120000, 0x20000, CRC(a12439f4) SHA1(e957d4fe275e982bedef28af8cc2957da27dc512) ) // Final Bubble Bobble (1/2)
 	ROM_LOAD( "K1.bin",  0x140000, 0x20000, CRC(dadffecd) SHA1(68ebb968539049a9e193da5200856b9f956f7e02) ) // Final Bubble Bobble (2/2)
 
-	ROM_LOAD( "rom4.bin",0x180000, 0x80000, NO_DUMP ) // missing	 
+	ROM_LOAD( "rom4.bin",0x180000, 0x80000, NO_DUMP ) // missing
 
 	// there seems to be some kind of MCU for the timer?
 ROM_END
@@ -310,5 +310,3 @@ ROM_END
 
 
 GAME( 199?, smssgame,  0,    sms_supergame, sms_supergame, smsbootleg_state,  sms_supergame, ROT0, "Sono Corp Japan", "Super Game (Sega Master System Multi-game bootleg)", MACHINE_NOT_WORKING )
-
-

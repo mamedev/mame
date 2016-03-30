@@ -92,7 +92,7 @@ public:
 		: m_seconds(0),
 			m_attoseconds(0) { }
 
-    /** Constructs with @p secs seconds and @p attos attoseconds. */
+	/** Constructs with @p secs seconds and @p attos attoseconds. */
 	attotime(seconds_t secs, attoseconds_t attos)
 		: m_seconds(secs),
 			m_attoseconds(attos) { }
@@ -118,25 +118,25 @@ public:
 	double as_double() const { return double(m_seconds) + ATTOSECONDS_TO_DOUBLE(m_attoseconds); }
 	attoseconds_t as_attoseconds() const;
 	UINT64 as_ticks(UINT32 frequency) const;
-    /** Convert to string using at @p precision */
+	/** Convert to string using at @p precision */
 	const char *as_string(int precision = 9) const;
 
-    /** @return the attoseconds portion. */
-    attoseconds_t attoseconds() const { return m_attoseconds; }
-    /** @return the seconds portion. */
+	/** @return the attoseconds portion. */
+	attoseconds_t attoseconds() const { return m_attoseconds; }
+	/** @return the seconds portion. */
 	seconds_t seconds() const { return m_seconds; }
 
 	static attotime from_double(double _time);
 	static attotime from_ticks(UINT64 ticks, UINT32 frequency);
-    /** Create an attotime from a integer count of seconds @seconds */
+	/** Create an attotime from a integer count of seconds @seconds */
 	static attotime from_seconds(INT32 seconds) { return attotime(seconds, 0); }
-    /** Create an attotime from a integer count of milliseconds @msec */
+	/** Create an attotime from a integer count of milliseconds @msec */
 	static attotime from_msec(INT64 msec) { return attotime(msec / 1000, (msec % 1000) * (ATTOSECONDS_PER_SECOND / 1000)); }
-    /** Create an attotime from a integer count of microseconds @usec */
+	/** Create an attotime from a integer count of microseconds @usec */
 	static attotime from_usec(INT64 usec) { return attotime(usec / 1000000, (usec % 1000000) * (ATTOSECONDS_PER_SECOND / 1000000)); }
-    /** Create an attotime from a integer count of nanoseconds @nsec */
+	/** Create an attotime from a integer count of nanoseconds @nsec */
 	static attotime from_nsec(INT64 nsec) { return attotime(nsec / 1000000000, (nsec % 1000000000) * (ATTOSECONDS_PER_SECOND / 1000000000)); }
-    /** Create an attotime from at the given frequency @frequency */
+	/** Create an attotime from at the given frequency @frequency */
 	static attotime from_hz(double frequency) { assert(frequency > 0); double d = 1 / frequency; return attotime(floor(d), modf(d, &d) * ATTOSECONDS_PER_SECOND); }
 
 	// math

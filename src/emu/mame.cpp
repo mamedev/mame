@@ -156,21 +156,21 @@ void machine_manager::update_machine()
 
 std::vector<std::string> split(const std::string &text, char sep)
 {
-    std::vector<std::string> tokens;
-    std::size_t start = 0, end = 0;
-    while ((end = text.find(sep, start)) != std::string::npos) {
-        std::string temp = text.substr(start, end - start);
-        if (temp != "") tokens.push_back(temp);
-        start = end + 1;
-    }
-    std::string temp = text.substr(start);
-    if (temp != "") tokens.push_back(temp);
-    return tokens;
+	std::vector<std::string> tokens;
+	std::size_t start = 0, end = 0;
+	while ((end = text.find(sep, start)) != std::string::npos) {
+		std::string temp = text.substr(start, end - start);
+		if (temp != "") tokens.push_back(temp);
+		start = end + 1;
+	}
+	std::string temp = text.substr(start);
+	if (temp != "") tokens.push_back(temp);
+	return tokens;
 }
 
 void machine_manager::start_luaengine()
 {
-	if (options().plugins()) 
+	if (options().plugins())
 	{
 		path_iterator iter(options().plugins_path());
 		std::string pluginpath;
@@ -193,15 +193,15 @@ void machine_manager::start_luaengine()
 			}
 		}
 		for (auto curentry = m_plugins->first(); curentry != nullptr; curentry = curentry->next())
-		{	
+		{
 			if (!curentry->is_header())
 			{
-				if (std::find(include.begin(), include.end(), curentry->name()) != include.end()) 
+				if (std::find(include.begin(), include.end(), curentry->name()) != include.end())
 				{
 					std::string error_string;
 					m_plugins->set_value(curentry->name(), "1", OPTION_PRIORITY_CMDLINE, error_string);
 				}
-				if (std::find(exclude.begin(), exclude.end(), curentry->name()) != exclude.end()) 
+				if (std::find(exclude.begin(), exclude.end(), curentry->name()) != exclude.end())
 				{
 					std::string error_string;
 					m_plugins->set_value(curentry->name(), "0", OPTION_PRIORITY_CMDLINE, error_string);
@@ -210,7 +210,7 @@ void machine_manager::start_luaengine()
 		}
 	}
 	m_lua->initialize();
-	
+
 	{
 		emu_file file(options().plugins_path(), OPEN_FLAG_READ);
 		osd_file::error filerr = file.open("boot.lua");

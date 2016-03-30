@@ -2406,5 +2406,3 @@ GAME( 198?, grudge,   0,        balsente, grudge, balsente_state,   grudge,   RO
 #if 0
 GAME( 1985, teamht,   hattrick, balsente, teamht, balsente_state, teamht, ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )
 #endif
-
-

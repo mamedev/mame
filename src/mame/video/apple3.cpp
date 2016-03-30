@@ -488,33 +488,33 @@ void apple3_state::graphics_chires(bitmap_ind16 &bitmap, const rectangle &clipre
 
 UINT32 apple3_state::screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//	printf("gfx mode %x\n", m_flags & (VAR_VM3|VAR_VM1|VAR_VM0));
+//  printf("gfx mode %x\n", m_flags & (VAR_VM3|VAR_VM1|VAR_VM0));
 
 	switch(m_flags & (VAR_VM3|VAR_VM1|VAR_VM0))
 	{
 		case 0:
 		case VAR_VM0:
-			text40(bitmap, cliprect);   	 	// 1
+			text40(bitmap, cliprect);           // 1
 			break;
 
-		case VAR_VM1:							// 2
-		case VAR_VM1|VAR_VM0:					// 3
+		case VAR_VM1:                           // 2
+		case VAR_VM1|VAR_VM0:                   // 3
 			text80(bitmap, cliprect);
 			break;
 
-		case VAR_VM3:							// 8
+		case VAR_VM3:                           // 8
 			graphics_hgr(bitmap, cliprect);    /* hgr mode */
 			break;
 
-		case VAR_VM3|VAR_VM0:					// 9
+		case VAR_VM3|VAR_VM0:                   // 9
 			graphics_chgr(bitmap, cliprect);
 			break;
 
-		case VAR_VM3|VAR_VM1:					// a
+		case VAR_VM3|VAR_VM1:                   // a
 			graphics_shgr(bitmap, cliprect);
 			break;
 
-		case VAR_VM3|VAR_VM1|VAR_VM0:			// b
+		case VAR_VM3|VAR_VM1|VAR_VM0:           // b
 			graphics_chires(bitmap, cliprect);
 			break;
 	}

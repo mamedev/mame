@@ -186,7 +186,7 @@ public:
 	void set_be(const int be) {m_be = be;}
 	void set_autoconfig(const int autoconfig) {m_autoconfig = autoconfig;}
 	void set_irq_info(const int irq_num) {m_irq_num = irq_num;}
-	
+
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
 	// pci bus
@@ -228,7 +228,7 @@ private:
 	UINT32 m_clock;
 	int m_be, m_autoconfig;
 	int m_irq_num;
-	
+
 	address_space_config m_mem_config, m_io_config;
 
 	DECLARE_ADDRESS_MAP(cpu_map, 32);

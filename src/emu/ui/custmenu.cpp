@@ -22,7 +22,7 @@
 //-------------------------------------------------
 //  ctor / dtor
 //-------------------------------------------------
-ui_menu_custom_filter::ui_menu_custom_filter(running_machine &machine, render_container *container, bool _single_menu) 
+ui_menu_custom_filter::ui_menu_custom_filter(running_machine &machine, render_container *container, bool _single_menu)
 	: ui_menu(machine, container)
 	, m_single_menu(_single_menu)
 	, m_added(false)

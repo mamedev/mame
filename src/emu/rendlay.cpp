@@ -1320,7 +1320,7 @@ void layout_element::component::load_bitmap()
 	// PNG failed, let's try JPG
 	if (!m_bitmap[0].valid())
 		render_load_jpeg(m_bitmap[0], *m_file[0], m_dirname.c_str(), m_imagefile[0].c_str());
-	
+
 	// if we can't load the bitmap, allocate a dummy one and report an error
 	if (!m_bitmap[0].valid())
 	{

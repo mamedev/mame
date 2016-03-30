@@ -72,12 +72,12 @@ public:
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(spyhuntertec_paletteram_w);
 	DECLARE_DRIVER_INIT(spyhuntertec);
-//	DECLARE_VIDEO_START(spyhuntertec);
-//	UINT32 screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+//  DECLARE_VIDEO_START(spyhuntertec);
+//  UINT32 screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_port04_w);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_fd00_w);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_portf0_w);
-	
+
 	DECLARE_WRITE8_MEMBER(spyhunt_videoram_w);
 	DECLARE_WRITE8_MEMBER(spyhunt_alpharam_w);
 	DECLARE_WRITE8_MEMBER(spyhunt_scroll_value_w);
@@ -106,12 +106,12 @@ public:
 
 WRITE8_MEMBER(spyhuntertec_state::ay1_porta_w)
 {
-//	printf("ay1_porta_w %02x\n", data);
+//  printf("ay1_porta_w %02x\n", data);
 }
 
 READ8_MEMBER(spyhuntertec_state::ay1_porta_r)
 {
-//	printf("ay1_porta_r\n");
+//  printf("ay1_porta_r\n");
 	return 0;
 }
 
@@ -119,9 +119,9 @@ READ8_MEMBER(spyhuntertec_state::ay1_porta_r)
 
 WRITE8_MEMBER(spyhuntertec_state::ay2_porta_w)
 {
-//	printf("ay2_porta_w %02x\n", data);
+//  printf("ay2_porta_w %02x\n", data);
 	// write 80 / 00
-	// or 81 / 01 
+	// or 81 / 01
 	// depending on which sound command was used
 	// assuming input select
 
@@ -139,9 +139,9 @@ WRITE8_MEMBER(spyhuntertec_state::ay2_porta_w)
 
 	}
 
-	
-	
-	
+
+
+
 
 }
 
@@ -149,7 +149,7 @@ READ8_MEMBER(spyhuntertec_state::ay2_porta_r)
 {
 // read often, even if port is set to output mode
 // maybe latches something?
-//	printf("ay2_porta_r\n");
+//  printf("ay2_porta_r\n");
 	return 0x00; // not sure value matters
 }
 
@@ -228,7 +228,7 @@ TILE_GET_INFO_MEMBER(spyhuntertec_state::spyhunt_get_alpha_tile_info)
 
 
 void spyhuntertec_state::video_start()
-{	
+{
 	/* initialize the background tilemap */
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spyhuntertec_state::spyhunt_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(spyhuntertec_state::spyhunt_bg_scan),this),  64,16, 64,32);
 
@@ -335,7 +335,7 @@ UINT32 spyhuntertec_state::screen_update_spyhuntertec(screen_device &screen, bit
 
 WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_fd00_w)
 {
-//	printf("%04x spyhuntertec_fd00_w %02x\n", space.device().safe_pc(), data);
+//  printf("%04x spyhuntertec_fd00_w %02x\n", space.device().safe_pc(), data);
 	soundlatch_byte_w(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -360,55 +360,55 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 
 	/*
 
-		-- input reading code here
-		A388: 3E 14         ld   a,$14
-		A38A: 28 04         jr   z,$A390
-		A38C: DD 23         inc  ix
-		A38E: 3E 04         ld   a,$04
-		A390: CD 20 A5      call $A520 << write command to sub-cpu
+	    -- input reading code here
+	    A388: 3E 14         ld   a,$14
+	    A38A: 28 04         jr   z,$A390
+	    A38C: DD 23         inc  ix
+	    A38E: 3E 04         ld   a,$04
+	    A390: CD 20 A5      call $A520 << write command to sub-cpu
 
-		-- delay loop / timeout loop for reading result? value of b doesn't get used in the end
-		A393: 06 1F         ld   b,$1F << loop counter
-		A395: 21 02 FC      ld   hl,$FC02
-		loopstart:
-		A398: CB 76         bit  6,(hl)
-		A39A: 28 06         jr   z,$A3A2 to dest2
-		A39C: 10 FA         djnz $A398 (to loopstart)
+	    -- delay loop / timeout loop for reading result? value of b doesn't get used in the end
+	    A393: 06 1F         ld   b,$1F << loop counter
+	    A395: 21 02 FC      ld   hl,$FC02
+	    loopstart:
+	    A398: CB 76         bit  6,(hl)
+	    A39A: 28 06         jr   z,$A3A2 to dest2
+	    A39C: 10 FA         djnz $A398 (to loopstart)
 
-		A39E: 06 0F         ld   b,$0F <
-		A3A0: 18 1E         jr   $A3C0  to dest 3
+	    A39E: 06 0F         ld   b,$0F <
+	    A3A0: 18 1E         jr   $A3C0  to dest 3
 
-		dest2:
-		A3A2: 06 33         ld   b,$33  << loop counter
-		loop2start:
-		A3A4: CB 76         bit  6,(hl)
-		A3A6: 20 11         jr   nz,$A3B9 (to outofloop)
-		A3A8: CB 76         bit  6,(hl)
-		A3AA: 00            nop
-		A3AB: CB 76         bit  6,(hl)
-		A3AD: 20 0A         jr   nz,$A3B9 (to outofloop)
-		A3AF: 10 F3         djnz $A3A4 (to loop2start)
+	    dest2:
+	    A3A2: 06 33         ld   b,$33  << loop counter
+	    loop2start:
+	    A3A4: CB 76         bit  6,(hl)
+	    A3A6: 20 11         jr   nz,$A3B9 (to outofloop)
+	    A3A8: CB 76         bit  6,(hl)
+	    A3AA: 00            nop
+	    A3AB: CB 76         bit  6,(hl)
+	    A3AD: 20 0A         jr   nz,$A3B9 (to outofloop)
+	    A3AF: 10 F3         djnz $A3A4 (to loop2start)
 
-		A3B1: 00            nop
-		A3B2: 00            nop
-		A3B3: 00            nop
-		A3B4: 00            nop
-		A3B5: 00            nop
-		A3B6: 00            nop
-		A3B7: 00            nop
-		A3B8: 00            nop
+	    A3B1: 00            nop
+	    A3B2: 00            nop
+	    A3B3: 00            nop
+	    A3B4: 00            nop
+	    A3B5: 00            nop
+	    A3B6: 00            nop
+	    A3B7: 00            nop
+	    A3B8: 00            nop
 
-		outofloop:
-		A3B9: 78            ld   a,b
-		A3BA: FE 20         cp   $20
-		A3BC: 38 02         jr   c,$A3C0
-		A3BE: 06 1F         ld   b,$1F
+	    outofloop:
+	    A3B9: 78            ld   a,b
+	    A3BA: FE 20         cp   $20
+	    A3BC: 38 02         jr   c,$A3C0
+	    A3BE: 06 1F         ld   b,$1F
 
-		dest3:
-		A3C0: 21 B6 A6      ld   hl,$A6B6
-		...
-	
-	
+	    dest3:
+	    A3C0: 21 B6 A6      ld   hl,$A6B6
+	    ...
+
+
 	*/
 
 	UINT8 ret = ioport("IN2")->read()&~0x40;
@@ -423,7 +423,7 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 		}
 		else
 		{
-		//	ret |= 0x40;
+		//  ret |= 0x40;
 			m_analog_read_count++;
 		}
 	}
@@ -432,14 +432,14 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 		ret |= 0x40;
 	}
 
-//	printf("%04x spyhuntertec_in2_r\n", space.device().safe_pc());
+//  printf("%04x spyhuntertec_in2_r\n", space.device().safe_pc());
 	return ret;
 }
 
 READ8_MEMBER(spyhuntertec_state::spyhuntertec_in3_r)
 {
 	UINT8 ret = ioport("IN3")->read();
-//	printf("%04x spyhuntertec_in3_r\n", space.device().safe_pc());
+//  printf("%04x spyhuntertec_in3_r\n", space.device().safe_pc());
 	return ret;
 }
 
@@ -715,7 +715,7 @@ static MACHINE_CONFIG_START( spyhuntertec, spyhuntertec_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spyhuntertec)
 	MCFG_PALETTE_ADD("palette", 64+4)
 
-//	MCFG_PALETTE_INIT_OWNER(spyhuntertec_state,spyhunt)
+//  MCFG_PALETTE_INIT_OWNER(spyhuntertec_state,spyhunt)
 
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000 )

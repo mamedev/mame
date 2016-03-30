@@ -264,17 +264,17 @@ struct hlsl_options
 
 struct slider_desc
 {
-	const char *        		name;
-	int                 		minval;
-	int                 		defval;
-	int                 		maxval;
-	int                 		step;
-	int							slider_type;
-	int                 		screen_type;
-	int							id;
-	float						scale;
-	const char *				format;
-	std::vector<const char *>	strings;
+	const char *                name;
+	int                         minval;
+	int                         defval;
+	int                         maxval;
+	int                         step;
+	int                         slider_type;
+	int                         screen_type;
+	int                         id;
+	float                       scale;
+	const char *                format;
+	std::vector<const char *>   strings;
 };
 
 class slider

@@ -158,17 +158,17 @@
 ***************************************************************************************
 
   Game notes...
-  
+
   The third set is resetting after drawing the maze, and when start a game.
 
   Attract reset:
-  
+
   bp d28e (this is after all the jsr tables that draw the maze)
   $d296: jsr $e0cd...
   $e189 (jsr $6337) ; $6337 ---> Goes nowhere. Hit the 00's (BRK) and reset.
 
   Start reset:
-   
+
   $e0e9: 4c ee 60  ; jmp $60ee <--- nothing here.
 
 ***************************************************************************************
@@ -588,7 +588,7 @@ ROM_END
 
 /* This Petaco's 2-player game
    seems to soffer of some bitrot.
-   
+
    The code executes subroutines located out of the ROM space.
    Finally jumps to nowhere.
 */

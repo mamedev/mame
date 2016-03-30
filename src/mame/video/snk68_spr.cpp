@@ -17,11 +17,10 @@ snk68_spr_device::snk68_spr_device(const machine_config &mconfig, const char *ta
 		m_partialupdates(1)
 {
 	m_newtilecb =  snk68_tile_indirection_delegate(FUNC(snk68_spr_device::tile_callback_noindirect), this);
-}	
+}
 
 void snk68_spr_device::tile_callback_noindirect(int &tile, int& fx, int& fy, int& region)
 {
-
 }
 
 
@@ -43,7 +42,7 @@ void snk68_spr_device::static_set_gfxdecode_tag(device_t &device, const char *ta
 void snk68_spr_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<snk68_spr_device &>(device).m_palette.set_tag(tag);
-}	
+}
 
 // static
 void snk68_spr_device::set_tile_indirect_cb(device_t &device,snk68_tile_indirection_delegate newtilecb)

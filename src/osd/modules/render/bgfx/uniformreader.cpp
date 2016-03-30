@@ -59,5 +59,5 @@ bool uniform_reader::validate_parameters(const Value& value, std::string prefix)
 	if (!READER_CHECK(value.HasMember("type"), (prefix + "Must have string value 'type' [int, vec4, mat3, mat4]\n").c_str())) return false;
 	if (!READER_CHECK(value.HasMember("values"), (prefix + "Must have array value 'values' (what are the uniform's default values?)\n").c_str())) return false;
 	if (!READER_CHECK(value["values"].IsArray(), (prefix + "Value 'values' must be an array\n").c_str())) return false;
-    return true;
+	return true;
 }

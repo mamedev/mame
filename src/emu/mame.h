@@ -93,7 +93,7 @@ public:
 private:
 	osd_interface &         m_osd;                  // reference to OSD system
 	emu_options &           m_options;              // reference to options
-	std::unique_ptr<plugin_options> m_plugins;				// pointer to plugin options
+	std::unique_ptr<plugin_options> m_plugins;              // pointer to plugin options
 	lua_engine *            m_lua;
 
 	const game_driver *     m_new_driver_pending;   // pointer to the next pending driver

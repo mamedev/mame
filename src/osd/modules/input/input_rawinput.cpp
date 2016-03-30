@@ -231,7 +231,7 @@ static std::wstring improve_name_from_usb_path(const std::wstring &regpath)
 		foreach_subkey(subkey, [&regstring, &parentid](HKEY endkey)
 		{
 			std::wstring endparentid = reg_query_string(endkey, L"ParentIdPrefix");
-			
+
 			// This key doesn't have a ParentIdPrefix
 			if (endparentid.empty())
 				return true;
@@ -277,7 +277,7 @@ static std::wstring rawinput_device_improve_name(const std::wstring &name)
 		if (!improved.empty())
 			return improved;
 	}
-	
+
 	// Fall back to the original name
 	return name;
 }
@@ -346,7 +346,7 @@ class rawinput_mouse_device : public rawinput_device
 private:
 	std::mutex  m_device_lock;
 public:
-	mouse_state			 mouse;
+	mouse_state          mouse;
 
 	rawinput_mouse_device(running_machine& machine, const char* name, input_module& module)
 		: rawinput_device(machine, name, DEVICE_CLASS_MOUSE, module),
@@ -373,7 +373,7 @@ public:
 		// If this data was intended for a rawinput lightgun, ignore it.
 		if (rawinput.data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE)
 			return;
-		
+
 		mouse.lX += rawinput.data.mouse.lLastX * INPUT_RELATIVE_PER_PIXEL;
 		mouse.lY += rawinput.data.mouse.lLastY * INPUT_RELATIVE_PER_PIXEL;
 

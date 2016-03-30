@@ -253,7 +253,7 @@ void ui_menu::reset(ui_menu_reset_options options)
 		item_append(_("Return to Machine"), nullptr, 0, nullptr);
 	else if (parent->is_special_main_menu())
 	{
-		if (strcmp(machine().options().ui(), "simple") == 0) 
+		if (strcmp(machine().options().ui(), "simple") == 0)
 			item_append(_("Exit"), nullptr, 0, nullptr);
 		else
 			item_append(_("Exit"), nullptr, MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, nullptr);

@@ -6946,7 +6946,7 @@ Currently stalls with "PRINTER ERROR"
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap1144.u50", 0x0000, 0x0100, CRC(c80e88ef) SHA1(51c62a07f660a2f3be46a8fbb5af01cff2660e8d) )
-	
+
 	ROM_REGION( 0x1000, "printer", 0 ) /* ROM from the printer driver PCB */
 	ROM_LOAD( "lp_86.u9", 0x0000, 0x1000, CRC(cdd93c06) SHA1(96f0a6e231f355a0b82bb0e1e698edbd66ff3020) ) /* 2732 EPROM */
 ROM_END

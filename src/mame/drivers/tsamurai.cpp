@@ -6,8 +6,8 @@
 
     TODO:
     - colors for this HW are a complete mystery and probably needs HW tests.
-	- vsgongf sets 0 as player color in work RAM 0xc502 and it's never ever 
-	  set up properly. Assume protection related issue.
+    - vsgongf sets 0 as player color in work RAM 0xc502 and it's never ever
+      set up properly. Assume protection related issue.
 
     driver by Phil Stroffolino
 

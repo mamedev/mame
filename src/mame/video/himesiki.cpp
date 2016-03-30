@@ -86,11 +86,11 @@ void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 	for (offs = 0; offs < 0x100; offs += 4)
 	{
 		// not sure about this, but you sometimes get a garbage sprite in the corner otherwise.
-		if ((spriteram[offs + 0] == 0x00) && 
-	        (spriteram[offs + 1] == 0x00) &&
-		    (spriteram[offs + 2] == 0x00) &&
-		    (spriteram[offs + 3] == 0x00))
-		 	 continue;
+		if ((spriteram[offs + 0] == 0x00) &&
+			(spriteram[offs + 1] == 0x00) &&
+			(spriteram[offs + 2] == 0x00) &&
+			(spriteram[offs + 3] == 0x00))
+				continue;
 
 		int attr = spriteram[offs + 1];
 		int code = spriteram[offs + 0] | (attr & 7) << 8;

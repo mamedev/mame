@@ -29,23 +29,23 @@ public:
 		CONDITION_COUNT
 	};
 
-    enum combine_mode {
-        COMBINE_AND,
-        COMBINE_OR
-    };
+	enum combine_mode {
+		COMBINE_AND,
+		COMBINE_OR
+	};
 
-    bgfx_suppressor(std::vector<bgfx_slider*> sliders, uint32_t condition, combine_mode combine, void* value);
-    ~bgfx_suppressor();
+	bgfx_suppressor(std::vector<bgfx_slider*> sliders, uint32_t condition, combine_mode combine, void* value);
+	~bgfx_suppressor();
 
-    // Getters
-    bool suppress();
-    combine_mode combine() const { return m_combine; }
+	// Getters
+	bool suppress();
+	combine_mode combine() const { return m_combine; }
 
 private:
-    std::vector<bgfx_slider*>	m_sliders;
-    uint32_t					m_condition;
-    combine_mode                m_combine;
-    uint8_t*					m_value;
+	std::vector<bgfx_slider*>   m_sliders;
+	uint32_t                    m_condition;
+	combine_mode                m_combine;
+	uint8_t*                    m_value;
 };
 
 #endif // __DRAWBGFX_SUPPRESSOR__

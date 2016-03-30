@@ -97,7 +97,7 @@ WRITE16_MEMBER(hh_sm510_state::lcd_segment_w)
 			char buf[0x10];
 			sprintf(buf, "%d.%d.%d", offset >> 2, seg, offset & 3);
 			output().set_value(buf, state);
-			
+
 			m_lcd_output_cache[index] = state;
 		}
 	}

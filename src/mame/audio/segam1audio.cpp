@@ -16,8 +16,8 @@
 #define YM3438_TAG      "m1ym"
 
 static ADDRESS_MAP_START( segam1audio_map, AS_PROGRAM, 16, segam1audio_device )
-        AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION(":m1sndcpu", 0)
-        AM_RANGE(0x080000, 0x09ffff) AM_ROM AM_REGION(":m1sndcpu", 0x20000) // mirror of upper ROM socket
+		AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION(":m1sndcpu", 0)
+		AM_RANGE(0x080000, 0x09ffff) AM_ROM AM_REGION(":m1sndcpu", 0x20000) // mirror of upper ROM socket
 	AM_RANGE(0xc20000, 0xc20001) AM_READWRITE(m1_snd_68k_latch_r, m1_snd_68k_latch1_w )
 	AM_RANGE(0xc20002, 0xc20003) AM_READWRITE(m1_snd_v60_ready_r, m1_snd_68k_latch2_w )
 	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8(MULTIPCM_1_TAG, multipcm_device, read, write, 0x00ff )

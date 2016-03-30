@@ -23,8 +23,8 @@ public:
 private:
 	static bool validate_parameters(const Value& value, std::string prefix);
 
-    static const int TYPE_COUNT = 3;
-    static const string_to_enum TYPE_NAMES[TYPE_COUNT];
+	static const int TYPE_COUNT = 3;
+	static const string_to_enum TYPE_NAMES[TYPE_COUNT];
 };
 
 #endif // __DRAWBGFX_PARAM_READER__

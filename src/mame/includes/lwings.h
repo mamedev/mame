@@ -40,7 +40,7 @@ public:
 	UINT8    m_soundstate;
 	UINT8    m_adpcm;
 	UINT8    m_nmi_mask;
-	int		 m_sprbank;
+	int      m_sprbank;
 
 	DECLARE_WRITE8_MEMBER(avengers_adpcm_w);
 	DECLARE_READ8_MEMBER(avengers_adpcm_r);
