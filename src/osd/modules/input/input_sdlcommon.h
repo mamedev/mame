@@ -96,12 +96,16 @@ public:
 		std::lock_guard<std::mutex> scope_lock(m_lock);
 
 		// Loop over the entries and find ones that match our subscriber
-		// remove those that match
-		for (auto iter = m_subscription_index.begin(); iter != m_subscription_index.end(); iter++)
+		std::vector<typename std::unordered_multimap<int, TSubscriber*>::iterator> remove;
+		for (auto iter = m_subscription_index.begin(); iter != m_subscription_index.end(); ++iter)
 		{
 			if (iter->second == subscriber)
-				m_subscription_index.erase(iter);
+				remove.push_back(iter);
 		}
+
+		// remove those that matched
+		for (int i = 0; i < remove.size(); i++)
+			m_subscription_index.erase(remove[i]);
 	}
 
 	virtual void process_events(running_machine &machine) = 0;

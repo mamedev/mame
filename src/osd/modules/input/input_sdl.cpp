@@ -435,6 +435,14 @@ public:
 		}
 	}
 
+	void exit() override
+	{
+		// unsubscribe for events
+		sdl_event_manager::instance().unsubscribe(this);
+
+		input_module_base::exit();
+	}
+
 	void before_poll(running_machine& machine) override
 	{
 		// Tell the event manager to process events and push them to the devices
