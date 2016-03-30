@@ -628,7 +628,7 @@ if _OPTIONS["with-system-jpeg"]~=nil then
 	}
 end
 
-if _OPTIONS["with-system-flac"]~=nil then
+if not _OPTIONS["with-system-flac"]~=nil then
 	defines {
 		"FLAC__NO_DLL",
 	}
