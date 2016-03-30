@@ -172,7 +172,9 @@ void ngbootleg_prot_device::install_kof10th_protection (cpu_device* maincpu, neo
 	maincpu->space(AS_PROGRAM).install_write_handler(0x240000, 0x2fffff, write16_delegate(FUNC(ngbootleg_prot_device::kof10th_bankswitch_w),this));
 	memcpy(m_cartridge_ram2, cpurom + 0xe0000, 0x20000);
 
-	save_pointer(NAME(m_fixedrom), 0x40000);
+	// HACK: only save this at device_start (not allowed later)
+	if (machine().phase() <= MACHINE_PHASE_INIT)
+		save_pointer(NAME(m_fixedrom), 0x40000);
 }
 
 void ngbootleg_prot_device::decrypt_kof10th(UINT8* cpurom, UINT32 cpurom_size)
