@@ -35,60 +35,60 @@ public:
 
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(m_line);
 	DECLARE_WRITE_LINE_MEMBER(mo_line);
 	DECLARE_WRITE_LINE_MEMBER(gsq_line);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
 
 	DECLARE_WRITE8_MEMBER( set_lines );
-	
-	static void set_region_and_ident(device_t &device, const char *regionname, int offset, int ident) 
+
+	static void set_region_and_ident(device_t &device, const char *regionname, int offset, int ident)
 	{
 		downcast<tmc0430_device &>(device).m_regionname = regionname;
 		downcast<tmc0430_device &>(device).m_offset = offset;
 		downcast<tmc0430_device &>(device).m_ident = ident<<13;
 	}
-	
+
 	int debug_get_address();
 
 protected:
 	void device_start(void) override;
 	void device_reset(void) override;
-	
+
 private:
 	// Ready callback. This line is usually connected to the READY pin of the CPU.
 	devcb_write_line   m_gromready;
 
 	// Clock line level
 	line_state m_current_clock_level;
-	
+
 	// Currently active GROM ident
 	int m_current_ident;
-	
+
 	// Phase of the state machine
 	int m_phase;
-	
+
 	// Address or data mode?
 	bool m_address_mode;
 
 	// Reading or writing?
 	bool m_read_mode;
-	
+
 	// Selected?
-	bool	m_selected;
+	bool    m_selected;
 
 	// Toggle for address loading
-	bool 		m_address_lowbyte;
+	bool        m_address_lowbyte;
 
 	// Region name
 	const char* m_regionname;
-		
+
 	// Offset in the region. We cannot rely on the ident because the GROMs
 	// in the cartridges begin with ident 3, but start at the beginning of their region.
-	int			m_offset;
-	
+	int         m_offset;
+
 	// Identification of this GROM (0-7 <<13)
 	int         m_ident;
 
@@ -107,5 +107,5 @@ private:
 	MCFG_DEVICE_ADD(_tag, TMC0430, 0)  \
 	tmc0430_device::set_region_and_ident(*device, _region, _offset, _ident); \
 	tmc0430_device::set_ready_wr_callback(*device, DEVCB_##_ready);
-	
+
 #endif
