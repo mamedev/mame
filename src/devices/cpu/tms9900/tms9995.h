@@ -54,12 +54,12 @@ public:
 	// READY input line. When asserted (high), the memory is ready for data exchange.
 	// We chose to use a direct method instead of a delegate to keep performance
 	// footprint low; this method may be called very frequently.
-	DECLARE_WRITE_LINE_MEMBER( set_ready );
+	DECLARE_WRITE_LINE_MEMBER( ready_line );
 
 	// HOLD input line. When asserted (low), the CPU is requested to release the
 	// data and address bus and enter the HOLD state. The entrance of this state
 	// is acknowledged by the HOLDA output line.
-	DECLARE_WRITE_LINE_MEMBER( set_hold );
+	DECLARE_WRITE_LINE_MEMBER( hold_line );
 
 	// RESET input line. Unlike the standard set_input_line, this input method
 	// is synchronous and will immediately lead to a reset of the CPU.

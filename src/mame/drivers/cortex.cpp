@@ -72,7 +72,7 @@ void cortex_state::machine_reset()
 {
 	UINT8* ROM = memregion("maincpu")->base();
 	memcpy(m_p_ram, ROM, 0x6000);
-	m_maincpu->set_ready(ASSERT_LINE);
+	m_maincpu->ready_line(ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( cortex, cortex_state )

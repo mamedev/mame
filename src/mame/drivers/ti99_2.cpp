@@ -139,7 +139,7 @@ void ti99_2_state::machine_reset()
 	// Configure CPU to insert 1 wait state for each external memory access
 	// by lowering the READY line on reset
 	// TODO: Check with specs
-	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(CLEAR_LINE);
+	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(ti99_2_state::ti99_2_vblank_interrupt)
