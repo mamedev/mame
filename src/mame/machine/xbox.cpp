@@ -1509,6 +1509,8 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	if (endpoint != 0)
 		return -1;
 	printf("Control request: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
+	for (int n = 0; n < setup->wLength; n++)
+		endpoints[endpoint].buffer[n] = 0x50 ^ n;
 	//if ((setup->bRequest == 0x18) && (setup->wValue == 0x8000))
 	if (setup->bRequest == 0x17)
 	{
@@ -1518,8 +1520,16 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		endpoints[2].remain = maximum_send;
 		endpoints[2].position = region + 0x2000 + setup->wValue;
 	}
-	for (int n = 0; n < setup->wLength; n++)
-		endpoints[endpoint].buffer[n] = 0xa0 ^ n;
+	if ((setup->bRequest == 0x16) && (setup->wValue == 0x1f00))
+	{
+		endpoints[1].remain = setup->wIndex;
+		endpoints[1].position = region + 0x1f00;
+	}
+	if (setup->bRequest == 0x19) // 19 used to receive jvs packet, 20 to send
+	{
+		endpoints[endpoint].buffer[5] = 0;
+		endpoints[endpoint].buffer[4] = 20;
+	}
 	endpoints[endpoint].buffer[0] = 0;
 	endpoints[endpoint].position = endpoints[endpoint].buffer;
 	endpoints[endpoint].remain = setup->wLength;
@@ -1529,13 +1539,13 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size)
 {
 	printf("Bulk request: %x %d %x\n\r", endpoint, pid, size);
-	if ((endpoint == 2) && (pid == InPid))
+	if (((endpoint == 1) || (endpoint == 2)) && (pid == InPid))
 	{
-		if (size > endpoints[2].remain)
-			size = endpoints[2].remain;
-		memcpy(buffer, endpoints[2].position, size);
-		endpoints[2].position = endpoints[3].position + size;
-		endpoints[2].remain = endpoints[3].remain - size;
+		if (size > endpoints[endpoint].remain)
+			size = endpoints[endpoint].remain;
+		memcpy(buffer, endpoints[endpoint].position, size);
+		endpoints[endpoint].position = endpoints[endpoint].position + size;
+		endpoints[endpoint].remain = endpoints[endpoint].remain - size;
 	}
 	return size;
 }
