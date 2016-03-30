@@ -624,7 +624,16 @@ int matrix_solver_w_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool
 	}
 	m_cnt++;
 
-
+	for (unsigned i=0; i<iN; i++)
+	{
+		nl_double tmp = 0.0;
+		for (unsigned j=0; j<iN; j++)
+		{
+			tmp += A(i,j) * new_V[j];
+		}
+		if (std::fabs(tmp-RHS(i)) > 1e-6)
+			printf("%s failed on row %d: %f RHS: %f\n", this->name().cstr(), i, std::fabs(tmp-RHS(i)), RHS(i));
+	}
 	if (newton_raphson)
 	{
 		nl_double err = delta(new_V);

@@ -18,7 +18,12 @@
  * going forward in case we implement cuda solvers in the future.
  */
 #define NL_USE_DYNAMIC_ALLOCATION (0)
+#define TEST_PARALLEL (0)
 
+#if TEST_PARALLEL
+#include <thread>
+#include <atomic>
+#endif
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -26,8 +31,92 @@ NETLIB_NAMESPACE_DEVICES_START()
 //#define nl_ext_double long double // slightly slower
 #define nl_ext_double nl_double
 
+#if TEST_PARALLEL
+#define MAXTHR 10
+static const int num_thr = 2;
+
+struct thr_intf
+{
+	virtual void do_work(const int id, void *param) = 0;
+};
+
+struct ti_t
+{
+	volatile std::atomic<int> lo;
+	thr_intf *intf;
+	void *params;
+	int _block[29]; /* make it 256 bytes */
+};
+
+static ti_t ti[MAXTHR];
+//static std::thread thr[MAXTHR];
+static std::thread thr[num_thr];
+
+int thr_init = 0;
+
+static void thr_process_proc(int id)
+{
+	while (true)
+	{
+		while (ti[id].lo.load() == 0)
+			;
+		if (ti[id].lo.load() == 2)
+			return;
+		ti[id].intf->do_work(id, ti[id].params);
+		ti[id].lo.store(0);
+	}
+}
+
+static void thr_process(int id, thr_intf *intf, void *params)
+{
+	ti[id].intf = intf;
+	ti[id].params = params;
+	ti[id].lo.store(1);
+}
+
+static void thr_wait()
+{
+	int c=1;
+	while (c > 0)
+	{
+		c=0;
+		for (int i=0; i<num_thr; i++)
+			c += ti[i].lo.load();
+	}
+}
+
+static void thr_initialize()
+{
+	thr_init++;
+	if (thr_init == 1)
+	{
+		for (int i=0; i<num_thr; i++)
+		{
+			ti[i].lo = 0;
+			thr[i] = std::thread(thr_process_proc, i);
+		}
+	}
+}
+
+static void thr_dispose()
+{
+	thr_init--;
+	if (thr_init == 0)
+	{
+		for (int i=0; i<num_thr; i++)
+			ti[i].lo = 2;
+		for (int i=0; i<num_thr; i++)
+			thr[i].join();
+	}
+}
+#endif
+
 template <unsigned m_N, unsigned _storage_N>
+#if TEST_PARALLEL
+class matrix_solver_direct_t: public matrix_solver_t, public thr_intf
+#else
 class matrix_solver_direct_t: public matrix_solver_t
+#endif
 {
 public:
 
@@ -61,6 +150,13 @@ protected:
 
 	virtual netlist_time compute_next_timestep() override;
 
+#if TEST_PARALLEL
+	int x_i[10];
+	int x_start[10];
+	int x_stop[10];
+	virtual void do_work(const int id, void *param) override;
+#endif
+
 #if (NL_USE_DYNAMIC_ALLOCATION)
 	template <typename T1, typename T2>
 	inline nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r * m_pitch + c]; }
@@ -80,11 +176,12 @@ protected:
 
 private:
 	static const std::size_t m_pitch = (((_storage_N + 1) + 7) / 8) * 8;
+	//static const std::size_t m_pitch = (((_storage_N + 1) + 15) / 16) * 16;
+	//static const std::size_t m_pitch = (((_storage_N + 1) + 31) / 32) * 32;
 #if (NL_USE_DYNAMIC_ALLOCATION)
 	ATTR_ALIGN nl_ext_double * RESTRICT m_A;
 #else
 	ATTR_ALIGN nl_ext_double m_A[_storage_N][m_pitch];
-	ATTR_ALIGN nl_ext_double m_B[_storage_N][m_pitch];
 #endif
 	//ATTR_ALIGN nl_ext_double m_RHSx[_storage_N];
 
@@ -107,6 +204,10 @@ matrix_solver_direct_t<m_N, _storage_N>::~matrix_solver_direct_t()
 #if (NL_USE_DYNAMIC_ALLOCATION)
 	pfree_array(m_A);
 #endif
+#if TEST_PARALLEL
+	thr_dispose();
+#endif
+
 }
 
 template <unsigned m_N, unsigned _storage_N>
@@ -399,6 +500,37 @@ void matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS()
 	}
 }
 
+#if TEST_PARALLEL
+template <unsigned m_N, unsigned _storage_N>
+void matrix_solver_direct_t<m_N, _storage_N>::do_work(const int id, void *param)
+{
+	const int i = x_i[id];
+	/* FIXME: Singular matrix? */
+	const nl_double f = 1.0 / A(i,i);
+	const unsigned * RESTRICT const p = m_terms[i]->m_nzrd.data();
+	const unsigned e = m_terms[i]->m_nzrd.size();
+	//nl_double A_cache[128];
+	//for (unsigned k = 0; k < e; k++)
+	//	A_cache[k] = A(i,p[k]);
+
+	/* Eliminate column i from row j */
+
+	const unsigned * RESTRICT const pb = m_terms[i]->m_nzbd.data();
+	//const unsigned eb = m_terms[i]->m_nzbd.size();
+	const unsigned sj = x_start[id];
+	const unsigned se = x_stop[id];
+	for (unsigned jb = sj; jb < se; jb++)
+	{
+		const unsigned j = pb[jb];
+		const nl_double f1 = - A(j,i) * f;
+		for (unsigned k = 0; k < e; k++)
+			//A(j,p[k]) += A_cache[k] * f1;
+			A(j,p[k]) += A(i,p[k]) * f1;
+		//RHS(j) += RHS(i) * f1;
+	}
+}
+#endif
+
 template <unsigned m_N, unsigned _storage_N>
 void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 {
@@ -406,7 +538,7 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 
 	for (unsigned i = 0; i < kN; i++) {
 		// FIXME: use a parameter to enable pivoting? m_pivot
-		if (m_params.m_pivot)
+		if (!TEST_PARALLEL && m_params.m_pivot)
 		{
 			/* Find the row with the largest first value */
 			unsigned maxrow = i;
@@ -452,23 +584,62 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 		}
 		else
 		{
+#if TEST_PARALLEL
+			const unsigned eb = m_terms[i]->m_nzbd.size();
+			if (eb > 16)
+			{
+				printf("here %d\n", eb);
+				unsigned chunks = (eb) / (num_thr + 1);
+				for (int p=0; p < num_thr + 1; p++)
+				{
+					x_i[p] = i;
+					x_start[p] = chunks * p;
+					x_stop[p] = std::min(chunks*(p+1), eb);
+					if (p<num_thr) thr_process(p, this, NULL);
+				}
+				do_work(num_thr, NULL);
+				thr_wait();
+			}
+			else if (eb > 0)
+			{
+				x_i[0] = i;
+				x_start[0] = 0;
+				x_stop[0] = eb;
+				do_work(0, NULL);
+			}
+#else
+#if 0
 			/* FIXME: Singular matrix? */
 			const nl_double f = 1.0 / A(i,i);
-			const unsigned * RESTRICT const p = m_terms[i]->m_nzrd.data();
-			const unsigned e = m_terms[i]->m_nzrd.size();
+			const auto &nzrd = m_terms[i]->m_nzrd;
+			const auto &nzbd = m_terms[i]->m_nzbd;
 
 			/* Eliminate column i from row j */
 
-			const unsigned * RESTRICT const pb = m_terms[i]->m_nzbd.data();
-			const unsigned eb = m_terms[i]->m_nzbd.size();
-			for (unsigned jb = 0; jb < eb; jb++)
+			for (auto j : nzbd)
 			{
-				const unsigned j = pb[jb];
 				const nl_double f1 = - A(j,i) * f;
-				for (unsigned k = 0; k < e; k++)
-					A(j,p[k]) += A(i,p[k]) * f1;
+				for (auto k : nzrd)
+					A(j,k) += A(i,k) * f1;
 				//RHS(j) += RHS(i) * f1;
 			}
+#else
+			/* FIXME: Singular matrix? */
+			const nl_double f = 1.0 / A(i,i);
+			const auto &nzrd = m_terms[i]->m_nzrd;
+			const auto &nzbd = m_terms[i]->m_nzbd;
+
+			/* Eliminate column i from row j */
+
+			for (auto j : nzbd)
+			{
+				const nl_double f1 = - A(j,i) * f;
+				for (auto k : nzrd)
+					A(j,k) += A(i,k) * f1;
+				//RHS(j) += RHS(i) * f1;
+			}
+#endif
+#endif
 		}
 	}
 }
@@ -591,6 +762,9 @@ matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const solver_par
 		m_last_RHS[k] = 0.0;
 		m_last_V[k] = 0.0;
 	}
+#if TEST_PARALLEL
+	thr_initialize();
+#endif
 }
 
 template <unsigned m_N, unsigned _storage_N>
@@ -608,6 +782,9 @@ matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const eSolverTyp
 		m_last_RHS[k] = 0.0;
 		m_last_V[k] = 0.0;
 	}
+#if TEST_PARALLEL
+	thr_initialize();
+#endif
 }
 
 NETLIB_NAMESPACE_DEVICES_END()
