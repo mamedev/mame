@@ -253,7 +253,7 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 		{
 			for(int xi=0;xi<width;xi++)
 			{
-				UINT16 sprite_offs = tile + xi + yi * 2;
+				UINT16 sprite_offs = tile + (xi ^ ((width - 1) & fx)) + yi * 2;
 				gfx_1->transmask(bitmap,cliprect,sprite_offs,color,fx,fy,x + xi*16,y + yi *16,m_palette->transpen_mask(*gfx_1, color, 0xff));
 			}
 		}
