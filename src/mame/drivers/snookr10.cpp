@@ -1150,7 +1150,22 @@ ROM_END
 
 ROM_START( crystalc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "crystals_colours_1.u2", 0x8000, 0x8000, CRC(ee7a6f62) SHA1(bb3f438ca563eeb4b365d344066b10b9aedb77bb) )
+	ROM_LOAD( "crystals_colours_1__(1.02).u2", 0x8000, 0x8000, CRC(a803d857) SHA1(8eb34f6b4f820776459d92f9c589794bec7547ea) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "crystals_colours_2_l.425.u16", 0x0000, 0x8000, CRC(834aba76) SHA1(86c1f282c11a4bb058ab702c237b76a620b99cc7) )
+	ROM_LOAD( "crystals_colours_3_l.425.u15", 0x8000, 0x8000, CRC(7f14f66a) SHA1(daba9a687b8985edfb61e21ba010544f97523bdc) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "crystals_colours_4.u28", 0x00000, 0x40000, CRC(ecc6b575) SHA1(f6032e89b30aebeab9ad721608277430084256bc) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s29pc.u17", 0x0000, 0x0200, CRC(1af53eab) SHA1(1cac837aed75a77a0b93a294b07f2a8de6fcffef) )
+ROM_END
+
+ROM_START( crystalca )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "crystals_colours_1__(1.01).u2", 0x8000, 0x8000, CRC(ee7a6f62) SHA1(bb3f438ca563eeb4b365d344066b10b9aedb77bb) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "crystals_colours_2.u16", 0x0000, 0x8000, CRC(527c07f6) SHA1(53ceb1d0267e1d76fa1a9325c9a1d2e8e034958d) )
@@ -1160,7 +1175,7 @@ ROM_START( crystalc )
 	ROM_LOAD( "crystals_colours_4.u28", 0x00000, 0x40000, CRC(ecc6b575) SHA1(f6032e89b30aebeab9ad721608277430084256bc) )
 
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
-	ROM_LOAD( "crystals_colours_nvram.bin", 0x0000, 0x0800, CRC(907d8828) SHA1(ffd302996bee81277c2280fc212d910e0801d81d) )
+	ROM_LOAD( "crystals_colours_1.01_nvram.bin", 0x0000, 0x0800, CRC(907d8828) SHA1(ffd302996bee81277c2280fc212d910e0801d81d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29pc.u17", 0x0000, 0x0200, CRC(1af53eab) SHA1(1cac837aed75a77a0b93a294b07f2a8de6fcffef) )
@@ -1171,8 +1186,9 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT ROT    COMPANY      FULLNAME                      FLAGS   LAYOUT */
-GAMEL( 1998, snookr10, 0,        snookr10, snookr10, driver_device, 0,   ROT0, "Sandii'",   "Snooker 10 (Ver 1.11)",       0,      layout_snookr10 )
-GAMEL( 1998, apple10,  0,        apple10,  apple10,  driver_device, 0,   ROT0, "Sandii'",   "Apple 10 (Ver 1.21)",         0,      layout_snookr10 )
-GAMEL( 1997, tenballs, snookr10, tenballs, tenballs, driver_device, 0,   ROT0, "<unknown>", "Ten Balls (Ver 1.05)",        0,      layout_snookr10 )
-GAMEL( 1998, crystalc, 0,        crystalc, crystalc, driver_device, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.01)", 0,      layout_snookr10 )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT ROT    COMPANY      FULLNAME                      FLAGS   LAYOUT */
+GAMEL( 1998, snookr10,  0,        snookr10, snookr10, driver_device, 0,   ROT0, "Sandii'",   "Snooker 10 (Ver 1.11)",       0,      layout_snookr10 )
+GAMEL( 1998, apple10,   0,        apple10,  apple10,  driver_device, 0,   ROT0, "Sandii'",   "Apple 10 (Ver 1.21)",         0,      layout_snookr10 )
+GAMEL( 1997, tenballs,  snookr10, tenballs, tenballs, driver_device, 0,   ROT0, "<unknown>", "Ten Balls (Ver 1.05)",        0,      layout_snookr10 )
+GAMEL( 1998, crystalc,  0,        crystalc, crystalc, driver_device, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.02)", 0,      layout_snookr10 )
+GAMEL( 1998, crystalca, crystalc, crystalc, crystalc, driver_device, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.01)", 0,      layout_snookr10 )
