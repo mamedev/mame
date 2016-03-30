@@ -42,7 +42,8 @@ try:
                 compsize = len(compchunk)
                 for b in compchunk:
                     # For Python 2.x compatibility.
-                    b = ord(b)
+                    if sys.hexversion < 0x03000000:
+                        b = ord(b)
                     dst.write('%d' % b)
                     offs += 1
                     if offs != compsize:
