@@ -138,14 +138,14 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_AUDIO_EFFECT "9",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 9" },
 #endif
 
-    { nullptr,                                nullptr,           OPTION_HEADER, "BGFX POST-PROCESSING OPTIONS" },
-    { OSDOPTION_BGFX_PATH,                    "bgfx",            OPTION_STRING, "path to BGFX-related files" },
-    { OSDOPTION_BGFX_BACKEND,                 "auto",            OPTION_STRING, "BGFX backend to use (d3d9, d3d11, metal, opengl, gles)" },
-    { OSDOPTION_BGFX_DEBUG,                   "0",               OPTION_BOOLEAN, "enable BGFX debugging statistics" },
-    { OSDOPTION_BGFX_SCREEN_CHAINS,           "default",         OPTION_STRING, "comma-delimited list of screen chain JSON names, colon-delimited per-window" },
-    { OSDOPTION_BGFX_SHADOW_MASK,             "slot-mask.png",   OPTION_STRING, "shadow mask texture name" },
+	{ nullptr,                                nullptr,           OPTION_HEADER, "BGFX POST-PROCESSING OPTIONS" },
+	{ OSDOPTION_BGFX_PATH,                    "bgfx",            OPTION_STRING, "path to BGFX-related files" },
+	{ OSDOPTION_BGFX_BACKEND,                 "auto",            OPTION_STRING, "BGFX backend to use (d3d9, d3d11, metal, opengl, gles)" },
+	{ OSDOPTION_BGFX_DEBUG,                   "0",               OPTION_BOOLEAN, "enable BGFX debugging statistics" },
+	{ OSDOPTION_BGFX_SCREEN_CHAINS,           "default",         OPTION_STRING, "comma-delimited list of screen chain JSON names, colon-delimited per-window" },
+	{ OSDOPTION_BGFX_SHADOW_MASK,             "slot-mask.png",   OPTION_STRING, "shadow mask texture name" },
 
-        // End of list
+		// End of list
 	{ nullptr }
 };
 

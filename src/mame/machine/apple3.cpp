@@ -135,11 +135,11 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		case 0x40: case 0x41: case 0x42: case 0x43:
 		case 0x44: case 0x45: case 0x46: case 0x47:
 		case 0x48: case 0x49: case 0x4A: case 0x4B:
-		case 0x4C: case 0x4D: 
+		case 0x4C: case 0x4D:
 			m_c040_time = 200;
 			break;
 
-		case 0x4E: case 0x4F:	// character RAM enable/disable
+		case 0x4E: case 0x4F:   // character RAM enable/disable
 			break;
 
 		case 0x50: case 0x51: case 0x52: case 0x53:
@@ -251,28 +251,28 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			break;
 
 		case 0xda:
-//			printf("ENCWRT off\n");
+//          printf("ENCWRT off\n");
 			break;
 
 		case 0xdb:
 			apple3_write_charmem();
-//			printf("ENCWRT on (write_charmem (r))\n");
+//          printf("ENCWRT on (write_charmem (r))\n");
 			break;
 
 		case 0xdc:
-//			printf("ENCSEL off\n");
+//          printf("ENCSEL off\n");
 			break;
 
 		case 0xdd:
-//			printf("ENCSEL on\n");
+//          printf("ENCSEL on\n");
 			break;
 
 		case 0xde:
-//			printf("ENSIO off\n");
+//          printf("ENSIO off\n");
 			break;
 
 		case 0xdf:
-//			printf("ENSIO on\n");
+//          printf("ENSIO on\n");
 			break;
 
 		case 0xe0: case 0xe1:
@@ -339,16 +339,16 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 		case 0x40: case 0x41: case 0x42: case 0x43:
 		case 0x44: case 0x45: case 0x46: case 0x47:
 		case 0x48: case 0x49: case 0x4A: case 0x4B:
-		case 0x4C: case 0x4D: 
+		case 0x4C: case 0x4D:
 			m_c040_time = 200;
 			break;
 
-		case 0x4E: case 0x4F: 	// character RAM disable/enable
+		case 0x4E: case 0x4F:   // character RAM disable/enable
 			break;
 
 		case 0x50: case 0x51: case 0x52: case 0x53:
 		case 0x54: case 0x55: case 0x56: case 0x57:
-		    machine().first_screen()->update_partial(machine().first_screen()->vpos());
+			machine().first_screen()->update_partial(machine().first_screen()->vpos());
 			/* graphics softswitches */
 			if (offset & 1)
 				m_flags |= 1 << ((offset - 0x50) / 2);
@@ -430,28 +430,28 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 			break;
 
 		case 0xda:
-//			printf("ENCWRT off\n");
+//          printf("ENCWRT off\n");
 			break;
 
 		case 0xdb:
 			apple3_write_charmem();
-//			printf("ENCWRT on (write_charmem (w))\n");
+//          printf("ENCWRT on (write_charmem (w))\n");
 			break;
 
 		case 0xdc:
-//			printf("ENCSEL off\n");
+//          printf("ENCSEL off\n");
 			break;
 
 		case 0xdd:
-//			printf("ENCSEL on\n");
+//          printf("ENCSEL on\n");
 			break;
 
 		case 0xde:
-//			printf("ENSIO off\n");
+//          printf("ENSIO off\n");
 			break;
 
 		case 0xdf:
-//			printf("ENSIO on\n");
+//          printf("ENSIO on\n");
 			break;
 
 		case 0xe0: case 0xe1: case 0xe2: case 0xe3:
@@ -673,7 +673,7 @@ MACHINE_RESET_MEMBER(apple3_state,apple3)
 	m_ramp_active = false;
 
 	m_fdc->set_floppies_4(floppy0, floppy1, floppy2, floppy3);
-	
+
 	m_scanstart->adjust(machine().first_screen()->time_until_pos(0, 0));
 	m_scanend->adjust(attotime::never);
 }
@@ -1097,19 +1097,19 @@ TIMER_CALLBACK_MEMBER(apple3_state::scanstart_cb)
 
 	scanline = machine().first_screen()->vpos();
 	//machine().first_screen()->update_partial(machine().first_screen()->vpos());
-	
+
 	m_via_1->write_pb6(0);
-	
+
 	m_scanend->adjust(machine().first_screen()->time_until_pos(scanline, 559));
 }
 
 TIMER_CALLBACK_MEMBER(apple3_state::scanend_cb)
 {
 	int scanline = machine().first_screen()->vpos();
-	
+
 	m_via_1->write_pb6(1);
-	
-	m_scanstart->adjust(machine().first_screen()->time_until_pos((scanline+1) % 224, 0));	
+
+	m_scanstart->adjust(machine().first_screen()->time_until_pos((scanline+1) % 224, 0));
 }
 
 READ_LINE_MEMBER(apple3_state::ay3600_shift_r)

@@ -97,7 +97,7 @@ A                                                   12.000MHz
 #include "machine/i8255.h"
 
 #define MCLK    XTAL_12MHz // this is on the video board
-#define CLK2	XTAL_8MHz // near the CPUs
+#define CLK2    XTAL_8MHz // near the CPUs
 
 WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 {
@@ -480,7 +480,7 @@ ROM_START( androidp )
 	ROM_CONTINUE(                                       0x0c000, 0x04000)
 
 	ROM_REGION( 0x18000, "sub", 0 )
-	ROM_LOAD( "MITSUBISHI_A04.toppcb.m5l27256k.N6.BIN", 0x00000, 0x08000, CRC(13c38fe4) SHA1(34a35fa057159a5c83892a88b8c908faa39d5cb3) )	
+	ROM_LOAD( "MITSUBISHI_A04.toppcb.m5l27256k.N6.BIN", 0x00000, 0x08000, CRC(13c38fe4) SHA1(34a35fa057159a5c83892a88b8c908faa39d5cb3) )
 
 	ROM_REGION( 0x10000, "bgtiles", 0 )
 	ROM_LOAD( "MITSUBISHI_A05.toppcb.m5l27512k.F5.BIN", 0x00000, 0x10000, CRC(4c72a930) SHA1(f1542844391b55fe43293eef7ce48c09b7aca75a) )

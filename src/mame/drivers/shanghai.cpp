@@ -7,7 +7,7 @@ Shanghai
 driver by Nicola Salmoria
 
 TODO:
-- games are currently too fast (especially noticeable with kothello screen transitions), either irqs actually 
+- games are currently too fast (especially noticeable with kothello screen transitions), either irqs actually
   fires every two frames or a HD63484 SR bit isn't behaving correctly;
 - minor glitch with gfx copy on shanghai stage info panel (garbage on right);
 
@@ -380,7 +380,7 @@ static MACHINE_CONFIG_START( shanghai, shanghai_state )
 	MCFG_PALETTE_INIT_OWNER(shanghai_state,shanghai)
 
 	MCFG_H63484_ADD("h63484", 0, h63484_map)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

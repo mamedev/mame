@@ -30,7 +30,7 @@ WRITE16_MEMBER(thoop2_state::OKIM6295_bankswitch_w)
 {
 	if (ACCESSING_BITS_0_7){
 		membank("okibank")->set_entry(data & 0x0f);
- 	}
+	}
 }
 
 WRITE16_MEMBER(thoop2_state::coin_w)

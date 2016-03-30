@@ -15,7 +15,7 @@
  * Whilst the book proposes to invert the matrix R=(I+transpose(V)*Z) we define
  *
  *       w = transpose(V)*y
- *       a = R⁻¹ * w
+ *       a = R????? * w
  *
  * and consequently
  *
@@ -26,7 +26,7 @@
  * One fact omitted in the book is the fact that actually the matrix Z which contains
  * in it's columns the solutions of
  *
- * 		A * zk = uk
+ *      A * zk = uk
  *
  * for uk being unit vectors for full rank (max(k) == n) is identical to the
  * inverse of A.
@@ -655,8 +655,8 @@ inline int matrix_solver_w_t<m_N, _storage_N>::vsolve_non_dynamic(const bool new
 template <unsigned m_N, unsigned _storage_N>
 matrix_solver_w_t<m_N, _storage_N>::matrix_solver_w_t(const solver_parameters_t *params, const int size)
 : matrix_solver_t(GAUSSIAN_ELIMINATION, params)
-  ,m_cnt(0)
-  , m_dim(size)
+	,m_cnt(0)
+	, m_dim(size)
 {
 	m_rails_temp = palloc_array(terms_t, N());
 #if (NL_USE_DYNAMIC_ALLOCATION)

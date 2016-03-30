@@ -214,4 +214,4 @@ References an external machine config.
 	device = config.device_find(owner, _tag);
 
 #endif  /* __MCONFIG_H__ */
-    /** @} */
+	/** @} */

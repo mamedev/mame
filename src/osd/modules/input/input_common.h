@@ -374,7 +374,7 @@ struct key_trans_entry {
 	input_item_id   mame_key;
 
 #if !defined(OSD_WINDOWS)
-	int				sdl_scancode;
+	int             sdl_scancode;
 	int             sdl_key;
 #else
 	int             scan_code;
@@ -395,7 +395,7 @@ private:
 	static key_trans_entry              s_default_table[];
 	std::unique_ptr<key_trans_entry[]>  m_custom_table;
 
-	key_trans_entry *			        m_table;
+	key_trans_entry *                   m_table;
 	UINT32                              m_table_size;
 
 public:
@@ -404,7 +404,7 @@ public:
 
 	// getters/setters
 	UINT32 size() { return m_table_size; }
-	
+
 	// public methods
 	input_item_id lookup_mame_code(const char * scode) const;
 	int lookup_mame_index(const char * scode) const;

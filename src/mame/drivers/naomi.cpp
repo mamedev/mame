@@ -6538,7 +6538,7 @@ ROM_START( wrungpo )
 	ROM_LOAD( "mpr-23724.ic6",  0x5800000, 0x1000000, CRC(c633c45a) SHA1(23b45140f965428d33e2424b0574715c0b952d05) )
 	// note: origin ROM board have 12x8MB FlashROMs with same contents as above
 
-	// 840-0064-01	2001	317-0306-COM	Naomi
+	// 840-0064-01  2001    317-0306-COM    Naomi
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "284ae7c3")
 ROM_END
 

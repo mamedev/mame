@@ -20,7 +20,7 @@ class plugin_options : public core_options
 public:
 	// construction/destruction
 	plugin_options();
-	
+
 	void parse_json(std::string path);
 private:
 	static const options_entry s_option_entries[];

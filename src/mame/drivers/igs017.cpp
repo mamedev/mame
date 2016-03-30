@@ -4248,4 +4248,3 @@ GAME( 2000?, starzan,  0,        starzan,  iqblocka, igs017_state, starzan,  ROT
 
 /* Parent spk306us in driver spoker.cpp.  Move this set to that driver? */
 GAME( ????,  spkrform, spk306us, spkrform, spkrform, igs017_state, spkrform, ROT0, "IGS",              "Super Poker (v100xD03) / Formosa",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-

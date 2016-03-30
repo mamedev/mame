@@ -52,7 +52,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(spartanxtec);
-	
+
 	tilemap_t*             m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(kungfum_tileram_w);
 	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
@@ -125,7 +125,7 @@ void spartanxtec_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 
 	}
 
-	
+
 }
 
 
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( spartanxtec_map, AS_PROGRAM, 8, spartanxtec_state )
 	AM_RANGE(0x8103, 0x8103) AM_READ_PORT("P1")
 
 	AM_RANGE(0x8200, 0x8200) AM_WRITE(irq_ack)
-	
+
 	AM_RANGE(0xA801, 0xA801) AM_WRITE(a801_w)
 
 	AM_RANGE(0xa900, 0xa903) AM_RAM AM_SHARE("scroll_lo")
@@ -363,7 +363,7 @@ static MACHINE_CONFIG_START( spartanxtec, spartanxtec_state )
 	MCFG_CPU_PROGRAM_MAP(spartanxtec_sound_map)
 	MCFG_CPU_IO_MAP(spartanxtec_sound_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(spartanxtec_state, irq0_line_assert, 1000) // controls speed of music
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_hold)
+//  MCFG_CPU_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_hold)
 
 	/* video hardware */
 	// todo, proper screen timings for this bootleg PCB - as visible area is less it's probably ~60hz, not 55
@@ -438,4 +438,3 @@ ROM_END
 
 
 GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, driver_device,  0, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )
-

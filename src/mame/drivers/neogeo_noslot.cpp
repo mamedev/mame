@@ -1291,7 +1291,7 @@ ROM_END
  . NGM-024
  NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
  . NGH-024
- 
+
  . prototype
  NEO-MVS PROG-EP / NEO-MVS CHA-EPG
 ****************************************/

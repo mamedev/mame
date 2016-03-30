@@ -1668,4 +1668,3 @@ GAMEL(1983, spyhunt,  0,        mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT9
 GAMEL(1983, spyhuntp, spyhunt,  mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT90, "Bally Midway (Playtronic license)", "Spy Hunter (Playtronic license)", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
 GAME( 1984, crater,   0,        mcrscroll, crater,   mcr3_state, crater,   ORIENTATION_FLIP_X, "Bally Midway", "Crater Raider", MACHINE_SUPPORTS_SAVE )
 GAMEL(1985, turbotag, 0,        mcrsc_csd, turbotag, mcr3_state, turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", MACHINE_SUPPORTS_SAVE, layout_turbotag )
-

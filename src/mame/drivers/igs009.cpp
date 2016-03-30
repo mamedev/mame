@@ -525,7 +525,7 @@ static ADDRESS_MAP_START( gp98_portmap, AS_IO, 8, igs009_state )
 
 	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 
-    // seems to lacks of PPI devices...
+	// seems to lacks of PPI devices...
 	AM_RANGE( 0x6480, 0x6480 ) AM_WRITE(nmi_and_coins_w )
 	AM_RANGE( 0x6481, 0x6481 ) AM_READ_PORT( "SERVICE" )
 	AM_RANGE( 0x6482, 0x6482 ) AM_READ_PORT( "COINS" )
@@ -863,7 +863,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Jingle Bell
-  IGS, 1997.  
+  IGS, 1997.
 
   English versions.
 

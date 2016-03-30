@@ -230,7 +230,7 @@ static offs_t tms1k_dasm(char *dst, const UINT8 *oprom, const UINT8 *lut_mnemoni
 	UINT16 op = oprom[pos++];
 	if (opcode_mask & 0x100)
 		op = (op << 8 | oprom[pos++]) & 0x1ff;
-	
+
 	// convert to mnemonic/param
 	UINT16 instr = lut_mnemonic[op];
 	dst += sprintf(dst, "%-8s ", s_mnemonic[instr]);

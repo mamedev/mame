@@ -115,14 +115,14 @@ void ui_menu_sliders::handle()
 			/* if we got here via up or page up, select the previous item */
 			if (menu_event->iptkey == IPT_UI_UP || menu_event->iptkey == IPT_UI_PAGE_UP)
 			{
-                selected = (selected + item.size() - 1) % item.size();
-                validate_selection(-1);
+				selected = (selected + item.size() - 1) % item.size();
+				validate_selection(-1);
 			}
 
 			/* otherwise select the next item */
 			else if (menu_event->iptkey == IPT_UI_DOWN || menu_event->iptkey == IPT_UI_PAGE_DOWN)
 			{
-                selected = (selected + 1) % item.size();
+				selected = (selected + 1) % item.size();
 				validate_selection(1);
 			}
 		}

@@ -1800,7 +1800,7 @@ d3d_render_target* shaders::get_texture_target(render_primitive *prim, texture_i
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
 
-	// find render target and check if the size of the target quad has changed 
+	// find render target and check if the size of the target quad has changed
 	d3d_render_target *target = find_render_target(texture);
 	if (target != nullptr && target->target_width == target_width && target->target_height == target_height)
 	{
@@ -1825,7 +1825,7 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim)
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
 
-	// find render target and check of the size of the target quad has changed 
+	// find render target and check of the size of the target quad has changed
 	d3d_render_target *target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
 	if (target != nullptr && target->target_width == target_width && target->target_height == target_height)
 	{
@@ -3058,10 +3058,10 @@ ULONG effect::release()
 
 slider_state *renderer_d3d9::get_slider_list()
 {
-    if (window().m_index > 0)
-    {
-        return nullptr;
-    }
+	if (window().m_index > 0)
+	{
+		return nullptr;
+	}
 	return g_slider_list;
 }
 

@@ -425,7 +425,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(skns_state::interrupt_callback)
 void skns_state::machine_start()
 {
 	m_btiles = memregion("gfx3")->base();
-	
+
 	save_pointer(NAME(m_btiles), memregion("gfx3")->bytes());
 	save_item(NAME(m_hit.x1p));
 	save_item(NAME(m_hit.y1p));
@@ -711,7 +711,7 @@ WRITE32_MEMBER(skns_state::v3t_w)
 
 	data = m_v3t_ram[offset];
 // i think we need to swap around to decode .. endian issues?
-	
+
 	m_btiles[offset*4+0] = (data & 0xff000000) >> 24;
 	m_btiles[offset*4+1] = (data & 0x00ff0000) >> 16;
 	m_btiles[offset*4+2] = (data & 0x0000ff00) >> 8;

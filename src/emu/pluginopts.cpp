@@ -40,7 +40,7 @@ plugin_options::plugin_options()
 void plugin_options::parse_json(std::string path)
 {
 	// first try to open as a directory
-	osd_directory *directory = osd_opendir(path.c_str());	
+	osd_directory *directory = osd_opendir(path.c_str());
 	if (directory != nullptr)
 	{
 		// iterate over all files in the directory
@@ -50,13 +50,13 @@ void plugin_options::parse_json(std::string path)
 			{
 				std::string name = entry->name;
 				if (name == "plugin.json")
-				{				
+				{
 					std::string curfile = std::string(path).append(PATH_SEPARATOR).append(entry->name);
 					std::ifstream ifs(curfile);
 					rapidjson::IStreamWrapper isw(ifs);
 					rapidjson::Document document;
 					document.ParseStream<0>(isw);
-										
+
 					if (document.HasParseError()) {
 						std::string error(GetParseError_En(document.GetParseError()));
 						osd_printf_error("Unable to parse plugin definition file %s. Errors returned:\n", curfile.c_str());

@@ -244,7 +244,6 @@ std::mutex m7z_file_impl::s_cache_mutex;
 /* ---------- FileInStream ---------- */
 
 extern "C" {
-
 static void *SZipAlloc(void *p, std::size_t size)
 {
 	return (size == 0) ? nullptr : std::malloc(size);

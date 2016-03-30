@@ -941,9 +941,9 @@ void ui_menu_plugins_configure::handle()
 void ui_menu_plugins_configure::populate()
 {
 	plugin_options& plugins = machine().manager().plugins();
-	
+
 	for (auto curentry = plugins.first(); curentry != nullptr; curentry = curentry->next())
-	{	
+	{
 		if (!curentry->is_header())
 		{
 			auto enabled = std::string(curentry->value()) == "1";

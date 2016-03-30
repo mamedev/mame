@@ -286,7 +286,7 @@ public:
 
 	windows_options &options() { return m_options; }
 
-    int window_count();
+	int window_count();
 
 protected:
 	virtual void build_slider_list() override;

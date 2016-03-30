@@ -12,4 +12,3 @@ class smsbootleg_state : public sms_state
 	DECLARE_WRITE8_MEMBER(port18_w);
 
 };
-

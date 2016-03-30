@@ -119,8 +119,8 @@ private:
 
 	sdl_event_manager()
 		: m_mouse_over_window(true),
-		  m_has_focus(true),
-		  m_focus_window(nullptr)
+			m_has_focus(true),
+			m_focus_window(nullptr)
 	{
 	}
 

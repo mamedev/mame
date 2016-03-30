@@ -41,15 +41,15 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 		const Value& slider_array = value["sliders"];
 		for (UINT32 i = 0; i < slider_array.Size(); i++)
 		{
-            std::vector<bgfx_slider*> expanded_sliders = slider_reader::read_from_value(slider_array[i], prefix + "sliders[" + std::to_string(i) + "]: ", machine, window_index, screen_index);
-            if (expanded_sliders.size() == 0)
-            {
+			std::vector<bgfx_slider*> expanded_sliders = slider_reader::read_from_value(slider_array[i], prefix + "sliders[" + std::to_string(i) + "]: ", machine, window_index, screen_index);
+			if (expanded_sliders.size() == 0)
+			{
 				return nullptr;
 			}
-            for (bgfx_slider* slider : expanded_sliders)
-            {
-                sliders.push_back(slider);
-            }
+			for (bgfx_slider* slider : expanded_sliders)
+			{
+				sliders.push_back(slider);
+			}
 		}
 	}
 
@@ -87,7 +87,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 	if (value.HasMember("targets"))
 	{
 		const Value& target_array = value["targets"];
-        // TODO: Move into its own reader
+		// TODO: Move into its own reader
 		for (UINT32 i = 0; i < target_array.Size(); i++)
 		{
 			if (!target_reader::read_from_value(target_array[i], prefix + "targets[" + std::to_string(i) + "]: ", targets, options, screen_index))
@@ -97,35 +97,35 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 		}
 	}
 
-    // Parse chain entries
-    std::vector<bgfx_chain_entry*> entries;
-    if (value.HasMember("passes"))
-    {
-        const Value& entry_array = value["passes"];
-        for (UINT32 i = 0; i < entry_array.Size(); i++)
-        {
+	// Parse chain entries
+	std::vector<bgfx_chain_entry*> entries;
+	if (value.HasMember("passes"))
+	{
+		const Value& entry_array = value["passes"];
+		for (UINT32 i = 0; i < entry_array.Size(); i++)
+		{
 			bgfx_chain_entry* entry = chain_entry_reader::read_from_value(entry_array[i], prefix + "passes[" + std::to_string(i) + "]: ", options, textures, targets, effects, slider_map, param_map, screen_index);
 			if (entry == nullptr)
 			{
 				return nullptr;
 			}
-            entries.push_back(entry);
-        }
-    }
+			entries.push_back(entry);
+		}
+	}
 
-    return new bgfx_chain(name, author, sliders, parameters, entries);
+	return new bgfx_chain(name, author, sliders, parameters, entries);
 }
 
 bool chain_reader::validate_parameters(const Value& value, std::string prefix)
 {
-    if (!READER_CHECK(value.HasMember("name"), (prefix + "Must have string value 'name'\n").c_str())) return false;
-    if (!READER_CHECK(value["name"].IsString(), (prefix + "Value 'name' must be a string\n").c_str())) return false;
-    if (!READER_CHECK(value.HasMember("author"), (prefix + "Must have string value 'author'\n").c_str())) return false;
-    if (!READER_CHECK(value["author"].IsString(), (prefix + "Value 'author' must be a string\n").c_str())) return false;
-    if (!READER_CHECK(value.HasMember("passes"), (prefix + "Must have array value 'passes'\n").c_str())) return false;
-    if (!READER_CHECK(value["passes"].IsArray(), (prefix + "Value 'passes' must be an array\n").c_str())) return false;
-    if (!READER_CHECK(!value.HasMember("sliders") || value["sliders"].IsArray(), (prefix + "Value 'sliders' must be an array\n").c_str())) return false;
-    if (!READER_CHECK(!value.HasMember("parameters") || value["parameters"].IsArray(), (prefix + "Value 'parameters' must be an array\n").c_str())) return false;
-    if (!READER_CHECK(!value.HasMember("targets") || value["targets"].IsArray(), (prefix + "Value 'targets' must be an array\n").c_str())) return false;
-    return true;
+	if (!READER_CHECK(value.HasMember("name"), (prefix + "Must have string value 'name'\n").c_str())) return false;
+	if (!READER_CHECK(value["name"].IsString(), (prefix + "Value 'name' must be a string\n").c_str())) return false;
+	if (!READER_CHECK(value.HasMember("author"), (prefix + "Must have string value 'author'\n").c_str())) return false;
+	if (!READER_CHECK(value["author"].IsString(), (prefix + "Value 'author' must be a string\n").c_str())) return false;
+	if (!READER_CHECK(value.HasMember("passes"), (prefix + "Must have array value 'passes'\n").c_str())) return false;
+	if (!READER_CHECK(value["passes"].IsArray(), (prefix + "Value 'passes' must be an array\n").c_str())) return false;
+	if (!READER_CHECK(!value.HasMember("sliders") || value["sliders"].IsArray(), (prefix + "Value 'sliders' must be an array\n").c_str())) return false;
+	if (!READER_CHECK(!value.HasMember("parameters") || value["parameters"].IsArray(), (prefix + "Value 'parameters' must be an array\n").c_str())) return false;
+	if (!READER_CHECK(!value.HasMember("targets") || value["targets"].IsArray(), (prefix + "Value 'targets' must be an array\n").c_str())) return false;
+	return true;
 }

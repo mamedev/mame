@@ -4875,7 +4875,7 @@ DRIVER_INIT_MEMBER(nmk16_state,tdragon_prot)
 DRIVER_INIT_MEMBER(nmk16_state,ssmissin)
 {
 	decode_ssmissin();
-	
+
 	membank("okibank1")->configure_entries(0, 4, memregion("oki1")->base() + 0x80000, 0x20000);
 }
 

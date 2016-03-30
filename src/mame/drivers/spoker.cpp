@@ -475,8 +475,8 @@ static const gfx_layout layout_8x8x6 =
 	RGN_FRAC(1, 3),
 	6,
 	{ RGN_FRAC(0,3)+8, RGN_FRAC(0,3)+0,
-	  RGN_FRAC(1,3)+8, RGN_FRAC(1,3)+0,
-	  RGN_FRAC(2,3)+8, RGN_FRAC(2,3)+0 },
+		RGN_FRAC(1,3)+8, RGN_FRAC(1,3)+0,
+		RGN_FRAC(2,3)+8, RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
 	{ STEP8(0,2*8) },
 	8*8*2
@@ -488,8 +488,8 @@ static const gfx_layout layout_8x32x6 =
 	RGN_FRAC(1, 3),
 	6,
 	{ RGN_FRAC(0,3)+8, RGN_FRAC(0,3)+0,
-	  RGN_FRAC(1,3)+8, RGN_FRAC(1,3)+0,
-	  RGN_FRAC(2,3)+8, RGN_FRAC(2,3)+0 },
+		RGN_FRAC(1,3)+8, RGN_FRAC(1,3)+0,
+		RGN_FRAC(2,3)+8, RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
 	{ STEP32(0,2*8) },
 	8*32*2
@@ -602,7 +602,7 @@ static MACHINE_CONFIG_DERIVED( 3super8, spoker )
 
 	MCFG_DEVICE_REMOVE("ppi8255_0")
 	MCFG_DEVICE_REMOVE("ppi8255_1")
-	
+
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 3super8)
 
 	MCFG_DEVICE_REMOVE("ymsnd")
@@ -615,13 +615,13 @@ MACHINE_CONFIG_END
 
 /* Super Poker (IGS)
    US & UA versions.
-   
+
    Original IGS boards
    IGS PCB-0308-01
 
    HD64180RP8 (u25)
    IGS026a (u10)
-   IGS001a (u30) 
+   IGS001a (u30)
    IGS002  (u20)
    U3567   (u42)
 
@@ -850,7 +850,7 @@ DRIVER_INIT_MEMBER(spoker_state, spkleftover)
 {
 /*  The last 4K have the scheme/table for the whole encryption.
     Maybe a leftover...
-*/	
+*/
 	int A, B;
 	UINT8 *rom = memregion("maincpu")->base();
 

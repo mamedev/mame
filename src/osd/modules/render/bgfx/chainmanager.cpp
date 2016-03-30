@@ -48,7 +48,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine
 	bx::CrtFileReader reader;
 	if (!bx::open(&reader, path.c_str()))
 	{
-        printf("Unable to open chain file %s, falling back to no post processing\n", path.c_str());
+		printf("Unable to open chain file %s, falling back to no post processing\n", path.c_str());
 		return nullptr;
 	}
 
@@ -62,13 +62,13 @@ bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine
 	Document document;
 	document.Parse<kParseCommentsFlag>(data);
 
-    delete [] data;
+	delete [] data;
 
 	if (document.HasParseError())
 	{
 		std::string error(GetParseError_En(document.GetParseError()));
-        printf("Unable to parse chain %s. Errors returned:\n", path.c_str());
-        printf("%s\n", error.c_str());
+		printf("Unable to parse chain %s. Errors returned:\n", path.c_str());
+		printf("%s\n", error.c_str());
 		return nullptr;
 	}
 
@@ -76,7 +76,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine
 
 	if (chain == nullptr)
 	{
-        printf("Unable to load chain %s, falling back to no post processing\n", path.c_str());
+		printf("Unable to load chain %s, falling back to no post processing\n", path.c_str());
 		return nullptr;
 	}
 

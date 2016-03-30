@@ -52,7 +52,7 @@ delegate_generic_function delegate_mfp::convert_to_generic(delegate_generic_clas
 	// otherwise, it is the byte index into the vtable where the actual function lives
 	std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(object);
 #if defined(LOG_DELEGATES)
-	printf("Calculated Addr = %08x (VTAB)\n", (uintptr_t)(void*)(*reinterpret_cast<delegate_generic_function *>(vtable_base + m_function + m_this_delta - 1)));		
+	printf("Calculated Addr = %08x (VTAB)\n", (uintptr_t)(void*)(*reinterpret_cast<delegate_generic_function *>(vtable_base + m_function + m_this_delta - 1)));
 #endif
 	return *reinterpret_cast<delegate_generic_function *>(vtable_base + m_function + m_this_delta - 1);
 #else
@@ -70,7 +70,7 @@ delegate_generic_function delegate_mfp::convert_to_generic(delegate_generic_clas
 	// otherwise, it is the byte index into the vtable where the actual function lives
 	std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(object);
 #if defined(LOG_DELEGATES)
-	printf("Calculated Addr = %08x (VTAB)\n", (uintptr_t)(void*)(*reinterpret_cast<delegate_generic_function *>(vtable_base + m_function - 1)));		
+	printf("Calculated Addr = %08x (VTAB)\n", (uintptr_t)(void*)(*reinterpret_cast<delegate_generic_function *>(vtable_base + m_function - 1)));
 #endif
 	return *reinterpret_cast<delegate_generic_function *>(vtable_base + m_function - 1);
 #endif

@@ -1003,7 +1003,7 @@ private:
 	render_bounds           m_bounds;                   // bounds of the target
 	bool                    m_keepaspect;               // constrain aspect ratio
 	float                   m_pixel_aspect;             // aspect ratio of individual pixels
-	int                     m_scale_mode;               // type of scale to apply 
+	int                     m_scale_mode;               // type of scale to apply
 	int                     m_int_scale_x;              // horizontal integer scale factor
 	int                     m_int_scale_y;              // vertical integer scale factor
 	float                   m_max_refresh;              // maximum refresh rate, 0 or if none

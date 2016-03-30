@@ -786,7 +786,7 @@ function createMAMEProjects(_target, _subtarget, _name)
 	includedirs {
 		ext_includedir("flac"),
 	}
-	
+
 end
 
 function createProjects_mame_arcade(_target, _subtarget)

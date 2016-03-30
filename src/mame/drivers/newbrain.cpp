@@ -32,10 +32,10 @@
     TODO:
 
     - keyboard
-    	- only key 7 is recognized
-    	- escape key mapping
+        - only key 7 is recognized
+        - escape key mapping
     - VFD
-	- reset/powerup time constants
+    - reset/powerup time constants
     - bitmapped video
     - accurate video timing
     - cassette

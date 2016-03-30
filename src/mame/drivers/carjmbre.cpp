@@ -4,7 +4,7 @@
 
     Car Jamboree
     Omori Electric CAD (OEC) 1983
-    
+
     TODO:
     - colors are wrong
     - sprite priorities?
@@ -89,7 +89,7 @@ void carjmbre_state::machine_start()
 	// zerofill
 	m_nmi_enabled = false;
 	m_bgcolor = 0;
-	
+
 	// register for savestates
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_bgcolor));
@@ -183,7 +183,7 @@ void carjmbre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int flipx = m_spriteram[offs + 2] >> 6 & 1;
 		int flipy = m_spriteram[offs + 2] >> 7 & 1;
 		int sx = m_spriteram[offs + 3];
-		
+
 		// align to tilemap
 		if (flip_screen())
 		{
@@ -197,7 +197,7 @@ void carjmbre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			sy = 241 - sy;
 			sx -= 7;
 		}
-		
+
 		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
 	}
 }
@@ -365,7 +365,7 @@ static MACHINE_CONFIG_START( carjmbre, carjmbre_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carjmbre)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(carjmbre_state, carjmbre)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/6/2)

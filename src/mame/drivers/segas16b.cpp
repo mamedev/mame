@@ -3492,7 +3492,7 @@ static INPUT_PORTS_START( lockonph )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START("SERVICE")   
+	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
@@ -3699,7 +3699,7 @@ void segas16b_state::tilemap_16b_fpointbl_fill_latch(int i, UINT16* latched_page
 		latched_yscroll[i] = 0;
 		latched_xscroll[i] = 0;
 	}
-//	printf("%02x returning latched page select %04x scrollx %04x scrolly %04x\n", i, latched_pageselect[i], latched_xscroll[i], latched_yscroll[i]);
+//  printf("%02x returning latched page select %04x scrollx %04x scrolly %04x\n", i, latched_pageselect[i], latched_xscroll[i], latched_yscroll[i]);
 }
 
 static MACHINE_CONFIG_DERIVED( fpointbl, system16b )
@@ -3737,7 +3737,7 @@ static MACHINE_CONFIG_START( lockonph, segas16b_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-//	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas16b_state, memory_mapper, mapper_sound_r, mapper_sound_w)
+//  MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas16b_state, memory_mapper, mapper_sound_r, mapper_sound_w)
 
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lockonph)
@@ -3756,7 +3756,7 @@ static MACHINE_CONFIG_START( lockonph, segas16b_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4) // ??
-//	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0)) // does set up the timer, but end up with no sound?
+//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0)) // does set up the timer, but end up with no sound?
 	MCFG_SOUND_ROUTE(0, "mono", 0.5)
 	MCFG_SOUND_ROUTE(1, "mono", 0.5)
 
@@ -9462,9 +9462,3 @@ GAME(          2006, isgsm,  0,      isgsm,  isgsm,  isgsm_state,isgsm,  ROT0,  
 /* 01 */ // ?? unknown
 /* 02 */ GAME( 2006, tetrbx, isgsm,  isgsm,  tetrbx, isgsm_state,tetrbx, ROT0,   "bootleg (ISG)", "Tetris / Bloxeed (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 )
 /* 03 */ GAME( 2008, shinfz, isgsm,  isgsm,  shinfz, isgsm_state,shinfz, ROT0,   "bootleg (ISG)", "Shinobi / FZ-2006 (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 ) // claims it's released in 2006, but set includes the PS2/S16 remake of Fantasy Zone II which is clearly from 2008
-
-
-
-
-
-

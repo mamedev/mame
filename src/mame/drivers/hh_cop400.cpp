@@ -250,7 +250,7 @@ UINT8 hh_cop400_state::read_inputs(int columns)
   Castle Toy Einstein
   * COP421 MCU label ~/927 COP421-NEZ/N
   * 4 lamps, 1-bit sound
-  
+
   This is a Simon clone, the tones are not harmonic. Two models exist, each
   with a different batteries setup, assume they're same otherwise.
 
@@ -347,12 +347,12 @@ MACHINE_CONFIG_END
   Coleco Head to Head Basketball/Hockey/Soccer
   * COP420 MCU label COP420L-NEZ/N
   * 2-digit 7seg display, 41 other leds, 1-bit sound
-  
+
   3 Head to Head games were released using this MCU/ROM. They play very much
   the same, only differing on game time.
-  
+
   An earlier revision of this game runs on TMS1000.
-  
+
 ***************************************************************************/
 
 class h2hbaskb_state : public hh_cop400_state
@@ -389,7 +389,7 @@ WRITE8_MEMBER(h2hbaskb_state::write_l)
 	// D2,D3 double as multiplexer
 	UINT16 mask = ((m_d >> 2 & 1) * 0x00ff) | ((m_d >> 3 & 1) * 0xff00);
 	UINT16 sel = (m_g | m_d << 4 | m_g << 8 | m_d << 12) & mask;
-	
+
 	// D2+G0,G1 are 7segs
 	set_display_segmask(3, 0x7f);
 

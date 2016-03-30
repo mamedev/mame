@@ -87,9 +87,9 @@ public:
 
 private:
 
-	void	*m_driver;
-	bool	m_software, m_inlist;
-	s_bios	m_bios;
+	void    *m_driver;
+	bool    m_software, m_inlist;
+	s_bios  m_bios;
 };
 
 struct reselect_last

@@ -1202,7 +1202,7 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 			// apply orientation if required
 			if (target_orientation & ORIENTATION_SWAP_XY)
 				src_aspect = 1.0 / src_aspect;
-	
+
 			// get destination size and aspect
 			float dest_width = (float)target_width;
 			float dest_height = (float)target_height;
@@ -1228,7 +1228,7 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 			visible_width = render_round_nearest(src_width * xscale);
 			visible_height = render_round_nearest(src_height * yscale);
 			break;
-		} 
+		}
 	}
 }
 

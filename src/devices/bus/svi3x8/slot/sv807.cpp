@@ -4,8 +4,8 @@
 
     SV-807 64k memory expansion for SVI-318/328
 
-	TODO:
-	- Switch S6 (but needs to be off for the SVI anyway)
+    TODO:
+    - Switch S6 (but needs to be off for the SVI anyway)
 
 ***************************************************************************/
 

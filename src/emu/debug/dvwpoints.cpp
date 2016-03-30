@@ -258,8 +258,8 @@ void debug_view_watchpoints::view_update()
 		m_total.y = 10;
 
 	// Draw
-	debug_view_char		*dest = &m_viewdata[0];
-	util::ovectorstream	linebuf;
+	debug_view_char     *dest = &m_viewdata[0];
+	util::ovectorstream linebuf;
 	linebuf.reserve(ARRAY_LENGTH(tableBreaks) - 1);
 
 	// Header

@@ -379,7 +379,7 @@ private:
 	std::unique_ptr<favorite_manager>  m_favorite;     // internal data from inifile.c for favorites
 
 	// string formatting buffer
-	mutable util::ovectorstream	m_string_buffer;
+	mutable util::ovectorstream m_string_buffer;
 };
 
 #endif  /* __MACHINE_H__ */

@@ -1641,7 +1641,7 @@ void cli_frontend::execute_commands(const char *exename)
 		emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		if (file_plugin.open("plugin.ini") != osd_file::error::NONE)
 			throw emu_fatalerror("Unable to create file plugin.ini\n");
-		
+
 		// generate the updated INI
 		file_plugin.puts(plugin_opts.output_ini().c_str());
 

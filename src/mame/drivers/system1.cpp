@@ -3286,7 +3286,7 @@ ROM_END
 
 
 ROM_START( teddybbobl ) // data in romset is an exact match for teddybbo, including encryption
-	ROM_REGION( 0x10000, "maincpu", 0 ) 
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.f2",   0x0000, 0x4000, CRC(81a37e69) SHA1(ddd0fd7ba5b3646c43ae4261f1e3fedd4184d92c) ) // == epr-6739.116 (encrypted
 	ROM_LOAD( "2.j2",   0x4000, 0x4000, CRC(715388a9) SHA1(5affc4ecb1e0d58b69093aed732b1e292b8d3118) ) // == epr-6740.109
 	ROM_LOAD( "3.k2",   0x8000, 0x4000, CRC(e5a74f5f) SHA1(ccf18b424d4aaeec0bae1e6f096b4c176f6ab554) ) // == epr-6741.96

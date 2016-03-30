@@ -47,18 +47,18 @@ bgfx_effect* effect_manager::effect(std::string name)
 
 bgfx_effect* effect_manager::load_effect(std::string name)
 {
-    std::string full_name = name;
-    if (full_name.length() < 5 || (full_name.compare(full_name.length() - 5, 5, ".json") != 0)) {
-        full_name = full_name + ".json";
-    }
-    std::string path = std::string(m_options.bgfx_path()) + "/effects/" + full_name;
+	std::string full_name = name;
+	if (full_name.length() < 5 || (full_name.compare(full_name.length() - 5, 5, ".json") != 0)) {
+		full_name = full_name + ".json";
+	}
+	std::string path = std::string(m_options.bgfx_path()) + "/effects/" + full_name;
 
 	bx::CrtFileReader reader;
 	if (!bx::open(&reader, path.c_str()))
-    {
-        printf("Unable to open effect file %s\n", path.c_str());
-        return nullptr;
-    }
+	{
+		printf("Unable to open effect file %s\n", path.c_str());
+		return nullptr;
+	}
 
 	int32_t size (bx::getSize(&reader));
 
@@ -70,23 +70,23 @@ bgfx_effect* effect_manager::load_effect(std::string name)
 	Document document;
 	document.Parse<kParseCommentsFlag>(data);
 
-    delete [] data;
+	delete [] data;
 
-    if (document.HasParseError()) {
-        std::string error(GetParseError_En(document.GetParseError()));
-        printf("Unable to parse effect %s. Errors returned:\n", path.c_str());
-        printf("%s\n", error.c_str());
-        return nullptr;
-    }
+	if (document.HasParseError()) {
+		std::string error(GetParseError_En(document.GetParseError()));
+		printf("Unable to parse effect %s. Errors returned:\n", path.c_str());
+		printf("%s\n", error.c_str());
+		return nullptr;
+	}
 
-    bgfx_effect* effect = effect_reader::read_from_value(document, "Effect '" + name + "': ", m_shaders);
+	bgfx_effect* effect = effect_reader::read_from_value(document, "Effect '" + name + "': ", m_shaders);
 
-    if (effect == nullptr) {
-        printf("Unable to load effect %s\n", path.c_str());
-        return nullptr;
-    }
+	if (effect == nullptr) {
+		printf("Unable to load effect %s\n", path.c_str());
+		return nullptr;
+	}
 
-    m_effects[name] = effect;
+	m_effects[name] = effect;
 
 	return effect;
 }

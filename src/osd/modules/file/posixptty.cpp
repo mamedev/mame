@@ -144,7 +144,7 @@ osd_file::error posix_open_ptty(std::uint32_t openflags, osd_file::ptr &file, st
 #elif defined(__ANDROID__)
 	int masterfd = -1, slavefd = -1;
 	char slavepath[PATH_MAX];
-#else 
+#else
 	struct termios tios;
 	std::memset(&tios, 0, sizeof(tios));
 	::cfmakeraw(&tios);

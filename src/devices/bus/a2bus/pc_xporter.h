@@ -50,4 +50,3 @@ private:
 
 // device type definition
 extern const device_type A2BUS_PCXPORTER;
-

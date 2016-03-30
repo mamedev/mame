@@ -34,7 +34,7 @@ public:
 private:
 	bgfx_effect* load_effect(std::string name);
 
-    osd_options&                        m_options;
+	osd_options&                        m_options;
 	shader_manager&                     m_shaders;
 	std::map<std::string, bgfx_effect*> m_effects;
 };

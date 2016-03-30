@@ -2332,7 +2332,7 @@ GAME( 1982, triplep,  0,        triplep,  triplep,  scramble_state, scramble_ppi
 GAME( 1982, triplepa, triplep,  triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 2)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1982, knockout, triplep,  triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "bootleg? (KKK)",      "Knock Out!! (bootleg, set 1)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1982, knockoutb,triplep,  triplep,  knockoutb,scramble_state, scramble_ppi, ROT90, "bootleg",             "Knock Out!! (bootleg, set 2)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1982, knockoutc,triplep,  triplep,  knockoutb,scramble_state, scramble_ppi, ROT90, "bootleg (ESG)",       "Knock Out!! (bootleg, set 3)",         MACHINE_SUPPORTS_SAVE ) // ESG = Elektronik Spiel Gerate 
+GAME( 1982, knockoutc,triplep,  triplep,  knockoutb,scramble_state, scramble_ppi, ROT90, "bootleg (ESG)",       "Knock Out!! (bootleg, set 3)",         MACHINE_SUPPORTS_SAVE ) // ESG = Elektronik Spiel Gerate
 
 GAME( 1981, mariner,  0,        mariner,  scramble, scramble_state, mariner,      ROT90, "Amenip",              "Mariner",                        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1981, 800fath,  mariner,  mariner,  800fath,  scramble_state, mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

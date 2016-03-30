@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Phil Stroffolino 
+// copyright-holders:Phil Stroffolino
 // thanks-to:Enrique Sanchez
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"

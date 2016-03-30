@@ -19,12 +19,12 @@ bgfx_effect::bgfx_effect(uint64_t state, bgfx::ShaderHandle vertex_shader, bgfx:
 
 	for (int i = 0; i < uniforms.size(); i++)
 	{
-        if (m_uniforms[uniforms[i]->name()] != nullptr)
-        {
-            osd_printf_verbose("Uniform %s appears to be duplicated in one or more effects, please double-check the effect JSON files.\n", uniforms[i]->name().c_str());
-            delete uniforms[i];
-            continue;
-        }
+		if (m_uniforms[uniforms[i]->name()] != nullptr)
+		{
+			osd_printf_verbose("Uniform %s appears to be duplicated in one or more effects, please double-check the effect JSON files.\n", uniforms[i]->name().c_str());
+			delete uniforms[i];
+			continue;
+		}
 		m_uniforms[uniforms[i]->name()] = uniforms[i];
 	}
 }

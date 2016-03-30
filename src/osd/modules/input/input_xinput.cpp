@@ -112,7 +112,7 @@ struct gamepad_state
 // state information for a gamepad; state must be first element
 struct xinput_api_state
 {
-	UINT32					playerIndex;
+	UINT32                  playerIndex;
 	XINPUT_STATE            xstate;
 	XINPUT_CAPABILITIES     caps;
 };
@@ -222,7 +222,7 @@ public:
 			int currentButton = xinput_buttons[buttonindex];
 			gamepad.rgbButtons[buttonindex] = (xinput_state.xstate.Gamepad.wButtons & currentButton) ? 0xFF : 0;
 		}
-		
+
 		// Now grab the axis values
 		// Each of the thumbstick axis members is a signed value between -32768 and 32767 describing the position of the thumbstick
 		// However, the Y axis values are inverted from what MAME expects, so multiply by -1 first

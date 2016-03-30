@@ -132,7 +132,7 @@ render_font::render_font(render_manager &manager, const char *filename)
 
 	// if this is an OSD font, we're done
 	if (filename != nullptr)
-	{		
+	{
 		m_osdfont = manager.machine().osd().font_alloc();
 		if (m_osdfont)
 		{

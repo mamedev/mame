@@ -401,4 +401,3 @@ WRITE8_MEMBER( at_mb_device::portb_w )
 	m_channel_check = BIT(data, 3);
 	m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
 }
-
