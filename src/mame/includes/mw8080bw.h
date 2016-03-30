@@ -242,7 +242,7 @@ public:
 
 MACHINE_CONFIG_EXTERN( mw8080bw_root );
 MACHINE_CONFIG_EXTERN( invaders );
-extern const char layout_invaders[];
+extern const internal_layout layout_invaders;
 
 /*----------- defined in audio/mw8080bw.c -----------*/
 

@@ -130,7 +130,7 @@ video_manager::video_manager(running_machine &machine)
 	// the native target is hard-coded to our internal layout and has all options disabled
 	if (m_snap_native)
 	{
-		m_snap_target = machine.render().target_alloc(layout_snap, RENDER_CREATE_SINGLE_FILE | RENDER_CREATE_HIDDEN);
+		m_snap_target = machine.render().target_alloc(&layout_snap, RENDER_CREATE_SINGLE_FILE | RENDER_CREATE_HIDDEN);
 		m_snap_target->set_backdrops_enabled(false);
 		m_snap_target->set_overlays_enabled(false);
 		m_snap_target->set_bezels_enabled(false);
