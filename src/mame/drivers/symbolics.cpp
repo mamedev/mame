@@ -25,7 +25,7 @@
 
     TODO:
     The entire lispcpu half (more like 3/4) of the machine
-    Framebuffer 1152x864? (lives on the i/o card)
+    Framebuffer 1152x864? 1150x900? (lives on the i/o card)
     I8274 MPSC (z80dart.cpp) x2
     1024x4bit SRAM AM2148-50 x6 @F22-F27
     2048x8bit SRAM @F7 and @G7
@@ -76,6 +76,13 @@ public:
 	DECLARE_DRIVER_INIT(symbolics);
 	DECLARE_READ16_MEMBER(buserror_r);
 	DECLARE_READ16_MEMBER(fep_paddle_id_prom_r);
+	//DECLARE_READ16_MEMBER(ram_parity_hack_r);
+	//DECLARE_WRITE16_MEMBER(ram_parity_hack_w);
+	//bool m_parity_error_has_occurred[0x20000];
+
+	// overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 //protected:
 //  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -95,7 +102,34 @@ READ16_MEMBER(symbolics_state::fep_paddle_id_prom_r) // bits 8 and 9 do somethin
 {
 	return 0x0300;
 }
+/*
+READ16_MEMBER(symbolics_state::ram_parity_hack_r)
+{
+	UINT16 *ram = (UINT16 *)(memregion("fepdram")->base());
+	//m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
+	m_maincpu->set_input_line_and_vector(M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+	if (!(m_parity_error_has_occurred[offset]))
+	{
+		//m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_parity_error_has_occurred[offset] = true;
+	}
+	ram += offset;
+	return *ram;
+}
 
+WRITE16_MEMBER(symbolics_state::ram_parity_hack_w)
+{
+	UINT16 *ram = (UINT16 *)(memregion("fepdram")->base());
+	m_maincpu->set_input_line_and_vector(M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+	if (!(m_parity_error_has_occurred[offset]))
+	{
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_parity_error_has_occurred[offset] = true;
+	}
+	COMBINE_DATA(&ram[offset]);
+}
+*/
 
 /******************************************************************************
  Address Maps
@@ -192,9 +226,12 @@ static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, symbolics_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	//AM_RANGE(0x000000, 0x01ffff) AM_ROM /* ROM lives here */
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM
+	// 0x00c000-0x00ffff is open bus but decoded/auto-DTACKed, does not cause bus error
 	AM_RANGE(0x010000, 0x01bfff) AM_ROM
-	//AM_RANGE(0x020000, 0x03ffff) AM_RAM /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
+	// 0x01c000-0x01ffff is open bus but decoded/auto-DTACKed, does not cause bus error
 	AM_RANGE(0x020000, 0x03ffff) AM_RAM AM_REGION("fepdram", 0) /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
+	//AM_RANGE(0x020000, 0x03ffff) AM_READWRITE(ram_parity_hack_r, ram_parity_hack_w)
+	//AM_RANGE(0x020002, 0x03ffff) AM_RAM AM_REGION("fepdram", 0) /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
 	// 2x AM9128-10PC 2048x8 SRAMs @F7 and @G7 map somewhere
 	// 6x AM2148-50 1024x4bit SRAMs @F22-F27 map somewhere
 	//AM_RANGE(0x040000, 0xffffff) AM_READ(buserror_r);
@@ -242,13 +279,27 @@ DRIVER_INIT_MEMBER(symbolics_state,symbolics)
 {
 }
 
+/* start */
+void symbolics_state::machine_start()
+{
+	//save_item(NAME(m_parity_error_has_occurred));
+}
+
+/* reset */
+void symbolics_state::machine_reset()
+{
+	/*for(int i=0; i < 0x20000; i++)
+		m_parity_error_has_occurred[i] = false;
+	*/
+}
+
 static MACHINE_CONFIG_START( symbolics, symbolics_state )
 	/* basic machine hardware */
 	// per page 159 of http://bitsavers.trailing-edge.com/pdf/symbolics/3600_series/Lisp_Machine_Hardware_Memos.pdf:
 	//XTALS: 16MHz @H11 (68k CPU clock)
 	//       4.9152MHz @J5 (driving the two MPSCs serial clocks)
 	//       66.67MHz @J10 (main lispcpu/system clock)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11 */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
 	MCFG_CPU_PROGRAM_MAP(m68k_mem)
 	MCFG_CPU_IO_MAP(m68k_io)
 
