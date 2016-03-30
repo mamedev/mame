@@ -28575,6 +28575,7 @@ opwolfa                         // B20 (c) 1987 Taito Corporation Japan (World)
 opwolfb                         // bootleg
 opwolfj                         // B20 (c) 1987 Taito Corporation (Japan)
 opwolfu                         // B20 (c) 1987 Taito America Corporation (US)
+opwolfp							// prototype?
 
 @source:orao.cpp
 orao                            //

@@ -89,6 +89,13 @@ public:
 	DECLARE_WRITE8_MEMBER(opwolf_adpcm_c_w);
 	DECLARE_DRIVER_INIT(opwolf);
 	DECLARE_DRIVER_INIT(opwolfb);
+	DECLARE_DRIVER_INIT(opwolfp);
+
+
+	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_x_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_y_r);
+
+
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(opwolf);
 	UINT32 screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
