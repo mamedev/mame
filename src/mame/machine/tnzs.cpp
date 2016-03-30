@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia, Mirko Buffoni, Takahiro Nogi
+// copyright-holders:Luca Elia, Mirko Buffoni, Takahiro Nogi,Stephane Humbert
 /***************************************************************************
 
   machine.c

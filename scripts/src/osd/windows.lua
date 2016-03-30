@@ -275,10 +275,10 @@ if _OPTIONS["with-tools"] then
 		kind "ConsoleApp"
 
 		flags {
-			"Symbols", -- always include minimum symbols for executables 	
+			"Symbols", -- always include minimum symbols for executables
 		}
 
-		if _OPTIONS["SEPARATE_BIN"]~="1" then 
+		if _OPTIONS["SEPARATE_BIN"]~="1" then
 			targetdir(MAME_DIR)
 		end
 
@@ -289,7 +289,7 @@ if _OPTIONS["with-tools"] then
 		includedirs {
 			MAME_DIR .. "src/osd",
 		}
-		
+
 		files {
 			MAME_DIR .. "src/osd/windows/ledutil.cpp",
 		}

@@ -2501,7 +2501,7 @@ void ui_menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 	}
 
 	if (icons_bitmap[linenum] != nullptr && icons_bitmap[linenum]->valid())
-		container->add_quad(x0, y0, x1, y1, ARGB_WHITE, icons_texture[linenum], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE);
+		container->add_quad(x0, y0, x1, y1, ARGB_WHITE, icons_texture[linenum], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
 
 //-------------------------------------------------

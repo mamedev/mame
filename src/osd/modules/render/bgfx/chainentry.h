@@ -49,6 +49,7 @@ private:
 	void setup_rotationtype_uniform(uint32_t rotation_type) const;
 	void setup_swapxy_uniform(bool swap_xy) const;
     void setup_quaddims_uniform(render_primitive* prim) const;
+    void setup_screenindex_uniform(int32_t screen) const;
 
 	bool setup_view(int view, uint16_t screen_width, uint16_t screen_height, int32_t screen) const;
 	void put_screen_buffer(render_primitive* prim, bgfx::TransientVertexBuffer* buffer) const;

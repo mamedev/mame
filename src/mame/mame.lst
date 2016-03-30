@@ -8206,6 +8206,7 @@ topsecrt                        // 3/1987 (c) 1987 (Japan)
 bishi                           // GX575 (c) 1996 (Japan)
 sbishi                          // GX675 (c) 1998 (Japan)
 sbishik                         // GX675 (c) 1998 (Korea)
+sbishika                        // GX675 (c) 1998 (Korea)
 
 @source:bitgraph.cpp
 bitgrpha                        // 
@@ -13216,6 +13217,8 @@ insector                        // GV-??? (c) 1982 Gottlieb - never released
 kngtmare                        // GV-??? (c) 1983 Gottlieb - never released
 krull                           // GV-105 (c) 1983 Gottlieb
 mach3                           // GV-109 (c) 1983 Mylstar
+mach3a							//
+mach3b							//
 mplanets                        // GV-102 (c) 1983 Gottlieb
 mplanetsuk                      // GV-102 (c) 1983 Gottlieb
 myqbert                         // GV-103?(c) 1982 Gottlieb
@@ -28715,6 +28718,7 @@ nmouse                          // (c) 1981 Amenip (Palcom Queen River)
 nmouseb                         // (c) 1981 Amenip Nova Games Ltd.
 numcrash                        // (c) 1983 Hanshin Goraku / "Peni"
 pacgal                          // hack
+pacgal2							// bootleg
 pacheart                        // hack
 pacman                          // (c) 1980 Midway
 pacmanf                         // hack
@@ -32637,6 +32641,9 @@ shougi2                         // (c) 1982 (Arcade TV Game List - P.80, Left, 1
 
 @source:shtzone.cpp
 shtzone                         // (c) 1987
+
+@source:sms_bootleg.cpp
+smssgame
 
 @source:shuuz.cpp
 shuuz                           // 136083           (c) 1990

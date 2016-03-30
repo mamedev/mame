@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail,Stephane Humbert
 /***************************************************************************
 
 Various Data East 8 bit games:

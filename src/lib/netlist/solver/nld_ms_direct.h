@@ -24,7 +24,7 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 //#define nl_ext_double __float128 // slow, very slow
 //#define nl_ext_double long double // slightly slower
-#define nl_ext_double double
+#define nl_ext_double nl_double
 
 template <unsigned m_N, unsigned _storage_N>
 class matrix_solver_direct_t: public matrix_solver_t
@@ -61,9 +61,6 @@ protected:
 
 	virtual netlist_time compute_next_timestep() override;
 
-	terms_t **m_terms;
-	terms_t *m_rails_temp;
-
 #if (NL_USE_DYNAMIC_ALLOCATION)
 	template <typename T1, typename T2>
 	inline nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r * m_pitch + c]; }
@@ -78,14 +75,16 @@ protected:
 	ATTR_ALIGN nl_double m_last_RHS[_storage_N]; // right hand side - contains currents
 	ATTR_ALIGN nl_double m_last_V[_storage_N];
 
-
+	terms_t * m_terms[_storage_N];
+	terms_t *m_rails_temp;
 
 private:
-	static const unsigned m_pitch = (((_storage_N + 1) + 7) / 8) * 8;
+	static const std::size_t m_pitch = (((_storage_N + 1) + 7) / 8) * 8;
 #if (NL_USE_DYNAMIC_ALLOCATION)
 	ATTR_ALIGN nl_ext_double * RESTRICT m_A;
 #else
 	ATTR_ALIGN nl_ext_double m_A[_storage_N][m_pitch];
+	ATTR_ALIGN nl_ext_double m_B[_storage_N][m_pitch];
 #endif
 	//ATTR_ALIGN nl_ext_double m_RHSx[_storage_N];
 
@@ -104,7 +103,6 @@ matrix_solver_direct_t<m_N, _storage_N>::~matrix_solver_direct_t()
 	{
 		pfree(m_terms[k]);
 	}
-	pfree_array(m_terms);
 	pfree_array(m_rails_temp);
 #if (NL_USE_DYNAMIC_ALLOCATION)
 	pfree_array(m_A);
@@ -271,16 +269,14 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 			}
 		}
 
-		for (unsigned j = 0; j < N(); j++)
+		for (unsigned i = 0; i < t->m_railstart; i++)
 		{
-			for (unsigned i = 0; i < t->m_railstart; i++)
-			{
-				if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
-					t->m_nzrd.push_back(other[i]);
-				if (!t->m_nz.contains(other[i]))
-					t->m_nz.push_back(other[i]);
-			}
+			if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
+				t->m_nzrd.push_back(other[i]);
+			if (!t->m_nz.contains(other[i]))
+				t->m_nz.push_back(other[i]);
 		}
+
 		/* Add RHS element */
 		if (!t->m_nzrd.contains(N()))
 			t->m_nzrd.push_back(N());
@@ -424,10 +420,10 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 			if (maxrow != i)
 			{
 				/* Swap the maxrow and ith row */
-				for (unsigned k = 0; k < kN; k++) {
+				for (unsigned k = 0; k < kN + 1; k++) {
 					std::swap(A(i,k), A(maxrow,k));
 				}
-				std::swap(RHS(i), RHS(maxrow));
+				//std::swap(RHS(i), RHS(maxrow));
 			}
 			/* FIXME: Singular matrix? */
 			const nl_double f = 1.0 / A(i,i);
@@ -439,10 +435,10 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 				const nl_double f1 = - A(j,i) * f;
 				if (f1 != NL_FCONST(0.0))
 				{
-					nl_double * RESTRICT pi = &A(i,i+1);
-					const nl_double * RESTRICT pj = &A(j,i+1);
+					const nl_double * RESTRICT pi = &A(i,i+1);
+					nl_double * RESTRICT pj = &A(j,i+1);
 #if 1
-					vec_add_mult_scalar(kN-i,pj,f1,pi);
+					vec_add_mult_scalar(kN-i,pi,f1,pj);
 #else
 					vec_add_mult_scalar(kN-i-1,pj,f1,pi);
 					//for (unsigned k = i+1; k < kN; k++)
@@ -528,7 +524,7 @@ T matrix_solver_direct_t<m_N, _storage_N>::delta(
 	const unsigned iN = this->N();
 	T cerr = 0;
 	for (unsigned i = 0; i < iN; i++)
-		cerr = std::max(cerr, nl_math::abs(V[i] - this->m_nets[i]->m_cur_Analog));
+		cerr = std::fmax(cerr, nl_math::abs(V[i] - (T) this->m_nets[i]->m_cur_Analog));
 	return cerr;
 }
 
@@ -585,7 +581,6 @@ matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const solver_par
 : matrix_solver_t(GAUSSIAN_ELIMINATION, params)
 , m_dim(size)
 {
-	m_terms = palloc_array(terms_t *, N());
 	m_rails_temp = palloc_array(terms_t, N());
 #if (NL_USE_DYNAMIC_ALLOCATION)
 	m_A = palloc_array(nl_ext_double, N() * m_pitch);
@@ -603,7 +598,6 @@ matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const eSolverTyp
 : matrix_solver_t(type, params)
 , m_dim(size)
 {
-	m_terms = palloc_array(terms_t *, N());
 	m_rails_temp = palloc_array(terms_t, N());
 #if (NL_USE_DYNAMIC_ALLOCATION)
 	m_A = palloc_array(nl_ext_double, N() * m_pitch);

@@ -12,7 +12,7 @@
 #include "rendutil.h"
 #include "png.h"
 
-
+#include "libjpeg/jpeglib.h"
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -541,9 +541,7 @@ void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname
 	else
 		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
 
-	osd_file::error filerr = file.open(fname.c_str());
-
-	if (filerr != osd_file::error::NONE)
+	if (file.open(fname.c_str()) != osd_file::error::NONE)
 		return;
 
 	// define standard JPEG structures
@@ -553,8 +551,8 @@ void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname
 	jpeg_create_decompress(&cinfo);
 
 	// allocates a buffer for the image
-	UINT64 jpg_size = file.size();
-	unsigned char *jpg_buffer = global_alloc_array(unsigned char, jpg_size + 100);
+	UINT32 jpg_size = file.size();
+	unsigned char *jpg_buffer = global_alloc_array(unsigned char, jpg_size);
 
 	// read data from the file and set them in the buffer
 	file.read(jpg_buffer, jpg_size);
@@ -587,7 +585,6 @@ void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname
 		else if (s == 3)
 			for (int i = 0; i < w; ++i)
 				bitmap.pix32(j, i) = rgb_t(0xFF, buffer[0][i * s], buffer[0][i * s + 1], buffer[0][i * s + 2]);
-
 		else
 		{
 			osd_printf_error("Cannot read JPEG data from %s file.\n", fname.c_str());

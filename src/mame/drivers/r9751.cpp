@@ -260,6 +260,8 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			data_b1 = (data & 0xFF00) >> 8;
 			m_pdc->reg_p6 = data_b0;
 			m_pdc->reg_p7 = data_b1;
+			m_pdc->reg_p38 |= 0x2; // Set bit 1 on port 38 register, PDC polls this port looking for a command
+			if(TRACE_FDC)logerror("--- FDD SET PDC Port 38: %X\n",m_pdc->reg_p38);
 			break;
 		case 0x80B0: /* FDD command address register */
 			UINT32 fdd_scsi_command;
@@ -295,8 +297,6 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			scsi_lba = c_fdd_scsi_command[3] | (c_fdd_scsi_command[2]<<8) | ((c_fdd_scsi_command[1]&0x1F)<<16);
 			if(TRACE_FDC) logerror("--- FDD SCSI LBA: %i\n", scsi_lba);
 
-			m_pdc->reg_p38 |= 0x2; // Set bit 1 on port 38 register, PDC polls this port looking for a command
-			if(TRACE_FDC)logerror("--- FDD SET PDC Port 38: %X\n",m_pdc->reg_p38);
 			break;
 
 		default:

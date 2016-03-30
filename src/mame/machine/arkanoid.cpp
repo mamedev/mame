@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Brad Oliver
+// copyright-holders:Brad Oliver,Stephane Humbert
 /***************************************************************************
 
   machine.c

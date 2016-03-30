@@ -201,6 +201,9 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_AUTOBOOT_DELAY,                             "0",         OPTION_INTEGER,    "timer delay in sec to trigger command execution on autoboot" },
 	{ OPTION_AUTOBOOT_SCRIPT ";script",                  nullptr,        OPTION_STRING,     "lua script to execute after machine boot" },
 	{ OPTION_CONSOLE,                                    "0",         OPTION_BOOLEAN,    "enable emulator LUA console" },
+	{ OPTION_PLUGINS,                                    "1",         OPTION_BOOLEAN,    "enable LUA plugin support" },
+	{ OPTION_PLUGIN,                                    nullptr,     OPTION_STRING,     "list of plugins to enable" },
+	{ OPTION_NO_PLUGIN,                                  nullptr,     OPTION_STRING,     "list of plugins to disable" },
 	{ OPTION_LANGUAGE ";lang",                           "English",   OPTION_STRING,    "display language" },
 	{ nullptr }
 };
@@ -563,7 +566,7 @@ void emu_options::set_system_name(const char *name)
 	if (cursystem == nullptr)
 		return;
 
-	if (software_name())
+	if (*software_name() != 0)
 	{
 		std::string sw_load(software_name());
 		std::string sw_list, sw_name, sw_part, sw_instance, option_errors, error_string;

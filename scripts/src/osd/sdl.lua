@@ -89,7 +89,7 @@ function maintargetosdoptions(_target,_subtarget)
 			configuration { "x64", "vs*" }
 				libdirs {
 					path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x64")
-				}			
+				}
 		end
 		links {
 			"psapi",
@@ -116,15 +116,15 @@ function maintargetosdoptions(_target,_subtarget)
 			"psapi"
 		}
 	configuration { }
-	    
-    if _OPTIONS["targetos"]=="macosx" then
+
+	if _OPTIONS["targetos"]=="macosx" then
 		if _OPTIONS["with-bundled-sdl2"]~=nil then
 			links {
 				"SDL2",
 			}
-        end
-    end
-    
+		end
+	end
+
 end
 
 
@@ -145,8 +145,8 @@ newoption {
 }
 
 newoption {
-    trigger = "SDL_INI_PATH",
-    description = "Default search path for .ini files",
+	trigger = "SDL_INI_PATH",
+	description = "Default search path for .ini files",
 }
 
 newoption {
@@ -255,22 +255,22 @@ if BASE_TARGETOS=="unix" then
 			"-framework QuartzCore",
 			"-framework OpenGL",
 		}
-      
-        
+
+
 		if os_version>=101100 then
 			linkoptions {
 				"-weak_framework Metal",
 			}
 		end
 		if _OPTIONS["with-bundled-sdl2"]~=nil then
-            linkoptions {
-                "-framework AudioUnit",
-                "-framework CoreAudio",
-                "-framework Carbon",
-                "-framework ForceFeedback",
-                "-framework IOKit",
-                "-framework CoreVideo",                                
-            }                  
+			linkoptions {
+				"-framework AudioUnit",
+				"-framework CoreAudio",
+				"-framework Carbon",
+				"-framework ForceFeedback",
+				"-framework IOKit",
+				"-framework CoreVideo",
+			}
 		else
 			if _OPTIONS["USE_LIBSDL"]~="1" then
 				linkoptions {
@@ -303,8 +303,8 @@ if BASE_TARGETOS=="unix" then
 			local str = backtick(sdlconfigcmd() .. " --libs")
 			addlibfromstring(str)
 			addoptionsfromstring(str)
-		end	
-		
+		end
+
 		if _OPTIONS["targetos"]~="haiku" and _OPTIONS["targetos"]~="android" then
 			links {
 				"m",

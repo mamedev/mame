@@ -214,7 +214,7 @@ public:
 	void pause();
 	void resume();
 	void toggle_pause();
-	void add_notifier(machine_notification event, machine_notify_delegate callback);
+	void add_notifier(machine_notification event, machine_notify_delegate callback, bool first = false);
 	void call_notifiers(machine_notification which);
 	void add_logerror_callback(logerror_callback callback);
 	void set_ui_active(bool active) { m_ui_active = active; }

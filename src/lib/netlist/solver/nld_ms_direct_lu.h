@@ -552,7 +552,7 @@ nl_double matrix_solver_direct_t<m_N, _storage_N>::delta(
 	const unsigned iN = this->N();
 	nl_double cerr = 0;
 	for (unsigned i = 0; i < iN; i++)
-		cerr = std::max(cerr, nl_math::abs(V[i] - this->m_nets[i]->m_cur_Analog));
+		cerr = std::fmax(cerr, nl_math::abs(V[i] - this->m_nets[i]->m_cur_Analog));
 	return cerr;
 }
 

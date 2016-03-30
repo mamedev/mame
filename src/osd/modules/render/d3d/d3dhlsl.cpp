@@ -739,8 +739,6 @@ void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 		options->bloom_level6_weight = winoptions.screen_bloom_lvl6_weight();
 		options->bloom_level7_weight = winoptions.screen_bloom_lvl7_weight();
 		options->bloom_level8_weight = winoptions.screen_bloom_lvl8_weight();
-		options->bloom_level9_weight = winoptions.screen_bloom_lvl9_weight();
-		options->bloom_level10_weight = winoptions.screen_bloom_lvl10_weight();
 
 		options->params_init = true;
 	}
@@ -1460,59 +1458,34 @@ int shaders::bloom_pass(d3d_render_target *rt, int source_index, poly_info *poly
 		return next_index;
 	}
 
-	float weight12[2] = {
-		options->bloom_level1_weight,
-		options->bloom_level2_weight
-	};
-	float weight34[2] = {
-		options->bloom_level3_weight,
-		options->bloom_level4_weight
-	};
-	float weight56[2] = {
-		options->bloom_level5_weight,
-		options->bloom_level6_weight,
-	};
-	float weight78[2] = {
-		options->bloom_level7_weight,
-		options->bloom_level8_weight
-	};
-	float weight9A[2]  = {
-		options->bloom_level9_weight,
-		options->bloom_level10_weight
-	};
-
 	curr_effect = bloom_effect;
 	curr_effect->update_uniforms();
 
-	curr_effect->set_float ("Level0Weight", options->bloom_level0_weight);
-	curr_effect->set_vector("Level12Weight", 2, weight12);
-	curr_effect->set_vector("Level34Weight", 2, weight34);
-	curr_effect->set_vector("Level56Weight", 2, weight56);
-	curr_effect->set_vector("Level78Weight", 2, weight78);
-	curr_effect->set_vector("Level9AWeight", 2, weight9A);
-
-	curr_effect->set_vector("Level0Size", 2, rt->bloom_dims[0]);
-	curr_effect->set_vector("Level12Size", 4, rt->bloom_dims[1]);
-	curr_effect->set_vector("Level34Size", 4, rt->bloom_dims[3]);
-	curr_effect->set_vector("Level56Size", 4, rt->bloom_dims[5]);
-	curr_effect->set_vector("Level78Size", 4, rt->bloom_dims[7]);
-	curr_effect->set_vector("Level9ASize", 4, rt->bloom_dims[9]);
+	curr_effect->set_float("Level0Weight", options->bloom_level0_weight);
+	curr_effect->set_float("Level1Weight", options->bloom_level1_weight);
+	curr_effect->set_float("Level2Weight", options->bloom_level2_weight);
+	curr_effect->set_float("Level3Weight", options->bloom_level3_weight);
+	curr_effect->set_float("Level4Weight", options->bloom_level4_weight);
+	curr_effect->set_float("Level5Weight", options->bloom_level5_weight);
+	curr_effect->set_float("Level6Weight", options->bloom_level6_weight);
+	curr_effect->set_float("Level7Weight", options->bloom_level7_weight);
+	curr_effect->set_float("Level8Weight", options->bloom_level8_weight);
 
 	curr_effect->set_int("BloomBlendMode", options->bloom_blend_mode);
 	curr_effect->set_float("BloomScale", options->bloom_scale);
 	curr_effect->set_vector("BloomOverdrive", 3, options->bloom_overdrive);
 
-	curr_effect->set_texture("DiffuseA", rt->target_texture[next_index]);
+	curr_effect->set_texture("DiffuseTexture", rt->target_texture[next_index]);
 
-	char name[9] = "Diffuse*";
+	char name[14] = "BloomTexture*";
 	for (int index = 1; index < rt->bloom_count; index++)
 	{
-		name[7] = 'A' + index;
+		name[12] = 'A' + index - 1;
 		curr_effect->set_texture(name, rt->bloom_texture[index - 1]);
 	}
-	for (int index = rt->bloom_count; index < 11; index++)
+	for (int index = rt->bloom_count; index < MAX_BLOOM_COUNT; index++)
 	{
-		name[7] = 'A' + index;
+		name[12] = 'A' + index - 1;
 		curr_effect->set_texture(name, black_texture);
 	}
 
@@ -2315,8 +2288,6 @@ enum slider_option
 	SLIDER_BLOOM_LVL6_SCALE,
 	SLIDER_BLOOM_LVL7_SCALE,
 	SLIDER_BLOOM_LVL8_SCALE,
-	SLIDER_BLOOM_LVL9_SCALE,
-	SLIDER_BLOOM_LVL10_SCALE,
 	SLIDER_NTSC_ENABLE,
 	SLIDER_NTSC_JITTER,
 	SLIDER_NTSC_A_VALUE,
@@ -2392,8 +2363,6 @@ slider_desc shaders::s_sliders[] =
 	{ "Bloom Level 6 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL6_SCALE,        0.01f,    "%1.2f", {} },
 	{ "Bloom Level 7 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL7_SCALE,        0.01f,    "%1.2f", {} },
 	{ "Bloom Level 8 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL8_SCALE,        0.01f,    "%1.2f", {} },
-	{ "Bloom Level 9 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL9_SCALE,        0.01f,    "%1.2f", {} },
-	{ "Bloom Level 10 Scale",               0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL10_SCALE,       0.01f,    "%1.2f", {} },
 	{ "NTSC processing",                    0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_ENABLE,             0,        "%s",    { "Off", "On" } },
 	{ "Signal Jitter",                      0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_JITTER,             0.01f,    "%1.2f", {} },
 	{ "A Value",                         -100,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_A_VALUE,            0.01f,    "%1.2f", {} },
@@ -2467,8 +2436,6 @@ void *shaders::get_slider_option(int id, int index)
 		case SLIDER_BLOOM_LVL6_SCALE: return &(options->bloom_level6_weight);
 		case SLIDER_BLOOM_LVL7_SCALE: return &(options->bloom_level7_weight);
 		case SLIDER_BLOOM_LVL8_SCALE: return &(options->bloom_level8_weight);
-		case SLIDER_BLOOM_LVL9_SCALE: return &(options->bloom_level9_weight);
-		case SLIDER_BLOOM_LVL10_SCALE: return &(options->bloom_level10_weight);
 		case SLIDER_NTSC_ENABLE: return &(options->yiq_enable);
 		case SLIDER_NTSC_JITTER: return &(options->yiq_jitter);
 		case SLIDER_NTSC_A_VALUE: return &(options->yiq_a);

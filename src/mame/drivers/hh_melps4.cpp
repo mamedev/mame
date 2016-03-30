@@ -361,7 +361,7 @@ public:
 void gjungler_state::prepare_display()
 {
 	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,1);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,8,9,10,11,17,16,15,14,13,12,0,7,1,6,2,5,3,4) | 0x2000;
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,8,9,10,11,13,16,15,14,13,12,7,0,6,1,5,2,4,3) | 0x2000;
 	display_matrix(18, 12, plate, grid);
 }
 
@@ -467,4 +467,4 @@ ROM_END
 /*    YEAR  NAME      PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1981, cfrogger, 0,        0, cfrogger, cfrogger, driver_device, 0, "Coleco", "Frogger (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1982, gjungler, 0,        0, gjungler, gjungler, driver_device, 0, "Gakken / Konami", "Jungler (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1982, gjungler, 0,        0, gjungler, gjungler, driver_device, 0, "Gakken / Konami", "Jungler (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

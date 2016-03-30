@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, Couriersud
+// copyright-holders:Aaron Giles, Couriersud,Stephane Humbert
 /***************************************************************************
 
     Galaxian-derived hardware

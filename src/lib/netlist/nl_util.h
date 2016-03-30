@@ -41,8 +41,8 @@ private:
 
 public:
 	ATTR_HOT inline static float exp(const float x) { return std::exp(x); }
-	ATTR_HOT inline static double abs(const double x) { return std::abs(x); }
-	ATTR_HOT inline static float abs(const float x) { return std::abs(x); }
+	ATTR_HOT inline static double abs(const double x) { return std::fabs(x); }
+	ATTR_HOT inline static float abs(const float x) { return std::fabs(x); }
 	ATTR_HOT inline static double log(const double x) { return std::log(x); }
 	ATTR_HOT inline static float log(const float x) { return std::log(x); }
 #if defined(_MSC_VER) && _MSC_VER < 1800

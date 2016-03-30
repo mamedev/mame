@@ -2795,7 +2795,7 @@ bool cache_target::init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width,
 
 d3d_render_target::~d3d_render_target()
 {
-	for (int index = 0; index < 11; index++)
+	for (int index = 0; index < MAX_BLOOM_COUNT; index++)
 	{
 		if (bloom_texture[index] != nullptr)
 		{
@@ -2869,13 +2869,13 @@ bool d3d_render_target::init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_w
 	bool vector_screen =
 		d3d->window().machine().first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
 
-	// larger blur width for vector screens than raster screens
-	float scale_factor = vector_screen ? 0.5f : 0.75f;
+	float scale_factor = 0.75f;
+	int scale_count = vector_screen ? MAX_BLOOM_COUNT : MAX_BLOOM_COUNT / 2;
 
 	float bloom_width = (float)source_width;
 	float bloom_height = (float)source_height;
 	float bloom_size = bloom_width < bloom_height ? bloom_width : bloom_height;
-	for (int bloom_index = 0; bloom_index < 11 && bloom_size >= 2.0f; bloom_size *= scale_factor)
+	for (int bloom_index = 0; bloom_index < scale_count && bloom_size >= 2.0f; bloom_size *= scale_factor)
 	{
 		this->bloom_dims[bloom_index][0] = (int)bloom_width;
 		this->bloom_dims[bloom_index][1] = (int)bloom_height;

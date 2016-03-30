@@ -595,10 +595,33 @@ WRITE8_MEMBER(balsente_state::balsente_adc_select_w)
 {
 	/* set a timer to go off and read the value after 50us */
 	/* it's important that we do this for Mini Golf */
-logerror("adc_select %d\n", offset & 7);
+	logerror("adc_select %d\n", offset & 7);
 	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(balsente_state::adc_finished),this), offset & 7);
 }
 
+READ8_MEMBER(balsente_state::teamht_extra_r)
+{
+	return m_teamht_input;
+}
+
+
+WRITE8_MEMBER(balsente_state::teamht_multiplex_select_w)
+{
+	logerror("multiplex_select %d\n", offset & 7);
+	switch (offset & 7)
+	{
+	case 0x04: m_teamht_input = ioport("EX0")->read(); break;
+	case 0x05: m_teamht_input = ioport("EX1")->read(); break;
+	case 0x06: m_teamht_input = ioport("EX2")->read(); break;
+	case 0x07: m_teamht_input = ioport("EX3")->read(); break;
+
+	default:
+		logerror("(unhandled)\n");
+		break;
+
+	}
+
+}
 
 
 /*************************************
@@ -1076,7 +1099,6 @@ WRITE8_MEMBER(balsente_state::spiker_expand_w)
 	else if (offset == 2)
 		m_spiker_expand_color = data;
 }
-
 
 READ8_MEMBER(balsente_state::spiker_expand_r)
 {

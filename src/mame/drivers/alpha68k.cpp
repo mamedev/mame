@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Pierpaolo Prazzoli, Bryan McPhail
+// copyright-holders:Pierpaolo Prazzoli, Bryan McPhail,Stephane Humbert
 /***************************************************************************
 
     SNK/Alpha 68000 based games:

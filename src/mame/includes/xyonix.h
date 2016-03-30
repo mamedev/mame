@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Stephh
+// copyright-holders:David Haywood
 class xyonix_state : public driver_device
 {
 public:

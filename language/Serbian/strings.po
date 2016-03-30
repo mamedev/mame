@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-25 23:59+0100\n"
+"POT-Creation-Date: 2016-03-28 09:02+0200\n"
 "PO-Revision-Date: 2016-03-02 21:46+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -41,7 +41,7 @@ msgid ""
 "Cheat Comment:\n"
 "%s"
 msgstr ""
-"Primedba za varanje:\n"
+"Komentar za varanje:\n"
 "%s"
 
 #: src/emu/ui/cheatopt.cpp:90
@@ -50,7 +50,7 @@ msgstr "Sva varanja ponovo učitana"
 
 #: src/emu/ui/cheatopt.cpp:121
 msgid "Autofire Settings"
-msgstr "Podešenja automatskog pucanja"
+msgstr "Podešavanja automatskog pucanja"
 
 #: src/emu/ui/cheatopt.cpp:139
 msgid "Reset All"
@@ -64,14 +64,14 @@ msgstr "Ponovo učitaj sve"
 msgid "Autofire Status"
 msgstr "Stanje automatskog pucanja"
 
-#: src/emu/ui/cheatopt.cpp:258 src/emu/ui/ui.cpp:1742
+#: src/emu/ui/cheatopt.cpp:258 src/emu/ui/ui.cpp:1692
 #: src/emu/ui/videoopt.cpp:207 src/emu/ui/videoopt.cpp:211
 #: src/emu/ui/videoopt.cpp:215 src/emu/ui/videoopt.cpp:219
 #: src/emu/ui/videoopt.cpp:223
 msgid "Disabled"
 msgstr "Onemogućeno"
 
-#: src/emu/ui/cheatopt.cpp:258 src/emu/ui/ui.cpp:1742
+#: src/emu/ui/cheatopt.cpp:258 src/emu/ui/ui.cpp:1692
 #: src/emu/ui/videoopt.cpp:207 src/emu/ui/videoopt.cpp:211
 #: src/emu/ui/videoopt.cpp:215 src/emu/ui/videoopt.cpp:219
 #: src/emu/ui/videoopt.cpp:223
@@ -147,12 +147,12 @@ msgstr "Drugi filter"
 
 #: src/emu/ui/custmenu.cpp:175 src/emu/ui/optsmenu.cpp:235
 msgid "^!Manufacturer"
-msgstr ""
+msgstr "^!Proizvođač"
 
 #: src/emu/ui/custmenu.cpp:184 src/emu/ui/custmenu.cpp:472
 #: src/emu/ui/optsmenu.cpp:243
 msgid "^!Year"
-msgstr ""
+msgstr "^!Godina"
 
 #: src/emu/ui/custmenu.cpp:193 src/emu/ui/custmenu.cpp:508
 msgid "Remove last filter"
@@ -169,19 +169,19 @@ msgstr "Izbor proizvoljnih filtera"
 
 #: src/emu/ui/custmenu.cpp:463
 msgid "^!Publisher"
-msgstr ""
+msgstr "^!Izdavač"
 
 #: src/emu/ui/custmenu.cpp:481
 msgid "^!Software List"
-msgstr ""
+msgstr "^!Lista programa"
 
 #: src/emu/ui/custmenu.cpp:490
 msgid "^!Device type"
-msgstr ""
+msgstr "^!Tip uredjaja"
 
 #: src/emu/ui/custmenu.cpp:499
 msgid "^!Region"
-msgstr ""
+msgstr "^!Region"
 
 #: src/emu/ui/custui.cpp:22
 msgid "Show All"
@@ -217,11 +217,11 @@ msgstr "Prikaži bočne panele"
 
 #: src/emu/ui/custui.cpp:166 src/emu/ui/custui.cpp:186
 msgid "Custom UI Settings"
-msgstr "Proizvoljna podešenja korisničkog interfejsa"
+msgstr "Podešavanja korisničkog interfejsa"
 
 #: src/emu/ui/custui.cpp:244
 msgid "default"
-msgstr ""
+msgstr "uobičajeno"
 
 #: src/emu/ui/custui.cpp:347
 msgid "UI Font"
@@ -233,7 +233,7 @@ msgstr "Podebljano"
 
 #: src/emu/ui/custui.cpp:353
 msgid "Italic"
-msgstr "Ukošeno"
+msgstr "Iskošeno"
 
 #: src/emu/ui/custui.cpp:358
 msgid "Lines"
@@ -245,7 +245,7 @@ msgstr "Visina teksta za informacije"
 
 #: src/emu/ui/custui.cpp:381
 msgid "UI Fonts Settings"
-msgstr "Podešenje fontova za korisnički interfejs"
+msgstr "Podešavanje fontova za korisnički interfejs"
 
 #: src/emu/ui/custui.cpp:408
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -270,7 +270,7 @@ msgstr "Boja pozadine za izabranu stavku"
 
 #: src/emu/ui/custui.cpp:510
 msgid "Subitem color"
-msgstr "Boja podstavke"
+msgstr "Boja pod-stavke"
 
 #: src/emu/ui/custui.cpp:511 src/emu/ui/custui.cpp:606
 msgid "Clone"
@@ -298,7 +298,7 @@ msgstr "Boja klizača"
 
 #: src/emu/ui/custui.cpp:517
 msgid "Gfx viewer background"
-msgstr ""
+msgstr "Grafički prikaz pozadine"
 
 #: src/emu/ui/custui.cpp:518
 msgid "Mouse over color"
@@ -310,11 +310,11 @@ msgstr "Boja pozadine pri prelasku miša"
 
 #: src/emu/ui/custui.cpp:520
 msgid "Mouse down color"
-msgstr ""
+msgstr "Boja pri pritisku miša"
 
 #: src/emu/ui/custui.cpp:521
 msgid "Mouse down background color"
-msgstr ""
+msgstr "Boja pozadine miša"
 
 #: src/emu/ui/custui.cpp:524
 msgid "Restore originals colors"
@@ -322,12 +322,12 @@ msgstr "Vrati originalne boje"
 
 #: src/emu/ui/custui.cpp:540
 msgid "UI Colors Settings"
-msgstr "Podešenje boja korisničkog interfejsa"
+msgstr "Podešavanje boja korisničkog interfejsa"
 
 #: src/emu/ui/custui.cpp:568
 #, c-format
 msgid "Double click or press %1$s to change the color value"
-msgstr ""
+msgstr "Dupli klik ili pritisnite %1$s da promenite boju"
 
 #: src/emu/ui/custui.cpp:594
 msgid "Menu Preview"
@@ -339,7 +339,7 @@ msgstr "Normalno"
 
 #: src/emu/ui/custui.cpp:603
 msgid "Subitem"
-msgstr "Podstavka"
+msgstr "Pod-stavka"
 
 #: src/emu/ui/custui.cpp:604
 msgid "Selected"
@@ -351,22 +351,22 @@ msgstr "Prelay mišem"
 
 #: src/emu/ui/custui.cpp:837 src/emu/ui/custui.cpp:840
 msgid "Alpha"
-msgstr ""
+msgstr "Alfa"
 
 #: src/emu/ui/custui.cpp:845 src/emu/ui/custui.cpp:848
 #: src/emu/ui/custui.cpp:1007
 msgid "Red"
-msgstr ""
+msgstr "Crvenа"
 
 #: src/emu/ui/custui.cpp:853 src/emu/ui/custui.cpp:856
 #: src/emu/ui/custui.cpp:1010
 msgid "Green"
-msgstr ""
+msgstr "Zelenа"
 
 #: src/emu/ui/custui.cpp:861 src/emu/ui/custui.cpp:864
 #: src/emu/ui/custui.cpp:1011
 msgid "Blue"
-msgstr ""
+msgstr "Plavа"
 
 #: src/emu/ui/custui.cpp:867
 msgid "Choose from palette"
@@ -374,39 +374,39 @@ msgstr "Izabrati iz palete"
 
 #: src/emu/ui/custui.cpp:883
 msgid " - ARGB Settings"
-msgstr " - ARGB podešenja"
+msgstr " - ARGB podešavanja"
 
 #: src/emu/ui/custui.cpp:907
 msgid "Color preview ="
-msgstr "Probni prikaz boja ="
+msgstr "Prikaz boja ="
 
 #: src/emu/ui/custui.cpp:1003
 msgid "White"
-msgstr ""
+msgstr "Bela"
 
 #: src/emu/ui/custui.cpp:1004
 msgid "Silver"
-msgstr ""
+msgstr "Srebrna"
 
 #: src/emu/ui/custui.cpp:1005
 msgid "Gray"
-msgstr ""
+msgstr "Siva"
 
 #: src/emu/ui/custui.cpp:1006
 msgid "Black"
-msgstr ""
+msgstr "Crna"
 
 #: src/emu/ui/custui.cpp:1008
 msgid "Orange"
-msgstr ""
+msgstr "Narandžasta"
 
 #: src/emu/ui/custui.cpp:1009
 msgid "Yellow"
-msgstr ""
+msgstr "Žuta"
 
 #: src/emu/ui/custui.cpp:1012
 msgid "Violet"
-msgstr ""
+msgstr "Ljubičasta"
 
 #: src/emu/ui/datmenu.cpp:64
 msgid "Software History"
@@ -429,11 +429,11 @@ msgstr "Istorija"
 
 #: src/emu/ui/datmenu.cpp:286 src/emu/ui/selgame.cpp:40
 msgid "Mameinfo"
-msgstr "Mame - informacije"
+msgstr "МАМЕ - informacije"
 
 #: src/emu/ui/datmenu.cpp:288 src/emu/ui/selgame.cpp:42
 msgid "Messinfo"
-msgstr "Mess - informacije"
+msgstr "МESS - informacije"
 
 #: src/emu/ui/datmenu.cpp:290 src/emu/ui/selgame.cpp:41
 msgid "Sysinfo"
@@ -445,7 +445,7 @@ msgstr "Mamescore"
 
 #: src/emu/ui/datmenu.cpp:294 src/emu/ui/selgame.cpp:44
 msgid "Gameinit"
-msgstr ""
+msgstr "Inicijalizacija"
 
 #: src/emu/ui/datmenu.cpp:296 src/emu/ui/selgame.cpp:43
 msgid "Command"
@@ -557,16 +557,16 @@ msgstr "Versus ekrani"
 
 #: src/emu/ui/dirmenu.cpp:58 src/emu/ui/menu.cpp:59
 msgid "Covers"
-msgstr ""
+msgstr "Maske"
 
 #: src/emu/ui/dirmenu.cpp:116 src/emu/ui/dirmenu.cpp:136
 msgid "Folders Setup"
-msgstr "Podešenje direktorijuma"
+msgstr "Podešavanje direktorijuma"
 
 #: src/emu/ui/dirmenu.cpp:183
 #, c-format
 msgid "Current %1$s Folders"
-msgstr ""
+msgstr "Trenutni %1$s direktorijum"
 
 #: src/emu/ui/dirmenu.cpp:195
 msgid "Change Folder"
@@ -583,12 +583,12 @@ msgstr "Ukloni direktorijum"
 #: src/emu/ui/dirmenu.cpp:496
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
-msgstr ""
+msgstr "Promeni %1$s direktorijum - Pretraga: %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:497
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
-msgstr ""
+msgstr "Dodaj %1$s direktorijum - Pretraga: %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:534
 msgid "Press TAB to set"
@@ -597,15 +597,15 @@ msgstr "Pritisnite TAB da podesite"
 #: src/emu/ui/dirmenu.cpp:640
 #, c-format
 msgid "Remove %1$s Folder"
-msgstr ""
+msgstr "Ukloni %1$s direktorijum"
 
 #: src/emu/ui/dsplmenu.cpp:38
 msgid "Video Mode"
-msgstr ""
+msgstr "Video mod"
 
 #: src/emu/ui/dsplmenu.cpp:40
 msgid "Triple Buffering"
-msgstr ""
+msgstr "Trostruko baferovanje"
 
 #: src/emu/ui/dsplmenu.cpp:41
 msgid "HLSL"
@@ -617,42 +617,42 @@ msgstr ""
 
 #: src/emu/ui/dsplmenu.cpp:44
 msgid "Bilinear Filtering"
-msgstr ""
+msgstr "Bilinearni filter"
 
 #: src/emu/ui/dsplmenu.cpp:45
 msgid "Bitmap Prescaling"
-msgstr ""
+msgstr "Pre-skaliranje"
 
 #: src/emu/ui/dsplmenu.cpp:46
 msgid "Window Mode"
-msgstr ""
+msgstr "Izvršavaj u prozoru"
 
 #: src/emu/ui/dsplmenu.cpp:47
 msgid "Enforce Aspect Ratio"
-msgstr ""
+msgstr "Forsiraj odnos stranica"
 
 #: src/emu/ui/dsplmenu.cpp:48
 msgid "Start Out Maximized"
-msgstr ""
+msgstr "Startuj maksimizovano"
 
 #: src/emu/ui/dsplmenu.cpp:49
 msgid "Synchronized Refresh"
-msgstr ""
+msgstr "Sinhronizovano osvežavanje"
 
 #: src/emu/ui/dsplmenu.cpp:50
 msgid "Wait Vertical Sync"
-msgstr ""
+msgstr "Čekaj vertikalnu sinhronizaciju"
 
 #: src/emu/ui/dsplmenu.cpp:202 src/emu/ui/dsplmenu.cpp:222
 #: src/emu/ui/optsmenu.cpp:261
 msgid "Display Options"
 msgstr "Opcije prikaza"
 
-#: src/emu/ui/filesel.cpp:159
+#: src/emu/ui/filesel.cpp:161
 msgid "File Already Exists - Override?"
-msgstr ""
+msgstr "Fajl već postoji - prepiši?"
 
-#: src/emu/ui/filesel.cpp:161 src/emu/ui/selgame.cpp:1560
+#: src/emu/ui/filesel.cpp:163 src/emu/ui/selgame.cpp:1560
 #: src/emu/ui/selgame.cpp:1561 src/emu/ui/selgame.cpp:1562
 #: src/emu/ui/selgame.cpp:1563 src/emu/ui/selgame.cpp:1564
 #: src/emu/ui/selgame.cpp:1565 src/emu/ui/selgame.cpp:1566
@@ -660,7 +660,7 @@ msgstr ""
 msgid "No"
 msgstr "Ne"
 
-#: src/emu/ui/filesel.cpp:162 src/emu/ui/selgame.cpp:1560
+#: src/emu/ui/filesel.cpp:164 src/emu/ui/selgame.cpp:1560
 #: src/emu/ui/selgame.cpp:1561 src/emu/ui/selgame.cpp:1562
 #: src/emu/ui/selgame.cpp:1563 src/emu/ui/selgame.cpp:1564
 #: src/emu/ui/selgame.cpp:1565 src/emu/ui/selgame.cpp:1566
@@ -668,79 +668,81 @@ msgstr "Ne"
 msgid "Yes"
 msgstr "Da"
 
-#: src/emu/ui/filesel.cpp:271
+#: src/emu/ui/filesel.cpp:275
 msgid "New Image Name:"
-msgstr ""
+msgstr "Novo ime:"
 
-#: src/emu/ui/filesel.cpp:277
+#: src/emu/ui/filesel.cpp:281
 msgid "Image Format:"
-msgstr ""
+msgstr "Format zapisa:"
 
-#: src/emu/ui/filesel.cpp:283
+#: src/emu/ui/filesel.cpp:287
 msgid "Create"
-msgstr ""
+msgstr "Kreiraj"
 
-#: src/emu/ui/filesel.cpp:314
+#: src/emu/ui/filesel.cpp:318
 msgid "Please enter a file extension too"
-msgstr ""
+msgstr "Molim unesite i ekstenziju"
 
-#: src/emu/ui/filesel.cpp:502 src/emu/ui/swlist.cpp:65
+#: src/emu/ui/filesel.cpp:506 src/emu/ui/swlist.cpp:65
 msgid "[empty slot]"
-msgstr ""
+msgstr "[prazan slot]"
 
-#: src/emu/ui/filesel.cpp:506
+#: src/emu/ui/filesel.cpp:510
 msgid "[create]"
-msgstr ""
+msgstr "[kreiraj]"
 
-#: src/emu/ui/filesel.cpp:510 src/emu/ui/swlist.cpp:76
+#: src/emu/ui/filesel.cpp:514 src/emu/ui/swlist.cpp:76
 msgid "[software list]"
-msgstr ""
+msgstr "[lista programa]"
 
-#: src/emu/ui/filesel.cpp:802
+#: src/emu/ui/filesel.cpp:806
 msgid "Select image format"
-msgstr ""
-
-#: src/emu/ui/filesel.cpp:862
-msgid "Select access mode"
-msgstr ""
-
-#: src/emu/ui/filesel.cpp:863
-msgid "Read-only"
-msgstr ""
-
-#: src/emu/ui/filesel.cpp:865
-msgid "Read-write"
-msgstr ""
+msgstr "Odaberi format"
 
 #: src/emu/ui/filesel.cpp:866
-msgid "Read this image, write to another image"
-msgstr ""
+msgid "Select access mode"
+msgstr "Odaberi mod pristupa"
 
 #: src/emu/ui/filesel.cpp:867
+msgid "Read-only"
+msgstr "Samo čitanje"
+
+#: src/emu/ui/filesel.cpp:869
+msgid "Read-write"
+msgstr "Čitanje-pisanje"
+
+#: src/emu/ui/filesel.cpp:870
+msgid "Read this image, write to another image"
+msgstr "Čitaj ovaj fajl, piši u drugi"
+
+#: src/emu/ui/filesel.cpp:871
 msgid "Read this image, write to diff"
-msgstr ""
+msgstr "Čitaj ovaj fajl, piši razlike"
 
 #: src/emu/ui/imgcntrl.cpp:115
 msgid "Cannot save over directory"
-msgstr ""
+msgstr "Nemoguće snimiti preko direktorijuma"
 
 #: src/emu/ui/imgcntrl.cpp:149
 msgid ""
 "The software selected is missing one or more required ROM or CHD images. "
 "Please select a different one."
 msgstr ""
+"Odabranom programu nedostaje jedan ili više ROM ili CHD fajlova. "
+"Molim odaberite drugi."
 
 #: src/emu/ui/info.cpp:98
 msgid "Not supported"
-msgstr ""
+msgstr "Nije podržano"
 
 #: src/emu/ui/info.cpp:101
 msgid "Partially supported"
-msgstr ""
+msgstr "Delimično podržano"
 
 #: src/emu/ui/info.cpp:109
 msgid "[empty]"
-msgstr ""
+msgstr "[prazno]"
 
 #: src/emu/ui/info_pty.cpp:26 src/emu/ui/mainmenu.cpp:90
 msgid "Pseudo terminals"
@@ -748,15 +750,15 @@ msgstr "Pseudo terminali"
 
 #: src/emu/ui/info_pty.cpp:35
 msgid "[failed]"
-msgstr ""
+msgstr "[neuspešno]"
 
 #: src/emu/ui/inputmap.cpp:52
 msgid "User Interface"
-msgstr ""
+msgstr "Korisnički interfejs"
 
 #: src/emu/ui/inputmap.cpp:59
 msgid "Other Controls"
-msgstr ""
+msgstr "Ostale kontrole"
 
 #: src/emu/ui/inputmap.cpp:625 src/emu/ui/miscmenu.cpp:90
 #: src/emu/ui/slotopt.cpp:172
@@ -765,11 +767,11 @@ msgstr "Resetuj"
 
 #: src/emu/ui/mainmenu.cpp:53
 msgid "Input (general)"
-msgstr "Podešenje kontrola (globalno)"
+msgstr "Podešavanje kontrola (globalno)"
 
 #: src/emu/ui/mainmenu.cpp:55
 msgid "Input (this Machine)"
-msgstr "Podešenje kontrola (ova mašina)"
+msgstr "Podešavanje kontrola (ova mašina)"
 
 #: src/emu/ui/mainmenu.cpp:59
 msgid "Analog Controls"
@@ -785,7 +787,7 @@ msgstr "Konfiguracija mašine"
 
 #: src/emu/ui/mainmenu.cpp:68
 msgid "Bookkeeping Info"
-msgstr "Informacije o knjigovodstvu mašine"
+msgstr "Informacije o statistici mašine"
 
 #: src/emu/ui/mainmenu.cpp:71
 msgid "Machine Information"
@@ -793,11 +795,11 @@ msgstr "Informacije o mašini"
 
 #: src/emu/ui/mainmenu.cpp:77
 msgid "Image Information"
-msgstr "Informacije o slici"
+msgstr "Informacije o programu"
 
 #: src/emu/ui/mainmenu.cpp:80
 msgid "File Manager"
-msgstr "Fajl menadžer"
+msgstr "Upravljanje fajlovima"
 
 #: src/emu/ui/mainmenu.cpp:85
 msgid "Tape Control"
@@ -809,7 +811,7 @@ msgstr "Izbor BIOS-a"
 
 #: src/emu/ui/mainmenu.cpp:99
 msgid "Slot Devices"
-msgstr ""
+msgstr "Slot uređaji"
 
 #: src/emu/ui/mainmenu.cpp:106
 msgid "Barcode Reader"
@@ -857,31 +859,31 @@ msgstr "Izaberi novu mašinu"
 
 #: src/emu/ui/menu.cpp:45
 msgid "Control Panels"
-msgstr ""
+msgstr "Kontrolni panel"
 
 #: src/emu/ui/menu.cpp:50
 msgid "Artwork Preview"
-msgstr ""
+msgstr "Pregled artwork-a"
 
 #: src/emu/ui/menu.cpp:54
 msgid "Game Over"
-msgstr ""
+msgstr "Završni ekran igre"
 
 #: src/emu/ui/menu.cpp:64
 msgid "Add or remove favorites"
-msgstr ""
+msgstr "Dodavanje ili uklanjanje omiljenih"
 
 #: src/emu/ui/menu.cpp:65
 msgid "Export displayed list to file"
-msgstr ""
+msgstr "Eksportuj prikazanu listu u fajl"
 
 #: src/emu/ui/menu.cpp:66
 msgid "Show DATs view"
-msgstr ""
+msgstr "Prikaži DAT"
 
 #: src/emu/ui/menu.cpp:253
 msgid "Return to Machine"
-msgstr "Podešenje kontrola (ova mašina)"
+msgstr "Podešavanje kontrola (ova mašina)"
 
 #: src/emu/ui/menu.cpp:257 src/emu/ui/menu.cpp:259
 msgid "Exit"
@@ -893,15 +895,15 @@ msgstr "Povratak u prethodni meni"
 
 #: src/emu/ui/menu.cpp:681
 msgid "Auto"
-msgstr ""
+msgstr "Automatski"
 
 #: src/emu/ui/menu.cpp:2098
 msgid "Images"
-msgstr ""
+msgstr "Programi"
 
 #: src/emu/ui/menu.cpp:2099
 msgid "Infos"
-msgstr ""
+msgstr "Informacije"
 
 #: src/emu/ui/miscmenu.cpp:36
 msgid "Keyboard Mode:"
@@ -1011,7 +1013,7 @@ msgstr "%s.xml sačuvan u ui direktorijum."
 
 #: src/emu/ui/miscmenu.cpp:765
 msgid "Name:             Description:\n"
-msgstr "Ime:             Opis:\n"
+msgstr "Ime:              Opis:\n"
 
 #: src/emu/ui/miscmenu.cpp:777
 #, c-format
@@ -1020,11 +1022,11 @@ msgstr "%s.txt sačuvan u ui direktorijum."
 
 #: src/emu/ui/miscmenu.cpp:795
 msgid "Export XML format (like -listxml)"
-msgstr "Izvezi XML format"
+msgstr "Izvezi XML format (kao -listxml)"
 
 #: src/emu/ui/miscmenu.cpp:796
 msgid "Export TXT format (like -listfull)"
-msgstr "Izvezi TXT format"
+msgstr "Izvezi TXT format (kao -listfull)"
 
 #: src/emu/ui/miscmenu.cpp:854
 msgid "Dummy"
@@ -1037,7 +1039,7 @@ msgstr "Sačuvaj konfiguraciju mašine"
 #: src/emu/ui/miscmenu.cpp:967 src/emu/ui/miscmenu.cpp:987
 #: src/emu/ui/selgame.cpp:587
 msgid "Plugins"
-msgstr ""
+msgstr "Dodatci"
 
 #: src/emu/ui/optsmenu.cpp:214
 msgid "Filter"
@@ -1045,15 +1047,15 @@ msgstr "Filter"
 
 #: src/emu/ui/optsmenu.cpp:222
 msgid " ^!File"
-msgstr ""
+msgstr " ^!Fajl"
 
 #: src/emu/ui/optsmenu.cpp:227
 msgid " ^!Category"
-msgstr ""
+msgstr " ^!Kategorija"
 
 #: src/emu/ui/optsmenu.cpp:250
 msgid "^!Setup custom filter"
-msgstr ""
+msgstr "^!Pripremi filter"
 
 #: src/emu/ui/optsmenu.cpp:258
 msgid "Customize UI"
@@ -1078,7 +1080,7 @@ msgstr "Sačuvaj konfiguraciju"
 
 #: src/emu/ui/optsmenu.cpp:281 src/emu/ui/optsmenu.cpp:301
 msgid "Settings"
-msgstr "Podešenja"
+msgstr "Podešavanja"
 
 #: src/emu/ui/optsmenu.cpp:321
 msgid "**Error saving ui.ini**"
@@ -1106,7 +1108,7 @@ msgstr "Izborna lista - pretraga:"
 #: src/emu/ui/selector.cpp:194
 #, c-format
 msgid "Double click or press %1$s to select"
-msgstr ""
+msgstr "Dupli klik ili pritisnite %1$s za selektovanje"
 
 #: src/emu/ui/selgame.cpp:38
 msgid "General Info"
@@ -1186,7 +1188,7 @@ msgstr "Drajver je klon od: %1$-.100s"
 
 #: src/emu/ui/selgame.cpp:841 src/emu/ui/selsoft.cpp:757
 msgid "Driver is parent"
-msgstr "Drajver je predak"
+msgstr "Drajver je osnovni"
 
 #: src/emu/ui/selgame.cpp:845 src/emu/ui/selsoft.cpp:761
 #: src/emu/ui/simpleselgame.cpp:332
@@ -1322,7 +1324,7 @@ msgstr "Zvuk: OK\n"
 #: src/emu/ui/selgame.cpp:1560
 #, c-format
 msgid "Driver is Skeleton: %1$s\n"
-msgstr "Drajver je okosnica: %s\n"
+msgstr "Drajver je \"skelet\": %s\n"
 
 #: src/emu/ui/selgame.cpp:1561
 #, c-format
@@ -1337,7 +1339,7 @@ msgstr "Zahteva ilustracije: %1$s\n"
 #: src/emu/ui/selgame.cpp:1563
 #, c-format
 msgid "Requires Clickable Artwork: %1$s\n"
-msgstr "Zahteva ilustracije na koje moze da se klikne: %1$s\n"
+msgstr "Zahteva klik ilustracije: %1$s\n"
 
 #: src/emu/ui/selgame.cpp:1564
 #, c-format
@@ -1420,6 +1422,10 @@ msgid ""
 "\n"
 "Press any key (except ESC) to continue."
 msgstr ""
+"Selektovanom programu nedostaje jedan ili više fajlova. Molim selektujte "
+"drugi program.\n"
+"\n"
+"Pritisnite bilo koji taster (osim ESC) za nastavak."
 
 #: src/emu/ui/selsoft.cpp:682
 #, c-format
@@ -1487,7 +1493,7 @@ msgstr ""
 "definisanu u %1$s.ini fajlu\n"
 "\n"
 "Ako je ovo Vaš prvi put da koristite %2$s, molimo Vas pogledajte config.txt "
-"fajl u docs direktorijumu za informacije o podešenju %2$s."
+"fajl u docs direktorijumu za informacije o podešavanju %2$s."
 
 #: src/emu/ui/simpleselgame.cpp:287
 #, c-format
@@ -1538,94 +1544,74 @@ msgstr "Koristi dodatne semplove"
 
 #: src/emu/ui/swlist.cpp:70
 msgid "[file manager]"
-msgstr ""
+msgstr "[upravljanje fajlovima]"
 
 #: src/emu/ui/swlist.cpp:235
 msgid "Switch Item Ordering"
-msgstr ""
+msgstr "Promeni sortiranje"
 
 #: src/emu/ui/swlist.cpp:268
 #, c-format
 msgid "Switched Order: entries now ordered by %s"
-msgstr ""
+msgstr "Promenjen redosled: sada je sortirano po %s"
 
 #: src/emu/ui/swlist.cpp:268
 msgid "shortname"
-msgstr ""
+msgstr "skraćeno ime"
 
 #: src/emu/ui/swlist.cpp:268
 msgid "description"
-msgstr ""
+msgstr "opis"
 
 #: src/emu/ui/swlist.cpp:436
 msgid "[compatible lists]"
-msgstr ""
+msgstr "[kompatibilne liste]"
 
 #: src/emu/ui/tapectrl.cpp:84
 msgid "stopped"
-msgstr ""
+msgstr "stopirano"
 
 #: src/emu/ui/tapectrl.cpp:86
 msgid "playing"
-msgstr ""
+msgstr "reprodukcija"
 
 #: src/emu/ui/tapectrl.cpp:86
 msgid "(playing)"
-msgstr ""
+msgstr "(reprodukcija)"
 
 #: src/emu/ui/tapectrl.cpp:87
 msgid "recording"
-msgstr ""
+msgstr "snimanje"
 
 #: src/emu/ui/tapectrl.cpp:87
 msgid "(recording)"
-msgstr ""
+msgstr "(snimanje)"
 
 #: src/emu/ui/tapectrl.cpp:94
 msgid "Pause/Stop"
-msgstr ""
+msgstr "Pauza/Stop"
 
 #: src/emu/ui/tapectrl.cpp:97
 msgid "Play"
-msgstr ""
+msgstr "Pusti"
 
 #: src/emu/ui/tapectrl.cpp:100
 msgid "Record"
-msgstr ""
+msgstr "Snimi"
 
 #: src/emu/ui/tapectrl.cpp:103
 msgid "Rewind"
-msgstr ""
+msgstr "Premotaj"
 
 #: src/emu/ui/tapectrl.cpp:106
 msgid "Fast Forward"
-msgstr ""
+msgstr "Premotaj u napred"
 
-#: src/emu/ui/ui.cpp:415
+#: src/emu/ui/ui.cpp:410
 msgid "This driver requires images to be loaded in the following device(s): "
 msgstr "Za ovaj drajver je neophodno da slike budu učitane u sledeće uređaje:"
 
-#: src/emu/ui/ui.cpp:1043
-#, c-format
-msgid ""
-"Usage of emulators in conjunction with ROMs you don't own is forbidden by "
-"copyright law.\n"
-"\n"
-"IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%1$s\" ON THIS EMULATOR, PRESS "
-"ESC.\n"
-"\n"
-"Otherwise, type OK or move the joystick left then right to continue"
-msgstr ""
-"Upotreba emulatora u vezi sa ROM-ovima koje ne posedujete je zabranjena "
-"zakonom o autorskim pravima.\n"
-"\n"
-"AKO VAM NIJE DOZVOLJENO ZAKONOM DA IGRATE \"%1$s\" NA OVOM EMULATORU, "
-"PRITISNITE ESC.\n"
-"\n"
-"U suprotnom, otkucajte OK ili pomerite komandnu palicu (džojstik) levo, pa "
-"desno da nastavite"
-
-#: src/emu/ui/ui.cpp:1081
+#: src/emu/ui/ui.cpp:1060
 msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
@@ -1633,7 +1619,7 @@ msgstr ""
 "Jedan ili više ROM/CHD fajlova za ovu mašinu su neispravni. Mašina možda "
 "neće ispravno raditi.\n"
 
-#: src/emu/ui/ui.cpp:1094
+#: src/emu/ui/ui.cpp:1073
 msgid ""
 "There are known problems with this machine\n"
 "\n"
@@ -1641,49 +1627,49 @@ msgstr ""
 "Postoje poznati problemi s ovom mašinom\n"
 "\n"
 
-#: src/emu/ui/ui.cpp:1098
+#: src/emu/ui/ui.cpp:1077
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
 msgstr ""
 "Jedan ili više ROM/CHD fajlova za ovu mašinu nisu ispravno napravljeni.\n"
 
-#: src/emu/ui/ui.cpp:1102
+#: src/emu/ui/ui.cpp:1081
 #, c-format
 msgid "The keyboard emulation may not be 100% accurate.\n"
 msgstr "Emulacija tastature možda nije 100% tačna.\n"
 
-#: src/emu/ui/ui.cpp:1104
+#: src/emu/ui/ui.cpp:1083
 #, c-format
 msgid "The colors aren't 100% accurate.\n"
 msgstr "Boje nisu 100% tačne.\n"
 
-#: src/emu/ui/ui.cpp:1106
+#: src/emu/ui/ui.cpp:1085
 msgid "The colors are completely wrong.\n"
 msgstr "Boje su potpuno pogrešne.\n"
 
-#: src/emu/ui/ui.cpp:1108
+#: src/emu/ui/ui.cpp:1087
 #, c-format
 msgid "The video emulation isn't 100% accurate.\n"
 msgstr "Video emulacija nije 100% tačna.\n"
 
-#: src/emu/ui/ui.cpp:1110
+#: src/emu/ui/ui.cpp:1089
 #, c-format
 msgid "The sound emulation isn't 100% accurate.\n"
 msgstr "Emulacija zvuka nije 100% tačna.\n"
 
-#: src/emu/ui/ui.cpp:1112
+#: src/emu/ui/ui.cpp:1091
 msgid "The machine lacks sound.\n"
 msgstr "Mašini nedostaje zvuk.\n"
 
-#: src/emu/ui/ui.cpp:1115
+#: src/emu/ui/ui.cpp:1094
 msgid "Screen flipping in cocktail mode is not supported.\n"
 msgstr "Obrtanje ekrana u \"koktel\" modu nije podržano.\n"
 
-#: src/emu/ui/ui.cpp:1119
+#: src/emu/ui/ui.cpp:1098
 msgid "The machine requires external artwork files\n"
 msgstr "Mašina zahteva dodatne ilustracione fajlove\n"
 
-#: src/emu/ui/ui.cpp:1124
+#: src/emu/ui/ui.cpp:1103
 msgid ""
 "This machine was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
@@ -1691,7 +1677,7 @@ msgstr ""
 "Mašsina nije nikad završena. Može se javiti čudno ponašanje ili nedostatak "
 "elemenata sto ne predstavlja problem s emulacijom.\n"
 
-#: src/emu/ui/ui.cpp:1129
+#: src/emu/ui/ui.cpp:1108
 msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
@@ -1699,11 +1685,11 @@ msgstr ""
 "Mašina ne poseduje uređaj za zvuk, MAME neće puštati zvuk, ovo je očekivano "
 "ponašanje.\n"
 
-#: src/emu/ui/ui.cpp:1137
+#: src/emu/ui/ui.cpp:1116
 msgid "The machine has protection which isn't fully emulated.\n"
 msgstr "Mašina ima zaštitu koja nije potpuno emulirana.\n"
 
-#: src/emu/ui/ui.cpp:1140
+#: src/emu/ui/ui.cpp:1119
 msgid ""
 "\n"
 "THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet "
@@ -1714,7 +1700,7 @@ msgstr ""
 "OVA MAŠINA NE RADI. Emulacija ove mašine još nije potpuna. Ne možete ništa "
 "uraditi u vezi s tim, osim da sačekate programere da unaprede emulaciju.\n"
 
-#: src/emu/ui/ui.cpp:1144
+#: src/emu/ui/ui.cpp:1123
 msgid ""
 "\n"
 "Certain elements of this machine cannot be emulated as it requires actual "
@@ -1726,7 +1712,7 @@ msgstr ""
 "interakciju ili se sastoje od mehaničkih uređaja. Nemoguće je igrati se na "
 "ovoj mašini u potpunosti.\n"
 
-#: src/emu/ui/ui.cpp:1163
+#: src/emu/ui/ui.cpp:1142
 msgid ""
 "\n"
 "\n"
@@ -1736,18 +1722,17 @@ msgstr ""
 "\n"
 "Postoji klonovi ove mašine koji rade: "
 
-#: src/emu/ui/ui.cpp:1177
+#: src/emu/ui/ui.cpp:1156
 msgid ""
 "\n"
 "\n"
-"Type OK or move the joystick left then right to continue"
+"Press any key to continue"
 msgstr ""
 "\n"
 "\n"
-"Otkucajte OK ili pomerite komandnu palicu (džojstik) levo, pa desno da "
-"nastavite"
+"Pritsnite bilo koji taster za nastavak"
 
-#: src/emu/ui/ui.cpp:1192
+#: src/emu/ui/ui.cpp:1171
 #, c-format
 msgid ""
 "%1$s\n"
@@ -1762,15 +1747,15 @@ msgstr ""
 "\n"
 "CPU:\n"
 
-#: src/emu/ui/ui.cpp:1228 src/emu/ui/ui.cpp:1267
+#: src/emu/ui/ui.cpp:1207 src/emu/ui/ui.cpp:1246
 msgid "MHz"
 msgstr "MHz"
 
-#: src/emu/ui/ui.cpp:1228 src/emu/ui/ui.cpp:1267
+#: src/emu/ui/ui.cpp:1207 src/emu/ui/ui.cpp:1246
 msgid "kHz"
 msgstr "kHz"
 
-#: src/emu/ui/ui.cpp:1242
+#: src/emu/ui/ui.cpp:1221
 msgid ""
 "\n"
 "Sound:\n"
@@ -1778,7 +1763,7 @@ msgstr ""
 "\n"
 "Zvuk:\n"
 
-#: src/emu/ui/ui.cpp:1271
+#: src/emu/ui/ui.cpp:1250
 msgid ""
 "\n"
 "Video:\n"
@@ -1786,80 +1771,80 @@ msgstr ""
 "\n"
 "Video:\n"
 
-#: src/emu/ui/ui.cpp:1275
+#: src/emu/ui/ui.cpp:1254
 msgid "None\n"
 msgstr ""
 "Nijedan\n"
 "\n"
 
-#: src/emu/ui/ui.cpp:1282
+#: src/emu/ui/ui.cpp:1261
 msgid "Vector"
 msgstr "Vektor"
 
-#: src/emu/ui/ui.cpp:1293
+#: src/emu/ui/ui.cpp:1272
 #, c-format
 msgid "%1$s: %2$s\n"
 msgstr "%1$s: %2$s\n"
 
-#: src/emu/ui/ui.cpp:1293
+#: src/emu/ui/ui.cpp:1272
 msgid "%2$s\n"
 msgstr "%2$s\n"
 
-#: src/emu/ui/ui.cpp:1577 src/emu/ui/ui.cpp:1587
+#: src/emu/ui/ui.cpp:1527 src/emu/ui/ui.cpp:1537
 msgid "Keyboard Emulation Status"
 msgstr "Stanje emulacije tastature"
 
-#: src/emu/ui/ui.cpp:1579
+#: src/emu/ui/ui.cpp:1529
 msgid "Mode: PARTIAL Emulation"
 msgstr "Mod: DELIMIČNA emulacija"
 
-#: src/emu/ui/ui.cpp:1580
+#: src/emu/ui/ui.cpp:1530
 msgid "UI:   Enabled"
 msgstr "Korisnički interfejs: omogućen"
 
-#: src/emu/ui/ui.cpp:1582 src/emu/ui/ui.cpp:1592
+#: src/emu/ui/ui.cpp:1532 src/emu/ui/ui.cpp:1542
 msgid "**Use ScrLock to toggle**"
 msgstr "**Koristite ScrLock da promenite radno stanje**"
 
-#: src/emu/ui/ui.cpp:1589
+#: src/emu/ui/ui.cpp:1539
 msgid "Mode: FULL Emulation"
 msgstr "Mod: POTPUNA emulacija"
 
-#: src/emu/ui/ui.cpp:1590
+#: src/emu/ui/ui.cpp:1540
 msgid "UI:   Disabled"
 msgstr "Korisnički interfejs: onesposobljen"
 
-#: src/emu/ui/ui.cpp:1736
+#: src/emu/ui/ui.cpp:1686
 msgid "Autofire can't be enabled"
 msgstr "Automatsko pucanje ne može da se omogući"
 
-#: src/emu/ui/ui.cpp:1775
+#: src/emu/ui/ui.cpp:1725
 msgid "Select position to save to"
 msgstr "Izaberite poziciju na koju želite da snimite"
 
-#: src/emu/ui/ui.cpp:1777
+#: src/emu/ui/ui.cpp:1727
 msgid "Select position to load from"
 msgstr "Izaberite poziciju sa koje želite da učitate"
 
-#: src/emu/ui/ui.cpp:1801
+#: src/emu/ui/ui.cpp:1751
 msgid "Save cancelled"
 msgstr "Čuvanje stanja igre otkazano"
 
-#: src/emu/ui/ui.cpp:1803
+#: src/emu/ui/ui.cpp:1753
 msgid "Load cancelled"
 msgstr "Učitavanje stanja igre otkazano"
 
-#: src/emu/ui/ui.cpp:1846
+#: src/emu/ui/ui.cpp:1796
 #, c-format
 msgid "Save to position %s"
 msgstr "Sačuvaj na poziciju %s"
 
-#: src/emu/ui/ui.cpp:1851
+#: src/emu/ui/ui.cpp:1801
 #, c-format
 msgid "Load from position %s"
 msgstr "Učitaj sa pozicije %s"
 
-#: src/emu/ui/ui.cpp:1891
+#: src/emu/ui/ui.cpp:1841
 #, c-format
 msgid ""
 "Are you sure you want to quit?\n"
@@ -1872,173 +1857,173 @@ msgstr ""
 "Pritisnite ''%s'' za napuštanje programa,\n"
 "Pritisnite ''%s'' za nastavak emulacije."
 
-#: src/emu/ui/ui.cpp:1966
+#: src/emu/ui/ui.cpp:1916
 msgid "Master Volume"
 msgstr "Glavna jačina zvuka"
 
-#: src/emu/ui/ui.cpp:1976
+#: src/emu/ui/ui.cpp:1926
 #, c-format
 msgid "%1$s Volume"
 msgstr "%1$s jačina zvuka"
 
-#: src/emu/ui/ui.cpp:1998
+#: src/emu/ui/ui.cpp:1948
 #, c-format
 msgid "Overclock CPU %1$s"
 msgstr "Ubrzanje osnovnog takta CPU %1$s"
 
-#: src/emu/ui/ui.cpp:2018
+#: src/emu/ui/ui.cpp:1968
 #, c-format
 msgid "%1$s Refresh Rate"
 msgstr "%1$s frekvencija osvežavanja"
 
-#: src/emu/ui/ui.cpp:2024
+#: src/emu/ui/ui.cpp:1974
 #, c-format
 msgid "%1$s Brightness"
 msgstr "%1$s osvetljenost"
 
-#: src/emu/ui/ui.cpp:2027
+#: src/emu/ui/ui.cpp:1977
 #, c-format
 msgid "%1$s Contrast"
 msgstr "%1$s kontrast"
 
-#: src/emu/ui/ui.cpp:2030
+#: src/emu/ui/ui.cpp:1980
 #, c-format
 msgid "%1$s Gamma"
-msgstr "%1$s gamut"
+msgstr "%1$s gama"
 
-#: src/emu/ui/ui.cpp:2035
+#: src/emu/ui/ui.cpp:1985
 #, c-format
 msgid "%1$s Horiz Stretch"
 msgstr "%1$s rastezanje po horizontali"
 
-#: src/emu/ui/ui.cpp:2038
+#: src/emu/ui/ui.cpp:1988
 #, c-format
 msgid "%1$s Horiz Position"
 msgstr "%1$s horizontalna pozicija"
 
-#: src/emu/ui/ui.cpp:2041
+#: src/emu/ui/ui.cpp:1991
 #, c-format
 msgid "%1$s Vert Stretch"
 msgstr "%1$s rastezanje po vertikali"
 
-#: src/emu/ui/ui.cpp:2044
+#: src/emu/ui/ui.cpp:1994
 #, c-format
 msgid "%1$s Vert Position"
 msgstr "%1$s vertikalna pozicija"
 
-#: src/emu/ui/ui.cpp:2062
+#: src/emu/ui/ui.cpp:2012
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
 msgstr "Laserdisc '%1$s' rastezanje po horizontali"
 
-#: src/emu/ui/ui.cpp:2065
+#: src/emu/ui/ui.cpp:2015
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
 msgstr "Laserdisc '%1$s' horizontalna pozicija"
 
-#: src/emu/ui/ui.cpp:2068
+#: src/emu/ui/ui.cpp:2018
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
 msgstr "Laserdisc '%1$s' rastezanje po vertikali"
 
-#: src/emu/ui/ui.cpp:2071
+#: src/emu/ui/ui.cpp:2021
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
 msgstr "Laserdisc '%1$s' vertikalna pozicija"
 
-#: src/emu/ui/ui.cpp:2080
+#: src/emu/ui/ui.cpp:2030
 msgid "Vector Flicker"
 msgstr "Treperenje vektora"
 
-#: src/emu/ui/ui.cpp:2082
+#: src/emu/ui/ui.cpp:2032
 msgid "Beam Width Minimum"
 msgstr "Minimalna širina snopa"
 
-#: src/emu/ui/ui.cpp:2084
+#: src/emu/ui/ui.cpp:2034
 msgid "Beam Width Maximum"
 msgstr "Maksimalna širinia snopa"
 
-#: src/emu/ui/ui.cpp:2086
+#: src/emu/ui/ui.cpp:2036
 msgid "Beam Intensity Weight"
 msgstr "Intenzitet snopa"
 
-#: src/emu/ui/ui.cpp:2098
+#: src/emu/ui/ui.cpp:2048
 #, c-format
 msgid "Crosshair Scale %1$s"
 msgstr "Razmera nišana %1$s"
 
-#: src/emu/ui/ui.cpp:2098 src/emu/ui/ui.cpp:2101
+#: src/emu/ui/ui.cpp:2048 src/emu/ui/ui.cpp:2051
 msgid "X"
 msgstr "X"
 
-#: src/emu/ui/ui.cpp:2098 src/emu/ui/ui.cpp:2101
+#: src/emu/ui/ui.cpp:2048 src/emu/ui/ui.cpp:2051
 msgid "Y"
 msgstr "Y"
 
-#: src/emu/ui/ui.cpp:2101
+#: src/emu/ui/ui.cpp:2051
 #, c-format
 msgid "Crosshair Offset %1$s"
 msgstr "Pomeraj nišana %1$s"
 
-#: src/emu/ui/ui.cpp:2120
+#: src/emu/ui/ui.cpp:2070
 #, c-format
 msgid "%1$3ddB"
 msgstr "%1$3ddB"
 
-#: src/emu/ui/ui.cpp:2164
+#: src/emu/ui/ui.cpp:2114
 #, c-format
 msgid "%1$d%%"
 msgstr "%1$d%%"
 
-#: src/emu/ui/ui.cpp:2180
+#: src/emu/ui/ui.cpp:2130
 #, c-format
 msgid "%1$3.0f%%"
 msgstr "%1$3.0f%%"
 
-#: src/emu/ui/ui.cpp:2203
+#: src/emu/ui/ui.cpp:2153
 #, c-format
 msgid "%1$.3ffps"
 msgstr "%1$.3ffps"
 
-#: src/emu/ui/ui.cpp:2226 src/emu/ui/ui.cpp:2248 src/emu/ui/ui.cpp:2269
-#: src/emu/ui/ui.cpp:2291 src/emu/ui/ui.cpp:2313 src/emu/ui/ui.cpp:2335
-#: src/emu/ui/ui.cpp:2357 src/emu/ui/ui.cpp:2379 src/emu/ui/ui.cpp:2401
-#: src/emu/ui/ui.cpp:2423 src/emu/ui/ui.cpp:2445
+#: src/emu/ui/ui.cpp:2176 src/emu/ui/ui.cpp:2198 src/emu/ui/ui.cpp:2219
+#: src/emu/ui/ui.cpp:2241 src/emu/ui/ui.cpp:2263 src/emu/ui/ui.cpp:2285
+#: src/emu/ui/ui.cpp:2307 src/emu/ui/ui.cpp:2329 src/emu/ui/ui.cpp:2351
+#: src/emu/ui/ui.cpp:2373 src/emu/ui/ui.cpp:2395
 #, c-format
 msgid "%1$.3f"
 msgstr "%1$.3f"
 
-#: src/emu/ui/ui.cpp:2461 src/emu/ui/ui.cpp:2477 src/emu/ui/ui.cpp:2493
-#: src/emu/ui/ui.cpp:2509
+#: src/emu/ui/ui.cpp:2411 src/emu/ui/ui.cpp:2427 src/emu/ui/ui.cpp:2443
+#: src/emu/ui/ui.cpp:2459
 #, c-format
 msgid "%1$1.2f"
 msgstr "%1$1.2f"
 
-#: src/emu/ui/ui.cpp:2525
+#: src/emu/ui/ui.cpp:2475
 #, c-format
 msgid "Screen '%1$s'"
 msgstr "Ekran  '%1$s'"
 
-#: src/emu/ui/ui.cpp:2527
+#: src/emu/ui/ui.cpp:2477
 msgid "Screen"
 msgstr "Ekran"
 
-#: src/emu/ui/ui.cpp:2543
+#: src/emu/ui/ui.cpp:2493
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
 msgstr "Razmera nišana X %1$1.3f"
 
-#: src/emu/ui/ui.cpp:2543
+#: src/emu/ui/ui.cpp:2493
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
 msgstr "Razmera nišana Y %1$1.3f"
 
-#: src/emu/ui/ui.cpp:2562
+#: src/emu/ui/ui.cpp:2512
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
 msgstr "Pomeraj nišana X %1$1.3f"
 
-#: src/emu/ui/ui.cpp:2562
+#: src/emu/ui/ui.cpp:2512
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
 msgstr "Pomeraj nišana Y %1$1.3f"
@@ -2086,43 +2071,4 @@ msgstr " BOJE"
 
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
-msgstr ""
-
-#~ msgid "Configure Machine"
-#~ msgstr "Konfiguracija mašine"
-
-#~ msgid "**Error loading %s.ini**"
-#~ msgstr "**Greška prilikom učitavanja %s.ini**"
-
-#~ msgid "**Error loading ui.ini**"
-#~ msgstr "**Greška prilikom učitavanja ui.ini**"
-
-#~ msgid "Double click or press "
-#~ msgstr "Dupli klik ili pritisak tastera"
-
-#~ msgid " to change the color value"
-#~ msgstr " da se promeni vrednost boje"
-
-#~ msgid " to select"
-#~ msgstr " za izabrati"
-
-#~ msgid "Current "
-#~ msgstr "Trenutno"
-
-#~ msgid " Folders"
-#~ msgstr " Direktorijumi"
-
-#~ msgid "Change)"
-#~ msgstr "Promeni)"
-
-#~ msgid "Add"
-#~ msgstr "Dodaj"
-
-#~ msgid " Folder - Search: "
-#~ msgstr " Direktorijum - pretraga"
-
-#~ msgid "Remove "
-#~ msgstr "Ukloni"
-
-#~ msgid " Folder"
-#~ msgstr " Direktorijum"
+msgstr " OLOVKE"

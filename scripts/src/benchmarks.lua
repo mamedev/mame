@@ -45,13 +45,13 @@ project "benchmark"
 
 project("benchmarks")
 	uuid ("a9750a48-d283-4a6d-b126-31c7ce049af1")
-	kind "ConsoleApp"	
+	kind "ConsoleApp"
 
 	flags {
-		"Symbols", -- always include minimum symbols for executables 	
+		"Symbols", -- always include minimum symbols for executables
 	}
 
-	if _OPTIONS["SEPARATE_BIN"]~="1" then 
+	if _OPTIONS["SEPARATE_BIN"]~="1" then
 		targetdir(MAME_DIR)
 	end
 
