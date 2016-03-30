@@ -89,14 +89,14 @@
 
 		{ "type": "color", "name": "phosphor", "text": "Phosphor Persistence, ",  "default": [ 45, 45, 45 ], "max": [ 100, 100, 100 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
 
-		{ "type": "float",   "name": "scanline_alpha",         "text": "Scanline Amount",            "default": 60,             "max": 100,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",   "name": "scanline_alpha",         "text": "Scanline Amount",            "default": 80,             "max": 100,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "float",   "name": "scanline_scale",         "text": "Overall Scanline Scale",     "default": 100,            "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "float",   "name": "scanline_bright_scale",  "text": "Scanline Brightness Scale",  "default": 200,            "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "float",   "name": "scanline_bright_offset", "text": "Scanline Brightness Offset", "default": 0,              "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "float",   "name": "scanline_jitter_amount", "text": "Scanline Jitter Amount",     "default": 0,              "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "float",   "name": "scanline_height",        "text": "Individual Scanline Scale",  "default": 100,            "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "float",   "name": "scanline_variation",     "text": "Scanline Variation",         "default": 100,            "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
-		{ "type": "float",   "name": "shadow_alpha",           "text": "Shadow Mask Amount",         "default": 40,             "max": 100,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",   "name": "shadow_alpha",           "text": "Shadow Mask Amount",         "default": 20,             "max": 100,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "vec2",    "name": "shadow_uv_count",        "text": "Shadow Mask Pixel Count ",   "default": [  12,  12 ],   "max": [ 128, 128 ],      "min": [ 1, 1 ],    "step": 1, "scale": 1.0,     "format": "%3f",   "screen": "crt" },
 		{ "type": "vec2",    "name": "shadow_uv_size",         "text": "Shadow Mask UV Size ",       "default": [ 500, 500 ],   "max": [ 1000, 1000 ],    "min": [ 0, 0 ],    "step": 1, "scale": 0.001,   "format": "%1.4f", "screen": "crt" },
 		{ "type": "vec2",    "name": "shadow_uv_offset",       "text": "Shadow Mask UV Offset ",     "default": [   0,   0 ],   "max": [ 1000, 1000 ],    "min": [ 0, 0 ],    "step": 1, "scale": 0.001,   "format": "%1.4f", "screen": "crt" },
@@ -152,9 +152,9 @@
 		// values: true, false
 		// default: true
 		// 
-		// oversample (optional): Double the internal size of this render target. Certain effects benefit from operating at a higher internal resolution. If you're not sure, leave it as false.
-		// values: true, false
-		// default: false
+		// scale (optional): Multiply the internal size of this render target by this amount. Certain effects benefit from operating at a higher internal resolution. If you're not sure, omit it.
+		// values: Any integer value
+		// default: 1
 		{
 			"name": "ntsc",
 			"mode": "guest",
@@ -168,7 +168,12 @@
 		},
 		{	"name": "internal",
 			"mode": "native",
-			"oversample": true,
+			"scale": 2,
+			"doublebuffer": true
+		},
+		{	"name": "previous",
+			"mode": "native",
+			"scale": 2,
 			"doublebuffer": true
 		}
 	],
@@ -252,6 +257,10 @@
 				// 
 				// option (optional): The name of any MAME option, which will have its value fetched and used as the name of a PNG to load from the artwork directory.
 				// value: Any valid MAME INI option name.
+				// 
+				// bilinear (optional, texture and target only): Whether to apply bilinear filtering to the sampler.
+				// values: true, false
+				// default: true
 				{ "sampler": "s_tex", "texture": "screen" }
 			],
 			

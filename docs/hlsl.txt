@@ -126,5 +126,3 @@ Presets
 ../ini/presets/lcd-matrix.ini           for screens with STN LCD matrix (rename to lcd.ini or <system>.ini)
 ../ini/presets/gameboy.ini              for Game Boy screen (same as lcd-matrix.ini with greenish color transformation)
 ../ini/presets/gba.ini                  for Game Boy Advance screen (same as lcd.ini)
-
-Copy them to ../ini/ to use.

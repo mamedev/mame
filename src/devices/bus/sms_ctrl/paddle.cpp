@@ -33,8 +33,9 @@ Notes:
 
 const device_type SMS_PADDLE = &device_creator<sms_paddle_device>;
 
-
-#define PADDLE_INTERVAL attotime::from_hz(XTAL_53_693175MHz/15/256)
+// time interval not verified
+// Player 2 of Galactic Protector is the most sensible to this timming.
+#define PADDLE_INTERVAL attotime::from_hz(XTAL_53_693175MHz/15/100)
 
 
 CUSTOM_INPUT_MEMBER( sms_paddle_device::dir_pins_r )

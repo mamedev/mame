@@ -27,7 +27,7 @@ enum
 class bgfx_target : public bgfx_texture_handle_provider
 {
 public:
-	bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t style, bool double_buffer, bool filter, bool smooth, uint32_t screen);
+	bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t style, bool double_buffer, bool filter, uint16_t scale, uint32_t screen);
 	bgfx_target(void *handle, uint16_t width, uint16_t height);
 	virtual ~bgfx_target();
 
@@ -40,7 +40,7 @@ public:
 	bool						double_buffered() const { return m_double_buffer; }
 	uint32_t 					style() const { return m_style; }
     bool 						filter() const { return m_filter; }
-    bool 						smooth() const { return m_smooth; }
+    uint16_t					scale() const { return m_scale; }
     uint32_t                    screen_index() const { return m_screen; }
 
 	// bgfx_texture_handle_provider
@@ -62,7 +62,7 @@ private:
     bool						m_double_buffer;
 	uint32_t					m_style;
 	bool						m_filter;
-    bool                        m_smooth;
+	uint16_t					m_scale;
 
     int32_t                     m_screen;
 

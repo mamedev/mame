@@ -699,6 +699,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="aliensynp" cloneof="aliensyn">
 		<description>Alien Syndrome (Prototype)</description>
 		<year>1987</year>
@@ -1108,6 +1109,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="borgmanp" cloneof="cyborgh">
 		<description>Chouon Senshi Borgman (Jpn, Prototype)</description>
 		<year>1988</year>
@@ -3000,6 +3002,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="greatglfp" cloneof="greatglf">
 		<description>Great Golf (Prototype)</description>
 		<year>1987</year>
@@ -3895,6 +3898,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="maougolvp" cloneof="golvell">
 		<description>Maou Golvellius (Jpn, Prototype)</description>
 		<year>1988</year>
@@ -4345,6 +4349,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="supgolf" cloneof="golfaman">
 		<description>Super Golf (Prototype)</description>
 		<year>1989</year>
@@ -6336,6 +6341,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
 	<software name="sumgamesp" cloneof="sumgames">
 		<description>Summer Games (Euro, Prototype)</description>
 		<year>1991</year>
@@ -7420,10 +7426,12 @@
 		</part>
 	</software>
 
+	<!-- Notes: FM support, video code relies on the tilemap mirroring bug of the 315-5124 VDP -->
 	<software name="ysd" cloneof="ys">
 		<description>Ys (USA, Demo)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="usage" value="Video only works correctly on drivers with SMS1 VDP, e.g. smsj" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="ys - the vanished omens [demo].bin" size="262144" crc="e8b82066" sha1="b70757876e4ff592692eb0ee1c51c571b31541a9" offset="000000" />
