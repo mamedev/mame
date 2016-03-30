@@ -30,8 +30,8 @@ public:
 	target_manager(texture_manager& textures);
 	~target_manager();
 
-	bgfx_target* create_target(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, uint32_t style, bool double_buffer, bool filter, bool smooth, uint32_t screen);
-	bgfx_target* create_backbuffer(void *handle, uint32_t width, uint32_t height);
+	bgfx_target* create_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t style, bool double_buffer, bool filter, uint16_t scale, uint32_t screen);
+	bgfx_target* create_backbuffer(void *handle, uint16_t width, uint16_t height);
 
     void update_target_sizes(uint32_t screen, uint16_t width, uint16_t height, uint32_t style);
     void update_screen_count(uint32_t count);
@@ -41,7 +41,7 @@ public:
 
 private:
     void rebuild_targets(uint32_t screen, uint32_t style);
-    void create_target_if_nonexistent(uint32_t screen, std::string name, bool double_buffered, bool filter, bool smooth, uint32_t style);
+    void create_target_if_nonexistent(uint32_t screen, std::string name, bool double_buffered, bool filter, uint32_t style);
 
 	std::map<std::string, bgfx_target*> m_targets;
 	texture_manager& m_textures;

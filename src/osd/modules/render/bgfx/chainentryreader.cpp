@@ -59,6 +59,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
             if (!READER_CHECK(!has_texture || input["texture"].IsString(), (prefix + "input[" + std::to_string(i) + ": Value 'texture' must be a string\n").c_str())) return nullptr;
             if (!READER_CHECK(!has_target || input["target"].IsString(), (prefix + "input[" + std::to_string(i) + ": Value 'target' must be a string\n").c_str())) return nullptr;
             if (!READER_CHECK(!has_option || input["option"].IsString(), (prefix + "input[" + std::to_string(i) + ": Value 'option' must be a string\n").c_str())) return nullptr;
+            if (!READER_CHECK(has_target || !input.HasMember("bilinear") || input["bilinear"].IsBool(), (prefix + "input[" + std::to_string(i) + ": Value 'bilinear' must be a boolean\n").c_str())) return nullptr;
 
             std::string texture_name = "";
             if (has_texture)
@@ -66,7 +67,9 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
                 texture_name = input["texture"].GetString();
                 if (texture_name != "screen")
                 {
-                    bgfx_texture* texture = textures.create_png_texture(options.art_path(), texture_name, texture_name, 0, screen_index);
+					bool bilinear = get_bool(input, "bilinear", true);
+					uint32_t flags = bilinear ? 0 : (BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
+                    bgfx_texture* texture = textures.create_png_texture(options.art_path(), texture_name, texture_name, flags, screen_index);
                     if (texture == nullptr)
                     {
                         return nullptr;
@@ -79,8 +82,10 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
             }
             else if (has_option)
             {
+				bool bilinear = get_bool(input, "bilinear", true);
+				uint32_t flags = bilinear ? 0 : (BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
                 texture_name = input["option"].GetString();
-                bgfx_texture* texture = textures.create_png_texture(options.art_path(), options.value(texture_name.c_str()), texture_name, 0, screen_index);
+                bgfx_texture* texture = textures.create_png_texture(options.art_path(), options.value(texture_name.c_str()), texture_name, flags, screen_index);
                 if (texture == nullptr)
                 {
                     return nullptr;
