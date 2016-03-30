@@ -18,7 +18,7 @@
 #define LOG_PCI
 //#define LOG_AUDIO
 //#define LOG_OHCI
-//#define USB_ENABLED
+#define USB_HACK_ENABLED
 
 static void dump_string_command(running_machine &machine, int ref, int params, const char **param)
 {
@@ -534,7 +534,7 @@ READ32_MEMBER(xbox_base_state::usbctrl_r)
 #endif
 	ret=ohcist.hc_regs[offset];
 	if (offset == 0) { /* hacks needed until usb (and jvs) is implemented */
-#ifndef USB_ENABLED
+#ifndef USB_HACK_ENABLED
 		hack_usb();
 #endif
 	}
@@ -543,9 +543,7 @@ READ32_MEMBER(xbox_base_state::usbctrl_r)
 
 WRITE32_MEMBER(xbox_base_state::usbctrl_w)
 {
-#ifdef USB_ENABLED
 	UINT32 old = ohcist.hc_regs[offset];
-#endif
 
 #ifdef LOG_OHCI
 	if (offset >= 0x54 / 4)
@@ -553,7 +551,6 @@ WRITE32_MEMBER(xbox_base_state::usbctrl_w)
 	else
 		logerror("usb controller 0 register %s write %08X\n", usbregnames[offset], data);
 #endif
-#ifdef USB_ENABLED
 	if (offset == HcRhStatus) {
 		if (data & 0x80000000)
 			ohcist.hc_regs[HcRhStatus] &= ~0x8000;
@@ -623,7 +620,6 @@ WRITE32_MEMBER(xbox_base_state::usbctrl_w)
 		usb_ohci_interrupts();
 		return;
 	}
-#endif
 	ohcist.hc_regs[offset] = data;
 }
 
@@ -2245,11 +2241,9 @@ ADDRESS_MAP_END
 
 void xbox_base_state::machine_start()
 {
-#ifdef USB_ENABLED
 	//ohci_game_controller_device *usb_device;
 	ohci_hlean2131qc_device *usb_device;
 	//ohci_hlean2131sc_device *usb_device;
-#endif
 
 	nvidia_nv2a = std::make_unique<nv2a_renderer>(machine());
 	memset(pic16lc_buffer, 0, sizeof(pic16lc_buffer));
@@ -2279,11 +2273,11 @@ void xbox_base_state::machine_start()
 	pic16lc_buffer[0x1d] = 0x0d;
 	pic16lc_buffer[0x1e] = 0x0e;
 	pic16lc_buffer[0x1f] = 0x0f;
+	// usb
 	ohcist.hc_regs[HcRevision] = 0x10;
 	ohcist.hc_regs[HcFmInterval] = 0x2edf;
 	ohcist.hc_regs[HcLSThreshold] = 0x628;
 	ohcist.hc_regs[HcRhDescriptorA] = 4;
-#ifdef USB_ENABLED
 	ohcist.interruptbulkratio = 1;
 	ohcist.writebackdonehadcounter = 7;
 	ohcist.space = &m_maincpu->space();
@@ -2294,7 +2288,7 @@ void xbox_base_state::machine_start()
 	usb_device->set_region_base(memregion(":others")->base()); // temporary, should be in chihiro
 	//usb_device = new ohci_hlean2131sc_device(machine());
 	usb_ohci_plug(1, usb_device); // test connect
-#endif
+	// super-io
 	memset(&superiost, 0, sizeof(superiost));
 	superiost.configuration_mode = false;
 	superiost.registers[0][0x26] = 0x2e; // Configuration port address byte 0
