@@ -373,7 +373,7 @@ WRITE8_MEMBER(merit_state::casino5_bank_w)
 	}
 	else
 	{
-		logerror( "Uknown banking write %02x\n", data );
+		logerror( "Unknown banking write %02x\n", data );
 	}
 }
 

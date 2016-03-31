@@ -353,7 +353,7 @@ WRITE8_MEMBER(gei_state::geimulti_bank_w)
 		case 0x5c3f: bank = 12; break;
 		case 0x5c7e: bank = 13; break;
 		case 0x5aff: case 0x5cff: break;
-		default: logerror( "Uknown banking write, offset = %04x, data = %02x\n", offset, data);
+		default: logerror( "Unknown banking write, offset = %04x, data = %02x\n", offset, data);
 	}
 
 	if (bank != -1)
@@ -1325,7 +1325,7 @@ ROM_START( gtsersb ) /* alt or older version questions */
 	ROM_LOAD( "sports_3",       0x14000, 0x4000, CRC(5986996c) SHA1(56432c15a3b0204ed527c18e24716f17bb52dc4e) ) /* Dated 3/9 */
 	ROM_LOAD( "television",     0x18000, 0x4000, CRC(413f34c8) SHA1(318f6b464449bf3f0c43c4210a667190c774eb67) ) /* Dated 4/9 */
 	ROM_LOAD( "sex_triv",       0x1c000, 0x4000, CRC(cd0ce4e2) SHA1(2046ee3da94f00bf4a8b3fc62b1190d58e83cc89) ) /* Dated 7/9 - likely an alt series 7 question set */
-	ROM_LOAD( "facts_of_life",  0x20000, 0x4000, CRC(1668c7bf) SHA1(6bf43de26f8a626560579ab75fd0890fe00f99dd) ) /* Uknown series question set */
+	ROM_LOAD( "facts_of_life",  0x20000, 0x4000, CRC(1668c7bf) SHA1(6bf43de26f8a626560579ab75fd0890fe00f99dd) ) /* Unknown series question set */
 ROM_END
 
 ROM_START( sextriv1 )

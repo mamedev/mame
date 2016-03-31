@@ -216,7 +216,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 					m_terminal->write(space,0,m_mem->read_dword(smioc_out_addr));
 					break;
 				default:
-					if(TRACE_SMIOC) logerror("Uknown serial DMA command: %X\n", data);
+					if(TRACE_SMIOC) logerror("Unknown serial DMA command: %X\n", data);
 			}
 			break;
 		case 0xC098: /* Serial DMA output address */
