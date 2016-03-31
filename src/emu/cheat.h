@@ -295,7 +295,7 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	bool enabled() const { return !m_disabled; }
-	const auto &entries() const { return m_cheatlist; }
+	const simple_list<cheat_entry> &entries() const { return m_cheatlist; }
 
 	// setters
 	void set_enable(bool enable = true);

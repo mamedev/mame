@@ -228,7 +228,7 @@ public:
 	const char *instance_name() const { return m_instance_name.c_str(); }
 	const char *brief_instance_name() const { return m_brief_instance_name.c_str(); }
 	bool uses_file_extension(const char *file_extension) const;
-	const auto &formatlist() const { return m_formatlist; }
+	const simple_list<image_device_format> &formatlist() const { return m_formatlist; }
 
 	bool load(const char *path);
 	bool open_image_file(emu_options &options);

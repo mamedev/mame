@@ -133,8 +133,9 @@ public:
 	const char *command() const { return m_command.c_str(); }
 
 	// range iterators
-	auto begin() const { return m_entrylist.begin(); }
-	auto end() const { return m_entrylist.end(); }
+	using auto_iterator = simple_list<entry>::auto_iterator;
+	auto_iterator begin() const { return m_entrylist.begin(); }
+	auto_iterator end() const { return m_entrylist.end(); }
 
 	// configuration
 	void add_entry(const char *name, const char *description, UINT32 flags = 0, const char *defvalue = nullptr, bool override_existing = false);

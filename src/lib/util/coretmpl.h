@@ -40,6 +40,7 @@ typedef std::vector<UINT8> dynamic_buffer;
 template<class _ElementType>
 class simple_list final
 {
+public:
 	class auto_iterator
 	{
 public:
@@ -57,7 +58,6 @@ private:
 		_ElementType *m_current;
 	};
 
-public:
 	// we don't support deep copying
 	simple_list(const simple_list &) = delete;
 	simple_list &operator=(const simple_list &) = delete;
@@ -77,8 +77,8 @@ public:
 	bool empty() const noexcept { return m_count == 0; }
 
 	// range iterators
-	auto begin() const noexcept { return auto_iterator(m_head); }
-	auto end() const noexcept { return auto_iterator(nullptr); }
+	auto_iterator begin() const noexcept { return auto_iterator(m_head); }
+	auto_iterator end() const noexcept { return auto_iterator(nullptr); }
 
 	// remove (free) all objects in the list, leaving an empty list
 	void reset() noexcept

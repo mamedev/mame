@@ -727,9 +727,9 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	const auto &banks() const { return m_banklist; }
-	const auto &regions() const { return m_regionlist; }
-	const auto &shares() const { return m_sharelist; }
+	const tagged_list<memory_bank> &banks() const { return m_banklist; }
+	const tagged_list<memory_region> &regions() const { return m_regionlist; }
+	const tagged_list<memory_share> &shares() const { return m_sharelist; }
 
 	// dump the internal memory tables to the given file
 	void dump(FILE *file);

@@ -124,7 +124,7 @@ public:
 	virtual ~device_state_interface();
 
 	// configuration access
-	const auto &state_entries() const { return m_state_list; }
+	const simple_list<device_state_entry> &state_entries() const { return m_state_list; }
 
 	// state getters
 	UINT64 state_int(int index);

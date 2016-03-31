@@ -111,7 +111,7 @@ public:
 	software_info &info() const { return m_info; }
 	const char *name() const { return m_name; }
 	const char *interface() const { return m_interface; }
-	const auto &featurelist() const { return m_featurelist; }
+	const simple_list<feature_list_item> &featurelist() const { return m_featurelist; }
 	rom_entry *romdata(unsigned int index = 0) { return (index < m_romdata.size()) ? &m_romdata[index] : nullptr; }
 
 	// helpers
@@ -150,10 +150,10 @@ public:
 	const char *parentname() const { return m_parentname; }
 	const char *year() const { return m_year; }
 	const char *publisher() const { return m_publisher; }
-	const auto &other_info() const { return m_other_info; }
-	const auto &shared_info() const { return m_shared_info; }
+	const simple_list<feature_list_item> &other_info() const { return m_other_info; }
+	const simple_list<feature_list_item> &shared_info() const { return m_shared_info; }
 	UINT32 supported() const { return m_supported; }
-	const auto &parts() const { return m_partdata; }
+	const simple_list<software_part> &parts() const { return m_partdata; }
 	software_part *first_part() const { return m_partdata.first(); }
 
 	// additional operations
@@ -202,7 +202,7 @@ public:
 	const char *description() { if (!m_parsed) parse(); return m_description; }
 	bool valid() { if (!m_parsed) parse(); return m_infolist.count() > 0; }
 	const char *errors_string() { if (!m_parsed) parse(); return m_errors.c_str(); }
-	const auto &get_info() { if (!m_parsed) parse(); return m_infolist; }
+	const simple_list<software_info> &get_info() { if (!m_parsed) parse(); return m_infolist; }
 
 	// operations
 	software_info *find(const char *look_for, software_info *prev = nullptr);

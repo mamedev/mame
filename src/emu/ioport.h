@@ -1105,8 +1105,8 @@ public:
 	ioport_manager &manager() const;
 	running_machine &machine() const;
 	int modcount() const { return m_modcount; }
-	const auto &settings() const { return m_settinglist; }
-	const auto &diplocations() const { return m_diploclist; }
+	const simple_list<ioport_setting> &settings() const { return m_settinglist; }
+	const simple_list<ioport_diplocation> &diplocations() const { return m_diploclist; }
 
 	ioport_value mask() const { return m_mask; }
 	ioport_value defvalue() const { return m_defvalue; }
@@ -1291,7 +1291,7 @@ public:
 	ioport_manager &manager() const;
 	device_t &device() const { return m_device; }
 	running_machine &machine() const;
-	const auto &fields() const { return m_fieldlist; }
+	const simple_list<ioport_field> &fields() const { return m_fieldlist; }
 	const char *tag() const { return m_tag.c_str(); }
 	int modcount() const { return m_modcount; }
 	ioport_value active() const { return m_active; }
@@ -1477,7 +1477,7 @@ public:
 	bool has_bioses() const { return m_has_bioses; }
 
 	// type helpers
-	const auto &types() const { return m_typelist; }
+	const simple_list<input_type_entry> &types() const { return m_typelist; }
 	bool type_pressed(ioport_type type, int player = 0);
 	const char *type_name(ioport_type type, UINT8 player);
 	ioport_group type_group(ioport_type type, int player);

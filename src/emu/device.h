@@ -110,8 +110,9 @@ public:
 		device_t *first() const { return m_list.first(); }
 
 		// range iterators
-		auto begin() const { return m_list.begin(); }
-		auto end() const { return m_list.end(); }
+		using auto_iterator = simple_list<device_t>::auto_iterator;
+		auto_iterator begin() const { return m_list.begin(); }
+		auto_iterator end() const { return m_list.end(); }
 
 private:
 		// private helpers
@@ -137,6 +138,7 @@ private:
 		friend class device_state_interface;
 		friend class device_execute_interface;
 
+public:
 		class auto_iterator
 		{
 public:
@@ -146,14 +148,13 @@ public:
 			// required operator overrides
 			bool operator!=(const auto_iterator &iter) const { return m_current != iter.m_current; }
 			device_interface &operator*() const { return *m_current; }
-			const auto &operator++();
+			const auto_iterator &operator++();
 
 private:
 			// private state
 			device_interface *m_current;
 		};
 
-public:
 		// construction/destruction
 		interface_list() : m_head(nullptr), m_execute(nullptr), m_memory(nullptr), m_state(nullptr) { }
 
@@ -161,8 +162,8 @@ public:
 		device_interface *first() const { return m_head; }
 
 		// range iterators
-		auto begin() const { return auto_iterator(m_head); }
-		auto end() const { return auto_iterator(nullptr); }
+		auto_iterator begin() const { return auto_iterator(m_head); }
+		auto_iterator end() const { return auto_iterator(nullptr); }
 
 private:
 		device_interface *      m_head;         // head of interface list
@@ -684,7 +685,7 @@ inline device_t *device_t::siblingdevice(const char *tag) const
 
 
 // this operator requires device_interface to be a complete type
-inline const auto &device_t::interface_list::auto_iterator::operator++()
+inline const device_t::interface_list::auto_iterator &device_t::interface_list::auto_iterator::operator++()
 {
 	m_current = m_current->interface_next();
 	return *this;

@@ -59,8 +59,9 @@ public:
 	bool empty() const { return m_list.empty(); }
 
 	// range iterators
-	auto begin() const { return m_list.begin(); }
-	auto end() const { return m_list.end(); }
+	using auto_iterator = typename simple_list<_ElementType>::auto_iterator;
+	auto_iterator begin() const { return m_list.begin(); }
+	auto_iterator end() const { return m_list.end(); }
 
 	// remove (free) all objects in the list, leaving an empty list
 	void reset() { m_list.reset(); m_map.clear(); }

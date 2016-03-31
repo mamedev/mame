@@ -88,7 +88,7 @@ public:
 	virtual ~device_sound_interface();
 
 	// configuration access
-	const auto &routes() const { return m_route_list; }
+	const simple_list<sound_route> &routes() const { return m_route_list; }
 
 	// static inline configuration helpers
 	static sound_route &static_add_route(device_t &device, UINT32 output, const char *target, double gain, UINT32 input = AUTO_ALLOC_INPUT, UINT32 mixoutput = 0);
