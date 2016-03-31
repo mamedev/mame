@@ -48,7 +48,6 @@
 
 #include "bus/ti99x/videowrp.h"
 #include "bus/ti99x/datamux.h"
-#include "bus/ti99x/grom.h"
 #include "bus/ti99x/gromport.h"
 #include "bus/ti99x/joyport.h"
 
@@ -102,6 +101,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( console_ready_grom );
 	DECLARE_WRITE_LINE_MEMBER( console_reset );
 	DECLARE_WRITE_LINE_MEMBER( notconnected );
+
+	// GROM clock
+	DECLARE_WRITE_LINE_MEMBER( gromclk_in );
 
 	// Connections with the system interface chip 9901
 	DECLARE_WRITE_LINE_MEMBER( extint );
@@ -177,16 +179,10 @@ enum
 };
 
 /*
-    Memory map.
-    Most of the work is done in the datamux (see datamux.c). We only keep ROM
-    and the small 256 byte PAD RAM here because they are directly connected
-    to the 16bit bus, and the wait state logic is not active during their
-    accesses.
+    Memory map. All of the work is done in the datamux (see datamux.c).
 */
 static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4x_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x0300) AM_RAM
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(DATAMUX_TAG, ti99_datamux_device, read, write) AM_DEVSETOFFSET(DATAMUX_TAG, ti99_datamux_device, setoffset)
 ADDRESS_MAP_END
 
@@ -364,21 +360,6 @@ INPUT_PORTS_END
 /*****************************************************************************
     Components
 ******************************************************************************/
-
-static GROM_CONFIG(grom0_config)
-{
-	false, 0, region_grom, 0x0000, 0x1800, GROMFREQ
-};
-
-static GROM_CONFIG(grom1_config)
-{
-	false, 1, region_grom, 0x2000, 0x1800, GROMFREQ
-};
-
-static GROM_CONFIG(grom2_config)
-{
-	false, 2, region_grom, 0x4000, 0x1800, GROMFREQ
-};
 
 READ8_MEMBER( ti99_4x_state::cruread )
 {
@@ -631,6 +612,7 @@ READ8_MEMBER( ti99_4x_state::interrupt_level )
 WRITE_LINE_MEMBER( ti99_4x_state::clock_out )
 {
 	m_datamux->clock_in(state);
+	m_peribox->clock_in(state);
 }
 
 /*
@@ -640,6 +622,15 @@ WRITE_LINE_MEMBER( ti99_4x_state::dbin_line )
 {
 	m_datamux->dbin_in(state);
 }
+
+/*
+    GROMCLK from VDP, propagating to datamux
+*/
+WRITE_LINE_MEMBER( ti99_4x_state::gromclk_in )
+{
+	m_datamux->gromclk_in(state);
+}
+
 
 /*****************************************************************************/
 
@@ -708,6 +699,7 @@ void ti99_4x_state::console_ready_join(int id, int state)
 */
 WRITE_LINE_MEMBER( ti99_4x_state::console_ready_grom )
 {
+	if (TRACE_READY) logerror("GROM ready = %d\n", state);
 	console_ready_join(READY_GROM, state);
 }
 
@@ -756,52 +748,6 @@ WRITE_LINE_MEMBER( ti99_4x_state::notconnected )
 {
 	if (TRACE_INTERRUPTS) logerror("ti99_4x: Setting a not connected line ... ignored\n");
 }
-
-/*****************************************************************************/
-
-/*
-    Devices attached to the databus multiplexer. We cannot solve this with
-    the common address maps since the multiplexer also inserts wait states
-    that we want to emulate properly. Also, devices may reside on the same
-    memory locations (like GROMs) and select themselves according to some
-    inner state (e.g. GROMs have an own address counter and a given address
-    area).
-*/
-static const dmux_device_list_entry dmux_devices[] =
-{
-	{ VIDEO_SYSTEM_TAG, 0x8800, 0xfc01, 0x0400, nullptr, 0, 0 },
-	{ GROM0_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
-	{ GROM1_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
-	{ GROM2_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
-	{ TISOUND_TAG,   0x8400, 0xfc01, 0x0000, nullptr, 0, 0 },
-	{ GROMPORT_TAG,  0x9800, 0xfc01, 0x0400, nullptr, 0, 0 },
-	{ GROMPORT_TAG,  0x6000, 0xe000, 0x0000, nullptr, 0, 0 },
-	{ PERIBOX_TAG,   0x0000, 0x0000, 0x0000, nullptr, 0, 0 },  // Peribox needs all addresses
-	{ nullptr, 0, 0, 0, nullptr, 0, 0  }
-};
-
-static const dmux_device_list_entry dmux_devices_ev[] =
-{
-	{ VIDEO_SYSTEM_TAG, 0x8800, 0xfc01, 0x0400, nullptr, 0, 0 },
-	{ GROM0_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
-	{ GROM1_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
-	{ GROM2_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
-	{ TISOUND_TAG,   0x8400, 0xfc01, 0x0000, nullptr, 0, 0 },
-	{ GROMPORT_TAG,  0x9800, 0xfc01, 0x0400, nullptr, 0, 0 },
-	{ GROMPORT_TAG,  0x6000, 0xe000, 0x0000, nullptr, 0, 0 },
-	{ PERIBOX_TAG,   0x0000, 0x0000, 0x0000, nullptr, 0, 0 },  // Peribox needs all addresses
-	{ nullptr, 0, 0, 0, nullptr, 0, 0  }
-};
-
-static DMUX_CONFIG( datamux_conf )
-{
-	dmux_devices
-};
-
-static DMUX_CONFIG( datamux_conf_ev )
-{
-	dmux_devices_ev
-};
 
 /******************************************************************************
     Machine definitions
@@ -852,9 +798,10 @@ static MACHINE_CONFIG_START( ti99_4, ti99_4x_state )
 	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_4x_state, cassette_output) )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_4x_state, tms9901_interrupt) )
 
-	MCFG_DMUX_ADD( DATAMUX_TAG, datamux_conf )
+	MCFG_DEVICE_ADD( DATAMUX_TAG, DATAMUX, 0)
 	MCFG_DMUX_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_dmux) )
-	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG )
+
+	MCFG_GROMPORT4_ADD( GROMPORT_TAG )
 	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_cart) )
 	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_4x_state, console_reset) )
 
@@ -879,13 +826,10 @@ static MACHINE_CONFIG_START( ti99_4, ti99_4x_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
-	/* GROM devices */
-	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
+	// GROM devices
+	MCFG_GROM_ADD( GROM0_TAG, 0, region_grom, 0x0000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( GROM1_TAG, 1, region_grom, 0x2000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( GROM2_TAG, 2, region_grom, 0x4000, WRITELINE(ti99_4x_state, console_ready_grom))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4_ADD( JOYPORT_TAG )
@@ -896,14 +840,14 @@ MACHINE_CONFIG_END
     US version: 60 Hz, NTSC
 */
 static MACHINE_CONFIG_DERIVED( ti99_4_60hz, ti99_4 )
-	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918, 0x4000, ti99_4x_state, video_interrupt_in)
+	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918, 0x4000, ti99_4x_state, video_interrupt_in, gromclk_in)
 MACHINE_CONFIG_END
 
 /*
     European version: 50 Hz, PAL
 */
 static MACHINE_CONFIG_DERIVED( ti99_4_50hz, ti99_4 )
-	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929, 0x4000, ti99_4x_state, video_interrupt_in)
+	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929, 0x4000, ti99_4x_state, video_interrupt_in, gromclk_in)
 MACHINE_CONFIG_END
 
 /**********************************************************************
@@ -951,9 +895,10 @@ static MACHINE_CONFIG_START( ti99_4a, ti99_4x_state )
 	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_4x_state, cassette_output) )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_4x_state, tms9901_interrupt) )
 
-	MCFG_DMUX_ADD( DATAMUX_TAG, datamux_conf )
+	MCFG_DEVICE_ADD( DATAMUX_TAG, DATAMUX, 0)
 	MCFG_DMUX_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_dmux) )
-	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG )
+
+	MCFG_GROMPORT4_ADD( GROMPORT_TAG )
 	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_cart) )
 	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_4x_state, console_reset) )
 
@@ -978,13 +923,10 @@ static MACHINE_CONFIG_START( ti99_4a, ti99_4x_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
-	/* GROM devices */
-	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
+	// GROM devices
+	MCFG_GROM_ADD( GROM0_TAG, 0, region_grom, 0x0000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( GROM1_TAG, 1, region_grom, 0x2000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( GROM2_TAG, 2, region_grom, 0x4000, WRITELINE(ti99_4x_state, console_ready_grom))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG )
@@ -994,14 +936,14 @@ MACHINE_CONFIG_END
     US version: 60 Hz, NTSC
 */
 static MACHINE_CONFIG_DERIVED( ti99_4a_60hz, ti99_4a )
-	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918A, 0x4000, ti99_4x_state, video_interrupt_in)
+	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918A, 0x4000, ti99_4x_state, video_interrupt_in, gromclk_in)
 MACHINE_CONFIG_END
 
 /*
     European version: 50 Hz, PAL
 */
 static MACHINE_CONFIG_DERIVED( ti99_4a_50hz, ti99_4a )
-	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929A, 0x4000, ti99_4x_state, video_interrupt_in)
+	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929A, 0x4000, ti99_4x_state, video_interrupt_in, gromclk_in)
 MACHINE_CONFIG_END
 
 /************************************************************************
@@ -1029,14 +971,14 @@ MACHINE_CONFIG_END
     US version: 60 Hz, NTSC
 */
 static MACHINE_CONFIG_DERIVED( ti99_4qi_60hz, ti99_4qi )
-	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918A, 0x4000, ti99_4x_state, video_interrupt_in)
+	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918A, 0x4000, ti99_4x_state, video_interrupt_in, gromclk_in)
 MACHINE_CONFIG_END
 
 /*
     European version: 50 Hz, PAL
 */
 static MACHINE_CONFIG_DERIVED( ti99_4qi_50hz, ti99_4qi )
-	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929A, 0x4000, ti99_4x_state, video_interrupt_in)
+	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929A, 0x4000, ti99_4x_state, video_interrupt_in, gromclk_in)
 MACHINE_CONFIG_END
 
 /************************************************************************
@@ -1056,6 +998,10 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(VIDEO_SYSTEM_TAG, V9938VIDEO, 0)
+	// Removing the TMS9928a requires to add a replacement for the GROMCLK.
+	// In the real hardware this is a circuit (REPL99x) that fits into the VDP socket
+	MCFG_ADD_GROMCLK_CB( WRITELINE(ti99_4x_state, gromclk_in) )
+
 	MCFG_V9938_ADD(VDP_TAG, SCREEN_TAG, 0x20000, XTAL_21_4772MHz)  /* typical 9938 clock, not verified */
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(ti99_4x_state, video_interrupt_in))
 	MCFG_V99X8_SCREEN_ADD_NTSC(SCREEN_TAG, VDP_TAG, XTAL_21_4772MHz)
@@ -1073,9 +1019,9 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_4x_state, cassette_output) )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_4x_state, tms9901_interrupt) )
 
-	MCFG_DMUX_ADD( DATAMUX_TAG, datamux_conf_ev )
+	MCFG_DEVICE_ADD( DATAMUX_TAG, DATAMUX, 0)
 	MCFG_DMUX_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_dmux) )
-	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG )
+	MCFG_GROMPORT4_ADD( GROMPORT_TAG )
 	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_cart) )
 	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_4x_state, console_reset) )
 
@@ -1100,13 +1046,10 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
-	/* GROM devices */
-	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
+	// GROM devices
+	MCFG_GROM_ADD( GROM0_TAG, 0, region_grom, 0x0000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( GROM1_TAG, 1, region_grom, 0x2000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( GROM2_TAG, 2, region_grom, 0x4000, WRITELINE(ti99_4x_state, console_ready_grom))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG )
@@ -1124,7 +1067,7 @@ MACHINE_CONFIG_END
 
 ROM_START(ti99_4)
 	// CPU memory space
-	ROM_REGION16_BE(0x2000, "maincpu", 0)
+	ROM_REGION16_BE(0x2000, CONSOLEROM, 0)
 	ROM_LOAD16_BYTE("u610.bin", 0x0000, 0x1000, CRC(6fcf4b15) SHA1(d085213c64701d429ae535f9a4ac8a50427a8343)) /* CPU ROMs high */
 	ROM_LOAD16_BYTE("u611.bin", 0x0001, 0x1000, CRC(491c21d1) SHA1(7741ae9294c51a44a78033d1b77c01568a6bbfb9)) /* CPU ROMs low */
 
@@ -1137,7 +1080,7 @@ ROM_END
 
 ROM_START(ti99_4a)
 	// CPU memory space
-	ROM_REGION16_BE(0x2000, "maincpu", 0)
+	ROM_REGION16_BE(0x2000, CONSOLEROM, 0)
 	ROM_LOAD16_WORD("994arom.bin", 0x0000, 0x2000, CRC(db8f33e5) SHA1(6541705116598ab462ea9403c00656d6353ceb85)) /* system ROMs */
 
 	// GROM memory space
@@ -1147,7 +1090,7 @@ ROM_END
 
 ROM_START(ti99_4qi)
 	// CPU memory space
-	ROM_REGION16_BE(0x2000, "maincpu", 0)
+	ROM_REGION16_BE(0x2000, CONSOLEROM, 0)
 	ROM_LOAD16_WORD("994qirom.bin", 0x0000, 0x2000, CRC(db8f33e5) SHA1(6541705116598ab462ea9403c00656d6353ceb85)) /* system ROMs */
 
 	// GROM memory space
@@ -1160,7 +1103,7 @@ ROM_END
 
 ROM_START(ti99_4ev)
 	/*CPU memory space*/
-	ROM_REGION16_BE(0x2000, "maincpu", 0)
+	ROM_REGION16_BE(0x2000, CONSOLEROM, 0)
 	ROM_LOAD16_WORD("994arom.bin", 0x0000, 0x2000, CRC(db8f33e5) SHA1(6541705116598ab462ea9403c00656d6353ceb85)) /* system ROMs */
 
 	/*GROM memory space*/

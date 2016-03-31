@@ -92,43 +92,87 @@
 
 #define ACTIVE_TAG "ACTIVE"
 
-#define LOG logerror
-#define VERBOSE 1
+#define TRACE_ROM 0
+#define TRACE_GROM 0
+#define TRACE_CRU 0
+#define TRACE_SWITCH 0
 
 ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: ti_expansion_card_device(mconfig, TI99_P_CODE, "TI-99 P-Code Card", tag, owner, clock, "ti99_pcode", __FILE__), m_rom(nullptr), m_bank_select(0), m_switch(false)
+: ti_expansion_card_device(mconfig, TI99_P_CODE, "TI-99 P-Code Card", tag, owner, clock, "ti99_pcode", __FILE__),
+	m_rom(nullptr),
+	m_bank_select(0),
+	m_active(false),
+	m_clock_count(0),
+	m_clockhigh(false),
+	m_inDsrArea(false),
+	m_isrom0(false),
+	m_isrom12(false),
+	m_isgrom(false),
+	m_address(0)
 {
+}
+
+SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
+{
+	// Do not allow setaddress for the debugger. It will mess up the
+	// setaddress/memory access pairs when the CPU enters wait states.
+	if (space.debugger_access()) return;
+
+	m_address = offset;
+	m_inDsrArea = ((m_address & m_select_mask)==m_select_value);
+
+	line_state a14 = ((m_address & 2)!=0)? ASSERT_LINE : CLEAR_LINE;
+
+	m_isrom0 = ((m_address & 0xf000)==0x4000);
+	m_isrom12 = ((m_address & 0xf000)==0x5000);
+
+	// Valid access (GROM write with DBIN=0 or read with DBIN=1)
+	bool validaccess = (state==CLEAR_LINE || (m_address & 0x0400)==0);
+
+	// GROM access  0101 1011 1111 1100
+	m_isgrom = ((m_address & 0xfbfd)==0x5bfc) && validaccess;
+
+	if (validaccess)
+	{
+		int lines = (state==ASSERT_LINE)? 1 : 0;
+		if (a14==ASSERT_LINE) lines |= 2;
+		line_state select = m_isgrom? ASSERT_LINE : CLEAR_LINE;
+
+		// always deliver to GROM so that the select line may be cleared
+		for (int i=0; i < 8; i++)
+			m_grom[i]->set_lines(space, lines, select);
+	}
 }
 
 READ8Z_MEMBER( ti_pcode_card_device::readz )
 {
-	if (m_switch && m_selected && ((offset & m_select_mask)==m_select_value))
+	if (m_active && m_inDsrArea && m_selected)
 	{
-		// GROM access
-		if ((offset & GROMMASK)==GROMREAD)
+		if (m_isrom0)
 		{
-			for (auto & elem : m_grom) elem->readz(space, offset, value, mem_mask);
-			if (VERBOSE>5) LOG("ti99_pcode: read from grom %04x: %02x\n", offset&0xffff, *value);
+			*value = m_rom[m_address & 0x0fff];
+			if (TRACE_ROM) logerror("Read from rom %04x: %02x\n", offset&0xffff, *value);
 		}
 		else
 		{
-			if ((offset & 0x1000) == 0x0000)
+			if (m_isgrom)
 			{
-				/* Accesses ROM 4732 (4K) */
-				// 0000 xxxx xxxx xxxx
-				*value = m_rom[offset & 0x0fff];
-				if (VERBOSE>5) LOG("ti99_pcode: read from rom %04x: %02x\n", offset&0xffff, *value);
+				for (auto& elem : m_grom) elem->readz(space, m_address, value);
+				if (TRACE_GROM) logerror("Read from grom %04x: %02x\n", m_address&0xffff, *value);
 			}
 			else
 			{
-				// Accesses ROM 4764 (2*4K)
-				// We have two banks here which are activated according
-				// to the setting of CRU bit 4
-				// Bank 0 is the ROM above
-				// 0001 xxxx xxxx xxxx   Bank 1
-				// 0010 xxxx xxxx xxxx   Bank 2
-				*value = m_rom[(m_bank_select<<12) | (offset & 0x0fff)];
-				if (VERBOSE>5) LOG("ti99_pcode: read from rom %04x (%02x): %02x\n", offset&0xffff, m_bank_select, *value);
+				if (m_isrom12)
+				{
+					// Accesses ROM 4764 (2*4K)
+					// We have two banks here which are activated according
+					// to the setting of CRU bit 4
+					// Bank 0 is the ROM above
+					// 0001 xxxx xxxx xxxx   Bank 1
+					// 0010 xxxx xxxx xxxx   Bank 2
+					*value = m_rom[(m_bank_select<<12) | (m_address & 0x0fff)];
+					if (TRACE_ROM) logerror("Read from rom %04x (%02x): %02x\n", m_address&0xffff, m_bank_select, *value);
+				}
 			}
 		}
 	}
@@ -140,32 +184,34 @@ READ8Z_MEMBER( ti_pcode_card_device::readz )
 */
 WRITE8_MEMBER( ti_pcode_card_device::write )
 {
-	if (m_switch && m_selected)
+	if (m_active && m_isgrom && m_selected)
 	{
-		if ((offset & m_select_mask)==m_select_value)
-		{
-			if (VERBOSE>5) LOG("ti99_pcode: write to address %04x: %02x\n", offset & 0xffff, data);
-			// 0101 1111 1111 11x0
-			if ((offset & GROMMASK) == GROMWRITE)
-			{
-				for (auto & elem : m_grom) elem->write(space, offset, data, mem_mask);
-			}
-		}
+		for (auto & elem : m_grom) elem->write(space, m_address, data);
 	}
 }
 
 /*
     Common READY* line from the GROMs.
-    At this time we do not emulate GROM READY* since the CPU emulation does
-    not yet process READY*. If it did, however, we would have to do a similar
-    handling as in peribox (with INTA*): The common READY* line is a logical
-    AND of all single READY lines. If any GROM pulls it down, the line goes
-    down, and only if all GROMs release it, it pulls up again. We should think
-    about a general solution.
 */
 WRITE_LINE_MEMBER( ti_pcode_card_device::ready_line )
 {
 	m_slot->set_ready(state);
+}
+
+/*
+    CLKOUT line from the CPU. This line is divided by 8 to generate a 375 Khz
+    clock input for the GROMs, which are thus running at a lower rate than
+    those in the console driven by the VDP (477 kHz).
+*/
+WRITE_LINE_MEMBER( ti_pcode_card_device::clock_in)
+{
+	m_clock_count = (m_clock_count+1) & 0x03;  // four pulses high, four pulses low
+	if (m_clock_count==0)
+	{
+		// Toggle
+		m_clockhigh = !m_clockhigh;
+		for (auto & elem : m_grom) elem->gclock_in(m_clockhigh? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 /*
@@ -198,55 +244,22 @@ WRITE8_MEMBER(ti_pcode_card_device::cruwrite)
 		if (addr==0x80) // Bit 4 is on address line 8
 		{
 			m_bank_select = (data+1);   // we're calling this bank 1 and bank 2
-			if (VERBOSE>5) LOG("ti99_pcode: select rom bank %d\n", m_bank_select);
+			if (TRACE_CRU) logerror("Select rom bank %d\n", m_bank_select);
 		}
 	}
 }
 
-static GROM_CONFIG(pgrom0_config)
-{
-	false, 0, PCODE_GROM_TAG, 0x0000, 0x1800, GROMFREQ
-};
-static GROM_CONFIG(pgrom1_config)
-{
-	false, 1, PCODE_GROM_TAG, 0x2000, 0x1800, GROMFREQ
-};
-static GROM_CONFIG(pgrom2_config)
-{
-	false, 2, PCODE_GROM_TAG, 0x4000, 0x1800, GROMFREQ
-};
-static GROM_CONFIG(pgrom3_config)
-{
-	false, 3, PCODE_GROM_TAG, 0x6000, 0x1800, GROMFREQ
-};
-static GROM_CONFIG(pgrom4_config)
-{
-	false, 4, PCODE_GROM_TAG, 0x8000, 0x1800, GROMFREQ
-};
-static GROM_CONFIG(pgrom5_config)
-{
-	false, 5, PCODE_GROM_TAG, 0xa000, 0x1800, GROMFREQ
-};
-static GROM_CONFIG(pgrom6_config)
-{
-	false, 6, PCODE_GROM_TAG, 0xc000, 0x1800, GROMFREQ
-};
-static GROM_CONFIG(pgrom7_config)
-{
-	false, 7, PCODE_GROM_TAG, 0xe000, 0x1800, GROMFREQ
-};
-
 void ti_pcode_card_device::device_start()
 {
 	m_cru_base = 0x1f00;
-	m_grom[0] = static_cast<ti99_grom_device*>(subdevice(PGROM0_TAG));
-	m_grom[1] = static_cast<ti99_grom_device*>(subdevice(PGROM1_TAG));
-	m_grom[2] = static_cast<ti99_grom_device*>(subdevice(PGROM2_TAG));
-	m_grom[3] = static_cast<ti99_grom_device*>(subdevice(PGROM3_TAG));
-	m_grom[4] = static_cast<ti99_grom_device*>(subdevice(PGROM4_TAG));
-	m_grom[5] = static_cast<ti99_grom_device*>(subdevice(PGROM5_TAG));
-	m_grom[6] = static_cast<ti99_grom_device*>(subdevice(PGROM6_TAG));
-	m_grom[7] = static_cast<ti99_grom_device*>(subdevice(PGROM7_TAG));
+	m_grom[0] = downcast<tmc0430_device*>(subdevice(PGROM0_TAG));
+	m_grom[1] = downcast<tmc0430_device*>(subdevice(PGROM1_TAG));
+	m_grom[2] = downcast<tmc0430_device*>(subdevice(PGROM2_TAG));
+	m_grom[3] = downcast<tmc0430_device*>(subdevice(PGROM3_TAG));
+	m_grom[4] = downcast<tmc0430_device*>(subdevice(PGROM4_TAG));
+	m_grom[5] = downcast<tmc0430_device*>(subdevice(PGROM5_TAG));
+	m_grom[6] = downcast<tmc0430_device*>(subdevice(PGROM6_TAG));
+	m_grom[7] = downcast<tmc0430_device*>(subdevice(PGROM7_TAG));
 	m_rom = memregion(PCODE_ROM_TAG)->base();
 }
 
@@ -264,8 +277,15 @@ void ti_pcode_card_device::device_reset()
 	}
 	m_bank_select = 1;
 	m_selected = false;
+	m_clock_count = 0;
+	m_clockhigh = false;
 
-	m_switch = ioport(ACTIVE_TAG)->read();
+	m_active = ioport(ACTIVE_TAG)->read();
+
+	m_isrom0 = false;
+	m_isrom12 = false;
+	m_isgrom = false;
+	m_address = 0;
 }
 
 void ti_pcode_card_device::device_config_complete()
@@ -274,28 +294,20 @@ void ti_pcode_card_device::device_config_complete()
 
 INPUT_CHANGED_MEMBER( ti_pcode_card_device::switch_changed )
 {
-	if (VERBOSE>7) LOG("ti_pcode_card_device: switch changed to %d\n", newval);
-	m_switch = (newval != 0);
+	if (TRACE_SWITCH) logerror("Switch changed to %d\n", newval);
+	m_active = (newval != 0);
 }
 
 
 MACHINE_CONFIG_FRAGMENT( ti99_pcode )
-	MCFG_GROM_ADD( PGROM0_TAG, pgrom0_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM1_TAG, pgrom1_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM2_TAG, pgrom2_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM3_TAG, pgrom3_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM4_TAG, pgrom4_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM5_TAG, pgrom5_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM6_TAG, pgrom6_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM7_TAG, pgrom7_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti_pcode_card_device, ready_line))
+	MCFG_GROM_ADD( PGROM0_TAG, 0, PCODE_GROM_TAG, 0x0000, WRITELINE(ti_pcode_card_device, ready_line))
+	MCFG_GROM_ADD( PGROM1_TAG, 1, PCODE_GROM_TAG, 0x2000, WRITELINE(ti_pcode_card_device, ready_line))
+	MCFG_GROM_ADD( PGROM2_TAG, 2, PCODE_GROM_TAG, 0x4000, WRITELINE(ti_pcode_card_device, ready_line))
+	MCFG_GROM_ADD( PGROM3_TAG, 3, PCODE_GROM_TAG, 0x6000, WRITELINE(ti_pcode_card_device, ready_line))
+	MCFG_GROM_ADD( PGROM4_TAG, 4, PCODE_GROM_TAG, 0x8000, WRITELINE(ti_pcode_card_device, ready_line))
+	MCFG_GROM_ADD( PGROM5_TAG, 5, PCODE_GROM_TAG, 0xa000, WRITELINE(ti_pcode_card_device, ready_line))
+	MCFG_GROM_ADD( PGROM6_TAG, 6, PCODE_GROM_TAG, 0xc000, WRITELINE(ti_pcode_card_device, ready_line))
+	MCFG_GROM_ADD( PGROM7_TAG, 7, PCODE_GROM_TAG, 0xe000, WRITELINE(ti_pcode_card_device, ready_line))
 MACHINE_CONFIG_END
 
 INPUT_PORTS_START( ti99_pcode )

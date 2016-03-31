@@ -2029,8 +2029,6 @@ if (BUSES["TI99X"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99x/datamux.h",
 		MAME_DIR .. "src/devices/bus/ti99x/genboard.cpp",
 		MAME_DIR .. "src/devices/bus/ti99x/genboard.h",
-		MAME_DIR .. "src/devices/bus/ti99x/grom.cpp",
-		MAME_DIR .. "src/devices/bus/ti99x/grom.h",
 		MAME_DIR .. "src/devices/bus/ti99x/gromport.cpp",
 		MAME_DIR .. "src/devices/bus/ti99x/gromport.h",
 		MAME_DIR .. "src/devices/bus/ti99x/handset.cpp",

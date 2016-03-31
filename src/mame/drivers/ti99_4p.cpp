@@ -439,11 +439,15 @@ READ16_MEMBER( ti99_4p_state::datamux_read )
 	UINT8 hbyte = 0;
 	UINT16 addroff = (offset << 1);
 
+	m_peribox->memen_in(ASSERT_LINE);
+
 	m_peribox->readz(space, addroff+1, &m_latch, mem_mask);
 	m_lowbyte = m_latch;
 
 	m_peribox->readz(space, addroff, &hbyte, mem_mask);
 	m_highbyte = hbyte;
+
+	m_peribox->memen_in(CLEAR_LINE);
 
 	// use the latch and the currently read byte and put it on the 16bit bus
 //  printf("read  address = %04x, value = %04x, memmask = %4x\n", addroff,  (hbyte<<8) | sgcpu->latch, mem_mask);
@@ -467,10 +471,14 @@ WRITE16_MEMBER( ti99_4p_state::datamux_write )
 	// read more about the datamux in datamux.c
 
 	// Write to the PEB
+	m_peribox->memen_in(ASSERT_LINE);
+
 	m_peribox->write(space, addroff+1, data & 0xff);
 
 	// Write to the PEB
 	m_peribox->write(space, addroff, (data>>8) & 0xff);
+
+	m_peribox->memen_in(CLEAR_LINE);
 
 	// Insert four wait states and let CPU enter wait state
 	m_waitcount = 6;
