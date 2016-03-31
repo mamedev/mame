@@ -47,6 +47,7 @@
  @209     uPD553C  1982, Tomy Caveman (TN-12)
  @258     uPD553C  1984, Tomy Alien Chase (TN-16)
 
+ *511     uPD557LC?1980, Gakken Game Robot 9/Mego Fabulous Fred
  @512     uPD557LC 1980, Castle Toy Tactix
 
  @060     uPD650C  1979, Mattel Computer Gin
