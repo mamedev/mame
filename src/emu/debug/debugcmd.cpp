@@ -1692,7 +1692,7 @@ static void execute_hotspot(running_machine &machine, int ref, int params, const
 
 	/* attempt to install */
 	device->debug()->hotspot_track(count, threshhold);
-	debug_console_printf(machine, "Now tracking hotspots on CPU '%s' using %d slots with a threshhold of %d\n", device->tag(), (int)count, (int)threshhold);
+	debug_console_printf(machine, "Now tracking hotspots on CPU '%s' using %d slots with a threshold of %d\n", device->tag(), (int)count, (int)threshhold);
 }
 
 
