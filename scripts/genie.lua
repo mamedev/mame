@@ -748,17 +748,6 @@ if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 	}
 end
 
---# add the optimization flag
-	buildoptions {
-		"-O".. _OPTIONS["OPTIMIZE"],
-		"-fno-strict-aliasing"
-	}
-configuration { "mingw-clang" }
-	buildoptions {
-		"-O1", -- without this executable crash often
-	}
-configuration {  }
-
 -- add the error warning flag
 if _OPTIONS["NOWERROR"]==nil then
 	buildoptions {
@@ -769,16 +758,9 @@ end
 -- if we are optimizing, include optimization options
 if _OPTIONS["OPTIMIZE"] then
 	buildoptions {
+		"-O".. _OPTIONS["OPTIMIZE"],
 		"-fno-strict-aliasing"
 	}
-	if _OPTIONS["ARCHOPTS"] then
-		buildoptions {
-			_OPTIONS["ARCHOPTS"]
-		}
-		linkoptions {
-			_OPTIONS["ARCHOPTS"]
-		}
-	end
 	if _OPTIONS["OPT_FLAGS"] then
 		buildoptions {
 			_OPTIONS["OPT_FLAGS"]
@@ -829,6 +811,21 @@ if _OPTIONS["OPTIMIZE"] then
 		}
 
 	end
+end
+
+configuration { "mingw-clang" }
+	buildoptions {
+		"-O1", -- without this executable crash often
+	}
+configuration {  }
+
+if _OPTIONS["ARCHOPTS"] then
+	buildoptions {
+		_OPTIONS["ARCHOPTS"]
+	}
+	linkoptions {
+		_OPTIONS["ARCHOPTS"]
+	}
 end
 
 if _OPTIONS["SHLIB"] then
