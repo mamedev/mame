@@ -22,28 +22,28 @@
   CPU:    1x 65SC02 at 2MHz.
 
   Sound:  1x AD-65 or U6295 (OKI6295 compatible) at 1MHz, pin7 HIGH.
-          1x LM358N
-          1x TDA2003
+          1x LM358N.
+          1x TDA2003.
 
-  HD-PLD: 2x AMD MACH231-15-JC/1-18JI/1     or...
-          2x XILINX XC9572 - PO100ASJ9745   or...
-          2x Lattice ispLSI1024-60LJ for earlier revisions
+  HD-PLD: 2x AMD MACH231-15-JC/1-18JI/1  or...
+          2x XILINX XC9572-PQ100ASJ-15C  or...
+          2x Lattice ispLSI1024-60LJ for earlier revisions.
 
-  RAM:    1x 76C88AL-15, SRAM 8Kx8
-  NVRAM:  1x 76C88AL-15, SRAM 8Kx8 (battery backed)
-  ROMs:   4x 27C256
-          (3x 27C256 for earlier revisions)
-          1x 27C020
+  RAM:    1x 76C88AL-15 or U6264, SRAM 8Kx8.
+  NVRAM:  1x 76C88AL-15 or HT6116-70, SRAM 8Kx8 (battery backed).
+  ROMs:   4x 27C256 (3x 27C256 for earlier revisions).
+          1x 27C020 for ADPCM samples.
 
-  PROMs:  1x 82S147 or similar. (512 bytes)
+  PROMs:  1x 82S147, AM27S29, or similar. (512 bytes).
 
   Clock:  1x Crystal: 16MHz.
 
   Other:  1x 28x2 edge connector.
           1x 15-pins connector.
+		  1x 7 pins connector (JTAG?) (on Crystals Colours boards).
           1x trimmer (volume).
           1x 8 DIP switches.
-          1x 3.5 Volt, 55-80 mAh battery.
+          1x 3.6 Volt, 55-80 mAh battery.
 
 
 ***************************************************************************************
@@ -968,7 +968,7 @@ static INPUT_PORTS_START( crystalc )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SW1")
-	PORT_DIPNAME( 0x03, 0x00, "Pool Value" )        PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0x03, 0x00, "Bull Value" )        PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x03, "100" )
 	PORT_DIPSETTING(    0x02, "200" )
 	PORT_DIPSETTING(    0x01, "500" )
@@ -990,6 +990,17 @@ static INPUT_PORTS_START( crystalc )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( crystalca )
+	PORT_INCLUDE( crystalc )
+
+	PORT_MODIFY("SW1")
+	PORT_DIPNAME( 0x03, 0x00, "Pool Value" )        PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x03, "100" )
+	PORT_DIPSETTING(    0x02, "200" )
+	PORT_DIPSETTING(    0x01, "500" )
+	PORT_DIPSETTING(    0x00, "1000" )
 INPUT_PORTS_END
 
 
@@ -1145,6 +1156,25 @@ ROM_START( tenballs )
 	ROM_LOAD( "82s147.u17", 0x0000, 0x0200, CRC(20234dcc) SHA1(197937bbec0201888467e250bdba49e39aa4204a) )
 ROM_END
 
+/*
+  Crystals Colours
+  
+  Ver 1.01
+  The top left bonus is called "Pool"
+
+  Ver 1.02
+  The top left bonus is called "Bull"
+  Minor differences against Ver 1.01
+  (see code at 0x9da0 onward...)
+
+  PROMs and ADPCM are identicals.
+
+  Coinage seems to be fixed to:
+  - Coin A: 10 credits per coin.
+  - Coin B: 10 credits per coin.
+  - Key In: 100 credits per coin.
+
+*/ 
 ROM_START( crystalc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "crystals_colours_1__(1.02).u2", 0x8000, 0x8000, CRC(a803d857) SHA1(8eb34f6b4f820776459d92f9c589794bec7547ea) )
@@ -1186,9 +1216,9 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT ROT    COMPANY      FULLNAME                      FLAGS   LAYOUT */
-GAMEL( 1998, snookr10,  0,        snookr10, snookr10, driver_device, 0,   ROT0, "Sandii'",   "Snooker 10 (Ver 1.11)",       0,      layout_snookr10 )
-GAMEL( 1998, apple10,   0,        apple10,  apple10,  driver_device, 0,   ROT0, "Sandii'",   "Apple 10 (Ver 1.21)",         0,      layout_snookr10 )
-GAMEL( 1997, tenballs,  snookr10, tenballs, tenballs, driver_device, 0,   ROT0, "<unknown>", "Ten Balls (Ver 1.05)",        0,      layout_snookr10 )
-GAMEL( 1998, crystalc,  0,        crystalc, crystalc, driver_device, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.02)", 0,      layout_snookr10 )
-GAMEL( 1998, crystalca, crystalc, crystalc, crystalc, driver_device, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.01)", 0,      layout_snookr10 )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT      STATE          INIT ROT    COMPANY      FULLNAME                      FLAGS   LAYOUT */
+GAMEL( 1998, snookr10,  0,        snookr10, snookr10,  driver_device, 0,   ROT0, "Sandii'",   "Snooker 10 (Ver 1.11)",       0,      layout_snookr10 )
+GAMEL( 1998, apple10,   0,        apple10,  apple10,   driver_device, 0,   ROT0, "Sandii'",   "Apple 10 (Ver 1.21)",         0,      layout_snookr10 )
+GAMEL( 1997, tenballs,  snookr10, tenballs, tenballs,  driver_device, 0,   ROT0, "<unknown>", "Ten Balls (Ver 1.05)",        0,      layout_snookr10 )
+GAMEL( 1998, crystalc,  0,        crystalc, crystalc,  driver_device, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.02)", 0,      layout_snookr10 )
+GAMEL( 1998, crystalca, crystalc, crystalc, crystalca, driver_device, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.01)", 0,      layout_snookr10 )
