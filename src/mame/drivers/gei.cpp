@@ -1785,7 +1785,7 @@ ROM_START( sexappl )  /* TRIV3D PCB, stickered SEX APPL 6.02 5/92 */
 	ROM_LOAD( "adult_sex", 0x30000, 0x8000, CRC(05798340) SHA1(8db308bb725112327027a725b2c69299e6da1dad) )
 
 	ROM_REGION( 0x0800, "nvram", 0 )
-	ROM_LOAD( "sexappl.nvram",   0x0000, 0x0800, CRC(be65737c) SHA1(5b8a603a9ddecdad4aaef0b9e8ef373885b236c0) ) /* Defualts but with card dispenser OFF! */
+	ROM_LOAD( "sexappl.nvram",   0x0000, 0x0800, CRC(be65737c) SHA1(5b8a603a9ddecdad4aaef0b9e8ef373885b236c0) ) /* Defaults but with card dispenser OFF! */
 ROM_END
 
 /*

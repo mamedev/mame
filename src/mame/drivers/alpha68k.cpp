@@ -1032,7 +1032,7 @@ static INPUT_PORTS_START( paddlema )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:4,3") /* See notes for Game Time / Match Type combos */
-	PORT_DIPSETTING(    0x00, "Defualt Time" )
+	PORT_DIPSETTING(    0x00, "Default Time" )
 	PORT_DIPSETTING(    0x20, "+10 Seconds" )
 	PORT_DIPSETTING(    0x10, "+20 Seconds" )
 	PORT_DIPSETTING(    0x30, "+30 Seconds" )
