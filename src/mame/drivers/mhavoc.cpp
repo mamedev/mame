@@ -102,8 +102,8 @@
     2800          |     D                     |  R   | Shield 1 Switch
     2800          |        D                  |  R   | Fire 2 Switch
     2800          |           D               |  R   | Shield 2 Switch
-    2800          |              D            |  R   | Not Used
-    2800          |                 D         |  R   | Speech Chip Ready
+    2800          |              D            |  R   | N/C (floating, probably reads as 1)
+    2800          |                 D         |  R   | /TIRDY (Speech Chip Ready)
     2800          |                    D      |  R   | Alpha Rcvd Flag
     2800          |                       D   |  R   | Alpha Xmtd Flag
                   |                           |      |
@@ -119,7 +119,7 @@
                   |                           |      |
     5800          |  D  D  D  D  D  D  D  D   |  W   | Speech Data Write / Write Strobe Clear
     5900          |                           |  W   | Speech Write Strobe Set
-                    |                           |      |
+                  |                           |      |
     6000-61FF     |  D  D  D  D  D  D  D  D   | R/W  | EEROM
     8000-BFFF     |  D  D  D  D  D  D  D  D   |  R   | Program ROM (16K)
     -----------------------------------------------------------------------------

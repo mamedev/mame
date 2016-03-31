@@ -888,7 +888,7 @@ class render_target
 	friend class render_manager;
 
 	// construction/destruction
-	render_target(render_manager &manager, const char *layoutfile = nullptr, UINT32 flags = 0);
+	render_target(render_manager &manager, const internal_layout *layoutfile = nullptr, UINT32 flags = 0);
 	~render_target();
 
 public:
@@ -966,8 +966,9 @@ public:
 private:
 	// internal helpers
 	void update_layer_config();
-	void load_layout_files(const char *layoutfile, bool singlefile);
+	void load_layout_files(const internal_layout *layoutfile, bool singlefile);
 	bool load_layout_file(const char *dirname, const char *filename);
+	bool load_layout_file(const char *dirname, const internal_layout *layout_data);
 	void add_container_primitives(render_primitive_list &list, const object_transform &xform, render_container &container, int blendmode);
 	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode);
 	bool map_point_internal(INT32 target_x, INT32 target_y, render_container *container, float &mapped_x, float &mapped_y, ioport_port *&mapped_input_port, ioport_value &mapped_input_mask);
@@ -1044,7 +1045,7 @@ public:
 	float max_update_rate() const;
 
 	// targets
-	render_target *target_alloc(const char *layoutfile = nullptr, UINT32 flags = 0);
+	render_target *target_alloc(const internal_layout *layoutfile = nullptr, UINT32 flags = 0);
 	void target_free(render_target *target);
 	render_target *first_target() const { return m_targetlist.first(); }
 	render_target *target_by_index(int index) const;

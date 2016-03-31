@@ -2310,7 +2310,7 @@ static void do_extract_cd(parameters_t &params)
 	std::string default_name(*output_file_str->second);
 	int chop = default_name.find_last_of('.');
 	if (chop != -1)
-		default_name.substr(0, chop);
+		default_name.erase(chop, default_name.size());
 	char basename[128];
 	strncpy(basename, default_name.c_str(), 127);
 	default_name.append(".bin");
