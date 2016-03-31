@@ -21,24 +21,29 @@
 #include "video/pc_vga.h"
 #include "sound/dac.h"
 #include "machine/pcshare.h"
+#include "bus/isa/isa.h"
+#include "bus/isa/sblaster.h"
 
 class fruitpc_state : public pcat_base_state
 {
 public:
 	fruitpc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag),
+			m_isabus(*this, "isa"),
 			m_inp1(*this, "INP1"),
 			m_inp2(*this, "INP2"),
 			m_inp3(*this, "INP3"),
 			m_inp4(*this, "INP4")
 			{ }
 
+	required_device<isa8_device> m_isabus;
 	required_ioport m_inp1;
 	required_ioport m_inp2;
 	required_ioport m_inp3;
 	required_ioport m_inp4;
 
 	DECLARE_READ8_MEMBER(fruit_inp_r);
+	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
 };
 
 READ8_MEMBER(fruitpc_state::fruit_inp_r)
@@ -102,6 +107,22 @@ static INPUT_PORTS_START( fruitpc )
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+//TODO: use atmb device
+WRITE8_MEMBER( fruitpc_state::dma8237_1_dack_w ){ m_isabus->dack_w(1, data); }
+
+static SLOT_INTERFACE_START( fruitpc_isa8_cards )
+	SLOT_INTERFACE("sb15",  ISA8_SOUND_BLASTER_1_5)
+SLOT_INTERFACE_END
+
+static DEVICE_INPUT_DEFAULTS_START( fruitpc_sb_def )
+	DEVICE_INPUT_DEFAULTS("CONFIG", 0x03, 0x01)
+DEVICE_INPUT_DEFAULTS_END
+
+static MACHINE_CONFIG_FRAGMENT( fruitpc_sb_conf )
+	MCFG_DEVICE_MODIFY("pc_joy")
+	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( fruitpc, fruitpc_state )
 	MCFG_CPU_ADD("maincpu", I486, 66000000) // ST STPCD0166BTC3 66 MHz 486 CPU
 	MCFG_CPU_PROGRAM_MAP(fruitpc_map)
@@ -116,8 +137,24 @@ static MACHINE_CONFIG_START( fruitpc, fruitpc_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	MCFG_DEVICE_MODIFY("dma8237_1")
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(fruitpc_state, dma8237_1_dack_w))
+
+	MCFG_DEVICE_ADD("isa", ISA8, 0)
+	MCFG_ISA8_CPU(":maincpu")
+	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259_2", pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir7_w))
+	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq3_w))
+
+	MCFG_ISA8_SLOT_ADD("isa", "isa1", fruitpc_isa8_cards, "sb15", true)
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("sb15", fruitpc_sb_def)
+	MCFG_DEVICE_CARD_MACHINE_CONFIG("sb15", fruitpc_sb_conf)
 MACHINE_CONFIG_END
 
 ROM_START( fruitpc )
@@ -128,7 +165,7 @@ ROM_START( fruitpc )
 	DISK_IMAGE( "fruit", 0,SHA1(df250ff06a97fa141a4144034f7035ac2947c53c) )
 ROM_END
 
-GAME( 2006, fruitpc,  0, fruitpc, fruitpc, driver_device,  0, ROT0, "<unknown>", "Fruit Land", MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2006, fruitpc,  0, fruitpc, fruitpc, driver_device,  0, ROT0, "<unknown>", "Fruit Land", MACHINE_IMPERFECT_GRAPHICS )
 
 // this doesn't really belong here, but is some kind of x86 pc-like hardware, exact CPU type etc. unknown
 // hardware ia by Paokai, motherboard has logos, large chip with logo too, http://www.paokai.com.tw/

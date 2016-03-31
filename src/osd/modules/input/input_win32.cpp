@@ -10,7 +10,7 @@
 #include "modules/osdmodule.h"
 
 #if defined(OSD_WINDOWS)
- 
+
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -125,8 +125,8 @@ struct win32_mouse_state
 class win32_mouse_device : public event_based_device<MouseButtonEventArgs>
 {
 public:
-	mouse_state			mouse;
-	win32_mouse_state	win32_mouse;
+	mouse_state         mouse;
+	win32_mouse_state   win32_mouse;
 
 	win32_mouse_device(running_machine& machine, const char *name, input_module &module)
 		: event_based_device(machine, name, DEVICE_CLASS_MOUSE, module),
@@ -242,13 +242,13 @@ private:
 	int m_gun_index;
 
 public:
-	mouse_state		mouse;
+	mouse_state     mouse;
 
 	win32_lightgun_device(running_machine& machine, const char *name, input_module &module)
 		: event_based_device(machine, name, DEVICE_CLASS_LIGHTGUN, module),
-		  m_lightgun_shared_axis_mode(FALSE),
-		  m_gun_index(0),
-		  mouse({0})
+			m_lightgun_shared_axis_mode(FALSE),
+			m_gun_index(0),
+			mouse({0})
 	{
 		m_lightgun_shared_axis_mode = downcast<windows_options &>(machine.options()).dual_lightgun();
 
@@ -415,4 +415,3 @@ MODULE_NOT_SUPPORTED(lightgun_input_win32, OSD_LIGHTGUNINPUT_PROVIDER, "win32")
 MODULE_DEFINITION(KEYBOARDINPUT_WIN32, keyboard_input_win32)
 MODULE_DEFINITION(MOUSEINPUT_WIN32, mouse_input_win32)
 MODULE_DEFINITION(LIGHTGUNINPUT_WIN32, lightgun_input_win32)
-

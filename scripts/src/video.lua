@@ -513,9 +513,9 @@ if (VIDEOS["MOS6566"]~=null) then
 end
 
 
-files {	
+files {
 	MAME_DIR .. "src/devices/video/cgapal.cpp",
-	MAME_DIR .. "src/devices/video/cgapal.h",	
+	MAME_DIR .. "src/devices/video/cgapal.h",
 }
 
 --------------------------------------------------

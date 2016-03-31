@@ -109,7 +109,6 @@ public:
 
 void blackt96_state::video_start()
 {
-
 }
 
 
@@ -333,7 +332,7 @@ void blackt96_state::tile_callback(int &tile, int& fx, int& fy, int& region)
 	fx = tile & 0x4000;
 	fy = tile & 0x8000;
 	tile &= 0x3fff;
-	
+
 	if (tile & 0x2000)
 	{
 		region = 0;

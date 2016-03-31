@@ -261,7 +261,7 @@ class ohci_function_device {
 public:
 	ohci_function_device(running_machine &machine);
 	void execute_reset();
-	int execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size) ;
+	int execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size);
 protected:
 	virtual int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) { return -1; };
 	virtual int handle_get_status_request(int endpoint, USBSetupPacket *setup) { return 0; };
@@ -269,6 +269,8 @@ protected:
 	virtual int handle_set_feature_request(int endpoint, USBSetupPacket *setup) { return 0; };
 	virtual int handle_set_descriptor_request(int endpoint, USBSetupPacket *setup) { return 0; };
 	virtual int handle_synch_frame_request(int endpoint, USBSetupPacket *setup) { return 0; };
+	virtual void handle_status_stage(int endpoint) { return; };
+	virtual int handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size) { return 0; };
 
 	void add_device_descriptor(const USBStandardDeviceDescriptor &descriptor);
 	void add_configuration_descriptor(const USBStandardConfigurationDescriptor &descriptor);
@@ -288,7 +290,7 @@ protected:
 		int controlrecipient;
 		int remain;
 		UINT8 *position;
-		UINT8 buffer[4];
+		UINT8 buffer[128];
 	} endpoints[256];
 	int state;
 	bool settingaddress;
@@ -297,6 +299,7 @@ protected:
 	int configurationvalue;
 	UINT8 *descriptors;
 	int descriptors_pos;
+	bool wantstatuscallback;
 	USBStandardDeviceDescriptor device_descriptor;
 	std::forward_list<usb_device_configuration *> configurations;
 	std::forward_list<usb_device_string *> device_strings;
@@ -308,8 +311,7 @@ protected:
 class ohci_game_controller_device : public ohci_function_device
 {
 public:
-	ohci_game_controller_device(running_machine &machine);// :
-		//ohci_function_device(machine) {}
+	ohci_game_controller_device(running_machine &machine);
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 private:
 	static const USBStandardDeviceDescriptor devdesc;

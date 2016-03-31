@@ -356,7 +356,7 @@ int running_machine::run(bool firstrun)
 		ui().initialize(*this);
 
 		// display the startup screens
-		ui().display_startup_screens(firstrun, false);
+		ui().display_startup_screens(firstrun);
 
 		// perform a soft reset -- this takes us to the running phase
 		soft_reset();
@@ -372,7 +372,7 @@ int running_machine::run(bool firstrun)
 			g_profiler.start(PROFILER_EXTRA);
 
 #if defined(EMSCRIPTEN)
-			//break out to our async javascript loop and halt
+			// break out to our async javascript loop and halt
 			js_set_main_loop(this);
 #endif
 
@@ -403,7 +403,7 @@ int running_machine::run(bool firstrun)
 	}
 	catch (emu_fatalerror &fatal)
 	{
-		osd_printf_error("FATALERROR: %s\n", fatal.string());
+		osd_printf_error("Fatal error: %s\n", fatal.string());
 		error = MAMERR_FATALERROR;
 		if (fatal.exitcode() != 0)
 			error = fatal.exitcode();
@@ -739,12 +739,15 @@ void running_machine::toggle_pause()
 //  given type
 //-------------------------------------------------
 
-void running_machine::add_notifier(machine_notification event, machine_notify_delegate callback)
+void running_machine::add_notifier(machine_notification event, machine_notify_delegate callback, bool first)
 {
 	assert_always(m_current_phase == MACHINE_PHASE_INIT, "Can only call add_notifier at init time!");
 
+	if(first)
+		m_notifier_list[event].push_front(std::make_unique<notifier_callback_item>(callback));
+
 	// exit notifiers are added to the head, and executed in reverse order
-	if (event == MACHINE_NOTIFY_EXIT)
+	else if (event == MACHINE_NOTIFY_EXIT)
 		m_notifier_list[event].push_front(std::make_unique<notifier_callback_item>(callback));
 
 	// all other notifiers are added to the tail, and executed in the order registered
@@ -761,7 +764,7 @@ void running_machine::add_notifier(machine_notification event, machine_notify_de
 void running_machine::add_logerror_callback(logerror_callback callback)
 {
 	assert_always(m_current_phase == MACHINE_PHASE_INIT, "Can only call add_logerror_callback at init time!");
-        m_string_buffer.reserve(1024);
+		m_string_buffer.reserve(1024);
 	m_logerror_list.push_back(std::make_unique<logerror_callback_item>(callback));
 }
 

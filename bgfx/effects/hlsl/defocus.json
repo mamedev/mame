@@ -1,0 +1,31 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz,ImJezze
+//============================================================
+//
+//  defocus.json: Foucs adjustment shader for CRT simulation.
+//
+//============================================================
+{
+    "blend": {
+    	"equation": "add",
+    	"srcColor": "srcalpha",
+    	"dstColor": "1-srcalpha",
+    	"srcAlpha": "srcalpha",
+    	"dstAlpha": "1-srcalpha"
+    },
+    "depth": {
+    	"function": "always"
+    },
+    "cull": { "mode": "none" },
+    "write": {
+    	"rgb": true,
+    	"alpha": true
+    },
+    "vertex": "vs_defocus",
+    "fragment": "fs_defocus",
+    "uniforms": [
+    	{ "name": "s_tex",         "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "u_tex_size0",   "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_defocus",     "type": "vec4", "values": [ 0.5, 0.5, 0.0, 0.0 ] }
+    ]
+}

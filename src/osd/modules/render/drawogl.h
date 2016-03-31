@@ -141,17 +141,13 @@ public:
 #endif
 	virtual render_primitive_list *get_primitives() override
 	{
-#ifdef OSD_WINDOWS
 		osd_dim nd = window().get_size();
-#else
-		osd_dim nd = window().blit_surface_size();
-#endif
 		if (nd != m_blit_dim)
 		{
 			m_blit_dim = nd;
 			notify_changed();
 		}
-		window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().aspect());
+		window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().pixel_aspect());
 		return &window().target()->get_primitives();
 	}
 

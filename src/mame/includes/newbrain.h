@@ -21,8 +21,8 @@
 #define COP420_TAG      "419"
 #define CASSETTE_TAG    "cassette"
 #define CASSETTE2_TAG   "cassette2"
-#define RS232_V24_TAG	"to"
-#define RS232_PRN_TAG	"po"
+#define RS232_V24_TAG   "to"
+#define RS232_PRN_TAG   "po"
 
 class newbrain_state : public driver_device
 {

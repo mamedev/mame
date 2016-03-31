@@ -276,7 +276,7 @@
 
 		_p(4,'EnableFunctionLevelLinking="%s"', bool(true))
 
-		if cfg.platform ~= "Xbox360" and cfg.platform ~= "x64" then
+		if cfg.platform ~= "Xbox360" and cfg.platform ~= "x64" and cfg.platform ~= "Durango" then
 			if cfg.flags.EnableSSE then
 				_p(4,'EnableEnhancedInstructionSet="1"')
 			elseif cfg.flags.EnableSSE2 then

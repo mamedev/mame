@@ -20,10 +20,13 @@ public:
 protected:
 	// overrides
 	//virtual void device_start() override;
-	//virtual void device_reset() override;
+
+	virtual UINT32 decode_fixed(UINT16 op) override { return 0; } // not yet
+	virtual UINT32 decode_micro(UINT8 sel) override;
+	virtual void device_reset() override;
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	//virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 

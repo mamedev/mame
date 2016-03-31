@@ -25,38 +25,38 @@ all:
 else
 
 ifeq ($(TARGET), 0)
-VS_FLAGS=--platform windows -p vs_3_0 -O 3
-FS_FLAGS=--platform windows -p ps_3_0 -O 3
-SHADER_PATH=shaders/dx9
+VS_FLAGS=--platform windows -p vs_3_0 -O 3 --debug
+FS_FLAGS=--platform windows -p ps_3_0 -O 3 --debug
+SHADER_PATH=bgfx/shaders/dx9
 else
 ifeq ($(TARGET), 1)
-VS_FLAGS=--platform windows -p vs_4_0 -O 3
-FS_FLAGS=--platform windows -p ps_4_0 -O 3
-CS_FLAGS=--platform windows -p cs_5_0 -O 1
-SHADER_PATH=shaders/dx11
+VS_FLAGS=--platform windows -p vs_4_0 -O 3 --debug
+FS_FLAGS=--platform windows -p ps_4_0 -O 3 --debug
+CS_FLAGS=--platform windows -p cs_5_0 -O 1 --debug
+SHADER_PATH=bgfx/shaders/dx11
 else
 ifeq ($(TARGET), 2)
 VS_FLAGS=--platform nacl
 FS_FLAGS=--platform nacl
-SHADER_PATH=shaders/gles
+SHADER_PATH=bgfx/shaders/gles
 else
 ifeq ($(TARGET), 3)
 VS_FLAGS=--platform android
 FS_FLAGS=--platform android
 CS_FLAGS=--platform android
-SHADER_PATH=shaders/gles
+SHADER_PATH=bgfx/shaders/gles
 else
 ifeq ($(TARGET), 4)
 VS_FLAGS=--platform linux -p 120
 FS_FLAGS=--platform linux -p 120
 CS_FLAGS=--platform linux -p 430
-SHADER_PATH=shaders/glsl
+SHADER_PATH=bgfx/shaders/glsl
 else
 ifeq ($(TARGET), 5)
 VS_FLAGS=--platform osx -p metal
 FS_FLAGS=--platform osx -p metal
 CS_FLAGS=--platform osx -p metal
-SHADER_PATH=shaders/metal
+SHADER_PATH=bgfx/shaders/metal
 endif
 endif
 endif

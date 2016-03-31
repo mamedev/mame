@@ -156,26 +156,27 @@ public:
 	int first_file()
 	{
 		m_cd_pos = 0;
-		return search(0, std::string(), false, false);
+		return search(0, std::string(), false, false, false);
 	}
 	int next_file()
 	{
-		return search(0, std::string(), false, false);
+		return search(0, std::string(), false, false, false);
 	}
+
 	int search(std::uint32_t crc)
 	{
 		m_cd_pos = 0;
-		return search(crc, std::string(), true, false);
+		return search(crc, std::string(), true, false, false);
 	}
-	int search(const std::string &filename)
+	int search(const std::string &filename, bool partialpath)
 	{
 		m_cd_pos = 0;
-		return search(0, filename, false, true);
+		return search(0, filename, false, true, partialpath);
 	}
-	int search(std::uint32_t crc, const std::string &filename)
+	int search(std::uint32_t crc, const std::string &filename, bool partialpath)
 	{
 		m_cd_pos = 0;
-		return search(crc, filename, true, true);
+		return search(crc, filename, true, true, partialpath);
 	}
 
 	bool current_is_directory() const { return m_curr_is_dir; }
@@ -191,7 +192,7 @@ private:
 	zip_file_impl &operator=(const zip_file_impl &) = delete;
 	zip_file_impl &operator=(zip_file_impl &&) = delete;
 
-	int search(std::uint32_t search_crc, const std::string &search_filename, bool matchcrc, bool matchname);
+	int search(std::uint32_t search_crc, const std::string &search_filename, bool matchcrc, bool matchname, bool partialpath);
 
 	archive_file::error reopen()
 	{
@@ -281,9 +282,18 @@ public:
 	virtual int first_file() override { return m_impl->first_file(); }
 	virtual int next_file() override { return m_impl->next_file(); }
 
-	virtual int search(std::uint32_t crc) override { return m_impl->search(crc); }
-	virtual int search(const std::string &filename) override { return m_impl->search(filename); }
-	virtual int search(std::uint32_t crc, const std::string &filename) override { return m_impl->search(crc, filename); }
+	virtual int search(std::uint32_t crc) override
+	{
+		return m_impl->search(crc);
+	}
+	virtual int search(const std::string &filename, bool partialpath) override
+	{
+		return m_impl->search(filename, partialpath);
+	}
+	virtual int search(std::uint32_t crc, const std::string &filename, bool partialpath) override
+	{
+		return m_impl->search(crc, filename, partialpath);
+	}
 
 	virtual bool current_is_directory() const override { return m_impl->current_is_directory(); }
 	virtual const std::string &current_name() const override { return m_impl->current_name(); }
@@ -396,11 +406,11 @@ void zip_file_impl::close(ptr &&zip)
     in the ZIP
 -------------------------------------------------*/
 
-int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_filename, bool matchcrc, bool matchname)
+int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_filename, bool matchcrc, bool matchname, bool partialpath)
 {
 	// if we're at or past the end, we're done
 	std::string filename;
-	while (m_cd_pos <= m_ecd.cd_size)
+	while ((m_cd_pos + ZIPCFN) <= m_ecd.cd_size)
 	{
 		// extract file header info
 		std::uint8_t const *const raw = &m_cd[0] + m_cd_pos;
@@ -437,7 +447,11 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 
 		// check to see if it matches query
 		bool const crcmatch(search_crc == m_header.crc);
-		const bool namematch(!core_stricmp(search_filename.c_str(), filename.c_str()));
+		auto const partialoffset(filename.length() - search_filename.length());
+		bool const partialpossible((filename.length() > search_filename.length()) && (filename[partialoffset - 1] == '/'));
+		const bool namematch(
+				!core_stricmp(search_filename.c_str(), filename.c_str()) ||
+				(partialpath && partialpossible && !core_stricmp(search_filename.c_str(), filename.c_str() + partialoffset)));
 
 		bool const found = ((!matchcrc && !matchname) || !is_dir) && (!matchcrc || crcmatch) && (!matchname || namematch);
 		if (found)

@@ -1,5 +1,6 @@
 *~
 .*.sw?
+*.mo
 *.pyc
 *.pyo
 .DS_Store
@@ -7,6 +8,7 @@
 /*
 /*/
 !/3rdparty/
+!/android-project/
 !/benchmarks/
 !/artwork/
 !/bgfx/
@@ -31,11 +33,11 @@
 !/makefile
 !/mame.doxygen
 !/*.md
+!/*.bdf
 !/LICENSE
 /.idea
 regtests/chdman/temp
 regtests/jedutil/output
-*.mo
 /CMakeLists.txt
 /src/devices/cpu/m68000/m68kops.cpp
 /src/devices/cpu/m68000/m68kops.h

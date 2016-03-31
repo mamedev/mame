@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- this is NOT Wonderswan based hardware (should be connected to a new driver instead) -->
+
+<softwarelist name="pockchalv1" description="Pocket Challenge V1 cartridges">
+
+	<!-- *K : Chuugaku Koumin -->
+
+	<software name="chuukoum" supported="no" >
+		<description>Chuugaku Koumin (1K - 0BE311)</description>
+		<year>2000?</year>
+		<publisher>Benesse Corporation</publisher>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="0BE311.bin" size="0x100000" crc="bf9da3ea" sha1="423266d16f6fecc367223c45658e3802176f1f7a" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
+

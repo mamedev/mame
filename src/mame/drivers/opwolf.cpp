@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:David Graves, Jarek Burczynski
+// copyright-holders:David Graves, Jarek Burczynski,Stephane Humbert
 // thanks-to:Richard Bush
 /****************************************************************************
 
@@ -317,18 +317,8 @@ READ16_MEMBER(opwolf_state::opwolf_dsw_r)
 
 READ16_MEMBER(opwolf_state::opwolf_lightgun_r)
 {
-	int scaled;
-
-	switch (offset)
-	{
-		case 0x00:  /* P1X - Have to remap 8 bit input value, into 0-319 visible range */
-			scaled = (ioport(P1X_PORT_TAG)->read() * 320 ) / 256;
-			return (scaled + 0x15 + m_opwolf_gun_xoffs);
-		case 0x01:  /* P1Y */
-			return (ioport(P1Y_PORT_TAG)->read() - 0x24 + m_opwolf_gun_yoffs);
-	}
-
-	return 0xff;
+	static const char *const dswname[2] = { "IN2", "IN3" };
+	return ioport(dswname[offset])->read();
 }
 
 READ8_MEMBER(opwolf_state::z80_input1_r)
@@ -389,6 +379,25 @@ static ADDRESS_MAP_START( opwolfb_map, AS_PROGRAM, 16, opwolf_state )
 	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)          /* dip switches */
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(opwolf_spritectrl_w)  // usually 0x4, changes when you fire
 	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)     /* lightgun, read at $11e0/6 */
+	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP                    /* watchdog ?? */
+	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
+	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
+	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_device, word_r, word_w)
+	AM_RANGE(0xc10000, 0xc1ffff) AM_WRITEONLY                   /* error in init code (?) */
+	AM_RANGE(0xc20000, 0xc20003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
+	AM_RANGE(0xc40000, 0xc40003) AM_DEVWRITE("pc080sn", pc080sn_device, xscroll_word_w)
+	AM_RANGE(0xc50000, 0xc50003) AM_DEVWRITE("pc080sn", pc080sn_device, ctrl_word_w)
+	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)  /* sprite ram */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( opwolfp_map, AS_PROGRAM, 16, opwolf_state )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x100000, 0x107fff) AM_RAM
+	
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)          /* dip switches */
+	AM_RANGE(0x380000, 0x380003) AM_WRITE(opwolf_spritectrl_w)  // usually 0x4, changes when you fire
+	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)     /* lightgun, read at $11e0/6 (AND INPUTS) */
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP                    /* watchdog ?? */
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
@@ -551,6 +560,21 @@ ADDRESS_MAP_END
              INPUT PORTS, DIPs
 ***********************************************************/
 
+
+CUSTOM_INPUT_MEMBER(opwolf_state::opwolf_gun_x_r )
+{
+  /* P1X - Have to remap 8 bit input value, into 0-319 visible range */
+	int scaled = (ioport(P1X_PORT_TAG)->read() * 320 ) / 256;
+	return (scaled + 0x15 + m_opwolf_gun_xoffs);
+}
+
+CUSTOM_INPUT_MEMBER(opwolf_state::opwolf_gun_y_r )
+{
+	return (ioport(P1Y_PORT_TAG)->read() - 0x24 + m_opwolf_gun_yoffs);
+}
+
+
+
 static INPUT_PORTS_START( opwolf )
 	/* 0x380000 -> 0x0ff028 (-$fd8,A5) (C-chip) */
 	PORT_START("DSWA")
@@ -601,14 +625,65 @@ static INPUT_PORTS_START( opwolf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	/* P1X (span allows you to shoot enemies behind status bar) */
-	PORT_START(P1X_PORT_TAG)
+	
+	PORT_START("IN2")
+	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, opwolf_state, opwolf_gun_x_r, NULL)
+	PORT_BIT( 0xfe00, IP_ACTIVE_LOW,  IPT_UNUSED )
+	
+	PORT_START("IN3")
+	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, opwolf_state, opwolf_gun_y_r, NULL)
+	PORT_BIT( 0xfe00, IP_ACTIVE_LOW,  IPT_UNUSED )
+
+	PORT_START(P1X_PORT_TAG)  /* P1X (span allows you to shoot enemies behind status bar) */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	/* P1Y (span allows you to be slightly offscreen) */
-	PORT_START(P1Y_PORT_TAG)
+	PORT_START(P1Y_PORT_TAG)  /* P1Y (span allows you to be slightly offscreen) */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+
+
 INPUT_PORTS_END
+
+
+
+static INPUT_PORTS_START( opwolfp )
+	PORT_INCLUDE( opwolf )
+
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
+
+
+
+	PORT_MODIFY("IN2")
+	/* 0x0000 - 0x01ff is GUNX */
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_BUTTON1 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_BUTTON2 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE1 )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_TILT )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_START1 )
+	PORT_BIT( 0xc000, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("IN3")
+	/* 0x0000 - 0x01ff is GUNY */
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0xf800, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x10, 0x10, "Display Hit Percentage (Cheat)" ) PORT_DIPLOCATION("SW2:5") // probably a cheat / debug feature as it's not in the final game
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "Infinite Health (Cheat)" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(    0x00, "English (invalid)" ) // game hangs on course screen (confirmed on hardware)
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( opwolfu )
 	PORT_INCLUDE( opwolf )
@@ -749,6 +824,15 @@ static MACHINE_CONFIG_START( opwolf, opwolf_state )
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( opwolfp, opwolf )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu") /* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(opwolfp_map)
+MACHINE_CONFIG_END
+
 
 
 static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for the bootleg, but changed to match original sets */
@@ -906,6 +990,33 @@ ROM_START( opwolfu ) /* Taito TC0030 C-Chip labeled B20-18 (yes, it has a specif
 	ROM_LOAD( "b20-08.21",  0x00000, 0x80000, CRC(f3e19c64) SHA1(39d48645f776c9c2ade537d959ecc6f9dc6dfa1b) )
 ROM_END
 
+/*
+Prototype board
+There is no C-CHIP and TC0070RGB module is replaced by three PC040DA DAC, 68000 CPU is socketed as well as RAMs, the PGA customs and YM2151, YM3012 and PC060HA on sound board.
+Labels on the 68k and Z80 roms are handwritten with checksums, GFX roms are the final MASK roms.
+*/
+
+ROM_START( opwolfp )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
+	ROM_LOAD16_BYTE( "ic40",     0x00000, 0x10000, CRC(81f56008) SHA1(8ff02c088ef325a1920b29651672bad2d2d2a7a2) )
+	ROM_LOAD16_BYTE( "ic30",     0x00001, 0x10000, CRC(d90cebb2) SHA1(c36070c20dfad0e1c56c4ac016a115e9e9601ecb) )
+	ROM_LOAD16_BYTE( "ic39",     0x20000, 0x10000, CRC(aeef5cfc) SHA1(3c75d1df80db6ae2d690fdf23b3c44b21056d24a) )
+	ROM_LOAD16_BYTE( "ic29",     0x20001, 0x10000, CRC(5ce89249) SHA1(be22fd57e29114cde66cf4339c26740b3e0f830f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
+	ROM_LOAD( "ic10",  0x00000, 0x10000, CRC(684b40dd) SHA1(0546e01cf2c76b9c60730a14835cdeaaec21d26f) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "b20-06.ic72",  0x00000, 0x80000, CRC(89f889e5) SHA1(1592f6ce4fbb75e33d6ab957e5b90242a7a7a8c4) )    /* Sprites (16 x 16) */ // same content as b20-14.72 despite different label (confirmed)
+
+	ROM_REGION( 0x80000, "adpcm", 0 )   /* ADPCM samples */
+	ROM_LOAD( "b20-08.21",  0x00000, 0x80000, CRC(f3e19c64) SHA1(39d48645f776c9c2ade537d959ecc6f9dc6dfa1b) )
+ROM_END
+
+
 ROM_START( opwolfb )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "opwlfb.12",  0x00000, 0x10000, CRC(d87e4405) SHA1(de8a7763acd57293fbbff609e949ecd66c0f9234) )
@@ -980,10 +1091,24 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolfb)
 	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
+DRIVER_INIT_MEMBER(opwolf_state,opwolfp)
+{
+	UINT16* rom = (UINT16*)memregion("maincpu")->base();
+
+	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
+
+	m_opwolf_gun_xoffs = 5;
+	m_opwolf_gun_yoffs = 30;
+
+	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+}
+
+
 
 /*    year  rom       parent    machine   inp       init */
-GAME( 1987, opwolf,   0,        opwolf,   opwolf, opwolf_state,   opwolf,   ROT0, "Taito Corporation Japan", "Operation Wolf (World, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf, opwolf_state,   opwolf,   ROT0, "Taito Corporation Japan", "Operation Wolf (World, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,   opwolf,   ROT0, "Taito Corporation", "Operation Wolf (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan", "Operation Wolf (World, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan", "Operation Wolf (World, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito Corporation", "Operation Wolf (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito America Corporation", "Operation Wolf (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, opwolfb,  opwolf,   opwolfb,  opwolfb, opwolf_state,  opwolfb,  ROT0, "bootleg (Bear Corporation Korea)", "Operation Bear (bootleg of Operation Wolf)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfp,  opwolf,   opwolfp,  opwolfp, opwolf_state,  opwolfp,  ROT0, "Taito Corporation", "Operation Wolf (Japan, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected

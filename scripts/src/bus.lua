@@ -1445,6 +1445,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/ramcard128k.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ezcgi.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/ezcgi.h",
+		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.h",
 	}
 end
 
@@ -2601,6 +2603,10 @@ if (BUSES["SVI_EXPANDER"]~=null) then
 		MAME_DIR .. "src/devices/bus/svi3x8/expander/modules.h",
 		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv601.cpp",
 		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv601.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv602.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv602.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv603.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv603.h",
 	}
 end
 
@@ -2617,6 +2623,8 @@ if (BUSES["SVI_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/svi3x8/slot/cards.h",
 		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv801.cpp",
 		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv801.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv802.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv802.h",
 		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv803.cpp",
 		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv803.h",
 		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv805.cpp",

@@ -47,7 +47,6 @@ public:
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 private:
 	required_device<svi_slot_bus_device> m_slotbus;

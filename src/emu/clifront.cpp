@@ -1630,6 +1630,21 @@ void cli_frontend::execute_commands(const char *exename)
 
 		// generate the updated INI
 		file_ui.puts(ui_opts.output_ini().c_str());
+
+		plugin_options plugin_opts;
+		path_iterator iter(m_options.plugins_path());
+		std::string pluginpath;
+		while (iter.next(pluginpath))
+		{
+			plugin_opts.parse_json(pluginpath);
+		}
+		emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		if (file_plugin.open("plugin.ini") != osd_file::error::NONE)
+			throw emu_fatalerror("Unable to create file plugin.ini\n");
+
+		// generate the updated INI
+		file_plugin.puts(plugin_opts.output_ini().c_str());
+
 		return;
 	}
 

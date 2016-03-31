@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mariusz Wojcieszek, Stephh
+// copyright-holders:Mariusz Wojcieszek
 /****************************************************************************
 
     TourVision
@@ -92,13 +92,12 @@
     USA Pro Basketball
     Veigues
   * Vigilante
-  # Volfied
+    Volfied
     W-Ring
     Winning Shot
     Xevious
 
 * Denotes Not Dumped
-# Denotes Redump Needed
 
  _______________________________________________________________________________________________________________________________________________
 |                                                                                                                                               |
@@ -1008,7 +1007,7 @@ ROM_END
 /* Volfied - Taito */
 ROM_START(tvvolfd)
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "tourv_volfd.bin", 0x00000, 0x100000, BAD_DUMP CRC(c33efba5) SHA1(41ad4f85e551321487be61e2adbeae67e65c47de) )
+	ROM_LOAD( "tourv_volfd.bin", 0x00000, 0x100000, CRC(6349113d) SHA1(b413342122409ea4ed981bd5077285cdcf337890) )
 
 	TOURVISION_BIOS
 ROM_END

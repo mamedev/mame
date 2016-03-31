@@ -574,6 +574,19 @@ void tms9901_device::device_stop(void)
 
 void tms9901_device::device_reset(void)
 {
+	do_reset();
+}
+
+/*
+    RST1 input line (active low; using ASSERT/CLEAR).
+*/
+WRITE_LINE_MEMBER( tms9901_device::rst1_line )
+{
+	if (state==ASSERT_LINE) do_reset();
+}
+
+void tms9901_device::do_reset()
+{
 	m_timer_int_pending = false;
 	m_enabled_ints = 0;
 

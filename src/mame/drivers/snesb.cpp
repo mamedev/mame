@@ -1,5 +1,5 @@
 // license:LGPL-2.1+
-// copyright-holders:Tomasz Slanina, Peter Ferrie
+// copyright-holders:Tomasz Slanina, Peter Ferrie,Stephane Humbert
 /***************************************************************************
 
  Arcade games (hacks of console games) running on SNES harware.

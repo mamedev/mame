@@ -322,7 +322,7 @@ rumbling on a subwoofer in the cabinet.)
 #include "includes/taitoipt.h"
 #include "includes/ninjaw.h"
 
-extern const char layout_darius[];
+extern const internal_layout layout_darius;
 
 void ninjaw_state::parse_control(  )   /* assumes Z80 sandwiched between 68Ks */
 {

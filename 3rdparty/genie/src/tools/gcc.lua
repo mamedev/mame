@@ -193,7 +193,35 @@
 		return result
 	end
 
+--
+-- Given a path, return true if it's considered a real path
+-- to a library file, false otherwise.
+--  p: path
+--
+	function premake.gcc.islibfile(p)
+		if path.getextension(p) == ".a" then
+			return true
+		end
+		return false
+	end
 
+--
+-- Returns a list of project-relative paths to external library files.
+-- This function examines the linker flags and returns any that seem to be
+-- a real path to a library file (e.g. "path/to/a/library.a", but not "GL").
+-- Useful for adding to targets to trigger a relink when an external static
+-- library gets updated.
+--  cfg: configuration
+--
+	function premake.gcc.getlibfiles(cfg)
+		local result = {}
+		for _, value in ipairs(premake.getlinks(cfg, "system", "fullpath")) do
+			if premake.gcc.islibfile(value) then
+				table.insert(result, _MAKE.esc(value))
+			end
+		end
+		return result
+	end
 
 --
 -- This is poorly named: returns a list of linker flags for external
@@ -203,17 +231,17 @@
 
 	function premake.gcc.getlinkflags(cfg)
 		local result = {}
-		for _, value in ipairs(premake.getlinks(cfg, "system", "name")) do
-			if path.getextension(value) == ".framework" then
+		for _, value in ipairs(premake.getlinks(cfg, "system", "fullpath")) do
+			if premake.gcc.islibfile(value) then
+				table.insert(result, _MAKE.esc(value))
+			elseif path.getextension(value) == ".framework" then
 				table.insert(result, '-framework ' .. _MAKE.esc(path.getbasename(value)))
 			else
-				table.insert(result, '-l' .. _MAKE.esc(value))
+				table.insert(result, '-l' .. _MAKE.esc(path.getname(value)))
 			end
 		end
 		return result
 	end
-
-
 
 --
 -- Get flags for passing to AR before the target is appended to the commandline

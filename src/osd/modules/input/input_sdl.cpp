@@ -192,13 +192,13 @@ public:
 	{
 		memset(&mouse, 0, sizeof(mouse));
 	}
-    
-    void poll() override
-    {
-        mouse.lX = 0;
-        mouse.lY = 0;
-        sdl_device::poll();
-    }
+
+	void poll() override
+	{
+		mouse.lX = 0;
+		mouse.lY = 0;
+		sdl_device::poll();
+	}
 
 	virtual void process_event(SDL_Event &sdlevent) override
 	{
@@ -303,7 +303,7 @@ public:
 	sdl_joystick_device(running_machine &machine, const char *name, input_module &module)
 		: sdl_device(machine, name, DEVICE_CLASS_JOYSTICK, module),
 			joystick({{0}}),
-		    sdl_state({0})
+			sdl_state({0})
 	{
 	}
 
@@ -372,7 +372,7 @@ public:
 
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
-		    joystick.buttons[sdlevent.jbutton.button] = (sdlevent.jbutton.state == SDL_PRESSED) ? 0x80 : 0;
+			joystick.buttons[sdlevent.jbutton.button] = (sdlevent.jbutton.state == SDL_PRESSED) ? 0x80 : 0;
 			break;
 		}
 	}
@@ -433,6 +433,14 @@ public:
 			osd_printf_warning("Debug Build: Disabling input grab for -debug\n");
 			set_mouse_enabled(false);
 		}
+	}
+
+	void exit() override
+	{
+		// unsubscribe for events
+		sdl_event_manager::instance().unsubscribe(this);
+
+		input_module_base::exit();
 	}
 
 	void before_poll(running_machine& machine) override
@@ -688,7 +696,7 @@ public:
 		int physical_stick;
 		for (physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
 		{
-		    if (SDL_IsGameController(physical_stick)) {
+			if (SDL_IsGameController(physical_stick)) {
 				osd_printf_verbose("Joystick %i is supported by the game controller interface!\n", physical_stick);
 				osd_printf_verbose("Compatible controller, named \'%s\'\n", SDL_GameControllerNameForIndex(physical_stick));
 				SDL_GameController  *joy = SDL_GameControllerOpen(physical_stick);
@@ -804,7 +812,7 @@ public:
 		for (int i = 0; i < devicelist()->size(); i++)
 		{
 			auto joy = downcast<sdl_joystick_device*>(devicelist()->at(i));
-			
+
 			// If we find a matching joystick, dispatch the event to the joystick
 			if (joy->sdl_state.joystick_id == sdlevent.jdevice.which)
 				joy->queue_events(&sdlevent, 1);

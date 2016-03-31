@@ -17,27 +17,28 @@
 
 #include <string>
 
-#include "emu.h"
-
 class bgfx_parameter
 {
 public:
 	enum parameter_type
 	{
-		PARAM_FRAME_MASK
+		PARAM_FRAME,
+		PARAM_WINDOW,
+		PARAM_TIME
 	};
 
-	bgfx_parameter(std::string name, parameter_type type, int period);
-	~bgfx_parameter();
+	bgfx_parameter(std::string name, parameter_type type) : m_name(name), m_type(type) { }
+	virtual ~bgfx_parameter() { }
 
-	void frame();
-	bool active();
+	virtual void tick(double delta) = 0;
 
-private:
+	// Getters
+	virtual float value() = 0;
+	std::string name() const { return m_name; }
+
+protected:
 	std::string m_name;
 	parameter_type m_type;
-	UINT32 m_period;
-	UINT32 m_frame;
 };
 
 #endif // __DRAWBGFX_PARAMETER__

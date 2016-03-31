@@ -14,7 +14,7 @@
      <there are probably others I've missed>
 
  * History of the machine can be found at http://freudenbergs.de/bert/publications/Ingalls-2014-Smalltalk78.pdf
- 
+
  * The notetaker has an 8-slot backplane, with the following cards in it:
    * I/O Processor card (8086@8Mhz, 8259pic, 4k ROM, Keyboard UART, DAC1200 (multiplexed to 2 channels))
    * Emulation Processor card (8086@5Mhz, 8259pic, 4k of local RAM with Parity check logic)
@@ -34,7 +34,7 @@
  * As far as I am aware, no media (world disks/boot disks) for the NoteTaker have survived (except maybe the two disks at Xerox Museum at PARC), but an incomplete dump of the Smalltalk-76 'world' which was used to bootstrap Smalltalk-78 originally did survive on the Alto disks at CHM
 
  * We are missing the dump for the i8748 Keyboard MCU which does row-column scanning and mouse quadrature reading, and talks to the main system via serial
- 
+
  * see http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker for additional information
  * see http://xeroxalto.computerhistory.org/Filene/Smalltalk-76/ for the smalltalk-76 dump
  * see http://xeroxalto.computerhistory.org/Indigo/BasicDisks/Smalltalk14.bfs!1_/ for more notetaker/smalltalk related files, including SmallTalk-80 files based on the notetaker smalltalk-78
@@ -56,9 +56,10 @@ TODO: everything below.
 * floppy controller wd1791 and its interrupt
   According to [3] and [5] the format is double density/MFM, 128 bytes per sector, 16 sectors per track, 1 or 2 sided, for 170K or 340K per disk. Drive spins at 300RPM.
 * According to the schematics, we're missing an 82s147 DISKSEP.PROM used as a data separator
+* hook up the DiskInt from the wd1791 either using m_fdc->intrq_r() polling or using device lines (latter is a much better idea)
 
 WIP:
-* crt5027 video controller - the iocpu side is hooked up, but crashes due to a bug in the crt5027/tms9927 code. the actual drawing to screen part is not connected anywhere yet.
+* crt5027 video controller - the iocpu side is hooked up, screen drawing 'works' but is scrambled due to not emulating the clock chain halting and clock changing yet. The crt5027 core also needs the odd/even interrupt hooked up, and proper interlace support as well as clock change/screen resize support (down to DC/no clock, which I guess should be a 1x1 single black pixel!)
 * pic8259 interrupt controller - this is attached as a device, but only the vblank interrupt is hooked to it yet.
 * Harris 6402 serial/EIA UART - connected to iocpu, other end isn't connected anywhere, interrupt is not connected
 * Harris 6402 keyboard UART (within notetaker) - connected to iocpu, other end isn't connected anywhere, interrupt is not connected
@@ -630,7 +631,7 @@ irq7    VSync   (interrupt from the VSYN VSync pin from the crt5027)
 0xf2 to port 0x142 (reg1 interlaced, hswidth=0xE, hsdelay=2) \
 0x7d to port 0x144 (reg2 16 scans/row, 5 chars/datarow)       \
 0x1d to port 0x146 (reg3 0 skew bits, 0x1D datarows/frame)     \_ set up CRTC
-0x04 to port 0x148 (reg4 4 scan lines/frame                    /
+0x04 to port 0x148 (reg4 4 scan lines/frame)                   /
 0x10 to port 0x14a (reg5 0x10 vdatastart)                     /
 0x00 to port 0x154 (reset the crtc)                          /
 0x1e to port 0x15a (reg8 load cursor line address = 0x1e)   /
@@ -655,19 +656,19 @@ read from 0x44 (byte wide) to check input fifo status
 /* Emulator CPU */
 /*
 static ADDRESS_MAP_START(notetaker_emulatorcpu_mem, AS_PROGRAM, 16, notetaker_state)
-	AM_RANGE(0x00000, 0x01fff) AM_MIRROR(0xC0000) AM_RAM // actually a banked block of ram, 8k (4k words)
-	AM_RANGE(0x02000, 0x3ffff) AM_MIRROR(0xC0000) AM_RAM AM_BASE("mainram") // 256k of ram (less 8k), shared between both processors, mirrored 4 times
-	AM_RANGE(0xFFFC0, 0xFFFDF) AM_READWRITE(proc_illinst_r, proc_illinst_w)
-	AM_RANGE(0xFFFE0, 0xFFFEF) AM_READWRITE(proc_control_r, proc_control_w)
+    AM_RANGE(0x00000, 0x01fff) AM_MIRROR(0xC0000) AM_RAM // actually a banked block of ram, 8k (4k words)
+    AM_RANGE(0x02000, 0x3ffff) AM_MIRROR(0xC0000) AM_RAM AM_BASE("mainram") // 256k of ram (less 8k), shared between both processors, mirrored 4 times
+    AM_RANGE(0xFFFC0, 0xFFFDF) AM_READWRITE(proc_illinst_r, proc_illinst_w)
+    AM_RANGE(0xFFFE0, 0xFFFEF) AM_READWRITE(proc_control_r, proc_control_w)
 ADDRESS_MAP_END
 
 // note everything in the emulatorcpu's io range is incompletely decoded; so if 0x1800 is accessed it will write to both the debug 8255 AND the pic8259! I'm not sure the code abuses this or not, but it might do so to both write registers and clear parity at once, or something similar.
 static ADDRESS_MAP_START(notetaker_emulatorcpu_io, AS_IO, 16, notetaker_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x800, 0x803) AM_MIRROR(0x07FC) AM_DEVREADWRITE8("emupic8259", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x07FE) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255, is this the same one as the iocpu accesses? or are these two 8255s on separate cards?
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07FE) AM_WRITE(EPConReg_w) // emu processor control reg & leds
-	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x07FE) AM_WRITE(EmuClearParity_w) // writes here clear the local 8k-ram parity error register
+    ADDRESS_MAP_UNMAP_HIGH
+    AM_RANGE(0x800, 0x803) AM_MIRROR(0x07FC) AM_DEVREADWRITE8("emupic8259", pic8259_device, read, write, 0x00ff)
+    AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x07FE) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255, is this the same one as the iocpu accesses? or are these two 8255s on separate cards?
+    AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07FE) AM_WRITE(EPConReg_w) // emu processor control reg & leds
+    AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x07FE) AM_WRITE(EmuClearParity_w) // writes here clear the local 8k-ram parity error register
 ADDRESS_MAP_END
 */
 

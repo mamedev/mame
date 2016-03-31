@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia, David Haywood
+// copyright-holders:Luca Elia, David Haywood,Stephane Humbert
 /* Kaneko 'Calc' hitbox collision / protection
 
    It is thought that this is done by the 'CALC1' 'TOYBOX' and 'CALC3' protection chips found on the various boards

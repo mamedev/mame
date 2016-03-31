@@ -125,40 +125,8 @@ VIDEO_START_MEMBER(mcr3_state,spyhunt)
 	save_item(NAME(m_spyhunt_scroll_offset));
 }
 
-VIDEO_START_MEMBER(mcr3_state,spyhuntpr)
-{
-	/* initialize the background tilemap */
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(mcr3_state::spyhunt_bg_scan),this),  64,16, 64,32);
-
-	/* initialize the text tilemap */
-	m_alpha_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_alpha_tile_info),this), TILEMAP_SCAN_COLS,  16,8, 32,32);
-	m_alpha_tilemap->set_transparent_pen(0);
-	m_alpha_tilemap->set_scrollx(0, 16);
-
-	save_item(NAME(m_spyhunt_sprite_color_mask));
-	save_item(NAME(m_spyhunt_scrollx));
-	save_item(NAME(m_spyhunt_scrolly));
-	save_item(NAME(m_spyhunt_scroll_offset));
-}
 
 
-/*************************************
- *
- *  Palette RAM writes
- *
- *************************************/
-
-WRITE8_MEMBER(mcr3_state::spyhuntpr_paletteram_w)
-{
-	m_paletteram[offset] = data;
-	offset = (offset & 0x0f) | (offset & 0x60) >> 1;
-
-	int r = (data & 0x07) >> 0;
-	int g = (data & 0x38) >> 3;
-	int b = (data & 0xc0) >> 6;
-
-	m_palette->set_pen_color(offset^0xf, rgb_t(r<<5,g<<5,b<<6));
-}
 
 
 /*************************************
@@ -320,23 +288,6 @@ UINT32 mcr3_state::screen_update_spyhunt(screen_device &screen, bitmap_ind16 &bi
 
 	/* draw the sprites */
 	mcr3_update_sprites(screen, bitmap, cliprect, m_spyhunt_sprite_color_mask, 0, -12, 0, 1);
-
-	/* render any characters on top */
-	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	return 0;
-}
-
-
-UINT32 mcr3_state::screen_update_spyhuntpr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	/* for every character in the Video RAM, check if it has been modified */
-	/* since last time and update it accordingly. */
-	m_bg_tilemap->set_scrollx(0, m_spyhunt_scrollx * 2 + m_spyhunt_scroll_offset);
-	m_bg_tilemap->set_scrolly(0, m_spyhunt_scrolly * 2);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-	/* draw the sprites */
-	mcr3_update_sprites(screen, bitmap, cliprect, m_spyhunt_sprite_color_mask, 0, -12, 0, 0);
 
 	/* render any characters on top */
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);

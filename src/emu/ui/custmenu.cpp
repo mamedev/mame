@@ -22,10 +22,11 @@
 //-------------------------------------------------
 //  ctor / dtor
 //-------------------------------------------------
-ui_menu_custom_filter::ui_menu_custom_filter(running_machine &machine, render_container *container, bool _single_menu) : ui_menu(machine, container)
+ui_menu_custom_filter::ui_menu_custom_filter(running_machine &machine, render_container *container, bool _single_menu)
+	: ui_menu(machine, container)
+	, m_single_menu(_single_menu)
+	, m_added(false)
 {
-	m_single_menu = _single_menu;
-	m_added = false;
 }
 
 ui_menu_custom_filter::~ui_menu_custom_filter()
@@ -208,7 +209,7 @@ void ui_menu_custom_filter::custom_render(void *selectedref, float top, float bo
 
 	// get the size of the text
 	mui.draw_text_full(container, _("Select custom filters:"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	float maxwidth = MAX(width, origx2 - origx1);
 
@@ -228,7 +229,7 @@ void ui_menu_custom_filter::custom_render(void *selectedref, float top, float bo
 
 	// draw the text within it
 	mui.draw_text_full(container, _("Select custom filters:"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 //-------------------------------------------------
@@ -266,7 +267,10 @@ void ui_menu_custom_filter::save_custom_filters()
 //  ctor / dtor
 //-------------------------------------------------
 ui_menu_swcustom_filter::ui_menu_swcustom_filter(running_machine &machine, render_container *container, const game_driver *_driver, s_filter &_filter) :
-	ui_menu(machine, container), m_added(false), m_filter(_filter), m_driver(_driver)
+	ui_menu(machine, container)
+	, m_added(false)
+	, m_filter(_filter)
+	, m_driver(_driver)
 {
 }
 
@@ -521,7 +525,7 @@ void ui_menu_swcustom_filter::custom_render(void *selectedref, float top, float 
 
 	// get the size of the text
 	mui.draw_text_full(container, _("Select custom filters:"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	float maxwidth = MAX(width, origx2 - origx1);
 
@@ -541,7 +545,7 @@ void ui_menu_swcustom_filter::custom_render(void *selectedref, float top, float 
 
 	// draw the text within it
 	mui.draw_text_full(container, _("Select custom filters:"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 //-------------------------------------------------

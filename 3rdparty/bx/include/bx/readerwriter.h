@@ -77,7 +77,7 @@ namespace bx
 		return _reader->read(_data, _size, _err);
 	}
 
-	/// Write value.
+	/// Read value.
 	template<typename Ty>
 	inline int32_t read(ReaderI* _reader, Ty& _value, Error* _err = NULL)
 	{
@@ -206,6 +206,25 @@ namespace bx
 	struct BX_NO_VTABLE ReaderSeekerI : public ReaderI, public SeekerI
 	{
 	};
+
+	/// Peek data.
+	inline int32_t peek(ReaderSeekerI* _reader, void* _data, int32_t _size, Error* _err = NULL)
+	{
+		BX_ERROR_SCOPE(_err);
+		int64_t offset = bx::seek(_reader);
+		int32_t size = _reader->read(_data, _size, _err);
+		bx::seek(_reader, offset, bx::Whence::Begin);
+		return size;
+	}
+
+	/// Peek value.
+	template<typename Ty>
+	inline int32_t peek(ReaderSeekerI* _reader, Ty& _value, Error* _err = NULL)
+	{
+		BX_ERROR_SCOPE(_err);
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
+		return peek(_reader, &_value, sizeof(Ty), _err);
+	}
 
 	struct BX_NO_VTABLE WriterSeekerI : public WriterI, public SeekerI
 	{

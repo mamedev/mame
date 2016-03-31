@@ -88,7 +88,7 @@ protected:
 	virtual bool is_creatable() const override { return 0; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "coleco_cart"; }
+	virtual const char *image_interface() const override { return ":coleco_cart"; }
 	virtual const char *file_extensions() const override { return "rom,col,bin"; }
 	virtual const option_guide *create_option_guide() const override { return nullptr; }
 

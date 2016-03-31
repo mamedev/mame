@@ -38,7 +38,7 @@ void device_colecovision_cartridge_interface::rom_alloc(size_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc("coleco_cart:rom", size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(":coleco_cart:rom", size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }

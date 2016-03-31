@@ -14,24 +14,27 @@
 #ifndef __DRAWBGFX_INPUT_PAIR__
 #define __DRAWBGFX_INPUT_PAIR__
 
-#include <bgfx/bgfx.h>
-
 #include <string>
 
 class bgfx_effect;
-class bgfx_texture;
+class texture_manager;
+class target_manager;
 
 class bgfx_input_pair
 {
 public:
-	bgfx_input_pair(int index, std::string sampler, bgfx_texture* texture);
+	bgfx_input_pair(int index, std::string sampler, std::string texture);
 
-	void bind(bgfx_effect *effect);
+	void bind(bgfx_effect *effect, target_manager& targets, texture_manager& textures, const int32_t screen) const;
+
+	// Getters
+	std::string sampler() const { return m_sampler; }
+	std::string texture() const { return m_texture; }
 
 private:
-	int             m_index;
-	std::string     m_sampler;
-	bgfx_texture*   m_texture;
+	int         m_index;
+	std::string m_sampler;
+	std::string m_texture;
 };
 
 #endif // __DRAWBGFX_INPUT_PAIR__

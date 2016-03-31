@@ -21,7 +21,6 @@
 
 
 namespace util {
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -739,7 +738,7 @@ static osd_file::error zippath_resolve(const char *path, osd_dir_entry_type &ent
 	// is this file a ZIP file?
 	if ((current_entry_type == ENTTYPE_FILE) &&
 		((is_zip_file(apath_trimmed) && (archive_file::open_zip(apath_trimmed, zipfile) == archive_file::error::NONE)) ||
-		 (is_7z_file(apath_trimmed) && (archive_file::open_7z(apath_trimmed, zipfile) == archive_file::error::NONE))))
+			(is_7z_file(apath_trimmed) && (archive_file::open_7z(apath_trimmed, zipfile) == archive_file::error::NONE))))
 	{
 		auto i = strlen(path + apath.length());
 		while ((i > 0) && is_zip_path_separator(path[apath.length() + i - 1]))

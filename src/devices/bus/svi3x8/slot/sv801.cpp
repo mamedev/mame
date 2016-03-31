@@ -31,7 +31,7 @@ static SLOT_INTERFACE_START( svi_floppies )
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( sv801 )
-	MCFG_FD1793_ADD("fdc", XTAL_1MHz)
+	MCFG_FD1793_ADD("fdc", XTAL_8MHz / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(sv801_device, intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(sv801_device, drq_w))
 
@@ -72,6 +72,9 @@ sv801_device::sv801_device(const machine_config &mconfig, const char *tag, devic
 
 void sv801_device::device_start()
 {
+	// register for savestates
+	save_item(NAME(m_irq));
+	save_item(NAME(m_drq));
 }
 
 //-------------------------------------------------

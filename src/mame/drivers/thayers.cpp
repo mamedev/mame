@@ -100,7 +100,7 @@ protected:
 };
 
 
-extern const char layout_dlair[];
+extern const internal_layout layout_dlair;
 
 
 

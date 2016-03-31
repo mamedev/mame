@@ -22,7 +22,12 @@
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container *container, const game_driver *driver) : ui_menu(machine, container)
+ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container *container, const game_driver *driver)
+	: ui_menu(machine, container)
+	, m_actual(0)
+	, m_driver((driver == nullptr) ? &machine.system() : driver)
+	, m_issoft(false)
+
 {
 	image_interface_iterator iter(machine.root_device());
 	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
@@ -35,9 +40,6 @@ ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container 
 			m_parent = strensure(image->software_entry()->parentname());
 		}
 	}
-	m_driver = (driver == nullptr) ? &machine.system() : driver;
-	m_actual = 0;
-	m_issoft = false;
 
 	init_items();
 }
@@ -46,17 +48,18 @@ ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container 
 //  ctor
 //-------------------------------------------------
 
-ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container *container, ui_software_info *swinfo, const game_driver *driver) : ui_menu(machine, container)
-{
-	m_list = swinfo->listname;
-	m_short = swinfo->shortname;
-	m_long = swinfo->longname;
-	m_parent = swinfo->parentname;
-	m_driver = (driver == nullptr) ? &machine.system() : driver;
-	m_swinfo = swinfo;
-	m_actual = 0;
-	m_issoft = true;
+ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container *container, ui_software_info *swinfo, const game_driver *driver)
+	: ui_menu(machine, container)
+	, m_actual(0)
+	, m_driver((driver == nullptr) ? &machine.system() : driver)
+	, m_swinfo(swinfo)
+	, m_list(swinfo->listname)
+	, m_short(swinfo->shortname)
+	, m_long(swinfo->longname)
+	, m_parent(swinfo->parentname)
+	, m_issoft(true)
 
+{
 	if (machine.datfile().has_software(m_list, m_short, m_parent))
 		m_items_list.emplace_back(_("Software History"), UI_HISTORY_LOAD, machine.datfile().rev_history());
 	if (swinfo != nullptr && !swinfo->usage.empty())
@@ -109,7 +112,7 @@ void ui_menu_dats_view::populate()
 	item_append(MENU_SEPARATOR_ITEM, nullptr, (MENU_FLAG_UI_DATS | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), nullptr);
 	customtop = 2.0f * machine().ui().get_line_height() + 4.0f * UI_BOX_TB_BORDER;
 	custombottom = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-	
+
 	if (!paused)
 		machine().resume();
 }
@@ -177,14 +180,13 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 		x1 += space;
 		rgb_t fcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0x00) : UI_TEXT_COLOR;
 		rgb_t bcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0xff) : UI_TEXT_BG_COLOR;
-		mui.draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, JUSTIFY_LEFT, WRAP_NEVER,
-			DRAW_NONE, fcolor, bcolor, &width, nullptr);
+		mui.draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, JUSTIFY_LEFT, WRAP_NEVER, DRAW_NONE, fcolor, bcolor, &width, nullptr);
+
 		if (bcolor != UI_TEXT_BG_COLOR)
 			mui.draw_textured_box(container, x1 - (space / 2), y1, x1 + width + (space / 2), y2, bcolor, rgb_t(255, 43, 43, 43),
 				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
-		mui.draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, JUSTIFY_LEFT, WRAP_NEVER,
-			DRAW_NORMAL, fcolor, bcolor, &width, nullptr);
+		mui.draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, JUSTIFY_LEFT, WRAP_NEVER, DRAW_NORMAL, fcolor, bcolor, &width, nullptr);
 		x1 += width + space;
 		++x;
 	}
@@ -192,8 +194,7 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 	// bottom
 	std::string revision;
 	revision.assign(_("Revision: ")).append(m_items_list[m_actual].revision);
-	mui.draw_text_full(container, revision.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	mui.draw_text_full(container, revision.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(origx2 - origx1, width);
 
@@ -213,7 +214,7 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 
 	// draw the text within it
 	mui.draw_text_full(container, revision.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 //-------------------------------------------------
@@ -258,7 +259,6 @@ void ui_menu_dats_view::get_data_sw()
 	std::vector<int> xstart;
 	std::vector<int> xend;
 	std::string buffer;
-	std::vector<std::string> m_item;
 	if (m_items_list[m_actual].option == 0)
 		buffer = m_swinfo->usage;
 	else
@@ -290,6 +290,8 @@ void ui_menu_dats_view::init_items()
 		m_items_list.emplace_back(_("Sysinfo"), UI_SYSINFO_LOAD, datfile.rev_sysinfo());
 	if (datfile.has_story(m_driver))
 		m_items_list.emplace_back(_("Mamescore"), UI_STORY_LOAD, datfile.rev_storyinfo());
+	if (datfile.has_gameinit(m_driver))
+		m_items_list.emplace_back(_("Gameinit"), UI_GINIT_LOAD, datfile.rev_ginitinfo());
 	if (datfile.has_command(m_driver))
 		m_items_list.emplace_back(_("Command"), UI_COMMAND_LOAD, "");
 }

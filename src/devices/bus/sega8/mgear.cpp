@@ -4,13 +4,13 @@
 
  Master Gear Converter emulation
 
- ***********************************************************************************************************/
+ The Master Gear Converter, also known as Master Gear, Gear Master Converter
+ or (in Brazil) as Master Gear Adaptor, allows to plug western SMS cartridges
+ on the Game Gear, by enabling the SMS compatibility mode on the Game Gear
+ cartridge slot. Some SMS games have compatibility issues, confirmed on the
+ real hardware, when run on the Game Gear.
 
-// The Master Gear Converter, also known as Master Gear, Gear Master Converter
-// or (in Brazil) as Master Gear Adaptor, allows to plug western SMS cartridges
-// on the Game Gear, by enabling the SMS compatibility mode on the Game Gear
-// cartridge slot. Some SMS games have compatibility issues, confirmed on the
-// real hardware, when run on the Game Gear.
+ ***********************************************************************************************************/
 
 
 #include "emu.h"

@@ -99,7 +99,7 @@ void gt64xxx_device::device_reset()
 	m_reg[GREG_CS3_HI] = 0xfb;
 	m_reg[GREG_CSBOOT_LO] = 0xfc;
 	m_reg[GREG_CSBOOT_HI] = 0xff;
-	
+
 	m_reg[GREG_PCI_COMMAND] = m_be ? 0 : 1;
 
 	map_cpu_space();
@@ -167,13 +167,13 @@ void gt64xxx_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_
 
 	// PCI Target Window 1
 	if (m_cpu_regs[NREG_PCITW1]&0x1000) {
-		winStart = m_cpu_regs[NREG_PCITW1]&0xffe00000;
-		winEnd = winStart | (~(0xf0000000 | (((m_cpu_regs[NREG_PCITW1]>>13)&0x7f)<<21)));
-		winSize = winEnd - winStart + 1;
-		memory_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(gt64xxx_device::target1_r), this));
-		memory_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(gt64xxx_device::target1_w), this));
-		if (LOG_GALILEO)
-			logerror("%s: map_extra Target Window 1 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_target1_laddr);
+	    winStart = m_cpu_regs[NREG_PCITW1]&0xffe00000;
+	    winEnd = winStart | (~(0xf0000000 | (((m_cpu_regs[NREG_PCITW1]>>13)&0x7f)<<21)));
+	    winSize = winEnd - winStart + 1;
+	    memory_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(gt64xxx_device::target1_r), this));
+	    memory_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(gt64xxx_device::target1_w), this));
+	    if (LOG_GALILEO)
+	        logerror("%s: map_extra Target Window 1 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_target1_laddr);
 	}
 	*/
 }
@@ -279,9 +279,9 @@ READ32_MEMBER (gt64xxx_device::cpu_if_r)
 			break;
 
 		case GREG_CONFIG_DATA:
-			result = config_data_r(space, offset);			
+			result = config_data_r(space, offset);
 			break;
-	
+
 		case GREG_CONFIG_ADDRESS:
 			result = config_address_r(space, offset);
 			break;
@@ -299,7 +299,7 @@ READ32_MEMBER (gt64xxx_device::cpu_if_r)
 	}
 
 	if (m_be) result =  FLIPENDIAN_INT32(result);
-		
+
 	return result;
 }
 

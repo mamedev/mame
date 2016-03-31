@@ -22,7 +22,7 @@
 #if defined(__FreeBSD__) || defined(__DragonFly__)
 #include <termios.h>
 #include <libutil.h>
-#elif defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
+#elif defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__) || defined(__ANDROID__)
 #include <termios.h>
 #include <util.h>
 #elif defined(__linux__) || defined(EMSCRIPTEN)
@@ -141,6 +141,9 @@ osd_file::error posix_open_ptty(std::uint32_t openflags, osd_file::ptr &file, st
 		::close(masterfd);
 		return errno_to_file_error(err);
 	}
+#elif defined(__ANDROID__)
+	int masterfd = -1, slavefd = -1;
+	char slavepath[PATH_MAX];
 #else
 	struct termios tios;
 	std::memset(&tios, 0, sizeof(tios));

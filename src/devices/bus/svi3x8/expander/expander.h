@@ -48,8 +48,7 @@
 
 #define MCFG_SVI_EXPANDER_BUS_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SVI_EXPANDER, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(svi_expander_modules, NULL, false) \
-
+	MCFG_DEVICE_SLOT_INTERFACE(svi_expander_modules, NULL, false)
 #define MCFG_SVI_EXPANDER_INT_HANDLER(_devcb) \
 	devcb = &svi_expander_device::set_int_handler(*device, DEVCB_##_devcb);
 
@@ -64,6 +63,12 @@
 
 #define MCFG_SVI_EXPANDER_CTRL2_HANDLER(_devcb) \
 	devcb = &svi_expander_device::set_ctrl2_handler(*device, DEVCB_##_devcb);
+
+#define MCFG_SVI_EXPANDER_EXCSR_HANDLER(_devcb) \
+	devcb = &svi_expander_device::set_excsr_handler(*device, DEVCB_##_devcb);
+
+#define MCFG_SVI_EXPANDER_EXCSW_HANDLER(_devcb) \
+	devcb = &svi_expander_device::set_excsw_handler(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -97,12 +102,21 @@ public:
 	template<class _Object> static devcb_base &set_ctrl2_handler(device_t &device, _Object object)
 		{ return downcast<svi_expander_device &>(device).m_ctrl2_handler.set_callback(object); }
 
+	template<class _Object> static devcb_base &set_excsr_handler(device_t &device, _Object object)
+		{ return downcast<svi_expander_device &>(device).m_excsr_handler.set_callback(object); }
+
+	template<class _Object> static devcb_base &set_excsw_handler(device_t &device, _Object object)
+		{ return downcast<svi_expander_device &>(device).m_excsw_handler.set_callback(object); }
+
 	// called from cart device
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( romdis_w ) { m_romdis_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( ramdis_w ) { m_ramdis_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( ctrl1_w ) { m_ctrl1_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( ctrl2_w ) { m_ctrl2_handler(state); }
+
+	DECLARE_READ8_MEMBER( excs_r ) { return m_excsr_handler(space, offset); }
+	DECLARE_WRITE8_MEMBER( excs_w ) { m_excsw_handler(space, offset, data); }
 
 	// called from host
 	DECLARE_READ8_MEMBER( mreq_r );
@@ -128,6 +142,9 @@ private:
 	devcb_write_line m_ramdis_handler;
 	devcb_write_line m_ctrl1_handler;
 	devcb_write_line m_ctrl2_handler;
+
+	devcb_read8 m_excsr_handler;
+	devcb_write8 m_excsw_handler;
 };
 
 // ======================> device_svi_expander_interface

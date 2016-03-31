@@ -156,9 +156,9 @@ render_font::render_font(render_manager &manager, const char *filename)
 	// attempt to load the cached version of the font first
 	if (filename != nullptr && load_cached_bdf(filename))
 	{
-			//mamep: allocate command glyph font
-			render_font_command_glyph();
-			return;
+		//mamep: allocate command glyph font
+		render_font_command_glyph();
+		return;
 	}
 
 	// load the raw data instead
@@ -659,7 +659,7 @@ bool render_font::load_cached(emu_file &file, UINT32 hash)
 	// validate the header
 	if (header[0] != 'f' || header[1] != 'o' || header[2] != 'n' || header[3] != 't')
 		return false;
-	if (header[4] != (UINT8)(hash >> 24) || header[5] != (UINT8)(hash >> 16) || header[6] != (UINT8)(hash >> 8) || header[7] != (UINT8)hash)
+	if (hash && (header[4] != (UINT8)(hash >> 24) || header[5] != (UINT8)(hash >> 16) || header[6] != (UINT8)(hash >> 8) || header[7] != (UINT8)hash))
 		return false;
 	m_height = (header[8] << 8) | header[9];
 	m_scale = 1.0f / (float)m_height;

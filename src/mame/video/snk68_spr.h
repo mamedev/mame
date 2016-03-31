@@ -29,7 +29,7 @@ public:
 	void draw_sprites_all(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	snk68_tile_indirection_delegate m_newtilecb;
-	
+
 	void tile_callback_noindirect(int& tile, int& fx, int& fy, int& region);
 	void set_flip(int flip);
 
@@ -48,5 +48,3 @@ private:
 
 
 extern const device_type SNK68_SPR;
-
-

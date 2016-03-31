@@ -17,6 +17,7 @@
 #define __MAME_H__
 
 #include <time.h>
+#include "pluginopts.h"
 
 class osd_interface;
 
@@ -76,6 +77,7 @@ public:
 
 	osd_interface &osd() const;
 	emu_options &options() const { return m_options; }
+	plugin_options &plugins() const { return *m_plugins; }
 	lua_engine *lua() { return m_lua; }
 
 	running_machine *machine() { return m_machine; }
@@ -91,7 +93,7 @@ public:
 private:
 	osd_interface &         m_osd;                  // reference to OSD system
 	emu_options &           m_options;              // reference to options
-
+	std::unique_ptr<plugin_options> m_plugins;              // pointer to plugin options
 	lua_engine *            m_lua;
 
 	const game_driver *     m_new_driver_pending;   // pointer to the next pending driver

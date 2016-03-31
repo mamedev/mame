@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "binpacker.h"
+#include "bgfx/vertex.h"
 
 class texture_manager;
 class target_manager;
@@ -29,6 +30,7 @@ public:
 	renderer_bgfx(osd_window *w)
 		: osd_renderer(w, FLAG_NONE)
 		, m_dimensions(0, 0)
+		, m_max_view(0)
 	{
 	}
 	virtual ~renderer_bgfx();
@@ -38,7 +40,9 @@ public:
 
 	virtual int create() override;
 	virtual slider_state* get_slider_list() override;
+	virtual bool multi_window_sliders() override { return true; }
 	virtual int draw(const int update) override;
+
 #ifdef OSD_SDL
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
 #else
@@ -46,54 +50,49 @@ public:
 	virtual void record() override { }
 	virtual void toggle_fsfx() override { }
 #endif
+
 	virtual render_primitive_list *get_primitives() override
 	{
 		osd_dim wdim = window().get_size();
-		window().target()->set_bounds(wdim.width(), wdim.height(), window().aspect());
+		window().target()->set_bounds(wdim.width(), wdim.height(), window().pixel_aspect());
 		return &window().target()->get_primitives();
 	}
 
+	static const char* WINDOW_PREFIX;
+
 private:
-	struct ScreenVertex
-	{
-		float m_x;
-		float m_y;
-		float m_z;
-		UINT32 m_rgba;
-		float m_u;
-		float m_v;
+	int handle_screen_chains();
+	void parse_screen_chains(std::string chain_str);
+	bgfx_chain* screen_chain(int32_t screen);
 
-		static void init()
-		{
-			ms_decl.begin()
-				.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-				.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-				.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-				.end();
-		}
-
-		static bgfx::VertexDecl ms_decl;
-	};
+	bool update_dimensions();
+	void setup_view(uint32_t view_index, bool screen);
+	void init_ui_view();
+	void setup_matrices(uint32_t view_index, bool screen);
 
 	void allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::TransientVertexBuffer *buffer);
 	enum buffer_status
 	{
 		BUFFER_PRE_FLUSH,
 		BUFFER_FLUSH,
+		BUFFER_SCREEN,
 		BUFFER_EMPTY,
 		BUFFER_DONE
 	};
-	buffer_status buffer_primitives(int view, bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer);
+	buffer_status buffer_primitives(bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer, int32_t screen);
 
-	void render_textured_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer);
+	void process_screen_quad(int view, render_primitive* prim);
+	void render_textured_quad(render_primitive* prim, bgfx::TransientVertexBuffer* buffer);
+	void render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int32_t screen);
 
 	void put_packed_quad(render_primitive *prim, UINT32 hash, ScreenVertex* vertex);
 	void put_polygon(const float* coords, UINT32 num_coords, float r, UINT32 rgba, ScreenVertex* vertex);
 	void put_line(float x0, float y0, float x1, float y1, float r, UINT32 rgba, ScreenVertex* vertex, float fth = 1.0f);
 
 	void set_bgfx_state(UINT32 blend);
+	uint64_t get_blend_state(UINT32 blend);
 
-	uint32_t u32Color(uint32_t r, uint32_t g, uint32_t b, uint32_t a);
+	static uint32_t u32Color(uint32_t r, uint32_t g, uint32_t b, uint32_t a);
 
 	bool check_for_dirty_atlas();
 	bool update_atlas();
@@ -115,7 +114,8 @@ private:
 
 	bgfx_effect* m_gui_effect[4];
 	bgfx_effect* m_screen_effect[4];
-	//bgfx_chain* m_screen_chain[4];
+	std::vector<std::vector<bgfx_chain*>> m_screen_chains;
+	std::vector<uint32_t> m_seen_views;
 
 	std::map<UINT32, rectangle_packer::packed_rectangle> m_hash_to_entry;
 	std::vector<rectangle_packer::packable_rectangle> m_texinfo;
@@ -124,11 +124,15 @@ private:
 	uint32_t m_width[16];
 	uint32_t m_height[16];
 	uint32_t m_white[16*16];
+	int32_t m_ui_view;
+	uint32_t m_max_view;
+
 	static const uint16_t CACHE_SIZE;
 	static const uint32_t PACKABLE_SIZE;
 	static const uint32_t WHITE_HASH;
 
 	static bool s_window_set;
+	static uint32_t s_current_view;
 };
 
 #endif

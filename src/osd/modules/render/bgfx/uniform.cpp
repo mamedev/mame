@@ -29,8 +29,10 @@ bgfx_uniform::~bgfx_uniform()
 
 void bgfx_uniform::upload()
 {
-	if (m_type != bgfx::UniformType::Int1) // Avoid samplers; set separately!
+	if (m_type != bgfx::UniformType::Int1)
+	{
 		bgfx::setUniform(m_handle, m_data);
+	}
 }
 
 bgfx_uniform* bgfx_uniform::set(float* value)

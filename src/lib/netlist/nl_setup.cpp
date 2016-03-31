@@ -598,9 +598,6 @@ void setup_t::connect_terminal_output(terminal_t &in, core_terminal_t &out)
 
 void setup_t::connect_terminals(core_terminal_t &t1, core_terminal_t &t2)
 {
-	//nl_assert(in.isType(netlist_terminal_t::TERMINAL));
-	//nl_assert(out.isType(netlist_terminal_t::TERMINAL));
-
 	if (t1.has_net() && t2.has_net())
 	{
 		log().debug("T2 and T1 have net\n");
@@ -621,7 +618,6 @@ void setup_t::connect_terminals(core_terminal_t &t1, core_terminal_t &t2)
 		log().debug("adding net ...\n");
 		analog_net_t *anet =  palloc(analog_net_t);
 		t1.set_net(*anet);
-		//m_netlist.solver()->m_nets.add(anet);
 		// FIXME: Nets should have a unique name
 		t1.net().init_object(netlist(),"net." + t1.name() );
 		t1.net().register_con(t2);
@@ -651,8 +647,7 @@ bool setup_t::connect_input_input(core_terminal_t &t1, core_terminal_t &t2)
 		{
 			for (core_terminal_t *t : t1.net().m_core_terms)
 			{
-				if (t->isType(core_terminal_t::TERMINAL)
-						/*|| t1.net().m_core_terms[i]->isType(netlist_core_terminal_t::OUTPUT)*/)
+				if (t->isType(core_terminal_t::TERMINAL))
 					ret = connect(t2, *t);
 				if (ret)
 					break;
@@ -667,8 +662,7 @@ bool setup_t::connect_input_input(core_terminal_t &t1, core_terminal_t &t2)
 		{
 			for (core_terminal_t *t : t2.net().m_core_terms)
 			{
-				if (t->isType(core_terminal_t::TERMINAL)
-						/*|| t2.net().m_core_terms[i]->isType(netlist_core_terminal_t::OUTPUT)*/)
+				if (t->isType(core_terminal_t::TERMINAL))
 					ret = connect(t1, *t);
 				if (ret)
 					break;
@@ -793,11 +787,12 @@ void setup_t::resolve_inputs()
 	for (std::size_t i = 0; i < m_terminals.size(); i++)
 	{
 		core_terminal_t *term = m_terminals.value_at(i);
-		if (!term->has_net())
+		if (!term->has_net() && dynamic_cast< devices::NETLIB_NAME(dummy_input) *>(&term->device()) != NULL)
+			log().warning("Found dummy terminal {1} without connections", term->name());
+		else if (!term->has_net())
 			errstr += pfmt("Found terminal {1} without a net\n")(term->name());
 		else if (term->net().num_cons() == 0)
-			log().warning("Found terminal {1} without connections",
-					term->name());
+			log().warning("Found terminal {1} without connections", term->name());
 	}
 	if (errstr != "")
 		log().fatal("{1}", errstr);
@@ -885,9 +880,9 @@ logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 	model_parse(model, map);
 
 	if (setup_t::model_value_str(map, "TYPE") == "TTL")
-		return netlist_family_TTL;
+		return family_TTL;
 	if (setup_t::model_value_str(map, "TYPE") == "CD4XXX")
-		return netlist_family_CD4XXX;
+		return family_CD4XXX;
 
 	logic_family_std_proxy_t *ret = palloc(logic_family_std_proxy_t);
 

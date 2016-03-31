@@ -85,9 +85,6 @@
 
 /**************************** common *******************************/
 
-/* layout */
-static const char layout_thomson[] = "thomson";
-
 #define KEY(pos,name,key)                   \
 	PORT_BIT  ( 1<<(pos), IP_ACTIVE_LOW, IPT_KEYBOARD ) \
 	PORT_NAME ( name )                  \
@@ -630,7 +627,6 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_PALETTE_ADD ( "palette", 4097 ) /* 12-bit color + transparency */
 	MCFG_PALETTE_INIT_OWNER(thomson_state, thom)
 	MCFG_VIDEO_START_OVERRIDE( thomson_state, thom )
-	MCFG_DEFAULT_LAYOUT( layout_thomson )
 
 /* sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -89,7 +89,7 @@ void evmbug_state::machine_reset()
 {
 	m_term_data = 0;
 	// Disable auto wait state generation by raising the READY line on reset
-	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(ASSERT_LINE);
+	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( evmbug, evmbug_state )

@@ -25,7 +25,7 @@
  *MP0168   TMS1000   1979, Conic Basketball
  @MP0170   TMS1000   1979, Conic Football
  @MP0914   TMS1000   1979, Entex Baseball 1
- *MP0919   TMS1000   1979, Tiger Copy Cat
+ *MP0919   TMS1000   1979, Tiger Copy Cat (model 7-520)
  @MP0923   TMS1000   1979, Entex Baseball 2
  @MP1030   TMS1100   1980, APF Mathemagician
  @MP1133   TMS1470   1979, Kosmos Astro
@@ -45,6 +45,7 @@
  *MP2139   TMS1370?  1982, Gakken Galaxy Invader 1000
  @MP2726   TMS1040   1979, Tomy Break Up
  *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
+ *MP3005   TMS1000?  1989, Tiger Copy Cat (model 7-522)
  *MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A or B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (model 4850)
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
@@ -1378,7 +1379,7 @@ MACHINE_CONFIG_END
   - USA(1): Football, ERS(Electronic Readout Systems)
   - USA(2): Football, ELECsonic
   - USA(3): Football, no brand!
-  
+
   Another hardware revision of this game uses a PIC16 MCU.
 
 ***************************************************************************/
@@ -1412,15 +1413,15 @@ WRITE16_MEMBER(cnfball_state::write_r)
 	// R5,R8: N/C
 	// R6,R7: speaker out
 	m_speaker->level_w(data >> 6 & 3);
-	
+
 	// R9,R10: input mux
 	m_inp_mux = data >> 9 & 3;
-	
+
 	// R0: DS8874N CP: clock pulse edge-triggered
 	// note: DS8874N CP goes back to K8 too, game relies on it
 	if ((data ^ m_r) & 1)
 		m_grid = m_grid << 1 & 0x1ff;
-	
+
 	// R1: DS8874N _DATA: reset shift register
 	if (~data & 2)
 		m_grid = 1;
@@ -2817,7 +2818,7 @@ MACHINE_CONFIG_END
   Gakken FX-Micom R-165
   * TMS1100 MCU, label MP1312, die label MP1312A
   * 1 7seg led, 6 other leds, 1-bit sound
-  
+
   This is a simple educational home computer. Refer to the extensive manual
   for more information. It was distributed later in the USA by Tandy Radio Shack,
   under their Science Fair series. Another 25 years later, Gakken re-released
@@ -2850,7 +2851,7 @@ void fxmcr165_state::prepare_display()
 	// 7seg digit from O0-O6
 	m_display_segmask[0] = 0x7f;
 	m_display_state[0] = BITSWAP8(m_o,7,2,6,5,4,3,1,0) & 0x7f;
-	
+
 	// leds from R4-R10
 	m_display_state[1] = m_r >> 4 & 0x7f;
 	set_display_size(7, 2);
@@ -2861,7 +2862,7 @@ WRITE16_MEMBER(fxmcr165_state::write_r)
 {
 	// R0-R3: input mux low
 	m_inp_mux = (m_inp_mux & 0x10) | (data & 0xf);
-	
+
 	// R7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
 
@@ -2874,7 +2875,7 @@ WRITE16_MEMBER(fxmcr165_state::write_o)
 {
 	// O7: input mux high
 	m_inp_mux = (m_inp_mux & 0xf) | (data >> 3 & 0x10);
-	
+
 	// O0-O6: digit segments (direct)
 	m_o = data;
 	prepare_display();

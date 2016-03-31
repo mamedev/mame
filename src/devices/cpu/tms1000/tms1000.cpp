@@ -81,10 +81,7 @@ offs_t tms1000_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 }
 
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
+// device_reset
 void tms1000_cpu_device::device_reset()
 {
 	// common reset

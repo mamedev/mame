@@ -6,6 +6,7 @@
  */
 
 #include <solver/nld_solver.h>
+#include <solver/nld_matrix_solver.h>
 #include "nld_system.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
@@ -212,7 +213,7 @@ void nld_d_to_a_proxy::reset()
 	m_Q.initial(0.0);
 	m_last_state = -1;
 	m_RV.do_reset();
-	m_is_timestep = m_RV.m_P.net().as_analog().solver()->is_timestep();
+	m_is_timestep = m_RV.m_P.net().solver()->is_timestep();
 	m_RV.set(NL_FCONST(1.0) / logic_family().m_R_low, logic_family().m_low_V, 0.0);
 }
 

@@ -5,7 +5,7 @@
  *
  */
 
-#include <solver/nld_solver.h>
+#include <solver/nld_matrix_solver.h>
 #include "nld_mm5837.h"
 #include "nl_setup.h"
 
@@ -45,7 +45,7 @@ NETLIB_RESET(MM5837_dip)
 	m_RV.set(NL_FCONST(1.0) / R_LOW, 0.0, 0.0);
 
 	m_shift = 0x1ffff;
-	m_is_timestep = m_RV.m_P.net().as_analog().solver()->is_timestep();
+	m_is_timestep = m_RV.m_P.net().solver()->is_timestep();
 }
 
 NETLIB_UPDATE(MM5837_dip)

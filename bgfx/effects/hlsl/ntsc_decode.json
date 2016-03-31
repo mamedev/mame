@@ -1,0 +1,43 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz,ImJezze
+//============================================================
+//
+//  ntsc_decode.json: Composite NTSC decoder shader for CRT
+//  simulation.
+//
+//============================================================
+{
+    "blend": {
+    	"equation": "add",
+    	"srcColor": "1",
+    	"dstColor": "0",
+    	"srcAlpha": "1",
+    	"dstAlpha": "0"
+    },
+    "depth": {
+    	"function": "always"
+    },
+    "cull": { "mode": "none" },
+    "write": {
+    	"rgb": true,
+    	"alpha": true
+    },
+    "vertex": "vs_ntsc_decode",
+    "fragment": "fs_ntsc_decode",
+    "uniforms": [
+    	{ "name": "s_tex",             "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "s_screen",        "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "u_source_dims",     "type": "vec4", "values": [ 1.0,  1.0, 0.0, 0.0 ] },
+    	{ "name": "u_a_value",         "type": "vec4", "values": [ 0.5,  0.5, 0.5, 0.5 ] },
+    	{ "name": "u_b_value",         "type": "vec4", "values": [ 0.5,  0.5, 0.5, 0.5 ] },
+    	{ "name": "u_cc_value",        "type": "vec4", "values": [ 3.5795454, 3.5795454, 3.5795454, 3.5795454 ] },
+    	{ "name": "u_o_value",         "type": "vec4", "values": [ 1.570796325,  1.570796325, 1.570796325, 1.570796325 ] },
+    	{ "name": "u_scan_time",       "type": "vec4", "values": [ 52.6, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_notch_width",     "type": "vec4", "values": [ 2.0,  0.0, 0.0, 0.0 ] },
+    	{ "name": "u_y_freq_response", "type": "vec4", "values": [ 6.0,  0.0, 0.0, 0.0 ] },
+    	{ "name": "u_i_freq_response", "type": "vec4", "values": [ 1.2,  0.0, 0.0, 0.0 ] },
+    	{ "name": "u_q_freq_response", "type": "vec4", "values": [ 0.6,  0.0, 0.0, 0.0 ] },
+    	{ "name": "u_jitter_amount",   "type": "vec4", "values": [ 0.0,  0.0, 0.0, 0.0 ] },
+    	{ "name": "u_jitter_offset",   "type": "vec4", "values": [ 0.0,  0.0, 0.0, 0.0 ] }
+    ]
+}
