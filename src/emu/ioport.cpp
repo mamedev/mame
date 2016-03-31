@@ -1583,71 +1583,23 @@ const input_seq &ioport_field::defseq(input_seq_type seqtype) const
 
 ioport_type_class ioport_field::type_class() const
 {
-	ioport_type_class result;
+	ioport_group group = manager().type_group(m_type, m_player);
+	if (group >= IPG_PLAYER1 && group <= IPG_PLAYER8)
+		return INPUT_CLASS_CONTROLLER;
 
-	switch (m_type)
-	{
-		case IPT_JOYSTICK_UP:
-		case IPT_JOYSTICK_DOWN:
-		case IPT_JOYSTICK_LEFT:
-		case IPT_JOYSTICK_RIGHT:
-		case IPT_JOYSTICKLEFT_UP:
-		case IPT_JOYSTICKLEFT_DOWN:
-		case IPT_JOYSTICKLEFT_LEFT:
-		case IPT_JOYSTICKLEFT_RIGHT:
-		case IPT_JOYSTICKRIGHT_UP:
-		case IPT_JOYSTICKRIGHT_DOWN:
-		case IPT_JOYSTICKRIGHT_LEFT:
-		case IPT_JOYSTICKRIGHT_RIGHT:
-		case IPT_BUTTON1:
-		case IPT_BUTTON2:
-		case IPT_BUTTON3:
-		case IPT_BUTTON4:
-		case IPT_BUTTON5:
-		case IPT_BUTTON6:
-		case IPT_BUTTON7:
-		case IPT_BUTTON8:
-		case IPT_BUTTON9:
-		case IPT_BUTTON10:
-		case IPT_AD_STICK_X:
-		case IPT_AD_STICK_Y:
-		case IPT_AD_STICK_Z:
-		case IPT_TRACKBALL_X:
-		case IPT_TRACKBALL_Y:
-		case IPT_LIGHTGUN_X:
-		case IPT_LIGHTGUN_Y:
-		case IPT_MOUSE_X:
-		case IPT_MOUSE_Y:
-		case IPT_START:
-		case IPT_SELECT:
-			result = INPUT_CLASS_CONTROLLER;
-			break;
+	if (m_type == IPT_KEYPAD || m_type == IPT_KEYBOARD)
+		return INPUT_CLASS_KEYBOARD;
 
-		case IPT_KEYPAD:
-		case IPT_KEYBOARD:
-			result = INPUT_CLASS_KEYBOARD;
-			break;
+	if (m_type == IPT_CONFIG)
+		return INPUT_CLASS_CONFIG;
 
-		case IPT_CONFIG:
-			result = INPUT_CLASS_CONFIG;
-			break;
+	if (m_type == IPT_DIPSWITCH)
+		return INPUT_CLASS_DIPSWITCH;
 
-		case IPT_DIPSWITCH:
-			result = INPUT_CLASS_DIPSWITCH;
-			break;
+	if (group == IPG_OTHER || (group == IPG_INVALID && m_name != nullptr))
+		return INPUT_CLASS_MISC;
 
-		case 0:
-			if (m_name != nullptr && m_name != (const char *)-1)
-				result = INPUT_CLASS_MISC;
-			else
-				result = INPUT_CLASS_INTERNAL;
-			break;
-
-		default:
-			result = INPUT_CLASS_INTERNAL;
-			break;
-	}
-	return result;
+	return INPUT_CLASS_INTERNAL;
 }
 
 
