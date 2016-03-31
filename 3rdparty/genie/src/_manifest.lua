@@ -26,6 +26,7 @@
 		"base/api.lua",
 		"base/cmdline.lua",
 		"base/inspect.lua",
+		"base/profiler.lua",
 		"tools/dotnet.lua",
 		"tools/gcc.lua",
 		"tools/ghs.lua",

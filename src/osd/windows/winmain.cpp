@@ -1049,7 +1049,7 @@ const char *symbol_manager::symbol_for_address(FPTR address)
 	if (!query_system_for_address(address))
 	{
 		// if that fails, scan the cache if we have one
-		if (m_cache.first() != nullptr)
+		if (!m_cache.empty())
 			scan_cache_for_address(address);
 
 		// or else try to open a sym/map file and find it there
@@ -1172,13 +1172,13 @@ void symbol_manager::scan_cache_for_address(FPTR address)
 	FPTR best_addr = 0;
 
 	// walk the cache, looking for valid entries
-	for (cache_entry *entry = m_cache.first(); entry != nullptr; entry = entry->next())
+	for (cache_entry &entry : m_cache)
 
 		// if this is the best one so far, remember it
-		if (entry->m_address <= address && entry->m_address > best_addr)
+		if (entry.m_address <= address && entry.m_address > best_addr)
 		{
-			best_addr = entry->m_address;
-			best_symbol = entry->m_name;
+			best_addr = entry.m_address;
+			best_symbol = entry.m_name;
 		}
 
 	// format the symbol and remember the last base

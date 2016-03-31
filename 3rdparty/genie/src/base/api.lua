@@ -1146,3 +1146,13 @@
 	function newoption(opt)
 		premake.option.add(opt)
 	end
+
+
+--
+-- Enable file level configuration
+-- this makes project generation slower for large projects
+--
+
+	function enablefilelevelconfig()
+		premake._filelevelconfig = true
+	end

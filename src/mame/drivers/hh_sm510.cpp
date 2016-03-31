@@ -165,10 +165,6 @@ WRITE8_MEMBER(hh_sm510_state::sm511_melody_w)
   * PCB label BH003
   * Sharp SM510 under epoxy (die label CMS54C, KMS598)
 
-  The ROM listing "BH003 Top Gun" from patent US5137277 is identical to the
-  released version, except for 2 probable bit errors and filler bytes. Unused
-  pages list data too, of what looks like assembler leftover garbage.
-
 ***************************************************************************/
 
 class ktopgun_state : public hh_sm510_state
@@ -238,9 +234,6 @@ MACHINE_CONFIG_END
 
   Konami Teenage Mutant Ninja Turtles
   * Sharp SM511 under epoxy (die label KMS 73B, KMS 774)
-
-  The ROM listing "BH005 TMNT" from patent US5150899 is identical to the
-  released version, excluding filler bytes.
 
 ***************************************************************************/
 
@@ -372,27 +365,27 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-ROM_START( ktopgun )
+ROM_START( ktopgun ) // except for filler/unused bytes, ROM listing in patent US5137277 "BH003 Top Gun" is same
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "cms54c_kms598", 0x0000, 0x1000, CRC(50870b35) SHA1(cda1260c2e1c180995eced04b7d7ff51616dcef5) )
 ROM_END
 
 
-ROM_START( ktmnt )
+ROM_START( ktmnt ) // except for filler/unused bytes, ROM listing in patent US5150899 "BH005 TMNT" prog/music is same
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "kms_73b_774.prog", 0x0000, 0x1000, CRC(a1064f87) SHA1(92156c35fbbb414007ee6804fe635128a741d5f1) )
+	ROM_LOAD( "kms73b_774.prog", 0x0000, 0x1000, CRC(a1064f87) SHA1(92156c35fbbb414007ee6804fe635128a741d5f1) )
 
 	ROM_REGION( 0x100, "maincpu:music", 0 )
-	ROM_LOAD( "kms_73b_774.music", 0x000, 0x100, CRC(8270d626) SHA1(bd91ca1d5cd7e2a62eef05c0033b19dcdbe441ca) )
+	ROM_LOAD( "kms73b_774.music", 0x000, 0x100, CRC(8270d626) SHA1(bd91ca1d5cd7e2a62eef05c0033b19dcdbe441ca) )
 ROM_END
 
 
-ROM_START( kcontra )
+ROM_START( kcontra ) // except for filler/unused bytes, ROM listing in patent US5120057 "BH002 C (Contra)" prog/music is same
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "bh002_c.prog", 0x0000, 0x1000, BAD_DUMP CRC(5496d84a) SHA1(7e31f8ff8037a1a9ec510798c2197d55a8e9799a) ) // from patent US5120057, may have errors
+	ROM_LOAD( "kms73b_774.prog", 0x0000, 0x1000, CRC(bf834877) SHA1(055dd56ec16d63afba61ab866481fd9c029fb54d) )
 
 	ROM_REGION( 0x100, "maincpu:music", 0 )
-	ROM_LOAD( "bh002_c.music", 0x000, 0x100, CRC(e678a199) SHA1(beff871b0aa52690f0fe456401ca75abb746a5cc) )
+	ROM_LOAD( "kms73b_774.music", 0x000, 0x100, CRC(23d02b99) SHA1(703938e496db0eeacd14fe7605d4b5c39e0a5bc8) )
 ROM_END
 
 

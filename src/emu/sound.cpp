@@ -1090,15 +1090,15 @@ void sound_manager::update(void *ptr, int param)
 	}
 
 	// iterate over all the streams and update them
-	for (sound_stream *stream = m_stream_list.first(); stream != nullptr; stream = stream->next())
-		stream->update_with_accounting(second_tick);
+	for (sound_stream &stream : m_stream_list)
+		stream.update_with_accounting(second_tick);
 
 	// remember the update time
 	m_last_update = curtime;
 
 	// update sample rates if they have changed
-	for (sound_stream *stream = m_stream_list.first(); stream != nullptr; stream = stream->next())
-		stream->apply_sample_rate_changes();
+	for (sound_stream &stream : m_stream_list)
+		stream.apply_sample_rate_changes();
 
 	g_profiler.stop();
 }

@@ -73,7 +73,7 @@ public:
 	public:
 		sound_route(int output, int input, float gain, const char *target, UINT32 mixoutput);
 
-		const sound_route *next() const { return m_next; }
+		sound_route *next() const { return m_next; }
 
 		sound_route *       m_next;             // pointer to next route
 		UINT32              m_output;           // output index, or ALL_OUTPUTS
@@ -88,7 +88,7 @@ public:
 	virtual ~device_sound_interface();
 
 	// configuration access
-	const sound_route *first_route() const { return m_route_list.first(); }
+	const simple_list<sound_route> &routes() const { return m_route_list; }
 
 	// static inline configuration helpers
 	static sound_route &static_add_route(device_t &device, UINT32 output, const char *target, double gain, UINT32 input = AUTO_ALLOC_INPUT, UINT32 mixoutput = 0);

@@ -397,7 +397,7 @@ device_state_interface::device_state_interface(const machine_config &mconfig, de
 	memset(m_fast_state, 0, sizeof(m_fast_state));
 
 	// configure the fast accessor
-	device.m_state = this;
+	device.interfaces().m_state = this;
 }
 
 

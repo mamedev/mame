@@ -226,11 +226,11 @@ core_options &core_options::operator=(const core_options &rhs)
 bool core_options::operator==(const core_options &rhs)
 {
 	// iterate over options in the first list
-	for (entry *curentry = m_entrylist.first(); curentry != nullptr; curentry = curentry->next())
-		if (!curentry->is_header())
+	for (entry &curentry : m_entrylist)
+		if (!curentry.is_header())
 		{
 			// if the values differ, return false
-			if (strcmp(curentry->value(), rhs.value(curentry->name())) != 0)
+			if (strcmp(curentry.value(), rhs.value(curentry.name())) != 0)
 				return false;
 		}
 
@@ -468,8 +468,8 @@ bool core_options::parse_ini_file(util::core_file &inifile, int priority, int ig
 void core_options::revert(int priority)
 {
 	// iterate over options and revert to defaults if below the given priority
-	for (entry *curentry = m_entrylist.first(); curentry != nullptr; curentry = curentry->next())
-		curentry->revert(priority);
+	for (entry &curentry : m_entrylist)
+		curentry.revert(priority);
 }
 
 
@@ -489,10 +489,10 @@ std::string core_options::output_ini(const core_options *diff) const
 	const char *last_header = nullptr;
 
 	// loop over all items
-	for (entry *curentry = m_entrylist.first(); curentry != nullptr; curentry = curentry->next())
+	for (entry &curentry : m_entrylist)
 	{
-		const char *name = curentry->name();
-		const char *value = curentry->value();
+		const char *name = curentry.name();
+		const char *value = curentry.value();
 		bool is_unadorned = false;
 
 		// check if it's unadorned
@@ -503,13 +503,13 @@ std::string core_options::output_ini(const core_options *diff) const
 		}
 
 		// header: record description
-		if (curentry->is_header())
-			last_header = curentry->description();
+		if (curentry.is_header())
+			last_header = curentry.description();
 
 		// otherwise, output entries for all non-command items
-		else if (!curentry->is_command())
+		else if (!curentry.is_command())
 		{
-			if ( !curentry->is_internal() )
+			if (!curentry.is_internal())
 			{
 				// look up counterpart in diff, if diff is specified
 				if (diff == nullptr || strcmp(value, diff->value(name)) != 0)
@@ -549,15 +549,15 @@ std::string core_options::output_help() const
 	std::ostringstream buffer;
 
 	// loop over all items
-	for (entry *curentry = m_entrylist.first(); curentry != nullptr; curentry = curentry->next())
+	for (entry &curentry : m_entrylist)
 	{
 		// header: just print
-		if (curentry->is_header())
-			util::stream_format(buffer, "\n#\n# %s\n#\n", curentry->description());
+		if (curentry.is_header())
+			util::stream_format(buffer, "\n#\n# %s\n#\n", curentry.description());
 
 		// otherwise, output entries for all non-deprecated items
-		else if (curentry->description() != nullptr)
-			util::stream_format(buffer, "-%-20s%s\n", curentry->name(), curentry->description());
+		else if (curentry.description() != nullptr)
+			util::stream_format(buffer, "-%-20s%s\n", curentry.name(), curentry.description());
 	}
 	return buffer.str();
 }
@@ -744,8 +744,8 @@ void core_options::copyfrom(const core_options &src)
 	reset();
 
 	// iterate through the src options and make our own
-	for (entry *curentry = src.m_entrylist.first(); curentry != nullptr; curentry = curentry->next())
-		append_entry(*global_alloc(entry(curentry->name(), curentry->description(), curentry->flags(), curentry->default_value())));
+	for (entry &curentry : src.m_entrylist)
+		append_entry(*global_alloc(entry(curentry.name(), curentry.description(), curentry.flags(), curentry.default_value())));
 }
 
 /**

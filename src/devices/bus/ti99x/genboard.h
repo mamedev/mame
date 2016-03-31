@@ -19,6 +19,7 @@
 #include "video/v9938.h"
 #include "cpu/tms9900/tms9995.h"
 #include "machine/at29x.h"
+#include "bus/ti99_peb/peribox.h"
 
 extern const device_type GENEVE_MOUSE;
 extern const device_type GENEVE_KEYBOARD;
@@ -207,7 +208,7 @@ private:
 
 	geneve_keyboard_device* m_keyboard;
 	bus8z_device*           m_video;
-	bus8z_device*           m_peribox;
+	peribox_device*          m_peribox;
 	bus8z_device*           m_sound;
 	UINT8*                  m_eprom;
 	UINT8*                  m_sram;

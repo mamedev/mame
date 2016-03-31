@@ -751,30 +751,30 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 	bool coin_error = false;
 
 	// iterate through the settings
-	for (ioport_setting *setting = field.first_setting(); setting != nullptr; setting = setting->next())
+	for (ioport_setting &setting : field.settings())
 	{
 		// note any coinage strings
-		int strindex = get_defstr_index(setting->name());
+		int strindex = get_defstr_index(setting.name());
 		if (strindex >= __input_string_coinage_start && strindex <= __input_string_coinage_end)
 			coin_list[strindex - __input_string_coinage_start] = 1;
 
 		// make sure demo sounds default to on
-		if (field.name() == demo_sounds && strindex == INPUT_STRING_On && field.defvalue() != setting->value())
+		if (field.name() == demo_sounds && strindex == INPUT_STRING_On && field.defvalue() != setting.value())
 			osd_printf_error("Demo Sounds must default to On\n");
 
 		// check for bad demo sounds options
 		if (field.name() == demo_sounds && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
-			osd_printf_error("Demo Sounds option must be Off/On, not %s\n", setting->name());
+			osd_printf_error("Demo Sounds option must be Off/On, not %s\n", setting.name());
 
 		// check for bad flip screen options
 		if (field.name() == flipscreen && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
-			osd_printf_error("Flip Screen option must be Off/On, not %s\n", setting->name());
+			osd_printf_error("Flip Screen option must be Off/On, not %s\n", setting.name());
 
 		// if we have a neighbor, compare ourselves to him
-		if (setting->next() != nullptr)
+		if (setting.next() != nullptr)
 		{
 			// check for inverted off/on dispswitch order
-			int next_strindex = get_defstr_index(setting->next()->name(), true);
+			int next_strindex = get_defstr_index(setting.next()->name(), true);
 			if (strindex == INPUT_STRING_On && next_strindex == INPUT_STRING_Off)
 				osd_printf_error("%s option must have Off/On options in the order: Off, On\n", field.name());
 
@@ -788,9 +788,9 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 
 			// check for proper coin ordering
 			else if (strindex >= __input_string_coinage_start && strindex <= __input_string_coinage_end && next_strindex >= __input_string_coinage_start && next_strindex <= __input_string_coinage_end &&
-						strindex >= next_strindex && setting->condition() == setting->next()->condition())
+						strindex >= next_strindex && setting.condition() == setting.next()->condition())
 			{
-				osd_printf_error("%s option has unsorted coinage %s > %s\n", field.name(), setting->name(), setting->next()->name());
+				osd_printf_error("%s option has unsorted coinage %s > %s\n", field.name(), setting.name(), setting.next()->name());
 				coin_error = true;
 			}
 		}
@@ -850,39 +850,39 @@ void validity_checker::validate_inputs()
 			osd_printf_error("I/O port error during construction:\n%s\n", errorbuf.c_str());
 
 		// do a first pass over ports to add their names and find duplicates
-		for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
-			if (!port_map.insert(port->tag()).second)
-				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port->tag());
+		for (ioport_port &port : portlist)
+			if (!port_map.insert(port.tag()).second)
+				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port.tag());
 
 		// iterate over ports
-		for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
+		for (ioport_port &port : portlist)
 		{
-			m_current_ioport = port->tag();
+			m_current_ioport = port.tag();
 
 			// iterate through the fields on this port
-			for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
+			for (ioport_field &field : port.fields())
 			{
 				// verify analog inputs
-				if (field->is_analog())
-					validate_analog_input_field(*field);
+				if (field.is_analog())
+					validate_analog_input_field(field);
 
 				// look for invalid (0) types which should be mapped to IPT_OTHER
-				if (field->type() == IPT_INVALID)
+				if (field.type() == IPT_INVALID)
 					osd_printf_error("Field has an invalid type (0); use IPT_OTHER instead\n");
 
 				// verify dip switches
-				if (field->type() == IPT_DIPSWITCH)
+				if (field.type() == IPT_DIPSWITCH)
 				{
 					// dip switch fields must have a name
-					if (field->name() == nullptr)
+					if (field.name() == nullptr)
 						osd_printf_error("DIP switch has a NULL name\n");
 
 					// verify the settings list
-					validate_dip_settings(*field);
+					validate_dip_settings(field);
 				}
 
 				// verify names
-				const char *name = field->specific_name();
+				const char *name = field.specific_name();
 				if (name != nullptr)
 				{
 					// check for empty string
@@ -902,13 +902,13 @@ void validity_checker::validate_inputs()
 				}
 
 				// verify conditions on the field
-				if (!field->condition().none())
-					validate_condition(field->condition(), *device, port_map);
+				if (!field.condition().none())
+					validate_condition(field.condition(), *device, port_map);
 
 				// verify conditions on the settings
-				for (ioport_setting *setting = field->first_setting(); setting != nullptr; setting = setting->next())
-					if (!setting->condition().none())
-						validate_condition(setting->condition(), *device, port_map);
+				for (ioport_setting &setting : field.settings())
+					if (!setting.condition().none())
+						validate_condition(setting.condition(), *device, port_map);
 			}
 
 			// done with this port
@@ -966,11 +966,11 @@ void validity_checker::validate_devices()
 	slot_interface_iterator slotiter(m_current_config->root_device());
 	for (const device_slot_interface *slot = slotiter.first(); slot != nullptr; slot = slotiter.next())
 	{
-		for (const device_slot_option *option = slot->first_option(); option != nullptr; option = option->next())
+		for (const device_slot_option &option : slot->option_list())
 		{
 			std::string temptag("_");
-			temptag.append(option->name());
-			device_t *dev = const_cast<machine_config &>(*m_current_config).device_add(&m_current_config->root_device(), temptag.c_str(), option->devtype(), 0);
+			temptag.append(option.name());
+			device_t *dev = const_cast<machine_config &>(*m_current_config).device_add(&m_current_config->root_device(), temptag.c_str(), option.devtype(), 0);
 
 			// notify this device and all its subdevices that they are now configured
 			device_iterator subiter(*dev);

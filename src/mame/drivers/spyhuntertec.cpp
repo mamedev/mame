@@ -15,14 +15,14 @@ non-interlaced
 
 sound system appears to be the same as 'spartanxtec.cpp'
 
-analog inputs seem to be read by the sound CPU, with serial communication
+
 
 */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
+#include "spyhunttec.lh"
 
 #define MASTER_CLOCK        XTAL_20MHz // ??
 
@@ -575,19 +575,11 @@ static INPUT_PORTS_START( spyhuntertec )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x0001, 0x0001, "2" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "handbrake?" )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Right Button / Smoke Screen")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1  ) PORT_NAME("Center Button / Weapons Van")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Left Trigger / Missiles")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left Button / Oil Slick")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Gear Shift") PORT_TOGGLE
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -616,7 +608,7 @@ static INPUT_PORTS_START( spyhuntertec )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Right Trigger / Machine Guns")
 
 	PORT_START("PEDAL")
 	PORT_BIT( 0xff, 0x02, IPT_PEDAL ) PORT_MINMAX(0x02,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
@@ -843,4 +835,4 @@ DRIVER_INIT_MEMBER(spyhuntertec_state,spyhuntertec)
 }
 
 
-GAME (1983, spyhuntpr,spyhunt,  spyhuntertec, spyhuntertec,spyhuntertec_state,  spyhuntertec,ROT90, "Bally Midway (Recreativos Franco S.A. license)", "Spy Hunter (Spain, Tecfri / Recreativos Franco S.A. PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAMEL(1983, spyhuntpr,spyhunt,  spyhuntertec, spyhuntertec,spyhuntertec_state,  spyhuntertec,ROT90, "bootleg (Recreativos Franco S.A. license, Tecfri)", "Spy Hunter (Spain, Recreativos Franco S.A., Tecfri PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_spyhunttec )

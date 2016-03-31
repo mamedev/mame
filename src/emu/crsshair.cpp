@@ -113,11 +113,11 @@ crosshair_manager::crosshair_manager(running_machine &machine)
 	m_auto_time = CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT;
 
 	/* determine who needs crosshairs */
-	for (ioport_port *port = machine.ioport().first_port(); port != nullptr; port = port->next())
-		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
-			if (field->crosshair_axis() != CROSSHAIR_AXIS_NONE)
+	for (ioport_port &port : machine.ioport().ports())
+		for (ioport_field &field : port.fields())
+			if (field.crosshair_axis() != CROSSHAIR_AXIS_NONE)
 			{
-				int player = field->player();
+				int player = field.player();
 
 				assert(player < MAX_PLAYERS);
 

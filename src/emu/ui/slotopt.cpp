@@ -45,12 +45,12 @@ int ui_menu_slot_devices::slot_get_current_index(device_slot_interface *slot)
 	if (current != nullptr)
 	{
 		int val = 0;
-		for (const device_slot_option *option = slot->first_option(); option != nullptr; option = option->next())
+		for (const device_slot_option &option : slot->option_list())
 		{
-			if (option == current)
+			if (&option == current)
 				return val;
 
-			if (option->selectable())
+			if (option.selectable())
 				val++;
 		}
 	}
@@ -64,8 +64,8 @@ int ui_menu_slot_devices::slot_get_current_index(device_slot_interface *slot)
 int ui_menu_slot_devices::slot_get_length(device_slot_interface *slot)
 {
 	int val = 0;
-	for (const device_slot_option *option = slot->first_option(); option != nullptr; option = option->next())
-		if (option->selectable())
+	for (const device_slot_option &option : slot->option_list())
+		if (option.selectable())
 			val++;
 
 	return val;
@@ -113,12 +113,12 @@ const char *ui_menu_slot_devices::slot_get_option(device_slot_interface *slot, i
 	if (index >= 0)
 	{
 		int val = 0;
-		for (const device_slot_option *option = slot->first_option(); option != nullptr; option = option->next())
+		for (const device_slot_option &option : slot->option_list())
 		{
 			if (val == index)
-				return option->name();
+				return option.name();
 
-			if (option->selectable())
+			if (option.selectable())
 				val++;
 		}
 	}

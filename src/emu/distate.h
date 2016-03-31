@@ -61,7 +61,7 @@ public:
 	device_state_entry &noshow() { m_flags |= DSF_NOSHOW; return *this; }
 
 	// iteration helpers
-	const device_state_entry *next() const { return m_next; }
+	device_state_entry *next() const { return m_next; }
 
 	// query information
 	int index() const { return m_index; }
@@ -124,7 +124,7 @@ public:
 	virtual ~device_state_interface();
 
 	// configuration access
-	const device_state_entry *state_first() const { return m_state_list.first(); }
+	const simple_list<device_state_entry> &state_entries() const { return m_state_list; }
 
 	// state getters
 	UINT64 state_int(int index);
@@ -197,7 +197,7 @@ typedef device_interface_iterator<device_state_interface> state_interface_iterat
 
 inline offs_t device_t::safe_pc() const
 {
-	return (m_state != nullptr) ? m_state->pc() : 0;
+	return (m_interfaces.m_state != nullptr) ? m_interfaces.m_state->pc() : 0;
 }
 
 
@@ -208,7 +208,7 @@ inline offs_t device_t::safe_pc() const
 
 inline offs_t device_t::safe_pcbase() const
 {
-	return (m_state != nullptr) ? m_state->pcbase() : 0;
+	return (m_interfaces.m_state != nullptr) ? m_interfaces.m_state->pcbase() : 0;
 }
 
 

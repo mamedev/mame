@@ -128,9 +128,9 @@ const char *software_part::feature(const char *feature_name) const
 	assert(feature_name != nullptr);
 
 	// scan the feature list for an entry matching feature_name and return the value
-	for (const feature_list_item *feature = m_featurelist.first(); feature != nullptr; feature = feature->next())
-		if (strcmp(feature->name(), feature_name) == 0)
-			return feature->value();
+	for (const feature_list_item &feature : m_featurelist)
+		if (strcmp(feature.name(), feature_name) == 0)
+			return feature.value();
 	return nullptr;
 
 }
@@ -232,14 +232,14 @@ software_part *software_info::find_part(const char *partname, const char *interf
 		return m_partdata.first();
 
 	// look for the part by name and match against the interface if provided
-	for (software_part *part = m_partdata.first(); part != nullptr; part = part->next())
-		if (partname != nullptr && strcmp(partname, part->name()) == 0)
+	for (software_part &part : m_partdata)
+		if (partname != nullptr && strcmp(partname, part.name()) == 0)
 		{
-			if (interface == nullptr || part->matches_interface(interface))
-				return part;
+			if (interface == nullptr || part.matches_interface(interface))
+				return &part;
 		}
-		else if (partname == nullptr && part->matches_interface(interface))
-				return part;
+		else if (partname == nullptr && part.matches_interface(interface))
+				return &part;
 	return nullptr;
 }
 
@@ -255,8 +255,8 @@ bool software_info::has_multiple_parts(const char *interface) const
 	int count = 0;
 
 	// increment the count for each match and stop if we hit more than 1
-	for (software_part *part = first_part(); part != nullptr; part = part->next())
-		if (part->matches_interface(interface))
+	for (software_part &part : m_partdata)
+		if (part.matches_interface(interface))
 			if (++count > 1)
 				return true;
 
@@ -338,14 +338,14 @@ void software_list_device::find_approx_matches(const char *name, int matches, so
 	}
 
 	// iterate over our info (will cause a parse if needed)
-	for (software_info *swinfo = first_software_info(); swinfo != nullptr; swinfo = swinfo->next())
+	for (software_info &swinfo : get_info())
 	{
-		software_part *part = swinfo->first_part();
+		software_part *part = swinfo.first_part();
 		if ((interface == nullptr || part->matches_interface(interface)) && part->is_compatible(*this))
 		{
 			// pick the best match between driver name and description
-			int longpenalty = driver_list::penalty_compare(name, swinfo->longname());
-			int shortpenalty = driver_list::penalty_compare(name, swinfo->shortname());
+			int longpenalty = driver_list::penalty_compare(name, swinfo.longname());
+			int shortpenalty = driver_list::penalty_compare(name, swinfo.shortname());
 			int curpenalty = MIN(longpenalty, shortpenalty);
 
 			// insert into the sorted table of matches
@@ -361,7 +361,7 @@ void software_list_device::find_approx_matches(const char *name, int matches, so
 					penalty[matchnum + 1] = penalty[matchnum];
 					list[matchnum + 1] = list[matchnum];
 				}
-				list[matchnum] = swinfo;
+				list[matchnum] = &swinfo;
 				penalty[matchnum] = curpenalty;
 			}
 		}
@@ -455,8 +455,8 @@ software_info *software_list_device::find(const char *look_for, software_info *p
 
 	bool iswild = strchr(look_for, '*') != nullptr || strchr(look_for, '?');
 
-	// find a match (will cause a parse if needed when calling first_software_info)
-	for (prev = (prev != nullptr) ? prev->next() : first_software_info(); prev != nullptr; prev = prev->next())
+	// find a match (will cause a parse if needed when calling get_info)
+	for (prev = (prev != nullptr) ? prev->next() : get_info().first(); prev != nullptr; prev = prev->next())
 		if ((iswild && core_strwildcmp(look_for, prev->shortname()) == 0) || core_stricmp(look_for, prev->shortname()) == 0)
 			break;
 
@@ -527,7 +527,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 
 	softlist_map names;
 	softlist_map descriptions;
-	for (software_info *swinfo = first_software_info(); swinfo != nullptr; swinfo = swinfo->next())
+	for (software_info &swinfo : get_info())
 	{
 		// first parse and output core errors if any
 		if (m_errors.length() > 0)
@@ -539,98 +539,98 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 		// Now check if the xml data is valid:
 
 		// Did we lost any description?
-		if (swinfo->longname() == nullptr)
+		if (swinfo.longname() == nullptr)
 		{
-			osd_printf_error("%s: %s has no description\n", filename(), swinfo->shortname());
+			osd_printf_error("%s: %s has no description\n", filename(), swinfo.shortname());
 			break;
 		}
 
 		// Did we lost any year?
-		if (swinfo->year() == nullptr)
+		if (swinfo.year() == nullptr)
 		{
-			osd_printf_error("%s: %s has no year\n", filename(), swinfo->shortname());
+			osd_printf_error("%s: %s has no year\n", filename(), swinfo.shortname());
 			break;
 		}
 
 		// Did we lost any publisher?
-		if (swinfo->publisher() == nullptr)
+		if (swinfo.publisher() == nullptr)
 		{
-			osd_printf_error("%s: %s has no publisher\n", filename(), swinfo->shortname());
+			osd_printf_error("%s: %s has no publisher\n", filename(), swinfo.shortname());
 			break;
 		}
 
 		// Did we lost the software parts?
-		if (swinfo->num_parts() == 0)
+		if (swinfo.parts().empty())
 		{
-			osd_printf_error("%s: %s has no part\n", filename(), swinfo->shortname());
+			osd_printf_error("%s: %s has no part\n", filename(), swinfo.shortname());
 			break;
 		}
 
 		// Second, since the xml is fine, run additional checks:
 
 		// check for duplicate names
-		if (!names.insert(std::make_pair(swinfo->shortname(), swinfo)).second)
+		if (!names.insert(std::make_pair(swinfo.shortname(), &swinfo)).second)
 		{
-			software_info *match = names.find(swinfo->shortname())->second;
-			osd_printf_error("%s: %s is a duplicate name (%s)\n", filename(), swinfo->shortname(), match->shortname());
+			software_info *match = names.find(swinfo.shortname())->second;
+			osd_printf_error("%s: %s is a duplicate name (%s)\n", filename(), swinfo.shortname(), match->shortname());
 		}
 
 		// check for duplicate descriptions
-		std::string longname = std::string(swinfo->longname());
-		if (!descriptions.insert(std::make_pair(strmakelower(longname), swinfo)).second)
-			osd_printf_error("%s: %s is a duplicate description (%s)\n", filename(), swinfo->longname(), swinfo->shortname());
+		std::string longname = std::string(swinfo.longname());
+		if (!descriptions.insert(std::make_pair(strmakelower(longname), &swinfo)).second)
+			osd_printf_error("%s: %s is a duplicate description (%s)\n", filename(), swinfo.longname(), swinfo.shortname());
 
 		bool is_clone = false;
-		if (swinfo->parentname() != nullptr)
+		if (swinfo.parentname() != nullptr)
 		{
 			is_clone = true;
-			if (strcmp(swinfo->parentname(), swinfo->shortname()) == 0)
+			if (strcmp(swinfo.parentname(), swinfo.shortname()) == 0)
 			{
-				osd_printf_error("%s: %s is set as a clone of itself\n", filename(), swinfo->shortname());
+				osd_printf_error("%s: %s is set as a clone of itself\n", filename(), swinfo.shortname());
 				break;
 			}
 
 			// make sure the parent exists
-			software_info *swinfo2 = find(swinfo->parentname());
+			software_info *swinfo2 = find(swinfo.parentname());
 
 			if (swinfo2 == nullptr)
-				osd_printf_error("%s: parent '%s' software for '%s' not found\n", filename(), swinfo->parentname(), swinfo->shortname());
+				osd_printf_error("%s: parent '%s' software for '%s' not found\n", filename(), swinfo.parentname(), swinfo.shortname());
 			else if (swinfo2->parentname() != nullptr)
-				osd_printf_error("%s: %s is a clone of a clone\n", filename(), swinfo->shortname());
+				osd_printf_error("%s: %s is a clone of a clone\n", filename(), swinfo.shortname());
 		}
 
 		// make sure the driver name is 8 chars or less
-		if ((is_clone && strlen(swinfo->shortname()) > NAME_LEN_CLONE) || (!is_clone && strlen(swinfo->shortname()) > NAME_LEN_PARENT))
-			osd_printf_error("%s: %s %s driver name must be %d characters or less\n", filename(), swinfo->shortname(),
+		if ((is_clone && strlen(swinfo.shortname()) > NAME_LEN_CLONE) || (!is_clone && strlen(swinfo.shortname()) > NAME_LEN_PARENT))
+			osd_printf_error("%s: %s %s driver name must be %d characters or less\n", filename(), swinfo.shortname(),
 								is_clone ? "clone" : "parent", is_clone ? NAME_LEN_CLONE : NAME_LEN_PARENT);
 
 		// make sure the year is only digits, '?' or '+'
-		for (const char *s = swinfo->year(); *s != 0; s++)
+		for (const char *s = swinfo.year(); *s != 0; s++)
 			if (!isdigit((UINT8)*s) && *s != '?' && *s != '+')
 			{
-				osd_printf_error("%s: %s has an invalid year '%s'\n", filename(), swinfo->shortname(), swinfo->year());
+				osd_printf_error("%s: %s has an invalid year '%s'\n", filename(), swinfo.shortname(), swinfo.year());
 				break;
 			}
 
 		softlist_map part_names;
-		for (software_part *part = swinfo->first_part(); part != nullptr; part = part->next())
+		for (software_part &part : swinfo.parts())
 		{
-			if (part->interface() == nullptr)
-				osd_printf_error("%s: %s has a part (%s) without interface\n", filename(), swinfo->shortname(), part->name());
+			if (part.interface() == nullptr)
+				osd_printf_error("%s: %s has a part (%s) without interface\n", filename(), swinfo.shortname(), part.name());
 
-			if (part->romdata() == nullptr)
-				osd_printf_error("%s: %s has a part (%s) with no data\n", filename(), swinfo->shortname(), part->name());
+			if (part.romdata() == nullptr)
+				osd_printf_error("%s: %s has a part (%s) with no data\n", filename(), swinfo.shortname(), part.name());
 
-			if (!part_names.insert(std::make_pair(part->name(), swinfo)).second)
-				osd_printf_error("%s: %s has a part (%s) whose name is duplicate\n", filename(), swinfo->shortname(), part->name());
+			if (!part_names.insert(std::make_pair(part.name(), &swinfo)).second)
+				osd_printf_error("%s: %s has a part (%s) whose name is duplicate\n", filename(), swinfo.shortname(), part.name());
 
-			for (const rom_entry *data = part->romdata(); data->_name != nullptr; data++)
+			for (const rom_entry *data = part.romdata(); data->_name != nullptr; data++)
 				if (data->_hashdata != nullptr)
 				{
 					// make sure the hash is valid
 					hash_collection hashes;
 					if (!hashes.from_internal_string(data->_hashdata))
-						osd_printf_error("%s: %s has rom '%s' with an invalid hash string '%s'\n", filename(), swinfo->shortname(), data->_name, data->_hashdata);
+						osd_printf_error("%s: %s has rom '%s' with an invalid hash string '%s'\n", filename(), swinfo.shortname(), data->_name, data->_hashdata);
 				}
 		}
 	}
@@ -1253,7 +1253,7 @@ void softlist_parser::parse_soft_end(const char *tagname)
 		// get the info; if present, copy shared data (we assume name/value strings live
 		// in the string pool and don't need to be reallocated)
 		if (m_current_info != nullptr)
-			for (feature_list_item *item = m_current_info->shared_info(); item != nullptr; item = item->next())
-				m_current_part->m_featurelist.append(*global_alloc(feature_list_item(item->name(), item->value())));
+			for (feature_list_item &item : m_current_info->shared_info())
+				m_current_part->m_featurelist.append(*global_alloc(feature_list_item(item.name(), item.value())));
 	}
 }

@@ -100,10 +100,10 @@ void ui_menu_input_general::populate()
 	suborder[SEQ_TYPE_INCREMENT] = 2;
 
 	/* iterate over the input ports and add menu items */
-	for (input_type_entry *entry = machine().ioport().first_type(); entry != nullptr; entry = entry->next())
+	for (input_type_entry &entry : machine().ioport().types())
 
 		/* add if we match the group and we have a valid name */
-		if (entry->group() == group && entry->name() != nullptr && entry->name()[0] != 0)
+		if (entry.group() == group && entry.name() != nullptr && entry.name()[0] != 0)
 		{
 			input_seq_type seqtype;
 
@@ -114,15 +114,15 @@ void ui_menu_input_general::populate()
 				/* build an entry for the standard sequence */
 				input_item_data *item = (input_item_data *)m_pool_alloc(sizeof(*item));
 				memset(item, 0, sizeof(*item));
-				item->ref = entry;
-				if(pollingitem && pollingref == entry && pollingseq == seqtype)
+				item->ref = &entry;
+				if(pollingitem && pollingref == &entry && pollingseq == seqtype)
 					pollingitem = item;
 				item->seqtype = seqtype;
-				item->seq = machine().ioport().type_seq(entry->type(), entry->player(), seqtype);
-				item->defseq = &entry->defseq(seqtype);
+				item->seq = machine().ioport().type_seq(entry.type(), entry.player(), seqtype);
+				item->defseq = &entry.defseq(seqtype);
 				item->sortorder = sortorder * 4 + suborder[seqtype];
-				item->type = ioport_manager::type_is_analog(entry->type()) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
-				item->name = entry->name();
+				item->type = ioport_manager::type_is_analog(entry.type()) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
+				item->name = entry.name();
 				item->owner_name = nullptr;
 				item->next = itemlist;
 				itemlist = item;
@@ -162,29 +162,29 @@ void ui_menu_input_specific::populate()
 	suborder[SEQ_TYPE_INCREMENT] = 2;
 
 	/* iterate over the input ports and add menu items */
-	for (ioport_port *port = machine().ioport().first_port(); port != nullptr; port = port->next())
+	for (ioport_port &port : machine().ioport().ports())
 	{
 		port_count++;
-		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
+		for (ioport_field &field : port.fields())
 		{
-			const char *name = field->name();
+			const char *name = field.name();
 
 			/* add if we match the group and we have a valid name */
-			if (name != nullptr && field->enabled() &&
-				((field->type() == IPT_OTHER && field->name() != nullptr) || machine().ioport().type_group(field->type(), field->player()) != IPG_INVALID))
+			if (name != nullptr && field.enabled() &&
+				((field.type() == IPT_OTHER && field.name() != nullptr) || machine().ioport().type_group(field.type(), field.player()) != IPG_INVALID))
 			{
 				input_seq_type seqtype;
 				UINT32 sortorder;
 
 				/* determine the sorting order */
-				if (field->type() >= IPT_START1 && field->type() < IPT_ANALOG_LAST)
+				if (field.type() >= IPT_START1 && field.type() < IPT_ANALOG_LAST)
 				{
-					sortorder = (field->type() << 2) | (field->player() << 12);
-					if (strcmp(field->device().tag(), ":"))
+					sortorder = (field.type() << 2) | (field.player() << 12);
+					if (strcmp(field.device().tag(), ":"))
 						sortorder |= (port_count & 0xfff) * 0x10000;
 				}
 				else
-					sortorder = field->type() | 0xf000;
+					sortorder = field.type() | 0xf000;
 
 				/* loop over all sequence types */
 				for (seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
@@ -192,16 +192,16 @@ void ui_menu_input_specific::populate()
 					/* build an entry for the standard sequence */
 					input_item_data *item = (input_item_data *)m_pool_alloc(sizeof(*item));
 					memset(item, 0, sizeof(*item));
-					item->ref = field;
+					item->ref = &field;
 					item->seqtype = seqtype;
-					if(pollingitem && pollingref == field && pollingseq == seqtype)
+					if(pollingitem && pollingref == item->ref && pollingseq == seqtype)
 						pollingitem = item;
-					item->seq = field->seq(seqtype);
-					item->defseq = &field->defseq(seqtype);
+					item->seq = field.seq(seqtype);
+					item->defseq = &field.defseq(seqtype);
 					item->sortorder = sortorder + suborder[seqtype];
-					item->type = field->is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
+					item->type = field.is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 					item->name = name;
-					item->owner_name = field->device().tag();
+					item->owner_name = field.device().tag();
 					item->next = itemlist;
 					itemlist = item;
 
@@ -537,8 +537,6 @@ ui_menu_settings::ui_menu_settings(running_machine &machine, render_container *c
 
 void ui_menu_settings::populate()
 {
-	ioport_field *field;
-	ioport_port *port;
 	dip_descriptor **diplist_tailptr;
 	std::string prev_owner;
 	bool first_entry = true;
@@ -549,51 +547,50 @@ void ui_menu_settings::populate()
 	diplist_tailptr = &diplist;
 
 	/* loop over input ports and set up the current values */
-	for (port = machine().ioport().first_port(); port != nullptr; port = port->next())
-		for (field = port->first_field(); field != nullptr; field = field->next())
-			if (field->type() == type && field->enabled())
+	for (ioport_port &port : machine().ioport().ports())
+		for (ioport_field &field : port.fields())
+			if (field.type() == type && field.enabled())
 			{
 				UINT32 flags = 0;
 
 				/* set the left/right flags appropriately */
-				if (field->has_previous_setting())
+				if (field.has_previous_setting())
 					flags |= MENU_FLAG_LEFT_ARROW;
-				if (field->has_next_setting())
+				if (field.has_next_setting())
 					flags |= MENU_FLAG_RIGHT_ARROW;
 
 				/* add the menu item */
-				if (strcmp(field->device().tag(), prev_owner.c_str()) != 0)
+				if (strcmp(field.device().tag(), prev_owner.c_str()) != 0)
 				{
 					if (first_entry)
 						first_entry = false;
 					else
 						item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-					string_format("[root%s]", field->device().tag());
-					item_append(string_format("[root%s]", field->device().tag()).c_str(), nullptr, 0, nullptr);
-					prev_owner.assign(field->device().tag());
+					string_format("[root%s]", field.device().tag());
+					item_append(string_format("[root%s]", field.device().tag()).c_str(), nullptr, 0, nullptr);
+					prev_owner.assign(field.device().tag());
 				}
 
-				item_append(field->name(), field->setting_name(), flags, (void *)field);
+				item_append(field.name(), field.setting_name(), flags, (void *)&field);
 
 				/* for DIP switches, build up the model */
-				if (type == IPT_DIPSWITCH && field->first_diplocation() != nullptr)
+				if (type == IPT_DIPSWITCH && !field.diplocations().empty())
 				{
-					const ioport_diplocation *diploc;
 					ioport_field::user_settings settings;
-					UINT32 accummask = field->mask();
+					UINT32 accummask = field.mask();
 
 					/* get current settings */
-					field->get_user_settings(settings);
+					field.get_user_settings(settings);
 
 					/* iterate over each bit in the field */
-					for (diploc = field->first_diplocation(); diploc != nullptr; diploc = diploc->next())
+					for (const ioport_diplocation &diploc : field.diplocations())
 					{
 						UINT32 mask = accummask & ~(accummask - 1);
 						dip_descriptor *dip;
 
 						/* find the matching switch name */
 						for (dip = diplist; dip != nullptr; dip = dip->next)
-							if (strcmp(dip->name, diploc->name()) == 0)
+							if (strcmp(dip->name, diploc.name()) == 0)
 								break;
 
 						/* allocate new if none */
@@ -601,7 +598,7 @@ void ui_menu_settings::populate()
 						{
 							dip = (dip_descriptor *)m_pool_alloc(sizeof(*dip));
 							dip->next = nullptr;
-							dip->name = diploc->name();
+							dip->name = diploc.name();
 							dip->mask = dip->state = 0;
 							*diplist_tailptr = dip;
 							diplist_tailptr = &dip->next;
@@ -609,9 +606,9 @@ void ui_menu_settings::populate()
 						}
 
 						/* apply the bits */
-						dip->mask |= 1 << (diploc->number() - 1);
-						if (((settings.value & mask) != 0 && !diploc->inverted()) || ((settings.value & mask) == 0 && diploc->inverted()))
-							dip->state |= 1 << (diploc->number() - 1);
+						dip->mask |= 1 << (diploc.number() - 1);
+						if (((settings.value & mask) != 0 && !diploc.inverted()) || ((settings.value & mask) == 0 && diploc.inverted()))
+							dip->state |= 1 << (diploc.number() - 1);
 
 						/* clear the relevant bit in the accumulated mask */
 						accummask &= ~mask;
@@ -651,7 +648,6 @@ void ui_menu_settings_dip_switches::custom_render(void *selectedref, float top, 
 	// iterate over DIP switches
 	for (dip_descriptor *dip = diplist; dip != nullptr; dip = dip->next)
 	{
-		const ioport_diplocation *diploc;
 		UINT32 selectedmask = 0;
 
 		// determine the mask of selected bits
@@ -659,10 +655,10 @@ void ui_menu_settings_dip_switches::custom_render(void *selectedref, float top, 
 		{
 			ioport_field *field = (ioport_field *)selectedref;
 
-			if (field != nullptr && field->first_diplocation() != nullptr)
-				for (diploc = field->first_diplocation(); diploc != nullptr; diploc = diploc->next())
-					if (strcmp(dip->name, diploc->name()) == 0)
-						selectedmask |= 1 << (diploc->number() - 1);
+			if (field != nullptr && !field->diplocations().empty())
+				for (const ioport_diplocation &diploc : field->diplocations())
+					if (strcmp(dip->name, diploc.name()) == 0)
+						selectedmask |= 1 << (diploc.number() - 1);
 		}
 
 		// draw one switch
@@ -815,28 +811,26 @@ ui_menu_analog::ui_menu_analog(running_machine &machine, render_container *conta
 
 void ui_menu_analog::populate()
 {
-	ioport_field *field;
-	ioport_port *port;
 	std::string text;
 	std::string subtext;
 	std::string prev_owner;
 	bool first_entry = true;
 
 	/* loop over input ports and add the items */
-	for (port = machine().ioport().first_port(); port != nullptr; port = port->next())
-		for (field = port->first_field(); field != nullptr; field = field->next())
-			if (field->is_analog() && field->enabled())
+	for (ioport_port &port : machine().ioport().ports())
+		for (ioport_field &field : port.fields())
+			if (field.is_analog() && field.enabled())
 			{
 				ioport_field::user_settings settings;
 				int use_autocenter = false;
 				int type;
 
 				/* based on the type, determine if we enable autocenter */
-				switch (field->type())
+				switch (field.type())
 				{
 					case IPT_POSITIONAL:
 					case IPT_POSITIONAL_V:
-						if (field->analog_wraps())
+						if (field.analog_wraps())
 							break;
 
 					case IPT_AD_STICK_X:
@@ -855,7 +849,7 @@ void ui_menu_analog::populate()
 				}
 
 				/* get the user settings */
-				field->get_user_settings(settings);
+				field.get_user_settings(settings);
 
 				/* iterate over types */
 				for (type = 0; type < ANALOG_ITEM_COUNT; type++)
@@ -863,19 +857,19 @@ void ui_menu_analog::populate()
 					{
 						analog_item_data *data;
 						UINT32 flags = 0;
-						if (strcmp(field->device().tag(), prev_owner.c_str()) != 0)
+						if (strcmp(field.device().tag(), prev_owner.c_str()) != 0)
 						{
 							if (first_entry)
 								first_entry = false;
 							else
 								item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-							item_append(string_format("[root%s]", field->device().tag()).c_str(), nullptr, 0, nullptr);
-							prev_owner.assign(field->device().tag());
+							item_append(string_format("[root%s]", field.device().tag()).c_str(), nullptr, 0, nullptr);
+							prev_owner.assign(field.device().tag());
 						}
 
 						/* allocate a data item for tracking what this menu item refers to */
 						data = (analog_item_data *)m_pool_alloc(sizeof(*data));
-						data->field = field;
+						data->field = &field;
 						data->type = type;
 
 						/* determine the properties of this item */
@@ -883,39 +877,39 @@ void ui_menu_analog::populate()
 						{
 							default:
 							case ANALOG_ITEM_KEYSPEED:
-								text = string_format("%s Digital Speed", field->name());
+								text = string_format("%s Digital Speed", field.name());
 								subtext = string_format("%d", settings.delta);
 								data->min = 0;
 								data->max = 255;
 								data->cur = settings.delta;
-								data->defvalue = field->delta();
+								data->defvalue = field.delta();
 								break;
 
 							case ANALOG_ITEM_CENTERSPEED:
-								text = string_format("%s Autocenter Speed", field->name());
+								text = string_format("%s Autocenter Speed", field.name());
 								subtext = string_format("%d", settings.centerdelta);
 								data->min = 0;
 								data->max = 255;
 								data->cur = settings.centerdelta;
-								data->defvalue = field->centerdelta();
+								data->defvalue = field.centerdelta();
 								break;
 
 							case ANALOG_ITEM_REVERSE:
-								text = string_format("%s Reverse", field->name());
+								text = string_format("%s Reverse", field.name());
 								subtext.assign(settings.reverse ? "On" : "Off");
 								data->min = 0;
 								data->max = 1;
 								data->cur = settings.reverse;
-								data->defvalue = field->analog_reverse();
+								data->defvalue = field.analog_reverse();
 								break;
 
 							case ANALOG_ITEM_SENSITIVITY:
-								text = string_format("%s Sensitivity", field->name());
+								text = string_format("%s Sensitivity", field.name());
 								subtext = string_format("%d", settings.sensitivity);
 								data->min = 1;
 								data->max = 255;
 								data->cur = settings.sensitivity;
-								data->defvalue = field->sensitivity();
+								data->defvalue = field.sensitivity();
 								break;
 						}
 
