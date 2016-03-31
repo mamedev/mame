@@ -17,7 +17,7 @@
 
 #include "emu.h"
 #include "peribox.h"
-#include "bus/ti99x/grom.h"
+#include "machine/tmc0430.h"
 
 extern const device_type TI99_P_CODE;
 
@@ -29,6 +29,9 @@ public:
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
+
+	DECLARE_WRITE_LINE_MEMBER(clock_in) override;
 
 	DECLARE_WRITE_LINE_MEMBER( ready_line );
 	DECLARE_INPUT_CHANGED_MEMBER( switch_changed );
@@ -42,10 +45,22 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	ti99_grom_device*   m_grom[8];
+	tmc0430_device*   m_grom[8];
 	UINT8*              m_rom;
 	int                 m_bank_select;
-	bool                m_switch;
+	bool                m_active;
+	int                 m_clock_count;
+	bool                m_clockhigh;
+
+	// Address in card area
+	bool m_inDsrArea;
+
+	bool    m_isrom0;
+	bool    m_isrom12;
+	bool    m_isgrom;
+
+	// Recent address
+	int m_address;
 };
 
 #endif

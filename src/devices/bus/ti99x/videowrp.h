@@ -30,7 +30,7 @@ protected:
 	/* Constructor */
 	ti_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual void device_start(void) override;
-	virtual void device_reset(void) override;
+	virtual void device_reset(void) override { };
 	virtual DECLARE_READ8Z_MEMBER(readz) override { };
 	virtual DECLARE_WRITE8_MEMBER(write) override { };
 };
@@ -55,6 +55,8 @@ class ti_exp_video_device : public ti_video_device
 {
 public:
 	ti_exp_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	template<class _Object> static devcb_base &set_out_gromclk_callback(device_t &device, _Object object) { return downcast<ti_exp_video_device &>(device).m_out_gromclk_cb.set_callback(object); }
+
 	void video_update_mouse(int delta_x, int delta_y, int buttons);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
@@ -63,9 +65,19 @@ public:
 	void    reset_vdp(int state) override { m_v9938->reset_line(state); }
 
 protected:
-	virtual void    device_start(void) override;
-	v9938_device    *m_v9938;
+	virtual void        device_start(void) override;
+	virtual void device_reset(void) override;
+
+private:
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	v9938_device        *m_v9938;
+	devcb_write_line    m_out_gromclk_cb; // GROMCLK line is optional; if present, pulse it by XTAL/24 rate
+	emu_timer   *m_gromclk_timer;
 };
+
+#define MCFG_ADD_GROMCLK_CB(_devcb) \
+	devcb = &ti_exp_video_device::set_out_gromclk_callback(*device, DEVCB_##_devcb);
+
 
 extern const device_type TI99VIDEO;
 extern const device_type V9938VIDEO;
@@ -131,35 +143,39 @@ protected:
 
 /****************************************************************************/
 
-#define MCFG_TI_TMS991x_ADD_NTSC(_tag, _chip, _vsize, _class, _int)    \
+#define MCFG_TI_TMS991x_ADD_NTSC(_tag, _chip, _vsize, _class, _int, _gclk)    \
 	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)                                     \
 	MCFG_DEVICE_ADD( VDP_TAG, _chip, XTAL_10_738635MHz / 2 )                  \
 	MCFG_TMS9928A_VRAM_SIZE(_vsize) \
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(_class,_int)) \
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(_class,_gclk)) \
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )                             \
 	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 
-#define MCFG_TI_TMS991x_ADD_PAL(_tag, _chip, _vsize, _class, _int)     \
+#define MCFG_TI_TMS991x_ADD_PAL(_tag, _chip, _vsize, _class, _int, _gclk)     \
 	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)                                     \
 	MCFG_DEVICE_ADD( VDP_TAG, _chip, XTAL_10_738635MHz / 2 ) \
 	MCFG_TMS9928A_VRAM_SIZE(_vsize) \
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(_class,_int))   \
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(_class,_gclk)) \
 	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )                              \
 	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 
-#define MCFG_TI998_ADD_NTSC(_tag, _chip, _vsize, _class, _int) \
+#define MCFG_TI998_ADD_NTSC(_tag, _chip, _vsize, _class, _int, _gclk) \
 	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)                                     \
 	MCFG_DEVICE_ADD( VDP_TAG, _chip, XTAL_10_738635MHz / 2 )                  \
 	MCFG_TMS9928A_VRAM_SIZE(_vsize) \
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(_class,_int)) \
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(_class,_gclk)) \
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )                             \
 	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 
-#define MCFG_TI998_ADD_PAL(_tag, _chip, _vsize, _class, _int)      \
+#define MCFG_TI998_ADD_PAL(_tag, _chip, _vsize, _class, _int, _gclk)      \
 	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)                                     \
 	MCFG_DEVICE_ADD( VDP_TAG, _chip, XTAL_10_738635MHz / 2 )                      \
 	MCFG_TMS9928A_VRAM_SIZE(_vsize) \
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(_class,_int)) \
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(_class,_gclk)) \
 	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )                              \
 	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 

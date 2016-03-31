@@ -259,7 +259,7 @@ WRITE8_MEMBER(peribox_device::write)
 SETADDRESS_DBIN_MEMBER(peribox_device::setaddress_dbin)
 {
 	// Ignore the address when the TI-99/8 transmits the high-order 8 bits
-	// if (!m_memen) return;
+	if (!m_memen) return;
 
 	for (int i=2; i <= 8; i++)
 	{

@@ -39,7 +39,9 @@ ti_std_video_device::ti_std_video_device(const machine_config &mconfig, const ch
 }
 
 ti_exp_video_device::ti_exp_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ti_video_device(mconfig, V9938VIDEO, "TI99 EXP Video subsystem", tag, owner, clock, "v9938_video", __FILE__), m_v9938(nullptr)
+	: ti_video_device(mconfig, V9938VIDEO, "TI99 EXP Video subsystem", tag, owner, clock, "v9938_video", __FILE__),
+		m_v9938(nullptr),
+		m_out_gromclk_cb(*this)
 {
 }
 
@@ -129,6 +131,14 @@ WRITE16_MEMBER( ti_exp_video_device::write16 )
 	}
 }
 
+void ti_exp_video_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	// Pulse it
+	m_out_gromclk_cb(ASSERT_LINE);
+	m_out_gromclk_cb(CLEAR_LINE);
+}
+
+
 /******************************************************************************/
 
 /*
@@ -194,10 +204,13 @@ void ti_video_device::device_start(void)
 void ti_exp_video_device::device_start(void)
 {
 	m_v9938 = static_cast<v9938_device*>(machine().device(VDP_TAG));
+	m_out_gromclk_cb.resolve();
+	m_gromclk_timer = timer_alloc(0);
 }
 
-void ti_video_device::device_reset(void)
+void ti_exp_video_device::device_reset(void)
 {
+	if (!m_out_gromclk_cb.isnull()) m_gromclk_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_10_738635MHz/24));
 }
 
 /**************************************************************************/
