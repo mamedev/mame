@@ -529,6 +529,8 @@
 			elseif kind == "StaticLib" then
 				prefix = "lib"
 				ext = ".a"
+			elseif kind == "SharedLib" then
+				ext = ".prx"
 			end
 		end
 
