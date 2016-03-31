@@ -1038,7 +1038,7 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *m_event)
 			{
 				software_list_device_iterator iter(enumerator.config().root_device());
 				for (software_list_device *swlistdev = iter.first(); swlistdev != nullptr; swlistdev = iter.next())
-					if (swlistdev->first_software_info() != nullptr)
+					if (!swlistdev->get_info().empty())
 					{
 						ui_menu::stack_push(global_alloc_clear<ui_menu_select_software>(machine(), container, driver));
 						return;
@@ -1149,14 +1149,14 @@ void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 			else if (!mopt.skip_parts_menu() && swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
 			{
 				s_parts parts;
-				for (const software_part *swpart = swinfo->first_part(); swpart != nullptr; swpart = swpart->next())
+				for (const software_part &swpart : swinfo->parts())
 				{
-					if (swpart->matches_interface(ui_swinfo->interface.c_str()))
+					if (swpart.matches_interface(ui_swinfo->interface.c_str()))
 					{
-						std::string menu_part_name(swpart->name());
-						if (swpart->feature("part_id") != nullptr)
-							menu_part_name.assign("(").append(swpart->feature("part_id")).append(")");
-						parts.emplace(swpart->name(), menu_part_name);
+						std::string menu_part_name(swpart.name());
+						if (swpart.feature("part_id") != nullptr)
+							menu_part_name.assign("(").append(swpart.feature("part_id")).append(")");
+						parts.emplace(swpart.name(), menu_part_name);
 					}
 				}
 				ui_menu::stack_push(global_alloc_clear<ui_software_parts>(machine(), container, parts, ui_swinfo));

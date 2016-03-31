@@ -2113,6 +2113,14 @@ tms5220_device::tms5220_device(const machine_config &mconfig, const char *tag, d
 		m_data_cb(*this),
 		m_romclk_cb(*this)
 {
+	// prevent unused variable warnings
+	(void)m_PDC;
+	(void)m_CTL_pins;
+	(void)m_state;
+	(void)m_address;
+	(void)m_next_is_address;
+	(void)m_addr_bit;
+	(void)m_CTL_buffer;
 }
 
 tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)

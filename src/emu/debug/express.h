@@ -169,7 +169,7 @@ public:
 	symbol_table(void *globalref, symbol_table *parent = nullptr);
 
 	// getters
-	symbol_entry *first() const { return m_symlist.first(); }
+	const tagged_list<symbol_entry> &entries() const { return m_symlist; }
 	symbol_table *parent() const { return m_parent; }
 	void *globalref() const { return m_globalref; }
 

@@ -533,9 +533,9 @@ void ui_menu_select_software::build_software_list()
 	{
 		m_filter.swlist.name.push_back(swlist->list_name());
 		m_filter.swlist.description.push_back(swlist->description());
-		for (software_info *swinfo = swlist->first_software_info(); swinfo != nullptr; swinfo = swinfo->next())
+		for (software_info &swinfo : swlist->get_info())
 		{
-			software_part *part = swinfo->first_part();
+			software_part *part = swinfo.first_part();
 			if (part->is_compatible(*swlist))
 			{
 				const char *instance_name = nullptr;
@@ -561,12 +561,12 @@ void ui_menu_select_software::build_software_list()
 				if (instance_name == nullptr || type_name == nullptr)
 					continue;
 
-				tmpmatches.shortname = strensure(swinfo->shortname());
-				tmpmatches.longname = strensure(swinfo->longname());
-				tmpmatches.parentname = strensure(swinfo->parentname());
-				tmpmatches.year = strensure(swinfo->year());
-				tmpmatches.publisher = strensure(swinfo->publisher());
-				tmpmatches.supported = swinfo->supported();
+				tmpmatches.shortname = strensure(swinfo.shortname());
+				tmpmatches.longname = strensure(swinfo.longname());
+				tmpmatches.parentname = strensure(swinfo.parentname());
+				tmpmatches.year = strensure(swinfo.year());
+				tmpmatches.publisher = strensure(swinfo.publisher());
+				tmpmatches.supported = swinfo.supported();
 				tmpmatches.part = strensure(part->name());
 				tmpmatches.driver = m_driver;
 				tmpmatches.listname = strensure(swlist->list_name());
@@ -576,9 +576,9 @@ void ui_menu_select_software::build_software_list()
 				tmpmatches.usage.clear();
 				tmpmatches.available = false;
 
-				for (feature_list_item *flist = swinfo->other_info(); flist != nullptr; flist = flist->next())
-					if (!strcmp(flist->name(), "usage"))
-						tmpmatches.usage = flist->value();
+				for (feature_list_item &flist : swinfo.other_info())
+					if (!strcmp(flist.name(), "usage"))
+						tmpmatches.usage = flist.value();
 
 				m_swinfo.push_back(tmpmatches);
 				m_filter.region.set(tmpmatches.longname);
@@ -937,14 +937,14 @@ void ui_menu_select_software::inkey_select(const ui_menu_event *m_event)
 			else if (!mopt.skip_parts_menu() && swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
 			{
 				s_parts parts;
-				for (const software_part *swpart = swinfo->first_part(); swpart != nullptr; swpart = swpart->next())
+				for (const software_part &swpart : swinfo->parts())
 				{
-					if (swpart->matches_interface(ui_swinfo->interface.c_str()))
+					if (swpart.matches_interface(ui_swinfo->interface.c_str()))
 					{
-						std::string menu_part_name(swpart->name());
-						if (swpart->feature("part_id") != nullptr)
-							menu_part_name.assign("(").append(swpart->feature("part_id")).append(")");
-						parts.emplace(swpart->name(), menu_part_name);
+						std::string menu_part_name(swpart.name());
+						if (swpart.feature("part_id") != nullptr)
+							menu_part_name.assign("(").append(swpart.feature("part_id")).append(")");
+						parts.emplace(swpart.name(), menu_part_name);
 					}
 				}
 				ui_menu::stack_push(global_alloc_clear<ui_software_parts>(machine(), container, parts, ui_swinfo));
@@ -2091,14 +2091,14 @@ void ui_bios_selection::handle()
 					if (!machine().ui().options().skip_parts_menu() && swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
 					{
 						s_parts parts;
-						for (const software_part *swpart = swinfo->first_part(); swpart != nullptr; swpart = swpart->next())
+						for (const software_part &swpart : swinfo->parts())
 						{
-							if (swpart->matches_interface(ui_swinfo->interface.c_str()))
+							if (swpart.matches_interface(ui_swinfo->interface.c_str()))
 							{
-								std::string menu_part_name(swpart->name());
-								if (swpart->feature("part_id") != nullptr)
-									menu_part_name.assign("(").append(swpart->feature("part_id")).append(")");
-								parts.emplace(swpart->name(), menu_part_name);
+								std::string menu_part_name(swpart.name());
+								if (swpart.feature("part_id") != nullptr)
+									menu_part_name.assign("(").append(swpart.feature("part_id")).append(")");
+								parts.emplace(swpart.name(), menu_part_name);
 							}
 						}
 						ui_menu::stack_push(global_alloc_clear<ui_software_parts>(machine(), container, parts, ui_swinfo));

@@ -668,7 +668,7 @@ void peribox_slot_device::device_start(void)
 void peribox_slot_device::device_config_complete()
 {
 	m_slotnumber = get_index_from_tagname();
-	device_t *carddev = first_subdevice();
+	device_t *carddev = subdevices().first();
 	peribox_device *peb = static_cast<peribox_device*>(owner());
 	if (carddev != nullptr)
 	{

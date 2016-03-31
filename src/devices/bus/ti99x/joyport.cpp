@@ -87,7 +87,7 @@ void joyport_device::device_start()
 
 void joyport_device::device_config_complete()
 {
-	m_connected = static_cast<joyport_attached_device*>(first_subdevice());
+	m_connected = static_cast<joyport_attached_device*>(subdevices().first());
 }
 
 /*****************************************************************************/

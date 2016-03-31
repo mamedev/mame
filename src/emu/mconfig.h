@@ -84,6 +84,10 @@ public:
 	device_t *device_find(device_t *owner, const char *tag);
 
 private:
+	// internal helpers
+	void remove_references(ATTR_UNUSED device_t &device);
+	device_t &config_new_device(device_t &device);
+
 	// internal state
 	const game_driver &     m_gamedrv;
 	emu_options &           m_options;

@@ -199,7 +199,7 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	int attenuation() const { return m_attenuation; }
-	sound_stream *first_stream() const { return m_stream_list.first(); }
+	const simple_list<sound_stream> &streams() const { return m_stream_list; }
 	attotime last_update() const { return m_last_update; }
 	attoseconds_t update_attoseconds() const { return m_update_attoseconds; }
 

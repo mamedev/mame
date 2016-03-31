@@ -434,14 +434,15 @@ void pci_bridge_device::device_start()
 	for(auto & elem : sub_devices)
 		elem = nullptr;
 
-	for(device_t *d = bus_root()->first_subdevice(); d != nullptr; d = d->next()) {
-		const char *t = d->tag();
+	for (device_t &d : bus_root()->subdevices())
+	{
+		const char *t = d.tag();
 		int l = strlen(t);
 		if(l <= 4 || t[l-5] != ':' || t[l-2] != '.')
 			continue;
 		int id = strtol(t+l-4, nullptr, 16);
 		int fct = t[l-1] - '0';
-		sub_devices[(id << 3) | fct] = downcast<pci_device *>(d);
+		sub_devices[(id << 3) | fct] = downcast<pci_device *>(&d);
 	}
 
 	mapper_cb cf_cb(FUNC(pci_bridge_device::regenerate_config_mapping), this);

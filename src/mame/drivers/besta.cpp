@@ -87,7 +87,7 @@ WRITE8_MEMBER( besta_state::mpcc_reg_w )
 			m_term_data = data;
 			break;
 		case 10:
-			dynamic_cast<generic_terminal_device *>(devconf)->write(*machine().memory().first_space(), 0, data);
+			dynamic_cast<generic_terminal_device *>(devconf)->write(generic_space(), 0, data);
 		default:
 			m_mpcc_regs[offset] = data;
 			break;

@@ -566,8 +566,8 @@ void screen_device::realloc_screen_bitmaps()
 	INT32 effheight = MAX(m_height, m_visarea.max_y + 1);
 
 	// reize all registered screen bitmaps
-	for (auto_bitmap_item *item = m_auto_bitmap_list.first(); item != nullptr; item = item->next())
-		item->m_bitmap.resize(effwidth, effheight);
+	for (auto_bitmap_item &item : m_auto_bitmap_list)
+		item.m_bitmap.resize(effwidth, effheight);
 
 	// re-set up textures
 	if (m_palette != nullptr)
@@ -910,15 +910,13 @@ void screen_device::register_vblank_callback(vblank_state_delegate vblank_callba
 	// validate arguments
 	assert(!vblank_callback.isnull());
 
-	// check if we already have this callback registered
-	callback_item *item;
-	for (item = m_callback_list.first(); item != nullptr; item = item->next())
-		if (item->m_callback == vblank_callback)
-			break;
+	// do nothing if we already have this callback registered
+	for (callback_item &item : m_callback_list)
+		if (item.m_callback == vblank_callback)
+			return;
 
 	// if not found, register
-	if (item == nullptr)
-		m_callback_list.append(*global_alloc(callback_item(vblank_callback)));
+	m_callback_list.append(*global_alloc(callback_item(vblank_callback)));
 }
 
 
@@ -955,8 +953,8 @@ void screen_device::vblank_begin()
 		machine().video().frame_update();
 
 	// call the screen specific callbacks
-	for (callback_item *item = m_callback_list.first(); item != nullptr; item = item->next())
-		item->m_callback(*this, true);
+	for (callback_item &item : m_callback_list)
+		item.m_callback(*this, true);
 	if (!m_screen_vblank.isnull())
 		m_screen_vblank(*this, true);
 
@@ -979,8 +977,8 @@ void screen_device::vblank_begin()
 void screen_device::vblank_end()
 {
 	// call the screen specific callbacks
-	for (callback_item *item = m_callback_list.first(); item != nullptr; item = item->next())
-		item->m_callback(*this, false);
+	for (callback_item &item : m_callback_list)
+		item.m_callback(*this, false);
 	if (!m_screen_vblank.isnull())
 		m_screen_vblank(*this, false);
 
