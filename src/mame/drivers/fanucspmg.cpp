@@ -19,7 +19,7 @@ if the LOAD key is accidentally pressed quickly while using the system, which wo
 erase everything in memory and all data up to that point and re-load the software from
 scratch. When loading is activated application software is read from floppies.
 
-The softwares are not point and click auto-generation type conversational CAD/CAM
+The software are not point and click auto-generation type conversational CAD/CAM
 applications. The earlier 'non-Symbolic' software requires knowledge of programming in APT
 and other languages of the era. The 'Symbolic' software has menus and asks questions and
 the blanks must be filled in correctly. The graphics are mostly made of lines but are
