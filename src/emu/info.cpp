@@ -1128,7 +1128,7 @@ void info_xml_creator::output_ports(const ioport_list &portlist)
 	// cycle through ports
 	for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
 	{
-		fprintf(m_output,"\t\t<port tag=\"%s\">\n",port->tag());
+		fprintf(m_output,"\t\t<port tag=\"%s\">\n", xml_normalize_string(port->tag()));
 		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 		{
 			if(field->is_analog())
