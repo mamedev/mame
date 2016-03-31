@@ -942,11 +942,22 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_argb3
 	bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
 	// loop over characters
-	for (const char *s = m_string.c_str(); *s != 0; s++)
+	const char *origs = m_string.c_str();
+	const char *ends = origs + strlen(origs);
+	const char *s = origs;
+	unicode_char schar;
+	
+	// loop over characters
+	while (*s != 0)
 	{
+		int	scharcount = uchar_from_utf8(&schar, s, ends - s);
+		
+		if (scharcount == -1)
+			break;
+
 		// get the font bitmap
 		rectangle chbounds;
-		font->get_scaled_bitmap_and_bounds(tempbitmap, bounds.height(), aspect, *s, chbounds);
+		font->get_scaled_bitmap_and_bounds(tempbitmap, bounds.height(), aspect, schar, chbounds);
 
 		// copy the data into the target
 		for (int y = 0; y < chbounds.height(); y++)
@@ -977,7 +988,8 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_argb3
 		}
 
 		// advance in the X direction
-		curx += font->char_width(bounds.height(), aspect, *s);
+		curx += font->char_width(bounds.height(), aspect, schar);
+		s += scharcount;
 	}
 
 	// free the temporary bitmap and font
@@ -1100,12 +1112,22 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 					// allocate a temporary bitmap
 					bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
+					const char *origs = m_stopnames[fruit].c_str();
+					const char *ends = origs + strlen(origs);
+					const char *s = origs;
+					unicode_char schar;
+
 					// loop over characters
-					for (const char *s = m_stopnames[fruit].c_str(); *s != 0; s++)
+					while (*s != 0)
 					{
+						int	scharcount = uchar_from_utf8(&schar, s, ends - s);
+		
+						if (scharcount == -1)
+							break;
+
 						// get the font bitmap
 						rectangle chbounds;
-						font->get_scaled_bitmap_and_bounds(tempbitmap, ourheight/num_shown, aspect, *s, chbounds);
+						font->get_scaled_bitmap_and_bounds(tempbitmap, ourheight/num_shown, aspect, schar, chbounds);
 
 						// copy the data into the target
 						for (int y = 0; y < chbounds.height(); y++)
@@ -1137,8 +1159,8 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 						}
 
 						// advance in the X direction
-						curx += font->char_width(ourheight/num_shown, aspect, *s);
-
+						curx += font->char_width(ourheight/num_shown, aspect, schar);
+						s += scharcount;
 					}
 
 				}
@@ -1250,12 +1272,23 @@ void layout_element::component::draw_beltreel(running_machine &machine, bitmap_a
 				// allocate a temporary bitmap
 				bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
+
+				const char *origs =m_stopnames[fruit].c_str();
+				const char *ends = origs + strlen(origs);
+				const char *s = origs;
+				unicode_char schar;
+
 				// loop over characters
-				for (const char *s = m_stopnames[fruit].c_str(); *s != 0; s++)
+				while (*s != 0)
 				{
+					int	scharcount = uchar_from_utf8(&schar, s, ends - s);
+		
+					if (scharcount == -1)
+						break;
+
 					// get the font bitmap
 					rectangle chbounds;
-					font->get_scaled_bitmap_and_bounds(tempbitmap, dest.height(), aspect, *s, chbounds);
+					font->get_scaled_bitmap_and_bounds(tempbitmap, dest.height(), aspect, schar, chbounds);
 
 					// copy the data into the target
 					for (int y = 0; y < chbounds.height(); y++)
@@ -1287,8 +1320,8 @@ void layout_element::component::draw_beltreel(running_machine &machine, bitmap_a
 					}
 
 					// advance in the X direction
-					curx += font->char_width(dest.height(), aspect, *s);
-
+					curx += font->char_width(dest.height(), aspect, schar);
+					s += scharcount;
 				}
 
 			}
