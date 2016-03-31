@@ -1105,8 +1105,8 @@ public:
 	ioport_manager &manager() const;
 	running_machine &machine() const;
 	int modcount() const { return m_modcount; }
-	ioport_setting *first_setting() const { return m_settinglist.first(); }
-	ioport_diplocation *first_diplocation() const { return m_diploclist.first(); }
+	const auto &settings() const { return m_settinglist; }
+	const auto &diplocations() const { return m_diploclist; }
 
 	ioport_value mask() const { return m_mask; }
 	ioport_value defvalue() const { return m_defvalue; }
@@ -1291,7 +1291,7 @@ public:
 	ioport_manager &manager() const;
 	device_t &device() const { return m_device; }
 	running_machine &machine() const;
-	ioport_field *first_field() const { return m_fieldlist.first(); }
+	const auto &fields() const { return m_fieldlist; }
 	const char *tag() const { return m_tag.c_str(); }
 	int modcount() const { return m_modcount; }
 	ioport_value active() const { return m_active; }
@@ -1302,7 +1302,7 @@ public:
 	void write(ioport_value value, ioport_value mask = ~0);
 
 	// other operations
-	ioport_field *field(ioport_value mask);
+	ioport_field *field(ioport_value mask) const;
 	void collapse_fields(std::string &errorbuf);
 	void frame_update(ioport_field *mouse_field);
 	void init_live_state();
@@ -1466,7 +1466,7 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	ioport_port *first_port() const { return m_portlist.first(); }
+	const ioport_list &ports() const { return m_portlist; }
 	bool safe_to_read() const { return m_safe_to_read; }
 	natural_keyboard &natkeyboard() { return m_natkeyboard; }
 
@@ -1477,7 +1477,7 @@ public:
 	bool has_bioses() const { return m_has_bioses; }
 
 	// type helpers
-	input_type_entry *first_type() const { return m_typelist.first(); }
+	const auto &types() const { return m_typelist; }
 	bool type_pressed(ioport_type type, int player = 0);
 	const char *type_name(ioport_type type, UINT8 player);
 	ioport_group type_group(ioport_type type, int player);

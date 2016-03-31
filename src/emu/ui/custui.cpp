@@ -215,18 +215,18 @@ ui_menu_font_ui::ui_menu_font_ui(running_machine &machine, render_container *con
 	m_info_size = moptions.infos_size();
 	m_font_size = moptions.font_rows();
 
-	for (ui_options::entry *f_entry = moptions.first(); f_entry != nullptr; f_entry = f_entry->next())
+	for (ui_options::entry &f_entry : moptions)
 	{
-		const char *name = f_entry->name();
-		if (name && strlen(name) && !strcmp(OPTION_INFOS_SIZE, f_entry->name()))
+		const char *name = f_entry.name();
+		if (name && strlen(name) && !strcmp(OPTION_INFOS_SIZE, f_entry.name()))
 		{
-			m_info_max = atof(f_entry->maximum());
-			m_info_min = atof(f_entry->minimum());
+			m_info_max = atof(f_entry.maximum());
+			m_info_min = atof(f_entry.minimum());
 		}
-		else if (name && strlen(name) && !strcmp(OPTION_FONT_ROWS, f_entry->name()))
+		else if (name && strlen(name) && !strcmp(OPTION_FONT_ROWS, f_entry.name()))
 		{
-			m_font_max = atof(f_entry->maximum());
-			m_font_min = atof(f_entry->minimum());
+			m_font_max = atof(f_entry.maximum());
+			m_font_min = atof(f_entry.minimum());
 		}
 	}
 

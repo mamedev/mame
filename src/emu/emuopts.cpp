@@ -311,7 +311,7 @@ void emu_options::update_slot_options(const software_part *swpart)
 	{
 		// retrieve info about the device instance
 		const char *name = slot->device().tag() + 1;
-		if (exists(name) && slot->first_option() != nullptr)
+		if (exists(name) && !slot->option_list().empty())
 		{
 			std::string defvalue = slot->get_default_card_software();
 			if (defvalue.length() > 0)

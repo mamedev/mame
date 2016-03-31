@@ -127,7 +127,7 @@ device_memory_interface::device_memory_interface(const machine_config &mconfig, 
 	memset(m_addrspace, 0, sizeof(m_addrspace));
 
 	// configure the fast accessor
-	device.m_memory = this;
+	device.interfaces().m_memory = this;
 }
 
 

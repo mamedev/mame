@@ -392,9 +392,9 @@ luabridge::LuaRef lua_engine::l_options_get_entries(const T *o)
 	luabridge::LuaRef entries_table = luabridge::LuaRef::newTable(L);
 
 	int unadorned_index = 0;
-	for (typename T::entry *curentry = options->first(); curentry != nullptr; curentry = curentry->next())
+	for (typename T::entry &curentry : *options)
 	{
-		const char *name = curentry->name();
+		const char *name = curentry.name();
 		bool is_unadorned = false;
 		// check if it's unadorned
 		if (name && strlen(name) && !strcmp(name, options->unadorned(unadorned_index)))
@@ -402,8 +402,8 @@ luabridge::LuaRef lua_engine::l_options_get_entries(const T *o)
 			unadorned_index++;
 			is_unadorned = true;
 		}
-		if (!curentry->is_header() && !curentry->is_command() && !curentry->is_internal() && !is_unadorned)
-			entries_table[name] = curentry;
+		if (!curentry.is_header() && !curentry.is_command() && !curentry.is_internal() && !is_unadorned)
+			entries_table[name] = &curentry;
 	}
 
 	return entries_table;
@@ -458,8 +458,8 @@ luabridge::LuaRef lua_engine::l_cheat_get_entries(const cheat_manager *c)
 	luabridge::LuaRef entry_table = luabridge::LuaRef::newTable(L);
 
 	int cheatnum = 0;
-	for (cheat_entry *entry = cm->first(); entry != nullptr; entry = entry->next()) {
-		entry_table[cheatnum++] = entry;
+	for (cheat_entry &entry : cm->entries()) {
+		entry_table[cheatnum++] = &entry;
 	}
 
 	return entry_table;
@@ -496,10 +496,9 @@ luabridge::LuaRef lua_engine::l_ioport_get_ports(const ioport_manager *m)
 	ioport_manager *im = const_cast<ioport_manager *>(m);
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef port_table = luabridge::LuaRef::newTable(L);
-	ioport_port *port;
 
-	for (port = im->first_port(); port != nullptr; port = port->next()) {
-		port_table[port->tag()] = port;
+	for (ioport_port &port : im->ports()) {
+		port_table[port.tag()] = &port;
 	}
 
 	return port_table;
@@ -515,10 +514,9 @@ luabridge::LuaRef lua_engine::l_ioports_port_get_fields(const ioport_port *i)
 	ioport_port *p = const_cast<ioport_port *>(i);
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef f_table = luabridge::LuaRef::newTable(L);
-	ioport_field *field;
 
-	for (field = p->first_field(); field != nullptr; field = field->next()) {
-		f_table[field->name()] = field;
+	for (ioport_field &field : p->fields()) {
+		f_table[field.name()] = &field;
 	}
 
 	return f_table;
@@ -535,9 +533,9 @@ luabridge::LuaRef lua_engine::l_render_get_targets(const render_manager *r)
 	luabridge::LuaRef target_table = luabridge::LuaRef::newTable(L);
 
 	int tc = 0;
-	for (render_target *curr_rt = r->first_target(); curr_rt != nullptr; curr_rt = curr_rt->next())
+	for (render_target &curr_rt : r->targets())
 	{
-		target_table[tc++] = curr_rt;
+		target_table[tc++] = &curr_rt;
 	}
 
 	return target_table;
@@ -547,10 +545,10 @@ luabridge::LuaRef lua_engine::l_render_get_targets(const render_manager *r)
 luabridge::LuaRef lua_engine::devtree_dfs(device_t *root, luabridge::LuaRef devs_table)
 {
 	if (root) {
-		for (device_t *dev = root->first_subdevice(); dev != nullptr; dev = dev->next()) {
-			if (dev && dev->configured() && dev->started()) {
-				devs_table[dev->tag()] = dev;
-				devtree_dfs(dev, devs_table);
+		for (device_t &dev : root->subdevices()) {
+			if (dev.configured() && dev.started()) {
+				devs_table[dev.tag()] = &dev;
+				devtree_dfs(&dev, devs_table);
 			}
 		}
 	}
@@ -587,11 +585,10 @@ luabridge::LuaRef lua_engine::l_dev_get_states(const device_t *d)
 	device_t *dev = const_cast<device_t *>(d);
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef st_table = luabridge::LuaRef::newTable(L);
-	for (const device_state_entry *s = dev->state().state_first(); s != nullptr; s = s->next()) {
+	for (device_state_entry &s : dev->state().state_entries())
+	{
 		// XXX: refrain from exporting non-visible entries?
-		if (s) {
-			st_table[s->symbol()] = const_cast<device_state_entry *>(s);
-		}
+		st_table[s.symbol()] = &s;
 	}
 
 	return st_table;
@@ -1385,17 +1382,16 @@ void lua_engine::update_machine()
 	if (m_machine!=nullptr)
 	{
 		// Create the ioport array
-		ioport_port *port = machine().ioport().first_port();
-		while(port) {
-			ioport_field *field = port->first_field();
-			while(field) {
-				if(field->name()) {
-					push(m_lua_state, field, tname_ioport);
-					lua_setfield(m_lua_state, -2, field->name());
+		for (ioport_port &port : machine().ioport().ports())
+		{
+			for (ioport_field &field : port.fields())
+			{
+				if (field.name())
+				{
+					push(m_lua_state, &field, tname_ioport);
+					lua_setfield(m_lua_state, -2, field.name());
 				}
-				field = field->next();
 			}
-			port = port->next();
 		}
 	}
 	lua_setglobal(m_lua_state, "ioport");

@@ -453,7 +453,7 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 			m_maxstate = 65536;
 	}
 
-	if (m_complist.first() != nullptr)
+	if (!m_complist.empty())
 	{
 		// determine the scale/offset for normalization
 		float xoffs = bounds.x0;
@@ -462,12 +462,12 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 		float yscale = 1.0f / (bounds.y1 - bounds.y0);
 
 		// normalize all the component bounds
-		for (component *curcomp = m_complist.first(); curcomp != nullptr; curcomp = curcomp->next())
+		for (component &curcomp : m_complist)
 		{
-			curcomp->m_bounds.x0 = (curcomp->m_bounds.x0 - xoffs) * xscale;
-			curcomp->m_bounds.x1 = (curcomp->m_bounds.x1 - xoffs) * xscale;
-			curcomp->m_bounds.y0 = (curcomp->m_bounds.y0 - yoffs) * yscale;
-			curcomp->m_bounds.y1 = (curcomp->m_bounds.y1 - yoffs) * yscale;
+			curcomp.m_bounds.x0 = (curcomp.m_bounds.x0 - xoffs) * xscale;
+			curcomp.m_bounds.x1 = (curcomp.m_bounds.x1 - xoffs) * xscale;
+			curcomp.m_bounds.y0 = (curcomp.m_bounds.y0 - yoffs) * yscale;
+			curcomp.m_bounds.y1 = (curcomp.m_bounds.y1 - yoffs) * yscale;
 		}
 	}
 
@@ -515,19 +515,19 @@ void layout_element::element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, c
 	texture *elemtex = (texture *)param;
 
 	// iterate over components that are part of the current state
-	for (component *curcomp = elemtex->m_element->m_complist.first(); curcomp != nullptr; curcomp = curcomp->next())
-		if (curcomp->m_state == -1 || curcomp->m_state == elemtex->m_state)
+	for (component &curcomp : elemtex->m_element->m_complist)
+		if (curcomp.m_state == -1 || curcomp.m_state == elemtex->m_state)
 		{
 			// get the local scaled bounds
 			rectangle bounds;
-			bounds.min_x = render_round_nearest(curcomp->bounds().x0 * dest.width());
-			bounds.min_y = render_round_nearest(curcomp->bounds().y0 * dest.height());
-			bounds.max_x = render_round_nearest(curcomp->bounds().x1 * dest.width());
-			bounds.max_y = render_round_nearest(curcomp->bounds().y1 * dest.height());
+			bounds.min_x = render_round_nearest(curcomp.bounds().x0 * dest.width());
+			bounds.min_y = render_round_nearest(curcomp.bounds().y0 * dest.height());
+			bounds.max_x = render_round_nearest(curcomp.bounds().x1 * dest.width());
+			bounds.max_y = render_round_nearest(curcomp.bounds().y1 * dest.height());
 			bounds &= dest.cliprect();
 
 			// based on the component type, add to the texture
-			curcomp->draw(elemtex->m_element->machine(), dest, bounds, elemtex->m_state);
+			curcomp.draw(elemtex->m_element->machine(), dest, bounds, elemtex->m_state);
 		}
 }
 
@@ -2186,21 +2186,22 @@ layout_view::~layout_view()
 
 
 //-------------------------------------------------
-//  first_item - return the first item in the
-//  appropriate list
+//  items - return the appropriate list
 //-------------------------------------------------
 
-layout_view::item *layout_view::first_item(item_layer layer) const
+const simple_list<layout_view::item> &layout_view::items(item_layer layer) const
 {
+	static simple_list<item> s_null_list;
+
 	switch (layer)
 	{
-		case ITEM_LAYER_BACKDROP:   return m_backdrop_list.first();
-		case ITEM_LAYER_SCREEN:     return m_screen_list.first();
-		case ITEM_LAYER_OVERLAY:    return m_overlay_list.first();
-		case ITEM_LAYER_BEZEL:      return m_bezel_list.first();
-		case ITEM_LAYER_CPANEL:     return m_cpanel_list.first();
-		case ITEM_LAYER_MARQUEE:    return m_marquee_list.first();
-		default:                    return nullptr;
+		case ITEM_LAYER_BACKDROP:   return m_backdrop_list;
+		case ITEM_LAYER_SCREEN:     return m_screen_list;
+		case ITEM_LAYER_OVERLAY:    return m_overlay_list;
+		case ITEM_LAYER_BEZEL:      return m_bezel_list;
+		case ITEM_LAYER_CPANEL:     return m_cpanel_list;
+		case ITEM_LAYER_MARQUEE:    return m_marquee_list;
+		default:                    return s_null_list;
 	}
 }
 
@@ -2235,26 +2236,26 @@ void layout_view::recompute(render_layer_config layerconfig)
 
 		// only do it if requested
 		if (m_layenabled[layer])
-			for (item *curitem = first_item(layer); curitem != nullptr; curitem = curitem->next())
+			for (item &curitem : items(layer))
 			{
 				// accumulate bounds
 				if (first)
-					m_bounds = curitem->m_rawbounds;
+					m_bounds = curitem.m_rawbounds;
 				else
-					union_render_bounds(&m_bounds, &curitem->m_rawbounds);
+					union_render_bounds(&m_bounds, &curitem.m_rawbounds);
 				first = false;
 
 				// accumulate screen bounds
-				if (curitem->m_screen != nullptr)
+				if (curitem.m_screen != nullptr)
 				{
 					if (scrfirst)
-						m_scrbounds = curitem->m_rawbounds;
+						m_scrbounds = curitem.m_rawbounds;
 					else
-						union_render_bounds(&m_scrbounds, &curitem->m_rawbounds);
+						union_render_bounds(&m_scrbounds, &curitem.m_rawbounds);
 					scrfirst = false;
 
 					// accumulate the screens in use while we're scanning
-					m_screens.add(*curitem->m_screen);
+					m_screens.add(*curitem.m_screen);
 				}
 			}
 	}
@@ -2296,12 +2297,12 @@ void layout_view::recompute(render_layer_config layerconfig)
 
 	// normalize all the item bounds
 	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
-		for (item *curitem = first_item(layer); curitem != nullptr; curitem = curitem->next())
+		for (item &curitem : items(layer))
 		{
-			curitem->m_bounds.x0 = target_bounds.x0 + (curitem->m_rawbounds.x0 - xoffs) * xscale;
-			curitem->m_bounds.x1 = target_bounds.x0 + (curitem->m_rawbounds.x1 - xoffs) * xscale;
-			curitem->m_bounds.y0 = target_bounds.y0 + (curitem->m_rawbounds.y0 - yoffs) * yscale;
-			curitem->m_bounds.y1 = target_bounds.y0 + (curitem->m_rawbounds.y1 - yoffs) * yscale;
+			curitem.m_bounds.x0 = target_bounds.x0 + (curitem.m_rawbounds.x0 - xoffs) * xscale;
+			curitem.m_bounds.x1 = target_bounds.x0 + (curitem.m_rawbounds.x1 - xoffs) * xscale;
+			curitem.m_bounds.y0 = target_bounds.y0 + (curitem.m_rawbounds.y0 - yoffs) * yscale;
+			curitem.m_bounds.y1 = target_bounds.y0 + (curitem.m_rawbounds.y1 - yoffs) * yscale;
 		}
 }
 
@@ -2314,9 +2315,9 @@ void layout_view::resolve_tags()
 {
 	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
 	{
-		for (item *curitem = first_item(layer); curitem != nullptr; curitem = curitem->next())
+		for (item &curitem : items(layer))
 		{
-			curitem->resolve_tags();
+			curitem.resolve_tags();
 		}
 	}
 }
@@ -2350,9 +2351,12 @@ layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simpl
 	if (name != nullptr)
 	{
 		// search the list of elements for a match
-		for (m_element = elemlist.first(); m_element != nullptr; m_element = m_element->next())
-			if (strcmp(name, m_element->name()) == 0)
+		for (layout_element &elem : elemlist)
+			if (strcmp(name, elem.name()) == 0)
+			{
+				m_element = &elem;
 				break;
+			}
 
 		// error if not found
 		if (m_element == nullptr)

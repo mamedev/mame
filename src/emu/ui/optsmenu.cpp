@@ -346,11 +346,11 @@ void save_main_option(running_machine &machine)
 		}
 	}
 
-	for (emu_options::entry *f_entry = machine.options().first(); f_entry != nullptr; f_entry = f_entry->next())
+	for (emu_options::entry &f_entry : machine.options())
 	{
-		if (f_entry->is_changed())
+		if (f_entry.is_changed())
 		{
-			options.set_value(f_entry->name(), f_entry->value(), OPTION_PRIORITY_CMDLINE, error_string);
+			options.set_value(f_entry.name(), f_entry.value(), OPTION_PRIORITY_CMDLINE, error_string);
 		}
 	}
 

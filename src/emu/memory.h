@@ -457,8 +457,9 @@ private:
 	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank);
 	void adjust_addresses(offs_t &start, offs_t &end, offs_t &mask, offs_t &mirror);
 	void *find_backing_memory(offs_t addrstart, offs_t addrend);
-	bool needs_backing_store(const address_map_entry *entry);
+	bool needs_backing_store(const address_map_entry &entry);
 	memory_bank &bank_find_or_allocate(const char *tag, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite);
+	memory_bank *bank_find_anonymous(offs_t bytestart, offs_t byteend) const;
 	address_map_entry *block_assign_intersecting(offs_t bytestart, offs_t byteend, UINT8 *base);
 
 protected:
@@ -551,7 +552,7 @@ class memory_bank
 		address_space &space() const { return m_space; }
 
 		// does this reference match the space+read/write combination?
-		bool matches(address_space &space, read_or_write readorwrite) const
+		bool matches(const address_space &space, read_or_write readorwrite) const
 		{
 			return (&space == &m_space && (readorwrite == ROW_READWRITE || readorwrite == m_readorwrite));
 		}
@@ -592,7 +593,7 @@ public:
 	bool straddles(offs_t bytestart, offs_t byteend) const { return (m_bytestart < byteend && m_byteend > bytestart); }
 
 	// track and verify address space references to this bank
-	bool references_space(address_space &space, read_or_write readorwrite) const;
+	bool references_space(const address_space &space, read_or_write readorwrite) const;
 	void add_reference(address_space &space, read_or_write readorwrite);
 
 	// set the base explicitly
@@ -718,9 +719,6 @@ private:
 class memory_manager
 {
 	friend class address_space;
-	friend class address_table;
-	friend class device_t;
-	friend class memory_block;
 
 public:
 	// construction/destruction
@@ -729,8 +727,9 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	address_space *first_space() const { return m_spacelist.first(); }
-	memory_region *first_region() const { return m_regionlist.first(); }
+	const auto &banks() const { return m_banklist; }
+	const auto &regions() const { return m_regionlist; }
+	const auto &shares() const { return m_sharelist; }
 
 	// dump the internal memory tables to the given file
 	void dump(FILE *file);
@@ -741,13 +740,10 @@ public:
 	// regions
 	memory_region *region_alloc(const char *name, UINT32 length, UINT8 width, endianness_t endian);
 	void region_free(const char *name);
+	memory_region *region_containing(const void *memory, offs_t bytes) const;
 
 private:
 	// internal helpers
-	memory_bank *first_bank() const { return m_banklist.first(); }
-	memory_bank *bank(const char *tag) const { return m_banklist.find(tag); }
-	memory_region *region(const char *tag) { return m_regionlist.find(tag); }
-	memory_share *shared(const char *tag) { return m_sharelist.find(tag); }
 	void bank_reattach();
 
 	// internal state

@@ -66,9 +66,9 @@ debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_up
 
 	// count the number of comments
 	int total_comments = 0;
-	for (const debug_view_source *source = m_source_list.first(); source != nullptr; source = source->next())
+	for (const debug_view_source &source : m_source_list)
 	{
-		const debug_view_disasm_source &dasmsource = downcast<const debug_view_disasm_source &>(*source);
+		const debug_view_disasm_source &dasmsource = downcast<const debug_view_disasm_source &>(source);
 		total_comments += dasmsource.m_device.debug()->comment_count();
 	}
 

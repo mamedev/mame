@@ -56,6 +56,11 @@ public:
 	_ElementType *first() const { return m_list.first(); }
 	_ElementType *last() const { return m_list.last(); }
 	int count() const { return m_list.count(); }
+	bool empty() const { return m_list.empty(); }
+
+	// range iterators
+	auto begin() const { return m_list.begin(); }
+	auto end() const { return m_list.end(); }
 
 	// remove (free) all objects in the list, leaving an empty list
 	void reset() { m_list.reset(); m_map.clear(); }

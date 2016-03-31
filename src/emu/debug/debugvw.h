@@ -156,7 +156,7 @@ public:
 	bool cursor_supported() { flush_updates(); return m_supports_cursor; }
 	bool cursor_visible() { flush_updates(); return m_cursor_visible; }
 	const debug_view_source *source() const { return m_source; }
-	const debug_view_source *first_source() { return m_source_list.first(); }
+	const debug_view_source *first_source() const { return m_source_list.first(); }
 	const simple_list<debug_view_source> &source_list() const { return m_source_list; }
 
 	// setters

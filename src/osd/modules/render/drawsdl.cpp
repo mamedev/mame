@@ -397,12 +397,12 @@ int renderer_sdl2::draw(int update)
 	// FIXME: this could be a lot easier if we get the primlist here!
 	//          Bounds would be set fit for purpose and done!
 
-	for (render_primitive *prim = window().m_primlist->first(); prim != nullptr; prim = prim->next())
+	for (render_primitive &prim : *window().m_primlist)
 	{
-		prim->bounds.x0 = floor(fw * prim->bounds.x0 + 0.5f);
-		prim->bounds.x1 = floor(fw * prim->bounds.x1 + 0.5f);
-		prim->bounds.y0 = floor(fh * prim->bounds.y0 + 0.5f);
-		prim->bounds.y1 = floor(fh * prim->bounds.y1 + 0.5f);
+		prim.bounds.x0 = floor(fw * prim.bounds.x0 + 0.5f);
+		prim.bounds.x1 = floor(fw * prim.bounds.x1 + 0.5f);
+		prim.bounds.y0 = floor(fh * prim.bounds.y0 + 0.5f);
+		prim.bounds.y1 = floor(fh * prim.bounds.y1 + 0.5f);
 	}
 
 	// render to it

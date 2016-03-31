@@ -1905,8 +1905,6 @@ static slider_state *slider_alloc(running_machine &machine, const char *title, I
 
 static slider_state *slider_init(running_machine &machine)
 {
-	ioport_field *field;
-	ioport_port *port;
 	slider_state *listhead = nullptr;
 	slider_state **tailptr = &listhead;
 	std::string str;
@@ -1929,12 +1927,12 @@ static slider_state *slider_init(running_machine &machine)
 	}
 
 	// add analog adjusters
-	for (port = machine.ioport().first_port(); port != nullptr; port = port->next())
-		for (field = port->first_field(); field != nullptr; field = field->next())
-			if (field->type() == IPT_ADJUSTER)
+	for (ioport_port &port : machine.ioport().ports())
+		for (ioport_field &field : port.fields())
+			if (field.type() == IPT_ADJUSTER)
 			{
-				void *param = (void *)field;
-				*tailptr = slider_alloc(machine, field->name(), field->minval(), field->defvalue(), field->maxval(), 1, slider_adjuster, param);
+				void *param = (void *)&field;
+				*tailptr = slider_alloc(machine, field.name(), field.minval(), field.defvalue(), field.maxval(), 1, slider_adjuster, param);
 				tailptr = &(*tailptr)->next;
 			}
 
@@ -2040,15 +2038,15 @@ static slider_state *slider_init(running_machine &machine)
 
 #ifdef MAME_DEBUG
 	// add crosshair adjusters
-	for (port = machine.ioport().first_port(); port != nullptr; port = port->next())
-		for (field = port->first_field(); field != nullptr; field = field->next())
-			if (field->crosshair_axis() != CROSSHAIR_AXIS_NONE && field->player() == 0)
+	for (ioport_port &port : machine.ioport().ports())
+		for (ioport_field &field : port.fields())
+			if (field.crosshair_axis() != CROSSHAIR_AXIS_NONE && field.player() == 0)
 			{
-				void *param = (void *)field;
-				str = string_format(_("Crosshair Scale %1$s"), (field->crosshair_axis() == CROSSHAIR_AXIS_X) ? _("X") : _("Y"));
+				void *param = (void *)&field;
+				str = string_format(_("Crosshair Scale %1$s"), (field.crosshair_axis() == CROSSHAIR_AXIS_X) ? _("X") : _("Y"));
 				*tailptr = slider_alloc(machine, str.c_str(), -3000, 1000, 3000, 100, slider_crossscale, param);
 				tailptr = &(*tailptr)->next;
-				str = string_format(_("Crosshair Offset %1$s"), (field->crosshair_axis() == CROSSHAIR_AXIS_X) ? _("X") : _("Y"));
+				str = string_format(_("Crosshair Offset %1$s"), (field.crosshair_axis() == CROSSHAIR_AXIS_X) ? _("X") : _("Y"));
 				*tailptr = slider_alloc(machine, str.c_str(), -3000, 0, 3000, 100, slider_crossoffset, param);
 				tailptr = &(*tailptr)->next;
 			}

@@ -254,7 +254,7 @@ void gromport_device::cartridge_inserted()
 
 void gromport_device::device_config_complete()
 {
-	m_connector = static_cast<ti99_cartridge_connector_device*>(first_subdevice());
+	m_connector = static_cast<ti99_cartridge_connector_device*>(subdevices().first());
 	set_grom_base(0x9800, 0xf800);
 }
 
@@ -352,7 +352,7 @@ WRITE8_MEMBER(single_conn_device::cruwrite)
 
 void single_conn_device::device_start()
 {
-	m_cartridge = static_cast<ti99_cartridge_device*>(first_subdevice());
+	m_cartridge = static_cast<ti99_cartridge_device*>(subdevices().first());
 }
 
 void single_conn_device::device_reset()

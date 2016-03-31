@@ -192,19 +192,19 @@ void machine_manager::start_luaengine()
 					osd_printf_error("**Error loading plugin.ini**");
 			}
 		}
-		for (auto curentry = m_plugins->first(); curentry != nullptr; curentry = curentry->next())
+		for (auto &curentry : *m_plugins)
 		{
-			if (!curentry->is_header())
+			if (!curentry.is_header())
 			{
-				if (std::find(include.begin(), include.end(), curentry->name()) != include.end())
+				if (std::find(include.begin(), include.end(), curentry.name()) != include.end())
 				{
 					std::string error_string;
-					m_plugins->set_value(curentry->name(), "1", OPTION_PRIORITY_CMDLINE, error_string);
+					m_plugins->set_value(curentry.name(), "1", OPTION_PRIORITY_CMDLINE, error_string);
 				}
-				if (std::find(exclude.begin(), exclude.end(), curentry->name()) != exclude.end())
+				if (std::find(exclude.begin(), exclude.end(), curentry.name()) != exclude.end())
 				{
 					std::string error_string;
-					m_plugins->set_value(curentry->name(), "0", OPTION_PRIORITY_CMDLINE, error_string);
+					m_plugins->set_value(curentry.name(), "0", OPTION_PRIORITY_CMDLINE, error_string);
 				}
 			}
 		}
