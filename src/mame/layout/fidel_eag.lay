@@ -113,12 +113,12 @@
 		<text string="H"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 
-	<element name="text_r11"><text string="K"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r21"><text string="Q"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r31"><text string="R"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r41"><text string="B"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r51"><text string="N"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r61"><text string="P"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r11"><text string="&#x265a;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r21"><text string="&#x265b;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r31"><text string="&#x265c;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r41"><text string="&#x265d;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r51"><text string="&#x265e;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r61"><text string="&#x265f;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
 	<element name="text_r12"><text string="PB" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_r22"><text string="PV" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
@@ -380,12 +380,12 @@
 
 	<!-- right side -->
 
-		<bezel element="text_r11"><bounds x="91.5" y="29.75" width="2.5" height="1.5" /></bezel>
-		<bezel element="text_r21"><bounds x="91.5" y="32.25" width="2.5" height="1.5" /></bezel>
-		<bezel element="text_r31"><bounds x="91.5" y="34.75" width="2.5" height="1.5" /></bezel>
-		<bezel element="text_r41"><bounds x="91.5" y="37.25" width="2.5" height="1.5" /></bezel>
-		<bezel element="text_r51"><bounds x="91.5" y="39.75" width="2.5" height="1.5" /></bezel>
-		<bezel element="text_r61"><bounds x="91.5" y="42.25" width="2.5" height="1.5" /></bezel>
+		<bezel element="text_r11"><bounds x="91.5" y="29.3" width="2.5" height="2" /></bezel>
+		<bezel element="text_r21"><bounds x="91.5" y="31.8" width="2.5" height="2" /></bezel>
+		<bezel element="text_r31"><bounds x="91.5" y="34.3" width="2.5" height="2" /></bezel>
+		<bezel element="text_r41"><bounds x="91.5" y="36.8" width="2.5" height="2" /></bezel>
+		<bezel element="text_r51"><bounds x="91.5" y="39.3" width="2.5" height="2" /></bezel>
+		<bezel element="text_r61"><bounds x="91.5" y="41.8" width="2.5" height="2" /></bezel>
 
 		<bezel element="text_r12"><bounds x="96.8" y="29.75" width="10" height="1.5" /></bezel>
 		<bezel element="text_r22"><bounds x="96.8" y="32.25" width="10" height="1.5" /></bezel>
