@@ -443,7 +443,7 @@ void ImGui::ShowTestWindow(bool* p_opened)
             static char buf6[64] = ""; ImGui::InputText("\"imgui\" letters", buf6, 64, ImGuiInputTextFlags_CallbackCharFilter, TextFilters::FilterImGuiLetters);
 
             ImGui::Text("Password input");
-            static char bufpass[64] = "password123"; 
+            static char bufpass[64] = "password123";
             ImGui::InputText("password", bufpass, 64, ImGuiInputTextFlags_Password | ImGuiInputTextFlags_CharsNoBlank);
             ImGui::SameLine(); ShowHelpMarker("Display all characters as '*'.\nDisable clipboard cut and copy.\nDisable logging.\n");
             ImGui::InputText("password (clear)", bufpass, 64, ImGuiInputTextFlags_CharsNoBlank);
@@ -454,7 +454,7 @@ void ImGui::ShowTestWindow(bool* p_opened)
         if (ImGui::TreeNode("Multi-line Text Input"))
         {
             static bool read_only = false;
-            static char text[1024*16] = 
+            static char text[1024*16] =
                 "/*\n"
                 " The Pentium F00F bug, shorthand for F0 0F C7 C8,\n"
                 " the hexadecimal encoding of one offending instruction,\n"
@@ -816,7 +816,7 @@ void ImGui::ShowTestWindow(bool* p_opened)
         if (ImGui::TreeNode("Widgets Width"))
         {
             static float f = 0.0f;
-            ImGui::Text("PushItemWidth(100)"); 
+            ImGui::Text("PushItemWidth(100)");
             ImGui::SameLine(); ShowHelpMarker("Fixed width.");
             ImGui::PushItemWidth(100);
             ImGui::DragFloat("float##1", &f);
@@ -996,8 +996,8 @@ void ImGui::ShowTestWindow(bool* p_opened)
 
             // Tree
             const float spacing = ImGui::GetStyle().ItemInnerSpacing.x;
-            ImGui::Button("Button##1"); 
-            ImGui::SameLine(0.0f, spacing); 
+            ImGui::Button("Button##1");
+            ImGui::SameLine(0.0f, spacing);
             if (ImGui::TreeNode("Node##1")) { for (int i = 0; i < 6; i++) ImGui::BulletText("Item %d..", i); ImGui::TreePop(); }    // Dummy tree data
 
             ImGui::AlignFirstTextHeightToWidgets();         // Vertically align text node a bit lower so it'll be vertically centered with upcoming widget. Otherwise you can use SmallButton (smaller fit).
@@ -1006,8 +1006,8 @@ void ImGui::ShowTestWindow(bool* p_opened)
             if (tree_opened) { for (int i = 0; i < 6; i++) ImGui::BulletText("Item %d..", i); ImGui::TreePop(); }   // Dummy tree data
 
             // Bullet
-            ImGui::Button("Button##3"); 
-            ImGui::SameLine(0.0f, spacing); 
+            ImGui::Button("Button##3");
+            ImGui::SameLine(0.0f, spacing);
             ImGui::BulletText("Bullet text");
 
             ImGui::AlignFirstTextHeightToWidgets();
@@ -1086,7 +1086,7 @@ void ImGui::ShowTestWindow(bool* p_opened)
             ImGui::PopStyleVar(2);
             float scroll_x_delta = 0.0f;
             ImGui::SmallButton("<<"); if (ImGui::IsItemActive()) scroll_x_delta = -ImGui::GetIO().DeltaTime * 1000.0f;
-            ImGui::SameLine(); ImGui::Text("Scroll from code"); ImGui::SameLine(); 
+            ImGui::SameLine(); ImGui::Text("Scroll from code"); ImGui::SameLine();
             ImGui::SmallButton(">>"); if (ImGui::IsItemActive()) scroll_x_delta = +ImGui::GetIO().DeltaTime * 1000.0f;
             if (scroll_x_delta != 0.0f)
             {
@@ -1108,7 +1108,7 @@ void ImGui::ShowTestWindow(bool* p_opened)
             ImGui::InvisibleButton("##dummy", size);
             if (ImGui::IsItemActive() && ImGui::IsMouseDragging()) { offset.x += ImGui::GetIO().MouseDelta.x; offset.y += ImGui::GetIO().MouseDelta.y; }
             ImGui::GetWindowDrawList()->AddRectFilled(pos, ImVec2(pos.x+size.x,pos.y+size.y), ImColor(90,90,120,255));
-            ImGui::GetWindowDrawList()->AddText(ImGui::GetWindowFont(), ImGui::GetWindowFontSize()*2.0f, ImVec2(pos.x+offset.x,pos.y+offset.y), ImColor(255,255,255,255), "Line 1 hello\nLine 2 clip me!", NULL, 0.0f, &clip_rect);
+            ImGui::GetWindowDrawList()->AddText(ImGui::GetFont(), ImGui::GetFontSize()*2.0f, ImVec2(pos.x+offset.x,pos.y+offset.y), ImColor(255,255,255,255), "Line 1 hello\nLine 2 clip me!", NULL, 0.0f, &clip_rect);
             ImGui::TreePop();
         }
     }
@@ -1181,7 +1181,7 @@ void ImGui::ShowTestWindow(bool* p_opened)
             ImGui::Spacing();
             ImGui::TextWrapped("Below we are testing adding menu items to a regular window. It's rather unusual but should work!");
             ImGui::Separator();
-            // NB: As a quirk in this very specific example, we want to differentiate the parent of this menu from the parent of the various popup menus above. 
+            // NB: As a quirk in this very specific example, we want to differentiate the parent of this menu from the parent of the various popup menus above.
             // To do so we are encloding the items in a PushID()/PopID() block to make them two different menusets. If we don't, opening any popup above and hovering our menu here
             // would open it. This is because once a menu is active, we allow to switch to a sibling menu by just hovering on it, which is the desired behavior for regular menus.
             ImGui::PushID("foo");
@@ -1396,7 +1396,7 @@ void ImGui::ShowTestWindow(bool* p_opened)
         ImGui::SameLine(); ShowHelpMarker("NB: Tree node must be poped before ending the cell.\nThere's no storage of state per-cell.");
         if (node_opened)
         {
-            ImGui::Columns(2, "tree items"); 
+            ImGui::Columns(2, "tree items");
             ImGui::Separator();
             if (ImGui::TreeNode("Hello")) { ImGui::BulletText("Sailor"); ImGui::TreePop(); } ImGui::NextColumn();
             if (ImGui::TreeNode("Bonjour")) { ImGui::BulletText("Marin"); ImGui::TreePop(); } ImGui::NextColumn();
@@ -1513,7 +1513,7 @@ void ImGui::ShowTestWindow(bool* p_opened)
             ImGui::Button("Holding me clears the\nthe keyboard capture flag");
             if (ImGui::IsItemActive())
                 ImGui::CaptureKeyboardFromApp(false);
-            
+
             ImGui::TreePop();
         }
 
@@ -1798,30 +1798,32 @@ static void ShowExampleAppCustomRendering(bool* opened)
     ImGui::Text("Primitives");
     static float sz = 36.0f;
     static ImVec4 col = ImVec4(1.0f,1.0f,0.4f,1.0f);
-    ImGui::DragFloat("Size", &sz, 0.2f, 2.0f, 72.0f, "%.0f"); 
+    ImGui::DragFloat("Size", &sz, 0.2f, 2.0f, 72.0f, "%.0f");
     ImGui::ColorEdit3("Color", &col.x);
     {
         const ImVec2 p = ImGui::GetCursorScreenPos();
         const ImU32 col32 = ImColor(col);
         float x = p.x + 4.0f, y = p.y + 4.0f, spacing = 8.0f;
-        draw_list->AddCircle(ImVec2(x+sz*0.5f, y+sz*0.5f), sz*0.5f, col32, 32); x += sz+spacing;
-        draw_list->AddRect(ImVec2(x, y), ImVec2(x+sz, y+sz), col32); x += sz+spacing;
-        draw_list->AddRect(ImVec2(x, y), ImVec2(x+sz, y+sz), col32, 10.0f); x += sz+spacing;
-        draw_list->AddLine(ImVec2(x, y), ImVec2(x+sz, y   ), col32); x += sz+spacing;
-        draw_list->AddLine(ImVec2(x, y), ImVec2(x+sz, y+sz), col32); x += sz+spacing;
-        draw_list->AddLine(ImVec2(x, y), ImVec2(x,    y+sz), col32); x += spacing;
-        draw_list->AddBezierCurve(ImVec2(x, y), ImVec2(x+sz*1.3f,y+sz*0.3f), ImVec2(x+sz-sz*1.3f,y+sz-sz*0.3f), ImVec2(x+sz, y+sz), col32, 1.0f);
-        x = p.x + 4;
-        y += sz+spacing;
+        for (int n = 0; n < 2; n++)
+        {
+            float thickness = (n == 0) ? 1.0f : 4.0f;
+            draw_list->AddCircle(ImVec2(x+sz*0.5f, y+sz*0.5f), sz*0.5f, col32, 20, thickness); x += sz+spacing;
+            draw_list->AddRect(ImVec2(x, y), ImVec2(x+sz, y+sz), col32, 0.0f, ~0, thickness); x += sz+spacing;
+            draw_list->AddRect(ImVec2(x, y), ImVec2(x+sz, y+sz), col32, 10.0f, ~0, thickness); x += sz+spacing;
+            draw_list->AddTriangle(ImVec2(x+sz*0.5f, y), ImVec2(x+sz,y+sz-0.5f), ImVec2(x,y+sz-0.5f), col32, thickness); x += sz+spacing;
+            draw_list->AddLine(ImVec2(x, y), ImVec2(x+sz, y   ), col32, thickness); x += sz+spacing;
+            draw_list->AddLine(ImVec2(x, y), ImVec2(x+sz, y+sz), col32, thickness); x += sz+spacing;
+            draw_list->AddLine(ImVec2(x, y), ImVec2(x,    y+sz), col32, thickness); x += spacing;
+            draw_list->AddBezierCurve(ImVec2(x, y), ImVec2(x+sz*1.3f,y+sz*0.3f), ImVec2(x+sz-sz*1.3f,y+sz-sz*0.3f), ImVec2(x+sz, y+sz), col32, thickness);
+            x = p.x + 4;
+            y += sz+spacing;
+        }
         draw_list->AddCircleFilled(ImVec2(x+sz*0.5f, y+sz*0.5f), sz*0.5f, col32, 32); x += sz+spacing;
         draw_list->AddRectFilled(ImVec2(x, y), ImVec2(x+sz, y+sz), col32); x += sz+spacing;
         draw_list->AddRectFilled(ImVec2(x, y), ImVec2(x+sz, y+sz), col32, 10.0f); x += sz+spacing;
-        draw_list->AddLine(ImVec2(x, y), ImVec2(x+sz, y   ), col32, 4.0f); x += sz+spacing;
-        draw_list->AddLine(ImVec2(x, y), ImVec2(x+sz, y+sz), col32, 4.0f); x += sz+spacing;
-        draw_list->AddLine(ImVec2(x, y), ImVec2(x,    y+sz), col32, 4.0f); x += spacing;
-        draw_list->AddBezierCurve(ImVec2(x, y), ImVec2(x+sz*1.3f,y+sz*0.3f), ImVec2(x+sz-sz*1.3f,y+sz-sz*0.3f), ImVec2(x+sz, y+sz), col32, 4.0f); x += sz+spacing;
+        draw_list->AddTriangleFilled(ImVec2(x+sz*0.5f, y), ImVec2(x+sz,y+sz-0.5f), ImVec2(x,y+sz-0.5f), col32); x += sz+spacing;
         draw_list->AddRectFilledMultiColor(ImVec2(x, y), ImVec2(x+sz, y+sz), ImColor(0,0,0), ImColor(255,0,0), ImColor(255,255,0), ImColor(0,255,0));
-        ImGui::Dummy(ImVec2((sz+spacing)*8, (sz+spacing)*2));
+        ImGui::Dummy(ImVec2((sz+spacing)*8, (sz+spacing)*3));
     }
     ImGui::Separator();
     {
@@ -2303,7 +2305,7 @@ static void ShowExampleAppPropertyEditor(bool* p_opened)
             ImGui::AlignFirstTextHeightToWidgets();
             ImGui::Text("my sailor is rich");
             ImGui::NextColumn();
-            if (opened) 
+            if (opened)
             {
                 static float dummy_members[8] = { 0.0f,0.0f,1.0f,3.1416f,100.0f,999.0f };
                 for (int i = 0; i < 8; i++)
@@ -2336,7 +2338,7 @@ static void ShowExampleAppPropertyEditor(bool* p_opened)
                 ImGui::TreePop();
             }
             ImGui::PopID();
-        }                
+        }
     };
 
     // Iterate dummy objects with dummy members (all the same data)

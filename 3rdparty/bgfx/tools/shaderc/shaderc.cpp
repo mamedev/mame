@@ -98,6 +98,14 @@ namespace bgfx
 		NULL
 	};
 
+	static const char* s_ARB_texture_multisample[] =
+	{
+		"sampler2DMS",
+		"isampler2DMS",
+		"usampler2DMS",
+		NULL
+	};
+
 	const char* s_uniformTypeName[UniformType::Count] =
 	{
 		"int",
@@ -1058,6 +1066,20 @@ namespace bgfx
 				memset(&data[size+1], 0, padding);
 				fclose(file);
 
+				if (!raw)
+				{
+					// To avoid commented code being recognized as used feature,
+					// first preprocess pass is used to strip all comments before
+					// substituting code.
+					preprocessor.run(data);
+					delete [] data;
+
+					size = (uint32_t)preprocessor.m_preprocessed.size();
+					data = new char[size+padding+1];
+					memcpy(data, preprocessor.m_preprocessed.c_str(), size);
+					memset(&data[size], 0, padding+1);
+				}
+
 				strNormalizeEol(data);
 
 				input = const_cast<char*>(bx::strws(data) );
@@ -1089,21 +1111,6 @@ namespace bgfx
 					}
 
 					input = const_cast<char*>(bx::strws(input) );
-				}
-
-				if (!raw)
-				{
-					// To avoid commented code being recognized as used feature,
-					// first preprocess pass is used to strip all comments before
-					// substituting code.
-					preprocessor.run(input);
-					delete [] data;
-
-					size = (uint32_t)preprocessor.m_preprocessed.size();
-					data = new char[size+padding+1];
-					memcpy(data, preprocessor.m_preprocessed.c_str(), size);
-					memset(&data[size], 0, padding+1);
-					input = data;
 				}
 			}
 
@@ -1726,6 +1733,7 @@ namespace bgfx
 								const bool hasTextureLod    = NULL != bx::findIdentifierMatch(input, s_ARB_shader_texture_lod /*EXT_shader_texture_lod*/);
 								const bool hasShader5       = NULL != bx::findIdentifierMatch(input, s_ARB_gpu_shader5);
 								const bool hasShaderPacking = NULL != bx::findIdentifierMatch(input, s_ARB_shading_language_packing);
+								const bool hasTextureMS     = NULL != bx::findIdentifierMatch(input, s_ARB_texture_multisample);
 
 								if (0 == essl)
 								{
@@ -1766,6 +1774,13 @@ namespace bgfx
 									{
 										bx::stringPrintf(code
 											, "#extension GL_ARB_shader_texture_lod : enable\n"
+											);
+									}
+
+									if (hasTextureMS)
+									{
+										bx::stringPrintf(code
+											, "#extension GL_ARB_texture_multisample : enable\n"
 											);
 									}
 								}
