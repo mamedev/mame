@@ -16,18 +16,18 @@
 		<led7seg><color red="1.0" green="0.15" blue="0.08" /></led7seg>
 	</element>
 
-	<element name="text_1"><text string="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_2"><text string="2"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_3"><text string="3"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_4"><text string="4"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_5"><text string="5"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_6"><text string="6"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_7"><text string="7"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_8"><text string="8"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_9"><text string="9"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_10"><text string="10"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_11"><text string="11"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_12"><text string="12"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z1"><text string="&#x2648;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z2"><text string="&#x2649;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z3"><text string="&#x264a;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z4"><text string="&#x264b;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z5"><text string="&#x264c;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z6"><text string="&#x264d;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z7"><text string="&#x264e;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z8"><text string="&#x264f;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z9"><text string="&#x2650;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z10"><text string="&#x2651;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z11"><text string="&#x2652;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_z12"><text string="&#x2653;"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 
 
 <!-- build screen -->
@@ -64,19 +64,19 @@
 		<bezel name="8.1" element="led"><bounds x="0" y="80" width="3" height="3" /></bezel>
 		<bezel name="8.3" element="led"><bounds x="0" y="120" width="3" height="3" /></bezel>
 
-		<bezel element="text_1"><bounds x="17" y="143" width="12" height="7" /></bezel>
-		<bezel element="text_2"><bounds x="42" y="158" width="12" height="7" /></bezel>
-		<bezel element="text_3"><bounds x="82" y="158" width="12" height="7" /></bezel>
-		<bezel element="text_4"><bounds x="107" y="143" width="12" height="7" /></bezel>
-		<bezel element="text_5"><bounds x="122" y="118" width="12" height="7" /></bezel>
-		<bezel element="text_6"><bounds x="122" y="78" width="12" height="7" /></bezel>
+		<bezel element="text_z1"><bounds x="17" y="143" width="12" height="7" /></bezel>
+		<bezel element="text_z2"><bounds x="42" y="158" width="12" height="7" /></bezel>
+		<bezel element="text_z3"><bounds x="82" y="158" width="12" height="7" /></bezel>
+		<bezel element="text_z4"><bounds x="107" y="143" width="12" height="7" /></bezel>
+		<bezel element="text_z5"><bounds x="122" y="118" width="12" height="7" /></bezel>
+		<bezel element="text_z6"><bounds x="122" y="78" width="12" height="7" /></bezel>
 
-		<bezel element="text_7"><bounds x="107" y="53" width="12" height="7" /></bezel>
-		<bezel element="text_8"><bounds x="82" y="38" width="12" height="7" /></bezel>
-		<bezel element="text_9"><bounds x="42" y="38" width="12" height="7" /></bezel>
-		<bezel element="text_10"><bounds x="17" y="53" width="12" height="7" /></bezel>
-		<bezel element="text_11"><bounds x="2" y="78" width="12" height="7" /></bezel>
-		<bezel element="text_12"><bounds x="2" y="118" width="12" height="7" /></bezel>
+		<bezel element="text_z7"><bounds x="107" y="53" width="12" height="7" /></bezel>
+		<bezel element="text_z8"><bounds x="82" y="38" width="12" height="7" /></bezel>
+		<bezel element="text_z9"><bounds x="42" y="38" width="12" height="7" /></bezel>
+		<bezel element="text_z10"><bounds x="17" y="53" width="12" height="7" /></bezel>
+		<bezel element="text_z11"><bounds x="2" y="78" width="12" height="7" /></bezel>
+		<bezel element="text_z12"><bounds x="2" y="118" width="12" height="7" /></bezel>
 
 	</view>
 </mamelayout>
