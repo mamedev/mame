@@ -15,7 +15,7 @@
 #include "dfi_dsk.h"
 #include <zlib.h>
 #define NUMBER_OF_MULTIREADS 3
-// threshholds for brickwall windowing
+// thresholds for brickwall windowing
 //define DFI_MIN_CLOCKS 65
 // number_please apple2 wants 40 min
 #define DFI_MIN_CLOCKS 60
