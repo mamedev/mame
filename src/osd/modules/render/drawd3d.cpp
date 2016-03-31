@@ -660,9 +660,9 @@ void d3d_texture_manager::update_textures()
 
 			if (m_renderer->get_shaders()->enabled())
 			{
-				if (!m_renderer->get_shaders()->get_texture_target(prim, texture))
+				if (!m_renderer->get_shaders()->get_texture_target(&prim, texture))
 				{
-					if (!m_renderer->get_shaders()->register_texture(prim, texture))
+					if (!m_renderer->get_shaders()->register_texture(&prim, texture))
 					{
 						d3dintf->post_fx_available = false;
 					}
@@ -671,9 +671,9 @@ void d3d_texture_manager::update_textures()
 		}
 		else if(m_renderer->get_shaders()->vector_enabled() && PRIMFLAG_GET_VECTORBUF(prim.flags))
 		{
-			if (!m_renderer->get_shaders()->get_vector_target(prim))
+			if (!m_renderer->get_shaders()->get_vector_target(&prim))
 			{
-				m_renderer->get_shaders()->create_vector_target(prim);
+				m_renderer->get_shaders()->create_vector_target(&prim);
 			}
 		}
 	}
