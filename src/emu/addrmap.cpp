@@ -728,7 +728,7 @@ void address_map::map_validity_check(validity_checker &valid, const device_t &de
 				case 64: devtag = entry.m_rproto64.device_name(); break;
 			}
 			if (entry.m_devbase.subdevice(devtag) == nullptr)
-				osd_printf_error("%s space memory map entry reads from nonexistant device '%s'\n", spaceconfig.m_name,
+				osd_printf_error("%s space memory map entry reads from nonexistent device '%s'\n", spaceconfig.m_name,
 					devtag != nullptr ? devtag : "<unspecified>");
 		}
 		if (entry.m_write.m_type == AMH_DEVICE_DELEGATE)
@@ -743,7 +743,7 @@ void address_map::map_validity_check(validity_checker &valid, const device_t &de
 				case 64: devtag = entry.m_wproto64.device_name(); break;
 			}
 			if (entry.m_devbase.subdevice(devtag) == nullptr)
-				osd_printf_error("%s space memory map entry writes to nonexistant device '%s'\n", spaceconfig.m_name,
+				osd_printf_error("%s space memory map entry writes to nonexistent device '%s'\n", spaceconfig.m_name,
 					devtag != nullptr ? devtag : "<unspecified>");
 		}
 		if (entry.m_setoffsethd.m_type == AMH_DEVICE_DELEGATE)
@@ -751,14 +751,14 @@ void address_map::map_validity_check(validity_checker &valid, const device_t &de
 			// extract the device tag from the proto-delegate
 			const char *devtag = entry.m_soproto.device_name();
 			if (entry.m_devbase.subdevice(devtag) == nullptr)
-				osd_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig.m_name,
+				osd_printf_error("%s space memory map entry references nonexistent device '%s'\n", spaceconfig.m_name,
 					devtag != nullptr ? devtag : "<unspecified>");
 		}
 
 		// make sure ports exist
 //      if ((entry.m_read.m_type == AMH_PORT && entry.m_read.m_tag != NULL && portlist.find(entry.m_read.m_tag) == NULL) ||
 //          (entry.m_write.m_type == AMH_PORT && entry.m_write.m_tag != NULL && portlist.find(entry.m_write.m_tag) == NULL))
-//          osd_printf_error("%s space memory map entry references nonexistant port tag '%s'\n", spaceconfig.m_name, entry.m_read.m_tag);
+//          osd_printf_error("%s space memory map entry references nonexistent port tag '%s'\n", spaceconfig.m_name, entry.m_read.m_tag);
 
 		// validate bank and share tags
 		if (entry.m_read.m_type == AMH_BANK)

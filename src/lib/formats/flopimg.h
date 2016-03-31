@@ -50,7 +50,7 @@ enum floperr_t
 	FLOPPY_ERROR_INTERNAL,          /* fatal internal error */
 	FLOPPY_ERROR_UNSUPPORTED,       /* this operation is unsupported */
 	FLOPPY_ERROR_OUTOFMEMORY,       /* ran out of memory */
-	FLOPPY_ERROR_SEEKERROR,         /* attempted to seek to nonexistant location */
+	FLOPPY_ERROR_SEEKERROR,         /* attempted to seek to nonexistent location */
 	FLOPPY_ERROR_INVALIDIMAGE,      /* this image in invalid */
 	FLOPPY_ERROR_READONLY,          /* attempt to write to read-only image */
 	FLOPPY_ERROR_NOSPACE,
