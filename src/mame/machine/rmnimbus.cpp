@@ -1247,11 +1247,11 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_req )
 	check_scsi_irq();
 }
 
-/* 8031/8051 Peripheral controler 80186 side */
+/* 8031/8051 Peripheral controller 80186 side */
 
 void rmnimbus_state::pc8031_reset()
 {
-	logerror("peripheral controler reset\n");
+	logerror("peripheral controller reset\n");
 
 	memset(&m_ipc_interface,0,sizeof(m_ipc_interface));
 }
@@ -1315,7 +1315,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_w)
 
 }
 
-/* 8031/8051 Peripheral controler 8031/8051 side */
+/* 8031/8051 Peripheral controller 8031/8051 side */
 
 READ8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_r)
 {

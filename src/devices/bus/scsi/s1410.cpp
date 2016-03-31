@@ -205,7 +205,7 @@ s1410_device::s1410_device(const machine_config &mconfig, const char *tag, devic
 #define S1410_CMD_READ_SEC_BUFFER ( 0x10 )
 #define S1410_CMD_RAM_DIAGS ( 0xe0 )
 #define S1410_CMD_DRIVE_DIAGS ( 0xe3 )
-#define S1410_CMD_CONTROLER_DIAGS ( 0xe4 )
+#define S1410_CMD_CONTROLLER_DIAGS ( 0xe4 )
 
 #define S1410_STATUS_NOT_READY ( 0x04 )
 
@@ -302,7 +302,7 @@ void s1410_device::ExecCommand()
 	case S1410_CMD_CHECK_TRACK_FORMAT:
 	case S1410_CMD_RAM_DIAGS:
 	case S1410_CMD_DRIVE_DIAGS:
-	case S1410_CMD_CONTROLER_DIAGS:
+	case S1410_CMD_CONTROLLER_DIAGS:
 		m_phase = SCSI_PHASE_STATUS;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = 0;
