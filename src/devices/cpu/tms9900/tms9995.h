@@ -54,12 +54,16 @@ public:
 	// READY input line. When asserted (high), the memory is ready for data exchange.
 	// We chose to use a direct method instead of a delegate to keep performance
 	// footprint low; this method may be called very frequently.
-	void set_ready(int state);
+	DECLARE_WRITE_LINE_MEMBER( ready_line );
 
 	// HOLD input line. When asserted (low), the CPU is requested to release the
 	// data and address bus and enter the HOLD state. The entrance of this state
 	// is acknowledged by the HOLDA output line.
-	void set_hold(int state);
+	DECLARE_WRITE_LINE_MEMBER( hold_line );
+
+	// RESET input line. Unlike the standard set_input_line, this input method
+	// is synchronous and will immediately lead to a reset of the CPU.
+	DECLARE_WRITE_LINE_MEMBER( reset_line );
 
 	// Callbacks
 	template<class _Object> static devcb_base &static_set_extop_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_external_operation.set_callback(object); }
@@ -133,6 +137,7 @@ private:
 	bool    m_nmi_state;
 //  bool    m_irq_state;
 	bool    m_hold_state;
+	bool    m_hold_requested;
 
 	// READY handling. The READY line is operated before the clock
 	// pulse falls. As the ready line is only set once in this emulation we
@@ -205,7 +210,7 @@ private:
 	inline void pulse_clock(int count);
 
 	// Signal the hold state via the external line
-	inline void set_hold_state(bool state);
+	void set_hold_state(bool state);
 
 	// Only used for the DIV(S) operations. It seems sufficient to let the
 	// command terminate at this point, so this method just calls command_terminated.

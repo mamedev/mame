@@ -66,8 +66,9 @@ The following MCU images were tested on an original Arkanoid PCB using sets
 (2) MCU image with CRC 0x515d77b6 <- this is a blackbox-reverse engineered bootleg MCU written by pirates
 
 An MCU found on a Tournament Arkanoid PCB was an unprotected type MC68705P3
-and when read the CRC matched (1). So we can assume the MCUs for Arkanoid and
+and when read the CRC matched (1). So we assumed the MCUs for Arkanoid and
 Tournament Arkanoid are the same.... or are at least interchangeable and work.
+This turns out not to be the case, in retrospect.
 
 "Tetris (D.R. Korea)" in MAME is a hack on an original Arkanoid PCB.
 The hack can be undone and returned to Arkanoid simply by removing the mod

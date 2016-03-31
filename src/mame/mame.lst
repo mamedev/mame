@@ -28575,6 +28575,7 @@ opwolfa                         // B20 (c) 1987 Taito Corporation Japan (World)
 opwolfb                         // bootleg
 opwolfj                         // B20 (c) 1987 Taito Corporation (Japan)
 opwolfu                         // B20 (c) 1987 Taito America Corporation (US)
+opwolfp							// prototype?
 
 @source:orao.cpp
 orao                            //
@@ -32949,9 +32950,10 @@ streetsmw                       // (c) 1989
 
 @source:snookr10.cpp
 apple10                         // (c) 1998 Sandii'
-crystalc                        // 199? unknown
 snookr10                        // (c) 1998 Sandii'
 tenballs                        // 1997 unknown
+crystalc                        // 1998 JCD srl
+crystalca                       // 1998 JCD srl
 
 @source:snowbros.cpp
 3in1semi                        // (c) 1998 SemiCom
@@ -33540,6 +33542,7 @@ victor6b                        // (c) 1995 Subsino (Alpha license)
 bishjan                         // (c) 1999 Subsino
 expcard                         // (c) 1998 American Alpha
 mtrain                          // (c) 1996 Subsino
+new2001                         // (c) 2000 Subsino
 ptrain                          // (c) 1999 Subsino
 saklove                         // (c) 1998 Subsino
 wtrnymph                        // (c) 1996 Subsino

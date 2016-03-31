@@ -46,6 +46,7 @@
 #include "drivenum.h"
 #include "xmlfile.h"
 #include "ui/ui.h"
+#include <zlib.h>
 
 
 
@@ -906,7 +907,7 @@ render_container::user_settings::user_settings()
 //  render_target - constructor
 //-------------------------------------------------
 
-render_target::render_target(render_manager &manager, const char *layoutfile, UINT32 flags)
+render_target::render_target(render_manager &manager, const internal_layout *layoutfile, UINT32 flags)
 	: m_next(nullptr),
 		m_manager(manager),
 		m_curview(nullptr),
@@ -1548,7 +1549,7 @@ void render_target::update_layer_config()
 //  given render target
 //-------------------------------------------------
 
-void render_target::load_layout_files(const char *layoutfile, bool singlefile)
+void render_target::load_layout_files(const internal_layout *layoutfile, bool singlefile)
 {
 	bool have_default = false;
 	// if there's an explicit file, load that first
@@ -1587,34 +1588,34 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 	if (screens == 1)
 	{
 		if (system.flags & ORIENTATION_SWAP_XY)
-			load_layout_file(nullptr, layout_vertical);
+			load_layout_file(nullptr, &layout_vertical);
 		else
-			load_layout_file(nullptr, layout_horizont);
+			load_layout_file(nullptr, &layout_horizont);
 		assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 	}
 	if (!have_default)
 	{
 		if (screens == 0)
 		{
-			load_layout_file(nullptr, layout_noscreens);
+			load_layout_file(nullptr, &layout_noscreens);
 			assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 		}
 		else
 		if (screens == 2)
 		{
-			load_layout_file(nullptr, layout_dualhsxs);
+			load_layout_file(nullptr, &layout_dualhsxs);
 			assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 		}
 		else
 		if (screens == 3)
 		{
-			load_layout_file(nullptr, layout_triphsxs);
+			load_layout_file(nullptr, &layout_triphsxs);
 			assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 		}
 		else
 		if (screens == 4)
 		{
-			load_layout_file(nullptr, layout_quadhsxs);
+			load_layout_file(nullptr, &layout_quadhsxs);
 			assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 		}
 	}
@@ -1625,6 +1626,55 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 //  load_layout_file - load a single layout file
 //  and append it to our list
 //-------------------------------------------------
+
+
+bool render_target::load_layout_file(const char *dirname, const internal_layout *layout_data)
+{
+	// +1 to ensure data is terminated for XML parser
+	auto tempout = make_unique_clear<UINT8[]>(layout_data->decompressed_size+1);
+
+	z_stream stream;
+	int zerr;
+
+	/* initialize the stream */
+	memset(&stream, 0, sizeof(stream));
+	stream.next_out = tempout.get();
+	stream.avail_out = layout_data->decompressed_size;
+
+
+	zerr = inflateInit(&stream);
+	if (zerr != Z_OK)
+	{
+		fatalerror("could not inflateInit");
+		return false;
+	}
+
+	/* decompress this chunk */
+	stream.next_in = (unsigned char*)layout_data->data;
+	stream.avail_in = layout_data->compressed_size;
+	zerr = inflate(&stream, Z_NO_FLUSH);
+
+	/* stop at the end of the stream */
+	if (zerr == Z_STREAM_END)
+	{
+		// OK
+	}
+	else if (zerr != Z_OK)
+	{
+		fatalerror("decompression error\n");
+		return false;
+	}
+
+	/* clean up */
+	zerr = inflateEnd(&stream);
+	if (zerr != Z_OK)
+	{
+		fatalerror("inflateEnd error\n");
+		return false;
+	}
+
+	return load_layout_file(dirname, (const char*)tempout.get());
+}
 
 bool render_target::load_layout_file(const char *dirname, const char *filename)
 {
@@ -2529,7 +2579,7 @@ float render_manager::max_update_rate() const
 //  target_alloc - allocate a new target
 //-------------------------------------------------
 
-render_target *render_manager::target_alloc(const char *layoutfile, UINT32 flags)
+render_target *render_manager::target_alloc(const internal_layout *layoutfile, UINT32 flags)
 {
 	return &m_targetlist.append(*global_alloc(render_target(*this, layoutfile, flags)));
 }

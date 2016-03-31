@@ -596,7 +596,7 @@ int matrix_solver_w_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool
 			}
 			/* Back substitution */
 			//inv(H) w = t     w = H t
-			nl_double *t=new nl_double[rowcount];
+			nl_double *t = new nl_double[rowcount];
 			for (int j = rowcount - 1; j >= 0; j--)
 			{
 				nl_double tmp = 0;
@@ -619,6 +619,7 @@ int matrix_solver_w_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool
 				}
 				new_V[i] -= tmp;
 			}
+			delete[] t;
 		}
 	}
 	m_cnt++;

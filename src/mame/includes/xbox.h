@@ -321,54 +321,6 @@ private:
 	static const USBStandardEndpointDescriptor enddesc02;
 };
 
-class ohci_hlean2131qc_device: public ohci_function_device
-{
-public:
-	ohci_hlean2131qc_device(running_machine &machine);
-	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
-	int handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size) override;
-	void set_region_base(UINT8 *data);
-private:
-	static const USBStandardDeviceDescriptor devdesc;
-	static const USBStandardConfigurationDescriptor condesc;
-	static const USBStandardInterfaceDescriptor intdesc;
-	static const USBStandardEndpointDescriptor enddesc01;
-	static const USBStandardEndpointDescriptor enddesc02;
-	static const USBStandardEndpointDescriptor enddesc03;
-	static const USBStandardEndpointDescriptor enddesc04;
-	static const USBStandardEndpointDescriptor enddesc05;
-	static const USBStandardEndpointDescriptor enddesc81;
-	static const USBStandardEndpointDescriptor enddesc82;
-	static const USBStandardEndpointDescriptor enddesc83;
-	static const USBStandardEndpointDescriptor enddesc84;
-	static const USBStandardEndpointDescriptor enddesc85;
-	static const UINT8 strdesc0[];
-	static const UINT8 strdesc1[];
-	static const UINT8 strdesc2[];
-	int maximum_send;
-	UINT8 *region;
-};
-
-class ohci_hlean2131sc_device : public ohci_function_device
-{
-public:
-	ohci_hlean2131sc_device(running_machine &machine);
-	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
-private:
-	static const USBStandardDeviceDescriptor devdesc;
-	static const USBStandardConfigurationDescriptor condesc;
-	static const USBStandardInterfaceDescriptor intdesc;
-	static const USBStandardEndpointDescriptor enddesc01;
-	static const USBStandardEndpointDescriptor enddesc02;
-	static const USBStandardEndpointDescriptor enddesc03;
-	static const USBStandardEndpointDescriptor enddesc81;
-	static const USBStandardEndpointDescriptor enddesc82;
-	static const USBStandardEndpointDescriptor enddesc83;
-	static const UINT8 strdesc0[];
-	static const UINT8 strdesc1[];
-	static const UINT8 strdesc2[];
-};
-
 class xbox_base_state : public driver_device
 {
 public:

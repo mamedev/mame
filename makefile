@@ -1436,9 +1436,9 @@ $(GENDIR)/includes/SDL2:
 	-$(call MKDIR,$@)
 	-$(call COPY,3rdparty/SDL2/include/,$(GENDIR)/includes/SDL2)
 
-$(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/file2str.py | $(GEN_FOLDERS)
-	@echo Converting $<...
-	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ layout_$(basename $(notdir $<))
+$(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/complay.py | $(GEN_FOLDERS)
+	@echo Compressing $<...
+	$(SILENT)$(PYTHON) scripts/build/complay.py $< $@ layout_$(basename $(notdir $<))
 
 $(SRC)/devices/cpu/m68000/m68kops.cpp: $(SRC)/devices/cpu/m68000/m68k_in.cpp $(SRC)/devices/cpu/m68000/m68kmake.cpp
 ifeq ($(TARGETOS),asmjs)

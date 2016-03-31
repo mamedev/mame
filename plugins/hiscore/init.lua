@@ -170,12 +170,10 @@ function hiscore.startplugin()
 
 	local function check_scores ( posdata )
 	  local r = 0;
-	  -- commonly the first entry will be for the entire table
-	  -- so it will only trigger a write once a player enters
-	  -- his/her name in.
-	  local row = positions[1];
-	  for i=0,row["size"]-1 do
+	  for ri,row in ipairs(posdata) do
+	    for i=0,row["size"]-1 do
 		r = r + row["mem"]:read_u8( row["addr"] + i );
+	    end
 	  end
 	  return r;
 	end

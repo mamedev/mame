@@ -51,6 +51,9 @@
 
 #define MCFG_TMS9928A_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
+#define MCFG_TMS9928A_OUT_GROMCLK_CB(_devcb) \
+	devcb = &tms9928a_device::set_out_gromclk_callback(*device, DEVCB_##_devcb);
+
 
 #define MCFG_TMS9928A_SCREEN_ADD_NTSC(_screen_tag) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
@@ -87,6 +90,7 @@ public:
 
 	static void set_vram_size(device_t &device, int vram_size) { downcast<tms9928a_device &>(device).m_vram_size = vram_size; }
 	template<class _Object> static devcb_base &set_out_int_line_callback(device_t &device, _Object object) { return downcast<tms9928a_device &>(device).m_out_int_line_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_gromclk_callback(device_t &device, _Object object) { return downcast<tms9928a_device &>(device).m_out_gromclk_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( vram_read );
 	DECLARE_WRITE8_MEMBER( vram_write );
@@ -117,9 +121,11 @@ private:
 	void set_palette();
 
 	static const device_timer_id TIMER_LINE = 0;
+	static const device_timer_id GROMCLK = 1;
 
 	int                 m_vram_size;    /* 4K, 8K, or 16K. This should be replaced by fetching data from an address space? */
 	devcb_write_line   m_out_int_line_cb; /* Callback is called whenever the state of the INT output changes */
+	devcb_write_line    m_out_gromclk_cb; // GROMCLK line is optional; if present, pulse it by XTAL/24 rate
 
 	/* TMS9928A internal settings */
 	UINT8   m_ReadAhead;
@@ -147,6 +153,7 @@ private:
 
 	bitmap_rgb32 m_tmpbmp;
 	emu_timer   *m_line_timer;
+	emu_timer   *m_gromclk_timer;
 	UINT8       m_mode;
 
 	/* emulation settings */

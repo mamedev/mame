@@ -754,7 +754,7 @@ void ti99_8_state::console_ready_join(int id, int state)
 	}
 
 	m_nready_prev = m_nready_combined;
-	m_cpu->set_ready(m_nready_combined==0);
+	m_cpu->ready_line(m_nready_combined==0);
 }
 
 /*
@@ -950,11 +950,11 @@ MACHINE_START_MEMBER(ti99_8_state,ti99_8)
 
 MACHINE_RESET_MEMBER(ti99_8_state, ti99_8)
 {
-	m_cpu->set_hold(CLEAR_LINE);
+	m_cpu->hold_line(CLEAR_LINE);
 
 	// Pulling down the line on RESET configures the CPU to insert one wait
 	// state on external memory accesses
-	m_cpu->set_ready(CLEAR_LINE);
+	m_cpu->ready_line(CLEAR_LINE);
 
 	// But we assert the line here so that the system starts running
 	m_nready_combined = 0;
