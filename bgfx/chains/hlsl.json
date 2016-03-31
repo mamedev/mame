@@ -1,0 +1,483 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz,ImJezze
+//============================================================
+//
+//  hlsl.json: A port of MAME's Direct3D HLSL CRT simulation.
+//
+//============================================================
+{
+	// name (unused): This value should contain a suitable name for the screen chain. It is not read by MAME, though it is still suggested that it be put in any user-made chains.
+	// type: string
+	"name": "Classic D3D HLSL CRT Simulation",
+	
+	// author (unused): This value should contain a suitable name for this chain's author. Again, it is not read by MAME, but it is still advisable to have.
+	// type: string
+	"author": "Ryan Holtz & ImJezze",
+	
+	// sliders (optional): The list of sliders used by all of the entries in this chain. Can be omitted if no entries use any sliders.
+	"sliders": [
+		// type (required): The sliders's conceptual type. Is it a list of string selections? Is it a single floating-point value? Does it require RGB values, or XY values?
+		// values: "intenum", "int", "float", "vec2", "color"
+		// 
+		// name (required): The internal name of the slider, used to attach it to entry uniforms.
+		// value: Any valid ASCII string.
+		// 
+		// text (required): The description of the slider, to which "X" or "Y" is appended for the "vec2" type, and to which "Red", "Green" or "Blue" will be appended for the "color" type.
+		// value: Any valid user-understandable ASCII string.
+		// 
+		// default (required): The value that this slider should have upon creation.
+		// type: Either a single integer value or an array of integer values corresponding to the size of the slider type:
+		//       "intenum": Single integer value
+		//       "int": Single integer value
+		//       "float": Single integer value
+		//       "vec2": Array of two integer values
+		//       "color": Array of three integer values
+		// 
+		// max (required): The upper limit to which the slider can be adjusted by a user.
+		// type: See type for "default"
+		// 
+		// min (required): The lower limit to which the slider can be adjusted by a user.
+		// type: See type for "default"
+		// 
+		// step (required): How much, in integer units, does a single left/right adjustment adjust the slider?
+		// type: Integer value
+		// 
+		// scale (required): By what value should we multiply the slider's integer value in order to get a usable value to disable?
+		// type: Numeric value
+		// 
+		// format (required): A C-style formatting string to use when displaying the slider's value.
+		// type: Any standard C-style formatting string (%s, %d, %1.2f, and so on)
+		// 
+		// screen (required): The type of screens for which we should populate this slider [NOT YET IMPLEMENTED]
+		// values: "none", "raster", "vector", "crt", "vectorraster", "lcd", "nonvector", "lcdraster", "lcdvector", "any", "all"
+		// "crt", "nonvector", and "all" are provided as aliases for "vectorraster", "lcdraster", and "any"
+		// 
+		// strings (optional): A list of strings to use with the "intenum" type, to select from a list of text options instead of simply numbers.
+		// value: An array of 2 or more entries, with one entry per possible slider setting from "min" to "max" inclusive.
+		
+		{ "type": "intenum", "name": "adjustments", "text": "Enable Adjustments", "default": 0, "max": 1, "min": 0, "step": 1, "scale": 1.0, "format": "%s", "screen": "any", "strings": [ "Off", "On" ] },
+
+		{ "type": "intenum", "name": "ntsc",            "text": "Enable NTSC",                           "default": 0,        "max": 1,        "min": 0,        "step": 1,   "scale": 1.0,       "format": "%s",    "screen": "any", "strings": [ "Off", "On" ] },
+		{ "type": "float",   "name": "a_value",         "text": "NTSC A Value",                          "default": 50,       "max": 100,      "min": 0,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",   "name": "b_value",         "text": "NTSC B Value",                          "default": 50,       "max": 100,      "min": 0,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",   "name": "cc_value",        "text": "NTSC Color Carrier (Hz)",               "default": 35795454, "max": 36795454, "min": 34795454, "step": 100, "scale": 0.0000001, "format": "%1.7f", "screen": "raster" },
+		{ "type": "float",   "name": "o_value",         "text": "NTSC Outgoing Phase Offset",            "default": 0,        "max": 100,      "min": 0,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",   "name": "p_value",         "text": "NTSC Incoming Phase Pixel Clock Scale", "default": 100,      "max": 200,      "min": 0,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",   "name": "scan_time",       "text": "NTSC Scanline Duration (uSec)",         "default": 526,      "max": 1500,     "min": 1,        "step": 1,   "scale": 0.1,       "format": "%3.1f", "screen": "raster" },
+		{ "type": "float",   "name": "notch_width",     "text": "NTSC Color Notch Filter Width",         "default": 200,      "max": 400,      "min": 1,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",   "name": "y_freq_response", "text": "NTSC Y Signal Bandwidth (Hz)",          "default": 600,      "max": 2100,     "min": 1,        "step": 10,  "scale": 0.01,      "format": "%2.2f", "screen": "raster" },
+		{ "type": "float",   "name": "i_freq_response", "text": "NTSC I Signal Bandwidth (Hz)",          "default": 120,      "max": 2100,     "min": 1,        "step": 10,  "scale": 0.01,      "format": "%2.2f", "screen": "raster" },
+		{ "type": "float",   "name": "q_freq_response", "text": "NTSC Q Signal Bandwidth (Hz)",          "default": 60,       "max": 2100,     "min": 1,        "step": 10,  "scale": 0.01,      "format": "%2.2f", "screen": "raster" },
+		{ "type": "float",   "name": "jitter_offset",   "text": "NTSC Frame Jitter Offset",              "default": 0,        "max": 200,      "min": 1,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
+
+		{ "type": "color", "name": "red_ratios", "text": "Red Output from ",   "default": [ 100,   0,   0 ], "max": [ 200, 200, 200 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "color", "name": "grn_ratios", "text": "Green Output from ", "default": [   0, 100,   0 ], "max": [ 200, 200, 200 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "color", "name": "blu_ratios", "text": "Blue Output from ",  "default": [   0,   0, 100 ], "max": [ 200, 200, 200 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "color", "name": "offset",     "text": "Signal Offset, ",    "default": [   0,   0,   0 ], "max": [ 200, 200, 200 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "color", "name": "scale",      "text": "Signal Scale, ",     "default": [  95,  95,  95 ], "max": [ 200, 200, 200 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "float", "name": "saturation", "text": "Color Saturation",   "default": 150,               "max": 400,               "min": 0,           "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
+
+		{ "type": "vec2", "name": "converge_red",          "text": "Red Convergence, ",   "default": [ 5, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "converge_green",        "text": "Green Convergence, ", "default": [ 0, 5 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "converge_blue",         "text": "Blue Convergence, ",  "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
+		
+		{ "type": "vec2", "name": "radial_converge_red",   "text": "Red Radial Convergence, ",   "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "radial_converge_green", "text": "Green Radial Convergence, ", "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "radial_converge_blue",  "text": "Blue Radial Convergence, ",  "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
+
+		{ "type": "vec2", "name": "defocus", "text": "Defocus, ",  "default": [ 15, 15 ], "max": [ 500, 500 ], "min": [ 0, 0 ], "step": 1, "scale": 0.1, "format": "%2.1f", "screen": "crt" },
+
+		{ "type": "color", "name": "phosphor", "text": "Phosphor Persistence, ",  "default": [ 45, 45, 45 ], "max": [ 100, 100, 100 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+
+		{ "type": "float",   "name": "scanline_alpha",         "text": "Scanline Amount",            "default": 80,             "max": 100,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",   "name": "scanline_scale",         "text": "Overall Scanline Scale",     "default": 100,            "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",   "name": "scanline_bright_scale",  "text": "Scanline Brightness Scale",  "default": 200,            "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",   "name": "scanline_bright_offset", "text": "Scanline Brightness Offset", "default": 0,              "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",   "name": "scanline_jitter_amount", "text": "Scanline Jitter Amount",     "default": 0,              "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",   "name": "scanline_height",        "text": "Individual Scanline Scale",  "default": 100,            "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",   "name": "scanline_variation",     "text": "Scanline Variation",         "default": 100,            "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",   "name": "shadow_alpha",           "text": "Shadow Mask Amount",         "default": 20,             "max": 100,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "vec2",    "name": "shadow_uv_count",        "text": "Shadow Mask Pixel Count ",   "default": [  12,  12 ],   "max": [ 128, 128 ],      "min": [ 1, 1 ],    "step": 1, "scale": 1.0,     "format": "%3f",   "screen": "crt" },
+		{ "type": "vec2",    "name": "shadow_uv_size",         "text": "Shadow Mask UV Size ",       "default": [ 500, 500 ],   "max": [ 1000, 1000 ],    "min": [ 0, 0 ],    "step": 1, "scale": 0.001,   "format": "%1.4f", "screen": "crt" },
+		{ "type": "vec2",    "name": "shadow_uv_offset",       "text": "Shadow Mask UV Offset ",     "default": [   0,   0 ],   "max": [ 1000, 1000 ],    "min": [ 0, 0 ],    "step": 1, "scale": 0.001,   "format": "%1.4f", "screen": "crt" },
+		{ "type": "float",   "name": "humbar_alpha",           "text": "Hum Bar Amount",             "default": 5,              "max": 100,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "float",   "name": "humbar_hertz_rate",      "text": "Hum Bar Frequency",          "default": 100,            "max": 10000,             "min": 0,           "step": 1, "scale": 0.00001, "format": "%1.7f", "screen": "crt" },
+		{ "type": "color",   "name": "floor",                  "text": "Signal Floor, ",             "default": [  5,  5,  5 ], "max": [ 100, 100, 100 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "color",   "name": "power",                  "text": "Signal Exponent, ",          "default": [ 80, 80, 80 ], "max": [ 400, 400, 400 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
+		
+		{ "type": "float", "name": "curvature",     "text": "Screen Curvature Amount", "default": 20, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "round_corner",  "text": "Rounded Corner Amount",   "default": 15, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "smooth_border", "text": "Smooth Border Amount",    "default": 5,  "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "vignetting",    "text": "Vignetting Amount",       "default": 20, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "reflection",    "text": "Reflection Amount",       "default": 15, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" }
+	],
+	
+	// parameters (optional): A list of procedurally-generated parameters that can be bound to entry uniforms.
+	"parameters": [
+		// name (required): The internal name of the parameter that will be used when binding to an entry uniform.
+		// value: Any valid ASCII string.
+		// 
+		// type (required): The type of the parameter.
+		// values:
+		//     "frame": Increment by 1 for each rendered frame. Limited to a given value range. Can be use for A/B field jitter and such.
+		//     "window": Contains the index of the window to which this screen belongs.
+		//     "time": The current time, in milliseconds. Can be limited to a given value range.
+		// 
+		// period (required by type "frame"): The range of frames across which to count. A value of 20 will make the value loop from 0-19.
+		// value: Any integer value.
+		// 
+		// limit (required by type "time"): The range of time across which to loop. 0.0 means run indefinitely.
+		// value: Any numeric value.
+		
+		{ "name": "jitter", "type": "frame", "period": 2 },
+		{ "name": "time",   "type": "time",  "limit": 0.0 }
+	],
+	
+	// targets (optional): A list of all render targets that will be used by the chain entries in this chain.
+	"targets": [
+		// name (required): The name of the target. Will be used to bind it as a texture and as an output in chain entries.
+		// value: Any valid ASCII string.
+		// 
+		// mode (required): The mode of the target. Can be used for different implicit and explicit sizing options.
+		// values:
+		//     "guest": Use the size of the emulated screen that is being processed (e.g. 256x256 when running "targ")
+		//     "native": Use the size of the displayed screen inside the window that is being displayed (the same size as the window size, for single-screen games with no artwork)
+		//     "custom": Use a custom size.
+		// 
+		// bilinear (optional): Whether or not to apply bilinear filtering to this render target.
+		// values: true, false
+		// default: true
+		// 
+		// doublebuffer (optional): Whether or not this render target will be needed as a source texture. If you don't know what this means, omit it or set it to true.
+		// values: true, false
+		// default: true
+		// 
+		// scale (optional): Multiply the internal size of this render target by this amount. Certain effects benefit from operating at a higher internal resolution. If you're not sure, omit it.
+		// values: Any integer value
+		// default: 1
+		{
+			"name": "ntsc",
+			"mode": "guest",
+			"doublebuffer": true
+		},
+		{
+			"name": "guest",
+			"mode": "guest",
+			"bilinear": false,
+			"doublebuffer": true
+		},
+		{	"name": "internal",
+			"mode": "native",
+			"scale": 2,
+			"doublebuffer": true
+		},
+		{	"name": "previous",
+			"mode": "native",
+			"scale": 2,
+			"doublebuffer": true
+		}
+	],
+	
+	// passes (required): The list of individual shaders to invoke, and any dynamic input parameters they need.
+	"passes": [
+		{
+			// effect (required): The name of the effect JSON file to load for this pass.
+			// value: Any valid JSON filename included in your shader chain, without the extension.
+			"effect": "hlsl/ntsc_encode",
+
+			// name (required): A verbal name for the effect. It is only used internally, but is required nonetheless.
+			// value: Any valid ASCII string.
+			"name": "NTSC Encode",
+
+			// disablewhen (optional): An array of conditions that can be used to disable this pass.
+			"disablewhen": [
+				// type (optional): Reserved for future expansion. Currently only "slider" is supported.
+				// value: "slider"
+				// 
+				// condition (optional): The disabler is active when the named slider is either equal or not equal to the reference value.
+				// values: "equal", "notequal"
+				// default: "equal"
+				// 
+				// combine (optional): All "and" conditions are ANDed together, all "or" conditions are OR'd together, then these two
+				//                     values are OR'd together to finally determine whether this pass should run or not.
+				// values: "or", "and"
+				// default: "or"
+				// 
+				// name (required): The name of the slider to use for this condition.
+				// value: Any valid ASCII string.
+				// 
+				// value (required): The value against which we are comparing to determine whether this disabler is active.
+				// type: Either a single integer value or an array of integer values corresponding to the size of the slider's type:
+				//       "intenum": Single integer value
+				//       "int": Single integer value
+				//       "float": Single integer value
+				//       "vec2": Array of two integer values
+				//       "color": Array of three integer values
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "ntsc",        "value": 0 }
+			],
+			
+			// uniforms (optional): Non-sampler uniform bindings for this chain entry.
+			"uniforms": [
+				// uniform (required): The name of the uniform, as it is referenced in the shader source code itself.
+				// value: Any valid ASCII string.
+				// 
+				// The remaining options can be one of either "slider", "parameter", or "value":
+				// 
+				// slider (optional): The name of the slider to bind to this uniform.
+				// value: Any valid ASCII string that corresponds to the name of a slider.
+				//
+				// parameter (optional): The name of the dynamic parameter to bind to this uniform.
+				// value: Any valid ASCII string that corresponds to the name of a parameter.
+				// 
+				// value (optional): An array of numeric values that should be loaded into this uniform.
+				// values: Should be an array containing anywhere from 1-16 numeric values, corresponding to the size of the uniform's type.
+				
+				{ "uniform": "u_a_value",         "slider": "a_value" },
+				{ "uniform": "u_b_value",         "slider": "b_value" },
+				{ "uniform": "u_cc_value",        "slider": "cc_value" },
+				{ "uniform": "u_p_value",         "slider": "p_value" },
+				{ "uniform": "u_scan_time",       "slider": "scan_time" },
+				{ "uniform": "u_jitter_offset",   "slider": "jitter_offset" },
+				{ "uniform": "u_jitter_amount",   "parameter": "jitter" }
+			],
+			
+			// inputs (optional): A list of samplers used by this entry, and their corresponding bindings.
+			"input": [
+				// sampler (required): The name of the sampler, as it is referenced in the shader source code itself.
+				// value: Any valid ASCII string.
+				// 
+				// The remaining options can be one of either "texture", "target", or "option".
+				// 
+				// texture (optional): Either "screen" for the texture that MAME provided for this chain's screen, or the name of a texture file in the artwork directory.
+				// value: Any valid ASCII string.
+				// 
+				// target (optioanl): Any target from the "targets" list, or "previous" or "output" for two native-sized automatically-generated targets.
+				// value: Any valid ASCII string that names a target.
+				// 
+				// option (optional): The name of any MAME option, which will have its value fetched and used as the name of a PNG to load from the artwork directory.
+				// value: Any valid MAME INI option name.
+				// 
+				// bilinear (optional, texture and target only): Whether to apply bilinear filtering to the sampler.
+				// values: true, false
+				// default: true
+				{ "sampler": "s_tex", "texture": "screen" }
+			],
+			
+			// output (required): The target to use as the output for this pass. Can be one of the named targets in "targets", or "output" 
+			//                    or "previous" for one of two automatically-generated targets.
+			// value: Any valid ASCII string that names a target.
+			"output": "ntsc"
+		},
+		{	"effect": "hlsl/ntsc_decode",
+			"name": "NTSC Decode",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "ntsc",        "value": 0 }
+			],
+			"uniforms": [
+				{ "uniform": "u_a_value",         "slider": "a_value" },
+				{ "uniform": "u_b_value",         "slider": "b_value" },
+				{ "uniform": "u_cc_value",        "slider": "cc_value" },
+				{ "uniform": "u_o_value",         "slider": "o_value" },
+				{ "uniform": "u_scan_time",       "slider": "scan_time" },
+				{ "uniform": "u_notch_width",     "slider": "notch_width" },
+				{ "uniform": "u_y_freq_response", "slider": "y_freq_response" },
+				{ "uniform": "u_i_freq_response", "slider": "i_freq_response" },
+				{ "uniform": "u_q_freq_response", "slider": "q_freq_response" },
+				{ "uniform": "u_q_freq_response", "slider": "q_freq_response" },
+				{ "uniform": "u_jitter_offset",   "slider": "jitter_offset" },
+				{ "uniform": "u_jitter_amount",   "parameter": "jitter" }
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "ntsc" },
+				{ "sampler": "s_screen", "texture": "screen" }
+			],
+			"output": "guest"
+		},
+		{	"effect": "hlsl/blit",
+			"name": "NTSC Skip",
+			"disablewhen": [
+				{ "type": "slider", "condition": "notequal", "combine": "and", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "notequal", "combine": "and", "name": "ntsc",        "value": 0 }
+			],
+			"input": [
+				{ "sampler": "s_tex", "texture": "screen" }
+			],
+			"output": "guest"
+		},
+		{	"effect": "hlsl/color",
+			"name": "Color Convolution",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "name": "adjustments", "value": 0 }
+			],
+			"uniforms": [
+				{ "uniform": "u_red_ratios", "slider": "red_ratios" },
+				{ "uniform": "u_grn_ratios", "slider": "grn_ratios" },
+				{ "uniform": "u_blu_ratios", "slider": "blu_ratios" },
+				{ "uniform": "u_offset",     "slider": "offset"     },
+				{ "uniform": "u_scale",      "slider": "scale"      },
+				{ "uniform": "u_saturation", "slider": "saturation" }
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "guest" }
+			],
+			"output": "guest"
+		},
+ 		{	"effect": "hlsl/prescale",
+			"name": "Prescale",
+			"input": [
+				{ "sampler": "s_tex", "target": "guest" }
+			],
+			"output": "internal"
+		},
+		{	"effect": "hlsl/deconverge",
+			"name": "Deconvergence",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or",  "name": "adjustments",           "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "converge_red",          "value": [ 0, 0 ] },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "converge_green",        "value": [ 0, 0 ] },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "converge_blue",         "value": [ 0, 0 ] },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "radial_converge_red",   "value": [ 0, 0 ] },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "radial_converge_green", "value": [ 0, 0 ] },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "radial_converge_blue",  "value": [ 0, 0 ] }
+			],
+			"uniforms": [
+				{ "uniform": "u_converge_red",          "slider": "converge_red"   },
+				{ "uniform": "u_converge_green",        "slider": "converge_green" },
+				{ "uniform": "u_converge_blue",         "slider": "converge_blue"  },
+				{ "uniform": "u_radial_converge_red",   "slider": "radial_converge_red"   },
+				{ "uniform": "u_radial_converge_green", "slider": "radial_converge_green" },
+				{ "uniform": "u_radial_converge_blue",  "slider": "radial_converge_blue"  }
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "internal" }
+			],
+			"output": "internal"
+		},
+		{	"effect": "hlsl/defocus",
+			"name": "Defocus Pass 1",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "defocus",     "value": [ 0, 0 ] }
+			],
+			"uniforms": [
+				{ "uniform": "u_defocus", "slider": "defocus" }
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "internal" }
+			],
+			"output": "internal"
+		},
+		{	"effect": "hlsl/defocus",
+			"name": "Defocus Pass 2",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "defocus",     "value": [ 0, 0 ] }
+			],
+			"uniforms": [
+				{ "uniform": "u_defocus", "slider": "defocus" }
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "internal" }
+			],
+			"output": "internal"
+		},
+		{	"effect": "hlsl/phosphor",
+			"name": "Phosphor Decay",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "phosphor",    "value": [ 0, 0, 0 ] }
+			],
+			"uniforms": [
+				{ "uniform": "u_passthrough", "value": [ 0 ] },
+				{ "uniform": "u_phosphor", "slider": "phosphor" }
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "internal" },
+				{ "sampler": "s_prev", "target": "previous" }
+			],
+			"output": "internal"
+		},
+		{	"effect": "hlsl/phosphor",
+			"name": "Phosphor Store",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "phosphor",    "value": [ 0, 0, 0 ] }
+			],
+			"uniforms": [
+				{ "uniform": "u_passthrough", "value": [ 1 ] },
+				{ "uniform": "u_phosphor", "slider": "phosphor" }
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "internal" },
+				{ "sampler": "s_prev", "target": "internal" }
+			],
+			"output": "previous"
+		},
+		{	"effect": "hlsl/post",
+			"name": "Non-Bloom Post Pass",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or",  "name": "adjustments",    "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "scanline_alpha", "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "shadow_alpha",   "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "humbar_alpha",   "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "floor",          "value": [ 0, 0, 0 ] },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "power",          "value": [ 0, 0, 0 ] }
+			],
+			"uniforms": [
+				{ "uniform": "u_scanline_alpha",         "slider": "scanline_alpha" },
+				{ "uniform": "u_scanline_scale",         "slider": "scanline_scale" },
+				{ "uniform": "u_scanline_bright_scale",  "slider": "scanline_bright_scale" },
+				{ "uniform": "u_scanline_bright_offset", "slider": "scanline_bright_offset" },
+				{ "uniform": "u_scanline_height",        "slider": "scanline_height" },
+				{ "uniform": "u_scanline_variation",     "slider": "scanline_variation" },
+				{ "uniform": "u_shadow_alpha",           "slider": "shadow_alpha" },
+				{ "uniform": "u_shadow_count",           "slider": "shadow_uv_count" },
+				{ "uniform": "u_shadow_uv",              "slider": "shadow_uv_size" },
+				{ "uniform": "u_shadow_uv_offset",       "slider": "shadow_uv_offset" },
+				{ "uniform": "u_humbar_alpha",           "slider": "humbar_alpha" },
+				{ "uniform": "u_humbar_hertz_rate",      "slider": "humbar_hertz_rate" },
+				{ "uniform": "u_floor",                  "slider": "floor" },
+				{ "uniform": "u_power",                  "slider": "power" },
+				{ "uniform": "u_scanline_jitter",        "slider": "scanline_jitter_amount" },
+				{ "uniform": "u_jitter_amount",          "parameter": "jitter" },
+				{ "uniform": "u_time",                   "parameter": "time" }
+			],
+			"input": [
+				{ "sampler": "s_tex",    "target": "internal" },
+				{ "sampler": "s_shadow", "option": "bgfx_shadow_mask" }
+			],
+			"output": "internal"
+		},
+		{	"effect": "hlsl/distortion",
+			"name": "Distortion Pass",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments",    "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "curvature",     "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "round_corner",  "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "smooth_border", "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "vignetting",    "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "reflection",    "value": 0.0 }
+			],
+			"uniforms": [
+				{ "uniform": "u_curvature",     "slider": "curvature" },
+				{ "uniform": "u_round_corner",  "slider": "round_corner" },
+				{ "uniform": "u_smooth_border", "slider": "smooth_border" },
+				{ "uniform": "u_vignetting",    "slider": "vignetting" },
+				{ "uniform": "u_reflection",    "slider": "reflection" }
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "internal" }
+			],
+			"output": "internal"
+		},
+		{	"effect": "hlsl/blit",
+			"name": "Final Blit",
+			"input": [
+				{ "sampler": "s_tex", "target": "internal" }
+			],
+			"output": "output"
+		}
+	]
+}

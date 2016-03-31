@@ -2,14 +2,13 @@ HLSL-Related Enable Switches
 ----------------------------
 
 Name                    Values		Description
-hlsl_enable             0/1             Enables HLSL post-processing in Direct3D 9 modes.
-yiq_enable              0/1             Enables YIQ-colorspace post-processing. Causes a
+hlsl_enable             0 or 1          Enables HLSL post-processing in Direct3D 9 modes.
+hlsl_oversampling       0 or 1          Enables HLSL oversampling.
+yiq_enable              0 or 1          Enables YIQ-colorspace post-processing. Causes a
                                         performance drop but gives a much more authentic
                                         NTSC TV appearance on TV-based systems when configured
                                         properly.
 hlslpath                [path]          Path to the .fx files that are in use.  (default: hlsl)
-hlsl_prescale_x         [horizontal]    HLSL pre-scale override factor for X.  (0 for auto)
-hlsl_prescale_y         [vertical]      HLSL pre-scale override factor for Y.  (0 for auto)
 hlsl_write              [filename]      Enables HLSL AVI writing.  (huge disk bandwidth suggested)
 hlsl_snap_width         [width]         HLSL upscaled-snapshot width.  (default: 2048)
 hlsl_snap_height        [height]        HLSL upscaled-snapshot height.  (default: 1536)
@@ -104,17 +103,26 @@ vector_length_ratio     500.0           Vector fade length (4.0 - vectors fade t
 Bloom Post-Processing Options
 -----------------------------
 Name                    Default Values  Description
-bloom_blend_mode        0 or 1          0 for addition blend mode or 1 for darken blend mode.
-bloom_scale             0.500           Bloom intensity factor.  (0.000-2.000)
-bloom_overdrive         0.00,0.00,0.00  Bloom overdrive factor to bright full saturated colors.  (0.000-2.000)
+bloom_blend_mode        0 or 1          0 for brighten blend mode or 1 for darken blend mode.
+bloom_scale             0.0             Bloom intensity factor.  (0.000-2.000)
+bloom_overdrive         0.0,0.0,0.0     Bloom overdrive factor to bright full saturated colors.  (0.000-2.000)
 bloom_lvl0_weight       1.00            Bloom level 0  (full-size target) weight.  (0.00-1.00)
-bloom_lvl1_weight       0.21            Bloom level 1  (half-size target) weight.  (0.00-1.00)
-bloom_lvl2_weight       0.19            Bloom level 2  (quarter-size target) weight.  (0.00-1.00)
-bloom_lvl3_weight       0.17            Bloom level 3  (.) weight.  (0.00-1.00)
-bloom_lvl4_weight       0.14            Bloom level 4  (.) weight.  (0.00-1.00)
-bloom_lvl5_weight       0.14            Bloom level 5  (.) weight.  (0.00-1.00)
-bloom_lvl6_weight       0.13            Bloom level 6  (.) weight.  (0.00-1.00)
-bloom_lvl7_weight       0.12            Bloom level 7  (.) weight.  (0.00-1.00)
-bloom_lvl8_weight       0.11            Bloom level 8  (.) weight.  (0.00-1.00)
-bloom_lvl9_weight       0.10            Bloom level 9  (.) weight.  (0.00-1.00)
-bloom_lvl10_weight      0.09            Bloom level 10 (1x1 target) weight.  (0.00-1.00)
+bloom_lvl1_weight       0.64            Bloom level 1  (1/2-size target) weight.  (0.00-1.00)
+bloom_lvl2_weight       0.32            Bloom level 2  (1/4-size target) weight.  (0.00-1.00)
+bloom_lvl3_weight       0.16            Bloom level 3  (1/8-size target) weight.  (0.00-1.00)
+bloom_lvl4_weight       0.08            Bloom level 4  (1/16-size target) weight.  (0.00-1.00)
+bloom_lvl5_weight       0.06            Bloom level 5  (1/32-size target) weight.  (0.00-1.00)
+bloom_lvl6_weight       0.04            Bloom level 6  (1/64-size target) weight.  (0.00-1.00)
+bloom_lvl7_weight       0.02            Bloom level 7  (1/128-size target) weight.  (0.00-1.00)
+bloom_lvl8_weight       0.01            Bloom level 8  (1/256-size target) weight.  (0.00-1.00)
+
+
+Presets
+-------
+../ini/presets/raster.ini               for raster screens
+../ini/presets/vector.ini               for color vector screens
+../ini/presets/vector-mono.ini          for monochrome vector screens (rename to vector.ini or <system>.ini)
+../ini/presets/lcd.ini                  for screens with TFT color LCD
+../ini/presets/lcd-matrix.ini           for screens with STN LCD matrix (rename to lcd.ini or <system>.ini)
+../ini/presets/gameboy.ini              for Game Boy screen (same as lcd-matrix.ini with greenish color transformation)
+../ini/presets/gba.ini                  for Game Boy Advance screen (same as lcd.ini)

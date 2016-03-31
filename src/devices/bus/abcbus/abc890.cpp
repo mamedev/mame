@@ -239,9 +239,9 @@ void abc890_t::device_start()
 
 void abc890_t::device_reset()
 {
-	for (device_t *device = first_subdevice(); device != nullptr; device = device->next())
+	for (device_t &device : subdevices())
 	{
-		device->reset();
+		device.reset();
 	}
 }
 

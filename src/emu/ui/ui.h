@@ -103,8 +103,7 @@ struct slider_state
 	INT32           defval;             /* default value */
 	INT32           maxval;             /* maximum value */
 	INT32           incval;             /* increment value */
-	bool            hidden;             /* hidden or not */
-	INT32           id;                 /* unique identifier */
+	int             id;
 	char            description[1];     /* textual description */
 };
 
@@ -130,7 +129,7 @@ public:
 	// methods
 	void initialize(running_machine &machine);
 	UINT32 set_handler(ui_callback callback, UINT32 param);
-	void display_startup_screens(bool first_time, bool show_disclaimer);
+	void display_startup_screens(bool first_time);
 	void set_startup_text(const char *text, bool force);
 	void update_and_render(render_container *container);
 	render_font *get_font();
@@ -214,12 +213,10 @@ private:
 	static slider_state     *slider_current;
 
 	// text generators
-	std::string &disclaimer_string(std::string &buffer);
 	std::string &warnings_string(std::string &buffer);
 
 	// UI handlers
 	static UINT32 handler_messagebox(running_machine &machine, render_container *container, UINT32 state);
-	static UINT32 handler_messagebox_ok(running_machine &machine, render_container *container, UINT32 state);
 	static UINT32 handler_messagebox_anykey(running_machine &machine, render_container *container, UINT32 state);
 	static UINT32 handler_ingame(running_machine &machine, render_container *container, UINT32 state);
 	static UINT32 handler_load_save(running_machine &machine, render_container *container, UINT32 state);

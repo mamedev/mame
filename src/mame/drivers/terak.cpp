@@ -104,7 +104,7 @@ static MACHINE_CONFIG_START( terak, terak_state )
 	MCFG_SCREEN_UPDATE_DRIVER(terak_state, screen_update_terak)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 MACHINE_CONFIG_END
 

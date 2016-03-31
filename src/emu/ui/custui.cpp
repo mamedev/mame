@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /*********************************************************************
 
     ui/custui.cpp
@@ -9,14 +9,16 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "ui/ui.h"
-#include "ui/menu.h"
-#include "ui/selector.h"
 #include "ui/custui.h"
+
+#include "ui/ui.h"
+#include "ui/selector.h"
 #include "ui/utils.h"
+
 #include <algorithm>
 
-const char *ui_menu_custom_ui::hide_status[] = {
+
+const char *const ui_menu_custom_ui::hide_status[] = {
 	__("Show All"),
 	__("Hide Filters"),
 	__("Hide Info/Image"),
@@ -192,58 +194,42 @@ void ui_menu_custom_ui::custom_render(void *selectedref, float top, float bottom
 ui_menu_font_ui::ui_menu_font_ui(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
 	ui_options &moptions = machine.ui().options();
-#ifdef UI_WINDOWS
-
 	std::string name(machine.options().ui_font());
 	list();
 
+#ifdef UI_WINDOWS
 	m_bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
 	m_italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
+#endif
 	m_actual = 0;
 
 	for (size_t index = 0; index < m_fonts.size(); index++)
 	{
-		if (m_fonts[index] == name)
+		if (m_fonts[index].first == name)
 		{
 			m_actual = index;
 			break;
 		}
 	}
-#endif
 
 	m_info_size = moptions.infos_size();
 	m_font_size = moptions.font_rows();
 
-	for (ui_options::entry *f_entry = moptions.first(); f_entry != nullptr; f_entry = f_entry->next())
+	for (ui_options::entry &f_entry : moptions)
 	{
-		const char *name = f_entry->name();
-		if (name && strlen(name) && !strcmp(OPTION_INFOS_SIZE, f_entry->name()))
+		const char *name = f_entry.name();
+		if (name && strlen(name) && !strcmp(OPTION_INFOS_SIZE, f_entry.name()))
 		{
-			m_info_max = atof(f_entry->maximum());
-			m_info_min = atof(f_entry->minimum());
+			m_info_max = atof(f_entry.maximum());
+			m_info_min = atof(f_entry.minimum());
 		}
-		else if (name && strlen(name) && !strcmp(OPTION_FONT_ROWS, f_entry->name()))
+		else if (name && strlen(name) && !strcmp(OPTION_FONT_ROWS, f_entry.name()))
 		{
-			m_font_max = atof(f_entry->maximum());
-			m_font_min = atof(f_entry->minimum());
+			m_font_max = atof(f_entry.maximum());
+			m_font_min = atof(f_entry.minimum());
 		}
 	}
 
-}
-
-#ifdef UI_WINDOWS
-//-------------------------------------------------
-//  fonts enumerator CALLBACK
-//-------------------------------------------------
-
-int CALLBACK ui_menu_font_ui::EnumFontFamiliesExProc(const LOGFONT *lpelfe, const TEXTMETRIC *lpntme, DWORD FontType, LPARAM lParam)
-{
-	std::vector<std::string> *lpc = (std::vector<std::string>*)lParam;
-	std::string utf((char *)lpelfe->lfFaceName);
-	if (utf[0] != '@')
-		lpc->push_back(utf);
-
-	return 1;
 }
 
 //-------------------------------------------------
@@ -252,22 +238,11 @@ int CALLBACK ui_menu_font_ui::EnumFontFamiliesExProc(const LOGFONT *lpelfe, cons
 
 void ui_menu_font_ui::list()
 {
-	// create LOGFONT structure
-	LOGFONT lf;
-	lf.lfCharSet = ANSI_CHARSET;
-	lf.lfFaceName[0] = '\0';
-
-	HDC hDC = GetDC( nullptr );
-	EnumFontFamiliesEx( hDC, &lf, (FONTENUMPROC)EnumFontFamiliesExProc, (LPARAM)&m_fonts, 0 );
-	ReleaseDC( nullptr, hDC );
-
-	// sort
-	std::stable_sort(m_fonts.begin(), m_fonts.end());
+	machine().osd().get_font_families(machine().options().font_path(), m_fonts);
 
 	// add default string to the top of array
-	m_fonts.insert(m_fonts.begin(), std::string(_("default")));
+	m_fonts.emplace(m_fonts.begin(), std::string("default"), std::string(_("default")));
 }
-#endif
 
 //-------------------------------------------------
 //  dtor
@@ -278,18 +253,18 @@ ui_menu_font_ui::~ui_menu_font_ui()
 	std::string error_string;
 	ui_options &moptions = machine().ui().options();
 
+	std::string name(m_fonts[m_actual].first);
 #ifdef UI_WINDOWS
-	std::string name(m_fonts[m_actual]);
-	if (m_fonts[m_actual] != "default")
+	if (name != "default")
 	{
 		if (m_italic)
 			name.insert(0, "[I]");
 		if (m_bold)
 			name.insert(0, "[B]");
 	}
+#endif
 	machine().options().set_value(OPTION_UI_FONT, name.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 	machine().options().mark_changed(OPTION_UI_FONT);
-#endif
 
 	moptions.set_value(OPTION_INFOS_SIZE, m_info_size, OPTION_PRIORITY_CMDLINE, error_string);
 	moptions.set_value(OPTION_FONT_ROWS, m_font_size, OPTION_PRIORITY_CMDLINE, error_string);
@@ -325,7 +300,6 @@ void ui_menu_font_ui::handle()
 				}
 				break;
 
-#ifdef UI_WINDOWS
 
 			case MUI_FNT:
 				if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
@@ -335,11 +309,15 @@ void ui_menu_font_ui::handle()
 				}
 				else if (m_event->iptkey == IPT_UI_SELECT)
 				{
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, m_fonts, m_actual));
+					std::vector<std::string> display_names;
+					display_names.reserve(m_fonts.size());
+					for (auto const &font : m_fonts) display_names.emplace_back(font.second);
+					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, std::move(display_names), m_actual));
 					changed = true;
 				}
 				break;
 
+#ifdef UI_WINDOWS
 			case MUI_BOLD:
 			case MUI_ITALIC:
 				if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT || m_event->iptkey == IPT_UI_SELECT)
@@ -364,13 +342,12 @@ void ui_menu_font_ui::populate()
 	// set filter arrow
 	UINT32 arrow_flags;
 
-#ifdef UI_WINDOWS
 	// add fonts option
 	arrow_flags = get_arrow_flags(0, m_fonts.size() - 1, m_actual);
-	std::string name(m_fonts[m_actual]);
-	item_append(_("UI Font"), name.c_str(), arrow_flags, (void *)(FPTR)MUI_FNT);
+	item_append(_("UI Font"), m_fonts[m_actual].second.c_str(), arrow_flags, (void *)(FPTR)MUI_FNT);
 
-	if (name != "default")
+#ifdef UI_WINDOWS
+	if (m_fonts[m_actual].first != "default")
 	{
 		item_append(_("Bold"), m_bold ? "On" : "Off", m_bold ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)MUI_BOLD);
 		item_append(_("Italic"), m_italic ? "On" : "Off", m_italic ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)MUI_ITALIC);

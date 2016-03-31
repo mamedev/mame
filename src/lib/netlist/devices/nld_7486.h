@@ -51,11 +51,11 @@ NETLIB_TRUTHTABLE(7486, 2, 1, 0);
 #else
 NETLIB_DEVICE(7486,
 public:
-		netlist_logic_input_t m_I[2];
-		netlist_logic_output_t m_Q[1];
+		logic_input_t m_I[2];
+		logic_output_t m_Q[1];
 
-		ATTR_HOT void inc_active();
-		ATTR_HOT void dec_active();
+		ATTR_HOT void inc_active() override;
+		ATTR_HOT void dec_active() override;
 		int m_active;
 );
 #endif

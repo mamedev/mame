@@ -21,11 +21,13 @@
     Bomberman World / New Atomic Punk  Nanao   08J27291A5 015 9219KK700
     Undercover Cops                    Nanao   08J27291A5 015 9219KK700
     Mystic Riders / Gun Hohki          Nanao   08J27291A6 016 9217NK700
-    Skins Game                         Nanao   08J27291A7 017
+    The IREM Skins Game/Major Title 2  Nanao   08J27291A7 017 9227NK700
+      or (some Major Title 2)          Nanao   08J27291A6 016 9217NK700 (same as Mystic Riders)
     Hook                               Nanao   08J27291A8 018 9237NK700
 
     R-Type Leo                         Irem    D8000021A1 019 9242NK700
     Fire Barrel                        Irem    D8000010A1 019 9243NK700
+    Air Assault                        sam as Gun Force
     In The Hunt                        Irem    D8000011A1 020
     Risky Challenge/Gussun Oyoyo       Irem    D8000019A1 022 9331NK700
     Match It II/Shisensho II           Irem    D8000020A1 023 9320NK700

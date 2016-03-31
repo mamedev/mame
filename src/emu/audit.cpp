@@ -208,10 +208,10 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, soft
 	int required = 0;
 
 	// now iterate over software parts
-	for ( software_part *part = swinfo->first_part(); part != nullptr; part = part->next() )
+	for (software_part &part : swinfo->parts())
 	{
 		// now iterate over regions
-		for ( const rom_entry *region = part->romdata(); region; region = rom_next_region( region ) )
+		for ( const rom_entry *region = part.romdata(); region; region = rom_next_region( region ) )
 		{
 			// now iterate over rom definitions
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
@@ -296,11 +296,11 @@ media_auditor::summary media_auditor::audit_samples()
 			while (path.next(curpath, samplename))
 			{
 				// attempt to access the file (.flac) or (.wav)
-				file_error filerr = file.open(curpath.c_str(), ".flac");
-				if (filerr != FILERR_NONE)
+				osd_file::error filerr = file.open(curpath.c_str(), ".flac");
+				if (filerr != osd_file::error::NONE)
 					filerr = file.open(curpath.c_str(), ".wav");
 
-				if (filerr == FILERR_NONE)
+				if (filerr == osd_file::error::NONE)
 				{
 					record.set_status(audit_record::STATUS_GOOD, audit_record::SUBSTATUS_GOOD);
 					found++;
@@ -336,25 +336,25 @@ media_auditor::summary media_auditor::summarize(const char *name, std::string *o
 
 	// loop over records
 	summary overall_status = CORRECT;
-	for (audit_record *record = m_record_list.first(); record != nullptr; record = record->next())
+	for (audit_record &record : m_record_list)
 	{
 		summary best_new_status = INCORRECT;
 
 		// skip anything that's fine
-		if (record->substatus() == audit_record::SUBSTATUS_GOOD)
+		if (record.substatus() == audit_record::SUBSTATUS_GOOD)
 			continue;
 
 		// output the game name, file name, and length (if applicable)
 		if (output != nullptr)
 		{
-			output->append(string_format("%-12s: %s", name, record->name()));
-			if (record->expected_length() > 0)
-				output->append(string_format(" (%d bytes)", record->expected_length()));
+			output->append(string_format("%-12s: %s", name, record.name()));
+			if (record.expected_length() > 0)
+				output->append(string_format(" (%d bytes)", record.expected_length()));
 			output->append(" - ");
 		}
 
 		// use the substatus for finer details
-		switch (record->substatus())
+		switch (record.substatus())
 		{
 			case audit_record::SUBSTATUS_GOOD_NEEDS_REDUMP:
 				if (output != nullptr) output->append("NEEDS REDUMP\n");
@@ -370,19 +370,19 @@ media_auditor::summary media_auditor::summarize(const char *name, std::string *o
 				if (output != nullptr)
 				{
 					output->append("INCORRECT CHECKSUM:\n");
-					output->append(string_format("EXPECTED: %s\n", record->expected_hashes().macro_string().c_str()));
-					output->append(string_format("   FOUND: %s\n", record->actual_hashes().macro_string().c_str()));
+					output->append(string_format("EXPECTED: %s\n", record.expected_hashes().macro_string().c_str()));
+					output->append(string_format("   FOUND: %s\n", record.actual_hashes().macro_string().c_str()));
 				}
 				break;
 
 			case audit_record::SUBSTATUS_FOUND_WRONG_LENGTH:
-				if (output != nullptr) output->append(string_format("INCORRECT LENGTH: %d bytes\n", record->actual_length()));
+				if (output != nullptr) output->append(string_format("INCORRECT LENGTH: %d bytes\n", record.actual_length()));
 				break;
 
 			case audit_record::SUBSTATUS_NOT_FOUND:
 				if (output != nullptr)
 				{
-					device_t *shared_device = record->shared_device();
+					device_t *shared_device = record.shared_device();
 					if (shared_device == nullptr)
 						output->append("NOT FOUND\n");
 					else
@@ -433,14 +433,14 @@ audit_record *media_auditor::audit_one_rom(const rom_entry *rom)
 	while (path.next(curpath, record.name()))
 	{
 		// open the file if we can
-		file_error filerr;
+		osd_file::error filerr;
 		if (has_crc)
 			filerr = file.open(curpath.c_str(), crc);
 		else
 			filerr = file.open(curpath.c_str());
 
 		// if it worked, get the actual length and hashes, then stop
-		if (filerr == FILERR_NONE)
+		if (filerr == osd_file::error::NONE)
 		{
 			record.set_actual(file.hashes(m_validation), file.size());
 			break;

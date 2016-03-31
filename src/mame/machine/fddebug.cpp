@@ -591,8 +591,8 @@ static void load_overlay_file(running_machine &machine)
 
 	/* determine the filename and open the file */
 	emu_file file(OPEN_FLAG_READ);
-	file_error filerr = file.open(machine.system().name, ".kov");
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = file.open(machine.system().name, ".kov");
+	if (filerr == osd_file::error::NONE)
 	{
 		file.read(keystatus, keystatus_words * 2);
 
@@ -617,8 +617,8 @@ static void save_overlay_file(running_machine &machine)
 
 	/* determin the filename and open the file */
 	emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-	file_error filerr = file.open(machine.system().name, ".kov");
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = file.open(machine.system().name, ".kov");
+	if (filerr == osd_file::error::NONE)
 	{
 		/* convert to big-endian */
 		for (pcaddr = 0; pcaddr < keystatus_words; pcaddr++)
@@ -760,8 +760,8 @@ static void execute_fdoutput(running_machine &machine, int ref, int params, cons
 
 	/* determin the filename and open the file */
 	emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-	file_error filerr = file.open(param[0]);
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = file.open(param[0]);
+	if (filerr == osd_file::error::NONE)
 		file.write(keyregion, KEY_SIZE);
 
 	debug_console_printf(machine, "File '%s' saved\n", param[0]);
@@ -1183,8 +1183,8 @@ static void execute_fddasm(running_machine &machine, int ref, int params, const 
 
 	/* open the file */
 	emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-	file_error filerr = file.open(filename);
-	if (filerr != FILERR_NONE)
+	osd_file::error filerr = file.open(filename);
+	if (filerr != osd_file::error::NONE)
 	{
 		debug_console_printf(machine, "Unable to create file '%s'\n", filename);
 		return;

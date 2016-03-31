@@ -155,8 +155,8 @@ int image_manager::write_config(emu_options &options, const char *filename, cons
 	}
 
 	emu_file file(options.ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-	file_error filerr = file.open(filename);
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = file.open(filename);
+	if (filerr == osd_file::error::NONE)
 	{
 		std::string inistring = options.output_ini();
 		file.puts(inistring.c_str());

@@ -12,6 +12,7 @@ public:
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bg1videoram(*this, "bg1videoram"),
 		m_soundlatch2(*this, "soundlatch2"),
+		m_nmi_mask(0),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "5205"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -21,7 +22,7 @@ public:
 	required_device<buffered_spriteram8_device> m_spriteram;
 	required_shared_ptr<UINT8> m_fgvideoram;
 	required_shared_ptr<UINT8> m_bg1videoram;
-	required_shared_ptr<UINT8> m_soundlatch2;
+	optional_shared_ptr<UINT8> m_soundlatch2;
 
 	/* video-related */
 	tilemap_t  *m_fg_tilemap;
@@ -39,6 +40,7 @@ public:
 	UINT8    m_soundstate;
 	UINT8    m_adpcm;
 	UINT8    m_nmi_mask;
+	int      m_sprbank;
 
 	DECLARE_WRITE8_MEMBER(avengers_adpcm_w);
 	DECLARE_READ8_MEMBER(avengers_adpcm_r);
@@ -54,6 +56,8 @@ public:
 	DECLARE_WRITE8_MEMBER(trojan_bg2_scrollx_w);
 	DECLARE_WRITE8_MEMBER(trojan_bg2_image_w);
 	DECLARE_WRITE8_MEMBER(msm5205_w);
+	DECLARE_WRITE8_MEMBER(fball_oki_bank_w);
+
 	TILEMAP_MAPPER_MEMBER(get_bg2_memory_offset);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(lwings_get_bg1_tile_info);

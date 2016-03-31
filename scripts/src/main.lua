@@ -10,7 +10,7 @@
 ---------------------------------------------------------------------------
 
 function mainProject(_target, _subtarget)
-if (_OPTIONS["SOURCES"] == nil) then 
+if (_OPTIONS["SOURCES"] == nil) then
 	if (_target == _subtarget) then
 		project (_target)
 	else
@@ -19,22 +19,27 @@ if (_OPTIONS["SOURCES"] == nil) then
 		else
 			project (_target .. _subtarget)
 		end
-	end	
+	end
 else
 	project (_subtarget)
-end	
+end
 	uuid (os.uuid(_target .."_" .. _subtarget))
 	kind "ConsoleApp"
-	
+
 	configuration { "android*" }
+		targetprefix "lib"
+		targetname "main"
 		targetextension ".so"
 		linkoptions {
 			"-shared",
+			"-Wl,-soname,libmain.so"
 		}
 		links {
 			"EGL",
+			"GLESv1_CM",
 			"GLESv2",
-		} 	
+			"SDL2",
+		}
 	configuration { "pnacl" }
 		kind "ConsoleApp"
 		targetextension ".pexe"
@@ -48,7 +53,7 @@ end
 	addprojectflags()
 	flags {
 		"NoManifest",
-		"Symbols", -- always include minimum symbols for executables 
+		"Symbols", -- always include minimum symbols for executables
 	}
 
 	if _OPTIONS["SYMBOLS"] then
@@ -58,7 +63,7 @@ end
 				"$(SILENT) objdump --section=.text --line-numbers --syms --demangle $(TARGET) >$(subst .exe,.sym,$(TARGET))"
 			}
 	end
-	
+
 	configuration { "vs*" }
 	flags {
 		"Unicode",
@@ -103,22 +108,28 @@ end
 	configuration { "mingw*" or "vs*" }
 		targetextension ".exe"
 
+	configuration { "rpi" }
+		targetextension ""
+
 	configuration { "asmjs" }
-		targetextension ".bc"  
+		targetextension ".bc"
 		if os.getenv("EMSCRIPTEN") then
 			local emccopts = ""
 			emccopts = emccopts .. " -O3"
 			emccopts = emccopts .. " -s USE_SDL=2"
+			emccopts = emccopts .. " -s USE_SDL_TTF=2"
 			emccopts = emccopts .. " --memory-init-file 0"
 			emccopts = emccopts .. " -s ALLOW_MEMORY_GROWTH=0"
 			emccopts = emccopts .. " -s TOTAL_MEMORY=268435456"
 			emccopts = emccopts .. " -s DISABLE_EXCEPTION_CATCHING=2"
-			emccopts = emccopts .. " -s EXCEPTION_CATCHING_WHITELIST='[\"__ZN15running_machine17start_all_devicesEv\"]'"
+			emccopts = emccopts .. " -s EXCEPTION_CATCHING_WHITELIST='[\"__ZN15running_machine17start_all_devicesEv\",\"__ZN12cli_frontend7executeEiPPc\"]'"
 			emccopts = emccopts .. " -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '__Z14js_get_machinev', '__Z9js_get_uiv', '__Z12js_get_soundv', '__ZN10ui_manager12set_show_fpsEb', '__ZNK10ui_manager8show_fpsEv', '__ZN13sound_manager4muteEbh', '_SDL_PauseAudio']\""
 			emccopts = emccopts .. " --pre-js " .. _MAKE.esc(MAME_DIR) .. "src/osd/modules/sound/js_sound.js"
 			emccopts = emccopts .. " --post-js " .. _MAKE.esc(MAME_DIR) .. "src/osd/sdl/emscripten_post.js"
-			emccopts = emccopts .. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx@bgfx"
-			emccopts = emccopts .. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "shaders/gles@shaders/gles"
+			emccopts = emccopts .. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/chains@bgfx/chains"
+			emccopts = emccopts .. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/effects@bgfx/effects"
+			emccopts = emccopts .. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/shaders/gles@bgfx/shaders/gles"
+			emccopts = emccopts .. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/slot-mask.png@artwork/slot-mask.png"
 			postbuildcommands {
 				os.getenv("EMSCRIPTEN") .. "/emcc " .. emccopts .. " $(TARGET) -o " .. _MAKE.esc(MAME_DIR) .. _OPTIONS["target"] .. _OPTIONS["subtarget"] .. ".js",
 			}
@@ -126,10 +137,41 @@ end
 
 	configuration { }
 
-	if _OPTIONS["SEPARATE_BIN"]~="1" then 
-		targetdir(MAME_DIR)
+	if _OPTIONS["targetos"]=="android" then
+		includedirs {
+			MAME_DIR .. "3rdparty/SDL2/include",
+		}
+
+		files {
+			MAME_DIR .. "3rdparty/SDL2/src/main/android/SDL_android_main.c",
+		}
+		targetsuffix ""
+		if _OPTIONS["SEPARATE_BIN"]~="1" then
+			if _OPTIONS["PLATFORM"]=="arm" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/armeabi-v7a")
+			end
+			if _OPTIONS["PLATFORM"]=="arm64" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/arm64-v8a")
+			end
+			if _OPTIONS["PLATFORM"]=="mips" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips")
+			end
+			if _OPTIONS["PLATFORM"]=="mips64" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips64")
+			end
+			if _OPTIONS["PLATFORM"]=="x86" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86")
+			end
+			if _OPTIONS["PLATFORM"]=="x64" then
+				targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86_64")
+			end
+		end
+	else
+		if _OPTIONS["SEPARATE_BIN"]~="1" then
+			targetdir(MAME_DIR)
+		end
 	end
-	
+
 	findfunction("linkProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
 	links {
 		"osd_" .. _OPTIONS["osd"],
@@ -150,62 +192,38 @@ if #disasm_files > 0 then
 end
 	links {
 		"utils",
-		"expat",
+		ext_lib("expat"),
 		"softfloat",
-		"jpeg",
+		ext_lib("jpeg"),
 		"7z",
-		"lua",
+		ext_lib("lua"),
 		"lualibs",
 	}
 
 	if _OPTIONS["USE_LIBUV"]=="1" then
-		links {		
-			"uv",
+		links {
+			ext_lib("uv"),
 			"http-parser",
 		}
 	end
-	if _OPTIONS["with-bundled-zlib"] then
-		links {
-			"zlib",
-		}
-	else
-		links {
-			"z",
-		}
-	end
-
-	if _OPTIONS["with-bundled-flac"] then
-		links {
-			"flac",
-		}
-	else
-		links {
-			"FLAC",
-		}
-	end
-
-	if _OPTIONS["with-bundled-sqlite3"] then
-		links {
-			"sqllite3",
-		}
-	else
-		links {
-			"sqlite3",
-		}
-	end
+	links {
+		ext_lib("zlib"),
+		ext_lib("flac"),
+		ext_lib("sqlite3"),
+	}
 
 	if _OPTIONS["NO_USE_MIDI"]~="1" then
 		links {
-			"portmidi",
+			ext_lib("portmidi"),
 		}
 	end
 	links {
 		"bgfx",
 		"ocore_" .. _OPTIONS["osd"],
 	}
-	
+
 	override_resources = false;
-	
+
 	maintargetosdoptions(_target,_subtarget)
 
 	includedirs {
@@ -218,13 +236,9 @@ end
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. _target .. "/layout",
 		GEN_DIR  .. "resource",
+		ext_includedir("zlib"),
+		ext_includedir("flac"),
 	}
-
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end
 
 	if _OPTIONS["targetos"]=="macosx" and (not override_resources) then
 		linkoptions {
@@ -260,7 +274,7 @@ end
 			dependency {
 				{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", true  },
 			}
-		end	
+		end
 	end
 
 	local mainfile = MAME_DIR .. "src/".._target .."/" .. _subtarget ..".cpp"
@@ -272,12 +286,12 @@ end
 		MAME_DIR .. "src/version.cpp",
 		GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",
 	}
-	
-if (_OPTIONS["SOURCES"] == nil) then 	
+
+if (_OPTIONS["SOURCES"] == nil) then
 
 	if os.isfile(MAME_DIR .. "src/".._target .."/" .. _subtarget ..".flt") then
 		dependency {
-		{  
+		{
 			GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
 		}
 		custombuildtask {
@@ -290,7 +304,7 @@ if (_OPTIONS["SOURCES"] == nil) then
 			}
 		else
 			dependency {
-			{  
+			{
 				GEN_DIR  .. _target .. "/" .. _target .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
 			}
 			custombuildtask {
@@ -298,11 +312,11 @@ if (_OPTIONS["SOURCES"] == nil) then
 			}
 		end
 	end
-end	
+end
 
 if (_OPTIONS["SOURCES"] ~= nil) then
 		dependency {
-		{  
+		{
 			GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
 		}
 		custombuildtask {
@@ -318,17 +332,17 @@ if _OPTIONS["FORCE_VERSION_COMPILE"]=="1" then
 		}
 end
 	configuration { "mingw*" }
-		custombuildtask {	
+		custombuildtask {
 			{ MAME_DIR .. "src/version.cpp" ,  GEN_DIR  .. "resource/" .. rctarget .. "vers.rc",    {  MAME_DIR .. "scripts/build/verinfo.py" }, {"@echo Emitting " .. rctarget .. "vers.rc" .. "...",    PYTHON .. " $(1)  -r -b " .. rctarget .. " $(<) > $(@)" }},
-		}	
-	
+		}
+
 	configuration { "vs*" }
-		prebuildcommands {	
+		prebuildcommands {
 			"mkdir " .. path.translate(GEN_DIR  .. "resource/","\\") .. " 2>NUL",
 			"@echo Emitting ".. rctarget .. "vers.rc...",
 			PYTHON .. " " .. path.translate(MAME_DIR .. "scripts/build/verinfo.py","\\") .. " -r -b " .. rctarget .. " " .. path.translate(MAME_DIR .. "src/version.cpp","\\") .. " > " .. path.translate(GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", "\\") ,
-		}	
-				
+		}
+
 	configuration { }
 
 	debugdir (MAME_DIR)

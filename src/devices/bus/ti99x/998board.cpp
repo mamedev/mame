@@ -296,7 +296,7 @@ READ8_MEMBER( mainboard8_device::readm )
 {
 	UINT8 value = 0;
 	bool found;
-	if (TRACE_MEM) logerror("%s: read from %04x\n", tag(), offset);
+	if (TRACE_DETAIL) logerror("%s: read from %04x\n", tag(), offset);
 	found = access_logical_r(space, offset, &value, mem_mask);
 	m_waitcount = 2;
 
@@ -487,10 +487,10 @@ bool mainboard8_device::access_logical_r(address_space& space, offs_t offset, UI
 	logically_addressed_device *ldev = m_logcomp.first();
 	bus8z_device *bdev;
 
-	if (TRACE_MEM) logerror("%s: offset=%04x; CRUS=%d, PTGEN=%d\n", tag(), offset, m_CRUS? 1:0, m_PTGE? 0:1);
+	if (TRACE_DETAIL) logerror("%s: offset=%04x; CRUS=%d, PTGEN=%d\n", tag(), offset, m_CRUS? 1:0, m_PTGE? 0:1);
 	while (ldev != nullptr)
 	{
-		if (TRACE_MEM) logerror("%s: checking node=%s\n", tag(), ldev->m_config->name);
+		if (TRACE_DETAIL) logerror("%s: checking node=%s\n", tag(), ldev->m_config->name);
 		// Check the mode
 		if (((ldev->m_config->mode == NATIVE) && (m_CRUS==false))
 			|| ((ldev->m_config->mode == TI99EM) && (m_CRUS==true))

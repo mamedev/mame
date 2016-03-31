@@ -6,6 +6,7 @@
  */
 
 #include <solver/nld_solver.h>
+#include <solver/nld_matrix_solver.h>
 #include "nld_system.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
@@ -78,7 +79,7 @@ NETLIB_START(extclock)
 	connect_late(m_feedback, m_Q);
 	{
 		netlist_time base = netlist_time::from_hz(m_freq.Value()*2);
-		pstring_list_t pat(m_pattern.Value(),",");
+		pstring_vector_t pat(m_pattern.Value(),",");
 		m_off = netlist_time::from_double(m_offset.Value());
 
 		int pati[256];
@@ -212,7 +213,7 @@ void nld_d_to_a_proxy::reset()
 	m_Q.initial(0.0);
 	m_last_state = -1;
 	m_RV.do_reset();
-	m_is_timestep = m_RV.m_P.net().as_analog().solver()->is_timestep();
+	m_is_timestep = m_RV.m_P.net().solver()->is_timestep();
 	m_RV.set(NL_FCONST(1.0) / logic_family().m_R_low, logic_family().m_low_V, 0.0);
 }
 
@@ -301,7 +302,7 @@ NETLIB_START(function)
 	for (int i=0; i < m_N; i++)
 		register_input(pfmt("A{1}")(i), m_I[i]);
 
-	pstring_list_t cmds(m_func.Value(), " ");
+	pstring_vector_t cmds(m_func.Value(), " ");
 	m_precompiled.clear();
 
 	for (std::size_t i=0; i < cmds.size(); i++)
@@ -329,7 +330,7 @@ NETLIB_START(function)
 			if (err)
 				netlist().log().fatal("nld_function: unknown/misformatted token <{1}> in <{2}>", cmd, m_func.Value());
 		}
-		m_precompiled.add(rc);
+		m_precompiled.push_back(rc);
 	}
 
 }

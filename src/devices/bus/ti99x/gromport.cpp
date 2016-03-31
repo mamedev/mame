@@ -148,7 +148,7 @@
 
 static void image_battery_load_by_name(emu_options &options, const char *filename, void *buffer, int length, int fill)
 {
-	file_error filerr;
+	osd_file::error filerr;
 	int bytes_read = 0;
 
 	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
@@ -156,7 +156,7 @@ static void image_battery_load_by_name(emu_options &options, const char *filenam
 	/* try to open the battery file and read it in, if possible */
 	emu_file file(options.nvram_directory(), OPEN_FLAG_READ);
 	filerr = file.open(filename);
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 		bytes_read = file.read(buffer, length);
 
 	/* fill remaining bytes (if necessary) */
@@ -174,8 +174,8 @@ static void image_battery_save_by_name(emu_options &options, const char *filenam
 
 	/* try to open the battery file and write it out, if possible */
 	emu_file file(options.nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	file_error filerr = file.open(filename);
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = file.open(filename);
+	if (filerr == osd_file::error::NONE)
 		file.write(buffer, length);
 }
 
@@ -254,7 +254,7 @@ void gromport_device::cartridge_inserted()
 
 void gromport_device::device_config_complete()
 {
-	m_connector = static_cast<ti99_cartridge_connector_device*>(first_subdevice());
+	m_connector = static_cast<ti99_cartridge_connector_device*>(subdevices().first());
 	set_grom_base(0x9800, 0xf800);
 }
 
@@ -352,7 +352,7 @@ WRITE8_MEMBER(single_conn_device::cruwrite)
 
 void single_conn_device::device_start()
 {
-	m_cartridge = static_cast<ti99_cartridge_device*>(first_subdevice());
+	m_cartridge = static_cast<ti99_cartridge_device*>(subdevices().first());
 }
 
 void single_conn_device::device_reset()
@@ -2245,43 +2245,46 @@ rpk_socket::rpk_socket(const char* id, int length, UINT8* contents)
 /*
     Locate a file in the ZIP container
 */
-const zip_file_header* rpk_reader::find_file(zip_file *zip, const char *filename, UINT32 crc)
+int rpk_reader::find_file(util::archive_file &zip, const char *filename, UINT32 crc)
 {
-	const zip_file_header *header;
-	for (header = zip_file_first_file(zip); header != nullptr; header = zip_file_next_file(zip))
+	for (int header = zip.first_file(); header >= 0; header = zip.next_file())
 	{
-		// We don't check for CRC == 0.
-		if (crc != 0)
+		// Ignore directories
+		if (!zip.current_is_directory())
 		{
-			// if the CRC and name both match, we're good
-			// if the CRC matches and the name doesn't, we're still good
-			if (header->crc == crc)
-				return header;
-		}
-		else
-		{
-			if (core_stricmp(header->filename, filename)==0)
+			// We don't check for CRC == 0.
+			if (crc != 0)
 			{
-				return header;
+				// if the CRC and name both match, we're good
+				// if the CRC matches and the name doesn't, we're still good
+				if (zip.current_crc() == crc)
+					return header;
+			}
+			else
+			{
+				if (core_stricmp(zip.current_name().c_str(), filename) == 0)
+				{
+					return header;
+				}
 			}
 		}
 	}
-	return nullptr;
+	return -1;
 }
 
 /*
     Load a rom resource and put it in a pcb socket instance.
 */
-rpk_socket* rpk_reader::load_rom_resource(zip_file* zip, xml_data_node* rom_resource_node, const char* socketname)
+rpk_socket* rpk_reader::load_rom_resource(util::archive_file &zip, xml_data_node* rom_resource_node, const char* socketname)
 {
 	const char* file;
 	const char* crcstr;
 	const char* sha1;
-	zip_error ziperr;
+	util::archive_file::error ziperr;
 	UINT32 crc;
 	int length;
 	UINT8* contents;
-	const zip_file_header *header;
+	int header;
 
 	// find the file attribute (required)
 	file = xml_get_attribute_string(rom_resource_node, "file", nullptr);
@@ -2301,19 +2304,19 @@ rpk_socket* rpk_reader::load_rom_resource(zip_file* zip, xml_data_node* rom_reso
 		crc = strtoul(crcstr, nullptr, 16);
 		header = find_file(zip, file, crc);
 	}
-	if (header == nullptr) throw rpk_exception(RPK_INVALID_FILE_REF, "File not found or CRC check failed");
+	if (header < 0) throw rpk_exception(RPK_INVALID_FILE_REF, "File not found or CRC check failed");
 
-	length = header->uncompressed_length;
+	length = zip.current_uncompressed_length();
 
 	// Allocate storage
 	contents = global_alloc_array_clear<UINT8>(length);
 	if (contents==nullptr) throw rpk_exception(RPK_OUT_OF_MEMORY);
 
 	// and unzip file from the zip file
-	ziperr = zip_file_decompress(zip, contents, length);
-	if (ziperr != ZIPERR_NONE)
+	ziperr = zip.decompress(contents, length);
+	if (ziperr != util::archive_file::error::NONE)
 	{
-		if (ziperr == ZIPERR_UNSUPPORTED) throw rpk_exception(RPK_ZIP_UNSUPPORTED);
+		if (ziperr == util::archive_file::error::UNSUPPORTED) throw rpk_exception(RPK_ZIP_UNSUPPORTED);
 		else throw rpk_exception(RPK_ZIP_ERROR);
 	}
 
@@ -2414,15 +2417,14 @@ rpk_socket* rpk_reader::load_ram_resource(emu_options &options, xml_data_node* r
 
 rpk* rpk_reader::open(emu_options &options, const char *filename, const char *system_name)
 {
-	zip_error ziperr;
+	util::archive_file::error ziperr;
 
-	const zip_file_header *header;
 	const char *pcb_type;
 	const char *id;
 	const char *uses_name;
 	const char *resource_name;
 
-	zip_file* zipfile;
+	util::archive_file::ptr zipfile;
 
 	std::vector<char> layout_text;
 	xml_data_node *layout_xml = nullptr;
@@ -2442,25 +2444,24 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 	try
 	{
 		/* open the ZIP file */
-		ziperr = zip_file_open(filename, &zipfile);
-		if (ziperr != ZIPERR_NONE) throw rpk_exception(RPK_NOT_ZIP_FORMAT);
+		ziperr = util::archive_file::open_zip(filename, zipfile);
+		if (ziperr != util::archive_file::error::NONE) throw rpk_exception(RPK_NOT_ZIP_FORMAT);
 
 		/* find the layout.xml file */
-		header = find_file(zipfile, "layout.xml", 0);
-		if (header == nullptr) throw rpk_exception(RPK_MISSING_LAYOUT);
+		if (find_file(*zipfile, "layout.xml", 0) < 0) throw rpk_exception(RPK_MISSING_LAYOUT);
 
 		/* reserve space for the layout file contents (+1 for the termination) */
-		layout_text.resize(header->uncompressed_length + 1);
+		layout_text.resize(zipfile->current_uncompressed_length() + 1);
 
 		/* uncompress the layout text */
-		ziperr = zip_file_decompress(zipfile, &layout_text[0], header->uncompressed_length);
-		if (ziperr != ZIPERR_NONE)
+		ziperr = zipfile->decompress(&layout_text[0], zipfile->current_uncompressed_length());
+		if (ziperr != util::archive_file::error::NONE)
 		{
-			if (ziperr == ZIPERR_UNSUPPORTED) throw rpk_exception(RPK_ZIP_UNSUPPORTED);
+			if (ziperr == util::archive_file::error::UNSUPPORTED) throw rpk_exception(RPK_ZIP_UNSUPPORTED);
 			else throw rpk_exception(RPK_ZIP_ERROR);
 		}
 
-		layout_text[header->uncompressed_length] = '\0';  // Null-terminate
+		layout_text[zipfile->current_uncompressed_length()] = '\0';  // Null-terminate
 
 		/* parse the layout text */
 		layout_xml = xml_string_read(&layout_text[0], nullptr);
@@ -2523,7 +2524,7 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 					// found it
 					if (strcmp(resource_node->name, "rom")==0)
 					{
-						newsock = load_rom_resource(zipfile, resource_node, id);
+						newsock = load_rom_resource(*zipfile, resource_node, id);
 						newrpk->add_socket(id, newsock);
 					}
 					else
@@ -2545,14 +2546,12 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 	{
 		newrpk->close();
 		if (layout_xml != nullptr)     xml_file_free(layout_xml);
-		if (zipfile != nullptr)        zip_file_close(zipfile);
 
 		// rethrow the exception
 		throw;
 	}
 
 	if (layout_xml != nullptr)     xml_file_free(layout_xml);
-	if (zipfile != nullptr)        zip_file_close(zipfile);
 
 	return newrpk;
 }

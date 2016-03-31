@@ -110,6 +110,7 @@ machine_manager* machine_manager::instance()
 machine_manager::machine_manager(emu_options &options,osd_interface &osd)
 		: m_osd(osd),
 		m_options(options),
+		m_plugins(std::make_unique<plugin_options>()),
 		m_lua(global_alloc(lua_engine)),
 		m_new_driver_pending(nullptr),
 		m_machine(nullptr)
@@ -153,13 +154,67 @@ void machine_manager::update_machine()
 }
 
 
+std::vector<std::string> split(const std::string &text, char sep)
+{
+	std::vector<std::string> tokens;
+	std::size_t start = 0, end = 0;
+	while ((end = text.find(sep, start)) != std::string::npos) {
+		std::string temp = text.substr(start, end - start);
+		if (temp != "") tokens.push_back(temp);
+		start = end + 1;
+	}
+	std::string temp = text.substr(start);
+	if (temp != "") tokens.push_back(temp);
+	return tokens;
+}
+
 void machine_manager::start_luaengine()
 {
+	if (options().plugins())
+	{
+		path_iterator iter(options().plugins_path());
+		std::string pluginpath;
+		while (iter.next(pluginpath))
+		{
+			m_plugins->parse_json(pluginpath);
+		}
+		std::vector<std::string> include = split(options().plugin(),',');
+		std::vector<std::string> exclude = split(options().no_plugin(),',');
+		{
+			// parse the file
+			std::string error;
+			// attempt to open the output file
+			emu_file file(options().ini_path(), OPEN_FLAG_READ);
+			if (file.open("plugin.ini") == osd_file::error::NONE)
+			{
+				bool result = m_plugins->parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+				if (!result)
+					osd_printf_error("**Error loading plugin.ini**");
+			}
+		}
+		for (auto &curentry : *m_plugins)
+		{
+			if (!curentry.is_header())
+			{
+				if (std::find(include.begin(), include.end(), curentry.name()) != include.end())
+				{
+					std::string error_string;
+					m_plugins->set_value(curentry.name(), "1", OPTION_PRIORITY_CMDLINE, error_string);
+				}
+				if (std::find(exclude.begin(), exclude.end(), curentry.name()) != exclude.end())
+				{
+					std::string error_string;
+					m_plugins->set_value(curentry.name(), "0", OPTION_PRIORITY_CMDLINE, error_string);
+				}
+			}
+		}
+	}
 	m_lua->initialize();
+
 	{
 		emu_file file(options().plugins_path(), OPEN_FLAG_READ);
-		file_error filerr = file.open("boot.lua");
-		if (filerr == FILERR_NONE)
+		osd_file::error filerr = file.open("boot.lua");
+		if (filerr == osd_file::error::NONE)
 		{
 			m_lua->load_script(file.fullpath());
 		}
@@ -230,40 +285,9 @@ int machine_manager::execute()
 		// check the state of the machine
 		if (m_new_driver_pending)
 		{
-			std::string old_system_name(m_options.system_name());
-			bool new_system = (old_system_name.compare(m_new_driver_pending->name)!=0);
-			// first: if we scheduled a new system, remove device options of the old system
-			// notice that, if we relaunch the same system, there is no effect on the emulation
-			if (new_system)
-				m_options.remove_device_options();
-			// second: set up new system name (and the related device options)
+			// set up new system name and adjust device options accordingly
 			m_options.set_system_name(m_new_driver_pending->name);
-			// third: if we scheduled a new system, take also care of ramsize options
-			if (new_system)
-			{
-				std::string error_string;
-				m_options.set_value(OPTION_RAMSIZE, "", OPTION_PRIORITY_CMDLINE, error_string);
-			}
 			firstrun = true;
-			if (m_options.software_name())
-			{
-				std::string sw_load(m_options.software_name());
-				std::string sw_list, sw_name, sw_part, sw_instance, option_errors, error_string;
-				int left = sw_load.find_first_of(':');
-				int middle = sw_load.find_first_of(':', left + 1);
-				int right = sw_load.find_last_of(':');
-
-				sw_list = sw_load.substr(0, left - 1);
-				sw_name = sw_load.substr(left + 1, middle - left - 1);
-				sw_part = sw_load.substr(middle + 1, right - middle - 1);
-				sw_instance = sw_load.substr(right + 1);
-				sw_load.assign(sw_load.substr(0, right));
-
-				char arg[] = "mame";
-				char *argv = &arg[0];
-				m_options.set_value(OPTION_SOFTWARENAME, sw_name.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-				m_options.parse_slot_devices(1, &argv, option_errors, sw_instance.c_str(), sw_load.c_str());
-			}
 		}
 		else
 		{

@@ -15,7 +15,7 @@ project "UnitTest++"
 		"../3rdparty/UnitTest++/src/*.h",
 	}
 
-	configuration { "linux or osx or android-* or *nacl* or ps4" }
+	configuration { "linux or osx or android-* or *nacl* or ps4 or rpi or riscv" }
 		files {
 			"../3rdparty/UnitTest++/src/Posix/**.cpp",
 			"../3rdparty/UnitTest++/src/Posix/**.h",

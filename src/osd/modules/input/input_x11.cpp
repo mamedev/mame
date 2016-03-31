@@ -138,46 +138,46 @@ find_device_info(Display    *display,
 	XID     id = (XID)-1;
 
 	for(loop = 0; loop < len; loop++)
-    {
-	   if (!isdigit(name[loop]))
-       {
-            is_id = false;
-            break;
-	   }
+	{
+		if (!isdigit(name[loop]))
+		{
+			is_id = false;
+			break;
+		}
 	}
 
 	if (is_id)
-    {
-	   id = atoi(name);
+	{
+		id = atoi(name);
 	}
 
 	devices = XListInputDevices(display, &num_devices);
 
 	for(loop = 0; loop < num_devices; loop++)
-    {
-        osd_printf_verbose("Evaluating device with name: %s\n", devices[loop].name);
-        
-        // if only extended devices and our device isn't extended, skip
-        if (only_extended && devices[loop].use < IsXExtensionDevice)
-            continue;
+	{
+		osd_printf_verbose("Evaluating device with name: %s\n", devices[loop].name);
 
-        // Adjust name to remove spaces for accurate comparison
-        std::string name_no_space = remove_spaces(devices[loop].name); 
-        if ((!is_id && strcmp(name_no_space.c_str(), name) == 0)
-            || (is_id && devices[loop].id == id))
-        {
-            if (found)
-            {
-                osd_printf_verbose(
-                    "Warning: There are multiple devices named \"%s\".\n"
-                    "To ensure the correct one is selected, please use "
-                    "the device ID instead.\n\n", name);
-            }
-            else
-            {
-                found = &devices[loop];
-            }
-        }
+		// if only extended devices and our device isn't extended, skip
+		if (only_extended && devices[loop].use < IsXExtensionDevice)
+			continue;
+
+		// Adjust name to remove spaces for accurate comparison
+		std::string name_no_space = remove_spaces(devices[loop].name);
+		if ((!is_id && strcmp(name_no_space.c_str(), name) == 0)
+			|| (is_id && devices[loop].id == id))
+		{
+			if (found)
+			{
+				osd_printf_verbose(
+					"Warning: There are multiple devices named \"%s\".\n"
+					"To ensure the correct one is selected, please use "
+					"the device ID instead.\n\n", name);
+			}
+			else
+			{
+				found = &devices[loop];
+			}
+		}
 	}
 
 	return found;
@@ -347,13 +347,13 @@ public:
 class x11_lightgun_device : public x11_input_device
 {
 public:
-    lightgun_state lightgun;
-    
-    x11_lightgun_device(running_machine &machine, const char* name, input_module &module)
-        : x11_input_device(machine, name, DEVICE_CLASS_LIGHTGUN, module),
-            lightgun({0})
-    {
-    }
+	lightgun_state lightgun;
+
+	x11_lightgun_device(running_machine &machine, const char* name, input_module &module)
+		: x11_input_device(machine, name, DEVICE_CLASS_LIGHTGUN, module),
+			lightgun({0})
+	{
+	}
 
 	void process_event(XEvent &xevent) override
 	{
@@ -413,44 +413,44 @@ public:
 class x11_lightgun_module : public input_module_base, public x11_event_handler
 {
 private:
-    device_map_t   m_lightgun_map;
+	device_map_t   m_lightgun_map;
 	Display *      m_display;
 public:
-    x11_lightgun_module()
-        : input_module_base(OSD_LIGHTGUNINPUT_PROVIDER, "x11")
-    {
-    }
-    
-    void input_init(running_machine &machine) override
-    {
-        int index;
-        
-        osd_printf_verbose("Lightgun: Begin initialization\n");
+	x11_lightgun_module()
+		: input_module_base(OSD_LIGHTGUNINPUT_PROVIDER, "x11")
+	{
+	}
 
-        devmap_init(machine, &m_lightgun_map, SDLOPTION_LIGHTGUNINDEX, 8, "Lightgun mapping");
-        
-        x11_event_manager::instance().initialize();
+	void input_init(running_machine &machine) override
+	{
+		int index;
+
+		osd_printf_verbose("Lightgun: Begin initialization\n");
+
+		devmap_init(machine, &m_lightgun_map, SDLOPTION_LIGHTGUNINDEX, 8, "Lightgun mapping");
+
+		x11_event_manager::instance().initialize();
 		m_display = x11_event_manager::instance().display();
 
 		// Loop through all 8 possible devices
-        for (index = 0; index < 8; index++)
-        {
-            XDeviceInfo *info;
+		for (index = 0; index < 8; index++)
+		{
+			XDeviceInfo *info;
 
 			// Skip if the name is empty
 			if (m_lightgun_map.map[index].name.length() == 0)
 				continue;
 
-            x11_lightgun_device *devinfo;
-            std::string const &name = m_lightgun_map.map[index].name;
-            char defname[512];
-                
-            // Register and add the device
-            devinfo = create_lightgun_device(machine, index);
-            osd_printf_verbose("%i: %s\n", index, name.c_str());
-                
-            // Find the device info associated with the name
-            info = find_device_info(m_display, name.c_str(), 0);
+			x11_lightgun_device *devinfo;
+			std::string const &name = m_lightgun_map.map[index].name;
+			char defname[512];
+
+			// Register and add the device
+			devinfo = create_lightgun_device(machine, index);
+			osd_printf_verbose("%i: %s\n", index, name.c_str());
+
+			// Find the device info associated with the name
+			info = find_device_info(m_display, name.c_str(), 0);
 
 			// If we couldn't find the device, skip
 			if (info == nullptr)
@@ -459,7 +459,7 @@ public:
 				continue;
 			}
 
-            //Grab device info and translate to stuff mame can use
+			//Grab device info and translate to stuff mame can use
 			if (info->num_classes > 0)
 			{
 				// Add the lightgun buttons based on what we read
@@ -468,46 +468,46 @@ public:
 				// Also, set the axix min/max ranges if we got them
 				set_lightgun_axis_props((XAnyClassPtr)info->inputclassinfo, info->num_classes, devinfo);
 			}
-                
-            // Add X and Y axis
-            sprintf(defname, "X %s", devinfo->name());
-            devinfo->device()->add_item(defname, ITEM_ID_XAXIS, generic_axis_get_state, &devinfo->lightgun.lX);
-                
-            sprintf(defname, "Y %s", devinfo->name());
-            devinfo->device()->add_item(defname, ITEM_ID_YAXIS, generic_axis_get_state, &devinfo->lightgun.lY);
+
+			// Add X and Y axis
+			sprintf(defname, "X %s", devinfo->name());
+			devinfo->device()->add_item(defname, ITEM_ID_XAXIS, generic_axis_get_state, &devinfo->lightgun.lX);
+
+			sprintf(defname, "Y %s", devinfo->name());
+			devinfo->device()->add_item(defname, ITEM_ID_YAXIS, generic_axis_get_state, &devinfo->lightgun.lY);
 
 			// Save the device id
-            devinfo->x11_state.deviceid = info->id;
-			
+			devinfo->x11_state.deviceid = info->id;
+
 			// Register this device to receive event notifications
 			int events_registered = register_events(m_display, info, m_lightgun_map.map[index].name.c_str(), 0);
 			osd_printf_verbose("Device %i: Registered %i events.\n", (int)info->id, events_registered);
-            
-            // register ourself to handle events from event manager
-            int event_types[] = { motion_type, button_press_type, button_release_type };
-            osd_printf_verbose("Events types to register: motion:%d, press:%d, release:%d\n", motion_type, button_press_type, button_release_type);
-            x11_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
-	   }
-	   
-       osd_printf_verbose("Lightgun: End initialization\n");
-    }
 
-    bool should_poll_devices(running_machine &machine) override
-    {
-        return sdl_event_manager::instance().app_has_mouse_focus();
-    }
-    
-    void before_poll(running_machine &machine) override
-    {
-        if (!should_poll_devices(machine))
-            return;
-        
+			// register ourself to handle events from event manager
+			int event_types[] = { motion_type, button_press_type, button_release_type };
+			osd_printf_verbose("Events types to register: motion:%d, press:%d, release:%d\n", motion_type, button_press_type, button_release_type);
+			x11_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
+		}
+
+		osd_printf_verbose("Lightgun: End initialization\n");
+	}
+
+	bool should_poll_devices(running_machine &machine) override
+	{
+		return sdl_event_manager::instance().has_focus();
+	}
+
+	void before_poll(running_machine &machine) override
+	{
+		if (!should_poll_devices(machine))
+			return;
+
 		// Tell the event manager to process events and push them to the devices
 		x11_event_manager::instance().process_events(machine);
 
 		// Also trigger the SDL event manager so it can process window events
 		sdl_event_manager::instance().process_events(machine);
-    }
+	}
 
 	void handle_event(XEvent &xevent) override
 	{
@@ -553,7 +553,7 @@ private:
 				XButtonInfoPtr b = (XButtonInfoPtr)any;
 				for (int button = 0; button < b->num_buttons; button++)
 				{
-                    input_item_id itemid = (input_item_id)(ITEM_ID_BUTTON1 + button);
+					input_item_id itemid = (input_item_id)(ITEM_ID_BUTTON1 + button);
 					devinfo->device()->add_item(default_button_name(button), itemid, generic_button_get_state, &devinfo->lightgun.buttons[button]);
 				}
 				break;

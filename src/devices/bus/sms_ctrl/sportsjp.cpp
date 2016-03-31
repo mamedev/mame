@@ -4,12 +4,25 @@
 
     Sega Master System "Sports Pad" (Japanese model) emulation
 
-**********************************************************************/
 
-// The Japanese Sports Pad controller is only required to play the cartridge
-// Sports Pad Soccer, released in Japan. It uses a different mode than the
-// used by the US model, due to missing output lines on Sega Mark III
-// controller ports.
+Release data from the Sega Retro project:
+
+  Year: 1988    Country/region: JP    Model code: SP-500
+
+TODO:
+
+- For low-level emulation, a device for the TMP42C66P, a Toshiba 4bit
+  microcontroller, needs to be created, but a dump of its internal ROM
+  seems to be required.
+
+Notes:
+
+  The Japanese Sports Pad controller is only required to play the cartridge
+  Sports Pad Soccer, released in Japan. It uses a different mode than the
+  used by the US model, due to the missing TH line on Sega Mark III
+  controller ports.
+
+**********************************************************************/
 
 #include "sportsjp.h"
 
@@ -21,8 +34,9 @@
 
 const device_type SMS_SPORTS_PAD_JP = &device_creator<sms_sports_pad_jp_device>;
 
+// time interval not verified
+#define SPORTS_PAD_JP_INTERVAL attotime::from_hz(20000)
 
-#define SPORTS_PAD_JP_INTERVAL attotime::from_hz(30000) // 30Hz (not measured)
 
 
 DECLARE_CUSTOM_INPUT_MEMBER( sms_sports_pad_jp_device::dir_pins_r )

@@ -205,7 +205,6 @@ private:
 	std::thread                                 m_audioThread;
 	std::queue<xaudio2_buffer>                  m_queue;
 	std::unique_ptr<bufferpool>                 m_buffer_pool;
-	HMODULE                                     m_xaudio2_module;
 	UINT32                                      m_overflows;
 	UINT32                                      m_underflows;
 	BOOL                                        m_in_underflow;
@@ -227,7 +226,6 @@ public:
 		m_hEventDataAvailable(nullptr),
 		m_hEventExiting(nullptr),
 		m_buffer_pool(nullptr),
-		m_xaudio2_module(nullptr),
 		m_overflows(0),
 		m_underflows(0),
 		m_in_underflow(FALSE),

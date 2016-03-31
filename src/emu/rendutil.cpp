@@ -12,7 +12,7 @@
 #include "rendutil.h"
 #include "png.h"
 
-
+#include "libjpeg/jpeglib.h"
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -524,6 +524,86 @@ void render_line_to_quad(const render_bounds *bounds, float width, render_bounds
 
 
 /*-------------------------------------------------
+    render_load_jpeg - load a JPG file into a
+    bitmap
+-------------------------------------------------*/
+
+void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename)
+{
+	// deallocate previous bitmap
+	bitmap.reset();
+
+	// define file's full name
+	std::string fname;
+
+	if (dirname == nullptr)
+		fname = filename;
+	else
+		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
+
+	if (file.open(fname.c_str()) != osd_file::error::NONE)
+		return;
+
+	// define standard JPEG structures
+	jpeg_decompress_struct cinfo;
+	jpeg_error_mgr jerr;
+	cinfo.err = jpeg_std_error(&jerr);
+	jpeg_create_decompress(&cinfo);
+
+	// allocates a buffer for the image
+	UINT32 jpg_size = file.size();
+	unsigned char *jpg_buffer = global_alloc_array(unsigned char, jpg_size);
+
+	// read data from the file and set them in the buffer
+	file.read(jpg_buffer, jpg_size);
+	jpeg_mem_src(&cinfo, jpg_buffer, jpg_size);
+
+	// read JPEG header and start decompression
+	jpeg_read_header(&cinfo, TRUE);
+	jpeg_start_decompress(&cinfo);
+
+	// allocates the destination bitmap
+	int w = cinfo.output_width;
+	int h = cinfo.output_height;
+	int s = cinfo.output_components;
+	bitmap.allocate(w, h);
+
+	// allocates a buffer to receive the information and copy them into the bitmap
+	int row_stride = cinfo.output_width * cinfo.output_components;
+	JSAMPARRAY buffer = (JSAMPARRAY)malloc(sizeof(JSAMPROW));
+	buffer[0] = (JSAMPROW)malloc(sizeof(JSAMPLE) * row_stride);
+
+	while ( cinfo.output_scanline < cinfo.output_height )
+	{
+		int j = cinfo.output_scanline;
+		jpeg_read_scanlines(&cinfo, buffer, 1);
+
+		if (s == 1)
+			for (int i = 0; i < w; ++i)
+				bitmap.pix32(j, i) = rgb_t(0xFF, buffer[0][i], buffer[0][i], buffer[0][i]);
+
+		else if (s == 3)
+			for (int i = 0; i < w; ++i)
+				bitmap.pix32(j, i) = rgb_t(0xFF, buffer[0][i * s], buffer[0][i * s + 1], buffer[0][i * s + 2]);
+		else
+		{
+			osd_printf_error("Cannot read JPEG data from %s file.\n", fname.c_str());
+			bitmap.reset();
+			break;
+		}
+	}
+
+	// finish decompression and frees the memory
+	jpeg_finish_decompress(&cinfo);
+	jpeg_destroy_decompress(&cinfo);
+	file.close();
+	free(buffer[0]);
+	free(buffer);
+	global_free_array(jpg_buffer);
+}
+
+
+/*-------------------------------------------------
     render_load_png - load a PNG file into a
     bitmap
 -------------------------------------------------*/
@@ -540,8 +620,8 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 		fname.assign(filename);
 	else
 		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
-	file_error filerr = file.open(fname.c_str());
-	if (filerr != FILERR_NONE)
+	osd_file::error filerr = file.open(fname.c_str());
+	if (filerr != osd_file::error::NONE)
 		return false;
 
 	// read the PNG data

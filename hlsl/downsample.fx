@@ -53,15 +53,23 @@ struct PS_INPUT
 
 uniform float2 ScreenDims;
 uniform float2 TargetDims;
-uniform float2 SourceRect;
+uniform float2 QuadDims;
 
-uniform bool PrepareVector;
+uniform bool VectorScreen;
+
+static const float2 Coord0Offset = float2(-0.5f, -0.5f);
+static const float2 Coord1Offset = float2( 0.5f, -0.5f);
+static const float2 Coord2Offset = float2(-0.5f,  0.5f);
+static const float2 Coord3Offset = float2( 0.5f,  0.5f);
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
-	float2 TargetTexelDims = 1.0f / TargetDims;
+	float2 HalfTargetTexelDims = 0.5f / TargetDims;
+	HalfTargetTexelDims *= VectorScreen
+		? (ScreenDims / QuadDims)
+		: 1.0f;
 
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
@@ -71,15 +79,13 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 	Output.Color = Input.Color;
 
-	float2 TexCoord = Input.Position.xy / ScreenDims;
-	TexCoord += PrepareVector
-		? 0.5f / TargetDims // half texel offset correction (DX9) - only for vector grpahics
-		: 0.0f;
+	float2 TexCoord = Input.TexCoord;
+	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
-	Output.TexCoord01.xy = TexCoord + float2(-0.5f, -0.5f) * TargetTexelDims;
-	Output.TexCoord01.zw = TexCoord + float2( 0.5f, -0.5f) * TargetTexelDims;
-	Output.TexCoord23.xy = TexCoord + float2(-0.5f,  0.5f) * TargetTexelDims;
-	Output.TexCoord23.zw = TexCoord + float2( 0.5f,  0.5f) * TargetTexelDims;
+	Output.TexCoord01.xy = TexCoord + Coord0Offset * HalfTargetTexelDims;
+	Output.TexCoord01.zw = TexCoord + Coord1Offset * HalfTargetTexelDims;
+	Output.TexCoord23.xy = TexCoord + Coord2Offset * HalfTargetTexelDims;
+	Output.TexCoord23.zw = TexCoord + Coord3Offset * HalfTargetTexelDims;
 
 	return Output;
 }

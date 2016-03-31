@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia, David Haywood
+// copyright-holders:Luca Elia, David Haywood,Stephane Humbert
 /* Kaneko Hit protection */
 
 

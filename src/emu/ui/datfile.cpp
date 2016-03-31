@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /***************************************************************************
 
     ui/datfile.cpp
@@ -31,6 +31,7 @@ static std::string TAG_MESSINFO_R("#     MESSINFO.DAT");
 static std::string TAG_SYSINFO_R("# This file was generated on");
 static std::string TAG_STORY_R("# version");
 static std::string TAG_COMMAND_SEPARATOR("-----------------------------------------------");
+static std::string TAG_GAMEINIT_R("# GAMEINIT.DAT");
 
 //-------------------------------------------------
 //  Statics
@@ -41,6 +42,7 @@ datfile_manager::dataindex datfile_manager::m_messidx;
 datfile_manager::dataindex datfile_manager::m_cmdidx;
 datfile_manager::dataindex datfile_manager::m_sysidx;
 datfile_manager::dataindex datfile_manager::m_storyidx;
+datfile_manager::dataindex datfile_manager::m_ginitidx;
 datfile_manager::drvindex datfile_manager::m_drvidx;
 datfile_manager::drvindex datfile_manager::m_messdrvidx;
 datfile_manager::drvindex datfile_manager::m_menuidx;
@@ -50,6 +52,7 @@ std::string datfile_manager::m_mame_rev;
 std::string datfile_manager::m_mess_rev;
 std::string datfile_manager::m_sysinfo_rev;
 std::string datfile_manager::m_story_rev;
+std::string datfile_manager::m_ginit_rev;
 bool datfile_manager::first_run = true;
 
 //-------------------------------------------------
@@ -95,6 +98,12 @@ datfile_manager::datfile_manager(running_machine &machine) : m_machine(machine)
 			init_history();
 			parseclose();
 		}
+
+		if (parseopen("gameinit.dat"))
+		{
+			init_gameinit();
+			parseclose();
+		}
 	}
 }
 
@@ -129,6 +138,18 @@ void datfile_manager::init_history()
 	osd_printf_verbose("History.dat games found = %i\n", count);
 	osd_printf_verbose("History.dat softwares found = %i\n", swcount);
 	osd_printf_verbose("Rev = %s\n", m_history_rev.c_str());
+}
+
+//-------------------------------------------------
+//  initialize gameinit.dat index
+//-------------------------------------------------
+void datfile_manager::init_gameinit()
+{
+	int swcount = 0;
+	drvindex tmp;
+	int count = index_mame_mess_info(m_ginitidx, tmp, swcount);
+	osd_printf_verbose("Gameinit.dat games found = %i\n", count);
+	osd_printf_verbose("Rev = %s\n", m_ginit_rev.c_str());
 }
 
 //-------------------------------------------------
@@ -250,6 +271,11 @@ void datfile_manager::load_data_info(const game_driver *drv, std::string &buffer
 			tag = TAG_STORY;
 			index_idx = m_storyidx;
 			break;
+		case UI_GINIT_LOAD:
+			filename = "gameinit.dat";
+			tag = TAG_MAME;
+			index_idx = m_ginitidx;
+			break;
 	}
 
 	if (parseopen(filename.c_str()))
@@ -261,7 +287,7 @@ void datfile_manager::load_data_info(const game_driver *drv, std::string &buffer
 			load_driver_text(drv, buffer, driver_idx, TAG_DRIVER);
 
 		// cleanup mameinfo and sysinfo double line spacing
-		if (tag == TAG_MAME || type == UI_SYSINFO_LOAD)
+		if ((tag == TAG_MAME && type != UI_GINIT_LOAD) || type == UI_SYSINFO_LOAD)
 			strreplace(buffer, "\n\n", "\n");
 
 		parseclose();
@@ -354,6 +380,7 @@ int datfile_manager::index_mame_mess_info(dataindex &index, drvindex &index_drv,
 	size_t foundtag;
 	size_t t_mame = TAG_MAMEINFO_R.size();
 	size_t t_mess = TAG_MESSINFO_R.size();
+	size_t t_ginit = TAG_GAMEINIT_R.size();
 	size_t t_info = TAG_INFO.size();
 
 	char rbuf[64 * 1024];
@@ -370,6 +397,11 @@ int datfile_manager::index_mame_mess_info(dataindex &index, drvindex &index_drv,
 		{
 			size_t found = readbuf.find(" ", foundtag + t_mess + 1);
 			m_mess_rev = readbuf.substr(foundtag + t_mess + 1, found - t_mess - foundtag);
+		}
+		else if (m_ginit_rev.empty() && readbuf.compare(0, t_ginit, TAG_GAMEINIT_R) == 0)
+		{
+			size_t found = readbuf.find(" ", t_ginit + 1);
+			m_ginit_rev = readbuf.substr(t_ginit + 1, found - t_ginit);
 		}
 		else if (readbuf.compare(0, t_info, TAG_INFO) == 0)
 		{
@@ -423,8 +455,6 @@ int datfile_manager::index_datafile(dataindex &index, int &swcount)
 		}
 		else if (m_story_rev.empty() && readbuf.compare(0, t_story, TAG_STORY_R) == 0)
 			m_story_rev = readbuf.substr(t_story + 1);
-
-		// TAG_INFO identifies the driver
 		else if (readbuf.compare(0, t_info, TAG_INFO) == 0)
 		{
 			int curpoint = t_info + 1;
@@ -548,7 +578,7 @@ bool datfile_manager::parseopen(const char *filename)
 	// so it's better and faster use standard C fileio functions.
 
 	emu_file file(machine().ui().options().history_path(), OPEN_FLAG_READ);
-	if (file.open(filename) != FILERR_NONE)
+	if (file.open(filename) != osd_file::error::NONE)
 		return false;
 
 	m_fullpath = file.fullpath();

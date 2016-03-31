@@ -19,13 +19,8 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist",
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/lib/util",
+	--      ext_includedir("expat"),
 	}
-	--	if _OPTIONS["with-bundled-expat"] then
-	--	includedirs {
-	--		MAME_DIR .. "3rdparty/expat/lib",
-	--	}
-	--end
-
 
 	files {
 		MAME_DIR .. "src/lib/netlist/nl_config.h",
@@ -73,6 +68,7 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/analog/nld_opamps.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_solver.cpp",
 		MAME_DIR .. "src/lib/netlist/solver/nld_solver.h",
+		MAME_DIR .. "src/lib/netlist/solver/nld_matrix_solver.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_direct.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_direct1.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_direct2.h",
@@ -80,14 +76,14 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_sor_mat.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_gmres.h",
 		MAME_DIR .. "src/lib/netlist/solver/mat_cr.h",
+		MAME_DIR .. "src/lib/netlist/solver/nld_ms_sm.h",
+		MAME_DIR .. "src/lib/netlist/solver/nld_ms_w.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_direct_lu.h",
-		MAME_DIR .. "src/lib/netlist/solver/vector_base.h",		
+		MAME_DIR .. "src/lib/netlist/solver/vector_base.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4020.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4020.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4066.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4066.h",
-		MAME_DIR .. "src/lib/netlist/devices/nld_7400.cpp",
-		MAME_DIR .. "src/lib/netlist/devices/nld_7400.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_7402.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_7402.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_7404.cpp",
@@ -173,5 +169,5 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/macro/nlm_opamp.cpp",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_opamp.h",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_other.cpp",
-		MAME_DIR .. "src/lib/netlist/macro/nlm_other.h",		
+		MAME_DIR .. "src/lib/netlist/macro/nlm_other.h",
 }

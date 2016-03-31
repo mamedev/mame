@@ -8,9 +8,9 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- everything
+    - everything
 
 */
 
@@ -28,7 +28,7 @@
 #define ADC0809_TAG     "427"
 #define DAC0808_TAG     "461"
 #define Z80CTC_TAG      "458"
-#define RS232_TAG	    "rs232"
+#define RS232_TAG       "rs232"
 
 
 

@@ -215,7 +215,7 @@ protected:
 	UINT8               m_hwc_input_value;
 	UINT8               m_mj_input_num;
 	UINT8               m_mj_last_val;
-	int					m_spritepalbase;
+	int                 m_spritepalbase;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_shared_ptr<UINT8> m_sound_decrypted_opcodes;

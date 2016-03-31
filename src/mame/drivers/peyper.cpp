@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Stephh, Robbbert
+// copyright-holders:Robbbert,Stephane Humbert
 /********************************************************************************************************
 
   PINBALL

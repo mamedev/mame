@@ -34,109 +34,6 @@ void win_output_debug_string_utf8(const char *string)
 
 
 //============================================================
-//  win_get_module_file_name_utf8
-//============================================================
-
-DWORD win_get_module_file_name_utf8(HMODULE module, char *filename, DWORD size)
-{
-	TCHAR t_filename[MAX_PATH];
-	char *utf8_filename;
-
-	if (GetModuleFileName(module, t_filename, ARRAY_LENGTH(t_filename)) == 0)
-		return 0;
-
-	utf8_filename = utf8_from_tstring(t_filename);
-	if (!utf8_filename)
-		return 0;
-
-	size = (DWORD) snprintf(filename, size, "%s", utf8_filename);
-	osd_free(utf8_filename);
-	return size;
-}
-
-
-
-//============================================================
-//  win_set_file_attributes_utf8
-//============================================================
-
-BOOL win_set_file_attributes_utf8(const char* filename, DWORD fileattributes)
-{
-	BOOL result = FALSE;
-	TCHAR* t_filename = tstring_from_utf8(filename);
-	if( !t_filename )
-		return result;
-
-	result = SetFileAttributes(t_filename, fileattributes);
-
-	osd_free(t_filename);
-
-	return result;
-}
-
-
-
-//============================================================
-//  win_copy_file_utf8
-//============================================================
-
-BOOL win_copy_file_utf8(const char* existingfilename, const char* newfilename, BOOL failifexists)
-{
-	TCHAR* t_existingfilename;
-	TCHAR* t_newfilename;
-	BOOL result = FALSE;
-
-	t_existingfilename = tstring_from_utf8(existingfilename);
-	if( !t_existingfilename )
-		return result;
-
-	t_newfilename = tstring_from_utf8(newfilename);
-	if( !t_newfilename ) {
-		osd_free(t_existingfilename);
-		return result;
-	}
-
-	result = CopyFile(t_existingfilename, t_newfilename, failifexists);
-
-	osd_free(t_newfilename);
-	osd_free(t_existingfilename);
-
-	return result;
-}
-
-
-
-//============================================================
-//  win_move_file_utf8
-//============================================================
-
-BOOL win_move_file_utf8(const char* existingfilename, const char* newfilename)
-{
-	TCHAR* t_existingfilename;
-	TCHAR* t_newfilename;
-	BOOL result = FALSE;
-
-	t_existingfilename = tstring_from_utf8(existingfilename);
-	if( !t_existingfilename )
-		return result;
-
-	t_newfilename = tstring_from_utf8(newfilename);
-	if( !t_newfilename ) {
-		free(t_existingfilename);
-		return result;
-	}
-
-	result = MoveFile(t_existingfilename, t_newfilename);
-
-	osd_free(t_newfilename);
-	osd_free(t_existingfilename);
-
-	return result;
-}
-
-
-
-//============================================================
 //  win_message_box_utf8
 //============================================================
 
@@ -188,7 +85,12 @@ BOOL win_set_window_text_utf8(HWND window, const char *text)
 			goto done;
 	}
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	result = SetWindowText(window, t_text);
+#else
+	Windows::UI::ViewManagement::ApplicationView::GetForCurrentView()->Title = ref new Platform::String(t_text);
+	result = TRUE;
+#endif
 
 done:
 	if (t_text)
@@ -210,8 +112,13 @@ int win_get_window_text_utf8(HWND window, char *buffer, size_t buffer_size)
 
 	t_buffer[0] = '\0';
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	// invoke the core Win32 API
 	GetWindowText(window, t_buffer, ARRAY_LENGTH(t_buffer));
+#else
+	auto title = Windows::UI::ViewManagement::ApplicationView::GetForCurrentView()->Title;
+	wcsncpy(t_buffer, title->Data(), ARRAY_LENGTH(t_buffer));
+#endif
 
 	utf8_buffer = utf8_from_tstring(t_buffer);
 	if (!utf8_buffer)

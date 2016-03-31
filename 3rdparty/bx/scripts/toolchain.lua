@@ -37,6 +37,7 @@ function toolchain(_buildDir, _libDir)
 			{ "ps4",             "PS4"                        },
 			{ "qnx-arm",         "QNX/Blackberry - ARM"       },
 			{ "rpi",             "RaspberryPi"                },
+			{ "riscv",           "RISC-V"                     },
 		},
 	}
 
@@ -47,6 +48,7 @@ function toolchain(_buildDir, _libDir)
 		allowed = {
 			{ "vs2012-clang",  "Clang 3.6"                       },
 			{ "vs2013-clang",  "Clang 3.6"                       },
+			{ "vs2015-clang",  "Clang 3.9"                       },
 			{ "vs2012-xp",     "Visual Studio 2012 targeting XP" },
 			{ "vs2013-xp",     "Visual Studio 2013 targeting XP" },
 			{ "vs2015-xp",     "Visual Studio 2015 targeting XP" },
@@ -335,11 +337,22 @@ function toolchain(_buildDir, _libDir)
 
 		elseif "rpi" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-rpi"))
+
+		elseif "riscv" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "/opt/riscv/bin/riscv64-unknown-elf-gcc"
+			premake.gcc.cxx = "/opt/riscv/bin/riscv64-unknown-elf-g++"
+			premake.gcc.ar  = "/opt/riscv/bin/riscv64-unknown-elf-ar"
+			location (path.join(_buildDir, "projects", _ACTION .. "-riscv"))
+
 		end
 	elseif _ACTION == "vs2012" or _ACTION == "vs2013" or _ACTION == "vs2015" then
 
 		if (_ACTION .. "-clang") == _OPTIONS["vs"] then
-			premake.vstudio.toolset = ("LLVM-" .. _ACTION)
+			if "vs2015-clang" == _OPTIONS["vs"] then
+				premake.vstudio.toolset = ("LLVM-vs2014")
+			else
+				premake.vstudio.toolset = ("LLVM-" .. _ACTION)
+			end
 			location (path.join(_buildDir, "projects", _ACTION .. "-clang"))
 
 		elseif "winphone8" == _OPTIONS["vs"] then
@@ -746,10 +759,11 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "android-arm/obj"))
 		libdirs {
 			path.join(_libDir, "lib/android-arm"),
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/libs/armeabi-v7a",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a/include",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/libs/armeabi-v7a/include",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/include",
 		}
 		buildoptions {
 			"--sysroot=" .. path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-arm"),
@@ -1122,6 +1136,17 @@ function toolchain(_buildDir, _libDir)
 			"-Wl,--gc-sections",
 		}
 
+	configuration { "riscv" }
+		targetdir (path.join(_buildDir, "riscv/bin"))
+		objdir (path.join(_buildDir, "riscv/obj"))
+		buildoptions {
+			"-Wunused-value",
+			"-Wundef",
+		}
+		buildoptions_cpp {
+			"-std=c++0x",
+		}
+
 	configuration {} -- reset configuration
 
 	return true
@@ -1185,6 +1210,7 @@ function strip()
 --				.. "-s EMTERPRETIFY_ASYNC=1 "
 				.. "-s TOTAL_MEMORY=268435456 "
 --				.. "-s ALLOW_MEMORY_GROWTH=1 "
+--				.. "-s USE_WEBGL2=1 "
 				.. "--memory-init-file 1 "
 				.. "\"$(TARGET)\" -o \"$(TARGET)\".html "
 --				.. "--preload-file ../../../examples/runtime@/"

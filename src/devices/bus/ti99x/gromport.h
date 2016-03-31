@@ -454,10 +454,10 @@ public:
 	rpk *open(emu_options &options, const char *filename, const char *system_name);
 
 private:
-	const zip_file_header*  find_file(zip_file *zip, const char *filename, UINT32 crc);
-	rpk_socket*             load_rom_resource(zip_file* zip, xml_data_node* rom_resource_node, const char* socketname);
-	rpk_socket*             load_ram_resource(emu_options &options, xml_data_node* ram_resource_node, const char* socketname, const char* system_name);
-	const pcb_type*         m_types;
+	int             find_file(util::archive_file &zip, const char *filename, UINT32 crc);
+	rpk_socket*     load_rom_resource(util::archive_file &zip, xml_data_node* rom_resource_node, const char* socketname);
+	rpk_socket*     load_ram_resource(emu_options &options, xml_data_node* ram_resource_node, const char* socketname, const char* system_name);
+	const pcb_type* m_types;
 };
 
 class rpk

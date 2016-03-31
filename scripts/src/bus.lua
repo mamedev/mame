@@ -1445,6 +1445,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/ramcard128k.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ezcgi.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/ezcgi.h",
+		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.h",
 	}
 end
 
@@ -2585,5 +2587,51 @@ if (BUSES["NEWBRAIN"]~=null) then
 		MAME_DIR .. "src/devices/bus/newbrain/eim.h",
 		MAME_DIR .. "src/devices/bus/newbrain/fdc.cpp",
 		MAME_DIR .. "src/devices/bus/newbrain/fdc.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/svi3x8/expander/expander.h,BUSES["SVI_EXPANDER"] = true
+---------------------------------------------------
+
+if (BUSES["SVI_EXPANDER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/expander.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/expander.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/modules.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/modules.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv601.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv601.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv602.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv602.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv603.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv603.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/svi3x8/slot/slot.h,BUSES["SVI_SLOT"] = true
+---------------------------------------------------
+
+if (BUSES["SVI_SLOT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/slot.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/slot.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/cards.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/cards.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv801.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv801.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv802.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv802.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv803.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv803.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv805.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv805.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv806.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv806.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv807.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv807.h",
 	}
 end

@@ -248,17 +248,17 @@ void texture_info::set_coloralphamode(SDL_Texture *texture_id, const render_colo
 	}
 }
 
-void texture_info::render_quad(const render_primitive *prim, const int x, const int y)
+void texture_info::render_quad(const render_primitive &prim, const int x, const int y)
 {
 	SDL_Rect target_rect;
 
 	target_rect.x = x;
 	target_rect.y = y;
-	target_rect.w = round_nearest(prim->bounds.x1) - round_nearest(prim->bounds.x0);
-	target_rect.h = round_nearest(prim->bounds.y1) - round_nearest(prim->bounds.y0);
+	target_rect.w = round_nearest(prim.bounds.x1) - round_nearest(prim.bounds.x0);
+	target_rect.h = round_nearest(prim.bounds.y1) - round_nearest(prim.bounds.y0);
 
 	SDL_SetTextureBlendMode(m_texture_id, m_sdl_blendmode);
-	set_coloralphamode(m_texture_id, &prim->color);
+	set_coloralphamode(m_texture_id, &prim.color);
 	//printf("%d %d %d %d\n", target_rect.x, target_rect.y, target_rect.w, target_rect.h);
 	// Arghhh .. Just another bug. SDL_RenderCopy has severe issues with scaling ...
 	SDL_RenderCopy(m_renderer->m_sdl_renderer,  m_texture_id, nullptr, &target_rect);
@@ -266,14 +266,14 @@ void texture_info::render_quad(const render_primitive *prim, const int x, const 
 	//SDL_RenderCopyEx(m_renderer->m_sdl_renderer,  m_texture_id, nullptr, nullptr, 0, nullptr, SDL_FLIP_NONE);
 }
 
-void renderer_sdl1::render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y)
+void renderer_sdl1::render_quad(texture_info *texture, const render_primitive &prim, const int x, const int y)
 {
 	SDL_Rect target_rect;
 
 	target_rect.x = x;
 	target_rect.y = y;
-	target_rect.w = round_nearest(prim->bounds.x1 - prim->bounds.x0);
-	target_rect.h = round_nearest(prim->bounds.y1 - prim->bounds.y0);
+	target_rect.w = round_nearest(prim.bounds.x1 - prim.bounds.x0);
+	target_rect.h = round_nearest(prim.bounds.y1 - prim.bounds.y0);
 
 	if (texture)
 	{
@@ -292,12 +292,12 @@ void renderer_sdl1::render_quad(texture_info *texture, const render_primitive *p
 	}
 	else
 	{
-		UINT32 sr = (UINT32)(255.0f * prim->color.r);
-		UINT32 sg = (UINT32)(255.0f * prim->color.g);
-		UINT32 sb = (UINT32)(255.0f * prim->color.b);
-		UINT32 sa = (UINT32)(255.0f * prim->color.a);
+		UINT32 sr = (UINT32)(255.0f * prim.color.r);
+		UINT32 sg = (UINT32)(255.0f * prim.color.g);
+		UINT32 sb = (UINT32)(255.0f * prim.color.b);
+		UINT32 sa = (UINT32)(255.0f * prim.color.a);
 
-		SDL_SetRenderDrawBlendMode(m_sdl_renderer, map_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags)));
+		SDL_SetRenderDrawBlendMode(m_sdl_renderer, map_blendmode(PRIMFLAG_GET_BLENDMODE(prim.flags)));
 		SDL_SetRenderDrawColor(m_sdl_renderer, sr, sg, sb, sa);
 		SDL_RenderFillRect(m_sdl_renderer, &target_rect);
 	}
@@ -499,7 +499,6 @@ void renderer_sdl1::destroy_all_textures()
 
 int renderer_sdl1::draw(int update)
 {
-	render_primitive *prim;
 	texture_info *texture=nullptr;
 	float vofs, hofs;
 	int blit_pixels = 0;
@@ -559,30 +558,30 @@ int renderer_sdl1::draw(int update)
 	window().m_primlist->acquire_lock();
 
 	// now draw
-	for (prim = window().m_primlist->first(); prim != nullptr; prim = prim->next())
+	for (render_primitive &prim : *window().m_primlist)
 	{
 		Uint8 sr, sg, sb, sa;
 
-		switch (prim->type)
+		switch (prim.type)
 		{
 			case render_primitive::LINE:
-				sr = (int)(255.0f * prim->color.r);
-				sg = (int)(255.0f * prim->color.g);
-				sb = (int)(255.0f * prim->color.b);
-				sa = (int)(255.0f * prim->color.a);
+				sr = (int)(255.0f * prim.color.r);
+				sg = (int)(255.0f * prim.color.g);
+				sb = (int)(255.0f * prim.color.b);
+				sa = (int)(255.0f * prim.color.a);
 
-				SDL_SetRenderDrawBlendMode(m_sdl_renderer, map_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags)));
+				SDL_SetRenderDrawBlendMode(m_sdl_renderer, map_blendmode(PRIMFLAG_GET_BLENDMODE(prim.flags)));
 				SDL_SetRenderDrawColor(m_sdl_renderer, sr, sg, sb, sa);
-				SDL_RenderDrawLine(m_sdl_renderer, prim->bounds.x0 + hofs, prim->bounds.y0 + vofs,
-						prim->bounds.x1 + hofs, prim->bounds.y1 + vofs);
+				SDL_RenderDrawLine(m_sdl_renderer, prim.bounds.x0 + hofs, prim.bounds.y0 + vofs,
+						prim.bounds.x1 + hofs, prim.bounds.y1 + vofs);
 				break;
 			case render_primitive::QUAD:
-				texture = texture_update(*prim);
+				texture = texture_update(prim);
 				if (texture)
 					blit_pixels += (texture->raw_height() * texture->raw_width());
 				render_quad(texture, prim,
-						round_nearest(hofs + prim->bounds.x0),
-						round_nearest(vofs + prim->bounds.y0));
+						round_nearest(hofs + prim.bounds.x0),
+						round_nearest(vofs + prim.bounds.y0));
 				break;
 			default:
 				throw emu_fatalerror("Unexpected render_primitive type\n");
@@ -960,12 +959,12 @@ texture_info * renderer_sdl1::texture_update(const render_primitive &prim)
 
 render_primitive_list *renderer_sdl1::get_primitives()
 {
-	osd_dim nd = window().blit_surface_size();
+	osd_dim nd = window().get_size();
 	if (nd != m_blit_dim)
 	{
 		m_blit_dim = nd;
 		notify_changed();
 	}
-	window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().aspect());
+	window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().pixel_aspect());
 	return &window().target()->get_primitives();
 }

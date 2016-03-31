@@ -155,6 +155,8 @@
 #ifndef NLBASE_H_
 #define NLBASE_H_
 
+#include <vector>
+
 #include "nl_lists.h"
 #include "nl_time.h"
 #include "nl_util.h"
@@ -165,7 +167,14 @@
 // Type definitions
 // ----------------------------------------------------------------------------------------
 
-typedef UINT8 netlist_sig_t;
+//typedef UINT8 netlist_sig_t;
+
+/*
+ *  unsigned int would be a 20% speed increase over UINT8 for pong.
+ *  For breakout it causes a slight decrease.
+ *
+ */
+typedef unsigned int netlist_sig_t;
 
 //============================================================
 //  MACROS / netlist devices
@@ -244,7 +253,7 @@ typedef UINT8 netlist_sig_t;
 #define NETLIB_LOGIC_FAMILY(_fam)                                               \
 virtual logic_family_desc_t *default_logic_family() override                    \
 {                                                                               \
-	return netlist_family_ ## _fam;                                             \
+	return family_ ## _fam;                                                     \
 }
 
 
@@ -308,7 +317,7 @@ namespace netlist
 	typedef phashmap_t<pstring, pstring> model_map_t;
 
 	// -----------------------------------------------------------------------------
-	// netlist_output_family_t
+	// logic_family_t
 	// -----------------------------------------------------------------------------
 
 	class logic_family_desc_t
@@ -342,7 +351,7 @@ namespace netlist
 		logic_family_desc_t *m_logic_family;
 	};
 
-	/* Terminals inherit the family description from the netlist_device
+	/* Terminals inherit the family description from the device
 	 * The default is the ttl family, but any device can override the family.
 	 * For individual terminals, these can be overwritten as well.
 	 *
@@ -350,12 +359,12 @@ namespace netlist
 	 */
 
 
-	extern logic_family_desc_t *netlist_family_TTL;
-	extern logic_family_desc_t *netlist_family_CD4XXX;
+	extern logic_family_desc_t *family_TTL;
+	extern logic_family_desc_t *family_CD4XXX;
 
 
 	// -----------------------------------------------------------------------------
-	// netlist_object_t
+	// object_t
 	// -----------------------------------------------------------------------------
 
 	class object_t
@@ -434,7 +443,7 @@ namespace netlist
 	};
 
 	// -----------------------------------------------------------------------------
-	// netlist_owned_object_t
+	// device_object_t
 	// -----------------------------------------------------------------------------
 
 	class device_object_t : public object_t
@@ -452,7 +461,7 @@ namespace netlist
 
 
 	// -----------------------------------------------------------------------------
-	// netlist_core_terminal_t
+	// core_terminal_t
 	// -----------------------------------------------------------------------------
 
 	class core_terminal_t : public device_object_t, public plinkedlist_element_t<core_terminal_t>
@@ -460,7 +469,7 @@ namespace netlist
 		P_PREVENT_COPYING(core_terminal_t)
 	public:
 
-		typedef plist_t<core_terminal_t *> list_t;
+		typedef pvector_t<core_terminal_t *> list_t;
 
 		/* needed here ... */
 
@@ -476,8 +485,6 @@ namespace netlist
 
 		ATTR_COLD core_terminal_t(const type_t atype, const family_t afamily);
 
-		//ATTR_COLD void init_object(netlist_core_device_t &dev, const pstring &aname);
-
 		ATTR_COLD void set_net(net_t &anet);
 		ATTR_COLD  void clear_net() { m_net = NULL; }
 		ATTR_HOT  bool has_net() const { return (m_net != NULL); }
@@ -486,15 +493,12 @@ namespace netlist
 		ATTR_HOT  net_t & net() { return *m_net;}
 
 		ATTR_HOT  bool is_state(const state_e astate) const { return (m_state == astate); }
-		ATTR_HOT  state_e state() const { return m_state; }
+		ATTR_HOT  const state_e &state() const { return m_state; }
 		ATTR_HOT  void set_state(const state_e astate)
 		{
 			nl_assert(astate != STATE_NONEX);
 			m_state = astate;
 		}
-
-
-		ATTR_HOT /* inline */ void update_dev(const UINT32 mask);
 
 	protected:
 		virtual void save_register() override
@@ -508,18 +512,46 @@ namespace netlist
 		state_e m_state;
 	};
 
-	class terminal_t : public core_terminal_t
+	// -----------------------------------------------------------------------------
+	// analog_t
+	// -----------------------------------------------------------------------------
+
+	class analog_t : public core_terminal_t
+	{
+	public:
+
+
+		ATTR_COLD analog_t(const type_t atype)
+			: core_terminal_t(atype, ANALOG)
+		{
+		}
+
+		virtual void reset() override
+		{
+		}
+
+		ATTR_HOT inline const analog_net_t & net() const;
+		ATTR_HOT inline analog_net_t & net();
+
+	protected:
+
+	private:
+	};
+
+	// -----------------------------------------------------------------------------
+	// terminal_t
+	// -----------------------------------------------------------------------------
+
+	class terminal_t : public analog_t
 	{
 		P_PREVENT_COPYING(terminal_t)
 	public:
 
-		typedef plist_t<terminal_t *> list_t;
+		typedef pvector_t<terminal_t *> list_t;
 
 		ATTR_COLD terminal_t();
 
-		nl_double *m_Idr1; // drive current
-		nl_double *m_go1;  // conductance for Voltage from other term
-		nl_double *m_gt1;  // conductance for total conductance
+		terminal_t *m_otherterm;
 
 		ATTR_HOT  void set(const nl_double G)
 		{
@@ -545,25 +577,35 @@ namespace netlist
 		ATTR_HOT void schedule_solve();
 		ATTR_HOT void schedule_after(const netlist_time &after);
 
-		terminal_t *m_otherterm;
+		void set_ptrs(nl_double *gt, nl_double *go, nl_double *Idr)
+		{
+			m_gt1 = gt;
+			m_go1 = go;
+			m_Idr1 = Idr;
+		}
 
 	protected:
 		virtual void save_register() override;
 
 		virtual void reset() override;
 	private:
-		ATTR_HOT  void set_ptr(nl_double *ptr, const nl_double val)
+		ATTR_HOT void set_ptr(nl_double *ptr, const nl_double val)
 		{
 			if (ptr != NULL && *ptr != val)
 			{
 				*ptr = val;
 			}
 		}
-	};
+
+		nl_double *m_Idr1; // drive current
+		nl_double *m_go1;  // conductance for Voltage from other term
+		nl_double *m_gt1;  // conductance for total conductance
+
+};
 
 
 	// -----------------------------------------------------------------------------
-	// netlist_input_t
+	// logic_t
 	// -----------------------------------------------------------------------------
 
 	class logic_t : public core_terminal_t, public logic_family_t
@@ -577,6 +619,10 @@ namespace netlist
 		{
 		}
 
+		virtual void reset() override
+		{
+		}
+
 		ATTR_COLD bool has_proxy() const { return (m_proxy != NULL); }
 		ATTR_COLD devices::nld_base_proxy *get_proxy() const  { return m_proxy; }
 		ATTR_COLD void set_proxy(devices::nld_base_proxy *proxy) { m_proxy = proxy; }
@@ -587,23 +633,8 @@ namespace netlist
 		devices::nld_base_proxy *m_proxy;
 	};
 
-	class netlist_analog_t : public core_terminal_t
-	{
-	public:
-
-
-		ATTR_COLD netlist_analog_t(const type_t atype)
-			: core_terminal_t(atype, ANALOG)
-		{
-		}
-
-	protected:
-
-	private:
-	};
-
 	// -----------------------------------------------------------------------------
-	// netlist_logic_input_t
+	// logic_input_t
 	// -----------------------------------------------------------------------------
 
 	class logic_input_t : public logic_t
@@ -626,21 +657,21 @@ namespace netlist
 	protected:
 		virtual void reset() override
 		{
-			//netlist_core_terminal_t::reset();
+			logic_t::reset();
 			set_state(STATE_INP_ACTIVE);
 		}
 
 	};
 
 	// -----------------------------------------------------------------------------
-	// netlist_analog_input_t
+	// analog_input_t
 	// -----------------------------------------------------------------------------
 
-	class analog_input_t : public netlist_analog_t
+	class analog_input_t : public analog_t
 	{
 	public:
 		ATTR_COLD analog_input_t()
-			: netlist_analog_t(INPUT)
+			: analog_t(INPUT)
 		{
 			set_state(STATE_INP_ACTIVE);
 		}
@@ -650,7 +681,7 @@ namespace netlist
 	protected:
 		virtual void reset() override
 		{
-			//netlist_core_terminal_t::reset();
+			analog_t::reset();
 			set_state(STATE_INP_ACTIVE);
 		}
 	};
@@ -664,7 +695,7 @@ namespace netlist
 		P_PREVENT_COPYING(net_t)
 	public:
 
-		typedef plist_t<net_t *> list_t;
+		typedef pvector_t<net_t *> list_t;
 
 		ATTR_COLD net_t(const family_t afamily);
 		virtual ~net_t();
@@ -702,7 +733,7 @@ namespace netlist
 
 		ATTR_COLD void move_connections(net_t *new_net);
 
-		plist_t<core_terminal_t *> m_core_terms; // save post-start m_list ...
+		pvector_t<core_terminal_t *> m_core_terms; // save post-start m_list ...
 
 		ATTR_HOT  void set_Q_time(const netlist_sig_t &newQ, const netlist_time &at)
 		{
@@ -744,7 +775,7 @@ namespace netlist
 		P_PREVENT_COPYING(logic_net_t)
 	public:
 
-		typedef plist_t<logic_net_t *> list_t;
+		typedef pvector_t<logic_net_t *> list_t;
 
 		ATTR_COLD logic_net_t();
 		virtual ~logic_net_t() { };
@@ -804,12 +835,12 @@ namespace netlist
 		P_PREVENT_COPYING(analog_net_t)
 	public:
 
-		typedef plist_t<analog_net_t *> list_t;
+		typedef pvector_t<analog_net_t *> list_t;
 
 		ATTR_COLD analog_net_t();
 		virtual ~analog_net_t() { };
 
-		ATTR_HOT  nl_double Q_Analog() const
+		ATTR_HOT const nl_double &Q_Analog() const
 		{
 			return m_cur_Analog;
 		}
@@ -821,8 +852,8 @@ namespace netlist
 
 		ATTR_HOT devices::matrix_solver_t *solver() { return m_solver; }
 
-		ATTR_COLD bool already_processed(list_t *groups, int cur_group);
-		ATTR_COLD void process_net(list_t *groups, int &cur_group);
+		ATTR_COLD bool already_processed(pvector_t<list_t> &groups);
+		ATTR_COLD void process_net(pvector_t<list_t> &groups);
 
 	protected:
 
@@ -868,7 +899,7 @@ namespace netlist
 		logic_net_t m_my_net;
 	};
 
-	class analog_output_t : public netlist_analog_t
+	class analog_output_t : public analog_t
 	{
 		P_PREVENT_COPYING(analog_output_t)
 	public:
@@ -990,7 +1021,7 @@ namespace netlist
 		P_PREVENT_COPYING(core_device_t)
 	public:
 
-		typedef plist_t<core_device_t *> list_t;
+		typedef pvector_t<core_device_t *> list_t;
 
 		ATTR_COLD core_device_t(const family_t afamily);
 
@@ -1031,7 +1062,7 @@ namespace netlist
 
 		ATTR_HOT  nl_double INPANALOG(const analog_input_t &inp) const { return inp.Q_Analog(); }
 
-		ATTR_HOT  nl_double TERMANALOG(const terminal_t &term) const { return term.net().as_analog().Q_Analog(); }
+		ATTR_HOT  nl_double TERMANALOG(const terminal_t &term) const { return term.net().Q_Analog(); }
 
 		ATTR_HOT  void OUTANALOG(analog_output_t &out, const nl_double val)
 		{
@@ -1059,7 +1090,7 @@ namespace netlist
 		virtual void stop() { }                                                  \
 		virtual logic_family_desc_t *default_logic_family()
 		{
-			return netlist_family_TTL;
+			return family_TTL;
 		}
 
 	private:
@@ -1106,7 +1137,7 @@ namespace netlist
 		ATTR_COLD void connect_late(core_terminal_t &t1, core_terminal_t &t2);
 		ATTR_COLD void connect_direct(core_terminal_t &t1, core_terminal_t &t2);
 
-		plist_t<pstring> m_terminals;
+		pvector_t<pstring> m_terminals;
 
 	protected:
 
@@ -1122,7 +1153,7 @@ namespace netlist
 
 
 	// -----------------------------------------------------------------------------
-	// netlist_queue_t
+	// queue_t
 	// -----------------------------------------------------------------------------
 
 	class queue_t : public timed_queue<net_t *, netlist_time>,
@@ -1148,7 +1179,7 @@ namespace netlist
 	};
 
 	// -----------------------------------------------------------------------------
-	// netlist_base_t
+	// netlist_t
 	// -----------------------------------------------------------------------------
 
 
@@ -1186,14 +1217,14 @@ namespace netlist
 		ATTR_COLD net_t *find_net(const pstring &name);
 
 		template<class _device_class>
-		ATTR_COLD plist_t<_device_class *> get_device_list()
+		ATTR_COLD pvector_t<_device_class *> get_device_list()
 		{
-			plist_t<_device_class *> tmp;
+			pvector_t<_device_class *> tmp;
 			for (std::size_t i = 0; i < m_devices.size(); i++)
 			{
 				_device_class *dev = dynamic_cast<_device_class *>(m_devices[i]);
 				if (dev != NULL)
-					tmp.add(dev);
+					tmp.push_back(dev);
 			}
 			return tmp;
 		}
@@ -1228,7 +1259,7 @@ namespace netlist
 			return ret;
 		}
 
-		pnamedlist_t<device_t *> m_devices;
+		pvector_t<device_t *> m_devices;
 		net_t::list_t m_nets;
 	#if (NL_KEEP_STATISTICS)
 		pnamedlist_t<core_device_t *> m_started_devices;
@@ -1239,10 +1270,7 @@ namespace netlist
 
 	protected:
 
-		// any derived netlist must override vlog inherited from plog_base
-		//  virtual void vlog(const plog_level &l, const pstring &ls) = 0;
-
-		/* from netlist_object */
+		/* from object */
 		virtual void reset() override;
 		virtual void save_register() override;
 
@@ -1376,6 +1404,16 @@ namespace netlist
 		}
 	}
 
+	ATTR_HOT inline const analog_net_t & analog_t::net() const
+	{
+		return core_terminal_t::net().as_analog();
+	}
+
+	ATTR_HOT inline analog_net_t & analog_t::net()
+	{
+		return core_terminal_t::net().as_analog();
+	}
+
 
 	ATTR_HOT inline netlist_sig_t logic_input_t::Q() const
 	{
@@ -1389,9 +1427,9 @@ namespace netlist
 
 	ATTR_HOT inline void analog_output_t::set_Q(const nl_double newQ)
 	{
-		if (newQ != net().as_analog().m_cur_Analog)
+		if (newQ != net().Q_Analog())
 		{
-			net().as_analog().m_cur_Analog = newQ;
+			net().m_cur_Analog = newQ;
 			net().push_to_queue(NLTIME_FROM_NS(1));
 		}
 	}

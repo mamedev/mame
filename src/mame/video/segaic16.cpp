@@ -1029,7 +1029,7 @@ void segaic16_video_device::tilemap_16b_fill_latch(int i, UINT16* latched_pagese
 	latched_pageselect[i] = textram[0xe80 / 2 + i];
 	latched_yscroll[i] = textram[0xe90/2 + i];
 	latched_xscroll[i] = textram[0xe98/2 + i];
-//	printf("%02x returning latched page select %04x scrollx %04x scrolly %04x\n", i, latched_pageselect[i], latched_xscroll[i], latched_yscroll[i]);
+//  printf("%02x returning latched page select %04x scrollx %04x scrolly %04x\n", i, latched_pageselect[i], latched_xscroll[i], latched_yscroll[i]);
 }
 
 TIMER_CALLBACK_MEMBER( segaic16_video_device::tilemap_16b_latch_values )

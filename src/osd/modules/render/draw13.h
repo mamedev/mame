@@ -62,7 +62,7 @@ public:
 	~texture_info();
 
 	void set_data(const render_texinfo &texsource, const UINT32 flags);
-	void render_quad(const render_primitive *prim, const int x, const int y);
+	void render_quad(const render_primitive &prim, const int x, const int y);
 	bool matches(const render_primitive &prim, const quad_setup_data &setup);
 
 	copy_info_t *compute_size_type();
@@ -176,7 +176,7 @@ private:
 	void expand_copy_info(const copy_info_t *list);
 	void add_list(copy_info_t **head, const copy_info_t *element, Uint32 bm);
 
-	void render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y);
+	void render_quad(texture_info *texture, const render_primitive &prim, const int x, const int y);
 
 	texture_info *texture_find(const render_primitive &prim, const quad_setup_data &setup);
 	texture_info *texture_update(const render_primitive &prim);

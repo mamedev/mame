@@ -77,7 +77,7 @@ namespace bx
 		return _reader->read(_data, _size, _err);
 	}
 
-	/// Write value.
+	/// Read value.
 	template<typename Ty>
 	inline int32_t read(ReaderI* _reader, Ty& _value, Error* _err = NULL)
 	{
@@ -207,42 +207,82 @@ namespace bx
 	{
 	};
 
+	/// Peek data.
+	inline int32_t peek(ReaderSeekerI* _reader, void* _data, int32_t _size, Error* _err = NULL)
+	{
+		BX_ERROR_SCOPE(_err);
+		int64_t offset = bx::seek(_reader);
+		int32_t size = _reader->read(_data, _size, _err);
+		bx::seek(_reader, offset, bx::Whence::Begin);
+		return size;
+	}
+
+	/// Peek value.
+	template<typename Ty>
+	inline int32_t peek(ReaderSeekerI* _reader, Ty& _value, Error* _err = NULL)
+	{
+		BX_ERROR_SCOPE(_err);
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
+		return peek(_reader, &_value, sizeof(Ty), _err);
+	}
+
 	struct BX_NO_VTABLE WriterSeekerI : public WriterI, public SeekerI
 	{
 	};
 
-	struct BX_NO_VTABLE FileReaderI : public ReaderSeekerI
+	struct BX_NO_VTABLE ReaderOpenI
 	{
+		virtual ~ReaderOpenI() = 0;
 		virtual bool open(const char* _filePath, Error* _err) = 0;
-		virtual void close() = 0;
 	};
 
-	struct BX_NO_VTABLE FileWriterI : public WriterSeekerI
+	inline ReaderOpenI::~ReaderOpenI()
 	{
+	}
+
+	struct BX_NO_VTABLE WriterOpenI
+	{
+		virtual ~WriterOpenI() = 0;
 		virtual bool open(const char* _filePath, bool _append, Error* _err) = 0;
+	};
+
+	inline WriterOpenI::~WriterOpenI()
+	{
+	}
+
+	struct BX_NO_VTABLE CloserI
+	{
+		virtual ~CloserI() = 0;
 		virtual void close() = 0;
 	};
 
-	inline bool open(FileReaderI* _reader, const char* _filePath, Error* _err = NULL)
+	inline CloserI::~CloserI()
+	{
+	}
+
+	struct BX_NO_VTABLE FileReaderI : public ReaderOpenI, public CloserI, public ReaderSeekerI
+	{
+	};
+
+	struct BX_NO_VTABLE FileWriterI : public WriterOpenI, public CloserI, public WriterSeekerI
+	{
+	};
+
+	inline bool open(ReaderOpenI* _reader, const char* _filePath, Error* _err = NULL)
 	{
 		BX_ERROR_USE_TEMP_WHEN_NULL(_err);
 		return _reader->open(_filePath, _err);
 	}
 
-	inline void close(FileReaderI* _reader)
-	{
-		_reader->close();
-	}
-
-	inline bool open(FileWriterI* _writer, const char* _filePath, bool _append = false, Error* _err = NULL)
+	inline bool open(WriterOpenI* _writer, const char* _filePath, bool _append = false, Error* _err = NULL)
 	{
 		BX_ERROR_USE_TEMP_WHEN_NULL(_err);
 		return _writer->open(_filePath, _append, _err);
 	}
 
-	inline void close(FileWriterI* _writer)
+	inline void close(CloserI* _reader)
 	{
-		_writer->close();
+		_reader->close();
 	}
 
 	struct BX_NO_VTABLE MemoryBlockI

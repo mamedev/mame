@@ -5,10 +5,6 @@
 //  drawbgfx.cpp - BGFX renderer
 //
 //============================================================
-#define __STDC_LIMIT_MACROS
-#define __STDC_FORMAT_MACROS
-#define __STDC_CONSTANT_MACROS
-
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
@@ -23,6 +19,7 @@
 // MAMEOS headers
 #include "emu.h"
 #include "window.h"
+#include "rendutil.h"
 
 #include <bgfx/bgfxplatform.h>
 #include <bgfx/bgfx.h>
@@ -31,6 +28,7 @@
 #include <algorithm>
 
 #include "drawbgfx.h"
+#include "copyutil.h"
 #include "bgfx/texturemanager.h"
 #include "bgfx/targetmanager.h"
 #include "bgfx/shadermanager.h"
@@ -40,6 +38,10 @@
 #include "bgfx/texture.h"
 #include "bgfx/target.h"
 #include "bgfx/chain.h"
+#include "bgfx/vertex.h"
+#include "bgfx/uniform.h"
+#include "bgfx/slider.h"
+#include "bgfx/target.h"
 
 //============================================================
 //  DEBUGGING
@@ -52,23 +54,21 @@
 const uint16_t renderer_bgfx::CACHE_SIZE = 1024;
 const uint32_t renderer_bgfx::PACKABLE_SIZE = 128;
 const uint32_t renderer_bgfx::WHITE_HASH = 0x87654321;
+const char* renderer_bgfx::WINDOW_PREFIX = "Window 0, ";
 
 //============================================================
 //  MACROS
 //============================================================
 
-#define GIBBERISH   (0)
+#define GIBBERISH       (0)
+#define SCENE_VIEW      (0)
 
 //============================================================
-//  INLINES
-//============================================================
-
-
-//============================================================
-//  TYPES
+//  STATICS
 //============================================================
 
 bool renderer_bgfx::s_window_set = false;
+uint32_t renderer_bgfx::s_current_view = 0;
 
 //============================================================
 //  renderer_bgfx::create
@@ -84,7 +84,7 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 		return nullptr;
 	}
 
-#   if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
+#   if BX_PLATFORM_LINUX || BX_PLATFORM_BSD || BX_PLATFORM_RPI
 	return (void*)wmi.info.x11.window;
 #   elif BX_PLATFORM_OSX
 	return wmi.info.cocoa.window;
@@ -92,7 +92,7 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 	return wmi.info.win.window;
 #   elif BX_PLATFORM_STEAMLINK
 	return wmi.info.vivante.window;
-#   elif BX_PLATFORM_EMSCRIPTEN
+#   elif BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_ANDROID
 	return nullptr;
 #   endif // BX_PLATFORM_
 }
@@ -102,6 +102,7 @@ int renderer_bgfx::create()
 {
 	// create renderer
 
+	osd_options& options = downcast<osd_options &>(window().machine().options());
 	osd_dim wdim = window().get_size();
 	m_width[window().m_index] = wdim.width();
 	m_height[window().m_index] = wdim.height();
@@ -124,25 +125,54 @@ int renderer_bgfx::create()
 #else
 		bgfx::sdlSetWindow(window().sdl_window());
 #endif
-		bgfx::init();
+		std::string backend(options.bgfx_backend());
+		if (backend == "auto")
+		{
+			bgfx::init();
+		}
+		else if (backend == "dx9" || backend == "d3d9")
+		{
+			bgfx::init(bgfx::RendererType::Direct3D9);
+		}
+		else if (backend == "dx11" || backend == "d3d11")
+		{
+			bgfx::init(bgfx::RendererType::Direct3D11);
+		}
+		else if (backend == "gles")
+		{
+			bgfx::init(bgfx::RendererType::OpenGLES);
+		}
+		else if (backend == "glsl" || backend == "opengl")
+		{
+			bgfx::init(bgfx::RendererType::OpenGL);
+		}
+		else if (backend == "metal")
+		{
+			bgfx::init(bgfx::RendererType::Metal);
+		}
+		else
+		{
+			printf("Unknown backend type '%s', going with auto-detection\n", backend.c_str());
+			bgfx::init();
+		}
 		bgfx::reset(m_width[window().m_index], m_height[window().m_index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 		// Enable debug text.
-		bgfx::setDebug(window().machine().options().verbose() ? BGFX_DEBUG_STATS : BGFX_DEBUG_TEXT);
+		bgfx::setDebug(options.bgfx_debug() ? BGFX_DEBUG_STATS : BGFX_DEBUG_TEXT);
 		m_dimensions = osd_dim(m_width[0], m_height[0]);
 	}
 
 	m_textures = new texture_manager();
 	m_targets = new target_manager(*m_textures);
-	m_shaders = new shader_manager();
-	m_effects = new effect_manager(*m_shaders);
-	m_chains = new chain_manager(*m_textures, *m_targets, *m_effects, m_width[window().m_index], m_height[window().m_index]);
+
+	m_shaders = new shader_manager(options);
+	m_effects = new effect_manager(options, *m_shaders);
 
 	if (window().m_index != 0)
 	{
 #ifdef OSD_WINDOWS
-		m_framebuffer = m_targets->create_target("backbuffer", window().m_hwnd, m_width[window().m_index], m_height[window().m_index]);
+		m_framebuffer = m_targets->create_backbuffer(window().m_hwnd, m_width[window().m_index], m_height[window().m_index]);
 #else
-		m_framebuffer = m_targets->create_target("backbuffer", sdlNativeWindowHandle(window().sdl_window()), m_width[window().m_index], m_height[window().m_index]);
+		m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(window().sdl_window()), m_width[window().m_index], m_height[window().m_index]);
 #endif
 		bgfx::touch(window().m_index);
 	}
@@ -158,7 +188,9 @@ int renderer_bgfx::create()
 	m_screen_effect[2] = m_effects->effect("screen_multiply");
 	m_screen_effect[3] = m_effects->effect("screen_add");
 
-	//m_screen_chain[0] = m_chains->chain("test");
+	m_chains = new chain_manager(options, *m_textures, *m_targets, *m_effects);
+	parse_screen_chains(options.bgfx_screen_chains());
+	m_sliders_dirty = true;
 
 	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
 	m_texture_cache = m_textures->create_texture("#cache", bgfx::TextureFormat::RGBA8, CACHE_SIZE, CACHE_SIZE, nullptr, flags);
@@ -167,6 +199,50 @@ int renderer_bgfx::create()
 	m_texinfo.push_back(rectangle_packer::packable_rectangle(WHITE_HASH, PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32), 16, 16, 16, nullptr, m_white));
 
 	return 0;
+}
+
+//============================================================
+//  parse_screen_chains
+//============================================================
+
+void renderer_bgfx::parse_screen_chains(std::string chain_str)
+{
+	std::vector<std::vector<std::string>> chains;
+	uint32_t length = chain_str.length();
+	uint32_t last_start = 0;
+	uint32_t win = 0;
+	chains.push_back(std::vector<std::string>());
+	for (uint32_t i = 0; i < length + 1; i++)
+	{
+		if (i == length || chain_str[i] == ',' || chain_str[i] == ':')
+		{
+			chains[win].push_back(chain_str.substr(last_start, i - last_start));
+			last_start = i + 1;
+			if (chain_str[i] == ':')
+			{
+				win++;
+				chains.push_back(std::vector<std::string>());
+			}
+		}
+	}
+
+	for (win = 0; win < chains.size(); win++)
+	{
+		m_screen_chains.push_back(std::vector<bgfx_chain*>());
+		if (win != window().m_index)
+		{
+			continue;
+		}
+		for (uint32_t screen = 0; screen < chains[win].size(); screen++)
+		{
+			bgfx_chain* chain = m_chains->chain(chains[win][screen], window().machine(), win, screen);
+			if (chain == nullptr) {
+				chains.clear();
+				return;
+			}
+			m_screen_chains[win].push_back(chain);
+		}
+	}
 }
 
 //============================================================
@@ -210,7 +286,7 @@ int renderer_bgfx::xy_to_render_target(int x, int y, int *xt, int *yt)
 //  drawbgfx_window_draw
 //============================================================
 
-bgfx::VertexDecl renderer_bgfx::ScreenVertex::ms_decl;
+bgfx::VertexDecl ScreenVertex::ms_decl;
 
 void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, ScreenVertex* vertex)
 {
@@ -225,8 +301,13 @@ void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, ScreenV
 	v0 += 0.5f / float(CACHE_SIZE);
 	UINT32 rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
 
-	float x[4] = { prim->bounds.x0, prim->bounds.x1, prim->bounds.x0, prim->bounds.x1 };
-	float y[4] = { prim->bounds.y0, prim->bounds.y0, prim->bounds.y1, prim->bounds.y1 };
+	const float x0 = prim->bounds.x0;
+	const float x1 = prim->bounds.x1;
+	const float y0 = prim->bounds.y0;
+	const float y1 = prim->bounds.y1;
+
+	float x[4] = { x0, x1, x0, x1 };
+	float y[4] = { y0, y0, y1, y1 };
 	float u[4] = { u0, u1, u0, u1 };
 	float v[4] = { v0, v0, v1, v1 };
 
@@ -295,9 +376,93 @@ void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, ScreenV
 	vertex[5].m_v = v[0];
 }
 
-void renderer_bgfx::render_textured_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer)
+void renderer_bgfx::process_screen_quad(int screen, render_primitive* prim)
 {
-	ScreenVertex* vertex = (ScreenVertex*)buffer->data;
+	uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
+	if (video_config.filter == 0)
+	{
+		texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
+	}
+
+	uint16_t tex_width(prim->texture.width);
+	uint16_t tex_height(prim->texture.height);
+
+	const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(prim->flags & PRIMFLAG_TEXFORMAT_MASK,
+		tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
+
+	std::string full_name = "screen" + std::to_string(screen);
+	bgfx_texture *texture = new bgfx_texture(full_name, bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem);
+	m_textures->add_provider(full_name, texture);
+
+	m_targets->update_target_sizes(screen, tex_width, tex_height, TARGET_STYLE_GUEST);
+
+	screen_chain(screen)->process(prim, s_current_view, screen, *m_textures, window(), get_blend_state(PRIMFLAG_GET_BLENDMODE(prim->flags)));
+	s_current_view += screen_chain(screen)->applicable_passes();
+
+	m_textures->add_provider(full_name, nullptr);
+	delete texture;
+}
+
+void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int32_t screen)
+{
+	ScreenVertex* vertex = reinterpret_cast<ScreenVertex*>(buffer->data);
+
+	float x[4] = { prim->bounds.x0, prim->bounds.x1, prim->bounds.x0, prim->bounds.x1 };
+	float y[4] = { prim->bounds.y0, prim->bounds.y0, prim->bounds.y1, prim->bounds.y1 };
+	float u[4] = { prim->texcoords.tl.u, prim->texcoords.tr.u, prim->texcoords.bl.u, prim->texcoords.br.u };
+	float v[4] = { prim->texcoords.tl.v, prim->texcoords.tr.v, prim->texcoords.bl.v, prim->texcoords.br.v };
+
+	vertex[0].m_x = x[0];
+	vertex[0].m_y = y[0];
+	vertex[0].m_z = 0;
+	vertex[0].m_rgba = 0xffffffff;
+	vertex[0].m_u = u[0];
+	vertex[0].m_v = v[0];
+
+	vertex[1].m_x = x[1];
+	vertex[1].m_y = y[1];
+	vertex[1].m_z = 0;
+	vertex[1].m_rgba = 0xffffffff;
+	vertex[1].m_u = u[1];
+	vertex[1].m_v = v[1];
+
+	vertex[2].m_x = x[3];
+	vertex[2].m_y = y[3];
+	vertex[2].m_z = 0;
+	vertex[2].m_rgba = 0xffffffff;
+	vertex[2].m_u = u[3];
+	vertex[2].m_v = v[3];
+
+	vertex[3].m_x = x[3];
+	vertex[3].m_y = y[3];
+	vertex[3].m_z = 0;
+	vertex[3].m_rgba = 0xffffffff;
+	vertex[3].m_u = u[3];
+	vertex[3].m_v = v[3];
+
+	vertex[4].m_x = x[2];
+	vertex[4].m_y = y[2];
+	vertex[4].m_z = 0;
+	vertex[4].m_rgba = 0xffffffff;
+	vertex[4].m_u = u[2];
+	vertex[4].m_v = v[2];
+
+	vertex[5].m_x = x[0];
+	vertex[5].m_y = y[0];
+	vertex[5].m_z = 0;
+	vertex[5].m_rgba = 0xffffffff;
+	vertex[5].m_u = u[0];
+	vertex[5].m_v = v[0];
+
+	UINT32 blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
+	bgfx::setVertexBuffer(buffer);
+	bgfx::setTexture(0, m_screen_effect[blend]->uniform("s_tex")->handle(), m_targets->target(screen, "output")->texture());
+	m_screen_effect[blend]->submit(view);
+}
+
+void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::TransientVertexBuffer* buffer)
+{
+	ScreenVertex* vertex = reinterpret_cast<ScreenVertex*>(buffer->data);
 
 	UINT32 rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
 
@@ -342,7 +507,6 @@ void renderer_bgfx::render_textured_quad(int view, render_primitive* prim, bgfx:
 	vertex[5].m_rgba = rgba;
 	vertex[5].m_u = prim->texcoords.tl.u;
 	vertex[5].m_v = prim->texcoords.tl.v;
-	bgfx::setVertexBuffer(buffer);
 
 	uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
 	if (video_config.filter == 0)
@@ -350,15 +514,20 @@ void renderer_bgfx::render_textured_quad(int view, render_primitive* prim, bgfx:
 		texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
 	}
 
-	const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(prim->flags & PRIMFLAG_TEXFORMAT_MASK,
-		prim->texture.width, prim->texture.height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
+	uint16_t tex_width(prim->texture.width);
+	uint16_t tex_height(prim->texture.height);
 
-	bgfx::TextureHandle texture = bgfx::createTexture2D((uint16_t)prim->texture.width, (uint16_t)prim->texture.height, 1, bgfx::TextureFormat::RGBA8, texture_flags, mem);
+	const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(prim->flags & PRIMFLAG_TEXFORMAT_MASK,
+		tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
+
+	bgfx::TextureHandle texture = bgfx::createTexture2D(tex_width, tex_height, 1, bgfx::TextureFormat::RGBA8, texture_flags, mem);
 
 	bgfx_effect** effects = PRIMFLAG_GET_SCREENTEX(prim->flags) ? m_screen_effect : m_gui_effect;
+
 	UINT32 blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
+	bgfx::setVertexBuffer(buffer);
 	bgfx::setTexture(0, effects[blend]->uniform("s_tex")->handle(), texture);
-	effects[blend]->submit(view);
+	effects[blend]->submit(m_ui_view);
 
 	bgfx::destroyTexture(texture);
 }
@@ -552,176 +721,6 @@ uint32_t renderer_bgfx::u32Color(uint32_t r, uint32_t g, uint32_t b, uint32_t a 
 	return (a << 24) | (b << 16) | (g << 8) | r;
 }
 
-//============================================================
-//  copyline_palette16
-//============================================================
-
-static inline void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette)
-{
-	for (int x = 0; x < width; x++)
-	{
-		rgb_t srcpixel = palette[*src++];
-		*dst++ = 0xff000000 | (srcpixel.b() << 16) | (srcpixel.g() << 8) | srcpixel.r();
-	}
-}
-
-
-//============================================================
-//  copyline_palettea16
-//============================================================
-
-static inline void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette)
-{
-	for (int x = 0; x < width; x++)
-	{
-		rgb_t srcpixel = palette[*src++];
-		*dst++ = (srcpixel.a() << 24) | (srcpixel.b() << 16) | (srcpixel.g() << 8) | srcpixel.r();
-	}
-}
-
-
-//============================================================
-//  copyline_rgb32
-//============================================================
-
-static inline void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette)
-{
-	int x;
-
-	// palette (really RGB map) case
-	if (palette != nullptr)
-	{
-		for (x = 0; x < width; x++)
-		{
-			rgb_t srcpix = *src++;
-			*dst++ = 0xff000000 | palette[0x200 + srcpix.b()] | palette[0x100 + srcpix.g()] | palette[srcpix.r()];
-		}
-	}
-
-	// direct case
-	else
-	{
-		for (x = 0; x < width; x++)
-		{
-			rgb_t srcpix = *src++;
-			*dst++ = 0xff000000 | (srcpix.b() << 16) | (srcpix.g() << 8) | srcpix.r();
-		}
-	}
-}
-
-
-//============================================================
-//  copyline_argb32
-//============================================================
-
-static inline void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette)
-{
-	int x;
-	// palette (really RGB map) case
-	if (palette != nullptr)
-	{
-		for (x = 0; x < width; x++)
-		{
-			rgb_t srcpix = *src++;
-			*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.b()] | palette[0x100 + srcpix.g()] | palette[srcpix.r()];
-		}
-	}
-
-	// direct case
-	else
-	{
-		for (x = 0; x < width; x++)
-		{
-			rgb_t srcpix = *src++;
-			*dst++ = (srcpix.a() << 24) | (srcpix.b() << 16) | (srcpix.g() << 8) | srcpix.r();
-		}
-	}
-}
-
-static inline UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
-{
-	/* original equations:
-
-	C = Y - 16
-	D = Cb - 128
-	E = Cr - 128
-
-	R = clip(( 298 * C           + 409 * E + 128) >> 8)
-	G = clip(( 298 * C - 100 * D - 208 * E + 128) >> 8)
-	B = clip(( 298 * C + 516 * D           + 128) >> 8)
-
-	R = clip(( 298 * (Y - 16)                    + 409 * (Cr - 128) + 128) >> 8)
-	G = clip(( 298 * (Y - 16) - 100 * (Cb - 128) - 208 * (Cr - 128) + 128) >> 8)
-	B = clip(( 298 * (Y - 16) + 516 * (Cb - 128)                    + 128) >> 8)
-
-	R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
-	G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
-	B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
-
-	R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
-	G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
-	B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
-	*/
-	int r, g, b, common;
-
-	common = 298 * y - 298 * 16;
-	r = (common + 409 * cr - 409 * 128 + 128) >> 8;
-	g = (common - 100 * cb + 100 * 128 - 208 * cr + 208 * 128 + 128) >> 8;
-	b = (common + 516 * cb - 516 * 128 + 128) >> 8;
-
-	if (r < 0) r = 0;
-	else if (r > 255) r = 255;
-	if (g < 0) g = 0;
-	else if (g > 255) g = 255;
-	if (b < 0) b = 0;
-	else if (b > 255) b = 255;
-
-	return 0xff000000 | (b << 16) | (g << 8) | r;
-}
-
-//============================================================
-//  copyline_yuy16_to_argb
-//============================================================
-
-static inline void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xprescale)
-{
-	int x;
-
-	assert(width % 2 == 0);
-
-	// palette (really RGB map) case
-	if (palette != nullptr)
-	{
-		for (x = 0; x < width / 2; x++)
-		{
-			UINT16 srcpix0 = *src++;
-			UINT16 srcpix1 = *src++;
-			UINT8 cb = srcpix0 & 0xff;
-			UINT8 cr = srcpix1 & 0xff;
-			for (int x2 = 0; x2 < xprescale; x2++)
-				*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
-			for (int x2 = 0; x2 < xprescale; x2++)
-				*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
-		}
-	}
-
-	// direct case
-	else
-	{
-		for (x = 0; x < width; x += 2)
-		{
-			UINT16 srcpix0 = *src++;
-			UINT16 srcpix1 = *src++;
-			UINT8 cb = srcpix0 & 0xff;
-			UINT8 cr = srcpix1 & 0xff;
-			for (int x2 = 0; x2 < xprescale; x2++)
-				*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
-			for (int x2 = 0; x2 < xprescale; x2++)
-				*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
-		}
-	}
-}
-
 const bgfx::Memory* renderer_bgfx::mame_texture_data_to_bgfx_texture_data(UINT32 format, int width, int height, int rowpixels, const rgb_t *palette, void *base)
 {
 	const bgfx::Memory* mem = bgfx::alloc(width * height * 4);
@@ -730,19 +729,19 @@ const bgfx::Memory* renderer_bgfx::mame_texture_data_to_bgfx_texture_data(UINT32
 		switch (format)
 		{
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16):
-				copyline_palette16((UINT32*)mem->data + y * width, (UINT16*)base + y * rowpixels, width, palette);
+				copy_util::copyline_palette16((UINT32*)mem->data + y * width, (UINT16*)base + y * rowpixels, width, palette);
 				break;
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTEA16):
-				copyline_palettea16((UINT32*)mem->data + y * width, (UINT16*)base + y * rowpixels, width, palette);
+				copy_util::copyline_palettea16((UINT32*)mem->data + y * width, (UINT16*)base + y * rowpixels, width, palette);
 				break;
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16):
-				copyline_yuy16_to_argb((UINT32*)mem->data + y * width, (UINT16*)base + y * rowpixels, width, palette, 1);
+				copy_util::copyline_yuy16_to_argb((UINT32*)mem->data + y * width, (UINT16*)base + y * rowpixels, width, palette, 1);
 				break;
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32):
-				copyline_argb32((UINT32*)mem->data + y * width, (UINT32*)base + y * rowpixels, width, palette);
+				copy_util::copyline_argb32((UINT32*)mem->data + y * width, (UINT32*)base + y * rowpixels, width, palette);
 				break;
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32):
-				copyline_rgb32((UINT32*)mem->data + y * width, (UINT32*)base + y * rowpixels, width, palette);
+				copy_util::copyline_rgb32((UINT32*)mem->data + y * width, (UINT32*)base + y * rowpixels, width, palette);
 				break;
 			default:
 				break;
@@ -751,72 +750,123 @@ const bgfx::Memory* renderer_bgfx::mame_texture_data_to_bgfx_texture_data(UINT32
 	return mem;
 }
 
-int renderer_bgfx::draw(int update)
+int renderer_bgfx::handle_screen_chains()
 {
-	int index = window().m_index;
-	// Set view 0 default viewport.
-	osd_dim wdim = window().get_size();
-	m_width[index] = wdim.width();
-	m_height[index] = wdim.height();
-	if (index == 0)
+	if (m_screen_chains.size() <= window().m_index || m_screen_chains[window().m_index].size() == 0)
 	{
-		if ((m_dimensions != osd_dim(m_width[index], m_height[index])))
+		return 0;
+	}
+
+	window().m_primlist->acquire_lock();
+
+	render_primitive *prim = window().m_primlist->first();
+
+	// Determine how many post-processing passes are needed
+	int screens = 0;
+	int total_screen_textures = 0;
+	std::vector<void*> bases;
+	while (prim != nullptr)
+	{
+		if (PRIMFLAG_GET_SCREENTEX(prim->flags))
 		{
-			bgfx::reset(m_width[index], m_height[index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
-			m_dimensions = osd_dim(m_width[index], m_height[index]);
+			total_screen_textures++;
+			bool found = false;
+			for (void* base : bases)
+			{
+				if (base == prim->texture.base)
+				{
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+			{
+				screens++;
+				bases.push_back(prim->texture.base);
+			}
 		}
+		prim = prim->next();
+	}
+
+	const uint32_t available_chains = m_screen_chains[window().m_index].size();
+	screens = screens >= available_chains ? available_chains : screens;
+
+	if (screens > 0)
+	{
+		m_targets->update_screen_count(screens);
+	}
+
+	// Process each screen as necessary
+	prim = window().m_primlist->first();
+	int screen_index = 0;
+	while (prim != nullptr)
+	{
+		if (PRIMFLAG_GET_SCREENTEX(prim->flags))
+		{
+			if (screen_index >= available_chains)
+			{
+				break;
+			}
+			uint16_t screen_width(floor((prim->bounds.x1 - prim->bounds.x0) + 0.5f));
+			uint16_t screen_height(floor((prim->bounds.y1 - prim->bounds.y0) + 0.5f));
+			m_targets->update_target_sizes(screen_index, screen_width, screen_height, TARGET_STYLE_NATIVE);
+			process_screen_quad(screen_index, prim);
+			screen_index++;
+		}
+		prim = prim->next();
+	}
+
+	window().m_primlist->release_lock();
+
+	bgfx::setViewFrameBuffer(s_current_view, BGFX_INVALID_HANDLE);
+
+	return s_current_view;
+}
+
+bgfx_chain* renderer_bgfx::screen_chain(int32_t screen)
+{
+	if (screen >= m_screen_chains[window().m_index].size())
+	{
+		return m_screen_chains[window().m_index][m_screen_chains[window().m_index].size() - 1];
 	}
 	else
 	{
-		if ((m_dimensions != osd_dim(m_width[index], m_height[index])))
-		{
-			bgfx::reset(window().m_main->get_size().width(), window().m_main->get_size().height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
-			delete m_framebuffer;
-#ifdef OSD_WINDOWS
-			m_framebuffer = m_targets->create_target("backbuffer", window().m_hwnd, m_width[index], m_height[index]);
-#else
-			m_framebuffer = m_targets->create_target("backbuffer", sdlNativeWindowHandle(window().sdl_window()), m_width[index], m_height[index]);
-#endif
-			bgfx::setViewFrameBuffer(index, m_framebuffer->target());
-			m_dimensions = osd_dim(m_width[index], m_height[index]);
-			bgfx::setViewClear(index
-				, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
-				, 0x000000ff
-				, 1.0f
-				, 0
-				);
-			bgfx::touch(index);
-			bgfx::frame();
-			return 0;
-		}
+		return m_screen_chains[window().m_index][screen];
 	}
+}
 
-	if (index != 0)
+int renderer_bgfx::draw(int update)
+{
+	int window_index = window().m_index;
+	if (window_index == 0)
 	{
-		bgfx::setViewFrameBuffer(index, m_framebuffer->target());
+		s_current_view = 0;
 	}
-		bgfx::setViewSeq(index, true);
-	bgfx::setViewRect(index, 0, 0, m_width[index], m_height[index]);
 
-	// Setup view transform.
+	m_seen_views.clear();
+	m_ui_view = -1;
+
+	// Set view 0 default viewport.
+	osd_dim wdim = window().get_size();
+	m_width[window_index] = wdim.width();
+	m_height[window_index] = wdim.height();
+
+	handle_screen_chains();
+
+	bool skip_frame = update_dimensions();
+	if (skip_frame)
 	{
-		float view[16];
-		bx::mtxIdentity(view);
-
-		float left = 0.0f;
-		float top = 0.0f;
-		float right = m_width[index];
-		float bottom = m_height[index];
-		float proj[16];
-		bx::mtxOrtho(proj, left, right, bottom, top, 0.0f, 100.0f);
-		bgfx::setViewTransform(index, view, proj);
+		return 0;
 	}
-	bgfx::setViewClear(index
-		, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
-		, 0x000000ff
-		, 1.0f
-		, 0
-		);
+
+	if (s_current_view > m_max_view)
+	{
+		m_max_view = s_current_view;
+	}
+	else
+	{
+		s_current_view = m_max_view;
+	}
 
 	window().m_primlist->acquire_lock();
 
@@ -824,6 +874,7 @@ int renderer_bgfx::draw(int update)
 	bool atlas_valid = update_atlas();
 
 	render_primitive *prim = window().m_primlist->first();
+	std::vector<void*> sources;
 	while (prim != nullptr)
 	{
 		UINT32 blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
@@ -831,13 +882,29 @@ int renderer_bgfx::draw(int update)
 		bgfx::TransientVertexBuffer buffer;
 		allocate_buffer(prim, blend, &buffer);
 
-		buffer_status status = buffer_primitives(index, atlas_valid, &prim, &buffer);
+		int32_t screen = -1;
+		if (PRIMFLAG_GET_SCREENTEX(prim->flags))
+		{
+			for (screen = 0; screen < sources.size(); screen++)
+			{
+				if (sources[screen] == prim->texture.base)
+				{
+					break;
+				}
+			}
+			if (screen == sources.size())
+			{
+				sources.push_back(prim->texture.base);
+			}
+		}
 
-		if (status != BUFFER_EMPTY)
+		buffer_status status = buffer_primitives(atlas_valid, &prim, &buffer, screen);
+
+		if (status != BUFFER_EMPTY && status != BUFFER_SCREEN)
 		{
 			bgfx::setVertexBuffer(&buffer);
-			bgfx::setTexture(0, m_gui_effect[blend]->uniform("s_tex")->handle(), m_texture_cache->handle());
-			m_gui_effect[blend]->submit(index);
+			bgfx::setTexture(0, m_gui_effect[blend]->uniform("s_tex")->handle(), m_texture_cache->texture());
+			m_gui_effect[blend]->submit(m_ui_view);
 		}
 
 		if (status != BUFFER_DONE && status != BUFFER_PRE_FLUSH)
@@ -850,16 +917,131 @@ int renderer_bgfx::draw(int update)
 
 	// This dummy draw call is here to make sure that view 0 is cleared
 	// if no other draw calls are submitted to view 0.
-	bgfx::touch(index);
+	bgfx::touch(s_current_view > 0 ? s_current_view - 1 : 0);
 
 	// Advance to next frame. Rendering thread will be kicked to
 	// process submitted rendering primitives.
-	if (index==0) bgfx::frame();
+	if (window_index == 0)
+	{
+		bgfx::frame();
+	}
 
 	return 0;
 }
 
-renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer)
+bool renderer_bgfx::update_dimensions()
+{
+	const uint32_t window_index = window().m_index;
+	const uint32_t width = m_width[window_index];
+	const uint32_t height = m_height[window_index];
+
+	if (window_index == 0)
+	{
+		if ((m_dimensions != osd_dim(width, height)))
+		{
+			bgfx::reset(width, height, video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+			m_dimensions = osd_dim(width, height);
+		}
+	}
+	else
+	{
+		if ((m_dimensions != osd_dim(width, height)))
+		{
+			bgfx::reset(window().m_main->get_size().width(), window().m_main->get_size().height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+			m_dimensions = osd_dim(width, height);
+
+			delete m_framebuffer;
+#ifdef OSD_WINDOWS
+			m_framebuffer = m_targets->create_backbuffer(window().m_hwnd, width, height);
+#else
+			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(window().sdl_window()), width, height);
+#endif
+
+			bgfx::setViewFrameBuffer(s_current_view, m_framebuffer->target());
+			bgfx::setViewClear(s_current_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
+			bgfx::touch(s_current_view);
+			bgfx::frame();
+			return true;
+		}
+	}
+	return false;
+}
+
+void renderer_bgfx::setup_view(uint32_t view_index, bool screen)
+{
+	const uint32_t window_index = window().m_index;
+	const uint32_t width = m_width[window_index];
+	const uint32_t height = m_height[window_index];
+
+	if (window_index != 0)
+	{
+		bgfx::setViewFrameBuffer(view_index, m_framebuffer->target());
+	}
+
+	bgfx::setViewSeq(view_index, true);
+	bgfx::setViewRect(view_index, 0, 0, width, height);
+
+#if SCENE_VIEW
+	if (view_index == m_max_view)
+	{
+#else
+	while ((view_index + 1) > m_seen_views.size())
+	{
+		m_seen_views.push_back(false);
+	}
+
+	if (!m_seen_views[view_index])
+	{
+		m_seen_views[view_index] = true;
+#endif
+		bgfx::setViewClear(view_index, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
+	}
+
+	setup_matrices(view_index, screen);
+}
+
+void renderer_bgfx::setup_matrices(uint32_t view_index, bool screen)
+{
+	const uint32_t window_index = window().m_index;
+	const uint32_t width = m_width[window_index];
+	const uint32_t height = m_height[window_index];
+
+	float proj[16];
+	float view[16];
+	if (screen)
+	{
+		static float offset = 0.0f;
+		offset += 0.5f;
+		float up[3]  = { 0.0f, -1.0f, 0.0f };
+		float cam_z = width * 0.5f * (float(height) / float(width));
+		cam_z *= 1.05f;
+		float eye_height = height * 0.5f * 1.05f;
+		float at[3]  = { width * 0.5f, height * 0.5f, 0.0f };
+		float eye[3] = { width * 0.5f, eye_height, cam_z };
+		bx::mtxLookAt(view, eye, at, up);
+
+		bx::mtxProj(proj, 90.0f, float(width) / float(height), 0.1f, 5000.0f);
+	}
+	else
+	{
+		bx::mtxIdentity(view);
+		bx::mtxOrtho(proj, 0.0f, width, height, 0.0f, 0.0f, 100.0f);
+	}
+
+	bgfx::setViewTransform(view_index, view, proj);
+}
+
+void renderer_bgfx::init_ui_view()
+{
+	if (m_ui_view < 0)
+	{
+		m_ui_view = s_current_view;
+		setup_view(m_ui_view, false);
+		s_current_view++;
+	}
+}
+
+renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer, int32_t screen)
 {
 	int vertices = 0;
 
@@ -869,6 +1051,7 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
 		switch ((*prim)->type)
 		{
 			case render_primitive::LINE:
+				init_ui_view();
 				put_line((*prim)->bounds.x0, (*prim)->bounds.y0, (*prim)->bounds.x1, (*prim)->bounds.y1, 1.0f, u32Color((*prim)->color.r * 255, (*prim)->color.g * 255, (*prim)->color.b * 255, (*prim)->color.a * 255), (ScreenVertex*)buffer->data + vertices, 1.0f);
 				vertices += 30;
 				break;
@@ -876,6 +1059,7 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
 			case render_primitive::QUAD:
 				if ((*prim)->texture.base == nullptr)
 				{
+					init_ui_view();
 					put_packed_quad(*prim, WHITE_HASH, (ScreenVertex*)buffer->data + vertices);
 					vertices += 6;
 				}
@@ -884,6 +1068,7 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
 					const UINT32 hash = get_texture_hash(*prim);
 					if (atlas_valid && (*prim)->packable(PACKABLE_SIZE) && hash != 0 && m_hash_to_entry[hash].hash())
 					{
+						init_ui_view();
 						put_packed_quad(*prim, hash, (ScreenVertex*)buffer->data + vertices);
 						vertices += 6;
 					}
@@ -893,8 +1078,26 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
 						{
 							return BUFFER_PRE_FLUSH;
 						}
-						render_textured_quad(view, *prim, buffer);
-						return BUFFER_EMPTY;
+
+						if (PRIMFLAG_GET_SCREENTEX((*prim)->flags) && m_screen_chains.size() > window().m_index && screen < m_screen_chains[window().m_index].size())
+						{
+#if SCENE_VIEW
+							setup_view(s_current_view, true);
+							render_post_screen_quad(s_current_view, *prim, buffer, screen);
+							s_current_view++;
+							m_ui_view = -1;
+#else
+							init_ui_view();
+							render_post_screen_quad(m_ui_view, *prim, buffer, screen);
+#endif
+							return BUFFER_SCREEN;
+						}
+						else
+						{
+							init_ui_view();
+							render_textured_quad(*prim, buffer);
+							return BUFFER_EMPTY;
+						}
 					}
 				}
 				break;
@@ -923,25 +1126,26 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(int view, bool atl
 	return BUFFER_FLUSH;
 }
 
+uint64_t renderer_bgfx::get_blend_state(UINT32 blend)
+{
+	switch (blend)
+	{
+		case BLENDMODE_ALPHA:
+			return BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
+		case BLENDMODE_RGB_MULTIPLY:
+			return BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_DST_COLOR, BGFX_STATE_BLEND_ZERO);
+		case BLENDMODE_ADD:
+			return BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_ONE);
+		default:
+			return 0L;
+	}
+	return 0L;
+}
+
 void renderer_bgfx::set_bgfx_state(UINT32 blend)
 {
 	uint64_t flags = BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_DEPTH_TEST_ALWAYS;
-
-	switch (blend)
-	{
-		case BLENDMODE_NONE:
-			bgfx::setState(flags);
-			break;
-		case BLENDMODE_ALPHA:
-			bgfx::setState(flags | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA));
-			break;
-		case BLENDMODE_RGB_MULTIPLY:
-			bgfx::setState(flags | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_DST_COLOR, BGFX_STATE_BLEND_ZERO));
-			break;
-		case BLENDMODE_ADD:
-			bgfx::setState(flags | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_ONE));
-			break;
-	}
+	bgfx::setState(flags | get_blend_state(blend));
 }
 
 bool renderer_bgfx::update_atlas()
@@ -985,7 +1189,7 @@ void renderer_bgfx::process_atlas_packs(std::vector<std::vector<rectangle_packer
 			}
 			m_hash_to_entry[rect.hash()] = rect;
 			const bgfx::Memory* mem = mame_texture_data_to_bgfx_texture_data(rect.format(), rect.width(), rect.height(), rect.rowpixels(), rect.palette(), rect.base());
-			bgfx::updateTexture2D(m_texture_cache->handle(), 0, rect.x(), rect.y(), rect.width(), rect.height(), mem);
+			bgfx::updateTexture2D(m_texture_cache->texture(), 0, rect.x(), rect.y(), rect.width(), rect.height(), mem);
 		}
 	}
 }
@@ -1022,21 +1226,21 @@ bool renderer_bgfx::check_for_dirty_atlas()
 	bool atlas_dirty = false;
 
 	std::map<UINT32, rectangle_packer::packable_rectangle> acquired_infos;
-	for (render_primitive *prim = window().m_primlist->first(); prim != nullptr; prim = prim->next())
+	for (render_primitive &prim : *window().m_primlist)
 	{
-		bool pack = prim->packable(PACKABLE_SIZE);
-		if (prim->type == render_primitive::QUAD && prim->texture.base != nullptr && pack)
+		bool pack = prim.packable(PACKABLE_SIZE);
+		if (prim.type == render_primitive::QUAD && prim.texture.base != nullptr && pack)
 		{
-			const UINT32 hash = get_texture_hash(prim);
+			const UINT32 hash = get_texture_hash(&prim);
 			// If this texture is packable and not currently in the atlas, prepare the texture for putting in the atlas
 			if ((hash != 0 && m_hash_to_entry[hash].hash() == 0 && acquired_infos[hash].hash() == 0)
 				|| (hash != 0 && m_hash_to_entry[hash].hash() != hash && acquired_infos[hash].hash() == 0))
 			{   // Create create the texture and mark the atlas dirty
 				atlas_dirty = true;
 
-				m_texinfo.push_back(rectangle_packer::packable_rectangle(hash, prim->flags & PRIMFLAG_TEXFORMAT_MASK,
-					prim->texture.width, prim->texture.height,
-					prim->texture.rowpixels, prim->texture.palette, prim->texture.base));
+				m_texinfo.push_back(rectangle_packer::packable_rectangle(hash, prim.flags & PRIMFLAG_TEXFORMAT_MASK,
+					prim.texture.width, prim.texture.height,
+					prim.texture.rowpixels, prim.texture.palette, prim.texture.base));
 				acquired_infos[hash] = m_texinfo[m_texinfo.size() - 1];
 			}
 		}
@@ -1053,7 +1257,6 @@ bool renderer_bgfx::check_for_dirty_atlas()
 void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::TransientVertexBuffer *buffer)
 {
 	int vertices = 0;
-
 	bool mode_switched = false;
 	while (prim != nullptr && !mode_switched)
 	{
@@ -1072,11 +1275,11 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::
 					}
 					else
 					{
-						mode_switched = true;
 						if (vertices == 0)
 						{
 							vertices += 6;
 						}
+						mode_switched = true;
 					}
 				}
 				else
@@ -1105,5 +1308,36 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::
 
 slider_state* renderer_bgfx::get_slider_list()
 {
-	return nullptr;
+	if (m_screen_chains.size() <= window().m_index || m_screen_chains[window().m_index].size() == 0)
+	{
+		return nullptr;
+	}
+
+	slider_state *listhead = nullptr;
+	slider_state **tailptr = &listhead;
+	for (std::vector<bgfx_chain*> screen : m_screen_chains)
+	{
+		for (bgfx_chain* chain : screen)
+		{
+			std::vector<bgfx_slider*> sliders = chain->sliders();
+			for (bgfx_slider* slider : sliders)
+			{
+				if (*tailptr == nullptr)
+				{
+					*tailptr = slider->core_slider();
+				}
+				else
+				{
+					(*tailptr)->next = slider->core_slider();
+					tailptr = &(*tailptr)->next;
+				}
+			}
+		}
+	}
+	if (*tailptr != nullptr)
+	{
+		(*tailptr)->next = nullptr;
+	}
+	m_sliders_dirty = false;
+	return listhead;
 }

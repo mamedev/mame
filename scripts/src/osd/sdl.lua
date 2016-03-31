@@ -38,7 +38,7 @@ function maintargetosdoptions(_target,_subtarget)
 		}
 	end
 
-	if BASE_TARGETOS=="unix" and _OPTIONS["targetos"]~="macosx" then
+	if BASE_TARGETOS=="unix" and _OPTIONS["targetos"]~="macosx" and _OPTIONS["targetos"]~="android" then
 		links {
 			"SDL2_ttf",
 		}
@@ -89,12 +89,12 @@ function maintargetosdoptions(_target,_subtarget)
 			configuration { "x64", "vs*" }
 				libdirs {
 					path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x64")
-				}			
+				}
 		end
 		links {
 			"psapi",
 		}
-		configuration { "mingw*-gcc" }
+		configuration { "mingw*" }
 			linkoptions{
 				"-municode",
 			}
@@ -116,15 +116,15 @@ function maintargetosdoptions(_target,_subtarget)
 			"psapi"
 		}
 	configuration { }
-	    
-    if _OPTIONS["targetos"]=="macosx" then
+
+	if _OPTIONS["targetos"]=="macosx" then
 		if _OPTIONS["with-bundled-sdl2"]~=nil then
 			links {
 				"SDL2",
 			}
-        end
-    end
-    
+		end
+	end
+
 end
 
 
@@ -145,8 +145,8 @@ newoption {
 }
 
 newoption {
-    trigger = "SDL_INI_PATH",
-    description = "Default search path for .ini files",
+	trigger = "SDL_INI_PATH",
+	description = "Default search path for .ini files",
 }
 
 newoption {
@@ -239,7 +239,7 @@ elseif _OPTIONS["targetos"]=="macosx" then
 	SDL_NETWORK         = "pcap"
 end
 
-if _OPTIONS["with-bundled-sdl2"]~=nil then
+if _OPTIONS["with-bundled-sdl2"]~=nil or _OPTIONS["targetos"]=="android" then
 	includedirs {
 		GEN_DIR .. "includes",
 	}
@@ -255,22 +255,22 @@ if BASE_TARGETOS=="unix" then
 			"-framework QuartzCore",
 			"-framework OpenGL",
 		}
-      
-        
+
+
 		if os_version>=101100 then
 			linkoptions {
 				"-weak_framework Metal",
 			}
 		end
 		if _OPTIONS["with-bundled-sdl2"]~=nil then
-            linkoptions {
-                "-framework AudioUnit",
-                "-framework CoreAudio",
-                "-framework Carbon",
-                "-framework ForceFeedback",
-                "-framework IOKit",
-                "-framework CoreVideo",                                
-            }                  
+			linkoptions {
+				"-framework AudioUnit",
+				"-framework CoreAudio",
+				"-framework Carbon",
+				"-framework ForceFeedback",
+				"-framework IOKit",
+				"-framework CoreVideo",
+			}
 		else
 			if _OPTIONS["USE_LIBSDL"]~="1" then
 				linkoptions {
@@ -295,7 +295,7 @@ if BASE_TARGETOS=="unix" then
 				"/usr/openwin/lib",
 			}
 		end
-		if _OPTIONS["with-bundled-sdl2"]~=nil then
+		if _OPTIONS["with-bundled-sdl2"]~=nil and _OPTIONS["targetos"]~="android" then
 			links {
 				"SDL2",
 			}
@@ -303,9 +303,9 @@ if BASE_TARGETOS=="unix" then
 			local str = backtick(sdlconfigcmd() .. " --libs")
 			addlibfromstring(str)
 			addoptionsfromstring(str)
-		end	
-		
-		if _OPTIONS["targetos"]~="haiku" then
+		end
+
+		if _OPTIONS["targetos"]~="haiku" and _OPTIONS["targetos"]~="android" then
 			links {
 				"m",
 				"pthread",
@@ -360,6 +360,7 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
+		MAME_DIR .. "src/osd/modules/file",
 		MAME_DIR .. "src/osd/modules/render",
 		MAME_DIR .. "3rdparty",
 		MAME_DIR .. "src/osd/sdl",
@@ -460,10 +461,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/strconv.cpp",
 		MAME_DIR .. "src/osd/strconv.h",
 		MAME_DIR .. "src/osd/sdl/sdldir.cpp",
-		MAME_DIR .. "src/osd/sdl/sdlfile.cpp",
-		MAME_DIR .. "src/osd/sdl/sdlfile.h",
-		MAME_DIR .. "src/osd/sdl/sdlptty_" .. BASE_TARGETOS ..".cpp",
-		MAME_DIR .. "src/osd/sdl/sdlsocket.cpp",
 		MAME_DIR .. "src/osd/sdl/sdlos_" .. SDLOS_TARGETOS .. ".cpp",
 		MAME_DIR .. "src/osd/modules/osdmodule.cpp",
 		MAME_DIR .. "src/osd/modules/osdmodule.h",
@@ -473,6 +470,30 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/sync/osdsync.h",
 		MAME_DIR .. "src/osd/modules/sync/work_osd.cpp",
 	}
+
+	if BASE_TARGETOS=="unix" then
+		files {
+			MAME_DIR .. "src/osd/modules/file/posixfile.cpp",
+			MAME_DIR .. "src/osd/modules/file/posixfile.h",
+			MAME_DIR .. "src/osd/modules/file/posixptty.cpp",
+			MAME_DIR .. "src/osd/modules/file/posixsocket.cpp",
+		}
+	elseif BASE_TARGETOS=="win32" then
+		includedirs {
+			MAME_DIR .. "src/osd/windows",
+		}
+		files {
+			MAME_DIR .. "src/osd/modules/file/winfile.cpp",
+			MAME_DIR .. "src/osd/modules/file/winfile.h",
+			MAME_DIR .. "src/osd/modules/file/winptty.cpp",
+			MAME_DIR .. "src/osd/modules/file/winsocket.cpp",
+			MAME_DIR .. "src/osd/windows/winutil.cpp", -- FIXME put the necessary functions somewhere more appropriate
+		}
+	else
+		files {
+			MAME_DIR .. "src/osd/modules/file/stdfile.cpp",
+		}
+	end
 
 	if _OPTIONS["targetos"]=="macosx" then
 		files {

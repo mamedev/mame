@@ -67,7 +67,7 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	memset(&m_localtime, 0, sizeof(m_localtime));
 
 	// configure the fast accessor
-	device.m_execute = this;
+	device.interfaces().m_execute = this;
 }
 
 

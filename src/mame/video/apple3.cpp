@@ -138,7 +138,7 @@ VIDEO_START_MEMBER(apple3_state,apple3)
 
 
 
-void apple3_state::apple3_video_text40(bitmap_ind16 &bitmap)
+void apple3_state::text40(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, col, row, lc;
 	offs_t offset;
@@ -149,8 +149,10 @@ void apple3_state::apple3_video_text40(bitmap_ind16 &bitmap)
 	UINT8 *ram = m_ram->pointer();
 	UINT32 ram_size = m_ram->size();
 	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
+	int beginrow = (cliprect.min_y - (cliprect.min_y % 8)) / 8;
+	int endrow = (cliprect.max_y - (cliprect.max_y % 8) + 7) / 8;
 
-	for (y = 0; y < 24; y++)
+	for (y = beginrow; y <= endrow; y++)
 	{
 		for (x = 0; x < 40; x++)
 		{
@@ -207,7 +209,7 @@ void apple3_state::apple3_video_text40(bitmap_ind16 &bitmap)
 
 
 
-void apple3_state::apple3_video_text80(bitmap_ind16 &bitmap)
+void apple3_state::text80(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, col, row, lc;
 	offs_t offset;
@@ -218,8 +220,10 @@ void apple3_state::apple3_video_text80(bitmap_ind16 &bitmap)
 	UINT8 *ram = m_ram->pointer();
 	UINT32 ram_size = m_ram->size();
 	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
+	int beginrow = (cliprect.min_y - (cliprect.min_y % 8)) / 8;
+	int endrow = (cliprect.max_y - (cliprect.max_y % 8) + 7) / 8;
 
-	for (y = 0; y < 24; y++)
+	for (y = beginrow; y <= endrow; y++)
 	{
 		for (x = 0; x < 40; x++)
 		{
@@ -270,7 +274,7 @@ void apple3_state::apple3_video_text80(bitmap_ind16 &bitmap)
 
 
 
-void apple3_state::apple3_video_graphics_hgr(bitmap_ind16 &bitmap)
+void apple3_state::graphics_hgr(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* hi-res mode: 280x192x2 */
 	int y, i, x, ly, lyb;
@@ -280,7 +284,7 @@ void apple3_state::apple3_video_graphics_hgr(bitmap_ind16 &bitmap)
 	UINT8 *ram = m_ram->pointer();
 	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
 
-	for (y = 0; y < 192; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		ly = y;
 		if (m_smoothscr)
@@ -313,7 +317,7 @@ void apple3_state::apple3_video_graphics_hgr(bitmap_ind16 &bitmap)
 	}
 }
 
-void apple3_state::apple3_video_graphics_chgr(bitmap_ind16 &bitmap)
+void apple3_state::graphics_chgr(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* color hi-res mode: 280x192x16 */
 	int y, i, x, ly, lyb;
@@ -325,7 +329,7 @@ void apple3_state::apple3_video_graphics_chgr(bitmap_ind16 &bitmap)
 	UINT8 *ram = m_ram->pointer();
 	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
 
-	for (y = 0; y < 192; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		ly = y;
 		if (m_smoothscr)
@@ -371,7 +375,7 @@ void apple3_state::apple3_video_graphics_chgr(bitmap_ind16 &bitmap)
 
 
 
-void apple3_state::apple3_video_graphics_shgr(bitmap_ind16 &bitmap)
+void apple3_state::graphics_shgr(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* super hi-res mode: 560x192x2 */
 	int y, i, x, ly, lyb;
@@ -382,7 +386,7 @@ void apple3_state::apple3_video_graphics_shgr(bitmap_ind16 &bitmap)
 	UINT8 *ram = m_ram->pointer();
 	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
 
-	for (y = 0; y < 192; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		ly = y;
 		if (m_smoothscr)
@@ -429,7 +433,7 @@ void apple3_state::apple3_video_graphics_shgr(bitmap_ind16 &bitmap)
 
 
 
-void apple3_state::apple3_video_graphics_chires(bitmap_ind16 &bitmap)
+void apple3_state::graphics_chires(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT16 *pen;
 	UINT8 p1, p2, p3, p4;
@@ -437,7 +441,7 @@ void apple3_state::apple3_video_graphics_chires(bitmap_ind16 &bitmap)
 	UINT8 *ram = m_ram->pointer();
 	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
 
-	for (y = 0; y < 192; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		ly = y;
 		if (m_smoothscr)
@@ -490,28 +494,28 @@ UINT32 apple3_state::screen_update_apple3(screen_device &screen, bitmap_ind16 &b
 	{
 		case 0:
 		case VAR_VM0:
-			apple3_video_text40(bitmap);
+			text40(bitmap, cliprect);           // 1
 			break;
 
-		case VAR_VM1:
-		case VAR_VM1|VAR_VM0:
-			apple3_video_text80(bitmap);
+		case VAR_VM1:                           // 2
+		case VAR_VM1|VAR_VM0:                   // 3
+			text80(bitmap, cliprect);
 			break;
 
-		case VAR_VM3:
-			apple3_video_graphics_hgr(bitmap);    /* hgr mode */
+		case VAR_VM3:                           // 8
+			graphics_hgr(bitmap, cliprect);    /* hgr mode */
 			break;
 
-		case VAR_VM3|VAR_VM0:
-			apple3_video_graphics_chgr(bitmap);
+		case VAR_VM3|VAR_VM0:                   // 9
+			graphics_chgr(bitmap, cliprect);
 			break;
 
-		case VAR_VM3|VAR_VM1:
-			apple3_video_graphics_shgr(bitmap);
+		case VAR_VM3|VAR_VM1:                   // a
+			graphics_shgr(bitmap, cliprect);
 			break;
 
-		case VAR_VM3|VAR_VM1|VAR_VM0:
-			apple3_video_graphics_chires(bitmap);
+		case VAR_VM3|VAR_VM1|VAR_VM0:           // b
+			graphics_chires(bitmap, cliprect);
 			break;
 	}
 	return 0;

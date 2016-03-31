@@ -22,7 +22,7 @@ NETLIB_UPDATE(82S16)
 	}
 	else
 	{
-		int adr = 0;
+		unsigned int adr = 0;
 		for (int i=0; i<8; i++)
 		{
 			//m_A[i].activate();
@@ -31,9 +31,9 @@ NETLIB_UPDATE(82S16)
 
 		if (!INPLOGIC(m_WEQ))
 		{
-			m_ram[adr] = INPLOGIC(m_DIN);
+			m_ram[adr >> 6] = (m_ram[adr >> 6] & ~((UINT64) 1 << (adr & 0x3f))) | ((UINT64) INPLOGIC(m_DIN) << (adr & 0x3f));
 		}
-		OUTLOGIC(m_DOUTQ, m_ram[adr] ^ 1, NLTIME_FROM_NS(20));
+		OUTLOGIC(m_DOUTQ, ((m_ram[adr >> 6] >> (adr & 0x3f)) & 1) ^ 1, NLTIME_FROM_NS(20));
 	}
 }
 
@@ -62,7 +62,7 @@ NETLIB_START(82S16)
 
 NETLIB_RESET(82S16)
 {
-	for (int i=0; i<256; i++)
+	for (int i=0; i<4; i++)
 	{
 		m_ram[i] = 0;
 	}

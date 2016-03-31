@@ -35,9 +35,9 @@ derivative of the original Torque Engine.
 Download (stable)
 -----------------
 
-[![Build Status](https://travis-ci.org/bkaradzic/genie.svg?branch=master)](https://travis-ci.org/bkaradzic/genie)
+[![Build Status](https://travis-ci.org/bkaradzic/GENie.svg?branch=master)](https://travis-ci.org/bkaradzic/GENie)
 
-	version 366 (commit b887178737cd74cf60899899c4c65b9bf02efb26)
+	version 415 (commit 53635be7264271a6d6c95b059c420251b7eb3280)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -106,39 +106,6 @@ intention to keep it compatible with it.
  - Added Green Hills Software compiler support.
  - Added edit & continue support for 64-bit builds in VS2013 upwards.
  - Added `windowstargetplatformversion` to specify VS Windows target version.
-
-## Why fork?
-
-At the time of writing this, September 2014, Premake project is on long hiatus.
-The last official release 4.3 is released in November 2010, 4.4 beta 5 was
-released in November 2013, and the main developer is focusing on Premake 5.
-
-Multiple requests for releasing new version end up with this type of [answer](http://industriousone.com/topic/premake-release-neglect-becoming-critical):
-
-	Then help fix the bugs marked 4.4 in the SourceForge tracker so that we can
-	make a release. Or review and improve the patches so that I may get them
-	applied more quickly. Or pay me to do it so that I can spend more time on
-	it, instead of doing other work that you value less (but which actually, you
-	know, pays me).
-
-So author has high expectations for release, but he is not working on it, but
-rather working on completely different... Pay me to finish this sentence...
-You get the point. :)
-
-This long period between releases where multiple versions are in flight cause
-confusion for users who are not familiar with Premake, and they just need to
-use Premake to generate project files for project they are interested in.
-
-I've been using Premake for [a while](https://web.archive.org/web/20120119020903/http://carbongames.com/2011/08/Premake),
-I really like it's simplicity, and that it does one thing really well.
-
-I was considering replacing Premake with other build systems that also could
-generate project files, but all these projects fail at being simple and doing
-only one thing. I don't need build system, or package manager, etc. just a
-simple project generator.
-
-In conclusion, forking it and maintaining it is not much different from current
-state of Premake, it's just acknowledging the problem, and dealing with it.
 
 [License](https://github.com/bkaradzic/genie/blob/master/LICENSE)
 -----------------------------------------------------------------

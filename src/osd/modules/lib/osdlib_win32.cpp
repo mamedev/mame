@@ -240,4 +240,3 @@ void osd_break_into_debugger(const char *message)
 	}
 #endif
 }
-

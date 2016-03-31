@@ -4,9 +4,6 @@
 	*                 Texas Instruments TMS32010 DSP Emulator                  *
 	*                                                                          *
 	*                  Copyright Tony La Porta                                 *
-	*      You are not allowed to distribute this software commercially.       *
-	*                      Written for the MAME project.                       *
-	*                                                                          *
 	*                                                                          *
 	*      Note :  This is a word based microcontroller, with addressing       *
 	*              architecture based on the Harvard addressing scheme.        *

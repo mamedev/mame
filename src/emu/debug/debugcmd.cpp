@@ -1872,6 +1872,7 @@ static void execute_dump(running_machine &machine, int ref, int params, const ch
 	for (i = offset; i <= endoffset; i += 16)
 	{
 		output.clear();
+		output.rdbuf()->clear();
 
 		/* print the address */
 		util::stream_format(output, "%0*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(i));
@@ -1934,7 +1935,6 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 	UINT64 curaddr;
 	UINT8 i, region_count = 0;
 
-	address_map_entry *entry;
 	cheat_region_map cheat_region[100];
 
 	memset(cheat_region, 0, sizeof(cheat_region));
@@ -1986,18 +1986,18 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 	/* initialize entire memory by default */
 	if (params <= 1)
 	{
-		for (entry = space->map()->m_entrylist.first(); entry != nullptr; entry = entry->next())
+		for (address_map_entry &entry : space->map()->m_entrylist)
 		{
-			cheat_region[region_count].offset = space->address_to_byte(entry->m_addrstart) & space->bytemask();
-			cheat_region[region_count].endoffset = space->address_to_byte(entry->m_addrend) & space->bytemask();
-			cheat_region[region_count].share = entry->m_share;
-			cheat_region[region_count].disabled = (entry->m_write.m_type == AMH_RAM) ? FALSE : TRUE;
+			cheat_region[region_count].offset = space->address_to_byte(entry.m_addrstart) & space->bytemask();
+			cheat_region[region_count].endoffset = space->address_to_byte(entry.m_addrend) & space->bytemask();
+			cheat_region[region_count].share = entry.m_share;
+			cheat_region[region_count].disabled = (entry.m_write.m_type == AMH_RAM) ? FALSE : TRUE;
 
 			/* disable double share regions */
-			if (entry->m_share != nullptr)
+			if (entry.m_share != nullptr)
 				for (i = 0; i < region_count; i++)
 					if (cheat_region[i].share != nullptr)
-						if (strcmp(cheat_region[i].share, entry->m_share) == 0)
+						if (strcmp(cheat_region[i].share, entry.m_share) == 0)
 							cheat_region[region_count].disabled = TRUE;
 
 			region_count++;
@@ -2306,6 +2306,7 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 			{
 				active_cheat++;
 				output.clear();
+				output.rdbuf()->clear();
 				stream_format(
 						output,
 						"  <cheat desc=\"Possibility %d : %0*X (%0*X)\">\n"
@@ -2516,6 +2517,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 		offs_t tempaddr;
 		int numbytes = 0;
 		output.clear();
+		output.rdbuf()->clear();
 
 		/* print the address */
 		stream_format(output, "%0*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(pcbyte));
@@ -2856,9 +2858,9 @@ static void execute_snap(running_machine &machine, int ref, int params, const ch
 		if (fname.find(".png") == -1)
 			fname.append(".png");
 		emu_file file(machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		file_error filerr = file.open(fname.c_str());
+		osd_file::error filerr = file.open(fname.c_str());
 
-		if (filerr != FILERR_NONE)
+		if (filerr != osd_file::error::NONE)
 		{
 			debug_console_printf(machine, "Error creating file '%s'\n", filename);
 			return;
@@ -2976,12 +2978,12 @@ static void execute_symlist(running_machine &machine, int ref, int params, const
 	}
 
 	/* gather names for all symbols */
-	for (symbol_entry *entry = symtable->first(); entry != nullptr; entry = entry->next())
+	for (symbol_entry &entry : symtable->entries())
 	{
 		/* only display "register" type symbols */
-		if (!entry->is_function())
+		if (!entry.is_function())
 		{
-			namelist[count++] = entry->name();
+			namelist[count++] = entry.name();
 			if (count >= ARRAY_LENGTH(namelist))
 				break;
 		}

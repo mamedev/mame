@@ -1,0 +1,37 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz,ImJezze
+//============================================================
+//
+//  deconverge.json: Electron-gun misalignment shader for CRT
+//  simulation.
+//
+//============================================================
+{
+    "blend": {
+    	"equation": "add",
+    	"srcColor": "srcalpha",
+    	"dstColor": "1-srcalpha",
+    	"srcAlpha": "srcalpha",
+    	"dstAlpha": "1-srcalpha"
+    },
+    "depth": {
+    	"function": "always"
+    },
+    "cull": { "mode": "none" },
+    "write": {
+    	"rgb": true,
+    	"alpha": true
+    },
+    "vertex": "vs_deconverge",
+    "fragment": "fs_deconverge",
+    "uniforms": [
+    	{ "name": "s_tex",                   "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "u_source_size",           "type": "vec4", "values": [ 256.0, 256.0, 0.0, 0.0 ] },
+    	{ "name": "u_converge_red",          "type": "vec4", "values": [ 0.5, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_converge_green",        "type": "vec4", "values": [ 0.0, 0.5, 0.0, 0.0 ] },
+    	{ "name": "u_converge_blue",         "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_radial_converge_red",   "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_radial_converge_green", "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_radial_converge_blue",  "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] }
+    ]
+}

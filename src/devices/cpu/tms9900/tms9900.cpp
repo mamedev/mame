@@ -240,7 +240,7 @@ void tms99xx_device::device_start()
 void tms99xx_device::device_stop()
 {
 	int k = 0;
-	if (TRACE_SETUP) logerror("tms99xx: Deleting lookup tables\n");
+	if (TRACE_SETUP) logerror("Deleting lookup tables\n");
 	while (m_lotables[k]!=nullptr) delete[] m_lotables[k++];
 }
 
@@ -266,7 +266,7 @@ void tms99xx_device::resolve_lines()
 */
 void tms99xx_device::device_reset()
 {
-	if (TRACE_EMU) logerror("tms99xx: Device reset by emulator\n");
+	if (TRACE_EMU) logerror("Device reset by emulator\n");
 	m_reset = true;
 	m_check_ready = false;
 	m_wait_state = false;
@@ -1061,7 +1061,7 @@ void tms99xx_device::build_command_lookup_table()
 	{
 		inst = &s_command[i];
 		table = m_command_lookup_table;
-		if (TRACE_SETUP) logerror("tms99xx: === opcode=%04x, len=%d\n", inst->opcode, format_mask_len[inst->format]);
+		if (TRACE_SETUP) logerror("=== opcode=%04x, len=%d\n", inst->opcode, format_mask_len[inst->format]);
 		bitcount = 4;
 		opcode = inst->opcode;
 		cmdindex = (opcode>>12) & 0x000f;
@@ -1071,7 +1071,7 @@ void tms99xx_device::build_command_lookup_table()
 			// Descend
 			if (table[cmdindex].next_digit == nullptr)
 			{
-				if (TRACE_SETUP) logerror("tms99xx: create new table at bitcount=%d for index=%d\n", bitcount, cmdindex);
+				if (TRACE_SETUP) logerror("create new table at bitcount=%d for index=%d\n", bitcount, cmdindex);
 				table[cmdindex].next_digit = new lookup_entry[16];
 				m_lotables[k++] = table[cmdindex].next_digit;
 				for (int j=0; j < 16; j++)
@@ -1082,7 +1082,7 @@ void tms99xx_device::build_command_lookup_table()
 			}
 			else
 			{
-				if (TRACE_SETUP) logerror("tms99xx: found a table at bitcount=%d\n", bitcount);
+				if (TRACE_SETUP) logerror("found a table at bitcount=%d\n", bitcount);
 			}
 
 			table = table[cmdindex].next_digit;
@@ -1090,17 +1090,17 @@ void tms99xx_device::build_command_lookup_table()
 			bitcount = bitcount+4;
 			opcode <<= 4;
 			cmdindex = (opcode>>12) & 0x000f;
-			if (TRACE_SETUP) logerror("tms99xx: next index=%x\n", cmdindex);
+			if (TRACE_SETUP) logerror("next index=%x\n", cmdindex);
 		}
 
-		if (TRACE_SETUP) logerror("tms99xx: bitcount=%d\n", bitcount);
+		if (TRACE_SETUP) logerror("bitcount=%d\n", bitcount);
 		// We are at the target level
 		// Need to fill in the same entry for all values in the bitcount
 		// (if a command needs 10 bits we have to copy it four
 		// times for all combinations with 12 bits)
 		for (int j=0; j < (1<<(bitcount-format_mask_len[inst->format])); j++)
 		{
-			if (TRACE_SETUP) logerror("tms99xx: opcode=%04x at position %d\n", inst->opcode, cmdindex+j);
+			if (TRACE_SETUP) logerror("opcode=%04x at position %d\n", inst->opcode, cmdindex+j);
 			table[cmdindex+j].entry = inst;
 		}
 
@@ -1108,7 +1108,7 @@ void tms99xx_device::build_command_lookup_table()
 	} while (inst->opcode != 0xf000);
 
 	m_lotables[k++] = nullptr;
-	if (TRACE_SETUP) logerror("tms99xx: Allocated %d tables\n", k);
+	if (TRACE_SETUP) logerror("Allocated %d tables\n", k);
 }
 
 /*
@@ -1151,7 +1151,7 @@ void tms99xx_device::execute_run()
 {
 	if (m_reset) service_interrupt();
 
-	if (TRACE_EMU) logerror("tms99xx: calling execute_run for %d cycles\n", m_icount);
+	if (TRACE_EMU) logerror("calling execute_run for %d cycles\n", m_icount);
 	do
 	{
 		// Only when last instruction has completed
@@ -1159,7 +1159,7 @@ void tms99xx_device::execute_run()
 		{
 			if (m_load_state)
 			{
-				logerror("tms99xx: LOAD interrupt\n");
+				logerror("LOAD interrupt\n");
 				m_irq_level = LOAD_INT;
 				m_irq_state = false;
 				service_interrupt();
@@ -1177,7 +1177,7 @@ void tms99xx_device::execute_run()
 
 		if (m_program == nullptr && m_idle_state)
 		{
-			if (TRACE_WAIT) logerror("tms99xx: idle state\n");
+			if (TRACE_WAIT) logerror("idle state\n");
 			pulse_clock(1);
 			if (!m_external_operation.isnull())
 			{
@@ -1196,7 +1196,7 @@ void tms99xx_device::execute_run()
 				m_program[MPC] != MEMORY_READ && m_program[MPC] != MEMORY_WRITE &&
 				m_program[MPC] != REG_READ && m_program[MPC] != REG_WRITE)))
 			{
-				if (TRACE_WAIT) logerror("tms99xx: hold\n");
+				if (TRACE_WAIT) logerror("hold\n");
 				if (!m_hold_acknowledged) acknowledge_hold();
 				pulse_clock(1);
 			}
@@ -1207,7 +1207,7 @@ void tms99xx_device::execute_run()
 				{
 					// We are in a wait state
 					set_wait_state(true);
-					if (TRACE_WAIT) logerror("tms99xx: wait\n");
+					if (TRACE_WAIT) logerror("wait\n");
 					// The clock output should be used to change the state of an outer
 					// device which operates the READY line
 					pulse_clock(1);
@@ -1222,7 +1222,7 @@ void tms99xx_device::execute_run()
 					{
 						m_op = m_program[MPC];
 					}
-					if (TRACE_MICRO) logerror("tms99xx: MPC = %d, m_op = %d\n", MPC, m_op);
+					if (TRACE_MICRO) logerror("MPC = %d, m_op = %d\n", MPC, m_op);
 					// Call the operation of the microprogram
 					(this->*s_microoperation[m_op])();
 					// If we have multiple passes (as in the TMS9980)
@@ -1238,7 +1238,7 @@ void tms99xx_device::execute_run()
 			}
 		}
 	} while (m_icount>0 && !m_reset);
-	if (TRACE_EMU) logerror("tms99xx: cycles expired; will return soon.\n");
+	if (TRACE_EMU) logerror("cycles expired; will return soon.\n");
 }
 
 /**************************************************************************/
@@ -1266,11 +1266,11 @@ void tms99xx_device::execute_set_input(int irqline, int state)
 			if (state==ASSERT_LINE)
 			{
 				m_irq_level = get_intlevel(state);
-				if (TRACE_INT) logerror("tms99xx: /INT asserted, level=%d, ST=%04x\n", m_irq_level, ST);
+				if (TRACE_INT) logerror("/INT asserted, level=%d, ST=%04x\n", m_irq_level, ST);
 			}
 			else
 			{
-				if (TRACE_INT) logerror("tms99xx: /INT cleared\n");
+				if (TRACE_INT) logerror("/INT cleared\n");
 			}
 		}
 	}
@@ -1321,9 +1321,9 @@ void tms99xx_device::service_interrupt()
 	{
 		switch (m_irq_level)
 		{
-		case RESET_INT: logerror("tms99xx: **** triggered a RESET interrupt\n"); break;
-		case LOAD_INT: logerror("tms99xx: **** triggered a LOAD (NMI) interrupt\n"); break;
-		default: logerror("tms99xx: ** triggered an interrupt on level %d\n", m_irq_level); break;
+		case RESET_INT: logerror("**** triggered a RESET interrupt\n"); break;
+		case LOAD_INT: logerror("**** triggered a LOAD (NMI) interrupt\n"); break;
+		default: logerror("** triggered an interrupt on level %d\n", m_irq_level); break;
 		}
 	}
 
@@ -1344,8 +1344,8 @@ void tms99xx_device::pulse_clock(int count)
 		m_icount--;                         // This is the only location where we count down the cycles.
 		if (TRACE_CLOCK)
 		{
-			if (m_check_ready) logerror("tms99xx: pulse_clock, READY=%d\n", m_ready? 1:0);
-			else logerror("tms99xx: pulse_clock\n");
+			if (m_check_ready) logerror("pulse_clock, READY=%d\n", m_ready? 1:0);
+			else logerror("pulse_clock\n");
 		}
 	}
 }
@@ -1416,7 +1416,7 @@ void tms99xx_device::decode(UINT16 inst)
 	while (!complete)
 	{
 		index = (opcode >> 12) & 0x000f;
-		if (TRACE_MICRO) logerror("tms99xx: Check next hex digit of instruction %x\n", index);
+		if (TRACE_MICRO) logerror("Check next hex digit of instruction %x\n", index);
 		if (table[index].next_digit != nullptr)
 		{
 			table = table[index].next_digit;
@@ -1428,7 +1428,7 @@ void tms99xx_device::decode(UINT16 inst)
 	if (decoded == nullptr)
 	{
 		// not found
-		logerror("tms99xx: Illegal opcode %04x\n", inst);
+		logerror("Address %04x: Illegal opcode %04x\n", PC, inst);
 		IR = 0;
 		// This will cause another instruction acquisition in the next machine cycle
 		// with an asserted IAQ line (can be used to indicate this illegal opcode detection).
@@ -1439,7 +1439,7 @@ void tms99xx_device::decode(UINT16 inst)
 		m_program = decoded->prog;
 		MPC = -1;
 		m_command = decoded->id;
-		if (TRACE_MICRO) logerror("tms99xx: Command decoded as id %d, %s, base opcode %04x\n", m_command, opname[m_command], decoded->opcode);
+		if (TRACE_MICRO) logerror("Command decoded as id %d, %s, base opcode %04x\n", m_command, opname[m_command], decoded->opcode);
 		// Byte operations are either format 1 with the byte flag set
 		// or format 4 (CRU multi bit operations) with 1-8 bits to transfer.
 		m_byteop = ((decoded->format==1 && ((IR & 0x1000)!=0))
@@ -1467,7 +1467,7 @@ void tms99xx_device::acquire_instruction()
 	if (m_mem_phase == 1)
 	{
 		decode(m_current_value);
-		if (TRACE_EXEC) logerror("tms99xx: %04x: %04x (%s)\n", PC, IR, opname[m_command]);
+		if (TRACE_EXEC) logerror("%04x: %04x (%s)\n", PC, IR, opname[m_command]);
 		debugger_instruction_hook(this, PC);
 		PC = (PC + 2) & 0xfffe & m_prgaddr_mask;
 		// IAQ will be cleared in the main loop
@@ -1491,7 +1491,7 @@ void tms99xx_device::mem_read()
 		m_check_ready = true;
 		m_mem_phase = 2;
 		m_pass = 2;
-		if (TRACE_ADDRESSBUS) logerror("tms99xx: set address (r) %04x\n", m_address);
+		if (TRACE_ADDRESSBUS) logerror("set address (r) %04x\n", m_address);
 
 		pulse_clock(1); // Concludes the first cycle
 		// If READY has been found to be low, the CPU will now stay in the wait state loop
@@ -1503,7 +1503,7 @@ void tms99xx_device::mem_read()
 		pulse_clock(1);
 		if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
 		m_mem_phase = 1;        // reset to phase 1
-		if (TRACE_MEM) logerror("tms99xx: mem r %04x -> %04x\n", m_address, m_current_value);
+		if (TRACE_MEM) logerror("mem r %04x -> %04x\n", m_address, m_current_value);
 	}
 }
 
@@ -1513,9 +1513,9 @@ void tms99xx_device::mem_write()
 	{
 		if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
 		// When writing, the data bus is asserted immediately after the address bus
-		if (TRACE_ADDRESSBUS) logerror("tms99xx: set address (w) %04x\n", m_address);
+		if (TRACE_ADDRESSBUS) logerror("set address (w) %04x\n", m_address);
 		m_prgspace->set_address(m_address & m_prgaddr_mask & 0xfffe);
-		if (TRACE_MEM) logerror("tms99xx: mem w %04x <- %04x\n",  m_address, m_current_value);
+		if (TRACE_MEM) logerror("mem w %04x <- %04x\n",  m_address, m_current_value);
 		m_prgspace->write_word(m_address & m_prgaddr_mask & 0xfffe, m_current_value);
 		m_check_ready = true;
 		m_mem_phase = 2;
@@ -1633,7 +1633,7 @@ void tms99xx_device::cru_output_operation()
 	// Write m_count bits from cru_address
 	for (int i=0; i < m_count; i++)
 	{
-		if (TRACE_CRU) logerror("tms99xx: CRU output operation, address %04x, value %d\n", location<<1, value & 0x01);
+		if (TRACE_CRU) logerror("CRU output operation, address %04x, value %d\n", location<<1, value & 0x01);
 		m_cru->write_byte(location, (value & 0x01));
 		value >>= 1;
 		location = (location + 1) & m_cruaddr_mask;
@@ -1655,7 +1655,7 @@ void tms99xx_device::command_completed()
 	// Pseudo state at the end of the current instruction cycle sequence
 	if (TRACE_CYCLES)
 	{
-		logerror("tms99xx: ------");
+		logerror("------");
 		int cycles =  m_first_cycle - m_icount;
 		// Avoid nonsense values due to expired and resumed main loop
 		if (cycles > 0 && cycles < 10000) logerror(" %d cycles", cycles);
@@ -1721,7 +1721,7 @@ inline void tms99xx_device::compare_and_set_lae(UINT16 value1, UINT16 value2)
 	set_status_bit(ST_EQ, value1 == value2);
 	set_status_bit(ST_LH, value1 > value2);
 	set_status_bit(ST_AGT, (INT16)value1 > (INT16)value2);
-	if (TRACE_STATUS) logerror("tms99xx: ST = %04x (val1=%04x, val2=%04x)\n", ST, value1, value2);
+	if (TRACE_STATUS) logerror("ST = %04x (val1=%04x, val2=%04x)\n", ST, value1, value2);
 }
 
 /**************************************************************************
@@ -1958,7 +1958,7 @@ void tms99xx_device::alu_f3()
 				compare_and_set_lae(m_current_value, 0);
 			}
 		}
-		if (TRACE_STATUS) logerror("tms99xx: ST = %04x\n", ST);
+		if (TRACE_STATUS) logerror("ST = %04x\n", ST);
 		break;
 	}
 
@@ -1977,7 +1977,7 @@ void tms99xx_device::alu_multiply()
 		m_address = ((IR >> 5) & 0x001e) + WP;
 		break;
 	case 1: // After reading the register (multiplier)
-		if (TRACE_ALU) logerror("tms99xx: Multiply %04x by %04x\n", m_current_value, m_source_value);
+		if (TRACE_ALU) logerror("Multiply %04x by %04x\n", m_current_value, m_source_value);
 		result = (m_source_value & 0x0000ffff) * (m_current_value & 0x0000ffff);
 		m_current_value = (result >> 16) & 0xffff;
 		m_value_copy = result & 0xffff;
@@ -2026,11 +2026,11 @@ void tms99xx_device::alu_divide()
 		// Create full word and perform division
 		uval32 = (m_value_copy << 16) | m_current_value;
 
-		if (TRACE_ALU) logerror("tms99xx: Dividing %08x by %04x\n", uval32, m_source_value);
+		if (TRACE_ALU) logerror("Dividing %08x by %04x\n", uval32, m_source_value);
 		m_current_value = uval32 / m_source_value;
 		m_value_copy = uval32 % m_source_value;
 
-		if (TRACE_ALU) logerror("tms99xx: Quotient %04x, remainder %04x\n", m_current_value, m_value_copy);
+		if (TRACE_ALU) logerror("Quotient %04x, remainder %04x\n", m_current_value, m_value_copy);
 
 		m_address = m_address_copy;
 
@@ -2056,7 +2056,7 @@ void tms99xx_device::alu_divide()
 		// Prepare to write the remainder
 		m_current_value = m_value_copy;
 		m_address = m_address + 2;
-		if (TRACE_STATUS) logerror("tms99xx: ST = %04x (div)\n", ST);
+		if (TRACE_STATUS) logerror("ST = %04x (div)\n", ST);
 		break;
 	}
 	pulse_clock(2);
@@ -2206,7 +2206,7 @@ void tms99xx_device::alu_abs()
 
 void tms99xx_device::alu_x()
 {
-	if (TRACE_ALU) logerror("tms99xx: Substituting current command by %04x\n", m_current_value);
+	if (TRACE_ALU) logerror("Substituting current command by %04x\n", m_current_value);
 	decode(m_current_value);
 	pulse_clock(2);
 }
@@ -2226,7 +2226,7 @@ void tms99xx_device::alu_b()
 	m_current_value = PC;
 	PC = m_address & m_prgaddr_mask & 0xfffe;
 	m_address = WP + 22;
-	if (TRACE_ALU) logerror("tms99xx: Set new PC = %04x\n", PC);
+	if (TRACE_ALU) logerror("Set new PC = %04x\n", PC);
 	pulse_clock(2);
 }
 
@@ -2296,7 +2296,7 @@ void tms99xx_device::alu_ldcr()
 		}
 		m_cru_address = m_current_value;
 		m_value = value;
-		if (TRACE_CRU) logerror("tms99xx: Load CRU address %04x (%d bits), value = %04x\n", m_cru_address, m_count, m_value);
+		if (TRACE_CRU) logerror("Load CRU address %04x (%d bits), value = %04x\n", m_cru_address, m_count, m_value);
 	}
 	m_state++;
 	pulse_clock(2);
@@ -2328,7 +2328,7 @@ void tms99xx_device::alu_stcr()
 		value = m_value & 0xffff;
 		if (m_count < 9)
 		{
-			if (TRACE_CRU) logerror("tms99xx: Store CRU at %04x (%d bits) in %04x, result = %02x\n", m_cru_address, m_count, m_source_address, value);
+			if (TRACE_CRU) logerror("Store CRU at %04x (%d bits) in %04x, result = %02x\n", m_cru_address, m_count, m_source_address, value);
 			set_status_parity((UINT8)(value & 0xff));
 			compare_and_set_lae(value<<8, 0);
 			if (m_source_even)
@@ -2340,7 +2340,7 @@ void tms99xx_device::alu_stcr()
 		}
 		else
 		{
-			if (TRACE_CRU) logerror("tms99xx: Store CRU at %04x (%d bits) in %04x, result = %04x\n", m_cru_address, m_count, m_source_address, value);
+			if (TRACE_CRU) logerror("Store CRU at %04x (%d bits) in %04x, result = %04x\n", m_cru_address, m_count, m_source_address, value);
 			m_current_value = value;
 			compare_and_set_lae(value, 0);
 			pulse_clock(2*(5 + (16-m_count)));
@@ -2386,7 +2386,7 @@ void tms99xx_device::alu_tb()
 		break;
 	case 2:
 		set_status_bit(ST_EQ, m_value!=0);
-		if (TRACE_STATUS) logerror("tms99xx: ST = %04x\n", ST);
+		if (TRACE_STATUS) logerror("ST = %04x\n", ST);
 		break;
 	}
 	m_state++;
@@ -2444,11 +2444,11 @@ void tms99xx_device::alu_jmp()
 		}
 		if (!cond)
 		{
-			if (TRACE_ALU) logerror("tms99xx: Jump condition false\n");
+			if (TRACE_ALU) logerror("Jump condition false\n");
 			MPC+=1; // skip next ALU call
 		}
 		else
-			if (TRACE_ALU) logerror("tms99xx: Jump condition true\n");
+			if (TRACE_ALU) logerror("Jump condition true\n");
 	}
 	else
 	{
@@ -2489,7 +2489,7 @@ void tms99xx_device::alu_shift()
 		}
 		else
 		{
-			if (TRACE_ALU) logerror("tms99xx: Shift operation gets count from R0\n");
+			if (TRACE_ALU) logerror("Shift operation gets count from R0\n");
 			pulse_clock(2);
 		}
 		pulse_clock(2);
@@ -2538,7 +2538,7 @@ void tms99xx_device::alu_shift()
 		set_status_bit(ST_OV, overflow);
 		compare_and_set_lae(m_current_value, 0);
 		m_address = m_address_saved;        // Register address
-		if (TRACE_STATUS) logerror("tms99xx: ST = %04x (val=%04x)\n", ST, m_current_value);
+		if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);
 		break;
 	}
 	m_state++;
@@ -2589,7 +2589,7 @@ void tms99xx_device::alu_lwpi()
 void tms99xx_device::alu_limi()
 {
 	ST = (ST & 0xfff0) | (m_current_value & 0x000f);
-	if (TRACE_STATUS) logerror("tms99xx: ST = %04x\n", ST);
+	if (TRACE_STATUS) logerror("ST = %04x\n", ST);
 	pulse_clock(2);
 }
 
@@ -2645,7 +2645,7 @@ void tms99xx_device::alu_rtwp()
 
 void tms99xx_device::alu_int()
 {
-	if (TRACE_EMU) logerror("tms99xx: INT state %d; irq_level %d\n", m_state, m_irq_level);
+	if (TRACE_EMU) logerror("INT state %d; irq_level %d\n", m_state, m_irq_level);
 	switch (m_state)
 	{
 	case 0:
@@ -2680,7 +2680,7 @@ void tms99xx_device::alu_int()
 		break;
 	case 4:
 		m_address = (m_address_copy + 2) & 0xfffe & m_prgaddr_mask;
-		if (TRACE_ALU) logerror("tms99xx: read from %04x\n", m_address);
+		if (TRACE_ALU) logerror("read from %04x\n", m_address);
 		break;
 	case 5:
 		PC = m_current_value & m_prgaddr_mask & 0xfffe;

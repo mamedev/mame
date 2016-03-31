@@ -224,6 +224,17 @@ TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
 	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }
 
+TIMER_CALLBACK_MEMBER(s3_vga_device::vblank_timer_cb)
+{
+	// not sure if this is correct, but XF86_S3 seems to expect the viewport scrolling to be faster
+	if(s3.memory_config & 0x08)
+		vga.crtc.start_addr = vga.crtc.start_addr_latch << 2;
+	else
+		vga.crtc.start_addr = vga.crtc.start_addr_latch;
+	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
+	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
+}
+
 void vga_device::device_start()
 {
 	zero();
@@ -1051,50 +1062,53 @@ UINT32 s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 //          printf("%08x: %02x %02x %02x %02x\n",src+x*4,vga.memory[src+x*4],vga.memory[src+x*4+1],vga.memory[src+x*4+2],vga.memory[src+x*4+3]);
 		for(y=0;y<64;y++)
 		{
-			dst = &bitmap.pix32(cy + y, cx);
-			for(x=0;x<64;x++)
+			if(cy + y < cliprect.max_y && cx < cliprect.max_x)
 			{
-				UINT16 bita = (vga.memory[(src+1) % vga.svga_intf.vram_size] | ((vga.memory[(src+0) % vga.svga_intf.vram_size]) << 8)) >> (15-(x % 16));
-				UINT16 bitb = (vga.memory[(src+3) % vga.svga_intf.vram_size] | ((vga.memory[(src+2) % vga.svga_intf.vram_size]) << 8)) >> (15-(x % 16));
-				val = ((bita & 0x01) << 1) | (bitb & 0x01);
-				if(s3.extended_dac_ctrl & 0x10)
-				{  // X11 mode
-					switch(val)
-					{
-					case 0x00:
-						// no change
-						break;
-					case 0x01:
-						// no change
-						break;
-					case 0x02:
-						dst[x] = bg_col;
-						break;
-					case 0x03:
-						dst[x] = fg_col;
-						break;
+				dst = &bitmap.pix32(cy + y, cx);
+				for(x=0;x<64;x++)
+				{
+					UINT16 bita = (vga.memory[(src+1) % vga.svga_intf.vram_size] | ((vga.memory[(src+0) % vga.svga_intf.vram_size]) << 8)) >> (15-(x % 16));
+					UINT16 bitb = (vga.memory[(src+3) % vga.svga_intf.vram_size] | ((vga.memory[(src+2) % vga.svga_intf.vram_size]) << 8)) >> (15-(x % 16));
+					val = ((bita & 0x01) << 1) | (bitb & 0x01);
+					if(s3.extended_dac_ctrl & 0x10)
+					{  // X11 mode
+						switch(val)
+						{
+						case 0x00:
+							// no change
+							break;
+						case 0x01:
+							// no change
+							break;
+						case 0x02:
+							dst[x] = bg_col;
+							break;
+						case 0x03:
+							dst[x] = fg_col;
+							break;
+						}
 					}
-				}
-				else
-				{  // Windows mode
-					switch(val)
-					{
-					case 0x00:
-						dst[x] = bg_col;
-						break;
-					case 0x01:
-						dst[x] = fg_col;
-						break;
-					case 0x02:  // screen data
-						// no change
-						break;
-					case 0x03:  // inverted screen data
-						dst[x] = ~(dst[x]);
-						break;
+					else
+					{  // Windows mode
+						switch(val)
+						{
+						case 0x00:
+							dst[x] = bg_col;
+							break;
+						case 0x01:
+							dst[x] = fg_col;
+							break;
+						case 0x02:  // screen data
+							// no change
+							break;
+						case 0x03:  // inverted screen data
+							dst[x] = ~(dst[x]);
+							break;
+						}
 					}
+					if(x % 16 == 15)
+						src+=4;
 				}
-				if(x % 16 == 15)
-					src+=4;
 			}
 		}
 	}
@@ -3388,7 +3402,6 @@ void ibm8514a_device::ibm8514_write(UINT32 offset, UINT32 src)
 {
 	int data_size = 8;
 	UINT32 xfer;
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch(ibm8514.pixel_control & 0x00c0)
 	{
@@ -3428,6 +3441,7 @@ void ibm8514a_device::ibm8514_write(UINT32 offset, UINT32 src)
 			ibm8514.src_x = 0;
 		break;
 	case 0x00c0:  // use source plane
+		address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 		if(m_vga->mem_linear_r(space,src,0xff) != 0x00)
 			ibm8514_write_fg(offset);
 		else

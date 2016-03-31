@@ -143,7 +143,7 @@ public:
 
 	void presave();
 	void postload();
-	
+
 	void clear_all(void);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };

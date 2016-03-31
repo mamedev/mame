@@ -224,10 +224,10 @@ void debug_view_watchpoints::pad_ostream_to_length(std::ostream& str, int len)
 void debug_view_watchpoints::gather_watchpoints()
 {
 	m_buffer.resize(0);
-	for (const debug_view_source *source = m_source_list.first(); source != nullptr; source = source->next())
+	for (const debug_view_source &source : m_source_list)
 	{
 		// Collect
-		device_debug &debugInterface = *source->device()->debug();
+		device_debug &debugInterface = *source.device()->debug();
 		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
 		{
 			for (device_debug::watchpoint *wp = debugInterface.watchpoint_first(spacenum); wp != nullptr; wp = wp->next())
@@ -258,14 +258,15 @@ void debug_view_watchpoints::view_update()
 		m_total.y = 10;
 
 	// Draw
-	debug_view_char		*dest = &m_viewdata[0];
-	util::ovectorstream	linebuf;
+	debug_view_char     *dest = &m_viewdata[0];
+	util::ovectorstream linebuf;
 	linebuf.reserve(ARRAY_LENGTH(tableBreaks) - 1);
 
 	// Header
 	if (m_visible.y > 0)
 	{
 		linebuf.clear();
+		linebuf.rdbuf()->clear();
 		linebuf << "ID";
 		if (m_sortType == &cIndexAscending) linebuf.put('\\');
 		else if (m_sortType == &cIndexDescending) linebuf.put('/');
@@ -317,6 +318,7 @@ void debug_view_watchpoints::view_update()
 			device_debug::watchpoint *const wp = m_buffer[wpi];
 
 			linebuf.clear();
+			linebuf.rdbuf()->clear();
 			util::stream_format(linebuf, "%2X", wp->index());
 			pad_ostream_to_length(linebuf, tableBreaks[0]);
 			linebuf.put(wp->enabled() ? 'X' : 'O');

@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Sega Master System "Paddle Control" emulation
+    Sega Mark III "Paddle Control" emulation
 
 **********************************************************************/
 

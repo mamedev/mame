@@ -25,6 +25,7 @@ $( document ).ready(function() {
     $("div#navrow5 > ul.tablist").addClass("pagination pagination-sm pagination-centered");
     $("ul.tablist").css("margin-top", "0.5em");
     $("ul.tablist").css("margin-bottom", "0.5em");
+    $("ul.tablist").css("padding-right", "50px");
     $("li.current").addClass("active");
     $("iframe").attr("scrolling", "yes");
 
@@ -58,7 +59,7 @@ $( document ).ready(function() {
     $("div.ttname a").css("color", 'white');
     $("div.ttdef,div.ttdoc,div.ttdeci").addClass("panel-body");
 
-    $('#MSearchBox').parent().remove();
+    //$('#MSearchBox').parent().remove();
 
     //$('div.fragment.well div.line:first').css('margin-top', '15px');
     //$('div.fragment.well div.line:last').css('margin-bottom', '15px');

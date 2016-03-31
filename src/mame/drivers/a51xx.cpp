@@ -128,7 +128,7 @@ static MACHINE_CONFIG_START( a5120, a51xx_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", a51xx)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 MACHINE_CONFIG_END
 

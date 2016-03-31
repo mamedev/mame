@@ -63,7 +63,7 @@ MACHINE_START_MEMBER(cyberbal_state,cyberbal2p)
 MACHINE_START_MEMBER(cyberbal_state,cyberbal)
 {
 	MACHINE_START_CALL_MEMBER(cyberbal2p);
-	
+
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x1000);
 }
 

@@ -19,7 +19,7 @@ struct nbfilectx {
 	UINT8 filename[128];
 	UINT8 curdir[1024];
 	osd_directory *dirp;
-	osd_file *fd;
+	osd_file::ptr fd;
 	UINT64 filelen;
 	UINT32 bytecount;
 };

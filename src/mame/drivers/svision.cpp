@@ -470,10 +470,11 @@ DEVICE_IMAGE_LOAD_MEMBER( svision_state, svision_cart )
 
 void svision_state::machine_start()
 {
-	int num_banks;
+	int num_banks = 0;
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	num_banks = m_cart_rom->bytes() / 0x4000;
+	if (m_cart_rom)
+		num_banks = m_cart_rom->bytes() / 0x4000;
 
 	m_bank1 = membank("bank1");
 	m_bank2 = membank("bank2");

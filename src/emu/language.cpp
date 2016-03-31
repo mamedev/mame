@@ -41,7 +41,7 @@ void load_translation(emu_options &m_options)
 	strreplace(name, " ", "_");
 	strreplace(name, "(", "");
 	strreplace(name, ")", "");
-	if (file.open(name.c_str(), PATH_SEPARATOR "strings.mo") == FILERR_NONE)
+	if (file.open(name.c_str(), PATH_SEPARATOR "strings.mo") == osd_file::error::NONE)
 	{
 		UINT64 size = file.size();
 		UINT32 *buffer = global_alloc_array(UINT32, size / 4 + 1);

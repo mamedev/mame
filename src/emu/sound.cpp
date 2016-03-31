@@ -231,11 +231,11 @@ void sound_stream::set_input(int index, sound_stream *input_stream, int output_i
 
 	// make sure it's a valid input
 	if (index >= m_input.size())
-		fatalerror("Fatal error: stream_set_input attempted to configure non-existant input %d (%d max)\n", index, int(m_input.size()));
+		fatalerror("stream_set_input attempted to configure non-existant input %d (%d max)\n", index, int(m_input.size()));
 
 	// make sure it's a valid output
 	if (input_stream != nullptr && output_index >= input_stream->m_output.size())
-		fatalerror("Fatal error: stream_set_input attempted to use a non-existant output %d (%d max)\n", output_index, int(m_output.size()));
+		fatalerror("stream_set_input attempted to use a non-existant output %d (%d max)\n", output_index, int(m_output.size()));
 
 	// if this input is already wired, update the dependent info
 	stream_input &input = m_input[index];
@@ -1090,15 +1090,15 @@ void sound_manager::update(void *ptr, int param)
 	}
 
 	// iterate over all the streams and update them
-	for (sound_stream *stream = m_stream_list.first(); stream != nullptr; stream = stream->next())
-		stream->update_with_accounting(second_tick);
+	for (sound_stream &stream : m_stream_list)
+		stream.update_with_accounting(second_tick);
 
 	// remember the update time
 	m_last_update = curtime;
 
 	// update sample rates if they have changed
-	for (sound_stream *stream = m_stream_list.first(); stream != nullptr; stream = stream->next())
-		stream->apply_sample_rate_changes();
+	for (sound_stream &stream : m_stream_list)
+		stream.apply_sample_rate_changes();
 
 	g_profiler.stop();
 }

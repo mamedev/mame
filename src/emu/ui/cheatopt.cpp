@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-    ui/cheatopt.c
+    ui/cheatopt.cpp
 
     Internal menu for the cheat interface.
 
@@ -36,8 +36,8 @@ void ui_menu_cheat::handle()
 		/* handle reset all + reset all cheats for reload all option */
 		if ((menu_event->itemref == ITEMREF_CHEATS_RESET_ALL || menu_event->itemref == ITEMREF_CHEATS_RELOAD_ALL) && menu_event->iptkey == IPT_UI_SELECT)
 		{
-			for (cheat_entry *curcheat = machine().cheat().first(); curcheat != nullptr; curcheat = curcheat->next())
-				if (curcheat->select_default_state())
+			for (cheat_entry &curcheat : machine().cheat().entries())
+				if (curcheat.select_default_state())
 					changed = true;
 		}
 
@@ -124,12 +124,12 @@ void ui_menu_cheat::populate()
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 
 	// add other cheats
-	if (machine().cheat().first() != nullptr) {
-		for (cheat_entry *curcheat = machine().cheat().first(); curcheat != nullptr; curcheat = curcheat->next())
+	if (!machine().cheat().entries().empty()) {
+		for (cheat_entry &curcheat : machine().cheat().entries())
 		{
 			UINT32 flags;
-			curcheat->menu_text(text, subtext, flags);
-			item_append(text.c_str(), subtext.c_str(), flags, curcheat);
+			curcheat.menu_text(text, subtext, flags);
+			item_append(text.c_str(), subtext.c_str(), flags, &curcheat);
 		}
 
 		/* add a separator */
@@ -249,8 +249,6 @@ void ui_menu_autofire::handle()
 
 void ui_menu_autofire::populate()
 {
-	ioport_field *field;
-	ioport_port *port;
 	char temp_text[64];
 
 	/* add autofire toggle item */
@@ -260,16 +258,16 @@ void ui_menu_autofire::populate()
 
 	/* iterate over the input ports and add autofire toggle items */
 	int menu_items = 0;
-	for (port = machine().ioport().first_port(); port != nullptr; port = port->next())
+	for (ioport_port &port : machine().ioport().ports())
 	{
 		bool is_first_button = true;
-		for (field = port->first_field(); field != nullptr; field = field->next())
+		for (ioport_field &field : port.fields())
 		{
-			if ((field->name()) && ((field->type() >= IPT_BUTTON1 && field->type() <= IPT_BUTTON16))) // IPT_BUTTON1 + 15)))
+			if ((field.name()) && ((field.type() >= IPT_BUTTON1 && field.type() <= IPT_BUTTON16))) // IPT_BUTTON1 + 15)))
 			{
 				menu_items++;
 				ioport_field::user_settings settings;
-				field->get_user_settings(settings);
+				field.get_user_settings(settings);
 
 				if (is_first_button)
 				{
@@ -281,13 +279,13 @@ void ui_menu_autofire::populate()
 				if (!autofire_toggle)
 				{
 					// item is enabled and can be switched to values on/off
-					item_append(field->name(), (settings.autofire ? _("On") : _("Off")),
-							(settings.autofire ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW), (void *)field);
+					item_append(field.name(), (settings.autofire ? _("On") : _("Off")),
+							(settings.autofire ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW), (void *)&field);
 				}
 				else
 				{
 					// item is disabled
-					item_append(field->name(), (settings.autofire ? _("On") : _("Off")),
+					item_append(field.name(), (settings.autofire ? _("On") : _("Off")),
 							MENU_FLAG_DISABLE | MENU_FLAG_INVERT, nullptr);
 				}
 			}

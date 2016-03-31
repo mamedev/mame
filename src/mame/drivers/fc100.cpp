@@ -524,7 +524,7 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "vdg")
 	MCFG_GFXDECODE_ADD("gfxdecode", "f4palette", fc100)
-	MCFG_PALETTE_ADD_MONOCHROME_AMBER("f4palette")
+	MCFG_PALETTE_ADD_MONOCHROME("f4palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

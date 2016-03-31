@@ -158,7 +158,7 @@ void device_image_interface::device_compute_hash(hash_collection &hashes, const 
 image_error_t device_image_interface::set_image_filename(const char *filename)
 {
 	m_image_name = filename;
-	zippath_parent(m_working_directory, filename);
+	util::zippath_parent(m_working_directory, filename);
 	m_basename.assign(m_image_name);
 
 	size_t loc1 = m_image_name.find_last_of('\\');
@@ -199,9 +199,9 @@ image_error_t device_image_interface::set_image_filename(const char *filename)
 
 const image_device_format *device_image_interface::device_get_named_creatable_format(const char *format_name)
 {
-	for (const image_device_format *format = m_formatlist.first(); format != nullptr; format = format->next())
-		if (strcmp(format->name(), format_name) == 0)
-			return format;
+	for (const image_device_format &format : m_formatlist)
+		if (strcmp(format.name(), format_name) == 0)
+			return &format;
 	return nullptr;
 }
 
@@ -319,7 +319,7 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 
 	/* did we successfully identify the directory? */
 	if (success)
-		zippath_combine(m_working_directory, m_working_directory.c_str(), subdir);
+		util::zippath_combine(m_working_directory, m_working_directory.c_str(), subdir);
 
 	return success;
 }
@@ -330,11 +330,8 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 
 void device_image_interface::setup_working_directory()
 {
-	char *dst = nullptr;
-
-	osd_get_full_path(&dst,".");
 	/* first set up the working directory to be the starting directory */
-	m_working_directory = dst;
+	osd_get_full_path(m_working_directory, ".");
 
 	/* now try browsing down to "software" */
 	if (try_change_working_directory("software"))
@@ -346,7 +343,6 @@ void device_image_interface::setup_working_directory()
 			gamedrv = driver_list::compatible_with(gamedrv);
 		}
 	}
-	osd_free(dst);
 }
 
 //-------------------------------------------------
@@ -512,14 +508,14 @@ void device_image_interface::battery_load(void *buffer, int length, int fill)
 {
 	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
 
-	file_error filerr;
+	osd_file::error filerr;
 	int bytes_read = 0;
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
 
 	/* try to open the battery file and read it in, if possible */
 	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_READ);
 	filerr = file.open(fname.c_str());
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 		bytes_read = file.read(buffer, length);
 
 	/* fill remaining bytes (if necessary) */
@@ -530,14 +526,14 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 {
 	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
 
-	file_error filerr;
+	osd_file::error filerr;
 	int bytes_read = 0;
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
 
 	/* try to open the battery file and read it in, if possible */
 	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_READ);
 	filerr = file.open(fname.c_str());
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 		bytes_read = file.read(buffer, length);
 
 	/* if no file was present, copy the default battery */
@@ -558,8 +554,8 @@ void device_image_interface::battery_save(const void *buffer, int length)
 
 	/* try to open the battery file and write it out, if possible */
 	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	file_error filerr = file.open(fname.c_str());
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = file.open(fname.c_str());
+	if (filerr == osd_file::error::NONE)
 		file.write(buffer, length);
 }
 
@@ -615,37 +611,37 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
 	std::string revised_path;
 
 	/* attempt to read the file */
-	auto const filerr = zippath_fopen(path, open_flags, m_file, revised_path);
+	auto const filerr = util::zippath_fopen(path, open_flags, m_file, revised_path);
 
 	/* did the open succeed? */
 	switch(filerr)
 	{
-		case FILERR_NONE:
+		case osd_file::error::NONE:
 			/* success! */
 			m_readonly = (open_flags & OPEN_FLAG_WRITE) ? 0 : 1;
 			m_created = (open_flags & OPEN_FLAG_CREATE) ? 1 : 0;
 			err = IMAGE_ERROR_SUCCESS;
 			break;
 
-		case FILERR_NOT_FOUND:
-		case FILERR_ACCESS_DENIED:
+		case osd_file::error::NOT_FOUND:
+		case osd_file::error::ACCESS_DENIED:
 			/* file not found (or otherwise cannot open); continue */
 			err = IMAGE_ERROR_FILENOTFOUND;
 			break;
 
-		case FILERR_OUT_OF_MEMORY:
+		case osd_file::error::OUT_OF_MEMORY:
 			/* out of memory */
 			err = IMAGE_ERROR_OUTOFMEMORY;
 			break;
 
-		case FILERR_ALREADY_OPEN:
+		case osd_file::error::ALREADY_OPEN:
 			/* this shouldn't happen */
 			err = IMAGE_ERROR_ALREADYOPEN;
 			break;
 
-		case FILERR_FAILURE:
-		case FILERR_TOO_MANY_FILES:
-		case FILERR_INVALID_DATA:
+		case osd_file::error::FAILURE:
+		case osd_file::error::TOO_MANY_FILES:
+		case osd_file::error::INVALID_DATA:
 		default:
 			/* other errors */
 			err = IMAGE_ERROR_INTERNAL;
@@ -653,7 +649,7 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
 	}
 
 	/* if successful, set the file name */
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 		set_image_filename(revised_path.c_str());
 
 	return err;
@@ -667,37 +663,37 @@ int device_image_interface::reopen_for_write(const char *path)
 	std::string revised_path;
 
 	/* attempt to open the file for writing*/
-	auto const filerr = zippath_fopen(path, OPEN_FLAG_READ|OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, m_file, revised_path);
+	auto const filerr = util::zippath_fopen(path, OPEN_FLAG_READ|OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, m_file, revised_path);
 
 	/* did the open succeed? */
 	switch(filerr)
 	{
-		case FILERR_NONE:
+		case osd_file::error::NONE:
 			/* success! */
 			m_readonly = 0;
 			m_created = 1;
 			err = IMAGE_ERROR_SUCCESS;
 			break;
 
-		case FILERR_NOT_FOUND:
-		case FILERR_ACCESS_DENIED:
+		case osd_file::error::NOT_FOUND:
+		case osd_file::error::ACCESS_DENIED:
 			/* file not found (or otherwise cannot open); continue */
 			err = IMAGE_ERROR_FILENOTFOUND;
 			break;
 
-		case FILERR_OUT_OF_MEMORY:
+		case osd_file::error::OUT_OF_MEMORY:
 			/* out of memory */
 			err = IMAGE_ERROR_OUTOFMEMORY;
 			break;
 
-		case FILERR_ALREADY_OPEN:
+		case osd_file::error::ALREADY_OPEN:
 			/* this shouldn't happen */
 			err = IMAGE_ERROR_ALREADYOPEN;
 			break;
 
-		case FILERR_FAILURE:
-		case FILERR_TOO_MANY_FILES:
-		case FILERR_INVALID_DATA:
+		case osd_file::error::FAILURE:
+		case osd_file::error::TOO_MANY_FILES:
+		case osd_file::error::INVALID_DATA:
 		default:
 			/* other errors */
 			err = IMAGE_ERROR_INTERNAL;
@@ -705,7 +701,7 @@ int device_image_interface::reopen_for_write(const char *path)
 	}
 
 	/* if successful, set the file name */
-	if (filerr == FILERR_NONE)
+	if (filerr == osd_file::error::NONE)
 		set_image_filename(revised_path.c_str());
 
 	return err;
@@ -803,7 +799,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 			/* handle files */
 			if (ROMENTRY_ISFILE(romp))
 			{
-				file_error filerr = FILERR_NOT_FOUND;
+				osd_file::error filerr = osd_file::error::NOT_FOUND;
 
 				UINT32 crc = 0;
 				bool has_crc = hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
@@ -872,9 +868,9 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 
 				warningcount += verify_length_and_hash(m_mame_file.get(),ROM_GETNAME(romp),ROM_GETLENGTH(romp),hash_collection(ROM_GETHASHDATA(romp)));
 
-				if (filerr == FILERR_NONE)
+				if (filerr == osd_file::error::NONE)
 					filerr = util::core_file::open_proxy(*m_mame_file, m_file);
-				if (filerr == FILERR_NONE)
+				if (filerr == osd_file::error::NONE)
 					retVal = TRUE;
 
 				break; // load first item for start

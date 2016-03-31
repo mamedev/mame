@@ -142,6 +142,9 @@ public:
 	virtual void init(running_machine &machine) override;
 	virtual void update(bool skip_redraw) override;
 
+	// video overridables
+	virtual slider_state *get_slider_list() override;
+
 	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 
@@ -149,19 +152,11 @@ public:
 
 	virtual bool video_init() override;
 	virtual bool window_init() override;
-#ifdef USE_OLD_SDL_INPUT
-	virtual bool input_init() override;
-	virtual void input_pause() override;
-	virtual void input_resume() override;
-#endif
 	virtual bool output_init() override;
 	//virtual bool midi_init();
 
 	virtual void video_exit() override;
 	virtual void window_exit() override;
-#ifdef USE_OLD_SDL_INPUT
-	virtual void input_exit() override;
-#endif
 	virtual void output_exit() override;
 	//virtual void midi_exit();
 
@@ -173,6 +168,10 @@ public:
 
 	sdl_options &options() { return m_options; }
 
+protected:
+	virtual void build_slider_list() override;
+	virtual void update_slider_list() override;
+
 private:
 	virtual void osd_exit() override;
 
@@ -181,7 +180,7 @@ private:
 	sdl_options &m_options;
 
 	watchdog *m_watchdog;
-
+	slider_state *      m_sliders;
 };
 
 //============================================================

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /*********************************************************************
 
-    ui/m_selector.cpp
+    ui/selector.cpp
 
     Internal UI user interface.
 
@@ -18,13 +18,26 @@
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_selector::ui_menu_selector(running_machine &machine, render_container *container, std::vector<std::string> s_sel, UINT16 &s_actual, int category, int _hover)
-	: ui_menu(machine, container), m_selector(s_actual)
+ui_menu_selector::ui_menu_selector(running_machine &machine, render_container *container, std::vector<std::string> const &s_sel, UINT16 &s_actual, int category, int _hover)
+	: ui_menu(machine, container)
+	, m_selector(s_actual)
+	, m_category(category)
+	, m_hover(_hover)
+	, m_first_pass(true)
+	, m_str_items(s_sel)
 {
-	m_category = category;
-	m_first_pass = true;
-	m_hover = _hover;
-	m_str_items = s_sel;
+	m_search[0] = '\0';
+	m_searchlist[0] = nullptr;
+}
+
+ui_menu_selector::ui_menu_selector(running_machine &machine, render_container *container, std::vector<std::string> &&s_sel, UINT16 &s_actual, int category, int _hover)
+	: ui_menu(machine, container)
+	, m_selector(s_actual)
+	, m_category(category)
+	, m_hover(_hover)
+	, m_first_pass(true)
+	, m_str_items(std::move(s_sel))
+{
 	m_search[0] = '\0';
 	m_searchlist[0] = nullptr;
 }
@@ -53,13 +66,13 @@ void ui_menu_selector::handle()
 			switch (m_category)
 			{
 				case SELECTOR_INIFILE:
-					machine().inifile().current_file = m_selector;
-					machine().inifile().current_category = 0;
+					machine().inifile().set_file(m_selector);
+					machine().inifile().set_cat(0);
 					ui_menu::menu_stack->parent->reset(UI_MENU_RESET_REMEMBER_REF);
 					break;
 
 				case SELECTOR_CATEGORY:
-					machine().inifile().current_category = m_selector;
+					machine().inifile().set_cat(m_selector);
 					ui_menu::menu_stack->parent->reset(UI_MENU_RESET_REMEMBER_REF);
 					break;
 

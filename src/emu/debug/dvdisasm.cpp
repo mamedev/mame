@@ -66,9 +66,9 @@ debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_up
 
 	// count the number of comments
 	int total_comments = 0;
-	for (const debug_view_source *source = m_source_list.first(); source != nullptr; source = source->next())
+	for (const debug_view_source &source : m_source_list)
 	{
-		const debug_view_disasm_source &dasmsource = downcast<const debug_view_disasm_source &>(*source);
+		const debug_view_disasm_source &dasmsource = downcast<const debug_view_disasm_source &>(source);
 		total_comments += dasmsource.m_device.debug()->comment_count();
 	}
 
@@ -370,6 +370,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 
 	// allocate disassembly buffer
 	const auto total_bytes = m_total.x * m_total.y;
+	m_dasm.clear();
 	m_dasm.reserve(total_bytes).seekp(total_bytes);
 
 	// iterate over lines
@@ -387,6 +388,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 
 		// convert back and set the address of this instruction
 		m_byteaddress[instr] = pcbyte;
+		m_dasm.clear();
 		util::stream_format(m_dasm.seekp(base),
 			source.m_space.is_octal() ? " %0*o  " : " %0*X  ",
 			source.m_space.logaddrchars()/2*char_num, source.m_space.byte_to_address(pcbyte));

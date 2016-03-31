@@ -6,12 +6,10 @@ Shanghai
 
 driver by Nicola Salmoria
 
-The end of round animation in Shanghai is wrong; change the opcode at 0xfb1f2
-to a NOP to jump to it immediately at the beginning of a round.
-
-I'm not sure about the refresh rate, 60Hz makes time match the dip switch
-settings, but music runs too fast.
-
+TODO:
+- games are currently too fast (especially noticeable with kothello screen transitions), either irqs actually
+  fires every two frames or a HD63484 SR bit isn't behaving correctly;
+- minor glitch with gfx copy on shanghai stage info panel (garbage on right);
 
 * kothello
 
@@ -24,7 +22,7 @@ displayed.
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "audio/seibu.h"
-#include "video/hd63484.h"
+#include "video/h63484.h"
 
 
 class shanghai_state : public driver_device
@@ -32,19 +30,13 @@ class shanghai_state : public driver_device
 public:
 	shanghai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_hd63484(*this, "hd63484") { }
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<hd63484_device> m_hd63484;
 
 	DECLARE_WRITE16_MEMBER(shanghai_coin_w);
-	DECLARE_READ16_MEMBER(kothello_hd63484_status_r);
 
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(shanghai);
-
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 };
@@ -80,57 +72,6 @@ PALETTE_INIT_MEMBER(shanghai_state,shanghai)
 	}
 }
 
-void shanghai_state::video_start()
-{
-}
-
-UINT32 shanghai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int x, y, b, src;
-
-	address_space &space = machine().driver_data()->generic_space();
-	b = ((m_hd63484->regs_r(space, 0xcc/2, 0xffff) & 0x000f) << 16) + m_hd63484->regs_r(space, 0xce/2, 0xffff);
-	for (y = 0; y < 280; y++)
-	{
-		for (x = 0 ; x < (m_hd63484->regs_r(space, 0xca/2, 0xffff) & 0x0fff) * 2 ; x += 2)
-		{
-			b &= (HD63484_RAM_SIZE - 1);
-			src = m_hd63484->ram_r(space, b, 0xffff);
-			bitmap.pix16(y, x)     = src & 0x00ff;
-			bitmap.pix16(y, x + 1) = (src & 0xff00) >> 8;
-			b++;
-		}
-	}
-
-	if ((m_hd63484->regs_r(space, 0x06/2, 0xffff) & 0x0300) == 0x0300)
-	{
-		int sy = (m_hd63484->regs_r(space, 0x94/2, 0xffff) & 0x0fff) - (m_hd63484->regs_r(space, 0x88/2, 0xffff) >> 8);
-		int h = m_hd63484->regs_r(space, 0x96/2, 0xffff) & 0x0fff;
-		int sx = ((m_hd63484->regs_r(space, 0x92/2, 0xffff) >> 8) - (m_hd63484->regs_r(space, 0x84/2, 0xffff) >> 8)) * 4;
-		int w = (m_hd63484->regs_r(space, 0x92/2, 0xffff) & 0xff) * 4;
-		if (sx < 0) sx = 0; // not sure about this (shangha2 title screen)
-
-		b = (((m_hd63484->regs_r(space, 0xdc/2, 0xffff) & 0x000f) << 16) + m_hd63484->regs_r(space, 0xde/2, 0xffff));
-
-		for (y = sy ; y <= sy + h && y < 280 ; y++)
-		{
-			for (x = 0 ; x < (m_hd63484->regs_r(space, 0xca/2, 0xffff) & 0x0fff) * 2 ; x += 2)
-			{
-				b &= (HD63484_RAM_SIZE - 1);
-				src = m_hd63484->ram_r(space, b, 0xffff);
-				if (x <= w && x + sx >= 0 && x + sx < (m_hd63484->regs_r(space, 0xca/2, 0xffff) & 0x0fff) * 2)
-				{
-					bitmap.pix16(y, x + sx)     = src & 0x00ff;
-					bitmap.pix16(y, x + sx + 1) = (src & 0xff00) >> 8;
-				}
-				b++;
-			}
-		}
-	}
-
-	return 0;
-}
-
 INTERRUPT_GEN_MEMBER(shanghai_state::interrupt)
 {
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x80);
@@ -159,8 +100,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( shanghai_portmap, AS_IO, 16, shanghai_state )
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8("ymsnd", ym2203_device, read, write, 0x00ff)
 	AM_RANGE(0x40, 0x41) AM_READ_PORT("P1")
 	AM_RANGE(0x44, 0x45) AM_READ_PORT("P2")
@@ -173,21 +114,16 @@ static ADDRESS_MAP_START( shangha2_portmap, AS_IO, 16, shanghai_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1")
 	AM_RANGE(0x10, 0x11) AM_READ_PORT("P2")
 	AM_RANGE(0x20, 0x21) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
-	AM_RANGE(0x32, 0x33) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
+	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w)
+	AM_RANGE(0x32, 0x33) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("ymsnd", ym2203_device, read, write, 0x00ff)
 	AM_RANGE(0x50, 0x51) AM_WRITE(shanghai_coin_w)
 ADDRESS_MAP_END
 
-READ16_MEMBER(shanghai_state::kothello_hd63484_status_r)
-{
-	return 0xff22;  /* write FIFO ready + command end + read FIFO ready */
-}
-
 static ADDRESS_MAP_START( kothello_map, AS_PROGRAM, 16, shanghai_state )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08010, 0x08011) AM_READ(kothello_hd63484_status_r) AM_DEVWRITE("hd63484", hd63484_device, address_w)
-	AM_RANGE(0x08012, 0x08013) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
+	AM_RANGE(0x08010, 0x08011) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w)
+	AM_RANGE(0x08012, 0x08013) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w)
 	AM_RANGE(0x09010, 0x09011) AM_READ_PORT("P1")
 	AM_RANGE(0x09012, 0x09013) AM_READ_PORT("P2")
 	AM_RANGE(0x09014, 0x09015) AM_READ_PORT("SYSTEM")
@@ -418,6 +354,9 @@ static INPUT_PORTS_START( shangha2 )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
+static ADDRESS_MAP_START( h63484_map, AS_0, 16, shanghai_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM
+ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( shanghai, shanghai_state )
 
@@ -429,18 +368,18 @@ static MACHINE_CONFIG_START( shanghai, shanghai_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_REFRESH_RATE(57)
+	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(384, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
-	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
+	MCFG_SCREEN_UPDATE_DEVICE("h63484", h63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_PALETTE_INIT_OWNER(shanghai_state,shanghai)
 
-	// TODO: convert to use H63484
-	MCFG_DEVICE_ADD("hd63484", HD63484, 0)
+	MCFG_H63484_ADD("h63484", 0, h63484_map)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -465,17 +404,17 @@ static MACHINE_CONFIG_START( shangha2, shanghai_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_REFRESH_RATE(57)
+	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(384, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
-	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
+	MCFG_SCREEN_UPDATE_DEVICE("h63484", h63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	// TODO: convert to use H63484
-	MCFG_DEVICE_ADD("hd63484", HD63484, 0)
+	MCFG_H63484_ADD("h63484", 0, h63484_map)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -503,17 +442,17 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30) /* Should be 57Hz, but plays too fast */
+	MCFG_SCREEN_REFRESH_RATE(57)
+	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(384, 280)
-	MCFG_SCREEN_VISIBLE_AREA(8, 384-1, 0, 250-1) // Base Screen is 376 pixel
-	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
+	MCFG_SCREEN_UPDATE_DEVICE("h63484", h63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	// TODO: convert to use H63484
-	MCFG_DEVICE_ADD("hd63484", HD63484, 0)
+	MCFG_H63484_ADD("h63484", 0, h63484_map)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

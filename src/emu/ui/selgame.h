@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /***************************************************************************
 
     ui/selgame.h
@@ -40,7 +40,8 @@ private:
 	enum
 	{
 		CONF_OPTS = 1,
-		CONF_MACHINE,
+//      CONF_MACHINE,
+		CONF_PLUGINS,
 	};
 
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };

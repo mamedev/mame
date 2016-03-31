@@ -2,7 +2,7 @@
 // copyright-holders:Maurizio Petrarota
 /***************************************************************************
 
-    ui/moptions.c
+    ui/moptions.cpp
 
     UI main options manager.
 
@@ -19,26 +19,27 @@
 const options_entry ui_options::s_option_entries[] =
 {
 	// seach path options
-	{ nullptr,                              nullptr,            OPTION_HEADER,  "UI SEARCH PATH OPTIONS" },
-	{ OPTION_HISTORY_PATH,                  "history;dats;.",   OPTION_STRING,  "path to history files" },
-	{ OPTION_EXTRAINI_PATH,                 "folders",          OPTION_STRING,  "path to extra ini files" },
-	{ OPTION_CABINETS_PATH,                 "cabinets;cabdevs", OPTION_STRING,  "path to cabinets / devices image" },
-	{ OPTION_CPANELS_PATH,                  "cpanel",           OPTION_STRING,  "path to control panel image" },
-	{ OPTION_PCBS_PATH,                     "pcb",              OPTION_STRING,  "path to pcbs image" },
-	{ OPTION_FLYERS_PATH,                   "flyers",           OPTION_STRING,  "path to flyers image" },
-	{ OPTION_TITLES_PATH,                   "titles",           OPTION_STRING,  "path to titles image" },
-	{ OPTION_ENDS_PATH,                     "ends",             OPTION_STRING,  "path to ends image" },
-	{ OPTION_MARQUEES_PATH,                 "marquees",         OPTION_STRING,  "path to marquees image" },
-	{ OPTION_ARTPREV_PATH,                  "artwork preview",  OPTION_STRING,  "path to artwork preview image" },
-	{ OPTION_BOSSES_PATH,                   "bosses",           OPTION_STRING,  "path to bosses image" },
-	{ OPTION_LOGOS_PATH,                    "logo",             OPTION_STRING,  "path to logos image" },
-	{ OPTION_SCORES_PATH,                   "scores",           OPTION_STRING,  "path to scores image" },
-	{ OPTION_VERSUS_PATH,                   "versus",           OPTION_STRING,  "path to versus image" },
-	{ OPTION_GAMEOVER_PATH,                 "gameover",         OPTION_STRING,  "path to gameover image" },
-	{ OPTION_HOWTO_PATH,                    "howto",            OPTION_STRING,  "path to howto image" },
-	{ OPTION_SELECT_PATH,                   "select",           OPTION_STRING,  "path to select image" },
-	{ OPTION_ICONS_PATH,                    "icons",            OPTION_STRING,  "path to ICOns image" },
-	{ OPTION_UI_PATH,                       "ui",               OPTION_STRING,  "path to UI files" },
+	{ nullptr,                              nullptr,                       OPTION_HEADER,  "UI SEARCH PATH OPTIONS" },
+	{ OPTION_HISTORY_PATH,                  "history;dats;.",              OPTION_STRING,  "path to history files" },
+	{ OPTION_EXTRAINI_PATH,                 "folders",                     OPTION_STRING,  "path to extra ini files" },
+	{ OPTION_CABINETS_PATH,                 "cabinets;cabdevs",            OPTION_STRING,  "path to cabinets / devices image" },
+	{ OPTION_CPANELS_PATH,                  "cpanel",                      OPTION_STRING,  "path to control panel image" },
+	{ OPTION_PCBS_PATH,                     "pcb",                         OPTION_STRING,  "path to pcbs image" },
+	{ OPTION_FLYERS_PATH,                   "flyers",                      OPTION_STRING,  "path to flyers image" },
+	{ OPTION_TITLES_PATH,                   "titles",                      OPTION_STRING,  "path to titles image" },
+	{ OPTION_ENDS_PATH,                     "ends",                        OPTION_STRING,  "path to ends image" },
+	{ OPTION_MARQUEES_PATH,                 "marquees",                    OPTION_STRING,  "path to marquees image" },
+	{ OPTION_ARTPREV_PATH,                  "artwork preview;artpreview",  OPTION_STRING,  "path to artwork preview image" },
+	{ OPTION_BOSSES_PATH,                   "bosses",                      OPTION_STRING,  "path to bosses image" },
+	{ OPTION_LOGOS_PATH,                    "logo",                        OPTION_STRING,  "path to logos image" },
+	{ OPTION_SCORES_PATH,                   "scores",                      OPTION_STRING,  "path to scores image" },
+	{ OPTION_VERSUS_PATH,                   "versus",                      OPTION_STRING,  "path to versus image" },
+	{ OPTION_GAMEOVER_PATH,                 "gameover",                    OPTION_STRING,  "path to gameover image" },
+	{ OPTION_HOWTO_PATH,                    "howto",                       OPTION_STRING,  "path to howto image" },
+	{ OPTION_SELECT_PATH,                   "select",                      OPTION_STRING,  "path to select image" },
+	{ OPTION_ICONS_PATH,                    "icons",                       OPTION_STRING,  "path to ICOns image" },
+	{ OPTION_COVER_PATH,                    "covers",                      OPTION_STRING,  "path to software cover image" },
+	{ OPTION_UI_PATH,                       "ui",                          OPTION_STRING,  "path to UI files" },
 
 	// misc options
 	{ nullptr,                              nullptr,    OPTION_HEADER,      "UI MISC OPTIONS" },

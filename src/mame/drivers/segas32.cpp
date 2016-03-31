@@ -3020,6 +3020,12 @@ ROM_END
  **************************************************************************************************************************
     Arabian Fight (Export)
     protected via a custom V25 with encrypted code
+
+    Sega Game ID codes:
+       Game BD: 833-8646-05 ARABIAN FIGHT
+    Rom PCB No: 833-8647-02
+   V25 sub PCB: 834-8529-01
+     A/D BD NO. 837-7968
 */
 ROM_START( arabfgt )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */

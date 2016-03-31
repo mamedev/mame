@@ -41,6 +41,23 @@ template<class _ElementType>
 class simple_list final
 {
 public:
+	class auto_iterator
+	{
+public:
+		// construction/destruction
+		auto_iterator(_ElementType *ptr) noexcept : m_current(ptr) { }
+
+		// required operator overrides
+		bool operator!=(const auto_iterator &iter) const noexcept { return m_current != iter.m_current; }
+		_ElementType &operator*() const noexcept { return *m_current; }
+		// note that _ElementType::next() must not return a const ptr
+		const auto_iterator &operator++() noexcept { m_current = m_current->next(); return *this; }
+
+private:
+		// private state
+		_ElementType *m_current;
+	};
+
 	// we don't support deep copying
 	simple_list(const simple_list &) = delete;
 	simple_list &operator=(const simple_list &) = delete;
@@ -57,16 +74,21 @@ public:
 	_ElementType *first() const noexcept { return m_head; }
 	_ElementType *last() const noexcept { return m_tail; }
 	int count() const noexcept { return m_count; }
+	bool empty() const noexcept { return m_count == 0; }
+
+	// range iterators
+	auto_iterator begin() const noexcept { return auto_iterator(m_head); }
+	auto_iterator end() const noexcept { return auto_iterator(nullptr); }
 
 	// remove (free) all objects in the list, leaving an empty list
-	void reset()
+	void reset() noexcept
 	{
 		while (m_head != nullptr)
 			remove(*m_head);
 	}
 
 	// add the given object to the head of the list
-	_ElementType &prepend(_ElementType &object)
+	_ElementType &prepend(_ElementType &object) noexcept
 	{
 		object.m_next = m_head;
 		m_head = &object;

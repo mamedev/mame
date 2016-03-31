@@ -5,8 +5,6 @@
 	*                                                                          *
 	*                  Copyright Tony La Porta                                 *
 	*               To be used with TMS32010 DSP Emulator engine.              *
-	*      You are not allowed to distribute this software commercially.       *
-	*                      Written for the MAME project.                       *
 	*                                                                          *
 	*         Many thanks to those involved in the i8039 Disassembler          *
 	*                        as this was based on it.                          *

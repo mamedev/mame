@@ -305,7 +305,7 @@ void gaelco_serial_device::sync_link()
 		/* stop if not connected .. */
 		if ((m_out_ptr->stat & GAELCOSER_STATUS_RESET) != 0)
 			breakme = 0;
-		
+
 	} while (breakme);
 
 	m_slack_cnt++;

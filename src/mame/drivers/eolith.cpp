@@ -36,7 +36,8 @@
   1999 - Land Breaker (pcb ver 3.03) (MCU internal flash dump is missing)
   1999 - Land Breaker (pcb ver 3.02)
   1999 - New Hidden Catch (pcb ver 3.02)
-  1999 - Penfan Girls
+  1999 - Penfan Girls (set 1, pcb ver 3.03)
+  1999 - Penfan Girls (set 2, pcb ver 3.03P)
   2000 - Hidden Catch 3 (v. 1.00 / pcb ver 3.05)
   2001 - Fortress 2 Blue Arcade (v. 1.01 / pcb ver 3.05)
   2001 - Fortress 2 Blue Arcade (v. 1.00 / pcb ver 3.05)
@@ -1199,8 +1200,9 @@ ROM_START( penfana )
 	ROM_LOAD32_WORD_SWAP( "11.u11", 0x1400002, 0x200000, CRC(ddcd2bae) SHA1(c4fa5ebbaf801a7f06222150658033955966fe1b) )
 	ROM_LOAD32_WORD_SWAP( "12.u17", 0x1800000, 0x200000, CRC(2eed0f64) SHA1(3b9e65e41d8699a93ea74225ba12a3f66ecba11d) )
 	ROM_LOAD32_WORD_SWAP( "13.u12", 0x1800002, 0x200000, CRC(cc3068a8) SHA1(0022fad5a4d36678d35e99092c870f2b99d3d8d4) )
-	ROM_LOAD32_WORD_SWAP( "14.u18", 0x1c00000, 0x200000, CRC(20a9a08e) SHA1(fe4071cdf78d362bccaee92cdc70c66f7e30f817) ) // not checked by rom check
-	ROM_LOAD32_WORD_SWAP( "15.u13", 0x1c00002, 0x200000, CRC(872fa9c4) SHA1(4902faa97c9a3a9671cfefc6a711cfcd25f2d6bc) ) // not checked by rom check
+	// The 3.03P version doesn't even have these populated
+	//ROM_LOAD32_WORD_SWAP( "14.u18", 0x1c00000, 0x200000, CRC(20a9a08e) SHA1(fe4071cdf78d362bccaee92cdc70c66f7e30f817) ) // not checked by rom check
+	//ROM_LOAD32_WORD_SWAP( "15.u13", 0x1c00002, 0x200000, CRC(872fa9c4) SHA1(4902faa97c9a3a9671cfefc6a711cfcd25f2d6bc) ) // not checked by rom check
 
 	ROM_REGION( 0x008000, "soundcpu", 0 ) /* Sound (80c301) CPU Code */
 	ROM_LOAD( "pfg.u111", 0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) )

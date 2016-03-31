@@ -130,7 +130,7 @@ video_manager::video_manager(running_machine &machine)
 	// the native target is hard-coded to our internal layout and has all options disabled
 	if (m_snap_native)
 	{
-		m_snap_target = machine.render().target_alloc(layout_snap, RENDER_CREATE_SINGLE_FILE | RENDER_CREATE_HIDDEN);
+		m_snap_target = machine.render().target_alloc(&layout_snap, RENDER_CREATE_SINGLE_FILE | RENDER_CREATE_HIDDEN);
 		m_snap_target->set_backdrops_enabled(false);
 		m_snap_target->set_overlays_enabled(false);
 		m_snap_target->set_bezels_enabled(false);
@@ -350,8 +350,8 @@ void video_manager::save_active_screen_snapshots()
 			if (machine().render().is_live(*screen))
 			{
 				emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-				file_error filerr = open_next(file, "png");
-				if (filerr == FILERR_NONE)
+				osd_file::error filerr = open_next(file, "png");
+				if (filerr == osd_file::error::NONE)
 					save_snapshot(screen, file);
 			}
 	}
@@ -360,8 +360,8 @@ void video_manager::save_active_screen_snapshots()
 	else
 	{
 		emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		file_error filerr = open_next(file, "png");
-		if (filerr == FILERR_NONE)
+		osd_file::error filerr = open_next(file, "png");
+		if (filerr == osd_file::error::NONE)
 			save_snapshot(nullptr, file);
 	}
 }
@@ -428,7 +428,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 
 		// build up information about this new movie
 		screen_device *screen = machine().first_screen();
-		avi_movie_info info;
+		avi_file::movie_info info;
 		info.video_format = 0;
 		info.video_timescale = 1000 * ((screen != nullptr) ? ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds()) : screen_device::DEFAULT_FRAME_RATE);
 		info.video_sampletime = 1000;
@@ -446,7 +446,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		info.audio_samplerate = machine().sample_rate();
 
 		// create a new temporary movie file
-		file_error filerr;
+		osd_file::error filerr;
 		std::string fullpath;
 		{
 			emu_file tempfile(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -456,20 +456,20 @@ void video_manager::begin_recording(const char *name, movie_format format)
 				filerr = open_next(tempfile, "avi");
 
 			// if we succeeded, make a copy of the name and create the real file over top
-			if (filerr == FILERR_NONE)
+			if (filerr == osd_file::error::NONE)
 				fullpath = tempfile.fullpath();
 		}
 
-		if (filerr == FILERR_NONE)
+		if (filerr == osd_file::error::NONE)
 		{
 			// compute the frame time
 			m_avi_frame_period = attotime::from_seconds(1000) / info.video_timescale;
 
 			// create the file and free the string
-			avi_error avierr = avi_create(fullpath.c_str(), &info, &m_avi_file);
-			if (avierr != AVIERR_NONE)
+			avi_file::error avierr = avi_file::create(fullpath, info, m_avi_file);
+			if (avierr != avi_file::error::NONE)
 			{
-				osd_printf_error("Error creating AVI: %s\n", avi_error_string(avierr));
+				osd_printf_error("Error creating AVI: %s\n", avi_file::error_string(avierr));
 				return end_recording(format);
 			}
 		}
@@ -487,13 +487,13 @@ void video_manager::begin_recording(const char *name, movie_format format)
 
 		// create a new movie file and start recording
 		m_mng_file = std::make_unique<emu_file>(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		file_error filerr;
+		osd_file::error filerr;
 		if (name != nullptr)
 			filerr = m_mng_file->open(name);
 		else
 			filerr = open_next(*m_mng_file, "mng");
 
-		if (filerr == FILERR_NONE)
+		if (filerr == osd_file::error::NONE)
 		{
 			// start the capture
 			screen_device *screen = machine().first_screen();
@@ -510,7 +510,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		}
 		else
 		{
-			osd_printf_error("Error creating MNG, file_error=%d\n", filerr);
+			osd_printf_error("Error creating MNG, osd_file::error=%d\n", int(filerr));
 			m_mng_file.reset();
 		}
 	}
@@ -526,10 +526,9 @@ void video_manager::end_recording(movie_format format)
 	if (format == MF_AVI)
 	{
 		// close the file if it exists
-		if (m_avi_file != nullptr)
+		if (m_avi_file)
 		{
-			avi_close(m_avi_file);
-			m_avi_file = nullptr;
+			m_avi_file.reset();
 
 			// reset the state
 			m_avi_frame = 0;
@@ -563,10 +562,10 @@ void video_manager::add_sound_to_recording(const INT16 *sound, int numsamples)
 		g_profiler.start(PROFILER_MOVIE_REC);
 
 		// write the next frame
-		avi_error avierr = avi_append_sound_samples(m_avi_file, 0, sound + 0, numsamples, 1);
-		if (avierr == AVIERR_NONE)
-			avierr = avi_append_sound_samples(m_avi_file, 1, sound + 1, numsamples, 1);
-		if (avierr != AVIERR_NONE)
+		avi_file::error avierr = m_avi_file->append_sound_samples(0, sound + 0, numsamples, 1);
+		if (avierr == avi_file::error::NONE)
+			avierr = m_avi_file->append_sound_samples(1, sound + 1, numsamples, 1);
+		if (avierr != avi_file::error::NONE)
 			end_recording(MF_AVI);
 
 		g_profiler.stop();
@@ -1091,8 +1090,8 @@ void video_manager::recompute_speed(const attotime &emutime)
 		{
 			// create a final screenshot
 			emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			file_error filerr = file.open(machine().basename(), PATH_SEPARATOR "final.png");
-			if (filerr == FILERR_NONE)
+			osd_file::error filerr = file.open(machine().basename(), PATH_SEPARATOR "final.png");
+			if (filerr == osd_file::error::NONE)
 				save_snapshot(screen, file);
 		}
 		//printf("Scheduled exit at %f\n", emutime.as_double());
@@ -1150,7 +1149,7 @@ void video_manager::create_snapshot_bitmap(screen_device *screen)
 //  scheme
 //-------------------------------------------------
 
-file_error video_manager::open_next(emu_file &file, const char *extension)
+osd_file::error video_manager::open_next(emu_file &file, const char *extension)
 {
 	UINT32 origflags = file.openflags();
 
@@ -1260,8 +1259,8 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 			strreplace(fname, "%i", string_format("%04d", seq).c_str());
 
 			// try to open the file; stop when we fail
-			file_error filerr = file.open(fname.c_str());
-			if (filerr != FILERR_NONE)
+			osd_file::error filerr = file.open(fname.c_str());
+			if (filerr != osd_file::error::NONE)
 				break;
 		}
 	}
@@ -1296,8 +1295,8 @@ void video_manager::record_frame()
 		while (m_avi_next_frame_time <= curtime)
 		{
 			// write the next frame
-			avi_error avierr = avi_append_video_frame(m_avi_file, m_snap_bitmap);
-			if (avierr != AVIERR_NONE)
+			avi_file::error avierr = m_avi_file->append_video_frame(m_snap_bitmap);
+			if (avierr != avi_file::error::NONE)
 			{
 				g_profiler.stop();
 				end_recording(MF_AVI);

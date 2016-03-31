@@ -568,6 +568,7 @@ public:
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb) override;
 
 	ibm8514a_device* get_8514() { return m_8514; }
 protected:

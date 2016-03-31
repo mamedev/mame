@@ -10,6 +10,12 @@
 #define __WIN_D3DCOMM__
 
 //============================================================
+//  CONSTANTS
+//============================================================
+
+#define MAX_BLOOM_COUNT 15 // shader model 3.0 support up to 16 samplers, but we need the last for the original texture
+
+//============================================================
 //  FORWARD DECLARATIONS
 //============================================================
 
@@ -112,34 +118,34 @@ public:
 
 	render_texinfo &        get_texinfo() { return m_texinfo; }
 
-	int                     get_width() { return m_rawdims.c.x; }
-	int                     get_height() { return m_rawdims.c.y; }
-	int                     get_xscale() { return m_xprescale; }
-	int                     get_yscale() { return m_yprescale; }
+	int                     get_width() const { return m_rawdims.c.x; }
+	int                     get_height() const { return m_rawdims.c.y; }
+	int                     get_xscale() const { return m_xprescale; }
+	int                     get_yscale() const { return m_yprescale; }
 
-	UINT32                  get_flags() { return m_flags; }
+	UINT32                  get_flags() const { return m_flags; }
 
 	void                    set_data(const render_texinfo *texsource, UINT32 flags);
 
-	texture_info *          get_next() { return m_next; }
-	texture_info *          get_prev() { return m_prev; }
+	texture_info *          get_next() const { return m_next; }
+	texture_info *          get_prev() const { return m_prev; }
 
-	UINT32                  get_hash() { return m_hash; }
+	UINT32                  get_hash() const { return m_hash; }
 
 	void                    set_next(texture_info *next) { m_next = next; }
 	void                    set_prev(texture_info *prev) { m_prev = prev; }
 
-	bool                    paused() { return m_cur_frame == m_prev_frame; }
+	bool                    paused() const { return m_cur_frame == m_prev_frame; }
 	void                    advance_frame() { m_prev_frame = m_cur_frame; }
 	void                    increment_frame_count() { m_cur_frame++; }
 	void                    mask_frame_count(int mask) { m_cur_frame %= mask; }
 
-	int                     get_cur_frame() { return m_cur_frame; }
-	int                     get_prev_frame() { return m_prev_frame; }
+	int                     get_cur_frame() const { return m_cur_frame; }
+	int                     get_prev_frame() const { return m_prev_frame; }
 
-	texture *               get_tex() { return m_d3dtex; }
-	surface *               get_surface() { return m_d3dsurface; }
-	texture *               get_finaltex() { return m_d3dfinaltex; }
+	texture *               get_tex() const { return m_d3dtex; }
+	surface *               get_surface() const { return m_d3dsurface; }
+	texture *               get_finaltex() const { return m_d3dfinaltex; }
 
 	vec2f &                 get_uvstart() { return m_start; }
 	vec2f &                 get_uvstop() { return m_stop; }
@@ -187,19 +193,20 @@ public:
 			float line_time, float line_length,
 			float prim_width, float prim_height);
 
-	D3DPRIMITIVETYPE        get_type() { return m_type; }
-	UINT32                  get_count() { return m_count; }
-	UINT32                  get_vertcount() { return m_numverts; }
-	UINT32                  get_flags() { return m_flags; }
+	// TODO: Remove needless 'get_' prefix
+	D3DPRIMITIVETYPE        get_type() const { return m_type; }
+	UINT32                  get_count() const { return m_count; }
+	UINT32                  get_vertcount() const { return m_numverts; }
+	UINT32                  get_flags() const { return m_flags; }
 
-	texture_info *     get_texture() { return m_texture; }
-	DWORD                   get_modmode() { return m_modmode; }
+	texture_info *          get_texture() const { return m_texture; }
+	DWORD                   get_modmode() const { return m_modmode; }
 
-	float                   get_line_time() { return m_line_time; }
-	float                   get_line_length() { return m_line_length; }
+	float                   get_line_time() const { return m_line_time; }
+	float                   get_line_length() const { return m_line_length; }
 
-	float                   get_prim_width() { return m_prim_width; }
-	float                   get_prim_height() { return m_prim_height; }
+	float                   get_prim_width() const { return m_prim_width; }
+	float                   get_prim_height() const { return m_prim_height; }
 
 private:
 
@@ -244,7 +251,7 @@ public:
 	cache_target() { }
 	~cache_target();
 
-	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int width, int height, int prescale_x, int prescale_y);
+	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height);
 
 	surface *last_target;
 	texture *last_texture;
@@ -269,31 +276,34 @@ public:
 	d3d_render_target() { }
 	~d3d_render_target();
 
-	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int width, int height, int prescale_x, int prescale_y);
+	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height);
 	int next_index(int index) { return ++index > 1 ? 0 : index; }
 
+	// real target dimension
 	int target_width;
 	int target_height;
 
-	int prescale_x;
-	int prescale_y;
-
+	// only used to identify/find the render target
 	int width;
 	int height;
 
 	int screen_index;
 	int page_index;
 
-	surface *prescale_target[2];
-	texture *prescale_texture[2];
-	surface *native_target[2];
-	texture *native_texture[2];
+	surface *target_surface[2];
+	texture *target_texture[2];
+	surface *source_surface[2];
+	texture *source_texture[2];
 
 	d3d_render_target *next;
 	d3d_render_target *prev;
 
-	surface *bloom_target[11];
-	texture *bloom_texture[11];
+	surface *bloom_surface[MAX_BLOOM_COUNT];
+	texture *bloom_texture[MAX_BLOOM_COUNT];
+
+	float bloom_dims[MAX_BLOOM_COUNT][2];
+
+	int bloom_count;
 };
 
 #endif

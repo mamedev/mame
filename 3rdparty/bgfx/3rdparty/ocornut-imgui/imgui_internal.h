@@ -152,14 +152,15 @@ inline void operator delete(void*, ImPlacementNewDummy, void*) {}
 
 enum ImGuiButtonFlags_
 {
-    ImGuiButtonFlags_Repeat             = 1 << 0,
-    ImGuiButtonFlags_PressedOnClick     = 1 << 1,   // return pressed on click only (default requires click+release)
-    ImGuiButtonFlags_PressedOnRelease   = 1 << 2,   // return pressed on release only (default requires click+release)
-    ImGuiButtonFlags_FlattenChilds      = 1 << 3,
-    ImGuiButtonFlags_DontClosePopups    = 1 << 4,
-    ImGuiButtonFlags_Disabled           = 1 << 5,
-    ImGuiButtonFlags_AlignTextBaseLine  = 1 << 6,
-    ImGuiButtonFlags_NoKeyModifiers     = 1 << 7
+    ImGuiButtonFlags_Repeat                 = 1 << 0,   // hold to repeat
+    ImGuiButtonFlags_PressedOnClick         = 1 << 1,   // return pressed on click (default requires click+release)
+    ImGuiButtonFlags_PressedOnRelease       = 1 << 2,   // return pressed on release (default requires click+release)
+    ImGuiButtonFlags_PressedOnDoubleClick   = 1 << 3,   // return pressed on double-click (default requires click+release)
+    ImGuiButtonFlags_FlattenChilds          = 1 << 4,   // allow interaction even if a child window is overlapping
+    ImGuiButtonFlags_DontClosePopups        = 1 << 5,   // disable automatically closing parent popup on press
+    ImGuiButtonFlags_Disabled               = 1 << 6,   // disable interaction
+    ImGuiButtonFlags_AlignTextBaseLine      = 1 << 7,   // vertically align button to match text baseline - ButtonEx() only
+    ImGuiButtonFlags_NoKeyModifiers         = 1 << 8    // disable interaction if a key modifier is held
 };
 
 enum ImGuiTreeNodeFlags_
@@ -176,10 +177,10 @@ enum ImGuiSliderFlags_
 enum ImGuiSelectableFlagsPrivate_
 {
     // NB: need to be in sync with last value of ImGuiSelectableFlags_
-    ImGuiSelectableFlags_Menu               = 1 << 2,
-    ImGuiSelectableFlags_MenuItem           = 1 << 3,
-    ImGuiSelectableFlags_Disabled           = 1 << 4,
-    ImGuiSelectableFlags_DrawFillAvailWidth = 1 << 5
+    ImGuiSelectableFlags_Menu               = 1 << 3,
+    ImGuiSelectableFlags_MenuItem           = 1 << 4,
+    ImGuiSelectableFlags_Disabled           = 1 << 5,
+    ImGuiSelectableFlags_DrawFillAvailWidth = 1 << 6
 };
 
 // FIXME: this is in development, not exposed/functional as a generic feature yet.
@@ -355,7 +356,7 @@ struct ImGuiState
     ImFont*                 Font;                               // (Shortcut) == FontStack.empty() ? IO.Font : FontStack.back()
     float                   FontSize;                           // (Shortcut) == FontBaseSize * g.CurrentWindow->FontWindowScale == window->FontSize()
     float                   FontBaseSize;                       // (Shortcut) == IO.FontGlobalScale * Font->Scale * Font->FontSize. Size of characters.
-    ImVec2                  FontTexUvWhitePixel;                // (Shortcut) == Font->TexUvForWhite
+    ImVec2                  FontTexUvWhitePixel;                // (Shortcut) == Font->TexUvWhitePixel
 
     float                   Time;
     int                     FrameCount;
@@ -434,8 +435,8 @@ struct ImGuiState
     float                   FramerateSecPerFrame[120];          // calculate estimate of framerate for user
     int                     FramerateSecPerFrameIdx;
     float                   FramerateSecPerFrameAccum;
-    bool                    CaptureMouseNextFrame;              // explicit capture via CaptureInputs() sets those flags
-    bool                    CaptureKeyboardNextFrame;
+    int                     CaptureMouseNextFrame;              // explicit capture via CaptureInputs() sets those flags
+    int                     CaptureKeyboardNextFrame;
     char                    TempBuffer[1024*3+1];               // temporary text buffer
 
     ImGuiState()
@@ -501,7 +502,7 @@ struct ImGuiState
         memset(FramerateSecPerFrame, 0, sizeof(FramerateSecPerFrame));
         FramerateSecPerFrameIdx = 0;
         FramerateSecPerFrameAccum = 0.0f;
-        CaptureMouseNextFrame = CaptureKeyboardNextFrame = false;
+        CaptureMouseNextFrame = CaptureKeyboardNextFrame = -1;
         memset(TempBuffer, 0, sizeof(TempBuffer));
     }
 };
@@ -682,8 +683,6 @@ namespace ImGui
     IMGUI_API void          SetHoveredID(ImGuiID id);
     IMGUI_API void          KeepAliveID(ImGuiID id);
 
-    IMGUI_API void          EndFrame();                 // Automatically called by Render()
-
     IMGUI_API void          ItemSize(const ImVec2& size, float text_offset_y = 0.0f);
     IMGUI_API void          ItemSize(const ImRect& bb, float text_offset_y = 0.0f);
     IMGUI_API bool          ItemAdd(const ImRect& bb, const ImGuiID* id);
@@ -707,6 +706,7 @@ namespace ImGui
     IMGUI_API void          RenderFrame(ImVec2 p_min, ImVec2 p_max, ImU32 fill_col, bool border = true, float rounding = 0.0f);
     IMGUI_API void          RenderCollapseTriangle(ImVec2 p_min, bool opened, float scale = 1.0f, bool shadow = false);
     IMGUI_API void          RenderCheckMark(ImVec2 pos, ImU32 col);
+    IMGUI_API const char*   FindRenderedTextEnd(const char* text, const char* text_end = NULL); // Find the optional ## from which we stop displaying text.
 
     IMGUI_API void          PushClipRect(const ImVec2& clip_rect_min, const ImVec2& clip_rect_max, bool intersect_with_existing_clip_rect = true);
     IMGUI_API void          PopClipRect();

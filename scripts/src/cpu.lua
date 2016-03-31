@@ -35,7 +35,7 @@ if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RS
 		MAME_DIR .. "src/devices/cpu/drcbex64.cpp",
 		MAME_DIR .. "src/devices/cpu/drcbex64.h",
 		MAME_DIR .. "src/devices/cpu/drcumlsh.h",
-		MAME_DIR .. "src/devices/cpu/x86emit.h",		
+		MAME_DIR .. "src/devices/cpu/x86emit.h",
 	}
 end
 
@@ -86,7 +86,7 @@ if (CPUS["ARCOMPACT"]~=null) then
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_common.h",
 	}
 	dependency {
-		{ MAME_DIR .. "src/devices/cpu/arcompact/arcompact.cpp",  	   GEN_DIR .. "emu/cpu/arcompact/arcompact.inc" },
+		{ MAME_DIR .. "src/devices/cpu/arcompact/arcompact.cpp",       GEN_DIR .. "emu/cpu/arcompact/arcompact.inc" },
 		{ MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute.cpp", GEN_DIR .. "emu/cpu/arcompact/arcompact.inc" },
 	}
 
@@ -577,7 +577,7 @@ if (CPUS["H8"]~=null) then
 		MAME_DIR .. "src/devices/cpu/h8/h8_sci.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h8_sci.h",
 	}
-	
+
 	dependency {
 		{ MAME_DIR .. "src/devices/cpu/h8/h8.cpp",       GEN_DIR .. "emu/cpu/h8/h8.inc" },
 		{ MAME_DIR .. "src/devices/cpu/h8/h8h.cpp",      GEN_DIR .. "emu/cpu/h8/h8h.inc" },
@@ -950,7 +950,7 @@ end
 if (CPUS["I960"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/i960/i960.cpp",
-		MAME_DIR .. "src/devices/cpu/i960/i960.h",		
+		MAME_DIR .. "src/devices/cpu/i960/i960.h",
 	}
 end
 
@@ -1163,7 +1163,7 @@ if (CPUS["M37710"]~=null) then
 		MAME_DIR .. "src/devices/cpu/m37710/m37710cm.h",
 		MAME_DIR .. "src/devices/cpu/m37710/m37710il.h",
 		MAME_DIR .. "src/devices/cpu/m37710/m37710op.h",
-		MAME_DIR .. "src/devices/cpu/m37710/m7700ds.h",	
+		MAME_DIR .. "src/devices/cpu/m37710/m7700ds.h",
 	}
 end
 
@@ -1233,7 +1233,7 @@ if (CPUS["M6502"]~=null) then
 		MAME_DIR .. "src/devices/cpu/m6502/m5074x.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m5074x.h",
 	}
-	
+
 	dependency {
 		{ MAME_DIR .. "src/devices/cpu/m6502/deco16.cpp",   GEN_DIR .. "emu/cpu/m6502/deco16.inc" },
 		{ MAME_DIR .. "src/devices/cpu/m6502/m4510.cpp",    GEN_DIR .. "emu/cpu/m6502/m4510.inc" },
@@ -1432,14 +1432,14 @@ end
 --------------------------------------------------
 
 if (CPUS["PATINHOFEIO"]~=null) then
-    files {
-        MAME_DIR .. "src/devices/cpu/patinhofeio/patinho_feio.cpp",
-        MAME_DIR .. "src/devices/cpu/patinhofeio/patinho_feio.h",
-    }
+	files {
+		MAME_DIR .. "src/devices/cpu/patinhofeio/patinho_feio.cpp",
+		MAME_DIR .. "src/devices/cpu/patinhofeio/patinho_feio.h",
+	}
 end
 
 if (CPUS["PATINHOFEIO"]~=null or _OPTIONS["with-tools"]) then
-    table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/patinhofeio/patinho_feio_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/patinhofeio/patinho_feio_dasm.cpp")
 end
 
 --------------------------------------------------
@@ -1612,7 +1612,7 @@ if (CPUS["MINX"]~=null) then
 		MAME_DIR .. "src/devices/cpu/minx/minxfunc.h",
 		MAME_DIR .. "src/devices/cpu/minx/minxopce.h",
 		MAME_DIR .. "src/devices/cpu/minx/minxopcf.h",
-		MAME_DIR .. "src/devices/cpu/minx/minxops.h",	
+		MAME_DIR .. "src/devices/cpu/minx/minxops.h",
 	}
 end
 
@@ -1696,7 +1696,7 @@ if (CPUS["SATURN"]~=null) then
 		MAME_DIR .. "src/devices/cpu/saturn/saturn.cpp",
 		MAME_DIR .. "src/devices/cpu/saturn/saturn.h",
 		MAME_DIR .. "src/devices/cpu/saturn/satops.inc",
-		MAME_DIR .. "src/devices/cpu/saturn/sattable.inc",		
+		MAME_DIR .. "src/devices/cpu/saturn/sattable.inc",
 	}
 end
 
@@ -1842,19 +1842,39 @@ if (CPUS["AVR8"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
--- Texas Instruments TMS0980
---@src/devices/cpu/tms0980/tms0980.h,CPUS["TMS0980"] = true
+-- Texas Instruments TMS1000 series
+--@src/devices/cpu/tms1000/tms1000.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms1100.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms1400.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms0970.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms0980.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms0270.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tp0320.h,CPUS["TMS1000"] = true
 --------------------------------------------------
 
-if (CPUS["TMS0980"]~=null) then
+if (CPUS["TMS1000"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/cpu/tms0980/tms0980.cpp",
-		MAME_DIR .. "src/devices/cpu/tms0980/tms0980.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1k_base.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1k_base.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1000.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1000.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1100.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1100.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1400.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms1400.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms0970.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms0970.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms0980.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms0980.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms0270.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms0270.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tp0320.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tp0320.h",
 	}
 end
 
-if (CPUS["TMS0980"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms0980/tms0980d.cpp")
+if (CPUS["TMS1000"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms1000/tms1k_dasm.cpp")
 end
 
 --------------------------------------------------
@@ -1879,7 +1899,6 @@ end
 --@src/devices/cpu/tms9900/tms9900.h,CPUS["TMS9900"] = true
 --@src/devices/cpu/tms9900/tms9980a.h,CPUS["TMS9900"] = true
 --@src/devices/cpu/tms9900/tms9995.h,CPUS["TMS9900"] = true
-
 --------------------------------------------------
 
 if (CPUS["TMS9900"]~=null) then
@@ -2024,7 +2043,7 @@ if (CPUS["TMS57002"]~=null) then
 		{ MAME_DIR .. "src/devices/cpu/tms57002/tms57kdec.cpp", GEN_DIR .. "emu/cpu/tms57002/tms57002.inc" },
 		{ MAME_DIR .. "src/devices/cpu/tms57002/tms57002.cpp",  GEN_DIR .. "emu/cpu/tms57002/tms57002.inc" },
 	}
-	custombuildtask { 	
+	custombuildtask {
 		{ MAME_DIR .. "src/devices/cpu/tms57002/tmsinstr.lst" , GEN_DIR .. "emu/cpu/tms57002/tms57002.inc",   { MAME_DIR .. "src/devices/cpu/tms57002/tmsmake.py" }, {"@echo Generating TMS57002 source file...", PYTHON .. " $(1) $(<) $(@)" } }
 	}
 end

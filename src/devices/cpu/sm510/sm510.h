@@ -62,6 +62,30 @@ enum
 
 /*
 
+        b2 a3 b3 a4 b4 a5 b5 GNDa6 b6 a7 b7 a8 b8 a9
+        45 44 43 42 41 40 39 38 37 36 35 34 33 32 31
+       ______________________________________________
+      |                                              |
+a2 46 |                                              | 30 b9
+b1 47 |                                              | 29 a10
+a1 48 |                                              | 28 b10
+H4 49 |                                              | 27 a11
+H3 50 |                                              | 26 b11
+H2 51 |                                              | 25 a12
+H1 52 |                    SM510                     | 24 b12
+S1 53 |                    SM511                     | 23 a13
+S2 54 |                                              | 22 b13
+S3 55 |                                              | 21 a14
+S4 56 |                                              | 20 b14
+S5 57 |                                              | 19 a15
+S6 58 |                                              | 18 b15
+S7 59 |                                              | 17 a16
+S8 60 | *                                            | 16 b16
+      |______________________________________________/
+
+         1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
+         T K1 K2 K3 K4 ACL | GND |OSCin| bt R1 R2 bs   note: bt = beta symbol
+                           BA  OSCout Vdd
 */
 
 class sm510_base_device : public cpu_device
@@ -260,6 +284,8 @@ protected:
 	void op_skip();
 	void op_cend();
 	void op_idiv();
+	void op_dr();
+	void op_dta();
 
 	void op_illegal();
 };

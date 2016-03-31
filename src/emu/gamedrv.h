@@ -74,7 +74,7 @@ struct game_driver
 	const rom_entry *   rom;                        // pointer to list of ROMs for the game
 	const char *        compatible_with;
 	UINT32              flags;                      // orientation and other flags; see defines below
-	const char *        default_layout;             // default internally defined layout
+	const internal_layout *        default_layout;             // default internally defined layout
 };
 
 
@@ -95,7 +95,22 @@ struct game_driver
 
 // standard GAME() macro
 #define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)  \
-	GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,((const char *)0))
+extern const game_driver GAME_NAME(NAME) =  \
+{                                           \
+	__FILE__,                               \
+	#PARENT,                                \
+	#NAME,                                  \
+	FULLNAME,                               \
+	#YEAR,                                  \
+	COMPANY,                                \
+	MACHINE_CONFIG_NAME(MACHINE),           \
+	INPUT_PORTS_NAME(INPUT),                \
+	&driver_device::driver_init_wrapper<CLASS, &CLASS::init_##INIT>,    \
+	ROM_NAME(NAME),                         \
+	nullptr,                                   \
+	(MONITOR)|(FLAGS)|MACHINE_TYPE_ARCADE,     \
+	nullptr                             \
+};
 
 // standard macro with additional layout
 #define GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,LAYOUT)  \
@@ -111,9 +126,9 @@ extern const game_driver GAME_NAME(NAME) =  \
 	INPUT_PORTS_NAME(INPUT),                \
 	&driver_device::driver_init_wrapper<CLASS, &CLASS::init_##INIT>,    \
 	ROM_NAME(NAME),                         \
-	NULL,                                   \
+	nullptr,                                   \
 	(MONITOR)|(FLAGS)|MACHINE_TYPE_ARCADE,     \
-	&LAYOUT[0]                              \
+	&LAYOUT                              \
 };
 
 // standard console definition macro
@@ -132,7 +147,7 @@ extern const game_driver GAME_NAME(NAME) =  \
 	ROM_NAME(NAME),                         \
 	#COMPAT,                                \
 	ROT0|(FLAGS)|MACHINE_TYPE_CONSOLE,         \
-	NULL                                    \
+	nullptr                                    \
 };
 
 // standard computer definition macro
@@ -151,7 +166,7 @@ extern const game_driver GAME_NAME(NAME) =  \
 	ROM_NAME(NAME),                         \
 	#COMPAT,                                \
 	ROT0|(FLAGS)|MACHINE_TYPE_COMPUTER,        \
-	NULL                                    \
+	nullptr                                    \
 };
 
 // standard system definition macro
@@ -170,7 +185,7 @@ extern const game_driver GAME_NAME(NAME) =  \
 	ROM_NAME(NAME),                         \
 	#COMPAT,                                \
 	ROT0|(FLAGS)|MACHINE_TYPE_OTHER,           \
-	NULL                                    \
+	nullptr                                    \
 };
 
 

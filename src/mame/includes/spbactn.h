@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Stephh
+// copyright-holders:David Haywood
 
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"

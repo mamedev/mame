@@ -11,6 +11,8 @@
 BX_ERROR_RESULT(BGFX_SHADER_SPIRV_INVALID_HEADER,      BX_MAKEFOURCC('S', 'H', 0, 1) );
 BX_ERROR_RESULT(BGFX_SHADER_SPIRV_INVALID_INSTRUCTION, BX_MAKEFOURCC('S', 'H', 0, 2) );
 
+#define SPV_CHUNK_HEADER BX_MAKEFOURCC(0x03, 0x02, 0x23, 0x07)
+
 namespace bgfx
 {
 	// Reference: https://www.khronos.org/registry/spir-v/specs/1.0/SPIRV.html
@@ -345,7 +347,9 @@ namespace bgfx
 		};
 	};
 
-	struct SpirvBuiltin
+	const char* getName(SpvOpcode::Enum _opcode);
+
+	struct SpvBuiltin
 	{
 		enum Enum
 		{
@@ -394,6 +398,8 @@ namespace bgfx
 			Count
 		};
 	};
+
+	const char* getName(SpvBuiltin::Enum _enum);
 
 	struct SpvExecutionModel
 	{
@@ -456,6 +462,8 @@ namespace bgfx
 		};
 	};
 
+	const char* getName(SpvStorageClass::Enum _enum);
+
 	struct SpvResourceDim
 	{
 		enum Enum
@@ -486,6 +494,7 @@ namespace bgfx
 			GLSLPacked,
 			CPacked,
 			BuiltIn,
+			Unknown12,
 			NoPerspective,
 			Flat,
 			Patch,
@@ -500,6 +509,7 @@ namespace bgfx
 			NonWritable,
 			NonReadable,
 			Uniform,
+			Unknown27,
 			SaturatedConversion,
 			Stream,
 			Location,
@@ -522,8 +532,12 @@ namespace bgfx
 		};
 	};
 
+	const char* getName(SpvDecoration::Enum _enum);
+
 	struct SpvOperand
 	{
+		SpvOperand() { /* not pod */ }
+
 		enum Enum
 		{
 			AccessQualifier,
@@ -538,6 +552,7 @@ namespace bgfx
 			Decoration,
 			Dim,
 			Dref,
+			ElementType,
 			ExecutionModel,
 			Function,
 			FunctionControl,
@@ -545,6 +560,7 @@ namespace bgfx
 			IdRep,
 			ImageFormat,
 			ImageOperands,
+			LinkageType,
 			LiteralNumber,
 			LiteralRep,
 			LiteralString,
@@ -567,14 +583,15 @@ namespace bgfx
 		};
 
 		Enum type;
-		uint32_t data[4];
+		uint32_t data;
 
-		uint32_t target;
 		stl::string literalString;
 	};
 
 	struct SpvInstruction
 	{
+		SpvInstruction() { /* not pod */ }
+
 		SpvOpcode::Enum opcode;
 		uint16_t length;
 		uint16_t numOperands;
@@ -593,20 +610,24 @@ namespace bgfx
 
 	struct SpvShader
 	{
+		SpvShader() { /* not pod */ }
+
 		stl::vector<uint8_t> byteCode;
 	};
 
 	int32_t read(bx::ReaderSeekerI* _reader, SpvShader& _shader, bx::Error* _err);
 	int32_t write(bx::WriterI* _writer, const SpvShader& _shader, bx::Error* _err);
 
-	typedef bool (*SpirvParseFn)(uint32_t _offset, const SpvInstruction& _instruction, void* _userData);
-	void parse(const SpvShader& _src, SpirvParseFn _fn, void* _userData, bx::Error* _err = NULL);
+	typedef bool (*SpvParseFn)(uint32_t _offset, const SpvInstruction& _instruction, void* _userData);
+	void parse(const SpvShader& _src, SpvParseFn _fn, void* _userData, bx::Error* _err = NULL);
 
-	typedef void (*SpirvFilterFn)(SpvInstruction& _instruction, void* _userData);
-	void filter(SpvShader& _dst, const SpvShader& _src, SpirvFilterFn _fn, void* _userData, bx::Error* _err = NULL);
+	typedef void (*SpvFilterFn)(SpvInstruction& _instruction, void* _userData);
+	void filter(SpvShader& _dst, const SpvShader& _src, SpvFilterFn _fn, void* _userData, bx::Error* _err = NULL);
 
 	struct SpirV
 	{
+		SpirV() { /* not pod */ }
+
 		struct Header
 		{
 			uint32_t magic;

@@ -2,7 +2,20 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Sega Master System "Rapid Fire Unit" emulation
+    Sega SG-1000/Mark-III/SMS "Rapid Fire Unit" emulation
+
+
+Release data from the Sega Retro project:
+
+  Year: 1985    Country/region: JP    Model code: RF-150
+  Year: 1987    Country/region: US    Model code: 3046
+  Year: 1988    Country/region: EU    Model code: MK-3046-50
+  Year: 1989    Country/region: BR    Model code: 011050
+
+Notes:
+
+  This emulated device is the version released by Sega. In Brazil, Tec Toy
+  released a version that does not have any switch to turn on/off auto-repeat.
 
 **********************************************************************/
 
@@ -16,7 +29,7 @@
 
 const device_type SMS_RAPID_FIRE = &device_creator<sms_rapid_fire_device>;
 
-
+// time interval not verified
 #define RAPID_FIRE_INTERVAL attotime::from_hz(10)
 
 

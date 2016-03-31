@@ -4,9 +4,6 @@
 	*                 Texas Instruments TMS32010 DSP Emulator                  *
 	*                                                                          *
 	*                  Copyright Tony La Porta                                 *
-	*      You are not allowed to distribute this software commercially.       *
-	*                      Written for the MAME project.                       *
-	*                                                                          *
 	*                                                                          *
 	*      Notes : The term 'DMA' within this document, is in reference        *
 	*                  to Direct Memory Addressing, and NOT the usual term     *

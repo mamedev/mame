@@ -108,7 +108,7 @@ NETLIB_UPDATE(LVCCS)
 NETLIB_UPDATE_TERMINALS(LVCCS)
 {
 	const nl_double m_mult = m_G.Value() * m_gfac; // 1.0 ==> 1V ==> 1A
-	const nl_double vi = m_IP.net().m_cur_Analog - m_IN.net().m_cur_Analog;
+	const nl_double vi = m_IP.net().Q_Analog() - m_IN.net().Q_Analog();
 
 	if (std::abs(m_mult / m_cur_limit * vi) > 0.5)
 		m_vi = m_vi + 0.2*std::tanh((vi - m_vi)/0.2);

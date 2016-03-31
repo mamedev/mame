@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __COREFILE_H__
-#define __COREFILE_H__
+#ifndef MAME_LIB_UTIL_COREFILE_H
+#define MAME_LIB_UTIL_COREFILE_H
 
 #include "corestr.h"
 #include "coretmpl.h"
@@ -23,7 +23,6 @@
 
 
 namespace util {
-
 /***************************************************************************
     ADDITIONAL OPEN FLAGS
 ***************************************************************************/
@@ -49,22 +48,22 @@ public:
 	// ----- file open/close -----
 
 	// open a file with the specified filename
-	static file_error open(const char *filename, std::uint32_t openflags, ptr &file);
+	static osd_file::error open(std::string const &filename, std::uint32_t openflags, ptr &file);
 
 	// open a RAM-based "file" using the given data and length (read-only)
-	static file_error open_ram(const void *data, std::size_t length, std::uint32_t openflags, ptr &file);
+	static osd_file::error open_ram(const void *data, std::size_t length, std::uint32_t openflags, ptr &file);
 
 	// open a RAM-based "file" using the given data and length (read-only), copying the data
-	static file_error open_ram_copy(const void *data, std::size_t length, std::uint32_t openflags, ptr &file);
+	static osd_file::error open_ram_copy(const void *data, std::size_t length, std::uint32_t openflags, ptr &file);
 
 	// open a proxy "file" that forwards requests to another file object
-	static file_error open_proxy(core_file &file, ptr &proxy);
+	static osd_file::error open_proxy(core_file &file, ptr &proxy);
 
 	// close an open file
 	virtual ~core_file();
 
 	// enable/disable streaming file compression via zlib; level is 0 to disable compression, or up to 9 for max compression
-	virtual file_error compress(int level) = 0;
+	virtual osd_file::error compress(int level) = 0;
 
 
 	// ----- file positioning -----
@@ -101,8 +100,8 @@ public:
 	virtual const void *buffer() = 0;
 
 	// open a file with the specified filename, read it into memory, and return a pointer
-	static file_error load(const char *filename, void **data, std::uint32_t &length);
-	static file_error load(const char *filename, dynamic_buffer &data);
+	static osd_file::error load(std::string const &filename, void **data, std::uint32_t &length);
+	static osd_file::error load(std::string const &filename, dynamic_buffer &data);
 
 
 	// ----- file write -----
@@ -121,10 +120,10 @@ public:
 	}
 
 	// file truncation
-	virtual file_error truncate(std::uint64_t offset) = 0;
+	virtual osd_file::error truncate(std::uint64_t offset) = 0;
 
 	// flush file buffers
-	virtual file_error flush() = 0;
+	virtual osd_file::error flush() = 0;
 
 
 protected:
@@ -147,4 +146,4 @@ std::string core_filename_extract_base(const char *name, bool strip_extension = 
 int core_filename_ends_with(const char *filename, const char *extension);
 
 
-#endif  /* __COREFILE_H__ */
+#endif // MAME_LIB_UTIL_COREFILE_H

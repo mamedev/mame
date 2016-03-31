@@ -44,12 +44,11 @@ struct PS_INPUT
 };
 
 //-----------------------------------------------------------------------------
-// YIQ Decode Vertex Shader
+// YIQ Vertex Shader
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
 uniform float2 SourceDims;
-uniform float2 SourceRect;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -108,10 +107,7 @@ static const int HalfSampleCount = SampleCount / 2;
 
 float4 GetCompositeYIQ(float2 TexCoord)
 {
-	float2 SourceTexelDims = 1.0f / SourceDims;
-	float2 SourceRes = SourceDims * SourceRect;
-
-	float2 PValueSourceTexel = float2(PValue, 0.0f) * SourceTexelDims;
+	float2 PValueSourceTexel = float2(PValue / SourceDims.x, 0.0f);
 
 	float2 C0 = TexCoord + PValueSourceTexel * OffsetX.x;
 	float2 C1 = TexCoord + PValueSourceTexel * OffsetX.y;
@@ -124,8 +120,8 @@ float4 GetCompositeYIQ(float2 TexCoord)
 	float4 Texel2 = tex2D(DiffuseSampler, C2);
 	float4 Texel3 = tex2D(DiffuseSampler, C3);
 
-	float4 HPosition = Cx / SourceRect.x;
-	float4 VPosition = Cy / SourceRect.y;
+	float4 HPosition = Cx;
+	float4 VPosition = Cy;
 
 	float4 Y = float4(dot(Texel0, YDot), dot(Texel1, YDot), dot(Texel2, YDot), dot(Texel3, YDot));
 	float4 I = float4(dot(Texel0, IDot), dot(Texel1, IDot), dot(Texel2, IDot), dot(Texel3, IDot));
@@ -135,7 +131,7 @@ float4 GetCompositeYIQ(float2 TexCoord)
 	float WoPI = W / PI;
 
 	float HOffset = (BValue + SignalOffset) / WoPI;
-	float VScale = (AValue * SourceRes.y) / WoPI;
+	float VScale = (AValue * SourceDims.y) / WoPI;
 
 	float4 T = HPosition + HOffset + VPosition * VScale;
 	float4 TW = T * W;
@@ -149,10 +145,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
 
-	float2 SourceTexelDims = 1.0f / SourceDims;
-	float2 SourceRes = SourceDims * SourceRect;
-
-	float TimePerSample = ScanTime / (SourceRes.x * 4.0f);
+	float TimePerSample = ScanTime / (SourceDims.x * 4.0f);
 
 	float Fc_y1 = (CCValue - NotchHalfWidth) * TimePerSample;
 	float Fc_y2 = (CCValue + NotchHalfWidth) * TimePerSample;
@@ -175,23 +168,22 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float WoPI = W / PI;
 
 	float HOffset = (BValue + SignalOffset) / WoPI;
-	float VScale = (AValue * SourceRes.y) / WoPI;
+	float VScale = (AValue * SourceDims.y) / WoPI;
 
 	float4 YAccum = 0.0f;
 	float4 IAccum = 0.0f;
 	float4 QAccum = 0.0f;
 
 	float4 Cy = Input.TexCoord.y;
-	float4 VPosition = Cy / SourceRect.y;
+	float4 VPosition = Cy;
 
 	for (float i = 0; i < SampleCount; i += 4.0f)
 	{
 		float n = i - HalfSampleCount;
-
 		float4 n4 = n + NotchOffset;
 
-		float4 Cx = Input.TexCoord.x + SourceTexelDims.x * (n4 * 0.25f);
-		float4 HPosition = Cx / SourceRect.x;
+		float4 Cx = Input.TexCoord.x + (n4 * 0.25f) / SourceDims.x;
+		float4 HPosition = Cx;
 
 		float4 C = GetCompositeYIQ(float2(Cx.r, Cy.r));
 

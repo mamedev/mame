@@ -1,0 +1,18 @@
+{	"name": "Default Bilinear Filter",
+	"author": "Ryan Holtz",
+	"targets": [
+		{	"name": "temp",
+			"mode": "guest",
+			"bilinear": true
+		}
+	],
+	"passes": [
+		{	"effect": "default/blit",
+			"name": "Final Upscale",
+			"input": [
+				{ "sampler": "s_tex", "texture": "screen" }
+			],
+			"output": "output"
+		}
+	]
+}

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /***************************************************************************
 
     ui/inifile.cpp
@@ -18,8 +18,8 @@
 //-------------------------------------------------
 //  GLOBAL VARIABLES
 //-------------------------------------------------
-UINT16 inifile_manager::current_category = 0;
-UINT16 inifile_manager::current_file = 0;
+UINT16 inifile_manager::c_cat = 0;
+UINT16 inifile_manager::c_file = 0;
 
 //-------------------------------------------------
 //  ctor
@@ -47,10 +47,6 @@ void inifile_manager::directory_scan()
 	{
 		int length = strlen(dir->name);
 		std::string filename(dir->name);
-
-		// skip ui_favorite file
-		if (!core_stricmp("ui_favorite.ini", filename.c_str()))
-			continue;
 
 		// check .ini file ending
 		if ((length > 4) && dir->name[length - 4] == '.' && tolower((UINT8)dir->name[length - 3]) == 'i' &&
@@ -103,8 +99,8 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
 		return;
 
 	bool search_clones = false;
-	std::string filename(ini_index[current_file].name);
-	long offset = ini_index[current_file].category[current_category].offset;
+	std::string filename(ini_index[c_file].first);
+	long offset = ini_index[c_file].second[c_cat].second;
 
 	if (!core_stricmp(filename.c_str(), "category.ini") || !core_stricmp(filename.c_str(), "alltime.ini"))
 		search_clones = true;
@@ -151,7 +147,7 @@ bool inifile_manager::parseopen(const char *filename)
 	// so it's better and faster use standard C fileio functions.
 
 	emu_file file(machine().ui().options().extraini_path(), OPEN_FLAG_READ);
-	if (file.open(filename) != FILERR_NONE)
+	if (file.open(filename) != osd_file::error::NONE)
 		return false;
 
 	m_fullpath = file.fullpath();
@@ -235,21 +231,21 @@ void favorite_manager::add_favorite_game()
 			if (swinfo->parentname())
 			{
 				software_list_device *swlist = software_list_device::find_by_name(machine().config(), image->software_list_name());
-				for (software_info *c_swinfo = swlist->first_software_info(); c_swinfo != nullptr; c_swinfo = c_swinfo->next())
+				for (software_info &c_swinfo : swlist->get_info())
 				{
-					std::string c_parent(c_swinfo->parentname());
+					std::string c_parent(c_swinfo.parentname());
 					if (!c_parent.empty() && c_parent == swinfo->shortname())
 						{
-							tmpmatches.parentlongname = c_swinfo->longname();
+							tmpmatches.parentlongname = c_swinfo.longname();
 							break;
 						}
 				}
 			}
 
 			tmpmatches.usage.clear();
-			for (feature_list_item *flist = swinfo->other_info(); flist != nullptr; flist = flist->next())
-				if (!strcmp(flist->name(), "usage"))
-					tmpmatches.usage = flist->value();
+			for (feature_list_item &flist : swinfo->other_info())
+				if (!strcmp(flist.name(), "usage"))
+					tmpmatches.usage = flist.value();
 
 			tmpmatches.devicetype = strensure(image->image_type_name());
 			tmpmatches.available = true;
@@ -359,7 +355,7 @@ bool favorite_manager::isgame_favorite(ui_software_info &swinfo)
 void favorite_manager::parse_favorite()
 {
 	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_READ);
-	if (file.open(favorite_filename) == FILERR_NONE)
+	if (file.open(favorite_filename) == osd_file::error::NONE)
 	{
 		char readbuf[1024];
 		file.gets(readbuf, 1024);
@@ -418,7 +414,7 @@ void favorite_manager::save_favorite_games()
 {
 	// attempt to open the output file
 	emu_file file(machine().ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file.open(favorite_filename) == FILERR_NONE)
+	if (file.open(favorite_filename) == osd_file::error::NONE)
 	{
 		if (m_list.empty())
 		{

@@ -153,20 +153,6 @@ void win_monitor_info::refresh()
 
 
 //============================================================
-//  sdlvideo_monitor_get_aspect
-//============================================================
-
-float osd_monitor_info::aspect()
-{
-	// FIXME: returning 0 looks odd, video_config is bad
-	if (video_config.keepaspect)
-	{
-		return m_aspect / ((float)m_pos_size.width() / (float)m_pos_size.height());
-	}
-	return 0.0f;
-}
-
-//============================================================
 //  winvideo_monitor_from_handle
 //============================================================
 
@@ -369,7 +355,6 @@ void windows_osd_interface::extract_video_config()
 	video_config.filter        = options().filter();
 	video_config.keepaspect    = options().keep_aspect();
 	video_config.numscreens    = options().numscreens();
-	video_config.fullstretch   = options().uneven_stretch();
 
 	// if we are in debug mode, never go full screen
 	if (machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)

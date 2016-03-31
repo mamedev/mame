@@ -405,7 +405,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(80*10, 25*10)
@@ -414,7 +414,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "vt100_video:palette", vt100)
-//  MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+//  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEFAULT_LAYOUT( layout_vt100 )
 

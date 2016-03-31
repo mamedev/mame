@@ -1014,7 +1014,6 @@ void renderer_ogl::loadGLExtensions()
 
 int renderer_ogl::draw(const int update)
 {
-	render_primitive *prim;
 	ogl_texture_info *texture=nullptr;
 	float vofs, hofs;
 	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE;
@@ -1160,11 +1159,11 @@ int renderer_ogl::draw(const int update)
 	window().m_primlist->acquire_lock();
 
 	// now draw
-	for (prim = window().m_primlist->first(); prim != nullptr; prim = prim->next())
+	for (render_primitive &prim : *window().m_primlist)
 	{
 		int i;
 
-		switch (prim->type)
+		switch (prim.type)
 		{
 			/**
 			 * Try to stay in one Begin/End block as long as possible,
@@ -1173,7 +1172,7 @@ int renderer_ogl::draw(const int update)
 			case render_primitive::LINE:
 				#if !USE_WIN32_STYLE_LINES
 				// check if it's really a point
-				if (((prim->bounds.x1 - prim->bounds.x0) == 0) && ((prim->bounds.y1 - prim->bounds.y0) == 0))
+				if (((prim.bounds.x1 - prim.bounds.x0) == 0) && ((prim.bounds.y1 - prim.bounds.y0) == 0))
 				{
 					curPrimitive=GL_POINTS;
 				} else {
@@ -1188,10 +1187,10 @@ int renderer_ogl::draw(const int update)
 
 						if ( pendingPrimitive==GL_NO_PRIMITIVE )
 				{
-							set_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags));
+							set_blendmode(PRIMFLAG_GET_BLENDMODE(prim.flags));
 				}
 
-				glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
+				glColor4f(prim.color.r, prim.color.g, prim.color.b, prim.color.a);
 
 				if(pendingPrimitive!=curPrimitive)
 				{
@@ -1202,12 +1201,12 @@ int renderer_ogl::draw(const int update)
 				// check if it's really a point
 				if (curPrimitive==GL_POINTS)
 				{
-					glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
+					glVertex2f(prim.bounds.x0+hofs, prim.bounds.y0+vofs);
 				}
 				else
 				{
-					glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
-					glVertex2f(prim->bounds.x1+hofs, prim->bounds.y1+vofs);
+					glVertex2f(prim.bounds.x0+hofs, prim.bounds.y0+vofs);
+					glVertex2f(prim.bounds.x1+hofs, prim.bounds.y1+vofs);
 				}
 				#else
 				{
@@ -1223,15 +1222,15 @@ int renderer_ogl::draw(const int update)
 						pendingPrimitive=GL_NO_PRIMITIVE;
 					}
 
-					set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags));
+					set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim.flags));
 
 					// compute the effective width based on the direction of the line
-					effwidth = prim->width();
+					effwidth = prim.width();
 					if (effwidth < 0.5f)
 						effwidth = 0.5f;
 
 					// determine the bounds of a quad to draw this line
-					render_line_to_quad(&prim->bounds, effwidth, &b0, &b1);
+					render_line_to_quad(&prim.bounds, effwidth, &b0, &b1);
 
 					// fix window position
 					b0.x0 += hofs;
@@ -1244,7 +1243,7 @@ int renderer_ogl::draw(const int update)
 					b1.y1 += vofs;
 
 					// iterate over AA steps
-					for (step = PRIMFLAG_GET_ANTIALIAS(prim->flags) ? line_aa_4step : line_aa_1step; step->weight != 0; step++)
+					for (step = PRIMFLAG_GET_ANTIALIAS(prim.flags) ? line_aa_4step : line_aa_1step; step->weight != 0; step++)
 					{
 						glBegin(GL_TRIANGLE_STRIP);
 
@@ -1261,17 +1260,17 @@ int renderer_ogl::draw(const int update)
 						glVertex2f(b1.x1 + step->xoffs, b1.y1 + step->yoffs);
 
 						// determine the color of the line
-						r = (prim->color.r * step->weight);
-						g = (prim->color.g * step->weight);
-						b = (prim->color.b * step->weight);
-						a = (prim->color.a * 255.0f);
+						r = (prim.color.r * step->weight);
+						g = (prim.color.g * step->weight);
+						b = (prim.color.b * step->weight);
+						a = (prim.color.a * 255.0f);
 						if (r > 1.0) r = 1.0;
 						if (g > 1.0) g = 1.0;
 						if (b > 1.0) b = 1.0;
 						if (a > 1.0) a = 1.0;
 						glColor4f(r, g, b, a);
 
-//                      texture = texture_update(window, prim, 0);
+//                      texture = texture_update(window, &prim, 0);
 //                      if (texture) printf("line has texture!\n");
 
 						// if we have a texture to use for the vectors, use it here
@@ -1306,11 +1305,11 @@ int renderer_ogl::draw(const int update)
 					pendingPrimitive=GL_NO_PRIMITIVE;
 				}
 
-				glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
+				glColor4f(prim.color.r, prim.color.g, prim.color.b, prim.color.a);
 
-				set_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags));
+				set_blendmode(PRIMFLAG_GET_BLENDMODE(prim.flags));
 
-				texture = texture_update(prim, 0);
+				texture = texture_update(&prim, 0);
 
 				if ( texture && texture->type==TEXTURE_TYPE_SHADER )
 				{
@@ -1319,14 +1318,14 @@ int renderer_ogl::draw(const int update)
 						if ( i==m_glsl_program_mb2sc )
 						{
 							// i==glsl_program_mb2sc -> transformation mamebm->scrn
-							m_texVerticex[0]=prim->bounds.x0 + hofs;
-							m_texVerticex[1]=prim->bounds.y0 + vofs;
-							m_texVerticex[2]=prim->bounds.x1 + hofs;
-							m_texVerticex[3]=prim->bounds.y0 + vofs;
-							m_texVerticex[4]=prim->bounds.x1 + hofs;
-							m_texVerticex[5]=prim->bounds.y1 + vofs;
-							m_texVerticex[6]=prim->bounds.x0 + hofs;
-							m_texVerticex[7]=prim->bounds.y1 + vofs;
+							m_texVerticex[0]=prim.bounds.x0 + hofs;
+							m_texVerticex[1]=prim.bounds.y0 + vofs;
+							m_texVerticex[2]=prim.bounds.x1 + hofs;
+							m_texVerticex[3]=prim.bounds.y0 + vofs;
+							m_texVerticex[4]=prim.bounds.x1 + hofs;
+							m_texVerticex[5]=prim.bounds.y1 + vofs;
+							m_texVerticex[6]=prim.bounds.x0 + hofs;
+							m_texVerticex[7]=prim.bounds.y1 + vofs;
 						} else {
 							// 1:1 tex coord CCW (0/0) (1/0) (1/1) (0/1) on texture dimensions
 							m_texVerticex[0]=(GLfloat)0.0;
@@ -1341,19 +1340,19 @@ int renderer_ogl::draw(const int update)
 
 						if(i>0) // first fetch already done
 						{
-							texture = texture_update(prim, i);
+							texture = texture_update(&prim, i);
 						}
 						glDrawArrays(GL_QUADS, 0, 4);
 					}
 				} else {
-					m_texVerticex[0]=prim->bounds.x0 + hofs;
-					m_texVerticex[1]=prim->bounds.y0 + vofs;
-					m_texVerticex[2]=prim->bounds.x1 + hofs;
-					m_texVerticex[3]=prim->bounds.y0 + vofs;
-					m_texVerticex[4]=prim->bounds.x1 + hofs;
-					m_texVerticex[5]=prim->bounds.y1 + vofs;
-					m_texVerticex[6]=prim->bounds.x0 + hofs;
-					m_texVerticex[7]=prim->bounds.y1 + vofs;
+					m_texVerticex[0]=prim.bounds.x0 + hofs;
+					m_texVerticex[1]=prim.bounds.y0 + vofs;
+					m_texVerticex[2]=prim.bounds.x1 + hofs;
+					m_texVerticex[3]=prim.bounds.y0 + vofs;
+					m_texVerticex[4]=prim.bounds.x1 + hofs;
+					m_texVerticex[5]=prim.bounds.y1 + vofs;
+					m_texVerticex[6]=prim.bounds.x0 + hofs;
+					m_texVerticex[7]=prim.bounds.y1 + vofs;
 
 					glDrawArrays(GL_QUADS, 0, 4);
 				}

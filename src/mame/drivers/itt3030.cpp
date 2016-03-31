@@ -787,7 +787,7 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", itt3030)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
 	MCFG_RAM_ADD("mainram")

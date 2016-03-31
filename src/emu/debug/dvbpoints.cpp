@@ -201,10 +201,10 @@ void debug_view_breakpoints::pad_ostream_to_length(std::ostream& str, int len)
 void debug_view_breakpoints::gather_breakpoints()
 {
 	m_buffer.resize(0);
-	for (const debug_view_source *source = m_source_list.first(); source != nullptr; source = source->next())
+	for (const debug_view_source &source : m_source_list)
 	{
 		// Collect
-		device_debug &debugInterface = *source->device()->debug();
+		device_debug &debugInterface = *source.device()->debug();
 		for (device_debug::breakpoint *bp = debugInterface.breakpoint_first(); bp != nullptr; bp = bp->next())
 			m_buffer.push_back(bp);
 	}
@@ -232,14 +232,15 @@ void debug_view_breakpoints::view_update()
 		m_total.y = 10;
 
 	// Draw
-	debug_view_char 	*dest = &m_viewdata[0];
-	util::ovectorstream	linebuf;
+	debug_view_char     *dest = &m_viewdata[0];
+	util::ovectorstream linebuf;
 	linebuf.reserve(ARRAY_LENGTH(tableBreaks) - 1);
 
 	// Header
 	if (m_visible.y > 0)
 	{
 		linebuf.clear();
+		linebuf.rdbuf()->clear();
 		linebuf << "ID";
 		if (m_sortType == &cIndexAscending) linebuf.put('\\');
 		else if (m_sortType == &cIndexDescending) linebuf.put('/');
@@ -282,6 +283,7 @@ void debug_view_breakpoints::view_update()
 			device_debug::breakpoint *const bp = m_buffer[bpi];
 
 			linebuf.clear();
+			linebuf.rdbuf()->clear();
 			util::stream_format(linebuf, "%2X", bp->index());
 			pad_ostream_to_length(linebuf, tableBreaks[0]);
 			linebuf.put(bp->enabled() ? 'X' : 'O');

@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-    ui/mainmenu.c
+    ui/mainmenu.cpp
 
     Internal MAME menus for the user interface.
 

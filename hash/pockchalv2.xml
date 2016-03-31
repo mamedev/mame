@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- the Pocket Challenge V2 appears to be compatible with the Wonderswan from a software point of view -->
+
+<softwarelist name="pockchalv2" description="Pocket Challenge V2 cartridges">
+
+	<!-- *EC : Chuu1 English New Crown Total English Taiouban -->
+
+	<software name="chuuengl" supported="no" >
+		<description>Chuu1 English New Crown Total English Taiouban (2EC - 2BB113)</description>
+		<year>2002</year>
+		<publisher>Benesse Corporation</publisher>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="0x400000">
+				<rom name="2BB113.pc2" size="0x400000" crc="4e0b65b4" sha1="3a8ded7174ad8e0003604dca4ea158eeefac4610" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- *PS : Chuugaku Chiri Rekishi Pack (Chiri Soft Rekishi Soft Kanzen Taiouban)-->
+
+	<software name="chuuchir" supported="no" >
+		<description>Chuugaku Chiri Rekishi Pack (Chiri Soft Rekishi Soft Kanzen Taiouban) (2PS - 2BD400)</description>
+		<year>2002</year>
+		<publisher>Benesse Corporation</publisher>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="0x400000">
+				<rom name="2BD400.pc2" size="0x400000" crc="93454b4a" sha1="3d820b91bb0fed87fc9343a8bc57c81256e4c490" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuuchir4" cloneof="chuuchir" supported="no" >
+		<description>Chuugaku Chiri Rekishi Pack (Chiri Soft Rekishi Soft Kanzen Taiouban) (4PS - 4BD400)</description>
+		<year>2004</year>
+		<publisher>Benesse Corporation</publisher>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="0x400000">
+				<rom name="4BD400.pc2" size="0x400000" crc="4cfd118d" sha1="8b395327209dae56461ef792cd2183d803e4687d" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuuchir6" cloneof="chuuchir" supported="no" >
+		<description>Chuugaku Chiri Rekishi Pack (Chiri Soft Rekishi Soft Kanzen Taiouban) (6PS - 6FD400)</description>
+		<year>2006</year>
+		<publisher>Benesse Corporation</publisher>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="0x400000">
+				<rom name="6FD400.pc2" size="0x400000" crc="0ac0e39d" sha1="1c47daf71ef4277fcf3eabfa4697827c7c322867" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- *PL : Chuugaku Rika Pack (1bunya Soft 2bunya Soft Kanzen Taiouban) -->
+
+	<software name="chuurika" supported="no" >
+		<description>Chuugaku Rika Pack (1bunya Soft 2bunya Soft Kanzen Taiouban) (2PL - 2BF400)</description>
+		<year>2002</year>
+		<publisher>Benesse Corporation</publisher>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="2BF400.pc2" size="0x200000" crc="75379357" sha1="791cd70cc9dc49a7ff38cc22a374c7d19eef1f70" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuurika6" cloneof="chuurika" supported="no" >
+		<description>Chuugaku Rika Pack (1bunya Soft 2bunya Soft Kanzen Taiouban) (6PL 6FF400)</description>
+		<year>2006</year>
+		<publisher>Benesse Corporation</publisher>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="0x400000">
+				<rom name="6FF400.pc2" size="0x400000" crc="fc46a921" sha1="5b2fd488c6ab734dcf8893509589a751458ce977" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- *BG : Jitsugi 4kyouka (Gijutsu Katei Hoken Taiiku Ongaku Bijutsu) -->
+
+	<software name="jitsugi" supported="no" >
+		<description>Jitsugi 4kyouka (Gijutsu Katei Hoken Taiiku Ongaku Bijutsu) (2BG - 2BG410)</description>
+		<year>2002</year>
+		<publisher>Benesse Corporation</publisher>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="0x400000">
+				<rom name="2BG410.pc2" size="0x400000" crc="84b430e9" sha1="bb1de1f0fc80a85f3b7fb7e53ed04718855aaf0b" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jitsugi3" cloneof="jitsugi" supported="no" >
+		<description>Jitsugi 4kyouka (Gijutsu Katei Hoken Taiiku Ongaku Bijutsu) (3BG - 3BG410)</description>
+		<year>2002</year>
+		<publisher>Benesse Corporation</publisher>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="0x400000">
+				<rom name="3BG410.pc2" size="0x400000" crc="2ff15e1a" sha1="f6c61d95fb26063c9d49ed0f36169aafbd6a3738" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- *JA : Chuu1 Kokugo Hyakunin Isshu -->
+
+	<software name="chuukoku" supported="no" >
+		<description>Chuu1 Kokugo Hyakunin Isshu (2JA - 2BK401)</description>
+		<year>2002</year>
+		<publisher>Benesse Corporation</publisher>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="0x400000">
+				<rom name="2BK401.pc2" size="0x400000" crc="b9d67f24" sha1="15c86cf056f680b91f2a6c15329bb31b44e030c6" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- *2M1 : Chuu1 Kokugo Hyakunin Isshu -->
+
+	<software name="chuusuug" supported="no" >
+		<description>Chuu1 Suugaku (2M1 - 2BM110)</description>
+		<year>2002</year>
+		<publisher>Benesse Corporation</publisher>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="2BM110.pc2" size="0x200000" crc="723a239d" sha1="a21d7c39ef64a37e0055c17d97c2ae7da29b8240" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+
+
+
+
+
+</softwarelist>
+

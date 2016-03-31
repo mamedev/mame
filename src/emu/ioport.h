@@ -134,15 +134,17 @@ enum ioport_type
 	IPT_TILT4,
 
 	// misc other digital inputs
+	IPT_POWER_ON,
+	IPT_POWER_OFF,
 	IPT_SERVICE,
 	IPT_TILT,
 	IPT_INTERLOCK,
 	IPT_VOLUME_UP,
 	IPT_VOLUME_DOWN,
-	IPT_START,                  // MESS only
-	IPT_SELECT,                 // MESS only
-	IPT_KEYPAD,                 // MESS only
-	IPT_KEYBOARD,               // MESS only
+	IPT_START,              // use the numbered start button(s) for coin-ops
+	IPT_SELECT,
+	IPT_KEYPAD,
+	IPT_KEYBOARD,
 
 	// digital joystick inputs
 	IPT_DIGITAL_JOYSTICK_FIRST,
@@ -206,7 +208,7 @@ enum ioport_type
 		IPT_MAHJONG_KAN,
 		IPT_MAHJONG_PON,
 		IPT_MAHJONG_CHI,
-		IPT_MAHJONG_REACH,  //IPT_MAHJONG_RIICHI,   // REACH is Japanglish
+		IPT_MAHJONG_REACH,
 		IPT_MAHJONG_RON,
 		IPT_MAHJONG_BET,
 		IPT_MAHJONG_LAST_CHANCE,
@@ -256,22 +258,6 @@ enum ioport_type
 		IPT_GAMBLE_STAND,   // player
 		IPT_GAMBLE_BET,     // player
 		IPT_GAMBLE_PAYOUT,  // player
-	//  IPT_GAMBLE_BUTTON1, // player
-	//  IPT_GAMBLE_BUTTON2, // many many gambling games have multi-games and/or multi-function-buttons
-	//  IPT_GAMBLE_BUTTON3, // I suggest to eliminate specific names
-	//  IPT_GAMBLE_BUTTON4,
-	//  IPT_GAMBLE_BUTTON5,
-	//  IPT_GAMBLE_BUTTON6,
-	//  IPT_GAMBLE_BUTTON7,
-	//  IPT_GAMBLE_BUTTON8,
-	//  IPT_GAMBLE_BUTTON9,
-	//  IPT_GAMBLE_BUTTON10,
-	//  IPT_GAMBLE_BUTTON11,
-	//  IPT_GAMBLE_BUTTON12,
-	//  IPT_GAMBLE_BUTTON13,
-	//  IPT_GAMBLE_BUTTON14,
-	//  IPT_GAMBLE_BUTTON15,
-	//  IPT_GAMBLE_BUTTON16,
 
 		// poker-specific inputs
 		IPT_POKER_HOLD1,
@@ -1119,8 +1105,8 @@ public:
 	ioport_manager &manager() const;
 	running_machine &machine() const;
 	int modcount() const { return m_modcount; }
-	ioport_setting *first_setting() const { return m_settinglist.first(); }
-	ioport_diplocation *first_diplocation() const { return m_diploclist.first(); }
+	const simple_list<ioport_setting> &settings() const { return m_settinglist; }
+	const simple_list<ioport_diplocation> &diplocations() const { return m_diploclist; }
 
 	ioport_value mask() const { return m_mask; }
 	ioport_value defvalue() const { return m_defvalue; }
@@ -1305,7 +1291,7 @@ public:
 	ioport_manager &manager() const;
 	device_t &device() const { return m_device; }
 	running_machine &machine() const;
-	ioport_field *first_field() const { return m_fieldlist.first(); }
+	const simple_list<ioport_field> &fields() const { return m_fieldlist; }
 	const char *tag() const { return m_tag.c_str(); }
 	int modcount() const { return m_modcount; }
 	ioport_value active() const { return m_active; }
@@ -1316,7 +1302,7 @@ public:
 	void write(ioport_value value, ioport_value mask = ~0);
 
 	// other operations
-	ioport_field *field(ioport_value mask);
+	ioport_field *field(ioport_value mask) const;
 	void collapse_fields(std::string &errorbuf);
 	void frame_update(ioport_field *mouse_field);
 	void init_live_state();
@@ -1480,7 +1466,7 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	ioport_port *first_port() const { return m_portlist.first(); }
+	const ioport_list &ports() const { return m_portlist; }
 	bool safe_to_read() const { return m_safe_to_read; }
 	natural_keyboard &natkeyboard() { return m_natkeyboard; }
 
@@ -1491,7 +1477,7 @@ public:
 	bool has_bioses() const { return m_has_bioses; }
 
 	// type helpers
-	input_type_entry *first_type() const { return m_typelist.first(); }
+	const simple_list<input_type_entry> &types() const { return m_typelist; }
 	bool type_pressed(ioport_type type, int player = 0);
 	const char *type_name(ioport_type type, UINT8 player);
 	ioport_group type_group(ioport_type type, int player);

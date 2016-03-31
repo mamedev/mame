@@ -13,8 +13,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __ROMLOAD_H__
-#define __ROMLOAD_H__
+#ifndef MAME_EMU_ROMLOAD_H
+#define MAME_EMU_ROMLOAD_H
 
 #include "chd.h"
 
@@ -350,7 +350,7 @@ private:
 
 /* ----- Helpers ----- */
 
-std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, file_error &filerr);
+std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, osd_file::error &filerr);
 
 /* return pointer to the first ROM region within a source */
 const rom_entry *rom_first_region(const device_t &device);
@@ -386,4 +386,4 @@ std::string rom_parameter_value(const rom_entry *romp);
 /* open a disk image, searching up the parent and loading by checksum */
 int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_entry *romp, chd_file &image_chd, const char *locationtag);
 
-#endif  /* __ROMLOAD_H__ */
+#endif  // MAME_EMU_ROMLOAD_H

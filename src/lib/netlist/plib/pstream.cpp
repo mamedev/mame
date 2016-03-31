@@ -101,7 +101,7 @@ void pifilestream::close()
 	}
 }
 
-unsigned pifilestream::vread(void *buf, unsigned n)
+unsigned pifilestream::vread(void *buf, const unsigned n)
 {
 	std::size_t r = fread(buf, 1, n, (FILE *) m_file);
 	if (r < n)
@@ -115,7 +115,7 @@ unsigned pifilestream::vread(void *buf, unsigned n)
 	return r;
 }
 
-void pifilestream::vseek(pos_type n)
+void pifilestream::vseek(const pos_type n)
 {
 	check_seekable();
 	if (fseek((FILE *) m_file, SEEK_SET, n) < 0)
@@ -200,7 +200,7 @@ void pofilestream::close()
 	}
 }
 
-void pofilestream::vwrite(const void *buf, unsigned n)
+void pofilestream::vwrite(const void *buf, const unsigned n)
 {
 	std::size_t r = fwrite(buf, 1, n, (FILE *) m_file);
 	if (r < n)
@@ -211,7 +211,7 @@ void pofilestream::vwrite(const void *buf, unsigned n)
 	m_pos += r;
 }
 
-void pofilestream::vseek(pos_type n)
+void pofilestream::vseek(const pos_type n)
 {
 	check_seekable();
 	if (fseek((FILE *) m_file, SEEK_SET, n) < 0)
@@ -271,7 +271,7 @@ pimemstream::~pimemstream()
 {
 }
 
-unsigned pimemstream::vread(void *buf, unsigned n)
+unsigned pimemstream::vread(void *buf, const unsigned n)
 {
 	unsigned ret = (m_pos + n <= m_len) ? n :  m_len - m_pos;
 
@@ -287,7 +287,7 @@ unsigned pimemstream::vread(void *buf, unsigned n)
 	return ret;
 }
 
-void pimemstream::vseek(pos_type n)
+void pimemstream::vseek(const pos_type n)
 {
 	m_pos = (n>=m_len) ? m_len : n;
 	clear_flag(FLAG_EOF);
@@ -314,7 +314,7 @@ pomemstream::~pomemstream()
 	pfree_array(m_mem);
 }
 
-void pomemstream::vwrite(const void *buf, unsigned n)
+void pomemstream::vwrite(const void *buf, const unsigned n)
 {
 	if (m_pos + n >= m_capacity)
 	{
@@ -336,7 +336,7 @@ void pomemstream::vwrite(const void *buf, unsigned n)
 	m_size = std::max(m_pos, m_size);
 }
 
-void pomemstream::vseek(pos_type n)
+void pomemstream::vseek(const pos_type n)
 {
 	m_pos = n;
 	m_size = std::max(m_pos, m_size);

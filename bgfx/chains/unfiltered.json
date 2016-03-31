@@ -1,0 +1,25 @@
+{	"name": "Default Nearest-Neighbor Filter",
+	"author": "Ryan Holtz",
+	"targets": [
+		{	"name": "temp",
+			"mode": "guest",
+			"bilinear": false
+		}
+	],
+	"passes": [
+		{	"effect": "unfiltered/blit",
+			"name": "Copy To Unstretched Texture",
+			"input": [
+				{ "sampler": "s_tex", "texture": "screen" }
+			],
+			"output": "temp"
+		},
+		{	"effect": "unfiltered/blit",
+			"name": "Final Upscale",
+			"input": [
+				{ "sampler": "s_tex", "target": "temp" }
+			],
+			"output": "output"
+		}
+	]
+}

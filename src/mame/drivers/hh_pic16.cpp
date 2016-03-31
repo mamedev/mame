@@ -258,8 +258,7 @@ static INPUT_PORTS_START( maniac )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // upper-left
 INPUT_PORTS_END
 
-
-static const INT16 maniac_speaker_levels[] = { 0, 32767, -32768, 0 };
+static const INT16 maniac_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
 static MACHINE_CONFIG_START( maniac, maniac_state )
 

@@ -53,6 +53,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "includes/lwings.h"
+#include "sound/okim6295.h"
 
 /* Avengers runs on hardware almost identical to Trojan, but with a protection
  * device and some small changes to the memory map and videohardware.
@@ -75,6 +76,10 @@ READ8_MEMBER(lwings_state::avengers_adpcm_r)
 
 WRITE8_MEMBER(lwings_state::lwings_bankswitch_w)
 {
+//  if (data & 0xe0) printf("bankswitch_w %02x\n", data);
+//  Fireball writes 0x20 on startup, maybe reset soundcpu?
+	m_sprbank = (data & 0x10)>>4; // Fireball only
+
 	/* bit 0 is flip screen */
 	flip_screen_set(~data & 0x01);
 
@@ -355,6 +360,58 @@ static ADDRESS_MAP_START( lwings_sound_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xe006, 0xe006) AM_WRITEONLY AM_SHARE("soundlatch2")
 ADDRESS_MAP_END
 
+
+
+static ADDRESS_MAP_START( fball_map, AS_PROGRAM, 8, lwings_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank2")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0xc000, 0xddff) AM_RAM
+	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_SHARE("bg1videoram")
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+
+	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xf809, 0xf809) AM_READ_PORT("P1")
+	AM_RANGE(0xf808, 0xf809) AM_WRITE(lwings_bg1_scrollx_w)
+	AM_RANGE(0xf80a, 0xf80a) AM_READ_PORT("P2")
+	AM_RANGE(0xf80b, 0xf80b) AM_READ_PORT("DSWA")
+	AM_RANGE(0xf80a, 0xf80b) AM_WRITE(lwings_bg1_scrolly_w)
+	AM_RANGE(0xf80c, 0xf80c) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xf80d, 0xf80d) AM_READ_PORT("P3") AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xf80e, 0xf80e) AM_READ_PORT("P4")
+
+	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
+ADDRESS_MAP_END
+
+
+
+
+WRITE8_MEMBER(lwings_state::fball_oki_bank_w)
+{
+	//printf("fball_oki_bank_w %02x\n", data);
+	membank("samplebank")->set_entry((data >> 1) & 0x7);
+}
+
+static ADDRESS_MAP_START( fball_oki_map, AS_0, 8, lwings_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("samplebank")
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( fball_sound_map, AS_PROGRAM, 8, lwings_state )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+
+	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_byte_r)
+
+	AM_RANGE(0xA000, 0xA000) AM_WRITE(fball_oki_bank_w)
+
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+
+	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+ADDRESS_MAP_END
+
 /* Yes, _no_ ram */
 static ADDRESS_MAP_START( trojan_adpcm_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
@@ -530,6 +587,58 @@ static INPUT_PORTS_START( lwingsb )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( fball )
+	PORT_INCLUDE( lwings_generic )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START4 )
+
+
+	PORT_START("DSWA") // only one set of dipswitches
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWA:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) ) // smaller starting explosion
+	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:2,3")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x06, "4" )
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SWA:4,5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("SWA:7") // 'X' in test mode, presumably unused
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SWA:8" )
+
+	PORT_START("P3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+
+	PORT_START("P4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 INPUT_PORTS_END
 
 /* Trojan with level selection - starting level dip switches not used */
@@ -743,6 +852,48 @@ void lwings_state::machine_start()
 	save_item(NAME(m_soundstate));
 	save_item(NAME(m_adpcm));
 	save_item(NAME(m_nmi_mask));
+	save_item(NAME(m_sprbank));
+
+	/*
+	Fireball has 2 copies of the 'fixed' code in the main program rom, with only slight changes.
+	it might be possible the hardware can bank that whole area or alternatively only see one version of the program
+	the only difference is 2 pieces of code have been swapped around.  It is unknown when this code is called.
+
+	3822:   CD  73
+	3823:   00  23
+	3824:   3E  72
+	3879:   73  CD
+	387A:   23  00
+	387B:   72  3E
+
+	bank 0
+	3822: 73            ld   (hl),e
+	3823: 23            inc  hl
+	3824: 72            ld   (hl),d
+	...
+	3879: CD 00 3E      call $3E00
+
+	bank 1
+	3822: CD 00 3E      call $3E00
+	..
+	3879: 73            ld   (hl),e
+	387A: 23            inc  hl
+	387B: 72            ld   (hl),d
+
+	*/
+
+	if (membank("bank2"))
+	{
+		membank("bank2")->configure_entries(0, 2, &ROM[0x0000], 0x8000);
+		membank("bank2")->set_entry(0);
+	}
+
+	if (membank("samplebank"))
+	{
+		UINT8 *OKIROM = memregion("oki")->base();
+		membank("samplebank")->configure_entries(0, 8, OKIROM, 0x20000);
+	}
+
 }
 
 void lwings_state::machine_reset()
@@ -804,6 +955,52 @@ static MACHINE_CONFIG_START( lwings, lwings_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 MACHINE_CONFIG_END
+
+
+
+
+
+
+
+
+
+static MACHINE_CONFIG_START( fball, lwings_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
+	MCFG_CPU_PROGRAM_MAP(fball_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", lwings_state,  avengers_interrupt)
+
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_12MHz/4) // ?
+	MCFG_CPU_PROGRAM_MAP(fball_sound_map)
+//  MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222)
+
+	/* video hardware */
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // the 16-pixel black border on left edge is correct, test mode actually uses that area
+	MCFG_SCREEN_UPDATE_DRIVER(lwings_state, screen_update_lwings)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lwings)
+
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, fball_oki_map)
+
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( trojan, lwings )
 
@@ -986,6 +1183,43 @@ ROM_START( lwingsb )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141.15g",   0x0000, 0x0100, CRC(d96bcc98) SHA1(99e69a624d5586e5eedacd2083fa68b36e7b5e40) )    /* timing (not used) */
 ROM_END
+
+
+
+ROM_START( fball )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "D4.bin", 0x00000, 0x20000, CRC(6122b3dc) SHA1(25aad9a7a26a10985a4af2de34d48ac917cfff04) )
+
+	ROM_REGION( 0x01000, "soundcpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "A05.bin", 0x00000, 0x01000, CRC(474dd19e) SHA1(962837716f54d0de2afb7f9df29f96b2e023bbcb) ) // BADADDR        ----xxxxxxxxxxxx (16x data repeat)
+	ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000)
+	ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000)
+	ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000)
+	ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000)
+
+	ROM_REGION( 0x04000, "gfx1", ROMREGION_ERASEFF )
+	ROM_LOAD( "J03.bin", 0x00000, 0x04000, CRC(be11627f) SHA1(de6b25e1b951d786d28a1c26716587754cfdc0df) ) // BADADDR        --xxxxxxxxxxxxxx (4x data repeat)
+	ROM_IGNORE(0x04000)
+	ROM_IGNORE(0x04000)
+	ROM_IGNORE(0x04000)
+
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_ERASEFF )
+	ROM_LOAD( "B15.bin", 0x20000, 0x10000, CRC(2169ad3e) SHA1(5628b97e6f4ad4291eb98b02ea8f9b2282b44c60) ) ROM_IGNORE(0x10000) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "C15.bin", 0x10000, 0x10000, CRC(0f77b03e) SHA1(23e4e7268346abcbadd9e42184853e2884a27430) ) ROM_IGNORE(0x10000) // ^
+	ROM_LOAD( "E15.bin", 0x00000, 0x10000, CRC(89a761d2) SHA1(71305ede65a2fa13f4331008f851509a0e1d92f9) ) ROM_IGNORE(0x10000) // ^
+	ROM_LOAD( "F15.bin", 0x30000, 0x10000, CRC(34b3f9a2) SHA1(29aeb22f0ee6b68a7a6d2a63bb99d5466d9ea798) ) ROM_IGNORE(0x10000) // ^
+
+	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASEFF )
+	ROM_LOAD( "J15.bin", 0x00000, 0x20000, CRC(ed7be8e7) SHA1(27f0e10161e0243b18326d4b23b2aaaaf4753960) )
+	ROM_LOAD( "H15.bin", 0x20000, 0x20000, CRC(6ffb5433) SHA1(8001b16f51909cf3f29f06650b60d99558759194) )
+
+	ROM_REGION( 0x100000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "A03.bin", 0x00000, 0x40000, CRC(22b0d089) SHA1(a82d04c389694e1ed0b9b24555ddd6f9d9f6ca38) )
+	ROM_RELOAD(0x40000,0x40000)
+	ROM_LOAD( "A02.bin", 0x80000, 0x40000, CRC(951d6579) SHA1(8976a836538eb510888f49af94dbf66dacb8f067) )
+	ROM_LOAD( "A01.bin", 0xc0000, 0x40000, CRC(020b5261) SHA1(698dbd7e125e4edd988791ecdae7db9ddc0705b3) )
+ROM_END
+
 
 ROM_START( sectionz )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
@@ -1509,3 +1743,8 @@ GAME( 1987, avengers,  0,        avengers, avengers, driver_device, 0, ROT90, "C
 GAME( 1987, avengers2, avengers, avengers, avengers, driver_device, 0, ROT90, "Capcom",                   "Avengers (US set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, buraiken,  avengers, avengers, avengers, driver_device, 0, ROT90, "Capcom",                   "Hissatsu Buraiken (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, buraikenb, avengers, avengersb,avengers, lwings_state, avengersb, ROT90, "Capcom",            "Hissatsu Buraiken (Japan, bootleg?)", MACHINE_SUPPORTS_SAVE ) // unprotected at least
+
+// cloned lwings hardware
+GAME( 1992, fball,  0,    fball, fball, driver_device,  0, ROT0, "FM Work", "Fire Ball (FM Work)", MACHINE_SUPPORTS_SAVE )
+
+	

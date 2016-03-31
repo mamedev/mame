@@ -526,6 +526,98 @@ static INPUT_PORTS_START( hattrick )
 	UNUSED_ANALOG
 INPUT_PORTS_END
 
+#if 0
+static INPUT_PORTS_START( teamht )
+	PORT_INCLUDE( sentetst )
+
+	PORT_MODIFY("SWH")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )      PORT_DIPLOCATION("H1:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x1c, 0x00, "Bonus Coin" )    PORT_DIPLOCATION("H1:3,4,5")
+	PORT_DIPSETTING(    0x00, "None" )
+	PORT_DIPSETTING(    0x04, "2 Coins +1" )
+	PORT_DIPSETTING(    0x08, "3 Coins +1" )
+	PORT_DIPSETTING(    0x0c, "4 Coins +1" )
+	PORT_DIPSETTING(    0x10, "4 Coins +2" )
+	PORT_DIPSETTING(    0x14, "5 Coins +1" )
+	PORT_DIPSETTING(    0x18, "5 Coins +2" )
+	PORT_DIPSETTING(    0x1c, "5 Coins +3" )
+	PORT_DIPNAME( 0x20, 0x00, "Left Multiplier" )    PORT_DIPLOCATION("H1:6")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPNAME( 0xc0, 0x00, "Right Multiplier" )    PORT_DIPLOCATION("H1:7,8")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "4" )
+	PORT_DIPSETTING(    0x80, "5" )
+	PORT_DIPSETTING(    0xc0, "6" )
+
+	PORT_MODIFY("SWG")
+	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("G1:1,2,3")
+	PORT_DIPSETTING(    0x00, "1:15" )
+	PORT_DIPSETTING(    0x01, "1:30" )
+	PORT_DIPSETTING(    0x02, "1:45" )
+	PORT_DIPSETTING(    0x03, "2:00" )
+	PORT_DIPSETTING(    0x04, "2:15" )
+	PORT_DIPSETTING(    0x05, "2:30" )
+	PORT_DIPSETTING(    0x06, "2:45" )
+	PORT_DIPSETTING(    0x07, "3:00" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "G1:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "G1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "G1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "G1:7" )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("AN2")
+	UNUSED_ANALOG
+
+	PORT_MODIFY("AN3")
+	UNUSED_ANALOG
+
+	PORT_START("EX0")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+
+	PORT_START("EX1")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+
+	PORT_START("EX2")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
+
+	PORT_START("EX3")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
+INPUT_PORTS_END
+#endif
 
 static INPUT_PORTS_START( otwalls )
 	PORT_INCLUDE( sentetst )
@@ -1360,6 +1452,22 @@ ROM_START( hattrick )
 ROM_END
 
 
+#if 0
+ROM_START( teamht )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_LOAD( "HATTRK.U8A", 0x10000, 0x4000, CRC(cb746de8) SHA1(b0e5003370b65f2aed4dc9ccb2a2d3eb29050245) )
+	ROM_LOAD( "HATTRK.U7A", 0x14000, 0x4000, CRC(5f2a0b24) SHA1(da1950a7e11014e47438a7c5831433390c1b1fd3) )
+	ROM_LOAD( "HATTRK.U1A", 0x2c000, 0x4000, CRC(6c6cf2be) SHA1(80e82ae4bd129000e74c4a5fd06d2109d5417e39) )
+
+	SOUNDBOARD_ROMS
+
+	ROM_REGION( 0x10000, "gfx1", 0 )        /* up to 64k of sprites */
+	ROM_LOAD( "HATTRK.U6B", 0x00000, 0x4000, CRC(6e299728) SHA1(f10fc020fdf8f61d059ac57306b0353ac7dbfb24) )
+
+	MOTHERBOARD_PALS
+ROM_END
+#endif
+
 ROM_START( otwalls )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "otw-ab0.bin", 0x10000, 0x2000, CRC(474441c7) SHA1(16fb5be9f94e072d4f3003abcc9dcf6d7af2359a) )
@@ -2162,6 +2270,16 @@ DRIVER_INIT_MEMBER(balsente_state,sentetst)  { expand_roms(EXPAND_ALL);  config_
 DRIVER_INIT_MEMBER(balsente_state,cshift)    { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 0 /* noanalog */); }
 DRIVER_INIT_MEMBER(balsente_state,gghost)    { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 1); }
 DRIVER_INIT_MEMBER(balsente_state,hattrick)  { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 0 /* noanalog */); }
+DRIVER_INIT_MEMBER(balsente_state,teamht)
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	expand_roms(EXPAND_ALL);
+	config_shooter_adc(FALSE, 0 /* noanalog */);
+	space.install_read_handler(0x9404, 0x9404, read8_delegate(FUNC(balsente_state::teamht_extra_r),this));
+	space.install_write_handler(0x9000, 0x9007, write8_delegate(FUNC(balsente_state::teamht_multiplex_select_w),this));
+
+}
+
 DRIVER_INIT_MEMBER(balsente_state,otwalls)   { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 0); }
 DRIVER_INIT_MEMBER(balsente_state,snakepit)  { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 1); }
 DRIVER_INIT_MEMBER(balsente_state,snakjack)  { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 1); }
@@ -2285,3 +2403,6 @@ GAME( 1987, rescraid, 0,        balsente, rescraid, balsente_state, rescraid, RO
 GAME( 1986, shrike,   0,        shrike,   shrike, balsente_state,   shrike,   ROT0, "Bally/Sente",  "Shrike Avenger (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rescraida,rescraid, balsente, rescraid, balsente_state, rescraid, ROT0, "Bally Midway", "Rescue Raider (stand-alone)", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, grudge,   0,        balsente, grudge, balsente_state,   grudge,   ROT0, "Bally Midway", "Grudge Match (prototype)", MACHINE_SUPPORTS_SAVE )
+#if 0
+GAME( 1985, teamht,   hattrick, balsente, teamht, balsente_state, teamht, ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )
+#endif

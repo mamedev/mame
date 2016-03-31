@@ -37,17 +37,10 @@ function devicesProject(_target, _subtarget)
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. "emu",
 		GEN_DIR  .. "emu/layout",
+		ext_includedir("expat"),
+		ext_includedir("lua"),
+		ext_includedir("flac"),
 	}
-	if _OPTIONS["with-bundled-expat"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/expat/lib",
-		}
-	end
-	if _OPTIONS["with-bundled-lua"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/lua/src",
-		}
-	end
 
 	dofile(path.join("src", "cpu.lua"))
 
@@ -75,17 +68,9 @@ if #disasm_files > 0 then
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. "emu",
+		ext_includedir("expat"),
+		ext_includedir("lua"),
 	}
-	if _OPTIONS["with-bundled-expat"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/expat/lib",
-		}
-	end
-	if _OPTIONS["with-bundled-lua"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/lua/src",
-		}
-	end
 
 	files {
 		disasm_files

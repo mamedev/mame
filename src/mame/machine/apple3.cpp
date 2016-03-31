@@ -135,12 +135,16 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		case 0x40: case 0x41: case 0x42: case 0x43:
 		case 0x44: case 0x45: case 0x46: case 0x47:
 		case 0x48: case 0x49: case 0x4A: case 0x4B:
-		case 0x4C: case 0x4D: case 0x4E: case 0x4F:
+		case 0x4C: case 0x4D:
 			m_c040_time = 200;
+			break;
+
+		case 0x4E: case 0x4F:   // character RAM enable/disable
 			break;
 
 		case 0x50: case 0x51: case 0x52: case 0x53:
 		case 0x54: case 0x55: case 0x56: case 0x57:
+			machine().first_screen()->update_partial(machine().first_screen()->vpos());
 			/* graphics softswitches */
 			if (offset & 1)
 				m_flags |= 1 << ((offset - 0x50) / 2);
@@ -235,8 +239,8 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			}
 			break;
 
-		case 0xD0: case 0xD1: case 0xD2: case 0xD3:
-		case 0xD4: case 0xD5: case 0xD6: case 0xD7:
+		case 0xd0: case 0xd1: case 0xd2: case 0xd3:
+		case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 			/* external drive stuff */
 			m_fdc->read_c0dx(space, offset&0xf);
 			result = 0x00;
@@ -246,35 +250,56 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			m_smoothscr = offset & 1;
 			break;
 
-		case 0xDB:
-			apple3_write_charmem();
+		case 0xda:
+//          printf("ENCWRT off\n");
 			break;
 
-		case 0xE0: case 0xE1:
+		case 0xdb:
+			apple3_write_charmem();
+//          printf("ENCWRT on (write_charmem (r))\n");
+			break;
+
+		case 0xdc:
+//          printf("ENCSEL off\n");
+			break;
+
+		case 0xdd:
+//          printf("ENCSEL on\n");
+			break;
+
+		case 0xde:
+//          printf("ENSIO off\n");
+			break;
+
+		case 0xdf:
+//          printf("ENSIO on\n");
+			break;
+
+		case 0xe0: case 0xe1:
 			result = m_fdc->read(space, offset&0xf);
 			m_va = offset & 1;
 			break;
 
-		case 0xE2: case 0xE3:
+		case 0xe2: case 0xe3:
 			result = m_fdc->read(space, offset&0xf);
 			m_vb = offset & 1;
 			break;
 
-		case 0xE4: case 0xE5:
+		case 0xe4: case 0xe5:
 			result = m_fdc->read(space, offset&0xf);
 			m_vc = offset & 1;
 			break;
 
-		case 0xE6: case 0xE7: case 0xE8: case 0xE9:
-		case 0xEA: case 0xEB: case 0xEC: case 0xED:
-		case 0xEE: case 0xEF:
+		case 0xe6: case 0xe7: case 0xe8: case 0xe9:
+		case 0xea: case 0xeb: case 0xec: case 0xed:
+		case 0xee: case 0xef:
 			result = m_fdc->read(space, offset&0xf);
 			break;
 
-		case 0xF0:
-		case 0xF1:
-		case 0xF2:
-		case 0xF3:
+		case 0xf0:
+		case 0xf1:
+		case 0xf2:
+		case 0xf3:
 			result = m_acia->read(space, offset & 0x03);
 			break;
 	}
@@ -314,12 +339,16 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 		case 0x40: case 0x41: case 0x42: case 0x43:
 		case 0x44: case 0x45: case 0x46: case 0x47:
 		case 0x48: case 0x49: case 0x4A: case 0x4B:
-		case 0x4C: case 0x4D: case 0x4E: case 0x4F:
+		case 0x4C: case 0x4D:
 			m_c040_time = 200;
+			break;
+
+		case 0x4E: case 0x4F:   // character RAM disable/enable
 			break;
 
 		case 0x50: case 0x51: case 0x52: case 0x53:
 		case 0x54: case 0x55: case 0x56: case 0x57:
+			machine().first_screen()->update_partial(machine().first_screen()->vpos());
 			/* graphics softswitches */
 			if (offset & 1)
 				m_flags |= 1 << ((offset - 0x50) / 2);
@@ -390,31 +419,52 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 			}
 			break;
 
-		case 0xD0: case 0xD1: case 0xD2: case 0xD3:
-		case 0xD4: case 0xD5: case 0xD6: case 0xD7:
+		case 0xd0: case 0xd1: case 0xd2: case 0xd3:
+		case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 			/* external drive stuff */
 			m_fdc->write_c0dx(space, offset&0xf, data);
 			break;
 
-		case 0xd9:
-			popmessage("Smooth scroll enabled, contact MESSdev");
+		case 0xd8: case 0xd9:
+			m_smoothscr = offset & 1;
 			break;
 
-		case 0xDB:
+		case 0xda:
+//          printf("ENCWRT off\n");
+			break;
+
+		case 0xdb:
 			apple3_write_charmem();
+//          printf("ENCWRT on (write_charmem (w))\n");
 			break;
 
-		case 0xE0: case 0xE1: case 0xE2: case 0xE3:
-		case 0xE4: case 0xE5: case 0xE6: case 0xE7:
-		case 0xE8: case 0xE9: case 0xEA: case 0xEB:
-		case 0xEC: case 0xED: case 0xEE: case 0xEF:
+		case 0xdc:
+//          printf("ENCSEL off\n");
+			break;
+
+		case 0xdd:
+//          printf("ENCSEL on\n");
+			break;
+
+		case 0xde:
+//          printf("ENSIO off\n");
+			break;
+
+		case 0xdf:
+//          printf("ENSIO on\n");
+			break;
+
+		case 0xe0: case 0xe1: case 0xe2: case 0xe3:
+		case 0xe4: case 0xe5: case 0xe6: case 0xe7:
+		case 0xe8: case 0xe9: case 0xea: case 0xeb:
+		case 0xec: case 0xed: case 0xee: case 0xef:
 			m_fdc->write(space, offset&0xf, data);
 			break;
 
-		case 0xF0:
-		case 0xF1:
-		case 0xF2:
-		case 0xF3:
+		case 0xf0:
+		case 0xf1:
+		case 0xf2:
+		case 0xf3:
 			m_acia->write(space, offset & 0x03, data);
 			break;
 	}
@@ -530,7 +580,6 @@ void apple3_state::apple3_update_memory()
 	}
 	else
 	{
-		m_rom_has_been_disabled = true;
 		m_bank7rd = m_bank7wr;
 
 		// if we had an IRQ waiting for RAM to be paged in...
@@ -576,17 +625,6 @@ void apple3_state::apple3_irq_update()
 {
 	if (m_acia_irq || m_via_1_irq || m_via_0_irq)
 	{
-		// HACK: SOS floppy driver enables ROM at Fxxx *before* trying to
-		// suppress IRQs.  IRQ hits at inopportune time -> bad vector -> system crash.
-		// This breaks the Confidence Test, but the Confidence Test
-		// never disables the ROM so checking for that gets us
-		// working in all cases.
-		// Bonus points: for some reason this isn't a problem with -debug.
-		// m6502 heisenbug maybe?
-		if ((m_via_0_a & ENV_ROMENABLE) && (m_rom_has_been_disabled))
-		{
-			return;
-		}
 //      printf("   setting IRQ\n");
 		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 		m_via_1->write_pa7(0);  // this is active low
@@ -630,12 +668,14 @@ MACHINE_RESET_MEMBER(apple3_state,apple3)
 	m_c040_time = 0;
 	m_strobe = 0;
 	m_lastchar = 0x0d;
-	m_rom_has_been_disabled = false;
 	m_cnxx_slot = -1;
 	m_analog_sel = 0;
 	m_ramp_active = false;
 
 	m_fdc->set_floppies_4(floppy0, floppy1, floppy2, floppy3);
+
+	m_scanstart->adjust(machine().first_screen()->time_until_pos(0, 0));
+	m_scanend->adjust(attotime::never);
 }
 
 
@@ -702,6 +742,9 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	m_via_1->write_pb6(1);
 	m_via_1->write_pb7(1);
 
+	m_scanstart = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple3_state::scanstart_cb),this));
+	m_scanend = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple3_state::scanend_cb),this));
+
 	apple3_update_memory();
 
 	save_item(NAME(m_acia_irq));
@@ -714,7 +757,6 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	save_item(NAME(m_zpa));
 	save_item(NAME(m_last_n));
 	save_item(NAME(m_sync));
-	save_item(NAME(m_rom_has_been_disabled));
 	save_item(NAME(m_indir_bank));
 	save_item(NAME(m_cnxx_slot));
 	save_item(NAME(m_speaker_state));
@@ -855,7 +897,11 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 	}
 	else
 	{
-		if (offset >= 0xffd0 && offset <= 0xffdf)
+		if (offset >= 0xffc0 && offset <= 0xffcf)
+		{
+			rv = m_bank7wr[offset - 0xf000];
+		}
+		else if (offset >= 0xffd0 && offset <= 0xffdf)
 		{
 			rv = m_via_0->read(space, offset);
 		}
@@ -992,7 +1038,15 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 	}
 	else
 	{
-		if (offset >= 0xffd0 && offset <= 0xffdf)
+		if (offset >= 0xffc0 && offset <= 0xffcf)
+		{
+			// does writeprot really apply to ffcx?
+			if (!(m_via_0_a & ENV_WRITEPROT))
+			{
+				m_bank7wr[offset - 0xf000] = data;
+			}
+		}
+		else if (offset >= 0xffd0 && offset <= 0xffdf)
 		{
 			if (!space.debugger_access())
 			{
@@ -1035,6 +1089,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_c040_tick)
 		m_speaker->level_w(m_speaker_state);
 		m_c040_time--;
 	}
+}
+
+TIMER_CALLBACK_MEMBER(apple3_state::scanstart_cb)
+{
+	int scanline;
+
+	scanline = machine().first_screen()->vpos();
+	//machine().first_screen()->update_partial(machine().first_screen()->vpos());
+
+	m_via_1->write_pb6(0);
+
+	m_scanend->adjust(machine().first_screen()->time_until_pos(scanline, 559));
+}
+
+TIMER_CALLBACK_MEMBER(apple3_state::scanend_cb)
+{
+	int scanline = machine().first_screen()->vpos();
+
+	m_via_1->write_pb6(1);
+
+	m_scanstart->adjust(machine().first_screen()->time_until_pos((scanline+1) % 224, 0));
 }
 
 READ_LINE_MEMBER(apple3_state::ay3600_shift_r)
@@ -1205,7 +1280,7 @@ void apple3_state::pdl_handler(int offset)
 					break;
 
 				case 2:
-					pdlread = m_joy1y->read();
+					pdlread = 255 - m_joy1y->read();
 					break;
 
 				case 4:
@@ -1213,7 +1288,7 @@ void apple3_state::pdl_handler(int offset)
 					break;
 
 				case 5:
-					pdlread = m_joy2y->read();
+					pdlread = 255 - m_joy2y->read();
 					break;
 
 				default:
@@ -1224,8 +1299,8 @@ void apple3_state::pdl_handler(int offset)
 			// help the ROM self-test
 			if (m_pdl_charge > 82)
 			{
-				m_pdl_charge += (pdlread*4);
-				m_pdl_charge -= 93;
+				m_pdl_charge += (pdlread*7);
+				m_pdl_charge -= 100;
 			}
 			m_pdltimer->adjust(attotime::from_hz(1000000.0));
 			m_ramp_active = true;

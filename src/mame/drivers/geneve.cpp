@@ -584,14 +584,14 @@ WRITE_LINE_MEMBER( geneve_state::ext_ready )
 {
 	if (TRACE_READY) logerror("geneve: READY level (ext) = %02x\n", state);
 	m_ready_line = state;
-	m_cpu->set_ready((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
+	m_cpu->ready_line((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( geneve_state::mapper_ready )
 {
 	if (TRACE_READY) logerror("geneve: READY level (mapper) = %02x\n", state);
 	m_ready_line1 = state;
-	m_cpu->set_ready((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
+	m_cpu->ready_line((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*
@@ -672,8 +672,8 @@ void geneve_state::machine_reset()
 	m_keyint = CLEAR_LINE;
 
 	// No automatic wait state (auto wait state is enabled with READY=CLEAR at RESET)
-	m_cpu->set_ready(ASSERT_LINE);
-	m_cpu->set_hold(CLEAR_LINE);
+	m_cpu->ready_line(ASSERT_LINE);
+	m_cpu->hold_line(CLEAR_LINE);
 
 	m_ready_line = m_ready_line1 = ASSERT_LINE;
 

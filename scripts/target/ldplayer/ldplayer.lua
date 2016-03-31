@@ -56,7 +56,7 @@ function createProjects_ldplayer_ldplayer(_target, _subtarget)
 	targetsubdir(_target .."_" .. _subtarget)
 	kind (LIBTYPE)
 	uuid (os.uuid("drvldplayer"))
-	
+
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
@@ -78,7 +78,7 @@ function createProjects_ldplayer_ldplayer(_target, _subtarget)
 
 	custombuildtask {
 		layoutbuildtask("ldplayer/layout", "pr8210"),
-	}		
+	}
 end
 
 function linkProjects_ldplayer_ldplayer(_target, _subtarget)

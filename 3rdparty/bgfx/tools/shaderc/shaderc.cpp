@@ -70,6 +70,23 @@ namespace bgfx
 		NULL
 	};
 
+	static const char* s_ARB_gpu_shader5[] =
+	{
+		"bitfieldReverse",
+		"floatBitsToInt",
+		"floatBitsToUint",
+		"intBitsToFloat",
+		"uintBitsToFloat",
+		NULL
+	};
+
+	static const char* s_ARB_shading_language_packing[] =
+	{
+		"packHalf2x16",
+		"unpackHalf2x16",
+		NULL
+	};
+
 	static const char* s_130[] =
 	{
 		"uint",
@@ -78,6 +95,14 @@ namespace bgfx
 		"uint4",
 		"isampler3D",
 		"usampler3D",
+		NULL
+	};
+
+	static const char* s_ARB_texture_multisample[] =
+	{
+		"sampler2DMS",
+		"isampler2DMS",
+		"usampler2DMS",
 		NULL
 	};
 
@@ -1041,6 +1066,20 @@ namespace bgfx
 				memset(&data[size+1], 0, padding);
 				fclose(file);
 
+				if (!raw)
+				{
+					// To avoid commented code being recognized as used feature,
+					// first preprocess pass is used to strip all comments before
+					// substituting code.
+					preprocessor.run(data);
+					delete [] data;
+
+					size = (uint32_t)preprocessor.m_preprocessed.size();
+					data = new char[size+padding+1];
+					memcpy(data, preprocessor.m_preprocessed.c_str(), size);
+					memset(&data[size], 0, padding+1);
+				}
+
 				strNormalizeEol(data);
 
 				input = const_cast<char*>(bx::strws(data) );
@@ -1072,21 +1111,6 @@ namespace bgfx
 					}
 
 					input = const_cast<char*>(bx::strws(input) );
-				}
-
-				if (!raw)
-				{
-					// To avoid commented code being recognized as used feature,
-					// first preprocess pass is used to strip all comments before
-					// substituting code.
-					preprocessor.run(input);
-					delete [] data;
-
-					size = (uint32_t)preprocessor.m_preprocessed.size();
-					data = new char[size+padding+1];
-					memcpy(data, preprocessor.m_preprocessed.c_str(), size);
-					memset(&data[size], 0, padding+1);
-					input = data;
 				}
 			}
 
@@ -1706,7 +1730,10 @@ namespace bgfx
 							{
 								std::string code;
 
-								bool hasTextureLod = NULL != bx::findIdentifierMatch(input, s_ARB_shader_texture_lod /*EXT_shader_texture_lod*/);
+								const bool hasTextureLod    = NULL != bx::findIdentifierMatch(input, s_ARB_shader_texture_lod /*EXT_shader_texture_lod*/);
+								const bool hasShader5       = NULL != bx::findIdentifierMatch(input, s_ARB_gpu_shader5);
+								const bool hasShaderPacking = NULL != bx::findIdentifierMatch(input, s_ARB_shading_language_packing);
+								const bool hasTextureMS     = NULL != bx::findIdentifierMatch(input, s_ARB_texture_multisample);
 
 								if (0 == essl)
 								{
@@ -1723,6 +1750,20 @@ namespace bgfx
 										bx::stringPrintf(code, "#version %s\n", need130 ? "130" : profile);
 									}
 
+									if (hasShader5)
+									{
+										bx::stringPrintf(code
+											, "#extension GL_ARB_gpu_shader5 : enable\n"
+											);
+									}
+
+									if (hasShaderPacking)
+									{
+										bx::stringPrintf(code
+											, "#extension GL_ARB_shading_language_packing : enable\n"
+											);
+									}
+
 									bx::stringPrintf(code
 										, "#define bgfxShadow2D shadow2D\n"
 										  "#define bgfxShadow2DProj shadow2DProj\n"
@@ -1733,6 +1774,13 @@ namespace bgfx
 									{
 										bx::stringPrintf(code
 											, "#extension GL_ARB_shader_texture_lod : enable\n"
+											);
+									}
+
+									if (hasTextureMS)
+									{
+										bx::stringPrintf(code
+											, "#extension GL_ARB_texture_multisample : enable\n"
 											);
 									}
 								}
@@ -1769,6 +1817,20 @@ namespace bgfx
 											, "#extension GL_EXT_shadow_samplers : enable\n"
 											  "#define shadow2D shadow2DEXT\n"
 											  "#define shadow2DProj shadow2DProjEXT\n"
+											);
+									}
+
+									if (hasShader5)
+									{
+										bx::stringPrintf(code
+											, "#extension GL_ARB_gpu_shader5 : enable\n"
+											);
+									}
+
+									if (hasShaderPacking)
+									{
+										bx::stringPrintf(code
+											, "#extension GL_ARB_shading_language_packing : enable\n"
 											);
 									}
 

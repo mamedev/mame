@@ -51,7 +51,7 @@ void DeviceInformationWindow::fill_device_information()
 	gl1->addWidget(new QLabel(QString(m_device->shortname()), primaryFrame), 2, 1);
 
 	int cpos = 3;
-	device_interface *intf = m_device->first_interface();
+	device_interface *intf = m_device->interfaces().first();
 	if(intf) {
 		gl1->addWidget(new QLabel(QString("Interfaces"), primaryFrame), cpos, 0);
 		while(intf) {

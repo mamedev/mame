@@ -112,7 +112,7 @@ struct gamepad_state
 // state information for a gamepad; state must be first element
 struct xinput_api_state
 {
-	UINT32					playerIndex;
+	UINT32                  playerIndex;
 	XINPUT_STATE            xstate;
 	XINPUT_CAPABILITIES     caps;
 };
@@ -187,7 +187,7 @@ private:
 public:
 	xinput_joystick_device(running_machine &machine, const char *name, input_module &module)
 		: device_info(machine, name, DEVICE_CLASS_JOYSTICK, module),
-			gamepad({0}),
+			gamepad({{0}}),
 			xinput_state({0}),
 			xinput_api(nullptr)
 	{
@@ -222,7 +222,7 @@ public:
 			int currentButton = xinput_buttons[buttonindex];
 			gamepad.rgbButtons[buttonindex] = (xinput_state.xstate.Gamepad.wButtons & currentButton) ? 0xFF : 0;
 		}
-		
+
 		// Now grab the axis values
 		// Each of the thumbstick axis members is a signed value between -32768 and 32767 describing the position of the thumbstick
 		// However, the Y axis values are inverted from what MAME expects, so multiply by -1 first
@@ -297,13 +297,13 @@ protected:
 					continue;
 
 				// Add the axes
-				for (int i = 0; i < XINPUT_MAX_AXIS; i++)
+				for (int axisnum = 0; axisnum < XINPUT_MAX_AXIS; axisnum++)
 				{
 					devinfo->device()->add_item(
-						xinput_axis_name[i],
-						xinput_axis_ids[i],
+						xinput_axis_name[axisnum],
+						xinput_axis_ids[axisnum],
 						generic_axis_get_state,
-						&devinfo->gamepad.sThumbLX + i);
+						&devinfo->gamepad.sThumbLX + axisnum);
 				}
 
 				// Populate the POVs

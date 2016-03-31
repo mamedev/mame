@@ -26,7 +26,7 @@ const device_type NEWBRAIN_EXPANSION_SLOT = &device_creator<newbrain_expansion_s
 //  device_newbrain_expansion_slot_interface - constructor
 //-------------------------------------------------
 
-device_newbrain_expansion_slot_interface::device_newbrain_expansion_slot_interface(const machine_config &mconfig, device_t &device)	:
+device_newbrain_expansion_slot_interface::device_newbrain_expansion_slot_interface(const machine_config &mconfig, device_t &device) :
 	device_slot_card_interface(mconfig,device)
 {
 	m_slot = dynamic_cast<newbrain_expansion_slot_t *>(device.owner());

@@ -181,10 +181,10 @@ const char *cheat_parameter::text()
 	{
 		// if not, we're an item cheat
 		m_curtext = string_format("??? (%d)", UINT32(m_value));
-		for (item *curitem = m_itemlist.first(); curitem != nullptr; curitem = curitem->next())
-			if (curitem->value() == m_value)
+		for (item &curitem : m_itemlist)
+			if (curitem.value() == m_value)
 			{
-				m_curtext.assign(curitem->text());
+				m_curtext.assign(curitem.text());
 				break;
 			}
 	}
@@ -216,8 +216,8 @@ void cheat_parameter::save(emu_file &cheatfile) const
 	// iterate over items
 	else
 	{
-		for (const item *curitem = m_itemlist.first(); curitem != nullptr; curitem = curitem->next())
-			cheatfile.printf("\t\t\t<item value=\"%s\">%s</item>\n", curitem->value().format().c_str(), curitem->text());
+		for (const item &curitem : m_itemlist)
+			cheatfile.printf("\t\t\t<item value=\"%s\">%s</item>\n", curitem.value().format().c_str(), curitem.text());
 		cheatfile.printf("\t\t</parameter>\n");
 	}
 }
@@ -357,8 +357,8 @@ void cheat_script::execute(cheat_manager &manager, UINT64 &argindex)
 		return;
 
 	// iterate over entries
-	for (script_entry *entry = m_entrylist.first(); entry != nullptr; entry = entry->next())
-		entry->execute(manager, argindex);
+	for (script_entry &entry : m_entrylist)
+		entry.execute(manager, argindex);
 }
 
 
@@ -381,8 +381,8 @@ void cheat_script::save(emu_file &cheatfile) const
 	cheatfile.printf(">\n");
 
 	// output entries
-	for (const script_entry *entry = m_entrylist.first(); entry != nullptr; entry = entry->next())
-		entry->save(cheatfile);
+	for (const script_entry &entry : m_entrylist)
+		entry.save(cheatfile);
 
 	// close the tag
 	cheatfile.printf("\t\t</script>\n");
@@ -499,8 +499,8 @@ void cheat_script::script_entry::execute(cheat_manager &manager, UINT64 &arginde
 		// iterate over arguments and evaluate them
 		UINT64 params[MAX_ARGUMENTS];
 		int curarg = 0;
-		for (output_argument *arg = m_arglist.first(); arg != nullptr; arg = arg->next())
-			curarg += arg->values(argindex, &params[curarg]);
+		for (output_argument &arg : m_arglist)
+			curarg += arg.values(argindex, &params[curarg]);
 
 		// generate the astring
 		manager.get_output_astring(m_line, m_justify) = string_format(m_format,
@@ -550,8 +550,8 @@ void cheat_script::script_entry::save(emu_file &cheatfile) const
 		else
 		{
 			cheatfile.printf(">\n");
-			for (const output_argument *curarg = m_arglist.first(); curarg != nullptr; curarg = curarg->next())
-				curarg->save(cheatfile);
+			for (const output_argument &curarg : m_arglist)
+				curarg.save(cheatfile);
 			cheatfile.printf("\t\t\t</output>\n");
 		}
 	}
@@ -567,8 +567,8 @@ void cheat_script::script_entry::validate_format(const char *filename, int line)
 {
 	// first count arguments
 	int argsprovided = 0;
-	for (const output_argument *curarg = m_arglist.first(); curarg != nullptr; curarg = curarg->next())
-		argsprovided += curarg->count();
+	for (const output_argument &curarg : m_arglist)
+		argsprovided += curarg.count();
 
 	// now scan the string for valid argument usage
 	const char *p = strchr(m_format.c_str(), '%');
@@ -1026,6 +1026,19 @@ std::unique_ptr<cheat_script> &cheat_entry::script_for_state(script_state state)
 }
 
 
+//-------------------------------------------------
+//  is_duplicate - determine if a new cheat entry
+//  is already included in the list
+//-------------------------------------------------
+
+bool cheat_entry::is_duplicate() const
+{
+	for (cheat_entry &scannode : manager().entries())
+		if (strcmp(scannode.description(), description()) == 0)
+			return true;
+	return false;
+}
+
 
 //**************************************************************************
 //  CHEAT MANAGER
@@ -1086,9 +1099,9 @@ void cheat_manager::set_enable(bool enable)
 	if (!m_disabled && !enable)
 	{
 		// iterate over running cheats and execute any OFF Scripts
-		for (cheat_entry *cheat = m_cheatlist.first(); cheat != nullptr; cheat = cheat->next())
-			if (cheat->state() == SCRIPT_STATE_RUN)
-				cheat->execute_off_script();
+		for (cheat_entry &cheat : m_cheatlist)
+			if (cheat.state() == SCRIPT_STATE_RUN)
+				cheat.execute_off_script();
 		machine().popmessage("Cheats Disabled");
 		m_disabled = true;
 	}
@@ -1098,9 +1111,9 @@ void cheat_manager::set_enable(bool enable)
 	{
 		// iterate over running cheats and execute any ON Scripts
 		m_disabled = false;
-		for (cheat_entry *cheat = m_cheatlist.first(); cheat != nullptr; cheat = cheat->next())
-			if (cheat->state() == SCRIPT_STATE_RUN)
-				cheat->execute_on_script();
+		for (cheat_entry &cheat : m_cheatlist)
+			if (cheat.state() == SCRIPT_STATE_RUN)
+				cheat.execute_on_script();
 		machine().popmessage("Cheats Enabled");
 	}
 }
@@ -1171,10 +1184,10 @@ bool cheat_manager::save_all(const char *filename)
 {
 	// open the file with the proper name
 	emu_file cheatfile(machine().options().cheat_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	file_error filerr = cheatfile.open(filename, ".xml");
+	osd_file::error filerr = cheatfile.open(filename, ".xml");
 
 	// if that failed, return nothing
-	if (filerr != FILERR_NONE)
+	if (filerr != osd_file::error::NONE)
 		return false;
 
 	// wrap the rest of catch errors
@@ -1186,8 +1199,8 @@ bool cheat_manager::save_all(const char *filename)
 		cheatfile.printf("<mamecheat version=\"%d\">\n", CHEAT_VERSION);
 
 		// iterate over cheats in the list and save them
-		for (cheat_entry *cheat = m_cheatlist.first(); cheat != nullptr; cheat = cheat->next())
-			cheat->save(cheatfile);
+		for (cheat_entry &cheat : m_cheatlist)
+			cheat.save(cheatfile);
 
 		// close out the file
 		cheatfile.printf("</mamecheat>\n");
@@ -1345,8 +1358,8 @@ void cheat_manager::frame_update()
 		elem.clear();
 
 	// iterate over running cheats and execute them
-	for (cheat_entry *cheat = m_cheatlist.first(); cheat != nullptr; cheat = cheat->next())
-		cheat->frame_update();
+	for (cheat_entry &cheat : m_cheatlist)
+		cheat.frame_update();
 
 	// increment the frame counter
 	m_framecount++;
@@ -1372,10 +1385,10 @@ void cheat_manager::load_cheats(const char *filename)
 	try
 	{
 		// open the file with the proper name
-		file_error filerr = cheatfile.open(filename, ".xml");
+		osd_file::error filerr = cheatfile.open(filename, ".xml");
 
 		// loop over all instrances of the files found in our search paths
-		while (filerr == FILERR_NONE)
+		while (filerr == osd_file::error::NONE)
 		{
 			osd_printf_verbose("Loading cheats file from %s\n", cheatfile.fullpath());
 
@@ -1403,23 +1416,16 @@ void cheat_manager::load_cheats(const char *filename)
 			for (xml_data_node *cheatnode = xml_get_sibling(mamecheatnode->child, "cheat"); cheatnode != nullptr; cheatnode = xml_get_sibling(cheatnode->next, "cheat"))
 			{
 				// load this entry
-				auto curcheat = global_alloc(cheat_entry(*this, m_symtable, filename, *cheatnode));
+				cheat_entry *curcheat = global_alloc(cheat_entry(*this, m_symtable, filename, *cheatnode));
 
 				// make sure we're not a duplicate
-				cheat_entry *scannode = nullptr;
-				if (REMOVE_DUPLICATE_CHEATS)
-					for (scannode = m_cheatlist.first(); scannode != nullptr; scannode = scannode->next())
-						if (strcmp(scannode->description(), curcheat->description()) == 0)
-						{
-							osd_printf_verbose("Ignoring duplicate cheat '%s' from file %s\n", curcheat->description(), cheatfile.fullpath());
-							break;
-						}
-
-				// add to the end of the list
-				if (scannode == nullptr)
-					m_cheatlist.append(*curcheat);
-				else
+				if (REMOVE_DUPLICATE_CHEATS && curcheat->is_duplicate())
+				{
+					osd_printf_verbose("Ignoring duplicate cheat '%s' from file %s\n", curcheat->description(), cheatfile.fullpath());
 					global_free(curcheat);
+				}
+				else // add to the end of the list
+					m_cheatlist.append(*curcheat);
 			}
 
 			// free the file and loop for the next one

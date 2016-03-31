@@ -21,6 +21,7 @@ Supported rendering backends:
  * OpenGL ES 2
  * OpenGL ES 3.1
  * WebGL 1.0
+ * WebGL 2.0
 
 Supported HMD:
 
@@ -77,7 +78,8 @@ Who is using it?
 ----------------
 
 http://airmech.com/ AirMech is a free-to-play futuristic action real-time
-strategy video game developed and published by Carbon Games.
+strategy video game developed and published by Carbon Games.  
+![airmech](https://www.mobygames.com/images/shots/l/830630-airmech-playstation-4-screenshot-blue-bar-on-your-mech-indicates.jpg)
 
 https://github.com/dariomanesku/cmftStudio cmftStudio - cubemap filtering tool.  
 ![cmftStudio](https://github.com/dariomanesku/cmftStudio/raw/master/screenshots/cmftStudio_small.jpg)
@@ -127,6 +129,13 @@ http://makingartstudios.itch.io/dls - DLS the digital logic simulator game.
 ![dls-screenshot](https://img.itch.io/aW1hZ2UvMzk3MTgvMTc5MjQ4LnBuZw==/original/kA%2FQPb.png)
 
 https://github.com/mamedev/mame MAME - Multiple Arcade Machine Emulator
+[Try MAME in Browser!](http://fos.textfiles.com/dfjustin/pacman/pacman/)  
+![mame-screenshot](https://raw.githubusercontent.com/mamedev/www.mamedev.org/d8d716dbb63919a11964b5d47b9b7f6cfa006b56/bgfx/Raiden.png)
+
+https://blackshift.itch.io/blackshift - Blackshift is a grid-based, space-themed
+action puzzle game which isn't afraid of complexity — think Chip's Challenge on
+crack.  
+![blackshift-screenshot](https://img.itch.io/aW1hZ2UvNTA3NDkvMjU2OTIzLmpwZw==/original/V%2BbpZD.jpg)
 
 [License (BSD 2-clause)](https://bkaradzic.github.io/bgfx/license.html)
 -----------------------------------------------------------------------

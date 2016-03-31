@@ -163,8 +163,8 @@ void debugger_windows::debugger_update()
 			debug_cpu_get_visible_cpu(*m_machine)->debug()->halt_on_next_instruction("User-initiated break\n");
 
 			// if we were focused on some window's edit box, reset it to default
-			for (debugwin_info *info = m_window_list.first(); info != NULL; info = info->next())
-				info->restore_field(focuswnd);
+			for (debugwin_info &info : m_window_list)
+				info.restore_field(focuswnd);
 		}
 	}
 }
@@ -229,16 +229,16 @@ void debugger_windows::remove_window(debugwin_info &info)
 
 void debugger_windows::show_all()
 {
-	for (debugwin_info *info = m_window_list.first(); info != NULL; info = info->next())
-		info->show();
+	for (debugwin_info &info : m_window_list)
+		info.show();
 }
 
 
 void debugger_windows::hide_all()
 {
 	SetForegroundWindow(win_window_list->m_hwnd);
-	for (debugwin_info *info = m_window_list.first(); info != NULL; info = info->next())
-		info->hide();
+	for (debugwin_info &info : m_window_list)
+		info.hide();
 }
 
 

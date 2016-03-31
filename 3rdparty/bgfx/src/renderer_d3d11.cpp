@@ -412,6 +412,9 @@ namespace bgfx { namespace d3d11
 	static const GUID IID_IDXGIDevice1          = { 0x77db970f, 0x6276, 0x48ba, { 0xba, 0x28, 0x07, 0x01, 0x43, 0xb4, 0x39, 0x2c } };
 	static const GUID IID_IDXGIDevice2          = { 0x05008617, 0xfbfd, 0x4051, { 0xa7, 0x90, 0x14, 0x48, 0x84, 0xb4, 0xf6, 0xa9 } };
 	static const GUID IID_IDXGIDevice3          = { 0x6007896c, 0x3244, 0x4afd, { 0xbf, 0x18, 0xa6, 0xd3, 0xbe, 0xda, 0x50, 0x23 } };
+	static const GUID IID_ID3D11Device1         = { 0xa04bfb29, 0x08ef, 0x43d6, { 0xa4, 0x9c, 0xa9, 0xbd, 0xbd, 0xcb, 0xe6, 0x86 } };
+	static const GUID IID_ID3D11Device2         = { 0x9d06dffa, 0xd1e5, 0x4d07, { 0x83, 0xa8, 0x1b, 0xb1, 0x23, 0xf2, 0xf8, 0x41 } };
+	static const GUID IID_ID3D11Device3         = { 0xa05c8c37, 0xd2c6, 0x4732, { 0xb3, 0xa0, 0x9c, 0xe0, 0xb0, 0xdc, 0x9a, 0xe6 } };
 	static const GUID IID_IDXGIAdapter          = { 0x2411e7e1, 0x12ac, 0x4ccf, { 0xbd, 0x14, 0x97, 0x98, 0xe8, 0x53, 0x4d, 0xc0 } };
 	static const GUID IID_ID3D11InfoQueue       = { 0x6543dbb6, 0x1b48, 0x42f5, { 0xab, 0x82, 0xe9, 0x7e, 0xc7, 0x43, 0x26, 0xf6 } };
 	static const GUID IID_IDXGIDeviceRenderDoc  = { 0xa7aa6116, 0x9c8d, 0x4bba, { 0x90, 0x83, 0xb4, 0xd8, 0x16, 0xb7, 0x1b, 0x78 } };
@@ -422,7 +425,14 @@ namespace bgfx { namespace d3d11
 		D3D11_FORMAT_SUPPORT2_UAV_TYPED_STORE = 0x80,
 	};
 
-	static const GUID s_deviceIIDs[] =
+	static const GUID s_d3dDeviceIIDs[] =
+	{
+		IID_ID3D11Device3,
+		IID_ID3D11Device2,
+		IID_ID3D11Device1,
+	};
+
+	static const GUID s_dxgiDeviceIIDs[] =
 	{
 		IID_IDXGIDevice3,
 		IID_IDXGIDevice2,
@@ -492,6 +502,31 @@ namespace bgfx { namespace d3d11
 
 		return false;
 	};
+
+	void resume(ID3D11Device* _device)
+	{
+		BX_UNUSED(_device);
+	}
+
+	void suspend(ID3D11Device* _device)
+	{
+		BX_UNUSED(_device);
+	}
+
+	void trim(ID3D11Device* _device)
+	{
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
+		IDXGIDevice3* device;
+		HRESULT hr = _device->QueryInterface(IID_IDXGIDevice3, (void**)&device);
+		if (SUCCEEDED(hr) )
+		{
+			device->Trim();
+			DX_RELEASE(device, 1);
+		}
+#else
+		BX_UNUSED(_device);
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
+	}
 
 	// Reference:
 	// https://github.com/GPUOpen-LibrariesAndSDKs/AGS_SDK
@@ -722,10 +757,10 @@ namespace bgfx { namespace d3d11
 
 #if USE_D3D11_DYNAMIC_LIB
 			m_d3d11dll = bx::dlopen("d3d11.dll");
-			BX_WARN(NULL != m_d3d11dll, "Failed to load d3d11.dll.");
 
 			if (NULL == m_d3d11dll)
 			{
+				BX_TRACE("Failed to load d3d11.dll.");
 				goto error;
 			}
 
@@ -752,25 +787,25 @@ namespace bgfx { namespace d3d11
 			}
 
 			D3D11CreateDevice = (PFN_D3D11_CREATE_DEVICE)bx::dlsym(m_d3d11dll, "D3D11CreateDevice");
-			BX_WARN(NULL != D3D11CreateDevice, "Function D3D11CreateDevice not found.");
 			if (NULL == D3D11CreateDevice)
 			{
+				BX_TRACE("Function D3D11CreateDevice not found.");
 				goto error;
 			}
 
 			m_dxgidll = bx::dlopen("dxgi.dll");
-			BX_WARN(NULL != m_dxgidll, "Failed to load dxgi.dll.");
 			if (NULL == m_dxgidll)
 			{
+				BX_TRACE("Failed to load dxgi.dll.");
 				goto error;
 			}
 
 			errorState = ErrorState::LoadedDXGI;
 
 			CreateDXGIFactory = (PFN_CREATE_DXGI_FACTORY)bx::dlsym(m_dxgidll, "CreateDXGIFactory");
-			BX_WARN(NULL != CreateDXGIFactory, "Function CreateDXGIFactory not found.");
 			if (NULL == CreateDXGIFactory)
 			{
+				BX_TRACE("Function CreateDXGIFactory not found.");
 				goto error;
 			}
 
@@ -803,9 +838,9 @@ namespace bgfx { namespace d3d11
 			hr = S_OK;
 			factory = NULL;
 #endif // BX_PLATFORM_*
-			BX_WARN(SUCCEEDED(hr), "Unable to create DXGI factory.");
 			if (FAILED(hr) )
 			{
+				BX_TRACE("Unable to create DXGI factory.");
 				goto error;
 			}
 
@@ -881,13 +916,16 @@ namespace bgfx { namespace d3d11
 
 				D3D_FEATURE_LEVEL featureLevel[] =
 				{
+					D3D_FEATURE_LEVEL_12_1,
+					D3D_FEATURE_LEVEL_12_0,
 					D3D_FEATURE_LEVEL_11_1,
 					D3D_FEATURE_LEVEL_11_0,
 					D3D_FEATURE_LEVEL_10_1,
 					D3D_FEATURE_LEVEL_10_0,
+#if BX_PLATFORM_WINRT
 					D3D_FEATURE_LEVEL_9_3,
 					D3D_FEATURE_LEVEL_9_2,
-					D3D_FEATURE_LEVEL_9_1,
+#endif // BX_PLATFORM_WINRT
 				};
 
 				for (;;)
@@ -941,10 +979,10 @@ namespace bgfx { namespace d3d11
 
 					break;
 				}
-				BX_WARN(SUCCEEDED(hr), "Unable to create Direct3D11 device.");
 
 				if (FAILED(hr) )
 				{
+					BX_TRACE("Unable to create Direct3D11 device.");
 					goto error;
 				}
 
@@ -956,22 +994,35 @@ namespace bgfx { namespace d3d11
 			else
 			{
 				m_device->GetImmediateContext(&m_deviceCtx);
-				BX_WARN(NULL != m_deviceCtx, "Unable to create Direct3D11 device.");
 
 				if (NULL == m_deviceCtx)
 				{
+					BX_TRACE("Unable to create Direct3D11 device.");
 					goto error;
 				}
 			}
 
 			{
-				IDXGIDevice*  device = NULL;
+				m_deviceInterfaceVersion = 0;
+				for (uint32_t ii = 0; ii < BX_COUNTOF(s_d3dDeviceIIDs); ++ii)
+				{
+					ID3D11Device* device;
+					hr = m_device->QueryInterface(s_d3dDeviceIIDs[ii], (void**)&device);
+					if (SUCCEEDED(hr) )
+					{
+						device->Release(); // BK - ignore ref count.
+						m_deviceInterfaceVersion = BX_COUNTOF(s_d3dDeviceIIDs)-ii;
+						break;
+					}
+				}
+
+				IDXGIDevice*  device  = NULL;
 				IDXGIAdapter* adapter = NULL;
 				hr = E_FAIL;
-				for (uint32_t ii = 0; ii < BX_COUNTOF(s_deviceIIDs) && FAILED(hr); ++ii)
+				for (uint32_t ii = 0; ii < BX_COUNTOF(s_dxgiDeviceIIDs) && FAILED(hr); ++ii)
 				{
-					hr = m_device->QueryInterface(s_deviceIIDs[ii], (void**)&device);
-					BX_TRACE("D3D device 11.%d, hr %x", BX_COUNTOF(s_deviceIIDs)-1-ii, hr);
+					hr = m_device->QueryInterface(s_dxgiDeviceIIDs[ii], (void**)&device);
+					BX_TRACE("DXGI device 11.%d, hr %x", BX_COUNTOF(s_dxgiDeviceIIDs)-1-ii, hr);
 
 					if (SUCCEEDED(hr) )
 					{
@@ -985,7 +1036,7 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4530) // warning C4530: C++ exception handler 
 						}
 						catch (...)
 						{
-							BX_TRACE("Failed to get adapter foro IID_IDXGIDevice%d.", BX_COUNTOF(s_deviceIIDs)-1-ii);
+							BX_TRACE("Failed to get adapter foro IID_IDXGIDevice%d.", BX_COUNTOF(s_dxgiDeviceIIDs)-1-ii);
 							DX_RELEASE(device, 0);
 							hr = E_FAIL;
 						}
@@ -996,9 +1047,9 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 					}
 				}
 
-				BX_WARN(SUCCEEDED(hr), "Unable to create Direct3D11 device.");
 				if (FAILED(hr) )
 				{
+					BX_TRACE("Unable to create Direct3D11 device.");
 					goto error;
 				}
 
@@ -1021,9 +1072,9 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				}
 
 				hr = adapter->GetDesc(&m_adapterDesc);
-				BX_WARN(SUCCEEDED(hr), "Unable to create Direct3D11 device.");
 				if (FAILED(hr) )
 				{
+					BX_TRACE("Unable to create Direct3D11 device.");
 					DX_RELEASE(adapter, 2);
 					goto error;
 				}
@@ -1038,10 +1089,10 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				{
 #if !BX_PLATFORM_WINDOWS
 					hr = adapter->GetParent(__uuidof(IDXGIFactory2), (void**)&m_factory);
-					BX_WARN(SUCCEEDED(hr), "Unable to create Direct3D11 device.");
 					DX_RELEASE(adapter, 2);
 					if (FAILED(hr) )
 					{
+						BX_TRACE("Unable to create Direct3D11 device.");
 						goto error;
 					}
 
@@ -1098,10 +1149,10 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 					}
 #else
 					hr = adapter->GetParent(IID_IDXGIFactory, (void**)&m_factory);
-					BX_WARN(SUCCEEDED(hr), "Unable to create Direct3D11 device.");
 					DX_RELEASE(adapter, 2);
 					if (FAILED(hr) )
 					{
+						BX_TRACE("Unable to create Direct3D11 device.");
 						goto error;
 					}
 
@@ -1128,9 +1179,9 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 						| DXGI_MWA_NO_ALT_ENTER
 						) );
 #endif // BX_PLATFORM_*
-					BX_WARN(SUCCEEDED(hr), "Failed to create swap chain.");
 					if (FAILED(hr) )
 					{
+						BX_TRACE("Failed to create swap chain.");
 						goto error;
 					}
 				}
@@ -1191,10 +1242,12 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 					| BGFX_CAPS_DRAW_INDIRECT
 					| BGFX_CAPS_TEXTURE_BLIT
 					| BGFX_CAPS_TEXTURE_READ_BACK
-					| BGFX_CAPS_OCCLUSION_QUERY
+					| ( (m_featureLevel >= D3D_FEATURE_LEVEL_9_2) ? BGFX_CAPS_OCCLUSION_QUERY : 0)
+					| BGFX_CAPS_ALPHA_TO_COVERAGE
+					| ( (m_deviceInterfaceVersion >= 3) ? BGFX_CAPS_CONSERVATIVE_RASTER : 0)
 					);
 
-				m_timerQuerySupport = m_featureLevel >= D3D_FEATURE_LEVEL_9_3;
+				m_timerQuerySupport = m_featureLevel >= D3D_FEATURE_LEVEL_10_0;
 
 				if (m_featureLevel <= D3D_FEATURE_LEVEL_9_2)
 				{
@@ -1497,8 +1550,8 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				DX_RELEASE(m_device, 0);
 				DX_RELEASE(m_factory, 0);
 
-			case ErrorState::LoadedDXGI:
 #if USE_D3D11_DYNAMIC_LIB
+			case ErrorState::LoadedDXGI:
 				if (NULL != m_dxgidebugdll)
 				{
 					bx::dlclose(m_dxgidebugdll);
@@ -1513,15 +1566,14 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 				bx::dlclose(m_dxgidll);
 				m_dxgidll = NULL;
-#endif // USE_D3D11_DYNAMIC_LIB
 
 			case ErrorState::LoadedD3D11:
-#if USE_D3D11_DYNAMIC_LIB
 				bx::dlclose(m_d3d11dll);
 				m_d3d11dll = NULL;
 #endif // USE_D3D11_DYNAMIC_LIB
 
 			case ErrorState::Default:
+			default:
 				if (NULL != m_ags)
 				{
 					agsDeInit(m_ags);
@@ -1757,7 +1809,6 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			bx::write(&writer, magic);
 
 			TextureCreate tc;
-			tc.m_flags   = texture.m_flags;
 			tc.m_width   = _width;
 			tc.m_height  = _height;
 			tc.m_sides   = 0;
@@ -1769,7 +1820,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			bx::write(&writer, tc);
 
 			texture.destroy();
-			texture.create(mem, tc.m_flags, 0);
+			texture.create(mem, texture.m_flags, 0);
 
 			release(mem);
 		}
@@ -1844,9 +1895,9 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 		void saveScreenShot(const char* _filePath) BX_OVERRIDE
 		{
-			BX_WARN(NULL != m_swapChain, "Unable to capture screenshot %s.", _filePath);
 			if (NULL == m_swapChain)
 			{
+				BX_TRACE("Unable to capture screenshot %s.", _filePath);
 				return;
 			}
 
@@ -2206,9 +2257,30 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			}
 		}
 
-		void updateResolution(const Resolution& _resolution)
+		bool updateResolution(const Resolution& _resolution)
 		{
-			bool recenter   = !!(_resolution.m_flags & BGFX_RESET_HMD_RECENTER);
+			const bool suspended    = !!( _resolution.m_flags & BGFX_RESET_SUSPEND);
+			const bool wasSuspended = !!(m_resolution.m_flags & BGFX_RESET_SUSPEND);
+			if (suspended && wasSuspended)
+			{
+				return true;
+			}
+			else if (suspended)
+			{
+				m_deviceCtx->Flush();
+				m_deviceCtx->ClearState();
+				trim(m_device);
+				suspend(m_device);
+				m_resolution.m_flags |= BGFX_RESET_SUSPEND;
+				return true;
+			}
+			else if (wasSuspended)
+			{
+				resume(m_device);
+				m_resolution.m_flags &= ~BGFX_RESET_SUSPEND;
+			}
+
+			bool recenter = !!(_resolution.m_flags & BGFX_RESET_HMD_RECENTER);
 
 			uint32_t maxAnisotropy = 1;
 			if (!!(_resolution.m_flags & BGFX_RESET_MAXANISOTROPY) )
@@ -2236,7 +2308,12 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				m_rasterizerStateCache.invalidate();
 			}
 
-			uint32_t flags = _resolution.m_flags & ~(BGFX_RESET_HMD_RECENTER | BGFX_RESET_MAXANISOTROPY | BGFX_RESET_DEPTH_CLAMP);
+			uint32_t flags = _resolution.m_flags & ~(0
+				| BGFX_RESET_HMD_RECENTER
+				| BGFX_RESET_MAXANISOTROPY
+				| BGFX_RESET_DEPTH_CLAMP
+				| BGFX_RESET_SUSPEND
+				);
 
 			if (m_resolution.m_width  != _resolution.m_width
 			||  m_resolution.m_height != _resolution.m_height
@@ -2259,6 +2336,9 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 				preReset();
 
+				m_deviceCtx->Flush();
+				m_deviceCtx->ClearState();
+
 				if (NULL == m_swapChain)
 				{
 					// Updated backbuffer if it changed in PlatformData.
@@ -2267,9 +2347,6 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				}
 				else
 				{
-					m_deviceCtx->ClearState();
-					m_deviceCtx->Flush();
-
 					if (resize)
 					{
 						m_deviceCtx->OMSetRenderTargets(1, s_zero.m_rtv, NULL);
@@ -2353,6 +2430,8 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			{
 				m_ovr.recenter();
 			}
+
+			return false;
 		}
 
 		void setShaderUniform(uint8_t _flags, uint32_t _regIndex, const void* _val, uint32_t _numRegs)
@@ -2553,7 +2632,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			if (NULL == bs)
 			{
 				D3D11_BLEND_DESC desc;
-				memset(&desc, 0, sizeof(desc) );
+				desc.AlphaToCoverageEnable  = !!(BGFX_STATE_BLEND_ALPHA_TO_COVERAGE & _state);
 				desc.IndependentBlendEnable = !!(BGFX_STATE_BLEND_INDEPENDENT & _state);
 
 				D3D11_RENDER_TARGET_BLEND_DESC* drt = &desc.RenderTarget[0];
@@ -2626,11 +2705,15 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				m_blendStateCache.add(hash, bs);
 			}
 
-			const uint64_t f0 = BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_FACTOR, BGFX_STATE_BLEND_FACTOR);
-			const uint64_t f1 = BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_INV_FACTOR, BGFX_STATE_BLEND_INV_FACTOR);
-			bool hasFactor = false
+			const uint64_t f0 = BGFX_STATE_BLEND_FACTOR;
+			const uint64_t f1 = BGFX_STATE_BLEND_INV_FACTOR;
+			const uint64_t f2 = BGFX_STATE_BLEND_FACTOR<<4;
+			const uint64_t f3 = BGFX_STATE_BLEND_INV_FACTOR<<4;
+			bool hasFactor = 0
 				|| f0 == (_state & f0)
 				|| f1 == (_state & f1)
+				|| f2 == (_state & f2)
+				|| f3 == (_state & f3)
 				;
 
 			float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -2704,28 +2787,61 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 		void setRasterizerState(uint64_t _state, bool _wireframe = false, bool _scissor = false)
 		{
-			_state &= BGFX_STATE_CULL_MASK|BGFX_STATE_MSAA;
+			_state &= 0
+				| BGFX_STATE_CULL_MASK
+				| BGFX_STATE_MSAA
+				| BGFX_STATE_LINEAA
+				| BGFX_STATE_CONSERVATIVE_RASTER
+				;
 			_state |= _wireframe ? BGFX_STATE_PT_LINES : BGFX_STATE_NONE;
 			_state |= _scissor   ? BGFX_STATE_RESERVED_MASK : 0;
+			_state &= ~(m_deviceInterfaceVersion >= 3 ? 0 : BGFX_STATE_CONSERVATIVE_RASTER);
 
 			ID3D11RasterizerState* rs = m_rasterizerStateCache.find(_state);
 			if (NULL == rs)
 			{
 				uint32_t cull = (_state&BGFX_STATE_CULL_MASK)>>BGFX_STATE_CULL_SHIFT;
 
-				D3D11_RASTERIZER_DESC desc;
-				desc.FillMode = _wireframe ? D3D11_FILL_WIREFRAME : D3D11_FILL_SOLID;
-				desc.CullMode = s_cullMode[cull];
-				desc.FrontCounterClockwise = false;
-				desc.DepthBias = 0;
-				desc.DepthBiasClamp = 0.0f;
-				desc.SlopeScaledDepthBias = 0.0f;
-				desc.DepthClipEnable = !m_depthClamp;
-				desc.ScissorEnable = _scissor;
-				desc.MultisampleEnable = !!(_state&BGFX_STATE_MSAA);
-				desc.AntialiasedLineEnable = false;
+#if BX_PLATFORM_WINDOWS
+				if (m_deviceInterfaceVersion >= 3)
+				{
+					D3D11_RASTERIZER_DESC2 desc;
+					desc.FillMode = _wireframe ? D3D11_FILL_WIREFRAME : D3D11_FILL_SOLID;
+					desc.CullMode = s_cullMode[cull];
+					desc.FrontCounterClockwise = false;
+					desc.DepthBias             = 0;
+					desc.DepthBiasClamp        = 0.0f;
+					desc.SlopeScaledDepthBias  = 0.0f;
+					desc.DepthClipEnable       = !m_depthClamp;
+					desc.ScissorEnable         = _scissor;
+					desc.MultisampleEnable     = !!(_state&BGFX_STATE_MSAA);
+					desc.AntialiasedLineEnable = !!(_state&BGFX_STATE_LINEAA);
+					desc.ForcedSampleCount     = 0;
+					desc.ConservativeRaster    = !!(_state&BGFX_STATE_CONSERVATIVE_RASTER)
+						? D3D11_CONSERVATIVE_RASTERIZATION_MODE_ON
+						: D3D11_CONSERVATIVE_RASTERIZATION_MODE_OFF
+						;
 
-				DX_CHECK(m_device->CreateRasterizerState(&desc, &rs) );
+					ID3D11Device3* device3 = reinterpret_cast<ID3D11Device3*>(m_device);
+					DX_CHECK(device3->CreateRasterizerState2(&desc, reinterpret_cast<ID3D11RasterizerState2**>(&rs) ) );
+				}
+				else
+#endif // BX_PLATFORM_WINDOWS
+				{
+					D3D11_RASTERIZER_DESC desc;
+					desc.FillMode = _wireframe ? D3D11_FILL_WIREFRAME : D3D11_FILL_SOLID;
+					desc.CullMode = s_cullMode[cull];
+					desc.FrontCounterClockwise = false;
+					desc.DepthBias             = 0;
+					desc.DepthBiasClamp        = 0.0f;
+					desc.SlopeScaledDepthBias  = 0.0f;
+					desc.DepthClipEnable       = !m_depthClamp;
+					desc.ScissorEnable         = _scissor;
+					desc.MultisampleEnable     = !!(_state&BGFX_STATE_MSAA);
+					desc.AntialiasedLineEnable = !!(_state&BGFX_STATE_LINEAA);
+
+					DX_CHECK(m_device->CreateRasterizerState(&desc, &rs) );
+				}
 
 				m_rasterizerStateCache.add(_state, rs);
 			}
@@ -3391,6 +3507,8 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		TimerQueryD3D11      m_gpuTimer;
 		OcclusionQueryD3D11  m_occlusionQuery;
 
+		uint32_t m_deviceInterfaceVersion;
+
 		ID3D11RenderTargetView* m_backBufferColor;
 		ID3D11DepthStencilView* m_backBufferDepthStencil;
 		ID3D11RenderTargetView* m_currentColor;
@@ -3469,25 +3587,6 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		s_renderD3D11->shutdown();
 		BX_DELETE(g_allocator, s_renderD3D11);
 		s_renderD3D11 = NULL;
-	}
-
-	void trim()
-	{
-#if BX_PLATFORM_WINRT
-		if (NULL != s_renderD3D11)
-		{
-			if (s_renderD3D11->m_device)
-			{
-				IDXGIDevice3* pDXGIDevice;
-				HRESULT hr = s_renderD3D11->m_device->QueryInterface(__uuidof(IDXGIDevice3),(void **)&pDXGIDevice);
-				if (SUCCEEDED(hr) )
-				{
-					pDXGIDevice->Trim();
-					pDXGIDevice->Release();
-				}
-			}
-		}
-#endif // BX_PLATFORM_WINRT
 	}
 
 	void stubMultiDrawInstancedIndirect(uint32_t _numDrawIndirect, ID3D11Buffer* _ptr, uint32_t _offset, uint32_t _stride)
@@ -4726,12 +4825,15 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 	void RendererContextD3D11::submit(Frame* _render, ClearQuad& _clearQuad, TextVideoMemBlitter& _textVideoMemBlitter)
 	{
+		if (updateResolution(_render->m_resolution) )
+		{
+			return;
+		}
+
 		PIX_BEGINEVENT(D3DCOLOR_RGBA(0xff, 0x00, 0x00, 0xff), L"rendererSubmit");
 		BGFX_GPU_PROFILER_BEGIN_DYNAMIC("rendererSubmit");
 
 		ID3D11DeviceContext* deviceCtx = m_deviceCtx;
-
-		updateResolution(_render->m_resolution);
 
 		int64_t elapsed = -bx::getHPCounter();
 		int64_t captureElapsed = 0;
@@ -5266,9 +5368,16 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 					 | BGFX_STATE_PT_MASK
 					 | BGFX_STATE_POINT_SIZE_MASK
 					 | BGFX_STATE_MSAA
+					 | BGFX_STATE_LINEAA
+					 | BGFX_STATE_CONSERVATIVE_RASTER
 					 ) & changedFlags)
 				{
-					if ( (BGFX_STATE_CULL_MASK|BGFX_STATE_MSAA) & changedFlags)
+					if ( (0
+						 | BGFX_STATE_CULL_MASK
+						 | BGFX_STATE_MSAA
+						 | BGFX_STATE_LINEAA
+						 | BGFX_STATE_CONSERVATIVE_RASTER
+						 ) & changedFlags)
 					{
 						setRasterizerState(newFlags, wireframe, scissorEnabled);
 					}
@@ -5687,8 +5796,11 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				tvm.clear();
 				uint16_t pos = 0;
 				tvm.printf(0, pos++, BGFX_CONFIG_DEBUG ? 0x89 : 0x8f
-					, " %s / " BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME " "
+					, " %s.%d (FL %d.%d) / " BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME " "
 					, getRendererName()
+					, m_deviceInterfaceVersion
+					, (m_featureLevel >> 12) & 0xf
+					, (m_featureLevel >>  8) & 0xf
 					);
 
 				const DXGI_ADAPTER_DESC& desc = m_adapterDesc;

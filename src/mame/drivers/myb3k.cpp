@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", myb3k)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_3_579545MHz/4)    /* unknown clock, hand tuned to get ~60 fps */

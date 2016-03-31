@@ -333,8 +333,8 @@ int running_machine::run(bool firstrun)
 		if (options().log() && &system() != &GAME_NAME(___empty))
 		{
 			m_logfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			file_error filerr = m_logfile->open("error.log");
-			assert_always(filerr == FILERR_NONE, "unable to open log file");
+			osd_file::error filerr = m_logfile->open("error.log");
+			assert_always(filerr == osd_file::error::NONE, "unable to open log file");
 			add_logerror_callback(logfile_callback);
 		}
 
@@ -356,7 +356,7 @@ int running_machine::run(bool firstrun)
 		ui().initialize(*this);
 
 		// display the startup screens
-		ui().display_startup_screens(firstrun, false);
+		ui().display_startup_screens(firstrun);
 
 		// perform a soft reset -- this takes us to the running phase
 		soft_reset();
@@ -372,7 +372,7 @@ int running_machine::run(bool firstrun)
 			g_profiler.start(PROFILER_EXTRA);
 
 #if defined(EMSCRIPTEN)
-			//break out to our async javascript loop and halt
+			// break out to our async javascript loop and halt
 			js_set_main_loop(this);
 #endif
 
@@ -403,7 +403,7 @@ int running_machine::run(bool firstrun)
 	}
 	catch (emu_fatalerror &fatal)
 	{
-		osd_printf_error("FATALERROR: %s\n", fatal.string());
+		osd_printf_error("Fatal error: %s\n", fatal.string());
 		error = MAMERR_FATALERROR;
 		if (fatal.exitcode() != 0)
 			error = fatal.exitcode();
@@ -440,7 +440,7 @@ int running_machine::run(bool firstrun)
 
 	// call all exit callbacks registered
 	call_notifiers(MACHINE_NOTIFY_EXIT);
-	zip_file_cache_clear();
+	util::archive_file::cache_clear();
 
 	// close the logfile
 	m_logfile.reset();
@@ -739,12 +739,15 @@ void running_machine::toggle_pause()
 //  given type
 //-------------------------------------------------
 
-void running_machine::add_notifier(machine_notification event, machine_notify_delegate callback)
+void running_machine::add_notifier(machine_notification event, machine_notify_delegate callback, bool first)
 {
 	assert_always(m_current_phase == MACHINE_PHASE_INIT, "Can only call add_notifier at init time!");
 
+	if(first)
+		m_notifier_list[event].push_front(std::make_unique<notifier_callback_item>(callback));
+
 	// exit notifiers are added to the head, and executed in reverse order
-	if (event == MACHINE_NOTIFY_EXIT)
+	else if (event == MACHINE_NOTIFY_EXIT)
 		m_notifier_list[event].push_front(std::make_unique<notifier_callback_item>(callback));
 
 	// all other notifiers are added to the tail, and executed in the order registered
@@ -761,6 +764,7 @@ void running_machine::add_notifier(machine_notification event, machine_notify_de
 void running_machine::add_logerror_callback(logerror_callback callback)
 {
 	assert_always(m_current_phase == MACHINE_PHASE_INIT, "Can only call add_logerror_callback at init time!");
+		m_string_buffer.reserve(1024);
 	m_logerror_list.push_back(std::make_unique<logerror_callback_item>(callback));
 }
 
@@ -821,76 +825,76 @@ void running_machine::call_notifiers(machine_notification which)
 
 void running_machine::handle_saveload()
 {
-	UINT32 openflags = (m_saveload_schedule == SLS_LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	const char *opnamed = (m_saveload_schedule == SLS_LOAD) ? "loaded" : "saved";
-	const char *opname = (m_saveload_schedule == SLS_LOAD) ? "load" : "save";
-	file_error filerr = FILERR_NONE;
-
 	// if no name, bail
-	emu_file file(m_saveload_searchpath, openflags);
-	if (m_saveload_pending_file.empty())
-		goto cancel;
-
-	// if there are anonymous timers, we can't save just yet, and we can't load yet either
-	// because the timers might overwrite data we have loaded
-	if (!m_scheduler.can_save())
+	if (!m_saveload_pending_file.empty())
 	{
-		// if more than a second has passed, we're probably screwed
-		if ((this->time() - m_saveload_schedule_time) > attotime::from_seconds(1))
+		const char *const opname = (m_saveload_schedule == SLS_LOAD) ? "load" : "save";
+
+		// if there are anonymous timers, we can't save just yet, and we can't load yet either
+		// because the timers might overwrite data we have loaded
+		if (!m_scheduler.can_save())
 		{
-			popmessage("Unable to %s due to pending anonymous timers. See error.log for details.", opname);
-			goto cancel;
+			// if more than a second has passed, we're probably screwed
+			if ((this->time() - m_saveload_schedule_time) > attotime::from_seconds(1))
+				popmessage("Unable to %s due to pending anonymous timers. See error.log for details.", opname);
+			else
+				return; // return without cancelling the operation
 		}
-		return;
-	}
-
-	// open the file
-	filerr = file.open(m_saveload_pending_file.c_str());
-	if (filerr == FILERR_NONE)
-	{
-		// read/write the save state
-		save_error saverr = (m_saveload_schedule == SLS_LOAD) ? m_save.read_file(file) : m_save.write_file(file);
-
-		// handle the result
-		switch (saverr)
+		else
 		{
-			case STATERR_ILLEGAL_REGISTRATIONS:
-				popmessage("Error: Unable to %s state due to illegal registrations. See error.log for details.", opname);
-				break;
+			UINT32 const openflags = (m_saveload_schedule == SLS_LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
-			case STATERR_INVALID_HEADER:
-				popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this game.", opname);
-				break;
+			// open the file
+			emu_file file(m_saveload_searchpath, openflags);
+			auto const filerr = file.open(m_saveload_pending_file.c_str());
+			if (filerr == osd_file::error::NONE)
+			{
+				const char *const opnamed = (m_saveload_schedule == SLS_LOAD) ? "loaded" : "saved";
 
-			case STATERR_READ_ERROR:
-				popmessage("Error: Unable to %s state due to a read error (file is likely corrupt).", opname);
-				break;
+				// read/write the save state
+				save_error saverr = (m_saveload_schedule == SLS_LOAD) ? m_save.read_file(file) : m_save.write_file(file);
 
-			case STATERR_WRITE_ERROR:
-				popmessage("Error: Unable to %s state due to a write error. Verify there is enough disk space.", opname);
-				break;
+				// handle the result
+				switch (saverr)
+				{
+				case STATERR_ILLEGAL_REGISTRATIONS:
+					popmessage("Error: Unable to %s state due to illegal registrations. See error.log for details.", opname);
+					break;
 
-			case STATERR_NONE:
-				if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
-					popmessage("State successfully %s.\nWarning: Save states are not officially supported for this game.", opnamed);
-				else
-					popmessage("State successfully %s.", opnamed);
-				break;
+				case STATERR_INVALID_HEADER:
+					popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this game.", opname);
+					break;
 
-			default:
-				popmessage("Error: Unknown error during state %s.", opnamed);
-				break;
+				case STATERR_READ_ERROR:
+					popmessage("Error: Unable to %s state due to a read error (file is likely corrupt).", opname);
+					break;
+
+				case STATERR_WRITE_ERROR:
+					popmessage("Error: Unable to %s state due to a write error. Verify there is enough disk space.", opname);
+					break;
+
+				case STATERR_NONE:
+					if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
+						popmessage("State successfully %s.\nWarning: Save states are not officially supported for this game.", opnamed);
+					else
+						popmessage("State successfully %s.", opnamed);
+					break;
+
+				default:
+					popmessage("Error: Unknown error during state %s.", opnamed);
+					break;
+				}
+
+				// close and perhaps delete the file
+				if (saverr != STATERR_NONE && m_saveload_schedule == SLS_SAVE)
+					file.remove_on_close();
+			}
+			else
+				popmessage("Error: Failed to open file for %s operation.", opname);
 		}
-
-		// close and perhaps delete the file
-		if (saverr != STATERR_NONE && m_saveload_schedule == SLS_SAVE)
-			file.remove_on_close();
 	}
-	else
-		popmessage("Error: Failed to open file for %s operation.", opname);
 
 	// unschedule the operation
-cancel:
 	m_saveload_pending_file.clear();
 	m_saveload_searchpath = nullptr;
 	m_saveload_schedule = SLS_NONE;
@@ -1170,7 +1174,7 @@ void running_machine::nvram_load()
 	for (device_nvram_interface *nvram = iter.first(); nvram != nullptr; nvram = iter.next())
 	{
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
-		if (file.open(nvram_filename(nvram->device()).c_str()) == FILERR_NONE)
+		if (file.open(nvram_filename(nvram->device()).c_str()) == osd_file::error::NONE)
 		{
 			nvram->nvram_load(file);
 			file.close();
@@ -1191,7 +1195,7 @@ void running_machine::nvram_save()
 	for (device_nvram_interface *nvram = iter.first(); nvram != nullptr; nvram = iter.next())
 	{
 		emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(nvram_filename(nvram->device()).c_str()) == FILERR_NONE)
+		if (file.open(nvram_filename(nvram->device()).c_str()) == osd_file::error::NONE)
 		{
 			nvram->nvram_save(file);
 			file.close();

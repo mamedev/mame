@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /***************************************************************************
 
     ui/custui.h
@@ -10,13 +10,14 @@
 
 #pragma once
 
-#ifndef __UI_CUSTUI_H__
-#define __UI_CUSTUI_H__
+#ifndef MAME_EMU_UI_UI_CUSTUI_H
+#define MAME_EMU_UI_UI_CUSTUI_H
 
-#ifdef UI_WINDOWS
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
+#include "ui/menu.h"
+
+#include <vector>
+#include <string>
+
 
 //-------------------------------------------------
 //  Custom UI menu
@@ -39,9 +40,9 @@ private:
 		COLORS_MENU,
 		HIDE_MENU
 	};
-	static const char *hide_status[];
+	static const char *const hide_status[];
 	std::vector<std::string> m_lang;
-	UINT16 m_currlang;
+	std::uint16_t m_currlang;
 };
 
 //-------------------------------------------------
@@ -67,14 +68,12 @@ private:
 		MUI_ITALIC
 	};
 
-#ifdef UI_WINDOWS
-	UINT16                      m_actual;
-	std::vector<std::string>    m_fonts;
-	bool                        m_bold, m_italic;
-
 	void list();
-	static int CALLBACK EnumFontFamiliesExProc(const LOGFONT *lpelfe, const TEXTMETRIC *lpntme, DWORD FontType, LPARAM lParam);
 
+	std::uint16_t                                       m_actual;
+	std::vector<std::pair<std::string, std::string> >   m_fonts;
+#ifdef UI_WINDOWS
+	bool                                                m_bold, m_italic;
 #endif
 
 	float m_info_min, m_info_max, m_info_size;
@@ -182,4 +181,4 @@ private:
 	rgb_t &m_original;
 };
 
-#endif /* __UI_CUSTUI_H__ */
+#endif // MAME_EMU_UI_UI_CUSTUI_H

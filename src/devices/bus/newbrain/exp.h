@@ -70,7 +70,7 @@
 class device_newbrain_expansion_slot_interface;
 
 class newbrain_expansion_slot_t : public device_t,
-								  public device_slot_interface
+									public device_slot_interface
 {
 public:
 	// construction/destruction

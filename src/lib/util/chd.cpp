@@ -660,8 +660,8 @@ chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hun
 
 	// create the new file
 	util::core_file::ptr file;
-	const file_error filerr = util::core_file::open(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
-	if (filerr != FILERR_NONE)
+	const osd_file::error filerr = util::core_file::open(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
+	if (filerr != osd_file::error::NONE)
 		return CHDERR_FILE_NOT_FOUND;
 
 	// create the file normally, then claim the file
@@ -672,7 +672,7 @@ chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hun
 	if (chderr != CHDERR_NONE)
 	{
 		file.reset();
-		osd_rmfile(filename);
+		osd_file::remove(filename);
 	}
 	else
 	{
@@ -705,8 +705,8 @@ chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hun
 
 	// create the new file
 	util::core_file::ptr file;
-	const file_error filerr = util::core_file::open(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
-	if (filerr != FILERR_NONE)
+	const osd_file::error filerr = util::core_file::open(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
+	if (filerr != osd_file::error::NONE)
 		return CHDERR_FILE_NOT_FOUND;
 
 	// create the file normally, then claim the file
@@ -717,7 +717,7 @@ chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hun
 	if (chderr != CHDERR_NONE)
 	{
 		file.reset();
-		osd_rmfile(filename);
+		osd_file::remove(filename);
 	}
 	else
 	{
@@ -749,8 +749,8 @@ chd_error chd_file::open(const char *filename, bool writeable, chd_file *parent)
 	// open the file
 	const UINT32 openflags = writeable ? (OPEN_FLAG_READ | OPEN_FLAG_WRITE) : OPEN_FLAG_READ;
 	util::core_file::ptr file;
-	const file_error filerr = util::core_file::open(filename, openflags, file);
-	if (filerr != FILERR_NONE)
+	const osd_file::error filerr = util::core_file::open(filename, openflags, file);
+	if (filerr != osd_file::error::NONE)
 		return CHDERR_FILE_NOT_FOUND;
 
 	// now open the CHD

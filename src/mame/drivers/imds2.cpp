@@ -840,7 +840,7 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_SCREEN_UPDATE_DEVICE("ioccrtc" , i8275_device , screen_update)
 		MCFG_SCREEN_REFRESH_RATE(50)
 		MCFG_GFXDECODE_ADD("gfxdecode" , "palette" , imds2)
-		MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+		MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 		MCFG_SPEAKER_STANDARD_MONO("mono")
 		MCFG_SOUND_ADD("iocbeep" , BEEP , IOC_BEEP_FREQ)

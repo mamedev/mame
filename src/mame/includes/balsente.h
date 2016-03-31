@@ -124,6 +124,7 @@ public:
 	UINT8 m_spiker_expand_bits;
 	UINT8 m_grudge_steering_result;
 	UINT8 m_grudge_last_steering[3];
+	UINT8 m_teamht_input;
 
 	/* video data */
 	UINT8 m_expanded_videoram[256*256];
@@ -163,6 +164,9 @@ public:
 	DECLARE_WRITE8_MEMBER(shrike_shared_6809_w);
 	DECLARE_WRITE16_MEMBER(shrike_io_68k_w);
 	DECLARE_READ16_MEMBER(shrike_io_68k_r);
+	DECLARE_READ8_MEMBER(teamht_extra_r);
+	DECLARE_WRITE8_MEMBER(teamht_multiplex_select_w);
+
 	void counter_set_out(int which, int out);
 	void counter_start(int which);
 	void counter_stop( int which);
@@ -184,6 +188,7 @@ public:
 	DECLARE_DRIVER_INIT(snakepit);
 	DECLARE_DRIVER_INIT(spiker);
 	DECLARE_DRIVER_INIT(hattrick);
+	DECLARE_DRIVER_INIT(teamht);
 	DECLARE_DRIVER_INIT(toggle);
 	DECLARE_DRIVER_INIT(snakjack);
 	DECLARE_DRIVER_INIT(grudge);

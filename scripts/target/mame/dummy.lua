@@ -19,7 +19,7 @@ function createProjects_mame_dummy(_target, _subtarget)
 	uuid (os.uuid("drv-mame_dummy"))
 	addprojectflags()
 	precompiledheaders()
-	
+
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",

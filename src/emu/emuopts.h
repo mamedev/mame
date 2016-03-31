@@ -23,7 +23,8 @@
 enum
 {
 	// command-line options are HIGH priority
-	OPTION_PRIORITY_CMDLINE = OPTION_PRIORITY_HIGH,
+	OPTION_PRIORITY_SUBCMD = OPTION_PRIORITY_HIGH,
+	OPTION_PRIORITY_CMDLINE,
 
 	// INI-based options are NORMAL priority, in increasing order:
 	OPTION_PRIORITY_INI = OPTION_PRIORITY_NORMAL,
@@ -96,6 +97,13 @@ enum
 #define OPTION_SLEEP                "sleep"
 #define OPTION_SPEED                "speed"
 #define OPTION_REFRESHSPEED         "refreshspeed"
+
+// core render options
+#define OPTION_KEEPASPECT           "keepaspect"
+#define OPTION_UNEVENSTRETCH        "unevenstretch"
+#define OPTION_UNEVENSTRETCHX       "unevenstretchx"
+#define OPTION_INTSCALEX            "intscalex"
+#define OPTION_INTSCALEY            "intscaley"
 
 // core rotation options
 #define OPTION_ROTATE               "rotate"
@@ -195,6 +203,9 @@ enum
 #define OPTION_AUTOBOOT_SCRIPT      "autoboot_script"
 
 #define OPTION_CONSOLE              "console"
+#define OPTION_PLUGINS              "plugins"
+#define OPTION_PLUGIN               "plugin"
+#define OPTION_NO_PLUGIN            "noplugin"
 
 #define OPTION_LANGUAGE             "language"
 
@@ -280,6 +291,13 @@ public:
 	bool sleep() const { return m_sleep; }
 	float speed() const { return float_value(OPTION_SPEED); }
 	bool refresh_speed() const { return m_refresh_speed; }
+
+	// core render options
+	bool keep_aspect() const { return bool_value(OPTION_KEEPASPECT); }
+	bool uneven_stretch() const { return bool_value(OPTION_UNEVENSTRETCH); }
+	bool uneven_stretch_x() const { return bool_value(OPTION_UNEVENSTRETCHX); }
+	int int_scale_x() const { return int_value(OPTION_INTSCALEX); }
+	int int_scale_y() const { return int_value(OPTION_INTSCALEY); }
 
 	// core rotation options
 	bool rotate() const { return bool_value(OPTION_ROTATE); }
@@ -378,6 +396,11 @@ public:
 	const char *autoboot_script() const { return value(OPTION_AUTOBOOT_SCRIPT); }
 
 	bool console() const { return bool_value(OPTION_CONSOLE); }
+
+	bool plugins() const { return bool_value(OPTION_PLUGINS); }
+
+	const char *plugin() const { return value(OPTION_PLUGIN); }
+	const char *no_plugin() const { return value(OPTION_NO_PLUGIN); }
 
 	const char *language() const { return value(OPTION_LANGUAGE); }
 

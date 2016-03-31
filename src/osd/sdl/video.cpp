@@ -93,6 +93,15 @@ bool sdl_osd_interface::video_init()
 
 
 //============================================================
+//  get_slider_list
+//============================================================
+
+slider_state *sdl_osd_interface::get_slider_list()
+{
+	return m_sliders;
+}
+
+//============================================================
 //  video_exit
 //============================================================
 
@@ -125,23 +134,6 @@ void sdl_monitor_info::refresh()
 }
 
 //============================================================
-//  sdlvideo_monitor_get_aspect
-//============================================================
-
-float osd_monitor_info::aspect()
-{
-	// FIXME: returning 0 looks odd, video_config is bad
-	if (video_config.keepaspect)
-	{
-		return m_aspect / ((float)m_pos_size.width() / (float)m_pos_size.height());
-	}
-	return 0.0f;
-}
-
-
-
-
-//============================================================
 //  update
 //============================================================
 
@@ -151,6 +143,8 @@ void sdl_osd_interface::update(bool skip_redraw)
 
 	if (m_watchdog != NULL)
 		m_watchdog->reset();
+
+	update_slider_list();
 
 	// if we're not skipping this redraw, update all windows
 	if (!skip_redraw)
@@ -286,12 +280,7 @@ finishit:
 
 static void check_osd_inputs(running_machine &machine)
 {
-#ifdef USE_OLD_SDL_INPUT
-	sdl_window_info *window = sdlinput_get_focus_window();
-#else
-	// BUG: TODO: Fix focus window support
 	sdl_window_info *window = sdl_window_list;
-#endif
 
 	// check for toggling fullscreen mode
 	if (machine.ui_input().pressed(IPT_OSD_1))
@@ -303,13 +292,6 @@ static void check_osd_inputs(running_machine &machine)
 			curwin->toggle_full_screen();
 			curwin = curwin->m_next;
 		}
-	}
-
-	if (machine.ui_input().pressed(IPT_OSD_2))
-	{
-		//FIXME: on a per window basis
-		video_config.fullstretch = !video_config.fullstretch;
-		machine.ui().popup_time(1, "Uneven stretch %s", video_config.fullstretch? "enabled":"disabled");
 	}
 
 	if (machine.ui_input().pressed(IPT_OSD_4))
@@ -351,7 +333,6 @@ void sdl_osd_interface::extract_video_config()
 	video_config.filter        = options().filter();
 	video_config.keepaspect    = options().keep_aspect();
 	video_config.numscreens    = options().numscreens();
-	video_config.fullstretch   = options().uneven_stretch();
 	#ifdef SDLMAME_X11
 	video_config.restrictonemonitor = !options().use_all_heads();
 	#endif
@@ -385,10 +366,10 @@ void sdl_osd_interface::extract_video_config()
 		if (options().seconds_to_run() == 0)
 			osd_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
-#if (USE_OPENGL)	
+#if (USE_OPENGL)
 	else if (strcmp(stemp, SDLOPTVAL_OPENGL) == 0)
 		video_config.mode = VIDEO_MODE_OPENGL;
-#endif		
+#endif
 	else if ((strcmp(stemp, SDLOPTVAL_SDL2ACCEL) == 0))
 	{
 		video_config.mode = VIDEO_MODE_SDL2ACCEL;

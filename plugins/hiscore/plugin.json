@@ -1,0 +1,10 @@
+{
+  "plugin": {
+    "name": "hiscore",
+	"description": "Hiscore support",
+    "version": "1.0.0",
+    "author": "borgar@borgar.net",
+	"type": "plugin",
+	"start": "false"
+  }
+}

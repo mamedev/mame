@@ -82,7 +82,7 @@ function createProjects_mame_tiny(_target, _subtarget)
 	uuid (os.uuid("drv-mame-tiny"))
 	addprojectflags()
 	precompiledheaders()
-	
+
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",

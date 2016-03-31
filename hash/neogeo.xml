@@ -30,7 +30,6 @@
 	***************************************-->
 
 	<software name="nam1975">
-		<!-- MVS AND AES VERSION -->
 		<description>NAM-1975 (NGM-001)(NGH-001)</description>
 		<year>1990</year>
 		<publisher>SNK</publisher>
@@ -90,7 +89,6 @@
 
 
 	<software name="bstars">
-		<!-- MVS VERSION -->
 		<description>Baseball Stars Professional (NGM-002)</description>
 		<year>1990</year>
 		<publisher>SNK</publisher>
@@ -141,7 +139,6 @@
 	</software>
 
 	<software name="bstarsh" cloneof="bstars">
-		<!-- AES VERSION -->
 		<description>Baseball Stars Professional (NGH-002)</description>
 		<year>1990</year>
 		<publisher>SNK</publisher>
@@ -200,7 +197,6 @@
 ***************************************-->
 
 	<software name="tpgolf">
-		<!-- MVS AND AES VERSION -->
 		<description>Top Player's Golf (NGM-003)(NGH-003)</description>
 		<year>1990</year>
 		<publisher>SNK</publisher>
@@ -267,7 +263,6 @@
 ***************************************-->
 
 	<software name="mahretsu">
-		<!-- MVS AND AES VERSION -->
 		<description>Mahjong Kyo Retsuden (NGM-004)(NGH-004)</description>
 		<year>1990</year>
 		<publisher>SNK</publisher>
@@ -322,7 +317,6 @@
 ***************************************-->
 
 	<software name="maglord">
-		<!-- MVS VERSION -->
 		<description>Magician Lord (NGM-005)</description>
 		<year>1990</year>
 		<publisher>Alpha Denshi Co.</publisher>
@@ -369,7 +363,6 @@
 	</software>
 
 	<software name="maglordh" cloneof="maglord">
-		<!-- AES VERSION -->
 		<description>Magician Lord (NGH-005)</description>
 		<year>1990</year>
 		<publisher>Alpha Denshi Co.</publisher>
@@ -424,7 +417,6 @@
 ***************************************-->
 
 	<software name="ridhero">
-		<!-- MVS AND AES VERSION -->
 		<description>Riding Hero (NGM-006)(NGH-006)</description>
 		<year>1990</year>
 		<publisher>SNK</publisher>
@@ -438,7 +430,7 @@
 			<dataarea name="mcu" size="0x2000">
 				<!-- Hitachi HD6301V1 MCU -->
 				<rom offset="0x000000" size="0x02000" name="rhcom.bin" crc="e5cd6306" sha1="f6bbb8ae562804d67e137290c765c3589fa334c0" />
-		<!-- dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally) -->
+				<!-- dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally) -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="006-s1.s1" crc="eb5189f0" sha1="0239c342ea62e73140a2306052f226226461a478" />
@@ -491,7 +483,7 @@
 			<dataarea name="mcu" size="0x2000">
 				<!-- Hitachi HD6301V1 MCU -->
 				<rom offset="0x000000" size="0x02000" name="rhcom.bin" crc="e5cd6306" sha1="f6bbb8ae562804d67e137290c765c3589fa334c0" />
-		<!-- dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally) -->
+				<!-- dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally) -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="006-s1.s1" crc="eb5189f0" sha1="0239c342ea62e73140a2306052f226226461a478" />
@@ -536,10 +528,12 @@
 	NEO-MVS PROG42G / NEO-MVS CHA42G
 	. NGH-007
 	NEO-AEG PROG42G / NEO-AEG CHA42G
+	NEO-AEG PROG42G / NEO-AEG CHA-8M
+	. prototype
+	NEO-AEG PROG-EP / NEO-AEG CHA-EP
 ***************************************-->
 
 	<software name="alpham2">
-		<!-- MVS AND AES VERSION -->
 		<description>Alpha Mission II / ASO II - Last Guardian (NGM-007)(NGH-007)</description>
 		<year>1991</year>
 		<publisher>SNK</publisher>
@@ -583,37 +577,37 @@
 		<description>Alpha Mission II / ASO II - Last Guardian (prototype)</description>
 		<year>1991</year>
 		<publisher>SNK</publisher>
-		<sharedfeat name="release" value="MVS" />
+		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
-				<rom loadflag="load16_byte" name="proto_007-p1.p1" offset="0x000001" size="0x080000" crc="c763e52a" sha1="b24acbac255c5ee1a2e92e77cdde6620a24081cf" />
-				<rom loadflag="load16_byte" name="proto_007-p2.p2" offset="0x000000" size="0x080000" crc="7a0b435c" sha1="40e6f42a92001d9f4e51898dd7489da143b6b74b" />
+				<rom loadflag="load16_byte" name="007_p1_faac.p1" offset="0x000001" size="0x080000" crc="c763e52a" sha1="b24acbac255c5ee1a2e92e77cdde6620a24081cf" />
+				<rom loadflag="load16_byte" name="007_p2_1813.p2" offset="0x000000" size="0x080000" crc="7a0b435c" sha1="40e6f42a92001d9f4e51898dd7489da143b6b74b" />
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
-				<rom offset="0x000000" size="0x020000" name="proto_007-s1.s1" crc="efc9ae2e" sha1="a594826b0082fe5a13191673e8d9aa42517230f5" />
+				<rom offset="0x000000" size="0x020000" name="007_s1_36f1.s1" crc="efc9ae2e" sha1="a594826b0082fe5a13191673e8d9aa42517230f5" />
 			</dataarea>
 			<dataarea name="audiocpu" size="0x020000">
-				<rom offset="0x000000" size="0x020000" name="proto_007-m1.m1" crc="5976b464" sha1="ec824567ecc3579f6d86c9d9385710cbaeef16a3" />
+				<rom offset="0x000000" size="0x020000" name="007_m1_9384.m1" crc="5976b464" sha1="ec824567ecc3579f6d86c9d9385710cbaeef16a3" />
 			</dataarea>
 			<dataarea name="ymsnd" size="0x200000">
-				<rom name="proto_007-v11.v11" offset="0x000000" size="0x080000" crc="18eaa9e1" sha1="85c94d8660f8a32e4ca8e015f0bd704208482d68" />
-				<rom name="proto_007-v12.v12" offset="0x080000" size="0x080000" crc="2487d495" sha1="49af3c4dc6a38c5158d3641fd8f9a40041b42aa6" />
-				<rom name="proto_007-v13.v13" offset="0x100000" size="0x080000" crc="25e60f25" sha1="d06b0df872372de38fcf90187195070ac5f8c651" />
+				<rom name="007_v11_1bb4.v11" offset="0x000000" size="0x080000" crc="18eaa9e1" sha1="85c94d8660f8a32e4ca8e015f0bd704208482d68" />
+				<rom name="007_v12_c8e8.v12" offset="0x080000" size="0x080000" crc="2487d495" sha1="49af3c4dc6a38c5158d3641fd8f9a40041b42aa6" />
+				<rom name="007_v13_09fa.v13" offset="0x100000" size="0x080000" crc="25e60f25" sha1="d06b0df872372de38fcf90187195070ac5f8c651" />
 			</dataarea>
 			<dataarea name="ymsnd.deltat" size="0x80000">
-				<rom name="proto_007-v21.v21" offset="0x000000" size="0x080000" crc="ac44b75a" sha1="7399a05cd4e2c7ecde4a7323d3e189255afe5fc2" />
+				<rom name="007_v21_28c2.v21" offset="0x000000" size="0x080000" crc="ac44b75a" sha1="7399a05cd4e2c7ecde4a7323d3e189255afe5fc2" />
 			</dataarea>
 			<dataarea name="sprites" size="0x400000">
-				<!-- note, ROM_LOAD32_BYTE -->
-				<rom loadflag="load32_byte" name="proto_007-c1.c1" offset="0x000000" size="0x080000" crc="24841639" sha1="fcc2a349121dad86ffefc44b9f0e8ba616ce0d30" />
-				<rom loadflag="load32_byte" name="proto_007-c2.c2" offset="0x000002" size="0x080000" crc="912763ab" sha1="cedf26d7d85ad140399ee62813c71f35e65498d6" />
-				<rom loadflag="load32_byte" name="proto_007-c3.c3" offset="0x000001" size="0x080000" crc="0743bde2" sha1="0d13ad6333909ad3cf10f9ac360f9abf191318de" />
-				<rom loadflag="load32_byte" name="proto_007-c4.c4" offset="0x000003" size="0x080000" crc="61240212" sha1="dee36f6604adaeb96e0d761a7256241c066b1cd2" />
-				<rom loadflag="load32_byte" name="proto_007-c5.c5" offset="0x200000" size="0x080000" crc="cf9f4c53" sha1="f979c85f83d9f76e554c2617f85f6d4efca6799c" />
-				<rom loadflag="load32_byte" name="proto_007-c6.c6" offset="0x200002" size="0x080000" crc="3d903b19" sha1="001a8c762336b855fe1df69fe2e605d30a3f00a1" />
-				<rom loadflag="load32_byte" name="proto_007-c7.c7" offset="0x200001" size="0x080000" crc="e41e3875" sha1="730aceb8a66cb33d0194b096568f053ad7dc000a" />
-				<rom loadflag="load32_byte" name="proto_007-c8.c8" offset="0x200003" size="0x080000" crc="4483e2cf" sha1="47c3364f5c36ae9dc3a49fe37ca60bcee0e73314" />
+				<!-- note, load32_byte -->
+				<rom loadflag="load32_byte" name="007_c1_210e.c11" offset="0x000000" size="0x080000" crc="24841639" sha1="fcc2a349121dad86ffefc44b9f0e8ba616ce0d30" />
+				<rom loadflag="load32_byte" name="007_c2_29ae.c12" offset="0x000002" size="0x080000" crc="912763ab" sha1="cedf26d7d85ad140399ee62813c71f35e65498d6" />
+				<rom loadflag="load32_byte" name="007_c3_c873.c13" offset="0x000001" size="0x080000" crc="0743bde2" sha1="0d13ad6333909ad3cf10f9ac360f9abf191318de" />
+				<rom loadflag="load32_byte" name="007_c4_2462.c14" offset="0x000003" size="0x080000" crc="61240212" sha1="dee36f6604adaeb96e0d761a7256241c066b1cd2" />
+				<rom loadflag="load32_byte" name="007_c5_5f16.c15" offset="0x200000" size="0x080000" crc="cf9f4c53" sha1="f979c85f83d9f76e554c2617f85f6d4efca6799c" />
+				<rom loadflag="load32_byte" name="007_c6_8abc.c16" offset="0x200002" size="0x080000" crc="3d903b19" sha1="001a8c762336b855fe1df69fe2e605d30a3f00a1" />
+				<rom loadflag="load32_byte" name="007_c7_c983.c17" offset="0x200001" size="0x080000" crc="e41e3875" sha1="730aceb8a66cb33d0194b096568f053ad7dc000a" />
+				<rom loadflag="load32_byte" name="007_c8_b599.c18" offset="0x200003" size="0x080000" crc="4483e2cf" sha1="47c3364f5c36ae9dc3a49fe37ca60bcee0e73314" />
 			</dataarea>
 		</part>
 	</software>
@@ -638,7 +632,6 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="009-p1.p1" offset="0x000000" size="0x080000" crc="b45fcfbf" sha1="3872147dda2d1ba905d35f4571065d87b1958b4a" />
 				<!-- TC534200 -->
@@ -687,7 +680,6 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="009-pg1.p1" offset="0x000000" size="0x080000" crc="8e9f0add" sha1="d0b908a86a58f2537eea73a431038f1cd74a5a2f" />
 				<!-- TC534200 -->
@@ -802,7 +794,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="011-p1.p1" offset="0x000000" size="0x080000" crc="c7f944b5" sha1="da7560e09187c68f1d9f7656218497b4464c56c9" />
 				<!-- MB834200 -->
@@ -865,7 +856,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="014-p1.p1" offset="0x000000" size="0x080000" crc="6f1699c8" sha1="87206f67a619dede7959230f9ff3701b8b78957a" />
 				<!-- CXK384500 -->
@@ -918,7 +908,6 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="016-p1.p1" offset="0x000000" size="0x080000" crc="1b818731" sha1="b98b1b33c0301fd79aac908f6b635dd00d1cb08d" />
 				<!-- TC534200 -->
@@ -959,7 +948,6 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="016-hp1.p1" offset="0x000000" size="0x080000" crc="b774621e" sha1="7684b2e07163aec68cd083ef1d8900f855f6cb42" />
 				<!-- TC534200 -->
@@ -1008,7 +996,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="017-p1.p1" offset="0x000000" size="0x080000" crc="f8a63983" sha1="7a10ecb2f0fd8315641374c065d2602107b09e72" />
 				<!-- TC534200 -->
@@ -1049,7 +1036,6 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- AES VERSION (US) -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="017-hp1.p1" offset="0x000000" size="0x080000" crc="33eccae0" sha1="000ccf9a9c73df75eeba3f2c367c3a1a9e0a3a6b" />
 				<!-- TC534200 -->
@@ -1091,6 +1077,8 @@
 	NEO-MVS PROG42G / NEO-MVS CHA42G
 	. NGH-018
 	NEO-AEG PROG42G / NEO-AEG CHA42G
+	. prototype
+	NEO-AEG PROG-EP / NEO-AEG CHA-EP
 ***************************************-->
 
 	<software name="burningf">
@@ -1100,7 +1088,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="018-p1.p1" offset="0x000000" size="0x080000" crc="4092c8db" sha1="df194a4ad2c35e0e18bc053ff9284183444a4666" />
 				<!-- HN62434 -->
@@ -1139,7 +1126,6 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- AES VERSION (US) -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="018-hp1.p1" offset="0x000000" size="0x080000" crc="ddffcbf4" sha1="c646c4bbdb4e9b32df76c90f582ccd69fcc9f8e7" />
 				<!-- HN62434 -->
@@ -1172,40 +1158,40 @@
 	</software>
 
 	<software name="burningfp" cloneof="burningf">
+		<!-- early prototype - all roms were hand labeled with CRCs, dumps verified against them -->
 		<description>Burning Fight (prototype)</description>
 		<year>1991</year>
 		<publisher>SNK</publisher>
-		<sharedfeat name="release" value="MVS" />
+		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- early prototype - all roms were hand labeled with CRCs, dumps verified against them -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
-				<rom loadflag="load16_byte" name="proto_018-p1.p1" offset="0x000001" size="0x080000" crc="5b4032e7" sha1="55df91dad6f484d3d49c28ab5972700bf71a8662" />
-				<rom loadflag="load16_byte" name="proto_018-p2.p2" offset="0x000000" size="0x080000" crc="78762f68" sha1="12170fc6efe75cb5d32624033d3d341032c97548" />
+				<rom loadflag="load16_byte" name="018_p1_9397.p1" offset="0x000001" size="0x080000" crc="5b4032e7" sha1="55df91dad6f484d3d49c28ab5972700bf71a8662" />
+				<rom loadflag="load16_byte" name="018_p2_e335.p2" offset="0x000000" size="0x080000" crc="78762f68" sha1="12170fc6efe75cb5d32624033d3d341032c97548" />
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
-				<rom offset="0x000000" size="0x020000" name="proto_018-s1.s1" crc="f3d130e8" sha1="2fdeb93f4bb2a60d391cac2822be41661b1e1795" />
+				<rom offset="0x000000" size="0x020000" name="018_s1_9899.s1" crc="f3d130e8" sha1="2fdeb93f4bb2a60d391cac2822be41661b1e1795" />
 			</dataarea>
 			<dataarea name="audiocpu" size="0x020000">
-				<rom offset="0x000000" size="0x020000" name="proto_018-m1.m1" crc="470dd5d4" sha1="4291811b4aefe45261a1ae3631b6999fcd74fb3f" />
+				<rom offset="0x000000" size="0x020000" name="018_m1_4586.m1" crc="470dd5d4" sha1="4291811b4aefe45261a1ae3631b6999fcd74fb3f" />
 			</dataarea>
 			<dataarea name="ymsnd" size="0x200000">
-				<rom name="proto_018-v11.v11" offset="0x000000" size="0x080000" crc="dc07ea3c" sha1="c3e71aaec44ead7ddc581565d16b90030e6db5fd" />
-				<rom name="proto_018-v12.v12" offset="0x080000" size="0x080000" crc="f1ae637c" sha1="02a4c7d4a544350a314ab7b26d8c9d3baa8f5778" />
+				<rom name="018_v11_56ac.v11" offset="0x000000" size="0x080000" crc="dc07ea3c" sha1="c3e71aaec44ead7ddc581565d16b90030e6db5fd" />
+				<rom name="018_v12_db95.v12" offset="0x080000" size="0x080000" crc="f1ae637c" sha1="02a4c7d4a544350a314ab7b26d8c9d3baa8f5778" />
 			</dataarea>
 			<dataarea name="ymsnd.deltat" size="0x80000">
-				<rom name="proto_018-v21.v21" offset="0x000000" size="0x080000" crc="9f3b4eda" sha1="7f516923d04daa483b4b99c9babba66505931a34" />
+				<rom name="018_v21_98dd.v21" offset="0x000000" size="0x080000" crc="9f3b4eda" sha1="7f516923d04daa483b4b99c9babba66505931a34" />
 			</dataarea>
 			<dataarea name="sprites" size="0x400000">
-				<!-- note, ROM_LOAD32_BYTE -->
-				<rom loadflag="load32_byte" name="proto_018-c1.c1" offset="0x000000" size="0x080000" crc="6569018b" sha1="25040e0a9c2b72900100a22a2a41de5f6c339d8a" />
-				<rom loadflag="load32_byte" name="proto_018-c2.c2" offset="0x000002" size="0x080000" crc="6949b501" sha1="d8ee48837faff6cc849046ee8757b2b94d440303" />
-				<rom loadflag="load32_byte" name="proto_018-c3.c3" offset="0x000001" size="0x080000" crc="410f653b" sha1="ce94667721baa7b2c318fc268e3bb9209671c9f5" />
-				<rom loadflag="load32_byte" name="proto_018-c4.c4" offset="0x000003" size="0x080000" crc="d43bf2a5" sha1="c27985d8973611d02570f469a0d8cb4f5b63b614" />
-				<rom loadflag="load32_byte" name="proto_018-c5.c5" offset="0x200000" size="0x080000" crc="837d09d3" sha1="d3b06931fca6123604549599544b04529ef34c53" />
-				<rom loadflag="load32_byte" name="proto_018-c6.c6" offset="0x200002" size="0x080000" crc="5fee51e7" sha1="835c632fa12a1d5b4104cd80b8f686ac80b314a1" />
-				<rom loadflag="load32_byte" name="proto_018-c7.c7" offset="0x200001" size="0x080000" crc="0f3f0823" sha1="ec1d681c1795de43d20f30f85956e2473ec39c95" />
-				<rom loadflag="load32_byte" name="proto_018-c8.c8" offset="0x200003" size="0x080000" crc="67cc9e34" sha1="dc72a464c1456a4d2f7b992b416a984fb7885e99" />
+				<!-- note, load32_byte -->
+				<rom loadflag="load32_byte" name="018_c1_ba06.c11" offset="0x000000" size="0x080000" crc="6569018b" sha1="25040e0a9c2b72900100a22a2a41de5f6c339d8a" />
+				<rom loadflag="load32_byte" name="018_c2_d534.c12" offset="0x000002" size="0x080000" crc="6949b501" sha1="d8ee48837faff6cc849046ee8757b2b94d440303" />
+				<rom loadflag="load32_byte" name="018_c3_9d70.c13" offset="0x000001" size="0x080000" crc="410f653b" sha1="ce94667721baa7b2c318fc268e3bb9209671c9f5" />
+				<rom loadflag="load32_byte" name="018_c4_bf9d.c14" offset="0x000003" size="0x080000" crc="d43bf2a5" sha1="c27985d8973611d02570f469a0d8cb4f5b63b614" />
+				<rom loadflag="load32_byte" name="018_c5_ac9d.c15" offset="0x200000" size="0x080000" crc="837d09d3" sha1="d3b06931fca6123604549599544b04529ef34c53" />
+				<rom loadflag="load32_byte" name="018_c6_d2a5.c16" offset="0x200002" size="0x080000" crc="5fee51e7" sha1="835c632fa12a1d5b4104cd80b8f686ac80b314a1" />
+				<rom loadflag="load32_byte" name="018_c7_d568.c17" offset="0x200001" size="0x080000" crc="0f3f0823" sha1="ec1d681c1795de43d20f30f85956e2473ec39c95" />
+				<rom loadflag="load32_byte" name="018_c8_d256.c18" offset="0x200003" size="0x080000" crc="67cc9e34" sha1="dc72a464c1456a4d2f7b992b416a984fb7885e99" />
 			</dataarea>
 		</part>
 	</software>
@@ -1225,7 +1211,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="019-p1.p1" offset="0x000000" size="0x080000" crc="a2de8445" sha1="893d7ae72b4644123469de143fa35fac1cbcd61e" />
 				<!-- TC534200 -->
@@ -1276,7 +1261,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="020-p1.p1" offset="0x000000" size="0x080000" crc="e6f2fe64" sha1="50ab82517e077727d97668a4df2b9b96d2e78ab6" />
 				<!-- TC534200 -->
@@ -1321,7 +1305,6 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- AES VERSION (US) -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="020-hp1.p1" offset="0x000000" size="0x080000" crc="7cdb01ce" sha1="32cae2ddf5e26fb7e8a09132e600220db82df3b8" />
 				<!-- TC534200 -->
@@ -1374,7 +1357,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="021-p1.p1" offset="0x000000" size="0x080000" crc="39c3478f" sha1="06ebe54c9c4e14c5c31e770013d58b7162359ecc" />
 				<!-- MB834200 -->
@@ -1419,7 +1401,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="022-p1.p1" offset="0x000000" size="0x100000" crc="6a2f6d4a" sha1="b8ca548e56f1c7abcdce415ba7329e0cf698ee13" />
 				<!-- TC538200 -->
@@ -1466,7 +1447,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="023-p1.p1" offset="0x000000" size="0x100000" crc="c488fda3" sha1="4cdf2f1837fffd720efef42f81f933bdf2ef1402" />
 				<!-- TC538200 -->
@@ -1525,6 +1505,9 @@
 	. NGM-024
 	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
 	. NGH-024
+
+	. prototype
+	NEO-MVS PROG-EP / NEO-MVS CHA-EPG
 ***************************************-->
 
 	<software name="lresort">
@@ -1565,6 +1548,44 @@
 		</part>
 	</software>
 
+	<software name="lresortp" cloneof="lresort">
+		<!-- prototype - all roms were hand labeled with CRCs -->
+		<description>Last Resort (prototype)</description>
+		<year>1992</year>
+		<publisher>SNK</publisher>
+		<sharedfeat name="release" value="MVS" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_byte" name="024_p1_5937.podd" offset="0x000001" size="0x080000" crc="8e6008ee" sha1="6779663118782207156dc9fa9e24e81e30c6391c" />
+				<rom loadflag="load16_byte" name="024_p2_8d37.peven" offset="0x000000" size="0x080000" crc="6d9ee90f" sha1="ecd42182988092417bc96db8301ea408e47735f2" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="024_s1_22fe.s1" crc="5cef5cc6" sha1="9ec305007bdb356e9f8f279beae5e2bcb3f2cf7b" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="024_m1_fc7a.m1" crc="22122875" sha1="540c21559163381467679f836cb068adaf526659" />
+			</dataarea>
+			<dataarea name="ymsnd" size="0x200000">
+				<rom name="024_v11_b085.v11" offset="0x000000" size="0x080000" crc="0722da38" sha1="66a9b463d5277908b3a01c03de82b3de9118f2cb" />
+				<rom name="024_v12_d3b7.v12" offset="0x080000" size="0x080000" crc="670ce3ec" sha1="9004aa85d4a9b0ecf9cf9357b073ed55a98fdb02" />
+				<rom name="024_v13_a31e.v13" offset="0x100000" size="0x080000" crc="2e39462b" sha1="b0a9b1a3377bf0369f3020192505c46ca52927d6" />
+				<rom name="024_v24_2f0f.v24" offset="0x180000" size="0x080000" crc="7944754f" sha1="d42a46c5127c6c62041ebffb0007af8a24abd360" />
+			</dataarea>
+			<dataarea name="sprites" size="0x400000">
+				<!-- note, load32_byte -->
+				<rom loadflag="load32_byte" name="024_c1_b764.c1" offset="0x000000" size="0x080000" crc="677749ec" sha1="6f94675e037956a380652ab1056e6f1dec605bec" />
+				<rom loadflag="load32_byte" name="024_c2_1951.c2" offset="0x000002" size="0x080000" crc="104d7b59" sha1="404e8776ee8df4ca282eb7b747759af8628ddca1" />
+				<rom loadflag="load32_byte" name="024_c3_0f63.c3" offset="0x000001" size="0x080000" crc="b0965a74" sha1="e8026dd4f722ccab9c913261d09ab8843ef56a0e" />
+				<rom loadflag="load32_byte" name="024_c4_c5b5.c4" offset="0x000003" size="0x080000" crc="dcfc3860" sha1="8443b455ae8de656adab57f3b7e68919f22d3b9d" />
+				<rom loadflag="load32_byte" name="024_c5_dd03.c5" offset="0x200000" size="0x080000" crc="50322397" sha1="3308fbe48ad165b9894a52fc3a8d9898bbbc0c0e" />
+				<rom loadflag="load32_byte" name="024_c6_c81a.c6" offset="0x200002" size="0x080000" crc="c3c93894" sha1="f23b9d7e2b54d44c96370dde282bdf45cebd9cba" />
+				<rom loadflag="load32_byte" name="024_c7_5edc.c7" offset="0x200001" size="0x080000" crc="21faf72b" sha1="00bf257b06180ae6ede57744cea6257b3488d9f0" />
+				<rom loadflag="load32_byte" name="024_c8_0850.c8" offset="0x200003" size="0x080000" crc="fb57217b" sha1="607a98da754e8b1dd94a6432b21a36cc38e06a0f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!--***************************************
 	ID-0025
 	. NGM-025
@@ -1580,7 +1601,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="025-p1.p1" offset="0x000000" size="0x080000" crc="43344cb0" sha1="29dfd699f35b0a74e20fedd6c9174c289f0ef6e0" />
 				<!-- TC574200 -->
@@ -1632,7 +1652,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="027-p1.p1" offset="0x000000" size="0x080000" crc="c8381327" sha1="c8f8be0ba276c6d12ef13d05af3cf83a2b924894" />
 				<!-- HN62422PC -->
@@ -1766,7 +1785,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="030-epr.p1" offset="0x000000" size="0x080000" crc="c59be3dd" sha1="4fbd462c1c18e85a252c58b04b54fd3b82b46cb0" />
 				<!-- TC574200 -->
@@ -1852,7 +1870,6 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="031-pg1.p1" offset="0x000000" size="0x080000" crc="17f034a7" sha1="2e66c7bd93a08efe63c4894494db50bbf58f60e4" />
 				<!-- TC534200 -->
@@ -1891,7 +1908,6 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="031-p1.p1" offset="0x000000" size="0x080000" crc="a2801c24" sha1="627d76ff0740ca29586f37b268f47fb469822529" />
 				<!-- TC534200 -->
@@ -1985,7 +2001,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="033-p1.p1" offset="0x000000" size="0x080000" crc="47ebdc2f" sha1="d46786502920fb510f1999db00c5e09fb641c0bd" />
 				<!-- TC534200 -->
@@ -2036,7 +2051,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="034-p1.p1" offset="0x000000" size="0x080000" crc="cdef6b19" sha1="97482db0dffc6d625fb41fa38449c0a74d741a72" />
 				<!-- TC534200 -->
@@ -2088,7 +2102,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="036-p1.p1" offset="0x000000" size="0x080000" crc="1c66b6fa" sha1="6c50cc452971c46c763ae0b2def95792671a1798" />
 				<!-- CXK384500 -->
@@ -2135,7 +2148,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="037-p1.p1" offset="0x000000" size="0x080000" crc="e7f2553c" sha1="8469ecb900477feed05ae3311fe9515019bbec2a" />
 				<!-- TC534200 -->
@@ -2180,7 +2192,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="038-p1.p1" offset="0x000000" size="0x080000" crc="1e52a576" sha1="a1cb56354c3378e955b0cd482c3c41ae15add952" />
 				<!-- TC534200 -->
@@ -2233,7 +2244,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="039-p1.p1" offset="0x000000" size="0x080000" crc="b372d54c" sha1="b70fc6f72e16a66b6e144cc01370548e3398b8b8" />
 				<!-- TC534200 -->
@@ -2269,8 +2279,8 @@
 		</part>
 	</software>
 
-		<!-- fairly late prototype release, only the code differs from the main set -->
 	<software name="kotm2p" cloneof="kotm2">
+		<!-- fairly late prototype release, only the code differs from the main set -->
 		<description>King of the Monsters 2 - The Next Thing (prototype)</description>
 		<year>1992</year>
 		<publisher>SNK</publisher>
@@ -2298,7 +2308,7 @@
 			</dataarea>
 				<!-- same data as main set, but prototype board layout -->
 			<dataarea name="sprites" size="0x600000">
-				<!-- note, ROM_LOAD32_BYTE -->
+				<!-- note, load32_byte -->
 				<rom loadflag="load32_byte" name="proto_039-c1.c1" offset="0x000000" size="0x100000" crc="7192a787" sha1="7bef6ce79c618103485480aee3c6f856968eb51f" />
 				<rom loadflag="load32_byte" name="proto_039-c2.c2" offset="0x000002" size="0x100000" crc="7157eca1" sha1="65f36c6a3834775b04076d2c38a6047bffe9a8cf" />
 				<rom loadflag="load32_byte" name="proto_039-c3.c3" offset="0x000001" size="0x100000" crc="11d75727" sha1="5a4c7b5ca3f1195e7853b45c5e71c13fe74d16e9" />
@@ -2412,7 +2422,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="042-p1.p1" offset="0x000000" size="0x100000" crc="ed719dcf" sha1="12baf2601e86c0e4358517b9fa1c55f2f5835f1d" />
 				<!-- TC538200 -->
@@ -2459,7 +2468,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="043-p1.p1" offset="0x000000" size="0x100000" crc="ffbdd928" sha1="05b24655ca32723661adc5509b450824deb0c176" />
 				<!-- TC538200 -->
@@ -2511,7 +2519,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="044-p1.p1" offset="0x000000" size="0x080000" crc="ca9f7a6d" sha1="4d28ef86696f7e832510a66d3e8eb6c93b5b91a1" />
 				<!-- TC534200 -->
@@ -2562,7 +2569,6 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="045-p1.p1" offset="0x000000" size="0x100000" crc="dfe51bf0" sha1="2243af3770a516ae698b69bcd9daf53632d9128d" />
 				<!-- TC538200 -->
@@ -2607,7 +2613,6 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x180000">
 				<rom loadflag="load16_word_swap" name="045-p1.p1" offset="0x000000" size="0x100000" crc="dfe51bf0" sha1="2243af3770a516ae698b69bcd9daf53632d9128d" />
 				<!-- TC538200 -->
@@ -2660,7 +2665,6 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="046-p1.p1" offset="0x000000" size="0x100000" crc="69fa9e29" sha1="9a40a16163193bb506a32bd34f6323b25ec69622" />
 				<!-- mask rom TC538200 -->
@@ -2713,7 +2717,6 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="046-pg1.p1" offset="0x000000" size="0x100000" crc="771e39bc" sha1="c0e05fd1ca81926438bb75e2fa6894e40ab6521e" />
 				<!-- mask rom TC538200 -->
@@ -2774,7 +2777,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<feature name="slot" value="rom_fatfur2" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="047-p1.p1" offset="0x000000" size="0x100000" crc="ecfdbb69" sha1="59e2f137c6eaf043df4ddae865a9159a10265c60" />
@@ -2825,7 +2827,6 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="048-p1.p1" offset="0x000000" size="0x100000" crc="fa818cbb" sha1="afee2c897b766c84f13891fb52c574fb18df0951" />
 				<!-- mask rom TC538200 -->
@@ -2866,7 +2867,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="049-p1.p1" offset="0x000000" size="0x080000" crc="3b857da2" sha1="4dd86c739944696c16c3cdd85935d6dfa9fdc276" />
 				<!-- CXK384500 -->
@@ -3040,7 +3040,6 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="053-epr.p1" offset="0x000000" size="0x080000" crc="d42e1e9a" sha1="9d1911fe4bf6202466ec45557dd008cbf01ca9c6" />
 				<!-- D27C4000 -->
@@ -3084,7 +3083,6 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="053-p1.p1" offset="0x000000" size="0x080000" crc="95b574cb" sha1="b7b7af6a04c3d902e7f8852897741ecaf0b1062c" />
 				<!-- TC534200 -->
@@ -3181,7 +3179,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="055-p1.p1" offset="0x100000" size="0x100000" crc="f10a2042" sha1="d08a3f3c28be4b1793de7d362456281329fe1828" />
 				<!-- mask rom TC5316200 -->
@@ -3239,7 +3236,6 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="056-p1.p1" offset="0x000000" size="0x100000" crc="a3b1d021" sha1="ee42f3ca4516226b0088d0303ed28e3ecdabcd71" />
 				<!-- TC538200 -->
@@ -3289,7 +3285,6 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="056-p1.p1" offset="0x000000" size="0x100000" crc="a3b1d021" sha1="ee42f3ca4516226b0088d0303ed28e3ecdabcd71" />
 				<!-- TC538200 -->
@@ -3350,7 +3345,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="057-p1.p1" offset="0x100000" size="0x100000" crc="65a891d9" sha1="ff8d5ccb0dd22c523902bb3db3c645583a335056" />
 				<!-- TC5316200 -->
@@ -3402,7 +3396,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x180000">
 				<rom loadflag="load16_word_swap" name="058-p1.p1" offset="0x000000" size="0x100000" crc="2f585ba2" sha1="429b4bf43fb9b1082c15d645ca328f9d175b976b" />
 				<!-- mask rom TC538200 -->
@@ -3449,7 +3442,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x180000">
 				<rom loadflag="load16_word_swap" name="058-p1.p1" offset="0x000000" size="0x100000" crc="2f585ba2" sha1="429b4bf43fb9b1082c15d645ca328f9d175b976b" />
 				<!-- mask rom TC538200 -->
@@ -3560,9 +3552,9 @@
 		<year>1994</year>
 		<publisher>Viccom</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="060-p1.p1" offset="0x000000" size="0x100000" crc="2a104b50" sha1="3eb663d3df7074e1cdf4c0e450a35c9cf55d8979" />
 				<!-- VIC940800 -->
@@ -3599,9 +3591,9 @@
 		<year>1994</year>
 		<publisher>Viccom</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="060-p1.p1" offset="0x000000" size="0x100000" crc="2a104b50" sha1="3eb663d3df7074e1cdf4c0e450a35c9cf55d8979" />
 				<!-- VIC940800 -->
@@ -3651,7 +3643,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="061-p1.p1" offset="0x000000" size="0x100000" crc="5969e0dc" sha1="78abea880c125ec5a85bef6404478512a34b5513" />
 				<!-- mask rom TC538200 -->
@@ -3752,7 +3743,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="063-p1.p1" offset="0x100000" size="0x100000" crc="22368892" sha1="0997f8284aa0f57a333be8a0fdea777d0d01afd6" />
 				<!-- TC5316200 -->
@@ -3868,7 +3858,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="064-p1.p1" offset="0x100000" size="0x100000" crc="385a2e86" sha1="cfde4a1aeae038a3d6ca9946065624f097682d3d" />
 				<!-- TC5316200 -->
@@ -4016,9 +4005,9 @@
 		<year>1994</year>
 		<publisher>Face</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="067-p1.p1" offset="0x000000" size="0x080000" crc="4cea8a49" sha1="cea4a35db8de898e30eb40dd339b3cbe77ac0856" />
 				<!-- UM8303B -->
@@ -4055,9 +4044,9 @@
 		<year>1994</year>
 		<publisher>Video System Co.</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="068-pg1.p1" offset="0x000000" size="0x100000" crc="105a408f" sha1="2ee51defa1c24c66c63a6498ee542ac26de3cfbb" />
 				<!-- mask rom TC538200 -->
@@ -4110,7 +4099,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x300000">
 				<rom loadflag="load16_word_swap" name="069-p1.p1" offset="0x000000" size="0x100000" crc="a8bcfbbc" sha1="519c4861151797e5f4d4f33432b83dfabed8e7c4" />
 				<!-- TC538200 -->
@@ -4161,10 +4149,10 @@
 		<year>2001</year>
 		<publisher>SNK</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Original Version - Encrypted GFX -->
-			<!-- MVS ONLY RELEASE -->
 			<feature name="slot" value="rom_cmc_zupapa" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="070-p1.p1" offset="0x000000" size="0x100000" crc="5a96203e" sha1="49cddec9ca6cc51e5ecf8a34e447a23e1f8a15a1" />
@@ -4223,9 +4211,9 @@
 		<year>1994</year>
 		<publisher>Eighting / Hudson</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="073-p1.p1" offset="0x000000" size="0x080000" crc="adc356ad" sha1="801e0a54b65d7a3500e6cef2d6bba40c6356dc1f" />
 				<!-- mask rom TC534200 -->
@@ -4268,7 +4256,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="074-p1.p1" offset="0x100000" size="0x100000" crc="62369553" sha1="ca4d561ee08d16fe6804249d1ba49188eb3bd606" />
 				<!-- TC5316200 -->
@@ -4366,9 +4353,9 @@
 		<year>1994</year>
 		<publisher>NMK</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="076-p1.p1" offset="0x000000" size="0x080000" crc="d7c1effd" sha1="485c2308a40baecd122be9ab4996044622bdcc7e" />
 				<!-- mask rom TC538200 -->
@@ -4478,7 +4465,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="079-p1.p1" offset="0x000000" size="0x100000" crc="5e78328e" sha1="7a00b096ed6dd77afc3008c5a4c83686e475f323" />
 				<!-- TC538200 -->
@@ -4526,7 +4512,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="080-p1.p1" offset="0x000000" size="0x100000" crc="4440315e" sha1="f4adba8e341d64a1f6280dfd98ebf6918c00608d" />
 				<!-- mask rom TC538200 -->
@@ -4715,11 +4700,11 @@
 		<year>1994</year>
 		<publisher>Taito</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
-		<!-- This set uses CHA and PROG board from Power Spikes II. Six Power Spikes II prom's are replaced with
-	Puzzle Bobble prom's. Confirmed on several original carts. Do other layouts also exist? -->
+			<!-- This set uses CHA and PROG board from Power Spikes II. Six Power Spikes II prom's are replaced with
+			Puzzle Bobble prom's. Confirmed on several original carts. Do other layouts also exist? -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="d96-07.ep1" offset="0x000000" size="0x080000" crc="6102ca14" sha1="328429d11de5b327a0654ae0548da4d0025a2ae6" />
 				<!-- 27C240 -->
@@ -4781,7 +4766,6 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="084-p1.p1" offset="0x100000" size="0x100000" crc="2cba2716" sha1="f6c2d0537c9c3e0938065c65b1797c47198fcff8" />
 				<!-- TC5316200 -->
@@ -4833,7 +4817,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<!-- There also exists a MVS version with 4x eprom (EP1~EP4); board used is NEO-MVS PROGSM -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="084-pg1.p1" offset="0x100000" size="0x100000" crc="5e54cf95" sha1="41abe2042fdbb1526e92a0789976a9b1ac5e60f0" />
@@ -4895,9 +4878,9 @@
 		<year>1996</year>
 		<publisher>Tecmo</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="086-p1.p1" offset="0x000000" size="0x100000" crc="03e20ab6" sha1="3a0a5a54649178ce7a6158980cb4445084b40fb5" />
 				<!-- mask rom TC538200 -->
@@ -4944,7 +4927,6 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x300000">
 				<rom loadflag="load16_word_swap" name="087-epr.ep1" offset="0x000000" size="0x080000" crc="23e09bb8" sha1="79da99fa50a639fce9d1266699b5e53c9ac55642" />
 				<!-- M27C4002 -->
@@ -5000,7 +4982,6 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x300000">
 				<rom loadflag="load16_word_swap" name="087-pg1.p1" offset="0x000000" size="0x100000" crc="282a336e" sha1="e062f1939d36a45f185b5dbd726cdd833dc7c28c" />
 				<!-- mask rom TC538200 -->
@@ -5314,9 +5295,9 @@
 		<year>1997</year>
 		<publisher>Hudson</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="093-p1.p1" offset="0x000000" size="0x100000" crc="a1a71d0d" sha1="059284c84f61a825923d86d2f29c91baa2c439cd" />
 				<!-- TC538200 -->
@@ -5419,7 +5400,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x300000">
 				<rom loadflag="load16_word_swap" name="095-p1.p1" offset="0x000000" size="0x100000" crc="63b4d8ae" sha1="03aa9f6bab6aee685d1b57a52823797704eea845" />
 				<!-- TC538200 -->
@@ -5470,7 +5450,6 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS VERSION -->
 			<!-- This is a bug fixed revision applied over the original cart. The original P1 and P2 stayed in the cart and this -->
 			<!-- 512k ROM was added to replace the first 512k of P1. -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x300000">
@@ -5805,9 +5784,9 @@
 		<year>1995</year>
 		<publisher>Taito (Visco license)</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="202-p1.p1" offset="0x000000" size="0x080000" crc="2b61415b" sha1="0e3e4faf2fd6e63407425e1ac788003e75aeeb4f" />
 				<!-- TC534200 -->
@@ -5938,9 +5917,9 @@
 		<year>1996</year>
 		<publisher>Visco</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="207-p1.p1" offset="0x000000" size="0x100000" crc="334ea51e" sha1="0a642f8565ec6e9587ed767bcf177f4677547162" />
 				<!-- TC538200 -->
@@ -5977,9 +5956,9 @@
 		<year>1996</year>
 		<publisher>Technos Japan</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="208-p1.p1" offset="0x100000" size="0x100000" crc="127f3d32" sha1="18e77b79b1197a89371533ef9b1e4d682c44d875" />
 				<!-- TC5316200 -->
@@ -6021,9 +6000,9 @@
 		<year>1995</year>
 		<publisher>Visco</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="209-p1.p1" offset="0x100000" size="0x100000" crc="2a019a79" sha1="422a639e74284fef2e53e1b49cf8803b0a7e80c6" />
 				<!-- mask rom TC5316200 -->
@@ -6123,9 +6102,9 @@
 		<year>1996</year>
 		<publisher>Visco</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="213-p1.p1" offset="0x100000" size="0x100000" crc="e397d798" sha1="10f459111db4bab7aaa63ca47e83304a84300812" />
 				<!-- mask rom TC5316200 -->
@@ -6168,7 +6147,6 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x300000">
 				<rom loadflag="load16_word_swap" name="214-p1.p1" offset="0x000000" size="0x100000" crc="52755d74" sha1="4232d627f1d2e6ea9fc8cf01571d77d4d5b8a1bb" />
 				<!-- TC538200 -->
@@ -6491,9 +6469,9 @@
 		<year>1996</year>
 		<publisher>Saurus</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="219-p1.p1" offset="0x100000" size="0x100000" crc="6af0e574" sha1="c3f0fed0d942e48c99c80b1713f271c033ce0f4f" />
 				<!-- TC5316200 -->
@@ -6643,7 +6621,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="222-p1.p1" offset="0x000000" size="0x100000" crc="1a5cb56d" sha1="9a0a5a1c7c5d428829f22d3d17f7033d43a51b5b" />
 				<!-- TC538200 -->
@@ -7092,9 +7069,9 @@
 		<year>1997</year>
 		<publisher>Face</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="231-p1.p1" offset="0x000000" size="0x080000" crc="61be1810" sha1="1ab0e11352ca05329c6e3f5657b60e4a227fcbfb" />
 				<!-- mask rom TC534200 -->
@@ -7139,7 +7116,6 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="232-p1.p1" offset="0x000000" size="0x100000" crc="7db81ad9" sha1="8bc42be872fd497eb198ca13bf004852b88eb1dc" />
 				<!-- TC538200 -->
@@ -7186,7 +7162,6 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="232-pg1.p1" offset="0x000000" size="0x100000" crc="5c2400b7" sha1="49e23f80c012c62146a1bb8f254a7597823de430" />
 				<!-- TC538200 -->
@@ -7333,7 +7308,6 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="234-p1.p1" offset="0x000000" size="0x100000" crc="e123a5a3" sha1="a3ddabc00feeb54272b145246612ad4632b0e413" />
 				<!-- TC538200 -->
@@ -7382,7 +7356,6 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="234-pg1.p1" offset="0x000000" size="0x100000" crc="cd01c06d" sha1="d66142571afe07c6191b52f319f1bc8bc8541c14" />
 				<!-- TC538200 -->
@@ -7485,9 +7458,9 @@
 		<year>1997</year>
 		<publisher>Taito (Visco license)</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="235-p1.p1" offset="0x000000" size="0x080000" crc="afed5de2" sha1="a5d82c6dbe687505e8c8d7339908da45cd379a0b" />
 			</dataarea>
@@ -7530,9 +7503,9 @@
 		<year>1997</year>
 		<publisher>Video System Co.</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="237-p1.p1" offset="0x000000" size="0x100000" crc="be96e44f" sha1="43679da8664fbb491103a1108040ddf94d59fc2b" />
 				<!-- TC538200 -->
@@ -7569,9 +7542,9 @@
 		<year>1997</year>
 		<publisher>Saurus</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="238-p1.p1" offset="0x000000" size="0x100000" crc="5677456f" sha1="f76169fa5c90871d65e2a16fd1bb036c90533ac8" />
 				<rom loadflag="load16_word_swap" name="238-p2.sp2" offset="0x100000" size="0x400000" crc="5b4a09c5" sha1="de04036cba2da4bb2da73d902d1822b82b4f67a9" />
@@ -7617,9 +7590,9 @@
 		<year>1997</year>
 		<publisher>Saurus</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="238-pg1.p1" offset="0x000000" size="0x100000" crc="efedf8dc" sha1="f638df9bf7aa7d514ee2bccfc7f2adbf39ca83fc" />
 				<!-- mask rom TC538200 -->
@@ -7731,7 +7704,6 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="240-p1.p1" offset="0x000000" size="0x100000" crc="80e41205" sha1="8f83eb8ff54be4ec40f8a0dd2cbe56c54908d00a" />
 				<!-- TC538200 -->
@@ -7780,7 +7752,6 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="240-pg1.p1" offset="0x000000" size="0x100000" crc="b6969780" sha1="e3373d18e0f0724d69efb8024a27cca121f1b5b2" />
 				<!-- TC538200 -->
@@ -7937,7 +7908,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- encrypted code + protection -->
-			<!-- MVS VERSION -->
 			<feature name="slot" value="rom_kof98" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x600000">
 				<rom loadflag="load16_word_swap" name="242-p1.p1" offset="0x000000" size="0x200000" crc="8893df89" sha1="0452828785110601c65f667209fc2d2926cd3751" />
@@ -8105,7 +8075,6 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- AES VERSION -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="242-pn1.p1" offset="0x000000" size="0x100000" crc="61ac868a" sha1="26577264aa72d6af272952a876fcd3775f53e3fa" />
 				<!-- TC538200 -->
@@ -8166,7 +8135,6 @@
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS AND AES VERSION -->
 			<!-- later revision -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="243-pg1.p1" offset="0x000000" size="0x100000" crc="af1e6554" sha1="bd8526f60c2472937728a5d933fbd19d899f2cba" />
@@ -8262,9 +8230,9 @@
 		<year>1998</year>
 		<publisher>Visco</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="245-p1.p1" offset="0x100000" size="0x100000" crc="c828876d" sha1="1dcba850e5cf8219d0945612cfded6d20ca8682a" />
 				<!-- mask rom TC5316200 -->
@@ -8366,9 +8334,9 @@
 		<year>1999</year>
 		<publisher>Visco</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="247-p1.p1" offset="0x000000" size="0x100000" crc="95779094" sha1="a985e033bc6f137fa65855d3eed245d66d5b244a" />
 				<!-- mask rom TC538200 -->
@@ -8405,9 +8373,9 @@
 		<year>1999</year>
 		<publisher>Taito (SNK license)</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="248-p1.p1" offset="0x000000" size="0x100000" crc="9d6c0754" sha1="95c70c2d51fc4de01e768e03cc800a850aaad5dc" />
 				<!-- TC538200 -->
@@ -8506,9 +8474,9 @@
 		<year>1999</year>
 		<publisher>Visco</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS ONLY RELEASE -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="249-p1.p1" offset="0x100000" size="0x100000" crc="c9386118" sha1="5554662c7bc8605889cac4a67fee05bbb4eb786f" />
 				<!-- TC5316200 -->
@@ -8611,7 +8579,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Original Version - Encrypted Code & GFX -->
-			<!-- MVS VERSION -->
 			<feature name="slot" value="rom_sma_kof99" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
 				<rom loadflag="load16_word_swap" name="ka.neo-sma" offset="0x0c0000" size="0x040000" crc="7766d09e" sha1="4e0a49d1ad669a62676cb30f527c6590cde80194" />
@@ -8669,7 +8636,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Original Version - Encrypted Code & GFX -->
-			<!-- AES VERSION -->
 			<feature name="slot" value="rom_sma_kof99" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
 				<rom loadflag="load16_word_swap" name="kc.neo-sma" offset="0x0c0000" size="0x040000" crc="6c9d0647" sha1="2a0ce62ca6c18007e8fbe1b60475c7874ab79389" />
@@ -8888,10 +8854,10 @@
 		<year>1999</year>
 		<publisher>Visco</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Original Version - Encrypted GFX -->
-			<!-- MVS ONLY RELEASE -->
 			<feature name="slot" value="rom_cmc_ganryu" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="252-p1.p1" offset="0x100000" size="0x100000" crc="4b8ac4fb" sha1="93d90271bff281862b03beba3809cf95a47a1e44" />
@@ -9091,10 +9057,10 @@
 		<year>1999</year>
 		<publisher>Psikyo</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Original Version, Encrypted GFX Roms -->
-			<!-- MVS ONLY RELEASE -->
 			<feature name="slot" value="rom_cmc_s1945p" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="254-p1.p1" offset="0x000000" size="0x100000" crc="ff8efcff" sha1="dcaeaca573385c172ecc43ee6bee355359091893" />
@@ -9137,10 +9103,10 @@
 		<year>1999</year>
 		<publisher>Yumekobo</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Original Version, Encrypted GFX -->
-			<!-- MVS ONLY RELEASE -->
 			<feature name="slot" value="r_cmc_preisle2" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="255-p1.p1" offset="0x000000" size="0x100000" crc="dfa3c0f3" sha1="793c6a46f3a794536dc0327a3f3fad20e25ab661" />
@@ -9188,7 +9154,6 @@
 		<part name="cart" interface="neo_cart">
 			<!-- Original Version - Encrypted Code & GFX -->
 			<!-- revision 2000.4.1 -->
-			<!-- MVS VERSION -->
 			<feature name="slot" value="rom_sma_mslug3" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
 				<rom loadflag="load16_word_swap" name="neo-sma" offset="0x0c0000" size="0x040000" crc="9cd55736" sha1="d6efb2b313127c2911d47d9324626b3f1e7c6ccb" />
@@ -9248,7 +9213,6 @@
 		<part name="cart" interface="neo_cart">
 			<!-- Original Version - Encrypted GFX -->
 			<!-- revision 2000.3.17 -->
-			<!-- AES VERSION -->
 			<feature name="slot" value="rom_cmc_mslug3h" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="256-ph1.p1" offset="0x000000" size="0x100000" crc="9c42ca85" sha1="7a8f77a89867b889295ae9b9dfd4ba28f02d234d" />
@@ -9313,7 +9277,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Original Version, Encrypted Code + Sound + GFX Roms -->
-			<!-- MVS AND AES VERSION -->
 			<feature name="slot" value="rom_sma_kof2000" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
 				<rom loadflag="load16_word_swap" name="neo-sma" offset="0x0c0000" size="0x040000" crc="71c6e6bb" sha1="1bd29ded4c6b29780db8e8b772c452189699ca89" />
@@ -9434,10 +9397,10 @@
 		<year>2000</year>
 		<publisher>Visco</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Original Version - Encrypted GFX -->
-			<!-- MVS ONLY RELEASE -->
 			<feature name="slot" value="r_cmc_bangbead" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
 				<rom loadflag="load16_word_swap" name="259-p1.p1" offset="0x100000" size="0x100000" crc="88a37f8b" sha1="566db84850fad5e8fe822e8bba910a33e083b550" />
@@ -9474,10 +9437,10 @@
 		<year>2000</year>
 		<publisher>Eleven / Gavaking</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Original Version - Encrypted GFX -->
-			<!-- MVS ONLY RELEASE -->
 			<feature name="slot" value="rom_cmc_nitd" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="260-p1.p1" offset="0x000000" size="0x080000" crc="61361082" sha1="441f3f41c1aa752c0e0a9a0b1d92711d9e636b85" />
@@ -9569,7 +9532,6 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS" />
 		<part name="cart" interface="neo_cart">
-			<!-- MVS VERSION -->
 			<feature name="slot" value="r_cmc_kof2001" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="262-p1-08-e0.p1" offset="0x000000" size="0x100000" crc="9381750d" sha1="dcfecd69e563ff52fe07d23c5372d0f748b07819" />
@@ -9626,7 +9588,6 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- AES VERSION -->
 			<feature name="slot" value="r_cmc_kof2001" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="262-pg1.p1" offset="0x000000" size="0x100000" crc="2af7e741" sha1="e41282d73ed6d521da056f1a16573bb61bfa3826" />
@@ -9691,7 +9652,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Original Version - Encrypted GFX -->
-			<!-- MVS VERSION -->
 			<feature name="slot" value="r_pc2_mslug4" />
 			<!-- These carts were manufactured by Mega Enterprise, not SNK. -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
@@ -9742,7 +9702,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Original Version - Encrypted GFX -->
-			<!-- AES VERSION -->
 			<feature name="slot" value="r_pc2_mslug4" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="263-ph1.p1" offset="0x000000" size="0x100000" crc="c67f5c8d" sha1="12af74964843f103520d9f0825069ea2f67eeb2f" />
@@ -9801,7 +9760,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Encrypted Set -->
-			<!-- MVS VERSION -->
 			<feature name="slot" value="r_pc2_rotd" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x800000">
 				<rom loadflag="load16_word_swap" name="264-p1.p1" offset="0x000000" size="0x800000" crc="b8cc969d" sha1="4f2205b4bdd32dd1522106ef4df10ac0eb1b852d" />
@@ -9861,7 +9819,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Encrypted Set -->
-			<!-- MVS AND AES VERSION -->
 			<feature name="slot" value="r_k2_kof2002" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="265-p1.p1" offset="0x000000" size="0x100000" crc="9ede7323" sha1="ad9d45498777fda9fa58e75781f48e09aee705a6" />
@@ -9923,7 +9880,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Encrypted Set -->
-			<!-- MVS AND AES VERSION -->
 			<feature name="slot" value="r_k2_matrim" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
 				<rom loadflag="load16_word_swap" name="266-p1.p1" offset="0x000000" size="0x100000" crc="5d4c2dc7" sha1="8d723b0d28ec344eef26009b361a2b97d300dd51" />
@@ -9980,10 +9936,10 @@
 		<year>2003</year>
 		<publisher>Aiky / Taito</publisher>
 		<sharedfeat name="release" value="MVS" />
+			<!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Encrypted Set -->
-			<!-- MVS ONLY RELEASE -->
 			<feature name="slot" value="r_pc2_pnyaa" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="267-p1.p1" offset="0x000000" size="0x100000" crc="112fe2c0" sha1="01420e051f0bdbd4f68ce306a3738161b96f8ba8" />
@@ -10028,7 +9984,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Encrypted Set -->
-			<!-- MVS VERSION -->
 			<feature name="slot" value="r_pv_mslug5" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x800000">
 				<rom loadflag="load32_word_swap" name="268-p1cr.p1" offset="0x000000" size="0x400000" crc="d0466792" sha1="880819933d997fab398f91061e9dbccb959ae8a1" />
@@ -10142,7 +10097,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Encrypted Set -->
-			<!-- MVS AND AES VERSION -->
 			<feature name="slot" value="r_pv_svc" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x800000">
 				<rom loadflag="load32_word_swap" name="269-p1.p1" offset="0x000000" size="0x400000" crc="38e2005e" sha1="1b902905916a30969282f1399a756e32ff069097" />
@@ -10205,7 +10159,6 @@
 		<sharedfeat name="compatibility" value="MVS" />
 		<part name="cart" interface="neo_cart">
 			<!-- Encrypted Set -->
-			<!-- MVS VERSION -->
 			<feature name="slot" value="r_k2_samsh5" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x800000">
 				<rom loadflag="load16_word_swap" name="270-p1.p1" offset="0x000000" size="0x400000" crc="4a2a09e6" sha1="2644de02cdab8ccc605488a7c76b8c9cd1d5bcb9" />
@@ -10259,7 +10212,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Encrypted Set, Alternate Set -->
-			<!-- AES VERSION -->
 			<feature name="slot" value="r_k2_samsh5" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x800000">
 				<rom loadflag="load16_word_swap" name="270-p1c.p1" offset="0x000000" size="0x400000" crc="bf956089" sha1="c538289069bf338b9fa7ecc5c9143763dbb776a8" />
@@ -10321,7 +10273,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Encrypted Code + Sound + GFX Roms -->
-			<!-- MVS VERSION -->
 			<feature name="slot" value="r_pv_kf2k3" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
 				<rom loadflag="load32_word_swap" name="271-p1c.p1" offset="0x000000" size="0x400000" crc="530ecc14" sha1="812cf7e9902af3f5e9e330b7c05c2171b139ad2b" />
@@ -10377,7 +10328,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Encrypted Code + Sound + GFX Roms -->
-			<!-- AES VERSION -->
 			<feature name="slot" value="r_pv_kf2k3h" />
 				<!-- All chip labels for this set are correct -->
 			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
@@ -10441,7 +10391,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Encrypted Set -->
-			<!-- MVS VERSION -->
 			<feature name="slot" value="r_k2_sams5s" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x800000">
 				<!-- Uncensored -->
@@ -10482,8 +10431,7 @@
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- Encrypted Set -->
-			<!-- AES VERSION, 2nd bugfix release -->
+			<!-- Encrypted Set, 2nd bugfix release -->
 			<feature name="slot" value="r_k2_sams5s" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x800000">
 				<!-- Less censored -->
@@ -10526,7 +10474,6 @@
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<!-- Encrypted Set -->
-			<!-- AES VERSION -->
 			<feature name="slot" value="r_k2_sams5s" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x800000">
 				<!-- Censored -->

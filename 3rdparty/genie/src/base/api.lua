@@ -139,6 +139,7 @@
 					ATL = 1,
 					DebugEnvsDontMerge = 1,
 					DebugEnvsInherit = 1,
+					DeploymentContent = 1,
 					EnableMinimalRebuild = 1,
 					EnableSSE = 1,
 					EnableSSE2 = 1,
@@ -216,10 +217,16 @@
 			kind  = "string",
 			scope = "project",
 		},
+		
+		windowstargetplatformminversion =
+		{
+			kind = "string",
+			scope = "project",
+		},
 
 		forcedincludes =
 		{
-			kind  = "absolutefilelist",
+			kind  = "list",
 			scope = "config",
 		},
 
@@ -1138,4 +1145,14 @@
 
 	function newoption(opt)
 		premake.option.add(opt)
+	end
+
+
+--
+-- Enable file level configuration
+-- this makes project generation slower for large projects
+--
+
+	function enablefilelevelconfig()
+		premake._filelevelconfig = true
 	end
