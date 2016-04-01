@@ -69,7 +69,7 @@ protected:
 	virtual void device_reset(void) override;
 
 private:
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	v9938_device        *m_v9938;
 	devcb_write_line    m_out_gromclk_cb; // GROMCLK line is optional; if present, pulse it by XTAL/24 rate
 	emu_timer   *m_gromclk_timer;
