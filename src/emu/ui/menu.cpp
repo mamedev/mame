@@ -544,13 +544,24 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 	if (!customonly)
 		machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
-	// determine the first visible line based on the current selection
-	if (selected > top_line + visible_lines || selected < top_line - visible_lines)
-		top_line = selected - (visible_lines / 2);
 	if (top_line < 0 || selected == 0)
 		top_line = 0;
-	if (top_line + visible_lines >= item.size())
+	if (top_line > item.size() - visible_lines || selected == (item.size() - 1))
 		top_line = item.size() - visible_lines;
+
+	bool show_top_arrow = false;
+	bool show_bottom_arrow = false;
+
+	// if scrolling, show arrows
+	if (item.size() > visible_lines) {
+		if (top_line > 0)
+			show_top_arrow = true;
+		if (top_line != item.size() - visible_lines)
+			show_bottom_arrow = true;
+	}
+
+	// set the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
+	visitems = visible_lines - show_top_arrow - show_bottom_arrow;
 
 	// determine effective positions taking into account the hilighting arrows
 	float effective_width = visible_width - 2.0f * gutter_width;
@@ -573,6 +584,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 	float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
 	float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
 	if (!customonly)
+	{
 		for (linenum = 0; linenum < visible_lines; linenum++)
 		{
 			float line_y = visible_top + (float)linenum * line_height;
@@ -613,7 +625,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 				highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
 
 			// if we're on the top line, display the up arrow
-			if (linenum == 0 && top_line != 0)
+			if (linenum == 0 && show_top_arrow)
 			{
 				draw_arrow(container,
 									0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
@@ -627,7 +639,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 			}
 
 			// if we're on the bottom line, display the down arrow
-			else if (linenum == visible_lines - 1 && itemnum != item.size() - 1)
+			else if (linenum == visible_lines - 1 && show_bottom_arrow)
 			{
 				draw_arrow(container,
 									0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
@@ -708,6 +720,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 				}
 			}
 		}
+	}
 
 	// if the selected subitem is too big, display it in a separate offset box
 	if (selected_subitem_too_big)
@@ -741,9 +754,6 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 
 	// if there is something special to add, do it by calling the virtual method
 	custom_render((selected >= 0 && selected < item.size()) ? item[selected].ref : nullptr, customtop, custombottom, x1, y1, x2, y2);
-
-	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != item.size());
 }
 
 void ui_menu::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
@@ -989,7 +999,9 @@ void ui_menu::handle_keys(UINT32 flags)
 		}
 		(selected == 0) ? selected = top_line = item.size() - 1 : --selected;
 		validate_selection(-1);
-		top_line -= (selected == top_line && top_line != 0);
+		top_line -= (selected <= top_line && top_line != 0);
+		if (selected <= top_line && visitems != visible_lines)
+			top_line--;
 	}
 
 	// down advances by one item
@@ -1001,7 +1013,10 @@ void ui_menu::handle_keys(UINT32 flags)
 			return;
 		}
 		(selected == item.size() - 1) ? selected = top_line = 0 : ++selected;
-		top_line += (selected == top_line + visitems + (top_line != 0));
+		validate_selection(1);
+		top_line += (selected >= top_line + visitems + (top_line != 0));
+		if (selected >= (top_line + visitems + (top_line != 0)))
+			top_line++;
 	}
 
 	// page up backs up by visitems

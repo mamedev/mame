@@ -131,6 +131,7 @@ public:
 	// getters
 	entry *first() const { return m_entrylist.first(); }
 	const char *command() const { return m_command.c_str(); }
+	entry *get_entry(const char *option) { return (m_entrymap.find(option) != m_entrymap.end()) ? m_entrymap.find(option)->second : nullptr; }
 
 	// range iterators
 	using auto_iterator = simple_list<entry>::auto_iterator;
