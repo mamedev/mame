@@ -485,10 +485,6 @@ private:
 	bool m_sound_ready;
 	bool m_pbox_ready;
 
-	// P-Code mode, negative logic. Name is taken from the spec. If asserted, P-Code libraries are available.
-	// May be read as "Pascal and Text-to-speech GROM libraries ENable"
-	line_state  m_ptgen;
-
 	// Keeps the recent DBIN level
 	line_state m_dbin_level;
 
