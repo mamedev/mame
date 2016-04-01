@@ -15,16 +15,12 @@ non-interlaced
 
 sound system appears to be the same as 'spartanxtec.cpp'
 
-
-
 */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "spyhunttec.lh"
-
-#define MASTER_CLOCK        XTAL_20MHz // ??
 
 class spyhuntertec_state : public driver_device
 {
@@ -34,6 +30,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_analog_timer(*this, "analog_timer"),
+		m_analog_input(*this, "AN"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
@@ -48,6 +45,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<timer_device> m_analog_timer;
+	required_ioport_array<2> m_analog_input;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_spriteram2;
@@ -102,13 +100,11 @@ public:
 	TILE_GET_INFO_MEMBER(spyhunt_get_alpha_tile_info);
 	void mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy, int interlaced);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(analog_shift_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(analog_count_callback);
 	void reset_analog_timer();
 
-	int m_analog_read_ready;
-	UINT8 m_analog_latched_value;
 	UINT8 m_analog_select;
-	int m_analog_read_count;
+	UINT8 m_analog_count;
 };
 
 WRITE8_MEMBER(spyhuntertec_state::ay1_porta_w)
@@ -124,31 +120,24 @@ READ8_MEMBER(spyhuntertec_state::ay1_porta_r)
 
 void spyhuntertec_state::reset_analog_timer()
 {
-	// 555 timer? complete guess
-	m_analog_timer->adjust(attotime::from_nsec(7600));
+	// 555 timer, period is guessed
+	m_analog_timer->adjust(attotime::from_nsec(9400));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(spyhuntertec_state::analog_shift_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(spyhuntertec_state::analog_count_callback)
 {
-	m_analog_read_count++;
+	if (m_analog_count != 0)
+		m_analog_count--;
 	reset_analog_timer();
 }
 
 WRITE8_MEMBER(spyhuntertec_state::ay2_porta_w)
 {
-//  printf("ay2_porta_w %02x\n", data);
-	// write 80 / 00
-	// or 81 / 01
-	// depending on which sound command was used
-	// assuming input select
-	
-	// d7 falling edge
+	// d7: latch analog counter on falling edge, d0 selects which one
 	if (~data & m_analog_select & 0x80)
 	{
-		m_analog_read_ready = 1;
-		m_analog_read_count = 0;
 		reset_analog_timer();
-		m_analog_latched_value = ioport((data & 1) ? "PADDLE" : "PEDAL")->read();
+		m_analog_count = m_analog_input[data & 1]->read();
 	}
 
 	m_analog_select = data;
@@ -420,24 +409,8 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 
 	*/
 //  printf("%04x spyhuntertec_in2_r\n", space.device().safe_pc());
-
-	UINT8 ret = ioport("IN2")->read()&~0x40;
-
-	if (m_analog_read_ready)
-	{
-		if (m_analog_read_count >= m_analog_latched_value)
-		{
-			ret |= 0x40;
-			m_analog_read_count = 0;
-			m_analog_read_ready = 0;
-		}
-	}
-	else
-	{
-		ret |= 0x40;
-	}
-
-	return ret;
+	
+	return (ioport("IN2")->read() & ~0x40) | ((m_analog_count == 0) ? 0x40 : 0x00);
 }
 
 READ8_MEMBER(spyhuntertec_state::spyhuntertec_in3_r)
@@ -610,9 +583,10 @@ static INPUT_PORTS_START( spyhuntertec )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Right Trigger / Machine Guns")
 
-	PORT_START("PEDAL")
+	PORT_START("AN.0")
 	PORT_BIT( 0xff, 0x02, IPT_PEDAL ) PORT_MINMAX(0x02,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
-	PORT_START("PADDLE")
+
+	PORT_START("AN.1")
 	PORT_BIT( 0x7f, 0x40, IPT_PADDLE ) PORT_MINMAX(0x30,0x50) PORT_SENSITIVITY(40) PORT_KEYDELTA(3) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -679,9 +653,6 @@ void spyhuntertec_state::machine_start()
 
 void spyhuntertec_state::machine_reset()
 {
-	m_analog_read_ready = 0;
-	m_analog_latched_value = 0;
-	m_analog_read_count = 0;
 }
 
 
@@ -691,13 +662,14 @@ static MACHINE_CONFIG_START( spyhuntertec, spyhuntertec_state )
 
 // note: no ctc, no nvram
 // 2*z80, 3*ay8912
+// 2 XTALs: one 20MHz, other one near maincpu ?MHz
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_CPU_ADD("maincpu", Z80, 4000000 ) // NEC D780C-2 (rated 6MHz)
 	MCFG_CPU_PROGRAM_MAP(spyhuntertec_map)
 	MCFG_CPU_IO_MAP(spyhuntertec_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spyhuntertec_state, irq0_line_hold)
-	MCFG_TIMER_DRIVER_ADD("analog_timer", spyhuntertec_state, analog_shift_callback)
+	MCFG_TIMER_DRIVER_ADD("analog_timer", spyhuntertec_state, analog_count_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -715,7 +687,7 @@ static MACHINE_CONFIG_START( spyhuntertec, spyhuntertec_state )
 //  MCFG_PALETTE_INIT_OWNER(spyhuntertec_state,spyhunt)
 
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000 )
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000 ) // SGS Z8400B1 (rated 2.5MHz?)
 	MCFG_CPU_PROGRAM_MAP(spyhuntertec_sound_map)
 	MCFG_CPU_IO_MAP(spyhuntertec_sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(spyhuntertec_state, irq0_line_assert, 1000)
