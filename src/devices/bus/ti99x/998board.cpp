@@ -126,6 +126,7 @@
 
 mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MAINBOARD8, "TI-99/8 Mainboard", tag, owner, clock, "ti998_mainboard", __FILE__),
+	m_A14_set(false),
 	m_pending_write(false),
 	m_speech_ready(true),
 	m_sound_ready(true),
@@ -785,6 +786,7 @@ void mainboard8_device::device_reset()
 	m_pbox_ready = true;
 	m_pending_write = false;
 	m_prev_grom = 0;
+	m_A14_set = false;
 }
 
 MACHINE_CONFIG_FRAGMENT( ti998_mainboard )

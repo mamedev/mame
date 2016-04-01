@@ -357,9 +357,6 @@ private:
 	// Accessing the mapper
 	bool m_mapper_accessed;
 
-	// Doing a DMA access
-	bool m_sram_dma;
-
 	// HOLDA flag
 	bool m_hold_acknowledged;
 
@@ -452,6 +449,9 @@ protected:
 	machine_config_constructor device_mconfig_additions() const override;
 
 private:
+	// Holds the state of the A14 line
+	bool    m_A14_set;
+
 	// Propagates the end of the memory cycle
 	void cycle_end();
 
@@ -484,12 +484,6 @@ private:
 	bool m_speech_ready;
 	bool m_sound_ready;
 	bool m_pbox_ready;
-
-	// Holds the A14 address line state. We need this for the clock_in method.
-	bool m_A14_set;
-
-	// 99/4A compatibility mode. Name is taken from the spec. If asserted, 99/4A compatibility is active.
-	line_state  m_crus;
 
 	// P-Code mode, negative logic. Name is taken from the spec. If asserted, P-Code libraries are available.
 	// May be read as "Pascal and Text-to-speech GROM libraries ENable"
