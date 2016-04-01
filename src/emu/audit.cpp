@@ -388,7 +388,6 @@ media_auditor::summary media_auditor::summarize(const char *name, std::string *o
 					else
 						output->append(string_format("NOT FOUND (%s)\n", shared_device->shortname()));
 				}
-				best_new_status = NOTFOUND;
 				break;
 
 			case audit_record::SUBSTATUS_NOT_FOUND_NODUMP:
