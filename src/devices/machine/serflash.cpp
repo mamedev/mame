@@ -9,6 +9,7 @@
 #include "machine/serflash.h"
 
 
+ALLOW_SAVE_TYPE(flash_state_t);
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -42,12 +43,27 @@ void serflash_device::device_start()
 
 	m_flashwritemap.resize(m_length / FLASH_PAGE_SIZE);
 	memset(&m_flashwritemap[0], 0, m_length / FLASH_PAGE_SIZE);
+	
+	save_item(NAME(m_flash_state));
+	save_item(NAME(m_flash_enab));
+	save_item(NAME(m_flash_cmd_seq));
+	save_item(NAME(m_flash_cmd_prev));
+	save_item(NAME(m_flash_addr_seq));
+	save_item(NAME(m_flash_read_seq));
+	save_item(NAME(m_flash_row));
+	save_item(NAME(m_flash_col));
+	save_item(NAME(m_flash_page_addr));
+	save_item(NAME(m_flash_page_index));
+	save_item(NAME(m_flashwritemap));
+	save_item(NAME(m_last_flash_cmd));
+	save_item(NAME(m_flash_addr));
+	save_item(NAME(m_flash_page_data));
 }
 
 void serflash_device::device_reset()
 {
 	m_flash_enab = 0;
-	flash_hard_reset(machine());
+	flash_hard_reset();
 
 	m_last_flash_cmd = 0x00;
 	m_flash_addr_seq = 0;
@@ -115,7 +131,7 @@ void serflash_device::nvram_write(emu_file &file)
 	file.write(&page, 4);
 }
 
-void serflash_device::flash_hard_reset(running_machine &machine)
+void serflash_device::flash_hard_reset()
 {
 //  logerror("%08x FLASH: RESET\n", cpuexec_describe_context(machine));
 
@@ -141,7 +157,7 @@ WRITE8_MEMBER( serflash_device::flash_enab_w )
 	m_flash_enab = data;
 }
 
-void serflash_device::flash_change_state(running_machine &machine, flash_state_t state)
+void serflash_device::flash_change_state(flash_state_t state)
 {
 	m_flash_state = state;
 
@@ -176,7 +192,7 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 				break;
 
 			case 0x70:  // READ STATUS
-				flash_change_state( space.machine(), STATE_READ_STATUS );
+				flash_change_state( STATE_READ_STATUS );
 				break;
 
 			case 0x80:  // PAGE / CACHE PROGRAM
@@ -186,11 +202,11 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 				break;
 
 			case 0x90:  // READ ID
-				flash_change_state( space.machine(), STATE_READ_ID );
+				flash_change_state( STATE_READ_ID );
 				break;
 
 			case 0xff:  // RESET
-				flash_change_state( space.machine(), STATE_IDLE );
+				flash_change_state( STATE_IDLE );
 				break;
 
 			default:
@@ -210,7 +226,7 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 					m_flash_page_addr = m_flash_col;
 					m_flash_page_index = m_flash_row;
 
-					flash_change_state( space.machine(), STATE_READ );
+					flash_change_state( STATE_READ );
 
 					//logerror("%08x FLASH: caching page = %04X\n", m_maincpu->pc(), m_flash_row);
 				}
@@ -219,7 +235,7 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 			case 0x60: // BLOCK ERASE
 				if (data==0xd0)
 				{
-					flash_change_state( space.machine(), STATE_BLOCK_ERASE );
+					flash_change_state( STATE_BLOCK_ERASE );
 					m_flashwritemap[m_flash_col] |= 1;
 					memset(m_region + m_flash_col * FLASH_PAGE_SIZE, 0xff, FLASH_PAGE_SIZE);
 					//logerror("erased block %04x (%08x - %08x)\n", m_flash_col, m_flash_col * FLASH_PAGE_SIZE,  ((m_flash_col+1) * FLASH_PAGE_SIZE)-1);
@@ -232,7 +248,7 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 			case 0x80:
 				if (data==0x10)
 				{
-					flash_change_state( space.machine(), STATE_PAGE_PROGRAM );
+					flash_change_state( STATE_PAGE_PROGRAM );
 					m_flashwritemap[m_flash_row] |= (memcmp(m_region + m_flash_row * FLASH_PAGE_SIZE, m_flash_page_data, FLASH_PAGE_SIZE) != 0);
 					memcpy(m_region + m_flash_row * FLASH_PAGE_SIZE, m_flash_page_data, FLASH_PAGE_SIZE);
 					//logerror("re-written block %04x (%08x - %08x)\n", m_flash_row, m_flash_row * FLASH_PAGE_SIZE,  ((m_flash_row+1) * FLASH_PAGE_SIZE)-1);

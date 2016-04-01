@@ -49,6 +49,20 @@ void epic12_device::device_start()
 
 	m_blitter_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(epic12_device::blitter_delay_callback),this));
 	m_blitter_delay_timer->adjust(attotime::never);
+	
+	save_item(NAME(m_gfx_addr));
+	save_item(NAME(m_gfx_scroll_0_x));
+	save_item(NAME(m_gfx_scroll_0_y));
+	save_item(NAME(m_gfx_scroll_1_x));
+	save_item(NAME(m_gfx_scroll_1_y));
+	save_item(NAME(m_delay_scale));
+	save_item(NAME(m_gfx_addr_shadowcopy));
+	save_item(NAME(m_gfx_scroll_0_x_shadowcopy));
+	save_item(NAME(m_gfx_scroll_0_y_shadowcopy));
+	save_item(NAME(m_gfx_scroll_1_x_shadowcopy));
+	save_item(NAME(m_gfx_scroll_1_y_shadowcopy));
+	save_pointer(NAME(m_ram16_copy.get()), m_main_ramsize/2);
+	save_item(NAME(*m_bitmaps));
 }
 
 void epic12_device::device_reset()
