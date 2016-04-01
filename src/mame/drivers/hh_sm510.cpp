@@ -361,67 +361,6 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Nintendo Game & Watch: Zelda (model ZL-65)
-  * PCB label ZL-65
-  * Sharp SM511 label ZL-65 (die label CMS55C, CMS694)
-
-***************************************************************************/
-
-class gnwzelda_state : public hh_sm510_state
-{
-public:
-	gnwzelda_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_sm510_state(mconfig, type, tag)
-	{
-		m_inp_lines = 3;
-	}
-};
-
-// config
-
-static INPUT_PORTS_START( gnwzelda )
-	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL) // water of life
-
-	PORT_START("IN.1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL) // b
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL) // a
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL) // alarm
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL) // time
-
-	PORT_START("IN.2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL) // attack
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-INPUT_PORTS_END
-
-static MACHINE_CONFIG_START( gnwzelda, gnwzelda_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, sm511_melody_w))
-
-	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
-
-
-
-
-
-/***************************************************************************
-
   Game driver(s)
 
 ***************************************************************************/
@@ -456,15 +395,6 @@ ROM_START( gnwmndon )
 ROM_END
 
 
-ROM_START( gnwzelda )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "zl65_cms55c_694.prog", 0x0000, 0x1000, CRC(7516a75d) SHA1(36ca3605d3fde1df62f79b9bb1f534c2a2ae0229) )
-
-	ROM_REGION( 0x100, "maincpu:music", 0 )
-	ROM_LOAD( "zl65_cms55c_694.music", 0x000, 0x100, CRC(1f7a4c83) SHA1(242c1278ddfe82c28fd7cd87300e48e7a4827831) )
-ROM_END
-
-
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1989, kcontra,   0,        0, ktmnt,     ktopgun,   driver_device, 0, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
@@ -472,4 +402,3 @@ CONS( 1989, ktopgun,   0,        0, ktopgun,   ktopgun,   driver_device, 0, "Kon
 CONS( 1989, ktmnt,     0,        0, ktmnt,     ktmnt,     driver_device, 0, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
 
 CONS( 1982, gnwmndon,  0,        0, gnwmndon,  gnwmndon,  driver_device, 0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
-CONS( 1989, gnwzelda,  0,        0, gnwzelda,  gnwzelda,  driver_device, 0, "Nintendo", "Game & Watch: Zelda", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
