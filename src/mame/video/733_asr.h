@@ -10,7 +10,7 @@ enum
 	asr733_chr_region_len   = 128*asr733_single_char_len
 };
 
-class asr733_device : public device_t
+class asr733_device : public device_t, public device_gfx_interface
 {
 public:
 	asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -33,7 +33,6 @@ public:
 
 protected:
 	// device-level overrides
-	void device_config_complete() override;
 	void device_start() override;
 	void device_reset() override;
 	machine_config_constructor device_mconfig_additions() const override;
@@ -73,8 +72,6 @@ private:
 
 	std::unique_ptr<bitmap_ind16>       m_bitmap;
 
-	required_device<palette_device>     m_palette;
-	required_device<gfxdecode_device>   m_gfxdecode;
 	devcb_write_line                   m_keyint_line;
 	devcb_write_line                   m_lineint_line;
 };

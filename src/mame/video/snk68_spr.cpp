@@ -10,7 +10,6 @@ const device_type SNK68_SPR = &device_creator<snk68_spr_device>;
 snk68_spr_device::snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SNK68_SPR, "SNK68 Sprites", tag, owner, clock, "snk68_spr", __FILE__),
 		m_gfxdecode(*this),
-		m_palette(*this),
 		m_spriteram(*this, "^spriteram"),
 		m_screen(*this, "^screen"),
 		m_flipscreen(0),
@@ -32,16 +31,6 @@ void snk68_spr_device::tile_callback_noindirect(int &tile, int& fx, int& fy, int
 void snk68_spr_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<snk68_spr_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void snk68_spr_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<snk68_spr_device &>(device).m_palette.set_tag(tag);
 }
 
 // static

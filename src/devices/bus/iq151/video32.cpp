@@ -36,13 +36,6 @@ static const gfx_layout iq151_video32_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( video32 )
-GFXDECODE_END
-
-static MACHINE_CONFIG_FRAGMENT( video32 )
-	MCFG_GFXDECODE_ADD("gfxdecode", "^^palette", video32)
-MACHINE_CONFIG_END
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -59,9 +52,8 @@ const device_type IQ151_VIDEO32 = &device_creator<iq151_video32_device>;
 
 iq151_video32_device::iq151_video32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, IQ151_VIDEO32, "IQ151 video32", tag, owner, clock, "iq151_video32", __FILE__),
-		device_iq151cart_interface( mconfig, *this ), m_videoram(nullptr), m_chargen(nullptr),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "^^palette")
+		device_gfx_interface(mconfig, *this, nullptr, "^^palette"),
+		device_iq151cart_interface( mconfig, *this ), m_videoram(nullptr), m_chargen(nullptr)
 {
 }
 
@@ -75,7 +67,7 @@ void iq151_video32_device::device_start()
 	m_videoram = (UINT8*)memregion("videoram")->base();
 	m_chargen = (UINT8*)memregion("chargen")->base();
 
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, iq151_video32_charlayout, m_chargen, 0, 1, 0));
+	set_gfx(0, std::make_unique<gfx_element>(palette(), iq151_video32_charlayout, m_chargen, 0, 1, 0));
 }
 
 //-------------------------------------------------
@@ -89,16 +81,6 @@ void iq151_video32_device::device_reset()
 	// if required adjust screen size
 	if (screen->visible_area().max_x < 32*8 - 1)
 		screen->set_visible_area(0, 32*8-1, 0, 32*8-1);
-}
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor iq151_video32_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( video32 );
 }
 
 //-------------------------------------------------

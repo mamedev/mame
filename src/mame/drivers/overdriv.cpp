@@ -340,17 +340,13 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 	MCFG_SCREEN_UPDATE_DRIVER(overdriv_state, screen_update_overdriv)
 	MCFG_SCREEN_PALETTE("palette")
 
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", overdriv)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k053246", K053246, 0)
 	MCFG_K053246_CB(overdriv_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx1", 0, NORMAL_PLANE_ORDER, 77, 22)
-	MCFG_K053246_GFXDECODE("gfxdecode")
+	MCFG_K053246_CONFIG("gfx1", NORMAL_PLANE_ORDER, 77, 22)
 	MCFG_K053246_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)

@@ -124,104 +124,6 @@ static INPUT_PORTS_START( namcond1 )
 INPUT_PORTS_END
 
 
-/* text-layer characters */
-
-static const UINT32 pts_4bits_layout_xoffset[64] =
-{
-	STEP8( 0*256, 4 ), STEP8( 1*256, 4 ), STEP8( 4*256, 4 ), STEP8( 5*256, 4 ),
-	STEP8( 16*256, 4 ), STEP8( 17*256, 4 ), STEP8( 20*256, 4 ), STEP8( 21*256, 4 )
-};
-
-static const UINT32 pts_4bits_layout_yoffset[64] =
-{
-	STEP8( 0*256, 8*4 ), STEP8( 2*256, 8*4 ), STEP8( 8*256, 8*4 ), STEP8( 10*256, 8*4 ),
-	STEP8( 32*256, 8*4 ), STEP8( 34*256, 8*4 ), STEP8( 40*256, 8*4 ), STEP8( 42*256, 8*4 )
-};
-
-static const gfx_layout pts_8x8_4bits_layout =
-{
-	8,8,          /* 8*8 pixels */
-	RGN_FRAC(1,1),        /* 65536 patterns */
-	4,            /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	EXTENDED_XOFFS,
-	EXTENDED_YOFFS,
-	8*8*4,
-	pts_4bits_layout_xoffset,
-	pts_4bits_layout_yoffset
-};
-
-static const gfx_layout pts_16x16_4bits_layout =
-{
-	16,16,        /* 16*16 pixels */
-	RGN_FRAC(1,1),        /* 16384 patterns */
-	4,            /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	EXTENDED_XOFFS,
-	EXTENDED_YOFFS,
-	16*16*4,
-	pts_4bits_layout_xoffset,
-	pts_4bits_layout_yoffset
-};
-
-static const gfx_layout pts_32x32_4bits_layout =
-{
-	32,32,        /* 32*32 pixels */
-	RGN_FRAC(1,1),         /* 4096 patterns */
-	4,            /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	EXTENDED_XOFFS,
-	EXTENDED_YOFFS,
-	32*32*4,
-	pts_4bits_layout_xoffset,
-	pts_4bits_layout_yoffset
-};
-
-static const gfx_layout pts_64x64_4bits_layout =
-{
-	64,64,        /* 32*32 pixels */
-	RGN_FRAC(1,1),         /* 1024 patterns */
-	4,            /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	EXTENDED_XOFFS,
-	EXTENDED_YOFFS,
-	64*64*4,
-	pts_4bits_layout_xoffset,
-	pts_4bits_layout_yoffset
-};
-
-
-static const gfx_layout pts_8x8_8bits_layout =
-{
-	8,8,          /* 8*8 pixels */
-	RGN_FRAC(1,1),        /* 32768 patterns */
-	8,            /* 8 bits per pixel */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ STEP8( 0*512, 8 ) },
-	{ STEP8( 0*512, 8*8 ) },
-	8*8*8
-};
-
-static const gfx_layout pts_16x16_8bits_layout =
-{
-	16,16,        /* 16*16 pixels */
-	RGN_FRAC(1,1),         /* 8192 patterns */
-	8,            /* 8 bits per pixel */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ STEP8( 0*512, 8 ), STEP8( 1*512, 8 ) },
-	{ STEP8( 0*512, 8*8 ), STEP8( 2*512, 8*8 ) },
-	16*16*8
-};
-
-static GFXDECODE_START( namcond1 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000000, pts_8x8_4bits_layout,    0,  16 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000000, pts_16x16_4bits_layout,  0,  16 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000000, pts_32x32_4bits_layout,  0,  16 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000000, pts_64x64_4bits_layout,  0,  16 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000000, pts_8x8_8bits_layout,    0, 256 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000000, pts_16x16_8bits_layout,  0, 256 )
-GFXDECODE_END
-
 READ16_MEMBER(namcond1_state::mcu_p7_read)
 {
 	return 0xff;
@@ -301,7 +203,6 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	MCFG_SCREEN_UPDATE_DEVICE("ygv608", ygv608_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcond1)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
@@ -316,7 +217,6 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	MCFG_AT28C16_ADD( "at28c16", NULL )
 
 	MCFG_YGV608_ADD("ygv608")
-	MCFG_YGV608_GFXDECODE("gfxdecode")
 	MCFG_YGV608_PALETTE("palette")
 MACHINE_CONFIG_END
 
@@ -328,7 +228,7 @@ ROM_START( ncv1 )
 	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
 	ROM_LOAD( "nc1sub.1c",          0x00000, 0x80000, CRC(48ea0de2) SHA1(33e57c8d084a960ccbda462d18e355de44ec7ad9) )
 
-	ROM_REGION( 0x200000,"gfx1", 0 )    /* 2MB character generator */
+	ROM_REGION( 0x200000,"ygv608", 0 )    /* 2MB character generator */
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -343,7 +243,7 @@ ROM_START( ncv1j )
 	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
 	ROM_LOAD( "nc1sub.1c",          0x00000, 0x80000, CRC(48ea0de2) SHA1(33e57c8d084a960ccbda462d18e355de44ec7ad9) )
 
-	ROM_REGION( 0x200000,"gfx1", 0 )    /* 2MB character generator */
+	ROM_REGION( 0x200000,"ygv608", 0 )    /* 2MB character generator */
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -358,7 +258,7 @@ ROM_START( ncv1j2 )
 	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
 	ROM_LOAD( "nc1sub.1c",          0x00000, 0x80000, CRC(48ea0de2) SHA1(33e57c8d084a960ccbda462d18e355de44ec7ad9) )
 
-	ROM_REGION( 0x200000,"gfx1", 0 )    /* 2MB character generator */
+	ROM_REGION( 0x200000,"ygv608", 0 )    /* 2MB character generator */
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -373,7 +273,7 @@ ROM_START( ncv2 )
 	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
 	ROM_LOAD( "ncs1sub.1d",          0x00000, 0x80000, CRC(365cadbf) SHA1(7263220e1630239e3e88b828c00389d02628bd7d) )
 
-	ROM_REGION( 0x400000,"gfx1", 0 )    /* 4MB character generator */
+	ROM_REGION( 0x400000,"ygv608", 0 )    /* 4MB character generator */
 	ROM_LOAD( "ncs1cg0.10e",         0x000000, 0x200000, CRC(fdd24dbe) SHA1(4dceaae3d853075f58a7408be879afc91d80292e) )
 	ROM_LOAD( "ncs1cg1.10e",         0x200000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
 
@@ -389,7 +289,7 @@ ROM_START( ncv2j )
 	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
 	ROM_LOAD("ncs1sub.1d",          0x00000, 0x80000, CRC(365cadbf) SHA1(7263220e1630239e3e88b828c00389d02628bd7d) )
 
-	ROM_REGION( 0x400000,"gfx1", 0 )    /* 4MB character generator */
+	ROM_REGION( 0x400000,"ygv608", 0 )    /* 4MB character generator */
 	ROM_LOAD( "ncs1cg0.10e",         0x000000, 0x200000, CRC(fdd24dbe) SHA1(4dceaae3d853075f58a7408be879afc91d80292e) )
 	ROM_LOAD( "ncs1cg1.10e",         0x200000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
 

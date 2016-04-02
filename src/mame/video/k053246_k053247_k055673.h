@@ -17,14 +17,14 @@ typedef device_delegate<void (int *code, int *color, int *priority_mask)> k05324
 #define MCFG_K053246_CB(_class, _method) \
 	k053247_device::set_k053247_callback(*device, k053247_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
-#define MCFG_K053246_CONFIG(_gfx_reg, _gfx_num, _order, _dx, _dy) \
-	k053247_device::set_config(*device, _gfx_reg, _gfx_num, _order, _dx, _dy);
+#define MCFG_K053246_CONFIG(_gfx_reg, _order, _dx, _dy) \
+	k053247_device::set_config(*device, _gfx_reg, _order, _dx, _dy);
 
 #define MCFG_K055673_CB(_class, _method) \
 	k053247_device::set_k053247_callback(*device, k053247_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
-#define MCFG_K055673_CONFIG(_gfx_reg, _gfx_num, _order, _dx, _dy) \
-	k053247_device::set_config(*device, _gfx_reg, _gfx_num, _order, _dx, _dy);
+#define MCFG_K055673_CONFIG(_gfx_reg, _order, _dx, _dy) \
+	k053247_device::set_config(*device, _gfx_reg, _order, _dx, _dy);
 
 
 /**  Konami 053246 / 053247 / 055673  **/
@@ -58,7 +58,8 @@ Callback procedures for non-standard shadows:
 
 
 class k053247_device : public device_t,
-						public device_video_interface
+						public device_video_interface,
+						public device_gfx_interface
 {
 public:
 	k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -67,14 +68,11 @@ public:
 	~k053247_device() { }
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_k053247_callback(device_t &device, k053247_cb_delegate callback) { downcast<k053247_device &>(device).m_k053247_cb = callback; }
-	static void set_config(device_t &device, const char *gfx_reg, int gfx_num, int bpp, int dx, int dy)
+	static void set_config(device_t &device, const char *gfx_reg, int bpp, int dx, int dy)
 	{
 		k053247_device &dev = downcast<k053247_device &>(device);
 		dev.m_memory_region = gfx_reg;
-		dev.m_gfx_num = gfx_num;
 		dev.m_bpp = bpp;
 		dev.m_dx = dx;
 		dev.m_dy = dy;
@@ -122,12 +120,9 @@ public:
 
 	k053247_cb_delegate m_k053247_cb;
 
-	//FIXME: device should be updated to use device_gfx_interface to get rid of most of these!
 	const char *m_memory_region;
 	int m_gfx_num;
 	int m_bpp;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	/* alt implementation - to be collapsed */
 	void zdrawgfxzoom32GP(
@@ -280,14 +275,14 @@ public:
 				color = 0;
 				shadow = -1;
 				whichtable = shadowmode_table;
-				m_palette->set_shadow_mode(0);
+				palette().set_shadow_mode(0);
 			}
 			else
 			{
 				if (shdmask >= 0)
 				{
 					shadow = (color & K053247_CUSTOMSHADOW) ? (color >> K053247_SHDSHIFT) : (shadow >> 10);
-					if (shadow &= 3) m_palette->set_shadow_mode((shadow - 1) & shdmask);
+					if (shadow &= 3) palette().set_shadow_mode((shadow - 1) & shdmask);
 				}
 				else
 					shadow = 0;
@@ -502,20 +497,12 @@ extern const device_type K055673;
 
 #define MCFG_K053246_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
-#define MCFG_K053246_GFXDECODE(_gfxtag) \
-	k053247_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
-#define MCFG_K053246_PALETTE(_palette_tag) \
-	k053247_device::static_set_palette_tag(*device, "^" _palette_tag);
+#define MCFG_K053246_PALETTE MCFG_GFX_PALETTE
 
 
 #define MCFG_K055673_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
-#define MCFG_K055673_GFXDECODE(_gfxtag) \
-	k055673_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
-#define MCFG_K055673_PALETTE(_palette_tag) \
-	k055673_device::static_set_palette_tag(*device, "^" _palette_tag);
+#define MCFG_K055673_PALETTE MCFG_GFX_PALETTE
 
 
 #endif

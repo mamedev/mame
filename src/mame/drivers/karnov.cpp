@@ -816,9 +816,8 @@ static MACHINE_CONFIG_START( karnov, karnov_state )
 	MCFG_PALETTE_INIT_OWNER(karnov_state, karnov)
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 2);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,karnov)
 
@@ -880,9 +879,8 @@ static MACHINE_CONFIG_START( wndrplnt, karnov_state )
 	MCFG_PALETTE_INIT_OWNER(karnov_state, karnov)
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 2);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,wndrplnt)
 

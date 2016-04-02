@@ -24,7 +24,8 @@
 // ======================> comx_clm_device
 
 class comx_clm_device : public device_t,
-						public device_comx_expansion_card_interface
+						public device_comx_expansion_card_interface,
+						public device_gfx_interface
 {
 public:
 	// construction/destruction

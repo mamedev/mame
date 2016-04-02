@@ -1403,8 +1403,7 @@ static MACHINE_CONFIG_START( djmainj, djmain_state )
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(djmain_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx2", 1, K056832_BPP_4dj, 1, 1, "none")
-	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_CONFIG("gfx2", K056832_BPP_4dj, 1, 1, "none")
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K055555_ADD("k055555")

@@ -140,8 +140,8 @@ public:
 	DECLARE_VIDEO_START(speglsht);
 	UINT32 screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<palette_device> m_palette;
-	optional_device<st0016_cpu_device> m_maincpu;
-	optional_device<cpu_device> m_subcpu;
+	required_device<st0016_cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 
 	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
 };
@@ -387,7 +387,7 @@ UINT32 speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rgb3
 		{
 			if(srcline[x])
 			{
-				rgb_t color=m_maincpu->m_palette->pen_color(srcline[x]);
+				rgb_t color = m_maincpu->palette().pen_color(srcline[x]);
 				PLOT_PIXEL_RGB(x,y,color.r(),color.g(),color.b());
 			}
 		}

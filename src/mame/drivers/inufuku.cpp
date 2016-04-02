@@ -395,7 +395,6 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( inufuku_state, inufuku_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", inufuku)
 	MCFG_PALETTE_ADD("palette", 4096)

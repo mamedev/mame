@@ -31,6 +31,7 @@ ADDRESS_MAP_END
 
 st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: z80_device(mconfig, ST0016_CPU, "ST0016", tag, owner, clock, "st0016_cpu", __FILE__),
+		device_gfx_interface(mconfig, *this, nullptr, "palette"),
 		st0016_game(-1),
 		st0016_spr_bank(0),
 		st0016_spr2_bank(0),
@@ -43,11 +44,7 @@ st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *
 		m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(st0016_cpu_internal_io_map)),
 		m_space_config("regs", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(st0016_cpu_internal_map)),
 
-
-		m_screen(*this, ":screen"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-
+		m_screen(*this, ":screen")
 {
 	for (auto & elem : st0016_vregs)
 		elem = 0;
@@ -109,14 +106,10 @@ READ8_MEMBER(st0016_cpu_device::soundram_read)
 	return m_charram[offset];
 }
 
-static GFXDECODE_START( st0016 )
-GFXDECODE_END
-
 /* CPU interface */
 static MACHINE_CONFIG_FRAGMENT( st0016_cpu )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", st0016)
 	MCFG_PALETTE_ADD("palette", 16*16*4+1)
 
 	MCFG_DEVICE_ADD("stsnd", ST0016, 0)
@@ -218,8 +211,8 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_palette_ram_w)
 	st0016_paletteram[ST0016_PAL_BANK_SIZE*st0016_pal_bank+offset]=data;
 	val=st0016_paletteram[color*2]+(st0016_paletteram[color*2+1]<<8);
 	if(!color)
-		m_palette->set_pen_color(UNUSED_PEN,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10)); /* same as color 0 - bg ? */
-	m_palette->set_pen_color(color,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10));
+		palette().set_pen_color(UNUSED_PEN,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10)); /* same as color 0 - bg ? */
+	palette().set_pen_color(color,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10));
 }
 
 READ8_MEMBER(st0016_cpu_device::st0016_character_ram_r)
@@ -230,7 +223,7 @@ READ8_MEMBER(st0016_cpu_device::st0016_character_ram_r)
 WRITE8_MEMBER(st0016_cpu_device::st0016_character_ram_w)
 {
 	m_charram[ST0016_CHAR_BANK_SIZE*st0016_char_bank+offset]=data;
-	m_gfxdecode->gfx(st0016_ramgfx)->mark_dirty(st0016_char_bank);
+	gfx(st0016_ramgfx)->mark_dirty(st0016_char_bank);
 }
 
 READ8_MEMBER(st0016_cpu_device::st0016_vregs_r)
@@ -383,7 +376,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 
 	*/
 
-	gfx_element *gfx = m_gfxdecode->gfx(st0016_ramgfx);
+	gfx_element *gfx = this->gfx(st0016_ramgfx);
 	int i, j, lx, ly, x, y, code, offset, length, sx, sy, color, flipx, flipy, scrollx, scrolly/*,plx,ply*/;
 
 
@@ -587,13 +580,13 @@ void st0016_cpu_device::startup()
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (m_gfxdecode->gfx(gfx_index) == nullptr)
+		if (gfx(gfx_index) == nullptr)
 			break;
 
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(m_palette, charlayout, m_charram.get(), 0, 0x40, 0));
+	set_gfx(gfx_index, std::make_unique<gfx_element>(palette(), charlayout, m_charram.get(), 0, 0x40, 0));
 	st0016_ramgfx = gfx_index;
 
 	spr_dx=0;
@@ -607,7 +600,7 @@ void st0016_cpu_device::startup()
 
 void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
-	gfx_element *gfx = m_gfxdecode->gfx(st0016_ramgfx);
+	gfx_element *gfx = this->gfx(st0016_ramgfx);
 	int j;
 	//for(j=0x40-8;j>=0;j-=8)
 	for (j = 0; j < 0x40; j += 8)

@@ -303,7 +303,6 @@ static MACHINE_CONFIG_START( gunbustr, gunbustr_state )
 	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
 	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
-	MCFG_TC0480SCP_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)

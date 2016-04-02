@@ -152,3 +152,6 @@ extern const device_type DECO_BAC06;
 
 #define MCFG_DECO_BAC06_GFXDECODE(_gfxtag) \
 	deco_bac06_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_DECO_BAC06_GFX_REGION_WIDE(_8x8, _16x16, _wide) \
+	deco_bac06_device::set_gfx_region_wide(*device, _8x8, _16x16, _wide);

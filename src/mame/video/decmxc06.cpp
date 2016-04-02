@@ -54,8 +54,7 @@ deco_mxc06_device::deco_mxc06_device(const machine_config &mconfig, const char *
 		device_video_interface(mconfig, *this),
 		m_gfxregion(0),
 		m_ramsize(0x800),
-		m_gfxdecode(*this),
-		m_palette(*this)
+		m_gfxdecode(*this)
 {
 }
 
@@ -222,14 +221,4 @@ void deco_mxc06_device::device_start()
 
 void deco_mxc06_device::device_reset()
 {
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void deco_mxc06_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<deco_mxc06_device &>(device).m_palette.set_tag(tag);
 }
