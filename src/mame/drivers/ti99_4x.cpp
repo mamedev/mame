@@ -82,8 +82,11 @@ public:
 	DECLARE_MACHINE_START(ti99_4);
 	DECLARE_MACHINE_START(ti99_4a);
 	DECLARE_MACHINE_START(ti99_4qi);
+	DECLARE_MACHINE_START(ti99_4ev);
+
 	DECLARE_MACHINE_RESET(ti99_4);
 	DECLARE_MACHINE_RESET(ti99_4a);
+	DECLARE_MACHINE_RESET(ti99_4ev);
 
 	// Processor connections with the main board
 	DECLARE_READ8_MEMBER( cruread );
@@ -126,6 +129,9 @@ public:
 	// Interrupt triggers
 	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
 
+	// Used by EVPC
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
 private:
 	void    set_keyboard_column(int number, int data);
 	int     m_keyboard_column;
@@ -154,6 +160,9 @@ private:
 	required_device<ti_video_device>    m_video;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
+
+	// Timer for EVPC (provided by the TMS9929A, but EVPC replaces that VDP)
+	emu_timer   *m_gromclk_timer;
 };
 
 /*
@@ -631,6 +640,18 @@ WRITE_LINE_MEMBER( ti99_4x_state::gromclk_in )
 	m_datamux->gromclk_in(state);
 }
 
+/*
+    Used by the EVPC
+*/
+void ti99_4x_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	// Pulse it
+	if (m_datamux != nullptr)
+	{
+		gromclk_in(ASSERT_LINE);
+		gromclk_in(CLEAR_LINE);
+	}
+}
 
 /*****************************************************************************/
 
@@ -990,6 +1011,27 @@ MACHINE_CONFIG_END
     replacing the console video processor.
 *************************************************************************/
 
+MACHINE_START_MEMBER(ti99_4x_state, ti99_4ev)
+{
+	m_peribox->senila(CLEAR_LINE);
+	m_peribox->senilb(CLEAR_LINE);
+	m_nready_combined = 0;
+	m_model = MODEL_4A;
+	// Removing the TMS9928a requires to add a replacement for the GROMCLK.
+	// In the real hardware this is a circuit (REPL99x) that fits into the VDP socket
+	m_gromclk_timer = timer_alloc(0);
+}
+
+MACHINE_RESET_MEMBER(ti99_4x_state, ti99_4ev)
+{
+	m_cpu->set_ready(ASSERT_LINE);
+	m_cpu->set_hold(CLEAR_LINE);
+	m_int1 = CLEAR_LINE;
+	m_int2 = CLEAR_LINE;
+	m_int12 = CLEAR_LINE;
+	m_gromclk_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_10_738635MHz/24));
+}
+
 static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	/* CPU */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
@@ -998,14 +1040,11 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(ti99_4x_state, clock_out) )
 	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(ti99_4x_state, dbin_line) )
 
-	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4a )
+	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4ev )
+	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4ev )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(VIDEO_SYSTEM_TAG, V9938VIDEO, 0)
-	// Removing the TMS9928a requires to add a replacement for the GROMCLK.
-	// In the real hardware this is a circuit (REPL99x) that fits into the VDP socket
-	MCFG_ADD_GROMCLK_CB( WRITELINE(ti99_4x_state, gromclk_in) )
-
 	MCFG_V9938_ADD(VDP_TAG, SCREEN_TAG, 0x20000, XTAL_21_4772MHz)  /* typical 9938 clock, not verified */
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(ti99_4x_state, video_interrupt_in))
 	MCFG_V99X8_SCREEN_ADD_NTSC(SCREEN_TAG, VDP_TAG, XTAL_21_4772MHz)
