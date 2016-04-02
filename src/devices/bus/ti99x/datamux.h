@@ -15,10 +15,11 @@
 #define __DMUX__
 
 #include "ti99defs.h"
-#include "videowrp.h"
 #include "machine/tmc0430.h"
 #include "gromport.h"
 #include "bus/ti99_peb/peribox.h"
+#include "sound/sn76496.h"
+#include "video/tms9928a.h"
 
 extern const device_type DATAMUX;
 
@@ -54,10 +55,10 @@ protected:
 
 private:
 	// Link to the video processor
-	bus8z_device* m_video;
+	tms9928a_device* m_video;
 
 	// Link to the sound processor
-	ti_sound_sn94624_device* m_sound;
+	sn76496_base_device* m_sound;
 
 	// Link to the peripheral expansion box
 	peribox_device* m_peb;

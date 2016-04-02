@@ -122,7 +122,19 @@ void ti99_datamux_device::read_all(address_space& space, UINT16 addr, UINT8 *val
 		}
 
 		// Video
-		if ((addr & 0xf801)==0x8800) m_video->readz(space, addr, value);
+		if ((addr & 0xf801)==0x8800)
+		{
+			if (addr & 2)
+			{
+				// Read VDP status
+				*value = m_video->register_read(space, 0);
+			}
+			else
+			{
+				// Read VDP RAM
+				*value = m_video->vram_read(space, 0);
+			}
+		}
 	}
 
 	// GROMport (ROMs)
@@ -147,10 +159,23 @@ void ti99_datamux_device::write_all(address_space& space, UINT16 addr, UINT8 val
 		m_gromport->write(space, addr, value);
 	}
 
-	// Other devices
+	// Cartridge port and sound
 	if ((addr & 0xe000)==0x6000) m_gromport->write(space, addr, value);
-	if ((addr & 0xfc01)==0x8400) m_sound->write(space, addr, value);
-	if ((addr & 0xf801)==0x8800) m_video->write(space, addr, value);
+	if ((addr & 0xfc01)==0x8400) m_sound->write(space, 0, value);
+
+	// Video
+	if ((addr & 0xf801)==0x8800)
+	{
+		if (addr & 2)
+		{
+			// Write VDP address
+			m_video->register_write(space, 0, value);
+		}
+		else
+		{   // Write VDP data
+			m_video->vram_write(space, 0, value);
+		}
+	}
 
 	// PEB gets all accesses
 	m_peb->write(space, addr, value);
@@ -182,12 +207,7 @@ void ti99_datamux_device::setaddress_all(address_space& space, UINT16 addr)
 	// GROMport (GROMs)
 	m_gromport->set_gromlines(space, lines, select);
 
-	if (validaccess)
-	{
-		// Other devices
-		if ((addr & 0xfc01)==0x8400) m_sound->setaddress_dbin(space, addr, m_dbin);
-		if ((addr & 0xf801)==0x8800) m_video->setaddress_dbin(space, addr, m_dbin);
-	}
+	// Sound chip and video chip do not require the address to be set before access
 
 	// GROMport (ROMs)
 	m_gromport->romgq_line(iscartrom? ASSERT_LINE : CLEAR_LINE);
@@ -557,8 +577,8 @@ void ti99_datamux_device::device_reset(void)
 
 void ti99_datamux_device::device_config_complete()
 {
-	m_video = downcast<bus8z_device*>(owner()->subdevice(VIDEO_SYSTEM_TAG));
-	m_sound = downcast<ti_sound_sn94624_device*>(owner()->subdevice(TISOUND_TAG));
+	m_video = downcast<tms9928a_device*>(owner()->subdevice(VDP_TAG));
+	m_sound = downcast<sn76496_base_device*>(owner()->subdevice(TISOUNDCHIP_TAG));
 	m_gromport = downcast<gromport_device*>(owner()->subdevice(GROMPORT_TAG));
 	m_peb = downcast<peribox_device*>(owner()->subdevice(PERIBOX_TAG));
 	m_grom[0] = downcast<tmc0430_device*>(owner()->subdevice(GROM0_TAG));

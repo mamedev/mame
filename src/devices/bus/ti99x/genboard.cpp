@@ -207,7 +207,10 @@
 
 geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : device_t(mconfig, GENEVE_MAPPER, "Geneve Gate Array", tag, owner, clock, "geneve_mapper", __FILE__), m_gromwaddr_LSB(false), m_gromraddr_LSB(false), m_grom_address(0), m_video_waitstates(false), m_extra_waitstates(false), m_ready_asserted(false), m_read_mode(false), m_debug_no_ws(false), m_geneve_mode(false), m_direct_mode(false), m_cartridge_size(0), m_cartridge_secondpage(false), m_cartridge6_writable(false), m_cartridge7_writable(false), m_turbo(false), m_genmod(false), m_timode(false), m_pfm_mode(0), m_pfm_bank(0), m_pfm_output_enable(false), m_sram_mask(0), m_sram_val(0),
-	m_ready(*this), m_waitcount(0), m_ext_waitcount(0), m_clock(nullptr), m_cpu(nullptr), m_pfm512(nullptr), m_pfm512a(nullptr), m_keyboard(nullptr), m_video(nullptr), m_peribox(nullptr), m_sound(nullptr), m_sram(nullptr), m_dram(nullptr)
+	m_ready(*this), m_waitcount(0), m_ext_waitcount(0),
+	m_clock(nullptr), m_cpu(nullptr), m_pfm512(nullptr),
+	m_pfm512a(nullptr), m_sound(nullptr), m_keyboard(nullptr),
+	m_video(nullptr), m_peribox(nullptr), m_sram(nullptr), m_dram(nullptr)
 {
 	m_eprom = nullptr;
 }
@@ -466,11 +469,14 @@ READ8_MEMBER( geneve_mapper_device::readm )
 	switch (dec->function)
 	{
 	case MLGVIDEO:
-		m_video->readz(space, dec->offset, &value, 0xff);
-		if (TRACE_READ) logerror("%s: Read video %04x -> %02x\n", tag(), dec->offset, value);
-		// Video wait states are created *after* the access
-		// Accordingly, they have no effect when execution is in onchip RAM
-		if (m_video_waitstates) set_ext_wait(15);
+		if (!space.debugger_access())
+		{
+			value = m_video->read(space, dec->offset>>1);
+			if (TRACE_READ) logerror("%s: Read video %04x -> %02x\n", tag(), dec->offset, value);
+			// Video wait states are created *after* the access
+			// Accordingly, they have no effect when execution is in onchip RAM
+			if (m_video_waitstates) set_ext_wait(15);
+		}
 		break;
 
 	case MLGMAPPER:
@@ -523,10 +529,13 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		// video
 		// ++++ ++-- ---- ---+
 		// 1000 1000 0000 00x0
-		m_video->readz(space, dec->offset, &value, 0xff);
-		if (TRACE_READ) logerror("%s: Read video %04x -> %02x\n", tag(), dec->offset, value);
-		// See above
-		if (m_video_waitstates) set_ext_wait(15);
+		if (!space.debugger_access())
+		{
+			value = m_video->read(space, dec->offset>>1);
+			if (TRACE_READ) logerror("%s: Read video %04x -> %02x\n", tag(), dec->offset, value);
+			// See above
+			if (m_video_waitstates) set_ext_wait(15);
+		}
 		break;
 
 	case MLTSPEECH:
@@ -649,10 +658,14 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		// video
 		// ++++ ++++ ++++ ---+
 		// 1111 0001 0000 .cc0
-		m_video->write(space, dec->offset, data, 0xff);
-		if (TRACE_WRITE) logerror("%s: Write video %04x <- %02x\n", tag(), offset, data);
-		// See above
-		if (m_video_waitstates) set_ext_wait(15);
+
+		if (!space.debugger_access())
+		{
+			m_video->write(space, dec->offset>>1, data);
+			if (TRACE_WRITE) logerror("%s: Write video %04x <- %02x\n", tag(), offset, data);
+			// See above
+			if (m_video_waitstates) set_ext_wait(15);
+		}
 		break;
 
 	case MLGMAPPER:
@@ -692,10 +705,13 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		// ++++ ++-- ---- ---+
 		// 1000 1100 0000 00c0
 		// Initialize waitstate timer
-		m_video->write(space, dec->offset, data, 0xff);
-		if (TRACE_WRITE) logerror("%s: Write video %04x <- %02x\n", tag(), offset, data);
-		// See above
-		if (m_video_waitstates) set_ext_wait(15);
+		if (!space.debugger_access())
+		{
+			m_video->write(space, dec->offset>>1, data);
+			if (TRACE_WRITE) logerror("%s: Write video %04x <- %02x\n", tag(), offset, data);
+			// See above
+			if (m_video_waitstates) set_ext_wait(15);
+		}
 		break;
 
 	case MLTSPEECH:
@@ -1360,8 +1376,8 @@ void geneve_mapper_device::device_start()
 	// Get pointers
 	m_peribox = machine().device<peribox_device>(PERIBOX_TAG);
 	m_keyboard = machine().device<geneve_keyboard_device>(GKEYBOARD_TAG);
-	m_video = machine().device<bus8z_device>(VIDEO_SYSTEM_TAG);
-	m_sound = machine().device<bus8z_device>(TISOUND_TAG);
+	m_video = machine().device<v9938_device>(VDP_TAG);
+	m_sound = machine().device<sn76496_base_device>(TISOUNDCHIP_TAG);
 	m_clock = machine().device<mm58274c_device>(GCLOCK_TAG);
 
 	// PFM expansion
