@@ -2936,10 +2936,10 @@ inline void emit_movd_m32_r128(x86code *&emitptr, x86_memref memref, UINT8 sreg)
 
 #if (X86EMIT_SIZE == 64)
 
-inline void emit_movq_r128_r64(x86code *&emitptr, UINT8 dreg, UINT8 sreg)               { emit_op_modrm_reg(emitptr, OP_MOVD_Vd_Ed, OP_64BIT, dreg, sreg); }
-inline void emit_movq_r128_m64(x86code *&emitptr, UINT8 dreg, x86_memref memref)        { emit_op_modrm_mem(emitptr, OP_MOVD_Vd_Ed, OP_64BIT, dreg, memref); }
-inline void emit_movq_r64_r128(x86code *&emitptr, UINT8 dreg, UINT8 sreg)               { emit_op_modrm_reg(emitptr, OP_MOVD_Ed_Vd, OP_64BIT, sreg, dreg); }
-inline void emit_movq_m64_r128(x86code *&emitptr, x86_memref memref, UINT8 sreg)        { emit_op_modrm_mem(emitptr, OP_MOVD_Ed_Vd, OP_64BIT, sreg, memref); }
+inline void emit_movq_r128_r64(x86code *&emitptr, UINT8 dreg, UINT8 sreg)               { emit_byte(emitptr, 0x66); emit_op_modrm_reg(emitptr, OP_MOVD_Pd_Ed, OP_64BIT, dreg, sreg); }
+inline void emit_movq_r128_m64(x86code *&emitptr, UINT8 dreg, x86_memref memref)        { emit_byte(emitptr, 0x66); emit_op_modrm_mem(emitptr, OP_MOVD_Pd_Ed, OP_64BIT, dreg, memref); }
+inline void emit_movq_r64_r128(x86code *&emitptr, UINT8 dreg, UINT8 sreg)               { emit_byte(emitptr, 0x66); emit_op_modrm_reg(emitptr, OP_MOVD_Ed_Pd, OP_64BIT, sreg, dreg); }
+inline void emit_movq_m64_r128(x86code *&emitptr, x86_memref memref, UINT8 sreg)        { emit_byte(emitptr, 0x66); emit_op_modrm_mem(emitptr, OP_MOVD_Ed_Pd, OP_64BIT, sreg, memref); }
 
 #endif
 
