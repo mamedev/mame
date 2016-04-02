@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 
-// SM510 opcode handlers
+// shared opcode handlers
 
 #include "sm510.h"
 
