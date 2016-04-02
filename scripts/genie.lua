@@ -16,6 +16,14 @@ MAME_DIR = (path.getabsolute("..") .. "/")
 local MAME_BUILD_DIR = (MAME_DIR .. _OPTIONS["build-dir"] .. "/")
 local naclToolchain = ""
 
+newoption {
+	trigger = "precompile",
+	description = "Precompiled headers generation.",
+	allowed = {
+		{ "0",   "Disabled"     },
+		{ "1",   "Enabled"      },
+	}
+}
 
 function backtick(cmd)
 	result = string.gsub(string.gsub(os.outputof(cmd), "\r?\n$", ""), " $", "")
@@ -57,9 +65,11 @@ function layoutbuildtask(_folder, _name)
 end
 
 function precompiledheaders()
-	configuration { "not xcode4" }
-		pchheader("emu.h")
-	configuration { }
+	if _OPTIONS["precompile"]==nil or (_OPTIONS["precompile"]~=nil and _OPTIONS["precompile"]=="1") then
+		configuration { "not xcode4" }
+			pchheader("emu.h")
+		configuration { }
+	end
 end
 
 function addprojectflags()
