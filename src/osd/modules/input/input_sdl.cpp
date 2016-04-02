@@ -681,9 +681,24 @@ public:
 		: sdl_input_module(OSD_JOYSTICKINPUT_PROVIDER)
 	{
 	}
-
+	
+	virtual void exit() override
+	{
+		sdl_input_module::exit();
+	
+		SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+	}	
+	
 	virtual void input_init(running_machine &machine) override
 	{
+	    SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+
+		if (SDL_InitSubSystem(SDL_INIT_JOYSTICK))
+		{
+			osd_printf_error("Could not initialize SDL Joystick: %s.\n", SDL_GetError());
+			return;
+		}
+		
 		sdl_input_module::input_init(machine);
 
 		char tempname[512];
@@ -696,20 +711,8 @@ public:
 		int physical_stick;
 		for (physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
 		{
-			if (SDL_IsGameController(physical_stick)) {
-				osd_printf_verbose("Joystick %i is supported by the game controller interface!\n", physical_stick);
-				osd_printf_verbose("Compatible controller, named \'%s\'\n", SDL_GameControllerNameForIndex(physical_stick));
-				SDL_GameController  *joy = SDL_GameControllerOpen(physical_stick);
-				osd_printf_verbose("Controller is mapped as \"%s\".\n", SDL_GameControllerMapping(joy));
-				std::string joy_name = remove_spaces(SDL_GameControllerName(joy));
-				SDL_GameControllerClose(joy);
+				std::string joy_name = remove_spaces(SDL_JoystickNameForIndex(physical_stick));
 				devmap_register(&m_joy_map, physical_stick, joy_name.c_str());
-			} else {
-				SDL_Joystick *joy = SDL_JoystickOpen(physical_stick);
-				std::string joy_name = remove_spaces(SDL_JoystickName(joy));
-				SDL_JoystickClose(joy);
-				devmap_register(&m_joy_map, physical_stick, joy_name.c_str());
-			}
 		}
 
 		for (int stick = 0; stick < MAX_DEVMAP_ENTRIES; stick++)
@@ -720,13 +723,11 @@ public:
 				continue;
 
 			physical_stick = m_joy_map.map[stick].physical;
-
 			SDL_Joystick *joy = SDL_JoystickOpen(physical_stick);
-
 			devinfo->sdl_state.device = joy;
 			devinfo->sdl_state.joystick_id = SDL_JoystickInstanceID(joy);
 
-			osd_printf_verbose("Joystick: %s\n", devinfo->name());
+			osd_printf_verbose("Joystick: %s\n", SDL_JoystickNameForIndex(physical_stick));
 			osd_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy), SDL_JoystickNumBalls(joy));
 			osd_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick + 1);
 
