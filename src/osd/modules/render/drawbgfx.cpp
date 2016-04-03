@@ -378,12 +378,6 @@ void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, ScreenV
 
 void renderer_bgfx::process_screen_quad(int screen, render_primitive* prim)
 {
-	uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
-	if (video_config.filter == 0)
-	{
-		texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
-	}
-
 	uint16_t tex_width(prim->texture.width);
 	uint16_t tex_height(prim->texture.height);
 
