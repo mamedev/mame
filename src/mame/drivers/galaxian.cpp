@@ -2210,6 +2210,36 @@ static INPUT_PORTS_START( swarm )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )             /* more aliens */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( kamikazp )
+	PORT_INCLUDE(galaxian)
+
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Bonus_Life ) )  // turning both of these on still seems to enable Free Play but actual coinage controlled by later dips?
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x40, "4000" )
+	PORT_DIPSETTING(    0x80, "5000" )
+	PORT_DIPSETTING(    0xc0, "7000 (buggy FREE PLAY message)" ) // also still causes the game to show 'FREE PLAY' which is the function of the old dips (doesn't operate in FREE PLAY tho)
+
+	PORT_MODIFY("IN2") // actual coinage appers to have been moved here (need to check code, wouldn't surprise me if some of these had other side-effects too) these are also some of the most ridiculous coinage setttings I've seen!
+	PORT_DIPNAME( 0x0f, 0x08, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x07, "6C / 2C" ) // first 4 coins give 1 credit, next 2 coins give 1 credit
+	PORT_DIPSETTING(    0x0c, DEF_STR( 3C_1C )  )
+	PORT_DIPSETTING(    0x03, "6C / 3C" ) // first 3 coins give 1 credit, 2nd 3 coins give 2 credits
+	PORT_DIPSETTING(    0x0b, "7C / 3C" )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 4C_2C )  ) // first 3 coins give 1 credit, next coin gives 1 credit
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) ) // 2		
+	PORT_DIPSETTING(    0x09, DEF_STR( 3C_2C ) ) // first 2 coins give 1 credit, next coin gives 1 credit
+	PORT_DIPSETTING(    0x05, DEF_STR( 4C_3C ) ) // first 2 coins give 1 credit, 2nd 2 coins give 2 credits
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C )   )
+	PORT_DIPSETTING(    0x06, "1C / 1C (duplicate 1)" )
+	PORT_DIPSETTING(    0x0a, "1C / 1C (duplicate 2)" )
+	PORT_DIPSETTING(    0x0e, "1C / 1C (duplicate 3)" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_3C ) ) // .66
+	PORT_DIPSETTING(    0x0f, DEF_STR( Free_Play ) ) // always shows 9 credits
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( zerotime )
 	PORT_INCLUDE(galaxian)
@@ -7316,6 +7346,23 @@ ROM_START( moonaln )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
+ROM_START( kamikazp )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "KK1PMC.bin",     0x0000, 0x0800, CRC(4a29bbe4) SHA1(731e77d76420ab946fb3963681770c81f79c705d) )
+	ROM_LOAD( "KK2PMC.bin",     0x0800, 0x0800, CRC(65c57131) SHA1(6884421b1ee74e6913ceb519b29979cf764ee3f7) )
+	ROM_LOAD( "KK3PMC.bin",     0x1000, 0x0800, CRC(24cf6da0) SHA1(1d6c6d3e8af4f3da449b363eb710c3a42f1dfb64) )
+	ROM_LOAD( "KK4PMC.bin",     0x1800, 0x0800, CRC(5e5ebca8) SHA1(f4f1c4f180a46fed67bb05d9b61c98a556645e7a) )
+	ROM_LOAD( "KK5PMC.bin",     0x2000, 0x0800, CRC(6d325b14) SHA1(2f67db374976cfa1dee3d6136a4b0404db7870f6) )
+	ROM_LOAD( "KK6PMC.bin",     0x2800, 0x0800, CRC(05883c29) SHA1(22a4e6ce5e35d4ddea4d1b583a36b4a64a899159) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "KK8PMC.bin",   0x0000, 0x0800, CRC(96b268b1) SHA1(3ad1fa972f8f841e26acd7e3363f42df898d01c6) )
+	ROM_LOAD( "KK7PMC.bin",   0x0800, 0x0800, CRC(58673a07) SHA1(4e51f803718f39436e43d3bceda836215a98cc37) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom.6l",      0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) // not dumped, taken from Astrians, colours match screenshots
+ROM_END
+
 ROM_START( superg )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "7f.bin",       0x0000, 0x1000, CRC(4335b1de) SHA1(e41e3d90dac738cf71377f3b476ec67b14dee27a) )
@@ -11331,6 +11378,8 @@ GAME( 1980, galaxrfgg,   galaxian, galaxian,   galaxrf,    galaxian_state, galax
 // these have the extra 'linescroll effect' title screens, like Moon Alien 2 but made out of a random tile, they lack an energy bar.
 GAME( 1979, moonaln,     galaxian, galaxian,   superg,     galaxian_state, galaxian,   ROT90,  "Namco / Nichibutsu (Karateco license?)", "Moon Alien", MACHINE_SUPPORTS_SAVE ) // or bootleg?
 GAME( 1979, galapx,      galaxian, galaxian,   superg,     galaxian_state, galaxian,   ROT90,  "hack", "Galaxian Part X (moonaln hack)", MACHINE_SUPPORTS_SAVE )
+// like above but does have the energy bar, also GFX changed to planes.
+GAME( 1979, kamikazp,    galaxian, galaxian,   kamikazp,   galaxian_state, galaxian,   ROT90,  "bootleg (Potomac Games)", "Kamikaze (Potomac Games)", MACHINE_SUPPORTS_SAVE )
 // this has the tiles to display the energy bar, but use the flag gfx for the 'linescroll effect' title screen, also doesn't work due to bad rom.
 GAME( 1980, supergx,     galaxian, galaxian,   superg,     galaxian_state, galaxian,   ROT90,  "Namco / Nichibutsu", "Super GX", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 // these have the energy bar, and the tiles needed to display a less corrupt 'linescroll effect' title, but don't display one
