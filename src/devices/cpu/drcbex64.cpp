@@ -388,7 +388,9 @@ const drcbe_x64::opcode_table_entry drcbe_x64::s_opcode_table_source[] =
 	{ uml::OP_FABS,    &drcbe_x64::op_fabs },       // FABS    dst,src1
 	{ uml::OP_FSQRT,   &drcbe_x64::op_fsqrt },      // FSQRT   dst,src1
 	{ uml::OP_FRECIP,  &drcbe_x64::op_frecip },     // FRECIP  dst,src1
-	{ uml::OP_FRSQRT,  &drcbe_x64::op_frsqrt }      // FRSQRT  dst,src1
+	{ uml::OP_FRSQRT,  &drcbe_x64::op_frsqrt },     // FRSQRT  dst,src1
+	{ uml::OP_FCOPYI,  &drcbe_x64::op_fcopyi },     // FCOPYI  dst,src
+	{ uml::OP_ICOPYF,  &drcbe_x64::op_icopyf }      // ICOPYF  dst,src
 };
 
 
@@ -6705,5 +6707,133 @@ void drcbe_x64::op_frsqrt(x86code *&dst, const instruction &inst)
 			emit_divsd_r128_r128(dst, dstreg, REG_XMM1);                                // divsd dstreg,xmm1
 		}
 		emit_movsd_p64_r128(dst, dstp, dstreg);                                         // movsd dstp,dstreg
+	}
+}
+
+
+//-------------------------------------------------
+//  op_fcopyi - process a FCOPYI opcode
+//-------------------------------------------------
+
+void drcbe_x64::op_fcopyi(x86code *&dst, const instruction &inst)
+{
+	// validate instruction
+	assert(inst.size() == 4 || inst.size() == 8);
+	assert_no_condition(inst);
+	assert_no_flags(inst);
+
+	// normalize parameters
+	be_parameter dstp(*this, inst.param(0), PTYPE_MF);
+	be_parameter srcp(*this, inst.param(1), PTYPE_MR);
+
+	// pick a target register for the general case
+	int dstreg = dstp.select_register(REG_XMM0);
+
+	// 32-bit form
+	if (inst.size() == 4)
+	{
+		if (srcp.is_memory())
+		{
+			emit_movd_r128_m32(dst, dstreg, MABS(srcp.memory()));                       // movd     dstreg,[srcp]
+			emit_movss_p32_r128(dst, dstp, dstreg);                                     // movss    dstp,dstreg
+		}
+		else
+		{
+			if (dstp.is_memory())
+			{
+				emit_mov_p32_r32(dst, dstp, srcp.ireg());								// mov      dstp,srcp
+			}
+			else
+			{
+				emit_movd_r128_r32(dst, dstreg, srcp.ireg());							// movd     dstreg,srcp
+				emit_movss_p32_r128(dst, dstp, dstreg);									// movss    dstp,dstreg
+			}
+		}
+		
+	}
+
+	// 64-bit form
+	else if (inst.size() == 8)
+	{
+		
+		if (srcp.is_memory())
+		{
+			emit_movq_r128_m64(dst, dstreg, MABS(srcp.memory()));                       // movq     dstreg,[srcp]
+			emit_movsd_p64_r128(dst, dstp, dstreg);                                     // movsd    dstp,dstreg
+		}
+		else
+		{
+			if (dstp.is_memory())
+			{
+				emit_mov_p64_r64(dst, dstp, srcp.ireg());								// mov      dstp,srcp
+			}
+			else
+			{
+				emit_movq_r128_r64(dst, dstreg, srcp.ireg());							// movq     dstreg,srcp
+				emit_movsd_p64_r128(dst, dstp, dstreg);									// movsd    dstp,dstreg
+			}
+		}
+
+	}
+}
+
+
+//-------------------------------------------------
+//  op_icopyf - process a ICOPYF opcode
+//-------------------------------------------------
+
+void drcbe_x64::op_icopyf(x86code *&dst, const instruction &inst)
+{
+	// validate instruction
+	assert(inst.size() == 4 || inst.size() == 8);
+	assert_no_condition(inst);
+	assert_no_flags(inst);
+
+	// normalize parameters
+	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
+	be_parameter srcp(*this, inst.param(1), PTYPE_MF);
+
+	// 32-bit form
+	if (inst.size() == 4)
+	{
+		if (srcp.is_memory())
+		{
+			int dstreg = dstp.select_register(REG_EAX);
+			emit_mov_r32_m32(dst, dstreg, MABS(srcp.memory()));                         // mov      dstreg,[srcp]
+			emit_mov_p32_r32(dst, dstp, dstreg);                                        // mov      dstp,dstreg
+		}
+		else
+		{
+			if (dstp.is_memory())
+			{
+				emit_movd_m32_r128(dst, MABS(dstp.memory()), srcp.freg());				// movd     dstp,srcp
+			}
+			else
+			{
+				emit_movd_r32_r128(dst, dstp.ireg(), srcp.freg());						// movd     dstp,srcp
+			}
+		}	
+	}
+
+	// 64-bit form
+	else if (inst.size() == 8)
+	{
+		if (srcp.is_memory())
+		{
+			int dstreg = dstp.select_register(REG_RAX);
+			emit_mov_r64_m64(dst, dstreg, MABS(srcp.memory()));                         // mov      dstreg,[srcp]
+			emit_mov_p64_r64(dst, dstp, dstreg);                                        // mov      dstp,dstreg
+		}
+		else
+		{
+			if (dstp.is_memory())
+			{
+				emit_movq_m64_r128(dst, MABS(dstp.memory()), srcp.freg());				// movq     dstp,srcp
+			}
+			else
+			{
+				emit_movq_r64_r128(dst, dstp.ireg(), srcp.freg());						// movq     dstp,srcp
+			}
+		}
 	}
 }

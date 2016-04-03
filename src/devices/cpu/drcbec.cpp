@@ -1929,6 +1929,14 @@ int drcbe_c::execute(code_handle &entry)
 				FSPARAM0 = 1.0f / sqrtf(FSPARAM1);
 				break;
 
+			case MAKE_OPCODE_SHORT(OP_FCOPYI, 4, 0):    // FSCOPYI dst,src
+				FSPARAM0 = u2f(*inst[1].pint32);
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_ICOPYF, 4, 0):    // ICOPYFS dst,src
+				*inst[0].pint32 = f2u(FSPARAM1);
+				break;
+
 
 			// ----------------------- 64-Bit Floating Point Operations -----------------------
 
@@ -2066,6 +2074,14 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_FRSQRT, 8, 0):    // FDRSQRT dst,src1
 				FDPARAM0 = 1.0 / sqrt(FDPARAM1);
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_FCOPYI, 8, 0):    // FDCOPYI dst,src
+				FDPARAM0 = u2d(*inst[1].pint64);
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_ICOPYF, 8, 0):    // ICOPYFD dst,src
+				*inst[0].pint64 = d2u(FDPARAM1);
 				break;
 
 			default:

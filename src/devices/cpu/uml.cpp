@@ -22,9 +22,6 @@
     * Support for FPU exceptions
 
     * New instructions?
-        - FCOPYI, ICOPYF
-            copy raw between float and integer registers
-
         - VALID opcode_desc,handle,param
             checksum/compare code referenced by opcode_desc; if not
             matching, generate exception with handle,param
@@ -214,6 +211,8 @@ const opcode_info instruction::s_opcode_info_table[OP_MAX] =
 	OPINFO2(FSQRT,   "f#sqrt",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
 	OPINFO2(FRECIP,  "f#recip",  4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
 	OPINFO2(FRSQRT,  "f#rsqrt",  4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
+	OPINFO2(FCOPYI,  "f#copyi",  4|8, false, NONE, NONE, NONE, PINFO(OUT, OP, FRM), PINFO(IN, OP, IRM))
+	OPINFO2(ICOPYF,  "icopyf#",  4|8, false, NONE, NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, FRM))
 };
 
 

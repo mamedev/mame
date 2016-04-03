@@ -218,6 +218,8 @@ namespace uml
 		OP_FSQRT,                   // FSQRT   dst,src1
 		OP_FRECIP,                  // FRECIP  dst,src1
 		OP_FRSQRT,                  // FRSQRT  dst,src1
+		OP_FCOPYI,                  // FCOPYI  dst,src
+		OP_ICOPYF,                  // ICOPYF  dst,src
 
 		OP_MAX
 	};
@@ -544,6 +546,8 @@ namespace uml
 		void fssqrt(parameter dst, parameter src1) { configure(OP_FSQRT, 4, dst, src1); }
 		void fsrecip(parameter dst, parameter src1) { configure(OP_FRECIP, 4, dst, src1); }
 		void fsrsqrt(parameter dst, parameter src1) { configure(OP_FRSQRT, 4, dst, src1); }
+		void fscopyi(parameter dst, parameter src) { configure(OP_FCOPYI, 4, dst, src); }
+		void icopyfs(parameter dst, parameter src) { configure(OP_ICOPYF, 4, dst, src); }
 
 		// 64-bit floating point operations
 		void fdload(parameter dst, const void *base, parameter index) { configure(OP_FLOAD, 8, dst, parameter::make_memory(base), index); }
@@ -566,6 +570,8 @@ namespace uml
 		void fdsqrt(parameter dst, parameter src1) { configure(OP_FSQRT, 8, dst, src1); }
 		void fdrecip(parameter dst, parameter src1) { configure(OP_FRECIP, 8, dst, src1); }
 		void fdrsqrt(parameter dst, parameter src1) { configure(OP_FRSQRT, 8, dst, src1); }
+		void fdcopyi(parameter dst, parameter src) { configure(OP_FCOPYI, 8, dst, src); }
+		void icopyfd(parameter dst, parameter src) { configure(OP_ICOPYF, 8, dst, src); }
 
 		// constants
 		static const int MAX_PARAMS = 4;

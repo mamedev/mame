@@ -270,7 +270,9 @@ const drcbe_x86::opcode_table_entry drcbe_x86::s_opcode_table_source[] =
 	{ uml::OP_FABS,    &drcbe_x86::op_fabs },       // FABS    dst,src1
 	{ uml::OP_FSQRT,   &drcbe_x86::op_fsqrt },      // FSQRT   dst,src1
 	{ uml::OP_FRECIP,  &drcbe_x86::op_frecip },     // FRECIP  dst,src1
-	{ uml::OP_FRSQRT,  &drcbe_x86::op_frsqrt }      // FRSQRT  dst,src1
+	{ uml::OP_FRSQRT,  &drcbe_x86::op_frsqrt },     // FRSQRT  dst,src1
+	{ uml::OP_FCOPYI,  &drcbe_x86::op_fcopyi },		// FCOPYI  dst,src
+	{ uml::OP_ICOPYF,  &drcbe_x86::op_icopyf },		// ICOPYF  dst,src
 };
 
 
@@ -6445,6 +6447,105 @@ void drcbe_x86::op_frsqrt(x86code *&dst, const instruction &inst)
 	emit_fsqrt(dst);                                                                    // fsqrt
 	emit_fdivp(dst);                                                                    // fdivp
 	emit_fstp_p(dst, inst.size(), dstp);                                                // fstp  dstp
+}
+
+
+//-------------------------------------------------
+//  op_fcopyi - process a FCOPYI opcode
+//-------------------------------------------------
+
+void drcbe_x86::op_fcopyi(x86code *&dst, const instruction &inst)
+{
+	// validate instruction
+	assert(inst.size() == 4 || inst.size() == 8);
+	assert_no_condition(inst);
+	assert_no_flags(inst);
+
+	// normalize parameters
+	be_parameter dstp(*this, inst.param(0), PTYPE_MF);
+	be_parameter srcp(*this, inst.param(1), PTYPE_MR);
+
+	// 32-bit case
+	if (inst.size() == 4)
+	{
+		if (srcp.is_memory())
+		{
+			emit_mov_r32_m32(dst, REG_EAX, MABS(srcp.memory()));							// mov eax,[srcp]
+			emit_mov_m32_r32(dst, MABS(dstp.memory()), REG_EAX);							// mov [dstp],eax
+		}
+		else if (srcp.is_int_register())
+		{
+			emit_mov_m32_r32(dst, MABS(dstp.memory()), srcp.ireg());						// mov [dstp],srcp
+		}
+	}
+
+	// 64-bit case
+	else if (inst.size() == 8)
+	{
+		if (srcp.is_memory())
+		{
+			emit_mov_r32_m32(dst, REG_EAX, MABS(srcp.memory()));							// mov eax,[srcp]
+			emit_mov_r32_m32(dst, REG_EDX, MABS(srcp.memory(4)));						// mov edx,[srcp+4]
+		}
+		else if (srcp.is_int_register())
+		{
+			emit_mov_r32_m32(dst, REG_EDX, MABS(m_reghi[srcp.ireg()]));					// mov edx,[reghi[srcp]]
+			emit_mov_r32_r32(dst, REG_EAX, srcp.ireg());									// mov eax,srcp
+		}
+
+		emit_mov_m32_r32(dst, MABS(dstp.memory()), REG_EAX);								// mov [dstp],eax
+		emit_mov_m32_r32(dst, MABS(dstp.memory(4)), REG_EDX);							// mov [dstp+4],edx
+	}
+}
+
+
+//-------------------------------------------------
+//  op_icopyf - process a ICOPYF opcode
+//-------------------------------------------------
+
+void drcbe_x86::op_icopyf(x86code *&dst, const instruction &inst)
+{
+	// validate instruction
+	assert(inst.size() == 4 || inst.size() == 8);
+	assert_no_condition(inst);
+	assert_no_flags(inst);
+
+	// normalize parameters
+	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
+	be_parameter srcp(*this, inst.param(1), PTYPE_MF);
+
+	// 32-bit case
+	if (inst.size() == 4)
+	{
+		emit_mov_r32_m32(dst, REG_EAX, MABS(srcp.memory()));								// mov eax,[srcp]
+
+		if (dstp.is_memory())
+		{
+			emit_mov_m32_r32(dst, MABS(dstp.memory()), REG_EAX);							// mov [dstp],eax
+		}
+		else if (dstp.is_int_register())
+		{
+			emit_mov_r32_r32(dst, dstp.ireg(), REG_EAX);									// mov dstp,eax
+		}
+	}
+
+	// 64-bit case
+	else if (inst.size() == 8)
+	{
+		emit_mov_r32_m32(dst, REG_EAX, MABS(srcp.memory()));								// mov eax,[srcp]
+		emit_mov_r32_m32(dst, REG_EDX, MABS(srcp.memory(4)));							// mov edx,[srcp+4]
+
+		if (dstp.is_memory())
+		{
+			emit_mov_m32_r32(dst, MABS(dstp.memory()), REG_EAX);							// mov [dstp],eax
+			emit_mov_m32_r32(dst, MABS(dstp.memory(4)), REG_EDX);						// mov [dstp+4],edx
+		}
+		else
+		{
+			emit_mov_m32_r32(dst, MABS(m_reghi[dstp.ireg()]), REG_EDX);					// mov [reghi[dstp]],edx
+			emit_mov_r32_r32(dst, dstp.ireg(), REG_EAX);									// mov dstp,eax
+		}
+	}
 }
 
 
