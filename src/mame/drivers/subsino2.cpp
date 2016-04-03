@@ -990,21 +990,21 @@ WRITE16_MEMBER(subsino2_state::new2001_outputs_w)
 				output().set_led_value(0, data & 0x4000); // record?
 				output().set_led_value(1, data & 0x2000); // shoot now
 				output().set_led_value(2, data & 0x1000); // double
-				output().set_led_value(0, data & 0x0800); // black/red
+				output().set_led_value(3, data & 0x0800); // black/red
 			}
 			if (ACCESSING_BITS_0_7)
 			{
-				output().set_led_value(0, data & 0x0080); // start
-				output().set_led_value(0, data & 0x0040); // take
-				output().set_led_value(0, data & 0x0020); // black/red
+				output().set_led_value(4, data & 0x0080); // start
+				output().set_led_value(5, data & 0x0040); // take
+				output().set_led_value(6, data & 0x0020); // black/red
 
 				machine().bookkeeping().coin_counter_w(0, data & 0x0010); // coin in / key in
-				output().set_led_value(0, data & 0x0004); // ?
-				output().set_led_value(0, data & 0x0002); // ?
+				output().set_led_value(7, data & 0x0004); // ?
+				output().set_led_value(8, data & 0x0002); // ?
 			}
 			break;
 	}
-	popmessage("0: %04x", m_outputs16[0]);
+//  popmessage("0: %04x", m_outputs16[0]);
 }
 
 // Same as bishjan (except for i/o and lo2 usage like xplan)
@@ -2258,7 +2258,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( bishjan, subsino2_state )
 	MCFG_CPU_ADD("maincpu", H83044, XTAL_44_1MHz / 3)
 	MCFG_CPU_PROGRAM_MAP( bishjan_map )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
@@ -2364,7 +2364,7 @@ static MACHINE_CONFIG_START( xplan, subsino2_state )
 	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz*2 )    // !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( xplan_map )
 	MCFG_CPU_IO_MAP( xplan_io )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state,  am188em_int0_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, am188em_int0_irq)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
