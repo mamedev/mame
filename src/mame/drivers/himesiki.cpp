@@ -496,7 +496,33 @@ ROM_START( androidp )
 	// + 2 undumped PLDs
 ROM_END
 
+ROM_START( androidp2 )
+	ROM_REGION( 0x08000, "maincpu", 0 )
+	ROM_LOAD( "ANDR1.BIN", 0x00000, 0x08000, CRC(fff04130) SHA1(9bdafa8b311cc5d0851b04df3c6dd16eb087a5dd) )
+
+	ROM_REGION( 0x10000, "banks", 0 )
+	ROM_LOAD( "ANDR3.BIN", 0x00000, 0x04000, CRC(112d5123) SHA1(653109eae7b58d9dcb8892ea9aca17427f14c145) )
+	ROM_CONTINUE(                                       0x08000, 0x04000)
+
+	ROM_REGION( 0x18000, "sub", 0 )
+	ROM_LOAD( "ANDR4.BIN", 0x00000, 0x08000, CRC(65f5e98b) SHA1(69f979d653695413a1c503c402d4bf5ffcfb6e5d) )
+
+	ROM_REGION( 0x10000, "bgtiles", 0 )
+	ROM_LOAD( "ANDR5.BIN", 0x00000, 0x10000, CRC(0a0b44c0) SHA1(8d359b802c7dee5faea9464f06b672fd401799cf) )
+
+	ROM_REGION( 0x20000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "ANDR6.BIN", 0x00000, 0x10000, CRC(122b7dd1) SHA1(5dffd2b97c8222afc98552513b84a91d6127f41b) )
+	ROM_LOAD16_BYTE( "ANDR7.BIN", 0x00001, 0x10000, CRC(fc0f9234) SHA1(496a918cc1f4d0e7191a49cc43c51fbd71e0bdf5) )
+
+	ROM_REGION( 0x20000, "spr_p103a", ROMREGION_ERASEFF )
+	// there's no P103A PCB for this on Android
+
+
+	// + 2 undumped PLDs (?)
+ROM_END
+
 
 GAME( 1989, himesiki, 0, himesiki, himesiki, driver_device, 0, ROT90, "Hi-Soft", "Himeshikibu (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 198?, androidp, 0, himesiki, androidp, driver_device, 0, ROT90, "Nasco", "Android (early build?)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, androidp2, androidp, himesiki, androidp, driver_device, 0, ROT90, "Nasco", "Android (later build?)", MACHINE_SUPPORTS_SAVE )
