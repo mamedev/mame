@@ -255,10 +255,7 @@ end
 	local rctarget = _subtarget
 
 	if _OPTIONS["targetos"]=="windows" and (not override_resources) then
-		local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/".._OPTIONS["osd"].."/"  .. _subtarget .. "/" .. rctarget ..".rc"
-		if not os.isfile(rcfile) then
-			rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _subtarget .. "/" .. rctarget ..".rc"
-		end
+		rcfile = MAME_DIR .. "scripts/resources/windows/" .. _subtarget .. "/" .. rctarget ..".rc"
 		if os.isfile(rcfile) then
 			files {
 				rcfile,
@@ -269,7 +266,7 @@ end
 		else
 			rctarget = "mame"
 			files {
-				MAME_DIR .. "src/mame/osd/windows/mame/mame.rc",
+				MAME_DIR .. "scripts/resources/windows/mame/mame.rc",
 			}
 			dependency {
 				{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", true  },
