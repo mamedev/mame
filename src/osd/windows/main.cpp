@@ -7,28 +7,22 @@
 //============================================================
 
 // standard windows headers
+#ifdef OSD_SDL
+#define _WIN32_WINNT 0x0501
+#endif
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <tchar.h>
 #include <stdlib.h>
 
-// MAMEOS headers
 #include "strconv.h"
 
 extern int utf8_main(int argc, char *argv[]);
-
-
-
 //============================================================
 //  main
 //============================================================
 
-// undo the command-line #define that maps main to utf8_main in all other cases
-#ifndef WINUI
-#undef main
-#undef wmain
-#endif
-
+#ifdef UNICODE
 extern "C" int _tmain(int argc, TCHAR **argv)
 {
 	int i, rc;
@@ -55,3 +49,4 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 
 	return rc;
 }
+#endif

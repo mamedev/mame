@@ -368,7 +368,7 @@ project ("osd_" .. _OPTIONS["osd"])
 
 	if _OPTIONS["targetos"]=="windows" then
 		files {
-			MAME_DIR .. "src/osd/sdl/main.cpp",
+			MAME_DIR .. "src/osd/windows/main.cpp",
 		}
 	end
 
