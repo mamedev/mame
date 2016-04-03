@@ -18,6 +18,7 @@
 #include "osdcore.h"
 #include "osdlib.h"
 
+#include "sdlinc.h"
 //============================================================
 //  osd_getenv
 //============================================================
@@ -158,4 +159,3 @@ char *osd_get_clipboard_text(void)
 }
 
 #endif
-
