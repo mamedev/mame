@@ -448,9 +448,15 @@ void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bg
 	vertex[5].m_u = u[0];
 	vertex[5].m_v = v[0];
 
+	uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
+	if (video_config.filter == 0)
+	{
+		texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
+	}
+
 	UINT32 blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
 	bgfx::setVertexBuffer(buffer);
-	bgfx::setTexture(0, m_screen_effect[blend]->uniform("s_tex")->handle(), m_targets->target(screen, "output")->texture());
+	bgfx::setTexture(0, m_screen_effect[blend]->uniform("s_tex")->handle(), m_targets->target(screen, "output")->texture(), texture_flags);
 	m_screen_effect[blend]->submit(view);
 }
 
@@ -803,10 +809,6 @@ int renderer_bgfx::handle_screen_chains()
 			}
 			uint16_t screen_width(floor((prim->bounds.x1 - prim->bounds.x0) + 0.5f));
 			uint16_t screen_height(floor((prim->bounds.y1 - prim->bounds.y0) + 0.5f));
-			if(window().swap_xy())
-			{
-				std::swap(screen_width, screen_height);
-			}
 			m_targets->update_target_sizes(screen_index, screen_width, screen_height, TARGET_STYLE_NATIVE);
 			process_screen_quad(screen_index, prim);
 			screen_index++;
