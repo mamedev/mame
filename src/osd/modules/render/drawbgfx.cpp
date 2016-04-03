@@ -809,6 +809,10 @@ int renderer_bgfx::handle_screen_chains()
 			}
 			uint16_t screen_width(floor((prim->bounds.x1 - prim->bounds.x0) + 0.5f));
 			uint16_t screen_height(floor((prim->bounds.y1 - prim->bounds.y0) + 0.5f));
+			if(window().swap_xy())
+			{
+				std::swap(screen_width, screen_height);
+			}
 			m_targets->update_target_sizes(screen_index, screen_width, screen_height, TARGET_STYLE_NATIVE);
 			process_screen_quad(screen_index, prim);
 			screen_index++;

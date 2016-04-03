@@ -120,6 +120,16 @@ public:
 
 	float pixel_aspect() const { return monitor()->pixel_aspect(); }
 
+	bool swap_xy()
+	{
+		bool orientation_swap_xy =
+			(machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+		bool rotation_swap_xy =
+			(target()->orientation() & ROT90) == ROT90 ||
+			(target()->orientation() & ROT270) == ROT270;
+		return orientation_swap_xy ^ rotation_swap_xy;
+	};
+
 	virtual osd_dim get_size() = 0;
 
 #ifdef OSD_SDL
