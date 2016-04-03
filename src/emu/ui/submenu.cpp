@@ -119,7 +119,7 @@ void ui_submenu::handle()
 				}
 				break;
 			default:
-				osd_printf_error("Unhandled option: %s", sm_option->description);
+				osd_printf_error("Unhandled option: %s", _(sm_option->description));
 				break;
 		}
 	}
@@ -148,13 +148,13 @@ void ui_submenu::populate()
 		switch (sm_option->type)
 		{
 			case ui_submenu::HEAD:
-				item_append(sm_option->description, nullptr, MENU_FLAG_INVERT | MENU_FLAG_DISABLE, nullptr);
+				item_append(_(sm_option->description), nullptr, MENU_FLAG_INVERT | MENU_FLAG_DISABLE, nullptr);
 				break;
 			case ui_submenu::SEP:
 				item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 				break;
 			case ui_submenu::CMD:
-				item_append(sm_option->description, nullptr, 0, static_cast<void*>(&(*sm_option)));
+				item_append(_(sm_option->description), nullptr, 0, static_cast<void*>(&(*sm_option)));
 				break;
 			case ui_submenu::EMU:
 			case ui_submenu::UI:
@@ -163,7 +163,7 @@ void ui_submenu::populate()
 				{
 					case OPTION_BOOLEAN:
 						arrow_flags = sm_option->options->bool_value(sm_option->name) ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW;
-						item_append(sm_option->description,
+						item_append(_(sm_option->description),
 								(arrow_flags == MENU_FLAG_RIGHT_ARROW) ? "On" : "Off",
 								arrow_flags,
 								static_cast<void*>(&(*sm_option)));
@@ -181,7 +181,7 @@ void ui_submenu::populate()
 							i_max = std::numeric_limits<int>::max();
 						}
 						arrow_flags = get_arrow_flags(i_min, i_max, i_cur);
-						item_append(sm_option->description,
+						item_append(_(sm_option->description),
 								sm_option->entry->value(),
 								arrow_flags,
 								static_cast<void*>(&(*sm_option)));
@@ -200,21 +200,21 @@ void ui_submenu::populate()
 						}
 						arrow_flags = get_arrow_flags(f_min, f_max, f_cur);
 						tmptxt = string_format("%g", f_cur);
-						item_append(sm_option->description,
+						item_append(_(sm_option->description),
 								tmptxt.c_str(),
 								arrow_flags,
 								static_cast<void*>(&(*sm_option)));
 						break;
 					default:
 						arrow_flags = MENU_FLAG_RIGHT_ARROW;
-						item_append(sm_option->description,
+						item_append(_(sm_option->description),
 								sm_option->options->value(sm_option->name),
 								arrow_flags, static_cast<void*>(&(*sm_option)));
 						break;
 				}
 				break;
 			default:
-				osd_printf_error("Unknown option type: %s", sm_option->description);
+				osd_printf_error("Unknown option type: %s", _(sm_option->description));
 				break;
 		}
 	}
@@ -235,7 +235,7 @@ void ui_submenu::custom_render(void *selectedref, float top, float bottom, float
 	float width;
 	ui_manager &mui = machine().ui();
 
-	mui.draw_text_full(container, m_options[0].description, 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	mui.draw_text_full(container, _(m_options[0].description), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
@@ -255,7 +255,7 @@ void ui_submenu::custom_render(void *selectedref, float top, float bottom, float
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, m_options[0].description, x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	mui.draw_text_full(container, _(m_options[0].description), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	if (selectedref != nullptr)
