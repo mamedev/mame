@@ -1633,17 +1633,9 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 
 	// toggle pause
 	if (machine.ui_input().pressed(IPT_UI_PAUSE))
-	{
-		// with a shift key, it is single step
-//      if (is_paused && (machine.input().code_pressed(KEYCODE_LSHIFT) || machine.input().code_pressed(KEYCODE_RSHIFT)))
-//      {
-//          machine.ui().set_single_step(true);
-//          machine.resume();
-//      }
-//      else
-			machine.toggle_pause();
-	}
+		machine.toggle_pause();
 
+	// pause single step
 	if (machine.ui_input().pressed(IPT_UI_PAUSE_SINGLE))
 	{
 		machine.ui().set_single_step(true);

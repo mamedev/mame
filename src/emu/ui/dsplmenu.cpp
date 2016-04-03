@@ -64,7 +64,6 @@ ui_menu_display_options::ui_menu_display_options(running_machine &machine, rende
 
 	// create video list
 	m_list.push_back("auto");
-	m_list.push_back("opengl"); // TODO: check USE_OPENGL
 
 	std::string descr = options.description(OSDOPTION_VIDEO);
 	descr.erase(0, descr.find(":") + 2);
@@ -80,7 +79,7 @@ ui_menu_display_options::ui_menu_display_options(running_machine &machine, rende
 		{
 			std::string txt(descr.substr(p1, p2 - p1));
 			if (txt != "or" && txt != "none")
-			m_list.push_back(descr.substr(p1, p2 - p1));
+				m_list.push_back(txt);
 		}
 		else
 		{

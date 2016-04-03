@@ -836,3 +836,9 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 	curentry.set_value(data.c_str(), priority);
 	return true;
 }
+
+inline core_options::entry *core_options::get_entry(const char *name) const
+{
+	auto curentry = m_entrymap.find(name);
+	return (curentry != m_entrymap.end()) ? curentry->second : nullptr;
+}
