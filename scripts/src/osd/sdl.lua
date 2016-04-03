@@ -494,10 +494,4 @@ project ("ocore_" .. _OPTIONS["osd"])
 		}
 	end
 
-	if _OPTIONS["targetos"]=="macosx" then
-		files {
-			MAME_DIR .. "src/osd/sdl/osxutils.h",
-			MAME_DIR .. "src/osd/sdl/osxutils.mm",
-		}
-	end
 
