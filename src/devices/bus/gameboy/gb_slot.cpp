@@ -816,24 +816,23 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 	soft[16] = '\0';
 	logerror("Cart Information\n");
 	logerror("\tName:             %s\n", soft);
-	logerror("\tType:             %s [0x%2X]\n", (ROM[0x0147] <= 32) ? cart_types[ROM[0x0147]] : "", ROM[0x0147] );
+	logerror("\tType:             %s [0x%02X]\n", (ROM[0x0147] <= 32) ? cart_types[ROM[0x0147]] : "", ROM[0x0147] );
 	logerror("\tGame Boy:         %s\n", (ROM[0x0143] == 0xc0) ? "No" : "Yes" );
-	logerror("\tSuper GB:         %s [0x%2X]\n", (ROM[0x0146] == 0x03) ? "Yes" : "No", ROM[0x0146] );
-	logerror("\tColor GB:         %s [0x%2X]\n", (ROM[0x0143] == 0x80 || ROM[0x0143] == 0xc0) ? "Yes" : "No", ROM[0x0143] );
-	logerror("\tROM Size:         %d 16kB Banks [0x%2X]\n", rom_banks, ROM[0x0148]);
-	logerror("\tRAM Size:         %d kB [0x%2X]\n", ramsize[ROM[0x0149] & 0x07], ROM[0x0149]);
-	logerror("\tLicense code:     0x%2X%2X\n", ROM[0x0145], ROM[0x0144] );
+	logerror("\tSuper GB:         %s [0x%02X]\n", (ROM[0x0146] == 0x03) ? "Yes" : "No", ROM[0x0146] );
+	logerror("\tColor GB:         %s [0x%02X]\n", (ROM[0x0143] == 0x80 || ROM[0x0143] == 0xc0) ? "Yes" : "No", ROM[0x0143] );
+	logerror("\tROM Size:         %d 16kB Banks [0x%02X]\n", rom_banks, ROM[0x0148]);
+	logerror("\tRAM Size:         %d kB [0x%02X]\n", ramsize[ROM[0x0149] & 0x07], ROM[0x0149]);
+	logerror("\tLicense code:     0x%02X%02X\n", ROM[0x0145], ROM[0x0144] );
 	tmp = (ROM[0x014b] << 8) + ROM[0x014a];
 	for (i = 0; i < ARRAY_LENGTH(companies); i++)
 		if (tmp == companies[i].code)
 			break;
-	logerror("\tManufacturer ID:  0x%2X", tmp);
-	logerror(" [%s]\n", (i < ARRAY_LENGTH(companies)) ? companies[i].name : "?");
-	logerror("\tVersion Number:   0x%2X\n", ROM[0x014c]);
-	logerror("\tComplement Check: 0x%2X\n", ROM[0x014d]);
-	logerror("\tChecksum:         0x%2X\n", ((ROM[0x014e] << 8) + ROM[0x014f]));
+	logerror("\tManufacturer ID:  0x%02X [%s]\n", tmp, (i < ARRAY_LENGTH(companies)) ? companies[i].name : "?");
+	logerror("\tVersion Number:   0x%02X\n", ROM[0x014c]);
+	logerror("\tComplement Check: 0x%02X\n", ROM[0x014d]);
+	logerror("\tChecksum:         0x%04X\n", ((ROM[0x014e] << 8) + ROM[0x014f]));
 	tmp = (ROM[0x0103] << 8) + ROM[0x0102];
-	logerror("\tStart Address:    0x%2X\n", tmp);
+	logerror("\tStart Address:    0x%04X\n", tmp);
 
 	// Additional checks
 	if (rom_banks == 256)
@@ -850,6 +849,6 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 	csum &= 0xffff;
 
 	if (csum != tmp)
-		logerror("\nWarning loading cartridge: Checksum is wrong (Actual %X vs Internal %X)\n", csum, tmp);
+		logerror("\nWarning loading cartridge: Checksum is wrong (Actual 0x%04X vs Internal 0x%04X)\n", csum, tmp);
 
 }
