@@ -58,8 +58,7 @@ pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, d
 	m_y_offset(0),
 	m_y_invert(0),
 	m_dblwidth(0),
-	m_gfxdecode(*this),
-	m_palette(*this)
+	m_gfxdecode(*this)
 {
 	for (auto & elem : m_ctrl)
 		elem = 0;
@@ -81,16 +80,6 @@ pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, d
 void pc080sn_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<pc080sn_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void pc080sn_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<pc080sn_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------

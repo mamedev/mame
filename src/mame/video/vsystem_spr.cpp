@@ -73,8 +73,7 @@ const device_type VSYSTEM_SPR = &device_creator<vsystem_spr_device>;
 
 vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VSYSTEM_SPR, "Video System Sprites", tag, owner, clock, "vsystem_spr", __FILE__),
-		m_gfxdecode(*this),
-		m_palette(*this)
+		m_gfxdecode(*this)
 {
 	m_transpen = 15;
 	m_pal_base = 0;
@@ -97,16 +96,6 @@ vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char
 void vsystem_spr_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<vsystem_spr_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void vsystem_spr_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<vsystem_spr_device &>(device).m_palette.set_tag(tag);
 }
 
 UINT32 vsystem_spr_device::tile_callback_noindirect(UINT32 tile)

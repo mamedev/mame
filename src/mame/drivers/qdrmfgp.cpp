@@ -598,12 +598,9 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(qdrmfgp_state, qdrmfgp_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_4dj, 1, 0, "none")
-	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0, "none")
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4)
@@ -645,12 +642,9 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(qdrmfgp_state, qdrmfgp2_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_4dj, 1, 0, "none")
-	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0, "none")
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4)

@@ -46,7 +46,7 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_w)
 		g |= ((i & 2) >> 1);
 		r |= (i & 1);
 
-		m_palette->set_pen_color(offset / 2, pal5bit(r), pal5bit(g), pal5bit(b));
+		m_gfxdecode->palette().set_pen_color(offset / 2, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -168,8 +168,7 @@ tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, TC0091LVC, "Taito TC0091LVC", tag, owner, clock, "tc0091lvc", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, nullptr, *ADDRESS_MAP_NAME(tc0091lvc_map8)),
-		m_gfxdecode(*this),
-		m_palette(*this)
+		m_gfxdecode(*this)
 {
 }
 
@@ -181,17 +180,6 @@ tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *ta
 void tc0091lvc_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<tc0091lvc_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void tc0091lvc_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<tc0091lvc_device &>(device).m_palette.set_tag(tag);
 }
 
 
@@ -297,7 +285,8 @@ void tc0091lvc_device::device_start()
 
 	//printf("m_gfx_index %d\n", m_gfx_index);
 
-	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(m_palette, char_layout, (UINT8 *)m_pcg_ram, 0, m_palette->entries() / 16, 0));
+	palette_device &palette = m_gfxdecode->palette();
+	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(palette, char_layout, (UINT8 *)m_pcg_ram, 0, palette.entries() / 16, 0));
 }
 
 void tc0091lvc_device::device_reset()
@@ -346,7 +335,7 @@ UINT32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	int x,y;
 	UINT8 global_flip;
 
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(m_gfxdecode->palette().black_pen(), cliprect);
 
 	if((m_vregs[4] & 0x20) == 0)
 		return 0;
@@ -367,7 +356,7 @@ UINT32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				res_y = (global_flip) ? 256-y : y;
 
 				if(screen.visible_area().contains(res_x, res_y))
-					bitmap.pix16(res_y, res_x) = m_palette->pen(m_bitmap_ram[count]);
+					bitmap.pix16(res_y, res_x) = m_gfxdecode->palette().pen(m_bitmap_ram[count]);
 
 				count++;
 			}

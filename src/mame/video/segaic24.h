@@ -19,13 +19,10 @@
 	MCFG_DEVICE_ADD(_tag, S24MIXER, 0)
 
 
-#define MCFG_S24TILE_DEVICE_GFXDECODE(_gfxtag) \
-	segas24_tile::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
 #define MCFG_S24TILE_DEVICE_PALETTE(_palette_tag) \
-	segas24_tile::static_set_palette_tag(*device, "^" _palette_tag);
+	MCFG_GFX_PALETTE(_palette_tag)
 
-class segas24_tile : public device_t
+class segas24_tile : public device_t, public device_gfx_interface
 {
 	friend class segas24_tile_config;
 
@@ -33,8 +30,6 @@ public:
 	segas24_tile(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void static_set_tile_mask(device_t &device, UINT16 tile_mask);
 
 	DECLARE_READ16_MEMBER(tile_r);
@@ -65,8 +60,6 @@ private:
 	UINT16 tile_mask;
 
 	static const gfx_layout char_layout;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	void tile_info(int offset, tile_data &tileinfo, tilemap_memory_index tile_index);
 	TILE_GET_INFO_MEMBER(tile_info_0s);

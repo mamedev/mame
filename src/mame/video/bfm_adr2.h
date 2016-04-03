@@ -3,7 +3,7 @@
 #ifndef INC_BFMADDER2
 #define INC_BFMADDER2
 
-class bfm_adder2_device : public device_t
+class bfm_adder2_device : public device_t, public device_gfx_interface
 {
 public:
 	// construction/destruction
@@ -61,8 +61,6 @@ private:
 	UINT8 m_adder2_sc2data;
 
 	optional_device<cpu_device> m_cpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 // device type definition
@@ -75,8 +73,5 @@ extern const device_type BFM_ADDER2;
 
 #define MCFG_BFM_ADDER2_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, BFM_ADDER2, 0)
-
-#define MCFG_BFM_ADDER2_PALETTE(_palette_tag) \
-	bfm_adder2_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif

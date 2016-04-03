@@ -183,6 +183,7 @@ const device_type K056832 = &device_creator<k056832_device>;
 
 k056832_device::k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K056832, "K056832 Tilemap Generator", tag, owner, clock, "k056832", __FILE__),
+	device_gfx_interface(mconfig, *this),
 	//m_tilemap[K056832_PAGE_COUNT],
 	//*m_pixmap[K056832_PAGE_COUNT],
 	//m_regs[0x20],
@@ -219,31 +220,8 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	m_use_ext_linescroll(0),
 	m_uses_tile_banks(0),
 	m_cur_tile_bank(0),
-	m_k055555(nullptr),
-	m_gfxdecode(*this),
-	m_palette(*this)
+	m_k055555(nullptr)
 {
-}
-
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void k056832_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<k056832_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void k056832_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<k056832_device &>(device).m_palette.set_tag(tag);
 }
 
 void k056832_device::create_tilemaps()
@@ -284,22 +262,22 @@ void k056832_device::create_tilemaps()
 	m_videoram.resize(0x2000 * (K056832_PAGE_COUNT + 1) / 2);
 	memset(&m_videoram[0], 0, 2*m_videoram.size());
 
-	m_tilemap[0x0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info0),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info1),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info2),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info3),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x4] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info4),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x5] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info5),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x6] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info6),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x7] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info7),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x8] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info8),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x9] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info9),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xa] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoa),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xb] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infob),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xc] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoc),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xd] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infod),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xe] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoe),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xf] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infof),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info0),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info1),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info2),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info3),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x4] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info4),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x5] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info5),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x6] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info6),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x7] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info7),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x8] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info8),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x9] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info9),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xa] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoa),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xb] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infob),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xc] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoc),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xd] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infod),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xe] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoe),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xf] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infof),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	for (i = 0; i < K056832_PAGE_COUNT; i++)
 	{
@@ -362,9 +340,6 @@ void k056832_device::finalize_init()
 
 void k056832_device::device_start()
 {
-	if(!m_gfxdecode->started())
-		throw device_missing_dependencies();
-
 	memset(m_regs,     0x00, sizeof(m_regs) );
 	memset(m_regsb,    0x00, sizeof(m_regsb) );
 
@@ -1296,7 +1271,7 @@ int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap,
 
 			pixmap  = m_pixmap[page];
 			pal_ptr = machine().pens;
-			src_gfx = m_gfxdecode->gfx(m_gfx_num];
+			src_gfx = gfx(m_gfx_num);
 			src_pitch  = src_gfx->rowbytes();
 			src_modulo = src_gfx->char_modulo;
 			dst_pitch  = pixmap->rowpixels;
@@ -2024,7 +1999,7 @@ READ16_MEMBER( k056832_device::b_word_r )
 
 void k056832_device::create_gfx(const char *gfx_memory_region, int bpp, int big)
 {
-	int gfx_index;
+	int gfx_index = 0;
 	int i;
 	UINT32 total;
 
@@ -2092,13 +2067,6 @@ void k056832_device::create_gfx(const char *gfx_memory_region, int bpp, int big)
 
 	m_bpp = bpp;
 
-	/* find first empty slot to decode gfx */
-	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-	{
-		if (m_gfxdecode->gfx(gfx_index) == nullptr) break;
-	}
-	assert(gfx_index != MAX_GFX_ELEMENTS);
-
 	/* handle the various graphics formats */
 	i = (big) ? 8 : 16;
 
@@ -2107,45 +2075,45 @@ void k056832_device::create_gfx(const char *gfx_memory_region, int bpp, int big)
 	{
 		case K056832_BPP_4:
 			total = machine().root_device().memregion(gfx_memory_region)->bytes() / (i*4);
-			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout4, 4);
+			konami_decode_gfx(*this, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout4, 4);
 			break;
 
 		case K056832_BPP_5:
 			total = machine().root_device().memregion(gfx_memory_region)->bytes() / (i*5);
-			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout5, 5);
+			konami_decode_gfx(*this, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout5, 5);
 			break;
 
 		case K056832_BPP_6:
 			total = machine().root_device().memregion(gfx_memory_region)->bytes() / (i*6);
-			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout6, 6);
+			konami_decode_gfx(*this, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout6, 6);
 			break;
 
 		case K056832_BPP_8:
 			total = machine().root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout8, 8);
+			konami_decode_gfx(*this, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout8, 8);
 			break;
 
 		case K056832_BPP_8LE:
 			total = machine().root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout8le, 8);
+			konami_decode_gfx(*this, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout8le, 8);
 			break;
 
 		case K056832_BPP_8TASMAN:
 			total = machine().root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout8, 8);
+			konami_decode_gfx(*this, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout8, 8);
 			break;
 
 		case K056832_BPP_4dj:
 			total = machine().root_device().memregion(gfx_memory_region)->bytes() / (i*4);
-			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout4dj, 4);
+			konami_decode_gfx(*this, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout4dj, 4);
 			break;
 
 		default:
 			fatalerror("Unsupported bpp\n");
 	}
 
-	m_gfxdecode->gfx(gfx_index)->set_granularity(16); /* override */
-	m_gfxdecode->gfx(gfx_index)->set_colors(m_palette->entries() / 16);
+	gfx(gfx_index)->set_granularity(16); /* override */
+	gfx(gfx_index)->set_colors(palette().entries() / 16);
 
 	m_gfx_memory_region = gfx_memory_region;
 	m_gfx_num = gfx_index;
@@ -2225,7 +2193,7 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 
 			pixmap  = m_pixmap[page];
 			pal_ptr    = machine().pens;
-			src_gfx    = m_gfxdecode->gfx(m_gfx_num];
+			src_gfx    = gfx(m_gfx_num);
 			src_pitch  = src_gfx->rowbytes();
 			src_modulo = src_gfx->char_modulo;
 			dst_pitch  = pixmap->rowpixels;

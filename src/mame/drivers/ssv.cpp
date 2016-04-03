@@ -2637,7 +2637,6 @@ static MACHINE_CONFIG_DERIVED( gdfs, ssv )
 	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_gdfs)
 
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
-	MCFG_ST0020_SPRITES_GFXDECODE("gfxdecode")
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gdfs)

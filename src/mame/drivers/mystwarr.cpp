@@ -953,20 +953,16 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(mystwarr_state, mystwarr_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_5, 0, 0, "none")
-	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0, "none")
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K055555_ADD("k055555")
 
 	MCFG_DEVICE_ADD("k055673", K055673, 0)
 	MCFG_K055673_CB(mystwarr_state, mystwarr_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX, -48, -24)
-	MCFG_K055673_GFXDECODE("gfxdecode")
+	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -48, -24)
 	MCFG_K055673_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k054338", K054338, 0)
@@ -1018,7 +1014,7 @@ static MACHINE_CONFIG_DERIVED( viostorm, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, metamrph_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_RNG, -62, -23)
+	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -62, -23)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
@@ -1051,7 +1047,7 @@ static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, metamrph_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_RNG, -51, -24)
+	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -51, -24)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
@@ -1067,7 +1063,7 @@ static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(24, 16+1)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", dadandrn)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dadandrn)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, dadandrn)
@@ -1084,7 +1080,7 @@ static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, gaiapols_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX, -42, -22)
+	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -42, -22)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
@@ -1102,7 +1098,7 @@ static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 
 	MCFG_K054000_ADD("k054000")
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gaiapols)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gaiapols)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, gaiapols)
@@ -1120,7 +1116,7 @@ static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, gaiapols_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_RNG, -61, -22) // stage2 brick walls
+	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -61, -22) // stage2 brick walls
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
@@ -1155,7 +1151,7 @@ static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, martchmp_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX, -58, -23)
+	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -58, -23)
 MACHINE_CONFIG_END
 
 /**********************************************************************************/

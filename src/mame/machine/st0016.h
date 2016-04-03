@@ -34,7 +34,7 @@ extern UINT8 macs_cart_slot;
 
 
 
-class st0016_cpu_device : public z80_device
+class st0016_cpu_device : public z80_device, public device_gfx_interface
 {
 public:
 	st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32);
@@ -97,13 +97,6 @@ protected:
 		}
 	};
 	required_device<screen_device> m_screen;
-	required_device<gfxdecode_device> m_gfxdecode;
-
-public: // speglsht needs to access this for mixing
-	required_device<palette_device> m_palette;
-
-private:
-
 };
 
 

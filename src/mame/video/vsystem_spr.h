@@ -17,8 +17,6 @@ typedef device_delegate<UINT32 (UINT32)> vsystem_tile_indirection_delegate;
 	vsystem_spr_device::CG10103_set_transpen(*device, _transpen);
 #define MCFG_VSYSTEM_SPR_GFXDECODE(_gfxtag) \
 	vsystem_spr_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-#define MCFG_VSYSTEM_SPR_PALETTE(_palette_tag) \
-	vsystem_spr_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 /*** CG10103 **********************************************/
 
@@ -29,7 +27,6 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_offsets(device_t &device, int xoffs, int yoffs);
 	static void set_pdraw(device_t &device, bool pdraw);
 	static void set_tile_indirect_cb(device_t &device,vsystem_tile_indirection_delegate newtilecb);
@@ -78,7 +75,6 @@ protected:
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 

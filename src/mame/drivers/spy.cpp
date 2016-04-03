@@ -511,8 +511,6 @@ static MACHINE_CONFIG_START( spy, spy_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k052109", K052109, 0)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(spy_state, tile_callback)
