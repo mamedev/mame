@@ -779,5 +779,7 @@ if _OPTIONS["targetos"] == "macosx" then
 			MAME_DIR .. "src/tools/aueffectutil.mm",
 		}
 
+        configuration { }
+
 		strip()
 end
