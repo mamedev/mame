@@ -2309,8 +2309,8 @@ GAME( 1992, gunhohki, mysticri, mysticri,      mysticri, m92_state, m92,      RO
 GAME( 1992, mysticrib,mysticri, mysticri,      mysticri, m92_state, m92,      ROT0,   "Irem",         "Mystic Riders (bootleg?)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
 GAME( 1992, majtitl2, 0,        majtitl2,      majtitl2, m92_state, majtitl2, ROT0,   "Irem",         "Major Title 2 (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // Nanao 08J27291A7 017 9227NK700 sound CPU
+GAME( 1992, majtitl2a,majtitl2, mysticri,      majtitl2, m92_state, majtitl2, ROT0,   "Irem",         "Major Title 2 (World, set 1, alt sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // same as set 1 but for the Nanao 08J27291A6 016 9217NK700 sound CPU
 GAME( 1992, majtitl2b,majtitl2, majtitl2,      majtitl2, m92_state, majtitl2, ROT0,   "Irem",         "Major Title 2 (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
-GAME( 1992, majtitl2a,majtitl2, mysticri,      majtitl2, m92_state, majtitl2, ROT0,   "Irem",         "Major Title 2 (World, alt sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // Nanao 08J27291A6 016 9217NK700 sound CPU
 GAME( 1992, majtitl2j,majtitl2, majtitl2,      majtitl2, m92_state, majtitl2, ROT0,   "Irem",         "Major Title 2 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME( 1992, skingame, majtitl2, majtitl2,      majtitl2, m92_state, majtitl2, ROT0,   "Irem America", "The Irem Skins Game (US set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1992, skingame2,majtitl2, majtitl2,      majtitl2, m92_state, majtitl2, ROT0,   "Irem America", "The Irem Skins Game (US set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
