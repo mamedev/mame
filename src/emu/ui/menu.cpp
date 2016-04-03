@@ -658,8 +658,16 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 
 			// if we don't have a subitem, just draw the string centered
 			else if (pitem.subtext == nullptr)
+			{
+				if (pitem.flags & MENU_FLAG_UI_HEADING)
+				{
+					float heading_width = machine().ui().get_string_width(itemtext);
+					container->add_line(visible_left, line_y + 0.5f * line_height, visible_left + ((visible_width - heading_width) / 2) - UI_BOX_LR_BORDER, line_y + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+					container->add_line(visible_left + visible_width - ((visible_width - heading_width) / 2) + UI_BOX_LR_BORDER, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				}
 				machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
 					JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+			}
 
 			// otherwise, draw the item on the left and the subitem text on the right
 			else
