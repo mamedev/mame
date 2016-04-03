@@ -783,8 +783,7 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 		{0x5A01, "Bitmap Brothers/Mindscape"},
 		{0x5301, "American Sammy"},
 		{0x4701, "Spectrum Holobyte"},
-		{0x1801, "Hudson Soft"},
-		{0x0000, nullptr}
+		{0x1801, "Hudson Soft"}
 	};
 	static const int ramsize[8] = { 0, 2, 8, 32, 128, 64, 0, 0 };
 
