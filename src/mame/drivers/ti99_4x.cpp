@@ -130,7 +130,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
 
 	// Used by EVPC
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	void    set_keyboard_column(int number, int data);
