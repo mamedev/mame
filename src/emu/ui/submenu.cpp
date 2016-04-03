@@ -148,7 +148,7 @@ void ui_submenu::populate()
 		switch (sm_option->type)
 		{
 			case ui_submenu::HEAD:
-				item_append(_(sm_option->description), nullptr, MENU_FLAG_INVERT | MENU_FLAG_DISABLE, nullptr);
+				item_append(_(sm_option->description), nullptr, MENU_FLAG_DISABLE | MENU_FLAG_UI_HEADING, nullptr);
 				break;
 			case ui_submenu::SEP:
 				item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
