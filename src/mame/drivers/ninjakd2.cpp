@@ -1354,7 +1354,7 @@ ROM_END
 
 
 
-ROM_START( robokida )
+ROM_START( robokidj3 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "robokid1.18j", 0x00000, 0x08000, CRC(77a9332a) SHA1(60464ff8bdea5ee2256f24210dc7246fcffb0fca) )
 	ROM_IGNORE(                        0x08000 )
@@ -1680,10 +1680,10 @@ GAME( 1987, mnight,    0,        mnight,   mnight,   ninjakd2_state, mnight,   R
 
 GAME( 1988, arkarea,   0,        arkarea,  arkarea,  ninjakd2_state, mnight,   ROT0,   "UPL", "Ark Area", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, robokid,   0,        robokid,  robokid,  ninjakd2_state, robokid,  ROT0,   "UPL", "Atomic Robo-kid (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robokida,  robokid,  robokid,  robokid,  driver_device,  0,        ROT0,   "UPL", "Atomic Robo-kid (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robokidj,  robokid,  robokid,  robokidj, ninjakd2_state, robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robokidj2, robokid,  robokid,  robokidj, ninjakd2_state, robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robokid,   0,        robokid,  robokid,  ninjakd2_state, robokid,  ROT0,   "UPL", "Atomic Robo-kid (World, Type-2)", MACHINE_SUPPORTS_SAVE ) // 3-digit highscore names
+GAME( 1988, robokidj,  robokid,  robokid,  robokidj, ninjakd2_state, robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robokidj2, robokid,  robokid,  robokidj, ninjakd2_state, robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robokidj3, robokid,  robokid,  robokid,  driver_device,  0,        ROT0,   "UPL", "Atomic Robo-kid (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, omegaf,    0,        omegaf,   omegaf,   driver_device,  0,        ROT270, "UPL", "Omega Fighter", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, omegafs,   omegaf,   omegaf,   omegaf,   driver_device,  0,        ROT270, "UPL", "Omega Fighter Special", MACHINE_SUPPORTS_SAVE )

@@ -28305,9 +28305,9 @@ omegaf                          // UPL-89016 (c) 1989
 omegafs                         // UPL-89016 (c) 1989
 rdaction                        // UPL-87003?(c) 1987 + World Games license
 robokid                         // UPL-88013 (c) 1988
-robokida						//
 robokidj                        // UPL-88013 (c) 1988
 robokidj2                       // UPL-88013 (c) 1988
+robokidj3						//
 
 @source:ninjaw.cpp
 darius2                         // C07 (c) 1989 Taito Corporation (Japan)
