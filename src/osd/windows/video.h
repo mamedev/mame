@@ -47,7 +47,9 @@ public:
 
 private:
 	HMONITOR            m_handle;                 // handle to the monitor
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	MONITORINFOEX       m_info;                   // most recently retrieved info
+#endif
 };
 
 struct osd_video_config
