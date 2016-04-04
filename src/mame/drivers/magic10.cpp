@@ -2,80 +2,74 @@
 // copyright-holders:Pierpaolo Prazzoli, Roberto Fresca
 /****************************************************************************
 
-    MAGIC'S 10
-    ----------
+  MAGIC'S 10
+  ----------
 
-    Driver by Pierpaolo Prazzoli.
-    Additional work by Roberto Fresca.
-
-
-    Supported games:
-
-    Magic's 10 (ver. 16.15),        1995, AWP Games.
-    Magic's 10 (ver. 16.45),        1995, AWP Games.
-    Magic's 10 (ver. 16.54),        1995, AWP Games.
-    Magic's 10 (ver. 16.55),        1995, AWP Games.
-    Magic's 10 2,                   1997, ABM Games.
-    Music Sort (ver 2.02, English), 1995, ABM Games.
-    Super Pool (9743 rev.01),       1997, ABM Games.
-    Hot Slot (ver. 05.01),          1996, ABM Electronics.
-    Magic Colors (ver. 1.7a),       1999, Unknown.
-    Super Gran Safari (ver 3.11),   1996, New Impeuropex Corp.
+  Driver by Pierpaolo Prazzoli.
+  Additional work by Roberto Fresca.
 
 
-*****************************************************************************
+  Supported games:
 
-
-    Game Notes
-    ==========
-
-
-    * Magic's 10
-
-    First time boot instructions:
-
-    - Switch "Disable Free Play" to ON
-    - Enter a coin
-    - Press Collect to get the 1st game over
-
-
-
-    * Super Gran Safari
-
-    There is a input sequence to initialize the game.
-
-    The code expects a mask of 0x4c00 in the DIP switches port to allow
-    enter the sequence, so DIP switches must be on default position.
-
-    When you see the black screen, enter the following sequence:
-    HOLD 4 (key V), HOLD 2 (key X), HOLD 5 (key B), START (key 1).
-
-    The code is checking for a 5th entry. In fact expects HOLD 3 as the first
-    entry, then the rest listed above. I don't know why bypass the first one.
-    Input port bits are checked in the following order: 2, 3, 1, 4, 5.
-
-    The player can play the "Super Game" to grab the points.
-    In this subgame, you must to hit the lion to get the prize.
-    For now, you must miss the shot till hopper & ticket dispenser are properly emulated.
-
+  Magic's 10 (ver. 16.15),        1995, AWP Games.
+  Magic's 10 (ver. 16.45),        1995, AWP Games.
+  Magic's 10 (ver. 16.54),        1995, AWP Games.
+  Magic's 10 (ver. 16.55),        1995, AWP Games.
+  Magic's 10 2,                   1997, ABM Games.
+  Music Sort (ver 2.02, English), 1995, ABM Games.
+  Super Pool (9743 rev.01),       1997, ABM Games.
+  Hot Slot (ver. 05.01),          1996, ABM Electronics.
+  Magic Colors (ver. 1.7a),       1999, Unknown.
+  Super Gran Safari (ver 3.11),   1996, New Impeuropex Corp.
+  Luna Park (ver. 1.2),           1998, ABM Games.
 
 *****************************************************************************
 
+  Game Notes
+  ==========
 
-    TODO:
+  * Magic's 10
 
-    - Ticket / Hopper support.
-    - Some unknown writes
-    - Finish magic10_2 (association coin - credits handling its inputs
-       and some reads that drive the note displayed?)
-    - Dump/decap/trojan the MCU in the later games (magic102, suprpool, hotslot, mcolors).
-       The MCU shares memory addresses at $500000-$50001f (in magic102)
-       It can't be simulated with a high level of confidence because all the game logic is
-       in there, including rngs for the cards and combinations for the points.
-    - Priorities,likely to be hardwired with the color writes (0=tile has the
-       highest priority).
-    - Define parent/clone relationship between Magic's 10 and Music Sort.
+  First time boot instructions:
 
+  - Switch "Disable Free Play" to ON
+  - Enter a coin
+  - Press Collect to get the 1st game over
+
+
+  * Super Gran Safari
+
+  There is a input sequence to initialize the game.
+
+  The code expects a mask of 0x4c00 in the DIP switches port to allow
+  enter the sequence, so DIP switches must be on default position.
+
+  When you see the black screen, enter the following sequence:
+  HOLD 4 (key V), HOLD 2 (key X), HOLD 5 (key B), START (key 1).
+
+  The code is checking for a 5th entry. In fact expects HOLD 3 as the first
+  entry, then the rest listed above. I don't know why bypass the first one.
+  Input port bits are checked in the following order: 2, 3, 1, 4, 5.
+
+  The player can play the "Super Game" to grab the points.
+  In this subgame, you must to hit the lion to get the prize.
+  For now, you must miss the shot till hopper & ticket dispenser are properly emulated.
+
+*****************************************************************************
+
+  TODO:
+
+  - Ticket / Hopper support.
+  - Some unknown writes
+  - Finish magic10_2 (association coin - credits handling its inputs
+     and some reads that drive the note displayed?)
+  - Dump/decap/trojan the MCU in the later games (magic102, suprpool, hotslot, mcolors).
+     The MCU shares memory addresses at $500000-$50001f (in magic102)
+     It can't be simulated with a high level of confidence because all the game logic is
+     in there, including rngs for the cards and combinations for the points.
+  - Priorities,likely to be hardwired with the color writes (0=tile has the
+     highest priority).
+  - Define parent/clone relationship between Magic's 10 and Music Sort.
 
 ****************************************************************************/
 
@@ -249,22 +243,22 @@ WRITE16_MEMBER(magic10_state::magic10_out_w)
   0x0400 - Coin counter.
 
 
-    - Lbits -
-    7654 3210
-    =========
-    ---- ---x  Hold1 lamp.
-    ---- --x-  Hold2 lamp.
-    ---- -x--  Hold3 lamp.
-    ---- x---  Hold4 lamp.
-    ---x ----  Hold5 lamp.
-    --x- ----  Start lamp.
-    -x-- ----  Play (Bet/Take/Cancel) lamp.
+  - Lbits -
+  7654 3210
+  =========
+  ---- ---x  Hold1 lamp.
+  ---- --x-  Hold2 lamp.
+  ---- -x--  Hold3 lamp.
+  ---- x---  Hold4 lamp.
+  ---x ----  Hold5 lamp.
+  --x- ----  Start lamp.
+  -x-- ----  Play (Bet/Take/Cancel) lamp.
 
-    - Hbits -
-    7654 3210
-    =========
-    ---- ---x  Payout lamp.
-    ---- -x--  Coin counter.
+  - Hbits -
+  7654 3210
+  =========
+  ---- ---x  Payout lamp.
+  ---- -x--  Coin counter.
 
 */
 
@@ -1216,6 +1210,60 @@ ROM_START( musicsrt )
 	ROM_LOAD( "musicsrt_nv.bin", 0x0000, 0x0800, CRC(f4e063cf) SHA1(a60bbd960bb7dcf023417e8c7164303b6ce71014) )
 ROM_END
 
+/*
+  Luna Park (ver. 1.2)
+  1998.25.11
+  ABM games.
+
+  PCB: ABM 9743 Rev.02
+
+  1x  MC68HC000FN10 (u1)    16/32-bit Microprocessor.
+  1x  HD6473308CP10 (u24)   label: version 1.2 - 16-bit Single-Chip Microcomputer. NOT DUMPED.
+
+  1x  M6295         (u31)   4-Channel Mixing ADCPM Voice Synthesis LSI.
+  1x  LM358N        (u33)   Dual Operational Amplifier.
+  1x  TDA2003       (u34)   Audio Amplifier.
+
+  1x 20.000000MHz oscillator (osc1).
+  1x 30.000MHz oscillator (osc2).
+  1x blu resonator 1000J (xtal1).
+
+  6x AM27C010 ROMs(2-7).
+  1x AM27C020 ROM (1).
+
+  1x LH5116-10 RAM (u6).
+  4x HY6264ALP-10 RAM (u4, u5, u43, u44).
+  2x HM3-65728H-8 RAM (u61, u62).
+
+  1x TPC1020AFN-084C (u50), read protected.
+  1x PALCE16V8H-25PC/4 (u54), read protected.
+  1x PALC22V10H-25PC/4 (u22), read protected.
+
+  1x 28x2 JAMMA edge connector.
+  1x 12-pins male connector (JP1).
+  1x trimmer (volume)(P1).
+  1x 8x2 DIP switches (DIP1).
+  1x Renata 3V. CR2032 lithium battery.
+
+*/
+ROM_START( lunaprk )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "2_2.00a.u3", 0x00000, 0x20000, CRC(5ec3d238) SHA1(a9e257275cd81b74309d20bc64b10f788ca1b22a) )
+	ROM_LOAD16_BYTE( "3_2.00a.u2", 0x00001, 0x20000, CRC(6fceb57b) SHA1(f9cf566c60f9c1c604dbfeb9c3ad4831bb3922d4) )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /* h8/330 HD6473308cp10 with internal ROM */
+	ROM_LOAD( "mcu",        0x00000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics */
+	ROM_LOAD( "7_l.p..u35", 0x00000, 0x20000, CRC(dfd6795d) SHA1(01929c31b5cc9468674830d9f687b2d3607d8052) )
+	ROM_LOAD( "6_l.p..u36", 0x20000, 0x20000, CRC(fe323a28) SHA1(1cfba6c8359efed48506e8ae231926fb77469aaa) )
+	ROM_LOAD( "5_l.p..u37", 0x40000, 0x20000, CRC(445b6564) SHA1(3568bcbcbdafa8503b50de960c370c85f2fbf62a) )
+	ROM_LOAD( "4_l.p..u38", 0x60000, 0x20000, CRC(81567520) SHA1(4a1990ee19b2346824bb5b9f2880db12a414fdf7) )
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "1.u32", 0x00000, 0x40000, CRC(47804af7) SHA1(602dc0361869b52532e2adcb0de3cbdd042761b3) )
+ROM_END
+
 
 /****************************
 *       Driver Init         *
@@ -1270,3 +1318,4 @@ GAME(  1996, hotslot,  0,        hotslot,  hotslot,  magic10_state, hotslot,  RO
 GAME(  1999, mcolors,  0,        magic102, magic102, magic10_state, magic102, ROT0, "<unknown>",            "Magic Colors (ver. 1.7a)",       MACHINE_NOT_WORKING                 )
 GAMEL( 1996, sgsafari, 0,        sgsafari, sgsafari, magic10_state, sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver 3.11)",   0,               layout_sgsafari )
 GAMEL( 1995, musicsrt, 0,        magic10a, musicsrt, magic10_state, magic10,  ROT0, "ABM Games",            "Music Sort (ver 2.02, English)", 0,               layout_musicsrt )
+GAME(  1998, lunaprk,  0,        magic102, magic102, magic10_state, suprpool, ROT0, "ABM Games",            "Luna Park (ver. 1.2)",           MACHINE_NOT_WORKING                 )
