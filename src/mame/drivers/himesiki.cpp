@@ -235,7 +235,7 @@ static INPUT_PORTS_START( himesiki )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( androidp )
+static INPUT_PORTS_START( androidpo )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -320,6 +320,38 @@ static INPUT_PORTS_START( androidp )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( androidp )
+	PORT_INCLUDE(androidpo)
+	
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x0c, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) ) 
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+
+INPUT_PORTS_END
 
 /****************************************************************************/
 
@@ -469,7 +501,7 @@ ROM_END
 
 
 
-ROM_START( androidp )
+ROM_START( androidpo )
 	ROM_REGION( 0x08000, "maincpu", 0 )
 	ROM_LOAD( "MITSUBISHI_A01.toppcb.m5l27256k.k1.BIN", 0x00000, 0x08000, CRC(25ab85eb) SHA1(e1fab149c83ff880b119258206d5818f3db641c5) )
 
@@ -496,7 +528,7 @@ ROM_START( androidp )
 	// + 2 undumped PLDs
 ROM_END
 
-ROM_START( androidp2 )
+ROM_START( androidp )
 	ROM_REGION( 0x08000, "maincpu", 0 )
 	ROM_LOAD( "ANDR1.BIN", 0x00000, 0x08000, CRC(fff04130) SHA1(9bdafa8b311cc5d0851b04df3c6dd16eb087a5dd) )
 
@@ -522,7 +554,8 @@ ROM_START( androidp2 )
 ROM_END
 
 
-GAME( 1989, himesiki, 0, himesiki, himesiki, driver_device, 0, ROT90, "Hi-Soft", "Himeshikibu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, himesiki, 0,         himesiki, himesiki,  driver_device, 0, ROT90, "Hi-Soft", "Himeshikibu (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 198?, androidp, 0, himesiki, androidp, driver_device, 0, ROT90, "Nasco", "Android (early build?)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, androidp2, androidp, himesiki, androidp, driver_device, 0, ROT90, "Nasco", "Android (later build?)", MACHINE_SUPPORTS_SAVE )
+// the game changed significantly between these 2 versions
+GAME( 198?, androidp,  0,          himesiki, androidp,  driver_device, 0, ROT90, "Nasco", "Android (prototype, later build)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, androidpo, androidp,   himesiki, androidpo, driver_device, 0, ROT90, "Nasco", "Android (prototype, early build)", MACHINE_SUPPORTS_SAVE )
