@@ -968,6 +968,7 @@ int lua_engine::lua_screen::l_type(lua_State *L)
 		case SCREEN_TYPE_RASTER:  lua_pushliteral(L, "raster"); break;
 		case SCREEN_TYPE_VECTOR:  lua_pushliteral(L, "vector"); break;
 		case SCREEN_TYPE_LCD:     lua_pushliteral(L, "lcd"); break;
+		case SCREEN_TYPE_SVG:     lua_pushliteral(L, "svg"); break;
 		default:                  lua_pushliteral(L, "unknown"); break;
 	}
 

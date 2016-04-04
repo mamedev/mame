@@ -64,6 +64,7 @@ project "utils"
 		MAME_DIR .. "src/lib/util/jedparse.h",
 		MAME_DIR .. "src/lib/util/md5.cpp",
 		MAME_DIR .. "src/lib/util/md5.h",
+		MAME_DIR .. "src/lib/util/nanosvg.cpp",
 		MAME_DIR .. "src/lib/util/opresolv.cpp",
 		MAME_DIR .. "src/lib/util/opresolv.h",
 		MAME_DIR .. "src/lib/util/options.cpp",

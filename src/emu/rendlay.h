@@ -37,5 +37,8 @@ extern const internal_layout layout_quadhsxs;    // quad 4:3 screens side-by-sid
 extern const internal_layout layout_lcd;         // generic 1:1 lcd screen layout
 extern const internal_layout layout_lcd_rot;     // same, for use with ROT90 or ROT270
 
+// SVG screen layouts
+extern const internal_layout layout_svg;         // generic 1:1 lcd screen layout
+
 
 #endif  // __RENDLAY_H__
