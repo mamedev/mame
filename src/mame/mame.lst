@@ -28879,6 +28879,7 @@ sicpc1605                       //
 ssam88s                         //
 sx16                            // Sanyo SX-16
 zdsupers                        //
+ncrpc4i							// NCR PC4i
 
 @source:pc100.cpp
 pc100                           //
