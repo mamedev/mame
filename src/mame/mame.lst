@@ -1209,6 +1209,7 @@ laser128                        // ??? 1987 Laser 128
 mprof3                          // Microprofessor III
 prav8c                          // Pravetz 8C
 tk3000                          // Microdigital TK3000
+spectred
 
 @source:apple2gs.cpp
 apple2gs                        // Aug 1989 Apple IIgs ROM03
