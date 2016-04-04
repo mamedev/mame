@@ -74,6 +74,12 @@
 ****************************************************************************/
 
 
+#define MAIN_CLOCK    XTAL_20MHz
+#define AUX_CLOCK     XTAL_30MHz
+
+#define CPU_CLOCK    MAIN_CLOCK/2
+
+
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
@@ -713,9 +719,9 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( magic10, magic10_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) // ?
+	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)  // 10 MHz.
 	MCFG_CPU_PROGRAM_MAP(magic10_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", magic10_state,  irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", magic10_state, irq1_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -774,7 +780,7 @@ static MACHINE_CONFIG_DERIVED( sgsafari, magic10 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sgsafari_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", magic10_state,  irq2_line_hold)    /* L1 interrupts */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", magic10_state, irq2_line_hold)    /* L1 interrupts */
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
@@ -786,16 +792,15 @@ MACHINE_CONFIG_END
 ****************************/
 
 /*
+  Magic 10 (videopoker)
 
-Magic 10 (videopoker)
-
-1x 68k
-1x 20mhz OSC near 68k
-1x Oki M6295
-1x 30mhz OSC near oki chip
-2x fpga
-1x bank of Dipswitch
-1x Dallas Ds1220y-200 Nonvolatile ram
+  1x 68000
+  1x 20mhz OSC near 68k
+  1x Oki M6295
+  1x 30mhz OSC near oki chip
+  2x fpga
+  1x bank of Dipswitch
+  1x Dallas Ds1220y-200 Nonvolatile ram
 
 */
 ROM_START( magic10 )
@@ -844,36 +849,35 @@ ROM_START( magic10b )
 ROM_END
 
 /*
+  Magic's 10 (ver. 16.15)
 
-Magic's 10 (ver. 16.15)
+  1995, A.W.P. Games
+  Version: 16.15
 
-1995, A.W.P. Games
-Version: 16.15
+  CPU:
+  1x TS68000P12 (main)(u1)
+  2x TPC1020AFN-084C (PLD)(not dumped)(u41,u60)
 
-CPU:
-1x TS68000P12 (main)(u1)
-2x TPC1020AFN-084C (PLD)(not dumped)(u41,u60)
+  Sound:
+  1x OKI M6295 (u21)
+  1x TDA2003 (u24)
+  1x LM358N
 
-Sound:
-1x OKI M6295 (u21)
-1x TDA2003 (u24)
-1x LM358N
+  1x oscillator 20.000000MHz (close to main)(osc1)
+  1x oscillator 30.000MHz (close to sound)(osc2)
+  1x orange resonator 1000J (close to sound)(xtal1)
 
-1x oscillator 20.000000MHz (close to main)(osc1)
-1x oscillator 30.000MHz (close to sound)(osc2)
-1x orange resonator 1000J (close to sound)(xtal1)
+  ROMs:
+  1x M27C2001 (1)
+  6x M27C1001 (2,3,5,6,7)
+  1x TMS27C010A (4)
+  1x PALCE16V8H (read protected)
 
-ROMs:
-1x M27C2001 (1)
-6x M27C1001 (2,3,5,6,7)
-1x TMS27C010A (4)
-1x PALCE16V8H (read protected)
-
-Note:
-1x 28x2 edge connector
-1x trimmer (volume)
-1x 8x2 switches dip
-1x battery
+  Note:
+  1x 28x2 edge connector
+  1x trimmer (volume)
+  1x 8x2 switches dip
+  1x battery
 
 */
 ROM_START( magic10c )
@@ -892,17 +896,16 @@ ROM_START( magic10c )
 ROM_END
 
 /*
+  PCB is marked: Copyright ABM - 9605 Rev.02
 
-pcb is marked: Copyright ABM - 9605 Rev.02
-
-1x 68000
-1x osc 30mhz
-1x osc 20mhz (near the 68k)
-1x h8/330 HD6473308cp10
-1x dipswitch
-1x battery
-1x fpga by Actel
-1x oki6295
+  1x 68000
+  1x osc 30mhz
+  1x osc 20mhz (near the 68k)
+  1x h8/330 HD6473308cp10
+  1x dipswitch
+  1x battery
+  1x fpga by Actel
+  1x oki6295
 
 */
 ROM_START( magic102 )
@@ -924,33 +927,32 @@ ROM_START( magic102 )
 ROM_END
 
 /*
+  Super Pool
 
-Super Pool
+  ABM (Nazionale Elettronica Giochi S.A.S.), 1998.
+  9743 Rev.01
 
-ABM (Nazionale Elettronica Giochi S.A.S.), 1998.
-9743 Rev.01
+  1x MC68HC000P10
+  1x ACTEL A1020B-PL84C
+  1x HD6473308CP10 (label says: do not remove version 1.2)
+  1x U6295 (sound)
+  1x LM358N (sound)
+  1x TDA2003 (sound)
+  1x oscillator 20.000MHz
+  1x oscillator 30.0000MHz
+  1x blu resonator 1000J (close to sound)
 
-1x MC68HC000P10
-1x ACTEL A1020B-PL84C
-1x HD6473308CP10 (label says: do not remove version 1.2)
-1x U6295 (sound)
-1x LM358N (sound)
-1x TDA2003 (sound)
-1x oscillator 20.000MHz
-1x oscillator 30.0000MHz
-1x blu resonator 1000J (close to sound)
+  1x M27C2001 (1) (Sound)
+  2x TMS27C010A (2,3) (main)
+  4x TMS27C010A (4,5,6,7) (gfx)
+  1x PALCE22V10H (not dumped)
+  1x PALCE16V8H (not dumped)
 
-1x M27C2001 (1) (Sound)
-2x TMS27C010A (2,3) (main)
-4x TMS27C010A (4,5,6,7) (gfx)
-1x PALCE22V10H (not dumped)
-1x PALCE16V8H (not dumped)
-
-1x 28x2 JAMMA edge connector
-1x 12 legs connector (J1)
-1x trimmer (volume)
-1x 8x2 switches dip
-1x lithium battery
+  1x 28x2 JAMMA edge connector
+  1x 12 legs connector (J1)
+  1x trimmer (volume)
+  1x 8x2 switches dip
+  1x lithium battery
 
 
   STATUS:
@@ -983,47 +985,45 @@ ROM_START( suprpool )
 ROM_END
 
 /*
+  Hot Slot
 
-Hot Slot
+  CPU:
+  1x missing CPU (QFP68 socket, u1)
+  1x HD6473308CP10 (u24)(MCU)
+  1x A40MX04-PL84-9828 (u50)
 
-CPU:
-1x HD6473308CP10 (u24)(main)
-1x A40MX04-PL84-9828 (u50)(main)
-1x missing PLD (u1)
+  1x 6295 (u31)(sound)
+  1x KA358 (u33)(sound)
+  1x TDA2003 (u34)(sound)
 
-1x 6295 (u31)(sound)
-1x KA358 (u33)(sound)
-1x TDA2003 (u34)(sound)
+  1x oscillator 20.0000MHz (OSC1)
+  1x 1000J blue resonator (XTAL1)
 
-1x oscillator 20.0000MHz (OSC1)
-1x 1000J blu resonator (XTAL1)
+  ROMs:
+  3x 27C2001 (1,4,6)
+  2x 27C020 (5,7)
+  2x 27C010 (2,3)
+  1x GAL16V8D (as PAL16R4)(read protected)
+  1x missing PAL22V10
 
-ROMs:
-3x 27C2001 (1,4,6)
-2x 27C020 (5,7)
-2x 27C010 (2,3)
-1x GAL16V8D (as PAL16R4)(read protected)
-1x missing PAL22V10
+  Note:
+  1x 28x2 edge connector
+  1x trimmer (volume)
+  1n trimmer (unknown)
+  3x 12 legs connector (J1,J2,J3)
+  1x 8x2 switches DIP
 
-Note:
-1x 28x2 edge connector
-1x trimmer (volume)
-1n trimmer (unknown)
-3x 12 legs connector (J1,J2,J3)
-1x 8x2 switches DIP
+  - The system RAM test need the bit 7 of offset 0x500005 activated to be successful.
+    This offset seems to be a kind of port connected to the MCU.
 
-- Co-processor is unknown, but fits in a QFP68 socket.
-- The system RAM test need the bit 7 of offset 0x500005 activated to be successful.
-  This offset seems to be a kind of port.
+    code:
 
-  code:
+    0x00f550  move.b  #$b,  $500005
+    0x00f558  btst    #$7,  $500005
+    0x00f560  beq     $f558
+    ....
 
-  0x00f550  move.b  #$b,  $500005
-  0x00f558  btst    #$7,  $500005
-  0x00f560  beq     $f558
-  ....
-
-  seems to copy some bytes (maybe commands) and wait for the status on bit 7
+    seems to copy some bytes (maybe commands) and wait for the status on bit 7
 
 
   STATUS:
@@ -1056,31 +1056,30 @@ ROM_START( hotslot )
 ROM_END
 
 /*
+  Magic Colors
 
-Magic Colors
+  CPU:
+  1x missing CPU (QFP68 socket, u1)
+  1x HD6473308CP10 (u24)(MCU)
+  1x A40MX04-PL84-9828 (u50)
 
-CPU:
-1x HD6473308CP10 (u24)(main)
-1x A40MX04-PL84-9828 (u50)(main)
-1x missing PLD (u1)
+  1x M6295 (u31)(sound)
+  1x KA358 (u33)(sound)
+  1x TDA2003 (u34)(sound)
 
-1x M6295 (u31)(sound)
-1x KA358 (u33)(sound)
-1x TDA2003 (u34)(sound)
+  1x oscillator 20.0000MHz (OSC1)
+  1x 1000J blu resonator (XTAL1)
 
-1x oscillator 20.0000MHz (OSC1)
-1x 1000J blu resonator (XTAL1)
+  ROMs:
+  6x 27C010 (2,3,4,5,6,7)
+  1x 27C020 (1)
+  1x GAL16V8D (as PAL16R4)(read protected)
+  1x missing PAL22V10
 
-ROMs:
-6x 27C010 (2,3,4,5,6,7)
-1x 27C020 (1)
-1x GAL16V8D (as PAL16R4)(read protected)
-1x missing PAL22V10
-
-Note:
-1x 28x2 edge connector
-1x trimmer (volume)
-1x 12 legs connector (J1,J2,J3)
+  Note:
+  1x 28x2 edge connector
+  1x trimmer (volume)
+  1x 12 legs connector (J1,J2,J3)
 
 
   STATUS:
@@ -1113,32 +1112,31 @@ ROM_START( mcolors )
 ROM_END
 
 /*
+  Super Gran Safari
+  1996 - New Impeuropex Corp.
 
-Super Gran Safari
-1996 - New Impeuropex Corp.
+  CPU:
+  1x MC68000P12 (main)
+  2x A1020B-PL84C (not dumped)
 
-CPU:
-1x MC68000P12 (main)
-2x A1020B-PL84C (not dumped)
+  1x M6295 (sound)
+  1x TDA2002 (sound)
+  1x GL324 (sound)
 
-1x M6295 (sound)
-1x TDA2002 (sound)
-1x GL324 (sound)
+  1x oscillator 30.000MHz
 
-1x oscillator 30.000MHz
+  ROMs:
+  2x M27C512 (1,2)
+  1x M27C2001 (3)
+  4x M27C1001 (4,5,6,7)
 
-ROMs:
-2x M27C512 (1,2)
-1x M27C2001 (3)
-4x M27C1001 (4,5,6,7)
-
-Note:
-1x JAMMA edge connector
-1x 12 legs connector (j2)
-1x 8x2 switches dip
-1x 4 legs jumper (j3)
-1x 2 legs jumper (j4)
-1x trimmer (volume)
+  Note:
+  1x JAMMA edge connector
+  1x 12 legs connector (j2)
+  1x 8x2 switches dip
+  1x 4 legs jumper (j3)
+  1x 2 legs jumper (j4)
+  1x trimmer (volume)
 
 
   STATUS:
@@ -1168,28 +1166,27 @@ ROM_START( sgsafari )
 ROM_END
 
 /*
+  Music Sort (Ver. 2.02).
+  Same PCB than Magic's 10 (ver. 16.15)
 
-Music Sort (Ver. 2.02).
-Same PCB than Magic's 10 (ver. 16.15)
+  CPU:
+  1x TS68000P12 (main)
+  2x TPC1020AFN-084C (PLD)(not dumped)
 
-CPU:
-1x TS68000P12 (main)
-2x TPC1020AFN-084C (PLD)(not dumped)
+  Sound:
+  1x OKI M6295
+  1x TDA2003
+  1x LM358N
 
-Sound:
-1x OKI M6295
-1x TDA2003
-1x LM358N
+  1x oscillator 20.000000MHz (close to main)
+  1x oscillator 30.000MHz (close to sound)
+  1x orange resonator 1000J (close to sound)
 
-1x oscillator 20.000000MHz (close to main)
-1x oscillator 30.000MHz (close to sound)
-1x orange resonator 1000J (close to sound)
-
-Note:
-1x 28x2 edge connector
-1x trimmer (volume)
-1x 8x2 switches dip
-1x battery
+  Note:
+  1x 28x2 edge connector
+  1x trimmer (volume)
+  1x 8x2 switches dip
+  1x battery
 
 */
 ROM_START( musicsrt )
@@ -1245,6 +1242,17 @@ ROM_END
   1x 8x2 DIP switches (DIP1).
   1x Renata 3V. CR2032 lithium battery.
 
+
+  STATUS:
+
+  Memory map = done.
+  Inputs =     done.
+  Machine =    done.
+
+  OKI 6295 =     ok.
+  Screen size =  ok.
+  Fixed layers = yes.
+
 */
 ROM_START( lunaprk )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
@@ -1269,25 +1277,25 @@ ROM_END
 *       Driver Init         *
 ****************************/
 
-DRIVER_INIT_MEMBER(magic10_state,magic10)
+DRIVER_INIT_MEMBER(magic10_state, magic10)
 {
 	m_layer2_offset[0] = 32;
 	m_layer2_offset[1] = 2;
 }
 
-DRIVER_INIT_MEMBER(magic10_state,magic102)
+DRIVER_INIT_MEMBER(magic10_state, magic102)
 {
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 20;
 }
 
-DRIVER_INIT_MEMBER(magic10_state,suprpool)
+DRIVER_INIT_MEMBER(magic10_state, suprpool)
 {
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 16;
 }
 
-DRIVER_INIT_MEMBER(magic10_state,hotslot)
+DRIVER_INIT_MEMBER(magic10_state, hotslot)
 {
 /*  a value of -56 center the playfield, but displace the intro and initial screen.
     a value of -64 center the intro and initial screen, but displace the playfield.
@@ -1296,7 +1304,7 @@ DRIVER_INIT_MEMBER(magic10_state,hotslot)
 	m_layer2_offset[1] = 0; // Y offset.
 }
 
-DRIVER_INIT_MEMBER(magic10_state,sgsafari)
+DRIVER_INIT_MEMBER(magic10_state, sgsafari)
 {
 	m_layer2_offset[0] = 16;
 	m_layer2_offset[1] = 20;
