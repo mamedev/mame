@@ -9,9 +9,10 @@ Android (C) 198? Nasco
 
 *****************************************************************************/
 
-// Note, another VERY different version of Android also exists, see https://www.youtube.com/watch?v=5rtqZqMBACI (uploaded by Chris Hardy)
-// it is unclear if that version is on the same hardware as this
 // Android uses PCBS MK-P102 and MK-P101 ONLY, there is no MK-P103 (extra sprites used on Himeshikibu)
+// Real hardware video of parent set can be seen at https://www.youtube.com/watch?v=5rtqZqMBACI (uploaded by Chris Hardy)
+// for some reason music fails to play the 2nd attract loop in MAME? 
+
 
 
 /*
@@ -449,13 +450,13 @@ static MACHINE_CONFIG_START( himesiki, himesiki_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", himesiki)
-	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ym2203", YM2203, MCLK/4)
+	MCFG_SOUND_ADD("ym2203", YM2203, CLK2/4) // ?? 
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
