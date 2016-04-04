@@ -216,6 +216,8 @@ files {
 	MAME_DIR .. "src/emu/ui/barcode.h",
 	MAME_DIR .. "src/emu/ui/cheatopt.cpp",
 	MAME_DIR .. "src/emu/ui/cheatopt.h",
+	MAME_DIR .. "src/emu/ui/pluginopt.cpp",
+	MAME_DIR .. "src/emu/ui/pluginopt.h",
 	MAME_DIR .. "src/emu/ui/devopt.cpp",
 	MAME_DIR .. "src/emu/ui/devopt.h",
 	MAME_DIR .. "src/emu/ui/filemngr.cpp",

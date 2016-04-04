@@ -49,9 +49,19 @@ public:
 	bool frame_hook();
 	void execute_function(const char *id);
 
+	struct menu_item {
+		std::string text;
+		std::string subtext;
+		int flags;
+	};
+	std::vector<menu_item> &menu_populate(std::string &menu);
+	bool menu_callback(std::string &menu, int index, std::string event);
+
 	void resume(lua_State *L, int nparam = 0, lua_State *root = nullptr);
 	void set_machine(running_machine *machine) { m_machine = machine; update_machine(); }
+	std::vector<std::string> &get_menu() { return m_menu; }
 	void attach_notifiers();
+
 private:
 	struct hook {
 		lua_State *L;
@@ -69,6 +79,8 @@ private:
 	// internal state
 	lua_State          *m_lua_state;
 	running_machine *   m_machine;
+
+	std::vector<std::string> m_menu;
 
 	hook hook_output_cb;
 	bool output_notifier_set;
@@ -121,6 +133,7 @@ private:
 	static int l_emu_register_pause(lua_State *L);
 	static int l_emu_register_resume(lua_State *L);
 	static int l_emu_register_frame(lua_State *L);
+	static int l_emu_register_menu(lua_State *L);
 	static int register_function(lua_State *L, const char *id);
 
 	// "emu.machine" namespace

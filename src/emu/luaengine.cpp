@@ -1274,6 +1274,82 @@ lua_engine::~lua_engine()
 	close();
 }
 
+std::vector<lua_engine::menu_item> &lua_engine::menu_populate(std::string &menu)
+{
+	std::vector<menu_item> &menu_list = *global_alloc(std::vector<menu_item>);
+	std::string field = "menu_pop_" + menu;
+	lua_settop(m_lua_state, 0);
+	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
+
+	if(!lua_isfunction(m_lua_state, -1))
+	{
+		lua_pop(m_lua_state, 1);
+		return menu_list;
+	}
+	lua_pcall(m_lua_state, 0, 1, 0);
+	if(!lua_istable(m_lua_state, -1))
+	{
+		lua_pop(m_lua_state, 1);
+		return menu_list;
+	}
+
+	lua_pushnil(m_lua_state);
+	while(lua_next(m_lua_state, -2))
+	{
+		if(lua_istable(m_lua_state, -1))
+		{
+			menu_item item;
+			lua_rawgeti(m_lua_state, -1, 1);
+			item.text = lua_tostring(m_lua_state, -1);
+			lua_pop(m_lua_state, 1);
+			lua_rawgeti(m_lua_state, -1, 2);
+			item.subtext = lua_tostring(m_lua_state, -1);
+			lua_pop(m_lua_state, 1);
+			lua_rawgeti(m_lua_state, -1, 3);
+			item.flags = lua_tointeger(m_lua_state, -1);
+			lua_pop(m_lua_state, 1);
+			menu_list.push_back(item);
+		}
+		lua_pop(m_lua_state, 1);
+	}
+	lua_pop(m_lua_state, 1);
+	return menu_list;
+}
+
+bool lua_engine::menu_callback(std::string &menu, int index, std::string event)
+{
+	std::string field = "menu_cb_" + menu;
+	bool ret = false;
+	lua_settop(m_lua_state, 0);
+	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
+
+	if(lua_isfunction(m_lua_state, -1))
+	{
+		lua_pushinteger(m_lua_state, index);
+		lua_pushstring(m_lua_state, event.c_str());
+		lua_pcall(m_lua_state, 2, 1, 0);
+		ret = lua_toboolean(m_lua_state, -1);
+		lua_pop(m_lua_state, 1);
+	}
+	return ret;
+}
+
+int lua_engine::l_emu_register_menu(lua_State *L)
+{
+	luaL_argcheck(L, lua_isfunction(L, 1), 1, "callback function expected");
+	luaL_argcheck(L, lua_isfunction(L, 2), 2, "callback function expected");
+	luaL_argcheck(L, lua_isstring(L, 3), 3, "message (string) expected");
+	std::string name = luaL_checkstring(L, 3);
+	std::string cbfield = "menu_cb_" + name;
+	std::string popfield = "menu_pop_" + name;
+	luaThis->m_menu.push_back(std::string(name));
+	lua_pushvalue(L, 1);
+	lua_setfield(L, LUA_REGISTRYINDEX, cbfield.c_str());
+	lua_pushvalue(L, 2);
+	lua_setfield(L, LUA_REGISTRYINDEX, popfield.c_str());
+	return 1;
+}
+
 void lua_engine::execute_function(const char *id)
 {
 	lua_settop(m_lua_state, 0);
@@ -1286,7 +1362,12 @@ void lua_engine::execute_function(const char *id)
 		{
 			if (lua_isfunction(m_lua_state, -1))
 			{
-				lua_pcall(m_lua_state, 0, 0, 0);
+				if(int error = lua_pcall(m_lua_state, 0, 0, 0))
+				{
+					if(error == 2)
+						printf("%s\n", lua_tostring(m_lua_state, -1));
+					lua_pop(m_lua_state, 1);
+				}
 			}
 			else
 			{
@@ -1453,7 +1534,8 @@ void lua_engine::initialize()
 			.addCFunction ("register_pause", l_emu_register_pause )
 			.addCFunction ("register_resume",l_emu_register_resume )
 			.addCFunction ("register_frame", l_emu_register_frame )
-			.beginClass <machine_manager> ("manager")
+			.addCFunction ("register_menu",  l_emu_register_menu )
+		.beginClass <machine_manager> ("manager")
 				.addFunction ("machine", &machine_manager::machine)
 				.addFunction ("options", &machine_manager::options)
 				.addFunction ("plugins", &machine_manager::plugins)
