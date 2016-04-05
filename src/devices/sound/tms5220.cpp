@@ -1842,7 +1842,7 @@ WRITE_LINE_MEMBER( tms5220_device::rsq_w )
 #ifdef DEBUG_RS_WS
 			else
 				/* illegal */
-				fprintf(stderr,"tms5220_rs_w: illegal\n");
+				fprintf(stderr,"tms5220_rsq_w: illegal\n");
 #endif
 			return;
 		}
@@ -1889,12 +1889,12 @@ WRITE_LINE_MEMBER( tms5220_device::wsq_w )
 		m_rs_ws = new_val;
 		if (new_val == 0)
 		{
-			if (TMS5220_HAS_RATE_CONTROL) // correct for 5220c, ? for cd2501ecd
+			if (TMS5220_HAS_RATE_CONTROL) // correct for 5220c, probably also correct for cd2501ecd
 				reset();
 #ifdef DEBUG_RS_WS
 			else
 				/* illegal */
-				fprintf(stderr,"tms5220_ws_w: illegal\n");
+				fprintf(stderr,"tms5220_wsq_w: illegal\n");
 #endif
 			return;
 		}
@@ -1917,7 +1917,7 @@ WRITE_LINE_MEMBER( tms5220_device::wsq_w )
 			/* upon /WS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
 			m_io_ready = 0;
 			update_ready_state();
-			/* Now comes the complicated part: long does /READY stay inactive, when /WS is pulled low? This depends ENTIRELY on the command written, or whether the chip is in speak external mode or not...
+			/* Now comes the complicated part: how long does /READY stay inactive, when /WS is pulled low? This depends ENTIRELY on the command written, or whether the chip is in speak external mode or not...
 			Speak external mode: ~16 cycles
 			Command Mode:
 			SPK: ? cycles
@@ -1932,6 +1932,80 @@ WRITE_LINE_MEMBER( tms5220_device::wsq_w )
 		}
 	}
 }
+
+/*
+ * combined /RS and /WS line write handler;
+ * /RS is bit 1, /WS is bit 0
+ * Note this is a hack and probably can be removed later, once the 'real' line handlers above defer by at least 4 clock cycles before taking effect
+ */
+WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
+{
+	UINT8 new_val;
+	UINT8 falling_edges;
+	m_true_timing = 1;
+#ifdef DEBUG_RS_WS
+	fprintf(stderr,"/RS and /WS written with %d and %d respectively\n", (data&2)>>1), data&1;
+#endif
+	new_val = data&0x03;
+	if (new_val != m_rs_ws)
+	{
+		falling_edges = ((m_rs_ws^new_val)&(~new_val));
+		m_rs_ws = new_val;
+		switch(new_val)
+		{
+			case 0:
+				if (TMS5220_HAS_RATE_CONTROL) // correct for 5220c, probably also correct for cd2501ecd
+					reset();
+#ifdef DEBUG_RS_WS
+				else
+					/* illegal */
+					fprintf(stderr,"tms5220_combined_rsq_wsq_w: illegal\n");
+#endif
+				return;
+			case 3:
+				/* high impedance */
+				m_read_latch = 0xff;
+				return;
+			case 2: // /WS active, /RS not
+				/* check for falling or rising edge */
+				if (!(falling_edges&0x02)) return; /* low to high, do nothing */
+				/* high to low - schedule ready cycle */
+#ifdef DEBUG_RS_WS
+				fprintf(stderr,"Scheduling ready cycle for /WS...\n");
+#endif
+				/* upon /WS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
+				m_io_ready = 0;
+				update_ready_state();
+				/* Now comes the complicated part: how long does /READY stay inactive, when /WS is pulled low? This depends ENTIRELY on the command written, or whether the chip is in speak external mode or not...
+				Speak external mode: ~16 cycles
+				Command Mode:
+				SPK: ? cycles
+				SPKEXT: ? cycles
+				RDBY: between 60 and 140 cycles
+				RB: ? cycles (80?)
+				RST: between 60 and 140 cycles
+				SET RATE (5220C and CD2501ECD only): ? cycles (probably ~16)
+				*/
+				// TODO: actually HANDLE the timing differences! currently just assuming always 16 cycles
+				m_timer_io_ready->adjust(attotime::from_hz(clock()/16), 1); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
+				return;
+			case 1: // /RS active, /WS not
+				/* check for falling or rising edge */
+				if (!(falling_edges&0x01)) return; /* low to high, do nothing */
+				/* high to low - schedule ready cycle */
+#ifdef DEBUG_RS_WS
+				fprintf(stderr,"Scheduling ready cycle for /RS...\n");
+#endif
+				/* upon /RS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
+				m_io_ready = 0;
+				update_ready_state();
+				/* How long does /READY stay inactive, when /RS is pulled low? I believe its almost always ~16 clocks (25 usec at 800khz as shown on the datasheet) */
+				m_timer_io_ready->adjust(attotime::from_hz(clock()/16), 1); // this should take around 10-16 (closer to ~11?) cycles to complete
+				return;
+		}
+	}
+}
+
 
 /**********************************************************************************************
 
