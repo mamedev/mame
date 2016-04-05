@@ -316,7 +316,7 @@ void mips3_device::check_irqs()
 
 void mips3_device::device_start()
 {
-	m_isdrc = (mconfig().options().drc() && !mconfig().m_force_no_drc) ? true : false;
+	m_isdrc = allow_drc();
 
 	/* allocate the implementation-specific state from the full cache */
 	m_core = (internal_mips3_state *)m_cache.alloc_near(sizeof(internal_mips3_state));

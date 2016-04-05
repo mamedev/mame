@@ -97,7 +97,7 @@ public:
 		void set_description(const char *description);
 		void set_flag(UINT32 mask, UINT32 flag);
 		void mark_changed() { m_changed = true; }
-		void revert(int priority);
+		void revert(int priority_hi, int priority_lo);
 
 	private:
 		// internal state
@@ -151,7 +151,7 @@ public:
 	bool parse_ini_file(util::core_file &inifile, int priority, int ignore_priority, std::string &error_string);
 
 	// reverting
-	void revert(int priority = OPTION_PRIORITY_MAXIMUM);
+	void revert(int priority_hi = OPTION_PRIORITY_MAXIMUM, int priority_lo = OPTION_PRIORITY_DEFAULT);
 
 	// output
 	std::string output_ini(const core_options *diff = nullptr) const;

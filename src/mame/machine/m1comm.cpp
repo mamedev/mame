@@ -51,6 +51,8 @@ Notes:
       JP8      - Jumper, set to 1-2 (selects CLOCK SOURCE)
 */
 
+#include "emu.h"
+#include "emuopts.h"
 #include "machine/m1comm.h"
 
 #define Z80_TAG     "m1commcpu"

@@ -339,7 +339,6 @@ Notes:
 #include "machine/vt83c461.h"
 #include "sound/dac.h"
 #include "includes/jaguar.h"
-#include "emuopts.h"
 #include "imagedev/snapquik.h"
 #include "sound/dac.h"
 #include "machine/eepromser.h"

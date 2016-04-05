@@ -255,24 +255,16 @@ bool emu_options::add_slot_options(const software_part *swpart)
 		if (slot->fixed())
 			continue;
 
-		// first device? add the header as to be pretty
-		if (m_slot_options++ == 0)
-			add_entry(nullptr, "SLOT DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
-
 		// retrieve info about the device instance
 		const char *name = slot->device().tag() + 1;
 		if (!exists(name))
 		{
+			// first device? add the header as to be pretty
+			if (m_slot_options++ == 0)
+				add_entry(nullptr, "SLOT DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
+
 			// add the option
-			UINT32 flags = OPTION_STRING | OPTION_FLAG_DEVICE;
-			const char *defvalue = slot->default_option();
-			if (defvalue != nullptr)
-			{
-				const device_slot_option *option = slot->option(defvalue);
-				if (option != nullptr && !option->selectable())
-					flags |= OPTION_FLAG_INTERNAL;
-			}
-			add_entry(name, nullptr, flags, defvalue, true);
+			add_entry(name, nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, slot->default_option(), true);
 		}
 
 		// allow software lists to supply their own defaults
@@ -314,12 +306,21 @@ void emu_options::update_slot_options(const software_part *swpart)
 		if (exists(name) && !slot->option_list().empty())
 		{
 			std::string defvalue = slot->get_default_card_software();
-			if (defvalue.length() > 0)
+			if (defvalue.empty())
 			{
-				set_default_value(name, defvalue.c_str());
-				const device_slot_option *option = slot->option(defvalue.c_str());
-				set_flag(name, ~OPTION_FLAG_INTERNAL, (option != nullptr && !option->selectable()) ? OPTION_FLAG_INTERNAL : 0);
+				// keep any non-default setting
+				if (priority(name) > OPTION_PRIORITY_DEFAULT)
+					continue;
+
+				// reinstate the actual default value as configured
+				if (slot->default_option() != nullptr)
+					defvalue.assign(slot->default_option());
 			}
+
+			// set the value and hide the option if not selectable
+			set_default_value(name, defvalue.c_str());
+			const device_slot_option *option = slot->option(defvalue.c_str());
+			set_flag(name, ~OPTION_FLAG_INTERNAL, (option != nullptr && !option->selectable()) ? OPTION_FLAG_INTERNAL : 0);
 		}
 	}
 	while (add_slot_options(swpart)) { }
@@ -344,10 +345,6 @@ void emu_options::add_device_options()
 	image_interface_iterator iter(config.root_device());
 	for (const device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 	{
-		// first device? add the header as to be pretty
-		if (m_device_options++ == 0)
-			add_entry(nullptr, "IMAGE DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
-
 		// retrieve info about the device instance
 		std::ostringstream option_name;
 		util::stream_format(option_name, "%s;%s", image->instance_name(), image->brief_instance_name());
@@ -356,7 +353,14 @@ void emu_options::add_device_options()
 
 		// add the option
 		if (!exists(image->instance_name()))
+		{
+			// first device? add the header as to be pretty
+			if (m_device_options++ == 0)
+				add_entry(nullptr, "IMAGE DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
+
+			// add the option
 			add_entry(option_name.str().c_str(), nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, nullptr, true);
+		}
 	}
 }
 
@@ -401,12 +405,10 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], std::string &error_
 	core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 
 	// keep adding slot options until we stop seeing new stuff
-	m_slot_options = 0;
 	while (add_slot_options(swpart))
 		core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 
 	// add device options and reparse
-	m_device_options = 0;
 	add_device_options();
 	if (name != nullptr && exists(name))
 		set_value(name, value, OPTION_PRIORITY_SUBCMD, error_string);
@@ -559,6 +561,11 @@ void emu_options::set_system_name(const char *name)
 
 		// remove any existing device options
 		remove_device_options();
+	}
+	else
+	{
+		// revert device options set for the old software
+		revert(OPTION_PRIORITY_SUBCMD, OPTION_PRIORITY_SUBCMD);
 	}
 
 	// get the new system

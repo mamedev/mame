@@ -16,6 +16,7 @@
 #include "emu.h"
 #include "cheat.h"
 #include "drivenum.h"
+#include "emuopts.h"
 #include "ui/ui.h"
 #include "luaengine.h"
 #include <mutex>

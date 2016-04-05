@@ -106,7 +106,6 @@
 
 #include "emu.h"
 #include "kc.h"
-#include "emuopts.h"
 
 #define  LOG    0
 
