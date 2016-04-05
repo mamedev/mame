@@ -1562,17 +1562,29 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
 
-	// we do not clear the backbuffe here because multiple screens might be rendered into
+	// we do not clear the backbuffer here because multiple screens might be rendered into
 	blit(backbuffer, false, poly->get_type(), vertnum, poly->get_count());
 
 	if (avi_output_file != nullptr)
 	{
 		blit(avi_final_target, false, poly->get_type(), vertnum, poly->get_count());
+
+		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
+		if (result != D3D_OK)
+		{
+			osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+		}
 	}
 
 	if (render_snap)
 	{
 		blit(snap_target, false, poly->get_type(), vertnum, poly->get_count());
+
+		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
+		if (result != D3D_OK)
+		{
+			osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+		}
 
 		snap_rendered = true;
 	}
