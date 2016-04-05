@@ -54,7 +54,7 @@ ifeq ($(TARGET), 4)
 VS_FLAGS=--platform linux -p 120
 FS_FLAGS=--platform linux -p 120
 CS_FLAGS=--platform linux -p 430
-SHADER_PATH=shaders/glsl$/$(SHADERS_DIR)
+SHADER_PATH=shaders/glsl/$(SHADERS_DIR)
 else
 ifeq ($(TARGET), 5)
 VS_FLAGS=--platform osx -p metal
