@@ -8,10 +8,10 @@
 
 #include "input_module.h"
 #include "modules/osdmodule.h"
-#include <wbemcli.h>
 
 #if defined(OSD_WINDOWS)
 
+#include <wbemcli.h>
 #include <list>
 
 // standard windows headers
