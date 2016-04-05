@@ -788,6 +788,8 @@ end
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/text_metrics.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/utf8.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/ocornut_imgui.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/scintilla.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp",
 	}
