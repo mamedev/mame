@@ -216,7 +216,7 @@ public:
 	DECLARE_TGP_FUNCTION( f43_swa );
 	DECLARE_TGP_FUNCTION( track_read_tri );
 	DECLARE_TGP_FUNCTION( matrix_sdir );
-	DECLARE_TGP_FUNCTION( inverse );
+	DECLARE_TGP_FUNCTION( fsqrt );
 	DECLARE_TGP_FUNCTION( vlength );
 	DECLARE_TGP_FUNCTION( f47 );
 	DECLARE_TGP_FUNCTION( track_read_info );

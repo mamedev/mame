@@ -677,8 +677,8 @@ TGP_FUNCTION( model1_state::xyz2rqf )
 	float c = fifoin_pop_f();
 	float norm;
 	logerror("TGP xyz2rqf %f, %f, %f (%x)\n", a, b, c, m_pushpc);
-	fifoout_push_f((a*a+b*b+c*c)/sqrtf(a*a+b*b+c*c));
-	norm = sqrt(a*a+c*c);
+	fifoout_push_f(sqrtf(a*a+b*b+c*c));
+	norm = sqrtf(a*a+c*c);
 	if(!c) {
 		if(a>=0)
 			fifoout_push(0);
@@ -762,7 +762,7 @@ TGP_FUNCTION( model1_state::matrix_sdir )
 	float a = fifoin_pop_f();
 	float b = fifoin_pop_f();
 	float c = fifoin_pop_f();
-	float norm = sqrt(a*a+b*b+c*c);
+	float norm = sqrtf(a*a+b*b+c*c);
 	float t[9], m[9];
 	logerror("TGP matrix_sdir %f, %f, %f (%x)\n", a, b, c, m_pushpc);
 
@@ -778,7 +778,7 @@ TGP_FUNCTION( model1_state::matrix_sdir )
 		t[1] = b / norm;
 		t[2] = a / norm;
 
-		norm = sqrt(a*a+c*c);
+		norm = sqrtf(a*a+c*c);
 		t[6] = a/norm;
 		t[7] = 0;
 		t[8] = c/norm;
@@ -786,7 +786,7 @@ TGP_FUNCTION( model1_state::matrix_sdir )
 		t[3] = -b*c;
 		t[4] = a*a+c*c;
 		t[5] = -b*a;
-		norm = sqrt(t[3]*t[3]+t[4]*t[4]+t[5]*t[5]);
+		norm = sqrtf(t[3]*t[3]+t[4]*t[4]+t[5]*t[5]);
 		t[3] /= norm;
 		t[4] /= norm;
 		t[5] /= norm;
@@ -807,11 +807,11 @@ TGP_FUNCTION( model1_state::matrix_sdir )
 	next_fn();
 }
 
-TGP_FUNCTION( model1_state::inverse )
+TGP_FUNCTION( model1_state::fsqrt )
 {
 	float a = fifoin_pop_f();
-	logerror("TGP f45 %f (%x)\n", a, m_pushpc);
-	fifoout_push_f(1/a);
+	logerror("TGP fsqrt %f (%x)\n", a, m_pushpc);
+	fifoout_push_f(sqrtf(a));
 	next_fn();
 }
 
@@ -825,7 +825,7 @@ TGP_FUNCTION( model1_state::vlength )
 	x -= m_tgp_vr_base[0];
 	y -= m_tgp_vr_base[1];
 	z -= m_tgp_vr_base[2];
-	fifoout_push_f(sqrt(x*x + y*y + z*z) - m_tgp_vr_base[3]);
+	fifoout_push_f(sqrtf(x*x + y*y + z*z) - m_tgp_vr_base[3]);
 	next_fn();
 }
 
@@ -943,7 +943,7 @@ TGP_FUNCTION( model1_state::matrix_rdir )
 	float a = fifoin_pop_f();
 	float b = fifoin_pop_f();
 	float c = fifoin_pop_f();
-	float norm = sqrt(a*a+c*c);
+	float norm = sqrtf(a*a+c*c);
 	float t1, t2;
 	(void)b;
 
@@ -1121,7 +1121,7 @@ TGP_FUNCTION( model1_state::col_testpt )
 	logerror("TGP col_testpt %f, %f (%x)\n", a, b, m_pushpc);
 	x = a - m_tgp_vr_circx;
 	y = b - m_tgp_vr_circy;
-	fifoout_push_f(((x*x+y*y)/sqrtf(x*x+y*y)) - m_tgp_vr_circrad);
+	fifoout_push_f(sqrtf(x*x+y*y) - m_tgp_vr_circrad);
 	next_fn();
 }
 
@@ -1182,7 +1182,7 @@ TGP_FUNCTION( model1_state::distance )
 	logerror("TGP distance (%f, %f), (%f, %f) (%x)\n", a, b, c, d, m_pushpc);
 	c -= a;
 	d -= b;
-	fifoout_push_f((c*c+d*d)/sqrtf(c*c+d*d));
+	fifoout_push_f(sqrtf(c*c+d*d));
 	next_fn();
 }
 
@@ -1245,7 +1245,7 @@ TGP_FUNCTION( model1_state::cpa )
 	dv_z = (i-k)*(1-dt) + (j-l)*dt;
 	dv2 = dv_x*dv_x + dv_y*dv_y + dv_z*dv_z;
 
-	fifoout_push_f(sqrt(dv2));
+	fifoout_push_f(sqrtf(dv2));
 	next_fn();
 }
 
@@ -1642,7 +1642,7 @@ const struct model1_state::function model1_state::ftab_vf[] = {
 	{ &model1_state::f42,             3 },            // 329
 	{ &model1_state::f43,             6 },            // 36c
 	{ &model1_state::track_read_tri,  1 },            // 3c2
-	{ &model1_state::inverse,         1 },            // 3c7
+	{ &model1_state::fsqrt,           1 },            // 3c7
 	{ &model1_state::vlength,         3 },            // 3cf
 	{ nullptr,                        0 },            // 3ef
 
@@ -1758,7 +1758,7 @@ const struct model1_state::function model1_state::ftab_swa[] = {
 	{ &model1_state::xyz2rqf,         3 },
 	{ &model1_state::f43_swa,         3 },
 	{ &model1_state::matrix_sdir,     3 },
-	{ &model1_state::inverse,         1 },
+	{ &model1_state::fsqrt,           1 },
 	{ &model1_state::vlength,         3 },
 	{ &model1_state::f47,             3 },
 
