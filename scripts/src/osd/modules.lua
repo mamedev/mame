@@ -74,6 +74,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_common.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_common.h",
 		MAME_DIR .. "src/osd/modules/input/input_dinput.cpp",
+    MAME_DIR .. "src/osd/modules/input/input_dinput.h",
 		MAME_DIR .. "src/osd/modules/input/input_none.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_rawinput.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_win32.cpp",
@@ -84,6 +85,8 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_windows.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_windows.h",
 		MAME_DIR .. "src/osd/modules/input/input_xinput.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_xinput.h",
+		MAME_DIR .. "src/osd/modules/input/input_winhybrid.cpp",
 	}
 
 	if _OPTIONS["targetos"]=="windows" then
@@ -393,6 +396,7 @@ function osdmodulestargetconf()
 			"gdi32",
 			"dsound",
 			"dxguid",
+			"oleaut32",
 		}
 	elseif _OPTIONS["targetos"]=="macosx" then
 		links {
