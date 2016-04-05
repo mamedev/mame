@@ -28,7 +28,7 @@ def parse_file(srcfile):
                 if c==13 and line[srcptr]==10:
                     srcptr+=1
                 continue
-            if c==' ':
+            if c<=' ' or c==160: # continues on tab, form-feed, (others), space, and non-breakable space.
                 continue
             if in_comment==1 and c=='*' and line[srcptr]=='/' :
                 srcptr+=1
