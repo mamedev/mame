@@ -13,6 +13,7 @@
 
 #include <wbemcli.h>
 #include <list>
+#include <vector>
 
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
@@ -41,7 +42,53 @@
 
 using namespace Microsoft::WRL;
 
-#define SAFE_RELEASE(p) { if(p) { (p)->Release(); (p)=nullptr; } }
+template<class TCom>
+class ComArray
+{
+private:
+	std::vector<TCom*> m_entries;
+
+public:
+	ComArray(size_t capacity)
+		: m_entries(capacity, nullptr)
+	{
+	}
+
+	~ComArray()
+	{
+		Release();
+	}
+
+	TCom** ReleaseAndGetAddressOf()
+	{
+		Release();
+
+		// This works b/c vector elements are guaranteed to be contiguous.
+		return &m_entries[0];
+	}
+
+	TCom* operator [] (int i)
+	{
+		return m_entries[i];
+	}
+
+	size_t Size()
+	{
+		return m_entries.size();
+	}
+
+	void Release()
+	{
+		for (int i = 0; i < m_entries.size(); i++)
+		{
+			if (m_entries[i] != nullptr)
+			{
+				m_entries[i]->Release();
+				m_entries[i] = nullptr;
+			}
+		}
+	}
+};
 
 struct bstr_deleter
 {
@@ -239,7 +286,7 @@ private:
 		ComPtr<IWbemServices> pIWbemServices;
 		ComPtr<IEnumWbemClassObject> pEnumDevices;
 		ComPtr<IWbemLocator> pIWbemLocator;
-		IWbemClassObject* pDevices[20];
+		ComArray<IWbemClassObject> pDevices(20);
 		bstr_ptr bstrDeviceID;
 		bstr_ptr bstrClassName;
 		bstr_ptr bstrNamespace;
@@ -309,12 +356,12 @@ private:
 		// Loop over all devices
 		for (; ; )
 		{
-			// Get 20 at a time
-			hr = pEnumDevices->Next(10000, 20, pDevices, &uReturned);
+			// Get a few at a time
+			hr = pEnumDevices->Next(10000, pDevices.Size(), pDevices.ReleaseAndGetAddressOf(), &uReturned);
 			if (FAILED(hr))
 			{
 				osd_printf_error("Enumerating WMI classes failed. Error: 0x%X\n", static_cast<unsigned int>(hr));
-				goto cleanup;;
+				return hr;
 			}
 
 			if (uReturned == 0)
@@ -350,12 +397,6 @@ private:
 					}
 				}
 			}
-		}
-
-	cleanup:
-		for (iDevice = 0; iDevice < 20; iDevice++)
-		{
-			SAFE_RELEASE(pDevices[iDevice]);
 		}
 
 		if (SUCCEEDED(hr))
