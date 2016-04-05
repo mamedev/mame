@@ -6,7 +6,7 @@ $input v_color0, v_texcoord0
 // NTSC Decode Effect
 //-----------------------------------------------------------------------------
 
-#include "../../../../../../3rdparty/bgfx/examples/common/common.sh"
+#include "common.sh"
 
 // Autos
 uniform vec4 u_source_dims;

@@ -6,7 +6,7 @@ $input v_color0, v_texcoord0, v_texcoord1, v_texcoord2, v_texcoord3
 // Deconvergence Effect
 //-----------------------------------------------------------------------------
 
-#include "../../../../../../3rdparty/bgfx/examples/common/common.sh"
+#include "common.sh"
 
 // Samplers
 SAMPLER2D(s_tex, 0);
