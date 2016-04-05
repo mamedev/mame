@@ -111,6 +111,7 @@
 
 ***************************************************************************/
 #include "gromport.h"
+#include "emuopts.h"
 #include "image.h"
 #include "softlist.h"
 

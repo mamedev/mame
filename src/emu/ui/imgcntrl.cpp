@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "emuopts.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "ui/imgcntrl.h"

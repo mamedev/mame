@@ -12,6 +12,7 @@
 #ifndef __UI_SUBMENU_H__
 #define __UI_SUBMENU_H__
 
+#include "emuopts.h"
 #include "ui/menu.h"
 
 //-------------------------------------------------

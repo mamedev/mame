@@ -7,7 +7,6 @@
 
 #define __M1COMM_SIMULATION__
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 
 #define MCFG_M1COMM_ADD(_tag ) \
