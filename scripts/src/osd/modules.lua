@@ -74,7 +74,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_common.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_common.h",
 		MAME_DIR .. "src/osd/modules/input/input_dinput.cpp",
-    MAME_DIR .. "src/osd/modules/input/input_dinput.h",
+		MAME_DIR .. "src/osd/modules/input/input_dinput.h",
 		MAME_DIR .. "src/osd/modules/input/input_none.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_rawinput.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_win32.cpp",
@@ -129,6 +129,7 @@ function osdmodulesbuild()
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",
 		"__STDC_CONSTANT_MACROS",
+		"IMGUI_DISABLE_OBSOLETE_FUNCTIONS",
 	}
 
 	files {
@@ -172,7 +173,9 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/render/bgfx/writereader.cpp",
 	}
 	includedirs {
+		MAME_DIR .. "3rdparty/bgfx/examples/common",
 		MAME_DIR .. "3rdparty/bgfx/include",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty",
 		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "3rdparty/rapidjson/include",
 	}
