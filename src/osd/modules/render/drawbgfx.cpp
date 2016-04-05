@@ -43,6 +43,8 @@
 #include "bgfx/slider.h"
 #include "bgfx/target.h"
 
+#include "imgui/imgui.h"
+
 //============================================================
 //  DEBUGGING
 //============================================================
@@ -198,6 +200,8 @@ int renderer_bgfx::create()
 	memset(m_white, 0xff, sizeof(uint32_t) * 16 * 16);
 	m_texinfo.push_back(rectangle_packer::packable_rectangle(WHITE_HASH, PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32), 16, 16, 16, nullptr, m_white));
 
+	imguiCreate();
+
 	return 0;
 }
 
@@ -261,6 +265,8 @@ renderer_bgfx::~renderer_bgfx()
 
 void renderer_bgfx::exit()
 {
+	imguiDestroy();
+
 	bgfx::shutdown();
 	s_window_set = false;
 }

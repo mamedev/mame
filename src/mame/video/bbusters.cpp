@@ -200,18 +200,20 @@ void bbusters_state::draw_sprites(bitmap_ind16 &bitmap, const UINT16 *source, in
 	int offs;
 
 	for (offs = 0;offs <0x800 ;offs += 4) {
-		int x,y,sprite,colour,fx,fy,scale;
+		int x,sprite,colour,fx,fy,scale;
+		INT16 y;
 		int block;
 
 		sprite=source[offs+1];
 		colour=source[offs+0];
 
-		if (colour==0xf7 && (sprite==0x3fff || sprite==0xffff))
-			continue;
+		if ((colour==0xf7 || colour==0xffff || colour == 0x43f9) && (sprite==0x3fff || sprite==0xffff || sprite==0x0001))
+			continue; // sprite 1, color 0x43f9 is the dead sprite in the top-right of the screen in Mechanized Attack's High Score table.
 
 		y=source[offs+3];
 		x=source[offs+2];
 		if (x&0x200) x=-(0x100-(x&0xff));
+		if (y > 320 || y < -256) y &= 0x1ff; // fix for bbusters ending & "Zing!" attract-mode fullscreen zombie & Helicopter on the 3rd rotation of the attractmode sequence
 
 		/*
 		    Source[0]:

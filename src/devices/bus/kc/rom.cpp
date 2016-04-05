@@ -43,7 +43,7 @@ const device_type KC_M033     = &device_creator<kc_m033_device>;
 //-------------------------------------------------
 
 kc_8k_device::kc_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, KC_STANDARD, "Standard", tag, owner, clock, "kc_8k", __FILE__),
+		: device_t(mconfig, KC_STANDARD, "Standard 8K ROM module", tag, owner, clock, "kc_8k", __FILE__),
 		device_kcexp_interface( mconfig, *this ), m_slot(nullptr), m_mei(0), m_rom(nullptr), m_enabled(0), m_base(0)
 	{
 }
