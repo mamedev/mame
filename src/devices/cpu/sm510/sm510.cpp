@@ -2,17 +2,24 @@
 // copyright-holders:hap
 /*
 
-  Sharp SM510 MCU family - known chips:
+  Known chips: (* means not emulated yet)
+  
+  Sharp SM510 MCU family:
   - SM510: 2.7Kx8 ROM, 128x4 RAM(32x4 for LCD)
   - SM511: 4Kx8 ROM, 128x4 RAM(32x4 for LCD), melody controller
   - SM512: 4Kx8 ROM, 128x4 RAM(48x4 for LCD), melody controller
+  - *KB1013VK4-2: Soviet-era clone of SM510, minor differences
 
-  Other chips that may be in the same family, investigate more when one of
-  them needs to get emulated: SM500, SM530/31, SM4A, SM3903, ..
-
+  Sharp SM500 MCU family:
+  - *SM500: x
+  - *SM530: x
+  - *SM531: x
+  - *KB1013VK1-2: Soviet-era clone of SM500, minor differences
+  
   References:
   - 1990 Sharp Microcomputers Data Book
   - 1996 Sharp Microcomputer Databook
+  - KB1013VK1-2/KB1013VK4-2 manual
 
   TODO:
   - proper support for LFSR program counter in debugger
@@ -58,35 +65,6 @@ void sm510_base_device::device_start()
 	m_write_segb.resolve_safe();
 	m_write_segbs.resolve_safe();
 	m_write_segc.resolve_safe();
-
-	// zerofill
-	memset(m_stack, 0, sizeof(m_stack));
-	m_pc = 0;
-	m_prev_pc = 0;
-	m_op = 0;
-	m_prev_op = 0;
-	m_param = 0;
-	m_acc = 0;
-	m_bl = 0;
-	m_bm = 0;
-	m_c = 0;
-	m_skip = false;
-	m_w = 0;
-	m_r = 0;
-	m_div = 0;
-	m_1s = false;
-	m_k_active = false;
-	m_l = 0;
-	m_x = 0;
-	m_y = 0;
-	m_bp = false;
-	m_bc = false;
-	m_halt = false;
-	m_melody_rd = 0;
-	m_melody_step_count = 0;
-	m_melody_duty_count = 0;
-	m_melody_duty_index = 0;
-	m_melody_address = 0;
 
 	// register for savestates
 	save_item(NAME(m_stack));

@@ -1716,6 +1716,11 @@ if (CPUS["SM510"]~=null) then
 		MAME_DIR .. "src/devices/cpu/sm510/sm510op.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm510core.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm511core.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm500.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm500.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm500op.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm500core.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/kb1013vk1-2core.cpp",
 	}
 end
 
