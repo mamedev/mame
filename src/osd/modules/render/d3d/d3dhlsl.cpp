@@ -38,7 +38,6 @@
 //============================================================
 
 static slider_state *g_slider_list;
-static osd_file::error open_next(renderer_d3d9 *d3d, emu_file &file, const char *templ, const char *extension, int idx);
 
 //============================================================
 //  PROTOTYPES
@@ -237,9 +236,9 @@ void shaders::render_snapshot(surface *surface)
 	render_snap = false;
 
 	// if we don't have a bitmap, or if it's not the right size, allocate a new one
-	if (!avi_snap.valid() || snap_width != (avi_snap.width() / 2) || snap_height != (avi_snap.height() / 2))
+	if (!avi_snap.valid() || snap_width != avi_snap.width() || snap_height != avi_snap.height())
 	{
-		avi_snap.allocate(snap_width / 2, snap_height / 2);
+		avi_snap.allocate(snap_width, snap_height);
 	}
 
 	// copy the texture
@@ -256,51 +255,41 @@ void shaders::render_snapshot(surface *surface)
 		return;
 	}
 
-	for (int cy = 0; cy < 2; cy++)
+	// loop over Y
+	for (int srcy = 0; srcy < snap_height; srcy++)
 	{
-		for (int cx = 0; cx < 2; cx++)
+		DWORD *src = (DWORD *)((BYTE *)rect.pBits + srcy * rect.Pitch);
+		UINT32 *dst = &avi_snap.pix32(srcy);
+
+		for (int x = 0; x < snap_width; x++)
 		{
-			// loop over Y
-			for (int srcy = 0; srcy < snap_height / 2; srcy++)
-			{
-				int toty = (srcy + cy * (snap_height / 2));
-				int totx = cx * (snap_width / 2);
-				DWORD *src = (DWORD *)((BYTE *)rect.pBits + toty * rect.Pitch + totx * 4);
-				UINT32 *dst = &avi_snap.pix32(srcy);
-
-				for (int x = 0; x < snap_width / 2; x++)
-				{
-					*dst++ = *src++;
-				}
-			}
-
-			int idx = cy * 2 + cx;
-
-			emu_file file(machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr = open_next(d3d, file, nullptr, "png", idx);
-			if (filerr != osd_file::error::NONE)
-			{
-				return;
-			}
-
-			// add two text entries describing the image
-			std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(build_version);
-			std::string text2 = std::string(machine->system().manufacturer).append(" ").append(machine->system().description);
-			png_info pnginfo = { 0 };
-			png_add_text(&pnginfo, "Software", text1.c_str());
-			png_add_text(&pnginfo, "System", text2.c_str());
-
-			// now do the actual work
-			png_error error = png_write_bitmap(file, &pnginfo, avi_snap, 1 << 24, nullptr);
-			if (error != PNGERR_NONE)
-			{
-				osd_printf_error("Error generating PNG for HLSL snapshot: png_error = %d\n", error);
-			}
-
-			// free any data allocated
-			png_free(&pnginfo);
+			*dst++ = *src++;
 		}
 	}
+
+	emu_file file(machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	osd_file::error filerr = machine->video().open_next(file, "png");
+	if (filerr != osd_file::error::NONE)
+	{
+		return;
+	}
+
+	// add two text entries describing the image
+	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(build_version);
+	std::string text2 = std::string(machine->system().manufacturer).append(" ").append(machine->system().description);
+	png_info pnginfo = { 0 };
+	png_add_text(&pnginfo, "Software", text1.c_str());
+	png_add_text(&pnginfo, "System", text2.c_str());
+
+	// now do the actual work
+	png_error error = png_write_bitmap(file, &pnginfo, avi_snap, 1 << 24, nullptr);
+	if (error != PNGERR_NONE)
+	{
+		osd_printf_error("Error generating PNG for HLSL snapshot: png_error = %d\n", error);
+	}
+
+	// free any data allocated
+	png_free(&pnginfo);
 
 	// unlock
 	result = (*d3dintf->surface.unlock_rect)(snap_copy_target);
@@ -483,7 +472,7 @@ void shaders::begin_avi_recording(const char *name)
 		}
 		else
 		{
-			filerr = open_next(d3d, tempfile, nullptr, "avi", 0);
+			filerr = machine->video().open_next(tempfile, "avi");
 		}
 
 		// compute the frame time
@@ -3075,152 +3064,4 @@ slider_state *renderer_d3d9::get_slider_list()
 		return nullptr;
 	}
 	return g_slider_list;
-}
-
-
-// NOTE: The function below is taken directly from src/emu/video.c and should likely be moved into a global helper function.
-//-------------------------------------------------
-//  open_next - open the next non-existing file of
-//  type filetype according to our numbering
-//  scheme
-//-------------------------------------------------
-
-static osd_file::error open_next(renderer_d3d9 *d3d, emu_file &file, const char *templ, const char *extension, int idx)
-{
-	UINT32 origflags = file.openflags();
-
-	// handle defaults
-	const char *snapname = templ ? templ : d3d->window().machine().options().snap_name();
-
-	if (snapname == nullptr || snapname[0] == 0)
-	{
-		snapname = "%g/%i";
-	}
-	std::string snapstr(snapname);
-
-	// strip any extension in the provided name
-	int index = snapstr.find_last_of('.');
-	if (index != -1)
-	{
-		snapstr.substr(0, index);
-	}
-
-	// handle %d in the template (for image devices)
-	std::string snapdev("%d_");
-	int pos = snapstr.find(snapdev,0);
-
-	if (pos != -1)
-	{
-		// if more %d are found, revert to default and ignore them all
-		if (snapstr.find(snapdev, pos + 3) != -1)
-		{
-			snapstr.assign("%g/%i");
-		}
-		// else if there is a single %d, try to create the correct snapname
-		else
-		{
-			int name_found = 0;
-
-			// find length of the device name
-			int end1 = snapstr.find("/", pos + 3);
-			int end2 = snapstr.find("%", pos + 3);
-			int end;
-
-			if ((end1 != -1) && (end2 != -1))
-			{
-				end = MIN(end1, end2);
-			}
-			else if (end1 != -1)
-			{
-				end = end1;
-			}
-			else if (end2 != -1)
-			{
-				end = end2;
-			}
-			else
-			{
-				end = snapstr.length();
-			}
-
-			if (end - pos < 3)
-			{
-				fatalerror("Something very wrong is going on!!!\n");
-			}
-
-			// copy the device name to a string
-			std::string snapdevname;
-			snapdevname.assign(snapstr.substr(pos + 3, end - pos - 3));
-
-			// verify that there is such a device for this system
-			image_interface_iterator iter(d3d->window().machine().root_device());
-			for (device_image_interface *image = iter.first(); image != nullptr; iter.next())
-			{
-				// get the device name
-				std::string tempdevname(image->brief_instance_name());
-
-				if (snapdevname.compare(tempdevname) == 0)
-				{
-					// verify that such a device has an image mounted
-					if (image->basename() != nullptr)
-					{
-						std::string filename(image->basename());
-
-						// strip extension
-						filename.substr(0, filename.find_last_of('.'));
-
-						// setup snapname and remove the %d_
-						strreplace(snapstr, snapdevname.c_str(), filename.c_str());
-						snapstr.erase(pos, 3);
-
-						name_found = 1;
-					}
-				}
-			}
-
-			// or fallback to default
-			if (name_found == 0)
-			{
-				snapstr.assign("%g/%i");
-			}
-		}
-	}
-
-	// add our own index
-	// add our own extension
-	snapstr.append(".").append(extension);
-
-	// substitute path and gamename up front
-	strreplace(snapstr, "/", PATH_SEPARATOR);
-	strreplace(snapstr, "%g", d3d->window().machine().basename());
-
-	// determine if the template has an index; if not, we always use the same name
-	std::string fname;
-	if (snapstr.find("%i") == -1)
-	{
-		fname.assign(snapstr);
-	}
-
-	// otherwise, we scan for the next available filename
-	else
-	{
-		// try until we succeed
-		file.set_openflags(OPEN_FLAG_READ);
-		for (int seq = 0; ; seq++)
-		{
-			// build up the filename
-			strreplace(fname.assign(snapstr), "%i", string_format("%04d_%d", seq, idx).c_str());
-
-			// try to open the file; stop when we fail
-			osd_file::error filerr = file.open(fname.c_str());
-			if (filerr != osd_file::error::NONE)
-			{
-				break;
-			}
-		}
-	}
-
-	// create the final file
-	file.set_openflags(origflags);
-	return file.open(fname.c_str());
 }
