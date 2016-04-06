@@ -181,7 +181,7 @@ void m3comm_device::device_reset_after_children()
 
 UINT16 swapb16(UINT16 data)
 {
-	return (data >> 8) | (data >> 8);
+	return (data << 8) | (data >> 8);
 }
 
 ///////////// Internal MMIO
