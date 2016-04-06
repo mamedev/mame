@@ -134,6 +134,8 @@ function osdmodulesbuild()
 
 	files {
 		MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfxutil.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfxutil.h",
 		MAME_DIR .. "src/osd/modules/render/binpacker.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/blendreader.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/chain.cpp",
