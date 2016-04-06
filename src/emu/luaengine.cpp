@@ -21,6 +21,9 @@
 #include "luaengine.h"
 #include <mutex>
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wshift-count-overflow"
+#endif
 //**************************************************************************
 //  LUA ENGINE
 //**************************************************************************
