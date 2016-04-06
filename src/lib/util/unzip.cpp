@@ -79,6 +79,67 @@ namespace {
 #define ZIPXTRALN       0x1c
 #define ZIPNAME         0x1e
 
+#define Z64EOCDLOCSZ    0x14        // zip64 end of central directory locator block size
+#define Z64EOCDO        0x08        // offset to zip64 end of central directory record (in the locator block)
+#define Z64EOCDSZ       0x38        // zip64 end of central directory record block size
+#define Z64_PK66        0x06064B50  // zip64 end of central directory record signature ("PK66")
+#define Z64_PK67        0x07064B50  // zip64 end of central directory locator signature ("PK67")
+#define Z64CDO          0x30        // offset to central directory (in the zip64 central directory block)
+
+#define FBOVERF         0x0ffffffff // 4 byte offset fields are set to this when the 8 bit offset should be used
+#define EBPLSIG         0x080001    // eight byte payload signature (for extra_field)
+#define EBPLO           0x04        // offset to eight byte offset (in "eight byte payload" type of extra_field)
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+/**
+ * @fn  static inline UINT16 read_word(UINT8 *buf)
+ *
+ * @brief   Reads a word.
+ *
+ * @param [in,out]  buf If non-null, the buffer.
+ *
+ * @return  The word.
+ */
+
+inline std::uint16_t read_word(std::uint8_t const *buf)
+{
+	return (buf[1] << 8) | buf[0];
+}
+
+/**
+ * @fn  static inline UINT32 read_dword(UINT8 *buf)
+ *
+ * @brief   Reads a double word.
+ *
+ * @param [in,out]  buf If non-null, the buffer.
+ *
+ * @return  The double word.
+ */
+
+inline std::uint32_t read_dword(std::uint8_t const *buf)
+{
+	return (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
+}
+
+/**
+ * @fn  static inline UINT64 read_qword(UINT8 *buf)
+ *
+ * @brief   Reads a quad word, calls read_dword().
+ *
+ * @param [in,out]  buf If non-null, the buffer.
+ *
+ * @return  The quad word.
+ */
+
+inline std::uint64_t read_qword(std::uint8_t const *buf)
+{
+	return (std::uint64_t)read_dword(buf + 4) << 32 | read_dword(buf);
+}
+
 
 
 /***************************************************************************
@@ -144,9 +205,53 @@ public:
 		try { m_cd.resize(m_ecd.cd_size + 1); }
 		catch (...) { return archive_file::error::OUT_OF_MEMORY; }
 
+		// initialize 8 byte offset to the value of existing 4 byte offset
+		std::uint64_t eboff = m_ecd.cd_start_disk_offset;
+		if (m_ecd.cd_start_disk_offset == FBOVERF) // test cd offset for overflow
+		{
+			// allocate buffer and read the zip64 end of central directory locator block
+			std::uint32_t buflen = Z64EOCDLOCSZ;
+			std::unique_ptr<std::uint8_t []> buffer;
+			try { buffer.reset(new std::uint8_t[buflen]); }
+			catch (...) { return archive_file::error::OUT_OF_MEMORY; }
+
+			std::uint32_t read_length;
+			auto const error = m_file->read(&buffer[0], m_ecd.zip64_loc, buflen, read_length);
+			if (error != osd_file::error::NONE || read_length != buflen)
+				return archive_file::error::FILE_ERROR;
+
+			// verify signature for the zip64 end of central directory locator
+			if (read_dword(&buffer[0]) == Z64_PK67)
+			{
+				// obtain offset of the zip64 end of central directory record
+				std::uint64_t z64ecd = read_qword(&buffer[Z64EOCDO]);
+
+				// get zip64 end of central directory block
+				buflen = Z64EOCDSZ;
+				if (z64ecd + buflen > m_length) // sanity check
+					return archive_file::error::FILE_TRUNCATED;
+
+				// re-size buffer and reload from new location
+				try { buffer.reset(new std::uint8_t[buflen]); }
+				catch (...) { return archive_file::error::OUT_OF_MEMORY; }
+
+				auto const error = m_file->read(&buffer[0], z64ecd, buflen, read_length);
+				if (error != osd_file::error::NONE || read_length != buflen)
+					return archive_file::error::FILE_ERROR;
+
+				// verify signature for the zip64 end of central directory record
+				if (read_dword(&buffer[0]) == Z64_PK66)
+					eboff = read_qword(&buffer[Z64CDO]); // obtain 8 byte offset to central directory
+				else
+					return archive_file::error::BAD_SIGNATURE;
+			}
+			else
+				return archive_file::error::BAD_SIGNATURE;
+		}
+
 		// read the central directory
 		std::uint32_t read_length;
-		auto const filerr = m_file->read(&m_cd[0], m_ecd.cd_start_disk_offset, m_ecd.cd_size, read_length);
+		auto const filerr = m_file->read(&m_cd[0], eboff, m_ecd.cd_size, read_length);
 		if ((filerr != osd_file::error::NONE) || (read_length != m_ecd.cd_size))
 			return (filerr == osd_file::error::NONE) ? archive_file::error::FILE_TRUNCATED : archive_file::error::FILE_ERROR;
 
@@ -233,6 +338,7 @@ private:
 		std::uint32_t   external_attributes;    // external file attributes
 		std::uint32_t   local_header_offset;    // relative offset of local header
 		const char *    filename;               // filename
+		const std::uint8_t *  extra_field;      // extra field
 	};
 
 	// contains extracted end of central directory information
@@ -250,6 +356,7 @@ private:
 
 		std::unique_ptr<std::uint8_t []> raw;   // pointer to the raw data
 		std::uint32_t   rawlength;              // length of the raw data
+		std::uint64_t	zip64_loc;              // probable location of zip64 end of central directory locator
 	};
 
 	static constexpr std::size_t        DECOMPRESS_BUFSIZE = 16384;
@@ -305,42 +412,6 @@ public:
 private:
 	zip_file_impl::ptr m_impl;
 };
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/**
- * @fn  static inline UINT16 read_word(UINT8 *buf)
- *
- * @brief   Reads a word.
- *
- * @param [in,out]  buf If non-null, the buffer.
- *
- * @return  The word.
- */
-
-inline std::uint16_t read_word(std::uint8_t const *buf)
-{
-	return (buf[1] << 8) | buf[0];
-}
-
-/**
- * @fn  static inline UINT32 read_dword(UINT8 *buf)
- *
- * @brief   Reads a double word.
- *
- * @param [in,out]  buf If non-null, the buffer.
- *
- * @return  The double word.
- */
-
-inline std::uint32_t read_dword(std::uint8_t const *buf)
-{
-	return (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
-}
 
 
 
@@ -432,6 +503,7 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 		m_header.external_attributes = read_dword(raw + ZIPEXT);
 		m_header.local_header_offset = read_dword(raw + ZIPOFST);
 		m_header.filename            = reinterpret_cast<const char *>(raw + ZIPCFN);
+		m_header.extra_field         = reinterpret_cast<const std::uint8_t *>(raw + ZIPCFN + m_header.filename_length);
 
 		// make sure we have enough data
 		std::uint32_t const rawlength = ZIPCFN + m_header.filename_length + m_header.extra_field_length + m_header.file_comment_length;
@@ -591,6 +663,8 @@ archive_file::error zip_file_impl::read_ecd()
 			m_ecd.cd_start_disk_offset = read_dword(&m_ecd.raw[ZIPEOFST]);
 			m_ecd.comment_length       = read_word (&m_ecd.raw[ZIPECOML]);
 			m_ecd.comment              = reinterpret_cast<const char *>(&m_ecd.raw[ZIPECOM]);
+			// save probable location of zip64 end of central directory locator
+			m_ecd.zip64_loc            = m_length - buflen + offset - 20;
 			return archive_file::error::NONE;
 		}
 
@@ -627,14 +701,22 @@ archive_file::error zip_file_impl::get_compressed_data_offset(std::uint64_t &off
 	if (ziperr != archive_file::error::NONE)
 		return ziperr;
 
+	// initialize 8 byte offset to the value of existing 4 byte offset
+	std::uint64_t eboff = m_header.local_header_offset;
+	// check for presence of extra field and overflowed offset
+	if (m_header.extra_field_length > 0 && m_header.local_header_offset == FBOVERF)
+		if (read_dword(m_header.extra_field) == EBPLSIG) // check extra field for one 8 byte payload
+			eboff = read_qword(m_header.extra_field + EBPLO);
+		// else let it fail in the regular way
+
 	// now go read the fixed-sized part of the local file header
 	std::uint32_t read_length;
-	auto const error = m_file->read(&m_buffer[0], m_header.local_header_offset, ZIPNAME, read_length);
+	auto const error = m_file->read(&m_buffer[0], eboff, ZIPNAME, read_length);
 	if (error != osd_file::error::NONE || read_length != ZIPNAME)
 		return (error == osd_file::error::NONE) ? archive_file::error::FILE_TRUNCATED : archive_file::error::FILE_ERROR;
 
 	/* compute the final offset */
-	offset = m_header.local_header_offset + ZIPNAME;
+	offset = eboff + ZIPNAME;
 	offset += read_word(&m_buffer[ZIPFNLN]);
 	offset += read_word(&m_buffer[ZIPXTRALN]);
 
