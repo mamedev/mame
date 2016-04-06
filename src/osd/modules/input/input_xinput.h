@@ -72,8 +72,8 @@ struct gamepad_state
 {
 	BYTE    rgbButtons[XINPUT_MAX_BUTTONS];
 	BYTE    rgbPov[XINPUT_MAX_POV];
-	BYTE    bLeftTrigger;
-	BYTE    bRightTrigger;
+	LONG    bLeftTrigger;
+	LONG    bRightTrigger;
 	LONG    sThumbLX;
 	LONG    sThumbLY;
 	LONG    sThumbRX;
