@@ -112,6 +112,52 @@ int lua_engine::docall(int narg, int nres)
 	return status;
 }
 
+namespace luabridge
+{
+template <>
+struct Stack <osd_file::error>
+{
+	static void push(lua_State *L, osd_file::error error)
+	{
+		std::string strerror;
+		switch(error)
+		{
+			case osd_file::error::NONE:
+				lua_pushboolean(L, false);
+				return;
+			case osd_file::error::FAILURE:
+				strerror = "failure";
+				break;
+			case osd_file::error::OUT_OF_MEMORY:
+				strerror = "out_of_memory";
+				break;
+			case osd_file::error::NOT_FOUND:
+				strerror = "not_found";
+				break;
+			case osd_file::error::ACCESS_DENIED:
+				strerror = "access_denied";
+				break;
+			case osd_file::error::ALREADY_OPEN:
+				strerror = "already_open";
+				break;
+			case osd_file::error::TOO_MANY_FILES:
+				strerror = "too_many_files";
+				break;
+			case osd_file::error::INVALID_DATA:
+				strerror = "invalid_data";
+				break;
+			case osd_file::error::INVALID_ACCESS:
+				strerror = "invalid_access";
+				break;
+			default:
+				strerror = "unknown_error";
+				break;
+		}
+		lua_pushstring(L, strerror.c_str());
+	}
+};
+}
+
 /* mark in error messages for incomplete statements */
 #define EOFMARK     "<eof>"
 #define marklen     (sizeof(EOFMARK)/sizeof(char) - 1)
@@ -451,6 +497,25 @@ luabridge::LuaRef lua_engine::l_machine_get_devices(const running_machine *r)
 }
 
 //-------------------------------------------------
+//  machine_get_images - return table of available image devices userdata
+//  -> manager:machine().images["flop1"]
+//-------------------------------------------------
+
+luabridge::LuaRef lua_engine::l_machine_get_images(const running_machine *r)
+{
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef image_table = luabridge::LuaRef::newTable(L);
+
+	image_interface_iterator iter(r->root_device());
+	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next()) {
+		image_table[image->brief_instance_name()] = image;
+		image_table[image->instance_name()] = image;
+	}
+
+	return image_table;
+}
+
+//-------------------------------------------------
 //  memory_banks - return memory_banks
 //  -> manager:machine():memory().banks["maincpu"]
 //-------------------------------------------------
@@ -606,6 +671,9 @@ luabridge::LuaRef lua_engine::l_dev_get_memspaces(const device_t *d)
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef sp_table = luabridge::LuaRef::newTable(L);
 
+	if(!&dev->memory())
+		return sp_table;
+
 	for (address_spacenum sp = AS_0; sp < ADDRESS_SPACES; ++sp) {
 		if (dev->memory().has_space(sp)) {
 			sp_table[dev->memory().space(sp).name()] = &(dev->memory().space(sp));
@@ -625,6 +693,10 @@ luabridge::LuaRef lua_engine::l_dev_get_states(const device_t *d)
 	device_t *dev = const_cast<device_t *>(d);
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef st_table = luabridge::LuaRef::newTable(L);
+
+	if(!&dev->state())
+		return st_table;
+
 	for (device_state_entry &s : dev->state().state_entries())
 	{
 		// XXX: refrain from exporting non-visible entries?
@@ -1288,6 +1360,18 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	return 0;
 }
 
+int lua_engine::lua_emu_file::l_emu_file_read(lua_State *L)
+{
+	emu_file *file = luabridge::Stack<emu_file *>::get(L, 1);
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "length (integer) expected");
+	int ret, len = lua_tonumber(L, 2);
+	luaL_Buffer buff;
+	char *ptr = luaL_buffinitsize(L, &buff, len);
+	ret = file->read(ptr, len);
+	luaL_pushresultsize(&buff, ret);
+	return 1;
+}
+
 void *lua_engine::checkparam(lua_State *L, int idx, const char *tname)
 {
 	const char *name;
@@ -1779,6 +1863,7 @@ void lua_engine::initialize()
 				.addFunction ("options", &running_machine::options)
 				.addProperty <luabridge::LuaRef, void> ("devices", &lua_engine::l_machine_get_devices)
 				.addProperty <luabridge::LuaRef, void> ("screens", &lua_engine::l_machine_get_screens)
+				.addProperty <luabridge::LuaRef, void> ("images", &lua_engine::l_machine_get_images)
 			.endClass ()
 			.beginClass <game_driver> ("game_driver")
 				.addData ("source_file", &game_driver::source_file)
@@ -1794,6 +1879,7 @@ void lua_engine::initialize()
 				.addFunction ("name", &device_t::name)
 				.addFunction ("shortname", &device_t::shortname)
 				.addFunction ("tag", &device_t::tag)
+				.addFunction ("owner", &device_t::owner)
 				.addProperty <luabridge::LuaRef, void> ("spaces", &lua_engine::l_dev_get_memspaces)
 				.addProperty <luabridge::LuaRef, void> ("state", &lua_engine::l_dev_get_states)
 			.endClass()
@@ -2032,6 +2118,33 @@ void lua_engine::initialize()
 			.deriveClass <memory_region, lua_memory_region> ("region")
 				.addProperty <UINT32> ("size", &memory_region::bytes)
 			.endClass()
+			.beginClass <device_image_interface> ("images")
+				.addFunction ("exists", &device_image_interface::exists)
+				.addFunction ("filename", &device_image_interface::filename)
+				.addFunction ("longname", &device_image_interface::longname)
+				.addFunction ("manufacturer", &device_image_interface::manufacturer)
+				.addFunction ("year", &device_image_interface::year)
+				.addFunction ("software_list_name", &device_image_interface::software_list_name)
+				.addFunction ("image_type_name", &device_image_interface::image_type_name)
+				.addFunction ("load", &device_image_interface::load)
+				.addFunction ("unload", &device_image_interface::unload)
+				.addFunction ("crc", &device_image_interface::crc)
+				.addProperty <const device_t &> ("device", static_cast<const device_t &(device_image_interface::*)() const>(&device_image_interface::device))
+				.addProperty <bool> ("is_readable", &device_image_interface::is_readable)
+				.addProperty <bool> ("is_writeable", &device_image_interface::is_writeable)
+				.addProperty <bool> ("is_creatable", &device_image_interface::is_creatable)
+				.addProperty <bool> ("is_reset_on_load", &device_image_interface::is_reset_on_load)
+			.endClass()
+			.beginClass <lua_emu_file> ("lua_file")
+				.addCFunction ("read", &lua_emu_file::l_emu_file_read)
+			.endClass()
+			.deriveClass <emu_file, lua_emu_file> ("file")
+				.addConstructor <void (*) (const char *, UINT32)> ()
+				.addFunction ("open", static_cast<osd_file::error (emu_file::*)(const char *)>(&emu_file::open))
+				.addFunction ("seek", &emu_file::seek)
+				.addFunction ("size", &emu_file::size)
+			.endClass()
+
 		.endNamespace();
 
 	luabridge::push (m_lua_state, machine_manager::instance());

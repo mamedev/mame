@@ -140,6 +140,7 @@ private:
 
 	// "emu.machine" namespace
 	static luabridge::LuaRef l_machine_get_devices(const running_machine *r);
+	static luabridge::LuaRef l_machine_get_images(const running_machine *r);
 	static luabridge::LuaRef l_ioport_get_ports(const ioport_manager *i);
 	static luabridge::LuaRef l_render_get_targets(const render_manager *r);
 	static luabridge::LuaRef l_ioports_port_get_fields(const ioport_port *i);
@@ -195,6 +196,10 @@ private:
 	struct lua_memory_region {
 		template<typename T> int l_region_read(lua_State *L);
 		template<typename T> int l_region_write(lua_State *L);
+	};
+
+	struct lua_emu_file {
+		int l_emu_file_read(lua_State *L);
 	};
 
 	void resume(void *L, INT32 param);
