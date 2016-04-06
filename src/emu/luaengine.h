@@ -61,6 +61,7 @@ public:
 	void set_machine(running_machine *machine) { m_machine = machine; update_machine(); }
 	std::vector<std::string> &get_menu() { return m_menu; }
 	void attach_notifiers();
+	void on_frame_done();
 
 private:
 	struct hook {
@@ -133,6 +134,7 @@ private:
 	static int l_emu_register_pause(lua_State *L);
 	static int l_emu_register_resume(lua_State *L);
 	static int l_emu_register_frame(lua_State *L);
+	static int l_emu_register_frame_done(lua_State *L);
 	static int l_emu_register_menu(lua_State *L);
 	static int register_function(lua_State *L, const char *id);
 
@@ -150,9 +152,13 @@ private:
 		int l_popmessage(lua_State *L);
 		int l_logerror(lua_State *L);
 	};
+	static UINT8 read_direct_byte(address_space &space, offs_t addr);
+	static void write_direct_byte(address_space &space, offs_t addr, UINT8 byte);
 	struct lua_addr_space {
 		template<typename T> int l_mem_read(lua_State *L);
 		template<typename T> int l_mem_write(lua_State *L);
+		template<typename T> int l_direct_mem_read(lua_State *L);
+		template<typename T> int l_direct_mem_write(lua_State *L);
 	};
 	static luabridge::LuaRef l_machine_get_screens(const running_machine *r);
 	struct lua_screen {
@@ -180,6 +186,15 @@ private:
 	template<typename T> static luabridge::LuaRef l_options_get_entries(const T *o);
 	struct lua_options_entry {
 		int l_entry_value(lua_State *L);
+	};
+
+	static luabridge::LuaRef l_memory_get_banks(const memory_manager *m);
+	static luabridge::LuaRef l_memory_get_regions(const memory_manager *m);
+	static UINT8 read_region_byte(memory_region &region, offs_t addr);
+	static void write_region_byte(memory_region &region, offs_t addr, UINT8 byte);
+	struct lua_memory_region {
+		template<typename T> int l_region_read(lua_State *L);
+		template<typename T> int l_region_write(lua_State *L);
 	};
 
 	void resume(void *L, INT32 param);

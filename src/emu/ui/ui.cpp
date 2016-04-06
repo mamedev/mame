@@ -13,6 +13,7 @@
 #include "video/vector.h"
 #include "machine/laserdsc.h"
 #include "render.h"
+#include "luaengine.h"
 #include "cheat.h"
 #include "rendfont.h"
 #include "uiinput.h"
@@ -481,7 +482,10 @@ void ui_manager::update_and_render(render_container *container)
 
 	// render any cheat stuff at the bottom
 	if (machine().phase() >= MACHINE_PHASE_RESET)
+	{
+		machine().manager().lua()->on_frame_done();
 		machine().cheat().render_text(*container);
+	}
 
 	// call the current UI handler
 	assert(m_handler_callback != nullptr);
