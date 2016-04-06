@@ -749,6 +749,7 @@ end
 		if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
 			buildoptions {
 				"-Wno-switch",
+				"-Wno-strict-overflow",
 			}
 		end
 	end
