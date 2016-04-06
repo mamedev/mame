@@ -66,22 +66,13 @@ function cheat.startplugin()
 	local function load_cheats()
 		local filename = emu.romname()
 		local json = require("json")
-		local file = emu.file(manager:machine():options().entries.cheatpath:value(), 1)
-		local function readAll(file)
-			local f = io.open(file, "rb")
-			if not f then
-				return nil
-			end
-			local content = f:read("*all")
-			f:close()
-			return content
-		end
+		local path = manager:machine():options().entries.cheatpath:value()
+		local file = emu.file(path .. ";" .. path .. "/cheat", 1)
 
 		if emu.softname() ~= "" then
 			for name, image in manager:machine().images do
 				if image:exists() and image:software_entry() then
-						filename = filename .. "/" .. image:software_entry()
-					end
+					filename = filename .. "/" .. image:software_entry()
 				end
 			end
 		end
@@ -116,7 +107,7 @@ function cheat.startplugin()
 
 	local function draw_line(screen, x1, y1, x2, y2, color)
 		if not screen then
-			print("draw_text: invalid screen")
+			print("draw_line: invalid screen")
 			return
 		end
 		output[#output + 1] = { type = "line", scr = screen, x1 = x1, x2 = x2, y1 = y1, y2 = y2, color = color }
@@ -124,7 +115,7 @@ function cheat.startplugin()
 
 	local function draw_box(screen, x1, y1, x2, y2, bgcolor, linecolor)
 		if not screen then
-			print("draw_text: invalid screen")
+			print("draw_box: invalid screen")
 			return
 		end
 		output[#output + 1] = { type = "box", scr = screen, x1 = x1, x2 = x2, y1 = y1, y2 = y2, bgcolor = bgcolor, linecolor = linecolor }
@@ -414,15 +405,15 @@ function cheat.startplugin()
 	emu.register_frame_done(function()
 		line = 0
 		for num, draw in pairs(output) do
-			if draw.type = "text" then
+			if draw.type == "text" then
 				if not draw.color then
 					draw.scr:draw_text(draw.x, draw.y, draw.str)
 				else
 					draw.scr:draw_text(draw.x, draw.y, draw.str, draw.color)
 				end
-			elseif draw.type = "line" then
+			elseif draw.type == "line" then
 				draw.scr:draw_line(draw.x1, draw.x2, draw.y1, draw.y2, draw.color)
-			elseif draw.type = "box" then
+			elseif draw.type == "box" then
 				draw.scr:draw_box(draw.x1, draw.x2, draw.y1, draw.y2, draw.bgcolor, draw.linecolor)
 			end
 		end
