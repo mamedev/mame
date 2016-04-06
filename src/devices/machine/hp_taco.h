@@ -88,20 +88,32 @@ private:
         tape_pos_t m_tach_reg_ref;
         bool m_tach_reg_frozen;
         UINT16 m_checksum_reg;
+        bool m_clear_checksum_reg;
         UINT16 m_timing_reg;
 
         // State
         bool m_irq;
         bool m_flg;
         bool m_sts;
-        UINT8 m_cmd_state;
+
+        // Command FSM state
+        typedef enum {
+                CMD_IDLE,
+                CMD_INVERTING,
+                CMD_PH0,
+                CMD_PH1,
+                CMD_PH2,
+                CMD_PH3,
+                CMD_END,
+                CMD_STOPPING
+        } cmd_state_t;
+        cmd_state_t m_cmd_state;
 
         // Tape position & motion
         tape_pos_t m_tape_pos;
         attotime m_start_time;  // Tape moving if != never
         bool m_tape_fwd;
         bool m_tape_fast;
-        bool m_tape_stopping;
 
         // Timers
         emu_timer *m_tape_timer;
@@ -130,6 +142,7 @@ private:
         void clear_state(void);
         void irq_w(bool state);
         void set_error(bool state);
+        bool is_braking(void) const;
         unsigned speed_to_tick_freq(void) const;
         bool pos_offset(tape_pos_t& pos , tape_pos_t offset) const;
         tape_pos_t current_tape_pos(void) const;
@@ -137,10 +150,10 @@ private:
         void update_tach_reg(void);
         void freeze_tach_reg(bool freeze);
         static void ensure_a_lt_b(tape_pos_t& a , tape_pos_t& b);
-        static bool any_hole(tape_pos_t tape_pos_a , tape_pos_t tape_pos_b);
         tape_pos_t next_hole(void) const;
         attotime time_to_distance(tape_pos_t distance) const;
         attotime time_to_target(tape_pos_t target) const;
+        attotime time_to_stopping_pos(void) const;
         bool start_tape_cmd(UINT16 cmd_reg , UINT16 must_be_1 , UINT16 must_be_0);
         void stop_tape(void);
         tape_track_t& current_track(void);
@@ -155,6 +168,7 @@ private:
         adv_res_t adv_it(tape_track_t::iterator& it);
         attotime fetch_next_wr_word(void);
         attotime time_to_rd_next_word(tape_pos_t& word_rd_pos);
+        tape_pos_t min_gap_size(void) const;
         bool next_n_gap(tape_pos_t& pos , tape_track_t::iterator it , unsigned n_gaps , tape_pos_t min_gap);
         bool next_n_gap(tape_pos_t& pos , unsigned n_gaps , tape_pos_t min_gap);
         void clear_tape(void);
@@ -165,6 +179,8 @@ private:
         void set_tape_present(bool present);
         attotime time_to_next_hole(void) const;
         attotime time_to_tach_pulses(void) const;
+        void terminate_cmd_now(void);
+        void cmd_fsm(void);
         void start_cmd_exec(UINT16 new_cmd_reg);
 };
 
