@@ -1,6 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:MetalliC
 
+
+// Communication board used by Sega in Model3, NAOMI and Hikaru, uses mostly same design
+// interface to main board LATTICE ICs: Model3 - 315-5958, Hikaru - 315-5958A, NAOMI - 315-6194A
+
 /*
 
 MODEL3 COMMUNICATION BOARD
@@ -71,15 +75,22 @@ SEGA 1998
 
 #define M68K_TAG     "m3commcpu"
 
+//////// Model 3 (main CPU @ C00xxxxx) and Hikaru (MMctrl bank 0E) interface
+DEVICE_ADDRESS_MAP_START(m3_map, 32, m3comm_device)
+	AM_RANGE(0x0000000, 0x000ffff) AM_READWRITE8(m3_comm_ram_r, m3_comm_ram_w, 0xffffffff)
+	AM_RANGE(0x0010000, 0x00101ff) AM_READWRITE16(m3_ioregs_r, m3_ioregs_w, 0xffff0000)
+	AM_RANGE(0x0020000, 0x003ffff) AM_READWRITE16(m3_m68k_ram_r, m3_m68k_ram_w, 0xffff0000)
+ADDRESS_MAP_END
+
+
 /*************************************
  *  M3COMM Memory Map
  *************************************/
 static ADDRESS_MAP_START( m3comm_mem, AS_PROGRAM, 16, m3comm_device )
 	AM_RANGE(0x0000000, 0x000ffff) AM_RAM AM_SHARE("m68k_ram")
-	AM_RANGE(0x0080000, 0x008ffff) AM_RAMBANK("comm_ram")
 	AM_RANGE(0x0040000, 0x0040001) AM_READWRITE(commbank_r, commbank_w)
-	AM_RANGE(0x00C0088, 0x00C0089) AM_READWRITE(status0_r, status0_w)
-	AM_RANGE(0x00C008A, 0x00C008B) AM_READWRITE(status1_r, status1_w)
+	AM_RANGE(0x0080000, 0x008ffff) AM_RAMBANK("comm_ram")
+	AM_RANGE(0x00C0000, 0x00C00ff) AM_READWRITE(ioregs_r, ioregs_w)
 ADDRESS_MAP_END
 
 
@@ -153,8 +164,8 @@ void m3comm_device::device_start()
 
 void m3comm_device::device_reset()
 {
-	m_control = 0xC000;
-	m_offset = 0;
+	naomi_control = 0xC000;
+	naomi_offset = 0;
 	m_status0 = 0;
 	m_status1 = 0;
 	m_commbank = 0;
@@ -166,6 +177,14 @@ void m3comm_device::device_reset_after_children()
 	m_commcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
+/////////////
+
+UINT16 swapb16(UINT16 data)
+{
+	return (data >> 8) | (data >> 8);
+}
+
+///////////// Internal MMIO
 
 READ16_MEMBER(m3comm_device::commbank_r)
 {
@@ -176,43 +195,115 @@ WRITE16_MEMBER(m3comm_device::commbank_w)
 	m_commbank = data;
 	membank("comm_ram")->set_base(m_ram->pointer() + (m_commbank ? 0x10000 : 0));
 }
-READ16_MEMBER(m3comm_device::status0_r)
+
+READ16_MEMBER(m3comm_device::ioregs_r)
 {
-	return m_status0;
+	switch (offset) {
+	case 0x88 / 2:
+		return m_status0;
+	case 0x8A / 2:
+		return m_status1;
+	default:
+		logerror("M3COMM IOread from %02x mask %04x\n", offset * 2, mem_mask);
+		return 0;
+	}
 }
-WRITE16_MEMBER(m3comm_device::status0_w)
+WRITE16_MEMBER(m3comm_device::ioregs_w)
 {
-	m_status0 = data;
+	switch (offset) {
+	case 0x16 / 2:
+		if ((data & 0xFF) == 0x8C) {
+			logerror("M3COMM Receive offs %04x size %04x\n", recv_offset, recv_size);
+		}
+		m_commcpu->set_input_line(M68K_IRQ_6, ((data & 0xFF) == 0x8C) ? ASSERT_LINE : CLEAR_LINE);	// debug hack
+		break;
+	case 0x1C / 2:
+		if ((data & 0xFF) == 0x8C) {
+			logerror("M3COMM Send offs %04x size %04x\n", send_offset, send_size);
+		}
+		m_commcpu->set_input_line(M68K_IRQ_4, ((data & 0xFF) == 0x8C) ? ASSERT_LINE : CLEAR_LINE);	// debug hack
+		break;
+	case 0x40 / 2:
+		recv_offset = (recv_offset >> 8) | (data << 8);
+		break;
+	case 0x42 / 2:
+		recv_size = (recv_size >> 8) | (data << 8);
+		break;
+	case 0x44 / 2:
+		send_offset = (send_offset >> 8) | (data << 8);
+		break;
+	case 0x46 / 2:
+		send_size = (send_size >> 8) | (data << 8);
+		break;
+	case 0x88 / 2:
+		m_status0 = data;
+		break;
+	case 0x8A / 2:
+		m_status1 = data;
+		break;
+	case 0xC0 / 2:
+		m_commcpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+		break;
+	default:
+		logerror("M3COMM IOwrite to %02x %04x mask %04x\n", offset * 2, data, mem_mask);
+		return;
+	}
 }
-READ16_MEMBER(m3comm_device::status1_r)
+
+////////////// Model3 interface
+
+READ16_MEMBER(m3comm_device::m3_m68k_ram_r)
 {
-	return m_status1;
+	UINT16 value = m68k_ram[offset];
+	return swapb16(value);
 }
-WRITE16_MEMBER(m3comm_device::status1_w)
+WRITE16_MEMBER(m3comm_device::m3_m68k_ram_w)
 {
-	m_status1 = data;
+	m68k_ram[offset] = swapb16(data);
 }
+READ8_MEMBER(m3comm_device::m3_comm_ram_r)
+{
+	UINT8 *commram = (UINT8*)membank("comm_ram")->base();
+	return commram[offset ^ 3];
+}
+WRITE8_MEMBER(m3comm_device::m3_comm_ram_w)
+{
+	UINT8 *commram = (UINT8*)membank("comm_ram")->base();
+	commram[offset ^ 3] = data;
+}
+READ16_MEMBER(m3comm_device::m3_ioregs_r)
+{
+	UINT16 value = ioregs_r(space, offset, swapb16(mem_mask));
+	return swapb16(value);
+}
+WRITE16_MEMBER(m3comm_device::m3_ioregs_w)
+{
+	UINT16 value = swapb16(data);
+	ioregs_w(space, offset, value, swapb16(mem_mask));
+}
+
+////////////// NAOMI inerface
 
 READ16_MEMBER(m3comm_device::naomi_r)
 {
 	switch (offset)
 	{
 	case 0:			// 5F7018
-		return m_control;
+		return naomi_control;
 	case 1:			// 5F701C
-		return m_offset;
+		return naomi_offset;
 	case 2:			// 5F7020
 	{
-		logerror("M3COMM read @ %08x\n", (m_control << 16) | m_offset);
+		logerror("M3COMM read @ %08x\n", (naomi_control << 16) | naomi_offset);
 		UINT16 value;
-		if (m_control & 1)
-			value = m68k_ram[m_offset / 2];
+		if (naomi_control & 1)
+			value = m68k_ram[naomi_offset / 2];
 		else {
 			UINT16 *commram = (UINT16*)membank("comm_ram")->base();
 
-			value = commram[m_offset / 2];
+			value = commram[naomi_offset / 2];
 		}
-		m_offset+= 2;
+		naomi_offset+= 2;
 		return value;
 	}
 	case 3:			// 5F7024
@@ -223,28 +314,27 @@ READ16_MEMBER(m3comm_device::naomi_r)
 		return 0;
 	}
 }
-
 WRITE16_MEMBER(m3comm_device::naomi_w)
 {
 	switch (offset)
 	{
 	case 0:			// 5F7018
 		logerror("M3COMM control write %04x\n", data);
-		m_control = data;
-		m_commcpu->set_input_line(INPUT_LINE_RESET, (m_control & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		naomi_control = data;
+		m_commcpu->set_input_line(INPUT_LINE_RESET, (naomi_control & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 		break;
 	case 1:			// 5F701C
-		m_offset = data;
+		naomi_offset = data;
 		break;
 	case 2:			// 5F7020
-		logerror("M3COMM write @ %08x %04x\n", (m_control << 16) | m_offset, data);
-		if (m_control & 1)
-			m68k_ram[m_offset / 2] = data;
+		logerror("M3COMM write @ %08x %04x\n", (naomi_control << 16) | naomi_offset, data);
+		if (naomi_control & 1)
+			m68k_ram[naomi_offset / 2] = data;
 		else {
 			UINT16 *commram = (UINT16*)membank("comm_ram")->base();
-			commram[m_offset / 2] = data;
+			commram[naomi_offset / 2] = data;
 		}
-		m_offset += 2;
+		naomi_offset += 2;
 		break;
 	case 3:			// 5F7024
 		m_status0 = data;

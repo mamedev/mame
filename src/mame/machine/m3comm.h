@@ -27,14 +27,23 @@ public:
 	required_shared_ptr<UINT16> m68k_ram;
 	required_device<m68000_device> m_commcpu;
 
-	DECLARE_READ16_MEMBER(naomi_r);
-	DECLARE_WRITE16_MEMBER(naomi_w);
-	DECLARE_READ16_MEMBER(status0_r);
-	DECLARE_WRITE16_MEMBER(status0_w);
-	DECLARE_READ16_MEMBER(status1_r);
-	DECLARE_WRITE16_MEMBER(status1_w);
+	DECLARE_ADDRESS_MAP(m3_map, 32);
+
 	DECLARE_READ16_MEMBER(commbank_r);
 	DECLARE_WRITE16_MEMBER(commbank_w);
+
+	DECLARE_READ16_MEMBER(ioregs_r);
+	DECLARE_WRITE16_MEMBER(ioregs_w);
+
+	DECLARE_READ16_MEMBER(m3_m68k_ram_r);
+	DECLARE_WRITE16_MEMBER(m3_m68k_ram_w);
+	DECLARE_READ8_MEMBER(m3_comm_ram_r);
+	DECLARE_WRITE8_MEMBER(m3_comm_ram_w);
+	DECLARE_READ16_MEMBER(m3_ioregs_r);
+	DECLARE_WRITE16_MEMBER(m3_ioregs_w);
+
+	DECLARE_READ16_MEMBER(naomi_r);
+	DECLARE_WRITE16_MEMBER(naomi_w);
 
 protected:
 	required_device<ram_device> m_ram;
@@ -45,11 +54,16 @@ protected:
 	virtual void device_reset_after_children() override;
 
 private:
-	UINT16 m_control;
-	UINT16 m_offset;
+	UINT16 naomi_control;
+	UINT16 naomi_offset;
 	UINT16 m_status0;
 	UINT16 m_status1;
 	UINT16 m_commbank;
+
+	UINT16 recv_offset;
+	UINT16 recv_size;
+	UINT16 send_offset;
+	UINT16 send_size;
 
 
 	emu_file m_line_rx;    // rx line - can be either differential, simple serial or toslink
