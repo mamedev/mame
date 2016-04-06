@@ -155,8 +155,8 @@ void xinput_joystick_device::poll()
 	gamepad.sThumbRY = normalize_absolute_axis(xinput_state.xstate.Gamepad.sThumbRY * -1, XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
 
 	// Now the triggers
-	gamepad.bLeftTrigger = normalize_absolute_axis(xinput_state.xstate.Gamepad.bLeftTrigger, 0, 0xFF);
-	gamepad.bRightTrigger = normalize_absolute_axis(xinput_state.xstate.Gamepad.bRightTrigger, 0, 0xFF);
+	gamepad.bLeftTrigger = normalize_absolute_axis(xinput_state.xstate.Gamepad.bLeftTrigger, -255, 255);
+	gamepad.bRightTrigger = normalize_absolute_axis(xinput_state.xstate.Gamepad.bRightTrigger, -255, 255);
 }
 
 void xinput_joystick_device::reset()
@@ -204,13 +204,13 @@ void xinput_joystick_device::configure()
 
 	device()->add_item(
 		"Left Trigger",
-		ITEM_ID_OTHER_AXIS_ABSOLUTE,
+		ITEM_ID_ZAXIS,
 		generic_axis_get_state,
 		&gamepad.bLeftTrigger);
 
 	device()->add_item(
 		"Right Trigger",
-		ITEM_ID_OTHER_AXIS_ABSOLUTE,
+		ITEM_ID_RZAXIS,
 		generic_axis_get_state,
 		&gamepad.bRightTrigger);
 
