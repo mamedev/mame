@@ -81,7 +81,7 @@ namespace {
 
 #define FBOVERF         0x0ffffffff // 4 byte offset fields are set to this when the 8 bit offset should be used
 #define EBPLSIG         0x080001    // eight byte payload signature (for extra_field)
-#define EBPLO           0x04        // offset to eight byte offset (in "eight byte payload" type of extra_field)#define Z64_PK12        0x02014B50  // central directory record signature ("PK12")
+#define EBPLO           0x04        // offset to eight byte offset (in "eight byte payload" type of extra_field)
 #define Z64_PK12        0x02014B50  // central directory record signature ("PK12")
 #define Z64_PK66        0x06064B50  // zip64 end of central directory record signature ("PK66")
 #define Z64_PK67        0x07064B50  // zip64 end of central directory locator signature ("PK67")
