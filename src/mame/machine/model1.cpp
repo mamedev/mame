@@ -501,24 +501,74 @@ TGP_FUNCTION( model1_state::track_read_quad )
 	next_fn();
 }
 
-TGP_FUNCTION( model1_state::f24_swa )
+TGP_FUNCTION( model1_state::intercept )
 {
-	float a = fifoin_pop_f();
-	float b = fifoin_pop_f();
-	float c = fifoin_pop_f();
-	float d = fifoin_pop_f();
-	float e = fifoin_pop_f();
-	float f = fifoin_pop_f();
-	UINT32 g = fifoin_pop();
-	(void)a;
-	(void)b;
-	(void)c;
-	(void)d;
-	(void)e;
-	(void)f;
-	(void)g;
-	logerror("TGP f24_swa %f, %f, %f, %f, %f, %f, %x (%x)\n", a, b, c, d, e, f, g, m_pushpc);
-	fifoout_push(1);
+	const UINT32 *tgp_data = (const UINT32 *)memregion("user2")->base();
+
+	float x1 = fifoin_pop_f();
+	float y1 = fifoin_pop_f();
+	float z1 = fifoin_pop_f();
+	float x2 = fifoin_pop_f();
+	float y2 = fifoin_pop_f();
+	float z2 = fifoin_pop_f();
+	UINT32 idx = fifoin_pop();
+
+	logerror("TGP intercept %f, %f, %f, %f, %f, %f, %x (%x)\n", x1, y1, z1, x2, y2, z2, idx, m_pushpc);
+
+	float dx = x2-x1;
+	float dy = y2-y1;
+	float dz = z2-z1;
+
+	idx = tgp_data[0x10] + 2*idx;
+	UINT32 count = tgp_data[idx];
+	UINT32 adr = tgp_data[idx+1];
+	UINT32 ret = 1;
+
+	for(unsigned int j=0; j<count; j++) {
+		float point[4][3];
+		for(int pt=0; pt<4; pt++)
+			for(int dim=0; dim<3; dim++)
+				point[pt][dim] = u2f(tgp_data[adr++]);
+		float plane[4];
+		for(int dim=0; dim<4; dim++)
+			plane[dim] = u2f(tgp_data[adr++]);
+		adr++; // 0, 1 or 2...
+
+		float den = dx * plane[0] + dy * plane[1] + dz * plane[2];
+		if(den > -0.0001 && den < 0.0001)
+			continue;
+		float t = - (x1 * plane[0] + y1 * plane[1] + z1 * plane[2] + plane[3]) / den;
+		if(t < 0 || t > 1)
+			continue;
+
+		float ix = x1 + dx*t;
+		float iy = y1 + dy*t;
+		float iz = z1 + dz*t;
+
+		int cp = 0;
+		for(int pt=0; pt<4; pt++) {
+			int pt1 = (pt+1) & 3;
+			float p01x = point[pt1][0] - point[pt][0];
+			float p01y = point[pt1][1] - point[pt][1];
+			float p01z = point[pt1][2] - point[pt][2];
+			float p0ix = ix - point[pt][0];
+			float p0iy = iy - point[pt][1];
+			float p0iz = iz - point[pt][2];
+			float det = plane[0] * (p01y * p0iz - p01z * p0iy) + plane[1] * (p01z * p0ix - p01x * p0iz) + plane[2] * (p01x * p0iy - p01y * p0ix);
+			cp += det >= 0;
+		}
+		if(cp == 0 || cp == 4) {
+			m_tgp_int_px = ix;
+			m_tgp_int_py = iy;
+			m_tgp_int_pz = iz;
+			ret = 0;
+			adr -= 17;
+			break;
+		}
+	}
+
+	m_tgp_int_adr = adr;
+	fifoout_push(ret);
 	next_fn();
 }
 
@@ -1067,12 +1117,13 @@ TGP_FUNCTION( model1_state::f56 )
 	next_fn();
 }
 
-TGP_FUNCTION( model1_state::f57 )
+TGP_FUNCTION( model1_state::int_normal )
 {
-	logerror("TGP f57 (%x)\n", m_pushpc);
-	fifoout_push_f(0);
-	fifoout_push_f(0);
-	fifoout_push_f(0);
+	const UINT32 *tgp_data = (const UINT32 *)memregion("user2")->base();
+	logerror("TGP int_normal (%x)\n", m_pushpc);
+	fifoout_push_f(u2f(tgp_data[m_tgp_int_adr+12]));
+	fifoout_push_f(u2f(tgp_data[m_tgp_int_adr+13]));
+	fifoout_push_f(u2f(tgp_data[m_tgp_int_adr+14]));
 	next_fn();
 }
 
@@ -1092,12 +1143,12 @@ TGP_FUNCTION( model1_state::acc_geti )
 	next_fn();
 }
 
-TGP_FUNCTION( model1_state::f60 )
+TGP_FUNCTION( model1_state::int_point )
 {
-	logerror("TGP f60 (%x)\n", m_pushpc);
-	fifoout_push_f(0);
-	fifoout_push_f(0);
-	fifoout_push_f(0);
+	logerror("TGP int_point (%x)\n", m_pushpc);
+	fifoout_push_f(m_tgp_int_px);
+	fifoout_push_f(m_tgp_int_py);
+	fifoout_push_f(m_tgp_int_pz);
 	next_fn();
 }
 
@@ -1736,7 +1787,7 @@ const struct model1_state::function model1_state::ftab_swa[] = {
 	{ &model1_state::matrix_roty,     1 },
 	{ &model1_state::matrix_rotz,     1 },
 	{ nullptr,                        0 },
-	{ &model1_state::f24_swa,         7 },
+	{ &model1_state::intercept,       7 },
 	{ nullptr,                        0 },
 	{ &model1_state::transform_point, 3 },
 	{ &model1_state::fsin_m1,         1 },
@@ -1771,10 +1822,10 @@ const struct model1_state::function model1_state::ftab_swa[] = {
 	{ nullptr,                        0 },
 	{ nullptr,                        0 },
 	{ &model1_state::f56,             7 },
-	{ &model1_state::f57,             0 },
+	{ &model1_state::int_normal,      0 },
 	{ &model1_state::matrix_readt,    0 },
 	{ &model1_state::acc_geti,        0 },
-	{ &model1_state::f60,             0 },
+	{ &model1_state::int_point,       0 },
 	{ nullptr,                        0 },
 	{ nullptr,                        0 },
 	{ nullptr,                        0 },
