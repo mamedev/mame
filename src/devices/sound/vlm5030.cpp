@@ -164,6 +164,7 @@ vlm5030_device::vlm5030_device(const machine_config &mconfig, const char *tag, d
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),
 		m_coeff(nullptr),
+		m_region(*this, DEVICE_SELF),
 		m_rom(nullptr),
 		m_address_mask(0),
 		m_address(0),
@@ -215,8 +216,8 @@ void vlm5030_device::device_start()
 	device_reset();
 	m_phase = PH_IDLE;
 
-	m_rom = region()->base();
-	m_address_mask = (region()->bytes() - 1) & 0xffff;
+	m_rom = m_region->base();
+	m_address_mask = (m_region->bytes() - 1) & 0xffff;
 
 	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 440);
 
@@ -388,6 +389,7 @@ void vlm5030_device::restore_state()
 }
 
 /* set speech rom address */
+// TO DO: rewrite using device_memory_interface to get rid of this ridiculous hack
 void vlm5030_device::set_rom(void *speech_rom)
 {
 	m_rom = (UINT8 *)speech_rom;

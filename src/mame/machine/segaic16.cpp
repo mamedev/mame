@@ -200,8 +200,8 @@ WRITE16_MEMBER( sega_16bit_common_base::philko_paletteram_w )
 
 sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, "Sega 315-5195 Memory Mapper", tag, owner, clock, "sega_315_5195", __FILE__),
-		m_cputag(nullptr),
-		m_cpu(nullptr),
+		m_cpu(*this),
+		m_cpuregion(*this),
 		m_space(nullptr),
 		m_decrypted_space(nullptr),
 		m_curregion(0)
@@ -217,7 +217,8 @@ sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &m
 void sega_315_5195_mapper_device::static_set_cputag(device_t &device, const char *cpu)
 {
 	sega_315_5195_mapper_device &mapper = downcast<sega_315_5195_mapper_device &>(device);
-	mapper.m_cputag = cpu;
+	mapper.m_cpu.set_tag(cpu);
+	mapper.m_cpuregion.set_tag(cpu);
 }
 
 
@@ -392,7 +393,7 @@ void sega_315_5195_mapper_device::map_as_rom(UINT32 offset, UINT32 length, offs_
 	}
 
 	// don't map if the start is past the end of the ROM region
-	offs_t romsize = m_cpu->region()->bytes();
+	offs_t romsize = m_cpuregion->bytes();
 	if (rgnoffset < romsize)
 	{
 		// clamp the end to the ROM size
@@ -408,7 +409,7 @@ void sega_315_5195_mapper_device::map_as_rom(UINT32 offset, UINT32 length, offs_
 		// configure the bank
 		memory_bank *bank = owner()->membank(bank_name);
 		memory_bank *decrypted_bank = owner()->membank(decrypted_bank_name);
-		UINT8 *memptr = m_cpu->region()->base() + rgnoffset;
+		UINT8 *memptr = m_cpuregion->base() + rgnoffset;
 		bank->set_base(memptr);
 
 		// remember this bank, and decrypt if necessary
@@ -527,19 +528,14 @@ void sega_315_5195_mapper_device::device_start()
 	m_sound_read.bind_relative_to(*owner());
 	m_sound_write.bind_relative_to(*owner());
 
-	// find our CPU
-	m_cpu = siblingdevice<m68000_device>(m_cputag);
-	if (m_cpu == nullptr)
-		throw emu_fatalerror("Unable to find sibling device '%s'", m_cputag);
-
 	// if we are mapping an FD1089, tell all the banks
-	fd1089_base_device *fd1089 = dynamic_cast<fd1089_base_device *>(m_cpu);
+	fd1089_base_device *fd1089 = dynamic_cast<fd1089_base_device *>(m_cpu.target());
 	if (fd1089 != nullptr)
 		for (auto & elem : m_banks)
 			elem.set_decrypt(fd1089);
 
 	// if we are mapping an FD1094, register for state change notifications and tell all the banks
-	fd1094_device *fd1094 = dynamic_cast<fd1094_device *>(m_cpu);
+	fd1094_device *fd1094 = dynamic_cast<fd1094_device *>(m_cpu.target());
 	if (fd1094 != nullptr)
 	{
 		fd1094->notify_state_change(fd1094_device::state_change_delegate(FUNC(sega_315_5195_mapper_device::fd1094_state_change), this));
@@ -550,7 +546,7 @@ void sega_315_5195_mapper_device::device_start()
 	// find the address space that is to be mapped
 	m_space = &m_cpu->space(AS_PROGRAM);
 	if (m_space == nullptr)
-		throw emu_fatalerror("Unable to find program address space on device '%s'", m_cputag);
+		throw emu_fatalerror("Unable to find program address space on device '%s'", m_cpu.finder_tag());
 
 	m_decrypted_space = m_cpu->has_space(AS_DECRYPTED_OPCODES) ? &m_cpu->space(AS_DECRYPTED_OPCODES) : nullptr;
 

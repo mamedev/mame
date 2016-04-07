@@ -50,6 +50,7 @@ private:
 	sound_stream *  m_stream;
 	emu_timer *     m_timer[2];
 	devcb_write_line m_irq_handler;
+	required_memory_region m_region;
 };
 
 extern const device_type YM2610;

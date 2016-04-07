@@ -106,8 +106,7 @@ GFXDECODE_END
 k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K051316, "K051316 PSAC", tag, owner, clock, "k051316", __FILE__),
 		device_gfx_interface(mconfig, *this, gfxinfo),
-		m_zoom_rom(nullptr),
-		m_zoom_size(0),
+		m_zoom_rom(*this, DEVICE_SELF),
 		m_dx(0),
 		m_dy(0),
 		m_wrap(0),
@@ -151,13 +150,6 @@ void k051316_device::set_bpp(device_t &device, int bpp)
 
 void k051316_device::device_start()
 {
-	memory_region *ROM = region();
-	if (ROM != nullptr)
-	{
-		m_zoom_rom = ROM->base();
-		m_zoom_size = ROM->bytes();
-	}
-
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
@@ -209,13 +201,13 @@ WRITE8_MEMBER( k051316_device::write )
 
 READ8_MEMBER( k051316_device::rom_r )
 {
-	assert (m_zoom_size != 0);
+	assert (m_zoom_rom.found());
 
 	if ((m_ctrlram[0x0e] & 0x01) == 0)
 	{
 		int addr = offset + (m_ctrlram[0x0c] << 11) + (m_ctrlram[0x0d] << 19);
 		addr /= m_pixels_per_byte;
-		addr &= m_zoom_size - 1;
+		addr &= m_zoom_rom.mask();
 
 		//  popmessage("%s: offset %04x addr %04x", space.machine().describe_context(), offset, addr);
 

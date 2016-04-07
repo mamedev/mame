@@ -20,6 +20,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
+		m_oki_region(*this, "oki"),
 		m_tms(*this, "tms"),
 		m_tlc34076(*this, "tlc34076"),
 		m_control(*this, "control"),
@@ -28,6 +29,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
+	required_memory_region m_oki_region;
 	required_device<tms34010_device> m_tms;
 	required_device<tlc34076_device> m_tlc34076;
 

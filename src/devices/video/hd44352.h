@@ -73,6 +73,7 @@ private:
 	UINT8 m_cursor_lcd;
 
 	devcb_write_line    m_on_cb;        // ON line callback
+	required_region_ptr<UINT8> m_char_rom;
 };
 
 // device type definition

@@ -60,8 +60,7 @@ gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, const char
 	: device_t(mconfig, GAELCO_GAE1, "Gaelco GAE1", tag, owner, clock, "gaelco_gae1", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
-		m_snd_data(nullptr),
-		m_data_tag(nullptr)
+		m_snd_data(*this)
 {
 }
 
@@ -69,8 +68,7 @@ gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_typ
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
-		m_snd_data(nullptr),
-		m_data_tag(nullptr)
+		m_snd_data(*this)
 {
 }
 
@@ -241,8 +239,6 @@ WRITE16_MEMBER( gaelco_gae1_device::gaelcosnd_w )
 void gaelco_gae1_device::device_start()
 {
 	m_stream = stream_alloc(0, 2, 8000);
-
-	m_snd_data = owner()->memregion(m_data_tag)->base();
 
 	/* init volume table */
 	for (int vol = 0; vol < GAELCO_VOLUME_LEVELS; vol++){

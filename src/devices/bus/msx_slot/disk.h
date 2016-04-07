@@ -27,35 +27,35 @@ extern const device_type MSX_SLOT_DISK6;
 
 #define MCFG_MSX_SLOT_DISK1_ADD(_tag, _startpage, _numpages, _region, _offset, _fdc_tag, _floppy0_tag, _floppy1_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_DISK1, _startpage, _numpages) \
-	msx_slot_rom_device::set_rom_start(*device, _region, _offset); \
+	msx_slot_rom_device::set_rom_start(*device, "^" _region, _offset); \
 	msx_slot_disk_device::set_fdc_tag(*device, _fdc_tag); \
 	msx_slot_disk_device::set_floppy0_tag(*device, _floppy0_tag); \
 	msx_slot_disk_device::set_floppy1_tag(*device, _floppy1_tag);
 
 #define MCFG_MSX_SLOT_DISK2_ADD(_tag, _startpage, _numpages, _region, _offset, _fdc_tag, _floppy0_tag, _floppy1_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_DISK2, _startpage, _numpages) \
-	msx_slot_rom_device::set_rom_start(*device, _region, _offset); \
+	msx_slot_rom_device::set_rom_start(*device, "^" _region, _offset); \
 	msx_slot_disk_device::set_fdc_tag(*device, _fdc_tag); \
 	msx_slot_disk_device::set_floppy0_tag(*device, _floppy0_tag); \
 	msx_slot_disk_device::set_floppy1_tag(*device, _floppy1_tag);
 
 #define MCFG_MSX_SLOT_DISK3_ADD(_tag, _startpage, _numpages, _region, _offset, _fdc_tag, _floppy0_tag, _floppy1_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_DISK3, _startpage, _numpages) \
-	msx_slot_rom_device::set_rom_start(*device, _region, _offset); \
+	msx_slot_rom_device::set_rom_start(*device, "^" _region, _offset); \
 	msx_slot_disk_device::set_fdc_tag(*device, _fdc_tag); \
 	msx_slot_disk_device::set_floppy0_tag(*device, _floppy0_tag); \
 	msx_slot_disk_device::set_floppy1_tag(*device, _floppy1_tag);
 
 #define MCFG_MSX_SLOT_DISK4_ADD(_tag, _startpage, _numpages, _region, _offset, _fdc_tag, _floppy0_tag, _floppy1_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_DISK4, _startpage, _numpages) \
-	msx_slot_rom_device::set_rom_start(*device, _region, _offset); \
+	msx_slot_rom_device::set_rom_start(*device, "^" _region, _offset); \
 	msx_slot_disk_device::set_fdc_tag(*device, _fdc_tag); \
 	msx_slot_disk_device::set_floppy0_tag(*device, _floppy0_tag); \
 	msx_slot_disk_device::set_floppy1_tag(*device, _floppy1_tag);
 
 #define MCFG_MSX_SLOT_DISK5_ADD(_tag, _startpage, _numpages, _region, _offset, _fdc_tag, _floppy0_tag, _floppy1_tag, _floppy2_tag, _floppy3_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_DISK5, _startpage, _numpages) \
-	msx_slot_rom_device::set_rom_start(*device, _region, _offset); \
+	msx_slot_rom_device::set_rom_start(*device, "^" _region, _offset); \
 	msx_slot_disk_device::set_fdc_tag(*device, _fdc_tag); \
 	msx_slot_disk_device::set_floppy0_tag(*device, _floppy0_tag); \
 	msx_slot_disk_device::set_floppy1_tag(*device, _floppy1_tag); \
@@ -64,7 +64,7 @@ extern const device_type MSX_SLOT_DISK6;
 
 #define MCFG_MSX_SLOT_DISK6_ADD(_tag, _startpage, _numpages, _region, _offset, _fdc_tag, _floppy0_tag, _floppy1_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_DISK6, _startpage, _numpages) \
-	msx_slot_rom_device::set_rom_start(*device, _region, _offset); \
+	msx_slot_rom_device::set_rom_start(*device, "^" _region, _offset); \
 	msx_slot_disk_device::set_fdc_tag(*device, _fdc_tag); \
 	msx_slot_disk_device::set_floppy0_tag(*device, _floppy0_tag); \
 	msx_slot_disk_device::set_floppy1_tag(*device, _floppy1_tag);

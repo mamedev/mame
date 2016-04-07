@@ -27,6 +27,7 @@ public:
 		: sega_16bit_common_base(mconfig, type, tag),
 			m_mapper(*this, "mapper"),
 			m_maincpu(*this, "maincpu"),
+			m_maincpu_region(*this, "maincpu"),
 			m_soundcpu(*this, "soundcpu"),
 			m_mcu(*this, "mcu"),
 			m_vdp(*this, "gen_vdp"),
@@ -128,6 +129,7 @@ protected:
 	// devices
 	required_device<sega_315_5195_mapper_device> m_mapper;
 	required_device<m68000_device> m_maincpu;
+	required_memory_region m_maincpu_region;
 	required_device<z80_device> m_soundcpu;
 	optional_device<i8751_device> m_mcu;
 	required_device<sega315_5313_device> m_vdp;

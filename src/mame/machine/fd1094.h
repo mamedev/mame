@@ -72,7 +72,7 @@ public:
 	fd1094_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// explicit decryption helpers
-	void decrypt(offs_t baseaddr, UINT32 size, offs_t regionoffs, UINT16 *opcodesptr, UINT8 state) { decrypt(baseaddr, size, m_srcbase + regionoffs/2, opcodesptr, state); }
+	void decrypt(offs_t baseaddr, UINT32 size, offs_t regionoffs, UINT16 *opcodesptr, UINT8 state) { decrypt(baseaddr, size, &m_srcbase[regionoffs/2], opcodesptr, state); }
 
 	// live state management
 	UINT8 state() const { return m_irqmode ? m_key[0] : m_state; }
@@ -110,9 +110,8 @@ protected:
 	bool                    m_irqmode;
 	state_change_delegate   m_state_change;
 	fd1094_decryption_cache m_cache;
-	UINT16 *                m_srcbase;
-	UINT32                  m_srcbytes;
-	const UINT8 *           m_key;
+	optional_region_ptr<UINT16> m_srcbase;
+	required_region_ptr<UINT8> m_key;
 	UINT8                   m_masked_opcodes_lookup[2][65536/8/2];
 
 	// static tables

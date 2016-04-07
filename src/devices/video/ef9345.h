@@ -84,7 +84,7 @@ private:
 	static const device_timer_id BUSY_TIMER = 0;
 	static const device_timer_id BLINKING_TIMER = 1;
 
-	memory_region *m_charset;
+	required_region_ptr<UINT8> m_charset;
 	address_space *m_videoram;
 
 	UINT8 m_bf;                             //busy flag

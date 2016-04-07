@@ -129,10 +129,8 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K051960, "K051960 Sprite Generator", tag, owner, clock, "k051960", __FILE__),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_ram(nullptr),
-	m_sprite_rom(nullptr),
-	m_sprite_size(0),
-	m_screen_tag(nullptr),
-	m_screen(nullptr),
+	m_sprite_rom(*this, DEVICE_SELF),
+	m_screen(*this),
 	m_scanline_timer(nullptr),
 	m_irq_handler(*this),
 	m_firq_handler(*this),
@@ -171,10 +169,10 @@ void k051960_device::set_plane_order(device_t &device, int order)
 //  set_screen_tag - set screen we are attached to
 //-------------------------------------------------
 
-void k051960_device::set_screen_tag(device_t &device, device_t *owner, const char *tag)
+void k051960_device::set_screen_tag(device_t &device, const char *tag)
 {
 	k051960_device &dev = dynamic_cast<k051960_device &>(device);
-	dev.m_screen_tag = tag;
+	dev.m_screen.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -184,16 +182,12 @@ void k051960_device::set_screen_tag(device_t &device, device_t *owner, const cha
 void k051960_device::device_start()
 {
 	// make sure our screen is started
-	m_screen = m_owner->subdevice<screen_device>(m_screen_tag);
 	if (!m_screen->started())
 		throw device_missing_dependencies();
 
 	// allocate scanline timer and start at first scanline
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k051960_device::scanline_callback), this));
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
-
-	m_sprite_rom = region()->base();
-	m_sprite_size = region()->bytes();
 
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
@@ -271,7 +265,7 @@ int k051960_device::k051960_fetchromdata( int byte )
 	m_k051960_cb(&code, &color, &pri, &shadow);
 
 	addr = (code << 7) | (off1 << 2) | byte;
-	addr &= m_sprite_size - 1;
+	addr &= m_sprite_rom.mask();
 
 //  popmessage("%s: addr %06x", machine().describe_context(), addr);
 

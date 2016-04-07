@@ -165,6 +165,7 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
+		m_region(*this, DEVICE_SELF),
 		m_type(variant),
 		m_size(0),
 		m_bits(8),
@@ -543,7 +544,7 @@ const address_space_config *intelfsh_device::memory_space_config(address_spacenu
 void intelfsh_device::nvram_default()
 {
 	// region always wins
-	if (m_region != nullptr)
+	if (m_region.found())
 	{
 		UINT32 bytes = m_region->bytes();
 		if (bytes > m_size)
@@ -552,19 +553,19 @@ void intelfsh_device::nvram_default()
 		if (m_bits == 8)
 		{
 			for (offs_t offs = 0; offs < bytes; offs++)
-				m_addrspace[0]->write_byte(offs, m_region->u8(offs));
+				space(AS_PROGRAM).write_byte(offs, m_region->u8(offs));
 		}
 		else
 		{
 			for (offs_t offs = 0; offs < bytes; offs += 2)
-				m_addrspace[0]->write_word(offs, m_region->u16(offs / 2));
+				space(AS_PROGRAM).write_word(offs, m_region->u16(offs / 2));
 		}
 		return;
 	}
 
 	// otherwise, default to 0xff
 	for (offs_t offs = 0; offs < m_size; offs++)
-		m_addrspace[0]->write_byte(offs, 0xff);
+		space(AS_PROGRAM).write_byte(offs, 0xff);
 }
 
 
@@ -578,7 +579,7 @@ void intelfsh_device::nvram_read(emu_file &file)
 	dynamic_buffer buffer(m_size);
 	file.read(&buffer[0], m_size);
 	for (int byte = 0; byte < m_size; byte++)
-		m_addrspace[0]->write_byte(byte, buffer[byte]);
+		space(AS_PROGRAM).write_byte(byte, buffer[byte]);
 }
 
 
@@ -591,7 +592,7 @@ void intelfsh_device::nvram_write(emu_file &file)
 {
 	dynamic_buffer buffer(m_size);
 	for (int byte = 0; byte < m_size; byte++)
-		buffer[byte] = m_addrspace[0]->read_byte(byte);
+		buffer[byte] = space(AS_PROGRAM).read_byte(byte);
 	file.write(&buffer[0], m_size);
 }
 
@@ -613,12 +614,12 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 		{
 		case 8:
 			{
-				data = m_addrspace[0]->read_byte(address);
+				data = space(AS_PROGRAM).read_byte(address);
 			}
 			break;
 		case 16:
 			{
-				data = m_addrspace[0]->read_word(address * 2);
+				data = space(AS_PROGRAM).read_word(address * 2);
 			}
 			break;
 		}
@@ -692,12 +693,12 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 			{
 			case 8:
 				{
-					data = m_addrspace[0]->read_byte(address);
+					data = space(AS_PROGRAM).read_byte(address);
 				}
 				break;
 			case 16:
 				{
-					data = m_addrspace[0]->read_word(address * 2);
+					data = space(AS_PROGRAM).read_word(address * 2);
 				}
 				break;
 			}
@@ -921,7 +922,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		{
 			// chip erase
 			for (offs_t offs = 0; offs < m_size; offs++)
-				m_addrspace[0]->write_byte(offs, 0xff);
+				space(AS_PROGRAM).write_byte(offs, 0xff);
 
 			m_status = 1 << 3;
 			m_flash_mode = FM_ERASEAMD4;
@@ -947,14 +948,14 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			if (m_sector_is_4k)
 			{
 				for (offs_t offs = 0; offs < 4 * 1024; offs++)
-					m_addrspace[0]->write_byte((base & ~0xfff) + offs, 0xff);
+					space(AS_PROGRAM).write_byte((base & ~0xfff) + offs, 0xff);
 				m_erase_sector = address & ((m_bits == 16) ? ~0x7ff : ~0xfff);
 				m_timer->adjust( attotime::from_msec( 125 ) );
 			}
 			else if(m_sector_is_16k)
 			{
 				for (offs_t offs = 0; offs < 16 * 1024; offs++)
-					m_addrspace[0]->write_byte((base & ~0x3fff) + offs, 0xff);
+					space(AS_PROGRAM).write_byte((base & ~0x3fff) + offs, 0xff);
 				m_erase_sector = address & ((m_bits == 16) ? ~0x1fff : ~0x3fff);
 				m_timer->adjust( attotime::from_msec( 500 ) );
 			}
@@ -963,21 +964,21 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 				if (address >= (m_size - (16*1024)))
 				{
 					for (offs_t offs = 0; offs < 16 * 1024; offs++)
-						m_addrspace[0]->write_byte((base & ~0x3fff) + offs, 0xff);
+						space(AS_PROGRAM).write_byte((base & ~0x3fff) + offs, 0xff);
 					m_erase_sector = address & ((m_bits == 16) ? ~0x1fff : ~0x3fff);
 					m_timer->adjust( attotime::from_msec( 500 ) );
 				}
 				else if (address >= (m_size - (32*1024)))
 				{
 					for (offs_t offs = 0; offs < 8 * 1024; offs++)
-						m_addrspace[0]->write_byte((base & ~0x1fff) + offs, 0xff);
+						space(AS_PROGRAM).write_byte((base & ~0x1fff) + offs, 0xff);
 					m_erase_sector = address & ((m_bits == 16) ? ~0xfff : ~0x1fff);
 					m_timer->adjust( attotime::from_msec( 250 ) );
 				}
 				else
 				{
 					for (offs_t offs = 0; offs < 32 * 1024; offs++)
-						m_addrspace[0]->write_byte((base & ~0x7fff) + offs, 0xff);
+						space(AS_PROGRAM).write_byte((base & ~0x7fff) + offs, 0xff);
 					m_erase_sector = address & ((m_bits == 16) ? ~0x3fff : ~0x7fff);
 					m_timer->adjust( attotime::from_msec( 500 ) );
 				}
@@ -985,7 +986,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			else
 			{
 				for (offs_t offs = 0; offs < 64 * 1024; offs++)
-					m_addrspace[0]->write_byte((base & ~0xffff) + offs, 0xff);
+					space(AS_PROGRAM).write_byte((base & ~0xffff) + offs, 0xff);
 				m_erase_sector = address & ((m_bits == 16) ? ~0x7fff : ~0xffff);
 				m_timer->adjust( attotime::from_seconds( 1 ) );
 			}
@@ -1003,7 +1004,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		{
 		case 8:
 			{
-				m_addrspace[0]->write_byte(address, data);
+				space(AS_PROGRAM).write_byte(address, data);
 			}
 			break;
 		default:
@@ -1016,14 +1017,10 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		switch( m_bits )
 		{
 		case 8:
-			{
-				m_addrspace[0]->write_byte(address, data);
-			}
+			space(AS_PROGRAM).write_byte(address, data);
 			break;
 		case 16:
-			{
-				m_addrspace[0]->write_word(address * 2, data);
-			}
+			space(AS_PROGRAM).write_word(address * 2, data);
 			break;
 		default:
 			logerror( "FM_WRITEPART1 not supported when m_bits == %d\n", m_bits );
@@ -1039,14 +1036,10 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		switch( m_bits )
 		{
 		case 8:
-			{
-				m_addrspace[0]->write_byte(address, data);
-			}
+			space(AS_PROGRAM).write_byte(address, data);
 			break;
 		case 16:
-			{
-				m_addrspace[0]->write_word(address * 2, data);
-			}
+			space(AS_PROGRAM).write_word(address * 2, data);
 			break;
 		default:
 			logerror( "FM_WRITEPAGEATMEL not supported when m_bits == %d\n", m_bits );
@@ -1068,7 +1061,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 				// clear the 256 bytes block containing the current address to all 0xffs
 				UINT32 base = address * ((m_bits == 16) ? 2 : 1);
 				for (offs_t offs = 0; offs < 256; offs++)
-					m_addrspace[0]->write_byte((base & ~0xff) + offs, 0xff);
+					space(AS_PROGRAM).write_byte((base & ~0xff) + offs, 0xff);
 
 				m_timer->adjust( attotime::from_msec( 4 ) );
 			}
@@ -1111,7 +1104,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 
 				// clear the block containing the current address to all 0xffffs
 				for (offs_t offs = 0; offs < size / 2; offs += 2)
-					m_addrspace[0]->write_word(base | offs, 0xffff);
+					space(AS_PROGRAM).write_word(base | offs, 0xffff);
 
 				m_timer->adjust( attotime::from_msec( duration ) );
 			}
@@ -1120,7 +1113,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 				// clear the 64k block containing the current address to all 0xffs
 				UINT32 base = address * ((m_bits == 16) ? 2 : 1);
 				for (offs_t offs = 0; offs < 64 * 1024; offs++)
-					m_addrspace[0]->write_byte((base & ~0xffff) + offs, 0xff);
+					space(AS_PROGRAM).write_byte((base & ~0xffff) + offs, 0xff);
 
 				m_timer->adjust( attotime::from_seconds( 1 ) );
 			}

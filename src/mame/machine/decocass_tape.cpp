@@ -65,7 +65,8 @@ decocass_tape_device::decocass_tape_device(const machine_config &mconfig, const 
 	m_region(REGION_LEADER),
 	m_bitnum(0),
 	m_clockpos(0),
-	m_numclocks(0)
+	m_numclocks(0),
+	m_tape_data(*this, DEVICE_SELF)
 {
 	for (auto & elem : m_crc16)
 	elem = 0;
@@ -91,13 +92,12 @@ void decocass_tape_device::device_start()
 
 	/* fetch the data pointer */
 	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(decocass_tape_device::tape_clock_callback), this));
-	if (region() == nullptr)
+	if (!m_tape_data.found())
 		return;
-	UINT8 *regionbase = region()->base();
 
 	/* scan for the first non-empty block in the image */
-	for (offs = region()->bytes() - 1; offs >= 0; offs--)
-		if (regionbase[offs] != 0)
+	for (offs = m_tape_data.bytes() - 1; offs >= 0; offs--)
+		if (m_tape_data[offs] != 0)
 			break;
 	numblocks = ((offs | 0xff) + 1) / 256;
 	assert(numblocks < ARRAY_LENGTH(m_crc16));
@@ -113,7 +113,7 @@ void decocass_tape_device::device_start()
 
 		/* first CRC the 256 bytes of data */
 		for (offs = 256 * curblock; offs < 256 * curblock + 256; offs++)
-			crc = tape_crc16_byte(crc, regionbase[offs]);
+			crc = tape_crc16_byte(crc, m_tape_data[offs]);
 
 		/* then find a pair of bytes that will bring the CRC to 0 (any better way than brute force?) */
 		for (testval = 0; testval < 0x10000; testval++)
@@ -292,7 +292,6 @@ TIMER_CALLBACK_MEMBER( decocass_tape_device::tape_clock_callback )
 UINT8 decocass_tape_device::get_status_bits()
 {
 	UINT8 tape_bits = 0;
-	UINT8 *tape_data = region()->base();
 
 	/* bit 0x20 is the BOT/EOT signal, which is also set in the leader/trailer area */
 	if (m_region == REGION_LEADER || m_region == REGION_BOT || m_region == REGION_EOT || m_region == REGION_TRAILER)
@@ -325,7 +324,7 @@ UINT8 decocass_tape_device::get_status_bits()
 
 		/* data block bytes are data */
 		else if (m_bytenum >= BYTE_DATA_0 && m_bytenum <= BYTE_DATA_255)
-			byteval = tape_data[blocknum * 256 + (m_bytenum - BYTE_DATA_0)];
+			byteval = m_tape_data[blocknum * 256 + (m_bytenum - BYTE_DATA_0)];
 
 		/* CRC MSB */
 		else if (m_bytenum == BYTE_CRC16_MSB)
@@ -350,7 +349,7 @@ UINT8 decocass_tape_device::get_status_bits()
 
 UINT8 decocass_tape_device::is_present()
 {
-	return region() != nullptr;
+	return m_tape_data.found();
 }
 
 

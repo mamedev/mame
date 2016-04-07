@@ -113,7 +113,8 @@ const device_type NAOMI_M2_BOARD = &device_creator<naomi_m2_board>;
 
 naomi_m2_board::naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: naomi_board(mconfig, NAOMI_M2_BOARD, "Sega NAOMI M2 Board", tag, owner, clock, "naomi_m2_board", __FILE__),
-	m_cryptdevice(*this, "segam2crypt")
+	m_cryptdevice(*this, "segam2crypt"),
+	m_region(*this, DEVICE_SELF)
 {
 }
 
@@ -194,7 +195,7 @@ UINT16 naomi_m2_board::read_callback(UINT32 addr)
 
 	}
 	else {
-		const UINT8 *base = m_region->base() + 2*addr;
+		const UINT8 *base = &m_region->u8(2*addr);
 		return base[1] | (base[0] << 8);
 	}
 }

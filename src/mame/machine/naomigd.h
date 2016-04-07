@@ -7,7 +7,7 @@
 
 #define MCFG_NAOMI_GDROM_BOARD_ADD(_tag, _image_tag, _pic_tag, _eeprom_tag, _irq_cb) \
 	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_GDROM_BOARD, _eeprom_tag, NULL, _irq_cb) \
-	naomi_gdrom_board::static_set_tags(*device, _image_tag, _pic_tag);
+	naomi_gdrom_board::static_set_tags(*device, "^" _image_tag, "^" _pic_tag);
 
 class naomi_gdrom_board : public naomi_board
 {

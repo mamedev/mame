@@ -56,7 +56,7 @@ nile_device::nile_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, NILE, "NiLe", tag, owner, clock, "nile", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
-		m_sound_ram(nullptr),
+		m_sound_ram(*this, DEVICE_SELF),
 		m_ctrl(0)
 {
 }
@@ -68,7 +68,6 @@ nile_device::nile_device(const machine_config &mconfig, const char *tag, device_
 
 void nile_device::device_start()
 {
-	m_sound_ram = region()->base();
 	m_stream = stream_alloc(0, 2, 44100);
 }
 
@@ -80,7 +79,7 @@ void nile_device::device_start()
 
 void nile_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	UINT8 *sound_ram = m_sound_ram;
+	UINT8 *sound_ram = &m_sound_ram[0];
 	int v, i, snum;
 	UINT16 *slot;
 	INT32 mix[48000*2];

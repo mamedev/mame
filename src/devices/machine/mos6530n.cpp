@@ -116,6 +116,7 @@ WRITE8_MEMBER(mos6532_t::io_w)
 mos6530_base_t::mos6530_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_ram(*this),
+	m_rom(*this, DEVICE_SELF),
 	m_irq_cb(*this),
 	m_in_pa_cb(*this),
 	m_out_pa_cb(*this),

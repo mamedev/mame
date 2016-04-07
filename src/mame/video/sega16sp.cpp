@@ -96,6 +96,7 @@ WRITE16_MEMBER( sega_16bit_sprite_device::draw_write )
 
 sega_hangon_sprite_device::sega_hangon_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_HANGON_SPRITES, "Sega Custom Sprites (Hang On)", tag, owner, "sega_hangon_sprite", __FILE__)
+	, m_sprite_region_ptr(*this, DEVICE_SELF)
 {
 	set_local_origin(189, -1);
 }
@@ -141,8 +142,8 @@ void sega_hangon_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 	//
 
 	// render the sprites in order
-	const UINT16 *spritebase = reinterpret_cast<const UINT16 *>(region()->base());
-	UINT8 numbanks = region()->bytes() / 0x10000;
+	const UINT16 *spritebase = &m_sprite_region_ptr[0];
+	UINT8 numbanks = m_sprite_region_ptr.bytes() / 0x10000;
 	const UINT8 *zoom = memregion("zoom")->base();
 	UINT16 *ramend = spriteram() + spriteram_elements();
 	for (UINT16 *data = spriteram(); data < ramend; data += 8)
@@ -272,6 +273,7 @@ void sega_hangon_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 sega_sharrier_sprite_device::sega_sharrier_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_SHARRIER_SPRITES, "Sega Custom Sprites (Space Harrier)", tag, owner, "sega_sharrier_sprite", __FILE__)
+	, m_sprite_region_ptr(*this, DEVICE_SELF)
 {
 	set_local_origin(189, -1);
 }
@@ -320,8 +322,8 @@ void sega_sharrier_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 	//
 
 	// render the sprites in order
-	const UINT32 *spritebase = reinterpret_cast<const UINT32 *>(region()->base());
-	UINT8 numbanks = region()->bytes() / 0x20000;
+	const UINT32 *spritebase = &m_sprite_region_ptr[0];
+	UINT8 numbanks = m_sprite_region_ptr.bytes() / 0x20000;
 	const UINT8 *zoom = memregion("zoom")->base();
 	UINT16 *ramend = spriteram() + spriteram_elements();
 	for (UINT16 *data = spriteram(); data < ramend; data += 8)
@@ -459,6 +461,7 @@ void sega_sharrier_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 
 sega_sys16a_sprite_device::sega_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_SYS16A_SPRITES, "Sega System 16A Sprites", tag, owner, "sega_sys16a_sprite", __FILE__)
+	, m_sprite_region_ptr(*this, DEVICE_SELF)
 {
 	set_local_origin(189, -1, -189, -1);
 }
@@ -503,8 +506,8 @@ void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 	//
 
 	// render the sprites in order
-	const UINT16 *spritebase = reinterpret_cast<const UINT16 *>(region()->base());
-	UINT8 numbanks = region()->bytes() / 0x10000;
+	const UINT16 *spritebase = &m_sprite_region_ptr[0];
+	UINT8 numbanks = m_sprite_region_ptr.bytes() / 0x10000;
 	UINT16 *ramend = spriteram() + spriteram_elements();
 	for (UINT16 *data = spriteram(); data < ramend; data += 8)
 	{
@@ -638,6 +641,7 @@ void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 bootleg_sys16a_sprite_device::bootleg_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, BOOTLEG_SYS16A_SPRITES, "Sega System 16A Sprites (Bootleg)", tag, owner, "bootleg_sys16a_sprite", __FILE__)
+	, m_sprite_region_ptr(*this, DEVICE_SELF)
 {
 	m_addrmap[0] = 0;
 	m_addrmap[1] = 1;
@@ -689,8 +693,8 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 	//
 
 	// render the sprites in order
-	const UINT16 *spritebase = reinterpret_cast<const UINT16 *>(region()->base());
-	UINT8 numbanks = region()->bytes() / 0x10000;
+	const UINT16 *spritebase = &m_sprite_region_ptr[0];
+	UINT8 numbanks = m_sprite_region_ptr.bytes() / 0x10000;
 	UINT16 *ramend = spriteram() + spriteram_elements();
 	for (UINT16 *data = spriteram(); data < ramend; data += 8)
 	{
@@ -826,7 +830,7 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 
 sega_sys16b_sprite_device::sega_sys16b_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_SYS16B_SPRITES, "Sega System 16B Sprites", tag, owner, "sega_16bit_sprite", __FILE__)
-	, m_sprite_region_ptr(*this, ":sprites")
+	, m_sprite_region_ptr(*this, DEVICE_SELF)
 {
 	set_local_origin(184, 0x00, -184, 0);
 }
@@ -1022,14 +1026,16 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_OUTRUN_SPRITES, "Sega Custom Sprites (Out Run)", tag, owner, "sega_outrun_sprite", __FILE__),
-		m_is_xboard(false)
+		m_is_xboard(false),
+		m_sprite_region_ptr(*this, DEVICE_SELF)
 {
 	set_local_origin(189, 0x00);
 }
 
 sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, bool xboard_variant, const char *shortname, const char *source)
 	: sega_16bit_sprite_device(mconfig, SEGA_XBOARD_SPRITES, "Sega X-Board Sprites", tag, owner, shortname, source),
-		m_is_xboard(true)
+		m_is_xboard(true),
+		m_sprite_region_ptr(*this, DEVICE_SELF)
 {
 	set_local_origin(190, 0x00);
 }
@@ -1090,8 +1096,8 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 	set_origin(m_xoffs, m_yoffs);
 
 	// render the sprites in order
-	const UINT32 *spritebase = reinterpret_cast<const UINT32 *>(region()->base());
-	UINT8 numbanks = region()->bytes() / 0x40000;
+	const UINT32 *spritebase = &m_sprite_region_ptr[0];
+	UINT8 numbanks = m_sprite_region_ptr.bytes() / 0x40000;
 	UINT16 *ramend = buffer() + spriteram_elements();
 	for (UINT16 *data = buffer(); data < ramend; data += 8)
 	{
@@ -1235,6 +1241,7 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 sega_yboard_sprite_device::sega_yboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_YBOARD_SPRITES, "Sega Y-Board Sprites", tag, owner, "sega_yboard_sprite", __FILE__)
+	, m_sprite_region_ptr(*this, DEVICE_SELF)
 {
 	set_local_origin(0x600, 0x600);
 }
@@ -1293,8 +1300,8 @@ void sega_yboard_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 	memset(visited, 0, sizeof(visited));
 
 	// render the sprites in order
-	const UINT64 *spritebase = reinterpret_cast<const UINT64 *>(region()->base());
-	UINT8 numbanks = region()->bytes() / 0x80000;
+	const UINT64 *spritebase = &m_sprite_region_ptr[0];
+	UINT8 numbanks = m_sprite_region_ptr.bytes() / 0x80000;
 	int next = 0;
 	for (UINT16 *data = spriteram(); !(data[0] & 0x8000) && !visited[next]; data = spriteram() + next * 8)
 	{

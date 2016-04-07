@@ -101,6 +101,7 @@ ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, dev
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(ef9345)),
+	m_charset(*this, DEVICE_SELF),
 	m_palette(*this)
 {
 }
@@ -125,7 +126,6 @@ void ef9345_device::device_start()
 	m_blink_timer = timer_alloc(BLINKING_TIMER);
 
 	m_videoram = &space(0);
-	m_charset = region();
 
 	m_screen_out.allocate(496, m_screen->height());
 
@@ -266,7 +266,7 @@ void ef9345_device::init_accented_chars(void)
 	UINT16 i, j;
 	for(j = 0; j < 0x10; j++)
 		for(i = 0; i < 0x200; i++)
-			m_acc_char[(j << 9) + i] = m_charset->u8(0x0600 + i);
+			m_acc_char[(j << 9) + i] = m_charset[0x0600 + i];
 
 	for(j = 0; j < 0x200; j += 0x40)
 		for(i = 0; i < 4; i++)
@@ -299,7 +299,7 @@ void ef9345_device::init_accented_chars(void)
 UINT8 ef9345_device::read_char(UINT8 index, UINT16 addr)
 {
 	if (index < 0x04)
-		return m_charset->u8(0x0800*index + addr);
+		return m_charset[0x0800*index + addr];
 	else if (index < 0x08)
 		return m_acc_char[0x0800*(index&3) + addr];
 	else if (index < 0x0c)
@@ -860,7 +860,7 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
 			set_busy_flag(3.5);
 			switch(cmd&7)
 			{
-				case 0:     m_registers[1] = m_charset->u8(indexrom(7) & 0x1fff); break;
+				case 0:     m_registers[1] = m_charset[indexrom(7) & 0x1fff]; break;
 				case 1:     m_registers[1] = m_tgs; break;
 				case 2:     m_registers[1] = m_mat; break;
 				case 3:     m_registers[1] = m_pat; break;

@@ -188,10 +188,9 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	//*m_pixmap[K056832_PAGE_COUNT],
 	//m_regs[0x20],
 	//m_regsb[4],
-	m_rombase(nullptr),
+	m_rombase(*this),
 	m_num_gfx_banks(0),
 	m_cur_gfx_banks(0),
-	m_gfx_memory_region(nullptr),
 	m_gfx_num(0),
 	m_bpp(-1),
 	m_big(0),
@@ -349,7 +348,7 @@ void k056832_device::device_start()
 /* TODO: understand which elements MUST be init here (to keep correct layer
    associations) and which ones can can be init at RESET, if any */
 
-	create_gfx(m_gfx_memory_region, m_bpp, m_big);
+	create_gfx();
 
 	create_tilemaps();
 
@@ -610,10 +609,7 @@ void k056832_device::SetExtLinescroll( )
 /* generic helper routine for ROM checksumming */
 int k056832_device::rom_read_b( int offset, int blksize, int blksize2, int zerosec )
 {
-	UINT8 *rombase;
 	int base, ret;
-
-	rombase = (UINT8 *)machine().root_device().memregion(m_gfx_memory_region)->base();
 
 	if ((m_rom_half) && (zerosec))
 	{
@@ -631,11 +627,11 @@ int k056832_device::rom_read_b( int offset, int blksize, int blksize2, int zeros
 
 	if (m_rom_half)
 	{
-		ret = rombase[base + 1];
+		ret = m_rombase[base + 1];
 	}
 	else
 	{
-		ret = rombase[base];
+		ret = m_rombase[base];
 		m_rom_half = 1;
 	}
 
@@ -697,9 +693,6 @@ READ16_MEMBER( k056832_device::rom_word_r )
 {
 	int addr = 0x2000 * m_cur_gfx_banks + 2 * offset;
 
-	if (!m_rombase)
-		m_rombase = space.machine().root_device().memregion(m_gfx_memory_region)->base();
-
 	return m_rombase[addr + 1] | (m_rombase[addr] << 8);
 }
 
@@ -709,9 +702,6 @@ READ16_MEMBER( k056832_device::mw_rom_word_r )
 {
 	int bank = 10240 * m_cur_gfx_banks;
 	int addr;
-
-	if (!m_rombase)
-		m_rombase = space.machine().root_device().memregion(m_gfx_memory_region)->base();
 
 	if (m_regsb[2] & 0x8)
 	{
@@ -772,9 +762,6 @@ READ16_MEMBER( k056832_device::bishi_rom_word_r )
 {
 	int addr = 0x4000 * m_cur_gfx_banks + offset;
 
-	if (!m_rombase)
-		m_rombase = space.machine().root_device().memregion(m_gfx_memory_region)->base();
-
 	return m_rombase[addr + 2] | (m_rombase[addr] << 8);
 }
 
@@ -782,18 +769,12 @@ READ16_MEMBER( k056832_device::rom_word_8000_r )
 {
 	int addr = 0x8000 * m_cur_gfx_banks + 2 * offset;
 
-	if (!m_rombase)
-		m_rombase = space.machine().root_device().memregion(m_gfx_memory_region)->base();
-
 	return m_rombase[addr + 2] | (m_rombase[addr] << 8);
 }
 
 READ16_MEMBER( k056832_device::old_rom_word_r )
 {
 	int addr = 0x2000 * m_cur_gfx_banks + 2 * offset;
-
-	if (!m_rombase)
-		m_rombase = space.machine().root_device().memregion(m_gfx_memory_region)->base();
 
 	return m_rombase[addr + 1] | (m_rombase[addr] << 8);
 }
@@ -1997,7 +1978,7 @@ READ16_MEMBER( k056832_device::b_word_r )
 /***************************************************************************/
 
 
-void k056832_device::create_gfx(const char *gfx_memory_region, int bpp, int big)
+void k056832_device::create_gfx()
 {
 	int gfx_index = 0;
 	int i;
@@ -2065,47 +2046,45 @@ void k056832_device::create_gfx(const char *gfx_memory_region, int bpp, int big)
 		8*8*4
 	};
 
-	m_bpp = bpp;
-
 	/* handle the various graphics formats */
-	i = (big) ? 8 : 16;
+	i = (m_big) ? 8 : 16;
 
 	/* decode the graphics */
-	switch (bpp)
+	switch (m_bpp)
 	{
 		case K056832_BPP_4:
-			total = machine().root_device().memregion(gfx_memory_region)->bytes() / (i*4);
-			konami_decode_gfx(*this, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout4, 4);
+			total = m_rombase.bytes() / (i*4);
+			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout4, 4);
 			break;
 
 		case K056832_BPP_5:
-			total = machine().root_device().memregion(gfx_memory_region)->bytes() / (i*5);
-			konami_decode_gfx(*this, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout5, 5);
+			total = m_rombase.bytes() / (i*5);
+			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout5, 5);
 			break;
 
 		case K056832_BPP_6:
-			total = machine().root_device().memregion(gfx_memory_region)->bytes() / (i*6);
-			konami_decode_gfx(*this, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout6, 6);
+			total = m_rombase.bytes() / (i*6);
+			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout6, 6);
 			break;
 
 		case K056832_BPP_8:
-			total = machine().root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(*this, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout8, 8);
+			total = m_rombase.bytes() / (i*8);
+			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout8, 8);
 			break;
 
 		case K056832_BPP_8LE:
-			total = machine().root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(*this, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout8le, 8);
+			total = m_rombase.bytes() / (i*8);
+			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout8le, 8);
 			break;
 
 		case K056832_BPP_8TASMAN:
-			total = machine().root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(*this, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout8, 8);
+			total = m_rombase.bytes() / (i*8);
+			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout8, 8);
 			break;
 
 		case K056832_BPP_4dj:
-			total = machine().root_device().memregion(gfx_memory_region)->bytes() / (i*4);
-			konami_decode_gfx(*this, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout4dj, 4);
+			total = m_rombase.bytes() / (i*4);
+			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout4dj, 4);
 			break;
 
 		default:
@@ -2115,11 +2094,9 @@ void k056832_device::create_gfx(const char *gfx_memory_region, int bpp, int big)
 	gfx(gfx_index)->set_granularity(16); /* override */
 	gfx(gfx_index)->set_colors(palette().entries() / 16);
 
-	m_gfx_memory_region = gfx_memory_region;
 	m_gfx_num = gfx_index;
 
-	m_rombase = machine().root_device().memregion(gfx_memory_region)->base();
-	m_num_gfx_banks = machine().root_device().memregion(gfx_memory_region)->bytes() / 0x2000;
+	m_num_gfx_banks = m_rombase.bytes() / 0x2000;
 	m_cur_gfx_banks = 0;
 	m_use_ext_linescroll = 0;
 	m_uses_tile_banks = 0;

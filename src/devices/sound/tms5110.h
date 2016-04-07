@@ -298,7 +298,7 @@ class tmsprom_device : public device_t
 public:
 	tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void set_region(device_t &device, const char *region) { downcast<tmsprom_device &>(device).m_prom_region = region; }
+	static void set_region(device_t &device, const char *region) { downcast<tmsprom_device &>(device).m_prom.set_tag(region); }
 	static void set_rom_size(device_t &device, UINT32 rom_size) { downcast<tmsprom_device &>(device).m_rom_size = rom_size; }
 	static void set_pdc_bit(device_t &device, UINT8 pdc_bit) { downcast<tmsprom_device &>(device).m_pdc_bit = pdc_bit; }
 	static void set_ctl1_bit(device_t &device, UINT8 ctl1_bit) { downcast<tmsprom_device &>(device).m_ctl1_bit = ctl1_bit; }
@@ -339,7 +339,8 @@ private:
 
 	int m_prom_cnt;
 
-	const char *m_prom_region;        /* prom memory region - sound region is automatically assigned */
+	required_region_ptr<UINT8> m_rom;
+	required_region_ptr<UINT8> m_prom;
 	UINT32 m_rom_size;                /* individual rom_size */
 	UINT8 m_pdc_bit;                  /* bit # of pdc line */
 	/* virtual bit 8: constant 0, virtual bit 9:constant 1 */
@@ -353,14 +354,12 @@ private:
 	devcb_write8 m_ctl_cb;          /* tms ctl func */
 
 	emu_timer *m_romclk_timer;
-	const UINT8 *m_rom;
-	const UINT8 *m_prom;
 };
 
 extern const device_type TMSPROM;
 
 #define MCFG_TMSPROM_REGION(_region) \
-	tmsprom_device::set_region(*device, _region);
+	tmsprom_device::set_region(*device, "^" _region);
 
 #define MCFG_TMSPROM_ROM_SIZE(_size) \
 	tmsprom_device::set_rom_size(*device, _size);

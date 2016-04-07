@@ -19,6 +19,7 @@ const device_type PLA = &device_creator<pla_device>;
 
 pla_device::pla_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PLA, "PLA", tag, owner, clock, "pla", __FILE__),
+		m_region(*this, DEVICE_SELF),
 		m_format(PLA_FMT_JEDBIN),
 		m_inputs(0),
 		m_outputs(0),
@@ -35,7 +36,6 @@ pla_device::pla_device(const machine_config &mconfig, const char *tag, device_t 
 
 void pla_device::device_start()
 {
-	assert(region() != nullptr);
 	assert(m_terms < MAX_TERMS);
 	assert(m_inputs < 32 && m_outputs <= 32);
 
@@ -74,11 +74,11 @@ void pla_device::parse_fusemap()
 	switch (m_format)
 	{
 		case PLA_FMT_JEDBIN:
-			result = jedbin_parse(region()->base(), region()->bytes(), &jed);
+			result = jedbin_parse(m_region->base(), m_region->bytes(), &jed);
 			break;
 
 		case PLA_FMT_BERKELEY:
-			result = pla_parse(region()->base(), region()->bytes(), &jed);
+			result = pla_parse(m_region->base(), m_region->bytes(), &jed);
 			break;
 	}
 

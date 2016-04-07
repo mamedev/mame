@@ -75,7 +75,7 @@ private:
 
 	// internal state
 
-	memory_region *m_charset;
+	required_region_ptr<UINT8> m_charset;
 	address_space *m_textram;
 
 	UINT8 x_curs_pos;

@@ -14,7 +14,7 @@ extern const device_type MSX_SLOT_MUSIC;
 
 #define MCFG_MSX_SLOT_MUSIC_ADD(_tag, _startpage, _numpages, _region, _offset, _ym2413_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_MUSIC, _startpage, _numpages) \
-	msx_slot_rom_device::set_rom_start(*device, _region, _offset); \
+	msx_slot_rom_device::set_rom_start(*device, "^" _region, _offset); \
 	msx_slot_music_device::set_ym2413_tag(*device, _ym2413_tag);
 class msx_slot_music_device : public msx_slot_rom_device
 {

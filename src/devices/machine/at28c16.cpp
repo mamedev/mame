@@ -45,7 +45,8 @@ at28c16_device::at28c16_device( const machine_config &mconfig, const char *tag, 
 		device_nvram_interface(mconfig, *this),
 		m_a9_12v( 0 ),
 		m_oe_12v( 0 ),
-		m_last_write( -1 )
+		m_last_write( -1 ),
+		m_default_data(*this, DEVICE_SELF, AT28C16_DATA_BYTES)
 {
 }
 
@@ -116,26 +117,14 @@ void at28c16_device::nvram_default()
 	UINT16 default_value = 0xff;
 	for( offs_t offs = 0; offs < AT28C16_TOTAL_BYTES; offs++ )
 	{
-		m_addrspace[ 0 ]->write_byte( offs, default_value );
+		space(AS_PROGRAM).write_byte( offs, default_value );
 	}
 
 	/* populate from a memory region if present */
-	if( m_region != nullptr )
+	if (m_default_data.found())
 	{
-		if( m_region->bytes() != AT28C16_DATA_BYTES )
-		{
-			fatalerror( "at28c16 region '%s' wrong size (expected size = 0x%X)\n", tag(), AT28C16_DATA_BYTES );
-		}
-
-		if( m_region->bytewidth() != 1 )
-		{
-			fatalerror( "at28c16 region '%s' needs to be an 8-bit region\n", tag() );
-		}
-
-		UINT8 *default_data = m_region->base();
-
 		for( offs_t offs = 0; offs < AT28C16_DATA_BYTES; offs++ )
-			m_addrspace[ 0 ]->write_byte( offs, default_data[offs] );
+			space(AS_PROGRAM).write_byte(offs, m_default_data[offs]);
 	}
 }
 
@@ -153,7 +142,7 @@ void at28c16_device::nvram_read( emu_file &file )
 
 	for( offs_t offs = 0; offs < AT28C16_TOTAL_BYTES; offs++ )
 	{
-		m_addrspace[ 0 ]->write_byte( offs, buffer[ offs ] );
+		space(AS_PROGRAM).write_byte( offs, buffer[ offs ] );
 	}
 }
 
@@ -168,7 +157,7 @@ void at28c16_device::nvram_write( emu_file &file )
 
 	for( offs_t offs = 0; offs < AT28C16_TOTAL_BYTES; offs++ )
 	{
-		buffer[ offs ] = m_addrspace[ 0 ]->read_byte( offs );
+		buffer[ offs ] = space(AS_PROGRAM).read_byte( offs );
 	}
 
 	file.write( &buffer[0], AT28C16_TOTAL_BYTES );
@@ -193,7 +182,7 @@ WRITE8_MEMBER( at28c16_device::write )
 		{
 			for( offs_t offs = 0; offs < AT28C16_TOTAL_BYTES; offs++ )
 			{
-				m_addrspace[ 0 ]->write_byte( offs, 0xff );
+				this->space(AS_PROGRAM).write_byte( offs, 0xff );
 			}
 
 			m_last_write = 0xff;
@@ -208,9 +197,9 @@ WRITE8_MEMBER( at28c16_device::write )
 		}
 
 //      logerror( "%s: AT28C16: write( %04x, %02x )\n", machine.describe_context(), offset, data );
-		if( m_last_write < 0 && m_addrspace[ 0 ]->read_byte( offset ) != data )
+		if( m_last_write < 0 && this->space(AS_PROGRAM).read_byte( offset ) != data )
 		{
-			m_addrspace[ 0 ]->write_byte( offset, data );
+			this->space(AS_PROGRAM).write_byte( offset, data );
 			m_last_write = data;
 			m_write_timer->adjust( attotime::from_usec( 200 ) );
 		}
@@ -233,7 +222,7 @@ READ8_MEMBER( at28c16_device::read )
 			offset += AT28C16_ID_BYTES;
 		}
 
-		UINT8 data = m_addrspace[ 0 ]->read_byte( offset );
+		UINT8 data = this->space(AS_PROGRAM).read_byte( offset );
 //      logerror( "%s: AT28C16: read( %04x ) data %02x\n", machine.describe_context(), offset, data );
 		return data;
 	}

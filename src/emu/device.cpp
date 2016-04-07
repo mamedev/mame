@@ -39,7 +39,6 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 		m_clock_scale(1.0),
 		m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock)),
 
-		m_region(nullptr),
 		m_machine_config(mconfig),
 		m_static_config(nullptr),
 		m_input_defaults(nullptr),
@@ -308,7 +307,26 @@ bool device_t::findit(bool isvalidation) const
 {
 	bool allfound = true;
 	for (finder_base *autodev = m_auto_finder_list; autodev != nullptr; autodev = autodev->m_next)
+	{
+		if (isvalidation)
+		{
+			// sanity checking
+			const char *tag = autodev->finder_tag();
+			if (tag == nullptr)
+			{
+				osd_printf_error("Finder tag is null!\n");
+				allfound = false;
+				continue;
+			}
+			if (tag[0] == '^' && tag[1] == ':')
+			{
+				osd_printf_error("Malformed finder tag: %s\n", tag);
+				allfound = false;
+				continue;
+			}
+		}
 		allfound &= autodev->findit(isvalidation);
+	}
 	return allfound;
 }
 
@@ -318,9 +336,6 @@ bool device_t::findit(bool isvalidation) const
 
 void device_t::start()
 {
-	// populate the machine and the region field
-	m_region = machine().root_device().memregion(tag());
-
 	// find all the registered devices
 	if (!findit(false))
 		throw emu_fatalerror("Missing some required objects, unable to proceed");

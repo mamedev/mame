@@ -59,7 +59,8 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, pci_bridge_device)
 ADDRESS_MAP_END
 
 pci_device::pci_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		m_region(*this, DEVICE_SELF)
 {
 	main_id = 0xffffffff;
 	revision = 0x00;

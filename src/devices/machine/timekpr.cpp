@@ -119,15 +119,16 @@ static int counter_from_ram( UINT8 *data, int offset )
 //  timekeeper_device_config - constructor
 //-------------------------------------------------
 
-timekeeper_device::timekeeper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+timekeeper_device::timekeeper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int size)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_nvram_interface(mconfig, *this)
-	, m_default_data(*this, DEVICE_SELF)
+	, m_default_data(*this, DEVICE_SELF, size)
+	, m_size(size)
 {
 }
 
 m48t02_device::m48t02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: timekeeper_device(mconfig, M48T02, "M48T02 Timekeeper", tag, owner, clock, "m48t02", __FILE__)
+	: timekeeper_device(mconfig, M48T02, "M48T02 Timekeeper", tag, owner, clock, "m48t02", __FILE__, 0x800)
 {
 	m_offset_control = 0x7f8;
 	m_offset_seconds = 0x7f9;
@@ -139,11 +140,10 @@ m48t02_device::m48t02_device(const machine_config &mconfig, const char *tag, dev
 	m_offset_year = 0x7ff;
 	m_offset_century = -1;
 	m_offset_flags = -1;
-	m_size = 0x800;
 }
 
 m48t35_device::m48t35_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: timekeeper_device(mconfig, M48T35, "M48T35 Timekeeper", tag, owner, clock, "m48t35", __FILE__)
+	: timekeeper_device(mconfig, M48T35, "M48T35 Timekeeper", tag, owner, clock, "m48t35", __FILE__, 0x8000)
 {
 	m_offset_control = 0x7ff8;
 	m_offset_seconds = 0x7ff9;
@@ -155,11 +155,10 @@ m48t35_device::m48t35_device(const machine_config &mconfig, const char *tag, dev
 	m_offset_year = 0x7fff;
 	m_offset_century = -1;
 	m_offset_flags = -1;
-	m_size = 0x8000;
 }
 
 m48t37_device::m48t37_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: timekeeper_device(mconfig, M48T37, "M48T37 Timekeeper", tag, owner, clock, "m48t37", __FILE__)
+	: timekeeper_device(mconfig, M48T37, "M48T37 Timekeeper", tag, owner, clock, "m48t37", __FILE__, 0x8000)
 {
 	m_offset_control = 0x7ff8;
 	m_offset_seconds = 0x7ff9;
@@ -171,11 +170,10 @@ m48t37_device::m48t37_device(const machine_config &mconfig, const char *tag, dev
 	m_offset_year = 0x7fff;
 	m_offset_century = 0x7ff1;
 	m_offset_flags = 0x7ff0;
-	m_size = 0x8000;
 }
 
 m48t58_device::m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: timekeeper_device(mconfig, M48T58, "M48T58 Timekeeper", tag, owner, clock, "m48t58", __FILE__)
+	: timekeeper_device(mconfig, M48T58, "M48T58 Timekeeper", tag, owner, clock, "m48t58", __FILE__, 0x2000)
 {
 	m_offset_control = 0x1ff8;
 	m_offset_seconds = 0x1ff9;
@@ -187,11 +185,10 @@ m48t58_device::m48t58_device(const machine_config &mconfig, const char *tag, dev
 	m_offset_year = 0x1fff;
 	m_offset_century = -1;
 	m_offset_flags = -1;
-	m_size = 0x2000;
 }
 
 mk48t08_device::mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: timekeeper_device(mconfig, MK48T08, "MK48T08 Timekeeper", tag, owner, clock, "m48t08", __FILE__)
+	: timekeeper_device(mconfig, MK48T08, "MK48T08 Timekeeper", tag, owner, clock, "m48t08", __FILE__, 0x2000)
 {
 	m_offset_control = 0x1ff8;
 	m_offset_seconds = 0x1ff9;
@@ -203,7 +200,6 @@ mk48t08_device::mk48t08_device(const machine_config &mconfig, const char *tag, d
 	m_offset_year = 0x1fff;
 	m_offset_century = 0x1ff1;
 	m_offset_flags = 0x1ff0;
-	m_size = 0x2000;
 }
 
 
@@ -230,11 +226,6 @@ void timekeeper_device::device_start()
 	m_year = make_bcd( systime.local_time.year % 100 );
 	m_century = make_bcd( systime.local_time.year / 100 );
 	m_data.resize( m_size );
-
-	if (m_default_data)
-	{
-		assert(m_default_data.bytes() == m_size);
-	}
 
 	save_item( NAME(m_control) );
 	save_item( NAME(m_seconds) );
@@ -398,7 +389,7 @@ READ8_MEMBER( timekeeper_device::read )
 
 void timekeeper_device::nvram_default()
 {
-	if( m_default_data != nullptr )
+	if (m_default_data.found())
 	{
 		memcpy( &m_data[0], m_default_data, m_size );
 	}

@@ -60,8 +60,7 @@ private:
 	int m_cmd_rw;
 	UINT8 m_phrase;
 
-	UINT8 *m_mem_base;
-	UINT32 m_mem_mask;
+	required_region_ptr<UINT8> m_mem;
 };
 
 
