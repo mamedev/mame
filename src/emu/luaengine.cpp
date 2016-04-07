@@ -755,12 +755,29 @@ int lua_engine::lua_item::l_item_read(lua_State *L)
 {
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "offset (integer) expected");
 	int offset = lua_tounsigned(L, 2);
-	if(!l_item_base || (offset > (l_item_size * l_item_count)))
+	int ret = 0;
+	if(!l_item_base || (offset > l_item_count))
 	{
 		lua_pushnil(L);
 		return 1;
 	}
-	lua_pushunsigned(L, ((char *)l_item_base)[offset]);
+	switch(l_item_size)
+	{
+		case 1:
+		default:
+			ret = ((UINT8 *)l_item_base)[offset];
+			break;
+		case 2:
+			ret = ((UINT16 *)l_item_base)[offset];
+			break;
+		case 4:
+			ret = ((UINT32 *)l_item_base)[offset];
+			break;
+		case 8:
+			ret = ((UINT64 *)l_item_base)[offset];
+			break;
+	}
+	lua_pushunsigned(L, ret);
 	return 1;
 }
 
@@ -769,10 +786,25 @@ int lua_engine::lua_item::l_item_write(lua_State *L)
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "offset (integer) expected");
 	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
 	int offset = lua_tounsigned(L, 2);
-	UINT8 value = lua_tounsigned(L, 3);
-	if(!l_item_base || (offset > (l_item_size * l_item_count)))
+	UINT64 value = lua_tounsigned(L, 3);
+	if(!l_item_base || (offset > l_item_count))
 		return 1;
-	((char *)l_item_base)[offset] = value;
+	switch(l_item_size)
+	{
+		case 1:
+		default:
+			((UINT8 *)l_item_base)[offset] = (UINT8)value;
+			break;
+		case 2:
+			((UINT16 *)l_item_base)[offset] = (UINT16)value;
+			break;
+		case 4:
+			((UINT32 *)l_item_base)[offset] = (UINT32)value;
+			break;
+		case 8:
+			((UINT64 *)l_item_base)[offset] = (UINT64)value;
+			break;
+	}
 	return 1;
 }
 
