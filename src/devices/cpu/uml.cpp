@@ -869,11 +869,19 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 	std::ostringstream buffer;
 	for (const char *opsrc = opinfo.mnemonic; *opsrc != 0; opsrc++)
 		if (*opsrc == '!')
-			util::stream_format(buffer, "%-8s", bang_size[m_size]);
+			util::stream_format(buffer, "%s", bang_size[m_size]);
 		else if (*opsrc == '#')
-			util::stream_format(buffer, "%-8s", pound_size[m_size]);
+			util::stream_format(buffer, "%s", pound_size[m_size]);
 		else
-			util::stream_format(buffer, "%-8c", *opsrc);
+			util::stream_format(buffer, "%c", *opsrc);
+
+	// pad to 8 spaces
+	int pad = 8 - buffer.tellp();
+	while (pad > 0)
+	{
+		buffer.put(' ');
+		pad--;
+	}
 
 	// iterate through parameters
 	for (int pnum = 0; pnum < m_numparams; pnum++)
