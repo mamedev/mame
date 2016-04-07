@@ -66,13 +66,12 @@ function cheat.startplugin()
 	local function load_cheats()
 		local filename = emu.romname()
 		local json = require("json")
-		local path = manager:machine():options().entries.cheatpath:value()
-		local file = emu.file(path .. ";" .. path .. "/cheat", 1)
+		local file = emu.file(manager:machine():options().entries.cheatpath:value():gsub("([^;]+)", "%1;%1/cheat"), 1)
 
 		if emu.softname() ~= "" then
-			for name, image in manager:machine().images do
-				if image:exists() and image:software_entry() then
-					filename = filename .. "/" .. image:software_entry()
+			for name, image in pairs(manager:machine().images) do
+				if image:exists() and image:software_list_name() ~= "" then
+					filename = image:software_list_name() .. "/" .. emu.softname()
 				end
 			end
 		end
