@@ -1459,7 +1459,7 @@ UINT32 hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , UINT16 addr)
 		bool top_half = BIT(addr , 15) != 0;
 
 		// Detect accesses to top half of base page
-		if (aec_case == AEC_CASE_C && (addr & 0xfe00) == 0xfe00) {
+		if ((aec_case == AEC_CASE_C || aec_case == AEC_CASE_I) && (addr & 0xfe00) == 0xfe00) {
 			aec_case = AEC_CASE_B;
 		}
 
