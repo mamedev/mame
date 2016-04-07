@@ -31,27 +31,37 @@ namespace bgfx
 	struct OVRBufferI
 	{
 		virtual ~OVRBufferI() {};
-		virtual void onRender(const ovrSession &session) = 0;
-		virtual void destroy(const ovrSession &session) = 0;
+		virtual void create(const ovrSession& _session, int _eyeIdx) = 0;
+		virtual void destroy(const ovrSession& _session) = 0;
+		virtual void render(const ovrSession& _session) = 0;
 
-		ovrSizei   m_eyeTextureSize;
-		ovrTextureSwapChain m_swapTextureChain;
+		ovrSizei m_eyeTextureSize;
+		ovrTextureSwapChain m_textureSwapChain;
 	};
 
 	// mirrored window output
 	struct OVRMirrorI
 	{
 		virtual ~OVRMirrorI() {};
-		virtual void init(const ovrSession &session, int windowWidth, int windowHeight) = 0;
-		virtual void destroy(const ovrSession &session) = 0;
-		virtual void blit(const ovrSession &session) = 0;
+		virtual void create(const ovrSession& _session, int windowWidth, int windowHeight) = 0;
+		virtual void destroy(const ovrSession& _session) = 0;
+		virtual void blit(const ovrSession& _session) = 0;
 
 		ovrMirrorTexture     m_mirrorTexture;
-		ovrMirrorTextureDesc m_mirrorDesc;
+		ovrMirrorTextureDesc m_mirrorTextureDesc;
 	};
 
 	struct OVR
 	{
+		enum Enum
+		{
+			NotEnabled,
+			DeviceLost,
+			Success,
+
+			Count
+		};
+
 		OVR();
 		~OVR();
 
@@ -62,7 +72,7 @@ namespace bgfx
 
 		bool isEnabled() const
 		{
-			return m_isenabled;
+			return m_enabled;
 		}
 
 		void init();
@@ -72,8 +82,7 @@ namespace bgfx
 		void renderEyeStart(uint8_t _eye);
 		bool postReset();
 		void preReset();
-		void commitEye(uint8_t _eye);
-		bool swap(HMD& _hmd, bool originBottomLeft);
+		Enum swap(HMD& _hmd, bool originBottomLeft);
 		void recenter();
 		void getEyePose(HMD& _hmd);
 
@@ -84,12 +93,11 @@ namespace bgfx
 		ovrPosef    m_pose[2];
 		ovrVector3f m_hmdToEyeOffset[2];
 		ovrSizei    m_hmdSize;
-		ovrResult   m_hmdFrameReady;
 		OVRBufferI *m_eyeBuffers[2];
 		OVRMirrorI *m_mirror;
-		long long   m_frameIndex;
+		uint64_t    m_frameIndex;
 		double      m_sensorSampleTime;
-		bool m_isenabled;
+		bool m_enabled;
 	};
 
 } // namespace bgfx
@@ -100,6 +108,15 @@ namespace bgfx
 {
 	struct OVR
 	{
+		enum Enum
+		{
+			NotEnabled,
+			DeviceLost,
+			Success,
+
+			Count
+		};
+
 		OVR()
 		{
 		}
@@ -139,19 +156,15 @@ namespace bgfx
 			_viewport->m_height = 0;
 		}
 
-		void commitEye(uint8_t /*_eye*/)
-		{
-		}
-
 		void renderEyeStart(uint8_t /*_eye*/)
 		{
 		}
 
-		bool swap(HMD& _hmd, bool /*originBottomLeft*/)
+		Enum swap(HMD& _hmd, bool /*originBottomLeft*/)
 		{
 			_hmd.flags = BGFX_HMD_NONE;
 			getEyePose(_hmd);
-			return false;
+			return NotEnabled;
 		}
 
 		void recenter()

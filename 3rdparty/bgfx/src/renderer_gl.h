@@ -901,6 +901,28 @@ namespace bgfx
 
 namespace bgfx { namespace gl
 {
+#if BGFX_CONFIG_USE_OVR
+	struct OVRBufferGL : public OVRBufferI
+	{
+		virtual void create(const ovrSession& _session, int _eyeIdx) BX_OVERRIDE;
+		virtual void destroy(const ovrSession& _session) BX_OVERRIDE;
+		virtual void render(const ovrSession& _session) BX_OVERRIDE;
+
+		GLuint m_eyeFbo;
+		GLuint m_eyeTexId;
+		GLuint m_depthBuffer;
+	};
+
+	struct OVRMirrorGL : public OVRMirrorI
+	{
+		virtual void create(const ovrSession& _session, int _width, int _height) BX_OVERRIDE;
+		virtual void destroy(const ovrSession& _session) BX_OVERRIDE;
+		virtual void blit(const ovrSession& _session) BX_OVERRIDE;
+
+		GLuint m_mirrorFBO;
+	};
+#endif // BGFX_CONFIG_USE_OVR
+
 	void dumpExtensions(const char* _extensions);
 
 	const char* glEnumName(GLenum _enum);
