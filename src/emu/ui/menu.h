@@ -32,6 +32,7 @@
 #define MENU_FLAG_UI_SWLIST         (1 << 8)
 #define MENU_FLAG_UI_FAVORITE       (1 << 9)
 #define MENU_FLAG_UI_PALETTE        (1 << 10)
+#define MENU_FLAG_UI_HEADING        (1 << 11)
 
 // special menu item for separators
 #define MENU_SEPARATOR_ITEM         "---"

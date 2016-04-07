@@ -4,6 +4,21 @@
 
     Sega Master System "Light Phaser" (light gun) emulation
 
+
+Release data from the Sega Retro project:
+
+  Year: 1986    Country/region: US    Model code: 3050
+  Year: 1987    Country/region: EU    Model code: ?
+  Year: 1989    Country/region: BR    Model code: 010470
+  Year: 198?    Country/region: KR    Model code: ?
+
+Notes:
+
+  The Light Phaser gun doesn't work with the Japanese SMS and Sega Mark III.
+  There are reports about Light Phaser working on the second Korean SMS
+  version, and a Korean advert shows support on the first version (Gam*Boy I,
+  although based on Japanese SMS).
+
 **********************************************************************/
 
 #include "lphaser.h"
@@ -21,7 +36,7 @@ const device_type SMS_LIGHT_PHASER = &device_creator<sms_light_phaser_device>;
 #define LGUN_X_INTERVAL       4
 
 
-CUSTOM_INPUT_MEMBER( sms_light_phaser_device::th_pin_r )
+READ_LINE_MEMBER( sms_light_phaser_device::th_pin_r )
 {
 	// The returned value is inverted due to IP_ACTIVE_LOW mapping.
 	return ~m_sensor_last_state;
@@ -38,7 +53,7 @@ INPUT_CHANGED_MEMBER( sms_light_phaser_device::position_changed )
 static INPUT_PORTS_START( sms_light_phaser )
 	PORT_START("CTRL_PORT")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // TL (trigger)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_light_phaser_device, th_pin_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, sms_light_phaser_device, th_pin_r)
 	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("LPHASER_X")

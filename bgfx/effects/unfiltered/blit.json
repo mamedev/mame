@@ -1,0 +1,121 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  blit.json: A simple texture-to-target copy.
+//
+//============================================================
+{
+	// blend (required): The blend state for this effect.
+    "blend": {
+    	// equation (optional): What equation to perform on the source and destination blend values.
+    	// values: "add", "sub", "revSub", "min", "max"
+    	// default: "add"
+    	// 
+    	// "subtract" and "revSubtract" are provided as aliases for "sub" and "revSub"
+    	"equation": "add",
+    	
+    	// blend function parameters (optional): What factors to use in the blend function when calculating the final pixel.
+    	// values: "0", "1", "srccolor", "1-srccolor", "dstcolor", "1-dstcolor", "srcalpha", "1-srcalpha", "dstalpha", "1-dstalpha"
+    	// defaults (srcColor, srcAlpha): "1"
+    	// defaults (dstColor, dstAlpha): "0"
+    	// 
+    	// "zero", "one", "invsrccolor", "invdstcolor", "invsrcalpha", and "invdstalpha" are provided as aliases for "0", "1", "1-srccolor", "1-dstcolor", "1-srcalpha", and "1-dstalpha"
+    	"srcColor": "srcalpha",
+    	"dstColor": "1-srcalpha",
+    	"srcAlpha": "srcalpha",
+    	"dstAlpha": "1-srcalpha"
+    },
+    
+    // depth (required): The depth state for this effect.
+    "depth": {
+    	// function (optional): The depth function to use when drawing.
+    	// values: "never", "less", "equal", "lequal", "greater", "notequal", "gequal", "always"
+    	// default: "always"
+    	"function": "always",
+    	
+    	// writeenable (optional): Whether to store Z-buffer data.
+    	// values: true, false
+    	// default: false
+    	"writeenable": false
+    },
+    
+    // cull (required): The cull mode for this effect.
+    "cull": {
+    	// mode (optional): What winding, if any, to cull.
+    	// values: "none", "cw", "ccw"
+    	// default: "ccw"
+    	// 
+    	// "clockwise" and "counterclockwise" are provided as aliases for "cw" and "ccw"
+    	"mode": "none"
+    },
+    
+    // write (required): Write enable for color and alpha channels.
+    "write": {
+    	// rgb (optional): Whether to store color data when drawing.
+    	// values: true, false
+    	// default: false
+    	"rgb": true,
+
+    	// alpha (optional): Whether to store alpha data when drawing.
+    	// values: true, false
+    	// default: false
+    	"alpha": true
+    },
+
+	// vertex (required): The vertex shader to use when drawing.
+	// value: A string containing the name of a shader file to use, minus the extension.
+    "vertex": "vs_blit",
+
+	// pixel/fragment (required): The pixel or fragment shader to use when drawing.
+	// value: A string containing the name of a shader file to use, minus the extension.
+    "fragment": "fs_blit",
+    
+    // uniforms (required): The list of uniforms for this effect. Can be empty, but must exist.
+    "uniforms": [    	
+    	{
+    		// name (required): The name of the uniform, as used in either the vertex or pixel/fragment shader.
+    		// value: A string containing the name of the uniform as described above.
+    		// 
+    		// NOTE: Some names correspond to special values that will be automatically filled by the BGFX
+    		//       code if they are used by the shader. These names are:
+    		//           "u_screen_dims"
+    		//				The dimensions of the first texture input if present, otherwise the dimensions of the output window.
+    		//				Valid values: xy
+    		//           "u_inv_screen_dims"
+    		//				The reciprocal of u_screen_dims.
+    		//				Valid values: xy
+    		//           "u_source_dims"
+    		//				The size, in pixels, of the screen texture incoming to the chain.
+    		//				Valid values: xy
+    		//           "u_rotation_type"
+    		//				This screen's rotation type. 0 if ROT0, 1 if ROT90, 2 if ROT180, 3 of ROT270.
+    		//              Valid values: x
+    		//           "u_swap_xy"
+    		//				Whether this screen is swapped on the X and Y axes. 1 if true, 0 if false.
+    		//				Valid values: x
+    		//			 "u_quad_dims"
+    		//				The dimensions, in pixels, occupied by this one screen primitive itself in the output window.
+    		//				Valid values: xy
+    		//			 "u_tex_sizeN"
+    		//				The dimensions, in pixels, of the texture in input pair N. Starts at 0.
+    		//				valid values: xy
+    		"name": "s_tex",
+
+    		// type (required): The type of the uniform.
+    		// values: "int", "vec4", "mat3", "mat4"
+    		//
+    		// Note: "int" should only be used for samplers.
+    		"type": "int",
+    		
+    		// values (required): The array of numbers with which to initialize the uniform.
+    		// value: A JSON array containin the correct amount of numbers to initialize a uniform of the
+    		//        above-specified type. The following size rules should be followed:
+    		//            "int": 1 float
+    		//            "vec4": 4 floats
+    		//            "mat3": 9 floats
+    		//            "mat4": 16 floats
+    		"values": [ 1.0 ]
+    	}
+    ]
+}

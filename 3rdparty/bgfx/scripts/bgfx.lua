@@ -51,11 +51,23 @@ function bgfxProject(_name, _kind, _defines)
 
 		if _OPTIONS["with-ovr"] then
 			defines {
+--				"BGFX_CONFIG_MULTITHREADED=0",
 				"BGFX_CONFIG_USE_OVR=1",
 			}
 			includedirs {
 				"$(OVR_DIR)/LibOVR/Include",
 			}
+
+			configuration { "x32" }
+				libdirs { path.join("$(OVR_DIR)/LibOVR/Lib/Windows/Win32/Release", _ACTION) }
+
+			configuration { "x64" }
+				libdirs { path.join("$(OVR_DIR)/LibOVR/Lib/Windows/x64/Release", _ACTION) }
+
+			configuration { "x32 or x64" }
+				links { "libovr" }
+
+			configuration {}
 		end
 
 		configuration { "Debug" }

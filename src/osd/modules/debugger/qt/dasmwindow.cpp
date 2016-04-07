@@ -265,11 +265,9 @@ void DasmWindow::populateComboBox()
 		return;
 
 	m_cpuComboBox->clear();
-	for (const debug_view_source* source = m_dasmView->view()->first_source();
-			source != NULL;
-			source = source->next())
+	for (const debug_view_source &source : m_dasmView->view()->source_list())
 	{
-		m_cpuComboBox->addItem(source->name());
+		m_cpuComboBox->addItem(source.name());
 	}
 }
 

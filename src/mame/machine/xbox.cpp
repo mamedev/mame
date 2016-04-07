@@ -18,7 +18,7 @@
 #define LOG_PCI
 //#define LOG_AUDIO
 //#define LOG_OHCI
-//#define USB_ENABLED
+#define USB_HACK_ENABLED
 
 static void dump_string_command(running_machine &machine, int ref, int params, const char **param)
 {
@@ -534,7 +534,7 @@ READ32_MEMBER(xbox_base_state::usbctrl_r)
 #endif
 	ret=ohcist.hc_regs[offset];
 	if (offset == 0) { /* hacks needed until usb (and jvs) is implemented */
-#ifndef USB_ENABLED
+#ifndef USB_HACK_ENABLED
 		hack_usb();
 #endif
 	}
@@ -543,9 +543,7 @@ READ32_MEMBER(xbox_base_state::usbctrl_r)
 
 WRITE32_MEMBER(xbox_base_state::usbctrl_w)
 {
-#ifdef USB_ENABLED
 	UINT32 old = ohcist.hc_regs[offset];
-#endif
 
 #ifdef LOG_OHCI
 	if (offset >= 0x54 / 4)
@@ -553,7 +551,6 @@ WRITE32_MEMBER(xbox_base_state::usbctrl_w)
 	else
 		logerror("usb controller 0 register %s write %08X\n", usbregnames[offset], data);
 #endif
-#ifdef USB_ENABLED
 	if (offset == HcRhStatus) {
 		if (data & 0x80000000)
 			ohcist.hc_regs[HcRhStatus] &= ~0x8000;
@@ -623,7 +620,6 @@ WRITE32_MEMBER(xbox_base_state::usbctrl_w)
 		usb_ohci_interrupts();
 		return;
 	}
-#endif
 	ohcist.hc_regs[offset] = data;
 }
 
@@ -984,6 +980,7 @@ ohci_function_device::ohci_function_device(running_machine &machine)
 		endpoints[e].position = nullptr;
 	}
 	endpoints[0].type = ControlEndpoint;
+	wantstatuscallback = false;
 	settingaddress = false;
 	configurationvalue = 0;
 	selected_configuration = nullptr;
@@ -1253,13 +1250,22 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 
 	if (pid == SetupPid) {
 		USBSetupPacket *p=(USBSetupPacket *)buffer;
+		// control transfers are done in 3 stages: first the setup stage, then an optional data stage, then a status stage
+		// so there are 3 cases:
+		// 1- control transfer with a data stage where the host sends data to the device
+		//    in this case the sequence of pids transferred is control pid, data out pid, data in pid
+		// 2- control transfer with a data stage where the host receives data from the device
+		//    in this case the sequence of pids transferred is control pid, data in pid, data out pid
+		// 3- control transfer without a data stage
+		//    in this case the sequence of pids transferred is control pid, data in pid
 		// define direction 0:host->device 1:device->host
-		// case == 1, IN data stage and OUT status stage
-		// case == 0, OUT data stage and IN status stage
-		// data stage is optional, IN status stage
+		// direction == 1 -> IN data stage and OUT status stage
+		// direction == 0 -> OUT data stage and IN status stage
+		// data stage not present -> IN status stage
 		endpoints[endpoint].controldirection = (p->bmRequestType & 128) >> 7;
 		endpoints[endpoint].controltype = (p->bmRequestType & 0x60) >> 5;
 		endpoints[endpoint].controlrecipient = p->bmRequestType & 0x1f;
+		wantstatuscallback = false;
 		if (endpoint == 0) {
 			endpoints[endpoint].position = nullptr;
 			// number of byte to transfer in data stage (0 no data stage)
@@ -1341,23 +1347,26 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 			return handle_nonstandard_request(endpoint, p);
 	}
 	else if (pid == InPid) {
-		if (endpoint == 0) {
+		if (endpoints[endpoint].type == ControlEndpoint) { //if (endpoint == 0) {
 			// if no data has been transferred (except for the setup stage)
 			// and the lenght of this IN transaction is 0
 			// assume this is the status stage
-			if ((size == 0) && (endpoints[endpoint].remain == 0)) {
-				if (settingaddress == true)
+			if ((endpoints[endpoint].remain == 0) && (size == 0)) {
+				if ((endpoint == 0) && (settingaddress == true))
 				{
 					// set of address is active at end of status stage
 					address = newaddress;
 					settingaddress = false;
 					state = AddressState;
 				}
+				if (wantstatuscallback == true)
+					handle_status_stage(endpoint);
+				wantstatuscallback = false;
 				return 0;
 			}
 			// case ==1, give data
 			// case ==0, nothing
-			// if device->host
+			// if device->host, since InPid then this is data stage
 			if (endpoints[endpoint].controldirection == DeviceToHost) {
 				// data stage
 				if (size > endpoints[endpoint].remain)
@@ -1367,15 +1376,22 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 				endpoints[endpoint].position = endpoints[endpoint].position + size;
 				endpoints[endpoint].remain = endpoints[endpoint].remain - size;
 			}
+			else {
+				if (wantstatuscallback == true)
+					handle_status_stage(endpoint);
+				wantstatuscallback = false;
+			}
 		}
+		else if (endpoints[endpoint].type == BulkEndpoint)
+			return handle_bulk_pid(endpoint, pid, buffer, size);
 		else
 			return -1;
 	}
 	else if (pid == OutPid) {
-		if (endpoint == 0) {
+		if (endpoints[endpoint].type == ControlEndpoint) { //if (endpoint == 0) {
 			// case ==1, nothing
 			// case ==0, give data
-			// if host->device
+			// if host->device, since OutPid then this is data stage
 			if (endpoints[endpoint].controldirection == HostToDevice) {
 				// data stage
 				if (size > endpoints[endpoint].remain)
@@ -1385,7 +1401,14 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 				endpoints[endpoint].position = endpoints[endpoint].position + size;
 				endpoints[endpoint].remain = endpoints[endpoint].remain - size;
 			}
+			else {
+				if (wantstatuscallback == true)
+					handle_status_stage(endpoint);
+				wantstatuscallback = false;
+			}
 		}
+		else if (endpoints[endpoint].type == BulkEndpoint)
+			return handle_bulk_pid(endpoint, pid, buffer, size);
 		else
 			return -1;
 	}
@@ -1428,99 +1451,6 @@ int ohci_game_controller_device::handle_nonstandard_request(int endpoint, USBSet
 		}
 	}
 	return -1;
-}
-
-//ic10
-const USBStandardDeviceDescriptor ohci_hlean2131qc_device::devdesc = { 0x12,0x01,0x0100,0x60,0x00,0x00,0x40,0x0CA3,0x0002,0x0108,0x01,0x02,0x00,0x01 };
-const USBStandardConfigurationDescriptor ohci_hlean2131qc_device::condesc = { 0x09,0x02,0x0058,0x01,0x01,0x00,0x80,0x96 };
-const USBStandardInterfaceDescriptor ohci_hlean2131qc_device::intdesc = { 0x09,0x04,0x00,0x00,0x0A,0xFF,0x00,0x00,0x00 };
-const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc01 = { 0x07,0x05,0x01,0x02,0x0040,0x00 };
-const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc02 = { 0x07,0x05,0x02,0x02,0x0040,0x00 };
-const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc03 = { 0x07,0x05,0x03,0x02,0x0040,0x00 };
-const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc04 = { 0x07,0x05,0x04,0x02,0x0040,0x00 };
-const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc05 = { 0x07,0x05,0x05,0x02,0x0040,0x00 };
-const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc81 = { 0x07,0x05,0x81,0x02,0x0040,0x00 };
-const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc82 = { 0x07,0x05,0x82,0x02,0x0040,0x00 };
-const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc83 = { 0x07,0x05,0x83,0x02,0x0040,0x00 };
-const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc84 = { 0x07,0x05,0x84,0x02,0x0040,0x00 };
-const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc85 = { 0x07,0x05,0x85,0x02,0x0040,0x00 };
-const UINT8 ohci_hlean2131qc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
-const UINT8 ohci_hlean2131qc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
-const UINT8 ohci_hlean2131qc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x03,0xFF,0x0B };
-
-ohci_hlean2131qc_device::ohci_hlean2131qc_device(running_machine &machine) :
-	ohci_function_device(machine)
-{
-	add_device_descriptor(devdesc);
-	add_configuration_descriptor(condesc);
-	add_interface_descriptor(intdesc);
-	add_endpoint_descriptor(enddesc81);
-	add_endpoint_descriptor(enddesc82);
-	add_endpoint_descriptor(enddesc83);
-	add_endpoint_descriptor(enddesc84);
-	add_endpoint_descriptor(enddesc85);
-	add_endpoint_descriptor(enddesc01);
-	add_endpoint_descriptor(enddesc02);
-	add_endpoint_descriptor(enddesc03);
-	add_endpoint_descriptor(enddesc04);
-	add_endpoint_descriptor(enddesc05);
-	add_string_descriptor(strdesc0);
-	add_string_descriptor(strdesc1);
-	add_string_descriptor(strdesc2);
-}
-
-int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
-{
-	if (endpoint != 0)
-		return -1;
-	for (int n = 0; n < setup->wLength; n++)
-		endpoints[endpoint].buffer[n] = 0xa0 ^ n;
-	endpoints[endpoint].buffer[0] = 0;
-	endpoints[endpoint].position = endpoints[endpoint].buffer;
-	endpoints[endpoint].remain = setup->wLength;
-	return 0;
-}
-
-//pc20
-const USBStandardDeviceDescriptor ohci_hlean2131sc_device::devdesc = { 0x12,0x01,0x0100,0x60,0x01,0x00,0x40,0x0CA3,0x0003,0x0110,0x01,0x02,0x00,0x01 };
-const USBStandardConfigurationDescriptor ohci_hlean2131sc_device::condesc = { 0x09,0x02,0x003C,0x01,0x01,0x00,0x80,0x96 };
-const USBStandardInterfaceDescriptor ohci_hlean2131sc_device::intdesc = { 0x09,0x04,0x00,0x00,0x06,0xFF,0x00,0x00,0x00 };
-const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc01 = { 0x07,0x05,0x01,0x02,0x0040,0x00 };
-const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc02 = { 0x07,0x05,0x02,0x02,0x0040,0x00 };
-const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc03 = { 0x07,0x05,0x03,0x02,0x0040,0x00 };
-const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc81 = { 0x07,0x05,0x81,0x02,0x0040,0x00 };
-const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc82 = { 0x07,0x05,0x82,0x02,0x0040,0x00 };
-const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc83 = { 0x07,0x05,0x83,0x02,0x0040,0x00 };
-const UINT8 ohci_hlean2131sc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
-const UINT8 ohci_hlean2131sc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
-const UINT8 ohci_hlean2131sc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x00,0x44,0x00 };
-
-ohci_hlean2131sc_device::ohci_hlean2131sc_device(running_machine &machine) :
-	ohci_function_device(machine)
-{
-	add_device_descriptor(devdesc);
-	add_configuration_descriptor(condesc);
-	add_interface_descriptor(intdesc);
-	add_endpoint_descriptor(enddesc81);
-	add_endpoint_descriptor(enddesc82);
-	add_endpoint_descriptor(enddesc83);
-	add_endpoint_descriptor(enddesc01);
-	add_endpoint_descriptor(enddesc02);
-	add_endpoint_descriptor(enddesc03);
-	add_string_descriptor(strdesc0);
-	add_string_descriptor(strdesc1);
-	add_string_descriptor(strdesc2);
-}
-
-int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
-{
-	if (endpoint != 0)
-		return -1;
-	for (int n = 0; n < setup->wLength; n++)
-		endpoints[endpoint].buffer[n] = 0xa0 ^ n;
-	endpoints[endpoint].position = endpoints[endpoint].buffer;
-	endpoints[endpoint].remain = setup->wLength;
-	return 0;
 }
 
 void xbox_base_state::usb_ohci_interrupts()
@@ -2175,11 +2105,7 @@ ADDRESS_MAP_END
 
 void xbox_base_state::machine_start()
 {
-#ifdef USB_ENABLED
 	//ohci_game_controller_device *usb_device;
-	ohci_hlean2131qc_device *usb_device;
-	//ohci_hlean2131sc_device *usb_device;
-#endif
 
 	nvidia_nv2a = std::make_unique<nv2a_renderer>(machine());
 	memset(pic16lc_buffer, 0, sizeof(pic16lc_buffer));
@@ -2209,21 +2135,19 @@ void xbox_base_state::machine_start()
 	pic16lc_buffer[0x1d] = 0x0d;
 	pic16lc_buffer[0x1e] = 0x0e;
 	pic16lc_buffer[0x1f] = 0x0f;
+	// usb
 	ohcist.hc_regs[HcRevision] = 0x10;
 	ohcist.hc_regs[HcFmInterval] = 0x2edf;
 	ohcist.hc_regs[HcLSThreshold] = 0x628;
 	ohcist.hc_regs[HcRhDescriptorA] = 4;
-#ifdef USB_ENABLED
 	ohcist.interruptbulkratio = 1;
 	ohcist.writebackdonehadcounter = 7;
 	ohcist.space = &m_maincpu->space();
 	ohcist.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xbox_base_state::usb_ohci_timer), this), (void *)"USB OHCI Timer");
 	ohcist.timer->enable(false);
 	//usb_device = new ohci_game_controller_device(machine());
-	usb_device = new ohci_hlean2131qc_device(machine());
-	//usb_device = new ohci_hlean2131sc_device(machine());
-	usb_ohci_plug(1, usb_device); // test connect
-#endif
+	//usb_ohci_plug(3, usb_device); // connect top root hub port 3, chihiro needs to use 1 and 2
+	// super-io
 	memset(&superiost, 0, sizeof(superiost));
 	superiost.configuration_mode = false;
 	superiost.registers[0][0x26] = 0x2e; // Configuration port address byte 0

@@ -46,6 +46,7 @@
 #include "drivenum.h"
 #include "xmlfile.h"
 #include "ui/ui.h"
+#include <zlib.h>
 
 
 
@@ -182,7 +183,7 @@ inline item_layer get_layer_and_blendmode(const layout_view &view, int index, in
 	//      screens (add) + overlays (RGB multiply) + backdrop (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
 
 	const int *layer_order = layer_order_standard;
-	if (view.first_item(ITEM_LAYER_BACKDROP) != nullptr && view.first_item(ITEM_LAYER_BACKDROP)->next() != nullptr && view.first_item(ITEM_LAYER_OVERLAY) == nullptr)
+	if (view.items(ITEM_LAYER_BACKDROP).count() > 1 && view.items(ITEM_LAYER_OVERLAY).empty())
 		layer_order = layer_order_alternate;
 
 	// select the layer
@@ -266,8 +267,8 @@ inline void render_primitive_list::add_reference(void *refptr)
 inline bool render_primitive_list::has_reference(void *refptr) const
 {
 	// skip if we already have one
-	for (reference *ref = m_reflist.first(); ref != nullptr; ref = ref->next())
-		if (ref->m_refptr == refptr)
+	for (reference &ref : m_reflist)
+		if (ref.m_refptr == refptr)
 			return true;
 	return false;
 }
@@ -906,7 +907,7 @@ render_container::user_settings::user_settings()
 //  render_target - constructor
 //-------------------------------------------------
 
-render_target::render_target(render_manager &manager, const char *layoutfile, UINT32 flags)
+render_target::render_target(render_manager &manager, const internal_layout *layoutfile, UINT32 flags)
 	: m_next(nullptr),
 		m_manager(manager),
 		m_curview(nullptr),
@@ -933,6 +934,7 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 
 	// aspect and scale options
 	m_keepaspect = (manager.machine().options().keep_aspect() && !(flags & RENDER_CREATE_HIDDEN));
+	m_int_overscan = manager.machine().options().int_overscan();
 	m_int_scale_x = manager.machine().options().int_scale_x();
 	m_int_scale_y = manager.machine().options().int_scale_y();
 	if (manager.machine().options().uneven_stretch() && !manager.machine().options().uneven_stretch_x())
@@ -1202,23 +1204,25 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 			// apply orientation if required
 			if (target_orientation & ORIENTATION_SWAP_XY)
 				src_aspect = 1.0 / src_aspect;
-	
-			// get destination size and aspect
-			float dest_width = (float)target_width;
-			float dest_height = (float)target_height;
-			float dest_aspect = dest_width / dest_height * target_pixel_aspect;
 
-			// apply aspect correction to destination rectangle
-			if (dest_aspect > src_aspect)
-				dest_width *= m_keepaspect? src_aspect / dest_aspect : 1.0f;
-			else
-				dest_height *= m_keepaspect? dest_aspect / src_aspect : 1.0f;
+			// get target aspect
+			float target_aspect = (float)target_width / (float)target_height * target_pixel_aspect;
 
-			// compute scale factors
-			float xscale = dest_width / src_width;
-			float yscale = dest_height / src_height;
-			xscale = dest_aspect >= 1.0f && m_scale_mode == SCALE_FRACTIONAL_X? xscale : MAX(1, render_round_nearest(xscale));
-			yscale = dest_aspect < 1.0f && m_scale_mode == SCALE_FRACTIONAL_X? yscale : MAX(1, render_round_nearest(yscale));
+			// determine the scale mode for each axis
+			bool x_is_integer = !(target_aspect >= 1.0f && m_scale_mode == SCALE_FRACTIONAL_X);
+			bool y_is_integer = !(target_aspect < 1.0f && m_scale_mode == SCALE_FRACTIONAL_X);
+
+			// first compute scale factors to fit the screen
+			float xscale = (float)target_width / src_width;
+			float yscale = (float)target_height / src_height;
+			float maxxscale = MAX(1, m_int_overscan? render_round_nearest(xscale) : floor(xscale));
+			float maxyscale = MAX(1, m_int_overscan? render_round_nearest(yscale) : floor(yscale));
+
+			// now apply desired scale mode and aspect correction
+			if (m_keepaspect && target_aspect > src_aspect) xscale *= src_aspect / target_aspect * (maxyscale / yscale);
+			if (m_keepaspect && target_aspect < src_aspect) yscale *= target_aspect / src_aspect * (maxxscale / xscale);
+			if (x_is_integer) xscale = MIN(maxxscale, MAX(1, render_round_nearest(xscale)));
+			if (y_is_integer) yscale = MIN(maxyscale, MAX(1, render_round_nearest(yscale)));
 
 			// check if we have user defined scale factors, if so use them instead
 			xscale = m_int_scale_x? m_int_scale_x : xscale;
@@ -1228,7 +1232,7 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 			visible_width = render_round_nearest(src_width * xscale);
 			visible_height = render_round_nearest(src_height * yscale);
 			break;
-		} 
+		}
 	}
 }
 
@@ -1260,16 +1264,16 @@ void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
 	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
 
 		// iterate over items in the layer
-		for (layout_view::item *curitem = m_curview->first_item(layer); curitem != nullptr; curitem = curitem->next())
-			if (curitem->screen() != nullptr)
+		for (layout_view::item &curitem : m_curview->items(layer))
+			if (curitem.screen() != nullptr)
 			{
 				// use a hard-coded default visible area for vector screens
-				screen_device *screen = curitem->screen();
+				screen_device *screen = curitem.screen();
 				const rectangle vectorvis(0, 639, 0, 479);
 				const rectangle &visarea = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? vectorvis : screen->visible_area();
 
 				// apply target orientation to the bounds
-				render_bounds bounds = curitem->bounds();
+				render_bounds bounds = curitem.bounds();
 				apply_orientation(bounds, m_orientation);
 				normalize_bounds(bounds);
 
@@ -1347,10 +1351,10 @@ render_primitive_list &render_target::get_primitives()
 			if (m_curview->layer_enabled(layer))
 			{
 				// iterate over items in the layer
-				for (layout_view::item *curitem = m_curview->first_item(layer); curitem != nullptr; curitem = curitem->next())
+				for (layout_view::item &curitem : m_curview->items(layer))
 				{
 					// first apply orientation to the bounds
-					render_bounds bounds = curitem->bounds();
+					render_bounds bounds = curitem.bounds();
 					apply_orientation(bounds, root_xform.orientation);
 					normalize_bounds(bounds);
 
@@ -1360,18 +1364,18 @@ render_primitive_list &render_target::get_primitives()
 					item_xform.yoffs = root_xform.yoffs + bounds.y0 * root_xform.yscale;
 					item_xform.xscale = (bounds.x1 - bounds.x0) * root_xform.xscale;
 					item_xform.yscale = (bounds.y1 - bounds.y0) * root_xform.yscale;
-					item_xform.color.r = curitem->color().r * root_xform.color.r;
-					item_xform.color.g = curitem->color().g * root_xform.color.g;
-					item_xform.color.b = curitem->color().b * root_xform.color.b;
-					item_xform.color.a = curitem->color().a * root_xform.color.a;
-					item_xform.orientation = orientation_add(curitem->orientation(), root_xform.orientation);
+					item_xform.color.r = curitem.color().r * root_xform.color.r;
+					item_xform.color.g = curitem.color().g * root_xform.color.g;
+					item_xform.color.b = curitem.color().b * root_xform.color.b;
+					item_xform.color.a = curitem.color().a * root_xform.color.a;
+					item_xform.orientation = orientation_add(curitem.orientation(), root_xform.orientation);
 					item_xform.no_center = false;
 
 					// if there is no associated element, it must be a screen element
-					if (curitem->screen() != nullptr)
-						add_container_primitives(list, item_xform, curitem->screen()->container(), blendmode);
+					if (curitem.screen() != nullptr)
+						add_container_primitives(list, item_xform, curitem.screen()->container(), blendmode);
 					else
-						add_element_primitives(list, item_xform, *curitem->element(), curitem->state(), blendmode);
+						add_element_primitives(list, item_xform, *curitem.element(), curitem.state(), blendmode);
 				}
 			}
 		}
@@ -1398,7 +1402,7 @@ render_primitive_list &render_target::get_primitives()
 	}
 
 	// process the debug containers
-	for (render_container *debug = m_debug_containers.first(); debug != nullptr; debug = debug->next())
+	for (render_container &debug : m_debug_containers)
 	{
 		object_transform ui_xform;
 		ui_xform.xoffs = 0;
@@ -1411,7 +1415,7 @@ render_primitive_list &render_target::get_primitives()
 		ui_xform.no_center = true;
 
 		// add UI elements
-		add_container_primitives(list, ui_xform, *debug, BLENDMODE_ALPHA);
+		add_container_primitives(list, ui_xform, debug, BLENDMODE_ALPHA);
 	}
 
 	// process the UI if we are the UI target
@@ -1522,11 +1526,11 @@ void render_target::debug_append(render_container &container)
 
 void render_target::resolve_tags()
 {
-	for (layout_file *file = m_filelist.first(); file != nullptr; file = file->next())
+	for (layout_file &file : m_filelist)
 	{
-		for (layout_view *view = file->first_view(); view != nullptr; view = view->next())
+		for (layout_view &view : file.views())
 		{
-			view->resolve_tags();
+			view.resolve_tags();
 		}
 	}
 }
@@ -1548,7 +1552,7 @@ void render_target::update_layer_config()
 //  given render target
 //-------------------------------------------------
 
-void render_target::load_layout_files(const char *layoutfile, bool singlefile)
+void render_target::load_layout_files(const internal_layout *layoutfile, bool singlefile)
 {
 	bool have_default = false;
 	// if there's an explicit file, load that first
@@ -1587,34 +1591,34 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 	if (screens == 1)
 	{
 		if (system.flags & ORIENTATION_SWAP_XY)
-			load_layout_file(nullptr, layout_vertical);
+			load_layout_file(nullptr, &layout_vertical);
 		else
-			load_layout_file(nullptr, layout_horizont);
+			load_layout_file(nullptr, &layout_horizont);
 		assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 	}
 	if (!have_default)
 	{
 		if (screens == 0)
 		{
-			load_layout_file(nullptr, layout_noscreens);
+			load_layout_file(nullptr, &layout_noscreens);
 			assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 		}
 		else
 		if (screens == 2)
 		{
-			load_layout_file(nullptr, layout_dualhsxs);
+			load_layout_file(nullptr, &layout_dualhsxs);
 			assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 		}
 		else
 		if (screens == 3)
 		{
-			load_layout_file(nullptr, layout_triphsxs);
+			load_layout_file(nullptr, &layout_triphsxs);
 			assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 		}
 		else
 		if (screens == 4)
 		{
-			load_layout_file(nullptr, layout_quadhsxs);
+			load_layout_file(nullptr, &layout_quadhsxs);
 			assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 		}
 	}
@@ -1625,6 +1629,55 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 //  load_layout_file - load a single layout file
 //  and append it to our list
 //-------------------------------------------------
+
+
+bool render_target::load_layout_file(const char *dirname, const internal_layout *layout_data)
+{
+	// +1 to ensure data is terminated for XML parser
+	auto tempout = make_unique_clear<UINT8[]>(layout_data->decompressed_size+1);
+
+	z_stream stream;
+	int zerr;
+
+	/* initialize the stream */
+	memset(&stream, 0, sizeof(stream));
+	stream.next_out = tempout.get();
+	stream.avail_out = layout_data->decompressed_size;
+
+
+	zerr = inflateInit(&stream);
+	if (zerr != Z_OK)
+	{
+		fatalerror("could not inflateInit");
+		return false;
+	}
+
+	/* decompress this chunk */
+	stream.next_in = (unsigned char*)layout_data->data;
+	stream.avail_in = layout_data->compressed_size;
+	zerr = inflate(&stream, Z_NO_FLUSH);
+
+	/* stop at the end of the stream */
+	if (zerr == Z_STREAM_END)
+	{
+		// OK
+	}
+	else if (zerr != Z_OK)
+	{
+		fatalerror("decompression error\n");
+		return false;
+	}
+
+	/* clean up */
+	zerr = inflateEnd(&stream);
+	if (zerr != Z_OK)
+	{
+		fatalerror("inflateEnd error\n");
+		return false;
+	}
+
+	return load_layout_file(dirname, (const char*)tempout.get());
+}
 
 bool render_target::load_layout_file(const char *dirname, const char *filename)
 {
@@ -1733,10 +1786,10 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 	}
 
 	// iterate over elements
-	for (render_container::item *curitem = container.first_item(); curitem != nullptr; curitem = curitem->next())
+	for (render_container::item &curitem : container.items())
 	{
 		// compute the oriented bounds
-		render_bounds bounds = curitem->bounds();
+		render_bounds bounds = curitem.bounds();
 		apply_orientation(bounds, container_xform.orientation);
 
 		// allocate the primitive and set the transformed bounds/color data
@@ -1746,7 +1799,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 
 		prim->bounds.x0 = render_round_nearest(container_xform.xoffs + bounds.x0 * container_xform.xscale);
 		prim->bounds.y0 = render_round_nearest(container_xform.yoffs + bounds.y0 * container_xform.yscale);
-		if (curitem->internal() & INTERNAL_FLAG_CHAR)
+		if (curitem.internal() & INTERNAL_FLAG_CHAR)
 		{
 			prim->bounds.x1 = prim->bounds.x0 + render_round_nearest((bounds.x1 - bounds.x0) * container_xform.xscale);
 			prim->bounds.y1 = prim->bounds.y0 + render_round_nearest((bounds.y1 - bounds.y0) * container_xform.yscale);
@@ -1758,14 +1811,14 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 		}
 
 		// compute the color of the primitive
-		prim->color.r = container_xform.color.r * curitem->color().r;
-		prim->color.g = container_xform.color.g * curitem->color().g;
-		prim->color.b = container_xform.color.b * curitem->color().b;
-		prim->color.a = container_xform.color.a * curitem->color().a;
+		prim->color.r = container_xform.color.r * curitem.color().r;
+		prim->color.g = container_xform.color.g * curitem.color().g;
+		prim->color.b = container_xform.color.b * curitem.color().b;
+		prim->color.a = container_xform.color.a * curitem.color().a;
 
 		// now switch off the type
 		bool clipped = true;
-		switch (curitem->type())
+		switch (curitem.type())
 		{
 			case CONTAINER_ITEM_LINE:
 				// adjust the color for brightness/contrast/gamma
@@ -1779,8 +1832,8 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 				prim->flags |= PRIMFLAG_TYPE_LINE;
 
 				// scale the width by the minimum of X/Y scale factors
-				prim->width = curitem->width() * MIN(container_xform.xscale, container_xform.yscale);
-				prim->flags |= curitem->flags();
+				prim->width = curitem.width() * MIN(container_xform.xscale, container_xform.yscale);
+				prim->flags |= curitem.flags();
 
 				// clip the primitive
 				clipped = render_clip_line(&prim->bounds, &cliprect);
@@ -1795,10 +1848,10 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 				normalize_bounds(prim->bounds);
 
 				// get the scaled bitmap and set the resulting palette
-				if (curitem->texture() != nullptr)
+				if (curitem.texture() != nullptr)
 				{
 					// determine the final orientation
-					int finalorient = orientation_add(PRIMFLAG_GET_TEXORIENT(curitem->flags()), container_xform.orientation);
+					int finalorient = orientation_add(PRIMFLAG_GET_TEXORIENT(curitem.flags()), container_xform.orientation);
 
 					// based on the swap values, get the scaled final texture
 					int width = (finalorient & ORIENTATION_SWAP_XY) ? (prim->bounds.y1 - prim->bounds.y0) : (prim->bounds.x1 - prim->bounds.x0);
@@ -1806,10 +1859,10 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					width = MIN(width, m_maxtexwidth);
 					height = MIN(height, m_maxtexheight);
 
-					curitem->texture()->get_scaled(width, height, prim->texture, list, curitem->flags());
+					curitem.texture()->get_scaled(width, height, prim->texture, list, curitem.flags());
 
 					// set the palette
-					prim->texture.palette = curitem->texture()->get_adjusted_palette(container);
+					prim->texture.palette = curitem.texture()->get_adjusted_palette(container);
 
 					// determine UV coordinates
 					prim->texcoords = oriented_texcoords[finalorient];
@@ -1818,16 +1871,16 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
 
 					// apply the final orientation from the quad flags and then build up the final flags
-					prim->flags = (curitem->flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK))
+					prim->flags = (curitem.flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK))
 						| PRIMFLAG_TEXORIENT(finalorient)
-						| PRIMFLAG_TEXFORMAT(curitem->texture()->format());
+						| PRIMFLAG_TEXFORMAT(curitem.texture()->format());
 					prim->flags |= blendmode != -1
 						? PRIMFLAG_BLENDMODE(blendmode)
-						: PRIMFLAG_BLENDMODE(PRIMFLAG_GET_BLENDMODE(curitem->flags()));
+						: PRIMFLAG_BLENDMODE(PRIMFLAG_GET_BLENDMODE(curitem.flags()));
 				}
 				else
 				{
-					if (curitem->flags() & PRIMFLAG_VECTORBUF_MASK)
+					if (curitem.flags() & PRIMFLAG_VECTORBUF_MASK)
 					{
 						// determine UV coordinates
 						prim->texcoords = oriented_texcoords[0];
@@ -1842,7 +1895,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					prim->texture.base = nullptr;
 
 					// set the basic flags
-					prim->flags = (curitem->flags() & ~PRIMFLAG_BLENDMODE_MASK)
+					prim->flags = (curitem.flags() & ~PRIMFLAG_BLENDMODE_MASK)
 						| PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 
 					// apply clipping
@@ -1991,25 +2044,25 @@ bool render_target::map_point_internal(INT32 target_x, INT32 target_y, render_co
 		if (m_curview->layer_enabled(layer))
 		{
 			// iterate over items in the layer
-			for (layout_view::item *item = m_curview->first_item(layer); item != nullptr; item = item->next())
+			for (layout_view::item &item : m_curview->items(layer))
 			{
 				bool checkit;
 
 				// if we're looking for a particular container, verify that we have the right one
 				if (container != nullptr)
-					checkit = (item->screen() != nullptr && &item->screen()->container() == container);
+					checkit = (item.screen() != nullptr && &item.screen()->container() == container);
 
 				// otherwise, assume we're looking for an input
 				else
-					checkit = item->has_input();
+					checkit = item.has_input();
 
 				// this target is worth looking at; now check the point
-				if (checkit && target_fx >= item->bounds().x0 && target_fx < item->bounds().x1 && target_fy >= item->bounds().y0 && target_fy < item->bounds().y1)
+				if (checkit && target_fx >= item.bounds().x0 && target_fx < item.bounds().x1 && target_fy >= item.bounds().y0 && target_fy < item.bounds().y1)
 				{
 					// point successfully mapped
-					mapped_x = (target_fx - item->bounds().x0) / (item->bounds().x1 - item->bounds().x0);
-					mapped_y = (target_fy - item->bounds().y0) / (item->bounds().y1 - item->bounds().y0);
-					mapped_input_port = item->input_tag_and_mask(mapped_input_mask);
+					mapped_x = (target_fx - item.bounds().x0) / (item.bounds().x1 - item.bounds().x0);
+					mapped_y = (target_fy - item.bounds().y0) / (item.bounds().y1 - item.bounds().y0);
+					mapped_input_port = item.input_tag_and_mask(mapped_input_mask);
 					return true;
 				}
 			}
@@ -2027,11 +2080,11 @@ bool render_target::map_point_internal(INT32 target_x, INT32 target_y, render_co
 layout_view *render_target::view_by_index(int index) const
 {
 	// scan the list of views within each layout, skipping those that don't apply
-	for (layout_file *file = m_filelist.first(); file != nullptr; file = file->next())
-		for (layout_view *view = file->first_view(); view != nullptr; view = view->next())
-			if (!(m_flags & RENDER_CREATE_NO_ART) || !view->has_art())
+	for (layout_file &file : m_filelist)
+		for (layout_view &view : file.views())
+			if (!(m_flags & RENDER_CREATE_NO_ART) || !view.has_art())
 				if (index-- == 0)
-					return view;
+					return &view;
 	return nullptr;
 }
 
@@ -2047,11 +2100,11 @@ int render_target::view_index(layout_view &targetview) const
 	int index = 0;
 
 	// scan the list of views within each layout, skipping those that don't apply
-	for (layout_file *file = m_filelist.first(); file != nullptr; file = file->next())
-		for (layout_view *view = file->first_view(); view != nullptr; view = view->next())
-			if (!(m_flags & RENDER_CREATE_NO_ART) || !view->has_art())
+	for (layout_file &file : m_filelist)
+		for (layout_view &view : file.views())
+			if (!(m_flags & RENDER_CREATE_NO_ART) || !view.has_art())
 			{
-				if (&targetview == view)
+				if (&targetview == &view)
 					return index;
 				index++;
 			}
@@ -2398,10 +2451,10 @@ void render_target::add_clear_and_optimize_primitive_list(render_primitive_list 
 	init_clear_extents();
 
 	// scan the list until we hit an intersection quad or a line
-	for (render_primitive *prim = list.first(); prim != nullptr; prim = prim->next())
+	for (render_primitive &prim : list)
 	{
 		// switch off the type
-		switch (prim->type)
+		switch (prim.type)
 		{
 			case render_primitive::LINE:
 				goto done;
@@ -2409,32 +2462,32 @@ void render_target::add_clear_and_optimize_primitive_list(render_primitive_list 
 			case render_primitive::QUAD:
 			{
 				// stop when we hit an alpha texture
-				if (PRIMFLAG_GET_TEXFORMAT(prim->flags) == TEXFORMAT_ARGB32 || PRIMFLAG_GET_TEXFORMAT(prim->flags) == TEXFORMAT_PALETTEA16)
+				if (PRIMFLAG_GET_TEXFORMAT(prim.flags) == TEXFORMAT_ARGB32 || PRIMFLAG_GET_TEXFORMAT(prim.flags) == TEXFORMAT_PALETTEA16)
 					goto done;
 
 				// if this quad can't be cleanly removed from the extents list, we're done
-				if (!remove_clear_extent(prim->bounds))
+				if (!remove_clear_extent(prim.bounds))
 					goto done;
 
 				// change the blendmode on the first primitive to be NONE
-				if (PRIMFLAG_GET_BLENDMODE(prim->flags) == BLENDMODE_RGB_MULTIPLY)
+				if (PRIMFLAG_GET_BLENDMODE(prim.flags) == BLENDMODE_RGB_MULTIPLY)
 				{
 					// RGB multiply will multiply against 0, leaving nothing
-					set_render_color(&prim->color, 1.0f, 0.0f, 0.0f, 0.0f);
-					prim->texture.base = nullptr;
-					prim->flags = (prim->flags & ~PRIMFLAG_BLENDMODE_MASK) | PRIMFLAG_BLENDMODE(BLENDMODE_NONE);
+					set_render_color(&prim.color, 1.0f, 0.0f, 0.0f, 0.0f);
+					prim.texture.base = nullptr;
+					prim.flags = (prim.flags & ~PRIMFLAG_BLENDMODE_MASK) | PRIMFLAG_BLENDMODE(BLENDMODE_NONE);
 				}
 				else
 				{
 					// for alpha or add modes, we will blend against 0 or add to 0; treat it like none
-					prim->flags = (prim->flags & ~PRIMFLAG_BLENDMODE_MASK) | PRIMFLAG_BLENDMODE(BLENDMODE_NONE);
+					prim.flags = (prim.flags & ~PRIMFLAG_BLENDMODE_MASK) | PRIMFLAG_BLENDMODE(BLENDMODE_NONE);
 				}
 
 				// since alpha is disabled, premultiply the RGB values and reset the alpha to 1.0
-				prim->color.r *= prim->color.a;
-				prim->color.g *= prim->color.a;
-				prim->color.b *= prim->color.a;
-				prim->color.a = 1.0f;
+				prim.color.r *= prim.color.a;
+				prim.color.g *= prim.color.a;
+				prim.color.b *= prim.color.a;
+				prim.color.a = 1.0f;
 				break;
 			}
 
@@ -2496,8 +2549,8 @@ render_manager::~render_manager()
 bool render_manager::is_live(screen_device &screen) const
 {
 	// iterate over all live targets and or together their screen masks
-	for (render_target *target = m_targetlist.first(); target != nullptr; target = target->next())
-		if (!target->hidden() && target->view_screens(target->view()).contains(screen))
+	for (render_target &target : m_targetlist)
+		if (!target.hidden() && target.view_screens(target.view()).contains(screen))
 			return true;
 	return false;
 }
@@ -2512,13 +2565,13 @@ float render_manager::max_update_rate() const
 {
 	// iterate over all live targets and or together their screen masks
 	float minimum = 0;
-	for (render_target *target = m_targetlist.first(); target != nullptr; target = target->next())
-		if (target->max_update_rate() != 0)
+	for (render_target &target : m_targetlist)
+		if (target.max_update_rate() != 0)
 		{
 			if (minimum == 0)
-				minimum = target->max_update_rate();
+				minimum = target.max_update_rate();
 			else
-				minimum = MIN(target->max_update_rate(), minimum);
+				minimum = MIN(target.max_update_rate(), minimum);
 		}
 
 	return minimum;
@@ -2529,7 +2582,7 @@ float render_manager::max_update_rate() const
 //  target_alloc - allocate a new target
 //-------------------------------------------------
 
-render_target *render_manager::target_alloc(const char *layoutfile, UINT32 flags)
+render_target *render_manager::target_alloc(const internal_layout *layoutfile, UINT32 flags)
 {
 	return &m_targetlist.append(*global_alloc(render_target(*this, layoutfile, flags)));
 }
@@ -2553,10 +2606,10 @@ void render_manager::target_free(render_target *target)
 render_target *render_manager::target_by_index(int index) const
 {
 	// count up the targets until we hit the requested index
-	for (render_target *target = m_targetlist.first(); target != nullptr; target = target->next())
-		if (!target->hidden())
+	for (render_target &target : m_targetlist)
+		if (!target.hidden())
 			if (index-- == 0)
-				return target;
+				return &target;
 	return nullptr;
 }
 
@@ -2583,7 +2636,15 @@ float render_manager::ui_aspect(render_container *rc)
 
 		// if we have a valid pixel aspect, apply that and return
 		if (m_ui_target->pixel_aspect() != 0.0f)
-				aspect /= m_ui_target->pixel_aspect();
+		{
+			float pixel_aspect = m_ui_target->pixel_aspect();
+
+			if (orient & ORIENTATION_SWAP_XY)
+				pixel_aspect = 1.0f / pixel_aspect;
+
+			return aspect /= pixel_aspect;
+		}
+
 	} else {
 		// single screen container
 
@@ -2666,8 +2727,8 @@ void render_manager::invalidate_all(void *refptr)
 		return;
 
 	// loop over targets
-	for (render_target *target = m_targetlist.first(); target != nullptr; target = target->next())
-		target->invalidate_all(refptr);
+	for (render_target &target : m_targetlist)
+		target.invalidate_all(refptr);
 }
 
 
@@ -2677,10 +2738,8 @@ void render_manager::invalidate_all(void *refptr)
 
 void render_manager::resolve_tags()
 {
-	for (render_target *target = m_targetlist.first(); target != nullptr; target = target->next())
-	{
-		target->resolve_tags();
-	}
+	for (render_target &target : m_targetlist)
+		target.resolve_tags();
 }
 
 

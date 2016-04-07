@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "cococart.h"
-#include "emuopts.h"
 
 /***************************************************************************
     PARAMETERS

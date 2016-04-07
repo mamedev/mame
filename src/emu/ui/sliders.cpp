@@ -44,6 +44,9 @@ void ui_menu_sliders::handle()
 			const slider_state *slider = (const slider_state *)menu_event->itemref;
 			INT32 curvalue = (*slider->update)(machine(), slider->arg, nullptr, SLIDER_NOCHANGE);
 			INT32 increment = 0;
+			bool alt_pressed = machine().input().code_pressed(KEYCODE_LALT) || machine().input().code_pressed(KEYCODE_RALT);
+			bool ctrl_pressed = machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(KEYCODE_RCONTROL);
+			bool shift_pressed = machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT);
 
 			switch (menu_event->iptkey)
 			{
@@ -57,11 +60,13 @@ void ui_menu_sliders::handle()
 
 				/* decrease value */
 				case IPT_UI_LEFT:
-					if (machine().input().code_pressed(KEYCODE_LALT) || machine().input().code_pressed(KEYCODE_RALT))
+					if (alt_pressed && shift_pressed)
 						increment = -1;
-					else if (machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT))
+					if (alt_pressed)
+						increment = -(curvalue - slider->minval);
+					else if (shift_pressed)
 						increment = (slider->incval > 10) ? -(slider->incval / 10) : -1;
-					else if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(KEYCODE_RCONTROL))
+					else if (ctrl_pressed)
 						increment = -slider->incval * 10;
 					else
 						increment = -slider->incval;
@@ -69,11 +74,13 @@ void ui_menu_sliders::handle()
 
 				/* increase value */
 				case IPT_UI_RIGHT:
-					if (machine().input().code_pressed(KEYCODE_LALT) || machine().input().code_pressed(KEYCODE_RALT))
+					if (alt_pressed && shift_pressed)
 						increment = 1;
-					else if (machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT))
+					if (alt_pressed)
+						increment = slider->maxval - curvalue;
+					else if (shift_pressed)
 						increment = (slider->incval > 10) ? (slider->incval / 10) : 1;
-					else if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(KEYCODE_RCONTROL))
+					else if (ctrl_pressed)
 						increment = slider->incval * 10;
 					else
 						increment = slider->incval;
@@ -108,14 +115,14 @@ void ui_menu_sliders::handle()
 			/* if we got here via up or page up, select the previous item */
 			if (menu_event->iptkey == IPT_UI_UP || menu_event->iptkey == IPT_UI_PAGE_UP)
 			{
-                selected = (selected + item.size() - 1) % item.size();
-                validate_selection(-1);
+				selected = (selected + item.size() - 1) % item.size();
+				validate_selection(-1);
 			}
 
 			/* otherwise select the next item */
 			else if (menu_event->iptkey == IPT_UI_DOWN || menu_event->iptkey == IPT_UI_PAGE_DOWN)
 			{
-                selected = (selected + 1) % item.size();
+				selected = (selected + 1) % item.size();
 				validate_selection(1);
 			}
 		}

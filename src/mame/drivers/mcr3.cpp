@@ -535,51 +535,6 @@ static ADDRESS_MAP_START( spyhunt_portmap, AS_IO, 8, mcr3_state )
 ADDRESS_MAP_END
 
 
-
-WRITE8_MEMBER(mcr3_state::spyhuntpr_fd00_w)
-{
-}
-
-static ADDRESS_MAP_START( spyhuntpr_map, AS_PROGRAM, 8, mcr3_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xa800, 0xa8ff) AM_RAM // the ROM is a solid fill in these areas, and they get tested as RAM, I think they moved the 'real' scroll regs here
-	AM_RANGE(0xa900, 0xa9ff) AM_RAM
-
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-
-
-
-
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE(spyhunt_alpharam_w) AM_SHARE("spyhunt_alpha")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM //AM_SHARE("nvram")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfa00, 0xfa7f) AM_MIRROR(0x0180) AM_RAM_WRITE(spyhuntpr_paletteram_w) AM_SHARE("paletteram")
-
-	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("DSW0")
-	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfc02, 0xfc02) AM_READ_PORT("IN2")
-	AM_RANGE(0xfc03, 0xfc03) AM_READ_PORT("IN3")
-
-	AM_RANGE(0xfd00, 0xfd00) AM_WRITE( spyhuntpr_fd00_w )
-
-	AM_RANGE(0xfe00, 0xffff) AM_RAM // a modified copy of spriteram for this hw??
-ADDRESS_MAP_END
-
-WRITE8_MEMBER(mcr3_state::spyhuntpr_port04_w)
-{
-}
-
-static ADDRESS_MAP_START( spyhuntpr_portmap, AS_IO, 8, mcr3_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_WRITE(spyhuntpr_port04_w)
-	AM_RANGE(0x84, 0x86) AM_WRITE(spyhunt_scroll_value_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITENOP // was watchdog
-//  AM_RANGE(0xe8, 0xe8) AM_WRITENOP
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
-
 /*************************************
  *
  *  Port definitions
@@ -979,109 +934,6 @@ static INPUT_PORTS_START( spyhunt )
 	PORT_BIT( 0xff, 0x74, IPT_PADDLE ) PORT_MINMAX(0x34,0xb4) PORT_SENSITIVITY(40) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( spyhuntpr )
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x01, "DSW0-01" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DSW0-02" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DSW0-04" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DSW0-08" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DSW0-10" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DSW0-20" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DSW0-40" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW0-80" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1-01" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DSW1-02" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, "DSW1-08" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DSW1-10" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DSW1-20" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DSW1-40" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW1-80" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x0001, 0x0001, "2" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "start" ) // start
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "handbrake?" )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "pedal inverse" )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x0001, 0x0001, "3" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "coin" ) // coin?
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "machineguns" ) // machine guns
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-INPUT_PORTS_END
 
 /* not verified, no manual found */
 static INPUT_PORTS_START( crater )
@@ -1206,52 +1058,6 @@ static const gfx_layout spyhunt_alphalayout =
 	16*8
 };
 
-static const gfx_layout spyhuntpr_alphalayout =
-{
-	16,8,
-	RGN_FRAC(1,1),
-	2,
-	{ 0, 4},
-	{ 0, 0, 1, 1, 2, 2, 3, 3, 8, 8, 9, 9, 10, 10, 11, 11 },
-	{ 0, 2*8, 4*8, 6*8, 8*8, 10*8, 12*8, 14*8 },
-	16*8
-};
-
-
-const gfx_layout spyhuntpr_sprite_layout =
-{
-	32,16,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 6,7,  4,5,  2,3,  0,1,  14,15,  12,13,  10,11,  8,9,    22,23, 20,21,  18,19,  16,17,  30,31,  28,29,  26,27,  24,25 },
-	{ 0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32,8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32   },
-
-	16*32
-};
-
-
-static const UINT32 spyhuntp_charlayout_xoffset[64] =
-{
-		0x0000*8,0x0000*8,   0x0000*8+1,0x0000*8+1,   0x0000*8+2,0x0000*8+2,   0x0000*8+3,0x0000*8+3,   0x0000*8+4,0x0000*8+4,   0x0000*8+5,0x0000*8+5,   0x0000*8+6,0x0000*8+6,   0x0000*8+7,0x0000*8+7,
-		0x1000*8,0x1000*8,   0x1000*8+1,0x1000*8+1,   0x1000*8+2,0x1000*8+2,   0x1000*8+3,0x1000*8+3,   0x1000*8+4,0x1000*8+4,   0x1000*8+5,0x1000*8+5,   0x1000*8+6,0x1000*8+6,   0x1000*8+7,0x1000*8+7,
-		0x2000*8,0x2000*8,   0x2000*8+1,0x2000*8+1,   0x2000*8+2,0x2000*8+2,   0x2000*8+3,0x2000*8+3,   0x2000*8+4,0x2000*8+4,   0x2000*8+5,0x2000*8+5,   0x2000*8+6,0x2000*8+6,   0x2000*8+7,0x2000*8+7,
-		0x3000*8,0x3000*8,   0x3000*8+1,0x3000*8+1,   0x3000*8+2,0x3000*8+2,   0x3000*8+3,0x3000*8+3,   0x3000*8+4,0x3000*8+4,   0x3000*8+5,0x3000*8+5,   0x3000*8+6,0x3000*8+6,   0x3000*8+7,0x3000*8+7,
-};
-
-
-static const gfx_layout spyhuntpr_charlayout =
-{
-	64,16,
-	RGN_FRAC(1,8),
-	4,
-	{  0*8,  0x4000*8 + 2*8, 0x4000*8 + 0*8, 2*8  },
-	EXTENDED_XOFFS,
-	{ 0*8,  4*8,  8*8,  12*8,    16*8,  20*8,  24*8,  28*8,     1*8,  5*8, 9*8, 13*8,    17*8,  21*8,  25*8,  29*8    },
-	32*8,
-	spyhuntp_charlayout_xoffset,
-	nullptr
-};
 
 static GFXDECODE_START( mcr3 )
 	GFXDECODE_SCALE( "gfx1", 0, mcr_bg_layout,     0, 4, 2, 2 )
@@ -1265,11 +1071,6 @@ static GFXDECODE_START( spyhunt )
 	GFXDECODE_ENTRY( "gfx3", 0, spyhunt_alphalayout, 4*16, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( spyhuntpr )
-	GFXDECODE_ENTRY( "gfx1", 0, spyhuntpr_charlayout,  3*16, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, spyhuntpr_sprite_layout,   0*16, 4 )
-	GFXDECODE_ENTRY( "gfx3", 0, spyhuntpr_alphalayout, 4*16, 1 )
-GFXDECODE_END
 
 /*************************************
  *
@@ -1379,78 +1180,6 @@ MACHINE_CONFIG_END
 
 
 
-static ADDRESS_MAP_START( spyhuntpr_sound_map, AS_PROGRAM, 8, mcr3_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-//  AM_RANGE(0xfe00, 0xffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( spyhuntpr_sound_portmap, AS_IO, 8, mcr3_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
-	AM_RANGE(0x12, 0x13) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
-	AM_RANGE(0x14, 0x15) AM_DEVWRITE("ay2", ay8912_device, address_data_w)
-	AM_RANGE(0x18, 0x19) AM_DEVWRITE("ay3", ay8912_device, address_data_w)
-
-ADDRESS_MAP_END
-
-
-
-static MACHINE_CONFIG_START( spyhuntpr, mcr3_state )
-
-// note: no ctc, no nvram
-// 2*z80, 3*ay8912
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(spyhuntpr_map)
-	MCFG_CPU_IO_MAP(spyhuntpr_portmap)
-	MCFG_CPU_CONFIG(mcr_daisy_chain)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr3_state, mcr_interrupt, "screen", 0, 1)
-
-	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK/4 /* same as "maincpu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
-
-	//MCFG_WATCHDOG_VBLANK_INIT(16)
-	MCFG_MACHINE_START_OVERRIDE(mcr3_state,mcr)
-	MCFG_MACHINE_RESET_OVERRIDE(mcr3_state,mcr)
-
-//  MCFG_NVRAM_ADD_0FILL("nvram")
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(30*16, 30*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_spyhuntpr)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spyhuntpr)
-	MCFG_PALETTE_ADD("palette", 64+4)
-
-	MCFG_PALETTE_INIT_OWNER(mcr3_state,spyhunt)
-	MCFG_VIDEO_START_OVERRIDE(mcr3_state,spyhuntpr)
-
-
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000 )
-	MCFG_CPU_PROGRAM_MAP(spyhuntpr_sound_map)
-	MCFG_CPU_IO_MAP(spyhuntpr_sound_portmap)
-//  MCFG_CPU_PERIODIC_INT_DRIVER(mcr3_state, irq0_line_hold, 4*60)
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ay1", AY8912, 3000000/2) // AY-3-8912
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay2", AY8912, 3000000/2) // "
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay3", AY8912, 3000000/2) // "
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-MACHINE_CONFIG_END
 
 
 
@@ -1729,93 +1458,6 @@ ROM_START( spyhuntp )
 ROM_END
 
 
-ROM_START( spyhuntpr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.bin",   0x0000, 0x4000, CRC(2a2f77cb) SHA1(e1b74c951efb2a49bef0507ab3268b274515f339) )
-	ROM_LOAD( "2.bin",   0x4000, 0x4000, CRC(00778aff) SHA1(7c0b24c393f841e8379d4bba57ba502e3d2512f9) )
-	ROM_LOAD( "3.bin",   0x8000, 0x4000, CRC(2183b4af) SHA1(2b958afc40b26c9bc8d5254b0600426649f4ebf0) )
-	ROM_LOAD( "4.bin",   0xc000, 0x2000, CRC(3ea6a65c) SHA1(1320ce17044307ed3c4f2459631a9aa1734f1f30) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "5.bin",   0x0000, 0x2000, CRC(33fe2829) SHA1(e6950dbf681242bf23542ca6604e62eacb431101) )
-
-
-	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "6.bin",   0x0000, 0x200, CRC(6b76f46a) SHA1(4b398084c42a60fcfa4a9bf14f844e36a3f42723) )
-	ROM_CONTINUE(0x0001, 0x200)
-	ROM_CONTINUE(0x0800, 0x200)
-	ROM_CONTINUE(0x0801, 0x200)
-	ROM_CONTINUE(0x1000, 0x200)
-	ROM_CONTINUE(0x1001, 0x200)
-	ROM_CONTINUE(0x1800, 0x200)
-	ROM_CONTINUE(0x1801, 0x200)
-	ROM_CONTINUE(0x2000, 0x200)
-	ROM_CONTINUE(0x2001, 0x200)
-	ROM_CONTINUE(0x2800, 0x200)
-	ROM_CONTINUE(0x2801, 0x200)
-	ROM_CONTINUE(0x3000, 0x200)
-	ROM_CONTINUE(0x3001, 0x200)
-	ROM_CONTINUE(0x3800, 0x200)
-	ROM_CONTINUE(0x3801, 0x200)
-	ROM_LOAD32_BYTE( "7.bin",   0x0002, 0x200, CRC(085bd7a7) SHA1(c35c309b6c6485baec54d4434dea44abf4d48f41) )
-	ROM_CONTINUE(0x0003, 0x200)
-	ROM_CONTINUE(0x0802, 0x200)
-	ROM_CONTINUE(0x0803, 0x200)
-	ROM_CONTINUE(0x1002, 0x200)
-	ROM_CONTINUE(0x1003, 0x200)
-	ROM_CONTINUE(0x1802, 0x200)
-	ROM_CONTINUE(0x1803, 0x200)
-	ROM_CONTINUE(0x2002, 0x200)
-	ROM_CONTINUE(0x2003, 0x200)
-	ROM_CONTINUE(0x2802, 0x200)
-	ROM_CONTINUE(0x2803, 0x200)
-	ROM_CONTINUE(0x3002, 0x200)
-	ROM_CONTINUE(0x3003, 0x200)
-	ROM_CONTINUE(0x3802, 0x200)
-	ROM_CONTINUE(0x3803, 0x200)
-	ROM_LOAD32_BYTE( "8.bin",   0x4000, 0x200, CRC(e699b329) SHA1(cb4b8c7b6fa1cb1144a18f1442dc3b267c408914) )
-	ROM_CONTINUE(0x4001, 0x200)
-	ROM_CONTINUE(0x4800, 0x200)
-	ROM_CONTINUE(0x4801, 0x200)
-	ROM_CONTINUE(0x5000, 0x200)
-	ROM_CONTINUE(0x5001, 0x200)
-	ROM_CONTINUE(0x5800, 0x200)
-	ROM_CONTINUE(0x5801, 0x200)
-	ROM_CONTINUE(0x6000, 0x200)
-	ROM_CONTINUE(0x6001, 0x200)
-	ROM_CONTINUE(0x6800, 0x200)
-	ROM_CONTINUE(0x6801, 0x200)
-	ROM_CONTINUE(0x7000, 0x200)
-	ROM_CONTINUE(0x7001, 0x200)
-	ROM_CONTINUE(0x7800, 0x200)
-	ROM_CONTINUE(0x7801, 0x200)
-	ROM_LOAD32_BYTE( "9.bin",   0x4002, 0x200, CRC(6d462ec7) SHA1(0ff37f75b0eeceb86177a3f7c93834d5c0e24515) )
-	ROM_CONTINUE(0x4003, 0x200)
-	ROM_CONTINUE(0x4802, 0x200)
-	ROM_CONTINUE(0x4803, 0x200)
-	ROM_CONTINUE(0x5002, 0x200)
-	ROM_CONTINUE(0x5003, 0x200)
-	ROM_CONTINUE(0x5802, 0x200)
-	ROM_CONTINUE(0x5803, 0x200)
-	ROM_CONTINUE(0x6002, 0x200)
-	ROM_CONTINUE(0x6003, 0x200)
-	ROM_CONTINUE(0x6802, 0x200)
-	ROM_CONTINUE(0x6803, 0x200)
-	ROM_CONTINUE(0x7002, 0x200)
-	ROM_CONTINUE(0x7003, 0x200)
-	ROM_CONTINUE(0x7802, 0x200)
-	ROM_CONTINUE(0x7803, 0x200)
-
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_INVERT )
-	ROM_LOAD( "10.bin",   0x00000, 0x4000, CRC(6f9fd416) SHA1(a51c86e5b22c91fc44673f53400b58af40b18065) )
-	ROM_LOAD( "11.bin",   0x04000, 0x4000, CRC(75526ffe) SHA1(ff1adf6f9b6595114d0bd06b72d9eb7bbf70144d) )
-	ROM_LOAD( "12.bin",   0x08000, 0x4000, CRC(82ee7a4d) SHA1(184720de76680275bf7c4a171f03a0ce771d91fc) )
-	ROM_LOAD( "13.bin",   0x0c000, 0x4000, CRC(0cc592a3) SHA1(b3563bde83432cdbaedb88d4d222da30bf679b08) )
-
-
-	ROM_REGION( 0x01000, "gfx3", 0 )
-	ROM_LOAD( "14.bin",  0x00000, 0x1000, CRC(87a4c130) SHA1(7792afdc36b0f3bd51c387d04d38f60c85fd2e93) )
-ROM_END
 
 
 ROM_START( crater )
@@ -1976,16 +1618,7 @@ DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
 	m_spyhunt_scroll_offset = 16;
 }
 
-DRIVER_INIT_MEMBER(mcr3_state,spyhuntpr)
-{
-	mcr_common_init();
-//  machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
-//  machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
-//  machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
 
-	m_spyhunt_sprite_color_mask = 0x00;
-	m_spyhunt_scroll_offset = 16;
-}
 
 DRIVER_INIT_MEMBER(mcr3_state,crater)
 {
@@ -2035,7 +1668,3 @@ GAMEL(1983, spyhunt,  0,        mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT9
 GAMEL(1983, spyhuntp, spyhunt,  mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT90, "Bally Midway (Playtronic license)", "Spy Hunter (Playtronic license)", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
 GAME( 1984, crater,   0,        mcrscroll, crater,   mcr3_state, crater,   ORIENTATION_FLIP_X, "Bally Midway", "Crater Raider", MACHINE_SUPPORTS_SAVE )
 GAMEL(1985, turbotag, 0,        mcrsc_csd, turbotag, mcr3_state, turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", MACHINE_SUPPORTS_SAVE, layout_turbotag )
-
-// very different hardware, probably bootleg despite the license text printed on the PCB, similar to '1942p' in 1942.c.  Probably should be put in separate driver.
-// PCB made by Tecfri for Recreativos Franco S.A. in Spain, has Bally Midway logo, and licensing text on the PCB.  Board is dated '85' so seems to be a low-cost rebuild? it is unclear if it made it to market.
-GAME (1983, spyhuntpr,spyhunt,  spyhuntpr, spyhuntpr,mcr3_state,  spyhuntpr,ROT90, "Bally Midway (Recreativos Franco S.A. license)", "Spy Hunter (Spain, Tecfri / Recreativos Franco S.A. PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

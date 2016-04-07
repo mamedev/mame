@@ -25,9 +25,25 @@
 #define MCFG_TMS52XX_READYQ_HANDLER(_devcb) \
 	devcb = &tms5220_device::set_readyq_handler(*device, DEVCB_##_devcb);
 
+/* old VSM handler, remove me! */
 #define MCFG_TMS52XX_SPEECHROM(_tag) \
 	tms5220_device::set_speechrom_tag(*device, _tag);
 
+/* new VSM handler */
+#define MCFG_TMS52XX_M0_CB(_devcb) \
+	devcb = &tms5220_device::set_m0_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_TMS52XX_M1_CB(_devcb) \
+	devcb = &tms5220_device::set_m1_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_TMS52XX_ADDR_CB(_devcb) \
+	devcb = &tms5220_device::set_addr_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_TMS52XX_DATA_CB(_devcb) \
+	devcb = &tms5220_device::set_data_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_TMS52XX_ROMCLK_CB(_devcb) \
+	devcb = &tms5220_device::set_romclk_callback(*device, DEVCB_##_devcb);
 class tms5220_device : public device_t,
 									public device_sound_interface
 {
@@ -38,7 +54,14 @@ public:
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_irq_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_readyq_handler(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_readyq_handler.set_callback(object); }
+	// old VSM support, remove me!
 	static void set_speechrom_tag(device_t &device, const char *_tag) { downcast<tms5220_device &>(device).m_speechrom_tag = _tag; }
+	// new VSM support
+	template<class _Object> static devcb_base &set_m0_callback(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_m0_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_m1_callback(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_m1_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_addr_callback(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_addr_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_data_callback(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_data_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_romclk_callback(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_romclk_cb.set_callback(object); }
 
 	/* Control lines - once written to will switch interface into
 	 * "true" timing behaviour.
@@ -49,6 +72,8 @@ public:
 	WRITE_LINE_MEMBER( rsq_w );
 	WRITE_LINE_MEMBER( wsq_w );
 
+	DECLARE_WRITE8_MEMBER( combined_rsq_wsq_w ); // this hack is necessary for specific systems such as the TI 99/8 since the 5220c and cd2501ecd do specific things if both lines go active or inactive at slightly different times by separate write_line writes, which causes the chip to incorrectly reset itself on the 99/8, where the writes are supposed to happen simultaneously; /RS is bit 1, /WS is bit 0
+	// Note this is a hack and probably can be removed later, once the 'real' line handlers above defer by at least 4 clock cycles before taking effect
 	DECLARE_WRITE8_MEMBER( data_w );
 	DECLARE_READ8_MEMBER( status_r );
 
@@ -73,6 +98,12 @@ protected:
 	void set_variant(int variant);
 
 private:
+	// 51xx and VSM related
+	void new_int_write(UINT8 rc, UINT8 m0, UINT8 m1, UINT8 addr);
+	void new_int_write_addr(UINT8 addr);
+	UINT8 new_int_read();
+	void perform_dummy_read();
+	// 52xx or common
 	void register_for_save_states();
 	void data_write(int data);
 	void update_fifo_status_and_ints();
@@ -95,6 +126,24 @@ private:
 
 	/* coefficient tables */
 	const struct tms5100_coeffs *m_coeff;
+
+	/* these contain global status bits */
+	UINT8 m_PDC;
+	UINT8 m_CTL_pins;
+	UINT8 m_state;
+
+	/* New VSM interface */
+	UINT32 m_address;
+	UINT8  m_next_is_address;
+	UINT8  m_schedule_dummy_read;
+	UINT8  m_addr_bit;
+	/* read byte */
+	UINT8  m_CTL_buffer;
+
+	/* Old VSM interface; R Nabet : These have been added to emulate speech Roms */
+	//UINT8 m_schedule_dummy_read;          /* set after each load address, so that next read operation is preceded by a dummy read */
+	UINT8 m_data_register;                /* data register, used by read command */
+	UINT8 m_RDB_flag;                 /* whether we should read data register or status register */
 
 	/* these contain data that describes the 128-bit data FIFO */
 	UINT8 m_fifo[FIFO_SIZE];
@@ -167,11 +216,6 @@ private:
 	UINT16 m_RNG;             /* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 TODO: no it isn't */
 	INT16 m_excitation_data;
 
-	/* R Nabet : These have been added to emulate speech Roms */
-	UINT8 m_schedule_dummy_read;          /* set after each load address, so that next read operation is preceded by a dummy read */
-	UINT8 m_data_register;                /* data register, used by read command */
-	UINT8 m_RDB_flag;                 /* whether we should read data register or status register */
-
 	/* The TMS52xx has two different ways of providing output data: the
 	   analog speaker pin (which was usually used) and the Digital I/O pin.
 	   The internal DAC used to feed the analog pin is only 8 bits, and has the
@@ -201,8 +245,18 @@ private:
 	/* callbacks */
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_readyq_handler;
+	// next 2 lines are old speechrom handler, remove me!
 	const char *m_speechrom_tag;
 	speechrom_device *m_speechrom;
+	// next lines are new speechrom handler
+	devcb_write_line   m_m0_cb;      // the M0 line
+	devcb_write_line   m_m1_cb;      // the M1 line
+	devcb_write8       m_addr_cb;    // Write to ADD1,2,4,8 - 4 address bits
+	devcb_read_line    m_data_cb;    // Read one bit from ADD8/Data - voice data
+	// On a real chip rom_clk is running all the time
+	// Here, we only use it to properly emulate the protocol.
+	// Do not rely on it to be a timed signal.
+	devcb_write_line   m_romclk_cb;  // rom clock - Only used to drive the data lines
 };
 
 extern const device_type TMS5220;

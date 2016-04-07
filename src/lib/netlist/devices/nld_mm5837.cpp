@@ -5,7 +5,7 @@
  *
  */
 
-#include <solver/nld_solver.h>
+#include <solver/nld_matrix_solver.h>
 #include "nld_mm5837.h"
 #include "nl_setup.h"
 

@@ -1,5 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
+//================================================================
+//
+//  statereader.cpp - Generic functions for reading state from
+//  a JSON file using RapidJSON.
+//
+//================================================================
+
 #include "statereader.h"
 
 uint64_t state_reader::get_enum_from_value(const Value& value, std::string name, const uint64_t default_value, const string_to_enum* enums, const int count)
@@ -48,10 +55,10 @@ void state_reader::validate_float_parameter(const Value& value, std::string type
 
 void state_reader::validate_int_parameter(const Value& value, std::string typeName, std::string name)
 {
-    if (value.HasMember(name.c_str()))
-    {
-        assert(value[name.c_str()].IsInt());
-    }
+	if (value.HasMember(name.c_str()))
+	{
+		assert(value[name.c_str()].IsInt());
+	}
 }
 
 void state_reader::validate_string_parameter(const Value& value, std::string typeName, std::string name)
@@ -81,11 +88,11 @@ bool state_reader::get_bool(const Value& value, const std::string name, const bo
 
 int state_reader::get_int(const Value& value, const std::string name, const int default_value)
 {
-    if (value.HasMember(name.c_str()))
-    {
-        return int(floor(value[name.c_str()].GetDouble() + 0.5));
-    }
-    return default_value;
+	if (value.HasMember(name.c_str()))
+	{
+		return int(floor(value[name.c_str()].GetDouble() + 0.5));
+	}
+	return default_value;
 }
 
 void state_reader::get_float(const Value& value, const std::string name, float* out, float* default_value, int count)

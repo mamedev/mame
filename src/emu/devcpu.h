@@ -42,6 +42,11 @@
 #define MCFG_CPU_PERIODIC_INT_REMOVE MCFG_DEVICE_PERIODIC_INT_REMOVE
 #define MCFG_CPU_IRQ_ACKNOWLEDGE_REMOVE MCFG_DEVICE_IRQ_ACKNOWLEDGE_REMOVE
 
+// recompilation parameters
+#define MCFG_CPU_FORCE_NO_DRC() \
+	cpu_device::static_set_force_no_drc(*device, true);
+
+
 
 //**************************************************************************
 //  MACROS
@@ -66,10 +71,19 @@ class cpu_device :  public device_t,
 {
 	friend resource_pool_object<cpu_device>::~resource_pool_object();
 
+public:
+	// configuration helpers
+	static void static_set_force_no_drc(device_t &device, bool value);
+	bool allow_drc() const;
+
 protected:
 	// construction/destruction
 	cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual ~cpu_device();
+
+private:
+	// configured state
+	bool                    m_force_no_drc;             // whether or not to force DRC off
 };
 
 

@@ -265,6 +265,9 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_out_0_w)
 		m_gamma_xmtd = 0;
 	}
 
+	/* Bit 2 = Beta reset */
+	/* this is the unpopulated processor in the corner of the pcb farthest from the quad pokey, not used on shipping boards */
+
 	/* Bit 0 = Roller light (Blinks on fatal errors) */
 	output().set_led_value(0, data & 0x01);
 }

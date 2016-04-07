@@ -287,7 +287,6 @@ static MACHINE_CONFIG_START( gotcha, gotcha_state )
 	MCFG_DECO_SPRITE_ISBOOTLEG(true)
 	MCFG_DECO_SPRITE_OFFSETS(5, -1) // aligned to 2nd instruction screen in attract
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, David Haywood, Ryan Holtz, Stephh, Pierpaolo Prazzoli, Roberto Fresca
+// copyright-holders:Angelo Salese, David Haywood, Ryan Holtz, Pierpaolo Prazzoli, Roberto Fresca,Stephane Humbert
 /*****************************************************************
 * Status Triv Two driver by David Haywood, Ryan Holtz, and Stephh*
 * Super Triv II driver by Ryan Holtz                             *

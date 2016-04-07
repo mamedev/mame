@@ -17,8 +17,7 @@ const device_type DECO_KARNOVSPRITES = &device_creator<deco_karnovsprites_device
 deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_KARNOVSPRITES, "DECO Karnov Sprites", tag, owner, clock, "deco_karnovsprites", __FILE__),
 		m_gfxregion(0),
-		m_gfxdecode(*this),
-		m_palette(*this)
+		m_gfxdecode(*this)
 {
 }
 
@@ -111,14 +110,4 @@ void deco_karnovsprites_device::draw_sprites( bitmap_ind16 &bitmap, const rectan
 				sprite2,
 				colour,fx,fy,x,y+16,0);
 	}
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void deco_karnovsprites_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<deco_karnovsprites_device &>(device).m_palette.set_tag(tag);
 }

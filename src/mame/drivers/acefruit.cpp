@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:smf
+// copyright-holders:smf,Stephane Humbert
 /***************************************************************************
 
 Ace Video Fruit Machine hardware

@@ -534,7 +534,6 @@ static MACHINE_CONFIG_START( thedealr, thedealr_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 
 	MCFG_MACHINE_RESET_OVERRIDE(thedealr_state,thedealr)
 	MCFG_MACHINE_START_OVERRIDE(thedealr_state,thedealr)

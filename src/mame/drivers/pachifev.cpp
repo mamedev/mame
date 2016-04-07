@@ -290,7 +290,7 @@ void pachifev_state::machine_reset()
 {
 	// Pulling down the line on RESET configures the CPU to insert one wait
 	// state on external memory accesses
-	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(CLEAR_LINE);
+	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(CLEAR_LINE);
 
 	m_power=0;
 	m_max_power=0;

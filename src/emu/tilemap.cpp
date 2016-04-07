@@ -1503,11 +1503,11 @@ tilemap_manager::~tilemap_manager()
 	while (found)
 	{
 		found = false;
-		for (tilemap_t *tmap = m_tilemap_list.first(); tmap != nullptr; tmap = tmap->next())
-			if (tmap->device() != nullptr)
+		for (tilemap_t &tmap : m_tilemap_list)
+			if (tmap.device() != nullptr)
 			{
 				found = true;
-				m_tilemap_list.detach(*tmap);
+				m_tilemap_list.detach(tmap);
 				break;
 			}
 	}
@@ -1553,8 +1553,8 @@ tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_in
 
 void tilemap_manager::set_flip_all(UINT32 attributes)
 {
-	for (tilemap_t *tmap = m_tilemap_list.first(); tmap != nullptr; tmap = tmap->next())
-		tmap->set_flip(attributes);
+	for (tilemap_t &tmap : m_tilemap_list)
+		tmap.set_flip(attributes);
 }
 
 
@@ -1565,8 +1565,8 @@ void tilemap_manager::set_flip_all(UINT32 attributes)
 
 void tilemap_manager::mark_all_dirty()
 {
-	for (tilemap_t *tmap = m_tilemap_list.first(); tmap != nullptr; tmap = tmap->next())
-		tmap->mark_all_dirty();
+	for (tilemap_t &tmap : m_tilemap_list)
+		tmap.mark_all_dirty();
 }
 
 

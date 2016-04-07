@@ -4,8 +4,8 @@
 //
 //  chainmanager.h - BGFX shader chain manager
 //
-//  Maintains a string-to-entry lookup of BGFX shader
-//  effect chains, defined by chain.h and read by chainreader.h
+//  Provides loading for BGFX shader effect chains, defined
+//  by chain.h and read by chainreader.h
 //
 //============================================================
 
@@ -22,35 +22,38 @@
 #include "effectmanager.h"
 
 class running_machine;
+class osd_window;
 
 class bgfx_chain;
 
 class chain_manager {
 public:
-	chain_manager(osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t width, uint32_t height)
-		: m_options(options)
-        , m_textures(textures)
-		, m_targets(targets)
-		, m_effects(effects)
-		, m_width(width)
-		, m_height(height)
-	{
-	}
+	chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index);
 	~chain_manager();
 
-	// Getters
-	bgfx_chain* chain(std::string name, running_machine& machine, uint32_t window_index, uint32_t screen_index);
+    uint32_t handle_screen_chains(uint32_t view, render_primitive *starting_prim, osd_window& window);
+    
+    // Getters
+    bgfx_chain* screen_chain(uint32_t screen);
+    bgfx_chain* load_chain(std::string name, running_machine& machine, uint32_t window_index, uint32_t screen_index);
+    bool has_applicable_pass(uint32_t screen);
+    slider_state* get_slider_list();
 
 private:
-	bgfx_chain* load_chain(std::string name, running_machine& machine, uint32_t window_index, uint32_t screen_index);
+    void load_screen_chains(std::string chain_str);
+    std::vector<std::vector<std::string>> split_option_string(std::string chain_str) const;
+    void load_chains(std::vector<std::vector<std::string>>& chains);
+    
+    std::vector<render_primitive*> count_screens(render_primitive* prim);
+    void process_screen_quad(uint32_t view, uint32_t screen, render_primitive* prim, osd_window &window);
 
-    osd_options&                        m_options;
-	texture_manager&					m_textures;
-	target_manager&						m_targets;
-	effect_manager&                     m_effects;
-	uint32_t							m_width;
-	uint32_t							m_height;
-	std::vector<bgfx_chain*>	        m_chains;
+    running_machine&                        m_machine;
+	osd_options&                            m_options;
+	texture_manager&                        m_textures;
+	target_manager&                         m_targets;
+	effect_manager&                         m_effects;
+    uint32_t                                m_window_index;
+    std::vector<std::vector<bgfx_chain*>>   m_screen_chains;
 };
 
 #endif // __DRAWBGFX_CHAIN_MANAGER__

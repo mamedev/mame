@@ -1151,6 +1151,10 @@ namespace bgfx
 		}
 
 		BX_TRACE("Max FB attachments: %d", g_caps.maxFBAttachments);
+		BX_TRACE("NDC depth [%d, 1], origin %s left."
+			, g_caps.homogeneousDepth ? -1 : 0
+			, g_caps.originBottomLeft ? "bottom" : "top"
+			);
 	}
 
 	TextureFormat::Enum getViableTextureFormat(const ImageContainer& _imageContainer)
@@ -1427,14 +1431,14 @@ namespace bgfx
 			m_indexBufferHandle.free(_frame->m_freeIndexBufferHandle[ii].idx);
 		}
 
-		for (uint16_t ii = 0, num = _frame->m_numFreeVertexDeclHandles; ii < num; ++ii)
-		{
-			m_vertexDeclHandle.free(_frame->m_freeVertexDeclHandle[ii].idx);
-		}
-
 		for (uint16_t ii = 0, num = _frame->m_numFreeVertexBufferHandles; ii < num; ++ii)
 		{
 			destroyVertexBufferInternal(_frame->m_freeVertexBufferHandle[ii]);
+		}
+
+		for (uint16_t ii = 0, num = _frame->m_numFreeVertexDeclHandles; ii < num; ++ii)
+		{
+			m_vertexDeclHandle.free(_frame->m_freeVertexDeclHandle[ii].idx);
 		}
 
 		for (uint16_t ii = 0, num = _frame->m_numFreeShaderHandles; ii < num; ++ii)

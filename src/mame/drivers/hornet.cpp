@@ -1014,10 +1014,7 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
-	MCFG_K037122_ADD("k037122_1", "screen", 0)
-	MCFG_K037122_GFXDECODE("gfxdecode")
+	MCFG_K037122_ADD("k037122_1", "screen")
 	MCFG_K037122_PALETTE("palette")
 
 	MCFG_K056800_ADD("k056800", XTAL_16_9344MHz)
@@ -1067,12 +1064,10 @@ static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 
 
 	MCFG_DEVICE_REMOVE("k037122_1")
-	MCFG_K037122_ADD("k037122_1", "lscreen", 0)
-	MCFG_K037122_GFXDECODE("gfxdecode")
+	MCFG_K037122_ADD("k037122_1", "lscreen")
 	MCFG_K037122_PALETTE("palette")
 
-	MCFG_K037122_ADD("k037122_2", "rscreen", 1)
-	MCFG_K037122_GFXDECODE("gfxdecode")
+	MCFG_K037122_ADD("k037122_2", "rscreen")
 	MCFG_K037122_PALETTE("palette")
 
 	MCFG_DEVICE_REMOVE("voodoo0")

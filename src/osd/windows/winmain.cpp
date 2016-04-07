@@ -52,6 +52,8 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+
 template<typename _FunctionPtr>
 class dynamic_bind
 {
@@ -217,6 +219,7 @@ public:
 	}
 };
 
+#endif
 
 
 
@@ -231,21 +234,23 @@ int _CRT_glob = 0;
 //  LOCAL VARIABLES
 //**************************************************************************
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 static LPTOP_LEVEL_EXCEPTION_FILTER pass_thru_filter;
+
+static sampling_profiler *profiler = nullptr;
+static symbol_manager *symbols = nullptr;
+
+bool stack_walker::s_initialized = false;
+
+static int timeresult = !TIMERR_NOERROR;
+static TIMECAPS timecaps;
+#endif
 
 static HANDLE watchdog_reset_event;
 static HANDLE watchdog_exit_event;
 static HANDLE watchdog_thread;
 
 static running_machine *g_current_machine;
-
-static int timeresult = !TIMERR_NOERROR;
-static TIMECAPS timecaps;
-
-static sampling_profiler *profiler = nullptr;
-static symbol_manager *symbols = nullptr;
-
-bool stack_walker::s_initialized = false;
 
 
 //**************************************************************************
@@ -277,8 +282,9 @@ const options_entry windows_options::s_option_entries[] =
 
 	// post-processing options
 	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "DIRECT3D POST-PROCESSING OPTIONS" },
-	{ WINOPTION_HLSL_ENABLE";hlsl",                             "0",                 OPTION_BOOLEAN,    "enables HLSL post-processing (PS3.0 required)" },
 	{ WINOPTION_HLSLPATH,                                       "hlsl",              OPTION_STRING,     "path to hlsl files" },
+	{ WINOPTION_HLSL_ENABLE";hlsl",                             "0",                 OPTION_BOOLEAN,    "enables HLSL post-processing (PS3.0 required)" },
+	{ WINOPTION_HLSL_OVERSAMPLING,                              "0",                 OPTION_BOOLEAN,    "enables HLSL oversampling" },
 	{ WINOPTION_HLSL_WRITE,                                     nullptr,             OPTION_STRING,     "enables HLSL AVI writing (huge disk bandwidth suggested)" },
 	{ WINOPTION_HLSL_SNAP_WIDTH,                                "2048",              OPTION_STRING,     "HLSL upscaled-snapshot width" },
 	{ WINOPTION_HLSL_SNAP_HEIGHT,                               "1536",              OPTION_STRING,     "HLSL upscaled-snapshot height" },
@@ -349,12 +355,10 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_BLOOM_LEVEL2_WEIGHT,                            "0.32",              OPTION_FLOAT,      "Bloom level 2  (1/4-size target) weight" },
 	{ WINOPTION_BLOOM_LEVEL3_WEIGHT,                            "0.16",              OPTION_FLOAT,      "Bloom level 3  (1/8-size target) weight" },
 	{ WINOPTION_BLOOM_LEVEL4_WEIGHT,                            "0.08",              OPTION_FLOAT,      "Bloom level 4  (1/16-size target) weight" },
-	{ WINOPTION_BLOOM_LEVEL5_WEIGHT,                            "0.04",              OPTION_FLOAT,      "Bloom level 5  (1/32-size target) weight" },
+	{ WINOPTION_BLOOM_LEVEL5_WEIGHT,                            "0.06",              OPTION_FLOAT,      "Bloom level 5  (1/32-size target) weight" },
 	{ WINOPTION_BLOOM_LEVEL6_WEIGHT,                            "0.04",              OPTION_FLOAT,      "Bloom level 6  (1/64-size target) weight" },
 	{ WINOPTION_BLOOM_LEVEL7_WEIGHT,                            "0.02",              OPTION_FLOAT,      "Bloom level 7  (1/128-size target) weight" },
-	{ WINOPTION_BLOOM_LEVEL8_WEIGHT,                            "0.02",              OPTION_FLOAT,      "Bloom level 8  (1/256-size target) weight" },
-	{ WINOPTION_BLOOM_LEVEL9_WEIGHT,                            "0.01",              OPTION_FLOAT,      "Bloom level 9  (1/512-size target) weight" },
-	{ WINOPTION_BLOOM_LEVEL10_WEIGHT,                           "0.01",              OPTION_FLOAT,      "Bloom level 10 (1/1024-size target) weight" },
+	{ WINOPTION_BLOOM_LEVEL8_WEIGHT,                            "0.01",              OPTION_FLOAT,      "Bloom level 8  (1/256-size target) weight" },
 
 	// full screen options
 	{ nullptr,                                        nullptr,    OPTION_HEADER,     "FULL SCREEN OPTIONS" },
@@ -375,6 +379,7 @@ const options_entry windows_options::s_option_entries[] =
 //  MAIN ENTRY POINT
 //**************************************************************************
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 //============================================================
 //  utf8_main
@@ -433,18 +438,6 @@ int main(int argc, char *argv[])
 	return result;
 }
 
-
-//============================================================
-//  windows_options
-//============================================================
-
-windows_options::windows_options()
-: osd_options()
-{
-	add_entries(s_option_entries);
-}
-
-
 //============================================================
 //  control_handler
 //============================================================
@@ -454,12 +447,12 @@ static BOOL WINAPI control_handler(DWORD type)
 	// indicate to the user that we detected something
 	switch (type)
 	{
-		case CTRL_C_EVENT:          fprintf(stderr, "Caught Ctrl+C");                   break;
-		case CTRL_BREAK_EVENT:      fprintf(stderr, "Caught Ctrl+break");               break;
-		case CTRL_CLOSE_EVENT:      fprintf(stderr, "Caught console close");            break;
-		case CTRL_LOGOFF_EVENT:     fprintf(stderr, "Caught logoff");                   break;
-		case CTRL_SHUTDOWN_EVENT:   fprintf(stderr, "Caught shutdown");                 break;
-		default:                    fprintf(stderr, "Caught unexpected console event"); break;
+	case CTRL_C_EVENT:          fprintf(stderr, "Caught Ctrl+C");                   break;
+	case CTRL_BREAK_EVENT:      fprintf(stderr, "Caught Ctrl+break");               break;
+	case CTRL_CLOSE_EVENT:      fprintf(stderr, "Caught console close");            break;
+	case CTRL_LOGOFF_EVENT:     fprintf(stderr, "Caught logoff");                   break;
+	case CTRL_SHUTDOWN_EVENT:   fprintf(stderr, "Caught shutdown");                 break;
+	default:                    fprintf(stderr, "Caught unexpected console event"); break;
 	}
 
 	// if we don't have a machine yet, or if we are handling ctrl+c/ctrl+break,
@@ -481,7 +474,18 @@ static BOOL WINAPI control_handler(DWORD type)
 	return TRUE;
 }
 
+#endif
 
+
+//============================================================
+//  windows_options
+//============================================================
+
+windows_options::windows_options()
+: osd_options()
+{
+	add_entries(s_option_entries);
+}
 
 
 //============================================================
@@ -593,11 +597,13 @@ void windows_osd_interface::init(running_machine &machine)
 	if (options.oslog())
 		machine.add_logerror_callback(output_oslog);
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	// crank up the multimedia timer resolution to its max
 	// this gives the system much finer timeslices
 	timeresult = timeGetDevCaps(&timecaps, sizeof(timecaps));
 	if (timeresult == TIMERR_NOERROR)
 		timeBeginPeriod(timecaps.wPeriodMin);
+#endif
 
 	// if a watchdog thread is requested, create one
 	int watchdog = options.watchdog();
@@ -612,11 +618,13 @@ void windows_osd_interface::init(running_machine &machine)
 	}
 
 	// create and start the profiler
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	if (profile > 0)
 	{
 		profiler = global_alloc(sampling_profiler(1000, profile - 1));
 		profiler->start();
 	}
+#endif
 
 	// initialize sockets
 	win_init_sockets();
@@ -653,6 +661,7 @@ void windows_osd_interface::osd_exit()
 		watchdog_thread = nullptr;
 	}
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	// stop the profiler
 	if (profiler != nullptr)
 	{
@@ -664,41 +673,10 @@ void windows_osd_interface::osd_exit()
 	// restore the timer resolution
 	if (timeresult == TIMERR_NOERROR)
 		timeEndPeriod(timecaps.wPeriodMin);
+#endif
 
 	// one last pass at events
 	winwindow_process_events(machine(), 0, 0);
-}
-
-//============================================================
-//  winmain_dump_stack
-//============================================================
-
-void winmain_dump_stack()
-{
-	// set up the stack walker
-	stack_walker walker;
-	if (!walker.reset())
-		return;
-
-	// walk the stack
-	while (walker.unwind())
-		fprintf(stderr, "  %p: %p%s\n", (void *)walker.frame(), (void *)walker.ip(), (symbols == nullptr) ? "" : symbols->symbol_for_address(walker.ip()));
-}
-
-
-//============================================================
-//  check_for_double_click_start
-//============================================================
-
-static int is_double_click_start(int argc)
-{
-	STARTUPINFO startup_info = { sizeof(STARTUPINFO) };
-
-	// determine our startup information
-	GetStartupInfo(&startup_info);
-
-	// try to determine if MAME was simply double-clicked
-	return (argc <= 1 && startup_info.dwFlags && !(startup_info.dwFlags & STARTF_USESTDHANDLES));
 }
 
 
@@ -751,6 +729,40 @@ void winmain_watchdog_ping(void)
 		SetEvent(watchdog_reset_event);
 }
 
+
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+
+//============================================================
+//  winmain_dump_stack
+//============================================================
+
+void winmain_dump_stack()
+{
+	// set up the stack walker
+	stack_walker walker;
+	if (!walker.reset())
+		return;
+
+	// walk the stack
+	while (walker.unwind())
+		fprintf(stderr, "  %p: %p%s\n", (void *)walker.frame(), (void *)walker.ip(), (symbols == nullptr) ? "" : symbols->symbol_for_address(walker.ip()));
+}
+
+
+//============================================================
+//  check_for_double_click_start
+//============================================================
+
+static int is_double_click_start(int argc)
+{
+	STARTUPINFO startup_info = { sizeof(STARTUPINFO) };
+
+	// determine our startup information
+	GetStartupInfo(&startup_info);
+
+	// try to determine if MAME was simply double-clicked
+	return (argc <= 1 && startup_info.dwFlags && !(startup_info.dwFlags & STARTF_USESTDHANDLES));
+}
 
 //============================================================
 //  exception_filter
@@ -1050,7 +1062,7 @@ const char *symbol_manager::symbol_for_address(FPTR address)
 	if (!query_system_for_address(address))
 	{
 		// if that fails, scan the cache if we have one
-		if (m_cache.first() != nullptr)
+		if (!m_cache.empty())
 			scan_cache_for_address(address);
 
 		// or else try to open a sym/map file and find it there
@@ -1173,13 +1185,13 @@ void symbol_manager::scan_cache_for_address(FPTR address)
 	FPTR best_addr = 0;
 
 	// walk the cache, looking for valid entries
-	for (cache_entry *entry = m_cache.first(); entry != nullptr; entry = entry->next())
+	for (cache_entry &entry : m_cache)
 
 		// if this is the best one so far, remember it
-		if (entry->m_address <= address && entry->m_address > best_addr)
+		if (entry.m_address <= address && entry.m_address > best_addr)
 		{
-			best_addr = entry->m_address;
-			best_symbol = entry->m_name;
+			best_addr = entry.m_address;
+			best_symbol = entry.m_name;
 		}
 
 	// format the symbol and remember the last base
@@ -1560,3 +1572,5 @@ void sampling_profiler::thread_run()
 		Sleep(1);
 	}
 }
+
+#endif

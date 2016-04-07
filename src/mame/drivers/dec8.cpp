@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail,Stephane Humbert
 /***************************************************************************
 
 Various Data East 8 bit games:
@@ -2002,9 +2002,8 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2055,9 +2054,8 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2107,9 +2105,8 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2160,9 +2157,8 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2213,13 +2209,12 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	deco_bac06_device::set_gfx_region_wide(*device,2,2,0);
+	MCFG_DECO_BAC06_GFX_REGION_WIDE(2, 2, 0)
 	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2277,9 +2272,8 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2335,13 +2329,12 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	deco_bac06_device::set_gfx_region_wide(*device,2,2,0);
+	MCFG_DECO_BAC06_GFX_REGION_WIDE(2, 2, 0)
 	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen_mxc", DECO_MXC06, 0)
-	deco_mxc06_device::set_gfx_region(*device, 1);
+	MCFG_DECO_MXC06_GFX_REGION(1)
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
-	MCFG_DECO_MXC06_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2432,16 +2425,15 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	deco_bac06_device::set_gfx_region_wide(*device,2,2,0);
+	MCFG_DECO_BAC06_GFX_REGION_WIDE(2, 2, 0)
 	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
-	deco_bac06_device::set_gfx_region_wide(*device,3,3,0);
+	MCFG_DECO_BAC06_GFX_REGION_WIDE(3, 3, 0)
 	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen_mxc", DECO_MXC06, 0)
-	deco_mxc06_device::set_gfx_region(*device, 1);
+	MCFG_DECO_MXC06_GFX_REGION(1)
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
-	MCFG_DECO_MXC06_PALETTE("palette")
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)

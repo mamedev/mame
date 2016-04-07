@@ -1445,6 +1445,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/ramcard128k.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ezcgi.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/ezcgi.h",
+		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.h",
 	}
 end
 
@@ -2027,8 +2029,6 @@ if (BUSES["TI99X"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99x/datamux.h",
 		MAME_DIR .. "src/devices/bus/ti99x/genboard.cpp",
 		MAME_DIR .. "src/devices/bus/ti99x/genboard.h",
-		MAME_DIR .. "src/devices/bus/ti99x/grom.cpp",
-		MAME_DIR .. "src/devices/bus/ti99x/grom.h",
 		MAME_DIR .. "src/devices/bus/ti99x/gromport.cpp",
 		MAME_DIR .. "src/devices/bus/ti99x/gromport.h",
 		MAME_DIR .. "src/devices/bus/ti99x/handset.cpp",
@@ -2603,6 +2603,8 @@ if (BUSES["SVI_EXPANDER"]~=null) then
 		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv601.h",
 		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv602.cpp",
 		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv602.h",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv603.cpp",
+		MAME_DIR .. "src/devices/bus/svi3x8/expander/sv603.h",
 	}
 end
 

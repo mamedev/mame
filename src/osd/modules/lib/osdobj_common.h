@@ -76,12 +76,10 @@
 #define OSDOPTVAL_NONE                  "none"
 
 #define OSDOPTION_BGFX_PATH             "bgfx_path"
-#define OSDOPTION_BGFX_BACKEND			"bgfx_backend"
-#define OSDOPTION_BGFX_DEBUG			"bgfx_debug"
+#define OSDOPTION_BGFX_BACKEND          "bgfx_backend"
+#define OSDOPTION_BGFX_DEBUG            "bgfx_debug"
 #define OSDOPTION_BGFX_SCREEN_CHAINS    "bgfx_screen_chains"
-#define OSDOPTION_BGFX_SHADOW_MASK		"bgfx_shadow_mask"
-#define OSDOPTION_BGFX_PRESCALE_X		"bgfx_prescale_x"
-#define OSDOPTION_BGFX_PRESCALE_Y		"bgfx_prescale_y"
+#define OSDOPTION_BGFX_SHADOW_MASK      "bgfx_shadow_mask"
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -149,14 +147,12 @@ public:
 	const char *audio_output() const { return value(OSDOPTION_AUDIO_OUTPUT); }
 	const char *audio_effect(int index) const { return value(string_format("%s%d", OSDOPTION_AUDIO_EFFECT, index).c_str()); }
 
-    // BGFX specific options
-    const char *bgfx_path() const { return value(OSDOPTION_BGFX_PATH); }
-    const char *bgfx_backend() const { return value(OSDOPTION_BGFX_BACKEND); }
-    const bool bgfx_debug() const { return bool_value(OSDOPTION_BGFX_DEBUG); }
-    const char *bgfx_screen_chains() const { return value(OSDOPTION_BGFX_SCREEN_CHAINS); }
-    const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
-    const uint32_t bgfx_prescale_x() const { return int_value(OSDOPTION_BGFX_PRESCALE_X); }
-    const uint32_t bgfx_prescale_y() const { return int_value(OSDOPTION_BGFX_PRESCALE_Y); }
+	// BGFX specific options
+	const char *bgfx_path() const { return value(OSDOPTION_BGFX_PATH); }
+	const char *bgfx_backend() const { return value(OSDOPTION_BGFX_BACKEND); }
+	const bool bgfx_debug() const { return bool_value(OSDOPTION_BGFX_DEBUG); }
+	const char *bgfx_screen_chains() const { return value(OSDOPTION_BGFX_SCREEN_CHAINS); }
+	const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
 
 private:
 	static const options_entry s_option_entries[];
@@ -278,10 +274,10 @@ protected:
 	sound_module* m_sound;
 	debug_module* m_debugger;
 	midi_module* m_midi;
-    input_module* m_keyboard_input;
-    input_module* m_mouse_input;
-    input_module* m_lightgun_input;
-    input_module* m_joystick_input;
+	input_module* m_keyboard_input;
+	input_module* m_mouse_input;
+	input_module* m_lightgun_input;
+	input_module* m_joystick_input;
 private:
 	std::vector<const char *> m_video_names;
 };

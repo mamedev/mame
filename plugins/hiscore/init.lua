@@ -5,7 +5,7 @@
 -- high-score saving with hiscore.dat infom just as older
 -- builds did in the past.
 -- 
-
+require('lfs')
 local exports = {}
 exports.name = "hiscore"
 exports.version = "1.0.0"
@@ -22,19 +22,19 @@ end
 
 function hiscore.startplugin()
 
-	hiscoredata_path = "hiscore.dat";
-	hiscore_path = "hi";
+	local hiscoredata_path = "hiscore.dat";
+	local hiscore_path = "hi";
 
-	current_checksum = 0;
-	default_checksum = 0;
+	local current_checksum = 0;
+	local default_checksum = 0;
 
-	scores_have_been_read = false;
-	mem_check_passed = false;
-	current_game = "";
+	local scores_have_been_read = false;
+	local mem_check_passed = false;
+	local found_hiscore_entry = false;
 
-	positions = {};
+	local positions = {};
 
-	function parse_table ( dsting )
+	local function parse_table ( dsting )
 	  local _table = {};
 	  for line in string.gmatch(dsting, '([^\n]+)') do
 		local cpu, mem;
@@ -59,14 +59,19 @@ function hiscore.startplugin()
 	end
 
 
-	function read_hiscore_dat ()
-	  file = io.open( hiscoredata_path, "r" );
+	local function read_hiscore_dat ()
+	  local file = io.open( hiscoredata_path, "r" );
+	  local rm_match;
 	  if not file then
 		file = io.open( hiscore_plugin_path .. "/hiscore.dat", "r" );
 	  end
-	  rm_match = '^' .. emu.romname() .. ':';
-	  cluster = "";
-	  current_is_match = false;
+	  if emu.softname() ~= "" then
+		rm_match = '^' .. emu.romname() .. ',' .. emu.softname() .. ':';
+	  else
+		rm_match = '^' .. emu.romname() .. ':';
+	  end
+	  local cluster = "";
+	  local current_is_match = false;
 	  if file then
 		repeat
 		  line = file:read("*l");
@@ -95,7 +100,7 @@ function hiscore.startplugin()
 	end
 
 
-	function check_mem ( posdata )
+	local function check_mem ( posdata )
 	  if #posdata < 1 then
 		return false;
 	  end
@@ -112,18 +117,23 @@ function hiscore.startplugin()
 	end
 
 
-	function get_file_name ()
-	  r = hiscore_path .. '/' .. emu.romname() .. ".hi";
+	local function get_file_name ()
+	  local r;
+	  if emu.softname() ~= "" then
+	  	r = hiscore_path .. '/' .. emu.romname() .. "_" .. emu.softname() .. ".hi";
+	  else
+	  	r = hiscore_path .. '/' .. emu.romname() .. ".hi";
+	  end
 	  return r;
 	end
 
 
-	function write_scores ( posdata )
-	print("write_scores")
+	local function write_scores ( posdata )
+	  print("write_scores")
 	  local output = io.open(get_file_name(), "wb");
 	  if not output then
 		-- attempt to create the directory, and try again
-		os.execute( "mkdir " .. hiscore_path );
+		lfs.mkdir( hiscore_path );
 		output = io.open(get_file_name(), "wb");
 	  end
 	  print("write_scores output")
@@ -141,7 +151,7 @@ function hiscore.startplugin()
 	end
 
 
-	function read_scores ( posdata )
+	local function read_scores ( posdata )
 	  local input = io.open(get_file_name(), "rb");
 	  if input then
 		for ri,row in ipairs(posdata) do
@@ -158,20 +168,18 @@ function hiscore.startplugin()
 	end
 
 
-	function check_scores ( posdata )
+	local function check_scores ( posdata )
 	  local r = 0;
-	  -- commonly the first entry will be for the entire table
-	  -- so it will only trigger a write once a player enters
-	  -- his/her name in.
-	  row = positions[1];
-	  for i=0,row["size"]-1 do
+	  for ri,row in ipairs(posdata) do
+	    for i=0,row["size"]-1 do
 		r = r + row["mem"]:read_u8( row["addr"] + i );
+	    end
 	  end
 	  return r;
 	end
 
 
-	function init ()
+	local function init ()
 	  if not scores_have_been_read then
 		if check_mem( positions ) then
 		  default_checksum = check_scores( positions );
@@ -193,7 +201,7 @@ function hiscore.startplugin()
 
 
 	local last_write_time = -10;
-	function tick ()
+	local function tick ()
 	  -- set up scores if they have been
 	  init();
 	  -- only allow save check to run when 
@@ -217,41 +225,47 @@ function hiscore.startplugin()
 	  end
 	end
 
-	function reset()
+	local function reset()
 	  -- the notifier will still be attached even if the running game has no hiscore.dat entry
-	  if mem_check_passed and (emu.romname() == current_game) then
+	  if mem_check_passed and found_hiscore_entry then
 		local checksum = check_scores(positions)
 		if checksum ~= current_checksum and checksum ~= default_checksum then
 		  write_scores(positions)
 		end
 	  end
-	  current_game = nil
+	  found_hiscore_entry = false
 	  mem_check_passed = false
+	  scores_have_been_read = false;
 	end
 	
 	emu.register_start(function()
-		print("Starting " .. emu.gamename())
-		-- check if we've just soft reset
-		if reset then
-			reset()
-		end
-		current_game = emu.romname()
-		dat = read_hiscore_dat()
-		if dat then
+		found_hiscore_entry = false
+		mem_check_passed = false
+	   	scores_have_been_read = false;
+		last_write_time = -10
+	  	print("Starting " .. emu.gamename())
+		local dat = read_hiscore_dat()
+		if dat and dat ~= "" then
 			print( "found hiscore.dat entry for " .. emu.romname() );
 			positions = parse_table( dat );
 			if not positions then
 				print("hiscore.dat parse error");
 				return;
 			end
-			emu.sethook( tick, "frame" );
-			emu.register_stop(function()
-				reset()
-			end)
+			found_hiscore_entry = true
 		end		
-
 	end)
-    
+	emu.register_frame(function()
+		if found_hiscore_entry then
+			tick()
+		end
+	end)  
+	emu.register_stop(function()
+		reset()
+	end)
+	emu.register_prestart(function()
+		reset()
+	end)
 end
 
 return exports

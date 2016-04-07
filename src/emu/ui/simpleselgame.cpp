@@ -103,7 +103,10 @@ void ui_simple_menu_select_game::handle()
 	{
 		// reset the error on any future menu_event
 		if (m_error)
+		{
 			m_error = false;
+			machine().ui_input().reset();
+		}
 
 		// handle selections
 		else

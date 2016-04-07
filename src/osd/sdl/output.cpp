@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <inttypes.h>
 
 // MAME headers
 #include "emu.h"
@@ -31,12 +32,6 @@
  * architectures.
  */
 
-
-#ifdef PTR64
-#define PID_FMT "%ld"
-#else
-#define PID_FMT "%d"
-#endif
 
 //============================================================
 //  TYPEDEFS
@@ -83,7 +78,7 @@ bool sdl_osd_interface::output_init()
 		output = fdopen(fildes, "w");
 
 		osd_printf_verbose("output: opened output notifier file %s\n", SDLMAME_OUTPUT);
-		fprintf(output, "MAME " PID_FMT " START %s\n", osd_getpid(), this->machine().system().name);
+		fprintf(output, "MAME %" PRIxPTR " START %s\n", osd_getpid(), this->machine().system().name);
 		fflush(output);
 	}
 
@@ -100,7 +95,7 @@ void sdl_osd_interface::output_exit()
 {
 	if (output != NULL)
 	{
-		fprintf(output, "MAME " PID_FMT " STOP %s\n", osd_getpid(), machine().system().name);
+		fprintf(output, "MAME %" PRIxPTR " STOP %s\n", osd_getpid(), machine().system().name);
 		fflush(output);
 		fclose(output);
 		output = NULL;
@@ -116,7 +111,7 @@ static void notifier_callback(const char *outname, INT32 value, void *param)
 {
 	if (output != NULL)
 	{
-		fprintf(output, "OUT " PID_FMT " %s %d\n", osd_getpid(), outname, value);
+		fprintf(output, "OUT %" PRIxPTR " %s %d\n", osd_getpid(), outname, value);
 		fflush(output);
 	}
 }

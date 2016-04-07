@@ -18,8 +18,6 @@
 #ifndef __MCONFIG_H__
 #define __MCONFIG_H__
 
-#include "emuopts.h"
-
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -35,6 +33,15 @@
 struct gfx_decode_entry;
 class driver_device;
 class screen_device;
+
+struct internal_layout
+{
+	size_t decompressed_size;
+	size_t compressed_size;
+	UINT8 compression_type;
+	const UINT8* data;
+};
+
 
 // ======================> machine_config
 
@@ -63,10 +70,9 @@ public:
 	std::string             m_perfect_cpu_quantum;      // tag of CPU to use for "perfect" scheduling
 	INT32                   m_watchdog_vblank_count;    // number of VBLANKs until the watchdog kills us
 	attotime                m_watchdog_time;            // length of time until the watchdog kills us
-	bool                    m_force_no_drc;             // whether or not to force DRC off
 
 	// other parameters
-	const char *            m_default_layout;           // default layout for this machine
+	const internal_layout *            m_default_layout;           // default layout for this machine
 
 	// helpers during configuration; not for general use
 	device_t *device_add(device_t *owner, const char *tag, device_type type, UINT32 clock);
@@ -75,6 +81,10 @@ public:
 	device_t *device_find(device_t *owner, const char *tag);
 
 private:
+	// internal helpers
+	void remove_references(ATTR_UNUSED device_t &device);
+	device_t &config_new_device(device_t &device);
+
 	// internal state
 	const game_driver &     m_gamedrv;
 	emu_options &           m_options;
@@ -189,10 +199,6 @@ References an external machine config.
 #define MCFG_QUANTUM_PERFECT_CPU(_cputag) \
 	config.m_perfect_cpu_quantum = owner->subtag(_cputag);
 
-// recompilation parameters
-#define MCFG_FORCE_NO_DRC() \
-	config.m_force_no_drc = true;
-
 // watchdog configuration
 #define MCFG_WATCHDOG_VBLANK_INIT(_count) \
 	config.m_watchdog_vblank_count = _count;
@@ -201,7 +207,7 @@ References an external machine config.
 
 // core video parameters
 #define MCFG_DEFAULT_LAYOUT(_layout) \
-	config.m_default_layout = &(_layout)[0];
+	config.m_default_layout = &(_layout);
 
 // add/remove devices
 #define MCFG_DEVICE_ADD(_tag, _type, _clock) \
@@ -214,4 +220,4 @@ References an external machine config.
 	device = config.device_find(owner, _tag);
 
 #endif  /* __MCONFIG_H__ */
-    /** @} */
+	/** @} */

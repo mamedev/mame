@@ -102,14 +102,14 @@ UINT32 tms0980_cpu_device::decode_fixed(UINT16 op)
 {
 	UINT32 decode = 0;
 	UINT32 mask = m_ipla->read(op);
-	
+
 	// 1 line per PLA row, no OR-mask
 	const UINT32 id[15] = { F_LDP, F_SBL, F_OFF, F_RBIT, F_SAL, F_XDA, F_REAC, F_SETR, F_RETN, F_SBIT, F_TDO, F_COMX8, F_COMX, F_LDX, F_SEAC };
 
 	for (int bit = 0; bit < 15; bit++)
 		if (mask & (0x80 << bit))
 			decode |= id[bit];
-	
+
 	return decode;
 }
 

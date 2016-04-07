@@ -999,7 +999,6 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	MCFG_DECO_SPRITE_FLIPALLX(1)
 	MCFG_DECO_SPRITE_OFFSETS(0, 8)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 
 	/* sound hardware */

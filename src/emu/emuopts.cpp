@@ -39,7 +39,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_SAMPLEPATH ";sp",                           "samples",   OPTION_STRING,     "path to samplesets" },
 	{ OPTION_ARTPATH,                                    "artwork",   OPTION_STRING,     "path to artwork files" },
 	{ OPTION_CTRLRPATH,                                  "ctrlr",     OPTION_STRING,     "path to controller definitions" },
-	{ OPTION_INIPATH,                                    ".;ini",     OPTION_STRING,     "path to ini files" },
+	{ OPTION_INIPATH,                                    ".;ini;ini/presets",     OPTION_STRING,     "path to ini files" },
 	{ OPTION_FONTPATH,                                   ".",         OPTION_STRING,     "path to font files" },
 	{ OPTION_CHEATPATH,                                  "cheat",     OPTION_STRING,     "path to cheat files" },
 	{ OPTION_CROSSHAIRPATH,                              "crosshair", OPTION_STRING,     "path to crosshair files" },
@@ -93,6 +93,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_KEEPASPECT ";ka",                           "1",         OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
 	{ OPTION_UNEVENSTRETCH ";ues",                       "1",         OPTION_BOOLEAN,    "allow non-integer stretch factors" },
 	{ OPTION_UNEVENSTRETCHX ";uesx",                     "0",         OPTION_BOOLEAN,    "allow non-integer stretch factors only on horizontal axis"},
+	{ OPTION_INTOVERSCAN ";ios",                         "0",         OPTION_BOOLEAN,    "allow overscan on integer scaled targets"},
 	{ OPTION_INTSCALEX ";sx",                            "0",         OPTION_INTEGER,    "set horizontal integer scale factor."},
 	{ OPTION_INTSCALEY ";sy",                            "0",         OPTION_INTEGER,    "set vertical integer scale."},
 
@@ -150,8 +151,8 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_UI_ACTIVE,                                  "0",         OPTION_BOOLEAN,    "enable user interface on top of emulated keyboard (if present)" },
 	{ OPTION_OFFSCREEN_RELOAD ";reload",                 "0",         OPTION_BOOLEAN,    "convert lightgun button 2 into offscreen reload" },
 	{ OPTION_JOYSTICK_MAP ";joymap",                     "auto",      OPTION_STRING,     "explicit joystick map, or auto to auto-select" },
-	{ OPTION_JOYSTICK_DEADZONE ";joy_deadzone;jdz",      "0.3",       OPTION_FLOAT,      "center deadzone range for joystick where change is ignored (0.0 center, 1.0 end)" },
-	{ OPTION_JOYSTICK_SATURATION ";joy_saturation;jsat", "0.85",      OPTION_FLOAT,      "end of axis saturation range for joystick where change is ignored (0.0 center, 1.0 end)" },
+	{ OPTION_JOYSTICK_DEADZONE ";joy_deadzone;jdz(0.00-1)",      "0.3",       OPTION_FLOAT,      "center deadzone range for joystick where change is ignored (0.0 center, 1.0 end)" },
+	{ OPTION_JOYSTICK_SATURATION ";joy_saturation;jsat(0.00-1)", "0.85",      OPTION_FLOAT,      "end of axis saturation range for joystick where change is ignored (0.0 center, 1.0 end)" },
 	{ OPTION_NATURAL_KEYBOARD ";nat",                    "0",         OPTION_BOOLEAN,    "specifies whether to use a natural keyboard or not" },
 	{ OPTION_JOYSTICK_CONTRADICTORY ";joy_contradictory","0",         OPTION_BOOLEAN,    "enable contradictory direction digital joystick input at the same time" },
 	{ OPTION_COIN_IMPULSE,                               "0",         OPTION_INTEGER,    "set coin impulse time (n<0 disable impulse, n==0 obey driver, 0<n set time n)" },
@@ -201,6 +202,9 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_AUTOBOOT_DELAY,                             "0",         OPTION_INTEGER,    "timer delay in sec to trigger command execution on autoboot" },
 	{ OPTION_AUTOBOOT_SCRIPT ";script",                  nullptr,        OPTION_STRING,     "lua script to execute after machine boot" },
 	{ OPTION_CONSOLE,                                    "0",         OPTION_BOOLEAN,    "enable emulator LUA console" },
+	{ OPTION_PLUGINS,                                    "1",         OPTION_BOOLEAN,    "enable LUA plugin support" },
+	{ OPTION_PLUGIN,                                    nullptr,     OPTION_STRING,     "list of plugins to enable" },
+	{ OPTION_NO_PLUGIN,                                  nullptr,     OPTION_STRING,     "list of plugins to disable" },
 	{ OPTION_LANGUAGE ";lang",                           "English",   OPTION_STRING,    "display language" },
 	{ nullptr }
 };
@@ -252,24 +256,16 @@ bool emu_options::add_slot_options(const software_part *swpart)
 		if (slot->fixed())
 			continue;
 
-		// first device? add the header as to be pretty
-		if (m_slot_options++ == 0)
-			add_entry(nullptr, "SLOT DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
-
 		// retrieve info about the device instance
 		const char *name = slot->device().tag() + 1;
 		if (!exists(name))
 		{
+			// first device? add the header as to be pretty
+			if (m_slot_options++ == 0)
+				add_entry(nullptr, "SLOT DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
+
 			// add the option
-			UINT32 flags = OPTION_STRING | OPTION_FLAG_DEVICE;
-			const char *defvalue = slot->default_option();
-			if (defvalue != nullptr)
-			{
-				const device_slot_option *option = slot->option(defvalue);
-				if (option != nullptr && !option->selectable())
-					flags |= OPTION_FLAG_INTERNAL;
-			}
-			add_entry(name, nullptr, flags, defvalue, true);
+			add_entry(name, nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, slot->default_option(), true);
 		}
 
 		// allow software lists to supply their own defaults
@@ -308,15 +304,24 @@ void emu_options::update_slot_options(const software_part *swpart)
 	{
 		// retrieve info about the device instance
 		const char *name = slot->device().tag() + 1;
-		if (exists(name) && slot->first_option() != nullptr)
+		if (exists(name) && !slot->option_list().empty())
 		{
 			std::string defvalue = slot->get_default_card_software();
-			if (defvalue.length() > 0)
+			if (defvalue.empty())
 			{
-				set_default_value(name, defvalue.c_str());
-				const device_slot_option *option = slot->option(defvalue.c_str());
-				set_flag(name, ~OPTION_FLAG_INTERNAL, (option != nullptr && !option->selectable()) ? OPTION_FLAG_INTERNAL : 0);
+				// keep any non-default setting
+				if (priority(name) > OPTION_PRIORITY_DEFAULT)
+					continue;
+
+				// reinstate the actual default value as configured
+				if (slot->default_option() != nullptr)
+					defvalue.assign(slot->default_option());
 			}
+
+			// set the value and hide the option if not selectable
+			set_default_value(name, defvalue.c_str());
+			const device_slot_option *option = slot->option(defvalue.c_str());
+			set_flag(name, ~OPTION_FLAG_INTERNAL, (option != nullptr && !option->selectable()) ? OPTION_FLAG_INTERNAL : 0);
 		}
 	}
 	while (add_slot_options(swpart)) { }
@@ -341,10 +346,6 @@ void emu_options::add_device_options()
 	image_interface_iterator iter(config.root_device());
 	for (const device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 	{
-		// first device? add the header as to be pretty
-		if (m_device_options++ == 0)
-			add_entry(nullptr, "IMAGE DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
-
 		// retrieve info about the device instance
 		std::ostringstream option_name;
 		util::stream_format(option_name, "%s;%s", image->instance_name(), image->brief_instance_name());
@@ -353,7 +354,14 @@ void emu_options::add_device_options()
 
 		// add the option
 		if (!exists(image->instance_name()))
+		{
+			// first device? add the header as to be pretty
+			if (m_device_options++ == 0)
+				add_entry(nullptr, "IMAGE DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
+
+			// add the option
 			add_entry(option_name.str().c_str(), nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, nullptr, true);
+		}
 	}
 }
 
@@ -376,6 +384,9 @@ void emu_options::remove_device_options()
 			remove_entry(*curentry);
 	}
 
+	// take also care of ramsize options
+	set_default_value(OPTION_RAMSIZE, "");
+
 	// reset counters
 	m_slot_options = 0;
 	m_device_options = 0;
@@ -395,12 +406,10 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], std::string &error_
 	core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 
 	// keep adding slot options until we stop seeing new stuff
-	m_slot_options = 0;
 	while (add_slot_options(swpart))
 		core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 
 	// add device options and reparse
-	m_device_options = 0;
 	add_device_options();
 	if (name != nullptr && exists(name))
 		set_value(name, value, OPTION_PRIORITY_SUBCMD, error_string);
@@ -541,20 +550,71 @@ void emu_options::set_system_name(const char *name)
 {
 	// remember the original system name
 	std::string old_system_name(system_name());
+	bool new_system = old_system_name.compare(name)!=0;
 
 	// if the system name changed, fix up the device options
-	if (old_system_name.compare(name)!=0)
+	if (new_system)
 	{
 		// first set the new name
 		std::string error;
 		set_value(OPTION_SYSTEMNAME, name, OPTION_PRIORITY_CMDLINE, error);
 		assert(error.empty());
 
-		// remove any existing device options and then add them afresh
+		// remove any existing device options
 		remove_device_options();
-		while (add_slot_options()) { }
+	}
+	else
+	{
+		// revert device options set for the old software
+		revert(OPTION_PRIORITY_SUBCMD, OPTION_PRIORITY_SUBCMD);
+	}
+
+	// get the new system
+	const game_driver *cursystem = system();
+	if (cursystem == nullptr)
+		return;
+
+	if (*software_name() != 0)
+	{
+		std::string sw_load(software_name());
+		std::string sw_list, sw_name, sw_part, sw_instance, option_errors, error_string;
+		int left = sw_load.find_first_of(':');
+		int middle = sw_load.find_first_of(':', left + 1);
+		int right = sw_load.find_last_of(':');
+
+		sw_list = sw_load.substr(0, left - 1);
+		sw_name = sw_load.substr(left + 1, middle - left - 1);
+		sw_part = sw_load.substr(middle + 1, right - middle - 1);
+		sw_instance = sw_load.substr(right + 1);
+		sw_load.assign(sw_load.substr(0, right));
+
+		// look up the software part
+		machine_config config(*cursystem, *this);
+		software_list_device *swlist = software_list_device::find_by_name(config, sw_list.c_str());
+		software_info *swinfo = swlist != nullptr ? swlist->find(sw_name.c_str()) : nullptr;
+		software_part *swpart = swinfo != nullptr ? swinfo->find_part(sw_part.c_str()) : nullptr;
 
 		// then add the options
+		if (new_system)
+		{
+			while (add_slot_options(swpart)) { }
+			add_device_options();
+		}
+
+		set_value(OPTION_SOFTWARENAME, sw_name.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+		if (exists(sw_instance.c_str()))
+			set_value(sw_instance.c_str(), sw_load.c_str(), OPTION_PRIORITY_SUBCMD, error_string);
+
+		int num;
+		do {
+			num = options_count();
+			update_slot_options(swpart);
+		} while(num != options_count());
+	}
+	else if (new_system)
+	{
+		// add the options afresh
+		while (add_slot_options()) { }
 		add_device_options();
 		int num;
 		do {

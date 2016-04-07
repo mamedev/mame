@@ -176,7 +176,7 @@ static OSDWORK_CALLBACK(sdlwindow_thread_id)
 
 	if (SDLMAME_INIT_IN_WORKER_THREAD)
 	{
-		if (SDL_InitSubSystem(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_GAMECONTROLLER|SDL_INIT_NOPARACHUTE))
+		if (SDL_InitSubSystem(SDL_INIT_VIDEO))
 		{
 			osd_printf_error("Could not initialize SDL: %s.\n", SDL_GetError());
 			exit(-1);
@@ -300,33 +300,33 @@ void sdl_osd_interface::update_slider_list()
 
 void sdl_osd_interface::build_slider_list()
 {
-    m_sliders = nullptr;
-    slider_state* full_list = nullptr;
-    slider_state* curr = nullptr;
+	m_sliders = nullptr;
+	slider_state* full_list = nullptr;
+	slider_state* curr = nullptr;
 	for (sdl_window_info *window = sdl_window_list; window != nullptr; window = window->m_next)
 	{
 		// take the sliders of the first window
-        slider_state* window_sliders = window->renderer().get_slider_list();
-        if (window_sliders == nullptr)
-        {
-            continue;
-        }
+		slider_state* window_sliders = window->renderer().get_slider_list();
+		if (window_sliders == nullptr)
+		{
+			continue;
+		}
 
-        if (full_list == nullptr)
-        {
-            full_list = curr = window_sliders;
-        }
-        else
-        {
-            curr->next = window_sliders;
-        }
+		if (full_list == nullptr)
+		{
+			full_list = curr = window_sliders;
+		}
+		else
+		{
+			curr->next = window_sliders;
+		}
 
-        while (curr->next != nullptr) {
-            curr = curr->next;
-        }
+		while (curr->next != nullptr) {
+			curr = curr->next;
+		}
 	}
 
-    m_sliders = full_list;
+	m_sliders = full_list;
 }
 
 //============================================================

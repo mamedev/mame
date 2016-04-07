@@ -231,21 +231,21 @@ void favorite_manager::add_favorite_game()
 			if (swinfo->parentname())
 			{
 				software_list_device *swlist = software_list_device::find_by_name(machine().config(), image->software_list_name());
-				for (software_info *c_swinfo = swlist->first_software_info(); c_swinfo != nullptr; c_swinfo = c_swinfo->next())
+				for (software_info &c_swinfo : swlist->get_info())
 				{
-					std::string c_parent(c_swinfo->parentname());
+					std::string c_parent(c_swinfo.parentname());
 					if (!c_parent.empty() && c_parent == swinfo->shortname())
 						{
-							tmpmatches.parentlongname = c_swinfo->longname();
+							tmpmatches.parentlongname = c_swinfo.longname();
 							break;
 						}
 				}
 			}
 
 			tmpmatches.usage.clear();
-			for (feature_list_item *flist = swinfo->other_info(); flist != nullptr; flist = flist->next())
-				if (!strcmp(flist->name(), "usage"))
-					tmpmatches.usage = flist->value();
+			for (feature_list_item &flist : swinfo->other_info())
+				if (!strcmp(flist.name(), "usage"))
+					tmpmatches.usage = flist.value();
 
 			tmpmatches.devicetype = strensure(image->image_type_name());
 			tmpmatches.available = true;

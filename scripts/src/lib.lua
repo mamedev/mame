@@ -19,17 +19,10 @@ project "utils"
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
+		ext_includedir("expat"),
+		ext_includedir("zlib"),
+		ext_includedir("flac"),
 	}
-	if _OPTIONS["with-bundled-expat"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/expat/lib",
-		}
-	end
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end
 
 	files {
 		MAME_DIR .. "src/lib/util/bitstream.h",
@@ -71,6 +64,7 @@ project "utils"
 		MAME_DIR .. "src/lib/util/jedparse.h",
 		MAME_DIR .. "src/lib/util/md5.cpp",
 		MAME_DIR .. "src/lib/util/md5.h",
+		MAME_DIR .. "src/lib/util/nanosvg.cpp",
 		MAME_DIR .. "src/lib/util/opresolv.cpp",
 		MAME_DIR .. "src/lib/util/opresolv.h",
 		MAME_DIR .. "src/lib/util/options.cpp",
@@ -119,13 +113,8 @@ project "formats"
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
+		ext_includedir("zlib"),
 	}
-
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end
 
 	files {
 		MAME_DIR .. "src/lib/formats/2d_dsk.cpp",

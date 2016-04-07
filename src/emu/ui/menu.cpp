@@ -253,7 +253,7 @@ void ui_menu::reset(ui_menu_reset_options options)
 		item_append(_("Return to Machine"), nullptr, 0, nullptr);
 	else if (parent->is_special_main_menu())
 	{
-		if (strcmp(machine().options().ui(), "simple") == 0) 
+		if (strcmp(machine().options().ui(), "simple") == 0)
 			item_append(_("Exit"), nullptr, 0, nullptr);
 		else
 			item_append(_("Exit"), nullptr, MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, nullptr);
@@ -544,13 +544,24 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 	if (!customonly)
 		machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
-	// determine the first visible line based on the current selection
-	if (selected > top_line + visible_lines || selected < top_line - visible_lines)
-		top_line = selected - (visible_lines / 2);
 	if (top_line < 0 || selected == 0)
 		top_line = 0;
-	if (top_line + visible_lines >= item.size())
+	if (top_line > item.size() - visible_lines || selected == (item.size() - 1))
 		top_line = item.size() - visible_lines;
+
+	bool show_top_arrow = false;
+	bool show_bottom_arrow = false;
+
+	// if scrolling, show arrows
+	if (item.size() > visible_lines) {
+		if (top_line > 0)
+			show_top_arrow = true;
+		if (top_line != item.size() - visible_lines)
+			show_bottom_arrow = true;
+	}
+
+	// set the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
+	visitems = visible_lines - show_top_arrow - show_bottom_arrow;
 
 	// determine effective positions taking into account the hilighting arrows
 	float effective_width = visible_width - 2.0f * gutter_width;
@@ -573,6 +584,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 	float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
 	float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
 	if (!customonly)
+	{
 		for (linenum = 0; linenum < visible_lines; linenum++)
 		{
 			float line_y = visible_top + (float)linenum * line_height;
@@ -613,7 +625,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 				highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
 
 			// if we're on the top line, display the up arrow
-			if (linenum == 0 && top_line != 0)
+			if (linenum == 0 && show_top_arrow)
 			{
 				draw_arrow(container,
 									0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
@@ -627,7 +639,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 			}
 
 			// if we're on the bottom line, display the down arrow
-			else if (linenum == visible_lines - 1 && itemnum != item.size() - 1)
+			else if (linenum == visible_lines - 1 && show_bottom_arrow)
 			{
 				draw_arrow(container,
 									0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
@@ -646,8 +658,16 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 
 			// if we don't have a subitem, just draw the string centered
 			else if (pitem.subtext == nullptr)
+			{
+				if (pitem.flags & MENU_FLAG_UI_HEADING)
+				{
+					float heading_width = machine().ui().get_string_width(itemtext);
+					container->add_line(visible_left, line_y + 0.5f * line_height, visible_left + ((visible_width - heading_width) / 2) - UI_BOX_LR_BORDER, line_y + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+					container->add_line(visible_left + visible_width - ((visible_width - heading_width) / 2) + UI_BOX_LR_BORDER, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				}
 				machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
 					JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+			}
 
 			// otherwise, draw the item on the left and the subitem text on the right
 			else
@@ -708,6 +728,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 				}
 			}
 		}
+	}
 
 	// if the selected subitem is too big, display it in a separate offset box
 	if (selected_subitem_too_big)
@@ -741,9 +762,6 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 
 	// if there is something special to add, do it by calling the virtual method
 	custom_render((selected >= 0 && selected < item.size()) ? item[selected].ref : nullptr, customtop, custombottom, x1, y1, x2, y2);
-
-	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != item.size());
 }
 
 void ui_menu::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
@@ -989,7 +1007,9 @@ void ui_menu::handle_keys(UINT32 flags)
 		}
 		(selected == 0) ? selected = top_line = item.size() - 1 : --selected;
 		validate_selection(-1);
-		top_line -= (selected == top_line && top_line != 0);
+		top_line -= (selected <= top_line && top_line != 0);
+		if (selected <= top_line && visitems != visible_lines)
+			top_line--;
 	}
 
 	// down advances by one item
@@ -1001,7 +1021,10 @@ void ui_menu::handle_keys(UINT32 flags)
 			return;
 		}
 		(selected == item.size() - 1) ? selected = top_line = 0 : ++selected;
-		top_line += (selected == top_line + visitems + (top_line != 0));
+		validate_selection(1);
+		top_line += (selected >= top_line + visitems + (top_line != 0));
+		if (selected >= (top_line + visitems + (top_line != 0)))
+			top_line++;
 	}
 
 	// page up backs up by visitems
@@ -1701,10 +1724,8 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	// hitting cancel also pops the stack
 	if (exclusive_input_pressed(IPT_UI_CANCEL, 0))
 	{
-		if (!menu_has_search_active())
+		if (!ui_error && !menu_has_search_active())
 			ui_menu::stack_pop(machine());
-		//    else if (!ui_error)
-		//        ui_menu::stack_pop(machine()); TODO
 		return;
 	}
 
@@ -2137,8 +2158,7 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 			mui.draw_textured_box(container, x1 + UI_LINE_WIDTH, y1 + UI_LINE_WIDTH, x1 + midl - UI_LINE_WIDTH, y1 + line_height,
 				bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		}
-
-		if (bgcolor == UI_MOUSEOVER_BG_COLOR)
+		else if (bgcolor == UI_MOUSEOVER_BG_COLOR)
 			container->add_rect(x1 + UI_LINE_WIDTH, y1 + UI_LINE_WIDTH, x1 + midl - UI_LINE_WIDTH, y1 + line_height,
 				bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
@@ -2159,13 +2179,13 @@ std::string ui_menu::arts_render_common(float origx1, float origy1, float origx2
 	ui_manager &mui = machine().ui();
 	float line_height = mui.get_line_height();
 	std::string snaptext, searchstr;
-	get_title_search(snaptext, searchstr);
-	float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
-
-	// apply title to right panel
 	float title_size = 0.0f;
 	float txt_lenght = 0.0f;
+	float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
 
+	get_title_search(snaptext, searchstr);
+
+	// apply title to right panel
 	for (int x = FIRST_VIEW; x < LAST_VIEW; x++)
 	{
 		mui.draw_text_full(container, _(arts_info[x].title), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
@@ -2174,14 +2194,8 @@ std::string ui_menu::arts_render_common(float origx1, float origy1, float origx2
 		title_size = MAX(txt_lenght, title_size);
 	}
 
-	rgb_t fgcolor = UI_TEXT_COLOR;
-	rgb_t bgcolor = UI_TEXT_BG_COLOR;
-	if (m_focus == focused_menu::rightbottom)
-	{
-		fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
-		bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
-	}
-
+	rgb_t fgcolor = (m_focus == focused_menu::rightbottom) ? rgb_t(0xff, 0xff, 0xff, 0x00) : UI_TEXT_COLOR;
+	rgb_t bgcolor = (m_focus == focused_menu::rightbottom) ? rgb_t(0xff, 0xff, 0xff, 0xff) : UI_TEXT_BG_COLOR;
 	float middle = origx2 - origx1;
 
 	// check size
@@ -2233,11 +2247,15 @@ void ui_menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software
 
 	int m_valid = 0;
 	for (int x = 0; x < UI_TOOLBAR_BUTTONS; ++x)
+	{
 		if (t_bitmap[x]->valid())
+		{
 			m_valid++;
+		}
+	}
 
 	float space_x = (y2 - y1) * container->manager().ui_aspect();
-	float total = (m_valid * space_x) + ((m_valid - 1) * 0.01f);
+	float total = (m_valid * space_x) + ((m_valid - 1) * 0.001f);
 	x1 = ((x2 - x1) * 0.5f) - (total / 2);
 	x2 = x1 + space_x;
 
@@ -2255,7 +2273,7 @@ void ui_menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software
 			}
 
 			container->add_quad(x1, y1, x2, y2, color, t_texture[z], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			x1 += space_x + ((z < UI_TOOLBAR_BUTTONS - 1) ? 0.01f : 0.0f);
+			x1 += space_x + ((z < UI_TOOLBAR_BUTTONS - 1) ? 0.001f : 0.0f);
 			x2 = x1 + space_x;
 		}
 	}
@@ -2288,13 +2306,11 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 		int screen_width = machine().render().ui_target().width();
 		int screen_height = machine().render().ui_target().height();
 
-		int rot = machine().render().ui_target().orientation();
-		if (rot == ROT90 || rot == ROT270)
+		if (machine().render().ui_target().orientation() & ORIENTATION_SWAP_XY)
 			std::swap(screen_height, screen_width);
 
 		int panel_width_pixel = panel_width * screen_width;
 		int panel_height_pixel = panel_height * screen_height;
-		float ratio = 0.0f;
 
 		// Calculate resize ratios for resizing
 		float ratioW = (float)panel_width_pixel / tmp_bitmap->width();
@@ -2309,7 +2325,7 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 			// smaller ratio will ensure that the image fits in the view
 			dest_yPixel = tmp_bitmap->width() * 0.75f;
 			ratioH = (float)panel_height_pixel / dest_yPixel;
-			ratio = MIN(ratioW, ratioH);
+			float ratio = MIN(ratioW, ratioH);
 			dest_xPixel = tmp_bitmap->width() * ratio;
 			dest_yPixel *= ratio;
 		}
@@ -2317,7 +2333,7 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 		else if (ratioW < 1 || ratioH < 1 || (machine().ui().options().enlarge_snaps() && !no_available))
 		{
 			// smaller ratio will ensure that the image fits in the view
-			ratio = MIN(ratioW, ratioH);
+			float ratio = MIN(ratioW, ratioH);
 			dest_xPixel = tmp_bitmap->width() * ratio;
 			dest_yPixel = tmp_bitmap->height() * ratio;
 		}
@@ -2455,8 +2471,7 @@ void ui_menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 			int screen_width = machine().render().ui_target().width();
 			int screen_height = machine().render().ui_target().height();
 
-			int rot = machine().render().ui_target().orientation();
-			if (rot == ROT90 || rot == ROT270)
+			if (machine().render().ui_target().orientation() & ORIENTATION_SWAP_XY)
 				std::swap(screen_height, screen_width);
 
 			int panel_width_pixel = panel_width * screen_width;
@@ -2500,17 +2515,14 @@ void ui_menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 
 			icons_texture[linenum]->set_bitmap(*icons_bitmap[linenum], icons_bitmap[linenum]->cliprect(), TEXFORMAT_ARGB32);
 		}
-		else {
-			if (icons_bitmap[linenum] != nullptr)
-			{
-				icons_bitmap[linenum]->reset();
-			}
-		}
+		else if (icons_bitmap[linenum] != nullptr)
+			icons_bitmap[linenum]->reset();
+
 		auto_free(machine(), tmp);
 	}
 
 	if (icons_bitmap[linenum] != nullptr && icons_bitmap[linenum]->valid())
-		container->add_quad(x0, y0, x1, y1, ARGB_WHITE, icons_texture[linenum], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE);
+		container->add_quad(x0, y0, x1, y1, ARGB_WHITE, icons_texture[linenum], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
 
 //-------------------------------------------------

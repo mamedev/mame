@@ -161,16 +161,16 @@ image_error_t device_image_interface::set_image_filename(const char *filename)
 	util::zippath_parent(m_working_directory, filename);
 	m_basename.assign(m_image_name);
 
-	size_t loc1 = m_image_name.find_last_of('\\');
-	size_t loc2 = m_image_name.find_last_of('/');
-	size_t loc3 = m_image_name.find_last_of(':');
-	size_t loc = MAX(loc1,MAX(loc2, loc3));
+	int loc1 = m_image_name.find_last_of('\\');
+	int loc2 = m_image_name.find_last_of('/');
+	int loc3 = m_image_name.find_last_of(':');
+	int loc = MAX(loc1, MAX(loc2, loc3));
 	if (loc != -1) {
 		if (loc == loc3)
 		{
 			// temp workaround for softlists now that m_image_name contains the part name too (e.g. list:gamename:cart)
 			m_basename = m_basename.substr(0, loc);
-			size_t tmploc = m_basename.find_last_of(':');
+			int tmploc = m_basename.find_last_of(':');
 			m_basename = m_basename.substr(tmploc + 1, loc - tmploc);
 		}
 		else
@@ -199,9 +199,9 @@ image_error_t device_image_interface::set_image_filename(const char *filename)
 
 const image_device_format *device_image_interface::device_get_named_creatable_format(const char *format_name)
 {
-	for (const image_device_format *format = m_formatlist.first(); format != nullptr; format = format->next())
-		if (strcmp(format->name(), format_name) == 0)
-			return format;
+	for (const image_device_format &format : m_formatlist)
+		if (strcmp(format.name(), format_name) == 0)
+			return &format;
 	return nullptr;
 }
 

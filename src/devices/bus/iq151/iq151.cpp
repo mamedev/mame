@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "iq151.h"
-#include "emuopts.h"
 
 #define  LOG    0
 

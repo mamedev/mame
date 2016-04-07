@@ -14,6 +14,7 @@
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <initguid.h>
 #include <tchar.h>
 #include <wrl/client.h>
 
@@ -31,16 +32,14 @@
 #include "strconv.h"
 
 // MAMEOS headers
-#include "winmain.h"
 #include "window.h"
 #include "winutil.h"
 
 #include "input_common.h"
 #include "input_windows.h"
+#include "input_dinput.h"
 
 using namespace Microsoft::WRL;
-
-#define STRUCTSIZE(x) (m_dinput_version == 0x0300) ? sizeof(x##_DX3) : sizeof(x)
 
 static INT32 dinput_joystick_pov_get_state(void *device_internal, void *item_internal);
 
@@ -58,255 +57,184 @@ static HRESULT dinput_set_dword_property(ComPtr<IDirectInputDevice> device, REFG
 	dipdw.diph.dwHow = how;
 	dipdw.dwData = value;
 
-	return IDirectInputDevice_SetProperty(device.Get(), property_guid, &dipdw.diph);
+	return device->SetProperty(property_guid, &dipdw.diph);
 }
 
 //============================================================
 //  dinput_device - base directinput device
 //============================================================
 
-// DirectInput-specific information about a device
-struct dinput_api_state
+dinput_device::dinput_device(running_machine &machine, const char *name, input_device_class deviceclass, input_module &module)
+	: device_info(machine, name, deviceclass, module),
+		dinput({nullptr})
 {
-	ComPtr<IDirectInputDevice>     device;
-	ComPtr<IDirectInputDevice2>    device2;
-	DIDEVCAPS                      caps;
-	LPCDIDATAFORMAT                format;
-};
+}
 
-class dinput_device : public device_info
+dinput_device::~dinput_device()
 {
-public:
-	dinput_api_state dinput;
+	if (dinput.device != nullptr)
+		dinput.device.Reset();
+}
 
-	dinput_device(running_machine &machine, const char *name, input_device_class deviceclass, input_module &module)
-		: device_info(machine, name, deviceclass, module),
-			dinput({nullptr})
+HRESULT dinput_device::poll_dinput(LPVOID pState) const
+{
+	HRESULT result;
+
+	// first poll the device, then get the state
+	if (dinput.device2 != nullptr)
+		dinput.device2->Poll();
+
+	// GetDeviceState returns the immediate state
+	result = dinput.device->GetDeviceState(dinput.format->dwDataSize, pState);
+
+	// handle lost inputs here
+	if (result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED)
 	{
+		result = dinput.device->Acquire();
+		if (result == DI_OK)
+			result = dinput.device->GetDeviceState(dinput.format->dwDataSize, pState);
 	}
 
-	virtual ~dinput_device()
-	{
-		if (dinput.device2 != nullptr)
-			dinput.device2.Reset();
-
-		if (dinput.device != nullptr)
-			dinput.device.Reset();
-	}
-
-protected:
-	HRESULT poll_dinput(LPVOID pState) const
-	{
-		HRESULT result;
-
-		// first poll the device, then get the state
-		if (dinput.device2 != nullptr)
-			IDirectInputDevice2_Poll(dinput.device2.Get());
-
-		// GetDeviceState returns the immediate state
-		result = IDirectInputDevice_GetDeviceState(dinput.device.Get(), dinput.format->dwDataSize, pState);
-
-		// handle lost inputs here
-		if (result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED)
-		{
-			result = IDirectInputDevice_Acquire(dinput.device.Get());
-			if (result == DI_OK)
-				result = IDirectInputDevice_GetDeviceState(dinput.device.Get(), dinput.format->dwDataSize, pState);
-		}
-
-		return result;
-	}
-};
+	return result;
+}
 
 //============================================================
 //  dinput_keyboard_device - directinput keyboard device
 //============================================================
 
-class dinput_keyboard_device : public dinput_device
+dinput_keyboard_device::dinput_keyboard_device(running_machine &machine, const char *name, input_module &module)
+	: dinput_device(machine, name, DEVICE_CLASS_KEYBOARD, module),
+		keyboard({{0}})
 {
-private:
-	std::mutex m_device_lock;
+}
 
-public:
-	keyboard_state	keyboard;
+// Polls the direct input immediate state
+void dinput_keyboard_device::poll()
+{
+	std::lock_guard<std::mutex> scope_lock(m_device_lock);
 
-	dinput_keyboard_device(running_machine &machine, const char *name, input_module &module)
-		: dinput_device(machine, name, DEVICE_CLASS_KEYBOARD, module),
-			keyboard({{0}})
-	{
-	}
+	// Poll the state
+	dinput_device::poll_dinput(&keyboard.state);
+}
 
-	// Polls the direct input immediate state
-	void poll() override
-	{
-		std::lock_guard<std::mutex> scope_lock(m_device_lock);
-
-		// Poll the state
-		dinput_device::poll_dinput(&keyboard.state);
-	}
-
-	void reset() override
-	{
-		memset(&keyboard.state, 0, sizeof(keyboard.state));
-	}
-};
+void dinput_keyboard_device::reset()
+{
+	memset(&keyboard.state, 0, sizeof(keyboard.state));
+}
 
 //============================================================
-//  dinput_module - base directinput module
+//  dinput_api_helper - DirectInput API helper
 //============================================================
 
-class dinput_module : public wininput_module
+dinput_api_helper::dinput_api_helper(int version)
+	: m_dinput(nullptr),
+	  m_dinput_version(version),
+	  m_pfn_DirectInputCreate("DirectInputCreateW", L"dinput.dll")
 {
-private:
-	ComPtr<IDirectInput> m_dinput;
-	int                  m_dinput_version;
+}
 
-public:
-	dinput_module(const char* type, const char* name)
-		: wininput_module(type, name),
-			m_dinput(nullptr),
-			m_dinput_version(0)
+dinput_api_helper::~dinput_api_helper()
+{
+	m_dinput.Reset();
+}
+
+int dinput_api_helper::initialize()
+{
+	HRESULT result;
+
+	if (m_dinput_version >= 0x0800)
 	{
-	}
-
-	int init_internal() override
-	{
-		HRESULT result;
-
-#if DIRECTINPUT_VERSION >= 0x800
-		m_dinput_version = DIRECTINPUT_VERSION;
 		result = DirectInput8Create(GetModuleHandleUni(), m_dinput_version, IID_IDirectInput8, reinterpret_cast<void **>(m_dinput.GetAddressOf()), nullptr);
 		if (result != DI_OK)
 		{
 			m_dinput_version = 0;
 			return result;
 		}
-#else
-		// first attempt to initialize DirectInput at the current version
-		m_dinput_version = DIRECTINPUT_VERSION;
-		result = DirectInputCreate(GetModuleHandleUni(), m_dinput_version, m_dinput.GetAddressOf(), nullptr);
+	}
+	else
+	{
+		result = m_pfn_DirectInputCreate.initialize();
+		if (result != DI_OK)
+			return result;
+
+		// first attempt to initialize DirectInput at v7
+		m_dinput_version = 0x0700;
+		result = m_pfn_DirectInputCreate(GetModuleHandleUni(), m_dinput_version, m_dinput.GetAddressOf(), nullptr);
 		if (result != DI_OK)
 		{
 			// if that fails, try version 5
 			m_dinput_version = 0x0500;
-			result = DirectInputCreate(GetModuleHandleUni(), m_dinput_version, m_dinput.GetAddressOf(), nullptr);
+			result = m_pfn_DirectInputCreate(GetModuleHandleUni(), m_dinput_version, m_dinput.GetAddressOf(), nullptr);
 			if (result != DI_OK)
 			{
-				// if that fails, try version 3
-				m_dinput_version = 0x0300;
-				result = DirectInputCreate(GetModuleHandleUni(), m_dinput_version, m_dinput.GetAddressOf(), nullptr);
-				if (result != DI_OK)
-				{
-					m_dinput_version = 0;
-					return result;
-				}
+				m_dinput_version = 0;
+				return result;
 			}
 		}
-#endif
+	}
 
-		osd_printf_verbose("DirectInput: Using DirectInput %d\n", m_dinput_version >> 8);
+	osd_printf_verbose("DirectInput: Using DirectInput %d\n", m_dinput_version >> 8);
+	return 0;
+}
+
+
+HRESULT dinput_api_helper::enum_attached_devices(int devclass, device_enum_interface *enumerate_interface, void *state) const
+{
+	device_enum_interface::dinput_callback_context ctx;
+	ctx.self = enumerate_interface;
+	ctx.state = state;
+
+	return m_dinput->EnumDevices(devclass, device_enum_interface::enum_callback, &ctx, DIEDFL_ATTACHEDONLY);
+}
+
+
+//============================================================
+//  dinput_module - base directinput module
+//============================================================
+
+class dinput_module : public wininput_module, public device_enum_interface
+{
+protected:
+	std::unique_ptr<dinput_api_helper> m_dinput_helper;
+
+public:
+	dinput_module(const char* type, const char* name)
+		: wininput_module(type, name),
+		  m_dinput_helper(nullptr)
+	{
+	}
+
+	int init_internal() override
+	{
+		m_dinput_helper = std::make_unique<dinput_api_helper>(DIRECTINPUT_VERSION);
+		int result = m_dinput_helper->initialize();
+		if (result != 0)
+			return result;
+
 		return 0;
 	}
 
 	void exit() override
 	{
-		m_dinput.Reset();
 		wininput_module::exit();
-	}
-
-	virtual BOOL device_enum_callback(LPCDIDEVICEINSTANCE instance, LPVOID ref) = 0;
-	
-	struct dinput_callback_context
-	{
-		dinput_module *     self;
-		running_machine *   machine;
-	};
-
-	static BOOL CALLBACK enum_callback(LPCDIDEVICEINSTANCE instance, LPVOID ref)
-	{
-		auto context = static_cast<dinput_callback_context*>(ref);
-		return context->self->device_enum_callback(instance, context->machine);
+		m_dinput_helper.reset();
 	}
 
 	void input_init(running_machine &machine) override
 	{
-		dinput_callback_context context = { this, &machine };
-
-		HRESULT result = IDirectInput_EnumDevices(m_dinput.Get(), dinput_devclass(), enum_callback, &context, DIEDFL_ATTACHEDONLY);
+		HRESULT result = m_dinput_helper->enum_attached_devices(dinput_devclass(), this, &machine);
 		if (result != DI_OK)
 			fatalerror("DirectInput: Unable to enumerate keyboards (result=%08X)\n", static_cast<UINT32>(result));
 	}
 
-protected:
-	virtual int dinput_devclass() = 0;
-
-	template <class TDevice>
-	TDevice* create_dinput_device(
-		running_machine &machine,
-		LPCDIDEVICEINSTANCE instance,
-		LPCDIDATAFORMAT format1,
-		LPCDIDATAFORMAT format2,
-		DWORD cooperative_level)
-	{
-		HRESULT result;
-
-		// convert instance name to utf8
-		auto osd_deleter = [](void *ptr) { osd_free(ptr); };
-		auto utf8_instance_name = std::unique_ptr<char, decltype(osd_deleter)>(utf8_from_tstring(instance->tszInstanceName), osd_deleter);
-
-		// allocate memory for the device object
-		TDevice* devinfo = devicelist()->create_device<TDevice>(machine, utf8_instance_name.get(), *this);
-
-		// attempt to create a device
-		result = IDirectInput_CreateDevice(m_dinput.Get(), WRAP_REFIID(instance->guidInstance), devinfo->dinput.device.GetAddressOf(), NULL);
-		if (result != DI_OK)
-			goto error;
-
-		// try to get a version 2 device for it
-		result = IDirectInputDevice_QueryInterface(devinfo->dinput.device.Get(), WRAP_REFIID(IID_IDirectInputDevice2), reinterpret_cast<void **>(devinfo->dinput.device2.GetAddressOf()));
-		if (result != DI_OK)
-			devinfo->dinput.device2 = nullptr;
-
-		// get the caps
-		devinfo->dinput.caps.dwSize = STRUCTSIZE(DIDEVCAPS);
-		result = IDirectInputDevice_GetCapabilities(devinfo->dinput.device.Get(), &devinfo->dinput.caps);
-		if (result != DI_OK)
-			goto error;
-
-		// attempt to set the data format
-		devinfo->dinput.format = format1;
-		result = IDirectInputDevice_SetDataFormat(devinfo->dinput.device.Get(), devinfo->dinput.format);
-		if (result != DI_OK)
-		{
-			// use the secondary format if available
-			if (format2 != nullptr)
-			{
-				devinfo->dinput.format = format2;
-				result = IDirectInputDevice_SetDataFormat(devinfo->dinput.device.Get(), devinfo->dinput.format);
-			}
-			if (result != DI_OK)
-				goto error;
-		}
-
-		// set the cooperative level
-		result = IDirectInputDevice_SetCooperativeLevel(devinfo->dinput.device.Get(), win_window_list->m_hwnd, cooperative_level);
-		if (result != DI_OK)
-			goto error;
-		return devinfo;
-
-	error:
-		devicelist()->free_device(devinfo);
-		return nullptr;
-	}
-
-	std::string device_item_name(dinput_device * devinfo, int offset, const char * defstring, const TCHAR * suffix) const
+	static std::string device_item_name(dinput_device * devinfo, int offset, const char * defstring, const TCHAR * suffix)
 	{
 		DIDEVICEOBJECTINSTANCE instance = { 0 };
 		HRESULT result;
 
 		// query the key name
-		instance.dwSize = STRUCTSIZE(DIDEVICEOBJECTINSTANCE);
-		result = IDirectInputDevice_GetObjectInfo(devinfo->dinput.device.Get(), &instance, offset, DIPH_BYOFFSET);
+		instance.dwSize = sizeof(instance);
+		result = devinfo->dinput.device->GetObjectInfo(&instance, offset, DIPH_BYOFFSET);
 
 		// if we got an error and have no default string, just return NULL
 		if (result != DI_OK)
@@ -342,6 +270,9 @@ protected:
 
 		return std::string(combined.get());
 	}
+
+protected:
+	virtual int dinput_devclass() = 0;
 };
 
 class keyboard_input_dinput : public dinput_module
@@ -368,7 +299,7 @@ public:
 		int keynum;
 
 		// allocate and link in a new device
-		devinfo = create_dinput_device<dinput_keyboard_device>(machine, instance, &c_dfDIKeyboard, nullptr, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+		devinfo = m_dinput_helper->create_device<dinput_keyboard_device>(machine, *this, instance, &c_dfDIKeyboard, nullptr, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 		if (devinfo == nullptr)
 			goto exit;
 
@@ -392,33 +323,28 @@ public:
 	}
 };
 
-class dinput_mouse_device : public dinput_device
+
+dinput_mouse_device::dinput_mouse_device(running_machine &machine, const char *name, input_module &module)
+	: dinput_device(machine, name, DEVICE_CLASS_MOUSE, module),
+		mouse({0})
 {
-public:
-	mouse_state mouse;
+}
 
-	dinput_mouse_device(running_machine &machine, const char *name, input_module &module)
-		: dinput_device(machine, name, DEVICE_CLASS_MOUSE, module),
-			mouse({0})
-	{
-	}
+void dinput_mouse_device::poll()
+{
+	// poll
+	dinput_device::poll_dinput(&mouse);
 
-	void poll() override
-	{
-		// poll
-		dinput_device::poll_dinput(&mouse);
+	// scale the axis data
+	mouse.lX *= INPUT_RELATIVE_PER_PIXEL;
+	mouse.lY *= INPUT_RELATIVE_PER_PIXEL;
+	mouse.lZ *= INPUT_RELATIVE_PER_PIXEL;
+}
 
-		// scale the axis data
-		mouse.lX *= INPUT_RELATIVE_PER_PIXEL;
-		mouse.lY *= INPUT_RELATIVE_PER_PIXEL;
-		mouse.lZ *= INPUT_RELATIVE_PER_PIXEL;
-	}
-
-	void reset() override
-	{
-		memset(&mouse, 0, sizeof(mouse));
-	}
-};
+void dinput_mouse_device::reset()
+{
+	memset(&mouse, 0, sizeof(mouse));
+}
 
 class mouse_input_dinput : public dinput_module
 {
@@ -445,7 +371,7 @@ public:
 		HRESULT result;
 
 		// allocate and link in a new device
-		devinfo = create_dinput_device<dinput_mouse_device>(machine, instance, &c_dfDIMouse2, &c_dfDIMouse, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+		devinfo = m_dinput_helper->create_device<dinput_mouse_device>(machine, *this, instance, &c_dfDIMouse2, &c_dfDIMouse, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 		if (devinfo == nullptr)
 			goto exit;
 
@@ -489,46 +415,130 @@ public:
 	}
 };
 
-// state information for a joystick; DirectInput state must be first element
-struct dinput_joystick_state
+dinput_joystick_device::dinput_joystick_device(running_machine &machine, const char *name, input_module &module)
+	: dinput_device(machine, name, DEVICE_CLASS_JOYSTICK, module),
+		joystick({{0}})
 {
-	DIJOYSTATE              state;
-	LONG                    rangemin[8];
-	LONG                    rangemax[8];
-};
+}
 
-class dinput_joystick_device : public dinput_device
+void dinput_joystick_device::reset()
 {
-public:
-	dinput_joystick_state   joystick;
+	memset(&joystick.state, 0, sizeof(joystick.state));
+}
 
-	dinput_joystick_device(running_machine &machine, const char *name, input_module &module)
-		: dinput_device(machine, name, DEVICE_CLASS_JOYSTICK, module),
-		  joystick({{0}})
+void dinput_joystick_device::poll()
+{
+	int axisnum;
+
+	// poll the device first
+	if (dinput_device::poll_dinput(&joystick.state) != ERROR_SUCCESS)
+		return;
+
+	// normalize axis values
+	for (axisnum = 0; axisnum < 8; axisnum++)
 	{
+		LONG *axis = (&joystick.state.lX) + axisnum;
+		*axis = normalize_absolute_axis(*axis, joystick.rangemin[axisnum], joystick.rangemax[axisnum]);
+	}
+}
+
+int dinput_joystick_device::configure()
+{
+	HRESULT result;
+	UINT32 axisnum, axiscount;
+
+	auto devicelist = static_cast<input_module_base&>(module()).devicelist();
+
+	// temporary approximation of index
+	int devindex = devicelist->size();
+
+	// set absolute mode
+	result = dinput_set_dword_property(dinput.device, DIPROP_AXISMODE, 0, DIPH_DEVICE, DIPROPAXISMODE_ABS);
+	if (result != DI_OK && result != DI_PROPNOEFFECT)
+		osd_printf_warning("DirectInput: Unable to set absolute mode for joystick %d (%s)\n", devindex, name());
+
+	// turn off deadzone; we do our own calculations
+	result = dinput_set_dword_property(dinput.device, DIPROP_DEADZONE, 0, DIPH_DEVICE, 0);
+	if (result != DI_OK && result != DI_PROPNOEFFECT)
+		osd_printf_warning("DirectInput: Unable to reset deadzone for joystick %d (%s)\n", devindex, name());
+
+	// turn off saturation; we do our own calculations
+	result = dinput_set_dword_property(dinput.device, DIPROP_SATURATION, 0, DIPH_DEVICE, 10000);
+	if (result != DI_OK && result != DI_PROPNOEFFECT)
+		osd_printf_warning("DirectInput: Unable to reset saturation for joystick %d (%s)\n", devindex, name());
+
+	// cap the number of axes, POVs, and buttons based on the format
+	dinput.caps.dwAxes = MIN(dinput.caps.dwAxes, 8);
+	dinput.caps.dwPOVs = MIN(dinput.caps.dwPOVs, 4);
+	dinput.caps.dwButtons = MIN(dinput.caps.dwButtons, 128);
+
+	// populate the axes
+	for (axisnum = axiscount = 0; axiscount < dinput.caps.dwAxes && axisnum < 8; axisnum++)
+	{
+		DIPROPRANGE dipr;
+		std::string name;
+
+		// fetch the range of this axis
+		dipr.diph.dwSize = sizeof(dipr);
+		dipr.diph.dwHeaderSize = sizeof(dipr.diph);
+		dipr.diph.dwObj = offsetof(DIJOYSTATE2, lX) + axisnum * sizeof(LONG);
+		dipr.diph.dwHow = DIPH_BYOFFSET;
+		result = dinput.device->GetProperty(DIPROP_RANGE, &dipr.diph);
+		if (result != DI_OK)
+			continue;
+
+		joystick.rangemin[axisnum] = dipr.lMin;
+		joystick.rangemax[axisnum] = dipr.lMax;
+
+		// populate the item description as well
+		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, lX) + axisnum * sizeof(LONG), default_axis_name[axisnum], nullptr);
+		device()->add_item(name.c_str(), static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &joystick.state.lX + axisnum);
+
+		axiscount++;
 	}
 
-	void reset() override
+	// populate the POVs
+	for (UINT32 povnum = 0; povnum < dinput.caps.dwPOVs; povnum++)
 	{
-		memset(&joystick.state, 0, sizeof(joystick.state));
+		std::string name;
+
+		// left
+		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("L"));
+		device()->add_item(name.c_str(), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<FPTR>(povnum * 4 + POVDIR_LEFT)));
+
+		// right
+		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("R"));
+		device()->add_item(name.c_str(), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<FPTR>(povnum * 4 + POVDIR_RIGHT)));
+
+		// up
+		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("U"));
+		device()->add_item(name.c_str(), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<FPTR>(povnum * 4 + POVDIR_UP)));
+
+		// down
+		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("D"));
+		device()->add_item(name.c_str(), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<FPTR>(povnum * 4 + POVDIR_DOWN)));
 	}
 
-	void poll() override
+	// populate the buttons
+	for (UINT32 butnum = 0; butnum < dinput.caps.dwButtons; butnum++)
 	{
-		int axisnum;
+		FPTR offset = reinterpret_cast<FPTR>(&static_cast<DIJOYSTATE2 *>(nullptr)->rgbButtons[butnum]);
+		std::string name = dinput_module::device_item_name(this, offset, default_button_name(butnum), nullptr);
 
-		// poll the device first
-		if (dinput_device::poll_dinput(&joystick.state) != ERROR_SUCCESS)
-			return;
+		input_item_id itemid;
 
-		// normalize axis values
-		for (axisnum = 0; axisnum < 8; axisnum++)
-		{
-			LONG *axis = (&joystick.state.lX) + axisnum;
-			*axis = normalize_absolute_axis(*axis, joystick.rangemin[axisnum], joystick.rangemax[axisnum]);
-		}
+		if (butnum < INPUT_MAX_BUTTONS)
+			itemid = static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum);
+		else if (butnum < INPUT_MAX_BUTTONS + INPUT_MAX_ADD_SWITCH)
+			itemid = static_cast<input_item_id>(ITEM_ID_ADD_SWITCH1 - INPUT_MAX_BUTTONS + butnum);
+		else
+			itemid = ITEM_ID_OTHER_SWITCH;
+
+		device()->add_item(name.c_str(), itemid, generic_button_get_state, &joystick.state.rgbButtons[butnum]);
 	}
-};
+
+	return 0;
+}
 
 class joystick_input_dinput : public dinput_module
 {
@@ -550,102 +560,22 @@ public:
 	BOOL device_enum_callback(LPCDIDEVICEINSTANCE instance, LPVOID ref) override
 	{
 		DWORD cooperative_level = DISCL_FOREGROUND | DISCL_NONEXCLUSIVE;
-		int axisnum, axiscount, povnum, butnum;
 		running_machine &machine = *static_cast<running_machine *>(ref);
 		dinput_joystick_device *devinfo;
-		HRESULT result;
+		int result = 0;
 
-		if (win_window_list != nullptr && win_window_list->win_has_menu()) {
+		if (win_window_list != nullptr && win_window_list->win_has_menu())
 			cooperative_level = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
-		}
+
 		// allocate and link in a new device
-		devinfo = create_dinput_device<dinput_joystick_device>(machine, instance, &c_dfDIJoystick, nullptr, cooperative_level);
+		devinfo = m_dinput_helper->create_device<dinput_joystick_device>(machine, *this, instance, &c_dfDIJoystick, nullptr, cooperative_level);
 		if (devinfo == nullptr)
 			goto exit;
 
-		// set absolute mode
-		result = dinput_set_dword_property(devinfo->dinput.device, DIPROP_AXISMODE, 0, DIPH_DEVICE, DIPROPAXISMODE_ABS);
-		if (result != DI_OK && result != DI_PROPNOEFFECT)
-			osd_printf_warning("DirectInput: Unable to set absolute mode for joystick %d (%s)\n", devicelist()->size(), devinfo->name());
-
-		// turn off deadzone; we do our own calculations
-		result = dinput_set_dword_property(devinfo->dinput.device, DIPROP_DEADZONE, 0, DIPH_DEVICE, 0);
-		if (result != DI_OK && result != DI_PROPNOEFFECT)
-			osd_printf_warning("DirectInput: Unable to reset deadzone for joystick %d (%s)\n", devicelist()->size(), devinfo->name());
-
-		// turn off saturation; we do our own calculations
-		result = dinput_set_dword_property(devinfo->dinput.device, DIPROP_SATURATION, 0, DIPH_DEVICE, 10000);
-		if (result != DI_OK && result != DI_PROPNOEFFECT)
-			osd_printf_warning("DirectInput: Unable to reset saturation for joystick %d (%s)\n", devicelist()->size(), devinfo->name());
-
-		// cap the number of axes, POVs, and buttons based on the format
-		devinfo->dinput.caps.dwAxes = MIN(devinfo->dinput.caps.dwAxes, 8);
-		devinfo->dinput.caps.dwPOVs = MIN(devinfo->dinput.caps.dwPOVs, 4);
-		devinfo->dinput.caps.dwButtons = MIN(devinfo->dinput.caps.dwButtons, 128);
-
-		// populate the axes
-		for (axisnum = axiscount = 0; axiscount < devinfo->dinput.caps.dwAxes && axisnum < 8; axisnum++)
+		result = devinfo->configure();
+		if (result != 0)
 		{
-			DIPROPRANGE dipr;
-			std::string name;
-
-			// fetch the range of this axis
-			dipr.diph.dwSize = sizeof(dipr);
-			dipr.diph.dwHeaderSize = sizeof(dipr.diph);
-			dipr.diph.dwObj = offsetof(DIJOYSTATE2, lX) + axisnum * sizeof(LONG);
-			dipr.diph.dwHow = DIPH_BYOFFSET;
-			result = IDirectInputDevice_GetProperty(devinfo->dinput.device.Get(), DIPROP_RANGE, &dipr.diph);
-			if (result != DI_OK)
-				continue;
-
-			devinfo->joystick.rangemin[axisnum] = dipr.lMin;
-			devinfo->joystick.rangemax[axisnum] = dipr.lMax;
-
-			// populate the item description as well
-			name = device_item_name(devinfo, offsetof(DIJOYSTATE2, lX) + axisnum * sizeof(LONG), default_axis_name[axisnum], nullptr);
-			devinfo->device()->add_item(name.c_str(), static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &devinfo->joystick.state.lX + axisnum);
-
-			axiscount++;
-		}
-
-		// populate the POVs
-		for (povnum = 0; povnum < devinfo->dinput.caps.dwPOVs; povnum++)
-		{
-			std::string name;
-
-			// left
-			name = device_item_name(devinfo, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("L"));
-			devinfo->device()->add_item(name.c_str(), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<FPTR>(povnum * 4 + POVDIR_LEFT)));
-
-			// right
-			name = device_item_name(devinfo, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("R"));
-			devinfo->device()->add_item(name.c_str(), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<FPTR>(povnum * 4 + POVDIR_RIGHT)));
-
-			// up
-			name = device_item_name(devinfo, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("U"));
-			devinfo->device()->add_item(name.c_str(), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<FPTR>(povnum * 4 + POVDIR_UP)));
-
-			// down
-			name = device_item_name(devinfo, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("D"));
-			devinfo->device()->add_item(name.c_str(), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<FPTR>(povnum * 4 + POVDIR_DOWN)));
-		}
-
-		// populate the buttons
-		for (butnum = 0; butnum < devinfo->dinput.caps.dwButtons; butnum++)
-		{
-			FPTR offset = reinterpret_cast<FPTR>(&static_cast<DIJOYSTATE2 *>(nullptr)->rgbButtons[butnum]);
-			std::string name = device_item_name(devinfo, offset, default_button_name(butnum), nullptr);
-
-			input_item_id itemid;
-
-			if (butnum < INPUT_MAX_BUTTONS)
-				itemid = static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum);
-			else if (butnum < INPUT_MAX_BUTTONS + INPUT_MAX_ADD_SWITCH)
-				itemid = static_cast<input_item_id>(ITEM_ID_ADD_SWITCH1 - INPUT_MAX_BUTTONS + butnum);
-			else
-				itemid = ITEM_ID_OTHER_SWITCH;
-
-			devinfo->device()->add_item(name.c_str(), itemid, generic_button_get_state, &devinfo->joystick.state.rgbButtons[butnum]);
+			osd_printf_error("Failed to configure DI Joystick device. Error 0x%x\n", static_cast<unsigned int>(result));
 		}
 
 	exit:

@@ -719,8 +719,8 @@
 			for _, file in ipairs(files) do
 				local translatedpath = path.translate(file.name, "\\")
 				_p(2, '<ClCompile Include=\"%s\">', translatedpath)
-				_p(3, '<ObjectFileName>$(IntDir)%s.obj</ObjectFileName>'
-					, premake.esc(path.translate(path.trimdots(path.removeext(file.name))))
+				_p(3, '<ObjectFileName>$(IntDir)%s\\</ObjectFileName>'
+					, premake.esc(path.translate(path.trimdots(path.getdirectory(file.name))))
 					)
 
 				--For Windows Store Builds, if the file is .c we have to exclude it from /ZW compilation

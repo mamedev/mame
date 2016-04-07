@@ -207,7 +207,10 @@
 
 geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : device_t(mconfig, GENEVE_MAPPER, "Geneve Gate Array", tag, owner, clock, "geneve_mapper", __FILE__), m_gromwaddr_LSB(false), m_gromraddr_LSB(false), m_grom_address(0), m_video_waitstates(false), m_extra_waitstates(false), m_ready_asserted(false), m_read_mode(false), m_debug_no_ws(false), m_geneve_mode(false), m_direct_mode(false), m_cartridge_size(0), m_cartridge_secondpage(false), m_cartridge6_writable(false), m_cartridge7_writable(false), m_turbo(false), m_genmod(false), m_timode(false), m_pfm_mode(0), m_pfm_bank(0), m_pfm_output_enable(false), m_sram_mask(0), m_sram_val(0),
-	m_ready(*this), m_waitcount(0), m_ext_waitcount(0), m_clock(nullptr), m_cpu(nullptr), m_pfm512(nullptr), m_pfm512a(nullptr), m_keyboard(nullptr), m_video(nullptr), m_peribox(nullptr), m_sound(nullptr), m_sram(nullptr), m_dram(nullptr)
+	m_ready(*this), m_waitcount(0), m_ext_waitcount(0),
+	m_clock(nullptr), m_cpu(nullptr), m_pfm512(nullptr),
+	m_pfm512a(nullptr), m_sound(nullptr), m_keyboard(nullptr),
+	m_video(nullptr), m_peribox(nullptr), m_sram(nullptr), m_dram(nullptr)
 {
 	m_eprom = nullptr;
 }
@@ -466,11 +469,14 @@ READ8_MEMBER( geneve_mapper_device::readm )
 	switch (dec->function)
 	{
 	case MLGVIDEO:
-		m_video->readz(space, dec->offset, &value, 0xff);
-		if (TRACE_READ) logerror("%s: Read video %04x -> %02x\n", tag(), dec->offset, value);
-		// Video wait states are created *after* the access
-		// Accordingly, they have no effect when execution is in onchip RAM
-		if (m_video_waitstates) set_ext_wait(15);
+		if (!space.debugger_access())
+		{
+			value = m_video->read(space, dec->offset>>1);
+			if (TRACE_READ) logerror("%s: Read video %04x -> %02x\n", tag(), dec->offset, value);
+			// Video wait states are created *after* the access
+			// Accordingly, they have no effect when execution is in onchip RAM
+			if (m_video_waitstates) set_ext_wait(15);
+		}
 		break;
 
 	case MLGMAPPER:
@@ -523,10 +529,13 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		// video
 		// ++++ ++-- ---- ---+
 		// 1000 1000 0000 00x0
-		m_video->readz(space, dec->offset, &value, 0xff);
-		if (TRACE_READ) logerror("%s: Read video %04x -> %02x\n", tag(), dec->offset, value);
-		// See above
-		if (m_video_waitstates) set_ext_wait(15);
+		if (!space.debugger_access())
+		{
+			value = m_video->read(space, dec->offset>>1);
+			if (TRACE_READ) logerror("%s: Read video %04x -> %02x\n", tag(), dec->offset, value);
+			// See above
+			if (m_video_waitstates) set_ext_wait(15);
+		}
 		break;
 
 	case MLTSPEECH:
@@ -535,6 +544,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		// 1001 0000 0000 0000
 		// We need to add the address prefix bits
 		m_peribox->readz(space, dec->offset, &value, 0xff);
+		m_peribox->memen_in(CLEAR_LINE);
 		if (TRACE_READ) logerror("%s: Read speech -> %02x\n", tag(), value);
 		break;
 
@@ -594,6 +604,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		//   0x000000-0x1fffff for the GenMod.(AME,AMD,AMC,AMB,AMA,A0 ...,A15)
 
 		m_peribox->readz(space, dec->physaddr, &value, 0xff);
+		m_peribox->memen_in(CLEAR_LINE);
 		if (TRACE_READ) logerror("%s: Read P-Box %04x (%06x) -> %02x\n", tag(), dec->offset, dec->physaddr, value);
 		break;
 
@@ -616,6 +627,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 	case MPGMBOX:
 		// Route everything else to the P-Box
 		m_peribox->readz(space, dec->physaddr, &value, 0xff);
+		m_peribox->memen_in(CLEAR_LINE);
 		break;
 	}
 	return value;
@@ -646,10 +658,14 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		// video
 		// ++++ ++++ ++++ ---+
 		// 1111 0001 0000 .cc0
-		m_video->write(space, dec->offset, data, 0xff);
-		if (TRACE_WRITE) logerror("%s: Write video %04x <- %02x\n", tag(), offset, data);
-		// See above
-		if (m_video_waitstates) set_ext_wait(15);
+
+		if (!space.debugger_access())
+		{
+			m_video->write(space, dec->offset>>1, data);
+			if (TRACE_WRITE) logerror("%s: Write video %04x <- %02x\n", tag(), offset, data);
+			// See above
+			if (m_video_waitstates) set_ext_wait(15);
+		}
 		break;
 
 	case MLGMAPPER:
@@ -689,10 +705,13 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		// ++++ ++-- ---- ---+
 		// 1000 1100 0000 00c0
 		// Initialize waitstate timer
-		m_video->write(space, dec->offset, data, 0xff);
-		if (TRACE_WRITE) logerror("%s: Write video %04x <- %02x\n", tag(), offset, data);
-		// See above
-		if (m_video_waitstates) set_ext_wait(15);
+		if (!space.debugger_access())
+		{
+			m_video->write(space, dec->offset>>1, data);
+			if (TRACE_WRITE) logerror("%s: Write video %04x <- %02x\n", tag(), offset, data);
+			// See above
+			if (m_video_waitstates) set_ext_wait(15);
+		}
 		break;
 
 	case MLTSPEECH:
@@ -701,6 +720,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		// 1001 0100 0000 0000
 		// We need to add the address prefix bits
 		m_peribox->write(space, dec->offset, data, 0xff);
+		m_peribox->memen_in(CLEAR_LINE);
 		if (TRACE_WRITE) logerror("%s: Write speech <- %02x\n", tag(), data);
 		break;
 
@@ -756,6 +776,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		dec->physaddr = (dec->physaddr & 0x0007ffff);  // 19 bit address
 		if (TRACE_WRITE) logerror("%s: Write P-Box %04x (%06x) <- %02x\n", tag(), offset, dec->physaddr, data);
 		m_peribox->write(space, dec->physaddr, data, 0xff);
+		m_peribox->memen_in(CLEAR_LINE);
 		break;
 
 	case MPGMDRAM:
@@ -775,6 +796,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 	case MPGMBOX:
 		// Route everything else to the P-Box
 		m_peribox->write(space, dec->physaddr, data, 0xff);
+		m_peribox->memen_in(CLEAR_LINE);
 		break;
 	}
 }
@@ -875,6 +897,7 @@ void geneve_mapper_device::decode(address_space& space, offs_t offset, bool read
 				// We need to add the address prefix bits
 				dec->function = MLTSPEECH;
 				dec->offset = offset | ((m_genmod)? 0x170000 : 0x070000);
+				m_peribox->memen_in(ASSERT_LINE);
 				m_peribox->setaddress_dbin(space, dec->offset, read_mode);
 				set_wait(1);
 				return;
@@ -954,6 +977,7 @@ void geneve_mapper_device::decode(address_space& space, offs_t offset, bool read
 			dec->function = MPGBOX;
 
 			dec->physaddr = (dec->physaddr & 0x0007ffff);  // 19 bit address (with AMA..AMC)
+			m_peribox->memen_in(ASSERT_LINE);
 			m_peribox->setaddress_dbin(space, dec->physaddr, read_mode);
 			return;
 		}
@@ -986,6 +1010,7 @@ void geneve_mapper_device::decode(address_space& space, offs_t offset, bool read
 			// Check: Are waitstates completely turned off for turbo mode, or
 			// merely the waitstates for DRAM memory access and box access?
 
+			m_peribox->memen_in(ASSERT_LINE);
 			m_peribox->setaddress_dbin(space, dec->physaddr, read_mode);
 			return;
 		}
@@ -1072,6 +1097,7 @@ void geneve_mapper_device::decode(address_space& space, offs_t offset, bool read
 			{
 				dec->function = MLTSPEECH;
 				dec->offset = dec->offset | ((m_genmod)? 0x170000 : 0x070000);
+				m_peribox->memen_in(ASSERT_LINE);
 				m_peribox->setaddress_dbin(space, dec->offset, read_mode);
 				set_wait(1);
 				return;
@@ -1151,6 +1177,7 @@ void geneve_mapper_device::decode(address_space& space, offs_t offset, bool read
 			// only AMA, AMB, AMC are used; AMD and AME are not used
 			dec->function = MPGBOX;
 			dec->physaddr = (dec->physaddr & 0x0007ffff);  // 19 bit address
+			m_peribox->memen_in(ASSERT_LINE);
 			m_peribox->setaddress_dbin(space, dec->physaddr, read_mode);
 			set_wait(1);
 		}
@@ -1175,6 +1202,7 @@ void geneve_mapper_device::decode(address_space& space, offs_t offset, bool read
 			// Route everything else to the P-Box
 			dec->function = MPGMBOX;
 			dec->physaddr = (dec->physaddr & 0x001fffff);  // 21 bit address for Genmod
+			m_peribox->memen_in(ASSERT_LINE);
 			m_peribox->setaddress_dbin(space, dec->physaddr, read_mode);
 			if (!m_turbo) set_wait(1);
 		}
@@ -1346,10 +1374,10 @@ WRITE_LINE_MEMBER( geneve_mapper_device::pfm_output_enable )
 void geneve_mapper_device::device_start()
 {
 	// Get pointers
-	m_peribox = machine().device<bus8z_device>(PERIBOX_TAG);
+	m_peribox = machine().device<peribox_device>(PERIBOX_TAG);
 	m_keyboard = machine().device<geneve_keyboard_device>(GKEYBOARD_TAG);
-	m_video = machine().device<bus8z_device>(VIDEO_SYSTEM_TAG);
-	m_sound = machine().device<bus8z_device>(TISOUND_TAG);
+	m_video = machine().device<v9938_device>(VDP_TAG);
+	m_sound = machine().device<sn76496_base_device>(TISOUNDCHIP_TAG);
 	m_clock = machine().device<mm58274c_device>(GCLOCK_TAG);
 
 	// PFM expansion

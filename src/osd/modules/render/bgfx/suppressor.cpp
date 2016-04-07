@@ -2,8 +2,8 @@
 // copyright-holders:Ryan Holtz
 //============================================================
 //
-//  suppressor.h - Conditionally suppress a bgfx chain entry
-//                 from being processed.
+//  suppressor.cpp - Conditionally suppress a bgfx chain entry
+//  from being processed.
 //
 //============================================================
 
@@ -14,7 +14,7 @@
 bgfx_suppressor::bgfx_suppressor(std::vector<bgfx_slider*> sliders, uint32_t condition, combine_mode combine, void* value)
 	: m_sliders(sliders)
 	, m_condition(condition)
-    , m_combine(combine)
+	, m_combine(combine)
 	, m_value(nullptr)
 {
 	uint32_t size = sliders[0]->size();

@@ -19,7 +19,6 @@
 
 /* Core includes */
 #include "emu.h"
-#include "emuopts.h"
 #include "sound/speaker.h"
 
 /* Components */

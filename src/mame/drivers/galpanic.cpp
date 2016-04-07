@@ -248,7 +248,6 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
 	MCFG_KANEKO_PANDORA_OFFSETS(0, -16)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
-	MCFG_KANEKO_PANDORA_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
 	kaneko_hit_device::set_type(*device, 0);

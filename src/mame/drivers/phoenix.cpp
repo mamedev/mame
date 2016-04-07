@@ -1272,7 +1272,7 @@ ROM_START( pleiadsn )
 	ROM_LOAD( "2.bin",     0x0800, 0x0800, CRC(b254217c) SHA1(312a33cca09d5d2d18992f28eb051230a90db6e3) )
 	ROM_LOAD( "3.bin",     0x1000, 0x0800, CRC(3b29aec5) SHA1(b90b55fdc799db672558e2f7c6b05a958bf33a2c) )
 	ROM_LOAD( "4.bin",     0x1800, 0x0800, CRC(1fbde4d7) SHA1(b358649288108159a426dba3940c627c2d2aeb01) )
-	ROM_LOAD( "5.bin",     0x2000, 0x0800, BAD_DUMP CRC(9dc73e63) SHA1(8a2de6666fecead7071285125b16641b50249adc) )  // the best of 50 different dumps. the device is clearly damaged. 
+	ROM_LOAD( "5.bin",     0x2000, 0x0800, BAD_DUMP CRC(9dc73e63) SHA1(8a2de6666fecead7071285125b16641b50249adc) )  // the best of 50 different dumps. the device is clearly damaged.
 	ROM_LOAD( "6.bin",     0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) )
 	ROM_LOAD( "7.bin",     0x3000, 0x0800, CRC(b5f07fbc) SHA1(2ae687c84732942e69ad4dfb7a4ac1b97b77487a) )
 	ROM_LOAD( "8.bin",     0x3800, 0x0800, CRC(b3db08c2) SHA1(d5b1b77dcf2d76498f30d5f880635f5acfac7dfd) )

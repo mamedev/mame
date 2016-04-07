@@ -240,8 +240,8 @@ Notes:
       24LC64    - Microchip 24LC64 64K I2C Serial EEPROM (SOIC8)
       24LC024   - Microchip 24LC024 2K I2C Serial EEPROM (SOIC8)
       M68AF127B - ST Microelectronics 1Mbit (128K x8), 5V Asynchronous SRAM (SOP32)
-      AN2131QC  - Cypress AN2131 EZ-USB-Family 8051-based High-Speed USB IC's (QFP80)
-      AN2131SC  /                                                             (QFP44)
+      AN2131QC  - Cypress AN2131 EZ-USB-Family 8051-based High-Speed USB IC's (QFP80) firmware in IC11
+      AN2131SC  /                                                             (QFP44) firmware in IC32
       ADM3222   - Analog Devices ADM3222 High-Speed, +3.3V, 2-Channel RS232/V.28 Interface Device (SOIC20)
       SN65240   - Texas Instruments SN65240 USB Port Transient Suppressor (SOIC8)
       BA7623    - Rohm BA7623 75-Ohm driver IC with 3 internal circuits (SOIC8)
@@ -381,6 +381,54 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 #define LOG_PCI
 //#define LOG_BASEBOARD
+
+class ohci_hlean2131qc_device : public ohci_function_device
+{
+public:
+	ohci_hlean2131qc_device(running_machine &machine);
+	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
+	int handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size) override;
+	void set_region_base(UINT8 *data);
+private:
+	static const USBStandardDeviceDescriptor devdesc;
+	static const USBStandardConfigurationDescriptor condesc;
+	static const USBStandardInterfaceDescriptor intdesc;
+	static const USBStandardEndpointDescriptor enddesc01;
+	static const USBStandardEndpointDescriptor enddesc02;
+	static const USBStandardEndpointDescriptor enddesc03;
+	static const USBStandardEndpointDescriptor enddesc04;
+	static const USBStandardEndpointDescriptor enddesc05;
+	static const USBStandardEndpointDescriptor enddesc81;
+	static const USBStandardEndpointDescriptor enddesc82;
+	static const USBStandardEndpointDescriptor enddesc83;
+	static const USBStandardEndpointDescriptor enddesc84;
+	static const USBStandardEndpointDescriptor enddesc85;
+	static const UINT8 strdesc0[];
+	static const UINT8 strdesc1[];
+	static const UINT8 strdesc2[];
+	int maximum_send;
+	UINT8 *region;
+};
+
+class ohci_hlean2131sc_device : public ohci_function_device
+{
+public:
+	ohci_hlean2131sc_device(running_machine &machine);
+	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
+private:
+	static const USBStandardDeviceDescriptor devdesc;
+	static const USBStandardConfigurationDescriptor condesc;
+	static const USBStandardInterfaceDescriptor intdesc;
+	static const USBStandardEndpointDescriptor enddesc01;
+	static const USBStandardEndpointDescriptor enddesc02;
+	static const USBStandardEndpointDescriptor enddesc03;
+	static const USBStandardEndpointDescriptor enddesc81;
+	static const USBStandardEndpointDescriptor enddesc82;
+	static const USBStandardEndpointDescriptor enddesc83;
+	static const UINT8 strdesc0[];
+	static const UINT8 strdesc1[];
+	static const UINT8 strdesc2[];
+};
 
 class chihiro_state : public xbox_base_state
 {
@@ -572,7 +620,7 @@ static const struct {
 		UINT32 address;
 		UINT8 write_byte;
 	} modify[16];
-} hacks[2] = { { "chihiro", { { 0x6a79f, 0x01 }, { 0x6a7a0, 0x00 }, { 0x6b575, 0x00 }, { 0x6b576, 0x00 }, { 0x6b5af, 0x75 }, { 0x6b78a, 0x75 }, { 0x6b7ca, 0x00 }, { 0x6b7b8, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e, 0x74 }, { 0x79b80, 0x74 }, { 0x79b97, 0x74 }, { 0, 0 } } },
+} hacks[2] = { { "chihiro", { { 0x6a79f/*3f79f*/, 0x01 }, { 0x6a7a0/*3f7a0*/, 0x00 }, { 0x6b575/*40575*/, 0x00 }, { 0x6b576/*40576*/, 0x00 }, { 0x6b5af/*405af*/, 0x75 }, { 0x6b78a/*4078a*/, 0x75 }, { 0x6b7ca/*407ca*/, 0x00 }, { 0x6b7b8/*407b8*/, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e/*2ea9e*/, 0x74 }, { 0x79b80/*2eb80*/, 0x74 }, { 0x79b97/*2eb97*/, 0x74 }, { 0, 0 } } },
 				{ "outr2", { { 0x12e4cf, 0x01 }, { 0x12e4d0, 0x00 }, { 0x4793e, 0x01 }, { 0x4793f, 0x00 }, { 0x47aa3, 0x01 }, { 0x47aa4, 0x00 }, { 0x14f2b6, 0x84 }, { 0x14f2d1, 0x75 }, { 0x8732f, 0x7d }, { 0x87384, 0x7d }, { 0x87388, 0xeb }, { 0, 0 } } } };
 
 void chihiro_state::hack_usb()
@@ -593,6 +641,151 @@ void chihiro_state::hack_usb()
 		}
 	}
 	usbhack_counter++;
+}
+
+//**************************************************************************
+//  BASE BOARD USB
+//**************************************************************************
+
+//ic10
+const USBStandardDeviceDescriptor ohci_hlean2131qc_device::devdesc = { 0x12,0x01,0x0100,0x60,0x00,0x00,0x40,0x0CA3,0x0002,0x0108,0x01,0x02,0x00,0x01 };
+const USBStandardConfigurationDescriptor ohci_hlean2131qc_device::condesc = { 0x09,0x02,0x0058,0x01,0x01,0x00,0x80,0x96 };
+const USBStandardInterfaceDescriptor ohci_hlean2131qc_device::intdesc = { 0x09,0x04,0x00,0x00,0x0A,0xFF,0x00,0x00,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc01 = { 0x07,0x05,0x01,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc02 = { 0x07,0x05,0x02,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc03 = { 0x07,0x05,0x03,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc04 = { 0x07,0x05,0x04,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc05 = { 0x07,0x05,0x05,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc81 = { 0x07,0x05,0x81,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc82 = { 0x07,0x05,0x82,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc83 = { 0x07,0x05,0x83,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc84 = { 0x07,0x05,0x84,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc85 = { 0x07,0x05,0x85,0x02,0x0040,0x00 };
+const UINT8 ohci_hlean2131qc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
+const UINT8 ohci_hlean2131qc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
+const UINT8 ohci_hlean2131qc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x03,0xFF,0x0B };
+
+ohci_hlean2131qc_device::ohci_hlean2131qc_device(running_machine &machine) :
+	ohci_function_device(machine)
+{
+	add_device_descriptor(devdesc);
+	add_configuration_descriptor(condesc);
+	add_interface_descriptor(intdesc);
+	// it is important to add the endpoints in the same order they are found in the device firmware
+	add_endpoint_descriptor(enddesc01);
+	add_endpoint_descriptor(enddesc02);
+	add_endpoint_descriptor(enddesc03);
+	add_endpoint_descriptor(enddesc04);
+	add_endpoint_descriptor(enddesc05);
+	add_endpoint_descriptor(enddesc81);
+	add_endpoint_descriptor(enddesc82);
+	add_endpoint_descriptor(enddesc83);
+	add_endpoint_descriptor(enddesc84);
+	add_endpoint_descriptor(enddesc85);
+	add_string_descriptor(strdesc0);
+	add_string_descriptor(strdesc1);
+	add_string_descriptor(strdesc2);
+	maximum_send = 0;
+	region = nullptr;
+}
+
+void ohci_hlean2131qc_device::set_region_base(UINT8 *data)
+{
+	region = data;
+}
+
+int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
+{
+	if (endpoint != 0)
+		return -1;
+	printf("Control request: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
+	for (int n = 0; n < setup->wLength; n++)
+		endpoints[endpoint].buffer[n] = 0x50 ^ n;
+	//if ((setup->bRequest == 0x18) && (setup->wValue == 0x8000))
+	if (setup->bRequest == 0x17)
+	{
+		maximum_send = setup->wIndex;
+		if (maximum_send > 0x40)
+			maximum_send = 0x40;
+		endpoints[2].remain = maximum_send;
+		endpoints[2].position = region + 0x2000 + setup->wValue;
+	}
+	if ((setup->bRequest == 0x16) && (setup->wValue == 0x1f00))
+	{
+		endpoints[1].remain = setup->wIndex;
+		endpoints[1].position = region + 0x1f00;
+	}
+	if (setup->bRequest == 0x19) // 19 used to receive jvs packet, 20 to send
+	{
+		endpoints[endpoint].buffer[5] = 0;
+		endpoints[endpoint].buffer[4] = 20;
+	}
+	if (setup->bRequest == 0x20)
+	{
+		printf("\tJvs packet of %d bytes\n\r", setup->wIndex);
+	}
+
+	endpoints[endpoint].buffer[0] = 0;
+	endpoints[endpoint].position = endpoints[endpoint].buffer;
+	endpoints[endpoint].remain = setup->wLength;
+	return 0;
+}
+
+int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size)
+{
+	printf("Bulk request: %x %d %x\n\r", endpoint, pid, size);
+	if (((endpoint == 1) || (endpoint == 2)) && (pid == InPid))
+	{
+		if (size > endpoints[endpoint].remain)
+			size = endpoints[endpoint].remain;
+		memcpy(buffer, endpoints[endpoint].position, size);
+		endpoints[endpoint].position = endpoints[endpoint].position + size;
+		endpoints[endpoint].remain = endpoints[endpoint].remain - size;
+	}
+	return size;
+}
+
+//pc20
+const USBStandardDeviceDescriptor ohci_hlean2131sc_device::devdesc = { 0x12,0x01,0x0100,0x60,0x01,0x00,0x40,0x0CA3,0x0003,0x0110,0x01,0x02,0x00,0x01 };
+const USBStandardConfigurationDescriptor ohci_hlean2131sc_device::condesc = { 0x09,0x02,0x003C,0x01,0x01,0x00,0x80,0x96 };
+const USBStandardInterfaceDescriptor ohci_hlean2131sc_device::intdesc = { 0x09,0x04,0x00,0x00,0x06,0xFF,0x00,0x00,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc01 = { 0x07,0x05,0x01,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc02 = { 0x07,0x05,0x02,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc03 = { 0x07,0x05,0x03,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc81 = { 0x07,0x05,0x81,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc82 = { 0x07,0x05,0x82,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc83 = { 0x07,0x05,0x83,0x02,0x0040,0x00 };
+const UINT8 ohci_hlean2131sc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
+const UINT8 ohci_hlean2131sc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
+const UINT8 ohci_hlean2131sc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x00,0x44,0x00 };
+
+ohci_hlean2131sc_device::ohci_hlean2131sc_device(running_machine &machine) :
+	ohci_function_device(machine)
+{
+	add_device_descriptor(devdesc);
+	add_configuration_descriptor(condesc);
+	add_interface_descriptor(intdesc);
+	// it is important to add the endpoints in the same order they are found in the device firmware
+	add_endpoint_descriptor(enddesc01);
+	add_endpoint_descriptor(enddesc02);
+	add_endpoint_descriptor(enddesc03);
+	add_endpoint_descriptor(enddesc81);
+	add_endpoint_descriptor(enddesc82);
+	add_endpoint_descriptor(enddesc83);
+	add_string_descriptor(strdesc0);
+	add_string_descriptor(strdesc1);
+	add_string_descriptor(strdesc2);
+}
+
+int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
+{
+	if (endpoint != 0)
+		return -1;
+	for (int n = 0; n < setup->wLength; n++)
+		endpoints[endpoint].buffer[n] = 0xa0 ^ n;
+	endpoints[endpoint].position = endpoints[endpoint].buffer;
+	endpoints[endpoint].remain = setup->wLength;
+	return 0;
 }
 
 // ======================> ide_baseboard_device
@@ -847,6 +1040,9 @@ INPUT_PORTS_END
 
 void chihiro_state::machine_start()
 {
+	ohci_hlean2131qc_device *usb_device;
+	//ohci_hlean2131sc_device *usb_device;
+
 	xbox_base_state::machine_start();
 	chihiro_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
 	chihiro_devs.dimmboard = machine().device<naomi_gdrom_board>("rom_board");
@@ -862,6 +1058,10 @@ void chihiro_state::machine_start()
 			break;
 		}
 	usbhack_counter = 0;
+	usb_device = new ohci_hlean2131qc_device(machine());
+	usb_device->set_region_base(memregion(":others")->base()); // temporary
+	//usb_device = new ohci_hlean2131sc_device(machine());
+	usb_ohci_plug(1, usb_device); // connect
 	// savestates
 	save_item(NAME(usbhack_counter));
 }

@@ -13,6 +13,8 @@
 #include "png.h"
 #include "rendutil.h"
 
+#include <nanosvg/src/nanosvg.h>
+#include <nanosvg/src/nanosvgrast.h>
 
 
 //**************************************************************************
@@ -35,6 +37,101 @@ const attotime screen_device::DEFAULT_FRAME_PERIOD(attotime::from_hz(DEFAULT_FRA
 
 UINT32 screen_device::m_id_counter = 0;
 
+class screen_device_svg_renderer {
+public:
+	screen_device_svg_renderer(memory_region *region);
+	~screen_device_svg_renderer();
+
+	int width() const;
+	int height() const;
+
+	int render(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	static void output_notifier(const char *outname, INT32 value, void *param);
+
+private:
+	NSVGimage *m_image;
+	NSVGrasterizer *m_rasterizer;
+
+	std::unordered_map<std::string, std::list<NSVGshape *>> m_keyed_shapes;
+
+	void output_change(const char *outname, INT32 value);
+};
+
+screen_device_svg_renderer::screen_device_svg_renderer(memory_region *region)
+{
+	char *s = new char[region->bytes()+1];
+	memcpy(s, region->base(), region->bytes());
+	s[region->bytes()] = 0;
+	m_image = nsvgParse(s, "px", 72);
+	delete[] s;
+	m_rasterizer = nsvgCreateRasterizer();
+
+	for (NSVGshape *shape = m_image->shapes; shape != NULL; shape = shape->next)
+		if(shape->title[0]) {
+			shape->flags &= ~NSVG_FLAGS_VISIBLE;
+			m_keyed_shapes[shape->title].push_back(shape);
+		}
+}
+
+screen_device_svg_renderer::~screen_device_svg_renderer()
+{
+	nsvgDeleteRasterizer(m_rasterizer);
+	nsvgDelete(m_image);
+}
+
+int screen_device_svg_renderer::width() const
+{
+	return int(m_image->width + 0.5);
+}
+
+int screen_device_svg_renderer::height() const
+{
+	return int(m_image->height + 0.5);
+}
+
+int screen_device_svg_renderer::render(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	double sx = double(bitmap.width())/m_image->width;
+	double sy = double(bitmap.height())/m_image->height;
+	double sz = sx > sy ? sy : sx;
+	nsvgRasterize(m_rasterizer, m_image, 0, 0, sz, (unsigned char *)bitmap.raw_pixptr(0, 0), bitmap.width(), bitmap.height(), bitmap.rowbytes());
+
+	// Annoyingly, nanosvg doesn't use the same byte order than our bitmaps
+
+	for(unsigned int y=0; y<bitmap.height(); y++) {
+		UINT8 *image = (UINT8 *)bitmap.raw_pixptr(y, 0);
+		for(unsigned int x=0; x<bitmap.width(); x++) {
+			UINT8 r = image[0];
+			UINT8 g = image[1];
+			UINT8 b = image[2];
+			UINT32 color = 0xff000000 | (r << 16) | (g << 8) | (b << 0);
+			*(UINT32 *)image = color;
+			image += 4;
+		}
+	}
+
+	return 0;
+}
+
+void screen_device_svg_renderer::output_notifier(const char *outname, INT32 value, void *param)
+{
+	static_cast<screen_device_svg_renderer *>(param)->output_change(outname, value);
+}
+
+void screen_device_svg_renderer::output_change(const char *outname, INT32 value)
+{
+	auto l = m_keyed_shapes.find(outname);
+	if (l == m_keyed_shapes.end())
+		return;
+	if (value)
+		for(auto s : l->second)
+			s->flags |= NSVG_FLAGS_VISIBLE;
+	else
+		for(auto s : l->second)
+			s->flags &= ~NSVG_FLAGS_VISIBLE;
+}
+
 //**************************************************************************
 //  SCREEN DEVICE
 //**************************************************************************
@@ -55,6 +152,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 		m_yscale(1.0f),
 		m_palette(*this),
 		m_video_attributes(0),
+		m_svg_region(nullptr),
 		m_container(nullptr),
 		m_width(100),
 		m_height(100),
@@ -103,6 +201,12 @@ screen_device::~screen_device()
 void screen_device::static_set_type(device_t &device, screen_type_enum type)
 {
 	downcast<screen_device &>(device).m_type = type;
+}
+
+
+void screen_device::static_set_svg_region(device_t &device, const char *region)
+{
+	downcast<screen_device &>(device).m_svg_region = region;
 }
 
 
@@ -265,7 +369,7 @@ void screen_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("Invalid display dimensions\n");
 
 	// sanity check display area
-	if (m_type != SCREEN_TYPE_VECTOR)
+	if (m_type != SCREEN_TYPE_VECTOR && m_type != SCREEN_TYPE_SVG)
 	{
 		if (m_visarea.empty() || m_visarea.max_x >= m_width || m_visarea.max_y >= m_height)
 			osd_printf_error("Invalid display area\n");
@@ -274,6 +378,10 @@ void screen_device::device_validity_check(validity_checker &valid) const
 		if (m_screen_update_ind16.isnull() && m_screen_update_rgb32.isnull())
 			osd_printf_error("Missing SCREEN_UPDATE function\n");
 	}
+
+	// check for svg region
+	if (m_type == SCREEN_TYPE_SVG && !m_svg_region)
+		osd_printf_error("Missing SVG region information\n");
 
 	// check for zero frame rate
 	if (m_refresh == 0)
@@ -293,6 +401,23 @@ void screen_device::device_validity_check(validity_checker &valid) const
 
 void screen_device::device_start()
 {
+	if (m_type == SCREEN_TYPE_SVG)
+	{
+		memory_region *reg = owner()->memregion(m_svg_region);
+		if (!reg)
+			fatalerror("SVG region \"%s\" does not exist\n", m_svg_region);
+		m_svg = std::make_unique<screen_device_svg_renderer>(reg);
+		machine().output().set_notifier(nullptr, screen_device_svg_renderer::output_notifier, m_svg.get());
+
+		if (0)
+		{
+			// The osd picks up the size before start is called, so that's useless
+			m_width = m_svg->width();
+			m_height = m_svg->height();
+			m_visarea.set(0, m_width-1, 0, m_height-1);
+		}
+	}
+
 	// bind our handlers
 	m_screen_update_ind16.bind_relative_to(*owner());
 	m_screen_update_rgb32.bind_relative_to(*owner());
@@ -303,6 +428,7 @@ void screen_device::device_start()
 		throw device_missing_dependencies();
 
 	// configure bitmap formats and allocate screen bitmaps
+	// svg is RGB32 too, and doesn't have any update method
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
 
 	for (auto & elem : m_bitmap)
@@ -472,8 +598,8 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	assert(visarea.min_y >= 0);
 //  assert(visarea.max_x < width);
 //  assert(visarea.max_y < height);
-	assert(m_type == SCREEN_TYPE_VECTOR || visarea.min_x < width);
-	assert(m_type == SCREEN_TYPE_VECTOR || visarea.min_y < height);
+	assert(m_type == SCREEN_TYPE_VECTOR || m_type == SCREEN_TYPE_SVG || visarea.min_x < width);
+	assert(m_type == SCREEN_TYPE_VECTOR || m_type == SCREEN_TYPE_SVG || visarea.min_y < height);
 	assert(frame_period > 0);
 
 	// fill in the new parameters
@@ -566,8 +692,8 @@ void screen_device::realloc_screen_bitmaps()
 	INT32 effheight = MAX(m_height, m_visarea.max_y + 1);
 
 	// reize all registered screen bitmaps
-	for (auto_bitmap_item *item = m_auto_bitmap_list.first(); item != nullptr; item = item->next())
-		item->m_bitmap.resize(effwidth, effheight);
+	for (auto_bitmap_item &item : m_auto_bitmap_list)
+		item.m_bitmap.resize(effwidth, effheight);
 
 	// re-set up textures
 	if (m_palette != nullptr)
@@ -649,12 +775,19 @@ bool screen_device::update_partial(int scanline)
 	g_profiler.start(PROFILER_VIDEO);
 
 	UINT32 flags;
-	screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
-	switch (curbitmap.format())
+	if (m_type != SCREEN_TYPE_SVG)
 	{
-		default:
-		case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
-		case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+		screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
+		switch (curbitmap.format())
+		{
+			default:
+			case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
+			case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+		}
+	}
+	else
+	{
+		flags = m_svg->render(*this, m_bitmap[m_curbitmap].as_rgb32(), clip);
 	}
 
 	m_partial_updates_this_frame++;
@@ -910,15 +1043,13 @@ void screen_device::register_vblank_callback(vblank_state_delegate vblank_callba
 	// validate arguments
 	assert(!vblank_callback.isnull());
 
-	// check if we already have this callback registered
-	callback_item *item;
-	for (item = m_callback_list.first(); item != nullptr; item = item->next())
-		if (item->m_callback == vblank_callback)
-			break;
+	// do nothing if we already have this callback registered
+	for (callback_item &item : m_callback_list)
+		if (item.m_callback == vblank_callback)
+			return;
 
 	// if not found, register
-	if (item == nullptr)
-		m_callback_list.append(*global_alloc(callback_item(vblank_callback)));
+	m_callback_list.append(*global_alloc(callback_item(vblank_callback)));
 }
 
 
@@ -955,8 +1086,8 @@ void screen_device::vblank_begin()
 		machine().video().frame_update();
 
 	// call the screen specific callbacks
-	for (callback_item *item = m_callback_list.first(); item != nullptr; item = item->next())
-		item->m_callback(*this, true);
+	for (callback_item &item : m_callback_list)
+		item.m_callback(*this, true);
 	if (!m_screen_vblank.isnull())
 		m_screen_vblank(*this, true);
 
@@ -979,8 +1110,8 @@ void screen_device::vblank_begin()
 void screen_device::vblank_end()
 {
 	// call the screen specific callbacks
-	for (callback_item *item = m_callback_list.first(); item != nullptr; item = item->next())
-		item->m_callback(*this, false);
+	for (callback_item &item : m_callback_list)
+		item.m_callback(*this, false);
 	if (!m_screen_vblank.isnull())
 		m_screen_vblank(*this, false);
 

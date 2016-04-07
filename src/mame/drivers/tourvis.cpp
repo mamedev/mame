@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mariusz Wojcieszek, Stephh
+// copyright-holders:Mariusz Wojcieszek
 /****************************************************************************
 
     TourVision
@@ -92,13 +92,12 @@
     USA Pro Basketball
     Veigues
   * Vigilante
-  # Volfied
+    Volfied
     W-Ring
     Winning Shot
     Xevious
 
 * Denotes Not Dumped
-# Denotes Redump Needed
 
  _______________________________________________________________________________________________________________________________________________
 |                                                                                                                                               |
@@ -1008,7 +1007,7 @@ ROM_END
 /* Volfied - Taito */
 ROM_START(tvvolfd)
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "tourv_volfd.bin", 0x00000, 0x100000, BAD_DUMP CRC(c33efba5) SHA1(41ad4f85e551321487be61e2adbeae67e65c47de) )
+	ROM_LOAD( "tourv_volfd.bin", 0x00000, 0x100000, CRC(6349113d) SHA1(b413342122409ea4ed981bd5077285cdcf337890) )
 
 	TOURVISION_BIOS
 ROM_END
@@ -1040,14 +1039,14 @@ ROM_END
 
 GAME( 19??, tourvis,  0,       tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision)",                                      "Tourvision PCE bootleg", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
 GAME( 1988, tvdrgnst, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Namcot",                             "Dragon Spirit (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1988, tvlegaxe, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Victor Musical Industries, Inc.",    "Makyo Densetsu - The Legenary Axe (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1988, tvlegaxe, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Victor Musical Industries, Inc.",    "Makyou Densetsu - The Legenary Axe (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 1989, tvdormon, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Fujiko-Shogakukan-TV Asahi / Hudson Soft", "Doraemon Meikyuu Daisakusen (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1989, tvdormon, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Fujiko-Shogakukan-TV Asahi / Hudson Soft", "Doraemon Meikyuu Dai Sakusen (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1989, tvdunexp, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Atlus Ltd. / Hudson Soft",           "Dungeon Explorer (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1989, tvflaptw, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Namco Ltd. / Namcot",                "Final Lap Twin (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1989, tvgunhed, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson / Toho Sunrise",              "Gunhed (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1989, tvdensho, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Big Club / Wolf Team",               "Jinmu Densho (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1989, tvmrheli, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / IREM Corp",                          "Mr Heli (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1989, tvgunhed, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson / Toho Sunrise",              "GunHed (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1989, tvdensho, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Big Club / Wolf Team",               "Jinmu Denshou (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1989, tvmrheli, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / IREM Corp",                          "Mr. Heli no Daibouken (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1989, tvpaclnd, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Namco / Namcot",                     "Pac-Land (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1989, tvshnobi, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Sega / Asmik Corporation",           "Shinobi (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1989, tvsdarms, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Capcom / Nec Avenue",                "Side Arms (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
@@ -1061,7 +1060,7 @@ GAME( 1990, tvaburn,  tourvis, tourvision, tourvision, pce_common_state, pce_com
 GAME( 1990, tvarmedf, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Nichibutsu / Big Don",               "Armed-F (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvbeball, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson Soft",                        "Be Ball (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvbomber, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson Soft",                        "Bomberman (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1990, tvbrabho, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Namco / Namcot",                     "Ch??zetsurinjin Beraboh Man (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1990, tvbrabho, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Namco / Namcot",                     "Chouzetsu Rinjin - Bravoman (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvdsenpu, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Toaplan / Nec Avenue",               "Daisenpu (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvdevilc, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Naxat / Red",                        "Devil Crash (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvdodgeb, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Technos Japan Corp / Naxat Soft",    "Dodge Ball (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
@@ -1074,22 +1073,22 @@ GAME( 1990, tvovride, tourvis, tourvision, tourvision, pce_common_state, pce_com
 GAME( 1990, tvpdrift, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Sega / Asmik Corporation",           "Power Drift (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvpchasr, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Naxat Soft",                         "Psycho Chaser (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvrs2,    tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Taito Corporation",                  "Rastan Saga II (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1990, tvninjas, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / IREM Corp",                          "Saiga No Nindou - Ninja Spirit (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1990, tvninjas, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / IREM Corp",                          "Saigo no Nindou - Ninja Spirit (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvsssold, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Inter State / Kaneko / Hudson Soft", "Super Star Soldier (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvsvball, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Video System",                       "Super Volley ball (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvthbld,  tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Sega / NEC Avenue",                  "Thunder Blade (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvtsboys, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Victor Musical Industries, Inc.",    "Toy Shop Boys (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1990, tveigues, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Victor Musical Industries, Inc.",    "Veigues (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1990, tvwring,  tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Naxat Soft",                         "W-Ring (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1990, tveigues, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Victor Musical Industries, Inc.",    "Veigues - Tactical Gladiator (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1990, tvwring,  tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Naxat Soft",                         "W-Ring - The Double Rings (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, tvxvious, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Namco Ltd. / Namcot",                "Xevious (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 1991, tv1943,   tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Capcom / Naxat Soft",                "1943 Kai (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1991, tvbalstx, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Psygnosis / Coconuts Japan",         "Ballistix (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1991, tvcolumn, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Telenet Japan",                      "Columns (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1991, tvcoryon, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Naxat Soft",                         "Coryoon (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, tvcoryon, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Naxat Soft",                         "Coryoon - Child of Dragon (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1991, tvdmoon,  tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / T.S.S",                              "Dead Moon (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1991, tvftenis, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Human",                              "Final Match Tennis (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1991, tvhtdaka, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Taito Corporation",                  "Hana Taka Daka (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, tvhtdaka, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Taito Corporation",                  "Hana Taaka Daka!? (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1991, tvjchan,  tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson Soft",                        "Jackie Chan (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1991, tvtonma,  tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / IREM Corp",                          "Legend of Hero Tonma (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1991, tvpcgen2, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson Soft / Red",                  "PC Genjin 2 - Pithecanthropus Computerurus (Tourvision PCE bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

@@ -76,7 +76,7 @@ READ8_MEMBER(lwings_state::avengers_adpcm_r)
 
 WRITE8_MEMBER(lwings_state::lwings_bankswitch_w)
 {
-//	if (data & 0xe0) printf("bankswitch_w %02x\n", data);
+//  if (data & 0xe0) printf("bankswitch_w %02x\n", data);
 //  Fireball writes 0x20 on startup, maybe reset soundcpu?
 	m_sprbank = (data & 0x10)>>4; // Fireball only
 
@@ -405,7 +405,7 @@ static ADDRESS_MAP_START( fball_sound_map, AS_PROGRAM, 8, lwings_state )
 
 	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_byte_r)
 
-	AM_RANGE(0xA000, 0xA000) AM_WRITE(fball_oki_bank_w) 
+	AM_RANGE(0xA000, 0xA000) AM_WRITE(fball_oki_bank_w)
 
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 
@@ -620,7 +620,7 @@ static INPUT_PORTS_START( fball )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SWA:8" )
 
-	PORT_START("P3") 
+	PORT_START("P3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
@@ -630,7 +630,7 @@ static INPUT_PORTS_START( fball )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 
-	PORT_START("P4") 
+	PORT_START("P4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
@@ -858,14 +858,14 @@ void lwings_state::machine_start()
 	Fireball has 2 copies of the 'fixed' code in the main program rom, with only slight changes.
 	it might be possible the hardware can bank that whole area or alternatively only see one version of the program
 	the only difference is 2 pieces of code have been swapped around.  It is unknown when this code is called.
-	
-	3822:	CD	73
-	3823:	00	23
-	3824:	3E	72
-	3879:	73	CD
-	387A:	23	00
-	387B:	72	3E
-	
+
+	3822:   CD  73
+	3823:   00  23
+	3824:   3E  72
+	3879:   73  CD
+	387A:   23  00
+	387B:   72  3E
+
 	bank 0
 	3822: 73            ld   (hl),e
 	3823: 23            inc  hl
@@ -973,7 +973,7 @@ static MACHINE_CONFIG_START( fball, lwings_state )
 
 	MCFG_CPU_ADD("soundcpu", Z80, XTAL_12MHz/4) // ?
 	MCFG_CPU_PROGRAM_MAP(fball_sound_map)
-//	MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222)
+//  MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -1192,16 +1192,16 @@ ROM_START( fball )
 
 	ROM_REGION( 0x01000, "soundcpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "A05.bin", 0x00000, 0x01000, CRC(474dd19e) SHA1(962837716f54d0de2afb7f9df29f96b2e023bbcb) ) // BADADDR        ----xxxxxxxxxxxx (16x data repeat)
-	ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) 
 	ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000)
-	ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) 
+	ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000)
+	ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000)
 	ROM_IGNORE(0x01000) ROM_IGNORE(0x01000) ROM_IGNORE(0x01000)
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_ERASEFF )
 	ROM_LOAD( "J03.bin", 0x00000, 0x04000, CRC(be11627f) SHA1(de6b25e1b951d786d28a1c26716587754cfdc0df) ) // BADADDR        --xxxxxxxxxxxxxx (4x data repeat)
 	ROM_IGNORE(0x04000)
 	ROM_IGNORE(0x04000)
-	ROM_IGNORE(0x04000) 
+	ROM_IGNORE(0x04000)
 
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_ERASEFF )
 	ROM_LOAD( "B15.bin", 0x20000, 0x10000, CRC(2169ad3e) SHA1(5628b97e6f4ad4291eb98b02ea8f9b2282b44c60) ) ROM_IGNORE(0x10000) // 1ST AND 2ND HALF IDENTICAL
@@ -1217,7 +1217,7 @@ ROM_START( fball )
 	ROM_LOAD( "A03.bin", 0x00000, 0x40000, CRC(22b0d089) SHA1(a82d04c389694e1ed0b9b24555ddd6f9d9f6ca38) )
 	ROM_RELOAD(0x40000,0x40000)
 	ROM_LOAD( "A02.bin", 0x80000, 0x40000, CRC(951d6579) SHA1(8976a836538eb510888f49af94dbf66dacb8f067) )
-	ROM_LOAD( "A01.bin", 0xc0000, 0x40000, CRC(020b5261) SHA1(698dbd7e125e4edd988791ecdae7db9ddc0705b3) )	
+	ROM_LOAD( "A01.bin", 0xc0000, 0x40000, CRC(020b5261) SHA1(698dbd7e125e4edd988791ecdae7db9ddc0705b3) )
 ROM_END
 
 
@@ -1747,4 +1747,4 @@ GAME( 1987, buraikenb, avengers, avengersb,avengers, lwings_state, avengersb, RO
 // cloned lwings hardware
 GAME( 1992, fball,  0,    fball, fball, driver_device,  0, ROT0, "FM Work", "Fire Ball (FM Work)", MACHINE_SUPPORTS_SAVE )
 
- 
+	

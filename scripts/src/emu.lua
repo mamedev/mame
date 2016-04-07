@@ -25,20 +25,18 @@ includedirs {
 	MAME_DIR .. "src/devices", -- till deps are fixed
 	MAME_DIR .. "src/lib",
 	MAME_DIR .. "src/lib/util",
+	MAME_DIR .. "3rdparty/rapidjson/include",
 	MAME_DIR .. "3rdparty",
 	GEN_DIR  .. "emu",
 	GEN_DIR  .. "emu/layout",
 }
-if _OPTIONS["with-bundled-expat"] then
-	includedirs {
-		MAME_DIR .. "3rdparty/expat/lib",
-	}
-end
-if _OPTIONS["with-bundled-lua"] then
-	includedirs {
-		MAME_DIR .. "3rdparty/lua/src",
-	}
-end
+
+includedirs {
+	ext_includedir("expat"),
+	ext_includedir("lua"),
+	ext_includedir("zlib"),
+	ext_includedir("flac"),
+}
 
 if (_OPTIONS["targetos"] == "windows" and _OPTIONS["osd"] ~= "osdmini") then
 	defines {
@@ -169,6 +167,8 @@ files {
 	MAME_DIR .. "src/emu/network.h",
 	MAME_DIR .. "src/emu/parameters.cpp",
 	MAME_DIR .. "src/emu/parameters.h",
+	MAME_DIR .. "src/emu/pluginopts.cpp",
+	MAME_DIR .. "src/emu/pluginopts.h",
 	MAME_DIR .. "src/emu/output.cpp",
 	MAME_DIR .. "src/emu/output.h",
 	MAME_DIR .. "src/emu/render.cpp",
@@ -206,6 +206,8 @@ files {
 	MAME_DIR .. "src/emu/ui/devctrl.h",
 	MAME_DIR .. "src/emu/ui/menu.cpp",
 	MAME_DIR .. "src/emu/ui/menu.h",
+	MAME_DIR .. "src/emu/ui/submenu.cpp",
+	MAME_DIR .. "src/emu/ui/submenu.h",
 	MAME_DIR .. "src/emu/ui/mainmenu.cpp",
 	MAME_DIR .. "src/emu/ui/mainmenu.h",
 	MAME_DIR .. "src/emu/ui/miscmenu.cpp",
@@ -214,6 +216,8 @@ files {
 	MAME_DIR .. "src/emu/ui/barcode.h",
 	MAME_DIR .. "src/emu/ui/cheatopt.cpp",
 	MAME_DIR .. "src/emu/ui/cheatopt.h",
+	MAME_DIR .. "src/emu/ui/pluginopt.cpp",
+	MAME_DIR .. "src/emu/ui/pluginopt.h",
 	MAME_DIR .. "src/emu/ui/devopt.cpp",
 	MAME_DIR .. "src/emu/ui/devopt.h",
 	MAME_DIR .. "src/emu/ui/filemngr.cpp",
@@ -281,7 +285,7 @@ files {
 	MAME_DIR .. "src/emu/ui/starimg.h",
 	MAME_DIR .. "src/emu/ui/toolbar.h",
 	MAME_DIR .. "src/emu/ui/utils.cpp",
-	MAME_DIR .. "src/emu/ui/utils.h",	
+	MAME_DIR .. "src/emu/ui/utils.h",
 	MAME_DIR .. "src/emu/validity.cpp",
 	MAME_DIR .. "src/emu/validity.h",
 	MAME_DIR .. "src/emu/video.cpp",
@@ -406,6 +410,7 @@ dependency {
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/vertical.lh" },
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/lcd.lh" },
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/lcd_rot.lh" },
+	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/svg.lh" },
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/noscreens.lh" },
 
 	{ MAME_DIR .. "src/emu/video.cpp",   GEN_DIR .. "emu/layout/snap.lh" },
@@ -428,6 +433,7 @@ custombuildtask {
 	layoutbuildtask("emu/layout", "vertical"),
 	layoutbuildtask("emu/layout", "lcd"),
 	layoutbuildtask("emu/layout", "lcd_rot"),
+	layoutbuildtask("emu/layout", "svg"),
 	layoutbuildtask("emu/layout", "noscreens"),
 	layoutbuildtask("emu/layout", "snap"),
 }

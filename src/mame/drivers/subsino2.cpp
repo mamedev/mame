@@ -12,18 +12,19 @@ There is RAM for 512 scroll values (line scroll). Video RAM is mirrored on multi
 One peculiarity is that video RAM access is split into high and low byte. The former is mapped
 in program space, the latter in I/O space.
 
--------------------------------------------------------------------------------------------------------------
-Year  Game            CPU         Sound            Custom                            Other
--------------------------------------------------------------------------------------------------------------
-1996  Magic Train     HD647180*   U6295            SS9601, SS9602                    HM86171 RAMDAC, Battery
-1996  Water-Nymph     HD647180*   U6295            SS9601, SS9602                    HM86171 RAMDAC, Battery
-1998  Express Card    AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
-1998  Ying Hua Lian   AM188-EM    M6295 + YM3812?  SS9601, SS9602                    HM86171 RAMDAC, Battery
-1999  Bishou Jan      H8/3044     SS9904?          SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
-1999  X-Train         AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
-2006  X-Plan          AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
--------------------------------------------------------------------------------------------------------------
-*SS9600
+--------------------------------------------------------------------------------------------------------------
+Year  Game              CPU         Sound            Custom                            Other
+--------------------------------------------------------------------------------------------------------------
+1996  Magic Train       HD647180*   U6295            SS9601, SS9602                    HM86171 RAMDAC, Battery
+1996  Water-Nymph       HD647180*   U6295            SS9601, SS9602                    HM86171 RAMDAC, Battery
+1998  Express Card      AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
+1998  Ying Hua Lian     AM188-EM    M6295 + YM3812?  SS9601, SS9602                    HM86171 RAMDAC, Battery
+1999  Bishou Jan        H8/3044**   SS9904?          SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
+1999  X-Train/P-Train   AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
+2000  New 2001          H8/3044**   SS9904?          SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
+2006  X-Plan            AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
+--------------------------------------------------------------------------------------------------------------
+*SS9600   **SS9689
 
 To do:
 
@@ -101,7 +102,7 @@ public:
 	UINT8 m_dsw_mask;
 	optional_shared_ptr<UINT16> m_outputs16;
 	optional_shared_ptr<UINT8> m_outputs;
-	UINT16 m_bishjan_sel;
+	UINT16 m_bishjan_sound;
 	UINT16 m_bishjan_input;
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo_w);
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo2_w);
@@ -139,11 +140,12 @@ public:
 	DECLARE_READ8_MEMBER(dsw_r);
 	DECLARE_READ8_MEMBER(vblank_bit2_r);
 	DECLARE_READ8_MEMBER(vblank_bit6_r);
-	DECLARE_WRITE16_MEMBER(bishjan_sel_w);
+	DECLARE_WRITE16_MEMBER(bishjan_sound_w);
 	DECLARE_READ16_MEMBER(bishjan_serial_r);
 	DECLARE_WRITE16_MEMBER(bishjan_input_w);
 	DECLARE_READ16_MEMBER(bishjan_input_r);
 	DECLARE_WRITE16_MEMBER(bishjan_outputs_w);
+	DECLARE_WRITE16_MEMBER(new2001_outputs_w);
 	DECLARE_WRITE8_MEMBER(expcard_outputs_w);
 	DECLARE_WRITE8_MEMBER(mtrain_outputs_w);
 	DECLARE_WRITE8_MEMBER(mtrain_videoram_w);
@@ -155,6 +157,7 @@ public:
 	DECLARE_WRITE8_MEMBER(oki_bank_bit0_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_bit4_w);
 	DECLARE_DRIVER_INIT(bishjan);
+	DECLARE_DRIVER_INIT(new2001);
 	DECLARE_DRIVER_INIT(xtrain);
 	DECLARE_DRIVER_INIT(expcard);
 	DECLARE_DRIVER_INIT(wtrnymph);
@@ -600,7 +603,7 @@ VIDEO_START_MEMBER(subsino2_state,subsino2)
 	// SS9601 Regs:
 
 	m_ss9601_tilesize       =   TILE_8x8;
-	m_ss9601_scrollctrl =   0xfd;   // not written by mtrain, default to reels on
+	m_ss9601_scrollctrl		=   0xfd;   // not written by mtrain, default to reels on
 	m_ss9601_disable        =   0x00;
 
 	// SS9601 Layers:
@@ -861,8 +864,7 @@ INTERRUPT_GEN_MEMBER(subsino2_state::am188em_int0_irq)
                                 Bishou Jan
 ***************************************************************************/
 
-
-WRITE16_MEMBER(subsino2_state::bishjan_sel_w)
+WRITE16_MEMBER(subsino2_state::bishjan_sound_w)
 {
 	/*
 	    sound writes in service mode:
@@ -870,14 +872,14 @@ WRITE16_MEMBER(subsino2_state::bishjan_sel_w)
 	    02 89 04 0v (v = voice = 0..3)
 	*/
 	if (ACCESSING_BITS_8_15)
-		m_bishjan_sel = data >> 8;
+		m_bishjan_sound = data >> 8;
 }
 
 READ16_MEMBER(subsino2_state::bishjan_serial_r)
 {
 	return
-		(machine().rand() & 0x9800) |   // bit 7 - serial communication
-		(((m_bishjan_sel==0x12) ? 0x40:0x00) << 8) |
+		(machine().rand() & 0x9800) |                     // bit 7 - serial communication
+		(((m_bishjan_sound == 0x12) ? 0x40:0x00) << 8) |  // bit 6 - sound communication
 //      (machine.rand() & 0xff);
 //      (((m_screen->frame_number()%60)==0)?0x18:0x00);
 		0x18;
@@ -899,7 +901,7 @@ READ16_MEMBER(subsino2_state::bishjan_input_r)
 		if (m_bishjan_input & (1 << i))
 			res = ioport(port[i])->read();
 
-	return  (res << 8) |                                    // high byte
+	return  (res << 8) |                    // high byte
 			ioport("SYSTEM")->read() |      // low byte
 			(machine().device<ticket_dispenser_device>("hopper")->read(space, 0) ? 0x00 : 0x04) // bit 2: hopper sensor
 	;
@@ -907,7 +909,7 @@ READ16_MEMBER(subsino2_state::bishjan_input_r)
 
 WRITE16_MEMBER(subsino2_state::bishjan_outputs_w)
 {
-	m_outputs16[offset] = data;
+	COMBINE_DATA( &m_outputs16[offset] );
 
 	switch (offset)
 	{
@@ -956,14 +958,13 @@ static ADDRESS_MAP_START( bishjan_map, AS_PROGRAM, 16, subsino2_state )
 	AM_RANGE( 0x436000, 0x436fff ) AM_WRITE8(ss9601_reelram_hi_lo_w, 0xffff )
 	AM_RANGE( 0x437000, 0x4371ff ) AM_WRITE8(ss9601_scrollram_0_hi_lo_w, 0xffff )
 
-	AM_RANGE( 0x600000, 0x600001 ) AM_READNOP AM_WRITE(bishjan_sel_w )
+	AM_RANGE( 0x600000, 0x600001 ) AM_READNOP AM_WRITE(bishjan_sound_w )
 	AM_RANGE( 0x600040, 0x600041 ) AM_WRITE8(ss9601_scrollctrl_w, 0xff00 )
 	AM_RANGE( 0x600060, 0x600063 ) AM_WRITE8(hm86171_colorram_w, 0xffff )
 	AM_RANGE( 0x600080, 0x600081 ) AM_WRITE8(ss9601_tilesize_w, 0xff00 )
 	AM_RANGE( 0x6000a0, 0x6000a1 ) AM_WRITE8(ss9601_byte_lo_w, 0xff00 )
 
 	AM_RANGE( 0xa0001e, 0xa0001f ) AM_WRITE8(ss9601_disable_w, 0x00ff )
-
 	AM_RANGE( 0xa00020, 0xa00025 ) AM_WRITE8(ss9601_scroll_w, 0xffff )
 
 	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ_PORT("DSW")                              // SW1
@@ -971,6 +972,92 @@ static ADDRESS_MAP_START( bishjan_map, AS_PROGRAM, 16, subsino2_state )
 	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ(bishjan_input_r )                        // IN A & B
 	AM_RANGE( 0xc00006, 0xc00007 ) AM_READ(bishjan_serial_r )                       // IN D
 	AM_RANGE( 0xc00008, 0xc00009 ) AM_READ_PORT("RESET") AM_WRITE(bishjan_outputs_w ) AM_SHARE("outputs16")
+ADDRESS_MAP_END
+
+/***************************************************************************
+                                  New 2001
+***************************************************************************/
+
+WRITE16_MEMBER(subsino2_state::new2001_outputs_w)
+{
+	COMBINE_DATA( &m_outputs16[offset] );
+
+	switch (offset)
+	{
+		case 0:
+			if (ACCESSING_BITS_8_15)
+			{
+				output().set_led_value(0, data & 0x4000); // record?
+				output().set_led_value(1, data & 0x2000); // shoot now
+				output().set_led_value(2, data & 0x1000); // double
+				output().set_led_value(3, data & 0x0800); // black/red
+			}
+			if (ACCESSING_BITS_0_7)
+			{
+				output().set_led_value(4, data & 0x0080); // start
+				output().set_led_value(5, data & 0x0040); // take
+				output().set_led_value(6, data & 0x0020); // black/red
+
+				machine().bookkeeping().coin_counter_w(0, data & 0x0010); // coin in / key in
+				output().set_led_value(7, data & 0x0004); // ?
+				output().set_led_value(8, data & 0x0002); // ?
+			}
+			break;
+	}
+//  popmessage("0: %04x", m_outputs16[0]);
+}
+
+// Same as bishjan (except for i/o and lo2 usage like xplan)
+static ADDRESS_MAP_START( new2001_map, AS_PROGRAM, 16, subsino2_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
+
+	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE( 0x080000, 0x0fffff ) AM_ROM AM_REGION("maincpu", 0)
+
+	AM_RANGE( 0x200000, 0x207fff ) AM_RAM AM_SHARE("nvram") // battery
+
+	// write both (L1, byte_lo2)
+	AM_RANGE( 0x410000, 0x411fff ) AM_WRITE8(ss9601_videoram_1_hi_lo2_w, 0xffff )
+	// read lo (L1)   (only half tilemap?)
+	AM_RANGE( 0x412000, 0x412fff ) AM_READ8(ss9601_videoram_1_lo_r, 0xffff )
+	AM_RANGE( 0x413000, 0x4131ff ) AM_READWRITE8(ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w, 0xffff )
+	// write both (L0 & REEL, byte_lo2)
+	AM_RANGE( 0x414000, 0x415fff ) AM_WRITE8(ss9601_videoram_0_hi_lo2_w, 0xffff )
+	// read lo (REEL)
+	AM_RANGE( 0x416000, 0x416fff ) AM_READ8(ss9601_reelram_lo_r, 0xffff )
+	AM_RANGE( 0x417000, 0x4171ff ) AM_READWRITE8(ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w, 0xffff )
+
+	// read hi (L1)
+	AM_RANGE( 0x422000, 0x422fff ) AM_READ8(ss9601_videoram_1_hi_r, 0xffff )
+	AM_RANGE( 0x423000, 0x4231ff ) AM_READWRITE8(ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w, 0xffff )
+	// read hi (REEL)
+	AM_RANGE( 0x426000, 0x426fff ) AM_READ8(ss9601_reelram_hi_r, 0xffff )
+	AM_RANGE( 0x427000, 0x4271ff ) AM_READWRITE8(ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w, 0xffff )
+
+	// write both (L1, byte_lo)
+	AM_RANGE( 0x430000, 0x431fff ) AM_WRITE8(ss9601_videoram_1_hi_lo_w, 0xffff )
+	AM_RANGE( 0x432000, 0x432fff ) AM_WRITE8(ss9601_videoram_1_hi_lo_w, 0xffff )
+	AM_RANGE( 0x433000, 0x4331ff ) AM_WRITE8(ss9601_scrollram_1_hi_lo_w, 0xffff )
+	// write both (L0 & REEL, byte_lo)
+	AM_RANGE( 0x434000, 0x435fff ) AM_WRITE8(ss9601_videoram_0_hi_lo_w, 0xffff )
+	AM_RANGE( 0x436000, 0x436fff ) AM_WRITE8(ss9601_reelram_hi_lo_w, 0xffff )
+	AM_RANGE( 0x437000, 0x4371ff ) AM_WRITE8(ss9601_scrollram_0_hi_lo_w, 0xffff )
+
+	AM_RANGE( 0x600000, 0x600001 ) AM_READNOP AM_WRITE(bishjan_sound_w )
+	AM_RANGE( 0x600020, 0x600021 ) AM_WRITE8(ss9601_byte_lo2_w, 0xff00 )
+	AM_RANGE( 0x600040, 0x600041 ) AM_WRITE8(ss9601_scrollctrl_w, 0xff00 )
+	AM_RANGE( 0x600060, 0x600063 ) AM_WRITE8(hm86171_colorram_w, 0xffff )
+	AM_RANGE( 0x600080, 0x600081 ) AM_WRITE8(ss9601_tilesize_w, 0xff00 )
+	AM_RANGE( 0x6000a0, 0x6000a1 ) AM_WRITE8(ss9601_byte_lo_w, 0xff00 )
+
+	AM_RANGE( 0xa0001e, 0xa0001f ) AM_WRITE8(ss9601_disable_w, 0x00ff )
+	AM_RANGE( 0xa00020, 0xa00025 ) AM_WRITE8(ss9601_scroll_w, 0xffff )
+
+	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ_PORT("DSW")
+	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ_PORT("IN C")
+	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ_PORT("IN A & B")
+	AM_RANGE( 0xc00006, 0xc00007 ) AM_READ(bishjan_serial_r )
+	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(new2001_outputs_w ) AM_SHARE("outputs16")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1404,30 +1491,16 @@ static INPUT_PORTS_START( bishjan )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 
 	PORT_START("DSW")   // SW1
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Controls ) )
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Controls ) )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, "Keyboard" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Joystick ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
 
 	PORT_START("JOY")   // IN C
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1         ) PORT_NAME("1 Player Start (Joy Mode)")    // start (joy)
@@ -1454,7 +1527,7 @@ static INPUT_PORTS_START( bishjan )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_E      )   // e
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_I      )   // i
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_M      )   // m
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // i2
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_KAN    )   // i2 (kan)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1         )   // b2 (start)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
@@ -1464,7 +1537,7 @@ static INPUT_PORTS_START( bishjan )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_F      )   // f
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J      )   // j
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_N      )   // n
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // l2
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_REACH  )   // l2 (reach)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_BET    )   // c2 (bet)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
@@ -1473,7 +1546,7 @@ static INPUT_PORTS_START( bishjan )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_C      )   // c
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G      )   // g
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_K      )   // k
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // k2
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_CHI    )   // k2 (chi)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // m2
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
@@ -1483,7 +1556,7 @@ static INPUT_PORTS_START( bishjan )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_D      )   // d
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_H      )   // h
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_L      )   // l
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // j2
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON    )   // j2 (pon)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
@@ -1498,6 +1571,54 @@ static INPUT_PORTS_START( bishjan )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // f2
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+INPUT_PORTS_END
+
+/***************************************************************************
+                                  New 2001
+***************************************************************************/
+
+static INPUT_PORTS_START( new2001 )
+	PORT_START("DSW") // c00000
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+	// high byte related to sound communication
+
+	// JAMMA inputs:
+	PORT_START("IN C") // c00002
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	// high byte not read
+
+	PORT_START("IN A & B") // c00004
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE       ) PORT_IMPULSE(1) // service mode (press twice for inputs)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_NAME("Hold 3 / Black")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) PORT_NAME("Double Up / Help")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD2   ) PORT_NAME("Hold 2 / Red")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_HOLD1   ) PORT_NAME("Hold 1 / Take")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET    ) PORT_NAME("Bet (Shoot)")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(1)
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1        ) PORT_NAME("Start")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   ) // stats (keep pressed during boot for service mode)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2137,7 +2258,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( bishjan, subsino2_state )
 	MCFG_CPU_ADD("maincpu", H83044, XTAL_44_1MHz / 3)
 	MCFG_CPU_PROGRAM_MAP( bishjan_map )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
@@ -2157,6 +2278,15 @@ static MACHINE_CONFIG_START( bishjan, subsino2_state )
 
 	// sound hardware
 	// SS9904?
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( new2001, bishjan )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP( new2001_map )
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE( 640, 256 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 640-1, 0, 256-16-1 )
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -2234,7 +2364,7 @@ static MACHINE_CONFIG_START( xplan, subsino2_state )
 	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz*2 )    // !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( xplan_map )
 	MCFG_CPU_IO_MAP( xplan_io )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state,  am188em_int0_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, am188em_int0_irq)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2321,7 +2451,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( bishjan )
-	ROM_REGION( 0x100000, "maincpu", 0 )    // H8/3044
+	ROM_REGION( 0x80000, "maincpu", 0 )    // H8/3044
 	ROM_LOAD( "1-v203.u21", 0x000000, 0x080000, CRC(1f891d48) SHA1(0b6a5aa8b781ba8fc133289790419aa8ea21c400) )
 
 	ROM_REGION( 0x400000, "tilemap", 0 )
@@ -2344,6 +2474,76 @@ DRIVER_INIT_MEMBER(subsino2_state,bishjan)
 	// rts -> rte
 	rom[0x33386/2] = 0x5670;
 	rom[0x0CC5C/2] = 0x5670;
+}
+
+/***************************************************************************
+
+New 2001 (Italy, V2.00N)
+(C)2000 Subsino
+
+CPU:
+  Subsino SS9689 (TQFP100, U16, H8/3044)
+
+Video:
+  Subsino SS9601      (TQFP12, U23)
+  Subsino SS9802 9948 (QFP100, U1)
+  Subsino SS9803      (TQFP100, U29)
+
+Sound:
+  Subsino SS9904 (QFP100, U8)
+  Subsino S-1    (DIP8, U11, audio OP AMP or DAC?)
+  ST324          (U12, Quad Operational Amplifier)
+  TDA1519        (U14, Audio Amplifier)
+  Oscill. 44.100 (OSC48)
+
+ROMs:
+  27C020     (1)
+  27C4001    (2)
+  4x 27C2001 (3,4,5,6)
+
+RAMs:
+  2x HM62H256AK-15  (U30,U31)
+  CXK58257AM-10L    (U22)
+  RAMDAC HM86171-80 (U35)
+
+Others:
+  28x2 JAMMA edge connector
+  36x2 edge connector
+  10x2 edge connector
+  6 legs connector
+  pushbutton (SW1)
+  trimmer (volume)(VR1)
+  8x2 switches DIP(DS1)
+  3x 3 legs jumper (JP1,JP2,JP4)
+  battery 3V 
+
+***************************************************************************/
+
+ROM_START( new2001 )
+	ROM_REGION( 0x80000, "maincpu", 0 )    // H8/3044
+	ROM_LOAD( "new_2001_italy_1_v200n.u21", 0x00000, 0x40000, CRC(bacc8c01) SHA1(e820bc53fa297c3f543a1d65d47eb7b5ee85a6e2) )
+	ROM_RELOAD(                             0x40000, 0x40000 )
+
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "new_2001_italy_3_v200.0.u25", 0x00000, 0x40000, CRC(621452d6) SHA1(a9654bb98df16b13e8bbc6dd4dada2e63ee05dc9) )
+	ROM_LOAD32_BYTE( "new_2001_italy_4_v200.1.u26", 0x00001, 0x40000, CRC(3073e2d2) SHA1(fb257c625e177d7aa12f1b176a3d1b93d5891cab) )
+	ROM_LOAD32_BYTE( "new_2001_italy_5_v200.2.u27", 0x00002, 0x40000, CRC(d028696b) SHA1(ebb047e7cafaefbdeb479c3877aea4fce0c47ad2) )
+	ROM_LOAD32_BYTE( "new_2001_italy_6_v200.3.u28", 0x00003, 0x40000, CRC(085599e3) SHA1(afd4bed369a96ba12037e6b8cf3a4cab84d12b21) )
+
+	ROM_REGION( 0x80000, "samples", 0 )    // SS9904?
+	ROM_LOAD( "new_2001_italy_2_v200.u9", 0x00000, 0x80000, CRC(9d522d04) SHA1(68f314b077a62598f3de8ef753bdedc93d6eca71) )
+ROM_END
+
+DRIVER_INIT_MEMBER(subsino2_state,new2001)
+{
+	UINT16 *rom = (UINT16*)memregion("maincpu")->base();
+
+	// patch serial protection test (ERROR 041920 otherwise)
+	rom[0x19A2/2] = 0x4066;
+
+	// rts -> rte
+	rom[0x45E8/2] = 0x5670;
+	rom[0x471C/2] = 0x5670;
 }
 
 /***************************************************************************
@@ -2794,4 +2994,5 @@ GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, saklove,  RO
 GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, xtrain,   ROT0, "Subsino",        "X-Train (Ver. 1.3)",                   0 )
 GAME( 1999, ptrain,   0,        xtrain,   xtrain,   subsino2_state, ptrain,   ROT0, "Subsino",        "Panda Train (Novamatic 1.7)",          MACHINE_IMPERFECT_GRAPHICS ) // missing scroll in race screens
 GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, bishjan,  ROT0, "Subsino",        "Bishou Jan (Japan, Ver. 2.03)",        MACHINE_NO_SOUND )
+GAME( 2000, new2001,  0,        new2001,  new2001,  subsino2_state, new2001,  ROT0, "Subsino",        "New 2001 (Italy, Ver. 2.00N)",         MACHINE_NO_SOUND )
 GAME( 2006, xplan,    0,        xplan,    xplan,    subsino2_state, xplan,    ROT0, "Subsino",        "X-Plan (Ver. 1.01)",                   0 )

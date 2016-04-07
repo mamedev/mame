@@ -60,6 +60,8 @@ public:
 
 	void set_single_int(int pin_number, int state);
 
+	DECLARE_WRITE_LINE_MEMBER( rst1_line );
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -94,6 +96,9 @@ private:
 	void device_start(void) override;
 	void device_stop(void) override;
 	void device_reset(void) override;
+
+	// Common method for device_reset and rst1_line
+	void do_reset();
 
 	// State of the INT1-INT15 lines (must be inverted when queried)
 	// Note that the levels must also be delivered when reading the pins, which

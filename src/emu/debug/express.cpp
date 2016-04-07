@@ -1395,17 +1395,17 @@ UINT64 parsed_expression::execute_tokens()
 
 	// loop over the entire sequence
 	parse_token t1, t2, result;
-	for (parse_token *token = m_tokenlist.first(); token != nullptr; token = token->next())
+	for (parse_token &token : m_tokenlist)
 	{
 		// symbols/numbers/strings just get pushed
-		if (!token->is_operator())
+		if (!token.is_operator())
 		{
-			push_token(*token);
+			push_token(token);
 			continue;
 		}
 
 		// otherwise, switch off the operator
-		switch (token->optype())
+		switch (token.optype())
 		{
 			case TVL_PREINCREMENT:
 				pop_token_lval(t1);
@@ -1616,7 +1616,7 @@ UINT64 parsed_expression::execute_tokens()
 				break;
 
 			case TVL_COMMA:
-				if (!token->is_function_separator())
+				if (!token.is_function_separator())
 				{
 					pop_token_rval(t2); pop_token_rval(t1);
 					push_token(t2);
@@ -1625,15 +1625,15 @@ UINT64 parsed_expression::execute_tokens()
 
 			case TVL_MEMORYAT:
 				pop_token_rval(t1);
-				push_token(result.configure_memory(t1.value(), *token));
+				push_token(result.configure_memory(t1.value(), token));
 				break;
 
 			case TVL_EXECUTEFUNC:
-				execute_function(*token);
+				execute_function(token);
 				break;
 
 			default:
-				throw expression_error(expression_error::SYNTAX, token->offset());
+				throw expression_error(expression_error::SYNTAX, token.offset());
 		}
 	}
 

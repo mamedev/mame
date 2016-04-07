@@ -19,6 +19,8 @@
 #include "ui/filesel.h"
 #include "imagedev/floppy.h"
 
+#include <cstring>
+
 
 /***************************************************************************
     CONSTANTS
@@ -224,6 +226,8 @@ ui_menu_file_create::ui_menu_file_create(running_machine &machine, render_contai
 	m_image = image;
 	m_ok = ok;
 	*m_ok = true;
+	auto const sep = current_file.rfind(PATH_SEPARATOR);
+	std::strncpy(m_filename_buffer, current_file.c_str() + ((std::string::npos == sep) ? 0 : (sep + 1)), sizeof(m_filename_buffer));
 }
 
 
@@ -271,7 +275,7 @@ void ui_menu_file_create::populate()
 	item_append(_("New Image Name:"), new_image_name, 0, ITEMREF_NEW_IMAGE_NAME);
 
 	// do we support multiple formats?
-	if (ENABLE_FORMATS) format = m_image->formatlist();
+	if (ENABLE_FORMATS) format = m_image->formatlist().first();
 	if (ENABLE_FORMATS && (format != nullptr))
 	{
 		item_append(_("Image Format:"), m_current_format->description(), 0, ITEMREF_FORMAT);
@@ -307,7 +311,7 @@ void ui_menu_file_create::handle()
 					std::string tmp_file(m_filename_buffer);
 					if (tmp_file.find(".") != -1 && tmp_file.find(".") < tmp_file.length() - 1)
 					{
-						m_current_file.append(m_filename_buffer);
+						m_current_file = m_filename_buffer;
 						ui_menu::stack_pop(machine());
 					}
 					else

@@ -1954,6 +1954,10 @@ void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32
 	UINT32 *dest;
 	UINT8 *pri;
 
+	const UINT8 *rlut = &m_gamma_proms[0x000];
+	const UINT8 *glut = &m_gamma_proms[0x100];
+	const UINT8 *blut = &m_gamma_proms[0x200];
+
 	// prepare fader and shadow factor
 	bool fade_enabled = m_mixer_flags & 2 && m_poly_fade_enabled;
 	bool shadow_enabled = (m_mixer_flags & 0x100) != 0; // ? (ridgerac is the only game not using shadow)
@@ -1973,6 +1977,8 @@ void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32
 		pri = &screen.priority().pix8(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
+			UINT32 pixel = dest[x];
+			
 			// skip if transparent or under poly
 			if (pri[x] == 2)
 			{
@@ -1985,7 +1991,7 @@ void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32
 					case 0xfe:
 						if (shadow_enabled)
 						{
-							rgb.set(dest[x]);
+							rgb.set(pixel);
 							rgb.scale_and_clamp(rgb_mix[(src[x] & 0xf) - 0xc]);
 							break;
 						}
@@ -2004,8 +2010,11 @@ void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32
 				// eg. a rr-gg-bb of 3f-7f-00 will fade to ff-ff-00 and not ff-ff-ff
 				// seen in victlapw attract mode
 
-				dest[x] = rgb.to_rgba();
+				pixel = rgb.to_rgba();
 			}
+
+			// final mix gamma here
+			dest[x] = (rlut[(pixel >> 16) & 0xff] << 16) | (glut[(pixel >> 8) & 0xff] << 8) | blut[pixel & 0xff];
 		}
 	}
 }
@@ -2333,24 +2342,7 @@ UINT32 namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb3
 	// layers
 	draw_polygons(bitmap);
 	m_poly->render_scene(screen, bitmap);
-	draw_text_layer(screen, bitmap, cliprect);
-
-	// apply gamma
-	const UINT8 *rlut = &m_gamma_proms[0x000];
-	const UINT8 *glut = &m_gamma_proms[0x100];
-	const UINT8 *blut = &m_gamma_proms[0x200];
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		UINT32 *dest = &bitmap.pix32(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-		{
-			int rgb = dest[x];
-			int r = rlut[(rgb >> 16) & 0xff];
-			int g = glut[(rgb >> 8) & 0xff];
-			int b = blut[rgb & 0xff];
-			dest[x] = (r << 16) | (g << 8) | b;
-		}
-	}
+	draw_text_layer(screen, bitmap, cliprect); // text layer + final mix(gamma)
 
 	return 0;
 }

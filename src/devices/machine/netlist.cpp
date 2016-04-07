@@ -312,12 +312,12 @@ void netlist_mame_device_t::device_start()
 	m_setup_func(*m_setup);
 
 	/* let sub-devices tweak the netlist */
-	for( device_t *d = this->first_subdevice(); d != nullptr; d = d->next() )
+	for (device_t &d : subdevices())
 	{
-		netlist_mame_sub_interface *sdev = dynamic_cast<netlist_mame_sub_interface *>(d);
+		netlist_mame_sub_interface *sdev = dynamic_cast<netlist_mame_sub_interface *>(&d);
 		if( sdev != nullptr )
 		{
-			LOG_DEV_CALLS(("Found subdevice %s/%s\n", d->name(), d->shortname()));
+			LOG_DEV_CALLS(("Found subdevice %s/%s\n", d.name(), d.shortname()));
 			sdev->custom_netlist_additions(*m_setup);
 		}
 	}

@@ -23,22 +23,22 @@ public:
 	enum parameter_type
 	{
 		PARAM_FRAME,
-        PARAM_WINDOW,
-        PARAM_TIME
+		PARAM_WINDOW,
+		PARAM_TIME
 	};
 
-    bgfx_parameter(std::string name, parameter_type type) : m_name(name), m_type(type) { }
-    virtual ~bgfx_parameter() { }
+	bgfx_parameter(std::string name, parameter_type type) : m_name(name), m_type(type) { }
+	virtual ~bgfx_parameter() { }
 
-    virtual void tick(double delta) = 0;
+	virtual void tick(double delta) = 0;
 
 	// Getters
-    virtual float value() = 0;
-    std::string name() const { return m_name; }
+	virtual float value() = 0;
+	std::string name() const { return m_name; }
 
 protected:
-    std::string m_name;
-    parameter_type m_type;
+	std::string m_name;
+	parameter_type m_type;
 };
 
 #endif // __DRAWBGFX_PARAMETER__

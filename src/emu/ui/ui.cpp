@@ -13,6 +13,7 @@
 #include "video/vector.h"
 #include "machine/laserdsc.h"
 #include "render.h"
+#include "luaengine.h"
 #include "cheat.h"
 #include "rendfont.h"
 #include "uiinput.h"
@@ -359,9 +360,9 @@ UINT32 ui_manager::set_handler(ui_callback callback, UINT32 param)
 //  various startup screens
 //-------------------------------------------------
 
-void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
+void ui_manager::display_startup_screens(bool first_time)
 {
-	const int maxstate = 4;
+	const int maxstate = 3;
 	int str = machine().options().seconds_to_run();
 	bool show_gameinfo = !machine().options().skip_gameinfo();
 	bool show_warnings = true, show_mandatory_fileman = true;
@@ -370,11 +371,11 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 	// disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
 	// or if we are debugging
 	if (!first_time || (str > 0 && str < 60*5) || &machine().system() == &GAME_NAME(___empty) || (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		show_gameinfo = show_warnings = show_disclaimer = show_mandatory_fileman = FALSE;
+		show_gameinfo = show_warnings = show_mandatory_fileman = FALSE;
 
 	#if defined(EMSCRIPTEN)
 	// also disable for the JavaScript port since the startup screens do not run asynchronously
-	show_gameinfo = show_warnings = show_disclaimer = FALSE;
+	show_gameinfo = show_warnings = FALSE;
 	#endif
 
 	// loop over states
@@ -388,14 +389,9 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 		switch (state)
 		{
 			case 0:
-				if (show_disclaimer && disclaimer_string(messagebox_text).length() > 0)
-					set_handler(handler_messagebox_ok, 0);
-				break;
-
-			case 1:
 				if (show_warnings && warnings_string(messagebox_text).length() > 0)
 				{
-					set_handler(handler_messagebox_ok, 0);
+					set_handler(handler_messagebox_anykey, 0);
 					if (machine().system().flags & (MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_KEYBOARD | MACHINE_NO_SOUND))
 						messagebox_backcolor = UI_YELLOW_COLOR;
 					if (machine().system().flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_MECHANICAL))
@@ -403,12 +399,12 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 				}
 				break;
 
-			case 2:
+			case 1:
 				if (show_gameinfo && game_info_astring(messagebox_text).length() > 0)
 					set_handler(handler_messagebox_anykey, 0);
 				break;
 
-			case 3:
+			case 2:
 				if (show_mandatory_fileman && machine().image().mandatory_scan(messagebox_text).length() > 0)
 				{
 					std::string warning;
@@ -486,7 +482,10 @@ void ui_manager::update_and_render(render_container *container)
 
 	// render any cheat stuff at the bottom
 	if (machine().phase() >= MACHINE_PHASE_RESET)
+	{
+		machine().manager().lua()->on_frame_done();
 		machine().cheat().render_text(*container);
+	}
 
 	// call the current UI handler
 	assert(m_handler_callback != nullptr);
@@ -1033,22 +1032,6 @@ bool ui_manager::show_timecode_total()
 ***************************************************************************/
 
 //-------------------------------------------------
-//  disclaimer_string - print the disclaimer
-//  text to the given buffer
-//-------------------------------------------------
-
-std::string &ui_manager::disclaimer_string(std::string &str)
-{
-	str = string_format(
-			_("Usage of emulators in conjunction with ROMs you don't own is forbidden by copyright law.\n\n"
-			"IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%1$s\" ON THIS EMULATOR, PRESS ESC.\n\n"
-			"Otherwise, type OK or move the joystick left then right to continue"),
-			machine().system().description);
-	return str;
-}
-
-
-//-------------------------------------------------
 //  warnings_string - print the warning flags
 //  text to the given buffer
 //-------------------------------------------------
@@ -1174,7 +1157,7 @@ std::string &ui_manager::warnings_string(std::string &str)
 	}
 
 	// add the 'press OK' string
-	str.append(_("\n\nType OK or move the joystick left then right to continue"));
+	str.append(_("\n\nPress any key to continue"));
 	return str;
 }
 
@@ -1313,35 +1296,6 @@ UINT32 ui_manager::handler_messagebox(running_machine &machine, render_container
 {
 	machine.ui().draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 	return 0;
-}
-
-
-//-------------------------------------------------
-//  handler_messagebox_ok - displays the current
-//  messagebox_text string and waits for an OK
-//-------------------------------------------------
-
-UINT32 ui_manager::handler_messagebox_ok(running_machine &machine, render_container *container, UINT32 state)
-{
-	// draw a standard message window
-	machine.ui().draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
-
-	// an 'O' or left joystick kicks us to the next state
-	if (state == 0 && (machine.input().code_pressed_once(KEYCODE_O) || machine.ui_input().pressed(IPT_UI_LEFT)))
-		state++;
-
-	// a 'K' or right joystick exits the state
-	else if (state == 1 && (machine.input().code_pressed_once(KEYCODE_K) || machine.ui_input().pressed(IPT_UI_RIGHT)))
-		state = UI_HANDLER_CANCEL;
-
-	// if the user cancels, exit out completely
-	else if (machine.ui_input().pressed(IPT_UI_CANCEL))
-	{
-		machine.schedule_exit();
-		state = UI_HANDLER_CANCEL;
-	}
-
-	return state;
 }
 
 
@@ -1683,17 +1637,9 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 
 	// toggle pause
 	if (machine.ui_input().pressed(IPT_UI_PAUSE))
-	{
-		// with a shift key, it is single step
-//      if (is_paused && (machine.input().code_pressed(KEYCODE_LSHIFT) || machine.input().code_pressed(KEYCODE_RSHIFT)))
-//      {
-//          machine.ui().set_single_step(true);
-//          machine.resume();
-//      }
-//      else
-			machine.toggle_pause();
-	}
+		machine.toggle_pause();
 
+	// pause single step
 	if (machine.ui_input().pressed(IPT_UI_PAUSE_SINGLE))
 	{
 		machine.ui().set_single_step(true);
@@ -1955,8 +1901,6 @@ static slider_state *slider_alloc(running_machine &machine, const char *title, I
 
 static slider_state *slider_init(running_machine &machine)
 {
-	ioport_field *field;
-	ioport_port *port;
 	slider_state *listhead = nullptr;
 	slider_state **tailptr = &listhead;
 	std::string str;
@@ -1979,12 +1923,12 @@ static slider_state *slider_init(running_machine &machine)
 	}
 
 	// add analog adjusters
-	for (port = machine.ioport().first_port(); port != nullptr; port = port->next())
-		for (field = port->first_field(); field != nullptr; field = field->next())
-			if (field->type() == IPT_ADJUSTER)
+	for (ioport_port &port : machine.ioport().ports())
+		for (ioport_field &field : port.fields())
+			if (field.type() == IPT_ADJUSTER)
 			{
-				void *param = (void *)field;
-				*tailptr = slider_alloc(machine, field->name(), field->minval(), field->defvalue(), field->maxval(), 1, slider_adjuster, param);
+				void *param = (void *)&field;
+				*tailptr = slider_alloc(machine, field.name(), field.minval(), field.defvalue(), field.maxval(), 1, slider_adjuster, param);
 				tailptr = &(*tailptr)->next;
 			}
 
@@ -2090,15 +2034,15 @@ static slider_state *slider_init(running_machine &machine)
 
 #ifdef MAME_DEBUG
 	// add crosshair adjusters
-	for (port = machine.ioport().first_port(); port != nullptr; port = port->next())
-		for (field = port->first_field(); field != nullptr; field = field->next())
-			if (field->crosshair_axis() != CROSSHAIR_AXIS_NONE && field->player() == 0)
+	for (ioport_port &port : machine.ioport().ports())
+		for (ioport_field &field : port.fields())
+			if (field.crosshair_axis() != CROSSHAIR_AXIS_NONE && field.player() == 0)
 			{
-				void *param = (void *)field;
-				str = string_format(_("Crosshair Scale %1$s"), (field->crosshair_axis() == CROSSHAIR_AXIS_X) ? _("X") : _("Y"));
+				void *param = (void *)&field;
+				str = string_format(_("Crosshair Scale %1$s"), (field.crosshair_axis() == CROSSHAIR_AXIS_X) ? _("X") : _("Y"));
 				*tailptr = slider_alloc(machine, str.c_str(), -3000, 1000, 3000, 100, slider_crossscale, param);
 				tailptr = &(*tailptr)->next;
-				str = string_format(_("Crosshair Offset %1$s"), (field->crosshair_axis() == CROSSHAIR_AXIS_X) ? _("X") : _("Y"));
+				str = string_format(_("Crosshair Offset %1$s"), (field.crosshair_axis() == CROSSHAIR_AXIS_X) ? _("X") : _("Y"));
 				*tailptr = slider_alloc(machine, str.c_str(), -3000, 0, 3000, 100, slider_crossoffset, param);
 				tailptr = &(*tailptr)->next;
 			}

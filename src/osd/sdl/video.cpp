@@ -294,10 +294,19 @@ static void check_osd_inputs(running_machine &machine)
 		}
 	}
 
+	if (machine.ui_input().pressed(IPT_OSD_2))
+	{
+		//FIXME: on a per window basis
+		video_config.fullstretch = !video_config.fullstretch;
+		window->target()->set_scale_mode(video_config.fullstretch? SCALE_FRACTIONAL : SCALE_INTEGER);
+		machine.ui().popup_time(1, "Uneven stretch %s", video_config.fullstretch? "enabled":"disabled");
+	}
+
 	if (machine.ui_input().pressed(IPT_OSD_4))
 	{
 		//FIXME: on a per window basis
 		video_config.keepaspect = !video_config.keepaspect;
+		window->target()->set_keepaspect(video_config.keepaspect);
 		machine.ui().popup_time(1, "Keepaspect %s", video_config.keepaspect? "enabled":"disabled");
 	}
 
@@ -333,6 +342,7 @@ void sdl_osd_interface::extract_video_config()
 	video_config.filter        = options().filter();
 	video_config.keepaspect    = options().keep_aspect();
 	video_config.numscreens    = options().numscreens();
+	video_config.fullstretch   = options().uneven_stretch();
 	#ifdef SDLMAME_X11
 	video_config.restrictonemonitor = !options().use_all_heads();
 	#endif

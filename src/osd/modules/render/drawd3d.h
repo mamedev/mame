@@ -54,17 +54,6 @@ public:
 	virtual void record() override;
 	virtual void toggle_fsfx() override;
 
-	bool swap_xy()
-	{
-		// todo: move to osd_window
-		bool orientation_swap_xy =
-			(window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
-		bool rotation_swap_xy =
-			(window().target()->orientation() & ROT90) == ROT90 ||
-			(window().target()->orientation() & ROT270) == ROT270;
-		return orientation_swap_xy ^ rotation_swap_xy;
-	};
-
 	int                     initialize();
 
 	int                     device_create(HWND device_HWND);
@@ -85,9 +74,9 @@ public:
 	void                    begin_frame();
 	void                    end_frame();
 
-	void                    draw_line(const render_primitive *prim);
-	void                    draw_quad(const render_primitive *prim);
-	void                    batch_vector(const render_primitive *prim, float line_time);
+	void                    draw_line(const render_primitive &prim);
+	void                    draw_quad(const render_primitive &prim);
+	void                    batch_vector(const render_primitive &prim, float line_time);
 	void                    batch_vectors();
 
 	vertex *                mesh_alloc(int numverts);

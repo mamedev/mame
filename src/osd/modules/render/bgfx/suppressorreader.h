@@ -25,13 +25,13 @@ public:
 	static bgfx_suppressor* read_from_value(const Value& value, std::string prefix, std::map<std::string, bgfx_slider*>& sliders);
 
 private:
-    static bool get_values(const Value& value, std::string prefix, std::string name, int* values, const int count);
+	static bool get_values(const Value& value, std::string prefix, std::string name, int* values, const int count);
 	static bool validate_parameters(const Value& value, std::string prefix);
 
-    static const int CONDITION_COUNT = 2;
-    static const string_to_enum CONDITION_NAMES[CONDITION_COUNT];
-    static const int COMBINE_COUNT = 2;
-    static const string_to_enum COMBINE_NAMES[COMBINE_COUNT];
+	static const int CONDITION_COUNT = 2;
+	static const string_to_enum CONDITION_NAMES[CONDITION_COUNT];
+	static const int COMBINE_COUNT = 2;
+	static const string_to_enum COMBINE_NAMES[COMBINE_COUNT];
 };
 
 #endif // __DRAWBGFX_SUPPRESSOR_READER__

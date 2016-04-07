@@ -46,7 +46,55 @@
 Note the standard naming for d* data bits with 7 as MSB and 0 as LSB is in lowercase.
 TI's naming has D7 as LSB and D0 as MSB and is in uppercase
 
+     TMS5100:
+
+                 +-----------------+
+        TST      |  1           28 |  CS
+        PDC      |  2           27 |  CTL8
+        ROM CK   |  3           26 |  ADD8
+        CPU CK   |  4           25 |  CTL1
+        VDD      |  5           24 |  ADD1
+        CR OSC   |  6           23 |  CTL2
+        RC OSC   |  7           22 |  ADD2
+        T11      |  8           21 |  ADD4
+        NC       |  9           20 |  CTL4
+        I/O      | 10           19 |  M1
+        SPK1     | 11           18 |  NC
+        SPK2     | 12           17 |  NC
+        PROM OUT | 13           16 |  NC
+        VSS      | 14           15 |  M0
+                 +-----------------+
+
+        T11: Sync for serial data out
+
+
+    M58817
+
+    The following connections could be derived from radar scope schematics.
+    The M58817 is not 100% pin compatible to the 5100, but really close.
+
+                 +-----------------+
+        (NC)     |  1           28 |  CS
+        PDC      |  2           27 |  CTL8
+        ROM CK   |  3           26 |  ADD8 (to 58819)
+        (NC)     |  4           25 |  CTL1
+        (VDD,-5) |  5           24 |  ADD1 (to 58819)
+        (GND)    |  6           23 |  CTL2
+        Xin      |  7           22 |  ADD2 (to 58819)
+        Xout     |  8           21 |  ADD4 (to 58819)
+        (NC)     |  9           20 |  CTL4
+        (VDD,-5) | 10           19 |  Status back to CPU
+        (NC)     | 11           18 |  C1 (to 58819)
+        SPKR     | 12           17 |  (NC)
+        SPKR     | 13           16 |  C0 (to 58819)
+        (NC)     | 14           15 |  (5V)
+                 +-----------------+
+
 TODO:
+    5110:
+    * implement CS
+    * TMS5110_CMD_TEST_TALK is only partially implemented
+    5220:
     * Samples repeat over and over in the 'eprom' test mode. Needs investigation.
     * Implement a ready callback for pc interfaces
     - this will be quite a challenge since for it to be really accurate
@@ -272,7 +320,7 @@ static INT16 clip_analog(INT16 cliptemp);
 /* must be defined; if 0, output the waveform as if it was tapped on the speaker pin as usual, if 1, output the waveform as if it was tapped on the i/o pin (volume is much lower in the latter case) */
 #define FORCE_DIGITAL 0
 
-/* must be defined; if 1, normal speech (one A cycle, one B cycle per interpolation step); if 0; speak as if SPKSLOW was used (two A cycles, one B cycle per interpolation step) */
+/* 5220 only; must be defined; if 1, normal speech (one A cycle, one B cycle per interpolation step); if 0; speak as if SPKSLOW was used (two A cycles, one B cycle per interpolation step) */
 #define FORCE_SUBC_RELOAD 1
 
 
@@ -280,9 +328,9 @@ static INT16 clip_analog(INT16 cliptemp);
 #undef VERBOSE
 // above is general, somewhat obsolete, catch all for debugs which don't fit elsewhere
 #undef DEBUG_DUMP_INPUT_DATA
-// above dumps the data input to the tms52xx to stdout, useful for making logged data dumps for real hardware tests
+// 5220 only; above dumps the data written to the tms52xx to stdout, useful for making logged data dumps for real hardware tests
 #undef DEBUG_FIFO
-// above debugs fifo stuff: writes, reads and flag updates
+// 5220 only; above debugs fifo stuff: writes, reads and flag updates
 #undef DEBUG_PARSE_FRAME_DUMP
 // above dumps each frame to stderr: be sure to select one of the options below if you define it!
 #undef DEBUG_PARSE_FRAME_DUMP_BIN
@@ -310,17 +358,38 @@ static INT16 clip_analog(INT16 cliptemp);
 
 #define MAX_SAMPLE_CHUNK    512
 
-/* Variants */
+/* 6+4 Variants, from tms5110r.inc */
 
-#define TMS5220_IS_5220C    (4)
-#define TMS5220_IS_5200     (5)
-#define TMS5220_IS_5220     (6)
-#define TMS5220_IS_CD2501ECD (7)
+#define TMS5220_IS_TMC0281  (1)
+#define TMS5220_IS_TMC0281D (2)
+#define TMS5220_IS_CD2801   (3)
+#define TMS5220_IS_CD2802   (4)
+#define TMS5220_IS_TMS5110A (5)
+#define TMS5220_IS_M58817   (6)
+#define TMS5220_IS_5220C    (7)
+#define TMS5220_IS_5200     (8)
+#define TMS5220_IS_5220     (9)
+#define TMS5220_IS_CD2501ECD (10)
 
 #define TMS5220_IS_CD2501E  TMS5220_IS_5200
 
+// 52xx: decide whether we have rate control or not
 #define TMS5220_HAS_RATE_CONTROL ((m_variant == TMS5220_IS_5220C) || (m_variant == TMS5220_IS_CD2501ECD))
+
+// All: decide whether we are a 51xx or a 52xx
 #define TMS5220_IS_52xx ((m_variant == TMS5220_IS_5220C) || (m_variant == TMS5220_IS_5200) || (m_variant == TMS5220_IS_5220) || (m_variant == TMS5220_IS_CD2501ECD))
+
+/* 51xx: States for CTL */
+// ctl bus is input to tms51xx
+#define CTL_STATE_INPUT               (0)
+// ctl bus is outputting a test talk command on CTL1(bit 0)
+#define CTL_STATE_TTALK_OUTPUT        (1)
+// ctl bus is switching direction, next will be above
+#define CTL_STATE_NEXT_TTALK_OUTPUT   (2)
+// ctl bus is outputting a read nybble 'output' command on CTL1,2,4,8 (bits 0-3)
+#define CTL_STATE_OUTPUT              (3)
+// ctl bus is switching direction, next will be above
+#define CTL_STATE_NEXT_OUTPUT         (4)
 
 static const UINT8 reload_table[4] = { 0, 2, 4, 6 }; //sample count reload for 5220c and cd2501ecd only; 5200 and 5220 always reload with 0; keep in mind this is loaded on IP=0 PC=12 subcycle=1 so it immediately will increment after one sample, effectively being 1,3,5,7 as in the comments above.
 
@@ -332,6 +401,24 @@ void tms5220_device::set_variant(int variant)
 {
 	switch (variant)
 	{
+		case TMS5220_IS_TMC0281:
+			m_coeff = &T0280B_0281A_coeff;
+			break;
+		case TMS5220_IS_TMC0281D:
+			m_coeff = &T0280D_0281D_coeff;
+			break;
+		case TMS5220_IS_CD2801:
+			m_coeff = &T0280F_2801A_coeff;
+			break;
+		case TMS5220_IS_M58817:
+			m_coeff = &M58817_coeff;
+			break;
+		case TMS5220_IS_CD2802:
+			m_coeff = &T0280F_2802_coeff;
+			break;
+		case TMS5220_IS_TMS5110A:
+			m_coeff = &tms5110a_coeff;
+			break;
 		case TMS5220_IS_5200:
 		case TMS5220_IS_CD2501ECD:
 			m_coeff = &T0285_2501E_coeff;
@@ -415,6 +502,15 @@ void tms5220_device::register_for_save_states()
 	save_item(NAME(m_rs_ws));
 	save_item(NAME(m_read_latch));
 	save_item(NAME(m_write_latch));
+
+	// 5110 specific stuff
+	save_item(NAME(m_PDC));
+	save_item(NAME(m_CTL_pins));
+	save_item(NAME(m_state));
+	save_item(NAME(m_address));
+	save_item(NAME(m_next_is_address));
+	save_item(NAME(m_addr_bit));
+	save_item(NAME(m_CTL_buffer));
 }
 
 
@@ -458,7 +554,59 @@ static void printbits(long data, int num)
 
 /**********************************************************************************************
 
-     tms5220_data_write -- handle a write to the TMS5220
+    tms5220_device::new_int_write -- wrap a write to the VSM
+
+***********************************************************************************************/
+void tms5220_device::new_int_write(UINT8 rc, UINT8 m0, UINT8 m1, UINT8 addr)
+{
+	if (!m_m0_cb.isnull())
+		m_m0_cb(m0);
+	if (!m_m1_cb.isnull())
+		m_m1_cb(m1);
+	if (!m_addr_cb.isnull())
+		m_addr_cb((offs_t)0, addr);
+	if (!m_romclk_cb.isnull())
+	{
+		//printf("rc %d\n", rc);
+		m_romclk_cb(rc);
+	}
+}
+
+/**********************************************************************************************
+
+    tms5220_device::new_int_write_addr -- wrap a 'load address' set of writes to the VSM
+
+***********************************************************************************************/
+void tms5220_device::new_int_write_addr(UINT8 addr)
+{
+	new_int_write(1, 0, 1, addr); // romclk 1, m0 0, m1 1, addr bus nybble = xxxx
+	new_int_write(0, 0, 1, addr); // romclk 0, m0 0, m1 1, addr bus nybble = xxxx
+	new_int_write(1, 0, 0, addr); // romclk 1, m0 0, m1 0, addr bus nybble = xxxx
+	new_int_write(0, 0, 0, addr); // romclk 0, m0 0, m1 0, addr bus nybble = xxxx
+}
+
+/**********************************************************************************************
+
+    tms5220_device::new_int_write_addr -- wrap a 'read bit' set of writes to the VSM
+
+***********************************************************************************************/
+UINT8 tms5220_device::new_int_read()
+{
+	new_int_write(1, 1, 0, 0); // romclk 1, m0 1, m1 0, addr bus nybble = 0/open bus
+	new_int_write(0, 1, 0, 0); // romclk 0, m0 1, m1 0, addr bus nybble = 0/open bus
+	new_int_write(1, 0, 0, 0); // romclk 1, m0 0, m1 0, addr bus nybble = 0/open bus
+	new_int_write(0, 0, 0, 0); // romclk 0, m0 0, m1 0, addr bus nybble = 0/open bus
+	if (!m_data_cb.isnull())
+		return m_data_cb();
+#ifdef VERBOSE
+	logerror("WARNING: CALLBACK MISSING, RETURNING 0!\n");
+#endif
+	return 0;
+}
+
+/**********************************************************************************************
+
+     tms5220_device::data_write -- handle a write to the TMS5220
 
 ***********************************************************************************************/
 
@@ -626,11 +774,37 @@ int tms5220_device::extract_bits(int count)
 	}
 	else
 	{
+#ifndef USE_NEW_TMS6100_CODE
+/** TODO: get rid of this old code */
 		// extract from VSM (speech ROM)
 		if (m_speechrom)
 			val = m_speechrom->read(count);
+#else
+		while (count--)
+		{
+			val = (val << 1) | new_int_read();
+#ifdef VERBOSE
+			logerror("bit read: %d\n", val&1);
+#endif
+		}
+#endif
 	}
 	return val;
+}
+
+/** TODO: dummy reads should be auto-done for tms52xx for the first read after an address load, but not tms51xx where they need to be done manually, if needed */
+void tms5220_device::perform_dummy_read()
+{
+	if (m_schedule_dummy_read)
+	{
+#ifdef VERBOSE
+		int data = new_int_read();
+		logerror("TMS5110 performing dummy read; value read = %1i\n", data & 1);
+#else
+		new_int_read();
+#endif
+		m_schedule_dummy_read = FALSE;
+	}
 }
 
 /**********************************************************************************************
@@ -1470,16 +1644,21 @@ void tms5220_device::device_start()
 	set_variant(TMS5220_IS_5220);
 	m_clock = clock();
 
-	/* resolve irq and readyq line */
+	/* resolve callbacks */
 	m_irq_handler.resolve();
 	m_readyq_handler.resolve();
+	m_m0_cb.resolve();
+	m_m1_cb.resolve();
+	m_romclk_cb.resolve();
+	m_addr_cb.resolve();
+	m_data_cb.resolve();
 
 	/* initialize a stream */
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / 80);
 
 	m_timer_io_ready = timer_alloc(0);
 
-	/* not during reset which is called frm within a write! */
+	/* not during reset which is called from within a write! */
 	m_io_ready = 1;
 	m_true_timing = 0;
 	m_rs_ws = 0x03; // rs and ws are assumed to be inactive on device startup
@@ -1580,6 +1759,16 @@ void tms5220_device::device_reset()
 		m_speechrom->read(1);
 		m_schedule_dummy_read = FALSE;
 	}
+	
+	// 5110 specific stuff
+	m_PDC = 0;
+	m_CTL_pins = 0;
+	m_state = 0;
+	m_address = 0;
+	m_next_is_address = FALSE;
+	m_addr_bit = 0;
+	m_CTL_buffer = 0;
+
 }
 
 /**********************************************************************************************
@@ -1653,7 +1842,7 @@ WRITE_LINE_MEMBER( tms5220_device::rsq_w )
 #ifdef DEBUG_RS_WS
 			else
 				/* illegal */
-				fprintf(stderr,"tms5220_rs_w: illegal\n");
+				fprintf(stderr,"tms5220_rsq_w: illegal\n");
 #endif
 			return;
 		}
@@ -1700,12 +1889,12 @@ WRITE_LINE_MEMBER( tms5220_device::wsq_w )
 		m_rs_ws = new_val;
 		if (new_val == 0)
 		{
-			if (TMS5220_HAS_RATE_CONTROL) // correct for 5220c, ? for cd2501ecd
+			if (TMS5220_HAS_RATE_CONTROL) // correct for 5220c, probably also correct for cd2501ecd
 				reset();
 #ifdef DEBUG_RS_WS
 			else
 				/* illegal */
-				fprintf(stderr,"tms5220_ws_w: illegal\n");
+				fprintf(stderr,"tms5220_wsq_w: illegal\n");
 #endif
 			return;
 		}
@@ -1728,7 +1917,7 @@ WRITE_LINE_MEMBER( tms5220_device::wsq_w )
 			/* upon /WS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
 			m_io_ready = 0;
 			update_ready_state();
-			/* Now comes the complicated part: long does /READY stay inactive, when /WS is pulled low? This depends ENTIRELY on the command written, or whether the chip is in speak external mode or not...
+			/* Now comes the complicated part: how long does /READY stay inactive, when /WS is pulled low? This depends ENTIRELY on the command written, or whether the chip is in speak external mode or not...
 			Speak external mode: ~16 cycles
 			Command Mode:
 			SPK: ? cycles
@@ -1743,6 +1932,80 @@ WRITE_LINE_MEMBER( tms5220_device::wsq_w )
 		}
 	}
 }
+
+/*
+ * combined /RS and /WS line write handler;
+ * /RS is bit 1, /WS is bit 0
+ * Note this is a hack and probably can be removed later, once the 'real' line handlers above defer by at least 4 clock cycles before taking effect
+ */
+WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
+{
+	UINT8 new_val;
+	UINT8 falling_edges;
+	m_true_timing = 1;
+#ifdef DEBUG_RS_WS
+	fprintf(stderr,"/RS and /WS written with %d and %d respectively\n", (data&2)>>1), data&1;
+#endif
+	new_val = data&0x03;
+	if (new_val != m_rs_ws)
+	{
+		falling_edges = ((m_rs_ws^new_val)&(~new_val));
+		m_rs_ws = new_val;
+		switch(new_val)
+		{
+			case 0:
+				if (TMS5220_HAS_RATE_CONTROL) // correct for 5220c, probably also correct for cd2501ecd
+					reset();
+#ifdef DEBUG_RS_WS
+				else
+					/* illegal */
+					fprintf(stderr,"tms5220_combined_rsq_wsq_w: illegal\n");
+#endif
+				return;
+			case 3:
+				/* high impedance */
+				m_read_latch = 0xff;
+				return;
+			case 2: // /WS active, /RS not
+				/* check for falling or rising edge */
+				if (!(falling_edges&0x02)) return; /* low to high, do nothing */
+				/* high to low - schedule ready cycle */
+#ifdef DEBUG_RS_WS
+				fprintf(stderr,"Scheduling ready cycle for /WS...\n");
+#endif
+				/* upon /WS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
+				m_io_ready = 0;
+				update_ready_state();
+				/* Now comes the complicated part: how long does /READY stay inactive, when /WS is pulled low? This depends ENTIRELY on the command written, or whether the chip is in speak external mode or not...
+				Speak external mode: ~16 cycles
+				Command Mode:
+				SPK: ? cycles
+				SPKEXT: ? cycles
+				RDBY: between 60 and 140 cycles
+				RB: ? cycles (80?)
+				RST: between 60 and 140 cycles
+				SET RATE (5220C and CD2501ECD only): ? cycles (probably ~16)
+				*/
+				// TODO: actually HANDLE the timing differences! currently just assuming always 16 cycles
+				m_timer_io_ready->adjust(attotime::from_hz(clock()/16), 1); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
+				return;
+			case 1: // /RS active, /WS not
+				/* check for falling or rising edge */
+				if (!(falling_edges&0x01)) return; /* low to high, do nothing */
+				/* high to low - schedule ready cycle */
+#ifdef DEBUG_RS_WS
+				fprintf(stderr,"Scheduling ready cycle for /RS...\n");
+#endif
+				/* upon /RS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
+				m_io_ready = 0;
+				update_ready_state();
+				/* How long does /READY stay inactive, when /RS is pulled low? I believe its almost always ~16 clocks (25 usec at 800khz as shown on the datasheet) */
+				m_timer_io_ready->adjust(attotime::from_hz(clock()/16), 1); // this should take around 10-16 (closer to ~11?) cycles to complete
+				return;
+		}
+	}
+}
+
 
 /**********************************************************************************************
 
@@ -1917,7 +2180,12 @@ tms5220_device::tms5220_device(const machine_config &mconfig, const char *tag, d
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this),
 		m_readyq_handler(*this),
-		m_speechrom_tag(nullptr)
+		m_speechrom_tag(nullptr),
+		m_m0_cb(*this),
+		m_m1_cb(*this),
+		m_addr_cb(*this),
+		m_data_cb(*this),
+		m_romclk_cb(*this)
 {
 }
 
@@ -1926,7 +2194,12 @@ tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, 
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this),
 		m_readyq_handler(*this),
-		m_speechrom_tag(nullptr)
+		m_speechrom_tag(nullptr),
+		m_m0_cb(*this),
+		m_m1_cb(*this),
+		m_addr_cb(*this),
+		m_data_cb(*this),
+		m_romclk_cb(*this)
 {
 }
 

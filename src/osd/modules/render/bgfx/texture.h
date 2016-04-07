@@ -37,8 +37,8 @@ public:
 protected:
 	std::string                 m_name;
 	bgfx::TextureFormat::Enum   m_format;
-	uint16_t 					m_width;
-	uint16_t 					m_height;
+	uint16_t                    m_width;
+	uint16_t                    m_height;
 	bgfx::TextureHandle         m_texture;
 };
 

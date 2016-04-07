@@ -7,17 +7,17 @@
 		}
 	],
 	"passes": [
-		{	"effect": "blit",
+		{	"effect": "unfiltered/blit",
 			"name": "Copy To Unstretched Texture",
 			"input": [
 				{ "sampler": "s_tex", "texture": "screen" }
 			],
 			"output": "temp"
 		},
-		{	"effect": "blit",
+		{	"effect": "unfiltered/blit",
 			"name": "Final Upscale",
 			"input": [
-				{ "sampler": "s_tex", "texture": "temp" }
+				{ "sampler": "s_tex", "target": "temp" }
 			],
 			"output": "output"
 		}

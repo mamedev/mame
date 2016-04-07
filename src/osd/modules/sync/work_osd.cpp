@@ -29,9 +29,6 @@
 
 #include "eminline.h"
 
-#if defined(SDLMAME_MACOSX)
-#include "osxutils.h"
-#endif
 #if defined(SDLMAME_LINUX) || defined(SDLMAME_BSD) || defined(SDLMAME_HAIKU) || defined(SDLMAME_EMSCRIPTEN) || defined(SDLMAME_MACOSX)
 #include <pthread.h>
 #endif
@@ -480,7 +477,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 			do
 			{
 				item = (osd_work_item *)queue->free;
-			} while (item != NULL && !queue->free.compare_exchange_weak(item, item->next, std::memory_order_release, std::memory_order_relaxed));			
+			} while (item != NULL && !queue->free.compare_exchange_weak(item, item->next, std::memory_order_release, std::memory_order_relaxed));
 		}
 
 		// if nothing, allocate something new
@@ -517,7 +514,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 	{
 		std::lock_guard<std::mutex> lock(*queue->lock);
 		*queue->tailptr = itemlist;
-		queue->tailptr = item_tailptr;		
+		queue->tailptr = item_tailptr;
 	}
 
 	// increment the number of items in the queue
@@ -573,7 +570,7 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 	if (item->event == NULL)
 	{
 		std::lock_guard<std::mutex> lock(*item->queue->lock);
-		item->event = osd_event_alloc(TRUE, FALSE);     // manual reset, not signalled		
+		item->event = osd_event_alloc(TRUE, FALSE);     // manual reset, not signalled
 	}
 	else
 		osd_event_reset(item->event);
@@ -663,10 +660,6 @@ static void *worker_thread_entry(void *param)
 	work_thread_info *thread = (work_thread_info *)param;
 	osd_work_queue *queue = thread->queue;
 
-#if defined(SDLMAME_MACOSX)
-	void *arp = NewAutoreleasePool();
-#endif
-
 	// loop until we exit
 	for ( ;; )
 	{
@@ -714,10 +707,6 @@ static void *worker_thread_entry(void *param)
 		thread->active = FALSE;
 		--queue->livethreads;
 	}
-
-#if defined(SDLMAME_MACOSX)
-	ReleaseAutoreleasePool(arp);
-#endif
 
 	return NULL;
 }

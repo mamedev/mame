@@ -2,8 +2,9 @@ HLSL-Related Enable Switches
 ----------------------------
 
 Name                    Values		Description
-hlsl_enable             0/1             Enables HLSL post-processing in Direct3D 9 modes.
-yiq_enable              0/1             Enables YIQ-colorspace post-processing. Causes a
+hlsl_enable             0 or 1          Enables HLSL post-processing in Direct3D 9 modes.
+hlsl_oversampling       0 or 1          Enables HLSL oversampling.
+yiq_enable              0 or 1          Enables YIQ-colorspace post-processing. Causes a
                                         performance drop but gives a much more authentic
                                         NTSC TV appearance on TV-based systems when configured
                                         properly.
@@ -110,9 +111,18 @@ bloom_lvl1_weight       0.64            Bloom level 1  (1/2-size target) weight.
 bloom_lvl2_weight       0.32            Bloom level 2  (1/4-size target) weight.  (0.00-1.00)
 bloom_lvl3_weight       0.16            Bloom level 3  (1/8-size target) weight.  (0.00-1.00)
 bloom_lvl4_weight       0.08            Bloom level 4  (1/16-size target) weight.  (0.00-1.00)
-bloom_lvl5_weight       0.04            Bloom level 5  (1/32-size target) weight.  (0.00-1.00)
+bloom_lvl5_weight       0.06            Bloom level 5  (1/32-size target) weight.  (0.00-1.00)
 bloom_lvl6_weight       0.04            Bloom level 6  (1/64-size target) weight.  (0.00-1.00)
 bloom_lvl7_weight       0.02            Bloom level 7  (1/128-size target) weight.  (0.00-1.00)
-bloom_lvl8_weight       0.02            Bloom level 8  (1/256-size target) weight.  (0.00-1.00)
-bloom_lvl9_weight       0.01            Bloom level 9  (1/512-size target) weight.  (0.00-1.00)
-bloom_lvl10_weight      0.01            Bloom level 10 (1/1024-size target) weight.  (0.00-1.00)
+bloom_lvl8_weight       0.01            Bloom level 8  (1/256-size target) weight.  (0.00-1.00)
+
+
+Presets
+-------
+../ini/presets/raster.ini               for raster screens
+../ini/presets/vector.ini               for color vector screens
+../ini/presets/vector-mono.ini          for monochrome vector screens (rename to vector.ini or <system>.ini)
+../ini/presets/lcd.ini                  for screens with TFT color LCD
+../ini/presets/lcd-matrix.ini           for screens with STN LCD matrix (rename to lcd.ini or <system>.ini)
+../ini/presets/gameboy.ini              for Game Boy screen (same as lcd-matrix.ini with greenish color transformation)
+../ini/presets/gba.ini                  for Game Boy Advance screen (same as lcd.ini)

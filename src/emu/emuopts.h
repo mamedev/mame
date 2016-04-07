@@ -27,8 +27,7 @@ enum
 	OPTION_PRIORITY_CMDLINE,
 
 	// INI-based options are NORMAL priority, in increasing order:
-	OPTION_PRIORITY_INI = OPTION_PRIORITY_NORMAL,
-	OPTION_PRIORITY_MAME_INI,
+	OPTION_PRIORITY_MAME_INI = OPTION_PRIORITY_NORMAL + 1,
 	OPTION_PRIORITY_DEBUG_INI,
 	OPTION_PRIORITY_ORIENTATION_INI,
 	OPTION_PRIORITY_SYSTYPE_INI,
@@ -36,7 +35,8 @@ enum
 	OPTION_PRIORITY_SOURCE_INI,
 	OPTION_PRIORITY_GPARENT_INI,
 	OPTION_PRIORITY_PARENT_INI,
-	OPTION_PRIORITY_DRIVER_INI
+	OPTION_PRIORITY_DRIVER_INI,
+	OPTION_PRIORITY_INI,
 };
 
 // core options
@@ -102,6 +102,7 @@ enum
 #define OPTION_KEEPASPECT           "keepaspect"
 #define OPTION_UNEVENSTRETCH        "unevenstretch"
 #define OPTION_UNEVENSTRETCHX       "unevenstretchx"
+#define OPTION_INTOVERSCAN          "intoverscan"
 #define OPTION_INTSCALEX            "intscalex"
 #define OPTION_INTSCALEY            "intscaley"
 
@@ -203,6 +204,9 @@ enum
 #define OPTION_AUTOBOOT_SCRIPT      "autoboot_script"
 
 #define OPTION_CONSOLE              "console"
+#define OPTION_PLUGINS              "plugins"
+#define OPTION_PLUGIN               "plugin"
+#define OPTION_NO_PLUGIN            "noplugin"
 
 #define OPTION_LANGUAGE             "language"
 
@@ -293,6 +297,7 @@ public:
 	bool keep_aspect() const { return bool_value(OPTION_KEEPASPECT); }
 	bool uneven_stretch() const { return bool_value(OPTION_UNEVENSTRETCH); }
 	bool uneven_stretch_x() const { return bool_value(OPTION_UNEVENSTRETCHX); }
+	bool int_overscan() const { return bool_value(OPTION_INTOVERSCAN); }
 	int int_scale_x() const { return int_value(OPTION_INTSCALEX); }
 	int int_scale_y() const { return int_value(OPTION_INTSCALEY); }
 
@@ -393,6 +398,11 @@ public:
 	const char *autoboot_script() const { return value(OPTION_AUTOBOOT_SCRIPT); }
 
 	bool console() const { return bool_value(OPTION_CONSOLE); }
+
+	bool plugins() const { return bool_value(OPTION_PLUGINS); }
+
+	const char *plugin() const { return value(OPTION_PLUGIN); }
+	const char *no_plugin() const { return value(OPTION_NO_PLUGIN); }
 
 	const char *language() const { return value(OPTION_LANGUAGE); }
 

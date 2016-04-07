@@ -158,16 +158,18 @@
 ***************************************************************************************
 
   Game notes...
-  
+
   The third set is resetting after drawing the maze, and when start a game.
 
-  The attract one:
-  
-  bp D28E (this is after all the jsr tables that draw the maze)
-  $D296: jsr $E0CD...
-  $E189 (jsr $6337) ; $6337 ---> Goes nowhere. Hit the 00's (BRK) and reset.
+  Attract reset:
 
-  Maybe should be jsr $E337 (MSB active)? There, there is a subroutina that has sense.
+  bp d28e (this is after all the jsr tables that draw the maze)
+  $d296: jsr $e0cd...
+  $e189 (jsr $6337) ; $6337 ---> Goes nowhere. Hit the 00's (BRK) and reset.
+
+  Start reset:
+
+  $e0e9: 4c ee 60  ; jmp $60ee <--- nothing here.
 
 ***************************************************************************************
 
@@ -219,6 +221,8 @@ public:
 	DECLARE_WRITE8_MEMBER(coincounter_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+	DECLARE_DRIVER_INIT(cocob);
 
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cocoloco);
@@ -582,11 +586,17 @@ ROM_START( cocolocoa )
 	ROM_LOAD( "tbp28l22.bin", 0x0000, 0x0100, CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )  // same decode prom from abattle (astrof.cpp)
 ROM_END
 
+/* This Petaco's 2-player game
+   seems to soffer of some bitrot.
+
+   The code executes subroutines located out of the ROM space.
+   Finally jumps to nowhere.
+*/
 ROM_START( cocolocob )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b1.bin",   0xd000, 0x0800, CRC(5ead42c4) SHA1(f2b8bf48f80c99c8c109ec67cdd6e1105f7f9702) )
 	ROM_LOAD( "b-c1.bin", 0xd800, 0x0800, CRC(104db6b3) SHA1(d0a9ce1b920124078f442bdcb226e8da9f96d60a) )
-	ROM_LOAD( "c1.bin",   0xe000, 0x0800, CRC(8774b1bc) SHA1(b7c09883c136dedfffd0724b49cc5ff987831850) )
+	ROM_LOAD( "c1.bin",   0xe000, 0x0800, BAD_DUMP CRC(8774b1bc) SHA1(b7c09883c136dedfffd0724b49cc5ff987831850) )
 	ROM_LOAD( "d1.bin",   0xe800, 0x0800, CRC(41b22627) SHA1(241659448074e5101ca7da3feb4a0a38580b12e9) )
 	ROM_LOAD( "d-e1.bin", 0xf000, 0x0800, CRC(db93f941) SHA1(b827341e408b5dc50acdfd3586f829f7bb2bb915) )
 	ROM_LOAD( "e1.bin",   0xf800, 0x0800, CRC(4e5705f0) SHA1(271d6c8eff331327dc1a75f7a4b0c64d3e363e3d) )
@@ -597,10 +607,28 @@ ROM_END
 
 
 /***********************************
+*           Driver Init            *
+***********************************/
+
+DRIVER_INIT_MEMBER(cocoloco_state, cocob)
+{
+//  Just for testing...
+
+	UINT8 *rom = memregion("maincpu")->base();
+
+	rom[0xe18b] = rom[0xe18b] ^ 0x80; // with jsr $e337, the character doesn't turn and eat straight (maze included)
+
+	rom[0xe049] = 0xea;
+	rom[0xe04a] = 0xea;
+	rom[0xe04b] = 0xea;
+}
+
+
+/***********************************
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT      STATE          INIT   ROT     COMPANY         FULLNAME            FLAGS  */
-GAME( 198?, cocoloco,  0,        cocoloco, cocoloco,  driver_device, 0,     ROT90, "Petaco S.A.",  "Coco Loco (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, cocolocoa, cocoloco, cocoloco, cocolocoa, driver_device, 0,     ROT90, "Recel S.A.",   "Coco Loco (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, cocolocob, cocoloco, cocoloco, cocoloco,  driver_device, 0,     ROT90, "Petaco S.A.",  "Coco Loco (set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT   ROT     COMPANY         FULLNAME            FLAGS  */
+GAME( 198?, cocoloco,  0,        cocoloco, cocoloco,  driver_device,  0,     ROT90, "Petaco S.A.",  "Coco Loco (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, cocolocoa, cocoloco, cocoloco, cocolocoa, driver_device,  0,     ROT90, "Recel S.A.",   "Coco Loco (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, cocolocob, cocoloco, cocoloco, cocoloco,  cocoloco_state, cocob, ROT90, "Petaco S.A.",  "Coco Loco (set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

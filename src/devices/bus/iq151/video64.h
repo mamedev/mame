@@ -16,6 +16,7 @@
 
 class iq151_video64_device :
 		public device_t,
+		public device_gfx_interface,
 		public device_iq151cart_interface
 {
 public:
@@ -24,7 +25,6 @@ public:
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:
 	// device-level overrides
@@ -40,8 +40,6 @@ protected:
 private:
 	UINT8 *     m_videoram;
 	UINT8 *     m_chargen;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 

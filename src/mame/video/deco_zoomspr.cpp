@@ -17,19 +17,8 @@ const device_type DECO_ZOOMSPR = &device_creator<deco_zoomspr_device>;
 
 deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_ZOOMSPR, "DECO Zooming Sprites", tag, owner, clock, "deco_zoomspr", __FILE__),
-	m_palette(*this),
 	m_gfxdecode(*this)
 {
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void deco_zoomspr_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<deco_zoomspr_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -80,7 +69,7 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+			const pen_t *pal = &m_gfxdecode->palette().pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const UINT8 *code_base = gfx->get_data(code % gfx->elements());
 
 			if (sprite_screen_width && sprite_screen_height)

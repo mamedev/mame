@@ -45,7 +45,6 @@ public:
 	{
 		CU_SCREEN_DIMS = 0,
 		CU_SOURCE_DIMS,
-		CU_SOURCE_RECT,
 		CU_TARGET_DIMS,
 		CU_QUAD_DIMS,
 
@@ -261,23 +260,21 @@ struct hlsl_options
 	float                   bloom_level6_weight;
 	float                   bloom_level7_weight;
 	float                   bloom_level8_weight;
-	float                   bloom_level9_weight;
-	float                   bloom_level10_weight;
 };
 
 struct slider_desc
 {
-	const char *        		name;
-	int                 		minval;
-	int                 		defval;
-	int                 		maxval;
-	int                 		step;
-	int							slider_type;
-	int                 		screen_type;
-	int							id;
-	float						scale;
-	const char *				format;
-	std::vector<const char *>	strings;
+	const char *                name;
+	int                         minval;
+	int                         defval;
+	int                         maxval;
+	int                         step;
+	int                         slider_type;
+	int                         screen_type;
+	int                         id;
+	float                       scale;
+	const char *                format;
+	std::vector<const char *>   strings;
 };
 
 class slider
@@ -384,6 +381,7 @@ private:
 
 	bool                    master_enable;              // overall enable flag
 	bool                    vector_enable;              // vector post-processing enable flag
+	bool                    oversampling_enable;        // oversampling enable flag
 	bool                    paused;                     // whether or not rendering is currently paused
 	int                     num_screens;                // number of emulated physical screens
 	int                     curr_screen;                // current screen for render target operations

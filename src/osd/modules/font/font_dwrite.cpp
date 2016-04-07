@@ -31,7 +31,7 @@
 DEFINE_GUID(CLSID_WICImagingFactory, 0xcacaf262, 0x9370, 0x4615, 0xa1, 0x3b, 0x9f, 0x55, 0x39, 0xda, 0x4c, 0xa);
 DEFINE_GUID(GUID_WICPixelFormat8bppAlpha, 0xe6cd0116, 0xeeba, 0x4161, 0xaa, 0x85, 0x27, 0xdd, 0x9f, 0xb3, 0xa8, 0x95);
 
-#include <wrl\client.h>
+#include <wrl/client.h>
 #undef interface
 
 #include "strconv.h"
@@ -57,10 +57,10 @@ static const float POINTS_PER_DIP = (3.0f / 4.0f);
 
 // Macro to check for a failed HRESULT and if failed, return 0
 #define HR_RET( CALL, ret ) do { \
-    result = CALL; \
-    if (FAILED(result)) { \
-        osd_printf_error(#CALL " failed with error 0x%X\n", (unsigned int)result); \
-        return ret; } \
+	result = CALL; \
+	if (FAILED(result)) { \
+		osd_printf_error(#CALL " failed with error 0x%X\n", (unsigned int)result); \
+		return ret; } \
 } while (0)
 
 #define HR_RETHR( CALL ) HR_RET(CALL, result)
@@ -338,9 +338,9 @@ public:
 class osd_font_dwrite : public osd_font
 {
 private:
-	ComPtr<ID2D1Factory>		    m_d2dfactory;
-	ComPtr<IDWriteFactory>		    m_dwriteFactory;
-	ComPtr<IWICImagingFactory>	    m_wicFactory;
+	ComPtr<ID2D1Factory>            m_d2dfactory;
+	ComPtr<IDWriteFactory>          m_dwriteFactory;
+	ComPtr<IWICImagingFactory>      m_wicFactory;
 	ComPtr<IDWriteFont>             m_font;
 	float                           m_fontEmHeightInDips;
 
@@ -411,10 +411,10 @@ public:
 		UINT cbData;
 		BYTE* pixels = nullptr;
 
-		ComPtr<ID2D1BitmapRenderTarget>	    target;
-		ComPtr<ID2D1SolidColorBrush>		pWhiteBrush;
-		ComPtr<IWICBitmap>					wicBitmap;
-		ComPtr<IWICBitmapLock>				lock;
+		ComPtr<ID2D1BitmapRenderTarget>     target;
+		ComPtr<ID2D1SolidColorBrush>        pWhiteBrush;
+		ComPtr<IWICBitmap>                  wicBitmap;
+		ComPtr<IWICBitmapLock>              lock;
 
 		ComPtr<IDWriteFontFace> face;
 		HR_RET0(m_font->CreateFontFace(face.GetAddressOf()));
@@ -648,11 +648,11 @@ private:
 class font_dwrite : public osd_module, public font_module
 {
 private:
-	d2d_create_factory_fn			m_pfnD2D1CreateFactory;
-	dwrite_create_factory_fn		m_pfnDWriteCreateFactory;
-	ComPtr<ID2D1Factory>		    m_d2dfactory;
-	ComPtr<IDWriteFactory>		    m_dwriteFactory;
-	ComPtr<IWICImagingFactory>	    m_wicFactory;
+	d2d_create_factory_fn           m_pfnD2D1CreateFactory;
+	dwrite_create_factory_fn        m_pfnDWriteCreateFactory;
+	ComPtr<ID2D1Factory>            m_d2dfactory;
+	ComPtr<IDWriteFactory>          m_dwriteFactory;
+	ComPtr<IWICImagingFactory>      m_wicFactory;
 
 public:
 	font_dwrite() :
@@ -741,7 +741,7 @@ public:
 			HR_RET0(fonts->GetFontFamily(i, family.ReleaseAndGetAddressOf()));
 
 			HR_RET0(family->GetFamilyNames(names.ReleaseAndGetAddressOf()));
-			
+
 			std::unique_ptr<WCHAR[]> name = nullptr;
 			HR_RET0(get_localized_familyname(names, name));
 
@@ -801,7 +801,7 @@ private:
 		// If the default locale is returned, find that locale name, otherwise use "en-us".
 		if (defaultLocaleSuccess)
 			return get_family_for_locale(family_names, localeName, family_name);
-		
+
 		// If locale can't be determined, fall back to US English
 		return get_family_for_locale(family_names, L"en-us", family_name);
 	}

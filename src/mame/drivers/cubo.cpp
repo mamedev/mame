@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, Mariusz Wojcieszek, Ernesto Corvi, Stephh, Dirk Best
+// copyright-holders:Aaron Giles, Mariusz Wojcieszek, Ernesto Corvi, Dirk Best,Stephane Humbert
 /*
 
    Cubo CD32 (additional hardware and games by CD Express, Milan, Italy)

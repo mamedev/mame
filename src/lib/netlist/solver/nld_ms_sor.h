@@ -33,9 +33,7 @@ public:
 	virtual ~matrix_solver_SOR_t() {}
 
 	virtual void vsetup(analog_net_t::list_t &nets) override;
-	ATTR_HOT virtual int vsolve_non_dynamic(const bool newton_raphson);
-protected:
-	ATTR_HOT virtual nl_double vsolve() override;
+	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
 
 private:
 	nl_double m_lp_fact;
@@ -54,14 +52,7 @@ void matrix_solver_SOR_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT nl_double matrix_solver_SOR_t<m_N, _storage_N>::vsolve()
-{
-	this->solve_base(this);
-	return this->compute_next_timestep();
-}
-
-template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT inline int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	const unsigned iN = this->N();
 	bool resched = false;

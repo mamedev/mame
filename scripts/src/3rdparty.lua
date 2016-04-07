@@ -13,7 +13,7 @@
 -- expat library objects
 --------------------------------------------------
 
-if _OPTIONS["with-bundled-expat"] then
+if not _OPTIONS["with-system-expat"] then
 project "expat"
 	uuid "f4cd40b1-c37c-452d-9785-640f26f0bf54"
 	kind "StaticLib"
@@ -26,10 +26,10 @@ project "expat"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd111",  			-- remark #111: statement is unreachable
-			"/Qwd1879", 			-- warning #1879: unimplemented pragma ignored
-			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
-			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
+			"/Qwd111",              -- remark #111: statement is unreachable
+			"/Qwd1879",             -- warning #1879: unimplemented pragma ignored
+			"/Qwd2557",             -- remark #2557: comparison between signed and unsigned operands
+			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
 	configuration { "vs2015" }
@@ -45,7 +45,7 @@ end
 	}
 else
 links {
-	"expat",
+	ext_lib("expat"),
 }
 end
 
@@ -53,7 +53,7 @@ end
 -- zlib library objects
 --------------------------------------------------
 
-if _OPTIONS["with-bundled-zlib"] then
+if not _OPTIONS["with-system-zlib"] then
 project "zlib"
 	uuid "3d78bd2a-2bd0-4449-8087-42ddfaef7ec9"
 	kind "StaticLib"
@@ -76,8 +76,8 @@ project "zlib"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd111",  			-- remark #111: statement is unreachable
-			"/Qwd280",  			-- remark #280: selector expression is constant
+			"/Qwd111",              -- remark #111: statement is unreachable
+			"/Qwd280",              -- remark #280: selector expression is constant
 		}
 end
 	configuration "Debug"
@@ -110,7 +110,7 @@ end
 	}
 else
 links {
-	"z",
+	ext_lib("zlib"),
 }
 end
 
@@ -137,7 +137,7 @@ project "softfloat"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
+			"/Qwd2557",             -- remark #2557: comparison between signed and unsigned operands
 		}
 end
 	configuration { }
@@ -152,7 +152,7 @@ end
 -- libJPEG library objects
 --------------------------------------------------
 
-if _OPTIONS["with-bundled-jpeg"] then
+if not _OPTIONS["with-system-jpeg"] then
 project "jpeg"
 	uuid "447c6800-dcfd-4c48-b72a-a8223bb409ca"
 	kind "StaticLib"
@@ -165,7 +165,7 @@ project "jpeg"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
+			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
 
@@ -221,7 +221,7 @@ end
 	}
 else
 links {
-	"jpeg",
+	ext_lib("jpeg"),
 }
 end
 
@@ -229,7 +229,7 @@ end
 -- libflac library objects
 --------------------------------------------------
 
-if _OPTIONS["with-bundled-flac"] then
+if not _OPTIONS["with-system-flac"] then
 project "flac"
 	uuid "b6fc19e8-073a-4541-bb7b-d24b548d424a"
 	kind "StaticLib"
@@ -243,11 +243,11 @@ project "flac"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd111",  			-- remark #111: statement is unreachable
-			"/Qwd177",  			-- remark #177: function "xxx" was declared but never referenced
-			"/Qwd181",  			-- remark #181: argument of type "UINT32={unsigned int}" is incompatible with format "%d", expecting argument of type "int"
-			"/Qwd188",  			-- error #188: enumerated type mixed with another type
-			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
+			"/Qwd111",              -- remark #111: statement is unreachable
+			"/Qwd177",              -- remark #177: function "xxx" was declared but never referenced
+			"/Qwd181",              -- remark #181: argument of type "UINT32={unsigned int}" is incompatible with format "%d", expecting argument of type "int"
+			"/Qwd188",              -- error #188: enumerated type mixed with another type
+			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
 
@@ -312,7 +312,7 @@ end
 	}
 else
 links {
-	"FLAC",
+	ext_lib("flac"),
 }
 end
 
@@ -330,7 +330,7 @@ project "7z"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
+			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
 	configuration { "vs2015" }
@@ -370,7 +370,7 @@ end
 -- LUA library objects
 --------------------------------------------------
 
-if _OPTIONS["with-bundled-lua"] then
+if not _OPTIONS["with-system-lua"] then
 project "lua"
 	uuid "d9e2eed1-f1ab-4737-a6ac-863700b1a5a9"
 	kind "StaticLib"
@@ -381,7 +381,7 @@ project "lua"
 	-- In addition comment out the "extern "C""
 	-- in lua.hpp and do the same in luaengine.c line 47
 	--options {
-	--	"ForceCPP",
+	--  "ForceCPP",
 	--}
 
 	configuration { "gmake" }
@@ -460,7 +460,7 @@ end
 	}
 else
 links {
-	"lua",
+	ext_lib("lua"),
 }
 end
 
@@ -493,16 +493,11 @@ project "lualibs"
 	includedirs {
 		MAME_DIR .. "3rdparty",
 	}
-	if _OPTIONS["with-bundled-lua"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/lua/src",
-		}
-	end
-	if _OPTIONS["with-bundled-zlib"] then
-		includedirs {
-			MAME_DIR .. "3rdparty/zlib",
-		}
-	end	
+	includedirs {
+		ext_includedir("lua"),
+		ext_includedir("zlib"),
+		ext_includedir("sqlite3"),
+	}
 
 	files {
 		MAME_DIR .. "3rdparty/lsqlite3/lsqlite3.c",
@@ -514,8 +509,8 @@ project "lualibs"
 -- SQLite3 library objects
 --------------------------------------------------
 
-if _OPTIONS["with-bundled-sqlite3"] then
-project "sqllite3"
+if not _OPTIONS["with-system-sqlite3"] then
+project "sqlite3"
 	uuid "5cb3d495-57ed-461c-81e5-80dc0857517d"
 	kind "StaticLib"
 
@@ -529,8 +524,8 @@ project "sqllite3"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
-			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
+			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
+			"/Qwd2557",             -- remark #2557: comparison between signed and unsigned operands
 		}
 end
 	configuration { "pnacl" }
@@ -565,7 +560,7 @@ end
 	}
 else
 links {
-	"sqlite3",
+	ext_lib("sqlite3"),
 }
 end
 
@@ -573,7 +568,7 @@ end
 -- portmidi library objects
 --------------------------------------------------
 if _OPTIONS["NO_USE_MIDI"]~="1" then
-if _OPTIONS["with-bundled-portmidi"] then
+if not _OPTIONS["with-system-portmidi"] then
 project "portmidi"
 	uuid "587f2da6-3274-4a65-86a2-f13ea315bb98"
 	kind "StaticLib"
@@ -592,10 +587,10 @@ project "portmidi"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd188",  			-- error #188: enumerated type mixed with another type
-			"/Qwd344",  			-- remark #344: typedef name has already been declared (with same type)
-			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
-			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
+			"/Qwd188",              -- error #188: enumerated type mixed with another type
+			"/Qwd344",              -- remark #344: typedef name has already been declared (with same type)
+			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
+			"/Qwd2557",             -- remark #2557: comparison between signed and unsigned operands
 		}
 end
 
@@ -652,7 +647,7 @@ end
 	end
 else
 links {
-	"portmidi",
+	ext_lib("portmidi"),
 }
 end
 end
@@ -673,9 +668,9 @@ project "bgfx"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd906",  			-- message #906: effect of this "#pragma pack" directive is local to function "xxx"
-			"/Qwd1879", 			-- warning #1879: unimplemented pragma ignored
-			"/Qwd82",   			-- remark #82: storage class is not first
+			"/Qwd906",              -- message #906: effect of this "#pragma pack" directive is local to function "xxx"
+			"/Qwd1879",             -- warning #1879: unimplemented pragma ignored
+			"/Qwd82",               -- remark #82: storage class is not first
 		}
 end
 	configuration { }
@@ -725,6 +720,7 @@ end
 		buildoptions {
 			"-Wno-uninitialized",
 			"-Wno-unused-function",
+			"-Wno-unused-but-set-variable",
 		}
 	configuration { "rpi" }
 		buildoptions {
@@ -770,14 +766,14 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_ppapi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_wgl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/image.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/ovr.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/hmd_ovr.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d12.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d11.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d9.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_gl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_null.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_vk.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/renderdoc.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/debug_renderdoc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dxbc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dx9bc.cpp",
@@ -793,8 +789,17 @@ end
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/text_metrics.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/utf8.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/ocornut_imgui.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/scintilla.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/ib-compress/indexbuffercompression.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/ib-compress/indexbufferdecompression.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui_demo.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui_draw.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui_node_graph_test.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui_wm.cpp",
 	}
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
@@ -808,7 +813,7 @@ end
 -- PortAudio library objects
 --------------------------------------------------
 
-if _OPTIONS["with-bundled-portaudio"] then
+if not _OPTIONS["with-system-portaudio"] then
 project "portaudio"
 	uuid "0755c5f5-eccf-47f3-98a9-df67018a94d4"
 	kind "StaticLib"
@@ -824,10 +829,10 @@ project "portaudio"
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
-			"/Qwd1478", 			-- warning #1478: function "xxx" (declared at line yyy of "zzz") was declared deprecated
-			"/Qwd2544", 			-- message #2544: empty dependent statement in if-statement
-			"/Qwd1879", 			-- warning #1879: unimplemented pragma ignored
+			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
+			"/Qwd1478",             -- warning #1478: function "xxx" (declared at line yyy of "zzz") was declared deprecated
+			"/Qwd2544",             -- message #2544: empty dependent statement in if-statement
+			"/Qwd1879",             -- warning #1879: unimplemented pragma ignored
 		}
 end
 	configuration { "vs2015" }
@@ -953,7 +958,7 @@ end
 
 else
 links {
-	"portaudio",
+	ext_lib("portaudio"),
 }
 end
 
@@ -961,7 +966,7 @@ end
 -- libuv library objects
 --------------------------------------------------
 if _OPTIONS["USE_LIBUV"]=="1" then
-if _OPTIONS["with-bundled-libuv"] then
+if not _OPTIONS["with-system-uv"] then
 project "uv"
 	uuid "cd2afe7f-139d-49c3-9000-fc9119f3cea0"
 	kind "StaticLib"
@@ -1026,7 +1031,7 @@ project "uv"
 			"WIN32_LEAN_AND_MEAN",
 			"_WIN32_WINNT=0x0502",
 		}
-        if _ACTION == "vs2013" then
+		if _ACTION == "vs2013" then
 			files {
 				MAME_DIR .. "3rdparty/libuv/src/win/snprintf.c",
 			}
@@ -1111,7 +1116,7 @@ project "uv"
 			MAME_DIR .. "3rdparty/libuv/src/unix/proctitle.c",
 		}
 	end
-			
+
 	if _OPTIONS["targetos"]=="android" then
 		defines {
 			"_GNU_SOURCE",
@@ -1129,7 +1134,7 @@ project "uv"
 			MAME_DIR .. "3rdparty/libuv/src/unix/android-ifaddrs.c",
 		}
 	end
-			
+
 	if _OPTIONS["targetos"]=="solaris" then
 		defines {
 			"__EXTENSIONS__",
@@ -1173,7 +1178,7 @@ project "http-parser"
 
 else
 links {
-	"libuv",
+	ext_lib("uv"),
 }
 end
 --------------------------------------------------
@@ -1182,10 +1187,43 @@ end
 if _OPTIONS["with-bundled-sdl2"] then
 project "SDL2"
 	uuid "caab3327-574f-4abf-b25b-74d5238ae59b"
-	kind "StaticLib"
+if _OPTIONS["targetos"]=="android" then
+	kind "SharedLib"
+	targetextension ".so"
+	targetprefix "lib"
+	links {
+		"GLESv1_CM",
+		"GLESv2",
+		"log",
+	}
+	linkoptions {
+		"-Wl,-soname,libSDL2.so"
+	}
 
-	configuration {  }
-	
+	if _OPTIONS["SEPARATE_BIN"]~="1" then
+		if _OPTIONS["PLATFORM"]=="arm" then
+			targetdir(MAME_DIR .. "android-project/app/src/main/libs/armeabi-v7a")
+		end
+		if _OPTIONS["PLATFORM"]=="arm64" then
+			targetdir(MAME_DIR .. "android-project/app/src/main/libs/arm64-v8a")
+		end
+		if _OPTIONS["PLATFORM"]=="mips" then
+			targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips")
+		end
+		if _OPTIONS["PLATFORM"]=="mips64" then
+			targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips64")
+		end
+		if _OPTIONS["PLATFORM"]=="x86" then
+			targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86")
+		end
+		if _OPTIONS["PLATFORM"]=="x64" then
+			targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86_64")
+		end
+	end
+else
+	kind "StaticLib"
+end
+
 	files {
 		MAME_DIR .. "3rdparty/SDL2/include/begin_code.h",
 		MAME_DIR .. "3rdparty/SDL2/include/close_code.h",
@@ -1259,8 +1297,8 @@ project "SDL2"
 		MAME_DIR .. "3rdparty/SDL2/include/SDL_types.h",
 		MAME_DIR .. "3rdparty/SDL2/include/SDL_version.h",
 		MAME_DIR .. "3rdparty/SDL2/include/SDL_video.h",
-		
-		
+
+
 		MAME_DIR .. "3rdparty/SDL2/src/atomic/SDL_atomic.c",
 		MAME_DIR .. "3rdparty/SDL2/src/atomic/SDL_spinlock.c",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/disk/SDL_diskaudio.c",
@@ -1356,7 +1394,6 @@ project "SDL2"
 		MAME_DIR .. "3rdparty/SDL2/src/stdlib/SDL_qsort.c",
 		MAME_DIR .. "3rdparty/SDL2/src/stdlib/SDL_stdlib.c",
 		MAME_DIR .. "3rdparty/SDL2/src/stdlib/SDL_string.c",
-		MAME_DIR .. "3rdparty/SDL2/src/thread/generic/SDL_syscond.c",
 		MAME_DIR .. "3rdparty/SDL2/src/thread/SDL_systhread.h",
 		MAME_DIR .. "3rdparty/SDL2/src/thread/SDL_thread.c",
 		MAME_DIR .. "3rdparty/SDL2/src/thread/SDL_thread_c.h",
@@ -1430,13 +1467,13 @@ project "SDL2"
 			MAME_DIR .. "3rdparty/SDL2/src/render/opengles/SDL_glesfuncs.h",
 		}
 	end
-	
+
 	if _OPTIONS["targetos"]=="android" then
 		files {
 			MAME_DIR .. "3rdparty/SDL2/src/audio/android/SDL_androidaudio.c",
 			MAME_DIR .. "3rdparty/SDL2/src/audio/android/SDL_androidaudio.h",
-			MAME_DIR .. "3rdparty/SDL2/src/core/android/SDL_android.c",	
-			MAME_DIR .. "3rdparty/SDL2/src/core/android/SDL_android.h",	
+			MAME_DIR .. "3rdparty/SDL2/src/core/android/SDL_android.c",
+			MAME_DIR .. "3rdparty/SDL2/src/core/android/SDL_android.h",
 			MAME_DIR .. "3rdparty/SDL2/src/filesystem/android/SDL_sysfilesystem.c",
 			MAME_DIR .. "3rdparty/SDL2/src/haptic/dummy/SDL_syshaptic.c",
 			MAME_DIR .. "3rdparty/SDL2/src/joystick/android/SDL_sysjoystick.c",
@@ -1470,7 +1507,7 @@ project "SDL2"
 			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidwindow.h",
 		}
 	end
-	
+
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
 			MAME_DIR .. "3rdparty/SDL2/src/audio/coreaudio/SDL_coreaudio.c",
@@ -1483,7 +1520,7 @@ project "SDL2"
 			MAME_DIR .. "3rdparty/SDL2/src/joystick/darwin/SDL_sysjoystick.c",
 			MAME_DIR .. "3rdparty/SDL2/src/joystick/darwin/SDL_sysjoystick_c.h",
 			MAME_DIR .. "3rdparty/SDL2/src/loadso/dlopen/SDL_sysloadso.c",
-			MAME_DIR .. "3rdparty/SDL2/src/power/macosx/SDL_syspower.c",			
+			MAME_DIR .. "3rdparty/SDL2/src/power/macosx/SDL_syspower.c",
 			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_syscond.c",
 			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_sysmutex.c",
 			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_sysmutex_c.h",
@@ -1520,6 +1557,7 @@ project "SDL2"
 
 	if _OPTIONS["targetos"]=="windows" then
 		files {
+			MAME_DIR .. "3rdparty/SDL2/src/thread/generic/SDL_syscond.c",
 			MAME_DIR .. "3rdparty/SDL2/src/audio/directsound/SDL_directsound.c",
 			MAME_DIR .. "3rdparty/SDL2/src/audio/directsound/SDL_directsound.h",
 			MAME_DIR .. "3rdparty/SDL2/src/audio/winmm/SDL_winmm.c",
@@ -1577,25 +1615,25 @@ project "SDL2"
 			MAME_DIR .. "3rdparty/SDL2/src/main/windows/version.rc",
 		}
 	end
-		
+
 	configuration { "vs*" }
 		files {
 			MAME_DIR .. "3rdparty/SDL2/src/audio/xaudio2/SDL_xaudio2.c",
 		}
-	
+
 		buildoptions {
 			"/wd4200", -- warning C4200: nonstandard extension used: zero-sized array in struct/union
 			"/wd4055", -- warning C4055: 'type cast': from data pointer 'void *' to function pointer 'xxx'
 			"/wd4152", -- warning C4152: nonstandard extension, function/data pointer conversion in expression
 			"/wd4057", -- warning C4057: 'function': 'xxx' differs in indirection to slightly different base types from 'xxx'
 			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
-			"/wd4204", -- warning C4204: nonstandard extension used: non-constant aggregate initializer	
+			"/wd4204", -- warning C4204: nonstandard extension used: non-constant aggregate initializer
 			"/wd4054", -- warning C4054: 'type cast': from function pointer 'xxx' to data pointer 'xxx'
 		}
 		defines {
 			"HAVE_LIBC",
 		}
-        
+
 	configuration { "mingw*"}
 		includedirs {
 			MAME_DIR .. "3rdparty/SDL2-override/mingw",
@@ -1607,21 +1645,21 @@ project "SDL2"
 			"-Wno-bad-function-cast",
 			"-Wno-discarded-qualifiers",
 			"-Wno-unused-but-set-variable",
-		}		
+		}
 
 	configuration { "osx*"}
 		buildoptions {
 			"-Wno-undef",
-        }
-    	buildoptions_objc {
-    		"-x objective-c",
-	       	"-std=c99",
-    	}
-        
+		}
+		buildoptions_objc {
+			"-x objective-c",
+			"-std=c99",
+		}
+
 		buildoptions_c {
 			"-Wno-bad-function-cast",
-		}		
-		
+		}
+
 	configuration { "android-*"}
 		defines {
 			"GL_GLEXT_PROTOTYPES",
@@ -1631,8 +1669,8 @@ project "SDL2"
 			"-Wno-incompatible-pointer-types-discards-qualifiers",
 			"-Wno-unneeded-internal-declaration",
 			"-Wno-unused-const-variable",
-		}		
-		
+		}
+
 	configuration { }
 		includedirs {
 			MAME_DIR .. "3rdparty/SDL2/include",

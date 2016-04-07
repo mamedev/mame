@@ -311,7 +311,6 @@ static MACHINE_CONFIG_START( galastrm, galastrm_state )
 	MCFG_TC0480SCP_TX_REGION(3)
 	MCFG_TC0480SCP_OFFSETS(-40, -3)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
-	MCFG_TC0480SCP_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)

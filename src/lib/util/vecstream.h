@@ -31,7 +31,6 @@
 #include <vector>
 
 namespace util {
-
 template <typename CharT, typename Traits = std::char_traits<CharT>, typename Allocator = std::allocator<CharT> >
 class basic_vectorbuf : public std::basic_streambuf<CharT, Traits>
 {

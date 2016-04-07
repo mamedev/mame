@@ -3,7 +3,7 @@
 /*
 
   TMS1000 family - TP0320
-  
+
   TODO:
   - lots
 
@@ -88,7 +88,7 @@ void tp0320_cpu_device::device_reset()
 {
 	// common reset
 	tms0980_cpu_device::device_reset();
-	
+
 	// fixed instructionset isn't fully understood yet
 	m_fixed_decode[0x19] = F_XDA;
 	m_fixed_decode[0xb0] = F_TDO;

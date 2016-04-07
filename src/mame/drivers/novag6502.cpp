@@ -3,7 +3,7 @@
 /******************************************************************************
 
     Novag generic 6502 based chess computer driver
-    
+
     TODO:
     - move other Novag sets here when applicable
 
@@ -254,7 +254,7 @@ WRITE8_MEMBER(novag6502_state::supercon_1f_w)
 	// d4-d6: select led row
 	m_led_select = data >> 4 & 7;
 	display_matrix(8, 3, m_led_data, m_led_select);
-	
+
 	// d7: enable beeper
 	m_beeper->set_state(data >> 7 & 1);
 }
@@ -403,9 +403,9 @@ static MACHINE_CONFIG_START( supercon, novag6502_state )
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_8MHz/2)
 	MCFG_CPU_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 600) // guessed
 	MCFG_CPU_PROGRAM_MAP(supercon_mem)
-	
+
 	MCFG_NVRAM_ADD_1FILL("nvram")
-	
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novag6502_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_supercon)
 

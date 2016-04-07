@@ -10,6 +10,12 @@
 #define __WIN_D3DCOMM__
 
 //============================================================
+//  CONSTANTS
+//============================================================
+
+#define MAX_BLOOM_COUNT 15 // shader model 3.0 support up to 16 samplers, but we need the last for the original texture
+
+//============================================================
 //  FORWARD DECLARATIONS
 //============================================================
 
@@ -187,7 +193,7 @@ public:
 			float line_time, float line_length,
 			float prim_width, float prim_height);
 
-    // TODO: Remove needless 'get_' prefix
+	// TODO: Remove needless 'get_' prefix
 	D3DPRIMITIVETYPE        get_type() const { return m_type; }
 	UINT32                  get_count() const { return m_count; }
 	UINT32                  get_vertcount() const { return m_numverts; }
@@ -292,10 +298,10 @@ public:
 	d3d_render_target *next;
 	d3d_render_target *prev;
 
-	surface *bloom_surface[11];
-	texture *bloom_texture[11];
+	surface *bloom_surface[MAX_BLOOM_COUNT];
+	texture *bloom_texture[MAX_BLOOM_COUNT];
 
-	float bloom_dims[11][2];
+	float bloom_dims[MAX_BLOOM_COUNT][2];
 
 	int bloom_count;
 };

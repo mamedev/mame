@@ -93,24 +93,6 @@ public:
 	required_device<palette_device> m_palette;
 };
 
-#define mfish_parent mfish_13
-#define czmon_parent czmon_13
-#define fcockt_parent fcockt_8
-#define lhaunt_parent lhaunt_6
-#define rollfr_parent rollfr_4
-#define garage_parent garage_5
-#define rclimb_parent rclimb_3
-#define sweetl_parent sweetl
-#define resdnt_parent resdnt_6
-#define island_parent island
-#define pirate_parent pirate_3
-#define island2_parent island2
-#define pirate2_parent pirate2
-#define keks_parent keks_2
-#define gnome_parent gnome_9
-#define sweetl2_parent sweetl2
-#define fcockt2_parent fcockt2
-#define crzmon2_parent crzmon2
 
 MACHINE_CONFIG_EXTERN( igrosoft_gamble );
 MACHINE_CONFIG_EXTERN( rollfr );

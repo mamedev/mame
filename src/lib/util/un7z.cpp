@@ -40,41 +40,41 @@ struct CSzFile
 {
 	CSzFile() : currfpos(0), length(0), osdfile() {}
 
-	long            currfpos;
+	std::uint64_t   currfpos;
 	std::uint64_t   length;
 	osd_file::ptr   osdfile;
 
-	WRes read(void *data, std::size_t &size)
+	SRes read(void *data, std::size_t &size)
 	{
 		if (!osdfile)
 		{
 			std::printf("un7z.c: called File_Read without file\n");
-			return 1;
+			return SZ_ERROR_READ;
 		}
 
-		if (!size) return 0;
-		size_t originalSize = size;
+		if (!size)
+			return SZ_OK;
 
-		std::uint32_t read_length;
-		//osd_file::error err =
-		osdfile->read(data, currfpos, originalSize, read_length);
+		// TODO: this casts a size_t to a uint32_t, so it will fail if >=4GB is requested at once (need a loop)
+		std::uint32_t read_length(0);
+		auto const err = osdfile->read(data, currfpos, size, read_length);
 		size = read_length;
 		currfpos += read_length;
 
-		if (size == originalSize)
-			return 0;
-
-		return 0;
+		return (osd_file::error::NONE == err) ? SZ_OK : SZ_ERROR_READ;
 	}
 
-	WRes seek(Int64 &pos, ESzSeek origin)
+	SRes seek(Int64 &pos, ESzSeek origin)
 	{
-		if (origin == 0) currfpos = pos;
-		if (origin == 1) currfpos = currfpos + pos;
-		if (origin == 2) currfpos = length -pos;
-
+		switch (origin)
+		{
+		case SZ_SEEK_CUR: currfpos += pos; break;
+		case SZ_SEEK_SET: currfpos = pos; break;
+		case SZ_SEEK_END: currfpos = length + pos; break;
+		default: return SZ_ERROR_READ;
+		}
 		pos = currfpos;
-		return 0;
+		return SZ_OK;
 	}
 };
 
@@ -124,12 +124,21 @@ public:
 
 	archive_file::error initialize();
 
-	int first_file() { return search(0, 0, std::string(), false, false); }
-	int next_file() { return (m_curr_file_idx < 0) ? -1 : search(m_curr_file_idx + 1, 0, std::string(), false, false); }
+	int first_file() { return search(0, 0, std::string(), false, false, false); }
+	int next_file() { return (m_curr_file_idx < 0) ? -1 : search(m_curr_file_idx + 1, 0, std::string(), false, false, false); }
 
-	int search(std::uint32_t crc) { return search(0, crc, std::string(), true, false); }
-	int search(const std::string &filename) { return search(0, 0, filename, false, true); }
-	int search(std::uint32_t crc, const std::string &filename) { return search(0, crc, filename, true, true); }
+	int search(std::uint32_t crc)
+	{
+		return search(0, crc, std::string(), true, false, false);
+	}
+	int search(const std::string &filename, bool partialpath)
+	{
+		return search(0, 0, filename, false, true, partialpath);
+	}
+	int search(std::uint32_t crc, const std::string &filename, bool partialpath)
+	{
+		return search(0, crc, filename, true, true, partialpath);
+	}
 
 	bool current_is_directory() const { return m_curr_is_dir; }
 	const std::string &current_name() const { return m_curr_name; }
@@ -144,7 +153,13 @@ private:
 	m7z_file_impl &operator=(const m7z_file_impl &) = delete;
 	m7z_file_impl &operator=(m7z_file_impl &&) = delete;
 
-	int search(int i, std::uint32_t search_crc, const std::string &search_filename, bool matchcrc, bool matchname);
+	int search(
+			int i,
+			std::uint32_t search_crc,
+			const std::string &search_filename,
+			bool matchcrc,
+			bool matchname,
+			bool partialpath);
 	void make_utf8_name(int index);
 
 	static constexpr std::size_t        CACHE_SIZE = 8;
@@ -187,9 +202,18 @@ public:
 	virtual int first_file() override { return m_impl->first_file(); }
 	virtual int next_file() override { return m_impl->next_file(); }
 
-	virtual int search(std::uint32_t crc) override { return m_impl->search(crc); }
-	virtual int search(const std::string &filename) override { return m_impl->search(filename); }
-	virtual int search(std::uint32_t crc, const std::string &filename) override { return m_impl->search(crc, filename); }
+	virtual int search(std::uint32_t crc) override
+	{
+		return m_impl->search(crc);
+	}
+	virtual int search(const std::string &filename, bool partialpath) override
+	{
+		return m_impl->search(filename, partialpath);
+	}
+	virtual int search(std::uint32_t crc, const std::string &filename, bool partialpath) override
+	{
+		return m_impl->search(crc, filename, partialpath);
+	}
 
 	virtual bool current_is_directory() const override { return m_impl->current_is_directory(); }
 	virtual const std::string &current_name() const override { return m_impl->current_name(); }
@@ -220,7 +244,6 @@ std::mutex m7z_file_impl::s_cache_mutex;
 /* ---------- FileInStream ---------- */
 
 extern "C" {
-
 static void *SZipAlloc(void *p, std::size_t size)
 {
 	return (size == 0) ? nullptr : std::malloc(size);
@@ -373,7 +396,13 @@ archive_file::error m7z_file_impl::decompress(void *buffer, std::uint32_t length
 }
 
 
-int m7z_file_impl::search(int i, std::uint32_t search_crc, const std::string &search_filename, bool matchcrc, bool matchname)
+int m7z_file_impl::search(
+		int i,
+		std::uint32_t search_crc,
+		const std::string &search_filename,
+		bool matchcrc,
+		bool matchname,
+		bool partialpath)
 {
 	for ( ; i < m_db.db.NumFiles; i++)
 	{
@@ -383,7 +412,11 @@ int m7z_file_impl::search(int i, std::uint32_t search_crc, const std::string &se
 		const std::uint64_t size(f.Size);
 		const std::uint32_t crc(f.Crc);
 		const bool crcmatch(crc == search_crc);
-		const bool namematch(!core_stricmp(search_filename.c_str(), &m_utf8_buf[0]));
+		auto const partialoffset(m_utf8_buf.size() - 1 - search_filename.length());
+		bool const partialpossible((m_utf8_buf.size() > (search_filename.length() + 1)) && (m_utf8_buf[partialoffset - 1] == '/'));
+		const bool namematch(
+				!core_stricmp(search_filename.c_str(), &m_utf8_buf[0]) ||
+				(partialpath && partialpossible && !core_stricmp(search_filename.c_str(), &m_utf8_buf[partialoffset])));
 
 		const bool found = ((!matchcrc && !matchname) || !f.IsDir) && (!matchcrc || crcmatch) && (!matchname || namematch);
 		if (found)

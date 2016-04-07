@@ -3,7 +3,7 @@
 /*
 
   TMS1000 family - base/shared
-  
+
   Don't include this file, include the specific device header instead,
   for example tms1000.h
 

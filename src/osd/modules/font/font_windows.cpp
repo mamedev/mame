@@ -29,7 +29,6 @@
 
 
 namespace {
-
 class osd_font_windows : public osd_font
 {
 public:

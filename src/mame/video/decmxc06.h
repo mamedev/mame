@@ -11,7 +11,6 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_gfx_region(device_t &device, int region);
 	static void set_ram_size(device_t &device, int size)
 	{
@@ -35,7 +34,6 @@ protected:
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 extern const device_type DECO_MXC06;
@@ -43,8 +41,8 @@ extern const device_type DECO_MXC06;
 #define MCFG_DECO_MXC06_GFXDECODE(_gfxtag) \
 	deco_mxc06_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
-#define MCFG_DECO_MXC06_PALETTE(_palette_tag) \
-	deco_mxc06_device::static_set_palette_tag(*device, "^" _palette_tag);
+#define MCFG_DECO_MXC06_GFX_REGION(_region) \
+	deco_mxc06_device::set_gfx_region(*device, _region);
 
 #define MCFG_DECO_MXC06_RAMSIZE(_size) \
 	deco_mxc06_device::set_ram_size(*device, _size);

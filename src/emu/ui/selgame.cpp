@@ -34,13 +34,14 @@
 extern const char UI_VERSION_TAG[];
 
 static bool first_start = true;
-static const char *dats_info[] = { 
-	__("General Info"), 
-	__("History"), 
-	__("Mameinfo"), 
-	__("Sysinfo"), 
-	__("Messinfo"), 
-	__("Command"), 
+static const char *dats_info[] = {
+	__("General Info"),
+	__("History"),
+	__("Mameinfo"),
+	__("Sysinfo"),
+	__("Messinfo"),
+	__("Command"),
+	__("Gameinit"),
 	__("Mamescore") };
 
 std::vector<const game_driver *> ui_menu_select_game::m_sortedlist;
@@ -204,7 +205,10 @@ void ui_menu_select_game::handle()
 	{
 		// reset the error on any future m_event
 		if (ui_error)
+		{
 			ui_error = false;
+			machine().ui_input().reset();
+		}
 
 		// handle selections
 		else if (m_event->iptkey == IPT_UI_SELECT)
@@ -238,7 +242,7 @@ void ui_menu_select_game::handle()
 			// Infos
 			else if (ui_globals::rpanel == RP_INFOS)
 			{
-				if (!isfavorite()) 
+				if (!isfavorite())
 				{
 					const game_driver *drv = (const game_driver *)m_event->itemref;
 					if ((FPTR)drv > skip_main_items && ui_globals::curdats_view > UI_FIRST_LOAD)
@@ -442,8 +446,8 @@ void ui_menu_select_game::handle()
 
 	// if we're in an error state, overlay an error message
 	if (ui_error)
-		machine().ui().draw_text_box(container, _("The selected machine is missing one or more required ROM or CHD images. " 
-			"Please select a different machine.\n\nPress any key (except ESC) to continue."), JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+		machine().ui().draw_text_box(container, _("The selected machine is missing one or more required ROM or CHD images. "
+			"Please select a different machine.\n\nPress any key to continue."), JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 
 	// handle filters selection from key shortcuts
 	if (check_filter)
@@ -582,8 +586,13 @@ void ui_menu_select_game::populate()
 	{
 		UINT32 flags_ui = MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
 		item_append(_("Configure Options"), nullptr, flags_ui, (void *)(FPTR)CONF_OPTS);
-		item_append(_("Configure Machine"), nullptr, flags_ui, (void *)(FPTR)CONF_MACHINE);
-		skip_main_items = 2;
+//      item_append(_("Configure Machine"), nullptr, flags_ui, (void *)(FPTR)CONF_MACHINE); TODO
+		skip_main_items = 1;
+		if (machine().options().plugins())
+		{
+			item_append(_("Plugins"), nullptr, flags_ui, (void *)(FPTR)CONF_PLUGINS);
+			skip_main_items++;
+		}
 	}
 	else
 		skip_main_items = 0;
@@ -805,7 +814,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	// draw the text within it
 	for (int line = 0; line < 2; ++line)
 	{
-		mui.draw_text_full(container, tempbuf[line].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER, 
+		mui.draw_text_full(container, tempbuf[line].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 			DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
 		y1 += mui.get_line_height();
 	}
@@ -862,7 +871,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		color = UI_GREEN_COLOR;
 
 		if ((driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS
-		    | MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)) != 0)
+			| MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)) != 0)
 			color = UI_YELLOW_COLOR;
 
 		if ((driver->flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION)) != 0)
@@ -930,7 +939,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 
 	for (auto & elem : tempbuf)
 	{
-		mui.draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER, 
+		mui.draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
 			DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
@@ -1003,13 +1012,18 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *m_event)
 	// special case for configure options
 	if ((FPTR)driver == CONF_OPTS)
 		ui_menu::stack_push(global_alloc_clear<ui_menu_game_options>(machine(), container));
-	// special case for configure machine
+	/* special case for configure machine TODO
 	else if ((FPTR)driver == CONF_MACHINE)
 	{
-		if (m_prev_selected != nullptr)
-			ui_menu::stack_push(global_alloc_clear<ui_menu_machine_configure>(machine(), container, (const game_driver *)m_prev_selected));
-		else
-			return;
+	    if (m_prev_selected != nullptr)
+	        ui_menu::stack_push(global_alloc_clear<ui_menu_machine_configure>(machine(), container, (const game_driver *)m_prev_selected));
+	    else
+	        return;
+	} */
+	// special case for configure plugins
+	else if ((FPTR)driver == CONF_PLUGINS)
+	{
+		ui_menu::stack_push(global_alloc_clear<ui_menu_plugins_configure>(machine(), container));
 	}
 	// anything else is a driver
 	else
@@ -1027,7 +1041,7 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *m_event)
 			{
 				software_list_device_iterator iter(enumerator.config().root_device());
 				for (software_list_device *swlistdev = iter.first(); swlistdev != nullptr; swlistdev = iter.next())
-					if (swlistdev->first_software_info() != nullptr)
+					if (!swlistdev->get_info().empty())
 					{
 						ui_menu::stack_push(global_alloc_clear<ui_menu_select_software>(machine(), container, driver));
 						return;
@@ -1068,17 +1082,22 @@ void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 	// special case for configure options
 	if ((FPTR)ui_swinfo == CONF_OPTS)
 		ui_menu::stack_push(global_alloc_clear<ui_menu_game_options>(machine(), container));
-	// special case for configure machine
+	/* special case for configure machine TODO
 	else if ((FPTR)ui_swinfo == CONF_MACHINE)
 	{
-		if (m_prev_selected != nullptr)
-		{
-			ui_software_info *swinfo = (ui_software_info *)m_prev_selected;
-			if (swinfo->startempty == 1)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_machine_configure>(machine(), container, swinfo->driver));
-		}
-		else
-			return;
+	    if (m_prev_selected != nullptr)
+	    {
+	        ui_software_info *swinfo = (ui_software_info *)m_prev_selected;
+	        if (swinfo->startempty == 1)
+	            ui_menu::stack_push(global_alloc_clear<ui_menu_machine_configure>(machine(), container, swinfo->driver));
+	    }
+	    else
+	        return;
+	} */
+	// special case for configure plugins
+	else if ((FPTR)ui_swinfo == CONF_PLUGINS)
+	{
+		ui_menu::stack_push(global_alloc_clear<ui_menu_plugins_configure>(machine(), container));
 	}
 	else if (ui_swinfo->startempty == 1)
 	{
@@ -1133,14 +1152,14 @@ void ui_menu_select_game::inkey_select_favorite(const ui_menu_event *m_event)
 			else if (!mopt.skip_parts_menu() && swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
 			{
 				s_parts parts;
-				for (const software_part *swpart = swinfo->first_part(); swpart != nullptr; swpart = swpart->next())
+				for (const software_part &swpart : swinfo->parts())
 				{
-					if (swpart->matches_interface(ui_swinfo->interface.c_str()))
+					if (swpart.matches_interface(ui_swinfo->interface.c_str()))
 					{
-						std::string menu_part_name(swpart->name());
-						if (swpart->feature("part_id") != nullptr)
-							menu_part_name.assign("(").append(swpart->feature("part_id")).append(")");
-						parts.emplace(swpart->name(), menu_part_name);
+						std::string menu_part_name(swpart.name());
+						if (swpart.feature("part_id") != nullptr)
+							menu_part_name.assign("(").append(swpart.feature("part_id")).append(")");
+						parts.emplace(swpart.name(), menu_part_name);
 					}
 				}
 				ui_menu::stack_push(global_alloc_clear<ui_software_parts>(machine(), container, parts, ui_swinfo));
@@ -1499,7 +1518,7 @@ void ui_menu_select_game::populate_search()
 			if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 				cloneof = false;
 		}
-		item_append(m_searchlist[curitem]->description, nullptr, (!cloneof) ? flags_ui : (MENU_FLAG_INVERT | flags_ui), 
+		item_append(m_searchlist[curitem]->description, nullptr, (!cloneof) ? flags_ui : (MENU_FLAG_INVERT | flags_ui),
 			(void *)m_searchlist[curitem]);
 	}
 }
@@ -1852,7 +1871,7 @@ float ui_menu_select_game::draw_left_panel(float x1, float y1, float x2, float y
 				convert_command_glyph(str);
 			}
 
-			mui.draw_text_full(container, str.c_str(), x1t, y1, x2 - x1, JUSTIFY_LEFT, WRAP_NEVER, 
+			mui.draw_text_full(container, str.c_str(), x1t, y1, x2 - x1, JUSTIFY_LEFT, WRAP_NEVER,
 				DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
 			y1 += line_height_max;
 		}
@@ -1962,7 +1981,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 
 		for (int x = UI_FIRST_LOAD; x < UI_LAST_LOAD; ++x)
 		{
-			mui.draw_text_full(container, _(dats_info[x]), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, 
+			mui.draw_text_full(container, _(dats_info[x]), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
 				WRAP_NEVER, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_length, nullptr);
 			txt_length += 0.01f;
 			title_size = (std::max)(txt_length, title_size);
@@ -2024,7 +2043,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 
 		if (buffer.empty())
 		{
-			mui.draw_text_full(container, _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, JUSTIFY_CENTER, 
+			mui.draw_text_full(container, _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, JUSTIFY_CENTER,
 				WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 			return;
 		}
@@ -2078,7 +2097,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 						JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &item_width, nullptr, tmp_size);
 
 					mui.draw_text_full(container, last_part.c_str(), effective_left + item_width, oy1,
-						origx2 - origx1 - 2.0f * gutter_width - item_width, JUSTIFY_RIGHT, WRAP_TRUNCATE, 
+						origx2 - origx1 - 2.0f * gutter_width - item_width, JUSTIFY_RIGHT, WRAP_TRUNCATE,
 						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size);
 				}
 			}
@@ -2098,18 +2117,18 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 					std::string first_part(tempbuf.substr(0, first_dspace));
 					std::string last_part(tempbuf.substr(first_dspace + 1));
 					strtrimspace(last_part);
-					mui.draw_text_full(container, first_part.c_str(), effective_left, oy1, effective_width, JUSTIFY_LEFT, 
+					mui.draw_text_full(container, first_part.c_str(), effective_left, oy1, effective_width, JUSTIFY_LEFT,
 						WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size);
 
-					mui.draw_text_full(container, last_part.c_str(), effective_left, oy1, origx2 - origx1 - 2.0f * gutter_width, 
+					mui.draw_text_full(container, last_part.c_str(), effective_left, oy1, origx2 - origx1 - 2.0f * gutter_width,
 						JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size);
 				}
 				else
-					mui.draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, JUSTIFY_LEFT, 
+					mui.draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, JUSTIFY_LEFT,
 						WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size);
 			}
 			else
-				mui.draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, JUSTIFY_LEFT, 
+				mui.draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, JUSTIFY_LEFT,
 					WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
 
 			oy1 += (line_height * text_size);
@@ -2212,7 +2231,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 			else if (r == r_visible_lines - 1 && itemline != totallines - 1)
 				info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
 			else
-				mui.draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, JUSTIFY_LEFT, 
+				mui.draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, JUSTIFY_LEFT,
 					WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
 			oy1 += (line_height * text_size);
 		}

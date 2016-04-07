@@ -21,7 +21,7 @@ class osd_options;
 class target_reader : public state_reader
 {
 public:
-	static bool read_from_value(const Value& value, std::string prefix, target_manager& targets, osd_options& options, uint32_t screen_width, uint32_t screen_height);
+	static bool read_from_value(const Value& value, std::string prefix, target_manager& targets, osd_options& options, uint32_t screen_index);
 
 private:
 	static bool validate_parameters(const Value& value, std::string prefix);

@@ -86,33 +86,6 @@
          - Native mode (Armadillo mode): Devices are located at positions above
            0xF000 that allow for a contiguous usage of memory.
 
-
-    ROM contents
-    ------------
-    The ROM0 chip is accessible at addresses 0000-1FFF in the logical address
-    space of the compatibility mode. It contains the GPL interpreter. In
-    native mode the ROM0 chip is invisible.
-
-      ROM0
-      offset  Logical address     Name
-      -----------------------------------
-      0000    0000-1FFF           ROM0
-
-
-    The ROM1 chip contains 32 KiB of various system software. It is located in
-    the physical address space, so it must be mapped into the logical address
-    space by defining an appropriate map.
-
-      ROM1
-      offset  Physical address            Name
-      ----------------------------------------------------------
-      0000    FFA000-FFDFFF               ROM1
-      4000    FF4000-FF5FFF @CRU>2700     Text-to-speech ROM/DSR
-      6000    FF4000-FF5FFF @CRU>1700     Hexbus DSR
-
-    The DSR portions have to be selected via the CRU bits >1700 or >2700.
-
-
     Mapper
     ------
     The mapper uses 4K pages (unlike the Geneve mapper with 8K pages) which
@@ -200,22 +173,27 @@ Known Issues (MZ, 2010-11-07)
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
 
+#include "bus/ti99x/ti99defs.h"
+
 #include "sound/sn76496.h"
 #include "sound/wave.h"
 #include "machine/tms9901.h"
+#include "machine/tmc0430.h"
 #include "imagedev/cassette.h"
 
 #include "bus/ti99x/998board.h"
 #include "bus/ti99x/videowrp.h"
-#include "bus/ti99x/grom.h"
 #include "bus/ti99x/gromport.h"
 #include "bus/ti99x/joyport.h"
 
 #include "bus/ti99_peb/peribox.h"
 
+#include "softlist.h"
+
 // Debugging
 #define TRACE_READY 0
 #define TRACE_INTERRUPTS 0
+#define TRACE_RESET 0
 #define TRACE_CRU 0
 
 /*
@@ -228,7 +206,8 @@ enum
 	READY_PBOX = 4,
 	READY_SOUND = 8,
 	READY_CART = 16,
-	READY_SPEECH = 32
+	READY_SPEECH = 32,
+	READY_MAINBOARD = 64
 };
 
 class ti99_8_state : public driver_device
@@ -242,8 +221,7 @@ public:
 		m_peribox(*this, PERIBOX_TAG),
 		m_mainboard(*this, MAINBOARD8_TAG),
 		m_joyport(*this, JOYPORT_TAG),
-		m_video(*this, VIDEO_SYSTEM_TAG),
-		m_cassette(*this, "cassette") { }
+		m_cassette(*this, "cassette") { };
 
 	// Machine management
 	DECLARE_MACHINE_START(ti99_8);
@@ -254,16 +232,16 @@ public:
 	DECLARE_WRITE8_MEMBER( cruwrite );
 	DECLARE_WRITE8_MEMBER( external_operation );
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
+	DECLARE_WRITE_LINE_MEMBER( dbin_line );
 
 	// Connections from outside towards the CPU (callbacks)
-	DECLARE_WRITE_LINE_MEMBER( console_ready_mapper );
-	DECLARE_WRITE_LINE_MEMBER( console_ready_sound );
-	DECLARE_WRITE_LINE_MEMBER( console_ready_pbox );
-	DECLARE_WRITE_LINE_MEMBER( console_ready_cart );
-	DECLARE_WRITE_LINE_MEMBER( console_ready_grom );
-	DECLARE_WRITE_LINE_MEMBER( console_ready_speech );
+	DECLARE_WRITE_LINE_MEMBER( console_ready );
 	DECLARE_WRITE_LINE_MEMBER( console_reset );
+	DECLARE_WRITE_LINE_MEMBER( cpu_hold );
 	DECLARE_WRITE_LINE_MEMBER( notconnected );
+
+	// GROM clock (coming from Vaquerro)
+	DECLARE_WRITE_LINE_MEMBER( gromclk_in );
 
 	// Connections with the system interface chip 9901
 	DECLARE_WRITE_LINE_MEMBER( extint );
@@ -275,8 +253,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(keyC1);
 	DECLARE_WRITE_LINE_MEMBER(keyC2);
 	DECLARE_WRITE_LINE_MEMBER(keyC3);
-	DECLARE_WRITE_LINE_MEMBER(CRUS);
-	DECLARE_WRITE_LINE_MEMBER(PTGEN);
 	DECLARE_WRITE_LINE_MEMBER(audio_gate);
 	DECLARE_WRITE_LINE_MEMBER(cassette_output);
 	DECLARE_WRITE_LINE_MEMBER(cassette_motor);
@@ -288,9 +264,7 @@ private:
 	int     m_keyboard_column;
 
 	// READY handling
-	int     m_nready_combined;
-	int     m_nready_prev;
-	void    console_ready_join(int id, int state);
+	line_state m_ready_old;
 
 	// Latch for 9901 INT2, INT1 lines
 	line_state  m_int1;
@@ -303,7 +277,6 @@ private:
 	required_device<peribox_device>     m_peribox;
 	required_device<mainboard8_device>  m_mainboard;
 	required_device<joyport_device>     m_joyport;
-	required_device<ti_video_device>    m_video;
 	required_device<cassette_image_device> m_cassette;
 };
 
@@ -312,7 +285,7 @@ private:
     job to the mapper completely.
 */
 static ADDRESS_MAP_START(memmap, AS_PROGRAM, 8, ti99_8_state)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(MAINBOARD8_TAG, mainboard8_device, readm, writem )
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(MAINBOARD8_TAG, mainboard8_device, read, write) AM_DEVSETOFFSET(MAINBOARD8_TAG, mainboard8_device, setoffset)
 ADDRESS_MAP_END
 
 /*
@@ -432,89 +405,6 @@ static INPUT_PORTS_START(ti99_8)
 
 INPUT_PORTS_END
 
-/*****************************************************************************
-    Components
-******************************************************************************/
-#define region_sysgrom "sysgrom"
-
-static GROM_CONFIG(grom0_config)
-{
-	false, 0, region_sysgrom, 0x0000, 0x1800, GROMFREQ
-};
-
-static GROM_CONFIG(grom1_config)
-{
-	false, 1, region_sysgrom, 0x2000, 0x1800, GROMFREQ
-};
-
-static GROM_CONFIG(grom2_config)
-{
-	false, 2, region_sysgrom, 0x4000, 0x1800, GROMFREQ
-};
-
-/****************************************************
-    PASCAL groms, 3 libraries @ 8 GROMs
-    Do some macro tricks to keep writing effort low
-*****************************************************/
-
-#define region_gromlib1 "gromlib1"
-#define region_gromlib2 "gromlib2"
-#define region_gromlib3 "gromlib3"
-
-#define MCFG_GROM_LIBRARY_ADD8(_tag, _config)    \
-	MCFG_DEVICE_ADD(#_tag "0", GROM, 0) \
-	MCFG_DEVICE_CONFIG(_config##0) \
-	MCFG_DEVICE_ADD(#_tag "1", GROM, 0) \
-	MCFG_DEVICE_CONFIG(_config##1) \
-	MCFG_DEVICE_ADD(#_tag "2", GROM, 0) \
-	MCFG_DEVICE_CONFIG(_config##2) \
-	MCFG_DEVICE_ADD(#_tag "3", GROM, 0) \
-	MCFG_DEVICE_CONFIG(_config##3) \
-	MCFG_DEVICE_ADD(#_tag "4", GROM, 0) \
-	MCFG_DEVICE_CONFIG(_config##4) \
-	MCFG_DEVICE_ADD(#_tag "5", GROM, 0) \
-	MCFG_DEVICE_CONFIG(_config##5) \
-	MCFG_DEVICE_ADD(#_tag "6", GROM, 0) \
-	MCFG_DEVICE_CONFIG(_config##6) \
-	MCFG_DEVICE_ADD(#_tag "7", GROM, 0) \
-	MCFG_DEVICE_CONFIG(_config##7)
-
-#define MCFG_GROM_LIBRARY_ADD3(_tag, _config)    \
-	MCFG_DEVICE_ADD(#_tag "0", GROM, 0) \
-	MCFG_DEVICE_CONFIG(_config##0) \
-	MCFG_DEVICE_ADD(#_tag "1", GROM, 0) \
-	MCFG_DEVICE_CONFIG(_config##1) \
-	MCFG_DEVICE_ADD(#_tag "2", GROM, 0) \
-	MCFG_DEVICE_CONFIG(_config##2)
-
-#define GROM_LIBRARY_CONFIG8(_conf, _region) \
-static GROM_CONFIG(_conf##0) \
-{   false, 0, _region, 0x0000, 0x1800, GROMFREQ }; \
-static GROM_CONFIG(_conf##1) \
-{   false, 1, _region, 0x2000, 0x1800, GROMFREQ }; \
-static GROM_CONFIG(_conf##2) \
-{   false, 2, _region, 0x4000, 0x1800, GROMFREQ }; \
-static GROM_CONFIG(_conf##3) \
-{   false, 3, _region, 0x6000, 0x1800, GROMFREQ }; \
-static GROM_CONFIG(_conf##4) \
-{   false, 4, _region, 0x8000, 0x1800, GROMFREQ }; \
-static GROM_CONFIG(_conf##5) \
-{   false, 5, _region, 0xa000, 0x1800, GROMFREQ }; \
-static GROM_CONFIG(_conf##6) \
-{   false, 6, _region, 0xc000, 0x1800, GROMFREQ }; \
-static GROM_CONFIG(_conf##7) \
-{   false, 7, _region, 0xe000, 0x1800, GROMFREQ };
-
-#define GROM_LIBRARY_CONFIG3(_conf, _region) \
-static GROM_CONFIG(_conf##0) \
-{   false, 0, _region, 0x0000, 0x1800, GROMFREQ }; \
-static GROM_CONFIG(_conf##1) \
-{   false, 1, _region, 0x2000, 0x1800, GROMFREQ }; \
-static GROM_CONFIG(_conf##2) \
-{   false, 2, _region, 0x4000, 0x1800, GROMFREQ };
-GROM_LIBRARY_CONFIG8(pascal1, region_gromlib1)
-GROM_LIBRARY_CONFIG8(pascal2, region_gromlib2)
-GROM_LIBRARY_CONFIG3(pascal3, region_gromlib3)
 
 READ8_MEMBER( ti99_8_state::cruread )
 {
@@ -661,33 +551,6 @@ WRITE_LINE_MEMBER( ti99_8_state::keyC3 )
 }
 
 /*
-    Set 99/4A compatibility mode (CRUS=1)
-*/
-WRITE_LINE_MEMBER( ti99_8_state::CRUS )
-{
-	m_mainboard->CRUS_set(state==ASSERT_LINE);
-
-	// In Armadillo mode, GROMs are located at f830; accordingly, the
-	// gromport must be reconfigured
-	if (state==ASSERT_LINE)
-	{
-		m_gromport->set_grom_base(0x9800, 0xfbf1);
-	}
-	else
-	{
-		m_gromport->set_grom_base(0xf830, 0xfff1);
-	}
-}
-
-/*
-    Set mapper /PTGEN. This is negative logic; we use PTGE as the positive logic signal.
-*/
-WRITE_LINE_MEMBER( ti99_8_state::PTGEN )
-{
-	m_mainboard->PTGE_set(state==CLEAR_LINE);
-}
-
-/*
     Control cassette tape unit motor (P6)
 */
 WRITE_LINE_MEMBER( ti99_8_state::cassette_motor )
@@ -723,11 +586,11 @@ WRITE8_MEMBER( ti99_8_state::tms9901_interrupt )
 /*****************************************************************************/
 
 /*
-    set the state of TMS9901's INT2 (called by the tms9928 core)
+    set the state of TMS9901's INT2 (called by the VDP)
 */
 WRITE_LINE_MEMBER( ti99_8_state::video_interrupt )
 {
-	if (TRACE_INTERRUPTS) logerror("ti99_8: VDP int 2 on tms9901, level=%02x\n", state);
+	if (TRACE_INTERRUPTS) logerror("VDP int 2 on tms9901, level=%02x\n", state);
 	m_int2 = (line_state)state;
 	m_tms9901->set_single_int(2, state);
 }
@@ -737,82 +600,59 @@ WRITE_LINE_MEMBER( ti99_8_state::video_interrupt )
 ***********************************************************/
 
 /*
-    We combine the incoming READY signals and propagate them to the CPU.
-    An alternative would be to let the CPU get the READY state, but this would
-    be a much higher overhead, as this happens in each clock tick.
+    Propagate READY signals to the CPU.
 */
-void ti99_8_state::console_ready_join(int id, int state)
+void ti99_8_state::console_ready(int state)
 {
-	if (state==CLEAR_LINE)
-		m_nready_combined |= id;
-	else
-		m_nready_combined &= ~id;
-
 	if (TRACE_READY)
 	{
-		if (m_nready_prev != m_nready_combined) logerror("ti99_8: READY bits = %04x\n", ~m_nready_combined);
+		if (m_ready_old != state) logerror("READY = %d\n", state);
 	}
 
-	m_nready_prev = m_nready_combined;
-	m_cpu->set_ready(m_nready_combined==0);
+	m_ready_old = (line_state)state;
+	m_cpu->ready_line(state);
 }
 
 /*
-    Connections to the READY line. This might look a bit ugly; we need an
-    implementation of a "Wired AND" device.
-*/
-WRITE_LINE_MEMBER( ti99_8_state::console_ready_grom )
-{
-	console_ready_join(READY_GROM, state);
-}
-
-WRITE_LINE_MEMBER( ti99_8_state::console_ready_mapper )
-{
-	console_ready_join(READY_MAPPER, state);
-}
-
-WRITE_LINE_MEMBER( ti99_8_state::console_ready_pbox )
-{
-	console_ready_join(READY_PBOX, state);
-}
-
-WRITE_LINE_MEMBER( ti99_8_state::console_ready_sound )
-{
-	console_ready_join(READY_SOUND, state);
-}
-
-WRITE_LINE_MEMBER( ti99_8_state::console_ready_cart )
-{
-	console_ready_join(READY_CART, state);
-}
-
-WRITE_LINE_MEMBER( ti99_8_state::console_ready_speech )
-{
-	console_ready_join(READY_SPEECH, state);
-}
-
-/*
-    The RESET line leading to a reset of the CPU.
+    Enqueue a RESET signal.
 */
 WRITE_LINE_MEMBER( ti99_8_state::console_reset )
 {
+	if (TRACE_RESET) logerror("Incoming RESET line = %d\n", state);
 	if (machine().phase() != MACHINE_PHASE_INIT)
 	{
-		m_cpu->set_input_line(INT_9995_RESET, state);
-		m_video->reset_vdp(state);
+		// RESET the 9901
+		m_tms9901->rst1_line(state);
+
+		// Pull up the CRUS and PTGEN lines (9901 outputs have been deactivated, pull-up resistors on the board show effect)
+		m_mainboard->crus_in(TRUE); // assert
+		m_mainboard->ptgen_in(TRUE); // clear
+
+		// Setting ready to false so that automatic wait states are enabled
+		m_cpu->ready_line(CLEAR_LINE);
+		m_cpu->reset_line(ASSERT_LINE);
 	}
+}
+
+/*
+    The HOLD line leading to the CPU entering the HOLD state.
+*/
+WRITE_LINE_MEMBER( ti99_8_state::cpu_hold )
+{
+	if (TRACE_INTERRUPTS) logerror("Incoming HOLD line = %d\n", state);
+	m_cpu->hold_line(state);
 }
 
 WRITE_LINE_MEMBER( ti99_8_state::extint )
 {
-	if (TRACE_READY) logerror("ti99_8: EXTINT level = %02x\n", state);
+	if (TRACE_INTERRUPTS) logerror("EXTINT level = %02x\n", state);
 	m_int1 = (line_state)state;
 	m_tms9901->set_single_int(1, state);
 }
 
 WRITE_LINE_MEMBER( ti99_8_state::notconnected )
 {
-	if (TRACE_READY) logerror("ti99_8: Setting a not connected line ... ignored\n");
+	if (TRACE_INTERRUPTS) logerror("Setting a not connected line ... ignored\n");
 }
 
 WRITE8_MEMBER( ti99_8_state::external_operation )
@@ -821,7 +661,7 @@ WRITE8_MEMBER( ti99_8_state::external_operation )
 	if (offset == IDLE_OP) return;
 	else
 	{
-		logerror("ti99_4x: External operation %s not implemented on TI-99/8 board\n", extop[offset]);
+		logerror("External operation %s not implemented on TI-99/8 board\n", extop[offset]);
 	}
 }
 
@@ -833,132 +673,34 @@ WRITE_LINE_MEMBER( ti99_8_state::clock_out )
 	m_mainboard->clock_in(state);
 }
 
-/*****************************************************************************/
-
 /*
-    Format:
-    Name, mode, stop, mask, select, write, read8z function, write8 function
-
-    Multiple devices may have the same select pattern; as in the real hardware,
-    care must be taken that only one device actually responds. In the case of
-    GROMs, each chip has an internal address counter and an ID, and the chip
-    only responds when the ID and the most significant 3 bits match.
-
-    NATIVE <-> CRUS=0
-    TI99EM <-> CRUS=1
-
-    PATGEN <-> PTGEN=1
-
-    CONT: Mapper continues iterating through devices
-    STOP: Mapper stops iterating when found
-
-    Access to the mapper registers is done directly in the mapper, not via
-    this list.
-
-    TODO: This should (must) be improved in terms of performance. Every single
-    memory access goes through the mapper. Either we use an ordered search list,
-    or we order the entries according to their frequency.
-    (I did this right now, putting the Pascal GROMs at the end.)
-    We should think about a set entry where devices with the same address
-    are collected as one single entry (think about the Pascal lib with 21 GROMs,
-    twice eight and once three of them on the same address).
+   Data bus in (DBIN) line from the CPU.
 */
-
-#define PASCAL_GROM_LIB8(_tag, _addr) \
-	{ _tag "0",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },   \
-	{ _tag "1",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },   \
-	{ _tag "2",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },   \
-	{ _tag "3",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },   \
-	{ _tag "4",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },   \
-	{ _tag "5",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },   \
-	{ _tag "6",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },   \
-	{ _tag "7",     PATGEN, CONT, _addr, 0xfff1, 0x0000    }
-
-#define PASCAL_GROM_LIB3(_tag, _addr) \
-	{ _tag "0",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },   \
-	{ _tag "1",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },   \
-	{ _tag "2",     PATGEN, CONT, _addr, 0xfff1, 0x0000    }
-
-
-static const mapper8_list_entry mapper_devices[] =
+WRITE_LINE_MEMBER( ti99_8_state::dbin_line )
 {
-	// TI-99/4A mode (CRUS=1)
-	// Full/partial decoding has been verified on a real machine
-	// GROMs: According to the spec, the 99/8 supports up to 4 GROM libraries
-	// (99/4A supports 256 libraries)
-	// at 9800, 9804, 9808, 980c. Address counter access is at 9802,6,a,e. Write access +0400.
-	{ ROM0NAME,         TI99EM, STOP, 0x0000, 0xe000, 0x0000    },  // 0000-1fff
-	{ TISOUND_TAG,      TI99EM, STOP, 0x8400, 0xfff1, 0x0000    },  // 8400-840f
-	{ VIDEO_SYSTEM_TAG, TI99EM, STOP, 0x8800, 0xfff1, 0x0400    },  // 8800,8802 / 8c00,8c02
-	{ SPEECH_TAG,       TI99EM, STOP, 0x9000, 0xfff1, 0x0400    },  // 9000-900f / 9400-940f
-	{ SRAMNAME,         TI99EM, STOP, 0x8000, 0xf800, 0x0000    },  // 8000-87ff; must follow the sound generator
-	{ MAINBOARD8_TAG,   TI99EM, STOP, 0x8810, 0xfff0, 0x0000    },
-
-	{ GROM0_TAG,        TI99EM, CONT, 0x9800, 0xfff1, 0x0400    },  // 9800,2,4,...e/9c00,2,4,...e
-	{ GROM1_TAG,        TI99EM, CONT, 0x9800, 0xfff1, 0x0400    },  // dto.
-	{ GROM2_TAG,        TI99EM, CONT, 0x9800, 0xfff1, 0x0400    },  // dto. (GROMs are connected in parallel,
-	{ GROMPORT_TAG,     TI99EM, CONT, 0x9800, 0xfff1, 0x0400    },  // dto.  use internal address counter and id)
-
-	// TI-99/8 mode
-	// Full/partial decoding has been verified on a real machine
-	// Sound ports are at f800, f802, f804, ..., f80e
-	// VDP ports are (f810,f812), (f814,f816), (f818,f81a), (f81c,f81e)
-	// Note that unmapped GROM accesses (odd addresses like F831) return FF,
-	// not 00 as in our emulation, so that is not quite consistent, but tolerable ... I guess
-
-	{ SRAMNAME,         NATIVE, STOP, 0xf000, 0xf800, 0x0000    },  // f000-f7ff
-	{ TISOUND_TAG,      NATIVE, STOP, 0xf800, 0xfff1, 0x0000    },  // f800-f80e (even addresses)
-	{ VIDEO_SYSTEM_TAG, NATIVE, STOP, 0xf810, 0xfff1, 0x0000    },  // f810,2 (unlike 99/4A, no different read/write ports)
-	{ SPEECH_TAG,       NATIVE, STOP, 0xf820, 0xfff1, 0x0000    },  // f820-f82f
-	{ MAINBOARD8_TAG,   NATIVE, STOP, 0xf870, 0xfff0, 0x0000    },
-
-	{ GROM0_TAG,        NATIVE, CONT, 0xf830, 0xfff1, 0x0000    },  // f830-f83e (4 banks), no different read/write ports
-	{ GROM1_TAG,        NATIVE, CONT, 0xf830, 0xfff1, 0x0000    },
-	{ GROM2_TAG,        NATIVE, CONT, 0xf830, 0xfff1, 0x0000    },
-	{ GROMPORT_TAG,     NATIVE, CONT, 0xf830, 0xfff1, 0x0000    },
-
-	PASCAL_GROM_LIB8("pascal1_grom", 0xf840),
-	PASCAL_GROM_LIB8("pascal2_grom", 0xf850),
-	PASCAL_GROM_LIB3("pascal3_grom", 0xf860),
-
-	// Physical (need to pack this in here as well to keep config simple)
-	// but these lines will be put into a separate list
-	{ DRAMNAME,         PHYSIC, STOP, 0x000000, 0xff0000, 0x000000  },  // 000000-00ffff 64 KiB DRAM
-	{ PCODENAME,        PHYSIC, STOP, 0xf00000, 0xffc000, 0x000000  },  // f00000-f03fff P-Code ROM
-	{ MAINBOARD8_TAG,   PHYSIC, CONT, 0xff4000, 0xffe000, 0x000000  },  // ff4000-ff5fff Internal DSR
-	{ GROMPORT_TAG,     PHYSIC, STOP, 0xff6000, 0xffe000, 0x000000  },  // ff6000-ff7fff Cartridge ROM space
-	{ GROMPORT_TAG,     PHYSIC, STOP, 0xff8000, 0xffe000, 0x000000  },  // ff8000-ff9fff Cartridge ROM space
-	{ ROM1A0NAME,       PHYSIC, STOP, 0xffa000, 0xffe000, 0x000000  },  // ffa000-ffbfff ROM1
-	{ ROM1C0NAME,       PHYSIC, STOP, 0xffc000, 0xffe000, 0x000000  },  // ffc000-ffdfff ROM1
-	{ INTSNAME,         PHYSIC, STOP, 0xffe000, 0xfffff0, 0x000000  },  // ffe000-ffe00f Interrupt level sense
-	{ PERIBOX_TAG,      PHYSIC, STOP, 0x000000, 0x000000, 0x000000  },  // Peripheral Expansion Box
-
-	{ nullptr, 0, 0, 0, 0, 0  }
-};
-
-static MAPPER8_CONFIG( mapper_conf )
-{
-	mapper_devices
-};
+	m_mainboard->dbin_in(state);
+}
 
 MACHINE_START_MEMBER(ti99_8_state,ti99_8)
 {
-	m_nready_combined = 0;
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
+	// m_mainboard->set_gromport(m_gromport);
+
+	// Need to configure the speech ROM for inverse bit order
+	speechrom_device* mem = subdevice<speechrom_device>(SPEECHROM_REG);
+	mem->set_reverse_bit_order(true);
 }
 
 MACHINE_RESET_MEMBER(ti99_8_state, ti99_8)
 {
-	m_cpu->set_hold(CLEAR_LINE);
+	m_cpu->hold_line(CLEAR_LINE);
 
 	// Pulling down the line on RESET configures the CPU to insert one wait
 	// state on external memory accesses
-	m_cpu->set_ready(CLEAR_LINE);
+	m_cpu->ready_line(CLEAR_LINE);
 
-	// But we assert the line here so that the system starts running
-	m_nready_combined = 0;
-	m_gromport->set_grom_base(0x9800, 0xfff1);
+	// m_gromport->set_grom_base(0x9800, 0xfff1);
 
 	// Clear INT1 and INT2 latch
 	m_int1 = CLEAR_LINE;
@@ -972,62 +714,92 @@ static MACHINE_CONFIG_START( ti99_8, ti99_8_state )
 	MCFG_TMS99xx_ADD("maincpu", TMS9995_MP9537, XTAL_10_738635MHz, memmap, crumap)
 	MCFG_TMS9995_EXTOP_HANDLER( WRITE8(ti99_8_state, external_operation) )
 	MCFG_TMS9995_CLKOUT_HANDLER( WRITELINE(ti99_8_state, clock_out) )
+	MCFG_TMS9995_DBIN_HANDLER( WRITELINE(ti99_8_state, dbin_line) )
+	MCFG_TMS9995_HOLDA_HANDLER( DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, holda_line) )
 
 	MCFG_MACHINE_START_OVERRIDE(ti99_8_state, ti99_8 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_8_state, ti99_8 )
 
-	/* Main board */
+	// 9901 configuration
 	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, XTAL_10_738635MHz/4.0)
 	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_8_state, read_by_9901) )
 	MCFG_TMS9901_P0_HANDLER( WRITELINE( ti99_8_state, keyC0) )
 	MCFG_TMS9901_P1_HANDLER( WRITELINE( ti99_8_state, keyC1) )
 	MCFG_TMS9901_P2_HANDLER( WRITELINE( ti99_8_state, keyC2) )
 	MCFG_TMS9901_P3_HANDLER( WRITELINE( ti99_8_state, keyC3) )
-	MCFG_TMS9901_P4_HANDLER( WRITELINE( ti99_8_state, CRUS) )
-	MCFG_TMS9901_P5_HANDLER( WRITELINE( ti99_8_state, PTGEN) )
+	MCFG_TMS9901_P4_HANDLER( DEVWRITELINE( MAINBOARD8_TAG, mainboard8_device, crus_in) )
+	MCFG_TMS9901_P5_HANDLER( DEVWRITELINE( MAINBOARD8_TAG, mainboard8_device, ptgen_in) )
 	MCFG_TMS9901_P6_HANDLER( WRITELINE( ti99_8_state, cassette_motor) )
 	MCFG_TMS9901_P8_HANDLER( WRITELINE( ti99_8_state, audio_gate) )
 	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_8_state, cassette_output) )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_8_state, tms9901_interrupt) )
 
-	MCFG_MAINBOARD8_ADD( MAINBOARD8_TAG, mapper_conf )
-	MCFG_MAINBOARD8_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_mapper))
-	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG )
-	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_8_state, console_ready_cart) )
+	// Mainboard with custom chips
+	MCFG_DEVICE_ADD(MAINBOARD8_TAG, MAINBOARD8, 0)
+	MCFG_MAINBOARD8_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready))
+	MCFG_MAINBOARD8_RESET_CALLBACK(WRITELINE(ti99_8_state, console_reset))
+	MCFG_MAINBOARD8_HOLD_CALLBACK(WRITELINE(ti99_8_state, cpu_hold))
+
+	MCFG_GROMPORT8_ADD( GROMPORT_TAG )
+	MCFG_GROMPORT_READY_HANDLER( DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, system_grom_ready) )
 	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_8_state, console_reset) )
 
-	/* Peripheral expansion box */
+	/* Software list */
+	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
+
+	// Peripheral expansion box
 	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX_998, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_8_state, extint) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_8_state, notconnected) )
-	MCFG_PERIBOX_READY_HANDLER( WRITELINE(ti99_8_state, console_ready_pbox) )
+	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, pbox_ready) )
 
-	/* Sound hardware */
-	MCFG_TI_SOUND_76496_ADD( TISOUND_TAG )
-	MCFG_TI_SOUND_READY_HANDLER( WRITELINE(ti99_8_state, console_ready_sound) )
+	// Sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("sound_out")
+	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN76496, 3579545)   /* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
+	MCFG_SN76496_READY_HANDLER(DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, sound_ready))
 
-	/* Cassette drives */
+	// Speech hardware
+	// Note: SPEECHROM uses its tag for referencing the region
+	MCFG_DEVICE_ADD(SPEECHROM_REG, SPEECHROM, 0)
+	MCFG_SPEAKER_STANDARD_MONO("speech_out")
+	MCFG_SOUND_ADD(SPEECHSYN_TAG, CD2501ECD, 640000L)
+	MCFG_TMS52XX_READYQ_HANDLER(DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, speech_ready))
+	MCFG_TMS52XX_SPEECHROM(SPEECHROM_REG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech_out", 0.50)
+
+	// Cassette drive
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
-	/* Console GROMs */
-	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_grom))
-	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_grom))
-	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
-	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_grom))
+	// GROM library
+	MCFG_GROM_ADD( SYSGROM0_TAG, 0, SYSGROM_REG, 0x0000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, system_grom_ready))
+	MCFG_GROM_ADD( SYSGROM1_TAG, 1, SYSGROM_REG, 0x2000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, system_grom_ready))
+	MCFG_GROM_ADD( SYSGROM2_TAG, 2, SYSGROM_REG, 0x4000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, system_grom_ready))
 
-	/* Pascal GROM libraries. */
-	MCFG_GROM_LIBRARY_ADD8(pascal1_grom, pascal1)
-	MCFG_GROM_LIBRARY_ADD8(pascal2_grom, pascal2)
-	MCFG_GROM_LIBRARY_ADD3(pascal3_grom, pascal3)
+	MCFG_GROM_ADD( GLIB10_TAG, 0, GROMLIB1_REG, 0x0000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, ptts_grom_ready))
+	MCFG_GROM_ADD( GLIB11_TAG, 1, GROMLIB1_REG, 0x2000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, ptts_grom_ready))
+	MCFG_GROM_ADD( GLIB12_TAG, 2, GROMLIB1_REG, 0x4000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, ptts_grom_ready))
+	MCFG_GROM_ADD( GLIB13_TAG, 3, GROMLIB1_REG, 0x6000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, ptts_grom_ready))
+	MCFG_GROM_ADD( GLIB14_TAG, 4, GROMLIB1_REG, 0x8000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, ptts_grom_ready))
+	MCFG_GROM_ADD( GLIB15_TAG, 5, GROMLIB1_REG, 0xa000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, ptts_grom_ready))
+	MCFG_GROM_ADD( GLIB16_TAG, 6, GROMLIB1_REG, 0xc000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, ptts_grom_ready))
+	MCFG_GROM_ADD( GLIB17_TAG, 7, GROMLIB1_REG, 0xe000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, ptts_grom_ready))
 
-	/* Devices */
-	MCFG_DEVICE_ADD(SPEECH_TAG, SPEECH8, 0)
-	MCFG_SPEECH8_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_speech))
+	MCFG_GROM_ADD( GLIB20_TAG, 0, GROMLIB2_REG, 0x0000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, p8_grom_ready))
+	MCFG_GROM_ADD( GLIB21_TAG, 1, GROMLIB2_REG, 0x2000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, p8_grom_ready))
+	MCFG_GROM_ADD( GLIB22_TAG, 2, GROMLIB2_REG, 0x4000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, p8_grom_ready))
+	MCFG_GROM_ADD( GLIB23_TAG, 3, GROMLIB2_REG, 0x6000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, p8_grom_ready))
+	MCFG_GROM_ADD( GLIB24_TAG, 4, GROMLIB2_REG, 0x8000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, p8_grom_ready))
+	MCFG_GROM_ADD( GLIB25_TAG, 5, GROMLIB2_REG, 0xa000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, p8_grom_ready))
+	MCFG_GROM_ADD( GLIB26_TAG, 6, GROMLIB2_REG, 0xc000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, p8_grom_ready))
+	MCFG_GROM_ADD( GLIB27_TAG, 7, GROMLIB2_REG, 0xe000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, p8_grom_ready))
+
+	MCFG_GROM_ADD( GLIB30_TAG, 0, GROMLIB3_REG, 0x0000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, p3_grom_ready))
+	MCFG_GROM_ADD( GLIB31_TAG, 1, GROMLIB3_REG, 0x2000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, p3_grom_ready))
+	MCFG_GROM_ADD( GLIB32_TAG, 2, GROMLIB3_REG, 0x4000, DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, p3_grom_ready))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG )
@@ -1037,14 +809,24 @@ MACHINE_CONFIG_END
     TI-99/8 US version (NTSC, 60 Hz)
 */
 static MACHINE_CONFIG_DERIVED( ti99_8_60hz, ti99_8 )
-	MCFG_TI998_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9118, 0x4000, ti99_8_state, video_interrupt)
+	// Video hardware
+	MCFG_DEVICE_ADD( VDP_TAG, TMS9118, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_8_state, video_interrupt))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
+	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
 /*
     TI-99/8 European version (PAL, 50 Hz)
 */
 static MACHINE_CONFIG_DERIVED( ti99_8_50hz, ti99_8 )
-	MCFG_TI998_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9129, 0x4000, ti99_8_state, video_interrupt)
+	// Video hardware
+	MCFG_DEVICE_ADD( VDP_TAG, TMS9129, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_8_state,video_interrupt))
+	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )
+	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
 /*
@@ -1055,11 +837,11 @@ MACHINE_CONFIG_END
 */
 ROM_START(ti99_8)
 	// Logical (CPU) memory space: ROM0
-	ROM_REGION(0x2000, ROM0_TAG, 0)
+	ROM_REGION(0x2000, ROM0_REG, 0)
 	ROM_LOAD("u4_rom0.bin", 0x0000, 0x2000, CRC(901eb8d6) SHA1(13190c5e834baa9c0a70066b566cfcef438ed88a))
 
 	// Physical memory space (mapped): ROM1
-	ROM_REGION(0x8000, ROM1_TAG, 0)
+	ROM_REGION(0x8000, ROM1_REG, 0)
 	ROM_LOAD("u25_rom1.bin", 0x0000, 0x8000, CRC(b574461a) SHA1(42c6aed44802cfabdd26b565d6e5ddfcd689f11e))
 
 	// Physical memory space (mapped): P-Code ROM
@@ -1069,20 +851,20 @@ ROM_START(ti99_8)
 	// the required select line for this ROM on the available schematics, so
 	// they seem to be from the earlier version. The location in the address
 	// space was determined by ROM disassembly.
-	ROM_REGION(0x8000, PCODEROM_TAG, 0)
+	ROM_REGION(0x8000, PASCAL_REG, 0)
 	ROM_LOAD("u25a_pas.bin", 0x0000, 0x4000, CRC(d7ed6dd6) SHA1(32212ce6426ceccbff73d342d4a3ef699c0ae1e4))
 
 	// System GROMs. 3 chips @ f830
 	// The schematics do not enumerate the circuits but only talk about
 	// "circuits on board" (COB) so we name the GROMs as gM_N.bin where M is the
 	// ID (0-7) and N is the access port in the logical address space.
-	ROM_REGION(0x6000, region_sysgrom, 0)
+	ROM_REGION(0x6000, SYSGROM_REG, 0)
 	ROM_LOAD("g0_f830.bin", 0x0000, 0x1800, CRC(1026db60) SHA1(7327095bf4f390476e69d9fd8424e98ea1f2325a))
 	ROM_LOAD("g1_f830.bin", 0x2000, 0x1800, CRC(93a43d65) SHA1(19be8a07d674bc7554c2bc9c7a5725d81e888e6e))
 	ROM_LOAD("g2_f830.bin", 0x4000, 0x1800, CRC(06f2b901) SHA1(f65e0fcb2c63e230b4a9563c72f91259b94ce955))
 
 	// TTS & Pascal library. 8 chips @ f840
-	ROM_REGION(0x10000, region_gromlib1, 0)
+	ROM_REGION(0x10000, GROMLIB1_REG, 0)
 	ROM_LOAD("g0_f840.bin", 0x0000, 0x1800, CRC(44501071) SHA1(4b5ef7f1aa43a87e7ae4f02090944be5c39b1f26))
 	ROM_LOAD("g1_f840.bin", 0x2000, 0x1800, CRC(5a271d9e) SHA1(bb95befa2ffba2cc17ac437386e069e8ff621248))
 	ROM_LOAD("g2_f840.bin", 0x4000, 0x1800, CRC(d52502df) SHA1(17063e33ee8709d0df8030f38bb92c4322d55e1e))
@@ -1093,7 +875,7 @@ ROM_START(ti99_8)
 	ROM_LOAD("g7_f840.bin", 0xE000, 0x1800, CRC(3a9d20df) SHA1(1e6f9f8ec7df4b997a7579be742d0a7d54bc8763))
 
 	// Pascal library. 8 chips @ f850
-	ROM_REGION(0x10000, region_gromlib2, 0)
+	ROM_REGION(0x10000, GROMLIB2_REG, 0)
 	ROM_LOAD("g0_f850.bin", 0x0000, 0x1800, CRC(2d948672) SHA1(cf15912d6dae5a450e0cfd796aa36ea5e521dc56))
 	ROM_LOAD("g1_f850.bin", 0x2000, 0x1800, CRC(7d64a842) SHA1(d5884bb2af21c8027311478ee506beac6f46203d))
 	ROM_LOAD("g2_f850.bin", 0x4000, 0x1800, CRC(e5ed8900) SHA1(03826882ce10fb5a6b3a9ccc85d3d1fe51979d0b))
@@ -1104,17 +886,15 @@ ROM_START(ti99_8)
 	ROM_LOAD("g7_f850.bin", 0xE000, 0x1800, CRC(71534098) SHA1(75e87123efde885e27dd749e07cb189eb2cc45a8))
 
 	// Pascal library. 3 chips @ f860
-	ROM_REGION(0x6000, region_gromlib3, 0)
+	ROM_REGION(0x6000, GROMLIB3_REG, 0)
 	ROM_LOAD("g0_f860.bin", 0x0000, 0x1800, CRC(0ceef210) SHA1(b89957fbff094b758746391a69dea6907c66b950))
 	ROM_LOAD("g1_f860.bin", 0x2000, 0x1800, CRC(fc87de25) SHA1(4695b7f979f59a01ec16c55e4587c3379482b658))
 	ROM_LOAD("g2_f860.bin", 0x4000, 0x1800, CRC(e833e350) SHA1(6ffe501981a1112be1af596a489d96e287fc6be5))
 
-	// Built-in RAM
-	ROM_REGION(SRAM_SIZE, SRAM_TAG, 0)
-	ROM_FILL(0x0000, SRAM_SIZE, 0x00)
-
-	ROM_REGION(DRAM_SIZE, DRAM_TAG, 0)
-	ROM_FILL(0x0000, DRAM_SIZE, 0x00)
+	// Speech ROM
+	ROM_REGION(0x8000, SPEECHROM_REG, 0)
+	ROM_LOAD("cd2325a.vsm", 0x0000, 0x4000, CRC(1f58b571) SHA1(0ef4f178716b575a1c0c970c56af8a8d97561ffe))
+	ROM_LOAD("cd2326a.vsm", 0x4000, 0x4000, CRC(65d00401) SHA1(a367242c2c96cebf0e2bf21862f3f6734b2b3020))
 ROM_END
 
 #define rom_ti99_8e rom_ti99_8

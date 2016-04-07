@@ -676,7 +676,6 @@ static MACHINE_CONFIG_START( syvalion, taitoh_state )
 	MCFG_TC0080VCO_OFFSETS(1, 1)
 	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
-	MCFG_TC0080VCO_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -732,7 +731,6 @@ static MACHINE_CONFIG_START( recordbr, taitoh_state )
 	MCFG_TC0080VCO_OFFSETS(1, 1)
 	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
-	MCFG_TC0080VCO_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -796,7 +794,6 @@ static MACHINE_CONFIG_START( dleague, taitoh_state )
 	MCFG_TC0080VCO_OFFSETS(1, 1)
 	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
-	MCFG_TC0080VCO_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

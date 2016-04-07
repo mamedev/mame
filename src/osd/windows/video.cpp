@@ -62,7 +62,7 @@ static void get_resolution(const char *defdata, const char *data, osd_window_con
 //============================================================
 
 // FIXME: Temporary workaround
-static osd_window_config   windows[MAX_WINDOWS];        // configuration data per-window
+static osd_window_config   windows[MAX_VIDEO_WINDOWS];        // configuration data per-window
 
 bool windows_osd_interface::video_init()
 {

@@ -96,7 +96,6 @@
  ******************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
 #include "cpu/z80/z80.h"
 #include "includes/nc.h"
 #include "machine/mc146818.h"   /* for NC200 real time clock */

@@ -14,7 +14,6 @@ The following basic program can be useful for identifying scancodes:
 
 
 #include "emu.h"
-#include "emuopts.h"
 #include "pc_kbdc.h"
 
 

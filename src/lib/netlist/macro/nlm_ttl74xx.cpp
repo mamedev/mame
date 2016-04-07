@@ -30,7 +30,7 @@ NETLIST_START(TTL_7416_DIP)
 		s3.A,  /*    A3 |5           10| Y5   */ s5.Q,
 		s3.Q,  /*    Y3 |6            9| A4   */ s4.A,
 		GND.I, /*   GND |7            8| Y4   */ s4.Q
-			   /*       +--------------+      */
+				/*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -69,7 +69,7 @@ NETLIST_START(TTL_7400_DIP)
 		s2.B,  /*    B2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
 		GND.I, /*   GND |7            8| Y3   */ s3.Q
-			   /*       +--------------+      */
+				/*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -84,7 +84,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7400_NAND, 2, 1, 0, "+A,B")
+	TRUTHTABLE_START(TTL_7400_NAND, 2, 1, 0, "A,B")
 		TT_HEAD("A,B|Q ")
 		TT_LINE("0,X|1|22")
 		TT_LINE("X,0|1|22")

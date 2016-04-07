@@ -109,7 +109,6 @@ public:
 
 void blackt96_state::video_start()
 {
-
 }
 
 
@@ -333,7 +332,7 @@ void blackt96_state::tile_callback(int &tile, int& fx, int& fy, int& region)
 	fx = tile & 0x4000;
 	fy = tile & 0x8000;
 	tile &= 0x3fff;
-	
+
 	if (tile & 0x2000)
 	{
 		region = 0;
@@ -374,7 +373,6 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 
 	MCFG_DEVICE_ADD("sprites", SNK68_SPR, 0)
 	MCFG_SNK68_SPR_GFXDECODE("gfxdecode")
-	MCFG_SNK68_SPR_PALETTE("palette")
 	MCFG_SNK68_SPR_SET_TILE_INDIRECT( blackt96_state, tile_callback )
 	MCFG_SNK68_SPR_NO_PARTIAL
 

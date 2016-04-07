@@ -138,16 +138,14 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_AUDIO_EFFECT "9",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 9" },
 #endif
 
-    { nullptr,                                nullptr,           OPTION_HEADER, "BGFX POST-PROCESSING OPTIONS" },
-    { OSDOPTION_BGFX_PATH,                    "bgfx",            OPTION_STRING, "path to BGFX-related files" },
-    { OSDOPTION_BGFX_BACKEND,                 "auto",            OPTION_STRING, "BGFX backend to use (d3d9, d3d11, metal, opengl, gles)" },
-    { OSDOPTION_BGFX_DEBUG,                   "0",               OPTION_BOOLEAN, "enable BGFX debugging statistics" },
-    { OSDOPTION_BGFX_SCREEN_CHAINS,           "default",         OPTION_STRING, "comma-delimited list of screen chain JSON names, colon-delimited per-window" },
-    { OSDOPTION_BGFX_SHADOW_MASK,             "shadow-mask.png", OPTION_STRING, "shadow mask texture name" },
-    { OSDOPTION_BGFX_PRESCALE_X,              "2",               OPTION_INTEGER, "x prescale" },
-    { OSDOPTION_BGFX_PRESCALE_Y,              "2",               OPTION_INTEGER, "y prescale" },
+	{ nullptr,                                nullptr,           OPTION_HEADER, "BGFX POST-PROCESSING OPTIONS" },
+	{ OSDOPTION_BGFX_PATH,                    "bgfx",            OPTION_STRING, "path to BGFX-related files" },
+	{ OSDOPTION_BGFX_BACKEND,                 "auto",            OPTION_STRING, "BGFX backend to use (d3d9, d3d11, metal, opengl, gles)" },
+	{ OSDOPTION_BGFX_DEBUG,                   "0",               OPTION_BOOLEAN, "enable BGFX debugging statistics" },
+	{ OSDOPTION_BGFX_SCREEN_CHAINS,           "default",         OPTION_STRING, "comma-delimited list of screen chain JSON names, colon-delimited per-window" },
+	{ OSDOPTION_BGFX_SHADOW_MASK,             "slot-mask.png",   OPTION_STRING, "shadow mask texture name" },
 
-        // End of list
+		// End of list
 	{ nullptr }
 };
 
@@ -200,11 +198,11 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, FONT_SDL);
 	REGISTER_MODULE(m_mod_man, FONT_NONE);
 
+	REGISTER_MODULE(m_mod_man, SOUND_XAUDIO2);
 	REGISTER_MODULE(m_mod_man, SOUND_DSOUND);
 	REGISTER_MODULE(m_mod_man, SOUND_COREAUDIO);
 	REGISTER_MODULE(m_mod_man, SOUND_JS);
 	REGISTER_MODULE(m_mod_man, SOUND_SDL);
-	REGISTER_MODULE(m_mod_man, SOUND_XAUDIO2);
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
 
 #ifdef SDLMAME_MACOSX
@@ -243,6 +241,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_NONE);
 
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDL);
+	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_WINHYBRID);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_XINPUT);
 	REGISTER_MODULE(m_mod_man, JOYSTICK_NONE);
@@ -305,6 +304,9 @@ void osd_common_t::register_options()
 
 	// Register video options and update options
 	video_options_add("none", nullptr);
+#if USE_OPENGL
+	video_options_add("opengl", nullptr);
+#endif
 	video_register();
 	update_option(OSDOPTION_VIDEO, m_video_names);
 }

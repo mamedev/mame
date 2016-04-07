@@ -11,7 +11,6 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_gfx_region(device_t &device, int gfxregion) { downcast<pc080sn_device &>(device).m_gfxnum = gfxregion; }
 	static void set_yinvert(device_t &device, int y_inv) { downcast<pc080sn_device &>(device).m_y_invert = y_inv; }
 	static void set_dblwidth(device_t &device, int dblwidth) { downcast<pc080sn_device &>(device).m_dblwidth = dblwidth; }
@@ -68,7 +67,6 @@ public:
 	int            m_dblwidth;
 
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 extern const device_type PC080SN;
@@ -88,8 +86,5 @@ extern const device_type PC080SN;
 
 #define MCFG_PC080SN_GFXDECODE(_gfxtag) \
 	pc080sn_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
-#define MCFG_PC080SN_PALETTE(_palette_tag) \
-	pc080sn_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif

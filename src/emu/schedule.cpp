@@ -726,8 +726,8 @@ void device_scheduler::compute_perfect_interleave()
 		{
 			// adjust all the actuals; this doesn't affect the current
 			m_quantum_minimum = perfect;
-			for (quantum_slot *quant = m_quantum_list.first(); quant != nullptr; quant = quant->next())
-				quant->m_actual = MAX(quant->m_requested, m_quantum_minimum);
+			for (quantum_slot &quant : m_quantum_list)
+				quant.m_actual = MAX(quant.m_requested, m_quantum_minimum);
 		}
 	}
 }
@@ -742,7 +742,7 @@ void device_scheduler::compute_perfect_interleave()
 void device_scheduler::rebuild_execute_list()
 {
 	// if we haven't yet set a scheduling quantum, do it now
-	if (m_quantum_list.first() == nullptr)
+	if (m_quantum_list.empty())
 	{
 		// set the core scheduling quantum
 		attotime min_quantum = machine().config().m_minimum_quantum;

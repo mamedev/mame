@@ -334,15 +334,7 @@ osd_file::error emu_file::open_next()
 		// if we're opening for read-only we have other options
 		if ((m_openflags & (OPEN_FLAG_READ | OPEN_FLAG_WRITE)) == OPEN_FLAG_READ)
 		{
-			std::string tempfullpath = m_fullpath;
-
 			filerr = attempt_zipped();
-			if (filerr == osd_file::error::NONE)
-				break;
-
-			m_fullpath = tempfullpath;
-
-			filerr = attempt__7zped();
 			if (filerr == osd_file::error::NONE)
 				break;
 		}
@@ -634,134 +626,76 @@ bool emu_file::part_of_mediapath(std::string path)
 
 osd_file::error emu_file::attempt_zipped()
 {
+	typedef util::archive_file::error (*open_func)(const std::string &filename, util::archive_file::ptr &result);
+	char const *const suffixes[] = { ".zip", ".7z" };
+	open_func const open_funcs[ARRAY_LENGTH(suffixes)] = { &util::archive_file::open_zip, &util::archive_file::open_7z };
+
+	// loop over archive types
+	std::string const savepath(m_fullpath);
 	std::string filename;
-
-	// loop over directory parts up to the start of filename
-	while (1)
+	for (unsigned i = 0; i < ARRAY_LENGTH(suffixes); i++, m_fullpath = savepath, filename.clear())
 	{
-		// find the final path separator
-		int dirsep = m_fullpath.find_last_of(PATH_SEPARATOR[0]);
-		if (dirsep == -1)
-			return osd_file::error::NOT_FOUND;
-
-		if (restrict_to_mediapath())
-			if ( !part_of_mediapath(m_fullpath) )
-				return osd_file::error::NOT_FOUND;
-
-		// insert the part from the right of the separator into the head of the filename
-		if (filename.length() > 0)
-			filename.insert(0, "/");
-		filename.insert(0, m_fullpath.substr(dirsep + 1, -1));
-
-		// remove this part of the filename and append a .zip extension
-		m_fullpath =  m_fullpath.substr(0, dirsep).append(".zip");
-
-		// attempt to open the ZIP file
-		util::archive_file::ptr zip;
-		util::archive_file::error ziperr = util::archive_file::open_zip(m_fullpath, zip);
-
-		// chop the .zip back off the filename before continuing
-		m_fullpath = m_fullpath.substr(0, dirsep);
-
-		// if we failed to open this file, continue scanning
-		if (ziperr != util::archive_file::error::NONE)
-			continue;
-
-		int header = -1;
-
-		// see if we can find a file with the right name and (if available) crc
-		if (m_openflags & OPEN_FLAG_HAS_CRC) header = zip->search(m_crc, filename);
-
-		// if that failed, look for a file with the right crc, but the wrong filename
-		if (header < 0 && (m_openflags & OPEN_FLAG_HAS_CRC)) header = zip->search(m_crc);
-
-		// if that failed, look for a file with the right name; reporting a bad checksum
-		// is more helpful and less confusing than reporting "rom not found"
-		if (header < 0) header = zip->search(filename);
-
-		// if we got it, read the data
-		if (header >= 0)
+		// loop over directory parts up to the start of filename
+		while (1)
 		{
-			m_zipfile = std::move(zip);
-			m_ziplength = m_zipfile->current_uncompressed_length();
+			// find the final path separator
+			auto const dirsep = m_fullpath.find_last_of(PATH_SEPARATOR[0]);
+			if (dirsep == std::string::npos)
+				break;
 
-			// build a hash with just the CRC
-			m_hashes.reset();
-			m_hashes.add_crc(m_zipfile->current_crc());
-			return (m_openflags & OPEN_FLAG_NO_PRELOAD) ? osd_file::error::NONE : load_zipped_file();
+			if (restrict_to_mediapath() && !part_of_mediapath(m_fullpath))
+				break;
+
+			// insert the part from the right of the separator into the head of the filename
+			if (!filename.empty()) filename.insert(0, 1, '/');
+			filename.insert(0, m_fullpath.substr(dirsep + 1, std::string::npos));
+
+			// remove this part of the filename and append an archive extension
+			m_fullpath.resize(dirsep);
+			m_fullpath.append(suffixes[i]);
+
+			// attempt to open the archive file
+			util::archive_file::ptr zip;
+			util::archive_file::error ziperr = open_funcs[i](m_fullpath, zip);
+
+			// chop the archive suffix back off the filename before continuing
+			m_fullpath = m_fullpath.substr(0, dirsep);
+
+			// if we failed to open this file, continue scanning
+			if (ziperr != util::archive_file::error::NONE)
+				continue;
+
+			int header = -1;
+
+			// see if we can find a file with the right name and (if available) CRC
+			if (m_openflags & OPEN_FLAG_HAS_CRC) header = zip->search(m_crc, filename, false);
+			if (header < 0 && (m_openflags & OPEN_FLAG_HAS_CRC)) header = zip->search(m_crc, filename, true);
+
+			// if that failed, look for a file with the right CRC, but the wrong filename
+			if (header < 0 && (m_openflags & OPEN_FLAG_HAS_CRC)) header = zip->search(m_crc);
+
+			// if that failed, look for a file with the right name;
+			// reporting a bad checksum is more helpful and less confusing than reporting "ROM not found"
+			if (header < 0) header = zip->search(filename, false);
+			if (header < 0) header = zip->search(filename, true);
+
+			// if we got it, read the data
+			if (header >= 0)
+			{
+				m_zipfile = std::move(zip);
+				m_ziplength = m_zipfile->current_uncompressed_length();
+
+				// build a hash with just the CRC
+				m_hashes.reset();
+				m_hashes.add_crc(m_zipfile->current_crc());
+				return (m_openflags & OPEN_FLAG_NO_PRELOAD) ? osd_file::error::NONE : load_zipped_file();
+			}
+
+			// close up the archive file and try the next level
+			zip.reset();
 		}
-
-		// close up the ZIP file and try the next level
-		zip.reset();
 	}
-}
-
-
-//-------------------------------------------------
-//  attempt__7zped - attempt to open a .7z file
-//-------------------------------------------------
-
-osd_file::error emu_file::attempt__7zped()
-{
-	std::string filename;
-
-	// loop over directory parts up to the start of filename
-	while (1)
-	{
-		// find the final path separator
-		int dirsep = m_fullpath.find_last_of(PATH_SEPARATOR[0]);
-		if (dirsep == -1)
-			return osd_file::error::NOT_FOUND;
-
-		if (restrict_to_mediapath())
-			if ( !part_of_mediapath(m_fullpath) )
-				return osd_file::error::NOT_FOUND;
-
-		// insert the part from the right of the separator into the head of the filename
-		if (filename.length() > 0)
-			filename.insert(0, "/");
-		filename.insert(0, m_fullpath.substr(dirsep + 1, -1));
-
-		// remove this part of the filename and append a .7z extension
-		m_fullpath = m_fullpath.substr(0, dirsep).append(".7z");
-
-		// attempt to open the _7Z file
-		util::archive_file::ptr _7z;
-		util::archive_file::error _7zerr = util::archive_file::open_7z(m_fullpath, _7z);
-
-		// chop the ._7z back off the filename before continuing
-		m_fullpath = m_fullpath.substr(0, dirsep);
-
-		// if we failed to open this file, continue scanning
-		if (_7zerr != util::archive_file::error::NONE)
-			continue;
-
-		int fileno = -1;
-
-		// see if we can find a file with the right name and (if available) crc
-		if (m_openflags & OPEN_FLAG_HAS_CRC) fileno = _7z->search(m_crc, filename);
-
-		// if that failed, look for a file with the right crc, but the wrong filename
-		if ((fileno < 0) && (m_openflags & OPEN_FLAG_HAS_CRC)) fileno = _7z->search(m_crc);
-
-		// if that failed, look for a file with the right name; reporting a bad checksum
-		// is more helpful and less confusing than reporting "rom not found"
-		if (fileno < 0) fileno = _7z->search(filename);
-
-		if (fileno >= 0)
-		{
-			m_zipfile = std::move(_7z);
-			m_ziplength = m_zipfile->current_uncompressed_length();
-
-			// build a hash with just the CRC
-			m_hashes.reset();
-			m_hashes.add_crc(m_zipfile->current_crc());
-			return (m_openflags & OPEN_FLAG_NO_PRELOAD) ? osd_file::error::NONE : load_zipped_file();
-		}
-
-		// close up the _7Z file and try the next level
-		_7z.reset();
-	}
+	return osd_file::error::NOT_FOUND;
 }
 
 

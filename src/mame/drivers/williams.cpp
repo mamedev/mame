@@ -2195,9 +2195,9 @@ ROM_START( robotron87 )
 	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
 	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
 
-//	ROM_REGION( 0x800, "patch", 0 ) // the bugfix was distributed as the following patches, we don't need them for emulation, but list them here for reference.
-//	ROM_LOAD( "fixrobo1.pat",   0x000, 0x6d1, CRC(38f81254) SHA1(7ea140c08bfd9947a7f3e769b24d5e8351525e4f) )
-//	ROM_LOAD( "fixrobo2.pat",   0x000, 0x6ae, CRC(61912101) SHA1(bb52db08301ac38268f6ae71e7002730022de1c8) )
+//  ROM_REGION( 0x800, "patch", 0 ) // the bugfix was distributed as the following patches, we don't need them for emulation, but list them here for reference.
+//  ROM_LOAD( "fixrobo1.pat",   0x000, 0x6d1, CRC(38f81254) SHA1(7ea140c08bfd9947a7f3e769b24d5e8351525e4f) )
+//  ROM_LOAD( "fixrobo2.pat",   0x000, 0x6ae, CRC(61912101) SHA1(bb52db08301ac38268f6ae71e7002730022de1c8) )
 ROM_END
 
 ROM_START( robotron12 )

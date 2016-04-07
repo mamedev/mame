@@ -165,7 +165,7 @@
 			toView:contentView];
 
 	// add interfaces if present
-	device_interface *interface = device->first_interface();
+	device_interface *interface = device->interfaces().first();
 	if (interface != NULL)
 	{
 		NSBox *const interfacesBox = [self makeBox:@"Interfaces" toFit:contentView];

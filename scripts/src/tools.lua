@@ -27,20 +27,11 @@ end
 
 links {
 	"utils",
-	"expat",
+	ext_lib("expat"),
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
+	ext_lib("zlib"),
 }
-
-if _OPTIONS["with-bundled-zlib"] then
-	links {
-		"zlib",
-	}
-else
-	links {
-		"z",
-	}
-end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -77,35 +68,20 @@ end
 
 links {
 	"utils",
-	"expat",
+	ext_lib("expat"),
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
+	ext_lib("zlib"),
+	ext_lib("flac"),
 }
-
-if _OPTIONS["with-bundled-zlib"] then
-	links {
-		"zlib",
-	}
-else
-	links {
-		"z",
-	}
-end
-
-if _OPTIONS["with-bundled-flac"] then
-	links {
-		"flac",
-	}
-else
-	links {
-		"FLAC",
-	}
-end
 
 includedirs {
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
+}
+includedirs {
+	ext_includedir("flac"),
 }
 
 files {
@@ -139,19 +115,10 @@ end
 
 links {
 	"utils",
-	"expat",
+	ext_lib("expat"),
 	"ocore_" .. _OPTIONS["osd"],
+	ext_lib("zlib"),
 }
-
-if _OPTIONS["with-bundled-zlib"] then
-	links {
-		"zlib",
-	}
-else
-	links {
-		"z",
-	}
-end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -189,30 +156,12 @@ end
 links {
 	"dasm",
 	"utils",
-	"expat",
+	ext_lib("expat"),
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
+	ext_lib("zlib"),
+	ext_lib("flac"),
 }
-
-if _OPTIONS["with-bundled-zlib"] then
-	links {
-		"zlib",
-	}
-else
-	links {
-		"z",
-	}
-end
-
-if _OPTIONS["with-bundled-flac"] then
-	links {
-		"flac",
-	}
-else
-	links {
-		"FLAC",
-	}
-end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -251,35 +200,20 @@ end
 
 links {
 	"utils",
-	"expat",
+	ext_lib("expat"),
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
+	ext_lib("zlib"),
+	ext_lib("flac"),
 }
-
-if _OPTIONS["with-bundled-zlib"] then
-	links {
-		"zlib",
-	}
-else
-	links {
-		"z",
-	}
-end
-
-if _OPTIONS["with-bundled-flac"] then
-	links {
-		"flac",
-	}
-else
-	links {
-		"FLAC",
-	}
-end
 
 includedirs {
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
+}
+includedirs {
+	ext_includedir("flac"),
 }
 
 files {
@@ -312,35 +246,20 @@ end
 
 links {
 	"utils",
-	"expat",
+	ext_lib("expat"),
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
+	ext_lib("zlib"),
+	ext_lib("flac"),
 }
-
-if _OPTIONS["with-bundled-zlib"] then
-	links {
-		"zlib",
-	}
-else
-	links {
-		"z",
-	}
-end
-
-if _OPTIONS["with-bundled-flac"] then
-	links {
-		"flac",
-	}
-else
-	links {
-		"FLAC",
-	}
-end
 
 includedirs {
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
+}
+includedirs {
+	ext_includedir("flac"),
 }
 
 files {
@@ -373,19 +292,10 @@ end
 
 links {
 	"utils",
-	"expat",
+	ext_lib("expat"),
 	"ocore_" .. _OPTIONS["osd"],
+	ext_lib("zlib"),
 }
-
-if _OPTIONS["with-bundled-zlib"] then
-	links {
-		"zlib",
-	}
-else
-	links {
-		"z",
-	}
-end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -422,19 +332,10 @@ end
 
 links {
 	"utils",
-	"expat",
+	ext_lib("expat"),
 	"ocore_" .. _OPTIONS["osd"],
+	ext_lib("zlib"),
 }
-
-if _OPTIONS["with-bundled-zlib"] then
-	links {
-		"zlib",
-	}
-else
-	links {
-		"z",
-	}
-end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -471,19 +372,10 @@ end
 
 links {
 	"utils",
-	"expat",
+	ext_lib("expat"),
 	"ocore_" .. _OPTIONS["osd"],
+	ext_lib("zlib"),
 }
-
-if _OPTIONS["with-bundled-zlib"] then
-	links {
-		"zlib",
-	}
-else
-	links {
-		"z",
-	}
-end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -520,30 +412,12 @@ end
 
 links {
 	"utils",
-	"expat",
+	ext_lib("expat"),
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
+	ext_lib("zlib"),
+	ext_lib("flac"),
 }
-
-if _OPTIONS["with-bundled-zlib"] then
-	links {
-		"zlib",
-	}
-else
-	links {
-		"z",
-	}
-end
-
-if _OPTIONS["with-bundled-flac"] then
-	links {
-		"flac",
-	}
-else
-	links {
-		"FLAC",
-	}
-end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -580,19 +454,10 @@ end
 
 links {
 	"utils",
-	"expat",
+	ext_lib("expat"),
 	"ocore_" .. _OPTIONS["osd"],
+	ext_lib("zlib"),
 }
-
-if _OPTIONS["with-bundled-zlib"] then
-	links {
-		"zlib",
-	}
-else
-	links {
-		"z",
-	}
-end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -629,31 +494,13 @@ end
 
 links {
 	"utils",
-	"expat",
+	ext_lib("expat"),
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 	"netlist",
+	ext_lib("zlib"),
+	ext_lib("flac"),
 }
-
-if _OPTIONS["with-bundled-zlib"] then
-	links {
-		"zlib",
-	}
-else
-	links {
-		"z",
-	}
-end
-
-if _OPTIONS["with-bundled-flac"] then
-	links {
-		"flac",
-	}
-else
-	links {
-		"FLAC",
-	}
-end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -682,27 +529,27 @@ uuid ("7c5396d1-2a1a-4c93-bed6-6b8fa182054a")
 kind "ConsoleApp"
 
 flags {
-  "Symbols", -- always include minimum symbols for executables
+	"Symbols", -- always include minimum symbols for executables
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then
-  targetdir(MAME_DIR)
+	targetdir(MAME_DIR)
 end
 
 links {
-  "utils",
-  "ocore_" .. _OPTIONS["osd"],
-  "netlist",
+	"utils",
+	"ocore_" .. _OPTIONS["osd"],
+	"netlist",
 }
 
 includedirs {
-  MAME_DIR .. "src/osd",
-  MAME_DIR .. "src/lib/util",
-  MAME_DIR .. "src/lib/netlist",
+	MAME_DIR .. "src/osd",
+	MAME_DIR .. "src/lib/util",
+	MAME_DIR .. "src/lib/netlist",
 }
 
 files {
-    MAME_DIR .. "src/lib/netlist/prg/nlwav.cpp",
+	MAME_DIR .. "src/lib/netlist/prg/nlwav.cpp",
 	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
@@ -732,30 +579,12 @@ end
 links {
 	"formats",
 	"utils",
-	"expat",
+	ext_lib("expat"),
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
+	ext_lib("zlib"),
+	ext_lib("flac"),
 }
-
-if _OPTIONS["with-bundled-zlib"] then
-	links {
-		"zlib",
-	}
-else
-	links {
-		"z",
-	}
-end
-
-if _OPTIONS["with-bundled-flac"] then
-	links {
-		"flac",
-	}
-else
-	links {
-		"FLAC",
-	}
-end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -795,30 +624,12 @@ links {
 	"formats",
 	"emu",
 	"utils",
-	"expat",
+	ext_lib("expat"),
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
+	ext_lib("zlib"),
+	ext_lib("flac"),
 }
-
-if _OPTIONS["with-bundled-zlib"] then
-	links {
-		"zlib",
-	}
-else
-	links {
-		"z",
-	}
-end
-
-if _OPTIONS["with-bundled-flac"] then
-	links {
-		"flac",
-	}
-else
-	links {
-		"FLAC",
-	}
-end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -858,36 +669,18 @@ links {
 	"formats",
 	"emu",
 	"utils",
-	"expat",
+	ext_lib("expat"),
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
+	ext_lib("zlib"),
+	ext_lib("flac"),
 }
-
-if _OPTIONS["with-bundled-zlib"] then
-	links {
-		"zlib",
-	}
-else
-	links {
-		"z",
-	}
-end
-
-if _OPTIONS["with-bundled-flac"] then
-	links {
-		"flac",
-	}
-else
-	links {
-		"FLAC",
-	}
-end
 
 includedirs {
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib",
 	MAME_DIR .. "src/lib/util",
-	MAME_DIR .. "3rdparty/zlib",
+	ext_includedir("zlib"),
 	MAME_DIR .. "src/tools/imgtool",
 }
 
@@ -948,3 +741,45 @@ configuration { "mingw*" or "vs*" }
 configuration { }
 
 strip()
+
+--------------------------------------------------
+-- aueffectutil
+--------------------------------------------------
+
+if _OPTIONS["targetos"] == "macosx" then
+	project("aueffectutil")
+		uuid ("3db8316d-fad7-4f5b-b46a-99373c91550e")
+		kind "ConsoleApp"
+
+		flags {
+			"Symbols", -- always include minimum symbols for executables
+		}
+
+		if _OPTIONS["SEPARATE_BIN"]~="1" then
+			targetdir(MAME_DIR)
+		end
+
+		linkoptions {
+			"-sectcreate __TEXT __info_plist " .. MAME_DIR .. "src/tools/aueffectutil-Info.plist",
+		}
+
+		dependency {
+			{ "aueffectutil",  MAME_DIR .. "src/tools/aueffectutil-Info.plist", true  },
+		}
+
+		links {
+			"AudioUnit.framework",
+			"AudioToolbox.framework",
+			"CoreAudio.framework",
+			"CoreAudioKit.framework",
+			"CoreServices.framework",
+		}
+
+		files {
+			MAME_DIR .. "src/tools/aueffectutil.mm",
+		}
+
+        configuration { }
+
+		strip()
+end

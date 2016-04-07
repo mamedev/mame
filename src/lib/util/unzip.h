@@ -21,7 +21,6 @@
 
 
 namespace util {
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -71,8 +70,8 @@ public:
 
 	// find a file index by crc, filename or both - returns non-negative on match
 	virtual int search(std::uint32_t crc) = 0;
-	virtual int search(const std::string &filename) = 0;
-	virtual int search(std::uint32_t crc, const std::string &filename) = 0;
+	virtual int search(const std::string &filename, bool partialpath) = 0;
+	virtual int search(std::uint32_t crc, const std::string &filename, bool partialpath) = 0;
 
 	// information on most recently found file
 	virtual bool current_is_directory() const = 0;

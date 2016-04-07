@@ -335,6 +335,7 @@ The Maze of the Kings (prototype)               no cart  *       21 (64Mb)   pre
 Tokyo Bus Guide (Rev A)                       840-0045C  23468A  18 (64Mb)   present  315-6206  317-0290-COM  requires 837-13844 JVS IO
 Virtua NBA (prototype)                          no cart  *       21 (64Mb)   present  315-6206  317-0271-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
 Virtua Tennis / Power Smash (prototype)         no cart  *       21 (64Mb)   present  315-6206  317-0263-COM  * flash-PCB, title screen have label "SOFT R&D Dept.#3", not dumped but known to exist
+Wave Runner GP (original, Rev A)              840-0064C  23725A  12 (64Mb)   present  315-6206  317-0306-COM  840-0064B-01
 
 
 837-13668  171-7919A (C) Sega 1998
@@ -1692,6 +1693,7 @@ static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x00200000, 0x00207fff) AM_MIRROR(0x02000000) AM_RAM                                             // bios uses it (battery backed ram ?)
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_MIRROR(0x02000000) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
+	AM_RANGE(0x005f7018, 0x005f702f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16( "comm_board", m3comm_device, naomi_r, naomi_w, U64(0x0000ffff0000ffff) )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", naomi_board, submap, U64(0x0000ffff0000ffff) )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
@@ -2702,6 +2704,7 @@ static MACHINE_CONFIG_DERIVED( naomi_base, naomi_aw_base )
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("mie_eeprom")
 
 	MCFG_X76F100_ADD("naomibd_eeprom")
+	MCFG_M3COMM_ADD("comm_board")
 MACHINE_CONFIG_END
 
 /*
@@ -3652,8 +3655,8 @@ ROM_START( derbyoc2 )
 	ROM_LOAD( "mpr-22304.ic10", 0x9800000, 0x1000000, CRC(46c1fb1f) SHA1(6daca76a75df3501f77e473eb065d48804fcc64a) )
 	ROM_LOAD( "mpr-22305.ic11", 0xa800000, 0x1000000, CRC(027d0e7b) SHA1(e3c874e60cabb6f9ce686696d9055a0c0d5289ae) )
 
-	// 840-0083-01    2001     317-0327-JPN   Naomi (label comes from unclear photo, can be wrong)
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // key is unknown, probably not used by game
+	// 840-0083-01    2001     317-0327-JPN   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2a436bb7")
 ROM_END
 
 /*
@@ -6523,12 +6526,30 @@ ROM_START( kick4csh )
 	ROM_PARAMETER( ":rom_board:key", "820857c9" )
 ROM_END
 
+ROM_START( wrungpo )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x6800000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-23725a.ic22",0x0000000, 0x400000,  CRC(f7a4d5e6) SHA1(4bf57d4ff1d42b50d22f289f6437b0c955c06e9e) )
+	ROM_LOAD( "mpr-23719.ic1",  0x0800000, 0x1000000, CRC(b9fb79df) SHA1(1568320c25118f4ee5c508dcca4e4496ff23c067) )
+	ROM_LOAD( "mpr-23720.ic2",  0x1800000, 0x1000000, CRC(d3f19874) SHA1(cde22c56dac233f5407d2e3ac8e6ea4f8681d0bf) )
+	ROM_LOAD( "mpr-23721.ic3",  0x2800000, 0x1000000, CRC(f599a52e) SHA1(ca0edc2e9496f218117cef7d71bf1761bed8d4ac) )
+	ROM_LOAD( "mpr-23722.ic4",  0x3800000, 0x1000000, CRC(e08a6a36) SHA1(ef37d8c7bc9d5055008d522825ef3e80e27745c2) )
+	ROM_LOAD( "mpr-23723.ic5",  0x4800000, 0x1000000, CRC(651610eb) SHA1(4dfe4f876a5440bd1034f41a4d76e1d6bd3e0e32) )
+	ROM_LOAD( "mpr-23724.ic6",  0x5800000, 0x1000000, CRC(c633c45a) SHA1(23b45140f965428d33e2424b0574715c0b952d05) )
+	// note: origin ROM board have 12x8MB FlashROMs with same contents as above
+
+	// 840-0064-01  2001    317-0306-COM    Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "284ae7c3")
+ROM_END
+
 ROM_START( wrungp )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0x6800000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "epr-24059.ic22", 0x0000000, 0x400000, CRC(f82c00b5) SHA1(e885a46b2d3d52d9222d9ce038766858a2046ea1) )
+	ROM_LOAD( "epr-24059.ic22", 0x0000000, 0x400000,  CRC(f82c00b5) SHA1(e885a46b2d3d52d9222d9ce038766858a2046ea1) )
 	ROM_LOAD( "mpr-23719.ic1",  0x0800000, 0x1000000, CRC(b9fb79df) SHA1(1568320c25118f4ee5c508dcca4e4496ff23c067) )
 	ROM_LOAD( "mpr-23720.ic2",  0x1800000, 0x1000000, CRC(d3f19874) SHA1(cde22c56dac233f5407d2e3ac8e6ea4f8681d0bf) )
 	ROM_LOAD( "mpr-23721.ic3",  0x2800000, 0x1000000, CRC(f599a52e) SHA1(ca0edc2e9496f218117cef7d71bf1761bed8d4ac) )
@@ -9498,6 +9519,7 @@ ROM_END
 /* 0054 */ GAME( 2000, starhrse, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Star Horse (big screens)", GAME_FLAGS )
 /* 0055 */ GAME( 2000, starhrct, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Star Horse (server)", GAME_FLAGS )
 /* 0056 */ GAME( 2000, starhrcl, naomi,    naomim2, naomi,   naomi_state, naomi,  ROT270,"Sega", "Star Horse (satellite)", GAME_FLAGS )
+/* 0064-01*/GAME(2001, wrungpo,  wrungp,   naomim2, naomi,   naomi_state, naomi,   ROT0, "CRI / Sega", "Wave Runner GP (original, Rev A)", GAME_FLAGS )
 /* 0064 */ GAME( 2001, wrungp,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "CRI / Sega", "Wave Runner GP", GAME_FLAGS )
 /* 0068 */ GAME( 2001, crakndj2, naomi,    naomim2, crackndj,naomi_state, naomi,   ROT0, "Sega", "Crackin' DJ Part 2", GAME_FLAGS )
 /* 0073 */ GAME( 2001, inunoos,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Inu No Osanpo / Dog Walking (Rev A)", GAME_FLAGS )

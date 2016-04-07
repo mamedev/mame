@@ -22,7 +22,7 @@
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container *container, const game_driver *driver) 
+ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container *container, const game_driver *driver)
 	: ui_menu(machine, container)
 	, m_actual(0)
 	, m_driver((driver == nullptr) ? &machine.system() : driver)
@@ -48,7 +48,7 @@ ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container 
 //  ctor
 //-------------------------------------------------
 
-ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container *container, ui_software_info *swinfo, const game_driver *driver) 
+ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container *container, ui_software_info *swinfo, const game_driver *driver)
 	: ui_menu(machine, container)
 	, m_actual(0)
 	, m_driver((driver == nullptr) ? &machine.system() : driver)
@@ -112,7 +112,7 @@ void ui_menu_dats_view::populate()
 	item_append(MENU_SEPARATOR_ITEM, nullptr, (MENU_FLAG_UI_DATS | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), nullptr);
 	customtop = 2.0f * machine().ui().get_line_height() + 4.0f * UI_BOX_TB_BORDER;
 	custombottom = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-	
+
 	if (!paused)
 		machine().resume();
 }
@@ -290,6 +290,8 @@ void ui_menu_dats_view::init_items()
 		m_items_list.emplace_back(_("Sysinfo"), UI_SYSINFO_LOAD, datfile.rev_sysinfo());
 	if (datfile.has_story(m_driver))
 		m_items_list.emplace_back(_("Mamescore"), UI_STORY_LOAD, datfile.rev_storyinfo());
+	if (datfile.has_gameinit(m_driver))
+		m_items_list.emplace_back(_("Gameinit"), UI_GINIT_LOAD, datfile.rev_ginitinfo());
 	if (datfile.has_command(m_driver))
 		m_items_list.emplace_back(_("Command"), UI_COMMAND_LOAD, "");
 }

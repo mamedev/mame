@@ -111,7 +111,7 @@ public:
 	software_info &info() const { return m_info; }
 	const char *name() const { return m_name; }
 	const char *interface() const { return m_interface; }
-	feature_list_item *featurelist() const { return m_featurelist.first(); }
+	const simple_list<feature_list_item> &featurelist() const { return m_featurelist; }
 	rom_entry *romdata(unsigned int index = 0) { return (index < m_romdata.size()) ? &m_romdata[index] : nullptr; }
 
 	// helpers
@@ -150,12 +150,11 @@ public:
 	const char *parentname() const { return m_parentname; }
 	const char *year() const { return m_year; }
 	const char *publisher() const { return m_publisher; }
-	feature_list_item *other_info() const { return m_other_info.first(); }
-	feature_list_item *shared_info() const { return m_shared_info.first(); }
+	const simple_list<feature_list_item> &other_info() const { return m_other_info; }
+	const simple_list<feature_list_item> &shared_info() const { return m_shared_info; }
 	UINT32 supported() const { return m_supported; }
-	int num_parts() const { return m_partdata.count(); }
+	const simple_list<software_part> &parts() const { return m_partdata; }
 	software_part *first_part() const { return m_partdata.first(); }
-	software_part *last_part() const { return m_partdata.last(); }
 
 	// additional operations
 	software_part *find_part(const char *partname, const char *interface = nullptr);
@@ -203,10 +202,10 @@ public:
 	const char *description() { if (!m_parsed) parse(); return m_description; }
 	bool valid() { if (!m_parsed) parse(); return m_infolist.count() > 0; }
 	const char *errors_string() { if (!m_parsed) parse(); return m_errors.c_str(); }
+	const simple_list<software_info> &get_info() { if (!m_parsed) parse(); return m_infolist; }
 
 	// operations
 	software_info *find(const char *look_for, software_info *prev = nullptr);
-	software_info *first_software_info() { if (!m_parsed) parse(); return m_infolist.first(); }
 	void find_approx_matches(const char *name, int matches, software_info **list, const char *interface);
 	void release();
 

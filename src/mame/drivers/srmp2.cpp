@@ -1168,7 +1168,6 @@ static MACHINE_CONFIG_START( srmp2, srmp2_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1215,7 +1214,6 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(srmp2_state, srmp3_gfxbank_callback)
 
 	/* video hardware */
@@ -1270,7 +1268,6 @@ static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(srmp2_state, srmp3_gfxbank_callback)
 
 	/* video hardware */

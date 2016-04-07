@@ -22,7 +22,8 @@
 	|| defined(__NetBSD__) \
 	|| defined(__OpenBSD__) \
 	|| defined(__FreeBSD__) \
-	|| defined(__native_client__)
+	|| defined(__native_client__) \
+	|| defined(__riscv)
 #	define UNITTEST_POSIX
 #endif
 

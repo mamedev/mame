@@ -10,7 +10,7 @@
 ---------------------------------------------------------------------------
 
 function string.starts(String,Start)
-   return string.sub(String,1,string.len(Start))==Start
+	return string.sub(String,1,string.len(Start))==Start
 end
 
 function addlibfromstring(str)
@@ -74,6 +74,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_common.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_common.h",
 		MAME_DIR .. "src/osd/modules/input/input_dinput.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_dinput.h",
 		MAME_DIR .. "src/osd/modules/input/input_none.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_rawinput.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_win32.cpp",
@@ -84,6 +85,8 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_windows.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_windows.h",
 		MAME_DIR .. "src/osd/modules/input/input_xinput.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_xinput.h",
+		MAME_DIR .. "src/osd/modules/input/input_winhybrid.cpp",
 	}
 
 	if _OPTIONS["targetos"]=="windows" then
@@ -122,8 +125,17 @@ function osdmodulesbuild()
 		end
 	end
 
+	defines {
+		"__STDC_LIMIT_MACROS",
+		"__STDC_FORMAT_MACROS",
+		"__STDC_CONSTANT_MACROS",
+		"IMGUI_DISABLE_OBSOLETE_FUNCTIONS",
+	}
+
 	files {
 		MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfxutil.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfxutil.h",
 		MAME_DIR .. "src/osd/modules/render/binpacker.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/blendreader.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/chain.cpp",
@@ -163,7 +175,9 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/render/bgfx/writereader.cpp",
 	}
 	includedirs {
+		MAME_DIR .. "3rdparty/bgfx/examples/common",
 		MAME_DIR .. "3rdparty/bgfx/include",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty",
 		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "3rdparty/rapidjson/include",
 	}
@@ -171,6 +185,10 @@ function osdmodulesbuild()
 	if _OPTIONS["NO_USE_MIDI"]=="1" then
 		defines {
 			"NO_USE_MIDI",
+		}
+	else
+		includedirs {
+			ext_includedir("portmidi"),
 		}
 	end
 
@@ -192,7 +210,7 @@ function qtdebuggerbuild()
 	removeflags {
 		"SingleOutputDir",
 	}
-  local version = str_to_version(_OPTIONS["gcc_version"])
+	local version = str_to_version(_OPTIONS["gcc_version"])
 	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
 		configuration { "gmake" }
 		if (version >= 30600) then
@@ -266,14 +284,14 @@ function qtdebuggerbuild()
 
 
 		custombuildtask {
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.h", 			GEN_DIR .. "osd/modules/debugger/qt/debuggerview.moc.cpp", { },			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/windowqt.h", 				GEN_DIR .. "osd/modules/debugger/qt/windowqt.moc.cpp", { }, 				{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/logwindow.h", 				GEN_DIR .. "osd/modules/debugger/qt/logwindow.moc.cpp", { }, 				{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/dasmwindow.h", 				GEN_DIR .. "osd/modules/debugger/qt/dasmwindow.moc.cpp", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/mainwindow.h", 				GEN_DIR .. "osd/modules/debugger/qt/mainwindow.moc.cpp", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/memorywindow.h",				GEN_DIR .. "osd/modules/debugger/qt/memorywindow.moc.cpp", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/breakpointswindow.h",		GEN_DIR .. "osd/modules/debugger/qt/breakpointswindow.moc.cpp", { }, 		{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceswindow.h", 			GEN_DIR .. "osd/modules/debugger/qt/deviceswindow.moc.cpp", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.h",             GEN_DIR .. "osd/modules/debugger/qt/debuggerview.moc.cpp", { },         { MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/windowqt.h",                 GEN_DIR .. "osd/modules/debugger/qt/windowqt.moc.cpp", { },                 { MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/logwindow.h",                GEN_DIR .. "osd/modules/debugger/qt/logwindow.moc.cpp", { },                { MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/dasmwindow.h",               GEN_DIR .. "osd/modules/debugger/qt/dasmwindow.moc.cpp", { },           { MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/mainwindow.h",               GEN_DIR .. "osd/modules/debugger/qt/mainwindow.moc.cpp", { },           { MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/memorywindow.h",             GEN_DIR .. "osd/modules/debugger/qt/memorywindow.moc.cpp", { },             { MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/breakpointswindow.h",        GEN_DIR .. "osd/modules/debugger/qt/breakpointswindow.moc.cpp", { },        { MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceswindow.h",            GEN_DIR .. "osd/modules/debugger/qt/deviceswindow.moc.cpp", { },            { MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
 			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceinformationwindow.h",  GEN_DIR .. "osd/modules/debugger/qt/deviceinformationwindow.moc.cpp", { },{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
 
 		}
@@ -383,6 +401,7 @@ function osdmodulestargetconf()
 			"gdi32",
 			"dsound",
 			"dxguid",
+			"oleaut32",
 		}
 	elseif _OPTIONS["targetos"]=="macosx" then
 		links {

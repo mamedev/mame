@@ -150,7 +150,7 @@ inline void mips3_device::save_fast_iregs(drcuml_block *block)
 
 void mips3_device::mips3drc_set_options(UINT32 options)
 {
-	if (!(mconfig().options().drc() && !mconfig().m_force_no_drc)) return;
+	if (!allow_drc()) return;
 	m_drcoptions = options;
 }
 
@@ -196,7 +196,7 @@ void mips3_device::add_fastram(offs_t start, offs_t end, UINT8 readonly, void *b
 
 void mips3_device::mips3drc_add_hotspot(offs_t pc, UINT32 opcode, UINT32 cycles)
 {
-	if (!(mconfig().options().drc() && !mconfig().m_force_no_drc)) return;
+	if (!allow_drc()) return;
 	if (m_hotspot_select < ARRAY_LENGTH(m_hotspot))
 	{
 		m_hotspot[m_hotspot_select].pc = pc;

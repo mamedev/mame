@@ -1,0 +1,35 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz,ImJezze
+//============================================================
+//
+//  color.json: Color aberration shader for CRT simulation.
+//
+//============================================================
+{
+    "blend": {
+    	"equation": "add",
+    	"srcColor": "srcalpha",
+    	"dstColor": "1-srcalpha",
+    	"srcAlpha": "srcalpha",
+    	"dstAlpha": "1-srcalpha"
+    },
+    "depth": {
+    	"function": "always"
+    },
+    "cull": { "mode": "none" },
+    "write": {
+    	"rgb": true,
+    	"alpha": true
+    },
+    "vertex": "vs_color",
+    "fragment": "fs_color",
+    "uniforms": [
+    	{ "name": "s_tex",          "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "u_red_ratios",   "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_grn_ratios",   "type": "vec4", "values": [ 0.0, 1.0, 0.0, 0.0 ] },
+    	{ "name": "u_blu_ratios",   "type": "vec4", "values": [ 0.0, 0.0, 1.0, 0.0 ] },
+    	{ "name": "u_offset",       "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_scale",        "type": "vec4", "values": [ 0.95, 0.95, 0.95, 0.0 ] },
+    	{ "name": "u_saturation",   "type": "vec4", "values": [ 1.5, 0.0, 0.0, 0.0 ] }
+    ]
+}

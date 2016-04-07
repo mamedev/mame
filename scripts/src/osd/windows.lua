@@ -253,7 +253,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/windows/winutf8.h",
 		MAME_DIR .. "src/osd/windows/winutil.cpp",
 		MAME_DIR .. "src/osd/windows/winutil.h",
-		MAME_DIR .. "src/osd/windows/winclip.cpp",
 		MAME_DIR .. "src/osd/modules/osdmodule.cpp",
 		MAME_DIR .. "src/osd/modules/osdmodule.h",
 		MAME_DIR .. "src/osd/modules/file/winfile.cpp",
@@ -275,10 +274,10 @@ if _OPTIONS["with-tools"] then
 		kind "ConsoleApp"
 
 		flags {
-			"Symbols", -- always include minimum symbols for executables 	
+			"Symbols", -- always include minimum symbols for executables
 		}
 
-		if _OPTIONS["SEPARATE_BIN"]~="1" then 
+		if _OPTIONS["SEPARATE_BIN"]~="1" then
 			targetdir(MAME_DIR)
 		end
 
@@ -289,7 +288,7 @@ if _OPTIONS["with-tools"] then
 		includedirs {
 			MAME_DIR .. "src/osd",
 		}
-		
+
 		files {
 			MAME_DIR .. "src/osd/windows/ledutil.cpp",
 		}

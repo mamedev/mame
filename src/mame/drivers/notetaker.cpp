@@ -14,7 +14,7 @@
      <there are probably others I've missed>
 
  * History of the machine can be found at http://freudenbergs.de/bert/publications/Ingalls-2014-Smalltalk78.pdf
- 
+
  * The notetaker has an 8-slot backplane, with the following cards in it:
    * I/O Processor card (8086@8Mhz, 8259pic, 4k ROM, Keyboard UART, DAC1200 (multiplexed to 2 channels))
    * Emulation Processor card (8086@5Mhz, 8259pic, 4k of local RAM with Parity check logic)
@@ -34,7 +34,7 @@
  * As far as I am aware, no media (world disks/boot disks) for the NoteTaker have survived (except maybe the two disks at Xerox Museum at PARC), but an incomplete dump of the Smalltalk-76 'world' which was used to bootstrap Smalltalk-78 originally did survive on the Alto disks at CHM
 
  * We are missing the dump for the i8748 Keyboard MCU which does row-column scanning and mouse quadrature reading, and talks to the main system via serial
- 
+
  * see http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker for additional information
  * see http://xeroxalto.computerhistory.org/Filene/Smalltalk-76/ for the smalltalk-76 dump
  * see http://xeroxalto.computerhistory.org/Indigo/BasicDisks/Smalltalk14.bfs!1_/ for more notetaker/smalltalk related files, including SmallTalk-80 files based on the notetaker smalltalk-78
@@ -656,19 +656,19 @@ read from 0x44 (byte wide) to check input fifo status
 /* Emulator CPU */
 /*
 static ADDRESS_MAP_START(notetaker_emulatorcpu_mem, AS_PROGRAM, 16, notetaker_state)
-	AM_RANGE(0x00000, 0x01fff) AM_MIRROR(0xC0000) AM_RAM // actually a banked block of ram, 8k (4k words)
-	AM_RANGE(0x02000, 0x3ffff) AM_MIRROR(0xC0000) AM_RAM AM_BASE("mainram") // 256k of ram (less 8k), shared between both processors, mirrored 4 times
-	AM_RANGE(0xFFFC0, 0xFFFDF) AM_READWRITE(proc_illinst_r, proc_illinst_w)
-	AM_RANGE(0xFFFE0, 0xFFFEF) AM_READWRITE(proc_control_r, proc_control_w)
+    AM_RANGE(0x00000, 0x01fff) AM_MIRROR(0xC0000) AM_RAM // actually a banked block of ram, 8k (4k words)
+    AM_RANGE(0x02000, 0x3ffff) AM_MIRROR(0xC0000) AM_RAM AM_BASE("mainram") // 256k of ram (less 8k), shared between both processors, mirrored 4 times
+    AM_RANGE(0xFFFC0, 0xFFFDF) AM_READWRITE(proc_illinst_r, proc_illinst_w)
+    AM_RANGE(0xFFFE0, 0xFFFEF) AM_READWRITE(proc_control_r, proc_control_w)
 ADDRESS_MAP_END
 
 // note everything in the emulatorcpu's io range is incompletely decoded; so if 0x1800 is accessed it will write to both the debug 8255 AND the pic8259! I'm not sure the code abuses this or not, but it might do so to both write registers and clear parity at once, or something similar.
 static ADDRESS_MAP_START(notetaker_emulatorcpu_io, AS_IO, 16, notetaker_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x800, 0x803) AM_MIRROR(0x07FC) AM_DEVREADWRITE8("emupic8259", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x07FE) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255, is this the same one as the iocpu accesses? or are these two 8255s on separate cards?
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07FE) AM_WRITE(EPConReg_w) // emu processor control reg & leds
-	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x07FE) AM_WRITE(EmuClearParity_w) // writes here clear the local 8k-ram parity error register
+    ADDRESS_MAP_UNMAP_HIGH
+    AM_RANGE(0x800, 0x803) AM_MIRROR(0x07FC) AM_DEVREADWRITE8("emupic8259", pic8259_device, read, write, 0x00ff)
+    AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x07FE) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255, is this the same one as the iocpu accesses? or are these two 8255s on separate cards?
+    AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07FE) AM_WRITE(EPConReg_w) // emu processor control reg & leds
+    AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x07FE) AM_WRITE(EmuClearParity_w) // writes here clear the local 8k-ram parity error register
 ADDRESS_MAP_END
 */
 

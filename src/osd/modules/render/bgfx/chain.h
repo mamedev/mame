@@ -31,18 +31,18 @@ public:
 
 	void process(render_primitive* prim, int view, int screen, texture_manager& textures, osd_window &window, uint64_t blend = 0L);
 
-    // Getters
-    std::vector<bgfx_slider*>& sliders() { return m_sliders; }
-    uint32_t applicable_passes();
+	// Getters
+	std::vector<bgfx_slider*>& sliders() { return m_sliders; }
+	uint32_t applicable_passes();
 
 private:
 	std::string                         m_name;
 	std::string                         m_author;
-    std::vector<bgfx_slider*>           m_sliders;
-    std::vector<bgfx_parameter*>        m_params;
+	std::vector<bgfx_slider*>           m_sliders;
+	std::vector<bgfx_parameter*>        m_params;
 	std::vector<bgfx_chain_entry*>      m_entries;
-    std::map<std::string, bgfx_slider*> m_slider_map;
-    int64_t                             m_current_time;
+	std::map<std::string, bgfx_slider*> m_slider_map;
+	int64_t                             m_current_time;
 };
 
 #endif // __DRAWBGFX_CHAIN__

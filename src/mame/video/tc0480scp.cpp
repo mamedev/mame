@@ -166,8 +166,7 @@ tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *ta
 	m_flip_xoffs(0),
 	m_flip_yoffs(0),
 	m_col_base(0),
-	m_gfxdecode(*this),
-	m_palette(*this)
+	m_gfxdecode(*this)
 {
 	memset(m_ctrl, 0, sizeof(m_ctrl));
 
@@ -190,16 +189,6 @@ tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *ta
 void tc0480scp_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<tc0480scp_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void tc0480scp_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<tc0480scp_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -297,7 +286,7 @@ void tc0480scp_device::device_start()
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(m_palette, tc0480scp_charlayout, (UINT8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, m_col_base));
+	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(m_gfxdecode->palette(), tc0480scp_charlayout, (UINT8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, m_col_base));
 	m_gfxdecode->gfx(m_gfxnum)->set_colorbase(m_col_base);
 
 	save_item(NAME(m_ram));

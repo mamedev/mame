@@ -86,7 +86,7 @@ public:
 	SDL_Window *sdl_window() override { return m_sdl_window; }
 
 	int prescale() const { return m_prescale; }
-    osd_renderer &renderer() const { return *m_renderer; }
+	osd_renderer &renderer() const { return *m_renderer; }
 
 	// Pointer to next window
 	sdl_window_info *   m_next;

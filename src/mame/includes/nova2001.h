@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Howie Cohen, Frank Palazzolo, Alex Pasadyn, David Haywood, Steph, Phil Stroffolino, Uki
+// copyright-holders:Howie Cohen, Frank Palazzolo, Alex Pasadyn, David Haywood, Phil Stroffolino, Uki
 class nova2001_state : public driver_device
 {
 public:

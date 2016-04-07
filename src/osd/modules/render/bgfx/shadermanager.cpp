@@ -44,9 +44,9 @@ bgfx::ShaderHandle shader_manager::load_shader(std::string name)
 	std::string shader_path;
 	switch (bgfx::getRendererType())
 	{
-        case bgfx::RendererType::Direct3D9:
-            shader_path = m_options.bgfx_path() + std::string("/shaders/dx9/");
-            break;
+		case bgfx::RendererType::Direct3D9:
+			shader_path = m_options.bgfx_path() + std::string("/shaders/dx9/");
+			break;
 
 		case bgfx::RendererType::Direct3D11:
 		case bgfx::RendererType::Direct3D12:
@@ -66,7 +66,7 @@ bgfx::ShaderHandle shader_manager::load_shader(std::string name)
 			break;
 
 		default:
-            fatalerror("Unknown BGFX renderer type %d", bgfx::getRendererType());
+			fatalerror("Unknown BGFX renderer type %d", bgfx::getRendererType());
 	}
 
 	bgfx::ShaderHandle handle = bgfx::createShader(load_mem(shader_path + name + ".bin"));
@@ -81,7 +81,7 @@ const bgfx::Memory* shader_manager::load_mem(std::string name)
 	bx::CrtFileReader reader;
 	bx::open(&reader, name.c_str());
 
-	uint32_t size = (uint32_t)bx::getSize(&reader);
+	uint32_t size(bx::getSize(&reader));
 	const bgfx::Memory* mem = bgfx::alloc(size + 1);
 	bx::read(&reader, mem->data, size);
 	bx::close(&reader);

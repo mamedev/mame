@@ -207,6 +207,8 @@ private:
 	void op_fsqrt(x86code *&dst, const uml::instruction &inst);
 	void op_frecip(x86code *&dst, const uml::instruction &inst);
 	void op_frsqrt(x86code *&dst, const uml::instruction &inst);
+	void op_fcopyi(x86code *&dst, const uml::instruction &inst);
+	void op_icopyf(x86code *&dst, const uml::instruction &inst);
 
 	// 32-bit code emission helpers
 	void emit_mov_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param);

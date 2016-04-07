@@ -10,11 +10,10 @@ const device_type PCX_VIDEO = &device_creator<pcx_video_device>;
 
 pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	device_gfx_interface(mconfig, *this, nullptr, "palette"),
 	m_maincpu(*this, ":maincpu"),
 	m_mcu(*this, "graphics"),
 	m_crtc(*this, "crtc"),
-	m_palette(*this, "palette"),
-	m_gfxdecode(*this, "gfxdecode"),
 	m_pic2(*this, ":pic2")
 {
 }
@@ -76,7 +75,7 @@ static const gfx_layout pcd_charlayout =
 };
 
 static GFXDECODE_START( pcx )
-	GFXDECODE_ENTRY( "char", 0x0000, pcd_charlayout, 0, 1 )
+	GFXDECODE_DEVICE( "char", 0x0000, pcd_charlayout, 0, 1 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( pcd_mouse )
@@ -113,7 +112,6 @@ static MACHINE_CONFIG_FRAGMENT( pcd_video )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2674_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(pcdx_video_device, pcdx)
 
@@ -159,7 +157,6 @@ static MACHINE_CONFIG_FRAGMENT( pcx_video )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2674_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcx)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_SCN2674_VIDEO_ADD("crtc", 0, INPUTLINE("graphics", MCS51_INT0_LINE));
@@ -184,7 +181,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 		if(m_p2 & 8)
 			data = ~data;
 		for(int i = 0; i < 16; i++)
-			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (15 - i))) ? 1 : 0);
+			bitmap.pix32(y, x + i) = palette().pen((data & (1 << (15 - i))) ? 1 : 0);
 	}
 	else
 	{
@@ -207,7 +204,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 		else if(attr & 8)
 			bgnd = 2;
 		for(int i = 0; i < 8; i++)
-			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (7 - i))) ? fgnd : bgnd);
+			bitmap.pix32(y, x + i) = palette().pen((data & (1 << (7 - i))) ? fgnd : bgnd);
 	}
 }
 
@@ -221,7 +218,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcx_video_device::display_pixels)
 	if(m_p1 & 0x20)
 		data = ~data;
 	for(int i = 0; i < 8; i++)
-		bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (7 - i))) ? 1 : 0);
+		bitmap.pix32(y, x + i) = palette().pen((data & (1 << (7 - i))) ? 1 : 0);
 }
 
 PALETTE_INIT_MEMBER(pcdx_video_device, pcdx)
@@ -276,7 +273,7 @@ WRITE8_MEMBER(pcd_video_device::vram_w)
 	{
 		offset >>= 1;
 		m_charram[offset & 0x1fff] = data;
-		m_gfxdecode->gfx(0)->mark_dirty(offset/16);
+		gfx(0)->mark_dirty(offset/16);
 	}
 }
 
@@ -410,7 +407,7 @@ void pcd_video_device::device_start()
 {
 	m_maincpu->space(AS_IO).install_readwrite_handler(0xfb00, 0xfb01, 0, 0, read8_delegate(FUNC(pcdx_video_device::detect_r), this), write8_delegate(FUNC(pcdx_video_device::detect_w), this), 0xff00);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0000, 0xf7fff, 0, 0, read8_delegate(FUNC(pcd_video_device::vram_r), this), write8_delegate(FUNC(pcd_video_device::vram_w), this), 0xffff);
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, pcd_charlayout, &m_charram[0], 0, 1, 0));
+	set_gfx(0, std::make_unique<gfx_element>(palette(), pcd_charlayout, &m_charram[0], 0, 1, 0));
 }
 
 void pcd_video_device::device_reset()
@@ -442,6 +439,8 @@ void pcx_video_device::device_start()
 	mcu->i8051_set_serial_rx_callback(READ8_DELEGATE(pcx_video_device, rx_callback));
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rate(600*2);  // FIXME: fix the keyboard when the mc2661 baud rate calc is fixed
+
+	decode_gfx(GFXDECODE_NAME(pcx));
 }
 
 void pcx_video_device::device_reset()

@@ -10,7 +10,7 @@
 
 
 #ifdef SDLMAME_UNIX
-#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_EMSCRIPTEN))
+#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID))
 #ifndef SDLMAME_HAIKU
 #include <fontconfig/fontconfig.h>
 #endif
@@ -61,7 +61,7 @@
 
 #ifndef INI_PATH
 #if defined(SDLMAME_WIN32)
-	#define INI_PATH ".;ini"
+	#define INI_PATH ".;ini;ini/presets"
 #elif defined(SDLMAME_MACOSX)
 	#define INI_PATH "$HOME/Library/Application Support/APP_NAME;$HOME/.APP_NAME;.;ini"
 #else
@@ -198,11 +198,16 @@ int main(int argc, char *argv[])
 	setvbuf(stdout, (char *) NULL, _IONBF, 0);
 	setvbuf(stderr, (char *) NULL, _IONBF, 0);
 
+#if defined(SDLMAME_ANDROID)
+	/* Enable standard application logging */
+	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
+#endif
+	
 	// FIXME: this should be done differently
 
 #ifdef SDLMAME_UNIX
 	sdl_entered_debugger = 0;
-#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
+#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID))
 	FcInit();
 #endif
 #endif
@@ -216,7 +221,7 @@ int main(int argc, char *argv[])
 	}
 
 #ifdef SDLMAME_UNIX
-#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
+#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID))
 	if (!sdl_entered_debugger)
 	{
 		FcFini();
@@ -269,7 +274,7 @@ void sdl_osd_interface::osd_exit()
 
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
 	{
-		SDL_QuitSubSystem(SDL_INIT_TIMER| SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER );
+		SDL_QuitSubSystem(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER );
 	}
 }
 
@@ -486,12 +491,7 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
 	{
-#ifdef SDLMAME_EMSCRIPTEN
-		// timer brings in threads which are not supported in Emscripten
-		if (SDL_InitSubSystem(SDL_INIT_VIDEO| SDL_INIT_GAMECONTROLLER|SDL_INIT_NOPARACHUTE)) {
-#else
-		if (SDL_InitSubSystem(SDL_INIT_TIMER| SDL_INIT_VIDEO| SDL_INIT_GAMECONTROLLER|SDL_INIT_NOPARACHUTE)) {
-#endif
+		if (SDL_InitSubSystem(SDL_INIT_VIDEO)) {
 			osd_printf_error("Could not initialize SDL %s\n", SDL_GetError());
 			exit(-1);
 		}
@@ -521,4 +521,3 @@ void sdl_osd_interface::init(running_machine &machine)
 	SDL_EventState(SDL_TEXTINPUT, SDL_TRUE);
 #endif
 }
-

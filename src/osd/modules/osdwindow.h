@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "ui/ui.h"
+#include "osdhelper.h"
 
 #ifdef OSD_SDL
 // standard SDL headers
@@ -37,57 +38,6 @@ enum
 	VIDEO_MODE_SOFT,
 
 	VIDEO_MODE_COUNT
-};
-
-class osd_dim
-{
-public:
-	osd_dim(const int &w, const int &h)
-	: m_w(w), m_h(h)
-	{
-	}
-	int width() const { return m_w; }
-	int height() const { return m_h; }
-
-	bool operator!=(const osd_dim &other) { return (m_w != other.width()) || (m_h != other.height()); }
-	bool operator==(const osd_dim &other) { return (m_w == other.width()) && (m_h == other.height()); }
-private:
-	int m_w;
-	int m_h;
-};
-
-class osd_rect
-{
-public:
-	osd_rect()
-	: m_x(0), m_y(0), m_d(0,0)
-	{
-	}
-	osd_rect(const int x, const int y, const int &w, const int &h)
-	: m_x(x), m_y(y), m_d(w,h)
-	{
-	}
-	osd_rect(const int x, const int y, const osd_dim &d)
-	: m_x(x), m_y(y), m_d(d)
-	{
-	}
-	int top() const { return m_y; }
-	int left() const { return m_x; }
-	int width() const { return m_d.width(); }
-	int height() const { return m_d.height(); }
-
-	osd_dim dim() const { return m_d; }
-
-	int bottom() const { return m_y + m_d.height(); }
-	int right() const { return m_x + m_d.width(); }
-
-	osd_rect move_by(int dx, int dy) const { return osd_rect(m_x + dx, m_y + dy, m_d); }
-	osd_rect resize(int w, int h) const { return osd_rect(m_x, m_y, w, h); }
-
-private:
-	int m_x;
-	int m_y;
-	osd_dim m_d;
 };
 
 class osd_monitor_info
@@ -170,6 +120,16 @@ public:
 
 	float pixel_aspect() const { return monitor()->pixel_aspect(); }
 
+	bool swap_xy()
+	{
+		bool orientation_swap_xy =
+			(machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+		bool rotation_swap_xy =
+			(target()->orientation() & ROT90) == ROT90 ||
+			(target()->orientation() & ROT270) == ROT270;
+		return orientation_swap_xy ^ rotation_swap_xy;
+	};
+
 	virtual osd_dim get_size() = 0;
 
 #ifdef OSD_SDL
@@ -236,7 +196,7 @@ public:
 	virtual void record() { };
 	virtual void toggle_fsfx() { };
 	virtual bool sliders_dirty() { return m_sliders_dirty; }
-    virtual bool multi_window_sliders() { return false; }
+	virtual bool multi_window_sliders() { return false; }
 
 	static osd_renderer* make_for_type(int mode, osd_window *window, int extra_flags = FLAG_NONE);
 
@@ -250,5 +210,82 @@ private:
 	int         m_flags;
 };
 
+
+
+//============================================================
+//  CONSTANTS
+//============================================================
+
+#define MAX_VIDEO_WINDOWS           (4)
+
+#define VIDEO_SCALE_MODE_NONE       (0)
+
+#define GLSL_SHADER_MAX 10
+
+
+//============================================================
+//  TYPE DEFINITIONS
+//============================================================
+
+struct osd_video_config
+{
+	// global configuration
+	int                 windowed;                   // start windowed?
+	int                 prescale;                   // prescale factor
+	int                 keepaspect;                 // keep aspect ratio
+	int                 numscreens;                 // number of screens
+	int                 fullstretch;                // fractional stretch
+
+	// hardware options
+	int                 mode;                       // output mode
+	int                 waitvsync;                  // spin until vsync
+	int                 syncrefresh;                // sync only to refresh rate
+	int                 switchres;                  // switch resolutions
+
+	// d3d, accel, opengl
+	int                 filter;                     // enable filtering
+	//int                 filter;         // enable filtering, disabled if glsl_filter>0
+
+	// OpenGL options
+	int                 glsl;
+	int                 glsl_filter;        // glsl filtering, >0 disables filter
+	char *              glsl_shader_mamebm[GLSL_SHADER_MAX]; // custom glsl shader set, mame bitmap
+	int                 glsl_shader_mamebm_num; // custom glsl shader set number, mame bitmap
+	char *              glsl_shader_scrn[GLSL_SHADER_MAX]; // custom glsl shader set, screen bitmap
+	int                 glsl_shader_scrn_num; // custom glsl shader number, screen bitmap
+	int                 pbo;
+	int                 vbo;
+	int                 allowtexturerect;   // allow GL_ARB_texture_rectangle, default: no
+	int                 forcepow2texture;   // force power of two textures, default: no
+
+	// dd, d3d
+	int                 triplebuf;                  // triple buffer
+
+	//============================================================
+	// SDL - options
+	//============================================================
+	int                 novideo;                // don't draw, for pure CPU benchmarking
+
+	int                 centerh;
+	int                 centerv;
+
+	// vector options
+	float               beamwidth;      // beam width
+
+	// perftest
+	int                 perftest;       // print out real video fps
+
+	// X11 options
+	int                 restrictonemonitor; // in fullscreen, confine to Xinerama monitor 0
+
+	// YUV options
+	int                 scale_mode;
+};
+
+//============================================================
+//  GLOBAL VARIABLES
+//============================================================
+
+extern osd_video_config video_config;
 
 #endif /* __OSDWINDOW__ */

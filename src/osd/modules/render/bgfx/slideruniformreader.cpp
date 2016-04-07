@@ -40,7 +40,7 @@ bgfx_entry_uniform* slider_uniform_reader::read_from_value(const Value& value, s
 
 bool slider_uniform_reader::validate_parameters(const Value& value, std::string prefix)
 {
-    if (!READER_CHECK(value.HasMember("slider"), (prefix + "Must have string value 'slider' (what slider are we getting the value of?)\n").c_str())) return false;
-    if (!READER_CHECK(value["slider"].IsString(), (prefix + "Value 'slider' must be a string\n").c_str())) return false;
-    return true;
+	if (!READER_CHECK(value.HasMember("slider"), (prefix + "Must have string value 'slider' (what slider are we getting the value of?)\n").c_str())) return false;
+	if (!READER_CHECK(value["slider"].IsString(), (prefix + "Value 'slider' must be a string\n").c_str())) return false;
+	return true;
 }

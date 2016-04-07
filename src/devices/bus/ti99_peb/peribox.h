@@ -43,7 +43,7 @@ public:
 	template<class _Object> static devcb_base &static_set_intb_callback(device_t &device, _Object object)  {  return downcast<peribox_device &>(device).m_console_intb.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object)     {  return downcast<peribox_device &>(device).m_datamux_ready.set_callback(object); }
 
-	// Next seven methods are called from the console
+	// Next eight methods are called from the console
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
@@ -52,6 +52,11 @@ public:
 	DECLARE_WRITE8_MEMBER(cruwrite);
 	DECLARE_WRITE_LINE_MEMBER(senila);
 	DECLARE_WRITE_LINE_MEMBER(senilb);
+
+	DECLARE_WRITE_LINE_MEMBER( memen_in );
+	DECLARE_WRITE_LINE_MEMBER( msast_in );
+
+	DECLARE_WRITE_LINE_MEMBER( clock_in );
 
 	// Part of configuration
 	void set_prefix(int prefix) { m_address_prefix = prefix; }
@@ -86,6 +91,12 @@ protected:
 
 	// The TI-99/4(A) Flex Cable Interface (slot 1) pulls up the AMA/AMB/AMC lines to 1/1/1.
 	int m_address_prefix;
+
+	// Most significant address byte strobe. Defined by TI-99/8.
+	bool    m_msast;
+
+	// Memory enable.
+	bool    m_memen;
 };
 
 /************************************************************************
@@ -157,6 +168,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(senila);
 	DECLARE_WRITE_LINE_MEMBER(senilb);
+	DECLARE_WRITE_LINE_MEMBER(clock_in);
 
 	// Called from the card (direction to box)
 	DECLARE_WRITE_LINE_MEMBER( set_inta );
@@ -206,6 +218,8 @@ public:
 
 	void    set_senila(int state) { m_senila = state; }
 	void    set_senilb(int state) { m_senilb = state; }
+
+	virtual DECLARE_WRITE_LINE_MEMBER(clock_in) { };
 
 protected:
 	peribox_slot_device *m_slot;        // using a link to the slot for callbacks

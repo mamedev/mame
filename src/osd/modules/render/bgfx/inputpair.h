@@ -27,9 +27,9 @@ public:
 
 	void bind(bgfx_effect *effect, target_manager& targets, texture_manager& textures, const int32_t screen) const;
 
-    // Getters
-    std::string sampler() const { return m_sampler; }
-    std::string texture() const { return m_texture; }
+	// Getters
+	std::string sampler() const { return m_sampler; }
+	std::string texture() const { return m_texture; }
 
 private:
 	int         m_index;

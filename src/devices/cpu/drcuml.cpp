@@ -35,6 +35,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "emuopts.h"
 #include "drcuml.h"
 #include "drcbec.h"
 #include "drcbex86.h"

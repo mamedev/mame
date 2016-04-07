@@ -26,8 +26,9 @@
 #define WINOPTION_MENU                  "menu"
 
 // core post-processing options
-#define WINOPTION_HLSL_ENABLE               "hlsl_enable"
 #define WINOPTION_HLSLPATH                  "hlslpath"
+#define WINOPTION_HLSL_ENABLE               "hlsl_enable"
+#define WINOPTION_HLSL_OVERSAMPLING         "hlsl_oversampling"
 #define WINOPTION_HLSL_WRITE                "hlsl_write"
 #define WINOPTION_HLSL_SNAP_WIDTH           "hlsl_snap_width"
 #define WINOPTION_HLSL_SNAP_HEIGHT          "hlsl_snap_height"
@@ -95,8 +96,6 @@
 #define WINOPTION_BLOOM_LEVEL6_WEIGHT       "bloom_lvl6_weight"
 #define WINOPTION_BLOOM_LEVEL7_WEIGHT       "bloom_lvl7_weight"
 #define WINOPTION_BLOOM_LEVEL8_WEIGHT       "bloom_lvl8_weight"
-#define WINOPTION_BLOOM_LEVEL9_WEIGHT       "bloom_lvl9_weight"
-#define WINOPTION_BLOOM_LEVEL10_WEIGHT      "bloom_lvl10_weight"
 
 // full screen options
 #define WINOPTION_TRIPLEBUFFER          "triplebuffer"
@@ -128,6 +127,7 @@ public:
 	// core post-processing options
 	const char *screen_post_fx_dir() const { return value(WINOPTION_HLSLPATH); }
 	bool d3d_hlsl_enable() const { return bool_value(WINOPTION_HLSL_ENABLE); }
+	bool d3d_hlsl_oversampling() const { return bool_value(WINOPTION_HLSL_OVERSAMPLING); }
 	const char *d3d_hlsl_write() const { return value(WINOPTION_HLSL_WRITE); }
 	int d3d_snap_width() const { return int_value(WINOPTION_HLSL_SNAP_WIDTH); }
 	int d3d_snap_height() const { return int_value(WINOPTION_HLSL_SNAP_HEIGHT); }
@@ -189,8 +189,6 @@ public:
 	float screen_bloom_lvl6_weight() const { return float_value(WINOPTION_BLOOM_LEVEL6_WEIGHT); }
 	float screen_bloom_lvl7_weight() const { return float_value(WINOPTION_BLOOM_LEVEL7_WEIGHT); }
 	float screen_bloom_lvl8_weight() const { return float_value(WINOPTION_BLOOM_LEVEL8_WEIGHT); }
-	float screen_bloom_lvl9_weight() const { return float_value(WINOPTION_BLOOM_LEVEL9_WEIGHT); }
-	float screen_bloom_lvl10_weight() const { return float_value(WINOPTION_BLOOM_LEVEL10_WEIGHT); }
 	const char *screen_offset() const { return value(WINOPTION_OFFSET); }
 	const char *screen_scale() const { return value(WINOPTION_SCALE); }
 	const char *screen_power() const { return value(WINOPTION_POWER); }
@@ -288,7 +286,7 @@ public:
 
 	windows_options &options() { return m_options; }
 
-    int window_count();
+	int window_count();
 
 protected:
 	virtual void build_slider_list() override;

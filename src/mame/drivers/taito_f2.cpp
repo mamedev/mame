@@ -1612,7 +1612,14 @@ static INPUT_PORTS_START( ssi )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( majest12 )
+static INPUT_PORTS_START( majest12u )
+	PORT_INCLUDE(ssi)
+
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_US_LOC(SW1)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( majest12j )
 	PORT_INCLUDE(ssi)
 
 	PORT_MODIFY("DSWA")
@@ -3232,7 +3239,6 @@ static MACHINE_CONFIG_DERIVED( footchmp, taito_f2 )
 	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
 	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
-	MCFG_TC0480SCP_PALETTE("palette")
 
 	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
@@ -3266,7 +3272,6 @@ static MACHINE_CONFIG_DERIVED( hthero, taito_f2 )
 	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
 	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
-	MCFG_TC0480SCP_PALETTE("palette")
 MACHINE_CONFIG_END
 
 
@@ -3433,7 +3438,6 @@ static MACHINE_CONFIG_DERIVED( metalb, taito_f2_tc0510nio )
 	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
 	MCFG_TC0480SCP_COL_BASE(4096)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
-	MCFG_TC0480SCP_PALETTE("palette")
 
 	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
@@ -3501,7 +3505,6 @@ static MACHINE_CONFIG_DERIVED( deadconx, taito_f2 )
 	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
 	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
-	MCFG_TC0480SCP_PALETTE("palette")
 
 	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
@@ -3526,7 +3529,6 @@ static MACHINE_CONFIG_DERIVED( deadconxj, taito_f2 )
 	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
 	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
-	MCFG_TC0480SCP_PALETTE("palette")
 
 	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
@@ -4427,7 +4429,28 @@ ROM_START( ssia )
 	/* no Delta-T samples */
 ROM_END
 
-ROM_START( majest12 )
+ROM_START( majest12u )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
+	ROM_LOAD16_BYTE( "c64_12.ic9", 0x00000, 0x40000, CRC(d5716d7e) SHA1(3a18d8ef1d16380946714910245b00bbcec39e3d) )
+	ROM_LOAD16_BYTE( "c64_14.ic8", 0x00001, 0x40000, CRC(eee4ed8a) SHA1(ad50dc12ede0d327ef9ded5ffd9dbd6e865ebcfc) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
+	/* empty! */
+
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
+	ROM_LOAD( "c64-01.1",     0x000000, 0x100000, CRC(a1b4f486) SHA1(bdd6bf144e50fe7b1d4cf4504471a689669415a4) )
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
+	ROM_LOAD( "c64-09.13",    0x00000, 0x04000, CRC(88d7f65c) SHA1(d6383bf8fd035772fa3c57b26b727eefe1aadd93) )
+	ROM_CONTINUE(             0x10000, 0x0c000 )    /* banked stuff */
+
+	ROM_REGION( 0x20000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_LOAD( "c64-02.2",     0x00000, 0x20000, CRC(3cb0b907) SHA1(7cbe437fe584575a2f26a582095fd49665c7003e) )
+
+	/* no Delta-T samples */
+ROM_END
+
+ROM_START( majest12j )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c64-07.10", 0x00000, 0x20000, CRC(f29ed5c9) SHA1(62283af1c08457db54057ee59a95fb7a3797b897) )
 	ROM_LOAD16_BYTE( "c64-06.4",  0x40000, 0x20000, CRC(18dc71ac) SHA1(cb9c0b330ae98e20269f18cdb543feb294647245) )
@@ -5583,7 +5606,8 @@ GAME( 1990, quizhq,     0,        quizhq,    quizhq, driver_device,    0,       
 
 GAME( 1990, ssi,        0,        ssi,       ssi, driver_device,       0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ssia,       ssi,      ssi,       ssi, driver_device,       0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, majest12,   ssi,      ssi,       majest12, driver_device,  0,        ROT270, "Taito Corporation",         "Majestic Twelve - The Space Invaders Part IV (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, majest12u,  ssi,      ssi,       majest12u, driver_device, 0,        ROT270, "Taito America Corporation", "Majestic Twelve - The Space Invaders Part IV (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, majest12j,  ssi,      ssi,       majest12j, driver_device, 0,        ROT270, "Taito Corporation",         "Majestic Twelve - The Space Invaders Part IV (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, gunfront,   0,        gunfront,  gunfront, driver_device,  0,        ROT270, "Taito Corporation Japan",   "Gun & Frontier (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, gunfrontj,  gunfront, gunfront,  gunfrontj, driver_device, 0,        ROT270, "Taito Corporation",         "Gun Frontier (Japan)", MACHINE_SUPPORTS_SAVE )

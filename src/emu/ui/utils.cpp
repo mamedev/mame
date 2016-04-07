@@ -84,6 +84,15 @@ const char* strensure(const char* s)
 	return s == nullptr ? "" : s;
 }
 
+int getprecisionchr(const char* s)
+{
+	int precision = 1;
+	char *dp = const_cast<char *>(strchr(s, '.'));
+	if (dp != nullptr)
+		precision = strlen(s) - (dp - s) - 1;
+	return precision;
+}
+
 //-------------------------------------------------
 //  search a substring with even partial matching
 //-------------------------------------------------

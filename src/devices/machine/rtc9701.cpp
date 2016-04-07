@@ -15,6 +15,8 @@
 #include "machine/rtc9701.h"
 
 
+ALLOW_SAVE_TYPE(rtc9701_state_t);
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -104,6 +106,25 @@ void rtc9701_device::device_start()
 	rtc_state = RTC9701_CMD_WAIT;
 	cmd_stream_pos = 0;
 	current_cmd = 0;
+	
+	save_item(NAME(m_latch));
+	save_item(NAME(m_reset_line));
+	save_item(NAME(m_clock_line));
+	save_item(NAME(rtc_state));
+	save_item(NAME(cmd_stream_pos));
+	save_item(NAME(current_cmd));
+	save_item(NAME(rtc9701_address_pos));
+	save_item(NAME(rtc9701_current_address));
+	save_item(NAME(rtc9701_current_data));
+	save_item(NAME(rtc9701_data_pos));
+	save_item(NAME(rtc9701_data));
+	save_item(NAME(m_rtc.sec));
+	save_item(NAME(m_rtc.min));
+	save_item(NAME(m_rtc.hour));
+	save_item(NAME(m_rtc.day));
+	save_item(NAME(m_rtc.wday));
+	save_item(NAME(m_rtc.month));
+	save_item(NAME(m_rtc.year));
 }
 
 
