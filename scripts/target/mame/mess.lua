@@ -251,6 +251,7 @@ SOUNDS["TMS5110A"] = true
 SOUNDS["LMC1992"] = true
 SOUNDS["AWACS"] = true
 --SOUNDS["YMZ770"] = true
+--SOUNDS["MPEG_AUDIO"] = true
 SOUNDS["T6721A"] = true
 SOUNDS["MOS7360"] = true
 SOUNDS["ESQPUMP"] = true

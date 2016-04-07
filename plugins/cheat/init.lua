@@ -120,10 +120,34 @@ function cheat.startplugin()
 		output[#output + 1] = { type = "box", scr = screen, x1 = x1, x2 = x2, y1 = y1, y2 = y2, bgcolor = bgcolor, linecolor = linecolor }
 	end
 
+	local function tobcd(val)
+		local result = 0
+		local shift = 0
+		while val ~= 0 do
+			result = result + ((val % 10) << shift)
+			val = val / 10
+			shift = shift + 4
+		end
+		return result
+	end
+
+	local function frombcd(val)
+		local result = 0
+		local mul = 1
+		while val ~= 0 do
+			result = result + ((val % 16) * mul)
+			val = val >> 4
+			mul = mul * 10
+		end
+		return result
+	end
+
 	local function parse_cheat(cheat)
 		cheat.cheat_env = { draw_text = draw_text,
 				    draw_line = draw_line,
 				    draw_box = draw_box,
+				    tobcd = tobcd,
+				    frombcd = frombcd,
 				    pairs = pairs }
 		cheat.enabled = false
 		-- verify scripts are valid first

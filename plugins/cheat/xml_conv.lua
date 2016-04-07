@@ -52,6 +52,7 @@ function xml.conv_cheat(data)
 	
 		local function convert_memref(cpu, space, width, addr, rw)
 			local direct = ""
+			local count
 			if space == "p" then
 				fullspace = "program"
 			elseif space == "d" then
@@ -96,6 +97,7 @@ function xml.conv_cheat(data)
 		end
 
 		data = data:lower()
+		data = data:gsub("^[(](.-)[)]$", "%1")
 		data = data:gsub("lt", "<")
 		data = data:gsub("ge", ">=")
 		data = data:gsub("gt", ">")
@@ -104,9 +106,13 @@ function xml.conv_cheat(data)
 		data = data:gsub("frame", frame)
 		data = data:gsub("band", "&")
 		data = data:gsub("bor", "|")
+		data = data:gsub("rshift", ">>")
+		data = data:gsub("lshift", "<<")
 		data = data:gsub("%f[%w](%x+)%f[%W]", "0x%1")
-		data = data:gsub("([%w:]-).([pmrodi3])([bwdq])@(0x%x+) *(=*)", convert_memref)
-		data = data:gsub("([%w:]-).([pmrodi3])([bwdq])@(%b()) *(=*)", convert_memref)
+		data = data:gsub("([%w_:]-).([pmrodi3])([bwdq])@(%w+) *(=*)", convert_memref)
+		repeat
+			data, count = data:gsub("([%w_:]-).([pmrodi3])([bwdq])@(%b()) *(=*)", convert_memref)
+		until count == 0
 		if write then
 			data = data .. ")"
 		end
@@ -148,7 +154,7 @@ function xml.conv_cheat(data)
 			elseif tag == "action" then
 				for count, action in pairs(block) do
 					if action["condition"] then
-						str = str .. " if " .. convert_expr(action["condition"]) .. " then "
+						str = str .. " if (" .. convert_expr(action["condition"]) .. ") then "
 						for expr in action["text"]:gmatch("([^,]+)") do
 							str = str .. convert_expr(expr) .. " "
 						end
@@ -189,7 +195,16 @@ function xml.conv_cheat(data)
 				end
 				data["cheat"][count]["script"] = scripts
 			elseif tag == "parameter" then
-				data["cheat"][count]["parameter"] = block[1]
+				if block[1]["min"] then
+					block[1]["min"] = block[1]["min"]:gsub("%$","0x")
+				end
+				if block[1]["max"] then
+					block[1]["max"] = block[1]["max"]:gsub("%$","0x")
+				end
+				if block[1]["step"] then
+					block[1]["step"] = block[1]["step"]:gsub("%$","0x")
+				end
+			data["cheat"][count]["parameter"] = block[1]
 			end
 		end
 		if next(spaces) then

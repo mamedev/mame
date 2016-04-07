@@ -2016,7 +2016,7 @@ WRITE64_MEMBER( powervr2_device::ta_fifo_poly_w )
 	}
 	else
 	{
-		fatalerror("ta_fifo_poly_w:  Only 64 bit writes supported!\n");
+		osd_printf_debug("%s",string_format("ta_fifo_poly_w:  Unmapped write64 %08x = %I64x mask %I64x\n", 0x10000000+offset*8, data, mem_mask).c_str());
 	}
 
 	tafifo_pos &= tafifo_mask;
