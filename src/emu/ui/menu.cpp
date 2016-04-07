@@ -1724,10 +1724,8 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	// hitting cancel also pops the stack
 	if (exclusive_input_pressed(IPT_UI_CANCEL, 0))
 	{
-		if (!menu_has_search_active())
+		if (!ui_error && !menu_has_search_active())
 			ui_menu::stack_pop(machine());
-		//    else if (!ui_error)
-		//        ui_menu::stack_pop(machine()); TODO
 		return;
 	}
 

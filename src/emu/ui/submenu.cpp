@@ -53,7 +53,6 @@ void ui_submenu::handle()
 {
 	bool changed = false;
 	std::string error_string, tmptxt;
-	int i_cur;
 	float f_cur, f_step;
 
 	// process the menu
@@ -80,7 +79,7 @@ void ui_submenu::handle()
 						if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
 						{
 							changed = true;
-							i_cur = atof(sm_option->entry->value());
+							int i_cur = atoi(sm_option->entry->value());
 							(m_event->iptkey == IPT_UI_LEFT) ? i_cur-- : i_cur++;
 							sm_option->options->set_value(sm_option->name, i_cur, OPTION_PRIORITY_CMDLINE, error_string);
 							sm_option->entry->mark_changed();
@@ -135,9 +134,6 @@ void ui_submenu::handle()
 void ui_submenu::populate()
 {
 	UINT32 arrow_flags;
-	std::string tmptxt;
-	float f_min, f_max, f_cur;
-	int i_min, i_max, i_cur;
 
 	// add options
 	for (auto sm_option = m_options.begin(); sm_option < m_options.end(); sm_option++)
@@ -164,16 +160,18 @@ void ui_submenu::populate()
 					case OPTION_BOOLEAN:
 						arrow_flags = sm_option->options->bool_value(sm_option->name) ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW;
 						item_append(_(sm_option->description),
-								(arrow_flags == MENU_FLAG_RIGHT_ARROW) ? "On" : "Off",
-								arrow_flags,
-								static_cast<void*>(&(*sm_option)));
+							(arrow_flags == MENU_FLAG_RIGHT_ARROW) ? "On" : "Off",
+							arrow_flags,
+							static_cast<void*>(&(*sm_option)));
 						break;
 					case OPTION_INTEGER:
-						i_cur = atof(sm_option->entry->value());
+					{
+						int i_min, i_max;
+						int i_cur = atoi(sm_option->entry->value());
 						if (sm_option->entry->has_range())
 						{
-							i_min = atof(sm_option->entry->minimum());
-							i_max = atof(sm_option->entry->maximum());
+							i_min = atoi(sm_option->entry->minimum());
+							i_max = atoi(sm_option->entry->maximum());
 						}
 						else
 						{
@@ -182,12 +180,15 @@ void ui_submenu::populate()
 						}
 						arrow_flags = get_arrow_flags(i_min, i_max, i_cur);
 						item_append(_(sm_option->description),
-								sm_option->entry->value(),
-								arrow_flags,
-								static_cast<void*>(&(*sm_option)));
+							sm_option->entry->value(),
+							arrow_flags,
+							static_cast<void*>(&(*sm_option)));
 						break;
+					}
 					case OPTION_FLOAT:
-						f_cur = atof(sm_option->entry->value());
+					{
+						float f_min, f_max;
+						float f_cur = atof(sm_option->entry->value());
 						if (sm_option->entry->has_range())
 						{
 							f_min = atof(sm_option->entry->minimum());
@@ -199,17 +200,18 @@ void ui_submenu::populate()
 							f_max = std::numeric_limits<float>::max();
 						}
 						arrow_flags = get_arrow_flags(f_min, f_max, f_cur);
-						tmptxt = string_format("%g", f_cur);
+						std::string tmptxt = string_format("%g", f_cur);
 						item_append(_(sm_option->description),
-								tmptxt.c_str(),
-								arrow_flags,
-								static_cast<void*>(&(*sm_option)));
+							tmptxt.c_str(),
+							arrow_flags,
+							static_cast<void*>(&(*sm_option)));
 						break;
+					}
 					default:
 						arrow_flags = MENU_FLAG_RIGHT_ARROW;
 						item_append(_(sm_option->description),
-								sm_option->options->value(sm_option->name),
-								arrow_flags, static_cast<void*>(&(*sm_option)));
+							sm_option->options->value(sm_option->name),
+							arrow_flags, static_cast<void*>(&(*sm_option)));
 						break;
 				}
 				break;
@@ -229,14 +231,11 @@ void ui_submenu::populate()
 
 void ui_submenu::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	static int interval = 0;
-	static ui_submenu::option *last_sm_option = nullptr;
-
 	float width;
 	ui_manager &mui = machine().ui();
 
 	mui.draw_text_full(container, _(m_options[0].description), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -256,22 +255,15 @@ void ui_submenu::custom_render(void *selectedref, float top, float bottom, float
 
 	// draw the text within it
 	mui.draw_text_full(container, _(m_options[0].description), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	if (selectedref != nullptr)
 	{
 		ui_submenu::option *selected_sm_option = (ui_submenu::option *)selectedref;
 
-		if (last_sm_option == selected_sm_option) {
-			if (interval <= 30) interval++;
-		} else {
-			last_sm_option = selected_sm_option;
-			interval = 0;
-		}
-
-		if (interval > 30 && last_sm_option->entry != nullptr)
+		if (selected_sm_option->entry != nullptr)
 		{
-			mui.draw_text_full(container, last_sm_option->entry->description(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+			mui.draw_text_full(container, selected_sm_option->entry->description(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 					DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 
 			width += 2 * UI_BOX_LR_BORDER;
@@ -292,13 +284,8 @@ void ui_submenu::custom_render(void *selectedref, float top, float bottom, float
 			y1 += UI_BOX_TB_BORDER;
 
 			// draw the text within it
-			mui.draw_text_full(container, last_sm_option->entry->description(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+			mui.draw_text_full(container, selected_sm_option->entry->description(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 					DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		}
-	}
-	else
-	{
-		last_sm_option = nullptr;
-		interval = 0;
 	}
 }
