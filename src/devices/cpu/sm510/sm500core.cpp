@@ -33,6 +33,6 @@ sm500_device::sm500_device(const machine_config &mconfig, const char *tag, devic
 // disasm
 offs_t sm500_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	extern CPU_DISASSEMBLE(sm510);
-	return CPU_DISASSEMBLE_NAME(sm510)(this, buffer, pc, oprom, opram, options);
+	extern CPU_DISASSEMBLE(sm500);
+	return CPU_DISASSEMBLE_NAME(sm500)(this, buffer, pc, oprom, opram, options);
 }
