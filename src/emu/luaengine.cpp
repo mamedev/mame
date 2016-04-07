@@ -707,6 +707,94 @@ luabridge::LuaRef lua_engine::l_dev_get_states(const device_t *d)
 }
 
 //-------------------------------------------------
+//  device_get_item - return table of indexed items owned by this device
+//  -> manager:machine().devices[":maincpu"].items
+//-------------------------------------------------
+
+luabridge::LuaRef lua_engine::l_dev_get_items(const device_t *d)
+{
+	device_t *dev = const_cast<device_t *>(d);
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef table = luabridge::LuaRef::newTable(L);
+	std::string tag = dev->tag();
+
+	// 10000 is enough?
+	for(int i = 0; i < 10000; i++)
+	{
+		std::string name;
+		const char *item;
+		unsigned int size, count;
+		void *base;
+		item = dev->machine().save().indexed_item(i, base, size, count);
+		if(!item)
+			break;
+		name = &(strchr(item, '/')[1]);
+		if(name.substr(0, name.find("/")) == tag)
+		{
+			name = name.substr(name.find("/") + 1, std::string::npos);
+			table[name] = i;
+		}
+	}
+	return table;
+}
+
+lua_engine::lua_item::lua_item(int index)
+{
+	std::string name;
+	const char *item;
+	item = luaThis->machine().save().indexed_item(index, l_item_base, l_item_size, l_item_count);
+	if(!item)
+	{
+		l_item_base = nullptr;
+		l_item_size = 0;
+		l_item_count= 0;
+	}
+}
+
+int lua_engine::lua_item::l_item_read(lua_State *L)
+{
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "offset (integer) expected");
+	int offset = lua_tounsigned(L, 2);
+	if(!l_item_base || (offset > (l_item_size * l_item_count)))
+	{
+		lua_pushnil(L);
+		return 1;
+	}
+	lua_pushunsigned(L, ((char *)l_item_base)[offset]);
+	return 1;
+}
+
+int lua_engine::lua_item::l_item_write(lua_State *L)
+{
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "offset (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
+	int offset = lua_tounsigned(L, 2);
+	UINT8 value = lua_tounsigned(L, 3);
+	if(!l_item_base || (offset > (l_item_size * l_item_count)))
+		return 1;
+	((char *)l_item_base)[offset] = value;
+	return 1;
+}
+
+int lua_engine::lua_item::l_item_read_block(lua_State *L)
+{
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "offset (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "length (integer) expected");
+	int offset = lua_tounsigned(L, 2);
+	int len = lua_tonumber(L, 3);
+	if(!l_item_base || ((offset + len) > (l_item_size * l_item_count)))
+	{
+		lua_pushnil(L);
+		return 1;
+	}
+	luaL_Buffer buff;
+	char *ptr = luaL_buffinitsize(L, &buff, len);
+	memcpy(ptr, l_item_base, len);
+	luaL_pushresultsize(&buff, len);
+	return 1;
+}
+
+//-------------------------------------------------
 //  state_get_value - return value of a device state entry
 //  -> manager:machine().devices[":maincpu"].state["PC"].value
 //-------------------------------------------------
@@ -1882,6 +1970,7 @@ void lua_engine::initialize()
 				.addFunction ("owner", &device_t::owner)
 				.addProperty <luabridge::LuaRef, void> ("spaces", &lua_engine::l_dev_get_memspaces)
 				.addProperty <luabridge::LuaRef, void> ("state", &lua_engine::l_dev_get_states)
+				.addProperty <luabridge::LuaRef, void> ("items", &lua_engine::l_dev_get_items)
 			.endClass()
 			.beginClass <cheat_manager> ("cheat")
 				.addProperty <bool, bool> ("enabled", &cheat_manager::enabled, &cheat_manager::set_enable)
@@ -2118,7 +2207,7 @@ void lua_engine::initialize()
 			.deriveClass <memory_region, lua_memory_region> ("region")
 				.addProperty <UINT32> ("size", &memory_region::bytes)
 			.endClass()
-			.beginClass <device_image_interface> ("images")
+			.beginClass <device_image_interface> ("image")
 				.addFunction ("exists", &device_image_interface::exists)
 				.addFunction ("filename", &device_image_interface::filename)
 				.addFunction ("longname", &device_image_interface::longname)
@@ -2139,12 +2228,19 @@ void lua_engine::initialize()
 				.addCFunction ("read", &lua_emu_file::l_emu_file_read)
 			.endClass()
 			.deriveClass <emu_file, lua_emu_file> ("file")
-				.addConstructor <void (*) (const char *, UINT32)> ()
+				.addConstructor <void (*)(const char *, UINT32)> ()
 				.addFunction ("open", static_cast<osd_file::error (emu_file::*)(const char *)>(&emu_file::open))
 				.addFunction ("seek", &emu_file::seek)
 				.addFunction ("size", &emu_file::size)
 			.endClass()
-
+			.beginClass <lua_item> ("item")
+				.addConstructor <void (*)(int)> ()
+				.addData ("size", &lua_item::l_item_size, false)
+				.addData ("count", &lua_item::l_item_count, false)
+				.addCFunction ("read", &lua_item::l_item_read)
+				.addCFunction ("read_block", &lua_item::l_item_read_block)
+				.addCFunction ("write", &lua_item::l_item_write)
+			.endClass()
 		.endNamespace();
 
 	luabridge::push (m_lua_state, machine_manager::instance());

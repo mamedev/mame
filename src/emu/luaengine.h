@@ -173,6 +173,7 @@ private:
 		int l_draw_line(lua_State *L);
 		int l_draw_text(lua_State *L);
 	};
+	static luabridge::LuaRef l_dev_get_items(const device_t *d);
 
 	struct lua_video {
 		int l_begin_recording(lua_State *L);
@@ -200,6 +201,16 @@ private:
 
 	struct lua_emu_file {
 		int l_emu_file_read(lua_State *L);
+	};
+
+	struct lua_item {
+		lua_item(int index);
+		void *l_item_base;
+		unsigned int l_item_size;
+		unsigned int l_item_count;
+		int l_item_read(lua_State *L);
+		int l_item_read_block(lua_State *L);
+		int l_item_write(lua_State *L);
 	};
 
 	void resume(void *L, INT32 param);
