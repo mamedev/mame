@@ -5,6 +5,13 @@
 // Communication board used by Sega in Model3, NAOMI and Hikaru, uses mostly same design
 // interface to main board LATTICE ICs: Model3 - 315-5958, Hikaru - 315-5958A, NAOMI - 315-6194A
 
+
+// TODO:
+// Find out sources of IRQ 2 (flip comm RAM bank) and IRQ 5 (data frame exchange cycle start signal on MASTER)
+// Is there any IRQs can be fired to host systems ?
+// Implement NAOMI G1-DMA mode
+// find out and hook actual networking exchange, some sort of token ring ???
+
 /*
 
 MODEL3 COMMUNICATION BOARD
@@ -88,7 +95,7 @@ ADDRESS_MAP_END
  *************************************/
 static ADDRESS_MAP_START( m3comm_mem, AS_PROGRAM, 16, m3comm_device )
 	AM_RANGE(0x0000000, 0x000ffff) AM_RAM AM_SHARE("m68k_ram")
-	AM_RANGE(0x0040000, 0x0040001) AM_READWRITE(commbank_r, commbank_w)
+	AM_RANGE(0x0040000, 0x00400ff) AM_READWRITE(ctrl_r, ctrl_w)
 	AM_RANGE(0x0080000, 0x008ffff) AM_RAMBANK("comm_ram")
 	AM_RANGE(0x00C0000, 0x00C00ff) AM_READWRITE(ioregs_r, ioregs_w)
 ADDRESS_MAP_END
@@ -186,19 +193,45 @@ UINT16 swapb16(UINT16 data)
 
 ///////////// Internal MMIO
 
-READ16_MEMBER(m3comm_device::commbank_r)
+READ16_MEMBER(m3comm_device::ctrl_r)
 {
-	return m_commbank;
+	switch (offset) {
+	case 0x00 / 2:
+		return m_commbank;
+	default:
+		logerror("M3COMM CtrlRead from %04x mask %04x unimplemented!\n", offset * 2, mem_mask);
+		return 0;
+	}
 }
-WRITE16_MEMBER(m3comm_device::commbank_w)
+WRITE16_MEMBER(m3comm_device::ctrl_w)
 {
-	m_commbank = data;
-	membank("comm_ram")->set_base(m_ram->pointer() + (m_commbank ? 0x10000 : 0));
+	switch (offset) {
+	case 0x00 / 2:		// Communication RAM bank switch (flipped in IRQ2 and IRQ5 handlers)
+		m_commbank = data;
+		membank("comm_ram")->set_base(m_ram->pointer() + ((m_commbank & 1) ? 0x10000 : 0));
+		break;
+	case 0x40 / 2:		// IRQ 5 ACK
+		m_commcpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
+		break;
+	case 0xA0 / 2:		// IRQ 2 ACK
+		m_commcpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+		break;
+	case 0x80 / 2:		// LEDs
+	case 0xC0 / 2:		// possible node unique ID and broadcast flag (7FFF) ????
+	case 0xE0 / 2:		// unknown, conditionally cleared in IRQ6 (receive complete) handler
+		break;
+	default:
+		logerror("M3COMM CtrlWrite to %04x %04x mask %04x\n", offset * 2, data, mem_mask);
+	}
 }
 
 READ16_MEMBER(m3comm_device::ioregs_r)
 {
 	switch (offset) {
+	case 0x10 / 2:	// receive result/status
+		return 5; // dbg random
+	case 0x18 / 2:	// transmit result/status
+		return 5; // dbg random
 	case 0x88 / 2:
 		return m_status0;
 	case 0x8A / 2:
@@ -211,13 +244,17 @@ READ16_MEMBER(m3comm_device::ioregs_r)
 WRITE16_MEMBER(m3comm_device::ioregs_w)
 {
 	switch (offset) {
-	case 0x16 / 2:
+	case 0x14 / 2:	// written 80 at data receive enable, 0 then 1 at IRQ6 handler
+		break;		// it seems one of these ^v is IRQ6 ON/ACK, another is data transfer enable
+	case 0x16 / 2:  // written 8C at data receive enable, 0 at IRQ6 handler
 		if ((data & 0xFF) == 0x8C) {
 			logerror("M3COMM Receive offs %04x size %04x\n", recv_offset, recv_size);
 		}
 		m_commcpu->set_input_line(M68K_IRQ_6, ((data & 0xFF) == 0x8C) ? ASSERT_LINE : CLEAR_LINE);	// debug hack
 		break;
-	case 0x1C / 2:
+	case 0x1A / 2:	// written 80 at data transmit enable, 0 at IRQ4 handler
+		break;		// it seems one of these ^v is IRQ4 ON/ACK, another is data transfer enable
+	case 0x1C / 2:	// written 8C at data transmit enable, 0 at IRQ4 handler
 		if ((data & 0xFF) == 0x8C) {
 			logerror("M3COMM Send offs %04x size %04x\n", send_offset, send_size);
 		}
@@ -236,10 +273,10 @@ WRITE16_MEMBER(m3comm_device::ioregs_w)
 		send_size = (send_size >> 8) | (data << 8);
 		break;
 	case 0x88 / 2:
-		m_status0 = data;
+		m_status0 = (m_status0 & ~mem_mask) | (data & mem_mask);
 		break;
 	case 0x8A / 2:
-		m_status1 = data;
+		m_status1 = (m_status1 & ~mem_mask) | (data & mem_mask);
 		break;
 	case 0xC0 / 2:
 		m_commcpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
@@ -294,7 +331,7 @@ READ16_MEMBER(m3comm_device::naomi_r)
 		return naomi_offset;
 	case 2:			// 5F7020
 	{
-		logerror("M3COMM read @ %08x\n", (naomi_control << 16) | naomi_offset);
+//		logerror("M3COMM read @ %08x\n", (naomi_control << 16) | naomi_offset);
 		UINT16 value;
 		if (naomi_control & 1)
 			value = m68k_ram[naomi_offset / 2];
@@ -303,7 +340,7 @@ READ16_MEMBER(m3comm_device::naomi_r)
 
 			value = commram[naomi_offset / 2];
 		}
-		naomi_offset+= 2;
+		naomi_offset += 2;
 		return value;
 	}
 	case 3:			// 5F7024
@@ -319,7 +356,14 @@ WRITE16_MEMBER(m3comm_device::naomi_w)
 	switch (offset)
 	{
 	case 0:			// 5F7018
-		logerror("M3COMM control write %04x\n", data);
+					// bit 0: access RAM is 0 - communication RAM / 1 - M68K RAM
+					// bit 1: comm RAM bank ??? (not really used)
+					// bit 5: M68K Reset
+					// bit 6: ???
+					// bit 7: ???
+					// bit 14: G1 DMA bus master 0 - active / 1 - disabled
+					// bit 15: 0 - enable / 1 - disable this device ???
+//		logerror("M3COMM control write %04x\n", data);
 		naomi_control = data;
 		m_commcpu->set_input_line(INPUT_LINE_RESET, (naomi_control & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 		break;
@@ -327,7 +371,7 @@ WRITE16_MEMBER(m3comm_device::naomi_w)
 		naomi_offset = data;
 		break;
 	case 2:			// 5F7020
-		logerror("M3COMM write @ %08x %04x\n", (naomi_control << 16) | naomi_offset, data);
+//		logerror("M3COMM write @ %08x %04x\n", (naomi_control << 16) | naomi_offset, data);
 		if (naomi_control & 1)
 			m68k_ram[naomi_offset / 2] = data;
 		else {
