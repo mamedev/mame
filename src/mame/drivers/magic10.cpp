@@ -792,15 +792,36 @@ MACHINE_CONFIG_END
 ****************************/
 
 /*
-  Magic 10 (videopoker)
+  Magic's 10 (ver. 16.55)
 
-  1x 68000
-  1x 20mhz OSC near 68k
-  1x Oki M6295
-  1x 30mhz OSC near oki chip
-  2x fpga
-  1x bank of Dipswitch
-  1x Dallas Ds1220y-200 Nonvolatile ram
+  CPUs:
+  1x MC68000P12 (u1) 16/32-bit Microprocessor (main).
+  1x OKI M6295 (u21) 4-Channel Mixing ADCPM Voice Synthesis LSI (sound).
+  1x KA358           Dual Operational Amplifier (sound).
+  1x TDA2003   (u24) Audio Amplifier (sound).
+
+  1x 20.000MHz. oscillator (OSC1, close to main CPU).
+  1x 30.000MHz. oscillator (OSC2, close to sound).
+  1x blu resonator 1000J (XTAL1, close to sound).
+
+  ROMs:
+  6x M27C1001 (1-6).
+  1x AM27C020 (1).
+
+  RAMs:
+  2x KM6865BP-20 (u4, u59).
+  2x HY6264ALP-70 (u34, u35).
+  2x HM3-65728BK-5 (u50, u51).
+  1x Dallas DS1220Y-200 Nonvolatile RAM.
+
+  PLDs:
+  2x TPC1020BFN-084C1 (u41, u60) (read protected).
+  1x AMPAL16R4PC (u42) (dumped).
+
+  Others:
+  1x 28x2 edge connector.
+  1x trimmer (volume).
+  1x 8x2 DIP switches (DIP1)
 
 */
 ROM_START( magic10 )
@@ -816,6 +837,9 @@ ROM_START( magic10 )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "u22.bin", 0x00000, 0x40000, CRC(98885246) SHA1(752d549e6248074f2a7f6c5cc4d0bbc44c7fa4c3) )
+
+	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_LOAD( "pal16r4.u42", 0x0000, 0x0104, CRC(6d70f3f2) SHA1(44c2be5945c052e057d4e0b03369acb7b9ff5d37) )
 ROM_END
 
 ROM_START( magic10a )
@@ -833,6 +857,42 @@ ROM_START( magic10a )
 	ROM_LOAD( "u22.bin", 0x00000, 0x40000, CRC(98885246) SHA1(752d549e6248074f2a7f6c5cc4d0bbc44c7fa4c3) )
 ROM_END
 
+/*
+  Magic's 10 (ver. 16.45)
+
+  1995, A.W.P. Games
+  Version: 16.15
+
+  CPU:
+  1x MC68000P12 (u1) 16/32-bit Microprocessor (main).
+  1x OKI M6295  (u21) 4-Channel Mixing ADCPM Voice Synthesis LSI (sound).
+  1x KA358            Dual Operational Amplifier (sound).
+  1x TDA2003    (u24) Audio Amplifier (sound).
+
+  1x 20.000MHz. oscillator (OSC1, close to main CPU).
+  1x 30.000MHz.	oscillator (OSC2, close to sound).
+  1x blu resonator 1000J (XTAL1, close to sound).
+
+  ROMs:
+  6x M27C1001 (1-6).
+  1x AM27C020 (1).
+
+  RAMs:
+  2x KM6865BP-20 (u4, u59).
+  2x HY6264ALP-70 (u34, u35).
+  2x HM3-65728BK-5 (u50, u51).
+  1x DS1220Y-200
+
+  PLDs:
+  2x TPC1020BFN-084C1 (u41, u60) (read protected).
+  1x AMPAL16R4PC (u42) dumped.
+
+  Others:
+  1x 28x2 edge connector.
+  1x trimmer (volume).
+  1x 8x2 DIP switches (DIP1).
+
+*/
 ROM_START( magic10b )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "u3_1645.bin",  0x00000, 0x20000, CRC(7f2549e4) SHA1(6578ad29273c357faae7c6be3fa1b49087e088a2) )
@@ -869,7 +929,7 @@ ROM_END
 
   ROMs:
   1x M27C2001 (1)
-  6x M27C1001 (2,3,5,6,7)
+  5x M27C1001 (2,3,5,6,7)
   1x TMS27C010A (4)
   1x PALCE16V8H (read protected)
 
@@ -988,30 +1048,48 @@ ROM_END
   Hot Slot
 
   CPU:
-  1x missing CPU (QFP68 socket, u1)
-  1x HD6473308CP10 (u24)(MCU)
-  1x A40MX04-PL84-9828 (u50)
+  1x MC68HC000FN12 (u1) 16/32-bit Microprocessor (main).
+  1x HD6473308CP10 (u24) 16-bit Single-Chip MCU (NOT DUMPED).
+  1x 6295          (u31) 4-Channel Mixing ADCPM Voice Synthesis LSI (sound).
+  1x KA358         (u33) Dual Operational Amplifier (sound).
+  1x TDA2003       (u34) Audio Amplifier (sound).
 
-  1x 6295 (u31)(sound)
-  1x KA358 (u33)(sound)
-  1x TDA2003 (u34)(sound)
+  1x 20.00000 MHz. oscillator (osc1).
+  1x 30.000 MHz. oscillator (osc2).
+  1x blu resonator 1000J (xtal1).
 
-  1x oscillator 20.0000MHz (OSC1)
-  1x 1000J blue resonator (XTAL1)
+  ROMs (1st PCB):
+  2x 27C010 (2,3).
+  2x 27C020 (5,7).
+  3x 27C2001 (1,4,6).
 
-  ROMs:
-  3x 27C2001 (1,4,6)
-  2x 27C020 (5,7)
-  2x 27C010 (2,3)
-  1x GAL16V8D (as PAL16R4)(read protected)
-  1x missing PAL22V10
+  ROMs (2nd PCB):
+  1x AM27C010 (2).
+  1x M27C1001 (3).
+  2x 27C020   (1,7).
+  1x M27C2001 (4).
+  1x AM27C020 (5,6).
 
-  Note:
-  1x 28x2 edge connector
-  1x trimmer (volume)
-  1n trimmer (unknown)
-  3x 12 legs connector (J1,J2,J3)
-  1x 8x2 switches DIP
+  RAMs
+  1x HM6116-70 (u6).
+  4x ZMDU6264ADC-07LLP (u4, u5, u43, u44).
+  2x HM3-65728H-8 (u61, u62).
+
+  PLDs
+  1x A40MX04-PL84 (u50) (not dumped).
+  1x GAL16V8D-25LP (u54), (read protected).
+  1x PALC22V10H-25PC/4 (u22), (read protected).
+
+  Others:
+  1x 28x2 JAMMA edge connector.
+  1x 12 legs connector (J1).
+  1x 12x2 pins jumper (J2, J3).
+  1x 2 pins jumper (J4).
+  1x trimmer (volume)(P1).
+  1x trimmer (unknown)(P2).
+  1x 8x2 DIP switches (DIP1).
+  1x CR2032 3v. lithium battery.
+
 
   - The system RAM test need the bit 7 of offset 0x500005 activated to be successful.
     This offset seems to be a kind of port connected to the MCU.
@@ -1057,6 +1135,7 @@ ROM_END
 
 /*
   Magic Colors
+  PCB marking: Rev.03
 
   CPU:
   1x missing CPU (QFP68 socket, u1)
