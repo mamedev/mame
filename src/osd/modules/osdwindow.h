@@ -234,6 +234,7 @@ struct osd_video_config
 	int                 prescale;                   // prescale factor
 	int                 keepaspect;                 // keep aspect ratio
 	int                 numscreens;                 // number of screens
+	int                 fullstretch;                // fractional stretch
 
 	// hardware options
 	int                 mode;                       // output mode
