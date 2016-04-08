@@ -32,6 +32,7 @@ const device_type DS1204 = &device_creator<ds1204_device>;
 ds1204_device::ds1204_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
 	: device_t( mconfig, DS1204, "DS1204", tag, owner, clock, "ds1204", __FILE__ ),
 	device_nvram_interface(mconfig, *this),
+	m_region(*this, DEVICE_SELF),
 	m_rst( 0 ),
 	m_clk( 0 ),
 	m_dqw( 0 ), m_dqr(0), m_state(0), m_bit(0)
@@ -69,7 +70,7 @@ void ds1204_device::nvram_default()
 
 	int expected_bytes = sizeof( m_unique_pattern ) + sizeof( m_identification ) + sizeof( m_security_match ) + sizeof( m_secure_memory );
 
-	if( !m_region )
+	if (!m_region.found())
 	{
 		logerror( "ds1204(%s) region not found\n", tag() );
 	}

@@ -16,7 +16,7 @@ const device_type TC0150ROD = &device_creator<tc0150rod_device>;
 
 tc0150rod_device::tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0150ROD, "Taito TC0150ROD", tag, owner, clock, "tc0150rod", __FILE__),
-	m_roadgfx(nullptr)
+	m_roadgfx(*this, DEVICE_SELF, 0x40000)
 {
 }
 
@@ -29,9 +29,6 @@ void tc0150rod_device::device_start()
 	m_ram.resize(TC0150ROD_RAM_SIZE / 2);
 	memset(&m_ram[0], 0, TC0150ROD_RAM_SIZE);
 	save_item(NAME(m_ram));
-
-	m_roadgfx = (UINT16 *)region()->base();
-	assert(m_roadgfx);
 }
 
 

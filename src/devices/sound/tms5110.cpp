@@ -1184,7 +1184,7 @@ void tms5110_device::device_reset()
 	m_RNG = 0x1FFF;
 	memset(m_u, 0, sizeof(m_u));
 	memset(m_x, 0, sizeof(m_x));
-	if (m_table != nullptr)
+	if (m_table.found())
 	{
 		/* legacy interface */
 		m_schedule_dummy_read = TRUE;
@@ -1454,11 +1454,6 @@ void tmsprom_device::device_start()
 	m_pdc_cb.resolve_safe();
 	m_ctl_cb.resolve_safe();
 
-	m_rom = region()->base();
-	assert_always(m_rom != nullptr, "Error creating TMSPROM chip: No rom region found");
-	m_prom = owner()->memregion(m_prom_region)->base();
-	assert_always(m_prom != nullptr, "Error creating TMSPROM chip: No prom region found");
-
 	m_romclk_timer = timer_alloc(0);
 	m_romclk_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 
@@ -1614,7 +1609,8 @@ const device_type TMSPROM = &device_creator<tmsprom_device>;
 
 tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMSPROM, "TMSPROM", tag, owner, clock, "tmsprom", __FILE__),
-		m_prom_region(""),
+		m_rom(*this, DEVICE_SELF),
+		m_prom(*this, 0x20),
 		m_rom_size(0),
 		m_pdc_bit(0),
 		m_ctl1_bit(0),

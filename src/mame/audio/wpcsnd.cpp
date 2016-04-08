@@ -21,6 +21,7 @@ wpcsnd_device::wpcsnd_device(const machine_config &mconfig, const char *tag, dev
 		m_dac(*this,"dac"),
 		m_cpubank(*this,"rombank"),
 		m_fixedbank(*this,"fixed"),
+		m_rom(*this),
 		m_reply_cb(*this)
 {
 }
@@ -92,10 +93,7 @@ void wpcsnd_device::device_start()
 
 void wpcsnd_device::device_reset()
 {
-	UINT8* ROM;
-
-	m_rom = memregion(m_regiontag);
-	ROM = m_rom->base();
+	UINT8* ROM = m_rom->base();
 	m_cpubank->configure_entries(0, 0x80, &ROM[0], 0x8000);
 	m_cpubank->set_entry(0);
 	m_fixedbank->configure_entries(0, 1, &ROM[0x17c000], 0x4000);
@@ -110,7 +108,7 @@ void wpcsnd_device::device_reset()
 void wpcsnd_device::static_set_gfxregion(device_t &device, const char *tag)
 {
 	wpcsnd_device &cpuboard = downcast<wpcsnd_device &>(device);
-	cpuboard.m_regiontag = tag;
+	cpuboard.m_rom.set_tag(tag);
 }
 
 WRITE_LINE_MEMBER( wpcsnd_device::ym2151_irq_w)

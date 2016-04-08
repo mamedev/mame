@@ -157,8 +157,8 @@ void ym2610_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this,0,2,rate, stream_update_delegate(FUNC(ym2610_device::stream_generate),this));
 
 	/* setup adpcm buffers */
-	void *pcmbufa  = region()->base();
-	int pcmsizea = region()->bytes();
+	void *pcmbufa = m_region->base();
+	int pcmsizea = m_region->bytes();
 
 	std::string name = tag() + std::string(".deltat");
 	memory_region *deltat_region = machine().root_device().memregion(name.c_str());
@@ -212,12 +212,14 @@ const device_type YM2610 = &device_creator<ym2610_device>;
 ym2610_device::ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ay8910_device(mconfig, YM2610, "YM2610", tag, owner, clock, PSG_TYPE_YM, 1, 0, "ym2610", __FILE__)
 	, m_irq_handler(*this)
+	, m_region(*this, DEVICE_SELF)
 {
 }
 
 ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: ay8910_device(mconfig, type, name, tag, owner, clock, PSG_TYPE_YM, 1, 0, shortname, source)
 	, m_irq_handler(*this)
+	, m_region(*this, DEVICE_SELF)
 {
 }
 

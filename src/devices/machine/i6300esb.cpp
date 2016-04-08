@@ -90,7 +90,8 @@ i6300esb_lpc_device::i6300esb_lpc_device(const machine_config &mconfig, const ch
 	: pci_device(mconfig, I6300ESB_LPC, "i6300ESB southbridge ISA/LPC bridge", tag, owner, clock, "i6300esb_lpc", __FILE__),
 		acpi(*this, "acpi"),
 		rtc (*this, "rtc"),
-		pit (*this, "pit")
+		pit (*this, "pit"),
+		m_region(*this, DEVICE_SELF)
 {
 }
 

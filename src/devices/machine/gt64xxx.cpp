@@ -27,7 +27,8 @@ gt64xxx_device::gt64xxx_device(const machine_config &mconfig, const char *tag, d
 	: pci_host_device(mconfig, GT64XXX, "Galileo GT-64XXX System Controller", tag, owner, clock, "gt64xxx", __FILE__),
 		m_be(0), m_autoconfig(0), m_irq_num(-1),
 		m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
-		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32)
+		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32),
+		m_region(*this, DEVICE_SELF)
 {
 }
 

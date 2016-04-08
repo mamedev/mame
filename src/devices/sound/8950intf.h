@@ -73,6 +73,7 @@ private:
 	devcb_write8 m_keyboard_write_handler;
 	devcb_read8 m_io_read_handler;
 	devcb_write8 m_io_write_handler;
+	required_memory_region m_region;
 };
 
 extern const device_type Y8950;

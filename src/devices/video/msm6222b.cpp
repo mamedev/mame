@@ -22,18 +22,22 @@ ROM_START( msm6222b_01 )
 ROM_END
 
 msm6222b_device::msm6222b_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source), cursor_direction(false), cursor_blinking(false), two_line(false), shift_on_write(false), double_height(false), cursor_on(false), display_on(false), adc(0), shift(0), cgrom(nullptr)
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source), cursor_direction(false), cursor_blinking(false), two_line(false), shift_on_write(false), double_height(false), cursor_on(false), display_on(false), adc(0), shift(0),
+	m_cgrom(*this)
 {
 }
 
 msm6222b_device::msm6222b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, MSM6222B, "msm6222b-xx", tag, owner, clock, "msm6222b", __FILE__), cursor_direction(false), cursor_blinking(false), two_line(false), shift_on_write(false), double_height(false), cursor_on(false), display_on(false), adc(0), shift(0), cgrom(nullptr)
+	device_t(mconfig, MSM6222B, "msm6222b-xx", tag, owner, clock, "msm6222b", __FILE__), cursor_direction(false), cursor_blinking(false), two_line(false), shift_on_write(false), double_height(false), cursor_on(false), display_on(false), adc(0), shift(0),
+	m_cgrom(*this, DEVICE_SELF)
 {
 }
 
 msm6222b_01_device::msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	msm6222b_device(mconfig, MSM6222B_01, "msm6222b-01", tag, owner, clock, "msm6222b", __FILE__)
 {
+	// load the fixed cgrom
+	m_cgrom.set_tag("cgrom");
 }
 
 const rom_entry *msm6222b_01_device::device_rom_region() const
@@ -43,13 +47,6 @@ const rom_entry *msm6222b_01_device::device_rom_region() const
 
 void msm6222b_device::device_start()
 {
-	if(memregion("cgrom"))
-		cgrom = memregion("cgrom")->base();
-	else if(m_region)
-		cgrom = m_region->base();
-	else
-		cgrom = nullptr;
-
 	memset(cgram, 0, sizeof(cgram));
 	memset(ddram, 0x20, sizeof(ddram));
 
@@ -218,8 +215,8 @@ const UINT8 *msm6222b_device::render()
 		UINT8 c = ddram[(i+shift) % 80];
 		if(c < 16)
 			memcpy(render_buf + 16*i, double_height ? cgram + 8*(c & 6) : cgram + 8*(c & 7), char_height);
-		else if(cgrom)
-			memcpy(render_buf + 16*i, cgrom + 16*c, char_height);
+		else if (m_cgrom.found())
+			memcpy(render_buf + 16*i, &m_cgrom[16*c], char_height);
 	}
 
 	if(cursor_on) {

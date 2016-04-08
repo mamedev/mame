@@ -105,8 +105,7 @@ l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const 
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_key(0),
-		m_rom(nullptr),
-		m_rom_size(0)
+		m_rom(*this, DEVICE_SELF)
 {
 }
 
@@ -119,9 +118,6 @@ void l7a1045_sound_device::device_start()
 {
 	/* Allocate the stream */
 	m_stream = stream_alloc(0, 2, 66150); //clock() / 384);
-
-	m_rom = m_region->base();
-	m_rom_size = m_region->bytes();
 }
 
 
@@ -171,7 +167,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 				}
 
 
-				data = m_rom[(start + pos) & (m_rom_size-1)];
+				data = m_rom[(start + pos) & m_rom.mask()];
 				sample = ((INT8)(data & 0xfc)) << (3 - (data & 3));
 				frac += step;
 
@@ -252,7 +248,7 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 			vptr->start |= (m_audiodat[m_audioregister][m_audiochannel].dat[1] & 0xffff) << (4);
 			vptr->start |= (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xf000) >> (12);
 
-			vptr->start &= m_rom_size - 1;
+			vptr->start &= m_rom.mask();
 
 			break;
 		case 0x01:
@@ -267,7 +263,7 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 				vptr->end += vptr->start;
 				vptr->mode = false;
 				// hopefully it'll never happen? Maybe assert here?
-				vptr->end &= m_rom_size - 1;
+				vptr->end &= m_rom.mask();
 
 			}
 			else // absolute
@@ -277,7 +273,7 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 				vptr->end |= (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xf000) >> (12);
 				vptr->mode = true;
 
-				vptr->end &= m_rom_size - 1;
+				vptr->end &= m_rom.mask();
 			}
 
 			break;

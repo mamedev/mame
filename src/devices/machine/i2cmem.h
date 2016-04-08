@@ -128,6 +128,8 @@ protected:
 	int select_device();
 	int data_offset();
 
+	optional_memory_region m_region;
+
 	// device-specific configuration
 	address_space_config m_space_config;
 

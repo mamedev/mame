@@ -48,6 +48,17 @@
 
 
 //**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// use this to refer to the owning device when providing a device tag
+static const char DEVICE_SELF[] = "";
+
+// use this to refer to the owning device's owner when providing a device tag
+static const char DEVICE_SELF_OWNER[] = "^";
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -199,7 +210,6 @@ public:
 	UINT8 default_bios() const { return m_default_bios; }
 	UINT8 system_bios() const { return m_system_bios; }
 	std::string default_bios_tag() const { return m_default_bios_tag; }
-	memory_region *region() const { return m_region; }
 
 	// interface helpers
 	interface_list &interfaces() { return m_interfaces; }
@@ -334,7 +344,6 @@ protected:
 	attoseconds_t           m_attoseconds_per_clock;// period in attoseconds
 
 	std::unique_ptr<device_debug> m_debug;
-	memory_region *         m_region;               // our device-local region
 	const machine_config &  m_machine_config;       // reference to the machine's configuration
 	const void *            m_static_config;        // static device configuration
 	const input_device_default *m_input_defaults;   // devices input ports default overrides

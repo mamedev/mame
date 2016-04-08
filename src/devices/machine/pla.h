@@ -109,6 +109,8 @@ protected:
 private:
 	void parse_fusemap();
 
+	required_memory_region m_region;
+
 	int m_format;
 
 	UINT32 m_inputs;

@@ -117,6 +117,9 @@ protected:
 	required_device<m6502_device> m_jsacpu;
 	required_device<ym2151_device> m_ym2151;
 
+	// memory regions
+	required_memory_region m_cpu_region;
+
 	// memory banks
 	required_memory_bank m_cpu_bank;
 
@@ -158,6 +161,10 @@ protected:
 	// devices
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;    // JSA IIIs only
+
+	// memory regions
+	optional_memory_region m_oki1_region;
+	optional_memory_region m_oki2_region;
 
 	// memory banks
 	optional_memory_bank m_oki1_banklo;         // JSA III(s) only

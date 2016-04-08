@@ -35,6 +35,7 @@ private:
 	required_device<lpc_acpi_device> acpi;
 	required_device<lpc_rtc_device> rtc;
 	required_device<lpc_pit_device> pit;
+	required_memory_region m_region;
 
 	DECLARE_ADDRESS_MAP(internal_io_map, 32);
 

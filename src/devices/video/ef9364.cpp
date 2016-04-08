@@ -61,6 +61,7 @@ ef9364_device::ef9364_device(const machine_config &mconfig, const char *tag, dev
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_space_config("textram", ENDIANNESS_LITTLE, 8, 12, 0, nullptr, *ADDRESS_MAP_NAME(ef9364)),
+	m_charset(*this, DEVICE_SELF),
 	m_palette(*this)
 {
 	clock_freq = clock;
@@ -112,7 +113,6 @@ void ef9364_device::set_color_entry( int index, UINT8 r, UINT8 g, UINT8 b )
 void ef9364_device::device_start()
 {
 	m_textram = &space(0);
-	m_charset = region();
 
 	bitplane_xres = EF9364_NB_OF_COLUMNS*8;
 	bitplane_yres = EF9364_NB_OF_ROWS*(8+4);
@@ -206,7 +206,7 @@ UINT32 ef9364_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				{
 					c = m_textram->read_byte( ( r * EF9364_NB_OF_COLUMNS ) + ( x>>3 ) );
 
-					if( m_charset->u8(((c&0x7F)<<3) + y ) & (0x80>>(x&7)) )
+					if( m_charset[((c&0x7F)<<3) + y] & (0x80>>(x&7)) )
 						m_screen_out.pix32((r*12)+y, x) = palette[1];
 					else
 						m_screen_out.pix32((r*12)+y, x) = palette[0];

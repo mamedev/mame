@@ -499,15 +499,4 @@ void _class :: _name(::address_map &map, device_t &device) \
 #define AM_RAM_DEVWRITE(_tag, _class, _write) AM_READONLY AM_DEVWRITE(_tag, _class, _write)
 
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// use this to refer to the owning device when providing a device tag
-static const char DEVICE_SELF[] = "";
-
-// use this to refer to the owning device's owner when providing a device tag
-static const char DEVICE_SELF_OWNER[] = "^";
-
-
 #endif  /* __ADDRMAP_H__ */

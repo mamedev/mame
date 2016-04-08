@@ -34,7 +34,7 @@ public:
 	required_device<dac_device> m_dac;
 	required_memory_bank m_cpubank;
 	required_memory_bank m_fixedbank;
-	memory_region* m_rom;
+	required_memory_region m_rom;
 
 	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
 	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
@@ -61,7 +61,6 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
-	const char* m_regiontag;
 	UINT8 m_latch;
 	UINT8 m_reply;
 	bool m_reply_available;

@@ -37,6 +37,7 @@ er2055_device::er2055_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, ER2055, "ER2055 EAROM", tag, owner, clock, "er2055", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
+		m_region(*this, DEVICE_SELF),
 		m_space_config("EAROM", ENDIANNESS_BIG, 8, 6, 0, *ADDRESS_MAP_NAME(er2055_map)),
 		m_control_state(0),
 		m_address(0),
@@ -79,7 +80,7 @@ void er2055_device::nvram_default()
 {
 	// default to all-0xff
 	for (int byte = 0; byte < SIZE_DATA; byte++)
-		m_addrspace[0]->write_byte(byte, 0xff);
+		space(AS_PROGRAM).write_byte(byte, 0xff);
 
 	// populate from a memory region if present
 	if (m_region != nullptr)
@@ -91,7 +92,7 @@ void er2055_device::nvram_default()
 
 		UINT8 *default_data = m_region->base();
 		for (int byte = 0; byte < SIZE_DATA; byte++)
-			m_addrspace[0]->write_byte(byte, default_data[byte]);
+			space(AS_PROGRAM).write_byte(byte, default_data[byte]);
 	}
 }
 
@@ -106,7 +107,7 @@ void er2055_device::nvram_read(emu_file &file)
 	UINT8 buffer[SIZE_DATA];
 	file.read(buffer, sizeof(buffer));
 	for (int byte = 0; byte < SIZE_DATA; byte++)
-		m_addrspace[0]->write_byte(byte, buffer[byte]);
+		space(AS_PROGRAM).write_byte(byte, buffer[byte]);
 }
 
 
@@ -119,7 +120,7 @@ void er2055_device::nvram_write(emu_file &file)
 {
 	UINT8 buffer[SIZE_DATA];
 	for (int byte = 0; byte < SIZE_DATA; byte++)
-		buffer[byte] = m_addrspace[0]->read_byte(byte);
+		buffer[byte] = space(AS_PROGRAM).read_byte(byte);
 	file.write(buffer, sizeof(buffer));
 }
 
@@ -155,13 +156,13 @@ void er2055_device::set_control(UINT8 cs1, UINT8 cs2, UINT8 c1, UINT8 c2, UINT8 
 		// write mode; erasing is required, so we perform an AND against previous
 		// data to simulate incorrect behavior if erasing was not done
 		case 0:
-			m_addrspace[0]->write_byte(m_address, m_addrspace[0]->read_byte(m_address) & m_data);
+			space(AS_PROGRAM).write_byte(m_address, space(AS_PROGRAM).read_byte(m_address) & m_data);
 //printf("Write %02X = %02X\n", m_address, m_data);
 			break;
 
 		// erase mode
 		case C2:
-			m_addrspace[0]->write_byte(m_address, 0xff);
+			space(AS_PROGRAM).write_byte(m_address, 0xff);
 //printf("Erase %02X\n", m_address);
 			break;
 
@@ -169,7 +170,7 @@ void er2055_device::set_control(UINT8 cs1, UINT8 cs2, UINT8 c1, UINT8 c2, UINT8 
 		case C1:
 			if ((oldstate & CK) != 0 && (m_control_state & CK) == 0)
 			{
-				m_data = m_addrspace[0]->read_byte(m_address);
+				m_data = space(AS_PROGRAM).read_byte(m_address);
 //printf("Read %02X = %02X\n", m_address, m_data);
 			}
 			break;

@@ -84,8 +84,7 @@ private:
 	UINT8 m_ctrlram[16];
 	tilemap_t *m_tmap;
 
-	UINT8 *m_zoom_rom;
-	UINT32 m_zoom_size;
+	optional_region_ptr<UINT8> m_zoom_rom;
 
 	int m_dx, m_dy;
 	int m_wrap;

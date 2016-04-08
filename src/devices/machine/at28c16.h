@@ -65,6 +65,7 @@ protected:
 	int m_a9_12v;
 	int m_oe_12v;
 	int m_last_write;
+	optional_region_ptr<UINT8> m_default_data;
 };
 
 

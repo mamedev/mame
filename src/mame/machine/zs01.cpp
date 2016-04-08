@@ -32,6 +32,7 @@ const device_type ZS01 = &device_creator<zs01_device>;
 zs01_device::zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
 	: device_t( mconfig, ZS01, "Konami ZS01 PIC", tag, owner, clock, "zs01", __FILE__ ),
 	device_nvram_interface(mconfig, *this),
+	m_region(*this, DEVICE_SELF),
 	m_cs( 0 ),
 	m_rst( 0 ),
 	m_scl( 0 ),
@@ -581,7 +582,7 @@ void zs01_device::nvram_default()
 
 	int expected_bytes = sizeof( m_response_to_reset ) + sizeof( m_command_key ) + sizeof( m_data_key ) + sizeof( m_data );
 
-	if( !m_region )
+	if (!m_region.found())
 	{
 		logerror( "zs01(%s) region not found\n", tag() );
 	}

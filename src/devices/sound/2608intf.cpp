@@ -144,8 +144,8 @@ void ym2608_device::device_start()
 	/* stream system initialize */
 	m_stream = machine().sound().stream_alloc(*this,0,2,rate, stream_update_delegate(FUNC(ym2608_device::stream_generate),this));
 	/* setup adpcm buffers */
-	pcmbufa  = region()->base();
-	pcmsizea = region()->bytes();
+	pcmbufa  = m_region->base();
+	pcmsizea = m_region->bytes();
 
 	/* initialize YM2608 */
 	m_chip = ym2608_init(this,this,clock(),rate,
@@ -187,7 +187,8 @@ const device_type YM2608 = &device_creator<ym2608_device>;
 
 ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ay8910_device(mconfig, YM2608, "YM2608", tag, owner, clock, PSG_TYPE_YM, 1, 2, "ym2608", __FILE__),
-		m_irq_handler(*this)
+		m_irq_handler(*this),
+		m_region(*this, DEVICE_SELF)
 {
 }
 

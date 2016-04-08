@@ -144,13 +144,14 @@ void at45db041_device::nvram_default()
 {
 	memset(&m_data[0], 0xff, m_data.size());
 
-	if (region() != nullptr)
+	memory_region *region = memregion(DEVICE_SELF);
+	if (region != nullptr)
 	{
-		UINT32 bytes = region()->bytes();
+		UINT32 bytes = region->bytes();
 		if (bytes > m_size)
 			bytes = m_size;
 
-		memcpy(&m_data[0], region()->base(), bytes);
+		memcpy(&m_data[0], region->base(), bytes);
 	}
 }
 

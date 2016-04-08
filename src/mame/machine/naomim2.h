@@ -32,6 +32,7 @@ protected:
 
 private:
 	required_device<sega_315_5881_crypt_device> m_cryptdevice;
+	required_memory_region m_region;
 };
 
 extern const device_type NAOMI_M2_BOARD;

@@ -74,6 +74,7 @@ private:
 
 	// internal state
 	const char *m_ds2401_tag;
+	optional_memory_region m_region;
 
 	int m_cs;
 	int m_rst;

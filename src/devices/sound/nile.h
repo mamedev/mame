@@ -46,7 +46,7 @@ public:
 
 private:
 	sound_stream *m_stream;
-	UINT8 *m_sound_ram;
+	required_region_ptr<UINT8> m_sound_ram;
 	UINT16 m_sound_regs[0x80];
 	int m_vpos[NILE_VOICES];
 	int m_frac[NILE_VOICES];

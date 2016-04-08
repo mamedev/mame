@@ -638,8 +638,7 @@ avr8_device::avr8_device(const machine_config &mconfig, const char *name, const 
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 22),
 		m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 4),
-		m_eeprom_tag(nullptr),
-		m_eeprom(nullptr),
+		m_eeprom(*this),
 		m_cpu_type(cpu_type),
 		m_lfuses(0x62),
 		m_hfuses(0x99),
@@ -824,8 +823,6 @@ void avr8_device::device_start()
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
-
-	m_eeprom = machine().root_device().memregion(m_eeprom_tag)->base();
 }
 
 //-------------------------------------------------

@@ -82,6 +82,8 @@ public:
 	virtual DECLARE_READ8_MEMBER(capptr_r);
 
 protected:
+	optional_memory_region m_region;
+
 	enum {
 		M_MEM = 0,
 		M_IO  = 1,

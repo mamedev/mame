@@ -47,24 +47,24 @@ DEVICE_ADDRESS_MAP_START(submap, 16, naomi_m4_board)
 ADDRESS_MAP_END
 
 naomi_m4_board::naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: naomi_board(mconfig, NAOMI_M4_BOARD, "Sega NAOMI M4 Board", tag, owner, clock, "naomi_m4_board", __FILE__)
+	: naomi_board(mconfig, NAOMI_M4_BOARD, "Sega NAOMI M4 Board", tag, owner, clock, "naomi_m4_board", __FILE__),
+		m_region(*this, DEVICE_SELF),
+		m_key_data(*this)
 {
-	key_tag = nullptr;
 }
 
-void naomi_m4_board::static_set_tags(device_t &device, const char *_key_tag)
+void naomi_m4_board::static_set_tags(device_t &device, const char *key_tag)
 {
 	naomi_m4_board &dev = downcast<naomi_m4_board &>(device);
-	dev.key_tag = _key_tag;
+	dev.m_key_data.set_tag(key_tag);
 }
 
 void naomi_m4_board::device_start()
 {
 	naomi_board::device_start();
 
-	const UINT8 *key_data = memregion(key_tag)->base();
-	subkey1 = (key_data[0x5e2] << 8) | key_data[0x5e0];
-	subkey2 = (key_data[0x5e6] << 8) | key_data[0x5e4];
+	subkey1 = (m_key_data[0x5e2] << 8) | m_key_data[0x5e0];
+	subkey2 = (m_key_data[0x5e6] << 8) | m_key_data[0x5e4];
 
 	buffer = std::make_unique<UINT8[]>(BUFFER_SIZE);
 	enc_init();
@@ -134,9 +134,9 @@ void naomi_m4_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 	if (cfi_mode) {
 		int fpr_num = 0;
 
-		if (rombdid_tag && memregion(rombdid_tag) != nullptr)
+		if (rombdid_tag && owner()->memregion(rombdid_tag) != nullptr)
 		{
-			fpr_num = *memregion(rombdid_tag)->base() & 0x7f;
+			fpr_num = *owner()->memregion(rombdid_tag)->base() & 0x7f;
 
 		}
 
@@ -217,9 +217,9 @@ READ16_MEMBER(naomi_m4_board::m4_id_r)
 {
 	UINT16 epr_flag = 0;
 
-	if (rombdid_tag && memregion(rombdid_tag) != nullptr)
+	if (rombdid_tag != nullptr && owner()->memregion(rombdid_tag) != nullptr)
 	{
-		epr_flag = *memregion(rombdid_tag)->base() & 0x80;
+		epr_flag = *owner()->memregion(rombdid_tag)->base() & 0x80;
 
 	}
 

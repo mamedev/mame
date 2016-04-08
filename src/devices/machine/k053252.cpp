@@ -76,8 +76,7 @@ k053252_device::k053252_device(const machine_config &mconfig, const char *tag, d
 		m_offsx(0),
 		m_offsy(0),
 		// ugly, needed to work with the rungun etc. video demux board
-		m_slave_screen_tag(nullptr),
-		m_slave_screen(nullptr)
+		m_slave_screen(*this)
 {
 }
 
@@ -103,12 +102,6 @@ void k053252_device::device_start()
 	save_item(NAME(m_vbp));
 	save_item(NAME(m_vsw));
 	save_item(NAME(m_hsw));
-
-	if (m_slave_screen_tag != nullptr)
-	{
-		// find the screen device if explicitly configured
-		m_slave_screen = device().siblingdevice<screen_device>(m_slave_screen_tag);
-	}
 }
 
 //-------------------------------------------------
@@ -181,7 +174,7 @@ void k053252_device::res_change()
 
 		m_screen->configure(m_hc, m_vc, visarea, refresh);
 
-		if (m_slave_screen)
+		if (m_slave_screen.found())
 			m_slave_screen->configure(m_hc, m_vc, visarea, refresh);
 
 #if 0
@@ -262,5 +255,5 @@ WRITE8_MEMBER( k053252_device::write )
 void k053252_device::static_set_slave_screen(device_t &device, const char *tag)
 {
 	k053252_device &dev = downcast<k053252_device &>(device);
-	dev.m_slave_screen_tag = tag;
+	dev.m_slave_screen.set_tag(tag);
 }

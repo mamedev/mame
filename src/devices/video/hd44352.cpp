@@ -36,7 +36,8 @@ const device_type HD44352 = &device_creator<hd44352_device>;
 
 hd44352_device::hd44352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock):
 	device_t(mconfig, HD44352, "hd44352", tag, owner, clock, "hd44352", __FILE__),
-	m_on_cb(*this)
+	m_on_cb(*this),
+	m_char_rom(*this, DEVICE_SELF)
 {
 }
 
@@ -216,7 +217,7 @@ UINT8 hd44352_device::get_char(UINT16 pos)
 		case 0xff:
 			return m_custom_char[3][pos%8];
 		default:
-			return region()->u8(pos);
+			return m_char_rom[pos];
 	}
 }
 

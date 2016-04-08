@@ -25,7 +25,7 @@ public:
 	template<class _Object> static devcb_base &set_ram_rd_callback(device_t &device, _Object object) { return downcast<vt100_video_device &>(device).m_read_ram.set_callback(object); }
 	template<class _Object> static devcb_base &set_clear_video_irq_wr_callback(device_t &device, _Object object) { return downcast<vt100_video_device &>(device).m_write_clear_video_interrupt.set_callback(object); }
 
-	static void set_chargen_tag(device_t &device, const char *tag) { downcast<vt100_video_device &>(device).m_char_rom_tag = tag; }
+	static void set_chargen_tag(device_t &device, const char *tag) { downcast<vt100_video_device &>(device).m_char_rom.set_tag(tag); }
 
 	DECLARE_READ8_MEMBER(lba7_r);
 	DECLARE_WRITE8_MEMBER(dc012_w);
@@ -47,8 +47,6 @@ protected:
 	devcb_read8        m_read_ram;
 	devcb_write8       m_write_clear_video_interrupt;
 
-	UINT8 *m_gfx;     /* content of char rom */
-
 	int m_lba7;
 
 	bool MHFU_FLAG;
@@ -68,7 +66,7 @@ protected:
 	UINT8 m_frequency;
 	UINT8 m_interlaced;
 
-	const char *m_char_rom_tag; /* character rom region */
+	required_region_ptr<UINT8> m_char_rom; /* character rom region */
 	required_device<palette_device> m_palette;
 
 	bool m_notify_vblank;
@@ -102,7 +100,7 @@ extern const device_type RAINBOW_VIDEO;
 #define MCFG_VT_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_VT_CHARGEN(_tag) \
-	vt100_video_device::set_chargen_tag(*device, _tag);
+	vt100_video_device::set_chargen_tag(*device, "^" _tag);
 
 #define MCFG_VT_VIDEO_RAM_CALLBACK(_read) \
 	devcb = &vt100_video_device::set_ram_rd_callback(*device, DEVCB_##_read);
