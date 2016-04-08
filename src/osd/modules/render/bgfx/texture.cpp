@@ -6,7 +6,7 @@
 //
 //============================================================
 
-#include "emu.h"
+#include <string.h>
 
 #include "texture.h"
 

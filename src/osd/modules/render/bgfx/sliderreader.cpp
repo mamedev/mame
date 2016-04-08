@@ -8,7 +8,6 @@
 
 #include "sliderreader.h"
 
-#include "emu.h"
 #include "slider.h"
 
 const slider_reader::string_to_enum slider_reader::TYPE_NAMES[slider_reader::TYPE_COUNT] = {

@@ -10,8 +10,6 @@
 
 #include <bgfx/bgfx.h>
 
-#include "emu.h"
-
 #include "effect.h"
 #include "blendreader.h"
 #include "depthreader.h"

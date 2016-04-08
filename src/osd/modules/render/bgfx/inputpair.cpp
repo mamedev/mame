@@ -9,7 +9,7 @@
 //
 //============================================================
 
-#include "emu.h"
+#include "emucore.h"
 
 #include "inputpair.h"
 #include "texture.h"

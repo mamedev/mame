@@ -51,6 +51,7 @@
 #include <math.h>
 #include <mutex>
 
+#include "bitmap.h"
 
 //**************************************************************************
 //  CONSTANTS

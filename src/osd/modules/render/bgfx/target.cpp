@@ -6,7 +6,7 @@
 //
 //============================================================
 
-#include "emu.h"
+#include "emucore.h"
 
 #include "target.h"
 
