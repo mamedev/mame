@@ -190,8 +190,8 @@ function cheat.startplugin()
 				local scr
 				scr = manager:machine().screens[screen]
 				if not scr then
-					print("error loading cheat script: " .. cheat.desc)
-					cheat = nil
+					local tag
+					tag, scr = next(manager:machine().screens) -- get any screen
 					return
 				end
 				cheat.cheat_env[name] = scr

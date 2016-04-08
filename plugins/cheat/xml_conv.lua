@@ -2,6 +2,12 @@ local xml = {}
 
 -- basic xml parser for mamecheat only
 local function xml_parse(data)
+	local function fix_gt(str)
+		str = str:gsub(">=", " ge ")
+		str = str:gsub(">", " gt ")
+		return str
+	end
+	data = data:gsub("(condition=%b\"\")", fix_gt)
 	local cheat_str = data:match("<mamecheat.->(.*)</ *mamecheat>")
 
 	local function get_tags(str)
@@ -98,20 +104,24 @@ function xml.conv_cheat(data)
 
 		data = data:lower()
 		data = data:gsub("^[(](.-)[)]$", "%1")
-		data = data:gsub("lt", "<")
-		data = data:gsub("ge", ">=")
-		data = data:gsub("gt", ">")
-		data = data:gsub("le", "<=")
+		data = data:gsub("%f[%w]lt%f[%W]", "<")
+		data = data:gsub("%f[%w]ge%f[%W]", ">=")
+		data = data:gsub("%f[%w]gt%f[%W]", ">")
+		data = data:gsub("%f[%w]le%f[%W]", "<=")
+		data = data:gsub("%f[%w]eq%f[%W]", "==")
+		data = data:gsub("%f[%w]ne%f[%W]", "~=")
 		data = data:gsub("!=", "~=")
-		data = data:gsub("frame", frame)
-		data = data:gsub("band", "&")
-		data = data:gsub("bor", "|")
-		data = data:gsub("rshift", ">>")
-		data = data:gsub("lshift", "<<")
+		data = data:gsub("||", " or ")
+		data = data:gsub("%f[%w]frame%f[%W]", frame)
+		data = data:gsub("%f[%w]band%f[%W]", "&")
+		data = data:gsub("%f[%w]bor%f[%W]", "|")
+		data = data:gsub("%f[%w]rshift%f[%W]", ">>")
+		data = data:gsub("%f[%w]lshift%f[%W]", "<<")
+		data = data:gsub("(%w-)%+%+", "%1 = %1 + 1")
 		data = data:gsub("%f[%w](%x+)%f[%W]", "0x%1")
-		data = data:gsub("([%w_:]-).([pmrodi3])([bwdq])@(%w+) *(=*)", convert_memref)
+		data = data:gsub("([%w_:]-)%.([pmrodi3]-)([bwdq])@(%w+) *(=*)", convert_memref)
 		repeat
-			data, count = data:gsub("([%w_:]-).([pmrodi3])([bwdq])@(%b()) *(=*)", convert_memref)
+			data, count = data:gsub("([%w_:]-)%.([pmrodi3]-)([bwdq])@(%b()) *(=*)", convert_memref)
 		until count == 0
 		if write then
 			data = data .. ")"
@@ -132,14 +142,16 @@ function xml.conv_cheat(data)
 			str = str .. ", \"auto\""
 		end
 		str = str .. ", nil,\"" .. data["format"] .. "\""
-		for count, block in pairs(data["argument"]) do
-			local expr = convert_expr(block["text"])
-			if block["count"] then
-				for i = 0, block["count"] - 1 do
-					str = str .. "," .. expr:gsub("argindex", i)
+		if data["argument"] then
+			for count, block in pairs(data["argument"]) do
+				local expr = convert_expr(block["text"])
+				if block["count"] then
+					for i = 0, block["count"] - 1 do
+						str = str .. "," .. expr:gsub("argindex", i)
+					end
+				else
+					str = str .. "," .. expr
 				end
-			else
-				str = str .. "," .. expr
 			end
 		end
 		return str .. ")"
