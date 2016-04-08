@@ -12,16 +12,10 @@
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 
-/* FIXME: Including emu.h here will include src/emu/memory.h.
- * bx/readerwriter.h includes allocator.h which includes a memory.h as well.
- * This memory.h is part of bgfx. However, src/emu/memory.h will be included.
- */
-#include "emu.h"
+#include "window.h"
 
 #include <bx/readerwriter.h>
 #include <bx/crtimpl.h>
-
-#include "window.h"
 
 #include "bgfxutil.h"
 

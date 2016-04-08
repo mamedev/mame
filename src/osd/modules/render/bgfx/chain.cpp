@@ -7,7 +7,6 @@
 //============================================================
 
 #include <bx/timer.h>
-#undef interface
 
 #include "slider.h"
 #include "parameter.h"
