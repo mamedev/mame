@@ -8,9 +8,9 @@ exports.description = "Game play timer"
 exports.license = "The BSD 3-Clause License"
 exports.author = { name = "Carl" }
 
-local dummy = exports
+local timer = exports
 
-function dummy.startplugin()
+function timer.startplugin()
 	local timer_path = "timer"
 	local timer_started = false
 	local total_time = 0
