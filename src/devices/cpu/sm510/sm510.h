@@ -162,6 +162,7 @@ protected:
 	UINT8 m_acc;
 	UINT8 m_bl;
 	UINT8 m_bm;
+	bool m_sbm;
 	UINT8 m_c;
 	bool m_skip;
 	UINT8 m_w;

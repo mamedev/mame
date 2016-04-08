@@ -47,14 +47,43 @@ class sm500_device : public sm510_base_device
 {
 public:
 	sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sm500_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual void execute_one() override;
+	virtual void get_opcode_param() override;
+
+	// opcode handlers
+	void op_comcb();
+	void op_ssr();
+	void op_trs();
+
+	void op_pdtw();
+	void op_tw();
+	void op_dtw();
+
+	void op_ats();
+	void op_exksa();
+	void op_exkfa();
+
+	void op_rmf();
+	void op_smf();
+	void op_comcn();
+
+	void op_ta();
 };
 
 
+class kb1013vk12_device : public sm500_device
+{
+public:
+	kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 
 extern const device_type SM500;
+extern const device_type KB1013VK12;
 
 
 #endif /* _SM500_H_ */
