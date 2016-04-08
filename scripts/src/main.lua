@@ -125,7 +125,7 @@ end
 			emccopts = emccopts .. " -s EXCEPTION_CATCHING_WHITELIST='[\"__ZN15running_machine17start_all_devicesEv\",\"__ZN12cli_frontend7executeEiPPc\"]'"
 			emccopts = emccopts .. " -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '__Z14js_get_machinev', '__Z9js_get_uiv', '__Z12js_get_soundv', '__ZN10ui_manager12set_show_fpsEb', '__ZNK10ui_manager8show_fpsEv', '__ZN13sound_manager4muteEbh', '_SDL_PauseAudio']\""
 			emccopts = emccopts .. " --pre-js " .. _MAKE.esc(MAME_DIR) .. "src/osd/modules/sound/js_sound.js"
-			emccopts = emccopts .. " --post-js " .. _MAKE.esc(MAME_DIR) .. "src/osd/sdl/emscripten_post.js"
+			emccopts = emccopts .. " --post-js " .. _MAKE.esc(MAME_DIR) .. "scripts/resources/emscripten/emscripten_post.js"
 			emccopts = emccopts .. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/chains@bgfx/chains"
 			emccopts = emccopts .. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/effects@bgfx/effects"
 			emccopts = emccopts .. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/shaders/gles@bgfx/shaders/gles"
@@ -255,10 +255,7 @@ end
 	local rctarget = _subtarget
 
 	if _OPTIONS["targetos"]=="windows" and (not override_resources) then
-		local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/".._OPTIONS["osd"].."/"  .. _subtarget .. "/" .. rctarget ..".rc"
-		if not os.isfile(rcfile) then
-			rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _subtarget .. "/" .. rctarget ..".rc"
-		end
+		rcfile = MAME_DIR .. "scripts/resources/windows/" .. _subtarget .. "/" .. rctarget ..".rc"
 		if os.isfile(rcfile) then
 			files {
 				rcfile,
@@ -269,7 +266,7 @@ end
 		else
 			rctarget = "mame"
 			files {
-				MAME_DIR .. "src/mame/osd/windows/mame/mame.rc",
+				MAME_DIR .. "scripts/resources/windows/mame/mame.rc",
 			}
 			dependency {
 				{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", true  },

@@ -44,7 +44,10 @@
 // Base address of video buffer
 #define VIDEO_BUFFER_BASE       0x17000
 
-#define MAX_WORD_PER_ROW        600
+// For test "B" of alpha video to succeed this must be < 234
+// Basically "B" test is designed to intentionally prevent line buffer to be filled so that display is blanked
+// from 2nd row on. This in turn prevents "BAD" text to be visible on screen.
+#define MAX_WORD_PER_ROW        220
 
 #define VIDEO_CHAR_WIDTH        9
 #define VIDEO_CHAR_HEIGHT       15
@@ -412,10 +415,14 @@ void hp9845b_state::video_render_buff(unsigned line_in_row, bool buff_idx)
 				m_video_blanked = true;
 		}
 
-		if (m_video_blanked) {
-				// TODO: blank scanline
-		} else {
 		const rgb_t *palette = m_palette->palette()->entry_list_raw();
+
+		if (m_video_blanked) {
+                        // Blank scanline
+                        for (unsigned i = 0; i < (80 * 9); i++) {
+                                m_bitmap.pix32(m_video_scanline , i) = palette[ 0 ];
+                        }
+		} else {
 				bool cursor_line = line_in_row == 12;
 				bool ul_line = line_in_row == 14;
 				bool cursor_blink = BIT(m_video_frame , 3);

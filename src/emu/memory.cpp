@@ -174,6 +174,7 @@
 #include <map>
 
 #include "emu.h"
+#include "emuopts.h"
 #include "debug/debugcpu.h"
 
 

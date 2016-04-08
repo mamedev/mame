@@ -18,6 +18,7 @@
 #include "osdcore.h"
 #include "osdlib.h"
 
+#include "sdlinc.h"
 //============================================================
 //  osd_getenv
 //============================================================
@@ -132,3 +133,29 @@ void osd_break_into_debugger(const char *message)
 	printf("Ignoring MAME exception: %s\n", message);
 	#endif
 }
+
+#ifdef SDLMAME_ANDROID
+char *osd_get_clipboard_text(void)
+{
+	return nullptr;
+}
+#else
+//============================================================
+//  osd_get_clipboard_text
+//============================================================
+
+char *osd_get_clipboard_text(void)
+{
+	char *result = NULL;
+
+	if (SDL_HasClipboardText())
+	{
+		char *temp = SDL_GetClipboardText();
+		result = (char *) osd_malloc_array(strlen(temp) + 1);
+		strcpy(result, temp);
+		SDL_free(temp);
+	}
+	return result;
+}
+
+#endif

@@ -254,5 +254,6 @@ char* chartrimcarriage(char str[]);
 
 const char* strensure(const char* s);
 
+int getprecisionchr(const char* s);
 
 #endif /* __UI_UTILS_H__ */

@@ -22,9 +22,6 @@
     * Support for FPU exceptions
 
     * New instructions?
-        - FCOPYI, ICOPYF
-            copy raw between float and integer registers
-
         - VALID opcode_desc,handle,param
             checksum/compare code referenced by opcode_desc; if not
             matching, generate exception with handle,param
@@ -214,6 +211,8 @@ const opcode_info instruction::s_opcode_info_table[OP_MAX] =
 	OPINFO2(FSQRT,   "f#sqrt",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
 	OPINFO2(FRECIP,  "f#recip",  4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
 	OPINFO2(FRSQRT,  "f#rsqrt",  4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
+	OPINFO2(FCOPYI,  "f#copyi",  4|8, false, NONE, NONE, NONE, PINFO(OUT, OP, FRM), PINFO(IN, OP, IRM))
+	OPINFO2(ICOPYF,  "icopyf#",  4|8, false, NONE, NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, FRM))
 };
 
 
@@ -870,11 +869,19 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 	std::ostringstream buffer;
 	for (const char *opsrc = opinfo.mnemonic; *opsrc != 0; opsrc++)
 		if (*opsrc == '!')
-			util::stream_format(buffer, "%-8s", bang_size[m_size]);
+			util::stream_format(buffer, "%s", bang_size[m_size]);
 		else if (*opsrc == '#')
-			util::stream_format(buffer, "%-8s", pound_size[m_size]);
+			util::stream_format(buffer, "%s", pound_size[m_size]);
 		else
-			util::stream_format(buffer, "%-8c", *opsrc);
+			util::stream_format(buffer, "%c", *opsrc);
+
+	// pad to 8 spaces
+	int pad = 8 - buffer.tellp();
+	while (pad > 0)
+	{
+		buffer.put(' ');
+		pad--;
+	}
 
 	// iterate through parameters
 	for (int pnum = 0; pnum < m_numparams; pnum++)

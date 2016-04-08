@@ -89,6 +89,9 @@ public:
 	float m_tgp_vr_circrad;
 	float m_tgp_vr_cbox[12];
 	int m_tgp_vr_select;
+
+	float m_tgp_int_px, m_tgp_int_py, m_tgp_int_pz;
+	UINT32 m_tgp_int_adr;
 	UINT16 m_ram_adr;
 	UINT16 m_ram_latch[2];
 	UINT16 m_ram_scanadr;
@@ -180,12 +183,12 @@ public:
 	DECLARE_TGP_FUNCTION( clear_stack );
 	DECLARE_TGP_FUNCTION( matrix_mul );
 	DECLARE_TGP_FUNCTION( anglev );
-	DECLARE_TGP_FUNCTION( f11 );
+	DECLARE_TGP_FUNCTION( triangle_normal );
 	DECLARE_TGP_FUNCTION( normalize );
 	DECLARE_TGP_FUNCTION( acc_seti );
 	DECLARE_TGP_FUNCTION( track_select );
-	DECLARE_TGP_FUNCTION( f14 );
-	DECLARE_TGP_FUNCTION( f15_swa );
+	DECLARE_TGP_FUNCTION( load_base );
+	DECLARE_TGP_FUNCTION( transpose );
 	DECLARE_TGP_FUNCTION( anglep );
 	DECLARE_TGP_FUNCTION( matrix_ident );
 	DECLARE_TGP_FUNCTION( matrix_read );
@@ -195,7 +198,7 @@ public:
 	DECLARE_TGP_FUNCTION( matrix_roty );
 	DECLARE_TGP_FUNCTION( matrix_rotz );
 	DECLARE_TGP_FUNCTION( track_read_quad );
-	DECLARE_TGP_FUNCTION( f24_swa );
+	DECLARE_TGP_FUNCTION( intercept );
 	DECLARE_TGP_FUNCTION( transform_point );
 	DECLARE_TGP_FUNCTION( fcos_m1 );
 	DECLARE_TGP_FUNCTION( fsin_m1 );
@@ -214,9 +217,9 @@ public:
 	DECLARE_TGP_FUNCTION( xyz2rqf );
 	DECLARE_TGP_FUNCTION( f43 );
 	DECLARE_TGP_FUNCTION( f43_swa );
-	DECLARE_TGP_FUNCTION( f44 );
+	DECLARE_TGP_FUNCTION( track_read_tri );
 	DECLARE_TGP_FUNCTION( matrix_sdir );
-	DECLARE_TGP_FUNCTION( f45 );
+	DECLARE_TGP_FUNCTION( fsqrt );
 	DECLARE_TGP_FUNCTION( vlength );
 	DECLARE_TGP_FUNCTION( f47 );
 	DECLARE_TGP_FUNCTION( track_read_info );
@@ -228,10 +231,10 @@ public:
 	DECLARE_TGP_FUNCTION( matrix_rdir );
 	DECLARE_TGP_FUNCTION( track_lookup );
 	DECLARE_TGP_FUNCTION( f56 );
-	DECLARE_TGP_FUNCTION( f57 );
+	DECLARE_TGP_FUNCTION( int_normal );
 	DECLARE_TGP_FUNCTION( matrix_readt );
 	DECLARE_TGP_FUNCTION( acc_geti );
-	DECLARE_TGP_FUNCTION( f60 );
+	DECLARE_TGP_FUNCTION( int_point );
 	DECLARE_TGP_FUNCTION( col_setcirc );
 	DECLARE_TGP_FUNCTION( col_testpt );
 	DECLARE_TGP_FUNCTION( push_and_ident );

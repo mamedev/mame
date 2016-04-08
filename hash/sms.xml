@@ -6128,6 +6128,7 @@
 		</part>
 	</software>
 
+	<!-- Notes: This has a player 2 input bug: it reads part of player 1 data instead (see sportsjp.cpp) -->
 	<software name="sportssc" cloneof="worldsoc">
 		<description>Sports Pad Soccer (Jpn)</description>
 		<year>1988</year>

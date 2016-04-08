@@ -33,6 +33,7 @@
 #include "ui/datfile.h"
 #include "ui/inifile.h"
 #include "ui/datmenu.h"
+#include "ui/pluginopt.h"
 
 
 /***************************************************************************
@@ -130,6 +131,9 @@ void ui_menu_main::populate()
 	/* add cheat menu */
 	if (machine().options().cheat())
 		item_append(_("Cheat"), nullptr, 0, (void *)CHEAT);
+
+	if (machine().options().plugins())
+		item_append(_("Plugin Options"), nullptr, 0, (void *)PLUGINS);
 
 	// add dats menu
 	if (machine().ui().options().enabled_dats() && machine().datfile().has_data())
@@ -239,6 +243,10 @@ void ui_menu_main::handle()
 
 		case CHEAT:
 			ui_menu::stack_push(global_alloc_clear<ui_menu_cheat>(machine(), container));
+			break;
+
+		case PLUGINS:
+			ui_menu::stack_push(global_alloc_clear<ui_menu_plugin>(machine(), container));
 			break;
 
 		case SELECT_GAME:

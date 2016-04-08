@@ -953,20 +953,16 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(mystwarr_state, mystwarr_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_5, 0, 0, "none")
-	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0, "none")
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K055555_ADD("k055555")
 
 	MCFG_DEVICE_ADD("k055673", K055673, 0)
 	MCFG_K055673_CB(mystwarr_state, mystwarr_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX, -48, -24)
-	MCFG_K055673_GFXDECODE("gfxdecode")
+	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -48, -24)
 	MCFG_K055673_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k054338", K054338, 0)
@@ -1018,7 +1014,7 @@ static MACHINE_CONFIG_DERIVED( viostorm, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, metamrph_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_RNG, -62, -23)
+	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -62, -23)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
@@ -1051,7 +1047,7 @@ static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, metamrph_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_RNG, -51, -24)
+	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -51, -24)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
@@ -1067,7 +1063,7 @@ static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(24, 16+1)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", dadandrn)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dadandrn)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, dadandrn)
@@ -1084,7 +1080,7 @@ static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, gaiapols_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX, -42, -22)
+	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -42, -22)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
@@ -1102,7 +1098,7 @@ static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 
 	MCFG_K054000_ADD("k054000")
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gaiapols)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gaiapols)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, gaiapols)
@@ -1120,7 +1116,7 @@ static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, gaiapols_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_RNG, -61, -22) // stage2 brick walls
+	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -61, -22) // stage2 brick walls
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
@@ -1155,7 +1151,7 @@ static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, martchmp_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX, -58, -23)
+	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -58, -23)
 MACHINE_CONFIG_END
 
 /**********************************************************************************/
@@ -1284,6 +1280,46 @@ ROM_START( mystwarrj )
 ROM_END
 
 ROM_START( mystwarra )
+	/* main program */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "128aab01.20f", 0x000000, 0x40000, CRC(3dc89153) SHA1(dd7b315794b07823d380fe2c59ceff93964d5542) )
+	ROM_LOAD16_BYTE( "128aab02.20g", 0x000001, 0x40000, CRC(8fe92ad2) SHA1(f99e6c4bab026fae6becbcf5463ae67081d3b6dd) )
+	ROM_LOAD16_BYTE( "128a03.19f",   0x100000, 0x80000, CRC(e98094f3) SHA1(a3f9b804ff487f792a00ce85a383868ab0b1b5d8) )
+	ROM_LOAD16_BYTE( "128a04.19g",   0x100001, 0x80000, CRC(88c6a3e4) SHA1(7c2361f716a2320730a3dd6723a271e349ad61c3) )
+
+	/* sound program */
+	ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_LOAD("128a05.6b", 0x00000, 0x20000, CRC(0e5194e0) SHA1(83356158d561f1b8e21f6ae5936b61da834a0545) )
+	ROM_RELOAD(           0x20000, 0x20000 )
+
+	/* tiles */
+	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOADTILE_WORD( "128a08.1h", 0x000000, 1*1024*1024, CRC(63d6cfa0) SHA1(324bf25cf79aa030d2dcc94a53c1984eb8abec3a) )
+	ROM_LOADTILE_WORD( "128a09.1k", 0x000002, 1*1024*1024, CRC(573a7725) SHA1(f2fef32053ed2a65c6c3ddd3e1657a866aa80b3e) )
+	ROM_LOADTILE_BYTE( "128a10.3h", 0x000004, 512*1024, CRC(558e545a) SHA1(cac53e545f3f8980d431443f2c3b8b95e6077d1c) )
+
+	/* sprites */
+	ROM_REGION( 0x500000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD64_WORD( "128a16.22k", 0x000000, 1*1024*1024, CRC(459b6407) SHA1(e4dace4912f9558bee75a8e95ee2637f5e950b47) )
+	ROM_LOAD64_WORD( "128a15.20k", 0x000002, 1*1024*1024, CRC(6bbfedf4) SHA1(0b3acb2b34c722ddc60c0e64e12baa1f225e4fbb) )
+	ROM_LOAD64_WORD( "128a14.19k", 0x000004, 1*1024*1024, CRC(f7bd89dd) SHA1(c9b2ebd5a49840f8b260d53c25cfcc238d21c75c) )
+	ROM_LOAD64_WORD( "128a13.17k", 0x000006, 1*1024*1024, CRC(e89b66a2) SHA1(fce6e56d1759ffe987766426ecb28e9015a500b7) )
+	ROM_LOAD16_BYTE( "128a12.12k", 0x400000, 512*1024, CRC(63de93e2) SHA1(c9a50e7beff1cbbc5d5820664adbd54d52782c54) )
+	ROM_LOAD16_BYTE( "128a11.10k", 0x400001, 512*1024, CRC(4eac941a) SHA1(c0a33f4b975ebee217fd335001839992f4c0bdc8) )
+
+	/* road generator */
+	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "shared", 0 )
+	ROM_LOAD( "128a06.2d", 0x000000, 2*1024*1024, CRC(88ed598c) SHA1(3c123e26b3a12541df77b368bc0e0d486f5622b6) )
+	ROM_LOAD( "128a07.1d", 0x200000, 2*1024*1024, CRC(db79a66e) SHA1(b7e118ed26bac557038e8ae6cb77f23f3da5646f) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "eeprom", 0x0000, 0x080, CRC(fd6a25b4) SHA1(6a9046b582f82efe85bff4e57d4d3b469213f8ae) )
+ROM_END
+
+ROM_START( mystwarraa )
 	/* main program */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "128aaa01.20f", 0x000000, 0x40000, CRC(633ead86) SHA1(56d8628f6081e860c4c6109eabd1c1392f669996) )
@@ -2141,7 +2177,8 @@ ROM_END
 GAME( 1993, mystwarr,   0,        mystwarr, mystwarr, driver_device, 0, ROT0,  "Konami", "Mystic Warriors (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, mystwarru,  mystwarr, mystwarr, mystwarr, driver_device, 0, ROT0,  "Konami", "Mystic Warriors (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, mystwarrj,  mystwarr, mystwarr, mystwarr, driver_device, 0, ROT0,  "Konami", "Mystic Warriors (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarra,  mystwarr, mystwarr, mystwarr, driver_device, 0, ROT0,  "Konami", "Mystic Warriors (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarra,  mystwarr, mystwarr, mystwarr, driver_device, 0, ROT0,  "Konami", "Mystic Warriors (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarraa, mystwarr, mystwarr, mystwarr, driver_device, 0, ROT0,  "Konami", "Mystic Warriors (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1993, mmaulers,   0,        dadandrn, dadandrn, driver_device, 0, ROT0,  "Konami", "Monster Maulers (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, dadandrn,   mmaulers, dadandrn, dadandrn, driver_device, 0, ROT0,  "Konami", "Kyukyoku Sentai Dadandarn (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )

@@ -9,9 +9,10 @@ Android (C) 198? Nasco
 
 *****************************************************************************/
 
-// Note, another VERY different version of Android also exists, see https://www.youtube.com/watch?v=5rtqZqMBACI (uploaded by Chris Hardy)
-// it is unclear if that version is on the same hardware as this
 // Android uses PCBS MK-P102 and MK-P101 ONLY, there is no MK-P103 (extra sprites used on Himeshikibu)
+// Real hardware video of parent set can be seen at https://www.youtube.com/watch?v=5rtqZqMBACI (uploaded by Chris Hardy)
+// for some reason music fails to play the 2nd attract loop in MAME? 
+
 
 
 /*
@@ -235,7 +236,7 @@ static INPUT_PORTS_START( himesiki )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( androidp )
+static INPUT_PORTS_START( androidpo )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -320,6 +321,38 @@ static INPUT_PORTS_START( androidp )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( androidp )
+	PORT_INCLUDE(androidpo)
+	
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x0c, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) ) 
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+
+INPUT_PORTS_END
 
 /****************************************************************************/
 
@@ -417,13 +450,13 @@ static MACHINE_CONFIG_START( himesiki, himesiki_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", himesiki)
-	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ym2203", YM2203, MCLK/4)
+	MCFG_SOUND_ADD("ym2203", YM2203, CLK2/4) // ?? 
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
@@ -469,7 +502,7 @@ ROM_END
 
 
 
-ROM_START( androidp )
+ROM_START( androidpo )
 	ROM_REGION( 0x08000, "maincpu", 0 )
 	ROM_LOAD( "MITSUBISHI_A01.toppcb.m5l27256k.k1.BIN", 0x00000, 0x08000, CRC(25ab85eb) SHA1(e1fab149c83ff880b119258206d5818f3db641c5) )
 
@@ -496,7 +529,34 @@ ROM_START( androidp )
 	// + 2 undumped PLDs
 ROM_END
 
+ROM_START( androidp )
+	ROM_REGION( 0x08000, "maincpu", 0 )
+	ROM_LOAD( "ANDR1.BIN", 0x00000, 0x08000, CRC(fff04130) SHA1(9bdafa8b311cc5d0851b04df3c6dd16eb087a5dd) )
 
-GAME( 1989, himesiki, 0, himesiki, himesiki, driver_device, 0, ROT90, "Hi-Soft", "Himeshikibu (Japan)", MACHINE_SUPPORTS_SAVE )
+	ROM_REGION( 0x10000, "banks", 0 )
+	ROM_LOAD( "ANDR3.BIN", 0x00000, 0x04000, CRC(112d5123) SHA1(653109eae7b58d9dcb8892ea9aca17427f14c145) )
+	ROM_CONTINUE(                                       0x08000, 0x04000)
 
-GAME( 198?, androidp, 0, himesiki, androidp, driver_device, 0, ROT90, "Nasco", "Android (early build?)", MACHINE_SUPPORTS_SAVE )
+	ROM_REGION( 0x18000, "sub", 0 )
+	ROM_LOAD( "ANDR4.BIN", 0x00000, 0x08000, CRC(65f5e98b) SHA1(69f979d653695413a1c503c402d4bf5ffcfb6e5d) )
+
+	ROM_REGION( 0x10000, "bgtiles", 0 )
+	ROM_LOAD( "ANDR5.BIN", 0x00000, 0x10000, CRC(0a0b44c0) SHA1(8d359b802c7dee5faea9464f06b672fd401799cf) )
+
+	ROM_REGION( 0x20000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "ANDR6.BIN", 0x00000, 0x10000, CRC(122b7dd1) SHA1(5dffd2b97c8222afc98552513b84a91d6127f41b) )
+	ROM_LOAD16_BYTE( "ANDR7.BIN", 0x00001, 0x10000, CRC(fc0f9234) SHA1(496a918cc1f4d0e7191a49cc43c51fbd71e0bdf5) )
+
+	ROM_REGION( 0x20000, "spr_p103a", ROMREGION_ERASEFF )
+	// there's no P103A PCB for this on Android
+
+
+	// + 2 undumped PLDs (?)
+ROM_END
+
+
+GAME( 1989, himesiki, 0,         himesiki, himesiki,  driver_device, 0, ROT90, "Hi-Soft", "Himeshikibu (Japan)", MACHINE_SUPPORTS_SAVE )
+
+// the game changed significantly between these 2 versions
+GAME( 198?, androidp,  0,          himesiki, androidp,  driver_device, 0, ROT90, "Nasco", "Android (prototype, later build)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, androidpo, androidp,   himesiki, androidpo, driver_device, 0, ROT90, "Nasco", "Android (prototype, early build)", MACHINE_SUPPORTS_SAVE )

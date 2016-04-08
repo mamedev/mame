@@ -8,7 +8,6 @@
 
 #include <string>
 
-#include "emu.h"
 #include <modules/lib/osdobj_common.h>
 
 #include "targetreader.h"

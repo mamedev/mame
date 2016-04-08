@@ -9,6 +9,7 @@
 **************************************************************************/
 
 #include "emu.h"
+#include "emuopts.h"
 #include "render.h"
 #include "ui/selgame.h"
 #include "ui/simpleselgame.h"

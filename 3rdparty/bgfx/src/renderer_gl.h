@@ -107,8 +107,8 @@ typedef uint64_t GLuint64;
 #endif // BGFX_CONFIG_RENDERER_OPENGL
 
 #include "renderer.h"
-#include "ovr.h"
-#include "renderdoc.h"
+#include "hmd_ovr.h"
+#include "debug_renderdoc.h"
 
 #ifndef GL_LUMINANCE
 #	define GL_LUMINANCE 0x1909
@@ -791,6 +791,22 @@ typedef uint64_t GLuint64;
 #	define GL_CONSERVATIVE_RASTERIZATION_NV 0x9346
 #endif // GL_CONSERVATIVE_RASTERIZATION_NV
 
+#ifndef GL_NEGATIVE_ONE_TO_ONE
+#	define GL_NEGATIVE_ONE_TO_ONE 0x935E
+#endif // GL_NEGATIVE_ONE_TO_ONE
+
+#ifndef GL_ZERO_TO_ONE
+#	define GL_ZERO_TO_ONE 0x935F
+#endif // GL_ZERO_TO_ONE
+
+#ifndef GL_LOWER_LEFT
+#	define GL_LOWER_LEFT 0x8CA1
+#endif // GL_LOWER_LEFT
+
+#ifndef GL_UPPER_LEFT
+#	define GL_UPPER_LEFT 0x8CA2
+#endif // GL_UPPER_LEFT
+
 // _KHR or _ARB...
 #define GL_DEBUG_OUTPUT_SYNCHRONOUS         0x8242
 #define GL_DEBUG_NEXT_LOGGED_MESSAGE_LENGTH 0x8243
@@ -885,6 +901,28 @@ namespace bgfx
 
 namespace bgfx { namespace gl
 {
+#if BGFX_CONFIG_USE_OVR
+	struct OVRBufferGL : public OVRBufferI
+	{
+		virtual void create(const ovrSession& _session, int _eyeIdx) BX_OVERRIDE;
+		virtual void destroy(const ovrSession& _session) BX_OVERRIDE;
+		virtual void render(const ovrSession& _session) BX_OVERRIDE;
+
+		GLuint m_eyeFbo;
+		GLuint m_eyeTexId;
+		GLuint m_depthBuffer;
+	};
+
+	struct OVRMirrorGL : public OVRMirrorI
+	{
+		virtual void create(const ovrSession& _session, int _width, int _height) BX_OVERRIDE;
+		virtual void destroy(const ovrSession& _session) BX_OVERRIDE;
+		virtual void blit(const ovrSession& _session) BX_OVERRIDE;
+
+		GLuint m_mirrorFBO;
+	};
+#endif // BGFX_CONFIG_USE_OVR
+
 	void dumpExtensions(const char* _extensions);
 
 	const char* glEnumName(GLenum _enum);

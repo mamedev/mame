@@ -51,6 +51,7 @@
 #include <math.h>
 #include <mutex>
 
+#include "bitmap.h"
 
 //**************************************************************************
 //  CONSTANTS
@@ -920,6 +921,8 @@ public:
 	void set_view(int viewindex);
 	void set_max_texture_size(int maxwidth, int maxheight);
 	void set_transform_primitives(bool transform_primitives) { m_transform_primitives = transform_primitives; }
+	void set_keepaspect(bool keepaspect) { m_keepaspect = keepaspect; }
+	void set_scale_mode(bool scale_mode) { m_scale_mode = scale_mode; }
 
 	// layer config getters
 	bool backdrops_enabled() const { return m_layerconfig.backdrops_enabled(); }
@@ -1008,6 +1011,7 @@ private:
 	INT32                   m_height;                   // height in pixels
 	render_bounds           m_bounds;                   // bounds of the target
 	bool                    m_keepaspect;               // constrain aspect ratio
+	bool                    m_int_overscan;             // allow overscan on integer scaled targets
 	float                   m_pixel_aspect;             // aspect ratio of individual pixels
 	int                     m_scale_mode;               // type of scale to apply
 	int                     m_int_scale_x;              // horizontal integer scale factor

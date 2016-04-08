@@ -74,6 +74,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_common.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_common.h",
 		MAME_DIR .. "src/osd/modules/input/input_dinput.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_dinput.h",
 		MAME_DIR .. "src/osd/modules/input/input_none.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_rawinput.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_win32.cpp",
@@ -84,6 +85,8 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_windows.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_windows.h",
 		MAME_DIR .. "src/osd/modules/input/input_xinput.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_xinput.h",
+		MAME_DIR .. "src/osd/modules/input/input_winhybrid.cpp",
 	}
 
 	if _OPTIONS["targetos"]=="windows" then
@@ -126,10 +129,13 @@ function osdmodulesbuild()
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",
 		"__STDC_CONSTANT_MACROS",
+		"IMGUI_DISABLE_OBSOLETE_FUNCTIONS",
 	}
 
 	files {
 		MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfxutil.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfxutil.h",
 		MAME_DIR .. "src/osd/modules/render/binpacker.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/blendreader.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/chain.cpp",
@@ -169,7 +175,9 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/render/bgfx/writereader.cpp",
 	}
 	includedirs {
+		MAME_DIR .. "3rdparty/bgfx/examples/common",
 		MAME_DIR .. "3rdparty/bgfx/include",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty",
 		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "3rdparty/rapidjson/include",
 	}
@@ -393,6 +401,7 @@ function osdmodulestargetconf()
 			"gdi32",
 			"dsound",
 			"dxguid",
+			"oleaut32",
 		}
 	elseif _OPTIONS["targetos"]=="macosx" then
 		links {

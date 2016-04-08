@@ -17,7 +17,9 @@
 --------------------------------------------------
 
 CPUS["Z80"] = true
---CPUS["M6502"] = true
+CPUS["M6800"] = true
+CPUS["M6803"] = true
+CPUS["M6809"] = true
 --CPUS["MCS48"] = true
 --CPUS["MCS51"] = true
 --CPUS["M6800"] = true
@@ -33,9 +35,9 @@ CPUS["Z80"] = true
 
 --SOUNDS["SAMPLES"] = true
 SOUNDS["DAC"] = true
---SOUNDS["DISCRETE"] = true
+SOUNDS["DISCRETE"] = true
 SOUNDS["AY8910"] = true
---SOUNDS["YM2151"] = true
+SOUNDS["MSM5205"] = true
 --SOUNDS["ASTROCADE"] = true
 --SOUNDS["TMS5220"] = true
 --SOUNDS["OKIM6295"] = true
@@ -84,6 +86,8 @@ function createProjects_mame_nl(_target, _subtarget)
 	targetsubdir(_target .."_" .. _subtarget)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-mame-nl"))
+  addprojectflags()
+  precompiledheaders()
 
 	includedirs {
 		MAME_DIR .. "src/osd",
@@ -109,6 +113,12 @@ files{
 	MAME_DIR .. "src/mame/drivers/popeye.cpp",
 	MAME_DIR .. "src/mame/includes/popeye.h",
 	MAME_DIR .. "src/mame/video/popeye.cpp",
+	
+  MAME_DIR .. "src/mame/drivers/m62.cpp",
+  MAME_DIR .. "src/mame/includes/m62.h",
+  MAME_DIR .. "src/mame/video/m62.cpp",
+  MAME_DIR .. "src/mame/audio/irem.cpp",
+  MAME_DIR .. "src/mame/audio/irem.h",
 
 }
 end

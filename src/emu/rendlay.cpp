@@ -82,6 +82,8 @@
 #include "lcd.lh"
 #include "lcd_rot.lh"
 
+// SVG screen layouts
+#include "svg.lh"
 
 
 //**************************************************************************

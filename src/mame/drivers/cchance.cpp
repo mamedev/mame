@@ -218,7 +218,6 @@ static MACHINE_CONFIG_START( cchance, cchance_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-  Sharp SM510 MCU family disassembler
+  Sharp SM510/SM500 MCU family disassembler
 
 */
 
@@ -15,7 +15,8 @@
 
 enum e_mnemonics
 {
-	mILL, mEXT,
+	// SM510 common
+	mILL /* 0! */, mEXT,
 	mLB, mLBL, mSBM, mEXBLA, mINCB, mDECB,
 	mATPL, mRTN0, mRTN1, mTL, mTML, mTM, mT,
 	mEXC, mBDC, mEXCI, mEXCD, mLDA, mLAX, mPTW, mWR, mWS,
@@ -24,7 +25,16 @@ enum e_mnemonics
 	mTB, mTC, mTAM, mTMI, mTA0, mTABL, mTIS, mTAL, mTF1, mTF4,
 	mRM, mSM,
 	mPRE, mSME, mRME, mTMEL,
-	mSKIP, mCEND, mIDIV
+	mSKIP, mCEND, mIDIV, mDR, mDTA,
+	
+	// SM500-specific
+	mCOMCB, mRTN, mRTNS, mSSR, mTR, mTRS,
+	mADDC, mPDTW, mTW, mDTW,
+	mATS, mEXKSA, mEXKFA,
+	mRMF, mSMF, mCOMCN,
+	mTA, mTG
+	
+	// KB1013VK1-2 aliases
 };
 
 static const char *const s_mnemonics[] =
@@ -38,7 +48,14 @@ static const char *const s_mnemonics[] =
 	"TB", "TC", "TAM", "TMI", "TA0", "TABL", "TIS", "TAL", "TF1", "TF4",
 	"RM", "SM",
 	"PRE", "SME", "RME", "TMEL",
-	"SKIP", "CEND", "IDIV"
+	"SKIP", "CEND", "IDIV", "DR", "DTA",
+
+	//
+	"COMCB", "RTN", "RTNS", "SSR", "TR", "TRS",
+	"ADDC", "PDTW", "TW", "DTW",
+	"ATS", "EXKSA", "EXKFA",
+	"RMF", "SMF", "COMCN",
+	"TA", "TG"
 };
 
 // number of bits per opcode parameter, 8 or larger means 2-byte opcode
@@ -53,7 +70,14 @@ static const UINT8 s_bits[] =
 	0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
 	2, 2,
 	8, 0, 0, 0,
-	0, 0, 0
+	0, 0, 0, 0, 0,
+	
+	//
+	0, 0, 0, 4, 6, 6,
+	0, 0, 0, 0,
+	0, 0, 0,
+	0, 0, 0,
+	0, 0
 };
 
 #define _OVER DASMFLAG_STEP_OVER
@@ -70,7 +94,14 @@ static const UINT32 s_flags[] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0,
 	0, 0, 0, 0,
-	0, _OVER, 0
+	0, _OVER, 0, 0, 0,
+
+	//
+	0, _OUT, _OUT, 0, 0, _OVER,
+	0, 0, 0, 0,
+	0, 0, 0,
+	0, 0, 0,
+	0, 0
 };
 
 // next program counter in sequence (relative)
@@ -178,14 +209,14 @@ CPU_DISASSEMBLE(sm510)
 static const UINT8 sm511_mnemonic[0x100] =
 {
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
-	mROT,  0,     mSBM,  mATPL, mRM,   mRM,   mRM,   mRM,   mADD,  mADD11,mCOMA, mEXBLA,mSM,   mSM,   mSM,   mSM,   // 0
+	mROT,  mDTA,  mSBM,  mATPL, mRM,   mRM,   mRM,   mRM,   mADD,  mADD11,mCOMA, mEXBLA,mSM,   mSM,   mSM,   mSM,   // 0
 	mEXC,  mEXC,  mEXC,  mEXC,  mEXCI, mEXCI, mEXCI, mEXCI, mLDA,  mLDA,  mLDA,  mLDA,  mEXCD, mEXCD, mEXCD, mEXCD, // 1
 	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 2
 	mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  // 3
 
 	mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   // 4
-	mKTA,  mTB,   mTC,   mTAM,  mTMI,  mTMI,  mTMI,  mTMI,  mTIS,  mATL,  mTA0,  mTABL, mATX,  0,     mTAL,  mLBL,  // 5
-	mEXT,  mPRE,  mWR,   mWS,   mINCB, 0,     mRC,   mSC,   mTML,  mTML,  mTML,  mTML,  mDECB, mPTW,  mRTN0, mRTN1, // 6
+	mKTA,  mTB,   mTC,   mTAM,  mTMI,  mTMI,  mTMI,  mTMI,  mTIS,  mATL,  mTA0,  mTABL, mATX,  mCEND, mTAL,  mLBL,  // 5
+	mEXT,  mPRE,  mWR,   mWS,   mINCB, mDR,   mRC,   mSC,   mTML,  mTML,  mTML,  mTML,  mDECB, mPTW,  mRTN0, mRTN1, // 6
 	mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   // 7
 
 	mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    // 8
@@ -201,7 +232,7 @@ static const UINT8 sm511_mnemonic[0x100] =
 
 static const UINT8 sm511_extended[0x10] =
 {
-	mRME,  mSME,  mTMEL, mATFC, mBDC,  mATBP, 0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     // 60 3
+	mRME,  mSME,  mTMEL, mATFC, mBDC,  mATBP, 0,     0,     0,     0,     0,     0,     0,     0,     0,     0      // 60 3
 };
 
 CPU_DISASSEMBLE(sm511)
@@ -212,4 +243,47 @@ CPU_DISASSEMBLE(sm511)
 	memcpy(ext + 0x30, sm511_extended, 0x10);
 
 	return sm510_common_disasm(sm511_mnemonic, ext, buffer, pc, oprom, opram);
+}
+
+
+// SM500 disasm
+
+static const UINT8 sm500_mnemonic[0x100] =
+{
+/*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
+
+	mSKIP, mATR,  mEXKSA,mATBP, mRM,   mRM,   mRM,   mRM,   mADD,  mADDC, mCOMA, mEXBLA,mSM,   mSM,   mSM,   mSM,   // 0
+	mEXC,  mEXC,  mEXC,  mEXC,  mEXCI, mEXCI, mEXCI, mEXCI, mLDA,  mLDA,  mLDA,  mLDA,  mEXCD, mEXCD, mEXCD, mEXCD, // 1
+	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 2
+	mATS,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  // 3
+
+	mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   // 4
+	mTA,   mTB,   mTC,   mTAM,  mTM,   mTM,   mTM,   mTM,   mTG,   mPTW,  mTA0,  mTABL, mTW,   mDTW,  mEXT,  mLBL,  // 5
+	mCOMCN,mPDTW, mWR,   mWS,   mINCB, mIDIV, mRC,   mSC,   mRMF,  mSMF,  mKTA,  mEXKFA,mDECB, mCOMCB,mRTN,  mRTNS, // 6
+	mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  // 7
+
+	mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   // 8
+	mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   // 9
+	mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   // A
+	mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   // B
+
+	mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  // C
+	mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  // D
+	mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  // E
+	mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS   // F
+};
+
+static const UINT8 sm500_extended[0x10] =
+{
+	mCEND, 0,     0,     0,     mDTA,  0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0      // 5E 0
+};
+
+CPU_DISASSEMBLE(sm500)
+{
+	// create extended opcode table
+	UINT8 ext[0x100];
+	memset(ext, 0, 0x100);
+	memcpy(ext + 0x00, sm500_extended, 0x10);
+
+	return sm510_common_disasm(sm500_mnemonic, ext, buffer, pc, oprom, opram);
 }

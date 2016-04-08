@@ -1693,6 +1693,7 @@ static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x00200000, 0x00207fff) AM_MIRROR(0x02000000) AM_RAM                                             // bios uses it (battery backed ram ?)
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_MIRROR(0x02000000) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
+	AM_RANGE(0x005f7018, 0x005f702f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16( "comm_board", m3comm_device, naomi_r, naomi_w, U64(0x0000ffff0000ffff) )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", naomi_board, submap, U64(0x0000ffff0000ffff) )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
@@ -2703,6 +2704,7 @@ static MACHINE_CONFIG_DERIVED( naomi_base, naomi_aw_base )
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("mie_eeprom")
 
 	MCFG_X76F100_ADD("naomibd_eeprom")
+	MCFG_M3COMM_ADD("comm_board")
 MACHINE_CONFIG_END
 
 /*

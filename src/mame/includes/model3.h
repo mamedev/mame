@@ -123,7 +123,6 @@ public:
 	int m_lightgun_reg_sel;
 	int m_adc_channel;
 	UINT64 m_real3d_status;
-	std::unique_ptr<UINT64[]> m_network_ram;
 	int m_prot_data_ptr;
 	std::unique_ptr<UINT32[]> m_vrom;
 	int m_step;
@@ -215,8 +214,6 @@ public:
 	DECLARE_READ64_MEMBER(real3d_status_r);
 	DECLARE_READ8_MEMBER(model3_sound_r);
 	DECLARE_WRITE8_MEMBER(model3_sound_w);
-	DECLARE_READ64_MEMBER(network_r);
-	DECLARE_WRITE64_MEMBER(network_w);
 
 	DECLARE_WRITE64_MEMBER(daytona2_rombank_w);
 	DECLARE_WRITE16_MEMBER(model3snd_ctrl);

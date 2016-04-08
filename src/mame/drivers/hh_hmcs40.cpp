@@ -36,7 +36,7 @@
  *29      HD38800B  1984, Tomy Portable 6000 Bombman
  *35      HD38800B  1983, Bandai Gundam vs Gelgoog Zaku
  @43      HD38800B  1983, Bandai Dokodemo Dorayaki Doraemon (PT-412)
- @52      HD38800B  1983, Bandai Ultra Man (PT-424)
+ @52      HD38800B  1983, Bandai Ultraman Monster Battle (PT-424)
 
  @09      HD38820A  1980, Mattel World Championship Baseball
  @13      HD38820A  1981, Entex Galaxian 2
@@ -87,6 +87,7 @@
 #include "sound/speaker.h"
 
 // internal artwork
+#include "rendlay.h"
 #include "pairmtch.lh"
 
 #include "hh_hmcs40_test.lh" // common test-layout - use external artwork
@@ -1519,7 +1520,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Bandai Ultra Man (FL LSI Game Push Up) (manufactured in Japan)
+  Bandai Ultraman Monster Battle (FL LSI Game Push Up) (manufactured in Japan)
   * PCB label Kaken Corp. PT-424 FL Ultra Man
   * Hitachi HD38800B52 MCU
   * cyan/red/blue VFD display NEC FIP8BM25T no. 21-8 2
@@ -1549,7 +1550,7 @@ WRITE8_MEMBER(bultrman_state::plate_w)
 
 	// update display
 	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,16,15,14,13,12,11,2,10,9,8,7,6,5,4,3,0,1);
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,0,18,17,16,15,14,13,12,3,11,10,9,8,7,6,5,4,1,2);
 	display_matrix(18, 8, plate, grid);
 }
 
@@ -1584,7 +1585,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( bultrman, bultrman_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_CPU_ADD("maincpu", HD38800, 350000) // approximation
 	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bultrman_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bultrman_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bultrman_state, plate_w))
@@ -2070,7 +2071,12 @@ static MACHINE_CONFIG_START( cdkong, cdkong_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", cdkong_state, speaker_decay_sim, attotime::from_msec(CDKONG_SPEAKER_DECAY))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(10)
+	MCFG_SCREEN_SIZE(538, 1001)
+	MCFG_SCREEN_VISIBLE_AREA(0, 537, 0, 1000)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3960,6 +3966,9 @@ ROM_START( cdkong )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "hd38820a45", 0x0000, 0x1000, CRC(196b8070) SHA1(da85d1eb4b048b77f3168630662ab94ec9baa262) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 714102, "svg", 0)
+	ROM_LOAD( "cdkong.svg", 0, 714102, CRC(184bbe69) SHA1(98554341054246e5d76e0779620498e6cb723958) )
 ROM_END
 
 
@@ -4093,12 +4102,12 @@ CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Banda
 CONS( 1983, bpengo,    0,        0, bpengo,   bpengo,   driver_device, 0, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1983, bbtime,    0,        0, bbtime,   bbtime,   driver_device, 0, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1983, bdoramon,  0,        0, bdoramon, bdoramon, driver_device, 0, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, bultrman,  0,        0, bultrman, bultrman, driver_device, 0, "Bandai", "Ultra Man (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1983, bultrman,  0,        0, bultrman, bultrman, driver_device, 0, "Bandai", "Ultraman Monster Battle", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1984, machiman,  0,        0, machiman, machiman, driver_device, 0, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1984, pairmtch,  0,        0, pairmtch, pairmtch, driver_device, 0, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
+CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  driver_device, 0, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
 CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

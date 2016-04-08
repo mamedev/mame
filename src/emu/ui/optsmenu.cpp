@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
+#include "ui/submenu.h"
 #include "ui/datfile.h"
 #include "ui/inifile.h"
 #include "ui/selector.h"
@@ -162,7 +163,7 @@ void ui_menu_game_options::handle()
 				break;
 			case MISC_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_misc_options>(machine(), container));
+					ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, misc_submenu_options));
 				break;
 			case SOUND_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
@@ -187,6 +188,10 @@ void ui_menu_game_options::handle()
 			case CUSTOM_FILTER:
 				if (m_event->iptkey == IPT_UI_SELECT)
 					ui_menu::stack_push(global_alloc_clear<ui_menu_custom_filter>(machine(), container));
+				break;
+			case ADVANCED_MENU:
+				if (m_event->iptkey == IPT_UI_SELECT)
+					ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, advanced_submenu_options));
 				break;
 			case SAVE_CONFIG:
 				if (m_event->iptkey == IPT_UI_SELECT)
@@ -260,9 +265,10 @@ void ui_menu_game_options::populate()
 	}
 	item_append(_("Display Options"), nullptr, 0, (void *)(FPTR)DISPLAY_MENU);
 	item_append(_("Sound Options"), nullptr, 0, (void *)(FPTR)SOUND_MENU);
-	item_append(_("Miscellaneous Options"), nullptr, 0, (void *)(FPTR)MISC_MENU);
+	item_append(_(misc_submenu_options[0].description),    nullptr, 0, (void *)(FPTR)MISC_MENU);
 	item_append(_("Device Mapping"), nullptr, 0, (void *)(FPTR)CONTROLLER_MENU);
 	item_append(_("General Inputs"), nullptr, 0, (void *)(FPTR)CGI_MENU);
+	item_append(_(advanced_submenu_options[0].description),  nullptr, 0, (void *)(FPTR)ADVANCED_MENU);
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 	item_append(_("Save Configuration"), nullptr, 0, (void *)(FPTR)SAVE_CONFIG);
 

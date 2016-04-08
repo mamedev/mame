@@ -31,8 +31,7 @@ const device_type VSYSTEM_SPR2 = &device_creator<vsystem_spr2_device>;
 
 vsystem_spr2_device::vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VSYSTEM_SPR2, "Video System Sprites Type 2", tag, owner, clock, "vsystem_spr2", __FILE__),
-		m_gfxdecode(*this),
-		m_palette(*this)
+		m_gfxdecode(*this)
 {
 	m_newtilecb =  vsystem_tile2_indirection_delegate(FUNC(vsystem_spr2_device::tile_callback_noindirect), this);
 	m_pritype = 0; // hack until we have better handling
@@ -49,16 +48,6 @@ vsystem_spr2_device::vsystem_spr2_device(const machine_config &mconfig, const ch
 void vsystem_spr2_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<vsystem_spr2_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void vsystem_spr2_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<vsystem_spr2_device &>(device).m_palette.set_tag(tag);
 }
 
 

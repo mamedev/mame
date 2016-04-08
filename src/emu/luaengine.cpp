@@ -16,10 +16,14 @@
 #include "emu.h"
 #include "cheat.h"
 #include "drivenum.h"
+#include "emuopts.h"
 #include "ui/ui.h"
 #include "luaengine.h"
 #include <mutex>
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wshift-count-overflow"
+#endif
 //**************************************************************************
 //  LUA ENGINE
 //**************************************************************************
@@ -106,6 +110,52 @@ int lua_engine::docall(int narg, int nres)
 	signal(SIGINT, SIG_DFL);
 	lua_remove(m_lua_state, base);  /* remove traceback function */
 	return status;
+}
+
+namespace luabridge
+{
+template <>
+struct Stack <osd_file::error>
+{
+	static void push(lua_State *L, osd_file::error error)
+	{
+		std::string strerror;
+		switch(error)
+		{
+			case osd_file::error::NONE:
+				lua_pushboolean(L, false);
+				return;
+			case osd_file::error::FAILURE:
+				strerror = "failure";
+				break;
+			case osd_file::error::OUT_OF_MEMORY:
+				strerror = "out_of_memory";
+				break;
+			case osd_file::error::NOT_FOUND:
+				strerror = "not_found";
+				break;
+			case osd_file::error::ACCESS_DENIED:
+				strerror = "access_denied";
+				break;
+			case osd_file::error::ALREADY_OPEN:
+				strerror = "already_open";
+				break;
+			case osd_file::error::TOO_MANY_FILES:
+				strerror = "too_many_files";
+				break;
+			case osd_file::error::INVALID_DATA:
+				strerror = "invalid_data";
+				break;
+			case osd_file::error::INVALID_ACCESS:
+				strerror = "invalid_access";
+				break;
+			default:
+				strerror = "unknown_error";
+				break;
+		}
+		lua_pushstring(L, strerror.c_str());
+	}
+};
 }
 
 /* mark in error messages for incomplete statements */
@@ -447,6 +497,61 @@ luabridge::LuaRef lua_engine::l_machine_get_devices(const running_machine *r)
 }
 
 //-------------------------------------------------
+//  machine_get_images - return table of available image devices userdata
+//  -> manager:machine().images["flop1"]
+//-------------------------------------------------
+
+luabridge::LuaRef lua_engine::l_machine_get_images(const running_machine *r)
+{
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef image_table = luabridge::LuaRef::newTable(L);
+
+	image_interface_iterator iter(r->root_device());
+	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next()) {
+		image_table[image->brief_instance_name()] = image;
+		image_table[image->instance_name()] = image;
+	}
+
+	return image_table;
+}
+
+//-------------------------------------------------
+//  memory_banks - return memory_banks
+//  -> manager:machine():memory().banks["maincpu"]
+//-------------------------------------------------
+
+luabridge::LuaRef lua_engine::l_memory_get_banks(const memory_manager *m)
+{
+	memory_manager *mm = const_cast<memory_manager *>(m);
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef table = luabridge::LuaRef::newTable(L);
+
+	for (memory_bank &bank : mm->banks()) {
+		table[bank.tag()] = &bank;
+	}
+
+	return table;
+}
+
+//-------------------------------------------------
+//  memory_regions - return memory_regions
+//  -> manager:machine():memory().region[":maincpu"]
+//-------------------------------------------------
+
+luabridge::LuaRef lua_engine::l_memory_get_regions(const memory_manager *m)
+{
+	memory_manager *mm = const_cast<memory_manager *>(m);
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef table = luabridge::LuaRef::newTable(L);
+
+	for (memory_region &region: mm->regions()) {
+		table[region.name()] = &region;
+	}
+
+	return table;
+}
+
+//-------------------------------------------------
 //  machine_cheat_entries - return cheat entries
 //  -> manager:machine():cheat().entries[0]
 //-------------------------------------------------
@@ -566,6 +671,9 @@ luabridge::LuaRef lua_engine::l_dev_get_memspaces(const device_t *d)
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef sp_table = luabridge::LuaRef::newTable(L);
 
+	if(!&dev->memory())
+		return sp_table;
+
 	for (address_spacenum sp = AS_0; sp < ADDRESS_SPACES; ++sp) {
 		if (dev->memory().has_space(sp)) {
 			sp_table[dev->memory().space(sp).name()] = &(dev->memory().space(sp));
@@ -585,6 +693,10 @@ luabridge::LuaRef lua_engine::l_dev_get_states(const device_t *d)
 	device_t *dev = const_cast<device_t *>(d);
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef st_table = luabridge::LuaRef::newTable(L);
+
+	if(!&dev->state())
+		return st_table;
+
 	for (device_state_entry &s : dev->state().state_entries())
 	{
 		// XXX: refrain from exporting non-visible entries?
@@ -592,6 +704,126 @@ luabridge::LuaRef lua_engine::l_dev_get_states(const device_t *d)
 	}
 
 	return st_table;
+}
+
+//-------------------------------------------------
+//  device_get_item - return table of indexed items owned by this device
+//  -> manager:machine().devices[":maincpu"].items
+//-------------------------------------------------
+
+luabridge::LuaRef lua_engine::l_dev_get_items(const device_t *d)
+{
+	device_t *dev = const_cast<device_t *>(d);
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef table = luabridge::LuaRef::newTable(L);
+	std::string tag = dev->tag();
+
+	// 10000 is enough?
+	for(int i = 0; i < 10000; i++)
+	{
+		std::string name;
+		const char *item;
+		unsigned int size, count;
+		void *base;
+		item = dev->machine().save().indexed_item(i, base, size, count);
+		if(!item)
+			break;
+		name = &(strchr(item, '/')[1]);
+		if(name.substr(0, name.find("/")) == tag)
+		{
+			name = name.substr(name.find("/") + 1, std::string::npos);
+			table[name] = i;
+		}
+	}
+	return table;
+}
+
+lua_engine::lua_item::lua_item(int index)
+{
+	std::string name;
+	const char *item;
+	item = luaThis->machine().save().indexed_item(index, l_item_base, l_item_size, l_item_count);
+	if(!item)
+	{
+		l_item_base = nullptr;
+		l_item_size = 0;
+		l_item_count= 0;
+	}
+}
+
+int lua_engine::lua_item::l_item_read(lua_State *L)
+{
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "offset (integer) expected");
+	int offset = lua_tounsigned(L, 2);
+	int ret = 0;
+	if(!l_item_base || (offset > l_item_count))
+	{
+		lua_pushnil(L);
+		return 1;
+	}
+	switch(l_item_size)
+	{
+		case 1:
+		default:
+			ret = ((UINT8 *)l_item_base)[offset];
+			break;
+		case 2:
+			ret = ((UINT16 *)l_item_base)[offset];
+			break;
+		case 4:
+			ret = ((UINT32 *)l_item_base)[offset];
+			break;
+		case 8:
+			ret = ((UINT64 *)l_item_base)[offset];
+			break;
+	}
+	lua_pushunsigned(L, ret);
+	return 1;
+}
+
+int lua_engine::lua_item::l_item_write(lua_State *L)
+{
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "offset (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
+	int offset = lua_tounsigned(L, 2);
+	UINT64 value = lua_tounsigned(L, 3);
+	if(!l_item_base || (offset > l_item_count))
+		return 1;
+	switch(l_item_size)
+	{
+		case 1:
+		default:
+			((UINT8 *)l_item_base)[offset] = (UINT8)value;
+			break;
+		case 2:
+			((UINT16 *)l_item_base)[offset] = (UINT16)value;
+			break;
+		case 4:
+			((UINT32 *)l_item_base)[offset] = (UINT32)value;
+			break;
+		case 8:
+			((UINT64 *)l_item_base)[offset] = (UINT64)value;
+			break;
+	}
+	return 1;
+}
+
+int lua_engine::lua_item::l_item_read_block(lua_State *L)
+{
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "offset (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "length (integer) expected");
+	int offset = lua_tounsigned(L, 2);
+	int len = lua_tonumber(L, 3);
+	if(!l_item_base || ((offset + len) > (l_item_size * l_item_count)))
+	{
+		lua_pushnil(L);
+		return 1;
+	}
+	luaL_Buffer buff;
+	char *ptr = luaL_buffinitsize(L, &buff, len);
+	memcpy(ptr, l_item_base, len);
+	luaL_pushresultsize(&buff, len);
+	return 1;
 }
 
 //-------------------------------------------------
@@ -716,6 +948,152 @@ int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
 			break;
 		default:
 			break;
+	}
+
+	return 0;
+}
+
+//-------------------------------------------------
+//  mem_direct_read - templated direct memory readers for <sign>,<size>
+//  -> manager:machine().devices[":maincpu"].spaces["program"]:read_direct_i8(0xC000)
+//-------------------------------------------------
+
+UINT8 lua_engine::read_direct_byte(address_space &space, offs_t addr)
+{
+	UINT8 *base = (UINT8 *)space.get_read_ptr(addr);
+	if(base)
+		return base[addr];
+	else
+		return 0;
+}
+
+template <typename T>
+int lua_engine::lua_addr_space::l_direct_mem_read(lua_State *L)
+{
+	address_space &sp = luabridge::Stack<address_space &>::get(L, 1);
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
+	offs_t address = lua_tounsigned(L, 2);
+	T mem_content = 0;
+	for(int i = 0; i < sizeof(T); i++)
+	{
+		UINT8 byte;
+		mem_content <<= 8;
+		if(sp.endianness() == ENDIANNESS_BIG)
+			byte = read_direct_byte(sp, address + sizeof(T) - i);
+		else
+			byte = read_direct_byte(sp, address + i);
+		mem_content |= byte;
+	}
+
+	if (std::numeric_limits<T>::is_signed) {
+		lua_pushinteger(L, mem_content);
+	} else {
+		lua_pushunsigned(L, mem_content);
+	}
+
+	return 1;
+}
+
+//-------------------------------------------------
+//  mem_direct_write - templated memory writer for <sign>,<size>
+//  -> manager:machine().devices[":maincpu"].spaces["program"]:write_direct_u16(0xC000, 0xF00D)
+//-------------------------------------------------
+
+void lua_engine::write_direct_byte(address_space &space, offs_t addr, UINT8 byte)
+{
+	UINT8 *base = (UINT8 *)space.get_read_ptr(addr);
+	if(base)
+		base[addr] = byte;
+}
+
+template <typename T>
+int lua_engine::lua_addr_space::l_direct_mem_write(lua_State *L)
+{
+	address_space &sp = luabridge::Stack<address_space &>::get(L, 1);
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
+	offs_t address = lua_tounsigned(L, 2);
+	T val = lua_tounsigned(L, 3);
+	for(int i = 0; i < sizeof(T); i++)
+	{
+		if(sp.endianness() == ENDIANNESS_BIG)
+			write_direct_byte(sp, address + sizeof(T) - i, val & 0xff);
+		else
+			write_direct_byte(sp, address + i, val & 0xff);
+		val >>= 8;
+	}
+
+	return 0;
+}
+
+//-------------------------------------------------
+//  region_read - templated region readers for <sign>,<size>
+//  -> manager:machine():memory().region[":maincpu"]:read_i8(0xC000)
+//-------------------------------------------------
+
+UINT8 lua_engine::read_region_byte(memory_region &region, offs_t addr)
+{
+	if(addr >= region.bytes())
+		return 0;
+
+	return region.u8(addr);
+}
+
+template <typename T>
+int lua_engine::lua_memory_region::l_region_read(lua_State *L)
+{
+	memory_region &region = luabridge::Stack<memory_region &>::get(L, 1);
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
+	offs_t address = lua_tounsigned(L, 2);
+	T mem_content = 0;
+	for(int i = 0; i < sizeof(T); i++)
+	{
+		UINT8 byte;
+		mem_content <<= 8;
+		if(region.endianness() == ENDIANNESS_BIG)
+			byte = read_region_byte(region, address + sizeof(T) - i);
+		else
+			byte = read_region_byte(region, address + i);
+		mem_content |= byte;
+	}
+
+	if (std::numeric_limits<T>::is_signed) {
+		lua_pushinteger(L, mem_content);
+	} else {
+		lua_pushunsigned(L, mem_content);
+	}
+
+	return 1;
+}
+
+//-------------------------------------------------
+//  region_write - templated region writer for <sign>,<size>
+//  -> manager:machine():memory().region[":maincpu"]:write_u16(0xC000, 0xF00D)
+//-------------------------------------------------
+
+void lua_engine::write_region_byte(memory_region &region, offs_t addr, UINT8 byte)
+{
+	if(addr >= region.bytes())
+		return;
+
+	region.base()[addr] = byte;
+}
+
+template <typename T>
+int lua_engine::lua_memory_region::l_region_write(lua_State *L)
+{
+	memory_region &region = luabridge::Stack<memory_region &>::get(L, 1);
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
+	offs_t address = lua_tounsigned(L, 2);
+	T val = lua_tounsigned(L, 3);
+	for(int i = 0; i < sizeof(T); i++)
+	{
+		if(region.endianness() == ENDIANNESS_BIG)
+			write_region_byte(region, address + sizeof(T) - i, val & 0xff);
+		else
+			write_region_byte(region, address + i, val & 0xff);
+		val >>= 8;
 	}
 
 	return 0;
@@ -968,6 +1346,7 @@ int lua_engine::lua_screen::l_type(lua_State *L)
 		case SCREEN_TYPE_RASTER:  lua_pushliteral(L, "raster"); break;
 		case SCREEN_TYPE_VECTOR:  lua_pushliteral(L, "vector"); break;
 		case SCREEN_TYPE_LCD:     lua_pushliteral(L, "lcd"); break;
+		case SCREEN_TYPE_SVG:     lua_pushliteral(L, "svg"); break;
 		default:                  lua_pushliteral(L, "unknown"); break;
 	}
 
@@ -1049,6 +1428,7 @@ int lua_engine::lua_screen::l_draw_line(lua_State *L)
 
 //-------------------------------------------------
 //  draw_text - draw text on a screen container
+//	if x is a position, then y is a pixel position, otherwise x and y are screen size relative
 //  -> manager:machine().screens[":screen"]:draw_text(x, y, message)
 //-------------------------------------------------
 
@@ -1060,7 +1440,7 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	}
 
 	// ensure that we got proper parameters
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "x (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 2) || lua_isstring(L, 2), 2, "x (integer or string) expected");
 	luaL_argcheck(L, lua_isnumber(L, 3), 3, "y (integer) expected");
 	luaL_argcheck(L, lua_isstring(L, 4), 4, "message (string) expected");
 	luaL_argcheck(L, lua_isinteger(L, 5) || lua_isnone(L, 5), 5, "optional argument: text color, integer expected (default: 0xffffffff)");
@@ -1068,8 +1448,22 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	// retrieve all parameters
 	int sc_width = sc->visible_area().width();
 	int sc_height = sc->visible_area().height();
-	float x = MIN(MAX(0, (float) lua_tonumber(L, 2)), sc_width-1) / static_cast<float>(sc_width);
-	float y = MIN(MAX(0, (float) lua_tonumber(L, 3)), sc_height-1) / static_cast<float>(sc_height);
+	int justify = JUSTIFY_LEFT;
+	float y, x = 0;
+	if(lua_isnumber(L, 2))
+	{
+		x = MIN(MAX(0, (float) lua_tonumber(L, 2)), sc_width-1) / static_cast<float>(sc_width);
+		y = MIN(MAX(0, (float) lua_tonumber(L, 3)), sc_height-1) / static_cast<float>(sc_height);
+	}
+	else
+	{
+		std::string just_str = lua_tostring(L, 2);
+		if(just_str == "right")
+			justify = JUSTIFY_RIGHT;
+		else if(just_str == "center")
+			justify = JUSTIFY_CENTER;
+		y = lua_tonumber(L, 3);
+	}
 	const char *msg = luaL_checkstring(L,4);
 	rgb_t textcolor = UI_TEXT_COLOR;
 	if (!lua_isnone(L, 5)) {
@@ -1079,11 +1473,23 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	// draw the text
 	render_container &rc = sc->container();
 	ui_manager &ui = sc->machine().ui();
-	ui.draw_text_full(&rc, msg, x, y , (1.0f - x),
-						JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, textcolor,
+	ui.draw_text_full(&rc, msg, x, y, (1.0f - x),
+						justify, WRAP_WORD, DRAW_NORMAL, textcolor,
 						UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	return 0;
+}
+
+int lua_engine::lua_emu_file::l_emu_file_read(lua_State *L)
+{
+	emu_file *file = luabridge::Stack<emu_file *>::get(L, 1);
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "length (integer) expected");
+	int ret, len = lua_tonumber(L, 2);
+	luaL_Buffer buff;
+	char *ptr = luaL_buffinitsize(L, &buff, len);
+	ret = file->read(ptr, len);
+	luaL_pushresultsize(&buff, ret);
+	return 1;
 }
 
 void *lua_engine::checkparam(lua_State *L, int idx, const char *tname)
@@ -1273,6 +1679,88 @@ lua_engine::~lua_engine()
 	close();
 }
 
+std::vector<lua_engine::menu_item> &lua_engine::menu_populate(std::string &menu)
+{
+	std::vector<menu_item> &menu_list = *global_alloc(std::vector<menu_item>);
+	std::string field = "menu_pop_" + menu;
+	lua_settop(m_lua_state, 0);
+	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
+
+	if(!lua_isfunction(m_lua_state, -1))
+	{
+		lua_pop(m_lua_state, 1);
+		return menu_list;
+	}
+	lua_pcall(m_lua_state, 0, 1, 0);
+	if(!lua_istable(m_lua_state, -1))
+	{
+		lua_pop(m_lua_state, 1);
+		return menu_list;
+	}
+
+	lua_pushnil(m_lua_state);
+	while(lua_next(m_lua_state, -2))
+	{
+		if(lua_istable(m_lua_state, -1))
+		{
+			menu_item item;
+			lua_rawgeti(m_lua_state, -1, 1);
+			item.text = lua_tostring(m_lua_state, -1);
+			lua_pop(m_lua_state, 1);
+			lua_rawgeti(m_lua_state, -1, 2);
+			item.subtext = lua_tostring(m_lua_state, -1);
+			lua_pop(m_lua_state, 1);
+			lua_rawgeti(m_lua_state, -1, 3);
+			item.flags = lua_tointeger(m_lua_state, -1);
+			lua_pop(m_lua_state, 1);
+			menu_list.push_back(item);
+		}
+		lua_pop(m_lua_state, 1);
+	}
+	lua_pop(m_lua_state, 1);
+	return menu_list;
+}
+
+bool lua_engine::menu_callback(std::string &menu, int index, std::string event)
+{
+	std::string field = "menu_cb_" + menu;
+	bool ret = false;
+	lua_settop(m_lua_state, 0);
+	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
+
+	if(lua_isfunction(m_lua_state, -1))
+	{
+		lua_pushinteger(m_lua_state, index);
+		lua_pushstring(m_lua_state, event.c_str());
+		if(int error = lua_pcall(m_lua_state, 2, 1, 0))
+		{
+			if(error == 2)
+				printf("%s\n", lua_tostring(m_lua_state, -1));
+			lua_pop(m_lua_state, 1);
+			return false;
+		}
+		ret = lua_toboolean(m_lua_state, -1);
+		lua_pop(m_lua_state, 1);
+	}
+	return ret;
+}
+
+int lua_engine::l_emu_register_menu(lua_State *L)
+{
+	luaL_argcheck(L, lua_isfunction(L, 1), 1, "callback function expected");
+	luaL_argcheck(L, lua_isfunction(L, 2), 2, "callback function expected");
+	luaL_argcheck(L, lua_isstring(L, 3), 3, "message (string) expected");
+	std::string name = luaL_checkstring(L, 3);
+	std::string cbfield = "menu_cb_" + name;
+	std::string popfield = "menu_pop_" + name;
+	luaThis->m_menu.push_back(std::string(name));
+	lua_pushvalue(L, 1);
+	lua_setfield(L, LUA_REGISTRYINDEX, cbfield.c_str());
+	lua_pushvalue(L, 2);
+	lua_setfield(L, LUA_REGISTRYINDEX, popfield.c_str());
+	return 1;
+}
+
 void lua_engine::execute_function(const char *id)
 {
 	lua_settop(m_lua_state, 0);
@@ -1285,7 +1773,12 @@ void lua_engine::execute_function(const char *id)
 		{
 			if (lua_isfunction(m_lua_state, -1))
 			{
-				lua_pcall(m_lua_state, 0, 0, 0);
+				if(int error = lua_pcall(m_lua_state, 0, 0, 0))
+				{
+					if(error == 2)
+						printf("%s\n", lua_tostring(m_lua_state, -1));
+					lua_pop(m_lua_state, 1);
+				}
 			}
 			else
 			{
@@ -1346,6 +1839,11 @@ int lua_engine::l_emu_register_frame(lua_State *L)
 	return register_function(L, "LUA_ON_FRAME");
 }
 
+int lua_engine::l_emu_register_frame_done(lua_State *L)
+{
+	return register_function(L, "LUA_ON_FRAME_DONE");
+}
+
 void lua_engine::on_machine_prestart()
 {
 	execute_function("LUA_ON_PRESTART");
@@ -1374,6 +1872,11 @@ void lua_engine::on_machine_resume()
 void lua_engine::on_machine_frame()
 {
 	execute_function("LUA_ON_FRAME");
+}
+
+void lua_engine::on_frame_done()
+{
+	execute_function("LUA_ON_FRAME_DONE");
 }
 
 void lua_engine::update_machine()
@@ -1452,6 +1955,8 @@ void lua_engine::initialize()
 			.addCFunction ("register_pause", l_emu_register_pause )
 			.addCFunction ("register_resume",l_emu_register_resume )
 			.addCFunction ("register_frame", l_emu_register_frame )
+			.addCFunction ("register_frame_done", l_emu_register_frame_done )
+			.addCFunction ("register_menu",  l_emu_register_menu )
 			.beginClass <machine_manager> ("manager")
 				.addFunction ("machine", &machine_manager::machine)
 				.addFunction ("options", &machine_manager::options)
@@ -1474,9 +1979,11 @@ void lua_engine::initialize()
 				.addFunction ("ioport", &running_machine::ioport)
 				.addFunction ("parameters", &running_machine::parameters)
 				.addFunction ("cheat", &running_machine::cheat)
+				.addFunction ("memory", &running_machine::memory)
 				.addFunction ("options", &running_machine::options)
 				.addProperty <luabridge::LuaRef, void> ("devices", &lua_engine::l_machine_get_devices)
 				.addProperty <luabridge::LuaRef, void> ("screens", &lua_engine::l_machine_get_screens)
+				.addProperty <luabridge::LuaRef, void> ("images", &lua_engine::l_machine_get_images)
 			.endClass ()
 			.beginClass <game_driver> ("game_driver")
 				.addData ("source_file", &game_driver::source_file)
@@ -1492,8 +1999,10 @@ void lua_engine::initialize()
 				.addFunction ("name", &device_t::name)
 				.addFunction ("shortname", &device_t::shortname)
 				.addFunction ("tag", &device_t::tag)
+				.addFunction ("owner", &device_t::owner)
 				.addProperty <luabridge::LuaRef, void> ("spaces", &lua_engine::l_dev_get_memspaces)
 				.addProperty <luabridge::LuaRef, void> ("state", &lua_engine::l_dev_get_states)
+				.addProperty <luabridge::LuaRef, void> ("items", &lua_engine::l_dev_get_items)
 			.endClass()
 			.beginClass <cheat_manager> ("cheat")
 				.addProperty <bool, bool> ("enabled", &cheat_manager::enabled, &cheat_manager::set_enable)
@@ -1621,6 +2130,22 @@ void lua_engine::initialize()
 				.addCFunction ("write_u32", &lua_addr_space::l_mem_write<UINT32>)
 				.addCFunction ("write_i64", &lua_addr_space::l_mem_write<INT64>)
 				.addCFunction ("write_u64", &lua_addr_space::l_mem_write<UINT64>)
+				.addCFunction ("read_direct_i8", &lua_addr_space::l_direct_mem_read<INT8>)
+				.addCFunction ("read_direct_u8", &lua_addr_space::l_direct_mem_read<UINT8>)
+				.addCFunction ("read_direct_i16", &lua_addr_space::l_direct_mem_read<INT16>)
+				.addCFunction ("read_direct_u16", &lua_addr_space::l_direct_mem_read<UINT16>)
+				.addCFunction ("read_direct_i32", &lua_addr_space::l_direct_mem_read<INT32>)
+				.addCFunction ("read_direct_u32", &lua_addr_space::l_direct_mem_read<UINT32>)
+				.addCFunction ("read_direct_i64", &lua_addr_space::l_direct_mem_read<INT64>)
+				.addCFunction ("read_direct_u64", &lua_addr_space::l_direct_mem_read<UINT64>)
+				.addCFunction ("write_direct_i8", &lua_addr_space::l_direct_mem_write<INT8>)
+				.addCFunction ("write_direct_u8", &lua_addr_space::l_direct_mem_write<UINT8>)
+				.addCFunction ("write_direct_i16", &lua_addr_space::l_direct_mem_write<INT16>)
+				.addCFunction ("write_direct_u16", &lua_addr_space::l_direct_mem_write<UINT16>)
+				.addCFunction ("write_direct_i32", &lua_addr_space::l_direct_mem_write<INT32>)
+				.addCFunction ("write_direct_u32", &lua_addr_space::l_direct_mem_write<UINT32>)
+				.addCFunction ("write_direct_i64", &lua_addr_space::l_direct_mem_write<INT64>)
+				.addCFunction ("write_direct_u64", &lua_addr_space::l_direct_mem_write<UINT64>)
 			.endClass()
 			.deriveClass <address_space, lua_addr_space> ("addr_space")
 				.addFunction("name", &address_space::name)
@@ -1662,6 +2187,7 @@ void lua_engine::initialize()
 				.addProperty <bool, bool> ("show_fps", &ui_manager::show_fps, &ui_manager::set_show_fps)
 				.addProperty <bool, bool> ("show_profiler", &ui_manager::show_profiler, &ui_manager::set_show_profiler)
 				.addProperty <bool, bool> ("single_step", &ui_manager::single_step, &ui_manager::set_single_step)
+				.addFunction ("get_line_height", &ui_manager::get_line_height)
 			.endClass()
 			.beginClass <lua_screen> ("lua_screen_dev")
 				.addCFunction ("draw_box",  &lua_screen::l_draw_box)
@@ -1687,6 +2213,65 @@ void lua_engine::initialize()
 				.addProperty <UINT64, UINT64> ("value", &lua_engine::l_state_get_value, &lua_engine::l_state_set_value)
 				.addFunction ("is_visible", &device_state_entry::visible)
 				.addFunction ("is_divider", &device_state_entry::divider)
+			.endClass()
+			.beginClass <memory_manager> ("memory")
+				.addProperty <luabridge::LuaRef, void> ("banks", &lua_engine::l_memory_get_banks)
+				.addProperty <luabridge::LuaRef, void> ("regions", &lua_engine::l_memory_get_regions)
+			.endClass()
+			.beginClass <lua_memory_region> ("lua_region")
+				.addCFunction ("read_i8", &lua_memory_region::l_region_read<INT8>)
+				.addCFunction ("read_u8", &lua_memory_region::l_region_read<UINT8>)
+				.addCFunction ("read_i16", &lua_memory_region::l_region_read<INT16>)
+				.addCFunction ("read_u16", &lua_memory_region::l_region_read<UINT16>)
+				.addCFunction ("read_i32", &lua_memory_region::l_region_read<INT32>)
+				.addCFunction ("read_u32", &lua_memory_region::l_region_read<UINT32>)
+				.addCFunction ("read_i64", &lua_memory_region::l_region_read<INT64>)
+				.addCFunction ("read_u64", &lua_memory_region::l_region_read<UINT64>)
+				.addCFunction ("write_i8", &lua_memory_region::l_region_write<INT8>)
+				.addCFunction ("write_u8", &lua_memory_region::l_region_write<UINT8>)
+				.addCFunction ("write_i16", &lua_memory_region::l_region_write<INT16>)
+				.addCFunction ("write_u16", &lua_memory_region::l_region_write<UINT16>)
+				.addCFunction ("write_i32", &lua_memory_region::l_region_write<INT32>)
+				.addCFunction ("write_u32", &lua_memory_region::l_region_write<UINT32>)
+				.addCFunction ("write_i64", &lua_memory_region::l_region_write<INT64>)
+				.addCFunction ("write_u64", &lua_memory_region::l_region_write<UINT64>)
+			.endClass()
+			.deriveClass <memory_region, lua_memory_region> ("region")
+				.addProperty <UINT32> ("size", &memory_region::bytes)
+			.endClass()
+			.beginClass <device_image_interface> ("image")
+				.addFunction ("exists", &device_image_interface::exists)
+				.addFunction ("filename", &device_image_interface::filename)
+				.addFunction ("longname", &device_image_interface::longname)
+				.addFunction ("manufacturer", &device_image_interface::manufacturer)
+				.addFunction ("year", &device_image_interface::year)
+				.addFunction ("software_list_name", &device_image_interface::software_list_name)
+				.addFunction ("image_type_name", &device_image_interface::image_type_name)
+				.addFunction ("load", &device_image_interface::load)
+				.addFunction ("unload", &device_image_interface::unload)
+				.addFunction ("crc", &device_image_interface::crc)
+				.addProperty <const device_t &> ("device", static_cast<const device_t &(device_image_interface::*)() const>(&device_image_interface::device))
+				.addProperty <bool> ("is_readable", &device_image_interface::is_readable)
+				.addProperty <bool> ("is_writeable", &device_image_interface::is_writeable)
+				.addProperty <bool> ("is_creatable", &device_image_interface::is_creatable)
+				.addProperty <bool> ("is_reset_on_load", &device_image_interface::is_reset_on_load)
+			.endClass()
+			.beginClass <lua_emu_file> ("lua_file")
+				.addCFunction ("read", &lua_emu_file::l_emu_file_read)
+			.endClass()
+			.deriveClass <emu_file, lua_emu_file> ("file")
+				.addConstructor <void (*)(const char *, UINT32)> ()
+				.addFunction ("open", static_cast<osd_file::error (emu_file::*)(const char *)>(&emu_file::open))
+				.addFunction ("seek", &emu_file::seek)
+				.addFunction ("size", &emu_file::size)
+			.endClass()
+			.beginClass <lua_item> ("item")
+				.addConstructor <void (*)(int)> ()
+				.addData ("size", &lua_item::l_item_size, false)
+				.addData ("count", &lua_item::l_item_count, false)
+				.addCFunction ("read", &lua_item::l_item_read)
+				.addCFunction ("read_block", &lua_item::l_item_read_block)
+				.addCFunction ("write", &lua_item::l_item_write)
 			.endClass()
 		.endNamespace();
 

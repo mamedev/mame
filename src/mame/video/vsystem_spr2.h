@@ -14,8 +14,6 @@ typedef device_delegate<UINT32 (UINT32)> vsystem_tile2_indirection_delegate;
 	vsystem_spr2_device::set_offsets(*device, _xoffs,_yoffs);
 #define MCFG_VSYSTEM_SPR2_GFXDECODE(_gfxtag) \
 	vsystem_spr2_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-#define MCFG_VSYSTEM_SPR2_PALETTE(_palette_tag) \
-	vsystem_spr2_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 class vsystem_spr2_device : public device_t
 {
@@ -24,7 +22,6 @@ public:
 
 		// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_tile_indirect_cb(device_t &device,vsystem_tile2_indirection_delegate newtilecb);
 	static void set_pritype(device_t &device, int pritype);
 	static void set_gfx_region(device_t &device, int gfx_region);
@@ -68,7 +65,6 @@ protected:
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 

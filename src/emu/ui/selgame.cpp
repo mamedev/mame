@@ -205,7 +205,10 @@ void ui_menu_select_game::handle()
 	{
 		// reset the error on any future m_event
 		if (ui_error)
+		{
 			ui_error = false;
+			machine().ui_input().reset();
+		}
 
 		// handle selections
 		else if (m_event->iptkey == IPT_UI_SELECT)
@@ -444,7 +447,7 @@ void ui_menu_select_game::handle()
 	// if we're in an error state, overlay an error message
 	if (ui_error)
 		machine().ui().draw_text_box(container, _("The selected machine is missing one or more required ROM or CHD images. "
-			"Please select a different machine.\n\nPress any key (except ESC) to continue."), JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+			"Please select a different machine.\n\nPress any key to continue."), JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 
 	// handle filters selection from key shortcuts
 	if (check_filter)

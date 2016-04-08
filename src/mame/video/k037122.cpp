@@ -18,33 +18,12 @@ const device_type K037122 = &device_creator<k037122_device>;
 k037122_device::k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K037122, "K037122 2D Tilemap", tag, owner, clock, "k037122", __FILE__),
 	device_video_interface(mconfig, *this),
+	device_gfx_interface(mconfig, *this, nullptr),
 	m_tile_ram(nullptr),
 	m_char_ram(nullptr),
 	m_reg(nullptr),
-	m_gfx_index(0),
-	m_gfxdecode(*this),
-	m_palette(*this)
+	m_gfx_index(0)
 {
-}
-
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void k037122_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<k037122_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void k037122_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<k037122_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -64,20 +43,17 @@ void k037122_device::device_start()
 	8*128
 	};
 
-	if(!m_gfxdecode->started())
-		throw device_missing_dependencies();
-
 	m_char_ram = make_unique_clear<UINT32[]>(0x200000 / 4);
 	m_tile_ram = make_unique_clear<UINT32[]>(0x20000 / 4);
 	m_reg = make_unique_clear<UINT32[]>(0x400 / 4);
 
-	m_layer[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k037122_device::tile_info_layer0),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
-	m_layer[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k037122_device::tile_info_layer1),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_layer[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k037122_device::tile_info_layer0),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	m_layer[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k037122_device::tile_info_layer1),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 
 	m_layer[0]->set_transparent_pen(0);
 	m_layer[1]->set_transparent_pen(0);
 
-	m_gfxdecode->set_gfx(m_gfx_index,std::make_unique<gfx_element>(m_palette, k037122_char_layout, (UINT8*)m_char_ram.get(), 0, m_palette->entries() / 16, 0));
+	set_gfx(m_gfx_index,std::make_unique<gfx_element>(palette(), k037122_char_layout, (UINT8*)m_char_ram.get(), 0, palette().entries() / 16, 0));
 
 	save_pointer(NAME(m_reg.get()), 0x400 / 4);
 	save_pointer(NAME(m_char_ram.get()), 0x200000 / 4);
@@ -153,7 +129,7 @@ void k037122_device::update_palette_color( UINT32 palette_base, int color )
 {
 	UINT32 data = m_tile_ram[(palette_base / 4) + color];
 
-	m_palette->set_pen_color(color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
+	palette().set_pen_color(color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
 }
 
 READ32_MEMBER( k037122_device::sram_r )
@@ -211,7 +187,7 @@ WRITE32_MEMBER( k037122_device::char_w )
 	UINT32 addr = offset + (bank * (0x40000/4));
 
 	COMBINE_DATA(m_char_ram.get() + addr);
-	m_gfxdecode->gfx(m_gfx_index)->mark_dirty(addr / 32);
+	gfx(m_gfx_index)->mark_dirty(addr / 32);
 }
 
 READ32_MEMBER( k037122_device::reg_r )

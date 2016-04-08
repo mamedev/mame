@@ -934,6 +934,7 @@ render_target::render_target(render_manager &manager, const internal_layout *lay
 
 	// aspect and scale options
 	m_keepaspect = (manager.machine().options().keep_aspect() && !(flags & RENDER_CREATE_HIDDEN));
+	m_int_overscan = manager.machine().options().int_overscan();
 	m_int_scale_x = manager.machine().options().int_scale_x();
 	m_int_scale_y = manager.machine().options().int_scale_y();
 	if (manager.machine().options().uneven_stretch() && !manager.machine().options().uneven_stretch_x())
@@ -1204,22 +1205,24 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 			if (target_orientation & ORIENTATION_SWAP_XY)
 				src_aspect = 1.0 / src_aspect;
 
-			// get destination size and aspect
-			float dest_width = (float)target_width;
-			float dest_height = (float)target_height;
-			float dest_aspect = dest_width / dest_height * target_pixel_aspect;
+			// get target aspect
+			float target_aspect = (float)target_width / (float)target_height * target_pixel_aspect;
 
-			// apply aspect correction to destination rectangle
-			if (dest_aspect > src_aspect)
-				dest_width *= m_keepaspect? src_aspect / dest_aspect : 1.0f;
-			else
-				dest_height *= m_keepaspect? dest_aspect / src_aspect : 1.0f;
+			// determine the scale mode for each axis
+			bool x_is_integer = !(target_aspect >= 1.0f && m_scale_mode == SCALE_FRACTIONAL_X);
+			bool y_is_integer = !(target_aspect < 1.0f && m_scale_mode == SCALE_FRACTIONAL_X);
 
-			// compute scale factors
-			float xscale = dest_width / src_width;
-			float yscale = dest_height / src_height;
-			xscale = dest_aspect >= 1.0f && m_scale_mode == SCALE_FRACTIONAL_X? xscale : MAX(1, render_round_nearest(xscale));
-			yscale = dest_aspect < 1.0f && m_scale_mode == SCALE_FRACTIONAL_X? yscale : MAX(1, render_round_nearest(yscale));
+			// first compute scale factors to fit the screen
+			float xscale = (float)target_width / src_width;
+			float yscale = (float)target_height / src_height;
+			float maxxscale = MAX(1, m_int_overscan? render_round_nearest(xscale) : floor(xscale));
+			float maxyscale = MAX(1, m_int_overscan? render_round_nearest(yscale) : floor(yscale));
+
+			// now apply desired scale mode and aspect correction
+			if (m_keepaspect && target_aspect > src_aspect) xscale *= src_aspect / target_aspect * (maxyscale / yscale);
+			if (m_keepaspect && target_aspect < src_aspect) yscale *= target_aspect / src_aspect * (maxxscale / xscale);
+			if (x_is_integer) xscale = MIN(maxxscale, MAX(1, render_round_nearest(xscale)));
+			if (y_is_integer) yscale = MIN(maxyscale, MAX(1, render_round_nearest(yscale)));
 
 			// check if we have user defined scale factors, if so use them instead
 			xscale = m_int_scale_x? m_int_scale_x : xscale;

@@ -249,6 +249,7 @@ SOUNDS["TMS5110A"] = true
 SOUNDS["LMC1992"] = true
 SOUNDS["AWACS"] = true
 SOUNDS["YMZ770"] = true
+SOUNDS["MPEG_AUDIO"] = true
 SOUNDS["T6721A"] = true
 SOUNDS["MOS7360"] = true
 --SOUNDS["ESQPUMP"] = true
@@ -3044,6 +3045,8 @@ files {
 	MAME_DIR .. "src/mame/machine/naomim2.h",
 	MAME_DIR .. "src/mame/machine/naomim4.cpp",
 	MAME_DIR .. "src/mame/machine/naomim4.h",
+	MAME_DIR .. "src/mame/machine/m3comm.cpp",
+	MAME_DIR .. "src/mame/machine/m3comm.h",
 	MAME_DIR .. "src/mame/machine/315-5881_crypt.cpp",
 	MAME_DIR .. "src/mame/machine/315-5881_crypt.h",
 	MAME_DIR .. "src/mame/machine/awboard.cpp",
@@ -4354,6 +4357,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/jongkyo.cpp",
 	MAME_DIR .. "src/mame/drivers/joystand.cpp",
 	MAME_DIR .. "src/mame/drivers/jubilee.cpp",
+	MAME_DIR .. "src/mame/drivers/jungleyo.cpp",
 	MAME_DIR .. "src/mame/drivers/kas89.cpp",
 	MAME_DIR .. "src/mame/drivers/kingpin.cpp",
 	MAME_DIR .. "src/mame/drivers/koikoi.cpp",

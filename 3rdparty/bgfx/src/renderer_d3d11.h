@@ -32,8 +32,8 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 #include "renderer.h"
 #include "renderer_d3d.h"
 #include "shader_dxbc.h"
-#include "ovr.h"
-#include "renderdoc.h"
+#include "hmd_ovr.h"
+#include "debug_renderdoc.h"
 
 #ifndef D3DCOLOR_ARGB
 #	define D3DCOLOR_ARGB(_a, _r, _g, _b) ( (DWORD)( ( ( (_a)&0xff)<<24)|( ( (_r)&0xff)<<16)|( ( (_g)&0xff)<<8)|( (_b)&0xff) ) )
@@ -59,6 +59,25 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 
 namespace bgfx { namespace d3d11
 {
+#if BGFX_CONFIG_USE_OVR
+	struct OVRBufferD3D11 : public OVRBufferI
+	{
+		virtual void create(const ovrSession& _session, int _eyeIdx) BX_OVERRIDE;
+		virtual void destroy(const ovrSession& _session) BX_OVERRIDE;
+		virtual void render(const ovrSession& _session) BX_OVERRIDE;
+
+		ID3D11RenderTargetView* m_eyeRtv[4];
+		ID3D11DepthStencilView* m_depthBuffer;
+	};
+
+	struct OVRMirrorD3D11 : public OVRMirrorI
+	{
+		virtual void create(const ovrSession& _session, int _width, int _height) BX_OVERRIDE;
+		virtual void destroy(const ovrSession& session) BX_OVERRIDE;
+		virtual void blit(const ovrSession& session) BX_OVERRIDE;
+	};
+#endif // BGFX_CONFIG_USE_OVR
+
 	struct BufferD3D11
 	{
 		BufferD3D11()

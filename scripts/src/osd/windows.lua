@@ -253,7 +253,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/windows/winutf8.h",
 		MAME_DIR .. "src/osd/windows/winutil.cpp",
 		MAME_DIR .. "src/osd/windows/winutil.h",
-		MAME_DIR .. "src/osd/windows/winclip.cpp",
 		MAME_DIR .. "src/osd/modules/osdmodule.cpp",
 		MAME_DIR .. "src/osd/modules/osdmodule.h",
 		MAME_DIR .. "src/osd/modules/file/winfile.cpp",

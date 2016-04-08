@@ -368,7 +368,7 @@ project ("osd_" .. _OPTIONS["osd"])
 
 	if _OPTIONS["targetos"]=="windows" then
 		files {
-			MAME_DIR .. "src/osd/sdl/main.cpp",
+			MAME_DIR .. "src/osd/windows/main.cpp",
 		}
 	end
 
@@ -461,7 +461,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/strconv.cpp",
 		MAME_DIR .. "src/osd/strconv.h",
 		MAME_DIR .. "src/osd/sdl/sdldir.cpp",
-		MAME_DIR .. "src/osd/sdl/sdlos_" .. SDLOS_TARGETOS .. ".cpp",
 		MAME_DIR .. "src/osd/modules/osdmodule.cpp",
 		MAME_DIR .. "src/osd/modules/osdmodule.h",
 		MAME_DIR .. "src/osd/modules/lib/osdlib_" .. SDLOS_TARGETOS .. ".cpp",
@@ -495,123 +494,4 @@ project ("ocore_" .. _OPTIONS["osd"])
 		}
 	end
 
-	if _OPTIONS["targetos"]=="macosx" then
-		files {
-			MAME_DIR .. "src/osd/sdl/osxutils.h",
-			MAME_DIR .. "src/osd/sdl/osxutils.mm",
-		}
-	end
 
-
---------------------------------------------------
--- testkeys
---------------------------------------------------
-
-if _OPTIONS["with-tools"] then
-	project("testkeys")
-		uuid ("744cec21-c3b6-4d69-93cb-6811fed0ffe3")
-		kind "ConsoleApp"
-
-		flags {
-			"Symbols", -- always include minimum symbols for executables
-		}
-
-		dofile("sdl_cfg.lua")
-
-		includedirs {
-			MAME_DIR .. "src/osd",
-			MAME_DIR .. "src/lib/util",
-		}
-
-		if _OPTIONS["SEPARATE_BIN"]~="1" then
-			targetdir(MAME_DIR)
-		end
-
-		links {
-			"utils",
-			"ocore_" .. _OPTIONS["osd"],
-		}
-
-		files {
-			MAME_DIR .. "src/osd/sdl/testkeys.cpp",
-		}
-
-		if _OPTIONS["targetos"] == "windows" then
-			if _OPTIONS["USE_LIBSDL"]~="1" then
-				configuration { "mingw*"}
-					links {
-						"SDL2.dll",
-					}
-				configuration { "vs*" }
-					links {
-						"SDL2",
-						"Imm32",
-						"Version",
-					}
-				configuration { }
-			else
-				local str = backtick(sdlconfigcmd() .. " --libs | sed 's/ -lSDLmain//'")
-				addlibfromstring(str)
-				addoptionsfromstring(str)
-			end
-			links {
-				"psapi",
-			}
-			linkoptions{
-				"-municode",
-			}
-			files {
-				MAME_DIR .. "src/osd/sdl/main.cpp",
-			}
-		end
-
-		configuration { "mingw*" or "vs*" }
-			targetextension ".exe"
-
-		configuration { }
-
-		strip()
-end
-
-
---------------------------------------------------
--- aueffectutil
---------------------------------------------------
-
-if _OPTIONS["targetos"] == "macosx" and _OPTIONS["with-tools"] then
-	project("aueffectutil")
-		uuid ("3db8316d-fad7-4f5b-b46a-99373c91550e")
-		kind "ConsoleApp"
-
-		flags {
-			"Symbols", -- always include minimum symbols for executables
-		}
-
-		dofile("sdl_cfg.lua")
-
-		if _OPTIONS["SEPARATE_BIN"]~="1" then
-			targetdir(MAME_DIR)
-		end
-
-		linkoptions {
-			"-sectcreate __TEXT __info_plist " .. MAME_DIR .. "src/osd/sdl/aueffectutil-Info.plist",
-		}
-
-		dependency {
-			{ "aueffectutil",  MAME_DIR .. "src/osd/sdl/aueffectutil-Info.plist", true  },
-		}
-
-		links {
-			"AudioUnit.framework",
-			"AudioToolbox.framework",
-			"CoreAudio.framework",
-			"CoreAudioKit.framework",
-			"CoreServices.framework",
-		}
-
-		files {
-			MAME_DIR .. "src/osd/sdl/aueffectutil.mm",
-		}
-
-		strip()
-end

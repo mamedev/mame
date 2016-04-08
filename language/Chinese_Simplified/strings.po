@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-28 09:02+0200\n"
+"POT-Creation-Date: 2016-04-07 12:30+0200\n"
 "PO-Revision-Date: 2016-03-28 16:32+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
@@ -58,80 +58,80 @@ msgstr "全部重设"
 msgid "Reload All"
 msgstr "全部重新载入"
 
-#: src/emu/ui/cheatopt.cpp:258
+#: src/emu/ui/cheatopt.cpp:256
 msgid "Autofire Status"
 msgstr "连发状态"
 
-#: src/emu/ui/cheatopt.cpp:258 src/emu/ui/ui.cpp:1692
+#: src/emu/ui/cheatopt.cpp:256 src/emu/ui/ui.cpp:1688
 #: src/emu/ui/videoopt.cpp:207 src/emu/ui/videoopt.cpp:211
 #: src/emu/ui/videoopt.cpp:215 src/emu/ui/videoopt.cpp:219
 #: src/emu/ui/videoopt.cpp:223
 msgid "Disabled"
 msgstr "已停用"
 
-#: src/emu/ui/cheatopt.cpp:258 src/emu/ui/ui.cpp:1692
+#: src/emu/ui/cheatopt.cpp:256 src/emu/ui/ui.cpp:1688
 #: src/emu/ui/videoopt.cpp:207 src/emu/ui/videoopt.cpp:211
 #: src/emu/ui/videoopt.cpp:215 src/emu/ui/videoopt.cpp:219
 #: src/emu/ui/videoopt.cpp:223
 msgid "Enabled"
 msgstr "已启用"
 
-#: src/emu/ui/cheatopt.cpp:284 src/emu/ui/cheatopt.cpp:290
-#: src/emu/ui/dsplmenu.cpp:182 src/emu/ui/menu.cpp:675
-#: src/emu/ui/miscmenu.cpp:637 src/emu/ui/miscmenu.cpp:950
-#: src/emu/ui/sndmenu.cpp:134 src/emu/ui/sndmenu.cpp:136
+#: src/emu/ui/cheatopt.cpp:282 src/emu/ui/cheatopt.cpp:288
+#: src/emu/ui/dsplmenu.cpp:181 src/emu/ui/menu.cpp:695
+#: src/emu/ui/miscmenu.cpp:829 src/emu/ui/sndmenu.cpp:134
+#: src/emu/ui/sndmenu.cpp:136
 msgid "On"
 msgstr "开"
 
-#: src/emu/ui/cheatopt.cpp:284 src/emu/ui/cheatopt.cpp:290
-#: src/emu/ui/dsplmenu.cpp:182 src/emu/ui/menu.cpp:678
-#: src/emu/ui/miscmenu.cpp:637 src/emu/ui/miscmenu.cpp:950
-#: src/emu/ui/sndmenu.cpp:134 src/emu/ui/sndmenu.cpp:136
+#: src/emu/ui/cheatopt.cpp:282 src/emu/ui/cheatopt.cpp:288
+#: src/emu/ui/dsplmenu.cpp:181 src/emu/ui/menu.cpp:698
+#: src/emu/ui/miscmenu.cpp:829 src/emu/ui/sndmenu.cpp:134
+#: src/emu/ui/sndmenu.cpp:136
 msgid "Off"
 msgstr "关"
 
-#: src/emu/ui/cheatopt.cpp:301
+#: src/emu/ui/cheatopt.cpp:299
 msgid "No buttons found on this machine!"
 msgstr "在此机器上找不到按钮!"
 
-#: src/emu/ui/cheatopt.cpp:312 src/emu/ui/cheatopt.cpp:316
+#: src/emu/ui/cheatopt.cpp:310 src/emu/ui/cheatopt.cpp:314
 msgid "Autofire Delay"
 msgstr "连发延迟"
 
-#: src/emu/ui/ctrlmenu.cpp:20
+#: src/emu/ui/ctrlmenu.cpp:21
 msgid "Lightgun Device Assignment"
 msgstr "配置光枪设备"
 
-#: src/emu/ui/ctrlmenu.cpp:21
+#: src/emu/ui/ctrlmenu.cpp:22
 msgid "Trackball Device Assignment"
 msgstr "配置轨迹球设备"
 
-#: src/emu/ui/ctrlmenu.cpp:22
+#: src/emu/ui/ctrlmenu.cpp:23
 msgid "Pedal Device Assignment"
 msgstr "配置踏板设备"
 
-#: src/emu/ui/ctrlmenu.cpp:23
+#: src/emu/ui/ctrlmenu.cpp:24
 msgid "Adstick Device Assignment"
 msgstr "配置 AD 游戏杆设备"
 
-#: src/emu/ui/ctrlmenu.cpp:24
+#: src/emu/ui/ctrlmenu.cpp:25
 msgid "Paddle Device Assignment"
 msgstr "配置操纵杆设备"
 
-#: src/emu/ui/ctrlmenu.cpp:25
+#: src/emu/ui/ctrlmenu.cpp:26
 msgid "Dial Device Assignment"
 msgstr "配置方向盘设备"
 
-#: src/emu/ui/ctrlmenu.cpp:26
+#: src/emu/ui/ctrlmenu.cpp:27
 msgid "Positional Device Assignment"
 msgstr "配置定位设备"
 
-#: src/emu/ui/ctrlmenu.cpp:27
+#: src/emu/ui/ctrlmenu.cpp:28
 msgid "Mouse Device Assignment"
 msgstr "配置鼠标设备"
 
-#: src/emu/ui/ctrlmenu.cpp:106 src/emu/ui/ctrlmenu.cpp:126
-#: src/emu/ui/optsmenu.cpp:264
+#: src/emu/ui/ctrlmenu.cpp:107 src/emu/ui/ctrlmenu.cpp:127
+#: src/emu/ui/optsmenu.cpp:269
 msgid "Device Mapping"
 msgstr "装置映对"
 
@@ -143,12 +143,12 @@ msgstr "主要过滤器"
 msgid "Other filter"
 msgstr "其他过滤器"
 
-#: src/emu/ui/custmenu.cpp:175 src/emu/ui/optsmenu.cpp:235
+#: src/emu/ui/custmenu.cpp:175 src/emu/ui/optsmenu.cpp:240
 msgid "^!Manufacturer"
 msgstr "^!制造商"
 
 #: src/emu/ui/custmenu.cpp:184 src/emu/ui/custmenu.cpp:472
-#: src/emu/ui/optsmenu.cpp:243
+#: src/emu/ui/optsmenu.cpp:248
 msgid "^!Year"
 msgstr "^!年代"
 
@@ -418,9 +418,9 @@ msgid "Revision: "
 msgstr "版本： "
 
 #: src/emu/ui/datmenu.cpp:284 src/emu/ui/selgame.cpp:39
-#: src/emu/ui/selgame.cpp:2142 src/emu/ui/selgame.cpp:2151
-#: src/emu/ui/selsoft.cpp:1576 src/emu/ui/selsoft.cpp:1594
-#: src/emu/ui/selsoft.cpp:1603
+#: src/emu/ui/selgame.cpp:2149 src/emu/ui/selgame.cpp:2158
+#: src/emu/ui/selsoft.cpp:1578 src/emu/ui/selsoft.cpp:1596
+#: src/emu/ui/selsoft.cpp:1605
 msgid "History"
 msgstr "历史"
 
@@ -476,7 +476,7 @@ msgstr "额外的 INI"
 msgid "Icons"
 msgstr "图示"
 
-#: src/emu/ui/dirmenu.cpp:39 src/emu/ui/miscmenu.cpp:560
+#: src/emu/ui/dirmenu.cpp:39
 msgid "Cheats"
 msgstr "作弊码文件 (cheat)"
 
@@ -640,8 +640,8 @@ msgstr "同步更新"
 msgid "Wait Vertical Sync"
 msgstr "等待垂直同步"
 
-#: src/emu/ui/dsplmenu.cpp:202 src/emu/ui/dsplmenu.cpp:222
-#: src/emu/ui/optsmenu.cpp:261
+#: src/emu/ui/dsplmenu.cpp:201 src/emu/ui/dsplmenu.cpp:221
+#: src/emu/ui/optsmenu.cpp:266
 msgid "Display Options"
 msgstr "视讯选项"
 
@@ -649,19 +649,19 @@ msgstr "视讯选项"
 msgid "File Already Exists - Override?"
 msgstr "档案已存在 — 是否覆写？"
 
-#: src/emu/ui/filesel.cpp:163 src/emu/ui/selgame.cpp:1560
-#: src/emu/ui/selgame.cpp:1561 src/emu/ui/selgame.cpp:1562
-#: src/emu/ui/selgame.cpp:1563 src/emu/ui/selgame.cpp:1564
-#: src/emu/ui/selgame.cpp:1565 src/emu/ui/selgame.cpp:1566
-#: src/emu/ui/selgame.cpp:1575
+#: src/emu/ui/filesel.cpp:163 src/emu/ui/selgame.cpp:1567
+#: src/emu/ui/selgame.cpp:1568 src/emu/ui/selgame.cpp:1569
+#: src/emu/ui/selgame.cpp:1570 src/emu/ui/selgame.cpp:1571
+#: src/emu/ui/selgame.cpp:1572 src/emu/ui/selgame.cpp:1573
+#: src/emu/ui/selgame.cpp:1582
 msgid "No"
 msgstr "否"
 
-#: src/emu/ui/filesel.cpp:164 src/emu/ui/selgame.cpp:1560
-#: src/emu/ui/selgame.cpp:1561 src/emu/ui/selgame.cpp:1562
-#: src/emu/ui/selgame.cpp:1563 src/emu/ui/selgame.cpp:1564
-#: src/emu/ui/selgame.cpp:1565 src/emu/ui/selgame.cpp:1566
-#: src/emu/ui/selgame.cpp:1575
+#: src/emu/ui/filesel.cpp:164 src/emu/ui/selgame.cpp:1567
+#: src/emu/ui/selgame.cpp:1568 src/emu/ui/selgame.cpp:1569
+#: src/emu/ui/selgame.cpp:1570 src/emu/ui/selgame.cpp:1571
+#: src/emu/ui/selgame.cpp:1572 src/emu/ui/selgame.cpp:1573
+#: src/emu/ui/selgame.cpp:1582
 msgid "Yes"
 msgstr "是"
 
@@ -717,11 +717,11 @@ msgstr "读取此映像档，写入至其他映像档"
 msgid "Read this image, write to diff"
 msgstr "读取此映像档，写入差异档"
 
-#: src/emu/ui/imgcntrl.cpp:115
+#: src/emu/ui/imgcntrl.cpp:116
 msgid "Cannot save over directory"
 msgstr "无法跨目录储存"
 
-#: src/emu/ui/imgcntrl.cpp:149
+#: src/emu/ui/imgcntrl.cpp:150
 msgid ""
 "The software selected is missing one or more required ROM or CHD images. "
 "Please select a different one."
@@ -739,7 +739,7 @@ msgstr "部分支援"
 msgid "[empty]"
 msgstr "[ 空 ]"
 
-#: src/emu/ui/info_pty.cpp:26 src/emu/ui/mainmenu.cpp:90
+#: src/emu/ui/info_pty.cpp:26 src/emu/ui/mainmenu.cpp:91
 msgid "Pseudo terminals"
 msgstr "伪终端"
 
@@ -755,100 +755,104 @@ msgstr "使用者介面"
 msgid "Other Controls"
 msgstr "其他控制"
 
-#: src/emu/ui/inputmap.cpp:625 src/emu/ui/miscmenu.cpp:90
+#: src/emu/ui/inputmap.cpp:622 src/emu/ui/miscmenu.cpp:90
 #: src/emu/ui/slotopt.cpp:172
 msgid "Reset"
 msgstr "重设"
 
-#: src/emu/ui/mainmenu.cpp:53
+#: src/emu/ui/mainmenu.cpp:54
 msgid "Input (general)"
 msgstr "输入设定 （一般）"
 
-#: src/emu/ui/mainmenu.cpp:55
+#: src/emu/ui/mainmenu.cpp:56
 msgid "Input (this Machine)"
 msgstr "输入设定 （本机器）"
 
-#: src/emu/ui/mainmenu.cpp:59
+#: src/emu/ui/mainmenu.cpp:60
 msgid "Analog Controls"
 msgstr "类比控制"
 
-#: src/emu/ui/mainmenu.cpp:61
+#: src/emu/ui/mainmenu.cpp:62
 msgid "Dip Switches"
 msgstr "机械设定开关"
 
-#: src/emu/ui/mainmenu.cpp:64
+#: src/emu/ui/mainmenu.cpp:65
 msgid "Machine Configuration"
 msgstr "机器设定"
 
-#: src/emu/ui/mainmenu.cpp:68
+#: src/emu/ui/mainmenu.cpp:69
 msgid "Bookkeeping Info"
 msgstr "收入信息"
 
-#: src/emu/ui/mainmenu.cpp:71
+#: src/emu/ui/mainmenu.cpp:72
 msgid "Machine Information"
 msgstr "机器信息"
 
-#: src/emu/ui/mainmenu.cpp:77
+#: src/emu/ui/mainmenu.cpp:78
 msgid "Image Information"
 msgstr "映像档信息"
 
-#: src/emu/ui/mainmenu.cpp:80
+#: src/emu/ui/mainmenu.cpp:81
 msgid "File Manager"
 msgstr "文件管理器"
 
-#: src/emu/ui/mainmenu.cpp:85
+#: src/emu/ui/mainmenu.cpp:86
 msgid "Tape Control"
 msgstr "磁带控制"
 
-#: src/emu/ui/mainmenu.cpp:93
+#: src/emu/ui/mainmenu.cpp:94
 msgid "Bios Selection"
 msgstr "选择 BIOS"
 
-#: src/emu/ui/mainmenu.cpp:99
+#: src/emu/ui/mainmenu.cpp:100
 msgid "Slot Devices"
 msgstr "插槽设备"
 
-#: src/emu/ui/mainmenu.cpp:106
+#: src/emu/ui/mainmenu.cpp:107
 msgid "Barcode Reader"
 msgstr "条码读取器"
 
-#: src/emu/ui/mainmenu.cpp:113
+#: src/emu/ui/mainmenu.cpp:114
 msgid "Network Devices"
 msgstr "网路装置"
 
-#: src/emu/ui/mainmenu.cpp:118
+#: src/emu/ui/mainmenu.cpp:119
 msgid "Keyboard Mode"
 msgstr "键盘模式"
 
-#: src/emu/ui/mainmenu.cpp:121
+#: src/emu/ui/mainmenu.cpp:122
 msgid "Slider Controls"
 msgstr "参数调整"
 
-#: src/emu/ui/mainmenu.cpp:124
+#: src/emu/ui/mainmenu.cpp:125
 msgid "Video Options"
 msgstr "视频选项"
 
-#: src/emu/ui/mainmenu.cpp:128
+#: src/emu/ui/mainmenu.cpp:129
 msgid "Crosshair Options"
 msgstr "十字准星选项"
 
-#: src/emu/ui/mainmenu.cpp:132
+#: src/emu/ui/mainmenu.cpp:133
 msgid "Cheat"
 msgstr "游戏作弊"
 
 #: src/emu/ui/mainmenu.cpp:136
+msgid "Plugin Options"
+msgstr ""
+
+#: src/emu/ui/mainmenu.cpp:140
 msgid "External DAT View"
 msgstr "檢視外部文件"
 
-#: src/emu/ui/mainmenu.cpp:142
+#: src/emu/ui/mainmenu.cpp:146
 msgid "Add To Favorites"
 msgstr "新增至最爱"
 
-#: src/emu/ui/mainmenu.cpp:144
+#: src/emu/ui/mainmenu.cpp:148
 msgid "Remove From Favorites"
 msgstr "从最爱移除"
 
-#: src/emu/ui/mainmenu.cpp:151
+#: src/emu/ui/mainmenu.cpp:155
 msgid "Select New Machine"
 msgstr "选择新机器"
 
@@ -888,15 +892,15 @@ msgstr "结束"
 msgid "Return to Previous Menu"
 msgstr "回上一层菜单"
 
-#: src/emu/ui/menu.cpp:681
+#: src/emu/ui/menu.cpp:701
 msgid "Auto"
 msgstr "自动"
 
-#: src/emu/ui/menu.cpp:2098
+#: src/emu/ui/menu.cpp:2119
 msgid "Images"
 msgstr "图像"
 
-#: src/emu/ui/menu.cpp:2099
+#: src/emu/ui/menu.cpp:2120
 msgid "Infos"
 msgstr "信息"
 
@@ -956,137 +960,92 @@ msgstr " （已锁定）"
 msgid "Visible Delay"
 msgstr "可见度延迟"
 
-#: src/emu/ui/miscmenu.cpp:557
-msgid "Re-select last machine played"
-msgstr "重新选择前一次执行的机械"
-
-#: src/emu/ui/miscmenu.cpp:558
-msgid "Enlarge images in the right panel"
-msgstr "右侧面版放大图片"
-
-#: src/emu/ui/miscmenu.cpp:559
-msgid "DATs info"
-msgstr "文件信息"
-
-#: src/emu/ui/miscmenu.cpp:561
-msgid "Show mouse pointer"
-msgstr "显示鼠标指标"
-
-#: src/emu/ui/miscmenu.cpp:562
-msgid "Confirm quit from machines"
-msgstr "从机械退出时需确认"
-
-#: src/emu/ui/miscmenu.cpp:563
-msgid "Skip displaying information's screen at startup"
-msgstr "略过启动时的显示资讯画面"
-
-#: src/emu/ui/miscmenu.cpp:564
-msgid "Force 4:3 appearance for software snapshot"
-msgstr "强制 4:3 外观供软件撷图"
-
-#: src/emu/ui/miscmenu.cpp:565
-msgid "Use image as background"
-msgstr "使用图片作为背景"
-
-#: src/emu/ui/miscmenu.cpp:566
-msgid "Skip bios selection menu"
-msgstr "略过 BIOS 选择菜单"
-
-#: src/emu/ui/miscmenu.cpp:567
-msgid "Skip software parts selection menu"
-msgstr "略过软件部分选择菜单"
-
-#: src/emu/ui/miscmenu.cpp:652 src/emu/ui/miscmenu.cpp:672
-#: src/emu/ui/optsmenu.cpp:263
-msgid "Miscellaneous Options"
-msgstr "杂项选项"
-
-#: src/emu/ui/miscmenu.cpp:737
+#: src/emu/ui/miscmenu.cpp:616
 #, c-format
 msgid "%s.xml saved under ui folder."
 msgstr "%s.xml 已储存于 ui 文件夹。"
 
-#: src/emu/ui/miscmenu.cpp:765
+#: src/emu/ui/miscmenu.cpp:644
 msgid "Name:             Description:\n"
 msgstr "名称：            描述：\n"
 
-#: src/emu/ui/miscmenu.cpp:777
+#: src/emu/ui/miscmenu.cpp:656
 #, c-format
 msgid "%s.txt saved under ui folder."
 msgstr "%s.txt 已储存于 ui 资料夹下。"
 
-#: src/emu/ui/miscmenu.cpp:795
+#: src/emu/ui/miscmenu.cpp:674
 msgid "Export XML format (like -listxml)"
 msgstr "汇出为 XML 格式 （同 -listxml）"
 
-#: src/emu/ui/miscmenu.cpp:796
+#: src/emu/ui/miscmenu.cpp:675
 msgid "Export TXT format (like -listfull)"
 msgstr "汇出为 TXT 格式 （同 -listfull）"
 
-#: src/emu/ui/miscmenu.cpp:854
+#: src/emu/ui/miscmenu.cpp:733
 msgid "Dummy"
 msgstr "Dummy"
 
-#: src/emu/ui/miscmenu.cpp:856
+#: src/emu/ui/miscmenu.cpp:735
 msgid "Save machine configuration"
 msgstr "保存机械设定"
 
-#: src/emu/ui/miscmenu.cpp:967 src/emu/ui/miscmenu.cpp:987
-#: src/emu/ui/selgame.cpp:587
+#: src/emu/ui/miscmenu.cpp:846 src/emu/ui/miscmenu.cpp:866
+#: src/emu/ui/selgame.cpp:593
 msgid "Plugins"
 msgstr "插件"
 
-#: src/emu/ui/optsmenu.cpp:214
+#: src/emu/ui/optsmenu.cpp:219
 msgid "Filter"
 msgstr "筛选"
 
-#: src/emu/ui/optsmenu.cpp:222
+#: src/emu/ui/optsmenu.cpp:227
 msgid " ^!File"
 msgstr " ^!文件"
 
-#: src/emu/ui/optsmenu.cpp:227
+#: src/emu/ui/optsmenu.cpp:232
 msgid " ^!Category"
 msgstr " ^!类别"
 
-#: src/emu/ui/optsmenu.cpp:250
+#: src/emu/ui/optsmenu.cpp:255
 msgid "^!Setup custom filter"
 msgstr "^!设定自订筛选"
 
-#: src/emu/ui/optsmenu.cpp:258
+#: src/emu/ui/optsmenu.cpp:263
 msgid "Customize UI"
 msgstr "自订 UI"
 
-#: src/emu/ui/optsmenu.cpp:259
+#: src/emu/ui/optsmenu.cpp:264
 msgid "Configure Directories"
 msgstr "设定目录"
 
-#: src/emu/ui/optsmenu.cpp:262 src/emu/ui/sndmenu.cpp:150
+#: src/emu/ui/optsmenu.cpp:267 src/emu/ui/sndmenu.cpp:150
 #: src/emu/ui/sndmenu.cpp:170
 msgid "Sound Options"
 msgstr "声音选项"
 
-#: src/emu/ui/optsmenu.cpp:265
+#: src/emu/ui/optsmenu.cpp:270
 msgid "General Inputs"
 msgstr "一般输入"
 
-#: src/emu/ui/optsmenu.cpp:267
+#: src/emu/ui/optsmenu.cpp:273
 msgid "Save Configuration"
 msgstr "保存设定"
 
-#: src/emu/ui/optsmenu.cpp:281 src/emu/ui/optsmenu.cpp:301
+#: src/emu/ui/optsmenu.cpp:287 src/emu/ui/optsmenu.cpp:307
 msgid "Settings"
 msgstr "设定"
 
-#: src/emu/ui/optsmenu.cpp:321
+#: src/emu/ui/optsmenu.cpp:327
 msgid "**Error saving ui.ini**"
 msgstr "**保存 ui.ini 时错误**"
 
-#: src/emu/ui/optsmenu.cpp:368
+#: src/emu/ui/optsmenu.cpp:374
 #, c-format
 msgid "**Error saving %s.ini**"
 msgstr "**保存 %s.ini 时错误**"
 
-#: src/emu/ui/optsmenu.cpp:372
+#: src/emu/ui/optsmenu.cpp:378
 msgid ""
 "\n"
 "    Configuration saved    \n"
@@ -1109,7 +1068,7 @@ msgstr "双击或按下 %1$s 以选择"
 msgid "General Info"
 msgstr "一般信息"
 
-#: src/emu/ui/selgame.cpp:370 src/emu/ui/selsoft.cpp:278
+#: src/emu/ui/selgame.cpp:373 src/emu/ui/selsoft.cpp:281
 #, c-format
 msgid ""
 "%s\n"
@@ -1118,275 +1077,272 @@ msgstr ""
 "%s\n"
 " 已新增至最爱清单。"
 
-#: src/emu/ui/selgame.cpp:376 src/emu/ui/selgame.cpp:385
-#: src/emu/ui/selsoft.cpp:283
+#: src/emu/ui/selgame.cpp:379 src/emu/ui/selgame.cpp:388
+#: src/emu/ui/selsoft.cpp:286
 #, c-format
 msgid ""
 "%s\n"
 " removed from favorites list."
 msgstr " 从最爱清单移除。"
 
-#: src/emu/ui/selgame.cpp:446
+#: src/emu/ui/selgame.cpp:449
 msgid ""
 "The selected machine is missing one or more required ROM or CHD images. "
 "Please select a different machine.\n"
 "\n"
-"Press any key (except ESC) to continue."
+"Press any key to continue."
 msgstr ""
-"选定的机械缺少一个至多个必要的 ROM 或 CHD 映像档，请选择其他机械。\n"
-"\n"
-"按任意键 （除 ESC 键） 继续。"
 
-#: src/emu/ui/selgame.cpp:585 src/emu/ui/simpleselgame.cpp:262
+#: src/emu/ui/selgame.cpp:588 src/emu/ui/simpleselgame.cpp:265
 msgid "Configure Options"
 msgstr "设定选项"
 
-#: src/emu/ui/selgame.cpp:744
+#: src/emu/ui/selgame.cpp:751
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
 msgstr "%1$s %2$s ( %3$d / %4$d 机械 (%5$d BIOS) )"
 
-#: src/emu/ui/selgame.cpp:754
+#: src/emu/ui/selgame.cpp:761
 #, c-format
 msgid "%1$s (%2$s - %3$s) - "
 msgstr "%1$s (%2$s - %3$s) - "
 
-#: src/emu/ui/selgame.cpp:761 src/emu/ui/selgame.cpp:767
+#: src/emu/ui/selgame.cpp:768 src/emu/ui/selgame.cpp:774
 #, c-format
 msgid "%1$s (%2$s) - "
 msgstr "%1$s (%2$s) - "
 
-#: src/emu/ui/selgame.cpp:776
+#: src/emu/ui/selgame.cpp:783
 #, c-format
 msgid "%1$s Search: %2$s_"
 msgstr "%1$s 搜寻： %2$s_"
 
-#: src/emu/ui/selgame.cpp:830
+#: src/emu/ui/selgame.cpp:837
 #, c-format
 msgid "Romset: %1$-.100s"
 msgstr "Rom组： %1$-.100s"
 
-#: src/emu/ui/selgame.cpp:833 src/emu/ui/selgame.cpp:882
-#: src/emu/ui/selsoft.cpp:749 src/emu/ui/selsoft.cpp:799
-#: src/emu/ui/simpleselgame.cpp:325
+#: src/emu/ui/selgame.cpp:840 src/emu/ui/selgame.cpp:889
+#: src/emu/ui/selsoft.cpp:751 src/emu/ui/selsoft.cpp:801
+#: src/emu/ui/simpleselgame.cpp:328
 #, c-format
 msgid "%1$s, %2$-.100s"
 msgstr "%1$s, %2$-.100s"
 
-#: src/emu/ui/selgame.cpp:839 src/emu/ui/selsoft.cpp:755
+#: src/emu/ui/selgame.cpp:846 src/emu/ui/selsoft.cpp:757
 #, c-format
 msgid "Driver is clone of: %1$-.100s"
 msgstr "驱动相容于： %-.100s"
 
-#: src/emu/ui/selgame.cpp:841 src/emu/ui/selsoft.cpp:757
+#: src/emu/ui/selgame.cpp:848 src/emu/ui/selsoft.cpp:759
 msgid "Driver is parent"
 msgstr "驱动为主档"
 
-#: src/emu/ui/selgame.cpp:845 src/emu/ui/selsoft.cpp:761
-#: src/emu/ui/simpleselgame.cpp:332
+#: src/emu/ui/selgame.cpp:852 src/emu/ui/selsoft.cpp:763
+#: src/emu/ui/simpleselgame.cpp:335
 msgid "Overall: NOT WORKING"
 msgstr "整体： 不可执行"
 
-#: src/emu/ui/selgame.cpp:847 src/emu/ui/selsoft.cpp:763
-#: src/emu/ui/simpleselgame.cpp:334
+#: src/emu/ui/selgame.cpp:854 src/emu/ui/selsoft.cpp:765
+#: src/emu/ui/simpleselgame.cpp:337
 msgid "Overall: Unemulated Protection"
 msgstr "整体： 未模拟保护"
 
-#: src/emu/ui/selgame.cpp:849 src/emu/ui/selsoft.cpp:765
-#: src/emu/ui/simpleselgame.cpp:336
+#: src/emu/ui/selgame.cpp:856 src/emu/ui/selsoft.cpp:767
+#: src/emu/ui/simpleselgame.cpp:339
 msgid "Overall: Working"
 msgstr "整体： 可以执行"
 
-#: src/emu/ui/selgame.cpp:853 src/emu/ui/selsoft.cpp:769
+#: src/emu/ui/selgame.cpp:860 src/emu/ui/selsoft.cpp:771
 msgid "Graphics: Imperfect, "
 msgstr "图形： 不完美， "
 
-#: src/emu/ui/selgame.cpp:855 src/emu/ui/selsoft.cpp:771
+#: src/emu/ui/selgame.cpp:862 src/emu/ui/selsoft.cpp:773
 msgid "Graphics: OK, "
 msgstr "图形： OK， "
 
-#: src/emu/ui/selgame.cpp:858 src/emu/ui/selsoft.cpp:774
+#: src/emu/ui/selgame.cpp:865 src/emu/ui/selsoft.cpp:776
 msgid "Sound: Unimplemented"
 msgstr "声音： 无法执行"
 
-#: src/emu/ui/selgame.cpp:860 src/emu/ui/selsoft.cpp:776
+#: src/emu/ui/selgame.cpp:867 src/emu/ui/selsoft.cpp:778
 msgid "Sound: Imperfect"
 msgstr "声音： 不完美"
 
-#: src/emu/ui/selgame.cpp:862 src/emu/ui/selsoft.cpp:778
+#: src/emu/ui/selgame.cpp:869 src/emu/ui/selsoft.cpp:780
 msgid "Sound: OK"
 msgstr "声音： OK"
 
-#: src/emu/ui/selgame.cpp:879
+#: src/emu/ui/selgame.cpp:886
 #, c-format
 msgid "System: %1$-.100s"
 msgstr "系统： %1$-.100s"
 
-#: src/emu/ui/selgame.cpp:886 src/emu/ui/selsoft.cpp:803
+#: src/emu/ui/selgame.cpp:893 src/emu/ui/selsoft.cpp:805
 #, c-format
 msgid "Software is clone of: %1$-.100s"
 msgstr "软件相容于： %1$-.100s"
 
-#: src/emu/ui/selgame.cpp:888 src/emu/ui/selsoft.cpp:805
+#: src/emu/ui/selgame.cpp:895 src/emu/ui/selsoft.cpp:807
 msgid "Software is parent"
 msgstr "软件为主档"
 
-#: src/emu/ui/selgame.cpp:893 src/emu/ui/selsoft.cpp:810
+#: src/emu/ui/selgame.cpp:900 src/emu/ui/selsoft.cpp:812
 msgid "Supported: No"
 msgstr "已支援： 否"
 
-#: src/emu/ui/selgame.cpp:898 src/emu/ui/selsoft.cpp:815
+#: src/emu/ui/selgame.cpp:905 src/emu/ui/selsoft.cpp:817
 msgid "Supported: Partial"
 msgstr "已支援： 部分"
 
-#: src/emu/ui/selgame.cpp:903 src/emu/ui/selsoft.cpp:820
+#: src/emu/ui/selgame.cpp:910 src/emu/ui/selsoft.cpp:822
 msgid "Supported: Yes"
 msgstr "已支援： 是"
 
-#: src/emu/ui/selgame.cpp:908 src/emu/ui/selsoft.cpp:825
+#: src/emu/ui/selgame.cpp:915 src/emu/ui/selsoft.cpp:827
 #, c-format
 msgid "romset: %1$-.100s"
 msgstr "Rom套： %1$-.100s"
 
-#: src/emu/ui/selgame.cpp:915
+#: src/emu/ui/selgame.cpp:922
 #, c-format
 msgid "%1$s %2$s"
 msgstr "%1$s %2$s"
 
-#: src/emu/ui/selgame.cpp:1527
+#: src/emu/ui/selgame.cpp:1534
 #, c-format
 msgid "Romset: %1$-.100s\n"
 msgstr "Rom套： %1$-.100s\n"
 
-#: src/emu/ui/selgame.cpp:1528
+#: src/emu/ui/selgame.cpp:1535
 #, c-format
 msgid "Year: %1$s\n"
 msgstr "年份： %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1529
+#: src/emu/ui/selgame.cpp:1536
 #, c-format
 msgid "Manufacturer: %1$-.100s\n"
 msgstr "制造商： %1$-.100s\n"
 
-#: src/emu/ui/selgame.cpp:1533
+#: src/emu/ui/selgame.cpp:1540
 #, c-format
 msgid "Driver is Clone of: %1$-.100s\n"
 msgstr "驱动程式相容于： %1$-.100s\n"
 
-#: src/emu/ui/selgame.cpp:1535
+#: src/emu/ui/selgame.cpp:1542
 msgid "Driver is Parent\n"
 msgstr "驱动程式为主档\n"
 
-#: src/emu/ui/selgame.cpp:1538
+#: src/emu/ui/selgame.cpp:1545
 msgid "Overall: NOT WORKING\n"
 msgstr "整体： 不可执行\n"
 
-#: src/emu/ui/selgame.cpp:1540
+#: src/emu/ui/selgame.cpp:1547
 msgid "Overall: Unemulated Protection\n"
 msgstr "整体： 未模拟保护\n"
 
-#: src/emu/ui/selgame.cpp:1542
+#: src/emu/ui/selgame.cpp:1549
 msgid "Overall: Working\n"
 msgstr "整体: 可以执行\n"
 
-#: src/emu/ui/selgame.cpp:1545
+#: src/emu/ui/selgame.cpp:1552
 msgid "Graphics: Imperfect Colors\n"
 msgstr "图形： 色彩不完美\n"
 
-#: src/emu/ui/selgame.cpp:1549
+#: src/emu/ui/selgame.cpp:1556
 msgid "Graphics: Imperfect\n"
 msgstr "图形： 不完美\n"
 
-#: src/emu/ui/selgame.cpp:1551
+#: src/emu/ui/selgame.cpp:1558
 msgid "Graphics: OK\n"
 msgstr "图形： OK\n"
 
-#: src/emu/ui/selgame.cpp:1554
+#: src/emu/ui/selgame.cpp:1561
 msgid "Sound: Unimplemented\n"
 msgstr "声音： 无法执行\n"
 
-#: src/emu/ui/selgame.cpp:1556
+#: src/emu/ui/selgame.cpp:1563
 msgid "Sound: Imperfect\n"
 msgstr "声音： 不完美\n"
 
-#: src/emu/ui/selgame.cpp:1558
+#: src/emu/ui/selgame.cpp:1565
 msgid "Sound: OK\n"
 msgstr "声音： OK\n"
 
-#: src/emu/ui/selgame.cpp:1560
+#: src/emu/ui/selgame.cpp:1567
 #, c-format
 msgid "Driver is Skeleton: %1$s\n"
 msgstr "驱动程式尚未完整： %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1561
+#: src/emu/ui/selgame.cpp:1568
 #, c-format
 msgid "Game is Mechanical: %1$s\n"
 msgstr "游戏为机械式： %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1562
+#: src/emu/ui/selgame.cpp:1569
 #, c-format
 msgid "Requires Artwork: %1$s\n"
 msgstr "需要装饰图： %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1563
+#: src/emu/ui/selgame.cpp:1570
 #, c-format
 msgid "Requires Clickable Artwork: %1$s\n"
 msgstr "必要可点击的装饰图： %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1564
+#: src/emu/ui/selgame.cpp:1571
 #, c-format
 msgid "Support Cocktail: %1$s\n"
 msgstr "支援台面型筐体： %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1565
+#: src/emu/ui/selgame.cpp:1572
 #, c-format
 msgid "Driver is Bios: %1$s\n"
 msgstr "驱动为 BIOS： %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1566
+#: src/emu/ui/selgame.cpp:1573
 #, c-format
 msgid "Support Save: %1$s\n"
 msgstr "支援即时存档： %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1567
+#: src/emu/ui/selgame.cpp:1574
 #, c-format
 msgid "Screen Orientation: %1$s\n"
 msgstr "画面方向： %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1567
+#: src/emu/ui/selgame.cpp:1574
 msgid "Vertical"
 msgstr "垂直"
 
-#: src/emu/ui/selgame.cpp:1567
+#: src/emu/ui/selgame.cpp:1574
 msgid "Horizontal"
 msgstr "水平"
 
-#: src/emu/ui/selgame.cpp:1575
+#: src/emu/ui/selgame.cpp:1582
 #, c-format
 msgid "Requires CHD: %1$s\n"
 msgstr "需要 CHD： %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1588
+#: src/emu/ui/selgame.cpp:1595
 msgid "Roms Audit Pass: OK\n"
 msgstr "ROM 验证通过： OK\n"
 
-#: src/emu/ui/selgame.cpp:1590
+#: src/emu/ui/selgame.cpp:1597
 msgid "Roms Audit Pass: BAD\n"
 msgstr "ROM 验证通过： 错误\n"
 
-#: src/emu/ui/selgame.cpp:1593
+#: src/emu/ui/selgame.cpp:1600
 msgid "Samples Audit Pass: None Needed\n"
 msgstr "样本档验证通过： 不需要\n"
 
-#: src/emu/ui/selgame.cpp:1595
+#: src/emu/ui/selgame.cpp:1602
 msgid "Samples Audit Pass: OK\n"
 msgstr "样本档验证通过： OK\n"
 
-#: src/emu/ui/selgame.cpp:1597
+#: src/emu/ui/selgame.cpp:1604
 msgid "Samples Audit Pass: BAD\n"
 msgstr "样本档验证通过： 错误\n"
 
-#: src/emu/ui/selgame.cpp:1600
+#: src/emu/ui/selgame.cpp:1607
 msgid ""
 "Roms Audit Pass: Disabled\n"
 "Samples Audit Pass: Disabled\n"
@@ -1394,12 +1350,12 @@ msgstr ""
 "ROM 验证通过： 已停用\n"
 "样本档验证通过： 已停用\n"
 
-#: src/emu/ui/selgame.cpp:2039 src/emu/ui/selgame.cpp:2200
-#: src/emu/ui/selsoft.cpp:1657
+#: src/emu/ui/selgame.cpp:2046 src/emu/ui/selgame.cpp:2207
+#: src/emu/ui/selsoft.cpp:1659
 msgid "No Infos Available"
 msgstr "无可用信息"
 
-#: src/emu/ui/selgame.cpp:2152 src/emu/ui/selsoft.cpp:1604
+#: src/emu/ui/selgame.cpp:2159 src/emu/ui/selsoft.cpp:1606
 msgid "Usage"
 msgstr "用法"
 
@@ -1407,72 +1363,69 @@ msgstr "用法"
 msgid " (default)"
 msgstr " (缺省)"
 
-#: src/emu/ui/selsoft.cpp:378
+#: src/emu/ui/selsoft.cpp:380
 msgid ""
 "The selected software is missing one or more required files. Please select a "
 "different software.\n"
 "\n"
-"Press any key (except ESC) to continue."
+"Press any key to continue."
 msgstr ""
-"选定的软件缺少一个至多个必要的 ROM 或 CHD 映像档，请选择其他软件。\n"
-"\n"
-"按任意键 （除 ESC 键） 继续。"
 
-#: src/emu/ui/selsoft.cpp:682
+#: src/emu/ui/selsoft.cpp:684
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d softwares )"
 msgstr "%1$s %2$s ( %3$d / %4$d 软件 )"
 
-#: src/emu/ui/selsoft.cpp:683
+#: src/emu/ui/selsoft.cpp:685
 #, c-format
 msgid "Driver: \"%1$s\" software list "
 msgstr "驱动： \"%1$s\" 软件清单 "
 
-#: src/emu/ui/selsoft.cpp:686
+#: src/emu/ui/selsoft.cpp:688
 #, c-format
 msgid "Region: %1$s -"
 msgstr "区域： %1$s -"
 
-#: src/emu/ui/selsoft.cpp:688
+#: src/emu/ui/selsoft.cpp:690
 #, c-format
 msgid "Publisher: %1$s -"
 msgstr "出版商： %1$s -"
 
-#: src/emu/ui/selsoft.cpp:690
+#: src/emu/ui/selsoft.cpp:692
 #, c-format
 msgid "Year: %1$s -"
 msgstr "年代： %1$s -"
 
-#: src/emu/ui/selsoft.cpp:692
+#: src/emu/ui/selsoft.cpp:694
 #, c-format
 msgid "Software List: %1$s -"
 msgstr "软件清单： %1$s -"
 
-#: src/emu/ui/selsoft.cpp:694
+#: src/emu/ui/selsoft.cpp:696
 #, c-format
 msgid "Device type: %1$s -"
 msgstr "装置类别： %1$s -"
 
-#: src/emu/ui/selsoft.cpp:696
+#: src/emu/ui/selsoft.cpp:698
 #, c-format
 msgid "%s Search: %s_"
 msgstr "%s 搜寻： %s_"
 
-#: src/emu/ui/selsoft.cpp:746 src/emu/ui/selsoft.cpp:796
-#: src/emu/ui/simpleselgame.cpp:322
+#: src/emu/ui/selsoft.cpp:748 src/emu/ui/selsoft.cpp:798
+#: src/emu/ui/simpleselgame.cpp:325
 #, c-format
 msgid "%1$-.100s"
 msgstr "%1$-.100s"
 
-#: src/emu/ui/selsoft.cpp:1994 src/emu/ui/selsoft.cpp:2014
+#: src/emu/ui/selsoft.cpp:1996 src/emu/ui/selsoft.cpp:2016
 msgid "Software part selection:"
 msgstr "软件部分选项： "
 
-#: src/emu/ui/selsoft.cpp:2132 src/emu/ui/selsoft.cpp:2152
+#: src/emu/ui/selsoft.cpp:2134 src/emu/ui/selsoft.cpp:2154
 msgid "Bios selection:"
 msgstr "选择 BIOS："
 
-#: src/emu/ui/simpleselgame.cpp:232
+#: src/emu/ui/simpleselgame.cpp:235
 #, c-format
 msgid ""
 "No machines found. Please check the rompath specified in the %1$s.ini file.\n"
@@ -1485,33 +1438,33 @@ msgstr ""
 "如果此为首次使用 %2$s，请参阅 docs 目录中的 config.txt 以取得设定 %2$s 的相关"
 "信息。"
 
-#: src/emu/ui/simpleselgame.cpp:287
+#: src/emu/ui/simpleselgame.cpp:290
 #, c-format
 msgid "Type name or select: %1$s_"
 msgstr "输入名称或选择： %1$s_"
 
-#: src/emu/ui/simpleselgame.cpp:289
+#: src/emu/ui/simpleselgame.cpp:292
 msgid "Type name or select: (random)"
 msgstr "输入名称或选择： (随机)"
 
-#: src/emu/ui/simpleselgame.cpp:328
+#: src/emu/ui/simpleselgame.cpp:331
 #, c-format
 msgid "Driver: %1$-.100s"
 msgstr "驱动： %-.100s\n"
 
-#: src/emu/ui/simpleselgame.cpp:340 src/emu/ui/simpleselgame.cpp:347
+#: src/emu/ui/simpleselgame.cpp:343 src/emu/ui/simpleselgame.cpp:350
 msgid "Imperfect"
 msgstr "不完美"
 
-#: src/emu/ui/simpleselgame.cpp:342 src/emu/ui/simpleselgame.cpp:349
+#: src/emu/ui/simpleselgame.cpp:345 src/emu/ui/simpleselgame.cpp:352
 msgid "OK"
 msgstr "确认"
 
-#: src/emu/ui/simpleselgame.cpp:345
+#: src/emu/ui/simpleselgame.cpp:348
 msgid "Unimplemented"
 msgstr "无法执行"
 
-#: src/emu/ui/simpleselgame.cpp:351
+#: src/emu/ui/simpleselgame.cpp:354
 #, c-format
 msgid "Gfx: %s, Sound: %s"
 msgstr "图形： %s, 声音: %s"
@@ -1597,17 +1550,17 @@ msgstr "倒带"
 msgid "Fast Forward"
 msgstr "快进"
 
-#: src/emu/ui/ui.cpp:410
+#: src/emu/ui/ui.cpp:411
 msgid "This driver requires images to be loaded in the following device(s): "
 msgstr "此驱动需要额外载入下列装置的映像档: "
 
-#: src/emu/ui/ui.cpp:1060
+#: src/emu/ui/ui.cpp:1064
 msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
 msgstr "本机械有一个或更多的 ROM/CHD 是不正确的。此机械可能无法正确执行。\n"
 
-#: src/emu/ui/ui.cpp:1073
+#: src/emu/ui/ui.cpp:1077
 msgid ""
 "There are known problems with this machine\n"
 "\n"
@@ -1615,64 +1568,64 @@ msgstr ""
 "本机械已知具有下列的问题\n"
 "\n"
 
-#: src/emu/ui/ui.cpp:1077
+#: src/emu/ui/ui.cpp:1081
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
 msgstr "本机械有一个或更多的 ROM/CHD 尚未正确地被 DUMP。\n"
 
-#: src/emu/ui/ui.cpp:1081
+#: src/emu/ui/ui.cpp:1085
 #, c-format
 msgid "The keyboard emulation may not be 100% accurate.\n"
 msgstr "键盘模拟可能未达到 100% 精确。"
 
-#: src/emu/ui/ui.cpp:1083
+#: src/emu/ui/ui.cpp:1087
 #, c-format
 msgid "The colors aren't 100% accurate.\n"
 msgstr "色彩是完全错误的。"
 
-#: src/emu/ui/ui.cpp:1085
+#: src/emu/ui/ui.cpp:1089
 msgid "The colors are completely wrong.\n"
 msgstr "色彩尚未达到 100% 精确。"
 
-#: src/emu/ui/ui.cpp:1087
+#: src/emu/ui/ui.cpp:1091
 #, c-format
 msgid "The video emulation isn't 100% accurate.\n"
 msgstr "视讯模拟尚未达到 100% 精确。"
 
-#: src/emu/ui/ui.cpp:1089
+#: src/emu/ui/ui.cpp:1093
 #, c-format
 msgid "The sound emulation isn't 100% accurate.\n"
 msgstr "声音模拟尚未达到 100% 精确。"
 
-#: src/emu/ui/ui.cpp:1091
+#: src/emu/ui/ui.cpp:1095
 msgid "The machine lacks sound.\n"
 msgstr "机械缺少声音。"
 
-#: src/emu/ui/ui.cpp:1094
+#: src/emu/ui/ui.cpp:1098
 msgid "Screen flipping in cocktail mode is not supported.\n"
 msgstr "尚未支援台面型筐体模式的画面翻转。"
 
-#: src/emu/ui/ui.cpp:1098
+#: src/emu/ui/ui.cpp:1102
 msgid "The machine requires external artwork files\n"
 msgstr "机械需要外部装饰图档案"
 
-#: src/emu/ui/ui.cpp:1103
+#: src/emu/ui/ui.cpp:1107
 msgid ""
 "This machine was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
 msgstr "本机械无法完成，并非模拟中的错误而可能呈现怪异的行为或缺少元件。\n"
 
-#: src/emu/ui/ui.cpp:1108
+#: src/emu/ui/ui.cpp:1112
 msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
 msgstr "本机械无声音硬体，故 MAME 将不会产生声音，这是可预期的行为。\n"
 
-#: src/emu/ui/ui.cpp:1116
+#: src/emu/ui/ui.cpp:1120
 msgid "The machine has protection which isn't fully emulated.\n"
 msgstr "机械具有保护尚未完全模拟。"
 
-#: src/emu/ui/ui.cpp:1119
+#: src/emu/ui/ui.cpp:1123
 msgid ""
 "\n"
 "THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet "
@@ -1682,7 +1635,7 @@ msgstr ""
 "此机械无法执行，机械的模拟还不完全。除了等待开发人员改良模拟之外，没有方法可"
 "以解决这个问题。\n"
 
-#: src/emu/ui/ui.cpp:1123
+#: src/emu/ui/ui.cpp:1127
 msgid ""
 "\n"
 "Certain elements of this machine cannot be emulated as it requires actual "
@@ -1693,7 +1646,7 @@ msgstr ""
 "本机械的的部分元件无法模拟，因其需要实际活动的互动或机械装置的组合。故无法完"
 "成此游戏的执行。\n"
 
-#: src/emu/ui/ui.cpp:1142
+#: src/emu/ui/ui.cpp:1146
 msgid ""
 "\n"
 "\n"
@@ -1703,14 +1656,14 @@ msgstr ""
 "\n"
 "本机械尚有可执行的仿制版: "
 
-#: src/emu/ui/ui.cpp:1156
+#: src/emu/ui/ui.cpp:1160
 msgid ""
 "\n"
 "\n"
 "Press any key to continue"
 msgstr "按任意按键继续"
 
-#: src/emu/ui/ui.cpp:1171
+#: src/emu/ui/ui.cpp:1175
 #, c-format
 msgid ""
 "%1$s\n"
@@ -1725,15 +1678,15 @@ msgstr ""
 "\n"
 "CPU:\n"
 
-#: src/emu/ui/ui.cpp:1207 src/emu/ui/ui.cpp:1246
+#: src/emu/ui/ui.cpp:1211 src/emu/ui/ui.cpp:1250
 msgid "MHz"
 msgstr "MHz"
 
-#: src/emu/ui/ui.cpp:1207 src/emu/ui/ui.cpp:1246
+#: src/emu/ui/ui.cpp:1211 src/emu/ui/ui.cpp:1250
 msgid "kHz"
 msgstr "kHz"
 
-#: src/emu/ui/ui.cpp:1221
+#: src/emu/ui/ui.cpp:1225
 msgid ""
 "\n"
 "Sound:\n"
@@ -1741,7 +1694,7 @@ msgstr ""
 "\n"
 "声音：\n"
 
-#: src/emu/ui/ui.cpp:1250
+#: src/emu/ui/ui.cpp:1254
 msgid ""
 "\n"
 "Video:\n"
@@ -1749,78 +1702,78 @@ msgstr ""
 "\n"
 "视讯：\n"
 
-#: src/emu/ui/ui.cpp:1254
+#: src/emu/ui/ui.cpp:1258
 msgid "None\n"
 msgstr "无\n"
 
-#: src/emu/ui/ui.cpp:1261
+#: src/emu/ui/ui.cpp:1265
 msgid "Vector"
 msgstr "向量"
 
-#: src/emu/ui/ui.cpp:1272
+#: src/emu/ui/ui.cpp:1276
 #, c-format
 msgid "%1$s: %2$s\n"
 msgstr "%1$s: %2$s\n"
 
-#: src/emu/ui/ui.cpp:1272
+#: src/emu/ui/ui.cpp:1276
 msgid "%2$s\n"
 msgstr "%2$s\n"
 
-#: src/emu/ui/ui.cpp:1527 src/emu/ui/ui.cpp:1537
+#: src/emu/ui/ui.cpp:1531 src/emu/ui/ui.cpp:1541
 msgid "Keyboard Emulation Status"
 msgstr "键盘模拟状态"
 
-#: src/emu/ui/ui.cpp:1529
+#: src/emu/ui/ui.cpp:1533
 msgid "Mode: PARTIAL Emulation"
 msgstr "模式： 部分模拟"
 
-#: src/emu/ui/ui.cpp:1530
+#: src/emu/ui/ui.cpp:1534
 msgid "UI:   Enabled"
 msgstr "UI：   已启用"
 
-#: src/emu/ui/ui.cpp:1532 src/emu/ui/ui.cpp:1542
+#: src/emu/ui/ui.cpp:1536 src/emu/ui/ui.cpp:1546
 msgid "**Use ScrLock to toggle**"
 msgstr "**使用 ScrLock 键切换**"
 
-#: src/emu/ui/ui.cpp:1539
+#: src/emu/ui/ui.cpp:1543
 msgid "Mode: FULL Emulation"
 msgstr "模式： 完整模拟"
 
-#: src/emu/ui/ui.cpp:1540
+#: src/emu/ui/ui.cpp:1544
 msgid "UI:   Disabled"
 msgstr "UI：   已停用"
 
-#: src/emu/ui/ui.cpp:1686
+#: src/emu/ui/ui.cpp:1682
 msgid "Autofire can't be enabled"
 msgstr "无法启用连发"
 
-#: src/emu/ui/ui.cpp:1725
+#: src/emu/ui/ui.cpp:1721
 msgid "Select position to save to"
 msgstr "选择保存位置"
 
-#: src/emu/ui/ui.cpp:1727
+#: src/emu/ui/ui.cpp:1723
 msgid "Select position to load from"
 msgstr "选择载入位置"
 
-#: src/emu/ui/ui.cpp:1751
+#: src/emu/ui/ui.cpp:1747
 msgid "Save cancelled"
 msgstr "取消保存"
 
-#: src/emu/ui/ui.cpp:1753
+#: src/emu/ui/ui.cpp:1749
 msgid "Load cancelled"
 msgstr "取消载入"
 
-#: src/emu/ui/ui.cpp:1796
+#: src/emu/ui/ui.cpp:1792
 #, c-format
 msgid "Save to position %s"
 msgstr "保存至位置 %s"
 
-#: src/emu/ui/ui.cpp:1801
+#: src/emu/ui/ui.cpp:1797
 #, c-format
 msgid "Load from position %s"
 msgstr "从位置 %s 载入"
 
-#: src/emu/ui/ui.cpp:1841
+#: src/emu/ui/ui.cpp:1837
 #, c-format
 msgid ""
 "Are you sure you want to quit?\n"
@@ -1833,173 +1786,173 @@ msgstr ""
 "按 ''%1$s'' 退出,\n"
 "按 ''%2$s'' 继续模拟。"
 
-#: src/emu/ui/ui.cpp:1916
+#: src/emu/ui/ui.cpp:1910
 msgid "Master Volume"
 msgstr "主音量"
 
-#: src/emu/ui/ui.cpp:1926
+#: src/emu/ui/ui.cpp:1920
 #, c-format
 msgid "%1$s Volume"
 msgstr "%1$s 音量"
 
-#: src/emu/ui/ui.cpp:1948
+#: src/emu/ui/ui.cpp:1942
 #, c-format
 msgid "Overclock CPU %1$s"
 msgstr "超频 CPU %1$s"
 
-#: src/emu/ui/ui.cpp:1968
+#: src/emu/ui/ui.cpp:1962
 #, c-format
 msgid "%1$s Refresh Rate"
 msgstr "%1$s 刷新率"
 
-#: src/emu/ui/ui.cpp:1974
+#: src/emu/ui/ui.cpp:1968
 #, c-format
 msgid "%1$s Brightness"
 msgstr "%1$s 亮度"
 
-#: src/emu/ui/ui.cpp:1977
+#: src/emu/ui/ui.cpp:1971
 #, c-format
 msgid "%1$s Contrast"
 msgstr "%1$s 对比"
 
-#: src/emu/ui/ui.cpp:1980
+#: src/emu/ui/ui.cpp:1974
 #, c-format
 msgid "%1$s Gamma"
 msgstr "%1$s 迦玛值"
 
-#: src/emu/ui/ui.cpp:1985
+#: src/emu/ui/ui.cpp:1979
 #, c-format
 msgid "%1$s Horiz Stretch"
 msgstr "%1$s 水平延展"
 
-#: src/emu/ui/ui.cpp:1988
+#: src/emu/ui/ui.cpp:1982
 #, c-format
 msgid "%1$s Horiz Position"
 msgstr "%1$s 水平位置"
 
-#: src/emu/ui/ui.cpp:1991
+#: src/emu/ui/ui.cpp:1985
 #, c-format
 msgid "%1$s Vert Stretch"
 msgstr "%1$s 垂直延展"
 
-#: src/emu/ui/ui.cpp:1994
+#: src/emu/ui/ui.cpp:1988
 #, c-format
 msgid "%1$s Vert Position"
 msgstr "%1$s 垂直位置"
 
-#: src/emu/ui/ui.cpp:2012
+#: src/emu/ui/ui.cpp:2006
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
 msgstr "激光影碟 %1$s 水平延展"
 
-#: src/emu/ui/ui.cpp:2015
+#: src/emu/ui/ui.cpp:2009
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
 msgstr "激光影碟 %1$s 水平位置"
 
-#: src/emu/ui/ui.cpp:2018
+#: src/emu/ui/ui.cpp:2012
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
 msgstr "激光影碟 %1$s 垂直延展"
 
-#: src/emu/ui/ui.cpp:2021
+#: src/emu/ui/ui.cpp:2015
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
 msgstr "激光影碟 %1$s 垂直位置"
 
-#: src/emu/ui/ui.cpp:2030
+#: src/emu/ui/ui.cpp:2024
 msgid "Vector Flicker"
 msgstr "向量闪烁度"
 
-#: src/emu/ui/ui.cpp:2032
+#: src/emu/ui/ui.cpp:2026
 msgid "Beam Width Minimum"
 msgstr "最小光束宽度"
 
-#: src/emu/ui/ui.cpp:2034
+#: src/emu/ui/ui.cpp:2028
 msgid "Beam Width Maximum"
 msgstr "最大光束宽度"
 
-#: src/emu/ui/ui.cpp:2036
+#: src/emu/ui/ui.cpp:2030
 msgid "Beam Intensity Weight"
 msgstr "光束强度"
 
-#: src/emu/ui/ui.cpp:2048
+#: src/emu/ui/ui.cpp:2042
 #, c-format
 msgid "Crosshair Scale %1$s"
 msgstr "十字准星尺度 %1$s"
 
-#: src/emu/ui/ui.cpp:2048 src/emu/ui/ui.cpp:2051
+#: src/emu/ui/ui.cpp:2042 src/emu/ui/ui.cpp:2045
 msgid "X"
 msgstr "X"
 
-#: src/emu/ui/ui.cpp:2048 src/emu/ui/ui.cpp:2051
+#: src/emu/ui/ui.cpp:2042 src/emu/ui/ui.cpp:2045
 msgid "Y"
 msgstr "Y"
 
-#: src/emu/ui/ui.cpp:2051
+#: src/emu/ui/ui.cpp:2045
 #, c-format
 msgid "Crosshair Offset %1$s"
 msgstr "十字准星位移 %1$s"
 
-#: src/emu/ui/ui.cpp:2070
+#: src/emu/ui/ui.cpp:2064
 #, c-format
 msgid "%1$3ddB"
 msgstr "%1$3ddB"
 
-#: src/emu/ui/ui.cpp:2114
+#: src/emu/ui/ui.cpp:2108
 #, c-format
 msgid "%1$d%%"
 msgstr "%1$d%%"
 
-#: src/emu/ui/ui.cpp:2130
+#: src/emu/ui/ui.cpp:2124
 #, c-format
 msgid "%1$3.0f%%"
 msgstr "%1$3.0f%%"
 
-#: src/emu/ui/ui.cpp:2153
+#: src/emu/ui/ui.cpp:2147
 #, c-format
 msgid "%1$.3ffps"
 msgstr "%1$.3ffps"
 
-#: src/emu/ui/ui.cpp:2176 src/emu/ui/ui.cpp:2198 src/emu/ui/ui.cpp:2219
-#: src/emu/ui/ui.cpp:2241 src/emu/ui/ui.cpp:2263 src/emu/ui/ui.cpp:2285
-#: src/emu/ui/ui.cpp:2307 src/emu/ui/ui.cpp:2329 src/emu/ui/ui.cpp:2351
-#: src/emu/ui/ui.cpp:2373 src/emu/ui/ui.cpp:2395
+#: src/emu/ui/ui.cpp:2170 src/emu/ui/ui.cpp:2192 src/emu/ui/ui.cpp:2213
+#: src/emu/ui/ui.cpp:2235 src/emu/ui/ui.cpp:2257 src/emu/ui/ui.cpp:2279
+#: src/emu/ui/ui.cpp:2301 src/emu/ui/ui.cpp:2323 src/emu/ui/ui.cpp:2345
+#: src/emu/ui/ui.cpp:2367 src/emu/ui/ui.cpp:2389
 #, c-format
 msgid "%1$.3f"
 msgstr "%1$.3f"
 
-#: src/emu/ui/ui.cpp:2411 src/emu/ui/ui.cpp:2427 src/emu/ui/ui.cpp:2443
-#: src/emu/ui/ui.cpp:2459
+#: src/emu/ui/ui.cpp:2405 src/emu/ui/ui.cpp:2421 src/emu/ui/ui.cpp:2437
+#: src/emu/ui/ui.cpp:2453
 #, c-format
 msgid "%1$1.2f"
 msgstr ""
 
-#: src/emu/ui/ui.cpp:2475
+#: src/emu/ui/ui.cpp:2469
 #, c-format
 msgid "Screen '%1$s'"
 msgstr "画面 '%1$s'"
 
-#: src/emu/ui/ui.cpp:2477
+#: src/emu/ui/ui.cpp:2471
 msgid "Screen"
 msgstr "画面"
 
-#: src/emu/ui/ui.cpp:2493
+#: src/emu/ui/ui.cpp:2487
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
 msgstr "十字准星尺度 X %1$1.3f"
 
-#: src/emu/ui/ui.cpp:2493
+#: src/emu/ui/ui.cpp:2487
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
 msgstr "十字准星尺度 Y %1$1.3f"
 
-#: src/emu/ui/ui.cpp:2512
+#: src/emu/ui/ui.cpp:2506
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
 msgstr "十字准星位移 X %1$1.3f"
 
-#: src/emu/ui/ui.cpp:2512
+#: src/emu/ui/ui.cpp:2506
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
 msgstr "十字准星位移 Y %1$1.3f"
@@ -2048,3 +2001,56 @@ msgstr " 色彩"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " PENS"
+
+#~ msgid ""
+#~ "The selected machine is missing one or more required ROM or CHD images. "
+#~ "Please select a different machine.\n"
+#~ "\n"
+#~ "Press any key (except ESC) to continue."
+#~ msgstr ""
+#~ "选定的机械缺少一个至多个必要的 ROM 或 CHD 映像档，请选择其他机械。\n"
+#~ "\n"
+#~ "按任意键 （除 ESC 键） 继续。"
+
+#~ msgid ""
+#~ "The selected software is missing one or more required files. Please "
+#~ "select a different software.\n"
+#~ "\n"
+#~ "Press any key (except ESC) to continue."
+#~ msgstr ""
+#~ "选定的软件缺少一个至多个必要的 ROM 或 CHD 映像档，请选择其他软件。\n"
+#~ "\n"
+#~ "按任意键 （除 ESC 键） 继续。"
+
+#~ msgid "Re-select last machine played"
+#~ msgstr "重新选择前一次执行的机械"
+
+#~ msgid "Enlarge images in the right panel"
+#~ msgstr "右侧面版放大图片"
+
+#~ msgid "DATs info"
+#~ msgstr "文件信息"
+
+#~ msgid "Show mouse pointer"
+#~ msgstr "显示鼠标指标"
+
+#~ msgid "Confirm quit from machines"
+#~ msgstr "从机械退出时需确认"
+
+#~ msgid "Skip displaying information's screen at startup"
+#~ msgstr "略过启动时的显示资讯画面"
+
+#~ msgid "Force 4:3 appearance for software snapshot"
+#~ msgstr "强制 4:3 外观供软件撷图"
+
+#~ msgid "Use image as background"
+#~ msgstr "使用图片作为背景"
+
+#~ msgid "Skip bios selection menu"
+#~ msgstr "略过 BIOS 选择菜单"
+
+#~ msgid "Skip software parts selection menu"
+#~ msgstr "略过软件部分选择菜单"
+
+#~ msgid "Miscellaneous Options"
+#~ msgstr "杂项选项"

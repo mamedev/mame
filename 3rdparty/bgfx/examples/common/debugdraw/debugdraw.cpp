@@ -1018,6 +1018,132 @@ struct DebugDraw
 		close();
 	}
 
+	void drawCone(const float* _from, const float* _to, float _radius, float _weight = 0.0f)
+	{
+		const Attrib& attrib = m_attrib[m_stack];
+		const uint32_t num = getCircleLod(attrib.m_lod);
+		const float step = bx::pi * 2.0f / num;
+		_weight = bx::fclamp(_weight, 0.0f, 2.0f);
+
+		float pos[3];
+		float tmp0[3];
+		float tmp1[3];
+
+		bx::vec3Sub(tmp0, _from, _to);
+
+		Plane plane;
+		plane.m_dist = 0.0f;
+		bx::vec3Norm(plane.m_normal, tmp0);
+
+		float udir[3];
+		float vdir[3];
+		calcPlaneUv(plane, udir, vdir);
+
+		float xy0[2];
+		float xy1[2];
+		circle(xy0, 0.0f);
+		squircle(xy1, 0.0f);
+
+		bx::vec3Mul(pos,  udir, bx::flerp(xy0[0], xy1[0], _weight)*_radius);
+		bx::vec3Mul(tmp0, vdir, bx::flerp(xy0[1], xy1[1], _weight)*_radius);
+		bx::vec3Add(tmp1, pos,  tmp0);
+		bx::vec3Add(pos,  tmp1, _from);
+		moveTo(pos);
+
+		for (uint32_t ii = 1; ii < num; ++ii)
+		{
+			float angle = step * ii;
+			circle(xy0, angle);
+			squircle(xy1, angle);
+
+			bx::vec3Mul(pos,  udir, bx::flerp(xy0[0], xy1[0], _weight)*_radius);
+			bx::vec3Mul(tmp0, vdir, bx::flerp(xy0[1], xy1[1], _weight)*_radius);
+			bx::vec3Add(tmp1, pos,  tmp0);
+			bx::vec3Add(pos,  tmp1, _from);
+			lineTo(pos);
+		}
+
+		close();
+
+		for (uint32_t ii = 0; ii < num; ++ii)
+		{
+			float angle = step * ii;
+			circle(xy0, angle);
+			squircle(xy1, angle);
+
+			bx::vec3Mul(pos,  udir, bx::flerp(xy0[0], xy1[0], _weight)*_radius);
+			bx::vec3Mul(tmp0, vdir, bx::flerp(xy0[1], xy1[1], _weight)*_radius);
+			bx::vec3Add(tmp1, pos,  tmp0);
+			bx::vec3Add(pos,  tmp1, _from);
+			moveTo(pos);
+			lineTo(_to);
+		}
+	}
+
+	void drawCone(const void* _from, const void* _to, float _radius, float _weight = 0.0f)
+	{
+		drawCone( (const float*)_from, (const float*)_to, _radius, _weight);
+	}
+
+	void drawCylinder(const float* _from, const float* _to, float _radius, float _weight = 0.0f)
+	{
+		const Attrib& attrib = m_attrib[m_stack];
+		const uint32_t num = getCircleLod(attrib.m_lod);
+		const float step = bx::pi * 2.0f / num;
+		_weight = bx::fclamp(_weight, 0.0f, 2.0f);
+
+		float pos[3];
+		float tmp0[3];
+		float tmp1[3];
+
+		bx::vec3Sub(tmp0, _from, _to);
+
+		Plane plane;
+		plane.m_dist = 0.0f;
+		bx::vec3Norm(plane.m_normal, tmp0);
+
+		float udir[3];
+		float vdir[3];
+		calcPlaneUv(plane, udir, vdir);
+
+		float xy0[2];
+		float xy1[2];
+		circle(xy0, 0.0f);
+		squircle(xy1, 0.0f);
+
+		float pos1[3];
+		bx::vec3Mul(pos,  udir, bx::flerp(xy0[0], xy1[0], _weight)*_radius);
+		bx::vec3Mul(tmp0, vdir, bx::flerp(xy0[1], xy1[1], _weight)*_radius);
+		bx::vec3Add(tmp1, pos,  tmp0);
+		bx::vec3Add(pos,  tmp1, _from);
+		bx::vec3Add(pos1, tmp1, _to);
+
+		for (uint32_t ii = 1; ii < num+1; ++ii)
+		{
+			float angle = step * ii;
+			circle(xy0, angle);
+			squircle(xy1, angle);
+
+			moveTo(pos); lineTo(pos1);
+
+			moveTo(pos);
+			bx::vec3Mul(pos,  udir, bx::flerp(xy0[0], xy1[0], _weight)*_radius);
+			bx::vec3Mul(tmp0, vdir, bx::flerp(xy0[1], xy1[1], _weight)*_radius);
+			bx::vec3Add(tmp1, pos,  tmp0);
+			bx::vec3Add(pos,  tmp1, _from);
+			lineTo(pos);
+
+			moveTo(pos1);
+			bx::vec3Add(pos1, tmp1, _to);
+			lineTo(pos1);
+		}
+	}
+
+	void drawCylinder(const void* _from, const void* _to, float _radius, float _weight = 0.0f)
+	{
+		drawCylinder( (const float*)_from, (const float*)_to, _radius, _weight);
+	}
+
 	void drawAxis(float _x, float _y, float _z, float _len, Axis::Enum _highlight)
 	{
 		push();
@@ -1271,18 +1397,19 @@ private:
 				bgfx::allocTransientIndexBuffer(&tib, m_indexPos);
 				memcpy(tib.data, m_indices, m_indexPos * sizeof(uint16_t) );
 
+				const Attrib& attrib = m_attrib[m_stack];
+
 				bgfx::setVertexBuffer(&tvb);
 				bgfx::setIndexBuffer(&tib);
 				bgfx::setState(0
 						| BGFX_STATE_RGB_WRITE
 						| BGFX_STATE_PT_LINES
-						| (m_depthTestLess ? BGFX_STATE_DEPTH_TEST_LEQUAL : BGFX_STATE_DEPTH_TEST_GEQUAL)
-						| BGFX_STATE_DEPTH_WRITE
+						| attrib.m_state
 						| BGFX_STATE_LINEAA
 						| BGFX_STATE_BLEND_ALPHA
 						);
 				bgfx::setTransform(m_mtx);
-				bgfx::ProgramHandle program = m_program[m_attrib[m_stack].m_stipple ? 1 : 0];
+				bgfx::ProgramHandle program = m_program[attrib.m_stipple ? 1 : 0];
 				bgfx::submit(m_viewId, program);
 			}
 
@@ -1479,6 +1606,16 @@ void ddDrawCircle(const void* _normal, const void* _center, float _radius, float
 void ddDrawCircle(Axis::Enum _axis, float _x, float _y, float _z, float _radius, float _weight)
 {
 	s_dd.drawCircle(_axis, _x, _y, _z, _radius, _weight);
+}
+
+void ddDrawCone(const void* _from, const void* _to, float _radius, float _weight)
+{
+	s_dd.drawCone(_from, _to, _radius, _weight);
+}
+
+void ddDrawCylinder(const void* _from, const void* _to, float _radius, float _weight)
+{
+	s_dd.drawCylinder(_from, _to, _radius, _weight);
 }
 
 void ddDrawAxis(float _x, float _y, float _z, float _len, Axis::Enum _hightlight)

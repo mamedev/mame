@@ -18,11 +18,11 @@ NVRAM   :   Battery for main RAM
 ---------------------------------------------------------------------------
 Year  Game                         Manufacturer    Notes
 ---------------------------------------------------------------------------
-1997  Jingle Bell (US, V157)       IGS             NMI issues...
-1997  Jingle Bell (EU, V155)       IGS             NMI issues...
-1997  Jingle Bell (EU, V153)       IGS             NMI issues...
-1995  Jingle Bell (EU, V141)       IGS             Working
-1995? Jingle Bell (Italy, V133I)   IGS             Working
+1997  Jingle Bell (US, V157US)     IGS             patched protection
+1997  Jingle Bell (EU, V155UE)     IGS             patched protection
+1997  Jingle Bell (EU, V153UE)     IGS             patched protection
+1995  Jingle Bell (EU, V141UE)     IGS             patched protection
+1995? Jingle Bell (Italy, V133I)   IGS             patched protection
 1998  Grand Prix '98               Romtec          1 reel gfx rom is bad
 ---------------------------------------------------------------------------
 
@@ -34,7 +34,6 @@ Year  Game                         Manufacturer    Notes
 #include "sound/2413intf.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
-
 
 class igs009_state : public driver_device
 {
@@ -106,7 +105,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_gp98_reel4_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
+	void decrypt_jingbell();
 	DECLARE_DRIVER_INIT(jingbell);
+	DECLARE_DRIVER_INIT(jingbelli);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -314,7 +316,6 @@ UINT32 igs009_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		int startclipmin = 0;
 		const rectangle &visarea = screen.visible_area();
 
-
 		for (i= 0;i < 0x80;i++)
 		{
 			m_reel1_tilemap->set_scrolly(i, m_bg_scroll[i]*2);
@@ -322,9 +323,6 @@ UINT32 igs009_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 			m_reel3_tilemap->set_scrolly(i, m_bg_scroll[i+0x100]*2);
 			m_reel4_tilemap->set_scrolly(i, m_bg_scroll[i+0x180]*2);
 		}
-
-
-
 
 		for (zz=0;zz<0x80-8;zz++) // -8 because of visible area (2*8 = 16)
 		{
@@ -395,9 +393,9 @@ WRITE8_MEMBER(igs009_state::nmi_and_coins_w)
 	machine().bookkeeping().coin_counter_w(0,        data & 0x01);   // coin_a
 	machine().bookkeeping().coin_counter_w(1,        data & 0x04);   // coin_c
 	machine().bookkeeping().coin_counter_w(2,        data & 0x08);   // key in
-	machine().bookkeeping().coin_counter_w(3,        data & 0x10);   // coin m_out mech
+	machine().bookkeeping().coin_counter_w(3,        data & 0x10);   // coin out mech
 
-	output().set_led_value(6,        data & 0x40);   // led for coin m_out / m_hopper active
+	output().set_led_value(6,        data & 0x40);   // led for coin out / m_hopper active
 
 	m_nmi_enable = data;    //  data & 0x80     // nmi enable?
 
@@ -525,7 +523,7 @@ static ADDRESS_MAP_START( gp98_portmap, AS_IO, 8, igs009_state )
 
 	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 
-	// seems to lacks of PPI devices...
+	// seems to lack PPI devices...
 	AM_RANGE( 0x6480, 0x6480 ) AM_WRITE(nmi_and_coins_w )
 	AM_RANGE( 0x6481, 0x6481 ) AM_READ_PORT( "SERVICE" )
 	AM_RANGE( 0x6482, 0x6482 ) AM_READ_PORT( "COINS" )
@@ -727,7 +725,7 @@ static const gfx_layout layout_8x8x6 =
 	8, 8,
 	RGN_FRAC(1, 3),
 	6,
-	{ RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
+	{	RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
 		RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
 		RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
@@ -740,7 +738,7 @@ static const gfx_layout layout_8x32x6 =
 	8, 32,
 	RGN_FRAC(1, 3),
 	6,
-	{ RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
+	{	RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
 		RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
 		RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
@@ -796,14 +794,14 @@ void igs009_state::machine_start()
 
 void igs009_state::machine_reset()
 {
-	m_nmi_enable        =   0;
-	m_hopper            =   0;
-	m_video_enable  =   1;
+	m_nmi_enable	=	0;
+	m_hopper		=	0;
+	m_video_enable	=	1;
 }
 
 INTERRUPT_GEN_MEMBER(igs009_state::interrupt)
 {
-		if (m_nmi_enable & 0x80)
+	if (m_nmi_enable & 0x80)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -1028,6 +1026,7 @@ Notes:
 12/02/2008 f205v
 
 ***************************************************************************/
+
 ROM_START( jingbelli )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jinglev133i.u44", 0x00000, 0x10000, CRC(df60dc39) SHA1(ff57afd50c045b621395353fdc50ffd1e1b65e9e) )
@@ -1055,14 +1054,12 @@ ROM_START( jingbelli )
 	ROM_LOAD( "palce22v10h-ch-jin-u27.u27", 0x000, 0x2dd, BAD_DUMP CRC(5c4e9024) SHA1(e9d1e4df3d79c21f4ce053a84bb7b7a43d650f91) )
 ROM_END
 
-
-DRIVER_INIT_MEMBER(igs009_state,jingbell)
+void igs009_state::decrypt_jingbell()
 {
-	int i;
 	UINT8 *rom  = (UINT8 *)memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes();
 
-	for (i=0; i<size; i++)
+	for (int i=0; i<size; i++)
 	{
 		UINT8 x = rom[i];
 		if (i & 0x0080)
@@ -1080,9 +1077,24 @@ DRIVER_INIT_MEMBER(igs009_state,jingbell)
 
 		rom[i] = x;
 	}
+}
+
+DRIVER_INIT_MEMBER(igs009_state,jingbelli)
+{
+	decrypt_jingbell();
 
 	// protection patch
+	UINT8 *rom  = (UINT8 *)memregion("maincpu")->base();
 	rom[0x01f19] = 0x18;
+}
+
+DRIVER_INIT_MEMBER(igs009_state,jingbell)
+{
+	decrypt_jingbell();
+
+	// protection patch
+	UINT8 *rom  = (UINT8 *)memregion("maincpu")->base();
+	rom[0x0e753] = 0x18;
 }
 
 /***************************************************************************
@@ -1145,10 +1157,10 @@ ROM_START( gp98 )
 ROM_END
 
 
-/*    YEAR   NAME       PARENT    MACHINE   INPUT     STATE          INIT      ROT    COMPANY           FULLNAME                     FLAGS  */
-GAME( 1997,  jingbell,  0,        jingbell, jingbell, igs009_state,  jingbell, ROT0, "IGS",            "Jingle Bell (US, V157)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  jingbell, ROT0, "IGS",            "Jingle Bell (EU, V155)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1997,  jingbellb, jingbell, jingbell, jingbell, igs009_state,  jingbell, ROT0, "IGS",            "Jingle Bell (EU, V153)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  jingbellc, jingbell, jingbell, jingbell, igs009_state,  jingbell, ROT0, "IGS",            "Jingle Bell (EU, V141)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995?, jingbelli, jingbell, jingbell, jingbell, igs009_state,  jingbell, ROT0, "IGS",            "Jingle Bell (Italy, V133I)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998,  gp98,      0,        gp98,     jingbell, driver_device, 0,        ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+/*    YEAR   NAME       PARENT    MACHINE   INPUT     STATE          INIT       ROT   COMPANY           FULLNAME                      FLAGS  */
+GAME( 1997,  jingbell,  0,        jingbell, jingbell, igs009_state,  jingbell,  ROT0, "IGS",            "Jingle Bell (US, V157US)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V155UE)",   MACHINE_SUPPORTS_SAVE )	// Shows V154UE in test mode!
+GAME( 1997,  jingbellb, jingbell, jingbell, jingbell, igs009_state,  jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V153UE)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  jingbellc, jingbell, jingbell, jingbell, igs009_state,  jingbelli, ROT0, "IGS",            "Jingle Bell (EU, V141UE)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1995?, jingbelli, jingbell, jingbell, jingbell, igs009_state,  jingbelli, ROT0, "IGS",            "Jingle Bell (Italy, V133I)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  gp98,      0,        gp98,     jingbell, driver_device, 0,         ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

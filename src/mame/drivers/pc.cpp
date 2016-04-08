@@ -340,6 +340,11 @@ ROM_START( sicpc1605 )
 	ROM_LOAD("multitech pc-700 3.1.bin", 0xe000, 0x2000, CRC(0ac7a2e1) SHA1(b9c8504e21213d81a068dde9f51f9c973d726e7b))
 ROM_END
 
+ROM_START( ncrpc4i )
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_LOAD( "ncr_pc4i_biosrom_1985.bin",0xc000, 0x4000, CRC(b9732648) SHA1(0d5d96fbc36089ca4d893b0db84faffa8043a5e4))
+ROM_END
+
 ROM_START( zdsupers )
 	ROM_REGION(0x10000,"bios", 0)
 	ROM_SYSTEM_BIOS( 0, "v31d", "v3.1d" )
@@ -434,17 +439,18 @@ ROM_END
 
 ROM_START( compc1 )
 	ROM_REGION(0x10000, "bios", 0)
-	ROM_LOAD("380270-01.bin", 0xc000, 0x4000, BAD_DUMP CRC(75135d37) SHA1(177283642240fee191ba2d87e1d0c2a377c78ccb))
+	ROM_LOAD("pc1_bios.bin", 0xc000, 0x4000, CRC(e37367c8) SHA1(9aac9c38b4ebdb9a740e393199c2eff75a0bde03))
 	ROM_REGION(0x8000, "gfx1", 0)
-	ROM_LOAD("pc1_char.bin", 0x0000, 0x8000, CRC(4773a945) SHA1(bcc38abecc75d3f641d42987cb0d2ed71d71bc4c))
+	ROM_LOAD("pc1_char.bin", 0x0000, 0x4000, CRC(ee6c27f0) SHA1(e769cc3a49a1d708bd74eb4ac85bb6ea67220d38))
 ROM_END
+
 
 // Note: Commodore PC20-III, PC10-III and COLT share the same BIOS
 ROM_START( pc10iii )
 	ROM_REGION(0x10000, "bios", 0)
 	ROM_DEFAULT_BIOS("v441")
 	ROM_SYSTEM_BIOS(0, "v435", "v4.35")
-	ROMX_LOAD("318085-01.u201", 0x8000, 0x8000, NO_DUMP, ROM_BIOS(1))
+	ROMX_LOAD("318085-01.u201", 0x8000, 0x8000, CRC(be752d1e) SHA1(5e5e63cd6d6269816cd691602e4c4d209fe3df67), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v436", "v4.36")
 	ROMX_LOAD("318085-02.u201", 0x8000, 0x8000, NO_DUMP, ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "v436c", "v4.36c")
@@ -509,7 +515,8 @@ COMP( 1991, poisk2,     ibm5150,    0,          poisk2,     pccga, driver_device
 COMP( 1990, mc1702,     ibm5150,    0,          pccga,      pccga, driver_device,      0,      "<unknown>", "Elektronika MC-1702", MACHINE_NOT_WORKING)
 
 COMP( 1987, zdsupers,   ibm5150,    0,          zenith,     pccga, driver_device,      0,      "Zenith Data Systems", "SuperSport", 0)
-COMP( 1985, sicpc1605,  ibm5150,    0,          siemens,    pccga, driver_device,      0,      "Siemens", "Sicomp PC16-05", 0)
+COMP( 1985, sicpc1605,  ibm5150,    0,          siemens,    pccga, driver_device,      0,      "Siemens", "Sicomp PC16-05", MACHINE_NOT_WORKING)
+COMP( 1985, ncrpc4i,	ibm5150,	0,			pccga,		pccga, driver_device,	   0,	   "NCR","PC4i", MACHINE_NOT_WORKING)
 
 COMP( 198?, olivm15,    ibm5150,    0,          m15,        pccga, driver_device,      0,      "Olivetti", "M15", 0)
 

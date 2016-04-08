@@ -1789,7 +1789,7 @@ d3d_render_target* shaders::get_texture_target(render_primitive *prim, texture_i
 		return nullptr;
 	}
 
-	bool swap_xy = d3d->swap_xy();
+	bool swap_xy = d3d->window().swap_xy();
 	int target_width = swap_xy
 		? static_cast<int>(prim->get_quad_height() + 0.5f)
 		: static_cast<int>(prim->get_quad_width() + 0.5f);
@@ -1944,7 +1944,7 @@ bool shaders::register_texture(render_primitive *prim, texture_info *texture)
 		return false;
 	}
 
-	bool swap_xy = d3d->swap_xy();
+	bool swap_xy = d3d->window().swap_xy();
 	int target_width = swap_xy
 		? static_cast<int>(prim->get_quad_height() + 0.5f)
 		: static_cast<int>(prim->get_quad_width() + 0.5f);
@@ -2617,7 +2617,7 @@ void uniform::update()
 
 		case CU_SWAP_XY:
 		{
-			m_shader->set_bool("SwapXY", d3d->swap_xy());
+			m_shader->set_bool("SwapXY", d3d->window().swap_xy());
 			break;
 		}
 		case CU_ORIENTATION_SWAP:

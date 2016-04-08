@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1000"
+   height="1000"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.2 r9819"
+   sodipodi:docname="drawing.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35"
+     inkscape:cx="375"
+     inkscape:cy="520"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="751"
+     inkscape:window-height="578"
+     inkscape:window-x="0"
+     inkscape:window-y="22"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-52.362183)">
+    <path
+       style="fill:#ff5555;stroke:#000000;stroke-width:10.62107277px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 131.73911,422.01626 c 0,146.85769 43.82213,215.39128 201.5818,141.96244 157.75968,-73.42885 188.43518,-107.69564 354.95926,78.32409 166.5241,186.01973 210.34624,244.76282 162.1419,-122.3814 -48.20435,-367.1442 -4.38221,34.26679 -131.46641,-24.47627 C 591.87149,436.70204 732.10231,191.93923 543.66715,187.04398 355.23198,182.14871 574.34264,265.36807 534.90271,368.16845 495.4628,470.96883 355.23198,627.61702 311.40985,475.8641 267.58772,324.11115 193.09009,333.90166 131.73911,422.01626 z"
+       id="path2985"
+       inkscape:connector-curvature="0" />
+    <rect
+       style="fill:#00ffff;stroke:#000000;stroke-width:10.62107277px;"
+       id="rect2987"
+       width="390.01697"
+       height="200.70551"
+       x="228.14781"
+       y="539.50238" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#00ffff"
+       id="path3008"
+       sodipodi:cx="157.14285"
+       sodipodi:cy="168.57143"
+       sodipodi:rx="57.142857"
+       sodipodi:ry="88.571426"
+       d="m 214.28571,168.57143 a 57.142857,88.571426 0 1 1 -114.285714,0 57.142857,88.571426 0 1 1 114.285714,0 z"
+       transform="translate(188.57143,138.07647)" />
+    <rect
+       style="fill:#00ff00"
+       id="rect3010"
+       width="371.42856"
+       height="145.71428"
+       x="261.66104"
+       y="945.44141"
+       transform="matrix(0.948958,-0.31540248,0.31540248,0.948958,0,0)"
+       ry="51.42857" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#00ff00"
+       id="path3038"
+       sodipodi:cx="200"
+       sodipodi:cy="177.14285"
+       sodipodi:rx="54.285713"
+       sodipodi:ry="54.285713"
+       d="m 254.28571,177.14285 a 54.285713,54.285713 0 1 1 -108.57142,0 54.285713,54.285713 0 1 1 108.57142,0 z"
+       transform="translate(0,52.362183)" />
+  </g>
+</svg>

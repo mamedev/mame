@@ -9,7 +9,6 @@
 
 
 #include "emu.h"
-#include "emuopts.h"
 #include "cpcexp.h"
 
 

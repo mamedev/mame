@@ -1209,6 +1209,7 @@ laser128                        // ??? 1987 Laser 128
 mprof3                          // Microprofessor III
 prav8c                          // Pravetz 8C
 tk3000                          // Microdigital TK3000
+spectred
 
 @source:apple2gs.cpp
 apple2gs                        // Aug 1989 Apple IIgs ROM03
@@ -2265,6 +2266,7 @@ bbcbc                           // 1985 BBC Bridge Companion
 bbusters                        // A9003 'BB' (c) 1989
 bbustersu                       // A9003 'BB' (c) 1989
 bbustersua                      // A9003 'BB' (c) 1989
+bbustersj						//
 mechatt                         // A8002 'MA' (c) 1989
 mechattj                        // A8002 'MA' (c) 1989
 mechattu                        // A8002 'MA' (c) 1989
@@ -12290,6 +12292,7 @@ monsterz                        // (c) 1982 Nihon (Arcade TV Game List - P.102, 
 moonal2                         // [1980] Nichibutsu
 moonal2b                        // [1980] Nichibutsu
 moonaln                         // [Nichibutsu] (Karateco license) or hack
+kamikazp						// bootleg (Potomac Games)
 mooncmw                         // bootleg
 mooncptc                        // bootleg (Petaco S.A.)
 mooncreg                        // bootleg
@@ -13791,6 +13794,7 @@ sgnascar                        // 2000.09 Nascar Arcade
 @source:himesiki.cpp
 himesiki                        // (c) 1989 Hi-Soft
 androidp                        // (c) 198? Nasco
+androidpo                       // (c) 198? Nasco
 
 @source:hitme.cpp
 barricad                        // (c) 1976 Ramtek
@@ -15945,6 +15949,9 @@ jubileep                        //
 @source:juicebox.cpp
 juicebox                        //
 
+@source:jungleyo.cpp
+jungleyo
+
 @source:junior.cpp
 junior                          //
 
@@ -16859,6 +16866,7 @@ leaguemn                        // (c) 1993 Irem (Japan)
 lethalth                        // (c) 1991 Irem (World)
 majtitl2                        // (c) 1992 Irem (World)
 majtitl2a                       //
+majtitl2b						//
 majtitl2j                       // (c) 1992 Irem (Japan)
 mysticri                        // (c) 1992 Irem (World)
 mysticrib                       // bootleg?
@@ -16952,6 +16960,7 @@ mcolors                         // 1999 unknown
 musicsrt                        // (c) 1995 ABM Games
 sgsafari                        // (c) 1996 New Impeuropex Corp.
 suprpool                        // (c) 1997 ABM Games
+lunaprk                         // (c) 1998 ABM Games
 
 @source:magicard.cpp
 hotslots                        // (c) 2002 Impera
@@ -27053,6 +27062,7 @@ mtlchampu                       // GX234 (c) 1993 (US)
 mtlchampu1                      // GX234 (c) 1993 (US)
 mystwarr                        // GX128 (c) 1993 (World)
 mystwarra                       // GX128 (c) 1993 (Asia)
+mystwarraa                      // GX128 (c) 1993 (Asia)
 mystwarrj                       // GX128 (c) 1993 (Japan)
 mystwarru                       // GX128 (c) 1993 (US)
 viostorm                        // GX168 (c) 1993 (Europe)
@@ -28304,6 +28314,7 @@ rdaction                        // UPL-87003?(c) 1987 + World Games license
 robokid                         // UPL-88013 (c) 1988
 robokidj                        // UPL-88013 (c) 1988
 robokidj2                       // UPL-88013 (c) 1988
+robokidj3						//
 
 @source:ninjaw.cpp
 darius2                         // C07 (c) 1989 Taito Corporation (Japan)
@@ -28873,6 +28884,7 @@ sicpc1605                       //
 ssam88s                         //
 sx16                            // Sanyo SX-16
 zdsupers                        //
+ncrpc4i							// NCR PC4i
 
 @source:pc100.cpp
 pc100                           //

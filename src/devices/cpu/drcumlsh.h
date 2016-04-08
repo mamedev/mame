@@ -156,6 +156,8 @@
 #define UML_FSSQRT(block, dst, src1)                        do { block->append().fssqrt(dst, src1); } while (0)
 #define UML_FSRECIP(block, dst, src1)                       do { block->append().fsrecip(dst, src1); } while (0)
 #define UML_FSRSQRT(block, dst, src1)                       do { block->append().fsrsqrt(dst, src1); } while (0)
+#define UML_FSCOPYI(block, dst, src)                        do { block->append().fscopyi(dst, src); } while (0)
+#define UML_ICOPYFS(block, dst, src)                        do { block->append().icopyfs(dst, src); } while (0)
 
 
 /* ----- 64-bit Floating Point Arithmetic Operations ----- */
@@ -179,6 +181,8 @@
 #define UML_FDSQRT(block, dst, src1)                        do { block->append().fdsqrt(dst, src1); } while (0)
 #define UML_FDRECIP(block, dst, src1)                       do { block->append().fdrecip(dst, src1); } while (0)
 #define UML_FDRSQRT(block, dst, src1)                       do { block->append().fdrsqrt(dst, src1); } while (0)
+#define UML_FDCOPYI(block, dst, src)                        do { block->append().fdcopyi(dst, src); } while (0)
+#define UML_ICOPYFD(block, dst, src)                        do { block->append().icopyfd(dst, src); } while (0)
 
 
 #endif /* __DRCUMLSH_H__ */

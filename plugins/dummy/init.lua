@@ -17,6 +17,17 @@ function dummy.startplugin()
 	emu.register_stop(function()
 		print("Exiting " .. emu.gamename())
 	end)
+
+	local function menu_populate()
+		return {{ "This is a", "test", 32 }, { "Also a", "test", 0 }} -- 32 is MENU_FLAG_DISABLE
+	end
+
+	local function menu_callback(index, event)
+		print("index: " .. index .. " event: " .. event)
+		return false
+	end
+
+	emu.register_menu(menu_callback, menu_populate, "Dummy")
 end
 
 return exports

@@ -29,9 +29,6 @@
 
 #include "eminline.h"
 
-#if defined(SDLMAME_MACOSX)
-#include "osxutils.h"
-#endif
 #if defined(SDLMAME_LINUX) || defined(SDLMAME_BSD) || defined(SDLMAME_HAIKU) || defined(SDLMAME_EMSCRIPTEN) || defined(SDLMAME_MACOSX)
 #include <pthread.h>
 #endif
@@ -663,10 +660,6 @@ static void *worker_thread_entry(void *param)
 	work_thread_info *thread = (work_thread_info *)param;
 	osd_work_queue *queue = thread->queue;
 
-#if defined(SDLMAME_MACOSX)
-	void *arp = NewAutoreleasePool();
-#endif
-
 	// loop until we exit
 	for ( ;; )
 	{
@@ -714,10 +707,6 @@ static void *worker_thread_entry(void *param)
 		thread->active = FALSE;
 		--queue->livethreads;
 	}
-
-#if defined(SDLMAME_MACOSX)
-	ReleaseAutoreleasePool(arp);
-#endif
 
 	return NULL;
 }

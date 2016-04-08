@@ -360,7 +360,6 @@ static MACHINE_CONFIG_START( crospang, crospang_state )
 	MCFG_DECO_SPRITE_ISBOOTLEG(true)
 	MCFG_DECO_SPRITE_OFFSETS(5, 7)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 
 	/* sound hardware */

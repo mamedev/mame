@@ -244,7 +244,7 @@ static MACHINE_CONFIG_START( pcktgal, pcktgal_state )
 
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	deco_bac06_device::set_gfx_region_wide(*device,0,0,0);
+	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 0, 0)
 	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 
 	/* sound hardware */

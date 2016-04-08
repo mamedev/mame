@@ -40,41 +40,41 @@ struct CSzFile
 {
 	CSzFile() : currfpos(0), length(0), osdfile() {}
 
-	long            currfpos;
+	std::uint64_t   currfpos;
 	std::uint64_t   length;
 	osd_file::ptr   osdfile;
 
-	WRes read(void *data, std::size_t &size)
+	SRes read(void *data, std::size_t &size)
 	{
 		if (!osdfile)
 		{
 			std::printf("un7z.c: called File_Read without file\n");
-			return 1;
+			return SZ_ERROR_READ;
 		}
 
-		if (!size) return 0;
-		size_t originalSize = size;
+		if (!size)
+			return SZ_OK;
 
-		std::uint32_t read_length;
-		//osd_file::error err =
-		osdfile->read(data, currfpos, originalSize, read_length);
+		// TODO: this casts a size_t to a uint32_t, so it will fail if >=4GB is requested at once (need a loop)
+		std::uint32_t read_length(0);
+		auto const err = osdfile->read(data, currfpos, size, read_length);
 		size = read_length;
 		currfpos += read_length;
 
-		if (size == originalSize)
-			return 0;
-
-		return 0;
+		return (osd_file::error::NONE == err) ? SZ_OK : SZ_ERROR_READ;
 	}
 
-	WRes seek(Int64 &pos, ESzSeek origin)
+	SRes seek(Int64 &pos, ESzSeek origin)
 	{
-		if (origin == 0) currfpos = pos;
-		if (origin == 1) currfpos = currfpos + pos;
-		if (origin == 2) currfpos = length -pos;
-
+		switch (origin)
+		{
+		case SZ_SEEK_CUR: currfpos += pos; break;
+		case SZ_SEEK_SET: currfpos = pos; break;
+		case SZ_SEEK_END: currfpos = length + pos; break;
+		default: return SZ_ERROR_READ;
+		}
 		pos = currfpos;
-		return 0;
+		return SZ_OK;
 	}
 };
 

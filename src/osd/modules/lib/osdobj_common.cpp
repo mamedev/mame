@@ -198,11 +198,11 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, FONT_SDL);
 	REGISTER_MODULE(m_mod_man, FONT_NONE);
 
+	REGISTER_MODULE(m_mod_man, SOUND_XAUDIO2);
 	REGISTER_MODULE(m_mod_man, SOUND_DSOUND);
 	REGISTER_MODULE(m_mod_man, SOUND_COREAUDIO);
 	REGISTER_MODULE(m_mod_man, SOUND_JS);
 	REGISTER_MODULE(m_mod_man, SOUND_SDL);
-	REGISTER_MODULE(m_mod_man, SOUND_XAUDIO2);
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
 
 #ifdef SDLMAME_MACOSX
@@ -241,6 +241,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_NONE);
 
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDL);
+	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_WINHYBRID);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_XINPUT);
 	REGISTER_MODULE(m_mod_man, JOYSTICK_NONE);
@@ -303,6 +304,9 @@ void osd_common_t::register_options()
 
 	// Register video options and update options
 	video_options_add("none", nullptr);
+#if USE_OPENGL
+	video_options_add("opengl", nullptr);
+#endif
 	video_register();
 	update_option(OSDOPTION_VIDEO, m_video_names);
 }

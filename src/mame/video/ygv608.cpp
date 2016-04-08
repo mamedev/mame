@@ -49,28 +49,111 @@
 #define GFX_16X16_8BIT  5
 
 
+/* text-layer characters */
+
+static const UINT32 pts_4bits_layout_xoffset[64] =
+{
+	STEP8( 0*256, 4 ), STEP8( 1*256, 4 ), STEP8( 4*256, 4 ), STEP8( 5*256, 4 ),
+	STEP8( 16*256, 4 ), STEP8( 17*256, 4 ), STEP8( 20*256, 4 ), STEP8( 21*256, 4 )
+};
+
+static const UINT32 pts_4bits_layout_yoffset[64] =
+{
+	STEP8( 0*256, 8*4 ), STEP8( 2*256, 8*4 ), STEP8( 8*256, 8*4 ), STEP8( 10*256, 8*4 ),
+	STEP8( 32*256, 8*4 ), STEP8( 34*256, 8*4 ), STEP8( 40*256, 8*4 ), STEP8( 42*256, 8*4 )
+};
+
+static const gfx_layout pts_8x8_4bits_layout =
+{
+	8,8,          /* 8*8 pixels */
+	RGN_FRAC(1,1),        /* 65536 patterns */
+	4,            /* 4 bits per pixel */
+	{ 0, 1, 2, 3 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	8*8*4,
+	pts_4bits_layout_xoffset,
+	pts_4bits_layout_yoffset
+};
+
+static const gfx_layout pts_16x16_4bits_layout =
+{
+	16,16,        /* 16*16 pixels */
+	RGN_FRAC(1,1),        /* 16384 patterns */
+	4,            /* 4 bits per pixel */
+	{ 0, 1, 2, 3 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	16*16*4,
+	pts_4bits_layout_xoffset,
+	pts_4bits_layout_yoffset
+};
+
+static const gfx_layout pts_32x32_4bits_layout =
+{
+	32,32,        /* 32*32 pixels */
+	RGN_FRAC(1,1),         /* 4096 patterns */
+	4,            /* 4 bits per pixel */
+	{ 0, 1, 2, 3 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	32*32*4,
+	pts_4bits_layout_xoffset,
+	pts_4bits_layout_yoffset
+};
+
+static const gfx_layout pts_64x64_4bits_layout =
+{
+	64,64,        /* 32*32 pixels */
+	RGN_FRAC(1,1),         /* 1024 patterns */
+	4,            /* 4 bits per pixel */
+	{ 0, 1, 2, 3 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	64*64*4,
+	pts_4bits_layout_xoffset,
+	pts_4bits_layout_yoffset
+};
+
+
+static const gfx_layout pts_8x8_8bits_layout =
+{
+	8,8,          /* 8*8 pixels */
+	RGN_FRAC(1,1),        /* 32768 patterns */
+	8,            /* 8 bits per pixel */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ STEP8( 0*512, 8 ) },
+	{ STEP8( 0*512, 8*8 ) },
+	8*8*8
+};
+
+static const gfx_layout pts_16x16_8bits_layout =
+{
+	16,16,        /* 16*16 pixels */
+	RGN_FRAC(1,1),         /* 8192 patterns */
+	8,            /* 8 bits per pixel */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ STEP8( 0*512, 8 ), STEP8( 1*512, 8 ) },
+	{ STEP8( 0*512, 8*8 ), STEP8( 2*512, 8*8 ) },
+	16*16*8
+};
+
+static GFXDECODE_START( ygv608 )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0x00000000, pts_8x8_4bits_layout,    0,  16 )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0x00000000, pts_16x16_4bits_layout,  0,  16 )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0x00000000, pts_32x32_4bits_layout,  0,  16 )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0x00000000, pts_64x64_4bits_layout,  0,  16 )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0x00000000, pts_8x8_8bits_layout,    0, 256 )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0x00000000, pts_16x16_8bits_layout,  0, 256 )
+GFXDECODE_END
+
+
 const device_type YGV608 = &device_creator<ygv608_device>;
 
 ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
 	: device_t(mconfig, YGV608, "YGV608 VDP", tag, owner, clock, "ygv608", __FILE__),
-	m_gfxdecode(*this),
-	m_palette(*this)
+	device_gfx_interface(mconfig, *this, GFXDECODE_NAME(ygv608))
 {
-}
-
-void ygv608_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<ygv608_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void ygv608_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<ygv608_device &>(device).m_palette.set_tag(tag);
 }
 
 void ygv608_device::set_gfxbank(UINT8 gfxbank)
@@ -120,7 +203,7 @@ TILEMAP_MAPPER_MEMBER( ygv608_device::get_tile_offset )
 }
 
 #define layout_total(x) \
-(m_gfxdecode->gfx(x)->elements())
+(gfx(x)->elements())
 
 TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
 {
@@ -516,9 +599,6 @@ void ygv608_device::register_state_save()
 
 void ygv608_device::device_start()
 {
-	if(!m_gfxdecode->started())
-		throw device_missing_dependencies();
-
 	memset(&m_ports, 0, sizeof(m_ports));
 	memset(&m_regs, 0, sizeof(m_regs));
 	memset(&m_pattern_name_table, 0, sizeof(m_pattern_name_table));
@@ -546,21 +626,21 @@ void ygv608_device::device_start()
 	save_item(NAME(m_namcond1_gfxbank));
 
 	/* create tilemaps of all sizes and combinations */
-	m_tilemap_A_cache_8[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,32);
-	m_tilemap_A_cache_8[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 64,32);
-	m_tilemap_A_cache_8[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,64);
+	m_tilemap_A_cache_8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,32);
+	m_tilemap_A_cache_8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 64,32);
+	m_tilemap_A_cache_8[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,64);
 
-	m_tilemap_A_cache_16[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,32);
-	m_tilemap_A_cache_16[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 64,32);
-	m_tilemap_A_cache_16[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,64);
+	m_tilemap_A_cache_16[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,32);
+	m_tilemap_A_cache_16[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 64,32);
+	m_tilemap_A_cache_16[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,64);
 
-	m_tilemap_B_cache_8[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,32);
-	m_tilemap_B_cache_8[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 64,32);
-	m_tilemap_B_cache_8[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,64);
+	m_tilemap_B_cache_8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,32);
+	m_tilemap_B_cache_8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 64,32);
+	m_tilemap_B_cache_8[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,64);
 
-	m_tilemap_B_cache_16[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,32);
-	m_tilemap_B_cache_16[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 64,32);
-	m_tilemap_B_cache_16[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,64);
+	m_tilemap_B_cache_16[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,32);
+	m_tilemap_B_cache_16[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 64,32);
+	m_tilemap_B_cache_16[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,64);
 
 	m_tilemap_A = nullptr;
 	m_tilemap_B = nullptr;
@@ -620,20 +700,20 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		logerror( "SZ_8X8: sprite=%d\n", code );
 		code = 0;
 		}
-		m_gfxdecode->gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
+		gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x10000,
 			color,
 			flipx,flipy,
 			sx,sy,0x00);
 		// redraw with wrap-around
 		if( sx > 512-8 )
-		m_gfxdecode->gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
+		gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x10000,
 			color,
 			flipx,flipy,
 			sx-512,sy,0x00);
 		if( sy > 512-8 )
-		m_gfxdecode->gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
+		gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x10000,
 			color,
 			flipx,flipy,
@@ -650,20 +730,20 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		logerror( "SZ_8X8: sprite=%d\n", code );
 		code = 0;
 		}
-		m_gfxdecode->gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
+		gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x4000,
 			color,
 			flipx,flipy,
 			sx,sy,0x00);
 		// redraw with wrap-around
 		if( sx > 512-16 )
-		m_gfxdecode->gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
+		gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x4000,
 			color,
 			flipx,flipy,
 			sx-512,sy,0x00);
 		if( sy > 512-16 )
-		m_gfxdecode->gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
+		gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x4000,
 			color,
 			flipx,flipy,
@@ -680,20 +760,20 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		logerror( "SZ_32X32: sprite=%d\n", code );
 	code = 0;
 		}
-		m_gfxdecode->gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
+		gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x1000,
 			color,
 			flipx,flipy,
 			sx,sy,0x00);
 		// redraw with wrap-around
 		if( sx > 512-32 )
-		m_gfxdecode->gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
+		gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x1000,
 			color,
 			flipx,flipy,
 			sx-512,sy,0x00);
 		if( sy > 512-32 )
-		m_gfxdecode->gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
+		gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x1000,
 			color,
 			flipx,flipy,
@@ -710,20 +790,20 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		logerror( "SZ_64X64: sprite=%d\n", code );
 		code = 0;
 		}
-		m_gfxdecode->gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
+		gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x400,
 			color,
 			flipx,flipy,
 			sx,sy,0x00);
 		// redraw with wrap-around
 		if( sx > 512-64 )
-		m_gfxdecode->gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
+		gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x400,
 			color,
 			flipx,flipy,
 			sx-512,sy,0x00);
 		if( sy > 512-64 )
-		m_gfxdecode->gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
+		gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x400,
 			color,
 			flipx,flipy,
@@ -1228,7 +1308,7 @@ WRITE16_MEMBER( ygv608_device::write )
 			if (++p3_state == 3)
 			{
 				p3_state = 0;
-				m_palette->set_pen_color(m_regs.s.cc,
+				palette().set_pen_color(m_regs.s.cc,
 					pal6bit(m_colour_palette[m_regs.s.cc][0]),
 					pal6bit(m_colour_palette[m_regs.s.cc][1]),
 					pal6bit(m_colour_palette[m_regs.s.cc][2]) );

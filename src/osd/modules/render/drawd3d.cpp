@@ -27,7 +27,6 @@
 #include "window.h"
 #include "drawd3d.h"
 #include "modules/render/d3d/d3dhlsl.h"
-#include "d3dtarget.h"
 
 
 //============================================================

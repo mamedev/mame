@@ -654,7 +654,6 @@ static MACHINE_CONFIG_START( rbisland, rbisland_state )
 	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
 	MCFG_PC080SN_GFX_REGION(1)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
-	MCFG_PC080SN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
@@ -708,7 +707,6 @@ static MACHINE_CONFIG_START( jumping, rbisland_state )
 	MCFG_PC080SN_GFX_REGION(1)
 	MCFG_PC080SN_YINVERT(1)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
-	MCFG_PC080SN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

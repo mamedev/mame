@@ -617,7 +617,6 @@ static MACHINE_CONFIG_START( pow, snk68_state )
 
 	MCFG_DEVICE_ADD("sprites", SNK68_SPR, 0)
 	MCFG_SNK68_SPR_GFXDECODE("gfxdecode")
-	MCFG_SNK68_SPR_PALETTE("palette")
 	MCFG_SNK68_SPR_SET_TILE_INDIRECT( snk68_state, tile_callback_pow )
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2) /* verified on pcb  */

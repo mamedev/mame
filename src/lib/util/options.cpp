@@ -146,13 +146,13 @@ void core_options::entry::set_flag(UINT32 mask, UINT32 flag)
 
 //-------------------------------------------------
 //  revert - revert back to our default if we are
-//  at or below the given priority
+//  within the given priority range
 //-------------------------------------------------
 
-void core_options::entry::revert(int priority)
+void core_options::entry::revert(int priority_hi, int priority_lo)
 {
-	// if our priority is low enough, revert to the default
-	if (m_priority <= priority)
+	// if our priority is within the range, revert to the default
+	if (m_priority <= priority_hi && m_priority >= priority_lo)
 	{
 		m_data = m_defdata;
 		m_priority = OPTION_PRIORITY_DEFAULT;
@@ -465,11 +465,11 @@ bool core_options::parse_ini_file(util::core_file &inifile, int priority, int ig
 //  priority back to their defaults
 //-------------------------------------------------
 
-void core_options::revert(int priority)
+void core_options::revert(int priority_hi, int priority_lo)
 {
 	// iterate over options and revert to defaults if below the given priority
 	for (entry &curentry : m_entrylist)
-		curentry.revert(priority);
+		curentry.revert(priority_hi, priority_lo);
 }
 
 
@@ -835,4 +835,10 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 	// set the data
 	curentry.set_value(data.c_str(), priority);
 	return true;
+}
+
+core_options::entry *core_options::get_entry(const char *name) const
+{
+	auto curentry = m_entrymap.find(name);
+	return (curentry != m_entrymap.end()) ? curentry->second : nullptr;
 }

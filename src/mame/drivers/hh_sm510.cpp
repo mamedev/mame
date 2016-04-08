@@ -257,10 +257,11 @@ static INPUT_PORTS_START( ktmnt )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
 
 	PORT_START("IN.1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL) PORT_NAME("Game Select")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL) PORT_NAME("Sound")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL) PORT_NAME("On/Start")
+	//Wouldn't be better if IPT_START for "On/Start" was used???
 
 	PORT_START("IN.2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, NULL)
@@ -429,28 +430,28 @@ ROM_END
 
 ROM_START( ktmnt ) // except for filler/unused bytes, ROM listing in patent US5150899 "BH005 TMNT" prog/music is same
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "kms73b_774.prog", 0x0000, 0x1000, CRC(a1064f87) SHA1(92156c35fbbb414007ee6804fe635128a741d5f1) )
+	ROM_LOAD( "kms73b_kms774.prog", 0x0000, 0x1000, CRC(a1064f87) SHA1(92156c35fbbb414007ee6804fe635128a741d5f1) )
 
 	ROM_REGION( 0x100, "maincpu:music", 0 )
-	ROM_LOAD( "kms73b_774.music", 0x000, 0x100, CRC(8270d626) SHA1(bd91ca1d5cd7e2a62eef05c0033b19dcdbe441ca) )
+	ROM_LOAD( "kms73b_kms774.music", 0x000, 0x100, CRC(8270d626) SHA1(bd91ca1d5cd7e2a62eef05c0033b19dcdbe441ca) )
 ROM_END
 
 
 ROM_START( kcontra ) // except for filler/unused bytes, ROM listing in patent US5120057 "BH002 C (Contra)" prog/music is same
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "kms73b_774.prog", 0x0000, 0x1000, CRC(bf834877) SHA1(055dd56ec16d63afba61ab866481fd9c029fb54d) )
+	ROM_LOAD( "kms73b_kms773.prog", 0x0000, 0x1000, CRC(bf834877) SHA1(055dd56ec16d63afba61ab866481fd9c029fb54d) )
 
 	ROM_REGION( 0x100, "maincpu:music", 0 )
-	ROM_LOAD( "kms73b_774.music", 0x000, 0x100, CRC(23d02b99) SHA1(703938e496db0eeacd14fe7605d4b5c39e0a5bc8) )
+	ROM_LOAD( "kms73b_kms773.music", 0x000, 0x100, CRC(23d02b99) SHA1(703938e496db0eeacd14fe7605d4b5c39e0a5bc8) )
 ROM_END
 
 
 ROM_START( kgradius )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "kms73b_774.prog", 0x0000, 0x1000, CRC(830c2afc) SHA1(bb9ebd4e52831cc02cd92dd4b37675f34cf37b8c) )
+	ROM_LOAD( "kms73b_kms771.prog", 0x0000, 0x1000, CRC(830c2afc) SHA1(bb9ebd4e52831cc02cd92dd4b37675f34cf37b8c) )
 
 	ROM_REGION( 0x100, "maincpu:music", 0 )
-	ROM_LOAD( "kms73b_774.music", 0x000, 0x100, CRC(4c586b73) SHA1(14c5ab2898013a577f678970a648c374749cc66d) )
+	ROM_LOAD( "kms73b_kms771.music", 0x000, 0x100, CRC(4c586b73) SHA1(14c5ab2898013a577f678970a648c374749cc66d) )
 ROM_END
 
 

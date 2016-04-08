@@ -7701,7 +7701,6 @@ static MACHINE_CONFIG_START( tndrcade, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -7756,7 +7755,6 @@ static MACHINE_CONFIG_START( twineagl, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -7800,7 +7798,6 @@ static MACHINE_CONFIG_START( downtown, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -7861,7 +7858,6 @@ static MACHINE_CONFIG_START( usclssic, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -7915,7 +7911,6 @@ static MACHINE_CONFIG_START( calibr50, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -7959,7 +7954,6 @@ static MACHINE_CONFIG_START( metafox, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -7997,7 +7991,6 @@ static MACHINE_CONFIG_START( atehate, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8041,7 +8034,6 @@ static MACHINE_CONFIG_START( blandia, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8079,7 +8071,6 @@ static MACHINE_CONFIG_START( blandiap, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8122,7 +8113,6 @@ static MACHINE_CONFIG_START( blockcar, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8194,7 +8184,6 @@ static MACHINE_CONFIG_START( daioh, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8232,7 +8221,6 @@ static MACHINE_CONFIG_START( daiohp, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8275,7 +8263,6 @@ static MACHINE_CONFIG_START( drgnunit, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8312,7 +8299,6 @@ static MACHINE_CONFIG_START( qzkklgy2, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8363,7 +8349,6 @@ static MACHINE_CONFIG_START( setaroul, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
@@ -8407,7 +8392,6 @@ static MACHINE_CONFIG_START( eightfrc, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8450,7 +8434,6 @@ static MACHINE_CONFIG_START( extdwnhl, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8516,7 +8499,6 @@ static MACHINE_CONFIG_START( gundhara, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8561,7 +8543,6 @@ static MACHINE_CONFIG_START( jjsquawk, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8597,7 +8578,6 @@ static MACHINE_CONFIG_START( jjsquawb, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8642,7 +8622,6 @@ static MACHINE_CONFIG_START( kamenrid, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8681,7 +8660,6 @@ static MACHINE_CONFIG_START( orbs, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8724,7 +8702,6 @@ static MACHINE_CONFIG_START( keroppij, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8766,7 +8743,6 @@ static MACHINE_CONFIG_START( krzybowl, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8809,7 +8785,6 @@ static MACHINE_CONFIG_START( madshark, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8854,7 +8829,6 @@ static MACHINE_CONFIG_START( magspeed, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8902,7 +8876,6 @@ static MACHINE_CONFIG_START( msgundam, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8942,7 +8915,6 @@ static MACHINE_CONFIG_START( oisipuzl, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -8982,7 +8954,6 @@ static MACHINE_CONFIG_START( triplfun, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -9021,7 +8992,6 @@ static MACHINE_CONFIG_START( kiwame, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -9063,7 +9033,6 @@ static MACHINE_CONFIG_START( rezon, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -9104,7 +9073,6 @@ static MACHINE_CONFIG_START( thunderl, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -9176,7 +9144,6 @@ static MACHINE_CONFIG_START( wiggie, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -9214,7 +9181,6 @@ static MACHINE_CONFIG_START( wits, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -9252,7 +9218,6 @@ static MACHINE_CONFIG_START( umanclub, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -9294,7 +9259,6 @@ static MACHINE_CONFIG_START( utoukond, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -9346,7 +9310,6 @@ static MACHINE_CONFIG_START( wrofaero, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -9391,7 +9354,6 @@ static MACHINE_CONFIG_START( zingzip, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -9447,7 +9409,6 @@ static MACHINE_CONFIG_START( pairlove, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -9496,7 +9457,6 @@ static MACHINE_CONFIG_START( crazyfgt, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
@@ -9562,7 +9522,6 @@ static MACHINE_CONFIG_START( inttoote, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
 	/* video hardware */
