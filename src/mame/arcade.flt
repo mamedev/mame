@@ -558,6 +558,7 @@ jpmsys5sw.cpp
 jpmsys7.cpp
 jrpacman.cpp
 jubilee.cpp
+jungleyo.cpp
 junofrst.cpp
 jvh.cpp
 kaneko16.cpp
@@ -1045,6 +1046,7 @@ sleic.cpp
 sliver.cpp
 slotcarn.cpp
 smsmcorp.cpp
+sms_bootleg.cpp
 snesb.cpp
 snk.cpp
 snk6502.cpp
@@ -1056,6 +1058,7 @@ sonson.cpp
 sothello.cpp
 spacefb.cpp
 spaceg.cpp
+spartanxtec.cpp
 spbactn.cpp
 spcforce.cpp
 spdodgeb.cpp
