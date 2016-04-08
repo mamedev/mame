@@ -196,7 +196,6 @@ function cheat.startplugin()
 				if not scr then
 					local tag
 					tag, scr = next(manager:machine().screens) -- get any screen
-					return
 				end
 				cheat.cheat_env[name] = scr
 			end
