@@ -9,14 +9,13 @@
 //
 //============================================================
 
+#include "emu.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 
 #include "chainentry.h"
 
-#include "emu.h"
-#include "render.h"
 #include "effect.h"
 #include "texture.h"
 #include "target.h"

@@ -12,10 +12,10 @@
 #ifndef __DRAWBGFX_STATE_READER__
 #define __DRAWBGFX_STATE_READER__
 
+#include "emu.h"
+
 #include <string>
 #include "rapidjson/document.h"
-
-#include "osdcore.h"
 
 using namespace rapidjson;
 
