@@ -5,6 +5,9 @@
 #include <thread>
 #include <chrono>
 
+#if defined(SDLMAME_ANDROID)
+#include <SDL2/SDL.h>
+#endif
 static const int MAXSTACK = 10;
 static osd_output *m_stack[MAXSTACK];
 static int m_ptr = -1;
@@ -58,7 +61,11 @@ void CLIB_DECL osd_printf_error(const char *format, ...)
 
 	/* do the output */
 	va_start(argptr, format);
+#if defined(SDLMAME_ANDROID)
+	SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, format, argptr);
+#else	
 	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_ERROR, format, argptr);
+#endif
 	va_end(argptr);
 }
 
@@ -74,7 +81,11 @@ void CLIB_DECL osd_printf_warning(const char *format, ...)
 
 	/* do the output */
 	va_start(argptr, format);
+#if defined(SDLMAME_ANDROID)
+	SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, format, argptr);
+#else	
 	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_WARNING, format, argptr);
+#endif
 	va_end(argptr);
 }
 
@@ -90,7 +101,11 @@ void CLIB_DECL osd_printf_info(const char *format, ...)
 
 	/* do the output */
 	va_start(argptr, format);
+#if defined(SDLMAME_ANDROID)
+	SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, format, argptr);
+#else	
 	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_INFO, format, argptr);
+#endif
 	va_end(argptr);
 }
 
@@ -106,7 +121,11 @@ void CLIB_DECL osd_printf_verbose(const char *format, ...)
 
 	/* do the output */
 	va_start(argptr, format);
+#if defined(SDLMAME_ANDROID)
+	SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE, format, argptr);
+#else	
 	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_VERBOSE, format, argptr);
+#endif
 	va_end(argptr);
 }
 
@@ -122,7 +141,11 @@ void CLIB_DECL osd_printf_debug(const char *format, ...)
 
 	/* do the output */
 	va_start(argptr, format);
+#if defined(SDLMAME_ANDROID)
+	SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG, format, argptr);
+#else	
 	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_DEBUG, format, argptr);
+#endif
 	va_end(argptr);
 }
 

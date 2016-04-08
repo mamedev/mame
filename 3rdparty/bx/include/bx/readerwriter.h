@@ -230,38 +230,59 @@ namespace bx
 	{
 	};
 
-	struct BX_NO_VTABLE FileReaderI : public ReaderSeekerI
+	struct BX_NO_VTABLE ReaderOpenI
 	{
+		virtual ~ReaderOpenI() = 0;
 		virtual bool open(const char* _filePath, Error* _err) = 0;
-		virtual void close() = 0;
 	};
 
-	struct BX_NO_VTABLE FileWriterI : public WriterSeekerI
+	inline ReaderOpenI::~ReaderOpenI()
 	{
+	}
+
+	struct BX_NO_VTABLE WriterOpenI
+	{
+		virtual ~WriterOpenI() = 0;
 		virtual bool open(const char* _filePath, bool _append, Error* _err) = 0;
+	};
+
+	inline WriterOpenI::~WriterOpenI()
+	{
+	}
+
+	struct BX_NO_VTABLE CloserI
+	{
+		virtual ~CloserI() = 0;
 		virtual void close() = 0;
 	};
 
-	inline bool open(FileReaderI* _reader, const char* _filePath, Error* _err = NULL)
+	inline CloserI::~CloserI()
+	{
+	}
+
+	struct BX_NO_VTABLE FileReaderI : public ReaderOpenI, public CloserI, public ReaderSeekerI
+	{
+	};
+
+	struct BX_NO_VTABLE FileWriterI : public WriterOpenI, public CloserI, public WriterSeekerI
+	{
+	};
+
+	inline bool open(ReaderOpenI* _reader, const char* _filePath, Error* _err = NULL)
 	{
 		BX_ERROR_USE_TEMP_WHEN_NULL(_err);
 		return _reader->open(_filePath, _err);
 	}
 
-	inline void close(FileReaderI* _reader)
-	{
-		_reader->close();
-	}
-
-	inline bool open(FileWriterI* _writer, const char* _filePath, bool _append = false, Error* _err = NULL)
+	inline bool open(WriterOpenI* _writer, const char* _filePath, bool _append = false, Error* _err = NULL)
 	{
 		BX_ERROR_USE_TEMP_WHEN_NULL(_err);
 		return _writer->open(_filePath, _append, _err);
 	}
 
-	inline void close(FileWriterI* _writer)
+	inline void close(CloserI* _reader)
 	{
-		_writer->close();
+		_reader->close();
 	}
 
 	struct BX_NO_VTABLE MemoryBlockI

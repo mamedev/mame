@@ -706,54 +706,54 @@ namespace bgfx
 		SpvOperand::Enum operands[2];
 	};
 
-//	static const SpvDecorationInfo s_spvDecorationInfo[] =
-//	{
-//		{ /* RelaxedPrecision     */ SPV_OPERAND(_) },
-//		{ /* SpecId               */ SPV_OPERAND(LiteralNumber) },
-//		{ /* Block                */ SPV_OPERAND(_) },
-//		{ /* BufferBlock          */ SPV_OPERAND(_) },
-//		{ /* RowMajor             */ SPV_OPERAND(_) },
-//		{ /* ColMajor             */ SPV_OPERAND(_) },
-//		{ /* ArrayStride          */ SPV_OPERAND(LiteralNumber) },
-//		{ /* MatrixStride         */ SPV_OPERAND(LiteralNumber) },
-//		{ /* GLSLShared           */ SPV_OPERAND(_) },
-//		{ /* GLSLPacked           */ SPV_OPERAND(_) },
-//		{ /* CPacked              */ SPV_OPERAND(_) },
-//		{ /* BuiltIn              */ SPV_OPERAND(LiteralNumber) },
-//		{ /* Unknown12            */ SPV_OPERAND(_) },
-//		{ /* NoPerspective        */ SPV_OPERAND(_) },
-//		{ /* Flat                 */ SPV_OPERAND(_) },
-//		{ /* Patch                */ SPV_OPERAND(_) },
-//		{ /* Centroid             */ SPV_OPERAND(_) },
-//		{ /* Sample               */ SPV_OPERAND(_) },
-//		{ /* Invariant            */ SPV_OPERAND(_) },
-//		{ /* Restrict             */ SPV_OPERAND(_) },
-//		{ /* Aliased              */ SPV_OPERAND(_) },
-//		{ /* Volatile             */ SPV_OPERAND(_) },
-//		{ /* Constant             */ SPV_OPERAND(_) },
-//		{ /* Coherent             */ SPV_OPERAND(_) },
-//		{ /* NonWritable          */ SPV_OPERAND(_) },
-//		{ /* NonReadable          */ SPV_OPERAND(_) },
-//		{ /* Uniform              */ SPV_OPERAND(_) },
-//		{ /* Unknown27            */ SPV_OPERAND(_) },
-//		{ /* SaturatedConversion  */ SPV_OPERAND(_) },
-//		{ /* Stream               */ SPV_OPERAND(LiteralNumber) },
-//		{ /* Location             */ SPV_OPERAND(LiteralNumber) },
-//		{ /* Component            */ SPV_OPERAND(LiteralNumber) },
-//		{ /* Index                */ SPV_OPERAND(LiteralNumber) },
-//		{ /* Binding              */ SPV_OPERAND(LiteralNumber) },
-//		{ /* DescriptorSet        */ SPV_OPERAND(LiteralNumber) },
-//		{ /* Offset               */ SPV_OPERAND(LiteralNumber) },
-//		{ /* XfbBuffer            */ SPV_OPERAND(LiteralNumber) },
-//		{ /* XfbStride            */ SPV_OPERAND(LiteralNumber) },
-//		{ /* FuncParamAttr        */ SPV_OPERAND(_) },
-//		{ /* FPRoundingMode       */ SPV_OPERAND(_) },
-//		{ /* FPFastMathMode       */ SPV_OPERAND(_) },
-//		{ /* LinkageAttributes    */ SPV_OPERAND(LiteralString, LinkageType) },
-//		{ /* NoContraction        */ SPV_OPERAND(_) },
-//		{ /* InputAttachmentIndex */ SPV_OPERAND(LiteralNumber) },
-//		{ /* Alignment            */ SPV_OPERAND(LiteralNumber) },
-//	};
+	static const SpvDecorationInfo s_spvDecorationInfo[] =
+	{
+		{ /* RelaxedPrecision     */ SPV_OPERAND(_) },
+		{ /* SpecId               */ SPV_OPERAND(LiteralNumber) },
+		{ /* Block                */ SPV_OPERAND(_) },
+		{ /* BufferBlock          */ SPV_OPERAND(_) },
+		{ /* RowMajor             */ SPV_OPERAND(_) },
+		{ /* ColMajor             */ SPV_OPERAND(_) },
+		{ /* ArrayStride          */ SPV_OPERAND(LiteralNumber) },
+		{ /* MatrixStride         */ SPV_OPERAND(LiteralNumber) },
+		{ /* GLSLShared           */ SPV_OPERAND(_) },
+		{ /* GLSLPacked           */ SPV_OPERAND(_) },
+		{ /* CPacked              */ SPV_OPERAND(_) },
+		{ /* BuiltIn              */ SPV_OPERAND(LiteralNumber) },
+		{ /* Unknown12            */ SPV_OPERAND(_) },
+		{ /* NoPerspective        */ SPV_OPERAND(_) },
+		{ /* Flat                 */ SPV_OPERAND(_) },
+		{ /* Patch                */ SPV_OPERAND(_) },
+		{ /* Centroid             */ SPV_OPERAND(_) },
+		{ /* Sample               */ SPV_OPERAND(_) },
+		{ /* Invariant            */ SPV_OPERAND(_) },
+		{ /* Restrict             */ SPV_OPERAND(_) },
+		{ /* Aliased              */ SPV_OPERAND(_) },
+		{ /* Volatile             */ SPV_OPERAND(_) },
+		{ /* Constant             */ SPV_OPERAND(_) },
+		{ /* Coherent             */ SPV_OPERAND(_) },
+		{ /* NonWritable          */ SPV_OPERAND(_) },
+		{ /* NonReadable          */ SPV_OPERAND(_) },
+		{ /* Uniform              */ SPV_OPERAND(_) },
+		{ /* Unknown27            */ SPV_OPERAND(_) },
+		{ /* SaturatedConversion  */ SPV_OPERAND(_) },
+		{ /* Stream               */ SPV_OPERAND(LiteralNumber) },
+		{ /* Location             */ SPV_OPERAND(LiteralNumber) },
+		{ /* Component            */ SPV_OPERAND(LiteralNumber) },
+		{ /* Index                */ SPV_OPERAND(LiteralNumber) },
+		{ /* Binding              */ SPV_OPERAND(LiteralNumber) },
+		{ /* DescriptorSet        */ SPV_OPERAND(LiteralNumber) },
+		{ /* Offset               */ SPV_OPERAND(LiteralNumber) },
+		{ /* XfbBuffer            */ SPV_OPERAND(LiteralNumber) },
+		{ /* XfbStride            */ SPV_OPERAND(LiteralNumber) },
+		{ /* FuncParamAttr        */ SPV_OPERAND(_) },
+		{ /* FPRoundingMode       */ SPV_OPERAND(_) },
+		{ /* FPFastMathMode       */ SPV_OPERAND(_) },
+		{ /* LinkageAttributes    */ SPV_OPERAND(LiteralString, LinkageType) },
+		{ /* NoContraction        */ SPV_OPERAND(_) },
+		{ /* InputAttachmentIndex */ SPV_OPERAND(LiteralNumber) },
+		{ /* Alignment            */ SPV_OPERAND(LiteralNumber) },
+	};
 
 	static const char* s_spvDecoration[] =
 	{
@@ -808,6 +808,7 @@ namespace bgfx
 
 	const char* getName(SpvDecoration::Enum _enum)
 	{
+		BX_UNUSED(s_spvDecorationInfo);
 		BX_CHECK(_enum <= SpvDecoration::Count, "Unknown decoration id %d.", _enum);
 		return _enum <= SpvDecoration::Count
 			?  s_spvDecoration[_enum]
@@ -920,7 +921,7 @@ namespace bgfx
 			break;
 
 		default:
-			size += bx::read(_reader, _operand.data[0], _err);
+			size += bx::read(_reader, _operand.data, _err);
 			break;
 		}
 
@@ -1046,7 +1047,7 @@ namespace bgfx
 				size += bx::snprintf(&_out[size], bx::uint32_imax(0, _size-size)
 							, "%sAddressingModel(%d)"
 							, 0 == ii ? " " : ", "
-							, operand.data[0]
+							, operand.data
 							);
 				break;
 
@@ -1054,7 +1055,7 @@ namespace bgfx
 				size += bx::snprintf(&_out[size], bx::uint32_imax(0, _size-size)
 							, "%s%s"
 							, 0 == ii ? " " : ", "
-							, getName(SpvDecoration::Enum(operand.data[0]) )
+							, getName(SpvDecoration::Enum(operand.data) )
 							);
 				break;
 
@@ -1062,7 +1063,7 @@ namespace bgfx
 				size += bx::snprintf(&_out[size], bx::uint32_imax(0, _size-size)
 							, "%s0x%08x"
 							, 0 == ii ? " " : ", "
-							, operand.data[0]
+							, operand.data
 							);
 				break;
 
@@ -1070,7 +1071,7 @@ namespace bgfx
 				size += bx::snprintf(&_out[size], bx::uint32_imax(0, _size-size)
 							, "%s%d"
 							, 0 == ii ? " " : ", "
-							, operand.data[0]
+							, operand.data
 							);
 				break;
 
@@ -1086,7 +1087,7 @@ namespace bgfx
 				size += bx::snprintf(&_out[size], bx::uint32_imax(0, _size-size)
 							, "%sMemoryModel(%d)"
 							, 0 == ii ? " " : ", "
-							, operand.data[0]
+							, operand.data
 							);
 				break;
 
@@ -1094,7 +1095,7 @@ namespace bgfx
 				size += bx::snprintf(&_out[size], bx::uint32_imax(0, _size-size)
 							, "%s%s"
 							, 0 == ii ? " " : ", "
-							, getName(SpvStorageClass::Enum(operand.data[0]) )
+							, getName(SpvStorageClass::Enum(operand.data) )
 							);
 				break;
 
@@ -1102,7 +1103,7 @@ namespace bgfx
 				size += bx::snprintf(&_out[size], bx::uint32_imax(0, _size-size)
 							, "%s__%d__"
 							, 0 == ii ? " " : ", "
-							, operand.data[0]
+							, operand.data
 							);
 				break;
 
@@ -1110,7 +1111,7 @@ namespace bgfx
 				size += bx::snprintf(&_out[size], bx::uint32_imax(0, _size-size)
 							, "%sr%d"
 							, 0 == ii ? " " : ", "
-							, operand.data[0]
+							, operand.data
 							);
 				break;
 

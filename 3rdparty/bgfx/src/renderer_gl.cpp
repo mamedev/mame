@@ -186,9 +186,9 @@ namespace bgfx { namespace gl
 
 	static const GLenum s_textureFilterMin[][3] =
 	{
-		{ GL_LINEAR,  GL_LINEAR_MIPMAP_LINEAR,  GL_NEAREST_MIPMAP_LINEAR  },
-		{ GL_NEAREST, GL_LINEAR_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_NEAREST },
-		{ GL_LINEAR,  GL_LINEAR_MIPMAP_LINEAR,  GL_NEAREST_MIPMAP_LINEAR  },
+		{ GL_LINEAR,  GL_LINEAR_MIPMAP_LINEAR,  GL_LINEAR_MIPMAP_NEAREST  },
+		{ GL_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST_MIPMAP_NEAREST },
+		{ GL_LINEAR,  GL_LINEAR_MIPMAP_LINEAR,  GL_LINEAR_MIPMAP_NEAREST  },
 	};
 
 	struct TextureFormatInfo
@@ -465,6 +465,7 @@ namespace bgfx { namespace gl
 			APPLE_texture_format_BGRA8888,
 			APPLE_texture_max_level,
 
+			ARB_clip_control,
 			ARB_compute_shader,
 			ARB_conservative_depth,
 			ARB_copy_image,
@@ -540,6 +541,7 @@ namespace bgfx { namespace gl
 			EXT_framebuffer_blit,
 			EXT_framebuffer_object,
 			EXT_framebuffer_sRGB,
+			EXT_gpu_shader4,
 			EXT_multi_draw_indirect,
 			EXT_occlusion_query_boolean,
 			EXT_packed_float,
@@ -673,6 +675,7 @@ namespace bgfx { namespace gl
 		{ "APPLE_texture_format_BGRA8888",         false,                             true  },
 		{ "APPLE_texture_max_level",               false,                             true  },
 
+		{ "ARB_clip_control",                      BGFX_CONFIG_RENDERER_OPENGL >= 43, true  },
 		{ "ARB_compute_shader",                    BGFX_CONFIG_RENDERER_OPENGL >= 43, true  },
 		{ "ARB_conservative_depth",                BGFX_CONFIG_RENDERER_OPENGL >= 42, true  },
 		{ "ARB_copy_image",                        BGFX_CONFIG_RENDERER_OPENGL >= 42, true  },
@@ -748,6 +751,7 @@ namespace bgfx { namespace gl
 		{ "EXT_framebuffer_blit",                  BGFX_CONFIG_RENDERER_OPENGL >= 30, true  },
 		{ "EXT_framebuffer_object",                BGFX_CONFIG_RENDERER_OPENGL >= 30, true  },
 		{ "EXT_framebuffer_sRGB",                  BGFX_CONFIG_RENDERER_OPENGL >= 30, true  },
+		{ "EXT_gpu_shader4",                       false,                             true  },
 		{ "EXT_multi_draw_indirect",               false,                             true  }, // GLES3.1 extension.
 		{ "EXT_occlusion_query_boolean",           false,                             true  }, // GLES2 extension.
 		{ "EXT_packed_float",                      BGFX_CONFIG_RENDERER_OPENGL >= 33, true  },
@@ -896,6 +900,21 @@ namespace bgfx { namespace gl
 		"usampler3D",
 		"isamplerCube",
 		"usamplerCube",
+		NULL
+	};
+
+	static const char* s_texelFetch[] =
+	{
+		"texelFetch",
+		"texelFetchOffset",
+		NULL
+	};
+
+	static const char* s_ARB_texture_multisample[] =
+	{
+		"sampler2DMS",
+		"isampler2DMS",
+		"usampler2DMS",
 		NULL
 	};
 
@@ -4437,11 +4456,11 @@ namespace bgfx { namespace gl
 		&&  !s_textureFilter[m_textureFormat])
 		{
 			// Force point sampling when texture format doesn't support linear sampling.
-			_flags &= 0
+			_flags &= ~(0
 				| BGFX_TEXTURE_MIN_MASK
 				| BGFX_TEXTURE_MAG_MASK
 				| BGFX_TEXTURE_MIP_MASK
-				;
+				);
 			_flags |= 0
 				| BGFX_TEXTURE_MIN_POINT
 				| BGFX_TEXTURE_MAG_POINT
@@ -4819,16 +4838,18 @@ namespace bgfx { namespace gl
 				else if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL)
 					 &&  BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL <= 21) )
 				{
-					bool usesTextureLod = true
+					const bool usesTextureLod = true
 						&& s_extension[Extension::ARB_shader_texture_lod].m_supported
 						&& bx::findIdentifierMatch(code, s_ARB_shader_texture_lod)
 						;
+					const bool usesIUsamplers = !!bx::findIdentifierMatch(code, s_uisamplers);
+					const bool usesTexelFetch = !!bx::findIdentifierMatch(code, s_texelFetch);
+					const bool usesTextureMS  = !!bx::findIdentifierMatch(code, s_ARB_texture_multisample);
 
-					bool usesIUsamplers = !!bx::findIdentifierMatch(code, s_uisamplers);
-
-					uint32_t version = usesIUsamplers
-						? 130
-						: (usesTextureLod ? 120 : 0)
+					uint32_t version =
+						  usesIUsamplers || usesTexelFetch || usesTextureMS ? 130
+						: usesTextureLod ? 120
+						: 0
 						;
 
 					if (0 != version)
@@ -4842,6 +4863,11 @@ namespace bgfx { namespace gl
 						{
 							writeString(&writer, "#extension GL_ARB_shader_texture_lod : enable\n");
 						}
+					}
+
+					if (usesTextureMS)
+					{
+						writeString(&writer, "#extension GL_ARB_texture_multisample : enable\n");
 					}
 
 					if (130 <= version)

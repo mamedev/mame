@@ -942,13 +942,13 @@ void ui_menu_plugins_configure::populate()
 {
 	plugin_options& plugins = machine().manager().plugins();
 
-	for (auto curentry = plugins.first(); curentry != nullptr; curentry = curentry->next())
+	for (auto &curentry : plugins)
 	{
-		if (!curentry->is_header())
+		if (!curentry.is_header())
 		{
-			auto enabled = std::string(curentry->value()) == "1";
-			item_append(curentry->description(), enabled ? _("On") : _("Off"),
-				enabled ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)curentry->name());
+			auto enabled = std::string(curentry.value()) == "1";
+			item_append(curentry.description(), enabled ? _("On") : _("Off"),
+				enabled ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)curentry.name());
 		}
 	}
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);

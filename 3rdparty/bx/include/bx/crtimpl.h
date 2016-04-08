@@ -192,6 +192,117 @@ namespace bx
 	};
 #endif // BX_CONFIG_CRT_FILE_READER_WRITER
 
+#if BX_CONFIG_CRT_PROCESS
+
+#if BX_COMPILER_MSVC_COMPATIBLE
+#	define popen  _popen
+#	define pclose _pclose
+#endif // BX_COMPILER_MSVC_COMPATIBLE
+
+	class ProcessReader : public ReaderOpenI, public CloserI, public ReaderI
+	{
+	public:
+		ProcessReader()
+			: m_file(NULL)
+		{
+		}
+
+		~ProcessReader()
+		{
+			BX_CHECK(NULL == m_file, "Process not closed!");
+		}
+
+		virtual bool open(const char* _command, Error* _err) BX_OVERRIDE
+		{
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+			m_file = popen(_command, "r");
+			if (NULL == m_file)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "ProcessReader: Failed to open process.");
+				return false;
+			}
+
+			return true;
+		}
+
+		virtual void close() BX_OVERRIDE
+		{
+			BX_CHECK(NULL != m_file, "Process not open!");
+			pclose(m_file);
+			m_file = NULL;
+		}
+
+		virtual int32_t read(void* _data, int32_t _size, Error* _err) BX_OVERRIDE
+		{
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors."); BX_UNUSED(_err);
+
+			int32_t size = (int32_t)fread(_data, 1, _size, m_file);
+			if (size != _size)
+			{
+				return size >= 0 ? size : 0;
+			}
+
+			return size;
+		}
+
+	private:
+		FILE* m_file;
+	};
+
+	class ProcessWriter : public WriterOpenI, public CloserI, public WriterI
+	{
+	public:
+		ProcessWriter()
+			: m_file(NULL)
+		{
+		}
+
+		~ProcessWriter()
+		{
+			BX_CHECK(NULL == m_file, "Process not closed!");
+		}
+
+		virtual bool open(const char* _command, bool, Error* _err) BX_OVERRIDE
+		{
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+			m_file = popen(_command, "w");
+			if (NULL == m_file)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "ProcessWriter: Failed to open process.");
+				return false;
+			}
+
+			return true;
+		}
+
+		virtual void close() BX_OVERRIDE
+		{
+			BX_CHECK(NULL != m_file, "Process not open!");
+			pclose(m_file);
+			m_file = NULL;
+		}
+
+		virtual int32_t write(const void* _data, int32_t _size, Error* _err) BX_OVERRIDE
+		{
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors."); BX_UNUSED(_err);
+
+			int32_t size = (int32_t)fwrite(_data, 1, _size, m_file);
+			if (size != _size)
+			{
+				return size >= 0 ? size : 0;
+			}
+
+			return size;
+		}
+
+	private:
+		FILE* m_file;
+	};
+
+#endif // BX_CONFIG_CRT_PROCESS
+
 } // namespace bx
 
 #endif // BX_CRTIMPL_H_HEADER_GUARD

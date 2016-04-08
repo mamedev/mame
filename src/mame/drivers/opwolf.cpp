@@ -679,9 +679,12 @@ static INPUT_PORTS_START( opwolfp )
 	PORT_DIPNAME( 0x20, 0x20, "Infinite Health (Cheat)" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, "Infinite Ammo (Cheat)" ) PORT_DIPLOCATION("SW2:7") // is 'Discount when Continuing' in final release
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
-	PORT_DIPSETTING(    0x00, "English (invalid)" ) // game hangs on course screen (confirmed on hardware)
+	PORT_DIPSETTING(    0x00, "English (invalid)" ) // game hangs on course screen (confirmed on hardware where it watchdog resets)
 INPUT_PORTS_END
 
 

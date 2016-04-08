@@ -650,46 +650,50 @@ void address_map::map_validity_check(validity_checker &valid, const device_t &de
 		osd_printf_error("Wrong memory handlers provided for %s space! (width = %d, memory = %08x)\n", spaceconfig.m_name, datawidth, m_databits);
 
 	// loop over entries and look for errors
-	for (address_map_entry *entry = m_entrylist.first(); entry != nullptr; entry = entry->next())
+	for (address_map_entry &entry : m_entrylist)
 	{
-		UINT32 bytestart = spaceconfig.addr2byte(entry->m_addrstart);
-		UINT32 byteend = spaceconfig.addr2byte_end(entry->m_addrend);
+		UINT32 bytestart = spaceconfig.addr2byte(entry.m_addrstart);
+		UINT32 byteend = spaceconfig.addr2byte_end(entry.m_addrend);
 
 		// look for overlapping entries
 		if (!detected_overlap)
 		{
-			for (address_map_entry *scan = m_entrylist.first(); scan != entry; scan = scan->next())
-				if (entry->m_addrstart <= scan->m_addrend && entry->m_addrend >= scan->m_addrstart &&
-					((entry->m_read.m_type != AMH_NONE && scan->m_read.m_type != AMH_NONE) ||
-						(entry->m_write.m_type != AMH_NONE && scan->m_write.m_type != AMH_NONE)))
+			for (address_map_entry &scan : m_entrylist)
+			{
+				if (&scan == &entry)
+					break;
+				if (entry.m_addrstart <= scan.m_addrend && entry.m_addrend >= scan.m_addrstart &&
+					((entry.m_read.m_type != AMH_NONE && scan.m_read.m_type != AMH_NONE) ||
+						(entry.m_write.m_type != AMH_NONE && scan.m_write.m_type != AMH_NONE)))
 				{
-					osd_printf_warning("%s space has overlapping memory (%X-%X,%d,%d) vs (%X-%X,%d,%d)\n", spaceconfig.m_name, entry->m_addrstart, entry->m_addrend, entry->m_read.m_type, entry->m_write.m_type, scan->m_addrstart, scan->m_addrend, scan->m_read.m_type, scan->m_write.m_type);
+					osd_printf_warning("%s space has overlapping memory (%X-%X,%d,%d) vs (%X-%X,%d,%d)\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_read.m_type, entry.m_write.m_type, scan.m_addrstart, scan.m_addrend, scan.m_read.m_type, scan.m_write.m_type);
 					detected_overlap = true;
 					break;
 				}
+			}
 		}
 
 		// look for inverted start/end pairs
 		if (byteend < bytestart)
-			osd_printf_error("Wrong %s memory read handler start = %08x > end = %08x\n", spaceconfig.m_name, entry->m_addrstart, entry->m_addrend);
+			osd_printf_error("Wrong %s memory read handler start = %08x > end = %08x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend);
 
 		// look for misaligned entries
 		if ((bytestart & (alignunit - 1)) != 0 || (byteend & (alignunit - 1)) != (alignunit - 1))
-			osd_printf_error("Wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", spaceconfig.m_name, entry->m_addrstart, entry->m_addrend, alignunit);
+			osd_printf_error("Wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, alignunit);
 
 		// if this is a program space, auto-assign implicit ROM entries
-		if (entry->m_read.m_type == AMH_ROM && entry->m_region == nullptr)
+		if (entry.m_read.m_type == AMH_ROM && entry.m_region == nullptr)
 		{
-			entry->m_region = device.tag();
-			entry->m_rgnoffs = entry->m_addrstart;
+			entry.m_region = device.tag();
+			entry.m_rgnoffs = entry.m_addrstart;
 		}
 
 		// if this entry references a memory region, validate it
-		if (entry->m_region != nullptr && entry->m_share == nullptr)
+		if (entry.m_region != nullptr && entry.m_share == nullptr)
 		{
 			// make sure we can resolve the full path to the region
 			bool found = false;
-			std::string entry_region = entry->m_devbase.subtag(entry->m_region);
+			std::string entry_region = entry.m_devbase.subtag(entry.m_region);
 
 			// look for the region
 			device_iterator deviter(device.mconfig().root_device());
@@ -700,68 +704,68 @@ void address_map::map_validity_check(validity_checker &valid, const device_t &de
 					{
 						// verify the address range is within the region's bounds
 						offs_t length = ROMREGION_GETLENGTH(romp);
-						if (entry->m_rgnoffs + (byteend - bytestart + 1) > length)
-							osd_printf_error("%s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", spaceconfig.m_name, entry->m_addrstart, entry->m_addrend, entry->m_region, length);
+						if (entry.m_rgnoffs + (byteend - bytestart + 1) > length)
+							osd_printf_error("%s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region, length);
 						found = true;
 					}
 				}
 
 			// error if not found
 			if (!found)
-				osd_printf_error("%s space memory map entry %X-%X references non-existant region '%s'\n", spaceconfig.m_name, entry->m_addrstart, entry->m_addrend, entry->m_region);
+				osd_printf_error("%s space memory map entry %X-%X references non-existant region '%s'\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
 		}
 
 		// make sure all devices exist
-		if (entry->m_read.m_type == AMH_DEVICE_DELEGATE)
+		if (entry.m_read.m_type == AMH_DEVICE_DELEGATE)
 		{
 			// extract the device tag from the proto-delegate
 			const char *devtag = nullptr;
-			switch (entry->m_read.m_bits)
+			switch (entry.m_read.m_bits)
 			{
-				case 8: devtag = entry->m_rproto8.device_name(); break;
-				case 16: devtag = entry->m_rproto16.device_name(); break;
-				case 32: devtag = entry->m_rproto32.device_name(); break;
-				case 64: devtag = entry->m_rproto64.device_name(); break;
+				case 8: devtag = entry.m_rproto8.device_name(); break;
+				case 16: devtag = entry.m_rproto16.device_name(); break;
+				case 32: devtag = entry.m_rproto32.device_name(); break;
+				case 64: devtag = entry.m_rproto64.device_name(); break;
 			}
-			if (entry->m_devbase.subdevice(devtag) == nullptr)
+			if (entry.m_devbase.subdevice(devtag) == nullptr)
 				osd_printf_error("%s space memory map entry reads from nonexistant device '%s'\n", spaceconfig.m_name,
 					devtag != nullptr ? devtag : "<unspecified>");
 		}
-		if (entry->m_write.m_type == AMH_DEVICE_DELEGATE)
+		if (entry.m_write.m_type == AMH_DEVICE_DELEGATE)
 		{
 			// extract the device tag from the proto-delegate
 			const char *devtag = nullptr;
-			switch (entry->m_write.m_bits)
+			switch (entry.m_write.m_bits)
 			{
-				case 8: devtag = entry->m_wproto8.device_name(); break;
-				case 16: devtag = entry->m_wproto16.device_name(); break;
-				case 32: devtag = entry->m_wproto32.device_name(); break;
-				case 64: devtag = entry->m_wproto64.device_name(); break;
+				case 8: devtag = entry.m_wproto8.device_name(); break;
+				case 16: devtag = entry.m_wproto16.device_name(); break;
+				case 32: devtag = entry.m_wproto32.device_name(); break;
+				case 64: devtag = entry.m_wproto64.device_name(); break;
 			}
-			if (entry->m_devbase.subdevice(devtag) == nullptr)
+			if (entry.m_devbase.subdevice(devtag) == nullptr)
 				osd_printf_error("%s space memory map entry writes to nonexistant device '%s'\n", spaceconfig.m_name,
 					devtag != nullptr ? devtag : "<unspecified>");
 		}
-		if (entry->m_setoffsethd.m_type == AMH_DEVICE_DELEGATE)
+		if (entry.m_setoffsethd.m_type == AMH_DEVICE_DELEGATE)
 		{
 			// extract the device tag from the proto-delegate
-			const char *devtag = entry->m_soproto.device_name();
-			if (entry->m_devbase.subdevice(devtag) == nullptr)
+			const char *devtag = entry.m_soproto.device_name();
+			if (entry.m_devbase.subdevice(devtag) == nullptr)
 				osd_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig.m_name,
 					devtag != nullptr ? devtag : "<unspecified>");
 		}
 
 		// make sure ports exist
-//      if ((entry->m_read.m_type == AMH_PORT && entry->m_read.m_tag != NULL && portlist.find(entry->m_read.m_tag) == NULL) ||
-//          (entry->m_write.m_type == AMH_PORT && entry->m_write.m_tag != NULL && portlist.find(entry->m_write.m_tag) == NULL))
-//          osd_printf_error("%s space memory map entry references nonexistant port tag '%s'\n", spaceconfig.m_name, entry->m_read.m_tag);
+//      if ((entry.m_read.m_type == AMH_PORT && entry.m_read.m_tag != NULL && portlist.find(entry.m_read.m_tag) == NULL) ||
+//          (entry.m_write.m_type == AMH_PORT && entry.m_write.m_tag != NULL && portlist.find(entry.m_write.m_tag) == NULL))
+//          osd_printf_error("%s space memory map entry references nonexistant port tag '%s'\n", spaceconfig.m_name, entry.m_read.m_tag);
 
 		// validate bank and share tags
-		if (entry->m_read.m_type == AMH_BANK)
-			valid.validate_tag(entry->m_read.m_tag);
-		if (entry->m_write.m_type == AMH_BANK)
-			valid.validate_tag(entry->m_write.m_tag);
-		if (entry->m_share != nullptr)
-			valid.validate_tag(entry->m_share);
+		if (entry.m_read.m_type == AMH_BANK)
+			valid.validate_tag(entry.m_read.m_tag);
+		if (entry.m_write.m_type == AMH_BANK)
+			valid.validate_tag(entry.m_write.m_tag);
+		if (entry.m_share != nullptr)
+			valid.validate_tag(entry.m_share);
 	}
 }

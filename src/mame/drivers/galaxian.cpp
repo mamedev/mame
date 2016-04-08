@@ -6351,7 +6351,7 @@ DRIVER_INIT_MEMBER(galaxian_state,gmgalax)
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
-	gmgalax_game_changed(*machine().ioport().first_port()->first_field(), nullptr, 0, 0);
+	gmgalax_game_changed(*machine().ioport().ports().first()->fields().first(), nullptr, 0, 0);
 	save_item(NAME(m_gmgalax_selected_game));
 }
 

@@ -41,6 +41,7 @@
 #include "cpu/tms9900/tms9900.h"
 #include "sound/wave.h"
 #include "sound/dac.h"
+#include "sound/sn76496.h"
 
 #include "machine/tms9901.h"
 #include "imagedev/cassette.h"
@@ -53,8 +54,9 @@
 #define TMS9901_TAG "tms9901"
 #define SGCPU_TAG "sgcpu"
 
-#define VERBOSE 1
-#define LOG logerror
+#define TRACE_ILLWRITE 0
+#define TRACE_READY 0
+#define TRACE_INT 0
 
 class ti99_4p_state : public driver_device
 {
@@ -63,7 +65,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_cpu(*this, "maincpu"),
 		m_tms9901(*this, TMS9901_TAG),
-		m_sound(*this, TISOUND_TAG),
+		m_sound(*this, TISOUNDCHIP_TAG),
 		m_video(*this, VIDEO_SYSTEM_TAG),
 		m_cassette(*this, "cassette"),
 		m_peribox(*this, PERIBOX_TAG),
@@ -103,13 +105,13 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(set_tms9901_INT2_from_v9938);
 
-	required_device<tms9900_device>             m_cpu;
-	required_device<tms9901_device>             m_tms9901;
-	required_device<ti_sound_system_device> m_sound;
-	required_device<ti_exp_video_device>        m_video;
-	required_device<cassette_image_device>  m_cassette;
-	required_device<peribox_device>             m_peribox;
-	required_device<joyport_device>             m_joyport;
+	required_device<tms9900_device>        m_cpu;
+	required_device<tms9901_device>        m_tms9901;
+	required_device<sn76496_base_device>    m_sound;
+	required_device<ti_exp_video_device>    m_video;
+	required_device<cassette_image_device> m_cassette;
+	required_device<peribox_device>        m_peribox;
+	required_device<joyport_device>        m_joyport;
 
 	// Pointer to ROM0
 	UINT16  *m_rom0;
@@ -354,7 +356,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 	if (zone==0x0000)
 	{
 		// ROM0
-		if (VERBOSE>4) LOG("sgcpu: ignoring ROM write access at %04x\n", addroff);
+		if (TRACE_ILLWRITE) logerror("Ignoring ROM write access at %04x\n", addroff);
 		return;
 	}
 
@@ -368,7 +370,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 	{
 		if (m_internal_dsr)
 		{
-			if (VERBOSE>4) LOG("sgcpu: ignoring DSR write access at %04x\n", addroff);
+			if (TRACE_ILLWRITE) logerror("Ignoring DSR write access at %04x\n", addroff);
 			return;
 		}
 		else
@@ -439,11 +441,15 @@ READ16_MEMBER( ti99_4p_state::datamux_read )
 	UINT8 hbyte = 0;
 	UINT16 addroff = (offset << 1);
 
+	m_peribox->memen_in(ASSERT_LINE);
+
 	m_peribox->readz(space, addroff+1, &m_latch, mem_mask);
 	m_lowbyte = m_latch;
 
 	m_peribox->readz(space, addroff, &hbyte, mem_mask);
 	m_highbyte = hbyte;
+
+	m_peribox->memen_in(CLEAR_LINE);
 
 	// use the latch and the currently read byte and put it on the 16bit bus
 //  printf("read  address = %04x, value = %04x, memmask = %4x\n", addroff,  (hbyte<<8) | sgcpu->latch, mem_mask);
@@ -467,10 +473,14 @@ WRITE16_MEMBER( ti99_4p_state::datamux_write )
 	// read more about the datamux in datamux.c
 
 	// Write to the PEB
+	m_peribox->memen_in(ASSERT_LINE);
+
 	m_peribox->write(space, addroff+1, data & 0xff);
 
 	// Write to the PEB
 	m_peribox->write(space, addroff, (data>>8) & 0xff);
+
+	m_peribox->memen_in(CLEAR_LINE);
 
 	// Insert four wait states and let CPU enter wait state
 	m_waitcount = 6;
@@ -684,39 +694,6 @@ WRITE_LINE_MEMBER( ti99_4p_state::cassette_output )
 	m_cassette->output((state!=0)? +1 : -1);
 }
 
-/*
-// TMS9901 setup. The callback functions pass a reference to the TMS9901 as device.
-const tms9901_interface tms9901_wiring_sgcpu =
-{
-    TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC, // only input pins whose state is always known
-
-    // read handler
-    DEVCB_DRIVER_MEMBER(ti99_4p_state, read_by_9901),
-
-    {   // write handlers
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, keyC0),
-        DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, keyC1),
-        DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, keyC2),
-        DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, alphaW),
-        DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, cs_motor),
-        DEVCB_NULL,
-        DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, audio_gate),
-        DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, cassette_output),
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL
-    },
-
-    // interrupt handler
-    DEVCB_DRIVER_MEMBER(ti99_4p_state, tms9901_interrupt)
-};
-
-*/
 
 /***************************************************************************
     Control lines
@@ -733,9 +710,9 @@ WRITE_LINE_MEMBER( ti99_4p_state::console_ready )
 	m_ready_line = state;
 	int combined = (m_ready_line == ASSERT_LINE && m_ready_line_dmux == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE;
 
-	if (VERBOSE>6)
+	if (TRACE_READY)
 	{
-		if (m_ready_prev != combined) LOG("ti99_4p: READY level = %d\n", combined);
+		if (m_ready_prev != combined) logerror("READY level = %d\n", combined);
 	}
 	m_ready_prev = combined;
 	m_cpu->set_ready(combined);
@@ -751,9 +728,9 @@ WRITE_LINE_MEMBER( ti99_4p_state::console_ready_dmux )
 	m_ready_line_dmux = state;
 	int combined = (m_ready_line == ASSERT_LINE && m_ready_line_dmux == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE;
 
-	if (VERBOSE>7)
+	if (TRACE_READY)
 	{
-		if (m_ready_prev != combined) LOG("ti99_4p: READY dmux level = %d\n", state);
+		if (m_ready_prev != combined) logerror("READY dmux level = %d\n", state);
 	}
 	m_ready_prev = combined;
 	m_cpu->set_ready(combined);
@@ -769,13 +746,13 @@ void ti99_4p_state::set_9901_int( int line, line_state state)
 
 WRITE_LINE_MEMBER( ti99_4p_state::extint )
 {
-	if (VERBOSE>6) LOG("ti99_4p: EXTINT level = %02x\n", state);
+	if (TRACE_INT) logerror("EXTINT level = %02x\n", state);
 	set_9901_int(1, (line_state)state);
 }
 
 WRITE_LINE_MEMBER( ti99_4p_state::notconnected )
 {
-	if (VERBOSE>6) LOG("ti99_4p: Setting a not connected line ... ignored\n");
+	if (TRACE_INT) logerror("Setting a not connected line ... ignored\n");
 }
 
 /*
@@ -804,7 +781,7 @@ READ8_MEMBER( ti99_4p_state::interrupt_level )
 WRITE8_MEMBER( ti99_4p_state::external_operation )
 {
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
-	if (VERBOSE>1) LOG("External operation %s not implemented on the SGCPU board\n", extop[offset]);
+	logerror("External operation %s not implemented on the SGCPU board\n", extop[offset]);
 }
 
 /*****************************************************************************/
@@ -883,9 +860,11 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4p_state, notconnected) )
 	MCFG_PERIBOX_READY_HANDLER( WRITELINE(ti99_4p_state, console_ready) )
 
-	// sound hardware
-	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG )
-	MCFG_TI_SOUND_READY_HANDLER( WRITELINE(ti99_4p_state, console_ready) )
+	// Sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("sound_out")
+	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
+	MCFG_SN76496_READY_HANDLER( WRITELINE(ti99_4p_state, console_ready) )
 
 	// Cassette drives
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")

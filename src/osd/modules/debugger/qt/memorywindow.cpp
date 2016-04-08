@@ -282,11 +282,9 @@ void MemoryWindow::populateComboBox()
 		return;
 
 	m_memoryComboBox->clear();
-	for (const debug_view_source* source = m_memTable->view()->first_source();
-			source != NULL;
-			source = source->next())
+	for (const debug_view_source &source : m_memTable->view()->source_list())
 	{
-		m_memoryComboBox->addItem(source->name());
+		m_memoryComboBox->addItem(source.name());
 	}
 }
 

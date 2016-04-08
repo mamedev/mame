@@ -85,9 +85,9 @@ public:
 	void                    begin_frame();
 	void                    end_frame();
 
-	void                    draw_line(const render_primitive *prim);
-	void                    draw_quad(const render_primitive *prim);
-	void                    batch_vector(const render_primitive *prim, float line_time);
+	void                    draw_line(const render_primitive &prim);
+	void                    draw_quad(const render_primitive &prim);
+	void                    batch_vector(const render_primitive &prim, float line_time);
 	void                    batch_vectors();
 
 	vertex *                mesh_alloc(int numverts);

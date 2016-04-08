@@ -2705,11 +2705,15 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				m_blendStateCache.add(hash, bs);
 			}
 
-			const uint64_t f0 = BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_FACTOR, BGFX_STATE_BLEND_FACTOR);
-			const uint64_t f1 = BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_INV_FACTOR, BGFX_STATE_BLEND_INV_FACTOR);
-			bool hasFactor = false
+			const uint64_t f0 = BGFX_STATE_BLEND_FACTOR;
+			const uint64_t f1 = BGFX_STATE_BLEND_INV_FACTOR;
+			const uint64_t f2 = BGFX_STATE_BLEND_FACTOR<<4;
+			const uint64_t f3 = BGFX_STATE_BLEND_INV_FACTOR<<4;
+			bool hasFactor = 0
 				|| f0 == (_state & f0)
 				|| f1 == (_state & f1)
+				|| f2 == (_state & f2)
+				|| f3 == (_state & f3)
 				;
 
 			float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -2798,6 +2802,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			{
 				uint32_t cull = (_state&BGFX_STATE_CULL_MASK)>>BGFX_STATE_CULL_SHIFT;
 
+#if BX_PLATFORM_WINDOWS
 				if (m_deviceInterfaceVersion >= 3)
 				{
 					D3D11_RASTERIZER_DESC2 desc;
@@ -2821,6 +2826,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 					DX_CHECK(device3->CreateRasterizerState2(&desc, reinterpret_cast<ID3D11RasterizerState2**>(&rs) ) );
 				}
 				else
+#endif // BX_PLATFORM_WINDOWS
 				{
 					D3D11_RASTERIZER_DESC desc;
 					desc.FillMode = _wireframe ? D3D11_FILL_WIREFRAME : D3D11_FILL_SOLID;

@@ -207,18 +207,18 @@ public:
 	required_shared_ptr<UINT64> m_ram;
 	required_shared_ptr<UINT64> m_rombase;
 
-	DECLARE_READ8_MEMBER(cv1k_flash_io_r);
-	DECLARE_WRITE8_MEMBER(cv1k_flash_io_w);
+	DECLARE_READ8_MEMBER(flash_io_r);
+	DECLARE_WRITE8_MEMBER(flash_io_w);
 	DECLARE_READ8_MEMBER(serial_rtc_eeprom_r);
 	DECLARE_WRITE8_MEMBER(serial_rtc_eeprom_w);
-	DECLARE_READ64_MEMBER(cv1k_flash_port_e_r);
+	DECLARE_READ64_MEMBER(flash_port_e_r);
 
-	UINT32 screen_update_cv1k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_reset() override;
 
 	/* game specific */
-	DECLARE_READ64_MEMBER(cv1k_speedup_r);
+	DECLARE_READ64_MEMBER(speedup_r);
 	DECLARE_DRIVER_INIT(mushisam);
 	DECLARE_DRIVER_INIT(ibara);
 	DECLARE_DRIVER_INIT(espgal2);
@@ -232,13 +232,13 @@ public:
 
 	UINT32 m_idleramoffs;
 	UINT32 m_idlepc;
-	void install_cv1k_speedups(UINT32 idleramoff, UINT32 idlepc, bool is_typed);
+	void install_speedups(UINT32 idleramoff, UINT32 idlepc, bool is_typed);
 };
 
 
 /**************************************************************************/
 
-UINT32 cv1k_state::screen_update_cv1k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 cv1k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_blitter->set_delay_scale(m_blitrate->read());
 
@@ -249,13 +249,13 @@ UINT32 cv1k_state::screen_update_cv1k(screen_device &screen, bitmap_rgb32 &bitma
 
 // FLASH interface
 
-READ64_MEMBER( cv1k_state::cv1k_flash_port_e_r )
+READ64_MEMBER( cv1k_state::flash_port_e_r )
 {
 	return ((m_serflash->flash_ready_r(space, offset) ? 0x20 : 0x00)) | 0xdf;
 }
 
 
-READ8_MEMBER( cv1k_state::cv1k_flash_io_r )
+READ8_MEMBER( cv1k_state::flash_io_r )
 {
 	switch (offset)
 	{
@@ -268,7 +268,7 @@ READ8_MEMBER( cv1k_state::cv1k_flash_io_r )
 		case 0x06:
 		case 0x07:
 
-		//  logerror("cv1k_flash_io_r offset %04x\n", offset);
+		//  logerror("flash_io_r offset %04x\n", offset);
 			return 0xff;
 
 		case 0x00:
@@ -276,13 +276,13 @@ READ8_MEMBER( cv1k_state::cv1k_flash_io_r )
 	}
 }
 
-WRITE8_MEMBER( cv1k_state::cv1k_flash_io_w )
+WRITE8_MEMBER( cv1k_state::flash_io_w )
 {
 	switch (offset)
 	{
 		default:
 		case 0x03:
-			logerror("unknown cv1k_flash_io_w offset %04x data %02x\n", offset, data); // 03 enable/disable fgpa access?
+			logerror("unknown flash_io_w offset %04x data %02x\n", offset, data); // 03 enable/disable fgpa access?
 			break;
 
 		case 0x00:
@@ -336,7 +336,7 @@ WRITE8_MEMBER( cv1k_state::serial_rtc_eeprom_w )
 static ADDRESS_MAP_START( cv1k_map, AS_PROGRAM, 64, cv1k_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP AM_SHARE("rombase") // mmmbanc writes here on startup for some reason..
 	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM AM_SHARE("mainram") AM_MIRROR(0x800000) // work RAM
-	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(cv1k_flash_io_r, cv1k_flash_io_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(flash_io_r, flash_io_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x10400000, 0x10400007) AM_DEVWRITE8("ymz770", ymz770_device, write, U64(0xffffffffffffffff))
 	AM_RANGE(0x10C00000, 0x10C00007) AM_READWRITE8(serial_rtc_eeprom_r, serial_rtc_eeprom_w, U64(0xffffffffffffffff))
 //  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
@@ -346,7 +346,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cv1k_d_map, AS_PROGRAM, 64, cv1k_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP AM_SHARE("rombase") // mmmbanc writes here on startup for some reason..
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("mainram") // work RAM
-	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(cv1k_flash_io_r, cv1k_flash_io_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(flash_io_r, flash_io_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x10400000, 0x10400007) AM_DEVWRITE8("ymz770", ymz770_device, write, U64(0xffffffffffffffff))
 	AM_RANGE(0x10C00000, 0x10C00007) AM_READWRITE8(serial_rtc_eeprom_r, serial_rtc_eeprom_w, U64(0xffffffffffffffff))
 //  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
@@ -356,7 +356,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cv1k_port, AS_IO, 64, cv1k_state )
 	AM_RANGE(SH3_PORT_C, SH3_PORT_C+7) AM_READ_PORT("PORT_C")
 	AM_RANGE(SH3_PORT_D, SH3_PORT_D+7) AM_READ_PORT("PORT_D")
-	AM_RANGE(SH3_PORT_E, SH3_PORT_E+7) AM_READ( cv1k_flash_port_e_r )
+	AM_RANGE(SH3_PORT_E, SH3_PORT_E+7) AM_READ( flash_port_e_r )
 	AM_RANGE(SH3_PORT_F, SH3_PORT_F+7) AM_READ_PORT("PORT_F")
 	AM_RANGE(SH3_PORT_L, SH3_PORT_L+7) AM_READ_PORT("PORT_L")
 	AM_RANGE(SH3_PORT_J, SH3_PORT_J+7) AM_DEVREADWRITE( "blitter", epic12_device, fpga_r, fpga_w )
@@ -455,7 +455,7 @@ static MACHINE_CONFIG_START( cv1k, cv1k_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cv1k_state, screen_update_cv1k)
+	MCFG_SCREEN_UPDATE_DRIVER(cv1k_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
 
@@ -828,18 +828,18 @@ ROM_START( dfkbl )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(31f9eb0a) SHA1(322158779e969bb321241065dd49c1167b91ff6c) )
 ROM_END
 
-READ64_MEMBER( cv1k_state::cv1k_speedup_r )
+READ64_MEMBER( cv1k_state::speedup_r )
 {
 	if (m_maincpu->pc()== m_idlepc ) m_maincpu->spin_until_time( attotime::from_usec(10));
 	return m_ram[m_idleramoffs/8];
 }
 
-void cv1k_state::install_cv1k_speedups(UINT32 idleramoff, UINT32 idlepc, bool is_typed)
+void cv1k_state::install_speedups(UINT32 idleramoff, UINT32 idlepc, bool is_typed)
 {
 	m_idleramoffs = idleramoff;
 	m_idlepc = idlepc;
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64_delegate(FUNC(cv1k_state::cv1k_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64_delegate(FUNC(cv1k_state::speedup_r),this));
 
 	m_maincpu->add_fastram(0x00000000, 0x003fffff, TRUE,  m_rombase);
 
@@ -850,37 +850,37 @@ void cv1k_state::install_cv1k_speedups(UINT32 idleramoff, UINT32 idlepc, bool is
 
 DRIVER_INIT_MEMBER(cv1k_state,mushisam)
 {
-	install_cv1k_speedups(0x024d8, 0xc04a2aa, false);
+	install_speedups(0x024d8, 0xc04a2aa, false);
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,ibara)
 {
-	install_cv1k_speedups(0x022f0, 0xc04a0aa, false);
+	install_speedups(0x022f0, 0xc04a0aa, false);
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,espgal2)
 {
-	install_cv1k_speedups(0x02310, 0xc05177a, false);
+	install_speedups(0x02310, 0xc05177a, false);
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,mushitam)
 {
-	install_cv1k_speedups(0x0022f0, 0xc04a0da, false);
+	install_speedups(0x0022f0, 0xc04a0da, false);
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,pinkswts)
 {
-	install_cv1k_speedups(0x02310, 0xc05176a, false);
+	install_speedups(0x02310, 0xc05176a, false);
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,deathsml)
 {
-	install_cv1k_speedups(0x02310, 0xc0519a2, false);
+	install_speedups(0x02310, 0xc0519a2, false);
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,dpddfk)
 {
-	install_cv1k_speedups(0x02310, 0xc1d1346, true);
+	install_speedups(0x02310, 0xc1d1346, true);
 
 }
 

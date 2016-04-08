@@ -110,9 +110,9 @@ UINT32 debugview_info::maxwidth()
 {
 	UINT32 max = m_view->total_size().x;
 	debug_view_source const *const cursource = m_view->source();
-	for (debug_view_source const *source = m_view->first_source(); source != NULL; source = source->next())
+	for (const debug_view_source &source : m_view->source_list())
 	{
-		m_view->set_source(*source);
+		m_view->set_source(source);
 		UINT32 const chars = m_view->total_size().x;
 		if (max < chars)
 			max = chars;

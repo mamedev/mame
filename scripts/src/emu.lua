@@ -34,6 +34,7 @@ includedirs {
 includedirs {
 	ext_includedir("expat"),
 	ext_includedir("lua"),
+	ext_includedir("zlib"),
 	ext_includedir("flac"),
 }
 

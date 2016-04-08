@@ -133,9 +133,9 @@ UINT8 legacy_scsi_host_adapter::get_status()
 scsihle_device *legacy_scsi_host_adapter::get_device(int id)
 {
 	// steal scsi devices from bus
-	for (device_t *device = m_scsi_port->first_subdevice(); device != nullptr; device = device->next())
+	for (device_t &device : m_scsi_port->subdevices())
 	{
-		SCSI_PORT_SLOT_device *slot = dynamic_cast<SCSI_PORT_SLOT_device *>(device);
+		SCSI_PORT_SLOT_device *slot = dynamic_cast<SCSI_PORT_SLOT_device *>(&device);
 		if (slot != nullptr)
 		{
 			scsihle_device *scsidev = dynamic_cast<scsihle_device *>(slot->dev());

@@ -87,36 +87,36 @@
 	<element name="text_rg6"><text string="Black"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_rg7"><text string="White"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
-	<element name="text_king1"><text string="K"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_queen1"><text string="Q"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_rook1"><text string="R"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_bishop1"><text string="B"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_knight1"><text string="N"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_pion1"><text string="P"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_king1"><text string="&#x265a;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_queen1"><text string="&#x265b;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rook1"><text string="&#x265c;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_bishop1"><text string="&#x265d;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_knight1"><text string="&#x265e;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_pion1"><text string="&#x265f;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
 	<element name="text_king2">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="K"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string="&#x265a;"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<element name="text_queen2">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="Q"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string="&#x265b;"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<element name="text_rook2">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="R"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string="&#x265c;"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<element name="text_bishop2">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="B"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string="&#x265d;"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<element name="text_knight2">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="N"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string="&#x265e;"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<element name="text_pion2">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="P"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string="&#x265f;"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 
 	<element name="text_rb00"><text string="Multi Move"><color red="0.51" green="0.5" blue="0.49" /></text></element>
@@ -379,12 +379,12 @@
 		<bezel element="white"><bounds x="88" y="66" width="6" height="4" /></bezel>
 		<bezel element="white"><bounds x="88" y="76" width="6" height="4" /></bezel>
 
-		<bezel element="text_king2"><bounds x="88" y="6.4" width="6" height="3" /></bezel>
-		<bezel element="text_queen2"><bounds x="88" y="16.4" width="6" height="3" /></bezel>
-		<bezel element="text_bishop2"><bounds x="88" y="26.4" width="6" height="3" /></bezel>
-		<bezel element="text_knight2"><bounds x="88" y="36.4" width="6" height="3" /></bezel>
-		<bezel element="text_rook2"><bounds x="88" y="46.4" width="6" height="3" /></bezel>
-		<bezel element="text_pion2"><bounds x="88" y="56.4" width="6" height="3" /></bezel>
+		<bezel element="text_king2"><bounds x="88" y="6.1" width="6" height="3.5" /></bezel>
+		<bezel element="text_queen2"><bounds x="88" y="16.1" width="6" height="3.5" /></bezel>
+		<bezel element="text_bishop2"><bounds x="88" y="26.1" width="6" height="3.5" /></bezel>
+		<bezel element="text_knight2"><bounds x="88" y="36.1" width="6" height="3.5" /></bezel>
+		<bezel element="text_rook2"><bounds x="88" y="46.1" width="6" height="3.5" /></bezel>
+		<bezel element="text_pion2"><bounds x="88" y="56.1" width="6" height="3.5" /></bezel>
 
 		<bezel element="hlb" inputtag="IN.0" inputmask="0x200"><bounds x="88" y="6" width="6" height="4" /><color alpha="0.4" /></bezel>
 		<bezel element="hlb" inputtag="IN.1" inputmask="0x200"><bounds x="88" y="16" width="6" height="4" /><color alpha="0.4" /></bezel>
@@ -417,15 +417,6 @@
 
 		<bezel element="black"><bounds x="107" y="2" width="1" height="82" /></bezel>
 
-		<bezel name="0.0" element="ledg"><bounds x="112" y="7.5" width="2" height="1" /></bezel>
-		<bezel name="0.1" element="ledg"><bounds x="112" y="17.5" width="2" height="1" /></bezel>
-		<bezel name="0.2" element="ledg"><bounds x="112" y="27.5" width="2" height="1" /></bezel>
-		<bezel name="0.3" element="ledg"><bounds x="112" y="37.5" width="2" height="1" /></bezel>
-		<bezel name="0.4" element="ledg"><bounds x="112" y="47.5" width="2" height="1" /></bezel>
-		<bezel name="0.5" element="ledg"><bounds x="112" y="57.5" width="2" height="1" /></bezel>
-		<bezel name="0.6" element="ledg"><bounds x="112" y="67.5" width="2" height="1" /></bezel>
-		<bezel name="0.7" element="ledg"><bounds x="112" y="77.5" width="2" height="1" /></bezel>
-
 		<bezel element="text_rg0"><bounds x="108" y="5.7" width="10" height="1.5" /></bezel>
 		<bezel element="text_rg1"><bounds x="108" y="15.7" width="10" height="1.5" /></bezel>
 		<bezel element="text_rg2"><bounds x="108" y="25.7" width="10" height="1.5" /></bezel>
@@ -435,13 +426,21 @@
 		<bezel element="text_rg6"><bounds x="108" y="65.7" width="10" height="1.5" /></bezel>
 		<bezel element="text_rg7"><bounds x="108" y="75.7" width="10" height="1.5" /></bezel>
 
-		<bezel element="text_king1"><bounds x="108" y="8.8" width="10" height="1.5" /></bezel>
-		<bezel element="text_queen1"><bounds x="108" y="18.8" width="10" height="1.5" /></bezel>
-		<bezel element="text_bishop1"><bounds x="108" y="28.8" width="10" height="1.5" /></bezel>
-		<bezel element="text_knight1"><bounds x="108" y="38.8" width="10" height="1.5" /></bezel>
-		<bezel element="text_rook1"><bounds x="108" y="48.8" width="10" height="1.5" /></bezel>
-		<bezel element="text_pion1"><bounds x="108" y="58.8" width="10" height="1.5" /></bezel>
+		<bezel element="text_king1"><bounds x="108.2" y="8.6" width="10" height="2" /></bezel>
+		<bezel element="text_queen1"><bounds x="108.2" y="18.6" width="10" height="2" /></bezel>
+		<bezel element="text_bishop1"><bounds x="108.2" y="28.6" width="10" height="2" /></bezel>
+		<bezel element="text_knight1"><bounds x="108.2" y="38.6" width="10" height="2" /></bezel>
+		<bezel element="text_rook1"><bounds x="108.2" y="48.6" width="10" height="2" /></bezel>
+		<bezel element="text_pion1"><bounds x="108.2" y="58.6" width="10" height="2" /></bezel>
 
+		<bezel name="0.0" element="ledg"><bounds x="112" y="7.5" width="2" height="1" /></bezel>
+		<bezel name="0.1" element="ledg"><bounds x="112" y="17.5" width="2" height="1" /></bezel>
+		<bezel name="0.2" element="ledg"><bounds x="112" y="27.5" width="2" height="1" /></bezel>
+		<bezel name="0.3" element="ledg"><bounds x="112" y="37.5" width="2" height="1" /></bezel>
+		<bezel name="0.4" element="ledg"><bounds x="112" y="47.5" width="2" height="1" /></bezel>
+		<bezel name="0.5" element="ledg"><bounds x="112" y="57.5" width="2" height="1" /></bezel>
+		<bezel name="0.6" element="ledg"><bounds x="112" y="67.5" width="2" height="1" /></bezel>
+		<bezel name="0.7" element="ledg"><bounds x="112" y="77.5" width="2" height="1" /></bezel>
 
 	</view>
 </mamelayout>

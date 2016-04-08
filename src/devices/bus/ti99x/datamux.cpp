@@ -75,9 +75,20 @@
     Constructor
 */
 ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, DATAMUX, "Databus multiplexer", tag, owner, clock, "ti99_datamux", __FILE__), m_spacep(nullptr),
-	m_ready(*this), m_muxready(), m_sysready(), m_addr_buf(0), m_read_mode(false), m_latch(0), m_waitcount(0), m_ram16b(nullptr), m_use32k(false), m_base32k(0), m_cpu(nullptr)
-{ }
+	: device_t(mconfig, DATAMUX, "Databus multiplexer", tag, owner, clock, "ti99_datamux", __FILE__),
+	m_spacep(nullptr),
+	m_ready(*this),
+	m_addr_buf(0),
+	m_dbin(CLEAR_LINE),
+	m_muxready(CLEAR_LINE),
+	m_sysready(CLEAR_LINE),
+	m_latch(0),
+	m_waitcount(0),
+	m_ram16b(nullptr),
+	m_use32k(false),
+	m_base32k(0),
+	m_console_groms_present(false)
+	{ }
 
 #define TRACE_READY 0
 #define TRACE_ACCESS 0
@@ -89,140 +100,239 @@ ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const ch
     DEVICE ACCESSOR FUNCTIONS
 ***************************************************************************/
 
-void ti99_datamux_device::read_all(address_space& space, UINT16 addr, UINT8 *target)
+void ti99_datamux_device::read_all(address_space& space, UINT16 addr, UINT8 *value)
 {
-	attached_device *dev = m_devices.first();
+	// Valid access
+	bool validaccess = ((addr & 0x0400)==0);
 
-	// Reading the odd address first (addr+1)
-	while (dev != nullptr)
+	if (validaccess)
 	{
-		if (dev->m_config->write_select != 0xffff) // write-only
+		// GROM access
+		if ((addr & 0xf801)==0x9800)
 		{
-			if ((addr & dev->m_config->address_mask)==dev->m_config->select)
+			if (m_console_groms_present)
 			{
-				// Cast to the bus8z_device (see ti99defs.h)
-				bus8z_device *devz = static_cast<bus8z_device *>(dev->m_device);
-				devz->readz(space, addr, target);
+				for (int i=0; i < 3; i++)
+				{
+					m_grom[i]->readz(space, addr, value);
+				}
 			}
-			// hope we don't have two devices answering...
-			// consider something like a logical OR and maybe some artificial smoke
+			// GROMport (GROMs)
+			m_gromport->readz(space, addr, value);
 		}
-		dev = dev->m_next;
+
+		// Video
+		if ((addr & 0xf801)==0x8800)
+		{
+			m_video->readz(space, addr, value);
+		}
 	}
+
+	// GROMport (ROMs)
+	if ((addr & 0xe000)==0x6000) m_gromport->readz(space, addr, value);
+
+	// PEB gets all accesses
+	m_peb->readz(space, addr, value);
+	m_peb->memen_in(CLEAR_LINE);
 }
 
 void ti99_datamux_device::write_all(address_space& space, UINT16 addr, UINT8 value)
 {
-	attached_device *dev = m_devices.first();
-	while (dev != nullptr)
+	// GROM access
+	if ((addr & 0xf801)==0x9800)
 	{
-		if ((addr & dev->m_config->address_mask)==(dev->m_config->select | dev->m_config->write_select))
+		if (m_console_groms_present)
 		{
-			bus8z_device *devz = static_cast<bus8z_device *>(dev->m_device);
-			devz->write(space, addr, value);
+			for (int i=0; i < 3; i++)
+				m_grom[i]->write(space, addr, value);
 		}
-		dev = dev->m_next;
+		// GROMport
+		m_gromport->write(space, addr, value);
 	}
+
+	// Cartridge port and sound
+	if ((addr & 0xe000)==0x6000) m_gromport->write(space, addr, value);
+	if ((addr & 0xfc01)==0x8400) m_sound->write(space, 0, value);
+
+	// Video
+	if ((addr & 0xf801)==0x8800)
+	{
+		m_video->write(space, addr, value);
+	}
+
+	// PEB gets all accesses
+	m_peb->write(space, addr, value);
+	m_peb->memen_in(CLEAR_LINE);
 }
 
 void ti99_datamux_device::setaddress_all(address_space& space, UINT16 addr)
 {
-	attached_device *dev = m_devices.first();
-	while (dev != nullptr)
-	{
-		if ((addr & dev->m_config->address_mask)==(dev->m_config->select | dev->m_config->write_select))
-		{
-			bus8z_device *devz = static_cast<bus8z_device *>(dev->m_device);
-			devz->setaddress_dbin(space, addr, m_read_mode? ASSERT_LINE : CLEAR_LINE);
-		}
-		dev = dev->m_next;
-	}
+	line_state a14 = ((addr & 2)!=0)? ASSERT_LINE : CLEAR_LINE;
+
+	// Valid access = not(DBIN and A5)
+	bool validaccess = (m_dbin==CLEAR_LINE || (addr & 0x0400)==0);
+
+	// GROM access
+	bool isgrom = ((addr & 0xf801)==0x9800) && validaccess;
+
+	// Cartridge ROM
+	bool iscartrom = ((addr & 0xe000)==0x6000);
+
+	// Always deliver to GROM so that the select line may be cleared
+	int lines = (m_dbin==ASSERT_LINE)? 1 : 0;
+	if (a14==ASSERT_LINE) lines |= 2;
+	line_state select = isgrom? ASSERT_LINE : CLEAR_LINE;
+
+	if (m_console_groms_present)
+		for (int i=0; i < 3; i++)
+			m_grom[i]->set_lines(space, lines, select);
+
+	// GROMport (GROMs)
+	m_gromport->set_gromlines(space, lines, select);
+
+	// Sound chip and video chip do not require the address to be set before access
+
+	// GROMport (ROMs)
+	m_gromport->romgq_line(iscartrom? ASSERT_LINE : CLEAR_LINE);
+
+	// PEB gets all accesses
+	m_peb->memen_in(ASSERT_LINE);
+	m_peb->setaddress_dbin(space, addr, m_dbin);
 }
 
 /*
-    Special debugger access; these routines have no influence on the wait
-    state generation.
+    Special debugger access. The access is similar to the normal access,
+    but it bypasses the wait state circuitry. Also, access ports of memory-
+    mapped devices are excluded because their state would be changed
+    unpredictably by the debugger access.
 */
 UINT16 ti99_datamux_device::debugger_read(address_space& space, UINT16 addr)
 {
-	UINT16 base32k = 0;
-	UINT8 lval, hval;
-
 	UINT16 addrb = addr << 1;
-	if (m_use32k)
-	{
-		if ((addrb & 0xe000)==0x2000) base32k = 0x1000;
-		if (((addrb & 0xe000)==0xa000) || ((addrb & 0xc000)==0xc000)) base32k = 0x4000;
-	}
-	if (base32k != 0)
-	{
-		return m_ram16b[addr - base32k];
-	}
+	UINT16 value = 0;
+
+	if ((addrb & 0xe000)==0x0000) value = m_consolerom[(addrb & 0x1fff)>>1];
 	else
 	{
-		lval = hval = 0;
-		read_all(space, addrb+1, &lval);
-		read_all(space, addrb, &hval);
-		return ((hval << 8)&0xff00) | (lval & 0xff);
+		if ((addrb & 0xfc00)==0x8000) value = m_padram[(addrb & 0x00ff)>>1];
+		else
+		{
+			int base32k = 0;
+			if (m_use32k)
+			{
+				if ((addrb & 0xe000)==0x2000) base32k = 0x2000;
+				if (((addrb & 0xe000)==0xa000) || ((addrb & 0xc000)==0xc000)) base32k = 0x8000;
+			}
+
+			if (base32k != 0) value = m_ram16b[(addrb-base32k)>>1];
+			else
+			{
+				UINT8 lval = 0;
+				UINT8 hval = 0;
+
+				if ((addr & 0xe000)==0x6000)
+				{
+					m_gromport->readz(space, addrb+1, &lval);
+					m_gromport->readz(space, addrb, &hval);
+				}
+				m_peb->memen_in(ASSERT_LINE);
+				m_peb->readz(space, addrb+1, &lval);
+				m_peb->readz(space, addrb, &hval);
+				m_peb->memen_in(CLEAR_LINE);
+				value = ((hval << 8)&0xff00) | (lval & 0xff);
+			}
+		}
 	}
+	return value;
 }
 
 void ti99_datamux_device::debugger_write(address_space& space, UINT16 addr, UINT16 data)
 {
-	UINT16 base32k = 0;
-
 	UINT16 addrb = addr << 1;
-	if (m_use32k)
-	{
-		if ((addrb & 0xe000)==0x2000) base32k = 0x1000;
-		if (((addrb & 0xe000)==0xa000) || ((addrb & 0xc000)==0xc000)) base32k = 0x4000;
-	}
-	if (base32k != 0)
-	{
-		m_ram16b[addr - base32k] = data;
-	}
+
+	if ((addrb & 0xe000)==0x0000) return;
+
+	if ((addrb & 0xfc00)==0x8000) m_padram[(addrb & 0x00ff)>>1] = data;
 	else
 	{
-		write_all(space, addrb+1, data & 0xff);
-		write_all(space, addrb, (data >> 8) & 0xff);
+		int base32k = 0;
+		if (m_use32k)
+		{
+			if ((addrb & 0xe000)==0x2000) base32k = 0x2000;
+			if (((addrb & 0xe000)==0xa000) || ((addrb & 0xc000)==0xc000)) base32k = 0x8000;
+		}
+
+		if (base32k != 0) m_ram16b[(addrb-base32k)>>1] = data;
+		else
+		{
+			if ((addr & 0xe000)==0x6000)
+			{
+				m_gromport->write(space, addr+1, data & 0xff);
+				m_gromport->write(space, addr, (data>>8) & 0xff);
+			}
+
+			m_peb->memen_in(ASSERT_LINE);
+			m_peb->write(space, addr+1, data & 0xff);
+			m_peb->write(space, addr,  (data>>8) & 0xff);
+			m_peb->memen_in(CLEAR_LINE);
+		}
 	}
 }
 
 /*
     Read access. We are using two loops because the delay between both
     accesses must not occur within the loop. So we have one access on the bus,
-    a delay, and then the second access (each one with possibly many attached
-    devices)
+    a delay, and then the second access.
+
+    mem_mask is always ffff on TMS processors (cannot control bus width)
 */
 READ16_MEMBER( ti99_datamux_device::read )
 {
+	UINT16 value = 0;
+
 	// Care for debugger
 	if (space.debugger_access())
 	{
 		return debugger_read(space, offset);
 	}
 
-	// Looks ugly, but this is close to the real thing. If the 16bit
-	// memory expansion is installed in the console, and the access hits its
-	// space, just respond to the memory access and don't bother the
-	// datamux in any way. In particular, do not make the datamux insert wait
-	// states.
-
-	if (m_base32k != 0)
+	// Addresses below 0x2000 are ROM (no wait states)
+	if ((m_addr_buf & 0xe000)==0x0000)
 	{
-		UINT16 reply = m_ram16b[offset-m_base32k];
-		return reply & mem_mask;
+		value = m_consolerom[(m_addr_buf & 0x1fff)>>1];
 	}
 	else
 	{
-		// The byte from the odd address has already been read into the latch
-		// Reading the even address now (addr)
-		UINT8 hbyte = 0;
-		read_all(space, m_addr_buf, &hbyte);
-		if (TRACE_ACCESS) logerror("datamux: read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
+		// Addresses from 8300-83ff (mirrors at 8000, 8100, 8200) are console RAM  (no wait states)
+		if ((m_addr_buf & 0xfc00)==0x8000)
+		{
+			value = m_padram[(m_addr_buf & 0x00ff)>>1];
+		}
+		else
+		{
+			// Looks ugly, but this is close to the real thing. If the 16bit
+			// memory expansion is installed in the console, and the access hits its
+			// space, just respond to the memory access and don't bother the
+			// datamux in any way. In particular, do not make the datamux insert wait
+			// states.
 
-		return ((hbyte<<8) | m_latch) & mem_mask;
+			if (m_base32k != 0)
+			{
+				value = m_ram16b[(m_addr_buf-m_base32k)>>1];
+			}
+			else
+			{
+				// The byte from the odd address has already been read into the latch
+				// Reading the even address now (addr)
+				UINT8 hbyte = 0;
+				read_all(space, m_addr_buf, &hbyte);
+				if (TRACE_ACCESS) logerror("Read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
+
+				value = (hbyte<<8) | m_latch;
+			}
+		}
 	}
+	return value;
 }
 
 /*
@@ -230,21 +340,29 @@ READ16_MEMBER( ti99_datamux_device::read )
 */
 WRITE16_MEMBER( ti99_datamux_device::write )
 {
-	// Addresses below 0x2000 are ROM and should be handled in the address map
-	// by the ROM entry, but as the write handler for ROM is not mapped, we end up
-	// here when there are invalid accesses, and this will mess up everything.
-	if (offset < 0x1000) return;
-
 	if (space.debugger_access())
 	{
 		debugger_write(space, offset, data);
 		return;
 	}
 
+	// Addresses below 0x2000 are ROM
+	if ((m_addr_buf & 0xe000)==0x0000)
+	{
+		return;
+	}
+
+	// Addresses from 8300-83ff (mirrors at 8000, 8100, 8200) are console RAM
+	if ((m_addr_buf & 0xfc00)==0x8000)
+	{
+		m_padram[(m_addr_buf & 0x00ff)>>1] = data;
+		return;
+	}
+
 	// Handle the internal 32K expansion
 	if (m_base32k != 0)
 	{
-		m_ram16b[offset-m_base32k] = data;
+		m_ram16b[(m_addr_buf-m_base32k)>>1] = data;
 	}
 	else
 	{
@@ -264,21 +382,34 @@ WRITE16_MEMBER( ti99_datamux_device::write )
 */
 SETOFFSET_MEMBER( ti99_datamux_device::setoffset )
 {
-	if (TRACE_ADDRESS) logerror("datamux: set address %04x\n", offset << 1);
+	m_addr_buf = offset << 1;
+	m_waitcount = 0;
+
+	if (TRACE_ADDRESS) logerror("set address %04x\n", m_addr_buf);
+
+	if ((m_addr_buf & 0xe000) == 0x0000)
+	{
+		return; // console ROM
+	}
+
+	if ((m_addr_buf & 0xfc00) == 0x8000)
+	{
+		return; // console RAM
+	}
+
 	// Initialize counter
 	// 1 cycle for loading into the datamux
 	// 2 subsequent wait states (LSB)
 	// 2 subsequent wait states (MSB)
 	// clock cycle 6 is the nominal follower of the last wait state
 	m_waitcount = 5;
-	m_addr_buf = offset << 1;
 	m_spacep = &space;
 
 	m_base32k = 0;
 	if (m_use32k)
 	{
-		if ((m_addr_buf & 0xe000)==0x2000) m_base32k = 0x1000;
-		if (((m_addr_buf & 0xe000)==0xa000) || ((m_addr_buf & 0xc000)==0xc000)) m_base32k = 0x4000;
+		if ((m_addr_buf & 0xe000)==0x2000) m_base32k = 0x2000;
+		if (((m_addr_buf & 0xe000)==0xa000) || ((m_addr_buf & 0xc000)==0xc000)) m_base32k = 0x8000;
 	}
 
 	// Suspend the CPU if not using the 32K
@@ -308,13 +439,13 @@ WRITE_LINE_MEMBER( ti99_datamux_device::clock_in )
 			if (TRACE_READY) logerror("datamux: stalled due to external READY=0\n");
 			return;
 		}
-		if (m_read_mode)
+
+		if (m_dbin==ASSERT_LINE)
 		{
 			// Reading
 			if (state==ASSERT_LINE)
 			{   // raising edge
-				m_waitcount--;
-				if (m_waitcount==0)
+				if (--m_waitcount==0)
 				{
 					m_muxready = ASSERT_LINE;
 					ready_join();
@@ -333,8 +464,7 @@ WRITE_LINE_MEMBER( ti99_datamux_device::clock_in )
 		{
 			if (state==ASSERT_LINE)
 			{   // raising edge
-				m_waitcount--;
-				if (m_waitcount==0)
+				if (--m_waitcount==0)
 				{
 					m_muxready = ASSERT_LINE;
 					ready_join();
@@ -365,19 +495,29 @@ void ti99_datamux_device::ready_join()
 
 WRITE_LINE_MEMBER( ti99_datamux_device::dbin_in )
 {
-	m_read_mode = (state==ASSERT_LINE);
-	if (TRACE_ADDRESS) logerror("datamux: data bus in = %d\n", m_read_mode? 1:0 );
+	m_dbin = (line_state)state;
+	if (TRACE_ADDRESS) logerror("data bus in = %d\n", (m_dbin==ASSERT_LINE)? 1:0 );
 }
 
 WRITE_LINE_MEMBER( ti99_datamux_device::ready_line )
 {
 	if (TRACE_READY)
 	{
-		if (state != m_sysready) logerror("datamux: READY line from PBox = %d\n", state);
+		if (state != m_sysready) logerror("READY line from PBox = %d\n", state);
 	}
 	m_sysready = (line_state)state;
 	// Also propagate to CPU via driver
 	ready_join();
+}
+
+WRITE_LINE_MEMBER( ti99_datamux_device::gromclk_in )
+{
+	// Propagate to the GROMs
+	if (m_console_groms_present)
+	{
+		for (int i=0; i < 3; i++) m_grom[i]->gclock_in(state);
+	}
+	m_gromport->gclock_in(state);
 }
 
 /***************************************************************************
@@ -398,66 +538,15 @@ void ti99_datamux_device::device_stop(void)
 
 void ti99_datamux_device::device_reset(void)
 {
-	const datamux_config *conf = reinterpret_cast<const datamux_config *>(static_config());
-
-	const dmux_device_list_entry *list = conf->devlist;
-
-	m_cpu = machine().device("maincpu");
-	// m_space = &m_cpu->memory().space(AS_PROGRAM);
-
-	m_devices.reset(); // clear the list
+	m_consolerom = (UINT16*)owner()->memregion(CONSOLEROM)->base();
 	m_use32k = (ioport("RAM")->read()==1);
+	m_console_groms_present = (ioport("GROMENA")->read()==1);
 
 	// better use a region?
 	if (m_ram16b==nullptr)
 	{
 		m_ram16b = make_unique_clear<UINT16[]>(32768/2);
 	}
-
-	// Now building the list of active devices at this databus multiplex.
-	// We allow for turning off devices according to configuration switch settings.
-	// In particular, the HSGPL card cannot function unless the console GROMs are
-	// removed.
-	if ( list != nullptr )
-	{
-		bool done = false;
-		for (int i=0; !done; i++)
-		{
-			if (list[i].name == nullptr)
-			{
-				done = true;
-			}
-			else
-			{
-				UINT32 set;
-				bool active_device = true;
-				if (list[i].setting!=nullptr)
-				{
-					set = ioport(list[i].setting)->read();
-					active_device = ((set & list[i].set)==list[i].set) && ((set & list[i].unset)==0);
-				}
-				if (active_device)
-				{
-					device_t *dev = machine().device(list[i].name);
-					if (dev != nullptr)
-					{
-						auto ad = new attached_device(dev, list[i]);
-						m_devices.append(*ad);
-						if (TRACE_SETUP) logerror("datamux: Device %s mounted at index %d.\n", list[i].name, i);
-					}
-					else
-					{
-						if (TRACE_SETUP) logerror("datamux: Device %s not found.\n", list[i].name);
-					}
-				}
-				else
-				{
-					if (TRACE_SETUP) logerror("datamux: Device %s not mounted due to configuration setting %s.\n", list[i].name, list[i].setting);
-				}
-			}
-		}
-	}
-	if (TRACE_SETUP) logerror("datamux: Device count = %d\n", m_devices.count());
 
 	m_sysready = ASSERT_LINE;
 	m_muxready = ASSERT_LINE;
@@ -466,8 +555,21 @@ void ti99_datamux_device::device_reset(void)
 	m_waitcount = 0;
 	m_latch = 0;
 
-	m_read_mode = true;
+	m_dbin = CLEAR_LINE;
 }
+
+void ti99_datamux_device::device_config_complete()
+{
+	m_video = downcast<bus8z_device*>(owner()->subdevice(VIDEO_SYSTEM_TAG));
+	m_sound = downcast<sn76496_base_device*>(owner()->subdevice(TISOUNDCHIP_TAG));
+	m_gromport = downcast<gromport_device*>(owner()->subdevice(GROMPORT_TAG));
+	m_peb = downcast<peribox_device*>(owner()->subdevice(PERIBOX_TAG));
+	m_grom[0] = downcast<tmc0430_device*>(owner()->subdevice(GROM0_TAG));
+	m_grom[1] = downcast<tmc0430_device*>(owner()->subdevice(GROM1_TAG));
+	m_grom[2] = downcast<tmc0430_device*>(owner()->subdevice(GROM2_TAG));
+	m_padram = make_unique_clear<UINT16[]>(256/2);
+}
+
 
 INPUT_PORTS_START( datamux )
 	PORT_START( "RAM" ) /* config */

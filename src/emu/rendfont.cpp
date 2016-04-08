@@ -416,8 +416,19 @@ float render_font::string_width(float height, float aspect, const char *string)
 {
 	// loop over the string and accumulate widths
 	int totwidth = 0;
-	for (const unsigned char *ptr = (const unsigned char *)string; *ptr != 0; ptr++)
-		totwidth += get_char(*ptr).width;
+
+	const char *ends = string + strlen(string);
+	const char *s = string;
+	unicode_char schar;
+	
+	// loop over characters
+	while (*s != 0)
+	{
+		int	scharcount = uchar_from_utf8(&schar, s, ends - s);
+		totwidth += get_char(schar).width;
+		s += scharcount;
+	}
+
 
 	// scale the final result based on height
 	return float(totwidth) * m_scale * height * aspect;

@@ -98,6 +98,7 @@
 # MSBUILD = 1
 # USE_LIBUV = 1
 # IGNORE_BAD_LOCALISATION=1
+# PRECOMPILE = 0
 
 ifdef PREFIX_MAKEFILE
 include $(PREFIX_MAKEFILE)
@@ -710,6 +711,10 @@ endif
 
 ifdef USE_LIBUV
 PARAMS += --USE_LIBUV='$(USE_LIBUV)'
+endif
+
+ifdef PRECOMPILE
+PARAMS += --precompile='$(PRECOMPILE)'
 endif
 
 #-------------------------------------------------

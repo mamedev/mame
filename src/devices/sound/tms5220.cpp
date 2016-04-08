@@ -502,6 +502,15 @@ void tms5220_device::register_for_save_states()
 	save_item(NAME(m_rs_ws));
 	save_item(NAME(m_read_latch));
 	save_item(NAME(m_write_latch));
+
+	// 5110 specific stuff
+	save_item(NAME(m_PDC));
+	save_item(NAME(m_CTL_pins));
+	save_item(NAME(m_state));
+	save_item(NAME(m_address));
+	save_item(NAME(m_next_is_address));
+	save_item(NAME(m_addr_bit));
+	save_item(NAME(m_CTL_buffer));
 }
 
 
@@ -1649,7 +1658,7 @@ void tms5220_device::device_start()
 
 	m_timer_io_ready = timer_alloc(0);
 
-	/* not during reset which is called frm within a write! */
+	/* not during reset which is called from within a write! */
 	m_io_ready = 1;
 	m_true_timing = 0;
 	m_rs_ws = 0x03; // rs and ws are assumed to be inactive on device startup
@@ -1750,6 +1759,16 @@ void tms5220_device::device_reset()
 		m_speechrom->read(1);
 		m_schedule_dummy_read = FALSE;
 	}
+	
+	// 5110 specific stuff
+	m_PDC = 0;
+	m_CTL_pins = 0;
+	m_state = 0;
+	m_address = 0;
+	m_next_is_address = FALSE;
+	m_addr_bit = 0;
+	m_CTL_buffer = 0;
+
 }
 
 /**********************************************************************************************

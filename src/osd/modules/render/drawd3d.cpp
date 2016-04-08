@@ -630,50 +630,50 @@ int renderer_d3d9::pre_window_draw_check()
 
 void d3d_texture_manager::update_textures()
 {
-	for (render_primitive *prim = m_renderer->window().m_primlist->first(); prim != nullptr; prim = prim->next())
+	for (render_primitive &prim : *m_renderer->window().m_primlist)
 	{
-		if (prim->texture.base != nullptr)
+		if (prim.texture.base != nullptr)
 		{
-			texture_info *texture = find_texinfo(&prim->texture, prim->flags);
+			texture_info *texture = find_texinfo(&prim.texture, prim.flags);
 			if (texture == nullptr)
 			{
 				if (m_renderer->get_shaders()->enabled())
 				{
 					// if there isn't one, create a new texture without prescale
-					texture = global_alloc(texture_info(this, &prim->texture, 1, prim->flags));
+					texture = global_alloc(texture_info(this, &prim.texture, 1, prim.flags));
 				}
 				else
 				{
 					// if there isn't one, create a new texture
-					texture = global_alloc(texture_info(this, &prim->texture, m_renderer->window().prescale(), prim->flags));
+					texture = global_alloc(texture_info(this, &prim.texture, m_renderer->window().prescale(), prim.flags));
 				}
 			}
 			else
 			{
 				// if there is one, but with a different seqid, copy the data
-				if (texture->get_texinfo().seqid != prim->texture.seqid)
+				if (texture->get_texinfo().seqid != prim.texture.seqid)
 				{
-					texture->set_data(&prim->texture, prim->flags);
-					texture->get_texinfo().seqid = prim->texture.seqid;
+					texture->set_data(&prim.texture, prim.flags);
+					texture->get_texinfo().seqid = prim.texture.seqid;
 				}
 			}
 
 			if (m_renderer->get_shaders()->enabled())
 			{
-				if (!m_renderer->get_shaders()->get_texture_target(prim, texture))
+				if (!m_renderer->get_shaders()->get_texture_target(&prim, texture))
 				{
-					if (!m_renderer->get_shaders()->register_texture(prim, texture))
+					if (!m_renderer->get_shaders()->register_texture(&prim, texture))
 					{
 						d3dintf->post_fx_available = false;
 					}
 				}
 			}
 		}
-		else if(m_renderer->get_shaders()->vector_enabled() && PRIMFLAG_GET_VECTORBUF(prim->flags))
+		else if(m_renderer->get_shaders()->vector_enabled() && PRIMFLAG_GET_VECTORBUF(prim.flags))
 		{
-			if (!m_renderer->get_shaders()->get_vector_target(prim))
+			if (!m_renderer->get_shaders()->get_vector_target(&prim))
 			{
-				m_renderer->get_shaders()->create_vector_target(prim);
+				m_renderer->get_shaders()->create_vector_target(&prim);
 			}
 		}
 	}
@@ -706,9 +706,9 @@ void renderer_d3d9::begin_frame()
 
 	// loop over line primitives
 	m_line_count = 0;
-	for (render_primitive *prim = window().m_primlist->first(); prim != nullptr; prim = prim->next())
+	for (render_primitive &prim : *window().m_primlist)
 	{
-		if (prim->type == render_primitive::LINE && PRIMFLAG_GET_VECTOR(prim->flags))
+		if (prim.type == render_primitive::LINE && PRIMFLAG_GET_VECTOR(prim.flags))
 		{
 			m_line_count++;
 		}
@@ -718,12 +718,12 @@ void renderer_d3d9::begin_frame()
 void renderer_d3d9::process_primitives()
 {
 	// Rotating index for vector time offsets
-	for (render_primitive *prim = window().m_primlist->first(); prim != nullptr; prim = prim->next())
+	for (render_primitive &prim : *window().m_primlist)
 	{
-		switch (prim->type)
+		switch (prim.type)
 		{
 			case render_primitive::LINE:
-				if (PRIMFLAG_GET_VECTOR(prim->flags))
+				if (PRIMFLAG_GET_VECTOR(prim.flags))
 				{
 					if (m_line_count > 0)
 						batch_vectors();
@@ -1404,12 +1404,12 @@ void renderer_d3d9::batch_vectors()
 	int line_index = 0;
 	float period = options.screen_vector_time_period();
 	UINT32 cached_flags = 0;
-	for (render_primitive *prim = window().m_primlist->first(); prim != nullptr; prim = prim->next())
+	for (render_primitive &prim : *window().m_primlist)
 	{
-		switch (prim->type)
+		switch (prim.type)
 		{
 			case render_primitive::LINE:
-				if (PRIMFLAG_GET_VECTOR(prim->flags))
+				if (PRIMFLAG_GET_VECTOR(prim.flags))
 				{
 					if (period == 0.0f || m_line_count == 0)
 					{
@@ -1420,15 +1420,15 @@ void renderer_d3d9::batch_vectors()
 						batch_vector(prim, (float)(start_index + line_index) / ((float)m_line_count * period));
 						line_index++;
 					}
-					cached_flags = prim->flags;
+					cached_flags = prim.flags;
 				}
 				break;
 
 			case render_primitive::QUAD:
-				if (PRIMFLAG_GET_VECTORBUF(prim->flags))
+				if (PRIMFLAG_GET_VECTORBUF(prim.flags))
 				{
-					width = prim->bounds.x1 - prim->bounds.x0;
-					height = prim->bounds.y1 - prim->bounds.y0;
+					width = prim.bounds.x1 - prim.bounds.x0;
+					height = prim.bounds.y1 - prim.bounds.y0;
 				}
 				break;
 
@@ -1452,10 +1452,10 @@ void renderer_d3d9::batch_vectors()
 	m_line_count = 0;
 }
 
-void renderer_d3d9::batch_vector(const render_primitive *prim, float line_time)
+void renderer_d3d9::batch_vector(const render_primitive &prim, float line_time)
 {
 	// compute the effective width based on the direction of the line
-	float effwidth = prim->width;
+	float effwidth = prim.width;
 	if (effwidth < 0.5f)
 	{
 		effwidth = 0.5f;
@@ -1463,10 +1463,10 @@ void renderer_d3d9::batch_vector(const render_primitive *prim, float line_time)
 
 	// determine the bounds of a quad to draw this line
 	render_bounds b0, b1;
-	render_line_to_quad(&prim->bounds, effwidth, &b0, &b1);
+	render_line_to_quad(&prim.bounds, effwidth, &b0, &b1);
 
 	// iterate over AA steps
-	for (const line_aa_step *step = PRIMFLAG_GET_ANTIALIAS(prim->flags) ? line_aa_4step : line_aa_1step;
+	for (const line_aa_step *step = PRIMFLAG_GET_ANTIALIAS(prim.flags) ? line_aa_4step : line_aa_1step;
 		step->weight != 0; step++)
 	{
 		// get a pointer to the vertex buffer
@@ -1492,10 +1492,10 @@ void renderer_d3d9::batch_vector(const render_primitive *prim, float line_time)
 		float line_length = sqrtf(dx * dx + dy * dy);
 
 		// determine the color of the line
-		INT32 r = (INT32)(prim->color.r * step->weight * 255.0f);
-		INT32 g = (INT32)(prim->color.g * step->weight * 255.0f);
-		INT32 b = (INT32)(prim->color.b * step->weight * 255.0f);
-		INT32 a = (INT32)(prim->color.a * 255.0f);
+		INT32 r = (INT32)(prim.color.r * step->weight * 255.0f);
+		INT32 g = (INT32)(prim.color.g * step->weight * 255.0f);
+		INT32 b = (INT32)(prim.color.b * step->weight * 255.0f);
+		INT32 a = (INT32)(prim.color.a * 255.0f);
 		if (r > 255 || g > 255 || b > 255)
 		{
 			if (r > 2*255 || g > 2*255 || b > 2*255)
@@ -1554,10 +1554,10 @@ void renderer_d3d9::batch_vector(const render_primitive *prim, float line_time)
 //  draw_line
 //============================================================
 
-void renderer_d3d9::draw_line(const render_primitive *prim)
+void renderer_d3d9::draw_line(const render_primitive &prim)
 {
 	// compute the effective width based on the direction of the line
-	float effwidth = prim->width;
+	float effwidth = prim.width;
 	if (effwidth < 0.5f)
 	{
 		effwidth = 0.5f;
@@ -1565,10 +1565,10 @@ void renderer_d3d9::draw_line(const render_primitive *prim)
 
 	// determine the bounds of a quad to draw this line
 	render_bounds b0, b1;
-	render_line_to_quad(&prim->bounds, effwidth, &b0, &b1);
+	render_line_to_quad(&prim.bounds, effwidth, &b0, &b1);
 
 	// iterate over AA steps
-	for (const line_aa_step *step = PRIMFLAG_GET_ANTIALIAS(prim->flags) ? line_aa_4step : line_aa_1step;
+	for (const line_aa_step *step = PRIMFLAG_GET_ANTIALIAS(prim.flags) ? line_aa_4step : line_aa_1step;
 		step->weight != 0; step++)
 	{
 		// get a pointer to the vertex buffer
@@ -1593,10 +1593,10 @@ void renderer_d3d9::draw_line(const render_primitive *prim)
 		vertex[3].y = b1.y1 + step->yoffs;
 
 		// determine the color of the line
-		INT32 r = (INT32)(prim->color.r * step->weight * 255.0f);
-		INT32 g = (INT32)(prim->color.g * step->weight * 255.0f);
-		INT32 b = (INT32)(prim->color.b * step->weight * 255.0f);
-		INT32 a = (INT32)(prim->color.a * 255.0f);
+		INT32 r = (INT32)(prim.color.r * step->weight * 255.0f);
+		INT32 g = (INT32)(prim.color.g * step->weight * 255.0f);
+		INT32 b = (INT32)(prim.color.b * step->weight * 255.0f);
+		INT32 a = (INT32)(prim.color.a * 255.0f);
 		if (r > 255) r = 255;
 		if (g > 255) g = 255;
 		if (b > 255) b = 255;
@@ -1627,7 +1627,7 @@ void renderer_d3d9::draw_line(const render_primitive *prim)
 		}
 
 		// now add a polygon entry
-		m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim->flags, get_vector_texture(),
+		m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, get_vector_texture(),
 								D3DTOP_MODULATE, 0.0f, 1.0f, 0.0f, 0.0f);
 		m_numpolys++;
 	}
@@ -1638,9 +1638,9 @@ void renderer_d3d9::draw_line(const render_primitive *prim)
 //  draw_quad
 //============================================================
 
-void renderer_d3d9::draw_quad(const render_primitive *prim)
+void renderer_d3d9::draw_quad(const render_primitive &prim)
 {
-	texture_info *texture = m_texture_manager->find_texinfo(&prim->texture, prim->flags);
+	texture_info *texture = m_texture_manager->find_texinfo(&prim.texture, prim.flags);
 
 	if (texture == nullptr)
 	{
@@ -1653,16 +1653,16 @@ void renderer_d3d9::draw_quad(const render_primitive *prim)
 		return;
 
 	// fill in the vertexes clockwise
-	vertex[0].x = prim->bounds.x0;
-	vertex[0].y = prim->bounds.y0;
-	vertex[1].x = prim->bounds.x1;
-	vertex[1].y = prim->bounds.y0;
-	vertex[2].x = prim->bounds.x0;
-	vertex[2].y = prim->bounds.y1;
-	vertex[3].x = prim->bounds.x1;
-	vertex[3].y = prim->bounds.y1;
-	float width = prim->bounds.x1 - prim->bounds.x0;
-	float height = prim->bounds.y1 - prim->bounds.y0;
+	vertex[0].x = prim.bounds.x0;
+	vertex[0].y = prim.bounds.y0;
+	vertex[1].x = prim.bounds.x1;
+	vertex[1].y = prim.bounds.y0;
+	vertex[2].x = prim.bounds.x0;
+	vertex[2].y = prim.bounds.y1;
+	vertex[3].x = prim.bounds.x1;
+	vertex[3].y = prim.bounds.y1;
+	float width = prim.bounds.x1 - prim.bounds.x0;
+	float height = prim.bounds.y1 - prim.bounds.y0;
 
 	// set the texture coordinates
 	if (texture != nullptr)
@@ -1671,21 +1671,21 @@ void renderer_d3d9::draw_quad(const render_primitive *prim)
 		vec2f& stop = texture->get_uvstop();
 		vec2f delta = stop - start;
 
-		vertex[0].u0 = start.c.x + delta.c.x * prim->texcoords.tl.u;
-		vertex[0].v0 = start.c.y + delta.c.y * prim->texcoords.tl.v;
-		vertex[1].u0 = start.c.x + delta.c.x * prim->texcoords.tr.u;
-		vertex[1].v0 = start.c.y + delta.c.y * prim->texcoords.tr.v;
-		vertex[2].u0 = start.c.x + delta.c.x * prim->texcoords.bl.u;
-		vertex[2].v0 = start.c.y + delta.c.y * prim->texcoords.bl.v;
-		vertex[3].u0 = start.c.x + delta.c.x * prim->texcoords.br.u;
-		vertex[3].v0 = start.c.y + delta.c.y * prim->texcoords.br.v;
+		vertex[0].u0 = start.c.x + delta.c.x * prim.texcoords.tl.u;
+		vertex[0].v0 = start.c.y + delta.c.y * prim.texcoords.tl.v;
+		vertex[1].u0 = start.c.x + delta.c.x * prim.texcoords.tr.u;
+		vertex[1].v0 = start.c.y + delta.c.y * prim.texcoords.tr.v;
+		vertex[2].u0 = start.c.x + delta.c.x * prim.texcoords.bl.u;
+		vertex[2].v0 = start.c.y + delta.c.y * prim.texcoords.bl.v;
+		vertex[3].u0 = start.c.x + delta.c.x * prim.texcoords.br.u;
+		vertex[3].v0 = start.c.y + delta.c.y * prim.texcoords.br.v;
 	}
 
 	// determine the color, allowing for over modulation
-	INT32 r = (INT32)(prim->color.r * 255.0f);
-	INT32 g = (INT32)(prim->color.g * 255.0f);
-	INT32 b = (INT32)(prim->color.b * 255.0f);
-	INT32 a = (INT32)(prim->color.a * 255.0f);
+	INT32 r = (INT32)(prim.color.r * 255.0f);
+	INT32 g = (INT32)(prim.color.g * 255.0f);
+	INT32 b = (INT32)(prim.color.b * 255.0f);
+	INT32 a = (INT32)(prim.color.a * 255.0f);
 	DWORD modmode = D3DTOP_MODULATE;
 	if (texture != nullptr)
 	{
@@ -1720,7 +1720,7 @@ void renderer_d3d9::draw_quad(const render_primitive *prim)
 	}
 
 	// now add a polygon entry
-	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim->flags, texture, modmode, width, height);
+	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, texture, modmode, width, height);
 	m_numpolys++;
 }
 

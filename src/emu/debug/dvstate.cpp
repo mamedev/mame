@@ -141,15 +141,15 @@ void debug_view_state::recompute()
 	tailptr = &(*tailptr)->m_next;
 
 	// add all registers into it
-	for (const device_state_entry *entry = source.m_stateintf->state_first(); entry != nullptr; entry = entry->next())
-		if (entry->divider())
+	for (const device_state_entry &entry : source.m_stateintf->state_entries())
+		if (entry.divider())
 		{
 			*tailptr = global_alloc(state_item(REG_DIVIDER, "", 0));
 			tailptr = &(*tailptr)->m_next;
 		}
-		else if (entry->visible())
+		else if (entry.visible())
 		{
-			*tailptr = global_alloc(state_item(entry->index(), entry->symbol(), source.m_stateintf->state_string_max_length(entry->index())));
+			*tailptr = global_alloc(state_item(entry.index(), entry.symbol(), source.m_stateintf->state_string_max_length(entry.index())));
 			tailptr = &(*tailptr)->m_next;
 		}
 

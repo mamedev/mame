@@ -728,11 +728,16 @@
 		-- step of building it later?
 		cfg.__fileconfigs = { }
 		for _, fname in ipairs(cfg.files) do
-			cfg.terms.required = fname:lower()
 			local fcfg = {}
-			for _, blk in ipairs(cfg.project.blocks) do
-				if (premake.iskeywordsmatch(blk.keywords, cfg.terms)) then
-					mergeobject(fcfg, blk)
+
+			-- Only do this if the script has called enablefilelevelconfig()
+			if premake._filelevelconfig then
+				cfg.terms.required = fname:lower()
+				for _, blk in ipairs(cfg.project.blocks) do
+					-- BK - `iskeywordsmatch` call is super slow for large projects...
+					if (premake.iskeywordsmatch(blk.keywords, cfg.terms)) then
+						mergeobject(fcfg, blk)
+					end
 				end
 			end
 

@@ -77,6 +77,7 @@
   - Though very uncommon when compared to games with LED/lamp display,
     some games may manipulate VFD plate brightness by strobing it longer,
     eg. cgalaxn when the player ship explodes.
+  - bzaxxon 3D effect is difficult to simulate
 
 ***************************************************************************/
 

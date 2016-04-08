@@ -3653,8 +3653,8 @@ ROM_START( derbyoc2 )
 	ROM_LOAD( "mpr-22304.ic10", 0x9800000, 0x1000000, CRC(46c1fb1f) SHA1(6daca76a75df3501f77e473eb065d48804fcc64a) )
 	ROM_LOAD( "mpr-22305.ic11", 0xa800000, 0x1000000, CRC(027d0e7b) SHA1(e3c874e60cabb6f9ce686696d9055a0c0d5289ae) )
 
-	// 840-0083-01    2001     317-0327-JPN   Naomi (label comes from unclear photo, can be wrong)
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // key is unknown, probably not used by game
+	// 840-0083-01    2001     317-0327-JPN   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2a436bb7")
 ROM_END
 
 /*

@@ -1187,7 +1187,7 @@ if _OPTIONS["targetos"]=="android" then
 		"log",
 	}
 	linkoptions {
-		"-Wl,-soname,liSDL2.so"
+		"-Wl,-soname,libSDL2.so"
 	}
 
 	if _OPTIONS["SEPARATE_BIN"]~="1" then

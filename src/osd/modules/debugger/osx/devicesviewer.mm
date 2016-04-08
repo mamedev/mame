@@ -34,7 +34,7 @@
 
 - (void)wrapChildren {
 	NSMutableArray *const tmp = [[NSMutableArray alloc] init];
-	for (device_t *child = device->first_subdevice(); child != NULL; child = child->next())
+	for (device_t *child = device->subdevices().first(); child != NULL; child = child->next())
 	{
 		MAMEDeviceWrapper *const wrap = [[MAMEDeviceWrapper alloc] initWithMachine:*machine 
 																			device:*child];

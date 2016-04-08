@@ -1226,21 +1226,21 @@ bool renderer_bgfx::check_for_dirty_atlas()
 	bool atlas_dirty = false;
 
 	std::map<UINT32, rectangle_packer::packable_rectangle> acquired_infos;
-	for (render_primitive *prim = window().m_primlist->first(); prim != nullptr; prim = prim->next())
+	for (render_primitive &prim : *window().m_primlist)
 	{
-		bool pack = prim->packable(PACKABLE_SIZE);
-		if (prim->type == render_primitive::QUAD && prim->texture.base != nullptr && pack)
+		bool pack = prim.packable(PACKABLE_SIZE);
+		if (prim.type == render_primitive::QUAD && prim.texture.base != nullptr && pack)
 		{
-			const UINT32 hash = get_texture_hash(prim);
+			const UINT32 hash = get_texture_hash(&prim);
 			// If this texture is packable and not currently in the atlas, prepare the texture for putting in the atlas
 			if ((hash != 0 && m_hash_to_entry[hash].hash() == 0 && acquired_infos[hash].hash() == 0)
 				|| (hash != 0 && m_hash_to_entry[hash].hash() != hash && acquired_infos[hash].hash() == 0))
 			{   // Create create the texture and mark the atlas dirty
 				atlas_dirty = true;
 
-				m_texinfo.push_back(rectangle_packer::packable_rectangle(hash, prim->flags & PRIMFLAG_TEXFORMAT_MASK,
-					prim->texture.width, prim->texture.height,
-					prim->texture.rowpixels, prim->texture.palette, prim->texture.base));
+				m_texinfo.push_back(rectangle_packer::packable_rectangle(hash, prim.flags & PRIMFLAG_TEXFORMAT_MASK,
+					prim.texture.width, prim.texture.height,
+					prim.texture.rowpixels, prim.texture.palette, prim.texture.base));
 				acquired_infos[hash] = m_texinfo[m_texinfo.size() - 1];
 			}
 		}

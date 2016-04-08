@@ -189,47 +189,47 @@ void ui_menu_device_config::populate()
 		portlist.append(*iptdev, errors);
 
 	// check if the device adds inputs to the system
-	for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
-		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
+	for (ioport_port &port : portlist)
+		for (ioport_field &field : port.fields())
 		{
-			if (field->type() >= IPT_MAHJONG_FIRST && field->type() < IPT_MAHJONG_LAST)
+			if (field.type() >= IPT_MAHJONG_FIRST && field.type() < IPT_MAHJONG_LAST)
 				input_mj++;
-			else if (field->type() >= IPT_HANAFUDA_FIRST && field->type() < IPT_HANAFUDA_LAST)
+			else if (field.type() >= IPT_HANAFUDA_FIRST && field.type() < IPT_HANAFUDA_LAST)
 				input_hana++;
-			else if (field->type() >= IPT_GAMBLING_FIRST && field->type() < IPT_GAMBLING_LAST)
+			else if (field.type() >= IPT_GAMBLING_FIRST && field.type() < IPT_GAMBLING_LAST)
 				input_gamble++;
-			else if (field->type() >= IPT_ANALOG_FIRST && field->type() < IPT_ANALOG_LAST)
+			else if (field.type() >= IPT_ANALOG_FIRST && field.type() < IPT_ANALOG_LAST)
 				input_analog++;
-			else if (field->type() == IPT_ADJUSTER)
+			else if (field.type() == IPT_ADJUSTER)
 				input_adjust++;
-			else if (field->type() == IPT_KEYPAD)
+			else if (field.type() == IPT_KEYPAD)
 				input_keypad++;
-			else if (field->type() == IPT_KEYBOARD)
+			else if (field.type() == IPT_KEYBOARD)
 				input_keyboard++;
-			else if (field->type() >= IPT_START1 && field->type() < IPT_UI_FIRST)
+			else if (field.type() >= IPT_START1 && field.type() < IPT_UI_FIRST)
 				input++;
-			else if (field->type() == IPT_DIPSWITCH)
+			else if (field.type() == IPT_DIPSWITCH)
 			{
 				dips++;
-				dips_opt << "  " << field->name();
-				for (ioport_setting *setting = field->first_setting(); setting != nullptr; setting = setting->next())
+				dips_opt << "  " << field.name();
+				for (ioport_setting &setting : field.settings())
 				{
-					if (setting->value() == field->defvalue())
+					if (setting.value() == field.defvalue())
 					{
-						util::stream_format(dips_opt, "    [default: %s]\n", setting->name());
+						util::stream_format(dips_opt, "    [default: %s]\n", setting.name());
 						break;
 					}
 				}
 			}
-			else if (field->type() == IPT_CONFIG)
+			else if (field.type() == IPT_CONFIG)
 			{
 				confs++;
-				confs_opt << "  " << field->name();
-				for (ioport_setting *setting = field->first_setting(); setting != nullptr; setting = setting->next())
+				confs_opt << "  " << field.name();
+				for (ioport_setting &setting : field.settings())
 				{
-					if (setting->value() == field->defvalue())
+					if (setting.value() == field.defvalue())
 					{
-						util::stream_format(confs_opt, "    [default: %s]\n", setting->name());
+						util::stream_format(confs_opt, "    [default: %s]\n", setting.name());
 						break;
 					}
 				}
