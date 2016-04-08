@@ -26,20 +26,25 @@ function timer.startplugin()
 		return path
 	end
 
+	local function save()
+		total_time = total_time + (os.time() - start_time)
+		os.remove(get_filename()) -- truncate file
+		file = io.open(get_filename(), "w")
+		if not file then
+			lfs.mkdir(timer_path)
+			file = io.open(get_filename(), "w")
+		end
+		if file then
+			file:write(total_time)
+			file:close()
+		end
+	end
+
+
 	emu.register_start(function()
 		local file
 		if timer_started then
-			total_time = total_time + (os.time() - start_time)
-			os.remove(get_filename()) -- truncate file
-			file = io.open(get_filename(), "w")
-			if not file then
-				lfs.mkdir(timer_path)
-				file = io.open(get_filename(), "w")
-			end
-			if file then
-				file:write(total_time)
-				file:close()
-			end
+			save()
 		end
 		timer_started = true
 		local file = io.open(get_filename(), "r")
@@ -50,11 +55,17 @@ function timer.startplugin()
 		start_time = os.time()
 	end)
 
+	emu.register_stop(function() 
+		timer_started = false
+		save()
+		total_time = 0
+	end)
+
 	local function sectohms(time)
 		local hrs = math.floor(time / 3600)
 		local min = math.floor((time % 3600) / 60)
 		local sec = math.floor(time % 60)
-		return string.format("%02d:%02d:%02d", hrs, min, sec)
+		return string.format("%03d:%02d:%02d", hrs, min, sec)
 	end
 
 	local function menu_populate()
