@@ -11,6 +11,7 @@
 #include <algorithm>
 
 #include "solver/nld_solver.h"
+#include "solver/nld_matrix_solver.h"
 #include "solver/vector_base.h"
 
 /* Disabling dynamic allocation gives a ~10% boost in performance
@@ -133,7 +134,7 @@ protected:
 	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
 	int solve_non_dynamic(const bool newton_raphson);
 
-	inline const unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
+	inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
 	void build_LE_A();
 	void build_LE_RHS();
@@ -574,7 +575,7 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 #else
 					vec_add_mult_scalar(kN-i-1,pj,f1,pi);
 					//for (unsigned k = i+1; k < kN; k++)
-					//  pj[k] = pj[k] + pi[k] * f1;
+					//	pj[k] = pj[k] + pi[k] * f1;
 					//for (unsigned k = i+1; k < kN; k++)
 						//A(j,k) += A(i,k) * f1;
 					RHS(j) += RHS(i) * f1;

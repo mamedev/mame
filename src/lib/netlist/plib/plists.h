@@ -126,7 +126,7 @@ public:
 
 	int indexof(const _ListClass &elem) const
 	{
-		for (int i = 0; i < this->size(); i++)
+		for (unsigned i = 0; i < this->size(); i++)
 		{
 			if (this->at(i) == elem)
 				return i;

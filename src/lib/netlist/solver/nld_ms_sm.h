@@ -13,9 +13,9 @@
  * In this specific implementation, u is a unit vector specifying the row which
  * changed. Thus v contains the changed column.
  *
- * Than z = A????? u ,  w = transpose(A?????) v , lambda = v z
+ * Than z = A⁻¹ u ,  w = transpose(A⁻¹) v , lambda = v z
  *
- * A????? <- 1.0 / (1.0 + lambda) * (z x w)
+ * A⁻¹ <- 1.0 / (1.0 + lambda) * (z x w)
  *
  * The approach is iterative and applied for each row changed.
  *
@@ -36,6 +36,7 @@
 #include <algorithm>
 
 #include "solver/nld_solver.h"
+#include "solver/nld_matrix_solver.h"
 #include "solver/vector_base.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
@@ -62,7 +63,7 @@ protected:
 	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
 	int solve_non_dynamic(const bool newton_raphson);
 
-	inline const unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
+	inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
 	void build_LE_A();
 	void build_LE_RHS();
@@ -454,14 +455,14 @@ void matrix_solver_sm_t<m_N, _storage_N>::LE_compute_x(
 {
 	const unsigned kN = N();
 
-	for (int i=0; i<kN; i++)
+	for (unsigned i=0; i<kN; i++)
 		x[i] = 0.0;
 
-	for (int k=0; k<kN; k++)
+	for (unsigned k=0; k<kN; k++)
 	{
 		const nl_double f = RHS(k);
 
-		for (int i=0; i<kN; i++)
+		for (unsigned i=0; i<kN; i++)
 			x[i] += Ainv(i,k) * f;
 	}
 }
@@ -512,13 +513,13 @@ int matrix_solver_sm_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const boo
 	}
 	else
 	{
-		if (!incremental)
+		if (not incremental)
 		{
-			for (int row = 0; row < iN; row ++)
-				for (int k = 0; k < iN; k++)
+			for (unsigned row = 0; row < iN; row ++)
+				for (unsigned k = 0; k < iN; k++)
 					Ainv(row,k) = lAinv(row, k);
 		}
-		for (int row = 0; row < iN; row ++)
+		for (unsigned row = 0; row < iN; row ++)
 		{
 			nl_double v[m_pitch] = {0};
 			unsigned cols[m_pitch];
@@ -555,11 +556,11 @@ int matrix_solver_sm_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const boo
 				}
 
 				lamba = -1.0 / (1.0 + lamba);
-				for (int i=0; i<iN; i++)
+				for (unsigned i=0; i<iN; i++)
 				{
 					const nl_double f = lamba * z[i];
 					if (f != 0.0)
-						for (int k = 0; k < iN; k++)
+						for (unsigned k = 0; k < iN; k++)
 							Ainv(i,k) += f * w[k];
 				}
 			}
