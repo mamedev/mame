@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles,Olivier Galibert
 /***************************************************************************
 
-    memory.c
+    emumem.c
 
     Functions which handle device memory access.
 

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles,Olivier Galibert
 /***************************************************************************
 
-    memory.h
+    emumem.h
 
     Functions which handle device memory accesses.
 
@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __MEMORY_H__
-#define __MEMORY_H__
+#ifndef __EMUMEM_H__
+#define __EMUMEM_H__
 
 
 
@@ -941,4 +941,4 @@ inline UINT64 direct_read_data::read_qword(offs_t byteaddress, offs_t directxor)
 	return m_space.read_qword(byteaddress);
 }
 
-#endif  /* __MEMORY_H__ */
+#endif  /* __EMUMEM_H__ */
