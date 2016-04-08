@@ -2452,6 +2452,8 @@ if (BUSES["VTECH_MEMEXP"]~=null) then
 		MAME_DIR .. "src/devices/bus/vtech/memexp/memory.h",
 		MAME_DIR .. "src/devices/bus/vtech/memexp/rs232.cpp",
 		MAME_DIR .. "src/devices/bus/vtech/memexp/rs232.h",
+		MAME_DIR .. "src/devices/bus/vtech/memexp/rtty.cpp",
+		MAME_DIR .. "src/devices/bus/vtech/memexp/rtty.h",
 		MAME_DIR .. "src/devices/bus/vtech/memexp/wordpro.cpp",
 		MAME_DIR .. "src/devices/bus/vtech/memexp/wordpro.h",
 	}
