@@ -11,6 +11,7 @@
 #ifndef __DEBUGCON_H__
 #define __DEBUGCON_H__
 
+#include "emu.h"
 #include "textbuf.h"
 
 
