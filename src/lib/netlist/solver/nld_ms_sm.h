@@ -513,7 +513,7 @@ int matrix_solver_sm_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const boo
 	}
 	else
 	{
-		if (not incremental)
+		if (!incremental)
 		{
 			for (unsigned row = 0; row < iN; row ++)
 				for (unsigned k = 0; k < iN; k++)
