@@ -14,6 +14,7 @@
 #define __CHDCODEC_H__
 
 #include "osdcore.h"
+#include "coretmpl.h"
 
 
 #define CHDCODEC_VERIFY_COMPRESSION 0
