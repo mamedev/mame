@@ -158,10 +158,14 @@ function cheat.startplugin()
 			script = load(script, cheat.desc .. name, "t", cheat.cheat_env)
 			if not script then
 				print("error loading cheat script: " .. cheat.desc)
-				cheat = nil
+				cheat = { desc = cheat.desc .. "error" }
 				return
 			end
 			cheat.script[name] = script
+		end
+		-- initialize temp[0-9] for backward compatbility reasons
+		for i = 0, 9 do
+			cheat.cheat_env["temp" .. i] = 0
 		end
 		if cheat.space then
 			for name, space in pairs(cheat.space) do
@@ -169,7 +173,7 @@ function cheat.startplugin()
 				cpu = manager:machine().devices[space.tag]
 				if not cpu then
 					print("error loading cheat script: " .. cheat.desc)
-					cheat = nil
+					cheat = { desc = cheat.desc .. "error" }
 					return
 				end
 				if space.type then
@@ -179,7 +183,7 @@ function cheat.startplugin()
 				end
 				if not mem then
 					print("error loading cheat script: " .. cheat.desc)
-					cheat = nil
+					cheat = { desc = cheat.desc .. "error" }
 					return
 				end
 				cheat.cheat_env[name] = mem
