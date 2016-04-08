@@ -289,9 +289,9 @@ void sm510_base_device::op_add11()
 
 void sm510_base_device::op_adx()
 {
-	// ADX x: add immediate value to ACC, skip next on carry
+	// ADX x: add immediate value to ACC, skip next on carry except if x = 10
 	m_acc += (m_op & 0xf);
-	m_skip = ((m_acc & 0x10) != 0);
+	m_skip = ((m_op & 0xf) != 10 && (m_acc & 0x10) != 0);
 	m_acc &= 0xf;
 }
 
