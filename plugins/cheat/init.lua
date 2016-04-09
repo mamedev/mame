@@ -260,17 +260,17 @@ function cheat.startplugin()
 						menu[num][1] = "---"
 					end
 					menu[num][2] = ""
-					menu[num][3] = 32 -- MENU_FLAG_DISABLE
+					menu[num][3] = "off"
 				elseif not cheat.script.run and not cheat.script.off then
 					menu[num][2] = "Set"
 					menu[num][3] = 0
 				else
 					if cheat.enabled then
 						menu[num][2] = "On"
-						menu[num][3] = 1 -- MENU_FLAG_LEFT_ARROW
+						menu[num][3] = "l"
 					else
 						menu[num][2] = "Off"
-						menu[num][3] = 2 -- MENU_FLAG_RIGHT_ARROW
+						menu[num][3] = "r"
 					end
 				end
 			else
@@ -280,16 +280,16 @@ function cheat.startplugin()
 					else
 						menu[num][2] = "Off"
 					end
-					menu[num][3] = 2
+					menu[num][3] = "r"
 				else
 					if cheat.parameter.item then
 						menu[num][2] = cheat.parameter.item[cheat.parameter.index].text
 					else
 						menu[num][2] = cheat.parameter.value
 					end
-					menu[num][3] = 1
+					menu[num][3] = "l"
 					if cheat.parameter.index < cheat.parameter.last then
-						menu[num][3] = 3
+						menu[num][3] = "lr"
 					end
 				end
 			end

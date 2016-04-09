@@ -139,38 +139,38 @@ function cheatfind.startplugin()
 		if #devtable == 1 then
 			menu[1][3] = 0
 		elseif devsel == 1 then
-			menu[1][3] = 2
+			menu[1][3] = "r"
 		elseif devsel == #devtable then
-			menu[1][3] = 1
+			menu[1][3] = "l"
 		else
-			menu[1][3] = 3
+			menu[1][3] = "lr"
 		end
 		menu[2] = { "Init", "", 0 }
 		if next(menu_blocks) then
-			menu[3] = { "---", "", 32 }
+			menu[3] = { "---", "", "off" }
 			menu[4] = {}
 			menu[4][1] = "Operator"
 			menu[4][2] = optable[opsel]
 			if opsel == 1 then
-				menu[4][3] = 2
+				menu[4][3] = "r"
 			elseif opsel == #optable then
-				menu[4][3] = 1
+				menu[4][3] = "l"
 			else
-				menu[4][3] = 3
+				menu[4][3] = "lr"
 			end
 			menu[5] = {}
 			menu[5][1] = "Change"
 			menu[5][2] = change
 			if change == 0 then
 				menu[5][2] = "Any"
-				menu[5][3] = 2
+				menu[5][3] = "r"
 			elseif change == 100 then --?
-				menu[5][3] = 1
+				menu[5][3] = "l"
 			else
-				menu[5][3] = 3
+				menu[5][3] = "lr"
 			end
 			menu[6] = { "Compare", "", 0 }
-			menu[7] = { "---", "", 32 }
+			menu[7] = { "---", "", "off" }
 			for num, list in ipairs(matches) do
 				for num2, match in ipairs(list) do
 					if #menu > 50 then
