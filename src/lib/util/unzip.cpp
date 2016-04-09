@@ -11,6 +11,7 @@
 #include "unzip.h"
 
 #include "corestr.h"
+#include "hashing.h"
 #include "osdcore.h"
 
 
@@ -283,6 +284,10 @@ protected:
 	{
 		return std::string(reinterpret_cast<char const *>(m_buffer + offs), len);
 	}
+	void read_string(std::string &result, std::size_t offs, std::string::size_type len) const
+	{
+		result.assign(reinterpret_cast<char const *>(m_buffer + offs), len);
+	}
 
 	std::uint8_t const *m_buffer;
 };
@@ -311,7 +316,7 @@ private:
 class zip64_ext_info_reader : private reader_base
 {
 public:
-	zip64_ext_info_reader(void const *buf) : reader_base(buf) { }
+	zip64_ext_info_reader(extra_field_reader const &field) : reader_base(field.data()) { }
 
 	std::uint64_t   uncompressed_size() const   { return read_qword(0x00); }
 	std::uint64_t   compressed_size() const     { return read_qword(0x08); }
@@ -323,25 +328,44 @@ public:
 };
 
 
+class utf8_path_reader : private reader_base
+{
+public:
+	utf8_path_reader(extra_field_reader const &field) : reader_base(field.data()), m_length(field.data_size()) { }
+
+	std::uint8_t    version() const                         { return m_buffer[0]; }
+	std::uint32_t   name_crc32() const                      { return read_dword(0x01); }
+	std::string     unicode_name() const                    { return read_string(0x05, m_length - 0x05); }
+	void            unicode_name(std::string &result) const { return read_string(result, 0x05, m_length - 0x05); }
+
+	std::size_t total_length() const { return m_length; }
+	static std::size_t minimum_length() { return 0x05; }
+
+private:
+	std::size_t m_length;
+};
+
+
 class local_file_header_reader : private reader_base
 {
 public:
 	local_file_header_reader(void const *buf) : reader_base(buf) { }
 
-	std::uint32_t       signature() const           { return read_dword(0x00); }
-	std::uint8_t        version_needed() const      { return m_buffer[0x04]; }
-	std::uint8_t        os_needed() const           { return m_buffer[0x05]; }
-	std::uint16_t       general_flag() const        { return read_word(0x06); }
-	std::uint16_t       compression_method() const  { return read_word(0x08); }
-	std::uint16_t       modified_time() const       { return read_word(0x0a); }
-	std::uint16_t       modified_date() const       { return read_word(0x0c); }
-	std::uint32_t       crc32() const               { return read_dword(0x0e); }
-	std::uint32_t       compressed_size() const     { return read_dword(0x12); }
-	std::uint32_t       uncompressed_size() const   { return read_dword(0x16); }
-	std::uint16_t       file_name_length() const    { return read_word(0x1a); }
-	std::uint16_t       extra_field_length() const  { return read_word(0x1c); }
-	std::string         file_name() const           { return read_string(0x1e, file_name_length()); }
-	extra_field_reader  extra_field() const         { return extra_field_reader(m_buffer + 0x1e + file_name_length(), extra_field_length()); }
+	std::uint32_t       signature() const                       { return read_dword(0x00); }
+	std::uint8_t        version_needed() const                  { return m_buffer[0x04]; }
+	std::uint8_t        os_needed() const                       { return m_buffer[0x05]; }
+	std::uint16_t       general_flag() const                    { return read_word(0x06); }
+	std::uint16_t       compression_method() const              { return read_word(0x08); }
+	std::uint16_t       modified_time() const                   { return read_word(0x0a); }
+	std::uint16_t       modified_date() const                   { return read_word(0x0c); }
+	std::uint32_t       crc32() const                           { return read_dword(0x0e); }
+	std::uint32_t       compressed_size() const                 { return read_dword(0x12); }
+	std::uint32_t       uncompressed_size() const               { return read_dword(0x16); }
+	std::uint16_t       file_name_length() const                { return read_word(0x1a); }
+	std::uint16_t       extra_field_length() const              { return read_word(0x1c); }
+	std::string         file_name() const                       { return read_string(0x1e, file_name_length()); }
+	void                file_name(std::string &result) const    { read_string(result, 0x1e, file_name_length()); }
+	extra_field_reader  extra_field() const                     { return extra_field_reader(m_buffer + 0x1e + file_name_length(), extra_field_length()); }
 
 	bool        signature_correct() const       { return signature() == 0x04034b50; }
 
@@ -349,6 +373,7 @@ public:
 	bool        implode_8k_dict() const         { return bool(general_flag() & 0x0002); }
 	bool        implode_3_trees() const         { return bool(general_flag() & 0x0004); }
 	unsigned    deflate_option() const          { return unsigned((general_flag() >> 1) & 0x0003); }
+	bool        lzma_eos_mark() const           { return bool(general_flag() & 0x0002); }
 	bool        use_descriptor() const          { return bool(general_flag() & 0x0008); }
 	bool        patch_data() const              { return bool(general_flag() & 0x0020); }
 	bool        strong_encryption() const       { return bool(general_flag() & 0x0040); }
@@ -365,40 +390,43 @@ class central_dir_entry_reader : private reader_base
 public:
 	central_dir_entry_reader(void const *buf) : reader_base(buf) { }
 
-	std::uint32_t       signature() const           { return read_dword(0x00); }
-	std::uint8_t        version_created() const     { return m_buffer[0x04]; }
-	std::uint8_t        os_created() const          { return m_buffer[0x05]; }
-	std::uint8_t        version_needed() const      { return m_buffer[0x06]; }
-	std::uint8_t        os_needed() const           { return m_buffer[0x07]; }
-	std::uint16_t       general_flag() const        { return read_word(0x08); }
-	std::uint16_t       compression_method() const  { return read_word(0x0a); }
-	std::uint16_t       modified_time() const       { return read_word(0x0c); }
-	std::uint16_t       modified_date() const       { return read_word(0x0e); }
-	std::uint32_t       crc32() const               { return read_dword(0x10); }
-	std::uint32_t       compressed_size() const     { return read_dword(0x14); }
-	std::uint32_t       uncompressed_size() const   { return read_dword(0x18); }
-	std::uint16_t       file_name_length() const    { return read_word(0x1c); }
-	std::uint16_t       extra_field_length() const  { return read_word(0x1e); }
-	std::uint16_t       file_comment_length() const { return read_word(0x20); }
-	std::uint16_t       start_disk() const          { return read_word(0x22); }
-	std::uint16_t       int_file_attr() const       { return read_word(0x24); }
-	std::uint32_t       ext_file_attr() const       { return read_dword(0x26); }
-	std::uint32_t       header_offset() const       { return read_dword(0x2a); }
-	std::string         file_name() const           { return read_string(0x2e, file_name_length()); }
-	extra_field_reader  extra_field() const         { return extra_field_reader(m_buffer + 0x2e + file_name_length(), extra_field_length()); }
-	std::string         file_comment() const        { return read_string(0x2e + file_name_length() + extra_field_length(), file_comment_length()); }
+	std::uint32_t       signature() const                       { return read_dword(0x00); }
+	std::uint8_t        version_created() const                 { return m_buffer[0x04]; }
+	std::uint8_t        os_created() const                      { return m_buffer[0x05]; }
+	std::uint8_t        version_needed() const                  { return m_buffer[0x06]; }
+	std::uint8_t        os_needed() const                       { return m_buffer[0x07]; }
+	std::uint16_t       general_flag() const                    { return read_word(0x08); }
+	std::uint16_t       compression_method() const              { return read_word(0x0a); }
+	std::uint16_t       modified_time() const                   { return read_word(0x0c); }
+	std::uint16_t       modified_date() const                   { return read_word(0x0e); }
+	std::uint32_t       crc32() const                           { return read_dword(0x10); }
+	std::uint32_t       compressed_size() const                 { return read_dword(0x14); }
+	std::uint32_t       uncompressed_size() const               { return read_dword(0x18); }
+	std::uint16_t       file_name_length() const                { return read_word(0x1c); }
+	std::uint16_t       extra_field_length() const              { return read_word(0x1e); }
+	std::uint16_t       file_comment_length() const             { return read_word(0x20); }
+	std::uint16_t       start_disk() const                      { return read_word(0x22); }
+	std::uint16_t       int_file_attr() const                   { return read_word(0x24); }
+	std::uint32_t       ext_file_attr() const                   { return read_dword(0x26); }
+	std::uint32_t       header_offset() const                   { return read_dword(0x2a); }
+	std::string         file_name() const                       { return read_string(0x2e, file_name_length()); }
+	void                file_name(std::string &result) const    { read_string(result, 0x2e, file_name_length()); }
+	extra_field_reader  extra_field() const                     { return extra_field_reader(m_buffer + 0x2e + file_name_length(), extra_field_length()); }
+	std::string         file_comment() const                    { return read_string(0x2e + file_name_length() + extra_field_length(), file_comment_length()); }
+	void                file_comment(std::string &result) const { read_string(result, 0x2e + file_name_length() + extra_field_length(), file_comment_length()); }
 
-	bool            signature_correct() const   { return signature() == 0x02014b50; }
+	bool                signature_correct() const               { return signature() == 0x02014b50; }
 
-	bool        encrypted() const               { return bool(general_flag() & 0x0001); }
-	bool        implode_8k_dict() const         { return bool(general_flag() & 0x0002); }
-	bool        implode_3_trees() const         { return bool(general_flag() & 0x0004); }
-	unsigned    deflate_option() const          { return unsigned((general_flag() >> 1) & 0x0003); }
-	bool        use_descriptor() const          { return bool(general_flag() & 0x0008); }
-	bool        patch_data() const              { return bool(general_flag() & 0x0020); }
-	bool        strong_encryption() const       { return bool(general_flag() & 0x0040); }
-	bool        utf8_encoding() const           { return bool(general_flag() & 0x0800); }
-	bool        directory_encryption() const    { return bool(general_flag() & 0x2000); }
+	bool                encrypted() const                       { return bool(general_flag() & 0x0001); }
+	bool                implode_8k_dict() const                 { return bool(general_flag() & 0x0002); }
+	bool                implode_3_trees() const                 { return bool(general_flag() & 0x0004); }
+	unsigned            deflate_option() const                  { return unsigned((general_flag() >> 1) & 0x0003); }
+	bool                lzma_eos_mark() const                   { return bool(general_flag() & 0x0002); }
+	bool                use_descriptor() const                  { return bool(general_flag() & 0x0008); }
+	bool                patch_data() const                      { return bool(general_flag() & 0x0020); }
+	bool                strong_encryption() const               { return bool(general_flag() & 0x0040); }
+	bool                utf8_encoding() const                   { return bool(general_flag() & 0x0800); }
+	bool                directory_encryption() const            { return bool(general_flag() & 0x2000); }
 
 	std::size_t total_length() const { return minimum_length() + file_name_length() + extra_field_length() + file_comment_length(); }
 	static std::size_t minimum_length() { return 0x2e; }
@@ -453,17 +481,18 @@ class ecd_reader : private reader_base
 public:
 	ecd_reader(void const *buf) : reader_base(buf) { }
 
-	std::uint32_t   signature() const           { return read_dword(0x00); }
-	std::uint16_t   this_disk_no() const        { return read_word(0x04); }
-	std::uint16_t   dir_start_disk() const      { return read_word(0x06); }
-	std::uint16_t   dir_disk_entries() const    { return read_word(0x08); }
-	std::uint16_t   dir_total_entries() const   { return read_word(0x0a); }
-	std::uint32_t   dir_size() const            { return read_dword(0x0c); }
-	std::uint32_t   dir_offset() const          { return read_dword(0x10); }
-	std::uint16_t   comment_length() const      { return read_word(0x14); }
-	std::string     comment() const             { return read_string(0x16, comment_length()); }
+	std::uint32_t   signature() const                   { return read_dword(0x00); }
+	std::uint16_t   this_disk_no() const                { return read_word(0x04); }
+	std::uint16_t   dir_start_disk() const              { return read_word(0x06); }
+	std::uint16_t   dir_disk_entries() const            { return read_word(0x08); }
+	std::uint16_t   dir_total_entries() const           { return read_word(0x0a); }
+	std::uint32_t   dir_size() const                    { return read_dword(0x0c); }
+	std::uint32_t   dir_offset() const                  { return read_dword(0x10); }
+	std::uint16_t   comment_length() const              { return read_word(0x14); }
+	std::string     comment() const                     { return read_string(0x16, comment_length()); }
+	void            comment(std::string &result) const  { read_string(result, 0x16, comment_length()); }
 
-	bool            signature_correct() const   { return signature() == 0x06054b50; }
+	bool            signature_correct() const           { return signature() == 0x06054b50; }
 
 	std::size_t total_length() const { return minimum_length() + comment_length(); }
 	static std::size_t minimum_length() { return 0x16; }
@@ -524,13 +553,8 @@ void zip_file_impl::close(ptr &&zip)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    zip_file_first_entry - return the first entry
-    in the ZIP
--------------------------------------------------*/
-
-/*-------------------------------------------------
-    zip_file_next_entry - return the next entry
-    in the ZIP
+    zip_file_search - return the next matching
+    entry in the ZIP
 -------------------------------------------------*/
 
 int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_filename, bool matchcrc, bool matchname, bool partialpath)
@@ -555,27 +579,44 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 		m_header.start_disk_number   = reader.start_disk();
 		m_header.local_header_offset = reader.header_offset();
 
-		// look for ZIP64 extended info
+		// advance the position
+		m_cd_pos += reader.total_length();
+
+		// copy the filename
+		bool is_utf8(reader.utf8_encoding());
+		reader.file_name(filename);
+
+		// walk the extra data
 		for (auto extra = reader.extra_field(); extra.length_sufficient(); extra = extra.next())
 		{
+			// look for ZIP64 extended info
 			if ((extra.header_id() == 0x0001) && (extra.data_size() >= zip64_ext_info_reader::minimum_length()))
 			{
-				zip64_ext_info_reader const ext64(extra.data());
+				zip64_ext_info_reader const ext64(extra);
 				if (extra.data_size() >= ext64.total_length())
 				{
 					m_header.compressed_length   = ext64.compressed_size();
 					m_header.uncompressed_length = ext64.uncompressed_size();
 					m_header.start_disk_number   = ext64.start_disk();
-					break;
+				}
+			}
+
+			// look for Info-ZIP UTF-8 path
+			if (!is_utf8 && (extra.header_id() == 0x7075) && (extra.data_size() >= utf8_path_reader::minimum_length()))
+			{
+				utf8_path_reader const utf8path(extra);
+				auto const crc(crc32_creator::simple(m_filename.empty() ? nullptr : &filename[0], filename.length() * sizeof(filename[0])));
+				if (utf8path.name_crc32() == crc.m_raw)
+				{
+					utf8path.unicode_name(filename);
+					is_utf8 = true;
 				}
 			}
 		}
 
-		// advance the position
-		m_cd_pos += reader.total_length();
+		// FIXME: if (!is_utf8) convert filename to UTF8 (assume CP437 or something)
 
-		// copy the filename filename
-		filename = reader.file_name();
+		// chop off trailing slash for directory entries
 		bool const is_dir((filename.length() > 0) && (filename[filename.length() - 1] == '/'));
 		if (is_dir) filename.resize(filename.length() - 1);
 
@@ -603,18 +644,6 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
     zip_file_decompress - decompress a file
     from a ZIP into the target buffer
 -------------------------------------------------*/
-
-/**
- * @fn  zip_error zip_file_decompress(zip_file *zip, void *buffer, UINT32 length)
- *
- * @brief   Zip file decompress.
- *
- * @param [in,out]  zip     If non-null, the zip.
- * @param [in,out]  buffer  If non-null, the buffer.
- * @param   length          The length.
- *
- * @return  A zip_error.
- */
 
 archive_file::error zip_file_impl::decompress(void *buffer, std::uint32_t length)
 {
@@ -661,16 +690,6 @@ archive_file::error zip_file_impl::decompress(void *buffer, std::uint32_t length
 /*-------------------------------------------------
     read_ecd - read the ECD data
 -------------------------------------------------*/
-
-/**
- * @fn  static zip_error read_ecd(zip_file *zip)
- *
- * @brief   Reads an ecd.
- *
- * @param [in,out]  zip If non-null, the zip.
- *
- * @return  The ecd.
- */
 
 archive_file::error zip_file_impl::read_ecd()
 {
@@ -784,17 +803,6 @@ archive_file::error zip_file_impl::read_ecd()
     offset of the compressed data
 -------------------------------------------------*/
 
-/**
- * @fn  static zip_error get_compressed_data_offset(zip_file *zip, UINT64 *offset)
- *
- * @brief   Gets compressed data offset.
- *
- * @param [in,out]  zip     If non-null, the zip.
- * @param [in,out]  offset  If non-null, the offset.
- *
- * @return  The compressed data offset.
- */
-
 archive_file::error zip_file_impl::get_compressed_data_offset(std::uint64_t &offset)
 {
 	// don't support a number of features
@@ -839,19 +847,6 @@ archive_file::error zip_file_impl::get_compressed_data_offset(std::uint64_t &off
     type 0 data (which is uncompressed)
 -------------------------------------------------*/
 
-/**
- * @fn  static zip_error decompress_data_type_0(zip_file *zip, UINT64 offset, void *buffer, UINT32 length)
- *
- * @brief   Decompress the data type 0.
- *
- * @param [in,out]  zip     If non-null, the zip.
- * @param   offset          The offset.
- * @param [in,out]  buffer  If non-null, the buffer.
- * @param   length          The length.
- *
- * @return  A zip_error.
- */
-
 archive_file::error zip_file_impl::decompress_data_type_0(std::uint64_t offset, void *buffer, std::uint32_t length)
 {
 	std::uint32_t read_length;
@@ -872,28 +867,18 @@ archive_file::error zip_file_impl::decompress_data_type_0(std::uint64_t offset, 
     type 8 data (which is deflated)
 -------------------------------------------------*/
 
-/**
- * @fn  static zip_error decompress_data_type_8(zip_file *zip, UINT64 offset, void *buffer, UINT32 length)
- *
- * @brief   Decompress the data type 8.
- *
- * @param [in,out]  zip     If non-null, the zip.
- * @param   offset          The offset.
- * @param [in,out]  buffer  If non-null, the buffer.
- * @param   length          The length.
- *
- * @return  A zip_error.
- */
-
 archive_file::error zip_file_impl::decompress_data_type_8(std::uint64_t offset, void *buffer, std::uint32_t length)
 {
-	std::uint32_t input_remaining = m_header.compressed_length;
+	std::uint64_t input_remaining = m_header.compressed_length;
 	int zerr;
 
-	/* reset the stream */
+	// reset the stream
 	z_stream stream;
-	memset(&stream, 0, sizeof(stream));
-	stream.next_out = (Bytef *)buffer;
+	stream.zalloc = Z_NULL;
+	stream.zfree = Z_NULL;
+	stream.opaque = Z_NULL;
+	stream.avail_in = 0;
+	stream.next_out = reinterpret_cast<Bytef *>(buffer);
 	stream.avail_out = length;
 
 	// initialize the decompressor
@@ -906,7 +891,11 @@ archive_file::error zip_file_impl::decompress_data_type_8(std::uint64_t offset, 
 	{
 		// read in the next chunk of data
 		std::uint32_t read_length;
-		auto const filerr = m_file->read(&m_buffer[0], offset, (std::min<std::uint32_t>)(input_remaining, m_buffer.size()), read_length);
+		auto const filerr = m_file->read(
+				&m_buffer[0],
+				offset,
+				std::uint32_t((std::min<std::uint64_t>)(input_remaining, m_buffer.size())),
+				read_length);
 		if (filerr != osd_file::error::NONE)
 		{
 			inflateEnd(&stream);
@@ -915,7 +904,7 @@ archive_file::error zip_file_impl::decompress_data_type_8(std::uint64_t offset, 
 		offset += read_length;
 
 		// if we read nothing, but still have data left, the file is truncated
-		if (read_length == 0 && input_remaining > 0)
+		if ((read_length == 0) && (input_remaining > 0))
 		{
 			inflateEnd(&stream);
 			return archive_file::error::FILE_TRUNCATED;
