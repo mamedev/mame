@@ -10,7 +10,7 @@
 //============================================================
 
 #include "emu.h"
-#include "window.h"
+#include "modules/osdwindow.h"
 #include "osdcore.h"
 
 #include <rapidjson/document.h>

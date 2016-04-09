@@ -17,7 +17,7 @@
 #include "targetmanager.h"
 #include "target.h"
 #include "vertex.h"
-#include "window.h"
+#include "modules/osdwindow.h"
 
 #include "chain.h"
 
