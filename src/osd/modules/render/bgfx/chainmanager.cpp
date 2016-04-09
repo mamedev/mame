@@ -9,9 +9,21 @@
 //
 //============================================================
 
+// TODO: RH 10 Apr. 2016 12:43 - hire assassin to deal with team member who made this #include chicanery necessary
+#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
+// standard windows headers
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#if defined(SDLMAME_WIN32)
+#include <SDL2/SDL_syswm.h>
+#endif
+#else
+#include "sdlinc.h"
+#endif
+
 #include "emu.h"
-#include "modules/osdwindow.h"
 #include "osdcore.h"
+#include "modules/osdwindow.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
