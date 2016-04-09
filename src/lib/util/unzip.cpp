@@ -26,6 +26,8 @@
 
 #include <zlib.h>
 
+#include "lzma/C/LzmaDec.h"
+
 
 namespace util {
 namespace {
@@ -165,6 +167,7 @@ private:
 	// decompression interfaces
 	archive_file::error decompress_data_type_0(std::uint64_t offset, void *buffer, std::uint32_t length);
 	archive_file::error decompress_data_type_8(std::uint64_t offset, void *buffer, std::uint32_t length);
+	archive_file::error decompress_data_type_14(std::uint64_t offset, void *buffer, std::uint32_t length);
 
 	struct file_header
 	{
@@ -674,6 +677,10 @@ archive_file::error zip_file_impl::decompress(void *buffer, std::uint32_t length
 		ziperr = decompress_data_type_8(offset, buffer, length);
 		break;
 
+	case 14:
+		ziperr = decompress_data_type_14(offset, buffer, length);
+		break;
+
 	default:
 		ziperr = archive_file::error::UNSUPPORTED;
 		break;
@@ -935,11 +942,137 @@ archive_file::error zip_file_impl::decompress_data_type_8(std::uint64_t offset, 
 	if (zerr != Z_OK)
 		return archive_file::error::DECOMPRESS_ERROR;
 
-	/* if anything looks funny, report an error */
-	if (stream.avail_out > 0 || input_remaining > 0)
+	// if anything looks funny, report an error
+	if ((stream.avail_out > 0) || (input_remaining > 0))
 		return archive_file::error::DECOMPRESS_ERROR;
 
 	return archive_file::error::NONE;
+}
+
+
+/*-------------------------------------------------
+    decompress_data_type_14 - decompress
+    type 14 data (LZMA)
+-------------------------------------------------*/
+
+archive_file::error zip_file_impl::decompress_data_type_14(std::uint64_t offset, void *buffer, std::uint32_t length)
+{
+	// two-byte version
+	// two-byte properties size (little-endian)
+	// properties
+	// compressed data
+
+	assert(4 <= m_buffer.size());
+	assert(LZMA_PROPS_SIZE <= m_buffer.size());
+
+	Byte *const output(reinterpret_cast<Byte *>(buffer));
+	SizeT output_remaining(length);
+	std::uint64_t input_remaining(m_header.compressed_length);
+
+	std::uint32_t read_length;
+	osd_file::error filerr;
+	SRes lzerr;
+	ELzmaStatus lzstatus;
+
+	// reset the stream
+	ISzAlloc alloc_imp;
+	alloc_imp.Alloc = [](void *p, std::size_t size) -> void * { return (size == 0) ? nullptr : std::malloc(size); };
+	alloc_imp.Free = [](void *p, void *address) -> void { std::free(address); };
+	CLzmaDec stream;
+	LzmaDec_Construct(&stream);
+
+	// need to read LZMA properties before we can initialise the decompressor
+	if (4 > input_remaining)
+		return archive_file::error::DECOMPRESS_ERROR;
+	filerr = m_file->read(&m_buffer[0], offset, 4, read_length);
+	if (filerr != osd_file::error::NONE)
+		return archive_file::error::FILE_ERROR;
+	offset += read_length;
+	input_remaining -= read_length;
+	if (4 != read_length)
+		return archive_file::error::FILE_TRUNCATED;
+	std::uint16_t const props_size((std::uint16_t(m_buffer[3]) << 8) | std::uint16_t(m_buffer[2]));
+	if (props_size > m_buffer.size())
+		return archive_file::error::UNSUPPORTED;
+	else if (props_size > input_remaining)
+		return archive_file::error::DECOMPRESS_ERROR;
+	filerr = m_file->read(&m_buffer[0], offset, props_size, read_length);
+	if (filerr != osd_file::error::NONE)
+		return archive_file::error::FILE_ERROR;
+	offset += read_length;
+	input_remaining -= read_length;
+	if (props_size != read_length)
+		return archive_file::error::FILE_TRUNCATED;
+
+	printf("Read %ld (%ld)\n", long(read_length), long(input_remaining));
+
+	// initialize the decompressor
+	lzerr = LzmaDec_Allocate(&stream, &m_buffer[0], props_size, &alloc_imp);
+	if (SZ_ERROR_MEM == lzerr)
+	{
+		printf("Allocation error\n");
+		return archive_file::error::OUT_OF_MEMORY;
+	}
+	else if (SZ_OK != lzerr)
+	{
+		printf("Properties error\n");
+		return archive_file::error::DECOMPRESS_ERROR;
+	}
+	LzmaDec_Init(&stream);
+
+	// loop until we're done
+	while (0 < input_remaining)
+	{
+		// read in the next chunk of data
+		filerr = m_file->read(
+				&m_buffer[0],
+				offset,
+				std::uint32_t((std::min<std::uint64_t>)(input_remaining, m_buffer.size())),
+				read_length);
+		if (filerr != osd_file::error::NONE)
+		{
+			LzmaDec_Free(&stream, &alloc_imp);
+			return archive_file::error::FILE_ERROR;
+		}
+		offset += read_length;
+		input_remaining -= read_length;
+
+		// if we read nothing, but still have data left, the file is truncated
+		if ((0 == read_length) && (0 < input_remaining))
+		{
+			LzmaDec_Free(&stream, &alloc_imp);
+			return archive_file::error::FILE_TRUNCATED;
+		}
+
+		// now decompress
+		SizeT len(read_length);
+		// FIXME: is the input length really an in/out parameter or not?
+		// At least on reaching the end of the input, the input length doesn't seem to get updated
+		lzerr = LzmaDec_DecodeToBuf(
+				&stream,
+				output + length - output_remaining,
+				&output_remaining,
+				reinterpret_cast<Byte const *>(&m_buffer[0]),
+				&len,
+				((0 == input_remaining) && (m_header.bit_flag & 0x0002)) ? LZMA_FINISH_END :  LZMA_FINISH_ANY,
+				&lzstatus);
+		if (SZ_OK != lzerr)
+		{
+			LzmaDec_Free(&stream, &alloc_imp);
+			return archive_file::error::DECOMPRESS_ERROR;
+		}
+	}
+
+	// finish decompression
+	LzmaDec_Free(&stream, &alloc_imp);
+
+	// if anything looks funny, report an error
+	if (LZMA_STATUS_FINISHED_WITH_MARK == lzstatus)
+		return archive_file::error::NONE;
+	else if ((LZMA_STATUS_MAYBE_FINISHED_WITHOUT_MARK != lzstatus) || (m_header.bit_flag & 0x0002))
+		return archive_file::error::DECOMPRESS_ERROR;
+	else
+		return archive_file::error::NONE;
 }
 
 } // anonymous namespace
