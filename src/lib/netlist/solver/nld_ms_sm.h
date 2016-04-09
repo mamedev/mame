@@ -369,15 +369,15 @@ void matrix_solver_sm_t<m_N, _storage_N>::build_LE_RHS()
 		nl_double rhsk_a = 0.0;
 		nl_double rhsk_b = 0.0;
 
-		const int terms_count = m_terms[k]->count();
+		const unsigned terms_count = m_terms[k]->count();
 		const nl_double * RESTRICT go = m_terms[k]->go();
 		const nl_double * RESTRICT Idr = m_terms[k]->Idr();
 		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->other_curanalog();
 
-		for (int i = 0; i < terms_count; i++)
+		for (unsigned i = 0; i < terms_count; i++)
 			rhsk_a = rhsk_a + Idr[i];
 
-		for (int i = m_terms[k]->m_railstart; i < terms_count; i++)
+		for (unsigned i = m_terms[k]->m_railstart; i < terms_count; i++)
 			//rhsk = rhsk + go[i] * terms[i]->m_otherterm->net().as_analog().Q_Analog();
 			rhsk_b = rhsk_b + go[i] * *other_cur_analog[i];
 

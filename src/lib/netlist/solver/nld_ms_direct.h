@@ -50,8 +50,7 @@ struct ti_t
 };
 
 static ti_t ti[MAXTHR];
-//static std::thread thr[MAXTHR];
-static std::thread thr[num_thr];
+static std::thread thr[MAXTHR];
 
 int thr_init = 0;
 
@@ -485,15 +484,15 @@ void matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS()
 		nl_double rhsk_a = 0.0;
 		nl_double rhsk_b = 0.0;
 
-		const int terms_count = m_terms[k]->count();
+		const unsigned terms_count = m_terms[k]->count();
 		const nl_double * RESTRICT go = m_terms[k]->go();
 		const nl_double * RESTRICT Idr = m_terms[k]->Idr();
 		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->other_curanalog();
 
-		for (int i = 0; i < terms_count; i++)
+		for (unsigned i = 0; i < terms_count; i++)
 			rhsk_a = rhsk_a + Idr[i];
 
-		for (int i = m_terms[k]->m_railstart; i < terms_count; i++)
+		for (unsigned i = m_terms[k]->m_railstart; i < terms_count; i++)
 			//rhsk = rhsk + go[i] * terms[i]->m_otherterm->net().as_analog().Q_Analog();
 			rhsk_b = rhsk_b + go[i] * *other_cur_analog[i];
 
@@ -587,9 +586,9 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 		{
 #if TEST_PARALLEL
 			const unsigned eb = m_terms[i]->m_nzbd.size();
-			if (eb > 16)
+			if (eb > 0)
 			{
-				printf("here %d\n", eb);
+				//printf("here %d\n", eb);
 				unsigned chunks = (eb) / (num_thr + 1);
 				for (int p=0; p < num_thr + 1; p++)
 				{
@@ -617,10 +616,10 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 
 			/* Eliminate column i from row j */
 
-			for (auto j : nzbd)
+			for (auto & j : nzbd)
 			{
 				const nl_double f1 = - A(j,i) * f;
-				for (auto k : nzrd)
+				for (auto & k : nzrd)
 					A(j,k) += A(i,k) * f1;
 				//RHS(j) += RHS(i) * f1;
 			}
@@ -632,10 +631,10 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 
 			/* Eliminate column i from row j */
 
-			for (auto j : nzbd)
+			for (auto & j : nzbd)
 			{
 				const nl_double f1 = - A(j,i) * f;
-				for (auto k : nzrd)
+				for (auto & k : nzrd)
 					A(j,k) += A(i,k) * f1;
 				//RHS(j) += RHS(i) * f1;
 			}
