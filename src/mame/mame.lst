@@ -11806,6 +11806,7 @@ cscg                            // * German
 cscsp                           // * Spanish
 fexcel                          //
 fexcelv                         //
+fscc9                           //
 fscc12                          //
 
 @source:fidel68k.cpp
