@@ -425,7 +425,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/sdl/window.h",
 		MAME_DIR .. "src/osd/modules/osdwindow.cpp",
 		MAME_DIR .. "src/osd/modules/osdwindow.h",
-		MAME_DIR .. "src/osd/sdl/output.cpp",
 		MAME_DIR .. "src/osd/sdl/watchdog.cpp",
 		MAME_DIR .. "src/osd/sdl/watchdog.h",
 		MAME_DIR .. "src/osd/modules/render/drawsdl.cpp",

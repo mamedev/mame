@@ -271,11 +271,9 @@ public:
 
 	virtual bool video_init() override;
 	virtual bool window_init() override;
-	virtual bool output_init() override;
 
 	virtual void video_exit() override;
 	virtual void window_exit() override;
-	virtual void output_exit() override;
 
 	void extract_video_config();
 
