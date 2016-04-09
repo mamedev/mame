@@ -329,6 +329,11 @@ project "7z"
 			"-Wno-undef",
 		}
 
+	configuration { "mingw*" }
+		buildoptions_c {
+			"-Wno-strict-prototypes",
+		}
+		
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
