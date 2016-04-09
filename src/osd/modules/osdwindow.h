@@ -15,7 +15,7 @@
 
 #ifdef OSD_SDL
 // forward declaration
-class SDL_Window;
+struct SDL_Window;
 #endif
 
 //============================================================
