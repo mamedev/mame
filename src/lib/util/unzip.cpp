@@ -29,59 +29,6 @@
 namespace util {
 namespace {
 /***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-/* offsets in end of central directory structure */
-#define ZIPESIG         0x00
-#define ZIPEDSK         0x04
-#define ZIPECEN         0x06
-#define ZIPENUM         0x08
-#define ZIPECENN        0x0a
-#define ZIPECSZ         0x0c
-#define ZIPEOFST        0x10
-#define ZIPECOML        0x14
-#define ZIPECOM         0x16
-
-/* offsets in central directory entry structure */
-#define ZIPCENSIG       0x00
-#define ZIPCVER         0x04
-#define ZIPCOS          0x05
-#define ZIPCVXT         0x06
-#define ZIPCEXOS        0x07
-#define ZIPCFLG         0x08
-#define ZIPCMTHD        0x0a
-#define ZIPCTIM         0x0c
-#define ZIPCDAT         0x0e
-#define ZIPCCRC         0x10
-#define ZIPCSIZ         0x14
-#define ZIPCUNC         0x18
-#define ZIPCFNL         0x1c
-#define ZIPCXTL         0x1e
-#define ZIPCCML         0x20
-#define ZIPDSK          0x22
-#define ZIPINT          0x24
-#define ZIPEXT          0x26
-#define ZIPOFST         0x2a
-#define ZIPCFN          0x2e
-
-/* offsets in local file header structure */
-#define ZIPLOCSIG       0x00
-#define ZIPVER          0x04
-#define ZIPGENFLG       0x06
-#define ZIPMTHD         0x08
-#define ZIPTIME         0x0a
-#define ZIPDATE         0x0c
-#define ZIPCRC          0x0e
-#define ZIPSIZE         0x12
-#define ZIPUNCMP        0x16
-#define ZIPFNLN         0x1a
-#define ZIPXTRALN       0x1c
-#define ZIPNAME         0x1e
-
-
-
-/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -137,18 +84,23 @@ public:
 			return ziperr;
 
 		// verify that we can work with this zipfile (no disk spanning allowed)
-		if ((m_ecd.disk_number != m_ecd.cd_start_disk_number) || (m_ecd.cd_disk_entries != m_ecd.cd_total_entries))
+		if ((m_ecd.disk_number != m_ecd.cd_start_disk_number) ||
+			(m_ecd.cd_disk_entries != m_ecd.cd_total_entries) ||
+			(std::size_t(m_ecd.cd_size) != m_ecd.cd_size))
 			return archive_file::error::UNSUPPORTED;
 
 		// allocate memory for the central directory
-		try { m_cd.resize(m_ecd.cd_size + 1); }
+		try { m_cd.resize(std::size_t(m_ecd.cd_size)); }
 		catch (...) { return archive_file::error::OUT_OF_MEMORY; }
 
 		// read the central directory
+		// FIXME: central directory can theoretically be bigger than maximum 32-bit integer value, should use a loop
 		std::uint32_t read_length;
 		auto const filerr = m_file->read(&m_cd[0], m_ecd.cd_start_disk_offset, m_ecd.cd_size, read_length);
-		if ((filerr != osd_file::error::NONE) || (read_length != m_ecd.cd_size))
-			return (filerr == osd_file::error::NONE) ? archive_file::error::FILE_TRUNCATED : archive_file::error::FILE_ERROR;
+		if (filerr != osd_file::error::NONE)
+			return archive_file::error::FILE_ERROR;
+		if (read_length != m_ecd.cd_size)
+			return archive_file::error::FILE_TRUNCATED;
 
 		return archive_file::error::NONE;
 	}
@@ -215,41 +167,26 @@ private:
 
 	struct file_header
 	{
-		std::uint32_t   signature;              // central file header signature
 		std::uint16_t   version_created;        // version made by
 		std::uint16_t   version_needed;         // version needed to extract
 		std::uint16_t   bit_flag;               // general purpose bit flag
 		std::uint16_t   compression;            // compression method
-		std::uint16_t   file_time;              // last mod file time
-		std::uint16_t   file_date;              // last mod file date
 		std::uint32_t   crc;                    // crc-32
-		std::uint32_t   compressed_length;      // compressed size
-		std::uint32_t   uncompressed_length;    // uncompressed size
-		std::uint16_t   filename_length;        // filename length
-		std::uint16_t   extra_field_length;     // extra field length
-		std::uint16_t   file_comment_length;    // file comment length
-		std::uint16_t   start_disk_number;      // disk number start
-		std::uint16_t   internal_attributes;    // internal file attributes
-		std::uint32_t   external_attributes;    // external file attributes
-		std::uint32_t   local_header_offset;    // relative offset of local header
-		const char *    filename;               // filename
+		std::uint64_t   compressed_length;      // compressed size
+		std::uint64_t   uncompressed_length;    // uncompressed size
+		std::uint32_t   start_disk_number;      // disk number start
+		std::uint64_t   local_header_offset;    // relative offset of local header
 	};
 
 	// contains extracted end of central directory information
 	struct ecd
 	{
-		std::uint32_t   signature;              // end of central dir signature
-		std::uint16_t   disk_number;            // number of this disk
-		std::uint16_t   cd_start_disk_number;   // number of the disk with the start of the central directory
-		std::uint16_t   cd_disk_entries;        // total number of entries in the central directory on this disk
-		std::uint16_t   cd_total_entries;       // total number of entries in the central directory
-		std::uint32_t   cd_size;                // size of the central directory
-		std::uint32_t   cd_start_disk_offset;   // offset of start of central directory with respect to the starting disk number
-		std::uint16_t   comment_length;         // .ZIP file comment length
-		const char *    comment;                // .ZIP file comment
-
-		std::unique_ptr<std::uint8_t []> raw;   // pointer to the raw data
-		std::uint32_t   rawlength;              // length of the raw data
+		std::uint32_t   disk_number;            // number of this disk
+		std::uint32_t   cd_start_disk_number;   // number of the disk with the start of the central directory
+		std::uint64_t   cd_disk_entries;        // total number of entries in the central directory on this disk
+		std::uint64_t   cd_total_entries;       // total number of entries in the central directory
+		std::uint64_t   cd_size;                // size of the central directory
+		std::uint64_t   cd_start_disk_offset;   // offset of start of central directory with respect to the starting disk number
 	};
 
 	static constexpr std::size_t        DECOMPRESS_BUFSIZE = 16384;
@@ -307,40 +244,230 @@ private:
 };
 
 
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/**
- * @fn  static inline UINT16 read_word(UINT8 *buf)
- *
- * @brief   Reads a word.
- *
- * @param [in,out]  buf If non-null, the buffer.
- *
- * @return  The word.
- */
-
-inline std::uint16_t read_word(std::uint8_t const *buf)
+class reader_base
 {
-	return (buf[1] << 8) | buf[0];
-}
+protected:
+	reader_base(void const *buf) : m_buffer(reinterpret_cast<std::uint8_t const *>(buf)) { }
 
-/**
- * @fn  static inline UINT32 read_dword(UINT8 *buf)
- *
- * @brief   Reads a double word.
- *
- * @param [in,out]  buf If non-null, the buffer.
- *
- * @return  The double word.
- */
+	std::uint8_t read_byte(std::size_t offs) const
+	{
+		return m_buffer[offs];
+	}
+	std::uint16_t read_word(std::size_t offs) const
+	{
+		return
+				(std::uint16_t(m_buffer[offs + 1]) << 8) |
+				(std::uint16_t(m_buffer[offs + 0]) << 0);
+	}
+	std::uint32_t read_dword(std::size_t offs) const
+	{
+		return
+				(std::uint32_t(m_buffer[offs + 3]) << 24) |
+				(std::uint32_t(m_buffer[offs + 2]) << 16) |
+				(std::uint32_t(m_buffer[offs + 1]) << 8) |
+				(std::uint32_t(m_buffer[offs + 0]) << 0);
+	}
+	std::uint64_t read_qword(std::size_t offs) const
+	{
+		return
+				(std::uint64_t(m_buffer[offs + 7]) << 56) |
+				(std::uint64_t(m_buffer[offs + 6]) << 48) |
+				(std::uint64_t(m_buffer[offs + 5]) << 40) |
+				(std::uint64_t(m_buffer[offs + 4]) << 32) |
+				(std::uint64_t(m_buffer[offs + 3]) << 24) |
+				(std::uint64_t(m_buffer[offs + 2]) << 16) |
+				(std::uint64_t(m_buffer[offs + 1]) << 8) |
+				(std::uint64_t(m_buffer[offs + 0]) << 0);
+	}
+	std::string read_string(std::size_t offs, std::string::size_type len) const
+	{
+		return std::string(reinterpret_cast<char const *>(m_buffer + offs), len);
+	}
 
-inline std::uint32_t read_dword(std::uint8_t const *buf)
+	std::uint8_t const *m_buffer;
+};
+
+
+class extra_field_reader : private reader_base
 {
-	return (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
-}
+public:
+	extra_field_reader(void const *buf, std::size_t len) : reader_base(buf), m_length(len) { }
+
+	std::uint16_t         header_id() const { return read_word(0x00); }
+	std::uint16_t         data_size() const { return read_word(0x02); }
+	void const *          data() const      { return m_buffer + 0x04; }
+	extra_field_reader    next() const      { return extra_field_reader(m_buffer + total_length(), m_length - total_length()); }
+
+	bool length_sufficient() const { return (m_length >= minimum_length()) && (m_length >= total_length()); }
+
+	std::size_t total_length() const { return minimum_length() + data_size(); }
+	static std::size_t minimum_length() { return 0x04; }
+
+private:
+	std::size_t m_length;
+};
+
+
+class zip64_ext_info_reader : private reader_base
+{
+public:
+	zip64_ext_info_reader(void const *buf) : reader_base(buf) { }
+
+	std::uint64_t   uncompressed_size() const   { return read_qword(0x00); }
+	std::uint64_t   compressed_size() const     { return read_qword(0x08); }
+	std::uint64_t   header_offset() const       { return read_qword(0x10); }
+	std::uint32_t   start_disk() const          { return read_dword(0x18); }
+
+	std::size_t total_length() const { return minimum_length(); }
+	static std::size_t minimum_length() { return 0x1c; }
+};
+
+
+class local_file_header_reader : private reader_base
+{
+public:
+	local_file_header_reader(void const *buf) : reader_base(buf) { }
+
+	std::uint32_t       signature() const           { return read_dword(0x00); }
+	std::uint8_t        version_needed() const      { return m_buffer[0x04]; }
+	std::uint8_t        os_needed() const           { return m_buffer[0x05]; }
+	std::uint16_t       general_flag() const        { return read_word(0x06); }
+	std::uint16_t       compression_method() const  { return read_word(0x08); }
+	std::uint16_t       modified_time() const       { return read_word(0x0a); }
+	std::uint16_t       modified_date() const       { return read_word(0x0c); }
+	std::uint32_t       crc32() const               { return read_dword(0x0e); }
+	std::uint32_t       compressed_size() const     { return read_dword(0x12); }
+	std::uint32_t       uncompressed_size() const   { return read_dword(0x16); }
+	std::uint16_t       file_name_length() const    { return read_word(0x1a); }
+	std::uint16_t       extra_field_length() const  { return read_word(0x1c); }
+	std::string         file_name() const           { return read_string(0x1e, file_name_length()); }
+	extra_field_reader  extra_field() const         { return extra_field_reader(m_buffer + 0x1e + file_name_length(), extra_field_length()); }
+
+	bool        signature_correct() const       { return signature() == 0x04034b50; }
+
+	bool        encrypted() const               { return bool(general_flag() & 0x0001); }
+	bool        implode_8k_dict() const         { return bool(general_flag() & 0x0002); }
+	bool        implode_3_trees() const         { return bool(general_flag() & 0x0004); }
+	unsigned    deflate_option() const          { return unsigned((general_flag() >> 1) & 0x0003); }
+	bool        use_descriptor() const          { return bool(general_flag() & 0x0008); }
+	bool        patch_data() const              { return bool(general_flag() & 0x0020); }
+	bool        strong_encryption() const       { return bool(general_flag() & 0x0040); }
+	bool        utf8_encoding() const           { return bool(general_flag() & 0x0800); }
+	bool        directory_encryption() const    { return bool(general_flag() & 0x2000); }
+
+	std::size_t total_length() const { return minimum_length() + file_name_length() + extra_field_length(); }
+	static std::size_t minimum_length() { return 0x1e; }
+};
+
+
+class central_dir_entry_reader : private reader_base
+{
+public:
+	central_dir_entry_reader(void const *buf) : reader_base(buf) { }
+
+	std::uint32_t       signature() const           { return read_dword(0x00); }
+	std::uint8_t        version_created() const     { return m_buffer[0x04]; }
+	std::uint8_t        os_created() const          { return m_buffer[0x05]; }
+	std::uint8_t        version_needed() const      { return m_buffer[0x06]; }
+	std::uint8_t        os_needed() const           { return m_buffer[0x07]; }
+	std::uint16_t       general_flag() const        { return read_word(0x08); }
+	std::uint16_t       compression_method() const  { return read_word(0x0a); }
+	std::uint16_t       modified_time() const       { return read_word(0x0c); }
+	std::uint16_t       modified_date() const       { return read_word(0x0e); }
+	std::uint32_t       crc32() const               { return read_dword(0x10); }
+	std::uint32_t       compressed_size() const     { return read_dword(0x14); }
+	std::uint32_t       uncompressed_size() const   { return read_dword(0x18); }
+	std::uint16_t       file_name_length() const    { return read_word(0x1c); }
+	std::uint16_t       extra_field_length() const  { return read_word(0x1e); }
+	std::uint16_t       file_comment_length() const { return read_word(0x20); }
+	std::uint16_t       start_disk() const          { return read_word(0x22); }
+	std::uint16_t       int_file_attr() const       { return read_word(0x24); }
+	std::uint32_t       ext_file_attr() const       { return read_dword(0x26); }
+	std::uint32_t       header_offset() const       { return read_dword(0x2a); }
+	std::string         file_name() const           { return read_string(0x2e, file_name_length()); }
+	extra_field_reader  extra_field() const         { return extra_field_reader(m_buffer + 0x2e + file_name_length(), extra_field_length()); }
+	std::string         file_comment() const        { return read_string(0x2e + file_name_length() + extra_field_length(), file_comment_length()); }
+
+	bool            signature_correct() const   { return signature() == 0x02014b50; }
+
+	bool        encrypted() const               { return bool(general_flag() & 0x0001); }
+	bool        implode_8k_dict() const         { return bool(general_flag() & 0x0002); }
+	bool        implode_3_trees() const         { return bool(general_flag() & 0x0004); }
+	unsigned    deflate_option() const          { return unsigned((general_flag() >> 1) & 0x0003); }
+	bool        use_descriptor() const          { return bool(general_flag() & 0x0008); }
+	bool        patch_data() const              { return bool(general_flag() & 0x0020); }
+	bool        strong_encryption() const       { return bool(general_flag() & 0x0040); }
+	bool        utf8_encoding() const           { return bool(general_flag() & 0x0800); }
+	bool        directory_encryption() const    { return bool(general_flag() & 0x2000); }
+
+	std::size_t total_length() const { return minimum_length() + file_name_length() + extra_field_length() + file_comment_length(); }
+	static std::size_t minimum_length() { return 0x2e; }
+};
+
+
+class ecd64_reader : private reader_base
+{
+public:
+	ecd64_reader(void const *buf) : reader_base(buf) { }
+
+	std::uint32_t   signature() const           { return read_dword(0x00); }
+	std::uint64_t   ecd64_size() const          { return read_qword(0x04); }
+	std::uint8_t    version_created() const     { return m_buffer[0x0c]; }
+	std::uint8_t    os_created() const          { return m_buffer[0x0d]; }
+	std::uint8_t    version_needed() const      { return m_buffer[0x0e]; }
+	std::uint8_t    os_needed() const           { return m_buffer[0x0f]; }
+	std::uint32_t   this_disk_no() const        { return read_dword(0x10); }
+	std::uint32_t   dir_start_disk() const      { return read_dword(0x14); }
+	std::uint64_t   dir_disk_entries() const    { return read_qword(0x18); }
+	std::uint64_t   dir_total_entries() const   { return read_qword(0x20); }
+	std::uint64_t   dir_size() const            { return read_qword(0x28); }
+	std::uint64_t   dir_offset() const          { return read_qword(0x30); }
+	void const *    extensible_data() const     { return m_buffer + 0x38; }
+
+	bool            signature_correct() const   { return signature() == 0x06064b50; }
+
+	std::size_t total_length() const { return 0x0c + ecd64_size(); }
+	static std::size_t minimum_length() { return 0x38; }
+};
+
+
+class ecd64_locator_reader : private reader_base
+{
+public:
+	ecd64_locator_reader(void const *buf) : reader_base(buf) { }
+
+	std::uint32_t   signature() const           { return read_dword(0x00); }
+	std::uint32_t   ecd64_disk() const          { return read_dword(0x04); }
+	std::uint64_t   ecd64_offset() const        { return read_qword(0x08); }
+	std::uint32_t   total_disks() const         { return read_dword(0x10); }
+
+	bool            signature_correct() const   { return signature() == 0x07064b50; }
+
+	std::size_t total_length() const { return minimum_length(); }
+	static std::size_t minimum_length() { return 0x14; }
+};
+
+
+class ecd_reader : private reader_base
+{
+public:
+	ecd_reader(void const *buf) : reader_base(buf) { }
+
+	std::uint32_t   signature() const           { return read_dword(0x00); }
+	std::uint16_t   this_disk_no() const        { return read_word(0x04); }
+	std::uint16_t   dir_start_disk() const      { return read_word(0x06); }
+	std::uint16_t   dir_disk_entries() const    { return read_word(0x08); }
+	std::uint16_t   dir_total_entries() const   { return read_word(0x0a); }
+	std::uint32_t   dir_size() const            { return read_dword(0x0c); }
+	std::uint32_t   dir_offset() const          { return read_dword(0x10); }
+	std::uint16_t   comment_length() const      { return read_word(0x14); }
+	std::string     comment() const             { return read_string(0x16, comment_length()); }
+
+	bool            signature_correct() const   { return signature() == 0x06054b50; }
+
+	std::size_t total_length() const { return minimum_length() + comment_length(); }
+	static std::size_t minimum_length() { return 0x16; }
+};
 
 
 
@@ -410,40 +537,47 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 {
 	// if we're at or past the end, we're done
 	std::string filename;
-	while ((m_cd_pos + ZIPCFN) <= m_ecd.cd_size)
+	while ((m_cd_pos + central_dir_entry_reader::minimum_length()) <= m_ecd.cd_size)
 	{
-		// extract file header info
-		std::uint8_t const *const raw = &m_cd[0] + m_cd_pos;
-		m_header.signature           = read_dword(raw + ZIPCENSIG);
-		m_header.version_created     = read_word (raw + ZIPCVER);
-		m_header.version_needed      = read_word (raw + ZIPCVXT);
-		m_header.bit_flag            = read_word (raw + ZIPCFLG);
-		m_header.compression         = read_word (raw + ZIPCMTHD);
-		m_header.file_time           = read_word (raw + ZIPCTIM);
-		m_header.file_date           = read_word (raw + ZIPCDAT);
-		m_header.crc                 = read_dword(raw + ZIPCCRC);
-		m_header.compressed_length   = read_dword(raw + ZIPCSIZ);
-		m_header.uncompressed_length = read_dword(raw + ZIPCUNC);
-		m_header.filename_length     = read_word (raw + ZIPCFNL);
-		m_header.extra_field_length  = read_word (raw + ZIPCXTL);
-		m_header.file_comment_length = read_word (raw + ZIPCCML);
-		m_header.start_disk_number   = read_word (raw + ZIPDSK);
-		m_header.internal_attributes = read_word (raw + ZIPINT);
-		m_header.external_attributes = read_dword(raw + ZIPEXT);
-		m_header.local_header_offset = read_dword(raw + ZIPOFST);
-		m_header.filename            = reinterpret_cast<const char *>(raw + ZIPCFN);
-
 		// make sure we have enough data
-		std::uint32_t const rawlength = ZIPCFN + m_header.filename_length + m_header.extra_field_length + m_header.file_comment_length;
-		if ((m_cd_pos + rawlength) > m_ecd.cd_size)
+		central_dir_entry_reader const reader(&m_cd[0] + m_cd_pos);
+		if (!reader.signature_correct() || ((m_cd_pos + reader.total_length()) > m_ecd.cd_size))
 			break;
 
+		// extract file header info
+		m_header.version_created     = reader.version_created();
+		m_header.version_needed      = reader.version_needed();
+		m_header.bit_flag            = reader.general_flag();
+		m_header.compression         = reader.compression_method();
+		m_header.crc                 = reader.crc32();
+		m_header.compressed_length   = reader.compressed_size();
+		m_header.uncompressed_length = reader.uncompressed_size();
+		m_header.start_disk_number   = reader.start_disk();
+		m_header.local_header_offset = reader.header_offset();
+
+		// look for ZIP64 extended info
+		for (auto extra = reader.extra_field(); extra.length_sufficient(); extra = extra.next())
+		{
+			if ((extra.header_id() == 0x0001) && (extra.data_size() >= zip64_ext_info_reader::minimum_length()))
+			{
+				zip64_ext_info_reader const ext64(extra.data());
+				if (extra.data_size() >= ext64.total_length())
+				{
+					m_header.compressed_length   = ext64.compressed_size();
+					m_header.uncompressed_length = ext64.uncompressed_size();
+					m_header.start_disk_number   = ext64.start_disk();
+					break;
+				}
+			}
+		}
+
 		// advance the position
-		m_cd_pos += rawlength;
+		m_cd_pos += reader.total_length();
 
 		// copy the filename filename
-		bool const is_dir((m_header.filename_length > 0) && (m_header.filename[m_header.filename_length - 1] == '/'));
-		filename.assign(m_header.filename, m_header.filename_length - (is_dir ? 1 : 0));
+		filename = reader.file_name();
+		bool const is_dir((filename.length() > 0) && (filename[filename.length() - 1] == '/'));
+		if (is_dir) filename.resize(filename.length() - 1);
 
 		// check to see if it matches query
 		bool const crcmatch(search_crc == m_header.crc);
@@ -546,6 +680,8 @@ archive_file::error zip_file_impl::read_ecd()
 		return ziperr;
 
 	// we may need multiple tries
+	osd_file::error error;
+	std::uint32_t read_length;
 	std::uint32_t buflen = 1024;
 	while (buflen < 65536)
 	{
@@ -559,38 +695,77 @@ archive_file::error zip_file_impl::read_ecd()
 		catch (...) { return archive_file::error::OUT_OF_MEMORY; }
 
 		// read in one buffers' worth of data
-		std::uint32_t read_length;
-		auto const error = m_file->read(&buffer[0], m_length - buflen, buflen, read_length);
-		if (error != osd_file::error::NONE || read_length != buflen)
+		error = m_file->read(&buffer[0], m_length - buflen, buflen, read_length);
+		if ((error != osd_file::error::NONE) || (read_length != buflen))
 			return archive_file::error::FILE_ERROR;
 
 		// find the ECD signature
 		std::int32_t offset;
-		for (offset = buflen - 22; offset >= 0; offset--)
-			if (buffer[offset + 0] == 'P' && buffer[offset + 1] == 'K' && buffer[offset + 2] == 0x05 && buffer[offset + 3] == 0x06)
+		for (offset = buflen - ecd_reader::minimum_length(); offset >= 0; offset--)
+		{
+			ecd_reader reader(buffer.get() + offset);
+			if (reader.signature_correct() && ((reader.total_length() + offset) <= buflen))
 				break;
+		}
 
 		// if we found it, fill out the data
 		if (offset >= 0)
 		{
-			// reuse the buffer as our ECD buffer
-			m_ecd.raw = std::move(buffer);
-			m_ecd.rawlength = buflen - offset;
+			// extract ECD info
+			ecd_reader const ecd_rd(buffer.get() + offset);
+			m_ecd.disk_number          = ecd_rd.this_disk_no();
+			m_ecd.cd_start_disk_number = ecd_rd.dir_start_disk();
+			m_ecd.cd_disk_entries      = ecd_rd.dir_disk_entries();
+			m_ecd.cd_total_entries     = ecd_rd.dir_total_entries();
+			m_ecd.cd_size              = ecd_rd.dir_size();
+			m_ecd.cd_start_disk_offset = ecd_rd.dir_offset();
 
-			/* append a NULL terminator to the comment */
-			memmove(&m_ecd.raw[0], &m_ecd.raw[offset], m_ecd.rawlength);
-			m_ecd.raw[m_ecd.rawlength] = 0;
+			// is the file too small to contain a ZIP64 ECD locator?
+			if ((m_length - buflen + offset) < ecd64_locator_reader::minimum_length())
+				return archive_file::error::NONE;
 
-			/* extract ecd info */
-			m_ecd.signature            = read_dword(&m_ecd.raw[ZIPESIG]);
-			m_ecd.disk_number          = read_word (&m_ecd.raw[ZIPEDSK]);
-			m_ecd.cd_start_disk_number = read_word (&m_ecd.raw[ZIPECEN]);
-			m_ecd.cd_disk_entries      = read_word (&m_ecd.raw[ZIPENUM]);
-			m_ecd.cd_total_entries     = read_word (&m_ecd.raw[ZIPECENN]);
-			m_ecd.cd_size              = read_dword(&m_ecd.raw[ZIPECSZ]);
-			m_ecd.cd_start_disk_offset = read_dword(&m_ecd.raw[ZIPEOFST]);
-			m_ecd.comment_length       = read_word (&m_ecd.raw[ZIPECOML]);
-			m_ecd.comment              = reinterpret_cast<const char *>(&m_ecd.raw[ZIPECOM]);
+			// try to read the ZIP64 ECD locator
+			error = m_file->read(
+					&buffer[0],
+					m_length - buflen + offset - ecd64_locator_reader::minimum_length(),
+					ecd64_locator_reader::minimum_length(),
+					read_length);
+			if ((error != osd_file::error::NONE) || (read_length != ecd64_locator_reader::minimum_length()))
+				return archive_file::error::FILE_ERROR;
+
+			// if the signature isn't correct, it's not a ZIP64 archive
+			ecd64_locator_reader const ecd64_loc_rd(buffer.get());
+			if (!ecd64_loc_rd.signature_correct())
+				return archive_file::error::NONE;
+
+			// check that the ZIP64 ECD is in this segment (assuming this segment is the last segment)
+			if ((ecd64_loc_rd.ecd64_disk() + 1) != ecd64_loc_rd.total_disks())
+				return archive_file::error::UNSUPPORTED;
+
+			// try to read the ZIP64 ECD
+			error = m_file->read(&buffer[0], ecd64_loc_rd.ecd64_offset(), ecd64_reader::minimum_length(), read_length);
+			if (error != osd_file::error::NONE)
+				return archive_file::error::FILE_ERROR;
+			if (read_length != ecd64_reader::minimum_length())
+				return archive_file::error::FILE_TRUNCATED;
+
+			// check ZIP64 ECD
+			ecd64_reader const ecd64_rd(buffer.get());
+			if (!ecd64_rd.signature_correct())
+				return archive_file::error::BAD_SIGNATURE;
+			if (ecd64_rd.total_length() < ecd64_reader::minimum_length())
+				return archive_file::error::UNSUPPORTED;
+			if (ecd64_rd.version_needed() > 63)
+				return archive_file::error::UNSUPPORTED;
+
+			// extract ZIP64 ECD info
+			m_ecd.disk_number          = ecd64_rd.this_disk_no();
+			m_ecd.cd_start_disk_number = ecd64_rd.dir_start_disk();
+			m_ecd.cd_disk_entries      = ecd64_rd.dir_disk_entries();
+			m_ecd.cd_total_entries     = ecd64_rd.dir_total_entries();
+			m_ecd.cd_size              = ecd64_rd.dir_size();
+			m_ecd.cd_start_disk_offset = ecd64_rd.dir_offset();
+
 			return archive_file::error::NONE;
 		}
 
@@ -622,6 +797,15 @@ archive_file::error zip_file_impl::read_ecd()
 
 archive_file::error zip_file_impl::get_compressed_data_offset(std::uint64_t &offset)
 {
+	// don't support a number of features
+	if ((m_header.start_disk_number != m_ecd.disk_number) || // in a different segment
+		(m_header.version_needed > 63) || // future version of specification
+		(m_header.bit_flag & 0x0001) || // encrypted
+		(m_header.bit_flag & 0x0020) || // compressed patch data
+		(m_header.bit_flag & 0x0040) || // strong encryption
+		(m_header.bit_flag & 0x2000)) // directory encryption
+		return archive_file::error::UNSUPPORTED;
+
 	// make sure the file handle is open
 	auto const ziperr = reopen();
 	if (ziperr != archive_file::error::NONE)
@@ -629,14 +813,17 @@ archive_file::error zip_file_impl::get_compressed_data_offset(std::uint64_t &off
 
 	// now go read the fixed-sized part of the local file header
 	std::uint32_t read_length;
-	auto const error = m_file->read(&m_buffer[0], m_header.local_header_offset, ZIPNAME, read_length);
-	if (error != osd_file::error::NONE || read_length != ZIPNAME)
-		return (error == osd_file::error::NONE) ? archive_file::error::FILE_TRUNCATED : archive_file::error::FILE_ERROR;
+	auto const error = m_file->read(&m_buffer[0], m_header.local_header_offset, local_file_header_reader::minimum_length(), read_length);
+	if (error != osd_file::error::NONE)
+		return archive_file::error::FILE_ERROR;
+	if (read_length != local_file_header_reader::minimum_length())
+		return archive_file::error::FILE_TRUNCATED;
 
-	/* compute the final offset */
-	offset = m_header.local_header_offset + ZIPNAME;
-	offset += read_word(&m_buffer[ZIPFNLN]);
-	offset += read_word(&m_buffer[ZIPXTRALN]);
+	// compute the final offset
+	local_file_header_reader reader(&m_buffer[0]);
+	if (!reader.signature_correct())
+		return archive_file::error::BAD_SIGNATURE;
+	offset = m_header.local_header_offset + reader.total_length();
 
 	return archive_file::error::NONE;
 }
@@ -702,10 +889,6 @@ archive_file::error zip_file_impl::decompress_data_type_8(std::uint64_t offset, 
 {
 	std::uint32_t input_remaining = m_header.compressed_length;
 	int zerr;
-
-	// make sure we don't need a newer mechanism
-	if (m_header.version_needed > 0x14)
-		return archive_file::error::UNSUPPORTED;
 
 	/* reset the stream */
 	z_stream stream;
