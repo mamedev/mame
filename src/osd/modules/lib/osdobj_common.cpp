@@ -252,6 +252,7 @@ void osd_common_t::register_options()
 	
 	REGISTER_MODULE(m_mod_man, OUTPUT_NONE);
 	REGISTER_MODULE(m_mod_man, OUTPUT_CONSOLE);
+	REGISTER_MODULE(m_mod_man, OUTPUT_NETWORK);
 
 
 	// after initialization we know which modules are supported

@@ -96,6 +96,7 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/output/output_module.h",
 		MAME_DIR .. "src/osd/modules/output/none.cpp",
 		MAME_DIR .. "src/osd/modules/output/console.cpp",
+		MAME_DIR .. "src/osd/modules/output/network.cpp",
 	}
 
 project ("ocore_" .. _OPTIONS["osd"])
