@@ -23,37 +23,56 @@
 
 class running_machine;
 class osd_window;
+class slider_dirty_notifier;
 
 class bgfx_chain;
+class bgfx_slider;
 
-class chain_manager {
+class chain_manager
+{
 public:
-	chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index);
+	chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index, slider_dirty_notifier& slider_notifier);
 	~chain_manager();
 
     uint32_t handle_screen_chains(uint32_t view, render_primitive *starting_prim, osd_window& window);
-    
+    int32_t chain_changed(int32_t index, std::string *str, int32_t newval);
+
     // Getters
     bgfx_chain* screen_chain(uint32_t screen);
-    bgfx_chain* load_chain(std::string name, running_machine& machine, uint32_t window_index, uint32_t screen_index);
-    bool has_applicable_pass(uint32_t screen);
+    bgfx_chain* load_chain(std::string name, uint32_t screen_index);
+    bool has_applicable_chain(uint32_t screen);
     slider_state* get_slider_list();
 
 private:
-    void load_screen_chains(std::string chain_str);
-    std::vector<std::vector<std::string>> split_option_string(std::string chain_str) const;
-    void load_chains(std::vector<std::vector<std::string>>& chains);
-    
+    void load_chains();
+    void destroy_chains();
+    void reload_chains();
+
+    void find_available_chains(std::string path);
+    void parse_chain_selections(std::string chain_str);
+    std::vector<std::string> split_option_string(std::string chain_str) const;
+
+	void update_screen_count(uint32_t screen_count);
+    void create_selection_slider(uint32_t screen_index);
+    bool needs_sliders();
+
     std::vector<render_primitive*> count_screens(render_primitive* prim);
     void process_screen_quad(uint32_t view, uint32_t screen, render_primitive* prim, osd_window &window);
 
-    running_machine&                        m_machine;
-	osd_options&                            m_options;
-	texture_manager&                        m_textures;
-	target_manager&                         m_targets;
-	effect_manager&                         m_effects;
-    uint32_t                                m_window_index;
-    std::vector<std::vector<bgfx_chain*>>   m_screen_chains;
+    running_machine&            m_machine;
+	osd_options&                m_options;
+	texture_manager&            m_textures;
+	target_manager&             m_targets;
+	effect_manager&             m_effects;
+    uint32_t                    m_window_index;
+    slider_dirty_notifier&      m_slider_notifier;
+    uint32_t					m_screen_count;
+    std::vector<std::string>	m_available_chains;
+    std::vector<bgfx_chain*>    m_screen_chains;
+    std::vector<slider_state*>  m_selection_sliders;
+    std::vector<int32_t>        m_current_chain;
+
+    static const uint32_t       CHAIN_NONE;
 };
 
 #endif // __DRAWBGFX_CHAIN_MANAGER__

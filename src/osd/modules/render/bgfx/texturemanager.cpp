@@ -62,23 +62,25 @@ bgfx_texture* texture_manager::create_png_texture(std::string path, std::string 
 		return nullptr;
 	}
 
-	uint8_t *texture_data = new uint8_t[bitmap.width() * bitmap.height() * 4];
+	uint8_t *data = new uint8_t[bitmap.width() * bitmap.height() * 4];
+	UINT32 *data32 = reinterpret_cast<UINT32 *>(data);
 
-	uint32_t width = bitmap.width();
-	uint32_t height = bitmap.height();
-	uint32_t rowpixels = bitmap.rowpixels();
-	void *base = bitmap.raw_pixptr(0);
-	for (int y = 0; y < height; y++) {
-		copy_util::copyline_argb32(reinterpret_cast<UINT32 *>(texture_data) + y * width, reinterpret_cast<UINT32 *>(base) + y * rowpixels, width, nullptr);
+	const uint32_t width = bitmap.width();
+	const uint32_t height = bitmap.height();
+	const uint32_t rowpixels = bitmap.rowpixels();
+	UINT32* base = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(0));
+	for (int y = 0; y < height; y++)
+	{
+		copy_util::copyline_argb32(data32 + y * width, base + y * rowpixels, width, nullptr);
 	}
 
 	if (screen >= 0)
 	{
 		texture_name += std::to_string(screen);
 	}
-	bgfx_texture* texture = create_texture(texture_name, bgfx::TextureFormat::RGBA8, width, height, texture_data, flags);
+	bgfx_texture* texture = create_texture(texture_name, bgfx::TextureFormat::RGBA8, width, height, data, flags);
 
-	delete[] texture_data;
+	delete [] data;
 
 	return texture;
 }
@@ -106,3 +108,16 @@ bgfx_texture_handle_provider* texture_manager::provider(std::string name)
 
 	return nullptr;
 }
+
+void texture_manager::remove_provider(std::string name, bool delete_provider)
+{
+	if (provider(name) != nullptr)
+	{
+		if (delete_provider)
+		{
+			delete m_textures[name];
+		}
+		m_textures[name] = nullptr;
+	}
+}
+
