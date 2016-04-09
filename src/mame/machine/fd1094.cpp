@@ -558,9 +558,8 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 		m_state(0x00),
 		m_irqmode(false),
 		m_cache(*this),
-		m_srcbase(nullptr),
-		m_srcbytes(0),
-		m_key(nullptr)
+		m_srcbase(*this, DEVICE_SELF),
+		m_key(*this, "key")
 {
 	// override the name after the m68000 initializes
 	m_name.assign("FD1094");
@@ -634,35 +633,18 @@ void fd1094_device::change_state(int newstate)
 
 void fd1094_device::device_start()
 {
-	// find the key
-	m_key = memregion("key")->base();
-	if (m_key == nullptr)
-		throw emu_fatalerror("FD1094 key region not found!");
-
-	// get a pointer to the ROM region
-	if (region() != nullptr)
-	{
-		m_srcbase = reinterpret_cast<UINT16 *>(region()->base());
-		m_srcbytes = region()->bytes();
-	}
-
 	// if no ROM region, see if there's a memory share with our name
-	else
+	if (!m_srcbase.found())
 	{
-		memory_share *share = owner()->memshare(tag());
+		memory_share *share = memshare(DEVICE_SELF);
 		if (share != nullptr)
-		{
-			m_srcbase = reinterpret_cast<UINT16 *>(share->ptr());
-			m_srcbytes = share->bytes();
-		}
+			m_srcbase.set_target(reinterpret_cast<UINT16 *>(share->ptr()), share->bytes() / 2);
+		else
+			throw emu_fatalerror("FD1094 found no data to decrypt!");
 	}
-
-	// if we got nothing, error
-	if (m_srcbase == nullptr)
-		throw emu_fatalerror("FD1094 found no data to decrypt!");
 
 	// determine length and configure our cache
-	m_cache.configure(0x000000, m_srcbytes, 0x000000);
+	m_cache.configure(0x000000, m_srcbase.bytes(), 0x000000);
 	change_state(STATE_RESET);
 
 	// start the base device
@@ -907,7 +889,7 @@ UINT16 fd1094_device::decrypt_one(offs_t address, UINT16 val, const UINT8 *main_
 void fd1094_device::decrypt(offs_t baseaddr, UINT32 size, const UINT16 *srcptr, UINT16 *opcodesptr, UINT8 state)
 {
 	for (offs_t offset = 0; offset < size; offset += 2)
-		opcodesptr[offset / 2] = decrypt_one((baseaddr + offset) / 2, srcptr[offset / 2], m_key, state, (baseaddr + offset) < 8);
+		opcodesptr[offset / 2] = decrypt_one((baseaddr + offset) / 2, srcptr[offset / 2], &m_key[0], state, (baseaddr + offset) < 8);
 }
 
 

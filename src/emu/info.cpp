@@ -249,6 +249,33 @@ void info_xml_creator::output_one()
 	device_iterator iter(config.root_device());
 	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 		portlist.append(*device, errors);
+    // renumber player numbers for controller ports
+    int player_offset = 0;
+    // but treat keyboard count separately from players' number
+    int kbd_offset = 0;
+    for (device_t *device = iter.first(); device != nullptr; device = iter.next())
+    {
+        int nplayers = 0;
+        bool new_kbd = FALSE;
+        for (ioport_port &port : portlist)
+            if (&port.device() == device)
+                for (ioport_field &field : port.fields())
+                    if (field.type() >= IPT_START && field.type() < IPT_ANALOG_LAST)
+                    {
+                        if (field.type() == IPT_KEYBOARD)
+                        {
+                            if (!new_kbd) new_kbd = TRUE;
+                            field.set_player(field.player() + kbd_offset);
+                        }
+                        else
+                        {
+                            nplayers = MAX(nplayers, field.player() + 1);
+                            field.set_player(field.player() + player_offset);
+                        }
+                    }
+        player_offset += nplayers;
+        if (new_kbd) kbd_offset++;
+    }
 
 	// print the header and the game name
 	fprintf(m_output, "\t<%s",XML_TOP);

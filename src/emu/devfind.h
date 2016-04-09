@@ -47,6 +47,7 @@ public:
 
 	// getters
 	virtual bool findit(bool isvalidation = false) = 0;
+	const char *finder_tag() const { return m_tag; }
 
 	// setter for setting the object
 	void set_tag(const char *tag) { m_tag = tag; }
@@ -54,8 +55,9 @@ public:
 protected:
 	// helpers
 	void *find_memregion(UINT8 width, size_t &length, bool required) const;
-	void *find_memshare(UINT8 width, size_t &bytes, bool required);
-	bool report_missing(bool found, const char *objname, bool required);
+	bool validate_memregion(size_t bytes, bool required) const;
+	void *find_memshare(UINT8 width, size_t &bytes, bool required) const;
+	bool report_missing(bool found, const char *objname, bool required) const;
 
 	void printf_warning(const char *format, ...) ATTR_PRINTF(2,3);
 
@@ -104,7 +106,7 @@ class device_finder : public object_finder_base<_DeviceClass>
 {
 public:
 	// construction/destruction
-	device_finder(device_t &base, const char *tag)
+	device_finder(device_t &base, const char *tag = FINDER_DUMMY_TAG)
 		: object_finder_base<_DeviceClass>(base, tag) { }
 
 	// make reference use transparent as well
@@ -148,7 +150,7 @@ class memory_region_finder : public object_finder_base<memory_region>
 {
 public:
 	// construction/destruction
-	memory_region_finder(device_t &base, const char *tag)
+	memory_region_finder(device_t &base, const char *tag = FINDER_DUMMY_TAG)
 		: object_finder_base<memory_region>(base, tag) { }
 
 	// make reference use transparent as well
@@ -157,7 +159,7 @@ public:
 	// finder
 	virtual bool findit(bool isvalidation = false) override
 	{
-		if (isvalidation) return true;
+		if (isvalidation) return this->validate_memregion(0, _Required);
 		m_target = m_base.memregion(m_tag);
 		return this->report_missing(m_target != nullptr, "memory region", _Required);
 	}
@@ -186,7 +188,7 @@ class memory_bank_finder : public object_finder_base<memory_bank>
 {
 public:
 	// construction/destruction
-	memory_bank_finder(device_t &base, const char *tag)
+	memory_bank_finder(device_t &base, const char *tag = FINDER_DUMMY_TAG)
 		: object_finder_base<memory_bank>(base, tag) { }
 
 	// make reference use transparent as well
@@ -224,7 +226,7 @@ class ioport_finder : public object_finder_base<ioport_port>
 {
 public:
 	// construction/destruction
-	ioport_finder(device_t &base, const char *tag)
+	ioport_finder(device_t &base, const char *tag = FINDER_DUMMY_TAG)
 		: object_finder_base<ioport_port>(base, tag) { }
 
 	// make reference use transparent as well
@@ -319,13 +321,19 @@ class region_ptr_finder : public object_finder_base<_PointerType>
 {
 public:
 	// construction/destruction
-	region_ptr_finder(device_t &base, const char *tag)
+	region_ptr_finder(device_t &base, const char *tag, size_t length = 0)
 		: object_finder_base<_PointerType>(base, tag),
-			m_length(0) { }
+			m_length(length) { }
+	region_ptr_finder(device_t &base, size_t length = 0)
+		: object_finder_base<_PointerType>(base, FINDER_DUMMY_TAG),
+			m_length(length) { }
 
 	// operators to make use transparent
 	_PointerType operator[](int index) const { assert(index < m_length); return this->m_target[index]; }
 	_PointerType &operator[](int index) { assert(index < m_length); return this->m_target[index]; }
+
+	// setter for setting the object and its length
+	void set_target(_PointerType *target, size_t length) { this->m_target = target; m_length = length; }
 
 	// getter for explicit fetching
 	UINT32 length() const { return m_length; }
@@ -335,7 +343,7 @@ public:
 	// finder
 	virtual bool findit(bool isvalidation = false) override
 	{
-		if (isvalidation) return true;
+		if (isvalidation) return this->validate_memregion(sizeof(_PointerType) * m_length, _Required);
 		this->m_target = reinterpret_cast<_PointerType *>(this->find_memregion(sizeof(_PointerType), m_length, _Required));
 		return this->report_missing(this->m_target != nullptr, "memory region", _Required);
 	}
@@ -350,7 +358,8 @@ template<class _PointerType>
 class optional_region_ptr : public region_ptr_finder<_PointerType, false>
 {
 public:
-	optional_region_ptr(device_t &base, const char *tag = FINDER_DUMMY_TAG) : region_ptr_finder<_PointerType, false>(base, tag) { }
+	optional_region_ptr(device_t &base, const char *tag, size_t length = 0) : region_ptr_finder<_PointerType, false>(base, tag, length) { }
+	optional_region_ptr(device_t &base, size_t length = 0) : 	region_ptr_finder<_PointerType, false>(base, FINDER_DUMMY_TAG, length) { }
 };
 
 // required region pointer finder
@@ -358,8 +367,10 @@ template<class _PointerType>
 class required_region_ptr : public region_ptr_finder<_PointerType, true>
 {
 public:
-	required_region_ptr(device_t &base, const char *tag = FINDER_DUMMY_TAG) : region_ptr_finder<_PointerType, true>(base, tag) { }
+	required_region_ptr(device_t &base, const char *tag, size_t length = 0) : region_ptr_finder<_PointerType, true>(base, tag, length) { }
+	required_region_ptr(device_t &base, size_t length = 0) : 	region_ptr_finder<_PointerType, true>(base, FINDER_DUMMY_TAG, length) { }
 };
+
 
 
 // ======================> shared_ptr_finder
@@ -370,7 +381,7 @@ class shared_ptr_finder : public object_finder_base<_PointerType>
 {
 public:
 	// construction/destruction
-	shared_ptr_finder(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8)
+	shared_ptr_finder(device_t &base, const char *tag = FINDER_DUMMY_TAG, UINT8 width = sizeof(_PointerType) * 8)
 		: object_finder_base<_PointerType>(base, tag),
 			m_bytes(0),
 			m_width(width) { }

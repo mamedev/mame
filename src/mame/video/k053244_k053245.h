@@ -66,8 +66,7 @@ private:
 	// internal state
 	std::unique_ptr<UINT16[]>  m_ram;
 	std::unique_ptr<UINT16[]>  m_buffer;
-	UINT8     *m_sprite_rom;
-	UINT32    m_sprite_size;
+	required_region_ptr<UINT8> m_sprite_rom;
 
 	int m_dx, m_dy;
 	k05324x_cb_delegate m_k05324x_cb;

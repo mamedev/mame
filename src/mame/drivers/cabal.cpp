@@ -503,11 +503,9 @@ static MACHINE_CONFIG_START( cabal_base, cabal_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
 	MCFG_SOUND_ADD("adpcm1", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
-	MCFG_SEIBU_ADPCM_ROMREGION("adpcm1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 
 	MCFG_SOUND_ADD("adpcm2", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
-	MCFG_SEIBU_ADPCM_ROMREGION("adpcm2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -873,8 +871,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cabal_state,cabal)
 {
-	m_adpcm1->decrypt("adpcm1");
-	m_adpcm2->decrypt("adpcm2");
+	m_adpcm1->decrypt();
+	m_adpcm2->decrypt();
 }
 
 DRIVER_INIT_MEMBER(cabal_state,cabalbl2)
@@ -882,8 +880,8 @@ DRIVER_INIT_MEMBER(cabal_state,cabalbl2)
 	UINT8 *decrypt = m_seibu_sound->get_custom_decrypt();
 	memcpy(decrypt,        memregion("audiocpu")->base()+0x2000, 0x2000);
 	memcpy(decrypt+0x8000, memregion("audiocpu")->base()+0x8000, 0x8000);
-	m_adpcm1->decrypt("adpcm1");
-	m_adpcm2->decrypt("adpcm2");
+	m_adpcm1->decrypt();
+	m_adpcm2->decrypt();
 }
 
 

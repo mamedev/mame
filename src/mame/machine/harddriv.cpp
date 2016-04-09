@@ -41,8 +41,6 @@ void harddriv_state::device_start()
 	//atarigen_state::machine_start();
 
 	/* predetermine memory regions */
-	m_sim_memory = (UINT16 *)memregion("user1")->base();
-	m_sim_memory_size = memregion("user1")->bytes() / 2;
 	m_adsp_pgm_memory_word = (UINT16 *)(reinterpret_cast<UINT8 *>(m_adsp_pgm_memory.target()) + 1);
 
 	init_video();
@@ -74,14 +72,14 @@ void  harddriv_state::device_reset()
 
 	if (m_ds3sdsp.found())
 	{
-		m_ds3sdsp->load_boot_data(m_ds3sdsp->region()->base(), m_ds3sdsp_pgm_memory);
+		m_ds3sdsp->load_boot_data(m_ds3sdsp_region->base(), m_ds3sdsp_pgm_memory);
 		m_ds3sdsp_timer_en = 0;
 		m_ds3sdsp_internal_timer->adjust(attotime::never);
 	}
 
 	if (m_ds3xdsp.found())
 	{
-		m_ds3xdsp->load_boot_data(m_ds3xdsp->region()->base(), m_ds3xdsp_pgm_memory);
+		m_ds3xdsp->load_boot_data(m_ds3xdsp_region->base(), m_ds3xdsp_pgm_memory);
 		m_ds3xdsp_timer_en = 0;
 		m_ds3xdsp_internal_timer->adjust(attotime::never);
 	}
@@ -760,7 +758,7 @@ READ16_MEMBER( harddriv_state::hdadsp_special_r )
 	switch (offset & 7)
 	{
 		case 0: /* /SIMBUF */
-			if (m_adsp_eprom_base + m_adsp_sim_address < m_sim_memory_size)
+			if (m_adsp_eprom_base + m_adsp_sim_address < m_sim_memory.length())
 				return m_sim_memory[m_adsp_eprom_base + m_adsp_sim_address++];
 			else
 				return 0xff;
@@ -862,7 +860,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_ds3_control_w )
 			if (m_ds3sdsp.found())
 			{
 				m_ds3sdsp->set_input_line(INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
-				m_ds3sdsp->load_boot_data(m_ds3sdsp->region()->base(), m_ds3sdsp_pgm_memory);
+				m_ds3sdsp->load_boot_data(m_ds3sdsp_region->base(), m_ds3sdsp_pgm_memory);
 
 				if (val && !m_ds3_sreset)
 				{
@@ -882,7 +880,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_ds3_control_w )
 			if (m_ds3xdsp.found())
 			{
 				m_ds3xdsp->set_input_line(INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
-				m_ds3xdsp->load_boot_data(m_ds3xdsp->region()->base(), m_ds3xdsp_pgm_memory);
+				m_ds3xdsp->load_boot_data(m_ds3xdsp_region->base(), m_ds3xdsp_pgm_memory);
 			}
 			break;
 
@@ -1190,7 +1188,7 @@ WRITE16_MEMBER( harddriv_state::hdds3_sdsp_control_w )
 			if (data & 0x200)
 			{
 				UINT32 page = (data >> 6) & 7;
-				m_ds3sdsp->load_boot_data(m_ds3sdsp->region()->base() + (0x2000 * page), m_ds3sdsp_pgm_memory);
+				m_ds3sdsp->load_boot_data(m_ds3sdsp_region->base() + (0x2000 * page), m_ds3sdsp_pgm_memory);
 				m_ds3sdsp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 				data &= ~0x200;
 			}
@@ -1374,7 +1372,7 @@ READ16_MEMBER( harddriv_state::hdds3_special_r )
 
 		case 6:
 			logerror("ADSP r @ %04x\n", m_ds3_sim_address);
-			if (m_ds3_sim_address < m_sim_memory_size)
+			if (m_ds3_sim_address < m_sim_memory.length())
 				return m_sim_memory[m_ds3_sim_address];
 			else
 				return 0xff;

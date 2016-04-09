@@ -65,8 +65,7 @@ private:
 	void iremga20_reset();
 
 private:
-	UINT8 *m_rom;
-	INT32 m_rom_size;
+	required_region_ptr<UINT8> m_rom;
 	sound_stream *m_stream;
 	UINT16 m_regs[0x40];
 	IremGA20_channel_def m_channel[4];

@@ -12,6 +12,7 @@
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 
+#include "emu.h"
 #include "window.h"
 
 #include <bx/readerwriter.h>

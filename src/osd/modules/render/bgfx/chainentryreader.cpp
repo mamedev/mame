@@ -8,6 +8,8 @@
 
 #include <string>
 
+#include "emu.h"
+#include "rendutil.h"
 #include <modules/render/copyutil.h>
 
 #include <modules/lib/osdobj_common.h>

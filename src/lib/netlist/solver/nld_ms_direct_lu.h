@@ -11,6 +11,7 @@
 #include <algorithm>
 
 #include "solver/nld_solver.h"
+#include "solver/nld_matrix_solver.h"
 
 //#define A(_r, _c) m_A[_r][_c]
 

@@ -6,6 +6,8 @@
 //
 //============================================================
 
+#include "emu.h"
+
 #include <bx/timer.h>
 
 #include "slider.h"

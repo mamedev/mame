@@ -10,6 +10,7 @@
 #include <vector>
 #include <map>
 
+#include "emu.h"
 #include <modules/lib/osdobj_common.h>
 
 #include "chainreader.h"

@@ -130,6 +130,9 @@ public:
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+	// memory regions
+	required_region_ptr<UINT16> m_sprite_region_ptr;
 };
 
 
@@ -144,6 +147,9 @@ public:
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+	// memory regions
+	required_region_ptr<UINT32> m_sprite_region_ptr;
 };
 
 
@@ -157,11 +163,13 @@ public:
 protected:
 	sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, bool xboard_variant, const char *shortname, const char *source);
 
+protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	// configuration
 	bool            m_is_xboard;
+	required_region_ptr<UINT32> m_sprite_region_ptr;
 };
 
 class sega_xboard_sprite_device : public sega_outrun_sprite_device
@@ -183,6 +191,9 @@ public:
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+	// memory regions
+	required_region_ptr<UINT16> m_sprite_region_ptr;
 };
 
 
@@ -200,6 +211,9 @@ public:
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+	// memory regions
+	required_region_ptr<UINT16> m_sprite_region_ptr;
 
 	// internal state
 	UINT8       m_addrmap[8];
@@ -236,7 +250,8 @@ protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
-	rotate_info*                        m_segaic16_rotate;
+	required_region_ptr<UINT64>     m_sprite_region_ptr;
+	rotate_info*                    m_segaic16_rotate;
 };
 
 

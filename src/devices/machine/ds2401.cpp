@@ -65,15 +65,16 @@ void ds2401_device::device_reset()
 	m_rx = true;
 	m_tx = true;
 
-	if(m_region)
+	memory_region *region = memregion(DEVICE_SELF);
+	if (region != nullptr)
 	{
-		if(m_region->bytes() == SIZE_DATA)
+		if (region->bytes() == SIZE_DATA)
 		{
-			memcpy(m_data, m_region->base(), SIZE_DATA);
+			memcpy(m_data, region->base(), SIZE_DATA);
 			return;
 		}
 
-		logerror("ds2401 %s: Wrong region length for id data, expected 0x%x, got 0x%x\n", tag(), SIZE_DATA, m_region->bytes());
+		logerror("ds2401 %s: Wrong region length for id data, expected 0x%x, got 0x%x\n", tag(), SIZE_DATA, region->bytes());
 	}
 	else
 	{

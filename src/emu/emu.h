@@ -41,7 +41,7 @@
 #include "devdelegate.h"
 
 // memory and address spaces
-#include "memory.h"
+#include "emumem.h"
 #include "addrmap.h"
 #include "memarray.h"
 

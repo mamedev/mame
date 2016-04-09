@@ -15,7 +15,7 @@
  * Whilst the book proposes to invert the matrix R=(I+transpose(V)*Z) we define
  *
  *       w = transpose(V)*y
- *       a = R????? * w
+ *       a = R⁻¹ * w
  *
  * and consequently
  *
@@ -43,6 +43,7 @@
 #include <algorithm>
 
 #include "solver/nld_solver.h"
+#include "solver/nld_matrix_solver.h"
 #include "solver/vector_base.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
@@ -69,7 +70,7 @@ protected:
 	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
 	int solve_non_dynamic(const bool newton_raphson);
 
-	inline const unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
+	inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
 	void build_LE_A();
 	void build_LE_RHS();
@@ -467,14 +468,14 @@ void matrix_solver_w_t<m_N, _storage_N>::LE_compute_x(
 {
 	const unsigned kN = N();
 
-	for (int i=0; i<kN; i++)
+	for (unsigned i=0; i<kN; i++)
 		x[i] = 0.0;
 
-	for (int k=0; k<kN; k++)
+	for (unsigned k=0; k<kN; k++)
 	{
 		const nl_double f = RHS(k);
 
-		for (int i=0; i<kN; i++)
+		for (unsigned i=0; i<kN; i++)
 			x[i] += Ainv(i,k) * f;
 	}
 }
@@ -531,7 +532,7 @@ int matrix_solver_w_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool
 		unsigned rowcount=0;
 		#define VT(r,c) (A(r,c) - lA(r,c))
 
-		for (int row = 0; row < iN; row ++)
+		for (unsigned row = 0; row < iN; row ++)
 		{
 			unsigned cc=0;
 			auto &nz = m_terms[row]->m_nz;
@@ -596,7 +597,7 @@ int matrix_solver_w_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool
 			}
 			/* Back substitution */
 			//inv(H) w = t     w = H t
-			nl_double *t = new nl_double[rowcount];
+			nl_double t[_storage_N];  // FIXME: convert to member
 			for (int j = rowcount - 1; j >= 0; j--)
 			{
 				nl_double tmp = 0;
@@ -619,7 +620,6 @@ int matrix_solver_w_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool
 				}
 				new_V[i] -= tmp;
 			}
-			delete[] t;
 		}
 	}
 	m_cnt++;

@@ -32,7 +32,7 @@ enum e_mnemonics
 	mADDC, mPDTW, mTW, mDTW,
 	mATS, mEXKSA, mEXKFA,
 	mRMF, mSMF, mCOMCN,
-	mTA, mTG
+	mTA, mTM2, mTG
 	
 	// KB1013VK1-2 aliases
 };
@@ -55,7 +55,7 @@ static const char *const s_mnemonics[] =
 	"ADDC", "PDTW", "TW", "DTW",
 	"ATS", "EXKSA", "EXKFA",
 	"RMF", "SMF", "COMCN",
-	"TA", "TG"
+	"TA", "TM", "TG"
 };
 
 // number of bits per opcode parameter, 8 or larger means 2-byte opcode
@@ -77,7 +77,7 @@ static const UINT8 s_bits[] =
 	0, 0, 0, 0,
 	0, 0, 0,
 	0, 0, 0,
-	0, 0
+	0, 2, 0
 };
 
 #define _OVER DASMFLAG_STEP_OVER
@@ -101,7 +101,7 @@ static const UINT32 s_flags[] =
 	0, 0, 0, 0,
 	0, 0, 0,
 	0, 0, 0,
-	0, 0
+	0, 0, 0
 };
 
 // next program counter in sequence (relative)
@@ -251,14 +251,13 @@ CPU_DISASSEMBLE(sm511)
 static const UINT8 sm500_mnemonic[0x100] =
 {
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
-
 	mSKIP, mATR,  mEXKSA,mATBP, mRM,   mRM,   mRM,   mRM,   mADD,  mADDC, mCOMA, mEXBLA,mSM,   mSM,   mSM,   mSM,   // 0
 	mEXC,  mEXC,  mEXC,  mEXC,  mEXCI, mEXCI, mEXCI, mEXCI, mLDA,  mLDA,  mLDA,  mLDA,  mEXCD, mEXCD, mEXCD, mEXCD, // 1
 	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 2
 	mATS,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  // 3
 
 	mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   // 4
-	mTA,   mTB,   mTC,   mTAM,  mTM,   mTM,   mTM,   mTM,   mTG,   mPTW,  mTA0,  mTABL, mTW,   mDTW,  mEXT,  mLBL,  // 5
+	mTA,   mTB,   mTC,   mTAM,  mTM2,  mTM2,  mTM2,  mTM2,  mTG,   mPTW,  mTA0,  mTABL, mTW,   mDTW,  mEXT,  mLBL,  // 5
 	mCOMCN,mPDTW, mWR,   mWS,   mINCB, mIDIV, mRC,   mSC,   mRMF,  mSMF,  mKTA,  mEXKFA,mDECB, mCOMCB,mRTN,  mRTNS, // 6
 	mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  mSSR,  // 7
 

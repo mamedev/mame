@@ -18,7 +18,7 @@ typedef device_delegate<void (double left, double right)> k054539_cb_delegate;
 	k054539_device::set_analog_callback(*device, k054539_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_K054539_REGION_OVERRRIDE(_region) \
-	k054539_device::set_override(*device, _region);
+	k054539_device::set_override(*device, "^" _region);
 
 #define MCFG_K054539_TIMER_HANDLER(_devcb) \
 	devcb = &k054539_device::set_timer_handler(*device, DEVCB_##_devcb);
@@ -46,7 +46,7 @@ public:
 
 	// static configuration helpers
 	static void set_analog_callback(device_t &device, k054539_cb_delegate callback) { downcast<k054539_device &>(device).m_apan_cb = callback; }
-	static void set_override(device_t &device, const char *rgnoverride) { downcast<k054539_device &>(device).m_rgnoverride = rgnoverride; }
+	static void set_override(device_t &device, const char *rgnoverride) { downcast<k054539_device &>(device).m_rom.set_tag(rgnoverride); }
 	template<class _Object> static devcb_base &set_timer_handler(device_t &device, _Object object) { return downcast<k054539_device &>(device).m_timer_handler.set_callback(object); }
 
 
@@ -100,8 +100,7 @@ private:
 	INT32 cur_ptr;
 	int cur_limit;
 	unsigned char *cur_zone;
-	unsigned char *rom;
-	UINT32 rom_size;
+	required_region_ptr<UINT8> m_rom;
 	UINT32 rom_mask;
 
 	channel channels[8];
@@ -110,7 +109,6 @@ private:
 	emu_timer          *m_timer;
 	UINT32             m_timer_state;
 	devcb_write_line   m_timer_handler;
-	const char         *m_rgnoverride;
 	k054539_cb_delegate m_apan_cb;
 
 	bool regupdate();

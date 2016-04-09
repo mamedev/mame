@@ -123,6 +123,9 @@ protected:
 
 	// configuration
 	address_map_constructor m_address_map[ADDRESS_SPACES]; // address maps for each address space
+
+private:
+	// internal state
 	address_space *     m_addrspace[ADDRESS_SPACES]; // reported address spaces
 };
 

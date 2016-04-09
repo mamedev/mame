@@ -70,6 +70,45 @@ enum OHCIRegisters {
 	HcRhPortStatus1
 };
 
+enum HcControlBits
+{
+	CBSR = 1 << 0, // ControlBulkServiceRatio
+	PLE = 1 << 2, // PeriodicListEnable
+	IE = 1 << 3, // IsochronousEnable
+	CLE = 1 << 4, // ControlListEnable
+	BLE = 1 << 5, // BulkListEnable
+	HCFS = 1 << 6, // HostControllerFunctionalState
+	IR = 1 << 8, // InterruptRouting
+	RWC = 1 << 9, // RemoteWakeupConnected
+	RWE = 1 << 10 // RemoteWakeupEnable
+};
+
+enum HcRhStatusBits
+{
+	LPS = 1 << 0, // LocalPowerStatus
+	OCI = 1 << 1, // OverCurrentIndicator
+	DRWE = 1 << 15, // DeviceRemoteWakeupEnable
+	LPSC = 1 << 16, // LocalPowerStatusChange
+	OCIC = 1 << 17, // OverCurrentIndicatorChange
+	CRWE = 1 << 31, // ClearRemoteWakeupEnable
+};
+
+enum HcRhPortStatusBits
+{
+	CCS = 1 << 0, // CurrentConnectStatus
+	PES = 1 << 1, // PortEnableStatus
+	PSS = 1 << 2, // PortSuspendStatus
+	POCI = 1 << 3, // PortOverCurrentIndicator
+	PRS = 1 << 4, // PortResetStatus
+	PPS = 1 << 8, // PortPowerStatus
+	LSDA = 1 << 9, // LowSpeedDeviceAttached
+	CSC = 1 << 16, // ConnectStatusChange
+	PESC = 1 << 17, // PortEnableStatusChange
+	PSSC = 1 << 18, // PortSuspendStatusChange
+	POCIC = 1 << 19, // PortOverCurrentIndicatorChange
+	PRSC = 1 << 20 // PortResetStatusChange
+};
+
 enum OHCIHostControllerFunctionalState {
 	UsbReset=0,
 	UsbResume,
@@ -257,11 +296,15 @@ struct usb_device_configuration
 	std::forward_list<usb_device_interface *> interfaces;
 };
 
+class xbox_base_state; // forward declaration
+
 class ohci_function_device {
 public:
-	ohci_function_device(running_machine &machine);
-	void execute_reset();
-	int execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size);
+	ohci_function_device(running_machine &machine, xbox_base_state *usb_bus_manager);
+	virtual void execute_reset();
+	virtual void execute_connect() {};
+	virtual void execute_disconnect() {};
+	int execute_transfer(int endpoint, int pid, UINT8 *buffer, int size);
 protected:
 	virtual int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) { return -1; };
 	virtual int handle_get_status_request(int endpoint, USBSetupPacket *setup) { return 0; };
@@ -283,6 +326,7 @@ protected:
 	UINT8 *position_device_descriptor(int &size);
 	UINT8 *position_configuration_descriptor(int index, int &size);
 	UINT8 *position_string_descriptor(int index, int &size);
+	xbox_base_state *busmanager;
 	struct {
 		int type;
 		int controldirection;
@@ -311,7 +355,7 @@ protected:
 class ohci_game_controller_device : public ohci_function_device
 {
 public:
-	ohci_game_controller_device(running_machine &machine);
+	ohci_game_controller_device(running_machine &machine, xbox_base_state *usb_bus_manager);
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 private:
 	static const USBStandardDeviceDescriptor devdesc;
@@ -360,8 +404,7 @@ public:
 	void usb_ohci_writeback_transfer_descriptor(UINT32 address);
 	void usb_ohci_read_isochronous_transfer_descriptor(UINT32 address);
 	void usb_ohci_writeback_isochronous_transfer_descriptor(UINT32 address);
-	void dword_write_le(UINT8 *addr, UINT32 d);
-	void word_write_le(UINT8 *addr, UINT16 d);
+	void usb_ohci_device_address_changed(int old_address, int new_address);
 	void debug_generate_irq(int irq, bool active);
 	virtual void hack_eeprom() {};
 	virtual void hack_usb() {};
@@ -422,8 +465,14 @@ public:
 		UINT32 hc_regs[255];
 		struct {
 			ohci_function_device *function;
+			int address;
 			int delay;
 		} ports[4 + 1];
+		struct
+		{
+			ohci_function_device *function;
+			int port;
+		} address[256];
 		emu_timer *timer;
 		int state;
 		UINT32 framenumber;

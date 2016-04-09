@@ -97,6 +97,8 @@ protected:
 	UINT32 internal_read(offs_t address);
 	void internal_write(offs_t address, UINT32 data);
 
+	optional_memory_region  m_region;
+
 	// configuration state
 	UINT32                  m_cells;
 	UINT8                   m_address_bits;

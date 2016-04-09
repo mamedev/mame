@@ -167,6 +167,8 @@ private:
 	int get_year();
 	void set_year(int year);
 
+	optional_memory_region m_region;
+
 	// internal state
 
 	UINT8           m_index;

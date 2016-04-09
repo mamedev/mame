@@ -83,7 +83,7 @@
 #include <typeinfo>
 #include <utility>
 #include <cstring>
-
+#include <cstdint>
 
 //**************************************************************************
 //  MACROS

@@ -55,7 +55,8 @@ protected:
 	void decrypt(offs_t baseaddr, UINT32 size, const UINT16 *srcptr, UINT16 *opcodesptr, UINT16 *dataptr);
 
 	// internal state
-	const UINT8 *           m_key;
+	required_memory_region       m_region;
+	required_region_ptr<UINT8>   m_key;
 	std::vector<UINT16>          m_plaintext;
 	required_shared_ptr<UINT16>  m_decrypted_opcodes;
 

@@ -492,7 +492,7 @@ static void geforce_pci_w(device_t *busdevice, device_t *device, int function, i
 }
 
 /*
- * ohci usb controller (placeholder for now)
+ * ohci usb controller
  */
 
 #ifdef LOG_OHCI
@@ -552,30 +552,36 @@ WRITE32_MEMBER(xbox_base_state::usbctrl_w)
 		logerror("usb controller 0 register %s write %08X\n", usbregnames[offset], data);
 #endif
 	if (offset == HcRhStatus) {
-		if (data & 0x80000000)
-			ohcist.hc_regs[HcRhStatus] &= ~0x8000;
-		if (data & 0x00020000)
-			ohcist.hc_regs[HcRhStatus] &= ~0x0002;
-		if (data & 0x00010000)
-			ohcist.hc_regs[HcRhStatus] &= ~0x0001;
+		if (data & CRWE)
+			ohcist.hc_regs[HcRhStatus] &= ~DRWE;
+		if (data & OCIC)
+			ohcist.hc_regs[HcRhStatus] &= ~OCI;
+		if (data & LPSC)
+			ohcist.hc_regs[HcRhStatus] &= ~LPS;
 		return;
 	}
 	if (offset == HcControl) {
 		int hcfs;
 
-		hcfs = (data >> 6) & 3;
+		hcfs = (data >> 6) & 3; // HostControllerFunctionalState
 		if (hcfs == UsbOperational) {
 			ohcist.timer->enable();
 			ohcist.timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 			ohcist.writebackdonehadcounter = 7;
+			// need to load the FrameRemaining field of HcFmRemaining with the value of the FrameInterval field in HcFmInterval
 		}
 		else
 			ohcist.timer->enable(false);
-		ohcist.state = hcfs;
 		ohcist.interruptbulkratio = (data & 3) + 1;
+		if ((hcfs != UsbReset) && (ohcist.state == UsbReset))
+		{
+			ohcist.hc_regs[HcInterruptStatus] |= RootHubStatusChange;
+			usb_ohci_interrupts();
+		}
+		ohcist.state = hcfs;
 	}
 	if (offset == HcCommandStatus) {
-		if (data & 1)
+		if (data & 1) // HostControllerReset
 			ohcist.hc_regs[HcControl] |= 3 << 6;
 		ohcist.hc_regs[HcCommandStatus] |= data;
 		return;
@@ -597,24 +603,69 @@ WRITE32_MEMBER(xbox_base_state::usbctrl_w)
 	}
 	if (offset >= HcRhPortStatus1) {
 		int port = offset - HcRhPortStatus1 + 1; // port 0 not used
-		// bit 0 ClearPortEnable: 1 clears PortEnableStatus
-		// bit 1 SetPortEnable: 1 sets PortEnableStatus
-		// bit 2 SetPortSuspend: 1 sets PortSuspendStatus
-		// bit 3 ClearSuspendStatus: 1 clears PortSuspendStatus
-		// bit 4 SetPortReset: 1 sets PortResetStatus
-		if (data & 0x10) {
-			ohcist.hc_regs[offset] |= 0x10;
+		// bit 0  R:CurrentConnectStatus           W:ClearPortEnable: 1 clears PortEnableStatus
+		if (data & CCS) {
+			ohcist.hc_regs[offset] &= ~PES;
+			ohcist.address[ohcist.ports[port].address].port = -1;
+		}
+		// bit 1  R:PortEnableStatus               W:SetPortEnable: 1 sets PortEnableStatus
+		if (data & PES) {
+			ohcist.hc_regs[offset] |= PES;
+			// the port is enabled, so the device connected to it can communicate on the bus
+			ohcist.address[ohcist.ports[port].address].function = ohcist.ports[port].function;
+			ohcist.address[ohcist.ports[port].address].port = port;
+		}
+		// bit 2  R:PortSuspendStatus              W:SetPortSuspend: 1 sets PortSuspendStatus
+		if (data & PSS) {
+			ohcist.hc_regs[offset] |= PSS;
+		}
+		// bit 3  R:PortOverCurrentIndicator       W:ClearSuspendStatus: 1 clears PortSuspendStatus
+		if (data & POCI) {
+			ohcist.hc_regs[offset] &= ~PSS;
+		}
+		// bit 4  R: PortResetStatus               W:SetPortReset: 1 sets PortResetStatus
+		if (data & PRS) {
+			ohcist.hc_regs[offset] |= PRS;
+			if (ohcist.ports[port].address >= 0)
+				ohcist.address[ohcist.ports[port].address].port = -1;
+			ohcist.ports[port].address = 0;
+			if (ohcist.hc_regs[offset] & PES)
+			{
+				ohcist.address[0].function = ohcist.ports[port].function;
+				ohcist.address[0].port = port;
+			}
 			ohcist.ports[port].function->execute_reset();
 			// after 10ms set PortResetStatusChange and clear PortResetStatus and set PortEnableStatus
 			ohcist.ports[port].delay = 10;
 		}
-		// bit 8 SetPortPower: 1 sets PortPowerStatus
-		// bit 9 ClearPortPower: 1 clears PortPowerStatus
-		// bit 16 1 clears ConnectStatusChange
-		// bit 17 1 clears PortEnableStatusChange
-		// bit 18 1 clears PortSuspendStatusChange
-		// bit 19 1 clears PortOverCurrentIndicatorChange
-		// bit 20 1 clears PortResetStatusChange
+		// bit 8  R:PortPowerStatus                W:SetPortPower: 1 sets PortPowerStatus
+		if (data & PPS) {
+			ohcist.hc_regs[offset] |= PPS;
+		}
+		// bit 9  R:LowSpeedDeviceAttached         W:ClearPortPower: 1 clears PortPowerStatus
+		if (data & LSDA) {
+			ohcist.hc_regs[offset] &= ~PPS;
+		}
+		// bit 16 R:ConnectStatusChange            W: 1 clears ConnectStatusChange
+		if (data & CSC) {
+			ohcist.hc_regs[offset] &= ~CSC;
+		}
+		// bit 17 R:PortEnableStatusChange         W: 1 clears PortEnableStatusChange
+		if (data & PESC) {
+			ohcist.hc_regs[offset] &= ~PESC;
+		}
+		// bit 18 R:PortSuspendStatusChange        W: 1 clears PortSuspendStatusChange
+		if (data & PSSC) {
+			ohcist.hc_regs[offset] &= ~PSSC;
+		}
+		// bit 19 R:PortOverCurrentIndicatorChange W: 1 clears PortOverCurrentIndicatorChange
+		if (data & POCIC) {
+			ohcist.hc_regs[offset] &= ~POCIC;
+		}
+		// bit 20 R:PortResetStatusChange          W: 1 clears PortResetStatusChange
+		if (data & PRSC) {
+			ohcist.hc_regs[offset] &= ~PRSC;
+		}
 		if (ohcist.hc_regs[offset] != old)
 			ohcist.hc_regs[HcInterruptStatus] |= RootHubStatusChange;
 		usb_ohci_interrupts();
@@ -644,7 +695,9 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 		if (ohcist.ports[p].delay > 0) {
 			ohcist.ports[p].delay--;
 			if (ohcist.ports[p].delay == 0) {
-				ohcist.hc_regs[HcRhPortStatus1 + p - 1] = (ohcist.hc_regs[HcRhPortStatus1 + p - 1] & ~(1 << 4)) | (1 << 20) | (1 << 1); // bit 1 PortEnableStatus
+				ohcist.hc_regs[HcRhPortStatus1 + p - 1] = (ohcist.hc_regs[HcRhPortStatus1 + p - 1] & ~PRS) | PRSC | PES;
+				ohcist.address[ohcist.ports[p].address].function = ohcist.ports[p].function;
+				ohcist.address[ohcist.ports[p].address].port = p;
 				changed = 1;
 			}
 		}
@@ -654,9 +707,9 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 		{
 			// select list, do transfer
 			if (list == 0) {
-				if (ohcist.hc_regs[HcControl] & (1 << 2)) {
+				if (ohcist.hc_regs[HcControl] & PLE) {
 					// periodic list
-					if (ohcist.hc_regs[HcControl] & (1 << 3)) {
+					if (ohcist.hc_regs[HcControl] & IE) {
 						// isochronous list
 					}
 				}
@@ -665,7 +718,7 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 			if (list == 1) {
 				// control list
 				// check if control list active
-				if (ohcist.hc_regs[HcControl] & (1 << 4)) {
+				if (ohcist.hc_regs[HcControl] & CLE) {
 					cont = true;
 					while (cont == true) {
 						// if current endpoint descriptor is not 0 use it, otherwise ...
@@ -736,8 +789,8 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 									}
 								}
 								// should check for time available
-								// execute transaction
-								done=ohcist.ports[1].function->execute_transfer(ohcist.endpoint_descriptor.fa, ohcist.endpoint_descriptor.en, pid, ohcist.buffer, mps);
+								// execute transaction ohcist.endpoint_descriptor.fa
+								done = ohcist.address[ohcist.endpoint_descriptor.fa].function->execute_transfer(ohcist.endpoint_descriptor.en, pid, ohcist.buffer, mps);
 								// if receiving ...
 								if (pid == InPid) {
 									// ... store done bytes
@@ -751,7 +804,7 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 								// status writeback (CompletionCode field, DataToggleControl field, CurrentBufferPointer field, ErrorCount field)
 								ohcist.transfer_descriptor.cc = NoError;
 								ohcist.transfer_descriptor.t = (ohcist.transfer_descriptor.t ^ 1) | 2;
-								// if all data is transferred (or there was no data to transfer) cbp must be 0 ?
+								// if all data is transferred (or there was no data to transfer) cbp must be 0, otherwise it must be updated
 								if ((done == remain) || (pid == SetupPid))
 									b = 0;
 								ohcist.transfer_descriptor.cbp = b;
@@ -793,7 +846,7 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 						// one bulk every n control transfers
 						ohcist.interruptbulkratio--;
 						if (ohcist.interruptbulkratio <= 0) {
-							ohcist.interruptbulkratio = (ohcist.hc_regs[HcControl] & 3) + 1;
+							ohcist.interruptbulkratio = (ohcist.hc_regs[HcControl] & 3) + 1; // ControlBulkServiceRatio
 							cont = false;
 						}
 					}
@@ -803,7 +856,7 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 			if (list == 2) {
 				// bulk list
 				// check if bulk list active
-				if (ohcist.hc_regs[HcControl] & (1 << 5)) {
+				if (ohcist.hc_regs[HcControl] & BLE) {
 					// if current endpoint descriptor is not 0 use it, otherwise ...
 					if (ohcist.hc_regs[HcBulkCurrentED] == 0) {
 						// ... check the filled bit ...
@@ -868,8 +921,8 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 									}
 								}
 								// should check for time available
-								// execute transaction
-								done = ohcist.ports[1].function->execute_transfer(ohcist.endpoint_descriptor.fa, ohcist.endpoint_descriptor.en, pid, ohcist.buffer, mps);
+								// execute transaction ohcist.endpoint_descriptor.fa
+								done = ohcist.address[ohcist.endpoint_descriptor.fa].function->execute_transfer(ohcist.endpoint_descriptor.en, pid, ohcist.buffer, mps);
 								// if receiving ...
 								if (pid == InPid) {
 									// ... store done bytes
@@ -883,7 +936,7 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 								// status writeback (CompletionCode field, DataToggleControl field, CurrentBufferPointer field, ErrorCount field)
 								ohcist.transfer_descriptor.cc = NoError;
 								ohcist.transfer_descriptor.t = (ohcist.transfer_descriptor.t ^ 1) | 2;
-								// if all data is transferred (or there was no data to transfer) cbp must be 0 ?
+								// if all data is transferred (or there was no data to transfer) cbp must be 0, otherwise it must be updated
 								if (done == remain)
 									b = 0;
 								ohcist.transfer_descriptor.cbp = b;
@@ -925,9 +978,9 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 						}
 					}
 					// go to the next list
-					if ((ohcist.hc_regs[HcCommandStatus] & (1 << 1)) && (ohcist.hc_regs[HcControl] & (1 << 4)))
+					if ((ohcist.hc_regs[HcCommandStatus] & (1 << 1)) && (ohcist.hc_regs[HcControl] & CLE))
 						list = 1; // go to control list if enabled and filled
-					else if ((ohcist.hc_regs[HcCommandStatus] & (1 << 2)) && (ohcist.hc_regs[HcControl] & (1 << 5)))
+					else if ((ohcist.hc_regs[HcCommandStatus] & (1 << 2)) && (ohcist.hc_regs[HcControl] & BLE))
 						list = 2; // otherwise stai in bulk list if enabled and filled
 					else
 						list = 0; // if no control or bulk lists, go to periodic list
@@ -960,12 +1013,19 @@ void xbox_base_state::usb_ohci_plug(int port, ohci_function_device *function)
 {
 	if ((port > 0) && (port <= 4)) {
 		ohcist.ports[port].function = function;
-		ohcist.hc_regs[HcRhPortStatus1+port-1] = 1;
+		ohcist.ports[port].address = -1;
+		ohcist.hc_regs[HcRhPortStatus1+port-1] = CCS | CSC;
+		if (ohcist.state != UsbReset)
+		{
+			ohcist.hc_regs[HcInterruptStatus] |= RootHubStatusChange;
+			usb_ohci_interrupts();
+		}
 	}
 }
 
-ohci_function_device::ohci_function_device(running_machine &machine)
+ohci_function_device::ohci_function_device(running_machine &machine, xbox_base_state *usb_bus_manager)
 {
+	busmanager = usb_bus_manager;
 	state = DefaultState;
 	descriptors = auto_alloc_array(machine, UINT8, 1024);
 	descriptors_pos = 0;
@@ -1244,7 +1304,7 @@ void ohci_function_device::execute_reset()
 	newaddress = 0;
 }
 
-int ohci_function_device::execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size)
+int ohci_function_device::execute_transfer(int endpoint, int pid, UINT8 *buffer, int size)
 {
 	int descriptortype, descriptorindex;
 
@@ -1355,6 +1415,7 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 				if ((endpoint == 0) && (settingaddress == true))
 				{
 					// set of address is active at end of status stage
+					busmanager->usb_ohci_device_address_changed(address, newaddress);
 					address = newaddress;
 					settingaddress = false;
 					state = AddressState;
@@ -1421,8 +1482,8 @@ const USBStandardInterfaceDescriptor ohci_game_controller_device::intdesc = { 9,
 const USBStandardEndpointDescriptor ohci_game_controller_device::enddesc82 = { 7,5,0x82,3,0x20,4 };
 const USBStandardEndpointDescriptor ohci_game_controller_device::enddesc02 = { 7,5,0x02,3,0x20,4 };
 
-ohci_game_controller_device::ohci_game_controller_device(running_machine &machine) :
-	ohci_function_device(machine)
+ohci_game_controller_device::ohci_game_controller_device(running_machine &machine, xbox_base_state *usb_bus_manager) :
+	ohci_function_device(machine, usb_bus_manager)
 {
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
@@ -1434,7 +1495,7 @@ ohci_game_controller_device::ohci_game_controller_device(running_machine &machin
 int ohci_game_controller_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
 	//                              >=8  ==42  !=0  !=0  1,3       2<20 <=20
-	const UINT8 mytestdata[16] = { 0x10,0x42 ,0x32,0x43,1   ,0x65,0x18,0x20,0x98,0xa9,0xba,0xcb,0xdc,0xed,0xfe };
+	static const UINT8 mytestdata[16] = { 0x10,0x42 ,0x32,0x43,1   ,0x65,0x18,0x20,0x98,0xa9,0xba,0xcb,0xdc,0xed,0xfe };
 
 	if (endpoint != 0)
 		return -1;
@@ -1570,6 +1631,13 @@ void xbox_base_state::usb_ohci_writeback_isochronous_transfer_descriptor(UINT32 
 	ohcist.space->write_dword(address + 24, w);
 	w = (ohcist.isochronous_transfer_descriptor.offset[7] << 16) | ohcist.isochronous_transfer_descriptor.offset[6];
 	ohcist.space->write_dword(address + 28, w);
+}
+
+void xbox_base_state::usb_ohci_device_address_changed(int old_address, int new_address)
+{
+	ohcist.address[new_address].function = ohcist.address[old_address].function;
+	ohcist.address[new_address].port = ohcist.address[old_address].port;
+	ohcist.address[old_address].port = -1;
 }
 
 /*
@@ -2105,7 +2173,7 @@ ADDRESS_MAP_END
 
 void xbox_base_state::machine_start()
 {
-	//ohci_game_controller_device *usb_device;
+	ohci_game_controller_device *usb_device;
 
 	nvidia_nv2a = std::make_unique<nv2a_renderer>(machine());
 	memset(pic16lc_buffer, 0, sizeof(pic16lc_buffer));
@@ -2140,13 +2208,19 @@ void xbox_base_state::machine_start()
 	ohcist.hc_regs[HcFmInterval] = 0x2edf;
 	ohcist.hc_regs[HcLSThreshold] = 0x628;
 	ohcist.hc_regs[HcRhDescriptorA] = 4;
+	ohcist.hc_regs[HcControl] = UsbReset << 6;
+	ohcist.state = UsbReset;
 	ohcist.interruptbulkratio = 1;
 	ohcist.writebackdonehadcounter = 7;
+	for (int n = 0; n <= 4; n++)
+		ohcist.ports[n].address = -1;
+	for (int n = 0; n < 256; n++)
+		ohcist.address[n].port = -1;
 	ohcist.space = &m_maincpu->space();
 	ohcist.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xbox_base_state::usb_ohci_timer), this), (void *)"USB OHCI Timer");
 	ohcist.timer->enable(false);
-	//usb_device = new ohci_game_controller_device(machine());
-	//usb_ohci_plug(3, usb_device); // connect top root hub port 3, chihiro needs to use 1 and 2
+	usb_device = new ohci_game_controller_device(machine(), this);
+	usb_ohci_plug(3, usb_device); // connect to root hub port 3, chihiro needs to use 1 and 2
 	// super-io
 	memset(&superiost, 0, sizeof(superiost));
 	superiost.configuration_mode = false;

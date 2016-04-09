@@ -12,6 +12,9 @@
 #ifndef __EMINLINE__
 #define __EMINLINE__
 
+#include "osdcomm.h"
+#include "osdcore.h"
+
 #if !defined(MAME_NOASM)
 /* we come with implementations for GCC x86 and PPC */
 #if defined(__GNUC__)

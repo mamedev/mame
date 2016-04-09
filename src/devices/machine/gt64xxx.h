@@ -231,6 +231,8 @@ private:
 
 	address_space_config m_mem_config, m_io_config;
 
+	required_memory_region m_region;
+
 	DECLARE_ADDRESS_MAP(cpu_map, 32);
 
 	void map_cpu_space();

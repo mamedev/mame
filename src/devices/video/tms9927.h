@@ -17,7 +17,7 @@
 	tms9927_device::set_char_width(*device, _pixels);
 
 #define MCFG_TMS9927_REGION(_tag) \
-	tms9927_device::set_region_tag(*device, _tag);
+	tms9927_device::set_region_tag(*device, "^" _tag);
 
 
 class tms9927_device : public device_t,
@@ -31,7 +31,7 @@ public:
 	template<class _Object> static devcb_base &set_vsyn_wr_callback(device_t &device, _Object object) { return downcast<tms9927_device &>(device).m_write_vsyn.set_callback(object); }
 
 	static void set_char_width(device_t &device, int pixels) { downcast<tms9927_device &>(device).m_hpixels_per_column = pixels; }
-	static void set_region_tag(device_t &device, const char *tag) { downcast<tms9927_device &>(device).m_selfload_region = tag; }
+	static void set_region_tag(device_t &device, const char *tag) { downcast<tms9927_device &>(device).m_selfload.set_tag(tag); }
 
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(read);
@@ -59,10 +59,9 @@ private:
 
 	devcb_write_line m_write_vsyn;
 	int m_hpixels_per_column;         /* number of pixels per video memory address */
-	const char *m_selfload_region;    /* name of the region with self-load data */
 
 	// internal state
-	const UINT8 *m_selfload;
+	optional_region_ptr<UINT8> m_selfload;
 
 	/* live state */
 	UINT32  m_clock;

@@ -76,6 +76,7 @@ protected:
 
 	// internal state
 	device_t *m_sound_cpu;
+	required_region_ptr<UINT8> m_sound_rom;
 	UINT8 m_main2sub[2];
 	UINT8 m_sub2main[2];
 	int m_main2sub_pending;
@@ -105,9 +106,7 @@ public:
 	seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~seibu_adpcm_device() {}
 
-	static void set_adpcm_rom_tag(device_t &device, const char *tag) { downcast<seibu_adpcm_device &>(device).m_rom_tag = tag; }
-
-	void decrypt(const char *region);
+	void decrypt();
 	DECLARE_WRITE8_MEMBER( adr_w );
 	DECLARE_WRITE8_MEMBER( ctl_w );
 
@@ -126,16 +125,12 @@ protected:
 	UINT32 m_end;
 	UINT8 m_nibble;
 	UINT8 m_playing;
-	const char *m_rom_tag;
-	UINT8 *m_base;
+	required_region_ptr<UINT8> m_base;
 };
 
 extern const device_type SEIBU_ADPCM;
 
 /**************************************************************************/
-
-#define MCFG_SEIBU_ADPCM_ROMREGION(_tag) \
-	seibu_adpcm_device::set_adpcm_rom_tag(*device, _tag);
 
 #define SEIBU_COIN_INPUTS                                           \
 	PORT_START("COIN")                                              \
@@ -278,11 +273,9 @@ extern const device_type SEIBU_ADPCM;
 
 #define SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE                          \
 	MCFG_SOUND_ADD("adpcm1", SEIBU_ADPCM, 8000)                     \
-	MCFG_SEIBU_ADPCM_ROMREGION("adpcm1")                            \
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)                     \
 																	\
 	MCFG_SOUND_ADD("adpcm2", SEIBU_ADPCM, 8000)                     \
-	MCFG_SEIBU_ADPCM_ROMREGION("adpcm2")                            \
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 /**************************************************************************/

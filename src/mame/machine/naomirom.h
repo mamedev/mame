@@ -23,6 +23,7 @@ protected:
 
 private:
 	UINT32 rom_cur_address;
+	required_memory_region m_region;
 };
 
 extern const device_type NAOMI_ROM_BOARD;

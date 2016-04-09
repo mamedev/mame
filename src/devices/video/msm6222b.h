@@ -41,7 +41,8 @@ private:
 	UINT8 render_buf[80*16];
 	bool cursor_direction, cursor_blinking, two_line, shift_on_write, double_height, cursor_on, display_on;
 	UINT8 adc, shift;
-	const UINT8 *cgrom;
+protected:
+	optional_region_ptr<UINT8> m_cgrom;
 
 	void cursor_step(bool direction);
 	void shift_step(bool direction);

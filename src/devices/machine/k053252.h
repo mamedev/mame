@@ -27,7 +27,7 @@
 	k053252_device::set_offsets(*device, _offsx, _offsy);
 
 #define MCFG_K053252_SET_SLAVE_SCREEN(_tag) \
-	k053252_device::static_set_slave_screen(*device, _tag);
+	k053252_device::static_set_slave_screen(*device, "^" _tag);
 
 
 class k053252_device : public device_t,
@@ -75,8 +75,7 @@ protected:
 	int                m_offsx;
 	int                m_offsy;
 
-	const char *    m_slave_screen_tag;
-	screen_device * m_slave_screen;
+	optional_device<screen_device> m_slave_screen;
 
 };
 

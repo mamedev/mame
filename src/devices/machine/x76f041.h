@@ -99,6 +99,8 @@ private:
 		STATE_WRITE_CONFIGURATION_REGISTERS
 	};
 
+	optional_memory_region m_region;
+
 	// internal state
 	int m_cs;
 	int m_rst;

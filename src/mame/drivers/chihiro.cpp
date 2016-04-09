@@ -385,7 +385,7 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 class ohci_hlean2131qc_device : public ohci_function_device
 {
 public:
-	ohci_hlean2131qc_device(running_machine &machine);
+	ohci_hlean2131qc_device(running_machine &machine, xbox_base_state *usb_bus_manager);
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size) override;
 	void set_region_base(UINT8 *data);
@@ -413,7 +413,7 @@ private:
 class ohci_hlean2131sc_device : public ohci_function_device
 {
 public:
-	ohci_hlean2131sc_device(running_machine &machine);
+	ohci_hlean2131sc_device(running_machine &machine, xbox_base_state *usb_bus_manager);
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 private:
 	static const USBStandardDeviceDescriptor devdesc;
@@ -665,8 +665,8 @@ const UINT8 ohci_hlean2131qc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
 const UINT8 ohci_hlean2131qc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
 const UINT8 ohci_hlean2131qc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x03,0xFF,0x0B };
 
-ohci_hlean2131qc_device::ohci_hlean2131qc_device(running_machine &machine) :
-	ohci_function_device(machine)
+ohci_hlean2131qc_device::ohci_hlean2131qc_device(running_machine &machine, xbox_base_state *usb_bus_manager) :
+	ohci_function_device(machine, usb_bus_manager)
 {
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
@@ -712,17 +712,22 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	}
 	if ((setup->bRequest == 0x16) && (setup->wValue == 0x1f00))
 	{
+		// should be for an2131sc
 		endpoints[1].remain = setup->wIndex;
 		endpoints[1].position = region + 0x1f00;
 	}
-	if (setup->bRequest == 0x19) // 19 used to receive jvs packet, 20 to send
+	if (setup->bRequest == 0x19) // 19 used to receive packet, 20 to send ?
 	{
-		endpoints[endpoint].buffer[5] = 0;
-		endpoints[endpoint].buffer[4] = 20;
+		// amount to transfer
+		endpoints[endpoint].buffer[5] = 20 >> 8;
+		endpoints[endpoint].buffer[4] = (20 & 0xff);
+		endpoints[4].remain = 20;
+		endpoints[4].position = endpoints[4].buffer;
+		memset(endpoints[4].buffer, 0, 20);
 	}
 	if (setup->bRequest == 0x20)
 	{
-		printf("\tJvs packet of %d bytes\n\r", setup->wIndex);
+		printf(" Jvs packet of %d bytes\n\r", setup->wIndex-3);
 	}
 
 	endpoints[endpoint].buffer[0] = 0;
@@ -734,13 +739,19 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size)
 {
 	printf("Bulk request: %x %d %x\n\r", endpoint, pid, size);
-	if (((endpoint == 1) || (endpoint == 2)) && (pid == InPid))
+	if (((endpoint == 1) || (endpoint == 2) || (endpoint == 4)) && (pid == InPid))
 	{
 		if (size > endpoints[endpoint].remain)
 			size = endpoints[endpoint].remain;
 		memcpy(buffer, endpoints[endpoint].position, size);
 		endpoints[endpoint].position = endpoints[endpoint].position + size;
 		endpoints[endpoint].remain = endpoints[endpoint].remain - size;
+	}
+	if ((endpoint == 4) && (pid == OutPid))
+	{
+		for (int n = 0; n < size; n++)
+			printf(" %02x",buffer[n]);
+		printf("\n\r");
 	}
 	return size;
 }
@@ -759,8 +770,8 @@ const UINT8 ohci_hlean2131sc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
 const UINT8 ohci_hlean2131sc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
 const UINT8 ohci_hlean2131sc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x00,0x44,0x00 };
 
-ohci_hlean2131sc_device::ohci_hlean2131sc_device(running_machine &machine) :
-	ohci_function_device(machine)
+ohci_hlean2131sc_device::ohci_hlean2131sc_device(running_machine &machine, xbox_base_state *usb_bus_manager) :
+	ohci_function_device(machine, usb_bus_manager)
 {
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
@@ -1058,7 +1069,7 @@ void chihiro_state::machine_start()
 			break;
 		}
 	usbhack_counter = 0;
-	usb_device = new ohci_hlean2131qc_device(machine());
+	usb_device = new ohci_hlean2131qc_device(machine(), this);
 	usb_device->set_region_base(memregion(":others")->base()); // temporary
 	//usb_device = new ohci_hlean2131sc_device(machine());
 	usb_ohci_plug(1, usb_device); // connect
@@ -1083,7 +1094,7 @@ static MACHINE_CONFIG_DERIVED_CLASS(chihiro_base, xbox_base, chihiro_state)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(chihirogd, chihiro_base)
-	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", nullptr, NOOP)
+	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", "gdrom", "pic", nullptr, NOOP)
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

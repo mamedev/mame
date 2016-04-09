@@ -160,6 +160,7 @@ ef9365_device::ef9365_device(const machine_config &mconfig, const char *tag, dev
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, nullptr, *ADDRESS_MAP_NAME(ef9365)),
+	m_charset(*this, DEVICE_SELF),
 	m_palette(*this),
 	m_irq_handler(*this)
 {
@@ -283,7 +284,6 @@ void ef9365_device::device_start()
 	m_busy_timer = timer_alloc(BUSY_TIMER);
 
 	m_videoram = &space(0);
-	m_charset = region();
 	m_current_color = 0x0F;
 
 	m_irq_vb = 0;
@@ -729,7 +729,7 @@ int ef9365_device::get_char_pix( unsigned char c, int x, int y )
 			char_base =  c * 5;
 			char_pix = ( y * 5 ) + x;
 
-			if ( m_charset->u8(char_base + (char_pix>>3) ) & ( 0x80 >> (char_pix&7)) )
+			if ( m_charset[char_base + (char_pix>>3)] & ( 0x80 >> (char_pix&7)) )
 				return 1;
 			else
 				return 0;

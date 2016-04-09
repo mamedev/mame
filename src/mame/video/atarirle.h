@@ -159,8 +159,7 @@ private:
 	sprite_parameter    m_vrammask;           // mask for the VRAM target
 
 	// ROM information
-	const UINT16 *      m_rombase;            // pointer to the base of the GFX ROM
-	int                 m_romlength;          // length of the GFX ROM
+	required_region_ptr<UINT16> m_rombase;    // pointer to the base of the GFX ROM
 	int                 m_objectcount;        // number of objects in the ROM
 	std::vector<object_info> m_info;               // list of info records
 

@@ -59,7 +59,7 @@ private:
 	void digitalker_register_for_save();
 
 private:
-	const UINT8 *m_rom;
+	required_region_ptr<UINT8> m_rom;
 	sound_stream *m_stream;
 
 	// Port/lines state

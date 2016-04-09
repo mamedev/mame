@@ -20,7 +20,7 @@ protected:
 private:
 	// internal state
 	std::vector<UINT16> m_ram;
-	UINT16 *m_roadgfx;
+	required_region_ptr<UINT16> m_roadgfx;
 };
 
 extern const device_type TC0150ROD;

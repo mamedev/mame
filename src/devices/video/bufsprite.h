@@ -55,7 +55,7 @@ public:
 	// construction
 	buffered_spriteram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, type, "Buffered Sprite RAM", tag, owner, clock, "buffered_spriteram", __FILE__),
-			m_spriteram(*owner, tag) { }
+			m_spriteram(*this, DEVICE_SELF) { }
 
 	// getters
 	_Type *live() const { return m_spriteram; }

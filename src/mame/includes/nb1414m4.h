@@ -24,7 +24,7 @@ private:
 	void _0600(UINT8 is2p, UINT8 *vram);
 	void _0e00(UINT16 mcu_cmd, UINT8 *vram);
 
-	optional_region_ptr<UINT8> m_data;
+	required_region_ptr<UINT8> m_data;
 
 };
 

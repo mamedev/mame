@@ -99,7 +99,7 @@ WRITE16_MEMBER(artmagic_state::control_w)
 	/* OKI banking here */
 	if (offset == 0)
 	{
-		m_oki->set_bank_base((((data >> 4) & 1) * 0x40000) % m_oki->region()->bytes());
+		m_oki->set_bank_base((((data >> 4) & 1) * 0x40000) % m_oki_region->bytes());
 	}
 
 	logerror("%06X:control_w(%d) = %04X\n", space.device().safe_pc(), offset, data);

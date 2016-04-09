@@ -646,7 +646,7 @@ void ymf278b_device::C_w(UINT8 reg, UINT8 data)
 
 			case 0x06:
 				// memory data
-				m_addrspace[0]->write_byte(m_memadr, data);
+				space(AS_0).write_byte(m_memadr, data);
 				m_memadr = (m_memadr + 1) & 0x3fffff;
 				break;
 

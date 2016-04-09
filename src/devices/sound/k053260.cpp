@@ -76,10 +76,8 @@ const device_type K053260 = &device_creator<k053260_device>;
 k053260_device::k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053260, "K053260 KDSC", tag, owner, clock, "k053260", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_rgnoverride(nullptr),
 		m_stream(nullptr),
-		m_rom(nullptr),
-		m_rom_size(0),
+		m_rom(*this, DEVICE_SELF),
 		m_keyon(0),
 		m_mode(0)
 {
@@ -93,10 +91,6 @@ k053260_device::k053260_device(const machine_config &mconfig, const char *tag, d
 
 void k053260_device::device_start()
 {
-	memory_region *ROM = (m_rgnoverride) ? owner()->memregion(m_rgnoverride) : region();
-	m_rom = ROM->base();
-	m_rom_size = ROM->bytes();
-
 	m_stream = stream_alloc( 0, 2, clock() / CLOCKS_PER_SAMPLE );
 
 	/* register with the save state system */
@@ -381,10 +375,10 @@ void k053260_device::KDSC_Voice::update_pan_volume()
 
 void k053260_device::KDSC_Voice::key_on()
 {
-	if (m_start >= m_device->m_rom_size)
+	if (m_start >= m_device->m_rom.bytes())
 		m_device->logerror("K053260: Attempting to start playing past the end of the ROM ( start = %06x, length = %06x )\n", m_start, m_length);
 
-	else if (m_start + m_length >= m_device->m_rom_size)
+	else if (m_start + m_length >= m_device->m_rom.bytes())
 		m_device->logerror("K053260: Attempting to play past the end of the ROM ( start = %06x, length = %06x )\n",
 					m_start, m_length);
 
@@ -462,10 +456,10 @@ UINT8 k053260_device::KDSC_Voice::read_rom()
 
 	m_position = (m_position + 1) & 0xffff;
 
-	if (offs >= m_device->m_rom_size)
+	if (offs >= m_device->m_rom.bytes())
 	{
 		m_device->logerror("%s: K053260: Attempting to read past the end of the ROM (offs = %06x, size = %06x)\n",
-					m_device->machine().describe_context(), offs, m_device->m_rom_size);
+					m_device->machine().describe_context(), offs, m_device->m_rom.bytes());
 		return 0;
 	}
 

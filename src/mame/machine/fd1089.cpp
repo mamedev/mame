@@ -223,6 +223,8 @@ ADDRESS_MAP_END
 
 fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: m68000_device(mconfig, tag, owner, clock, shortname, source),
+		m_region(*this, DEVICE_SELF),
+		m_key(*this, "key"),
 		m_decrypted_opcodes(*this, ":fd1089_decrypted_opcodes")
 {
 	// override the name after the m68000 initializes
@@ -251,18 +253,11 @@ void fd1089_base_device::device_start()
 	// start the base device
 	m68000_device::device_start();
 
-	// find the key
-	m_key = memregion("key")->base();
-	if (m_key == nullptr)
-		throw emu_fatalerror("FD1089 key region not found!");
-
 	// get a pointer to the ROM region
-	UINT16 *rombase = reinterpret_cast<UINT16 *>(region()->base());
-	if (rombase == nullptr)
-		throw emu_fatalerror("FD1089 found no ROM data to decrypt!");
+	UINT16 *rombase = reinterpret_cast<UINT16 *>(m_region->base());
 
 	// determine length and resize our internal buffers
-	UINT32 romsize = region()->bytes();
+	UINT32 romsize = m_region->bytes();
 	m_plaintext.resize(romsize/2);
 
 	// copy the plaintext
@@ -493,7 +488,7 @@ void fd1089_base_device::decrypt(offs_t baseaddr, UINT32 size, const UINT16 *src
 	for (offs_t offset = 0; offset < size; offset += 2)
 	{
 		UINT16 src = srcptr[offset / 2];
-		opcodesptr[offset / 2] = decrypt_one(baseaddr + offset, src, m_key, true);
-		dataptr[offset / 2] = decrypt_one(baseaddr + offset, src, m_key, false);
+		opcodesptr[offset / 2] = decrypt_one(baseaddr + offset, src, &m_key[0], true);
+		dataptr[offset / 2] = decrypt_one(baseaddr + offset, src, &m_key[0], false);
 	}
 }

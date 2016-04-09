@@ -257,6 +257,8 @@ protected:
 	optional_device<dsp32c_device> m_dsp32;
 	optional_device<adsp2105_device> m_ds3sdsp;
 	optional_device<adsp2105_device> m_ds3xdsp;
+	optional_memory_region m_ds3sdsp_region;
+	optional_memory_region m_ds3xdsp_region;
 	optional_device<dac_device> m_ds3dac1;
 	optional_device<dac_device> m_ds3dac2;
 	optional_device<harddriv_sound_board_device> m_harddriv_sound;
@@ -339,8 +341,7 @@ protected:
 	UINT16                  m_adsp_som_address;
 	UINT32                  m_adsp_eprom_base;
 
-	UINT16 *                m_sim_memory;
-	UINT32                  m_sim_memory_size;
+	required_region_ptr<UINT16> m_sim_memory;
 	UINT16                  m_som_memory[0x8000/2];
 	UINT16 *                m_adsp_pgm_memory_word;
 

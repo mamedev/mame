@@ -178,9 +178,8 @@ k052109_device::k052109_device(const machine_config &mconfig, const char *tag, d
 	m_irq_enabled(0),
 	m_romsubbank(0),
 	m_scrollctrl(0),
-	m_char_rom(nullptr),
-	m_char_size(0),
-	m_screen_tag(nullptr),
+	m_char_rom(*this, DEVICE_SELF),
+	m_screen(*this),
 	m_irq_handler(*this),
 	m_firq_handler(*this),
 	m_nmi_handler(*this)
@@ -205,21 +204,14 @@ void k052109_device::set_ram(device_t &device, bool ram)
 
 void k052109_device::device_start()
 {
-	if (m_screen_tag != nullptr)
+	if (m_screen.found())
 	{
 		// make sure our screen is started
-		screen_device *screen = m_owner->subdevice<screen_device>(m_screen_tag);
-		if (!screen->started())
+		if (!m_screen->started())
 			throw device_missing_dependencies();
 
 		// and register a callback for vblank state
-		screen->register_vblank_callback(vblank_state_delegate(FUNC(k052109_device::vblank_callback), this));
-	}
-
-	if (region() != nullptr)
-	{
-		m_char_rom = region()->base();
-		m_char_size = region()->bytes();
+		m_screen->register_vblank_callback(vblank_state_delegate(FUNC(k052109_device::vblank_callback), this));
 	}
 
 	decode_gfx();
@@ -288,10 +280,10 @@ void k052109_device::device_reset()
 //  set_screen_tag - set screen we are attached to
 //-------------------------------------------------
 
-void k052109_device::set_screen_tag(device_t &device, device_t *owner, const char *tag)
+void k052109_device::set_screen_tag(device_t &device, const char *tag)
 {
 	k052109_device &dev = dynamic_cast<k052109_device &>(device);
-	dev.m_screen_tag = tag;
+	dev.m_screen.set_tag(tag);
 }
 
 
@@ -329,7 +321,7 @@ READ8_MEMBER( k052109_device::read )
 	}
 	else    /* Punk Shot and TMNT read from 0000-1fff, Aliens from 2000-3fff */
 	{
-		assert (m_char_size != 0);
+		assert (m_char_rom.found());
 
 		int code = (offset & 0x1fff) >> 5;
 		int color = m_romsubbank;
@@ -346,7 +338,7 @@ READ8_MEMBER( k052109_device::read )
 		m_k052109_cb(0, bank, &code, &color, &flags, &priority);
 
 		addr = (code << 5) + (offset & 0x1f);
-		addr &= m_char_size - 1;
+		addr &= m_char_rom.mask();
 
 //      logerror("%04x: off = %04x sub = %02x (bnk = %x) adr = %06x\n", space.device().safe_pc(), offset, m_romsubbank, bank, addr);
 

@@ -99,6 +99,7 @@ protected:
 	void determine_final_base();
 
 	// configuration state
+	optional_memory_region      m_region;
 	default_value               m_default_value;
 	nvram_init_delegate         m_custom_handler;
 

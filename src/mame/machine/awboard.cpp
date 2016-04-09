@@ -166,15 +166,16 @@ DEVICE_ADDRESS_MAP_START(submap, 16, aw_rom_board)
 ADDRESS_MAP_END
 
 aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: naomi_g1_device(mconfig, AW_ROM_BOARD, "Sammy Atomiswave ROM Board", tag, owner, clock, "aw_rom_board", __FILE__)
+	: naomi_g1_device(mconfig, AW_ROM_BOARD, "Sammy Atomiswave ROM Board", tag, owner, clock, "aw_rom_board", __FILE__),
+		m_region(*this, DEVICE_SELF),
+		m_keyregion(*this)
 {
-	keyregion = nullptr;
 }
 
-void aw_rom_board::static_set_keyregion(device_t &device, const char *_keyregion)
+void aw_rom_board::static_set_keyregion(device_t &device, const char *keyregion)
 {
 	aw_rom_board &dev = downcast<aw_rom_board &>(device);
-	dev.keyregion = _keyregion;
+	dev.m_keyregion.set_tag(keyregion);
 }
 
 
@@ -256,20 +257,13 @@ UINT16 aw_rom_board::decrypt(UINT16 cipherText, UINT32 address, const UINT32 key
 
 void aw_rom_board::set_key()
 {
-	if(!m_region)
-		throw emu_fatalerror("AW-ROM-BOARD: region %s is missing\n", tag());
-
-	if(!keyregion)
+	if (!m_keyregion.found())
 		return;
 
-	memory_region *kr = memregion(keyregion);
-	if(!kr)
-		return;
+	if (m_keyregion->bytes() != 4)
+		throw emu_fatalerror("AW-ROM-BOARD: key region %s has incorrect size (%d, expected 4)\n", m_keyregion.finder_tag(), m_keyregion->bytes());
 
-	if(kr->bytes() != 4)
-		throw emu_fatalerror("AW-ROM-BOARD: key region %s has incorrect size (%d, expected 4)\n", keyregion, kr->bytes());
-
-	const UINT8 *krp = kr->base();
+	const UINT8 *krp = m_keyregion->base();
 	rombd_key = (krp[0] << 24) | (krp[1] << 16) | (krp[2] << 8) | krp[3];
 }
 
@@ -307,7 +301,7 @@ READ16_MEMBER(aw_rom_board::pio_r)
 	UINT32 roffset = epr_offset & 0x3ffffff;
 	if (roffset >= (mpr_offset / 2))
 		roffset += mpr_bank * 0x4000000;
-	UINT16 retval = (m_region->bytes() > roffset) ? m_region->u16(roffset) : 0;
+	UINT16 retval = (m_region->bytes() > roffset) ? m_region->u16(roffset) : 0; // not endian-safe?
 	return retval;
 }
 
