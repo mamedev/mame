@@ -89,6 +89,14 @@ sdl_window_info *sdl_window_list;
 
 static sdl_window_info **last_window_ptr;
 
+class SDL_DM_Wrapper
+{
+public:
+	SDL_DisplayMode mode;
+};
+
+
+
 // event handling
 static SDL_threadID main_threadid;
 static SDL_threadID window_threadid;
@@ -488,7 +496,7 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 	if (window->fullscreen() && (video_config.switchres || is_osx))
 	{
 		SDL_SetWindowFullscreen(window->sdl_window(), 0);    // Try to set mode
-		SDL_SetWindowDisplayMode(window->sdl_window(), &window->m_original_mode);    // Try to set mode
+		SDL_SetWindowDisplayMode(window->sdl_window(), &window->m_original_mode->mode);    // Try to set mode
 		SDL_SetWindowFullscreen(window->sdl_window(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
 	}
 	SDL_DestroyWindow(window->sdl_window());
@@ -673,7 +681,7 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_video_window_destroy_wt )
 	if (window->fullscreen() && video_config.switchres)
 	{
 		SDL_SetWindowFullscreen(window->sdl_window(), 0);    // Try to set mode
-		SDL_SetWindowDisplayMode(window->sdl_window(), &window->m_original_mode);    // Try to set mode
+		SDL_SetWindowDisplayMode(window->sdl_window(), &window->m_original_mode->mode);    // Try to set mode
 		SDL_SetWindowFullscreen(window->sdl_window(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
 	}
 	SDL_DestroyWindow(window->sdl_window());
@@ -967,7 +975,7 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 		SDL_DisplayMode mode;
 		//SDL_GetCurrentDisplayMode(window().monitor()->handle, &mode);
 		SDL_GetWindowDisplayMode(window->sdl_window(), &mode);
-		window->m_original_mode = mode;
+		window->m_original_mode->mode = mode;
 		mode.w = temp.width();
 		mode.h = temp.height();
 		if (window->m_win_config.refresh)
@@ -1319,6 +1327,16 @@ osd_dim sdl_window_info::get_min_bounds(int constrain)
 	return osd_dim(minwidth, minheight);
 }
 
+//============================================================
+//  get_size
+//============================================================
+
+osd_dim sdl_window_info::get_size()
+{
+	int w=0; int h=0;
+	SDL_GetWindowSize(m_sdl_window, &w, &h);
+	return osd_dim(w,h);
+}
 
 
 //============================================================
@@ -1360,4 +1378,38 @@ osd_dim sdl_window_info::get_max_bounds(int constrain)
 	maximum = maximum.resize(maximum.width() - wnd_extra_width(), maximum.height() - wnd_extra_height());
 
 	return maximum.dim();
+}
+
+//============================================================
+//  construction and destruction
+//============================================================
+
+sdl_window_info::sdl_window_info(running_machine &a_machine, int index, osd_monitor_info *a_monitor,
+		const osd_window_config *config)
+: osd_window(), m_next(NULL),
+	// Following three are used by input code to defer resizes
+	m_resize_width(0),
+	m_resize_height(0),
+	m_last_resize(0),
+	m_minimum_dim(0,0),
+	m_windowed_dim(0,0),
+	m_rendered_event(0), m_target(0),
+	m_sdl_window(NULL),
+	m_machine(a_machine), m_monitor(a_monitor), m_fullscreen(0)
+{
+	m_win_config = *config;
+	m_index = index;
+
+	//FIXME: these should be per_window in config-> or even better a bit set
+	m_fullscreen = !video_config.windowed;
+	m_prescale = video_config.prescale;
+
+	m_windowed_dim = osd_dim(config->width, config->height);
+	m_original_mode = global_alloc(SDL_DM_Wrapper);
+}
+
+sdl_window_info::~sdl_window_info()
+{
+	global_free(m_renderer);
+	global_free(m_original_mode);
 }

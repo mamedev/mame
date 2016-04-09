@@ -327,6 +327,7 @@ project "7z"
 	configuration { "gmake" }
 		buildoptions_c {
 			"-Wno-undef",
+      "-Wno-strict-prototypes",
 		}
 
 	configuration { "mingw*" }

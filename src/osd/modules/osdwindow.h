@@ -14,8 +14,8 @@
 #include "osdhelper.h"
 
 #ifdef OSD_SDL
-// standard SDL headers
-#include "sdlinc.h"
+// forward declaration
+class SDL_Window;
 #endif
 
 //============================================================
