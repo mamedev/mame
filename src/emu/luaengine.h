@@ -161,6 +161,8 @@ private:
 		template<typename T> int l_direct_mem_read(lua_State *L);
 		template<typename T> int l_direct_mem_write(lua_State *L);
 	};
+	static luabridge::LuaRef l_addr_space_map(const address_space *as);
+
 	static luabridge::LuaRef l_machine_get_screens(const running_machine *r);
 	struct lua_screen {
 		int l_height(lua_State *L);

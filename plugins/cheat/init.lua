@@ -148,7 +148,8 @@ function cheat.startplugin()
 				    draw_box = draw_box,
 				    tobcd = tobcd,
 				    frombcd = frombcd,
-				    pairs = pairs }
+				    pairs = pairs,
+				    ipairs = ipairs }
 		cheat.enabled = false
 		-- verify scripts are valid first
 		if not cheat.script then
@@ -250,7 +251,7 @@ function cheat.startplugin()
 
 	local function menu_populate()
 		local menu = {}
-		for num, cheat in pairs(cheats) do
+		for num, cheat in ipairs(cheats) do
 			menu[num] = {}
 			menu[num][1] = cheat.desc
 			if not cheat.parameter then
@@ -415,13 +416,13 @@ function cheat.startplugin()
 
 	emu.register_start(function()
 		cheats = load_cheats()
-		for num, cheat in pairs(cheats) do
+		for num, cheat in ipairs(cheats) do
 			parse_cheat(cheat)
 		end
 	end)
 
 	emu.register_frame(function()
-		for num, cheat in pairs(cheats) do
+		for num, cheat in ipairs(cheats) do
 			if cheat.enabled and cheat.script.run then
 				cheat.script.run()
 			end
@@ -430,7 +431,7 @@ function cheat.startplugin()
 
 	emu.register_frame_done(function()
 		line = 0
-		for num, draw in pairs(output) do
+		for num, draw in ipairs(output) do
 			if draw.type == "text" then
 				if not draw.color then
 					draw.scr:draw_text(draw.x, draw.y, draw.str)
