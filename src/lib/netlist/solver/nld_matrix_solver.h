@@ -10,6 +10,8 @@
 
 #include "solver/nld_solver.h"
 
+#include <type_traits>
+
 NETLIB_NAMESPACE_DEVICES_START()
 
 class terms_t
@@ -120,6 +122,11 @@ protected:
 	template <typename T>
 	T delta(const T * RESTRICT V);
 
+	template <typename T>
+	void build_LE_A(T & child);
+	template <typename T>
+	void build_LE_RHS(T & child);
+
 	pvector_t<terms_t *> m_terms;
 	pvector_t<analog_net_t *> m_nets;
 	pvector_t<analog_output_t *> m_inps;
@@ -174,6 +181,61 @@ void matrix_solver_t::store(const T * RESTRICT V)
 		this->m_nets[i]->m_cur_Analog = V[i];
 }
 
+template <typename T>
+void matrix_solver_t::build_LE_A(T & child)
+{
+	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
+
+	const unsigned iN = child.N();
+	for (unsigned k = 0; k < iN; k++)
+	{
+		for (unsigned i=0; i < iN; i++)
+			child.A(k,i) = 0.0;
+
+		const unsigned terms_count = m_terms[k]->count();
+		const unsigned railstart =  m_terms[k]->m_railstart;
+		const nl_double * RESTRICT gt = m_terms[k]->gt();
+
+		{
+			nl_double akk  = 0.0;
+			for (unsigned i = 0; i < terms_count; i++)
+				akk += gt[i];
+
+			child.A(k,k) = akk;
+		}
+
+		const nl_double * RESTRICT go = m_terms[k]->go();
+		const int * RESTRICT net_other = m_terms[k]->net_other();
+
+		for (unsigned i = 0; i < railstart; i++)
+			child.A(k,net_other[i]) -= go[i];
+	}
+}
+
+template <typename T>
+void matrix_solver_t::build_LE_RHS(T & child)
+{
+	const unsigned iN = child.N();
+	for (unsigned k = 0; k < iN; k++)
+	{
+		nl_double rhsk_a = 0.0;
+		nl_double rhsk_b = 0.0;
+
+		const unsigned terms_count = m_terms[k]->count();
+		const nl_double * RESTRICT go = m_terms[k]->go();
+		const nl_double * RESTRICT Idr = m_terms[k]->Idr();
+		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->other_curanalog();
+
+		for (unsigned i = 0; i < terms_count; i++)
+			rhsk_a = rhsk_a + Idr[i];
+
+		for (unsigned i = m_terms[k]->m_railstart; i < terms_count; i++)
+			//rhsk = rhsk + go[i] * terms[i]->m_otherterm->net().as_analog().Q_Analog();
+			rhsk_b = rhsk_b + go[i] * *other_cur_analog[i];
+
+		child.RHS(k) = rhsk_a + rhsk_b;
+	}
+}
 
 NETLIB_NAMESPACE_DEVICES_END()
 

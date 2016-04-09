@@ -118,6 +118,7 @@ class matrix_solver_direct_t: public matrix_solver_t, public thr_intf
 class matrix_solver_direct_t: public matrix_solver_t
 #endif
 {
+	friend class matrix_solver_t;
 public:
 
 	matrix_solver_direct_t(const solver_parameters_t *params, const int size);
@@ -134,8 +135,6 @@ protected:
 
 	inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
-	void build_LE_A();
-	void build_LE_RHS();
 	void LE_solve();
 
 	template <typename T>
@@ -360,59 +359,6 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 }
 
 
-template <unsigned m_N, unsigned _storage_N>
-void matrix_solver_direct_t<m_N, _storage_N>::build_LE_A()
-{
-	const unsigned iN = N();
-	for (unsigned k = 0; k < iN; k++)
-	{
-		for (unsigned i=0; i < iN; i++)
-			A(k,i) = 0.0;
-
-		const unsigned terms_count = m_terms[k]->count();
-		const unsigned railstart =  m_terms[k]->m_railstart;
-		const nl_double * RESTRICT gt = m_terms[k]->gt();
-
-		{
-			nl_double akk  = 0.0;
-			for (unsigned i = 0; i < terms_count; i++)
-				akk += gt[i];
-
-			A(k,k) = akk;
-		}
-
-		const nl_double * RESTRICT go = m_terms[k]->go();
-		const int * RESTRICT net_other = m_terms[k]->net_other();
-
-		for (unsigned i = 0; i < railstart; i++)
-			A(k,net_other[i]) -= go[i];
-	}
-}
-
-template <unsigned m_N, unsigned _storage_N>
-void matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS()
-{
-	const unsigned iN = N();
-	for (unsigned k = 0; k < iN; k++)
-	{
-		nl_double rhsk_a = 0.0;
-		nl_double rhsk_b = 0.0;
-
-		const unsigned terms_count = m_terms[k]->count();
-		const nl_double * RESTRICT go = m_terms[k]->go();
-		const nl_double * RESTRICT Idr = m_terms[k]->Idr();
-		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->other_curanalog();
-
-		for (unsigned i = 0; i < terms_count; i++)
-			rhsk_a = rhsk_a + Idr[i];
-
-		for (unsigned i = m_terms[k]->m_railstart; i < terms_count; i++)
-			//rhsk = rhsk + go[i] * terms[i]->m_otherterm->net().as_analog().Q_Analog();
-			rhsk_b = rhsk_b + go[i] * *other_cur_analog[i];
-
-		RHS(k) = rhsk_a + rhsk_b;
-	}
-}
 
 #if TEST_PARALLEL
 template <unsigned m_N, unsigned _storage_N>
@@ -622,8 +568,8 @@ int matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const
 template <unsigned m_N, unsigned _storage_N>
 inline int matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
-	this->build_LE_A();
-	this->build_LE_RHS();
+	this->build_LE_A(*this);
+	this->build_LE_RHS(*this);
 
 	for (unsigned i=0, iN=N(); i < iN; i++)
 		m_last_RHS[i] = RHS(i);
