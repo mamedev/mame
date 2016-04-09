@@ -624,13 +624,13 @@ void hmcs40_cpu_device::op_td()
 void hmcs40_cpu_device::op_sedd()
 {
 	// SEDD n: Set Discrete I/O Latch Direct
-	write_d(m_op & 0xf, 1);
+	write_d(m_op & 3, 1);
 }
 
 void hmcs40_cpu_device::op_redd()
 {
 	// REDD n: Reset Discrete I/O Latch Direct
-	write_d(m_op & 0xf, 0);
+	write_d(m_op & 3, 0);
 }
 
 void hmcs40_cpu_device::op_lar()

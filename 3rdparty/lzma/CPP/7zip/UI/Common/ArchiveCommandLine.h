@@ -3,15 +3,16 @@
 #ifndef __ARCHIVE_COMMAND_LINE_H
 #define __ARCHIVE_COMMAND_LINE_H
 
-#include "Common/CommandLineParser.h"
-#include "Common/Wildcard.h"
+#include "../../../Common/CommandLineParser.h"
+#include "../../../Common/Wildcard.h"
 
 #include "Extract.h"
+#include "HashCalc.h"
 #include "Update.h"
 
-struct CArchiveCommandLineException: public AString
+struct CArcCmdLineException: public UString
 {
-  CArchiveCommandLineException(const char *errorMessage): AString(errorMessage) {}
+  CArcCmdLineException(const char *a, const wchar_t *u = NULL);
 };
 
 namespace NCommandType { enum EEnum
@@ -21,35 +22,38 @@ namespace NCommandType { enum EEnum
   kDelete,
   kTest,
   kExtract,
-  kFullExtract,
+  kExtractFull,
   kList,
   kBenchmark,
-  kInfo
+  kInfo,
+  kHash,
+  kRename
 };}
 
-namespace NRecursedType { enum EEnum
-{
-  kRecursed,
-  kWildCardOnlyRecursed,
-  kNonRecursed
-};}
-
-struct CArchiveCommand
+struct CArcCommand
 {
   NCommandType::EEnum CommandType;
+
   bool IsFromExtractGroup() const;
   bool IsFromUpdateGroup() const;
-  bool IsTestMode() const { return CommandType == NCommandType::kTest; }
+  bool IsTestCommand() const { return CommandType == NCommandType::kTest; }
   NExtract::NPathMode::EEnum GetPathMode() const;
 };
 
-struct CArchiveCommandLineOptions
+enum
+{
+  k_OutStream_disabled = 0,
+  k_OutStream_stdout = 1,
+  k_OutStream_stderr = 2
+};
+
+struct CArcCmdLineOptions
 {
   bool HelpMode;
 
-  #ifdef _WIN32
   bool LargePages;
-  #endif
+  bool CaseSensitiveChange;
+  bool CaseSensitive;
 
   bool IsInTerminal;
   bool IsStdOutTerminal;
@@ -60,10 +64,9 @@ struct CArchiveCommandLineOptions
 
   bool YesToAll;
   bool ShowDialog;
-  // NWildcard::CCensor ArchiveWildcardCensor;
-  NWildcard::CCensor WildcardCensor;
+  NWildcard::CCensor Censor;
 
-  CArchiveCommand Command;
+  CArcCommand Command;
   UString ArchiveName;
 
   #ifndef _NO_CRYPTO
@@ -72,36 +75,73 @@ struct CArchiveCommandLineOptions
   #endif
 
   bool TechMode;
-  // Extract
-  bool CalcCrc;
+  bool ShowTime;
+  
+  UStringVector HashMethods;
+
   bool AppendName;
-  FString OutputDir;
-  NExtract::NOverwriteMode::EEnum OverwriteMode;
-  UStringVector ArchivePathsSorted;
-  UStringVector ArchivePathsFullSorted;
+  // UStringVector ArchivePathsSorted;
+  // UStringVector ArchivePathsFullSorted;
+  NWildcard::CCensor arcCensor;
+  UString ArcName_for_StdInMode;
+
   CObjectVector<CProperty> Properties;
 
+  CExtractOptionsBase ExtractOptions;
+
+  CBoolPair NtSecurity;
+  CBoolPair AltStreams;
+  CBoolPair HardLinks;
+  CBoolPair SymLinks;
+
   CUpdateOptions UpdateOptions;
+  CHashOptions HashOptions;
   UString ArcType;
-  bool EnablePercents;
+  UStringVector ExcludedArcTypes;
+  
+  unsigned Number_for_Out;
+  unsigned Number_for_Errors;
+  unsigned Number_for_Percents;
+  unsigned LogLevel;
+
+  // bool IsOutAllowed() const { return Number_for_Out != k_OutStream_disabled; }
 
   // Benchmark
   UInt32 NumIterations;
 
-  CArchiveCommandLineOptions(): StdInMode(false), StdOutMode(false) {};
+  CArcCmdLineOptions():
+      LargePages(false),
+      CaseSensitiveChange(false),
+      CaseSensitive(false),
+
+      StdInMode(false),
+      StdOutMode(false),
+
+      Number_for_Out(k_OutStream_stdout),
+      Number_for_Errors(k_OutStream_stderr),
+      Number_for_Percents(k_OutStream_stdout),
+
+      LogLevel(0)
+  {
+  };
 };
 
-class CArchiveCommandLineParser
+class CArcCmdLineParser
 {
   NCommandLineParser::CParser parser;
 public:
-  CArchiveCommandLineParser();
-  void Parse1(const UStringVector &commandStrings, CArchiveCommandLineOptions &options);
-  void Parse2(CArchiveCommandLineOptions &options);
+  CArcCmdLineParser();
+  void Parse1(const UStringVector &commandStrings, CArcCmdLineOptions &options);
+  void Parse2(CArcCmdLineOptions &options);
 };
 
-void EnumerateDirItemsAndSort(NWildcard::CCensor &wildcardCensor,
+HRESULT EnumerateDirItemsAndSort(
+    NWildcard::CCensor &censor,
+    NWildcard::ECensorPathMode pathMode,
+    const UString &addPathPrefix,
     UStringVector &sortedPaths,
-    UStringVector &sortedFullPaths);
+    UStringVector &sortedFullPaths,
+    CDirItemsStat &st,
+    IDirItemsCallback *callback);
 
 #endif

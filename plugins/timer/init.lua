@@ -75,12 +75,12 @@ function timer.startplugin()
 
 	local function menu_populate()
 		local time = os.time() - start_time
-		return {{ "Current time", "", 32 },
-			{ sectohms(time), "", 32 },
-			{ "Total time", "", 32 },
-			{ sectohms(total_time + time), "", 32 },
-			{ "Play Count", "", 32 },
-			{ play_count, "", 32 }}
+		return {{ "Current time", "", "off" },
+			{ sectohms(time), "", "off" },
+			{ "Total time", "", "off" },
+			{ sectohms(total_time + time), "", "off" },
+			{ "Play Count", "", "off" },
+			{ play_count, "", "off" }}
 	end
 
 	local function menu_callback(index, event)

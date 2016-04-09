@@ -21,6 +21,7 @@
 #include "modules/debugger/debug_module.h"
 #include "modules/netdev/netdev_module.h"
 #include "modules/midi/midi_module.h"
+#include "modules/output/output_module.h"
 #include "cliopts.h"
 
 //============================================================
@@ -213,13 +214,11 @@ public:
 	virtual bool window_init();
 
 	virtual void input_resume();
-	virtual bool output_init();
 
 	virtual void exit_subsystems();
 	virtual void video_exit();
 	virtual void window_exit();
 	virtual void input_exit();
-	virtual void output_exit();
 
 	virtual void osd_exit();
 
@@ -232,6 +231,7 @@ public:
 	bool verbose() const { return m_print_verbose; }
 	void set_verbose(bool print_verbose) { m_print_verbose = print_verbose; }
 
+	void notify(const char *outname, INT32 value) { m_output->notify(outname, value); }
 protected:
 	virtual bool input_init();
 	virtual void input_pause();
@@ -278,6 +278,7 @@ protected:
 	input_module* m_mouse_input;
 	input_module* m_lightgun_input;
 	input_module* m_joystick_input;
+	output_module* m_output;
 private:
 	std::vector<const char *> m_video_names;
 };

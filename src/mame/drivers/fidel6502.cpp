@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
+// thanks-to:Berger
 /******************************************************************************
 
     Fidelity Electronics 6502 based board driver
@@ -156,7 +157,7 @@ NE556 dual-timer IC:
 
 Memory map:
 -----------
-6000-0FFF: 4K RAM (2016 * 2)
+0000-0FFF: 4K RAM (2016 * 2)
 2000-5FFF: cartridge
 6000-7FFF: control(W)
 8000-9FFF: 8K ROM SSS SCM23C65E4
@@ -271,6 +272,7 @@ Z80 D6 to W: (model 6092, tied to VCC otherwise)
 // internal artwork
 #include "fidel_csc.lh" // clickable
 #include "fidel_fev.lh" // clickable
+#include "fidel_sc9.lh" // clickable
 #include "fidel_sc12.lh" // clickable
 
 
@@ -455,8 +457,6 @@ WRITE_LINE_MEMBER(fidel6502_state::csc_pia1_ca2_w)
     SC12/6086
 ******************************************************************************/
 
-
-
 // TTL/generic
 
 WRITE8_MEMBER(fidel6502_state::sc12_control_w)
@@ -587,6 +587,15 @@ static ADDRESS_MAP_START( csc_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0x1800, 0x1803) AM_MIRROR(0x47fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0xa000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+// SC9
+
+static ADDRESS_MAP_START( sc9_map, AS_PROGRAM, 8, fidel6502_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
+	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -826,6 +835,22 @@ static MACHINE_CONFIG_START( csc, fidel6502_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( sc9, fidel6502_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M6502, 1400000) // from ceramic resonator "681 JSA", measured
+	MCFG_CPU_PROGRAM_MAP(sc9_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80base_state, irq0_line_hold, 600) // 555 timer, guessed
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_fidel_sc9)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( sc12, fidel6502_state )
 
 	/* basic machine hardware */
@@ -932,6 +957,13 @@ ROM_START( cscfr )
 ROM_END
 
 
+ROM_START( fscc9 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("b30", 0xc000, 0x2000, CRC(b845c458) SHA1(d3fda65dbd9fae44fa4b93f8207839d8fa0c367a) ) // HN48364P
+	ROM_LOAD("b31", 0xe000, 0x2000, CRC(cbaf97d7) SHA1(7ed8e68bb74713d9e2ff1d9c037012320b7bfcbf) ) // "
+ROM_END
+
+
 ROM_START( fscc12 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1068a01",   0x8000, 0x2000, CRC(63c76cdd) SHA1(e0771c98d4483a6b1620791cb99a7e46b0db95c4) ) // SSS SCM23C65E4
@@ -965,6 +997,7 @@ CONS( 1981, cscsp,   csc,    0,      csc,     cscg,    driver_device, 0, "Fideli
 CONS( 1981, cscg,    csc,    0,      csc,     cscg,    driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, cscfr,   csc,    0,      csc,     cscg,    driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
+CONS( 1982, fscc9,   0,      0,      sc9,     sc12,    driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1984, fscc12,  0,      0,      sc12,    sc12,    driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1987, fexcel,  0,      0,      fexcel,  fexcel,  driver_device, 0, "Fidelity Electronics", "Excellence (model 6080/6093)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

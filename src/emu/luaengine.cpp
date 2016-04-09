@@ -156,8 +156,49 @@ struct Stack <osd_file::error>
 		lua_pushstring(L, strerror.c_str());
 	}
 };
+template <>
+struct Stack <map_handler_type>
+{
+	static void push(lua_State *L, map_handler_type error)
+	{
+		std::string type;
+		switch(error)
+		{
+			case AMH_NONE:
+				type = "none";
+				break;
+			case AMH_RAM:
+				type = "ram";
+				break;
+			case AMH_ROM:
+				type = "rom";
+				break;
+			case AMH_NOP:
+				type = "nop";
+				break;
+			case AMH_UNMAP:
+				type = "unmap";
+				break;
+			case AMH_DEVICE_DELEGATE:
+				type = "delegate";
+				break;
+			case AMH_PORT:
+				type = "port";
+				break;
+			case AMH_BANK:
+				type = "bank";
+				break;
+			case AMH_DEVICE_SUBMAP:
+				type = "submap";
+				break;
+			default:
+				type = "unknown";
+				break;
+		}
+		lua_pushstring(L, type.c_str());
+	}
+};
 }
-
 /* mark in error messages for incomplete statements */
 #define EOFMARK     "<eof>"
 #define marklen     (sizeof(EOFMARK)/sizeof(char) - 1)
@@ -960,7 +1001,7 @@ int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
 
 UINT8 lua_engine::read_direct_byte(address_space &space, offs_t addr)
 {
-	UINT8 *base = (UINT8 *)space.get_read_ptr(addr);
+	UINT8 *base = (UINT8 *)space.get_read_ptr(space.address_to_byte(addr));
 	if(base)
 		return base[addr];
 	else
@@ -1001,7 +1042,7 @@ int lua_engine::lua_addr_space::l_direct_mem_read(lua_State *L)
 
 void lua_engine::write_direct_byte(address_space &space, offs_t addr, UINT8 byte)
 {
-	UINT8 *base = (UINT8 *)space.get_read_ptr(addr);
+	UINT8 *base = (UINT8 *)space.get_read_ptr(space.address_to_byte(addr));
 	if(base)
 		base[addr] = byte;
 }
@@ -1097,6 +1138,24 @@ int lua_engine::lua_memory_region::l_region_write(lua_State *L)
 	}
 
 	return 0;
+}
+
+luabridge::LuaRef lua_engine::l_addr_space_map(const address_space *space)
+{
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef map = luabridge::LuaRef::newTable(L);
+
+	int i = 1;
+	for (address_map_entry &entry : space->map()->m_entrylist)
+	{
+		luabridge::LuaRef mapentry = luabridge::LuaRef::newTable(L);
+		mapentry["offset"] = space->address_to_byte(entry.m_addrstart) & space->bytemask();
+		mapentry["endoff"] = space->address_to_byte(entry.m_addrend) & space->bytemask();
+		mapentry["readtype"] = entry.m_read.m_type;
+		mapentry["writetype"] = entry.m_write.m_type;
+		map[i++] = mapentry;
+	}
+	return map;
 }
 
 int lua_engine::lua_options_entry::l_entry_value(lua_State *L)
@@ -1679,9 +1738,8 @@ lua_engine::~lua_engine()
 	close();
 }
 
-std::vector<lua_engine::menu_item> &lua_engine::menu_populate(std::string &menu)
+void lua_engine::menu_populate(std::string &menu, std::vector<menu_item> &menu_list)
 {
-	std::vector<menu_item> &menu_list = *global_alloc(std::vector<menu_item>);
 	std::string field = "menu_pop_" + menu;
 	lua_settop(m_lua_state, 0);
 	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
@@ -1689,13 +1747,19 @@ std::vector<lua_engine::menu_item> &lua_engine::menu_populate(std::string &menu)
 	if(!lua_isfunction(m_lua_state, -1))
 	{
 		lua_pop(m_lua_state, 1);
-		return menu_list;
+		return;
 	}
-	lua_pcall(m_lua_state, 0, 1, 0);
+	if(int error = lua_pcall(m_lua_state, 0, 1, 0))
+	{
+		if(error == 2)
+			printf("%s\n", lua_tostring(m_lua_state, -1));
+		lua_pop(m_lua_state, 1);
+		return;
+	}
 	if(!lua_istable(m_lua_state, -1))
 	{
 		lua_pop(m_lua_state, 1);
-		return menu_list;
+		return;
 	}
 
 	lua_pushnil(m_lua_state);
@@ -1711,14 +1775,13 @@ std::vector<lua_engine::menu_item> &lua_engine::menu_populate(std::string &menu)
 			item.subtext = lua_tostring(m_lua_state, -1);
 			lua_pop(m_lua_state, 1);
 			lua_rawgeti(m_lua_state, -1, 3);
-			item.flags = lua_tointeger(m_lua_state, -1);
+			item.flags = lua_tostring(m_lua_state, -1);
 			lua_pop(m_lua_state, 1);
 			menu_list.push_back(item);
 		}
 		lua_pop(m_lua_state, 1);
 	}
 	lua_pop(m_lua_state, 1);
-	return menu_list;
 }
 
 bool lua_engine::menu_callback(std::string &menu, int index, std::string event)
@@ -2149,6 +2212,7 @@ void lua_engine::initialize()
 			.endClass()
 			.deriveClass <address_space, lua_addr_space> ("addr_space")
 				.addFunction("name", &address_space::name)
+				.addProperty <luabridge::LuaRef, void> ("map", &lua_engine::l_addr_space_map)
 			.endClass()
 			.beginClass <render_target> ("target")
 				.addFunction ("width", &render_target::width)

@@ -1,10 +1,10 @@
 // SortUtils.h
 
-#ifndef __SORTUTLS_H
-#define __SORTUTLS_H
+#ifndef __SORT_UTLS_H
+#define __SORT_UTLS_H
 
-#include "Common/MyString.h"
+#include "../../../Common/MyString.h"
 
-void SortFileNames(const UStringVector &strings, CIntVector &indices);
+void SortFileNames(const UStringVector &strings, CUIntVector &indices);
 
 #endif

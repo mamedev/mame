@@ -1,10 +1,10 @@
 /*  LzmaEnc.h -- LZMA Encoder
-2011-01-27 : Igor Pavlov : Public domain */
+2013-01-18 : Igor Pavlov : Public domain */
 
 #ifndef __LZMA_ENC_H
 #define __LZMA_ENC_H
 
-#include "Types.h"
+#include "7zTypes.h"
 
 EXTERN_C_BEGIN
 
@@ -16,7 +16,7 @@ typedef struct _CLzmaEncProps
   UInt32 dictSize; /* (1 << 12) <= dictSize <= (1 << 27) for 32-bit version
                       (1 << 12) <= dictSize <= (1 << 30) for 64-bit version
                        default = (1 << 24) */
-  UInt32 reduceSize; /* estimated size of data that will be compressed. default = 0xFFFFFFFF.
+  UInt64 reduceSize; /* estimated size of data that will be compressed. default = 0xFFFFFFFF.
                         Encoder uses this value to reduce dictionary size */
   int lc;          /* 0 <= lc <= 8, default = 3 */
   int lp;          /* 0 <= lp <= 4, default = 0 */

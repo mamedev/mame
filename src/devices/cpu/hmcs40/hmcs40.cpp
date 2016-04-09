@@ -7,7 +7,7 @@
   References:
   - 1985 #AP1 Hitachi 4-bit Single-Chip Microcomputer Data Book
   - 1988 HMCS400 Series Handbook (note: *400 is a newer MCU series, with similarities)
-  - opcode decoding by Tatsuyuki Satoh, Olivier Galibert, Kevin Horton, Lord Nightmare
+  - opcode decoding by Tatsuyuki Satoh, Olivier Galibert, Kevin Horton, Lord Nightmare - and verified
 
 */
 
@@ -595,7 +595,7 @@ void hmcs40_cpu_device::execute_run()
 		debugger_instruction_hook(this, m_pc);
 		m_icount--;
 		m_op = m_program->read_word(m_pc << 1) & 0x3ff;
-		m_i = BITSWAP8(m_op,7,6,5,4,0,1,2,3) & 0xf; // reversed bit-order for 4-bit immediate param (except for XAMR, REDD, SEDD)
+		m_i = BITSWAP8(m_op,7,6,5,4,0,1,2,3) & 0xf; // reversed bit-order for 4-bit immediate param (except for XAMR)
 		increment_pc();
 
 		// handle opcode
@@ -667,8 +667,7 @@ void hmcs40_cpu_device::execute_run()
 
 			case 0x0c0: case 0x0c1: case 0x0c2: case 0x0c3: case 0x0c4: case 0x0c5: case 0x0c6: case 0x0c7:
 				op_lar(); break;
-			case 0x0d0: case 0x0d1: case 0x0d2: case 0x0d3: case 0x0d4: case 0x0d5: case 0x0d6: case 0x0d7:
-			case 0x0d8: case 0x0d9: case 0x0da: case 0x0db: case 0x0dc: case 0x0dd: case 0x0de: case 0x0df:
+			case 0x0d0: case 0x0d1: case 0x0d2: case 0x0d3:
 				op_sedd(); break;
 			case 0x0e0: case 0x0e1: case 0x0e2: case 0x0e3: case 0x0e4: case 0x0e5: case 0x0e6: case 0x0e7:
 				op_lbr(); break;
@@ -787,8 +786,7 @@ void hmcs40_cpu_device::execute_run()
 
 			case 0x2c0: case 0x2c1: case 0x2c2: case 0x2c3: case 0x2c4: case 0x2c5: case 0x2c6: case 0x2c7:
 				op_lra(); break;
-			case 0x2d0: case 0x2d1: case 0x2d2: case 0x2d3: case 0x2d4: case 0x2d5: case 0x2d6: case 0x2d7:
-			case 0x2d8: case 0x2d9: case 0x2da: case 0x2db: case 0x2dc: case 0x2dd: case 0x2de: case 0x2df:
+			case 0x2d0: case 0x2d1: case 0x2d2: case 0x2d3:
 				op_redd(); break;
 			case 0x2e0: case 0x2e1: case 0x2e2: case 0x2e3: case 0x2e4: case 0x2e5: case 0x2e6: case 0x2e7:
 				op_lrb(); break;

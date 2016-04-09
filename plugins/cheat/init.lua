@@ -148,7 +148,8 @@ function cheat.startplugin()
 				    draw_box = draw_box,
 				    tobcd = tobcd,
 				    frombcd = frombcd,
-				    pairs = pairs }
+				    pairs = pairs,
+				    ipairs = ipairs }
 		cheat.enabled = false
 		-- verify scripts are valid first
 		if not cheat.script then
@@ -250,7 +251,7 @@ function cheat.startplugin()
 
 	local function menu_populate()
 		local menu = {}
-		for num, cheat in pairs(cheats) do
+		for num, cheat in ipairs(cheats) do
 			menu[num] = {}
 			menu[num][1] = cheat.desc
 			if not cheat.parameter then
@@ -259,17 +260,17 @@ function cheat.startplugin()
 						menu[num][1] = "---"
 					end
 					menu[num][2] = ""
-					menu[num][3] = 32 -- MENU_FLAG_DISABLE
+					menu[num][3] = "off"
 				elseif not cheat.script.run and not cheat.script.off then
 					menu[num][2] = "Set"
 					menu[num][3] = 0
 				else
 					if cheat.enabled then
 						menu[num][2] = "On"
-						menu[num][3] = 1 -- MENU_FLAG_LEFT_ARROW
+						menu[num][3] = "l"
 					else
 						menu[num][2] = "Off"
-						menu[num][3] = 2 -- MENU_FLAG_RIGHT_ARROW
+						menu[num][3] = "r"
 					end
 				end
 			else
@@ -279,16 +280,16 @@ function cheat.startplugin()
 					else
 						menu[num][2] = "Off"
 					end
-					menu[num][3] = 2
+					menu[num][3] = "r"
 				else
 					if cheat.parameter.item then
 						menu[num][2] = cheat.parameter.item[cheat.parameter.index].text
 					else
 						menu[num][2] = cheat.parameter.value
 					end
-					menu[num][3] = 1
+					menu[num][3] = "l"
 					if cheat.parameter.index < cheat.parameter.last then
-						menu[num][3] = 3
+						menu[num][3] = "lr"
 					end
 				end
 			end
@@ -415,13 +416,13 @@ function cheat.startplugin()
 
 	emu.register_start(function()
 		cheats = load_cheats()
-		for num, cheat in pairs(cheats) do
+		for num, cheat in ipairs(cheats) do
 			parse_cheat(cheat)
 		end
 	end)
 
 	emu.register_frame(function()
-		for num, cheat in pairs(cheats) do
+		for num, cheat in ipairs(cheats) do
 			if cheat.enabled and cheat.script.run then
 				cheat.script.run()
 			end
@@ -430,7 +431,7 @@ function cheat.startplugin()
 
 	emu.register_frame_done(function()
 		line = 0
-		for num, draw in pairs(output) do
+		for num, draw in ipairs(output) do
 			if draw.type == "text" then
 				if not draw.color then
 					draw.scr:draw_text(draw.x, draw.y, draw.str)

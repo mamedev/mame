@@ -42,7 +42,7 @@ bgfx_slider::~bgfx_slider()
 {
 }
 
-static INT32 update_trampoline(running_machine &machine, void *arg, std::string *str, INT32 newval)
+static INT32 update_trampoline(running_machine &machine, void *arg, int /*id*/, std::string *str, INT32 newval)
 {
 	if (arg != nullptr)
 	{
@@ -62,7 +62,7 @@ slider_state* bgfx_slider::create_core_slider(running_machine& machine)
 	state->incval = m_step;
 	state->update = update_trampoline;
 	state->arg = this;
-	state->id = 0; // fixme
+	state->id = 0;
 	strcpy(state->description, m_description.c_str());
 
 	return state;

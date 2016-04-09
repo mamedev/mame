@@ -42,7 +42,7 @@ void ui_menu_sliders::handle()
 		if (menu_event->itemref != nullptr)
 		{
 			const slider_state *slider = (const slider_state *)menu_event->itemref;
-			INT32 curvalue = (*slider->update)(machine(), slider->arg, nullptr, SLIDER_NOCHANGE);
+			INT32 curvalue = (*slider->update)(machine(), slider->arg, slider->id, nullptr, SLIDER_NOCHANGE);
 			INT32 increment = 0;
 			bool alt_pressed = machine().input().code_pressed(KEYCODE_LALT) || machine().input().code_pressed(KEYCODE_RALT);
 			bool ctrl_pressed = machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(KEYCODE_RCONTROL);
@@ -104,7 +104,7 @@ void ui_menu_sliders::handle()
 					newvalue = slider->maxval;
 
 				/* update the slider and recompute the menu */
-				(*slider->update)(machine(), slider->arg, nullptr, newvalue);
+				(*slider->update)(machine(), slider->arg, slider->id, nullptr, newvalue);
 				reset(UI_MENU_RESET_REMEMBER_REF);
 			}
 		}
@@ -142,7 +142,7 @@ void ui_menu_sliders::populate()
 	/* add UI sliders */
 	for (const slider_state *curslider = machine().ui().get_slider_list(); curslider != nullptr; curslider = curslider->next)
 	{
-		INT32 curval = (*curslider->update)(machine(), curslider->arg, &tempstring, SLIDER_NOCHANGE);
+		INT32 curval = (*curslider->update)(machine(), curslider->arg, curslider->id, &tempstring, SLIDER_NOCHANGE);
 		UINT32 flags = 0;
 		if (curval > curslider->minval)
 			flags |= MENU_FLAG_LEFT_ARROW;
@@ -154,7 +154,7 @@ void ui_menu_sliders::populate()
 	/* add OSD sliders */
 	for (const slider_state *curslider = (slider_state*)machine().osd().get_slider_list(); curslider != nullptr; curslider = curslider->next)
 	{
-		INT32 curval = (*curslider->update)(machine(), curslider->arg, &tempstring, SLIDER_NOCHANGE);
+		INT32 curval = (*curslider->update)(machine(), curslider->arg, curslider->id, &tempstring, SLIDER_NOCHANGE);
 		UINT32 flags = 0;
 		if (curval > curslider->minval)
 			flags |= MENU_FLAG_LEFT_ARROW;
@@ -184,7 +184,7 @@ void ui_menu_sliders::custom_render(void *selectedref, float top, float bottom, 
 		INT32 curval;
 
 		/* determine the current value and text */
-		curval = (*curslider->update)(machine(), curslider->arg, &tempstring, SLIDER_NOCHANGE);
+		curval = (*curslider->update)(machine(), curslider->arg, curslider->id, &tempstring, SLIDER_NOCHANGE);
 
 		/* compute the current and default percentages */
 		percentage = (float)(curval - curslider->minval) / (float)(curslider->maxval - curslider->minval);

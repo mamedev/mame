@@ -6,29 +6,33 @@
 
 STDMETHODIMP CSequentialInStreamWithCRC::Read(void *data, UInt32 size, UInt32 *processedSize)
 {
-  UInt32 realProcessedSize;
-  HRESULT result = _stream->Read(data, size, &realProcessedSize);
-  _size += realProcessedSize;
-  if (size > 0 && realProcessedSize == 0)
+  UInt32 realProcessed = 0;
+  HRESULT result = S_OK;
+  if (_stream)
+    result = _stream->Read(data, size, &realProcessed);
+  _size += realProcessed;
+  if (size != 0 && realProcessed == 0)
     _wasFinished = true;
-  _crc = CrcUpdate(_crc, data, realProcessedSize);
-  if(processedSize != NULL)
-    *processedSize = realProcessedSize;
+  _crc = CrcUpdate(_crc, data, realProcessed);
+  if (processedSize)
+    *processedSize = realProcessed;
   return result;
 }
 
 STDMETHODIMP CInStreamWithCRC::Read(void *data, UInt32 size, UInt32 *processedSize)
 {
-  UInt32 realProcessedSize;
-  HRESULT result = _stream->Read(data, size, &realProcessedSize);
+  UInt32 realProcessed = 0;
+  HRESULT result = S_OK;
+  if (_stream)
+    result = _stream->Read(data, size, &realProcessed);
+  _size += realProcessed;
   /*
-  if (size > 0 && realProcessedSize == 0)
+  if (size != 0 && realProcessed == 0)
     _wasFinished = true;
   */
-  _size += realProcessedSize;
-  _crc = CrcUpdate(_crc, data, realProcessedSize);
-  if(processedSize != NULL)
-    *processedSize = realProcessedSize;
+  _crc = CrcUpdate(_crc, data, realProcessed);
+  if (processedSize)
+    *processedSize = realProcessed;
   return result;
 }
 

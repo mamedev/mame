@@ -190,7 +190,7 @@ int renderer_bgfx::create()
 	m_screen_effect[2] = m_effects->effect("screen_multiply");
 	m_screen_effect[3] = m_effects->effect("screen_add");
 
-	m_chains = new chain_manager(window().machine(), options, *m_textures, *m_targets, *m_effects, window().m_index);
+	m_chains = new chain_manager(window().machine(), options, *m_textures, *m_targets, *m_effects, window().m_index, *this);
 	m_sliders_dirty = true;
 
 	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
@@ -907,7 +907,7 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(bool atlas_valid, 
 							return BUFFER_PRE_FLUSH;
 						}
 
-						if (PRIMFLAG_GET_SCREENTEX((*prim)->flags) && m_chains->has_applicable_pass(screen))
+						if (PRIMFLAG_GET_SCREENTEX((*prim)->flags) && m_chains->has_applicable_chain(screen))
 						{
 #if SCENE_VIEW
 							setup_view(s_current_view, true);
@@ -1122,4 +1122,9 @@ slider_state* renderer_bgfx::get_slider_list()
 {
     m_sliders_dirty = false;
     return m_chains->get_slider_list();
+}
+
+void renderer_bgfx::set_sliders_dirty()
+{
+    m_sliders_dirty = true;
 }

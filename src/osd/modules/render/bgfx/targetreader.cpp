@@ -21,11 +21,11 @@ const target_reader::string_to_enum target_reader::STYLE_NAMES[target_reader::ST
 	{ "custom", TARGET_STYLE_CUSTOM }
 };
 
-bool target_reader::read_from_value(const Value& value, std::string prefix, target_manager& targets, osd_options& options, uint32_t screen_index)
+bgfx_target* target_reader::read_from_value(const Value& value, std::string prefix, target_manager& targets, osd_options& options, uint32_t screen_index)
 {
 	if (!validate_parameters(value, prefix))
 	{
-		return false;
+		return nullptr;
 	}
 
 	std::string target_name = value["name"].GetString();
@@ -43,21 +43,24 @@ bool target_reader::read_from_value(const Value& value, std::string prefix, targ
 	switch (mode)
 	{
 		case TARGET_STYLE_GUEST:
-			break;
+            width = targets.width(TARGET_STYLE_GUEST, screen_index);
+            height = targets.height(TARGET_STYLE_GUEST, screen_index);
+            break;
 		case TARGET_STYLE_NATIVE:
-			break;
+            width = targets.width(TARGET_STYLE_NATIVE, screen_index);
+            height = targets.height(TARGET_STYLE_NATIVE, screen_index);
+            break;
 		case TARGET_STYLE_CUSTOM:
-			if (!READER_CHECK(value.HasMember("width"), (prefix + "Target '" + target_name + "': Must have numeric value 'width'\n").c_str())) return false;
-			if (!READER_CHECK(value["width"].IsNumber(), (prefix + "Target '" + target_name + "': Value 'width' must be a number\n").c_str())) return false;
-			if (!READER_CHECK(value.HasMember("height"), (prefix + "Target '" + target_name + "': Must have numeric value 'height'\n").c_str())) return false;
-			if (!READER_CHECK(value["height"].IsNumber(), (prefix + "Target '" + target_name + "': Value 'height' must be a number\n").c_str())) return false;
+			if (!READER_CHECK(value.HasMember("width"), (prefix + "Target '" + target_name + "': Must have numeric value 'width'\n").c_str())) return nullptr;
+			if (!READER_CHECK(value["width"].IsNumber(), (prefix + "Target '" + target_name + "': Value 'width' must be a number\n").c_str())) return nullptr;
+			if (!READER_CHECK(value.HasMember("height"), (prefix + "Target '" + target_name + "': Must have numeric value 'height'\n").c_str())) return nullptr;
+			if (!READER_CHECK(value["height"].IsNumber(), (prefix + "Target '" + target_name + "': Value 'height' must be a number\n").c_str())) return nullptr;
 			width = uint16_t(value["width"].GetDouble());
 			height = uint16_t(value["height"].GetDouble());
 			break;
 	}
 
-	targets.create_target(target_name, bgfx::TextureFormat::RGBA8, width, height, mode, double_buffer, bilinear, scale, screen_index);
-	return true;
+	return targets.create_target(target_name, bgfx::TextureFormat::RGBA8, width, height, mode, double_buffer, bilinear, scale, screen_index);
 }
 
 bool target_reader::validate_parameters(const Value& value, std::string prefix)

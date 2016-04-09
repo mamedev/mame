@@ -2,8 +2,6 @@
 
 #include "StdAfx.h"
 
-#include "../../../../C/Types.h"
-
 #include "ItemNameUtils.h"
 
 namespace NArchive {
@@ -11,6 +9,21 @@ namespace NItemName {
 
 static const wchar_t kOSDirDelimiter = WCHAR_PATH_SEPARATOR;
 static const wchar_t kDirDelimiter = L'/';
+
+void ReplaceToOsPathSeparator(wchar_t *s)
+{
+  #ifdef _WIN32
+  for (;;)
+  {
+    wchar_t c = *s;
+    if (c == 0)
+      break;
+    if (c == kDirDelimiter)
+      *s = kOSDirDelimiter;
+    s++;
+  }
+  #endif
+}
 
 UString MakeLegalName(const UString &name)
 {
@@ -36,15 +49,29 @@ UString GetOSName2(const UString &name)
   return newName;
 }
 
-bool HasTailSlash(const AString &name, UINT codePage)
+void ConvertToOSName2(UString &name)
+{
+  if (!name.IsEmpty())
+  {
+    name.Replace(kDirDelimiter, kOSDirDelimiter);
+    if (name.Back() == kOSDirDelimiter)
+      name.DeleteBack();
+  }
+}
+
+bool HasTailSlash(const AString &name, UINT
+  #if defined(_WIN32) && !defined(UNDER_CE)
+    codePage
+  #endif
+  )
 {
   if (name.IsEmpty())
     return false;
   LPCSTR prev =
   #if defined(_WIN32) && !defined(UNDER_CE)
-    CharPrevExA((WORD)codePage, name, &name[name.Length()], 0);
+    CharPrevExA((WORD)codePage, name, &name[name.Len()], 0);
   #else
-    (LPCSTR)(name) + (name.Length() - 1);
+    (LPCSTR)(name) + (name.Len() - 1);
   #endif
   return (*prev == '/');
 }

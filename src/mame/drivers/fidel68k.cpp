@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:Berger
 /******************************************************************************
 
     Fidelity Electronics 68000 based board driver
