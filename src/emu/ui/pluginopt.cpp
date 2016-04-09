@@ -94,13 +94,13 @@ void ui_menu_plugin_opt::populate()
 	{
 		UINT32 flags = 0;
 		if(item.flags == "off")
-			flags = 32;
+			flags = MENU_FLAG_DISABLE;
 		else if(item.flags == "l")
-			flags = 1;
+			flags = MENU_FLAG_LEFT_ARROW;
 		else if(item.flags == "r")
-			flags = 2;
+			flags = MENU_FLAG_RIGHT_ARROW;
 		else if(item.flags == "lr")
-			flags = 3;
+			flags = MENU_FLAG_RIGHT_ARROW | MENU_FLAG_LEFT_ARROW;
 
 		item_append(item.text.c_str(), item.subtext.c_str(), flags, (void *)i++);
 	}
