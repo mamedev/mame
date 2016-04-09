@@ -19,6 +19,7 @@ class CEncoder:
   public CMyUnknownImp
 {
   CLzmaEncHandle _encoder;
+  UInt64 _inputProcessed;
 public:
   MY_UNKNOWN_IMP2(ICompressSetCoderProperties, ICompressWriteCoderProperties)
     
@@ -29,6 +30,7 @@ public:
 
   CEncoder();
   virtual ~CEncoder();
+  UInt64 GetInputProcessedSize() const { return _inputProcessed; }
 };
 
 }}

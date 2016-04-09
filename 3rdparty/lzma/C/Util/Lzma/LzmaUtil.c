@@ -1,7 +1,7 @@
 /* LzmaUtil.c -- Test application for LZMA compression
-2010-09-20 : Igor Pavlov : Public domain */
+2015-11-08 : Igor Pavlov : Public domain */
 
-#define _CRT_SECURE_NO_WARNINGS
+#include "../../Precomp.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,10 +17,6 @@ const char *kCantReadMessage = "Can not read input file";
 const char *kCantWriteMessage = "Can not write output file";
 const char *kCantAllocateMessage = "Can not allocate memory";
 const char *kDataErrorMessage = "Data error";
-
-static void *SzAlloc(void *p, size_t size) { p = p; return MyAlloc(size); }
-static void SzFree(void *p, void *address) { p = p; MyFree(address); }
-static ISzAlloc g_Alloc = { SzAlloc, SzFree };
 
 void PrintHelp(char *buffer)
 {
@@ -92,7 +88,7 @@ static SRes Decode2(CLzmaDec *state, ISeqOutStream *outStream, ISeqInStream *inS
         
       outPos = 0;
       
-      if (res != SZ_OK || thereIsSize && unpackSize == 0)
+      if (res != SZ_OK || (thereIsSize && unpackSize == 0))
         return res;
       
       if (inProcessed == 0 && outProcessed == 0)
@@ -137,7 +133,7 @@ static SRes Encode(ISeqOutStream *outStream, ISeqInStream *inStream, UInt64 file
   SRes res;
   CLzmaEncProps props;
 
-  rs = rs;
+  UNUSED_VAR(rs);
 
   enc = LzmaEnc_Create(&g_Alloc);
   if (enc == 0)

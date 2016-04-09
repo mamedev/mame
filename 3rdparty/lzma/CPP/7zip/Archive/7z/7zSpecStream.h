@@ -3,9 +3,9 @@
 #ifndef __7Z_SPEC_STREAM_H
 #define __7Z_SPEC_STREAM_H
 
-#include "../../IStream.h"
-#include "../../ICoder.h"
 #include "../../../Common/MyCom.h"
+
+#include "../../ICoder.h"
 
 class CSequentialInStreamSizeCount2:
   public ISequentialInStream,
@@ -18,14 +18,14 @@ class CSequentialInStreamSizeCount2:
 public:
   void Init(ISequentialInStream *stream)
   {
-    _stream = stream;
-    _getSubStreamSize = 0;
-    _stream.QueryInterface(IID_ICompressGetSubStreamSize, &_getSubStreamSize);
     _size = 0;
+    _getSubStreamSize.Release();
+    _stream = stream;
+    _stream.QueryInterface(IID_ICompressGetSubStreamSize, &_getSubStreamSize);
   }
   UInt64 GetSize() const { return _size; }
 
-  MY_UNKNOWN_IMP1(ICompressGetSubStreamSize)
+  MY_UNKNOWN_IMP2(ISequentialInStream, ICompressGetSubStreamSize)
 
   STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
 

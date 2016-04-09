@@ -13,7 +13,7 @@ extern HINSTANCE g_hInstance;
 namespace NWindows {
 namespace NDLL {
 
-bool CLibrary::Free()
+bool CLibrary::Free() throw()
 {
   if (_module == 0)
     return true;
@@ -23,7 +23,7 @@ bool CLibrary::Free()
   return true;
 }
 
-bool CLibrary::LoadEx(CFSTR path, DWORD flags)
+bool CLibrary::LoadEx(CFSTR path, DWORD flags) throw()
 {
   if (!Free())
     return false;
@@ -40,7 +40,7 @@ bool CLibrary::LoadEx(CFSTR path, DWORD flags)
   return (_module != NULL);
 }
 
-bool CLibrary::Load(CFSTR path)
+bool CLibrary::Load(CFSTR path) throw()
 {
   if (!Free())
     return false;
@@ -93,11 +93,14 @@ bool MyGetModuleFileName(FString &path)
 FString GetModuleDirPrefix()
 {
   FString s;
-  if (NDLL::MyGetModuleFileName(s))
+  if (MyGetModuleFileName(s))
   {
-    int pos = s.ReverseFind(FCHAR_PATH_SEPARATOR);
+    int pos = s.ReverseFind_PathSepar();
     if (pos >= 0)
-      return s.Left(pos + 1);
+    {
+      s.DeleteFrom(pos + 1);
+      return s;
+    }
   }
   return FTEXT(".") FSTRING_PATH_SEPARATOR;
 }

@@ -1,9 +1,10 @@
 // OffsetStream.h
 
-#ifndef __OFFSETSTREAM_H
-#define __OFFSETSTREAM_H
+#ifndef __OFFSET_STREAM_H
+#define __OFFSET_STREAM_H
 
-#include "Common/MyCom.h"
+#include "../../Common/MyCom.h"
+
 #include "../IStream.h"
 
 class COffsetOutStream:

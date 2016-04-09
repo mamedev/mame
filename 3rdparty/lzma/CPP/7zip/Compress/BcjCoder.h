@@ -5,15 +5,22 @@
 
 #include "../../../C/Bra.h"
 
-#include "BranchCoder.h"
+#include "../../Common/MyCom.h"
 
-struct CBranch86
+#include "../ICoder.h"
+
+class CBcjCoder:
+  public ICompressFilter,
+  public CMyUnknownImp
 {
+  UInt32 _bufferPos;
   UInt32 _prevMask;
-  void x86Init() { x86_Convert_Init(_prevMask); }
-};
+  int _encode;
+public:
+  MY_UNKNOWN_IMP;
+  INTERFACE_ICompressFilter(;)
 
-MyClassB(BCJ_x86, 0x01, 3, CBranch86 ,
-    virtual void SubInit() { x86Init(); })
+  CBcjCoder(int encode): _bufferPos(0), _encode(encode) { x86_Convert_Init(_prevMask); }
+};
 
 #endif
