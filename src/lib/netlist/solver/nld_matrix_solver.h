@@ -16,8 +16,8 @@ class terms_t
 {
 	P_PREVENT_COPYING(terms_t)
 
-	public:
-	ATTR_COLD terms_t() : m_railstart(0)
+public:
+	ATTR_COLD terms_t() : m_railstart(0), m_last_V(0)
 	{}
 
 	ATTR_COLD void clear()
@@ -48,6 +48,10 @@ class terms_t
 	pvector_t<unsigned> m_nz;   /* all non zero for multiplication */
 	pvector_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
 	pvector_t<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
+
+	/* state */
+	nl_double m_last_V;
+
 private:
 	pvector_t<terminal_t *> m_term;
 	pvector_t<int> m_net_other;
@@ -55,6 +59,7 @@ private:
 	pvector_t<nl_double> m_gt;
 	pvector_t<nl_double> m_Idr;
 	pvector_t<nl_double *> m_other_curanalog;
+
 };
 
 class matrix_solver_t : public device_t
@@ -104,13 +109,22 @@ protected:
 	ATTR_COLD void setup_base(analog_net_t::list_t &nets);
 	void update_dynamic();
 
-	virtual void  add_term(int net_idx, terminal_t *term) = 0;
 	virtual void vsetup(analog_net_t::list_t &nets) = 0;
 	virtual int vsolve_non_dynamic(const bool newton_raphson) = 0;
-	virtual netlist_time compute_next_timestep() = 0;
 
+	/* virtual */ netlist_time compute_next_timestep();
+	/* virtual */ void  add_term(int net_idx, terminal_t *term);
+
+	template <typename T>
+	void store(const T * RESTRICT V);
+	template <typename T>
+	T delta(const T * RESTRICT V);
+
+	pvector_t<terms_t *> m_terms;
 	pvector_t<analog_net_t *> m_nets;
 	pvector_t<analog_output_t *> m_inps;
+
+	pvector_t<terms_t *> m_rails_temp;
 
 	int m_stat_calculations;
 	int m_stat_newton_raphson;
@@ -137,6 +151,28 @@ private:
 
 	const eSolverType m_type;
 };
+
+template <typename T>
+T matrix_solver_t::delta(const T * RESTRICT V)
+{
+	/* FIXME: Ideally we should also include currents (RHS) here. This would
+	 * need a revaluation of the right hand side after voltages have been updated
+	 * and thus belong into a different calculation. This applies to all solvers.
+	 */
+
+	const unsigned iN = this->m_terms.size();
+	T cerr = 0;
+	for (unsigned i = 0; i < iN; i++)
+		cerr = nl_math::max(cerr, nl_math::abs(V[i] - (T) this->m_nets[i]->m_cur_Analog));
+	return cerr;
+}
+
+template <typename T>
+void matrix_solver_t::store(const T * RESTRICT V)
+{
+	for (unsigned i = 0, iN=m_terms.size(); i < iN; i++)
+		this->m_nets[i]->m_cur_Analog = V[i];
+}
 
 
 NETLIB_NAMESPACE_DEVICES_END()

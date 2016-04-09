@@ -66,7 +66,6 @@ public:
 	virtual void reset() override { matrix_solver_t::reset(); }
 
 protected:
-	virtual void add_term(int net_idx, terminal_t *term) override;
 	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
 	int solve_non_dynamic(const bool newton_raphson);
 
@@ -79,13 +78,6 @@ protected:
 	template <typename T>
 	void LE_compute_x(T * RESTRICT x);
 
-	template <typename T>
-	T delta(const T * RESTRICT V);
-
-	template <typename T>
-	void store(const T * RESTRICT V);
-
-	virtual netlist_time compute_next_timestep() override;
 
 	template <typename T1, typename T2>
 	inline nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r][c]; }
@@ -103,10 +95,6 @@ protected:
 	inline nl_ext_double &lA(const T1 &r, const T2 &c) { return m_lA[r][c]; }
 
 	ATTR_ALIGN nl_double m_last_RHS[_storage_N]; // right hand side - contains currents
-	ATTR_ALIGN nl_double m_last_V[_storage_N];
-
-	terms_t * m_terms[_storage_N];
-	terms_t *m_rails_temp;
 
 private:
 	static const std::size_t m_pitch  = (((  _storage_N) + 7) / 8) * 8;
@@ -138,80 +126,10 @@ private:
 template <unsigned m_N, unsigned _storage_N>
 matrix_solver_w_t<m_N, _storage_N>::~matrix_solver_w_t()
 {
-	for (unsigned k = 0; k < N(); k++)
-	{
-		pfree(m_terms[k]);
-	}
-	pfree_array(m_rails_temp);
 #if (NL_USE_DYNAMIC_ALLOCATION)
 	pfree_array(m_A);
 #endif
 }
-
-template <unsigned m_N, unsigned _storage_N>
-netlist_time matrix_solver_w_t<m_N, _storage_N>::compute_next_timestep()
-{
-	nl_double new_solver_timestep = m_params.m_max_timestep;
-
-	if (m_params.m_dynamic)
-	{
-		/*
-		 * FIXME: We should extend the logic to use either all nets or
-		 *        only output nets.
-		 */
-		for (unsigned k = 0, iN=N(); k < iN; k++)
-		{
-			analog_net_t *n = m_nets[k];
-
-			const nl_double DD_n = (n->Q_Analog() - m_last_V[k]);
-			const nl_double hn = current_timestep();
-
-			nl_double DD2 = (DD_n / hn - n->m_DD_n_m_1 / n->m_h_n_m_1) / (hn + n->m_h_n_m_1);
-			nl_double new_net_timestep;
-
-			n->m_h_n_m_1 = hn;
-			n->m_DD_n_m_1 = DD_n;
-			if (nl_math::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
-				new_net_timestep = nl_math::sqrt(m_params.m_lte / nl_math::abs(NL_FCONST(0.5)*DD2));
-			else
-				new_net_timestep = m_params.m_max_timestep;
-
-			if (new_net_timestep < new_solver_timestep)
-				new_solver_timestep = new_net_timestep;
-
-			m_last_V[k] = n->Q_Analog();
-		}
-		if (new_solver_timestep < m_params.m_min_timestep)
-			new_solver_timestep = m_params.m_min_timestep;
-	}
-	//if (new_solver_timestep > 10.0 * hn)
-	//    new_solver_timestep = 10.0 * hn;
-	return netlist_time::from_double(new_solver_timestep);
-}
-
-template <unsigned m_N, unsigned _storage_N>
-ATTR_COLD void matrix_solver_w_t<m_N, _storage_N>::add_term(int k, terminal_t *term)
-{
-	if (term->m_otherterm->net().isRailNet())
-	{
-		m_rails_temp[k].add(term, -1, false);
-	}
-	else
-	{
-		int ot = get_net_idx(&term->m_otherterm->net());
-		if (ot>=0)
-		{
-			m_terms[k]->add(term, ot, true);
-		}
-		/* Should this be allowed ? */
-		else // if (ot<0)
-		{
-			m_rails_temp[k].add(term, ot, true);
-			log().fatal("found term with missing othernet {1}\n", term->name());
-		}
-	}
-}
-
 
 template <unsigned m_N, unsigned _storage_N>
 ATTR_COLD void matrix_solver_w_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
@@ -219,21 +137,15 @@ ATTR_COLD void matrix_solver_w_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &
 	if (m_dim < nets.size())
 		log().fatal("Dimension {1} less than {2}", m_dim, nets.size());
 
-	for (unsigned k = 0; k < N(); k++)
-	{
-		m_terms[k]->clear();
-		m_rails_temp[k].clear();
-	}
-
 	matrix_solver_t::setup_base(nets);
 
 	for (unsigned k = 0; k < N(); k++)
 	{
 		m_terms[k]->m_railstart = m_terms[k]->count();
-		for (unsigned i = 0; i < m_rails_temp[k].count(); i++)
-			this->m_terms[k]->add(m_rails_temp[k].terms()[i], m_rails_temp[k].net_other()[i], false);
+		for (unsigned i = 0; i < m_rails_temp[k]->count(); i++)
+			this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->net_other()[i], false);
 
-		m_rails_temp[k].clear(); // no longer needed
+		m_rails_temp[k]->clear(); // no longer needed
 		m_terms[k]->set_pointers();
 	}
 
@@ -329,13 +241,13 @@ ATTR_COLD void matrix_solver_w_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &
 	 * save states
 	 */
 	save(NLNAME(m_last_RHS));
-	save(NLNAME(m_last_V));
 
 	for (unsigned k = 0; k < N(); k++)
 	{
 		pstring num = pfmt("{1}")(k);
 
 		save(RHS(k), "RHS" + num);
+		save(m_terms[k]->m_last_V, "lastV" + num);
 
 		save(m_terms[k]->go(),"GO" + num, m_terms[k]->count());
 		save(m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
@@ -383,15 +295,15 @@ void matrix_solver_w_t<m_N, _storage_N>::build_LE_RHS()
 		nl_double rhsk_a = 0.0;
 		nl_double rhsk_b = 0.0;
 
-		const int terms_count = m_terms[k]->count();
+		const unsigned terms_count = m_terms[k]->count();
 		const nl_double * RESTRICT go = m_terms[k]->go();
 		const nl_double * RESTRICT Idr = m_terms[k]->Idr();
 		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->other_curanalog();
 
-		for (int i = 0; i < terms_count; i++)
+		for (unsigned i = 0; i < terms_count; i++)
 			rhsk_a = rhsk_a + Idr[i];
 
-		for (int i = m_terms[k]->m_railstart; i < terms_count; i++)
+		for (unsigned i = m_terms[k]->m_railstart; i < terms_count; i++)
 			//rhsk = rhsk + go[i] * terms[i]->m_otherterm->net().as_analog().Q_Analog();
 			rhsk_b = rhsk_b + go[i] * *other_cur_analog[i];
 
@@ -480,34 +392,6 @@ void matrix_solver_w_t<m_N, _storage_N>::LE_compute_x(
 	}
 }
 
-
-template <unsigned m_N, unsigned _storage_N>
-template <typename T>
-T matrix_solver_w_t<m_N, _storage_N>::delta(
-		const T * RESTRICT V)
-{
-	/* FIXME: Ideally we should also include currents (RHS) here. This would
-	 * need a revaluation of the right hand side after voltages have been updated
-	 * and thus belong into a different calculation. This applies to all solvers.
-	 */
-
-	const unsigned iN = this->N();
-	T cerr = 0;
-	for (unsigned i = 0; i < iN; i++)
-		cerr = std::fmax(cerr, nl_math::abs(V[i] - (T) this->m_nets[i]->m_cur_Analog));
-	return cerr;
-}
-
-template <unsigned m_N, unsigned _storage_N>
-template <typename T>
-void matrix_solver_w_t<m_N, _storage_N>::store(
-		const T * RESTRICT V)
-{
-	for (unsigned i = 0, iN=N(); i < iN; i++)
-	{
-		this->m_nets[i]->m_cur_Analog = V[i];
-	}
-}
 
 template <unsigned m_N, unsigned _storage_N>
 int matrix_solver_w_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
@@ -668,15 +552,12 @@ matrix_solver_w_t<m_N, _storage_N>::matrix_solver_w_t(const solver_parameters_t 
 	,m_cnt(0)
 	, m_dim(size)
 {
-	m_rails_temp = palloc_array(terms_t, N());
 #if (NL_USE_DYNAMIC_ALLOCATION)
 	m_A = palloc_array(nl_ext_double, N() * m_pitch);
 #endif
 	for (unsigned k = 0; k < N(); k++)
 	{
-		m_terms[k] = palloc(terms_t);
 		m_last_RHS[k] = 0.0;
-		m_last_V[k] = 0.0;
 	}
 }
 
@@ -686,12 +567,9 @@ matrix_solver_w_t<m_N, _storage_N>::matrix_solver_w_t(const eSolverType type, co
 ,m_cnt(0)
 , m_dim(size)
 {
-	m_rails_temp = palloc_array(terms_t, N());
 	for (unsigned k = 0; k < N(); k++)
 	{
-		m_terms[k] = palloc(terms_t);
 		m_last_RHS[k] = 0.0;
-		m_last_V[k] = 0.0;
 	}
 }
 
