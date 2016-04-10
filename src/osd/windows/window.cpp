@@ -277,7 +277,7 @@ void windows_osd_interface::build_slider_list()
 	for (win_window_info *window = win_window_list; window != nullptr; window = window->m_next)
 	{
 		// take the sliders of the first window
-		std::vector<slider_state*> window_sliders = window->m_renderer->get_slider_list();
+		std::vector<ui_menu_item> window_sliders = window->m_renderer->get_slider_list();
 		m_sliders.insert(m_sliders.end(), window_sliders.begin(), window_sliders.end());
 	}
 }

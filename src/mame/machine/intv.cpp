@@ -326,28 +326,6 @@ void intv_state::machine_reset()
 
 void intv_state::machine_start()
 {
-	// TODO: split these for intvkbd & intvecs??
-	for (int i = 0; i < 4; i++)
-	{
-		char str[8];
-		sprintf(str, "KEYPAD%i", i + 1);
-		m_keypad[i] = ioport(str);
-	}
-	for (int i = 0; i < 4; i++)
-	{
-		char str[6];
-		sprintf(str, "DISC%i", i + 1);
-		m_disc[i] = ioport(str);
-	}
-	for (int i = 0; i < 4; i++)
-	{
-		char str[7];
-		sprintf(str, "DISCX%i", i + 1);
-		m_discx[i] = ioport(str);
-		sprintf(str, "DISCY%i", i + 1);
-		m_discy[i] = ioport(str);
-	}
-
 	save_item(NAME(m_bus_copy_mode));
 	save_item(NAME(m_backtab_row));
 	save_item(NAME(m_ram16));
@@ -459,74 +437,3 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt)
 	m_stic->screenrefresh();
 }
 
-/* hand 0 == left, 1 == right, 2 == ECS hand controller 1, 3 == ECS hand controller 2 */
-UINT8 intv_state::intv_control_r(int hand)
-{
-	static const UINT8 keypad_table[] =
-	{
-		0xFF, 0x3F, 0x9F, 0x5F, 0xD7, 0xB7, 0x77, 0xDB,
-		0xBB, 0x7B, 0xDD, 0xBD, 0x7D, 0xDE, 0xBE, 0x7E
-	};
-
-	static const UINT8 disc_table[] =
-	{
-		0xF3, 0xE3, 0xE7, 0xF7, 0xF6, 0xE6, 0xEE, 0xFE,
-		0xFC, 0xEC, 0xED, 0xFD, 0xF9, 0xE9, 0xEB, 0xFB
-	};
-
-	static const UINT8 discyx_table[5][5] =
-	{
-		{ 0xE3, 0xF3, 0xFB, 0xEB, 0xE9 },
-		{ 0xE7, 0xE3, 0xFB, 0xE9, 0xF9 },
-		{ 0xF7, 0xF7, 0xFF, 0xFD, 0xFD },
-		{ 0xF6, 0xE6, 0xFE, 0xEC, 0xED },
-		{ 0xE6, 0xEE, 0xFE, 0xFC, 0xEC }
-	};
-
-	int x, y;
-	UINT8 rv = 0xFF;
-
-	/* keypad */
-	x = m_keypad[hand]->read();
-	for (y = 0; y < 16; y++)
-	{
-		if (x & (1 << y))
-		{
-			rv &= keypad_table[y];
-		}
-	}
-
-	switch ((m_io_options->read() >> hand) & 1)
-	{
-		case 0: /* disc == digital */
-		default:
-
-			x = m_disc[hand]->read();
-			for (y = 0; y < 16; y++)
-			{
-				if (x & (1 << y))
-				{
-					rv &= disc_table[y];
-				}
-			}
-			break;
-
-		case 1: /* disc == _fake_ analog */
-
-			x = m_discx[hand]->read();
-			y = m_discy[hand]->read();
-			rv &= discyx_table[y / 32][x / 32];
-	}
-
-	return rv;
-}
-
-READ8_MEMBER( intv_state::intv_left_control_r )
-{
-	return intv_control_r(0);
-}
-
-READ8_MEMBER( intv_state::intv_right_control_r )
-{
-	return intv_control_r(1);
-}

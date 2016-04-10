@@ -211,7 +211,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	queue->flags = flags;
 
 	// allocate events for the queue
-	queue->doneevent = osd_event_alloc(TRUE, TRUE);     // manual reset, signalled
+	queue->doneevent = new osd_event(TRUE, TRUE);     // manual reset, signalled
 	if (queue->doneevent == NULL)
 		goto error;
 
@@ -258,7 +258,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 		thread->queue = queue;
 
 		// create the per-thread wake event
-		thread->wakeevent = osd_event_alloc(FALSE, FALSE);  // auto-reset, not signalled
+		thread->wakeevent = new osd_event(FALSE, FALSE);  // auto-reset, not signalled
 		if (thread->wakeevent == NULL)
 			goto error;
 
@@ -338,10 +338,10 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 	}
 
 	// reset our done event and double-check the items before waiting
-	osd_event_reset(queue->doneevent);
+	queue->doneevent->reset();
 	queue->waiting = TRUE;
 	if (queue->items != 0)
-		osd_event_wait(queue->doneevent, timeout);
+		queue->doneevent->wait(timeout);
 	queue->waiting = FALSE;
 
 	// return TRUE if we actually hit 0
@@ -372,7 +372,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		{
 			work_thread_info *thread = &queue->thread[threadnum];
 			if (thread->wakeevent != NULL)
-				osd_event_set(thread->wakeevent);
+				thread->wakeevent->set();
 		}
 
 		// wait for all the threads to go away
@@ -389,7 +389,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 
 			// clean up the wake event
 			if (thread->wakeevent != NULL)
-				osd_event_free(thread->wakeevent);
+				delete thread->wakeevent;
 		}
 
 #if KEEP_STATISTICS
@@ -421,7 +421,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 
 	// free all the events
 	if (queue->doneevent != NULL)
-		osd_event_free(queue->doneevent);
+		delete queue->doneevent;
 
 	// free all items in the free list
 	while (queue->free.load() != nullptr)
@@ -429,7 +429,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		osd_work_item *item = (osd_work_item *)queue->free;
 		queue->free = item->next;
 		if (item->event != NULL)
-			osd_event_free(item->event);
+			delete item->event;
 		osd_free(item);
 	}
 
@@ -439,7 +439,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		osd_work_item *item = (osd_work_item *)queue->list;
 		queue->list = item->next;
 		if (item->event != NULL)
-			osd_event_free(item->event);
+			delete item->event;
 		osd_free(item);
 	}
 
@@ -534,7 +534,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 			// if this thread is not active, wake him up
 			if (!thread->active)
 			{
-				osd_event_set(thread->wakeevent);
+				thread->wakeevent->set();
 				add_to_stat(queue->setevents, 1);
 
 				// for non-shared, the first one we find is good enough
@@ -570,10 +570,10 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 	if (item->event == NULL)
 	{
 		std::lock_guard<std::mutex> lock(*item->queue->lock);
-		item->event = osd_event_alloc(TRUE, FALSE);     // manual reset, not signalled
+		item->event = new osd_event(TRUE, FALSE);     // manual reset, not signalled
 	}
 	else
-		osd_event_reset(item->event);
+		item->event->reset();
 
 	// if we don't have an event, we need to spin (shouldn't ever really happen)
 	if (item->event == NULL)
@@ -584,7 +584,7 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 
 	// otherwise, block on the event until done
 	else if (!item->done)
-		osd_event_wait(item->event, timeout);
+		item->event->wait(timeout);
 
 	// return TRUE if the refcount actually hit 0
 	return item->done;
@@ -671,7 +671,7 @@ static void *worker_thread_entry(void *param)
 		if (!queue_has_list_items(queue))
 		{
 			begin_timing(thread->waittime);
-			osd_event_wait(thread->wakeevent, OSD_EVENT_WAIT_INFINITE);
+			thread->wakeevent->wait( OSD_EVENT_WAIT_INFINITE);
 			end_timing(thread->waittime);
 		}
 
@@ -777,7 +777,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 
 				if (item->event != NULL)
 				{
-					osd_event_set(item->event);
+					item->event->set();
 					add_to_stat(item->queue->setevents, 1);
 				}
 			}
@@ -791,7 +791,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 	// we don't need to set the doneevent for multi queues because they spin
 	if (queue->waiting)
 	{
-		osd_event_set(queue->doneevent);
+		queue->doneevent->set();
 		add_to_stat(queue->setevents, 1);
 	}
 

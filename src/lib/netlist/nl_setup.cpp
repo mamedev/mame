@@ -197,8 +197,6 @@ pstring setup_t::objtype_as_astr(object_t &in) const
 			return "PARAM";
 		case terminal_t::DEVICE:
 			return "DEVICE";
-		case terminal_t::NETLIST:
-			return "NETLIST";
 		case terminal_t::QUEUE:
 			return "QUEUE";
 	}
@@ -282,9 +280,6 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 			break;
 		case terminal_t::DEVICE:
 			log().fatal("Device registration not yet supported - {1}\n", name);
-			break;
-		case terminal_t::NETLIST:
-			log().fatal("Netlist registration not yet supported - {1}\n", name);
 			break;
 		case terminal_t::QUEUE:
 			log().fatal("QUEUE registration not yet supported - {1}\n", name);

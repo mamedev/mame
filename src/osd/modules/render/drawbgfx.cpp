@@ -1118,7 +1118,7 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::
 	}
 }
 
-std::vector<slider_state*> renderer_bgfx::get_slider_list()
+std::vector<ui_menu_item> renderer_bgfx::get_slider_list()
 {
     m_sliders_dirty = false;
     return m_chains->get_slider_list();

@@ -367,7 +367,7 @@ namespace netlist
 	// object_t
 	// -----------------------------------------------------------------------------
 
-	class object_t
+	class object_t : public pstate_interface_t<object_t>
 	{
 		P_PREVENT_COPYING(object_t)
 	public:
@@ -378,8 +378,7 @@ namespace netlist
 			PARAM    = 3,
 			NET      = 4,
 			DEVICE   = 5,
-			NETLIST   = 6,
-			QUEUE   = 7
+			QUEUE    = 6
 		};
 		enum family_t {
 			// Terminal families
@@ -405,15 +404,18 @@ namespace netlist
 		};
 
 		ATTR_COLD object_t(const type_t atype, const family_t afamily);
+		ATTR_COLD object_t(netlist_t &nl, const type_t atype, const family_t afamily);
+		ATTR_COLD object_t(netlist_t &nl, const pstring &aname, const type_t atype, const family_t afamily);
 
 		virtual ~object_t();
 
+		ATTR_COLD void init_object(const pstring &aname);
 		ATTR_COLD void init_object(netlist_t &nl, const pstring &aname);
 		ATTR_COLD bool isInitialized() { return (m_netlist != NULL); }
 
 		ATTR_COLD const pstring &name() const;
 
-		PSTATE_INTERFACE_DECL()
+		ATTR_COLD inline pstate_manager_t *state_manager();
 
 		ATTR_HOT  type_t type() const { return m_objtype; }
 		ATTR_HOT  family_t family() const { return m_family; }
@@ -904,6 +906,7 @@ namespace netlist
 		P_PREVENT_COPYING(analog_output_t)
 	public:
 
+		ATTR_COLD analog_output_t(core_device_t &dev, const pstring &aname);
 		ATTR_COLD analog_output_t();
 
 		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
@@ -1183,13 +1186,15 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 
-	class netlist_t : public object_t, public pstate_manager_t, public plog_dispatch_intf
+	class netlist_t : public pstate_manager_t, public plog_dispatch_intf
 	{
 		P_PREVENT_COPYING(netlist_t)
 	public:
 
-		netlist_t();
+		netlist_t(const pstring &aname);
 		virtual ~netlist_t();
+
+		pstring name() const { return m_name; }
 
 		ATTR_COLD void start();
 		ATTR_COLD void stop();
@@ -1265,14 +1270,12 @@ namespace netlist
 		pnamedlist_t<core_device_t *> m_started_devices;
 	#endif
 
-	ATTR_COLD plog_base<NL_DEBUG> &log() { return m_log; }
-	ATTR_COLD const plog_base<NL_DEBUG> &log() const { return m_log; }
+		ATTR_COLD plog_base<NL_DEBUG> &log() { return m_log; }
+		ATTR_COLD const plog_base<NL_DEBUG> &log() const { return m_log; }
+
+		virtual void reset();
 
 	protected:
-
-		/* from object */
-		virtual void reset() override;
-		virtual void save_register() override;
 
 	#if (NL_KEEP_STATISTICS)
 		// performance
@@ -1288,13 +1291,13 @@ namespace netlist
 		bool                        m_use_deactivate;
 		queue_t                     m_queue;
 
-
 		devices::NETLIB_NAME(mainclock) *    m_mainclock;
 		devices::NETLIB_NAME(solver) *       m_solver;
 		devices::NETLIB_NAME(gnd) *          m_gnd;
 
-
 		devices::NETLIB_NAME(netlistparams) *m_params;
+
+		pstring m_name;
 		setup_t *m_setup;
 		plog_base<NL_DEBUG> m_log;
 	};
@@ -1303,7 +1306,10 @@ namespace netlist
 	// inline implementations
 	// -----------------------------------------------------------------------------
 
-	PSTATE_INTERFACE(object_t, m_netlist, name())
+	ATTR_COLD inline pstate_manager_t *object_t::state_manager()
+	{
+		return m_netlist;
+	}
 
 	template <class C, param_t::param_type_t T>
 	ATTR_HOT inline void param_template_t<C, T>::setTo(const C &param)

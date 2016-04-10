@@ -85,8 +85,8 @@ class netlist_mame_t : public netlist::netlist_t
 {
 public:
 
-	netlist_mame_t(netlist_mame_device_t &parent)
-	: netlist::netlist_t(),
+	netlist_mame_t(netlist_mame_device_t &parent, const pstring &aname)
+	: netlist::netlist_t(aname),
 		m_parent(parent)
 	{}
 	virtual ~netlist_mame_t() { };

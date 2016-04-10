@@ -81,7 +81,7 @@ private:
 	osd_dim             m_windowed_dim;
 
 	// rendering info
-	osd_event *         m_rendered_event;
+	osd_event           m_rendered_event;
 	render_target *     m_target;
 
 	// Needs to be here as well so we can identify window

@@ -17,6 +17,7 @@
 #ifndef __MACHINE_H__
 #define __MACHINE_H__
 
+#include "strformat.h"
 #include "vecstream.h"
 
 #include <time.h>
@@ -274,6 +275,8 @@ private:
 	std::string nvram_filename(device_t &device) const;
 	void nvram_load();
 	void nvram_save();
+	void popup_clear() const;
+	void popup_message(util::format_argument_pack<std::ostream> const &args) const;
 
 	// internal callbacks
 	static void logfile_callback(const running_machine &machine, const char *buffer);
@@ -381,5 +384,55 @@ private:
 	// string formatting buffer
 	mutable util::ovectorstream m_string_buffer;
 };
+
+
+
+//**************************************************************************
+//  MEMBER TEMPLATES
+//**************************************************************************
+
+/*-------------------------------------------------
+    popmessage - pop up a user-visible message
+-------------------------------------------------*/
+
+template <typename Format, typename... Params>
+inline void running_machine::popmessage(Format &&fmt, Params &&... args) const
+{
+	// if the format is NULL, it is a signal to clear the popmessage
+	// otherwise, generate the buffer and call the UI to display the message
+	if (is_null<Format>::value(fmt))
+		popup_clear();
+	else
+		popup_message(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+}
+
+
+/*-------------------------------------------------
+    logerror - log to the debugger and any other
+    OSD-defined output streams
+-------------------------------------------------*/
+
+template <typename Format, typename... Params>
+inline void running_machine::logerror(Format &&fmt, Params &&... args) const
+{
+	// process only if there is a target
+	if (!m_logerror_list.empty())
+	{
+		g_profiler.start(PROFILER_LOGERROR);
+
+		// dump to the buffer
+		m_string_buffer.clear();
+		m_string_buffer.seekp(0);
+		util::stream_format(m_string_buffer, std::forward<Format>(fmt), std::forward<Params>(args)...);
+		m_string_buffer.put('\0');
+
+		// log to all callbacks
+		char const *const str(&m_string_buffer.vec()[0]);
+		for (auto &cb : m_logerror_list)
+			(cb->m_func)(*this, str);
+
+		g_profiler.stop();
+	}
+}
 
 #endif  /* __MACHINE_H__ */

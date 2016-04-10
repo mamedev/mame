@@ -611,9 +611,6 @@ int sdl_window_info::window_init()
 
 	set_renderer(osd_renderer::make_for_type(video_config.mode, reinterpret_cast<osd_window *>(this)));
 
-	// create an event that we can use to skip blitting
-	m_rendered_event = osd_event_alloc(FALSE, TRUE);
-
 	// load the layout
 	m_target = m_machine.render().target_alloc();
 
@@ -693,9 +690,6 @@ void sdl_window_info::destroy()
 
 	// free the render target, after the textures!
 	this->machine().render().target_free(m_target);
-
-	// free the event
-	osd_event_free(m_rendered_event);
 
 }
 
@@ -816,7 +810,7 @@ void sdl_window_info::update()
 		else
 			event_wait_ticks = 0;
 
-		if (osd_event_wait(m_rendered_event, event_wait_ticks))
+		if (m_rendered_event.wait(event_wait_ticks))
 		{
 			// ensure the target bounds are up-to-date, and then get the primitives
 
@@ -1118,7 +1112,7 @@ OSDWORK_CALLBACK( sdl_window_info::draw_video_contents_wt )
 	}
 
 	/* all done, ready for next */
-	osd_event_set(window->m_rendered_event);
+	window->m_rendered_event.set();
 	osd_free(wp);
 
 	return nullptr;
@@ -1373,7 +1367,7 @@ sdl_window_info::sdl_window_info(running_machine &a_machine, int index, osd_moni
 	m_last_resize(0),
 	m_minimum_dim(0,0),
 	m_windowed_dim(0,0),
-	m_rendered_event(0), m_target(0),
+	m_rendered_event(0, 1), m_target(0),
 	m_sdl_window(NULL),
 	m_machine(a_machine), m_monitor(a_monitor), m_fullscreen(0)
 {

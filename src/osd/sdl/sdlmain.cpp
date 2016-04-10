@@ -250,7 +250,7 @@ static void output_oslog(const running_machine &machine, const char *buffer)
 //============================================================
 
 sdl_osd_interface::sdl_osd_interface(sdl_options &options)
-: osd_common_t(options), m_options(options), m_watchdog(nullptr), m_sliders(nullptr)
+: osd_common_t(options), m_options(options), m_watchdog(nullptr)
 {
 }
 

@@ -9,8 +9,12 @@
 #ifndef __OSDSYNC__
 #define __OSDSYNC__
 
+// C++ headers
+#include <mutex>
+#include <atomic>
+#include <condition_variable>
+
 #include "osdcomm.h"
-#include "osdcore.h"
 
 /***************************************************************************
     SYNCHRONIZATION INTERFACES - Events
@@ -20,87 +24,143 @@
 
 /* osd_event is an opaque type which represents a setable/resetable event */
 
-struct osd_event;
+class osd_event
+{
+public:
+	/*-----------------------------------------------------------------------------
+	    constructor: allocate a new event
 
+	    Parameters:
 
-/*-----------------------------------------------------------------------------
-    osd_event_alloc: allocate a new event
+	        manualreset  - boolean. If true, the event will be automatically set
+	                       to non-signalled after a thread successfully waited for
+	                       it.
+	        initialstate - boolean. If true, the event is signalled initially.
 
-    Parameters:
+	    Return value:
 
-        manualreset  - boolean. If true, the event will be automatically set
-                       to non-signalled after a thread successfully waited for
-                       it.
-        initialstate - boolean. If true, the event is signalled initially.
+	        A pointer to the allocated event.
+	-----------------------------------------------------------------------------*/
+	osd_event(int manualreset, int initialstate)
+	{
+		m_signalled = initialstate;
+		m_autoreset = !manualreset;
+	}
 
-    Return value:
+	~osd_event()
+	{
+	}
 
-        A pointer to the allocated event.
------------------------------------------------------------------------------*/
-osd_event *osd_event_alloc(int manualreset, int initialstate);
+	/*-----------------------------------------------------------------------------
+	    wait: 	wait for an event to be signalled
+	        	If the event is in signalled state, the
+	            function returns immediately. If not it will wait for the event
+	            to become signalled.
 
+	    Parameters:
 
-/*-----------------------------------------------------------------------------
-    osd_event_wait: wait for an event to be signalled
+	        timeout - timeout in osd_ticks
 
-    Parameters:
+	    Return value:
 
-        event - The event to wait for. If the event is in signalled state, the
-                function returns immediately. If not it will wait for the event
-                to become signalled.
-        timeout - timeout in osd_ticks
+	        true:  The event was signalled
+	        false: A timeout occurred
+	-----------------------------------------------------------------------------*/
 
-    Return value:
+	bool wait(osd_ticks_t timeout)
+	{
+		if (timeout == OSD_EVENT_WAIT_INFINITE)
+			timeout = osd_ticks_per_second() * (osd_ticks_t)10000;
 
-        TRUE:  The event was signalled
-        FALSE: A timeout occurred
------------------------------------------------------------------------------*/
-int osd_event_wait(osd_event *event, osd_ticks_t timeout);
+		std::unique_lock<std::mutex> lock(m_mutex);
+		if (!timeout)
+		{
+			if (!m_signalled)
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if (!m_signalled)
+			{
+				UINT64 msec = timeout * 1000 / osd_ticks_per_second();
 
+				do {
+					if (m_cond.wait_for(lock, std::chrono::milliseconds(msec)) == std::cv_status::timeout)
+					{
+						if (!m_signalled)
+						{
+							return FALSE;
+						}
+						else
+							break;
+					} else
+						break;
 
-/*-----------------------------------------------------------------------------
-    osd_event_reset: reset an event to non-signalled state
+				} while (true);
+			}
+		}
 
-    Parameters:
+		if (m_autoreset)
+			m_signalled = 0;
 
-        event - The event to set to non-signalled state
+		return true;
+	}
 
-    Return value:
+	/*-----------------------------------------------------------------------------
+	    osd_event_reset: reset an event to non-signalled state
 
-        None
------------------------------------------------------------------------------*/
-void osd_event_reset(osd_event *event);
+	    Parameters:
 
+	        None
 
-/*-----------------------------------------------------------------------------
-    osd_event_set: set an event to signalled state
+	    Return value:
 
-    Parameters:
+	        None
+	-----------------------------------------------------------------------------*/
+	void reset()
+	{
+		m_mutex.lock();
+		m_signalled = FALSE;
+		m_mutex.unlock();
+	}
 
-        event - The event to set to signalled state
+	/*-----------------------------------------------------------------------------
+	    osd_event_set: set an event to signalled state
 
-    Return value:
+	    Parameters:
 
-        None
+	        None
 
-    Notes:
+	    Return value:
 
-        All threads waiting for the event will be signalled.
------------------------------------------------------------------------------*/
-void osd_event_set(osd_event *event);
+	        None
 
+	    Notes:
 
-/*-----------------------------------------------------------------------------
-    osd_event_free: free the memory and resources associated with an osd_event
+	        All threads waiting for the event will be signalled.
+	-----------------------------------------------------------------------------*/
+	void set()
+	{
+		m_mutex.lock();
+		if (m_signalled == FALSE)
+		{
+			m_signalled = TRUE;
+			if (m_autoreset)
+				m_cond.notify_one();
+			else
+				m_cond.notify_all();
+		}
+		m_mutex.unlock();
+	}
 
-    Parameters:
+private:
+	std::mutex               m_mutex;
+	std::condition_variable  m_cond;
+	std::atomic<INT32>       m_autoreset;
+	std::atomic<INT32>       m_signalled;
 
-        event - a pointer to a previously allocated osd_event.
-
-    Return value:
-
-        None.
------------------------------------------------------------------------------*/
-void osd_event_free(osd_event *event);
+};
 
 #endif  /* __OSDSYNC__ */

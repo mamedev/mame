@@ -400,7 +400,7 @@ void shaders::end_avi_recording()
 //  shaders::toggle
 //============================================================
 
-void shaders::toggle(std::vector<slider_state*>& sliders)
+void shaders::toggle(std::vector<ui_menu_item>& sliders)
 {
 	if (master_enable)
 	{
@@ -827,7 +827,7 @@ void shaders::init_fsfx_quad(void *vertbuf)
 //  shaders::create_resources
 //============================================================
 
-int shaders::create_resources(bool reset, std::vector<slider_state*>& sliders)
+int shaders::create_resources(bool reset, std::vector<ui_menu_item>& sliders)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
 	{
@@ -1003,7 +1003,7 @@ int shaders::create_resources(bool reset, std::vector<slider_state*>& sliders)
 
 	initialized = true;
 
-	std::vector<slider_state*> my_sliders = init_slider_list();
+	std::vector<ui_menu_item> my_sliders = init_slider_list();
 	sliders.insert(sliders.end(), my_sliders.begin(), my_sliders.end());
 
 	return 0;
@@ -2447,9 +2447,9 @@ void *shaders::get_slider_option(int id, int index)
 	return nullptr;
 }
 
-std::vector<slider_state*> shaders::init_slider_list()
+std::vector<ui_menu_item> shaders::init_slider_list()
 {
-	std::vector<slider_state*> sliders;
+	std::vector<ui_menu_item> sliders;
 
 	for (slider* slider : internal_sliders)
 	{
@@ -2502,7 +2502,16 @@ std::vector<slider_state*> shaders::init_slider_list()
 					default:
 						break;
 				}
-				sliders.push_back(slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_update_trampoline, slider_arg));
+
+                slider_state* core_slider = slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_update_trampoline, slider_arg);
+
+                ui_menu_item item;
+                item.text = core_slider->description;
+                item.subtext = "";
+                item.flags = 0;
+                item.ref = core_slider;
+                item.type = ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER;
+                sliders.push_back(item);
 			}
 		}
 	}
