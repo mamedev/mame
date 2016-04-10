@@ -367,7 +367,7 @@ namespace netlist
 	// object_t
 	// -----------------------------------------------------------------------------
 
-	class object_t
+	class object_t : public pstate_interface_t<object_t>
 	{
 		P_PREVENT_COPYING(object_t)
 	public:
@@ -413,7 +413,7 @@ namespace netlist
 
 		ATTR_COLD const pstring &name() const;
 
-		PSTATE_INTERFACE_DECL()
+		ATTR_COLD inline pstate_manager_t *state_manager();
 
 		ATTR_HOT  type_t type() const { return m_objtype; }
 		ATTR_HOT  family_t family() const { return m_family; }
@@ -1303,7 +1303,10 @@ namespace netlist
 	// inline implementations
 	// -----------------------------------------------------------------------------
 
-	PSTATE_INTERFACE(object_t, m_netlist, name())
+	ATTR_COLD inline pstate_manager_t *object_t::state_manager()
+	{
+		return m_netlist;
+	}
 
 	template <class C, param_t::param_type_t T>
 	ATTR_HOT inline void param_template_t<C, T>::setTo(const C &param)
