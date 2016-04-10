@@ -46,13 +46,15 @@ public:
 	DECLARE_WRITE16_MEMBER(naomi_w);
 
 protected:
+	enum { TIMER_IRQ5 = 1 };
+
 	required_device<ram_device> m_ram;
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_reset_after_children() override;
-
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 private:
 	UINT16 naomi_control;
 	UINT16 naomi_offset;
@@ -70,6 +72,8 @@ private:
 	emu_file m_line_tx;    // tx line - is differential, simple serial and toslink
 	char m_localhost[256];
 	char m_remotehost[256];
+
+	emu_timer *timer;
 };
 
 // device type definition
