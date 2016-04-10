@@ -19,7 +19,11 @@ class terms_t
 	P_PREVENT_COPYING(terms_t)
 
 public:
-	ATTR_COLD terms_t() : m_railstart(0), m_last_V(0)
+	ATTR_COLD terms_t()
+	: m_railstart(0)
+	, m_last_V(0.0)
+	, m_DD_n_m_1(0.0)
+	, m_h_n_m_1(1e-6)
 	{}
 
 	ATTR_COLD void clear()
@@ -47,20 +51,22 @@ public:
 
 	unsigned m_railstart;
 
-	pvector_t<unsigned> m_nz;   /* all non zero for multiplication */
-	pvector_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
-	pvector_t<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
+	pvector_t<int> m_nz;   /* all non zero for multiplication */
+	pvector_t<int> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
+	pvector_t<int> m_nzbd; /* non zero below of the diagonal for elimination */
 
 	/* state */
 	nl_double m_last_V;
+	nl_double m_DD_n_m_1;
+	nl_double m_h_n_m_1;
 
 private:
-	pvector_t<terminal_t *> m_term;
 	pvector_t<int> m_net_other;
 	pvector_t<nl_double> m_go;
 	pvector_t<nl_double> m_gt;
 	pvector_t<nl_double> m_Idr;
 	pvector_t<nl_double *> m_other_curanalog;
+	pvector_t<terminal_t *> m_term;
 
 };
 

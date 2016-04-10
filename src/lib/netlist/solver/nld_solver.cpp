@@ -356,15 +356,16 @@ netlist_time matrix_solver_t::compute_next_timestep()
 		for (unsigned k = 0, iN=m_terms.size(); k < iN; k++)
 		{
 			analog_net_t *n = m_nets[k];
+			terms_t *t = m_terms[k];
 
-			const nl_double DD_n = (n->Q_Analog() - m_terms[k]->m_last_V);
+			const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
 			const nl_double hn = current_timestep();
 
-			nl_double DD2 = (DD_n / hn - n->m_DD_n_m_1 / n->m_h_n_m_1) / (hn + n->m_h_n_m_1);
+			nl_double DD2 = (DD_n / hn - t->m_DD_n_m_1 / t->m_h_n_m_1) / (hn + t->m_h_n_m_1);
 			nl_double new_net_timestep;
 
-			n->m_h_n_m_1 = hn;
-			n->m_DD_n_m_1 = DD_n;
+			t->m_h_n_m_1 = hn;
+			t->m_DD_n_m_1 = DD_n;
 			if (nl_math::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
 				new_net_timestep = nl_math::sqrt(m_params.m_lte / nl_math::abs(NL_FCONST(0.5)*DD2));
 			else
@@ -373,7 +374,7 @@ netlist_time matrix_solver_t::compute_next_timestep()
 			if (new_net_timestep < new_solver_timestep)
 				new_solver_timestep = new_net_timestep;
 
-			m_terms[k]->m_last_V = n->Q_Analog();
+			t->m_last_V = n->Q_Analog();
 		}
 		if (new_solver_timestep < m_params.m_min_timestep)
 			new_solver_timestep = m_params.m_min_timestep;

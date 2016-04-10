@@ -34,7 +34,7 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 #if TEST_PARALLEL
 #define MAXTHR 10
-static const int num_thr = 2;
+static const int num_thr = 1;
 
 struct thr_intf
 {
@@ -46,7 +46,7 @@ struct ti_t
 	volatile std::atomic<int> lo;
 	thr_intf *intf;
 	void *params;
-	int _block[29]; /* make it 256 bytes */
+//	int _block[29]; /* make it 256 bytes */
 };
 
 static ti_t ti[MAXTHR];
@@ -315,20 +315,27 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 			touched[k][m_terms[k]->m_nz[j]] = true;
 	}
 
+	unsigned ops = 0;
 	for (unsigned k = 0; k < N(); k++)
 	{
+		ops++; // 1/A(k,k)
 		for (unsigned row = k + 1; row < N(); row++)
 		{
 			if (touched[row][k])
 			{
+				ops++;
 				if (!m_terms[k]->m_nzbd.contains(row))
 					m_terms[k]->m_nzbd.push_back(row);
 				for (unsigned col = k; col < N(); col++)
 					if (touched[k][col])
+					{
 						touched[row][col] = true;
+						ops += 2;
+					}
 			}
 		}
 	}
+	log().verbose("Number of mults/adds for {1}: {2}", name(), ops);
 
 	if (0)
 		for (unsigned k = 0; k < N(); k++)
@@ -348,8 +355,10 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 	{
 		pstring num = pfmt("{1}")(k);
 
-		save(RHS(k), "RHS" + num);
-		save(m_terms[k]->m_last_V, "lastV" + num);
+		save(RHS(k), "RHS." + num);
+		save(m_terms[k]->m_last_V, "lastV." + num);
+		save(m_terms[k]->m_DD_n_m_1, "m_DD_n_m_1." + num);
+		save(m_terms[k]->m_h_n_m_1, "m_h_n_m_1." + num);
 
 		save(m_terms[k]->go(),"GO" + num, m_terms[k]->count());
 		save(m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
@@ -369,14 +378,10 @@ void matrix_solver_direct_t<m_N, _storage_N>::do_work(const int id, void *param)
 	const nl_double f = 1.0 / A(i,i);
 	const unsigned * RESTRICT const p = m_terms[i]->m_nzrd.data();
 	const unsigned e = m_terms[i]->m_nzrd.size();
-	//nl_double A_cache[128];
-	//for (unsigned k = 0; k < e; k++)
-	//	A_cache[k] = A(i,p[k]);
 
 	/* Eliminate column i from row j */
 
 	const unsigned * RESTRICT const pb = m_terms[i]->m_nzbd.data();
-	//const unsigned eb = m_terms[i]->m_nzbd.size();
 	const unsigned sj = x_start[id];
 	const unsigned se = x_stop[id];
 	for (unsigned jb = sj; jb < se; jb++)
@@ -384,9 +389,7 @@ void matrix_solver_direct_t<m_N, _storage_N>::do_work(const int id, void *param)
 		const unsigned j = pb[jb];
 		const nl_double f1 = - A(j,i) * f;
 		for (unsigned k = 0; k < e; k++)
-			//A(j,p[k]) += A_cache[k] * f1;
 			A(j,p[k]) += A(i,p[k]) * f1;
-		//RHS(j) += RHS(i) * f1;
 	}
 }
 #endif
@@ -449,15 +452,16 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 			if (eb > 0)
 			{
 				//printf("here %d\n", eb);
-				unsigned chunks = (eb) / (num_thr + 1);
+				unsigned chunks = (eb + num_thr) / (num_thr + 1);
 				for (int p=0; p < num_thr + 1; p++)
 				{
 					x_i[p] = i;
 					x_start[p] = chunks * p;
 					x_stop[p] = std::min(chunks*(p+1), eb);
-					if (p<num_thr) thr_process(p, this, NULL);
+					if (p<num_thr && x_start[p] < x_stop[p]) thr_process(p, this, NULL);
 				}
-				do_work(num_thr, NULL);
+				if (x_start[num_thr] < x_stop[num_thr])
+					do_work(num_thr, NULL);
 				thr_wait();
 			}
 			else if (eb > 0)
@@ -468,7 +472,6 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 				do_work(0, NULL);
 			}
 #else
-#if 0
 			/* FIXME: Singular matrix? */
 			const nl_double f = 1.0 / A(i,i);
 			const auto &nzrd = m_terms[i]->m_nzrd;
@@ -478,27 +481,12 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 
 			for (auto & j : nzbd)
 			{
+				//__builtin_prefetch((const void*)(&A(j+2,0)),0,0);
 				const nl_double f1 = - A(j,i) * f;
 				for (auto & k : nzrd)
 					A(j,k) += A(i,k) * f1;
 				//RHS(j) += RHS(i) * f1;
 			}
-#else
-			/* FIXME: Singular matrix? */
-			const nl_double f = 1.0 / A(i,i);
-			const auto &nzrd = m_terms[i]->m_nzrd;
-			const auto &nzbd = m_terms[i]->m_nzbd;
-
-			/* Eliminate column i from row j */
-
-			for (auto & j : nzbd)
-			{
-				const nl_double f1 = - A(j,i) * f;
-				for (auto & k : nzrd)
-					A(j,k) += A(i,k) * f1;
-				//RHS(j) += RHS(i) * f1;
-			}
-#endif
 #endif
 		}
 	}
@@ -528,12 +516,12 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 		{
 			T tmp = 0;
 
-			const unsigned *p = m_terms[j]->m_nzrd.data();
-			const unsigned e = m_terms[j]->m_nzrd.size() - 1; /* exclude RHS element */
+			const auto *p = m_terms[j]->m_nzrd.data();
+			const auto e = m_terms[j]->m_nzrd.size() - 1; /* exclude RHS element */
 
 			for (unsigned k = 0; k < e; k++)
 			{
-				const unsigned pk = p[k];
+				const auto pk = p[k];
 				tmp += A(j,pk) * x[pk];
 			}
 			x[j] = (RHS(j) - tmp) / A(j,j);

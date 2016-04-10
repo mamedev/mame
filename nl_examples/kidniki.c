@@ -4,7 +4,7 @@
 #include "netlist/devices/nld_system.h"
 #include "netlist/analog/nld_bjt.h"
 
-#define USE_FRONTIERS 1
+#define USE_FRONTIERS 0
 #define USE_FIXED_STV 1
 
 NETLIST_START(dummy)
@@ -23,7 +23,7 @@ NETLIST_START(dummy)
 	PARAM(Solver.MIN_TIMESTEP, 10e-6)
 	PARAM(Solver.PARALLEL, 0)
 	PARAM(Solver.SOR_FACTOR, 1.00)
-	PARAM(Solver.PIVOT, 0)
+	PARAM(Solver.PIVOT, 1)
 #else
 	SOLVER(Solver, 12000)
 	PARAM(Solver.ACCURACY, 1e-8)

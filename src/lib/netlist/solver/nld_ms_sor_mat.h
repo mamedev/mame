@@ -178,7 +178,7 @@ int matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newt
 		{
 			nl_double Idrive = 0;
 
-			const unsigned *p = this->m_terms[k]->m_nz.data();
+			const auto *p = this->m_terms[k]->m_nz.data();
 			const unsigned e = this->m_terms[k]->m_nz.size();
 
 			for (unsigned i = 0; i < e; i++)

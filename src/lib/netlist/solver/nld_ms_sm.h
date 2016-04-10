@@ -263,12 +263,12 @@ void matrix_solver_sm_t<m_N, _storage_N>::LE_invert()
 	{
 		/* FIXME: Singular matrix? */
 		const nl_double f = 1.0 / W(i,i);
-		const unsigned * RESTRICT const p = m_terms[i]->m_nzrd.data();
+		const auto * RESTRICT const p = m_terms[i]->m_nzrd.data();
 		const unsigned e = m_terms[i]->m_nzrd.size();
 
 		/* Eliminate column i from row j */
 
-		const unsigned * RESTRICT const pb = m_terms[i]->m_nzbd.data();
+		const auto * RESTRICT const pb = m_terms[i]->m_nzbd.data();
 		const unsigned eb = m_terms[i]->m_nzbd.size();
 		for (unsigned jb = 0; jb < eb; jb++)
 		{
