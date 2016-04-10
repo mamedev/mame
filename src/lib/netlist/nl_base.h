@@ -405,6 +405,8 @@ namespace netlist
 		};
 
 		ATTR_COLD object_t(const type_t atype, const family_t afamily);
+		ATTR_COLD object_t(const pstring &aname, const type_t atype, const family_t afamily);
+		ATTR_COLD object_t(netlist_t &nl, const pstring &aname, const type_t atype, const family_t afamily);
 
 		virtual ~object_t();
 
@@ -1188,7 +1190,7 @@ namespace netlist
 		P_PREVENT_COPYING(netlist_t)
 	public:
 
-		netlist_t();
+		netlist_t(const pstring &aname);
 		virtual ~netlist_t();
 
 		ATTR_COLD void start();

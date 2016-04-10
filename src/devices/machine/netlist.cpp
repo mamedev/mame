@@ -300,9 +300,8 @@ void netlist_mame_device_t::device_start()
 
 	//printf("clock is %d\n", clock());
 
-	m_netlist = global_alloc(netlist_mame_t(*this));
+	m_netlist = global_alloc(netlist_mame_t(*this, "netlist"));
 	m_setup = global_alloc(netlist::setup_t(m_netlist));
-	netlist().init_object(*m_netlist, "netlist");
 	m_setup->init();
 
 	// register additional devices

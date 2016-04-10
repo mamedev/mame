@@ -74,13 +74,12 @@ logic_family_desc_t *family_CD4XXX = palloc(logic_family_cd4xxx_t);
 
 queue_t::queue_t(netlist_t &nl)
 	: timed_queue<net_t *, netlist_time>(512)
-	, object_t(QUEUE, GENERIC)
+	, object_t(nl, "QUEUE", QUEUE, GENERIC)
 	, pstate_callback_t()
 	, m_qsize(0)
 	, m_times(512)
 	, m_names(512)
 {
-	this->init_object(nl, "QUEUE");
 }
 
 void queue_t::register_state(pstate_manager_t &manager, const pstring &module)
@@ -131,6 +130,23 @@ ATTR_COLD object_t::object_t(const type_t atype, const family_t afamily)
 , m_netlist(NULL)
 {}
 
+ATTR_COLD object_t::object_t(const pstring &aname, const type_t atype, const family_t afamily)
+: m_name(aname)
+, m_objtype(atype)
+, m_family(afamily)
+{
+	// FIXME:
+	m_netlist = reinterpret_cast<netlist_t *>(this);
+}
+
+ATTR_COLD object_t::object_t(netlist_t &nl, const pstring &aname, const type_t atype, const family_t afamily)
+: m_name(aname)
+, m_objtype(atype)
+, m_family(afamily)
+, m_netlist(&nl)
+{
+}
+
 ATTR_COLD object_t::~object_t()
 {
 }
@@ -171,8 +187,8 @@ ATTR_COLD void device_object_t::init_object(core_device_t &dev,
 // netlist_t
 // ----------------------------------------------------------------------------------------
 
-netlist_t::netlist_t()
-	:   object_t(NETLIST, GENERIC), pstate_manager_t(),
+netlist_t::netlist_t(const pstring &aname)
+	:   object_t(aname, NETLIST, GENERIC), pstate_manager_t(),
 		m_stop(netlist_time::zero),
 		m_time(netlist_time::zero),
 		m_use_deactivate(0),
