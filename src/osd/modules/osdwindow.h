@@ -13,6 +13,14 @@
 #include "ui/ui.h"
 #include "osdhelper.h"
 
+// standard windows headers
+#ifdef OSD_WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <windowsx.h>
+#include <mmsystem.h>
+#endif
+
 #ifdef OSD_SDL
 // forward declaration
 struct SDL_Window;
@@ -132,11 +140,11 @@ public:
 
 	virtual osd_dim get_size() = 0;
 
-#ifdef OSD_SDL
 	virtual osd_monitor_info *monitor() const = 0;
+
+#ifdef OSD_SDL
 	virtual SDL_Window *sdl_window() = 0;
 #else
-	virtual osd_monitor_info *monitor() const = 0;
 	virtual bool win_has_menu() = 0;
 	// FIXME: cann we replace winwindow_video_window_monitor(NULL) with monitor() ?
 	virtual osd_monitor_info *winwindow_video_window_monitor(const osd_rect *proposed) = 0;
