@@ -13,6 +13,8 @@
 #ifndef __USRINTRF_H__
 #define __USRINTRF_H__
 
+#include <vector>
+
 #include "render.h"
 #include "moptions.h"
 
@@ -128,6 +130,7 @@ public:
 
 	// methods
 	void initialize(running_machine &machine);
+	std::vector<slider_state *> slider_init(running_machine &machine);
 	UINT32 set_handler(ui_callback callback, UINT32 param);
 	void display_startup_screens(bool first_time);
 	void set_startup_text(const char *text, bool force);
@@ -166,7 +169,7 @@ public:
 	std::string &game_info_astring(std::string &str);
 
 	// slider controls
-	const slider_state *get_slider_list(void);
+	std::vector<slider_state *>&	get_slider_list(void);
 
 	// other
 	void process_natural_keyboard();
@@ -209,7 +212,7 @@ private:
 	static std::string      messagebox_poptext;
 	static rgb_t            messagebox_backcolor;
 
-	static slider_state     *slider_list;
+	static std::vector<slider_state *> slider_list;
 	static slider_state     *slider_current;
 
 	// text generators

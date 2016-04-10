@@ -118,7 +118,7 @@ std::string ui_manager::messagebox_poptext;
 rgb_t ui_manager::messagebox_backcolor;
 
 // slider info
-slider_state *ui_manager::slider_list;
+std::vector<slider_state *> ui_manager::slider_list;
 slider_state *ui_manager::slider_current;
 
 
@@ -128,7 +128,6 @@ slider_state *ui_manager::slider_current;
 
 // slider controls
 static slider_state *slider_alloc(running_machine &machine, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg);
-static slider_state *slider_init(running_machine &machine);
 static INT32 slider_volume(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
 static INT32 slider_mixervol(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
 static INT32 slider_adjuster(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
@@ -338,7 +337,15 @@ void ui_manager::exit()
 void ui_manager::initialize(running_machine &machine)
 {
 	// initialize the on-screen display system
-	slider_list = slider_current = slider_init(machine);
+	slider_list = slider_init(machine);
+	if (slider_list.size() > 0)
+	{
+		slider_current = slider_list[0];
+	}
+	else
+	{
+		slider_current = nullptr;
+	}
 }
 
 
@@ -1866,7 +1873,7 @@ UINT32 ui_manager::handler_confirm_quit(running_machine &machine, render_contain
 //  ui_get_slider_list - get the list of sliders
 //-------------------------------------------------
 
-const slider_state *ui_manager::get_slider_list(void)
+std::vector<slider_state *>& ui_manager::get_slider_list(void)
 {
 	return slider_list;
 }
@@ -1894,43 +1901,40 @@ static slider_state *slider_alloc(running_machine &machine, const char *title, I
 }
 
 
-//-------------------------------------------------
-//  slider_init - initialize the list of slider
+//----------------------------------------------------------
+//  ui_manager::slider_init - initialize the list of slider
 //  controls
-//-------------------------------------------------
+//----------------------------------------------------------
 
-static slider_state *slider_init(running_machine &machine)
+std::vector<slider_state *> ui_manager::slider_init(running_machine &machine)
 {
-	slider_state *listhead = nullptr;
-	slider_state **tailptr = &listhead;
-	std::string str;
-	int item;
+	std::vector<slider_state *> sliders;
 
 	// add overall volume
-	*tailptr = slider_alloc(machine, _("Master Volume"), -32, 0, 0, 1, slider_volume, nullptr);
-	tailptr = &(*tailptr)->next;
+	sliders.push_back(slider_alloc(machine, _("Master Volume"), -32, 0, 0, 1, slider_volume, nullptr));
 
 	// add per-channel volume
 	mixer_input info;
-	for (item = 0; machine.sound().indexed_mixer_input(item, info); item++)
+	for (int item = 0; machine.sound().indexed_mixer_input(item, info); item++)
 	{
 		INT32 maxval = 2000;
 		INT32 defval = 1000;
 
-		str = string_format(_("%1$s Volume"), info.stream->input_name(info.inputnum));
-		*tailptr = slider_alloc(machine, str.c_str(), 0, defval, maxval, 20, slider_mixervol, (void *)(FPTR)item);
-		tailptr = &(*tailptr)->next;
+		std::string str = string_format(_("%1$s Volume"), info.stream->input_name(info.inputnum));
+		sliders.push_back(slider_alloc(machine, str.c_str(), 0, defval, maxval, 20, slider_mixervol, (void *)(FPTR)item));
 	}
 
 	// add analog adjusters
 	for (ioport_port &port : machine.ioport().ports())
+	{
 		for (ioport_field &field : port.fields())
+		{
 			if (field.type() == IPT_ADJUSTER)
 			{
-				void *param = (void *)&field;
-				*tailptr = slider_alloc(machine, field.name(), field.minval(), field.defvalue(), field.maxval(), 1, slider_adjuster, param);
-				tailptr = &(*tailptr)->next;
+				sliders.push_back(slider_alloc(machine, field.name(), field.minval(), field.defvalue(), field.maxval(), 1, slider_adjuster, (void *)&field));
 			}
+		}
+	}
 
 	// add CPU overclocking (cheat only)
 	if (machine.options().cheat())
@@ -1939,9 +1943,8 @@ static slider_state *slider_init(running_machine &machine)
 		for (device_execute_interface *exec = iter.first(); exec != nullptr; exec = iter.next())
 		{
 			void *param = (void *)&exec->device();
-			str = string_format(_("Overclock CPU %1$s"), exec->device().tag());
-			*tailptr = slider_alloc(machine, str.c_str(), 10, 1000, 2000, 1, slider_overclock, param);
-			tailptr = &(*tailptr)->next;
+			std::string str = string_format(_("Overclock CPU %1$s"), exec->device().tag());
+			sliders.push_back(slider_alloc(machine, str.c_str(), 10, 1000, 2000, 1, slider_overclock, param));
 		}
 	}
 
@@ -1959,39 +1962,32 @@ static slider_state *slider_init(running_machine &machine)
 		// add refresh rate tweaker
 		if (machine.options().cheat())
 		{
-			str = string_format(_("%1$s Refresh Rate"), screen_desc);
-			*tailptr = slider_alloc(machine, str.c_str(), -10000, 0, 10000, 1000, slider_refresh, param);
-			tailptr = &(*tailptr)->next;
+			std::string str = string_format(_("%1$s Refresh Rate"), screen_desc);
+			sliders.push_back(slider_alloc(machine, str.c_str(), -10000, 0, 10000, 1000, slider_refresh, param));
 		}
 
 		// add standard brightness/contrast/gamma controls per-screen
-		str = string_format(_("%1$s Brightness"), screen_desc);
-		*tailptr = slider_alloc(machine, str.c_str(), 100, 1000, 2000, 10, slider_brightness, param);
-		tailptr = &(*tailptr)->next;
+		std::string str = string_format(_("%1$s Brightness"), screen_desc);
+		sliders.push_back(slider_alloc(machine, str.c_str(), 100, 1000, 2000, 10, slider_brightness, param));
 		str = string_format(_("%1$s Contrast"), screen_desc);
-		*tailptr = slider_alloc(machine, str.c_str(), 100, 1000, 2000, 50, slider_contrast, param);
-		tailptr = &(*tailptr)->next;
+		sliders.push_back(slider_alloc(machine, str.c_str(), 100, 1000, 2000, 50, slider_contrast, param));
 		str = string_format(_("%1$s Gamma"), screen_desc);
-		*tailptr = slider_alloc(machine, str.c_str(), 100, 1000, 3000, 50, slider_gamma, param);
-		tailptr = &(*tailptr)->next;
+		sliders.push_back(slider_alloc(machine, str.c_str(), 100, 1000, 3000, 50, slider_gamma, param));
 
 		// add scale and offset controls per-screen
 		str = string_format(_("%1$s Horiz Stretch"), screen_desc);
-		*tailptr = slider_alloc(machine, str.c_str(), 500, defxscale, 1500, 2, slider_xscale, param);
-		tailptr = &(*tailptr)->next;
+		sliders.push_back(slider_alloc(machine, str.c_str(), 500, defxscale, 1500, 2, slider_xscale, param));
 		str = string_format(_("%1$s Horiz Position"), screen_desc);
-		*tailptr = slider_alloc(machine, str.c_str(), -500, defxoffset, 500, 2, slider_xoffset, param);
-		tailptr = &(*tailptr)->next;
+		sliders.push_back(slider_alloc(machine, str.c_str(), -500, defxoffset, 500, 2, slider_xoffset, param));
 		str = string_format(_("%1$s Vert Stretch"), screen_desc);
-		*tailptr = slider_alloc(machine, str.c_str(), 500, defyscale, 1500, 2, slider_yscale, param);
-		tailptr = &(*tailptr)->next;
+		sliders.push_back(slider_alloc(machine, str.c_str(), 500, defyscale, 1500, 2, slider_yscale, param));
 		str = string_format(_("%1$s Vert Position"), screen_desc);
-		*tailptr = slider_alloc(machine, str.c_str(), -500, defyoffset, 500, 2, slider_yoffset, param);
-		tailptr = &(*tailptr)->next;
+		sliders.push_back(slider_alloc(machine, str.c_str(), -500, defyoffset, 500, 2, slider_yoffset, param));
 	}
 
 	laserdisc_device_iterator lditer(machine.root_device());
 	for (laserdisc_device *laserdisc = lditer.first(); laserdisc != nullptr; laserdisc = lditer.next())
+	{
 		if (laserdisc->overlay_configured())
 		{
 			laserdisc_overlay_config config;
@@ -2003,52 +1999,48 @@ static slider_state *slider_init(running_machine &machine)
 			void *param = (void *)laserdisc;
 
 			// add scale and offset controls per-overlay
-			str = string_format(_("Laserdisc '%1$s' Horiz Stretch"), laserdisc->tag());
-			*tailptr = slider_alloc(machine, str.c_str(), 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
-			tailptr = &(*tailptr)->next;
+			std::string str = string_format(_("Laserdisc '%1$s' Horiz Stretch"), laserdisc->tag());
+			sliders.push_back(slider_alloc(machine, str.c_str(), 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param));
 			str = string_format(_("Laserdisc '%1$s' Horiz Position"), laserdisc->tag());
-			*tailptr = slider_alloc(machine, str.c_str(), -500, defxoffset, 500, 2, slider_overxoffset, param);
-			tailptr = &(*tailptr)->next;
+			sliders.push_back(slider_alloc(machine, str.c_str(), -500, defxoffset, 500, 2, slider_overxoffset, param));
 			str = string_format(_("Laserdisc '%1$s' Vert Stretch"), laserdisc->tag());
-			*tailptr = slider_alloc(machine, str.c_str(), 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_overyscale, param);
-			tailptr = &(*tailptr)->next;
+			sliders.push_back(slider_alloc(machine, str.c_str(), 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_overyscale, param));
 			str = string_format(_("Laserdisc '%1$s' Vert Position"), laserdisc->tag());
-			*tailptr = slider_alloc(machine, str.c_str(), -500, defyoffset, 500, 2, slider_overyoffset, param);
-			tailptr = &(*tailptr)->next;
+			sliders.push_back(slider_alloc(machine, str.c_str(), -500, defyoffset, 500, 2, slider_overyoffset, param));
 		}
+	}
 
 	for (screen_device *screen = scriter.first(); screen != nullptr; screen = scriter.next())
+	{
 		if (screen->screen_type() == SCREEN_TYPE_VECTOR)
 		{
 			// add vector control
-			*tailptr = slider_alloc(machine, _("Vector Flicker"), 0, 0, 1000, 10, slider_flicker, nullptr);
-			tailptr = &(*tailptr)->next;
-			*tailptr = slider_alloc(machine, _("Beam Width Minimum"), 1, 100, 1000, 1, slider_beam_width_min, nullptr);
-			tailptr = &(*tailptr)->next;
-			*tailptr = slider_alloc(machine, _("Beam Width Maximum"), 1, 100, 1000, 1, slider_beam_width_max, nullptr);
-			tailptr = &(*tailptr)->next;
-			*tailptr = slider_alloc(machine, _("Beam Intensity Weight"), -1000, 0, 1000, 10, slider_beam_intensity_weight, nullptr);
-			tailptr = &(*tailptr)->next;
+			sliders.push_back(slider_alloc(machine, _("Vector Flicker"), 0, 0, 1000, 10, slider_flicker, nullptr));
+			sliders.push_back(slider_alloc(machine, _("Beam Width Minimum"), 1, 100, 1000, 1, slider_beam_width_min, nullptr));
+			sliders.push_back(slider_alloc(machine, _("Beam Width Maximum"), 1, 100, 1000, 1, slider_beam_width_max, nullptr));
+			sliders.push_back(slider_alloc(machine, _("Beam Intensity Weight"), -1000, 0, 1000, 10, slider_beam_intensity_weight, nullptr));
 			break;
 		}
+	}
 
 #ifdef MAME_DEBUG
 	// add crosshair adjusters
 	for (ioport_port &port : machine.ioport().ports())
+	{
 		for (ioport_field &field : port.fields())
+		{
 			if (field.crosshair_axis() != CROSSHAIR_AXIS_NONE && field.player() == 0)
 			{
-				void *param = (void *)&field;
-				str = string_format(_("Crosshair Scale %1$s"), (field.crosshair_axis() == CROSSHAIR_AXIS_X) ? _("X") : _("Y"));
-				*tailptr = slider_alloc(machine, str.c_str(), -3000, 1000, 3000, 100, slider_crossscale, param);
-				tailptr = &(*tailptr)->next;
+				std::string str = string_format(_("Crosshair Scale %1$s"), (field.crosshair_axis() == CROSSHAIR_AXIS_X) ? _("X") : _("Y"));
+				sliders.push_back(slider_alloc(machine, str.c_str(), -3000, 1000, 3000, 100, slider_crossscale, (void *)&field));
 				str = string_format(_("Crosshair Offset %1$s"), (field.crosshair_axis() == CROSSHAIR_AXIS_X) ? _("X") : _("Y"));
-				*tailptr = slider_alloc(machine, str.c_str(), -3000, 0, 3000, 100, slider_crossoffset, param);
-				tailptr = &(*tailptr)->next;
+				sliders.push_back(slider_alloc(machine, str.c_str(), -3000, 0, 3000, 100, slider_crossoffset, (void *)&field));
 			}
+		}
+	}
 #endif
 
-	return listhead;
+	return sliders;
 }
 
 

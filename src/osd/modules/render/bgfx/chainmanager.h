@@ -41,7 +41,7 @@ public:
     bgfx_chain* screen_chain(uint32_t screen);
     bgfx_chain* load_chain(std::string name, uint32_t screen_index);
     bool has_applicable_chain(uint32_t screen);
-    slider_state* get_slider_list();
+    std::vector<slider_state*> get_slider_list();
 
 private:
     void load_chains();

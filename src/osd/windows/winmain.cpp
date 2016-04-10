@@ -506,7 +506,6 @@ static void output_oslog(const running_machine &machine, const char *buffer)
 windows_osd_interface::windows_osd_interface(windows_options &options)
 	: osd_common_t(options)
 	, m_options(options)
-	, m_sliders(nullptr)
 {
 }
 

@@ -23,6 +23,7 @@
 #include "aviio.h"
 #include "png.h"
 #include "screen.h"
+#include "ui/ui.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -37,7 +38,6 @@
 //  GLOBALS
 //============================================================
 
-static slider_state *g_slider_list;
 static osd_file::error open_next(renderer_d3d9 *d3d, emu_file &file, const char *templ, const char *extension, int idx);
 
 //============================================================
@@ -86,7 +86,7 @@ shaders::shaders() :
 
 shaders::~shaders()
 {
-	for (slider* slider : sliders)
+	for (slider* slider : internal_sliders)
 	{
 		delete slider;
 	}
@@ -400,7 +400,7 @@ void shaders::end_avi_recording()
 //  shaders::toggle
 //============================================================
 
-void shaders::toggle()
+void shaders::toggle(std::vector<slider_state*>& sliders)
 {
 	if (master_enable)
 	{
@@ -427,7 +427,7 @@ void shaders::toggle()
 		if (!initialized)
 		{
 			// re-create shader resources after renderer resources
-			bool failed = create_resources(false);
+			bool failed = create_resources(false, sliders);
 			if (failed)
 			{
 				master_enable = false;
@@ -827,7 +827,7 @@ void shaders::init_fsfx_quad(void *vertbuf)
 //  shaders::create_resources
 //============================================================
 
-int shaders::create_resources(bool reset)
+int shaders::create_resources(bool reset, std::vector<slider_state*>& sliders)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
 	{
@@ -1003,7 +1003,8 @@ int shaders::create_resources(bool reset)
 
 	initialized = true;
 
-	init_slider_list();
+	std::vector<slider_state*> my_sliders = init_slider_list();
+	sliders.insert(sliders.end(), my_sliders.begin(), my_sliders.end());
 
 	return 0;
 }
@@ -2103,8 +2104,6 @@ void shaders::delete_resources(bool reset)
 	}
 
 	shadow_bitmap.reset();
-
-	g_slider_list = nullptr;
 }
 
 
@@ -2379,10 +2378,6 @@ slider_desc shaders::s_sliders[] =
 };
 
 
-//============================================================
-//  init_slider_list
-//============================================================
-
 void *shaders::get_slider_option(int id, int index)
 {
 	switch (id)
@@ -2452,15 +2447,15 @@ void *shaders::get_slider_option(int id, int index)
 	return nullptr;
 }
 
-void shaders::init_slider_list()
+std::vector<slider_state*> shaders::init_slider_list()
 {
-	if (!master_enable || !d3dintf->post_fx_available)
-	{
-		g_slider_list = nullptr;
-	}
+	std::vector<slider_state*> sliders;
 
-	slider_state *listhead = nullptr;
-	slider_state **tailptr = &listhead;
+	for (slider* slider : internal_sliders)
+	{
+		delete slider;
+	}
+	internal_sliders.clear();
 
 	for (int i = 0; s_sliders[i].name != nullptr; i++)
 	{
@@ -2488,7 +2483,7 @@ void shaders::init_slider_list()
 			for (int j = 0; j < count; j++)
 			{
 				slider* slider_arg = new slider(desc, get_slider_option(desc->id, j), &options->params_dirty);
-				sliders.push_back(slider_arg);
+				internal_sliders.push_back(slider_arg);
 				std::string name = desc->name;
 				switch (desc->slider_type)
 				{
@@ -2507,13 +2502,12 @@ void shaders::init_slider_list()
 					default:
 						break;
 				}
-				*tailptr = slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_update_trampoline, slider_arg);
-				tailptr = &(*tailptr)->next;
+				sliders.push_back(slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_update_trampoline, slider_arg));
 			}
 		}
 	}
 
-	g_slider_list = listhead;
+	return sliders;
 }
 
 
@@ -3049,20 +3043,6 @@ D3DXHANDLE effect::get_parameter(D3DXHANDLE param, const char *name)
 ULONG effect::release()
 {
 	return m_effect->Release();
-}
-
-
-//============================================================
-//  get_slider_list
-//============================================================
-
-slider_state *renderer_d3d9::get_slider_list()
-{
-	if (window().m_index > 0)
-	{
-		return nullptr;
-	}
-	return g_slider_list;
 }
 
 

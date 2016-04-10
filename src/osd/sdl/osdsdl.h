@@ -141,7 +141,7 @@ public:
 	virtual void update(bool skip_redraw) override;
 
 	// video overridables
-	virtual slider_state *get_slider_list() override;
+	// virtual std::vector<slider_state *> get_slider_list() override;
 
 	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
@@ -174,7 +174,6 @@ private:
 	sdl_options &m_options;
 
 	watchdog *m_watchdog;
-	slider_state *      m_sliders;
 };
 
 //============================================================

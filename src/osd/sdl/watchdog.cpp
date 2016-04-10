@@ -21,13 +21,13 @@ static void *watchdog_thread(void *param)
 
 	while (TRUE)
 	{
-		if (osd_event_wait(thiz->event(), thiz->getTimeout()))
+		if (thiz->event().wait(thiz->getTimeout()))
 		{
 			if (thiz->do_exit())
 				break;
 			else
 			{
-				osd_event_reset(thiz->event());
+				thiz->event().reset();
 				continue;
 			}
 		}
@@ -42,9 +42,9 @@ static void *watchdog_thread(void *param)
 }
 
 watchdog::watchdog(void)
+: m_event(1,0)
 {
 	m_do_exit = 0;
-	m_event = osd_event_alloc(1, 0);
 	m_thread = new std::thread(watchdog_thread, this);
 	m_timeout = 60 * osd_ticks_per_second();
 }
@@ -52,10 +52,9 @@ watchdog::watchdog(void)
 watchdog::~watchdog(void)
 {
 	m_do_exit = 1;
-	osd_event_set(m_event);
+	m_event.set();
 	m_thread->join();
 	delete m_thread;
-	osd_event_free(m_event);
 }
 
 void watchdog::setTimeout(int timeout)

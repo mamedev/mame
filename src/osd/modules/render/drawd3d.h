@@ -47,7 +47,6 @@ public:
 	static void exit();
 
 	virtual int create() override;
-	virtual slider_state* get_slider_list() override;
 	virtual render_primitive_list *get_primitives() override;
 	virtual int draw(const int update) override;
 	virtual void save() override;

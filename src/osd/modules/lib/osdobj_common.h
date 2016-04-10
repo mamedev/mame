@@ -189,7 +189,7 @@ public:
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 
 	// video overridables
-	virtual slider_state *get_slider_list() override;
+	virtual std::vector<slider_state *> get_slider_list() override;
 
 	// command option overrides
 	virtual bool execute_command(const char *command) override;
@@ -279,6 +279,8 @@ protected:
 	input_module* m_lightgun_input;
 	input_module* m_joystick_input;
 	output_module* m_output;
+	std::vector<slider_state *> m_sliders;
+
 private:
 	std::vector<const char *> m_video_names;
 };

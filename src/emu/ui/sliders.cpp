@@ -39,7 +39,7 @@ void ui_menu_sliders::handle()
 	if (menu_event != nullptr)
 	{
 		/* handle keys if there is a valid item selected */
-		if (menu_event->itemref != nullptr)
+		if (menu_event->itemref != nullptr && menu_event->type == ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER)
 		{
 			const slider_state *slider = (const slider_state *)menu_event->itemref;
 			INT32 curvalue = (*slider->update)(machine(), slider->arg, slider->id, nullptr, SLIDER_NOCHANGE);
@@ -140,27 +140,32 @@ void ui_menu_sliders::populate()
 	std::string tempstring;
 
 	/* add UI sliders */
-	for (const slider_state *curslider = machine().ui().get_slider_list(); curslider != nullptr; curslider = curslider->next)
+	std::vector<slider_state *> ui_sliders = machine().ui().get_slider_list();
+	for (slider_state* slider : ui_sliders)
 	{
-		INT32 curval = (*curslider->update)(machine(), curslider->arg, curslider->id, &tempstring, SLIDER_NOCHANGE);
+		INT32 curval = (*slider->update)(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
 		UINT32 flags = 0;
-		if (curval > curslider->minval)
+		if (curval > slider->minval)
 			flags |= MENU_FLAG_LEFT_ARROW;
-		if (curval < curslider->maxval)
+		if (curval < slider->maxval)
 			flags |= MENU_FLAG_RIGHT_ARROW;
-		item_append(curslider->description, tempstring.c_str(), flags, (void *)curslider);
+		item_append(slider->description, tempstring.c_str(), flags, (void *)slider, ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER);
 	}
 
-	/* add OSD sliders */
-	for (const slider_state *curslider = (slider_state*)machine().osd().get_slider_list(); curslider != nullptr; curslider = curslider->next)
+	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+
+	/* add OSD options */
+	std::vector<slider_state *> osd_sliders = machine().osd().get_slider_list();
+	for (slider_state* slider : osd_sliders)
 	{
-		INT32 curval = (*curslider->update)(machine(), curslider->arg, curslider->id, &tempstring, SLIDER_NOCHANGE);
+
+		INT32 curval = (*slider->update)(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
 		UINT32 flags = 0;
-		if (curval > curslider->minval)
+		if (curval > slider->minval)
 			flags |= MENU_FLAG_LEFT_ARROW;
-		if (curval < curslider->maxval)
+		if (curval < slider->maxval)
 			flags |= MENU_FLAG_RIGHT_ARROW;
-		item_append(curslider->description, tempstring.c_str(), flags, (void *)curslider);
+		item_append(slider->description, tempstring.c_str(), flags, (void *)slider, ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER);
 	}
 
 	custombottom = 2.0f * machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;

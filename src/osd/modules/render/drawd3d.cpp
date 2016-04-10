@@ -598,7 +598,8 @@ int renderer_d3d9::pre_window_draw_check()
 	// if we're restarting the renderer, leave things alone
 	if (m_restarting)
 	{
-		m_shaders->toggle();
+		m_sliders.clear();
+		m_shaders->toggle(m_sliders);
 
 		m_restarting = false;
 	}
@@ -896,13 +897,15 @@ try_again:
 
 	m_shaders = (shaders*)global_alloc_clear<shaders>();
 	m_shaders->init(d3dintf, &window().machine(), this);
-	m_sliders_dirty = true;
 
-	int failed = m_shaders->create_resources(false);
+	m_sliders.clear();
+	int failed = m_shaders->create_resources(false, m_sliders);
 	if (failed)
 	{
 		return failed;
 	}
+
+	m_sliders_dirty = true;
 
 	return device_create_resources();
 }
@@ -1002,6 +1005,7 @@ void renderer_d3d9::device_delete()
 	if (m_shaders != nullptr)
 	{
 		// free our effects
+		m_sliders.clear();
 		m_shaders->delete_resources(false);
 
 		// delete the HLSL interface
@@ -1130,6 +1134,7 @@ int renderer_d3d9::device_test_cooperative()
 		osd_printf_verbose("Direct3D: resetting device\n");
 
 		// free all existing resources and call reset on the device
+		m_sliders.clear();
 		m_shaders->delete_resources(true);
 		device_delete_resources();
 		result = (*d3dintf->device.reset)(m_device, &m_presentation);
@@ -1149,7 +1154,8 @@ int renderer_d3d9::device_test_cooperative()
 			return 1;
 		}
 
-		if (m_shaders->create_resources(true))
+		m_sliders.clear();
+		if (m_shaders->create_resources(true, m_sliders))
 		{
 			osd_printf_verbose("Direct3D: failed to recreate HLSL resources for device; failing permanently\n");
 			device_delete();

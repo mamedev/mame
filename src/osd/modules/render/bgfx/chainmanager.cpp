@@ -9,18 +9,6 @@
 //
 //============================================================
 
-// TODO: RH 10 Apr. 2016 12:43 - hire assassin to deal with team member who made this #include chicanery necessary
-#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
-// standard windows headers
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#if defined(SDLMAME_WIN32)
-#include <SDL2/SDL_syswm.h>
-#endif
-#else
-#include "sdlinc.h"
-#endif
-
 #include "emu.h"
 #include "osdcore.h"
 #include "modules/osdwindow.h"
@@ -219,12 +207,14 @@ void chain_manager::load_chains()
 
 void chain_manager::destroy_chains()
 {
+	int index = 0;
     for (bgfx_chain* chain : m_screen_chains)
     {
         if (chain != nullptr)
         {
             delete chain;
         }
+        index++;
     }
 }
 
@@ -345,8 +335,7 @@ int32_t chain_manager::chain_changed(int32_t id, std::string *str, int32_t newva
     {
         m_current_chain[id] = newval;
 
-        // Reload chains
-        load_chains();
+        reload_chains();
 
         m_slider_notifier.set_sliders_dirty();
     }
@@ -431,54 +420,36 @@ bool chain_manager::needs_sliders()
 	return m_screen_count > 0 && m_available_chains.size() > 1;
 }
 
-slider_state* chain_manager::get_slider_list()
+std::vector<slider_state*> chain_manager::get_slider_list()
 {
+	std::vector<slider_state*> sliders;
+
     if (!needs_sliders())
     {
-        return nullptr;
+        return sliders;
     }
-
-    slider_state *listhead = nullptr;
-    slider_state **tailptr = &listhead;
 
     for (size_t index = 0; index < m_screen_chains.size(); index++)
     {
         bgfx_chain* chain = m_screen_chains[index];
-
-        if (*tailptr == nullptr)
-        {
-            *tailptr = m_selection_sliders[index];
-        }
-        else
-        {
-            (*tailptr)->next = m_selection_sliders[index];
-            tailptr = &(*tailptr)->next;
-        }
+		sliders.push_back(m_selection_sliders[index]);
 
         if (chain == nullptr)
         {
             continue;
         }
 
-        std::vector<bgfx_slider*> sliders = chain->sliders();
-        for (bgfx_slider* slider : sliders)
+        std::vector<bgfx_slider*> chain_sliders = chain->sliders();
+        for (bgfx_slider* slider : chain_sliders)
         {
-            if (*tailptr == nullptr)
-            {
-                *tailptr = slider->core_slider();
-            }
-            else
-            {
-                (*tailptr)->next = slider->core_slider();
-                tailptr = &(*tailptr)->next;
-            }
+			sliders.push_back(slider->core_slider());
         }
+
+        if (sliders.size() > 0)
+        {
+        	// TODO: Put dividing line
+		}
     }
 
-    if (*tailptr != nullptr)
-    {
-        (*tailptr)->next = nullptr;
-    }
-
-    return listhead;
+    return sliders;
 }
