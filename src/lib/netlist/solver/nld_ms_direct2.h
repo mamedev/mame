@@ -30,8 +30,8 @@ public:
 
 inline int matrix_solver_direct2_t::vsolve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
-	build_LE_A();
-	build_LE_RHS();
+	build_LE_A(*this);
+	build_LE_RHS(*this);
 
 	const nl_double a = A(0,0);
 	const nl_double b = A(0,1);

@@ -3,8 +3,6 @@
 #ifndef _osdsdl_h_
 #define _osdsdl_h_
 
-#include "sdlinc.h"
-
 #include "watchdog.h"
 #include "clifront.h"
 #include "modules/lib/osdobj_common.h"

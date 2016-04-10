@@ -953,6 +953,7 @@ end
 				"-Wno-inline-new-delete",
 				"-Wno-constant-logical-operand",
 				"-Wno-deprecated-register",
+				"-fdiagnostics-show-note-include-stack",
 			}
 			if (version >= 30500) then
 				buildoptions {

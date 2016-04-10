@@ -11,7 +11,6 @@
 #ifndef __SDLWINDOW__
 #define __SDLWINDOW__
 
-#include "sdlinc.h"
 #include "osdsdl.h"
 #include "video.h"
 
@@ -24,6 +23,10 @@
 //  TYPE DEFINITIONS
 //============================================================
 
+// forward of SDL_DisplayMode not possible (typedef struct) - define wrapper
+
+class SDL_DM_Wrapper;
+
 typedef uintptr_t HashT;
 
 #define OSDWORK_CALLBACK(name)  void *name(void *param, ATTR_UNUSED int threadid)
@@ -32,32 +35,9 @@ class sdl_window_info : public osd_window
 {
 public:
 	sdl_window_info(running_machine &a_machine, int index, osd_monitor_info *a_monitor,
-			const osd_window_config *config)
-	: osd_window(), m_next(NULL),
-		// Following three are used by input code to defer resizes
-		m_resize_width(0),
-		m_resize_height(0),
-		m_last_resize(0),
-		m_minimum_dim(0,0),
-		m_windowed_dim(0,0),
-		m_rendered_event(0), m_target(0),
-		m_sdl_window(NULL),
-		m_machine(a_machine), m_monitor(a_monitor), m_fullscreen(0)
-	{
-		m_win_config = *config;
-		m_index = index;
+			const osd_window_config *config);
 
-		//FIXME: these should be per_window in config-> or even better a bit set
-		m_fullscreen = !video_config.windowed;
-		m_prescale = video_config.prescale;
-
-		m_windowed_dim = osd_dim(config->width, config->height);
-	}
-
-	~sdl_window_info()
-	{
-		global_free(m_renderer);
-	}
+	~sdl_window_info();
 
 	int window_init();
 
@@ -69,12 +49,7 @@ public:
 
 	void notify_changed();
 
-	osd_dim get_size() override
-	{
-		int w=0; int h=0;
-		SDL_GetWindowSize(m_sdl_window, &w, &h);
-		return osd_dim(w,h);
-	}
+	osd_dim get_size() override;
 
 	int xy_to_render_target(int x, int y, int *xt, int *yt);
 
@@ -112,7 +87,7 @@ private:
 	// Needs to be here as well so we can identify window
 	SDL_Window          *m_sdl_window;
 	// Original display_mode
-	SDL_DisplayMode m_original_mode;
+	SDL_DM_Wrapper	 	*m_original_mode;
 
 	int                 m_extra_flags;
 

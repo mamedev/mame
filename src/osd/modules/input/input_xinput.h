@@ -70,20 +70,20 @@ static const char *const xinput_button_names[] = {
 
 struct gamepad_state
 {
-	BYTE    rgbButtons[XINPUT_MAX_BUTTONS];
-	BYTE    rgbPov[XINPUT_MAX_POV];
-	LONG    bLeftTrigger;
-	LONG    bRightTrigger;
-	LONG    sThumbLX;
-	LONG    sThumbLY;
-	LONG    sThumbRX;
-	LONG    sThumbRY;
+	BYTE    buttons[XINPUT_MAX_BUTTONS];
+	BYTE    povs[XINPUT_MAX_POV];
+	LONG    left_trigger;
+	LONG    right_trigger;
+	LONG    left_thumb_x;
+	LONG    left_thumb_y;
+	LONG    right_thumb_x;
+	LONG    right_thumb_y;
 };
 
 // state information for a gamepad; state must be first element
 struct xinput_api_state
 {
-	UINT32                  playerIndex;
+	UINT32                  player_index;
 	XINPUT_STATE            xstate;
 	XINPUT_CAPABILITIES     caps;
 };

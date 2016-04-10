@@ -116,6 +116,11 @@ void sdl_osd_interface::video_exit()
 //  sdlvideo_monitor_refresh
 //============================================================
 
+inline osd_rect SDL_Rect_to_osd_rect(const SDL_Rect &r)
+{
+	return osd_rect(r.x, r.y, r.w, r.h);
+}
+
 void sdl_monitor_info::refresh()
 {
 	SDL_DisplayMode dmode;

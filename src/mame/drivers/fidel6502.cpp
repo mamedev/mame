@@ -141,7 +141,22 @@ All three of the above are called "segment H".
 
 ******************************************************************************
 
-Sensory Chess Challenger (SC12-B, 6086)
+Sensory Chess Challenger "9" (SC9)
+2 versions were available, the newer version was 2MHz and included the Budapest program.
+---------------------------------
+
+8*(8+1) buttons, 8*8+1 LEDs
+36-pin edge connector, assume same as SC12
+4KB RAM(TMM2016P), 2*8KB ROM(HN48364P)
+R6502-13, 1.4MHz from resonator
+PCB label 510-1045C01 2-1-82
+
+I/O is via TTL, not further documented here
+
+
+******************************************************************************
+
+Sensory 12 Chess Challenger (SC12-B, 6086)
 4 versions are known to exist: A,B,C, and X, with increasing CPU speed.
 ---------------------------------
 RE information from netlist by Berger
@@ -307,6 +322,12 @@ public:
 	DECLARE_READ_LINE_MEMBER(csc_pia1_ca1_r);
 	DECLARE_READ_LINE_MEMBER(csc_pia1_cb1_r);
 
+	// SC9
+	void sc9_prepare_display();
+	DECLARE_WRITE8_MEMBER(sc9_control_w);
+	DECLARE_WRITE8_MEMBER(sc9_led_w);
+	DECLARE_READ8_MEMBER(sc9_input_r);
+
 	// SC12/6086
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
 	DECLARE_READ8_MEMBER(sc12_input_r);
@@ -454,6 +475,48 @@ WRITE_LINE_MEMBER(fidel6502_state::csc_pia1_ca2_w)
 
 
 /******************************************************************************
+    SC9
+******************************************************************************/
+
+// TTL/generic
+
+void fidel6502_state::sc9_prepare_display()
+{
+	// 8*8 chessboard leds + 1 corner led
+	display_matrix(8, 9, m_led_data, m_inp_mux);
+}
+
+WRITE8_MEMBER(fidel6502_state::sc9_control_w)
+{
+	// d0-d3: 74245 P0-P3
+	// 74245 Q0-Q8: input mux, led select
+	UINT16 sel = 1 << (data & 0xf) & 0x3ff;
+	m_inp_mux = sel & 0x1ff;
+	sc9_prepare_display();
+
+	// 74245 Q9: speaker out
+	m_speaker->level_w(sel >> 9 & 1);
+
+	// d4,d5: ?
+	// d6,d7: N/C
+}
+
+WRITE8_MEMBER(fidel6502_state::sc9_led_w)
+{
+	// a0-a2,d0: led data via NE591N
+	m_led_data = (data & 1) << offset;
+	sc9_prepare_display();
+}
+
+READ8_MEMBER(fidel6502_state::sc9_input_r)
+{
+	// multiplexed inputs (active low)
+	return read_inputs(9) ^ 0xff;
+}
+
+
+
+/******************************************************************************
     SC12/6086
 ******************************************************************************/
 
@@ -595,6 +658,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sc9_map, AS_PROGRAM, 8, fidel6502_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
+	AM_RANGE(0x2000, 0x5fff) AM_READ(sc12_cart_r)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_WRITE(sc9_control_w)
+	AM_RANGE(0x8000, 0x8007) AM_MIRROR(0x1ff8) AM_WRITE(sc9_led_w) AM_READNOP
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_READ(sc9_input_r)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -849,6 +916,12 @@ static MACHINE_CONFIG_START( sc9, fidel6502_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
+	MCFG_GENERIC_EXTENSIONS("bin,dat")
+	MCFG_GENERIC_LOAD(fidelz80base_state, scc_cartridge)
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sc12, fidel6502_state )
@@ -997,7 +1070,7 @@ CONS( 1981, cscsp,   csc,    0,      csc,     cscg,    driver_device, 0, "Fideli
 CONS( 1981, cscg,    csc,    0,      csc,     cscg,    driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, cscfr,   csc,    0,      csc,     cscg,    driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1982, fscc9,   0,      0,      sc9,     sc12,    driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, fscc9,   0,      0,      sc9,     sc12,    driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1984, fscc12,  0,      0,      sc12,    sc12,    driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1987, fexcel,  0,      0,      fexcel,  fexcel,  driver_device, 0, "Fidelity Electronics", "Excellence (model 6080/6093)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
