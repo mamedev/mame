@@ -50,7 +50,6 @@ public:
 		, m_curr_is_dir(false)
 		, m_buffer()
 	{
-		std::memset(&m_header, 0, sizeof(m_header));
 		std::fill(m_buffer.begin(), m_buffer.end(), 0);
 	}
 
