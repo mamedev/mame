@@ -57,7 +57,8 @@ enum ui_menu_reset_options
 enum class ui_menu_item_type
 {
 	UI_MENU_ITEM_TYPE_UNKNOWN,
-	UI_MENU_ITEM_TYPE_SLIDER
+    UI_MENU_ITEM_TYPE_SLIDER,
+    UI_MENU_ITEM_TYPE_SEPARATOR
 };
 
 

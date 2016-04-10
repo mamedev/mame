@@ -140,9 +140,6 @@ public:
 	virtual void init(running_machine &machine) override;
 	virtual void update(bool skip_redraw) override;
 
-	// video overridables
-	// virtual std::vector<slider_state *> get_slider_list() override;
-
 	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 

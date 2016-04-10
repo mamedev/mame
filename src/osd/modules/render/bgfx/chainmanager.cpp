@@ -10,6 +10,9 @@
 //============================================================
 
 #include "emu.h"
+#include "ui/ui.h"
+#include "ui/menu.h"
+
 #include "osdcore.h"
 #include "modules/osdwindow.h"
 
@@ -28,8 +31,6 @@
 #include "texture.h"
 #include "target.h"
 #include "slider.h"
-
-#include "ui/ui.h"
 
 #include "sliderdirtynotifier.h"
 
@@ -367,7 +368,13 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
     state->id = screen_index;
     strcpy(state->description, description.c_str());
 
-    m_selection_sliders.push_back(state);
+    ui_menu_item item;
+    item.text = state->description;
+    item.subtext = "";
+    item.flags = 0;
+    item.ref = state;
+    item.type = ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER;
+    m_selection_sliders.push_back(item);
 }
 
 uint32_t chain_manager::handle_screen_chains(uint32_t view, render_primitive *starting_prim, osd_window& window)
@@ -419,9 +426,9 @@ bool chain_manager::needs_sliders()
 	return m_screen_count > 0 && m_available_chains.size() > 1;
 }
 
-std::vector<slider_state*> chain_manager::get_slider_list()
+std::vector<ui_menu_item> chain_manager::get_slider_list()
 {
-	std::vector<slider_state*> sliders;
+	std::vector<ui_menu_item> sliders;
 
     if (!needs_sliders())
     {
@@ -441,12 +448,29 @@ std::vector<slider_state*> chain_manager::get_slider_list()
         std::vector<bgfx_slider*> chain_sliders = chain->sliders();
         for (bgfx_slider* slider : chain_sliders)
         {
-			sliders.push_back(slider->core_slider());
+            slider_state* core_slider = slider->core_slider();
+            
+            ui_menu_item item;
+            item.text = core_slider->description;
+            item.subtext = "";
+            item.flags = 0;
+            item.ref = core_slider;
+            item.type = ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER;
+            m_selection_sliders.push_back(item);
+            
+            sliders.push_back(item);
         }
 
         if (chain_sliders.size() > 0)
         {
-        	sliders.push_back(nullptr);
+            ui_menu_item item;
+            item.text = MENU_SEPARATOR_ITEM;
+            item.subtext = "";
+            item.flags = 0;
+            item.ref = nullptr;
+            item.type = ui_menu_item_type::UI_MENU_ITEM_TYPE_SEPARATOR;
+        	
+            sliders.push_back(item);
 		}
     }
 

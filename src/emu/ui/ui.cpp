@@ -118,7 +118,7 @@ std::string ui_manager::messagebox_poptext;
 rgb_t ui_manager::messagebox_backcolor;
 
 // slider info
-std::vector<slider_state *> ui_manager::slider_list;
+std::vector<ui_menu_item> ui_manager::slider_list;
 slider_state *ui_manager::slider_current;
 
 
@@ -340,7 +340,7 @@ void ui_manager::initialize(running_machine &machine)
 	slider_list = slider_init(machine);
 	if (slider_list.size() > 0)
 	{
-		slider_current = slider_list[0];
+		slider_current = reinterpret_cast<slider_state *>(slider_list[0].ref);
 	}
 	else
 	{
@@ -1873,7 +1873,7 @@ UINT32 ui_manager::handler_confirm_quit(running_machine &machine, render_contain
 //  ui_get_slider_list - get the list of sliders
 //-------------------------------------------------
 
-std::vector<slider_state *>& ui_manager::get_slider_list(void)
+std::vector<ui_menu_item>& ui_manager::get_slider_list(void)
 {
 	return slider_list;
 }
@@ -1906,7 +1906,7 @@ static slider_state *slider_alloc(running_machine &machine, const char *title, I
 //  controls
 //----------------------------------------------------------
 
-std::vector<slider_state *> ui_manager::slider_init(running_machine &machine)
+std::vector<ui_menu_item> ui_manager::slider_init(running_machine &machine)
 {
 	std::vector<slider_state *> sliders;
 
@@ -2040,7 +2040,19 @@ std::vector<slider_state *> ui_manager::slider_init(running_machine &machine)
 	}
 #endif
 
-	return sliders;
+    std::vector<ui_menu_item> items;
+    for (slider_state *slider : sliders)
+    {
+        ui_menu_item item;
+        item.text = slider->description;
+        item.subtext = "";
+        item.flags = 0;
+        item.ref = slider;
+        item.type = ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER;
+        items.push_back(item);
+    }
+
+	return items;
 }
 
 
