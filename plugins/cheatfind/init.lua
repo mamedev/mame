@@ -61,8 +61,45 @@ function cheatfind.startplugin()
 	end
 
 	-- compare two data blocks
-	function cheat.comp(olddata, newdata, oper, val)
+	function cheat.comp(olddata, newdata, oper, val, signed, width, endian)
 		local ret = {}
+		local format = ""
+		local size = olddata.size
+
+		if endian == 1 then
+			format = format .. ">"
+		else
+			format = format .. "<"
+		end
+		if width == 16 then
+			size = size & 0xfffe
+			if signed == "signed" then
+				format = format .. "h"
+			else
+				format = format .. "H"
+			end
+		elseif width == 32 then
+			size = size & 0xfffc
+			if signed == "signed" then
+				format = format .. "l"
+			else
+				format = format .. "L"
+			end
+		elseif width == 64 then
+			size = size & 0xfff8
+			if signed == "signed" then
+				format = format .. "j"
+			else
+				format = format .. "J"
+			end
+		else
+			if signed == "signed" then
+				format = format .. "b"
+			else
+				format = format .. "B"
+			end
+		end
+
 		if olddata.start ~= newdata.start or olddata.size ~= newdata.size then
 			return {} 
 		end
@@ -70,37 +107,37 @@ function cheatfind.startplugin()
 			val = 0
 		end
 		if oper == "+" or oper == "inc" or oper == "<" or oper == "lt" then
-			for i = 1, olddata.size do
-				local old = string.unpack("B", olddata.block, i)
-				local new = string.unpack("B", newdata.block, i)
+			for i = 1, size do
+				local old = string.unpack(format, olddata.block, i)
+				local new = string.unpack(format, newdata.block, i)
 				if old < new then
 					if (val > 0 and (old + val) == new) or val == 0 then
 						ret[#ret + 1] = { addr = olddata.start + i - 1,
-								  oldval = old,
-								  newval = new}
+						oldval = old,
+						newval = new}
 					end
 				end
 			end
 		elseif oper == "-" or oper == "dec" or oper == ">" or oper == "gt" then
-			for i = 1, olddata.size do
-				local old = string.unpack("B", olddata.block, i)
-				local new = string.unpack("B", newdata.block, i)
+			for i = 1, size do
+				local old = string.unpack(format, olddata.block, i)
+				local new = string.unpack(format, newdata.block, i)
 				if old > new then
 					if (val > 0 and (old - val) == new) or val == 0 then
 						ret[#ret + 1] = { addr = olddata.start + i - 1,
-								  oldval = old,
-								  newval = new}
+						oldval = old,
+						newval = new}
 					end
 				end
 			end
 		elseif oper == "=" or oper == "eq" then
-			for i = 1, olddata.size do
-				local old = string.unpack("B", olddata.block, i)
-				local new = string.unpack("B", newdata.block, i)
+			for i = 1, size do
+				local old = string.unpack(format, olddata.block, i)
+				local new = string.unpack(format, newdata.block, i)
 				if old == new then
 					ret[#ret + 1] = { addr = olddata.start + i - 1,
-							  oldval = old,
-							  newval = new}
+					oldval = old,
+					newval = new}
 				end
 			end
 		end
@@ -108,17 +145,18 @@ function cheatfind.startplugin()
 	end
 
 	-- compare a data block to the current state
-	function cheat.compcur(olddata, oper, val)
+	function cheat.compcur(olddata, oper, val, signed, width, endian)
 		local newdata = cheat.save(olddata.space, olddata.start, olddata.size, olddata.space)
-		return cheat.comp(olddata, newdata, oper, val)
+		return cheat.comp(olddata, newdata, oper, val, signed, width, endian)
 	end
-	
+
 	_G.cf = cheat
-	
+
 	local devtable = {}
 	local devsel = 1
 	local bitwidth = 3
 	local signed = 0
+	local endian = 0
 	local optable = { "<", ">", "=" }
 	local opsel = 1
 	local value = 0
@@ -127,12 +165,16 @@ function cheatfind.startplugin()
 	local matches = {}
 	local matchsel = 1
 	local menu_blocks = {}
-	local midx = { region = 1, init = 2, width = 3, signed = 4, save = 3, op = 5, val = 6,
-		       lop = 7, rop = 8, comp = 9, match = 11 }
+	local midx = { region = 1, init = 2, save = 3, width = 5, signed = 6, endian = 7, op = 8, val = 9,
+	lop = 10, rop = 11, comp = 12, match = 14 }
 
 	local function start()
 		devtable = {}
 		devsel = 1
+		devsel = 1
+		bitwidth = 3
+		signed = 0
+		endian = 0
 		opsel = 1
 		value = 0
 		leftop = 1
@@ -165,7 +207,7 @@ function cheatfind.startplugin()
 
 	local function menu_populate()
 		local menu = {}
-		
+
 		local function menu_lim(val, min, max, menuitem)
 			if val == min then
 				menuitem[3] = "r"
@@ -183,17 +225,21 @@ function cheatfind.startplugin()
 			menu_lim(devsel, 1, #devtable, menu[midx.region])
 		end
 		menu[midx.init] = { "Init", "", 0 }
-		if not next(menu_blocks) then
-			menu[midx.width] = { "Bit Width", 1 << bitwidth , 0 }
-			menu_lim(bitwidth, 3, 6, menu[midx.width])
-			menu[midx.signed] = { "Signed", "true", 0 }
-			menu_lim(signed, 0, 1, menu[midx.signed])
-			if signed == 0 then
-				menu[midx.signed][2] = "false"
-			end
-		else
+		if next(menu_blocks) then
 			menu[midx.save] = { "Save current", "", 0 }
 			menu[midx.save + 1] = { "---", "", "off" }
+			menu[midx.width] = { "Bit Width", 1 << bitwidth , 0 }
+			menu_lim(bitwidth, 3, 6, menu[midx.width])
+			menu[midx.signed] = { "Signed", "false", 0 }
+			menu_lim(signed, 0, 1, menu[midx.signed])
+			if signed == 1 then
+				menu[midx.signed][2] = "true"
+			end
+			menu[midx.endian] = { "Endian", "little", 0 }
+			menu_lim(endian, 0, 1, menu[midx.endian])
+			if endian == 1 then
+				menu[midx.endian][2] = "big"
+			end
 			menu[midx.op] = { "Operator", optable[opsel], "" }
 			menu_lim(opsel, 1, #optable, menu[midx.op])
 			menu[midx.val] = { "Value", value, "" }
@@ -225,7 +271,18 @@ function cheatfind.startplugin()
 					if #menu > 50 then
 						break
 					end
-					menu[#menu + 1] = { string.format("%08x %02x %02x", match.addr, match.oldval, match.newval), "", 0 }
+					local numform = ""
+					if bitwidth == 4 then
+						numform = " %04x"
+					elseif bitwidth == 5 then
+						numform = " %08x"
+					elseif bitwidth == 6 then
+						numform = " %016x"
+					else
+						numform = " %02x"
+					end
+					menu[#menu + 1] = { string.format("%08x" .. numform .. numform, match.addr, match.oldval, 
+					                                  match.newval), "", 0 }
 				end
 			end
 		end
@@ -247,7 +304,7 @@ function cheatfind.startplugin()
 		end
 
 		if index == midx.region then
-			 devsel = incdec(devsel, 1, #devtable)
+			devsel = incdec(devsel, 1, #devtable)
 		elseif index == midx.init then
 			if event == "select" then
 				menu_blocks = {{}}
@@ -258,11 +315,15 @@ function cheatfind.startplugin()
 				manager:machine():popmessage("Data cleared and current state saved")
 				ret = true
 			end
-		elseif not next(menu_blocks) then
-			if index == midx.bitwidth then
-				bitwidth = incdec(bitwidth, 3, 6)
-			elseif index == midx.signed then
-				signed = incdec(signed, 0, 1)
+		elseif index == midx.init then
+			if event == "select" then
+				menu_blocks = {{}}
+				matches = {}
+				for num, region in ipairs(devtable[devsel].ram) do
+					menu_blocks[1][num] = cheat.save(devtable[devsel].space, region.offset, region.size)
+				end
+				manager:machine():popmessage("Data cleared and current state saved")
+				ret = true
 			end
 		elseif index == midx.save then
 			if event == "select" then
@@ -273,6 +334,12 @@ function cheatfind.startplugin()
 				manager:machine():popmessage("Current state saved")
 				ret = true
 			end
+		elseif index == midx.width then
+			bitwidth = incdec(bitwidth, 3, 6)
+		elseif index == midx.signed then
+			signed = incdec(signed, 0, 1)
+		elseif index == midx.endian then
+			endian = incdec(endian, 0, 1)
 		elseif index == midx.op then
 			if event == "up" or event == "down" or event == "comment" then
 				if optable[opsel] == "<" then
@@ -296,10 +363,11 @@ function cheatfind.startplugin()
 				matches = {}
 				for num = 1, #menu_blocks[1] do
 					if rightop == 0 then
-						matches[#matches + 1] = cheat.compcur(menu_blocks[leftop][num], optable[opsel], value)
+						matches[#matches + 1] = cheat.compcur(menu_blocks[leftop][num], optable[opsel], value,
+						signed, 1 << bitwidth, endian)
 					else
 						matches[#matches + 1] = cheat.comp(menu_blocks[leftop][num], menu_blocks[rightop][num],
-										   optable[opsel], value)
+						optable[opsel], value, signed, 1 << bitwidth, endian)
 					end
 				end
 				ret = true
