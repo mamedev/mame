@@ -11,6 +11,9 @@
 #include "bgfxutil.h"
 #include "copyutil.h"
 
+#include "render.h"
+
+
 const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(UINT32 format, int width, int height, int rowpixels, const rgb_t *palette, void *base)
 {
 	const bgfx::Memory* mem = bgfx::alloc(width * height * 4);
