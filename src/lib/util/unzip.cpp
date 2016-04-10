@@ -48,7 +48,6 @@ public:
 		, m_cd_pos(0)
 		, m_header()
 		, m_curr_is_dir(false)
-		, m_curr_name()
 		, m_buffer()
 	{
 		std::memset(&m_header, 0, sizeof(m_header));
@@ -134,7 +133,7 @@ public:
 	}
 
 	bool current_is_directory() const { return m_curr_is_dir; }
-	const std::string &current_name() const { return m_curr_name; }
+	const std::string &current_name() const { return m_header.file_name; }
 	std::uint64_t current_uncompressed_length() const { return m_header.uncompressed_length; }
 	std::uint32_t current_crc() const { return m_header.crc; }
 
@@ -179,6 +178,7 @@ private:
 		std::uint64_t   uncompressed_length;    // uncompressed size
 		std::uint32_t   start_disk_number;      // disk number start
 		std::uint64_t   local_header_offset;    // relative offset of local header
+		std::string     file_name;              // file name
 	};
 
 	// contains extracted end of central directory information
@@ -207,7 +207,6 @@ private:
 	std::uint32_t               m_cd_pos;                   // position in central directory
 	file_header                 m_header;                   // current file header
 	bool                        m_curr_is_dir;              // current file is directory
-	std::string                 m_curr_name;                // current file name
 
 	std::array<std::uint8_t, DECOMPRESS_BUFSIZE> m_buffer;  // buffer for decompression
 };
@@ -309,39 +308,6 @@ public:
 
 	std::size_t total_length() const { return minimum_length() + data_size(); }
 	static std::size_t minimum_length() { return 0x04; }
-
-private:
-	std::size_t m_length;
-};
-
-
-class zip64_ext_info_reader : private reader_base
-{
-public:
-	zip64_ext_info_reader(extra_field_reader const &field) : reader_base(field.data()) { }
-
-	std::uint64_t   uncompressed_size() const   { return read_qword(0x00); }
-	std::uint64_t   compressed_size() const     { return read_qword(0x08); }
-	std::uint64_t   header_offset() const       { return read_qword(0x10); }
-	std::uint32_t   start_disk() const          { return read_dword(0x18); }
-
-	std::size_t total_length() const { return minimum_length(); }
-	static std::size_t minimum_length() { return 0x1c; }
-};
-
-
-class utf8_path_reader : private reader_base
-{
-public:
-	utf8_path_reader(extra_field_reader const &field) : reader_base(field.data()), m_length(field.data_size()) { }
-
-	std::uint8_t    version() const                         { return m_buffer[0]; }
-	std::uint32_t   name_crc32() const                      { return read_dword(0x01); }
-	std::string     unicode_name() const                    { return read_string(0x05, m_length - 0x05); }
-	void            unicode_name(std::string &result) const { return read_string(result, 0x05, m_length - 0x05); }
-
-	std::size_t total_length() const { return m_length; }
-	static std::size_t minimum_length() { return 0x05; }
 
 private:
 	std::size_t m_length;
@@ -479,6 +445,64 @@ public:
 };
 
 
+class zip64_ext_info_reader : private reader_base
+{
+public:
+	template <typename T>
+	zip64_ext_info_reader(
+			T const &header,
+			extra_field_reader const &field)
+		: reader_base(field.data())
+		, m_uncompressed_size(header.uncompressed_size())
+		, m_compressed_size(header.compressed_size())
+		, m_header_offset(header.header_offset())
+		, m_start_disk(header.start_disk())
+		, m_offs_compressed_size(~m_uncompressed_size ? 0 : 8)
+		, m_offs_header_offset(m_offs_compressed_size + (~m_compressed_size ? 0 : 8))
+		, m_offs_start_disk(m_offs_header_offset + (~m_header_offset ? 0 : 8))
+		, m_offs_end(m_offs_start_disk + (~m_start_disk ? 0 : 4))
+	{
+	}
+
+	std::uint64_t   uncompressed_size() const   { return ~m_uncompressed_size ? m_uncompressed_size : read_qword(0x00); }
+	std::uint64_t   compressed_size() const     { return ~m_compressed_size ? m_compressed_size : read_qword(m_offs_compressed_size); }
+	std::uint64_t   header_offset() const       { return ~m_header_offset ? m_header_offset : read_qword(m_offs_header_offset); }
+	std::uint32_t   start_disk() const          { return ~m_start_disk ? m_start_disk : read_dword(m_offs_start_disk); }
+
+	std::size_t total_length() const { return minimum_length() + m_offs_end; }
+	static std::size_t minimum_length() { return 0x00; }
+
+private:
+	std::uint32_t   m_uncompressed_size;
+	std::uint32_t   m_compressed_size;
+	std::uint32_t   m_header_offset;
+	std::uint16_t   m_start_disk;
+
+	std::size_t     m_offs_compressed_size;
+	std::size_t     m_offs_header_offset;
+	std::size_t     m_offs_start_disk;
+	std::size_t     m_offs_end;
+};
+
+
+class utf8_path_reader : private reader_base
+{
+public:
+	utf8_path_reader(extra_field_reader const &field) : reader_base(field.data()), m_length(field.data_size()) { }
+
+	std::uint8_t    version() const                         { return m_buffer[0]; }
+	std::uint32_t   name_crc32() const                      { return read_dword(0x01); }
+	std::string     unicode_name() const                    { return read_string(0x05, m_length - 0x05); }
+	void            unicode_name(std::string &result) const { return read_string(result, 0x05, m_length - 0x05); }
+
+	std::size_t total_length() const { return m_length; }
+	static std::size_t minimum_length() { return 0x05; }
+
+private:
+	std::size_t m_length;
+};
+
+
 class general_flag_reader
 {
 public:
@@ -553,7 +577,6 @@ void zip_file_impl::close(ptr &&zip)
 int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_filename, bool matchcrc, bool matchname, bool partialpath)
 {
 	// if we're at or past the end, we're done
-	std::string filename;
 	while ((m_cd_pos + central_dir_entry_reader::minimum_length()) <= m_ecd.cd_size)
 	{
 		// make sure we have enough data
@@ -577,7 +600,7 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 
 		// copy the filename
 		bool is_utf8(general_flag_reader(m_header.bit_flag).utf8_encoding());
-		reader.file_name(filename);
+		reader.file_name(m_header.file_name);
 
 		// walk the extra data
 		for (auto extra = reader.extra_field(); extra.length_sufficient(); extra = extra.next())
@@ -585,12 +608,13 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 			// look for ZIP64 extended info
 			if ((extra.header_id() == 0x0001) && (extra.data_size() >= zip64_ext_info_reader::minimum_length()))
 			{
-				zip64_ext_info_reader const ext64(extra);
+				zip64_ext_info_reader const ext64(reader, extra);
 				if (extra.data_size() >= ext64.total_length())
 				{
 					m_header.compressed_length   = ext64.compressed_size();
 					m_header.uncompressed_length = ext64.uncompressed_size();
 					m_header.start_disk_number   = ext64.start_disk();
+					m_header.local_header_offset = ext64.header_offset();
 				}
 			}
 
@@ -600,10 +624,12 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 				utf8_path_reader const utf8path(extra);
 				if (utf8path.version() == 1)
 				{
-					auto const crc(crc32_creator::simple(m_filename.empty() ? nullptr : &filename[0], filename.length() * sizeof(filename[0])));
+					auto const addr(m_header.file_name.empty() ? nullptr : &m_header.file_name[0]);
+					auto const length(m_header.file_name.empty() ? 0 : m_header.file_name.length() * sizeof(m_header.file_name[0]));
+					auto const crc(crc32_creator::simple(addr, length));
 					if (utf8path.name_crc32() == crc.m_raw)
 					{
-						utf8path.unicode_name(filename);
+						utf8path.unicode_name(m_header.file_name);
 						is_utf8 = true;
 					}
 				}
@@ -613,22 +639,21 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 		// FIXME: if (!is_utf8) convert filename to UTF8 (assume CP437 or something)
 
 		// chop off trailing slash for directory entries
-		bool const is_dir((filename.length() > 0) && (filename[filename.length() - 1] == '/'));
-		if (is_dir) filename.resize(filename.length() - 1);
+		bool const is_dir(!m_header.file_name.empty() && (*m_header.file_name.rbegin() == '/'));
+		if (is_dir) m_header.file_name.resize(m_header.file_name.length() - 1);
 
 		// check to see if it matches query
 		bool const crcmatch(search_crc == m_header.crc);
-		auto const partialoffset(filename.length() - search_filename.length());
-		bool const partialpossible((filename.length() > search_filename.length()) && (filename[partialoffset - 1] == '/'));
+		auto const partialoffset(m_header.file_name.length() - search_filename.length());
+		bool const partialpossible((m_header.file_name.length() > search_filename.length()) && (m_header.file_name[partialoffset - 1] == '/'));
 		const bool namematch(
-				!core_stricmp(search_filename.c_str(), filename.c_str()) ||
-				(partialpath && partialpossible && !core_stricmp(search_filename.c_str(), filename.c_str() + partialoffset)));
+				!core_stricmp(search_filename.c_str(), m_header.file_name.c_str()) ||
+				(partialpath && partialpossible && !core_stricmp(search_filename.c_str(), m_header.file_name.c_str() + partialoffset)));
 
 		bool const found = ((!matchcrc && !matchname) || !is_dir) && (!matchcrc || crcmatch) && (!matchname || namematch);
 		if (found)
 		{
 			m_curr_is_dir = is_dir;
-			m_curr_name = std::move(filename);
 			return 0;
 		}
 	}
