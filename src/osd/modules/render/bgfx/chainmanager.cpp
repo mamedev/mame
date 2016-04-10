@@ -207,14 +207,13 @@ void chain_manager::load_chains()
 
 void chain_manager::destroy_chains()
 {
-	int index = 0;
-    for (bgfx_chain* chain : m_screen_chains)
+    for (size_t index = 0; index < m_screen_chains.size(); index++)
     {
-        if (chain != nullptr)
+        if (m_screen_chains[index] != nullptr)
         {
-            delete chain;
+            delete m_screen_chains[index];
+            m_screen_chains[index] = nullptr;
         }
-        index++;
     }
 }
 
@@ -445,9 +444,9 @@ std::vector<slider_state*> chain_manager::get_slider_list()
 			sliders.push_back(slider->core_slider());
         }
 
-        if (sliders.size() > 0)
+        if (chain_sliders.size() > 0)
         {
-        	// TODO: Put dividing line
+        	sliders.push_back(nullptr);
 		}
     }
 

@@ -158,7 +158,11 @@ void ui_menu_sliders::populate()
 	std::vector<slider_state *> osd_sliders = machine().osd().get_slider_list();
 	for (slider_state* slider : osd_sliders)
 	{
-
+		if (slider == nullptr)
+		{
+			item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+			continue;
+		}
 		INT32 curval = (*slider->update)(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
 		UINT32 flags = 0;
 		if (curval > slider->minval)
