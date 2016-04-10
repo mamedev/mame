@@ -26,7 +26,7 @@
 #include "machine/spchrom.h"
 
 #define TRACE_MEM 0
-#define TRACE_ADDR 1
+#define TRACE_ADDR 0
 #define TRACE_READY 0
 
 /****************************************************************************/
