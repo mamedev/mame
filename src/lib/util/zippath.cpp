@@ -925,11 +925,6 @@ static const char *get_relative_path(zippath_directory const &directory)
 const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 {
 	const osd_directory_entry *result = nullptr;
-	int header;
-	const char *relpath;
-	const char *separator;
-	const char *s;
-	zippath_returned_directory *rdent;
 
 	if (!directory->returned_parent)
 	{
@@ -960,37 +955,36 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 	}
 	else if (directory->zipfile)
 	{
+		char const *relpath;
 		do
 		{
 			/* a zip file read */
+			int header;
 			do
 			{
-				if (!directory->called_zip_first)
-					header = directory->zipfile->first_file();
-				else
-					header = directory->zipfile->next_file();
+				header = directory->called_zip_first ? directory->zipfile->next_file() : directory->zipfile->first_file();
 				directory->called_zip_first = true;
 				relpath = nullptr;
 			}
-			while((header >= 0) && ((relpath = get_relative_path(*directory)) == nullptr));
+			while ((header >= 0) && ((relpath = get_relative_path(*directory)) == nullptr));
 
-			if (relpath != nullptr)
+			if (relpath)
 			{
 				/* we've found a ZIP entry; but this may be an entry deep within the target directory */
-				for (s = relpath; *s && !is_zip_file_separator(*s); s++)
-					;
-				separator = *s ? s : nullptr;
+				char const *separator = relpath;
+				while (*separator && !is_zip_file_separator(*separator)) separator++;
 
-				if (separator != nullptr)
+				if (*separator || directory->zipfile->current_is_directory())
 				{
 					/* a nested entry; loop through returned_dirlist to see if we've returned the parent directory */
+					zippath_returned_directory *rdent;
 					for (rdent = directory->returned_dirlist; rdent != nullptr; rdent = rdent->next)
 					{
-						if (!core_strnicmp(rdent->name.c_str(), relpath, separator - relpath))
+						if (!core_strnicmp(rdent->name.c_str(), relpath, separator - relpath + 1))
 							break;
 					}
 
-					if (rdent == nullptr)
+					if (!rdent)
 					{
 						/* we've found a new directory; add this to returned_dirlist */
 						rdent = new zippath_returned_directory;
@@ -1016,7 +1010,7 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 				}
 			}
 		}
-		while((relpath != nullptr) && (result == nullptr));
+		while (relpath && !result);
 	}
 	return result;
 }
