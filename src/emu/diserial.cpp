@@ -425,8 +425,8 @@ void device_serial_interface::transmit_register_setup(UINT8 data_byte)
 		transmit_register_add_bit(parity);
 	}
 
-	/* stop bit(s) */
-	for (i=0; i<m_df_stop_bit_count; i++)
+	/* stop bit(s) + 1 extra bit as delay between bytes, needed to get 1 stop bit to work.  */
+	for (i=0; i<=m_df_stop_bit_count; i++)
 	{
 		transmit_register_add_bit(1);
 	}
