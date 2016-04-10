@@ -5,7 +5,7 @@
     pcxporter.cpp
 
     Implementation of the Applied Engineering PC Transporter card
-    Preliminary version by R. Belmont
+    Preliminary version by R. Belmont, additional reverse-engineering by Peter Ferrie
 
     The PC Transporter is basically a PC-XT on an Apple II card.
     Features include:
@@ -37,18 +37,42 @@
         plus used for general storage by the system.
         RAM from 0xB0000-0xBFFFF is the CGA framebuffer as usual.
 
+		C800-CBFF?: RAM, used as scratchpad space by the software
         CF00: PC memory pointer (bits 0-7)
         CF01: PC memory pointer (bits 8-15)
         CF02: PC memory pointer (bits 16-23)
         CF03: read/write PC memory at the pointer and increment the pointer
         CF04: read/write PC memory at the pointer and *don't* increment the pointer
+        CF2C: CGA 6845 register select (port 3D0/3D2/3D4/3D6)
+        CF2D: CGA 6845 data read/write (port 3D1/3D3/3D5/3D7)
+        CF2E: CGA mode select (port 3D8)
+        CF2F: CGA color select (port 3D9)
 
     TODO:
-        - A2 probably also can access the V30's I/O space: where's that at?  CF0E/CF0F
-          are suspects...
+        - What's going on at CF0E/CF0F?
+        - How is the V30 started/stopped?
         - There's likely A2 ROM at CnXX and C800-CBFF to support the "Slinky" memory
           expansion card emulation function inside one of the custom ASICs.  Need to
           dump this...
+          
+    The final stages before the software settles into its loop are:
+    
+    20 to C800 at cf30
+	00 to C800 at cf31
+	12 to C800 at cf2b
+	21 to C800 at cf25
+	33 to C800 at cf24
+	80 to C800 at cf31
+	20 to C800 at cf30
+	loop:
+		Read $C800 at cf36
+		Read $C800 at cf31
+		Read $C800 at cf31
+		Read $C800 at cf36
+		Read $C800 at cf31
+		Read $C800 at cf31
+		80 to C800 at cf31
+	loop end: (return to loop)
 
 *********************************************************************/
 
@@ -176,7 +200,7 @@ UINT8 a2bus_pcxporter_device::read_c800(address_space &space, UINT16 offset)
 
 	if (offset < 0x400)
 	{
-		return 0xff;
+		return m_c800_ram[offset];
 	}
 	else
 	{
@@ -195,12 +219,20 @@ UINT8 a2bus_pcxporter_device::read_c800(address_space &space, UINT16 offset)
 
 			case 0x703: // read with increment
 				rv = m_ram[m_offset];
-				m_offset++;
+				// don't increment if the debugger's reading
+				if (!space.debugger_access())
+				{
+					m_offset++;
+				}
 				return rv;
 
 			case 0x704: // read w/o increment
 				rv = m_ram[m_offset];
-				return rv;
+				return rv;			
+				
+			default:
+				printf("Read $C800 at %x\n", offset + 0xc800);
+				break;					
 		}
 
 		return m_regs[offset];
@@ -214,6 +246,7 @@ void a2bus_pcxporter_device::write_c800(address_space &space, UINT16 offset, UIN
 {
 	if (offset < 0x400)
 	{
+		m_c800_ram[offset] = data;
 	}
 	else
 	{
@@ -244,6 +277,11 @@ void a2bus_pcxporter_device::write_c800(address_space &space, UINT16 offset, UIN
 
 			case 0x704: // write w/o increment
 				m_ram[m_offset] = data;
+				break;
+				
+			case 0x72c:	// CGA 6845 register select
+			case 0x72d:	// CGA 6845 data read/write
+			case 0x72e:	// CGA mode select
 				break;
 
 			default:
