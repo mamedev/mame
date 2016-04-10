@@ -991,7 +991,7 @@ archive_file::error zip_file_impl::decompress_data_type_14(std::uint64_t offset,
 	std::uint32_t read_length;
 	osd_file::error filerr;
 	SRes lzerr;
-	ELzmaStatus lzstatus;
+	ELzmaStatus lzstatus = LZMA_STATUS_NOT_SPECIFIED;
 
 	// reset the stream
 	ISzAlloc alloc_imp;
