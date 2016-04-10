@@ -158,7 +158,6 @@ files {
 	MAME_DIR .. "src/emu/mame.h",
 	MAME_DIR .. "src/emu/machine.cpp",
 	MAME_DIR .. "src/emu/machine.h",
-	MAME_DIR .. "src/emu/machine.ipp",
 	MAME_DIR .. "src/emu/mconfig.cpp",
 	MAME_DIR .. "src/emu/mconfig.h",
 	MAME_DIR .. "src/emu/memarray.cpp",

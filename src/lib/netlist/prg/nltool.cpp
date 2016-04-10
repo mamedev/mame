@@ -145,8 +145,8 @@ class netlist_tool_t : public netlist::netlist_t
 {
 public:
 
-	netlist_tool_t()
-	: netlist::netlist_t(), m_opts(NULL), m_setup(NULL)
+	netlist_tool_t(const pstring &aname)
+	: netlist::netlist_t(aname), m_opts(NULL), m_setup(NULL)
 	{
 	}
 
@@ -159,7 +159,6 @@ public:
 	void init()
 	{
 		m_setup = palloc(netlist::setup_t(this));
-		this->init_object(*this, "netlist");
 		m_setup->init();
 	}
 
@@ -281,7 +280,7 @@ pvector_t<input_t> *read_input(netlist::netlist_t *netlist, pstring fname)
 
 static void run(tool_options_t &opts)
 {
-	netlist_tool_t nt;
+	netlist_tool_t nt("netlist");
 	osd_ticks_t t = osd_ticks();
 
 	nt.m_opts = &opts;
@@ -326,7 +325,7 @@ static void run(tool_options_t &opts)
 
 static void listdevices()
 {
-	netlist_tool_t nt;
+	netlist_tool_t nt("netlist");
 	nt.init();
 	const netlist::factory_list_t &list = nt.setup().factory();
 

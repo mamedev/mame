@@ -17,6 +17,7 @@
 
 #include <cassert>
 #include <cctype>
+#include <forward_list>
 #include <new>
 
 
@@ -24,20 +25,6 @@ namespace util {
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-/**
- * @struct  zippath_returned_directory
- *
- * @brief   A zippath returned directory.
- */
-
-struct zippath_returned_directory
-{
-	/** @brief  The next. */
-	zippath_returned_directory *next;
-	/** @brief  The name. */
-	std::string name;
-};
 
 /**
  * @class   zippath_directory
@@ -49,11 +36,13 @@ class zippath_directory
 {
 public:
 	zippath_directory()
-		: returned_parent(false),
-			directory(nullptr),
-			called_zip_first(false),
-			zipfile(nullptr),
-			returned_dirlist(nullptr) { }
+		: returned_parent(false)
+		, directory(nullptr)
+		, called_zip_first(false)
+		, zipfile(nullptr)
+		, returned_dirlist()
+	{
+	}
 
 	/* common */
 	/** @brief  true to returned parent. */
@@ -73,7 +62,7 @@ public:
 	/** @brief  The zipprefix. */
 	std::string zipprefix;
 	/** @brief  The returned dirlist. */
-	zippath_returned_directory *returned_dirlist;
+	std::forward_list<std::string> returned_dirlist;
 };
 
 
@@ -856,12 +845,7 @@ void zippath_closedir(zippath_directory *directory)
 	if (directory->zipfile != nullptr)
 		directory->zipfile.reset();
 
-	while (directory->returned_dirlist != nullptr)
-	{
-		zippath_returned_directory *dirlist = directory->returned_dirlist;
-		directory->returned_dirlist = directory->returned_dirlist->next;
-		delete dirlist;
-	}
+	directory->returned_dirlist.clear();
 
 	delete directory;
 }
@@ -887,24 +871,28 @@ void zippath_closedir(zippath_directory *directory)
 static const char *get_relative_path(zippath_directory const &directory)
 {
 	auto len = directory.zipprefix.length();
-	const char *prefix = directory.zipprefix.c_str();
+	char const *prefix = directory.zipprefix.c_str();
 	while (is_zip_file_separator(*prefix))
 	{
 		len--;
 		prefix++;
 	}
 
-	if ((len <= directory.zipfile->current_name().length()) &&
-		!strncmp(prefix, directory.zipfile->current_name().c_str(), len))
+	std::string const &current(directory.zipfile->current_name());
+	char const *result = directory.zipfile->current_name().c_str() + len;
+	if ((current.length() >= len) &&
+		!strncmp(prefix, current.c_str(), len) &&
+		(!*prefix || is_zip_file_separator(*result) || is_zip_file_separator(directory.zipprefix.back())))
 	{
-		const char *result = &directory.zipfile->current_name().c_str()[len];
 		while (is_zip_file_separator(*result))
 			result++;
 
 		return *result ? result : nullptr;
 	}
-
-	return nullptr;
+	else
+	{
+		return nullptr;
+	}
 }
 
 
@@ -925,11 +913,6 @@ static const char *get_relative_path(zippath_directory const &directory)
 const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 {
 	const osd_directory_entry *result = nullptr;
-	int header;
-	const char *relpath;
-	const char *separator;
-	const char *s;
-	zippath_returned_directory *rdent;
 
 	if (!directory->returned_parent)
 	{
@@ -947,10 +930,10 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 		{
 			result = osd_readdir(directory->directory);
 		}
-		while((result != nullptr) && (!strcmp(result->name, ".") || !strcmp(result->name, "..")));
+		while (result && (!strcmp(result->name, ".") || !strcmp(result->name, "..")));
 
 		/* special case - is this entry a ZIP file?  if so we need to return it as a "directory" */
-		if ((result != nullptr) && (is_zip_file(result->name) || is_7z_file(result->name)))
+		if (result && (is_zip_file(result->name) || is_7z_file(result->name)))
 		{
 			/* copy; but change the entry type */
 			directory->returned_entry = *result;
@@ -960,47 +943,46 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 	}
 	else if (directory->zipfile)
 	{
+		char const *relpath;
 		do
 		{
 			/* a zip file read */
+			int header;
 			do
 			{
-				if (!directory->called_zip_first)
-					header = directory->zipfile->first_file();
-				else
-					header = directory->zipfile->next_file();
+				header = directory->called_zip_first ? directory->zipfile->next_file() : directory->zipfile->first_file();
 				directory->called_zip_first = true;
 				relpath = nullptr;
 			}
-			while((header >= 0) && ((relpath = get_relative_path(*directory)) == nullptr));
+			while ((header >= 0) && ((relpath = get_relative_path(*directory)) == nullptr));
 
-			if (relpath != nullptr)
+			if (relpath)
 			{
 				/* we've found a ZIP entry; but this may be an entry deep within the target directory */
-				for (s = relpath; *s && !is_zip_file_separator(*s); s++)
-					;
-				separator = *s ? s : nullptr;
+				char const *separator = relpath;
+				while (*separator && !is_zip_file_separator(*separator)) separator++;
 
-				if (separator != nullptr)
+				if (*separator || directory->zipfile->current_is_directory())
 				{
 					/* a nested entry; loop through returned_dirlist to see if we've returned the parent directory */
-					for (rdent = directory->returned_dirlist; rdent != nullptr; rdent = rdent->next)
+					auto const len(separator - relpath);
+					auto rdent = directory->returned_dirlist.begin();
+					while (directory->returned_dirlist.end() != rdent)
 					{
-						if (!core_strnicmp(rdent->name.c_str(), relpath, separator - relpath))
+						if ((rdent->length() == len) && !core_strnicmp(rdent->c_str(), relpath, len))
 							break;
+						else
+							++rdent;
 					}
 
-					if (rdent == nullptr)
+					if (directory->returned_dirlist.end() == rdent)
 					{
 						/* we've found a new directory; add this to returned_dirlist */
-						rdent = new zippath_returned_directory;
-						rdent->next = directory->returned_dirlist;
-						rdent->name.assign(relpath, separator - relpath);
-						directory->returned_dirlist = rdent;
+						directory->returned_dirlist.emplace_front(relpath, separator - relpath);
 
 						/* ...and return it */
 						memset(&directory->returned_entry, 0, sizeof(directory->returned_entry));
-						directory->returned_entry.name = rdent->name.c_str();
+						directory->returned_entry.name = directory->returned_dirlist.front().c_str();
 						directory->returned_entry.type = ENTTYPE_DIR;
 						result = &directory->returned_entry;
 					}
@@ -1016,7 +998,7 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 				}
 			}
 		}
-		while((relpath != nullptr) && (result == nullptr));
+		while (relpath && !result);
 	}
 	return result;
 }

@@ -91,6 +91,18 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/output/none.cpp",
 		MAME_DIR .. "src/osd/modules/output/console.cpp",
 		MAME_DIR .. "src/osd/modules/output/network.cpp",
+		MAME_DIR .. "src/osd/modules/ipc/tcp_connection.cpp",
+		MAME_DIR .. "src/osd/modules/ipc/tcp_connection.h",
+		MAME_DIR .. "src/osd/modules/ipc/tcp_server.cpp",
+		MAME_DIR .. "src/osd/modules/ipc/tcp_server.h",
+		MAME_DIR .. "src/osd/modules/ipc/raw_tcp_connection.cpp",
+		MAME_DIR .. "src/osd/modules/ipc/raw_tcp_connection.h",
+		MAME_DIR .. "src/osd/modules/ipc/raw_tcp_server.cpp",
+		MAME_DIR .. "src/osd/modules/ipc/raw_tcp_server.h",
+		MAME_DIR .. "src/osd/modules/ipc/rtc_tcp_connection.cpp",
+		MAME_DIR .. "src/osd/modules/ipc/rtc_tcp_connection.h",
+		MAME_DIR .. "src/osd/modules/ipc/rtc_tcp_server.cpp",
+		MAME_DIR .. "src/osd/modules/ipc/rtc_tcp_server.h",
 	}
 	includedirs {
 		ext_includedir("uv"),
