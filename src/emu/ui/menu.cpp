@@ -527,6 +527,7 @@ void ui_menu::draw(bool customonly, bool noimage, bool noinput)
 		visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_extra_menu_height;
 
 	visible_lines = floor(visible_main_menu_height / line_height);
+	if (visible_lines > item.size()) visible_lines = item.size();
 	visible_main_menu_height = (float)visible_lines * line_height;
 
 	// compute top/left of inner menu area by centering
@@ -907,9 +908,10 @@ void ui_menu::handle_events(UINT32 flags)
 							top_line -= local_menu_event.num_lines;
 							return;
 						}
-						selected -= local_menu_event.num_lines;
+						(selected == 0) ? selected = top_line = item.size() - 1 : selected -= local_menu_event.num_lines;
 						validate_selection(-1);
-						if (selected < top_line + (top_line != 0))
+						top_line -= (selected <= top_line && top_line != 0);
+						if (selected <= top_line && visitems != visible_lines)
 							top_line -= local_menu_event.num_lines;
 					}
 					else
@@ -919,11 +921,10 @@ void ui_menu::handle_events(UINT32 flags)
 							top_line += local_menu_event.num_lines;
 							return;
 						}
-						selected += local_menu_event.num_lines;
+						(selected == item.size() - 1) ? selected = top_line = 0 : selected += local_menu_event.num_lines;
 						validate_selection(1);
-						if (selected > item.size() - 1)
-							selected = item.size() - 1;
-						if (selected >= top_line + visitems + (top_line != 0))
+						top_line += (selected >= top_line + visitems + (top_line != 0));
+						if (selected >= (top_line + visitems + (top_line != 0)))
 							top_line += local_menu_event.num_lines;
 					}
 				}
@@ -1467,9 +1468,8 @@ void ui_menu::draw_select_game(bool noinput)
 	x1 = visible_left - UI_BOX_LR_BORDER;
 	x2 = visible_left + visible_width + UI_BOX_LR_BORDER;
 	float line = visible_top + (float)(visible_lines * line_height);
-
-	//machine().ui().draw_outlined_box(container, x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+
 	if (visible_items < visible_lines)
 		visible_lines = visible_items;
 	if (top_line < 0 || selected == 0)
