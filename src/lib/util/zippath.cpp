@@ -871,24 +871,28 @@ void zippath_closedir(zippath_directory *directory)
 static const char *get_relative_path(zippath_directory const &directory)
 {
 	auto len = directory.zipprefix.length();
-	const char *prefix = directory.zipprefix.c_str();
+	char const *prefix = directory.zipprefix.c_str();
 	while (is_zip_file_separator(*prefix))
 	{
 		len--;
 		prefix++;
 	}
 
-	if ((len <= directory.zipfile->current_name().length()) &&
-		!strncmp(prefix, directory.zipfile->current_name().c_str(), len))
+	std::string const &current(directory.zipfile->current_name());
+	char const *result = directory.zipfile->current_name().c_str() + len;
+	if ((current.length() >= len) &&
+		!strncmp(prefix, current.c_str(), len) &&
+		(!*prefix || is_zip_file_separator(*result) || is_zip_file_separator(directory.zipprefix.back())))
 	{
-		const char *result = &directory.zipfile->current_name().c_str()[len];
 		while (is_zip_file_separator(*result))
 			result++;
 
 		return *result ? result : nullptr;
 	}
-
-	return nullptr;
+	else
+	{
+		return nullptr;
+	}
 }
 
 

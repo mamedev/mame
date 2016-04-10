@@ -639,7 +639,7 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 		// FIXME: if (!is_utf8) convert filename to UTF8 (assume CP437 or something)
 
 		// chop off trailing slash for directory entries
-		bool const is_dir(!m_header.file_name.empty() && (*m_header.file_name.rbegin() == '/'));
+		bool const is_dir(!m_header.file_name.empty() && (m_header.file_name.back() == '/'));
 		if (is_dir) m_header.file_name.resize(m_header.file_name.length() - 1);
 
 		// check to see if it matches query
