@@ -219,12 +219,14 @@ void chain_manager::load_chains()
 
 void chain_manager::destroy_chains()
 {
+	int index = 0;
     for (bgfx_chain* chain : m_screen_chains)
     {
         if (chain != nullptr)
         {
             delete chain;
         }
+        index++;
     }
 }
 
@@ -345,8 +347,7 @@ int32_t chain_manager::chain_changed(int32_t id, std::string *str, int32_t newva
     {
         m_current_chain[id] = newval;
 
-        // Reload chains
-        load_chains();
+        reload_chains();
 
         m_slider_notifier.set_sliders_dirty();
     }
