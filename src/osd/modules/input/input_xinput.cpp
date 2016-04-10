@@ -136,7 +136,7 @@ void xinput_joystick_device::poll()
 	for (int povindex = 0; povindex < XINPUT_MAX_POV; povindex++)
 	{
 		int currentPov = xinput_pov_dir[povindex];
-		gamepad.povs[currentPov] = (xinput_state.xstate.Gamepad.wButtons & currentPov) ? 0xFF : 0;
+		gamepad.povs[povindex] = (xinput_state.xstate.Gamepad.wButtons & currentPov) ? 0xFF : 0;
 	}
 
 	// Now do the buttons
