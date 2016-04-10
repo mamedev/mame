@@ -17,6 +17,7 @@
 
 #include <cassert>
 #include <cctype>
+#include <forward_list>
 #include <new>
 
 
@@ -24,20 +25,6 @@ namespace util {
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-/**
- * @struct  zippath_returned_directory
- *
- * @brief   A zippath returned directory.
- */
-
-struct zippath_returned_directory
-{
-	/** @brief  The next. */
-	zippath_returned_directory *next;
-	/** @brief  The name. */
-	std::string name;
-};
 
 /**
  * @class   zippath_directory
@@ -49,11 +36,13 @@ class zippath_directory
 {
 public:
 	zippath_directory()
-		: returned_parent(false),
-			directory(nullptr),
-			called_zip_first(false),
-			zipfile(nullptr),
-			returned_dirlist(nullptr) { }
+		: returned_parent(false)
+		, directory(nullptr)
+		, called_zip_first(false)
+		, zipfile(nullptr)
+		, returned_dirlist()
+	{
+	}
 
 	/* common */
 	/** @brief  true to returned parent. */
@@ -73,7 +62,7 @@ public:
 	/** @brief  The zipprefix. */
 	std::string zipprefix;
 	/** @brief  The returned dirlist. */
-	zippath_returned_directory *returned_dirlist;
+	std::forward_list<std::string> returned_dirlist;
 };
 
 
@@ -856,12 +845,7 @@ void zippath_closedir(zippath_directory *directory)
 	if (directory->zipfile != nullptr)
 		directory->zipfile.reset();
 
-	while (directory->returned_dirlist != nullptr)
-	{
-		zippath_returned_directory *dirlist = directory->returned_dirlist;
-		directory->returned_dirlist = directory->returned_dirlist->next;
-		delete dirlist;
-	}
+	directory->returned_dirlist.clear();
 
 	delete directory;
 }
@@ -978,24 +962,23 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 				{
 					/* a nested entry; loop through returned_dirlist to see if we've returned the parent directory */
 					auto const len(separator - relpath);
-					zippath_returned_directory *rdent;
-					for (rdent = directory->returned_dirlist; rdent != nullptr; rdent = rdent->next)
+					auto rdent = directory->returned_dirlist.begin();
+					while (directory->returned_dirlist.end() != rdent)
 					{
-						if ((rdent->name.length() == len) && !core_strnicmp(rdent->name.c_str(), relpath, len))
+						if ((rdent->length() == len) && !core_strnicmp(rdent->c_str(), relpath, len))
 							break;
+						else
+							++rdent;
 					}
 
-					if (!rdent)
+					if (directory->returned_dirlist.end() == rdent)
 					{
 						/* we've found a new directory; add this to returned_dirlist */
-						rdent = new zippath_returned_directory;
-						rdent->next = directory->returned_dirlist;
-						rdent->name.assign(relpath, separator - relpath);
-						directory->returned_dirlist = rdent;
+						directory->returned_dirlist.emplace_front(relpath, separator - relpath);
 
 						/* ...and return it */
 						memset(&directory->returned_entry, 0, sizeof(directory->returned_entry));
-						directory->returned_entry.name = rdent->name.c_str();
+						directory->returned_entry.name = directory->returned_dirlist.front().c_str();
 						directory->returned_entry.type = ENTTYPE_DIR;
 						result = &directory->returned_entry;
 					}
