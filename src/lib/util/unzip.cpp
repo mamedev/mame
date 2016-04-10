@@ -14,7 +14,6 @@
 #include "hashing.h"
 #include "osdcore.h"
 
-
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -370,18 +369,7 @@ public:
 	void                file_name(std::string &result) const    { read_string(result, 0x1e, file_name_length()); }
 	extra_field_reader  extra_field() const                     { return extra_field_reader(m_buffer + 0x1e + file_name_length(), extra_field_length()); }
 
-	bool        signature_correct() const       { return signature() == 0x04034b50; }
-
-	bool        encrypted() const               { return bool(general_flag() & 0x0001); }
-	bool        implode_8k_dict() const         { return bool(general_flag() & 0x0002); }
-	bool        implode_3_trees() const         { return bool(general_flag() & 0x0004); }
-	unsigned    deflate_option() const          { return unsigned((general_flag() >> 1) & 0x0003); }
-	bool        lzma_eos_mark() const           { return bool(general_flag() & 0x0002); }
-	bool        use_descriptor() const          { return bool(general_flag() & 0x0008); }
-	bool        patch_data() const              { return bool(general_flag() & 0x0020); }
-	bool        strong_encryption() const       { return bool(general_flag() & 0x0040); }
-	bool        utf8_encoding() const           { return bool(general_flag() & 0x0800); }
-	bool        directory_encryption() const    { return bool(general_flag() & 0x2000); }
+	bool                signature_correct() const               { return signature() == 0x04034b50; }
 
 	std::size_t total_length() const { return minimum_length() + file_name_length() + extra_field_length(); }
 	static std::size_t minimum_length() { return 0x1e; }
@@ -419,17 +407,6 @@ public:
 	void                file_comment(std::string &result) const { read_string(result, 0x2e + file_name_length() + extra_field_length(), file_comment_length()); }
 
 	bool                signature_correct() const               { return signature() == 0x02014b50; }
-
-	bool                encrypted() const                       { return bool(general_flag() & 0x0001); }
-	bool                implode_8k_dict() const                 { return bool(general_flag() & 0x0002); }
-	bool                implode_3_trees() const                 { return bool(general_flag() & 0x0004); }
-	unsigned            deflate_option() const                  { return unsigned((general_flag() >> 1) & 0x0003); }
-	bool                lzma_eos_mark() const                   { return bool(general_flag() & 0x0002); }
-	bool                use_descriptor() const                  { return bool(general_flag() & 0x0008); }
-	bool                patch_data() const                      { return bool(general_flag() & 0x0020); }
-	bool                strong_encryption() const               { return bool(general_flag() & 0x0040); }
-	bool                utf8_encoding() const                   { return bool(general_flag() & 0x0800); }
-	bool                directory_encryption() const            { return bool(general_flag() & 0x2000); }
 
 	std::size_t total_length() const { return minimum_length() + file_name_length() + extra_field_length() + file_comment_length(); }
 	static std::size_t minimum_length() { return 0x2e; }
@@ -502,6 +479,27 @@ public:
 };
 
 
+class general_flag_reader
+{
+public:
+	general_flag_reader(std::uint16_t val) : m_value(val) { }
+
+	bool        encrypted() const               { return bool(m_value & 0x0001); }
+	bool        implode_8k_dict() const         { return bool(m_value & 0x0002); }
+	bool        implode_3_trees() const         { return bool(m_value & 0x0004); }
+	unsigned    deflate_option() const          { return unsigned((m_value >> 1) & 0x0003); }
+	bool        lzma_eos_mark() const           { return bool(m_value & 0x0002); }
+	bool        use_descriptor() const          { return bool(m_value & 0x0008); }
+	bool        patch_data() const              { return bool(m_value & 0x0020); }
+	bool        strong_encryption() const       { return bool(m_value & 0x0040); }
+	bool        utf8_encoding() const           { return bool(m_value & 0x0800); }
+	bool        directory_encryption() const    { return bool(m_value & 0x2000); }
+
+private:
+	std::uint16_t m_value;
+};
+
+
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -517,14 +515,6 @@ std::mutex zip_file_impl::s_cache_mutex;
     zip_file_close - close a ZIP file and add it
     to the cache
 -------------------------------------------------*/
-
-/**
- * @fn  void zip_file_close(zip_file *zip)
- *
- * @brief   Zip file close.
- *
- * @param [in,out]  zip If non-null, the zip.
- */
 
 void zip_file_impl::close(ptr &&zip)
 {
@@ -586,7 +576,7 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 		m_cd_pos += reader.total_length();
 
 		// copy the filename
-		bool is_utf8(reader.utf8_encoding());
+		bool is_utf8(general_flag_reader(m_header.bit_flag).utf8_encoding());
 		reader.file_name(filename);
 
 		// walk the extra data
@@ -608,11 +598,14 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 			if (!is_utf8 && (extra.header_id() == 0x7075) && (extra.data_size() >= utf8_path_reader::minimum_length()))
 			{
 				utf8_path_reader const utf8path(extra);
-				auto const crc(crc32_creator::simple(m_filename.empty() ? nullptr : &filename[0], filename.length() * sizeof(filename[0])));
-				if (utf8path.name_crc32() == crc.m_raw)
+				if (utf8path.version() == 1)
 				{
-					utf8path.unicode_name(filename);
-					is_utf8 = true;
+					auto const crc(crc32_creator::simple(m_filename.empty() ? nullptr : &filename[0], filename.length() * sizeof(filename[0])));
+					if (utf8path.name_crc32() == crc.m_raw)
+					{
+						utf8path.unicode_name(filename);
+						is_utf8 = true;
+					}
 				}
 			}
 		}
@@ -813,12 +806,12 @@ archive_file::error zip_file_impl::read_ecd()
 archive_file::error zip_file_impl::get_compressed_data_offset(std::uint64_t &offset)
 {
 	// don't support a number of features
-	if ((m_header.start_disk_number != m_ecd.disk_number) || // in a different segment
-		(m_header.version_needed > 63) || // future version of specification
-		(m_header.bit_flag & 0x0001) || // encrypted
-		(m_header.bit_flag & 0x0020) || // compressed patch data
-		(m_header.bit_flag & 0x0040) || // strong encryption
-		(m_header.bit_flag & 0x2000)) // directory encryption
+	general_flag_reader const flags(m_header.bit_flag);
+	if ((m_header.start_disk_number != m_ecd.disk_number) ||
+		(m_header.version_needed > 63) ||
+		flags.encrypted() ||
+		flags.patch_data() ||
+		flags.strong_encryption())
 		return archive_file::error::UNSUPPORTED;
 
 	// make sure the file handle is open
@@ -965,6 +958,7 @@ archive_file::error zip_file_impl::decompress_data_type_14(std::uint64_t offset,
 	assert(4 <= m_buffer.size());
 	assert(LZMA_PROPS_SIZE <= m_buffer.size());
 
+	bool const eos_mark(general_flag_reader(m_header.bit_flag).lzma_eos_mark());
 	Byte *const output(reinterpret_cast<Byte *>(buffer));
 	SizeT output_remaining(length);
 	std::uint64_t input_remaining(m_header.compressed_length);
@@ -1004,20 +998,12 @@ archive_file::error zip_file_impl::decompress_data_type_14(std::uint64_t offset,
 	if (props_size != read_length)
 		return archive_file::error::FILE_TRUNCATED;
 
-	printf("Read %ld (%ld)\n", long(read_length), long(input_remaining));
-
 	// initialize the decompressor
 	lzerr = LzmaDec_Allocate(&stream, &m_buffer[0], props_size, &alloc_imp);
 	if (SZ_ERROR_MEM == lzerr)
-	{
-		printf("Allocation error\n");
 		return archive_file::error::OUT_OF_MEMORY;
-	}
 	else if (SZ_OK != lzerr)
-	{
-		printf("Properties error\n");
 		return archive_file::error::DECOMPRESS_ERROR;
-	}
 	LzmaDec_Init(&stream);
 
 	// loop until we're done
@@ -1054,7 +1040,7 @@ archive_file::error zip_file_impl::decompress_data_type_14(std::uint64_t offset,
 				&output_remaining,
 				reinterpret_cast<Byte const *>(&m_buffer[0]),
 				&len,
-				((0 == input_remaining) && (m_header.bit_flag & 0x0002)) ? LZMA_FINISH_END :  LZMA_FINISH_ANY,
+				((0 == input_remaining) && eos_mark) ? LZMA_FINISH_END :  LZMA_FINISH_ANY,
 				&lzstatus);
 		if (SZ_OK != lzerr)
 		{
@@ -1069,7 +1055,7 @@ archive_file::error zip_file_impl::decompress_data_type_14(std::uint64_t offset,
 	// if anything looks funny, report an error
 	if (LZMA_STATUS_FINISHED_WITH_MARK == lzstatus)
 		return archive_file::error::NONE;
-	else if ((LZMA_STATUS_MAYBE_FINISHED_WITHOUT_MARK != lzstatus) || (m_header.bit_flag & 0x0002))
+	else if ((LZMA_STATUS_MAYBE_FINISHED_WITHOUT_MARK != lzstatus) || eos_mark)
 		return archive_file::error::DECOMPRESS_ERROR;
 	else
 		return archive_file::error::NONE;
@@ -1094,17 +1080,6 @@ void m7z_file_cache_clear();
 /*-------------------------------------------------
     zip_file_open - opens a ZIP file for reading
 -------------------------------------------------*/
-
-/**
- * @fn  zip_error zip_file_open(const char *filename, zip_file **zip)
- *
- * @brief   Queries if a given zip file open.
- *
- * @param   filename    Filename of the file.
- * @param [in,out]  zip If non-null, the zip.
- *
- * @return  A zip_error.
- */
 
 archive_file::error archive_file::open_zip(const std::string &filename, ptr &result)
 {
