@@ -431,54 +431,36 @@ bool chain_manager::needs_sliders()
 	return m_screen_count > 0 && m_available_chains.size() > 1;
 }
 
-slider_state* chain_manager::get_slider_list()
+std::vector<slider_state*> chain_manager::get_slider_list()
 {
+	std::vector<slider_state*> sliders;
+
     if (!needs_sliders())
     {
-        return nullptr;
+        return sliders;
     }
-
-    slider_state *listhead = nullptr;
-    slider_state **tailptr = &listhead;
 
     for (size_t index = 0; index < m_screen_chains.size(); index++)
     {
         bgfx_chain* chain = m_screen_chains[index];
-
-        if (*tailptr == nullptr)
-        {
-            *tailptr = m_selection_sliders[index];
-        }
-        else
-        {
-            (*tailptr)->next = m_selection_sliders[index];
-            tailptr = &(*tailptr)->next;
-        }
+		sliders.push_back(m_selection_sliders[index]);
 
         if (chain == nullptr)
         {
             continue;
         }
 
-        std::vector<bgfx_slider*> sliders = chain->sliders();
-        for (bgfx_slider* slider : sliders)
+        std::vector<bgfx_slider*> chain_sliders = chain->sliders();
+        for (bgfx_slider* slider : chain_sliders)
         {
-            if (*tailptr == nullptr)
-            {
-                *tailptr = slider->core_slider();
-            }
-            else
-            {
-                (*tailptr)->next = slider->core_slider();
-                tailptr = &(*tailptr)->next;
-            }
+			sliders.push_back(slider->core_slider());
         }
+
+        if (sliders.size() > 0)
+        {
+        	// TODO: Put dividing line
+		}
     }
 
-    if (*tailptr != nullptr)
-    {
-        (*tailptr)->next = nullptr;
-    }
-
-    return listhead;
+    return sliders;
 }

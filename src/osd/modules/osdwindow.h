@@ -189,7 +189,7 @@ public:
 	virtual int create() = 0;
 	virtual render_primitive_list *get_primitives() = 0;
 
-	virtual slider_state* get_slider_list() { return nullptr; }
+	virtual std::vector<slider_state*> get_slider_list() { return m_sliders; }
 	virtual int draw(const int update) = 0;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) { return 0; };
 	virtual void save() { };
@@ -200,9 +200,12 @@ public:
 	static osd_renderer* make_for_type(int mode, osd_window *window, int extra_flags = FLAG_NONE);
 
 protected:
+	virtual void build_slider_list() { }
+
 	/* Internal flags */
 	static const int FI_CHANGED                 = 0x010000;
-	bool        m_sliders_dirty;
+	bool        				m_sliders_dirty;
+	std::vector<slider_state*>	m_sliders;
 
 private:
 	osd_window  *m_window;

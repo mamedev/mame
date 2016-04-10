@@ -296,7 +296,17 @@ void ui_menu::set_special_main_menu(bool special)
 //  end of the menu
 //-------------------------------------------------
 
-void ui_menu::item_append(const char *text, const char *subtext, UINT32 flags, void *ref)
+void ui_menu::item_append(ui_menu_item item)
+{
+	item_append(item.text, item.subtext, item.flags, item.ref, item.type);
+}
+
+//-------------------------------------------------
+//  item_append - append a new item to the
+//  end of the menu
+//-------------------------------------------------
+
+void ui_menu::item_append(const char *text, const char *subtext, UINT32 flags, void *ref, ui_menu_item_type type)
 {
 	// only allow multiline as the first item
 	if ((flags & MENU_FLAG_MULTILINE) != 0)
@@ -312,6 +322,7 @@ void ui_menu::item_append(const char *text, const char *subtext, UINT32 flags, v
 	pitem.subtext = (subtext != nullptr) ? pool_strdup(subtext) : nullptr;
 	pitem.flags = flags;
 	pitem.ref = ref;
+	pitem.type = type;
 
 	// append to array
 	int index = item.size();
@@ -380,6 +391,7 @@ const ui_menu_event *ui_menu::process(UINT32 flags)
 	if (menu_event.iptkey != IPT_INVALID && selected >= 0 && selected < item.size())
 	{
 		menu_event.itemref = item[selected].ref;
+		menu_event.type = item[selected].type;
 		return &menu_event;
 	}
 	return nullptr;

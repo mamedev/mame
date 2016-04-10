@@ -53,6 +53,12 @@ enum ui_menu_reset_options
 	UI_MENU_RESET_REMEMBER_REF
 };
 
+// types of menu items (TODO: please expand)
+enum class ui_menu_item_type
+{
+	UI_MENU_ITEM_TYPE_UNKNOWN,
+	UI_MENU_ITEM_TYPE_SLIDER
+};
 
 
 /***************************************************************************
@@ -62,9 +68,10 @@ enum ui_menu_reset_options
 // menu-related events
 struct ui_menu_event
 {
-	void         *itemref;   // reference for the selected item
-	int          iptkey;     // one of the IPT_* values from inptport.h
-	unicode_char unichar;    // unicode character if iptkey == IPT_SPECIAL
+	void         		*itemref;   // reference for the selected item
+	ui_menu_item_type	type;	// item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
+	int          		iptkey;     // one of the IPT_* values from inptport.h
+	unicode_char 		unichar;    // unicode character if iptkey == IPT_SPECIAL
 };
 
 struct ui_menu_pool
@@ -78,10 +85,11 @@ struct ui_menu_pool
 class ui_menu_item
 {
 public:
-	const char  *text;
-	const char  *subtext;
-	UINT32      flags;
-	void        *ref;
+	const char  		*text;
+	const char  		*subtext;
+	UINT32      		flags;
+	void        		*ref;
+	ui_menu_item_type	type;	// item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
 
 	inline bool is_selectable() const;
 };
@@ -111,7 +119,8 @@ public:
 	void reset(ui_menu_reset_options options);
 
 	// append a new item to the end of the menu
-	void item_append(const char *text, const char *subtext, UINT32 flags, void *ref);
+	void item_append(const char *text, const char *subtext, UINT32 flags, void *ref, ui_menu_item_type type = ui_menu_item_type::UI_MENU_ITEM_TYPE_UNKNOWN);
+	void item_append(ui_menu_item item);
 
 	// process a menu, drawing it and returning any interesting events
 	const ui_menu_event *process(UINT32 flags);

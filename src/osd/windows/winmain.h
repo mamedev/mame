@@ -263,8 +263,6 @@ public:
 	virtual void update(bool skip_redraw) override;
 
 	// video overridables
-	virtual slider_state *get_slider_list() override;
-
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 
 	virtual void video_register() override;
@@ -294,7 +292,6 @@ private:
 	virtual void osd_exit() override;
 
 	windows_options &   m_options;
-	slider_state *      m_sliders;
 
 	static const int DEFAULT_FONT_HEIGHT = 200;
 };

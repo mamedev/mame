@@ -249,7 +249,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_XINPUT);
 	REGISTER_MODULE(m_mod_man, JOYSTICK_NONE);
-	
+
 	REGISTER_MODULE(m_mod_man, OUTPUT_NONE);
 	REGISTER_MODULE(m_mod_man, OUTPUT_CONSOLE);
 	REGISTER_MODULE(m_mod_man, OUTPUT_NETWORK);
@@ -537,9 +537,9 @@ void osd_common_t::customize_input_type_list(simple_list<input_type_entry> &type
 //  list of OS-dependent slider values.
 //-------------------------------------------------
 
-slider_state* osd_common_t::get_slider_list()
+std::vector<slider_state*> osd_common_t::get_slider_list()
 {
-	return nullptr;
+	return m_sliders;
 }
 
 //-------------------------------------------------
@@ -612,7 +612,7 @@ void osd_common_t::init_subsystems()
 	select_module_options<netdev_module *>(options(), OSD_NETDEV_PROVIDER);
 
 	m_midi = select_module_options<midi_module *>(options(), OSD_MIDI_PROVIDER);
-	
+
 	m_output = select_module_options<output_module *>(options(), OSD_OUTPUT_PROVIDER);
 	machine().output().set_notifier(NULL, output_notifier_callback, this);
 

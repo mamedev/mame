@@ -42,7 +42,7 @@ public:
 	virtual int create() override;
     virtual int draw(const int update) override;
 
-    virtual slider_state* get_slider_list() override;
+    virtual std::vector<slider_state*> get_slider_list() override;
     virtual void set_sliders_dirty() override;
 
 #ifdef OSD_SDL
