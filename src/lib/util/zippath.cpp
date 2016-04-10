@@ -942,10 +942,10 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 		{
 			result = osd_readdir(directory->directory);
 		}
-		while((result != nullptr) && (!strcmp(result->name, ".") || !strcmp(result->name, "..")));
+		while (result && (!strcmp(result->name, ".") || !strcmp(result->name, "..")));
 
 		/* special case - is this entry a ZIP file?  if so we need to return it as a "directory" */
-		if ((result != nullptr) && (is_zip_file(result->name) || is_7z_file(result->name)))
+		if (result && (is_zip_file(result->name) || is_7z_file(result->name)))
 		{
 			/* copy; but change the entry type */
 			directory->returned_entry = *result;
@@ -977,10 +977,11 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 				if (*separator || directory->zipfile->current_is_directory())
 				{
 					/* a nested entry; loop through returned_dirlist to see if we've returned the parent directory */
+					auto const len(separator - relpath);
 					zippath_returned_directory *rdent;
 					for (rdent = directory->returned_dirlist; rdent != nullptr; rdent = rdent->next)
 					{
-						if (!core_strnicmp(rdent->name.c_str(), relpath, separator - relpath + 1))
+						if ((rdent->name.length() == len) && !core_strnicmp(rdent->name.c_str(), relpath, len))
 							break;
 					}
 
