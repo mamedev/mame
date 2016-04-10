@@ -2073,9 +2073,9 @@ static MACHINE_CONFIG_START( cdkong, cdkong_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(10)
-	MCFG_SCREEN_SIZE(538, 1001)
-	MCFG_SCREEN_VISIBLE_AREA(0, 537, 0, 1000)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(559, 998)
+	MCFG_SCREEN_VISIBLE_AREA(0, 558, 0, 997)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
@@ -3967,8 +3967,8 @@ ROM_START( cdkong )
 	ROM_LOAD( "hd38820a45", 0x0000, 0x1000, CRC(196b8070) SHA1(da85d1eb4b048b77f3168630662ab94ec9baa262) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 714102, "svg", 0)
-	ROM_LOAD( "cdkong.svg", 0, 714102, CRC(184bbe69) SHA1(98554341054246e5d76e0779620498e6cb723958) )
+	ROM_REGION( 359199, "svg", 0)
+	ROM_LOAD( "cdkong.svg", 0, 359199, CRC(ba159fd5) SHA1(3188e2ed3234f39ac9ee93a485a7e73314bc3457) ) // version 8 april 2016. by Rik, kevtris
 ROM_END
 
 
