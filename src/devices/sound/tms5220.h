@@ -8,6 +8,12 @@
 #include "emu.h"
 #include "machine/spchrom.h"
 
+enum
+{
+	RS=2,
+	WS=1
+};
+
 /* HACK: if defined, uses impossibly perfect 'straight line' interpolation */
 #undef PERFECT_INTERPOLATION_HACK
 
