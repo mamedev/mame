@@ -127,17 +127,14 @@ void queue_t::on_post_load()
 ATTR_COLD object_t::object_t(const type_t atype, const family_t afamily)
 : m_objtype(atype)
 , m_family(afamily)
-, m_netlist(NULL)
+, m_netlist(nullptr)
 {}
 
-ATTR_COLD object_t::object_t(const pstring &aname, const type_t atype, const family_t afamily)
-: m_name(aname)
-, m_objtype(atype)
+ATTR_COLD object_t::object_t(netlist_t &nl, const type_t atype, const family_t afamily)
+: m_objtype(atype)
 , m_family(afamily)
-{
-	// FIXME:
-	m_netlist = reinterpret_cast<netlist_t *>(this);
-}
+, m_netlist(&nl)
+{}
 
 ATTR_COLD object_t::object_t(netlist_t &nl, const pstring &aname, const type_t atype, const family_t afamily)
 : m_name(aname)
@@ -149,6 +146,12 @@ ATTR_COLD object_t::object_t(netlist_t &nl, const pstring &aname, const type_t a
 
 ATTR_COLD object_t::~object_t()
 {
+}
+
+ATTR_COLD void object_t::init_object(const pstring &aname)
+{
+	m_name = aname;
+	save_register();
 }
 
 ATTR_COLD void object_t::init_object(netlist_t &nl, const pstring &aname)
@@ -188,7 +191,7 @@ ATTR_COLD void device_object_t::init_object(core_device_t &dev,
 // ----------------------------------------------------------------------------------------
 
 netlist_t::netlist_t(const pstring &aname)
-	:   object_t(aname, NETLIST, GENERIC), pstate_manager_t(),
+	:   pstate_manager_t(),
 		m_stop(netlist_time::zero),
 		m_time(netlist_time::zero),
 		m_use_deactivate(0),
@@ -197,9 +200,12 @@ netlist_t::netlist_t(const pstring &aname)
 		m_solver(NULL),
 		m_gnd(NULL),
 		m_params(NULL),
+		m_name(aname),
 		m_setup(NULL),
 		m_log(this)
 {
+	save_item(static_cast<pstate_callback_t &>(m_queue), this,  "m_queue");
+	save_item(m_time, this, "m_time");
 }
 
 netlist_t::~netlist_t()
@@ -216,13 +222,6 @@ netlist_t::~netlist_t()
 	m_devices.clear_and_free();
 
 	pstring::resetmem();
-}
-
-ATTR_COLD void netlist_t::save_register()
-{
-	save(static_cast<pstate_callback_t &>(m_queue), "m_queue");
-	save(NLNAME(m_time));
-	object_t::save_register();
 }
 
 ATTR_HOT nl_double netlist_t::gmin() const
@@ -939,6 +938,19 @@ ATTR_COLD analog_output_t::analog_output_t()
 	set_state(STATE_OUT);
 
 	net().m_cur_Analog = NL_FCONST(0.99);
+}
+
+ATTR_COLD analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
+	: analog_t(OUTPUT), m_proxied_net(NULL)
+{
+	this->set_net(m_my_net);
+	set_state(STATE_OUT);
+
+	net().m_cur_Analog = NL_FCONST(0.99);
+
+	analog_t::init_object(dev, aname);
+	net().init_object(dev.netlist(), aname + ".net");
+	net().register_railterminal(*this);
 }
 
 ATTR_COLD void analog_output_t::init_object(core_device_t &dev, const pstring &aname)
