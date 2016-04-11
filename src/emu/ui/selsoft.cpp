@@ -431,7 +431,6 @@ void ui_menu_select_software::populate()
 
 	machine_config config(*m_driver, machine().options());
 	image_interface_iterator iter(config.root_device());
-
 	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 		if (image->filename() == nullptr && image->must_be_loaded())
 		{
@@ -1431,7 +1430,6 @@ float ui_menu_select_software::draw_left_panel(float x1, float y1, float x2, flo
 		}
 
 		x2 = x1 + left_width + 2.0f * UI_BOX_LR_BORDER;
-		//machine().ui().draw_outlined_box(container, x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 		mui.draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 		// take off the borders
@@ -1512,7 +1510,6 @@ float ui_menu_select_software::draw_left_panel(float x1, float y1, float x2, flo
 		float ar_x1 = ar_x0 + lr_arrow_width;
 		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
 
-		//machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 		mui.draw_outlined_box(container, x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
 		if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y2 > mouse_y)
@@ -1536,7 +1533,6 @@ float ui_menu_select_software::draw_left_panel(float x1, float y1, float x2, flo
 		float ar_x1 = ar_x0 + lr_arrow_width;
 		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
 
-		//machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 		mui.draw_outlined_box(container, x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
 		if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y2 > mouse_y)
@@ -1899,7 +1895,6 @@ void ui_menu_select_software::draw_right_panel(void *selectedref, float origx1, 
 	float ar_x1 = ar_x0 + lr_arrow_width;
 	float ar_y1 = 0.5f * (origy2 + origy1) + 0.9f * space;
 
-	//machine().ui().draw_outlined_box(container, origx1, origy1, origx2, origy2, UI_BACKGROUND_COLOR);
 	mui.draw_outlined_box(container, origx1, origy1, origx2, origy2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
 	if (mouse_hit && origx1 <= mouse_x && x2 > mouse_x && origy1 <= mouse_y && origy2 > mouse_y)
