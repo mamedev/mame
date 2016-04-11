@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-11 03:33+0200\n"
-"PO-Revision-Date: 2016-03-28 16:32+0800\n"
+"PO-Revision-Date: 2016-04-11 14:17+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh\n"
@@ -750,7 +750,7 @@ msgstr "游戏作弊"
 
 #: src/emu/ui/mainmenu.cpp:136
 msgid "Plugin Options"
-msgstr ""
+msgstr "插件选项"
 
 #: src/emu/ui/mainmenu.cpp:140
 msgid "External DAT View"
@@ -1004,6 +1004,9 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"选定的机械缺少一个至多个必要的 ROM 或 CHD 映像档，请选择其他机械。\n"
+"\n"
+"按任意键继续。"
 
 #: src/emu/ui/selgame.cpp:589 src/emu/ui/simpleselgame.cpp:265
 msgid "Configure Options"
@@ -1282,6 +1285,9 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"选定的软件缺少一个至多个必要的 ROM 或 CHD 映像档，请选择其他软件。\n"
+"\n"
+"按任意键继续。"
 
 #: src/emu/ui/selsoft.cpp:684
 #, c-format
@@ -1838,7 +1844,7 @@ msgstr "%1$.3f"
 #: src/emu/ui/ui.cpp:2460
 #, c-format
 msgid "%1$1.2f"
-msgstr ""
+msgstr "%1$1.2f"
 
 #: src/emu/ui/ui.cpp:2476
 #, c-format
@@ -1913,119 +1919,3 @@ msgstr " 色彩"
 #: src/emu/ui/viewgfx.cpp:392
 msgid " PENS"
 msgstr " PENS"
-
-#~ msgid "Lightgun Device Assignment"
-#~ msgstr "配置光枪设备"
-
-#~ msgid "Trackball Device Assignment"
-#~ msgstr "配置轨迹球设备"
-
-#~ msgid "Pedal Device Assignment"
-#~ msgstr "配置踏板设备"
-
-#~ msgid "Adstick Device Assignment"
-#~ msgstr "配置 AD 游戏杆设备"
-
-#~ msgid "Paddle Device Assignment"
-#~ msgstr "配置操纵杆设备"
-
-#~ msgid "Dial Device Assignment"
-#~ msgstr "配置方向盘设备"
-
-#~ msgid "Positional Device Assignment"
-#~ msgstr "配置定位设备"
-
-#~ msgid "Mouse Device Assignment"
-#~ msgstr "配置鼠标设备"
-
-#~ msgid "Device Mapping"
-#~ msgstr "装置映对"
-
-#~ msgid "Video Mode"
-#~ msgstr "视讯模式"
-
-#~ msgid "Triple Buffering"
-#~ msgstr "三重缓冲"
-
-#~ msgid "HLSL"
-#~ msgstr "HLSL"
-
-#~ msgid "GLSL"
-#~ msgstr "GLSL"
-
-#~ msgid "Bilinear Filtering"
-#~ msgstr "双线过滤"
-
-#~ msgid "Bitmap Prescaling"
-#~ msgstr "点阵预缩放"
-
-#~ msgid "Window Mode"
-#~ msgstr "视窗模式"
-
-#~ msgid "Enforce Aspect Ratio"
-#~ msgstr "强制长宽比例"
-
-#~ msgid "Start Out Maximized"
-#~ msgstr "启动时最大化"
-
-#~ msgid "Synchronized Refresh"
-#~ msgstr "同步更新"
-
-#~ msgid "Wait Vertical Sync"
-#~ msgstr "等待垂直同步"
-
-#~ msgid "Display Options"
-#~ msgstr "视讯选项"
-
-#~ msgid ""
-#~ "The selected machine is missing one or more required ROM or CHD images. "
-#~ "Please select a different machine.\n"
-#~ "\n"
-#~ "Press any key (except ESC) to continue."
-#~ msgstr ""
-#~ "选定的机械缺少一个至多个必要的 ROM 或 CHD 映像档，请选择其他机械。\n"
-#~ "\n"
-#~ "按任意键 （除 ESC 键） 继续。"
-
-#~ msgid ""
-#~ "The selected software is missing one or more required files. Please "
-#~ "select a different software.\n"
-#~ "\n"
-#~ "Press any key (except ESC) to continue."
-#~ msgstr ""
-#~ "选定的软件缺少一个至多个必要的 ROM 或 CHD 映像档，请选择其他软件。\n"
-#~ "\n"
-#~ "按任意键 （除 ESC 键） 继续。"
-
-#~ msgid "Re-select last machine played"
-#~ msgstr "重新选择前一次执行的机械"
-
-#~ msgid "Enlarge images in the right panel"
-#~ msgstr "右侧面版放大图片"
-
-#~ msgid "DATs info"
-#~ msgstr "文件信息"
-
-#~ msgid "Show mouse pointer"
-#~ msgstr "显示鼠标指标"
-
-#~ msgid "Confirm quit from machines"
-#~ msgstr "从机械退出时需确认"
-
-#~ msgid "Skip displaying information's screen at startup"
-#~ msgstr "略过启动时的显示资讯画面"
-
-#~ msgid "Force 4:3 appearance for software snapshot"
-#~ msgstr "强制 4:3 外观供软件撷图"
-
-#~ msgid "Use image as background"
-#~ msgstr "使用图片作为背景"
-
-#~ msgid "Skip bios selection menu"
-#~ msgstr "略过 BIOS 选择菜单"
-
-#~ msgid "Skip software parts selection menu"
-#~ msgstr "略过软件部分选择菜单"
-
-#~ msgid "Miscellaneous Options"
-#~ msgstr "杂项选项"

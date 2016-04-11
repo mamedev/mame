@@ -110,6 +110,7 @@ CPU_DISASSEMBLE( i960 );
 CPU_DISASSEMBLE( ie15 );
 CPU_DISASSEMBLE( jaguardsp );
 CPU_DISASSEMBLE( jaguargpu );
+CPU_DISASSEMBLE( kb1013vk12 );
 CPU_DISASSEMBLE( konami );
 CPU_DISASSEMBLE( lh5801 );
 CPU_DISASSEMBLE( lr35902 );
@@ -266,6 +267,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "ie15",       _8bit,  0, CPU_DISASSEMBLE_NAME(ie15) },
 	{ "jaguardsp",  _16be,  0, CPU_DISASSEMBLE_NAME(jaguardsp) },
 	{ "jaguargpu",  _16be,  0, CPU_DISASSEMBLE_NAME(jaguargpu) },
+	{ "kb1013vk12", _8bit,  0, CPU_DISASSEMBLE_NAME(kb1013vk12) },
 	{ "konami",     _8bit,  0, CPU_DISASSEMBLE_NAME(konami) },
 	{ "lh5801",     _8bit,  0, CPU_DISASSEMBLE_NAME(lh5801) },
 	{ "lr35902",    _8bit,  0, CPU_DISASSEMBLE_NAME(lr35902) },

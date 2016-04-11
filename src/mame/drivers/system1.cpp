@@ -4096,20 +4096,46 @@ ROM_END
 
 ROM_START( wboysys2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "7580.90",  0x0000, 0x8000, CRC(d69927a5) SHA1(b633177146a83953131d4e03fa987416f222199a) ) /* encrypted */
-	ROM_LOAD( "7579.91",  0x10000, 0x8000, CRC(8a6f4b00) SHA1(2b1c26daa2e9c668292db73e28318257c62b175c) ) /* encrypted */
+	ROM_LOAD( "epr7580.90",  0x00000, 0x8000, CRC(d69927a5) SHA1(b633177146a83953131d4e03fa987416f222199a) ) /* encrypted */
+	ROM_LOAD( "epr7579.91",  0x10000, 0x8000, CRC(8a6f4b00) SHA1(2b1c26daa2e9c668292db73e28318257c62b175c) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "7583.126", 0x0000, 0x8000, CRC(99334b3c) SHA1(dfc09f63082b7666fa2152e22810c0455a7e5051) )
+	ROM_LOAD( "epr7583.126", 0x0000, 0x8000, CRC(99334b3c) SHA1(dfc09f63082b7666fa2152e22810c0455a7e5051) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "7581.4",   0x00000, 0x8000, CRC(d95565fd) SHA1(25f1653cca1d6432171a7b391cbb76bc18ddfb06) )
-	ROM_LOAD( "7582.5",   0x08000, 0x8000, CRC(560cbac0) SHA1(851283e6d63e33d250840501dd22750b19772fb0) )
-	ROM_LOAD( "7607.6",   0x10000, 0x8000, CRC(bd36df03) SHA1(7f7efac2c71fae48dd1dcb4dcc849f07e8127f7d) )
+	ROM_LOAD( "epr7581.4",   0x00000, 0x8000, CRC(d95565fd) SHA1(25f1653cca1d6432171a7b391cbb76bc18ddfb06) )
+	ROM_LOAD( "epr7582.5",   0x08000, 0x8000, CRC(560cbac0) SHA1(851283e6d63e33d250840501dd22750b19772fb0) )
+	ROM_LOAD( "epr7607.6",   0x10000, 0x8000, CRC(bd36df03) SHA1(7f7efac2c71fae48dd1dcb4dcc849f07e8127f7d) )
 
 	ROM_REGION( 0x10000, "sprites", 0 )
-	ROM_LOAD( "7578.87",  0x00000, 0x8000, CRC(6ff1637f) SHA1(9a6ddbd7b8d53273b30c3529b028c1f28bf3c63b) )
-	ROM_LOAD( "7577.86",  0x08000, 0x8000, CRC(58b3705e) SHA1(1a8ff3f1765a3b21145bd1a6c85441f806f7b17d) )
+	ROM_LOAD( "epr7578.87",  0x00000, 0x8000, CRC(6ff1637f) SHA1(9a6ddbd7b8d53273b30c3529b028c1f28bf3c63b) )
+	ROM_LOAD( "epr7577.86",  0x08000, 0x8000, CRC(58b3705e) SHA1(1a8ff3f1765a3b21145bd1a6c85441f806f7b17d) )
+
+	ROM_REGION( 0x0300, "palette", 0 )
+	ROM_LOAD( "pr-7345.20",      0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* palette red component */
+	ROM_LOAD( "pr-7344.14",      0x0100, 0x0100, CRC(3e7babd7) SHA1(d4f8790db4dce75e27156a4c6de2dcef2baf6d76) ) /* palette green component */
+	ROM_LOAD( "pr-7343.8",      0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "pr-5317.28",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+ROM_END
+
+ROM_START( wboysys2a )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "epr7625.90",  0x00000, 0x8000, CRC(43b3d155) SHA1(40cc063bf64327250be7ae078ea85315ad4db794) ) /* encrypted */
+	ROM_LOAD( "epr7626.91",  0x10000, 0x8000, CRC(8a6f4b00) SHA1(2b1c26daa2e9c668292db73e28318257c62b175c) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "epr7583.126", 0x0000, 0x8000, CRC(99334b3c) SHA1(dfc09f63082b7666fa2152e22810c0455a7e5051) )
+
+	ROM_REGION( 0x18000, "tiles", 0 )
+	ROM_LOAD( "epr7581.4",   0x00000, 0x8000, CRC(d95565fd) SHA1(25f1653cca1d6432171a7b391cbb76bc18ddfb06) )
+	ROM_LOAD( "epr7582.5",   0x08000, 0x8000, CRC(560cbac0) SHA1(851283e6d63e33d250840501dd22750b19772fb0) )
+	ROM_LOAD( "epr7607.6",   0x10000, 0x8000, CRC(bd36df03) SHA1(7f7efac2c71fae48dd1dcb4dcc849f07e8127f7d) )
+
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "epr7578.87",  0x00000, 0x8000, CRC(6ff1637f) SHA1(9a6ddbd7b8d53273b30c3529b028c1f28bf3c63b) )
+	ROM_LOAD( "epr7577.86",  0x08000, 0x8000, CRC(58b3705e) SHA1(1a8ff3f1765a3b21145bd1a6c85441f806f7b17d) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
 	ROM_LOAD( "pr-7345.20",      0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* palette red component */
@@ -4937,20 +4963,16 @@ ROM_END
 
 DRIVER_INIT_MEMBER(system1_state,bank00)
 {
-	m_videomode_custom = nullptr;
-	m_banked_decrypted_opcodes = nullptr;
 }
 
 DRIVER_INIT_MEMBER(system1_state,bank44)
 {
 	m_videomode_custom = &system1_state::bank44_custom_w;
-	m_banked_decrypted_opcodes = nullptr;
 }
 
 DRIVER_INIT_MEMBER(system1_state,bank0c)
 {
 	m_videomode_custom = &system1_state::bank0c_custom_w;
-	m_banked_decrypted_opcodes = nullptr;
 }
 
 DRIVER_INIT_MEMBER(system1_state,sega315_5033)
@@ -5516,6 +5538,18 @@ DRIVER_INIT_MEMBER(system1_state,sega315_5177_s2)
 	DRIVER_INIT_CALL(bank0c);
 }
 
+DRIVER_INIT_MEMBER(system1_state, sega315_5176)
+{
+	// todo
+}
+
+DRIVER_INIT_MEMBER(system1_state,sega315_5176_s2)
+{
+	DRIVER_INIT_CALL(sega315_5176);
+	DRIVER_INIT_CALL(bank0c);
+}
+
+
 
 
 DRIVER_INIT_MEMBER(system1_state,sega315_5178)
@@ -5823,7 +5857,7 @@ GAME( 1985, myherok,    myhero,   sys1piox,  myhero,    system1_state, myherok, 
 GAME( 1985, 4dwarrio,   0,        sys1piox,  4dwarrio,  system1_state, sega315_5162,  ROT0,   "Coreland / Sega", "4-D Warriors (315-5162)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, raflesia,   0,        sys1piox,  raflesia,  system1_state, sega315_5162,  ROT270, "Coreland / Sega", "Rafflesia (315-5162)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboy,       0,        sys1piox,  wboy,      system1_state, sega315_5177,  ROT0,   "Escape (Sega license)", "Wonder Boy (set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboyo,      wboy,     sys1piox,  wboy,      system1_state, sega315_5135,  ROT0,   "Escape (Sega license)", "Wonder Boy (set 1, 315-5135)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboyo,      wboy,     sys1piox,  wboy,      system1_state, sega315_5135,  ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5135)", MACHINE_SUPPORTS_SAVE ) // aka 317-0003
 GAME( 1986, wboy3,      wboy,     sys1piox,  wboy3,     system1_state, sega315_5135,  ROT0,   "Escape (Sega license)", "Wonder Boy (set 3, 315-5135)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboy4,      wboy,     sys1piox,  wboy,      system1_state, sega315_5162,  ROT0,   "Escape (Sega license)", "Wonder Boy (315-5162, 4-D Warriors Conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboyu,      wboy,     sys1pio,   wboyu,     system1_state, bank00,        ROT0,   "Escape (Sega license)", "Wonder Boy (prototype?)", MACHINE_SUPPORTS_SAVE ) // appears to be a very early / unfinished version.
@@ -5844,7 +5878,8 @@ GAME( 1985, shtngmst,   0,        sys2m,     shtngmst,  system1_state, shtngmst,
 GAME( 1985, shtngmste,  shtngmst, sys2m,     shtngmst,  system1_state, shtngmst,        ROT0,   "Sega / EVG", "Shooting Master (EVG, 8751 315-5159a)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gardiab,    gardia,   sys2x,     gardia,    system1_state, gardiab,         ROT270, "bootleg", "Gardia (317-0007?, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gardiaj,    gardia,   sys2x,     gardia,    system1_state, gardia,          ROT270, "Coreland / Sega", "Gardia (Japan, 317-0006)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboysys2,   wboy,     sys2x,     wboysys2,  system1_state, sega315_5177_s2, ROT0,   "Escape (Sega license)", "Wonder Boy (system 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboysys2,   wboy,     sys2x,     wboysys2,  system1_state, sega315_5177_s2, ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboysys2a,  wboy,     sys2x,     wboysys2,  system1_state, sega315_5176_s2, ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 2, 315-5176)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, tokisens,   0,        sys2,      tokisens,  system1_state, bank0c,          ROT90,  "Sega", "Toki no Senshi - Chrono Soldier", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, wbml,       0,        sys2xb,    wbml,      system1_state, wbml,            ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, wbmljo,     wbml,     sys2xb,    wbml,      system1_state, wbml,            ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
