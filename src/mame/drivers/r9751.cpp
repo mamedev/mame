@@ -87,6 +87,8 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<UINT32> m_main_ram;
 
+	m68000_base_device* ptr_m68000;
+
 	// Begin registers
 	UINT32 reg_ff050004;
 	UINT32 reg_fff80040;
@@ -102,6 +104,9 @@ private:
 
 	// functions
 	UINT32 swap_uint32( UINT32 val );
+	UINT32 debug_a6();
+	UINT32 debug_a5();
+	UINT32 debug_a5_20();
 
 	virtual void machine_reset() override;
 };
@@ -113,10 +118,25 @@ UINT32 r9751_state::swap_uint32( UINT32 val )
 	return (val << 16) | (val >> 16);
 }
 
+UINT32 r9751_state::debug_a6()
+{
+	return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[14] + 4);
+}
+
+UINT32 r9751_state::debug_a5()
+{
+        return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13]);
+}
+
+UINT32 r9751_state::debug_a5_20()
+{
+        return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13] + 0x20);
+}
+
 READ8_MEMBER(r9751_state::pdc_dma_r)
 {
 	/* This callback function takes the value written to 0xFF01000C as the bank offset */
-	UINT32 address = (fdd_dma_bank & 0x7FFFF800) + (offset&0xFFFF);
+	UINT32 address = (fdd_dma_bank & 0x7FFFF800) + (offset&0x3FFFF);
 	if(TRACE_DMA) logerror("DMA READ: %08X DATA: %08X\n", address, m_maincpu->space(AS_PROGRAM).read_byte(address));
 	return m_maincpu->space(AS_PROGRAM).read_byte(address);
 }
@@ -124,7 +144,7 @@ READ8_MEMBER(r9751_state::pdc_dma_r)
 WRITE8_MEMBER(r9751_state::pdc_dma_w)
 {
 	/* This callback function takes the value written to 0xFF01000C as the bank offset */
-	UINT32 address = (fdd_dma_bank & 0x7FFFF800) + (m_pdc->fdd_68k_dma_address&0xFFFF);
+	UINT32 address = (fdd_dma_bank & 0x7FFFF800) + (m_pdc->fdd_68k_dma_address&0x3FFFF);
 	m_maincpu->space(AS_PROGRAM).write_byte(address,data);
 	if(TRACE_DMA) logerror("DMA WRITE: %08X DATA: %08X\n", address,data);
 }
@@ -140,6 +160,7 @@ DRIVER_INIT_MEMBER(r9751_state,r9751)
 	smioc_dma_bank = 0;
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 
+	m_maincpu->interface<m68000_base_device>(ptr_m68000);
 }
 
 void r9751_state::machine_reset()
@@ -255,7 +276,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 		case 0xC0B0:
 		case 0xC1B0: /* fdd_dest_address register */
 			fdd_dest_address = data << 1;
-			if(TRACE_FDC) logerror("--- FDD destination address: %08X PC: %08X Register: %08X\n", (fdd_dma_bank & 0x7FFFF800) + (fdd_dest_address&0xFFFF), space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
+			if(TRACE_FDC) logerror("--- FDD destination address: %08X PC: %08X Register: %08X (A6+4): %08X\n", (fdd_dma_bank & 0x7FFFF800) + (fdd_dest_address&0x3FFFF), space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, debug_a6());
 			data_b0 = data & 0xFF;
 			data_b1 = (data & 0xFF00) >> 8;
 			m_pdc->reg_p6 = data_b0;
@@ -274,14 +295,14 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			m_pdc->reg_p5 = 0;
 
 			/* Send FDD SCSI command location address to PDC 0x2, 0x3 */
-			if(TRACE_FDC) logerror("--- FDD command address: %08X PC: %08X Register: %08X\n", (fdd_dma_bank & 0x7FFFF800) + ((data << 1)&0xFFFF), space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
+			if(TRACE_FDC) logerror("--- FDD command address: %08X PC: %08X Register: %08X (A6+4): %08X A4: %08X (A5): %08X (A5+20): %08X\n", (fdd_dma_bank & 0x7FFFF800) + ((data << 1)&0x3FFFF), space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, debug_a6(), ptr_m68000->dar[12], debug_a5(), debug_a5_20());
 			data_b0 = data & 0xFF;
 			data_b1 = (data & 0xFF00) >> 8;
 			m_pdc->reg_p2 = data_b0;
 			m_pdc->reg_p3 = data_b1;
 
-			fdd_scsi_command = swap_uint32(m_mem->read_dword((fdd_dma_bank & 0x7FFFF800) + ((data << 1)&0xFFFF)));
-			fdd_scsi_command2 = swap_uint32(m_mem->read_dword(((fdd_dma_bank & 0x7FFFF800) + ((data << 1)&0xFFFF))+4));
+			fdd_scsi_command = swap_uint32(m_mem->read_dword((fdd_dma_bank & 0x7FFFF800) + ((data << 1)&0x3FFFF)));
+			fdd_scsi_command2 = swap_uint32(m_mem->read_dword(((fdd_dma_bank & 0x7FFFF800) + ((data << 1)&0x3FFFF))+4));
 
 			memcpy(c_fdd_scsi_command,&fdd_scsi_command,4);
 			memcpy(c_fdd_scsi_command+4,&fdd_scsi_command2,4);
@@ -300,7 +321,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			break;
 
 		default:
-			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, data, mem_mask);
+			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x (A6+4): %08X\n", space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, data, mem_mask, debug_a6());
 	}
 }
 
