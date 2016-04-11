@@ -14,6 +14,7 @@ public:
 		m_nob_mcu_latch(*this, "nob_mcu_latch"),
 		m_nob_mcu_status(*this, "nob_mcu_status"),
 		m_paletteram(*this, "palette"),
+		m_videomode_custom(nullptr),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_mcu(*this, "mcu"),
@@ -25,7 +26,9 @@ public:
 		m_color_prom(*this, "palette"),
 		m_bank1(*this, "bank1"),
 		m_bank0d(*this, "bank0d"),
-		m_bank1d(*this, "bank1d") { }
+		m_bank1d(*this, "bank1d"),
+		m_banked_decrypted_opcodes(nullptr)
+		{ }
 
 	optional_device<i8255_device>  m_ppi8255;
 	required_shared_ptr<UINT8> m_ram;

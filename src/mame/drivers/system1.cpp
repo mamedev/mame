@@ -4963,20 +4963,16 @@ ROM_END
 
 DRIVER_INIT_MEMBER(system1_state,bank00)
 {
-	m_videomode_custom = nullptr;
-	m_banked_decrypted_opcodes = nullptr;
 }
 
 DRIVER_INIT_MEMBER(system1_state,bank44)
 {
 	m_videomode_custom = &system1_state::bank44_custom_w;
-	m_banked_decrypted_opcodes = nullptr;
 }
 
 DRIVER_INIT_MEMBER(system1_state,bank0c)
 {
 	m_videomode_custom = &system1_state::bank0c_custom_w;
-	m_banked_decrypted_opcodes = nullptr;
 }
 
 DRIVER_INIT_MEMBER(system1_state,sega315_5033)
