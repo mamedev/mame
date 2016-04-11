@@ -166,7 +166,7 @@ Language
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/appoooh.h"
-#include "machine/segacrp2.h"
+#include "machine/segacrp2_device.h"
 #include "sound/sn76496.h"
 
 
@@ -481,6 +481,16 @@ static MACHINE_CONFIG_DERIVED( robowres, appoooh_common )
 	MCFG_VIDEO_START_OVERRIDE(appoooh_state,appoooh)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( robowrese, robowres )
+
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5179,18432000/6) /* ??? the main xtal is 18.432 MHz */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_IO_MAP(main_portmap)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
+MACHINE_CONFIG_END
+
 /*************************************
  *
  *  ROM definition(s)
@@ -585,46 +595,6 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(appoooh_state,robowres)
-{
-	static const UINT8 xor_table[128] =
-	{
-		0x00,0x45,0x41,0x14,0x10,0x55,0x51,0x01,0x04,0x40,0x45,0x11,0x14,0x50,
-		0x00,0x05,0x41,0x44,0x10,0x15,0x51,0x54,0x04,
-		0x00,0x45,0x41,0x14,0x10,0x55,0x05,0x01,0x44,0x40,0x15,0x11,0x54,0x50,
-		0x00,0x05,0x41,0x44,0x10,0x15,0x51,0x01,0x04,
-		0x40,0x45,0x11,0x14,0x50,0x55,0x05,0x01,0x44,0x40,0x15,0x11,0x54,0x04,
-		0x00,0x45,0x41,0x14,0x50,
-		0x00,0x05,0x41,0x44,0x10,0x15,0x51,0x54,0x04,
-		0x00,0x45,0x41,0x14,0x50,0x55,0x05,0x01,0x44,0x40,0x15,0x11,0x54,0x50,
-		0x00,0x05,0x41,0x44,0x10,0x55,0x51,0x01,0x04,
-		0x40,0x45,0x11,0x14,0x50,0x55,0x05,0x01,0x44,0x40,0x15,0x51,0x54,0x04,
-		0x00,0x45,0x41,0x14,0x10,0x55,0x51,0x01,0x04,
-		0x40,0x45,0x11,0x54,0x50,0x00,0x05,0x41,
-	};
-
-	static const int swap_table[128] =
-	{
-			8, 9,11,13,15, 0, 2, 4, 6,
-			8, 9,11,13,15, 1, 2, 4, 6,
-			8, 9,11,13,15, 1, 2, 4, 6,
-			8, 9,11,13,15, 1, 2, 4, 6,
-			8,10,11,13,15, 1, 2, 4, 6,
-			8,10,11,13,15, 1, 2, 4, 6,
-			8,10,11,13,15, 1, 3, 4, 6,
-			8,
-			7, 1, 2, 4, 6, 0, 1, 3, 5,
-			7, 1, 2, 4, 6, 0, 1, 3, 5,
-			7, 1, 2, 4, 6, 0, 2, 3, 5,
-			7, 1, 2, 4, 6, 0, 2, 3, 5,
-			7, 1, 2, 4, 6, 0, 2, 3, 5,
-			7, 1, 3, 4, 6, 0, 2, 3, 5,
-			7, 1, 3, 4, 6, 0, 2, 4, 5,
-			7,
-	};
-
-	sega_decode_2(memregion("maincpu")->base(), m_decrypted_opcodes, xor_table, swap_table);
-}
 
 DRIVER_INIT_MEMBER(appoooh_state,robowresb)
 {
@@ -639,5 +609,5 @@ DRIVER_INIT_MEMBER(appoooh_state,robowresb)
  *************************************/
 
 GAME( 1984, appoooh,   0,        appoooh,  appoooh, driver_device,  0,        ROT0, "Sanritsu / Sega", "Appoooh", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, robowres,  0,        robowres, robowres, appoooh_state, robowres, ROT0, "Sanritsu / Sega", "Robo Wres 2001", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, robowres,  0,        robowrese,robowres, driver_device, 0,        ROT0, "Sanritsu / Sega", "Robo Wres 2001", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, robowresb, robowres, robowres, robowres, appoooh_state, robowresb,ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", MACHINE_SUPPORTS_SAVE )

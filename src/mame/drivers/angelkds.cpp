@@ -125,7 +125,7 @@ Dumped by Chackn
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/segacrp2.h"
+#include "machine/segacrp2_device.h"
 #include "sound/2203intf.h"
 #include "includes/angelkds.h"
 #include "machine/i8255.h"
@@ -570,8 +570,13 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( spcpostn, angelkds )
 	/* encryption */
-	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", SEGA_317_0005, XTAL_6MHz)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_IO_MAP(main_portmap)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", angelkds_state,  irq0_line_hold)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
+
 MACHINE_CONFIG_END
 
 /*** Rom Loading
@@ -678,16 +683,7 @@ DRIVER_INIT_MEMBER(angelkds_state,angelkds)
 	membank("bank1")->configure_entries(0, 16, &RAM[0x0000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(angelkds_state,spcpostn)
-{
-	UINT8 *RAM = memregion("user1")->base();
-
-	// 317-0005
-	sega_decode_317(memregion("maincpu")->base(), m_decrypted_opcodes, 1);
-
-	membank("bank1")->configure_entries(0, 16, &RAM[0x0000], 0x4000);
-}
 
 
 GAME( 1988, angelkds, 0, angelkds, angelkds, angelkds_state, angelkds,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" ,     MACHINE_SUPPORTS_SAVE) /* Nasco not displayed but 'Exa Planning' is */
-GAME( 1986, spcpostn, 0, spcpostn, spcpostn, angelkds_state, spcpostn,  ROT90,  "Sega / Nasco",  "Space Position (Japan)" , MACHINE_SUPPORTS_SAVE) /* encrypted */
+GAME( 1986, spcpostn, 0, spcpostn, spcpostn, angelkds_state, angelkds,  ROT90,  "Sega / Nasco",  "Space Position (Japan)" , MACHINE_SUPPORTS_SAVE) /* encrypted */
