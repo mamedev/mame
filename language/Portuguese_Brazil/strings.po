@@ -752,7 +752,7 @@ msgstr "Truques"
 
 #: src/emu/ui/mainmenu.cpp:136
 msgid "Plugin Options"
-msgstr ""
+msgstr "Opções dos Plugins"
 
 #: src/emu/ui/mainmenu.cpp:140
 msgid "External DAT View"
@@ -1000,6 +1000,10 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"A máquina selecionada está faltando uma ou mais imagens CHD ou ROMS necessárias. "
+"Por favor selecione uma máquina diferente.\n"
+"\n"
+"Pressione qualquer tecla para continuar."
 
 #: src/emu/ui/selgame.cpp:589 src/emu/ui/simpleselgame.cpp:265
 msgid "Configure Options"
@@ -1278,6 +1282,10 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"O programa selecionado está faltando um ou mais arquivos necessários. Por favor selecione um"
+"programa diferente.\n"
+"\n"
+"Pressione qualquer tecla para continuar."
 
 #: src/emu/ui/selsoft.cpp:684
 #, c-format
