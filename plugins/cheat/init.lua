@@ -462,6 +462,18 @@ function cheat.startplugin()
 		end
 		output = {}
 	end)
+
+	local ce = {}
+
+	-- interface to script cheat engine
+	function ce.inject(newcheat)
+		cheats[#cheats + 1] = newcheat
+		parse_cheat(newcheat)
+		manager:machine():popmessage(newcheat.desc .. " added")
+	end
+
+	_G.ce = ce
+
 end
 
 return exports
