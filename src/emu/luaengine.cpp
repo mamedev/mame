@@ -970,7 +970,7 @@ int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
 			if (WORD_ALIGNED(address)) {
 				sp.write_word(address, val);
 			} else {
-				sp.read_word_unaligned(address, val);
+				sp.write_word_unaligned(address, val);
 			}
 			break;
 		case 32:
