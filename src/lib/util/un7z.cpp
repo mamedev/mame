@@ -16,8 +16,9 @@
 #include "unicode.h"
 
 #include "lzma/C/7z.h"
+#include "lzma/C/7zAlloc.h"
 #include "lzma/C/7zCrc.h"
-#include "lzma/C/7zVersion.h"
+#include "lzma/C/7zTypes.h"
 
 #include <algorithm>
 #include <array>
@@ -48,7 +49,7 @@ struct CSzFile
 	{
 		if (!osdfile)
 		{
-			std::printf("un7z.c: called File_Read without file\n");
+			osd_printf_error("un7z: called CSzFile::read without file\n");
 			return SZ_ERROR_READ;
 		}
 
@@ -109,6 +110,7 @@ public:
 			{
 				ptr result;
 				std::swap(s_cache[cachenum], result);
+				osd_printf_verbose("un7z: found %s in cache\n", filename.c_str());
 				return result;
 			}
 		}
@@ -244,17 +246,6 @@ std::mutex m7z_file_impl::s_cache_mutex;
 /* ---------- FileInStream ---------- */
 
 extern "C" {
-static void *SZipAlloc(void *p, std::size_t size)
-{
-	return (size == 0) ? nullptr : std::malloc(size);
-}
-
-static void SZipFree(void *p, void *address)
-{
-	std::free(address);
-}
-
-
 static SRes FileInStream_Read(void *pp, void *buf, size_t *size)
 {
 	return (reinterpret_cast<CFileInStream *>(pp)->read(buf, *size) == 0) ? SZ_OK : SZ_ERROR_READ;
@@ -291,15 +282,19 @@ m7z_file_impl::m7z_file_impl(const std::string &filename)
 	, m_uchar_buf(128)
 	, m_utf8_buf(512)
 	, m_inited(false)
-	, m_block_index(0xffffffff) // it can have any value before first call (if outBuffer = 0)
-	, m_out_buffer(nullptr)     // it must be 0 before first call for each new archive
-	, m_out_buffer_size(0)      // it can have any value before first call (if outBuffer = 0)
+	, m_block_index(0)
+	, m_out_buffer(nullptr)
+	, m_out_buffer_size(0)
 {
-	m_alloc_imp.Alloc = SZipAlloc;
-	m_alloc_imp.Free = SZipFree;
+	m_alloc_imp.Alloc = &SzAlloc;
+	m_alloc_imp.Free = &SzFree;
 
-	m_alloc_temp_imp.Alloc = SZipAlloc;
-	m_alloc_temp_imp.Free = SZipFree;
+	m_alloc_temp_imp.Alloc = &SzAllocTemp;
+	m_alloc_temp_imp.Free = &SzFreeTemp;
+
+	LookToRead_CreateVTable(&m_look_stream, False);
+	m_look_stream.realStream = &m_archive_stream;
+	LookToRead_Init(&m_look_stream);
 }
 
 
@@ -309,18 +304,24 @@ archive_file::error m7z_file_impl::initialize()
 	if (err != osd_file::error::NONE)
 		return archive_file::error::FILE_ERROR;
 
-	LookToRead_CreateVTable(&m_look_stream, False);
-	m_look_stream.realStream = &m_archive_stream;
-	LookToRead_Init(&m_look_stream);
+	osd_printf_verbose("un7z: opened archive file %s\n", m_filename.c_str());
 
-	CrcGenerateTable();
+	CrcGenerateTable(); // FIXME: doesn't belong here - it should be called once statically
 
 	SzArEx_Init(&m_db);
 	m_inited = true;
-
 	SRes const res = SzArEx_Open(&m_db, &m_look_stream.s, &m_alloc_imp, &m_alloc_temp_imp);
 	if (res != SZ_OK)
-		return archive_file::error::FILE_ERROR;
+	{
+		osd_printf_error("un7z: error opening %s as 7z archive (%d)\n", m_filename.c_str(), int(res));
+		switch (res)
+		{
+		case SZ_ERROR_UNSUPPORTED:  return archive_file::error::UNSUPPORTED;
+		case SZ_ERROR_MEM:          return archive_file::error::OUT_OF_MEMORY;
+		case SZ_ERROR_INPUT_EOF:    return archive_file::error::FILE_TRUNCATED;
+		default:                    return archive_file::error::FILE_ERROR;
+		}
+	}
 
 	return archive_file::error::NONE;
 }
@@ -336,6 +337,7 @@ void m7z_file_impl::close(ptr &&archive)
 	if (!archive) return;
 
 	// close the open files
+	osd_printf_verbose("un7z: closing archive file %s and sending to cache\n", archive->m_filename.c_str());
 	archive->m_archive_stream.osdfile.reset();
 
 	// find the first NULL entry in the cache
@@ -347,7 +349,11 @@ void m7z_file_impl::close(ptr &&archive)
 
 	// if no room left in the cache, free the bottommost entry
 	if (cachenum == s_cache.size())
-		s_cache[--cachenum].reset();
+	{
+		cachenum--;
+		osd_printf_verbose("un7z: removing %s from cache to make space\n", s_cache[cachenum]->m_filename.c_str());
+		s_cache[cachenum].reset();
+	}
 
 	// move everyone else down and place us at the top
 	for ( ; cachenum > 0; cachenum--)
@@ -368,30 +374,47 @@ void m7z_file_impl::close(ptr &&archive)
 
 archive_file::error m7z_file_impl::decompress(void *buffer, std::uint32_t length)
 {
+	// if we don't have enough buffer, error
+	if (length < m_curr_length)
+	{
+		osd_printf_error("un7z: buffer too small to decompress %s from %s\n", m_curr_name.c_str(), m_filename.c_str());
+		return archive_file::error::BUFFER_TOO_SMALL;
+	}
+
 	// make sure the file is open..
 	if (!m_archive_stream.osdfile)
 	{
 		m_archive_stream.currfpos = 0;
 		osd_file::error const err = osd_file::open(m_filename, OPEN_FLAG_READ, m_archive_stream.osdfile, m_archive_stream.length);
 		if (err != osd_file::error::NONE)
+		{
+			osd_printf_error("un7z: error reopening archive file %s (%d)\n", m_filename.c_str(), int(err));
 			return archive_file::error::FILE_ERROR;
+		}
+		osd_printf_verbose("un7z: reopened archive file %s\n", m_filename.c_str());
 	}
 
-	size_t offset = 0;
-	size_t out_size_processed = 0;
-
+	std::size_t offset(0);
+	std::size_t out_size_processed(0);
 	SRes const res = SzArEx_Extract(
-			&m_db, &m_look_stream.s, m_curr_file_idx,
-			&m_block_index,
-			&m_out_buffer, &m_out_buffer_size,
-			&offset, &out_size_processed,
-			&m_alloc_imp, &m_alloc_temp_imp);
-
+			&m_db, &m_look_stream.s, m_curr_file_idx,           // requested file
+			&m_block_index, &m_out_buffer, &m_out_buffer_size,  // solid block caching
+			&offset, &out_size_processed,                       // data size/offset
+			&m_alloc_imp, &m_alloc_temp_imp);                   // allocator helpers
 	if (res != SZ_OK)
-		return archive_file::error::FILE_ERROR;
+	{
+		osd_printf_error("un7z: error decompressing %s from %s (%d)\n", m_curr_name.c_str(), m_filename.c_str(), int(res));
+		switch (res)
+		{
+		case SZ_ERROR_UNSUPPORTED:  return archive_file::error::UNSUPPORTED;
+		case SZ_ERROR_MEM:          return archive_file::error::OUT_OF_MEMORY;
+		case SZ_ERROR_INPUT_EOF:    return archive_file::error::FILE_TRUNCATED;
+		default:                    return archive_file::error::DECOMPRESS_ERROR;
+		}
+	}
 
-	std::memcpy(buffer, m_out_buffer + offset, length);
-
+	// copy to destination buffer
+	std::memcpy(buffer, m_out_buffer + offset, (std::min<std::size_t>)(length, out_size_processed));
 	return archive_file::error::NONE;
 }
 

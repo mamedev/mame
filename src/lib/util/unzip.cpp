@@ -130,6 +130,7 @@ public:
 			cd_remaining -= read_length;
 			cd_offs += read_length;
 		}
+		osd_printf_verbose("unzip: read %s central directory\n", m_filename.c_str());
 
 		return archive_file::error::NONE;
 	}
@@ -581,6 +582,7 @@ void zip_file_impl::close(ptr &&zip)
 	if (!zip) return;
 
 	// close the open files
+	osd_printf_verbose("unzip: closing archive file %s and sending to cache\n", zip->m_filename.c_str());
 	zip->m_file.reset();
 
 	// find the first NULL entry in the cache
@@ -811,6 +813,8 @@ archive_file::error zip_file_impl::read_ecd()
 		// if we found it, fill out the data
 		if (offset >= 0)
 		{
+			osd_printf_verbose("unzip: found %s ECD\n", m_filename.c_str());
+
 			// extract ECD info
 			ecd_reader const ecd_rd(buffer.get() + offset);
 			m_ecd.disk_number          = ecd_rd.this_disk_no();
