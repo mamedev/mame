@@ -26,9 +26,12 @@ public:
 	kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 	virtual void execute_one() override;
 
 	// opcode handlers
+	virtual void op_bs0();
+	virtual void op_bs1();
 };
 
 
