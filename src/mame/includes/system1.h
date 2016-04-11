@@ -2,6 +2,7 @@
 // copyright-holders:Jarek Parchanski, Nicola Salmoria, Mirko Buffoni
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/segacrp2_device.h"
 
 class system1_state : public driver_device
 {
@@ -86,7 +87,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 
 	DECLARE_DRIVER_INIT(nobb);
-	DECLARE_DRIVER_INIT(sega315_5178);
 	DECLARE_DRIVER_INIT(sega315_5110);
 	DECLARE_DRIVER_INIT(sega315_5093);
 	DECLARE_DRIVER_INIT(dakkochn);
@@ -113,18 +113,11 @@ public:
 	DECLARE_DRIVER_INIT(bootsys2);
 	DECLARE_DRIVER_INIT(bootsys2d);
 	DECLARE_DRIVER_INIT(sega315_5065);
-	DECLARE_DRIVER_INIT(sega315_5177);
-	DECLARE_DRIVER_INIT(sega315_5177_s2);
-	DECLARE_DRIVER_INIT(sega315_5176);
-	DECLARE_DRIVER_INIT(sega315_5176_s2);
 	DECLARE_DRIVER_INIT(sega315_3135);
-	DECLARE_DRIVER_INIT(gardiab);
-	DECLARE_DRIVER_INIT(sega315_5162);
 	DECLARE_DRIVER_INIT(choplift);
 	DECLARE_DRIVER_INIT(sega315_5102);
 	DECLARE_DRIVER_INIT(sega315_5133);
 
-	DECLARE_DRIVER_INIT(gardia);
 	DECLARE_DRIVER_INIT(sega315_spat);
 	DECLARE_DRIVER_INIT(sega315_5099);
 	TILE_GET_INFO_MEMBER(tile_get_info);

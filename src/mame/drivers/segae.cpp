@@ -296,7 +296,7 @@ GND  8A 8B GND
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "machine/mc8123.h"
-#include "machine/segacrp2.h"
+#include "machine/segacrp2_device.h"
 #include "video/315_5124.h"
 #include "includes/segaipt.h"
 
@@ -1018,6 +1018,14 @@ static MACHINE_CONFIG_DERIVED( systemex, systeme )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( systemex_315_5177, systeme )
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5177, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */
+	MCFG_CPU_PROGRAM_MAP(systeme_map)
+	MCFG_CPU_IO_MAP(io_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( systemeb, systeme )
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(banked_decrypted_opcodes_map)
@@ -1030,61 +1038,6 @@ DRIVER_INIT_MEMBER(systeme_state, hangonjr)
 }
 
 
-DRIVER_INIT_MEMBER(systeme_state, astrofl)
-{
-	// 315-5177
-	static const UINT8 xor_table[128] =
-	{
-		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
-		0x05,0x55,0x50,0x14,0x41,0x45,0x00,0x50,0x54,0x11,0x45,0x40,
-		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
-		0x05,0x55,0x50,0x14,0x41,0x45,0x00,0x50,0x54,0x11,0x45,0x40,
-		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
-		0x05,0x55,0x50,0x14,
-
-		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
-		0x05,0x55,0x50,0x14,0x41,0x45,0x00,0x50,0x54,0x11,0x45,0x40,
-		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
-		0x05,0x55,0x50,0x14,0x41,0x45,0x00,0x50,0x54,0x11,0x45,0x40,
-		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
-		0x05,0x55,0x50,0x14,
-	};
-
-	static const int swap_table[128] =
-	{
-		0,0,0,0,
-		1,1,1,1,1,
-		2,2,2,2,2,
-		3,3,3,3,
-		4,4,4,4,4,
-		5,5,5,5,5,
-		6,6,6,6,6,
-		7,7,7,7,7,
-		8,8,8,8,
-		9,9,9,9,9,
-		10,10,10,10,10,
-		11,11,11,11,11,
-		12,12,12,12,12,
-		13,13,
-
-		8,8,8,8,
-		9,9,9,9,9,
-		10,10,10,10,10,
-		11,11,11,11,
-		12,12,12,12,12,
-		13,13,13,13,13,
-		14,14,14,14,14,
-		15,15,15,15,15,
-		16,16,16,16,
-		17,17,17,17,17,
-		18,18,18,18,18,
-		19,19,19,19,19,
-		20,20,20,20,20,
-		21,21,
-	};
-
-	sega_decode_2(m_maincpu_region->base(), m_decrypted_opcodes, xor_table, swap_table);
-}
 
 
 DRIVER_INIT_MEMBER(systeme_state, ridleofp)
@@ -1113,7 +1066,7 @@ DRIVER_INIT_MEMBER(systeme_state, fantzn2)
 //    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1985, hangonjr, 0,        systeme,  hangonjr, systeme_state, hangonjr, ROT0,   "Sega", "Hang-On Jr.", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, transfrm, 0,        systeme,  transfrm, driver_device, 0,        ROT0,   "Sega", "Transformer", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, astrofl,  transfrm, systemex, transfrm, systeme_state, astrofl,  ROT0,   "Sega", "Astro Flash (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, astrofl,  transfrm, systemex_315_5177, transfrm, driver_device, 0,        ROT0,   "Sega", "Astro Flash (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ridleofp, 0,        systeme,  ridleofp, systeme_state, ridleofp, ROT90,  "Sega / Nasco", "Riddle of Pythagoras (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, opaopa,   0,        systemeb, opaopa,   systeme_state, opaopa,   ROT0,   "Sega", "Opa Opa (MC-8123, 317-0042)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, fantzn2,  0,        systemex, fantzn2,  systeme_state, fantzn2,  ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", MACHINE_SUPPORTS_SAVE )
