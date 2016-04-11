@@ -525,7 +525,7 @@ static void printbits(long data, int num)
 {
 	int i;
 	for (i=(num-1); i>=0; i--)
-		fprintf(stderr,"%0ld", (data>>i)&1);
+		logerror("%0ld", (data>>i)&1);
 }
 #endif
 #ifdef DEBUG_PARSE_FRAME_DUMP_HEX
@@ -534,19 +534,19 @@ static void printbits(long data, int num)
 	switch((num-1)&0xFC)
 	{
 		case 0:
-			fprintf(stderr,"%0lx", data);
+			logerror("%0lx", data);
 			break;
 		case 4:
-			fprintf(stderr,"%02lx", data);
+			logerror("%02lx", data);
 			break;
 		case 8:
-			fprintf(stderr,"%03lx", data);
+			logerror("%03lx", data);
 			break;
 		case 12:
-			fprintf(stderr,"%04lx", data);
+			logerror("%04lx", data);
 			break;
 		default:
-			fprintf(stderr,"%04lx", data);
+			logerror("%04lx", data);
 			break;
 	}
 }
@@ -625,7 +625,7 @@ void tms5220_device::data_write(int data)
 			m_fifo_tail = (m_fifo_tail + 1) % FIFO_SIZE;
 			m_fifo_count++;
 #ifdef DEBUG_FIFO
-			fprintf(stderr,"data_write: Added byte to FIFO (current count=%2d)\n", m_fifo_count);
+			logerror("data_write: Added byte to FIFO (current count=%2d)\n", m_fifo_count);
 #endif
 			update_fifo_status_and_ints();
 			// if we just unset buffer low with that last write, and SPEN *was* zero (see circuit 251, sheet 12)
@@ -633,7 +633,7 @@ void tms5220_device::data_write(int data)
 			{
 				int i;
 #ifdef DEBUG_FIFO
-				fprintf(stderr,"data_write triggered SPEN to go active!\n");
+				logerror("data_write triggered SPEN to go active!\n");
 #endif
 				// ...then we now have enough bytes to start talking; set zpar and clear out the new frame parameters (it will become old frame just before the first call to parse_frame() )
 				m_zpar = 1;
@@ -662,7 +662,7 @@ void tms5220_device::data_write(int data)
 		else
 		{
 #ifdef DEBUG_FIFO
-			fprintf(stderr,"data_write: Ran out of room in the tms52xx FIFO! this should never happen!\n");
+			logerror("data_write: Ran out of room in the tms52xx FIFO! this should never happen!\n");
 			// at this point, /READY should remain HIGH/inactive until the fifo has at least one byte open in it.
 #endif
 		}
@@ -736,7 +736,7 @@ void tms5220_device::update_fifo_status_and_ints()
 	if (m_previous_TALK_STATUS == 1 && (TALK_STATUS == 0))
 	{
 #ifdef VERBOSE
-		fprintf(stderr,"Talk status WAS 1, is now 0, unsetting DDIS and firing an interrupt!\n");
+		logerror("Talk status WAS 1, is now 0, unsetting DDIS and firing an interrupt!\n");
 #endif
 		set_interrupt_state(1);
 		m_DDIS = 0;
@@ -825,7 +825,7 @@ int tms5220_device::status_read()
 		/* clear the interrupt pin on status read */
 		set_interrupt_state(0);
 #ifdef DEBUG_PIN_READS
-		fprintf(stderr,"Status read: TS=%d BL=%d BE=%d\n", TALK_STATUS, m_buffer_low, m_buffer_empty);
+		logerror("Status read: TS=%d BL=%d BE=%d\n", TALK_STATUS, m_buffer_low, m_buffer_empty);
 #endif
 		return (TALK_STATUS << 7) | (m_buffer_low << 6) | (m_buffer_empty << 5);
 	}
@@ -841,7 +841,7 @@ int tms5220_device::status_read()
 int tms5220_device::ready_read()
 {
 #ifdef DEBUG_PIN_READS
-	fprintf(stderr,"ready_read: ready pin read, io_ready is %d, fifo count is %d, DDIS(speak external) is %d\n", m_io_ready, m_fifo_count, m_DDIS);
+	logerror("ready_read: ready pin read, io_ready is %d, fifo count is %d, DDIS(speak external) is %d\n", m_io_ready, m_fifo_count, m_DDIS);
 #endif
 	return ((m_fifo_count < FIFO_SIZE)||(!m_DDIS)) && m_io_ready;
 }
@@ -899,7 +899,7 @@ int tms5220_device::cycles_to_ready()
 int tms5220_device::int_read()
 {
 #ifdef DEBUG_PIN_READS
-	fprintf(stderr,"int_read: irq pin read, state is %d\n", m_irq_pin);
+	logerror("int_read: irq pin read, state is %d\n", m_irq_pin);
 #endif
 	return m_irq_pin;
 }
@@ -918,7 +918,7 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 	INT32 this_sample;
 
 #ifdef VERBOSE
-	fprintf(stderr,"process called with size of %d; IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", size, m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
+	logerror("process called with size of %d; IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", size, m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
 #endif
 
 	/* loop until the buffer is full or we've stopped speaking */
@@ -975,14 +975,14 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 
 #ifdef DEBUG_GENERATION
 				/* Debug info for current parsed frame */
-				fprintf(stderr, "OLDE: %d; NEWE: %d; OLDP: %d; NEWP: %d ", OLD_FRAME_SILENCE_FLAG, NEW_FRAME_SILENCE_FLAG, OLD_FRAME_UNVOICED_FLAG, NEW_FRAME_UNVOICED_FLAG);
-				fprintf(stderr,"Processing new frame: ");
+				logerror( "OLDE: %d; NEWE: %d; OLDP: %d; NEWP: %d ", OLD_FRAME_SILENCE_FLAG, NEW_FRAME_SILENCE_FLAG, OLD_FRAME_UNVOICED_FLAG, NEW_FRAME_UNVOICED_FLAG);
+				logerror("Processing new frame: ");
 				if (m_inhibit == 0)
-					fprintf(stderr, "Normal Frame\n");
+					logerror( "Normal Frame\n");
 				else
-					fprintf(stderr,"Interpolation Inhibited\n");
-				fprintf(stderr,"*** current Energy, Pitch and Ks =      %04d,   %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_current_energy, m_current_pitch, m_current_k[0], m_current_k[1], m_current_k[2], m_current_k[3], m_current_k[4], m_current_k[5], m_current_k[6], m_current_k[7], m_current_k[8], m_current_k[9]);
-				fprintf(stderr,"*** target Energy(idx), Pitch, and Ks = %04d(%x),%04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",
+					logerror("Interpolation Inhibited\n");
+				logerror("*** current Energy, Pitch and Ks =      %04d,   %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_current_energy, m_current_pitch, m_current_k[0], m_current_k[1], m_current_k[2], m_current_k[3], m_current_k[4], m_current_k[5], m_current_k[6], m_current_k[7], m_current_k[8], m_current_k[9]);
+				logerror("*** target Energy(idx), Pitch, and Ks = %04d(%x),%04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",
 					(m_coeff->energytable[m_new_frame_energy_idx] * (1-m_zpar)),
 					m_new_frame_energy_idx,
 					(m_coeff->pitchtable[m_new_frame_pitch_idx] * (1-m_zpar)),
@@ -1006,7 +1006,7 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 				int samples_per_frame = m_subc_reload?175:266; // either (13 A cycles + 12 B cycles) * 7 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 7 interps for SPKSLOW
 				//int samples_per_frame = m_subc_reload?200:304; // either (13 A cycles + 12 B cycles) * 8 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 8 interps for SPKSLOW
 				int current_sample = (m_subcycle - m_subc_reload)+(m_PC*(3-m_subc_reload))+((m_subc_reload?25:38)*((m_IP-1)&7));
-				//fprintf(stderr, "CS: %03d", current_sample);
+				//logerror( "CS: %03d", current_sample);
 				// reset the current energy, pitch, etc to what it was at frame start
 				m_current_energy = (m_coeff->energytable[m_old_frame_energy_idx] * (1-m_old_zpar));
 				m_current_pitch = (m_coeff->pitchtable[m_old_frame_pitch_idx] * (1-m_old_zpar));
@@ -1089,18 +1089,18 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 			}
 			this_sample = lattice_filter(); /* execute lattice filter */
 #ifdef DEBUG_GENERATION_VERBOSE
-			//fprintf(stderr,"C:%01d; ",m_subcycle);
-			fprintf(stderr,"IP:%01d PC:%02d X:%04d E:%03d P:%03d Pc:%03d ",m_IP, m_PC, m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
-			//fprintf(stderr,"X:%04d E:%03d P:%03d Pc:%03d ", m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
+			//logerror("C:%01d; ",m_subcycle);
+			logerror("IP:%01d PC:%02d X:%04d E:%03d P:%03d Pc:%03d ",m_IP, m_PC, m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
+			//logerror("X:%04d E:%03d P:%03d Pc:%03d ", m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
 			for (i=0; i<10; i++)
-				fprintf(stderr,"K%d:%04d ", i+1, m_current_k[i]);
-			fprintf(stderr,"Out:%06d ", this_sample);
+				logerror("K%d:%04d ", i+1, m_current_k[i]);
+			logerror("Out:%06d ", this_sample);
 //#ifdef PERFECT_INTERPOLATION_HACK
-//          fprintf(stderr,"%d%d%d%d",m_old_zpar,m_zpar,m_old_uv_zpar,m_uv_zpar);
+//          logerror("%d%d%d%d",m_old_zpar,m_zpar,m_old_uv_zpar,m_uv_zpar);
 //#else
-//          fprintf(stderr,"x%dx%d",m_zpar,m_uv_zpar);
+//          logerror("x%dx%d",m_zpar,m_uv_zpar);
 //#endif
-			fprintf(stderr,"\n");
+			logerror("\n");
 #endif
 			/* next, force result to 14 bits (since its possible that the addition at the final (k1) stage of the lattice overflowed) */
 			while (this_sample > 16383) this_sample -= 32768;
@@ -1145,17 +1145,17 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 					OLD_FRAME_UNVOICED_FLAG = NEW_FRAME_UNVOICED_FLAG; // m_OLDP
 					/* if TALK was clear last frame, halt speech now, since TALKD (latched from TALK on new frame) just went inactive. */
 #ifdef DEBUG_GENERATION
-					fprintf(stderr,"RESETL4, about to update status: IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
+					logerror("RESETL4, about to update status: IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
 #endif
 #ifdef DEBUG_GENERATION
 					if ((!m_TALK) && (!m_SPEN))
-						fprintf(stderr,"tms5220_process: processing frame: TALKD = 0 caused by stop frame or buffer empty, halting speech.\n");
+						logerror("tms5220_process: processing frame: TALKD = 0 caused by stop frame or buffer empty, halting speech.\n");
 #endif
 					m_TALKD = m_TALK; // TALKD is latched from TALK
 					update_fifo_status_and_ints(); // to trigger an interrupt if TALK_STATUS has changed
 					if ((!m_TALK) && m_SPEN) m_TALK = 1; // TALK is only activated if it wasn't already active, if m_SPEN is active, and if we're in RESETL4 (which we are).
 #ifdef DEBUG_GENERATION
-					fprintf(stderr,"RESETL4, status updated: IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
+					logerror("RESETL4, status updated: IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
 #endif
 				}
 				m_subcycle = m_subc_reload;
@@ -1217,7 +1217,7 @@ static INT16 clip_analog(INT16 cliptemp)
 	 * 0x xxxx xxxx xxxx -> 0b01111111
 	 */
 #ifdef DEBUG_CLIP
-	if ((cliptemp > 2047) || (cliptemp < -2048)) fprintf(stderr,"clipping cliptemp to range; was %d\n", cliptemp);
+	if ((cliptemp > 2047) || (cliptemp < -2048)) logerror("clipping cliptemp to range; was %d\n", cliptemp);
 #endif
 	if (cliptemp > 2047) cliptemp = 2047;
 	else if (cliptemp < -2048) cliptemp = -2048;
@@ -1257,8 +1257,8 @@ static INT32 matrix_multiply(INT32 a, INT32 b)
 	while (b<-16384) { b+=32768; }
 	result = ((a*b)>>9); /** TODO: this isn't technically right to the chip, which truncates the lowest result bit, but it causes glitches otherwise. **/
 #ifdef VERBOSE
-	if (result>16383) fprintf(stderr,"matrix multiplier overflowed! a: %x, b: %x, result: %x", a, b, result);
-	if (result<-16384) fprintf(stderr,"matrix multiplier underflowed! a: %x, b: %x, result: %x", a, b, result);
+	if (result>16383) logerror("matrix multiplier overflowed! a: %x, b: %x, result: %x", a, b, result);
+	if (result<-16384) logerror("matrix multiplier underflowed! a: %x, b: %x, result: %x", a, b, result);
 #endif
 	return result;
 }
@@ -1321,18 +1321,18 @@ INT32 tms5220_device::lattice_filter()
 		m_previous_energy = m_current_energy;
 #ifdef DEBUG_LATTICE
 		int i;
-		fprintf(stderr,"V:%04d ", m_u[10]);
+		logerror("V:%04d ", m_u[10]);
 		for (i = 9; i >= 0; i--)
 		{
-			fprintf(stderr,"Y%d:%04d ", i+1, m_u[i]);
+			logerror("Y%d:%04d ", i+1, m_u[i]);
 		}
-		fprintf(stderr,"\n");
-		fprintf(stderr,"E:%04d ", err);
+		logerror("\n");
+		logerror("E:%04d ", err);
 		for (i = 9; i >= 0; i--)
 		{
-			fprintf(stderr,"b%d:%04d ", i+1, m_x[i]);
+			logerror("b%d:%04d ", i+1, m_x[i]);
 		}
-		fprintf(stderr,"\n");
+		logerror("\n");
 #endif
 		return m_u[0];
 }
@@ -1348,7 +1348,7 @@ void tms5220_device::process_command(unsigned char cmd)
 {
 	int i;
 #ifdef DEBUG_COMMAND_DUMP
-		fprintf(stderr,"process_command called with parameter %02X\n",cmd);
+		logerror("process_command called with parameter %02X\n",cmd);
 #endif
 		/* parse the command */
 		switch (cmd & 0x70)
@@ -1379,7 +1379,7 @@ void tms5220_device::process_command(unsigned char cmd)
 			if (TALK_STATUS == 0) /* TALKST must be clear for RB */
 			{
 #ifdef VERBOSE
-				fprintf(stderr,"read and branch command received\n");
+				logerror("read and branch command received\n");
 #endif
 				m_RDB_flag = FALSE;
 				if (m_speechrom)
@@ -1495,7 +1495,7 @@ void tms5220_device::parse_frame()
 		i = extract_bits(2);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 		printbits(i,2);
-		fprintf(stderr," ");
+		logerror(" ");
 #endif
 		m_IP = reload_table[i];
 	}
@@ -1509,7 +1509,7 @@ void tms5220_device::parse_frame()
 	m_new_frame_energy_idx = extract_bits(m_coeff->energy_bits);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 	printbits(m_new_frame_energy_idx,m_coeff->energy_bits);
-	fprintf(stderr," ");
+	logerror(" ");
 #endif
 	update_fifo_status_and_ints();
 	if (m_DDIS && m_buffer_empty) goto ranout;
@@ -1522,14 +1522,14 @@ void tms5220_device::parse_frame()
 	rep_flag = extract_bits(1);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 	printbits(rep_flag, 1);
-	fprintf(stderr," ");
+	logerror(" ");
 #endif
 
 	// attempt to extract the pitch
 	m_new_frame_pitch_idx = extract_bits(m_coeff->pitch_bits);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 	printbits(m_new_frame_pitch_idx,m_coeff->pitch_bits);
-	fprintf(stderr," ");
+	logerror(" ");
 #endif
 	// if the new frame is unvoiced, be sure to zero out the k5-k10 parameters
 	m_uv_zpar = NEW_FRAME_UNVOICED_FLAG;
@@ -1545,7 +1545,7 @@ void tms5220_device::parse_frame()
 		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 		printbits(m_new_frame_k_idx[i],m_coeff->kbits[i]);
-		fprintf(stderr," ");
+		logerror(" ");
 #endif
 		update_fifo_status_and_ints();
 		if (m_DDIS && m_buffer_empty) goto ranout;
@@ -1564,25 +1564,25 @@ void tms5220_device::parse_frame()
 		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 		printbits(m_new_frame_k_idx[i],m_coeff->kbits[i]);
-		fprintf(stderr," ");
+		logerror(" ");
 #endif
 		update_fifo_status_and_ints();
 		if (m_DDIS && m_buffer_empty) goto ranout;
 	}
 #ifdef DEBUG_PARSE_FRAME_DUMP
-			fprintf(stderr,"\n");
+			logerror("\n");
 #endif
 #ifdef VERBOSE
 	if (m_DDIS)
-		fprintf(stderr,"Parsed a frame successfully in FIFO - %d bits remaining\n", (m_fifo_count*8)-(m_fifo_bits_taken));
+		logerror("Parsed a frame successfully in FIFO - %d bits remaining\n", (m_fifo_count*8)-(m_fifo_bits_taken));
 	else
-		fprintf(stderr,"Parsed a frame successfully in ROM\n");
+		logerror("Parsed a frame successfully in ROM\n");
 #endif
 	return;
 
 	ranout:
 #ifdef DEBUG_FRAME_ERRORS
-	fprintf(stderr,"Ran out of bits on a parse!\n");
+	logerror("Ran out of bits on a parse!\n");
 #endif
 	return;
 }
@@ -1597,7 +1597,7 @@ void tms5220_device::set_interrupt_state(int state)
 {
 	if (!TMS5220_IS_52xx) return; // bail out if not a 52xx chip, since there's no int pin
 #ifdef DEBUG_PIN_READS
-	fprintf(stderr,"irq pin set to state %d\n", state);
+	logerror("irq pin set to state %d\n", state);
 #endif
 	if (!m_irq_handler.isnull() && state != m_irq_pin)
 		m_irq_handler(!state);
@@ -1614,7 +1614,7 @@ void tms5220_device::update_ready_state()
 {
 	int state = ready_read();
 #ifdef DEBUG_PIN_READS
-	fprintf(stderr,"ready pin set to state %d\n", state);
+	logerror("ready pin set to state %d\n", state);
 #endif
 	if (!m_readyq_handler.isnull() && state != m_ready_pin)
 		m_readyq_handler(!state);
@@ -1759,7 +1759,7 @@ void tms5220_device::device_reset()
 		m_speechrom->read(1);
 		m_schedule_dummy_read = FALSE;
 	}
-	
+
 	// 5110 specific stuff
 	m_PDC = 0;
 	m_CTL_pins = 0;
@@ -1790,8 +1790,8 @@ void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				/* Write */
 				/* bring up to date first */
 #ifdef DEBUG_IO_READY
-				fprintf(stderr,"Serviced write: %02x\n", m_write_latch);
-				//fprintf(stderr, "Processed write data: %02X\n", m_write_latch);
+				logerror("Serviced write: %02x\n", m_write_latch);
+				//logerror( "Processed write data: %02X\n", m_write_latch);
 #endif
 				m_stream->update();
 				data_write(m_write_latch);
@@ -1802,7 +1802,7 @@ void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				m_stream->update();
 				m_read_latch = status_read();
 #ifdef DEBUG_IO_READY
-				fprintf(stderr,"Serviced read, returning %02x\n", m_read_latch);
+				logerror("Serviced read, returning %02x\n", m_read_latch);
 #endif
 				break;
 			case 0x03:
@@ -1829,7 +1829,7 @@ WRITE_LINE_MEMBER( tms5220_device::rsq_w )
 	m_true_timing = 1;
 	state &= 0x01;
 #ifdef DEBUG_RS_WS
-	fprintf(stderr,"/RS written with data: %d\n", state);
+	logerror("/RS written with data: %d\n", state);
 #endif
 	new_val = (m_rs_ws & 0x01) | (state<<1);
 	if (new_val != m_rs_ws)
@@ -1842,7 +1842,7 @@ WRITE_LINE_MEMBER( tms5220_device::rsq_w )
 #ifdef DEBUG_RS_WS
 			else
 				/* illegal */
-				fprintf(stderr,"tms5220_rsq_w: illegal\n");
+				logerror("tms5220_rsq_w: illegal\n");
 #endif
 			return;
 		}
@@ -1860,7 +1860,7 @@ WRITE_LINE_MEMBER( tms5220_device::rsq_w )
 		{
 			/* high to low - schedule ready cycle */
 #ifdef DEBUG_RS_WS
-			fprintf(stderr,"Scheduling ready cycle for /RS...\n");
+			logerror("Scheduling ready cycle for /RS...\n");
 #endif
 			/* upon /RS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
 			m_io_ready = 0;
@@ -1881,7 +1881,7 @@ WRITE_LINE_MEMBER( tms5220_device::wsq_w )
 	m_true_timing = 1;
 	state &= 0x01;
 #ifdef DEBUG_RS_WS
-	fprintf(stderr,"/WS written with data: %d\n", state);
+	logerror("/WS written with data: %d\n", state);
 #endif
 	new_val = (m_rs_ws & 0x02) | (state<<0);
 	if (new_val != m_rs_ws)
@@ -1894,7 +1894,7 @@ WRITE_LINE_MEMBER( tms5220_device::wsq_w )
 #ifdef DEBUG_RS_WS
 			else
 				/* illegal */
-				fprintf(stderr,"tms5220_wsq_w: illegal\n");
+				logerror("tms5220_wsq_w: illegal\n");
 #endif
 			return;
 		}
@@ -1912,7 +1912,7 @@ WRITE_LINE_MEMBER( tms5220_device::wsq_w )
 		{
 			/* high to low - schedule ready cycle */
 #ifdef DEBUG_RS_WS
-			fprintf(stderr,"Scheduling ready cycle for /WS...\n");
+			logerror("Scheduling ready cycle for /WS...\n");
 #endif
 			/* upon /WS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
 			m_io_ready = 0;
@@ -1944,7 +1944,7 @@ WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
 	UINT8 falling_edges;
 	m_true_timing = 1;
 #ifdef DEBUG_RS_WS
-	fprintf(stderr,"/RS and /WS written with %d and %d respectively\n", (data&2)>>1), data&1;
+	logerror("/RS and /WS written with %d and %d respectively\n", (data&2)>>1, data&1);
 #endif
 	new_val = data&0x03;
 	if (new_val != m_rs_ws)
@@ -1959,7 +1959,7 @@ WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
 #ifdef DEBUG_RS_WS
 				else
 					/* illegal */
-					fprintf(stderr,"tms5220_combined_rsq_wsq_w: illegal\n");
+					logerror("tms5220_combined_rsq_wsq_w: illegal\n");
 #endif
 				return;
 			case 3:
@@ -1968,10 +1968,10 @@ WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
 				return;
 			case 2: // /WS active, /RS not
 				/* check for falling or rising edge */
-				if (!(falling_edges&0x02)) return; /* low to high, do nothing */
+				if (!(falling_edges&0x01)) return; /* low to high, do nothing */
 				/* high to low - schedule ready cycle */
 #ifdef DEBUG_RS_WS
-				fprintf(stderr,"Scheduling ready cycle for /WS...\n");
+				logerror("Scheduling ready cycle for /WS...\n");
 #endif
 				/* upon /WS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
 				m_io_ready = 0;
@@ -1991,10 +1991,10 @@ WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
 				return;
 			case 1: // /RS active, /WS not
 				/* check for falling or rising edge */
-				if (!(falling_edges&0x01)) return; /* low to high, do nothing */
+				if (!(falling_edges&0x02)) return; /* low to high, do nothing */
 				/* high to low - schedule ready cycle */
 #ifdef DEBUG_RS_WS
-				fprintf(stderr,"Scheduling ready cycle for /RS...\n");
+				logerror("Scheduling ready cycle for /RS...\n");
 #endif
 				/* upon /RS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
 				m_io_ready = 0;
@@ -2019,7 +2019,7 @@ WRITE8_MEMBER( tms5220_device::data_w )
 	if (space.debugger_access()) return;
 
 #ifdef DEBUG_RS_WS
-	fprintf(stderr,"tms5220_data_w: data %02x\n", data);
+	logerror("tms5220_data_w: data %02x\n", data);
 #endif
 	if (!m_true_timing)
 	{
@@ -2032,7 +2032,7 @@ WRITE8_MEMBER( tms5220_device::data_w )
 		/* actually in a write ? */
 #ifdef DEBUG_RS_WS
 		if (!(m_rs_ws == 0x02))
-			fprintf(stderr,"tms5220_data_w: data written outside ws, status: %02x!\n", m_rs_ws);
+			logerror("tms5220_data_w: data written outside ws, status: %02x!\n", m_rs_ws);
 #endif
 		m_write_latch = data;
 	}
@@ -2064,7 +2064,7 @@ READ8_MEMBER( tms5220_device::status_r )
 			return m_read_latch;
 #ifdef DEBUG_RS_WS
 		else
-			fprintf(stderr,"tms5220_status_r: data read outside rs!\n");
+			logerror("tms5220_status_r: data read outside rs!\n");
 #endif
 		return 0xff;
 	}

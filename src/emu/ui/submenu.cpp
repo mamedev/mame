@@ -13,6 +13,7 @@
 #include "ui/submenu.h"
 #include "ui/utils.h"
 #include <limits>
+#include <iterator>
 
 //-------------------------------------------------
 //  ctor / dtor
@@ -24,19 +25,65 @@ ui_submenu::ui_submenu(running_machine &machine, render_container *container, st
 {
 	for (auto & sm_option : m_options)
 	{
-		if (sm_option.type < ui_submenu::EMU)
-			continue;
-
-		// fixme use switch
-		sm_option.entry = machine.options().get_entry(sm_option.name);
-		if (sm_option.entry == nullptr)
+		switch (sm_option.type)
 		{
-			sm_option.entry = machine.ui().options().get_entry(sm_option.name);
-			sm_option.options = dynamic_cast<core_options*>(&machine.ui().options());
-		}
-		else
-		{
-			sm_option.options = dynamic_cast<core_options*>(&machine.options());
+			case ui_submenu::EMU:
+				sm_option.entry = machine.options().get_entry(sm_option.name);
+				sm_option.options = dynamic_cast<core_options*>(&machine.options());
+				if (sm_option.entry->type() == OPTION_STRING)
+				{
+					sm_option.value.clear();
+					std::string namestr(sm_option.entry->description());
+					int lparen = namestr.find_first_of('(', 0);
+					int vslash = namestr.find_first_of('|', lparen + 1);
+					int rparen = namestr.find_first_of(')', vslash + 1);
+					if (lparen != -1 && vslash != -1 && rparen != -1)
+					{
+						int semi;
+						namestr.erase(rparen);
+						namestr.erase(0, lparen + 1);
+						while ((semi = namestr.find_first_of('|')) != -1)
+						{
+							sm_option.value.emplace_back(namestr.substr(0, semi));
+							namestr.erase(0, semi + 1);
+						}
+						sm_option.value.emplace_back(namestr);
+					}
+				}
+				break;
+			case ui_submenu::OSD:
+				sm_option.entry = machine.options().get_entry(sm_option.name);
+				sm_option.options = dynamic_cast<core_options*>(&machine.options());
+				if (sm_option.entry->type() == OPTION_STRING)
+				{
+					sm_option.value.clear();
+					std::string descr(sm_option.entry->description()), delim(", ");
+					descr.erase(0, descr.find(":") + 2);
+					size_t p1, p2 = 0;
+					while ((p1 = descr.find_first_not_of(delim, p2)) != std::string::npos)
+					{
+						p2 = descr.find_first_of(delim, p1 + 1);
+						if (p2 != std::string::npos)
+						{
+							std::string txt(descr.substr(p1, p2 - p1));
+							if (txt != "or")
+								sm_option.value.push_back(txt);
+						}
+						else
+						{
+							sm_option.value.push_back(descr.substr(p1));
+							break;
+						}
+					}
+				}
+				break;
+			case ui_submenu::UI:
+				sm_option.entry = machine.ui().options().get_entry(sm_option.name);
+				sm_option.options = dynamic_cast<core_options*>(&machine.ui().options());
+				break;
+			default:
+				continue;
+				break;
 		}
 	}
 }
@@ -112,6 +159,20 @@ void ui_submenu::handle()
 								f_cur += f_step;
 							tmptxt = string_format("%g", f_cur);
 							sm_option->options->set_value(sm_option->name, tmptxt.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+							sm_option->entry->mark_changed();
+						}
+						break;
+					case OPTION_STRING:
+						if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
+						{
+							changed = true;
+							std::string v_cur(sm_option->entry->value());
+							int cur_value = std::distance(sm_option->value.begin(), std::find(sm_option->value.begin(), sm_option->value.end(), v_cur));
+							if (m_event->iptkey == IPT_UI_LEFT)
+								v_cur = sm_option->value[--cur_value];
+							else
+								v_cur = sm_option->value[++cur_value];
+							sm_option->options->set_value(sm_option->name, v_cur.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 							sm_option->entry->mark_changed();
 						}
 						break;
@@ -207,6 +268,16 @@ void ui_submenu::populate()
 							static_cast<void*>(&(*sm_option)));
 						break;
 					}
+					case OPTION_STRING:
+					{
+						std::string v_cur(sm_option->entry->value());
+						int cur_value = std::distance(sm_option->value.begin(), std::find(sm_option->value.begin(), sm_option->value.end(), v_cur));
+						arrow_flags = get_arrow_flags(0, sm_option->value.size() - 1, cur_value);
+						item_append(_(sm_option->description),
+							sm_option->options->value(sm_option->name),
+							arrow_flags, static_cast<void*>(&(*sm_option)));
+						break;
+					}
 					default:
 						arrow_flags = MENU_FLAG_RIGHT_ARROW;
 						item_append(_(sm_option->description),
@@ -260,7 +331,6 @@ void ui_submenu::custom_render(void *selectedref, float top, float bottom, float
 	if (selectedref != nullptr)
 	{
 		ui_submenu::option *selected_sm_option = (ui_submenu::option *)selectedref;
-
 		if (selected_sm_option->entry != nullptr)
 		{
 			mui.draw_text_full(container, selected_sm_option->entry->description(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,

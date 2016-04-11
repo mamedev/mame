@@ -1699,8 +1699,9 @@ ROM_START( sstar97 )
 	ROM_LOAD16_BYTE( "bor_dun_5.u22", 0x40001, 0x20000, CRC(ca17a632) SHA1(d491310ccdbe9b59a1e607f9254646f20700d79d) )
 ROM_END
 
-/* Butterfly Dream 97 / Hudie Meng 97
-   Game is encrypted and needs better decoded graphics.
+/*
+  Butterfly Dream 97 / Hudie Meng 97
+  Game is encrypted and needs better decoded graphics.
 */
 ROM_START( bdream97 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1717,6 +1718,34 @@ ROM_START( bdream97 )
 	ROM_LOAD16_BYTE( "27c010.u26", 0x00001, 0x20000, CRC(27cd64ef) SHA1(6b39b2919aca967f72fa16cd61b1641d0fb98d88) )
 	ROM_LOAD16_BYTE( "27c010.u25", 0x40000, 0x20000, CRC(bdebdf35) SHA1(245247b23ddeded32519608f4696205bb5541ccc) )
 	ROM_LOAD16_BYTE( "27c010.u27", 0x40001, 0x20000, CRC(0a266de4) SHA1(0ff9ad793e77d5419bd446cb73d4968e42305353) )
+ROM_END
+
+/*
+  Sonik Fighter.
+  Greek Version By ZBOUNOS (Z GAMES).
+
+  Multiple Butterfly type with naked girls.
+  + new features and hold a pair.
+  + jackpot.
+  + tetris game?.
+
+  Program ROM is encrypted.
+*/
+ROM_START( sonikfig )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "subboard_27c512.bin",  0x00000, 0x10000, CRC(f9b5b03e) SHA1(3832a7d70b41052f9dca46faa6f311ccc5a817b7) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "1__am27c100.u29", 0x00000, 0x20000, CRC(69824294) SHA1(a221ab3e5d50435c10e3cd4601cfda1c87038a74) )
+	ROM_LOAD16_BYTE( "2__am27c100.u31", 0x00001, 0x20000, CRC(5224ed08) SHA1(3ba9af7557f13bf31c529bff7b2b8cfd6e71552c) )
+	ROM_LOAD16_BYTE( "3__am27c100.u33", 0x40000, 0x20000, CRC(38fef15c) SHA1(00f7578bac395421fa3289748f85cf3b9d80e04b) )
+	ROM_LOAD16_BYTE( "4__am27c100.u35", 0x40001, 0x20000, CRC(6193d30d) SHA1(390b3f451224eb4236c6c921d34b25b702d366e0) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "5__am27c100.u52", 0x00000, 0x20000, CRC(56921033) SHA1(25086b0f5978df04b28b60a30e271f4364112c96) )
+	ROM_LOAD16_BYTE( "6__am27c100.u54", 0x00001, 0x20000, CRC(72802c6c) SHA1(c552d438399fb8c983e995d5e78e591982ef96e5) )
+	ROM_LOAD16_BYTE( "7__am27c100.u56", 0x40000, 0x20000, CRC(90a09327) SHA1(3bb1150ec397627cc04b46d2bf07538c55e7f116) )
+	ROM_LOAD16_BYTE( "8__am27c100.u58", 0x40001, 0x20000, CRC(b02ed0ce) SHA1(ec8ab64210a1b10cdba5ee179e46fc8d6a1a67b6) )
 ROM_END
 
 
@@ -1745,3 +1774,4 @@ GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  skylncr, ROT0
 GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr, ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
 GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr, ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
 GAME( 199?, bdream97, 0,       bdream97, skylncr,  skylncr_state,  skylncr, ROT0, "bootleg",              "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_NOT_WORKING )
+GAME( 199?, sonikfig, 0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Z Games",              "Sonik Fighter (encrypted)",                      MACHINE_NOT_WORKING )

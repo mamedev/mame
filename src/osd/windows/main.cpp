@@ -17,6 +17,8 @@
 
 #include "strconv.h"
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+
 extern int utf8_main(int argc, char *argv[]);
 //============================================================
 //  main
@@ -49,4 +51,19 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 
 	return rc;
 }
+#endif
+
+#else
+
+#include "winmain.h"
+
+// The main function is only used to initialize our IFrameworkView class.
+[Platform::MTAThread]
+int main(Platform::Array<Platform::String^>^)
+{
+	auto app_source = ref new MameViewSource();
+	Windows::ApplicationModel::Core::CoreApplication::Run(app_source);
+	return 0;
+}
+
 #endif

@@ -23,9 +23,13 @@
 --   },
 --   "screen": {
 --     "varname": "tag"
---     },
+--   },
 --     ...
 --   "region": {
+--     "varname": "tag",
+--     ...
+--   },
+--   "ram": {
 --     "varname": "tag",
 --     ...
 --   },
@@ -159,7 +163,7 @@ function cheat.startplugin()
 			script = load(script, cheat.desc .. name, "t", cheat.cheat_env)
 			if not script then
 				print("error loading cheat script: " .. cheat.desc)
-				cheat = { desc = cheat.desc .. "error" }
+				cheat = { desc = cheat.desc .. " error" }
 				return
 			end
 			cheat.script[name] = script
@@ -174,7 +178,7 @@ function cheat.startplugin()
 				cpu = manager:machine().devices[space.tag]
 				if not cpu then
 					print("error loading cheat script: " .. cheat.desc)
-					cheat = { desc = cheat.desc .. "error" }
+					cheat = { desc = cheat.desc .. " error" }
 					return
 				end
 				if space.type then
@@ -184,7 +188,7 @@ function cheat.startplugin()
 				end
 				if not mem then
 					print("error loading cheat script: " .. cheat.desc)
-					cheat = { desc = cheat.desc .. "error" }
+					cheat = { desc = cheat.desc .. " error" }
 					return
 				end
 				cheat.cheat_env[name] = mem
@@ -207,10 +211,22 @@ function cheat.startplugin()
 				mem = manager:machine():memory().regions[region]
 				if not mem then
 					print("error loading cheat script: " .. cheat.desc)
-					cheat = nil
+					cheat = { desc = cheat.desc .. " error" }
 					return
 				end
 				cheat.cheat_env[name] = mem
+			end
+		end
+		if cheat.ram then
+			for name, ram in pairs(cheat.ram) do
+				local ram
+				ram = manager:machine().devices[ram]
+				if not ram then
+					print("error loading cheat script: " .. cheat.desc)
+					cheat = { desc = cheat.desc .. " error" }
+					return
+				end
+				cheat.cheat_env[name] = emu.item(ram.items["0/pointer"])
 			end
 		end
 		local param = cheat.parameter
@@ -446,6 +462,18 @@ function cheat.startplugin()
 		end
 		output = {}
 	end)
+
+	local ce = {}
+
+	-- interface to script cheat engine
+	function ce.inject(newcheat)
+		cheats[#cheats + 1] = newcheat
+		parse_cheat(newcheat)
+		manager:machine():popmessage(newcheat.desc .. " added")
+	end
+
+	_G.ce = ce
+
 end
 
 return exports

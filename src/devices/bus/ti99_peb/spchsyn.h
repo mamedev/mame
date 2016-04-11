@@ -40,8 +40,10 @@ protected:
 	virtual void            device_config_complete() override;
 
 private:
-	cd2501e_device *m_vsp;
-	bool            m_read_mode;
+	address_space*  m_space;
+	cd2501e_device* m_vsp;
+	bool            m_reading;
+	bool            m_sbe;          // Signal "Speech block enable"
 };
 
 #endif

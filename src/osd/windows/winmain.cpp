@@ -33,6 +33,13 @@
 #include "winutil.h"
 #include "debugger.h"
 #include "winfile.h"
+#include "strconv.h"
+
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+using namespace Windows::ApplicationModel;
+using namespace Windows::ApplicationModel::Core;
+using namespace Windows::UI::Popups;
+#endif
 
 #define DEBUG_SLOW_LOCKS    0
 
@@ -213,6 +220,33 @@ public:
 
 			vsnprintf(buffer, ARRAY_LENGTH(buffer), msg, args);
 			win_message_box_utf8(win_window_list ? win_window_list->m_hwnd : nullptr, buffer, emulator_info::get_appname(), MB_OK);
+		}
+		else
+			chain_output(channel, msg, args);
+	}
+};
+
+#else
+
+//============================================================
+//  winuniversal_output_error
+//============================================================
+
+class winuniversal_output_error : public osd_output
+{
+public:
+	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args) override
+	{
+		if (channel == OSD_OUTPUT_CHANNEL_ERROR)
+		{
+			char buffer[1024];
+			vsnprintf(buffer, ARRAY_LENGTH(buffer), msg, args);
+
+			osd_unique_wstr wcbuffer(wstring_from_utf8(buffer));
+			osd_unique_wstr wcappname(wstring_from_utf8(emulator_info::get_appname()));
+
+			auto dlg = ref new MessageDialog(ref new Platform::String(wcbuffer.get()), ref new Platform::String(wcappname.get()));
+			dlg->ShowAsync();
 		}
 		else
 			chain_output(channel, msg, args);
@@ -472,6 +506,70 @@ static BOOL WINAPI control_handler(DWORD type)
 
 	// in all cases we handled it
 	return TRUE;
+}
+
+#else
+
+MameMainApp::MameMainApp()
+{
+}
+
+void MameMainApp::Initialize(Windows::ApplicationModel::Core::CoreApplicationView^ applicationView)
+{
+	// Register event handlers for app lifecycle.
+}
+
+// Called when the CoreWindow object is created (or re-created).
+void MameMainApp::SetWindow(Windows::UI::Core::CoreWindow^ window)
+{
+	// Attach event handlers on the window for input, etc.
+}
+
+// Initializes scene resources, or loads a previously saved app state.
+void MameMainApp::Load(Platform::String^ entryPoint)
+{
+}
+
+void MameMainApp::Run()
+{
+	// use small output buffers on non-TTYs (i.e. pipes)
+	if (!isatty(fileno(stdout)))
+		setvbuf(stdout, (char *) nullptr, _IOFBF, 64);
+	if (!isatty(fileno(stderr)))
+		setvbuf(stderr, (char *) nullptr, _IOFBF, 64);
+
+	// parse config and cmdline options
+	m_options = std::make_unique<windows_options>();
+	m_osd = std::make_unique<windows_osd_interface>(m_options);
+
+	// Since we're a GUI app, out errors to message boxes
+	// Initialize this after the osd interface so that we are first in the
+	// output order
+	winuniversal_output_error winerror;
+	osd_output::push(&winerror);
+
+	m_osd->register_options();
+	m_frontend = std::make_unique<cli_frontend>(*m_options.get(), *m_osd.get());
+
+	// To satisfy the latter things, pass in the module path name
+	char exe_path[MAX_PATH];
+	GetModuleFileNameA(NULL, exe_path, MAX_PATH);
+	char* args[2] = { exe_path, (char*)"-verbose" };
+
+	DWORD result = m_frontend->execute(ARRAY_LENGTH(args), args);
+	osd_output::pop(&winerror);
+}
+
+// Required for IFrameworkView.
+void MameMainApp::Uninitialize()
+{
+	// Terminate events do not cause Uninitialize to be called. It will be called if your IFrameworkView 
+	// class is torn down while the app is in the foreground. 
+}
+
+IFrameworkView^ MameViewSource::CreateView()
+{
+	return ref new MameMainApp();
 }
 
 #endif
