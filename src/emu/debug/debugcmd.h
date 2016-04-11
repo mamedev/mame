@@ -11,6 +11,7 @@
 #ifndef __DEBUGCMD_H__
 #define __DEBUGCMD_H__
 
+#include "emu.h"
 
 /***************************************************************************
     FUNCTION PROTOTYPES

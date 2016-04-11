@@ -9,11 +9,15 @@
 //
 //============================================================
 
+#include "emu.h"
+#include "ui/ui.h"
+#include "ui/menu.h"
+
+#include "osdcore.h"
+#include "modules/osdwindow.h"
+
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
-
-#include "emu.h"
-#include "window.h"
 
 #include <bx/readerwriter.h>
 #include <bx/crtimpl.h>
@@ -28,31 +32,66 @@
 #include "target.h"
 #include "slider.h"
 
+#include "sliderdirtynotifier.h"
+
 using namespace rapidjson;
 
-chain_manager::chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index)
+const uint32_t chain_manager::CHAIN_NONE = 0;
+
+chain_manager::chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index, slider_dirty_notifier& slider_notifier)
     : m_machine(machine)
     , m_options(options)
     , m_textures(textures)
     , m_targets(targets)
     , m_effects(effects)
     , m_window_index(window_index)
+    , m_slider_notifier(slider_notifier)
+    , m_screen_count(0)
 {
-    load_screen_chains(options.bgfx_screen_chains());
+	find_available_chains(options.bgfx_path());
+    parse_chain_selections(options.bgfx_screen_chains());
 }
 
 chain_manager::~chain_manager()
 {
-    for (std::vector<bgfx_chain*> screen_chains : m_screen_chains)
-    {
-        for (bgfx_chain* chain : screen_chains)
-        {
-            delete chain;
-        }
-    }
+    destroy_chains();
 }
 
-bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine, uint32_t window_index, uint32_t screen_index)
+void chain_manager::find_available_chains(std::string path)
+{
+	m_available_chains.clear();
+	m_available_chains.push_back("none");
+
+	osd_directory *directory = osd_opendir((path + "/chains").c_str());
+	if (directory != nullptr)
+	{
+		for (const osd_directory_entry *entry = osd_readdir(directory); entry != nullptr; entry = osd_readdir(directory))
+		{
+			if (entry->type == ENTTYPE_FILE)
+			{
+				std::string name(entry->name);
+				std::string extension(".json");
+
+				// Does the name has at least one character in addition to ".json"?
+				if (name.length() > extension.length())
+				{
+					size_t start = name.length() - extension.length();
+					std::string test_segment = name.substr(start, extension.length());
+
+					// Does it end in .json?
+					if (test_segment == extension)
+					{
+						m_available_chains.push_back(name.substr(0, start));
+					}
+				}
+			}
+		}
+
+		osd_closedir(directory);
+	}
+}
+
+bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 {
 	if (name.length() < 5 || (name.compare(name.length() - 5, 5, ".json")!= 0))
 	{
@@ -87,7 +126,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine
 		return nullptr;
 	}
 
-	bgfx_chain* chain = chain_reader::read_from_value(document, name + ": ", m_options, machine, window_index, screen_index, m_textures, m_targets, m_effects);
+	bgfx_chain* chain = chain_reader::read_from_value(document, name + ": ", m_options, m_machine, m_window_index, screen_index, m_textures, m_targets, m_effects);
 
 	if (chain == nullptr)
 	{
@@ -98,27 +137,57 @@ bgfx_chain* chain_manager::load_chain(std::string name, running_machine& machine
 	return chain;
 }
 
-void chain_manager::load_screen_chains(std::string chain_str)
+void chain_manager::parse_chain_selections(std::string chain_str)
 {
-    std::vector<std::vector<std::string>> chain_names = split_option_string(chain_str);
-    load_chains(chain_names);
+    std::vector<std::string> chain_names = split_option_string(chain_str);
+
+    while (m_current_chain.size() != chain_names.size())
+    {
+        m_screen_chains.push_back(nullptr);
+        m_current_chain.push_back(CHAIN_NONE);
+    }
+
+    for (size_t index = 0; index < chain_names.size(); index++)
+    {
+        size_t chain_index = 0;
+        for (chain_index = 0; chain_index < m_available_chains.size(); chain_index++)
+        {
+            if (m_available_chains[chain_index] == chain_names[index])
+            {
+                break;
+            }
+        }
+
+        if (chain_index < m_available_chains.size())
+        {
+            m_current_chain[index] = chain_index;
+        }
+        else
+        {
+            m_current_chain[index] = CHAIN_NONE;
+        }
+    }
 }
 
-std::vector<std::vector<std::string>> chain_manager::split_option_string(std::string chain_str) const
+std::vector<std::string> chain_manager::split_option_string(std::string chain_str) const
 {
-    std::vector<std::vector<std::string>> chain_names;
-    chain_names.push_back(std::vector<std::string>());
+    std::vector<std::string> chain_names;
 
     uint32_t length = chain_str.length();
     uint32_t win = 0;
     uint32_t last_start = 0;
-    for (uint32_t i = 0; i < length + 1; i++) {
-        if (i == length || chain_str[i] == ',' || chain_str[i] == ':') {
-            chain_names[win].push_back(chain_str.substr(last_start, i - last_start));
+    for (uint32_t i = 0; i < length + 1; i++)
+    {
+        if (i == length || chain_str[i] == ',' || chain_str[i] == ':')
+        {
+            if (win == m_window_index)
+            {
+                chain_names.push_back(chain_str.substr(last_start, i - last_start));
+            }
             last_start = i + 1;
-            if (chain_str[i] == ':') {
+            if (chain_str[i] == ':')
+            {
                 win++;
-                chain_names.push_back(std::vector<std::string>());
             }
         }
     }
@@ -126,33 +195,44 @@ std::vector<std::vector<std::string>> chain_manager::split_option_string(std::st
     return chain_names;
 }
 
-void chain_manager::load_chains(std::vector<std::vector<std::string>>& chain_names)
+void chain_manager::load_chains()
 {
-    for (uint32_t win = 0; win < chain_names.size(); win++) {
-        m_screen_chains.push_back(std::vector<bgfx_chain*>());
-        if (win != m_window_index) {
-            continue;
-        }
-        for (uint32_t screen = 0; screen < chain_names[win].size(); screen++) {
-            bgfx_chain* chain = load_chain(chain_names[win][screen], m_machine, win, screen);
-            if (chain == nullptr) {
-                chain_names.clear();
-                return;
-            }
-            m_screen_chains[win].push_back(chain);
+    for (size_t chain = 0; chain < m_current_chain.size() && chain < m_screen_chains.size(); chain++)
+    {
+        if (m_current_chain[chain] != CHAIN_NONE)
+        {
+            m_screen_chains[chain] = load_chain(m_available_chains[m_current_chain[chain]], uint32_t(chain));
         }
     }
 }
 
+void chain_manager::destroy_chains()
+{
+    for (size_t index = 0; index < m_screen_chains.size(); index++)
+    {
+        if (m_screen_chains[index] != nullptr)
+        {
+            delete m_screen_chains[index];
+            m_screen_chains[index] = nullptr;
+        }
+    }
+}
+
+void chain_manager::reload_chains()
+{
+    destroy_chains();
+    load_chains();
+}
+
 bgfx_chain* chain_manager::screen_chain(uint32_t screen)
 {
-    if (screen >= m_screen_chains[m_window_index].size())
+    if (screen >= m_screen_chains.size())
     {
-        return m_screen_chains[m_window_index][m_screen_chains[m_window_index].size() - 1];
+        return m_screen_chains[m_screen_chains.size() - 1];
     }
     else
     {
-        return m_screen_chains[m_window_index][screen];
+        return m_screen_chains[screen];
     }
 }
 
@@ -184,16 +264,21 @@ std::vector<render_primitive*> chain_manager::count_screens(render_primitive* pr
 
     int screen_count = 0;
     std::vector<void*> bases;
-    while (prim != nullptr) {
-        if (PRIMFLAG_GET_SCREENTEX(prim->flags)) {
+    while (prim != nullptr)
+    {
+        if (PRIMFLAG_GET_SCREENTEX(prim->flags))
+        {
             bool found = false;
-            for (void* base : bases) {
-                if (base == prim->texture.base) {
+            for (void* base : bases)
+            {
+                if (base == prim->texture.base)
+                {
                     found = true;
                     break;
                 }
             }
-            if (!found) {
+            if (!found)
+            {
                 screen_count++;
                 screens.push_back(prim);
                 bases.push_back(prim->texture.base);
@@ -202,43 +287,120 @@ std::vector<render_primitive*> chain_manager::count_screens(render_primitive* pr
         prim = prim->next();
     }
 
-    const uint32_t available_chains = m_screen_chains[m_window_index].size();
-    if (screen_count >= available_chains)
+    if (screen_count > 0)
     {
-        screen_count = available_chains;
-    }
-
-    if (screen_count > 0) {
+		update_screen_count(screen_count);
         m_targets.update_screen_count(screen_count);
     }
 
     return screens;
 }
 
-uint32_t chain_manager::handle_screen_chains(uint32_t view, render_primitive *starting_prim, osd_window& window) {
-    if (m_screen_chains.size() <= m_window_index || m_screen_chains[m_window_index].size() == 0) {
-        return 0;
+void chain_manager::update_screen_count(uint32_t screen_count)
+{
+	if (screen_count != m_screen_count)
+	{
+        m_slider_notifier.set_sliders_dirty();
+		m_screen_count = screen_count;
+
+        // Ensure we have one screen chain entry per screen
+        while (m_screen_chains.size() < m_screen_count)
+        {
+            m_screen_chains.push_back(nullptr);
+            m_current_chain.push_back(CHAIN_NONE);
+        }
+
+        // Ensure we have a screen chain selection slider per screen
+        while (m_selection_sliders.size() < m_screen_count)
+        {
+            create_selection_slider(m_selection_sliders.size());
+        }
+
+        load_chains();
+	}
+}
+
+static INT32 update_trampoline(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+{
+    if (arg != nullptr)
+    {
+        return reinterpret_cast<chain_manager*>(arg)->chain_changed(id, str, newval);
+    }
+    return 0;
+}
+
+int32_t chain_manager::chain_changed(int32_t id, std::string *str, int32_t newval)
+{
+    if (newval != SLIDER_NOCHANGE)
+    {
+        m_current_chain[id] = newval;
+
+        reload_chains();
+
+        m_slider_notifier.set_sliders_dirty();
     }
 
+    if (str != nullptr)
+    {
+        *str = string_format("%s", m_available_chains[m_current_chain[id]].c_str());
+    }
+
+    return m_current_chain[id];
+}
+
+void chain_manager::create_selection_slider(uint32_t screen_index)
+{
+    if (screen_index < m_selection_sliders.size())
+    {
+        return;
+    }
+
+    std::string description = "Window " + std::to_string(m_window_index) + ", Screen " + std::to_string(screen_index) + " Effect:";
+    size_t size = sizeof(slider_state) + description.length();
+    slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(m_machine, UINT8, size));
+
+    state->minval = 0;
+    state->defval = m_current_chain[screen_index];
+    state->maxval = m_available_chains.size() - 1;
+    state->incval = 1;
+    state->update = update_trampoline;
+    state->arg = this;
+    state->id = screen_index;
+    strcpy(state->description, description.c_str());
+
+    ui_menu_item item;
+    item.text = state->description;
+    item.subtext = "";
+    item.flags = 0;
+    item.ref = state;
+    item.type = ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER;
+    m_selection_sliders.push_back(item);
+}
+
+uint32_t chain_manager::handle_screen_chains(uint32_t view, render_primitive *starting_prim, osd_window& window)
+{
     std::vector<render_primitive*> screens = count_screens(starting_prim);
 
-    if (screens.size() == 0) {
+    if (screens.size() == 0)
+    {
         return 0;
     }
-
-    const uint32_t available_chains = m_screen_chains[m_window_index].size();
 
     // Process each screen as necessary
     uint32_t used_views = 0;
-    int screen_index = 0;
-    for (render_primitive* prim : screens) {
-        if (screen_index >= available_chains) {
-            break;
+    uint32_t screen_index = 0;
+    for (render_primitive* prim : screens)
+    {
+        if (m_current_chain[screen_index] == CHAIN_NONE)
+        {
+			screen_index++;
+            continue;
         }
 
         uint16_t screen_width(floor((prim->bounds.x1 - prim->bounds.x0) + 0.5f));
         uint16_t screen_height(floor((prim->bounds.y1 - prim->bounds.y0) + 0.5f));
-        if (window.swap_xy()) {
+        if (window.swap_xy())
+        {
             std::swap(screen_width, screen_height);
         }
 
@@ -254,34 +416,63 @@ uint32_t chain_manager::handle_screen_chains(uint32_t view, render_primitive *st
     return used_views;
 }
 
-bool chain_manager::has_applicable_pass(uint32_t screen)
+bool chain_manager::has_applicable_chain(uint32_t screen)
 {
-    return m_screen_chains.size() > m_window_index && screen < m_screen_chains[m_window_index].size();
+    return screen < m_screen_count && m_current_chain[screen] != CHAIN_NONE && m_screen_chains[screen] != nullptr;
 }
 
-slider_state* chain_manager::get_slider_list()
+bool chain_manager::needs_sliders()
 {
-    if (m_screen_chains.size() <= m_window_index || m_screen_chains[m_window_index].size() == 0) {
-        return nullptr;
+	return m_screen_count > 0 && m_available_chains.size() > 1;
+}
+
+std::vector<ui_menu_item> chain_manager::get_slider_list()
+{
+	std::vector<ui_menu_item> sliders;
+
+    if (!needs_sliders())
+    {
+        return sliders;
     }
 
-    slider_state *listhead = nullptr;
-    slider_state **tailptr = &listhead;
-    for (std::vector<bgfx_chain*> screen : m_screen_chains) {
-        for (bgfx_chain* chain : screen) {
-            std::vector<bgfx_slider*> sliders = chain->sliders();
-            for (bgfx_slider* slider : sliders) {
-                if (*tailptr == nullptr) {
-                    *tailptr = slider->core_slider();
-                } else {
-                    (*tailptr)->next = slider->core_slider();
-                    tailptr = &(*tailptr)->next;
-                }
-            }
+    for (size_t index = 0; index < m_screen_chains.size(); index++)
+    {
+        bgfx_chain* chain = m_screen_chains[index];
+		sliders.push_back(m_selection_sliders[index]);
+
+        if (chain == nullptr)
+        {
+            continue;
         }
+
+        std::vector<bgfx_slider*> chain_sliders = chain->sliders();
+        for (bgfx_slider* slider : chain_sliders)
+        {
+            slider_state* core_slider = slider->core_slider();
+            
+            ui_menu_item item;
+            item.text = core_slider->description;
+            item.subtext = "";
+            item.flags = 0;
+            item.ref = core_slider;
+            item.type = ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER;
+            m_selection_sliders.push_back(item);
+            
+            sliders.push_back(item);
+        }
+
+        if (chain_sliders.size() > 0)
+        {
+            ui_menu_item item;
+            item.text = MENU_SEPARATOR_ITEM;
+            item.subtext = "";
+            item.flags = 0;
+            item.ref = nullptr;
+            item.type = ui_menu_item_type::UI_MENU_ITEM_TYPE_SEPARATOR;
+        	
+            sliders.push_back(item);
+		}
     }
-    if (*tailptr != nullptr) {
-        (*tailptr)->next = nullptr;
-    }
-    return listhead;
+
+    return sliders;
 }

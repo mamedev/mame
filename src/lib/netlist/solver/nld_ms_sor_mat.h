@@ -128,8 +128,8 @@ int matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newt
 
 	int  resched_cnt = 0;
 
-	this->build_LE_A();
-	this->build_LE_RHS();
+	this->build_LE_A(*this);
+	this->build_LE_RHS(*this);
 
 #if 0
 	static int ws_cnt = 0;

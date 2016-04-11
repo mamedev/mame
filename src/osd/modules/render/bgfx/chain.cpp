@@ -14,18 +14,23 @@
 #include "parameter.h"
 #include "entryuniform.h"
 #include "texturemanager.h"
+#include "targetmanager.h"
+#include "target.h"
 #include "vertex.h"
-#include "window.h"
+#include "modules/osdwindow.h"
 
 #include "chain.h"
 
-bgfx_chain::bgfx_chain(std::string name, std::string author, std::vector<bgfx_slider*> sliders, std::vector<bgfx_parameter*> params, std::vector<bgfx_chain_entry*> entries)
+bgfx_chain::bgfx_chain(std::string name, std::string author, target_manager& targets, std::vector<bgfx_slider*> sliders, std::vector<bgfx_parameter*> params, std::vector<bgfx_chain_entry*> entries, std::vector<bgfx_target*> target_list, std::uint32_t screen_index)
 	: m_name(name)
 	, m_author(author)
+	, m_targets(targets)
 	, m_sliders(sliders)
 	, m_params(params)
 	, m_entries(entries)
+	, m_target_list(target_list)
 	, m_current_time(0)
+	, m_screen_index(screen_index)
 {
 	for (bgfx_slider* slider : m_sliders)
 	{
@@ -46,6 +51,10 @@ bgfx_chain::~bgfx_chain()
 	for (bgfx_chain_entry* entry : m_entries)
 	{
 		delete entry;
+	}
+	for (bgfx_target* target : m_target_list)
+	{
+		m_targets.destroy_target(target->name(), m_screen_index);
 	}
 }
 

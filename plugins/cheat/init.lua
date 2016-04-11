@@ -23,9 +23,13 @@
 --   },
 --   "screen": {
 --     "varname": "tag"
---     },
+--   },
 --     ...
 --   "region": {
+--     "varname": "tag",
+--     ...
+--   },
+--   "ram": {
 --     "varname": "tag",
 --     ...
 --   },
@@ -159,7 +163,7 @@ function cheat.startplugin()
 			script = load(script, cheat.desc .. name, "t", cheat.cheat_env)
 			if not script then
 				print("error loading cheat script: " .. cheat.desc)
-				cheat = { desc = cheat.desc .. "error" }
+				cheat = { desc = cheat.desc .. " error" }
 				return
 			end
 			cheat.script[name] = script
@@ -174,7 +178,7 @@ function cheat.startplugin()
 				cpu = manager:machine().devices[space.tag]
 				if not cpu then
 					print("error loading cheat script: " .. cheat.desc)
-					cheat = { desc = cheat.desc .. "error" }
+					cheat = { desc = cheat.desc .. " error" }
 					return
 				end
 				if space.type then
@@ -184,7 +188,7 @@ function cheat.startplugin()
 				end
 				if not mem then
 					print("error loading cheat script: " .. cheat.desc)
-					cheat = { desc = cheat.desc .. "error" }
+					cheat = { desc = cheat.desc .. " error" }
 					return
 				end
 				cheat.cheat_env[name] = mem
@@ -207,10 +211,22 @@ function cheat.startplugin()
 				mem = manager:machine():memory().regions[region]
 				if not mem then
 					print("error loading cheat script: " .. cheat.desc)
-					cheat = nil
+					cheat = { desc = cheat.desc .. " error" }
 					return
 				end
 				cheat.cheat_env[name] = mem
+			end
+		end
+		if cheat.ram then
+			for name, ram in pairs(cheat.ram) do
+				local ram
+				ram = manager:machine().devices[ram]
+				if not ram then
+					print("error loading cheat script: " .. cheat.desc)
+					cheat = { desc = cheat.desc .. " error" }
+					return
+				end
+				cheat.cheat_env[name] = emu.item(ram.items["0/pointer"])
 			end
 		end
 		local param = cheat.parameter
@@ -260,17 +276,17 @@ function cheat.startplugin()
 						menu[num][1] = "---"
 					end
 					menu[num][2] = ""
-					menu[num][3] = 32 -- MENU_FLAG_DISABLE
+					menu[num][3] = "off"
 				elseif not cheat.script.run and not cheat.script.off then
 					menu[num][2] = "Set"
 					menu[num][3] = 0
 				else
 					if cheat.enabled then
 						menu[num][2] = "On"
-						menu[num][3] = 1 -- MENU_FLAG_LEFT_ARROW
+						menu[num][3] = "l"
 					else
 						menu[num][2] = "Off"
-						menu[num][3] = 2 -- MENU_FLAG_RIGHT_ARROW
+						menu[num][3] = "r"
 					end
 				end
 			else
@@ -280,16 +296,16 @@ function cheat.startplugin()
 					else
 						menu[num][2] = "Off"
 					end
-					menu[num][3] = 2
+					menu[num][3] = "r"
 				else
 					if cheat.parameter.item then
 						menu[num][2] = cheat.parameter.item[cheat.parameter.index].text
 					else
 						menu[num][2] = cheat.parameter.value
 					end
-					menu[num][3] = 1
+					menu[num][3] = "l"
 					if cheat.parameter.index < cheat.parameter.last then
-						menu[num][3] = 3
+						menu[num][3] = "lr"
 					end
 				end
 			end
@@ -446,6 +462,18 @@ function cheat.startplugin()
 		end
 		output = {}
 	end)
+
+	local ce = {}
+
+	-- interface to script cheat engine
+	function ce.inject(newcheat)
+		cheats[#cheats + 1] = newcheat
+		parse_cheat(newcheat)
+		manager:machine():popmessage(newcheat.desc .. " added")
+	end
+
+	_G.ce = ce
+
 end
 
 return exports

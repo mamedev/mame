@@ -24,6 +24,9 @@
 #include "vertex.h"
 #include "suppressor.h"
 
+#include "render.h"
+
+
 bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair> inputs, std::vector<bgfx_entry_uniform*> uniforms, target_manager& targets, std::string output)
 	: m_name(name)
 	, m_effect(effect)

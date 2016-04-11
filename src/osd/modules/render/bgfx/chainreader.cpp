@@ -84,16 +84,19 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 	}
 
 	// Create targets
+	std::vector<bgfx_target*> target_list;
 	if (value.HasMember("targets"))
 	{
 		const Value& target_array = value["targets"];
 		// TODO: Move into its own reader
 		for (UINT32 i = 0; i < target_array.Size(); i++)
 		{
-			if (!target_reader::read_from_value(target_array[i], prefix + "targets[" + std::to_string(i) + "]: ", targets, options, screen_index))
+			bgfx_target* target = target_reader::read_from_value(target_array[i], prefix + "targets[" + std::to_string(i) + "]: ", targets, options, screen_index);
+			if (target == nullptr)
 			{
 				return nullptr;
 			}
+			target_list.push_back(target);
 		}
 	}
 
@@ -113,7 +116,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 		}
 	}
 
-	return new bgfx_chain(name, author, sliders, parameters, entries);
+	return new bgfx_chain(name, author, targets, sliders, parameters, entries, target_list, screen_index);
 }
 
 bool chain_reader::validate_parameters(const Value& value, std::string prefix)

@@ -7561,6 +7561,30 @@ ROM_START( kf2k3pcb ) /* Encrypted Set, JAMMA PCB */
 ROM_END
 
 
+
+ROM_START( unkneo )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "EP1.bin", 0x000001, 0x080000, CRC(f353448c) SHA1(f0f966ca15d503e01b40e901765ff0888463b65d) )
+	ROM_LOAD16_BYTE( "EP2.bin", 0x000000, 0x080000, CRC(f25c71ad) SHA1(803fb6cd6a7ada59678ad901ff9788b1e54ddd0c) )
+
+	NEO_SFIX_128K( "s1.s1", CRC(706477a7) SHA1(8cbee7f6832e7edd2dc792ca330420a6a984b879) ) // was a dead AXS512PC 512KB sram card, this data is handcrafted to make the set usable (hence BAD_DUMP)
+
+	NEOGEO_BIOS
+	ROM_REGION( 0x20000, "audiobios", 0 )
+	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) )
+	ROM_REGION( 0x30000, "audiocpu", ROMREGION_ERASE00 )
+	/* not present */
+
+	ROM_REGION( 0x400000, "ymsnd", 0 )
+	ROM_LOAD( "sram.v1", 0x000000, 0x200000, NO_DUMP ) // was a dead AXS2000PC 2MB sram card, battery dead, data lost.
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x2000000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "no3.bin", 0x000000, 0x1000000, CRC(81821826) SHA1(b7c1a53e32633383675206a16c68f6f2ff984865) ) 
+	ROM_LOAD16_BYTE( "no4.bin", 0x000001, 0x1000000, CRC(3601d568) SHA1(800323e52f5d33b402f84d31850b42c688082d67) )
+ROM_END
+
 /*************************************
  *
  *  Bootleg sets
@@ -9902,6 +9926,8 @@ GAME( 1995, marukodq,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neoge
 GAME( 1995, doubledr,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Technos Japan", "Double Dragon (Neo-Geo)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, gowcaizr,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Technos Japan", "Voltage Fighter - Gowcaizer / Choujin Gakuen Gowcaizer", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, sdodgeb,    neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Technos Japan", "Super Dodge Ball / Kunio no Nekketsu Toukyuu Densetsu", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkneo,     neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Technos Japan?", "Unknown Neo-Geo Vs. Fighter (prototype)", MACHINE_SUPPORTS_SAVE ) // same ID code as Voltage Fighter Gowkaizer so probably by Technos
+
 
 /* Tecmo */
 GAME( 1996, tws96,      neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Tecmo", "Tecmo World Soccer '96", MACHINE_SUPPORTS_SAVE )

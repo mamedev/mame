@@ -27,6 +27,10 @@ public:
 	static UINT32 ui_handler(running_machine &machine, render_container *container, UINT32 state);
 
 private:
+	enum {
+		INPUT_GROUPS,
+		INPUT_SPECIFIC,
+	};
 	bool m_menuless_mode;
 	bool m_hidden;
 };

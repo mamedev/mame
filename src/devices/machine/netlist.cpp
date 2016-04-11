@@ -300,9 +300,8 @@ void netlist_mame_device_t::device_start()
 
 	//printf("clock is %d\n", clock());
 
-	m_netlist = global_alloc(netlist_mame_t(*this));
+	m_netlist = global_alloc(netlist_mame_t(*this, "netlist"));
 	m_setup = global_alloc(netlist::setup_t(m_netlist));
-	netlist().init_object(*m_netlist, "netlist");
 	m_setup->init();
 
 	// register additional devices
@@ -325,9 +324,9 @@ void netlist_mame_device_t::device_start()
 	m_setup->start_devices();
 	m_setup->resolve_inputs();
 
-	netlist().save(NAME(m_rem));
-	netlist().save(NAME(m_div));
-	netlist().save(NAME(m_old));
+	netlist().save_item(m_rem, this, "m_rem");
+	netlist().save_item(m_div, this, "m_div");
+	netlist().save_item(m_old, this, "m_old");
 
 	save_state();
 
@@ -348,7 +347,7 @@ void netlist_mame_device_t::device_reset()
 	LOG_DEV_CALLS(("device_reset\n"));
 	m_old = netlist::netlist_time::zero;
 	m_rem = netlist::netlist_time::zero;
-	netlist().do_reset();
+	netlist().reset();
 }
 
 void netlist_mame_device_t::device_stop()

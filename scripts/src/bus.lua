@@ -705,6 +705,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/intv/slot.h,BUSES["INTV_CTRL"] = true
+---------------------------------------------------
+
+if (BUSES["INTV_CTRL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/intv_ctrl/ctrl.cpp",
+		MAME_DIR .. "src/devices/bus/intv_ctrl/ctrl.h",
+		MAME_DIR .. "src/devices/bus/intv_ctrl/handctrl.cpp",
+		MAME_DIR .. "src/devices/bus/intv_ctrl/handctrl.h",
+		MAME_DIR .. "src/devices/bus/intv_ctrl/ecs_ctrl.cpp",
+		MAME_DIR .. "src/devices/bus/intv_ctrl/ecs_ctrl.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/isa/isa.h,BUSES["ISA"] = true
 ---------------------------------------------------
 

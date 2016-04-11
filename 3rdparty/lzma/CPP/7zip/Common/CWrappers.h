@@ -11,7 +11,8 @@ struct CCompressProgressWrap
   ICompressProgress p;
   ICompressProgressInfo *Progress;
   HRESULT Res;
-  CCompressProgressWrap(ICompressProgressInfo *progress);
+  
+  CCompressProgressWrap(ICompressProgressInfo *progress) throw();
 };
 
 struct CSeqInStreamWrap
@@ -19,7 +20,9 @@ struct CSeqInStreamWrap
   ISeqInStream p;
   ISequentialInStream *Stream;
   HRESULT Res;
-  CSeqInStreamWrap(ISequentialInStream *stream);
+  UInt64 Processed;
+  
+  CSeqInStreamWrap(ISequentialInStream *stream) throw();
 };
 
 struct CSeekInStreamWrap
@@ -27,7 +30,8 @@ struct CSeekInStreamWrap
   ISeekInStream p;
   IInStream *Stream;
   HRESULT Res;
-  CSeekInStreamWrap(IInStream *stream);
+  
+  CSeekInStreamWrap(IInStream *stream) throw();
 };
 
 struct CSeqOutStreamWrap
@@ -36,10 +40,11 @@ struct CSeqOutStreamWrap
   ISequentialOutStream *Stream;
   HRESULT Res;
   UInt64 Processed;
-  CSeqOutStreamWrap(ISequentialOutStream *stream);
+  
+  CSeqOutStreamWrap(ISequentialOutStream *stream) throw();
 };
 
-HRESULT SResToHRESULT(SRes res);
+HRESULT SResToHRESULT(SRes res) throw();
 
 struct CByteInBufWrap
 {
@@ -54,9 +59,9 @@ struct CByteInBufWrap
   HRESULT Res;
   
   CByteInBufWrap();
-  ~CByteInBufWrap() { Free();  }
-  void Free();
-  bool Alloc(UInt32 size);
+  ~CByteInBufWrap() { Free(); }
+  void Free() throw();
+  bool Alloc(UInt32 size) throw();
   void Init()
   {
     Lim = Cur = Buf;
@@ -65,7 +70,7 @@ struct CByteInBufWrap
     Res = S_OK;
   }
   UInt64 GetProcessed() const { return Processed + (Cur - Buf); }
-  Byte ReadByteFromNewBlock();
+  Byte ReadByteFromNewBlock() throw();
   Byte ReadByte()
   {
     if (Cur != Lim)
@@ -85,10 +90,10 @@ struct CByteOutBufWrap
   UInt64 Processed;
   HRESULT Res;
   
-  CByteOutBufWrap();
-  ~CByteOutBufWrap() { Free();  }
-  void Free();
-  bool Alloc(size_t size);
+  CByteOutBufWrap() throw();
+  ~CByteOutBufWrap() { Free(); }
+  void Free() throw();
+  bool Alloc(size_t size) throw();
   void Init()
   {
     Cur = Buf;
@@ -97,7 +102,7 @@ struct CByteOutBufWrap
     Res = S_OK;
   }
   UInt64 GetProcessed() const { return Processed + (Cur - Buf); }
-  HRESULT Flush();
+  HRESULT Flush() throw();
   void WriteByte(Byte b)
   {
     *Cur++ = b;

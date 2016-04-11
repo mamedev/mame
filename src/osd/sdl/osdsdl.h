@@ -3,8 +3,6 @@
 #ifndef _osdsdl_h_
 #define _osdsdl_h_
 
-#include "sdlinc.h"
-
 #include "watchdog.h"
 #include "clifront.h"
 #include "modules/lib/osdobj_common.h"
@@ -142,9 +140,6 @@ public:
 	virtual void init(running_machine &machine) override;
 	virtual void update(bool skip_redraw) override;
 
-	// video overridables
-	virtual slider_state *get_slider_list() override;
-
 	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 
@@ -152,13 +147,9 @@ public:
 
 	virtual bool video_init() override;
 	virtual bool window_init() override;
-	virtual bool output_init() override;
-	//virtual bool midi_init();
 
 	virtual void video_exit() override;
 	virtual void window_exit() override;
-	virtual void output_exit() override;
-	//virtual void midi_exit();
 
 	// sdl specific
 	void poll_inputs(running_machine &machine);
@@ -180,7 +171,6 @@ private:
 	sdl_options &m_options;
 
 	watchdog *m_watchdog;
-	slider_state *      m_sliders;
 };
 
 //============================================================

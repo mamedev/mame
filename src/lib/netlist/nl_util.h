@@ -11,6 +11,7 @@
 #include <cmath>
 #include <cstring>
 #include <cstdlib>
+#include <algorithm>
 
 #include "plib/pstring.h"
 #include "plib/plists.h"
@@ -40,26 +41,35 @@ private:
 	nl_math() {};
 
 public:
-	ATTR_HOT inline static float exp(const float x) { return std::exp(x); }
-	ATTR_HOT inline static double abs(const double x) { return std::fabs(x); }
-	ATTR_HOT inline static float abs(const float x) { return std::fabs(x); }
-	ATTR_HOT inline static double log(const double x) { return std::log(x); }
-	ATTR_HOT inline static float log(const float x) { return std::log(x); }
-#if defined(_MSC_VER) && _MSC_VER < 1800
-	ATTR_HOT inline static double e_log1p(const double x) { return nl_math::log(1.0 + x); }
-	ATTR_HOT inline static float e_log1p(const float x) { return nl_math::log(1.0 + x); }
+	template <typename T>
+	static T abs(const T &x) { return std::abs(x); }
+
+	template <typename T>
+	static T max(const T &x, const T &y) { return std::max(x, y); }
+
+	template <typename T>
+	static T min(const T &x, const T &y) { return std::min(x, y); }
+
+	template <typename T>
+	static T log(const T &x) { return std::log(x); }
+
+	#if defined(_MSC_VER) && _MSC_VER < 1800
+	ATTR_HOT inline static double e_log1p(const double &x) { return nl_math::log(1.0 + x); }
+	ATTR_HOT inline static float e_log1p(const float &x) { return nl_math::log(1.0 + x); }
 #else
-	ATTR_HOT inline static double e_log1p(const double x) { return log1p(x); }
-	ATTR_HOT inline static float e_log1p(const float x) { return log1pf(x); }
+	template <typename T>
+	static T e_log1p(const T &x) { return log1p(x); }
 #endif
-	ATTR_HOT inline static double sqrt(const double x) { return std::sqrt(x); }
-	ATTR_HOT inline static float sqrt(const float x) { return std::sqrt(x); }
+
+	template <typename T>
+	static T sqrt(const T &x) { return std::sqrt(x); }
 
 	// this one has an accuracy of better than 5%. That's enough for our purpose
 	// add c3 and it'll be better than 1%
 
 #if 0
-	inline static double fastexp_h(const double x)
+	ATTR_HOT inline static float exp(const float &x) { return std::exp(x); }
+	inline static double fastexp_h(const double &x)
 	{
 		/* static */ const double ln2r = 1.442695040888963387;
 		/* static */ const double ln2  = 0.693147180559945286;
@@ -79,7 +89,7 @@ public:
 			return pow(2.0, t)*e;
 	}
 
-	ATTR_HOT inline static double exp(const double x)
+	ATTR_HOT inline static double exp(const double &x)
 	{
 		if (x<0)
 			return 1.0 / fastexp_h(-x);
@@ -87,7 +97,8 @@ public:
 			return fastexp_h(x);
 	}
 #else
-	ATTR_HOT inline static double exp(const double x)  { return std::exp(x); }
+	template <typename T>
+	static double exp(const T &x)  { return std::exp(x); }
 #endif
 
 };

@@ -33,6 +33,17 @@ char *utf8_from_astring(const CHAR *s);
 WCHAR *wstring_from_utf8(const char *s);
 char *utf8_from_wstring(const WCHAR *s);
 
+struct osd_wstr_deleter
+{
+	void operator () (wchar_t* wstr)
+	{
+		if (wstr != nullptr)
+			osd_free(wstr);
+	}
+};
+
+typedef std::unique_ptr<wchar_t, osd_wstr_deleter> osd_unique_wstr;
+
 #ifdef UNICODE
 #define tstring_from_utf8   wstring_from_utf8
 #define utf8_from_tstring   utf8_from_wstring

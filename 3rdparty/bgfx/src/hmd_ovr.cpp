@@ -17,6 +17,8 @@ namespace bgfx
 
 #if BGFX_CONFIG_DEBUG
 #	define OVR_CHECK(_call) _OVR_CHECK(_call)
+#else
+#	define OVR_CHECK(_call) _call
 #endif // BGFX_CONFIG_DEBUG
 
 	OVR::OVR()
@@ -152,6 +154,7 @@ namespace bgfx
 
 		for (uint32_t ii = 0; ii < 2; ++ii)
 		{
+			m_eyeBuffers[ii]->postRender(m_hmd);
 			result = ovr_CommitTextureSwapChain(m_hmd, m_eyeBuffers[ii]->m_textureSwapChain);
 			if (!OVR_SUCCESS(result) )
 			{

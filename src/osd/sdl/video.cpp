@@ -91,16 +91,6 @@ bool sdl_osd_interface::video_init()
 	return true;
 }
 
-
-//============================================================
-//  get_slider_list
-//============================================================
-
-slider_state *sdl_osd_interface::get_slider_list()
-{
-	return m_sliders;
-}
-
 //============================================================
 //  video_exit
 //============================================================
@@ -115,6 +105,11 @@ void sdl_osd_interface::video_exit()
 //============================================================
 //  sdlvideo_monitor_refresh
 //============================================================
+
+inline osd_rect SDL_Rect_to_osd_rect(const SDL_Rect &r)
+{
+	return osd_rect(r.x, r.y, r.w, r.h);
+}
 
 void sdl_monitor_info::refresh()
 {

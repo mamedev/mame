@@ -479,10 +479,10 @@ public:
 			const pstring &def_param)
 	: base_factory_t(name, classname, def_param), m_setup(setup) {  }
 
-	class dummy : public device_t
+	class wrapper : public device_t
 	{
 	public:
-		dummy(const pstring &dev_name) : device_t(), m_dev_name(dev_name) { }
+		wrapper(const pstring &dev_name) : device_t(), m_dev_name(dev_name) { }
 	protected:
 		virtual void init(netlist_t &anetlist, const pstring &aname) override
 		{
@@ -499,7 +499,7 @@ public:
 
 	ATTR_COLD device_t *Create() override
 	{
-		device_t *r = palloc(dummy(this->name()));
+		device_t *r = palloc(wrapper(this->name()));
 		return r;
 	}
 

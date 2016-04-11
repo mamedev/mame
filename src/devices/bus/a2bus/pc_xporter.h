@@ -44,6 +44,7 @@ protected:
 
 private:
 	UINT8 m_ram[768*1024];
+	UINT8 m_c800_ram[0x400];
 	UINT8 m_regs[0x400];
 	UINT32 m_offset;
 };

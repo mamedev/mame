@@ -11,11 +11,20 @@
 
 #include "emu.h"
 #include "ui/ui.h"
+#include "ui/menu.h"
 #include "osdhelper.h"
 
+// standard windows headers
+#ifdef OSD_WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <windowsx.h>
+#include <mmsystem.h>
+#endif
+
 #ifdef OSD_SDL
-// standard SDL headers
-#include "sdlinc.h"
+// forward declaration
+struct SDL_Window;
 #endif
 
 //============================================================
@@ -132,11 +141,11 @@ public:
 
 	virtual osd_dim get_size() = 0;
 
-#ifdef OSD_SDL
 	virtual osd_monitor_info *monitor() const = 0;
+
+#ifdef OSD_SDL
 	virtual SDL_Window *sdl_window() = 0;
 #else
-	virtual osd_monitor_info *monitor() const = 0;
 	virtual bool win_has_menu() = 0;
 	// FIXME: cann we replace winwindow_video_window_monitor(NULL) with monitor() ?
 	virtual osd_monitor_info *winwindow_video_window_monitor(const osd_rect *proposed) = 0;
@@ -189,21 +198,23 @@ public:
 	virtual int create() = 0;
 	virtual render_primitive_list *get_primitives() = 0;
 
-	virtual slider_state* get_slider_list() { return nullptr; }
+	virtual std::vector<ui_menu_item> get_slider_list() { return m_sliders; }
 	virtual int draw(const int update) = 0;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) { return 0; };
 	virtual void save() { };
 	virtual void record() { };
 	virtual void toggle_fsfx() { };
 	virtual bool sliders_dirty() { return m_sliders_dirty; }
-	virtual bool multi_window_sliders() { return false; }
 
 	static osd_renderer* make_for_type(int mode, osd_window *window, int extra_flags = FLAG_NONE);
 
 protected:
+	virtual void build_slider_list() { }
+
 	/* Internal flags */
 	static const int FI_CHANGED                 = 0x010000;
-	bool        m_sliders_dirty;
+	bool        				m_sliders_dirty;
+	std::vector<ui_menu_item>	m_sliders;
 
 private:
 	osd_window  *m_window;

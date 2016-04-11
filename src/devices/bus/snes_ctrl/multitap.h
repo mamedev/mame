@@ -37,7 +37,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_sms_control_port_interface overrides
+	// device_snes_control_port_interface overrides
 	virtual UINT8 read_pin4() override;
 	virtual UINT8 read_pin5() override;
 	virtual void write_strobe(UINT8 data) override;

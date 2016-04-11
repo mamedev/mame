@@ -3,7 +3,7 @@
 #ifndef __EXTRACT_H
 #define __EXTRACT_H
 
-#include "Windows/FileFind.h"
+#include "../../../Windows/FileFind.h"
 
 #include "../../Archive/IArchive.h"
 
@@ -14,21 +14,37 @@
 
 #include "../Common/LoadCodecs.h"
 
-struct CExtractOptions
+struct CExtractOptionsBase
+{
+  CBoolPair ElimDup;
+  
+  bool PathMode_Force;
+  bool OverwriteMode_Force;
+  NExtract::NPathMode::EEnum PathMode;
+  NExtract::NOverwriteMode::EEnum OverwriteMode;
+  
+  FString OutputDir;
+  CExtractNtOptions NtOptions;
+
+  CExtractOptionsBase():
+      PathMode_Force(false),
+      OverwriteMode_Force(false),
+      PathMode(NExtract::NPathMode::kFullPaths),
+      OverwriteMode(NExtract::NOverwriteMode::kAsk)
+      {}
+};
+
+struct CExtractOptions: public CExtractOptionsBase
 {
   bool StdInMode;
   bool StdOutMode;
   bool YesToAll;
   bool TestMode;
-  bool CalcCrc;
-  NExtract::NPathMode::EEnum PathMode;
-  NExtract::NOverwriteMode::EEnum OverwriteMode;
-  FString OutputDir;
   
   // bool ShowDialog;
   // bool PasswordEnabled;
   // UString Password;
-  #if !defined(_7ZIP_ST) && !defined(_SFX)
+  #ifndef _SFX
   CObjectVector<CProperty> Properties;
   #endif
 
@@ -37,13 +53,10 @@ struct CExtractOptions
   #endif
 
   CExtractOptions():
+      TestMode(false),
       StdInMode(false),
       StdOutMode(false),
-      YesToAll(false),
-      TestMode(false),
-      CalcCrc(false),
-      PathMode(NExtract::NPathMode::kFullPathnames),
-      OverwriteMode(NExtract::NOverwriteMode::kAskBefore)
+      YesToAll(false)
       {}
 };
 
@@ -51,26 +64,31 @@ struct CDecompressStat
 {
   UInt64 NumArchives;
   UInt64 UnpackSize;
+  UInt64 AltStreams_UnpackSize;
   UInt64 PackSize;
   UInt64 NumFolders;
   UInt64 NumFiles;
-  UInt32 CrcSum;
+  UInt64 NumAltStreams;
 
   void Clear()
   {
-    NumArchives = UnpackSize = PackSize = NumFolders = NumFiles = 0;
-    CrcSum = 0;
+    NumArchives = UnpackSize = AltStreams_UnpackSize = PackSize = NumFolders = NumFiles = NumAltStreams = 0;
   }
 };
 
-HRESULT DecompressArchives(
-    CCodecs *codecs, const CIntVector &formatIndices,
+HRESULT Extract(
+    CCodecs *codecs,
+    const CObjectVector<COpenType> &types,
+    const CIntVector &excludedFormats,
     UStringVector &archivePaths, UStringVector &archivePathsFull,
     const NWildcard::CCensorNode &wildcardCensor,
     const CExtractOptions &options,
     IOpenCallbackUI *openCallback,
     IExtractCallbackUI *extractCallback,
+    #ifndef _SFX
+    IHashCalc *hash,
+    #endif
     UString &errorMessage,
-    CDecompressStat &stat);
+    CDecompressStat &st);
 
 #endif

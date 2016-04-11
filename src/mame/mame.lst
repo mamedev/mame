@@ -11806,6 +11806,7 @@ cscg                            // * German
 cscsp                           // * Spanish
 fexcel                          //
 fexcelv                         //
+fscc9                           //
 fscc12                          //
 
 @source:fidel68k.cpp
@@ -28028,6 +28029,7 @@ garoup                          // 0253 (c) 1999 SNK
 ghostlop                        // 0228 GhostLop (prototype) 1996? Data East
 goalx3                          // 0209 (c) 1995 Visco
 gowcaizr                        // 0094 (c) 1995 Technos
+unkneo							// prototype
 gpilots                         // 0020 (c) 1991 SNK
 gpilotsh                        // 0020 (c) 1991 SNK
 gururin                         // 0067 (c) 1994 Face
@@ -29946,6 +29948,7 @@ pc_moglf                        // (c) 1991 Nintendo
 pc_mtoid                        // (c) 1986 Nintendo
 pc_ngai2                        // (c) 1990 Tecmo (Nintendo of America license)
 pc_ngai3                        // (c) 1991 Tecmo (Nintendo of America license)
+pc_ttoon						//
 pc_ngaid                        // (c) 1989 Tecmo (Nintendo of America license)
 pc_pinbt                        // (c) 1988 Rare (Nintendo of America license)
 pc_pwbld                        // (c) 1991 Taito (Nintendo of America license)
@@ -30709,6 +30712,7 @@ raidendxa2                      // (c) 1994 Seibu Kaihatsu + Metrotainment licen
 raidendxch                      //
 raidendxg                       // (c) 1994 Seibu Kaihatsu + Tuning license
 raidendxj                       // (c) 1994 Seibu Kaihatsu
+raidendxja						// (c) 1994 Seibu Kaihatsu
 raidendxk                       // (c) 1994 Seibu Kaihatsu
 raidendxnl                      // (c) 1994 Seibu Kaihatsu
 raidendxu                       // (c) 1994 Seibu Kaihatsu + Fabtek license
@@ -32793,6 +32797,7 @@ neraidou                        // Bootleg?
 skylncr                         // (c) 1995 Bordun International
 sstar97                         // (c) 199? Bordun International
 bdream97                        // Bootleg?
+sonikfig                        // Z Games
 
 @source:skyraid.cpp
 skyraid                         // 009709           1978/03 [6502]
@@ -35817,7 +35822,8 @@ cstlevna                        // (c) 1987 Konami licensed to Nintendo
 drmario                         // (c) 1990 Nintendo
 duckhunt                        // (c) 1985 Nintendo
 excitebk                        // (c) 1984 Nintendo
-excitebka                       // (c) 1984 Nintendo
+excitebko                       // (c) 1984 Nintendo
+excitebkj                       // (c) 1984 Nintendo
 goonies                         // (c) 1986 Konami
 hogalley                        // (c) 1985 Nintendo
 iceclimb                        // (c) 1984 Nintendo

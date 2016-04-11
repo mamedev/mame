@@ -52,9 +52,9 @@ public:
 	struct menu_item {
 		std::string text;
 		std::string subtext;
-		int flags;
+		std::string flags;
 	};
-	std::vector<menu_item> &menu_populate(std::string &menu);
+	void menu_populate(std::string &menu, std::vector<menu_item> &menu_list);
 	bool menu_callback(std::string &menu, int index, std::string event);
 
 	void resume(lua_State *L, int nparam = 0, lua_State *root = nullptr);

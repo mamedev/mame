@@ -51,7 +51,9 @@
 #include <math.h>
 #include <mutex>
 
-#include "bitmap.h"
+#include "emu.h"
+//#include "bitmap.h"
+//#include "screen.h"
 
 //**************************************************************************
 //  CONSTANTS

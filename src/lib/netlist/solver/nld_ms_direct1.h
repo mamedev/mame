@@ -30,8 +30,8 @@ public:
 
 inline int matrix_solver_direct1_t::vsolve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
-	this->build_LE_A();
-	this->build_LE_RHS();
+	this->build_LE_A(*this);
+	this->build_LE_RHS(*this);
 	//NL_VERBOSE_OUT(("{1} {2}\n", new_val, m_RHS[0] / m_A[0][0]);
 
 	nl_double new_val[1] = { RHS(0) / A(0,0) };

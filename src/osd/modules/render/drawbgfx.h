@@ -12,6 +12,7 @@
 
 #include "binpacker.h"
 #include "bgfx/vertex.h"
+#include "sliderdirtynotifier.h"
 
 class texture_manager;
 class target_manager;
@@ -24,7 +25,7 @@ class bgfx_target;
 class bgfx_chain;
 
 /* sdl_info is the information about SDL for the current screen */
-class renderer_bgfx : public osd_renderer
+class renderer_bgfx : public osd_renderer, public slider_dirty_notifier
 {
 public:
 	renderer_bgfx(osd_window *w)
@@ -39,9 +40,10 @@ public:
 	static void exit();
 
 	virtual int create() override;
-	virtual slider_state* get_slider_list() override;
-	virtual bool multi_window_sliders() override { return true; }
-	virtual int draw(const int update) override;
+    virtual int draw(const int update) override;
+
+    virtual std::vector<ui_menu_item> get_slider_list() override;
+    virtual void set_sliders_dirty() override;
 
 #ifdef OSD_SDL
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;

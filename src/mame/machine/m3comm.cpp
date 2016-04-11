@@ -7,7 +7,9 @@
 
 
 // TODO:
-// Find out sources of IRQ 2 (flip comm RAM bank) and IRQ 5 (data frame exchange cycle start signal on MASTER)
+// does IRQ 2 correct ? or it fired at any IO reg write by host
+// IRQ 5 source (data frame exchange cycle start signal on MASTER), can be some timer or 'token acquired' event ?
+// how exactly comm RAM bank flipping works ?
 // Is there any IRQs can be fired to host systems ?
 // Implement NAOMI G1-DMA mode
 // find out and hook actual networking exchange, some sort of token ring ???
@@ -163,6 +165,8 @@ m3comm_device::m3comm_device(const machine_config &mconfig, const char *tag, dev
 
 void m3comm_device::device_start()
 {
+	timer = timer_alloc(TIMER_IRQ5);
+	timer->adjust(attotime::from_usec(10000));
 }
 
 //-------------------------------------------------
@@ -189,6 +193,16 @@ void m3comm_device::device_reset_after_children()
 UINT16 swapb16(UINT16 data)
 {
 	return (data << 8) | (data >> 8);
+}
+
+
+void m3comm_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if(id != TIMER_IRQ5)
+		return;
+
+	m_commcpu->set_input_line(M68K_IRQ_5, ASSERT_LINE);
+	timer.adjust(attotime::from_usec(10000));	// there is it from actually ??????
 }
 
 ///////////// Internal MMIO
@@ -228,6 +242,9 @@ WRITE16_MEMBER(m3comm_device::ctrl_w)
 READ16_MEMBER(m3comm_device::ioregs_r)
 {
 	switch (offset) {
+	case 0x00 / 2:	// UNK, Model3 host wait it to be NZ then write 0
+			// perhaps Model3 IO regs 0-80 mapped not to M68K C0000-80 ? 
+		return 1;
 	case 0x10 / 2:	// receive result/status
 		return 5; // dbg random
 	case 0x18 / 2:	// transmit result/status
@@ -245,18 +262,44 @@ WRITE16_MEMBER(m3comm_device::ioregs_w)
 {
 	switch (offset) {
 	case 0x14 / 2:	// written 80 at data receive enable, 0 then 1 at IRQ6 handler
+		if ((data & 0xFF) != 0x80)
+			m_commcpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 		break;		// it seems one of these ^v is IRQ6 ON/ACK, another is data transfer enable
 	case 0x16 / 2:  // written 8C at data receive enable, 0 at IRQ6 handler
 		if ((data & 0xFF) == 0x8C) {
 			logerror("M3COMM Receive offs %04x size %04x\n", recv_offset, recv_size);
+/*
+			if (!m_line_rx.is_open())
+			{
+				logerror("M3COMM: listen on %s\n", m_localhost);
+				m_line_rx.open(m_localhost);
+			}
+			if (m_line_rx.is_open())
+			{
+				UINT8 *commram = (UINT8*)membank("comm_ram")->base();
+				m_line_rx.read(&commram[recv_offset], recv_size);
+			}
+*/
+		m_commcpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);	// debug hack
 		}
-		m_commcpu->set_input_line(M68K_IRQ_6, ((data & 0xFF) == 0x8C) ? ASSERT_LINE : CLEAR_LINE);	// debug hack
 		break;
 	case 0x1A / 2:	// written 80 at data transmit enable, 0 at IRQ4 handler
 		break;		// it seems one of these ^v is IRQ4 ON/ACK, another is data transfer enable
 	case 0x1C / 2:	// written 8C at data transmit enable, 0 at IRQ4 handler
 		if ((data & 0xFF) == 0x8C) {
 			logerror("M3COMM Send offs %04x size %04x\n", send_offset, send_size);
+/*
+			if (!m_line_tx.is_open())
+			{
+				logerror("M3COMM: connect to %s\n", m_remotehost);
+				m_line_tx.open(m_remotehost);
+			}
+			if (m_line_tx.is_open())
+			{
+				UINT8 *commram = (UINT8*)membank("comm_ram")->base();
+				m_line_tx.write(&commram[send_offset], send_size);
+			}
+*/
 		}
 		m_commcpu->set_input_line(M68K_IRQ_4, ((data & 0xFF) == 0x8C) ? ASSERT_LINE : CLEAR_LINE);	// debug hack
 		break;
@@ -291,12 +334,12 @@ WRITE16_MEMBER(m3comm_device::ioregs_w)
 
 READ16_MEMBER(m3comm_device::m3_m68k_ram_r)
 {
-	UINT16 value = m68k_ram[offset];
+	UINT16 value = m68k_ram[offset];		// FIXME endian
 	return swapb16(value);
 }
 WRITE16_MEMBER(m3comm_device::m3_m68k_ram_w)
 {
-	m68k_ram[offset] = swapb16(data);
+	m68k_ram[offset] = swapb16(data);		// FIXME endian
 }
 READ8_MEMBER(m3comm_device::m3_comm_ram_r)
 {
@@ -317,6 +360,10 @@ WRITE16_MEMBER(m3comm_device::m3_ioregs_w)
 {
 	UINT16 value = swapb16(data);
 	ioregs_w(space, offset, value, swapb16(mem_mask));
+
+	// guess, can be asserted at any reg write
+	if (offset == (0x88 / 2))
+		m_commcpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 }
 
 ////////////// NAOMI inerface
@@ -334,11 +381,11 @@ READ16_MEMBER(m3comm_device::naomi_r)
 //		logerror("M3COMM read @ %08x\n", (naomi_control << 16) | naomi_offset);
 		UINT16 value;
 		if (naomi_control & 1)
-			value = m68k_ram[naomi_offset / 2];
+			value = m68k_ram[naomi_offset / 2];		// FIXME endian
 		else {
 			UINT16 *commram = (UINT16*)membank("comm_ram")->base();
 
-			value = commram[naomi_offset / 2];
+			value = commram[naomi_offset / 2];		// FIXME endian
 		}
 		naomi_offset += 2;
 		return value;
@@ -373,10 +420,10 @@ WRITE16_MEMBER(m3comm_device::naomi_w)
 	case 2:			// 5F7020
 //		logerror("M3COMM write @ %08x %04x\n", (naomi_control << 16) | naomi_offset, data);
 		if (naomi_control & 1)
-			m68k_ram[naomi_offset / 2] = data;
+			m68k_ram[naomi_offset / 2] = data;		// FIXME endian
 		else {
 			UINT16 *commram = (UINT16*)membank("comm_ram")->base();
-			commram[naomi_offset / 2] = data;
+			commram[naomi_offset / 2] = data;		// FIXME endian
 		}
 		naomi_offset += 2;
 		break;

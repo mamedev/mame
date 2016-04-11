@@ -2,7 +2,8 @@
 
 #include "StdAfx.h"
 
-#include "Common/Defs.h"
+#include "../../Common/Defs.h"
+
 #include "OffsetStream.h"
 
 HRESULT COffsetOutStream::Init(IOutStream *stream, UInt64 offset)
@@ -17,14 +18,17 @@ STDMETHODIMP COffsetOutStream::Write(const void *data, UInt32 size, UInt32 *proc
   return _stream->Write(data, size, processedSize);
 }
 
-STDMETHODIMP COffsetOutStream::Seek(Int64 offset, UInt32 seekOrigin,
-    UInt64 *newPosition)
+STDMETHODIMP COffsetOutStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition)
 {
   UInt64 absoluteNewPosition;
   if (seekOrigin == STREAM_SEEK_SET)
+  {
+    if (offset < 0)
+      return HRESULT_WIN32_ERROR_NEGATIVE_SEEK;
     offset += _offset;
+  }
   HRESULT result = _stream->Seek(offset, seekOrigin, &absoluteNewPosition);
-  if (newPosition != NULL)
+  if (newPosition)
     *newPosition = absoluteNewPosition - _offset;
   return result;
 }

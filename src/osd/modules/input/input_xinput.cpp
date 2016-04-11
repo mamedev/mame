@@ -98,7 +98,7 @@ xinput_joystick_device * xinput_api_helper::create_xinput_device(running_machine
 	devinfo = module.devicelist()->create_device1<xinput_joystick_device>(machine, device_name, module, shared_from_this());
 
 	// Set the player ID
-	devinfo->xinput_state.playerIndex = index;
+	devinfo->xinput_state.player_index = index;
 
 	// Assign the caps we captured earlier
 	devinfo->xinput_state.caps = caps;
@@ -125,7 +125,7 @@ void xinput_joystick_device::poll()
 		return;
 
 	// poll the device first
-	HRESULT result = m_xinput_helper->XInputGetState(xinput_state.playerIndex, &xinput_state.xstate);
+	HRESULT result = m_xinput_helper->XInputGetState(xinput_state.player_index, &xinput_state.xstate);
 
 	// If we can't poll the device, skip
 	if (FAILED(result))
@@ -136,27 +136,27 @@ void xinput_joystick_device::poll()
 	for (int povindex = 0; povindex < XINPUT_MAX_POV; povindex++)
 	{
 		int currentPov = xinput_pov_dir[povindex];
-		gamepad.rgbPov[currentPov] = (xinput_state.xstate.Gamepad.wButtons & currentPov) ? 0xFF : 0;
+		gamepad.povs[povindex] = (xinput_state.xstate.Gamepad.wButtons & currentPov) ? 0xFF : 0;
 	}
 
 	// Now do the buttons
 	for (int buttonindex = 0; buttonindex < XINPUT_MAX_BUTTONS; buttonindex++)
 	{
 		int currentButton = xinput_buttons[buttonindex];
-		gamepad.rgbButtons[buttonindex] = (xinput_state.xstate.Gamepad.wButtons & currentButton) ? 0xFF : 0;
+		gamepad.buttons[buttonindex] = (xinput_state.xstate.Gamepad.wButtons & currentButton) ? 0xFF : 0;
 	}
 
 	// Now grab the axis values
 	// Each of the thumbstick axis members is a signed value between -32768 and 32767 describing the position of the thumbstick
-	// However, the Y axis values are inverted from what MAME expects, so multiply by -1 first
-	gamepad.sThumbLX = normalize_absolute_axis(xinput_state.xstate.Gamepad.sThumbLX, XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
-	gamepad.sThumbLY = normalize_absolute_axis(xinput_state.xstate.Gamepad.sThumbLY * -1, XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
-	gamepad.sThumbRX = normalize_absolute_axis(xinput_state.xstate.Gamepad.sThumbRX, XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
-	gamepad.sThumbRY = normalize_absolute_axis(xinput_state.xstate.Gamepad.sThumbRY * -1, XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
+	// However, the Y axis values are inverted from what MAME expects, so negate the value
+	gamepad.left_thumb_x = normalize_absolute_axis(xinput_state.xstate.Gamepad.sThumbLX, XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
+	gamepad.left_thumb_y = normalize_absolute_axis(-xinput_state.xstate.Gamepad.sThumbLY, XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
+	gamepad.right_thumb_x = normalize_absolute_axis(xinput_state.xstate.Gamepad.sThumbRX, XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
+	gamepad.right_thumb_y = normalize_absolute_axis(-xinput_state.xstate.Gamepad.sThumbRY, XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
 
 	// Now the triggers
-	gamepad.bLeftTrigger = normalize_absolute_axis(xinput_state.xstate.Gamepad.bLeftTrigger, -255, 255);
-	gamepad.bRightTrigger = normalize_absolute_axis(xinput_state.xstate.Gamepad.bRightTrigger, -255, 255);
+	gamepad.left_trigger = normalize_absolute_axis(xinput_state.xstate.Gamepad.bLeftTrigger, 0, 255);
+	gamepad.right_trigger = normalize_absolute_axis(xinput_state.xstate.Gamepad.bRightTrigger, 0, 255);
 }
 
 void xinput_joystick_device::reset()
@@ -178,7 +178,7 @@ void xinput_joystick_device::configure()
 			xinput_axis_name[axisnum],
 			xinput_axis_ids[axisnum],
 			generic_axis_get_state,
-			&gamepad.sThumbLX + axisnum);
+			&gamepad.left_thumb_x + axisnum);
 	}
 
 	// Populate the POVs
@@ -189,7 +189,7 @@ void xinput_joystick_device::configure()
 			xinput_pov_names[povnum],
 			ITEM_ID_OTHER_SWITCH,
 			generic_button_get_state,
-			&gamepad.rgbPov[povnum]);
+			&gamepad.povs[povnum]);
 	}
 
 	// populate the buttons
@@ -199,20 +199,20 @@ void xinput_joystick_device::configure()
 			xinput_button_names[butnum],
 			static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum),
 			generic_button_get_state,
-			&gamepad.rgbButtons[butnum]);
+			&gamepad.buttons[butnum]);
 	}
 
 	device()->add_item(
 		"Left Trigger",
 		ITEM_ID_ZAXIS,
 		generic_axis_get_state,
-		&gamepad.bLeftTrigger);
+		&gamepad.left_trigger);
 
 	device()->add_item(
 		"Right Trigger",
 		ITEM_ID_RZAXIS,
 		generic_axis_get_state,
-		&gamepad.bRightTrigger);
+		&gamepad.right_trigger);
 
 	m_configured = true;
 }

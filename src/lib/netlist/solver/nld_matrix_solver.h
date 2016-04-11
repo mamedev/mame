@@ -10,14 +10,16 @@
 
 #include "solver/nld_solver.h"
 
+#include <type_traits>
+
 NETLIB_NAMESPACE_DEVICES_START()
 
 class terms_t
 {
 	P_PREVENT_COPYING(terms_t)
 
-	public:
-	ATTR_COLD terms_t() : m_railstart(0)
+public:
+	ATTR_COLD terms_t() : m_railstart(0), m_last_V(0)
 	{}
 
 	ATTR_COLD void clear()
@@ -48,6 +50,10 @@ class terms_t
 	pvector_t<unsigned> m_nz;   /* all non zero for multiplication */
 	pvector_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
 	pvector_t<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
+
+	/* state */
+	nl_double m_last_V;
+
 private:
 	pvector_t<terminal_t *> m_term;
 	pvector_t<int> m_net_other;
@@ -55,6 +61,7 @@ private:
 	pvector_t<nl_double> m_gt;
 	pvector_t<nl_double> m_Idr;
 	pvector_t<nl_double *> m_other_curanalog;
+
 };
 
 class matrix_solver_t : public device_t
@@ -104,13 +111,27 @@ protected:
 	ATTR_COLD void setup_base(analog_net_t::list_t &nets);
 	void update_dynamic();
 
-	virtual void  add_term(int net_idx, terminal_t *term) = 0;
 	virtual void vsetup(analog_net_t::list_t &nets) = 0;
 	virtual int vsolve_non_dynamic(const bool newton_raphson) = 0;
-	virtual netlist_time compute_next_timestep() = 0;
 
+	/* virtual */ netlist_time compute_next_timestep();
+	/* virtual */ void  add_term(int net_idx, terminal_t *term);
+
+	template <typename T>
+	void store(const T * RESTRICT V);
+	template <typename T>
+	T delta(const T * RESTRICT V);
+
+	template <typename T>
+	void build_LE_A(T & child);
+	template <typename T>
+	void build_LE_RHS(T & child);
+
+	pvector_t<terms_t *> m_terms;
 	pvector_t<analog_net_t *> m_nets;
 	pvector_t<analog_output_t *> m_inps;
+
+	pvector_t<terms_t *> m_rails_temp;
 
 	int m_stat_calculations;
 	int m_stat_newton_raphson;
@@ -138,6 +159,83 @@ private:
 	const eSolverType m_type;
 };
 
+template <typename T>
+T matrix_solver_t::delta(const T * RESTRICT V)
+{
+	/* FIXME: Ideally we should also include currents (RHS) here. This would
+	 * need a revaluation of the right hand side after voltages have been updated
+	 * and thus belong into a different calculation. This applies to all solvers.
+	 */
+
+	const unsigned iN = this->m_terms.size();
+	T cerr = 0;
+	for (unsigned i = 0; i < iN; i++)
+		cerr = nl_math::max(cerr, nl_math::abs(V[i] - (T) this->m_nets[i]->m_cur_Analog));
+	return cerr;
+}
+
+template <typename T>
+void matrix_solver_t::store(const T * RESTRICT V)
+{
+	for (unsigned i = 0, iN=m_terms.size(); i < iN; i++)
+		this->m_nets[i]->m_cur_Analog = V[i];
+}
+
+template <typename T>
+void matrix_solver_t::build_LE_A(T & child)
+{
+	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
+
+	const unsigned iN = child.N();
+	for (unsigned k = 0; k < iN; k++)
+	{
+		for (unsigned i=0; i < iN; i++)
+			child.A(k,i) = 0.0;
+
+		const unsigned terms_count = m_terms[k]->count();
+		const unsigned railstart =  m_terms[k]->m_railstart;
+		const nl_double * RESTRICT gt = m_terms[k]->gt();
+
+		{
+			nl_double akk  = 0.0;
+			for (unsigned i = 0; i < terms_count; i++)
+				akk += gt[i];
+
+			child.A(k,k) = akk;
+		}
+
+		const nl_double * RESTRICT go = m_terms[k]->go();
+		const int * RESTRICT net_other = m_terms[k]->net_other();
+
+		for (unsigned i = 0; i < railstart; i++)
+			child.A(k,net_other[i]) -= go[i];
+	}
+}
+
+template <typename T>
+void matrix_solver_t::build_LE_RHS(T & child)
+{
+	const unsigned iN = child.N();
+	for (unsigned k = 0; k < iN; k++)
+	{
+		nl_double rhsk_a = 0.0;
+		nl_double rhsk_b = 0.0;
+
+		const unsigned terms_count = m_terms[k]->count();
+		const nl_double * RESTRICT go = m_terms[k]->go();
+		const nl_double * RESTRICT Idr = m_terms[k]->Idr();
+		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->other_curanalog();
+
+		for (unsigned i = 0; i < terms_count; i++)
+			rhsk_a = rhsk_a + Idr[i];
+
+		for (unsigned i = m_terms[k]->m_railstart; i < terms_count; i++)
+			//rhsk = rhsk + go[i] * terms[i]->m_otherterm->net().as_analog().Q_Analog();
+			rhsk_b = rhsk_b + go[i] * *other_cur_analog[i];
+
+		child.RHS(k) = rhsk_a + rhsk_b;
+	}
+}
 
 NETLIB_NAMESPACE_DEVICES_END()
 

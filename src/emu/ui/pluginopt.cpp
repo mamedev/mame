@@ -87,12 +87,24 @@ void ui_menu_plugin_opt::handle()
 
 void ui_menu_plugin_opt::populate()
 {
-	std::vector<lua_engine::menu_item> &menu_list = machine().manager().lua()->menu_populate(m_menu);
+	std::vector<lua_engine::menu_item> menu_list;
+	machine().manager().lua()->menu_populate(m_menu, menu_list);
 	FPTR i = 1;
 	for(auto &item : menu_list)
-		item_append(item.text.c_str(), item.subtext.c_str(), item.flags, (void *)i++);
+	{
+		UINT32 flags = 0;
+		if(item.flags == "off")
+			flags = MENU_FLAG_DISABLE;
+		else if(item.flags == "l")
+			flags = MENU_FLAG_LEFT_ARROW;
+		else if(item.flags == "r")
+			flags = MENU_FLAG_RIGHT_ARROW;
+		else if(item.flags == "lr")
+			flags = MENU_FLAG_RIGHT_ARROW | MENU_FLAG_LEFT_ARROW;
+
+		item_append(item.text.c_str(), item.subtext.c_str(), flags, (void *)i++);
+	}
 	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-	global_free(&menu_list);
 }
 
 ui_menu_plugin_opt::~ui_menu_plugin_opt()

@@ -2,7 +2,7 @@
 
 #include "StdAfx.h"
 
-#include "Windows/FileMapping.h"
+#include "FileMapping.h"
 
 namespace NWindows {
 namespace NFile {

@@ -272,33 +272,14 @@ int windows_osd_interface::window_count()
 
 void windows_osd_interface::build_slider_list()
 {
-	m_sliders = nullptr;
-	slider_state* full_list = nullptr;
-	slider_state* curr = nullptr;
+	m_sliders.clear();
+
 	for (win_window_info *window = win_window_list; window != nullptr; window = window->m_next)
 	{
 		// take the sliders of the first window
-		slider_state* window_sliders = window->m_renderer->get_slider_list();
-		if (window_sliders == nullptr)
-		{
-			continue;
-		}
-
-		if (full_list == nullptr)
-		{
-			full_list = curr = window_sliders;
-		}
-		else
-		{
-			curr->next = window_sliders;
-		}
-
-		while (curr->next != nullptr) {
-			curr = curr->next;
-		}
+		std::vector<ui_menu_item> window_sliders = window->m_renderer->get_slider_list();
+		m_sliders.insert(m_sliders.end(), window_sliders.begin(), window_sliders.end());
 	}
-
-	m_sliders = full_list;
 }
 
 //============================================================

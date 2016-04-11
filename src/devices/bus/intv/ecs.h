@@ -6,7 +6,7 @@
 #include "slot.h"
 #include "rom.h"
 #include "sound/ay8910.h"
-
+#include "bus/intv_ctrl/ecs_ctrl.h"
 
 
 // ======================> intv_ecs_device
@@ -21,7 +21,6 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
 	virtual const rom_entry *device_rom_region() const override;
 
 	// reading and writing
@@ -38,9 +37,6 @@ public:
 	// AY8914
 	virtual DECLARE_READ16_MEMBER(read_ay) override;
 	virtual DECLARE_WRITE16_MEMBER(write_ay) override;
-	DECLARE_READ8_MEMBER(ay_porta_r);
-	DECLARE_READ8_MEMBER(ay_portb_r);
-	DECLARE_WRITE8_MEMBER(ay_porta_w);
 
 	// passthru accesses
 	virtual DECLARE_READ16_MEMBER(read_rom04) override { return m_subslot->read_rom04(space, offset, mem_mask); }
@@ -117,28 +113,14 @@ public:
 
 	virtual void late_subslot_setup() override;
 
-	UINT8 intv_control_r(int hand);
-
 private:
 
 	required_device<ay8914_device> m_snd;
 	required_device<intv_cart_slot_device> m_subslot;
-	required_ioport_array<7> m_keybd;
-	required_ioport_array<7> m_synth;
-	required_ioport m_cntrlsel;
-	required_ioport m_options;
-	required_ioport_array<2> m_keypad;
-	required_ioport_array<2> m_disc;
-	required_ioport_array<2> m_discx;
-	required_ioport_array<2> m_discy;
 
 	int m_bank_base[0x10];
-	UINT8 m_psg_porta;
 	bool m_voice_enabled, m_ramd0_enabled, m_ram88_enabled;
 };
-
-
-
 
 
 // device type definition

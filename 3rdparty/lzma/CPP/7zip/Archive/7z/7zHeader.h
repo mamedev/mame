@@ -3,12 +3,12 @@
 #ifndef __7Z_HEADER_H
 #define __7Z_HEADER_H
 
-#include "../../../Common/Types.h"
+#include "../../../Common/MyTypes.h"
 
 namespace NArchive {
 namespace N7z {
 
-const int kSignatureSize = 6;
+const unsigned kSignatureSize = 6;
 extern Byte kSignature[kSignatureSize];
 
 // #define _7Z_VOL
@@ -82,14 +82,65 @@ namespace NID
     kCTime,
     kATime,
     kMTime,
-    kWinAttributes,
+    kWinAttrib,
     kComment,
 
     kEncodedHeader,
 
     kStartPos,
     kDummy
+
+    // kNtSecure,
+    // kParent,
+    // kIsAux
   };
+}
+
+
+const UInt32 k_Copy = 0;
+const UInt32 k_Delta = 3;
+
+const UInt32 k_LZMA2 = 0x21;
+
+const UInt32 k_SWAP2 = 0x20302;
+const UInt32 k_SWAP4 = 0x20304;
+
+const UInt32 k_LZMA  = 0x30101;
+const UInt32 k_PPMD  = 0x30401;
+
+const UInt32 k_Deflate = 0x40108;
+const UInt32 k_BZip2   = 0x40202;
+
+const UInt32 k_BCJ   = 0x3030103;
+const UInt32 k_BCJ2  = 0x303011B;
+const UInt32 k_PPC   = 0x3030205;
+const UInt32 k_IA64  = 0x3030401;
+const UInt32 k_ARM   = 0x3030501;
+const UInt32 k_ARMT  = 0x3030701;
+const UInt32 k_SPARC = 0x3030805;
+
+const UInt32 k_AES   = 0x6F10701;
+
+
+static inline bool IsFilterMethod(UInt64 m)
+{
+  if (m > (UInt64)0xFFFFFFFF)
+    return false;
+  switch ((UInt32)m)
+  {
+    case k_Delta:
+    case k_BCJ:
+    case k_BCJ2:
+    case k_PPC:
+    case k_IA64:
+    case k_ARM:
+    case k_ARMT:
+    case k_SPARC:
+    case k_SWAP2:
+    case k_SWAP4:
+      return true;
+  }
+  return false;
 }
 
 }}

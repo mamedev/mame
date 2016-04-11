@@ -108,6 +108,11 @@ ATTR_COLD matrix_solver_t::matrix_solver_t(const eSolverType type, const solver_
 ATTR_COLD matrix_solver_t::~matrix_solver_t()
 {
 	m_inps.clear_and_free();
+	for (unsigned k = 0; k < m_terms.size(); k++)
+	{
+		pfree(m_terms[k]);
+	}
+
 }
 
 ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
@@ -115,9 +120,14 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 	log().debug("New solver setup\n");
 
 	m_nets.clear();
+	m_terms.clear();
 
 	for (auto & net : nets)
+	{
 		m_nets.push_back(net);
+		m_terms.push_back(palloc(terms_t));
+		m_rails_temp.push_back(palloc(terms_t));
+	}
 
 	for (std::size_t k = 0; k < nets.size(); k++)
 	{
@@ -168,6 +178,9 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 
 						if (net_proxy_output == NULL)
 						{
+							//net_proxy_output = palloc(analog_output_t(*this,
+							//		this->name() + "." + pfmt("m{1}")(m_inps.size())));
+
 							net_proxy_output = palloc(analog_output_t);
 							net_proxy_output->init_object(*this, this->name() + "." + pfmt("m{1}")(m_inps.size()));
 							m_inps.push_back(net_proxy_output);
@@ -307,6 +320,70 @@ ATTR_COLD int matrix_solver_t::get_net_idx(net_t *net)
 			return k;
 	return -1;
 }
+
+ATTR_COLD void matrix_solver_t::add_term(int k, terminal_t *term)
+{
+	if (term->m_otherterm->net().isRailNet())
+	{
+		m_rails_temp[k]->add(term, -1, false);
+	}
+	else
+	{
+		int ot = get_net_idx(&term->m_otherterm->net());
+		if (ot>=0)
+		{
+			m_terms[k]->add(term, ot, true);
+		}
+		/* Should this be allowed ? */
+		else // if (ot<0)
+		{
+			m_rails_temp[k]->add(term, ot, true);
+			log().fatal("found term with missing othernet {1}\n", term->name());
+		}
+	}
+}
+
+netlist_time matrix_solver_t::compute_next_timestep()
+{
+	nl_double new_solver_timestep = m_params.m_max_timestep;
+
+	if (m_params.m_dynamic)
+	{
+		/*
+		 * FIXME: We should extend the logic to use either all nets or
+		 *        only output nets.
+		 */
+		for (unsigned k = 0, iN=m_terms.size(); k < iN; k++)
+		{
+			analog_net_t *n = m_nets[k];
+
+			const nl_double DD_n = (n->Q_Analog() - m_terms[k]->m_last_V);
+			const nl_double hn = current_timestep();
+
+			nl_double DD2 = (DD_n / hn - n->m_DD_n_m_1 / n->m_h_n_m_1) / (hn + n->m_h_n_m_1);
+			nl_double new_net_timestep;
+
+			n->m_h_n_m_1 = hn;
+			n->m_DD_n_m_1 = DD_n;
+			if (nl_math::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
+				new_net_timestep = nl_math::sqrt(m_params.m_lte / nl_math::abs(NL_FCONST(0.5)*DD2));
+			else
+				new_net_timestep = m_params.m_max_timestep;
+
+			if (new_net_timestep < new_solver_timestep)
+				new_solver_timestep = new_net_timestep;
+
+			m_terms[k]->m_last_V = n->Q_Analog();
+		}
+		if (new_solver_timestep < m_params.m_min_timestep)
+			new_solver_timestep = m_params.m_min_timestep;
+	}
+	//if (new_solver_timestep > 10.0 * hn)
+	//    new_solver_timestep = 10.0 * hn;
+	return netlist_time::from_double(new_solver_timestep);
+}
+
+
 
 void matrix_solver_t::log_stats()
 {

@@ -404,25 +404,24 @@ int m7z_file_impl::search(
 		bool matchname,
 		bool partialpath)
 {
-	for ( ; i < m_db.db.NumFiles; i++)
+	for ( ; i < m_db.NumFiles; i++)
 	{
-		const CSzFileItem &f(m_db.db.Files[i]);
-
 		make_utf8_name(i);
-		const std::uint64_t size(f.Size);
-		const std::uint32_t crc(f.Crc);
-		const bool crcmatch(crc == search_crc);
+		bool const is_dir(SzArEx_IsDir(&m_db, i));
+		const std::uint64_t size(SzArEx_GetFileSize(&m_db, i));
+		const std::uint32_t crc(m_db.CRCs.Vals[i]);
+		const bool crcmatch(SzBitArray_Check(m_db.CRCs.Defs, i) && (crc == search_crc));
 		auto const partialoffset(m_utf8_buf.size() - 1 - search_filename.length());
 		bool const partialpossible((m_utf8_buf.size() > (search_filename.length() + 1)) && (m_utf8_buf[partialoffset - 1] == '/'));
 		const bool namematch(
 				!core_stricmp(search_filename.c_str(), &m_utf8_buf[0]) ||
 				(partialpath && partialpossible && !core_stricmp(search_filename.c_str(), &m_utf8_buf[partialoffset])));
 
-		const bool found = ((!matchcrc && !matchname) || !f.IsDir) && (!matchcrc || crcmatch) && (!matchname || namematch);
+		const bool found = ((!matchcrc && !matchname) || !is_dir) && (!matchcrc || crcmatch) && (!matchname || namematch);
 		if (found)
 		{
 			m_curr_file_idx = i;
-			m_curr_is_dir = bool(f.IsDir);
+			m_curr_is_dir = is_dir;
 			m_curr_name = &m_utf8_buf[0];
 			m_curr_length = size;
 			m_curr_crc = crc;

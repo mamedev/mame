@@ -144,7 +144,6 @@ protected:
 	ATTR_ALIGN nl_double m_last_RHS[_storage_N]; // right hand side - contains currents
 	ATTR_ALIGN nl_double m_last_V[_storage_N];
 
-	terms_t **m_terms;
 	terms_t *m_rails_temp;
 
 private:
@@ -161,11 +160,6 @@ private:
 template <unsigned m_N, unsigned _storage_N>
 matrix_solver_direct_t<m_N, _storage_N>::~matrix_solver_direct_t()
 {
-	for (unsigned k = 0; k < N(); k++)
-	{
-		pfree(m_terms[k]);
-	}
-	pfree_array(m_terms);
 	pfree_array(m_rails_temp);
 }
 
@@ -608,14 +602,11 @@ matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const solver_par
 , m_dim(size)
 , m_lp_fact(0)
 {
-	m_terms = palloc_array(terms_t *, N());
 	m_rails_temp = palloc_array(terms_t, N());
 
 	for (unsigned k = 0; k < N(); k++)
 	{
-		m_terms[k] = palloc(terms_t);
 		m_last_RHS[k] = 0.0;
-		m_last_V[k] = 0.0;
 	}
 }
 
@@ -625,14 +616,12 @@ matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const eSolverTyp
 , m_dim(size)
 , m_lp_fact(0)
 {
-	m_terms = palloc_array(terms_t *, N());
 	m_rails_temp = palloc_array(terms_t, N());
 
 	for (unsigned k = 0; k < N(); k++)
 	{
 		m_terms[k] = palloc(terms_t);
 		m_last_RHS[k] = 0.0;
-		m_last_V[k] = 0.0;
 	}
 }
 

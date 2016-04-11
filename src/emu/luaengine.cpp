@@ -1738,9 +1738,8 @@ lua_engine::~lua_engine()
 	close();
 }
 
-std::vector<lua_engine::menu_item> &lua_engine::menu_populate(std::string &menu)
+void lua_engine::menu_populate(std::string &menu, std::vector<menu_item> &menu_list)
 {
-	std::vector<menu_item> &menu_list = *global_alloc(std::vector<menu_item>);
 	std::string field = "menu_pop_" + menu;
 	lua_settop(m_lua_state, 0);
 	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
@@ -1748,19 +1747,19 @@ std::vector<lua_engine::menu_item> &lua_engine::menu_populate(std::string &menu)
 	if(!lua_isfunction(m_lua_state, -1))
 	{
 		lua_pop(m_lua_state, 1);
-		return menu_list;
+		return;
 	}
 	if(int error = lua_pcall(m_lua_state, 0, 1, 0))
 	{
 		if(error == 2)
 			printf("%s\n", lua_tostring(m_lua_state, -1));
 		lua_pop(m_lua_state, 1);
-		return menu_list;
+		return;
 	}
 	if(!lua_istable(m_lua_state, -1))
 	{
 		lua_pop(m_lua_state, 1);
-		return menu_list;
+		return;
 	}
 
 	lua_pushnil(m_lua_state);
@@ -1776,14 +1775,13 @@ std::vector<lua_engine::menu_item> &lua_engine::menu_populate(std::string &menu)
 			item.subtext = lua_tostring(m_lua_state, -1);
 			lua_pop(m_lua_state, 1);
 			lua_rawgeti(m_lua_state, -1, 3);
-			item.flags = lua_tointeger(m_lua_state, -1);
+			item.flags = lua_tostring(m_lua_state, -1);
 			lua_pop(m_lua_state, 1);
 			menu_list.push_back(item);
 		}
 		lua_pop(m_lua_state, 1);
 	}
 	lua_pop(m_lua_state, 1);
-	return menu_list;
 }
 
 bool lua_engine::menu_callback(std::string &menu, int index, std::string event)
