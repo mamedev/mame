@@ -11765,6 +11765,9 @@ fb01                            // 1986 FB-01
 @source:fc100.cpp
 fc100                           //
 
+@source:fcscsi.cpp
+fcscsi1                         //
+
 @source:fcombat.cpp
 fcombat                         // (c) 1985 Jaleco
 
