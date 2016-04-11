@@ -21,7 +21,7 @@
 // driver is required to use execute_set_input(SM510_INPUT_LINE_K, state)
 #define SM510_INPUT_LINE_K 0
 
-// 1-bit BA input pin (pull-up)
+// 1-bit BA(aka alpha) input pin (pull-up)
 #define MCFG_SM510_READ_BA_CB(_devcb) \
 	sm510_base_device::set_read_ba_callback(*device, DEVCB_##_devcb);
 
@@ -181,7 +181,7 @@ protected:
 
 	UINT16 get_lcd_row(int column, UINT8* ram);
 	TIMER_CALLBACK_MEMBER(lcd_timer_cb);
-	void init_lcd_driver();
+	virtual void init_lcd_driver();
 
 	// melody controller
 	optional_region_ptr<UINT8> m_melody_rom;
@@ -223,70 +223,70 @@ protected:
 	UINT8 bitmask(UINT16 param);
 
 	// opcode handlers
-	void op_lb();
-	void op_lbl();
-	void op_sbm();
-	void op_exbla();
-	void op_incb();
-	void op_decb();
+	virtual void op_lb();
+	virtual void op_lbl();
+	virtual void op_sbm();
+	virtual void op_exbla();
+	virtual void op_incb();
+	virtual void op_decb();
 
-	void op_atpl();
-	void op_rtn0();
-	void op_rtn1();
-	void op_tl();
-	void op_tml();
-	void op_tm();
-	void op_t();
+	virtual void op_atpl();
+	virtual void op_rtn0();
+	virtual void op_rtn1();
+	virtual void op_tl();
+	virtual void op_tml();
+	virtual void op_tm();
+	virtual void op_t();
 
-	void op_exc();
-	void op_bdc();
-	void op_exci();
-	void op_excd();
-	void op_lda();
-	void op_lax();
-	void op_ptw();
-	void op_wr();
-	void op_ws();
+	virtual void op_exc();
+	virtual void op_bdc();
+	virtual void op_exci();
+	virtual void op_excd();
+	virtual void op_lda();
+	virtual void op_lax();
+	virtual void op_ptw();
+	virtual void op_wr();
+	virtual void op_ws();
 
-	void op_kta();
-	void op_atbp();
-	void op_atx();
-	void op_atl();
-	void op_atfc();
-	void op_atr();
+	virtual void op_kta();
+	virtual void op_atbp();
+	virtual void op_atx();
+	virtual void op_atl();
+	virtual void op_atfc();
+	virtual void op_atr();
 
-	void op_add();
-	void op_add11();
-	void op_adx();
-	void op_coma();
-	void op_rot();
-	void op_rc();
-	void op_sc();
+	virtual void op_add();
+	virtual void op_add11();
+	virtual void op_adx();
+	virtual void op_coma();
+	virtual void op_rot();
+	virtual void op_rc();
+	virtual void op_sc();
 
-	void op_tb();
-	void op_tc();
-	void op_tam();
-	void op_tmi();
-	void op_ta0();
-	void op_tabl();
-	void op_tis();
-	void op_tal();
-	void op_tf1();
-	void op_tf4();
+	virtual void op_tb();
+	virtual void op_tc();
+	virtual void op_tam();
+	virtual void op_tmi();
+	virtual void op_ta0();
+	virtual void op_tabl();
+	virtual void op_tis();
+	virtual void op_tal();
+	virtual void op_tf1();
+	virtual void op_tf4();
 
-	void op_rm();
-	void op_sm();
+	virtual void op_rm();
+	virtual void op_sm();
 
-	void op_pre();
-	void op_sme();
-	void op_rme();
-	void op_tmel();
+	virtual void op_pre();
+	virtual void op_sme();
+	virtual void op_rme();
+	virtual void op_tmel();
 
-	void op_skip();
-	void op_cend();
-	void op_idiv();
-	void op_dr();
-	void op_dta();
+	virtual void op_skip();
+	virtual void op_cend();
+	virtual void op_idiv();
+	virtual void op_dr();
+	virtual void op_dta();
 
 	void op_illegal();
 };
