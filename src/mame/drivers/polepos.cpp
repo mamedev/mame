@@ -724,7 +724,7 @@ static INPUT_PORTS_START( polepos2 )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x04, 0x00, "Speed Unit" )        PORT_DIPLOCATION("SW1:6") /* Set defualt to MPH for "English" regions */
+	PORT_DIPNAME( 0x04, 0x00, "Speed Unit" )        PORT_DIPLOCATION("SW1:6") /* Set default to MPH for "English" regions */
 	PORT_DIPSETTING(    0x00, "mph" )
 	PORT_DIPSETTING(    0x04, "km/h" )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:7")
@@ -763,7 +763,7 @@ static INPUT_PORTS_START( polepos2j )
 	PORT_INCLUDE( polepos2 )
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x04, 0x04, "Speed Unit" )        PORT_DIPLOCATION("SW1:6") /* Set defualt to km/h for Japan */
+	PORT_DIPNAME( 0x04, 0x04, "Speed Unit" )        PORT_DIPLOCATION("SW1:6") /* Set default to km/h for Japan */
 	PORT_DIPSETTING(    0x00, "mph" )
 	PORT_DIPSETTING(    0x04, "km/h" )
 INPUT_PORTS_END

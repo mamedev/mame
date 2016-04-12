@@ -106,7 +106,7 @@ Title Screen Language | Japanese |                       |off|   |*#
                       |   Test   |                           |on |
 ------------------------------------------------------------------
 
-* Denotes Factory Defualts
+* Denotes Factory Defaults
 # English title page doesn't display the Japanese translation of the word "Macross"
 
 

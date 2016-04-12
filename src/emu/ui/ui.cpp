@@ -563,7 +563,7 @@ float ui_manager::get_line_height()
 	// if our font is small-ish, do integral scaling
 	if (raw_font_pixel_height < 24)
 	{
-		// do we want to scale smaller? only do so if we exceed the threshhold
+		// do we want to scale smaller? only do so if we exceed the threshold
 		if (scale_factor <= 1.0f)
 		{
 			if (one_to_one_line_height < UI_MAX_FONT_HEIGHT || raw_font_pixel_height < 12)

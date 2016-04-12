@@ -5375,7 +5375,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0467 ) /* Normal board : Uknown Bonus Poker (PP0467) */
+ROM_START( pepp0467 ) /* Normal board : Unknown Bonus Poker (PP0467) */
 /*
 PayTable   Js+  2P  3K  STR  FL  FH  4K  ?? SF  RF  (Bonus)
 -----------------------------------------------------------

@@ -1896,9 +1896,9 @@ WRITE16_MEMBER(dcs_audio_device:: adsp_control_w )
 
 		case S1_CONTROL_REG:
 			if (((data >> 4) & 3) == 2)
-				logerror("DCS: Oh no!, the data is compresed with u-law encoding\n");
+				logerror("DCS: Oh no!, the data is compressed with u-law encoding\n");
 			if (((data >> 4) & 3) == 3)
-				logerror("DCS: Oh no!, the data is compresed with A-law encoding\n");
+				logerror("DCS: Oh no!, the data is compressed with A-law encoding\n");
 			break;
 
 		case TIMER_SCALE_REG:

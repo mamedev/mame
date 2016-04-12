@@ -510,7 +510,7 @@ void validity_checker::validate_driver()
 	// if we have at least 100 drivers, validate the clone
 	// (100 is arbitrary, but tries to avoid tiny.mak dependencies)
 	if (driver_list::total() > 100 && clone_of == -1 && is_clone)
-		osd_printf_error("Driver is a clone of nonexistant driver %s\n", m_current_driver->parent);
+		osd_printf_error("Driver is a clone of nonexistent driver %s\n", m_current_driver->parent);
 
 	// look for recursive cloning
 	if (clone_of != -1 && &m_drivlist.driver(clone_of) == m_current_driver)
@@ -541,7 +541,7 @@ void validity_checker::validate_driver()
 
 	// check for this driver being compatible with a non-existant driver
 	if (compatible_with != nullptr && m_drivlist.find(m_current_driver->compatible_with) == -1)
-		osd_printf_error("Driver is listed as compatible with nonexistant driver %s\n", m_current_driver->compatible_with);
+		osd_printf_error("Driver is listed as compatible with nonexistent driver %s\n", m_current_driver->compatible_with);
 
 	// check for clone_of and compatible_with being specified at the same time
 	if (m_drivlist.clone(*m_current_driver) != -1 && compatible_with != nullptr)

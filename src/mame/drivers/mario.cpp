@@ -695,7 +695,7 @@ ROM_END
 
 ROM_START( marioo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tma1-c-7f_.7f",     0x0000, 0x2000, CRC(c0c6e014) SHA1(36a04f9ca1c2a583477cb8a6f2ef94e044e08296) ) /* Uknown revision */
+	ROM_LOAD( "tma1-c-7f_.7f",     0x0000, 0x2000, CRC(c0c6e014) SHA1(36a04f9ca1c2a583477cb8a6f2ef94e044e08296) ) /* Unknown revision */
 	ROM_LOAD( "tma1-c-7f_.7e",     0x2000, 0x2000, CRC(116b3856) SHA1(e372f846d0e5a2b9b47ebd0330293fcc8a12363f) )
 	ROM_LOAD( "tma1-c-7f_.7d",     0x4000, 0x2000, CRC(dcceb6c1) SHA1(b19804e69ce2c98cf276c6055c3a250316b96b45) )
 	ROM_LOAD( "tma1-c-7f_.7c",     0xf000, 0x1000, CRC(4a63d96b) SHA1(b09060b2c84ab77cc540a27b8f932cb60ec8d442) )

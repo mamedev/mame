@@ -528,7 +528,7 @@ void namcos10_state::i2c_update()
 			i2c_bit--;
 			if(i2c_bit < 0) {
 				i2cp_mode = I2CP_RECIEVE_ACK_1;
-				logerror("i2c recieved byte %02x\n", i2c_byte);
+				logerror("i2c received byte %02x\n", i2c_byte);
 				i2c_dev_data = 0;
 				data = 0;
 			}
