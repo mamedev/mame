@@ -3323,15 +3323,15 @@
 		<year>1991</year>
 		<manufacturer>Compile</manufacturer>
 	</hash>
-	<hash crc32="850e2cf5" name="Gryzor - Contra">
+	<hash crc32="850e2cf5" name="Contra">
 		<year>1989</year>
 		<manufacturer>Konami</manufacturer>
 	</hash>
-	<hash crc32="ac22c7b7" name="Gryzor - Contra [a2]">
+	<hash crc32="ac22c7b7" name="Contra [a2]">
 		<year>1989</year>
 		<manufacturer>Konami</manufacturer>
 	</hash>
-	<hash crc32="14c46c3c" name="Gryzor - Contra [a]">
+	<hash crc32="14c46c3c" name="Contra [a]">
 		<year>1989</year>
 		<manufacturer>Konami</manufacturer>
 	</hash>
@@ -5268,15 +5268,15 @@
 		<year>19??</year>
 		<manufacturer>MSX Link International</manufacturer>
 	</hash>
-	<hash crc32="c4a1b110" name="Samurai - Ganbare Goemon (Jp)">
+	<hash crc32="c4a1b110" name="Ganbare Goemon (Jp)">
 		<year>1987</year>
 		<manufacturer>Konami</manufacturer>
 	</hash>
-	<hash crc32="eb59d1f6" name="Samurai - Ganbare Goemon (Jp)[a2]">
+	<hash crc32="eb59d1f6" name="Ganbare Goemon (Jp)[a2]">
 		<year>1987</year>
 		<manufacturer>Konami</manufacturer>
 	</hash>
-	<hash crc32="ce7a2090" name="Samurai. Ganbare Goemon (Jp)[a]">
+	<hash crc32="ce7a2090" name="Ganbare Goemon (Jp)[a]">
 		<year>1987</year>
 		<manufacturer>Konami</manufacturer>
 	</hash>
@@ -8222,10 +8222,10 @@
 		<year>19??</year>
 		<manufacturer>Konami</manufacturer>
 	</hash>
-	<hash crc32="7f958990" md5="2516867abfd70ba0b240c9ff55c6c01f" name="Gryzor (Jp-En)[RC-762][aka Contra]">
+	<hash crc32="7f958990" md5="2516867abfd70ba0b240c9ff55c6c01f" name="Contra (Jp-En)[RC-762]">
 		<status>KNOWN BAD DUMP</status>
 	</hash>
-	<hash crc32="4e82660d" md5="855dc91e683d897662c2f676b4dc3e3a" name="Gryzor (Jp-En)[RC-762][aka Contra]">
+	<hash crc32="4e82660d" md5="855dc91e683d897662c2f676b4dc3e3a" name="Contra (Jp-En)[RC-762]">
 		<year>1989</year>
 		<manufacturer>Konami</manufacturer>
 	</hash>
