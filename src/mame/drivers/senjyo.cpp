@@ -601,7 +601,7 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( senjyox_e, senjyo )
-	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_STARFORE, 4000000)   /* 4 MHz? */
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(senjyo_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
@@ -609,7 +609,7 @@ static MACHINE_CONFIG_DERIVED( senjyox_e, senjyo )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( senjyox_a, senjyo )
-	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_STARFORA, 4000000)   /* 4 MHz? */
+	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_YAMATO, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(senjyo_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)

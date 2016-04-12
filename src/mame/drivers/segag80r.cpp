@@ -885,7 +885,7 @@ static MACHINE_CONFIG_DERIVED( monsterb, g80r_base )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( monster2, monsterb )
-	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_MONSTER2, VIDEO_CLOCK/4)
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_SPAT, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state,  segag80r_vblank_start)
