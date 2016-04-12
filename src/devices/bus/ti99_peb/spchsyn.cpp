@@ -117,12 +117,7 @@ WRITE_LINE_MEMBER( ti_speech_synthesizer_device::speech_ready )
 
 void ti_speech_synthesizer_device::device_start()
 {
-}
-
-void ti_speech_synthesizer_device::device_config_complete()
-{
 	m_vsp = subdevice<cd2501e_device>("speechsyn");
-
 	// Need to configure the speech ROM for inverse bit order
 	speechrom_device* mem = subdevice<speechrom_device>("vsm");
 	mem->set_reverse_bit_order(true);
