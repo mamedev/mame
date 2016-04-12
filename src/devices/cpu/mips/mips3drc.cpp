@@ -2062,77 +2062,11 @@ int mips3_device::generate_special(drcuml_block *block, compiler_state *compiler
 			return TRUE;
 
 		case 0x1c:  /* DMULT - MIPS III */
-			// I0: INT64 rshi = (INT32)(rs >> 32);
-			// I1: INT64 rthi = (INT32)(rt >> 32);
-			// I2: INT64 rslo = (UINT32)rs;
-			// I3: INT64 rtlo = (UINT32)rt;
-
-			UML_DSHR(block, I0, R64(RSREG), 32);
-			UML_DSEXT(block, I0, I0, SIZE_DWORD);
-			UML_DSHR(block, I1, R64(RTREG), 32);
-			UML_DSEXT(block, I1, I1, SIZE_DWORD);
-			UML_DMOV(block, I2, R32(RSREG));
-			UML_DMOV(block, I3, R32(RTREG));
-
-			// I4: INT64 mid_prods = (rshi * rtlo) + (rslo + rthi)
-			UML_DMULS(block, I4, I5, I0, I3);
-			UML_DMULS(block, I6, I7, I1, I2);
-			UML_DADD(block, I4, I4, I6);
-
-			// I5: UINT64 lo_prod = rslo * rtlo;
-			UML_DMULU(block, I5, I6, I2, I3);
-
-			// I6: INT64 hi_prod = rshi * rthi;
-			UML_DMULS(block, I6, I7, I0, I1);
-
-			// mid_prods += lo_prod >> 32;
-			UML_DSHR(block, I7, I5, 32);
-			UML_DADD(block, I4, I4, I7);
-
-			// hi = hi_prod + (mid_prods >> 32);
-			UML_DSHR(block, I7, I4, 32);
-			UML_DADD(block, HI64, I6, I7);
-
-			// lo = (UINT32)lo_prod + (mid_prods << 32);
-			UML_DSHL(block, I4, I4, 32);
-			UML_DAND(block, I5, I5, 0x00000000ffffffffL);
-			UML_DADD(block, LO64, I4, I5);
+			UML_DMULS(block, LO64, HI64, R64(RSREG), R64(RTREG));
 			return TRUE;
 
 		case 0x1d:  /* DMULTU - MIPS III */
-			// I0: UINT64 rshi = (INT32)(rs >> 32);
-			// I1: UINT64 rthi = (INT32)(rt >> 32);
-			// I2: UINT64 rslo = (UINT32)rs;
-			// I3: UINT64 rtlo = (UINT32)rt;
-
-			UML_DSHR(block, I0, R64(RSREG), 32);
-			UML_DSHR(block, I1, R64(RTREG), 32);
-			UML_DMOV(block, I2, R32(RSREG));
-			UML_DMOV(block, I3, R32(RTREG));
-
-			// I4: UINT64 mid_prods = (rshi * rtlo) + (rslo + rthi)
-			UML_DMULU(block, I4, I5, I0, I3);
-			UML_DMULU(block, I6, I7, I1, I2);
-			UML_DADD(block, I4, I4, I6);
-
-			// I5: UINT64 lo_prod = rslo * rtlo;
-			UML_DMULU(block, I5, I6, I2, I3);
-
-			// I6: UINT64 hi_prod = rshi * rthi;
-			UML_DMULU(block, I6, I7, I0, I1);
-
-			// mid_prods += lo_prod >> 32;
-			UML_DSHR(block, I7, I5, 32);
-			UML_DADD(block, I4, I4, I7);
-
-			// hi = hi_prod + (mid_prods >> 32);
-			UML_DSHR(block, I7, I4, 32);
-			UML_DADD(block, HI64, I6, I7);
-
-			// lo = (UINT32)lo_prod + (mid_prods << 32);
-			UML_DSHL(block, I4, I4, 32);
-			UML_DAND(block, I5, I5, 0x00000000ffffffffL);
-			UML_DADD(block, LO64, I4, I5);
+			UML_DMULU(block, LO64, HI64, R64(RSREG), R64(RTREG));
 			return TRUE;
 
 		case 0x1a:  /* DIV - MIPS I */
