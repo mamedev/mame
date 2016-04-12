@@ -322,7 +322,7 @@ void isa8_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t m
 void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
 {
 	m_prgspace->install_readwrite_bank(start, end, mask, mirror, tag );
-	machine().root_device().membank(tag)->set_base(data);
+	machine().root_device().membank(siblingtag(tag).c_str())->set_base(data);
 }
 
 void isa8_device::unmap_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror)
@@ -339,7 +339,7 @@ void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t ma
 	} else {
 		m_prgspace->install_read_bank(start, end, mask, mirror, tag);
 		m_prgspace->unmap_write(start, end, mask, mirror);
-		machine().root_device().membank(tag)->set_base(machine().root_device().memregion(dev->subtag(region).c_str())->base());
+		machine().root_device().membank(siblingtag(tag).c_str())->set_base(machine().root_device().memregion(dev->subtag(region).c_str())->base());
 	}
 }
 

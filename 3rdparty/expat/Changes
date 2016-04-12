@@ -1,3 +1,18 @@
+Release 2.1.1 Sat March 12 2016
+        Security fixes:
+            #582: CVE-2015-1283 - Multiple integer overflows in XML_GetBuffer
+
+        Bug fixes:
+            #502: Fix potential null pointer dereference
+            #520: Symbol XML_SetHashSalt was not exported
+            Output of "xmlwf -h" was incomplete
+
+        Other changes
+            #503: Document behavior of calling XML_SetHashSalt with salt 0
+            Minor improvements to man page xmlwf(1)
+            Improvements to the experimental CMake build system
+            libtool now invoked with --verbose
+
 Release 2.1.0 Sat March 24 2012
         - Bug Fixes:
           #1742315: Harmful XML_ParserCreateNS suggestion.
@@ -23,7 +38,7 @@ Release 2.1.0 Sat March 24 2012
           #3312568: CMake support.
           #3446384: Report byte offsets for attr names and values.
         - New Features / API changes:
-          Added new API member XML_SetHashSalt() that allows setting an intial
+          Added new API member XML_SetHashSalt() that allows setting an initial
                 value (salt) for hash calculations. This is part of the fix for
                 bug #3496608 to randomize hash parameters.
           When compiled with XML_ATTR_INFO defined, adds new API member

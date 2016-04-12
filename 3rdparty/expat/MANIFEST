@@ -54,7 +54,7 @@ MANIFEST
 Makefile.in
 README
 configure
-configure.in
+configure.ac
 expat_config.h.in
 expat_config.h.cmake
 expat.pc.in

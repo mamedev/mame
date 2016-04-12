@@ -7,17 +7,17 @@
 [Setup]
 AppName=Expat
 AppId=expat
-AppVersion=2.1.0
-AppVerName=Expat 2.1.0
+AppVersion=2.1.1
+AppVerName=Expat 2.1.1
 AppCopyright=Copyright © 1998-2012 Thai Open Source Software Center, Clark Cooper, and the Expat maintainers
 AppPublisher=The Expat Developers
 AppPublisherURL=http://www.libexpat.org/
 AppSupportURL=http://www.libexpat.org/
 AppUpdatesURL=http://www.libexpat.org/
-UninstallDisplayName=Expat XML Parser 2.1.0
-VersionInfoVersion=2.1.0
+UninstallDisplayName=Expat XML Parser 2.1.1
+VersionInfoVersion=2.1.1
 
-DefaultDirName={pf}\Expat 2.1.0
+DefaultDirName={pf}\Expat 2.1.1
 UninstallFilesDir={app}\Uninstall
 
 Compression=lzma
