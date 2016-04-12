@@ -405,7 +405,7 @@ static MACHINE_CONFIG_DERIVED( pengou, pengo )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pengoe, pengo )
-	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_PENGO, MASTER_CLOCK/6)
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5010, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(pengo_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pengo_state,  vblank_irq)

@@ -910,7 +910,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_SINBADM, VIDEO_CLOCK/4)
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5028, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(sindbadm_portmap)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)

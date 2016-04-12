@@ -491,7 +491,7 @@ void jongkyo_state::machine_reset()
 static MACHINE_CONFIG_START( jongkyo, jongkyo_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SEGA_CPU_JONGKYO,JONGKYO_CLOCK/4)
+	MCFG_CPU_ADD("maincpu", SEGA_315_5084,JONGKYO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(jongkyo_memmap)
 	MCFG_CPU_IO_MAP(jongkyo_portmap)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)

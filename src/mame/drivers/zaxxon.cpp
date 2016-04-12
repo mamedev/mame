@@ -951,7 +951,7 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( szaxxone, zaxxon )
-	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_SZAXXON, MASTER_CLOCK/16)
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaxxon_state,  vblank_int)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -962,7 +962,7 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( futspye, root )
-	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_FUTSPY, MASTER_CLOCK/16)
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5061, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaxxon_state,  vblank_int)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -1004,7 +1004,7 @@ static MACHINE_CONFIG_DERIVED( razmataze, root )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ixion, razmataze )
-	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_SZAXXON, MASTER_CLOCK/16)
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(ixion_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaxxon_state,  vblank_int)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)

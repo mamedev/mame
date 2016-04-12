@@ -135,7 +135,6 @@
   315-5132      My Hero
   315-5135      Heavy Metal &
                 Wonder Boy (set 1a & 3; bootlegs?)
-  ???-????      Lovely Cards
 
 
   Some text found in the ROMs:
@@ -272,19 +271,21 @@ const device_type SEGA_315_5041 = &device_creator<sega_315_5041_device>;
 const device_type SEGA_315_5048 = &device_creator<sega_315_5048_device>;
 const device_type SEGA_315_5093 = &device_creator<sega_315_5093_device>;
 const device_type SEGA_315_5099 = &device_creator<sega_315_5099_device>;
-const device_type SEGA_315_SPAT = &device_creator<sega_315_spat_device>; // unknown part number
 const device_type SEGA_315_5015 = &device_creator<sega_315_5015_device>;
 const device_type SEGA_315_5133 = &device_creator<sega_315_5133_device>; // NOT DECRYPTED YET
+const device_type SEGA_315_5061 = &device_creator<sega_315_5061_device>;
+const device_type SEGA_315_5028 = &device_creator<sega_315_5028_device>;
+const device_type SEGA_315_5084 = &device_creator<sega_315_5084_device>;
+const device_type SEGA_315_5013 = &device_creator<sega_315_5013_device>;
+const device_type SEGA_315_5014 = &device_creator<sega_315_5014_device>;
+const device_type SEGA_315_5018 = &device_creator<sega_315_5018_device>;
+const device_type SEGA_315_5010 = &device_creator<sega_315_5010_device>;
 
 // below are unknown part numbers
-const device_type SEGA_CPU_BUCKROG = &device_creator<sega_cpu_buckrog_device>;
-const device_type SEGA_CPU_SZAXXON = &device_creator<sega_cpu_szaxxon_device>;
-const device_type SEGA_CPU_FUTSPY =  &device_creator<sega_cpu_futspy_device>;
-const device_type SEGA_CPU_YAMATO =  &device_creator<sega_cpu_yamato_device>;
-const device_type SEGA_CPU_PENGO =  &device_creator<sega_cpu_pengo_device>;
+const device_type SEGA_315_SPAT = &device_creator<sega_315_spat_device>; // unknown part number
 const device_type SEGA_CPU_PBACTIO4 =  &device_creator<sega_cpu_pbactio4_device>;
-const device_type SEGA_CPU_SINBADM =  &device_creator<sega_cpu_sinbadm_device>;
-const device_type SEGA_CPU_JONGKYO =  &device_creator<sega_cpu_jongkyo_device>;
+
+
 
 
 segacrpt_z80_device::segacrpt_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
@@ -852,8 +853,8 @@ void sega_315_5133_device::decrypt()
 
 
 
-sega_cpu_buckrog_device::sega_cpu_buckrog_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrpt_z80_device(mconfig, tag, owner, clock) {}
-void sega_cpu_buckrog_device::decrypt()
+sega_315_5014_device::sega_315_5014_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrpt_z80_device(mconfig, tag, owner, clock) {}
+void sega_315_5014_device::decrypt()
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -881,8 +882,8 @@ void sega_cpu_buckrog_device::decrypt()
 
 
 
-sega_cpu_szaxxon_device::sega_cpu_szaxxon_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrpt_z80_device(mconfig, tag, owner, clock) {}
-void sega_cpu_szaxxon_device::decrypt()
+sega_315_5013_device::sega_315_5013_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrpt_z80_device(mconfig, tag, owner, clock) {}
+void sega_315_5013_device::decrypt()
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -910,8 +911,8 @@ void sega_cpu_szaxxon_device::decrypt()
 }
 
 
-sega_cpu_futspy_device::sega_cpu_futspy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrpt_z80_device(mconfig, tag, owner, clock) {}
-void sega_cpu_futspy_device::decrypt()
+sega_315_5061_device::sega_315_5061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrpt_z80_device(mconfig, tag, owner, clock) {}
+void sega_315_5061_device::decrypt()
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -940,8 +941,8 @@ void sega_cpu_futspy_device::decrypt()
 
 
 
-sega_cpu_yamato_device::sega_cpu_yamato_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrpt_z80_device(mconfig, tag, owner, clock) {}
-void sega_cpu_yamato_device::decrypt()
+sega_315_5018_device::sega_315_5018_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrpt_z80_device(mconfig, tag, owner, clock) {}
+void sega_315_5018_device::decrypt()
 {
 
 	static const UINT8 convtable[32][4] =
@@ -971,8 +972,8 @@ void sega_cpu_yamato_device::decrypt()
 }
 
 
-sega_cpu_pengo_device::sega_cpu_pengo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrpt_z80_device(mconfig, tag, owner, clock) {}
-void sega_cpu_pengo_device::decrypt()
+sega_315_5010_device::sega_315_5010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrpt_z80_device(mconfig, tag, owner, clock) {}
+void sega_315_5010_device::decrypt()
 {
 
 	static const UINT8 convtable[32][4] =
@@ -1032,8 +1033,8 @@ void sega_cpu_pbactio4_device::decrypt()
 }
 
 
-sega_cpu_sinbadm_device::sega_cpu_sinbadm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrpt_z80_device(mconfig, tag, owner, clock) {}
-void sega_cpu_sinbadm_device::decrypt()
+sega_315_5028_device::sega_315_5028_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrpt_z80_device(mconfig, tag, owner, clock) {}
+void sega_315_5028_device::decrypt()
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -1061,8 +1062,8 @@ void sega_cpu_sinbadm_device::decrypt()
 }
 
 
-sega_cpu_jongkyo_device::sega_cpu_jongkyo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrpt_z80_device(mconfig, tag, owner, clock) {}
-void sega_cpu_jongkyo_device::decrypt()
+sega_315_5084_device::sega_315_5084_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrpt_z80_device(mconfig, tag, owner, clock) {}
+void sega_315_5084_device::decrypt()
 {
 
 	static const UINT8 convtable[32][4] =

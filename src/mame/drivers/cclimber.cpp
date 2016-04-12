@@ -1090,7 +1090,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( yamato, root )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_YAMATO, MASTER_CLOCK/3/2)  /* 3.072 MHz */
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5018, MASTER_CLOCK/3/2)  /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(yamato_map)
 	MCFG_CPU_IO_MAP(yamato_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cclimber_state,  vblank_irq)
@@ -1121,7 +1121,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( toprollr, cclimber )
 
-	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_YAMATO, MASTER_CLOCK/3/2)  /* 3.072 MHz */
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5018, MASTER_CLOCK/3/2)  /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(toprollr_map)
 	MCFG_CPU_IO_MAP(cclimber_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cclimber_state,  vblank_irq)

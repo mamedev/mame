@@ -972,7 +972,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( buckroge, buckrog )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_BUCKROG, MASTER_CLOCK/4)
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5014, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(buckrog_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
