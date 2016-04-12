@@ -602,9 +602,9 @@ float ui_manager::get_char_width(unicode_char ch)
 //  character string
 //-------------------------------------------------
 
-float ui_manager::get_string_width(const char *s)
+float ui_manager::get_string_width(const char *s, float text_size)
 {
-	return get_font()->utf8string_width(get_line_height(), machine().render().ui_aspect(), s);
+	return get_font()->utf8string_width(get_line_height() * text_size, machine().render().ui_aspect(), s);
 }
 
 
@@ -2682,16 +2682,6 @@ void ui_manager::draw_textured_box(render_container *container, float x0, float 
 	container->add_line(x1, y0, x1, y1, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	container->add_line(x1, y1, x0, y1, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	container->add_line(x0, y1, x0, y0, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-}
-
-//-------------------------------------------------
-//  get_string_width_ex - return the width of a
-//  character string with given text size
-//-------------------------------------------------
-
-float ui_manager::get_string_width_ex(const char *s, float text_size)
-{
-	return get_font()->utf8string_width(get_line_height() * text_size, machine().render().ui_aspect(), s);
 }
 
 //-------------------------------------------------

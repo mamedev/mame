@@ -496,7 +496,6 @@ void ui_menu_select_game::populate()
 			// reset search string
 			m_search[0] = '\0';
 			m_displaylist.clear();
-			m_tmp.clear();
 
 			// if filter is set on category, build category list
 			switch (main_filters::actual)
@@ -505,16 +504,16 @@ void ui_menu_select_game::populate()
 					build_category();
 					break;
 				case FILTER_MANUFACTURER:
-					build_list(m_tmp, c_mnfct::ui[c_mnfct::actual].c_str());
+					build_list(c_mnfct::ui[c_mnfct::actual].c_str());
 					break;
 				case FILTER_YEAR:
-					build_list(m_tmp, c_year::ui[c_year::actual].c_str());
+					build_list(c_year::ui[c_year::actual].c_str());
 					break;
 				case FILTER_CUSTOM:
 					build_custom();
 					break;
 				default:
-					build_list(m_tmp);
+					build_list();
 					break;
 			}
 
@@ -1280,7 +1279,7 @@ void ui_menu_select_game::inkey_configure(const ui_menu_event *m_event)
 //  build list
 //-------------------------------------------------
 
-void ui_menu_select_game::build_list(std::vector<const game_driver *> &s_drivers, const char *filter_text, int filter, bool bioscheck)
+void ui_menu_select_game::build_list(const char *filter_text, int filter, bool bioscheck, std::vector<const game_driver *> s_drivers)
 {
 	int cx = 0;
 	bool cloneof = false;
@@ -1444,13 +1443,13 @@ void ui_menu_select_game::build_custom()
 		switch (filter)
 		{
 			case FILTER_YEAR:
-				build_list(s_drivers, c_year::ui[custfltr::year[count]].c_str(), filter, bioscheck);
+				build_list(c_year::ui[custfltr::year[count]].c_str(), filter, bioscheck, s_drivers);
 				break;
 			case FILTER_MANUFACTURER:
-				build_list(s_drivers, c_mnfct::ui[custfltr::mnfct[count]].c_str(), filter, bioscheck);
+				build_list(c_mnfct::ui[custfltr::mnfct[count]].c_str(), filter, bioscheck, s_drivers);
 				break;
 			default:
-				build_list(s_drivers, nullptr, filter, bioscheck);
+				build_list(nullptr, filter, bioscheck, s_drivers);
 				break;
 		}
 	}
@@ -1462,14 +1461,14 @@ void ui_menu_select_game::build_custom()
 
 void ui_menu_select_game::build_category()
 {
+	m_displaylist.clear();
 	std::vector<int> temp_filter;
 	machine().inifile().load_ini_category(temp_filter);
 
 	for (auto actual : temp_filter)
-		m_tmp.push_back(&driver_list::driver(actual));
+		m_displaylist.push_back(&driver_list::driver(actual));
 
-	std::stable_sort(m_tmp.begin(), m_tmp.end(), sorted_game_list);
-	m_displaylist = m_tmp;
+	std::stable_sort(m_displaylist.begin(), m_displaylist.end(), sorted_game_list);
 }
 
 //-------------------------------------------------
@@ -1780,7 +1779,7 @@ float ui_menu_select_game::draw_left_panel(float x1, float y1, float x2, float y
 	{
 		float origy1 = y1;
 		float origy2 = y2;
-		float text_size = 0.75f;
+		float text_size = machine().ui().options().infos_size();
 		float line_height_max = line_height * text_size;
 		float left_width = 0.0f;
 		int text_lenght = main_filters::length;
@@ -1796,13 +1795,13 @@ float ui_menu_select_game::draw_left_panel(float x1, float y1, float x2, float y
 			line_height_max = line_height * text_size;
 		}
 
-		float text_sign = mui.get_string_width_ex("_# ", text_size);
+		float text_sign = mui.get_string_width("_# ", text_size);
 		for (int x = 0; x < text_lenght; ++x)
 		{
 			float total_width;
 
 			// compute width of left hand side
-			total_width = mui.get_string_width_ex(text[x], text_size);
+			total_width = mui.get_string_width(text[x], text_size);
 			total_width += text_sign;
 
 			// track the maximum
@@ -2076,7 +2075,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 			else if (ui_globals::curdats_view == UI_STORY_LOAD)
 			{
 				// check size
-				float textlen = mui.get_string_width_ex(tempbuf.c_str(), text_size);
+				float textlen = mui.get_string_width(tempbuf.c_str(), text_size);
 				float tmp_size = (textlen > sc) ? text_size * (sc / textlen) : text_size;
 
 				size_t last_underscore = tempbuf.find_last_of("_");
@@ -2106,7 +2105,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 			else if (ui_globals::curdats_view == UI_COMMAND_LOAD || ui_globals::curdats_view == UI_GENERAL_LOAD)
 			{
 				// check size
-				float textlen = mui.get_string_width_ex(tempbuf.c_str(), text_size);
+				float textlen = mui.get_string_width(tempbuf.c_str(), text_size);
 				float tmp_size = (textlen > sc) ? text_size * (sc / textlen) : text_size;
 
 				int first_dspace = (ui_globals::curdats_view == UI_COMMAND_LOAD) ? tempbuf.find("  ") : tempbuf.find(":");

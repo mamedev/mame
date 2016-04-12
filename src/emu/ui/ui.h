@@ -140,7 +140,7 @@ public:
 	render_font *get_font();
 	float get_line_height();
 	float get_char_width(unicode_char ch);
-	float get_string_width(const char *s);
+	float get_string_width(const char *s, float text_size = 1.0f);
 	void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor);
 	void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor);
 	void draw_text(render_container *container, const char *buf, float x, float y);
@@ -185,9 +185,6 @@ public:
 
 	// draw an outlined box with given line color and filled with a texture
 	void draw_textured_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = nullptr, UINT32 flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-
-	// return text string width with given text size
-	float get_string_width_ex(const char *s, float text_size);
 
 private:
 	// instance variables

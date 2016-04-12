@@ -1415,13 +1415,13 @@ float ui_menu_select_software::draw_left_panel(float x1, float y1, float x2, flo
 			line_height = l_height * text_size;
 		}
 
-		float text_sign = mui.get_string_width_ex("_# ", text_size);
+		float text_sign = mui.get_string_width("_# ", text_size);
 		for (int x = 0; x < text_lenght; ++x)
 		{
 			float total_width;
 
 			// compute width of left hand side
-			total_width = mui.get_string_width_ex(text[x], text_size);
+			total_width = mui.get_string_width(text[x], text_size);
 			total_width += text_sign;
 
 			// track the maximum
