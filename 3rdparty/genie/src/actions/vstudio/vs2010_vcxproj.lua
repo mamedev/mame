@@ -847,6 +847,10 @@
 			_p('    <LocalDebuggerWorkingDirectory>%s</LocalDebuggerWorkingDirectory>', path.translate(cfg.debugdir, '\\'))
 			_p('    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>')
 		end
+		if cfg.debugabsolutedir and not vstudio.iswinrt() then
+			_p('    <LocalDebuggerWorkingDirectory>%s</LocalDebuggerWorkingDirectory>', path.translate(cfg.debugabsolutedir, '\\'))
+			_p('    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>')
+		end
 		if cfg.debugargs then
 			_p('    <LocalDebuggerCommandArguments>%s</LocalDebuggerCommandArguments>', table.concat(cfg.debugargs, " "))
 		end
