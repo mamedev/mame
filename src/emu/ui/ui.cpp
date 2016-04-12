@@ -2402,12 +2402,11 @@ static INT32 slider_overyoffset(running_machine &machine, void *arg, int id, std
 
 static INT32 slider_flicker(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
 {
-	vector_device *vector = nullptr;
 	if (newval != SLIDER_NOCHANGE)
-		vector->set_flicker((float)newval * 0.001f);
+		vector_options::s_flicker = (float)newval * 0.001f;
 	if (str)
-		*str = string_format(_("%1$1.2f"), vector->get_flicker());
-	return floor(vector->get_flicker() * 1000.0f + 0.5f);
+		*str = string_format(_("%1$1.2f"), vector_options::s_flicker);
+	return floor(vector_options::s_flicker * 1000.0f + 0.5f);
 }
 
 
@@ -2418,12 +2417,11 @@ static INT32 slider_flicker(running_machine &machine, void *arg, int id, std::st
 
 static INT32 slider_beam_width_min(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
 {
-	vector_device *vector = nullptr;
 	if (newval != SLIDER_NOCHANGE)
-		vector->set_beam_width_min(MIN((float)newval * 0.01f, vector->get_beam_width_max()));
+		vector_options::s_beam_width_min = MIN((float)newval * 0.01f, vector_options::s_beam_width_max);
 	if (str != nullptr)
-		*str = string_format(_("%1$1.2f"), vector->get_beam_width_min());
-	return floor(vector->get_beam_width_min() * 100.0f + 0.5f);
+		*str = string_format(_("%1$1.2f"), vector_options::s_beam_width_min);
+	return floor(vector_options::s_beam_width_min * 100.0f + 0.5f);
 }
 
 
@@ -2434,12 +2432,11 @@ static INT32 slider_beam_width_min(running_machine &machine, void *arg, int id, 
 
 static INT32 slider_beam_width_max(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
 {
-	vector_device *vector = nullptr;
 	if (newval != SLIDER_NOCHANGE)
-		vector->set_beam_width_max(MAX((float)newval * 0.01f, vector->get_beam_width_min()));
+		vector_options::s_beam_width_max = MAX((float)newval * 0.01f, vector_options::s_beam_width_min);
 	if (str != nullptr)
-		*str = string_format(_("%1$1.2f"), vector->get_beam_width_max());
-	return floor(vector->get_beam_width_max() * 100.0f + 0.5f);
+		*str = string_format(_("%1$1.2f"), vector_options::s_beam_width_max);
+	return floor(vector_options::s_beam_width_max * 100.0f + 0.5f);
 }
 
 
@@ -2450,12 +2447,11 @@ static INT32 slider_beam_width_max(running_machine &machine, void *arg, int id, 
 
 static INT32 slider_beam_intensity_weight(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
 {
-	vector_device *vector = nullptr;
 	if (newval != SLIDER_NOCHANGE)
-		vector->set_beam_intensity_weight((float)newval * 0.001f);
+		vector_options::s_beam_intensity_weight = (float)newval * 0.001f;
 	if (str != nullptr)
-		*str = string_format(_("%1$1.2f"), vector->get_beam_intensity_weight());
-	return floor(vector->get_beam_intensity_weight() * 1000.0f + 0.5f);
+		*str = string_format(_("%1$1.2f"), vector_options::s_beam_intensity_weight);
+	return floor(vector_options::s_beam_intensity_weight * 1000.0f + 0.5f);
 }
 
 

@@ -54,6 +54,19 @@
 	"Andrew Caldwell (anti-aliasing)\n" \
 	"- *** -\n"
 
+float vector_options::s_flicker = 0.0f;
+float vector_options::s_beam_width_min = 0.0f;
+float vector_options::s_beam_width_max = 0.0f;
+float vector_options::s_beam_intensity_weight = 0.0f;
+
+void vector_options::init(emu_options& options)
+{
+	s_beam_width_min = options.beam_width_min();
+	s_beam_width_max = options.beam_width_max();
+	s_beam_intensity_weight = options.beam_intensity_weight();
+	s_flicker = options.flicker();
+}
+
 #if 0
 
 #define TEXTURE_LENGTH_BUCKETS      32
@@ -146,66 +159,15 @@ vector_device::vector_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-float vector_device::m_flicker = 0.0f;
-float vector_device::m_beam_width_min = 0.0f;
-float vector_device::m_beam_width_max = 0.0f;
-float vector_device::m_beam_intensity_weight = 0.0f;
-int vector_device::m_vector_index;
-
 void vector_device::device_start()
 {
-	/* Grab the settings for this session */
-	m_beam_width_min = machine().options().beam_width_min();
-	m_beam_width_max = machine().options().beam_width_max();
-	m_beam_intensity_weight = machine().options().beam_intensity_weight();
-	m_flicker = machine().options().flicker();
+	vector_options::init(machine().options());
 
 	m_vector_index = 0;
 
 	/* allocate memory for tables */
 	m_vector_list = make_unique_clear<point[]>(MAX_POINTS);
 }
-
-void vector_device::set_flicker(float newval)
-{
-	m_flicker = newval;
-}
-
-float vector_device::get_flicker()
-{
-	return m_flicker;
-}
-
-void vector_device::set_beam_width_min(float newval)
-{
-	m_beam_width_min = newval;
-}
-
-float vector_device::get_beam_width_min()
-{
-	return m_beam_width_min;
-}
-
-void vector_device::set_beam_width_max(float newval)
-{
-	m_beam_width_max = newval;
-}
-
-float vector_device::get_beam_width_max()
-{
-	return m_beam_width_max;
-}
-
-void vector_device::set_beam_intensity_weight(float newval)
-{
-	m_beam_intensity_weight = newval;
-}
-
-float vector_device::get_beam_intensity_weight()
-{
-	return m_beam_intensity_weight;
-}
-
 
 /*
  * www.dinodini.wordpress.com/2010/04/05/normalized-tunable-sigmoid-functions/
@@ -230,11 +192,11 @@ void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 	m_min_intensity = intensity > 0 ? MIN(m_min_intensity, intensity) : m_min_intensity;
 	m_max_intensity = intensity > 0 ? MAX(m_max_intensity, intensity) : m_max_intensity;
 
-	if (m_flicker && (intensity > 0))
+	if (vector_options::s_flicker && (intensity > 0))
 	{
 		float random = (float)(machine().rand() & 255) / 255.0f; // random value between 0.0 and 1.0
 
-		intensity -= (int)(intensity * random * m_flicker);
+		intensity -= (int)(intensity * random * vector_options::s_flicker);
 
 		intensity = MAX(0, MIN(255, intensity));
 	}
@@ -290,7 +252,7 @@ void vector_device::clear_list(void)
 
 UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 flags = PRIMFLAG_ANTIALIAS(screen.machine().options().antialias() ? 1 : 0) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD) | PRIMFLAG_VECTOR(1);
+	UINT32 flags = PRIMFLAG_ANTIALIAS(machine().options().antialias() ? 1 : 0) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD) | PRIMFLAG_VECTOR(1);
 	const rectangle &visarea = screen.visible_area();
 	float xscale = 1.0f / (65536 * visarea.width());
 	float yscale = 1.0f / (65536 * visarea.height());
@@ -333,12 +295,12 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		else
 		{
 			float intensity = (float)curpoint->intensity / 255.0f;
-			float intensity_weight = normalized_sigmoid(intensity, m_beam_intensity_weight);
+			float intensity_weight = normalized_sigmoid(intensity, vector_options::s_beam_intensity_weight);
 
 			// check for static intensity
 			float beam_width = m_min_intensity == m_max_intensity
-				? m_beam_width_min
-				: m_beam_width_min + intensity_weight * (m_beam_width_max - m_beam_width_min);
+				? vector_options::s_beam_width_min
+				: vector_options::s_beam_width_min + intensity_weight * (vector_options::s_beam_width_max - vector_options::s_beam_width_min);
 
 			// normalize width
 			beam_width *= 1.0f / (float)VECTOR_WIDTH_DENOM;

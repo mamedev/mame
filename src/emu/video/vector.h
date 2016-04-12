@@ -12,6 +12,7 @@
 #define VECTOR_COLOR444(c) \
 	rgb_t(pal4bit((c) >> 8), pal4bit((c) >> 4), pal4bit((c) >> 0))
 
+class vector_device;
 
 /* The vertices are buffered here */
 struct point
@@ -30,6 +31,20 @@ struct point
 	int intensity;
 	int arg1; int arg2; /* start/end in pixel array or clipping info */
 	int status;         /* for dirty and clipping handling */
+};
+
+class vector_options
+{
+public:
+	friend class vector_device;
+
+	static float s_flicker;
+	static float s_beam_width_min;
+	static float s_beam_width_max;
+	static float s_beam_intensity_weight;
+
+protected:
+	static void init(emu_options& options);
 };
 
 class vector_device : public device_t, public device_video_interface
@@ -61,18 +76,13 @@ public:
 	virtual void device_start() override;
 
 private:
-	static float m_flicker;
-	static float m_beam_width_min;
-	static float m_beam_width_max;
-	static float m_beam_intensity_weight;
 	std::unique_ptr<point[]> m_vector_list;
-	static int m_vector_index;
+	int m_vector_index;
 	int m_min_intensity;
 	int m_max_intensity;
 
 	float normalized_sigmoid(float n, float k);
 };
-
 
 // device type definition
 extern const device_type VECTOR;
