@@ -9065,9 +9065,9 @@ outr2                           // 2003.12 Outrun 2 (Rev A)
 outr2st                         // 2004.12 Outrun 2 Special Tours (Rev A)
 scg06nt                         // 2005.12 Sega Golf Club 2006: Next Tours (Rev A)
 vcop3                           // 2003.02.26 Virtua Cop 3 (Rev A)
-wangmd2b                        // 2005.10 Wangan Midnight Maximum Tune 2 (Export) (Rev A)
 wangmid                         // 2004.07 Wangan Midnight Maximum Tune (export) (Rev B)
-wangmid2                        // 2005.04 Wangan Midnight Maximum Tune 2 (Japan)
+wangmid2                        // 2005.10 Wangan Midnight Maximum Tune 2 (Export) (Rev A)
+wangmid2j                       // 2005.04 Wangan Midnight Maximum Tune 2 (Japan)
 
 @source:chinagat.cpp
 chinagat                        // TA-0023 (c) 1988 Taito + Romstar license (US)
