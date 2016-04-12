@@ -680,6 +680,46 @@ WRITE16_MEMBER( segas24_state::iod_w )
 	logerror("IO daughterboard write %02x, %04x & %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
 }
 
+/* HACK for Gain Ground to avoid 'forced free play' issue
+
+Notes from Olivier
+
+The encrypted CPU does:
+
+849c:  moveq #-1, d1
+849e:  move.w 0xa00000, d0
+84a4:  cmp.w 0xa00000, d0
+84aa:  beq.s 84a4
+84ac:  add.w #0x200, d0
+84b0:  andi.w #0xfff, d0
+84b4:  cmp.w 0xa00000, d0 // 16 cycles
+84ba:  dbeq d1, 84b4      // 10 cycles
+84be:  addi.w #0x1b5f, d1
+84c2:  bpl 84c8
+84c4:  st 0x404           // Force freeplay
+84c8:  ...
+
+
+a00000 is the timer 12bit counter.  It is configured to be clocked by
+the hsync pulse.  That code counts how many loops it takes for the
+counter to count 512 times.  The force freeplay happens if the count
+is more than 7007.
+
+Pixel clock is 16MHz, hsync is every 656 pixels, cpu clock is 10MHz.
+So that's 656*10/16=410 cpu clocks per hsync, or 410*512=209902 total.
+With 26 cycles per loop, that's 8073 loops.  Freeplay it is.
+
+So, now what?  Maybe the cpu is 8Mhz, maybe there's a wait time on the
+a00000 access. 
+
+
+*/
+
+TIMER_CALLBACK_MEMBER(segas24_state::gground_hack_timer_callback)
+{
+	m_subcpu->set_clock_scale(1.0f);
+}
+
 
 // Cpu #1 reset control
 
@@ -693,6 +733,11 @@ void segas24_state::reset_reset()
 			m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 //          osd_printf_debug("enable 2nd cpu!\n");
 //          debugger_break(machine);
+			if (m_gground_hack_timer)
+			{
+				m_subcpu->set_clock_scale(0.7f); // reduce clock speed temporarily so a check passes, see notes above
+				m_gground_hack_timer->adjust(attotime::from_seconds(2));
+			}
 
 		} else
 			m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -2450,6 +2495,8 @@ DRIVER_INIT_MEMBER(segas24_state,gground)
 	io_w = &segas24_state::hotrod_io_w;
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
+
+	m_gground_hack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas24_state::gground_hack_timer_callback), this));
 }
 
 DRIVER_INIT_MEMBER(segas24_state,crkdown)
