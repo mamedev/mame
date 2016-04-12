@@ -4030,6 +4030,36 @@ ROM_START( wboy )
 	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
+ROM_START( wboyub ) // seems to be the same as 'wboy' but a different rom layout and external encryption handling
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",        0x0000, 0x8000, CRC(07066b6f) SHA1(1ead373907fd5bd5f4cc003a97218aa582758a00) )
+	ROM_LOAD( "epr-7491.96",  0x8000, 0x4000, CRC(1f7d0efe) SHA1(a1b4f8faf1614f4808df1292209c340f1490adbd) )
+
+	ROM_REGION( 0x10000, "unk", 0 )
+	ROM_LOAD( "0cpu.bin",     0xc000, 0x2000, CRC(a962e6af) SHA1(f46b01db38cdc9c8485d7fe0a344e9f6ed918925) ) /* supposedly the encryption key */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "epr7498a.3",     0x0000, 0x2000, CRC(c198205c) SHA1(d2d5cd154ce6a5a3c6a099b4ab2ea7cc045ab0a1) )
+
+	ROM_REGION( 0xc000, "tiles", 0 )
+	ROM_LOAD( "epr-7497.62",    0x0000, 0x2000, CRC(08d609ca) SHA1(11799e9ef7e6942b304f132b404bff3ed44d524b) )
+	ROM_LOAD( "epr-7496.61",    0x2000, 0x2000, CRC(6f61fdf1) SHA1(21826aebf5835b9f3d9c467c8647809c1bc0d01f) )
+	ROM_LOAD( "epr-7495.64",    0x4000, 0x2000, CRC(6a0d2c2d) SHA1(8c21d7f0768e8dda2b7185f3c510cae4229a4a2e) )
+	ROM_LOAD( "epr-7494.63",    0x6000, 0x2000, CRC(a8e281c7) SHA1(a88b80a7b94ab1401bbf28d7707fdf28a5505127) )
+	ROM_LOAD( "epr-7493.66",    0x8000, 0x2000, CRC(89305df4) SHA1(7a5098624769a31e7512f56831e818bce6a18871) )
+	ROM_LOAD( "epr-7492.65",    0xa000, 0x2000, CRC(60f806b1) SHA1(f91e5868a455dff2bce3c2891a7cfd648957cd73) )
+
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "4.bin",        0x0000, 0x4000, CRC(8b3124e6) SHA1(e90deaa687128c1f0b7e9e6b6d767bd484c7fc61) )
+	ROM_CONTINUE(0x8000,0x4000)
+	ROM_LOAD( "5.bin",        0x4000, 0x4000, CRC(b75278e7) SHA1(5b7c519f32eac40dc46ca5bba03cec1e893b6fcd) )
+	ROM_CONTINUE(0xc000,0x4000)
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+ROM_END
+
+
 
 /* Wonder Boy (Escape, Sega license)
 PCB: 834-3984-09 WONDER BOY
@@ -4240,35 +4270,6 @@ ROM_START( wboyu )
 	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
-ROM_START( wboyub )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	/* this has way more code than the parent sets, I have no idea what to do with it */
-	ROM_LOAD( "1.bin",        0x0000, 0x8000, CRC(07066b6f) SHA1(1ead373907fd5bd5f4cc003a97218aa582758a00) )
-	ROM_LOAD( "4.bin",        0x4000, 0x8000, CRC(8b3124e6) SHA1(e90deaa687128c1f0b7e9e6b6d767bd484c7fc61) )
-	ROM_LOAD( "5.bin",        0x8000, 0x8000, CRC(b75278e7) SHA1(5b7c519f32eac40dc46ca5bba03cec1e893b6fcd) )
-	ROM_LOAD( "epr-7491.96",  0x8000, 0x4000, CRC(1f7d0efe) SHA1(a1b4f8faf1614f4808df1292209c340f1490adbd) )
-	ROM_LOAD( "0cpu.bin",     0xc000, 0x2000, CRC(a962e6af) SHA1(f46b01db38cdc9c8485d7fe0a344e9f6ed918925) ) /* supposedly the encryption key */
-
-	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr7498a.3",     0x0000, 0x2000, CRC(c198205c) SHA1(d2d5cd154ce6a5a3c6a099b4ab2ea7cc045ab0a1) )
-
-	ROM_REGION( 0xc000, "tiles", 0 )
-	ROM_LOAD( "epr-7497.62",    0x0000, 0x2000, CRC(08d609ca) SHA1(11799e9ef7e6942b304f132b404bff3ed44d524b) )
-	ROM_LOAD( "epr-7496.61",    0x2000, 0x2000, CRC(6f61fdf1) SHA1(21826aebf5835b9f3d9c467c8647809c1bc0d01f) )
-	ROM_LOAD( "epr-7495.64",    0x4000, 0x2000, CRC(6a0d2c2d) SHA1(8c21d7f0768e8dda2b7185f3c510cae4229a4a2e) )
-	ROM_LOAD( "epr-7494.63",    0x6000, 0x2000, CRC(a8e281c7) SHA1(a88b80a7b94ab1401bbf28d7707fdf28a5505127) )
-	ROM_LOAD( "epr-7493.66",    0x8000, 0x2000, CRC(89305df4) SHA1(7a5098624769a31e7512f56831e818bce6a18871) )
-	ROM_LOAD( "epr-7492.65",    0xa000, 0x2000, CRC(60f806b1) SHA1(f91e5868a455dff2bce3c2891a7cfd648957cd73) )
-
-	ROM_REGION( 0x10000, "sprites", 0 )
-	ROM_LOAD( "epr-7485.117",   0x0000, 0x4000, CRC(c2891722) SHA1(e4e11c0e9bd0dc121c25349493f2b13d2ff8c807) )
-	ROM_LOAD( "epr-7487.04",    0x4000, 0x4000, CRC(2d3a421b) SHA1(d70440a8703ccface3212cd9544c950b36263e8c) )
-	ROM_LOAD( "epr-7486.110",   0x8000, 0x4000, CRC(8d622c50) SHA1(9a76a50204c618347d3e8eee6cda841becd906eb) )
-	ROM_LOAD( "epr-7488.05",    0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) )
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-ROM_END
 
 ROM_START( wboysys2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -5405,7 +5406,7 @@ GAME( 1986, wboy3,      wboy,     sys1piox_315_5135, wboy3,     system1_state, b
 GAME( 1986, wboy4,      wboy,     sys1piox_315_5162, wboy,      system1_state, bank00,        ROT0,   "Escape (Sega license)", "Wonder Boy (315-5162, 4-D Warriors Conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboyu,      wboy,     sys1pio,           wboyu,     system1_state, bank00,        ROT0,   "Escape (Sega license)", "Wonder Boy (prototype?)", MACHINE_SUPPORTS_SAVE ) // appears to be a very early / unfinished version.
 GAME( 1986, wboy5,      wboy,     sys1piox_315_5135, wboy3,     system1_state, bank00,        ROT0,   "bootleg", "Wonder Boy (set 5, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboyub,     wboy,     sys1piox_315_5135, wboy,      system1_state, bank00,        ROT0,   "bootleg", "Wonder Boy (US bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1986, wboyub,     wboy,     sys1piox_315_5177, wboy,      system1_state, bank00,        ROT0,   "bootleg", "Wonder Boy (US bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, blockgal,   0,        sys1piox,          blockgal,  system1_state, blockgal,      ROT90,  "Sega / Vic Tokai","Block Gal (MC-8123B, 317-0029)", MACHINE_SUPPORTS_SAVE)
 
 /* PIO-based System 1 with ROM banking */
