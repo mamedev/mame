@@ -289,7 +289,7 @@ const device_type SEGA_CPU_PBACTIO4 =  &device_creator<sega_cpu_pbactio4_device>
 
 
 segacrpt_z80_device::segacrpt_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	z80_device(mconfig, SEGACRPT_Z80, "Z80", tag, owner, clock, "z80_sega2", __FILE__),
+	z80_device(mconfig, SEGACRPT_Z80, "Z80 SegaCrypt", tag, owner, clock, "z80_sega", __FILE__),
 	m_decrypted_ptr(nullptr),
 	m_region_ptr(nullptr),
 	m_decode_size(0x8000),
