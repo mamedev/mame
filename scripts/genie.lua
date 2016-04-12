@@ -376,6 +376,16 @@ newoption {
 	}
 }
 
+newoption {
+	trigger = "DEBUG_DIR",
+	description = "Default directory for debugger.",
+}
+
+newoption {
+	trigger = "DEBUG_ARGS",
+	description = "Arguments for running debug build.",
+}
+
 dofile ("extlib.lua")
 
 if _OPTIONS["SHLIB"]=="1" then

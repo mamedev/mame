@@ -342,6 +342,15 @@ end
 
 	configuration { }
 
-	debugdir (MAME_DIR)
-	debugargs ("-window")
+	if _OPTIONS["DEBUG_DIR"]~=nil then
+		debugdir (_OPTIONS["DEBUG_DIR"])
+	else
+		debugdir (MAME_DIR)
+	end
+	if _OPTIONS["DEBUG_ARGS"]~=nil then
+		debugargs (_OPTIONS["DEBUG_ARGS"])
+	else
+		debugargs ("-window")
+	end	
+	
 end
