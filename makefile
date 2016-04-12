@@ -498,15 +498,21 @@ endif
 endif
 
 ifdef TOOLS
+ifneq '$(TOOLS)' '0'
 PARAMS += --with-tools
+endif
 endif
 
 ifdef TESTS
+ifneq '$(TESTS)' '0'
 PARAMS += --with-tests
+endif
 endif
 
 ifdef BENCHMARKS
+ifneq '$(BENCHMARKS)' '0'
 PARAMS += --with-benchmarks
+endif
 endif
 
 ifdef SYMBOLS

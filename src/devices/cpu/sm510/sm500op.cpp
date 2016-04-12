@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Igor
+// copyright-holders:hap
 
 // SM500 opcode handlers
 
@@ -9,6 +9,21 @@
 // instruction set
 
 // RAM address instructions
+
+void sm500_device::op_lb()
+{
+	// LB x: load BM/BL with 4-bit immediate value (partial)
+	// BL bit 2 is clearned, bit 3 is param bit 2|3
+	m_bm = (m_op & 3);
+	m_bl = ((m_op << 1 | m_op) & 8) | (m_op >> 2 & 3);
+}
+
+void sm500_device::op_incb()
+{
+	// INCB: increment BL, skip next on overflow, of 3rd bit!
+	m_bl = (m_bl + 1) & 0xf;
+	m_skip = (m_bl == 8);
+}
 
 
 // ROM address instructions
@@ -78,6 +93,3 @@ void sm500_device::op_comcn()
 
 // Test instructions
 
-void sm500_device::op_ta()
-{
-}

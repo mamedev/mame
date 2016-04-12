@@ -55,7 +55,6 @@ public:
 	DECLARE_WRITE8_MEMBER(angelkds_bgbotscroll_write);
 	DECLARE_WRITE8_MEMBER(angelkds_layer_ctrl_write);
 	DECLARE_DRIVER_INIT(angelkds);
-	DECLARE_DRIVER_INIT(spcpostn);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bgtop_tile_info);
 	TILE_GET_INFO_MEMBER(get_bgbot_tile_info);

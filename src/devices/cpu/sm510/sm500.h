@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Igor
+// copyright-holders:hap
 /*
 
   Sharp SM500 MCU family cores
@@ -55,35 +55,28 @@ protected:
 	virtual void get_opcode_param() override;
 
 	// opcode handlers
-	void op_comcb();
-	void op_ssr();
-	void op_trs();
+	virtual void op_lb() override;
+	virtual void op_incb() override;
+	
+	virtual void op_comcb();
+	virtual void op_ssr();
+	virtual void op_trs();
 
-	void op_pdtw();
-	void op_tw();
-	void op_dtw();
+	virtual void op_pdtw();
+	virtual void op_tw();
+	virtual void op_dtw();
 
-	void op_ats();
-	void op_exksa();
-	void op_exkfa();
+	virtual void op_ats();
+	virtual void op_exksa();
+	virtual void op_exkfa();
 
-	void op_rmf();
-	void op_smf();
-	void op_comcn();
-
-	void op_ta();
-};
-
-
-class kb1013vk12_device : public sm500_device
-{
-public:
-	kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual void op_rmf();
+	virtual void op_smf();
+	virtual void op_comcn();
 };
 
 
 extern const device_type SM500;
-extern const device_type KB1013VK12;
 
 
 #endif /* _SM500_H_ */

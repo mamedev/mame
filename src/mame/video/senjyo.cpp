@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/segacrpt.h"
 #include "includes/senjyo.h"
 
 

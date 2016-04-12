@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "cpu/sm510/sm510.h"
+#include "cpu/sm510/kb1013vk1-2.h"
 #include "sound/speaker.h"
 
 #include "hh_sm510_test.lh" // common test-layout - use external artwork
@@ -477,6 +478,46 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  IM-02 Nu, Pogodi!
+  * KB1013VK1-2, die label V2-2 VK1-2
+
+***************************************************************************/
+
+class nupogodi_state : public hh_sm510_state
+{
+public:
+	nupogodi_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 2;
+	}
+};
+
+// handlers
+
+
+// config
+
+static INPUT_PORTS_START( nupogodi )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( nupogodi, nupogodi_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", KB1013VK12, XTAL_32_768kHz)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Game driver(s)
 
 ***************************************************************************/
@@ -529,6 +570,12 @@ ROM_START( gnwmndon )
 ROM_END
 
 
+ROM_START( nupogodi )
+	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "nupogodi.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+ROM_END
+
+
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1989, kcontra,   0,        0, ktmnt,     ktopgun,   driver_device, 0, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
@@ -538,3 +585,5 @@ CONS( 1989, kgradius,  0,        0, kgradius,  kgradius,  driver_device, 0, "Kon
 CONS( 1989, kloneran,  0,        0, kloneran,  kloneran,  driver_device, 0, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
 
 CONS( 1982, gnwmndon,  0,        0, gnwmndon,  gnwmndon,  driver_device, 0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+
+CONS( 1984, nupogodi,  0,        0, nupogodi,  nupogodi,  driver_device, 0, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )

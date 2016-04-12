@@ -13696,6 +13696,7 @@ kgradius                        // Konami
 kloneran                        // Konami
 ktmnt                           // Konami
 ktopgun                         // Konami
+nupogodi                        //
 
 @source:hh_tms1k.cpp
 amaztron                        // Coleco
@@ -29948,6 +29949,7 @@ pc_moglf                        // (c) 1991 Nintendo
 pc_mtoid                        // (c) 1986 Nintendo
 pc_ngai2                        // (c) 1990 Tecmo (Nintendo of America license)
 pc_ngai3                        // (c) 1991 Tecmo (Nintendo of America license)
+pc_ttoon						//
 pc_ngaid                        // (c) 1989 Tecmo (Nintendo of America license)
 pc_pinbt                        // (c) 1988 Rare (Nintendo of America license)
 pc_pwbld                        // (c) 1991 Taito (Nintendo of America license)
@@ -32796,6 +32798,7 @@ neraidou                        // Bootleg?
 skylncr                         // (c) 1995 Bordun International
 sstar97                         // (c) 199? Bordun International
 bdream97                        // Bootleg?
+sonikfig                        // Z Games
 
 @source:skyraid.cpp
 skyraid                         // 009709           1978/03 [6502]
@@ -33865,6 +33868,7 @@ wboy4                           // 834-5984 (c) 1986 + Escape license (S1)
 wboy5                           // 834-5984 (c) 1986 + Escape license (S1)
 wboyo                           // 834-5984 (c) 1986 + Escape license (S1)
 wboysys2                        // 834-5984  (c) 1986 + Escape license (S1)
+wboysys2a						//
 wboyu                           // 834-5753 (? maybe a conversion) (c) 1986 + Escape license (S1)
 wboyub                          // bootleg of wboyu
 wmatch                          // (c) 1984 (S1)

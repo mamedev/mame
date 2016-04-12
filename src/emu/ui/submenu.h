@@ -15,6 +15,12 @@
 #include "emuopts.h"
 #include "ui/menu.h"
 
+#if defined(UI_WINDOWS) && !defined(UI_SDL)
+#include "../osd/windows/winmain.h"
+#else
+#include "../osd/modules/lib/osdobj_common.h"
+#endif
+
 //-------------------------------------------------
 //  class ui menu
 //-------------------------------------------------
@@ -37,6 +43,7 @@ public:
 		const char  *name;
 		core_options::entry *entry;
 		core_options (*options);
+		std::vector<std::string> value;
 	};
 
 	ui_submenu(running_machine &machine, render_container *container, std::vector<ui_submenu::option> &suboptions);
@@ -74,9 +81,7 @@ static std::vector<ui_submenu::option> advanced_submenu_options = {
 	{ ui_submenu::EMU,  __("Sleep"),                                   OPTION_SLEEP },
 	{ ui_submenu::EMU,  __("Speed"),                                   OPTION_SPEED },
 	{ ui_submenu::EMU,  __("Refresh speed"),                           OPTION_REFRESHSPEED },
-//};
 
-//static std::vector<ui_submenu::option> rotate_submenu_options = {
 	{ ui_submenu::HEAD, __("Rotation Options") },
 	{ ui_submenu::EMU,  __("Rotate"),                                  OPTION_ROTATE },
 	{ ui_submenu::EMU,  __("Rotate right"),                            OPTION_ROR },
@@ -85,9 +90,7 @@ static std::vector<ui_submenu::option> advanced_submenu_options = {
 	{ ui_submenu::EMU,  __("Auto rotate left"),                        OPTION_AUTOROL },
 	{ ui_submenu::EMU,  __("Flip X"),                                  OPTION_FLIPX },
 	{ ui_submenu::EMU,  __("Flip Y"),                                  OPTION_FLIPY },
-//};
 
-//static std::vector<ui_submenu::option> artwork_submenu_options = {
 	{ ui_submenu::HEAD, __("Artwork Options") },
 	{ ui_submenu::EMU,  __("Artwork Crop"),                            OPTION_ARTWORK_CROP },
 	{ ui_submenu::EMU,  __("Use Backdrops"),                           OPTION_USE_BACKDROPS },
@@ -95,16 +98,12 @@ static std::vector<ui_submenu::option> advanced_submenu_options = {
 	{ ui_submenu::EMU,  __("Use Bezels"),                              OPTION_USE_BEZELS },
 	{ ui_submenu::EMU,  __("Use Control Panels"),                      OPTION_USE_CPANELS },
 	{ ui_submenu::EMU,  __("Use Marquees"),                            OPTION_USE_MARQUEES },
-//};
 
-//static std::vector<ui_submenu::option> state_submenu_options = {
 	{ ui_submenu::HEAD, __("State/Playback Options") },
 	{ ui_submenu::EMU,  __("Automatic save/restore"),                  OPTION_AUTOSAVE },
 	{ ui_submenu::EMU,  __("Bilinear snapshot"),                       OPTION_SNAPBILINEAR },
 	{ ui_submenu::EMU,  __("Burn-in"),                                 OPTION_BURNIN },
-//};
 
-//static std::vector<ui_submenu::option> input_submenu_options = {
 	{ ui_submenu::HEAD, __("Input Options") },
 	{ ui_submenu::EMU,  __("Coin lockout"),                            OPTION_COIN_LOCKOUT },
 	{ ui_submenu::EMU,  __("Mouse"),                                   OPTION_MOUSE },
@@ -120,6 +119,35 @@ static std::vector<ui_submenu::option> advanced_submenu_options = {
 	{ ui_submenu::EMU,  __("Natural keyboard"),                        OPTION_NATURAL_KEYBOARD },
 	{ ui_submenu::EMU,  __("Simultaneous contradictory"),              OPTION_JOYSTICK_CONTRADICTORY },
 	{ ui_submenu::EMU,  __("Coin impulse"),                            OPTION_COIN_IMPULSE },
+};
+
+static std::vector<ui_submenu::option> control_submenu_options = {
+	{ ui_submenu::HEAD, __("Device Mapping") },
+	{ ui_submenu::EMU,  __("Lightgun Device Assignment"),              OPTION_LIGHTGUN_DEVICE },
+	{ ui_submenu::EMU,  __("Trackball Device Assignment"),             OPTION_TRACKBALL_DEVICE },
+	{ ui_submenu::EMU,  __("Pedal Device Assignment"),                 OPTION_PEDAL_DEVICE },
+	{ ui_submenu::EMU,  __("Adstick Device Assignment"),               OPTION_ADSTICK_DEVICE },
+	{ ui_submenu::EMU,  __("Paddle Device Assignment"),                OPTION_PADDLE_DEVICE },
+	{ ui_submenu::EMU,  __("Dial Device Assignment"),                  OPTION_DIAL_DEVICE },
+	{ ui_submenu::EMU,  __("Positional Device Assignment"),            OPTION_POSITIONAL_DEVICE },
+	{ ui_submenu::EMU,  __("Mouse Device Assignment"),                 OPTION_MOUSE_DEVICE }
+};
+
+static std::vector<ui_submenu::option> video_submenu_options = {
+	{ ui_submenu::HEAD, __("Display Options") },
+	{ ui_submenu::OSD,  __("Video Mode"),                              OSDOPTION_VIDEO },
+#if defined(UI_WINDOWS) && !defined(UI_SDL)
+	{ ui_submenu::OSD,  __("Triple Buffering"),                        WINOPTION_TRIPLEBUFFER },
+	{ ui_submenu::OSD,  __("HLSL"),                                    WINOPTION_HLSL_ENABLE },
+#endif
+	{ ui_submenu::OSD,  __("GLSL"),                                    OSDOPTION_GL_GLSL },
+	{ ui_submenu::OSD,  __("Bilinear Filtering"),                      OSDOPTION_FILTER },
+	{ ui_submenu::OSD,  __("Bitmap Prescaling"),                       OSDOPTION_PRESCALE },
+	{ ui_submenu::OSD,  __("Window Mode"),                             OSDOPTION_WINDOW },
+	{ ui_submenu::EMU,  __("Enforce Aspect Ratio"),                    OPTION_KEEPASPECT },
+	{ ui_submenu::OSD,  __("Start Out Maximized"),                     OSDOPTION_MAXIMIZE },
+	{ ui_submenu::OSD,  __("Synchronized Refresh"),                    OSDOPTION_SYNCREFRESH },
+	{ ui_submenu::OSD,  __("Wait Vertical Sync"),                      OSDOPTION_WAITVSYNC }
 };
 
 //static std::vector<ui_submenu::option> export_submenu_options = {

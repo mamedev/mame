@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Igor
+// copyright-holders:hap
 /*
 
   Sharp SM500 MCU core implementation
@@ -15,18 +15,21 @@ const device_type SM500 = &device_creator<sm500_device>;
 
 
 // internal memory maps
-static ADDRESS_MAP_START(program_2_7k, AS_PROGRAM, 8, sm510_base_device)
-	AM_RANGE(0x0000, 0x00ff) AM_ROM
+static ADDRESS_MAP_START(program_1_2k, AS_PROGRAM, 8, sm510_base_device)
+	AM_RANGE(0x000, 0x4bf) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_96_32x4, AS_DATA, 8, sm510_base_device)
-	AM_RANGE(0x00, 0x1f) AM_RAM
+static ADDRESS_MAP_START(data_4x10x4, AS_DATA, 8, sm510_base_device)
+	AM_RANGE(0x00, 0x09) AM_RAM
+	AM_RANGE(0x10, 0x19) AM_RAM
+	AM_RANGE(0x20, 0x29) AM_RAM
+	AM_RANGE(0x30, 0x39) AM_RAM
 ADDRESS_MAP_END
 
 
 // device definitions
 sm500_device::sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sm510_base_device(mconfig, SM500, "SM500", tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, ADDRESS_MAP_NAME(program_2_7k), 7 /* data width */, ADDRESS_MAP_NAME(data_96_32x4), "sm500", __FILE__)
+	: sm510_base_device(mconfig, SM500, "SM500", tag, owner, clock, 1 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1_2k), 6 /* data width */, ADDRESS_MAP_NAME(data_4x10x4), "sm500", __FILE__)
 { }
 
 sm500_device::sm500_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
@@ -98,7 +101,7 @@ void sm500_device::execute_one()
 		case 0x0a: op_coma(); break;
 		case 0x0b: op_exbla(); break;
 
-		case 0x50: op_ta(); break;
+		case 0x50: op_tal(); break; // aka ta: test alpha
 		case 0x51: op_tb(); break;
 		case 0x52: op_tc(); break;
 		case 0x53: op_tam(); break;

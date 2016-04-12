@@ -63,6 +63,7 @@ public:
 			{
 				ptr result;
 				std::swap(s_cache[cachenum], result);
+				osd_printf_verbose("unzip: found %s in cache\n", filename.c_str());
 				return result;
 			}
 		}
@@ -84,23 +85,52 @@ public:
 			return ziperr;
 
 		// verify that we can work with this zipfile (no disk spanning allowed)
-		if ((m_ecd.disk_number != m_ecd.cd_start_disk_number) ||
-			(m_ecd.cd_disk_entries != m_ecd.cd_total_entries) ||
-			(std::size_t(m_ecd.cd_size) != m_ecd.cd_size))
+		if (m_ecd.disk_number != m_ecd.cd_start_disk_number)
+		{
+			osd_printf_error("unzip: %s central directory starts in another segment\n", m_filename.c_str());
 			return archive_file::error::UNSUPPORTED;
+		}
+		if (m_ecd.cd_disk_entries != m_ecd.cd_total_entries)
+		{
+			osd_printf_error("unzip: %s not all central directory entries reside in this segment\n", m_filename.c_str());
+			return archive_file::error::UNSUPPORTED;
+		}
+		if (std::size_t(m_ecd.cd_size) != m_ecd.cd_size)
+		{
+			osd_printf_error("unzip: %s central directory too large to load\n", m_filename.c_str());
+			return archive_file::error::UNSUPPORTED;
+		}
 
 		// allocate memory for the central directory
 		try { m_cd.resize(std::size_t(m_ecd.cd_size)); }
-		catch (...) { return archive_file::error::OUT_OF_MEMORY; }
+		catch (...)
+		{
+			osd_printf_error("unzip: %s failed to allocate memory for central directory\n", m_filename.c_str());
+			return archive_file::error::OUT_OF_MEMORY;
+		}
 
 		// read the central directory
-		// FIXME: central directory can theoretically be bigger than maximum 32-bit integer value, should use a loop
-		std::uint32_t read_length;
-		auto const filerr = m_file->read(&m_cd[0], m_ecd.cd_start_disk_offset, m_ecd.cd_size, read_length);
-		if (filerr != osd_file::error::NONE)
-			return archive_file::error::FILE_ERROR;
-		if (read_length != m_ecd.cd_size)
-			return archive_file::error::FILE_TRUNCATED;
+		auto cd_remaining(m_ecd.cd_size);
+		std::size_t cd_offs(0);
+		while (cd_remaining)
+		{
+			std::uint32_t const chunk(std::uint32_t((std::min<std::uint64_t>)(std::numeric_limits<std::uint32_t>::max(), cd_remaining)));
+			std::uint32_t read_length(0);
+			auto const filerr = m_file->read(&m_cd[cd_offs], m_ecd.cd_start_disk_offset + cd_offs, chunk, read_length);
+			if (filerr != osd_file::error::NONE)
+			{
+				osd_printf_error("unzip: %s error reading central directory (%d)\n", m_filename.c_str(), int(filerr));
+				return archive_file::error::FILE_ERROR;
+			}
+			if (!read_length)
+			{
+				osd_printf_error("unzip: %s unexpectedly reached end-of-file while reading central directory\n", m_filename.c_str());
+				return archive_file::error::FILE_TRUNCATED;
+			}
+			cd_remaining -= read_length;
+			cd_offs += read_length;
+		}
+		osd_printf_verbose("unzip: read %s central directory\n", m_filename.c_str());
 
 		return archive_file::error::NONE;
 	}
@@ -152,7 +182,15 @@ private:
 		{
 			auto const filerr = osd_file::open(m_filename, OPEN_FLAG_READ, m_file, m_length);
 			if (filerr != osd_file::error::NONE)
+			{
+				// this would spam every time it looks for a non-existent archive, which is a lot
+				//osd_printf_error("unzip: error reopening archive file %s (%d)\n", m_filename.c_str(), int(filerr));
 				return archive_file::error::FILE_ERROR;
+			}
+			else
+			{
+				osd_printf_verbose("unzip: opened archive file %s\n", m_filename.c_str());
+			}
 		}
 		return archive_file::error::NONE;
 	}
@@ -544,6 +582,7 @@ void zip_file_impl::close(ptr &&zip)
 	if (!zip) return;
 
 	// close the open files
+	osd_printf_verbose("unzip: closing archive file %s and sending to cache\n", zip->m_filename.c_str());
 	zip->m_file.reset();
 
 	// find the first NULL entry in the cache
@@ -555,7 +594,11 @@ void zip_file_impl::close(ptr &&zip)
 
 	// if no room left in the cache, free the bottommost entry
 	if (cachenum == s_cache.size())
-		s_cache[--cachenum].reset();
+	{
+		cachenum--;
+		osd_printf_verbose("unzip: removing %s from cache to make space\n", s_cache[cachenum]->m_filename.c_str());
+		s_cache[cachenum].reset();
+	}
 
 	// move everyone else down and place us at the top
 	for ( ; cachenum > 0; cachenum--)
@@ -672,11 +715,17 @@ archive_file::error zip_file_impl::decompress(void *buffer, std::uint32_t length
 
 	// if we don't have enough buffer, error
 	if (length < m_header.uncompressed_length)
+	{
+		osd_printf_error("unzip: buffer too small to decompress %s from %s\n", m_header.file_name.c_str(), m_filename.c_str());
 		return archive_file::error::BUFFER_TOO_SMALL;
+	}
 
 	// make sure the info in the header aligns with what we know
 	if (m_header.start_disk_number != m_ecd.disk_number)
+	{
+		osd_printf_error("unzip: %s does not reside in segment %s\n", m_header.file_name.c_str(), m_filename.c_str());
 		return archive_file::error::UNSUPPORTED;
+	}
 
 	// get the compressed data offset
 	ziperr = get_compressed_data_offset(offset);
@@ -699,6 +748,9 @@ archive_file::error zip_file_impl::decompress(void *buffer, std::uint32_t length
 		break;
 
 	default:
+		osd_printf_error(
+				"unzip: %s in %s uses unsupported compression method %u\n",
+				m_header.file_name.c_str(), m_filename.c_str(), m_header.compression);
 		ziperr = archive_file::error::UNSUPPORTED;
 		break;
 	}
@@ -735,12 +787,19 @@ archive_file::error zip_file_impl::read_ecd()
 		// allocate buffer
 		std::unique_ptr<std::uint8_t []> buffer;
 		try { buffer.reset(new std::uint8_t[buflen + 1]); }
-		catch (...) { return archive_file::error::OUT_OF_MEMORY; }
+		catch (...)
+		{
+			osd_printf_error("unzip: %s failed to allocate memory for ECD search\n", m_filename.c_str());
+			return archive_file::error::OUT_OF_MEMORY;
+		}
 
 		// read in one buffers' worth of data
 		error = m_file->read(&buffer[0], m_length - buflen, buflen, read_length);
 		if ((error != osd_file::error::NONE) || (read_length != buflen))
+		{
+			osd_printf_error("unzip: %s error reading file to search for ECD (%d)\n", m_filename.c_str(), int(error));
 			return archive_file::error::FILE_ERROR;
+		}
 
 		// find the ECD signature
 		std::int32_t offset;
@@ -754,6 +813,8 @@ archive_file::error zip_file_impl::read_ecd()
 		// if we found it, fill out the data
 		if (offset >= 0)
 		{
+			osd_printf_verbose("unzip: found %s ECD\n", m_filename.c_str());
+
 			// extract ECD info
 			ecd_reader const ecd_rd(buffer.get() + offset);
 			m_ecd.disk_number          = ecd_rd.this_disk_no();
@@ -765,7 +826,10 @@ archive_file::error zip_file_impl::read_ecd()
 
 			// is the file too small to contain a ZIP64 ECD locator?
 			if ((m_length - buflen + offset) < ecd64_locator_reader::minimum_length())
+			{
+				osd_printf_verbose("unzip: %s too small to contain ZIP64 ECD locator\n", m_filename.c_str());
 				return archive_file::error::NONE;
+			}
 
 			// try to read the ZIP64 ECD locator
 			error = m_file->read(
@@ -774,32 +838,61 @@ archive_file::error zip_file_impl::read_ecd()
 					ecd64_locator_reader::minimum_length(),
 					read_length);
 			if ((error != osd_file::error::NONE) || (read_length != ecd64_locator_reader::minimum_length()))
+			{
+				osd_printf_error("unzip: error reading %s to search for ZIP64 ECD locator (%d)\n", m_filename.c_str(), int(error));
 				return archive_file::error::FILE_ERROR;
+			}
 
 			// if the signature isn't correct, it's not a ZIP64 archive
 			ecd64_locator_reader const ecd64_loc_rd(buffer.get());
 			if (!ecd64_loc_rd.signature_correct())
+			{
+				osd_printf_verbose("unzip: %s has no ZIP64 ECD locator\n", m_filename.c_str());
 				return archive_file::error::NONE;
+			}
 
 			// check that the ZIP64 ECD is in this segment (assuming this segment is the last segment)
 			if ((ecd64_loc_rd.ecd64_disk() + 1) != ecd64_loc_rd.total_disks())
+			{
+				osd_printf_error("unzip: %s ZIP64 ECD resides in a different segment\n", m_filename.c_str());
 				return archive_file::error::UNSUPPORTED;
+			}
 
 			// try to read the ZIP64 ECD
 			error = m_file->read(&buffer[0], ecd64_loc_rd.ecd64_offset(), ecd64_reader::minimum_length(), read_length);
 			if (error != osd_file::error::NONE)
+			{
+				osd_printf_error("unzip: error reading %s ZIP64 ECD (%d)\n", m_filename.c_str(), int(error));
 				return archive_file::error::FILE_ERROR;
+			}
 			if (read_length != ecd64_reader::minimum_length())
+			{
+				osd_printf_error("unzip: unexpectedly reached end-of-file while reading %s ZIP64 ECD\n", m_filename.c_str());
 				return archive_file::error::FILE_TRUNCATED;
+			}
 
 			// check ZIP64 ECD
 			ecd64_reader const ecd64_rd(buffer.get());
 			if (!ecd64_rd.signature_correct())
+			{
+				osd_printf_error(
+						"unzip: %s ZIP64 ECD has incorrect signature 0x%08lx\n",
+						m_filename.c_str(), long(ecd64_rd.signature()));
 				return archive_file::error::BAD_SIGNATURE;
+			}
 			if (ecd64_rd.total_length() < ecd64_reader::minimum_length())
+			{
+				osd_printf_error("unzip: %s ZIP64 ECD appears to be too small\n", m_filename.c_str());
 				return archive_file::error::UNSUPPORTED;
+			}
 			if (ecd64_rd.version_needed() > 63)
+			{
+				osd_printf_error(
+						"unzip: %s ZIP64 ECD requires unsupported version %u.%u\n",
+						m_filename.c_str(), unsigned(ecd64_rd.version_needed() / 10), unsigned(ecd64_rd.version_needed() % 10));
 				return archive_file::error::UNSUPPORTED;
+			}
+			osd_printf_verbose("unzip: found %s ZIP64 ECD\n", m_filename.c_str());
 
 			// extract ZIP64 ECD info
 			m_ecd.disk_number          = ecd64_rd.this_disk_no();
@@ -814,10 +907,16 @@ archive_file::error zip_file_impl::read_ecd()
 
 		// didn't find it; free this buffer and expand our search
 		if (buflen < m_length)
+		{
 			buflen *= 2;
+		}
 		else
+		{
+			osd_printf_error("unzip: %s couldn't find ECD\n", m_filename.c_str());
 			return archive_file::error::BAD_SIGNATURE;
+		}
 	}
+	osd_printf_error("unzip: %s couldn't find ECD in last 64KiB\n", m_filename.c_str());
 	return archive_file::error::OUT_OF_MEMORY;
 }
 
@@ -831,12 +930,28 @@ archive_file::error zip_file_impl::get_compressed_data_offset(std::uint64_t &off
 {
 	// don't support a number of features
 	general_flag_reader const flags(m_header.bit_flag);
-	if ((m_header.start_disk_number != m_ecd.disk_number) ||
-		(m_header.version_needed > 63) ||
-		flags.encrypted() ||
-		flags.patch_data() ||
-		flags.strong_encryption())
+	if (m_header.start_disk_number != m_ecd.disk_number)
+	{
+		osd_printf_error("unzip: %s does not reside in segment %s\n", m_header.file_name.c_str(), m_filename.c_str());
 		return archive_file::error::UNSUPPORTED;
+	}
+	if (m_header.version_needed > 63)
+	{
+		osd_printf_error(
+				"unzip: %s in %s requires unsupported version %u.%u\n",
+				m_header.file_name.c_str(), m_filename.c_str(), unsigned(m_header.version_needed / 10), unsigned(m_header.version_needed % 10));
+		return archive_file::error::UNSUPPORTED;
+	}
+	if (flags.encrypted() || flags.strong_encryption())
+	{
+		osd_printf_error("unzip: %s in %s is encrypted\n", m_header.file_name.c_str(), m_filename.c_str());
+		return archive_file::error::UNSUPPORTED;
+	}
+	if (flags.patch_data())
+	{
+		osd_printf_error("unzip: %s in %s is compressed patch data\n", m_header.file_name.c_str(), m_filename.c_str());
+		return archive_file::error::UNSUPPORTED;
+	}
 
 	// make sure the file handle is open
 	auto const ziperr = reopen();
@@ -847,14 +962,29 @@ archive_file::error zip_file_impl::get_compressed_data_offset(std::uint64_t &off
 	std::uint32_t read_length;
 	auto const error = m_file->read(&m_buffer[0], m_header.local_header_offset, local_file_header_reader::minimum_length(), read_length);
 	if (error != osd_file::error::NONE)
+	{
+		osd_printf_error(
+				"unzip: error reading local file header for %s in %s (%d)\n",
+				m_header.file_name.c_str(), m_filename.c_str(), int(error));
 		return archive_file::error::FILE_ERROR;
+	}
 	if (read_length != local_file_header_reader::minimum_length())
+	{
+		osd_printf_error(
+				"unzip: unexpectedly reached end-of-file while reading local file header for %s in %s\n",
+				m_header.file_name.c_str(), m_filename.c_str());
 		return archive_file::error::FILE_TRUNCATED;
+	}
 
 	// compute the final offset
 	local_file_header_reader reader(&m_buffer[0]);
 	if (!reader.signature_correct())
+	{
+		osd_printf_error(
+				"unzip: local file header for %s in %s has incorrect signature %04lx\n",
+				m_header.file_name.c_str(), m_filename.c_str(), long(reader.signature()));
 		return archive_file::error::BAD_SIGNATURE;
+	}
 	offset = m_header.local_header_offset + reader.total_length();
 
 	return archive_file::error::NONE;
@@ -873,16 +1003,23 @@ archive_file::error zip_file_impl::get_compressed_data_offset(std::uint64_t &off
 
 archive_file::error zip_file_impl::decompress_data_type_0(std::uint64_t offset, void *buffer, std::uint32_t length)
 {
-	std::uint32_t read_length;
-
 	// the data is uncompressed; just read it
+	std::uint32_t read_length(0);
 	auto const filerr = m_file->read(buffer, offset, m_header.compressed_length, read_length);
 	if (filerr != osd_file::error::NONE)
+	{
+		osd_printf_error("unzip: error reading %s from %s (%d)\n", m_header.file_name.c_str(), m_filename.c_str(), int(filerr));
 		return archive_file::error::FILE_ERROR;
+	}
 	else if (read_length != m_header.compressed_length)
+	{
+		osd_printf_error("unzip: unexpectedly reached end-of-file while reading %s from %s\n", m_header.file_name.c_str(), m_filename.c_str());
 		return archive_file::error::FILE_TRUNCATED;
+	}
 	else
+	{
 		return archive_file::error::NONE;
+	}
 }
 
 
@@ -908,13 +1045,18 @@ archive_file::error zip_file_impl::decompress_data_type_8(std::uint64_t offset, 
 	// initialize the decompressor
 	zerr = inflateInit2(&stream, -MAX_WBITS);
 	if (zerr != Z_OK)
+	{
+		osd_printf_error(
+				"unzip: error allocating zlib stream to inflate %s from %s (%d)\n",
+				m_header.file_name.c_str(), m_filename.c_str(), zerr);
 		return archive_file::error::DECOMPRESS_ERROR;
+	}
 
 	// loop until we're done
 	while (1)
 	{
 		// read in the next chunk of data
-		std::uint32_t read_length;
+		std::uint32_t read_length(0);
 		auto const filerr = m_file->read(
 				&m_buffer[0],
 				offset,
@@ -922,6 +1064,9 @@ archive_file::error zip_file_impl::decompress_data_type_8(std::uint64_t offset, 
 				read_length);
 		if (filerr != osd_file::error::NONE)
 		{
+			osd_printf_error(
+					"unzip: error reading compressed data for %s in %s (%d)\n",
+					m_header.file_name.c_str(), m_filename.c_str(), int(filerr));
 			inflateEnd(&stream);
 			return archive_file::error::FILE_ERROR;
 		}
@@ -930,6 +1075,9 @@ archive_file::error zip_file_impl::decompress_data_type_8(std::uint64_t offset, 
 		// if we read nothing, but still have data left, the file is truncated
 		if ((read_length == 0) && (input_remaining > 0))
 		{
+			osd_printf_error(
+					"unzip: unexpectedly reached end-of-file while reading compressed data for %s in %s\n",
+					m_header.file_name.c_str(), m_filename.c_str());
 			inflateEnd(&stream);
 			return archive_file::error::FILE_TRUNCATED;
 		}
@@ -946,9 +1094,12 @@ archive_file::error zip_file_impl::decompress_data_type_8(std::uint64_t offset, 
 		// now inflate
 		zerr = inflate(&stream, Z_NO_FLUSH);
 		if (zerr == Z_STREAM_END)
-			break;
-		if (zerr != Z_OK)
 		{
+			break;
+		}
+		else if (zerr != Z_OK)
+		{
+			osd_printf_error("unzip: error inflating %s from %s (%d)\n", m_header.file_name.c_str(), m_filename.c_str(), zerr);
 			inflateEnd(&stream);
 			return archive_file::error::DECOMPRESS_ERROR;
 		}
@@ -957,11 +1108,19 @@ archive_file::error zip_file_impl::decompress_data_type_8(std::uint64_t offset, 
 	// finish decompression
 	zerr = inflateEnd(&stream);
 	if (zerr != Z_OK)
+	{
+		osd_printf_error("unzip: error finishing inflation of %s from %s (%d)\n", m_header.file_name.c_str(), m_filename.c_str(), zerr);
 		return archive_file::error::DECOMPRESS_ERROR;
+	}
 
 	// if anything looks funny, report an error
 	if ((stream.avail_out > 0) || (input_remaining > 0))
+	{
+		osd_printf_error(
+				"unzip: inflation of %s from %s doesn't appear to have completed correctly\n",
+				m_header.file_name.c_str(), m_filename.c_str());
 		return archive_file::error::DECOMPRESS_ERROR;
+	}
 
 	return archive_file::error::NONE;
 }
@@ -1001,33 +1160,78 @@ archive_file::error zip_file_impl::decompress_data_type_14(std::uint64_t offset,
 
 	// need to read LZMA properties before we can initialise the decompressor
 	if (4 > input_remaining)
+	{
+		osd_printf_error(
+				"unzip:compressed data for %s in %s is too small to hold LZMA properties header\n",
+				m_header.file_name.c_str(), m_filename.c_str());
 		return archive_file::error::DECOMPRESS_ERROR;
+	}
 	filerr = m_file->read(&m_buffer[0], offset, 4, read_length);
 	if (filerr != osd_file::error::NONE)
+	{
+		osd_printf_error(
+				"unzip: error reading LZMA properties header for %s in %s (%d)\n",
+				m_header.file_name.c_str(), m_filename.c_str(), int(filerr));
 		return archive_file::error::FILE_ERROR;
+	}
 	offset += read_length;
 	input_remaining -= read_length;
 	if (4 != read_length)
+	{
+		osd_printf_error(
+				"unzip: unexpectedly reached end-of-file while reading LZMA properties header for %s in %s\n",
+				m_header.file_name.c_str(), m_filename.c_str());
 		return archive_file::error::FILE_TRUNCATED;
+	}
 	std::uint16_t const props_size((std::uint16_t(m_buffer[3]) << 8) | std::uint16_t(m_buffer[2]));
 	if (props_size > m_buffer.size())
+	{
+		osd_printf_error(
+				"unzip: %s in %s has excessively large LZMA properties\n",
+				m_header.file_name.c_str(), m_filename.c_str());
 		return archive_file::error::UNSUPPORTED;
+	}
 	else if (props_size > input_remaining)
+	{
+		osd_printf_error(
+				"unzip:compressed data for %s in %s is too small to hold LZMA properties\n",
+				m_header.file_name.c_str(), m_filename.c_str());
 		return archive_file::error::DECOMPRESS_ERROR;
+	}
 	filerr = m_file->read(&m_buffer[0], offset, props_size, read_length);
 	if (filerr != osd_file::error::NONE)
+	{
+		osd_printf_error(
+				"unzip: error reading LZMA properties for %s in %s (%d)\n",
+				m_header.file_name.c_str(), m_filename.c_str(), int(filerr));
 		return archive_file::error::FILE_ERROR;
+	}
 	offset += read_length;
 	input_remaining -= read_length;
 	if (props_size != read_length)
+	{
+		osd_printf_error(
+				"unzip: unexpectedly reached end-of-file while reading LZMA properties for %s in %s\n",
+				m_header.file_name.c_str(), m_filename.c_str());
 		return archive_file::error::FILE_TRUNCATED;
+	}
 
 	// initialize the decompressor
 	lzerr = LzmaDec_Allocate(&stream, &m_buffer[0], props_size, &alloc_imp);
 	if (SZ_ERROR_MEM == lzerr)
+	{
+		osd_printf_error(
+				"unzip: memory error allocating LZMA decoder to decompress %s from %s\n",
+				m_header.file_name.c_str(), m_filename.c_str());
 		return archive_file::error::OUT_OF_MEMORY;
+	}
 	else if (SZ_OK != lzerr)
+	{
+		osd_printf_error(
+				"unzip: error allocating LZMA decoder to decompress %s from %s (%d)\n",
+				m_header.file_name.c_str(), m_filename.c_str(), int(lzerr));
 		return archive_file::error::DECOMPRESS_ERROR;
+	}
 	LzmaDec_Init(&stream);
 
 	// loop until we're done
@@ -1041,6 +1245,9 @@ archive_file::error zip_file_impl::decompress_data_type_14(std::uint64_t offset,
 				read_length);
 		if (filerr != osd_file::error::NONE)
 		{
+			osd_printf_error(
+					"unzip: error reading compressed data for %s in %s (%d)\n",
+					m_header.file_name.c_str(), m_filename.c_str(), int(filerr));
 			LzmaDec_Free(&stream, &alloc_imp);
 			return archive_file::error::FILE_ERROR;
 		}
@@ -1050,6 +1257,9 @@ archive_file::error zip_file_impl::decompress_data_type_14(std::uint64_t offset,
 		// if we read nothing, but still have data left, the file is truncated
 		if ((0 == read_length) && (0 < input_remaining))
 		{
+			osd_printf_error(
+					"unzip: unexpectedly reached end-of-file while reading compressed data for %s in %s\n",
+					m_header.file_name.c_str(), m_filename.c_str());
 			LzmaDec_Free(&stream, &alloc_imp);
 			return archive_file::error::FILE_TRUNCATED;
 		}
@@ -1068,6 +1278,7 @@ archive_file::error zip_file_impl::decompress_data_type_14(std::uint64_t offset,
 				&lzstatus);
 		if (SZ_OK != lzerr)
 		{
+			osd_printf_error("unzip: error decoding LZMA data for %s in %s (%d)\n", m_header.file_name.c_str(), m_filename.c_str(), int(lzerr));
 			LzmaDec_Free(&stream, &alloc_imp);
 			return archive_file::error::DECOMPRESS_ERROR;
 		}
@@ -1078,11 +1289,27 @@ archive_file::error zip_file_impl::decompress_data_type_14(std::uint64_t offset,
 
 	// if anything looks funny, report an error
 	if (LZMA_STATUS_FINISHED_WITH_MARK == lzstatus)
+	{
 		return archive_file::error::NONE;
-	else if ((LZMA_STATUS_MAYBE_FINISHED_WITHOUT_MARK != lzstatus) || eos_mark)
+	}
+	else if (eos_mark)
+	{
+		osd_printf_error(
+				"unzip: LZMA end mark not found for %s in %s (%d)\n",
+				m_header.file_name.c_str(), m_filename.c_str(), int(lzstatus));
 		return archive_file::error::DECOMPRESS_ERROR;
+	}
+	else if (LZMA_STATUS_MAYBE_FINISHED_WITHOUT_MARK != lzstatus)
+	{
+		osd_printf_error(
+				"unzip: LZMA decompression of %s from %s doesn't appear to have completed correctly (%d)\n",
+				m_header.file_name.c_str(), m_filename.c_str(), int(lzstatus));
+		return archive_file::error::DECOMPRESS_ERROR;
+	}
 	else
+	{
 		return archive_file::error::NONE;
+	}
 }
 
 } // anonymous namespace

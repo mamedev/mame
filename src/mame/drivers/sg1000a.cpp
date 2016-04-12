@@ -118,7 +118,7 @@ CN4               CN5
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "machine/i8255.h"
-#include "machine/segacrpt.h"
+#include "machine/segacrpt_device.h"
 
 
 class sg1000a_state : public driver_device
@@ -132,7 +132,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 	DECLARE_WRITE8_MEMBER(sg1000a_coin_counter_w);
 	DECLARE_DRIVER_INIT(sg1000a);
-	DECLARE_DRIVER_INIT(chwrestl);
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 };
@@ -292,8 +291,11 @@ static MACHINE_CONFIG_START( sg1000a, sg1000a_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sg1000ax, sg1000a )
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5033, XTAL_3_579545MHz)
+	MCFG_CPU_PROGRAM_MAP(program_map)
+	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
 /*************************************
@@ -333,33 +335,7 @@ DRIVER_INIT_MEMBER(sg1000a_state,sg1000a)
 {
 }
 
-DRIVER_INIT_MEMBER(sg1000a_state,chwrestl)
-{
-	static const UINT8 convtable[32][4] =
-	{
-		/*       opcode                   data                     address      */
-		/*  A    B    C    D         A    B    C    D                           */
-		{ 0x28,0x08,0xa8,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...0...0...0...0 */
-		{ 0x28,0x08,0xa8,0x88 }, { 0x28,0xa8,0x08,0x88 },   /* ...0...0...0...1 */
-		{ 0x88,0x80,0x08,0x00 }, { 0x88,0x08,0x80,0x00 },   /* ...0...0...1...0 */
-		{ 0x88,0x08,0x80,0x00 }, { 0x28,0xa8,0x08,0x88 },   /* ...0...0...1...1 */
-		{ 0x28,0x08,0xa8,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...0...1...0...0 */
-		{ 0x88,0x80,0x08,0x00 }, { 0x88,0x80,0x08,0x00 },   /* ...0...1...0...1 */
-		{ 0x88,0x08,0x80,0x00 }, { 0x88,0x08,0x80,0x00 },   /* ...0...1...1...0 */
-		{ 0xa0,0x80,0xa8,0x88 }, { 0xa0,0x80,0xa8,0x88 },   /* ...0...1...1...1 */
-		{ 0x80,0xa0,0x00,0x20 }, { 0x28,0x08,0xa8,0x88 },   /* ...1...0...0...0 */
-		{ 0x28,0xa8,0x08,0x88 }, { 0x28,0x08,0xa8,0x88 },   /* ...1...0...0...1 */
-		{ 0x80,0xa0,0x00,0x20 }, { 0x80,0xa0,0x00,0x20 },   /* ...1...0...1...0 */
-		{ 0x28,0xa8,0x08,0x88 }, { 0x80,0xa0,0x00,0x20 },   /* ...1...0...1...1 */
-		{ 0xa0,0x80,0xa8,0x88 }, { 0x28,0x08,0xa8,0x88 },   /* ...1...1...0...0 */
-		{ 0x80,0xa0,0x00,0x20 }, { 0xa0,0x80,0xa8,0x88 },   /* ...1...1...0...1 */
-		{ 0xa0,0x80,0xa8,0x88 }, { 0x80,0xa0,0x00,0x20 },   /* ...1...1...1...0 */
-		{ 0xa0,0x80,0xa8,0x88 }, { 0xa0,0x80,0xa8,0x88 }    /* ...1...1...1...1 */
-	};
 
-	DRIVER_INIT_CALL(sg1000a);
-	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
-}
 
 /*************************************
  *
@@ -368,5 +344,5 @@ DRIVER_INIT_MEMBER(sg1000a_state,chwrestl)
  *************************************/
 
 GAME( 1984, chboxing, 0, sg1000a,  chboxing, sg1000a_state, sg1000a,  ROT0, "Sega", "Champion Boxing", 0 )
-GAME( 1985, chwrestl, 0, sg1000ax, chwrestl, sg1000a_state, chwrestl, ROT0, "Sega", "Champion Pro Wrestling", 0 )
+GAME( 1985, chwrestl, 0, sg1000ax, chwrestl, sg1000a_state, sg1000a, ROT0, "Sega", "Champion Pro Wrestling", 0 )
 GAME( 1985, dokidoki, 0, sg1000a,  dokidoki, sg1000a_state, sg1000a,  ROT0, "Sega", "Doki Doki Penguin Land", 0 )

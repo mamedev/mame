@@ -347,6 +347,15 @@ function cheatfind.startplugin()
 					end
 					menu[#menu + 1] = { string.format("%08x" .. numform .. numform, match.addr, match.oldval, 
 					                                  match.newval), "", 0 }
+					if not match.mode then
+						match.mode = 1
+					end
+					if match.mode == 1 then
+						menu[#menu][2] = "Test"
+					else
+						menu[#menu][2] = "Write"
+					end
+					menu_lim(match.mode, 1, 2, menu[#menu])
 				end
 			end
 		end
@@ -456,8 +465,28 @@ function cheatfind.startplugin()
 		elseif index == midx.match then
 			matchsel = incdec(matchsel, 0, #matches)
 		elseif index > midx.match then 
+			local match = matches[matchsel][index - midx.match]
+			match.mode = incdec(match.mode, 1, 2)
 			if event == "select" then
-				-- write out a script?
+				local dev = devtable[devcur]
+				local cheat = { desc = string.format("Test cheat at addr %08x", match.addr), script = {} }
+				if dev.space.shortname then
+					cheat.ram = dev.tag
+					cheat.script.on = "ram:write(" .. match.addr .. "," .. match.newval .. ")"
+				else
+					cheat.space = { cpu = { tag = dev.tag, type = "program" } }
+					cheat.script.on = "cpu:write_u8(" .. match.addr .. "," .. match.newval .. ")"
+				end
+				if match.mode == 1 then
+					if not _G.ce then
+						manager:machine():popmessage("Cheat engine not available")
+					else
+						ce.inject(cheat)
+					end
+				else
+
+				end
+
 			end
 		end
 		devsel = devcur

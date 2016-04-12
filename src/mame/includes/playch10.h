@@ -119,6 +119,7 @@ public:
 	DECLARE_DRIVER_INIT(pcfboard);
 	DECLARE_DRIVER_INIT(pcfboard_2);
 	DECLARE_DRIVER_INIT(virus);
+	DECLARE_DRIVER_INIT(ttoon);
 	DECLARE_DRIVER_INIT(pcgboard);
 	DECLARE_DRIVER_INIT(pcgboard_type2);
 	DECLARE_DRIVER_INIT(pchboard);

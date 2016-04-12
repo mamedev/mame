@@ -81,7 +81,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/segacrp2.h"
+#include "machine/segacrp2_device.h"
 #include "sound/ay8910.h"
 
 
@@ -110,7 +110,6 @@ public:
 	DECLARE_WRITE8_MEMBER(calorie_flipscreen_w);
 	DECLARE_READ8_MEMBER(calorie_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(bogus_w);
-	DECLARE_DRIVER_INIT(calorie);
 	DECLARE_DRIVER_INIT(calorieb);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -488,6 +487,13 @@ static MACHINE_CONFIG_START( calorie, calorie_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)  /* YM2149 really */
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( caloriee, calorie )
+	MCFG_CPU_REPLACE("maincpu", SEGA_317_0004,4000000)         /* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(calorie_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
+	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -560,11 +566,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(calorie_state,calorie)
-{
-	// 317-0004
-	sega_decode_317(memregion("maincpu")->base(), m_decrypted_opcodes, 0);
-}
+
 
 DRIVER_INIT_MEMBER(calorie_state,calorieb)
 {
@@ -579,5 +581,5 @@ DRIVER_INIT_MEMBER(calorie_state,calorieb)
  *************************************/
 
 /* Note: the bootleg is identical to the original once decrypted */
-GAME( 1986, calorie,  0,       calorie, calorie, calorie_state, calorie,  ROT0, "Sega",    "Calorie Kun vs Moguranian", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, calorie,  0,       caloriee,calorie, driver_device, 0,        ROT0, "Sega",    "Calorie Kun vs Moguranian", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, calorieb, calorie, calorie, calorie, calorie_state, calorieb, ROT0, "bootleg", "Calorie Kun vs Moguranian (bootleg)", MACHINE_SUPPORTS_SAVE )
