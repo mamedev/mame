@@ -36,6 +36,9 @@ image_manager::image_manager(running_machine &machine)
 		/* is an image specified for this image */
 		image_name = machine.options().value(image->instance_name());
 
+        if (!image->user_loadable())
+            continue;
+
 		if ((image_name != nullptr) && (image_name[0] != '\0'))
 		{
 			/* mark init state */
@@ -226,6 +229,7 @@ void image_manager::postdevice_init()
 	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 	{
 			int result = image->finish_load();
+
 			/* did the image load fail? */
 			if (result)
 			{

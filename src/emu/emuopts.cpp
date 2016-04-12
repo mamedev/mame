@@ -346,7 +346,10 @@ void emu_options::add_device_options()
 	image_interface_iterator iter(config.root_device());
 	for (const device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 	{
-		// retrieve info about the device instance
+        if (!image->user_loadable())
+            continue;
+
+        // retrieve info about the device instance
 		std::ostringstream option_name;
 		util::stream_format(option_name, "%s;%s", image->instance_name(), image->brief_instance_name());
 		if (strcmp(image->device_typename(image->image_type()), image->instance_name()) == 0)

@@ -715,6 +715,9 @@ void cli_frontend::listmedia(const char *gamename)
 		bool first = true;
 		for (const device_image_interface *imagedev = iter.first(); imagedev != nullptr; imagedev = iter.next())
 		{
+            if (!imagedev->user_loadable())
+                continue;
+            
 			// extract the shortname with parentheses
 			std::string paren_shortname = string_format("(%s)", imagedev->brief_instance_name());
 

@@ -148,6 +148,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t<!ELEMENT device (instance*, extension*)>\n"
 "\t\t\t<!ATTLIST device type CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST device tag CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST device fixed_image CDATA #IMPLIED>\n"
 "\t\t\t<!ATTLIST device mandatory CDATA #IMPLIED>\n"
 "\t\t\t<!ATTLIST device interface CDATA #IMPLIED>\n"
 "\t\t\t<!ELEMENT instance EMPTY>\n"
@@ -1428,6 +1429,7 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 	{
 		if (strcmp(imagedev->device().tag(), device.tag()))
 		{
+            bool loadable = imagedev->user_loadable();
 			std::string newtag(imagedev->device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
@@ -1438,9 +1440,13 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 			if (imagedev->device().tag())
 				fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
 
-			// is this device mandatory?
-			if (imagedev->must_be_loaded())
-				fprintf(m_output, " mandatory=\"1\"");
+			// is this device available as media switch?
+			if (!loadable)
+				fprintf(m_output, " fixed_image=\"1\"");
+            
+            // is this device mandatory?
+            if (imagedev->must_be_loaded())
+                fprintf(m_output, " mandatory=\"1\"");
 
 			if (imagedev->image_interface() && imagedev->image_interface()[0])
 				fprintf(m_output, " interface=\"%s\"", xml_normalize_string(imagedev->image_interface()));
@@ -1448,25 +1454,27 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 			// close the XML tag
 			fprintf(m_output, ">\n");
 
-			const char *name = imagedev->instance_name();
-			const char *shortname = imagedev->brief_instance_name();
-
-			fprintf(m_output, "\t\t\t<instance");
-			fprintf(m_output, " name=\"%s\"", xml_normalize_string(name));
-			fprintf(m_output, " briefname=\"%s\"", xml_normalize_string(shortname));
-			fprintf(m_output, "/>\n");
-
-			std::string extensions(imagedev->file_extensions());
-
-			char *ext = strtok((char *)extensions.c_str(), ",");
-			while (ext != nullptr)
-			{
-				fprintf(m_output, "\t\t\t<extension");
-				fprintf(m_output, " name=\"%s\"", xml_normalize_string(ext));
-				fprintf(m_output, "/>\n");
-				ext = strtok(nullptr, ",");
-			}
-
+            if (loadable)
+            {
+                const char *name = imagedev->instance_name();
+                const char *shortname = imagedev->brief_instance_name();
+                
+                fprintf(m_output, "\t\t\t<instance");
+                fprintf(m_output, " name=\"%s\"", xml_normalize_string(name));
+                fprintf(m_output, " briefname=\"%s\"", xml_normalize_string(shortname));
+                fprintf(m_output, "/>\n");
+                
+                std::string extensions(imagedev->file_extensions());
+                
+                char *ext = strtok((char *)extensions.c_str(), ",");
+                while (ext != nullptr)
+                {
+                    fprintf(m_output, "\t\t\t<extension");
+                    fprintf(m_output, " name=\"%s\"", xml_normalize_string(ext));
+                    fprintf(m_output, "/>\n");
+                    ext = strtok(nullptr, ",");
+                }
+            }
 			fprintf(m_output, "\t\t</device>\n");
 		}
 	}

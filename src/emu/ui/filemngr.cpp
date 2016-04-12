@@ -129,6 +129,9 @@ void ui_menu_file_manager::populate()
 			image_interface_iterator subiterator(*dev);
 			for (device_image_interface *scan = subiterator.first(); scan != nullptr; scan = subiterator.next())
 			{
+                if (!scan->user_loadable())
+                    continue;
+                
 				// if it is a children device, and not something further down the device tree, we want it in the menu!
 				if (strcmp(scan->device().owner()->tag(), dev->tag()) == 0)
 					if (devtags.insert(scan->device().tag()).second)
