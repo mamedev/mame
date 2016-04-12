@@ -65,7 +65,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/segacrpt.h"
+#include "machine/segacrpt_device.h"
 #include "includes/pacman.h"
 
 
@@ -77,7 +77,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pengo_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_DRIVER_INIT(penta);
-	DECLARE_DRIVER_INIT(pengo);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
 	optional_shared_ptr<UINT8> m_decrypted_opcodes;
@@ -405,6 +404,14 @@ static MACHINE_CONFIG_DERIVED( pengou, pengo )
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_DECRYPTED_OPCODES)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( pengoe, pengo )
+	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_PENGO, MASTER_CLOCK/6)
+	MCFG_CPU_PROGRAM_MAP(pengo_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pengo_state,  vblank_irq)
+	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( jrpacmbl, pengo )
 
 	/* basic machine hardware */
@@ -643,32 +650,6 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(pengo_state,pengo)
-{
-	static const UINT8 convtable[32][4] =
-	{
-		/*       opcode                   data                     address      */
-		/*  A    B    C    D         A    B    C    D                           */
-		{ 0xa0,0x80,0xa8,0x88 }, { 0x28,0xa8,0x08,0x88 },   /* ...0...0...0...0 */
-		{ 0x28,0xa8,0x08,0x88 }, { 0xa0,0x80,0xa8,0x88 },   /* ...0...0...0...1 */
-		{ 0xa0,0x80,0x20,0x00 }, { 0xa0,0x80,0x20,0x00 },   /* ...0...0...1...0 */
-		{ 0x08,0x28,0x88,0xa8 }, { 0xa0,0x80,0xa8,0x88 },   /* ...0...0...1...1 */
-		{ 0x08,0x00,0x88,0x80 }, { 0x28,0xa8,0x08,0x88 },   /* ...0...1...0...0 */
-		{ 0xa0,0x80,0x20,0x00 }, { 0x08,0x00,0x88,0x80 },   /* ...0...1...0...1 */
-		{ 0xa0,0x80,0x20,0x00 }, { 0xa0,0x80,0x20,0x00 },   /* ...0...1...1...0 */
-		{ 0xa0,0x80,0x20,0x00 }, { 0x00,0x08,0x20,0x28 },   /* ...0...1...1...1 */
-		{ 0x88,0x80,0x08,0x00 }, { 0xa0,0x80,0x20,0x00 },   /* ...1...0...0...0 */
-		{ 0x88,0x80,0x08,0x00 }, { 0x00,0x08,0x20,0x28 },   /* ...1...0...0...1 */
-		{ 0x08,0x28,0x88,0xa8 }, { 0x08,0x28,0x88,0xa8 },   /* ...1...0...1...0 */
-		{ 0xa0,0x80,0xa8,0x88 }, { 0xa0,0x80,0x20,0x00 },   /* ...1...0...1...1 */
-		{ 0x08,0x00,0x88,0x80 }, { 0x88,0x80,0x08,0x00 },   /* ...1...1...0...0 */
-		{ 0x00,0x08,0x20,0x28 }, { 0x88,0x80,0x08,0x00 },   /* ...1...1...0...1 */
-		{ 0x08,0x28,0x88,0xa8 }, { 0x08,0x28,0x88,0xa8 },   /* ...1...1...1...0 */
-		{ 0x08,0x00,0x88,0x80 }, { 0xa0,0x80,0x20,0x00 }    /* ...1...1...1...1 */
-	};
-
-	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
-}
 
 
 DRIVER_INIT_MEMBER(pengo_state,penta)
@@ -749,11 +730,11 @@ DRIVER_INIT_MEMBER(pengo_state,penta)
  *
  *************************************/
 
-GAME( 1982, pengo,    0,     pengo,  pengo, pengo_state, pengo,    ROT90, "Sega", "Pengo (set 1 rev c)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo2,   pengo, pengo,  pengo, pengo_state, pengo,    ROT90, "Sega", "Pengo (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo,    0,     pengoe, pengo, driver_device, 0,      ROT90, "Sega", "Pengo (set 1 rev c)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo2,   pengo, pengoe, pengo, driver_device, 0,      ROT90, "Sega", "Pengo (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pengo2u,  pengo, pengou, pengo, driver_device, 0,      ROT90, "Sega", "Pengo (set 2 not encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pengo3u,  pengo, pengou, pengo, driver_device, 0,      ROT90, "Sega", "Pengo (set 3 not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo4,   pengo, pengo,  pengo, pengo_state, pengo,    ROT90, "Sega", "Pengo (set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo4,   pengo, pengoe, pengo, driver_device, 0,      ROT90, "Sega", "Pengo (set 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pengob,   pengo, pengo,  pengo, pengo_state, penta,    ROT90, "bootleg", "Pengo (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, penta,    pengo, pengo,  pengo, pengo_state, penta,    ROT90, "bootleg (Grinbee Shouji)", "Penta", MACHINE_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
 GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, driver_device, 0, ROT90, "bootleg", "Jr. Pac-Man (Pengo hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

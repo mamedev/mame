@@ -239,7 +239,7 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/segacrpt.h"
+#include "machine/segacrpt_device.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "audio/cclimber.h"
@@ -1090,10 +1090,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( yamato, root )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_YAMATO, MASTER_CLOCK/3/2)  /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(yamato_map)
 	MCFG_CPU_IO_MAP(yamato_portmap)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cclimber_state,  vblank_irq)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(yamato_decrypted_opcodes_map)
+	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3072000) /* 3.072 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(yamato_audio_map)
@@ -1119,10 +1121,15 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( toprollr, cclimber )
 
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_YAMATO, MASTER_CLOCK/3/2)  /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(toprollr_map)
+	MCFG_CPU_IO_MAP(cclimber_portmap)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cclimber_state,  vblank_irq)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(toprollr_decrypted_opcodes_map)
+	MCFG_SEGACRPT_SET_SIZE(0)
+	MCFG_SEGACRPT_SET_NUMBANKS(3)
+	MCFG_SEGACRPT_SET_BANKSIZE(0x6000)
+
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", toprollr)
@@ -2461,29 +2468,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cclimber_state,yamato)
 {
-	static const UINT8 convtable[32][4] =
-	{
-		/*       opcode                   data                     address      */
-		/*  A    B    C    D         A    B    C    D                           */
-		{ 0x88,0xa8,0x08,0x28 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...0...0...0 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...0...0...1 */
-		{ 0x88,0xa8,0x80,0xa0 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...0...1...0 */
-		{ 0x88,0xa8,0x80,0xa0 }, { 0x20,0xa0,0x28,0xa8 },   /* ...0...0...1...1 */
-		{ 0x88,0xa8,0x08,0x28 }, { 0x88,0xa8,0x08,0x28 },   /* ...0...1...0...0 */
-		{ 0x88,0xa8,0x80,0xa0 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...1...0...1 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x20,0xa0,0x28,0xa8 },   /* ...0...1...1...0 */
-		{ 0x88,0xa8,0x80,0xa0 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...1...1...1 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x88,0xa8,0x08,0x28 },   /* ...1...0...0...0 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x28,0x20,0xa8,0xa0 },   /* ...1...0...0...1 */
-		{ 0xa0,0x20,0x80,0x00 }, { 0x20,0xa0,0x28,0xa8 },   /* ...1...0...1...0 */
-		{ 0x28,0x20,0xa8,0xa0 }, { 0x20,0xa0,0x28,0xa8 },   /* ...1...0...1...1 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x88,0xa8,0x08,0x28 },   /* ...1...1...0...0 */
-		{ 0x88,0xa8,0x08,0x28 }, { 0x88,0xa8,0x08,0x28 },   /* ...1...1...0...1 */
-		{ 0xa0,0x20,0x80,0x00 }, { 0x88,0x08,0x80,0x00 },   /* ...1...1...1...0 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x00,0x08,0x20,0x28 }    /* ...1...1...1...1 */
-	};
 
-	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
 
 	save_item(NAME(m_yamato_p0));
 	save_item(NAME(m_yamato_p1));
@@ -2492,30 +2477,20 @@ DRIVER_INIT_MEMBER(cclimber_state,yamato)
 
 DRIVER_INIT_MEMBER(cclimber_state,toprollr)
 {
-	static const UINT8 convtable[32][4] =
-	{
-		/*       opcode                   data                     address      */
-		/*  A    B    C    D         A    B    C    D                           */
-		{ 0x88,0xa8,0x08,0x28 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...0...0...0 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...0...0...1 */
-		{ 0x88,0xa8,0x80,0xa0 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...0...1...0 */
-		{ 0x88,0xa8,0x80,0xa0 }, { 0x20,0xa0,0x28,0xa8 },   /* ...0...0...1...1 */
-		{ 0x88,0xa8,0x08,0x28 }, { 0x88,0xa8,0x08,0x28 },   /* ...0...1...0...0 */
-		{ 0x88,0xa8,0x80,0xa0 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...1...0...1 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x20,0xa0,0x28,0xa8 },   /* ...0...1...1...0 */
-		{ 0x88,0xa8,0x80,0xa0 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...1...1...1 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x88,0xa8,0x08,0x28 },   /* ...1...0...0...0 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x28,0x20,0xa8,0xa0 },   /* ...1...0...0...1 */
-		{ 0xa0,0x20,0x80,0x00 }, { 0x20,0xa0,0x28,0xa8 },   /* ...1...0...1...0 */
-		{ 0x28,0x20,0xa8,0xa0 }, { 0x20,0xa0,0x28,0xa8 },   /* ...1...0...1...1 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x88,0xa8,0x08,0x28 },   /* ...1...1...0...0 */
-		{ 0x88,0xa8,0x08,0x28 }, { 0x88,0xa8,0x08,0x28 },   /* ...1...1...0...1 */
-		{ 0xa0,0x20,0x80,0x00 }, { 0x88,0x08,0x80,0x00 },   /* ...1...1...1...0 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x00,0x08,0x20,0x28 }    /* ...1...1...1...1 */
-	};
-
 	m_opcodes = std::make_unique<UINT8[]>(0x6000*3);
-	sega_decode(memregion("user1")->base(), m_opcodes.get(), 0, convtable, 3, 0x6000);
+
+	segacrpt_z80_device* cpu = (segacrpt_z80_device*)machine().device(":maincpu");
+
+	// this seems to be a messy abuse / use of the encryption, investigate
+	if (!cpu)
+	{
+		fatalerror("can't find cpu!\n");
+	}
+	else
+	{
+		cpu->set_region_p(memregion("user1")->base());
+		cpu->set_decrypted_p(m_opcodes.get());
+	}
 
 	membank("bank1")->configure_entries(0, 3, memregion("user1")->base(), 0x6000);
 	membank("bank1d")->configure_entries(0, 3, m_opcodes.get(), 0x6000);

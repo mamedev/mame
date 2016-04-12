@@ -68,7 +68,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "machine/segacrpt.h"
+#include "machine/segacrpt_device.h"
 #include "includes/pbaction.h"
 
 
@@ -317,8 +317,11 @@ static MACHINE_CONFIG_START( pbaction, pbaction_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pbactionx, pbaction )
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_PBACTIO4, 4000000)   /* 4 MHz? */
+	MCFG_CPU_PROGRAM_MAP(pbaction_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pbaction_state,  vblank_irq)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
 
@@ -487,45 +490,15 @@ DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,4,1,2,3,0);
 	}
 
-	/* then do the standard Sega decryption */
-	DRIVER_INIT_CALL(pbactio4);
-
 	/* install a protection (?) workaround */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(pbaction_state::pbactio3_prot_kludge_r),this) );
 }
 
-DRIVER_INIT_MEMBER(pbaction_state,pbactio4)
-{
-	static const UINT8 convtable[32][4] =
-	{
-		/*       opcode                   data                     address      */
-		/*  A    B    C    D         A    B    C    D                           */
-		{ 0xa8,0xa0,0x88,0x80 }, { 0x28,0xa8,0x08,0x88 },   /* ...0...0...0...0 */
-		{ 0x28,0x08,0xa8,0x88 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...0...0...1 */
-		{ 0x28,0x20,0xa8,0xa0 }, { 0x28,0xa8,0x08,0x88 },   /* ...0...0...1...0 */
-		{ 0x28,0x08,0xa8,0x88 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...0...1...1 */
-		{ 0xa8,0xa0,0x88,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...1...0...0 */
-		{ 0x28,0x20,0xa8,0xa0 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...1...0...1 */
-		{ 0x28,0x20,0xa8,0xa0 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...1...1...0 */
-		{ 0xa8,0xa0,0x88,0x80 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...1...1...1 */
-		{ 0xa8,0xa0,0x88,0x80 }, { 0x28,0x20,0xa8,0xa0 },   /* ...1...0...0...0 */
-		{ 0x28,0x20,0xa8,0xa0 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...0...0...1 */
-		{ 0x28,0x20,0xa8,0xa0 }, { 0xa0,0x80,0xa8,0x88 },   /* ...1...0...1...0 */
-		{ 0x28,0x08,0xa8,0x88 }, { 0x28,0x08,0xa8,0x88 },   /* ...1...0...1...1 */
-		{ 0xa0,0x80,0xa8,0x88 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...1...0...0 */
-		{ 0x28,0x20,0xa8,0xa0 }, { 0xa8,0x28,0xa0,0x20 },   /* ...1...1...0...1 */
-		{ 0xa0,0x80,0xa8,0x88 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...1...1...0 */
-		{ 0xa8,0xa0,0x88,0x80 }, { 0xa8,0x28,0xa0,0x20 }    /* ...1...1...1...1 */
-	};
-
-	/* this one only has the Sega decryption */
-	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
-}
 
 
 
 GAME( 1985, pbaction,  0,        pbaction,  pbaction, driver_device,  0,        ROT90, "Tehkan", "Pinball Action (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pbaction2, pbaction, pbaction,  pbaction, driver_device,  0,        ROT90, "Tehkan", "Pinball Action (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, pbactio4, ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction5, pbaction, pbactionx, pbaction, pbaction_state, pbactio4, ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, driver_device,  0, ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction5, pbaction, pbactionx, pbaction, driver_device,  0, ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", MACHINE_SUPPORTS_SAVE )
