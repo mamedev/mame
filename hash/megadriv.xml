@@ -14937,7 +14937,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="f1wceval" cloneof="f1wc">
-		<description>F1 - World Championship Edition (Euro, Prototype, set 2)</description>
+		<description>F1 - World Championship Edition (US, Prototype)</description>
 		<year>1994</year>
 		<publisher>Domark</publisher>
 		<part name="cart" interface="megadriv_cart">
