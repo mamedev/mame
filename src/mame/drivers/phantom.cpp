@@ -140,4 +140,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1988, fphantom, 0,      0,      fphantom, fphantom, driver_device, 0, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, fphantom, 0,      0,      fphantom, fphantom, driver_device, 0, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
