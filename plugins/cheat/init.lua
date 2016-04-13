@@ -154,8 +154,9 @@ function cheat.startplugin()
 				    frombcd = frombcd,
 				    pairs = pairs,
 				    ipairs = ipairs,
-			    	    table_insert = table.insert,
-			    	    table_remove = table.remove }
+			    	    table = 
+				    { insert = table.insert,
+			    	      remove = table.remove } }
 		cheat.enabled = false
 		-- verify scripts are valid first
 		if not cheat.script then
