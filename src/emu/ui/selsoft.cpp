@@ -680,7 +680,7 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 
 	// determine the text for the header
 	int vis_item = (m_search[0] != 0) ? visible_items : (m_has_empty_start ? visible_items - 1 : visible_items);
-	tempbuf[0] = string_format(_("%1$s %2$s ( %3$d / %4$d software )"), emulator_info::get_appname(), bare_build_version, vis_item, m_swinfo.size() - 1);
+	tempbuf[0] = string_format(_("%1$s %2$s ( %3$d / %4$d software packages )"), emulator_info::get_appname(), bare_build_version, vis_item, m_swinfo.size() - 1);
 	tempbuf[1] = string_format(_("Driver: \"%1$s\" software list "), m_driver->description);
 
 	if (sw_filters::actual == UI_SW_REGION && m_filter.region.ui.size() != 0)
