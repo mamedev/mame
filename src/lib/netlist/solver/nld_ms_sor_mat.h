@@ -15,6 +15,7 @@
 #include <algorithm>
 
 #include "solver/nld_ms_direct.h"
+#include "solver/nld_matrix_solver.h"
 #include "solver/nld_solver.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
@@ -22,6 +23,9 @@ NETLIB_NAMESPACE_DEVICES_START()
 template <unsigned m_N, unsigned _storage_N>
 class matrix_solver_SOR_mat_t: public matrix_solver_direct_t<m_N, _storage_N>
 {
+
+	friend class matrix_solver_t;
+
 public:
 
 	matrix_solver_SOR_mat_t(const solver_parameters_t *params, int size)
@@ -124,12 +128,13 @@ int matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newt
 	ATTR_ALIGN nl_double new_v[_storage_N] = { 0.0 };
 	const unsigned iN = this->N();
 
+	matrix_solver_t::build_LE_A<matrix_solver_SOR_mat_t>();
+	matrix_solver_t::build_LE_RHS<matrix_solver_SOR_mat_t>();
+
 	bool resched = false;
 
 	int  resched_cnt = 0;
 
-	this->build_LE_A(*this);
-	this->build_LE_RHS(*this);
 
 #if 0
 	static int ws_cnt = 0;

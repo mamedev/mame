@@ -60,7 +60,8 @@ struct mat_cr_t
 		for (unsigned i = 1; ia[i] < lnz; i++) // row i
 		{
 			const unsigned iai1 = ia[i + 1];
-			for (unsigned pk = ia[i]; pk < diag[i]; pk++) // all columns left of diag in row i
+			const unsigned pke = diag[i];
+			for (unsigned pk = ia[i]; pk < pke; pk++) // all columns left of diag in row i
 			{
 				// pk == (i, k)
 				const unsigned k = ja[pk];

@@ -32,25 +32,10 @@ public:
 		, m_use_more_precise_stop_condition(false)
 		, m_accuracy_mult(1.0)
 		{
-			unsigned mr=this->N(); /* FIXME: maximum iterations locked in here */
-
-			for (unsigned i = 0; i < mr + 1; i++)
-				m_ht[i] = new nl_double[mr];
-
-			for (unsigned i = 0; i < this->N(); i++)
-				m_v[i] = new nl_double[_storage_N];
-
 		}
 
 	virtual ~matrix_solver_GMRES_t()
 	{
-		unsigned mr=this->N(); /* FIXME: maximum iterations locked in here */
-
-		for (unsigned i = 0; i < mr + 1; i++)
-			delete[] m_ht[i];
-
-		for (unsigned i = 0; i < this->N(); i++)
-			delete[] m_v[i];
 	}
 
 	virtual void vsetup(analog_net_t::list_t &nets) override;
@@ -72,9 +57,9 @@ private:
 
 	nl_double m_c[_storage_N + 1];  /* mr + 1 */
 	nl_double m_g[_storage_N + 1];  /* mr + 1 */
-	nl_double * RESTRICT m_ht[_storage_N + 1];  /* (mr + 1), mr */
-	nl_double m_s[_storage_N];     /* mr + 1 */
-	nl_double * RESTRICT m_v[_storage_N + 1];      /*(mr + 1), n */
+	nl_double m_ht[_storage_N + 1][_storage_N];  /* (mr + 1), mr */
+	nl_double m_s[_storage_N + 1];     /* mr + 1 */
+	nl_double m_v[_storage_N + 1][_storage_N];      /*(mr + 1), n */
 	//double m_y[_storage_N];       /* mr + 1 */
 
 	nl_double m_accuracy_mult; // FXIME: Save state
@@ -182,11 +167,10 @@ int matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton
 
 	const nl_double accuracy = this->m_params.m_accuracy;
 
-	int mr = _storage_N;
-	if (_storage_N > 3 )
-		mr = (int) sqrt(iN);
-	mr = std::min(mr, this->m_params.m_gs_loops);
-	int iter = 4;
+	int mr = iN;
+	if (iN > 3 )
+		mr = (int) sqrt(iN) * 2;
+	int iter = std::max(1, this->m_params.m_gs_loops);
 	int gsl = solve_ilu_gmres(new_V, RHS, iter, mr, accuracy);
 	int failed = mr * iter;
 
@@ -221,7 +205,7 @@ int matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton
 }
 
 template <typename T>
-inline void givens_mult( const T c, const T s, T & g0, T & g1 )
+inline void givens_mult( const T & c, const T & s, T & g0, T & g1 )
 {
 	const T tg0 = c * g0 - s * g1;
 	const T tg1 = s * g0 + c * g1;
@@ -339,7 +323,7 @@ int matrix_solver_GMRES_t<m_N, _storage_N>::solve_ilu_gmres (nl_double * RESTRIC
 			for (unsigned j = 0; j < k; j++)
 				givens_mult(m_c[j], m_s[j], m_ht[j][k], m_ht[j+1][k]);
 
-			mu = std::sqrt(std::pow(m_ht[k][k], 2) + std::pow(m_ht[k1][k], 2));
+			mu = std::hypot(m_ht[k][k], m_ht[k1][k]);
 
 			m_c[k] = m_ht[k][k] / mu;
 			m_s[k] = -m_ht[k1][k] / mu;

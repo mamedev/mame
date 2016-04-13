@@ -43,6 +43,7 @@
 
 #if 1
 #include "nld_ms_direct.h"
+//#include "nld_ms_gcr.h"
 #else
 #include "nld_ms_direct_lu.h"
 #endif
@@ -200,8 +201,191 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 		log().debug("added net with {1} populated connections\n", net->m_core_terms.size());
 	}
 
+	/* now setup the matrix */
+	setup_matrix();
 }
 
+ATTR_COLD void matrix_solver_t::setup_matrix()
+{
+	const unsigned iN = m_nets.size();
+
+	for (unsigned k = 0; k < iN; k++)
+	{
+		m_terms[k]->m_railstart = m_terms[k]->count();
+		for (unsigned i = 0; i < m_rails_temp[k]->count(); i++)
+			this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->net_other()[i], false);
+
+		m_rails_temp[k]->clear(); // no longer needed
+		m_terms[k]->set_pointers();
+	}
+
+	for (unsigned k = 0; k < iN; k++)
+		pfree(m_rails_temp[k]); // no longer needed
+
+	m_rails_temp.clear();
+#if 0
+
+	/* Sort in descending order by number of connected matrix voltages.
+	 * The idea is, that for Gauss-Seidel algo the first voltage computed
+	 * depends on the greatest number of previous voltages thus taking into
+	 * account the maximum amout of information.
+	 *
+	 * This actually improves performance on popeye slightly. Average
+	 * GS computations reduce from 2.509 to 2.370
+	 *
+	 * Smallest to largest : 2.613
+	 * Unsorted            : 2.509
+	 * Largest to smallest : 2.370
+	 *
+	 * Sorting as a general matrix pre-conditioning is mentioned in
+	 * literature but I have found no articles about Gauss Seidel.
+	 *
+	 * For Gaussian Elimination however increasing order is better suited.
+	 * FIXME: Even better would be to sort on elements right of the matrix diagonal.
+	 *
+	 */
+
+	int sort_order = (type() == GAUSS_SEIDEL ? 1 : -1) * -1;
+
+	for (unsigned k = 0; k < iN / 2; k++)
+		for (unsigned i = 0; i < iN - 1; i++)
+		{
+			if ((m_terms[i]->m_railstart - m_terms[i+1]->m_railstart) * sort_order < 0)
+			{
+				std::swap(m_terms[i], m_terms[i+1]);
+				std::swap(m_nets[i], m_nets[i+1]);
+			}
+		}
+
+	for (unsigned k = 0; k < iN; k++)
+	{
+		int *other = m_terms[k]->net_other();
+		for (unsigned i = 0; i < m_terms[k]->count(); i++)
+			if (other[i] != -1)
+				other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_otherterm->net());
+	}
+
+#endif
+
+	/* create a list of non zero elements. */
+	for (unsigned k = 0; k < iN; k++)
+	{
+		terms_t * t = m_terms[k];
+		/* pretty brutal */
+		int *other = t->net_other();
+
+		t->m_nz.clear();
+
+		for (unsigned i = 0; i < t->m_railstart; i++)
+			if (!t->m_nz.contains(other[i]))
+				t->m_nz.push_back(other[i]);
+
+		t->m_nz.push_back(k);     // add diagonal
+
+		/* and sort */
+		psort_list(t->m_nz);
+	}
+
+	/* create a list of non zero elements right of the diagonal
+	 * These list anticipate the population of array elements by
+	 * Gaussian elimination.
+	 */
+	for (unsigned k = 0; k < iN; k++)
+	{
+		terms_t * t = m_terms[k];
+		/* pretty brutal */
+		int *other = t->net_other();
+
+		if (k==0)
+			t->m_nzrd.clear();
+		else
+		{
+			t->m_nzrd = m_terms[k-1]->m_nzrd;
+			unsigned j=0;
+			while(j < t->m_nzrd.size())
+			{
+				if (t->m_nzrd[j] < k + 1)
+					t->m_nzrd.remove_at(j);
+				else
+					j++;
+			}
+		}
+
+		for (unsigned i = 0; i < t->m_railstart; i++)
+			if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
+				t->m_nzrd.push_back(other[i]);
+
+		/* and sort */
+		psort_list(t->m_nzrd);
+	}
+
+	/* create a list of non zero elements below diagonal k
+	 * This should reduce cache misses ...
+	 */
+
+	bool **touched = new bool*[iN];
+	for (unsigned k=0; k<iN; k++)
+		touched[k] = new bool[iN];
+
+	for (unsigned k = 0; k < iN; k++)
+	{
+		for (unsigned j = 0; j < iN; j++)
+			touched[k][j] = false;
+		for (unsigned j = 0; j < m_terms[k]->m_nz.size(); j++)
+			touched[k][m_terms[k]->m_nz[j]] = true;
+	}
+
+	unsigned ops = 0;
+	for (unsigned k = 0; k < iN; k++)
+	{
+		ops++; // 1/A(k,k)
+		for (unsigned row = k + 1; row < iN; row++)
+		{
+			if (touched[row][k])
+			{
+				ops++;
+				if (!m_terms[k]->m_nzbd.contains(row))
+					m_terms[k]->m_nzbd.push_back(row);
+				for (unsigned col = k + 1; col < iN; col++)
+					if (touched[k][col])
+					{
+						touched[row][col] = true;
+						ops += 2;
+					}
+			}
+		}
+	}
+	log().verbose("Number of mults/adds for {1}: {2}", name(), ops);
+
+	if (0)
+		for (unsigned k = 0; k < iN; k++)
+		{
+			pstring line = pfmt("{1}")(k, "3");
+			for (unsigned j = 0; j < m_terms[k]->m_nzrd.size(); j++)
+				line += pfmt(" {1}")(m_terms[k]->m_nzrd[j], "3");
+			log().verbose("{1}", line);
+		}
+
+	/*
+	 * save states
+	 */
+	for (unsigned k = 0; k < iN; k++)
+	{
+		pstring num = pfmt("{1}")(k);
+
+		save(m_terms[k]->m_last_V, "lastV." + num);
+		save(m_terms[k]->m_DD_n_m_1, "m_DD_n_m_1." + num);
+		save(m_terms[k]->m_h_n_m_1, "m_h_n_m_1." + num);
+
+		save(m_terms[k]->go(),"GO" + num, m_terms[k]->count());
+		save(m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
+		save(m_terms[k]->Idr(),"IDR" + num , m_terms[k]->count());
+	}
+
+	for (unsigned k=0; k<iN; k++)
+		delete [] touched[k];
+	delete [] touched;
+}
 
 void matrix_solver_t::update_inputs()
 {
@@ -539,6 +723,7 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_sp
 			else if (pstring("MAT").equals(m_iterative_solver))
 			{
 				typedef matrix_solver_direct_t<m_N,_storage_N> solver_mat;
+				//typedef matrix_solver_GCR_t<m_N,_storage_N> solver_mat;
 				return palloc(solver_mat(&m_params, size));
 			}
 			else if (pstring("SM").equals(m_iterative_solver))

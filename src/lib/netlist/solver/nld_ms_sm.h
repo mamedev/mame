@@ -125,121 +125,15 @@ ATTR_COLD void matrix_solver_sm_t<m_N, _storage_N>::vsetup(analog_net_t::list_t 
 
 	matrix_solver_t::setup_base(nets);
 
-	for (unsigned k = 0; k < N(); k++)
-	{
-		m_terms[k]->m_railstart = m_terms[k]->count();
-		for (unsigned i = 0; i < m_rails_temp[k]->count(); i++)
-			this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->net_other()[i], false);
 
-		m_rails_temp[k]->clear(); // no longer needed
-		m_terms[k]->set_pointers();
-	}
-
-	/* create a list of non zero elements. */
-	for (unsigned k = 0; k < N(); k++)
-	{
-		terms_t * t = m_terms[k];
-		/* pretty brutal */
-		int *other = t->net_other();
-
-		t->m_nz.clear();
-
-		for (unsigned i = 0; i < t->m_railstart; i++)
-			if (!t->m_nz.contains(other[i]))
-				t->m_nz.push_back(other[i]);
-
-		t->m_nz.push_back(k);     // add diagonal
-
-		/* and sort */
-		psort_list(t->m_nz);
-	}
-
-	/* create a list of non zero elements right of the diagonal
-	 * These list anticipate the population of array elements by
-	 * Gaussian elimination.
-	 */
-	for (unsigned k = 0; k < N(); k++)
-	{
-		terms_t * t = m_terms[k];
-		/* pretty brutal */
-		int *other = t->net_other();
-
-		if (k==0)
-			t->m_nzrd.clear();
-		else
-		{
-			t->m_nzrd = m_terms[k-1]->m_nzrd;
-			unsigned j=0;
-			while(j < t->m_nzrd.size())
-			{
-				if (t->m_nzrd[j] < k + 1)
-					t->m_nzrd.remove_at(j);
-				else
-					j++;
-			}
-		}
-
-		for (unsigned i = 0; i < t->m_railstart; i++)
-			if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
-				t->m_nzrd.push_back(other[i]);
-
-		/* and sort */
-		psort_list(t->m_nzrd);
-	}
-
-	/* create a list of non zero elements below diagonal k
-	 * This should reduce cache misses ...
-	 */
-
-	bool touched[_storage_N][_storage_N] = { { false } };
-	for (unsigned k = 0; k < N(); k++)
-	{
-		m_terms[k]->m_nzbd.clear();
-		for (unsigned j = 0; j < m_terms[k]->m_nz.size(); j++)
-			touched[k][m_terms[k]->m_nz[j]] = true;
-	}
-
-	for (unsigned k = 0; k < N(); k++)
-	{
-		for (unsigned row = k + 1; row < N(); row++)
-		{
-			if (touched[row][k])
-			{
-				if (!m_terms[k]->m_nzbd.contains(row))
-					m_terms[k]->m_nzbd.push_back(row);
-				for (unsigned col = k; col < N(); col++)
-					if (touched[k][col])
-						touched[row][col] = true;
-			}
-		}
-	}
-
-	if (0)
-		for (unsigned k = 0; k < N(); k++)
-		{
-			pstring line = pfmt("{1}")(k, "3");
-			for (unsigned j = 0; j < m_terms[k]->m_nzrd.size(); j++)
-				line += pfmt(" {1}")(m_terms[k]->m_nzrd[j], "3");
-			log().verbose("{1}", line);
-		}
-
-	/*
-	 * save states
-	 */
 	save(NLNAME(m_last_RHS));
 
 	for (unsigned k = 0; k < N(); k++)
 	{
 		pstring num = pfmt("{1}")(k);
 
-		save(RHS(k), "RHS" + num);
-		save(m_terms[k]->m_last_V, "lastV" + num);
-
-		save(m_terms[k]->go(),"GO" + num, m_terms[k]->count());
-		save(m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
-		save(m_terms[k]->Idr(),"IDR" + num , m_terms[k]->count());
+		save(RHS(k), "RHS." + num);
 	}
-
 }
 
 
@@ -420,8 +314,8 @@ int matrix_solver_sm_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const boo
 template <unsigned m_N, unsigned _storage_N>
 inline int matrix_solver_sm_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
-	this->build_LE_A(*this);
-	this->build_LE_RHS(*this);
+	build_LE_A<matrix_solver_sm_t>();
+	build_LE_RHS<matrix_solver_sm_t>();
 
 	for (unsigned i=0, iN=N(); i < iN; i++)
 		m_last_RHS[i] = RHS(i);

@@ -129,9 +129,9 @@ protected:
 	T delta(const T * RESTRICT V);
 
 	template <typename T>
-	void build_LE_A(T & child);
+	void build_LE_A();
 	template <typename T>
-	void build_LE_RHS(T & child);
+	void build_LE_RHS();
 
 	pvector_t<terms_t *> m_terms;
 	pvector_t<analog_net_t *> m_nets;
@@ -158,6 +158,9 @@ private:
 	logic_input_t m_fb_sync;
 	logic_output_t m_Q_sync;
 
+	/* calculate matrix */
+	void setup_matrix();
+
 	void step(const netlist_time &delta);
 
 	void update_inputs();
@@ -169,7 +172,7 @@ template <typename T>
 T matrix_solver_t::delta(const T * RESTRICT V)
 {
 	/* FIXME: Ideally we should also include currents (RHS) here. This would
-	 * need a revaluation of the right hand side after voltages have been updated
+	 * need a reevaluation of the right hand side after voltages have been updated
 	 * and thus belong into a different calculation. This applies to all solvers.
 	 */
 
@@ -188,9 +191,11 @@ void matrix_solver_t::store(const T * RESTRICT V)
 }
 
 template <typename T>
-void matrix_solver_t::build_LE_A(T & child)
+void matrix_solver_t::build_LE_A()
 {
 	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
+
+	T &child = static_cast<T &>(*this);
 
 	const unsigned iN = child.N();
 	for (unsigned k = 0; k < iN; k++)
@@ -219,8 +224,11 @@ void matrix_solver_t::build_LE_A(T & child)
 }
 
 template <typename T>
-void matrix_solver_t::build_LE_RHS(T & child)
+void matrix_solver_t::build_LE_RHS()
 {
+	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
+	T &child = static_cast<T &>(*this);
+
 	const unsigned iN = child.N();
 	for (unsigned k = 0; k < iN; k++)
 	{
