@@ -175,27 +175,22 @@ float2 GetShadowCoord(float2 QuadCoord, float2 SourceCoord)
 	float2 shadowUV = ShadowUV;
 	float2 shadowCount = ShadowCount;
 
-	// swap x/y vector and raster in screen mode (not source mode)
+	// swap x/y in screen mode (not source mode)
 	canvasCoord = ShadowTileMode == 0 && SwapXY
 		? canvasCoord.yx
 		: canvasCoord.xy;
 
-	// swap x/y vector and raster in screen mode (not source mode)
+	// swap x/y in screen mode (not source mode)
 	shadowCount = ShadowTileMode == 0 && SwapXY
 		? shadowCount.yx
 		: shadowCount.xy;
 
 	float2 shadowTile = canvasTexelDims * shadowCount;
 
-	// swap x/y vector in screen mode (not raster and not source mode)
-	shadowTile = VectorScreen && ShadowTileMode == 0 && SwapXY
-		? shadowTile.yx
-		: shadowTile.xy;
-
 	float2 shadowFrac = frac(canvasCoord / shadowTile);
 
-	// swap x/y raster in screen mode (not vector and not source mode)
-	shadowFrac = !VectorScreen && ShadowTileMode == 0 && SwapXY
+	// swap x/y in screen mode (not source mode)
+	shadowFrac = ShadowTileMode == 0 && SwapXY
 		? shadowFrac.yx
 		: shadowFrac.xy;
 
@@ -215,12 +210,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 BaseColor = tex2D(DiffuseSampler, TexCoord);
 	BaseColor.a = 1.0f;
 
-	// keep border
-	if (!PrepareBloom)
-	{
-		// clip border
-		clip(TexCoord < 0.0f || TexCoord > 1.0f ? -1 : 1);
-	}
+	// clip border
+	clip(TexCoord < 0.0f || TexCoord > 1.0f ? -1 : 1);
 
 	// Mask Simulation (may not affect bloom)
 	if (!PrepareBloom && ShadowAlpha > 0.0f)

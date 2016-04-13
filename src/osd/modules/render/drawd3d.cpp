@@ -1398,12 +1398,12 @@ void renderer_d3d9::batch_vectors()
 {
 	windows_options &options = downcast<windows_options &>(window().machine().options());
 
+	float quad_width = 0.0f;
+	float quad_height = 0.0f;
+
 	int vector_size = (options.antialias() ? 24 : 6);
 	m_vectorbatch = mesh_alloc(m_line_count * vector_size);
 	m_batchindex = 0;
-
-	float width = 0.0f;
-	float height = 0.0f;
 
 	static int start_index = 0;
 	int line_index = 0;
@@ -1432,8 +1432,8 @@ void renderer_d3d9::batch_vectors()
 			case render_primitive::QUAD:
 				if (PRIMFLAG_GET_VECTORBUF(prim.flags))
 				{
-					width = prim.bounds.x1 - prim.bounds.x0;
-					height = prim.bounds.y1 - prim.bounds.y0;
+					quad_width = prim.bounds.x1 - prim.bounds.x0;
+					quad_height = prim.bounds.y1 - prim.bounds.y0;
 				}
 				break;
 
@@ -1443,9 +1443,76 @@ void renderer_d3d9::batch_vectors()
 		}
 	}
 
+	// handle orientation and rotation for vectors as they were a texture
+	if (m_shaders->enabled())
+	{
+		bool orientation_swap_xy =
+			(window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+		bool rotation_swap_xy =
+			(window().target()->orientation() & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+		bool swap_xy = orientation_swap_xy ^ rotation_swap_xy;
+
+		bool rotation_0 = window().target()->orientation() == ROT0;
+		bool rotation_90 = window().target()->orientation() == ROT90;
+		bool rotation_180 = window().target()->orientation() == ROT180;
+		bool rotation_270 = window().target()->orientation() == ROT270;
+		bool flip_x =
+			((rotation_0 || rotation_270) && orientation_swap_xy) ||
+			((rotation_180 || rotation_270) && !orientation_swap_xy);
+		bool flip_y =
+			((rotation_0 || rotation_90) && orientation_swap_xy) ||
+			((rotation_180 || rotation_90) && !orientation_swap_xy);
+
+		float screen_width = static_cast<float>(this->get_width());
+		float screen_height = static_cast<float>(this->get_height());
+		float half_screen_width = screen_width * 0.5f;
+		float half_screen_height = screen_height * 0.5f;
+		float screen_swap_x_factor = 1.0f / screen_width * screen_height;
+		float screen_swap_y_factor = 1.0f / screen_height * screen_width;
+		float screen_quad_ratio_x = screen_width / quad_width;
+		float screen_quad_ratio_y = screen_height / quad_height;
+
+		if (swap_xy)
+		{
+			std::swap(screen_quad_ratio_x, screen_quad_ratio_y);
+		}
+
+		for (int batchindex = 0; batchindex < m_batchindex; batchindex++)
+		{
+			if (swap_xy)
+			{
+				m_vectorbatch[batchindex].x *= screen_swap_x_factor;
+				m_vectorbatch[batchindex].y *= screen_swap_y_factor;
+				std::swap(m_vectorbatch[batchindex].x, m_vectorbatch[batchindex].y);
+			}
+
+			if (flip_x)
+			{
+				m_vectorbatch[batchindex].x = screen_width - m_vectorbatch[batchindex].x;
+			}
+
+			if (flip_y)
+			{
+				m_vectorbatch[batchindex].y = screen_height - m_vectorbatch[batchindex].y;
+			}
+
+			// center
+			m_vectorbatch[batchindex].x -= half_screen_width;
+			m_vectorbatch[batchindex].y -= half_screen_height;
+
+			// correct screen/quad ratio (vectors are created in screen coordinates and have to be adjusted for texture corrdinates of the quad)
+			m_vectorbatch[batchindex].x *= screen_quad_ratio_x;
+			m_vectorbatch[batchindex].y *= screen_quad_ratio_y;
+
+			// un-center
+			m_vectorbatch[batchindex].x += half_screen_width;
+			m_vectorbatch[batchindex].y += half_screen_height;
+		}
+	}
+
 	// now add a polygon entry
 	m_poly[m_numpolys].init(D3DPT_TRIANGLELIST, m_line_count * (options.antialias() ? 8 : 2), vector_size * m_line_count, cached_flags,
-		m_texture_manager->get_vector_texture(), D3DTOP_MODULATE, 0.0f, 1.0f, width, height);
+		m_texture_manager->get_vector_texture(), D3DTOP_MODULATE, 0.0f, 1.0f, quad_width, quad_height);
 	m_numpolys++;
 
 	start_index += (int)((float)line_index * period);
@@ -1470,13 +1537,22 @@ void renderer_d3d9::batch_vector(const render_primitive &prim, float line_time)
 	render_bounds b0, b1;
 	render_line_to_quad(&prim.bounds, effwidth, &b0, &b1);
 
+	float dx = b1.x1 - b0.x1;
+	float dy = b1.y1 - b0.y1;
+	float line_length = sqrtf(dx * dx + dy * dy);
+
+	vec2f& start = (get_vector_texture() ? get_vector_texture()->get_uvstart() : get_default_texture()->get_uvstart());
+	vec2f& stop = (get_vector_texture() ? get_vector_texture()->get_uvstop() : get_default_texture()->get_uvstop());
+
 	// iterate over AA steps
 	for (const line_aa_step *step = PRIMFLAG_GET_ANTIALIAS(prim.flags) ? line_aa_4step : line_aa_1step;
 		step->weight != 0; step++)
 	{
 		// get a pointer to the vertex buffer
 		if (m_vectorbatch == nullptr)
+		{
 			return;
+		}
 
 		m_vectorbatch[m_batchindex + 0].x = b0.x0 + step->xoffs;
 		m_vectorbatch[m_batchindex + 0].y = b0.y0 + step->yoffs;
@@ -1491,10 +1567,6 @@ void renderer_d3d9::batch_vector(const render_primitive &prim, float line_time)
 		m_vectorbatch[m_batchindex + 4].y = b1.y0 + step->yoffs;
 		m_vectorbatch[m_batchindex + 5].x = b1.x1 + step->xoffs;
 		m_vectorbatch[m_batchindex + 5].y = b1.y1 + step->yoffs;
-
-		float dx = b1.x1 - b0.x1;
-		float dy = b1.y1 - b0.y1;
-		float line_length = sqrtf(dx * dx + dy * dy);
 
 		// determine the color of the line
 		INT32 r = (INT32)(prim.color.r * step->weight * 255.0f);
@@ -1517,9 +1589,6 @@ void renderer_d3d9::batch_vector(const render_primitive &prim, float line_time)
 		if (b > 255) b = 255;
 		if (a > 255) a = 255;
 		DWORD color = D3DCOLOR_ARGB(a, r, g, b);
-
-		vec2f& start = (get_vector_texture() ? get_vector_texture()->get_uvstart() : get_default_texture()->get_uvstart());
-		vec2f& stop = (get_vector_texture() ? get_vector_texture()->get_uvstop() : get_default_texture()->get_uvstop());
 
 		m_vectorbatch[m_batchindex + 0].u0 = start.c.x;
 		m_vectorbatch[m_batchindex + 0].v0 = start.c.y;

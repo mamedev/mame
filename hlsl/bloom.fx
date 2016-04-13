@@ -278,9 +278,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 	Output.TexCoord = TexCoord.xy;
 
-	TexCoord += VectorScreen
-		? 0.5f / TargetDims.xy
-		: 0.5f / SourceDims.xy;
+	TexCoord += 0.5f / SourceDims;
 
 	Output.BloomCoord = TexCoord.xy;
 
