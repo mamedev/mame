@@ -64,8 +64,316 @@
 extern const char layout_neogeo[];
 
 
+/*************************************
+ *
+ *  AES
+ *
+ *************************************/
+
+class ng_aes_state : public neogeo_state
+{
+public:
+	ng_aes_state(const machine_config &mconfig, device_type type, const char *tag)
+		: neogeo_state(mconfig, type, tag)
+		, m_io_in2(*this, "IN2")
+		, m_ctrl1(*this, "ctrl1")
+		, m_ctrl2(*this, "ctrl2")
+	{ }
+
+	DECLARE_READ16_MEMBER(aes_in2_r);
+	DECLARE_WRITE8_MEMBER(io_control_w);
+
+	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
+
+	DECLARE_MACHINE_START(neogeo);
+	DECLARE_MACHINE_RESET(neogeo);
+
+	DECLARE_DRIVER_INIT(neogeo);
+
+protected:
+	required_ioport m_io_in2;
+	required_device<neogeo_control_port_device> m_ctrl1;
+	required_device<neogeo_control_port_device> m_ctrl2;
+
+	void common_machine_start();
+};
 
 
+/*************************************
+ *
+ *  Input read handlers
+ *
+ *************************************/
+
+READ16_MEMBER(ng_aes_state::aes_in2_r)
+{
+	UINT32 ret = m_io_in2->read();
+	ret = (ret & 0xfcff) | (m_ctrl1->read_start_sel() << 8);
+	ret = (ret & 0xf3ff) | (m_ctrl2->read_start_sel() << 10);
+	return ret;
+}
+
+WRITE8_MEMBER(ng_aes_state::io_control_w)
+{
+	switch (offset)
+	{
+		case 0x00:
+			m_ctrl1->write_ctrlsel(data);
+			m_ctrl2->write_ctrlsel(data);
+			break;
+		default:
+			neogeo_state::io_control_w(space, offset, data);
+			break;
+	}
+}
+
+
+/*************************************
+ *
+ *  Machine initialization
+ *
+ *************************************/
+
+
+void ng_aes_state::common_machine_start()
+{
+	/* set the initial main CPU bank */
+	neogeo_main_cpu_banking_init();
+
+	/* set the initial audio CPU ROM banks */
+	neogeo_audio_cpu_banking_init(1);
+
+	create_interrupt_timers();
+
+	/* irq levels for MVS / AES */
+	m_vblank_level = 1;
+	m_raster_level = 2;
+
+	/* start with an IRQ3 - but NOT on a reset */
+	m_irq3_pending = 1;
+
+	/* register state save */
+	save_item(NAME(m_display_position_interrupt_control));
+	save_item(NAME(m_display_counter));
+	save_item(NAME(m_vblank_interrupt_pending));
+	save_item(NAME(m_display_position_interrupt_pending));
+	save_item(NAME(m_irq3_pending));
+	save_item(NAME(m_audio_cpu_nmi_enabled));
+	save_item(NAME(m_audio_cpu_nmi_pending));
+	save_item(NAME(m_controller_select));
+	save_item(NAME(m_use_cart_vectors));
+	save_item(NAME(m_use_cart_audio));
+	//save_item(NAME(m_main_cpu_bank_address));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(ng_aes_state::neogeo_postload), this));
+
+
+	m_cartslots[0] = m_cartslot1;
+	m_cartslots[1] = m_cartslot2;
+	m_cartslots[2] = m_cartslot3;
+	m_cartslots[3] = m_cartslot4;
+	m_cartslots[4] = m_cartslot5;
+	m_cartslots[5] = m_cartslot6;
+
+	m_sprgen->set_screen(m_screen);
+
+	m_sprgen->set_sprite_region(m_region_sprites->base(), m_region_sprites->bytes());
+	m_sprgen->set_fixed_regions(m_region_fixed->base(), m_region_fixed->bytes(), m_region_fixedbios);
+
+}
+
+MACHINE_START_MEMBER(ng_aes_state,neogeo)
+{
+	m_type = NEOGEO_AES;
+	common_machine_start();
+}
+
+
+/*************************************
+ *
+ *  Machine reset
+ *
+ *************************************/
+
+MACHINE_RESET_MEMBER(ng_aes_state,neogeo)
+{
+	offs_t offs;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	/* reset system control registers */
+	for (offs = 0; offs < 8; offs++)
+		system_control_w(space, offs, 0);
+
+	// disable audiocpu nmi
+	m_audio_cpu_nmi_enabled = false;
+	m_audio_cpu_nmi_pending = false;
+	audio_cpu_check_nmi();
+
+	m_maincpu->reset();
+
+	start_interrupt_timers();
+
+	/* trigger the IRQ3 that was set by MACHINE_START */
+	update_interrupts();
+
+	m_recurse = false;
+
+	/* AES has no SFIX ROM and always uses the cartridge's */
+	m_sprgen->neogeo_set_fixed_layer_source(1);
+
+	if (m_cartslots[0]) // if thie system has cart slots then do some extra initialization
+	{
+		set_slot_number(0);
+	}
+}
+
+
+/*************************************
+ *
+ *  Main CPU memory handlers
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( aes_main_map, AS_PROGRAM, 16, ng_aes_state )
+//  AM_RANGE(0x000000, 0x00007f) AM_ROMBANK("vectors")
+	AM_RANGE(0x000000, 0x00007f) AM_READ(neogeo_slot_rom_low_bectors_r)
+	AM_RANGE(0x000080, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM
+	/* some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too */
+	//AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK("cartridge")
+	//AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
+	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_DEVREAD("ctrl1", neogeo_control_port_device, ctrl_r)
+	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO") AM_WRITE8(audio_command_w, 0xff00)
+	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_DEVREAD("ctrl2", neogeo_control_port_device, ctrl_r)
+	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
+	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ(aes_in2_r)
+	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
+	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITE8(system_control_w, 0x00ff)
+	AM_RANGE(0x3c0000, 0x3c0007) AM_MIRROR(0x01fff8) AM_READ(neogeo_video_register_r)
+	AM_RANGE(0x3c0000, 0x3c000f) AM_MIRROR(0x01fff0) AM_WRITE(neogeo_video_register_w)
+	AM_RANGE(0x3e0000, 0x3fffff) AM_READ(neogeo_unmapped_r)
+	AM_RANGE(0x400000, 0x401fff) AM_MIRROR(0x3fe000) AM_READWRITE(neogeo_paletteram_r, neogeo_paletteram_w)
+	AM_RANGE(0x800000, 0x800fff) AM_READWRITE(memcard_r, memcard_w)
+	AM_RANGE(0xc00000, 0xc1ffff) AM_MIRROR(0x0e0000) AM_ROM AM_REGION("mainbios", 0)
+	AM_RANGE(0xd00000, 0xffffff) AM_READ(neogeo_unmapped_r)
+ADDRESS_MAP_END
+
+
+
+/*************************************
+ *
+ *  Input port definitions
+ *
+ *************************************/
+
+
+static INPUT_PORTS_START( aes )
+	PORT_START("IN2")
+	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
+	// Start & Select are read from controller slot device
+	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, get_memcard_status, NULL)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* Hardware type (AES=0, MVS=1) Some games check this and show a piracy warning screen if the hardware and BIOS don't match */
+
+	PORT_START("AUDIO")
+	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_UNUSED )  /* AES has no coin slots, it's a console */
+	PORT_BIT( 0x0018, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* what is this? Universe BIOS uses these bits to detect MVS or AES hardware */
+	PORT_BIT( 0x00e0, IP_ACTIVE_HIGH, IPT_UNUSED )  /* AES has no upd4990a */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, get_audio_result, NULL)
+
+	PORT_START("JP") // JP1 and JP2 are jumpers or solderpads depending on AES board revision, intended for use on the Development BIOS
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Short JP1 (Debug Monitor)") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, ng_aes_state, aes_jp1, 0)
+//  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) // what is JP2 for? somehow related to system reset, disable watchdog?
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(ng_aes_state::aes_jp1)
+{
+	// Shorting JP1 causes a 68000 /BERR (Bus Error). On Dev Bios, this pops up the debug monitor.
+	if (newval)
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, HOLD_LINE);
+}
+
+
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+
+static MACHINE_CONFIG_DERIVED_CLASS( aes, neogeo_base, ng_aes_state )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(aes_main_map)
+
+	MCFG_NEOGEO_MEMCARD_ADD("memcard")
+
+	MCFG_MACHINE_START_OVERRIDE(ng_aes_state, neogeo)
+	MCFG_MACHINE_RESET_OVERRIDE(ng_aes_state, neogeo)
+
+	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot1", neogeo_cart, nullptr)
+
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_controls, "joy")
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_controls, "joy")
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list","neogeo")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list","AES")
+MACHINE_CONFIG_END
+
+
+
+/*************************************
+ *
+ *  Driver initalization
+ *
+ *************************************/
+
+#define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+
+ROM_START( aes )
+	ROM_REGION16_BE( 0x20000, "mainbios", 0 )
+	ROM_SYSTEM_BIOS( 0, "asia", "Asia AES" )
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "neo-epo.bin",  0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07) ) /* AES Console (Asia?) Bios */
+	ROM_SYSTEM_BIOS( 1, "japan", "Japan AES" )
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "neo-po.bin",   0x00000, 0x020000, CRC(16d0c132) SHA1(4e4a440cae46f3889d20234aebd7f8d5f522e22c) ) /* AES Console (Japan) Bios */
+	ROM_SYSTEM_BIOS( 2, "devel", "Development System ROM" )
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "neodebug.rom", 0x00000, 0x020000, CRC(698ebb7d) SHA1(081c49aa8cc7dad5939833dc1b18338321ea0a07) ) /* Official debug (development) ROM, for home-use base board */
+	NEOGEO_UNIBIOS(3)
+
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "zoomy", 0 )
+	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
+
+	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x1000000, "ymsnd", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x1000000, "ymsnd.deltat", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x900000, "sprites", ROMREGION_ERASEFF )
+ROM_END
+
+
+DRIVER_INIT_MEMBER(ng_aes_state,neogeo)
+{
+	if (!m_cartslots[0]) m_banked_cart->install_banks(machine(), m_maincpu, m_region_maincpu->base(), m_region_maincpu->bytes());
+}
+
+
+/*    YEAR  NAME  PARENT COMPAT MACHINE INPUT  INIT     COMPANY      FULLNAME            FLAGS */
+CONS( 1990, aes,    0,      0,   aes,      aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo AES", MACHINE_SUPPORTS_SAVE )
+
+
+
+
+/*************************************
+ *
+ *  NEOCD
+ *
+ *************************************/
 
 /* Stubs for various functions called by the FBA code, replace with MAME specifics later */
 
@@ -86,29 +394,12 @@ UINT8 NeoSystem = NEOCD_REGION_JAPAN;
 
 
 
-
-
-
-
-
-class ng_aes_state : public neogeo_state
+class ngcd_state : public ng_aes_state
 {
 public:
-	ng_aes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: neogeo_state(mconfig, type, tag)
+	ngcd_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ng_aes_state(mconfig, type, tag)
 		, m_tempcdc(*this,"tempcdc")
-		, m_io_in2(*this, "IN2")
-		, m_io_in0(*this, "IN0")
-		, m_io_in1(*this, "IN1")
-		, m_io_mj01_p1(*this, "MJ01_P1")
-		, m_io_mj02_p1(*this, "MJ02_P1")
-		, m_io_mj03_p1(*this, "MJ03_P1")
-		, m_io_mj04_p1(*this, "MJ04_P1")
-		, m_io_mj01_p2(*this, "MJ01_P2")
-		, m_io_mj02_p2(*this, "MJ02_P2")
-		, m_io_mj03_p2(*this, "MJ03_P2")
-		, m_io_mj04_p2(*this, "MJ04_P2")
-		, m_io_ctrlsel(*this, "CTRLSEL")
 	{
 		NeoCDDMAAddress1 = 0;
 		NeoCDDMAAddress2 = 0;
@@ -128,7 +419,6 @@ public:
 	optional_device<lc89510_temp_device> m_tempcdc;
 
 
-
 	void NeoCDDoDMA(address_space& curr_space);
 	void set_DMA_regs(int offset, UINT16 wordValue);
 
@@ -138,15 +428,10 @@ public:
 	DECLARE_WRITE16_MEMBER(neocd_control_w);
 	DECLARE_READ8_MEMBER(neocd_transfer_r);
 	DECLARE_WRITE8_MEMBER(neocd_transfer_w);
-	DECLARE_READ16_MEMBER(aes_in0_r);
-	DECLARE_READ16_MEMBER(aes_in1_r);
-	DECLARE_READ16_MEMBER(aes_in2_r);
 
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 
 	DECLARE_MACHINE_START(neocd);
-	DECLARE_MACHINE_START(neogeo);
-	DECLARE_MACHINE_RESET(neogeo);
 	DECLARE_MACHINE_RESET(neocd);
 
 	// neoCD
@@ -185,8 +470,6 @@ public:
 
 	UINT32 screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DRIVER_INIT(neogeo);
-
 	DECLARE_DRIVER_INIT(neocdz);
 	DECLARE_DRIVER_INIT(neocdzj);
 
@@ -194,20 +477,7 @@ public:
 
 	std::unique_ptr<UINT8[]> m_meminternal_data;
 protected:
-	required_ioport m_io_in2;
-	required_ioport m_io_in0;
-	required_ioport m_io_in1;
-	required_ioport m_io_mj01_p1;
-	required_ioport m_io_mj02_p1;
-	required_ioport m_io_mj03_p1;
-	required_ioport m_io_mj04_p1;
-	required_ioport m_io_mj01_p2;
-	required_ioport m_io_mj02_p2;
-	required_ioport m_io_mj03_p2;
-	required_ioport m_io_mj04_p2;
-	required_ioport m_io_ctrlsel;
 
-	void common_machine_start();
 	INT32 SekIdle(INT32 nCycles);
 };
 
@@ -226,13 +496,13 @@ protected:
 
 
 /* The NeoCD has an 8kB internal memory card, instead of memcard slots like the MVS and AES */
-READ16_MEMBER(ng_aes_state::neocd_memcard_r)
+READ16_MEMBER(ngcd_state::neocd_memcard_r)
 {
 	return m_meminternal_data[offset] | 0xff00;
 }
 
 
-WRITE16_MEMBER(ng_aes_state::neocd_memcard_w)
+WRITE16_MEMBER(ngcd_state::neocd_memcard_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -241,19 +511,13 @@ WRITE16_MEMBER(ng_aes_state::neocd_memcard_w)
 }
 
 
-
-
-
-
 /*************************************
  *
  *  System control register
  *
  *************************************/
 
-
-
-READ16_MEMBER(ng_aes_state::neocd_control_r)
+READ16_MEMBER(ngcd_state::neocd_control_r)
 {
 	UINT32 sekAddress = 0xff0000+ (offset*2);
 
@@ -282,7 +546,7 @@ READ16_MEMBER(ng_aes_state::neocd_control_r)
 }
 
 
-WRITE16_MEMBER(ng_aes_state::neocd_control_w)
+WRITE16_MEMBER(ngcd_state::neocd_control_w)
 {
 	UINT32 sekAddress = 0xff0000+ (offset*2);
 	UINT16 wordValue = data;
@@ -481,7 +745,7 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
  */
 
 
-READ8_MEMBER(ng_aes_state::neocd_transfer_r)
+READ8_MEMBER(ngcd_state::neocd_transfer_r)
 {
 	UINT32 sekAddress = 0xe00000+ (offset);
 	int address;
@@ -511,7 +775,7 @@ READ8_MEMBER(ng_aes_state::neocd_transfer_r)
 
 }
 
-WRITE8_MEMBER(ng_aes_state::neocd_transfer_w)
+WRITE8_MEMBER(ngcd_state::neocd_transfer_w)
 {
 	UINT8 byteValue = data;
 	UINT32 sekAddress = 0xe00000+ (offset);
@@ -562,7 +826,7 @@ WRITE8_MEMBER(ng_aes_state::neocd_transfer_w)
 
 
 
-void ng_aes_state::set_DMA_regs(int offset, UINT16 wordValue)
+void ngcd_state::set_DMA_regs(int offset, UINT16 wordValue)
 {
 	switch (offset)
 	{
@@ -607,7 +871,7 @@ void ng_aes_state::set_DMA_regs(int offset, UINT16 wordValue)
 
 
 
-INT32 ng_aes_state::SekIdle(INT32 nCycles)
+INT32 ngcd_state::SekIdle(INT32 nCycles)
 {
 	return nCycles;
 }
@@ -660,7 +924,7 @@ INT32 ng_aes_state::SekIdle(INT32 nCycles)
  */
 
 
-void ng_aes_state::NeoCDDoDMA(address_space& curr_space)
+void ngcd_state::NeoCDDoDMA(address_space& curr_space)
 {
 	// The LC8953 chip has a programmable DMA controller, which is not properly emulated.
 	// Since the software only uses it in a limited way, we can apply a simple heuristic
@@ -900,148 +1164,13 @@ if (NeoCDDMAAddress2 == 0x0800)  {
 }
 
 
-/*
- * Handling selectable controller types
- */
-
-READ16_MEMBER(ng_aes_state::aes_in0_r)
-{
-	UINT32 ret = 0xffff;
-	UINT32 ctrl = m_io_ctrlsel->read();
-
-	switch(ctrl & 0x0f)
-	{
-	case 0x00:
-		ret = 0xffff;
-		break;
-	case 0x01:
-		ret = m_io_in0->read();
-		break;
-	case 0x02:
-		switch (m_controller_select)
-		{
-			case 0x09: ret = m_io_mj01_p1->read(); break;
-			case 0x12: ret = m_io_mj02_p1->read(); break;
-			case 0x1b: ret = m_io_mj03_p1->read(); break; /* player 1 normal inputs? */
-			case 0x24: ret = m_io_mj04_p1->read(); break;
-			default:
-				ret = m_io_in0->read();
-				break;
-		}
-		break;
-	}
-
-	return ret;
-}
-
-READ16_MEMBER(ng_aes_state::aes_in1_r)
-{
-	UINT32 ret = 0xffff;
-	UINT32 ctrl = m_io_ctrlsel->read();
-
-	switch(ctrl & 0xf0)
-	{
-	case 0x00:
-		ret = 0xffff;
-		break;
-	case 0x10:
-		ret = m_io_in1->read();
-		break;
-	case 0x20:
-		switch (m_controller_select)
-		{
-			case 0x09: ret = m_io_mj01_p2->read(); break;
-			case 0x12: ret = m_io_mj02_p2->read(); break;
-			case 0x1b: ret = m_io_mj03_p2->read(); break; /* player 2 normal inputs? */
-			case 0x24: ret = m_io_mj04_p2->read(); break;
-			default:
-				ret = m_io_in1->read();
-				break;
-		}
-		break;
-	}
-
-	return ret;
-}
-
-
-READ16_MEMBER(ng_aes_state::aes_in2_r)
-{
-	UINT32 in2 = m_io_in2->read();
-	UINT32 ret = in2;
-	UINT32 sel = m_io_ctrlsel->read();
-
-	if((sel & 0x02) && (m_controller_select == 0x24))
-		ret ^= 0x0200;
-
-	if((sel & 0x20) && (m_controller_select == 0x24))
-		ret ^= 0x0800;
-
-	return ret;
-}
-
-
 /*************************************
  *
  *  Machine initialization
  *
  *************************************/
 
-
-void ng_aes_state::common_machine_start()
-{
-	/* set the initial main CPU bank */
-	neogeo_main_cpu_banking_init();
-
-	/* set the initial audio CPU ROM banks */
-	neogeo_audio_cpu_banking_init(1);
-
-	create_interrupt_timers();
-
-	/* irq levels for MVS / AES */
-	m_vblank_level = 1;
-	m_raster_level = 2;
-
-	/* start with an IRQ3 - but NOT on a reset */
-	m_irq3_pending = 1;
-
-	/* register state save */
-	save_item(NAME(m_display_position_interrupt_control));
-	save_item(NAME(m_display_counter));
-	save_item(NAME(m_vblank_interrupt_pending));
-	save_item(NAME(m_display_position_interrupt_pending));
-	save_item(NAME(m_irq3_pending));
-	save_item(NAME(m_audio_cpu_nmi_enabled));
-	save_item(NAME(m_audio_cpu_nmi_pending));
-	save_item(NAME(m_controller_select));
-	save_item(NAME(m_use_cart_vectors));
-	save_item(NAME(m_use_cart_audio));
-	//save_item(NAME(m_main_cpu_bank_address));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(ng_aes_state::neogeo_postload), this));
-
-
-	m_cartslots[0] = m_cartslot1;
-	m_cartslots[1] = m_cartslot2;
-	m_cartslots[2] = m_cartslot3;
-	m_cartslots[3] = m_cartslot4;
-	m_cartslots[4] = m_cartslot5;
-	m_cartslots[5] = m_cartslot6;
-
-	m_sprgen->set_screen(m_screen);
-
-	m_sprgen->set_sprite_region(m_region_sprites->base(), m_region_sprites->bytes());
-	m_sprgen->set_fixed_regions(m_region_fixed->base(), m_region_fixed->bytes(), m_region_fixedbios);
-
-}
-
-MACHINE_START_MEMBER(ng_aes_state,neogeo)
-{
-	m_type = NEOGEO_AES;
-	common_machine_start();
-}
-
-MACHINE_START_MEMBER(ng_aes_state,neocd)
+MACHINE_START_MEMBER(ngcd_state,neocd)
 {
 	m_type = NEOGEO_CD;
 	common_machine_start();
@@ -1069,46 +1198,14 @@ MACHINE_START_MEMBER(ng_aes_state,neocd)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(ng_aes_state,neogeo)
+MACHINE_RESET_MEMBER(ngcd_state,neocd)
 {
-	offs_t offs;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	/* reset system control registers */
-	for (offs = 0; offs < 8; offs++)
-		system_control_w(space, offs, 0);
-
-	// disable audiocpu nmi
-	m_audio_cpu_nmi_enabled = false;
-	m_audio_cpu_nmi_pending = false;
-	audio_cpu_check_nmi();
-
-	m_maincpu->reset();
-
-	start_interrupt_timers();
-
-	/* trigger the IRQ3 that was set by MACHINE_START */
-	update_interrupts();
-
-	m_recurse = false;
-
-	/* AES has no SFIX ROM and always uses the cartridge's */
-	m_sprgen->neogeo_set_fixed_layer_source(1);
-
-	if (m_cartslots[0]) // if thie system has cart slots then do some extra initialization
-	{
-		set_slot_number(0);
-	}
-
+	MACHINE_RESET_CALL_MEMBER( neogeo );
+	
 	NeoSpriteRAM = memregion("sprites")->base();
 	YM2610ADPCMAROM = memregion("ymsnd")->base();
 	NeoZ80ROMActive = memregion("audiocpu")->base();
 	NeoTextRAM = memregion("fixed")->base();
-}
-
-MACHINE_RESET_MEMBER(ng_aes_state,neocd)
-{
-	MACHINE_RESET_CALL_MEMBER( neogeo );
 
 	m_tempcdc->NeoCDCommsReset();
 
@@ -1125,41 +1222,14 @@ MACHINE_RESET_MEMBER(ng_aes_state,neocd)
  *
  *************************************/
 
-static ADDRESS_MAP_START( aes_main_map, AS_PROGRAM, 16, ng_aes_state )
-//  AM_RANGE(0x000000, 0x00007f) AM_ROMBANK("vectors")
-	AM_RANGE(0x000000, 0x00007f) AM_READ(neogeo_slot_rom_low_bectors_r)
-	AM_RANGE(0x000080, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM
-	/* some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too */
-	//AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK("cartridge")
-	//AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
-	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_READ(aes_in0_r)
-	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO") AM_WRITE8(audio_command_w, 0xff00)
-	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_READ(aes_in1_r)
-	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
-	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ(aes_in2_r)
-	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
-	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITE8(system_control_w, 0x00ff)
-	AM_RANGE(0x3c0000, 0x3c0007) AM_MIRROR(0x01fff8) AM_READ(neogeo_video_register_r)
-	AM_RANGE(0x3c0000, 0x3c000f) AM_MIRROR(0x01fff0) AM_WRITE(neogeo_video_register_w)
-	AM_RANGE(0x3e0000, 0x3fffff) AM_READ(neogeo_unmapped_r)
-	AM_RANGE(0x400000, 0x401fff) AM_MIRROR(0x3fe000) AM_READWRITE(neogeo_paletteram_r, neogeo_paletteram_w)
-	AM_RANGE(0x800000, 0x800fff) AM_READWRITE(memcard_r, memcard_w)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_MIRROR(0x0e0000) AM_ROM AM_REGION("mainbios", 0)
-	AM_RANGE(0xd00000, 0xffffff) AM_READ(neogeo_unmapped_r)
-ADDRESS_MAP_END
-
-
-
-
-static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ng_aes_state )
+static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ngcd_state )
 //  AM_RANGE(0x000000, 0x00007f) AM_READ_BANK("vectors") // writes will fall through to area below
 	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_REGION("maincpu", 0x00000)
 
-	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_READ(aes_in0_r)
+	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_DEVREAD("ctrl1", neogeo_control_port_device, ctrl_r)
 	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO") AM_WRITE8(audio_command_w, 0xff00)
-	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_READ(aes_in1_r)
+	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_DEVREAD("ctrl2", neogeo_control_port_device, ctrl_r)
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
 	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ(aes_in2_r)
 	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
@@ -1188,12 +1258,12 @@ ADDRESS_MAP_END
  *************************************/
 
 
-static ADDRESS_MAP_START( neocd_audio_map, AS_PROGRAM, 8, ng_aes_state )
+static ADDRESS_MAP_START( neocd_audio_map, AS_PROGRAM, 8, ngcd_state )
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_REGION("audiocpu", 0x00000)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( neocd_audio_io_map, AS_IO, 8, ng_aes_state )
+static ADDRESS_MAP_START( neocd_audio_io_map, AS_IO, 8, ngcd_state )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, soundlatch_clear_byte_w)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff10) AM_MASK(0x0010) AM_WRITE(audio_cpu_enable_nmi_w)
@@ -1214,171 +1284,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-
-static INPUT_PORTS_START( controller )
-	PORT_START("IN0")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-
-
-	PORT_START("IN1")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( mjpanel )
-	PORT_START("MJ01_P1")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("MJ02_P1")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-
-	PORT_START("MJ03_P1")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-
-	PORT_START("MJ04_P1")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("MJ01_P2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("MJ02_P2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("MJ03_P2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-
-	PORT_START("MJ04_P2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( aes )
-	PORT_START("CTRLSEL") /* Select Controller Type */
-	PORT_CONFNAME( 0x0f, 0x01, "P1 Controller")
-	PORT_CONFSETTING(    0x00, "Unconnected" )
-	PORT_CONFSETTING(    0x01, "NeoGeo Controller" )
-	PORT_CONFSETTING(    0x02, "NeoGeo Mahjong Panel" )
-	PORT_CONFNAME( 0xf0, 0x10, "P2 Controller")
-	PORT_CONFSETTING(    0x00, "Unconnected" )
-	PORT_CONFSETTING(    0x10, "NeoGeo Controller" )
-	PORT_CONFSETTING(    0x20, "NeoGeo Mahjong Panel" )
-
-	PORT_INCLUDE( controller )
-
-	PORT_INCLUDE( mjpanel )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SELECT ) PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SELECT ) PORT_PLAYER(2)
-	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, get_memcard_status, NULL)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* Hardware type (AES=0, MVS=1) Some games check this and show a piracy warning screen if the hardware and BIOS don't match */
-
-	PORT_START("AUDIO")
-	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_UNUSED )  /* AES has no coin slots, it's a console */
-	PORT_BIT( 0x0018, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* what is this? Universe BIOS uses these bits to detect MVS or AES hardware */
-	PORT_BIT( 0x00e0, IP_ACTIVE_HIGH, IPT_UNUSED )  /* AES has no upd4990a */
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, get_audio_result, NULL)
-
-	PORT_START("JP") // JP1 and JP2 are jumpers or solderpads depending on AES board revision, intended for use on the Development BIOS
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Short JP1 (Debug Monitor)") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, ng_aes_state, aes_jp1, 0)
-//  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) // what is JP2 for? somehow related to system reset, disable watchdog?
-INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(ng_aes_state::aes_jp1)
-{
-	// Shorting JP1 causes a 68000 /BERR (Bus Error). On Dev Bios, this pops up the debug monitor.
-	if (newval)
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, HOLD_LINE);
-}
-
-
 static INPUT_PORTS_START( neocd )
 	PORT_INCLUDE( aes )
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_UNUSED ) // the NeoCD memcard is internal
 INPUT_PORTS_END
+
 
 
 /*************************************
@@ -1388,25 +1300,9 @@ INPUT_PORTS_END
  *************************************/
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( aes, neogeo_base, ng_aes_state )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(aes_main_map)
-
-	MCFG_NEOGEO_MEMCARD_ADD("memcard")
-
-	MCFG_MACHINE_START_OVERRIDE(ng_aes_state, neogeo)
-	MCFG_MACHINE_RESET_OVERRIDE(ng_aes_state, neogeo)
-
-	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot1", neogeo_cart, nullptr)
-
-	MCFG_SOFTWARE_LIST_ADD("cart_list","neogeo")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list","AES")
-MACHINE_CONFIG_END
-
-
 /* NeoCD uses custom vectors on IRQ4 to handle various events from the CDC */
 
-IRQ_CALLBACK_MEMBER(ng_aes_state::neocd_int_callback)
+IRQ_CALLBACK_MEMBER(ngcd_state::neocd_int_callback)
 {
 	if (irqline==4)
 	{
@@ -1419,26 +1315,26 @@ IRQ_CALLBACK_MEMBER(ng_aes_state::neocd_int_callback)
 	return (0x60+irqline*4)/4;
 }
 
-void ng_aes_state::interrupt_callback_type1(void)
+void ngcd_state::interrupt_callback_type1(void)
 {
 	nIRQAcknowledge &= ~0x20;
 	NeoCDIRQUpdate(0);
 }
 
-void ng_aes_state::interrupt_callback_type2(void)
+void ngcd_state::interrupt_callback_type2(void)
 {
 	nIRQAcknowledge &= ~0x10;
 	NeoCDIRQUpdate(0);
 }
 
-void ng_aes_state::interrupt_callback_type3(void)
+void ngcd_state::interrupt_callback_type3(void)
 {
 	nIRQAcknowledge &= ~0x08;
 	NeoCDIRQUpdate(0);
 }
 
 
-void ng_aes_state::NeoCDIRQUpdate(UINT8 byteValue)
+void ngcd_state::NeoCDIRQUpdate(UINT8 byteValue)
 {
 	// do we also need to check the regular interrupts like FBA?
 
@@ -1468,7 +1364,7 @@ void ng_aes_state::NeoCDIRQUpdate(UINT8 byteValue)
 }
 
 
-UINT32 ng_aes_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 ngcd_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// fill with background color first
 	bitmap.fill(*m_bg_pen, cliprect);
@@ -1481,70 +1377,46 @@ UINT32 ng_aes_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bi
 }
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( neocd, neogeo_base, ng_aes_state )
+static MACHINE_CONFIG_DERIVED_CLASS( neocd, neogeo_base, ngcd_state )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(neocd_main_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ng_aes_state,neocd_int_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ngcd_state,neocd_int_callback)
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(neocd_audio_map)
 	MCFG_CPU_IO_MAP(neocd_audio_io_map)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(ng_aes_state, screen_update_neocd)
+	MCFG_SCREEN_UPDATE_DRIVER(ngcd_state, screen_update_neocd)
 
 	// temporary until things are cleaned up
 	MCFG_DEVICE_ADD("tempcdc", LC89510_TEMP, 0) // cd controller
 	MCFG_SEGACD_HACK_SET_NEOCD
-	MCFG_SET_TYPE1_INTERRUPT_CALLBACK( ng_aes_state, interrupt_callback_type1 )
-	MCFG_SET_TYPE2_INTERRUPT_CALLBACK( ng_aes_state, interrupt_callback_type2 )
-	MCFG_SET_TYPE3_INTERRUPT_CALLBACK( ng_aes_state, interrupt_callback_type3 )
+	MCFG_SET_TYPE1_INTERRUPT_CALLBACK( ngcd_state, interrupt_callback_type1 )
+	MCFG_SET_TYPE2_INTERRUPT_CALLBACK( ngcd_state, interrupt_callback_type2 )
+	MCFG_SET_TYPE3_INTERRUPT_CALLBACK( ngcd_state, interrupt_callback_type3 )
 
 	MCFG_NVRAM_ADD_0FILL("saveram")
 
-	MCFG_MACHINE_START_OVERRIDE(ng_aes_state,neocd)
-	MCFG_MACHINE_RESET_OVERRIDE(ng_aes_state,neocd)
+	MCFG_MACHINE_START_OVERRIDE(ngcd_state,neocd)
+	MCFG_MACHINE_RESET_OVERRIDE(ngcd_state,neocd)
+
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_controls, "joy")
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_controls, "joy")
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("neocd_cdrom")
 	MCFG_SOFTWARE_LIST_ADD("cd_list","neocd")
 MACHINE_CONFIG_END
 
+
+
 /*************************************
  *
  *  Driver initalization
  *
  *************************************/
-
-#define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
-
-ROM_START( aes )
-	ROM_REGION16_BE( 0x20000, "mainbios", 0 )
-	ROM_SYSTEM_BIOS( 0, "asia", "Asia AES" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "neo-epo.bin",  0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07) ) /* AES Console (Asia?) Bios */
-	ROM_SYSTEM_BIOS( 1, "japan", "Japan AES" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "neo-po.bin",   0x00000, 0x020000, CRC(16d0c132) SHA1(4e4a440cae46f3889d20234aebd7f8d5f522e22c) ) /* AES Console (Japan) Bios */
-	ROM_SYSTEM_BIOS( 2, "devel", "Development System ROM" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "neodebug.rom", 0x00000, 0x020000, CRC(698ebb7d) SHA1(081c49aa8cc7dad5939833dc1b18338321ea0a07) ) /* Official debug (development) ROM, for home-use base board */
-	NEOGEO_UNIBIOS(3)
-
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x20000, "zoomy", 0 )
-	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
-
-	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x1000000, "ymsnd", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x1000000, "ymsnd.deltat", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x900000, "sprites", ROMREGION_ERASEFF )
-ROM_END
 
 ROM_START( neocd )
 	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
@@ -1597,28 +1469,20 @@ ROM_END
 
 #define rom_neocdzj    rom_neocdz
 
-DRIVER_INIT_MEMBER(ng_aes_state,neogeo)
-{
-	if (!m_cartslots[0]) m_banked_cart->install_banks(machine(), m_maincpu, m_region_maincpu->base(), m_region_maincpu->bytes());
-}
-
-
-/*    YEAR  NAME  PARENT COMPAT MACHINE INPUT  INIT     COMPANY      FULLNAME            FLAGS */
-CONS( 1990, aes,    0,      0,   aes,      aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo AES", MACHINE_SUPPORTS_SAVE )
-
-DRIVER_INIT_MEMBER(ng_aes_state,neocdz)
+DRIVER_INIT_MEMBER(ngcd_state,neocdz)
 {
 	NeoSystem = NEOCD_REGION_US;
 }
 
-DRIVER_INIT_MEMBER(ng_aes_state,neocdzj)
+DRIVER_INIT_MEMBER(ngcd_state,neocdzj)
 {
 	NeoSystem = NEOCD_REGION_JAPAN;
 }
 
 
-CONS( 1996, neocdz,  0,      0,   neocd, neocd, ng_aes_state,  neocdz,  "SNK", "Neo-Geo CDZ (US)", 0 ) // the CDZ is the newer model
-CONS( 1996, neocdzj, neocdz, 0,   neocd, neocd, ng_aes_state,  neocdzj,  "SNK", "Neo-Geo CDZ (Japan)", 0 )
+/*    YEAR  NAME  PARENT COMPAT MACHINE INPUT  INIT     COMPANY      FULLNAME            FLAGS */
+CONS( 1996, neocdz,  0,      0,   neocd, neocd, ngcd_state,  neocdz,  "SNK", "Neo-Geo CDZ (US)", 0 ) // the CDZ is the newer model
+CONS( 1996, neocdzj, neocdz, 0,   neocd, neocd, ngcd_state,  neocdzj,  "SNK", "Neo-Geo CDZ (Japan)", 0 )
 
 
 CONS( 1994, neocd,   neocdz, 0,   neocd, neocd, ng_aes_state,  neogeo,  "SNK", "Neo-Geo CD", MACHINE_NOT_WORKING ) // older  model, ignores disc protections?

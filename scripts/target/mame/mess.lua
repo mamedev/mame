@@ -631,6 +631,7 @@ BUSES["MEGADRIVE"] = true
 BUSES["MSX_SLOT"] = true
 BUSES["NASBUS"] = true
 BUSES["NEOGEO"] = true
+BUSES["NEOGEO_CTRL"] = true
 BUSES["NES"] = true
 BUSES["NES_CTRL"] = true
 BUSES["NEWBRAIN"] = true

@@ -22,6 +22,8 @@
 #include "bus/neogeo/sbp_prot.h"
 #include "bus/neogeo/kog_prot.h"
 
+#include "bus/neogeo_ctrl/ctrl.h"
+
 // On scanline 224, /VBLANK goes low 56 mclks (14 pixels) from the rising edge of /HSYNC.
 // Two mclks after /VBLANK goes low, the hardware sets a pending IRQ1 flip-flop.
 #define NEOGEO_VBLANK_IRQ_HTIM (attotime::from_ticks(56+2, NEOGEO_MASTER_CLOCK))
