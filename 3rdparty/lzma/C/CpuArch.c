@@ -137,7 +137,7 @@ int x86cpuid_GetFirm(const Cx86cpuid *p)
   return -1;
 }
 
-Bool CPU_Is_InOrder()
+Bool CPU_Is_InOrder(void)
 {
   Cx86cpuid p;
   int firm;
@@ -168,7 +168,7 @@ Bool CPU_Is_InOrder()
 
 #if !defined(MY_CPU_AMD64) && defined(_WIN32)
 #include <windows.h>
-static Bool CPU_Sys_Is_SSE_Supported()
+static Bool CPU_Sys_Is_SSE_Supported(void)
 {
   OSVERSIONINFO vi;
   vi.dwOSVersionInfoSize = sizeof(vi);
@@ -181,7 +181,7 @@ static Bool CPU_Sys_Is_SSE_Supported()
 #define CHECK_SYS_SSE_SUPPORT
 #endif
 
-Bool CPU_Is_Aes_Supported()
+Bool CPU_Is_Aes_Supported(void)
 {
   Cx86cpuid p;
   CHECK_SYS_SSE_SUPPORT
