@@ -29755,6 +29755,9 @@ orleg2                          // (c) 2007
 orleg2o                         //
 orleg2oa                        //
 
+@source:phantom.cpp
+fphantom                        //
+
 @source:phc25.cpp
 phc25                           //
 phc25j                          //
