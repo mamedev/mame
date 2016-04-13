@@ -14936,6 +14936,20 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="f1wceval" cloneof="f1wc">
+		<description>F1 - World Championship Edition (Euro, Prototype, set 2)</description>
+		<year>1994</year>
+		<publisher>Domark</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="F1 Champion Edtn MDRIVE ROM0 Eval only.BIN" size="0x080000" crc="679773eb" sha1="2a659c22a2bf9e200ba8dca9a2e10eb971050a5b" offset="0x000000" loadflag="load16_byte"/>
+				<rom name="F1 Champion Edtn MDRIVE ROM1 Eval only.BIN" size="0x080000" crc="f346a130" sha1="f4561ceaf3dfe0c75eefd067c4aae97fa69f7656" offset="0x000001" loadflag="load16_byte"/>
+				<rom name="F1 Champion Edtn MDRIVE ROM2 Eval only.BIN" size="0x080000" crc="bfb1349d" sha1="e5f4faa6f8f4aa4ffc9d8528bead1a2ba975acce" offset="0x100000" loadflag="load16_byte"/>
+				<rom name="F1 Champion Edtn MDRIVE ROM3 Eval only.BIN" size="0x080000" crc="7863f441" sha1="ccad151b160a7b361d2d8982d56e80895b4799a7" offset="0x100001" loadflag="load16_byte"/>
+			</dataarea>
+		</part>
+	</software> 
+
 	<software name="f1circus">
 		<description>F1 Circus MD (Jpn)</description>
 		<year>1991</year>
