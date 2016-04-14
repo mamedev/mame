@@ -123,6 +123,8 @@ private:
 	address_space *m_pcmem_space, *m_pcio_space;
 	bool m_reset_during_halt;
 
+	UINT8 m_6845_reg;
+
 	void pc_select_dma_channel(int channel, bool state);
 };
 
