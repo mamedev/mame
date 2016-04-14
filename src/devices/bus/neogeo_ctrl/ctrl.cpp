@@ -10,6 +10,8 @@
 // slot devices
 #include "joystick.h"
 #include "mahjong.h"
+#include "dial.h"
+#include "kizuna4p.h"
 
 
 //**************************************************************************
@@ -106,7 +108,16 @@ void neogeo_control_port_device::write_ctrlsel(UINT8 data)
 //-------------------------------------------------
 
 SLOT_INTERFACE_START( neogeo_controls )
-	SLOT_INTERFACE("joy",     NEOGEO_JOYSTICK)
+	SLOT_INTERFACE("joy",     NEOGEO_JOY)
 	SLOT_INTERFACE("mahjong", NEOGEO_MJCTRL)
 SLOT_INTERFACE_END
 
+SLOT_INTERFACE_START( neogeo_arc_ctrls )
+	SLOT_INTERFACE("joy",     NEOGEO_JOY_AC)
+	SLOT_INTERFACE("mahjong", NEOGEO_MJCTRL_AC)
+	SLOT_INTERFACE("dial",    NEOGEO_DIAL)
+SLOT_INTERFACE_END
+
+SLOT_INTERFACE_START( neogeo_kiz4p )
+	SLOT_INTERFACE("kiz4p",     NEOGEO_KIZ4P)
+SLOT_INTERFACE_END

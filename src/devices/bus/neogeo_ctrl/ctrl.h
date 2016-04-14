@@ -68,13 +68,15 @@ extern const device_type NEOGEO_CONTROL_PORT;
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_NEOGEO_CONTROL_PORT_ADD(_tag, _slot_intf, _def_slot) \
+#define MCFG_NEOGEO_CONTROL_PORT_ADD(_tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, NEOGEO_CONTROL_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
 
 
 
 SLOT_INTERFACE_EXTERN( neogeo_controls );
+SLOT_INTERFACE_EXTERN( neogeo_arc_ctrls );
+SLOT_INTERFACE_EXTERN( neogeo_kiz4p );
 
 
 #endif

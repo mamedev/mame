@@ -1962,6 +1962,10 @@ if (BUSES["NEOGEO_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/neogeo_ctrl/joystick.h",
 		MAME_DIR .. "src/devices/bus/neogeo_ctrl/mahjong.cpp",
 		MAME_DIR .. "src/devices/bus/neogeo_ctrl/mahjong.h",
+		MAME_DIR .. "src/devices/bus/neogeo_ctrl/dial.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo_ctrl/dial.h",
+		MAME_DIR .. "src/devices/bus/neogeo_ctrl/kizuna4p.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo_ctrl/kizuna4p.h",
 	}
 end
 
