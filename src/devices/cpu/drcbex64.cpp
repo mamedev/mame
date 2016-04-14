@@ -5952,15 +5952,29 @@ void drcbe_x64::op_fmov(x86code *&dst, const instruction &inst)
 	// 32-bit form
 	if (inst.size() == 4)
 	{
-		emit_movss_r128_p32(dst, dstreg, srcp);                                         // movss dstreg,srcp
-		emit_movss_p32_r128(dst, dstp, dstreg);                                         // movss dstp,dstreg
+		if (srcp.is_float_register())
+		{
+			emit_movss_p32_r128(dst, dstp, srcp.ireg());                                // movss dstp,srcp
+		}
+		else
+		{
+			emit_movss_r128_p32(dst, dstreg, srcp);                                     // movss dstreg,srcp
+			emit_movss_p32_r128(dst, dstp, dstreg);                                     // movss dstp,dstreg
+		}
 	}
 
 	// 64-bit form
 	else if (inst.size() == 8)
 	{
-		emit_movsd_r128_p64(dst, dstreg, srcp);                                         // movsd dstreg,srcp
-		emit_movsd_p64_r128(dst, dstp, dstreg);                                         // movsd dstp,dstreg
+		if (srcp.is_float_register())
+		{
+			emit_movsd_p64_r128(dst, dstp, srcp.ireg());                                // movsd dstp,srcp
+		}
+		else
+		{
+			emit_movsd_r128_p64(dst, dstreg, srcp);                                     // movsd dstreg,srcp
+			emit_movsd_p64_r128(dst, dstp, dstreg);                                     // movsd dstp,dstreg
+		}
 	}
 
 	// resolve the jump
