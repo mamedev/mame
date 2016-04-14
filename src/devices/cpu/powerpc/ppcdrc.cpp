@@ -1882,7 +1882,10 @@ void ppc_device::generate_fp_flags(drcuml_block *block, const opcode_desc *desc,
 	/* for now, only handle the FPRF field */
 	if (updatefprf)
 	{
-		save_fast_fregs(block);
+		int regnum = G_RD(desc->opptr.l[0]);
+		if (m_fdregmap[regnum].is_float_register())
+			UML_FDMOV(block, mem(&m_core->f[regnum]), freg(m_fdregmap[regnum].freg() - REG_F0));
+
 		UML_MOV(block, mem(&m_core->param0), G_RD(desc->opptr.l[0]));
 		UML_CALLC(block, (c_function)cfunc_ppccom_update_fprf, this);
 	}
