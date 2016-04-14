@@ -91,6 +91,7 @@ MACHINE_CONFIG_FRAGMENT( pcxporter )
 	MCFG_CPU_PROGRAM_MAP(pc_map)
 	MCFG_CPU_IO_MAP(pc_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
@@ -124,8 +125,8 @@ MACHINE_CONFIG_FRAGMENT( pcxporter )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(a2bus_pcxporter_device, pc_ppi_portb_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(a2bus_pcxporter_device, pc_ppi_portc_r))
 
-	MCFG_DEVICE_ADD("isa", ISA16, 0)
-	MCFG_ISA16_CPU("^v30")
+	MCFG_DEVICE_ADD("isa", ISA8, 0)
+	MCFG_ISA8_CPU("^v30")
 	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
 	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
 	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
@@ -146,8 +147,8 @@ MACHINE_CONFIG_FRAGMENT( pcxporter )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_ISA16_SLOT_ADD("isa", "isa1", pc_isa8_cards, "cga", true)
-	MCFG_ISA16_SLOT_ADD("isa", "isa2", pc_isa8_cards, "fdc_xt", true)
+	MCFG_ISA8_SLOT_ADD("isa", "isa1", pc_isa8_cards, "cga", true)
+	MCFG_ISA8_SLOT_ADD("isa", "isa2", pc_isa8_cards, "fdc_xt", true)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -356,15 +357,19 @@ void a2bus_pcxporter_device::write_c800(address_space &space, UINT16 offset, UIN
 
 			case 0x703: // write w/increment
 				m_ram[m_offset] = data;
-				if (m_offset >= 0xb0000 && m_offset <= 0xb7fff) m_pcmem_space->write_byte(m_offset+0x8000, data);
-				if (m_offset >= 0xb8000 && m_offset <= 0xbffff) m_pcmem_space->write_byte(m_offset, data);
+				if (m_offset >= 0xb0000 && m_offset <= 0xb3fff) m_pcmem_space->write_byte(m_offset+0x8000, data);
+				else if (m_offset >= 0xb4000 && m_offset <= 0xb7fff) m_pcmem_space->write_byte(m_offset+0x4000, data);
+				else if (m_offset >= 0xb8000 && m_offset <= 0xbbfff) m_pcmem_space->write_byte(m_offset, data);
+				else if (m_offset >= 0xbc000 && m_offset <= 0xbffff) m_pcmem_space->write_byte(m_offset-0x4000, data);
 				m_offset++;
 				break;
 
 			case 0x704: // write w/o increment
 				m_ram[m_offset] = data;
-				if (m_offset >= 0xb0000 && m_offset <= 0xb7fff) m_pcmem_space->write_byte(m_offset+0x8000, data);
-				if (m_offset >= 0xb8000 && m_offset <= 0xbffff) m_pcmem_space->write_byte(m_offset, data);
+				if (m_offset >= 0xb0000 && m_offset <= 0xb3fff) m_pcmem_space->write_byte(m_offset+0x8000, data);
+				else if (m_offset >= 0xb4000 && m_offset <= 0xb7fff) m_pcmem_space->write_byte(m_offset+0x4000, data);
+				else if (m_offset >= 0xb8000 && m_offset <= 0xbbfff) m_pcmem_space->write_byte(m_offset, data);
+				else if (m_offset >= 0xbc000 && m_offset <= 0xbffff) m_pcmem_space->write_byte(m_offset-0x4000, data);
 				break;
 				
 			case 0x72c:	// CGA 6845 register select
@@ -421,6 +426,7 @@ void a2bus_pcxporter_device::write_c800(address_space &space, UINT16 offset, UIN
 					}
 				
 					m_v30->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+					m_v30->resume(SUSPEND_REASON_HALT | SUSPEND_REASON_DISABLE);
 				}
 				break;
 				
