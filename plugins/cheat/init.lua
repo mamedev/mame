@@ -244,7 +244,7 @@ function cheat.startplugin()
 			return
 		end
 		param.min = tonumber(param.min) or 0
-		param.min = tonumber(param.min) or #param.item
+		param.max = tonumber(param.max) or #param.item
 		param.step = tonumber(param.step) or 1
 		if param.item then
 			for count, item in pairs(param.item) do
