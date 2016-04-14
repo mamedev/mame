@@ -46,6 +46,8 @@
 class am9517a_device :  public device_t,
 						public device_execute_interface
 {
+	friend class pcxport_dmac_device;
+
 public:
 	// construction/destruction
 	am9517a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
@@ -90,6 +92,8 @@ protected:
 	virtual void device_reset() override;
 	virtual void execute_run() override;
 
+	virtual void end_of_process();
+
 	int m_icount;
 	UINT32 m_address_mask;
 
@@ -127,7 +131,6 @@ private:
 	inline void dma_read();
 	inline void dma_write();
 	inline void dma_advance();
-	inline void end_of_process();
 
 	devcb_write_line   m_out_hreq_cb;
 	devcb_write_line   m_out_eop_cb;
@@ -176,11 +179,24 @@ protected:
 };
 
 
+class pcxport_dmac_device : public am9517a_device
+{
+public:
+	// construction/destruction
+	pcxport_dmac_device(const machine_config &mconfig,  const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual void device_reset() override;
+
+	virtual void end_of_process() override;
+};
+
 
 
 // device type definition
 extern const device_type AM9517A;
 extern const device_type V53_DMAU;
+extern const device_type PCXPORT_DMAC;
 
 
 /***************************************************************************

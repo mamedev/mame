@@ -53,31 +53,11 @@
         CF31: control/flags: bit 4 = 1 to assert reset on V30, 5 = 1 to assert halt on V30
 
     TODO:
-    	- Code at $70b0-$70c5 waits for the V30 to answer some configuration data.
+    	- Code at $70b0-$70c5 waits for the V30 to answer FPU presence.
         - What's going on at CF0E/CF0F?
-        - There's likely A2 ROM at CnXX and C800-CBFF to support the "Slinky" memory
-          expansion card emulation function inside one of the custom ASICs.  Need to
-          dump this...
+    	- The manual indicates there is no ROM; special drivers installed into ProDOS 8
+    	  provide the RAMdisk and A2-accessing-PC-drives functionality.
           
-    The final stages before the software settles into its loop are:
-    
-    20 to C800 at cf30
-	00 to C800 at cf31
-	12 to C800 at cf2b
-	21 to C800 at cf25
-	33 to C800 at cf24
-	80 to C800 at cf31
-	20 to C800 at cf30
-	loop:
-		Read $C800 at cf36
-		Read $C800 at cf31
-		Read $C800 at cf31
-		Read $C800 at cf36
-		Read $C800 at cf31
-		Read $C800 at cf31
-		80 to C800 at cf31
-	loop end: (return to loop)
-
 *********************************************************************/
 
 #include "pc_xporter.h"
@@ -94,7 +74,6 @@ const device_type A2BUS_PCXPORTER = &device_creator<a2bus_pcxporter_device>;
 
 static ADDRESS_MAP_START( pc_map, AS_PROGRAM, 16, a2bus_pcxporter_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	//AM_RANGE(0xf0000, 0xfffff) AM_READ(pc_bios_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pc_io, AS_IO, 16, a2bus_pcxporter_device )
@@ -108,10 +87,11 @@ static ADDRESS_MAP_START(pc_io, AS_IO, 16, a2bus_pcxporter_device )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT( pcxporter )
-	MCFG_CPU_ADD("v30", V30, XTAL_14_31818MHz/3)
+	MCFG_CPU_ADD("v30", V30, XTAL_14_31818MHz/2)	// 7.16 MHz as per manual
 	MCFG_CPU_PROGRAM_MAP(pc_map)
 	MCFG_CPU_IO_MAP(pc_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
@@ -121,7 +101,7 @@ MACHINE_CONFIG_FRAGMENT( pcxporter )
 	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(a2bus_pcxporter_device, pc_pit8253_out2_changed))
 
-	MCFG_DEVICE_ADD( "dma8237", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_DEVICE_ADD( "dma8237", PCXPORT_DMAC, XTAL_14_31818MHz/2 )
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(a2bus_pcxporter_device, pc_dma_hrq_changed))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(a2bus_pcxporter_device, pc_dma8237_out_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(a2bus_pcxporter_device, pc_dma_read_byte))
@@ -145,8 +125,8 @@ MACHINE_CONFIG_FRAGMENT( pcxporter )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(a2bus_pcxporter_device, pc_ppi_portb_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(a2bus_pcxporter_device, pc_ppi_portc_r))
 
-	MCFG_DEVICE_ADD("isa", ISA16, 0)
-	MCFG_ISA16_CPU("^v30")
+	MCFG_DEVICE_ADD("isa", ISA8, 0)
+	MCFG_ISA8_CPU("^v30")
 	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
 	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
 	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
@@ -167,8 +147,8 @@ MACHINE_CONFIG_FRAGMENT( pcxporter )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_ISA16_SLOT_ADD("isa", "isa1", pc_isa8_cards, "cga", true)
-	MCFG_ISA16_SLOT_ADD("isa", "isa2", pc_isa8_cards, "fdc_xt", true)
+	MCFG_ISA8_SLOT_ADD("isa", "isa1", pc_isa8_cards, "cga", true)
+	MCFG_ISA8_SLOT_ADD("isa", "isa2", pc_isa8_cards, "fdc_xt", true)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -377,22 +357,53 @@ void a2bus_pcxporter_device::write_c800(address_space &space, UINT16 offset, UIN
 
 			case 0x703: // write w/increment
 				m_ram[m_offset] = data;
-				if (m_offset >= 0xb0000 && m_offset <= 0xb7fff) m_pcmem_space->write_byte(m_offset+0x8000, data);
-				if (m_offset >= 0xb8000 && m_offset <= 0xbffff) m_pcmem_space->write_byte(m_offset, data);
+				if (m_offset >= 0xb0000 && m_offset <= 0xb3fff) m_pcmem_space->write_byte(m_offset+0x8000, data);
+				else if (m_offset >= 0xb4000 && m_offset <= 0xb7fff) m_pcmem_space->write_byte(m_offset+0x4000, data);
+				else if (m_offset >= 0xb8000 && m_offset <= 0xbbfff) m_pcmem_space->write_byte(m_offset, data);
+				else if (m_offset >= 0xbc000 && m_offset <= 0xbffff) m_pcmem_space->write_byte(m_offset-0x4000, data);
 				m_offset++;
 				break;
 
 			case 0x704: // write w/o increment
 				m_ram[m_offset] = data;
-				if (m_offset >= 0xb0000 && m_offset <= 0xb7fff) m_pcmem_space->write_byte(m_offset+0x8000, data);
-				if (m_offset >= 0xb8000 && m_offset <= 0xbffff) m_pcmem_space->write_byte(m_offset, data);
+				if (m_offset >= 0xb0000 && m_offset <= 0xb3fff) m_pcmem_space->write_byte(m_offset+0x8000, data);
+				else if (m_offset >= 0xb4000 && m_offset <= 0xb7fff) m_pcmem_space->write_byte(m_offset+0x4000, data);
+				else if (m_offset >= 0xb8000 && m_offset <= 0xbbfff) m_pcmem_space->write_byte(m_offset, data);
+				else if (m_offset >= 0xbc000 && m_offset <= 0xbffff) m_pcmem_space->write_byte(m_offset-0x4000, data);
 				break;
 				
 			case 0x72c:	// CGA 6845 register select
 				m_pcio_space->write_byte(0x3d6, data);
+				m_6845_reg = data;
 				break;
 			
 			case 0x72d:	// CGA 6845 data read/write
+				// HACK: adjust the 40 column mode the 6502 sets to
+				// be more within specs.
+				switch (m_6845_reg)
+				{
+					case 0:
+						if (data == 0x3e)
+						{
+							data -= 6;
+						}
+						break;
+
+					case 2:
+						if (data == 0x29)
+						{
+							data += 4;
+						}
+						break;
+
+					case 3:
+						if (data == 0x5)
+						{
+							data *= 2;
+						}
+						break;
+				}
+
 				m_pcio_space->write_byte(0x3d7, data);
 				break;
 			
@@ -415,6 +426,7 @@ void a2bus_pcxporter_device::write_c800(address_space &space, UINT16 offset, UIN
 					}
 				
 					m_v30->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+					m_v30->resume(SUSPEND_REASON_HALT | SUSPEND_REASON_DISABLE);
 				}
 				break;
 				
@@ -424,7 +436,7 @@ void a2bus_pcxporter_device::write_c800(address_space &space, UINT16 offset, UIN
 				break;
 				
 			default:
-				printf("%02x to C800 at %x\n", data, offset + 0xc800);
+//				printf("%02x to C800 at %x\n", data, offset + 0xc800);
 				m_regs[offset] = data;
 				break;
 		}

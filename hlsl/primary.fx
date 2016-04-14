@@ -55,8 +55,6 @@ uniform float2 ScreenDims;
 uniform float2 TargetDims;
 uniform float2 QuadDims;
 
-uniform bool VectorScreen;
-
 VS_OUTPUT vs_screen_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;

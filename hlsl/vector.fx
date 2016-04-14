@@ -28,7 +28,7 @@ struct PS_INPUT
 {
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 LineInfo : TEXCOORD1;
+	float2 LineInfo : TEXCOORD1; // x is the line length, y is unused
 };
 
 //-----------------------------------------------------------------------------
@@ -47,9 +47,9 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
-	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.y = 1.0f - Output.Position.y;
 	Output.Position.xy -= 0.5f; // center
-	Output.Position.xy *= 2.0f * (ScreenDims / QuadDims); // zoom
+	Output.Position.xy *= 2.0f; // zoom
 
 	Output.TexCoord = Input.TexCoord;
 

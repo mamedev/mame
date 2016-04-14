@@ -617,6 +617,7 @@ BUSES["MIDI"] = true
 --BUSES["MEGADRIVE"] = true
 --BUSES["MSX_SLOT"] = true
 BUSES["NEOGEO"] = true
+BUSES["NEOGEO_CTRL"] = true
 --BUSES["NES"] = true
 --BUSES["NUBUS"] = true
 --BUSES["O2"] = true

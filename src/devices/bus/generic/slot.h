@@ -28,8 +28,11 @@ public:
 	virtual void rom_alloc(size_t size, int width, endianness_t end, const char *tag);
 	virtual void ram_alloc(UINT32 size);
 
-    UINT8* get_rom_base()  { if (m_region.found()) return m_region->base(); return m_rom; }
-    UINT32 get_rom_size() { if (m_region.found()) return m_region->bytes(); return m_rom_size; }
+    UINT8* get_rom_base()  { return m_rom; }
+    UINT32 get_rom_size() { return m_rom_size; }
+
+	UINT8* get_region_base()  { if (m_region.found()) return m_region->base(); return nullptr; }
+	UINT32 get_region_size() { if (m_region.found()) return m_region->bytes(); return 0; }
 
 	UINT8* get_ram_base() { return &m_ram[0]; }
 	UINT32 get_ram_size() { return m_ram.size(); }
@@ -140,9 +143,27 @@ public:
 	virtual void rom_alloc(size_t size, int width, endianness_t end) { if (m_cart) m_cart->rom_alloc(size, width, end, tag()); }
 	virtual void ram_alloc(UINT32 size)  { if (m_cart) m_cart->ram_alloc(size); }
 
-    UINT8* get_rom_base()  { if (m_cart) return m_cart->get_rom_base(); return nullptr; }
-    UINT8* get_ram_base() { if (m_cart) return m_cart->get_ram_base(); return nullptr; }
-	UINT32 get_rom_size() { if (m_cart) return m_cart->get_rom_size(); return 0; }
+	UINT8* get_rom_base()  {
+		if (m_cart)
+		{
+			if (!user_loadable())
+				return m_cart->get_region_base();
+			else
+				return m_cart->get_rom_base();
+		}
+		return nullptr;
+	}
+	UINT32 get_rom_size()	{
+		if (m_cart)
+		{
+			if (!user_loadable())
+				return m_cart->get_region_size();
+			else
+				return m_cart->get_rom_size();
+		}
+		return 0;
+	}
+	UINT8* get_ram_base() { if (m_cart) return m_cart->get_ram_base(); return nullptr; }
 
 	void save_ram()   { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 

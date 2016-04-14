@@ -1880,12 +1880,6 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 				}
 				else
 				{
-					if (curitem.flags() & PRIMFLAG_VECTORBUF_MASK)
-					{
-						// determine UV coordinates
-						prim->texcoords = oriented_texcoords[0];
-					}
-
 					// adjust the color for brightness/contrast/gamma
 					prim->color.r = container.apply_brightness_contrast_gamma_fp(prim->color.r);
 					prim->color.g = container.apply_brightness_contrast_gamma_fp(prim->color.g);
@@ -1894,12 +1888,33 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					// no texture
 					prim->texture.base = nullptr;
 
-					// set the basic flags
-					prim->flags = (curitem.flags() & ~PRIMFLAG_BLENDMODE_MASK)
-						| PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
+					if (PRIMFLAG_GET_VECTORBUF(curitem.flags()))
+					{
+						// determine the final orientation (textures are up-side down, so flip y-axis for vectors to immitate that behavior)
+						int finalorient = orientation_add(ORIENTATION_FLIP_Y, container_xform.orientation);
 
-					// apply clipping
-					clipped = render_clip_quad(&prim->bounds, &cliprect, nullptr);
+						// determine UV coordinates
+						prim->texcoords = oriented_texcoords[finalorient];
+
+						// apply clipping
+						clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
+
+						// apply the final orientation from the quad flags and then build up the final flags
+						prim->flags = (curitem.flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK))
+							| PRIMFLAG_TEXORIENT(finalorient);
+						prim->flags |= blendmode != -1
+							? PRIMFLAG_BLENDMODE(blendmode)
+							: PRIMFLAG_BLENDMODE(PRIMFLAG_GET_BLENDMODE(curitem.flags()));
+					}
+					else
+					{
+						// set the basic flags
+						prim->flags = (curitem.flags() & ~PRIMFLAG_BLENDMODE_MASK)
+							| PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
+
+						// apply clipping
+						clipped = render_clip_quad(&prim->bounds, &cliprect, nullptr);
+					}
 				}
 				break;
 		}

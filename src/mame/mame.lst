@@ -29756,6 +29756,9 @@ orleg2                          // (c) 2007
 orleg2o                         //
 orleg2oa                        //
 
+@source:phantom.cpp
+fphantom                        //
+
 @source:phc25.cpp
 phc25                           //
 phc25j                          //
@@ -34763,6 +34766,7 @@ vocaid                          //
 @source:tispellb.cpp
 mrchalgr                        //
 spellb                          //
+spellb79                        //
 
 @source:tk2000.cpp
 tk2000                          // Microdigital TK2000
