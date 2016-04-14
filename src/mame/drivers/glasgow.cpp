@@ -54,6 +54,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_beep(*this, "beeper")
+		, m_keyboard(*this, "LINE")
 		{ }
 
 	DECLARE_WRITE16_MEMBER(glasgow_lcd_w);
@@ -95,6 +96,7 @@ private:
 	UINT8 m_mouse_down;
 	UINT16 m_Line18_LED;
 	UINT16 m_Line18_REED;
+	UINT8 m_selected[2];
 
 	UINT8 pos_to_num( UINT8 );
 	void set_board( );
@@ -102,7 +104,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;
-
+	required_ioport_array<8> m_keyboard;
 };
 
 typedef struct
@@ -196,33 +198,37 @@ WRITE16_MEMBER( glasgow_state::glasgow_lcd_flag_w )
 
 READ16_MEMBER( glasgow_state::glasgow_keys_r )
 {
-	static const char *const keynames[] = { "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
-	UINT8 pos2num_res = 0;
 	m_board_row++;
 	m_board_row &= 7;
 
 	// See if we are moving a piece
-	UINT8 data = ioport(keynames[m_board_row])->read();
+	UINT8 data = m_keyboard[m_board_row]->read();
 
-	if ((data != 0xff) && (!m_mouse_down))
+	if ((data < 0xff) && (m_mouse_down == 0))
 	{
-		pos2num_res = pos_to_num(data);
+		UINT8 pos2num_res = pos_to_num(data);
+		UINT8 piece = l_board[m_board_row][pos2num_res].piece;
 
-		if (!(pos2num_res < 8))
+		if (pos2num_res > 7)
 			logerror("Position out of bound!");
 		else
-		if ((m_mouse_hold) && (!l_board[m_board_row][pos2num_res].piece))
+		if ((m_mouse_hold > 0) && ((piece == 0) || (piece > 12))) // putting a piece down onto blank spot or a shadow
 		{
-			// Moving a piece onto a blank
+			if (m_selected[0] < 8)
+			{
+				l_board[m_selected[0]][m_selected[1]].piece = 0; // remove shadow
+				m_selected[0] = 0xff;
+			}
 			l_board[m_board_row][pos2num_res].piece = m_mouse_hold;
 			m_mouse_hold = 0;
 		}
 		else
-		if ((!m_mouse_hold) && (l_board[m_board_row][pos2num_res].piece))
+		if ((m_mouse_hold == 0) && (piece) && (piece < 13)) // picking up a piece
 		{
-			// Picking up a piece
-			m_mouse_hold = l_board[m_board_row][pos2num_res].piece;
-			l_board[m_board_row][pos2num_res].piece = 0;
+			m_mouse_hold = piece;
+			l_board[m_board_row][pos2num_res].piece = m_mouse_hold + 12; // replace piece with shadow
+			m_selected[0] = m_board_row;
+			m_selected[1] = pos2num_res; // save position of shadow
 		}
 
 		m_mouse_down = m_board_row + 1;
@@ -233,7 +239,14 @@ READ16_MEMBER( glasgow_state::glasgow_keys_r )
 
 	// See if we are taking a piece off the board
 	if (!ioport("LINE10")->read())
+	{
 		m_mouse_hold = 0;
+		if (m_selected[0] < 8)
+		{
+			l_board[m_selected[0]][m_selected[1]].piece = 0; // remove shadow
+			m_selected[0] = 0xff;
+		}
+	}
 
 	// See if any keys pressed
 	data = 3;
@@ -519,6 +532,7 @@ MACHINE_START_MEMBER( glasgow_state, dallas32 )
 MACHINE_RESET_MEMBER( glasgow_state, glasgow )
 {
 	m_lcd_shift_counter = 3;
+	m_selected[0] = 0xff;
 	set_board();
 }
 
@@ -562,7 +576,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( chessboard )
-	PORT_START("LINE2")
+	PORT_START("LINE.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
@@ -571,7 +585,7 @@ static INPUT_PORTS_START( chessboard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE3")
+	PORT_START("LINE.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
@@ -580,7 +594,7 @@ static INPUT_PORTS_START( chessboard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE4")
+	PORT_START("LINE.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
@@ -589,7 +603,7 @@ static INPUT_PORTS_START( chessboard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE5")
+	PORT_START("LINE.3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
@@ -598,7 +612,7 @@ static INPUT_PORTS_START( chessboard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE6")
+	PORT_START("LINE.4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
@@ -607,7 +621,7 @@ static INPUT_PORTS_START( chessboard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE7")
+	PORT_START("LINE.5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
@@ -616,7 +630,7 @@ static INPUT_PORTS_START( chessboard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE8")
+	PORT_START("LINE.6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
@@ -625,7 +639,7 @@ static INPUT_PORTS_START( chessboard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_START("LINE9")
+	PORT_START("LINE.7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
