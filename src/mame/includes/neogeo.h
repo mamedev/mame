@@ -92,13 +92,8 @@ public:
 	TIMER_CALLBACK_MEMBER(display_position_vblank_callback);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(neo_cartridge);
-
 	// MVS-specific
 	DECLARE_WRITE16_MEMBER(save_ram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_controller_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(multiplexed_controller_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kizuna4p_controller_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kizuna4p_start_r);
 	DECLARE_INPUT_CHANGED_MEMBER(select_bios);
 

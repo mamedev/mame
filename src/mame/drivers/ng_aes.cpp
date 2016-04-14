@@ -79,7 +79,6 @@ public:
 	{ }
 
 	DECLARE_READ16_MEMBER(aes_in2_r);
-	DECLARE_WRITE8_MEMBER(io_control_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 
@@ -108,21 +107,6 @@ READ16_MEMBER(ng_aes_state::aes_in2_r)
 	ret = (ret & 0xf3ff) | (m_ctrl2->read_start_sel() << 10);
 	return ret;
 }
-
-WRITE8_MEMBER(ng_aes_state::io_control_w)
-{
-	switch (offset)
-	{
-		case 0x00:
-			m_ctrl1->write_ctrlsel(data);
-			m_ctrl2->write_ctrlsel(data);
-			break;
-		default:
-			neogeo_state::io_control_w(space, offset, data);
-			break;
-	}
-}
-
 
 /*************************************
  *
