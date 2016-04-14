@@ -37,7 +37,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_intv_control_port_interface overrides
-	virtual UINT16 read_ctrl() override;
+	virtual UINT8 read_ctrl() override;
 	virtual UINT8 read_start_sel() override;
 
 private:
@@ -64,7 +64,7 @@ protected:
 	virtual void device_reset() override;
 	
 	// device_intv_control_port_interface overrides
-	virtual UINT16 read_ctrl() override;
+	virtual UINT8 read_ctrl() override;
 	
 private:
 	required_ioport m_joy;

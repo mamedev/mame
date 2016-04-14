@@ -37,7 +37,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_intv_control_port_interface overrides
-	virtual UINT16 read_ctrl() override;
+	virtual UINT8 read_ctrl() override;
 	virtual UINT8 read_start_sel() override;
 	virtual void write_ctrlsel(UINT8 data) override;
 

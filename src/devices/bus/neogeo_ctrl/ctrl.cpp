@@ -77,9 +77,9 @@ void neogeo_control_port_device::device_start()
 }
 
 
-UINT16 neogeo_control_port_device::read_ctrl()
+UINT8 neogeo_control_port_device::read_ctrl()
 {
-	UINT16 data = 0;
+	UINT8 data = 0;
 	if (m_device)
 		data |= m_device->read_ctrl();
 	return data;
