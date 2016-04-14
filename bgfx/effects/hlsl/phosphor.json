@@ -22,8 +22,8 @@
     	"rgb": true,
     	"alpha": true
     },
-    "vertex": "vs_phosphor",
-    "fragment": "fs_phosphor",
+    "vertex": "chains/hlsl/vs_phosphor",
+    "fragment": "chains/hlsl/fs_phosphor",
     "uniforms": [
     	{ "name": "s_tex",         "type": "int",  "values": [ 1.0 ] },
     	{ "name": "s_prev",        "type": "int",  "values": [ 1.0 ] },

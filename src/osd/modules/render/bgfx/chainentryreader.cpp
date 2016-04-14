@@ -26,6 +26,8 @@
 #include "entryuniformreader.h"
 #include "suppressor.h"
 #include "suppressorreader.h"
+#include "clear.h"
+#include "clearreader.h"
 
 bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::string prefix, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, std::map<std::string, bgfx_slider*>& sliders, std::map<std::string, bgfx_parameter*>& params, uint32_t screen_index)
 {
@@ -134,8 +136,19 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 		}
 	}
 
+	// Parse clear state
+	clear_state* clear = nullptr;
+	if (value.HasMember("clear"))
+	{
+		clear = clear_reader::read_from_value(value["clear"], prefix + "clear state: ");
+	}
+	else
+	{
+		clear = new clear_state(BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
+	}
+
 	std::string output = value["output"].GetString();
-	return new bgfx_chain_entry(name, effect, suppressors, inputs, uniforms, targets, output);
+	return new bgfx_chain_entry(name, effect, clear, suppressors, inputs, uniforms, targets, output);
 }
 
 bool chain_entry_reader::validate_parameters(const Value& value, std::string prefix)

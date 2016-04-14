@@ -22,8 +22,8 @@
     	"rgb": true,
     	"alpha": true
     },
-    "vertex": "vs_deconverge",
-    "fragment": "fs_deconverge",
+    "vertex": "chains/hlsl/vs_deconverge",
+    "fragment": "chains/hlsl/fs_deconverge",
     "uniforms": [
     	{ "name": "s_tex",                   "type": "int",  "values": [ 1.0 ] },
     	{ "name": "u_source_size",           "type": "vec4", "values": [ 256.0, 256.0, 0.0, 0.0 ] },

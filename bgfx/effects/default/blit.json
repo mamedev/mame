@@ -64,12 +64,12 @@
     },
 
 	// vertex (required): The vertex shader to use when drawing.
-	// value: A string containing the name of a shader file to use, minus the extension.
-    "vertex": "vs_blit",
+	// value: A string containing the path and name of a shader file to use, minus the extension.
+    "vertex": "chains/default/vs_blit",
 
 	// pixel/fragment (required): The pixel or fragment shader to use when drawing.
-	// value: A string containing the name of a shader file to use, minus the extension.
-    "fragment": "fs_blit",
+	// value: A string containing the path and name of a shader file to use, minus the extension.
+    "fragment": "chains/default/fs_blit",
     
     // uniforms (required): The list of uniforms for this effect. Can be empty, but must exist.
     "uniforms": [    	
