@@ -263,7 +263,7 @@ static const UINT8 int_register_map[REG_I_COUNT] =
 
 static UINT8 float_register_map[REG_F_COUNT] =
 {
-	REG_XMM6, REG_XMM7, REG_XMM8, REG_XMM9
+	REG_XMM6, REG_XMM7, REG_XMM8, REG_XMM9, REG_XMM10, REG_XMM11, REG_XMM12, REG_XMM13, REG_XMM14, REG_XMM15
 };
 
 // condition mapping table

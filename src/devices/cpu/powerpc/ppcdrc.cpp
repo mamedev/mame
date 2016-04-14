@@ -149,6 +149,28 @@ void ppc_device::save_fast_iregs(drcuml_block *block)
 }
 
 
+inline void ppc_device::load_fast_fregs(drcuml_block *block)
+{
+	for (int regnum = 0; regnum < ARRAY_LENGTH(m_fdregmap); regnum++)
+	{
+		if (m_fdregmap[regnum].is_float_register())
+		{
+			UML_FDMOV(block, freg(m_fdregmap[regnum].freg() - REG_F0), mem(&m_core->f[regnum]));
+		}
+	}
+}
+
+void ppc_device::save_fast_fregs(drcuml_block *block)
+{
+	for (int regnum = 0; regnum < ARRAY_LENGTH(m_fdregmap); regnum++)
+	{
+		if (m_fdregmap[regnum].is_float_register())
+		{
+			UML_FDMOV(block, mem(&m_core->f[regnum]), freg(m_fdregmap[regnum].freg() - REG_F0));
+		}
+	}
+}
+
 /*-------------------------------------------------
     compute_rlw_mask - compute the 32-bit mask
     for an rlw* instruction
@@ -654,6 +676,7 @@ void ppc_device::static_generate_entry_point()
 
 	/* load fast integer registers */
 	load_fast_iregs(block);                                                            // <load fastregs>
+	load_fast_fregs(block);
 
 	/* check for interrupts */
 	UML_TEST(block, mem(&m_core->irq_pending), ~0);                                        // test    [irq_pending],0
@@ -690,6 +713,7 @@ void ppc_device::static_generate_nocode_handler()
 	UML_GETEXP(block, I0);                                                              // getexp  i0
 	UML_MOV(block, mem(&m_core->pc), I0);                                                  // mov     [pc],i0
 	save_fast_iregs(block);                                                            // <save fastregs>
+	save_fast_fregs(block);
 	UML_EXIT(block, EXECUTE_MISSING_CODE);                                              // exit    EXECUTE_MISSING_CODE
 
 	block->end();
@@ -714,6 +738,7 @@ void ppc_device::static_generate_out_of_cycles()
 	UML_GETEXP(block, I0);                                                              // getexp  i0
 	UML_MOV(block, mem(&m_core->pc), I0);                                                  // mov     <pc>,i0
 	save_fast_iregs(block);                                                            // <save fastregs>
+	save_fast_fregs(block);
 	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);                                         // exit    EXECUTE_OUT_OF_CYCLES
 
 	block->end();
@@ -756,6 +781,7 @@ void ppc_device::static_generate_tlb_mismatch()
 	UML_LABEL(block, exit);                                                             // exit:
 	UML_MOV(block, mem(&m_core->pc), I0);                                                  // mov     <pc>,i0
 	save_fast_iregs(block);                                                            // <save fastregs>
+	save_fast_fregs(block);
 	UML_EXIT(block, EXECUTE_MISSING_CODE);                                              // exit    EXECUTE_MISSING_CODE
 	UML_LABEL(block, isi);                                                              // isi:
 	if (!(m_cap & PPCCAP_603_MMU))
@@ -1676,6 +1702,7 @@ void ppc_device::generate_sequence_instruction(drcuml_block *block, compiler_sta
 	{
 		UML_MOV(block, mem(&m_core->pc), desc->pc);                                        // mov     [pc],desc->pc
 		save_fast_iregs(block);                                                        // <save fastregs>
+		save_fast_fregs(block);
 		UML_DEBUG(block, desc->pc);                                                 // debug   desc->pc
 	}
 
@@ -1684,6 +1711,7 @@ void ppc_device::generate_sequence_instruction(drcuml_block *block, compiler_sta
 	{
 		UML_MOV(block, mem(&m_core->pc), desc->pc);                                        // mov     [pc],desc->pc
 		save_fast_iregs(block);                                                        // <save fastregs>
+		save_fast_fregs(block);
 		UML_EXIT(block, EXECUTE_UNMAPPED_CODE);                                     // exit    EXECUTE_UNMAPPED_CODE
 	}
 
@@ -1854,6 +1882,7 @@ void ppc_device::generate_fp_flags(drcuml_block *block, const opcode_desc *desc,
 	/* for now, only handle the FPRF field */
 	if (updatefprf)
 	{
+		save_fast_fregs(block);
 		UML_MOV(block, mem(&m_core->param0), G_RD(desc->opptr.l[0]));
 		UML_CALLC(block, (c_function)cfunc_ppccom_update_fprf, this);
 	}
