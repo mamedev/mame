@@ -89,9 +89,12 @@ void matrix_solver_GCR_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 					if (touched[k][col])
 					{
 						if (touched[row][col])
+						{
 							if (static_compile) printf("    A(%d,%d) += f%d * A(%d,%d); \n", row, col, fc, k, col);
-						else
+						} else
+						{
 							if (static_compile) printf("    A(%d,%d) = f%d * A(%d,%d); \n", row, col, fc, k, col);
+						}
 						touched[row][col] = true;
 						ops += 2;
 					}
