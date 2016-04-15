@@ -126,7 +126,8 @@ private:
 		CONTROLLER,
 		VIDEO,
 		BIOS,
-		LAST = BIOS
+		ADVANCED,
+		LAST = ADVANCED
 	};
 	const game_driver *m_drv;
 	emu_options m_opts;

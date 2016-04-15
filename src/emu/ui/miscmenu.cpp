@@ -747,6 +747,10 @@ void ui_menu_machine_configure::handle()
 					if (m_event->iptkey == IPT_UI_SELECT)
 						ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, video_submenu_options, m_drv, &m_opts));
 					break;
+				case ADVANCED:
+					if (m_event->iptkey == IPT_UI_SELECT)
+						ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, advanced_submenu_options, m_drv, &m_opts));
+					break;
 				default:
 					break;
 			}
@@ -777,6 +781,7 @@ void ui_menu_machine_configure::populate()
 	}
 
 	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(_(advanced_submenu_options[0].description), nullptr, 0, (void *)(FPTR)ADVANCED);
 	item_append(_(video_submenu_options[0].description), nullptr, 0, (void *)(FPTR)VIDEO);
 	item_append(_(control_submenu_options[0].description), nullptr, 0, (void *)(FPTR)CONTROLLER);
 	item_append(ui_menu_item_type::SEPARATOR);
