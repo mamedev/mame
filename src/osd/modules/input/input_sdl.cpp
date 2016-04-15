@@ -248,6 +248,17 @@ public:
 					}
 				}
 			}
+
+			else if (sdlevent.button.button == 3)
+			{
+				int cx, cy;
+				sdl_window_info *window = GET_FOCUS_WINDOW(&sdlevent.button);
+
+				if (window != NULL && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
+				{
+					machine().ui_input().push_mouse_rdown_event(window->target(), cx, cy);
+				}
+			}
 			break;
 
 		case SDL_MOUSEBUTTONUP:
@@ -262,6 +273,16 @@ public:
 				if (window != NULL && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
 				{
 					machine().ui_input().push_mouse_up_event(window->target(), cx, cy);
+				}
+			}
+			else if (sdlevent.button.button == 3)
+			{
+				int cx, cy;
+				sdl_window_info *window = GET_FOCUS_WINDOW(&sdlevent.button);
+
+				if (window != NULL && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
+				{
+					machine().ui_input().push_mouse_rup_event(window->target(), cx, cy);
 				}
 			}
 			break;

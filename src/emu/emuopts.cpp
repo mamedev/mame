@@ -451,7 +451,7 @@ bool emu_options::parse_command_line(int argc, char *argv[], std::string &error_
 //  of INI files
 //-------------------------------------------------
 
-void emu_options::parse_standard_inis(std::string &error_string)
+void emu_options::parse_standard_inis(std::string &error_string, const game_driver *driver)
 {
 	// start with an empty string
 	error_string.clear();
@@ -466,7 +466,7 @@ void emu_options::parse_standard_inis(std::string &error_string)
 		parse_one_ini("debug", OPTION_PRIORITY_DEBUG_INI, &error_string);
 
 	// if we have a valid system driver, parse system-specific INI files
-	const game_driver *cursystem = system();
+	const game_driver *cursystem = (driver == nullptr) ? system() : driver;
 	if (cursystem == nullptr)
 		return;
 

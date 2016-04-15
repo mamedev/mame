@@ -19,17 +19,24 @@
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_submenu::ui_submenu(running_machine &machine, render_container *container, std::vector<ui_submenu::option> &suboptions)
-	: ui_menu(machine, container),
-	m_options(suboptions)
+ui_submenu::ui_submenu(running_machine &machine, render_container *container, std::vector<ui_submenu::option> &suboptions, const game_driver *drv, emu_options *options)
+	: ui_menu(machine, container)
+	, m_options(suboptions)
+	, m_driver(drv)
 {
+	core_options *opts = nullptr;
+	if (m_driver == nullptr)
+		opts = dynamic_cast<core_options*>(&machine.options());
+	else
+		opts = dynamic_cast<core_options*>(options);
+
 	for (auto & sm_option : m_options)
 	{
 		switch (sm_option.type)
 		{
 			case ui_submenu::EMU:
-				sm_option.entry = machine.options().get_entry(sm_option.name);
-				sm_option.options = dynamic_cast<core_options*>(&machine.options());
+				sm_option.entry = opts->get_entry(sm_option.name);
+				sm_option.options = opts;
 				if (sm_option.entry->type() == OPTION_STRING)
 				{
 					sm_option.value.clear();
@@ -52,8 +59,8 @@ ui_submenu::ui_submenu(running_machine &machine, render_container *container, st
 				}
 				break;
 			case ui_submenu::OSD:
-				sm_option.entry = machine.options().get_entry(sm_option.name);
-				sm_option.options = dynamic_cast<core_options*>(&machine.options());
+				sm_option.entry = opts->get_entry(sm_option.name);
+				sm_option.options = opts;
 				if (sm_option.entry->type() == OPTION_STRING)
 				{
 					sm_option.value.clear();
@@ -208,7 +215,7 @@ void ui_submenu::populate()
 				item_append(_(sm_option->description), nullptr, MENU_FLAG_DISABLE | MENU_FLAG_UI_HEADING, nullptr);
 				break;
 			case ui_submenu::SEP:
-				item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+				item_append(ui_menu_item_type::SEPARATOR);
 				break;
 			case ui_submenu::CMD:
 				item_append(_(sm_option->description), nullptr, 0, static_cast<void*>(&(*sm_option)));
@@ -292,7 +299,7 @@ void ui_submenu::populate()
 		}
 	}
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	custombottom = customtop = machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
 }
 

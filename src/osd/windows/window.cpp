@@ -1372,6 +1372,14 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			window->machine().ui_input().push_mouse_up_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 			break;
 
+		case WM_RBUTTONDOWN:
+			window->machine().ui_input().push_mouse_rdown_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			break;
+
+		case WM_RBUTTONUP:
+			window->machine().ui_input().push_mouse_rup_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			break;
+
 		case WM_CHAR:
 			window->machine().ui_input().push_char_event(window->m_target, (unicode_char) wparam);
 			break;

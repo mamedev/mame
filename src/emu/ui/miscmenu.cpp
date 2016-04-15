@@ -17,6 +17,8 @@
 #include "ui/miscmenu.h"
 #include "ui/utils.h"
 #include "../info.h"
+#include "ui/inifile.h"
+#include "ui/submenu.h"
 
 /***************************************************************************
     MENU HANDLERS
@@ -86,7 +88,7 @@ void ui_menu_bios_selection::populate()
 		}
 	}
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	item_append(_("Reset"),  nullptr, 0, (void *)1);
 }
 
@@ -579,6 +581,7 @@ void ui_menu_export::handle()
 		switch ((FPTR)m_event->itemref)
 		{
 			case 1:
+			case 3:
 			{
 				if (m_event->iptkey == IPT_UI_SELECT)
 				{
@@ -611,7 +614,7 @@ void ui_menu_export::handle()
 							drvlist.include(driver_list::find(*elem));
 
 						info_xml_creator creator(drvlist);
-						creator.output(pfile, false);
+						creator.output(pfile, ((FPTR)m_event->itemref == 1) ? false : true);
 						fclose(pfile);
 						machine().popmessage(_("%s.xml saved under ui folder."), filename.c_str());
 					}
@@ -671,18 +674,28 @@ void ui_menu_export::handle()
 void ui_menu_export::populate()
 {
 	// add options items
-	item_append(_("Export XML format (like -listxml)"), nullptr, 0, (void *)(FPTR)1);
-	item_append(_("Export TXT format (like -listfull)"), nullptr, 0, (void *)(FPTR)2);
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(_("Export list in XML format (like -listxml)"), nullptr, 0, (void *)(FPTR)1);
+	item_append(_("Export list in XML format (like -listxml, but exclude devices)"), nullptr, 0, (void *)(FPTR)3);
+	item_append(_("Export list in TXT format (like -listfull)"), nullptr, 0, (void *)(FPTR)2);
+	item_append(ui_menu_item_type::SEPARATOR);
 }
 
 //-------------------------------------------------
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_machine_configure::ui_menu_machine_configure(running_machine &machine, render_container *container, const game_driver *prev)
-	: ui_menu(machine, container), m_drv(prev)
+ui_menu_machine_configure::ui_menu_machine_configure(running_machine &machine, render_container *container, const game_driver *prev, float _x0, float _y0)
+	: ui_menu(machine, container)
+	, m_drv(prev)
+	, m_opts(machine.options())
+	, x0(_x0)
+	, y0(_y0)
+	, m_curbios(0)
 {
+	// parse the INI file
+	std::string error;
+	m_opts.parse_standard_inis(error, m_drv);
+	setup_bios();
 }
 
 ui_menu_machine_configure::~ui_menu_machine_configure()
@@ -697,28 +710,54 @@ void ui_menu_machine_configure::handle()
 {
 	// process the menu
 	ui_menu::menu_stack->parent->process(UI_MENU_PROCESS_NOINPUT);
-	const ui_menu_event *m_event = process(UI_MENU_PROCESS_NOIMAGE);
+	const ui_menu_event *m_event = process(UI_MENU_PROCESS_NOIMAGE, x0, y0);
 	if (m_event != nullptr && m_event->itemref != nullptr)
 	{
-		switch ((FPTR)m_event->itemref)
+		if (m_event->iptkey == IPT_UI_SELECT)
 		{
-			case 1:
+			switch ((FPTR)m_event->itemref)
 			{
-				if (m_event->iptkey == IPT_UI_SELECT)
+				case SAVE:
 				{
 					std::string filename(m_drv->name);
 					emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
 					osd_file::error filerr = file.open(filename.c_str(), ".ini");
 					if (filerr == osd_file::error::NONE)
 					{
-						std::string inistring = machine().options().output_ini();
+						std::string inistring = m_opts.output_ini();
 						file.puts(inistring.c_str());
+						machine().ui().popup_time(2, "%s", _("\n    Configuration saved    \n\n"));
 					}
+					break;
 				}
-			break;
+				case ADDFAV:
+					machine().favorite().add_favorite_game(m_drv);
+					reset(UI_MENU_RESET_REMEMBER_POSITION);
+					break;
+
+				case DELFAV:
+					machine().favorite().remove_favorite_game();
+					reset(UI_MENU_RESET_REMEMBER_POSITION);
+					break;
+				case CONTROLLER:
+					if (m_event->iptkey == IPT_UI_SELECT)
+						ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, control_submenu_options, m_drv, &m_opts));
+					break;
+				case VIDEO:
+					if (m_event->iptkey == IPT_UI_SELECT)
+						ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, video_submenu_options, m_drv, &m_opts));
+					break;
+				default:
+					break;
 			}
-		default:
-			break;
+		}
+		else if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
+		{
+			(m_event->iptkey == IPT_UI_LEFT) ? --m_curbios : ++m_curbios;
+			std::string error;
+			m_opts.set_value(OPTION_BIOS, m_bios[m_curbios].second, OPTION_PRIORITY_CMDLINE, error);
+			m_opts.mark_changed(OPTION_BIOS);
+			reset(UI_MENU_RESET_REMEMBER_POSITION);
 		}
 	}
 }
@@ -730,11 +769,27 @@ void ui_menu_machine_configure::handle()
 void ui_menu_machine_configure::populate()
 {
 	// add options items
-	item_append(_("Dummy"), nullptr, 0, (void *)(FPTR)10);
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-	item_append(_("Save machine configuration"), nullptr, 0, (void *)(FPTR)1);
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-	customtop = machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
+	if (!m_bios.empty())
+	{
+		item_append(_("Bios"), nullptr, MENU_FLAG_DISABLE | MENU_FLAG_UI_HEADING, nullptr);
+		UINT32 arrows = get_arrow_flags(0, m_bios.size() - 1, m_curbios);
+		item_append(_("Driver"), m_bios[m_curbios].first.c_str(), arrows, (void *)(FPTR)BIOS);
+	}
+
+	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(_(video_submenu_options[0].description), nullptr, 0, (void *)(FPTR)VIDEO);
+	item_append(_(control_submenu_options[0].description), nullptr, 0, (void *)(FPTR)CONTROLLER);
+	item_append(ui_menu_item_type::SEPARATOR);
+
+	if (!machine().favorite().isgame_favorite(m_drv))
+		item_append(_("Add To Favorites"), nullptr, 0, (void *)ADDFAV);
+	else
+		item_append(_("Remove From Favorites"), nullptr, 0, (void *)DELFAV);
+
+	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(_("Save machine configuration"), nullptr, 0, (void *)(FPTR)SAVE);
+	item_append(ui_menu_item_type::SEPARATOR);
+	customtop = 2.0f * machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 //-------------------------------------------------
@@ -745,14 +800,23 @@ void ui_menu_machine_configure::custom_render(void *selectedref, float top, floa
 {
 	float width;
 	ui_manager &mui = machine().ui();
+	std::string text[2];
+	float maxwidth = origx2 - origx1;
 
-	mui.draw_text_full(container, m_drv->description, 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
-	width += 2 * UI_BOX_LR_BORDER;
-	float maxwidth = MAX(origx2 - origx1, width);
+	text[0] = _("Configure machine:");
+	text[1] = m_drv->description;
+
+	for (auto & elem : text)
+	{
+		mui.draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+			DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+		width += 2 * UI_BOX_LR_BORDER;
+		maxwidth = MAX(maxwidth, width);
+	}
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
+//	float x1 = origx1;
 	float x2 = x1 + maxwidth;
 	float y1 = origy1 - top;
 	float y2 = origy1 - UI_BOX_TB_BORDER;
@@ -766,8 +830,51 @@ void ui_menu_machine_configure::custom_render(void *selectedref, float top, floa
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, m_drv->description, x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	for (auto & elem : text)
+	{
+		mui.draw_text_full(container, elem.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+			DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+		y1 += mui.get_line_height();
+	}
+}
+
+void ui_menu_machine_configure::setup_bios()
+{
+	if (m_drv->rom == nullptr)
+		return;
+
+	std::string specbios(m_opts.bios());
+	std::string default_name;
+	for (const rom_entry *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
+		if (ROMENTRY_ISDEFAULT_BIOS(rom))
+			default_name = ROM_GETNAME(rom);
+	
+	int bios_count = 0;
+	for (const rom_entry *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
+	{
+		if (ROMENTRY_ISSYSTEM_BIOS(rom))
+		{
+			std::string name(ROM_GETHASHDATA(rom));
+			std::string biosname(ROM_GETNAME(rom));
+			int bios_flags = ROM_GETBIOSFLAGS(rom);
+			std::string bios_number = std::to_string(bios_flags - 1);
+
+			// check biosnumber and name
+			if (bios_number == specbios || biosname == specbios)
+				m_curbios = bios_count;
+
+			if (biosname == default_name)
+			{
+				name.append(_(" (default)"));
+				if (specbios == "default")
+					m_curbios = bios_count;
+			}
+
+			m_bios.emplace_back(name, bios_flags - 1);
+			bios_count++;
+		}
+	}
+
 }
 
 //-------------------------------------------------
@@ -830,7 +937,7 @@ void ui_menu_plugins_configure::populate()
 				enabled ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)curentry.name());
 		}
 	}
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	customtop = machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
 }
 
