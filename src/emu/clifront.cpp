@@ -1713,14 +1713,14 @@ void cli_frontend::display_help()
 	osd_printf_info("This software reproduces, more or less faithfully, the behaviour of a wide range\n"
 					"of machines. But hardware is useless without software, so images of the ROMs and\n"
 					"other media which run on that hardware are also required.\n\n");
-	osd_printf_info("Usage:  %s [machine] [media] [software] [options]",emulator_info::get_appname());
+	osd_printf_info("Usage:  %s [machine] [media] [software] [options]",emulator_info::get_appname_lower());
 	osd_printf_info("\n\n"
 			"        %s -showusage    for a brief list of options\n"
 			"        %s -showconfig   for a list of configuration options\n"
 			"        %s -listmedia    for a full list of supported media\n"
 			"        %s -createconfig to create a %s.ini\n\n"
-			"For usage instructions, please consult the files config.txt and windows.txt.\n",emulator_info::get_appname(),
-			emulator_info::get_appname(),emulator_info::get_appname(),emulator_info::get_appname(),emulator_info::get_configname());
+			"For usage instructions, please consult the files config.txt and windows.txt.\n",emulator_info::get_appname_lower(),
+			emulator_info::get_appname_lower(),emulator_info::get_appname_lower(),emulator_info::get_appname_lower(),emulator_info::get_configname());
 }
 
 
