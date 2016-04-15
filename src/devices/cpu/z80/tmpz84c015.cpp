@@ -163,7 +163,7 @@ WRITE8_MEMBER(tmpz84c015_device::irq_priority_w)
 			{ dev[prio[data][2]] },
 			{ nullptr }
 		};
-		m_daisy.init(this, daisy_chain);
+		daisy_init(daisy_chain);
 
 		m_irq_priority = data;
 	}

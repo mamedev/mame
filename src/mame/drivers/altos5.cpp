@@ -381,7 +381,7 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(altos5_mem)
 	MCFG_CPU_IO_MAP(altos5_io)
-	MCFG_CPU_CONFIG(daisy_chain_intf)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 
 	/* devices */
 	MCFG_DEVICE_ADD("z80dma", Z80DMA, XTAL_8MHz / 2)

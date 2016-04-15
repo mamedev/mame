@@ -913,7 +913,7 @@ static MACHINE_CONFIG_START( p7_base, pasopia7_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pasopia7_mem)
 	MCFG_CPU_IO_MAP(pasopia7_io)
-	MCFG_CPU_CONFIG(p7_daisy)
+	MCFG_Z80_DAISY_CHAIN(p7_daisy)
 
 
 	/* Audio */

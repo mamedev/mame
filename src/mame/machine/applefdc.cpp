@@ -106,9 +106,10 @@ enum
 //-------------------------------------------------
 
 applefdc_base_device::applefdc_base_device(applefdc_base_device::applefdc_t fdc_type, const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		m_type(fdc_type),
+		m_interface(nullptr)
 {
-	m_type = fdc_type;
 }
 
 
@@ -176,9 +177,7 @@ const applefdc_interface *applefdc_base_device::get_interface()
 {
 	static const applefdc_interface dummy_interface = {nullptr, };
 
-	return (static_config() != nullptr)
-		? (const applefdc_interface *) static_config()
-		: &dummy_interface;
+	return (m_interface != nullptr) ? m_interface : &dummy_interface;
 }
 
 

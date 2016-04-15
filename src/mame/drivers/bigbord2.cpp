@@ -545,7 +545,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(bigbord2_mem)
 	MCFG_CPU_IO_MAP(bigbord2_io)
-	MCFG_CPU_CONFIG(bigbord2_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(bigbord2_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)

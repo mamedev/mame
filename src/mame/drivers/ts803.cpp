@@ -493,7 +493,7 @@ static MACHINE_CONFIG_START( ts803, ts803_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(ts803_mem)
 	MCFG_CPU_IO_MAP(ts803_io)
-	MCFG_CPU_CONFIG(daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)

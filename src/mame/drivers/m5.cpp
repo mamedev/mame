@@ -1400,7 +1400,7 @@ static MACHINE_CONFIG_START( m5, m5_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_14_31818MHz/4)
 	MCFG_CPU_PROGRAM_MAP(m5_mem)
 	MCFG_CPU_IO_MAP(m5_io)
-	MCFG_CPU_CONFIG(m5_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(m5_daisy_chain)
 
 	MCFG_CPU_ADD(Z80_FD5_TAG, Z80, XTAL_14_31818MHz/4)
 	MCFG_CPU_PROGRAM_MAP(fd5_mem)
@@ -1492,7 +1492,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( brno, m5, brno_state )
 	MCFG_CPU_MODIFY(Z80_TAG)
 	MCFG_CPU_PROGRAM_MAP(m5_mem_brno)
 	MCFG_CPU_IO_MAP(brno_io)
-//  MCFG_CPU_CONFIG(m5_daisy_chain)
+//  MCFG_Z80_DAISY_CHAIN(m5_daisy_chain)
 
 
 	//remove devices used for fd5 floppy

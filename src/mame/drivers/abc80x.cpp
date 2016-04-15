@@ -1015,7 +1015,7 @@ void abc806_state::machine_reset()
 static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
-	MCFG_CPU_CONFIG(abc800_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(abc800c_mem)
 	MCFG_CPU_IO_MAP(abc800c_io)
 
@@ -1090,7 +1090,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
-	MCFG_CPU_CONFIG(abc800_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(abc800m_mem)
 	MCFG_CPU_IO_MAP(abc800m_io)
 
@@ -1165,7 +1165,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( abc802, abc802_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
-	MCFG_CPU_CONFIG(abc800_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(abc802_mem)
 	MCFG_CPU_IO_MAP(abc802_io)
 
@@ -1241,7 +1241,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( abc806, abc806_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
-	MCFG_CPU_CONFIG(abc800_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(abc806_mem)
 	MCFG_CPU_IO_MAP(abc806_io)
 

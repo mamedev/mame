@@ -148,7 +148,7 @@ static MACHINE_CONFIG_START( cchasm, cchasm_state )
 	MCFG_CPU_PROGRAM_MAP(memmap)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3584229)       /* 3.58  MHz (from schematics) */
-	MCFG_CPU_CONFIG(daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
 

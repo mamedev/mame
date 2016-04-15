@@ -209,7 +209,7 @@ static MACHINE_CONFIG_START( vcs80, vcs80_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_5MHz/2) /* U880D */
 	MCFG_CPU_PROGRAM_MAP(vcs80_mem)
 	MCFG_CPU_IO_MAP(vcs80_io)
-	MCFG_CPU_CONFIG(vcs80_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(vcs80_daisy_chain)
 
 	/* keyboard timer */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", vcs80_state, vcs80_keyboard_tick, attotime::from_hz(1000))

@@ -114,13 +114,13 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_START( c8002, onyx_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8002, XTAL_4MHz )
-	//MCFG_CPU_CONFIG(main_daisy_chain)
+	//MCFG_Z80_DAISY_CHAIN(main_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(c8002_mem)
 	//MCFG_CPU_DATA_MAP(c8002_data)
 	MCFG_CPU_IO_MAP(c8002_io)
 
 	MCFG_CPU_ADD("subcpu", Z80, XTAL_4MHz )
-	//MCFG_CPU_CONFIG(sub_daisy_chain)
+	//MCFG_Z80_DAISY_CHAIN(sub_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(submem)
 	MCFG_CPU_IO_MAP(subio)
 	MCFG_MACHINE_RESET_OVERRIDE(onyx_state, c8002)

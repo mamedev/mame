@@ -891,28 +891,14 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  CPU configuration
- *
- *************************************/
-
-#if 0
-/* TODO: Unknown */
-static const mips3_config config =
-{
-	16384,              /* code cache size */
-	16384               /* data cache size */
-};
-#endif
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
 
 static MACHINE_CONFIG_START( magictg, magictg_state )
 	MCFG_CPU_ADD("mips", R5000BE, 150000000) /* TODO: CPU type and clock are unknown */
-	MCFG_CPU_CONFIG(config)
+	//MCFG_MIPS3_ICACHE_SIZE(16384) /* TODO: Unknown */
+	//MCFG_MIPS3_DCACHE_SIZE(16384) /* TODO: Unknown */
 	MCFG_CPU_PROGRAM_MAP(magictg_map)
 
 	MCFG_CPU_ADD("adsp", ADSP2181, 16000000)

@@ -1102,7 +1102,7 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(bullet_mem)
 	MCFG_CPU_IO_MAP(bullet_io)
-	MCFG_CPU_CONFIG(daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	// devices
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_16MHz/4)
@@ -1182,7 +1182,7 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(bulletf_mem)
 	MCFG_CPU_IO_MAP(bulletf_io)
-	MCFG_CPU_CONFIG(daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	// devices
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_16MHz/4)

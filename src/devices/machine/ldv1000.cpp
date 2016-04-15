@@ -86,7 +86,7 @@ static const z80_daisy_config daisy_chain[] =
 
 static MACHINE_CONFIG_FRAGMENT( ldv1000 )
 	MCFG_CPU_ADD("ldv1000", Z80, XTAL_5MHz/2)
-	MCFG_CPU_CONFIG(daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(ldv1000_map)
 	MCFG_CPU_IO_MAP(ldv1000_portmap)
 

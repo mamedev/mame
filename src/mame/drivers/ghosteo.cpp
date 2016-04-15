@@ -638,7 +638,7 @@ static MACHINE_CONFIG_START( ghosteo, ghosteo_state )
 
 //  MCFG_DEVICE_ADD("nand", NAND, 0)
 //  MCFG_NAND_TYPE(NAND_CHIP_K9F5608U0D)    // or another variant with ID 0xEC 0x75 ?
-//  MCFG_DEVICE_CONFIG(bballoon_nand_intf)
+//  MCFG_NAND_RNB_CALLBACK(DEVWRITELINE("s3c2410", s3c2410_device, s3c24xx_pin_frnb_w))
 
 //  MCFG_I2CMEM_ADD("i2cmem", 0xA0, 0, 0x100, NULL)
 

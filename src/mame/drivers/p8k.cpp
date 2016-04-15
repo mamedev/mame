@@ -466,7 +466,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( p8k, p8k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz )
-	MCFG_CPU_CONFIG(p8k_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(p8k_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(p8k_memmap)
 	MCFG_CPU_IO_MAP(p8k_iomap)
 	MCFG_MACHINE_RESET_OVERRIDE(p8k_state,p8k)
@@ -526,7 +526,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( p8k_16, p8k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8001, XTAL_4MHz )
-	MCFG_CPU_CONFIG(p8k_16_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(p8k_16_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(p8k_16_memmap)
 	MCFG_CPU_DATA_MAP(p8k_16_datamap)
 	MCFG_CPU_IO_MAP(p8k_16_iomap)

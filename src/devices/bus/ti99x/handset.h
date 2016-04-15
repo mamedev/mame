@@ -58,13 +58,6 @@ private:
 	emu_timer *m_delay_timer;
 };
 
-#define MCFG_HANDSET_ADD(_tag, _intf, _clock )  \
-	MCFG_DEVICE_ADD(_tag, HANDSET, _clock)  \
-	MCFG_DEVICE_CONFIG(_intf)
-
-#define TI99_HANDSET_INTERFACE(name)    \
-	const ti99_handset_intf(name) =
-
 /****************************************************************************/
 
 extern const device_type TI99_JOYSTICK;

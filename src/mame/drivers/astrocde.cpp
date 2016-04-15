@@ -1441,7 +1441,7 @@ static MACHINE_CONFIG_DERIVED( tenpindx, astrocade_16color_base )
 	MCFG_CPU_IO_MAP(port_map_16col_pattern_nosound)
 
 	MCFG_CPU_ADD("sub", Z80, ASTROCADE_CLOCK/4) /* real clock unknown */
-	MCFG_CPU_CONFIG(tenpin_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(tenpin_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(tenpin_sub_map)
 	MCFG_CPU_IO_MAP(tenpin_sub_io_map)
 

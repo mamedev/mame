@@ -1311,7 +1311,7 @@ MACHINE_CONFIG_FRAGMENT( demon_sound )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
-	MCFG_CPU_CONFIG(daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(demon_sound_map)
 	MCFG_CPU_IO_MAP(demon_sound_ports)
 

@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_10MHz /4)
 	MCFG_CPU_PROGRAM_MAP(pcm_mem)
 	MCFG_CPU_IO_MAP(pcm_io)
-	MCFG_CPU_CONFIG(pcm_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(pcm_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
