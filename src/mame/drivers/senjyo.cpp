@@ -553,7 +553,7 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
 
 	MCFG_CPU_ADD("sub", Z80, 2000000)   /* 2 MHz? */
-	MCFG_CPU_CONFIG(senjyo_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(senjyo_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(senjyo_sound_map)
 	MCFG_CPU_IO_MAP(senjyo_sound_io_map)
 

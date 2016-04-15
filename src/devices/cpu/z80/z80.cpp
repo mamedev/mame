@@ -110,7 +110,6 @@
 #include "emu.h"
 #include "debugger.h"
 #include "z80.h"
-#include "z80daisy.h"
 
 #define VERBOSE             0
 
@@ -647,7 +646,7 @@ inline void z80_device::reti()
 	pop(m_pc);
 	WZ = PC;
 	m_iff1 = m_iff2;
-	m_daisy.call_reti_device();
+	daisy_call_reti_device();
 }
 
 /***************************************************************
@@ -3160,8 +3159,8 @@ void z80_device::take_interrupt()
 	m_iff1 = m_iff2 = 0;
 
 	/* Daisy chain mode? If so, call the requesting device */
-	if (m_daisy.present())
-		irq_vector = m_daisy.call_ack_device();
+	if (daisy_chain_present())
+		irq_vector = daisy_call_ack_device();
 
 	/* else call back the cpu interface to retrieve the vector */
 	else
@@ -3419,8 +3418,6 @@ void z80_device::device_start()
 	m_decrypted_opcodes_direct = &m_decrypted_opcodes->direct();
 	m_io = &space(AS_IO);
 
-	if (static_config() != nullptr)
-		m_daisy.init(this, (const z80_daisy_config *)static_config());
 	m_irq_callback = device_irq_acknowledge_delegate(FUNC(z80_device::standard_irq_callback_member), this);
 
 	IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */
@@ -3493,8 +3490,6 @@ void z80_device::device_reset()
 	m_after_ldair = FALSE;
 	m_iff1 = 0;
 	m_iff2 = 0;
-
-	m_daisy.reset();
 
 	WZ=PCD;
 }
@@ -3582,8 +3577,8 @@ void z80_device::execute_set_input(int inputnum, int state)
 	case INPUT_LINE_IRQ0:
 		/* update the IRQ state via the daisy chain */
 		m_irq_state = state;
-		if (m_daisy.present())
-			m_irq_state = ( m_daisy.update_irq_state() == ASSERT_LINE ) ? ASSERT_LINE : m_irq_state;
+		if (daisy_chain_present())
+			m_irq_state = (daisy_update_irq_state() == ASSERT_LINE ) ? ASSERT_LINE : m_irq_state;
 
 		/* the main execute loop will take the interrupt */
 		break;
@@ -3700,6 +3695,7 @@ void z80_device::z80_set_cycle_tables(const UINT8 *op, const UINT8 *cb, const UI
 
 z80_device::z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	cpu_device(mconfig, Z80, "Z80", tag, owner, clock, "z80", __FILE__),
+	z80_daisy_chain_interface(mconfig, *this),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_decrypted_opcodes_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0),
@@ -3710,6 +3706,7 @@ z80_device::z80_device(const machine_config &mconfig, const char *tag, device_t 
 
 z80_device::z80_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	z80_daisy_chain_interface(mconfig, *this),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_decrypted_opcodes_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0),

@@ -475,7 +475,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL_16MHz/2) // tmpz84c011-8
-	MCFG_CPU_CONFIG(daisy_chain_gamecpu)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain_gamecpu)
 	MCFG_CPU_PROGRAM_MAP(kenseim_map)
 	MCFG_CPU_IO_MAP(kenseim_io_map)
 	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(kenseim_state, cpu_portc_w))

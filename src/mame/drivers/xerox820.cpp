@@ -544,7 +544,7 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_20MHz/8)
 	MCFG_CPU_PROGRAM_MAP(xerox820_mem)
 	MCFG_CPU_IO_MAP(xerox820_io)
-	MCFG_CPU_CONFIG(xerox820_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(xerox820_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -618,7 +618,7 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(xerox820ii_mem)
 	MCFG_CPU_IO_MAP(xerox820ii_io)
-	MCFG_CPU_CONFIG(xerox820_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(xerox820_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)

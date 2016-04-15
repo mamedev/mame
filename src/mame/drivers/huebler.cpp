@@ -330,7 +330,7 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz/4) // U880D
 	MCFG_CPU_PROGRAM_MAP(amu880_mem)
 	MCFG_CPU_IO_MAP(amu880_io)
-	MCFG_CPU_CONFIG(amu880_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(amu880_daisy_chain)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", amu880_state, keyboard_tick, attotime::from_hz(1500))
 

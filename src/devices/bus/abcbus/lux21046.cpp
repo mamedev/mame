@@ -286,7 +286,7 @@ static const z80_daisy_config z80_daisy_chain[] =
 
 static MACHINE_CONFIG_FRAGMENT( luxor_55_21046 )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
-	MCFG_CPU_CONFIG(z80_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(luxor_55_21046_mem)
 	MCFG_CPU_IO_MAP(luxor_55_21046_io)
 

@@ -196,7 +196,7 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_CPU_PROGRAM_MAP(kaypro_map)
 	MCFG_CPU_IO_MAP(kayproii_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kaypro_state, kay_kbd_interrupt)  /* this doesn't actually exist, it is to run the keyboard */
-	MCFG_CPU_CONFIG(kayproii_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(kayproii_daisy_chain)
 
 	MCFG_MACHINE_START_OVERRIDE(kaypro_state, kayproii )
 	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
@@ -266,7 +266,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_CPU_PROGRAM_MAP(kaypro_map)
 	MCFG_CPU_IO_MAP(kaypro2x_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kaypro_state, kay_kbd_interrupt)
-	MCFG_CPU_CONFIG(kaypro2x_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(kaypro2x_daisy_chain)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
 

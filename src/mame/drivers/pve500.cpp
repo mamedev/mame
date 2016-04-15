@@ -351,7 +351,7 @@ static MACHINE_CONFIG_START( pve500, pve500_state )
 	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(maincpu_prg)
 	MCFG_CPU_IO_MAP(maincpu_io)
-	MCFG_CPU_CONFIG(maincpu_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(maincpu_daisy_chain)
 	MCFG_TMPZ84C015_OUT_DTRA_CB(WRITELINE(pve500_state, GPI_w))
 	MCFG_TMPZ84C015_OUT_DTRB_CB(DEVWRITELINE("buzzer", beep_device, set_state))
 	MCFG_TMPZ84C015_OUT_TXDA_CB(DEVWRITELINE("recorder", rs232_port_device, write_txd))

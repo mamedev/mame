@@ -220,7 +220,7 @@ static MACHINE_CONFIG_START( pulsar, pulsar_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pulsar_mem)
 	MCFG_CPU_IO_MAP(pulsar_io)
-	MCFG_CPU_CONFIG(daisy_chain_intf)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 	MCFG_MACHINE_RESET_OVERRIDE(pulsar_state, pulsar)
 
 	/* Devices */

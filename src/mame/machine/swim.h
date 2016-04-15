@@ -54,10 +54,10 @@ private:
 
 #define MCFG_SWIM_ADD(_tag, _intrf) \
 	MCFG_DEVICE_ADD(_tag, SWIM, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_APPLEFDC_CONFIG(_intrf)
 
 #define MCFG_SWIM_MODIFY(_tag, _intrf) \
 	MCFG_DEVICE_MODIFY(_tag)          \
-	MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_APPLEFDC_CONFIG(_intrf)
 
 #endif // __SWIM_H__

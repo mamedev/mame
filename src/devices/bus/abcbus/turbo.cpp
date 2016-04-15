@@ -85,7 +85,7 @@ static MACHINE_CONFIG_FRAGMENT( turbo_kontroller )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(turbo_kontroller_mem)
 	MCFG_CPU_IO_MAP(turbo_kontroller_io)
-	MCFG_CPU_CONFIG(daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 MACHINE_CONFIG_END
 
 

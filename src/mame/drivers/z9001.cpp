@@ -205,7 +205,7 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_9_8304MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(z9001_mem)
 	MCFG_CPU_IO_MAP(z9001_io)
-	MCFG_CPU_CONFIG(z9001_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(z9001_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

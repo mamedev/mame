@@ -259,7 +259,7 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( inder_sb )
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000) // unk freq
-	MCFG_CPU_CONFIG(daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io)
 

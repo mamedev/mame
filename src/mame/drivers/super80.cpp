@@ -693,7 +693,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(super80_map)
 	MCFG_CPU_IO_MAP(super80_io)
-	MCFG_CPU_CONFIG(super80_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(super80_daisy_chain)
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, MASTER_CLOCK/6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -773,7 +773,7 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(super80v_map)
 	MCFG_CPU_IO_MAP(super80v_io)
-	MCFG_CPU_CONFIG(super80_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(super80_daisy_chain)
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, MASTER_CLOCK/6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

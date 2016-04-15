@@ -701,7 +701,7 @@ void trs80m2_state::machine_reset()
 static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
-	MCFG_CPU_CONFIG(trs80m2_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)
 
@@ -786,7 +786,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
-	MCFG_CPU_CONFIG(trs80m2_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(m16_z80_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(AM9519A_TAG, pic8259_device, inta_cb)

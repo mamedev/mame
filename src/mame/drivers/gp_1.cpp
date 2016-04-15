@@ -421,7 +421,7 @@ static MACHINE_CONFIG_START( gp_1, gp_1_state )
 	MCFG_CPU_ADD("maincpu", Z80, 2457600)
 	MCFG_CPU_PROGRAM_MAP(gp_1_map)
 	MCFG_CPU_IO_MAP(gp_1_io)
-	MCFG_CPU_CONFIG(daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
