@@ -146,7 +146,7 @@ int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_r
 
 			const nl_double new_val = new_V[k] * one_m_w[k] + (Idrive + RHS[k]) * w[k];
 
-			err = std::max(nl_math::abs(new_val - new_V[k]), err);
+			err = nl_math::max(nl_math::abs(new_val - new_V[k]), err);
 			new_V[k] = new_val;
 		}
 

@@ -43,7 +43,7 @@
 
 #if 1
 #include "nld_ms_direct.h"
-//#include "nld_ms_gcr.h"
+#include "nld_ms_gcr.h"
 #else
 #include "nld_ms_direct_lu.h"
 #endif
@@ -223,7 +223,7 @@ ATTR_COLD void matrix_solver_t::setup_matrix()
 		pfree(m_rails_temp[k]); // no longer needed
 
 	m_rails_temp.clear();
-#if 0
+#if 1
 
 	/* Sort in descending order by number of connected matrix voltages.
 	 * The idea is, that for Gauss-Seidel algo the first voltage computed
@@ -245,15 +245,15 @@ ATTR_COLD void matrix_solver_t::setup_matrix()
 	 *
 	 */
 
-	int sort_order = (type() == GAUSS_SEIDEL ? 1 : -1) * -1;
+	int sort_order = -1;//(type() == GAUSS_SEIDEL ? 1 : -1);
 
-	for (unsigned k = 0; k < iN / 2; k++)
-		for (unsigned i = 0; i < iN - 1; i++)
+	for (unsigned k = 0; k < iN - 1; k++)
+		for (unsigned i = k+1; i < iN; i++)
 		{
-			if ((m_terms[i]->m_railstart - m_terms[i+1]->m_railstart) * sort_order < 0)
+			if (((int) m_terms[k]->m_railstart - (int) m_terms[i]->m_railstart) * sort_order < 0)
 			{
-				std::swap(m_terms[i], m_terms[i+1]);
-				std::swap(m_nets[i], m_nets[i+1]);
+				std::swap(m_terms[i], m_terms[k]);
+				std::swap(m_nets[i], m_nets[k]);
 			}
 		}
 
@@ -720,10 +720,14 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_sp
 				typedef matrix_solver_SOR_mat_t<m_N,_storage_N> solver_sor_mat;
 				return palloc(solver_sor_mat(&m_params, size));
 			}
+			else if (pstring("MAT_CR").equals(m_iterative_solver))
+			{
+				typedef matrix_solver_GCR_t<m_N,_storage_N> solver_mat;
+				return palloc(solver_mat(&m_params, size));
+			}
 			else if (pstring("MAT").equals(m_iterative_solver))
 			{
 				typedef matrix_solver_direct_t<m_N,_storage_N> solver_mat;
-				//typedef matrix_solver_GCR_t<m_N,_storage_N> solver_mat;
 				return palloc(solver_mat(&m_params, size));
 			}
 			else if (pstring("SM").equals(m_iterative_solver))

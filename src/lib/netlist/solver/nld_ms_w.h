@@ -125,9 +125,6 @@ private:
 template <unsigned m_N, unsigned _storage_N>
 matrix_solver_w_t<m_N, _storage_N>::~matrix_solver_w_t()
 {
-#if (NL_USE_DYNAMIC_ALLOCATION)
-	pfree_array(m_A);
-#endif
 }
 
 template <unsigned m_N, unsigned _storage_N>
@@ -276,17 +273,22 @@ int matrix_solver_w_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool
 			/* construct w = transform(V) * y
 			 * dim: rowcount x iN
 			 * */
-			nl_double w[_storage_N] = {0};
+			nl_double w[_storage_N];
 			for (unsigned i = 0; i < rowcount; i++)
+			{
+				const unsigned r = rows[i];
+				double tmp = 0.0;
 				for (unsigned k = 0; k < iN; k++)
-					w[i] += VT(rows[i],k) * new_V[k];
+					tmp += VT(r,k) * new_V[k];
+				w[i] = tmp;
+			}
 
 			for (unsigned i = 0; i < rowcount; i++)
 				for (unsigned k=0; k< rowcount; k++)
 					H[i][k] = 0.0;
 
 			for (unsigned i = 0; i < rowcount; i++)
-				H[i][i] += 1.0;
+				H[i][i] = 1.0;
 			/* Construct H = (I + VT*Z) */
 			for (unsigned i = 0; i < rowcount; i++)
 				for (unsigned k=0; k< colcount[i]; k++)
@@ -348,16 +350,17 @@ int matrix_solver_w_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool
 	}
 	m_cnt++;
 
-	for (unsigned i=0; i<iN; i++)
-	{
-		nl_double tmp = 0.0;
-		for (unsigned j=0; j<iN; j++)
+	if (0)
+		for (unsigned i=0; i<iN; i++)
 		{
-			tmp += A(i,j) * new_V[j];
+			nl_double tmp = 0.0;
+			for (unsigned j=0; j<iN; j++)
+			{
+				tmp += A(i,j) * new_V[j];
+			}
+			if (nl_math::abs(tmp-RHS(i)) > 1e-6)
+				printf("%s failed on row %d: %f RHS: %f\n", this->name().cstr(), i, nl_math::abs(tmp-RHS(i)), RHS(i));
 		}
-		if (std::fabs(tmp-RHS(i)) > 1e-6)
-			printf("%s failed on row %d: %f RHS: %f\n", this->name().cstr(), i, std::fabs(tmp-RHS(i)), RHS(i));
-	}
 	if (newton_raphson)
 	{
 		nl_double err = delta(new_V);
@@ -392,9 +395,6 @@ matrix_solver_w_t<m_N, _storage_N>::matrix_solver_w_t(const solver_parameters_t 
 	,m_cnt(0)
 	, m_dim(size)
 {
-#if (NL_USE_DYNAMIC_ALLOCATION)
-	m_A = palloc_array(nl_ext_double, N() * m_pitch);
-#endif
 	for (unsigned k = 0; k < N(); k++)
 	{
 		m_last_RHS[k] = 0.0;
@@ -407,9 +407,6 @@ matrix_solver_w_t<m_N, _storage_N>::matrix_solver_w_t(const eSolverType type, co
 ,m_cnt(0)
 , m_dim(size)
 {
-#if (NL_USE_DYNAMIC_ALLOCATION)
-	m_A = palloc_array(nl_ext_double, N() * m_pitch);
-#endif
 	for (unsigned k = 0; k < N(); k++)
 	{
 		m_last_RHS[k] = 0.0;

@@ -106,7 +106,7 @@ nl_double matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 
 		// FIXME: used to be 1e90, but this would not be compatible with float
 		if (sqo > NL_FCONST(1e-20))
-			m_lp_fact = std::min(nl_math::sqrt(sq/sqo), (nl_double) 2.0);
+			m_lp_fact = nl_math::min(nl_math::sqrt(sq/sqo), (nl_double) 2.0);
 		else
 			m_lp_fact = NL_FCONST(0.0);
 	}
@@ -190,7 +190,7 @@ int matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newt
 				Idrive = Idrive + this->A(k,p[i]) * new_v[p[i]];
 
 			const nl_double delta = m_omega * (this->RHS(k) - Idrive) / this->A(k,k);
-			cerr = std::max(cerr, nl_math::abs(delta));
+			cerr = nl_math::max(cerr, nl_math::abs(delta));
 			new_v[k] += delta;
 		}
 

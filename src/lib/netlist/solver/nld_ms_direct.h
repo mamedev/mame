@@ -307,7 +307,7 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 				{
 					x_i[p] = i;
 					x_start[p] = chunks * p;
-					x_stop[p] = std::min(chunks*(p+1), eb);
+					x_stop[p] = nl_math::min(chunks*(p+1), eb);
 					if (p<num_thr && x_start[p] < x_stop[p]) thr_process(p, this, NULL);
 				}
 				if (x_start[num_thr] < x_stop[num_thr])
@@ -327,17 +327,14 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 			const auto &nzrd = m_terms[i]->m_nzrd;
 			const auto &nzbd = m_terms[i]->m_nzbd;
 
-			/* Eliminate column i from row j */
-
 			for (auto & j : nzbd)
 			{
-				//__builtin_prefetch((const void*)(&A(j+2,0)),0,0);
-				const nl_double f1 = - A(j,i) * f;
+				const nl_double f1 = -f * A(j,i);
 				for (auto & k : nzrd)
 					A(j,k) += A(i,k) * f1;
 				//RHS(j) += RHS(i) * f1;
-			}
 #endif
+			}
 		}
 	}
 }
