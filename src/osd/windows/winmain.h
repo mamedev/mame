@@ -10,7 +10,6 @@
 #define __WINDOWS_WINMAIN_H__
 
 #include <winapifamily.h>
-#include "clifront.h"
 #include "osdepend.h"
 #include "modules/lib/osdobj_common.h"
 
