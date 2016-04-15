@@ -175,7 +175,8 @@ osd_common_t::osd_common_t(osd_options &options)
 		m_mouse_input(nullptr),
 		m_lightgun_input(nullptr),
 		m_joystick_input(nullptr),
-		m_output(nullptr)
+		m_output(nullptr),
+		m_watchdog(nullptr)
 {
 	osd_output::push(this);
 }
@@ -420,6 +421,16 @@ void osd_common_t::init(running_machine &machine)
 
 	// ensure we get called on the way out
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(osd_common_t::osd_exit), this));
+	
+	
+	/* now setup watchdog */
+	int watchdog_timeout = options.watchdog();
+
+	if (watchdog_timeout != 0)
+	{
+		m_watchdog = std::make_unique<watchdog>();
+		m_watchdog->setTimeout(watchdog_timeout);
+	}
 }
 
 
@@ -437,6 +448,11 @@ void osd_common_t::update(bool skip_redraw)
 	// irregular intervals in some circumstances (e.g., multi-screen games
 	// or games with asynchronous updates).
 	//
+	if (m_watchdog != NULL)
+		m_watchdog->reset();
+
+	update_slider_list();
+
 }
 
 

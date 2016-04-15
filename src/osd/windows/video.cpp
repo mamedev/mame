@@ -166,10 +166,7 @@ osd_monitor_info *win_monitor_info::monitor_from_handle(HMONITOR hmonitor)
 
 void windows_osd_interface::update(bool skip_redraw)
 {
-	// ping the watchdog on each update
-	winmain_watchdog_ping();
-
-	update_slider_list();
+	osd_common_t::update(skip_redraw);
 
 	// if we're not skipping this redraw, update all windows
 	if (!skip_redraw)

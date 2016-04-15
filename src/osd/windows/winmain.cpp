@@ -280,10 +280,6 @@ static int timeresult = !TIMERR_NOERROR;
 static TIMECAPS timecaps;
 #endif
 
-static HANDLE watchdog_reset_event;
-static HANDLE watchdog_exit_event;
-static HANDLE watchdog_thread;
-
 static running_machine *g_current_machine;
 
 
@@ -293,7 +289,6 @@ static running_machine *g_current_machine;
 
 static BOOL WINAPI control_handler(DWORD type);
 static int is_double_click_start(int argc);
-static DWORD WINAPI watchdog_thread_entry(LPVOID lpParameter);
 static LONG WINAPI exception_filter(struct _EXCEPTION_POINTERS *info);
 
 
@@ -702,17 +697,6 @@ void windows_osd_interface::init(running_machine &machine)
 		timeBeginPeriod(timecaps.wPeriodMin);
 #endif
 
-	// if a watchdog thread is requested, create one
-	int watchdog = options.watchdog();
-	if (watchdog != 0)
-	{
-		watchdog_reset_event = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-		assert_always(watchdog_reset_event != nullptr, "Failed to create watchdog reset event");
-		watchdog_exit_event = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-		assert_always(watchdog_exit_event != nullptr, "Failed to create watchdog exit event");
-		watchdog_thread = CreateThread(nullptr, 0, watchdog_thread_entry, (LPVOID)(FPTR)watchdog, 0, nullptr);
-		assert_always(watchdog_thread != nullptr, "Failed to create watchdog thread");
-	}
 
 	// create and start the profiler
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
@@ -745,18 +729,6 @@ void windows_osd_interface::osd_exit()
 
 	osd_common_t::osd_exit();
 
-	// take down the watchdog thread if it exists
-	if (watchdog_thread != nullptr)
-	{
-		SetEvent(watchdog_exit_event);
-		WaitForSingleObject(watchdog_thread, INFINITE);
-		CloseHandle(watchdog_reset_event);
-		CloseHandle(watchdog_exit_event);
-		CloseHandle(watchdog_thread);
-		watchdog_reset_event = nullptr;
-		watchdog_exit_event = nullptr;
-		watchdog_thread = nullptr;
-	}
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	// stop the profiler
@@ -776,55 +748,6 @@ void windows_osd_interface::osd_exit()
 	winwindow_process_events(machine(), 0, 0);
 }
 
-
-//============================================================
-//  watchdog_thread_entry
-//============================================================
-
-static DWORD WINAPI watchdog_thread_entry(LPVOID lpParameter)
-{
-	DWORD timeout = (int)(FPTR)lpParameter * 1000;
-
-	while (TRUE)
-	{
-		HANDLE handle_list[2];
-		DWORD wait_result;
-
-		// wait for either a reset or an exit, or a timeout
-		handle_list[0] = watchdog_reset_event;
-		handle_list[1] = watchdog_exit_event;
-		wait_result = WaitForMultipleObjects(2, handle_list, FALSE, timeout);
-
-		// on a reset, just loop around and re-wait
-		if (wait_result == WAIT_OBJECT_0 + 0)
-			continue;
-
-		// on an exit, break out
-		if (wait_result == WAIT_OBJECT_0 + 1)
-			break;
-
-		// on a timeout, kill the process
-		if (wait_result == WAIT_TIMEOUT)
-		{
-			fprintf(stderr, "Terminating due to watchdog timeout\n");
-			fflush(stderr);
-			TerminateProcess(GetCurrentProcess(), -1);
-		}
-	}
-	return EXCEPTION_CONTINUE_SEARCH;
-}
-
-
-//============================================================
-//  winmain_watchdog_ping
-//============================================================
-
-void winmain_watchdog_ping(void)
-{
-	// if we have a watchdog, reset it
-	if (watchdog_reset_event != nullptr)
-		SetEvent(watchdog_reset_event);
-}
 
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)

@@ -337,8 +337,6 @@ extern int osd_num_processors;
 //  FUNCTION PROTOTYPES
 //============================================================
 
-// use this to ping the watchdog
-void winmain_watchdog_ping(void);
 void winmain_dump_stack();
 
 #endif

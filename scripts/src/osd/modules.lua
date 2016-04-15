@@ -44,6 +44,8 @@ function osdmodulesbuild()
 	files {
 		MAME_DIR .. "src/osd/osdnet.cpp",
 		MAME_DIR .. "src/osd/osdnet.h",
+		MAME_DIR .. "src/osd/watchdog.cpp",
+		MAME_DIR .. "src/osd/watchdog.h",
 		MAME_DIR .. "src/osd/modules/debugger/debug_module.h",
 		MAME_DIR .. "src/osd/modules/font/font_module.h",
 		MAME_DIR .. "src/osd/modules/midi/midi_module.h",
