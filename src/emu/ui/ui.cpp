@@ -2048,7 +2048,7 @@ std::vector<ui_menu_item> ui_manager::slider_init(running_machine &machine)
         item.subtext = "";
         item.flags = 0;
         item.ref = slider;
-        item.type = ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER;
+        item.type = ui_menu_item_type::SLIDER;
         items.push_back(item);
     }
 

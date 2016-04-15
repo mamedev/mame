@@ -1355,7 +1355,7 @@ static void CreateMainMenu(running_machine &machine)
 	}
 
 	menu->item_append(title.append(focus_view->title).c_str(), nullptr, MENU_FLAG_DISABLE, nullptr);
-	menu->item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	menu->item_append(ui_menu_item_type::SEPARATOR);
 
 	switch (focus_view->type)
 	{
@@ -1375,7 +1375,7 @@ static void CreateMainMenu(running_machine &machine)
 		{
 			menu->item_append("CPU", focus_view->view->source()->name(), MENU_FLAG_RIGHT_ARROW, (void *)on_disasm_cpu_activate);
 		}
-		menu->item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+		menu->item_append(ui_menu_item_type::SEPARATOR);
 		break;
 	}
 	case DVT_MEMORY:
@@ -1399,7 +1399,7 @@ static void CreateMainMenu(running_machine &machine)
 		case 11: subtext = "80-bit floating point"; break;
 		}
 		menu->item_append("Format", subtext, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)on_memory_data_format);
-		menu->item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+		menu->item_append(ui_menu_item_type::SEPARATOR);
 		break;
 	}
 	}
@@ -1411,19 +1411,19 @@ static void CreateMainMenu(running_machine &machine)
 	menu->item_append("New Error Log Window", "[Ctrl+L]", 0, (void *)on_log_window_activate);
 	menu->item_append("New Breakpoints Window", "[Ctrl+B]", 0, (void *)on_bp_window_activate);
 	menu->item_append("New Watchpoints Window", "[Ctrl+W]", 0, (void *)on_wp_window_activate);
-	menu->item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	menu->item_append(ui_menu_item_type::SEPARATOR);
 	menu->item_append("Run", "[F5]", 0, (void *)on_run_activate);
 	menu->item_append("Run and Hide Debugger", "[F12]", 0, (void *)on_run_h_activate);
 	menu->item_append("Run to Next CPU", "[F6]", 0, (void *)on_run_cpu_activate);
 	menu->item_append("Run until Next Interrupt on This CPU", "[F7]", 0, (void *)on_run_irq_activate);
 	menu->item_append("Run until Next VBLANK", "[F8]", 0, (void *)on_run_vbl_activate);
-	menu->item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	menu->item_append(ui_menu_item_type::SEPARATOR);
 	menu->item_append("Step Into", "[F11]", 0, (void *)on_step_into_activate);
 	menu->item_append("Step Over", "[F10]", 0, (void *)on_step_over_activate);
-	menu->item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	menu->item_append(ui_menu_item_type::SEPARATOR);
 	menu->item_append("Soft Reset", "[F3]", 0, (void *)on_soft_reset_activate);
 	menu->item_append("Hard Reset", "[Shift+F3]", 0, (void *)on_hard_reset_activate);
-	menu->item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	menu->item_append(ui_menu_item_type::SEPARATOR);
 	if (!dview_is_state(focus_view, VIEW_STATE_FOLLOW_CPU))
 		menu->item_append("Close Window", "[Shift+F4]", 0, (void *)on_close_activate);
 	menu->item_append("Exit", nullptr, 0, (void *)on_exit_activate);

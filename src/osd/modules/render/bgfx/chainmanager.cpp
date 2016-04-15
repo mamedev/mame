@@ -373,7 +373,7 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
     item.subtext = "";
     item.flags = 0;
     item.ref = state;
-    item.type = ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER;
+    item.type = ui_menu_item_type::SLIDER;
     m_selection_sliders.push_back(item);
 }
 
@@ -455,7 +455,7 @@ std::vector<ui_menu_item> chain_manager::get_slider_list()
             item.subtext = "";
             item.flags = 0;
             item.ref = core_slider;
-            item.type = ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER;
+            item.type = ui_menu_item_type::SLIDER;
             m_selection_sliders.push_back(item);
 
             sliders.push_back(item);
@@ -468,7 +468,7 @@ std::vector<ui_menu_item> chain_manager::get_slider_list()
             item.subtext = "";
             item.flags = 0;
             item.ref = nullptr;
-            item.type = ui_menu_item_type::UI_MENU_ITEM_TYPE_SEPARATOR;
+            item.type = ui_menu_item_type::SEPARATOR;
 
             sliders.push_back(item);
 		}

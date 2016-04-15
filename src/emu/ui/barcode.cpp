@@ -72,7 +72,7 @@ void ui_menu_barcode_reader::populate()
 		item_append(_("New Barcode:"), new_barcode, 0, ITEMREF_NEW_BARCODE);
 
 		// finish up the menu
-		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+		item_append(ui_menu_item_type::SEPARATOR);
 		item_append(_("Enter Code"), nullptr, 0, ITEMREF_ENTER_BARCODE);
 
 		customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;

@@ -306,6 +306,17 @@ void ui_menu::item_append(ui_menu_item item)
 //  end of the menu
 //-------------------------------------------------
 
+void ui_menu::item_append(ui_menu_item_type type)
+{
+	if (type == ui_menu_item_type::SEPARATOR)
+		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+}
+
+//-------------------------------------------------
+//  item_append - append a new item to the
+//  end of the menu
+//-------------------------------------------------
+
 void ui_menu::item_append(const char *text, const char *subtext, UINT32 flags, void *ref, ui_menu_item_type type)
 {
 	// only allow multiline as the first item

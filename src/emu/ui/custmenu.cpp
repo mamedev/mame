@@ -159,7 +159,7 @@ void ui_menu_custom_filter::populate()
 	// add other filters
 	for (int x = 1; x <= custfltr::numother; x++)
 	{
-		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+		item_append(ui_menu_item_type::SEPARATOR);
 
 		// add filter items
 		arrow_flags = get_arrow_flags((int)FILTER_UNAVAILABLE + 1, (int)FILTER_LAST - 1, custfltr::other[x]);
@@ -187,7 +187,7 @@ void ui_menu_custom_filter::populate()
 		}
 	}
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 
 	if (custfltr::numother > 0)
 		item_append(_("Remove last filter"), nullptr, 0, (void *)(FPTR)REMOVE_FILTER);
@@ -195,7 +195,7 @@ void ui_menu_custom_filter::populate()
 	if (custfltr::numother < MAX_CUST_FILTER - 2)
 		item_append(_("Add filter"), nullptr, 0, (void *)(FPTR)ADD_FILTER);
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
@@ -447,7 +447,7 @@ void ui_menu_swcustom_filter::populate()
 	// add other filters
 	for (int x = 1; x <= sw_custfltr::numother; x++)
 	{
-		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+		item_append(ui_menu_item_type::SEPARATOR);
 
 		// add filter items
 		arrow_flags = get_arrow_flags((int)UI_SW_UNAVAILABLE + 1, (int)UI_SW_LAST - 1, sw_custfltr::other[x]);
@@ -502,7 +502,7 @@ void ui_menu_swcustom_filter::populate()
 		}
 	}
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 
 	if (sw_custfltr::numother > 0)
 		item_append(_("Remove last filter"), nullptr, 0, (void *)(FPTR)REMOVE_FILTER);
@@ -510,7 +510,7 @@ void ui_menu_swcustom_filter::populate()
 	if (sw_custfltr::numother < MAX_CUST_FILTER - 2)
 		item_append(_("Add filter"), nullptr, 0, (void *)(FPTR)ADD_FILTER);
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }

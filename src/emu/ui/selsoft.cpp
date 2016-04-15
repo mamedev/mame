@@ -89,7 +89,7 @@ bool compare_software(ui_software_info a, ui_software_info b)
 bool has_multiple_bios(const game_driver *driver, s_bios &biosname)
 {
 	if (driver->rom == nullptr)
-		return 0;
+		return false;
 
 	std::string default_name;
 	for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
@@ -366,7 +366,7 @@ void ui_menu_select_software::handle()
 		{
 			highlight++;
 		}
-		else if (m_event->iptkey == IPT_UI_SELECT && m_focus == focused_menu::left)
+		else if (m_event->iptkey == IPT_OTHER && m_focus == focused_menu::left)
 		{
 			l_sw_hover = highlight;
 			check_filter = true;
@@ -1946,7 +1946,7 @@ void ui_software_parts::populate()
 	for (auto & elem : m_parts)
 		item_append(elem.first.c_str(), elem.second.c_str(), 0, (void *)&elem);
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	customtop = machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
 }
 
@@ -2041,7 +2041,7 @@ void ui_bios_selection::populate()
 	for (auto & elem : m_bios)
 		item_append(elem.first.c_str(), nullptr, 0, (void *)&elem.first);
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	customtop = machine().ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
 }
 
@@ -2072,7 +2072,7 @@ void ui_bios_selection::handle()
 					}
 
 					std::string error;
-					moptions.set_value("bios", elem.second, OPTION_PRIORITY_CMDLINE, error);
+					moptions.set_value(OPTION_BIOS, elem.second, OPTION_PRIORITY_CMDLINE, error);
 					machine().manager().schedule_new_driver(*s_driver);
 					machine().schedule_hard_reset();
 					ui_menu::stack_reset(machine());
@@ -2081,7 +2081,7 @@ void ui_bios_selection::handle()
 				{
 					ui_software_info *ui_swinfo = (ui_software_info *)m_driver;
 					std::string error;
-					machine().options().set_value("bios", elem.second, OPTION_PRIORITY_CMDLINE, error);
+					machine().options().set_value(OPTION_BIOS, elem.second, OPTION_PRIORITY_CMDLINE, error);
 					driver_enumerator drivlist(machine().options(), *ui_swinfo->driver);
 					drivlist.next();
 					software_list_device *swlist = software_list_device::find_by_name(drivlist.config(), ui_swinfo->listname.c_str());

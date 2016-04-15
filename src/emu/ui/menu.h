@@ -56,9 +56,9 @@ enum ui_menu_reset_options
 // types of menu items (TODO: please expand)
 enum class ui_menu_item_type
 {
-	UI_MENU_ITEM_TYPE_UNKNOWN,
-    UI_MENU_ITEM_TYPE_SLIDER,
-    UI_MENU_ITEM_TYPE_SEPARATOR
+	UNKNOWN,
+	SLIDER,
+	SEPARATOR
 };
 
 
@@ -120,8 +120,9 @@ public:
 	void reset(ui_menu_reset_options options);
 
 	// append a new item to the end of the menu
-	void item_append(const char *text, const char *subtext, UINT32 flags, void *ref, ui_menu_item_type type = ui_menu_item_type::UI_MENU_ITEM_TYPE_UNKNOWN);
+	void item_append(const char *text, const char *subtext, UINT32 flags, void *ref, ui_menu_item_type type = ui_menu_item_type::UNKNOWN);
 	void item_append(ui_menu_item item);
+	void item_append(ui_menu_item_type type);
 
 	// process a menu, drawing it and returning any interesting events
 	const ui_menu_event *process(UINT32 flags);

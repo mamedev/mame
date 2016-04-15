@@ -131,7 +131,7 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 	mui.draw_text_full(container, driver.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
-	maxwidth = MAX(origx2 - origx1, width);
+	maxwidth = MAX(maxwidth, width);
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
@@ -246,8 +246,8 @@ void ui_menu_dats_view::get_data()
 	else
 		machine().datfile().load_data_info(m_driver, buffer, m_items_list[m_actual].option);
 
-	int totallines = machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
-	for (int x = 0; x < totallines; ++x)
+	int lines = machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
+	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
 		item_append(tempbuf.c_str(), nullptr, (MENU_FLAG_UI_DATS | MENU_FLAG_DISABLE), (void *)(FPTR)(x + 1));
@@ -269,8 +269,8 @@ void ui_menu_dats_view::get_data_sw()
 			machine().datfile().load_software_info(m_swinfo->listname, buffer, m_swinfo->shortname, m_swinfo->parentname);
 	}
 
-	int totallines = machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
-	for (int x = 0; x < totallines; ++x)
+	int lines = machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
+	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
 		item_append(tempbuf.c_str(), nullptr, (MENU_FLAG_UI_DATS | MENU_FLAG_DISABLE), (void *)(FPTR)(x + 1));
