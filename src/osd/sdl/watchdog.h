@@ -10,7 +10,7 @@
 //
 //============================================================
 
-#include "modules/sync/osdsync.h"
+#include "osdsync.h"
 #include <atomic>
 #include <thread>
 

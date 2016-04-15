@@ -345,7 +345,7 @@ CXX:= $(SILENT)g++
 
 ifndef OSD
 
-OSD := osdmini
+OSD := sdl
 
 ifeq ($(TARGETOS),windows)
 OSD := windows
@@ -874,7 +874,6 @@ else
 FULLTARGET := $(TARGET)$(SUBTARGET)
 endif
 PROJECTDIR := $(BUILDDIR)/projects/$(OSD)/$(FULLTARGET)
-PROJECTDIR_MINI := $(BUILDDIR)/projects/osdmini/$(FULLTARGET)
 PROJECTDIR_SDL := $(BUILDDIR)/projects/sdl/$(FULLTARGET)
 PROJECTDIR_WIN := $(BUILDDIR)/projects/windows/$(FULLTARGET)
 
@@ -1156,24 +1155,6 @@ ifndef EMSCRIPTEN
 endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-asmjs config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-asmjs config=$(CONFIG)
-
-#-------------------------------------------------
-# PNaCl
-#-------------------------------------------------
-
-$(PROJECTDIR_MINI)/gmake-pnacl/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef NACL_SDK_ROOT
-	$(error NACL_SDK_ROOT is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=pnacl --gcc_version=3.7.0 --osd=osdmini --targetos=pnacl --NOASM=1 --USE_LIBUV=0 gmake
-
-.PHONY: pnacl
-pnacl: generate $(PROJECTDIR_MINI)/gmake-pnacl/Makefile
-ifndef NACL_SDK_ROOT
-	$(error NACL_SDK_ROOT is not set)
-endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-pnacl config=$(CONFIG) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_MINI)/gmake-pnacl config=$(CONFIG)
 
 #-------------------------------------------------
 # gmake-linux

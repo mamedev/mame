@@ -459,14 +459,13 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/osdcore.h",
 		MAME_DIR .. "src/osd/strconv.cpp",
 		MAME_DIR .. "src/osd/strconv.h",
+		MAME_DIR .. "src/osd/osdsync.cpp",
+		MAME_DIR .. "src/osd/osdsync.h",
 		MAME_DIR .. "src/osd/sdl/sdldir.cpp",
 		MAME_DIR .. "src/osd/modules/osdmodule.cpp",
 		MAME_DIR .. "src/osd/modules/osdmodule.h",
 		MAME_DIR .. "src/osd/modules/lib/osdlib_" .. SDLOS_TARGETOS .. ".cpp",
 		MAME_DIR .. "src/osd/modules/lib/osdlib.h",
-		MAME_DIR .. "src/osd/modules/sync/osdsync.cpp",
-		MAME_DIR .. "src/osd/modules/sync/osdsync.h",
-		MAME_DIR .. "src/osd/modules/sync/work_osd.cpp",
 	}
 
 	if BASE_TARGETOS=="unix" then
