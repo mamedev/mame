@@ -481,7 +481,7 @@ function cheatfind.startplugin()
 					if not _G.ce then
 						manager:machine():popmessage("Cheat engine not available")
 					else
-						ce.inject(cheat)
+						_G.ce.inject(cheat)
 					end
 				else
 
