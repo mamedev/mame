@@ -784,8 +784,6 @@ ATTR_COLD void logic_net_t::save_register()
 
 ATTR_COLD analog_net_t::analog_net_t()
 	: net_t(ANALOG)
-	, m_DD_n_m_1(0.0)
-	, m_h_n_m_1(1e-6)
 	, m_solver(NULL)
 {
 }
@@ -797,8 +795,6 @@ ATTR_COLD void analog_net_t::reset()
 
 ATTR_COLD void analog_net_t::save_register()
 {
-	save(NLNAME(m_DD_n_m_1));
-	save(NLNAME(m_h_n_m_1));
 	net_t::save_register();
 }
 

@@ -125,9 +125,6 @@ private:
 template <unsigned m_N, unsigned _storage_N>
 matrix_solver_w_t<m_N, _storage_N>::~matrix_solver_w_t()
 {
-#if (NL_USE_DYNAMIC_ALLOCATION)
-	pfree_array(m_A);
-#endif
 }
 
 template <unsigned m_N, unsigned _storage_N>
@@ -138,121 +135,15 @@ ATTR_COLD void matrix_solver_w_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &
 
 	matrix_solver_t::setup_base(nets);
 
-	for (unsigned k = 0; k < N(); k++)
-	{
-		m_terms[k]->m_railstart = m_terms[k]->count();
-		for (unsigned i = 0; i < m_rails_temp[k]->count(); i++)
-			this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->net_other()[i], false);
 
-		m_rails_temp[k]->clear(); // no longer needed
-		m_terms[k]->set_pointers();
-	}
-
-	/* create a list of non zero elements. */
-	for (unsigned k = 0; k < N(); k++)
-	{
-		terms_t * t = m_terms[k];
-		/* pretty brutal */
-		int *other = t->net_other();
-
-		t->m_nz.clear();
-
-		for (unsigned i = 0; i < t->m_railstart; i++)
-			if (!t->m_nz.contains(other[i]))
-				t->m_nz.push_back(other[i]);
-
-		t->m_nz.push_back(k);     // add diagonal
-
-		/* and sort */
-		psort_list(t->m_nz);
-	}
-
-	/* create a list of non zero elements right of the diagonal
-	 * These list anticipate the population of array elements by
-	 * Gaussian elimination.
-	 */
-	for (unsigned k = 0; k < N(); k++)
-	{
-		terms_t * t = m_terms[k];
-		/* pretty brutal */
-		int *other = t->net_other();
-
-		if (k==0)
-			t->m_nzrd.clear();
-		else
-		{
-			t->m_nzrd = m_terms[k-1]->m_nzrd;
-			unsigned j=0;
-			while(j < t->m_nzrd.size())
-			{
-				if (t->m_nzrd[j] < k + 1)
-					t->m_nzrd.remove_at(j);
-				else
-					j++;
-			}
-		}
-
-		for (unsigned i = 0; i < t->m_railstart; i++)
-			if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
-				t->m_nzrd.push_back(other[i]);
-
-		/* and sort */
-		psort_list(t->m_nzrd);
-	}
-
-	/* create a list of non zero elements below diagonal k
-	 * This should reduce cache misses ...
-	 */
-
-	bool touched[_storage_N][_storage_N] = { { false } };
-	for (unsigned k = 0; k < N(); k++)
-	{
-		m_terms[k]->m_nzbd.clear();
-		for (unsigned j = 0; j < m_terms[k]->m_nz.size(); j++)
-			touched[k][m_terms[k]->m_nz[j]] = true;
-	}
-
-	for (unsigned k = 0; k < N(); k++)
-	{
-		for (unsigned row = k + 1; row < N(); row++)
-		{
-			if (touched[row][k])
-			{
-				if (!m_terms[k]->m_nzbd.contains(row))
-					m_terms[k]->m_nzbd.push_back(row);
-				for (unsigned col = k; col < N(); col++)
-					if (touched[k][col])
-						touched[row][col] = true;
-			}
-		}
-	}
-
-	if (0)
-		for (unsigned k = 0; k < N(); k++)
-		{
-			pstring line = pfmt("{1}")(k, "3");
-			for (unsigned j = 0; j < m_terms[k]->m_nzrd.size(); j++)
-				line += pfmt(" {1}")(m_terms[k]->m_nzrd[j], "3");
-			log().verbose("{1}", line);
-		}
-
-	/*
-	 * save states
-	 */
 	save(NLNAME(m_last_RHS));
 
 	for (unsigned k = 0; k < N(); k++)
 	{
 		pstring num = pfmt("{1}")(k);
 
-		save(RHS(k), "RHS" + num);
-		save(m_terms[k]->m_last_V, "lastV" + num);
-
-		save(m_terms[k]->go(),"GO" + num, m_terms[k]->count());
-		save(m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
-		save(m_terms[k]->Idr(),"IDR" + num , m_terms[k]->count());
+		save(RHS(k), "RHS." + num);
 	}
-
 }
 
 
@@ -276,16 +167,16 @@ void matrix_solver_w_t<m_N, _storage_N>::LE_invert()
 	{
 		/* FIXME: Singular matrix? */
 		const nl_double f = 1.0 / W(i,i);
-		const unsigned * RESTRICT const p = m_terms[i]->m_nzrd.data();
+		const auto * RESTRICT const p = m_terms[i]->m_nzrd.data();
 		const unsigned e = m_terms[i]->m_nzrd.size();
 
 		/* Eliminate column i from row j */
 
-		const unsigned * RESTRICT const pb = m_terms[i]->m_nzbd.data();
+		const auto * RESTRICT const pb = m_terms[i]->m_nzbd.data();
 		const unsigned eb = m_terms[i]->m_nzbd.size();
 		for (unsigned jb = 0; jb < eb; jb++)
 		{
-			const unsigned j = pb[jb];
+			const auto j = pb[jb];
 			const nl_double f1 = - W(j,i) * f;
 			if (f1 != 0.0)
 			{
@@ -382,17 +273,22 @@ int matrix_solver_w_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool
 			/* construct w = transform(V) * y
 			 * dim: rowcount x iN
 			 * */
-			nl_double w[_storage_N] = {0};
+			nl_double w[_storage_N];
 			for (unsigned i = 0; i < rowcount; i++)
+			{
+				const unsigned r = rows[i];
+				double tmp = 0.0;
 				for (unsigned k = 0; k < iN; k++)
-					w[i] += VT(rows[i],k) * new_V[k];
+					tmp += VT(r,k) * new_V[k];
+				w[i] = tmp;
+			}
 
 			for (unsigned i = 0; i < rowcount; i++)
 				for (unsigned k=0; k< rowcount; k++)
 					H[i][k] = 0.0;
 
 			for (unsigned i = 0; i < rowcount; i++)
-				H[i][i] += 1.0;
+				H[i][i] = 1.0;
 			/* Construct H = (I + VT*Z) */
 			for (unsigned i = 0; i < rowcount; i++)
 				for (unsigned k=0; k< colcount[i]; k++)
@@ -454,16 +350,17 @@ int matrix_solver_w_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool
 	}
 	m_cnt++;
 
-	for (unsigned i=0; i<iN; i++)
-	{
-		nl_double tmp = 0.0;
-		for (unsigned j=0; j<iN; j++)
+	if (0)
+		for (unsigned i=0; i<iN; i++)
 		{
-			tmp += A(i,j) * new_V[j];
+			nl_double tmp = 0.0;
+			for (unsigned j=0; j<iN; j++)
+			{
+				tmp += A(i,j) * new_V[j];
+			}
+			if (nl_math::abs(tmp-RHS(i)) > 1e-6)
+				printf("%s failed on row %d: %f RHS: %f\n", this->name().cstr(), i, nl_math::abs(tmp-RHS(i)), RHS(i));
 		}
-		if (std::fabs(tmp-RHS(i)) > 1e-6)
-			printf("%s failed on row %d: %f RHS: %f\n", this->name().cstr(), i, std::fabs(tmp-RHS(i)), RHS(i));
-	}
 	if (newton_raphson)
 	{
 		nl_double err = delta(new_V);
@@ -482,8 +379,8 @@ int matrix_solver_w_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool
 template <unsigned m_N, unsigned _storage_N>
 inline int matrix_solver_w_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
-	this->build_LE_A(*this);
-	this->build_LE_RHS(*this);
+	build_LE_A<matrix_solver_w_t>();
+	build_LE_RHS<matrix_solver_w_t>();
 
 	for (unsigned i=0, iN=N(); i < iN; i++)
 		m_last_RHS[i] = RHS(i);
@@ -498,9 +395,6 @@ matrix_solver_w_t<m_N, _storage_N>::matrix_solver_w_t(const solver_parameters_t 
 	,m_cnt(0)
 	, m_dim(size)
 {
-#if (NL_USE_DYNAMIC_ALLOCATION)
-	m_A = palloc_array(nl_ext_double, N() * m_pitch);
-#endif
 	for (unsigned k = 0; k < N(); k++)
 	{
 		m_last_RHS[k] = 0.0;

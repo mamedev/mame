@@ -17,6 +17,7 @@
 #include "chainentry.h"
 
 #include "effect.h"
+#include "clear.h"
 #include "texture.h"
 #include "target.h"
 #include "entryuniform.h"
@@ -27,9 +28,10 @@
 #include "render.h"
 
 
-bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair> inputs, std::vector<bgfx_entry_uniform*> uniforms, target_manager& targets, std::string output)
+bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, clear_state* clear, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair> inputs, std::vector<bgfx_entry_uniform*> uniforms, target_manager& targets, std::string output)
 	: m_name(name)
 	, m_effect(effect)
+	, m_clear(clear)
 	, m_suppressors(suppressors)
 	, m_inputs(inputs)
 	, m_uniforms(uniforms)
@@ -45,6 +47,7 @@ bgfx_chain_entry::~bgfx_chain_entry()
 		delete uniform;
 	}
 	m_uniforms.clear();
+	delete m_clear;
 }
 
 void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen)
@@ -193,7 +196,7 @@ bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
 	bx::mtxOrtho(projMat, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
 	bgfx::setViewTransform(view, nullptr, projMat);
 
-	bgfx::setViewClear(view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
+	m_clear->bind(view);
 	return true;
 }
 

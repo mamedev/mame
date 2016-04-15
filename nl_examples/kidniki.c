@@ -4,7 +4,7 @@
 #include "netlist/devices/nld_system.h"
 #include "netlist/analog/nld_bjt.h"
 
-#define USE_FRONTIERS 1
+#define USE_FRONTIERS 0
 #define USE_FIXED_STV 1
 
 NETLIST_START(dummy)
@@ -15,7 +15,8 @@ NETLIST_START(dummy)
 	PARAM(Solver.GS_LOOPS, 1)
 	PARAM(Solver.GS_THRESHOLD, 6)
 	//PARAM(Solver.ITERATIVE, "W")
-	PARAM(Solver.ITERATIVE, "MAT")
+	PARAM(Solver.ITERATIVE, "MAT_CR")
+	//PARAM(Solver.ITERATIVE, "MAT")
 	//PARAM(Solver.ITERATIVE, "GMRES")
 	//PARAM(Solver.ITERATIVE, "SOR")
 	PARAM(Solver.DYNAMIC_TS, 0)

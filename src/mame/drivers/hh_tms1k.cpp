@@ -25,7 +25,7 @@
  *MP0168   TMS1000   1979, Conic Basketball
  @MP0170   TMS1000   1979, Conic Football
  @MP0914   TMS1000   1979, Entex Baseball 1
- *MP0919   TMS1000   1979, Tiger Copy Cat (model 7-520)
+ @MP0919   TMS1000   1979, Tiger Copy Cat (model 7-520)
  @MP0923   TMS1000   1979, Entex Baseball 2
  @MP1030   TMS1100   1980, APF Mathemagician
  @MP1133   TMS1470   1979, Kosmos Astro
@@ -126,6 +126,7 @@
 #include "cnfball2.lh"
 #include "cnsector.lh" // clickable
 #include "comp4.lh" // clickable
+#include "copycat.lh" // clickable
 #include "cqback.lh"
 #include "ebball.lh"
 #include "ebball2.lh"
@@ -546,7 +547,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Coleco Amaze-A-Tron, by Ralph Baer
-  * TMS1100 MCU, label MP3405(die label too)
+  * TMS1100 MCU, label MP3405 (die label same)
   * 2-digit 7seg LED display + 2 LEDs(one red, one green), 1-bit sound
   * 5*5 pressure-sensitive playing board(buttons), 4 game pieces
 
@@ -838,7 +839,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Coleco Electronic Quarterback
-  * TMS1100NLL MP3415 (die label MP3415)
+  * TMS1100NLL MP3415 (die label same)
   * 9-digit LED grid, 1-bit sound
 
   known releases:
@@ -953,7 +954,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Coleco Head to Head Football
-  * TMS1100NLLE (rev. E!) MP3460 (die label MP3460)
+  * TMS1100NLLE (rev. E!) MP3460 (die label same)
   * 2*SN75492N LED display drivers, 9-digit LED grid, 1-bit sound
 
   known releases:
@@ -1367,7 +1368,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Conic Electronic Football
-  * TMS1000 MP0170 (die label MP0170)
+  * TMS1000 MP0170 (die label same)
   * DS8874N, 3*9 LED array, 7 7seg LEDs, 1-bit sound
 
   This is a clone of Mattel Football. Apparently Mattel tried to keep imports
@@ -1467,7 +1468,7 @@ static INPUT_PORTS_START( cnfball )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-static const INT16 cnfball_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+static const INT16 cnfball_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
 static MACHINE_CONFIG_START( cnfball, cnfball_state )
 
@@ -1757,7 +1758,7 @@ MACHINE_CONFIG_END
 
   Entex (Electronic) Baseball 2
   * PCB label: ZENY
-  * TMS1000 MCU, MP0923 (die label MP0923)
+  * TMS1000 MCU, MP0923 (die label same)
   * 3 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
   The Japanese version was published by Gakken, black case instead of white.
@@ -2062,7 +2063,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Space Invader
-  * TMS1100 MP1211 (die label MP1211)
+  * TMS1100 MP1211 (die label same)
   * 3 7seg LEDs, LED matrix and overlay mask, 1-bit sound
 
   There are two versions of this game: the first release(this one) is on
@@ -2416,7 +2417,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Raise The Devil
-  * TMS1100 MP1221 (die label MP1221)
+  * TMS1100 MP1221 (die label same)
   * 4 7seg LEDs(rightmost one unused), and other LEDs behind bezel, 1-bit sound
 
   lamp translation table: led zz from game PCB = MAME lampyx:
@@ -2559,7 +2560,7 @@ MACHINE_CONFIG_END
 
   Gakken Poker
   * PCB label POKER. gakken
-  * TMS1370 MP2105 (die label MP2105)
+  * TMS1370 MP2105 (die label same)
   * 11-digit cyan VFD display Itron FG1114B, oscillator sound
 
   known releases:
@@ -2704,7 +2705,7 @@ MACHINE_CONFIG_END
 
   Gakken Jackpot: Gin Rummy & Black Jack
   * PCB label gakken
-  * TMS1670 MPF553 (die label MPF553)
+  * TMS1670 MPF553 (die label same)
   * 11-digit cyan VFD display Itron FG1114B, oscillator sound
 
   known releases:
@@ -4955,6 +4956,112 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Tiger Electronics Copy Cat (model 7-520)
+  * PCB label CC REV B
+  * TMS1000 MCU, label 69-11513 MP0919 (die label MP0919)
+  * 4 LEDs, 1-bit sound
+
+  known releases:
+  - World: Copy Cat
+  - USA: Follow Me, distributed by Sears
+
+***************************************************************************/
+
+class copycat_state : public hh_tms1k_state
+{
+public:
+	copycat_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(copycat_state::write_r)
+{
+	// R0-R3: leds
+	display_matrix(4, 1, data & 0xf, 1);
+
+	// R4-R7: input mux
+	// R8-R10: N/C
+	m_inp_mux = data >> 4 & 0xf;
+}
+
+WRITE16_MEMBER(copycat_state::write_o)
+{
+	// O0,O1: speaker out
+	// O2,O7: N/C, O3-O6: tied together but unused
+	m_o = data;
+	m_speaker->level_w(data & 3);
+}
+
+READ8_MEMBER(copycat_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(4);
+}
+
+
+// config
+
+static INPUT_PORTS_START( copycat )
+	PORT_START("IN.0") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Green Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Red Button")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Orange Button")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Yellow Button")
+
+	PORT_START("IN.1") // R5
+	PORT_CONFNAME( 0x0f, 0x01, "Skill Level")
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+	PORT_CONFSETTING(    0x08, "4" )
+
+	PORT_START("IN.2") // R6
+	PORT_CONFNAME( 0x07, 0x01, "Game Select")
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Best Play")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Replay")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static const INT16 copycat_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
+
+static MACHINE_CONFIG_START( copycat, copycat_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=47K, C=47pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(copycat_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(copycat_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(copycat_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_copycat)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, copycat_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Tomy(tronics) Break Up (manufactured in Japan)
   * PCB label TOMY B.O.
   * TMS1040 MP2726 TOMY WIPE (die label MP2726A)
@@ -5709,6 +5816,17 @@ ROM_START( tandy12 )
 ROM_END
 
 
+ROM_START( copycat )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0919", 0x0000, 0x0400, CRC(92a21299) SHA1(16daadb8dbf53aaab8a71833017b4a578d035d6d) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_copycat_output.pla", 0, 365, CRC(b1d0c96d) SHA1(ac1a003eab3f69e09e9050cb24ea17211e0523fe) )
+ROM_END
+
+
 ROM_START( tbreakup )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "mp2726a", 0x0000, 0x0400, CRC(1f7c28e2) SHA1(164cda4eb3f0b1d20955212a197c9aadf8d18a06) )
@@ -5781,6 +5899,8 @@ CONS( 1982, mmerlin,   0,        0, mmerlin,   mmerlin,   driver_device, 0, "Par
 CONS( 1982, lostreas,  0,        0, lostreas,  lostreas,  driver_device, 0, "Parker Brothers", "Lost Treasure - The Electronic Deep-Sea Diving Game (Electronic Dive-Control Center)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
 CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+
+CONS( 1979, copycat,   0,        0, copycat,   copycat,   driver_device, 0, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, tbreakup,  0,        0, tbreakup,  tbreakup,  driver_device, 0, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, phpball,   0,        0, phpball,   phpball,   driver_device, 0, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

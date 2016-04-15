@@ -192,7 +192,7 @@ void main()
 	// Clamp
 	if (BaseCoord.x > 1.0 || BaseCoord.y > 1.0 || BaseCoord.x < 0.0 || BaseCoord.y < 0.0)
 	{
-		gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+		gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
 	}
 	else
 	{

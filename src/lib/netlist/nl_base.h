@@ -866,8 +866,6 @@ namespace netlist
 	private:
 
 	public:
-		nl_double m_DD_n_m_1;
-		nl_double m_h_n_m_1;
 
 		//FIXME: needed by current solver code
 		devices::matrix_solver_t *m_solver;

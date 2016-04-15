@@ -29,7 +29,7 @@ public:
 	device_neogeo_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_neogeo_control_port_interface();
 
-	virtual UINT16 read_ctrl() { return 0xffff; };
+	virtual UINT8 read_ctrl() { return 0xff; };
 	virtual UINT8 read_start_sel() { return 0xff; };
 	virtual void write_ctrlsel(UINT8 data) { };
 
@@ -47,10 +47,10 @@ public:
 	neogeo_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~neogeo_control_port_device();
 
-    UINT16 read_ctrl();
+    UINT8 read_ctrl();
 	UINT8 read_start_sel();
 	void write_ctrlsel(UINT8 data);
-	DECLARE_READ16_MEMBER( ctrl_r ) { return read_ctrl(); }
+	DECLARE_READ8_MEMBER( ctrl_r ) { return read_ctrl(); }
 
 protected:
 	// device-level overrides
@@ -68,13 +68,15 @@ extern const device_type NEOGEO_CONTROL_PORT;
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_NEOGEO_CONTROL_PORT_ADD(_tag, _slot_intf, _def_slot) \
+#define MCFG_NEOGEO_CONTROL_PORT_ADD(_tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, NEOGEO_CONTROL_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
 
 
 
 SLOT_INTERFACE_EXTERN( neogeo_controls );
+SLOT_INTERFACE_EXTERN( neogeo_arc_ctrls );
+SLOT_INTERFACE_EXTERN( neogeo_kiz4p );
 
 
 #endif

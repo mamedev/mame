@@ -23,6 +23,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( neogeo_noslot, neogeo_arcade, neogeo_noslot
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_noslot)
 
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_ctrls, "joy", true)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_ctrls, "joy", true)
+
 	MCFG_MSLUGX_PROT_ADD("mslugx_prot")
 	MCFG_SMA_PROT_ADD("sma_prot")
 	MCFG_CMC_PROT_ADD("cmc_prot")
@@ -35,12 +38,44 @@ static MACHINE_CONFIG_DERIVED_CLASS( neogeo_noslot, neogeo_arcade, neogeo_noslot
 	MCFG_SBP_PROT_ADD("sbp_prot")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( neogeo_noslot_kog, neogeo_arcade, neogeo_noslot_kog_state )
+static MACHINE_CONFIG_DERIVED_CLASS( neogeo_kog, neogeo_arcade, neogeo_noslot_kog_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_noslot)
 
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_ctrls, "joy", true)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_ctrls, "joy", true)
+
 	MCFG_NGBOOTLEG_PROT_ADD("bootleg_prot")
 	MCFG_KOG_PROT_ADD("kog_prot")
+MACHINE_CONFIG_END
+
+// these basically correspond to the cabinets which were available in arcades:
+// with mahjong panel, with dial for Pop'n Bounce and with 4 controls for Kizuna...
+static MACHINE_CONFIG_DERIVED( neogeo_mj, neogeo_noslot )
+	MCFG_DEVICE_REMOVE("ctrl1")
+	MCFG_DEVICE_REMOVE("ctrl2")
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_ctrls, "mahjong", true)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_ctrls, "", true)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( neogeo_dial, neogeo_noslot )
+	MCFG_DEVICE_REMOVE("ctrl1")
+	MCFG_DEVICE_REMOVE("ctrl2")
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_ctrls, "dial", true)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_ctrls, "dial", true)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( neogeo_kiz4p, neogeo_noslot )
+	MCFG_DEVICE_REMOVE("ctrl1")
+	MCFG_DEVICE_REMOVE("ctrl2")
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_kiz4p, "kiz4p", true)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_kiz4p, "kiz4p", true)
+MACHINE_CONFIG_END
+
+// this is used by V-Liner and Irritating Maze, which handle differently inputs...
+static MACHINE_CONFIG_DERIVED( neogeo_noctrl, neogeo_noslot )
+	MCFG_DEVICE_REMOVE("ctrl1")
+	MCFG_DEVICE_REMOVE("ctrl2")
 MACHINE_CONFIG_END
 
 
@@ -155,202 +190,64 @@ static INPUT_PORTS_START( dualbios )
 	PORT_INCLUDE( neogeo )
 
 	/* the rom banking seems to be tied directly to the dipswitch */
-	PORT_MODIFY("P1/DSW")
-	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Region ) ) PORT_DIPLOCATION("SW:3") PORT_CHANGED_MEMBER(DEVICE_SELF, neogeo_state, select_bios, 0)
-	PORT_DIPSETTING(    0x0000, DEF_STR( Asia ) )
-	PORT_DIPSETTING(    0x0004, DEF_STR( Japan ) )
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Region ) ) PORT_DIPLOCATION("SW:3") PORT_CHANGED_MEMBER(DEVICE_SELF, neogeo_state, select_bios, 0)
+	PORT_DIPSETTING(    0x00, DEF_STR( Asia ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Japan ) )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mjneogeo )
 	PORT_INCLUDE( neogeo )
 
-	PORT_MODIFY("P1/DSW")
-	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Controller ) ) PORT_DIPLOCATION("SW:3")
-	PORT_DIPSETTING(      0x0004, DEF_STR( Joystick ) )
-	PORT_DIPSETTING(      0x0000, "Mahjong Panel" )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,mahjong_controller_r, NULL)
-
-	PORT_START("MAHJONG1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("MAHJONG2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("MAHJONG3")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("MAHJONG4")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Controller ) ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Joystick ) )
+	PORT_DIPSETTING(    0x00, "Mahjong Panel" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kizuna4p )
 	PORT_INCLUDE( neogeo )
 
-	PORT_MODIFY("P1/DSW")
-	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Players ) ) PORT_DIPLOCATION("SW:2")
-	PORT_DIPSETTING(      0x0002, "2" )
-	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, kizuna4p_controller_r, (void *)0)
-
-	PORT_MODIFY("P2")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, kizuna4p_controller_r, (void *)1)
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Players ) ) PORT_DIPLOCATION("SW:2")
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x00, "4" )
 
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, kizuna4p_start_r, NULL)
-
-	/* Fake inputs read by CUSTOM_INPUT handlers */
-	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-
-	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
-
-	PORT_START("IN1-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-
-	PORT_START("IN1-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
-
-	PORT_START("START")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START4 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( irrmaze )
 	PORT_INCLUDE( neogeo )
 
-	PORT_MODIFY("P1/DSW")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)0)
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("P2")
+	PORT_START("BUTTONS")
 	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
-	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN0-0")
+	PORT_START("TRACK_X")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(20) PORT_REVERSE
 
-	PORT_START("IN0-1")
+	PORT_START("TRACK_Y")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(10) PORT_KEYDELTA(20) PORT_REVERSE
 INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( popbounc )
-	PORT_INCLUDE( neogeo )
-
-	PORT_MODIFY("P1/DSW")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)0)
-
-	PORT_MODIFY("P2")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)1)
-
-	/* Fake inputs read by CUSTOM_INPUT handlers */
-	PORT_START("IN0-0")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
-
-	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x90, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* note it needs it from 0x80 when using paddle */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
-
-	PORT_START("IN1-0")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL  ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_PLAYER(2)
-
-	PORT_START("IN1-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x90, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* note it needs it from 0x80 when using paddle */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( vliner )
 	PORT_INCLUDE( neogeo )
 
-	PORT_MODIFY("P1/DSW")
+	PORT_MODIFY("DSW")
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("View Payout Table/Big")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Bet/Small")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Stop/Double Up")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Start/Collect")
-
-	PORT_MODIFY("P2")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -8960,12 +8857,26 @@ DRIVER_INIT_MEMBER(neogeo_noslot_state,jockeygp)
 //  m_maincpu->space(AS_PROGRAM).install_read_port(0x2c0000, 0x2c0001, "IN6");
 }
 
+
+DRIVER_INIT_MEMBER(neogeo_noslot_state,irrmaze)
+{
+	if (!m_cartslots[0]) m_banked_cart->install_banks(machine(), m_maincpu, m_region_maincpu->base(), m_region_maincpu->bytes());
+
+	m_sprgen->m_fixed_layer_bank_type = 0;
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, 0, 0x01ff7e, read16_delegate(FUNC(neogeo_state::irrmaze_in0_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x340000, 0x340001, 0, 0x01fffe, "BUTTONS");
+}
+
 DRIVER_INIT_MEMBER(neogeo_noslot_state,vliner)
 {
-	DRIVER_INIT_CALL(neogeo);
+	if (!m_cartslots[0]) m_banked_cart->install_banks(machine(), m_maincpu, m_region_maincpu->base(), m_region_maincpu->bytes());
+
+	m_sprgen->m_fixed_layer_bank_type = 0;
 
 	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x201fff);
 
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x300000, 0x300001, 0, 0x01ff7e, "DSW");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x280000, 0x280001, "IN5");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x2c0000, 0x2c0001, "IN6");
 
@@ -9747,7 +9658,7 @@ GAME( 1996, kof96,      neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neoge
 GAME( 1996, kof96h,     kof96,    neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '96 (NGH-214)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ssideki4,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Ultimate 11 - The SNK Football Championship / Tokuten Ou - Honoo no Libero", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, kizuna,     neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Kizuna Encounter - Super Tag Battle / Fu'un Super Tag Battle", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kizuna4p,   kizuna,   neogeo_noslot,   kizuna4p, neogeo_state, neogeo,   ROT0, "SNK", "Kizuna Encounter - Super Tag Battle 4 Way Battle Version / Fu'un Super Tag Battle Special Version", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kizuna4p,   kizuna,   neogeo_kiz4p,    kizuna4p, neogeo_state, neogeo,   ROT0, "SNK", "Kizuna Encounter - Super Tag Battle 4 Way Battle Version / Fu'un Super Tag Battle Special Version", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, samsho4,    neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Samurai Shodown IV - Amakusa's Revenge / Samurai Spirits - Amakusa Kourin (NGM-222)(NGH-222)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, samsho4k,   samsho4,  neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Pae Wang Jeon Seol / Legend of a Warrior (Korean censored Samurai Shodown IV)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, rbffspec,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury Special / Real Bout Garou Densetsu Special", MACHINE_SUPPORTS_SAVE )
@@ -9757,11 +9668,11 @@ GAME( 1997, kof97h,     kof97,    neogeo_noslot,   neogeo, neogeo_state,   neoge
 GAME( 1997, kof97k,     kof97,    neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '97 (Korean release)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, kof97pls,   kof97,    neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "bootleg", "The King of Fighters '97 Plus (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, kof97oro,   kof97,    neogeo_noslot,   neogeo, neogeo_noslot_state,   kof97oro, ROT0, "bootleg", "The King of Fighters '97 Oroshi Plus 2003 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, kog,        kof97,    neogeo_noslot_kog,   neogeo,    neogeo_noslot_kog_state,   kog,      ROT0, "bootleg", "King of Gladiator (The King of Fighters '97 bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // protected bootleg
+GAME( 1997, kog,        kof97,    neogeo_kog,   neogeo,    neogeo_noslot_kog_state,   kog,      ROT0, "bootleg", "King of Gladiator (The King of Fighters '97 bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // protected bootleg
 GAME( 1997, lastblad,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGM-2340)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, lastbladh,  lastblad, neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGH-2340)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, lastsold,   lastblad, neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Soldier (Korean release of The Last Blade)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, irrmaze,    neogeo,   neogeo_noslot,   irrmaze, neogeo_state,  neogeo,   ROT0, "SNK / Saurus", "The Irritating Maze / Ultra Denryu Iraira Bou", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, irrmaze,    neogeo,   neogeo_noctrl,  irrmaze, neogeo_noslot_state,  irrmaze,  ROT0, "SNK / Saurus", "The Irritating Maze / Ultra Denryu Iraira Bou", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, rbff2,      neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (NGM-2400)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, rbff2h,     rbff2,    neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (NGH-2400)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, rbff2k,     rbff2,    neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers (Korean release)", MACHINE_SUPPORTS_SAVE ) // no Japanese title / mode
@@ -9854,7 +9765,7 @@ GAME( 1996, zintrckb,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neoge
 
 /* Aicom (was a part of Sammy) / Yumekobo (changed name in 1996) */
 GAME( 1992, viewpoin,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Sammy / Aicom", "Viewpoint", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, janshin,    neogeo,   neogeo_noslot,   mjneogeo, neogeo_state, neogeo,   ROT0, "Aicom", "Jyanshin Densetsu - Quest of Jongmaster", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, janshin,    neogeo,   neogeo_mj,       mjneogeo, neogeo_state, neogeo,   ROT0, "Aicom", "Jyanshin Densetsu - Quest of Jongmaster", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, pulstar,    neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Aicom", "Pulstar", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, blazstar,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Yumekobo", "Blazing Star", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, preisle2,   neogeo,   neogeo_noslot,   neogeo, neogeo_noslot_state,   preisle2, ROT0, "Yumekobo", "Prehistoric Isle 2" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
@@ -9882,8 +9793,8 @@ GAME( 1995, kabukikl,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neoge
 GAME( 1997, neobombe,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Hudson", "Neo Bomberman", MACHINE_SUPPORTS_SAVE )
 
 /* Monolith Corp. */
-GAME( 1990, minasan,    neogeo,   neogeo_noslot,   mjneogeo, neogeo_state, neogeo,   ROT0, "Monolith Corp.", "Minasanno Okagesamadesu! Daisugorokutaikai (MOM-001)(MOH-001)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, bakatono,   neogeo,   neogeo_noslot,   mjneogeo, neogeo_state, neogeo,   ROT0, "Monolith Corp.", "Bakatonosama Mahjong Manyuuki (MOM-002)(MOH-002)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, minasan,    neogeo,   neogeo_mj,       mjneogeo, neogeo_state, neogeo,   ROT0, "Monolith Corp.", "Minasanno Okagesamadesu! Daisugorokutaikai (MOM-001)(MOH-001)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bakatono,   neogeo,   neogeo_mj,       mjneogeo, neogeo_state, neogeo,   ROT0, "Monolith Corp.", "Bakatonosama Mahjong Manyuuki (MOM-002)(MOH-002)", MACHINE_SUPPORTS_SAVE )
 
 /* Nazca (later acquired by SNK) */
 GAME( 1996, turfmast,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Nazca", "Neo Turf Masters / Big Tournament Golf", MACHINE_SUPPORTS_SAVE )
@@ -9940,7 +9851,7 @@ GAME( 1994, fightfeva,  fightfev, neogeo_noslot,   neogeo, neogeo_state,   neoge
 GAME( 1994, pspikes2,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Video System Co.", "Power Spikes II (NGM-068)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, sonicwi2,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Video System Co.", "Aero Fighters 2 / Sonic Wings 2", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sonicwi3,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Video System Co.", "Aero Fighters 3 / Sonic Wings 3", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, popbounc,   neogeo,   neogeo_noslot,   popbounc, neogeo_state, neogeo,   ROT0, "Video System Co.", "Pop 'n Bounce / Gapporin", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, popbounc,   neogeo,   neogeo_dial,     neogeo, neogeo_state,   neogeo,   ROT0, "Video System Co.", "Pop 'n Bounce / Gapporin", MACHINE_SUPPORTS_SAVE )
 
 /* Visco */
 GAME( 1992, androdun,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Visco", "Andro Dunos (NGM-049)(NGH-049)", MACHINE_SUPPORTS_SAVE )
@@ -9974,8 +9885,8 @@ GAME( 2002, matrimbl,   matrim,   neogeo_noslot,   neogeo, neogeo_noslot_state, 
 /* BrezzaSoft */
 GAME( 2001, jockeygp,   neogeo,   neogeo_noslot,   jockeygp, neogeo_noslot_state, jockeygp, ROT0, "Sun Amusement / BrezzaSoft", "Jockey Grand Prix (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, jockeygpa,  jockeygp, neogeo_noslot,   jockeygp, neogeo_noslot_state, jockeygp, ROT0, "Sun Amusement / BrezzaSoft", "Jockey Grand Prix (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, vliner,     neogeo,   neogeo_noslot,   vliner, neogeo_noslot_state,   vliner,   ROT0, "Dyna / BrezzaSoft", "V-Liner (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, vlinero,    vliner,   neogeo_noslot,   vliner, neogeo_noslot_state,   vliner,   ROT0, "Dyna / BrezzaSoft", "V-Liner (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, vliner,     neogeo,   neogeo_noctrl,   vliner, neogeo_noslot_state,   vliner,   ROT0, "Dyna / BrezzaSoft", "V-Liner (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, vlinero,    vliner,   neogeo_noctrl,   vliner, neogeo_noslot_state,   vliner,   ROT0, "Dyna / BrezzaSoft", "V-Liner (set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* Kyle Hodgetts */
 GAME( 2000, diggerma,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Kyle Hodgetts", "Digger Man (prototype)", MACHINE_SUPPORTS_SAVE )

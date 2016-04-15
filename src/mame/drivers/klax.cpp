@@ -42,7 +42,7 @@ void klax_state::update_interrupts()
 void klax_state::scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
-	if ((scanline & 32) == 0 && !(ioport("P1")->read() & 0x800))
+	if ((scanline & 32) == 0 && !(m_p1->read() & 0x800))
 		scanline_int_gen(m_maincpu);
 }
 

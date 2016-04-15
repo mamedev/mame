@@ -34,7 +34,7 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 #if TEST_PARALLEL
 #define MAXTHR 10
-static const int num_thr = 2;
+static const int num_thr = 1;
 
 struct thr_intf
 {
@@ -46,7 +46,7 @@ struct ti_t
 	volatile std::atomic<int> lo;
 	thr_intf *intf;
 	void *params;
-	int _block[29]; /* make it 256 bytes */
+//	int _block[29]; /* make it 256 bytes */
 };
 
 static ti_t ti[MAXTHR];
@@ -198,164 +198,23 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 
 	matrix_solver_t::setup_base(nets);
 
-	for (unsigned k = 0; k < N(); k++)
-	{
-		m_terms[k]->m_railstart = m_terms[k]->count();
-		for (unsigned i = 0; i < m_rails_temp[k]->count(); i++)
-			this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->net_other()[i], false);
-
-		m_rails_temp[k]->clear(); // no longer needed
-		m_terms[k]->set_pointers();
-	}
-
-	for (unsigned k = 0; k < N(); k++)
-		pfree(m_rails_temp[k]); // no longer needed
-
-	m_rails_temp.clear();
-#if 1
-
-	/* Sort in descending order by number of connected matrix voltages.
-	 * The idea is, that for Gauss-Seidel algo the first voltage computed
-	 * depends on the greatest number of previous voltages thus taking into
-	 * account the maximum amout of information.
-	 *
-	 * This actually improves performance on popeye slightly. Average
-	 * GS computations reduce from 2.509 to 2.370
-	 *
-	 * Smallest to largest : 2.613
-	 * Unsorted            : 2.509
-	 * Largest to smallest : 2.370
-	 *
-	 * Sorting as a general matrix pre-conditioning is mentioned in
-	 * literature but I have found no articles about Gauss Seidel.
-	 *
-	 * For Gaussian Elimination however increasing order is better suited.
-	 * FIXME: Even better would be to sort on elements right of the matrix diagonal.
-	 *
-	 */
-
-	int sort_order = (type() == GAUSS_SEIDEL ? 1 : -1);
-
-	for (unsigned k = 0; k < N() / 2; k++)
-		for (unsigned i = 0; i < N() - 1; i++)
-		{
-			if ((m_terms[i]->m_railstart - m_terms[i+1]->m_railstart) * sort_order < 0)
-			{
-				std::swap(m_terms[i], m_terms[i+1]);
-				std::swap(m_nets[i], m_nets[i+1]);
-			}
-		}
-
-	for (unsigned k = 0; k < N(); k++)
-	{
-		int *other = m_terms[k]->net_other();
-		for (unsigned i = 0; i < m_terms[k]->count(); i++)
-			if (other[i] != -1)
-				other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_otherterm->net());
-	}
-
-#endif
-
-	/* create a list of non zero elements right of the diagonal
-	 * These list anticipate the population of array elements by
-	 * Gaussian elimination.
-	 */
+	/* add RHS element */
 	for (unsigned k = 0; k < N(); k++)
 	{
 		terms_t * t = m_terms[k];
-		/* pretty brutal */
-		int *other = t->net_other();
 
-		t->m_nz.clear();
-
-		if (k==0)
-			t->m_nzrd.clear();
-		else
-		{
-			t->m_nzrd = m_terms[k-1]->m_nzrd;
-			unsigned j=0;
-			while(j < t->m_nzrd.size())
-			{
-				if (t->m_nzrd[j] < k + 1)
-					t->m_nzrd.remove_at(j);
-				else
-					j++;
-			}
-		}
-
-		for (unsigned i = 0; i < t->m_railstart; i++)
-		{
-			if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
-				t->m_nzrd.push_back(other[i]);
-			if (!t->m_nz.contains(other[i]))
-				t->m_nz.push_back(other[i]);
-		}
-
-		/* Add RHS element */
 		if (!t->m_nzrd.contains(N()))
 			t->m_nzrd.push_back(N());
-
-		/* and sort */
-		psort_list(t->m_nzrd);
-
-		t->m_nz.push_back(k);     // add diagonal
-
-		psort_list(t->m_nz);
 	}
 
-	/* create a list of non zero elements below diagonal k
-	 * This should reduce cache misses ...
-	 */
-
-	bool touched[_storage_N][_storage_N] = { { false } };
-	for (unsigned k = 0; k < N(); k++)
-	{
-		m_terms[k]->m_nzbd.clear();
-		for (unsigned j = 0; j < m_terms[k]->m_nz.size(); j++)
-			touched[k][m_terms[k]->m_nz[j]] = true;
-	}
-
-	for (unsigned k = 0; k < N(); k++)
-	{
-		for (unsigned row = k + 1; row < N(); row++)
-		{
-			if (touched[row][k])
-			{
-				if (!m_terms[k]->m_nzbd.contains(row))
-					m_terms[k]->m_nzbd.push_back(row);
-				for (unsigned col = k; col < N(); col++)
-					if (touched[k][col])
-						touched[row][col] = true;
-			}
-		}
-	}
-
-	if (0)
-		for (unsigned k = 0; k < N(); k++)
-		{
-			pstring line = pfmt("{1}")(k, "3");
-			for (unsigned j = 0; j < m_terms[k]->m_nzrd.size(); j++)
-				line += pfmt(" {1}")(m_terms[k]->m_nzrd[j], "3");
-			log().verbose("{1}", line);
-		}
-
-	/*
-	 * save states
-	 */
 	save(NLNAME(m_last_RHS));
 
 	for (unsigned k = 0; k < N(); k++)
 	{
 		pstring num = pfmt("{1}")(k);
 
-		save(RHS(k), "RHS" + num);
-		save(m_terms[k]->m_last_V, "lastV" + num);
-
-		save(m_terms[k]->go(),"GO" + num, m_terms[k]->count());
-		save(m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
-		save(m_terms[k]->Idr(),"IDR" + num , m_terms[k]->count());
+		save(RHS(k), "RHS." + num);
 	}
-
 }
 
 
@@ -369,14 +228,10 @@ void matrix_solver_direct_t<m_N, _storage_N>::do_work(const int id, void *param)
 	const nl_double f = 1.0 / A(i,i);
 	const unsigned * RESTRICT const p = m_terms[i]->m_nzrd.data();
 	const unsigned e = m_terms[i]->m_nzrd.size();
-	//nl_double A_cache[128];
-	//for (unsigned k = 0; k < e; k++)
-	//	A_cache[k] = A(i,p[k]);
 
 	/* Eliminate column i from row j */
 
 	const unsigned * RESTRICT const pb = m_terms[i]->m_nzbd.data();
-	//const unsigned eb = m_terms[i]->m_nzbd.size();
 	const unsigned sj = x_start[id];
 	const unsigned se = x_stop[id];
 	for (unsigned jb = sj; jb < se; jb++)
@@ -384,9 +239,7 @@ void matrix_solver_direct_t<m_N, _storage_N>::do_work(const int id, void *param)
 		const unsigned j = pb[jb];
 		const nl_double f1 = - A(j,i) * f;
 		for (unsigned k = 0; k < e; k++)
-			//A(j,p[k]) += A_cache[k] * f1;
 			A(j,p[k]) += A(i,p[k]) * f1;
-		//RHS(j) += RHS(i) * f1;
 	}
 }
 #endif
@@ -449,15 +302,16 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 			if (eb > 0)
 			{
 				//printf("here %d\n", eb);
-				unsigned chunks = (eb) / (num_thr + 1);
+				unsigned chunks = (eb + num_thr) / (num_thr + 1);
 				for (int p=0; p < num_thr + 1; p++)
 				{
 					x_i[p] = i;
 					x_start[p] = chunks * p;
-					x_stop[p] = std::min(chunks*(p+1), eb);
-					if (p<num_thr) thr_process(p, this, NULL);
+					x_stop[p] = nl_math::min(chunks*(p+1), eb);
+					if (p<num_thr && x_start[p] < x_stop[p]) thr_process(p, this, NULL);
 				}
-				do_work(num_thr, NULL);
+				if (x_start[num_thr] < x_stop[num_thr])
+					do_work(num_thr, NULL);
 				thr_wait();
 			}
 			else if (eb > 0)
@@ -468,38 +322,19 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 				do_work(0, NULL);
 			}
 #else
-#if 0
 			/* FIXME: Singular matrix? */
 			const nl_double f = 1.0 / A(i,i);
 			const auto &nzrd = m_terms[i]->m_nzrd;
 			const auto &nzbd = m_terms[i]->m_nzbd;
 
-			/* Eliminate column i from row j */
-
 			for (auto & j : nzbd)
 			{
-				const nl_double f1 = - A(j,i) * f;
+				const nl_double f1 = -f * A(j,i);
 				for (auto & k : nzrd)
 					A(j,k) += A(i,k) * f1;
 				//RHS(j) += RHS(i) * f1;
-			}
-#else
-			/* FIXME: Singular matrix? */
-			const nl_double f = 1.0 / A(i,i);
-			const auto &nzrd = m_terms[i]->m_nzrd;
-			const auto &nzbd = m_terms[i]->m_nzbd;
-
-			/* Eliminate column i from row j */
-
-			for (auto & j : nzbd)
-			{
-				const nl_double f1 = - A(j,i) * f;
-				for (auto & k : nzrd)
-					A(j,k) += A(i,k) * f1;
-				//RHS(j) += RHS(i) * f1;
-			}
 #endif
-#endif
+			}
 		}
 	}
 }
@@ -528,12 +363,12 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 		{
 			T tmp = 0;
 
-			const unsigned *p = m_terms[j]->m_nzrd.data();
-			const unsigned e = m_terms[j]->m_nzrd.size() - 1; /* exclude RHS element */
+			const auto *p = m_terms[j]->m_nzrd.data();
+			const auto e = m_terms[j]->m_nzrd.size() - 1; /* exclude RHS element */
 
 			for (unsigned k = 0; k < e; k++)
 			{
-				const unsigned pk = p[k];
+				const auto pk = p[k];
 				tmp += A(j,pk) * x[pk];
 			}
 			x[j] = (RHS(j) - tmp) / A(j,j);
@@ -568,8 +403,8 @@ int matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const
 template <unsigned m_N, unsigned _storage_N>
 inline int matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
-	this->build_LE_A(*this);
-	this->build_LE_RHS(*this);
+	build_LE_A<matrix_solver_direct_t>();
+	build_LE_RHS<matrix_solver_direct_t>();
 
 	for (unsigned i=0, iN=N(); i < iN; i++)
 		m_last_RHS[i] = RHS(i);

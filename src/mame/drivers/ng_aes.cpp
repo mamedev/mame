@@ -76,12 +76,9 @@ public:
 	ng_aes_state(const machine_config &mconfig, device_type type, const char *tag)
 		: neogeo_state(mconfig, type, tag)
 		, m_io_in2(*this, "IN2")
-		, m_ctrl1(*this, "ctrl1")
-		, m_ctrl2(*this, "ctrl2")
 	{ }
 
 	DECLARE_READ16_MEMBER(aes_in2_r);
-	DECLARE_WRITE8_MEMBER(io_control_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 
@@ -92,8 +89,6 @@ public:
 
 protected:
 	required_ioport m_io_in2;
-	required_device<neogeo_control_port_device> m_ctrl1;
-	required_device<neogeo_control_port_device> m_ctrl2;
 
 	void common_machine_start();
 };
@@ -112,21 +107,6 @@ READ16_MEMBER(ng_aes_state::aes_in2_r)
 	ret = (ret & 0xf3ff) | (m_ctrl2->read_start_sel() << 10);
 	return ret;
 }
-
-WRITE8_MEMBER(ng_aes_state::io_control_w)
-{
-	switch (offset)
-	{
-		case 0x00:
-			m_ctrl1->write_ctrlsel(data);
-			m_ctrl2->write_ctrlsel(data);
-			break;
-		default:
-			neogeo_state::io_control_w(space, offset, data);
-			break;
-	}
-}
-
 
 /*************************************
  *
@@ -242,9 +222,9 @@ static ADDRESS_MAP_START( aes_main_map, AS_PROGRAM, 16, ng_aes_state )
 	/* some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too */
 	//AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK("cartridge")
 	//AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
-	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_DEVREAD("ctrl1", neogeo_control_port_device, ctrl_r)
+	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_DEVREAD8("ctrl1", neogeo_control_port_device, ctrl_r, 0xff00)
 	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO") AM_WRITE8(audio_command_w, 0xff00)
-	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_DEVREAD("ctrl2", neogeo_control_port_device, ctrl_r)
+	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_DEVREAD8("ctrl2", neogeo_control_port_device, ctrl_r, 0xff00)
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
 	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ(aes_in2_r)
 	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
@@ -312,8 +292,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( aes, neogeo_base, ng_aes_state )
 
 	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot1", neogeo_cart, nullptr)
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_controls, "joy")
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_controls, "joy")
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_controls, "joy", false)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_controls, "joy", false)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","neogeo")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list","AES")
@@ -1227,9 +1207,9 @@ static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ngcd_state )
 	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_REGION("maincpu", 0x00000)
 
-	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_DEVREAD("ctrl1", neogeo_control_port_device, ctrl_r)
+	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_DEVREAD8("ctrl1", neogeo_control_port_device, ctrl_r, 0xff00)
 	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO") AM_WRITE8(audio_command_w, 0xff00)
-	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_DEVREAD("ctrl2", neogeo_control_port_device, ctrl_r)
+	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_DEVREAD8("ctrl1", neogeo_control_port_device, ctrl_r, 0xff00)
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
 	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ(aes_in2_r)
 	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
@@ -1402,8 +1382,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( neocd, neogeo_base, ngcd_state )
 	MCFG_MACHINE_START_OVERRIDE(ngcd_state,neocd)
 	MCFG_MACHINE_RESET_OVERRIDE(ngcd_state,neocd)
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_controls, "joy")
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_controls, "joy")
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_controls, "joy", false)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_controls, "joy", false)
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("neocd_cdrom")

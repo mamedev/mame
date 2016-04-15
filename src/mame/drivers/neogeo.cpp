@@ -631,76 +631,30 @@ WRITE8_MEMBER(neogeo_state::audio_cpu_enable_nmi_w)
  *
  *************************************/
 
-void neogeo_state::select_controller( UINT8 data )
+READ16_MEMBER(neogeo_state::in0_r)
 {
-	m_controller_select = data;
+	return (m_ctrl1->ctrl_r(space, offset) << 8) | m_dsw->read();
 }
 
-
-CUSTOM_INPUT_MEMBER(neogeo_state::multiplexed_controller_r)
+READ16_MEMBER(neogeo_state::irrmaze_in0_r)
 {
-	int port = (FPTR)param;
-
-	static const char *const cntrl[2][2] =
-	{
-		{ "IN0-0", "IN0-1" }, { "IN1-0", "IN1-1" }
-	};
-
-	return read_safe(ioport(cntrl[port][m_controller_select & 0x01]), 0x00);
-}
-
-CUSTOM_INPUT_MEMBER(neogeo_state::kizuna4p_controller_r)
-{
-	int port = (FPTR)param;
-
-	static const char *const cntrl[2][2] =
-	{
-		{ "IN0-0", "IN0-1" }, { "IN1-0", "IN1-1" }
-	};
-
-	int ret = read_safe(ioport(cntrl[port][m_controller_select & 0x01]), 0x00);
-	if (m_controller_select & 0x04) ret &= ((m_controller_select & 0x01) ? ~0x20 : ~0x10);
-
-	return ret;
+	UINT8 track_ipt = (m_controller_select & 0x01) ? m_tracky->read() : m_trackx->read();
+	return (track_ipt << 8) | m_dsw->read();
 }
 
 CUSTOM_INPUT_MEMBER(neogeo_state::kizuna4p_start_r)
 {
-	return (ioport("START")->read() >> (m_controller_select & 0x01)) | ~0x05;
+	return (m_ctrl1->read_start_sel()) | (m_ctrl2->read_start_sel() << 2) | ~0x05;
 }
-
-#if 1 // this needs to be added dynamically somehow
-CUSTOM_INPUT_MEMBER(neogeo_state::mahjong_controller_r)
-{
-	UINT32 ret;
-
-/*
-cpu #0 (PC=00C18B9A): unmapped memory word write to 00380000 = 0012 & 00FF
-cpu #0 (PC=00C18BB6): unmapped memory word write to 00380000 = 001B & 00FF
-cpu #0 (PC=00C18D54): unmapped memory word write to 00380000 = 0024 & 00FF
-cpu #0 (PC=00C18D6C): unmapped memory word write to 00380000 = 0009 & 00FF
-cpu #0 (PC=00C18C40): unmapped memory word write to 00380000 = 0000 & 00FF
-*/
-	switch (m_controller_select)
-	{
-	default:
-	case 0x00: ret = 0x0000; break; /* nothing? */
-	case 0x09: ret = ioport("MAHJONG1")->read(); break;
-	case 0x12: ret = ioport("MAHJONG2")->read(); break;
-	case 0x1b: ret = ioport("MAHJONG3")->read(); break; /* player 1 normal inputs? */
-	case 0x24: ret = ioport("MAHJONG4")->read(); break;
-	}
-
-	return ret;
-}
-#endif
 
 WRITE8_MEMBER(neogeo_state::io_control_w)
 {
 	switch (offset)
 	{
 		case 0x00:
-			select_controller(data);
+			m_controller_select = data;
+			if (m_ctrl1) m_ctrl1->write_ctrlsel(data);
+			if (m_ctrl2) m_ctrl2->write_ctrlsel(data);
 			break;
 
 		case 0x10:
@@ -1068,6 +1022,10 @@ DRIVER_INIT_MEMBER(neogeo_state,neogeo)
 	if (!m_cartslots[0]) m_banked_cart->install_banks(machine(), m_maincpu, m_region_maincpu->base(), m_region_maincpu->bytes());
 
 	m_sprgen->m_fixed_layer_bank_type = 0;
+
+	// install controllers
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, 0, 0x01ff7e, read16_delegate(FUNC(neogeo_state::in0_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x340000, 0x340001, 0, 0x01fffe, read8_delegate(FUNC(neogeo_control_port_device::ctrl_r),(neogeo_control_port_device*)m_ctrl2), 0xff00);
 }
 
 
@@ -1274,11 +1232,9 @@ ADDRESS_MAP_START( neogeo_main_map, AS_PROGRAM, 16, neogeo_state )
 
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM
 	/* some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too */
-	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ff7e) AM_READ_PORT("P1/DSW")
 	AM_RANGE(0x300080, 0x300081) AM_MIRROR(0x01ff7e) AM_READ_PORT("TEST")
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_WRITE8(watchdog_reset_w, 0x00ff)
 	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO/COIN") AM_WRITE8(audio_command_w, 0xff00)
-	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_READ_PORT("P2")
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
 	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
@@ -1292,8 +1248,6 @@ ADDRESS_MAP_START( neogeo_main_map, AS_PROGRAM, 16, neogeo_state )
 	AM_RANGE(0xd00000, 0xd0ffff) AM_MIRROR(0x0f0000) AM_RAM_WRITE(save_ram_w) AM_SHARE("saveram")
 	AM_RANGE(0xe00000, 0xffffff) AM_READ(neogeo_unmapped_r)
 ADDRESS_MAP_END
-
-
 
 
 static ADDRESS_MAP_START( main_map_slot, AS_PROGRAM, 16, neogeo_state )
@@ -1345,49 +1299,30 @@ ADDRESS_MAP_END
  *************************************/
 
 INPUT_PORTS_START( neogeo )
-	PORT_START("P1/DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, "Setting Mode" ) PORT_DIPLOCATION("SW:1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW:2")
-	PORT_DIPSETTING(      0x0002, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0000, "VS Mode" )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Controller ) ) PORT_DIPLOCATION("SW:3")
-	PORT_DIPSETTING(      0x0004, DEF_STR( Joystick ) )
-	PORT_DIPSETTING(      0x0000, "Mahjong Panel" )
-	PORT_DIPNAME( 0x0018, 0x0018, "COMM Setting (Cabinet No.)" ) PORT_DIPLOCATION("SW:4,5")
-	PORT_DIPSETTING(      0x0018, "1" )
-	PORT_DIPSETTING(      0x0010, "2" )
-	PORT_DIPSETTING(      0x0008, "3" )
-	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_DIPNAME( 0x0020, 0x0020, "COMM Setting (Link Enable)" ) PORT_DIPLOCATION("SW:6")
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW:7")
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Freeze" ) PORT_DIPLOCATION("SW:8")
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 )
-
-	PORT_START("P2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "Setting Mode" ) PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "VS Mode" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Controller ) ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Joystick ) )
+	PORT_DIPSETTING(    0x00, "Mahjong Panel" )
+	PORT_DIPNAME( 0x18, 0x18, "COMM Setting (Cabinet No.)" ) PORT_DIPLOCATION("SW:4,5")
+	PORT_DIPSETTING(    0x18, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x20, 0x20, "COMM Setting (Link Enable)" ) PORT_DIPLOCATION("SW:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" ) PORT_DIPLOCATION("SW:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1488,6 +1423,9 @@ static MACHINE_CONFIG_DERIVED( mvs, neogeo_arcade )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_slot)
 
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_ctrls, "joy", false)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_ctrls, "joy", false)
+
 	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot1", neogeo_cart, nullptr)
 	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot2", neogeo_cart, nullptr)
 	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot3", neogeo_cart, nullptr)
@@ -1497,10 +1435,6 @@ static MACHINE_CONFIG_DERIVED( mvs, neogeo_arcade )
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","neogeo")
 MACHINE_CONFIG_END
-
-
-
-
 
 
 

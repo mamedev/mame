@@ -189,6 +189,21 @@
 			// value: Any valid ASCII string.
 			"name": "NTSC Encode",
 
+			// clear (optional): How to clear the output target for this particular entry.
+			"clear": {
+				// clearcolor (optional): An array containing an RGBA quadruplet to which to clear the output target.
+				// value: An array of four numeric values of the range 0.0 to 1.0.
+				"clearcolor": [ 0.0, 0.0, 0.0, 0.0 ],
+				
+				// cleardepth (optional): A numeric value containing the depth value to which to clear the output target.
+				// value: Any numeric value.
+				"cleardepth": 1.0,
+
+				// clearstencil (optional): A numeric value containing the stencil value to which to clear the output target.
+				// value: An integer value.
+				"clearstencil": 0
+			},
+
 			// disablewhen (optional): An array of conditions that can be used to disable this pass.
 			"disablewhen": [
 				// type (optional): Reserved for future expansion. Currently only "slider" is supported.

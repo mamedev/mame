@@ -49,6 +49,11 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_memcard(*this, "memcard"),
+		m_dsw(*this, "DSW"),
+		m_trackx(*this, "TRACK_X"),
+		m_tracky(*this, "TRACK_Y"),
+		m_ctrl1(*this, "ctrl1"),
+		m_ctrl2(*this, "ctrl2"),
 		m_sprgen(*this, "spritegen"),
 		m_use_cart_vectors(0),
 		m_use_cart_audio(0),
@@ -75,6 +80,9 @@ public:
 	DECLARE_READ16_MEMBER(neogeo_video_register_r);
 	DECLARE_WRITE16_MEMBER(neogeo_video_register_w);
 	READ16_MEMBER(banked_vectors_r);
+	DECLARE_READ16_MEMBER(in0_r);
+	DECLARE_READ16_MEMBER(irrmaze_in0_r);
+
 	void set_slot_number(int slot);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(get_memcard_status);
@@ -84,13 +92,8 @@ public:
 	TIMER_CALLBACK_MEMBER(display_position_vblank_callback);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(neo_cartridge);
-
 	// MVS-specific
 	DECLARE_WRITE16_MEMBER(save_ram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_controller_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(multiplexed_controller_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kizuna4p_controller_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kizuna4p_start_r);
 	DECLARE_INPUT_CHANGED_MEMBER(select_bios);
 
@@ -122,17 +125,10 @@ protected:
 	void neogeo_set_palette_bank( int data );
 
 	void audio_cpu_check_nmi();
-	void select_controller( UINT8 data );
 	void set_save_ram_unlock( UINT8 data );
 	void set_outputs(  );
 	void set_output_latch( UINT8 data );
 	void set_output_data( UINT8 data );
-
-
-
-
-
-
 
 
 	// device overrides
@@ -177,6 +173,12 @@ protected:
 	UINT8      m_el_value;
 	UINT8      m_led1_value;
 	UINT8      m_led2_value;
+	
+	optional_ioport m_dsw;
+	optional_ioport m_trackx;
+	optional_ioport m_tracky;
+	optional_device<neogeo_control_port_device> m_ctrl1;
+	optional_device<neogeo_control_port_device> m_ctrl2;
 
 	// video hardware, including maincpu interrupts
 	// TODO: make into a device
@@ -203,7 +205,6 @@ protected:
 	const pen_t *m_bg_pen;
 	int          m_screen_shadow;
 	int          m_palette_bank;
-
 
 
 	int m_use_cart_vectors;
@@ -307,6 +308,7 @@ class neogeo_noslot_state : public neogeo_state
 	DECLARE_DRIVER_INIT(kof97oro);
 	DECLARE_DRIVER_INIT(lans2004);
 	DECLARE_DRIVER_INIT(sbp);
+	DECLARE_DRIVER_INIT(irrmaze);
 
 	void install_banked_bios();
 	// non-carts

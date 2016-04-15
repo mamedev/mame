@@ -22,8 +22,8 @@
     	"rgb": true,
     	"alpha": true
     },
-    "vertex": "vs_prescale",
-    "fragment": "fs_prescale",
+    "vertex": "chains/hlsl/vs_prescale",
+    "fragment": "chains/hlsl/fs_prescale",
     "uniforms": [
     	{ "name": "s_tex",          "type": "int",  "values": [ 1.0 ] },
     	{ "name": "u_source_dims",  "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
