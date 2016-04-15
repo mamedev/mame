@@ -282,7 +282,7 @@ protected:
 	input_module*  m_lightgun_input;
 	input_module*  m_joystick_input;
 	output_module* m_output;
-	std::unique_ptr<watchdog> m_watchdog;
+	std::unique_ptr<osd_watchdog> m_watchdog;
 	std::vector<ui_menu_item> m_sliders;
 
 private:

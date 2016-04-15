@@ -428,7 +428,7 @@ void osd_common_t::init(running_machine &machine)
 
 	if (watchdog_timeout != 0)
 	{
-		m_watchdog = std::make_unique<watchdog>();
+		m_watchdog = std::make_unique<osd_watchdog>();
 		m_watchdog->setTimeout(watchdog_timeout);
 	}
 }

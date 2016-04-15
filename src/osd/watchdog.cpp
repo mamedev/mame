@@ -17,7 +17,7 @@
 
 static void *watchdog_thread(void *param)
 {
-	watchdog *thiz = (watchdog *) param;
+	osd_watchdog *thiz = (osd_watchdog *) param;
 
 	while (TRUE)
 	{
@@ -41,7 +41,7 @@ static void *watchdog_thread(void *param)
 	return nullptr;
 }
 
-watchdog::watchdog(void)
+osd_watchdog::osd_watchdog(void)
 : m_event(1,0)
 {
 	m_do_exit = 0;
@@ -49,7 +49,7 @@ watchdog::watchdog(void)
 	m_timeout = 60 * osd_ticks_per_second();
 }
 
-watchdog::~watchdog(void)
+osd_watchdog::~osd_watchdog(void)
 {
 	m_do_exit = 1;
 	m_event.set();
@@ -57,7 +57,7 @@ watchdog::~watchdog(void)
 	delete m_thread;
 }
 
-void watchdog::setTimeout(int timeout)
+void osd_watchdog::setTimeout(int timeout)
 {
 	m_timeout = timeout * osd_ticks_per_second();
 	this->reset();
