@@ -25,6 +25,8 @@ public:
 	virtual void ExecCommand() override;
 	virtual void WriteData( UINT8 *data, int dataLength ) override;
 	virtual void ReadData( UINT8 *data, int dataLength ) override;
+	// ksys573 changes discs without telling the cdrom_image_device
+	virtual void process_buffer() override { atapi_hle_device::process_buffer(); }
 
 protected:
 	// device-level overrides

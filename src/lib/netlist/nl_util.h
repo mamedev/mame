@@ -64,6 +64,9 @@ public:
 	template <typename T>
 	static T sqrt(const T &x) { return std::sqrt(x); }
 
+	template <typename T>
+	static T hypot(const T &x, const T &y) { return std::hypot(x, y); }
+
 	// this one has an accuracy of better than 5%. That's enough for our purpose
 	// add c3 and it'll be better than 1%
 

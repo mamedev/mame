@@ -9065,9 +9065,9 @@ outr2                           // 2003.12 Outrun 2 (Rev A)
 outr2st                         // 2004.12 Outrun 2 Special Tours (Rev A)
 scg06nt                         // 2005.12 Sega Golf Club 2006: Next Tours (Rev A)
 vcop3                           // 2003.02.26 Virtua Cop 3 (Rev A)
-wangmd2b                        // 2005.10 Wangan Midnight Maximum Tune 2 (Export) (Rev A)
 wangmid                         // 2004.07 Wangan Midnight Maximum Tune (export) (Rev B)
-wangmid2                        // 2005.04 Wangan Midnight Maximum Tune 2 (Japan)
+wangmid2                        // 2005.10 Wangan Midnight Maximum Tune 2 (Export) (Rev A)
+wangmid2j                       // 2005.04 Wangan Midnight Maximum Tune 2 (Japan)
 
 @source:chinagat.cpp
 chinagat                        // TA-0023 (c) 1988 Taito + Romstar license (US)
@@ -13666,6 +13666,7 @@ cpacman                         // Coleco
 cpacmanr1                       // Coleco (rev 1)
 egalaxn2                        // Entex
 epacman2                        // Entex
+epacman2r                       // Entex
 estargte                        // Entex
 eturtles                        // Entex
 gckong                          // Gakken
@@ -13703,6 +13704,7 @@ amaztron                        // Coleco
 astro                           // Kosmos
 bankshot                        // Parker Bros
 bigtrak                         // Milton Bradley
+copycat                         // Tiger Electronics
 cnfball                         // Conic
 cnfball2                        // Conic
 cnsector                        // Parker Bros
@@ -27390,6 +27392,7 @@ cosmogng                        // (c) 1991 (US)
 cosmogngj                       // (c) 1991 (Japan)
 dirtfoxj                        // (c) 1989 (Japan)
 dsaber                          // (c) 1990
+dsabera							//
 dsaberj                         // (c) 1990 (Japan)
 finalap2                        // 90.8  Final Lap 2
 finalap2j                       // 90.8  Final Lap 2 (Japan)
@@ -29754,6 +29757,9 @@ kov3                            //
 orleg2                          // (c) 2007
 orleg2o                         //
 orleg2oa                        //
+
+@source:phantom.cpp
+fphantom                        //
 
 @source:phc25.cpp
 phc25                           //
@@ -34762,6 +34768,7 @@ vocaid                          //
 @source:tispellb.cpp
 mrchalgr                        //
 spellb                          //
+spellb79                        //
 
 @source:tk2000.cpp
 tk2000                          // Microdigital TK2000

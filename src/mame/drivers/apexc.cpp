@@ -871,7 +871,6 @@ static MACHINE_CONFIG_START( apexc, apexc_state )
 	/* basic machine hardware */
 	/* APEXC CPU @ 2.0 kHz (memory word clock frequency) */
 	MCFG_CPU_ADD("maincpu", APEXC, 2000)
-	/*MCFG_CPU_CONFIG(NULL)*/
 	MCFG_CPU_PROGRAM_MAP(apexc_mem_map)
 	MCFG_CPU_IO_MAP(apexc_io_map)
 	/* dummy interrupt: handles the control panel */

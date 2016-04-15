@@ -22,8 +22,8 @@
     	"rgb": true,
     	"alpha": true
     },
-    "vertex": "vs_post",
-    "fragment": "fs_post",
+    "vertex": "chains/hlsl/vs_post",
+    "fragment": "chains/hlsl/fs_post",
     "uniforms": [
     	{ "name": "s_tex",                    "type": "int",  "values": [ 0.0 ] },
     	{ "name": "s_shadow",                 "type": "int",  "values": [ 1.0 ] },

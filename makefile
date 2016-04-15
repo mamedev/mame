@@ -100,6 +100,9 @@
 # IGNORE_BAD_LOCALISATION=1
 # PRECOMPILE = 0
 
+# DEBUG_DIR=c:\test\location
+# DEBUG_ARGS= -window -video bgfx
+
 ifdef PREFIX_MAKEFILE
 include $(PREFIX_MAKEFILE)
 else
@@ -723,6 +726,13 @@ ifdef PRECOMPILE
 PARAMS += --precompile='$(PRECOMPILE)'
 endif
 
+ifdef DEBUG_DIR
+PARAMS += --DEBUG_DIR='$(DEBUG_DIR)'
+endif
+
+ifdef DEBUG_ARGS
+PARAMS += --DEBUG_ARGS='$(DEBUG_ARGS)'
+endif
 #-------------------------------------------------
 # All scripts
 #-------------------------------------------------

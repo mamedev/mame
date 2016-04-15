@@ -992,14 +992,12 @@ int shaders::create_resources(bool reset, std::vector<ui_menu_item>& sliders)
 	post_effect->add_uniform("ScanlineBrightOffset", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_BRIGHT_OFFSET);
 	post_effect->add_uniform("Power", uniform::UT_VEC3, uniform::CU_POST_POWER);
 	post_effect->add_uniform("Floor", uniform::UT_VEC3, uniform::CU_POST_FLOOR);
-	post_effect->add_uniform("RotationType", uniform::UT_INT, uniform::CU_ROTATION_TYPE);
 
 	distortion_effect->add_uniform("VignettingAmount", uniform::UT_FLOAT, uniform::CU_POST_VIGNETTING);
 	distortion_effect->add_uniform("CurvatureAmount", uniform::UT_FLOAT, uniform::CU_POST_CURVATURE);
 	distortion_effect->add_uniform("RoundCornerAmount", uniform::UT_FLOAT, uniform::CU_POST_ROUND_CORNER);
 	distortion_effect->add_uniform("SmoothBorderAmount", uniform::UT_FLOAT, uniform::CU_POST_SMOOTH_BORDER);
 	distortion_effect->add_uniform("ReflectionAmount", uniform::UT_FLOAT, uniform::CU_POST_REFLECTION);
-	distortion_effect->add_uniform("RotationType", uniform::UT_INT, uniform::CU_ROTATION_TYPE);
 
 	initialized = true;
 
@@ -1656,7 +1654,11 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		lines_pending = true;
 
-		curr_render_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
+		bool swap_xy = d3d->window().swap_xy();
+		int source_width = swap_xy ? (float)d3d->get_height() : (float)d3d->get_width();
+		int source_height = swap_xy ? (float)d3d->get_width() : (float)d3d->get_height();
+
+		curr_render_target = find_render_target(source_width, source_height, 0, 0);
 
 		d3d_render_target *rt = curr_render_target;
 		if (rt == nullptr)
@@ -1679,7 +1681,11 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		curr_screen = curr_screen < num_screens ? curr_screen : 0;
 
-		curr_render_target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
+		bool swap_xy = d3d->window().swap_xy();
+		int source_width = swap_xy ? (float)d3d->get_height() : (float)d3d->get_width();
+		int source_height = swap_xy ? (float)d3d->get_width() : (float)d3d->get_height();
+
+		curr_render_target = find_render_target(source_width, source_height, 0, 0);
 
 		d3d_render_target *rt = curr_render_target;
 		if (rt == nullptr)
@@ -1820,14 +1826,21 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim)
 		return nullptr;
 	}
 
-	int target_width = static_cast<int>(prim->get_quad_width() + 0.5f);
-	int target_height = static_cast<int>(prim->get_quad_height() + 0.5f);
+	bool swap_xy = d3d->window().swap_xy();
+	int target_width = swap_xy
+		? static_cast<int>(prim->get_quad_height() + 0.5f)
+		: static_cast<int>(prim->get_quad_width() + 0.5f);
+	int target_height = swap_xy
+		? static_cast<int>(prim->get_quad_width() + 0.5f)
+		: static_cast<int>(prim->get_quad_height() + 0.5f);
+	int source_width = swap_xy ? (float)d3d->get_height() : (float)d3d->get_width();
+	int source_height = swap_xy ? (float)d3d->get_width() : (float)d3d->get_height();
 
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
 
 	// find render target and check of the size of the target quad has changed
-	d3d_render_target *target = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
+	d3d_render_target *target = find_render_target(source_width, source_height, 0, 0);
 	if (target != nullptr && target->target_width == target_width && target->target_height == target_height)
 	{
 		return target;
@@ -1840,14 +1853,21 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim)
 
 void shaders::create_vector_target(render_primitive *prim)
 {
-	int target_width = static_cast<int>(prim->get_quad_width() + 0.5f);
-	int target_height = static_cast<int>(prim->get_quad_height() + 0.5f);
+	bool swap_xy = d3d->window().swap_xy();
+	int target_width = swap_xy
+		? static_cast<int>(prim->get_quad_height() + 0.5f)
+		: static_cast<int>(prim->get_quad_width() + 0.5f);
+	int target_height = swap_xy
+		? static_cast<int>(prim->get_quad_width() + 0.5f)
+		: static_cast<int>(prim->get_quad_height() + 0.5f);
+	int source_width = swap_xy ? (float)d3d->get_height() : (float)d3d->get_width();
+	int source_height = swap_xy ? (float)d3d->get_width() : (float)d3d->get_height();
 
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
 
 	osd_printf_verbose("create_vector_target() - %d, %d\n", target_width, target_height);
-	if (!add_render_target(d3d, nullptr, d3d->get_width(), d3d->get_height(), target_width, target_height))
+	if (!add_render_target(d3d, nullptr, source_width, source_height, target_width, target_height))
 	{
 		vector_enable = false;
 	}
@@ -2587,10 +2607,26 @@ void uniform::update()
 		}
 		case CU_SOURCE_DIMS:
 		{
-			if (shadersys->curr_texture)
+			bool vector_screen =
+				d3d->window().machine().first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
+			if (vector_screen)
 			{
-				vec2f sourcedims = shadersys->curr_texture->get_rawdims();
-				m_shader->set_vector("SourceDims", 2, &sourcedims.c.x);
+				if (shadersys->curr_render_target)
+				{
+					// vector screen has no source texture, so take the source dimensions of the render target
+					float sourcedims[2] = {
+						static_cast<float>(shadersys->curr_render_target->width),
+						static_cast<float>(shadersys->curr_render_target->height) };
+					m_shader->set_vector("SourceDims", 2, sourcedims);
+				}
+			}
+			else
+			{
+				if (shadersys->curr_texture)
+				{
+					vec2f sourcedims = shadersys->curr_texture->get_rawdims();
+					m_shader->set_vector("SourceDims", 2, &sourcedims.c.x);
+				}
 			}
 			break;
 		}
@@ -2621,35 +2657,6 @@ void uniform::update()
 		case CU_SWAP_XY:
 		{
 			m_shader->set_bool("SwapXY", d3d->window().swap_xy());
-			break;
-		}
-		case CU_ORIENTATION_SWAP:
-		{
-			bool orientation_swap_xy =
-				(d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
-			m_shader->set_bool("OrientationSwapXY", orientation_swap_xy);
-			break;
-
-		}
-		case CU_ROTATION_SWAP:
-		{
-			bool rotation_swap_xy =
-				(d3d->window().target()->orientation() & ROT90) == ROT90 ||
-				(d3d->window().target()->orientation() & ROT270) == ROT270;
-			m_shader->set_bool("RotationSwapXY", rotation_swap_xy);
-			break;
-		}
-		case CU_ROTATION_TYPE:
-		{
-			int rotation_type =
-				(d3d->window().target()->orientation() & ROT90) == ROT90
-					? 1
-					: (d3d->window().target()->orientation() & ROT180) == ROT180
-						? 2
-						: (d3d->window().target()->orientation() & ROT270) == ROT270
-							? 3
-							: 0;
-			m_shader->set_int("RotationType", rotation_type);
 			break;
 		}
 		case CU_VECTOR_SCREEN:

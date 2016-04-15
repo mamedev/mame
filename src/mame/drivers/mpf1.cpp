@@ -338,7 +338,7 @@ static MACHINE_CONFIG_START( mpf1, mpf1_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz/2)
 	MCFG_CPU_PROGRAM_MAP(mpf1_map)
 	MCFG_CPU_IO_MAP(mpf1_io_map)
-	MCFG_CPU_CONFIG(mpf1_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_3_579545MHz/2)
@@ -371,7 +371,7 @@ static MACHINE_CONFIG_START( mpf1b, mpf1_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz/2)
 	MCFG_CPU_PROGRAM_MAP(mpf1b_map)
 	MCFG_CPU_IO_MAP(mpf1b_io_map)
-	MCFG_CPU_CONFIG(mpf1_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_3_579545MHz/2)
@@ -407,7 +407,7 @@ static MACHINE_CONFIG_START( mpf1p, mpf1_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(mpf1p_map)
 	MCFG_CPU_IO_MAP(mpf1p_io_map)
-	MCFG_CPU_CONFIG(mpf1_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mpf1p)

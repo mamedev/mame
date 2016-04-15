@@ -18,6 +18,34 @@ project "expat"
 	uuid "f4cd40b1-c37c-452d-9785-640f26f0bf54"
 	kind "StaticLib"
 
+	-- fake out the enough of expat_config.h to get by
+	defines {
+		"HAVE_MEMMOVE",
+		"HAVE_STDINT_H",
+		"HAVE_STDLIB_H",
+		"HAVE_STRING_H",
+		"PACKAGE_BUGREPORT=\"expat-bugs@libexpat.org\"",
+		"PACKAGE_NAME=\"expat\"",
+		"PACKAGE_STRING=\"expat 2.1.1\"",
+		"PACKAGE_TARNAME=\"expat\"",
+		"PACKAGE_URL=\"\"",
+		"PACKAGE_VERSION=\"2.1.1\"",
+		"STDC_HEADERS",
+		"XML_CONTEXT_BYTES=1024",
+		"XML_DTD",
+		"XML_NS",
+	}
+if _OPTIONS["BIGENDIAN"]=="1" then
+	defines {
+		"BYTEORDER=4321",
+		"WORDS_BIGENDIAN",
+	}
+else
+	defines {
+		"BYTEORDER=1234",
+	}
+end
+
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter

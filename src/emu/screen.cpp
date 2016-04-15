@@ -99,12 +99,21 @@ int screen_device_svg_renderer::render(screen_device &screen, bitmap_rgb32 &bitm
 
 	// Annoyingly, nanosvg doesn't use the same byte order than our bitmaps
 
+	// It generates non-premultiplied alpha anyway, so remultiply by
+	// alpha to "blend" against a black background.
+
 	for(unsigned int y=0; y<bitmap.height(); y++) {
 		UINT8 *image = (UINT8 *)bitmap.raw_pixptr(y, 0);
 		for(unsigned int x=0; x<bitmap.width(); x++) {
 			UINT8 r = image[0];
 			UINT8 g = image[1];
 			UINT8 b = image[2];
+			UINT8 a = image[3];
+			if(a != 0xff) {
+				r = r*a/255;
+				g = g*a/255;
+				b = b*a/255;
+			}
 			UINT32 color = 0xff000000 | (r << 16) | (g << 8) | (b << 0);
 			*(UINT32 *)image = color;
 			image += 4;

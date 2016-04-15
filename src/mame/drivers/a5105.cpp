@@ -557,7 +557,7 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_15MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(a5105_mem)
 	MCFG_CPU_IO_MAP(a5105_io)
-	MCFG_CPU_CONFIG(a5105_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(a5105_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

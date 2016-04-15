@@ -187,7 +187,7 @@ static MACHINE_CONFIG_START( ts802, ts802_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ts802_mem)
 	MCFG_CPU_IO_MAP(ts802_io)
-	//MCFG_CPU_CONFIG(daisy_chain_intf) // causes problems
+	//MCFG_Z80_DAISY_CHAIN(daisy_chain_intf) // causes problems
 	MCFG_MACHINE_RESET_OVERRIDE(ts802_state, ts802)
 
 	/* Devices */

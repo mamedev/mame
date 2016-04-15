@@ -697,7 +697,7 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)
-	MCFG_CPU_CONFIG(dleuro_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(dleuro_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(dleuro_map)
 	MCFG_CPU_IO_MAP(dleuro_io_map)
 

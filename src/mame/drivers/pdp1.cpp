@@ -1931,7 +1931,7 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 	/* basic machine hardware */
 	/* PDP1 CPU @ 200 kHz (no master clock, but the instruction and memory rate is 200 kHz) */
 	MCFG_CPU_ADD("maincpu", PDP1, 1000000/*the CPU core uses microsecond counts*/)
-	MCFG_CPU_CONFIG(pdp1_reset_param)
+	MCFG_PDP1_RESET_PARAM(pdp1_reset_param)
 	MCFG_CPU_PROGRAM_MAP(pdp1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pdp1_state,  pdp1_interrupt)   /* dummy interrupt: handles input */
 

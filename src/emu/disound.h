@@ -42,9 +42,6 @@ const int AUTO_ALLOC_INPUT  = 65535;
 #define MCFG_SOUND_REPLACE(_tag, _type, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, _type, _clock)
 
-#define MCFG_SOUND_CONFIG(_config) \
-	MCFG_DEVICE_CONFIG(_config)
-
 #define MCFG_SOUND_ROUTE(_output, _target, _gain) \
 	device_sound_interface::static_add_route(*device, _output, _target, _gain);
 #define MCFG_SOUND_ROUTE_EX(_output, _target, _gain, _input) \

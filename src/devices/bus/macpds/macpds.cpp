@@ -126,7 +126,7 @@ void macpds_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t m
 	m_maincpu = machine().device<cpu_device>(m_cputag);
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_readwrite_bank(start, end, mask, mirror, tag );
-	machine().root_device().membank(tag)->set_base(data);
+	machine().root_device().membank(siblingtag(tag).c_str())->set_base(data);
 }
 
 void macpds_device::set_irq_line(int line, int state)

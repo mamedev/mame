@@ -705,7 +705,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/intv/slot.h,BUSES["INTV_CTRL"] = true
+--@src/devices/bus/intv_ctrl/ctrl.h,BUSES["INTV_CTRL"] = true
 ---------------------------------------------------
 
 if (BUSES["INTV_CTRL"]~=null) then
@@ -1945,6 +1945,27 @@ if (BUSES["NEOGEO"]~=null) then
 		MAME_DIR .. "src/devices/bus/neogeo/kog_prot.h",
 		MAME_DIR .. "src/devices/bus/neogeo/rom.cpp",
 		MAME_DIR .. "src/devices/bus/neogeo/rom.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/neogeo_ctrl/ctrl.h,BUSES["NEOGEO_CTRL"] = true
+---------------------------------------------------
+
+if (BUSES["NEOGEO_CTRL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/neogeo_ctrl/ctrl.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo_ctrl/ctrl.h",
+		MAME_DIR .. "src/devices/bus/neogeo_ctrl/joystick.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo_ctrl/joystick.h",
+		MAME_DIR .. "src/devices/bus/neogeo_ctrl/mahjong.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo_ctrl/mahjong.h",
+		MAME_DIR .. "src/devices/bus/neogeo_ctrl/dial.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo_ctrl/dial.h",
+		MAME_DIR .. "src/devices/bus/neogeo_ctrl/kizuna4p.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo_ctrl/kizuna4p.h",
 	}
 end
 

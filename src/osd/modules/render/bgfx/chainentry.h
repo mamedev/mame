@@ -27,13 +27,14 @@ class bgfx_effect;
 class bgfx_target;
 class bgfx_entry_uniform;
 class bgfx_suppressor;
+class clear_state;
 class texture_manager;
 class target_manager;
 
 class bgfx_chain_entry
 {
 public:
-	bgfx_chain_entry(std::string name, bgfx_effect* effect, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair> inputs, std::vector<bgfx_entry_uniform*> uniforms, target_manager& targets, std::string output);
+	bgfx_chain_entry(std::string name, bgfx_effect* effect, clear_state* clear, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair> inputs, std::vector<bgfx_entry_uniform*> uniforms, target_manager& targets, std::string output);
 	~bgfx_chain_entry();
 
 	void submit(int view, render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen);
@@ -56,6 +57,7 @@ private:
 
 	std::string                         m_name;
 	bgfx_effect*                        m_effect;
+	clear_state*						m_clear;
 	std::vector<bgfx_suppressor*>       m_suppressors;
 	std::vector<bgfx_input_pair>        m_inputs;
 	std::vector<bgfx_entry_uniform*>    m_uniforms;

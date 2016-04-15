@@ -21,8 +21,8 @@
     	"rgb": true,
     	"alpha": true
     },
-    "vertex": "vs_color",
-    "fragment": "fs_color",
+    "vertex": "chains/hlsl/vs_color",
+    "fragment": "chains/hlsl/fs_color",
     "uniforms": [
     	{ "name": "s_tex",          "type": "int",  "values": [ 1.0 ] },
     	{ "name": "u_red_ratios",   "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },

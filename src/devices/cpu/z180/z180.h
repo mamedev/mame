@@ -125,7 +125,7 @@ enum
 #define Z180_IRQ2       2           /* Execute IRQ2 */
 
 
-class z180_device :  public cpu_device
+class z180_device : public cpu_device, public z80_daisy_chain_interface
 {
 public:
 	// construction/destruction
@@ -184,7 +184,6 @@ private:
 	UINT8   m_timer_cnt;                      /* timer counter / divide by 20 */
 	UINT8   m_dma0_cnt;                       /* dma0 counter / divide by 20 */
 	UINT8   m_dma1_cnt;                       /* dma1 counter / divide by 20 */
-	z80_daisy_chain m_daisy;
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_oprogram;

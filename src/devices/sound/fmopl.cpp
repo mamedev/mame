@@ -2101,8 +2101,8 @@ static unsigned char OPLRead(FM_OPL *OPL,int a)
 	case 0x1a: /* PCM-DATA    */
 		if(OPL->type&OPL_TYPE_ADPCM)
 		{
-			OPL->device->logerror("Y8950 A/D convertion is accessed but not implemented !\n");
-			return 0x80; /* 2's complement PCM data - result from A/D convertion */
+			OPL->device->logerror("Y8950 A/D conversion is accessed but not implemented !\n");
+			return 0x80; /* 2's complement PCM data - result from A/D conversion */
 		}
 		return 0;
 	}

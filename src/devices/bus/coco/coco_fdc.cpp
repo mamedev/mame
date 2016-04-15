@@ -45,12 +45,12 @@
 
     2007-02-22, P.Harvey-Smith
 
-    Began implementing the Dragon Delta Dos controler, this was actually the first
-    Dragon disk controler to market, beating Dragon Data's by a couple of months,
+    Began implementing the Dragon Delta Dos controller, this was actually the first
+    Dragon disk controller to market, beating Dragon Data's by a couple of months,
     it is based around the WD2791 FDC, which is compatible with the WD1793/WD2797 used
-    by the standard CoCo and Dragon disk controlers except that it used an inverted
+    by the standard CoCo and Dragon disk controllers except that it used an inverted
     data bus, which is the reason the read/write handlers invert the data. This
-    controler like, the DragonDos WD2797 is mapped at $FF40-$FF43, in the normal
+    controller like, the DragonDos WD2797 is mapped at $FF40-$FF43, in the normal
     register order.
 
     The Delta cart also has a register (74LS174 hex flipflop) at $FF44 encoded as

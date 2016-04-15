@@ -950,6 +950,20 @@ void ppc_device::device_start()
 			m_regmap[1] = uml::I6;
 		if (beinfo.direct_iregs > 7)
 			m_regmap[2] = uml::I7;
+
+		
+		if (beinfo.direct_fregs > 3)
+			m_fdregmap[0] = uml::F3;
+		if (beinfo.direct_fregs > 4)
+			m_fdregmap[1] = uml::F4;
+		if (beinfo.direct_fregs > 5)
+			m_fdregmap[2] = uml::F5;
+		if (beinfo.direct_fregs > 6)
+			m_fdregmap[3] = uml::F6;
+		if (beinfo.direct_fregs > 7)
+			m_fdregmap[30] = uml::F7;
+		if (beinfo.direct_fregs > 8)
+			m_fdregmap[31] = uml::F8;
 	}
 
 	/* mark the cache dirty so it is updated on next execute */

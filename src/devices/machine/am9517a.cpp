@@ -49,6 +49,7 @@
 
 const device_type AM9517A = &device_creator<am9517a_device>;
 const device_type V53_DMAU = &device_creator<upd71071_v53_device>;
+const device_type PCXPORT_DMAC = &device_creator<pcxport_dmac_device>;
 
 
 //**************************************************************************
@@ -422,7 +423,7 @@ inline void am9517a_device::dma_advance()
 //  end_of_process -
 //-------------------------------------------------
 
-inline void am9517a_device::end_of_process()
+void am9517a_device::end_of_process()
 {
 	// terminal count
 	if (COMMAND_MEM_TO_MEM)
@@ -527,6 +528,11 @@ am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, d
 
 upd71071_v53_device::upd71071_v53_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: am9517a_device(mconfig, V53_DMAU, "V53 DMAU", tag, owner, clock, "v53_dmau")
+{
+}
+
+pcxport_dmac_device::pcxport_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: am9517a_device(mconfig, PCXPORT_DMAC, "PC Transporter DMAC", tag, owner, clock, "pcx_dmac")
 {
 }
 
@@ -1277,3 +1283,58 @@ WRITE8_MEMBER(upd71071_v53_device::write)
 	trigger(1);
 
 }
+
+void pcxport_dmac_device::device_reset()
+{
+	m_state = STATE_SI;
+	m_command = 0;
+	m_status = 0;
+	m_request = 0;
+	m_mask = 0;
+	m_temp = 0;
+	m_msb = 0;
+	m_current_channel = -1;
+	m_last_channel = 3;
+	m_hreq = -1;
+	m_eop = 0;
+
+	set_hreq(0);
+	set_eop(ASSERT_LINE);
+
+	set_dack();
+}
+
+void pcxport_dmac_device::end_of_process()
+{
+	// terminal count
+	if (COMMAND_MEM_TO_MEM)
+	{
+		m_status |= 1 << 0;
+		m_status |= 1 << 1;
+		m_request &= ~(1 << 0);
+		m_request &= ~(1 << 1);
+	}
+	else
+	{
+		m_status |= 1 << m_current_channel;
+		m_request &= ~(1 << m_current_channel);
+	}
+
+	if (MODE_AUTOINITIALIZE)
+	{
+		// autoinitialize
+		m_channel[m_current_channel].m_address = m_channel[m_current_channel].m_base_address;
+		m_channel[m_current_channel].m_count = m_channel[m_current_channel].m_base_count;
+	}
+	// don't mask out channel if not autoinitialize
+
+	// signal end of process
+	set_eop(ASSERT_LINE);
+	set_hreq(0);
+
+	m_current_channel = -1;
+	set_dack();
+
+	m_state = STATE_SI;
+}
+

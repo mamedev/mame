@@ -28,8 +28,11 @@ public:
 	virtual void rom_alloc(size_t size, int width, endianness_t end, const char *tag);
 	virtual void ram_alloc(UINT32 size);
 
-	UINT8* get_rom_base()  { return m_rom; }
-	UINT32 get_rom_size() { return m_rom_size; }
+    UINT8* get_rom_base()  { return m_rom; }
+    UINT32 get_rom_size() { return m_rom_size; }
+
+	UINT8* get_region_base()  { if (m_region.found()) return m_region->base(); return nullptr; }
+	UINT32 get_region_size() { if (m_region.found()) return m_region->bytes(); return 0; }
 
 	UINT8* get_ram_base() { return &m_ram[0]; }
 	UINT32 get_ram_size() { return m_ram.size(); }
@@ -40,6 +43,9 @@ public:
 	UINT8  *m_rom;
 	UINT32  m_rom_size;
 	dynamic_buffer m_ram;
+
+    // this replaces m_rom for non-user configurable carts!
+    optional_memory_region  m_region;
 };
 
 
@@ -137,9 +143,27 @@ public:
 	virtual void rom_alloc(size_t size, int width, endianness_t end) { if (m_cart) m_cart->rom_alloc(size, width, end, tag()); }
 	virtual void ram_alloc(UINT32 size)  { if (m_cart) m_cart->ram_alloc(size); }
 
-	UINT8* get_rom_base()  { if (m_cart) return m_cart->get_rom_base(); return nullptr; }
+	UINT8* get_rom_base()  {
+		if (m_cart)
+		{
+			if (!user_loadable())
+				return m_cart->get_region_base();
+			else
+				return m_cart->get_rom_base();
+		}
+		return nullptr;
+	}
+	UINT32 get_rom_size()	{
+		if (m_cart)
+		{
+			if (!user_loadable())
+				return m_cart->get_region_size();
+			else
+				return m_cart->get_rom_size();
+		}
+		return 0;
+	}
 	UINT8* get_ram_base() { if (m_cart) return m_cart->get_ram_base(); return nullptr; }
-	UINT32 get_rom_size() { if (m_cart) return m_cart->get_rom_size(); return 0; }
 
 	void save_ram()   { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 
@@ -173,4 +197,9 @@ extern const device_type GENERIC_SOCKET;
 	MCFG_DEVICE_ADD(_tag, GENERIC_SOCKET, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, NULL, false) \
 	MCFG_GENERIC_INTERFACE(_dev_intf)
+
+#define MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT(_tag, _slot_intf, _dev_intf, _default) \
+    MCFG_DEVICE_ADD(_tag, GENERIC_SOCKET, 0) \
+    MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, false) \
+    MCFG_GENERIC_INTERFACE(_dev_intf)
 #endif

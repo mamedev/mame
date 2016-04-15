@@ -145,7 +145,7 @@ void a1bus_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mi
 	m_maincpu = machine().device<cpu_device>(m_cputag);
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_readwrite_bank(start, end, mask, mirror, tag );
-	machine().root_device().membank(tag)->set_base(data);
+	machine().root_device().membank(siblingtag(tag).c_str())->set_base(data);
 }
 
 // interrupt request from a1bus card

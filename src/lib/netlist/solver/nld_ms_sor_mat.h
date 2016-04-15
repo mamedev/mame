@@ -15,6 +15,7 @@
 #include <algorithm>
 
 #include "solver/nld_ms_direct.h"
+#include "solver/nld_matrix_solver.h"
 #include "solver/nld_solver.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
@@ -22,6 +23,9 @@ NETLIB_NAMESPACE_DEVICES_START()
 template <unsigned m_N, unsigned _storage_N>
 class matrix_solver_SOR_mat_t: public matrix_solver_direct_t<m_N, _storage_N>
 {
+
+	friend class matrix_solver_t;
+
 public:
 
 	matrix_solver_SOR_mat_t(const solver_parameters_t *params, int size)
@@ -102,7 +106,7 @@ nl_double matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 
 		// FIXME: used to be 1e90, but this would not be compatible with float
 		if (sqo > NL_FCONST(1e-20))
-			m_lp_fact = std::min(nl_math::sqrt(sq/sqo), (nl_double) 2.0);
+			m_lp_fact = nl_math::min(nl_math::sqrt(sq/sqo), (nl_double) 2.0);
 		else
 			m_lp_fact = NL_FCONST(0.0);
 	}
@@ -124,12 +128,13 @@ int matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newt
 	ATTR_ALIGN nl_double new_v[_storage_N] = { 0.0 };
 	const unsigned iN = this->N();
 
+	matrix_solver_t::build_LE_A<matrix_solver_SOR_mat_t>();
+	matrix_solver_t::build_LE_RHS<matrix_solver_SOR_mat_t>();
+
 	bool resched = false;
 
 	int  resched_cnt = 0;
 
-	this->build_LE_A(*this);
-	this->build_LE_RHS(*this);
 
 #if 0
 	static int ws_cnt = 0;
@@ -178,14 +183,14 @@ int matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newt
 		{
 			nl_double Idrive = 0;
 
-			const unsigned *p = this->m_terms[k]->m_nz.data();
+			const auto *p = this->m_terms[k]->m_nz.data();
 			const unsigned e = this->m_terms[k]->m_nz.size();
 
 			for (unsigned i = 0; i < e; i++)
 				Idrive = Idrive + this->A(k,p[i]) * new_v[p[i]];
 
 			const nl_double delta = m_omega * (this->RHS(k) - Idrive) / this->A(k,k);
-			cerr = std::max(cerr, nl_math::abs(delta));
+			cerr = nl_math::max(cerr, nl_math::abs(delta));
 			new_v[k] += delta;
 		}
 

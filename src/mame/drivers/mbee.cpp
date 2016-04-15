@@ -627,7 +627,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 6)         /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(mbee_mem)
 	MCFG_CPU_IO_MAP(mbee_io)
-	MCFG_CPU_CONFIG(mbee_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(mbee_daisy_chain)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 
@@ -686,7 +686,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_5MHz / 4)         /* 3.37500 MHz */
 	MCFG_CPU_PROGRAM_MAP(mbeeic_mem)
 	MCFG_CPU_IO_MAP(mbeeic_io)
-	MCFG_CPU_CONFIG(mbee_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(mbee_daisy_chain)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 

@@ -59,6 +59,9 @@ struct applefdc_interface
 class applefdc_base_device : public device_t
 {
 public:
+	// configuration helpers
+	static void static_set_config(device_t &device, const applefdc_interface *intrf) { downcast<applefdc_base_device &>(device).m_interface = intrf; }
+
 	// read/write handlers
 	virtual UINT8 read(UINT8 offset);
 	virtual void write(UINT8 offset, UINT8 data);
@@ -95,6 +98,7 @@ private:
 	// data that is constant for the lifetime of the emulation
 	emu_timer * m_motor_timer;
 	applefdc_t  m_type;
+	const applefdc_interface *m_interface;
 
 	// data that changes at emulation time
 	UINT8       m_write_byte;
@@ -143,21 +147,24 @@ public:
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
+#define MCFG_APPLEFDC_CONFIG(_intrf) \
+	applefdc_base_device::static_set_config(*device, &(_intrf));
+
 #define MCFG_APPLEFDC_ADD(_tag, _intrf) \
 	MCFG_DEVICE_ADD(_tag, APPLEFDC, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_APPLEFDC_CONFIG(_intrf)
 
 #define MCFG_APPLEFDC_MODIFY(_tag, _intrf) \
 	MCFG_DEVICE_MODIFY(_tag)          \
-	MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_APPLEFDC_CONFIG(_intrf)
 
 #define MCFG_IWM_ADD(_tag, _intrf) \
 	MCFG_DEVICE_ADD(_tag, IWM, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_APPLEFDC_CONFIG(_intrf)
 
 #define MCFG_IWM_MODIFY(_tag, _intrf) \
 	MCFG_DEVICE_MODIFY(_tag)          \
-	MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_APPLEFDC_CONFIG(_intrf)
 
 
 #endif /* __APPLEFDC_H__ */

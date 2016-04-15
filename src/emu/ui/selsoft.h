@@ -4,7 +4,7 @@
 
     ui/selsoft.h
 
-    UI softwares menu.
+    UI software menu.
 
 ***************************************************************************/
 #pragma once

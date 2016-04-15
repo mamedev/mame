@@ -66,6 +66,7 @@ function cheat.startplugin()
 	local cheats = {}
 	local output = {}
 	local line = 0
+	local start_time = 0
 
 	local function load_cheats()
 		local filename = emu.romname()
@@ -146,6 +147,11 @@ function cheat.startplugin()
 		return result
 	end
 
+	local function time()
+		return emu.time() - start_time
+	end
+
+
 	local function parse_cheat(cheat)
 		cheat.cheat_env = { draw_text = draw_text,
 				    draw_line = draw_line,
@@ -154,8 +160,10 @@ function cheat.startplugin()
 				    frombcd = frombcd,
 				    pairs = pairs,
 				    ipairs = ipairs,
-			    	    table_insert = table.insert,
-			    	    table_remove = table.remove }
+				    time = time,
+			    	    table = 
+				    { insert = table.insert,
+			    	      remove = table.remove } }
 		cheat.enabled = false
 		-- verify scripts are valid first
 		if not cheat.script then
@@ -236,7 +244,7 @@ function cheat.startplugin()
 			return
 		end
 		param.min = tonumber(param.min) or 0
-		param.min = tonumber(param.min) or #param.item
+		param.max = tonumber(param.max) or #param.item
 		param.step = tonumber(param.step) or 1
 		if param.item then
 			for count, item in pairs(param.item) do
@@ -421,6 +429,7 @@ function cheat.startplugin()
 			  end, "Cheat")
 
 	emu.register_start(function()
+		start_time = emu.time()
 		cheats = load_cheats()
 		for num, cheat in pairs(cheats) do
 			parse_cheat(cheat)

@@ -19,6 +19,7 @@
 #include "writereader.h"
 #include "shadermanager.h"
 #include "uniformreader.h"
+#include "uniform.h"
 
 #include "effectreader.h"
 
@@ -52,6 +53,17 @@ bgfx_effect* effect_reader::read_from_value(const Value& value, std::string pref
 
 	std::string vertex_name(value["vertex"].GetString());
 	bgfx::ShaderHandle vertex_shader = shaders.shader(vertex_name);
+	if (vertex_shader.idx == 0xffff)
+	{
+		for (bgfx_uniform* uniform : uniforms)
+		{
+			if (uniform != nullptr)
+			{
+				delete uniform;
+			}
+		}
+		return nullptr;
+	}
 
 	std::string fragment_name("");
 	if (value.HasMember("fragment"))
@@ -63,6 +75,17 @@ bgfx_effect* effect_reader::read_from_value(const Value& value, std::string pref
 		fragment_name = value["pixel"].GetString();
 	}
 	bgfx::ShaderHandle fragment_shader = shaders.shader(fragment_name);
+	if (fragment_shader.idx == 0xffff)
+	{
+		for (bgfx_uniform* uniform : uniforms)
+		{
+			if (uniform != nullptr)
+			{
+				delete uniform;
+			}
+		}
+		return nullptr;
+	}
 
 	return new bgfx_effect(blend | depth | cull | write, vertex_shader, fragment_shader, uniforms);
 }

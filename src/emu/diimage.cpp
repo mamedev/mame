@@ -68,6 +68,7 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 		m_from_swlist(false),
 		m_create_format(0),
 		m_create_args(nullptr),
+        m_user_loadable(TRUE),
 		m_is_loading(FALSE)
 {
 }

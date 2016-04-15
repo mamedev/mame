@@ -89,8 +89,6 @@ uniform float2 ScreenDims; // size of the window or fullscreen
 uniform float2 TargetDims; // size of the target surface
 uniform float2 QuadDims; // size of the screen quad
 
-uniform bool VectorScreen;
-
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
@@ -120,7 +118,6 @@ uniform float VignettingAmount = 0.0f;
 uniform float ReflectionAmount = 0.0f;
 
 uniform bool SwapXY = false;
-uniform int RotationType = 0; // 0 = 0°, 1 = 90°, 2 = 180°, 3 = 270°
 
 float GetNoiseFactor(float3 n, float random)
 {
@@ -146,40 +143,16 @@ float GetSpotAddend(float2 coord, float amount)
 {
 	float2 SpotCoord = coord;
 
-	// hack for vector screen
-	if (VectorScreen)
-	{
-		// upper right quadrant
-		float2 spotOffset =
-			RotationType == 1 // 90°
-				? float2(-0.25f, -0.25f)
-				: RotationType == 2 // 180°
-					? float2(0.25f, -0.25f)
-					: RotationType == 3 // 270° else 0°
-						? float2(0.25f, 0.25f)
-						: float2(-0.25f, 0.25f);
+	// upper right quadrant
+	float2 spotOffset = float2(-0.25f, 0.25f);
 
-		// normalized screen canvas ratio
-		float2 CanvasRatio = SwapXY
-			? float2(QuadDims.x / QuadDims.y, 1.0f)
-			: float2(1.0f, QuadDims.y / QuadDims.x);
+	// normalized screen canvas ratio
+	float2 CanvasRatio = SwapXY 
+		? float2(1.0f, QuadDims.x / QuadDims.y)
+		: float2(1.0f, QuadDims.y / QuadDims.x);
 
-		SpotCoord += spotOffset;
-		SpotCoord *= CanvasRatio;
-	}
-	else
-	{
-		// upper right quadrant
-		float2 spotOffset = float2(-0.25f, 0.25f);
-
-		// normalized screen canvas ratio
-		float2 CanvasRatio = SwapXY 
-			? float2(1.0f, QuadDims.x / QuadDims.y)
-			: float2(1.0f, QuadDims.y / QuadDims.x);
-
-		SpotCoord += spotOffset;
-		SpotCoord *= CanvasRatio;
-	}
+	SpotCoord += spotOffset;
+	SpotCoord *= CanvasRatio;
 
 	float SpotBlur = amount;
 
@@ -201,7 +174,7 @@ float GetRoundCornerFactor(float2 coord, float radiusAmount, float smoothAmount)
 	smoothAmount = min(smoothAmount, radiusAmount);
 
 	float2 quadDims = QuadDims;
-	quadDims = !VectorScreen && SwapXY
+	quadDims = SwapXY
 		? quadDims.yx
 		: quadDims.xy;
 

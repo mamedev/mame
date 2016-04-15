@@ -329,7 +329,7 @@ static MACHINE_CONFIG_START( superslave, superslave_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(superslave_mem)
 	MCFG_CPU_IO_MAP(superslave_io)
-	MCFG_CPU_CONFIG(superslave_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(superslave_daisy_chain)
 
 	// devices
 	MCFG_PIC8259_ADD(AM9519_TAG, INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0), VCC, NULL)

@@ -466,7 +466,7 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 #endif
 
 	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000)  /* TMPZ84C011, unknown clock */
-	MCFG_CPU_CONFIG(daisy_chain_sound)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain_sound)
 	MCFG_CPU_PROGRAM_MAP(csplayh5_sound_map)
 	MCFG_CPU_IO_MAP(csplayh5_sound_io_map)
 	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(csplayh5_state, soundcpu_porta_w))

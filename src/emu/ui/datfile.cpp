@@ -135,8 +135,8 @@ void datfile_manager::init_history()
 {
 	int swcount = 0;
 	int count = index_datafile(m_histidx, swcount);
-	osd_printf_verbose("History.dat games found = %i\n", count);
-	osd_printf_verbose("History.dat softwares found = %i\n", swcount);
+	osd_printf_verbose("History.dat systems found = %i\n", count);
+	osd_printf_verbose("History.dat software packages found = %i\n", swcount);
 	osd_printf_verbose("Rev = %s\n", m_history_rev.c_str());
 }
 

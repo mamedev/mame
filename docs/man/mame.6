@@ -514,10 +514,6 @@ Default is OFF (\-norefreshspeed).
 .\" OS specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .TP
-.B \-[no]multithreading, \-[no]mt
-Enable multithreading; this enables rendering and blitting on a separate
-thread. The default is OFF (\-nomultithreading).
-.TP
 .B \-numprocessors, \-np \fIvalue
 Set number of processors; this overrides the number the system reports.
 .TP
@@ -1143,15 +1139,6 @@ Default is 2.
 .TP
 .B \-autoboot_script, \-script \fR[\fIfilename.lua\fP]
 File containing scripting to execute after machine boot.
-.TP
-.B \-[no]http
-Enable local http server. Default is OFF (\-nohttp).
-.TP
-.B \-http_port \fIport
-Internal webserver listener port.
-.TP
-.B \-http_path \fIpath
-Path to web files. Default is /usr/share/games/mess/web.
 .TP
 .B \-[no]console
 Enable emulator LUA console. Default is OFF (\-noconsole).

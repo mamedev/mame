@@ -127,7 +127,7 @@ static MACHINE_CONFIG_START( tim011,tim011_state )
 	MCFG_CPU_IO_MAP(tim011_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tim011_state, irq0_line_hold)
 
-//  MCFG_CPU_ADD("keyboard",CDP1802, XTAL_1_75MHz) // CDP1802, uknown clock
+//  MCFG_CPU_ADD("keyboard",CDP1802, XTAL_1_75MHz) // CDP1802, unknown clock
 
 	// FDC9266 location U43 XTAL_8MHz
 	MCFG_UPD765A_ADD(FDC9266_TAG, true, true)

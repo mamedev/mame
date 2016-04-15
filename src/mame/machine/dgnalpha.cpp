@@ -211,7 +211,7 @@ WRITE8_MEMBER( dragon_alpha_state::ff20_write )
     PIA2 PA2        Rom switch, 0=basic rom, 1=boot rom.
     PIA2 PA3-PA7    Unknown/unused ?
     PIA2 PB0-PB7    connected to D0..7 of the AY8912.
-    CB1             DRQ from WD2797 disk controler.
+    CB1             DRQ from WD2797 disk controller.
 ***************************************************************************/
 
 //-------------------------------------------------

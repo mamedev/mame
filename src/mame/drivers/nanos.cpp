@@ -473,7 +473,7 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(nanos_mem)
 	MCFG_CPU_IO_MAP(nanos_io)
-	MCFG_CPU_CONFIG(nanos_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(nanos_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

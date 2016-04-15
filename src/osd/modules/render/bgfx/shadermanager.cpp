@@ -69,23 +69,35 @@ bgfx::ShaderHandle shader_manager::load_shader(std::string name)
 			fatalerror("Unknown BGFX renderer type %d", bgfx::getRendererType());
 	}
 
-	bgfx::ShaderHandle handle = bgfx::createShader(load_mem(shader_path + name + ".bin"));
+	const bgfx::Memory* mem = load_mem(shader_path + name + ".bin");
+	if (mem != nullptr)
+	{
+		bgfx::ShaderHandle handle = bgfx::createShader(mem);
 
-	m_shaders[name] = handle;
+		m_shaders[name] = handle;
 
-	return handle;
+		return handle;
+	}
+
+	return BGFX_INVALID_HANDLE;
 }
 
 const bgfx::Memory* shader_manager::load_mem(std::string name)
 {
 	bx::CrtFileReader reader;
-	bx::open(&reader, name.c_str());
+	if (bx::open(&reader, name.c_str()))
+	{
+		uint32_t size(bx::getSize(&reader));
+		const bgfx::Memory* mem = bgfx::alloc(size + 1);
+		bx::read(&reader, mem->data, size);
+		bx::close(&reader);
 
-	uint32_t size(bx::getSize(&reader));
-	const bgfx::Memory* mem = bgfx::alloc(size + 1);
-	bx::read(&reader, mem->data, size);
-	bx::close(&reader);
-
-	mem->data[mem->size - 1] = '\0';
-	return mem;
+		mem->data[mem->size - 1] = '\0';
+		return mem;
+	}
+	else
+	{
+		printf("Unable to load shader %s\n", name.c_str());
+	}
+	return nullptr;
 }

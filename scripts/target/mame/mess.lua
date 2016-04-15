@@ -631,6 +631,7 @@ BUSES["MEGADRIVE"] = true
 BUSES["MSX_SLOT"] = true
 BUSES["NASBUS"] = true
 BUSES["NEOGEO"] = true
+BUSES["NEOGEO_CTRL"] = true
 BUSES["NES"] = true
 BUSES["NES_CTRL"] = true
 BUSES["NEWBRAIN"] = true
@@ -1968,6 +1969,7 @@ createMESSProjects(_target, _subtarget, "mb")
 files {
 	MAME_DIR .. "src/mame/drivers/mbdtower.cpp",
 	MAME_DIR .. "src/mame/drivers/microvsn.cpp",
+	MAME_DIR .. "src/mame/drivers/phantom.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "mchester")

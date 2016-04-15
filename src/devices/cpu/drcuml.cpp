@@ -22,9 +22,6 @@
     * Support for FPU exceptions
 
     * New instructions?
-        - FCOPYI, ICOPYF
-            copy raw between float and integer registers
-
         - VALID opcode_desc,handle,param
             checksum/compare code referenced by opcode_desc; if not
             matching, generate exception with handle,param

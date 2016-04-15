@@ -134,8 +134,7 @@ public:
 		bool orientation_swap_xy =
 			(machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
 		bool rotation_swap_xy =
-			(target()->orientation() & ROT90) == ROT90 ||
-			(target()->orientation() & ROT270) == ROT270;
+			(target()->orientation() & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
 		return orientation_swap_xy ^ rotation_swap_xy;
 	};
 

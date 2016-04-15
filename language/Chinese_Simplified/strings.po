@@ -1919,3 +1919,66 @@ msgstr " 色彩"
 #: src/emu/ui/viewgfx.cpp:392
 msgid " PENS"
 msgstr " PENS"
+
+#~ msgid "Lightgun Device Assignment"
+#~ msgstr "配置光枪设备"
+
+#~ msgid "Trackball Device Assignment"
+#~ msgstr "配置轨迹球设备"
+
+#~ msgid "Pedal Device Assignment"
+#~ msgstr "配置踏板设备"
+
+#~ msgid "Adstick Device Assignment"
+#~ msgstr "配置 AD 游戏杆设备"
+
+#~ msgid "Paddle Device Assignment"
+#~ msgstr "配置操纵杆设备"
+
+#~ msgid "Dial Device Assignment"
+#~ msgstr "配置方向盘设备"
+
+#~ msgid "Positional Device Assignment"
+#~ msgstr "配置定位设备"
+
+#~ msgid "Mouse Device Assignment"
+#~ msgstr "配置鼠标设备"
+
+#~ msgid "Device Mapping"
+#~ msgstr "装置映对"
+
+#~ msgid "Video Mode"
+#~ msgstr "视讯模式"
+
+#~ msgid "Triple Buffering"
+#~ msgstr "三重缓冲"
+
+#~ msgid "HLSL"
+#~ msgstr "HLSL"
+
+#~ msgid "GLSL"
+#~ msgstr "GLSL"
+
+#~ msgid "Bilinear Filtering"
+#~ msgstr "双线过滤"
+
+#~ msgid "Bitmap Prescaling"
+#~ msgstr "点阵预缩放"
+
+#~ msgid "Window Mode"
+#~ msgstr "视窗模式"
+
+#~ msgid "Enforce Aspect Ratio"
+#~ msgstr "强制长宽比例"
+
+#~ msgid "Start Out Maximized"
+#~ msgstr "启动时最大化"
+
+#~ msgid "Synchronized Refresh"
+#~ msgstr "同步更新"
+
+#~ msgid "Wait Vertical Sync"
+#~ msgstr "等待垂直同步"
+
+#~ msgid "Display Options"
+#~ msgstr "视讯选项"

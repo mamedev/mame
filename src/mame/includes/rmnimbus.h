@@ -190,7 +190,7 @@ public:
 		UINT8   reg400;
 	} m_nimbus_drives;
 
-	/* 8031 Peripheral controler */
+	/* 8031 Peripheral controller */
 	struct
 	{
 		UINT8   ipc_in;

@@ -84,6 +84,12 @@
 			scope = "config",
 		},
 
+		debugabsolutedir =
+		{
+			kind = "string",
+			scope = "config",
+		},
+
 		debugenvs  =
 		{
 			kind = "list",

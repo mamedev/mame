@@ -40,7 +40,6 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 		m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock)),
 
 		m_machine_config(mconfig),
-		m_static_config(nullptr),
 		m_input_defaults(nullptr),
 		m_default_bios_tag(""),
 

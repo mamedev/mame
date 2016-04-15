@@ -22,8 +22,8 @@
     	"rgb": true,
     	"alpha": true
     },
-    "vertex": "vs_ntsc_decode",
-    "fragment": "fs_ntsc_decode",
+    "vertex": "chains/hlsl/vs_ntsc_decode",
+    "fragment": "chains/hlsl/fs_ntsc_decode",
     "uniforms": [
     	{ "name": "s_tex",             "type": "int",  "values": [ 1.0 ] },
     	{ "name": "s_screen",        "type": "int",  "values": [ 1.0 ] },

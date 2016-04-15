@@ -170,7 +170,7 @@ static MACHINE_CONFIG_START( uts20, univac_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(uts20_mem)
 	MCFG_CPU_IO_MAP(uts20_io)
-	MCFG_CPU_CONFIG(daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)

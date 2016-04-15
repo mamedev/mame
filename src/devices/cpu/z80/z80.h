@@ -37,7 +37,7 @@ enum
 	Z80_GENPCBASE = STATE_GENPCBASE
 };
 
-class z80_device : public cpu_device
+class z80_device : public cpu_device, public z80_daisy_chain_interface
 {
 public:
 	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -283,7 +283,6 @@ protected:
 	device_irq_acknowledge_delegate m_irq_callback;
 
 	int             m_icount;
-	z80_daisy_chain m_daisy;
 	UINT8           m_rtemp;
 	const UINT8 *   m_cc_op;
 	const UINT8 *   m_cc_cb;

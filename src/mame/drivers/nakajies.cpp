@@ -206,7 +206,7 @@ On boot: 50 = 98, 51 = 06, 52 = 7f
 0061 - unknown
        0xFE written in irq 0xFB handler
 
-0070 - uknown 0x01 is written when going to terminal mode (enable rs232 receive?)
+0070 - unknown 0x01 is written when going to terminal mode (enable rs232 receive?)
 
 0090 - Interrupt source clear
        b7 - 1 = clear interrupt source for irq vector 0xf8

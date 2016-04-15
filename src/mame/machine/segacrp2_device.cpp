@@ -100,7 +100,7 @@ const device_type SEGA_317_0007 = &device_creator<sega_317_0007_device>;
 
 
 
-segacrp2_z80_device::segacrp2_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : z80_device(mconfig, SEGACRP2_Z80, "Z80", tag, owner, clock, "z80_sega2", __FILE__) {}
+segacrp2_z80_device::segacrp2_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : z80_device(mconfig, SEGACRP2_Z80, "Z80 SegaCrypt2", tag, owner, clock, "z80_sega2", __FILE__) {}
 void segacrp2_z80_device::device_start() { z80_device::device_start(); decrypt();  }
 void segacrp2_z80_device::device_reset() { z80_device::device_reset(); }
 void segacrp2_z80_device::decrypt() { }

@@ -55,8 +55,6 @@ uniform float2 ScreenDims;
 uniform float2 TargetDims;
 uniform float2 QuadDims;
 
-uniform bool VectorScreen;
-
 static const float2 Coord0Offset = float2(-0.5f, -0.5f);
 static const float2 Coord1Offset = float2( 0.5f, -0.5f);
 static const float2 Coord2Offset = float2(-0.5f,  0.5f);
@@ -67,9 +65,6 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
 	float2 HalfTargetTexelDims = 0.5f / TargetDims;
-	HalfTargetTexelDims *= VectorScreen
-		? (ScreenDims / QuadDims)
-		: 1.0f;
 
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;

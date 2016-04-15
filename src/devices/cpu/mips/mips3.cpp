@@ -6,9 +6,6 @@
     Core implementation for the portable MIPS III/IV emulator.
     Written by Aaron Giles
 
-    Still not implemented:
-       * DMULT needs to be fixed properly
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -45,11 +42,11 @@
 #define LFSVALL_FR0  (get_cop1_reg64(FSREG))
 #define LFDVALL_FR0  (get_cop1_reg64(FDREG))
 
-#define SFRVALD_FR0(x)  (set_cop1_reg64(FRREG,d2u((x))))
-#define SFTVALD_FR0(x)  (set_cop1_reg64(FTREG,d2u((x))))
-#define SFSVALD_FR0(x)  (set_cop1_reg64(FSREG,d2u((x))))
+//#define SFRVALD_FR0(x)  (set_cop1_reg64(FRREG,d2u((x))))
+//#define SFTVALD_FR0(x)  (set_cop1_reg64(FTREG,d2u((x))))
+//#define SFSVALD_FR0(x)  (set_cop1_reg64(FSREG,d2u((x))))
 #define SFDVALD_FR0(x)  (set_cop1_reg64(FDREG,d2u((x))))
-#define SFSVALL_FR0(x)  (set_cop1_reg64(FSREG,(x)))
+//#define SFSVALL_FR0(x)  (set_cop1_reg64(FSREG,(x)))
 #define SFDVALL_FR0(x)  (set_cop1_reg64(FDREG,(x)))
 
 #define FRVALS_FR1  (((float *)&m_core->cpr[1][FRREG])[BYTE_XOR_LE(0)])
@@ -1447,6 +1444,7 @@ void mips3_device::handle_cop0(UINT32 op)
 	{
 		m_badcop_value = 0;
 		generate_exception(EXCEPTION_BADCOP, 1);
+		return;
 	}
 
 	switch (RSREG)
@@ -1519,10 +1517,7 @@ void mips3_device::handle_cop0(UINT32 op)
 
 inline UINT32 mips3_device::get_cop1_reg32(int idx)
 {
-	//if (IS_FR0)
-	//	return ((UINT32 *)&m_core->cpr[1][0])[idx];
-	//else
-		return m_core->cpr[1][idx];
+	return m_core->cpr[1][idx];
 }
 
 inline UINT64 mips3_device::get_cop1_reg64(int idx)
@@ -1536,10 +1531,7 @@ inline UINT64 mips3_device::get_cop1_reg64(int idx)
 
 inline void mips3_device::set_cop1_reg32(int idx, UINT32 val)
 {
-	//if (IS_FR0)
-	//	((UINT32 *)&m_core->cpr[1][0])[idx] = val;
-	//else
-		m_core->cpr[1][idx] = val;
+	m_core->cpr[1][idx] = val;
 }
 
 inline void mips3_device::set_cop1_reg64(int idx, UINT64 val)
@@ -1550,7 +1542,9 @@ inline void mips3_device::set_cop1_reg64(int idx, UINT64 val)
 		((UINT32 *)&m_core->cpr[1][(idx&0x1E) + 1])[BYTE_XOR_LE(0)] = val >> 32;
 	}
 	else
+	{
 		m_core->cpr[1][idx] = val;
+	}
 }
 inline UINT64 mips3_device::get_cop1_creg(int idx)
 {
@@ -1589,6 +1583,7 @@ void mips3_device::handle_cop1_fr0(UINT32 op)
 	{
 		m_badcop_value = 1;
 		generate_exception(EXCEPTION_BADCOP, 1);
+		return;
 	}
 
 	switch (RSREG)
@@ -1948,6 +1943,7 @@ void mips3_device::handle_cop1_fr1(UINT32 op)
 	{
 		m_badcop_value = 1;
 		generate_exception(EXCEPTION_BADCOP, 1);
+		return;
 	}
 
 	switch (RSREG)
@@ -2311,6 +2307,7 @@ void mips3_device::handle_cop1x_fr0(UINT32 op)
 	{
 		m_badcop_value = 1;
 		generate_exception(EXCEPTION_BADCOP, 1);
+		return;
 	}
 
 	switch (op & 0x3f)
@@ -2389,6 +2386,7 @@ void mips3_device::handle_cop1x_fr1(UINT32 op)
 	{
 		m_badcop_value = 1;
 		generate_exception(EXCEPTION_BADCOP, 1);
+		return;
 	}
 
 	switch (op & 0x3f)
@@ -2490,6 +2488,7 @@ void mips3_device::handle_cop2(UINT32 op)
 	{
 		m_badcop_value = 2;
 		generate_exception(EXCEPTION_BADCOP, 1);
+		return;
 	}
 
 	switch (RSREG)
@@ -2617,17 +2616,33 @@ void mips3_device::handle_special(UINT32 op)
 			break;
 		case 0x1c:  /* DMULT */
 		{
-			UINT64 temp64 = (INT64)RSVAL64 * (INT64)RTVAL64;
-			LOVAL64 = temp64;
-			HIVAL64 = (INT64)temp64 >> 63;
+			INT64 rshi = (INT32)(RSVAL64 >> 32);
+			INT64 rthi = (INT32)(RTVAL64 >> 32);
+			INT64 rslo = (UINT32)RSVAL64;
+			INT64 rtlo = (UINT32)RTVAL64;
+			INT64 mid_prods = (rshi * rtlo) + (rslo * rthi);
+			UINT64 lo_prod = (rslo * rtlo);
+			INT64 hi_prod = (rshi * rthi);
+			mid_prods += lo_prod >> 32;
+
+			HIVAL64 = hi_prod + (mid_prods >> 32);
+			LOVAL64 = (UINT32)lo_prod + (mid_prods << 32);
 			m_core->icount -= 7;
 			break;
 		}
 		case 0x1d:  /* DMULTU */
 		{
-			UINT64 temp64 = (UINT64)RSVAL64 * (UINT64)RTVAL64;
-			LOVAL64 = temp64;
-			HIVAL64 = 0;
+			UINT64 rshi = (INT32)(RSVAL64 >> 32);
+			UINT64 rthi = (INT32)(RTVAL64 >> 32);
+			UINT64 rslo = (UINT32)RSVAL64;
+			UINT64 rtlo = (UINT32)RTVAL64;
+			UINT64 mid_prods = (rshi * rtlo) + (rslo * rthi);
+			UINT64 lo_prod = (rslo * rtlo);
+			UINT64 hi_prod = (rshi * rthi);
+			mid_prods += lo_prod >> 32;
+
+			HIVAL64 = hi_prod + (mid_prods >> 32);
+			LOVAL64 = (UINT32)lo_prod + (mid_prods << 32);
 			m_core->icount -= 7;
 			break;
 		}
@@ -2801,9 +2816,19 @@ void mips3_device::execute_run()
 			case 0x0e:  /* XORI */      if (RTREG) RTVAL64 = RSVAL64 ^ UIMMVAL;                                 break;
 			case 0x0f:  /* LUI */       if (RTREG) RTVAL64 = (INT32)(UIMMVAL << 16);                            break;
 			case 0x10:  /* COP0 */      handle_cop0(op);                                                        break;
-			case 0x11:  /* COP1 */      if (IS_FR0) handle_cop1_fr0(op); else handle_cop1_fr1(op);              break;
+			case 0x11:  /* COP1 */
+				if (IS_FR0)
+					handle_cop1_fr0(op);
+				else
+					handle_cop1_fr1(op);
+				break;
 			case 0x12:  /* COP2 */      handle_cop2(op);                                                        break;
-			case 0x13:  /* COP1X - R5000 */if (IS_FR0) handle_cop1x_fr0(op); else handle_cop1x_fr1(op);         break;
+			case 0x13:  /* COP1X - R5000 */
+				if (IS_FR0)
+					handle_cop1x_fr0(op);
+				else
+					handle_cop1x_fr1(op);
+				break;
 			case 0x14:  /* BEQL */      if (RSVAL64 == RTVAL64) ADDPC(SIMMVAL); else m_core->pc += 4;                break;
 			case 0x15:  /* BNEL */      if (RSVAL64 != RTVAL64) ADDPC(SIMMVAL); else m_core->pc += 4;                break;
 			case 0x16:  /* BLEZL */     if ((INT64)RSVAL64 <= 0) ADDPC(SIMMVAL); else m_core->pc += 4;           break;
@@ -2847,8 +2872,11 @@ void mips3_device::execute_run()
 				{
 					m_badcop_value = 1;
 					generate_exception(EXCEPTION_BADCOP, 1);
+					break;
 				}
-				if (RWORD(SIMMVAL+RSVAL32, &temp)) set_cop1_reg32(RTREG, temp);         break;
+				if (RWORD(SIMMVAL+RSVAL32, &temp))
+					set_cop1_reg32(RTREG, temp);
+				break;
 			case 0x32:  /* LWC2 */      if (RWORD(SIMMVAL+RSVAL32, &temp)) set_cop2_reg(RTREG, temp);           break;
 			case 0x33:  /* PREF */      /* effective no-op */                                                   break;
 			case 0x34:  /* LLD */       if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG) RTVAL64 = temp64; m_lld_value = temp64;     break;
@@ -2857,8 +2885,11 @@ void mips3_device::execute_run()
 			{
 				m_badcop_value = 1;
 				generate_exception(EXCEPTION_BADCOP, 1);
+				break;
 			}
-			if (RDOUBLE(SIMMVAL+RSVAL32, &temp64)) set_cop1_reg64(RTREG, temp64);       break;
+			if (RDOUBLE(SIMMVAL+RSVAL32, &temp64))
+				set_cop1_reg64(RTREG, temp64);
+			break;
 			case 0x36:  /* LDC2 */      if (RDOUBLE(SIMMVAL+RSVAL32, &temp64)) set_cop2_reg(RTREG, temp64);     break;
 			case 0x37:  /* LD */        if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG) RTVAL64 = temp64;       break;
 			case 0x38:  /* SC */        if (RWORD(SIMMVAL+RSVAL32, &temp) && RTREG)
@@ -2879,8 +2910,10 @@ void mips3_device::execute_run()
 				{
 					m_badcop_value = 1;
 					generate_exception(EXCEPTION_BADCOP, 1);
+					break;
 				}
-				WWORD(SIMMVAL+RSVAL32, get_cop1_reg32(RTREG));                          break;
+				WWORD(SIMMVAL+RSVAL32, get_cop1_reg32(RTREG));
+				break;
 			case 0x3a:  /* SWC2 */      WWORD(SIMMVAL+RSVAL32, get_cop2_reg(RTREG));                            break;
 			case 0x3b:  /* SWC3 */      invalid_instruction(op);                                                break;
 			case 0x3c:  /* SCD */       if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG)
@@ -2901,8 +2934,10 @@ void mips3_device::execute_run()
 				{
 					m_badcop_value = 1;
 					generate_exception(EXCEPTION_BADCOP, 1);
+					break;
 				}
-				WDOUBLE(SIMMVAL+RSVAL32, get_cop1_reg64(RTREG));                            break;
+				WDOUBLE(SIMMVAL+RSVAL32, get_cop1_reg64(RTREG));
+				break;
 			case 0x3e:  /* SDC2 */      WDOUBLE(SIMMVAL+RSVAL32, get_cop2_reg(RTREG));                          break;
 			case 0x3f:  /* SD */        WDOUBLE(SIMMVAL+RSVAL32, RTVAL64);                                      break;
 			default:    /* ??? */       invalid_instruction(op);                                                break;

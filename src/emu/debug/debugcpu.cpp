@@ -3083,7 +3083,7 @@ void device_debug::hotspot_check(address_space &space, offs_t address)
 	// if we didn't find any, make a new entry
 	if (hotindex == m_hotspots.size())
 	{
-		// if the bottom of the list is over the threshhold, print it
+		// if the bottom of the list is over the threshold, print it
 		hotspot_entry &spot = m_hotspots[m_hotspots.size() - 1];
 		if (spot.m_count > m_hotspot_threshhold)
 			debug_console_printf(space.machine(), "Hotspot @ %s %08X (PC=%08X) hit %d times (fell off bottom)\n", space.name(), spot.m_access, spot.m_pc, spot.m_count);

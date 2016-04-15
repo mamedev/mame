@@ -1757,7 +1757,7 @@ static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_OSC_MCR_I/8)
-	MCFG_CPU_CONFIG(mcr_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(mcr_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(cpu_90009_map)
 	MCFG_CPU_IO_MAP(cpu_90009_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr_state, mcr_interrupt, "screen", 0, 1)
@@ -1879,7 +1879,7 @@ static MACHINE_CONFIG_DERIVED( mcr_91490_ipu, mcr_91490_snt )
 	MCFG_MACHINE_START_OVERRIDE(mcr_state,nflfoot)
 
 	MCFG_CPU_ADD("ipu", Z80, 7372800/2)
-	MCFG_CPU_CONFIG(mcr_ipu_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(mcr_ipu_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(ipu_91695_map)
 	MCFG_CPU_IO_MAP(ipu_91695_portmap)
 	MCFG_TIMER_MODIFY("scantimer")

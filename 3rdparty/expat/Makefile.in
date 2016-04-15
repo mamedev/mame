@@ -42,7 +42,7 @@ INSTALL_DATA = @INSTALL_DATA@
 mkinstalldirs = $(SHELL) $(top_srcdir)/conftools/mkinstalldirs
 
 MANFILE = $(srcdir)/doc/xmlwf.1
-APIHEADER = $(srcdir)/lib/expat.h $(srcdir)/lib/expat_external.h
+APIHEADER = $(srcdir)/lib/expat.h $(srcdir)/lib/expat_external.h expat_config.h
 LIBRARY = libexpat.la
 
 DESTDIR = $(INSTALL_ROOT)
@@ -116,7 +116,7 @@ CXXFLAGS = @CXXFLAGS@
 VSNFLAG = -version-info @LIBCURRENT@:@LIBREVISION@:@LIBAGE@
 
 ### autoconf this?
-LTFLAGS = --silent
+LTFLAGS = --verbose
 
 COMPILE = $(CC) $(INCLUDES) $(CFLAGS) $(DEFS) $(CPPFLAGS)
 CXXCOMPILE = $(CXX) $(INCLUDES) $(CXXFLAGS) $(DEFS) $(CPPFLAGS)
