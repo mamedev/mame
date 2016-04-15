@@ -391,7 +391,7 @@ pdp1_device::pdp1_device(const machine_config &mconfig, const char *tag, device_
 void pdp1_device::device_config_complete()
 {
 	// inherit a copy of the static data
-	const pdp1_reset_param_t *intf = reinterpret_cast<const pdp1_reset_param_t *>(static_config());
+	const pdp1_reset_param_t *intf = m_reset_param;
 	if (intf != nullptr)
 		*static_cast<pdp1_reset_param_t *>(this) = *intf;
 

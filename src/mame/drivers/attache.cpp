@@ -927,7 +927,7 @@ static MACHINE_CONFIG_START( attache, attache_state )
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(attache_map)
 	MCFG_CPU_IO_MAP(attache_io)
-	MCFG_CPU_CONFIG(attache_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(attache_daisy_chain)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

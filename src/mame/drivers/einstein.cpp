@@ -686,7 +686,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	MCFG_CPU_ADD(IC_I001, Z80, XTAL_X002 / 2)
 	MCFG_CPU_PROGRAM_MAP(einstein_mem)
 	MCFG_CPU_IO_MAP(einstein_io)
-	MCFG_CPU_CONFIG(einstein_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(einstein_daisy_chain)
 
 	/* this is actually clocked at the system clock 4 MHz, but this would be too fast for our
 	driver. So we update at 50Hz and hope this is good enough. */

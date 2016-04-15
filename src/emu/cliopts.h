@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    clifront.h
+    cliopts.h
 
     Command-line interface frontend for MAME.
 

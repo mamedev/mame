@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "softlist.h"
-#include "clifront.h"
 #include "validity.h"
 #include "expat.h"
 
@@ -508,7 +507,7 @@ void software_list_device::device_validity_check(validity_checker &valid) const
 		return;
 
 	// do device validation only in case of validate command
-	if (strcmp(mconfig().options().command(), CLICOMMAND_VALIDATE) != 0)
+	if (!valid.validate_all())
 		return;
 
 	// actually do the validate

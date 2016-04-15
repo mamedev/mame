@@ -706,7 +706,7 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(tiki100_mem)
 	MCFG_CPU_IO_MAP(tiki100_io)
-	MCFG_CPU_CONFIG(tiki100_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(tiki100_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)

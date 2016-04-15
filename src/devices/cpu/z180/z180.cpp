@@ -83,6 +83,7 @@ const device_type Z180 = &device_creator<z180_device>;
 
 z180_device::z180_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, Z180, "Z180", tag, owner, clock, "z180", __FILE__)
+	, z80_daisy_chain_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_decrypted_opcodes_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
@@ -1888,11 +1889,6 @@ void z180_device::device_start()
 	int oldval, newval, val;
 	UINT8 *padd, *padc, *psub, *psbc;
 
-	if (static_config() != nullptr)
-	{
-		m_daisy.init(this, (const z80_daisy_config *)static_config());
-	}
-
 	/* allocate big flag arrays once */
 	SZHVC_add = std::make_unique<UINT8[]>(2*256*256);
 	SZHVC_sub = std::make_unique<UINT8[]>(2*256*256);
@@ -2241,7 +2237,6 @@ void z180_device::device_reset()
 	IO_OMCR    = Z180_OMCR_RESET;
 	IO_IOCR    = Z180_IOCR_RESET;
 
-	m_daisy.reset();
 	z180_mmu();
 }
 
@@ -2496,8 +2491,8 @@ void z180_device::execute_set_input(int irqline, int state)
 
 		/* update the IRQ state */
 		m_irq_state[irqline] = state;
-		if (m_daisy.present())
-			m_irq_state[0] = m_daisy.update_irq_state();
+		if (daisy_chain_present())
+			m_irq_state[0] = daisy_update_irq_state();
 
 		/* the main execute loop will take the interrupt */
 	}

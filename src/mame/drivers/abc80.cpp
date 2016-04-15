@@ -524,7 +524,7 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_11_9808MHz/2/2) // 2.9952 MHz
 	MCFG_CPU_PROGRAM_MAP(abc80_mem)
 	MCFG_CPU_IO_MAP(abc80_io)
-	MCFG_CPU_CONFIG(abc80_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(abc80_daisy_chain)
 
 	// video hardware
 	MCFG_FRAGMENT_ADD(abc80_video)

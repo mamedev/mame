@@ -251,7 +251,7 @@ static MACHINE_CONFIG_START( c80, c80_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2500000) /* U880D */
 	MCFG_CPU_PROGRAM_MAP(c80_mem)
 	MCFG_CPU_IO_MAP(c80_io)
-	MCFG_CPU_CONFIG(c80_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(c80_daisy_chain)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_c80 )

@@ -490,7 +490,7 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_24MHz/4)
 	MCFG_CPU_PROGRAM_MAP(super6_mem)
 	MCFG_CPU_IO_MAP(super6_io)
-	MCFG_CPU_CONFIG(super6_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(super6_daisy_chain)
 
 	// devices
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_24MHz/4)

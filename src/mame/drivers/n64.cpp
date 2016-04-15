@@ -242,16 +242,6 @@ static INPUT_PORTS_START( n64 )
 
 INPUT_PORTS_END
 
-#if 0
-/* ?? */
-static const mips3_config config =
-{
-	16384,              /* code cache size */
-	8192,               /* data cache size */
-	62500000            /* system clock */
-};
-#endif
-
 void n64_mess_state::mempak_format(UINT8* pak)
 {
 	unsigned char pak_header[] =
@@ -419,7 +409,9 @@ static MACHINE_CONFIG_START( n64, n64_mess_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, 93750000)
 	MCFG_CPU_FORCE_NO_DRC()
-	MCFG_CPU_CONFIG(config)
+	//MCFG_MIPS3_ICACHE_SIZE(16384) /* ?? */
+	//MCFG_MIPS3_DCACHE_SIZE(8192) /* ?? */
+	//MCFG_MIPS3_SYSTEM_CLOCK(62500000) /* ?? */
 	MCFG_CPU_PROGRAM_MAP(n64_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", n64_mess_state, n64_reset_poll)
 

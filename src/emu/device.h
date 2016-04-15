@@ -33,8 +33,6 @@
 //**************************************************************************
 
 // configure devices
-#define MCFG_DEVICE_CONFIG(_config) \
-	device_t::static_set_static_config(*device, &(_config));
 #define MCFG_DEVICE_CLOCK(_clock) \
 	device_t::static_set_clock(*device, _clock);
 #define MCFG_DEVICE_INPUT_DEFAULTS(_config) \
@@ -201,7 +199,6 @@ public:
 	device_t *owner() const { return m_owner; }
 	device_t *next() const { return m_next; }
 	UINT32 configured_clock() const { return m_configured_clock; }
-	const void *static_config() const { return m_static_config; }
 	const machine_config &mconfig() const { return m_machine_config; }
 	const input_device_default *input_ports_defaults() const { return m_input_defaults; }
 	const rom_entry *rom_region() const { return device_rom_region(); }
@@ -247,7 +244,6 @@ public:
 
 	// configuration helpers
 	static void static_set_clock(device_t &device, UINT32 clock);
-	static void static_set_static_config(device_t &device, const void *config) { device.m_static_config = config; }
 	static void static_set_input_default(device_t &device, const input_device_default *config) { device.m_input_defaults = config; }
 	static void static_set_default_bios_tag(device_t &device, const char *tag) { std::string default_bios_tag(tag); device.m_default_bios_tag = default_bios_tag; }
 
@@ -345,7 +341,6 @@ protected:
 
 	std::unique_ptr<device_debug> m_debug;
 	const machine_config &  m_machine_config;       // reference to the machine's configuration
-	const void *            m_static_config;        // static device configuration
 	const input_device_default *m_input_defaults;   // devices input ports default overrides
 
 	UINT8                   m_system_bios;          // the system BIOS we wish to load

@@ -131,7 +131,7 @@ static MACHINE_CONFIG_START( bbcbc, bbcbc_state )
 	MCFG_CPU_ADD( "maincpu", Z80, MAIN_CLOCK / 8 )
 	MCFG_CPU_PROGRAM_MAP( bbcbc_prg)
 	MCFG_CPU_IO_MAP( bbcbc_io)
-	MCFG_CPU_CONFIG(bbcbc_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(bbcbc_daisy_chain)
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, MAIN_CLOCK/8)
 

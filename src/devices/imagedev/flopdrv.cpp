@@ -127,7 +127,7 @@ void legacy_floppy_image_device::floppy_drive_init()
 	m_index_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(legacy_floppy_image_device::floppy_drive_index_callback),this));
 	m_idx = 0;
 
-	floppy_drive_set_geometry(((floppy_interface*)static_config())->floppy_type);
+	floppy_drive_set_geometry(m_config->floppy_type);
 
 	/* initialise id index - not so important */
 	m_id_index = 0;
@@ -426,7 +426,7 @@ int legacy_floppy_image_device::internal_floppy_device_load(int create_format, o
 
 	device_image_interface *image = nullptr;
 	interface(image);   /* figure out the floppy options */
-	floppy_options = ((floppy_interface*)static_config())->formats;
+	floppy_options = m_config->formats;
 
 	if (has_been_created())
 	{
@@ -776,7 +776,6 @@ legacy_floppy_image_device::~legacy_floppy_image_device()
 
 void legacy_floppy_image_device::device_start()
 {
-	m_config = (const floppy_interface*)static_config();
 	floppy_drive_init();
 
 	m_drive_id = floppy_get_drive(this);
@@ -816,7 +815,7 @@ void legacy_floppy_image_device::device_start()
 void legacy_floppy_image_device::device_config_complete()
 {
 	m_extension_list[0] = '\0';
-	const struct FloppyFormat *floppy_options = ((floppy_interface*)static_config())->formats;
+	const struct FloppyFormat *floppy_options = m_config->formats;
 	for (int i = 0; floppy_options[i].construct; i++)
 	{
 		// only add if creatable
@@ -885,9 +884,9 @@ void legacy_floppy_image_device::call_unload()
 bool legacy_floppy_image_device::is_creatable() const
 {
 	int cnt = 0;
-	if (static_config() )
+	if (m_config != nullptr)
 	{
-		const struct FloppyFormat *floppy_options = ((floppy_interface*)static_config())->formats;
+		const struct FloppyFormat *floppy_options = m_config->formats;
 		int i;
 		for ( i = 0; floppy_options[i].construct; i++ ) {
 			if(floppy_options[i].param_guidelines) cnt++;
@@ -898,5 +897,5 @@ bool legacy_floppy_image_device::is_creatable() const
 
 const char *legacy_floppy_image_device::image_interface() const
 {
-	return ((floppy_interface *)static_config())->interface;
+	return m_config->interface;
 }

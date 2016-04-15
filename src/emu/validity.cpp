@@ -116,7 +116,8 @@ validity_checker::validity_checker(emu_options &options)
 		m_current_driver(nullptr),
 		m_current_config(nullptr),
 		m_current_device(nullptr),
-		m_current_ioport(nullptr)
+		m_current_ioport(nullptr),
+		m_validate_all(false)
 {
 	// pre-populate the defstr map with all the default strings
 	for (int strnum = 1; strnum < INPUT_STRING_COUNT; strnum++)

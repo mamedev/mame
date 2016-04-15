@@ -4,7 +4,6 @@
 #define _osdsdl_h_
 
 #include "watchdog.h"
-#include "clifront.h"
 #include "modules/lib/osdobj_common.h"
 #include "modules/osdmodule.h"
 #include "modules/font/font_module.h"

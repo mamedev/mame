@@ -1087,7 +1087,7 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_CPU_ADD("maincpu", Z80, SYSTEM_CLK/6)
 	MCFG_CPU_PROGRAM_MAP(meritm_crt250_map)
 	MCFG_CPU_IO_MAP(meritm_crt250_io_map)
-	MCFG_CPU_CONFIG(meritm_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(meritm_daisy_chain)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(meritm_state, meritm_crt250_port_b_w))   // used LMP x DRIVE

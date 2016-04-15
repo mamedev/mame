@@ -1602,6 +1602,7 @@ void cli_frontend::execute_commands(const char *exename)
 	if (strcmp(m_options.command(), CLICOMMAND_VALIDATE) == 0)
 	{
 		validity_checker valid(m_options);
+		valid.set_validate_all(true);
 		const char *sysname = m_options.system_name();
 		bool result = valid.check_all_matching((sysname[0] == 0) ? "*" : sysname);
 		if (!result)

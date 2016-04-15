@@ -26,6 +26,16 @@ const UINT8 Z80_DAISY_IEO = 0x02;       // interrupt disable mask (IEO)
 
 
 //**************************************************************************
+//  DEVICE CONFIGURATION MACROS
+//**************************************************************************
+
+// configure devices
+#define MCFG_Z80_DAISY_CHAIN(_config) \
+	z80_daisy_chain_interface::static_set_daisy_config(*device, _config);
+
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -43,6 +53,8 @@ struct z80_daisy_config
 
 class device_z80daisy_interface : public device_interface
 {
+	friend class z80_daisy_chain_interface;
+
 public:
 	// construction/destruction
 	device_z80daisy_interface(const machine_config &mconfig, device_t &device);
@@ -52,37 +64,44 @@ public:
 	virtual int z80daisy_irq_state() = 0;
 	virtual int z80daisy_irq_ack() = 0;
 	virtual void z80daisy_irq_reti() = 0;
+
+private:
+	device_z80daisy_interface *m_daisy_next;    // next device in the chain
 };
 
 
 
-// ======================> z80_daisy_chain
+// ======================> z80_daisy_chain_interface
 
-class z80_daisy_chain
+class z80_daisy_chain_interface : public device_interface
 {
 public:
-	z80_daisy_chain();
-	void init(device_t *cpudevice, const z80_daisy_config *daisy);
+	// construction/destruction
+	z80_daisy_chain_interface(const machine_config &mconfig, device_t &device);
+	virtual ~z80_daisy_chain_interface();
 
-	bool present() const { return (m_daisy_list != nullptr); }
+	// configuration helpers
+	static void static_set_daisy_config(device_t &device, const z80_daisy_config *config);
 
-	void reset();
-	int update_irq_state();
-	int call_ack_device();
-	void call_reti_device();
+	// getters
+	bool daisy_chain_present() const { return (m_chain != nullptr); }
 
 protected:
-	class daisy_entry
-	{
-	public:
-		daisy_entry(device_t *device);
+	// interface-level overrides
+	virtual void interface_post_start() override;
+	virtual void interface_post_reset() override;
 
-		daisy_entry *               m_next;         // next device
-		device_t *                  m_device;       // associated device
-		device_z80daisy_interface * m_interface;    // associated device's daisy interface
-	};
+	// initialization
+	void daisy_init(const z80_daisy_config *daisy);
 
-	daisy_entry *           m_daisy_list;   // head of the daisy chain
+	// callbacks
+	int daisy_update_irq_state();
+	int daisy_call_ack_device();
+	void daisy_call_reti_device();
+
+private:
+	const z80_daisy_config *m_daisy_config;
+	device_z80daisy_interface *m_chain;     // head of the daisy chain
 };
 
 

@@ -528,7 +528,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/6 )
 	MCFG_CPU_PROGRAM_MAP( osbexec_mem)
 	MCFG_CPU_IO_MAP( osbexec_io)
-	MCFG_CPU_CONFIG( osbexec_daisy_config )
+	MCFG_Z80_DAISY_CHAIN( osbexec_daisy_config )
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_UPDATE_DRIVER(osbexec_state, screen_update)

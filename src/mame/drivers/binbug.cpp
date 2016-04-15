@@ -531,7 +531,7 @@ static MACHINE_CONFIG_START( dg680, dg680_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(dg680_mem)
 	MCFG_CPU_IO_MAP(dg680_io)
-	MCFG_CPU_CONFIG(dg680_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(dg680_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber)
