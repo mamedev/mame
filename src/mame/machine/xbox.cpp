@@ -677,6 +677,7 @@ WRITE32_MEMBER(xbox_base_state::usbctrl_w)
 TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 {
 	UINT32 hcca;
+	UINT32 plh;
 	int changed = 0;
 	int list = 1;
 	bool cont = false;
@@ -709,8 +710,163 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 			if (list == 0) {
 				if (ohcist.hc_regs[HcControl] & PLE) {
 					// periodic list
-					if (ohcist.hc_regs[HcControl] & IE) {
-						// isochronous list
+					plh=ohcist.space->read_dword(hcca + (ohcist.framenumber & 0x1f) * 4);
+					cont = true;
+					while (cont == true) {
+						if (plh != 0) {
+							usb_ohci_read_endpoint_descriptor(plh);
+							// if this an isochronous endpoint and isochronous list not enabled, stop list processing
+							if (((ohcist.hc_regs[HcControl] & IE) == 0) && (ohcist.endpoint_descriptor.f == 1))
+								cont = false;
+						}
+						else
+							cont = false;
+						if (cont == false)
+							break;
+						// service endpoint descriptor
+						// only if it is not halted and not to be skipped
+						if (!(ohcist.endpoint_descriptor.h | ohcist.endpoint_descriptor.k)) {
+							// compare the Endpoint Descriptor TailPointer and NextTransferDescriptor fields.
+							if (ohcist.endpoint_descriptor.headp != ohcist.endpoint_descriptor.tailp) {
+								UINT32 a, b;
+								int R = 0;
+
+								// service transfer descriptor
+								if (ohcist.endpoint_descriptor.f != 1) {
+									usb_ohci_read_transfer_descriptor(ohcist.endpoint_descriptor.headp);
+									// get pid
+									if (ohcist.endpoint_descriptor.d == 1)
+										pid = OutPid; // out
+									else if (ohcist.endpoint_descriptor.d == 2)
+										pid = InPid; // in
+									else {
+										pid = ohcist.transfer_descriptor.dp; // 0 setup 1 out 2 in
+									}
+									a = ohcist.transfer_descriptor.be;
+									b = ohcist.transfer_descriptor.cbp;
+								}
+								else {
+									usb_ohci_read_isochronous_transfer_descriptor(ohcist.endpoint_descriptor.headp);
+									// get pid
+									if (ohcist.endpoint_descriptor.d == 1)
+										pid = OutPid; // out
+									else if (ohcist.endpoint_descriptor.d == 2)
+										pid = InPid; // in
+									else 
+										pid = InPid; // in
+									R = (int)ohcist.framenumber - (int)ohcist.isochronous_transfer_descriptor.sf;
+									//if ((R < 0) || (R > (int)ohcist.isochronous_transfer_descriptor.fc))
+									//	; // greater than fc should be an error
+									if (R == (int)ohcist.isochronous_transfer_descriptor.fc)
+										a = ohcist.isochronous_transfer_descriptor.be;
+									else {
+										a = ohcist.isochronous_transfer_descriptor.offset[R + 1] - 1;
+										if (a & (1 << 12))
+											a = (ohcist.isochronous_transfer_descriptor.be & 0xfffff000) | (a & 0xfff);
+										else
+											a = ohcist.isochronous_transfer_descriptor.bp0 | (a & 0xfff);
+									}
+									b=ohcist.isochronous_transfer_descriptor.offset[R];
+									if (b & (1 << 12))
+										b = (ohcist.isochronous_transfer_descriptor.be & 0xfffff000) | (b & 0xfff);
+									else
+										b = ohcist.isochronous_transfer_descriptor.bp0 | (b & 0xfff);
+								}
+								if ((a ^ b) & 0xfffff000)
+									remain = ((a | 0x1000) & 0x1fff) - (b & 0xfff) + 1;
+								else
+									remain = a - b + 1;
+								mps = ohcist.endpoint_descriptor.mps;
+								if (remain < mps)
+									mps = remain;
+								// if sending ...
+								if (pid != InPid) {
+									// ... get mps bytes
+									for (int c = 0; c < remain; c++) {
+										ohcist.buffer[c] = ohcist.space->read_byte(b);
+										b++;
+										if ((b & 0xfff) == 0)
+											b = ohcist.transfer_descriptor.be & 0xfffff000;
+									}
+								}
+								// should check for time available
+								// execute transaction
+								done = ohcist.address[ohcist.endpoint_descriptor.fa].function->execute_transfer(ohcist.endpoint_descriptor.en, pid, ohcist.buffer, mps);
+								// if receiving ...
+								if (pid == InPid) {
+									// ... store done bytes
+									for (int c = 0; c < done; c++) {
+										ohcist.space->write_byte(b, ohcist.buffer[c]);
+										b++;
+										if ((b & 0xfff) == 0)
+											b = a & 0xfffff000;
+									}
+								}
+								if (ohcist.endpoint_descriptor.f != 1) {
+									// status writeback (CompletionCode field, DataToggleControl field, CurrentBufferPointer field, ErrorCount field)
+									ohcist.transfer_descriptor.cc = NoError;
+									ohcist.transfer_descriptor.t = (ohcist.transfer_descriptor.t ^ 1) | 2;
+									// if all data is transferred (or there was no data to transfer) cbp must be 0, otherwise it must be updated
+									if (done == remain)
+										b = 0;
+									ohcist.transfer_descriptor.cbp = b;
+									ohcist.transfer_descriptor.ec = 0;
+									retire = false;
+									if ((done == mps) && (done == remain)) {
+										retire = true;
+									}
+									if ((done != mps) && (done <= remain))
+										retire = true;
+									if (done == 0)
+										retire = true;
+									if (retire == true) {
+										// retire transfer descriptor
+										a = ohcist.endpoint_descriptor.headp;
+										ohcist.endpoint_descriptor.headp = ohcist.transfer_descriptor.nexttd;
+										ohcist.transfer_descriptor.nexttd = ohcist.hc_regs[HcDoneHead];
+										ohcist.hc_regs[HcDoneHead] = a;
+										ohcist.endpoint_descriptor.c = ohcist.transfer_descriptor.t & 1;
+										if (ohcist.transfer_descriptor.di != 7) {
+											if (ohcist.transfer_descriptor.di < ohcist.writebackdonehadcounter)
+												ohcist.writebackdonehadcounter = ohcist.transfer_descriptor.di;
+										}
+										usb_ohci_writeback_transfer_descriptor(a);
+										usb_ohci_writeback_endpoint_descriptor(plh);
+									}
+									else {
+										usb_ohci_writeback_transfer_descriptor(ohcist.endpoint_descriptor.headp);
+									}
+								} else
+								{
+									// status writeback
+									ohcist.isochronous_transfer_descriptor.cc = NoError;
+									if (done == remain)
+										b = 0;
+									ohcist.isochronous_transfer_descriptor.offset[R] = b;
+									retire = false;
+									if ((done == mps) && (done == remain)) {
+										retire = true;
+									}
+									if ((done != mps) && (done <= remain))
+										retire = true;
+									if (done == 0)
+										retire = true;
+									if (retire == true) {
+										// retire transfer descriptor
+									}
+									else {
+										usb_ohci_writeback_isochronous_transfer_descriptor(ohcist.endpoint_descriptor.headp);
+									}
+								}
+							}
+						}
+						// go to next endpoint
+						if (ohcist.endpoint_descriptor.nexted != 0)
+						{
+							plh = ohcist.endpoint_descriptor.nexted;
+						}
+						else 
+							cont = false;
 					}
 				}
 				list = -1;
@@ -789,7 +945,7 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 									}
 								}
 								// should check for time available
-								// execute transaction ohcist.endpoint_descriptor.fa
+								// execute transaction
 								done = ohcist.address[ohcist.endpoint_descriptor.fa].function->execute_transfer(ohcist.endpoint_descriptor.en, pid, ohcist.buffer, mps);
 								// if receiving ...
 								if (pid == InPid) {
@@ -905,10 +1061,6 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 								mps = ohcist.endpoint_descriptor.mps;
 								if (remain < mps)
 									mps = remain;
-								if (ohcist.transfer_descriptor.cbp == 0) {
-									remain = 0;
-									mps = 0;
-								}
 								b = ohcist.transfer_descriptor.cbp;
 								// if sending ...
 								if (pid != InPid) {
@@ -921,7 +1073,7 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 									}
 								}
 								// should check for time available
-								// execute transaction ohcist.endpoint_descriptor.fa
+								// execute transaction
 								done = ohcist.address[ohcist.endpoint_descriptor.fa].function->execute_transfer(ohcist.endpoint_descriptor.en, pid, ohcist.buffer, mps);
 								// if receiving ...
 								if (pid == InPid) {
@@ -981,7 +1133,7 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 					if ((ohcist.hc_regs[HcCommandStatus] & (1 << 1)) && (ohcist.hc_regs[HcControl] & CLE))
 						list = 1; // go to control list if enabled and filled
 					else if ((ohcist.hc_regs[HcCommandStatus] & (1 << 2)) && (ohcist.hc_regs[HcControl] & BLE))
-						list = 2; // otherwise stai in bulk list if enabled and filled
+						list = 2; // otherwise stay in bulk list if enabled and filled
 					else
 						list = 0; // if no control or bulk lists, go to periodic list
 				}
@@ -1445,11 +1597,15 @@ int ohci_function_device::execute_transfer(int endpoint, int pid, UINT8 *buffer,
 		}
 		else if (endpoints[endpoint].type == BulkEndpoint)
 			return handle_bulk_pid(endpoint, pid, buffer, size);
+		else if (endpoints[endpoint].type == InterruptEndpoint)
+			return handle_interrupt_pid(endpoint, pid, buffer, size);
+		else if (endpoints[endpoint].type == IsochronousEndpoint)
+			return handle_isochronous_pid(endpoint, pid, buffer, size);
 		else
 			return -1;
 	}
 	else if (pid == OutPid) {
-		if (endpoints[endpoint].type == ControlEndpoint) { //if (endpoint == 0) {
+		if (endpoints[endpoint].type == ControlEndpoint) {
 			// case ==1, nothing
 			// case ==0, give data
 			// if host->device, since OutPid then this is data stage
@@ -1470,6 +1626,10 @@ int ohci_function_device::execute_transfer(int endpoint, int pid, UINT8 *buffer,
 		}
 		else if (endpoints[endpoint].type == BulkEndpoint)
 			return handle_bulk_pid(endpoint, pid, buffer, size);
+		else if (endpoints[endpoint].type == InterruptEndpoint)
+			return handle_interrupt_pid(endpoint, pid, buffer, size);
+		else if (endpoints[endpoint].type == IsochronousEndpoint)
+			return handle_isochronous_pid(endpoint, pid, buffer, size);
 		else
 			return -1;
 	}
@@ -1494,22 +1654,63 @@ ohci_game_controller_device::ohci_game_controller_device(running_machine &machin
 
 int ohci_game_controller_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
-	//                              >=8  ==42  !=0  !=0  1,3       2<20 <=20
-	static const UINT8 mytestdata[16] = { 0x10,0x42 ,0x32,0x43,1   ,0x65,0x18,0x20,0x98,0xa9,0xba,0xcb,0xdc,0xed,0xfe };
+	//                                     >=8  ==42  !=0  !=0  1,3       2<20 <=20
+	static const UINT8 mytestdata1[16] = { 0x10,0x42 ,0x32,0x43,1   ,0x65,0x18,0x20,0x98,0xa9,0xba,0xcb,0xdc,0xed,0xfe };
 
 	if (endpoint != 0)
 		return -1;
 	if ((endpoints[endpoint].controltype == VendorType) && (endpoints[endpoint].controlrecipient == InterfaceRecipient))
 	{
-		if (setup->bRequest == GET_DESCRIPTOR)
+		if ((setup->bRequest == GET_DESCRIPTOR) && (setup->wValue == 0x4200))
 		{
-			if (setup->wValue == 0x4200)
-			{
-				endpoints[endpoint].position = (UINT8 *)mytestdata;
-				endpoints[endpoint].remain = 16;
-				return 0;
-			}
+			endpoints[endpoint].position = (UINT8 *)mytestdata1;
+			endpoints[endpoint].remain = 16;
+			return 0;
 		}
+	}
+	if ((endpoints[endpoint].controltype == ClassType) && (endpoints[endpoint].controlrecipient == InterfaceRecipient))
+	{
+		if ((setup->bRequest == 1) && (setup->wValue == 0x0100))
+		{
+			endpoints[endpoint].position = endpoints[endpoint].buffer;
+			endpoints[endpoint].remain = setup->wLength;
+			for (int n = 0; n < setup->wLength; n++)
+				endpoints[endpoint].buffer[n] = 0x10 ^ n;
+			endpoints[endpoint].buffer[2] = 0;
+			return 0;
+		}
+	}
+	if ((endpoints[endpoint].controltype == VendorType) && (endpoints[endpoint].controlrecipient == InterfaceRecipient))
+	{
+		if ((setup->bRequest == 1) && (setup->wValue == 0x0200))
+		{
+			endpoints[endpoint].position = endpoints[endpoint].buffer;
+			endpoints[endpoint].remain = setup->wLength;
+			for (int n = 0; n < setup->wLength; n++)
+				endpoints[endpoint].buffer[n] = 0x20 ^ n;
+			return 0;
+		}
+	}
+	if ((endpoints[endpoint].controltype == VendorType) && (endpoints[endpoint].controlrecipient == InterfaceRecipient))
+	{
+		if ((setup->bRequest == 1) && (setup->wValue == 0x0100))
+		{
+			endpoints[endpoint].position = endpoints[endpoint].buffer;
+			endpoints[endpoint].remain = setup->wLength;
+			for (int n = 0; n < setup->wLength; n++)
+				endpoints[endpoint].buffer[n] = 0x30 ^ n;
+			return 0;
+		}
+	}
+	return -1;
+}
+
+int ohci_game_controller_device::handle_interrupt_pid(int endpoint, int pid, UINT8 *buffer, int size)
+{
+	if ((endpoint == 2) && (pid == InPid)) {
+		for (int n = 0; n < size; n++)
+			buffer[n] = n;
+		return size;
 	}
 	return -1;
 }

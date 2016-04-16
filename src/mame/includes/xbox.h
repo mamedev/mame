@@ -314,6 +314,8 @@ protected:
 	virtual int handle_synch_frame_request(int endpoint, USBSetupPacket *setup) { return 0; };
 	virtual void handle_status_stage(int endpoint) { return; };
 	virtual int handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size) { return 0; };
+	virtual int handle_interrupt_pid(int endpoint, int pid, UINT8 *buffer, int size) { return 0; };
+	virtual int handle_isochronous_pid(int endpoint, int pid, UINT8 *buffer, int size) { return 0; };
 
 	void add_device_descriptor(const USBStandardDeviceDescriptor &descriptor);
 	void add_configuration_descriptor(const USBStandardConfigurationDescriptor &descriptor);
@@ -357,6 +359,7 @@ class ohci_game_controller_device : public ohci_function_device
 public:
 	ohci_game_controller_device(running_machine &machine, xbox_base_state *usb_bus_manager);
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
+	int handle_interrupt_pid(int endpoint, int pid, UINT8 *buffer, int size) override;
 private:
 	static const USBStandardDeviceDescriptor devdesc;
 	static const USBStandardConfigurationDescriptor condesc;
