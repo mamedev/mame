@@ -363,15 +363,6 @@ newoption {
 }
 
 newoption {
-	trigger = "FORCE_VERSION_COMPILE",
-	description = "Force compiling of version.c file.",
-	allowed = {
-		{ "0",   "Disabled"     },
-		{ "1",   "Enabled"      },
-	}
-}
-
-newoption {
 	trigger = "PLATFORM",
 	description = "Target machine platform (x86,arm,...)",
 }
@@ -530,14 +521,13 @@ if (_OPTIONS["SOURCES"] == nil) then
 end
 
 
-if _OPTIONS["IGNORE_GIT"]~="1" then
-	GIT_VERSION         = backtick( "git rev-parse --short HEAD" )
-	GIT_VERSION_RELEASE = backtick( "git rev-list --tags --max-count=1" )
-	GIT_VERSION_LASTONE = backtick( "git rev-list --max-count=1 HEAD" ) 
-	if (GIT_VERSION_RELEASE ~= GIT_VERSION_LASTONE) then
-	defines {
-		"GIT_VERSION=" .. GIT_VERSION,
-	}
+if _OPTIONS["IGNORE_GIT"]~="1" then	
+	GIT_VERSION = backtick( "git describe" )
+	local p = string.find(GIT_VERSION, '-', 1)
+	if (p~=nil) then
+		defines {
+			"GIT_VERSION=" .. string.sub(GIT_VERSION,p+1)
+		}
 	end
 end
 

@@ -876,6 +876,17 @@ ifeq ($(wildcard .git/*),)
 PARAMS += --IGNORE_GIT='1'
 endif
 
+ifeq ($(GIT_AVAILABLE),git)
+NEW_GIT_VERSION := $(shell git describe)
+OLD_GIT_VERSION := $(shell cat .mame_version)
+
+ifneq ($(NEW_GIT_VERSION),$(OLD_GIT_VERSION))
+$(shell git describe > .mame_version)
+$(shell touch $(SRC)/version.cpp)
+endif
+endif
+
+
 GENIE := 3rdparty/genie/bin/$(GENIEOS)/genie$(EXE)
 
 ifeq ($(TARGET),$(SUBTARGET))
