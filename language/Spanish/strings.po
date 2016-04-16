@@ -408,7 +408,7 @@ msgstr "Puntuación MAME"
 
 #: src/emu/ui/datmenu.cpp:294 src/emu/ui/selgame.cpp:44
 msgid "Gameinit"
-msgstr ""
+msgstr "Inicio de partida"
 
 #: src/emu/ui/datmenu.cpp:296 src/emu/ui/selgame.cpp:43
 msgid "Command"
@@ -757,7 +757,7 @@ msgstr "Truco"
 
 #: src/emu/ui/mainmenu.cpp:135
 msgid "Plugin Options"
-msgstr ""
+msgstr "Configuración del plugin"
 
 #: src/emu/ui/mainmenu.cpp:139
 msgid "External DAT View"
@@ -895,15 +895,15 @@ msgstr "%s.txt guardado en la carpeta «ui»."
 
 #: src/emu/ui/miscmenu.cpp:677
 msgid "Export list in XML format (like -listxml)"
-msgstr ""
+msgstr "Exportar lista en formato XML (igual que -listxml)"
 
 #: src/emu/ui/miscmenu.cpp:678
 msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr ""
+msgstr "Exportar lista en formato XML (igual que -listxml, pero excluyendo los dispositivos)"
 
 #: src/emu/ui/miscmenu.cpp:679
 msgid "Export list in TXT format (like -listfull)"
-msgstr ""
+msgstr "Exportar lista en formato TXT (igual que -listfull)"
 
 #: src/emu/ui/miscmenu.cpp:729 src/emu/ui/optsmenu.cpp:376
 msgid ""
@@ -929,7 +929,7 @@ msgstr "Guardar ajustes de máquina"
 
 #: src/emu/ui/miscmenu.cpp:806
 msgid "Configure machine:"
-msgstr ""
+msgstr "Configurar máquina:"
 
 #: src/emu/ui/miscmenu.cpp:868 src/emu/ui/selsoft.cpp:109
 msgid " (default)"
@@ -1029,6 +1029,10 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"Falta la máquina seleccionada o una o más de sus ROMs o imágenes CHD. "
+"Por favor, elige otra máquina.\n"
+"\n"
+"Pulsa cualquier tecla para continuar."
 
 #: src/emu/ui/selgame.cpp:595 src/emu/ui/simpleselgame.cpp:265
 msgid "Configure Options"
@@ -1307,11 +1311,15 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"Al software elegido le falta uno o varios archivos necesarios. Por favor, "
+"elige otro software.\n"
+"\n"
+"Pulsa cualquier tecla para continuar."
 
 #: src/emu/ui/selsoft.cpp:683
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr ""
+msgstr "%1$s %2$s ( %3$d / %4$d paquetes de software )"
 
 #: src/emu/ui/selsoft.cpp:684
 #, c-format
@@ -1610,6 +1618,9 @@ msgid ""
 "\n"
 "Press any key to continue"
 msgstr ""
+"\n"
+"\n"
+"Pulsa cualquier tecla para continuar"
 
 #: src/emu/ui/ui.cpp:1182
 #, c-format
