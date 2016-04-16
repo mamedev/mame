@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Joakim Larsson Edstrom
 /***************************************************************************
+ * Interrupt scheme and dmac hookup shamelessly based on esq5505.cpp 
  *
  *  11/04/2016
  *  Force SYS68K ISCSI-1 driver - This driver will be converted into a slot device once the VME bus driver exists.
@@ -39,19 +40,19 @@
  * ----------------------------------------------------------
  *
  *  TODO:
- *  - Write and attach a 68450 DMA device
  *  - Write and attach a NCR5386S SCSI device
  *  - Find a floppy image and present it to the WD1772 floppy controller
  *  - Add VME bus driver
  *  - Let a controller CPU board (eg CPU-1 or CPU-30) boot from floppy or SCSI disk
  *
  ****************************************************************************/
-#define TODO "Drivers for SCSI NCR5386s and DMA Motorola 68450 devices needed\n"
+#define TODO "Driver for SCSI NCR5386s device needed\n"
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68230pit.h"
 #include "machine/wd_fdc.h"
+#include "machine/hd63450.h" // compatible with MC68450
 #include "machine/clock.h"
 
 #define VERBOSE 0
@@ -80,45 +81,64 @@ fcscsi1_state(const machine_config &mconfig, device_type type, const char *tag) 
 		m_maincpu (*this, "maincpu")
 		,m_fdc (*this, "fdc")
 		,m_pit (*this, "pit")
+		,m_dmac(*this, "mc68450")
 		,m_tcr (0)
 {
 }
+	DECLARE_READ16_MEMBER (bootvect_r);
+	DECLARE_READ8_MEMBER (tcr_r);
+	DECLARE_WRITE8_MEMBER (tcr_w);
 
-DECLARE_READ16_MEMBER (bootvect_r);
-DECLARE_READ8_MEMBER (tcr_r);
-DECLARE_WRITE8_MEMBER (tcr_w);
+	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
 
-/* Dummy driver routines */
-DECLARE_READ8_MEMBER (not_implemented_r);
-DECLARE_WRITE8_MEMBER (not_implemented_w);
+	//dmac
+	DECLARE_WRITE8_MEMBER(dma_end);
+	DECLARE_WRITE8_MEMBER(dma_error);
 
-virtual void machine_start () override;
+	//fdc
+	DECLARE_WRITE8_MEMBER(fdc_irq);
+	DECLARE_READ8_MEMBER(fdc_read_byte);
+	DECLARE_WRITE8_MEMBER(fdc_write_byte);
+
+	/* Dummy driver routines */
+	DECLARE_READ8_MEMBER (not_implemented_r);
+	DECLARE_WRITE8_MEMBER (not_implemented_w);
+
+	UINT8 fdc_irq_state;
+	UINT8 dmac_irq_state;
+	int dmac_irq_vector;
+
+	virtual void machine_start () override;
+	void update_irq_to_maincpu();
 
 protected:
 
 private:
-required_device<cpu_device> m_maincpu;
-required_device<wd1772_t> m_fdc;
-required_device<pit68230_device> m_pit;
+	required_device<cpu_device> m_maincpu;
+	required_device<wd1772_t> m_fdc;
+	required_device<pit68230_device> m_pit;
+	required_device<hd63450_device> m_dmac;
 
-UINT8 m_tcr;
-// Pointer to System ROMs needed by bootvect_r
-UINT16  *m_sysrom;
+
+	UINT8 m_tcr;
+
+	// Pointer to System ROMs needed by bootvect_r
+	UINT16  *m_sysrom;
 };
 
 static ADDRESS_MAP_START (fcscsi1_mem, AS_PROGRAM, 16, fcscsi1_state)
-ADDRESS_MAP_UNMAP_HIGH
-AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ (bootvect_r)       /* Vectors mapped from System EPROM */
-AM_RANGE (0x000008, 0x001fff) AM_RAM /* SRAM */
-AM_RANGE (0x002000, 0x01ffff) AM_RAM /* Dual Ported RAM */
-AM_RANGE (0xe00000, 0xe7ffff) AM_ROM /* System EPROM Area 32Kb DEBUGGER supplied */
-AM_RANGE (0xd00000, 0xd0003f) AM_DEVREADWRITE8 ("pit", pit68230_device, read, write, 0x00ff)
-//AM_RANGE (0xc40000, 0xc4001f) AM_DEVREADWRITE8("scsi", ncr5386s_t, read, write, 0x00ff) /* SCSI Controller interface - device support not yet available*/
-//AM_RANGE (0xc80000, 0xc800ff) AM_DEVREADWRITE8("dma", m68450_t, read, write, 0x00ff)    /* DMA Controller interface - device support not yet available */
-AM_RANGE (0xc40000, 0xc800ff) AM_READWRITE8 (not_implemented_r, not_implemented_w, 0xffff)  /* Dummy mapping af address area to display message */
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ (bootvect_r)       /* Vectors mapped from System EPROM */
+	AM_RANGE (0x000008, 0x001fff) AM_RAM /* SRAM */
+	AM_RANGE (0x002000, 0x01ffff) AM_RAM /* Dual Ported RAM */
+	AM_RANGE (0xe00000, 0xe7ffff) AM_ROM /* System EPROM Area 32Kb DEBUGGER supplied */
+	AM_RANGE (0xd00000, 0xd0003f) AM_DEVREADWRITE8 ("pit", pit68230_device, read, write, 0x00ff)
+	//AM_RANGE (0xc40000, 0xc4001f) AM_DEVREADWRITE8("scsi", ncr5386s_t, read, write, 0x00ff) /* SCSI Controller interface - device support not yet available*/
+	AM_RANGE (0xc80000, 0xc800ff) AM_DEVREADWRITE("mc68450", hd63450_device, read, write)  /* DMA Controller interface */
+	AM_RANGE (0xc40000, 0xc800ff) AM_READWRITE8 (not_implemented_r, not_implemented_w, 0xffff)  /* Dummy mapping af address area to display message */
 
-AM_RANGE (0xcc0000, 0xcc0007) AM_DEVREADWRITE8("fdc", wd1772_t, read, write, 0x00ff)      /* Floppy Controller interface */
-AM_RANGE (0xcc0008, 0xcc0009) AM_READWRITE8 (tcr_r, tcr_w, 0x00ff) /* The Control Register, SCSI ID and FD drive select bits */
+	AM_RANGE (0xcc0000, 0xcc0007) AM_DEVREADWRITE8("fdc", wd1772_t, read, write, 0x00ff)      /* Floppy Controller interface */
+	AM_RANGE (0xcc0008, 0xcc0009) AM_READWRITE8 (tcr_r, tcr_w, 0x00ff) /* The Control Register, SCSI ID and FD drive select bits */
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -163,6 +183,60 @@ WRITE8_MEMBER (fcscsi1_state::tcr_w){
 	return;
 }
 
+WRITE8_MEMBER(fcscsi1_state::dma_end)
+{
+	if (data != 0)
+	{
+		dmac_irq_state = 1;
+		dmac_irq_vector = m_dmac->get_vector(offset);
+	}
+	else
+	{
+		dmac_irq_state = 0;
+	}
+
+	update_irq_to_maincpu();
+}
+
+WRITE8_MEMBER(fcscsi1_state::dma_error)
+{
+	if(data != 0)
+	{
+		logerror("DMAC error, vector = %x\n", m_dmac->get_error_vector(offset));
+		dmac_irq_state = 1;
+		dmac_irq_vector = m_dmac->get_vector(offset);
+	}
+	else
+	{
+		dmac_irq_state = 0;
+	}
+
+	update_irq_to_maincpu();
+}
+
+WRITE8_MEMBER(fcscsi1_state::fdc_irq)
+{
+	if (data != 0)
+	{
+		fdc_irq_state = 1;
+	}
+	else
+	{
+		fdc_irq_state = 0;
+	}
+	update_irq_to_maincpu();
+}
+
+READ8_MEMBER(fcscsi1_state::fdc_read_byte)
+{
+	return m_fdc->data_r();
+}
+
+WRITE8_MEMBER(fcscsi1_state::fdc_write_byte)
+{
+	m_fdc->data_w(data & 0xff);
+}
+
 READ8_MEMBER (fcscsi1_state::not_implemented_r){
 	static int been_here = 0;
 	if (!been_here++){
@@ -180,28 +254,104 @@ WRITE8_MEMBER (fcscsi1_state::not_implemented_w){
 	}
 	return;
 }
+
+/*
+----------------------------------------------------
+ IRQ  IRQ 
+Level Source       B4l inserted     B4l removed (Def)
+-----------------------------------------------------
+ 1     P3 Pin #13   AV1 Autovector   AV1 Autovector
+ 2     DMAC         DMAC             AV2 Autovector
+ 3     SCSIBC       AV3 Autovector   AV3 Autovector
+ 4     FDC          AV4 Autovector   AV4 Autovector
+ 5     PI/T Timer   PI/T Timer Vect  PI/T Timer Vect
+ 6     --           --               --           
+ 7     PI/T Port    PI/T Port Vect   PI/T Port Vect
+------------------------------------------------------
+Default configuration: B41 jumper removed 
+
+The PI/T port interrupt can be used under software control to
+cause non-maskable (Level 7) interrupts if the watchdog timer
+elapses and/or if the VMEbus interrupt trigger call occurs.
+*/
+
+/* TODO: Add configurable B41 jumper */
+#define B41 0
+
+void fcscsi1_state::update_irq_to_maincpu() {
+	if (fdc_irq_state) {
+		m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+	} else if (dmac_irq_state) {
+		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+#if B41 == 1
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, dmac_irq_vector);
+#else
+		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
+#endif
+	} else {
+		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+	}
+}
+
+IRQ_CALLBACK_MEMBER(fcscsi1_state::maincpu_irq_acknowledge_callback)
+{
+	// We immediately update the interrupt presented to the CPU, so that it doesn't
+	// end up retrying the same interrupt over and over. We then return the appropriate vector.
+	int vector = 0;
+	switch(irqline) {
+	case 2:
+		dmac_irq_state = 0;
+		vector = dmac_irq_vector;
+		break;
+	default:
+		logerror("\nUnexpected IRQ ACK Callback: IRQ %d\n", irqline);
+		return 0;
+	}
+	update_irq_to_maincpu();
+	return vector;
+}
+
 /*
  * Machine configuration
  */
 static MACHINE_CONFIG_START (fcscsi1, fcscsi1_state)
-/* basic machine hardware */
-MCFG_CPU_ADD ("maincpu", M68010, CPU_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
-MCFG_CPU_PROGRAM_MAP (fcscsi1_mem)
+	/* basic machine hardware */
+	MCFG_CPU_ADD ("maincpu", M68010, CPU_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
+	MCFG_CPU_PROGRAM_MAP (fcscsi1_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fcscsi1_state, maincpu_irq_acknowledge_callback)
 
-/* FDC  */
-MCFG_WD1772_ADD("fdc", CPU_CRYSTAL / 2) /* Same clock divider as for the CPU */
+	/* FDC  */
+	MCFG_WD1772_ADD("fdc", CPU_CRYSTAL / 2) /* Same clock divider as for the CPU */
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(fcscsi1_state, fdc_irq))
 
-/* PIT Parallel Interface and Timer device */
-MCFG_DEVICE_ADD ("pit", PIT68230, PIT_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
+	/* PIT Parallel Interface and Timer device */
+	MCFG_DEVICE_ADD ("pit", PIT68230, PIT_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
+
+	/* DMAC it is really a M68450 but the HD63850 is upwards compatible */
+	MCFG_DEVICE_ADD("mc68450", HD63450, 0)   // MC68450 compatible
+	MCFG_HD63450_CPU("maincpu") // CPU - 68010
+	MCFG_HD63450_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2))
+	MCFG_HD63450_BURST_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50))
+	MCFG_HD63450_DMA_END_CB(WRITE8(fcscsi1_state, dma_end))
+	MCFG_HD63450_DMA_ERROR_CB(WRITE8(fcscsi1_state, dma_error))
+	//MCFG_HD63450_DMA_READ_0_CB(READ8(fcscsi1_state, scsi_read_byte))  // ch 0 = SCSI
+	//MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(fcscsi1_state, scsi_write_byte))
+	MCFG_HD63450_DMA_READ_1_CB(READ8(fcscsi1_state, fdc_read_byte))  // ch 1 = fdc
+	MCFG_HD63450_DMA_WRITE_1_CB(WRITE8(fcscsi1_state, fdc_write_byte))
 MACHINE_CONFIG_END
 
 /* ROM definitions */
 ROM_START (fcscsi1)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 
-/* Besta ROM:s */
-ROM_LOAD16_BYTE ("besta88_scsi_lower.ROM", 0xe00001, 0x4000, CRC (fb3ab364) SHA1 (d79112100f1c4beaf358e006efd4dde5e300b0ba))
-ROM_LOAD16_BYTE ("besta88_scsi_upper.ROM", 0xe00000, 0x4000, CRC (41f9cdf4) SHA1 (66b998bbf9459f0a613718260e05e97749532073))
+	/* Besta ROM:s */
+	ROM_LOAD16_BYTE ("besta88_scsi_lower.ROM", 0xe00001, 0x4000, CRC (fb3ab364) SHA1 (d79112100f1c4beaf358e006efd4dde5e300b0ba))
+	ROM_LOAD16_BYTE ("besta88_scsi_upper.ROM", 0xe00000, 0x4000, CRC (41f9cdf4) SHA1 (66b998bbf9459f0a613718260e05e97749532073))
 ROM_END
 
 /* Driver */
