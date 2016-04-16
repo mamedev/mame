@@ -679,7 +679,7 @@ NETLIB_UPDATE(solver)
 				if (m_mat_solvers[i]->is_timestep())
 				{
 					// Ignore return value
-					ATTR_UNUSED const nl_double ts = m_mat_solvers[i]->solve();
+					ATTR_UNUSED const netlist_time ts = m_mat_solvers[i]->solve();
 				}
 		}
 	}
@@ -688,7 +688,7 @@ NETLIB_UPDATE(solver)
 			if (m_mat_solvers[i]->is_timestep())
 			{
 				// Ignore return value
-				ATTR_UNUSED const nl_double ts = m_mat_solvers[i]->solve();
+				ATTR_UNUSED const netlist_time ts = m_mat_solvers[i]->solve();
 			}
 #else
 	for (auto & solver : m_mat_solvers)
