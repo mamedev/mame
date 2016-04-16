@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-15 17:42+0200\n"
-"PO-Revision-Date: 2016-04-11 09:57+0200\n"
+"PO-Revision-Date: 2016-04-15 21:04+0200\n"
 "Last-Translator: Lothar Serra Mari <scummvm@rootfather.de>\n"
 "Language-Team: MAME Language Team\n"
 "Language: de\n"
@@ -893,15 +893,16 @@ msgstr "%s.txt im Ordner der Benutzeroberfläche gespeichert."
 
 #: src/emu/ui/miscmenu.cpp:677
 msgid "Export list in XML format (like -listxml)"
-msgstr ""
+msgstr "Liste im XML-Format exportieren (wie -listxml)"
 
 #: src/emu/ui/miscmenu.cpp:678
 msgid "Export list in XML format (like -listxml, but exclude devices)"
 msgstr ""
+"Liste im XML-Format exportieren (wie -listxml, Geräte jedoch ausschließen)"
 
 #: src/emu/ui/miscmenu.cpp:679
 msgid "Export list in TXT format (like -listfull)"
-msgstr ""
+msgstr "Liste im TXT-Format exportieren (wie -listfull)"
 
 #: src/emu/ui/miscmenu.cpp:729 src/emu/ui/optsmenu.cpp:376
 msgid ""
@@ -915,11 +916,11 @@ msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:774
 msgid "Bios"
-msgstr ""
+msgstr "BIOS"
 
 #: src/emu/ui/miscmenu.cpp:776
 msgid "Driver"
-msgstr ""
+msgstr "Treiber"
 
 #: src/emu/ui/miscmenu.cpp:790
 msgid "Save machine configuration"
@@ -927,7 +928,7 @@ msgstr "Konfiguration der Maschine speichern"
 
 #: src/emu/ui/miscmenu.cpp:806
 msgid "Configure machine:"
-msgstr ""
+msgstr "Maschine konfigurieren:"
 
 #: src/emu/ui/miscmenu.cpp:868 src/emu/ui/selsoft.cpp:109
 msgid " (default)"
@@ -1317,7 +1318,7 @@ msgstr ""
 #: src/emu/ui/selsoft.cpp:683
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr ""
+msgstr "%1$s %2$s ( %3$d / %4$d Programm-Pakete )"
 
 #: src/emu/ui/selsoft.cpp:684
 #, c-format
