@@ -878,8 +878,11 @@ endif
 
 ifeq ($(GIT_AVAILABLE),git)
 NEW_GIT_VERSION := $(shell git describe)
-OLD_GIT_VERSION := $(shell cat .mame_version)
-
+ifeq (posix,$(SHELLTYPE))
+OLD_GIT_VERSION := $(shell cat .mame_version 2> /dev/null)
+else
+OLD_GIT_VERSION := $(shell cat .mame_version 2> NUL)
+endif
 ifneq ($(NEW_GIT_VERSION),$(OLD_GIT_VERSION))
 $(shell git describe > .mame_version)
 $(shell touch $(SRC)/version.cpp)
