@@ -23,8 +23,8 @@ const device_type TMS1070 = &device_creator<tms1070_cpu_device>; // high voltage
 const device_type TMS1040 = &device_creator<tms1040_cpu_device>; // same as TMS1070 with just a different pinout?
 const device_type TMS1200 = &device_creator<tms1200_cpu_device>; // 40-pin DIP, 13 R pins
 // TMS1270 has 10 O pins, how does that work?
-const device_type TMS1700 = &device_creator<tms1000_cpu_device>; // 28-pin DIP, RAM/ROM size halved, 9 R pins
-const device_type TMS1730 = &device_creator<tms1000_cpu_device>; // 20-pin DIP, same die as TMS1700, package has less pins: 6 R pins, 5 O pins(output PLA is still 8-bit, O1,O3,O5 unused)
+const device_type TMS1700 = &device_creator<tms1700_cpu_device>; // 28-pin DIP, RAM/ROM size halved, 9 R pins
+const device_type TMS1730 = &device_creator<tms1730_cpu_device>; // 20-pin DIP, same die as TMS1700, package has less pins: 6 R pins, 5 O pins(output PLA is still 8-bit, O1,O3,O5 unused)
 
 
 // internal memory maps
