@@ -236,6 +236,7 @@ int renderer_bgfx::create()
 //  renderer_bgfx::record
 //============================================================
 
+#ifndef OSD_SDL
 void renderer_bgfx::record()
 {
 	std::string filename("test.avi");//m_options.d3d_hlsl_write());
@@ -249,6 +250,7 @@ void renderer_bgfx::record()
 		begin_avi_recording(filename);
 	}
 }
+#endif
 
 void renderer_bgfx::end_avi_recording()
 {
