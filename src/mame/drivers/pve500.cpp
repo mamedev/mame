@@ -102,7 +102,6 @@ WRITE_LINE_MEMBER( pve500_state::external_monitor_w )
 
 static const z80_daisy_config maincpu_daisy_chain[] =
 {
-	TMPZ84C015_DAISY_INTERNAL,
 	{ "external_ctc" },
 	{ "external_sio" },
 	{ nullptr }
