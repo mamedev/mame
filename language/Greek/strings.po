@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-15 17:42+0200\n"
-"PO-Revision-Date: 2016-03-28 15:32+0300\n"
+"PO-Revision-Date: 2016-04-16 17:53+0300\n"
 "Last-Translator: Mame.gr\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -753,7 +753,7 @@ msgstr "Cheat"
 
 #: src/emu/ui/mainmenu.cpp:135
 msgid "Plugin Options"
-msgstr ""
+msgstr "Επιλογές Πρόσθετων"
 
 #: src/emu/ui/mainmenu.cpp:139
 msgid "External DAT View"
@@ -891,15 +891,15 @@ msgstr "%s.txt αποθηκεύτηκε στο φάκελο ui."
 
 #: src/emu/ui/miscmenu.cpp:677
 msgid "Export list in XML format (like -listxml)"
-msgstr ""
+msgstr "Εξαγωγή σε μορφή XML (όπως -listxml)"
 
 #: src/emu/ui/miscmenu.cpp:678
 msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr ""
+msgstr "Εξαγωγή σε μορφή XML (όπως -listxml, χωρίς τις συσκευές)"
 
 #: src/emu/ui/miscmenu.cpp:679
 msgid "Export list in TXT format (like -listfull)"
-msgstr ""
+msgstr "Εξαγωγή σε μορφή TXT(όπως -listfull)"
 
 #: src/emu/ui/miscmenu.cpp:729 src/emu/ui/optsmenu.cpp:376
 msgid ""
@@ -913,11 +913,11 @@ msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:774
 msgid "Bios"
-msgstr ""
+msgstr "Bios"
 
 #: src/emu/ui/miscmenu.cpp:776
 msgid "Driver"
-msgstr ""
+msgstr "Οδηγός"
 
 #: src/emu/ui/miscmenu.cpp:790
 msgid "Save machine configuration"
@@ -925,7 +925,7 @@ msgstr "Αποθήκευση παραμετροποίησης μηχανήματ
 
 #: src/emu/ui/miscmenu.cpp:806
 msgid "Configure machine:"
-msgstr ""
+msgstr "Ρύθμιση μηχανήματος:"
 
 #: src/emu/ui/miscmenu.cpp:868 src/emu/ui/selsoft.cpp:109
 msgid " (default)"
@@ -1025,6 +1025,10 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"Στο επιλεγμένο μηχάνημα λείπουν μία ή περισσότερες απαιτούμενες ROMs ή "
+"αρχεία CHD. Παρακαλούμε επιλέξτε ένα άλλο μηχάνημα.\n"
+"\n"
+"Πιέστε ένα πλήκτρο για να συνεχίσετε."
 
 #: src/emu/ui/selgame.cpp:595 src/emu/ui/simpleselgame.cpp:265
 msgid "Configure Options"
@@ -1032,7 +1036,7 @@ msgstr "Ρύθμιση Επιλογών"
 
 #: src/emu/ui/selgame.cpp:596
 msgid "Configure Machine"
-msgstr ""
+msgstr "Ρύθμιση Μηχανήματος"
 
 #: src/emu/ui/selgame.cpp:758
 #, c-format
@@ -1303,11 +1307,15 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"Στο επιλεγμένο λογισμικό λείπει ένα ή περισσότερα απαιτούμενα αρχεία. "
+"Παρακαλώ επιλέξτε ένα διαφορετικό λογισμικό.\n"
+"\n"
+"Πιέστε ένα πλήκτρο για να συνεχίσετε."
 
 #: src/emu/ui/selsoft.cpp:683
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr ""
+msgstr "%1$s %2$s ( %3$d / %4$d πακέτα λογισμικού)"
 
 #: src/emu/ui/selsoft.cpp:684
 #, c-format
@@ -1954,133 +1962,3 @@ msgstr " ΧΡΩΜΑΤΑ"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " ΓΡΑΦΙΔΕΣ"
-
-#~ msgid "Export XML format (like -listxml)"
-#~ msgstr "Εξαγωγή σε μορφή XML (όπως -listxml)"
-
-#~ msgid "Export TXT format (like -listfull)"
-#~ msgstr "Εξαγωγή σε μορφή XML TXT(όπως -listfull)"
-
-#~ msgid "Dummy"
-#~ msgstr "Dummy"
-
-#~ msgid "%1$s %2$s ( %3$d / %4$d softwares )"
-#~ msgstr "%1$s %2$s ( %3$d / %4$d λογισμικό )"
-
-#~ msgid "Lightgun Device Assignment"
-#~ msgstr "Ανάθεση συσκευής Lightgun"
-
-#~ msgid "Trackball Device Assignment"
-#~ msgstr "Ανάθεση συσκευής Trackball"
-
-#~ msgid "Pedal Device Assignment"
-#~ msgstr "Ανάθεση συσκευής Pedal"
-
-#~ msgid "Adstick Device Assignment"
-#~ msgstr "Ανάθεση συσκευής Adstick"
-
-#~ msgid "Paddle Device Assignment"
-#~ msgstr "Ανάθεση συσκευής Paddle"
-
-#~ msgid "Dial Device Assignment"
-#~ msgstr "Ανάθεση συσκευής Dial"
-
-#~ msgid "Positional Device Assignment"
-#~ msgstr "Ανάθεση συσκευής θέσης"
-
-#~ msgid "Mouse Device Assignment"
-#~ msgstr "Ανάθεση συσκευής Ποντικιού"
-
-#~ msgid "Device Mapping"
-#~ msgstr "Αντιστοίχιση Συσκευής"
-
-#~ msgid "Video Mode"
-#~ msgstr "Λειτουργία Βίντεο"
-
-#~ msgid "Triple Buffering"
-#~ msgstr "Triple Buffering"
-
-#~ msgid "HLSL"
-#~ msgstr "HLSL"
-
-#~ msgid "GLSL"
-#~ msgstr "GLSL"
-
-#~ msgid "Bilinear Filtering"
-#~ msgstr "Bilinear Filtering"
-
-#~ msgid "Bitmap Prescaling"
-#~ msgstr "Bitmap Prescaling"
-
-#~ msgid "Window Mode"
-#~ msgstr "Λειτουργία Παραθύρου"
-
-#~ msgid "Enforce Aspect Ratio"
-#~ msgstr "Επιβολή Αναλογίας Εικόνας"
-
-#~ msgid "Start Out Maximized"
-#~ msgstr "Εκκίνηση Μεγιστοποιημένο"
-
-#~ msgid "Synchronized Refresh"
-#~ msgstr "Συγχρονισμένη Ανανέωση"
-
-#~ msgid "Wait Vertical Sync"
-#~ msgstr "Αναμονή για Κάθετο Συγχρονισμό"
-
-#~ msgid "Display Options"
-#~ msgstr "Επιλογές Γραφικών"
-
-#~ msgid ""
-#~ "The selected machine is missing one or more required ROM or CHD images. "
-#~ "Please select a different machine.\n"
-#~ "\n"
-#~ "Press any key (except ESC) to continue."
-#~ msgstr ""
-#~ "Στο επιλεγμένο μηχάνημα λείπει μία ή περισσότερες ROMs ή εικόνες CHD. "
-#~ "Παρακαλούμε επιλέξτε ένα άλλο μηχάνημα.\n"
-#~ "\n"
-#~ "Πιέστε οποιοδήποτε πλήκτρο (εκτός από το ESC) για να συνεχίσετε."
-
-#~ msgid ""
-#~ "The selected software is missing one or more required files. Please "
-#~ "select a different software.\n"
-#~ "\n"
-#~ "Press any key (except ESC) to continue."
-#~ msgstr ""
-#~ "Στο επιλεγμένο λογισμικό λείπει μία ή περισσότερες ROMs ή εικόνες CHD. "
-#~ "Παρακαλούμε επιλέξτε ένα άλλο λογισμικό.\n"
-#~ "\n"
-#~ "Πιέστε οποιοδήποτε πλήκτρο (εκτός από το ESC) για να συνεχίσετε."
-
-#~ msgid "Re-select last machine played"
-#~ msgstr "Επιλογή του τελευταίου μηχανήματος που έπαιζε"
-
-#~ msgid "Enlarge images in the right panel"
-#~ msgstr "Μεγέθυνση εικόνων στο δεξιό πίνακα"
-
-#~ msgid "DATs info"
-#~ msgstr "Πληροφορίες DATs"
-
-#~ msgid "Show mouse pointer"
-#~ msgstr "Εμφάνιση δείκτη ποντικιού"
-
-#~ msgid "Confirm quit from machines"
-#~ msgstr "Επιβεβαίωση εγκατάληψης από μηχάνημα"
-
-#~ msgid "Skip displaying information's screen at startup"
-#~ msgstr "Να μην εμφανίζεται η οθόνη πληροφοριών κατά την εκκίνηση"
-
-#~ msgid "Force 4:3 appearance for software snapshot"
-#~ msgstr "Επιβολή 4:3 Εμφάνισης για το στιγμιότυπο"
-
-#~ msgid "Use image as background"
-#~ msgstr "Χρήση εικόνας ως φόντου"
-
-#~ msgid "Skip bios selection menu"
-#~ msgstr "Παράλειψη μενού επιλογής bios"
-
-#~ msgid "Skip software parts selection menu"
-#~ msgstr "Παράλειψη μενού επιλογής τμημάτων λογισμικού"
-
-#~ msgid "Miscellaneous Options"
-#~ msgstr "Διάφορες Επιλογές"
