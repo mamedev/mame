@@ -53,8 +53,6 @@
 #include <X11/Xutil.h>
 #endif
 
-#include "watchdog.h"
-
 //============================================================
 //  OPTIONS
 //============================================================
@@ -250,7 +248,7 @@ static void output_oslog(const running_machine &machine, const char *buffer)
 //============================================================
 
 sdl_osd_interface::sdl_osd_interface(sdl_options &options)
-: osd_common_t(options), m_options(options), m_watchdog(nullptr)
+: osd_common_t(options), m_options(options)
 {
 }
 
@@ -505,15 +503,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	if (options().oslog())
 		machine.add_logerror_callback(output_oslog);
 
-	/* now setup watchdog */
 
-	int watchdog_timeout = options().watchdog();
-
-	if (watchdog_timeout != 0)
-	{
-		m_watchdog = auto_alloc(machine, watchdog);
-		m_watchdog->setTimeout(watchdog_timeout);
-	}
 
 #ifdef SDLMAME_EMSCRIPTEN
 	SDL_EventState(SDL_TEXTINPUT, SDL_FALSE);

@@ -415,7 +415,7 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 			if (first_entry)
 				first_entry = false;
 			else
-				item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+				item_append(ui_menu_item_type::SEPARATOR);
 			item_append(string_format("[root%s]", item->owner_name).c_str(), nullptr, 0, nullptr);
 			prev_owner.assign(item->owner_name);
 		}
@@ -565,7 +565,7 @@ void ui_menu_settings::populate()
 					if (first_entry)
 						first_entry = false;
 					else
-						item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+						item_append(ui_menu_item_type::SEPARATOR);
 					string_format("[root%s]", field.device().tag());
 					item_append(string_format("[root%s]", field.device().tag()).c_str(), nullptr, 0, nullptr);
 					prev_owner.assign(field.device().tag());
@@ -618,7 +618,7 @@ void ui_menu_settings::populate()
 	if (type == IPT_DIPSWITCH)
 		custombottom = dipcount ? dipcount * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) + DIP_SWITCH_SPACING : 0;
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	item_append(_("Reset"),  nullptr, 0, (void *)1);
 }
 
@@ -862,7 +862,7 @@ void ui_menu_analog::populate()
 							if (first_entry)
 								first_entry = false;
 							else
-								item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+								item_append(ui_menu_item_type::SEPARATOR);
 							item_append(string_format("[root%s]", field.device().tag()).c_str(), nullptr, 0, nullptr);
 							prev_owner.assign(field.device().tag());
 						}

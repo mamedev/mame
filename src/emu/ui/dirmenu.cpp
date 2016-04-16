@@ -99,7 +99,7 @@ void ui_menu_directory::populate()
 	for (auto & elem : s_folders)
 		item_append(_(elem.name), nullptr, 0, (void *)(FPTR)elem.action);
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
@@ -197,7 +197,7 @@ void ui_menu_display_actual::populate()
 	if (m_folders.size() > 1)
 		item_append(_("Remove Folder"), nullptr, 0, (void *)REMOVE);
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	customtop = (m_folders.size() + 1) * machine().ui().get_line_height() + 6.0f * UI_BOX_TB_BORDER;
 }
 
@@ -475,7 +475,7 @@ void ui_menu_add_change_folder::populate()
 			item_append(dirent->name, "[DIR]", 0, (void *)(FPTR)++folders_count);
 	}
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 
 	// configure the custom rendering
 	customtop = 2.0f * machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
@@ -625,7 +625,7 @@ void ui_menu_remove_folder::populate()
 	for (auto & elem : m_folders)
 		item_append(elem.c_str(), nullptr, 0, (void *)(FPTR)++folders_count);
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 

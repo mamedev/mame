@@ -14,6 +14,7 @@
 #define MAME_OSD_LIB_OSDOBJ_COMMON_H
 
 #include "osdepend.h"
+#include "watchdog.h"
 #include "modules/osdmodule.h"
 #include "modules/font/font_module.h"
 #include "modules/input/input_module.h"
@@ -273,14 +274,15 @@ private:
 	}
 
 protected:
-	sound_module* m_sound;
-	debug_module* m_debugger;
-	midi_module* m_midi;
-	input_module* m_keyboard_input;
-	input_module* m_mouse_input;
-	input_module* m_lightgun_input;
-	input_module* m_joystick_input;
+	sound_module*  m_sound;
+	debug_module*  m_debugger;
+	midi_module*   m_midi;
+	input_module*  m_keyboard_input;
+	input_module*  m_mouse_input;
+	input_module*  m_lightgun_input;
+	input_module*  m_joystick_input;
 	output_module* m_output;
+	std::unique_ptr<osd_watchdog> m_watchdog;
 	std::vector<ui_menu_item> m_sliders;
 
 private:

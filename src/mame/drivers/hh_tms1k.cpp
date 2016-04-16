@@ -45,7 +45,7 @@
  *MP2139   TMS1370?  1982, Gakken Galaxy Invader 1000
  @MP2726   TMS1040   1979, Tomy Break Up
  *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
- *MP3005   TMS1000?  1989, Tiger Copy Cat (model 7-522)
+ @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
  *MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A or B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (model 4850)
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
@@ -4995,7 +4995,6 @@ WRITE16_MEMBER(copycat_state::write_o)
 {
 	// O0,O1: speaker out
 	// O2,O7: N/C, O3-O6: tied together but unused
-	m_o = data;
 	m_speaker->level_w(data & 3);
 }
 
@@ -5045,6 +5044,74 @@ static MACHINE_CONFIG_START( copycat, copycat_state )
 	MCFG_TMS1XXX_READ_K_CB(READ8(copycat_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(copycat_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(copycat_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_copycat)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, copycat_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Tiger Electronics Copy Cat (model 7-522)
+  * PCB label WS 8107-1
+  * TMS1730 MCU, label MP3005N (die label 1700 MP3005)
+  * 4 LEDs, 1-bit sound
+
+***************************************************************************/
+
+class copycatm2_state : public hh_tms1k_state
+{
+public:
+	copycatm2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+};
+
+// handlers
+
+WRITE16_MEMBER(copycatm2_state::write_r)
+{
+	// R0-R3: leds
+	display_matrix(4, 1, data & 0xf, 1);
+}
+
+WRITE16_MEMBER(copycatm2_state::write_o)
+{
+	// O0,O1: speaker out
+	// others: N/C
+	m_speaker->level_w(data & 3);
+}
+
+
+// config
+
+static INPUT_PORTS_START( copycatm2 )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Orange Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Red Button")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Yellow Button")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Green Button")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( copycatm2, copycatm2_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1730, 350000) // approximation - RC osc. R=100K, C=47pf
+	MCFG_TMS1XXX_READ_K_CB(IOPORT("IN.0"))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(copycatm2_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(copycatm2_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_copycat)
@@ -5826,6 +5893,16 @@ ROM_START( copycat )
 	ROM_LOAD( "tms1000_copycat_output.pla", 0, 365, CRC(b1d0c96d) SHA1(ac1a003eab3f69e09e9050cb24ea17211e0523fe) )
 ROM_END
 
+ROM_START( copycatm2 )
+	ROM_REGION( 0x0200, "maincpu", 0 )
+	ROM_LOAD( "mp3005n", 0x0000, 0x0200, CRC(0381a2ea) SHA1(2476096b9556eea1a1ad0537dc811b8505d7e05a) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_copycatm2_micro.pla", 0, 867, CRC(2710d8ef) SHA1(cb7a13bfabedad43790de753844707fe829baed0) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_copycatm2_output.pla", 0, 365, CRC(d1999aaf) SHA1(0c27789b349e491d5230f9c75c4741e621f5a14e) )
+ROM_END
+
 
 ROM_START( tbreakup )
 	ROM_REGION( 0x0400, "maincpu", 0 )
@@ -5901,6 +5978,7 @@ CONS( 1982, lostreas,  0,        0, lostreas,  lostreas,  driver_device, 0, "Par
 CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 
 CONS( 1979, copycat,   0,        0, copycat,   copycat,   driver_device, 0, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, copycatm2, copycat,  0, copycatm2, copycatm2, driver_device, 0, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
 
 CONS( 1979, tbreakup,  0,        0, tbreakup,  tbreakup,  driver_device, 0, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, phpball,   0,        0, phpball,   phpball,   driver_device, 0, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

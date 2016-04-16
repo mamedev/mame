@@ -67,6 +67,7 @@ function cheat.startplugin()
 	local output = {}
 	local line = 0
 	local start_time = 0
+	local stop = true
 
 	local function load_cheats()
 		local filename = emu.romname()
@@ -308,10 +309,40 @@ function cheat.startplugin()
 				end
 			end
 		end
+		menu[#menu + 1] = {"---", "", 0}
+		menu[#menu + 1] = {"Reset All", "", 0}
+		menu[#menu + 1] = {"Reload All", "", 0}
 		return menu
 	end
 
 	local function menu_callback(index, event)
+		if index > #cheats and event == "select" then
+			index = index - #cheats
+			if index == 2 then
+				for num, cheat in pairs(cheats) do
+					if cheat.script and cheat.script.off then
+						cheat.script.off()
+					end
+					cheat.enabled = false
+					if cheat.parameter then
+						cheat.parameter.value = cheat.parameter.min
+						cheat.parameter.index = 0
+					end
+				end
+			elseif index == 3 then
+				for num, cheat in pairs(cheats) do 
+					if cheat.script and cheat.script.off then
+						cheat.script.off()
+					end
+				end
+				cheats = load_cheats()
+				for num, cheat in pairs(cheats) do
+					parse_cheat(cheat)
+				end
+			end
+			return true
+		end
+
 		local function param_calc(param)
 			if param.item then
 				if not param.item[param.index] then -- uh oh
@@ -429,6 +460,10 @@ function cheat.startplugin()
 			  end, "Cheat")
 
 	emu.register_start(function()
+		if not stop then
+			return
+		end
+		stop = false
 		start_time = emu.time()
 		cheats = load_cheats()
 		for num, cheat in pairs(cheats) do
@@ -436,7 +471,14 @@ function cheat.startplugin()
 		end
 	end)
 
+	emu.register_stop(function()
+		stop = true
+	end)
+
 	emu.register_frame(function()
+		if stop then
+			return
+		end
 		for num, cheat in pairs(cheats) do
 			if cheat.enabled and cheat.script.run then
 				cheat.script.run()
@@ -445,6 +487,9 @@ function cheat.startplugin()
 	end)
 
 	emu.register_frame_done(function()
+		if stop then
+			return
+		end
 		line = 0
 		for num, draw in pairs(output) do
 			if draw.type == "text" then
@@ -469,6 +514,21 @@ function cheat.startplugin()
 		cheats[#cheats + 1] = newcheat
 		parse_cheat(newcheat)
 		manager:machine():popmessage(newcheat.desc .. " added")
+	end
+
+	function ce.dump(index)
+		cheat = cheats[index]
+		if cheat then
+			for k, v in pairs(cheat.cheat_env) do
+				print(k, v)
+			end
+		end
+	end
+
+	function ce.list()
+		for num, cheat in pairs(cheats) do
+			print(num, cheat.desc)
+		end
 	end
 
 	_G.ce = ce

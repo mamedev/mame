@@ -39,7 +39,7 @@ void ui_menu_sliders::handle()
 	if (menu_event != nullptr)
 	{
 		/* handle keys if there is a valid item selected */
-		if (menu_event->itemref != nullptr && menu_event->type == ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER)
+		if (menu_event->itemref != nullptr && menu_event->type == ui_menu_item_type::SLIDER)
 		{
 			const slider_state *slider = (const slider_state *)menu_event->itemref;
 			INT32 curvalue = (*slider->update)(machine(), slider->arg, slider->id, nullptr, SLIDER_NOCHANGE);
@@ -143,7 +143,7 @@ void ui_menu_sliders::populate()
 	std::vector<ui_menu_item> ui_sliders = machine().ui().get_slider_list();
 	for (ui_menu_item item : ui_sliders)
 	{
-        if (item.type == ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER)
+        if (item.type == ui_menu_item_type::SLIDER)
         {
             slider_state* slider = reinterpret_cast<slider_state *>(item.ref);
             INT32 curval = (*slider->update)(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
@@ -152,7 +152,7 @@ void ui_menu_sliders::populate()
                 flags |= MENU_FLAG_LEFT_ARROW;
             if (curval < slider->maxval)
                 flags |= MENU_FLAG_RIGHT_ARROW;
-            item_append(slider->description, tempstring.c_str(), flags, (void *)slider, ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER);
+            item_append(slider->description, tempstring.c_str(), flags, (void *)slider, ui_menu_item_type::SLIDER);
         }
         else
         {
@@ -160,13 +160,13 @@ void ui_menu_sliders::populate()
         }
 	}
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 
 	/* add OSD options */
 	std::vector<ui_menu_item> osd_sliders = machine().osd().get_slider_list();
 	for (ui_menu_item item : osd_sliders)
 	{
-        if (item.type == ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER)
+        if (item.type == ui_menu_item_type::SLIDER)
         {
             slider_state* slider = reinterpret_cast<slider_state *>(item.ref);
             INT32 curval = (*slider->update)(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
@@ -175,7 +175,7 @@ void ui_menu_sliders::populate()
                 flags |= MENU_FLAG_LEFT_ARROW;
             if (curval < slider->maxval)
                 flags |= MENU_FLAG_RIGHT_ARROW;
-            item_append(slider->description, tempstring.c_str(), flags, (void *)slider, ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER);
+            item_append(slider->description, tempstring.c_str(), flags, (void *)slider, ui_menu_item_type::SLIDER);
         }
         else
         {

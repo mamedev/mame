@@ -138,7 +138,7 @@ void ui_menu_main::populate()
 	if (machine().ui().options().enabled_dats() && machine().datfile().has_data())
 		item_append(_("External DAT View"), nullptr, 0, (void *)EXTERNAL_DATS);
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 
 	/* add favorite menu */
 	if (!machine().favorite().isgame_favorite())
@@ -146,7 +146,7 @@ void ui_menu_main::populate()
 	else
 		item_append(_("Remove From Favorites"), nullptr, 0, (void *)REMOVE_FAVORITE);
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 
 //  item_append(_("Quit from Machine"), nullptr, 0, (void *)QUIT_GAME);
 

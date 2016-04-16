@@ -149,7 +149,7 @@ void ui_menu_selector::populate()
 			}
 	}
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	customtop = custombottom = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	m_first_pass = false;
 }

@@ -121,7 +121,7 @@ void ui_menu_cheat::populate()
 	item_append(_("Autofire Settings"), nullptr, 0, (void *)ITEMREF_CHEATS_AUTOFIRE_SETTINGS);
 
 	/* add a separator */
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 
 	// add other cheats
 	if (!machine().cheat().entries().empty()) {
@@ -133,7 +133,7 @@ void ui_menu_cheat::populate()
 		}
 
 		/* add a separator */
-		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+		item_append(ui_menu_item_type::SEPARATOR);
 
 		/* add a reset all option */
 		item_append(_("Reset All"), nullptr, 0, (void *)ITEMREF_CHEATS_RESET_ALL);
@@ -272,7 +272,7 @@ void ui_menu_autofire::populate()
 				if (is_first_button)
 				{
 					/* add a separator for each player */
-					item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+					item_append(ui_menu_item_type::SEPARATOR);
 					is_first_button = false;
 				}
 				/* add an autofire item */
@@ -295,12 +295,12 @@ void ui_menu_autofire::populate()
 	/* add text item if no buttons found */
 	if (menu_items==0)
 	{
-		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+		item_append(ui_menu_item_type::SEPARATOR);
 		item_append(_("No buttons found on this machine!"), nullptr, MENU_FLAG_DISABLE, nullptr);
 	}
 
 	/* add a separator */
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 
 	/* add autofire delay item */
 	int value = machine().ioport().get_autofire_delay();
@@ -315,7 +315,7 @@ void ui_menu_autofire::populate()
 	}
 
 	/* add a separator */
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 
 	last_toggle = autofire_toggle;
 }

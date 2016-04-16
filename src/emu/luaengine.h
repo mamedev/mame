@@ -63,6 +63,9 @@ public:
 	void attach_notifiers();
 	void on_frame_done();
 
+	int compile_with_env(const char *env, const char *script);
+	void run(const char *env, int ref);
+
 private:
 	struct hook {
 		lua_State *L;
@@ -153,8 +156,6 @@ private:
 		int l_popmessage(lua_State *L);
 		int l_logerror(lua_State *L);
 	};
-	static UINT8 read_direct_byte(address_space &space, offs_t addr);
-	static void write_direct_byte(address_space &space, offs_t addr, UINT8 byte);
 	struct lua_addr_space {
 		template<typename T> int l_mem_read(lua_State *L);
 		template<typename T> int l_mem_write(lua_State *L);
@@ -194,8 +195,6 @@ private:
 
 	static luabridge::LuaRef l_memory_get_banks(const memory_manager *m);
 	static luabridge::LuaRef l_memory_get_regions(const memory_manager *m);
-	static UINT8 read_region_byte(memory_region &region, offs_t addr);
-	static void write_region_byte(memory_region &region, offs_t addr, UINT8 byte);
 	struct lua_memory_region {
 		template<typename T> int l_region_read(lua_State *L);
 		template<typename T> int l_region_write(lua_State *L);

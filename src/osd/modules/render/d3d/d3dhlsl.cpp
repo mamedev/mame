@@ -2530,7 +2530,7 @@ std::vector<ui_menu_item> shaders::init_slider_list()
                 item.subtext = "";
                 item.flags = 0;
                 item.ref = core_slider;
-                item.type = ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER;
+                item.type = ui_menu_item_type::SLIDER;
                 sliders.push_back(item);
 			}
 		}

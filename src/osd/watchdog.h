@@ -10,15 +10,15 @@
 //
 //============================================================
 
-#include "modules/sync/osdsync.h"
+#include "osdsync.h"
 #include <atomic>
 #include <thread>
 
-class watchdog
+class osd_watchdog
 {
 public:
-	watchdog(void);
-	~watchdog(void);
+	osd_watchdog(void);
+	~osd_watchdog(void);
 
 	void reset() { m_event.set(); }
 

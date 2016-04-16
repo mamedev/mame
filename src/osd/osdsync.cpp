@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  sdlwork.c - SDL OSD core work item functions
+//  osdsync.c - OSD core work item functions
 //
 //============================================================
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
@@ -24,9 +24,7 @@
 
 // MAME headers
 #include "osdcore.h"
-
-#include "modules/sync/osdsync.h"
-#include "modules/lib/osdlib.h"
+#include "osdsync.h"
 
 #include "eminline.h"
 
@@ -84,6 +82,15 @@ static void spin_while_not(const volatile _AtomType * volatile atom, const _Main
 	spin_while<_AtomType, _MainType>(atom, val, timeout, 1);
 }
 
+//============================================================
+//  osd_num_processors
+//============================================================
+
+int osd_get_num_processors(void)
+{
+	// max out at 4 for now since scaling above that seems to do poorly
+	return MIN(std::thread::hardware_concurrency(), 4);
+}
 
 //============================================================
 //  TYPE DEFINITIONS

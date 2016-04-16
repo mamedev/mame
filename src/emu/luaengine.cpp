@@ -999,15 +999,6 @@ int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
 //  -> manager:machine().devices[":maincpu"].spaces["program"]:read_direct_i8(0xC000)
 //-------------------------------------------------
 
-UINT8 lua_engine::read_direct_byte(address_space &space, offs_t addr)
-{
-	UINT8 *base = (UINT8 *)space.get_read_ptr(space.address_to_byte(addr));
-	if(base)
-		return base[addr];
-	else
-		return 0;
-}
-
 template <typename T>
 int lua_engine::lua_addr_space::l_direct_mem_read(lua_State *L)
 {
@@ -1015,15 +1006,18 @@ int lua_engine::lua_addr_space::l_direct_mem_read(lua_State *L)
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
 	offs_t address = lua_tounsigned(L, 2);
 	T mem_content = 0;
+	offs_t lowmask = sp.data_width() / 8 - 1;
 	for(int i = 0; i < sizeof(T); i++)
 	{
-		UINT8 byte;
+		int addr = sp.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
+		UINT8 *base = (UINT8 *)sp.get_read_ptr(sp.address_to_byte(addr & ~lowmask));
+		if(!base)
+			continue;
 		mem_content <<= 8;
 		if(sp.endianness() == ENDIANNESS_BIG)
-			byte = read_direct_byte(sp, address + sizeof(T) - i);
+			mem_content |= base[BYTE8_XOR_BE(addr) & lowmask];
 		else
-			byte = read_direct_byte(sp, address + i);
-		mem_content |= byte;
+			mem_content |= base[BYTE8_XOR_LE(addr) & lowmask];
 	}
 
 	if (std::numeric_limits<T>::is_signed) {
@@ -1040,13 +1034,6 @@ int lua_engine::lua_addr_space::l_direct_mem_read(lua_State *L)
 //  -> manager:machine().devices[":maincpu"].spaces["program"]:write_direct_u16(0xC000, 0xF00D)
 //-------------------------------------------------
 
-void lua_engine::write_direct_byte(address_space &space, offs_t addr, UINT8 byte)
-{
-	UINT8 *base = (UINT8 *)space.get_read_ptr(space.address_to_byte(addr));
-	if(base)
-		base[addr] = byte;
-}
-
 template <typename T>
 int lua_engine::lua_addr_space::l_direct_mem_write(lua_State *L)
 {
@@ -1055,12 +1042,17 @@ int lua_engine::lua_addr_space::l_direct_mem_write(lua_State *L)
 	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
 	offs_t address = lua_tounsigned(L, 2);
 	T val = lua_tounsigned(L, 3);
+	offs_t lowmask = sp.data_width() / 8 - 1;
 	for(int i = 0; i < sizeof(T); i++)
 	{
+		int addr = sp.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
+		UINT8 *base = (UINT8 *)sp.get_read_ptr(sp.address_to_byte(addr & ~lowmask));
+		if(!base)
+			continue;
 		if(sp.endianness() == ENDIANNESS_BIG)
-			write_direct_byte(sp, address + sizeof(T) - i, val & 0xff);
+			base[BYTE8_XOR_BE(addr) & lowmask] = val & 0xff;
 		else
-			write_direct_byte(sp, address + i, val & 0xff);
+			base[BYTE8_XOR_LE(addr) & lowmask] = val & 0xff;
 		val >>= 8;
 	}
 
@@ -1072,14 +1064,6 @@ int lua_engine::lua_addr_space::l_direct_mem_write(lua_State *L)
 //  -> manager:machine():memory().region[":maincpu"]:read_i8(0xC000)
 //-------------------------------------------------
 
-UINT8 lua_engine::read_region_byte(memory_region &region, offs_t addr)
-{
-	if(addr >= region.bytes())
-		return 0;
-
-	return region.u8(addr);
-}
-
 template <typename T>
 int lua_engine::lua_memory_region::l_region_read(lua_State *L)
 {
@@ -1087,15 +1071,17 @@ int lua_engine::lua_memory_region::l_region_read(lua_State *L)
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
 	offs_t address = lua_tounsigned(L, 2);
 	T mem_content = 0;
+	offs_t lowmask = region.bytewidth() - 1;
 	for(int i = 0; i < sizeof(T); i++)
 	{
-		UINT8 byte;
+		int addr = region.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
+		if(addr >= region.bytes())
+			continue;
 		mem_content <<= 8;
 		if(region.endianness() == ENDIANNESS_BIG)
-			byte = read_region_byte(region, address + sizeof(T) - i);
+			mem_content |= region.u8((BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask));
 		else
-			byte = read_region_byte(region, address + i);
-		mem_content |= byte;
+			mem_content |= region.u8((BYTE8_XOR_LE(addr) & lowmask) | (addr & ~lowmask));
 	}
 
 	if (std::numeric_limits<T>::is_signed) {
@@ -1112,14 +1098,6 @@ int lua_engine::lua_memory_region::l_region_read(lua_State *L)
 //  -> manager:machine():memory().region[":maincpu"]:write_u16(0xC000, 0xF00D)
 //-------------------------------------------------
 
-void lua_engine::write_region_byte(memory_region &region, offs_t addr, UINT8 byte)
-{
-	if(addr >= region.bytes())
-		return;
-
-	region.base()[addr] = byte;
-}
-
 template <typename T>
 int lua_engine::lua_memory_region::l_region_write(lua_State *L)
 {
@@ -1128,12 +1106,16 @@ int lua_engine::lua_memory_region::l_region_write(lua_State *L)
 	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
 	offs_t address = lua_tounsigned(L, 2);
 	T val = lua_tounsigned(L, 3);
+	offs_t lowmask = region.bytewidth() - 1;
 	for(int i = 0; i < sizeof(T); i++)
 	{
+		int addr = region.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
+		if(addr >= region.bytes())
+			continue;
 		if(region.endianness() == ENDIANNESS_BIG)
-			write_region_byte(region, address + sizeof(T) - i, val & 0xff);
+			region.base()[(BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
 		else
-			write_region_byte(region, address + i, val & 0xff);
+			region.base()[(BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
 		val >>= 8;
 	}
 
@@ -1738,6 +1720,68 @@ lua_engine::~lua_engine()
 	close();
 }
 
+int lua_engine::compile_with_env(const char *env, const char *script)
+{
+	std::string field = std::string("env_").append(env);
+	lua_settop(m_lua_state, 0);
+	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
+
+	if(!lua_istable(m_lua_state, -1))
+	{
+		emu_file file(m_machine->manager().options().plugins_path(), OPEN_FLAG_READ);
+		// optionally load a script to prepare the environment
+		if(file.open(env, ".lua") != osd_file::error::NONE)
+		{
+			int error = luaL_loadfile(m_lua_state, file.fullpath());
+			if(error || (error = lua_pcall(m_lua_state, 0, 0, 0) != LUA_OK))
+			{
+				if(error == LUA_ERRRUN)
+					printf("%s\n", lua_tostring(m_lua_state, -1));
+				lua_pop(m_lua_state, 1);
+			}
+		}
+		if(!lua_istable(m_lua_state, -1))
+			lua_newtable(m_lua_state);
+		lua_setfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
+		lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
+	}
+
+	if(int error = luaL_loadstring(m_lua_state, script) != LUA_OK)
+	{
+		if(error == LUA_ERRSYNTAX)
+			printf("%s\n", lua_tostring(m_lua_state, -1));
+		lua_tostring(m_lua_state, -1);
+		lua_pop(m_lua_state, 2);
+		return -1;
+	}
+	lua_pushvalue(m_lua_state, -2);
+	lua_setupvalue(m_lua_state, -2, 1);
+	int ref = luaL_ref(m_lua_state, -2);
+	lua_pop(m_lua_state, 1);
+	return ref;
+}
+
+void lua_engine::run(const char *env, int ref)
+{
+	std::string field = std::string("env_").append(env);
+	lua_settop(m_lua_state, 0);
+	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
+	if(lua_istable(m_lua_state, -1))
+	{
+		lua_rawgeti(m_lua_state, -1, ref);
+		if(lua_isfunction(m_lua_state, -1))
+		{
+			if(int error = lua_pcall(m_lua_state, 0, 0, 0) != LUA_OK)
+			{
+				if(error == LUA_ERRRUN)
+					printf("%s\n", lua_tostring(m_lua_state, -1));
+				lua_pop(m_lua_state, 1);
+			}
+		}
+		lua_pop(m_lua_state, 1);
+	}
+	lua_pop(m_lua_state, 1);
+}
 void lua_engine::menu_populate(std::string &menu, std::vector<menu_item> &menu_list)
 {
 	std::string field = "menu_pop_" + menu;
@@ -1749,9 +1793,9 @@ void lua_engine::menu_populate(std::string &menu, std::vector<menu_item> &menu_l
 		lua_pop(m_lua_state, 1);
 		return;
 	}
-	if(int error = lua_pcall(m_lua_state, 0, 1, 0))
+	if(int error = lua_pcall(m_lua_state, 0, 1, 0) != LUA_OK)
 	{
-		if(error == 2)
+		if(error == LUA_ERRRUN)
 			printf("%s\n", lua_tostring(m_lua_state, -1));
 		lua_pop(m_lua_state, 1);
 		return;

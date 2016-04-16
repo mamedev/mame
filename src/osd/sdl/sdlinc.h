@@ -5,9 +5,6 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_version.h>
-// on win32 this includes windows.h by itself and breaks us!
-#ifndef SDLMAME_WIN32
 #include <SDL2/SDL_syswm.h>
-#endif
 
 #endif

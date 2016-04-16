@@ -15,6 +15,8 @@
 
 #include "drivenum.h"
 #include "crsshair.h"
+#include "emuopts.h"
+#include "ui/selsoft.h"
 
 class ui_menu_keyboard_mode : public ui_menu {
 public:
@@ -85,28 +87,6 @@ public:
 	virtual void handle() override;
 };
 
-//-------------------------------------------------
-//  class miscellaneous options menu
-//-------------------------------------------------
-class ui_menu_misc_options : public ui_menu
-{
-public:
-	ui_menu_misc_options(running_machine &machine, render_container *container);
-	virtual ~ui_menu_misc_options();
-	virtual void populate() override;
-	virtual void handle() override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-
-private:
-	struct misc_option
-	{
-		bool        status;
-		const char  *description;
-		const char  *option;
-	};
-
-	static misc_option m_options[];
-};
 
 //-------------------------------------------------
 //  export menu
@@ -131,14 +111,30 @@ private:
 class ui_menu_machine_configure : public ui_menu
 {
 public:
-	ui_menu_machine_configure(running_machine &machine, render_container *container, const game_driver *prev);
+	ui_menu_machine_configure(running_machine &machine, render_container *container, const game_driver *prev, float x0 = 0.0f, float y0 = 0.0f);
 	virtual ~ui_menu_machine_configure();
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
+	enum
+	{
+		ADDFAV = 1,
+		DELFAV,
+		SAVE,
+		CONTROLLER,
+		VIDEO,
+		BIOS,
+		ADVANCED,
+		LAST = ADVANCED
+	};
 	const game_driver *m_drv;
+	emu_options m_opts;
+	float x0, y0;
+	s_bios m_bios;
+	int m_curbios;
+	void setup_bios();
 };
 
 //-------------------------------------------------

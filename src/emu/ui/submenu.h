@@ -46,7 +46,7 @@ public:
 		std::vector<std::string> value;
 	};
 
-	ui_submenu(running_machine &machine, render_container *container, std::vector<ui_submenu::option> &suboptions);
+	ui_submenu(running_machine &machine, render_container *container, std::vector<ui_submenu::option> &suboptions, const game_driver *drv = nullptr, emu_options *options = nullptr);
 	virtual ~ui_submenu();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -54,6 +54,7 @@ public:
 
 private:
 	std::vector<option> &m_options;
+	const game_driver  *m_driver;
 };
 
 static std::vector<ui_submenu::option> misc_submenu_options = {
@@ -134,8 +135,9 @@ static std::vector<ui_submenu::option> control_submenu_options = {
 };
 
 static std::vector<ui_submenu::option> video_submenu_options = {
-	{ ui_submenu::HEAD, __("Display Options") },
+	{ ui_submenu::HEAD, __("Video Options") },
 	{ ui_submenu::OSD,  __("Video Mode"),                              OSDOPTION_VIDEO },
+	{ ui_submenu::OSD,  __("Number Of Screens"),                       OSDOPTION_NUMSCREENS },
 #if defined(UI_WINDOWS) && !defined(UI_SDL)
 	{ ui_submenu::OSD,  __("Triple Buffering"),                        WINOPTION_TRIPLEBUFFER },
 	{ ui_submenu::OSD,  __("HLSL"),                                    WINOPTION_HLSL_ENABLE },

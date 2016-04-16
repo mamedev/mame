@@ -228,6 +228,13 @@ void ui_menu_select_game::handle()
 			}
 		}
 
+		// handle IPT_CUSTOM (mouse right click)
+		else if (m_event->iptkey == IPT_CUSTOM)
+		{
+			if (!isfavorite())
+				ui_menu::stack_push(global_alloc_clear<ui_menu_machine_configure>(machine(), container, (const game_driver *)m_prev_selected, m_event->mouse.x0, m_event->mouse.y0));
+		}
+
 		// handle UI_LEFT
 		else if (m_event->iptkey == IPT_UI_LEFT)
 		{
@@ -425,8 +432,9 @@ void ui_menu_select_game::handle()
 			inkey_special(m_event);
 		else if (m_event->iptkey == IPT_UI_CONFIGURE)
 			inkey_configure(m_event);
-		else if (m_event->iptkey == IPT_UI_SELECT && m_focus == focused_menu::left)
+		else if (m_event->iptkey == IPT_OTHER)
 		{
+			m_focus = focused_menu::left;
 			m_prev_selected = nullptr;
 			l_hover = highlight;
 			check_filter = true;
@@ -585,8 +593,8 @@ void ui_menu_select_game::populate()
 	{
 		UINT32 flags_ui = MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
 		item_append(_("Configure Options"), nullptr, flags_ui, (void *)(FPTR)CONF_OPTS);
-//      item_append(_("Configure Machine"), nullptr, flags_ui, (void *)(FPTR)CONF_MACHINE); TODO
-		skip_main_items = 1;
+		item_append(_("Configure Machine"), nullptr, flags_ui, (void *)(FPTR)CONF_MACHINE);
+		skip_main_items = 2;
 		if (machine().options().plugins())
 		{
 			item_append(_("Plugins"), nullptr, flags_ui, (void *)(FPTR)CONF_PLUGINS);
@@ -1011,14 +1019,16 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *m_event)
 	// special case for configure options
 	if ((FPTR)driver == CONF_OPTS)
 		ui_menu::stack_push(global_alloc_clear<ui_menu_game_options>(machine(), container));
-	/* special case for configure machine TODO
+	
+	// special case for configure machine
 	else if ((FPTR)driver == CONF_MACHINE)
 	{
 	    if (m_prev_selected != nullptr)
 	        ui_menu::stack_push(global_alloc_clear<ui_menu_machine_configure>(machine(), container, (const game_driver *)m_prev_selected));
 	    else
 	        return;
-	} */
+	}
+
 	// special case for configure plugins
 	else if ((FPTR)driver == CONF_PLUGINS)
 	{

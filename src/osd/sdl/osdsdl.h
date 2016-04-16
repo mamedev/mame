@@ -3,7 +3,6 @@
 #ifndef _osdsdl_h_
 #define _osdsdl_h_
 
-#include "watchdog.h"
 #include "modules/lib/osdobj_common.h"
 #include "modules/osdmodule.h"
 #include "modules/font/font_module.h"
@@ -168,8 +167,6 @@ private:
 	void extract_video_config();
 
 	sdl_options &m_options;
-
-	watchdog *m_watchdog;
 };
 
 //============================================================
