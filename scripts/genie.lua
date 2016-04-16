@@ -349,6 +349,15 @@ newoption {
 }
 
 newoption {
+	trigger = "IGNORE_GIT",
+	description = "Ignore usage of git command in build process",
+	allowed = {
+		{ "0",  "Do not ignore"   },
+		{ "1",  "Ingore"  },
+	},
+}
+
+newoption {
 	trigger = "SOURCES",
 	description = "List of sources to compile.",
 }
@@ -518,6 +527,18 @@ if (_OPTIONS["SOURCES"] == nil) then
 		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 	end
 	dofile (path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
+end
+
+
+if _OPTIONS["IGNORE_GIT"]~="1" then
+	GIT_VERSION         = backtick( "git rev-parse --short HEAD" )
+	GIT_VERSION_RELEASE = backtick( "git rev-list --tags --max-count=1" )
+	GIT_VERSION_LASTONE = backtick( "git rev-list --max-count=1 HEAD" ) 
+	if (GIT_VERSION_RELEASE ~= GIT_VERSION_LASTONE) then
+	defines {
+		"GIT_VERSION=" .. GIT_VERSION,
+	}
+	end
 end
 
 configuration { "gmake" }
