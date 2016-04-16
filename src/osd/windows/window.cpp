@@ -16,6 +16,7 @@
 #include <process.h>
 
 #include <atomic>
+#include <chrono>
 
 // MAME headers
 #include "emu.h"
@@ -42,6 +43,9 @@
 #define IS_EXTENDED(x) (0x01000000 & x)
 #define MAKE_DI_SCAN(scan, isextended) (scan & 0x7f) | (isextended ? 0x80 : 0x00)
 #define WINOSD(machine) downcast<windows_osd_interface*>(&machine.osd())
+
+// min(x, y) macro interferes with chrono time_point::min()
+#undef min
 
 //============================================================
 //  PARAMETERS
@@ -93,7 +97,7 @@ static int win_physical_height;
 //============================================================
 
 // event handling
-static DWORD last_event_check;
+static std::chrono::system_clock::time_point last_event_check;
 
 // debugger
 static int in_background;
@@ -348,7 +352,7 @@ win_window_info::win_window_info(running_machine &machine)
 		m_target(nullptr),
 		m_targetview(0),
 		m_targetorient(0),
-		m_lastclicktime(0),
+		m_lastclicktime(std::chrono::system_clock::time_point::min()),
 		m_lastclickx(0),
 		m_lastclicky(0),
 		m_renderer(nullptr),
@@ -378,12 +382,12 @@ win_window_info::~win_window_info()
 
 void winwindow_process_events_periodic(running_machine &machine)
 {
-	DWORD currticks = GetTickCount();
+	auto currticks = std::chrono::system_clock::now();
 
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// update once every 1/8th of a second
-	if (currticks - last_event_check < 1000 / 8)
+	if (currticks - last_event_check < std::chrono::milliseconds(1000 / 8))
 		return;
 	winwindow_process_events(machine, TRUE, FALSE);
 }
@@ -441,7 +445,7 @@ void winwindow_process_events(running_machine &machine, int ingame, bool nodispa
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// remember the last time we did this
-	last_event_check = GetTickCount();
+	last_event_check = std::chrono::system_clock::now();
 
 	do
 	{
@@ -1348,15 +1352,15 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 
 		case WM_LBUTTONDOWN:
 		{
-			DWORD ticks = GetTickCount();
+			auto ticks = std::chrono::system_clock::now();
 			window->machine().ui_input().push_mouse_down_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 
 			// check for a double-click
-			if (ticks - window->m_lastclicktime < GetDoubleClickTime() &&
+			if (ticks - window->m_lastclicktime < std::chrono::milliseconds(GetDoubleClickTime()) &&
 				GET_X_LPARAM(lparam) >= window->m_lastclickx - 4 && GET_X_LPARAM(lparam) <= window->m_lastclickx + 4 &&
 				GET_Y_LPARAM(lparam) >= window->m_lastclicky - 4 && GET_Y_LPARAM(lparam) <= window->m_lastclicky + 4)
 			{
-				window->m_lastclicktime = 0;
+				window->m_lastclicktime = std::chrono::system_clock::time_point::min();
 				window->machine().ui_input().push_mouse_double_click_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 			}
 			else

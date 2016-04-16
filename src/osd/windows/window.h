@@ -15,6 +15,7 @@
 #include <windowsx.h>
 #include <mmsystem.h>
 
+#include <chrono>
 #include <mutex>
 #include "video.h"
 #include "render.h"
@@ -114,9 +115,9 @@ public:
 	render_layer_config m_targetlayerconfig;
 
 	// input info
-	DWORD               m_lastclicktime;
-	int                 m_lastclickx;
-	int                 m_lastclicky;
+	std::chrono::system_clock::time_point  m_lastclicktime;
+	int                                    m_lastclickx;
+	int                                    m_lastclicky;
 
 	// drawing data
 	osd_renderer *      m_renderer;
