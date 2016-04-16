@@ -20,6 +20,7 @@
 #include "emu.h"
 #include "window.h"
 #include "rendutil.h"
+#include "aviio.h"
 
 #include <bgfx/bgfxplatform.h>
 #include <bgfx/bgfx.h>
@@ -73,6 +74,35 @@ bool renderer_bgfx::s_window_set = false;
 uint32_t renderer_bgfx::s_current_view = 0;
 
 //============================================================
+//  renderer_bgfx - constructor
+//============================================================
+
+renderer_bgfx::renderer_bgfx(osd_window *w)
+	: osd_renderer(w, FLAG_NONE)
+	, m_options(downcast<osd_options &>(w->machine().options()))
+	, m_dimensions(0, 0)
+	, m_max_view(0)
+	, m_avi_output_file(nullptr)
+	, m_avi_frame(0)
+{
+	m_options = downcast<osd_options &>(window().machine().options());
+}
+
+//============================================================
+//  renderer_bgfx - destructor
+//============================================================
+
+renderer_bgfx::~renderer_bgfx()
+{
+	// Cleanup.
+	delete m_chains;
+	delete m_effects;
+	delete m_shaders;
+	delete m_textures;
+	delete m_targets;
+}
+
+//============================================================
 //  renderer_bgfx::create
 //============================================================
 
@@ -103,8 +133,6 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 int renderer_bgfx::create()
 {
 	// create renderer
-
-	osd_options& options = downcast<osd_options &>(window().machine().options());
 	osd_dim wdim = window().get_size();
 	m_width[window().m_index] = wdim.width();
 	m_height[window().m_index] = wdim.height();
@@ -127,7 +155,7 @@ int renderer_bgfx::create()
 #else
 		bgfx::sdlSetWindow(window().sdl_window());
 #endif
-		std::string backend(options.bgfx_backend());
+		std::string backend(m_options.bgfx_backend());
 		if (backend == "auto")
 		{
 			bgfx::init();
@@ -159,15 +187,15 @@ int renderer_bgfx::create()
 		}
 		bgfx::reset(m_width[window().m_index], m_height[window().m_index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 		// Enable debug text.
-		bgfx::setDebug(options.bgfx_debug() ? BGFX_DEBUG_STATS : BGFX_DEBUG_TEXT);
+		bgfx::setDebug(m_options.bgfx_debug() ? BGFX_DEBUG_STATS : BGFX_DEBUG_TEXT);
 		m_dimensions = osd_dim(m_width[0], m_height[0]);
 	}
 
 	m_textures = new texture_manager();
 	m_targets = new target_manager(*m_textures);
 
-	m_shaders = new shader_manager(options);
-	m_effects = new effect_manager(options, *m_shaders);
+	m_shaders = new shader_manager(m_options);
+	m_effects = new effect_manager(m_options, *m_shaders);
 
 	if (window().m_index != 0)
 	{
@@ -190,7 +218,7 @@ int renderer_bgfx::create()
 	m_screen_effect[2] = m_effects->effect("screen_multiply");
 	m_screen_effect[3] = m_effects->effect("screen_add");
 
-	m_chains = new chain_manager(window().machine(), options, *m_textures, *m_targets, *m_effects, window().m_index, *this);
+	m_chains = new chain_manager(window().machine(), m_options, *m_textures, *m_targets, *m_effects, window().m_index, *this);
 	m_sliders_dirty = true;
 
 	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
@@ -205,17 +233,29 @@ int renderer_bgfx::create()
 }
 
 //============================================================
-//  destructor
+//  renderer_bgfx::record
 //============================================================
 
-renderer_bgfx::~renderer_bgfx()
+void renderer_bgfx::record()
 {
-	// Cleanup.
-	delete m_chains;
-	delete m_effects;
-	delete m_shaders;
-	delete m_textures;
-	delete m_targets;
+	std::string filename("test.avi");//m_options.d3d_hlsl_write());
+
+	if (m_avi_output_file != nullptr)
+	{
+		end_avi_recording();
+	}
+	else if (filename[0] != 0)
+	{
+		begin_avi_recording(filename);
+	}
+}
+
+void renderer_bgfx::end_avi_recording()
+{
+}
+
+void renderer_bgfx::begin_avi_recording(std::string filename)
+{
 }
 
 void renderer_bgfx::exit()
@@ -715,14 +755,14 @@ int renderer_bgfx::draw(int update)
 		{
 			for (screen = 0; screen < sources.size(); screen++)
 			{
-				if (sources[screen] == prim->texture.base)
+				if (sources[screen] == prim)
 				{
 					break;
 				}
 			}
 			if (screen == sources.size())
 			{
-				sources.push_back(prim->texture.base);
+				sources.push_back(prim);
 			}
 		}
 
@@ -786,7 +826,7 @@ bool renderer_bgfx::update_dimensions()
 #endif
 
 			bgfx::setViewFrameBuffer(s_current_view, m_framebuffer->target());
-			bgfx::setViewClear(s_current_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
+			bgfx::setViewClear(s_current_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
 			bgfx::touch(s_current_view);
 			bgfx::frame();
 			return true;

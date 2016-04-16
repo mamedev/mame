@@ -263,26 +263,12 @@ std::vector<render_primitive*> chain_manager::count_screens(render_primitive* pr
     std::vector<render_primitive*> screens;
 
     int screen_count = 0;
-    std::vector<void*> bases;
     while (prim != nullptr)
     {
         if (PRIMFLAG_GET_SCREENTEX(prim->flags))
         {
-            bool found = false;
-            for (void* base : bases)
-            {
-                if (base == prim->texture.base)
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                screen_count++;
-                screens.push_back(prim);
-                bases.push_back(prim->texture.base);
-            }
+			screen_count++;
+			screens.push_back(prim);
         }
         prim = prim->next();
     }
@@ -435,7 +421,7 @@ std::vector<ui_menu_item> chain_manager::get_slider_list()
         return sliders;
     }
 
-    for (size_t index = 0; index < m_screen_chains.size(); index++)
+    for (size_t index = 0; index < m_screen_chains.size() && index < m_screen_count; index++)
     {
         bgfx_chain* chain = m_screen_chains[index];
 		sliders.push_back(m_selection_sliders[index]);
