@@ -64,8 +64,10 @@ public:
 	void on_frame_done();
 
 	int compile_with_env(const char *env, const char *script);
+	template <typename Tout, typename Tin> Tout run(const char *env, int ref, Tin in);
+	template <typename Tout> Tout run(const char *env, int ref);
+	template <typename Tin> void run(const char *env, int ref, Tin in);
 	void run(const char *env, int ref);
-
 private:
 	struct hook {
 		lua_State *L;
@@ -213,6 +215,7 @@ private:
 		int l_item_read_block(lua_State *L);
 		int l_item_write(lua_State *L);
 	};
+	void run_internal(const char *env, int ref);
 
 	void resume(void *L, INT32 param);
 	void start();

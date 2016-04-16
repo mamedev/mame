@@ -1761,25 +1761,67 @@ int lua_engine::compile_with_env(const char *env, const char *script)
 	return ref;
 }
 
+template <typename Tout, typename Tin>
+Tout lua_engine::run(const char *env, int ref, Tin in)
+{
+	Tout ret;
+	lua_settop(m_lua_state, 0);
+	luabridge::Stack<Tin>::push(m_lua_state, in);
+	run_internal(env, ref);
+	ret = luabridge::Stack<Tout>::get(m_lua_state, 1);
+	lua_pop(m_lua_state, 1);
+	return ret;
+}
+
+template <typename Tout>
+Tout lua_engine::run(const char *env, int ref)
+{
+	Tout ret;
+	lua_settop(m_lua_state, 0);
+	lua_pushnil(m_lua_state);
+	run_internal(env, ref);
+	ret = luabridge::Stack<Tout>::get(m_lua_state, 1);
+	lua_pop(m_lua_state, 1);
+	return ret;
+}
+
+template <typename Tin>
+void lua_engine::run(const char *env, int ref, Tin in)
+{
+	lua_settop(m_lua_state, 0);
+	luabridge::Stack<Tin>::push(m_lua_state, in);
+	run_internal(env, ref);
+	lua_pop(m_lua_state, 1);
+}
+
 void lua_engine::run(const char *env, int ref)
 {
-	std::string field = std::string("env_").append(env);
 	lua_settop(m_lua_state, 0);
+	lua_pushnil(m_lua_state);
+	run_internal(env, ref);
+	lua_pop(m_lua_state, 1);
+}
+
+void lua_engine::run_internal(const char *env, int ref)
+{
+	std::string field = std::string("env_").append(env);
 	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
 	if(lua_istable(m_lua_state, -1))
 	{
 		lua_rawgeti(m_lua_state, -1, ref);
 		if(lua_isfunction(m_lua_state, -1))
 		{
-			if(int error = lua_pcall(m_lua_state, 0, 0, 0) != LUA_OK)
+			lua_pushvalue(m_lua_state, -3);
+			if(int error = lua_pcall(m_lua_state, 1, 1, 0) != LUA_OK)
 			{
 				if(error == LUA_ERRRUN)
 					printf("%s\n", lua_tostring(m_lua_state, -1));
 				lua_pop(m_lua_state, 1);
+				lua_pushnil(m_lua_state);
 			}
 		}
-		lua_pop(m_lua_state, 1);
 	}
+	lua_replace(m_lua_state, 1);
 	lua_pop(m_lua_state, 1);
 }
 void lua_engine::menu_populate(std::string &menu, std::vector<menu_item> &menu_list)
@@ -2088,6 +2130,7 @@ void lua_engine::initialize()
 				.addFunction ("cheat", &running_machine::cheat)
 				.addFunction ("memory", &running_machine::memory)
 				.addFunction ("options", &running_machine::options)
+				.addFunction ("outputs", &running_machine::output)
 				.addProperty <luabridge::LuaRef, void> ("devices", &lua_engine::l_machine_get_devices)
 				.addProperty <luabridge::LuaRef, void> ("screens", &lua_engine::l_machine_get_screens)
 				.addProperty <luabridge::LuaRef, void> ("images", &lua_engine::l_machine_get_images)
@@ -2344,6 +2387,14 @@ void lua_engine::initialize()
 				.addCFunction ("write_i64", &lua_memory_region::l_region_write<INT64>)
 				.addCFunction ("write_u64", &lua_memory_region::l_region_write<UINT64>)
 			.endClass()
+			.beginClass <output_manager> ("output")
+				.addFunction ("set_value", &output_manager::set_value)
+				.addFunction ("set_indexed_value", &output_manager::set_indexed_value)
+				.addFunction ("get_value", &output_manager::get_value)
+				.addFunction ("get_indexed_value", &output_manager::get_indexed_value)
+				.addFunction ("name_to_id", &output_manager::name_to_id)
+				.addFunction ("id_to_name", &output_manager::id_to_name)
+			.endClass()
 			.deriveClass <memory_region, lua_memory_region> ("region")
 				.addProperty <UINT32> ("size", &memory_region::bytes)
 			.endClass()
@@ -2367,11 +2418,16 @@ void lua_engine::initialize()
 			.beginClass <lua_emu_file> ("lua_file")
 				.addCFunction ("read", &lua_emu_file::l_emu_file_read)
 			.endClass()
+			// make sure there's a reference to the emu_file search path in your script as long as you need it
+			// otherwise it might be garbage collected as emu_file don't copy the string
 			.deriveClass <emu_file, lua_emu_file> ("file")
 				.addConstructor <void (*)(const char *, UINT32)> ()
 				.addFunction ("open", static_cast<osd_file::error (emu_file::*)(const char *)>(&emu_file::open))
+				.addFunction ("open_next", &emu_file::open_next)
 				.addFunction ("seek", &emu_file::seek)
 				.addFunction ("size", &emu_file::size)
+				.addFunction ("filename", &emu_file::filename)
+				.addFunction ("fullpath", &emu_file::fullpath)
 			.endClass()
 			.beginClass <lua_item> ("item")
 				.addConstructor <void (*)(int)> ()
