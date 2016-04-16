@@ -2075,6 +2075,49 @@ int lua_engine::lua_machine::l_logerror(lua_State *L)
 	return 0;
 }
 
+std::string lua_engine::get_print_buffer(lua_State *L)
+{
+    int nargs = lua_gettop(L);
+    
+    const std::string sep = " ";
+    
+    std::ostringstream ss;
+    bool first = true;
+
+    for (int i = 1; i <= nargs; i++) {
+      const char* c = lua_tostring(L, i);
+      const std::string str = c ? c : "<nil>";
+      if (first) first = false;
+      else ss << sep;
+      ss << str;
+    }
+
+	return ss.str();
+}
+int lua_engine::l_osd_printf_verbose(lua_State *L)
+{
+    osd_printf_verbose("%s\n",get_print_buffer(L).c_str());
+	return 0;
+}
+
+int lua_engine::l_osd_printf_error(lua_State *L)
+{
+	osd_printf_error("%s\n",get_print_buffer(L).c_str());
+	return 0;
+}
+
+int lua_engine::l_osd_printf_info(lua_State *L)
+{
+	osd_printf_info("%s\n",get_print_buffer(L).c_str());
+	return 0;
+}
+
+int lua_engine::l_osd_printf_debug(lua_State *L)
+{
+	osd_printf_debug("%s\n",get_print_buffer(L).c_str());
+	return 0;
+}
+
 //-------------------------------------------------
 //  initialize - initialize lua hookup to emu engine
 //-------------------------------------------------
@@ -2106,6 +2149,10 @@ void lua_engine::initialize()
 			.addCFunction ("register_frame", l_emu_register_frame )
 			.addCFunction ("register_frame_done", l_emu_register_frame_done )
 			.addCFunction ("register_menu",  l_emu_register_menu )
+			.addCFunction ("print_verbose", l_osd_printf_verbose )
+			.addCFunction ("print_error",   l_osd_printf_error )
+			.addCFunction ("print_info",    l_osd_printf_info )
+			.addCFunction ("print_debug",   l_osd_printf_debug )
 			.beginClass <machine_manager> ("manager")
 				.addFunction ("machine", &machine_manager::machine)
 				.addFunction ("options", &machine_manager::options)

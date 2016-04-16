@@ -112,7 +112,7 @@ function cheat.startplugin()
 			line = line + 1
 		end
 		if not screen then
-			print("draw_text: invalid screen")
+			emu.print_verbose("draw_text: invalid screen")
 			return
 		end
 		if type(x) == "string" then
@@ -123,7 +123,7 @@ function cheat.startplugin()
 
 	local function draw_line(screen, x1, y1, x2, y2, color)
 		if not screen then
-			print("draw_line: invalid screen")
+			emu.print_verbose("draw_line: invalid screen")
 			return
 		end
 		output[#output + 1] = { type = "line", scr = screen, x1 = x1, x2 = x2, y1 = y1, y2 = y2, color = color }
@@ -131,7 +131,7 @@ function cheat.startplugin()
 
 	local function draw_box(screen, x1, y1, x2, y2, bgcolor, linecolor)
 		if not screen then
-			print("draw_box: invalid screen")
+			emu.print_verbose("draw_box: invalid screen")
 			return
 		end
 		output[#output + 1] = { type = "box", scr = screen, x1 = x1, x2 = x2, y1 = y1, y2 = y2, bgcolor = bgcolor, linecolor = linecolor }
@@ -184,7 +184,7 @@ function cheat.startplugin()
 		for name, script in pairs(cheat.script) do
 			script, err = load(script, cheat.desc .. name, "t", cheat.cheat_env)
 			if not script then
-				print("error loading cheat script: " .. cheat.desc .. " " .. err)
+				emu.print_verbose("error loading cheat script: " .. cheat.desc .. " " .. err)
 				cheat = { desc = cheat.desc .. " error" }
 				return
 			end
@@ -199,7 +199,7 @@ function cheat.startplugin()
 				local cpu, mem
 				cpu = manager:machine().devices[space.tag]
 				if not cpu then
-					print("error loading cheat script: " .. cheat.desc)
+					emu.print_verbose("error loading cheat script: " .. cheat.desc)
 					cheat = { desc = cheat.desc .. " error" }
 					return
 				end
@@ -209,7 +209,7 @@ function cheat.startplugin()
 					mem = cpu.spaces["program"]
 				end
 				if not mem then
-					print("error loading cheat script: " .. cheat.desc)
+					emu.print_verbose("error loading cheat script: " .. cheat.desc)
 					cheat = { desc = cheat.desc .. " error" }
 					return
 				end
@@ -232,7 +232,7 @@ function cheat.startplugin()
 				local mem 
 				mem = manager:machine():memory().regions[region]
 				if not mem then
-					print("error loading cheat script: " .. cheat.desc)
+					emu.print_verbose("error loading cheat script: " .. cheat.desc)
 					cheat = { desc = cheat.desc .. " error" }
 					return
 				end
@@ -244,7 +244,7 @@ function cheat.startplugin()
 				local ram
 				ram = manager:machine().devices[ram]
 				if not ram then
-					print("error loading cheat script: " .. cheat.desc)
+					emu.print_verbose("error loading cheat script: " .. cheat.desc)
 					cheat = { desc = cheat.desc .. " error" }
 					return
 				end
@@ -531,14 +531,14 @@ function cheat.startplugin()
 		cheat = cheats[index]
 		if cheat then
 			for k, v in pairs(cheat.cheat_env) do
-				print(k, v)
+				emu.print_verbose(k, v)
 			end
 		end
 	end
 
 	function ce.list()
 		for num, cheat in pairs(cheats) do
-			print(num, cheat.desc)
+			emu.print_verbose(num, cheat.desc)
 		end
 	end
 

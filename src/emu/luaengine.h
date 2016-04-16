@@ -141,6 +141,11 @@ private:
 	static int l_emu_register_frame(lua_State *L);
 	static int l_emu_register_frame_done(lua_State *L);
 	static int l_emu_register_menu(lua_State *L);
+	static std::string get_print_buffer(lua_State *L);
+	static int l_osd_printf_verbose(lua_State *L);
+	static int l_osd_printf_error(lua_State *L);
+	static int l_osd_printf_info(lua_State *L);
+	static int l_osd_printf_debug(lua_State *L);
 	static int register_function(lua_State *L, const char *id);
 
 	// "emu.machine" namespace
