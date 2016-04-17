@@ -73,7 +73,7 @@ public:
 				winwindow_toggle_full_screen();
 
 			vsnprintf(buffer, ARRAY_LENGTH(buffer), msg, args);
-			win_message_box_utf8(win_window_list ? win_window_list->m_hwnd : nullptr, buffer, emulator_info::get_appname(), MB_OK);
+			win_message_box_utf8(win_window_list ? win_window_list->platform_window<HWND>() : nullptr, buffer, emulator_info::get_appname(), MB_OK);
 		}
 		else
 			chain_output(channel, msg, args);

@@ -43,7 +43,7 @@ static inline sdl_window_info * window_from_id(Uint32 windowID)
 	for (w = sdl_window_list; w != NULL; w = w->m_next)
 	{
 		//printf("w->window_id: %d\n", w->window_id);
-		if (w->sdl_window() == window)
+		if (w->platform_window<SDL_Window*>() == window)
 		{
 			return w;
 		}

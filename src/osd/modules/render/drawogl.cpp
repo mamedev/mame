@@ -563,9 +563,9 @@ int renderer_ogl::create()
 {
 	// create renderer
 #if defined(OSD_WINDOWS)
-	m_gl_context = global_alloc(win_gl_context(window().m_hwnd));
+	m_gl_context = global_alloc(win_gl_context(window().platform_window<HWND>()));
 #else
-	m_gl_context = global_alloc(sdl_gl_context(window().sdl_window()));
+	m_gl_context = global_alloc(sdl_gl_context(window().platform_window<SDL_Window*>()));
 #endif
 	if  (m_gl_context->LastErrorMsg() != nullptr)
 	{

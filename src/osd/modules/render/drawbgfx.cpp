@@ -164,9 +164,9 @@ int renderer_bgfx::create()
 			bgfx::setPlatformData(blank_pd);
 		}
 #ifdef OSD_WINDOWS
-		bgfx::winSetHwnd(window().m_hwnd);
+		bgfx::winSetHwnd(window().platform_window<HWND>());
 #else
-		bgfx::sdlSetWindow(window().sdl_window());
+		bgfx::sdlSetWindow(window().platform_window<SDL_Window*>());
 #endif
 		std::string backend(m_options.bgfx_backend());
 		if (backend == "auto")
@@ -213,9 +213,9 @@ int renderer_bgfx::create()
 	if (window().m_index != 0)
 	{
 #ifdef OSD_WINDOWS
-		m_framebuffer = m_targets->create_backbuffer(window().m_hwnd, m_width[window().m_index], m_height[window().m_index]);
+		m_framebuffer = m_targets->create_backbuffer(window().platform_window<HWND>(), m_width[window().m_index], m_height[window().m_index]);
 #else
-		m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(window().sdl_window()), m_width[window().m_index], m_height[window().m_index]);
+		m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(window().platform_window<SDL_Window*>()), m_width[window().m_index], m_height[window().m_index]);
 #endif
 		bgfx::touch(window().m_index);
 	}
@@ -803,9 +803,9 @@ bool renderer_bgfx::update_dimensions()
 
 			delete m_framebuffer;
 #ifdef OSD_WINDOWS
-			m_framebuffer = m_targets->create_backbuffer(window().m_hwnd, width, height);
+			m_framebuffer = m_targets->create_backbuffer(window().platform_window<HWND>(), width, height);
 #else
-			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(window().sdl_window()), width, height);
+			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(window().platform_window<SDL_Window*>()), width, height);
 #endif
 
 			bgfx::setViewFrameBuffer(s_current_view, m_framebuffer->target());

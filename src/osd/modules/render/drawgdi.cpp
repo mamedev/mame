@@ -46,7 +46,7 @@ int renderer_gdi::create()
 render_primitive_list *renderer_gdi::get_primitives()
 {
 	RECT client;
-	GetClientRect(window().m_hwnd, &client);
+	GetClientRect(window().platform_window<HWND>(), &client);
 	window().target()->set_bounds(rect_width(&client), rect_height(&client), window().pixel_aspect());
 	return &window().target()->get_primitives();
 }
@@ -63,7 +63,7 @@ int renderer_gdi::draw(const int update)
 
 	// get the target bounds
 	RECT bounds;
-	GetClientRect(window().m_hwnd, &bounds);
+	GetClientRect(window().platform_window<HWND>(), &bounds);
 
 	// compute width/height/pitch of target
 	int width = rect_width(&bounds);

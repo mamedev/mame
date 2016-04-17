@@ -377,6 +377,31 @@ void sdl_osd_interface::window_exit()
 
 }
 
+void sdl_window_info::capture_pointer()
+{
+	if (!SDL_GetWindowGrab(platform_window<SDL_Window*>()))
+		SDL_SetWindowGrab(platform_window<SDL_Window*>(), SDL_TRUE);
+	SDL_SetRelativeMouseMode(SDL_TRUE);
+}
+
+void sdl_window_info::release_pointer()
+{
+	if (SDL_GetWindowGrab(platform_window<SDL_Window*>()))
+		SDL_SetWindowGrab(platform_window<SDL_Window*>(), SDL_FALSE);
+	SDL_SetRelativeMouseMode(SDL_FALSE);
+}
+
+void sdl_window_info::hide_pointer()
+{
+	SDL_ShowCursor(SDL_DISABLE);
+}
+
+void sdl_window_info::show_pointer()
+{
+	SDL_ShowCursor(SDL_ENABLE);
+	
+}
+
 
 //============================================================
 //  sdlwindow_resize
@@ -392,7 +417,7 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_resize_wt )
 
 	ASSERT_WINDOW_THREAD();
 
-	SDL_SetWindowSize(window->sdl_window(), width, height);
+	SDL_SetWindowSize(window->platform_window<SDL_Window*>(), width, height);
 	window->renderer().notify_changed();
 
 	osd_free(wp);
@@ -475,11 +500,11 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 #endif
 	if (window->fullscreen() && (video_config.switchres || is_osx))
 	{
-		SDL_SetWindowFullscreen(window->sdl_window(), 0);    // Try to set mode
-		SDL_SetWindowDisplayMode(window->sdl_window(), &window->m_original_mode->mode);    // Try to set mode
-		SDL_SetWindowFullscreen(window->sdl_window(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
+		SDL_SetWindowFullscreen(window->platform_window<SDL_Window*>(), 0);    // Try to set mode
+		SDL_SetWindowDisplayMode(window->platform_window<SDL_Window*>(), &window->m_original_mode->mode);    // Try to set mode
+		SDL_SetWindowFullscreen(window->platform_window<SDL_Window*>(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
 	}
-	SDL_DestroyWindow(window->sdl_window());
+	SDL_DestroyWindow(window->platform_window<SDL_Window*>());
 
 	downcast<sdl_osd_interface &>(window->machine().osd()).release_keys();
 
@@ -555,20 +580,17 @@ void sdl_window_info::update_cursor_state()
 
 		if (!fullscreen() && !should_hide_mouse)
 		{
-			SDL_ShowCursor(SDL_ENABLE);
-			if (SDL_GetWindowGrab(sdl_window() ))
-				SDL_SetWindowGrab(sdl_window(), SDL_FALSE);
-			SDL_SetRelativeMouseMode(SDL_FALSE);
+			show_pointer();
+			release_pointer();
 		}
 		else
 		{
-			SDL_ShowCursor(SDL_DISABLE);
-			if (!SDL_GetWindowGrab(sdl_window()))
-				SDL_SetWindowGrab(sdl_window(), SDL_TRUE);
-			SDL_SetRelativeMouseMode(SDL_TRUE);
+			hide_pointer();
+			capture_pointer();
 		}
+
 		SDL_SetCursor(nullptr); // Force an update in case the underlying driver has changed visibility
-			}
+	}
 #endif
 }
 
@@ -657,11 +679,11 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_video_window_destroy_wt )
 
 	if (window->fullscreen() && video_config.switchres)
 	{
-		SDL_SetWindowFullscreen(window->sdl_window(), 0);    // Try to set mode
-		SDL_SetWindowDisplayMode(window->sdl_window(), &window->m_original_mode->mode);    // Try to set mode
-		SDL_SetWindowFullscreen(window->sdl_window(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
+		SDL_SetWindowFullscreen(window->platform_window<SDL_Window*>(), 0);    // Try to set mode
+		SDL_SetWindowDisplayMode(window->platform_window<SDL_Window*>(), &window->m_original_mode->mode);    // Try to set mode
+		SDL_SetWindowFullscreen(window->platform_window<SDL_Window*>(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
 	}
-	SDL_DestroyWindow(window->sdl_window());
+	SDL_DestroyWindow(window->platform_window<SDL_Window*>());
 	// release all keys ...
 	downcast<sdl_osd_interface &>(window->machine().osd()).release_keys();
 
@@ -928,14 +950,14 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 	osd_rect work = window->monitor()->usuable_position_size();
 
 	// create the SDL window
-	window->m_sdl_window = SDL_CreateWindow(window->m_title,
+	auto sdlwindow = SDL_CreateWindow(window->m_title,
 			work.left() + (work.width() - temp.width()) / 2,
 			work.top() + (work.height() - temp.height()) / 2,
 			temp.width(), temp.height(), window->m_extra_flags);
 	//window().sdl_window() = SDL_CreateWindow(window().m_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 	//      width, height, m_extra_flags);
 
-	if  ( window->m_sdl_window == nullptr )
+	if  (sdlwindow == nullptr )
 	{
 		if (window->renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL))
 			osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
@@ -944,18 +966,20 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 		return (void *) &result[1];
 	}
 
+	window->set_platform_window(sdlwindow);
+
 	if (window->fullscreen() && video_config.switchres)
 	{
 		SDL_DisplayMode mode;
 		//SDL_GetCurrentDisplayMode(window().monitor()->handle, &mode);
-		SDL_GetWindowDisplayMode(window->sdl_window(), &mode);
+		SDL_GetWindowDisplayMode(window->platform_window<SDL_Window*>(), &mode);
 		window->m_original_mode->mode = mode;
 		mode.w = temp.width();
 		mode.h = temp.height();
 		if (window->m_win_config.refresh)
 			mode.refresh_rate = window->m_win_config.refresh;
 
-		SDL_SetWindowDisplayMode(window->sdl_window(), &mode);    // Try to set mode
+		SDL_SetWindowDisplayMode(window->platform_window<SDL_Window*>(), &mode);    // Try to set mode
 #ifndef SDLMAME_WIN32
 		/* FIXME: Warp the mouse to 0,0 in case a virtual desktop resolution
 		 * is in place after the mode switch - which will most likely be the case
@@ -971,14 +995,14 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 
 	// show window
 
-	SDL_ShowWindow(window->sdl_window());
+	SDL_ShowWindow(window->platform_window<SDL_Window*>());
 	//SDL_SetWindowFullscreen(window->sdl_window(), 0);
 	//SDL_SetWindowFullscreen(window->sdl_window(), window->fullscreen());
-	SDL_RaiseWindow(window->sdl_window());
+	SDL_RaiseWindow(window->platform_window<SDL_Window*>());
 
 #ifdef SDLMAME_WIN32
 	if (window->fullscreen())
-		SDL_SetWindowGrab(window->sdl_window(), SDL_TRUE);
+		SDL_SetWindowGrab(window->platform_window<SDL_Window*>(), SDL_TRUE);
 #endif
 
 	// set main window
@@ -1308,7 +1332,7 @@ osd_dim sdl_window_info::get_min_bounds(int constrain)
 osd_dim sdl_window_info::get_size()
 {
 	int w=0; int h=0;
-	SDL_GetWindowSize(m_sdl_window, &w, &h);
+	SDL_GetWindowSize(platform_window<SDL_Window*>(), &w, &h);
 	return osd_dim(w,h);
 }
 
@@ -1368,7 +1392,6 @@ sdl_window_info::sdl_window_info(running_machine &a_machine, int index, osd_moni
 	m_minimum_dim(0,0),
 	m_windowed_dim(0,0),
 	m_rendered_event(0, 1), m_target(0),
-	m_sdl_window(NULL),
 	m_machine(a_machine), m_monitor(a_monitor), m_fullscreen(0)
 {
 	m_win_config = *config;

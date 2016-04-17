@@ -81,7 +81,7 @@ bool windows_osd_interface::video_init()
 	}
 
 	if (video_config.mode != VIDEO_MODE_NONE)
-		SetForegroundWindow(win_window_list->m_hwnd);
+		SetForegroundWindow(win_window_list->platform_window<HWND>());
 
 	return true;
 }
