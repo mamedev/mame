@@ -131,7 +131,7 @@ private:
 	ImguiFontHandle  m_font;
 	UINT8            m_key_char;
 	bool             m_hide;
-        unsigned char* font_data;
+    //    unsigned char* font_data;
 	int              m_win_count;  // number of active windows, does not decrease, used to ID individual windows
 };
 
