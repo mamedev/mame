@@ -249,8 +249,14 @@ struct MouseButtonEventArgs
 	int ypos;
 };
 
+// Forward declarations
+struct _EXCEPTION_POINTERS;
+
 class windows_osd_interface : public osd_common_t
 {
+	// Access to exception filter static method
+	friend int main(int argc, char *argv[]);
+
 public:
 	// construction/destruction
 	windows_osd_interface(windows_options &options);
@@ -297,6 +303,7 @@ private:
 	windows_options &   m_options;
 
 	static const int DEFAULT_FONT_HEIGHT = 200;
+	static long __stdcall exception_filter(struct _EXCEPTION_POINTERS *info);
 };
 
 #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
@@ -336,12 +343,5 @@ extern const options_entry mame_win_options[];
 // defined in winwork.c
 extern int osd_num_processors;
 
-
-
-//============================================================
-//  FUNCTION PROTOTYPES
-//============================================================
-
-void winmain_dump_stack();
 
 #endif

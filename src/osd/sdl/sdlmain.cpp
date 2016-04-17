@@ -196,6 +196,9 @@ int main(int argc, char *argv[])
 	setvbuf(stdout, (char *) NULL, _IONBF, 0);
 	setvbuf(stderr, (char *) NULL, _IONBF, 0);
 
+	// Initialize crash diagnostics
+	diagnostics_module::get_instance()->init_crash_diagnostics();
+
 #if defined(SDLMAME_ANDROID)
 	/* Enable standard application logging */
 	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
