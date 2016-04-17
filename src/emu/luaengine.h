@@ -63,11 +63,11 @@ public:
 	void attach_notifiers();
 	void on_frame_done();
 
-	int compile_with_env(const char *env, const char *script);
-	template <typename Tout, typename Tin> Tout run(const char *env, int ref, Tin in);
-	template <typename Tout> Tout run(const char *env, int ref);
-	template <typename Tin> void run(const char *env, int ref, Tin in);
-	void run(const char *env, int ref);
+	int compile_with_env(const char *envname, const char *script, const char *env = nullptr);
+	template <typename Tout, typename Tin> Tout run(const char *envname, int ref, Tin in);
+	template <typename Tout> Tout run(const char *envname, int ref);
+	template <typename Tin> void run(const char *envname, int ref, Tin in);
+	void run(const char *envname, int ref);
 private:
 	struct hook {
 		lua_State *L;

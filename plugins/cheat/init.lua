@@ -327,6 +327,7 @@ function cheat.startplugin()
 	end
 
 	local function menu_callback(index, event)
+		manager:machine():popmessage()
 		if index > #cheats and event == "select" then
 			index = index - #cheats
 			if index == 2 then
