@@ -643,10 +643,16 @@ void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 	// check if no driver loaded (not all settings might be loaded yet)
 	if (&machine->system() == &GAME_NAME(___empty))
 	{
+		return;
+	}
+
+	// check if another driver is loaded
+	if (std::strcmp(machine->system().name, last_system_name) != 0)
+	{
+		strncpy(last_system_name, machine->system().name, sizeof(last_system_name));
+
 		options->params_init = false;
 		last_options.params_init = false;
-
-		return;
 	}
 
 	enumerate_screens();
@@ -2254,6 +2260,8 @@ static INT32 slider_update_trampoline(running_machine &machine, void *arg, int i
 	}
 	return 0;
 }
+
+char shaders::last_system_name[16];
 
 hlsl_options shaders::last_options = { false };
 

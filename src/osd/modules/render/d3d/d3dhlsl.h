@@ -439,6 +439,7 @@ private:
 
 	static slider_desc      s_sliders[];
 	static hlsl_options     last_options;               // last used options
+	static char             last_system_name[16];       // last used system
 };
 
 #endif
