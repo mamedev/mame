@@ -118,6 +118,7 @@ files{
   MAME_DIR .. "src/mame/includes/m62.h",
   MAME_DIR .. "src/mame/video/m62.cpp",
   MAME_DIR .. "src/mame/audio/irem.cpp",
+  MAME_DIR .. "src/mame/audio/nl_kidniki.cpp",
   MAME_DIR .. "src/mame/audio/irem.h",
 
 }
