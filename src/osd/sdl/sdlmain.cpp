@@ -44,6 +44,7 @@
 #include "video.h"
 #include "osdsdl.h"
 #include "modules/lib/osdlib.h"
+#include "modules/diagnostics/diagnostics_module.h"
 
 // we override SDL's normal startup on Win32
 // please see sdlprefix.h as well
