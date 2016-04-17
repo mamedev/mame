@@ -2,13 +2,8 @@
 // copyright-holders:Andrew Gardner, Couriersud
 #include "netlist/devices/net_lib.h"
 
-#ifndef USE_FRONTIERS
-#define USE_FRONTIERS 0
-#endif
-
-#ifndef USE_FIXED_STV
-#define USE_FIXED_STV 0
-#endif
+#define USE_FRONTIERS 1
+#define USE_FIXED_STV 1
 
 /* ----------------------------------------------------------------------------
  *  Library section header START
@@ -304,5 +299,100 @@ NETLIST_START(kidniki_schematics)
 	NET_C(C26.2, R25.1)
 	NET_C(R25.2, R26.1, C29.1)
 	NET_C(R26.2, C29.2, GND)
+
+NETLIST_END()
+
+/* ----------------------------------------------------------------------------
+ *  Kidniki audio
+ * ---------------------------------------------------------------------------*/
+
+NETLIST_START(kidniki)
+
+#if (USE_FRONTIERS)
+	SOLVER(Solver, 18000)
+	PARAM(Solver.ACCURACY, 1e-8)
+	PARAM(Solver.NR_LOOPS, 300)
+	PARAM(Solver.GS_LOOPS, 1)
+	PARAM(Solver.GS_THRESHOLD, 6)
+	//PARAM(Solver.ITERATIVE, "SOR")
+	PARAM(Solver.ITERATIVE, "MAT_CR")
+	//PARAM(Solver.ITERATIVE, "GMRES")
+	PARAM(Solver.PARALLEL, 0)
+	PARAM(Solver.SOR_FACTOR, 1.00)
+	PARAM(Solver.DYNAMIC_TS, 0)
+	PARAM(Solver.DYNAMIC_LTE, 5e-4)
+	PARAM(Solver.MIN_TIMESTEP, 20e-6)
+#else
+	SOLVER(Solver, 12000)
+	PARAM(Solver.ACCURACY, 1e-8)
+	PARAM(Solver.NR_LOOPS, 300)
+	PARAM(Solver.GS_LOOPS, 20)
+	PARAM(Solver.ITERATIVE, "GMRES")
+	PARAM(Solver.PARALLEL, 0)
+#endif
+
+	LOCAL_SOURCE(kidniki_schematics)
+
+	ANALOG_INPUT(I_V5, 5)
+	//ANALOG_INPUT(I_V0, 0)
+	ALIAS(I_V0.Q, GND)
+
+	/* AY 8910 internal resistors */
+
+	RES(R_AY45L_A, 1000)
+	RES(R_AY45L_B, 1000)
+	RES(R_AY45L_C, 1000)
+
+	RES(R_AY45M_A, 1000)
+	RES(R_AY45M_B, 1000)
+	RES(R_AY45M_C, 1000)
+
+	NET_C(I_V5, R_AY45L_A.1, R_AY45L_B.1, R_AY45L_C.1, R_AY45M_A.1, R_AY45M_B.1, R_AY45M_C.1)
+	NET_C(R_AY45L_A.2, R_AY45L_B.2, R_AY45M_A.2, R_AY45M_B.2, R_AY45M_C.2)
+
+	ALIAS(I_SOUNDIC0, R_AY45L_C.2)
+	ALIAS(I_SOUND0, R_AY45L_A.2)
+
+	/* On M62 boards with pcb pictures available
+	 * D6 is missing, although the pcb print exists.
+	 * We are replacing this with a 10m Resistor.
+	 */
+	TTL_INPUT(SINH, 1)
+#if 0
+	DIODE(D6, "1N914")
+	NET_C(D6.K, SINH)
+	ALIAS(I_SINH0, D6.A)
+#else
+	RES(SINH_DUMMY, RES_M(10))
+	NET_C(SINH_DUMMY.1, SINH)
+	ALIAS(I_SINH0, SINH_DUMMY.2)
+#endif
+
+	NET_MODEL("AY8910PORT FAMILY(OVL=0.05 OVH=4.95 ORL=100.0 ORH=0.5k)")
+
+	LOGIC_INPUT(I_SD0, 1, "AY8910PORT")
+	//CLOCK(I_SD0, 5)
+	LOGIC_INPUT(I_BD0, 1, "AY8910PORT")
+	//CLOCK(I_BD0, 5)
+	LOGIC_INPUT(I_CH0, 1, "AY8910PORT")
+	//CLOCK(I_CH0, 2.2  )
+	LOGIC_INPUT(I_OH0, 1, "AY8910PORT")
+	//CLOCK(I_OH0, 1.0)
+	ANALOG_INPUT(I_MSM2K0, 0)
+	ANALOG_INPUT(I_MSM3K0, 0)
+
+	INCLUDE(kidniki_schematics)
+
+	#if (USE_FRONTIERS)
+	OPTIMIZE_FRONTIER(C63.2, RES_K(27), RES_K(1))
+	OPTIMIZE_FRONTIER(R31.2, RES_K(5.1), 50)
+	OPTIMIZE_FRONTIER(R29.2, RES_K(2.7), 50)
+	OPTIMIZE_FRONTIER(R87.2, RES_K(68), 50)
+
+	OPTIMIZE_FRONTIER(R50.1, RES_K(2.2), 50)
+	OPTIMIZE_FRONTIER(R55.1, RES_K(510), 50)
+	OPTIMIZE_FRONTIER(R84.2, RES_K(50), RES_K(5))
+
+	#endif
 
 NETLIST_END()

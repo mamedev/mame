@@ -1902,6 +1902,7 @@ files {
 	MAME_DIR .. "src/mame/machine/irem_cpu.h",
 	MAME_DIR .. "src/mame/audio/irem.cpp",
 	MAME_DIR .. "src/mame/audio/irem.h",
+  MAME_DIR .. "src/mame/audio/nl_kidniki.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "itech")
