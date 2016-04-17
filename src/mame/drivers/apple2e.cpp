@@ -1978,7 +1978,6 @@ READ8_MEMBER(apple2e_state::c800_int_r)
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		update_slotrom_banks();
-		return 0xff;
 	}
 
 	return m_rom_ptr[0x800 + offset];
@@ -1995,7 +1994,6 @@ READ8_MEMBER(apple2e_state::c800_b2_int_r)
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		update_slotrom_banks();
-		return 0xff;
 	}
 
 	return m_rom_ptr[0x4800 + offset];
