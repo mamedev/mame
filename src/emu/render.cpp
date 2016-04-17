@@ -1890,16 +1890,16 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 
 					if (PRIMFLAG_GET_VECTORBUF(curitem.flags()))
 					{
-						// flags S swap-xy, Y flip-y, X flip-x
+						// flags X(1) flip-x, Y(2) flip-y, S(4) swap-xy
 						//
-						// S  Y  X   e.g.       flips
+						// X  Y  S   e.g.       flips
 						// 0  0  0   asteroid   !X !Y
-						// 0  0  1   -
+						// 0  0  1   -           X  Y
 						// 0  1  0   speedfrk   !X  Y
-						// 0  1  1   solarq      X  Y
-						// 1  0  0   -
-						// 1  0  1   -
-						// 1  1  0   tempest    !X  Y
+						// 0  1  1   tempest    !X  Y
+						// 1  0  0   -           X !Y
+						// 1  0  1   -           x !Y
+						// 1  1  0   solarq      X  Y
 						// 1  1  1   barrier    !X !Y
 
 						bool flip_x = (manager().machine().system().flags & ORIENTATION_FLIP_X) == ORIENTATION_FLIP_X;
@@ -1915,13 +1915,13 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 						{
 							vectororient |= ORIENTATION_FLIP_Y;
 						}
-						if (flip_x && flip_y && swap_xy)
+						if ((flip_x && flip_y && swap_xy) || (!flip_x && !flip_y && swap_xy))
 						{
-							vectororient ^= ORIENTATION_FLIP_Y;
 							vectororient ^= ORIENTATION_FLIP_X;
+							vectororient ^= ORIENTATION_FLIP_Y;
 						}
 
-						// determine the final orientation (textures are up-side down, so flip y-axis for vectors to immitate that behavior)
+						// determine the final orientation (textures are up-side down, so flip axis for vectors to immitate that behavior)
 						int finalorient = orientation_add(vectororient, container_xform.orientation);
 
 						// determine UV coordinates
