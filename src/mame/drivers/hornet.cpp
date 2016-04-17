@@ -950,17 +950,22 @@ void hornet_state::machine_start()
 
 void hornet_state::machine_reset()
 {
-	if (m_user3_ptr)
+	memory_region* comm_region = memregion("user3");
+	if (comm_region != nullptr)
 	{
-		membank("bank1")->configure_entries(0, m_user3_ptr.bytes() / 0x10000, m_user3_ptr, 0x10000);
+		UINT8* comm_rom = comm_region->base();
+		membank("bank1")->configure_entries(0, comm_region->bytes() / 0x10000, comm_rom, 0x10000);
 		membank("bank1")->set_entry(0);
 	}
 
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	if (m_dsp2 != nullptr)
+		m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (m_user5_ptr)
 	{
 		membank("bank5")->set_base(m_user5_ptr);
+		membank("bank6")->set_base(m_user5_ptr);
 	}
 }
 
@@ -1036,31 +1041,11 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 	MCFG_KONPPC_CGBOARD_TYPE(CGBOARD_TYPE_HORNET)
 MACHINE_CONFIG_END
 
-
-MACHINE_RESET_MEMBER(hornet_state,hornet_2board)
-{
-	if (m_user3_ptr)
-	{
-		membank("bank1")->configure_entries(0, m_user3_ptr.bytes() / 0x10000, m_user3_ptr, 0x10000);
-		membank("bank1")->set_entry(0);
-	}
-	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-
-	if (m_user5_ptr)
-	{
-		membank("bank5")->set_base(m_user5_ptr);
-		membank("bank6")->set_base(m_user5_ptr);
-	}
-}
-
 static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 
 	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL_36MHz)
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(sharc1_map)
-
-	MCFG_MACHINE_RESET_OVERRIDE(hornet_state,hornet_2board)
 
 
 	MCFG_DEVICE_REMOVE("k037122_1")
