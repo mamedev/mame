@@ -58,20 +58,6 @@
 			],
 			"output": "internal"
 		},
-		{
-			"effect": "pillarbox_left_horizontal/saturation",
-			"name": "Saturation Pass",
-			"disablewhen": [
-				{ "type": "slider", "condition": "equal", "name": "saturation", "value": 100 }
-			],
-			"uniforms": [
-				{ "uniform": "u_saturation", "slider": "saturation" }
-			],
-			"input": [
-				{ "sampler": "s_tex", "target": "internal" }
-			],
-			"output": "internal"
-		},
 		{	"effect": "pillarbox_left_horizontal/gaussian",
 			"name": "Gaussian Blur 2, Horizontal",
 			"uniforms": [
@@ -86,6 +72,20 @@
 			"name": "Gaussian Blur 2, Vertical",
 			"uniforms": [
 				{ "uniform": "u_dimension", "value": [ 0.0, 1.0 ] }
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "internal" }
+			],
+			"output": "internal"
+		},
+		{
+			"effect": "pillarbox_left_horizontal/saturation",
+			"name": "Saturation Pass",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "name": "saturation", "value": 100 }
+			],
+			"uniforms": [
+				{ "uniform": "u_saturation", "slider": "saturation" }
 			],
 			"input": [
 				{ "sampler": "s_tex", "target": "internal" }
