@@ -197,6 +197,7 @@ public:
 	virtual int create() = 0;
 	virtual render_primitive_list *get_primitives() = 0;
 
+	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) { }
 	virtual std::vector<ui_menu_item> get_slider_list() { return m_sliders; }
 	virtual int draw(const int update) = 0;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) { return 0; };

@@ -314,6 +314,9 @@ static void check_osd_inputs(running_machine &machine)
 
 	if (machine.ui_input().pressed(IPT_OSD_7))
 		window->modify_prescale(1);
+
+	if (machine.ui_input().pressed(IPT_OSD_8))
+		window->renderer().record();
 }
 
 //============================================================

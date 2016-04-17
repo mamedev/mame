@@ -79,6 +79,7 @@ public:
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) = 0;
 
 	// video overridables
+	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) = 0;
 	virtual std::vector<ui_menu_item> get_slider_list() = 0;
 
 	// font interface

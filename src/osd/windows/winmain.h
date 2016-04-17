@@ -260,8 +260,11 @@ public:
 	virtual void init(running_machine &machine) override;
 	virtual void update(bool skip_redraw) override;
 
-	// video overridables
+	// input overrideables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
+
+	// video overridables
+	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) override;
 
 	virtual void video_register() override;
 
@@ -286,6 +289,8 @@ protected:
 	virtual void build_slider_list() override;
 	virtual void update_slider_list() override;
 
+	void check_osd_inputs();
+
 private:
 	virtual void osd_exit() override;
 
@@ -306,7 +311,7 @@ private:
 public:
 	MameMainApp();
 
-	// IFrameworkView Methods. 
+	// IFrameworkView Methods.
 	virtual void Initialize(Windows::ApplicationModel::Core::CoreApplicationView^ applicationView);
 	virtual void SetWindow(Windows::UI::Core::CoreWindow^ window);
 	virtual void Load(Platform::String^ entryPoint);

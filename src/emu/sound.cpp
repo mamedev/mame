@@ -1075,6 +1075,7 @@ void sound_manager::update(void *ptr, int param)
 	{
 		if (!m_nosound_mode)
 			machine().osd().update_audio_stream(finalmix, finalmix_offset / 2);
+		machine().osd().add_audio_to_recording(finalmix, finalmix_offset / 2);
 		machine().video().add_sound_to_recording(finalmix, finalmix_offset / 2);
 		if (m_wavfile != nullptr)
 			wav_add_data_16(m_wavfile, finalmix, finalmix_offset);

@@ -233,7 +233,14 @@ void sdl_osd_interface::customize_input_type_list(simple_list<input_type_entry> 
 			entry.configure_osd("INCREASE_PRESCALE", "Increase Prescaling");
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F7, KEYCODE_LCONTROL);
 			break;
-			// add a Not lcrtl condition to the load state key
+
+		// lshift-lalt-F12 for fullscreen video (BGFX)
+		case IPT_OSD_8:
+			entry.configure_osd("RENDER_AVI", "Record Rendered Video");
+			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, KEYCODE_LSHIFT, KEYCODE_LALT);
+			break;
+
+		// add a Not lcrtl condition to the load state key
 		case IPT_UI_LOAD_STATE:
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F7, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LSHIFT);
 			break;
