@@ -985,7 +985,7 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 		 * is in place after the mode switch - which will most likely be the case
 		 * This is a hack to work around a deficiency in SDL2
 		 */
-		SDL_WarpMouseInWindow(window->sdl_window(), 1, 1);
+		SDL_WarpMouseInWindow(window->platform_window<SDL_Window*>(), 1, 1);
 #endif
 	}
 	else
