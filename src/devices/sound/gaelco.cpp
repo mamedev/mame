@@ -186,6 +186,9 @@ READ16_MEMBER( gaelco_gae1_device::gaelcosnd_r )
 {
 	LOG_READ_WRITES(("%s: (GAE1): read from %04x\n", machine().describe_context(), offset));
 
+	/* first update the stream to this point in time */
+	m_stream->update();
+
 	return m_sndregs[offset];
 }
 
