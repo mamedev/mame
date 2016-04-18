@@ -1,4 +1,4 @@
-// Initial test to attempt an imgui based debugger
+// ImGui based debugger
 
 #include "emu.h"
 #include "imgui/imgui.h"
@@ -18,25 +18,14 @@
 #include "debug_module.h"
 #include "modules/osdmodule.h"
 
-enum
+class debug_area
 {
-	VIEW_STATE_BUTTON           = 0x01,
-	VIEW_STATE_MOVING           = 0x02,
-	VIEW_STATE_SIZING           = 0x04,
-	VIEW_STATE_NEEDS_UPDATE     = 0x08,
-	VIEW_STATE_FOLLOW_CPU       = 0x10,
-	VIEW_STATE_VISIBLE          = 0x20
-};
-
-class DView
-{
-	DISABLE_COPYING(DView);
+	DISABLE_COPYING(debug_area);
 
 public:
-	DView(running_machine &machine, debug_view_type type, int flags)
+	debug_area(running_machine &machine, debug_view_type type)
 		: next(nullptr),
 			type(0),
-			state(0),
 			ofs_x(0),
 			ofs_y(0),
 			exec_cmd(false)
@@ -44,7 +33,6 @@ public:
 		this->view = machine.debug_view().alloc_view(type, nullptr, this);
 		this->type = type;
 		this->m_machine = &machine;
-		this->state = flags | VIEW_STATE_NEEDS_UPDATE | VIEW_STATE_VISIBLE;
 		this->width = 300;
 		this->height = 300;
 
@@ -59,7 +47,7 @@ public:
 			break;
 		}
 		}
-	~DView()
+	~debug_area()
 	{
 		//this->target->debug_free(*this->container);
 		machine().debug_view().free_view(*this->view);
@@ -67,12 +55,11 @@ public:
 
 	running_machine &machine() const { assert(m_machine != nullptr); return *m_machine; }
 
-	DView *             next;
+	debug_area *             next;
 
 	int                 type;
 	debug_view *        view;
 	running_machine *   m_machine;
-	int                 state;
 	// drawing
 	int                 ofs_x;
 	int                 ofs_y;
@@ -116,9 +103,9 @@ private:
 	void add_memory(int id);
 	void add_bpoints(int id);
 	void add_wpoints(int id);
-	void draw_disasm(DView* view_ptr, bool* opened);
-	void draw_memory(DView* view_ptr, bool* opened);
-	void draw_bpoints(DView* view_ptr, bool* opened);
+	void draw_disasm(debug_area* view_ptr, bool* opened);
+	void draw_memory(debug_area* view_ptr, bool* opened);
+	void draw_bpoints(debug_area* view_ptr, bool* opened);
 	void update_cpu_view(device_t* device);
 
 	running_machine* m_machine;
@@ -131,24 +118,23 @@ private:
 	ImguiFontHandle  m_font;
 	UINT8            m_key_char;
 	bool             m_hide;
-    //    unsigned char* font_data;
 	int              m_win_count;  // number of active windows, does not decrease, used to ID individual windows
 };
 
 // globals
-static std::vector<DView*> view_list;
-static DView* view_main_console = nullptr;
-static DView* view_main_disasm = nullptr;
-static DView* view_main_regs = nullptr;
+static std::vector<debug_area*> view_list;
+static debug_area* view_main_console = nullptr;
+static debug_area* view_main_disasm = nullptr;
+static debug_area* view_main_regs = nullptr;
 
-static void view_list_add(DView* item)
+static void view_list_add(debug_area* item)
 {
 	view_list.push_back(item);
 }
 
-static void view_list_remove(DView* item)
+static void view_list_remove(debug_area* item)
 {
-	std::vector<DView*>::iterator it;
+	std::vector<debug_area*>::iterator it;
 	if(view_list.empty())
 		return;
 	it = std::find(view_list.begin(),view_list.end(),item);
@@ -156,11 +142,11 @@ static void view_list_remove(DView* item)
 		
 }
 
-static DView *dview_alloc(running_machine &machine, debug_view_type type, int flags)
+static debug_area *dview_alloc(running_machine &machine, debug_view_type type)
 {
-	DView *dv;
+	debug_area *dv;
 
-	dv = global_alloc(DView(machine, type, flags));
+	dv = global_alloc(debug_area(machine, type));
 
 	return dv;
 }
@@ -367,7 +353,7 @@ void debug_imgui::update_cpu_view(device_t* device)
 	view_main_regs->view->set_source(*source);
 }
 
-void debug_imgui::draw_bpoints(DView* view_ptr, bool* opened)
+void debug_imgui::draw_bpoints(debug_area* view_ptr, bool* opened)
 {
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened))
@@ -424,8 +410,8 @@ void debug_imgui::draw_bpoints(DView* view_ptr, bool* opened)
 void debug_imgui::add_bpoints(int id)
 {
 	std::stringstream str;
-	DView* new_view;
-	new_view = dview_alloc(*m_machine, DVT_BREAK_POINTS, 0);
+	debug_area* new_view;
+	new_view = dview_alloc(*m_machine, DVT_BREAK_POINTS);
 	str << id;
 	str << ": Breakpoints";
 	new_view->title = str.str();
@@ -439,8 +425,8 @@ void debug_imgui::add_bpoints(int id)
 void debug_imgui::add_wpoints(int id)
 {
 	std::stringstream str;
-	DView* new_view;
-	new_view = dview_alloc(*m_machine, DVT_WATCH_POINTS, 0);
+	debug_area* new_view;
+	new_view = dview_alloc(*m_machine, DVT_WATCH_POINTS);
 	str << id;
 	str << ": Watchpoints";
 	new_view->title = str.str();
@@ -451,7 +437,7 @@ void debug_imgui::add_wpoints(int id)
 	view_list_add(new_view);
 }
 
-void debug_imgui::draw_disasm(DView* view_ptr, bool* opened)
+void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 {
 	std::string cpu_list = "";
 	const debug_view_source* src = view_ptr->view->first_source();
@@ -566,8 +552,8 @@ void debug_imgui::draw_disasm(DView* view_ptr, bool* opened)
 void debug_imgui::add_disasm(int id)
 {
 	std::stringstream str;
-	DView* new_view;
-	new_view = dview_alloc(*m_machine, DVT_DISASSEMBLY, 0);
+	debug_area* new_view;
+	new_view = dview_alloc(*m_machine, DVT_DISASSEMBLY);
 	str << id;
 	str << ": Disassembly";
 	new_view->title = str.str();
@@ -580,7 +566,7 @@ void debug_imgui::add_disasm(int id)
 	view_list_add(new_view);
 }
 
-void debug_imgui::draw_memory(DView* view_ptr, bool* opened)
+void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 {
 	std::string region_list = "";
 	const debug_view_source* src = view_ptr->view->first_source();
@@ -719,8 +705,8 @@ void debug_imgui::draw_memory(DView* view_ptr, bool* opened)
 void debug_imgui::add_memory(int id)
 {
 	std::stringstream str;
-	DView* new_view;
-	new_view = dview_alloc(*m_machine, DVT_MEMORY, 0);
+	debug_area* new_view;
+	new_view = dview_alloc(*m_machine, DVT_MEMORY);
 	str << id;
 	str << ": Memory";
 	new_view->title = str.str();
@@ -796,13 +782,13 @@ void debug_imgui::draw_console()
 			{
 				if(ImGui::MenuItem("Show all"))
 				{
-					for(std::vector<DView*>::iterator view_ptr = view_list.begin();view_ptr != view_list.end();++view_ptr)
+					for(std::vector<debug_area*>::iterator view_ptr = view_list.begin();view_ptr != view_list.end();++view_ptr)
 						ImGui::SetWindowCollapsed((*view_ptr)->title.c_str(),false);
 				}
 				ImGui::Separator();
 				// list all extra windows, so we can un-collapse the windows if necessary
-				//DView* view_ptr;
-				for(std::vector<DView*>::iterator view_ptr = view_list.begin();view_ptr != view_list.end();++view_ptr)
+				//debug_area* view_ptr;
+				for(std::vector<debug_area*>::iterator view_ptr = view_list.begin();view_ptr != view_list.end();++view_ptr)
 				{
 					bool collapsed;
 					if(ImGui::Begin((*view_ptr)->title.c_str()))
@@ -935,9 +921,9 @@ void debug_imgui::draw_console()
 
 void debug_imgui::update()
 {
-	DView* to_delete = nullptr;
-	//DView* view_ptr = view_list;
-	std::vector<DView*>::iterator view_ptr;
+	debug_area* to_delete = nullptr;
+	//debug_area* view_ptr = view_list;
+	std::vector<debug_area*>::iterator view_ptr;
 	bool opened;
 	int count = 0;
 	ImGui::PushStyleColor(ImGuiCol_WindowBg,ImVec4(1.0f,1.0f,1.0f,0.9f));
@@ -1031,16 +1017,16 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 	UINT32 height = m_machine->render().ui_target().height();
 	if(firststop && view_list.empty())
 	{
-		view_main_console = dview_alloc(device.machine(), DVT_CONSOLE, VIEW_STATE_FOLLOW_CPU);
+		view_main_console = dview_alloc(device.machine(), DVT_CONSOLE);
 		view_main_console->title = "MAME Debugger";
 		view_main_console->width = 500;
 		view_main_console->height = 200;
 		view_main_console->ofs_x = 0;
 		view_main_console->ofs_y = 0;
-		view_main_disasm = dview_alloc(device.machine(), DVT_DISASSEMBLY, VIEW_STATE_FOLLOW_CPU);
+		view_main_disasm = dview_alloc(device.machine(), DVT_DISASSEMBLY);
 		view_main_disasm->width = 500;
 		view_main_disasm->height = 200;
-		view_main_regs = dview_alloc(device.machine(), DVT_STATE, VIEW_STATE_FOLLOW_CPU);
+		view_main_regs = dview_alloc(device.machine(), DVT_STATE);
 		view_main_regs->width = 180;
 		view_main_regs->height = 440;
 		strcpy(view_main_console->console_input,"");  // clear console input
