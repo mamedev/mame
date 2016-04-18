@@ -41,6 +41,16 @@ WRITE8_MEMBER( generic_latch_8_device::write )
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(generic_latch_8_device::sync_callback), this), data);
 }
 
+WRITE8_MEMBER( generic_latch_8_device::preset_w )
+{
+	m_latched_value = 0xff;
+}
+
+WRITE8_MEMBER( generic_latch_8_device::clear_w )
+{
+	m_latched_value = 0x00;
+}
+
 WRITE_LINE_MEMBER( generic_latch_8_device::preset_w )
 {
 	m_latched_value = 0xff;
@@ -111,6 +121,16 @@ READ16_MEMBER( generic_latch_16_device::read )
 WRITE16_MEMBER( generic_latch_16_device::write )
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(generic_latch_16_device::sync_callback), this), data);
+}
+
+WRITE16_MEMBER( generic_latch_16_device::preset_w )
+{
+	m_latched_value = 0xffff;
+}
+
+WRITE16_MEMBER( generic_latch_16_device::clear_w )
+{
+	m_latched_value = 0x0000;
 }
 
 WRITE_LINE_MEMBER( generic_latch_16_device::preset_w )

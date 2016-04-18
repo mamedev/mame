@@ -35,6 +35,9 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+	
+	DECLARE_WRITE8_MEMBER( preset_w );
+	DECLARE_WRITE8_MEMBER( clear_w );
 	DECLARE_WRITE_LINE_MEMBER( preset_w );
 	DECLARE_WRITE_LINE_MEMBER( clear_w );
 
@@ -61,6 +64,9 @@ public:
 
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
+	
+	DECLARE_WRITE16_MEMBER( preset_w );
+	DECLARE_WRITE16_MEMBER( clear_w );
 	DECLARE_WRITE_LINE_MEMBER( preset_w );
 	DECLARE_WRITE_LINE_MEMBER( clear_w );
 
