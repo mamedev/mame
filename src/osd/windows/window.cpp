@@ -289,7 +289,10 @@ void windows_osd_interface::build_slider_list()
 void windows_osd_interface::add_audio_to_recording(const INT16 *buffer, int samples_this_frame)
 {
 	win_window_info *window = win_window_list; // We only record on the first window
-	window->m_renderer->add_audio_to_recording(buffer, samples_this_frame);
+	if (window != nullptr && window->m_renderer != nullptr)
+	{
+		window->m_renderer->add_audio_to_recording(buffer, samples_this_frame);
+	}
 }
 
 //============================================================
