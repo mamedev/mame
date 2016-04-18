@@ -122,7 +122,7 @@ class matrix_solver_direct_t: public matrix_solver_t
 public:
 
 	matrix_solver_direct_t(const solver_parameters_t *params, const int size);
-	matrix_solver_direct_t(const eSolverType type, const solver_parameters_t *params, const int size);
+	matrix_solver_direct_t(const eSortType sort, const solver_parameters_t *params, const int size);
 
 	virtual ~matrix_solver_direct_t();
 
@@ -1022,7 +1022,7 @@ inline int matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(const boo
 
 template <unsigned m_N, unsigned _storage_N>
 matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const solver_parameters_t *params, const int size)
-: matrix_solver_t(GAUSSIAN_ELIMINATION, params)
+: matrix_solver_t(ASCENDING, params)
 , m_dim(size)
 {
 #if (NL_USE_DYNAMIC_ALLOCATION)
@@ -1038,8 +1038,8 @@ matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const solver_par
 }
 
 template <unsigned m_N, unsigned _storage_N>
-matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const eSolverType type, const solver_parameters_t *params, const int size)
-: matrix_solver_t(type, params)
+matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const eSortType sort, const solver_parameters_t *params, const int size)
+: matrix_solver_t(sort, params)
 , m_dim(size)
 {
 #if (NL_USE_DYNAMIC_ALLOCATION)

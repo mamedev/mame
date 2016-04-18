@@ -29,7 +29,7 @@ class matrix_solver_SOR_mat_t: public matrix_solver_direct_t<m_N, _storage_N>
 public:
 
 	matrix_solver_SOR_mat_t(const solver_parameters_t *params, int size)
-		: matrix_solver_direct_t<m_N, _storage_N>(matrix_solver_t::GAUSS_SEIDEL, params, size)
+		: matrix_solver_direct_t<m_N, _storage_N>(matrix_solver_t::DESCENDING, params, size)
 		, m_omega(params->m_sor)
 		, m_lp_fact(0)
 		, m_gs_fail(0)

@@ -94,7 +94,7 @@ ATTR_COLD void terms_t::set_pointers()
 // matrix_solver
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD matrix_solver_t::matrix_solver_t(const eSolverType type, const solver_parameters_t *params)
+ATTR_COLD matrix_solver_t::matrix_solver_t(const eSortType sort, const solver_parameters_t *params)
 : m_stat_calculations(0),
 	m_stat_newton_raphson(0),
 	m_stat_vsolver_calls(0),
@@ -102,7 +102,7 @@ ATTR_COLD matrix_solver_t::matrix_solver_t(const eSolverType type, const solver_
 	m_iterative_total(0),
 	m_params(*params),
 	m_cur_ts(0),
-	m_type(type)
+	m_sort(sort)
 {
 }
 
@@ -223,7 +223,6 @@ ATTR_COLD void matrix_solver_t::setup_matrix()
 		pfree(m_rails_temp[k]); // no longer needed
 
 	m_rails_temp.clear();
-#if 1
 
 	/* Sort in descending order by number of connected matrix voltages.
 	 * The idea is, that for Gauss-Seidel algo the first voltage computed
@@ -245,27 +244,28 @@ ATTR_COLD void matrix_solver_t::setup_matrix()
 	 *
 	 */
 
-	int sort_order = -1;//(type() == GAUSS_SEIDEL ? 1 : -1);
-
-	for (unsigned k = 0; k < iN - 1; k++)
-		for (unsigned i = k+1; i < iN; i++)
-		{
-			if (((int) m_terms[k]->m_railstart - (int) m_terms[i]->m_railstart) * sort_order < 0)
-			{
-				std::swap(m_terms[i], m_terms[k]);
-				std::swap(m_nets[i], m_nets[k]);
-			}
-		}
-
-	for (unsigned k = 0; k < iN; k++)
+	if (m_sort != NOSORT)
 	{
-		int *other = m_terms[k]->net_other();
-		for (unsigned i = 0; i < m_terms[k]->count(); i++)
-			if (other[i] != -1)
-				other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_otherterm->net());
-	}
+		int sort_order = (m_sort == DESCENDING ? 1 : -1);
 
-#endif
+		for (unsigned k = 0; k < iN - 1; k++)
+			for (unsigned i = k+1; i < iN; i++)
+			{
+				if (((int) m_terms[k]->m_railstart - (int) m_terms[i]->m_railstart) * sort_order < 0)
+				{
+					std::swap(m_terms[i], m_terms[k]);
+					std::swap(m_nets[i], m_nets[k]);
+				}
+			}
+
+		for (unsigned k = 0; k < iN; k++)
+		{
+			int *other = m_terms[k]->net_other();
+			for (unsigned i = 0; i < m_terms[k]->count(); i++)
+				if (other[i] != -1)
+					other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_otherterm->net());
+		}
+	}
 
 	/* create a list of non zero elements. */
 	for (unsigned k = 0; k < iN; k++)
