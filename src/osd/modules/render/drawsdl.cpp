@@ -90,10 +90,9 @@ int drawsdl_scale_mode(const char *s)
 //  drawsdl_init
 //============================================================
 
-bool renderer_sdl1::init(running_machine &machine)
+void renderer_sdl1::init(running_machine &machine)
 {
 	osd_printf_verbose("Using SDL multi-window soft driver (SDL 2.0+)\n");
-	return false;
 }
 
 //============================================================

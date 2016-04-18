@@ -362,7 +362,7 @@ void renderer_sdl2::expand_copy_info(const copy_info_t *list)
 }
 
 // FIXME: machine only used to access options.
-bool renderer_sdl2::init(running_machine &machine)
+void renderer_sdl2::init(running_machine &machine)
 {
 	osd_printf_verbose("Using SDL native texturing driver (SDL 2.0+)\n");
 
@@ -380,8 +380,6 @@ bool renderer_sdl2::init(running_machine &machine)
 		osd_printf_warning("Warning: Unable to load opengl library: %s\n", stemp ? stemp : "<default>");
 	else
 		osd_printf_verbose("Loaded opengl shared library: %s\n", stemp ? stemp : "<default>");
-
-	return false;
 }
 
 

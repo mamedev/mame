@@ -36,7 +36,7 @@ public:
 	}
 	virtual ~renderer_sdl1();
 
-	static bool init(running_machine &machine);
+	static void init(running_machine &machine);
 	static void exit() { }
 
 	virtual int create() override;
