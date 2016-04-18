@@ -72,6 +72,7 @@
   - gckong random lockups (tap the jump button repeatedly): mcu stack overflow,
     works ok if stack levels is increased, 38800 B rev. has more stack levels?
     Or it could be a race condition: irq happening too late/early.
+  - bultrman building explosions are wrong, especially visible on the first one
   - epacman booting the game in demo mode, pacman should go straight to the
     upper-left power pill: mcu cycle/interrupt timing related
   - Though very uncommon when compared to games with LED/lamp display,
