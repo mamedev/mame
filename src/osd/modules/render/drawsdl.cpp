@@ -90,7 +90,7 @@ int drawsdl_scale_mode(const char *s)
 //  drawsdl_init
 //============================================================
 
-bool renderer_sdl2::init(running_machine &machine)
+bool renderer_sdl1::init(running_machine &machine)
 {
 	osd_printf_verbose("Using SDL multi-window soft driver (SDL 2.0+)\n");
 	return false;
@@ -100,7 +100,7 @@ bool renderer_sdl2::init(running_machine &machine)
 //  setup_texture for window
 //============================================================
 
-void renderer_sdl2::setup_texture(const osd_dim &size)
+void renderer_sdl1::setup_texture(const osd_dim &size)
 {
 	const sdl_scale_mode *sdl_sm = &scale_modes[video_config.scale_mode];
 	SDL_DisplayMode mode;
@@ -151,7 +151,7 @@ void renderer_sdl2::setup_texture(const osd_dim &size)
 //  drawsdl_show_info
 //============================================================
 
-void renderer_sdl2::show_info(struct SDL_RendererInfo *render_info)
+void renderer_sdl1::show_info(struct SDL_RendererInfo *render_info)
 {
 #define RF_ENTRY(x) {x, #x }
 	static struct
@@ -182,7 +182,7 @@ void renderer_sdl2::show_info(struct SDL_RendererInfo *render_info)
 //  renderer_sdl2::create
 //============================================================
 
-int renderer_sdl2::create()
+int renderer_sdl1::create()
 {
 	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
 
@@ -250,7 +250,7 @@ int renderer_sdl2::create()
 //  DESTRUCTOR
 //============================================================
 
-renderer_sdl2::~renderer_sdl2()
+renderer_sdl1::~renderer_sdl1()
 {
 	destroy_all_textures();
 
@@ -271,7 +271,7 @@ renderer_sdl2::~renderer_sdl2()
 //  drawsdl_xy_to_render_target
 //============================================================
 
-int renderer_sdl2::xy_to_render_target(int x, int y, int *xt, int *yt)
+int renderer_sdl1::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
 	*xt = x - m_last_hofs;
 	*yt = y - m_last_vofs;
@@ -286,7 +286,7 @@ int renderer_sdl2::xy_to_render_target(int x, int y, int *xt, int *yt)
 //  drawsdl_destroy_all_textures
 //============================================================
 
-void renderer_sdl2::destroy_all_textures()
+void renderer_sdl1::destroy_all_textures()
 {
 	SDL_DestroyTexture(m_texture_id);
 	m_texture_id = nullptr;
@@ -297,7 +297,7 @@ void renderer_sdl2::destroy_all_textures()
 //  renderer_sdl2::draw
 //============================================================
 
-int renderer_sdl2::draw(int update)
+int renderer_sdl1::draw(int update)
 {
 	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
 	UINT8 *surfptr;
@@ -502,7 +502,7 @@ int renderer_sdl2::draw(int update)
 #define YMASK  (Y1MASK|Y2MASK)
 #define UVMASK (UMASK|VMASK)
 
-void renderer_sdl2::yuv_lookup_set(unsigned int pen, unsigned char red,
+void renderer_sdl1::yuv_lookup_set(unsigned int pen, unsigned char red,
 			unsigned char green, unsigned char blue)
 {
 	UINT32 y,u,v;
@@ -514,7 +514,7 @@ void renderer_sdl2::yuv_lookup_set(unsigned int pen, unsigned char red,
 	m_yuv_lookup[pen]=(y<<Y1SHIFT)|(u<<USHIFT)|(y<<Y2SHIFT)|(v<<VSHIFT);
 }
 
-void renderer_sdl2::yuv_init()
+void renderer_sdl1::yuv_init()
 {
 	unsigned char r,g,b;
 	if (m_yuv_lookup == nullptr)
@@ -670,7 +670,7 @@ static void yuv_RGB_to_YUY2X2(const UINT16 *bitmap, UINT8 *ptr, const int pitch,
 	}
 }
 
-render_primitive_list *renderer_sdl2::get_primitives()
+render_primitive_list *renderer_sdl1::get_primitives()
 {
 	osd_dim nd = window().get_size();
 	if (nd != m_blit_dim)

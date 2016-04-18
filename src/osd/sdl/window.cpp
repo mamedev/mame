@@ -354,7 +354,7 @@ void sdl_osd_interface::window_exit()
 	switch(video_config.mode)
 	{
 		case VIDEO_MODE_SDL2ACCEL:
-			renderer_sdl2::exit();
+			renderer_sdl1::exit();
 			break;
 		case VIDEO_MODE_SOFT:
 			renderer_sdl1::exit();
@@ -914,7 +914,6 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 	 *
 	 */
 	osd_printf_verbose("Enter sdl_info::create\n");
-
 	if (window->renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL))
 	{
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
