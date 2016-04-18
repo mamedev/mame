@@ -827,6 +827,12 @@ void a2_video_device::plot_text_character_orig(bitmap_ind16 &bitmap, int xpos, i
 			bg = i;
 		}
 	}
+	else if (code < 0x40)	// inverse: flip FG and BG
+	{
+			i = fg;
+			fg = bg;
+			bg = i;
+	}
 
 	/* look up the character data */
 	chardata = &textgfx_data[(code * 8)];
