@@ -712,7 +712,9 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( 1, "single", "Single Monitor Version" ) \
 	ROM_LOAD_BIOS( 1, "pck1-c.8t", 0x00000, 0x4000, CRC(503ee8b1) SHA1(3bd20bc71cac742d1b8c1430a6426d0a19db7ad0) ) \
 	ROM_SYSTEM_BIOS( 2, "alt", "Alt Bios" ) /* this bios doens't work properly, selecting service mode causes it to hang, is it good? maybe different hw? */ \
-	ROM_LOAD_BIOS( 2, "pch1-c_8te.8t", 0x00000, 0x4000, CRC(123ffa37) SHA1(3bef754a5a85a8498bb6222ddf5cb9021f264db5) )
+	ROM_LOAD_BIOS( 2, "pch1-c_8te.8t", 0x00000, 0x4000, CRC(123ffa37) SHA1(3bef754a5a85a8498bb6222ddf5cb9021f264db5) ) \
+	ROM_SYSTEM_BIOS( 3, "singleb", "Single Monitor Version (Newer?)" ) /* Newer single screen? Four bytes different, reported bugfix in freeplay */ \
+	ROM_LOAD_BIOS( 3, "pck1-c_fix.8t", 0x00000, 0x4000, CRC(0be8ceb4) SHA1(45b127a537370226e6b30be2b5a92ad05673ca7f) )
 
 
 #define BIOS_GFX                                            \
@@ -728,6 +730,10 @@ MACHINE_CONFIG_END
 	ROM_LOAD_BIOS( 2, "pch1-c_8p-8p",    0x00000, 0x2000, CRC(90e1b80c) SHA1(c4f4b135b2a11743518aaa0554c365b4a8cf299a) )   \
 	ROM_LOAD_BIOS( 2, "pch1-c_8m.8m",    0x02000, 0x2000, CRC(83ebc7a3) SHA1(a7c607138f4f9b96ab5d3a82c47895f77672e296) )   \
 	ROM_LOAD_BIOS( 2, "pch1-c__8k.8k",    0x04000, 0x2000, CRC(9acffb30) SHA1(b814f10ef23f2ca445fabafcbf7f25e2d454ba8c) ) \
+	\
+	ROM_LOAD_BIOS( 3, "pch1-c__8p_e-1.8p",    0x00000, 0x2000, CRC(30c15e23) SHA1(69166afdb2fe827c7f1919cdf4197caccbd961fa) )   \
+	ROM_LOAD_BIOS( 3, "pch1-c__8m_e-1.8m",    0x02000, 0x2000, CRC(c1232eee) SHA1(beaf9fa2d091a3c7f70c51e966d885b1f9f0935f) )   \
+	ROM_LOAD_BIOS( 3, "pch1-c__8k.8k",    0x04000, 0x2000, CRC(9acffb30) SHA1(b814f10ef23f2ca445fabafcbf7f25e2d454ba8c) )   \
 	\
 	ROM_REGION( 0x0300, "proms", 0 )                        \
 	ROM_LOAD( "pch1-c-6f.82s129an.6f",    0x0000, 0x0100, CRC(e5414ca3) SHA1(d2878411cda84ffe0afb2e538a67457f51bebffb) )    \
