@@ -1175,7 +1175,11 @@ void xbox_base_state::usb_ohci_plug(int port, ohci_function_device *function)
 	}
 }
 
-ohci_function_device::ohci_function_device(running_machine &machine, xbox_base_state *usb_bus_manager)
+ohci_function_device::ohci_function_device()
+{
+}
+
+void ohci_function_device::initialize(running_machine &machine, xbox_base_state *usb_bus_manager)
 {
 	busmanager = usb_bus_manager;
 	state = DefaultState;
@@ -1636,15 +1640,95 @@ int ohci_function_device::execute_transfer(int endpoint, int pid, UINT8 *buffer,
 	return size;
 }
 
+INPUT_PORTS_START(xbox_controller)
+	PORT_START("ThumbstickLh") // left analog thumbstick horizontal movement
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_NAME("ThumbstickLh") PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 0xff)
+		PORT_CODE_DEC(KEYCODE_J) PORT_CODE_INC(KEYCODE_L)
+	PORT_START("ThumbstickLv") // left analog thumbstick vertical movement
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_NAME("ThumbstickLv") PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 0xff)
+		PORT_CODE_DEC(KEYCODE_K) PORT_CODE_INC(KEYCODE_I)
+
+	PORT_START("ThumbstickRh") // right analog thumbstick horizontal movement
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_NAME("ThumbstickRh") PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 0xff)
+		PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD)
+	PORT_START("ThumbstickRv") // right analog thumbstick vertical movement
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_NAME("ThumbstickRv") PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 0xff)
+		PORT_CODE_DEC(KEYCODE_2_PAD) PORT_CODE_INC(KEYCODE_8_PAD)
+
+	PORT_START("DPad") // pressure sensitive directional pad
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_NAME("DPad Up")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_NAME("DPad Down")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_NAME("DPad Left")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_NAME("DPad Right")
+
+	PORT_START("TriggerL") // analog trigger
+	PORT_BIT(0xff, 0x00, IPT_PEDAL) PORT_NAME("TriggerL") PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 0xff)
+		PORT_CODE_DEC(KEYCODE_1_PAD) PORT_CODE_INC(KEYCODE_7_PAD)
+
+	PORT_START("TriggerR") // analog trigger
+	PORT_BIT(0xff, 0x00, IPT_PEDAL) PORT_NAME("TriggerR") PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 0xff)
+		PORT_CODE_DEC(KEYCODE_3_PAD) PORT_CODE_INC(KEYCODE_9_PAD)
+
+	PORT_START("Buttons") // digital buttons
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Start") // Start button
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Back") // Back button
+
+	PORT_START("AGreen") // analog button
+	PORT_BIT(0xff, 0x00, IPT_PEDAL) PORT_NAME("A-Green") PORT_SENSITIVITY(100) PORT_KEYDELTA(32)  PORT_MINMAX(0, 0xff)
+		PORT_CODE_DEC(KEYCODE_A) PORT_CODE_INC(KEYCODE_Q)
+
+	PORT_START("BRed") // analog button
+	PORT_BIT(0xff, 0x00, IPT_PEDAL) PORT_NAME("B-Red") PORT_SENSITIVITY(100) PORT_KEYDELTA(32) PORT_MINMAX(0, 0xff)
+		PORT_CODE_DEC(KEYCODE_S) PORT_CODE_INC(KEYCODE_W)
+
+	PORT_START("XBlue") // analog button
+	PORT_BIT(0xff, 0x00, IPT_PEDAL) PORT_NAME("X-Blue") PORT_SENSITIVITY(100) PORT_KEYDELTA(32) PORT_MINMAX(0, 0xff)
+		PORT_CODE_DEC(KEYCODE_D) PORT_CODE_INC(KEYCODE_E)
+
+	PORT_START("YYellow") // analog button
+	PORT_BIT(0xff, 0x00, IPT_PEDAL) PORT_NAME("Y-Yellow") PORT_SENSITIVITY(100) PORT_KEYDELTA(32) PORT_MINMAX(0, 0xff)
+		PORT_CODE_DEC(KEYCODE_F) PORT_CODE_INC(KEYCODE_R)
+
+	PORT_START("Black") // analog button
+	PORT_BIT(0xff, 0x00, IPT_PEDAL) PORT_NAME("Black") PORT_SENSITIVITY(100) PORT_KEYDELTA(32) PORT_MINMAX(0, 0xff)
+		PORT_CODE_DEC(KEYCODE_G) PORT_CODE_INC(KEYCODE_T)
+
+	PORT_START("White") // analog button
+	PORT_BIT(0xff, 0x00, IPT_PEDAL) PORT_NAME("White") PORT_SENSITIVITY(100) PORT_KEYDELTA(32) PORT_MINMAX(0, 0xff)
+		PORT_CODE_DEC(KEYCODE_H) PORT_CODE_INC(KEYCODE_Y)
+INPUT_PORTS_END
+
 const USBStandardDeviceDescriptor ohci_game_controller_device::devdesc = { 18,1,0x110,0x00,0x00,0x00,64,0x45e,0x202,0x100,0,0,0,1 };
 const USBStandardConfigurationDescriptor ohci_game_controller_device::condesc = { 9,2,0x20,1,1,0,0x80,50 };
 const USBStandardInterfaceDescriptor ohci_game_controller_device::intdesc = { 9,4,0,0,2,0x58,0x42,0,0 };
 const USBStandardEndpointDescriptor ohci_game_controller_device::enddesc82 = { 7,5,0x82,3,0x20,4 };
 const USBStandardEndpointDescriptor ohci_game_controller_device::enddesc02 = { 7,5,0x02,3,0x20,4 };
 
-ohci_game_controller_device::ohci_game_controller_device(running_machine &machine, xbox_base_state *usb_bus_manager) :
-	ohci_function_device(machine, usb_bus_manager)
+const device_type OHCI_GAME_CONTROLLER = &device_creator<ohci_game_controller_device>;
+
+ohci_game_controller_device::ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, OHCI_GAME_CONTROLLER, "OHCI Game Controller", tag, owner, clock, "ohci_gc", __FILE__),
+	ohci_function_device(),
+	m_ThumbstickLh(*this, "ThumbstickLh"),
+	m_ThumbstickLv(*this, "ThumbstickLv"),
+	m_ThumbstickRh(*this, "ThumbstickRh"),
+	m_ThumbstickRv(*this, "ThumbstickRv"),
+	m_DPad(*this, "DPad"),
+	m_TriggerL(*this, "TriggerL"),
+	m_TriggerR(*this, "TriggerR"),
+	m_Buttons(*this, "Buttons"),
+	m_AGreen(*this, "AGreen"),
+	m_BRed(*this, "BRed"),
+	m_XBlue(*this, "XBlue"),
+	m_YYellow(*this, "YYellow"),
+	m_Black(*this, "Black"),
+	m_White(*this, "White")
 {
+}
+
+void ohci_game_controller_device::initialize(running_machine &machine, xbox_base_state *usb_bus_manager)
+{
+	ohci_function_device::initialize(machine, usb_bus_manager);
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
 	add_interface_descriptor(intdesc);
@@ -1654,8 +1738,8 @@ ohci_game_controller_device::ohci_game_controller_device(running_machine &machin
 
 int ohci_game_controller_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
-	//                                     >=8  ==42  !=0  !=0  1,3       2<20 <=20
-	static const UINT8 mytestdata1[16] = { 0x10,0x42 ,0x32,0x43,1   ,0x65,0x18,0x20,0x98,0xa9,0xba,0xcb,0xdc,0xed,0xfe };
+	//                                    >=8  ==42  !=0  !=0  1,3       2<20 <=20
+	static const UINT8 reportinfo[16] = { 0x10,0x42 ,0x32,0x43,1   ,0x65,0x14,0x20,0x98,0xa9,0xba,0xcb,0xdc,0xed,0xfe };
 
 	if (endpoint != 0)
 		return -1;
@@ -1663,7 +1747,7 @@ int ohci_game_controller_device::handle_nonstandard_request(int endpoint, USBSet
 	{
 		if ((setup->bRequest == GET_DESCRIPTOR) && (setup->wValue == 0x4200))
 		{
-			endpoints[endpoint].position = (UINT8 *)mytestdata1;
+			endpoints[endpoint].position = (UINT8 *)reportinfo;
 			endpoints[endpoint].remain = 16;
 			return 0;
 		}
@@ -1708,11 +1792,50 @@ int ohci_game_controller_device::handle_nonstandard_request(int endpoint, USBSet
 int ohci_game_controller_device::handle_interrupt_pid(int endpoint, int pid, UINT8 *buffer, int size)
 {
 	if ((endpoint == 2) && (pid == InPid)) {
-		for (int n = 0; n < size; n++)
-			buffer[n] = n;
+		int v;
+
+		buffer[0] = 0;
+		buffer[1] = 20;
+		v = m_DPad->read();
+		v = v | (m_Buttons->read() << 4);
+		buffer[2] = (UINT8)v;
+		buffer[3] = 0;
+		buffer[4] = m_AGreen->read();
+		buffer[5] = m_BRed->read();
+		buffer[6] = m_XBlue->read();
+		buffer[7] = m_YYellow->read();
+		buffer[8] = m_Black->read();
+		buffer[9] = m_White->read();
+		buffer[10] = m_TriggerL->read();
+		buffer[11] = m_TriggerR->read();
+		v = m_ThumbstickLh->read();
+		v = (v - 128) * 256;
+		buffer[12] = (UINT16)v & 255;
+		buffer[13] = (UINT16)v >> 8;
+		v = m_ThumbstickLv->read();
+		v = (v - 128) * 256;
+		buffer[14] = (UINT16)v & 255;
+		buffer[15] = (UINT16)v >> 8;
+		v = m_ThumbstickRh->read();
+		v = (v - 128) * 256;
+		buffer[16] = (UINT16)v & 255;
+		buffer[17] = (UINT16)v >> 8;
+		v = m_ThumbstickRv->read();
+		v = (v - 128) * 256;
+		buffer[18] = (UINT16)v & 255;
+		buffer[19] = (UINT16)v >> 8;
 		return size;
 	}
 	return -1;
+}
+
+void ohci_game_controller_device::device_start()
+{
+}
+
+ioport_constructor ohci_game_controller_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(xbox_controller);
 }
 
 void xbox_base_state::usb_ohci_interrupts()
@@ -2420,7 +2543,8 @@ void xbox_base_state::machine_start()
 	ohcist.space = &m_maincpu->space();
 	ohcist.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xbox_base_state::usb_ohci_timer), this), (void *)"USB OHCI Timer");
 	ohcist.timer->enable(false);
-	usb_device = new ohci_game_controller_device(machine(), this);
+	usb_device = machine().device<ohci_game_controller_device>("ohci_gamepad");
+	usb_device->initialize(machine(), this);
 	usb_ohci_plug(3, usb_device); // connect to root hub port 3, chihiro needs to use 1 and 2
 	// super-io
 	memset(&superiost, 0, sizeof(superiost));
@@ -2478,6 +2602,9 @@ MACHINE_CONFIG_START(xbox_base, xbox_base_state)
 	MCFG_DEVICE_ADD("ide", BUS_MASTER_IDE_CONTROLLER, 0)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)
+
+	// next line is temporary
+	MCFG_DEVICE_ADD("ohci_gamepad", OHCI_GAME_CONTROLLER, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
