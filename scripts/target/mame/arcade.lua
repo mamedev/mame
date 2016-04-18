@@ -566,6 +566,7 @@ MACHINES["STEPPERS"] = true
 MACHINES["PCI9050"] = true
 --MACHINES["TMS1024"] = true
 MACHINES["GENPC"] = true
+MACHINES["GEN_LATCH"] = true
 
 --------------------------------------------------
 -- specify available bus cores
