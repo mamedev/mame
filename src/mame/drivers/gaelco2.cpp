@@ -633,11 +633,6 @@ ROM_END
                             TOUCH & GO
   ============================================================================*/
 
-/* the game expects this value each frame to know that the DS5002FP is alive */
-READ16_MEMBER(gaelco2_state::dallas_kludge_r)
-{
-	return 0x0200;
-}
 
 static ADDRESS_MAP_START( touchgo_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                         /* ROM */
@@ -650,9 +645,9 @@ static ADDRESS_MAP_START( touchgo_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("IN2")                                                            /* COINSW + Input 3P */
 	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("IN3")                                                            /* SERVICESW + Input 4P */
 	AM_RANGE(0x500000, 0x50001f) AM_WRITE(touchgo_coin_w)                                                       /* Coin counters */
-	AM_RANGE(0xfefffa, 0xfefffb) AM_RAM_READ(dallas_kludge_r)                                                   /* DS5002FP related patch */
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                                                                         /* Work RAM */
 ADDRESS_MAP_END
+
 
 
 static INPUT_PORTS_START( touchgo )
@@ -1504,12 +1499,24 @@ DRIVER_INIT_MEMBER(gaelco2_state,maniacsqa)
 }
 
 
+/* the game expects this value each frame to know that the DS5002FP is alive */
+READ16_MEMBER(gaelco2_state::dallas_kludge_r)
+{
+	return 0x0200;
+}
+
+DRIVER_INIT_MEMBER(gaelco2_state,touchgop)
+{
+	DRIVER_INIT_CALL(touchgo);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfefffa, 0xfefffb, read16_delegate(FUNC(gaelco2_state::dallas_kludge_r), this) );
+}
+
 GAME( 1994, aligator,  0,       alighunt, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1994, aligatorun,aligator,alighunt, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected)", 0 )
 
-GAME( 1995, touchgo,  0,        touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1995, touchgon, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1995, touchgoe, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1995, touchgo,  0,        touchgo,  touchgo,  gaelco2_state, touchgop, ROT0, "Gaelco", "Touch & Go (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1995, touchgon, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgop, ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1995, touchgoe, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgop, ROT0, "Gaelco", "Touch & Go (earlier revision)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1995, touchgok, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1995, wrally2,  0,        wrally2,  wrally2,  driver_device, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
