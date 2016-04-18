@@ -103,9 +103,11 @@ private:
 	void add_memory(int id);
 	void add_bpoints(int id);
 	void add_wpoints(int id);
+	void add_log(int id);
 	void draw_disasm(debug_area* view_ptr, bool* opened);
 	void draw_memory(debug_area* view_ptr, bool* opened);
 	void draw_bpoints(debug_area* view_ptr, bool* opened);
+	void draw_log(debug_area* view_ptr, bool* opened);
 	void update_cpu_view(device_t* device);
 
 	running_machine* m_machine;
@@ -300,6 +302,8 @@ void debug_imgui::handle_keys()
 		add_bpoints(++m_win_count);
 	if(ImGui::IsKeyPressed(ITEM_ID_W) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_wpoints(++m_win_count);
+	if(ImGui::IsKeyPressed(ITEM_ID_L) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
+		add_log(++m_win_count);
 
 	m_machine->ui_input().reset();  // clear remaining inputs, so they don't fall through to the UI
 }
@@ -429,6 +433,64 @@ void debug_imgui::add_wpoints(int id)
 	new_view = dview_alloc(*m_machine, DVT_WATCH_POINTS);
 	str << id;
 	str << ": Watchpoints";
+	new_view->title = str.str();
+	new_view->width = 500;
+	new_view->height = 300;
+	new_view->ofs_x = 0;
+	new_view->ofs_y = 0;
+	view_list_add(new_view);
+}
+
+void debug_imgui::draw_log(debug_area* view_ptr, bool* opened)
+{
+	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
+	if(ImGui::Begin(view_ptr->title.c_str(),opened))
+	{
+		rgb_t bg, fg;
+		const debug_view_char *viewdata;
+		debug_view_xy vsize,totalsize;
+		unsigned char v;
+		int x,y;
+
+		viewdata = view_ptr->view->viewdata();
+		totalsize = view_ptr->view->total_size();
+		if(totalsize.y > 100)
+			totalsize.y = 100;
+		view_ptr->view->set_visible_size(totalsize);
+		vsize = view_ptr->view->visible_size();
+		
+		ImGui::BeginChild("##log_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
+		for(y=0;y<vsize.y;y++)
+		{
+			for(x=0;x<vsize.x;x++)
+			{
+				ImVec2 xy1,xy2;
+				map_attr_to_fg_bg(viewdata->attrib,&fg,&bg);
+				v = viewdata->byte;
+				ImGui::PushStyleColor(ImGuiCol_Text,ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
+				ImGui::Text("%c",v);
+				ImGui::PopStyleColor();
+				if(x<vsize.x - 1)
+					ImGui::SameLine();
+				viewdata++;
+			}
+		}
+		ImGui::PopStyleVar(2);
+		ImGui::EndChild();
+
+		ImGui::End();
+	}
+}
+
+void debug_imgui::add_log(int id)
+{
+	std::stringstream str;
+	debug_area* new_view;
+	new_view = dview_alloc(*m_machine, DVT_LOG);
+	str << id;
+	str << ": Error log";
 	new_view->title = str.str();
 	new_view->width = 500;
 	new_view->height = 300;
@@ -745,6 +807,8 @@ void debug_imgui::draw_console()
 					add_bpoints(++m_win_count);
 				if(ImGui::MenuItem("New watchpoints window", "Ctrl+W")) 
 					add_wpoints(++m_win_count);
+				if(ImGui::MenuItem("New log window", "Ctrl+L")) 
+					add_log(++m_win_count);
 				ImGui::Separator();
 				if(ImGui::MenuItem("Run", "F5"))
 				{
@@ -884,6 +948,8 @@ void debug_imgui::draw_console()
 		// console portion
 		viewdata = view_main_console->view->viewdata();
 		totalsize = view_main_console->view->total_size();
+		if(totalsize.y > 100)
+			totalsize.y = 100;
 		view_main_console->view->set_visible_size(totalsize);
 //		height = ImGui::GetTextLineHeight();
 		vsize = view_main_console->view->visible_size();
@@ -950,6 +1016,11 @@ void debug_imgui::update()
 			break;
 		case DVT_MEMORY:
 			draw_memory((*view_ptr),&opened);
+			if(opened == false)
+				to_delete = (*view_ptr);
+			break;
+		case DVT_LOG:
+			draw_log((*view_ptr),&opened);
 			if(opened == false)
 				to_delete = (*view_ptr);
 			break;
