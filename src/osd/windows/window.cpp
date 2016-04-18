@@ -214,11 +214,11 @@ bool windows_osd_interface::window_init()
 				error = renderer_gdi::init(machine());
 				break;
 			case VIDEO_MODE_BGFX:
-				error = renderer_bgfx::init(machine());
+				renderer_bgfx::init(machine());
 				break;
 #if (USE_OPENGL)
 			case VIDEO_MODE_OPENGL:
-				error = renderer_ogl::init(machine());
+				renderer_ogl::init(machine());
 				break;
 #endif
 			case VIDEO_MODE_SDL2ACCEL:
