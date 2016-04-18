@@ -728,14 +728,18 @@ void winwindow_update_cursor_state(running_machine &machine)
 	assert(GetCurrentThreadId() == main_threadid);
 
 	win_window_info *window = win_window_list;
+	
+	// If no window yet, just return
+	if (window == nullptr)
+		return;
 
 	// if we should hide the mouse cursor, then do it
 	// rules are:
 	//   1. we must have focus before hiding the cursor
-	//   2. we also hide the cursor in full screen mode and when the window doesn't have a menu
+	//   2. we also hide the cursor in full screen mode and when tshe window doesn't have a menu
 	//   3. we also hide the cursor in windowed mode if we're not paused and
 	//      the input system requests it
-	if (winwindow_has_focus() && ((!video_config.windowed && !win_window_list->win_has_menu()) || (!machine.paused() && downcast<windows_osd_interface&>(machine.osd()).should_hide_mouse())))
+	if (winwindow_has_focus() && ((!video_config.windowed && !window->win_has_menu()) || (!machine.paused() && downcast<windows_osd_interface&>(machine.osd()).should_hide_mouse())))
 	{
 		// hide cursor
 		window->hide_pointer();
