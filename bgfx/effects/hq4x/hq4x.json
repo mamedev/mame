@@ -1,0 +1,29 @@
+// license:LGPL-2.1+
+// copyright-holders:Jules Blok,Cameron Zemek,Maxim Stepin
+{
+    "blend": {
+    	"equation": "add",
+    	"srcColor": "1",
+    	"dstColor": "0",
+    	"srcAlpha": "1",
+    	"dstAlpha": "0"
+    },
+    "depth": {
+    	"function": "always",
+    	"writeenable": false
+    },
+    "cull": {
+    	"mode": "none"
+    },
+    "write": {
+    	"rgb": true,
+    	"alpha": true
+    },
+    "vertex": "chains/hq4x/vs_hq4x",
+    "fragment": "chains/hq4x/fs_hq4x",
+    "uniforms": [
+    	{ "name": "decal",       "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "LUT",         "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "u_tex_size0", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
+    ]
+}

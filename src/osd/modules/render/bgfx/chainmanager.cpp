@@ -245,7 +245,7 @@ void chain_manager::process_screen_quad(uint32_t view, uint32_t screen, render_p
         tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
 
     std::string full_name = "screen" + std::to_string(screen);
-    bgfx_texture *texture = new bgfx_texture(full_name, bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem);
+    bgfx_texture *texture = new bgfx_texture(full_name, bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem, BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
     m_textures.add_provider(full_name, texture);
 
     m_targets.update_target_sizes(screen, tex_width, tex_height, TARGET_STYLE_GUEST);
