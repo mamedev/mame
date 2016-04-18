@@ -42,7 +42,9 @@
 #define WINOPTION_SHADOW_MASK_UOFFSET       "shadow_mask_uoffset"
 #define WINOPTION_SHADOW_MASK_VOFFSET       "shadow_mask_voffset"
 #define WINOPTION_REFLECTION                "reflection"
-#define WINOPTION_CURVATURE                 "curvature"
+#define WINOPTION_DISTORTION                "distortion"
+#define WINOPTION_CUBIC_DISTORTION          "cubic_distortion"
+#define WINOPTION_DISTORT_CORNER            "distort_corner"
 #define WINOPTION_ROUND_CORNER              "round_corner"
 #define WINOPTION_SMOOTH_BORDER             "smooth_border"
 #define WINOPTION_VIGNETTING                "vignetting"
@@ -149,7 +151,9 @@ public:
 	float screen_scanline_jitter() const { return float_value(WINOPTION_SCANLINE_JITTER); }
 	float screen_hum_bar_alpha() const { return float_value(WINOPTION_HUM_BAR_ALPHA); }
 	float screen_reflection() const { return float_value(WINOPTION_REFLECTION); }
-	float screen_curvature() const { return float_value(WINOPTION_CURVATURE); }
+	float screen_distortion() const { return float_value(WINOPTION_DISTORTION); }
+	float screen_cubic_distortion() const { return float_value(WINOPTION_CUBIC_DISTORTION); }
+	float screen_distort_corner() const { return float_value(WINOPTION_DISTORT_CORNER); }
 	float screen_round_corner() const { return float_value(WINOPTION_ROUND_CORNER); }
 	float screen_smooth_border() const { return float_value(WINOPTION_SMOOTH_BORDER); }
 	float screen_vignetting() const { return float_value(WINOPTION_VIGNETTING); }

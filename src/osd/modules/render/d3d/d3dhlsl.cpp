@@ -680,7 +680,9 @@ void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 		options->shadow_mask_v_size = winoptions.screen_shadow_mask_v_size();
 		options->shadow_mask_u_offset = winoptions.screen_shadow_mask_u_offset();
 		options->shadow_mask_v_offset = winoptions.screen_shadow_mask_v_offset();
-		options->curvature = winoptions.screen_curvature();
+		options->distortion = winoptions.screen_distortion();
+		options->cubic_distortion = winoptions.screen_cubic_distortion();
+		options->distort_corner = winoptions.screen_distort_corner();
 		options->round_corner = winoptions.screen_round_corner();
 		options->smooth_border = winoptions.screen_smooth_border();
 		options->reflection = winoptions.screen_reflection();
@@ -989,7 +991,9 @@ int shaders::create_resources(bool reset, std::vector<ui_menu_item>& sliders)
 	post_effect->add_uniform("Floor", uniform::UT_VEC3, uniform::CU_POST_FLOOR);
 
 	distortion_effect->add_uniform("VignettingAmount", uniform::UT_FLOAT, uniform::CU_POST_VIGNETTING);
-	distortion_effect->add_uniform("CurvatureAmount", uniform::UT_FLOAT, uniform::CU_POST_CURVATURE);
+	distortion_effect->add_uniform("DistortionAmount", uniform::UT_FLOAT, uniform::CU_POST_DISTORTION);
+	distortion_effect->add_uniform("CubicDistortionAmount", uniform::UT_FLOAT, uniform::CU_POST_CUBIC_DISTORTION);
+	distortion_effect->add_uniform("DistortCornerAmount", uniform::UT_FLOAT, uniform::CU_POST_DISTORT_CORNER);
 	distortion_effect->add_uniform("RoundCornerAmount", uniform::UT_FLOAT, uniform::CU_POST_ROUND_CORNER);
 	distortion_effect->add_uniform("SmoothBorderAmount", uniform::UT_FLOAT, uniform::CU_POST_SMOOTH_BORDER);
 	distortion_effect->add_uniform("ReflectionAmount", uniform::UT_FLOAT, uniform::CU_POST_REFLECTION);
@@ -1496,7 +1500,9 @@ int shaders::distortion_pass(d3d_render_target *rt, int source_index, poly_info 
 	// skip distortion if no influencing settings
 	if (options->reflection == 0 &&
 		options->vignetting == 0 &&
-		options->curvature == 0 &&
+		options->distortion == 0 &&
+		options->cubic_distortion == 0 &&
+		options->distort_corner == 0 &&
 		options->round_corner == 0 &&
 		options->smooth_border == 0)
 	{
@@ -2277,7 +2283,9 @@ enum slider_option
 	SLIDER_SHADOW_MASK_V_SIZE,
 	SLIDER_SHADOW_MASK_U_OFFSET,
 	SLIDER_SHADOW_MASK_V_OFFSET,
-	SLIDER_CURVATURE,
+	SLIDER_DISTORTION,
+	SLIDER_CUBIC_DISTORTION,
+	SLIDER_DISTORT_CORNER,
 	SLIDER_ROUND_CORNER,
 	SLIDER_SMOOTH_BORDER,
 	SLIDER_REFLECTION,
@@ -2352,7 +2360,9 @@ slider_desc shaders::s_sliders[] =
 	{ "Shadow Mask Pixel Count Y",          1,     1,    64, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_V_SIZE,      0.03125f, "%2.5f", {} },
 	{ "Shadow Mask Offset X",            -100,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_U_OFFSET,    0.01f,    "%1.2f", {} },
 	{ "Shadow Mask Offset Y",            -100,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_V_OFFSET,    0.01f,    "%1.2f", {} },
-	{ "Screen Curvature",                   0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_CURVATURE,               0.01f,    "%2.2f", {} },
+	{ "Screen Distortion",               -100,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_DISTORTION,              0.01f,    "%2.2f", {} },
+	{ "Screen Distortion (Cubic)",       -100,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_CUBIC_DISTORTION,        0.01f,    "%2.2f", {} },
+	{ "Screen Distort Corner",              0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_DISTORT_CORNER,          0.01f,    "%1.2f", {} },
 	{ "Screen Round Corner",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_ROUND_CORNER,            0.01f,    "%1.2f", {} },
 	{ "Screen Smooth Border",               0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SMOOTH_BORDER,           0.01f,    "%1.2f", {} },
 	{ "Screen Reflection",                  0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_REFLECTION,              0.01f,    "%1.2f", {} },
@@ -2421,7 +2431,9 @@ void *shaders::get_slider_option(int id, int index)
 		case SLIDER_SHADOW_MASK_V_SIZE: return &(options->shadow_mask_v_size);
 		case SLIDER_SHADOW_MASK_U_OFFSET: return &(options->shadow_mask_u_offset);
 		case SLIDER_SHADOW_MASK_V_OFFSET: return &(options->shadow_mask_v_offset);
-		case SLIDER_CURVATURE: return &(options->curvature);
+		case SLIDER_DISTORTION: return &(options->distortion);
+		case SLIDER_CUBIC_DISTORTION: return &(options->cubic_distortion);
+		case SLIDER_DISTORT_CORNER: return &(options->distort_corner);
 		case SLIDER_ROUND_CORNER: return &(options->round_corner);
 		case SLIDER_SMOOTH_BORDER: return &(options->smooth_border);
 		case SLIDER_REFLECTION: return &(options->reflection);
@@ -2756,8 +2768,14 @@ void uniform::update()
 		case CU_POST_VIGNETTING:
 			m_shader->set_float("VignettingAmount", options->vignetting);
 			break;
-		case CU_POST_CURVATURE:
-			m_shader->set_float("CurvatureAmount", options->curvature);
+		case CU_POST_DISTORTION:
+			m_shader->set_float("DistortionAmount", options->distortion);
+			break;
+		case CU_POST_CUBIC_DISTORTION:
+			m_shader->set_float("CubicDistortionAmount", options->cubic_distortion);
+			break;
+		case CU_POST_DISTORT_CORNER:
+			m_shader->set_float("DistortCornerAmount", options->distort_corner);
 			break;
 		case CU_POST_ROUND_CORNER:
 			m_shader->set_float("RoundCornerAmount", options->round_corner);
