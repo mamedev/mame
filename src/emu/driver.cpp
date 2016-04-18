@@ -201,9 +201,8 @@ ioport_constructor driver_device::device_input_ports() const
 void driver_device::device_start()
 {
 	// reschedule ourselves to be last
-	device_iterator iter(*this);
-	for (device_t *test = iter.first(); test != nullptr; test = iter.next())
-		if (test != this && !test->started())
+	for (device_t &test : device_iterator(*this))
+		if (&test != this && !test.started())
 			throw device_missing_dependencies();
 
 	// call the game-specific init

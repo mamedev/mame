@@ -20,21 +20,9 @@
 
 ui_menu_device_config::ui_menu_device_config(running_machine &machine, render_container *container, device_slot_interface *slot, device_slot_option *option) : ui_menu(machine, container)
 {
-	std::string tmp_tag;
-	tmp_tag.assign(slot->device().tag()).append(":").append(option->name());
 	m_option = option;
 	m_owner = slot;
-	m_mounted = false;
-
-	device_iterator deviter(machine.config().root_device());
-	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
-	{
-		if (strcmp(device->tag(), tmp_tag.c_str()) == 0)
-		{
-			m_mounted = true;
-			break;
-		}
-	}
+	m_mounted = slot->device().subdevice(option->name()) != nullptr;
 }
 
 void ui_menu_device_config::populate()
@@ -59,22 +47,21 @@ void ui_menu_device_config::populate()
 	{
 		str << "* CPU:\n";
 		std::unordered_set<std::string> exectags;
-		for (device_execute_interface *exec = execiter.first(); exec != nullptr; exec = execiter.next())
+		for (device_execute_interface &exec : execiter)
 		{
-			if (!exectags.insert(exec->device().tag()).second)
+			if (!exectags.insert(exec.device().tag()).second)
 				continue;
 
 			// get cpu specific clock that takes internal multiplier/dividers into account
-			int clock = exec->device().clock();
+			int clock = exec.device().clock();
 
 			// count how many identical CPUs we have
 			int count = 1;
-			const char *name = exec->device().name();
-			execute_interface_iterator execinneriter(*dev);
-			for (device_execute_interface *scan = execinneriter.first(); scan != nullptr; scan = execinneriter.next())
+			const char *name = exec.device().name();
+			for (device_execute_interface &scan : execiter)
 			{
-				if (exec->device().type() == scan->device().type() && strcmp(name, scan->device().name()) == 0 && exec->device().clock() == scan->device().clock())
-					if (exectags.insert(scan->device().tag()).second)
+				if (exec.device().type() == scan.device().type() && strcmp(name, scan.device().name()) == 0 && exec.device().clock() == scan.device().clock())
+					if (exectags.insert(scan.device().tag()).second)
 						count++;
 			}
 
@@ -98,20 +85,20 @@ void ui_menu_device_config::populate()
 	if (scriter.count() > 0)
 	{
 		str << "* Video:\n";
-		for (screen_device *screen = scriter.first(); screen != nullptr; screen = scriter.next())
+		for (screen_device &screen : scriter)
 		{
-			util::stream_format(str, "  Screen '%s': ", screen->tag());
+			util::stream_format(str, "  Screen '%s': ", screen.tag());
 
-			if (screen->screen_type() == SCREEN_TYPE_VECTOR)
+			if (screen.screen_type() == SCREEN_TYPE_VECTOR)
 				str << "Vector\n";
 			else
 			{
-				const rectangle &visarea = screen->visible_area();
+				const rectangle &visarea = screen.visible_area();
 
 				util::stream_format(str, "%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
 									visarea.width(), visarea.height(),
 									(machine().system().flags & ORIENTATION_SWAP_XY) ? "V" : "H",
-									ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds()));
+									ATTOSECONDS_TO_HZ(screen.frame_period().attoseconds()));
 			}
 		}
 	}
@@ -122,18 +109,17 @@ void ui_menu_device_config::populate()
 	{
 		str << "* Sound:\n";
 		std::unordered_set<std::string> soundtags;
-		for (device_sound_interface *sound = snditer.first(); sound != nullptr; sound = snditer.next())
+		for (device_sound_interface &sound : snditer)
 		{
-			if (!soundtags.insert(sound->device().tag()).second)
+			if (!soundtags.insert(sound.device().tag()).second)
 				continue;
 
 			// count how many identical sound chips we have
 			int count = 1;
-			sound_interface_iterator sndinneriter(*dev);
-			for (device_sound_interface *scan = sndinneriter.first(); scan != nullptr; scan = sndinneriter.next())
+			for (device_sound_interface &scan : snditer)
 			{
-				if (sound->device().type() == scan->device().type() && sound->device().clock() == scan->device().clock())
-					if (soundtags.insert(scan->device().tag()).second)
+				if (sound.device().type() == scan.device().type() && sound.device().clock() == scan.device().clock())
+					if (soundtags.insert(scan.device().tag()).second)
 						count++;
 			}
 			// if more than one, prepend a #x in front of the CPU name
@@ -141,10 +127,10 @@ void ui_menu_device_config::populate()
 				util::stream_format(str,"  %d" UTF8_MULTIPLY, count);
 			else
 				str << "  ";
-			str << sound->device().name();
+			str << sound.device().name();
 
 			// display clock in kHz or MHz
-			int clock = sound->device().clock();
+			int clock = sound.device().clock();
 			if (clock >= 1000000)
 				util::stream_format(str," %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
 			else if (clock != 0)
@@ -184,9 +170,8 @@ void ui_menu_device_config::populate()
 	std::string errors;
 	std::ostringstream dips_opt, confs_opt;
 	ioport_list portlist;
-	device_iterator iptiter(*dev);
-	for (device_t *iptdev = iptiter.first(); iptdev != nullptr; iptdev = iptiter.next())
-		portlist.append(*iptdev, errors);
+	for (device_t &iptdev : device_iterator(*dev))
+		portlist.append(iptdev, errors);
 
 	// check if the device adds inputs to the system
 	for (ioport_port &port : portlist)
@@ -263,16 +248,16 @@ void ui_menu_device_config::populate()
 	if (imgiter.count() > 0)
 	{
 		str << "* Media Options:\n";
-		for (const device_image_interface *imagedev = imgiter.first(); imagedev != nullptr; imagedev = imgiter.next())
-			util::stream_format(str, "  %s    [tag: %s]\n", imagedev->image_type_name(), imagedev->device().tag());
+		for (const device_image_interface &imagedev : imgiter)
+			util::stream_format(str, "  %s    [tag: %s]\n", imagedev.image_type_name(), imagedev.device().tag());
 	}
 
 	slot_interface_iterator slotiter(*dev);
 	if (slotiter.count() > 0)
 	{
 		str << "* Slot Options:\n";
-		for (const device_slot_interface *slot = slotiter.first(); slot != nullptr; slot = slotiter.next())
-			util::stream_format(str, "  %s    [default: %s]\n", slot->device().tag(), slot->default_option() ? slot->default_option() : "----");
+		for (const device_slot_interface &slot : slotiter)
+			util::stream_format(str, "  %s    [default: %s]\n", slot.device().tag(), slot.default_option() ? slot.default_option() : "----");
 	}
 
 	if ((execiter.count() + scriter.count() + snditer.count() + imgiter.count() + slotiter.count() + bios + dips + confs

@@ -569,19 +569,15 @@ int debug_command_parameter_cpu(running_machine &machine, const char *param, dev
 	}
 
 	/* if we got a valid one, return */
-	const UINT64 original_cpunum = cpunum;
-	execute_interface_iterator iter(machine.root_device());
-	for (device_execute_interface *exec = iter.first(); exec != nullptr; exec = iter.next())
+	device_execute_interface *exec = execute_interface_iterator(machine.root_device()).byindex(cpunum);
+	if (exec != nullptr)
 	{
-		if (cpunum-- == 0)
-		{
-			*result = &exec->device();
-			return TRUE;
-		}
+		*result = &exec->device();
+		return TRUE;
 	}
 
 	/* if out of range, complain */
-	debug_console_printf(machine, "Invalid CPU index %d\n", (UINT32)original_cpunum);
+	debug_console_printf(machine, "Invalid CPU index %d\n", (int)cpunum);
 	return FALSE;
 }
 
@@ -1009,10 +1005,9 @@ static void execute_focus(running_machine &machine, int ref, int params, const c
 	cpu->debug()->ignore(false);
 
 	/* then loop over CPUs and set the ignore flags on all other CPUs */
-	execute_interface_iterator iter(machine.root_device());
-	for (device_execute_interface *exec = iter.first(); exec != nullptr; exec = iter.next())
-		if (&exec->device() != cpu)
-			exec->device().debug()->ignore(true);
+	for (device_execute_interface &exec : execute_interface_iterator(machine.root_device()))
+		if (&exec.device() != cpu)
+			exec.device().debug()->ignore(true);
 	debug_console_printf(machine, "Now focused on CPU '%s'\n", cpu->tag());
 }
 
@@ -1029,16 +1024,15 @@ static void execute_ignore(running_machine &machine, int ref, int params, const 
 		std::string buffer;
 
 		/* loop over all executable devices */
-		execute_interface_iterator iter(machine.root_device());
-		for (device_execute_interface *exec = iter.first(); exec != nullptr; exec = iter.next())
+		for (device_execute_interface &exec : execute_interface_iterator(machine.root_device()))
 
 			/* build up a comma-separated list */
-			if (!exec->device().debug()->observing())
+			if (!exec.device().debug()->observing())
 			{
 				if (buffer.empty())
-					buffer = string_format("Currently ignoring device '%s'", exec->device().tag());
+					buffer = string_format("Currently ignoring device '%s'", exec.device().tag());
 				else
-					buffer.append(string_format(", '%s'", exec->device().tag()));
+					buffer.append(string_format(", '%s'", exec.device().tag()));
 			}
 
 		/* special message for none */
@@ -1061,10 +1055,9 @@ static void execute_ignore(running_machine &machine, int ref, int params, const 
 		for (int paramnum = 0; paramnum < params; paramnum++)
 		{
 			/* make sure this isn't the last live CPU */
-			execute_interface_iterator iter(machine.root_device());
 			bool gotone = false;
-			for (device_execute_interface *exec = iter.first(); exec != nullptr; exec = iter.next())
-				if (&exec->device() != devicelist[paramnum] && exec->device().debug()->observing())
+			for (device_execute_interface &exec : execute_interface_iterator(machine.root_device()))
+				if (&exec.device() != devicelist[paramnum] && exec.device().debug()->observing())
 				{
 					gotone = true;
 					break;
@@ -1094,16 +1087,15 @@ static void execute_observe(running_machine &machine, int ref, int params, const
 		std::string buffer;
 
 		/* loop over all executable devices */
-		execute_interface_iterator iter(machine.root_device());
-		for (device_execute_interface *exec = iter.first(); exec != nullptr; exec = iter.next())
+		for (device_execute_interface &exec : execute_interface_iterator(machine.root_device()))
 
 			/* build up a comma-separated list */
-			if (exec->device().debug()->observing())
+			if (exec.device().debug()->observing())
 			{
 				if (buffer.empty())
-					buffer = string_format("Currently observing CPU '%s'", exec->device().tag());
+					buffer = string_format("Currently observing CPU '%s'", exec.device().tag());
 				else
-					buffer.append(string_format(", '%s'", exec->device().tag()));
+					buffer.append(string_format(", '%s'", exec.device().tag()));
 			}
 
 		/* special message for none */
@@ -1246,9 +1238,8 @@ static void execute_bpclear(running_machine &machine, int ref, int params, const
 	/* if 0 parameters, clear all */
 	if (params == 0)
 	{
-		device_iterator iter(machine.root_device());
-		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-			device->debug()->breakpoint_clear_all();
+		for (device_t &device : device_iterator(machine.root_device()))
+			device.debug()->breakpoint_clear_all();
 		debug_console_printf(machine, "Cleared all breakpoints\n");
 	}
 
@@ -1257,10 +1248,9 @@ static void execute_bpclear(running_machine &machine, int ref, int params, const
 		return;
 	else
 	{
-		device_iterator iter(machine.root_device());
 		bool found = false;
-		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-			if (device->debug()->breakpoint_clear(bpindex))
+		for (device_t &device : device_iterator(machine.root_device()))
+			if (device.debug()->breakpoint_clear(bpindex))
 				found = true;
 		if (found)
 			debug_console_printf(machine, "Breakpoint %X cleared\n", (UINT32)bpindex);
@@ -1282,9 +1272,8 @@ static void execute_bpdisenable(running_machine &machine, int ref, int params, c
 	/* if 0 parameters, clear all */
 	if (params == 0)
 	{
-		device_iterator iter(machine.root_device());
-		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-			device->debug()->breakpoint_enable_all(ref);
+		for (device_t &device : device_iterator(machine.root_device()))
+			device.debug()->breakpoint_enable_all(ref);
 		if (ref == 0)
 			debug_console_printf(machine, "Disabled all breakpoints\n");
 		else
@@ -1296,10 +1285,9 @@ static void execute_bpdisenable(running_machine &machine, int ref, int params, c
 		return;
 	else
 	{
-		device_iterator iter(machine.root_device());
 		bool found = false;
-		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-			if (device->debug()->breakpoint_enable(bpindex, ref))
+		for (device_t &device : device_iterator(machine.root_device()))
+			if (device.debug()->breakpoint_enable(bpindex, ref))
 				found = true;
 		if (found)
 			debug_console_printf(machine, "Breakpoint %X %s\n", (UINT32)bpindex, ref ? "enabled" : "disabled");
@@ -1320,16 +1308,15 @@ static void execute_bplist(running_machine &machine, int ref, int params, const 
 	std::string buffer;
 
 	/* loop over all CPUs */
-	device_iterator iter(machine.root_device());
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-		if (device->debug()->breakpoint_first() != nullptr)
+	for (device_t &device : device_iterator(machine.root_device()))
+		if (device.debug()->breakpoint_first() != nullptr)
 		{
-			debug_console_printf(machine, "Device '%s' breakpoints:\n", device->tag());
+			debug_console_printf(machine, "Device '%s' breakpoints:\n", device.tag());
 
 			/* loop over the breakpoints */
-			for (device_debug::breakpoint *bp = device->debug()->breakpoint_first(); bp != nullptr; bp = bp->next())
+			for (device_debug::breakpoint *bp = device.debug()->breakpoint_first(); bp != nullptr; bp = bp->next())
 			{
-				buffer = string_format("%c%4X @ %0*X", bp->enabled() ? ' ' : 'D', bp->index(), device->debug()->logaddrchars(), bp->address());
+				buffer = string_format("%c%4X @ %0*X", bp->enabled() ? ' ' : 'D', bp->index(), device.debug()->logaddrchars(), bp->address());
 				if (std::string(bp->condition()).compare("1") != 0)
 					buffer.append(string_format(" if %s", bp->condition()));
 				if (std::string(bp->action()).compare("") != 0)
@@ -1409,9 +1396,8 @@ static void execute_wpclear(running_machine &machine, int ref, int params, const
 	/* if 0 parameters, clear all */
 	if (params == 0)
 	{
-		device_iterator iter(machine.root_device());
-		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-			device->debug()->watchpoint_clear_all();
+		for (device_t &device : device_iterator(machine.root_device()))
+			device.debug()->watchpoint_clear_all();
 		debug_console_printf(machine, "Cleared all watchpoints\n");
 	}
 
@@ -1420,10 +1406,9 @@ static void execute_wpclear(running_machine &machine, int ref, int params, const
 		return;
 	else
 	{
-		device_iterator iter(machine.root_device());
 		bool found = false;
-		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-			if (device->debug()->watchpoint_clear(wpindex))
+		for (device_t &device : device_iterator(machine.root_device()))
+			if (device.debug()->watchpoint_clear(wpindex))
 				found = true;
 		if (found)
 			debug_console_printf(machine, "Watchpoint %X cleared\n", (UINT32)wpindex);
@@ -1445,9 +1430,8 @@ static void execute_wpdisenable(running_machine &machine, int ref, int params, c
 	/* if 0 parameters, clear all */
 	if (params == 0)
 	{
-		device_iterator iter(machine.root_device());
-		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-			device->debug()->watchpoint_enable_all(ref);
+		for (device_t &device : device_iterator(machine.root_device()))
+			device.debug()->watchpoint_enable_all(ref);
 		if (ref == 0)
 			debug_console_printf(machine, "Disabled all watchpoints\n");
 		else
@@ -1459,10 +1443,9 @@ static void execute_wpdisenable(running_machine &machine, int ref, int params, c
 		return;
 	else
 	{
-		device_iterator iter(machine.root_device());
 		bool found = false;
-		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-			if (device->debug()->watchpoint_enable(wpindex, ref))
+		for (device_t &device : device_iterator(machine.root_device()))
+			if (device.debug()->watchpoint_enable(wpindex, ref))
 				found = true;
 		if (found)
 			debug_console_printf(machine, "Watchpoint %X %s\n", (UINT32)wpindex, ref ? "enabled" : "disabled");
@@ -1483,18 +1466,17 @@ static void execute_wplist(running_machine &machine, int ref, int params, const 
 	std::string buffer;
 
 	/* loop over all CPUs */
-	device_iterator iter(machine.root_device());
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
+	for (device_t &device : device_iterator(machine.root_device()))
 		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
-			if (device->debug()->watchpoint_first(spacenum) != nullptr)
+			if (device.debug()->watchpoint_first(spacenum) != nullptr)
 			{
 				static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
 
-				debug_console_printf(machine, "Device '%s' %s space watchpoints:\n", device->tag(),
-																						device->debug()->watchpoint_first(spacenum)->space().name());
+				debug_console_printf(machine, "Device '%s' %s space watchpoints:\n", device.tag(),
+																						device.debug()->watchpoint_first(spacenum)->space().name());
 
 				/* loop over the watchpoints */
-				for (device_debug::watchpoint *wp = device->debug()->watchpoint_first(spacenum); wp != nullptr; wp = wp->next())
+				for (device_debug::watchpoint *wp = device.debug()->watchpoint_first(spacenum); wp != nullptr; wp = wp->next())
 				{
 					buffer = string_format("%c%4X @ %0*X-%0*X %s", wp->enabled() ? ' ' : 'D', wp->index(),
 							wp->space().addrchars(), wp->space().byte_to_address(wp->address()),
@@ -1556,9 +1538,8 @@ static void execute_rpclear(running_machine &machine, int ref, int params, const
 	/* if 0 parameters, clear all */
 	if (params == 0)
 	{
-		device_iterator iter(machine.root_device());
-		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-			device->debug()->registerpoint_clear_all();
+		for (device_t &device : device_iterator(machine.root_device()))
+			device.debug()->registerpoint_clear_all();
 		debug_console_printf(machine, "Cleared all registerpoints\n");
 	}
 
@@ -1567,10 +1548,9 @@ static void execute_rpclear(running_machine &machine, int ref, int params, const
 		return;
 	else
 	{
-		device_iterator iter(machine.root_device());
 		bool found = false;
-		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-			if (device->debug()->registerpoint_clear(rpindex))
+		for (device_t &device : device_iterator(machine.root_device()))
+			if (device.debug()->registerpoint_clear(rpindex))
 				found = true;
 		if (found)
 			debug_console_printf(machine, "Registerpoint %X cleared\n", (UINT32)rpindex);
@@ -1592,9 +1572,8 @@ static void execute_rpdisenable(running_machine &machine, int ref, int params, c
 	/* if 0 parameters, clear all */
 	if (params == 0)
 	{
-		device_iterator iter(machine.root_device());
-		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-			device->debug()->registerpoint_enable_all(ref);
+		for (device_t &device : device_iterator(machine.root_device()))
+			device.debug()->registerpoint_enable_all(ref);
 		if (ref == 0)
 			debug_console_printf(machine, "Disabled all registerpoints\n");
 		else
@@ -1606,10 +1585,9 @@ static void execute_rpdisenable(running_machine &machine, int ref, int params, c
 		return;
 	else
 	{
-		device_iterator iter(machine.root_device());
 		bool found = false;
-		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-			if (device->debug()->registerpoint_enable(rpindex, ref))
+		for (device_t &device : device_iterator(machine.root_device()))
+			if (device.debug()->registerpoint_enable(rpindex, ref))
 				found = true;
 		if (found)
 			debug_console_printf(machine, "Registerpoint %X %s\n", (UINT32)rpindex, ref ? "enabled" : "disabled");
@@ -1630,14 +1608,13 @@ static void execute_rplist(running_machine &machine, int ref, int params, const 
 	std::string buffer;
 
 	/* loop over all CPUs */
-	device_iterator iter(machine.root_device());
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-		if (device->debug()->registerpoint_first() != nullptr)
+	for (device_t &device : device_iterator(machine.root_device()))
+		if (device.debug()->registerpoint_first() != nullptr)
 		{
-			debug_console_printf(machine, "Device '%s' registerpoints:\n", device->tag());
+			debug_console_printf(machine, "Device '%s' registerpoints:\n", device.tag());
 
 			/* loop over the breakpoints */
-			for (device_debug::registerpoint *rp = device->debug()->registerpoint_first(); rp != nullptr; rp = rp->next())
+			for (device_debug::registerpoint *rp = device.debug()->registerpoint_first(); rp != nullptr; rp = rp->next())
 			{
 				buffer = string_format("%c%4X if %s", rp->enabled() ? ' ' : 'D', rp->index(), rp->condition());
 				if (rp->action() != nullptr)
@@ -1665,12 +1642,11 @@ static void execute_hotspot(running_machine &machine, int ref, int params, const
 		bool cleared = false;
 
 		/* loop over CPUs and find live spots */
-		device_iterator iter(machine.root_device());
-		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-			if (device->debug()->hotspot_tracking_enabled())
+		for (device_t &device : device_iterator(machine.root_device()))
+			if (device.debug()->hotspot_tracking_enabled())
 			{
-				device->debug()->hotspot_track(0, 0);
-				debug_console_printf(machine, "Cleared hotspot tracking on CPU '%s'\n", device->tag());
+				device.debug()->hotspot_track(0, 0);
+				debug_console_printf(machine, "Cleared hotspot tracking on CPU '%s'\n", device.tag());
 				cleared = true;
 			}
 
@@ -1718,11 +1694,10 @@ static void execute_stateload(running_machine &machine, int ref, int params, con
 	machine.immediate_load(filename.c_str());
 
 	// Clear all PC & memory tracks
-	device_iterator iter(machine.root_device());
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
+	for (device_t &device : device_iterator(machine.root_device()))
 	{
-		device->debug()->track_pc_data_clear();
-		device->debug()->track_mem_data_clear();
+		device.debug()->track_pc_data_clear();
+		device.debug()->track_mem_data_clear();
 	}
 	debug_console_printf(machine, "State load attempted.  Please refer to window message popup for results.\n");
 }
@@ -3036,13 +3011,10 @@ static void execute_hardreset(running_machine &machine, int ref, int params, con
 static void execute_images(running_machine &machine, int ref, int params, const char **param)
 {
 	image_interface_iterator iter(machine.root_device());
-	for (device_image_interface *img = iter.first(); img != nullptr; img = iter.next())
-	{
-		debug_console_printf(machine, "%s: %s\n",img->brief_instance_name(),img->exists() ? img->filename() : "[empty slot]");
-	}
-	if (iter.first() == nullptr) {
+	for (device_image_interface &img : iter)
+		debug_console_printf(machine, "%s: %s\n", img.brief_instance_name(), img.exists() ? img.filename() : "[empty slot]");
+	if (iter.first() == nullptr)
 		debug_console_printf(machine, "No image devices in this driver\n");
-	}
 }
 
 /*-------------------------------------------------
@@ -3051,16 +3023,15 @@ static void execute_images(running_machine &machine, int ref, int params, const 
 
 static void execute_mount(running_machine &machine, int ref, int params, const char **param)
 {
-	image_interface_iterator iter(machine.root_device());
 	bool done = false;
-	for (device_image_interface *img = iter.first(); img != nullptr; img = iter.next())
+	for (device_image_interface &img : image_interface_iterator(machine.root_device()))
 	{
-		if (strcmp(img->brief_instance_name(),param[0])==0) {
-			if (img->load(param[1])==IMAGE_INIT_FAIL) {
+		if (strcmp(img.brief_instance_name(),param[0]) == 0)
+		{
+			if (img.load(param[1])==IMAGE_INIT_FAIL)
 				debug_console_printf(machine, "Unable to mount file %s on %s\n",param[1],param[0]);
-			} else {
+			else
 				debug_console_printf(machine, "File %s mounted on %s\n",param[1],param[0]);
-			}
 			done = true;
 			break;
 		}
@@ -3075,12 +3046,12 @@ static void execute_mount(running_machine &machine, int ref, int params, const c
 
 static void execute_unmount(running_machine &machine, int ref, int params, const char **param)
 {
-	image_interface_iterator iter(machine.root_device());
 	bool done = false;
-	for (device_image_interface *img = iter.first(); img != nullptr; img = iter.next())
+	for (device_image_interface &img : image_interface_iterator(machine.root_device()))
 	{
-		if (strcmp(img->brief_instance_name(),param[0])==0) {
-			img->unload();
+		if (strcmp(img.brief_instance_name(),param[0]) == 0)
+		{
+			img.unload();
 			debug_console_printf(machine, "Unmounted file from : %s\n",param[0]);
 			done = true;
 			break;

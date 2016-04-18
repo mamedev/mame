@@ -1073,22 +1073,8 @@ OSDWORK_CALLBACK( sdl_window_info::draw_video_contents_wt )
 
 	{
 #if 1
-		int scrnum = 0;
-		int is_vector = 0;
-		screen_device_iterator iter(window->machine().root_device());
-		for (const screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
-		{
-			if (scrnum == window->m_index)
-			{
-				is_vector = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? 1 : 0;
-				break;
-			}
-			else
-			{
-				scrnum++;
-			}
-		}
-		if (is_vector)
+		const screen_device *screen = screen_device_iterator(window->machine().root_device()).byindex(window->m_index);
+		if ((screen != nullptr) && (screen->screen_type() == SCREEN_TYPE_VECTOR))
 			window->renderer().set_flags(osd_renderer::FLAG_HAS_VECTOR_SCREEN);
 		else
 			window->renderer().clear_flags(osd_renderer::FLAG_HAS_VECTOR_SCREEN);

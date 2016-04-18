@@ -1141,22 +1141,21 @@ void cheat_manager::reload()
 
 	// load the cheat file, if it's a system that has a software list then try softlist_name/shortname.xml first,
 	// if it fails to load then try to load via crc32 - basename/crc32.xml ( eg. 01234567.xml )
-	image_interface_iterator iter(machine().root_device());
-	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
-		if (image->exists())
+	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+		if (image.exists())
 		{
 			// if we are loading through a software list, try to load softlist_name/shortname.xml
 			// this allows the coexistence of arcade cheats with cheats for home conversions which
 			// have the same shortname
-			if (image->software_entry() != nullptr)
+			if (image.software_entry() != nullptr)
 			{
-				load_cheats(string_format("%s%s%s", image->software_list_name(), PATH_SEPARATOR, image->basename()).c_str());
+				load_cheats(string_format("%s%s%s", image.software_list_name(), PATH_SEPARATOR, image.basename()).c_str());
 				break;
 			}
 			// else we are loading outside the software list, try to load machine_basename/crc32.xml
 			else
 			{
-				UINT32 crc = image->crc();
+				UINT32 crc = image.crc();
 				if (crc != 0)
 				{
 					load_cheats(string_format("%s%s%08X", machine().basename(), PATH_SEPARATOR, crc).c_str());

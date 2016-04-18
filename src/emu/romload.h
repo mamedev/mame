@@ -305,7 +305,7 @@ public:
 	void load_software_part_region(device_t &device, software_list_device &swlist, const char *swname, const rom_entry *start_region);
 
 private:
-	void determine_bios_rom(device_t *device, const char *specbios);
+	void determine_bios_rom(device_t &device, const char *specbios);
 	void count_roms();
 	void fill_random(UINT8 *base, UINT32 length);
 	void handle_missing_file(const rom_entry *romp, std::string tried_file_names, chd_error chderr);

@@ -86,16 +86,19 @@ bool finder_base::validate_memregion(size_t bytes, bool required) const
 	std::string region_fulltag = m_base.subtag(m_tag);
 
 	// look for the region
-	device_iterator deviter(m_base.mconfig().root_device());
-	for (device_t *dev = deviter.first(); dev != nullptr && bytes_found == 0; dev = deviter.next())
-		for (const rom_entry *romp = rom_first_region(*dev); romp != nullptr; romp = rom_next_region(romp))
+	for (device_t &dev : device_iterator(m_base.mconfig().root_device()))
+	{
+		for (const rom_entry *romp = rom_first_region(dev); romp != nullptr; romp = rom_next_region(romp))
 		{
-			if (rom_region_name(*dev, romp) == region_fulltag)
+			if (rom_region_name(dev, romp) == region_fulltag)
 			{
 				bytes_found = ROMREGION_GETLENGTH(romp);
 				break;
 			}
 		}
+		if (bytes_found != 0)
+			break;
+	}
 
 	if (bytes_found != 0)
 	{

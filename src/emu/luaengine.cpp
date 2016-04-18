@@ -547,10 +547,10 @@ luabridge::LuaRef lua_engine::l_machine_get_images(const running_machine *r)
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef image_table = luabridge::LuaRef::newTable(L);
 
-	image_interface_iterator iter(r->root_device());
-	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next()) {
-		image_table[image->brief_instance_name()] = image;
-		image_table[image->instance_name()] = image;
+	for (device_image_interface &image : image_interface_iterator(r->root_device()))
+	{
+		image_table[image.brief_instance_name()] = &image;
+		image_table[image.instance_name()] = &image;
 	}
 
 	return image_table;

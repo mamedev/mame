@@ -72,19 +72,19 @@ ui_menu_bios_selection::ui_menu_bios_selection(running_machine &machine, render_
 void ui_menu_bios_selection::populate()
 {
 	/* cycle through all devices for this system */
-	device_iterator deviter(machine().root_device());
-	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
+	for (device_t &device : device_iterator(machine().root_device()))
 	{
-		if (device->rom_region()) {
+		if (device.rom_region())
+		{
 			const char *val = "default";
-			for (const rom_entry *rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++)
+			for (const rom_entry *rom = device.rom_region(); !ROMENTRY_ISEND(rom); rom++)
 			{
-				if (ROMENTRY_ISSYSTEM_BIOS(rom) && ROM_GETBIOSFLAGS(rom)==device->system_bios())
+				if (ROMENTRY_ISSYSTEM_BIOS(rom) && ROM_GETBIOSFLAGS(rom) == device.system_bios())
 				{
 					val = ROM_GETHASHDATA(rom);
 				}
 			}
-			item_append(strcmp(device->tag(),":")==0 ? "driver" : device->tag()+1, val, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)device);
+			item_append(device.owner() == nullptr ? "driver" : device.tag()+1, val, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)&device);
 		}
 	}
 
@@ -154,10 +154,9 @@ ui_menu_network_devices::~ui_menu_network_devices()
 void ui_menu_network_devices::populate()
 {
 	/* cycle through all devices for this system */
-	network_interface_iterator iter(machine().root_device());
-	for (device_network_interface *network = iter.first(); network != nullptr; network = iter.next())
+	for (device_network_interface &network : network_interface_iterator(machine().root_device()))
 	{
-		int curr = network->get_interface();
+		int curr = network.get_interface();
 		const char *title = nullptr;
 		const osd_netdev::entry_t *entry = netdev_first();
 		while(entry) {
@@ -168,7 +167,7 @@ void ui_menu_network_devices::populate()
 			entry = entry->m_next;
 		}
 
-		item_append(network->device().tag(),  (title) ? title : "------", MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)network);
+		item_append(network.device().tag(),  (title) ? title : "------", MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)network);
 	}
 }
 
