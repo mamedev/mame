@@ -1523,12 +1523,12 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 
 int lua_engine::lua_emu_file::l_emu_file_read(lua_State *L)
 {
-	emu_file *file = luabridge::Stack<emu_file *>::get(L, 1);
+	lua_emu_file *file = luabridge::Stack<lua_emu_file *>::get(L, 1);
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "length (integer) expected");
 	int ret, len = lua_tonumber(L, 2);
 	luaL_Buffer buff;
 	char *ptr = luaL_buffinitsize(L, &buff, len);
-	ret = file->read(ptr, len);
+	ret = file->file.read(ptr, len);
 	luaL_pushresultsize(&buff, ret);
 	return 1;
 }
@@ -1738,7 +1738,8 @@ int lua_engine::compile_with_env(const char *envname, const char *script, const 
 	if(env)
 	{
 		error = luaL_loadstring(m_lua_state, env);
-		lua_pushvalue(m_lua_state, -2);
+		if(error == LUA_OK)
+			lua_pushvalue(m_lua_state, -2);
 		if((error != LUA_OK) || ((error = lua_pcall(m_lua_state, 1, 0, 0)) != LUA_OK))
 		{
 			if((error == LUA_ERRSYNTAX) || (error == LUA_ERRRUN))
@@ -1770,7 +1771,10 @@ Tout lua_engine::run(const char *env, int ref, Tin in)
 	lua_settop(m_lua_state, 0);
 	luabridge::Stack<Tin>::push(m_lua_state, in);
 	run_internal(env, ref);
-	ret = luabridge::Stack<Tout>::get(m_lua_state, 1);
+	if(lua_isnil(m_lua_state, 1))
+		ret = reinterpret_cast<Tout>(0);
+	else
+		ret = luabridge::Stack<Tout>::get(m_lua_state, 1);
 	lua_pop(m_lua_state, 1);
 	return ret;
 }
@@ -1782,7 +1786,10 @@ Tout lua_engine::run(const char *env, int ref)
 	lua_settop(m_lua_state, 0);
 	lua_pushnil(m_lua_state);
 	run_internal(env, ref);
-	ret = luabridge::Stack<Tout>::get(m_lua_state, 1);
+	if(lua_isnil(m_lua_state, 1))
+		ret = reinterpret_cast<Tout>(0);
+	else
+		ret = luabridge::Stack<Tout>::get(m_lua_state, 1);
 	lua_pop(m_lua_state, 1);
 	return ret;
 }
@@ -1906,7 +1913,7 @@ int lua_engine::l_emu_register_menu(lua_State *L)
 {
 	luaL_argcheck(L, lua_isfunction(L, 1), 1, "callback function expected");
 	luaL_argcheck(L, lua_isfunction(L, 2), 2, "callback function expected");
-	luaL_argcheck(L, lua_isstring(L, 3), 3, "message (string) expected");
+	luaL_argcheck(L, lua_isstring(L, 3), 3, "name (string) expected");
 	std::string name = luaL_checkstring(L, 3);
 	std::string cbfield = "menu_cb_" + name;
 	std::string popfield = "menu_pop_" + name;
@@ -2476,19 +2483,15 @@ void lua_engine::initialize()
 				.addProperty <bool> ("is_creatable", &device_image_interface::is_creatable)
 				.addProperty <bool> ("is_reset_on_load", &device_image_interface::is_reset_on_load)
 			.endClass()
-			.beginClass <lua_emu_file> ("lua_file")
-				.addCFunction ("read", &lua_emu_file::l_emu_file_read)
-			.endClass()
-			// make sure there's a reference to the emu_file search path in your script as long as you need it
-			// otherwise it might be garbage collected as emu_file doesn't copy the string
-			.deriveClass <emu_file, lua_emu_file> ("file")
+			.beginClass <lua_emu_file> ("file")
 				.addConstructor <void (*)(const char *, UINT32)> ()
-				.addFunction ("open", static_cast<osd_file::error (emu_file::*)(const char *)>(&emu_file::open))
-				.addFunction ("open_next", &emu_file::open_next)
-				.addFunction ("seek", &emu_file::seek)
-				.addFunction ("size", &emu_file::size)
-				.addFunction ("filename", &emu_file::filename)
-				.addFunction ("fullpath", &emu_file::fullpath)
+				.addCFunction ("read", &lua_emu_file::l_emu_file_read)
+				.addFunction ("open", &lua_emu_file::open)
+				.addFunction ("open_next", &lua_emu_file::open_next)
+				.addFunction ("seek", &lua_emu_file::seek)
+				.addFunction ("size", &lua_emu_file::size)
+				.addFunction ("filename", &lua_emu_file::filename)
+				.addFunction ("fullpath", &lua_emu_file::fullpath)
 			.endClass()
 			.beginClass <lua_item> ("item")
 				.addConstructor <void (*)(int)> ()

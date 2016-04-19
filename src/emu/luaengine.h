@@ -208,7 +208,20 @@ private:
 	};
 
 	struct lua_emu_file {
+		lua_emu_file(const char *searchpath, UINT32 openflags) :
+			path(searchpath),
+			file(path.c_str(), openflags) {}
+
 		int l_emu_file_read(lua_State *L);
+		osd_file::error open(const char *name) {return file.open(name);}
+		osd_file::error open_next() {return file.open_next();}
+		int seek(INT64 offset, int whence) {return file.seek(offset, whence);}
+		UINT64 size() {return file.size();}
+		const char *filename() {return file.filename();}
+		const char *fullpath() {return file.fullpath();}
+
+		std::string path;
+		emu_file file;
 	};
 
 	struct lua_item {
